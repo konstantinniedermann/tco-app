@@ -29,3 +29,8 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   Hosting (Daten in der Schweiz oder EU/EWR); Entwurf der
   Datenschutzerklärung (`docs/datenschutzerklaerung.md`). Jedes Issue prüft im neuen
   Abschnitt *Datenschutz* der Issue-Vorlage, ob das Konzept angepasst werden muss.
+- Fachmodell (`docs/fachmodell.md`): Objekte von Mitglied und Konto über Clubmeisterschaft
+  (Kategorie, Anmeldung als Einzel oder Doppel, Gruppe, KO-Tableau, Spiel, Resultat Satz für
+  Satz) bis Lizenzantrag mit Stichtag; Fachregeln `FR-01` bis `FR-23` mit Anforderungs-IDs,
+  Annahmen zu offenen Fragen markiert. Junioren vorerst ausgeklammert, Datenschutzkonzept
+  entsprechend angeglichen.

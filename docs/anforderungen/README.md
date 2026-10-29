@@ -38,6 +38,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 | 29.10.2026 | Zielsetzung und Etappen festgelegt (siehe oben, [Roadmap](../roadmap.md)) | Projektleiter |
 | 29.10.2026 | Anforderungen mit IDs erfasst ([`anforderungen.md`](anforderungen.md)); Newsfeed aus der WhatsApp-Gruppe zum Verwerfen vorgeschlagen, weil nicht machbar (A-NEWSFEED-02; Bestätigung durch den Verein offen) | Projektleiter |
 | 29.10.2026 | Technik der App entschieden: zuerst installierbare Web-App mit Admin-Bereich und Web Push, Store-App bei Bedarf ([ADR-001](../adr/adr-001-web-app-zuerst.md)); beantwortet die Frage „Store oder Browser zum Mitglieder-Login“ vorläufig | Projektleiter |
+| 29.10.2026 | Fachmodell ([`fachmodell.md`](../fachmodell.md)): Junioren vorerst ausgeklammert, alle Mitglieder wie Volljährige (K-08 bleibt offen); neu der Wildcard-Antrag für Kategorien ausserhalb des eigenen Klassierungsbereichs (A-ANMELDUNG-10) | Projektleiter |
 
 ## Offene Fragen an den Verein
 

@@ -52,9 +52,11 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Auslosung | Teilt nach der Setzung die übrigen Spieler auf die Positionen im Tableau zu | Auslosung | ADV 7, 10, 28–29 |
 | Runde | Stufe im Tableau; Spielplan und Resultate werden je Runde erfasst | Runde | ADV 30, 32, 37 |
 | Begegnung | Advantage-Wort für ein einzelnes Match | Spiel | ADV 10, 32, 41; PDF 5d |
-| Anmeldung | Teilnahme eines Spielers an einer Kategorie. In Advantage meldet man sich online über myTennis an und landet in der Anmeldeliste; ins Tableau kommt man erst, wenn die Anmeldung *bestätigt* ist. In MyTCO höchstens 3 gleichzeitig | Anmeldung | PDF 5b; ADV 18, 20–23, 28–29 |
+| Anmeldung | Teilnahme eines Spielers (Einzel) oder eines Doppelteams an einer Kategorie. In Advantage meldet man sich online über myTennis an und landet in der Anmeldeliste; ins Tableau kommt man erst, wenn die Anmeldung *bestätigt* ist. In MyTCO höchstens 3 gleichzeitig | Anmeldung | PDF 5b; ADV 18, 20–23, 28–29 |
 | Anmeldeschluss | Datum, nach dem keine Anmeldungen mehr möglich sind; in Advantage je Turnier oder Konkurrenz. Beim TCO Anfang Juni | Anmeldeschluss | ADV 7, 10, 13, 28; Recherche |
 | Nenngeld | Startgebühr in Advantage, je Spieler mit Vermerk „bezahlt“. Ob die CM ein Nenngeld hat, ist nicht belegt | Nenngeld | ADV 7, 28 |
+| Wildcard-Antrag | Anmeldung für eine Kategorie ausserhalb des eigenen Klassierungsbereichs, mit Kommentar; der Verantwortliche der CM entscheidet | Wildcard-Antrag | [A-ANMELDUNG-10](anforderungen/anforderungen.md#anmeldung--anmeldung-zur-clubmeisterschaft) |
+| Folgespiel | Spiel der nächsten KO-Runde, in das der Sieger eines Spiels nachrückt | Folgespiel | [Fachmodell](fachmodell.md) |
 | Resultat | Ergebnis eines Spiels. In MyTCO melden die Spieler es selbst. In Advantage erfasst nur der Organisator, von Hand pro Runde oder Spiel; einen Import gibt es nicht | Resultat; der Vorgang heisst *Resultat melden* | PDF 5d; ADV 37, 41, 43 |
 | Rangliste | Reihenfolge in einer Gruppe nach gewonnenen Begegnungen. Bei Gleichstand gilt: 1. Direktbegegnung, 2. bessere Satzdifferenz, 3. bessere Gamedifferenz; danach manuelle Anpassung möglich. Das PDF nennt das „Einreihung“ | Rangliste | ADV 41; PDF 5d |
 | Finalwochenende | Abschluss der CM Mitte August mit den KO-Spielen | Finalwochenende | PDF 5e; Recherche |
@@ -74,6 +76,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Storno | Antrag, die Lizenz abzubestellen. *Vermutung:* entspricht der Sistierung bei Swiss Tennis (siehe [K-34](abklaerungen.md#vor-lizenzanträgen-01102027)) | Storno | Ziel; PDF 3e |
 | Sistierung | Beim TCO bis Ende Februar möglich. *Vermutung:* die Lizenz ruht für die folgende Saison. Im Advantage-Handbuch nicht erwähnt | Sistierung | Recherche |
 | Stichtag | Datum, zu dem der Lizenzverantwortliche die Liste der Lizenzanträge sieht und exportiert. *Vermutung:* liegt vor der Sistierungsfrist Ende Februar | Stichtag | Ziel |
+| Lizenzrunde | Alle Lizenzanträge eines Jahres bis zu einem Stichtag; der Lizenzverantwortliche exportiert sie gesammelt | Lizenzrunde | [Fachmodell](fachmodell.md) |
 | Lizenzliste | Jährliche Liste aller aktuellen Lizenzen als PDF, mit den Änderungen zum Vorjahr | Lizenzliste | PDF 4b |
 | Lizenzverantwortlicher | Person im Verein, die die Lizenzanträge bei Swiss Tennis von Hand einträgt. Keine der fünf Rollen im PDF | Lizenzverantwortlicher; Rolle klärt Issue #4 | Ziel |
 
