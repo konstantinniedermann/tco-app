@@ -98,6 +98,17 @@ jedes Issue mit einer Entscheidung oder einer Annahme über den Verein:
 - Entscheidungen, die ohne Antwort getroffen werden, nennen die offene Frage als Annahme
   und als Reevaluations-Trigger.
 
+## Datenschutz
+
+Das [Datenschutzkonzept](datenschutz.md) ist Grundlage für jede Funktion. Jedes Issue, das
+Personendaten neu erhebt, anders verwendet, anderen zeigt, an einen neuen Empfänger gibt,
+länger aufbewahrt oder eine Vorgabe `DS-NN` berührt, passt **vor** der Umsetzung das
+Konzept und die Datenschutzerklärung an
+([Änderungen am Konzept](datenschutz.md#änderungen-an-diesem-konzept)). Die Definition of
+Done enthält dann den Punkt *Datenschutzkonzept und Datenschutzerklärung nachgeführt*.
+Betrifft ein Issue keine Personendaten, steht das im Abschnitt *Datenschutz* der Vorlage
+in einem Satz.
+
 ## Befunde ausserhalb des Scopes
 
 Nicht jeder Befund wird ein Issue. Trivial-Fixes werden mitgemacht, alles andere kommt
@@ -114,3 +125,4 @@ Zustimmung (Regel in der übergeordneten `CLAUDE.md`).
 6. **1 Milestone**
 7. Body mit **Kontext**, **Definition of Done** und **Abhängigkeiten**
 8. Prüfen, ob eine [Abklärung beim Verein](#abklärungen-beim-verein) nötig ist
+9. Prüfen, ob das [Datenschutzkonzept](#datenschutz) angepasst werden muss

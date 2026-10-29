@@ -17,6 +17,9 @@ Definition of Done auf.
   Vereinsunterlagen liegen nur im gitignorierten Ordner `intern/`.
 - Personen aus dem Verein werden in Doku und Issues mit ihrer Rolle benannt, nicht mit
   Namen. Ausnahme: das Original-Anforderungsdokument unter `docs/anforderungen/`.
+- Nie eine Funktion planen oder bauen, die Personendaten bearbeitet, ohne sie gegen
+  `docs/datenschutz.md` zu prüfen. Was dort nicht steht, wird erst ins Konzept und die
+  Datenschutzerklärung aufgenommen, dann gebaut; die Vorgaben `DS-NN` sind verbindlich.
 
 ## Branches — Dauerverbote
 
