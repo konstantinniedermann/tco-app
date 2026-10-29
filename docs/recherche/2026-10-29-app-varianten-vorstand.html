@@ -1,0 +1,259 @@
+<title>MyTCO App-Varianten</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column for the board, decision first, then variants, member experience, budget and open questions; same tokens as the Systemlandschaft page, club teal as the only accent */
+:root{
+  --bg:#f5f8f7; --surface:#ffffff; --fg:#14211f; --muted:#5a6b68; --line:#d5dfdc;
+  --accent:#095d5d; --accent-soft:#e1efed; --on-accent:#ffffff;
+  --ok:#1f7a4a; --ok-bg:#e2f3e8; --est:#8a5a00; --est-bg:#fbefd6; --guess:#6b3fa0; --guess-bg:#efe6f8; --open:#5a6b68; --open-bg:#e9eeed;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif; --f-body:"Source Sans 3","Segoe UI",Roboto,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1716; --surface:#152120; --fg:#e4ecea; --muted:#9db0ac; --line:#2a3b39;
+  --accent:#5fc1b8; --accent-soft:#1a3331; --on-accent:#0e1716;
+  --ok:#6fd39b; --ok-bg:#16301f; --est:#f0c060; --est-bg:#33280f; --guess:#c9a6f2; --guess-bg:#2a1f3a; --open:#9db0ac; --open-bg:#1f2b2a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1716; --surface:#152120; --fg:#e4ecea; --muted:#9db0ac; --line:#2a3b39;
+  --accent:#5fc1b8; --accent-soft:#1a3331; --on-accent:#0e1716;
+  --ok:#6fd39b; --ok-bg:#16301f; --est:#f0c060; --est-bg:#33280f; --guess:#c9a6f2; --guess-bg:#2a1f3a; --open:#9db0ac; --open-bg:#1f2b2a; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:22px;font-weight:700;color:var(--accent)}
+h3{font-size:17px;font-weight:700}
+p{margin:0;max-width:72ch}
+section{display:flex;flex-direction:column;gap:14px;min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header{display:flex;flex-direction:column;gap:10px;border-bottom:2px solid var(--accent);padding-bottom:20px}
+.lead{color:var(--muted);font-size:17px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:14px;color:var(--muted)}
+.m{display:inline-block;font-family:var(--f-mono);font-size:11px;font-weight:500;line-height:1;padding:3px 6px;border-radius:4px;white-space:nowrap;vertical-align:1px}
+.m.b{color:var(--ok);background:var(--ok-bg)} .m.s{color:var(--est);background:var(--est-bg)} .m.v{color:var(--guess);background:var(--guess-bg)} .m.o{color:var(--open);background:var(--open-bg)}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.key{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.key strong{font-family:var(--f-display);font-size:16px}
+.key p{font-size:15px;color:var(--muted)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{font-family:var(--f-display);font-weight:700;font-size:13px;background:var(--accent-soft);color:var(--fg)}
+tr:last-child td{border-bottom:0}
+td .m{margin-left:4px}
+tr.grp td{background:var(--bg);font-family:var(--f-display);font-weight:700;font-size:13.5px;color:var(--accent);padding-top:14px}
+tr.tot td{font-weight:700;background:var(--accent-soft)}
+td.num,th.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.small{font-size:13.5px;color:var(--muted)}
+.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.path{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.path.rec{border:2px solid var(--accent)}
+.path ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:15px}
+.path dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:14.5px}
+.path dt{color:var(--muted)} .path dd{margin:0}
+.tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.chosen{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--on-accent);background:var(--accent);border-radius:4px;padding:3px 7px;align-self:flex-start}
+ol.q{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;max-width:80ch}
+ol.q li::marker{font-family:var(--f-mono);color:var(--accent)}
+ol.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:15px}
+ol.src{margin:0;padding-left:28px;font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.note{background:var(--accent-soft);border-radius:8px;padding:12px 16px;font-size:15px;max-width:none}
+</style>
+
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">Tennis-Club Olten · Projekt MyTCO · Entscheidungsgrundlage für den Vorstand · Stand 29.10.2026</span>
+  <h1>MyTCO als App: aus dem Browser oder aus dem App Store?</h1>
+  <p class="lead">Wie MyTCO auf die Handys der Mitglieder kommt, was das kostet und was der Verein dafür klären muss. Der Projektleiter hat entschieden, mit einer Web-App zu starten und die Store-App als Ausblick zu behalten. Diese Seite zeigt die Varianten mit Kosten, damit der Vorstand die offenen Punkte entscheiden kann.</p>
+  <div class="legend">
+    <span><span class="m b">belegt · 3</span> geprüft, Quelle Nr. 3 unten</span>
+    <span><span class="m s">Schätzung</span> eigene Einschätzung</span>
+    <span><span class="m v">Vermutung</span> naheliegend, aber nicht geprüft</span>
+    <span><span class="m o">offen</span> muss der Verein klären</span>
+  </div>
+</header>
+
+<section>
+  <h2>Das Wichtigste in Kürze</h2>
+  <div class="keys">
+    <div class="key"><strong>Start als Web-App</strong><p>Mitglieder öffnen MyTCO im Browser und legen es mit zwei Tipps als Symbol auf den Startbildschirm. Danach startet es wie eine App. Kein App Store, keine Store-Gebühren, Push-Benachrichtigungen sind möglich <span class="m b">belegt · 1</span>.</p></div>
+    <div class="key"><strong>Geldunterschied ist klein</strong><p>Eine Store-App kostet zusätzlich etwa CHF 80 pro Jahr bei Apple und einmalig CHF 20 bei Google <span class="m b">belegt · 3 5</span> <span class="m s">Kurs ~0.80</span>. Apple erlässt die Jahresgebühr anerkannten Non-Profits <span class="m b">belegt · 4</span>; ob der TCO dazu zählt, ist <span class="m o">offen</span>.</p></div>
+    <div class="key"><strong>Der eigentliche Preis ist Zeit</strong><p>Die Store-App braucht einmalig ca. 4–7 Personentage und danach ca. 1–2 Personentage pro Jahr für Store-Pflichten <span class="m s">Schätzung</span>. Ein Personentag sind etwa drei Feierabende.</p></div>
+    <div class="key"><strong>Was der Vorstand klären muss</strong><p>Ob der Verein einen Store-Eintrag erwartet, ob der TCO als gemeinnützig anerkannt ist, wer für den Verein bei Apple und Google unterschreibt und welches Budget gilt. Die Fragen stehen in Abschnitt 6.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>1 · Die drei Varianten</h2>
+  <p>Technisch gibt es mehr Wege. Für den Verein zählen drei. Der Unterschied zwischen den Werkzeugen für Store-Apps (React Native/Expo oder Flutter) ändert an Kosten und Ablauf für den Verein nichts <span class="m s">Schätzung</span>.</p>
+  <div class="paths">
+    <div class="path">
+      <span class="tag">Variante 1</span>
+      <h3>Nur Web-App</h3>
+      <ul>
+        <li>MyTCO läuft im Browser und lässt sich auf den Startbildschirm legen.</li>
+        <li>Änderungen sind ohne Store-Prüfung bei allen, spätestens beim nächsten Start <span class="m s">Schätzung</span>.</li>
+        <li>Nicht im App Store zu finden. Mitglieder kommen über Link oder QR-Code.</li>
+      </ul>
+      <dl>
+        <dt>Plattform</dt><dd>CHF 0</dd>
+        <dt>Zusatzzeit</dt><dd>keine</dd>
+        <dt>Nachteil</dt><dd>iPhone-Push nur, wenn MyTCO auf dem Startbildschirm liegt</dd>
+      </dl>
+    </div>
+    <div class="path rec">
+      <span class="chosen">gewählt</span>
+      <span class="tag">Variante 2</span>
+      <h3>Web-App jetzt, Store-App später</h3>
+      <ul>
+        <li>Start wie Variante 1.</li>
+        <li>Wird ein Store-Eintrag nötig, wird dieselbe Web-App in eine Store-App verpackt. Oberfläche und Abläufe bleiben <span class="m s">Schätzung</span>.</li>
+        <li>Store-Kosten fallen erst ab diesem Zeitpunkt an.</li>
+      </ul>
+      <dl>
+        <dt>Plattform</dt><dd>bis zum Umstieg CHF 0, danach wie Variante 3</dd>
+        <dt>Zusatzzeit</dt><dd>beim Umstieg ca. 4–7 PT, danach ca. 1–2 PT pro Jahr <span class="m s">Schätzung</span></dd>
+        <dt>Vorteil</dt><dd>Login und Mitgliederverwaltung bis Ende Februar 2027 ohne Store-Konten und Store-Prüfung</dd>
+      </dl>
+    </div>
+    <div class="path">
+      <span class="tag">Variante 3</span>
+      <h3>Store-App von Anfang an</h3>
+      <ul>
+        <li>MyTCO steht im App Store und bei Google Play.</li>
+        <li>Zuverlässiger Push auch auf dem iPhone, ohne Umweg über den Startbildschirm.</li>
+        <li>Jede neue Version geht durch die Prüfung von Apple, meist innert 48 Stunden <span class="m b">belegt · 7</span>.</li>
+      </ul>
+      <dl>
+        <dt>Plattform</dt><dd>ca. CHF 80/Jahr + CHF 20 einmalig</dd>
+        <dt>Zusatzzeit</dt><dd>ca. 3–6 PT am Anfang, danach ca. 1–2 PT pro Jahr <span class="m s">Schätzung</span></dd>
+        <dt>Nachteil</dt><dd>Vereinskonten bei Apple und Google müssen vor dem Start stehen</dd>
+      </dl>
+    </div>
+  </div>
+  <p class="note"><strong>Warum Variante 2:</strong> Bis zum Mitglieder-Login Ende Februar 2027 ist die Zeit knapp. Push wird erst für die Gruppenspiele der Clubmeisterschaft gebraucht (ab Ende Juni 2027). So geht die Zeit zuerst in Login und Mitgliederverwaltung, und die Store-App bleibt möglich, ohne neu zu bauen. Begründung im Detail: Architektur-Entscheid ADR-001 im Projekt-Repository.</p>
+</section>
+
+<section>
+  <h2>2 · Was die Mitglieder erleben</h2>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>Web-App (Varianten 1 und 2)</th><th>Store-App (Variante 3, später Variante 2)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>MyTCO finden</strong></td><td>Link oder QR-Code, z. B. im Brief mit den Zugangsdaten</td><td>Im App Store bzw. bei Google Play suchen, oder Link</td></tr>
+      <tr><td><strong>Installieren auf dem iPhone</strong></td><td>
+        <ol class="steps"><li>MyTCO in Safari öffnen</li><li>Teilen-Knopf antippen (Quadrat mit Pfeil)</li><li>„Zum Home-Bildschirm“ wählen</li></ol>
+        Ab iOS 26 öffnet jedes so abgelegte Symbol als App <span class="m b">belegt · 2</span>.</td><td>„Laden“ im App Store</td></tr>
+      <tr><td><strong>Installieren auf Android</strong></td><td>Chrome bietet „App installieren“ meist selbst an <span class="m v">Vermutung</span></td><td>„Installieren“ bei Google Play</td></tr>
+      <tr><td><strong>Push auf dem iPhone</strong></td><td>Ab iOS 16.4 (2023), nur wenn MyTCO auf dem Startbildschirm liegt; das Mitglied schaltet Push mit einem Tipp ein <span class="m b">belegt · 1</span></td><td>Nach Erlaubnis beim ersten Start</td></tr>
+      <tr><td><strong>Push auf Android</strong></td><td>Funktioniert, auch im Browser <span class="m v">Vermutung</span></td><td>Funktioniert</td></tr>
+      <tr><td><strong>Neue Version</strong></td><td>Kommt von selbst</td><td>Kommt über den Store, je nach Handy-Einstellung automatisch</td></tr>
+    </tbody>
+  </table></div>
+  <p>Bei allen Varianten gilt: <strong>Alles Wichtige kommt auch per E-Mail.</strong> Push ist eine Ergänzung. In einer Push-Nachricht stehen keine Personendaten, nur ein Hinweis wie „Neues Spiel in deiner Gruppe, öffne MyTCO“.</p>
+</section>
+
+<section>
+  <h2>3 · Budget und Kosten</h2>
+  <p>Geldbeträge in CHF, gerundet. USD zum Kurs von ca. 0.80 umgerechnet <span class="m s">Schätzung</span>. Hosting und E-Mail-Versand fallen bei jeder Variante an und werden in der Kostenübersicht des Projekts genauer bestimmt; hier die Spannen aus der Recherche Systemlandschaft.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Posten</th><th>Variante 1 · nur Web</th><th>Variante 2 · Web, später Store</th><th>Variante 3 · Store von Anfang an</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr class="grp"><td colspan="5">Laufende Kosten pro Jahr</td></tr>
+      <tr><td>Hosting (Server oder Plattformdienst in der Schweiz oder EU)</td><td class="num">60–300</td><td class="num">60–300</td><td class="num">60–300</td><td><span class="m s">Schätzung · 11</span></td></tr>
+      <tr><td>E-Mail-Versand (wenige hundert Mails pro Monat)</td><td class="num">0–150</td><td class="num">0–150</td><td class="num">0–150</td><td><span class="m s">Schätzung · 11</span></td></tr>
+      <tr><td>Web Push</td><td class="num">0</td><td class="num">0</td><td class="num">—</td><td><span class="m b">belegt · 1</span></td></tr>
+      <tr><td>Apple Developer Program (USD 99)</td><td class="num">0</td><td class="num">0, ab Umstieg ca. 80</td><td class="num">ca. 80</td><td><span class="m b">belegt · 3</span></td></tr>
+      <tr><td>… mit Gebührenerlass für Non-Profits</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="m b">belegt · 4</span> Berechtigung <span class="m o">offen</span></td></tr>
+      <tr><td>Push-Dienste von Google (Firebase) und Apple</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="m b">belegt · 8</span> <span class="m v">Vermutung</span> für Apple</td></tr>
+      <tr><td>Build-Dienst in der Cloud (nur bei Expo)</td><td class="num">0</td><td class="num">0</td><td class="num">0 im Gratisplan, sonst ab USD 19/Monat</td><td><span class="m b">belegt · 9</span></td></tr>
+      <tr class="tot"><td>Summe pro Jahr</td><td class="num">60–450</td><td class="num">60–450, ab Umstieg 140–530</td><td class="num">140–530</td><td><span class="m s">Schätzung</span></td></tr>
+      <tr class="grp"><td colspan="5">Einmalige Kosten</td></tr>
+      <tr><td>Google Play Konto (USD 25)</td><td class="num">0</td><td class="num">ca. 20 beim Umstieg</td><td class="num">ca. 20</td><td><span class="m b">belegt · 5</span></td></tr>
+      <tr><td>Domain</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td>tcolten.ch vorhanden; Nutzung von my.tcolten.ch <span class="m o">offen</span></td></tr>
+      <tr><td>Mac für iPhone-Versionen</td><td class="num">—</td><td class="num">0, wenn ein Mac vorhanden ist</td><td class="num">0 mit Cloud-Build-Dienst</td><td><span class="m s">Schätzung</span>; bei einer Übergabe zu klären</td></tr>
+      <tr class="grp"><td colspan="5">Ehrenamtliche Zeit (PT = Personentag zu 8 Stunden, ca. drei Feierabende)</td></tr>
+      <tr><td>MyTCO selbst bauen, alle Etappen</td><td class="num">55–89 PT</td><td class="num">55–89 PT</td><td class="num">55–89 PT</td><td><span class="m s">Schätzung · 11</span></td></tr>
+      <tr><td>Store-App einrichten (Konten, Verpacken, nativer Push, Store-Einträge)</td><td class="num">0</td><td class="num">4–7 PT beim Umstieg</td><td class="num">3–6 PT vor dem Start</td><td><span class="m s">Schätzung</span></td></tr>
+      <tr><td>Store-Pflichten pro Jahr (neue Vorgaben von Apple und Google, Prüfungen)</td><td class="num">0</td><td class="num">1–2 PT ab Umstieg</td><td class="num">1–2 PT</td><td><span class="m s">Schätzung</span></td></tr>
+      <tr><td>Wartung MyTCO pro Jahr</td><td class="num">3–6 PT</td><td class="num">3–6 PT</td><td class="num">3–6 PT</td><td><span class="m s">Schätzung · 11</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Über fünf Jahre (2027–2031), nur Geld</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Variante</th><th class="num">Ohne Gebührenerlass</th><th class="num">Mit Gebührenerlass bei Apple</th><th>Annahme</th></tr></thead>
+    <tbody>
+      <tr><td>1 · Nur Web-App</td><td class="num">300–2'250</td><td class="num">300–2'250</td><td>5 × Hosting und E-Mail</td></tr>
+      <tr><td>2 · Web, später Store</td><td class="num">300–2'670</td><td class="num">300–2'270</td><td>Untergrenze: Umstieg kommt nie. Obergrenze: Umstieg schon 2027</td></tr>
+      <tr><td>3 · Store von Anfang an</td><td class="num">720–2'670</td><td class="num">320–2'270</td><td>5 × Apple + einmal Google</td></tr>
+    </tbody>
+  </table></div>
+  <p>Die grosse Spanne kommt vom Hosting, nicht von der Variante. Zwischen den Varianten liegen höchstens <strong>CHF 420 in fünf Jahren</strong>, mit Gebührenerlass CHF 20 <span class="m s">Schätzung</span>. Alle Varianten liegen im Rahmen „niedriger dreistelliger Betrag pro Jahr“ aus der Zielsetzung.</p>
+</section>
+
+<section>
+  <h2>4 · Was eine Store-App vom Verein verlangt</h2>
+  <p>Betrifft Variante 3 sofort und Variante 2 beim Umstieg. Die Konten sollen auf den Verein laufen, nicht auf eine Privatperson. Nur so lässt sich MyTCO an Nachfolger übergeben.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Anforderung</th><th>Apple</th><th>Google</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Rechtsform</strong></td><td>Juristische Person, die Verträge schliessen kann; keine Abteilungen oder Handelsnamen <span class="m b">belegt · 6</span>. Ein Verein mit Statuten ist das nach Schweizer Recht <span class="m v">Vermutung</span></td><td>Organisationskonto <span class="m b">belegt · 5</span></td></tr>
+      <tr><td><strong>D-U-N-S-Nummer</strong></td><td>Pflicht, kostenlos zu beantragen <span class="m b">belegt · 6</span> <span class="m v">Vermutung</span> für „kostenlos“</td><td>Für Organisationskonten nötig, Beschaffung kann bis 30 Tage dauern <span class="m v">Vermutung · Sekundärquelle 12</span></td></tr>
+      <tr><td><strong>Website und E-Mail</strong></td><td>Öffentliche Website mit eigener Domain, E-Mail-Adresse mit dieser Domain <span class="m b">belegt · 6</span>. tcolten.ch erfüllt das vermutlich <span class="m v">Vermutung</span></td><td>—</td></tr>
+      <tr><td><strong>Unterschrift</strong></td><td>Die Person, die das Konto eröffnet, muss den Verein rechtlich binden dürfen <span class="m b">belegt · 6</span></td><td>—</td></tr>
+      <tr><td><strong>Testphase</strong></td><td>Bei einer App mit Login ein Demo-Konto für die Prüfer, mit erfundenen Daten <span class="m b">belegt · 10</span></td><td>Persönliche Konten: Test mit mindestens 12 Personen über 14 Tage vor der Veröffentlichung <span class="m b">belegt · 13</span>; Organisationskonten vermutlich nicht <span class="m v">Vermutung</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Gebührenerlass bei Apple</h3>
+  <p>Apple erlässt die Jahresgebühr von USD 99, wenn der Verein (1) eine juristische Person ist, (2) von einer zuständigen Behörde als Non-Profit anerkannt ist, (3) in seinen Apps nichts verkauft und (4) keine kostenpflichtigen Apps anbietet <span class="m b">belegt · 4</span>. MyTCO verkauft nichts. Offen ist Punkt (2): <span class="m v">Vermutung</span> Massgeblich wäre in der Schweiz eine Steuerbefreiung wegen Gemeinnützigkeit. Sportvereine, die vor allem ihren eigenen Mitgliedern dienen, erhalten diese oft nicht. Eine Verfügung der kantonalen Steuerverwaltung würde die Frage beantworten.</p>
+</section>
+
+<section>
+  <h2>5 · Wann die Store-App kommt</h2>
+  <p>Der Projektleiter prüft den Umstieg, sobald eines davon eintritt. Der Umstieg selbst wird jeweils neu entschieden.</p>
+  <ol class="q">
+    <li><strong>Zu wenig Push auf dem iPhone:</strong> Vier Wochen nach Einführung von Push hat weniger als die Hälfte der aktiven iPhone-Nutzer Push eingeschaltet <span class="m s">Schwelle: Schätzung</span>.</li>
+    <li><strong>Der Verein will einen Store-Eintrag</strong>, oder Mitglieder finden MyTCO ohne Store nicht.</li>
+    <li><strong>Der Gebührenerlass wird bestätigt.</strong> Dann fällt der grösste laufende Kostenpunkt der Store-App weg.</li>
+    <li><strong>Apple schränkt Web-Apps oder Web Push ein.</strong></li>
+  </ol>
+</section>
+
+<section>
+  <h2>6 · Fragen an den Vorstand</h2>
+  <ol class="q">
+    <li><strong>Store-Eintrag:</strong> Erwartet der Verein, dass MyTCO im App Store und bei Google Play steht? Wenn ja, ab wann: zum Mitglieder-Login (Februar 2027), zur Clubmeisterschaft (Mai bis August 2027) oder später?</li>
+    <li><strong>Gemeinnützigkeit:</strong> Ist der TCO steuerbefreit oder anderweitig behördlich als gemeinnützig anerkannt? Gibt es eine Verfügung, die man Apple vorlegen kann?</li>
+    <li><strong>Herausgeber:</strong> Tritt der Verein als Herausgeber in den Stores auf? Wer darf für den Verein bei Apple und Google unterschreiben, und wer beantragt die D-U-N-S-Nummer?</li>
+    <li><strong>Konten:</strong> Gibt es eine E-Mail-Adresse mit @tcolten.ch, auf die Vereinskonten (Hosting, Apple, Google) laufen können?</li>
+    <li><strong>Budget:</strong> Gilt der Rahmen „niedriger dreistelliger Betrag pro Jahr“, und wer gibt die einzelnen Posten frei?</li>
+    <li><strong>Adresse:</strong> Darf MyTCO unter my.tcolten.ch laufen? (Absprache mit dem Website-Betreuer.)</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Quellen</h2>
+  <p class="small">Webquellen abgerufen am 29.10.2026.</p>
+  <ol class="src">
+    <li><a href="https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/" target="_blank" rel="noopener">WebKit: Web Push for Web Apps on iOS and iPadOS</a>: ab iOS 16.4, nur vom Startbildschirm, ohne Entwicklerkonto</li>
+    <li><a href="https://webkit.org/?p=16993" target="_blank" rel="noopener">WebKit: News from WWDC25</a>: iOS 26 öffnet Startbildschirm-Symbole als Web-App; bestätigt von <a href="https://heise.de/-10749652" target="_blank" rel="noopener">heise</a></li>
+    <li><a href="https://developer.apple.com/programs/enroll/" target="_blank" rel="noopener">Apple: Enrollment</a>: USD 99 pro Mitgliedsjahr</li>
+    <li><a href="https://developer.apple.com/support/fee-waiver/" target="_blank" rel="noopener">Apple: Fee Waiver</a>: Gebührenerlass für anerkannte Non-Profits</li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/6112435?hl=en" target="_blank" rel="noopener">Google Play: Registrierung</a>: USD 25 einmalig, persönliche und Organisationskonten</li>
+    <li><a href="https://developer.apple.com/programs/enroll/" target="_blank" rel="noopener">Apple: Enrollment, Anforderungen an Organisationen</a>: Rechtsform, D-U-N-S, Website, E-Mail, Zeichnungsberechtigung</li>
+    <li><a href="https://developer.apple.com/distribute/app-review/" target="_blank" rel="noopener">Apple: App Review</a>: 50 % in unter 24 h, 90 % in unter 48 h</li>
+    <li><a href="https://firebase.google.com/pricing" target="_blank" rel="noopener">Firebase: Preise</a>: Cloud Messaging kostenlos</li>
+    <li><a href="https://expo.dev/pricing" target="_blank" rel="noopener">Expo: Preise</a>: Gratisplan 15 iOS- und 15 Android-Builds, Starter USD 19/Monat</li>
+    <li><a href="https://developer.apple.com/app-store/review/guidelines/" target="_blank" rel="noopener">Apple: App Review Guidelines</a>: 2.1 Demo-Konto</li>
+    <li>Recherche Systemlandschaft vom 29.10.2026 im Projekt-Repository: Hosting, E-Mail, Aufwand und Wartung (dort selbst als Schätzung markiert)</li>
+    <li><a href="https://www.revenuecat.com/blog/engineering/google-play-14-day/" target="_blank" rel="noopener">RevenueCat: Google Play 14-Tage-Regel</a> (Sekundärquelle)</li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/14151465?hl=en" target="_blank" rel="noopener">Google Play: Testpflicht für persönliche Konten</a>: 12 Tester, 14 Tage</li>
+  </ol>
+</section>
+
+</div>
