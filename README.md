@@ -27,6 +27,8 @@ entsteht. Termine und Umfang der Etappen → [`docs/roadmap.md`](docs/roadmap.md
 ## Arbeitsweise
 
 - Branches: `main` (Produktion) ← PR ← `dev` (Integration) ← `feat/issue-NNN`
+- Parallele Sessions arbeiten in Worktrees unter `.worktrees/` im Repo (gitignoriert):
+  `git worktree add .worktrees/issue-NNN -b feat/issue-NNN origin/dev`
 - Jede Änderung hängt an einem Issue mit Definition of Done.
 - Fertig heisst nachgewiesen: Tests, CI oder Screenshot belegen die Änderung.
 - Vor jedem Commit: `make check` (dasselbe prüft die CI). Einmalig `make hooks` aktiviert
