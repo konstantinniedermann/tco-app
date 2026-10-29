@@ -83,3 +83,10 @@ Punkte für die nächste Sitzung. Erledigte Fragen wandern mit Antwort ins Ände
 - Soll der Spielplan des Finalwochenendes öffentlich, also ohne Login, sichtbar sein?
   (A-SPIELPLAN-08)
 - Welche Ausfallzeit ist akzeptabel, besonders während der Clubmeisterschaft? (N-BETRIEB-01)
+
+**Aus dem Glossar (29.10.2026)** — Begriffe siehe [`glossar.md`](../glossar.md):
+
+- Advantage kennt ein Finaltableau, das direkt auf die Gruppenspiele folgt. Laut PDF
+  eröffnet der TCO fürs Finalwochenende aber neue KO-Turniere. Warum, und bleibt das so?
+- Gibt es bei der Clubmeisterschaft ein Nenngeld, und soll MyTCO festhalten, wer bezahlt hat?
+- Welche Alterskategorien bietet die Clubmeisterschaft an?

@@ -4,7 +4,7 @@
 
 Jede Anforderung aus dem Anforderungsdokument v1.2 und der Zielsetzung vom 29.10.2026
 mit fester ID. ADRs, Issues und Tests verweisen auf diese IDs. Quellen, Änderungsprotokoll
-und offene Fragen stehen im [README](README.md).
+und offene Fragen stehen im [README](README.md); die Begriffe im [Glossar](../glossar.md).
 
 ## Lesehilfe
 

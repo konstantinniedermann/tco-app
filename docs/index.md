@@ -10,6 +10,7 @@ Issue im Milestone *Fundament*.
 | [Roadmap](roadmap.md) | Etappen mit Termin und Umfang |
 | [Anforderungen](anforderungen/README.md) | Anforderungsdokument des Vereins, Zielsetzung, Änderungen, offene Fragen |
 | [Anforderungen mit IDs](anforderungen/anforderungen.md) | Jede Anforderung mit ID, Quelle, Etappe und Status |
+| [Glossar](glossar.md) | Fachbegriffe von TCO und Swiss Tennis und wie MyTCO sie nennt |
 | [Recherche Systemlandschaft](recherche/README.md) | Bestehende Systeme des Vereins, Kosten, kaufen oder bauen (Stand 29.10.2026) |
 
 ## Architektur
@@ -29,5 +30,5 @@ Issue im Milestone *Fundament*.
 
 ## Geplant (Milestone *Fundament*)
 
-Glossar · Fachmodell · Rollen und Rechte · Datenschutzkonzept · Sicherheitskonzept ·
+Fachmodell · Rollen und Rechte · Datenschutzkonzept · Sicherheitskonzept ·
 Kosten · Betrieb und Übergabe · Testkonzept · CI/CD und Release · arc42 · UI-Leitbild
