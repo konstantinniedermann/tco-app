@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Lokaler pre-commit-Hook (aktivieren: make hooks).
+# Feature-Branches laufen erst beim PR durch den CI-Secret-Scan, daher schon hier.
+set -euo pipefail
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "Abbruch: gitleaks fehlt — ohne Secret-Scan kein Commit (brew install gitleaks)." >&2
+  exit 1
+fi
+gitleaks git --pre-commit --staged --no-banner --redact --exit-code 1
+
+bash scripts/check-docs.sh

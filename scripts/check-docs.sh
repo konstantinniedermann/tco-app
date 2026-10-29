@@ -5,6 +5,8 @@
 #  3. kein literales \n in Mermaid-Blöcken (wird in VS Code als Text gerendert)
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
+# Dateinamen mit Umlauten nicht in Anführungszeichen setzen, sonst werden sie still übersprungen
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.quotePath GIT_CONFIG_VALUE_0=false
 
 fehler=0
 melde() { echo "  ✗ $1"; fehler=1; }
