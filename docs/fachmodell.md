@@ -11,7 +11,7 @@ Begriffe stehen im [Glossar](glossar.md), Anforderungs-IDs in den
 **Namen im Code:** die Objektnamen aus dem Diagramm, deutsch und ohne Umlaute
 (`Mitglied`, `Anmeldung`, `KoTableau`). So bleiben Doku, Oberfläche und Code bei einem Wort.
 
-**P** = personenbezogen, geregelt im [Datenschutzkonzept](datenschutz.md).
+**P** = personenbezogene Attribute des Objekts, geregelt im [Datenschutzkonzept](datenschutz.md).
 **Annahme K-NN** = vom Verein noch zu bestätigen, Frage in den [Abklärungen](abklaerungen.md).
 
 **Junioren:** Im MVP behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Junioren,
@@ -25,12 +25,13 @@ classDiagram
     Konto "*" -- "*" Rolle
     Turnier "1" *-- "1..*" Turniernummer
     Turnier "1" *-- "*" Kategorie
-    Kategorie "*" --> "0..1" Turniernummer
     Kategorie "1" *-- "*" Anmeldung
     Anmeldung "*" --> "1..2" Mitglied : Spieler
     Kategorie "1" *-- "*" Gruppe
     Gruppe "0..1" o-- "*" Anmeldung
     Kategorie "1" *-- "0..1" KoTableau
+    Gruppe "*" --> "0..1" Turniernummer
+    KoTableau "*" --> "0..1" Turniernummer
     Gruppe "0..1" *-- "*" Spiel
     KoTableau "0..1" *-- "*" Spiel
     Spiel "*" --> "0..2" Anmeldung
@@ -47,8 +48,8 @@ classDiagram
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Mitglied** | Vorname, Nachname, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang (K-40), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst), Status *aktiv / ausgetreten*, Austrittsdatum | P |
-| **Konto** | Benutzername, Passwort (nur als Hash), Einmalpasswort aktiv ja/nein, Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein | P |
+| **Mitglied** | Vorname, Nachname, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang (K-40), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum | alle ausser Status |
+| **Konto** | Benutzername, Passwort (nur als Hash), Einmalpasswort aktiv ja/nein, Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein | alle |
 | **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](https://github.com/konstantinniedermann/tco-app/issues/4) fest | — |
 
 ### Clubmeisterschaft
@@ -57,20 +58,20 @@ classDiagram
 |--------|-----------|---|
 | **Turnier** | Jahr, Name, Anmeldeschluss, Status (siehe [Lebenszyklen](#lebenszyklen)) | — |
 | **Turniernummer** | Nummer bei Swiss Tennis, Bezeichnung (z. B. Gruppenphase, Finalwochenende — Annahme K-25) | — |
-| **Kategorie** | Name, Geschlecht (Herren / Damen / Mixed / offen), Jahrgang von–bis (Alterskategorie, optional), Klassierung von–bis (Klassierungsbereich), Einzel oder Doppel, Turniernummer | — |
-| **Anmeldung** | Kategorie, 1 Spieler (Einzel) oder 2 (Doppel), Wildcard-Antrag ja/nein, Kommentar, Status, angemeldet am, Gruppe (nach Auslosung), Rang-Korrektur (optional) | P |
-| **Gruppe** | Kategorie, Name. Die Rangliste wird aus den Resultaten berechnet, nicht gespeichert | — |
-| **KoTableau** | Kategorie, Grösse (Anzahl Positionen). Kommt aus Advantage | — |
-| **Spiel** | Gruppe *oder* KoTableau mit Runde (z. B. Viertelfinal) und Position, Anmeldung A und B (im KO leer, bis bekannt), Folgespiel (nur KO) | P |
-| **Resultat** | Spiel, Sätze, Sonderfall (keiner / w.o. / Aufgabe), Sieger, gemeldet von, gemeldet am, Status, bestätigt von | P |
-| **Satz** | Games A, Games B, Tiebreak-Punkte (optional). Höchstens 3 Sätze, der dritte evtl. als Match-Tiebreak (Annahme K-25) | — |
+| **Kategorie** | Name, Geschlecht (Herren / Damen / Mixed / offen), Jahrgang von–bis (Alterskategorie, optional), Klassierung von–bis (Klassierungsbereich), Einzel oder Doppel | — |
+| **Anmeldung** | Kategorie, 1 Spieler (Einzel) oder 2 (Doppel), Wildcard-Antrag ja/nein, Kommentar, Status, angemeldet am, Gruppe (nach Auslosung), Rang-Korrektur (optional) | Spieler, Kommentar |
+| **Gruppe** | Kategorie, Name, Turniernummer. Die Rangliste wird aus den Resultaten berechnet, nicht gespeichert | — |
+| **KoTableau** | Kategorie, Grösse (Anzahl Positionen), Turniernummer. Kommt aus Advantage | — |
+| **Spiel** | Gruppe *oder* KoTableau mit Runde (z. B. Viertelfinal) und Position, Anmeldung A und B (im KO leer, bis bekannt), Folgespiel (nur KO) | — (über die Anmeldung) |
+| **Resultat** | Spiel, Sätze, Sonderfall (keiner / w.o. / Aufgabe), Sieger, gemeldet von, gemeldet am, Status, bestätigt von | Sätze, gemeldet von, bestätigt von |
+| **Satz** | Games A, Games B, Tiebreak-Punkte (optional). Höchstens 3 Sätze, der dritte evtl. als Match-Tiebreak (Annahme K-41) | — |
 
 ### Lizenzen
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Lizenzrunde** | Jahr, Stichtag (setzt der Admin) | — |
-| **Lizenzantrag** | Mitglied, Art (Bestellung / Aktualisierung / Storno), Status, beantragt am, exportiert am, Lizenzrunde | P |
+| **Lizenzrunde** | Jahr, Stichtag (setzt der Lizenzverantwortliche) | — |
+| **Lizenzantrag** | Mitglied, Art (Bestellung / Aktualisierung / Storno), Status, beantragt am, exportiert am, Lizenzrunde | Mitglied, Art |
 
 ## Fachregeln
 
@@ -79,11 +80,11 @@ classDiagram
 | FR-01 | Ein Mitglied hat genau ein Konto. Der Admin legt beides zusammen an; das Konto startet mit Einmalpasswort | A-MITGLIED-01, A-LOGIN-01 |
 | FR-02 | Beim ersten Login ersetzt das Mitglied das Einmalpasswort und ergänzt fehlende Daten (u. a. Lizenznummer, Klassierung), bevor es etwas anderes tun kann | A-LOGIN-02, A-LOGIN-03 |
 | FR-03 | Ein Konto hat mindestens die Rolle *Mitglied*; der Admin vergibt weitere | A-ROLLE-01 |
-| FR-04 | Austritt: Konto sofort gesperrt, Mitglied nach 3 Monaten gelöscht; in vergangenen Resultaten bleibt nur der Name | [Datenschutz](datenschutz.md#löschen), Annahme K-38 |
+| FR-04 | Austritt: Konto sofort gesperrt. Nach 3 Monaten wird das Konto gelöscht und das Mitglied auf Vor- und Nachname reduziert (Status *gelöscht*), damit vergangene Resultate lesbar bleiben | [Datenschutz](datenschutz.md#löschen), Annahme K-38 |
 | FR-05 | Anmelden geht nur, solange das Turnier den Status *Anmeldung offen* hat (bis Anmeldeschluss) | A-ANMELDUNG-07 |
 | FR-06 | Ein Spieler hat je Turnier höchstens 3 Anmeldungen, die nicht *abgelehnt* oder *zurückgezogen* sind. Wildcard-Anträge zählen mit; ein Doppel zählt für beide Partner (Annahme K-27) | A-ANMELDUNG-02 |
-| FR-07 | MyTCO schlägt nur Kategorien vor, die nach Geschlecht, Jahrgang und Klassierung passen | A-ANMELDUNG-03 |
-| FR-08 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet man sich mit Wildcard-Antrag und Kommentar an. Die Anmeldung bleibt *beantragt*, bis der Verantwortliche der CM sie bestätigt oder ablehnt | A-ANMELDUNG-03, A-ANMELDUNG-06 |
+| FR-07 | MyTCO schlägt nur Kategorien vor, die nach Geschlecht, Jahrgang und Klassierung passen; im Doppel muss auch der Partner passen (Annahme K-27) | A-ANMELDUNG-03 |
+| FR-08 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet man sich mit Wildcard-Antrag und Kommentar an. Die Anmeldung bleibt *beantragt*, bis der Verantwortliche der CM sie bestätigt oder ablehnt. Kommentar und Wildcard sehen nur der Spieler und die Verantwortlichen | A-ANMELDUNG-10 |
 | FR-09 | Ein Doppelpartner muss die Anmeldung nicht bestätigen; er wird benachrichtigt (Annahme K-27). Jedes Mitglied steht je Kategorie in höchstens einer Anmeldung | A-ANMELDUNG-04 |
 | FR-10 | Bis zum Anmeldeschluss kann ein Spieler seine Anmeldung selbst zurückziehen (Annahme K-29); danach nur der Admin | A-ANMELDUNG-06 |
 | FR-11 | Der Kommentar enthält keine Gesundheitsangaben; die Eingabemaske weist darauf hin | [Datenschutz](datenschutz.md#welche-daten) |
@@ -98,7 +99,7 @@ classDiagram
 | FR-20 | Ein Mitglied hat je Lizenzrunde höchstens einen offenen Lizenzantrag. Zurückziehen geht, solange er *beantragt* ist | A-LIZENZ-01, A-LIZENZ-02 |
 | FR-21 | Ein Antrag gehört zur nächsten Lizenzrunde, deren Stichtag noch nicht vorbei ist. Storno entspricht der Sistierung bei Swiss Tennis (Annahme K-34) | A-LIZENZ-03 |
 | FR-22 | Der Export einer Lizenzrunde setzt alle ihre beantragten Anträge auf *exportiert*; der Lizenzverantwortliche hakt sie nach dem Eintragen bei Swiss Tennis als *erledigt* ab | A-LIZENZ-04 |
-| FR-23 | Exporte an Swiss Tennis enthalten nur die Felder, die Advantage braucht (vor allem Lizenznummern) | A-ADVANTAGE-01, A-ADVANTAGE-04, DS-04 |
+| FR-23 | Exporte an Swiss Tennis enthalten nur die Felder, die Swiss Tennis braucht (vor allem Lizenznummern) | A-ADVANTAGE-01, A-ADVANTAGE-04, A-LIZENZ-04, DS-04 |
 
 ## Lebenszyklen
 
@@ -108,7 +109,7 @@ classDiagram
 | Anmeldung | *bestätigt* (ohne Wildcard sofort) · *beantragt* → *bestätigt* / *abgelehnt* (mit Wildcard) · jederzeit → *zurückgezogen* (FR-10) |
 | Resultat | *gemeldet* → *bestätigt* / *bestritten* → *bestätigt* (Entscheid des Admins) |
 | Lizenzantrag | *beantragt* → *exportiert* → *erledigt* · *beantragt* → *zurückgezogen* |
-| Mitglied | *aktiv* → *ausgetreten* → gelöscht nach 3 Monaten (FR-04) |
+| Mitglied | *aktiv* → *ausgetreten* → *gelöscht* nach 3 Monaten, nur noch der Name (FR-04) |
 
 ## Ausblick
 

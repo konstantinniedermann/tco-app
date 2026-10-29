@@ -32,7 +32,8 @@ Konzept angepasst, dann die Funktion ([Änderungen](#änderungen-an-diesem-konze
 | Geschlecht, Jahrgang | Zulassung zu Kategorien; volles Geburtsdatum nur, falls Swiss Tennis es verlangt (K-40) | ja |
 | Lizenznummer, Klassierung | Anmeldung, Lizenzanträge, Export an Swiss Tennis | nein |
 | Konto, Rollen, Benachrichtigungs-Einstellungen | Login, Berechtigungen, Push | ja |
-| Anmeldungen, Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
+| Anmeldungen (mit Kommentar zum Wildcard-Antrag), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
+| Austrittsdatum | Löschfrist nach Austritt | — |
 
 Keine Gesundheitsdaten (auch nicht als Grund für eine Abmeldung), keine Fotos, keine
 Bankdaten.
@@ -42,7 +43,7 @@ Bankdaten.
 | Wer | Sieht |
 |-----|-------|
 | Mitglied | alle eigenen Daten |
-| Admin, Verantwortliche CM und Lizenzen | was sie für ihre Aufgabe brauchen |
+| Admin, Verantwortliche CM und Lizenzen | was sie für ihre Aufgabe brauchen, u. a. Kommentar und Wildcard-Antrag einer Anmeldung |
 | Alle Mitglieder | Name, Kategorien und Resultate der Clubmeisterschaft |
 | Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM (**Vorschlag K-31**) |
 | Alle, ohne Login | Spielplan des Finalwochenendes mit Name, Kategorie, Platz, Zeit, Resultat (**Vorschlag K-39**, spätere Etappe) |
