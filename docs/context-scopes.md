@@ -8,5 +8,5 @@ Welche Pfade bei welcher Aufgabe geladen werden. Die Tabelle wächst mit dem Cod
 |---------|-----------------|-------------|
 | Anforderungen klären | `docs/anforderungen/`, `docs/glossar.md`, `docs/roadmap.md`, `docs/recherche/` | `.github/` |
 | Architektur-Dokumente | `docs/`, insbesondere `docs/adr/`, `docs/anforderungen/`, `docs/glossar.md` | `.github/` |
-| Arbeitsweise, Issues | `docs/issue-konventionen.md`, `.github/ISSUE_TEMPLATE/`, `CLAUDE.md` | `docs/recherche/` |
-| CI und Prüfungen | `Makefile`, `scripts/`, `.github/workflows/`, `.github/dependabot.yml` | `docs/recherche/` |
+| Arbeitsweise, Issues | `docs/issue-konventionen.md`, `.github/ISSUE_TEMPLATE/`, `CLAUDE.md`, `.claude/skills/tco-branching/` | `docs/recherche/` |
+| CI und Prüfungen | `Makefile`, `scripts/`, `.githooks/`, `.github/workflows/`, `.github/dependabot.yml` | `docs/recherche/` |
