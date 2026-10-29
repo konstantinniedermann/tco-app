@@ -34,3 +34,8 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   Satz) bis Lizenzantrag mit Stichtag; Fachregeln `FR-01` bis `FR-23` mit Anforderungs-IDs,
   Annahmen zu offenen Fragen markiert. Junioren vorerst ausgeklammert, Datenschutzkonzept
   entsprechend angeglichen.
+- Rollen und Rechte (`docs/rollen-und-rechte.md`): Mitglied, Admin, CM-Verantwortlicher und
+  Lizenzverantwortlicher, kombinierbar; Admin vertritt beide Verantwortlichen. Grundsätze
+  `RR-01` bis `RR-08` und Matrix Rolle × Daten bis zur Etappe *Lizenzanträge*. CM-Aufgaben in
+  Fachmodell und Anforderungen vom Admin zum CM-Verantwortlichen verschoben; Kontaktdaten
+  für die Verantwortlichen im Datenschutzkonzept ergänzt (K-42).

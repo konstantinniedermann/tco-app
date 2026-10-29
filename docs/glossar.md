@@ -55,7 +55,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Anmeldung | Teilnahme eines Spielers (Einzel) oder eines Doppelteams an einer Kategorie. In Advantage meldet man sich online über myTennis an und landet in der Anmeldeliste; ins Tableau kommt man erst, wenn die Anmeldung *bestätigt* ist. In MyTCO höchstens 3 gleichzeitig | Anmeldung | PDF 5b; ADV 18, 20–23, 28–29 |
 | Anmeldeschluss | Datum, nach dem keine Anmeldungen mehr möglich sind; in Advantage je Turnier oder Konkurrenz. Beim TCO Anfang Juni | Anmeldeschluss | ADV 7, 10, 13, 28; Recherche |
 | Nenngeld | Startgebühr in Advantage, je Spieler mit Vermerk „bezahlt“. Ob die CM ein Nenngeld hat, ist nicht belegt | Nenngeld | ADV 7, 28 |
-| Wildcard-Antrag | Anmeldung für eine Kategorie ausserhalb des eigenen Klassierungsbereichs, mit Kommentar; der Verantwortliche der CM entscheidet | Wildcard-Antrag | [A-ANMELDUNG-10](anforderungen/anforderungen.md#anmeldung--anmeldung-zur-clubmeisterschaft) |
+| Wildcard-Antrag | Anmeldung für eine Kategorie ausserhalb des eigenen Klassierungsbereichs, mit Kommentar; der CM-Verantwortliche entscheidet | Wildcard-Antrag | [A-ANMELDUNG-10](anforderungen/anforderungen.md#anmeldung--anmeldung-zur-clubmeisterschaft) |
 | Folgespiel | Spiel der nächsten KO-Runde, in das der Sieger eines Spiels nachrückt | Folgespiel | [Fachmodell](fachmodell.md) |
 | Resultat | Ergebnis eines Spiels. In MyTCO melden die Spieler es selbst. In Advantage erfasst nur der Organisator, von Hand pro Runde oder Spiel; einen Import gibt es nicht | Resultat; der Vorgang heisst *Resultat melden* | PDF 5d; ADV 37, 41, 43 |
 | Rangliste | Reihenfolge in einer Gruppe nach gewonnenen Begegnungen. Bei Gleichstand gilt: 1. Direktbegegnung, 2. bessere Satzdifferenz, 3. bessere Gamedifferenz; danach manuelle Anpassung möglich. Das PDF nennt das „Einreihung“ | Rangliste | ADV 41; PDF 5d |
@@ -64,7 +64,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Spielzeitraster | Zeitraster, das Advantage aus Plätzen, Matchdauer und Spielbeginn erzeugt. Das PDF wünscht ein Raster in 30-Minuten-Schritten | Spielzeitraster | ADV 7, 34; PDF 5e-i |
 | Platz | Tennisplatz, auf dem gespielt wird; in Advantage vor der Spielplanung zu definieren. Plätze werden benannt, u. a. für die neue Anlage Gheid | Platz | ADV 7, 13, 31, 34; PDF 5e-i |
 | Spielplanüberprüfung | Prüfung in Advantage auf Abwesenheiten, gleichzeitige Spiele und zu kurze Pausen. Das PDF spricht von Konfliktsituationen | Konflikt | ADV 7, 26, 34; PDF 5e-i |
-| Organisator | Club oder Vereinigung, die ein Turnier in Advantage führt. Das PDF spricht vom „Verantwortlichen“ der CM | Verantwortliche der Clubmeisterschaft; ob das eine eigene Rolle ist, klärt Issue #4 | ADV 6–7, 11, 21, 30; PDF 5a |
+| Organisator | Club oder Vereinigung, die ein Turnier in Advantage führt. Das PDF spricht vom „Verantwortlichen“ der CM | CM-Verantwortlicher (Rolle) | ADV 6–7, 11, 21, 30; PDF 5a |
 
 ## Lizenz
 
@@ -78,7 +78,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Stichtag | Datum, zu dem der Lizenzverantwortliche die Liste der Lizenzanträge sieht und exportiert. *Vermutung:* liegt vor der Sistierungsfrist Ende Februar | Stichtag | Ziel |
 | Lizenzrunde | Alle Lizenzanträge eines Jahres bis zu einem Stichtag; der Lizenzverantwortliche exportiert sie gesammelt | Lizenzrunde | [Fachmodell](fachmodell.md) |
 | Lizenzliste | Jährliche Liste aller aktuellen Lizenzen als PDF, mit den Änderungen zum Vorjahr | Lizenzliste | PDF 4b |
-| Lizenzverantwortlicher | Person im Verein, die die Lizenzanträge bei Swiss Tennis von Hand einträgt. Keine der fünf Rollen im PDF | Lizenzverantwortlicher; Rolle klärt Issue #4 | Ziel |
+| Lizenzverantwortlicher | Person im Verein, die die Lizenzanträge bei Swiss Tennis von Hand einträgt. Keine der fünf Rollen im PDF | Lizenzverantwortlicher (Rolle) | Ziel |
 
 ## Systeme
 
@@ -95,17 +95,17 @@ Was nicht belegt ist, steht als *Vermutung* da.
 
 | Begriff | Bedeutung | In MyTCO | Quelle |
 |---------|-----------|----------|--------|
-| Rolle | Bündel von Berechtigungen, das der Admin einem Konto gibt: Gast, Mitglied, Junioren-Leiter, Anlässe-Veranstalter, Admin. Was jede Rolle darf, klärt Issue #4 | Rolle | PDF 4a |
+| Rolle | Bündel von Berechtigungen, das der Admin einem Konto gibt: Gast, Mitglied, Junioren-Leiter, Anlässe-Veranstalter, Admin; dazu CM-Verantwortlicher und Lizenzverantwortlicher. Was jede Rolle darf, steht in [Rollen und Rechte](rollen-und-rechte.md) | Rolle | PDF 4a |
 | Mitglied | Person, die Mitglied im TCO ist; zugleich die Grundrolle in MyTCO | Mitglied | PDF 1, 4a |
 | Mitgliedschaft | Zugehörigkeit eines Mitglieds zum TCO. Was ein Mitglied daran selbst ändern kann, ist offen | Mitgliedschaft | PDF 1 |
 | Spieler | Mitglied, das an der Clubmeisterschaft teilnimmt | Spieler | PDF 5b, 5d |
 | Gast | Rolle nur für die Registrierung, ohne Zugriff auf weitere Seiten | Gast | PDF 4a |
 | Admin | Rolle mit Zugang zur Mitgliederverwaltung und zu den Admin-Masken | Admin | PDF 4a; Ziel |
 | Junioren-Leiter | Rolle für die Betreuung der Junioren | Junioren-Leiter | PDF 4a |
-| Anlässe-Veranstalter | Rolle für die Organisation von Anlässen | Anlässe-Veranstalter | PDF 4a |
+| Anlässe-Veranstalter | Rolle für die Organisation von Anlässen | Anlässe-Veranstalter, später; die CM leitet der CM-Verantwortliche | PDF 4a |
 | Website-Betreuer | Vereinsmitglied, das tcolten.ch programmiert und betreut | Website-Betreuer | Recherche |
 | Registrierung | Ein neues Konto selbst anlegen statt per Brief zu erhalten; vorgesehen über tcolten.ch, später | Registrierung | PDF 4a |
-| Admin-Oberfläche | Teil von MyTCO für den Admin. Das PDF nennt die einzelnen Eingabeseiten darin *Admin-Masken* | Admin-Oberfläche | PDF 5b, 5d; Ziel |
+| Admin-Oberfläche | Teil von MyTCO für Admin und Verantwortliche. Das PDF nennt die einzelnen Eingabeseiten darin *Admin-Masken* | Admin-Oberfläche | PDF 5b, 5d; Ziel |
 | Mitgliederverwaltung | Seite, auf der der Admin Mitglieder von Hand anlegt, bearbeitet und löscht | Mitgliederverwaltung | Ziel; PDF 4a |
 | Konto | Zugang eines Mitglieds zu MyTCO mit seinen Daten | Konto | PDF 3e, 4a |
 | Login | Einloggen in MyTCO | Login | PDF 2, 3b |
