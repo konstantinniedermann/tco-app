@@ -114,4 +114,14 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
-_Noch keine Einträge._
+### 2026-10-29 — Recherche-Seiten ohne Zeichensatz-Angabe, Schriften von Google
+
+**Thema:** Doku-Darstellung
+
+**Fundort:** `docs/recherche/2026-10-29-systemlandschaft.html` (Kopf); die Seite `2026-10-29-app-varianten-vorstand.html` hat seither ein `<meta charset="utf-8">`.
+
+**Beobachtung:** Die Systemlandschaft-Seite hat weder `<!doctype html>` noch eine Zeichensatz-Angabe. Als lokale Datei geöffnet, kann ein Browser die Umlaute falsch darstellen. Beide Seiten laden Schriften von Google Fonts; beim Öffnen geht die IP-Adresse an Google.
+
+**Ursprung:** Review durch `cas-reviewer` zur Vorstandsseite (Issue #7).
+
+**Einschätzung:** Gering; im Artifact-Viewer kein Problem, weil dort der Zeichensatz gesetzt wird. Für Seiten, die an den Vorstand gehen, eventuell Systemschriften statt Google Fonts (Datenschutz-Optik).
