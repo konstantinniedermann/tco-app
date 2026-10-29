@@ -47,7 +47,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Gruppe, Gruppenspiele | Form „Round Robin“: Jeder spielt gegen jeden in seiner Gruppe. Der Organisator legt die Anzahl Gruppen fest und teilt die Spieler zu | Gruppe, Gruppenspiele | ADV 10, 39–41; PDF 5c |
 | KO-System | Wer verliert, scheidet aus. In Advantage heisst die Form *Draw*. *Vermutung:* „Draw“ ist das KO-System; das Handbuch erklärt den Begriff nicht | KO-System | PDF 5c; ADV 10 |
 | Tableau | Spielfeld einer Konkurrenz mit Positionen; die Grösse ergibt sich aus der Zahl der bestätigten Spieler | Tableau | ADV 10–11, 29–30 |
-| Finaltableau | Tableau, das in Advantage auf die Gruppenspiele folgt. Laut PDF eröffnet der TCO dafür neue KO-Turniere (siehe offene Fragen) | Finaltableau | ADV 42; PDF 5e-i |
+| Finaltableau | Tableau, das in Advantage auf die Gruppenspiele folgt. Laut PDF eröffnet der TCO dafür neue KO-Turniere (siehe [K-25](abklaerungen.md#vor-cm-anmeldung-15052027)) | Finaltableau | ADV 42; PDF 5e-i |
 | Setzung | Die Gesetzten werden aus der Klassierung bestimmt und nach Turnierreglement platziert | Setzung | ADV 29 |
 | Auslosung | Teilt nach der Setzung die übrigen Spieler auf die Positionen im Tableau zu | Auslosung | ADV 7, 10, 28–29 |
 | Runde | Stufe im Tableau; Spielplan und Resultate werden je Runde erfasst | Runde | ADV 30, 32, 37 |
@@ -71,7 +71,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Lizenz | Spielberechtigung von Swiss Tennis, Pflicht für offizielle Turniere. Beim TCO macht der Club das Inkasso, die Lizenz verlängert sich automatisch | Lizenz | ADV 15, 20, 22, 25; Recherche |
 | Lizenznummer | Nummer, unter der Swiss Tennis einen lizenzierten Spieler führt. Advantage nimmt eine ganze Spalte Lizenznummern per Copy-Paste an. Das Mitglied ergänzt sie beim ersten Login | Lizenznummer | ADV 17–18; PDF 3b-i |
 | Lizenzantrag | Antrag eines Mitglieds in MyTCO, eine Lizenz zu bestellen bzw. zu aktualisieren oder zu stornieren | Lizenzantrag | Ziel; PDF 3e |
-| Storno | Antrag, die Lizenz abzubestellen. *Vermutung:* entspricht der Sistierung bei Swiss Tennis (siehe offene Fragen) | Storno | Ziel; PDF 3e |
+| Storno | Antrag, die Lizenz abzubestellen. *Vermutung:* entspricht der Sistierung bei Swiss Tennis (siehe [K-34](abklaerungen.md#vor-lizenzanträgen-01102027)) | Storno | Ziel; PDF 3e |
 | Sistierung | Beim TCO bis Ende Februar möglich. *Vermutung:* die Lizenz ruht für die folgende Saison. Im Advantage-Handbuch nicht erwähnt | Sistierung | Recherche |
 | Stichtag | Datum, zu dem der Lizenzverantwortliche die Liste der Lizenzanträge sieht und exportiert. *Vermutung:* liegt vor der Sistierungsfrist Ende Februar | Stichtag | Ziel |
 | Lizenzliste | Jährliche Liste aller aktuellen Lizenzen als PDF, mit den Änderungen zum Vorjahr | Lizenzliste | PDF 4b |

@@ -86,6 +86,10 @@ flowchart LR
   erst nach dem Login.
 - **Einwilligung:** Push nur nach ausdrücklichem Einschalten durch das Mitglied; auf dem
   iPhone kann die Erlaubnis ohnehin nur nach einem Tipp auf einen Knopf erfragt werden (B·6).
+- **Android und iPhone:** Auf Android funktioniert Web Push auch im Browser ohne
+  Installation (V). Die Einschränkung auf den Startbildschirm gilt nur fürs iPhone (B·6),
+  und in der Schweiz ist gut die Hälfte der Handys ein iPhone: iOS 2026 je nach Monat
+  54–60 % (B·14). Deshalb beziehen sich Push-Trigger und Anleitung auf das iPhone.
 - **E-Mail ist die Grundlage:** Alles, was ein Mitglied wissen muss, geht auch per E-Mail.
   Push ist eine Ergänzung, weil iPhones ihn nur nach der Installation auf dem
   Startbildschirm und erst ab iOS 16.4 bekommen (B·6).
@@ -170,3 +174,4 @@ Abgerufen am 29.10.2026.
 11. [Expo: Pricing](https://expo.dev/pricing) — Gratisplan 15 iOS- und 15 Android-Builds
 12. [Capacitor: Push Notifications](https://capacitorjs.com/docs/apis/push-notifications) — nativer Push über APNs und FCM
 13. [Stack Overflow Developer Survey 2025](https://survey.stackoverflow.co/2025/technology) — React 44.7 % aller Befragten
+14. [StatCounter: Mobile OS Schweiz](https://gs.statcounter.com/os-market-share/mobile/switzerland) — iOS 2026 je nach Monat 54–60 %, Android 40–46 %

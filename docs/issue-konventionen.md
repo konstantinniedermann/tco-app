@@ -85,6 +85,19 @@ Verwandt: #56       (gehört inhaltlich dazu, blockiert aber nicht)
 
 Beim Schliessen prüfen, ob dadurch andere Issues frei werden, und dort `blocked` entfernen.
 
+## Abklärungen beim Verein
+
+Der Projektleiter kann Vorstand, Website-Betreuer, Hoster der Website und die
+Verantwortlichen von Clubmeisterschaft und Lizenzen jederzeit fragen. Deshalb gilt für
+jedes Issue mit einer Entscheidung oder einer Annahme über den Verein:
+
+- Vor der Entscheidung prüfen, ob eine Rückfrage Bedürfnisse schärft, Kosten feststellt
+  oder eine Vermutung ersetzt.
+- Wenn ja, die Frage in [`abklaerungen.md`](abklaerungen.md) mit ID, Ansprechperson und
+  Fälligkeit eintragen und im Issue auf die ID verweisen (`Abklärung: K-09`).
+- Entscheidungen, die ohne Antwort getroffen werden, nennen die offene Frage als Annahme
+  und als Reevaluations-Trigger.
+
 ## Befunde ausserhalb des Scopes
 
 Nicht jeder Befund wird ein Issue. Trivial-Fixes werden mitgemacht, alles andere kommt
@@ -100,3 +113,4 @@ Zustimmung (Regel in der übergeordneten `CLAUDE.md`).
 5. ggf. **Status-Label(s)**
 6. **1 Milestone**
 7. Body mit **Kontext**, **Definition of Done** und **Abhängigkeiten**
+8. Prüfen, ob eine [Abklärung beim Verein](#abklärungen-beim-verein) nötig ist
