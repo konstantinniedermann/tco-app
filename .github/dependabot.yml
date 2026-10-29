@@ -1,0 +1,15 @@
+version: 2
+updates:
+  # Hält die SHA-gepinnten GitHub Actions aktuell. Weitere Ökosysteme (App, Backend)
+  # kommen mit dem Code-Gerüst dazu.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+    labels:
+      - "chore"
+      - "infra"
+      - "P2"

@@ -1,0 +1,11 @@
+# Echte Vereinsunterlagen (Mitgliederlisten, Exporte) — nie ins Repo
+intern/
+
+# Lokale Notizen und Secrets
+NOTES.local.md
+.env
+.env.*
+!.env.example
+
+# System
+.DS_Store

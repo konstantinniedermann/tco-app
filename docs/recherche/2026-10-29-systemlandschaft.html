@@ -1,0 +1,327 @@
+<title>MyTCO Systemlandschaft</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column of tables and a diagram, grouped by the question each section answers; club teal as the only accent */
+:root{
+  --bg:#f5f8f7; --surface:#ffffff; --fg:#14211f; --muted:#5a6b68; --line:#d5dfdc;
+  --accent:#095d5d; --accent-soft:#e1efed;
+  --ok:#1f7a4a; --ok-bg:#e2f3e8; --est:#8a5a00; --est-bg:#fbefd6; --guess:#6b3fa0; --guess-bg:#efe6f8; --open:#5a6b68; --open-bg:#e9eeed; --no:#a33030; --no-bg:#f8e1e1;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif; --f-body:"Source Sans 3","Segoe UI",Roboto,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1716; --surface:#152120; --fg:#e4ecea; --muted:#9db0ac; --line:#2a3b39;
+  --accent:#5fc1b8; --accent-soft:#1a3331;
+  --ok:#6fd39b; --ok-bg:#16301f; --est:#f0c060; --est-bg:#33280f; --guess:#c9a6f2; --guess-bg:#2a1f3a; --open:#9db0ac; --open-bg:#1f2b2a; --no:#f08a8a; --no-bg:#3a1a1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1716; --surface:#152120; --fg:#e4ecea; --muted:#9db0ac; --line:#2a3b39;
+  --accent:#5fc1b8; --accent-soft:#1a3331;
+  --ok:#6fd39b; --ok-bg:#16301f; --est:#f0c060; --est-bg:#33280f; --guess:#c9a6f2; --guess-bg:#2a1f3a; --open:#9db0ac; --open-bg:#1f2b2a; --no:#f08a8a; --no-bg:#3a1a1a; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:22px;font-weight:700;color:var(--accent)}
+h3{font-size:17px;font-weight:700}
+p{margin:0;max-width:72ch}
+section{display:flex;flex-direction:column;gap:14px;min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header{display:flex;flex-direction:column;gap:10px;border-bottom:2px solid var(--accent);padding-bottom:20px}
+.lead{color:var(--muted);font-size:17px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:14px;color:var(--muted)}
+.m{display:inline-block;font-family:var(--f-mono);font-size:11px;font-weight:500;line-height:1;padding:3px 6px;border-radius:4px;white-space:nowrap;vertical-align:1px}
+.m.b{color:var(--ok);background:var(--ok-bg)} .m.s{color:var(--est);background:var(--est-bg)} .m.v{color:var(--guess);background:var(--guess-bg)} .m.o{color:var(--open);background:var(--open-bg)} .m.x{color:var(--no);background:var(--no-bg)}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.key{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.key strong{font-family:var(--f-display);font-size:16px}
+.key p{font-size:15px;color:var(--muted)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{font-family:var(--f-display);font-weight:700;font-size:13px;background:var(--accent-soft);color:var(--fg);position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+td .m{margin-left:4px}
+tr.grp td{background:var(--bg);font-family:var(--f-display);font-weight:700;font-size:13.5px;color:var(--accent);padding-top:14px}
+td.num,th.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.small{font-size:13.5px;color:var(--muted)}
+.diagram{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto}
+.matrix td,.matrix th{text-align:center}
+.matrix td:first-child,.matrix th:first-child{text-align:left}
+.ac{font-family:var(--f-mono);font-size:13px}
+.ac.w{color:var(--accent);font-weight:500}
+.ac.n{color:var(--muted)}
+.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.path{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.path.rec{border:2px solid var(--accent)}
+.path ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:15px}
+.path dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:14.5px}
+.path dt{color:var(--muted)} .path dd{margin:0}
+.tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+ol.q{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;max-width:80ch}
+ol.q li::marker{font-family:var(--f-mono);color:var(--accent)}
+ol.src{margin:0;padding-left:28px;font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.note{background:var(--accent-soft);border-radius:8px;padding:12px 16px;font-size:15px;max-width:none}
+</style>
+
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">Tennis-Club Olten · Projekt MyTCO · Stand 29.10.2026</span>
+  <h1>MyTCO Systemlandschaft</h1>
+  <p class="lead">Was ist im Club schon im Einsatz, was müsste man kaufen, was lohnt sich selbst zu bauen und mit welchem Aufwand? Grundlage sind das Anforderungsdokument v1.2, öffentlich zugängliche Quellen und deine Angaben zu Fairgate.</p>
+  <div class="legend">
+    <span><span class="m b">belegt · 3</span> geprüft, Quelle Nr. 3 unten</span>
+    <span><span class="m s">Schätzung</span> eigene Einschätzung mit Begründung</span>
+    <span><span class="m v">Vermutung</span> naheliegend, aber nicht geprüft</span>
+    <span><span class="m o">offen</span> öffentlich nicht herauszufinden</span>
+    <span><span class="m x">nicht machbar</span> geprüft</span>
+  </div>
+</header>
+
+<section>
+  <h2>Das Wichtigste in Kürze</h2>
+  <div class="keys">
+    <div class="key"><strong>Vieles gibt es schon</strong><p>Fairgate kann Mitglieder-Login, Mitgliederbereich, Eventanmeldung und Swiss-Tennis-Lizenzen <span class="m b">belegt · 5 6 7 16</span>. Advantage von Swiss Tennis kann Gruppen, Ranglisten, Spielpläne mit Plätzen und Konfliktprüfung, kostenlos <span class="m b">belegt · 11</span>.</p></div>
+    <div class="key"><strong>Fairgate beim TCO</strong><p>Gebucht sind „Basis Medium“ und „Finance Pro“ <span class="m b">belegt · 18</span>. Mitgliederbereich und Eventmodul fehlen. Beide zusammen liessen sich für grob CHF 280–400 pro Jahr dazubuchen <span class="m s">Schätzung · 16 17</span>. Ob die Schnittstelle Daten schreiben kann, ist <span class="m o">offen</span>.</p></div>
+    <div class="key"><strong>Was heute fehlt</strong><p>Die Clubmeisterschaft aus Sicht der Spieler: Online-Anmeldung mit Regeln, Resultate selbst melden, Gegnerkontakte, Live-Ranglisten. Heute wird per E-Mail angemeldet und die Gruppenspiele selbst organisiert <span class="m b">belegt · 3</span>.</p></div>
+    <div class="key"><strong>Aufwand alles selbst gebaut</strong><p>Rund 55–90 Personentage, also etwa 165–270 Feierabende <span class="m s">Schätzung</span>. In Etappen machbar, aber nicht nebenbei in einem Winter.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>1 · Was heute im Einsatz ist</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>System</th><th>Wofür</th><th>Im Einsatz beim TCO?</th><th>Kosten heute</th></tr></thead>
+    <tbody>
+      <tr><td><strong>tcolten.ch</strong></td><td>Öffentliche Website mit News, eigenem Admin-Bereich</td><td>Ja, selbst programmiert vom Website-Betreuer (Vereinsmitglied), Hosting bei Metanet <span class="m b">belegt · 2</span>. Die Subdomain my.tcolten.ch zeigt bereits auf denselben Server <span class="m b">belegt · 2</span>, vermutlich über einen Sammeleintrag <span class="m v">Vermutung</span>.</td><td><span class="m o">offen</span></td></tr>
+      <tr><td><strong>Fairgate</strong></td><td>Mitgliederverwaltung und Finanzen</td><td>Ja, mit den Modulen <strong>Basis Medium</strong> und <strong>Finance Pro</strong> <span class="m b">belegt · 18</span>.<br>„Basis“ umfasst die Kontaktverwaltung, laut einer alten Preisseite inklusive Dokumente und Kommunikation. „Medium“ bedeutet bis 600 Kontakte <span class="m v">Vermutung · nur Suchindex</span>.<br>Mitgliederbereich (Intranet) und Kurs- und Eventmodul sind eigene Module und beim TCO nicht gebucht <span class="m b">belegt · 16 17 18</span>.<br>Ob Lizenzverwaltung und Kontakt-Schnittstelle in Basis enthalten sind: <span class="m o">offen</span>.<br>Dass die Jahresrechnung über Finance Pro läuft, ist eine <span class="m v">Vermutung</span>.</td><td><span class="m o">offen</span> (steht auf der Rechnung an den Club)</td></tr>
+      <tr><td><strong>Swiss Tennis Advantage</strong></td><td>Turniersoftware für offizielle Turniere</td><td>Ja, für die Clubmeisterschaft (Swiss-Tennis-Turniernummern) <span class="m b">belegt · 1</span></td><td>Kostenlos für alle Turnierorganisatoren <span class="m b">belegt · 11</span></td></tr>
+      <tr><td><strong>Swiss Tennis Lizenzen</strong></td><td>Lizenzen der Spieler</td><td>Der TCO macht das Inkasso, Lizenzen verlängern sich automatisch, Sistierung bis Ende Februar <span class="m b">belegt · 3</span>. Ob über Fairgate oder direkt bei Swiss Tennis verwaltet: <span class="m o">offen</span></td><td>Lizenzgebühren, nicht Teil dieses Projekts</td></tr>
+      <tr><td><strong>GotCourts</strong></td><td>Platzreservation (App)</td><td>Ja <span class="m b">belegt · 3</span></td><td><span class="m o">offen</span>; nicht Teil der Anforderungen</td></tr>
+      <tr><td><strong>Microsoft Forms</strong></td><td>Aufnahmeformular für neue Mitglieder</td><td>Ja <span class="m b">belegt · 4</span></td><td>Vermutlich kostenlos oder in einem bestehenden Abo enthalten <span class="m v">Vermutung</span></td></tr>
+      <tr><td><strong>E-Mail-Postfach Clubmeisterschaft</strong></td><td>Anmeldung zur Clubmeisterschaft</td><td>Ja, Anmeldung per E-Mail <span class="m b">belegt · 3</span></td><td>kostenlos</td></tr>
+      <tr><td><strong>WhatsApp-Gruppe</strong></td><td>Ankündigungen</td><td>Geplant <span class="m b">belegt · 1</span></td><td>kostenlos</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>2 · Wie die Teile zusammenspielen könnten</h2>
+  <p>Grün: neu zu bauen. Gestrichelt: ungeklärt oder nur von Hand. Rot: geprüft und nicht möglich. Das Bild ist ein Vorschlag, kein Ist-Zustand.</p>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  M([Mitglieder]) -->|Login-Feld oben rechts| W[tcolten.ch Website]
+  W -->|Weiterleitung| APP[MyTCO neu]
+  M -->|direkt via my.tcolten.ch| APP
+  M -->|Platz buchen| GC[GotCourts]
+  APP <-.->|Stammdaten: Schnittstelle ungeklärt| FG[Fairgate Basis Medium und Finance Pro]
+  FG <-.->|Lizenzmodul, falls genutzt| ST[Swiss Tennis Lizenzen]
+  APP -->|Lizenznummern je Kategorie per Copy-Paste| ADV[Swiss Tennis Advantage]
+  ADV -->|Excel: Gruppen und Tableaus| APP
+  APP -.->|Resultate von Hand abtippen| ADV
+  APP -->|Bestätigungen und Updates| N[E-Mail / SMS / WhatsApp]
+  WA[WhatsApp-Gruppe] -.-x|kein automatischer Import möglich| APP
+  classDef neu fill:#d7ecea,stroke:#095d5d,stroke-width:2px,color:#0b2b2b
+  classDef nein fill:#f6dcdc,stroke:#a33,color:#3a0d0d
+  class APP neu
+  class WA nein
+</pre>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Verbindung</th><th>Wie sie funktioniert</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>MyTCO → Advantage (Anmeldungen)</td><td>Advantage nimmt eine ganze Spalte Lizenznummern per Copy-Paste an. MyTCO liefert diese Liste pro Kategorie.</td><td><span class="m b">belegt · 11</span></td></tr>
+      <tr><td>Advantage → MyTCO (Gruppen, Tableaus)</td><td>Advantage exportiert Spieler, Tableaus und Spielpläne als Excel. Wie die Spalten genau aussehen, ist noch nicht geprüft.</td><td><span class="m b">belegt · 11</span> Format <span class="m o">offen</span></td></tr>
+      <tr><td>MyTCO → Advantage (Resultate)</td><td>Es gibt keinen Import. Resultate werden in Advantage pro Spiel oder Runde eingetippt. MyTCO kann höchstens eine übersichtliche Abtipp-Liste liefern.</td><td><span class="m b">belegt · 11</span></td></tr>
+      <tr><td>MyTCO ↔ Fairgate (Stammdaten)</td><td>Fairgate hat eine Kontakt-Schnittstelle. Ob sie in Basis enthalten ist, ob sie auch Schreiben erlaubt und was sie kostet, ist nicht dokumentiert. Die Event-Schnittstelle kann nur lesen und braucht das Eventmodul, das der TCO nicht hat.</td><td><span class="m b">belegt · 8 18</span> Schreiben <span class="m o">offen</span></td></tr>
+      <tr><td>Fairgate ↔ Swiss Tennis (Lizenzen)</td><td>Fairgate kann Lizenzen bestellen, sistieren und löschen, ohne Doppelerfassung.</td><td><span class="m b">belegt · 6</span> Kosten und Nutzung beim TCO <span class="m o">offen</span></td></tr>
+      <tr><td>WhatsApp → MyTCO (Newsfeed)</td><td>Nachrichten aus normalen WhatsApp-Gruppen oder Communities lassen sich nicht automatisch auslesen. Die offizielle Gruppen-Schnittstelle ist für Firmenkonten und hat höchstens 8 Teilnehmer pro Gruppe. Machbar ist nur der umgekehrte Weg: News in MyTCO schreiben und den Link teilen.</td><td><span class="m x">nicht machbar · 13 14</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>3 · Jede Anforderung: kaufen oder selbst bauen?</h2>
+  <p>Aufwand in Personentagen (PT, je 8 Stunden) inklusive Tests, bei Entwicklung mit KI-Unterstützung. Alle Aufwände sind <span class="m s">Schätzung</span>. Ein PT entspricht etwa drei Feierabenden. Die Etappen sind nach dem Kalender der Clubmeisterschaft geordnet: Anmeldeschluss Anfang Juni, Gruppenspiele bis Anfang August, Finalwochenende Mitte August <span class="m b">belegt · 3</span>. Dass 2027 derselbe Kalender gilt, ist eine <span class="m v">Vermutung</span>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Anforderung (Abschnitt)</th><th>Gibt es das schon?</th><th>Zusatzkosten Fertiglösung</th><th>Selbst bauen?</th><th class="num">PT</th></tr></thead>
+    <tbody>
+      <tr class="grp"><td colspan="5">Etappe 1 · Fundament und Anmeldung zur Clubmeisterschaft · bis ca. Mai 2027</td></tr>
+      <tr><td>Login, Einmalpasswort per Brief, Pflicht-Passwortwechsel, Daten ergänzen (2, 3b)</td><td>Der Fairgate-Mitgliederbereich hat ein Login mit Erstanmeldung per E-Mail-Link <span class="m b">belegt · 7</span>, ist beim TCO aber nicht gebucht <span class="m b">belegt · 18</span>. Ein Einmalpasswort per Brief ist dort nicht beschrieben.</td><td>Intranet-Modul: Verbandspreis 2022 CHF 90/Jahr + 90 einmalig <span class="m b">belegt · 17</span>; regulärer Preis <span class="m o">offen</span></td><td>Ja, Standardaufgabe. Der Briefversand bleibt Handarbeit.</td><td class="num">3–5</td></tr>
+      <tr><td>Admin: Konten anlegen und löschen, 5 Rollen (4a)</td><td>Fairgate kann Mitgliedern Lese- oder Schreibrechte geben <span class="m b">belegt · 5</span>. Die 5 Rollen aus der Anforderung: <span class="m o">offen</span></td><td>–</td><td>Ja, wird ohnehin für jede eigene App gebraucht.</td><td class="num">3–5</td></tr>
+      <tr><td>Startseite mit Shortcuts, Konto, Logout (3c)</td><td>–</td><td>–</td><td>Ja</td><td class="num">2–3</td></tr>
+      <tr><td>Clubmeisterschaft anlegen: Turniernummern, Kategorien (5a)</td><td>In Advantage vorhanden, kostenlos <span class="m b">belegt · 11</span></td><td>keine</td><td>Ja, als Spiegel von Advantage, damit die Anmeldung in MyTCO läuft.</td><td class="num">2–3</td></tr>
+      <tr><td>Anmeldung: höchstens 3 Kategorien, nur passende anzeigen, Doppelpartner wählen (5b)</td><td>Advantage hat eine Online-Anmeldung über myTennis <span class="m b">belegt · 11</span>. Ob es die Regel „höchstens 3“ und den Filter nach Alter und Geschlecht gibt: <span class="m o">offen</span>. Das Fairgate-Eventmodul kann das nicht <span class="m s">Schätzung · 16</span>. Heute wird per E-Mail angemeldet <span class="m b">belegt · 3</span>.</td><td>keine</td><td>Ja. Hier liegt der Mehrwert gegenüber dem heutigen Ablauf.</td><td class="num">4–6</td></tr>
+      <tr><td>Bestätigung per E-Mail (5b)</td><td>–</td><td>E-Mail-Versand bei kleinen Mengen günstig bis gratis <span class="m s">Schätzung</span></td><td>Ja</td><td class="num">1–2</td></tr>
+      <tr><td>Export der Anmeldungen an Swiss Tennis (5c)</td><td>Advantage nimmt Lizenznummern per Copy-Paste an <span class="m b">belegt · 11</span></td><td>keine</td><td>Ja, sehr einfach</td><td class="num">0.5–1</td></tr>
+      <tr><td>Betrieb: Hosting, Backups, Datenschutz (nDSG), Sicherheit, Deployment</td><td>–</td><td>Hosting ca. CHF 60–300 pro Jahr <span class="m s">Schätzung</span></td><td>Pflicht bei jedem Eigenbau</td><td class="num">5–8</td></tr>
+
+      <tr class="grp"><td colspan="5">Etappe 2 · Gruppenphase · bis ca. Juni 2027</td></tr>
+      <tr><td>Gruppen und Tableaus aus Advantage übernehmen (5c)</td><td>Advantage exportiert Excel <span class="m b">belegt · 11</span>, Format <span class="m o">offen</span></td><td>keine</td><td>Ja</td><td class="num">3–5</td></tr>
+      <tr><td>Spieler melden Resultate, sehen Gegnerkontakte, Live-Rangliste (5d)</td><td>Advantage berechnet Ranglisten (Siege, direkte Begegnung, Satz- und Gamedifferenz) <span class="m b">belegt · 11</span>, aber nur Organisatoren erfassen Resultate. Gegnerkontakte nur mit Einwilligung zeigen <span class="m s">Schätzung</span>.</td><td>keine</td><td>Ja. Kernstück, das es so nirgends gibt.</td><td class="num">5–7</td></tr>
+      <tr><td>Abtipp-Liste für Resultate an Swiss Tennis (5d)</td><td>Kein Import in Advantage möglich <span class="m b">belegt · 11</span></td><td>–</td><td>Ja, als Hilfsliste</td><td class="num">1</td></tr>
+
+      <tr class="grp"><td colspan="5">Etappe 3 · Finalwochenende · bis ca. Juli 2027</td></tr>
+      <tr><td>Spielplaner: Tage, Plätze, Spieldauer je Kategorie, 30-Minuten-Raster, Konfliktprüfung (5e-i)</td><td>Advantage kann Plätze benennen, ein Spielzeitraster erzeugen, Spielzeiten vergeben und prüft auf Doppelbelegung, zu kurze Pausen und Abwesenheiten <span class="m b">belegt · 11</span>. Drag-and-Drop und farbige Konflikte: nicht beschrieben <span class="m o">offen</span></td><td>keine</td><td>Nur wenn der Advantage-Spielplan in der Praxis nicht reicht. Das ist der grösste Einzelposten.</td><td class="num">10–15</td></tr>
+      <tr><td>Live-Ansicht für Spieler, Resultat per Klick (5e-ii)</td><td>Advantage veröffentlicht Tableaus und Spielpläne <span class="m b">belegt · 11</span></td><td>keine</td><td>Ja, wenn der Planer selbst gebaut wird</td><td class="num">2–4</td></tr>
+
+      <tr class="grp"><td colspan="5">Etappe 4 · Mitglieder-Hub · nach der Klärung mit Fairgate</td></tr>
+      <tr><td>Adresse, E-Mail, Telefon ändern (3e)</td><td>Bei Fairgate können Mitglieder laut Kundenstimmen ihre Daten selbst bearbeiten <span class="m b">belegt · 5</span>. Dafür braucht es vermutlich das Intranet-Modul, das der TCO nicht hat <span class="m v">Vermutung</span></td><td>Intranet-Modul, siehe oben</td><td>Nur mit Schreibzugriff auf Fairgate. Ohne ihn gibt es zwei Mitgliederdatenbanken.</td><td class="num">2–3</td></tr>
+      <tr><td>Lizenz bestellen oder abbestellen (3e)</td><td>Die Fairgate-Lizenzverwaltung macht das direkt mit Swiss Tennis <span class="m b">belegt · 6</span>. Ob der TCO sie nutzt: <span class="m o">offen</span></td><td>Preis <span class="m o">offen</span></td><td>Nur als Antragsformular, ausgeführt von Hand. Eine öffentliche Swiss-Tennis-Schnittstelle habe ich nicht gefunden <span class="m v">Vermutung</span></td><td class="num">1</td></tr>
+      <tr><td>Zustellart der Jahresrechnung (3e)</td><td>Der TCO hat Fairgate Finance Pro <span class="m b">belegt · 18</span>. Dass die Jahresrechnung von dort verschickt wird, ist eine <span class="m v">Vermutung</span></td><td>–</td><td>Nur als Feld, das jemand in Fairgate überträgt</td><td class="num">0.5</td></tr>
+      <tr><td>Anmeldung zu Anlässen, erweiterbar (3d)</td><td>Fairgate Kurs- und Eventmodul, beim TCO nicht gebucht <span class="m b">belegt · 18</span>. Lite kann: Anlässe auf der Website oder im internen Bereich zeigen, minimale und maximale Teilnehmerzahl, An- und Abmeldefristen, Bestätigungsmails, Teilnehmerlisten. Pro kann zusätzlich Wartelisten, Rechnungen und Gäste ohne Fairgate-Konto <span class="m b">belegt · 16</span></td><td>Lite CHF 190/Jahr + 190 einmalig, Pro CHF 390/Jahr + 390 einmalig <span class="m b">belegt · 16</span>, Stand vermutlich 2022 <span class="m v">Vermutung</span></td><td>Für normale Anlässe ist Kaufen günstiger als Bauen. Für die Clubmeisterschaft reicht das Modul nicht: keine Regel „höchstens 3“, kein Filter nach Kategorie, keine Wahl des Doppelpartners <span class="m s">Schätzung</span></td><td class="num">5–8</td></tr>
+      <tr><td>Lizenzliste als PDF, mit Änderungen zum Vorjahr (4b)</td><td>Swiss Tennis veröffentlicht die lizenzierten Spieler des TCO <span class="m b">belegt · 3</span>. Einen Vergleich mit dem Vorjahr gibt es nicht.</td><td>–</td><td>Ja</td><td class="num">2–3</td></tr>
+      <tr><td>Newsfeed (3c)</td><td>tcolten.ch hat schon News <span class="m b">belegt · 2</span>. WhatsApp-Import: <span class="m x">nicht machbar · 13</span></td><td>–</td><td>Ja, oder die News von tcolten.ch anzeigen (mit dem Website-Betreuer zu klären)</td><td class="num">1–3</td></tr>
+      <tr><td>Zwei-Faktor, Passkey, Login per Code (2)</td><td>Bei Fairgate nicht dokumentiert <span class="m o">offen</span></td><td>SMS kostet pro Nachricht ca. CHF 0.05–0.10 <span class="m s">Schätzung</span></td><td>Ja, mit Standardbibliotheken</td><td class="num">2–4</td></tr>
+      <tr><td>Login-Feld auf tcolten.ch (3b)</td><td>–</td><td>keine</td><td>Ja, aber auf der Website. Das macht der Website-Betreuer.</td><td class="num">0.5–1</td></tr>
+      <tr><td>Benachrichtigung per SMS oder WhatsApp (5b)</td><td>–</td><td>SMS siehe oben. WhatsApp braucht ein verifiziertes Firmenkonto bei Meta und kostet pro Nachricht <span class="m v">Vermutung</span></td><td>Zuerst E-Mail; SMS und WhatsApp später, falls gewünscht</td><td class="num">+2–6</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Etappe</th><th class="num">PT</th><th class="num">Feierabende ca.</th><th>Hängt ab von</th></tr></thead>
+    <tbody>
+      <tr><td>1 · Fundament und Anmeldung zur Clubmeisterschaft</td><td class="num">20–33</td><td class="num">60–100</td><td>Entscheid über die Plattform, Hosting</td></tr>
+      <tr><td>2 · Gruppenphase</td><td class="num">9–13</td><td class="num">27–40</td><td>Excel-Format aus Advantage</td></tr>
+      <tr><td>3 · Finalwochenende</td><td class="num">12–19</td><td class="num">36–57</td><td>Reicht der Spielplan in Advantage?</td></tr>
+      <tr><td>4 · Mitglieder-Hub</td><td class="num">14–24</td><td class="num">42–72</td><td>Intranet und Eventmodul dazubuchen oder selbst bauen; Schreibzugriff auf Fairgate</td></tr>
+      <tr><td><strong>Total, alles selbst gebaut</strong></td><td class="num"><strong>55–89</strong></td><td class="num"><strong>165–270</strong></td><td>Ohne SMS und WhatsApp. Dazu kommt Wartung von ca. 3–6 PT pro Jahr <span class="m s">Schätzung</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>4 · Was es kosten würde</h2>
+  <p>Fairgate veröffentlicht keine aktuelle Preisliste. Die Preise werden pro Verein nach Modulen und Anzahl Kontakte berechnet <span class="m b">belegt · 9 10</span>. Die Zahlen unten sind Anhaltspunkte, kein Angebot für den TCO. Den genauen Preis zeigt Fairgate in der Verwaltung des Clubs unter „Module &amp; Services“ an <span class="m b">belegt · 16</span>. Dort kann jemand vom Vorstand nachschauen.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Posten</th><th>Betrag</th><th>Gilt für</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr class="grp"><td colspan="4">Was der TCO dazubuchen müsste, damit Fairgate den Mitglieder-Teil abdeckt</td></tr>
+      <tr><td>Fairgate Intranet (Mitglieder-Login, Mitgliederbereich)</td><td class="num">CHF 90/Jahr + 90 einmalig</td><td>Verbandspreis Swiss-Ski 2022; der reguläre Preis ist vermutlich höher</td><td><span class="m b">belegt · 17</span> für den TCO <span class="m o">offen</span></td></tr>
+      <tr><td>Fairgate Kurs- und Eventmodul Lite</td><td class="num">CHF 190/Jahr + 190 einmalig</td><td>Produktblatt von Fairgate, Stand vermutlich 2022</td><td><span class="m b">belegt · 16</span></td></tr>
+      <tr><td>Fairgate Kurs- und Eventmodul Pro</td><td class="num">CHF 390/Jahr + 390 einmalig</td><td>wie oben</td><td><span class="m b">belegt · 16</span></td></tr>
+      <tr><td><strong>Intranet + Event Lite zusammen</strong></td><td class="num"><strong>ca. CHF 280–400/Jahr + ca. 280–400 einmalig</strong></td><td>Spanne, weil der reguläre Intranet-Preis unbekannt ist</td><td><span class="m s">Schätzung</span></td></tr>
+      <tr class="grp"><td colspan="4">Weitere Anhaltspunkte</td></tr>
+      <tr><td>Fairgate-Paket „Silber“: Kontakte, Finanzen, Kommunikation, Mitgliederbereich, Sponsoren</td><td class="num">CHF 490/Jahr + 190 einmalig</td><td>Bis 300 Kontakte, nur ZKB-Neukunden, exkl. MWST</td><td><span class="m b">belegt · 9</span></td></tr>
+      <tr><td>Fairgate-Paket „Gold“: wie Silber, zusätzlich Website</td><td class="num">CHF 690/Jahr + 290 einmalig</td><td>Bis 1'000 Kontakte, nur ZKB-Neukunden, exkl. MWST</td><td><span class="m b">belegt · 9</span></td></tr>
+      <tr><td>Fairgate mit Kernmodulen, Verein mit 150 Mitgliedern</td><td class="num">ca. CHF 450/Jahr</td><td>Schätzung eines Konkurrenzanbieters, Mai 2026</td><td><span class="m b">belegt · 10</span> als fremde Schätzung</td></tr>
+      <tr><td>Fairgate-Lizenzverwaltung Swiss Tennis, Kontakt-Schnittstelle</td><td class="num">?</td><td>–</td><td><span class="m o">offen</span></td></tr>
+      <tr><td>Swiss Tennis Advantage</td><td class="num">CHF 0</td><td>Alle Turnierorganisatoren</td><td><span class="m b">belegt · 11</span></td></tr>
+      <tr><td>Eigenbau: Hosting, Domain vorhanden</td><td class="num">ca. CHF 60–300/Jahr</td><td>Kleiner Server oder Plattformdienst in der Schweiz oder EU</td><td><span class="m s">Schätzung</span></td></tr>
+      <tr><td>Eigenbau: E-Mail-Versand</td><td class="num">ca. CHF 0–150/Jahr</td><td>Bei wenigen hundert Mails pro Monat</td><td><span class="m s">Schätzung</span></td></tr>
+      <tr><td>Eigenbau: Entwicklung</td><td class="num">ehrenamtlich?</td><td>55–89 PT, siehe oben</td><td><span class="m o">offen</span>, zu klären</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Bei den Geldbeträgen liegen Kaufen und Selbstbauen nahe beieinander: wenige hundert Franken pro Jahr. Intranet und Event Lite bei Fairgate kosten ungefähr gleich viel wie das Hosting einer eigenen App. Der eigentliche Preis des Eigenbaus ist Zeit. Dazu kommt die Frage, wer die App in fünf Jahren noch betreut <span class="m s">Schätzung</span>.</p>
+</section>
+
+<section>
+  <h2>5 · Wer darf was sehen und ändern</h2>
+  <p>Die fünf Rollen stammen aus der Anforderung <span class="m b">belegt · 1</span>. Die Verteilung der Rechte ist ein <span class="m v">Vorschlag</span> zur Diskussion. <span class="ac w">S</span> = lesen und schreiben, <span class="ac">L</span> = nur lesen, <span class="ac">eigene</span> = nur die eigenen Einträge, <span class="ac n">–</span> = kein Zugriff.</p>
+  <div class="tbl"><table class="matrix">
+    <thead><tr><th>Daten in MyTCO</th><th>Gast</th><th>Mitglied</th><th>Junioren-Leiter</th><th>Anlässe-Veranstalter</th><th>Admin</th></tr></thead>
+    <tbody>
+      <tr><td>Eigenes Profil</td><td class="ac w">S (Registrierung)</td><td class="ac w">S</td><td class="ac w">S</td><td class="ac w">S</td><td class="ac w">S</td></tr>
+      <tr><td>Kontaktdaten anderer Mitglieder</td><td class="ac n">–</td><td class="ac">L (nur Doppelpartner, Gegner)</td><td class="ac">L (Junioren)</td><td class="ac">L (Teilnehmende)</td><td class="ac w">S</td></tr>
+      <tr><td>Anlässe</td><td class="ac n">–</td><td class="ac">L</td><td class="ac w">S (Junioren)</td><td class="ac w">S</td><td class="ac w">S</td></tr>
+      <tr><td>Anmeldungen</td><td class="ac n">–</td><td class="ac w">eigene</td><td class="ac w">S (Junioren)</td><td class="ac w">S</td><td class="ac w">S</td></tr>
+      <tr><td>Clubmeisterschaft: Kategorien, Gruppen</td><td class="ac n">–</td><td class="ac">L</td><td class="ac">L</td><td class="ac w">S</td><td class="ac w">S</td></tr>
+      <tr><td>Resultate</td><td class="ac n">–</td><td class="ac w">eigene Spiele</td><td class="ac">L</td><td class="ac w">S</td><td class="ac w">S</td></tr>
+      <tr><td>Spielplan Finalwochenende</td><td class="ac n">–</td><td class="ac">L</td><td class="ac">L</td><td class="ac w">S</td><td class="ac w">S</td></tr>
+      <tr><td>Lizenzliste</td><td class="ac n">–</td><td class="ac n">–</td><td class="ac">L (Junioren)</td><td class="ac n">–</td><td class="ac w">S</td></tr>
+      <tr><td>Benutzerkonten und Rollen</td><td class="ac n">–</td><td class="ac n">–</td><td class="ac n">–</td><td class="ac n">–</td><td class="ac w">S</td></tr>
+      <tr><td>Newsfeed</td><td class="ac n">–</td><td class="ac">L</td><td class="ac">L</td><td class="ac w">S</td><td class="ac w">S</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Bestehendes System</th><th>Wer pflegt es heute?</th></tr></thead>
+    <tbody>
+      <tr><td>Fairgate</td><td><span class="m o">offen</span> (vermutlich Vorstand, Finanzen und Mitglieder <span class="m v">Vermutung</span>)</td></tr>
+      <tr><td>Advantage</td><td><span class="m o">offen</span> (vermutlich die Verantwortlichen der Clubmeisterschaft <span class="m v">Vermutung</span>)</td></tr>
+      <tr><td>tcolten.ch</td><td>Website-Betreuer <span class="m b">belegt · 2</span></td></tr>
+      <tr><td>GotCourts</td><td><span class="m o">offen</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>6 · Drei mögliche Wege</h2>
+  <div class="paths">
+    <div class="path rec">
+      <span class="tag">Meine Empfehlung · Schätzung</span>
+      <h3>A · Fairgate ausbauen, MyTCO als Turnier-App</h3>
+      <ul>
+        <li>Intranet und Event Lite bei Fairgate dazubuchen: Mitglieder-Login, eigene Daten ändern, Anlässe.</li>
+        <li>MyTCO macht die Clubmeisterschaft, also das, was es nirgends gibt.</li>
+        <li>Nur eine Mitgliederdatenbank.</li>
+      </ul>
+      <dl><dt>Eigenbau</dt><dd>Etappen 1–3: ca. 41–65 PT</dd><dt>Laufend</dt><dd>Intranet + Event Lite ca. CHF 280–400/Jahr, dazu Hosting <span class="m s">Schätzung</span></dd><dt>Nachteil</dt><dd>Zwei Logins, sofern Fairgate kein gemeinsames Login erlaubt</dd></dl>
+    </div>
+    <div class="path">
+      <span class="tag">Möglich, falls Fairgate es zulässt</span>
+      <h3>B · MyTCO als Hub, Fairgate im Hintergrund</h3>
+      <ul>
+        <li>Mitglieder sehen nur MyTCO. Änderungen gehen über die Schnittstelle nach Fairgate.</li>
+        <li>Die vollständige Vision aus dem Anforderungsdokument.</li>
+      </ul>
+      <dl><dt>Eigenbau</dt><dd>ca. 55–89 PT, plus Anbindung an Fairgate</dd><dt>Laufend</dt><dd>Fairgate-Schnittstelle (offen) und Hosting</dd><dt>Nachteil</dt><dd>Steht und fällt mit dem Schreibzugriff auf Fairgate</dd></dl>
+    </div>
+    <div class="path">
+      <span class="tag">Riskant</span>
+      <h3>C · MyTCO komplett eigenständig</h3>
+      <ul>
+        <li>Eigene Mitgliederdatenbank neben Fairgate; Fairgate bleibt für die Finanzen.</li>
+        <li>Volle Freiheit bei Design und Abläufen.</li>
+      </ul>
+      <dl><dt>Eigenbau</dt><dd>ca. 55–89 PT, plus Datenübernahme</dd><dt>Laufend</dt><dd>Hosting; Fairgate Basis und Finance Pro laufen weiter</dd><dt>Nachteil</dt><dd>Doppelte Datenpflege, weil Finance Pro die Mitgliederdaten für die Rechnungen braucht <span class="m v">Vermutung</span>; die ganze Datenschutzverantwortung liegt beim Club</dd></dl>
+    </div>
+  </div>
+  <p>Bei allen drei Wegen fängt man gleich an: mit der Anmeldung zur Clubmeisterschaft 2027. Das deckt kein bestehendes System ab, und der Anmeldeschluss gibt ein klares Datum vor. Der Entscheid zwischen A, B und C kann warten, bis die Fragen zu Fairgate geklärt sind.</p>
+</section>
+
+<section>
+  <h2>7 · Fragen für das Gespräch</h2>
+  <ol class="q">
+    <li>Was kosten Basis Medium und Finance Pro heute pro Jahr, und wer betreut Fairgate? Was würden Intranet und Event Lite laut „Module &amp; Services“ zusätzlich kosten?</li>
+    <li>Ist die Swiss-Tennis-Lizenzverwaltung in Basis enthalten und wird sie genutzt, oder laufen die Lizenzen direkt über Swiss Tennis?</li>
+    <li>Ist die Kontakt-Schnittstelle in Basis enthalten, und kann sie Daten schreiben? Das muss Fairgate beantworten.</li>
+    <li>Was läuft heute bei der Clubmeisterschaft am schlechtesten: die Anmeldung, die Gruppenspiele, die Resultate oder das Finalwochenende?</li>
+    <li>Wurde der Spielplan von Advantage fürs Finalwochenende schon ausprobiert, und was fehlt dort?</li>
+    <li>Bis wann muss die Anmeldung zur Clubmeisterschaft 2027 laufen?</li>
+    <li>Gibt es ein Budget für laufende Kosten? Wer betreut die App langfristig, falls du ausfällst?</li>
+    <li>Macht der Website-Betreuer mit, also Login-Feld, Subdomain und eventuell die News?</li>
+    <li>Wer ist im Club für den Datenschutz verantwortlich? Dürfen Spieler die Kontaktdaten ihrer Gegner sehen?</li>
+    <li>Muss der Gegner ein gemeldetes Resultat bestätigen?</li>
+    <li>Für dich: Ehrenamt oder entschädigt, und wie viel Zeit kannst du pro Woche einsetzen?</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Quellen</h2>
+  <p class="small">Webquellen abgerufen am 28. und 29.10.2026.</p>
+  <ol class="src">
+    <li>Anforderungsdokument „Anforderungen MyTCO“, Version 1.2 vom 22.10.2026</li>
+    <li>tcolten.ch: Seitenquelltext, DNS- und Hosting-Abfrage (Metanet AG)</li>
+    <li><a href="https://tcolten.ch/wettkampf" target="_blank" rel="noopener">tcolten.ch/wettkampf</a>: Platzreservation, Lizenzen, Clubmeisterschaften</li>
+    <li><a href="https://tcolten.ch/club" target="_blank" rel="noopener">tcolten.ch/club</a>: Aufnahmeformular, Finanzen und Mitgliederverwaltung</li>
+    <li><a href="https://www.fairgate.ch" target="_blank" rel="noopener">fairgate.ch</a>: Module, Kundenstimmen</li>
+    <li><a href="https://fairgate.ch/swiss-tennis/" target="_blank" rel="noopener">fairgate.ch/swiss-tennis</a>: Lizenzverwaltung</li>
+    <li><a href="https://support.fairgate.ch/de/kb/articles/login-passwort-3" target="_blank" rel="noopener">Fairgate Hilfe: Login und Passwort</a></li>
+    <li><a href="https://support.fairgate.ch/de/kb/articles/fsa-api-v20-fur-entwickler-und-integratoren" target="_blank" rel="noopener">Fairgate Hilfe: FSA-API v2.0</a></li>
+    <li><a href="https://fairgate.ch/zkb/" target="_blank" rel="noopener">fairgate.ch/zkb</a>: Paketpreise für ZKB-Kunden</li>
+    <li><a href="https://www.membear.ch/de/competitors/membear-vs-fairgate" target="_blank" rel="noopener">membear.ch: Vergleich mit Fairgate</a> (Konkurrenzanbieter, Stand Mai 2026)</li>
+    <li><a href="https://www.swisstennis.ch/media/3964/benutzerdokumentation_turnierapplikation_de.pdf" target="_blank" rel="noopener">Swiss Tennis: Benutzerdokumentation Turnieradministration Advantage</a> (PDF)</li>
+    <li><a href="https://www.swisstennis.ch/de/wettkampf/turnierwesen/faq-turnierwesen/" target="_blank" rel="noopener">Swiss Tennis: FAQ Turnierwesen</a></li>
+    <li><a href="https://kapso.ai/blog/whatsapp-groups-api-state-2026" target="_blank" rel="noopener">Kapso: WhatsApp Groups API 2026</a></li>
+    <li><a href="https://developers.facebook.com/documentation/business-messaging/whatsapp/changelog/" target="_blank" rel="noopener">Meta: WhatsApp Business Platform Changelog</a></li>
+    <li><a href="https://support.fairgate.ch/de" target="_blank" rel="noopener">Fairgate Hilfe-Center</a>: Kategorien Kurse und Events, Einbettung in Websites</li>
+    <li><a href="https://fairgate.ch/wp-content/uploads/2022/03/Fairgate-Produktinfo_Event_Kursmodul.pdf" target="_blank" rel="noopener">Fairgate: Produktinfo Event- und Kursmodul</a> (PDF, abgelegt 2022/03): Funktionen und Preise Lite und Pro</li>
+    <li><a href="https://www.swiss-ski.ch/fileadmin/user_upload/DE_Factsheet_Fairgate.pdf" target="_blank" rel="noopener">Swiss-Ski: Factsheet Fairgate</a> (2022): Modulpreise für Swiss-Ski-Clubs, Intranet als eigenes Modul</li>
+    <li>Deine Auskunft vom 29.10.2026: Der TCO nutzt Fairgate Basis Medium und Finance Pro</li>
+  </ol>
+</section>
+
+</div>

@@ -1,0 +1,26 @@
+name: Check
+
+# Dieselben Prüfungen wie lokal `make check`. Nur PRs und die beiden dauerhaften
+# Branches — Feature-Branches deckt der lokale pre-commit-Hook ab (Actions-Minuten
+# werden über alle privaten Repos geteilt).
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+  workflow_dispatch:
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: make check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - run: make check
