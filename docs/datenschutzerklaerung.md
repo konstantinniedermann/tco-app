@@ -2,8 +2,10 @@
 
 # Datenschutzerklärung MyTCO — Entwurf
 
-Text, den Mitglieder in MyTCO und auf dem Login-Brief lesen. Er leitet sich aus dem
-[Datenschutzkonzept](datenschutz.md) ab und wird mit ihm geändert.
+Text, den Mitglieder in MyTCO lesen und auf den die Login-Briefe verweisen. Er leitet sich
+aus dem [Datenschutzkonzept](datenschutz.md) ab und wird mit ihm geändert. Stellen mit dem Vermerk
+*ab der Etappe …* beschreiben Funktionen, die es noch nicht gibt; sie kommen erst mit dieser
+Etappe in die veröffentlichte Fassung.
 
 **Status:** Entwurf, nicht freigegeben. Freigabe durch den Vorstand (K-06). Platzhalter in
 eckigen Klammern füllt der Verein aus. Die mit *(Vorschlag)* markierten Stellen hängen an
@@ -31,11 +33,13 @@ Fragen zum Datenschutz richten Sie an: [Funktion der Ansprechperson, z. B. Präs
 ### Welche Daten bearbeitet MyTCO?
 
 - **Angaben zur Person:** Vorname, Nachname, Postadresse, Geschlecht, Jahrgang
+  *(Vorschlag, K-40)*
 - **Kontakt:** E-Mail-Adresse, Telefonnummer (für die Anmeldung zur Clubmeisterschaft
   nötig, sonst freiwillig)
 - **Tennis:** Lizenznummer und Klassierung bei Swiss Tennis (freiwillig)
 - **Konto:** Ihre Rollen, Ihr Passwort (nur in einer Form gespeichert, aus der es sich
-  nicht zurückgewinnen lässt — auch der Verein kann es nicht lesen), Zeitpunkt des letzten Logins, Ihre Einstellungen für Benachrichtigungen
+  nicht zurückgewinnen lässt — auch der Verein kann es nicht lesen), Zeitpunkt des letzten
+  Logins, Ihre Einstellungen für Benachrichtigungen
 - **Clubmeisterschaft:** Ihre Anmeldungen, Spiele und Resultate
 - **Lizenzen:** Ihre Anträge auf eine Lizenz oder deren Storno
 - **Technik:** Beim Aufruf von MyTCO speichert der Server Ihre IP-Adresse, den Zeitpunkt
@@ -68,7 +72,8 @@ Profile.
   Bedingung für die Teilnahme. Nach dem Finalwochenende sind die Daten nicht mehr sichtbar.
   *(Vorschlag, K-31)*
 - **Alle, auch ohne Login,** sehen den Spielplan des Finalwochenendes mit Name, Kategorie,
-  Platz, Zeit und Resultat. *(Vorschlag, K-39)*
+  Platz, Zeit und Resultat; Spieler unter 16 nur mit Vorname und Anfangsbuchstabe des
+  Nachnamens. *(Vorschlag, K-39; ab der Etappe mit dem Spielplan)*
 
 ### Wer erhält Ihre Daten ausserhalb des Vereins?
 
@@ -76,14 +81,16 @@ Profile.
   Lizenzanträge. Swiss Tennis ist dafür selbst verantwortlich.
 - **[Name des Hosters], [Land]** betreibt den Server von MyTCO im Auftrag des Vereins.
 - **[Name des E-Mail-Dienstes], [Land]** versendet E-Mails von MyTCO im Auftrag des Vereins.
-- **Die Schweizerische Post** stellt den Brief mit Ihren Zugangsdaten zu.
+- **Die Schweizerische Post** stellt die Briefe mit Ihren Zugangsdaten zu.
 - **Push-Dienste:** Wenn Sie Push-Nachrichten einschalten, stellt der Hersteller Ihres
   Browsers oder Handys sie zu (z. B. Google, Apple, Mozilla), teils mit Servern in den USA.
   Der Inhalt ist verschlüsselt und für diese Dienste nicht lesbar; er nennt keine anderen
-  Mitglieder.
+  Mitglieder. Der Dienst sieht nur die Zustelladresse Ihres Geräts und den Zeitpunkt.
+  Grundlage: [Angemessenheit nach Anhang 1 DSV für zertifizierte Firmen bzw. andere
+  Garantie — wird mit dem Hosting-Entscheid geprüft]
 
-Ihre Daten liegen in der Schweiz oder in der EU. Der Verein gibt sie nicht an Dritte für
-deren eigene Zwecke weiter und verkauft sie nicht.
+Ihre Daten liegen in der Schweiz oder in einem Staat der EU bzw. des EWR. Der Verein gibt
+sie nicht an Dritte für deren eigene Zwecke weiter und verkauft sie nicht.
 
 ### Wie lange?
 
@@ -92,21 +99,24 @@ deren eigene Zwecke weiter und verkauft sie nicht.
   Clubmeisterschaften. *(Vorschlag, K-38)*
 - Ihre Kontaktdaten sind für Gegner und Doppelpartner nur bis zum Ende der
   Clubmeisterschaft sichtbar.
-- Lizenzanträge werden am Ende des Folgejahres gelöscht.
+- Lizenzanträge werden am Ende des Folgejahres gelöscht, nach einem Austritt früher.
 - Technische Protokolle werden nach 30 Tagen gelöscht.
 - Sicherungskopien werden spätestens 30 Tage nach einer Löschung überschrieben.
 
 ### Cookies und Tracking
 
 MyTCO speichert in Ihrem Browser nur, was für das Login und Ihre Einstellungen nötig ist.
-Es gibt kein Tracking, keine Analyse-Dienste und keine Werbung. MyTCO lädt keine Inhalte
-von fremden Servern.
+Sie können das in den Einstellungen Ihres Browsers verhindern; das Login funktioniert dann
+nicht. Es gibt kein Tracking, keine Analyse-Dienste und keine Werbung. MyTCO lädt keine
+Inhalte von fremden Servern.
 
 ### Junioren
 
 Ein eigenes Konto erhalten Mitglieder ab 16 Jahren. Jüngere Spieler erfasst der Admin für
-die Clubmeisterschaft ohne eigenes Konto; als Kontakt für die Gegner dient die Adresse
-eines Elternteils. *(Vorschlag, K-08)*
+die Clubmeisterschaft ohne eigenes Konto. Als Kontakt für die Gegner dienen E-Mail-Adresse
+und Telefonnummer eines Elternteils; dieser erhält bei der Anmeldung diese Erklärung per
+E-Mail. Die Kontaktdaten des Elternteils werden 3 Monate nach Ende der Clubmeisterschaft
+gelöscht. *(Vorschlag, K-08)*
 
 ### Ihre Rechte
 

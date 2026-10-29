@@ -21,7 +21,7 @@ Issue im Milestone *Fundament*.
 |----------|--------|
 | [ADR-Index](adr/adr-index.md) | Architektur-Entscheidungen mit Begründung |
 | [Datenschutzkonzept](datenschutz.md) | Was MyTCO mit Personendaten tut, nach nDSG; Vorgaben `DS-NN` für Technik und Hosting; Grundlage für jede neue Funktion |
-| [Datenschutzerklärung (Entwurf)](datenschutzerklaerung.md) | Text für die Mitglieder in der App und auf dem Login-Brief |
+| [Datenschutzerklärung (Entwurf)](datenschutzerklaerung.md) | Text für die Mitglieder in der App und in den Login-Briefen |
 
 ## Arbeitsweise
 
