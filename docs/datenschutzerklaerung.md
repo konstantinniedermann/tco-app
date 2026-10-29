@@ -2,137 +2,48 @@
 
 # Datenschutzerklärung MyTCO — Entwurf
 
-Text, den Mitglieder in MyTCO lesen und auf den die Login-Briefe verweisen. Er leitet sich
-aus dem [Datenschutzkonzept](datenschutz.md) ab und wird mit ihm geändert. Stellen mit dem Vermerk
-*ab der Etappe …* beschreiben Funktionen, die es noch nicht gibt; sie kommen erst mit dieser
-Etappe in die veröffentlichte Fassung.
-
-**Status:** Entwurf, nicht freigegeben. Freigabe durch den Vorstand (K-06). Platzhalter in
-eckigen Klammern füllt der Verein aus. Die mit *(Vorschlag)* markierten Stellen hängen an
-offenen Fragen in den [Abklärungen](abklaerungen.md) und werden nach der Antwort angepasst;
-in der veröffentlichten Fassung fallen diese Markierungen weg.
+Text für die Mitglieder, in MyTCO und als Verweis auf den Login-Briefen. Folgt dem
+[Datenschutzkonzept](datenschutz.md). Entwurf, Freigabe durch den Vorstand (K-06);
+Platzhalter in eckigen Klammern füllt der Verein aus.
 
 ---
 
-## Datenschutzerklärung für MyTCO
+## Datenschutz in MyTCO
 
-Stand: [Datum der Freigabe]
+Stand: [Datum]
 
-MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Hier erfahren Sie, welche Daten
-MyTCO über Sie bearbeitet, wozu, wer sie sieht und welche Rechte Sie haben. Es gilt das
-Schweizer Datenschutzgesetz (DSG).
+MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Fragen zum Datenschutz an:
+[Ansprechperson], [E-Mail-Adresse des Vereins].
 
-### Wer ist verantwortlich?
+**Welche Daten:** Name, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Lizenznummer
+und Klassierung, Ihre Anmeldungen, Resultate und Lizenzanträge. Ihre Grunddaten übernimmt
+der Verein aus seiner Mitgliederliste.
 
-Tennis-Club Olten
-[Postadresse des Vereins]
+**Wozu:** für Ihr Konto, die Clubmeisterschaft, Lizenzanträge und Benachrichtigungen, die
+Sie selbst einschalten. Für nichts anderes.
 
-Fragen zum Datenschutz richten Sie an: [Funktion der Ansprechperson, z. B. Präsidium],
-[E-Mail-Adresse des Vereins für Datenschutz]
+**Wer sieht was:**
 
-### Welche Daten bearbeitet MyTCO?
+- Der Admin und die Verantwortlichen von Clubmeisterschaft und Lizenzen sehen, was sie für
+  ihre Aufgabe brauchen.
+- Alle Mitglieder sehen Name, Kategorien und Resultate der Clubmeisterschaft.
+- Ihre Gegner und Ihr Doppelpartner sehen während der Clubmeisterschaft Ihre E-Mail und
+  Telefonnummer, damit Sie die Spiele absprechen können.
+- Den Spielplan des Finalwochenendes sehen alle, auch ohne Login.
+- Swiss Tennis erhält Anmeldungen, Resultate und Lizenzanträge.
 
-- **Angaben zur Person:** Vorname, Nachname, Postadresse, Geschlecht, Jahrgang
-  *(Vorschlag, K-40)*
-- **Kontakt:** E-Mail-Adresse, Telefonnummer (für die Anmeldung zur Clubmeisterschaft
-  nötig, sonst freiwillig)
-- **Tennis:** Lizenznummer und Klassierung bei Swiss Tennis (freiwillig)
-- **Konto:** Ihre Rollen, Ihr Passwort (nur in einer Form gespeichert, aus der es sich
-  nicht zurückgewinnen lässt — auch der Verein kann es nicht lesen), Zeitpunkt des letzten
-  Logins, Ihre Einstellungen für Benachrichtigungen
-- **Clubmeisterschaft:** Ihre Anmeldungen, Spiele und Resultate
-- **Lizenzen:** Ihre Anträge auf eine Lizenz oder deren Storno
-- **Technik:** Beim Aufruf von MyTCO speichert der Server Ihre IP-Adresse, den Zeitpunkt
-  und allfällige Fehler, um den Betrieb zu sichern
+**Wo:** Die Daten liegen bei [Hoster] in [Land]; E-Mails versendet [E-Mail-Dienst].
+Push-Nachrichten stellt der Hersteller Ihres Browsers oder Handys zu (z. B. Google, Apple);
+sie enthalten keine Daten anderer Mitglieder.
 
-Ihre Grunddaten erfasst der Verein aus seiner Mitgliederliste. Lizenznummer, Telefonnummer
-und Einstellungen ergänzen Sie selbst.
+**Wie lange:** Solange Sie Mitglied sind. Nach einem Austritt wird Ihr Konto gesperrt und
+nach 3 Monaten gelöscht; Ihr Name bleibt in vergangenen Resultaten.
 
-### Wozu?
+**Junioren:** Ein eigenes Konto gibt es ab 16. Für jüngere Spieler ist ein Elternteil
+Kontakt für die Gegner.
 
-- um Ihnen ein Konto zu geben und Ihnen die Zugangsdaten per Post zu senden
-- um die Clubmeisterschaft durchzuführen: Anmeldung, Gruppen, Resultate, Ranglisten
-- um Ihre Lizenzanträge an Swiss Tennis weiterzugeben
-- um Sie per E-Mail oder Push-Nachricht zu benachrichtigen, wenn Sie das wünschen
-- um MyTCO sicher zu betreiben
+**Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login nötig ist. Keine Werbung,
+keine Analyse-Dienste.
 
-MyTCO verwendet Ihre Daten für keine anderen Zwecke, zeigt keine Werbung und erstellt keine
-Profile.
-
-### Wer sieht Ihre Daten?
-
-- **Sie selbst** sehen alle Ihre Daten.
-- **Der Admin** des Vereins sieht Ihre Daten, um Konten und Anmeldungen zu verwalten.
-- **Die Verantwortlichen der Clubmeisterschaft und der Lizenzen** sehen die Daten, die sie
-  für ihre Aufgabe brauchen.
-- **Andere Mitglieder** sehen Ihren Namen, Ihre Kategorien und Ihre Resultate in der
-  Clubmeisterschaft.
-- **Ihre Gegner und Ihr Doppelpartner** sehen während der Clubmeisterschaft Ihre
-  E-Mail-Adresse und Telefonnummer, damit Sie die Spiele absprechen können. Das ist
-  Bedingung für die Teilnahme. Nach dem Finalwochenende sind die Daten nicht mehr sichtbar.
-  *(Vorschlag, K-31)*
-- **Alle, auch ohne Login,** sehen den Spielplan des Finalwochenendes mit Name, Kategorie,
-  Platz, Zeit und Resultat; Spieler unter 16 nur mit Vorname und Anfangsbuchstabe des
-  Nachnamens. *(Vorschlag, K-39; ab der Etappe mit dem Spielplan)*
-
-### Wer erhält Ihre Daten ausserhalb des Vereins?
-
-- **Swiss Tennis** erhält Ihre Anmeldungen und Resultate der Clubmeisterschaft sowie Ihre
-  Lizenzanträge. Swiss Tennis ist dafür selbst verantwortlich.
-- **[Name des Hosters], [Land]** betreibt den Server von MyTCO im Auftrag des Vereins.
-- **[Name des E-Mail-Dienstes], [Land]** versendet E-Mails von MyTCO im Auftrag des Vereins.
-- **Die Schweizerische Post** stellt die Briefe mit Ihren Zugangsdaten zu.
-- **Push-Dienste:** Wenn Sie Push-Nachrichten einschalten, stellt der Hersteller Ihres
-  Browsers oder Handys sie zu (z. B. Google, Apple, Mozilla), teils mit Servern in den USA.
-  Der Inhalt ist verschlüsselt und für diese Dienste nicht lesbar; er nennt keine anderen
-  Mitglieder. Der Dienst sieht nur die Zustelladresse Ihres Geräts und den Zeitpunkt.
-  Grundlage: [Angemessenheit nach Anhang 1 DSV für zertifizierte Firmen bzw. andere
-  Garantie — wird mit dem Hosting-Entscheid geprüft]
-
-Ihre Daten liegen in der Schweiz oder in einem Staat der EU bzw. des EWR. Der Verein gibt
-sie nicht an Dritte für deren eigene Zwecke weiter und verkauft sie nicht.
-
-### Wie lange?
-
-- Solange Sie Mitglied sind. Nach Ihrem Austritt wird Ihr Konto sofort gesperrt und Ihre
-  Daten werden innert 3 Monaten gelöscht. Ihr Name bleibt in den Resultaten vergangener
-  Clubmeisterschaften. *(Vorschlag, K-38)*
-- Ihre Kontaktdaten sind für Gegner und Doppelpartner nur bis zum Ende der
-  Clubmeisterschaft sichtbar.
-- Lizenzanträge werden am Ende des Folgejahres gelöscht, nach einem Austritt früher.
-- Technische Protokolle werden nach 30 Tagen gelöscht.
-- Sicherungskopien werden spätestens 30 Tage nach einer Löschung überschrieben.
-
-### Cookies und Tracking
-
-MyTCO speichert in Ihrem Browser nur, was für das Login und Ihre Einstellungen nötig ist.
-Sie können das in den Einstellungen Ihres Browsers verhindern; das Login funktioniert dann
-nicht. Es gibt kein Tracking, keine Analyse-Dienste und keine Werbung. MyTCO lädt keine
-Inhalte von fremden Servern.
-
-### Junioren
-
-Ein eigenes Konto erhalten Mitglieder ab 16 Jahren. Jüngere Spieler erfasst der Admin für
-die Clubmeisterschaft ohne eigenes Konto. Als Kontakt für die Gegner dienen E-Mail-Adresse
-und Telefonnummer eines Elternteils; dieser erhält bei der Anmeldung diese Erklärung per
-E-Mail. Die Kontaktdaten des Elternteils werden 3 Monate nach Ende der Clubmeisterschaft
-gelöscht. *(Vorschlag, K-08)*
-
-### Ihre Rechte
-
-- **Auskunft:** Sie können jederzeit erfahren, welche Daten MyTCO über Sie bearbeitet. Sie
-  erhalten die Antwort kostenlos innert 30 Tagen.
-- **Herausgabe:** Sie können Ihre Daten als Datei verlangen.
-- **Berichtigung:** E-Mail-Adresse und Telefonnummer ändern Sie selbst in MyTCO. Für alles
-  andere wenden Sie sich an den Verein.
-- **Löschung:** Sie können verlangen, dass Ihre Daten gelöscht werden, soweit der Verein sie
-  nicht aufbewahren muss.
-
-Wenden Sie sich dafür an die oben genannte Adresse. Sind Sie mit der Antwort nicht
-einverstanden, können Sie sich an den Eidgenössischen Datenschutz- und
-Öffentlichkeitsbeauftragten (EDÖB) wenden: [www.edoeb.admin.ch](https://www.edoeb.admin.ch).
-
-### Änderungen
-
-Der Verein passt diese Erklärung an, wenn MyTCO neue Funktionen erhält, die Personendaten
-anders bearbeiten. Die aktuelle Fassung steht jederzeit in MyTCO, auch ohne Login.
+**Ihre Rechte:** Sie können jederzeit erfahren, welche Daten MyTCO über Sie hat, und sie
+berichtigen oder löschen lassen. E-Mail und Telefon ändern Sie selbst in der App.

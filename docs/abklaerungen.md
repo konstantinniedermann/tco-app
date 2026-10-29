@@ -56,7 +56,6 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-37 | Reichen für Benachrichtigungen E-Mail und Push, oder braucht es SMS oder WhatsApp? Die beiden kosten pro Nachricht. | Vorstand | N-APP-02, A-ANMELDUNG-08, A-ANMELDUNG-09, #9 |
 | K-38 | Wie lange bleiben Daten nach einem Austritt in MyTCO, und was muss der Verein aufbewahren (z. B. Resultate, Lizenzanträge)? | Vorstand, Ansprechperson Datenschutz | #5, [Datenschutz](datenschutz.md) |
 | K-40 | Reicht für Alterskategorien und Lizenzanträge der Jahrgang, oder verlangt Swiss Tennis das volle Geburtsdatum? | Lizenzverantwortlicher, Verantwortliche CM | K-07, #3, [Datenschutz](datenschutz.md) |
-| K-41 | Informieren Statuten oder Beitrittsformular des TCO heute darüber, dass der Verein Mitgliederdaten bearbeitet und an Swiss Tennis weitergibt? | Vorstand | [Datenschutz](datenschutz.md) |
 
 ## Vor dem ersten Release *Mitglieder-Login* (28.02.2027)
 
