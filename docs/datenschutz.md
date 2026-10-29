@@ -108,7 +108,7 @@ neue Funktion ist.
 | Vorname, Nachname | Konto, Anmeldung, Resultate | ja | Admin |
 | Postadresse | Login-Brief mit Einmalpasswort | ja | Admin |
 | E-Mail-Adresse | Bestätigungen, Benachrichtigungen, Passwort zurücksetzen | ja | Admin oder Mitglied |
-| Telefonnummer | Absprache der Gruppenspiele mit Gegnern | nein | Admin oder Mitglied |
+| Telefonnummer | Absprache der Gruppenspiele mit Gegnern | für die CM-Anmeldung ja, sonst nein | Admin oder Mitglied |
 | Geschlecht | Zulassung zu CM-Kategorien | ja | Admin |
 | Jahrgang | Zulassung zu Alterskategorien; volles Geburtsdatum nur, falls Swiss Tennis es verlangt (K-40) | ja | Admin |
 | Lizenznummer | Export an Swiss Tennis, Lizenzanträge | nein | Mitglied beim ersten Login |
@@ -181,8 +181,11 @@ Hinweis:
 
 Das genügt nach nDSG: Die Bekanntgabe ist für die Teilnahme nötig, beschränkt auf die
 Mitspieler und zeitlich begrenzt (Art. 6 Abs. 2–3, Art. 31 Abs. 1 nDSG). Eine Einwilligung
-mit Häkchen ist nicht nötig. Wer seine Telefonnummer nicht zeigen will, lässt sie leer oder
-bittet den Admin, sie zu verbergen; die E-Mail-Adresse bleibt für die Absprache sichtbar.
+mit Häkchen ist nicht nötig. E-Mail-Adresse und Telefonnummer sind für Gegner und
+Doppelpartner **immer** sichtbar; ein Verbergen gibt es nicht, weil die Spieler die
+Gruppenspiele selbst absprechen. Deshalb ist die Telefonnummer für die Anmeldung zur
+Clubmeisterschaft Pflicht. Wer seine Kontaktdaten nicht zeigen will, nimmt nicht teil —
+die Teilnahme ist freiwillig.
 
 Andere Mitglieder ausserhalb der eigenen Spiele sehen nur Name, Kategorie und Resultate,
 keine Kontaktdaten.

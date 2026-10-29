@@ -31,7 +31,8 @@ Fragen zum Datenschutz richten Sie an: [Funktion der Ansprechperson, z. B. Präs
 ### Welche Daten bearbeitet MyTCO?
 
 - **Angaben zur Person:** Vorname, Nachname, Postadresse, Geschlecht, Jahrgang
-- **Kontakt:** E-Mail-Adresse, Telefonnummer (freiwillig)
+- **Kontakt:** E-Mail-Adresse, Telefonnummer (für die Anmeldung zur Clubmeisterschaft
+  nötig, sonst freiwillig)
 - **Tennis:** Lizenznummer und Klassierung bei Swiss Tennis (freiwillig)
 - **Konto:** Ihre Rollen, Ihr Passwort (nur in einer Form gespeichert, aus der es sich
   nicht zurückgewinnen lässt — auch der Verein kann es nicht lesen), Zeitpunkt des letzten Logins, Ihre Einstellungen für Benachrichtigungen
@@ -63,8 +64,9 @@ Profile.
 - **Andere Mitglieder** sehen Ihren Namen, Ihre Kategorien und Ihre Resultate in der
   Clubmeisterschaft.
 - **Ihre Gegner und Ihr Doppelpartner** sehen während der Clubmeisterschaft Ihre
-  E-Mail-Adresse und Telefonnummer, damit Sie die Spiele absprechen können. Nach dem
-  Finalwochenende nicht mehr. *(Vorschlag, K-31)*
+  E-Mail-Adresse und Telefonnummer, damit Sie die Spiele absprechen können. Das ist
+  Bedingung für die Teilnahme. Nach dem Finalwochenende sind die Daten nicht mehr sichtbar.
+  *(Vorschlag, K-31)*
 - **Alle, auch ohne Login,** sehen den Spielplan des Finalwochenendes mit Name, Kategorie,
   Platz, Zeit und Resultat. *(Vorschlag, K-39)*
 
