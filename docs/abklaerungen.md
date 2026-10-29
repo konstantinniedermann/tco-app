@@ -83,6 +83,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 |----|-------|--------|------|
 | K-32 | Muss der Gegner ein gemeldetes Resultat bestätigen? | Verantwortliche CM | A-RESULTAT-04 |
 | K-33 | Wurde der Spielplan von Advantage fürs Finalwochenende schon ausprobiert, und was fehlt dort? | Verantwortliche CM | A-SPIELPLAN |
+| K-41 | Mit welchem Spielformat laufen die Spiele der CM: zwei Gewinnsätze, dritter Satz als Match-Tiebreak, je Kategorie verschieden? | Verantwortliche CM | A-RESULTAT-03, A-RESULTAT-06, [Fachmodell](fachmodell.md) |
 
 ## Vor Lizenzanträgen (01.10.2027)
 

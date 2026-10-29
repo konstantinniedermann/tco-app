@@ -39,9 +39,6 @@ sie enthalten keine Daten anderer Mitglieder.
 **Wie lange:** Solange Sie Mitglied sind. Nach einem Austritt wird Ihr Konto gesperrt und
 nach 3 Monaten gelöscht; Ihr Name bleibt in vergangenen Resultaten.
 
-**Junioren:** Ein eigenes Konto gibt es ab 16. Für jüngere Spieler ist ein Elternteil
-Kontakt für die Gegner.
-
 **Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login nötig ist. Keine Werbung,
 keine Analyse-Dienste.
 
