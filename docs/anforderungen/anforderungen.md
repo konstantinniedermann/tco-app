@@ -65,8 +65,6 @@ Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 | A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später\* | später |
 | A-ROLLE-07 | Rolle *CM-Verantwortlicher*: Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | geplant |
 | A-ROLLE-08 | Rolle *Lizenzverantwortlicher*: Lizenzrunde und Lizenzanträge | PL | Lizenzanträge | geplant |
-| A-ROLLE-07 | Rolle *CM-Verantwortlicher*: Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | geplant |
-| A-ROLLE-08 | Rolle *Lizenzverantwortlicher*: Lizenzrunde und Lizenzanträge | PL | Lizenzanträge | geplant |
 
 ### KONTO — Eigene Daten ändern
 
@@ -128,7 +126,7 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-TURNIER-01 | Der Verantwortliche legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | geplant |
+| A-TURNIER-01 | Der CM-Verantwortliche legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | geplant |
 | A-TURNIER-02 | Zum Turnier werden die Swiss-Tennis-Turniernummern erfasst | PDF 5a | CM-Anmeldung | geplant |
 | A-TURNIER-03 | Zum Turnier werden alle Kategorien erfasst, eingeteilt nach Geschlecht, Alter, Klassierungsbereich (im PDF: Stärkekategorie) und Einzel/Doppel | PDF 5a | CM-Anmeldung | geplant |
 
@@ -145,7 +143,7 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 | A-ANMELDUNG-07 | Die Anmeldung schliesst zu einem Anmeldeschluss | PDF 5c (abgeleitet) | CM-Anmeldung\* | geplant |
 | A-ANMELDUNG-08 | Der Spieler wählt, ob er bei Neuigkeiten, die ihn betreffen (neue Spiele, geänderter Spielplan), benachrichtigt wird | PDF 5b | CM-Betrieb\* | geplant |
 | A-ANMELDUNG-09 | Benachrichtigung per SMS oder WhatsApp (zuerst E-Mail und Push, siehe N-APP-02) | PDF 5b | später\* | später |
-| A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der Verantwortliche der CM entscheidet | PL | CM-Anmeldung | geplant |
+| A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der CM-Verantwortliche entscheidet | PL | CM-Anmeldung | geplant |
 
 ### ADVANTAGE — Datenaustausch mit Swiss Tennis
 

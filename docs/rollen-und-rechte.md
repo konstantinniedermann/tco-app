@@ -28,9 +28,9 @@ Wer diese Rollen im Verein übernimmt, klärt K-18.
 | RR-02 | Der Admin darf alles, was CM- und Lizenzverantwortlicher dürfen — als Stellvertretung, ohne sich die Rolle zu geben |
 | RR-03 | Der letzte Admin kann sich die Rolle *Admin* nicht entziehen und sein Konto nicht löschen |
 | RR-04 | Niemand sieht Passwörter. Der Admin kann nur ein neues Einmalpasswort ausstellen; wie es zum Mitglied kommt, klären K-16 und das [Sicherheitskonzept](https://github.com/konstantinniedermann/tco-app/issues/6) |
-| RR-05 | Es gibt kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM und bei der Wahl des Doppelpartners |
+| RR-05 | Für die Rolle *Mitglied* gibt es kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM und bei der Wahl des Doppelpartners (nur Mitglieder, die für die Kategorie passen und noch frei sind) |
 | RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist |
-| RR-07 | Die Admin-Oberfläche sieht, wer mehr als die Rolle *Mitglied* hat; sie zeigt nur die Bereiche der eigenen Rollen (N-APP-03) |
+| RR-07 | Die Admin-Oberfläche sieht nur, wer mindestens eine Rolle über *Mitglied* hinaus hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03) |
 | RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) |
 
 ## Matrix
@@ -43,16 +43,18 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 |------------------|:----------:|:--------:|:-------------------:|:----------------------:|:-----:|
 | **Mitglieder-Login** | | | | | |
 | Datenschutzerklärung, Login-Seite (DS-09) | L | L | L | L | L |
-| Eigene Daten, Passwort, Benachrichtigungen | – | S eigene | S eigene | S eigene | S eigene |
+| Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Passwort, Benachrichtigungen (FR-02) | – | S eigene | S eigene | S eigene | S eigene |
+| Eigener Name, Adresse, Geschlecht, Jahrgang (Adresse ändern: K-19) | – | L eigene | L eigene | L eigene | S |
 | Mitglieder anlegen, bearbeiten, löschen, exportieren (DS-07) | – | – | – | – | S |
 | Konto sperren, neues Einmalpasswort | – | – | – | – | S |
 | Rollen vergeben | – | – | – | – | S |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S |
-| Kontaktdaten anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L alle (K-42) | L alle (K-42) | S |
+| E-Mail und Telefon anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L alle (K-42) | L alle (K-42) | S |
 | **CM-Anmeldung** | | | | | |
 | Turnier, Turniernummern, Kategorien | – | L | S | L | S |
 | Eigene Anmeldung, bis Anmeldeschluss (FR-10) | – | S eigene | S eigene | S eigene | S eigene |
-| Anmeldungen aller (Name, Kategorie) | – | L | S | L | S |
+| Anmeldungen aller (Name, Kategorie) | – | L bestätigte | S | L bestätigte | S |
+| Klassierung der Spieler korrigieren (A-ANMELDUNG-06, K-28) | – | – | S | – | S |
 | Wildcard-Antrag und Kommentar (FR-08) | – | S eigene | S, entscheidet | S eigene | S |
 | **CM-Betrieb** | | | | | |
 | Gruppen, KO-Tableaus, Spiele aus Advantage (FR-12) | – | L | S | L | S |
