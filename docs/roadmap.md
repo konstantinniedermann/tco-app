@@ -32,6 +32,8 @@ bestätigt.
 ## Vorerst nicht dabei
 
 Aus dem Anforderungsdokument v1.2, bewusst später: Login-Feld auf tcolten.ch,
-Newsfeed, WhatsApp-Anbindung, Zwei-Faktor-Login und Passkeys, allgemeine Anlässe,
+Newsfeed, Benachrichtigungen per SMS oder WhatsApp, Zwei-Faktor-Login und Passkeys, allgemeine Anlässe,
 Lizenzliste als PDF mit Vorjahresvergleich, Planer für das Finalwochenende,
 Anbindung an Fairgate.
+Den Newsfeed automatisch aus der WhatsApp-Gruppe zu füllen, ist nicht machbar
+([A-NEWSFEED-02](anforderungen/anforderungen.md#newsfeed)).

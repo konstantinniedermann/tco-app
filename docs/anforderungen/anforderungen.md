@@ -9,7 +9,7 @@ und offene Fragen stehen im [README](README.md); die Begriffe im [Glossar](../gl
 ## Lesehilfe
 
 **ID-Schema:** `A-<BEREICH>-NN` für funktionale, `N-<THEMA>-NN` für nicht-funktionale
-Anforderungen. Bereich und Thema sind Wörter aus dem Glossar. Eine ID bleibt fest, auch
+Anforderungen. Die Bereiche sind Wörter aus dem Glossar. Eine ID bleibt fest, auch
 wenn sich die Anforderung verschiebt; eine gestrichene ID wird nie neu vergeben. Neue
 Anforderungen bekommen die nächste freie Nummer im Bereich.
 
@@ -28,7 +28,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 
 ## Funktionale Anforderungen
 
-### LOGIN — Anmelden
+### LOGIN — Einloggen
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
@@ -39,7 +39,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-LOGIN-05 | Login-Feld oben rechts auf tcolten.ch, das nach dem Login zu MyTCO weiterleitet | PDF 3b | später | später |
 | A-LOGIN-06 | Zwei-Faktor-Login (App oder SMS/E-Mail, zwingend oder freiwillig) | PDF 2 | später | später |
 | A-LOGIN-07 | Login mit Passkey | PDF 2 | später | später |
-| A-LOGIN-08 | Login nur per SMS- oder App-Code, ohne Passwort | PDF 2 | später | später |
+| A-LOGIN-08 | Login nur per SMS- oder App-Code, ohne Passwort | PDF 2 | später\* | später |
 
 ### MITGLIED — Mitgliederverwaltung durch den Admin
 
@@ -48,7 +48,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-MITGLIED-01 | Der Admin legt Mitgliederkonten nach manueller Prüfung einfach und schnell von Hand an | PDF 4a, Ziel | Mitglieder-Login | geplant |
 | A-MITGLIED-02 | Der Admin bearbeitet die Daten eines Mitglieds | Ziel | Mitglieder-Login | geplant |
 | A-MITGLIED-03 | Der Admin löscht Mitgliederkonten | PDF 4a | Mitglieder-Login\* | geplant |
-| A-MITGLIED-04 | Selbstregistrierung über die Website tcolten.ch, damit der Briefversand entfallen kann (mit dem Website-Betreuer) | PDF 4a | später | später |
+| A-MITGLIED-04 | Selbstregistrierung über die Website tcolten.ch, damit der Briefversand entfallen kann (mit der zuständigen Person) | PDF 4a | später\* | später |
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
 
 ### ROLLE — Benutzerrollen
@@ -61,8 +61,8 @@ Was jede Rolle darf, legt das Dokument *Rollen und Rechte* fest (Issue #4).
 | A-ROLLE-02 | Rolle *Admin*: Zugang zur Mitgliederverwaltung | PDF 4a, Ziel | Mitglieder-Login | geplant |
 | A-ROLLE-03 | Rolle *Mitglied* | PDF 4a | Mitglieder-Login | geplant |
 | A-ROLLE-04 | Rolle *Anlässe-Veranstalter* | PDF 4a | CM-Anmeldung\* | geplant |
-| A-ROLLE-05 | Rolle *Junioren-Leiter* | PDF 4a | später | später |
-| A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später | später |
+| A-ROLLE-05 | Rolle *Junioren-Leiter* | PDF 4a | später\* | später |
+| A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später\* | später |
 
 ### KONTO — Eigene Daten ändern
 
@@ -70,8 +70,8 @@ Was jede Rolle darf, legt das Dokument *Rollen und Rechte* fest (Issue #4).
 |----|-------------|--------|--------|--------|
 | A-KONTO-01 | Das Mitglied ändert E-Mail-Adresse und Telefonnummer selbst | PDF 3e | Mitglieder-Login\* | geplant |
 | A-KONTO-02 | Das Mitglied ändert seine Adresse selbst | PDF 3e | später\* | offen |
-| A-KONTO-03 | Das Mitglied wählt die Zustellart der Jahresrechnung | PDF 3e | später | später |
-| A-KONTO-04 | Das Mitglied ändert seine Mitgliedschaft | PDF 1 | später | offen |
+| A-KONTO-03 | Das Mitglied wählt die Zustellart der Jahresrechnung | PDF 3e | später\* | später |
+| A-KONTO-04 | Das Mitglied ändert seine Mitgliedschaft | PDF 1 | später\* | offen |
 
 Lizenz bestellen und abbestellen (PDF 3e) steht unter [LIZENZ](#lizenz--lizenzanträge-und-lizenzliste).
 
@@ -82,7 +82,7 @@ auf dem Handy aussieht, klärt das UI-Leitbild (Issue #13).
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-STARTSEITE-01 | Die Startseite zeigt das angemeldete Konto und einen Logout-Knopf | PDF 3c | Mitglieder-Login\* | geplant |
+| A-STARTSEITE-01 | Die Startseite zeigt das eingeloggte Konto und einen Logout-Knopf | PDF 3c | Mitglieder-Login\* | geplant |
 | A-STARTSEITE-02 | Die Startseite bietet Shortcuts zu den wichtigsten Funktionen | PDF 3c | CM-Anmeldung\* | geplant |
 | A-STARTSEITE-03 | Die Shortcuts lassen sich später einfach ändern (z. B. für die Anmeldung zu einem bestimmten Anlass) | PDF 3c | CM-Anmeldung\* | geplant |
 | A-STARTSEITE-04 | Die Startseite zeigt die Anlässe, für die das Mitglied angemeldet ist | PDF 3c | CM-Anmeldung\* | geplant |
@@ -126,7 +126,7 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 |----|-------------|--------|--------|--------|
 | A-TURNIER-01 | Der Verantwortliche legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | geplant |
 | A-TURNIER-02 | Zum Turnier werden die Swiss-Tennis-Turniernummern erfasst | PDF 5a | CM-Anmeldung | geplant |
-| A-TURNIER-03 | Zum Turnier werden alle Kategorien erfasst, eingeteilt nach Geschlecht, Alter, Stärkekategorie und Einzel/Doppel | PDF 5a | CM-Anmeldung | geplant |
+| A-TURNIER-03 | Zum Turnier werden alle Kategorien erfasst, eingeteilt nach Geschlecht, Alter, Klassierungsbereich (im PDF: Stärkekategorie) und Einzel/Doppel | PDF 5a | CM-Anmeldung | geplant |
 
 ### ANMELDUNG — Anmeldung zur Clubmeisterschaft
 
@@ -134,10 +134,10 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 |----|-------------|--------|--------|--------|
 | A-ANMELDUNG-01 | Alle Mitglieder können sich zur Clubmeisterschaft anmelden | PDF 5b, Ziel | CM-Anmeldung | geplant |
 | A-ANMELDUNG-02 | Ein Spieler hat höchstens 3 Anmeldungen gleichzeitig | PDF 5b | CM-Anmeldung | geplant |
-| A-ANMELDUNG-03 | MyTCO zeigt nur die Kategorien an, die für den Spieler möglich sind (Stärkekategorie evtl. ausgenommen, weil die Klassierung nicht automatisch von Swiss Tennis kommt) | PDF 5b | CM-Anmeldung | geplant |
+| A-ANMELDUNG-03 | MyTCO zeigt nur die Kategorien an, die für den Spieler möglich sind (Klassierung evtl. ausgenommen, weil die Klassierung nicht automatisch von Swiss Tennis kommt) | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-04 | Bei einer Doppelkategorie zeigt MyTCO sofort alle verfügbaren Spieler des Clubs zur Wahl des Doppelpartners | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-05 | Nach der Anmeldung erhält der Spieler eine automatische Bestätigung mit seinen Kategorien | PDF 5b | CM-Anmeldung | geplant |
-| A-ANMELDUNG-06 | Der Admin fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Stärkekategorie) | PDF 5b | CM-Anmeldung | geplant |
+| A-ANMELDUNG-06 | Der Admin fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-07 | Die Anmeldung schliesst zu einem Anmeldeschluss | PDF 5c (abgeleitet) | CM-Anmeldung\* | geplant |
 | A-ANMELDUNG-08 | Der Spieler wählt, ob er bei Neuigkeiten, die ihn betreffen (neue Spiele, geänderter Spielplan), benachrichtigt wird | PDF 5b | CM-Betrieb\* | geplant |
 | A-ANMELDUNG-09 | Benachrichtigung per SMS oder WhatsApp (zuerst E-Mail und Push, siehe N-APP-02) | PDF 5b | später\* | später |
@@ -151,7 +151,7 @@ Resultate importieren ([Recherche Systemlandschaft](../recherche/README.md)).
 |----|-------------|--------|--------|--------|
 | A-ADVANTAGE-01 | Nach Anmeldeschluss exportiert MyTCO die Anmeldungen in einem für Swiss Tennis möglichst guten Format | PDF 5c, Ziel | CM-Betrieb | geplant |
 | A-ADVANTAGE-02 | MyTCO übernimmt die in Advantage erstellten Kategorien mit Gruppen bzw. Tableaus | PDF 5c, Ziel | CM-Betrieb | geplant |
-| A-ADVANTAGE-03 | Kategorien laufen entweder als Gruppenspiele (Gruppengrösse und -anzahl variabel) oder im KO-System; Details mit den Verantwortlichen der Clubmeisterschaft | PDF 5c | CM-Betrieb | geplant |
+| A-ADVANTAGE-03 | Kategorien laufen entweder als Gruppenspiele (Gruppengrösse und -anzahl variabel) oder im KO-System; Details mit den zuständigen Personen | PDF 5c | CM-Betrieb | geplant |
 | A-ADVANTAGE-04 | MyTCO liefert die Resultate in einer Form, die sich schnell und einfach in Advantage eintragen lässt | PDF 5d, Ziel | CM-Betrieb | geplant |
 | A-ADVANTAGE-05 | MyTCO übernimmt die KO-Tableaus fürs Finalwochenende (neu eröffnete und fortgesetzte Kategorien) | PDF 5e-i | später\* | später |
 | A-ADVANTAGE-06 | Nach dem Finalwochenende liefert MyTCO die Resultate zum Eintragen in Advantage | PDF 5e-ii | später\* | später |
@@ -160,13 +160,13 @@ Resultate importieren ([Recherche Systemlandschaft](../recherche/README.md)).
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-RESULTAT-01 | Der Spieler sieht seine Spiele und alle für ihn wichtigen Daten | PDF 5d | CM-Betrieb | geplant |
-| A-RESULTAT-02 | Der Spieler sieht die Kontaktmöglichkeiten seiner Gegner | PDF 5d | CM-Betrieb | offen |
+| A-RESULTAT-01 | Der Spieler sieht seine Spiele und alle für ihn wichtigen Daten | PDF 5d | CM-Betrieb\* | geplant |
+| A-RESULTAT-02 | Der Spieler sieht die Kontaktmöglichkeiten seiner Gegner | PDF 5d | CM-Betrieb\* | offen |
 | A-RESULTAT-03 | Der Spieler meldet seine Resultate selbst | PDF 5d, Ziel | CM-Betrieb | geplant |
 | A-RESULTAT-04 | Der Gegner bestätigt ein gemeldetes Resultat | PDF 5d | CM-Betrieb | offen |
-| A-RESULTAT-05 | Alle Resultate der anderen Kategorien lassen sich mitverfolgen | PDF 5d | CM-Betrieb | geplant |
-| A-RESULTAT-06 | Für jede Gruppe entsteht live eine Rangliste nach den Regeln von Swiss Tennis | PDF 5d | CM-Betrieb | geplant |
-| A-RESULTAT-07 | Der Admin erfasst Resultate von Hand | PDF 5d | CM-Betrieb | geplant |
+| A-RESULTAT-05 | Alle Resultate der anderen Kategorien lassen sich mitverfolgen | PDF 5d | CM-Betrieb\* | geplant |
+| A-RESULTAT-06 | Für jede Gruppe entsteht live eine Rangliste nach den Regeln von Swiss Tennis | PDF 5d | CM-Betrieb\* | geplant |
+| A-RESULTAT-07 | Der Admin erfasst Resultate von Hand | PDF 5d | CM-Betrieb\* | geplant |
 
 ### SPIELPLAN — Finalwochenende
 
@@ -190,7 +190,7 @@ der Praxis reicht (offene Frage im [README](README.md)).
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
 | N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später | Ziel, PDF 1 | Fundament (Technik-ADR, #7) | geplant |
-| N-APP-02 | Benachrichtigungen per Push | Ziel | Fundament (Technik-ADR, #7) | geplant |
+| N-APP-02 | Benachrichtigungen per Push und E-Mail | Ziel, PDF 5b | Fundament (Technik-ADR, #7) | geplant |
 | N-APP-03 | Der Admin arbeitet in einer eigenen Admin-Oberfläche; deren Form legt der Technik-ADR fest | PL | Fundament (Technik-ADR, #7) | geplant |
 | N-DESIGN-01 | Das Design lehnt sich an die Website tcolten.ch an, mit abgeändertem Farbkonzept zur Abgrenzung | PDF 3a | Fundament (UI-Leitbild, #13) | geplant |
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |
@@ -201,5 +201,5 @@ der Praxis reicht (offene Frage im [README](README.md)).
 | N-BARRIEREFREI-01 | MyTCO ist für Mitglieder jeden Alters bedienbar; Zielniveau WCAG 2.1 AA\* | PL | durchgehend | geplant |
 | N-KOSTEN-01 | Laufende Kosten im niedrigen dreistelligen Bereich pro Jahr | Ziel | Fundament (Kosten, #9) | geplant |
 | N-KOSTEN-02 | Die Kosten werden im Detail dokumentiert und analysiert | Ziel | Fundament (Kosten, #9) | geplant |
-| N-EIGENSTAENDIG-01 | MyTCO entsteht vorerst ohne Anbindung an Fairgate und ohne Einbindung in tcolten.ch | Ziel | durchgehend | geplant |
+| N-EIGENSTAENDIG-01 | MyTCO entsteht vorerst ohne Anbindung an Fairgate und ohne Einbindung in tcolten.ch | Ziel | durchgehend (ADR, #16) | geplant |
 | N-ERWEITERBAR-01 | MyTCO ist modular aufgebaut: weitere Anlässe und Funktionen der Clubverwaltung lassen sich einfach ergänzen | PDF 1, 3d | Fundament (Fachmodell, #3) | geplant |

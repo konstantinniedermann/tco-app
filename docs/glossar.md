@@ -55,13 +55,13 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Anmeldung | Teilnahme eines Spielers an einer Kategorie. In Advantage meldet man sich online über myTennis an und landet in der Anmeldeliste; ins Tableau kommt man erst, wenn die Anmeldung *bestätigt* ist. In MyTCO höchstens 3 gleichzeitig | Anmeldung | PDF 5b; ADV 18, 20–23, 28–29 |
 | Anmeldeschluss | Datum, nach dem keine Anmeldungen mehr möglich sind; in Advantage je Turnier oder Konkurrenz. Beim TCO Anfang Juni | Anmeldeschluss | ADV 7, 10, 13, 28; Recherche |
 | Nenngeld | Startgebühr in Advantage, je Spieler mit Vermerk „bezahlt“. Ob die CM ein Nenngeld hat, ist nicht belegt | Nenngeld | ADV 7, 28 |
-| Resultat | Ergebnis eines Spiels. In MyTCO melden die Spieler es selbst. In Advantage erfasst nur der Organisator, von Hand pro Runde oder Spiel; ein Import gibt es nicht | Resultat; der Vorgang heisst *Resultat melden* | PDF 5d; ADV 37, 41, 43 |
+| Resultat | Ergebnis eines Spiels. In MyTCO melden die Spieler es selbst. In Advantage erfasst nur der Organisator, von Hand pro Runde oder Spiel; einen Import gibt es nicht | Resultat; der Vorgang heisst *Resultat melden* | PDF 5d; ADV 37, 41, 43 |
 | Rangliste | Reihenfolge in einer Gruppe nach gewonnenen Begegnungen. Bei Gleichstand gilt: 1. Direktbegegnung, 2. bessere Satzdifferenz, 3. bessere Gamedifferenz; danach manuelle Anpassung möglich. Das PDF nennt das „Einreihung“ | Rangliste | ADV 41; PDF 5d |
 | Finalwochenende | Abschluss der CM Mitte August mit den KO-Spielen | Finalwochenende | PDF 5e; Recherche |
 | Spielplan | Spielzeiten und Orte der Spiele, in Advantage je Runde oder direkt im Tableau erfasst | Spielplan | ADV 26, 31–35; PDF 5e |
 | Spielzeitraster | Zeitraster, das Advantage aus Plätzen, Matchdauer und Spielbeginn erzeugt. Das PDF wünscht ein Raster in 30-Minuten-Schritten | Spielzeitraster | ADV 7, 34; PDF 5e-i |
 | Platz | Tennisplatz, auf dem gespielt wird; in Advantage vor der Spielplanung zu definieren. Plätze werden benannt, u. a. für die neue Anlage Gheid | Platz | ADV 7, 13, 31, 34; PDF 5e-i |
-| Spielplanüberprüfung | Prüfung in Advantage auf Abwesenheiten, gleichzeitige Spiele und zu kurze Pausen. Das PDF nennt es Konfliktprüfung | Konflikt | ADV 7, 26, 34; PDF 5e-i |
+| Spielplanüberprüfung | Prüfung in Advantage auf Abwesenheiten, gleichzeitige Spiele und zu kurze Pausen. Das PDF spricht von Konfliktsituationen | Konflikt | ADV 7, 26, 34; PDF 5e-i |
 | Organisator | Club oder Vereinigung, die ein Turnier in Advantage führt. Das PDF spricht vom „Verantwortlichen“ der CM | Verantwortliche der Clubmeisterschaft; ob das eine eigene Rolle ist, klärt Issue #4 | ADV 6–7, 11, 21, 30; PDF 5a |
 
 ## Lizenz
@@ -92,13 +92,17 @@ Was nicht belegt ist, steht als *Vermutung* da.
 
 | Begriff | Bedeutung | In MyTCO | Quelle |
 |---------|-----------|----------|--------|
+| Rolle | Bündel von Berechtigungen, das der Admin einem Konto gibt: Gast, Mitglied, Junioren-Leiter, Anlässe-Veranstalter, Admin. Was jede Rolle darf, klärt Issue #4 | Rolle | PDF 4a |
 | Mitglied | Person, die Mitglied im TCO ist; zugleich die Grundrolle in MyTCO | Mitglied | PDF 1, 4a |
+| Mitgliedschaft | Zugehörigkeit eines Mitglieds zum TCO. Was ein Mitglied daran selbst ändern kann, ist offen | Mitgliedschaft | PDF 1 |
 | Spieler | Mitglied, das an der Clubmeisterschaft teilnimmt | Spieler | PDF 5b, 5d |
 | Gast | Rolle nur für die Registrierung, ohne Zugriff auf weitere Seiten | Gast | PDF 4a |
 | Admin | Rolle mit Zugang zur Mitgliederverwaltung und zu den Admin-Masken | Admin | PDF 4a; Ziel |
 | Junioren-Leiter | Rolle für die Betreuung der Junioren | Junioren-Leiter | PDF 4a |
 | Anlässe-Veranstalter | Rolle für die Organisation von Anlässen | Anlässe-Veranstalter | PDF 4a |
 | Website-Betreuer | Vereinsmitglied, das tcolten.ch programmiert und betreut | Website-Betreuer | Recherche |
+| Registrierung | Ein neues Konto selbst anlegen statt per Brief zu erhalten; vorgesehen über tcolten.ch, später | Registrierung | PDF 4a |
+| Admin-Oberfläche | Teil von MyTCO für den Admin. Das PDF nennt die einzelnen Eingabeseiten darin *Admin-Masken* | Admin-Oberfläche | PDF 5b, 5d; Ziel |
 | Mitgliederverwaltung | Seite, auf der der Admin Mitglieder von Hand anlegt, bearbeitet und löscht | Mitgliederverwaltung | Ziel; PDF 4a |
 | Konto | Zugang eines Mitglieds zu MyTCO mit seinen Daten | Konto | PDF 3e, 4a |
 | Login | Einloggen in MyTCO | Login | PDF 2, 3b |

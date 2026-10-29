@@ -36,7 +36,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 | Datum | Änderung | Quelle |
 |-------|----------|--------|
 | 29.10.2026 | Zielsetzung und Etappen festgelegt (siehe oben, [Roadmap](../roadmap.md)) | Projektleiter |
-| 29.10.2026 | Anforderungen mit IDs erfasst ([`anforderungen.md`](anforderungen.md)); Newsfeed aus der WhatsApp-Gruppe als nicht machbar verworfen (A-NEWSFEED-02) | Projektleiter |
+| 29.10.2026 | Anforderungen mit IDs erfasst ([`anforderungen.md`](anforderungen.md)); Newsfeed aus der WhatsApp-Gruppe zum Verwerfen vorgeschlagen, weil nicht machbar (A-NEWSFEED-02; Bestätigung durch den Verein offen) | Projektleiter |
 
 ## Offene Fragen an den Verein
 
@@ -74,8 +74,8 @@ Punkte für die nächste Sitzung. Erledigte Fragen wandern mit Antwort ins Ände
   Februar)? Welcher Stichtag gilt für die Liste der Anträge? (A-LIZENZ-02, A-LIZENZ-03)
 - Höchstens 3 Anmeldungen: Zählt ein Doppel für beide Partner? Muss der Doppelpartner
   zustimmen, und wer gilt als „verfügbar“? (A-ANMELDUNG-02, A-ANMELDUNG-04)
-- Wie wird die Stärkekategorie bei der Anmeldung festgelegt: gibt der Spieler seine
-  Klassierung selbst an, oder prüft der Admin? (A-ANMELDUNG-03, A-ANMELDUNG-06)
+- Wie wird die Klassierung eines Spielers bei der Anmeldung festgelegt: gibt er sie
+  selbst an, oder prüft der Admin? (A-ANMELDUNG-03, A-ANMELDUNG-06)
 - Dürfen Spieler sich bis zum Anmeldeschluss selbst wieder abmelden oder ummelden?
   (A-ANMELDUNG-07)
 - Reichen für Benachrichtigungen zunächst E-Mail und Push? SMS und WhatsApp kosten pro
