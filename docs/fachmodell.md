@@ -14,6 +14,9 @@ Begriffe stehen im [Glossar](glossar.md), Anforderungs-IDs in den
 **P** = personenbezogene Attribute des Objekts, geregelt im [Datenschutzkonzept](datenschutz.md).
 **Annahme K-NN** = vom Verein noch zu bestätigen, Frage in den [Abklärungen](abklaerungen.md).
 
+**Rollen:** Was der CM-Verantwortliche darf, darf auch der Admin
+([RR-02](rollen-und-rechte.md#grundsätze)).
+
 **Junioren:** Im MVP behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Junioren,
 Eltern und Konten für Minderjährige kommen mit den Junioren-Funktionen (K-08).
 
@@ -50,7 +53,7 @@ classDiagram
 |--------|-----------|---|
 | **Mitglied** | Vorname, Nachname, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang (K-40), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum | alle ausser Status |
 | **Konto** | Benutzername, Passwort (nur als Hash), Einmalpasswort aktiv ja/nein, Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein | alle |
-| **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](https://github.com/konstantinniedermann/tco-app/issues/4) fest | — |
+| **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](rollen-und-rechte.md) fest | — |
 
 ### Clubmeisterschaft
 
@@ -84,16 +87,16 @@ classDiagram
 | FR-05 | Anmelden geht nur, solange das Turnier den Status *Anmeldung offen* hat (bis Anmeldeschluss) | A-ANMELDUNG-07 |
 | FR-06 | Ein Spieler hat je Turnier höchstens 3 Anmeldungen, die nicht *abgelehnt* oder *zurückgezogen* sind. Wildcard-Anträge zählen mit; ein Doppel zählt für beide Partner (Annahme K-27) | A-ANMELDUNG-02 |
 | FR-07 | MyTCO schlägt nur Kategorien vor, die nach Geschlecht, Jahrgang und Klassierung passen; im Doppel muss auch der Partner passen (Annahme K-27) | A-ANMELDUNG-03 |
-| FR-08 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet man sich mit Wildcard-Antrag und Kommentar an. Die Anmeldung bleibt *beantragt*, bis der Verantwortliche der CM sie bestätigt oder ablehnt. Kommentar und Wildcard sehen nur der Spieler und die Verantwortlichen | A-ANMELDUNG-10 |
+| FR-08 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet man sich mit Wildcard-Antrag und Kommentar an. Die Anmeldung bleibt *beantragt*, bis der CM-Verantwortliche sie bestätigt oder ablehnt. Kommentar und Wildcard sehen nur der Spieler und die Verantwortlichen | A-ANMELDUNG-10 |
 | FR-09 | Ein Doppelpartner muss die Anmeldung nicht bestätigen; er wird benachrichtigt (Annahme K-27). Jedes Mitglied steht je Kategorie in höchstens einer Anmeldung | A-ANMELDUNG-04 |
-| FR-10 | Bis zum Anmeldeschluss kann ein Spieler seine Anmeldung selbst zurückziehen (Annahme K-29); danach nur der Admin | A-ANMELDUNG-06 |
+| FR-10 | Bis zum Anmeldeschluss kann ein Spieler seine Anmeldung selbst zurückziehen (Annahme K-29); danach nur der CM-Verantwortliche | A-ANMELDUNG-06 |
 | FR-11 | Der Kommentar enthält keine Gesundheitsangaben; die Eingabemaske weist darauf hin | [Datenschutz](datenschutz.md#welche-daten) |
 | FR-12 | Gruppen und KO-Tableaus entstehen in Advantage und werden übernommen; MyTCO lost nicht selbst aus | A-ADVANTAGE-02, A-ADVANTAGE-03 |
 | FR-13 | Eine Kategorie spielt Gruppen, KO oder zuerst Gruppen und dann KO. Ein Spiel gehört entweder zu einer Gruppe oder zu einem KoTableau | A-ADVANTAGE-03 |
 | FR-14 | Im KO rückt der Sieger eines bestätigten Resultats ins Folgespiel; so sieht jeder, gegen wen er in der nächsten Runde spielen würde | A-RESULTAT-01 |
-| FR-15 | Rangliste je Gruppe nach gewonnenen Spielen; bei Gleichstand 1. Direktbegegnung, 2. Satzdifferenz, 3. Gamedifferenz; danach Korrektur durch den Admin | A-RESULTAT-06, [Glossar](glossar.md#clubmeisterschaft-und-turnier) |
-| FR-16 | Ein Spieler des Spiels meldet das Resultat, der Gegner bestätigt oder bestreitet es. Ohne Reaktion gilt es nach 3 Tagen als bestätigt; bei Streit entscheidet der Admin (Annahme K-32) | A-RESULTAT-03, A-RESULTAT-04 |
-| FR-17 | Erfasst der Admin ein Resultat, ist es sofort bestätigt | A-RESULTAT-07 |
+| FR-15 | Rangliste je Gruppe nach gewonnenen Spielen; bei Gleichstand 1. Direktbegegnung, 2. Satzdifferenz, 3. Gamedifferenz; danach Korrektur durch den CM-Verantwortlichen | A-RESULTAT-06, [Glossar](glossar.md#clubmeisterschaft-und-turnier) |
+| FR-16 | Ein Spieler des Spiels meldet das Resultat, der Gegner bestätigt oder bestreitet es. Ohne Reaktion gilt es nach 3 Tagen als bestätigt; bei Streit entscheidet der CM-Verantwortliche (Annahme K-32) | A-RESULTAT-03, A-RESULTAT-04 |
+| FR-17 | Erfasst der CM-Verantwortliche ein Resultat, ist es sofort bestätigt | A-RESULTAT-07 |
 | FR-18 | Rangliste und Folgespiele rechnen nur mit bestätigten Resultaten | A-RESULTAT-06 |
 | FR-19 | Gegner und Doppelpartner sehen E-Mail und Telefon, bis das Turnier *abgeschlossen* ist | N-DATENSCHUTZ-02, Annahme K-31 |
 | FR-20 | Ein Mitglied hat je Lizenzrunde höchstens einen offenen Lizenzantrag. Zurückziehen geht, solange er *beantragt* ist | A-LIZENZ-01, A-LIZENZ-02 |
@@ -107,7 +110,7 @@ classDiagram
 |--------|----------|
 | Turnier | *in Vorbereitung* → *Anmeldung offen* → *Anmeldung geschlossen* → *läuft* → *abgeschlossen* |
 | Anmeldung | *bestätigt* (ohne Wildcard sofort) · *beantragt* → *bestätigt* / *abgelehnt* (mit Wildcard) · jederzeit → *zurückgezogen* (FR-10) |
-| Resultat | *gemeldet* → *bestätigt* / *bestritten* → *bestätigt* (Entscheid des Admins) |
+| Resultat | *gemeldet* → *bestätigt* / *bestritten* → *bestätigt* (Entscheid des CM-Verantwortlichen) |
 | Lizenzantrag | *beantragt* → *exportiert* → *erledigt* · *beantragt* → *zurückgezogen* |
 | Mitglied | *aktiv* → *ausgetreten* → *gelöscht* nach 3 Monaten, nur noch der Name (FR-04) |
 

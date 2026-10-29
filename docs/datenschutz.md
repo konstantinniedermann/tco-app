@@ -16,7 +16,7 @@ Konzept angepasst, dann die Funktion ([Änderungen](#änderungen-an-diesem-konze
 - Verantwortlich ist der **TC Olten**. Fragen von Mitgliedern gehen an eine Person, die der
   Vorstand bestimmt (**Vorschlag K-06:** Präsidium).
 - Projektleiter, Admins und Verantwortliche von CM und Lizenzen bearbeiten Daten nur für
-  ihre Aufgabe ([Rollen und Rechte](https://github.com/konstantinniedermann/tco-app/issues/4)).
+  ihre Aufgabe ([Rollen und Rechte](rollen-und-rechte.md)).
 - Hoster und E-Mail-Dienst bearbeiten Daten nur im Auftrag des Vereins (Art. 9 nDSG).
 
 ## Welche Daten
@@ -43,7 +43,8 @@ Bankdaten.
 | Wer | Sieht |
 |-----|-------|
 | Mitglied | alle eigenen Daten |
-| Admin, Verantwortliche CM und Lizenzen | was sie für ihre Aufgabe brauchen, u. a. Kommentar und Wildcard-Antrag einer Anmeldung |
+| Admin | alle Daten der Mitglieder ausser Passwörtern |
+| CM- und Lizenzverantwortlicher | Name und Kontaktdaten aller Mitglieder (**Vorschlag K-42**), dazu was ihre Aufgabe braucht: Anmeldungen mit Kommentar und Wildcard-Antrag bzw. Lizenzanträge |
 | Alle Mitglieder | Name, Kategorien und Resultate der Clubmeisterschaft |
 | Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM (**Vorschlag K-31**) |
 | Alle, ohne Login | Spielplan des Finalwochenendes mit Name, Kategorie, Platz, Zeit, Resultat (**Vorschlag K-39**, spätere Etappe) |
@@ -97,7 +98,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 
 K-06 (Ansprechperson), K-07 (Datenumfang), K-08 (Junioren), K-09 (Vertrag mit dem
 Hoster), K-14 (Austritte), K-31 (Kontaktdaten), K-38 (Löschfrist), K-39 (öffentlicher
-Spielplan), K-40 (Jahrgang) — alle in den [Abklärungen](abklaerungen.md).
+Spielplan), K-40 (Jahrgang), K-42 (Kontaktdaten für die Verantwortlichen) — alle in den [Abklärungen](abklaerungen.md).
 
 ## Änderungen an diesem Konzept
 

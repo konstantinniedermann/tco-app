@@ -49,13 +49,14 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-15 | Wie gut muss MyTCO erreichbar sein, besonders während Anmeldung, Gruppenspielen und Finalwochenende? Was passiert, wenn es einen Abend ausfällt? | Vorstand | N-BETRIEB-01, #10 |
 | K-16 | Wer druckt und verschickt die Briefe mit den Zugangsdaten, und wer trägt das Porto? Wie kommt ein Mitglied wieder hinein, wenn es sein Passwort vergessen hat: neuer Brief oder E-Mail? | Vorstand | A-LOGIN-01, #6, #9 |
 | K-17 | Wie kommen die Mitglieder zum Start in MyTCO: von Hand abtippen oder einmal aus einer Fairgate-Liste übernehmen? Wie viele Mitglieder sind es etwa? (Eine solche Liste liegt nur im gitignorierten Ordner `intern/`, nie im Repo.) | Vorstand | A-MITGLIED-01, #3, #9 |
-| K-18 | Wer wird Admin, und wie viele Personen sind das? Sind Lizenzverantwortlicher und Verantwortliche der Clubmeisterschaft eigene Rollen oder Admin bzw. Anlässe-Veranstalter? Darf eine Person mehrere Rollen haben? | Vorstand | A-ROLLE, A-LIZENZ-03, A-TURNIER-01, #4 |
+| K-18 | Wer wird Admin, und wie viele Personen sind das? Sind Lizenzverantwortlicher und Verantwortliche der Clubmeisterschaft eigene Rollen oder Admin bzw. Anlässe-Veranstalter? Darf eine Person mehrere Rollen haben? | Vorstand | A-ROLLE, A-LIZENZ-03, A-TURNIER-01, [Rollen und Rechte](rollen-und-rechte.md) |
 | K-22 | Erwartet der Verein, dass MyTCO im App Store und bei Google Play steht, und ab wann? | Vorstand | N-APP-04, [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-23 | Ist der TCO steuerbefreit oder anderweitig behördlich als gemeinnützig anerkannt? Dann könnte Apple die Jahresgebühr der Store-App erlassen. | Vorstand | [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-31 | Dürfen Spieler die Kontaktdaten ihrer Gegner und Doppelpartner sehen, und braucht es dafür eine Einwilligung? | Vorstand, Ansprechperson Datenschutz | N-DATENSCHUTZ-02, A-RESULTAT-02, #5, [Datenschutz](datenschutz.md) |
 | K-37 | Reichen für Benachrichtigungen E-Mail und Push, oder braucht es SMS oder WhatsApp? Die beiden kosten pro Nachricht. | Vorstand | N-APP-02, A-ANMELDUNG-08, A-ANMELDUNG-09, #9 |
 | K-38 | Wie lange bleiben Daten nach einem Austritt in MyTCO, und was muss der Verein aufbewahren (z. B. Resultate, Lizenzanträge)? | Vorstand, Ansprechperson Datenschutz | #5, [Datenschutz](datenschutz.md) |
 | K-40 | Reicht für Alterskategorien und Lizenzanträge der Jahrgang, oder verlangt Swiss Tennis das volle Geburtsdatum? | Lizenzverantwortlicher, Verantwortliche CM | K-07, #3, [Datenschutz](datenschutz.md) |
+| K-42 | Dürfen CM-Verantwortlicher und Lizenzverantwortlicher E-Mail und Telefon aller Mitglieder sehen, z. B. um für die CM zu werben oder bei Lizenzen nachzufragen? | Vorstand, Ansprechperson Datenschutz | [Rollen und Rechte](rollen-und-rechte.md), [Datenschutz](datenschutz.md) |
 
 ## Vor dem ersten Release *Mitglieder-Login* (28.02.2027)
 

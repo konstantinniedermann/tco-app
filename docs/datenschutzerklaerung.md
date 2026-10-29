@@ -24,8 +24,8 @@ Sie selbst einschalten. Für nichts anderes.
 
 **Wer sieht was:**
 
-- Der Admin und die Verantwortlichen von Clubmeisterschaft und Lizenzen sehen, was sie für
-  ihre Aufgabe brauchen.
+- Der Admin und die Verantwortlichen von Clubmeisterschaft und Lizenzen sehen Ihren Namen
+  und Ihre Kontaktdaten und, was sie für ihre Aufgabe brauchen.
 - Alle Mitglieder sehen Name, Kategorien und Resultate der Clubmeisterschaft.
 - Ihre Gegner und Ihr Doppelpartner sehen während der Clubmeisterschaft Ihre E-Mail und
   Telefonnummer, damit Sie die Spiele absprechen können.
