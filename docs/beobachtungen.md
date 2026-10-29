@@ -70,7 +70,7 @@ als Empfehlung.
 Dann trägt er, was die Verifikation ergeben hat:
 
 ```markdown
-**Verifiziert:** TT.MM.JJJJ gegen v0.3.2-prod — belegt
+**Verifiziert:** TT.MM.JJJJ gegen vX.Y.Z-prod — belegt
 (`pfad/zur/datei` → `symbol`, kurze Begründung).
 Offen ist nur die Entscheidung, ob …
 ```

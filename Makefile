@@ -10,6 +10,6 @@ check: ## Alle Prüfungen wie in der CI (vor jedem Commit)
 secrets: ## Secret-Scan über die ganze Git-Historie (gitleaks)
 	@gitleaks git --no-banner --redact --exit-code 1 .
 
-hooks: ## Lokalen pre-commit-Hook installieren (Secret-Scan + Doku-Check)
-	@cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
-	@echo "pre-commit-Hook installiert."
+hooks: ## Versionierte Git-Hooks aktivieren (Secret-Scan + Doku-Check, kein Push auf main)
+	@git config core.hooksPath .githooks
+	@echo "Git-Hooks aus .githooks/ aktiv."

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Lokaler pre-push-Hook (aktivieren: make hooks).
+# Branch-Schutz für private Repos gibt es auf GitHub nur mit Pro — daher lokal:
+# Der Weg auf main ist immer ein PR aus dev, nie ein direkter Push.
+set -euo pipefail
+
+while read -r _lokal_ref _lokal_sha remote_ref _remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "Abbruch: Direkter Push auf main ist verboten — Release per PR dev → main." >&2
+    exit 1
+  fi
+done
