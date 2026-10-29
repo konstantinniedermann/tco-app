@@ -39,4 +39,5 @@ entsteht. Termine und Umfang der Etappen → [`docs/roadmap.md`](docs/roadmap.md
 ## Datenschutz
 
 Das Repo enthält **keine echten Mitgliederdaten**. Echte Vereinsunterlagen gehören in
-den gitignorierten Ordner `intern/`, Testdaten sind erfunden.
+den gitignorierten Ordner `intern/`, Testdaten sind erfunden. Was MyTCO mit Personendaten
+tut und welche Vorgaben für jede Funktion gelten → [`docs/datenschutz.md`](docs/datenschutz.md).
