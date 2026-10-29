@@ -37,6 +37,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 |-------|----------|--------|
 | 29.10.2026 | Zielsetzung und Etappen festgelegt (siehe oben, [Roadmap](../roadmap.md)) | Projektleiter |
 | 29.10.2026 | Anforderungen mit IDs erfasst ([`anforderungen.md`](anforderungen.md)); Newsfeed aus der WhatsApp-Gruppe zum Verwerfen vorgeschlagen, weil nicht machbar (A-NEWSFEED-02; Bestätigung durch den Verein offen) | Projektleiter |
+| 29.10.2026 | Technik der App entschieden: zuerst installierbare Web-App mit Admin-Bereich und Web Push, Store-App bei Bedarf ([ADR-001](../adr/adr-001-web-app-zuerst.md)); beantwortet die Frage „Store oder Browser zum Mitglieder-Login“ vorläufig | Projektleiter |
 
 ## Offene Fragen an den Verein
 
@@ -60,8 +61,10 @@ Punkte für die nächste Sitzung. Erledigte Fragen wandern mit Antwort ins Ände
 - Das PDF nennt vier Personen mit Vornamen: für die Registrierung über die Website, für
   das Format der Lizenzliste und für die Spielformen der Kategorien. Welche Rolle hat
   jede im Verein? (Die Doku nennt nur Rollen.)
-- Das PDF beschreibt eine Web-App, die Zielsetzung eine Mobile-App. Muss die App zum
-  Mitglieder-Login schon in den Stores sein, oder reicht anfangs der Browser? (N-APP-01)
+- Erwartet der Verein, dass MyTCO im App Store und bei Google Play zu finden ist? MyTCO
+  startet als Web-App, die Store-App folgt bei Bedarf ([ADR-001](../adr/adr-001-web-app-zuerst.md)). (N-APP-01)
+- Ist der TCO als gemeinnützig anerkannt (z. B. steuerbefreit)? Dann könnte Apple die
+  Jahresgebühr von USD 99 für die Store-App erlassen ([ADR-001](../adr/adr-001-web-app-zuerst.md)).
 - Wer druckt und verschickt die Briefe mit den Zugangsdaten? Und wie kommt ein Mitglied
   wieder hinein, wenn es sein Passwort vergessen hat — neuer Brief oder E-Mail? (A-LOGIN-01)
 - Sollen Mitglieder ihre Adresse in MyTCO ändern können, solange Fairgate nicht angebunden

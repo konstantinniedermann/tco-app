@@ -9,4 +9,4 @@ bewerten ist. Vorlage: [`vorlage.md`](vorlage.md). Dateiname: `adr-NNN-kurztitel
 
 | ADR | Titel | Status | Datum |
 |-----|-------|--------|-------|
-| — | _Noch keine ADRs. Die ersten entstehen im Milestone *Fundament*._ | — | — |
+| [ADR-001](adr-001-web-app-zuerst.md) | MyTCO startet als installierbare Web-App, die Store-App folgt bei Bedarf | Entschieden | 2026-10-29 |
