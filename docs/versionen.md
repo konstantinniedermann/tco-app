@@ -19,3 +19,5 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   unter `.claude/worktrees/`; Ablauf im Skill `tco-branching`.
 - ADR-001: MyTCO startet als installierbare Web-App (PWA) mit Admin-Bereich und Web Push,
   E-Mail als Grundlage; Store-App per Capacitor, sobald ein Reevaluations-Trigger greift.
+- Entscheidungsgrundlage für den Vorstand zu den App-Varianten mit Budget über fünf Jahre
+  (`docs/recherche/2026-10-29-app-varianten-vorstand.html`).
