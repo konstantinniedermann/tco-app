@@ -3,8 +3,8 @@
 # Anforderungen mit IDs
 
 Jede Anforderung aus dem Anforderungsdokument v1.2 und der Zielsetzung vom 29.10.2026
-mit fester ID. ADRs, Issues und Tests verweisen auf diese IDs. Quellen, Änderungsprotokoll
-und offene Fragen stehen im [README](README.md); die Begriffe im [Glossar](../glossar.md).
+mit fester ID. ADRs, Issues und Tests verweisen auf diese IDs. Quellen und Änderungsprotokoll
+stehen im [README](README.md), offene Fragen in den [Abklärungen](../abklaerungen.md); die Begriffe im [Glossar](../glossar.md).
 
 ## Lesehilfe
 
@@ -172,7 +172,7 @@ Resultate importieren ([Recherche Systemlandschaft](../recherche/README.md)).
 
 Advantage kann Plätze benennen, ein Spielzeitraster erzeugen und auf Doppelbelegung
 prüfen. Ob ein eigener Planer nötig ist, hängt davon ab, ob der Spielplan in Advantage in
-der Praxis reicht (offene Frage im [README](README.md)).
+der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|

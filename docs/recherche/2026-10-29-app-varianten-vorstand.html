@@ -84,7 +84,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <div class="key"><strong>Start als Web-App</strong><p>Mitglieder öffnen MyTCO im Browser und legen es mit zwei Tipps als Symbol auf den Startbildschirm. Danach startet es wie eine App. Kein App Store, keine Store-Gebühren, Push-Benachrichtigungen sind möglich <span class="m b">belegt · 1</span>.</p></div>
     <div class="key"><strong>Geldunterschied ist klein</strong><p>Eine Store-App kostet zusätzlich etwa CHF 80 pro Jahr bei Apple und einmalig CHF 20 bei Google <span class="m b">belegt · 3 5</span> <span class="m s">Kurs ~0.80</span>. Apple erlässt die Jahresgebühr anerkannten Non-Profits <span class="m b">belegt · 4</span>; ob der TCO dazu zählt, ist <span class="m o">offen</span>.</p></div>
     <div class="key"><strong>Der eigentliche Preis ist Zeit</strong><p>Die Store-App braucht einmalig ca. 3–7 Personentage, je nach Variante, und danach ca. 1–2 Personentage pro Jahr für Store-Pflichten <span class="m s">Schätzung</span>. Ein Personentag sind etwa drei Feierabende.</p></div>
-    <div class="key"><strong>Was der Vorstand klären muss</strong><p>Ob der Verein einen Store-Eintrag erwartet, ob der TCO als gemeinnützig anerkannt ist, wer für den Verein bei Apple und Google unterschreibt und welches Budget gilt. Die Fragen stehen in Abschnitt 6.</p></div>
+    <div class="key"><strong>Was der Vorstand klären muss</strong><p>Ob der Verein einen Store-Eintrag erwartet, ob der TCO als gemeinnützig anerkannt ist, wer für den Verein bei Apple und Google unterschreibt und welches Budget gilt. Die Fragen stehen in Abschnitt 6; die vollständige Liste aller Abklärungen führt das Projekt im Repository (docs/abklaerungen.md).</p></div>
   </div>
 </section>
 
@@ -151,10 +151,11 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
         Ab iOS 26 öffnet jedes so abgelegte Symbol als App <span class="m b">belegt · 2</span>.</td><td>„Laden“ im App Store</td></tr>
       <tr><td><strong>Installieren auf Android</strong></td><td>Chrome bietet „App installieren“ meist selbst an <span class="m v">Vermutung</span></td><td>„Installieren“ bei Google Play</td></tr>
       <tr><td><strong>Push auf dem iPhone</strong></td><td>Ab iOS 16.4 (2023), nur wenn MyTCO auf dem Startbildschirm liegt; das Mitglied schaltet Push mit einem Tipp ein <span class="m b">belegt · 1</span></td><td>Nach Erlaubnis beim ersten Start</td></tr>
-      <tr><td><strong>Push auf Android</strong></td><td>Funktioniert, auch im Browser <span class="m v">Vermutung</span></td><td>Funktioniert</td></tr>
+      <tr><td><strong>Push auf Android</strong></td><td>Funktioniert schon im Browser, ohne Installation <span class="m v">Vermutung</span>. Die Einschränkung auf den Startbildschirm gilt nur fürs iPhone <span class="m b">belegt · 1</span></td><td>Funktioniert</td></tr>
       <tr><td><strong>Neue Version</strong></td><td>Kommt von selbst</td><td>Kommt über den Store, je nach Handy-Einstellung automatisch</td></tr>
     </tbody>
   </table></div>
+  <p><strong>Warum diese Seite vor allem vom iPhone spricht:</strong> Auf Android klappt Web Push ohne Umweg, auf dem iPhone nur vom Startbildschirm aus. In der Schweiz ist gut die Hälfte der Handys ein iPhone, 2026 je nach Monat 54–60 % <span class="m b">belegt · 16</span>. Der Engpass ist also das iPhone, nicht Android.</p>
   <p>Bei allen Varianten gilt: <strong>Alles Wichtige kommt auch per E-Mail.</strong> Push ist eine Ergänzung. In einer Push-Nachricht stehen keine Personendaten, nur ein Hinweis wie „Neues Spiel in deiner Gruppe, öffne MyTCO“.</p>
 </section>
 
@@ -219,7 +220,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <h2>5 · Wann die Store-App kommt</h2>
   <p>Der Projektleiter prüft den Umstieg, sobald eines davon eintritt. Der Umstieg selbst wird jeweils neu entschieden.</p>
   <ol class="q">
-    <li><strong>Zu wenig Push auf dem iPhone:</strong> Vier Wochen nach Einführung von Push hat weniger als die Hälfte der aktiven iPhone-Nutzer Push eingeschaltet <span class="m s">Schwelle und Frist: Schätzung</span>.</li>
+    <li><strong>Zu wenig Push auf dem iPhone:</strong> Vier Wochen nach Einführung von Push hat weniger als die Hälfte der aktiven iPhone-Nutzer Push eingeschaltet (Android ist nicht betroffen) <span class="m s">Schwelle und Frist: Schätzung</span>.</li>
     <li><strong>Der Verein will einen Store-Eintrag</strong>, oder Mitglieder finden MyTCO ohne Store nicht.</li>
     <li><strong>Der Gebührenerlass wird bestätigt.</strong> Dann fällt der grösste laufende Kostenpunkt der Store-App weg.</li>
     <li><strong>Apple schränkt Web-Apps oder Web Push ein.</strong></li>
@@ -257,6 +258,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <li><a href="https://support.google.com/googleplay/android-developer/answer/14151465?hl=en" target="_blank" rel="noopener">Google Play: Testpflicht für persönliche Konten</a>: 12 Tester, 14 Tage</li>
     <li><a href="https://www.infomaniak.com/de/hosting/vps-lite" target="_blank" rel="noopener">Infomaniak: VPS Lite</a>: ab CHF 2.70/Monat, Rechenzentren in der Schweiz (Preis nur aus dem Suchindex, Seite selbst nicht lesbar)</li>
     <li><a href="https://www.hetzner.com/cloud/" target="_blank" rel="noopener">Hetzner: Cloud-Server</a>: ab EUR 5.99/Monat exkl. MWST</li>
+    <li><a href="https://gs.statcounter.com/os-market-share/mobile/switzerland" target="_blank" rel="noopener">StatCounter: Mobile Betriebssysteme Schweiz</a>: iOS 2026 je nach Monat 54–60 %, Android 40–46 %</li>
   </ol>
 </section>
 

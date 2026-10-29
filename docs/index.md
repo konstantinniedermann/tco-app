@@ -8,8 +8,9 @@ Issue im Milestone *Fundament*.
 | Dokument | Inhalt |
 |----------|--------|
 | [Roadmap](roadmap.md) | Etappen mit Termin und Umfang |
-| [Anforderungen](anforderungen/README.md) | Anforderungsdokument des Vereins, Zielsetzung, Änderungen, offene Fragen |
+| [Anforderungen](anforderungen/README.md) | Anforderungsdokument des Vereins, Zielsetzung, Änderungen |
 | [Anforderungen mit IDs](anforderungen/anforderungen.md) | Jede Anforderung mit ID, Quelle, Etappe und Status |
+| [Abklärungen beim Verein](abklaerungen.md) | Offene Fragen an Vorstand, Website-Betreuer und Hoster, nach Fälligkeit |
 | [Glossar](glossar.md) | Fachbegriffe von TCO und Swiss Tennis und wie MyTCO sie nennt |
 | [Recherche Systemlandschaft](recherche/README.md) | Bestehende Systeme des Vereins, Kosten, kaufen oder bauen (Stand 29.10.2026) |
 | [App-Varianten für den Vorstand](recherche/2026-10-29-app-varianten-vorstand.html) | Web-App oder Store-App: Kosten, Budget, offene Fragen an den Vorstand (Stand 29.10.2026) |

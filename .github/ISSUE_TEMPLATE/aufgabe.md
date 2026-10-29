@@ -41,3 +41,9 @@ Keine echten Mitgliederdaten in Issues — Personen mit ihrer Rolle benennen.
 Blocked by:
 Blocks:
 Verwandt:
+
+## Abklärung beim Verein
+
+<!-- Braucht die Entscheidung eine Antwort von Vorstand, Website-Betreuer oder Hoster?
+     Dann Frage in docs/abklaerungen.md eintragen und hier die ID nennen (z. B. K-09). Sonst weglassen. -->
+

@@ -54,7 +54,7 @@ jeder Eintrag genau einen von sechs Ausgängen:
 | **Abhaken** | Trifft zu, wir tun bewusst nichts. Mit Begründung, und wo sinnvoll mit **Reevaluations-Trigger** („kommt zurück, wenn …") |
 | **Mitmachen** | Trivial-Fix, sofort erledigt, eigener Commit |
 | **Doku / Regel / Memory** | Erkenntnis ohne Vorgang — ADR, arc42, `CLAUDE.md` oder Memory |
-| **Vereinsthema** | Braucht eine Entscheidung oder Auskunft des Vereins → offener Punkt für die nächste Sitzung in `docs/anforderungen/README.md` (Abschnitt „Offene Fragen an den Verein“) |
+| **Vereinsthema** | Braucht eine Entscheidung oder Auskunft des Vereins → offener Punkt für die nächste Sitzung in `docs/abklaerungen.md` |
 | **Issue** | Erfüllt Regel 3 der `CLAUDE.md`. Neu, an ein bestehendes angehängt, oder mehrere gebündelt — nur auf ausdrückliche Zustimmung |
 
 **„Abhaken" ist ein vollwertiges Ergebnis und ausdrücklich der Normalfall.** Ein
