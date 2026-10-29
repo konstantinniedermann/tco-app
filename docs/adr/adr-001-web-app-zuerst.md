@@ -22,6 +22,10 @@ Randbedingungen:
 - **Abhängigkeitsschutz:** Der Hook `dep-guard` erkennt `npm`/`pnpm`/`yarn`/`bun`, aber
   nicht `npx expo install`, `flutter pub add` oder `dart pub add`.
 
+**Für den Vorstand** sind Varianten, Budget und offene Fragen in der
+[Entscheidungsgrundlage App-Varianten](../recherche/2026-10-29-app-varianten-vorstand.html)
+zusammengefasst.
+
 **Legende der Angaben:** **B·n** = belegt mit Quelle n (unten) · **S** = Schätzung ·
 **V** = Vermutung, nicht geprüft · **PT** = Personentag zu 8 Stunden. Wechselkurs USD → CHF
 ca. 0.80 (**S**).

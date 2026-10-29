@@ -12,6 +12,7 @@ Issue im Milestone *Fundament*.
 | [Anforderungen mit IDs](anforderungen/anforderungen.md) | Jede Anforderung mit ID, Quelle, Etappe und Status |
 | [Glossar](glossar.md) | Fachbegriffe von TCO und Swiss Tennis und wie MyTCO sie nennt |
 | [Recherche Systemlandschaft](recherche/README.md) | Bestehende Systeme des Vereins, Kosten, kaufen oder bauen (Stand 29.10.2026) |
+| [App-Varianten für den Vorstand](recherche/2026-10-29-app-varianten-vorstand.html) | Web-App oder Store-App: Kosten, Budget, offene Fragen an den Vorstand (Stand 29.10.2026) |
 
 ## Architektur
 
