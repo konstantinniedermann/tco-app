@@ -44,6 +44,6 @@ Verwandt:
 
 ## Abklärung beim Verein
 
-<!-- Braucht die Entscheidung eine Antwort von Vorstand, Website-Betreuer oder Hoster?
+<!-- Braucht die Entscheidung eine Antwort von Vorstand, Website-Betreuer, Hoster oder den
+     Verantwortlichen von Clubmeisterschaft und Lizenzen?
      Dann Frage in docs/abklaerungen.md eintragen und hier die ID nennen (z. B. K-09). Sonst weglassen. -->
-

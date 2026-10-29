@@ -22,5 +22,5 @@ Release-Konzept festgelegt (Milestone *Fundament*).
 - Entscheidungsgrundlage für den Vorstand zu den App-Varianten mit Budget über fünf Jahre
   (`docs/recherche/2026-10-29-app-varianten-vorstand.html`).
 - Abklärungen beim Verein (`docs/abklaerungen.md`): alle offenen Fragen an Vorstand,
-  Website-Betreuer und Hoster mit ID und Fälligkeit; Regel dazu in den Issue-Konventionen
+  Website-Betreuer, Hoster und Verantwortliche mit ID und Fälligkeit; Regel dazu in den Issue-Konventionen
   und der Issue-Vorlage.

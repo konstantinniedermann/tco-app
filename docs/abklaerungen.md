@@ -19,9 +19,16 @@ ist, bei wem und bis wann. Fragen haben eine feste ID (`K-NN`), auf die Issues v
 **Für das Gespräch mit dem Vorstand** zu App und Kosten gibt es eine eigene Seite:
 [Entscheidungsgrundlage App-Varianten](recherche/2026-10-29-app-varianten-vorstand.html).
 
+Jeder Abschnitt nennt den **spätesten** Termin für die Antwort. Das Fachmodell (#3)
+beschreibt schon im *Fundament* alle Etappen bis zu den Lizenzanträgen; wo dort eine
+Antwort fehlt (vor allem K-25, K-27, K-32, K-34), hält es eine Annahme fest und verweist
+auf die Frage. Wer eine Antwort früher braucht, fragt früher.
+
 ## Vor Ende Fundament (15.12.2026)
 
 Diese Antworten braucht es für die Konzepte und Technik-Entscheide des Milestones *Fundament*.
+Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon braucht
+(Rollen, Login-Ablauf, Datenschutz, Store-Erwartung).
 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
@@ -40,14 +47,19 @@ Diese Antworten braucht es für die Konzepte und Technik-Entscheide des Mileston
 | K-13 | Darf MyTCO Logo, Farben und Schriften von tcolten.ch verwenden, und wer liefert die Dateien? Wie stark soll sich MyTCO farblich abgrenzen? | Website-Betreuer, Vorstand | N-DESIGN-01, #13 |
 | K-14 | Ohne Fairgate-Anbindung gibt es zwei Mitgliederlisten. Wer überträgt Ein- und Austritte und Adressänderungen zwischen Fairgate und MyTCO, und ist das für den Verein tragbar? | Vorstand | N-EIGENSTAENDIG-01, #16 |
 | K-15 | Wie gut muss MyTCO erreichbar sein, besonders während Anmeldung, Gruppenspielen und Finalwochenende? Was passiert, wenn es einen Abend ausfällt? | Vorstand | N-BETRIEB-01, #10 |
+| K-16 | Wer druckt und verschickt die Briefe mit den Zugangsdaten, und wer trägt das Porto? Wie kommt ein Mitglied wieder hinein, wenn es sein Passwort vergessen hat: neuer Brief oder E-Mail? | Vorstand | A-LOGIN-01, #6, #9 |
+| K-17 | Wie kommen die Mitglieder zum Start in MyTCO: von Hand abtippen oder einmal aus einer Fairgate-Liste übernehmen? Wie viele Mitglieder sind es etwa? (Eine solche Liste liegt nur im gitignorierten Ordner `intern/`, nie im Repo.) | Vorstand | A-MITGLIED-01, #3, #9 |
+| K-18 | Wer wird Admin, und wie viele Personen sind das? Sind Lizenzverantwortlicher und Verantwortliche der Clubmeisterschaft eigene Rollen oder Admin bzw. Anlässe-Veranstalter? Darf eine Person mehrere Rollen haben? | Vorstand | A-ROLLE, A-LIZENZ-03, A-TURNIER-01, #4 |
+| K-22 | Erwartet der Verein, dass MyTCO im App Store und bei Google Play steht, und ab wann? | Vorstand | N-APP-04, [ADR-001](adr/adr-001-web-app-zuerst.md) |
+| K-23 | Ist der TCO steuerbefreit oder anderweitig behördlich als gemeinnützig anerkannt? Dann könnte Apple die Jahresgebühr der Store-App erlassen. | Vorstand | [ADR-001](adr/adr-001-web-app-zuerst.md) |
+| K-31 | Dürfen Spieler die Kontaktdaten ihrer Gegner und Doppelpartner sehen, und braucht es dafür eine Einwilligung? | Vorstand, Datenschutzverantwortliche | N-DATENSCHUTZ-02, A-RESULTAT-02, #5 |
+| K-37 | Reichen für Benachrichtigungen E-Mail und Push, oder braucht es SMS oder WhatsApp? Die beiden kosten pro Nachricht. | Vorstand | N-APP-02, A-ANMELDUNG-08, A-ANMELDUNG-09, #9 |
+| K-38 | Wie lange bleiben Daten nach einem Austritt in MyTCO, und was muss der Verein aufbewahren (z. B. Resultate, Lizenzanträge)? | Vorstand, Datenschutzverantwortliche | #5 |
 
 ## Vor dem ersten Release *Mitglieder-Login* (28.02.2027)
 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
-| K-16 | Wer druckt und verschickt die Briefe mit den Zugangsdaten, und wer trägt das Porto? Wie kommt ein Mitglied wieder hinein, wenn es sein Passwort vergessen hat: neuer Brief oder E-Mail? | Vorstand | A-LOGIN-01, #6, #9 |
-| K-17 | Wie kommen die Mitglieder zum Start in MyTCO: von Hand abtippen oder einmal aus einer Fairgate-Liste übernehmen? Wie viele Mitglieder sind es etwa? (Eine solche Liste liegt nur im gitignorierten Ordner `intern/`, nie im Repo.) | Vorstand | A-MITGLIED-01, #3, #9 |
-| K-18 | Wer wird Admin, und wie viele Personen sind das? Sind Lizenzverantwortlicher und Verantwortliche der Clubmeisterschaft eigene Rollen oder Admin bzw. Anlässe-Veranstalter? Darf eine Person mehrere Rollen haben? | Vorstand | A-ROLLE, A-LIZENZ-03, A-TURNIER-01, #4 |
 | K-19 | Dürfen Mitglieder E-Mail und Telefon selbst ändern? Auch die Adresse, solange Fairgate nicht angebunden ist, und wer überträgt sie dann nach Fairgate? | Vorstand | A-KONTO-01, A-KONTO-02 |
 | K-20 | Stellt der Verein eine Testgruppe von 5–10 Mitgliedern unterschiedlichen Alters, mit iPhone und Android, die Brief, Login und Installation vor dem Start ausprobiert? | Vorstand | #11, [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-21 | An wen wenden sich Mitglieder bei Fragen (Passwort vergessen, Installation auf dem Handy)? | Vorstand | #10 |
@@ -56,10 +68,8 @@ Diese Antworten braucht es für die Konzepte und Technik-Entscheide des Mileston
 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
-| K-22 | Erwartet der Verein, dass MyTCO im App Store und bei Google Play steht, und ab wann? | Vorstand | N-APP-04, [ADR-001](adr/adr-001-web-app-zuerst.md) |
-| K-23 | Ist der TCO steuerbefreit oder anderweitig behördlich als gemeinnützig anerkannt? Dann könnte Apple die Jahresgebühr der Store-App erlassen. | Vorstand | [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-24 | Gilt 2027 derselbe CM-Kalender (Anmeldeschluss Anfang Juni, Gruppenspiele bis Anfang August, Finalwochenende Mitte August)? An welchem Datum schliesst die Anmeldung? | Verantwortliche CM | A-ANMELDUNG-07, [Glossar](glossar.md) |
-| K-25 | Welche Kategorien und Alterskategorien bietet die CM an, gibt es ein Nenngeld, und gibt es je Phase eine eigene Turniernummer? Eröffnet der TCO fürs Finalwochenende neue KO-Turniere, wie das Anforderungsdokument sagt? | Verantwortliche CM | A-TURNIER-02, A-TURNIER-03, [Glossar](glossar.md) |
+| K-25 | Welche Kategorien und Alterskategorien bietet die CM an, gibt es ein Nenngeld, und gibt es je Phase eine eigene Turniernummer? Advantage kennt ein Finaltableau direkt nach den Gruppenspielen; laut Anforderungsdokument eröffnet der TCO fürs Finalwochenende aber neue KO-Turniere. Warum, und bleibt das so? Soll MyTCO festhalten, wer das Nenngeld bezahlt hat? | Verantwortliche CM | A-TURNIER-02, A-TURNIER-03, [Glossar](glossar.md) |
 | K-26 | Was läuft heute bei der Clubmeisterschaft am schlechtesten: Anmeldung, Gruppenspiele, Resultate oder Finalwochenende? | Verantwortliche CM | Priorisierung der CM-Etappen |
 | K-27 | Höchstens 3 Anmeldungen: Zählt ein Doppel für beide Partner? Muss der Doppelpartner zustimmen, und wer gilt als „verfügbar“? | Verantwortliche CM | A-ANMELDUNG-02, A-ANMELDUNG-04 |
 | K-28 | Wie wird die Klassierung bei der Anmeldung festgelegt: gibt der Spieler sie an, oder prüft der Admin? | Verantwortliche CM | A-ANMELDUNG-03, A-ANMELDUNG-06 |
@@ -70,7 +80,6 @@ Diese Antworten braucht es für die Konzepte und Technik-Entscheide des Mileston
 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
-| K-31 | Dürfen Spieler die Kontaktdaten ihrer Gegner und Doppelpartner sehen, und braucht es dafür eine Einwilligung? | Vorstand, Datenschutzverantwortliche | N-DATENSCHUTZ-02, A-RESULTAT-02, #5 |
 | K-32 | Muss der Gegner ein gemeldetes Resultat bestätigen? | Verantwortliche CM | A-RESULTAT-04 |
 | K-33 | Wurde der Spielplan von Advantage fürs Finalwochenende schon ausprobiert, und was fehlt dort? | Verantwortliche CM | A-SPIELPLAN |
 
@@ -91,6 +100,7 @@ Diese Antworten braucht es für die Konzepte und Technik-Entscheide des Mileston
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
 | K-36 | Was gehört zu „Mitgliedschaft ändern“: Austritt, Wechsel der Mitgliederkategorie, anderes? | Vorstand | A-KONTO-04 |
+| K-39 | Soll der Spielplan des Finalwochenendes öffentlich, also ohne Login, sichtbar sein? Dann stehen Namen der Spieler auf einer öffentlichen Seite. | Vorstand, Datenschutzverantwortliche | A-SPIELPLAN-08, #5 |
 
 ## Beantwortet
 
