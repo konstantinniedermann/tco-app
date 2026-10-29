@@ -13,3 +13,7 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   nicht-funktional, je mit Quelle, Etappe und Status; neue offene Fragen an den Verein.
 - Glossar der Fachbegriffe (`docs/glossar.md`) mit Sprachregeln für MyTCO und Belegen aus
   dem Advantage-Handbuch von Swiss Tennis.
+- Setup gehärtet nach Review: versionierte Git-Hooks (Secret-Scan bricht ohne gitleaks ab,
+  kein direkter Push auf `main`), Secret-Scan auch bei PRs, Zeitlimit für CI-Jobs.
+- Parallele Sessions: Hauptordner bleibt auf `dev`, jede Session arbeitet in einem Worktree
+  unter `.claude/worktrees/`; Ablauf im Skill `tco-branching`.

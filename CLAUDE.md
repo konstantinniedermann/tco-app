@@ -26,6 +26,9 @@ Definition of Done auf.
 - **Nie `git reset --hard` auf `dev`.**
 - **Feature-Branches zweigen ab `origin/dev` ab.**
 - **Nie `git add -A` oder `git add .`** — Dateien einzeln stagen.
+- **Im Hauptordner nie einen Feature-Branch auschecken.** Er bleibt auf `dev` und dient nur
+  Merges und Releases. Jede Session arbeitet an ihrem Issue in einem eigenen Worktree unter
+  `.claude/worktrees/` — Ablauf (Start, Merge, Release, Aufräumen) → Skill `tco-branching`.
 
 ## Issue-Konventionen
 

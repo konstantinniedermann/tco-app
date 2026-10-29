@@ -7,8 +7,9 @@ NOTES.local.md
 .env.*
 !.env.example
 
-# Git-Worktrees paralleler Sessions (gehören ins Projekt, nicht auf die Ebene darüber)
-.worktrees/
+# Git-Worktrees paralleler Sessions (Standardort von Claude Code) und lokale Einstellungen
+.claude/worktrees/
+.claude/settings.local.json
 
 # System
 .DS_Store
