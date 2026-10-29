@@ -9,8 +9,8 @@
 | 22.10.2026 | Anforderungsdokument „Anforderungen MyTCO“, Version 1.2, vom Verein | [`2026-10-22-anforderungen-mytco-v1.2.pdf`](2026-10-22-anforderungen-mytco-v1.2.pdf) |
 | 29.10.2026 | Zielsetzung des Projektleiters nach dem ersten Gespräch mit dem Verein | dieser Abschnitt unten |
 
-Die Anforderungen werden im Milestone *Fundament* einzeln mit IDs erfasst, damit ADRs,
-Issues und Tests darauf verweisen können. Bis dahin gelten das PDF und die Zielsetzung.
+Jede Anforderung aus beiden Quellen steht mit fester ID in
+[`anforderungen.md`](anforderungen.md); darauf verweisen ADRs, Issues und Tests.
 
 ## Zielsetzung vom 29.10.2026
 
@@ -36,6 +36,7 @@ Issues und Tests darauf verweisen können. Bis dahin gelten das PDF und die Ziel
 | Datum | Änderung | Quelle |
 |-------|----------|--------|
 | 29.10.2026 | Zielsetzung und Etappen festgelegt (siehe oben, [Roadmap](../roadmap.md)) | Projektleiter |
+| 29.10.2026 | Anforderungen mit IDs erfasst ([`anforderungen.md`](anforderungen.md)); Newsfeed aus der WhatsApp-Gruppe zum Verwerfen vorgeschlagen, weil nicht machbar (A-NEWSFEED-02; Bestätigung durch den Verein offen) | Projektleiter |
 
 ## Offene Fragen an den Verein
 
@@ -51,3 +52,41 @@ Punkte für die nächste Sitzung. Erledigte Fragen wandern mit Antwort ins Ände
 - Was läuft heute bei der Clubmeisterschaft am schlechtesten, und wurde der Spielplan in
   Advantage schon ausprobiert?
 - Darf `my.tcolten.ch` für MyTCO verwendet werden? (Absprache mit dem Website-Betreuer.)
+
+**Aus der Erfassung der Anforderungen (29.10.2026)** — IDs siehe [`anforderungen.md`](anforderungen.md):
+
+- Die mit \* markierten Etappen und Status in `anforderungen.md` sind Vorschläge des
+  Projektleiters. Passen sie?
+- Das PDF nennt vier Personen mit Vornamen: für die Registrierung über die Website, für
+  das Format der Lizenzliste und für die Spielformen der Kategorien. Welche Rolle hat
+  jede im Verein? (Die Doku nennt nur Rollen.)
+- Das PDF beschreibt eine Web-App, die Zielsetzung eine Mobile-App. Muss die App zum
+  Mitglieder-Login schon in den Stores sein, oder reicht anfangs der Browser? (N-APP-01)
+- Wer druckt und verschickt die Briefe mit den Zugangsdaten? Und wie kommt ein Mitglied
+  wieder hinein, wenn es sein Passwort vergessen hat — neuer Brief oder E-Mail? (A-LOGIN-01)
+- Sollen Mitglieder ihre Adresse in MyTCO ändern können, solange Fairgate nicht angebunden
+  ist? Wer überträgt die Änderung dann nach Fairgate? (A-KONTO-02)
+- Was gehört zu „Mitgliedschaft ändern“ — Austritt, Wechsel der Mitgliederkategorie,
+  anderes? (A-KONTO-04)
+- Sind der Lizenzverantwortliche und die Verantwortlichen der Clubmeisterschaft eigene
+  Rollen, oder Admin bzw. Anlässe-Veranstalter? (A-ROLLE, A-LIZENZ-03, A-TURNIER-01)
+- Ist das Storno einer Lizenz dasselbe wie die Sistierung bei Swiss Tennis (Frist Ende
+  Februar)? Welcher Stichtag gilt für die Liste der Anträge? (A-LIZENZ-02, A-LIZENZ-03)
+- Höchstens 3 Anmeldungen: Zählt ein Doppel für beide Partner? Muss der Doppelpartner
+  zustimmen, und wer gilt als „verfügbar“? (A-ANMELDUNG-02, A-ANMELDUNG-04)
+- Wie wird die Klassierung eines Spielers bei der Anmeldung festgelegt: gibt er sie
+  selbst an, oder prüft der Admin? (A-ANMELDUNG-03, A-ANMELDUNG-06)
+- Dürfen Spieler sich bis zum Anmeldeschluss selbst wieder abmelden oder ummelden?
+  (A-ANMELDUNG-07)
+- Reichen für Benachrichtigungen zunächst E-Mail und Push? SMS und WhatsApp kosten pro
+  Nachricht. (A-ANMELDUNG-08, A-ANMELDUNG-09)
+- Soll der Spielplan des Finalwochenendes öffentlich, also ohne Login, sichtbar sein?
+  (A-SPIELPLAN-08)
+- Welche Ausfallzeit ist akzeptabel, besonders während der Clubmeisterschaft? (N-BETRIEB-01)
+
+**Aus dem Glossar (29.10.2026)** — Begriffe siehe [`glossar.md`](../glossar.md):
+
+- Advantage kennt ein Finaltableau, das direkt auf die Gruppenspiele folgt. Laut PDF
+  eröffnet der TCO fürs Finalwochenende aber neue KO-Turniere. Warum, und bleibt das so?
+- Gibt es bei der Clubmeisterschaft ein Nenngeld, und soll MyTCO festhalten, wer bezahlt hat?
+- Welche Alterskategorien bietet die Clubmeisterschaft an?
