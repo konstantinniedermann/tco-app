@@ -39,7 +39,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-05 | Wer betreut MyTCO mit oder übernimmt, falls der Projektleiter ausfällt? | Vorstand | #10 |
 | K-06 | Wer ist im Verein für den Datenschutz verantwortlich, und wer gibt die Datenschutzerklärung von MyTCO frei? Gibt es auf tcolten.ch schon eine, an die MyTCO anschliesst? | Vorstand, Website-Betreuer | N-DATENSCHUTZ-01, #5, [Datenschutz](datenschutz.md) |
 | K-07 | Welche Mitgliederdaten braucht MyTCO wirklich: Name, E-Mail, Telefon, Postadresse (für den Brief), Geburtsdatum und Geschlecht (für Kategorien), Lizenznummer? Was davon darf fehlen? | Vorstand | #3, #5, [Datenschutz](datenschutz.md) |
-| K-08 | Ab wann kommen Junioren in MyTCO, und wer loggt sich für Minderjährige ein (Eltern)? | Vorstand | #4, #5, [Datenschutz](datenschutz.md) |
+| K-08 | Ab wann kommen Junioren in MyTCO, und wer loggt sich für Minderjährige ein (Eltern)? | Vorstand | [Rollen und Rechte](rollen-und-rechte.md), #5, [Datenschutz](datenschutz.md) |
 | K-09 | Hosting bei Metanet: Welches Paket hat der Verein, was kostet es heute, welche Technik bietet es (PHP, Node.js, Python, Datenbank, SSH, Backups)? Darf MyTCO dort getrennt von der Website laufen? Gibt es einen Auftragsbearbeitungsvertrag nach nDSG? | Website-Betreuer, Hoster | #8, #9, #5, [Datenschutz](datenschutz.md) |
 | K-10 | Darf MyTCO unter `my.tcolten.ch` laufen, und wer verwaltet die DNS-Einträge? | Website-Betreuer | A-LOGIN-04, #8 |
 | K-11 | E-Mail-Versand: Darf MyTCO von einer Adresse @tcolten.ch senden (z. B. Bestätigungen)? Geht das über das bestehende Hosting, mit welchem Limit? Wer setzt die nötigen DNS-Einträge gegen Spam-Verdacht? | Website-Betreuer, Hoster | N-APP-02, #8, #9 |
@@ -49,13 +49,14 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-15 | Wie gut muss MyTCO erreichbar sein, besonders während Anmeldung, Gruppenspielen und Finalwochenende? Was passiert, wenn es einen Abend ausfällt? | Vorstand | N-BETRIEB-01, #10 |
 | K-16 | Wer druckt und verschickt die Briefe mit den Zugangsdaten, und wer trägt das Porto? Wie kommt ein Mitglied wieder hinein, wenn es sein Passwort vergessen hat: neuer Brief oder E-Mail? | Vorstand | A-LOGIN-01, #6, #9 |
 | K-17 | Wie kommen die Mitglieder zum Start in MyTCO: von Hand abtippen oder einmal aus einer Fairgate-Liste übernehmen? Wie viele Mitglieder sind es etwa? (Eine solche Liste liegt nur im gitignorierten Ordner `intern/`, nie im Repo.) | Vorstand | A-MITGLIED-01, #3, #9 |
-| K-18 | Wer wird Admin, und wie viele Personen sind das? Sind Lizenzverantwortlicher und Verantwortliche der Clubmeisterschaft eigene Rollen oder Admin bzw. Anlässe-Veranstalter? Darf eine Person mehrere Rollen haben? | Vorstand | A-ROLLE, A-LIZENZ-03, A-TURNIER-01, #4 |
+| K-18 | Vorschlag: vier Rollen Mitglied, Admin, CM-Verantwortlicher und Lizenzverantwortlicher; eine Person kann mehrere haben, der Admin vertritt die Verantwortlichen. Passt das? Wer übernimmt welche Rolle, und wie viele Admins gibt es? | Vorstand | A-ROLLE, A-LIZENZ-03, A-TURNIER-01, [Rollen und Rechte](rollen-und-rechte.md) |
 | K-22 | Erwartet der Verein, dass MyTCO im App Store und bei Google Play steht, und ab wann? | Vorstand | N-APP-04, [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-23 | Ist der TCO steuerbefreit oder anderweitig behördlich als gemeinnützig anerkannt? Dann könnte Apple die Jahresgebühr der Store-App erlassen. | Vorstand | [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-31 | Dürfen Spieler die Kontaktdaten ihrer Gegner und Doppelpartner sehen, und braucht es dafür eine Einwilligung? | Vorstand, Ansprechperson Datenschutz | N-DATENSCHUTZ-02, A-RESULTAT-02, #5, [Datenschutz](datenschutz.md) |
 | K-37 | Reichen für Benachrichtigungen E-Mail und Push, oder braucht es SMS oder WhatsApp? Die beiden kosten pro Nachricht. | Vorstand | N-APP-02, A-ANMELDUNG-08, A-ANMELDUNG-09, #9 |
 | K-38 | Wie lange bleiben Daten nach einem Austritt in MyTCO, und was muss der Verein aufbewahren (z. B. Resultate, Lizenzanträge)? | Vorstand, Ansprechperson Datenschutz | #5, [Datenschutz](datenschutz.md) |
 | K-40 | Reicht für Alterskategorien und Lizenzanträge der Jahrgang, oder verlangt Swiss Tennis das volle Geburtsdatum? | Lizenzverantwortlicher, Verantwortliche CM | K-07, #3, [Datenschutz](datenschutz.md) |
+| K-42 | Dürfen CM-Verantwortlicher und Lizenzverantwortlicher E-Mail und Telefon aller Mitglieder sehen, z. B. um für die CM zu werben oder bei Lizenzen nachzufragen? | Vorstand, Ansprechperson Datenschutz | [Rollen und Rechte](rollen-und-rechte.md), [Datenschutz](datenschutz.md) |
 
 ## Vor dem ersten Release *Mitglieder-Login* (28.02.2027)
 
@@ -73,7 +74,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-25 | Welche Kategorien und Alterskategorien bietet die CM an, gibt es ein Nenngeld, und gibt es je Phase eine eigene Turniernummer? Advantage kennt ein Finaltableau direkt nach den Gruppenspielen; laut Anforderungsdokument eröffnet der TCO fürs Finalwochenende aber neue KO-Turniere. Warum, und bleibt das so? Soll MyTCO festhalten, wer das Nenngeld bezahlt hat? | Verantwortliche CM | A-TURNIER-02, A-TURNIER-03, [Glossar](glossar.md) |
 | K-26 | Was läuft heute bei der Clubmeisterschaft am schlechtesten: Anmeldung, Gruppenspiele, Resultate oder Finalwochenende? | Verantwortliche CM | Priorisierung der CM-Etappen |
 | K-27 | Höchstens 3 Anmeldungen: Zählt ein Doppel für beide Partner? Muss der Doppelpartner zustimmen, und wer gilt als „verfügbar“? | Verantwortliche CM | A-ANMELDUNG-02, A-ANMELDUNG-04 |
-| K-28 | Wie wird die Klassierung bei der Anmeldung festgelegt: gibt der Spieler sie an, oder prüft der Admin? | Verantwortliche CM | A-ANMELDUNG-03, A-ANMELDUNG-06 |
+| K-28 | Wie wird die Klassierung bei der Anmeldung festgelegt: gibt der Spieler sie an, oder prüft der CM-Verantwortliche? | Verantwortliche CM | A-ANMELDUNG-03, A-ANMELDUNG-06 |
 | K-29 | Dürfen Spieler sich bis zum Anmeldeschluss selbst wieder abmelden oder ummelden? | Verantwortliche CM | A-ANMELDUNG-07 |
 | K-30 | Das Anforderungsdokument nennt vier Personen mit Vornamen (Registrierung über die Website, Format der Lizenzliste, Spielformen der Kategorien). Welche Rolle hat jede im Verein? | Vorstand | [Anforderungen](anforderungen/README.md) |
 

@@ -53,16 +53,18 @@ nicht festlegen. Vom Verein zu bestätigen.
 
 ### ROLLE — Benutzerrollen
 
-Was jede Rolle darf, legt das Dokument *Rollen und Rechte* fest (Issue #4).
+Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
 | A-ROLLE-01 | Der Admin vergibt Benutzerrollen mit den zugehörigen Berechtigungen | PDF 4a | Mitglieder-Login | geplant |
 | A-ROLLE-02 | Rolle *Admin*: Zugang zur Mitgliederverwaltung | PDF 4a, Ziel | Mitglieder-Login | geplant |
 | A-ROLLE-03 | Rolle *Mitglied* | PDF 4a | Mitglieder-Login | geplant |
-| A-ROLLE-04 | Rolle *Anlässe-Veranstalter* | PDF 4a | CM-Anmeldung\* | geplant |
+| A-ROLLE-04 | Rolle *Anlässe-Veranstalter*; die CM leitet bis dahin der CM-Verantwortliche (A-ROLLE-07) | PDF 4a | später\* | später |
 | A-ROLLE-05 | Rolle *Junioren-Leiter* | PDF 4a | später\* | später |
 | A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später\* | später |
+| A-ROLLE-07 | Rolle *CM-Verantwortlicher*: Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | geplant |
+| A-ROLLE-08 | Rolle *Lizenzverantwortlicher*: Lizenzrunde und Lizenzanträge | PL | Lizenzanträge | geplant |
 
 ### KONTO — Eigene Daten ändern
 
@@ -124,7 +126,7 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-TURNIER-01 | Der Verantwortliche legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | geplant |
+| A-TURNIER-01 | Der CM-Verantwortliche legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | geplant |
 | A-TURNIER-02 | Zum Turnier werden die Swiss-Tennis-Turniernummern erfasst | PDF 5a | CM-Anmeldung | geplant |
 | A-TURNIER-03 | Zum Turnier werden alle Kategorien erfasst, eingeteilt nach Geschlecht, Alter, Klassierungsbereich (im PDF: Stärkekategorie) und Einzel/Doppel | PDF 5a | CM-Anmeldung | geplant |
 
@@ -137,11 +139,11 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 | A-ANMELDUNG-03 | MyTCO zeigt nur die Kategorien an, die für den Spieler möglich sind (Klassierung evtl. ausgenommen, weil die Klassierung nicht automatisch von Swiss Tennis kommt) | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-04 | Bei einer Doppelkategorie zeigt MyTCO sofort alle verfügbaren Spieler des Clubs zur Wahl des Doppelpartners | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-05 | Nach der Anmeldung erhält der Spieler eine automatische Bestätigung mit seinen Kategorien | PDF 5b | CM-Anmeldung | geplant |
-| A-ANMELDUNG-06 | Der Admin fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | geplant |
+| A-ANMELDUNG-06 | Der CM-Verantwortliche fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-07 | Die Anmeldung schliesst zu einem Anmeldeschluss | PDF 5c (abgeleitet) | CM-Anmeldung\* | geplant |
 | A-ANMELDUNG-08 | Der Spieler wählt, ob er bei Neuigkeiten, die ihn betreffen (neue Spiele, geänderter Spielplan), benachrichtigt wird | PDF 5b | CM-Betrieb\* | geplant |
 | A-ANMELDUNG-09 | Benachrichtigung per SMS oder WhatsApp (zuerst E-Mail und Push, siehe N-APP-02) | PDF 5b | später\* | später |
-| A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der Verantwortliche der CM entscheidet | PL | CM-Anmeldung | geplant |
+| A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der CM-Verantwortliche entscheidet | PL | CM-Anmeldung | geplant |
 
 ### ADVANTAGE — Datenaustausch mit Swiss Tennis
 
@@ -167,7 +169,7 @@ Resultate importieren ([Recherche Systemlandschaft](../recherche/README.md)).
 | A-RESULTAT-04 | Der Gegner bestätigt ein gemeldetes Resultat | PDF 5d | CM-Betrieb | offen |
 | A-RESULTAT-05 | Alle Resultate der anderen Kategorien lassen sich mitverfolgen | PDF 5d | CM-Betrieb\* | geplant |
 | A-RESULTAT-06 | Für jede Gruppe entsteht live eine Rangliste nach den Regeln von Swiss Tennis | PDF 5d | CM-Betrieb\* | geplant |
-| A-RESULTAT-07 | Der Admin erfasst Resultate von Hand | PDF 5d | CM-Betrieb\* | geplant |
+| A-RESULTAT-07 | Der CM-Verantwortliche erfasst Resultate von Hand | PDF 5d | CM-Betrieb\* | geplant |
 
 ### SPIELPLAN — Finalwochenende
 
@@ -192,7 +194,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 |----|-------------|--------|--------|--------|
 | N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später. Zuerst als installierbare Web-App, die Store-App ist N-APP-04 | Ziel, PDF 1 | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
 | N-APP-02 | Benachrichtigungen per Push und E-Mail | Ziel, PDF 5b | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
-| N-APP-03 | Der Admin arbeitet in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit der Rolle Admin sichtbar ist | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
+| N-APP-03 | Admin und Verantwortliche arbeiten in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Funktionen zeigt | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
 | N-APP-04 | MyTCO ist als App im App Store und bei Google Play erhältlich | Ziel | später ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | später |
 | N-DESIGN-01 | Das Design lehnt sich an die Website tcolten.ch an, mit abgeändertem Farbkonzept zur Abgrenzung | PDF 3a | Fundament (UI-Leitbild, #13) | geplant |
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |
