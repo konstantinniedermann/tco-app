@@ -23,20 +23,21 @@ Randbedingungen:
   nicht `npx expo install`, `flutter pub add` oder `dart pub add`.
 
 **Legende der Angaben:** **B·n** = belegt mit Quelle n (unten) · **S** = Schätzung ·
-**V** = Vermutung, nicht geprüft. Wechselkurs USD → CHF ca. 0.80 (**S**).
+**V** = Vermutung, nicht geprüft · **PT** = Personentag zu 8 Stunden. Wechselkurs USD → CHF
+ca. 0.80 (**S**).
 
 ## Optionen
 
 | Option | Dafür | Dagegen |
 |--------|-------|---------|
-| **A · Installierbare Web-App (PWA)** — Webseite, die sich auf den Startbildschirm legen lässt und dann wie eine App startet | Kein Store, keine Konten, keine Prüfung, Updates sofort bei allen; Plattformkosten CHF 0; eine Sprache; Webtechnik am weitesten verbreitet (React: 44.7 % der Befragten, B·13); einfach automatisch zu testen (S) | Push auf dem iPhone erst ab iOS 16.4 und nur, wenn die App auf dem Startbildschirm liegt (B·6); nicht im Store auffindbar |
-| **B · Plattformübergreifende App mit React Native / Expo** | Echte Store-App; zuverlässiger Push auf beiden Plattformen über Expo, Versand kostenlos (B·9, B·10); dieselbe Sprache wie im Web | Apple USD 99/Jahr (B·1), Google USD 25 einmalig (B·3); Vereinskonto braucht D-U-N-S-Nummer und Zeichnungsberechtigte (B·1); jede Version durch die Store-Prüfung, Demo-Konto für Apple nötig (B·5, B·8); Einrichten ca. 3–6 PT, danach ca. 1–2 PT/Jahr Store-Pflichten (S); `dep-guard` deckt `npx expo install` nicht ab |
+| **A · Installierbare Web-App (PWA)** — Webseite, die sich auf den Startbildschirm legen lässt und dann wie eine App startet | Kein Store, keine Konten, keine Prüfung, Updates ohne Store spätestens beim nächsten Start der App (S); Plattformkosten CHF 0; eine Sprache; Webtechnik am weitesten verbreitet (React: 44.7 % der Befragten, B·13); einfach automatisch zu testen (S) | Push auf dem iPhone erst ab iOS 16.4 und nur, wenn die App auf dem Startbildschirm liegt (B·6); nicht im Store auffindbar |
+| **B · Plattformübergreifende App mit React Native / Expo** | Echte Store-App; zuverlässiger Push auf beiden Plattformen über Expo, Versand kostenlos (B·9, B·10); dieselbe Sprache (JavaScript/TypeScript) wie eine Web-App (S); Builds in der Cloud im Gratisplan bis 15 iOS- und 15 Android-Builds (B·11) | Apple USD 99/Jahr (B·1), Google USD 25 einmalig (B·3); Vereinskonto braucht D-U-N-S-Nummer und Zeichnungsberechtigte (B·1); jede Version durch die Store-Prüfung, Demo-Konto für Apple nötig (B·5, B·8); Einrichten ca. 3–6 PT, danach ca. 1–2 PT/Jahr Store-Pflichten (S); `dep-guard` deckt `npx expo install` nicht ab |
 | **C · Plattformübergreifende App mit Flutter** | Echte Store-App; sehr gute Werkzeuge und eingebautes Testen (S) | Kosten und Prüfprozess wie B; Sprache Dart seltener als JavaScript/TypeScript, fürs Backend vermutlich eine zweite Sprache (S); `dep-guard` deckt `flutter pub add` nicht ab |
-| **D · Web-App zuerst, Store-App später als Hülle** — wie A; bei Bedarf packt Capacitor dieselbe Web-App in eine Store-App mit echtem Push (B·12) | Alle Vorteile von A für den Start; der Weg in die Stores bleibt offen, ohne neu zu schreiben; Store-Kosten erst, wenn die Hülle kommt | Beim Umstieg dieselben Store-Pflichten wie B; Ablehnungsrisiko bei Apple für „verpackte Websites“ (Regel 4.2, B·8) etwas höher als bei B (S) |
+| **D · Web-App zuerst, Store-App später als Hülle** — wie A; bei Bedarf packt Capacitor dieselbe Web-App in eine Store-App mit echtem Push (B·12) | Alle Vorteile von A für den Start; der Weg in die Stores bleibt offen, Oberfläche und Logik werden weiterverwendet (S); Store-Kosten erst, wenn die Hülle kommt | Beim Umstieg dieselben Store-Pflichten wie B, dazu ein zweiter Push-Weg über APNs und FCM (B·12); Ablehnungsrisiko bei Apple für „verpackte Websites“ (Regel 4.2, B·8) etwas höher als bei B (S) |
 
 **Admin-Oberfläche:** (1) Teil derselben App, sichtbar nur mit Rolle Admin · (2) eigene
 Web-App mit eigenem Login und eigener Auslieferung · (3) gemeinsame Codebasis mit zwei
-Ausgaben (bei B und C üblich, weil Admin-Arbeit am PC stattfindet).
+Ausgaben (bei B und C naheliegend, weil Admin-Arbeit am PC stattfindet, S).
 
 ## Entscheidung
 
@@ -50,10 +51,11 @@ Begründung:
 - **Termin:** Bis 28.02.2027 braucht es weder Store-Konten noch D-U-N-S-Nummer noch eine
   Store-Prüfung; die Zeit geht ganz in Login und Mitgliederverwaltung.
 - **Ehrenamt und Übergabe:** eine Sprache, eine Auslieferung, keine jährlichen
-  Store-Pflichten; Webkenntnisse sind am leichtesten zu finden.
+  Store-Pflichten; Webkenntnisse sind am leichtesten zu finden (S, gestützt auf B·13).
 - **Kosten:** Plattformkosten CHF 0, solange keine Store-App nötig ist.
-- **Nichts verbaut:** Der Weg zur Store-App führt über dieselbe Codebasis. Ein späterer
-  Wechsel von B oder C zurück ins Web wäre teurer (S).
+- **Nichts verbaut:** Der Weg zur Store-App führt über dieselbe Codebasis; Oberfläche und
+  Logik bleiben, neu kommt der native Push dazu (siehe Konsequenzen). Ein späterer Wechsel
+  von B oder C zurück ins Web wäre teurer (S).
 - **Admin als Teil der App:** Ein Login, eine Auslieferung. Die Admin-Seiten sind für den
   PC ausgelegt, funktionieren aber auch auf dem Handy. Die Berechtigung prüft immer der
   Server, nie nur die Oberfläche.
@@ -100,6 +102,12 @@ des Hooks ist für den Start nicht nötig.
 Push. Ein Teil der Mitglieder wird das nicht tun (S) — deshalb E-Mail als Grundlage. MyTCO
 ist nicht im App Store auffindbar; Mitglieder erreichen es über Link oder QR-Code.
 
+**Beim späteren Umstieg auf die Store-App:** Die Hülle verschickt Push nativ über APNs
+(Apple) und FCM (Google), nicht über Web Push (B·12). Der Server braucht dann einen zweiten
+Push-Weg, ein Firebase-Projekt mit Google-Konto und einen APNs-Schlüssel von Apple. Beide
+Konten gehören in die Kontenübersicht (#10), der Datenfluss zu Google und Apple ins
+Datenschutzkonzept (#5).
+
 **Kosten** (nur App-Plattform; Hosting und E-Mail-Versand → Issues #8 und #9):
 
 | Posten | Einmalig | Wiederkehrend | Ab wann |
@@ -107,7 +115,7 @@ ist nicht im App Store auffindbar; Mitglieder erreichen es über Link oder QR-Co
 | Web-App inkl. Web Push | CHF 0 | CHF 0 | sofort |
 | Apple Developer Program | — | USD 99/Jahr, ca. CHF 80 (B·1, S) — CHF 0 mit Gebührenerlass (B·2), ob der TCO berechtigt ist: offen | erst mit der Store-App |
 | Google Play Console | USD 25, ca. CHF 20 (B·3, S) | — | erst mit der Store-App |
-| Aufwand Store-App (Capacitor-Hülle, Konten, Store-Einträge) | ca. 3–5 PT (S) | ca. 1–2 PT/Jahr Store-Pflichten (S) | erst mit der Store-App |
+| Aufwand Store-App (Capacitor-Hülle, nativer Push-Weg, Konten, Store-Einträge) | ca. 4–7 PT (S) | ca. 1–2 PT/Jahr Store-Pflichten (S) | erst mit der Store-App |
 
 **Gebührenerlass bei Apple:** Apple erlässt die Jahresgebühr für Non-Profits, die von
 einer zuständigen Behörde als solche anerkannt sind, juristische Person sind und in ihren
@@ -128,8 +136,9 @@ Cloud-Build-Dienst (S).
 
 Die Entscheidung wird neu bewertet, sobald eines eintritt:
 
-1. **Push-Abdeckung zu tief:** Nach Abschluss der CM-Anmeldung (Mitte Mai 2027) hat
-   weniger als die Hälfte der aktiven iPhone-Nutzer Push eingeschaltet (Schwelle: S).
+1. **Push-Abdeckung zu tief:** Vier Wochen nachdem Push eingeführt ist (Etappe
+   *CM-Betrieb*), hat weniger als die Hälfte der aktiven iPhone-Nutzer Push eingeschaltet
+   (Schwelle und Frist: S).
 2. **Der Verein verlangt einen Store-Eintrag** oder die Zielgruppe findet MyTCO ohne Store
    nicht.
 3. **Der Vorstand klärt den Gebührenerlass positiv** — dann fällt der grösste laufende
@@ -137,8 +146,8 @@ Die Entscheidung wird neu bewertet, sobald eines eintritt:
 4. **Apple schränkt Web-Apps oder Web Push auf iOS ein** (wie 2024 in der EU kurzzeitig
    angekündigt, V).
 
-Bei Trigger 1–3 entsteht ein Issue für die Capacitor-Hülle; `dep-guard` wird dann für die
-zusätzlichen Paketquellen geprüft.
+Bei Trigger 1–3 wird dem Projektleiter die Capacitor-Hülle zur Entscheidung vorgelegt;
+kommt sie, wird `dep-guard` für die zusätzlichen Paketquellen geprüft.
 
 ## Quellen
 
