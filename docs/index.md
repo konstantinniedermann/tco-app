@@ -9,6 +9,7 @@ Issue im Milestone *Fundament*.
 |----------|--------|
 | [Roadmap](roadmap.md) | Etappen mit Termin und Umfang |
 | [Anforderungen](anforderungen/README.md) | Anforderungsdokument des Vereins, Zielsetzung, Änderungen, offene Fragen |
+| [Anforderungen mit IDs](anforderungen/anforderungen.md) | Jede Anforderung mit ID, Quelle, Etappe und Status |
 | [Recherche Systemlandschaft](recherche/README.md) | Bestehende Systeme des Vereins, Kosten, kaufen oder bauen (Stand 29.10.2026) |
 
 ## Architektur
