@@ -17,3 +17,5 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   kein direkter Push auf `main`), Secret-Scan auch bei PRs, Zeitlimit für CI-Jobs.
 - Parallele Sessions: Hauptordner bleibt auf `dev`, jede Session arbeitet in einem Worktree
   unter `.claude/worktrees/`; Ablauf im Skill `tco-branching`.
+- ADR-001: MyTCO startet als installierbare Web-App (PWA) mit Admin-Bereich und Web Push,
+  E-Mail als Grundlage; Store-App per Capacitor, sobald ein Reevaluations-Trigger greift.

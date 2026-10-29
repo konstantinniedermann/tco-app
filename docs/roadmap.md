@@ -34,6 +34,7 @@ bestätigt.
 Aus dem Anforderungsdokument v1.2, bewusst später: Login-Feld auf tcolten.ch,
 Newsfeed, Benachrichtigungen per SMS oder WhatsApp, Zwei-Faktor-Login und Passkeys, allgemeine Anlässe,
 Lizenzliste als PDF mit Vorjahresvergleich, Planer für das Finalwochenende,
-Anbindung an Fairgate.
+Anbindung an Fairgate, App in den Stores (MyTCO startet als Web-App, siehe
+[ADR-001](adr/adr-001-web-app-zuerst.md)).
 Den Newsfeed automatisch aus der WhatsApp-Gruppe zu füllen, ist nicht machbar
 ([A-NEWSFEED-02](anforderungen/anforderungen.md#newsfeed)).

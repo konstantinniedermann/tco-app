@@ -189,9 +189,9 @@ der Praxis reicht (offene Frage im [README](README.md)).
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später | Ziel, PDF 1 | Fundament (Technik-ADR, #7) | geplant |
-| N-APP-02 | Benachrichtigungen per Push und E-Mail | Ziel, PDF 5b | Fundament (Technik-ADR, #7) | geplant |
-| N-APP-03 | Der Admin arbeitet in einer eigenen Admin-Oberfläche; deren Form legt der Technik-ADR fest | PL | Fundament (Technik-ADR, #7) | geplant |
+| N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später | Ziel, PDF 1 | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
+| N-APP-02 | Benachrichtigungen per Push und E-Mail | Ziel, PDF 5b | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
+| N-APP-03 | Der Admin arbeitet in einer eigenen Admin-Oberfläche; deren Form legt der Technik-ADR fest | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
 | N-DESIGN-01 | Das Design lehnt sich an die Website tcolten.ch an, mit abgeändertem Farbkonzept zur Abgrenzung | PDF 3a | Fundament (UI-Leitbild, #13) | geplant |
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |
 | N-DATENSCHUTZ-01 | Die Bearbeitung der Mitgliederdaten entspricht dem Schweizer Datenschutzgesetz (nDSG) | PL | Fundament (Datenschutzkonzept, #5) | geplant |
