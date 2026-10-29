@@ -114,6 +114,30 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-10-29 — Push-Auslöser sind nirgends festgelegt
+
+**Thema:** Fachmodell
+
+**Fundort:** `docs/adr/adr-001-web-app-zuerst.md` (Push-Auslöser), `docs/fachmodell.md`
+
+**Beobachtung:** ADR-001 verweist für die Auslöser von Push-Nachrichten auf „das Fachmodell (#3) bzw. die Etappe CM-Betrieb“. Das Fachmodell kennt nur den Schalter am Konto und die Benachrichtigung des Doppelpartners; welche Ereignisse (neues Spiel, Resultat gemeldet, Spielplan geändert) eine Nachricht auslösen, steht nirgends.
+
+**Ursprung:** cas-reviewer zu #3
+
+**Einschätzung:** Gehört in die Planung der Etappe CM-Betrieb (A-ANMELDUNG-08); bis dahin unkritisch.
+
+### 2026-10-29 — „Mermaid rendert“ lässt sich lokal nicht nachweisen
+
+**Thema:** Doku-Check
+
+**Fundort:** `scripts/check-docs.sh`, DoD-Punkt „Mermaid-Diagramm rendert“ in Doku-Issues
+
+**Beobachtung:** `make check` prüft in Mermaid-Blöcken nur auf literales `\n`. Ob ein Diagramm rendert, war in #3 nur über den externen Mermaid-Chart-Validator nachweisbar; lokal ist kein `mmdc` installiert, der Reviewer konnte es nicht selbst prüfen.
+
+**Ursprung:** #3, cas-reviewer
+
+**Einschätzung:** Fürs Fundament mit wenigen Diagrammen tragbar; mit arc42 (#14) kommen mehr. Ein Render-Check bräuchte eine neue Abhängigkeit (Freigabe nötig).
+
 ### 2026-10-29 — Recherche-Seiten ohne Zeichensatz-Angabe, Schriften von Google
 
 **Thema:** Doku-Darstellung
