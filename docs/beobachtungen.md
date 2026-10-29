@@ -125,3 +125,27 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** Review durch `cas-reviewer` zur Vorstandsseite (Issue #7).
 
 **Einschätzung:** Gering; im Artifact-Viewer kein Problem, weil dort der Zeichensatz gesetzt wird. Für Seiten, die an den Vorstand gehen, eventuell Systemschriften statt Google Fonts (Datenschutz-Optik).
+
+### 2026-10-29 — Doku-Check prüft keine Anker in Markdown-Links
+
+**Thema:** Doku-Check
+
+**Fundort:** `scripts/check-docs.sh` (Prüfung „Relative Links in Markdown“).
+
+**Beobachtung:** Der Check schneidet `#anker` ab und prüft nur, ob die Datei existiert. Links wie `datenschutz.md#änderungen-an-diesem-konzept` brechen still, wenn eine Überschrift umbenannt wird. Beim Kürzen des Datenschutzkonzepts fielen mehrere Anker weg; geprüft wurde nur von Hand.
+
+**Ursprung:** Review durch `cas-reviewer` zu Issue #5.
+
+**Einschätzung:** Gering bis mittel; mit wachsender Doku häufiger. Anker-Prüfung (GitHub-Slug aus Überschriften) wäre ein überschaubarer Ausbau des Skripts.
+
+### 2026-10-29 — Skill tco-branching: Merge nach dev aus dem Worktree heraus wird geblockt
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** `.claude/skills/tco-branching/SKILL.md`, Schritt 4 (`git -C $M …`).
+
+**Beobachtung:** Solange die Session per `EnterWorktree` im Worktree ist, verweigert Claude Code Git-Befehle mit `-C` auf den Hauptordner. Für den Merge muss die Session zuerst `ExitWorktree` (keep) aufrufen; der Skill sagt das erst in Schritt 7.
+
+**Ursprung:** Issue #5, Merge nach `dev`.
+
+**Einschätzung:** Gering; ein Satz in Schritt 4 („vorher `ExitWorktree` mit `keep`“) würde den Fehlversuch vermeiden.
