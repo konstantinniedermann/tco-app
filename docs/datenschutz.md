@@ -33,7 +33,6 @@ Konzept angepasst, dann die Funktion ([Änderungen](#änderungen-an-diesem-konze
 | Lizenznummer, Klassierung | Anmeldung, Lizenzanträge, Export an Swiss Tennis | nein |
 | Konto, Rollen, Benachrichtigungs-Einstellungen | Login, Berechtigungen, Push | ja |
 | Anmeldungen, Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
-| E-Mail und Telefon eines Elternteils | nur bei Spielern unter 16 ohne Konto | für die CM ja |
 
 Keine Gesundheitsdaten (auch nicht als Grund für eine Abmeldung), keine Fotos, keine
 Bankdaten.
@@ -57,17 +56,15 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 
 - **Austritt:** Konto sofort gesperrt, Daten nach 3 Monaten gelöscht; der Name bleibt in
   vergangenen Resultaten (**Vorschlag K-38**). Wie MyTCO vom Austritt erfährt, klärt K-14.
-- **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar; Kontakte von Eltern
-  werden nach 3 Monaten gelöscht.
+- **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Logs und Backups:** höchstens 30 Tage.
 
 ## Junioren
 
-**Vorschlag K-08:** Ein eigenes Konto gibt es ab 16. Jüngere Spieler erfasst der Admin für
-die CM ohne Login, mit E-Mail und Telefon eines Elternteils als Kontakt für die Gegner; der
-Elternteil erhält dabei die Datenschutzerklärung per E-Mail. Konten für Eltern und Kinder
-kommen mit den Junioren-Funktionen (ab 2028).
+Vorerst behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Wie Junioren und ihre
+Eltern erfasst werden, wird mit den Junioren-Funktionen (ab 2028) geklärt (K-08) und dann
+hier ergänzt.
 
 ## Rechte der Mitglieder
 
