@@ -20,6 +20,8 @@ Issue im Milestone *Fundament*.
 | Dokument | Inhalt |
 |----------|--------|
 | [ADR-Index](adr/adr-index.md) | Architektur-Entscheidungen mit Begründung |
+| [Datenschutzkonzept](datenschutz.md) | Was MyTCO mit Personendaten tut, nach nDSG; Vorgaben `DS-NN` für Technik und Hosting; Grundlage für jede neue Funktion |
+| [Datenschutzerklärung (Entwurf)](datenschutzerklaerung.md) | Text für die Mitglieder in der App und auf dem Login-Brief |
 
 ## Arbeitsweise
 
@@ -32,5 +34,5 @@ Issue im Milestone *Fundament*.
 
 ## Geplant (Milestone *Fundament*)
 
-Fachmodell · Rollen und Rechte · Datenschutzkonzept · Sicherheitskonzept ·
+Fachmodell · Rollen und Rechte · Sicherheitskonzept ·
 Kosten · Betrieb und Übergabe · Testkonzept · CI/CD und Release · arc42 · UI-Leitbild

@@ -24,3 +24,8 @@ Release-Konzept festgelegt (Milestone *Fundament*).
 - Abklärungen beim Verein (`docs/abklaerungen.md`): alle offenen Fragen an Vorstand,
   Website-Betreuer, Hoster und Verantwortliche mit ID und Fälligkeit; Regel dazu in den Issue-Konventionen
   und der Issue-Vorlage.
+- Datenschutzkonzept nach nDSG (`docs/datenschutz.md`): Verantwortung, Verzeichnis der
+  Bearbeitungen, Löschkonzept, Minderjährige, Sichtbarkeit von Kontaktdaten, Datenstandort
+  Schweiz/EU, Vorgaben `DS-01` bis `DS-16` für Technik und Hosting; Entwurf der
+  Datenschutzerklärung (`docs/datenschutzerklaerung.md`). Jedes Issue prüft im neuen
+  Abschnitt *Datenschutz* der Issue-Vorlage, ob das Konzept angepasst werden muss.

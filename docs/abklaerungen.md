@@ -37,10 +37,10 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-03 | Gilt der Budgetrahmen „niedriger dreistelliger Betrag pro Jahr“? Wer gibt einzelne Posten frei, und wie bezahlt der Verein Online-Dienste (Rechnung, Kreditkarte)? | Vorstand | N-KOSTEN-01, #9 |
 | K-04 | Auf wen laufen die Konten (GitHub, Hosting, Domain, E-Mail-Versand)? Gibt es eine Vereinsadresse @tcolten.ch, auf die sie laufen können, und wer hat einen Zweitzugang? | Vorstand, Website-Betreuer | #10 |
 | K-05 | Wer betreut MyTCO mit oder übernimmt, falls der Projektleiter ausfällt? | Vorstand | #10 |
-| K-06 | Wer ist im Verein für den Datenschutz verantwortlich, und wer gibt die Datenschutzerklärung von MyTCO frei? Gibt es auf tcolten.ch schon eine, an die MyTCO anschliesst? | Vorstand, Website-Betreuer | N-DATENSCHUTZ-01, #5 |
-| K-07 | Welche Mitgliederdaten braucht MyTCO wirklich: Name, E-Mail, Telefon, Postadresse (für den Brief), Geburtsdatum und Geschlecht (für Kategorien), Lizenznummer? Was davon darf fehlen? | Vorstand | #3, #5 |
-| K-08 | Ab wann kommen Junioren in MyTCO, und wer loggt sich für Minderjährige ein (Eltern)? | Vorstand | #4, #5 |
-| K-09 | Hosting bei Metanet: Welches Paket hat der Verein, was kostet es heute, welche Technik bietet es (PHP, Node.js, Python, Datenbank, SSH, Backups)? Darf MyTCO dort getrennt von der Website laufen? Gibt es einen Auftragsverarbeitungsvertrag nach nDSG? | Website-Betreuer, Hoster | #8, #9, #5 |
+| K-06 | Wer ist im Verein für den Datenschutz verantwortlich, und wer gibt die Datenschutzerklärung von MyTCO frei? Gibt es auf tcolten.ch schon eine, an die MyTCO anschliesst? | Vorstand, Website-Betreuer | N-DATENSCHUTZ-01, #5, [Datenschutz](datenschutz.md) |
+| K-07 | Welche Mitgliederdaten braucht MyTCO wirklich: Name, E-Mail, Telefon, Postadresse (für den Brief), Geburtsdatum und Geschlecht (für Kategorien), Lizenznummer? Was davon darf fehlen? | Vorstand | #3, #5, [Datenschutz](datenschutz.md) |
+| K-08 | Ab wann kommen Junioren in MyTCO, und wer loggt sich für Minderjährige ein (Eltern)? | Vorstand | #4, #5, [Datenschutz](datenschutz.md) |
+| K-09 | Hosting bei Metanet: Welches Paket hat der Verein, was kostet es heute, welche Technik bietet es (PHP, Node.js, Python, Datenbank, SSH, Backups)? Darf MyTCO dort getrennt von der Website laufen? Gibt es einen Auftragsverarbeitungsvertrag nach nDSG? | Website-Betreuer, Hoster | #8, #9, #5, [Datenschutz](datenschutz.md) |
 | K-10 | Darf MyTCO unter `my.tcolten.ch` laufen, und wer verwaltet die DNS-Einträge? | Website-Betreuer | A-LOGIN-04, #8 |
 | K-11 | E-Mail-Versand: Darf MyTCO von einer Adresse @tcolten.ch senden (z. B. Bestätigungen)? Geht das über das bestehende Hosting, mit welchem Limit? Wer setzt die nötigen DNS-Einträge gegen Spam-Verdacht? | Website-Betreuer, Hoster | N-APP-02, #8, #9 |
 | K-12 | Ist ein zweiter Login-Faktor für Admins zumutbar? Hat der Verein weitere Sicherheitsvorgaben? | Vorstand | N-SICHERHEIT-01, #6 |
@@ -52,9 +52,11 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-18 | Wer wird Admin, und wie viele Personen sind das? Sind Lizenzverantwortlicher und Verantwortliche der Clubmeisterschaft eigene Rollen oder Admin bzw. Anlässe-Veranstalter? Darf eine Person mehrere Rollen haben? | Vorstand | A-ROLLE, A-LIZENZ-03, A-TURNIER-01, #4 |
 | K-22 | Erwartet der Verein, dass MyTCO im App Store und bei Google Play steht, und ab wann? | Vorstand | N-APP-04, [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-23 | Ist der TCO steuerbefreit oder anderweitig behördlich als gemeinnützig anerkannt? Dann könnte Apple die Jahresgebühr der Store-App erlassen. | Vorstand | [ADR-001](adr/adr-001-web-app-zuerst.md) |
-| K-31 | Dürfen Spieler die Kontaktdaten ihrer Gegner und Doppelpartner sehen, und braucht es dafür eine Einwilligung? | Vorstand, Datenschutzverantwortliche | N-DATENSCHUTZ-02, A-RESULTAT-02, #5 |
+| K-31 | Dürfen Spieler die Kontaktdaten ihrer Gegner und Doppelpartner sehen, und braucht es dafür eine Einwilligung? | Vorstand, Datenschutzverantwortliche | N-DATENSCHUTZ-02, A-RESULTAT-02, #5, [Datenschutz](datenschutz.md) |
 | K-37 | Reichen für Benachrichtigungen E-Mail und Push, oder braucht es SMS oder WhatsApp? Die beiden kosten pro Nachricht. | Vorstand | N-APP-02, A-ANMELDUNG-08, A-ANMELDUNG-09, #9 |
-| K-38 | Wie lange bleiben Daten nach einem Austritt in MyTCO, und was muss der Verein aufbewahren (z. B. Resultate, Lizenzanträge)? | Vorstand, Datenschutzverantwortliche | #5 |
+| K-38 | Wie lange bleiben Daten nach einem Austritt in MyTCO, und was muss der Verein aufbewahren (z. B. Resultate, Lizenzanträge)? | Vorstand, Datenschutzverantwortliche | #5, [Datenschutz](datenschutz.md) |
+| K-40 | Reicht für Alterskategorien und Lizenzanträge der Jahrgang, oder verlangt Swiss Tennis das volle Geburtsdatum? | Lizenzverantwortlicher, Verantwortliche CM | K-07, #3, [Datenschutz](datenschutz.md) |
+| K-41 | Informieren Statuten oder Beitrittsformular des TCO heute darüber, dass der Verein Mitgliederdaten bearbeitet und an Swiss Tennis weitergibt? | Vorstand | [Datenschutz](datenschutz.md) |
 
 ## Vor dem ersten Release *Mitglieder-Login* (28.02.2027)
 
@@ -100,7 +102,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
 | K-36 | Was gehört zu „Mitgliedschaft ändern“: Austritt, Wechsel der Mitgliederkategorie, anderes? | Vorstand | A-KONTO-04 |
-| K-39 | Soll der Spielplan des Finalwochenendes öffentlich, also ohne Login, sichtbar sein? Dann stehen Namen der Spieler auf einer öffentlichen Seite. | Vorstand, Datenschutzverantwortliche | A-SPIELPLAN-08, #5 |
+| K-39 | Soll der Spielplan des Finalwochenendes öffentlich, also ohne Login, sichtbar sein? Dann stehen Namen der Spieler auf einer öffentlichen Seite. | Vorstand, Datenschutzverantwortliche | A-SPIELPLAN-08, #5, [Datenschutz](datenschutz.md) |
 
 ## Beantwortet
 
