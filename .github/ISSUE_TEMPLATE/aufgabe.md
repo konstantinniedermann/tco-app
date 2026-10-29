@@ -34,6 +34,14 @@ Keine echten Mitgliederdaten in Issues — Personen mit ihrer Rolle benennen.
 - [ ]
 - [ ]
 
+## Datenschutz
+
+<!-- Pflicht. Erhebt, zeigt, teilt oder speichert dieses Issue Personendaten neu oder anders,
+     oder berührt es eine Vorgabe DS-NN? Dann: welche Abschnitte von docs/datenschutz.md und
+     docs/datenschutzerklaerung.md werden VOR der Umsetzung angepasst, und die DoD bekommt
+     „Datenschutzkonzept und Datenschutzerklärung nachgeführt“.
+     Sonst ein Satz: „Keine Personendaten betroffen.“ -->
+
 ## Abhängigkeiten
 
 <!-- Weglassen, wenn keine. -->
