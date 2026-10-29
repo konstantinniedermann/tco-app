@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>MyTCO App-Varianten</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -82,14 +83,14 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <div class="keys">
     <div class="key"><strong>Start als Web-App</strong><p>Mitglieder öffnen MyTCO im Browser und legen es mit zwei Tipps als Symbol auf den Startbildschirm. Danach startet es wie eine App. Kein App Store, keine Store-Gebühren, Push-Benachrichtigungen sind möglich <span class="m b">belegt · 1</span>.</p></div>
     <div class="key"><strong>Geldunterschied ist klein</strong><p>Eine Store-App kostet zusätzlich etwa CHF 80 pro Jahr bei Apple und einmalig CHF 20 bei Google <span class="m b">belegt · 3 5</span> <span class="m s">Kurs ~0.80</span>. Apple erlässt die Jahresgebühr anerkannten Non-Profits <span class="m b">belegt · 4</span>; ob der TCO dazu zählt, ist <span class="m o">offen</span>.</p></div>
-    <div class="key"><strong>Der eigentliche Preis ist Zeit</strong><p>Die Store-App braucht einmalig ca. 4–7 Personentage und danach ca. 1–2 Personentage pro Jahr für Store-Pflichten <span class="m s">Schätzung</span>. Ein Personentag sind etwa drei Feierabende.</p></div>
+    <div class="key"><strong>Der eigentliche Preis ist Zeit</strong><p>Die Store-App braucht einmalig ca. 3–7 Personentage, je nach Variante, und danach ca. 1–2 Personentage pro Jahr für Store-Pflichten <span class="m s">Schätzung</span>. Ein Personentag sind etwa drei Feierabende.</p></div>
     <div class="key"><strong>Was der Vorstand klären muss</strong><p>Ob der Verein einen Store-Eintrag erwartet, ob der TCO als gemeinnützig anerkannt ist, wer für den Verein bei Apple und Google unterschreibt und welches Budget gilt. Die Fragen stehen in Abschnitt 6.</p></div>
   </div>
 </section>
 
 <section>
   <h2>1 · Die drei Varianten</h2>
-  <p>Technisch gibt es mehr Wege. Für den Verein zählen drei. Der Unterschied zwischen den Werkzeugen für Store-Apps (React Native/Expo oder Flutter) ändert an Kosten und Ablauf für den Verein nichts <span class="m s">Schätzung</span>.</p>
+  <p>Technisch gibt es mehr Wege. Für den Verein zählen drei. Welches Werkzeug die Store-App baut (React Native/Expo oder Flutter), ändert für den Verein wenig: Store-Gebühren und Konten sind gleich, nur beim Erstellen der iPhone-Version unterscheiden sie sich (Abschnitt 3) <span class="m s">Schätzung</span>.</p>
   <div class="paths">
     <div class="path">
       <span class="tag">Variante 1</span>
@@ -112,6 +113,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       <ul>
         <li>Start wie Variante 1.</li>
         <li>Wird ein Store-Eintrag nötig, wird dieselbe Web-App in eine Store-App verpackt. Oberfläche und Abläufe bleiben <span class="m s">Schätzung</span>.</li>
+        <li>Risiko: Apple lehnt Apps ab, die nur eine verpackte Website sind <span class="m b">belegt · 10</span>. Mit Login und Push als App-Funktionen ist das Risiko tragbar, ganz ausschliessen lässt es sich nicht <span class="m s">Schätzung</span>.</li>
         <li>Store-Kosten fallen erst ab diesem Zeitpunkt an.</li>
       </ul>
       <dl>
@@ -135,7 +137,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       </dl>
     </div>
   </div>
-  <p class="note"><strong>Warum Variante 2:</strong> Bis zum Mitglieder-Login Ende Februar 2027 ist die Zeit knapp. Push wird erst für die Gruppenspiele der Clubmeisterschaft gebraucht (ab Ende Juni 2027). So geht die Zeit zuerst in Login und Mitgliederverwaltung, und die Store-App bleibt möglich, ohne neu zu bauen. Begründung im Detail: Architektur-Entscheid ADR-001 im Projekt-Repository.</p>
+  <p class="note"><strong>Warum Variante 2:</strong> Bis zum Mitglieder-Login Ende Februar 2027 ist die Zeit knapp. Push wird erst für die Gruppenspiele der Clubmeisterschaft gebraucht (Etappe CM-Betrieb, geplant bis Ende Juni 2027, Termin vom Verein noch zu bestätigen). So geht die Zeit zuerst in Login und Mitgliederverwaltung, und die Store-App bleibt möglich, ohne neu zu bauen. Beim Umstieg ist eine Ablehnung durch Apple nicht ganz ausgeschlossen (siehe Variante 2). Begründung im Detail: Architektur-Entscheid ADR-001 im Projekt-Repository.</p>
 </section>
 
 <section>
@@ -163,20 +165,20 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <thead><tr><th>Posten</th><th>Variante 1 · nur Web</th><th>Variante 2 · Web, später Store</th><th>Variante 3 · Store von Anfang an</th><th>Status</th></tr></thead>
     <tbody>
       <tr class="grp"><td colspan="5">Laufende Kosten pro Jahr</td></tr>
-      <tr><td>Hosting (Server oder Plattformdienst in der Schweiz oder EU)</td><td class="num">60–300</td><td class="num">60–300</td><td class="num">60–300</td><td><span class="m s">Schätzung · 11</span></td></tr>
+      <tr><td>Hosting (Server oder Plattformdienst in der Schweiz oder EU)<br><span class="small">Untergrenze: kleiner eigener Server, z. B. ab CHF 2.70/Monat in der Schweiz <span class="m v">Vermutung · 14</span> oder ab EUR 5.99/Monat exkl. MWST in Deutschland <span class="m b">belegt · 15</span>; Updates und Backups macht dann ein Ehrenamtlicher. Obergrenze: wartungsarmer Plattformdienst mit Datenbank und Backups <span class="m s">Schätzung</span>. Möglich ist auch das bestehende Hosting von tcolten.ch bei Metanet <span class="m b">belegt · 11</span>; ob das Paket dort MyTCO trägt und was es zusätzlich kostet, ist <span class="m o">offen</span>. Entschieden wird mit der Wahl des Hostings.</span></td><td class="num">60–300</td><td class="num">60–300</td><td class="num">60–300</td><td><span class="m s">Schätzung · 11</span></td></tr>
       <tr><td>E-Mail-Versand (wenige hundert Mails pro Monat)</td><td class="num">0–150</td><td class="num">0–150</td><td class="num">0–150</td><td><span class="m s">Schätzung · 11</span></td></tr>
       <tr><td>Web Push</td><td class="num">0</td><td class="num">0</td><td class="num">—</td><td><span class="m b">belegt · 1</span></td></tr>
       <tr><td>Apple Developer Program (USD 99)</td><td class="num">0</td><td class="num">0, ab Umstieg ca. 80</td><td class="num">ca. 80</td><td><span class="m b">belegt · 3</span></td></tr>
       <tr><td>… mit Gebührenerlass für Non-Profits</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="m b">belegt · 4</span> Berechtigung <span class="m o">offen</span></td></tr>
       <tr><td>Push-Dienste von Google (Firebase) und Apple</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="m b">belegt · 8</span> <span class="m v">Vermutung</span> für Apple</td></tr>
       <tr><td>Build-Dienst in der Cloud (nur bei Expo)</td><td class="num">0</td><td class="num">0</td><td class="num">0 im Gratisplan, sonst ab USD 19/Monat</td><td><span class="m b">belegt · 9</span></td></tr>
-      <tr class="tot"><td>Summe pro Jahr</td><td class="num">60–450</td><td class="num">60–450, ab Umstieg 140–530</td><td class="num">140–530</td><td><span class="m s">Schätzung</span></td></tr>
+      <tr class="tot"><td>Summe pro Jahr (Annahme: der Gratisplan des Build-Dienstes reicht)</td><td class="num">60–450</td><td class="num">60–450, ab Umstieg 140–530</td><td class="num">140–530</td><td><span class="m s">Schätzung</span></td></tr>
       <tr class="grp"><td colspan="5">Einmalige Kosten</td></tr>
       <tr><td>Google Play Konto (USD 25)</td><td class="num">0</td><td class="num">ca. 20 beim Umstieg</td><td class="num">ca. 20</td><td><span class="m b">belegt · 5</span></td></tr>
-      <tr><td>Domain</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td>tcolten.ch vorhanden; Nutzung von my.tcolten.ch <span class="m o">offen</span></td></tr>
-      <tr><td>Mac für iPhone-Versionen</td><td class="num">—</td><td class="num">0, wenn ein Mac vorhanden ist</td><td class="num">0 mit Cloud-Build-Dienst</td><td><span class="m s">Schätzung</span>; bei einer Übergabe zu klären</td></tr>
+      <tr><td>Domain</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td>tcolten.ch vorhanden <span class="m b">belegt · 11</span>; Nutzung von my.tcolten.ch <span class="m o">offen</span></td></tr>
+      <tr><td>Mac für iPhone-Versionen</td><td class="num">—</td><td class="num">0, wenn ein Mac vorhanden ist</td><td class="num">0 mit Expo-Cloud-Build; bei Flutter ein Mac nötig</td><td><span class="m s">Schätzung</span>; bei einer Übergabe zu klären</td></tr>
       <tr class="grp"><td colspan="5">Ehrenamtliche Zeit (PT = Personentag zu 8 Stunden, ca. drei Feierabende)</td></tr>
-      <tr><td>MyTCO selbst bauen, alle Etappen</td><td class="num">55–89 PT</td><td class="num">55–89 PT</td><td class="num">55–89 PT</td><td><span class="m s">Schätzung · 11</span></td></tr>
+      <tr><td>MyTCO selbst bauen, alle Etappen</td><td class="num">55–89 PT</td><td class="num">55–89 PT</td><td class="num">55–89 PT oder mehr</td><td><span class="m s">Schätzung · 11</span> für eine Web-App; bei Variante 3 kommt vermutlich eine eigene Admin-Web-App dazu <span class="m s">Schätzung</span></td></tr>
       <tr><td>Store-App einrichten (Konten, Verpacken, nativer Push, Store-Einträge)</td><td class="num">0</td><td class="num">4–7 PT beim Umstieg</td><td class="num">3–6 PT vor dem Start</td><td><span class="m s">Schätzung</span></td></tr>
       <tr><td>Store-Pflichten pro Jahr (neue Vorgaben von Apple und Google, Prüfungen)</td><td class="num">0</td><td class="num">1–2 PT ab Umstieg</td><td class="num">1–2 PT</td><td><span class="m s">Schätzung</span></td></tr>
       <tr><td>Wartung MyTCO pro Jahr</td><td class="num">3–6 PT</td><td class="num">3–6 PT</td><td class="num">3–6 PT</td><td><span class="m s">Schätzung · 11</span></td></tr>
@@ -202,7 +204,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <thead><tr><th>Anforderung</th><th>Apple</th><th>Google</th></tr></thead>
     <tbody>
       <tr><td><strong>Rechtsform</strong></td><td>Juristische Person, die Verträge schliessen kann; keine Abteilungen oder Handelsnamen <span class="m b">belegt · 6</span>. Ein Verein mit Statuten ist das nach Schweizer Recht <span class="m v">Vermutung</span></td><td>Organisationskonto <span class="m b">belegt · 5</span></td></tr>
-      <tr><td><strong>D-U-N-S-Nummer</strong></td><td>Pflicht, kostenlos zu beantragen <span class="m b">belegt · 6</span> <span class="m v">Vermutung</span> für „kostenlos“</td><td>Für Organisationskonten nötig, Beschaffung kann bis 30 Tage dauern <span class="m v">Vermutung · Sekundärquelle 12</span></td></tr>
+      <tr><td><strong>D-U-N-S-Nummer</strong></td><td>Pflicht, kostenlos zu beantragen <span class="m b">belegt · 6</span> <span class="m v">Vermutung</span> für „kostenlos“</td><td>Für Organisationskonten nötig, Antrag kostenlos <span class="m b">belegt · 12</span>; Beschaffung kann einige Wochen dauern <span class="m v">Vermutung</span></td></tr>
       <tr><td><strong>Website und E-Mail</strong></td><td>Öffentliche Website mit eigener Domain, E-Mail-Adresse mit dieser Domain <span class="m b">belegt · 6</span>. tcolten.ch erfüllt das vermutlich <span class="m v">Vermutung</span></td><td>—</td></tr>
       <tr><td><strong>Unterschrift</strong></td><td>Die Person, die das Konto eröffnet, muss den Verein rechtlich binden dürfen <span class="m b">belegt · 6</span></td><td>—</td></tr>
       <tr><td><strong>Testphase</strong></td><td>Bei einer App mit Login ein Demo-Konto für die Prüfer, mit erfundenen Daten <span class="m b">belegt · 10</span></td><td>Persönliche Konten: Test mit mindestens 12 Personen über 14 Tage vor der Veröffentlichung <span class="m b">belegt · 13</span>; Organisationskonten vermutlich nicht <span class="m v">Vermutung</span></td></tr>
@@ -217,7 +219,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <h2>5 · Wann die Store-App kommt</h2>
   <p>Der Projektleiter prüft den Umstieg, sobald eines davon eintritt. Der Umstieg selbst wird jeweils neu entschieden.</p>
   <ol class="q">
-    <li><strong>Zu wenig Push auf dem iPhone:</strong> Vier Wochen nach Einführung von Push hat weniger als die Hälfte der aktiven iPhone-Nutzer Push eingeschaltet <span class="m s">Schwelle: Schätzung</span>.</li>
+    <li><strong>Zu wenig Push auf dem iPhone:</strong> Vier Wochen nach Einführung von Push hat weniger als die Hälfte der aktiven iPhone-Nutzer Push eingeschaltet <span class="m s">Schwelle und Frist: Schätzung</span>.</li>
     <li><strong>Der Verein will einen Store-Eintrag</strong>, oder Mitglieder finden MyTCO ohne Store nicht.</li>
     <li><strong>Der Gebührenerlass wird bestätigt.</strong> Dann fällt der grösste laufende Kostenpunkt der Store-App weg.</li>
     <li><strong>Apple schränkt Web-Apps oder Web Push ein.</strong></li>
@@ -232,7 +234,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <li><strong>Herausgeber:</strong> Tritt der Verein als Herausgeber in den Stores auf? Wer darf für den Verein bei Apple und Google unterschreiben, und wer beantragt die D-U-N-S-Nummer?</li>
     <li><strong>Konten:</strong> Gibt es eine E-Mail-Adresse mit @tcolten.ch, auf die Vereinskonten (Hosting, Apple, Google) laufen können?</li>
     <li><strong>Budget:</strong> Gilt der Rahmen „niedriger dreistelliger Betrag pro Jahr“, und wer gibt die einzelnen Posten frei?</li>
-    <li><strong>Adresse:</strong> Darf MyTCO unter my.tcolten.ch laufen? (Absprache mit dem Website-Betreuer.)</li>
+    <li><strong>Adresse und Hosting:</strong> Darf MyTCO unter my.tcolten.ch laufen? Welches Paket hat der Verein bei Metanet, was kostet es heute, und darf MyTCO dort mitlaufen? (Absprache mit dem Website-Betreuer.)</li>
   </ol>
 </section>
 
@@ -249,10 +251,12 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <li><a href="https://developer.apple.com/distribute/app-review/" target="_blank" rel="noopener">Apple: App Review</a>: 50 % in unter 24 h, 90 % in unter 48 h</li>
     <li><a href="https://firebase.google.com/pricing" target="_blank" rel="noopener">Firebase: Preise</a>: Cloud Messaging kostenlos</li>
     <li><a href="https://expo.dev/pricing" target="_blank" rel="noopener">Expo: Preise</a>: Gratisplan 15 iOS- und 15 Android-Builds, Starter USD 19/Monat</li>
-    <li><a href="https://developer.apple.com/app-store/review/guidelines/" target="_blank" rel="noopener">Apple: App Review Guidelines</a>: 2.1 Demo-Konto</li>
+    <li><a href="https://developer.apple.com/app-store/review/guidelines/" target="_blank" rel="noopener">Apple: App Review Guidelines</a>: 2.1 Demo-Konto, 4.2 keine verpackten Websites</li>
     <li>Recherche Systemlandschaft vom 29.10.2026 im Projekt-Repository: Hosting, E-Mail, Aufwand und Wartung (dort selbst als Schätzung markiert)</li>
-    <li><a href="https://www.revenuecat.com/blog/engineering/google-play-14-day/" target="_blank" rel="noopener">RevenueCat: Google Play 14-Tage-Regel</a> (Sekundärquelle)</li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/13634885?hl=en" target="_blank" rel="noopener">Google Play: D-U-N-S-Nummer für Organisationskonten</a>: Pflicht, Antrag bei Dun &amp; Bradstreet kostenlos</li>
     <li><a href="https://support.google.com/googleplay/android-developer/answer/14151465?hl=en" target="_blank" rel="noopener">Google Play: Testpflicht für persönliche Konten</a>: 12 Tester, 14 Tage</li>
+    <li><a href="https://www.infomaniak.com/de/hosting/vps-lite" target="_blank" rel="noopener">Infomaniak: VPS Lite</a>: ab CHF 2.70/Monat, Rechenzentren in der Schweiz (Preis nur aus dem Suchindex, Seite selbst nicht lesbar)</li>
+    <li><a href="https://www.hetzner.com/cloud/" target="_blank" rel="noopener">Hetzner: Cloud-Server</a>: ab EUR 5.99/Monat exkl. MWST</li>
   </ol>
 </section>
 
