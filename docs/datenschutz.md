@@ -98,8 +98,9 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 ## Offene Fragen an den Verein
 
 K-06 (Ansprechperson), K-07 (Datenumfang), K-08 (Junioren), K-09 (Vertrag mit Metanet
-für E-Mail), K-14 (Austritte), K-31 (Kontaktdaten), K-38 (Löschfrist), K-39 (öffentlicher
-Spielplan), K-40 (Jahrgang), K-42 (Kontaktdaten für die Verantwortlichen) — alle in den [Abklärungen](abklaerungen.md).
+für E-Mail), K-14 (Austritte), K-38 (Löschfrist), K-39 (öffentlicher Spielplan), K-40
+(Jahrgang) — alle in den [Abklärungen](abklaerungen.md). K-31 und K-42 (Kontaktdaten) hat der
+Projektleiter entschieden, siehe [Beantwortet](abklaerungen.md#beantwortet).
 
 ## Änderungen an diesem Konzept
 

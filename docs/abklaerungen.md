@@ -56,7 +56,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
 | K-01 | Passt der Fahrplan des Projektleiters mit den Etappen der Roadmap und ihren Wunschterminen? *Fundament* bis zur ausserordentlichen GV am 26.11.2026, *CM-Betrieb* ab 30.06.2027, mit einem Ausblick auf spätere Saisons. Enthält auch die Reihenfolge der Etappen (früher Teil von K-02). | Vorstand | [Roadmap](roadmap.md) |
-| K-02 | Stimmt der Umfang des ersten Releases: Der Projektleiter erfasst die Mitglieder einmal anhand einer Liste vom Vorstand, Login mit Einmalpasswort per Brief, beim ersten Login Passwort ändern und Daten ergänzen? | Vorstand | [Anforderungen](anforderungen/anforderungen.md), #1 |
+| K-02 | Stimmt der Umfang des ersten Releases: Der Projektleiter erfasst die Mitglieder einmal anhand einer Liste vom Vorstand, Login mit Einmalpasswort per Brief, beim ersten Login Passwort ändern und Daten ergänzen? Passen die mit \* markierten Etappen und Status in den Anforderungen? (Steht nicht in der Tabelle, weil es die Anforderungsliste voraussetzt: im Gespräch mit dem Vorstand klären.) | Vorstand | [Anforderungen](anforderungen/anforderungen.md), #1 |
 | K-43 | Welche Online-Dienste nutzt der Verein heute, bei welchem Anbieter und zu welchen Kosten? Damit lässt sich prüfen, ob MyTCO etwas mitnutzen kann, ob sich Dienste zusammenlegen lassen oder ob MyTCO getrennt läuft. | Vorstand | #9, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md) |
 | K-03 | Gilt der Budgetrahmen „niedriger dreistelliger Betrag pro Jahr“? Wer gibt einzelne Posten frei, und wie bezahlt der Verein Online-Dienste (Rechnung, Kreditkarte)? | Vorstand | N-KOSTEN-01, #9 |
 | K-04 | Auf wen laufen die Konten (GitHub, Hosting, Domain, E-Mail-Versand)? Gibt es eine Vereinsadresse @tcolten.ch, auf die sie laufen können, und wer hat einen Zweitzugang? | Vorstand, Website-Betreuer | #10 |
@@ -131,7 +131,6 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 
 | ID | Frage | Antwort | Von, am | Folgen |
 |----|-------|---------|---------|--------|
-| K-02 (Teil) | Passt die Reihenfolge der Etappen? | Teil von K-01 geworden | Projektleiter, 30.10.2026 | — |
 | K-15 | Wie gut muss MyTCO erreichbar sein? | Keine besonderen Anforderungen. Der TCO ist ein Hobbyverein, alle arbeiten ehrenamtlich; ist MyTCO einmal kurz nicht erreichbar, nimmt man das in Kauf. | Projektleiter, 30.10.2026 | N-BETRIEB-01; Server ohne SLA reicht ([ADR-003](adr/adr-003-hosting-infomaniak-vps.md)), #10 |
 | K-16 (Teil) | Wer trägt das Porto für die Briefe? | Der Verein | Projektleiter, 30.10.2026 | #9 |
 | K-25 (Teil) | Gibt es ein Nenngeld, und soll MyTCO festhalten, wer bezahlt hat? | Kein Nenngeld, also auch nichts festzuhalten | Projektleiter, 30.10.2026 | [Glossar](glossar.md) |
