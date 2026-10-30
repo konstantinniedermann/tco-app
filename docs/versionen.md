@@ -43,3 +43,9 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   pg-boss); Bauregel „Server liefert Daten“ für die spätere Store-App, CI-Vorgaben gegen
   veralteten KI-Code. ADR-003: eigener Server bei Infomaniak in der Schweiz, E-Mail-Versand
   je nach K-11 über Metanet oder Scaleway.
+- Abklärungen: Fragen gehen über eine Google-Tabelle an den Verein (ein Blatt pro Adressat,
+  Auswahl plus Freitext, Priorität 1–3, Teilfragen `K-NN.x`, Blatt *Beantwortet* als
+  Historie); Ablauf in `docs/abklaerungen.md`. Neue Fragen K-43 (bestehende Dienste und
+  Kosten), K-44 (Code der Website) und K-45 (Export aus Fairgate); erste Antworten zu K-15, K-16, K-25, K-31, K-42
+  in Anforderungen, Datenschutz, Fachmodell und Glossar übernommen. *Fundament* neu bis
+  26.11.2026.

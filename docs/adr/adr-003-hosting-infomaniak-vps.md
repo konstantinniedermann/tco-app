@@ -73,7 +73,8 @@ keine Bindung an eine Plattform; PostgreSQL ohne Aufpreis.
 **Schwerer:** Jemand ist für den Server verantwortlich — Updates von Containern, Prüfen der
 Sicherung, Reaktion bei Ausfall. Ohne Snapshots muss die Wiederherstellung aus der
 Sicherung geübt sein (#10). Kein SLA; ob das für Anmeldung und Finalwochenende reicht,
-hängt an K-15.
+hing an K-15. *Nachtrag 30.10.2026:* K-15 ist beantwortet — ein kurzer Ausfall wird in Kauf
+genommen, ein VPS ohne SLA reicht.
 
 **Kosten** (Details und Freigabe → #9):
 

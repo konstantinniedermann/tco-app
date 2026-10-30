@@ -79,5 +79,6 @@ Neue Rollen und Rechte kommen erst in diese Matrix und, wo sie Personendaten zei
 
 ## Offene Fragen an den Verein
 
-K-08 (Junioren), K-16 (neues Passwort), K-18 (wer übernimmt welche Rolle), K-42
-(Kontaktdaten für die Verantwortlichen) — alle in den [Abklärungen](abklaerungen.md).
+K-08 (Junioren), K-16 (neues Passwort), K-18 (wer übernimmt welche Rolle) — alle in den
+[Abklärungen](abklaerungen.md). K-42 (Kontaktdaten für die Verantwortlichen) ist entschieden, siehe
+[Beantwortet](abklaerungen.md#beantwortet).

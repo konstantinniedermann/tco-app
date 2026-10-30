@@ -44,10 +44,10 @@ Bankdaten.
 |-----|-------|
 | Mitglied | alle eigenen Daten |
 | Admin | alle Daten der Mitglieder ausser Passwörtern |
-| CM-Verantwortlicher | Name, E-Mail und Telefon aller Mitglieder (**Vorschlag K-42**); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
-| Lizenzverantwortlicher | Name, E-Mail und Telefon aller Mitglieder (**Vorschlag K-42**); Lizenzanträge |
+| CM-Verantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
+| Lizenzverantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
 | Alle Mitglieder | Name, Kategorien und Resultate der Clubmeisterschaft; bei der Wahl des Doppelpartners die Namen der Mitglieder, die für die Kategorie passen |
-| Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM (**Vorschlag K-31**) |
+| Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31) |
 | Alle, ohne Login | Spielplan des Finalwochenendes mit Name, Kategorie, Platz, Zeit, Resultat (**Vorschlag K-39**, spätere Etappe) |
 | Swiss Tennis | Anmeldungen, Resultate und Lizenzanträge, als Export von Hand |
 
@@ -98,8 +98,9 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 ## Offene Fragen an den Verein
 
 K-06 (Ansprechperson), K-07 (Datenumfang), K-08 (Junioren), K-09 (Vertrag mit Metanet
-für E-Mail), K-14 (Austritte), K-31 (Kontaktdaten), K-38 (Löschfrist), K-39 (öffentlicher
-Spielplan), K-40 (Jahrgang), K-42 (Kontaktdaten für die Verantwortlichen) — alle in den [Abklärungen](abklaerungen.md).
+für E-Mail), K-14 (Austritte), K-38 (Löschfrist), K-39 (öffentlicher Spielplan), K-40
+(Jahrgang) — alle in den [Abklärungen](abklaerungen.md). K-31 und K-42 (Kontaktdaten) hat der
+Projektleiter entschieden, siehe [Beantwortet](abklaerungen.md#beantwortet).
 
 ## Änderungen an diesem Konzept
 

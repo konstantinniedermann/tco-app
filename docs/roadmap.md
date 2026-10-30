@@ -16,15 +16,16 @@ nicht angebunden ist.
 
 | Milestone | Fällig | Umfang |
 |-----------|--------|--------|
-| **Fundament** | 15.12.2026 | Anforderungen mit IDs, Glossar, Fachmodell, Rollen und Rechte, Datenschutz- und Sicherheitskonzept, Technik-ADRs, Kosten, Betrieb und Übergabe, Test- und Release-Konzept, arc42, UI-Leitbild. Danach das leere Code-Gerüst mit CI |
+| **Fundament** | 26.11.2026 | Anforderungen mit IDs, Glossar, Fachmodell, Rollen und Rechte, Datenschutz- und Sicherheitskonzept, Technik-ADRs, Kosten, Betrieb und Übergabe, Test- und Release-Konzept, arc42, UI-Leitbild. Danach das leere Code-Gerüst mit CI |
 | **Mitglieder-Login** | 28.02.2027 | Admin-Rolle mit einer Seite zur Mitgliederverwaltung (Mitglieder von Hand anlegen und bearbeiten). Login für Mitglieder: Einmalpasswort per Brief, beim ersten Login Pflicht zum Passwortwechsel und Ergänzen fehlender Daten |
 | **CM-Anmeldung** | 15.05.2027 | Anmeldung zur Clubmeisterschaft ist offen |
 | **CM-Betrieb** | 30.06.2027 | Datenaustausch mit Swiss Tennis in beide Richtungen, Spieler melden ihre Resultate selbst |
 | **Lizenzanträge** | 01.10.2027 | Mitglieder beantragen eine Lizenz oder deren Storno. Der Lizenzverantwortliche sieht zu einem Stichtag die Liste der Anträge, exportiert sie und trägt sie von Hand bei Swiss Tennis ein |
 | **Backlog / Optional** | — | Alles ohne festen Termin |
 
-**Termin-Annahmen:** *Fundament* bis Mitte Dezember ist ein Vorschlag, damit bis Ende
-Februar genug Zeit für die Umsetzung bleibt. *CM-Betrieb* bis Ende Juni ist eine
+**Termin-Annahmen:** *Fundament* bis zur ausserordentlichen GV am 26.11.2026 ist ein
+Vorschlag des Projektleiters: Dort kann der Verein den Plan sehen, und bis Ende Februar
+bleibt genug Zeit für die Umsetzung. *CM-Betrieb* bis Ende Juni ist eine
 Annahme: Die Gruppenspiele laufen erfahrungsgemäss bis Anfang August, die Funktionen
 müssen vorher stehen. Beide Termine werden in der nächsten Sitzung mit dem Verein
 bestätigt.
