@@ -34,7 +34,7 @@ Sie selbst einschalten. Für nichts anderes.
 - Den Spielplan des Finalwochenendes sehen alle, auch ohne Login.
 - Swiss Tennis erhält Anmeldungen, Resultate und Lizenzanträge.
 
-**Wo:** Die Daten liegen bei [Hoster] in [Land]; E-Mails versendet [E-Mail-Dienst].
+**Wo:** Die Daten liegen bei Infomaniak in der Schweiz; E-Mails versendet [E-Mail-Dienst].
 Push-Nachrichten stellt der Hersteller Ihres Browsers oder Handys zu (z. B. Google, Apple);
 sie enthalten keine Daten anderer Mitglieder.
 

@@ -10,3 +10,5 @@ bewerten ist. Vorlage: [`vorlage.md`](vorlage.md). Dateiname: `adr-NNN-kurztitel
 | ADR | Titel | Status | Datum |
 |-----|-------|--------|-------|
 | [ADR-001](adr-001-web-app-zuerst.md) | MyTCO startet als installierbare Web-App, die Store-App folgt bei Bedarf | Entschieden | 2026-10-29 |
+| [ADR-002](adr-002-sveltekit-postgresql.md) | MyTCO wird in TypeScript mit SvelteKit und PostgreSQL gebaut | Entschieden | 2026-10-30 |
+| [ADR-003](adr-003-hosting-infomaniak-vps.md) | MyTCO läuft auf einem eigenen Server bei Infomaniak in der Schweiz | Entschieden | 2026-10-30 |
