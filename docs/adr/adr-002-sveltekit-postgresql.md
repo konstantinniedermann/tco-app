@@ -27,9 +27,9 @@ Randbedingungen:
 
 | Option | Dafür | Dagegen |
 |--------|-------|---------|
-| **A · SvelteKit** | Offizielle Bausteine für alles aus ADR-001: Node-Server (B·5), reine Web-App für Capacitor (B·4), eingebauter Service Worker (B·3); 8 direkte Abhängigkeiten (B·8); seit 10/2024 keine kritische Sicherheitsmeldung (B·9); offizieller MCP-Server für KI-Assistenten (B·6) | Svelte kennen 7 % der Entwickler (B·1); KI-Modelle lösten Aufgaben 2025 mit Svelte teils deutlich seltener als mit React (B·7); Version 3 erst seit 10/2026 stabil (B·8) |
-| **B · React Router (ex Remix)** | React kennen 45 % (B·1), beste KI-Abdeckung (B·7); reine Web-App offiziell möglich (B·11) | Jährliche Hauptversion mit Umbauten, vorher Remix → v7 → v8 (B·12); mehr Sicherheitsmeldungen als A (B·9) |
-| **C · Next.js** | Am weitesten verbreitet (21 %, B·1) | Als reine Web-App fallen Server Actions und Middleware weg — also was es auszeichnet (B·13); 192 MB, 7 kritische Meldungen seit 10/2024, eine davon aktiv ausgenutzt (B·8, B·9) |
+| **A · SvelteKit** | Offizielle Bausteine für alles aus ADR-001: Node-Server (B·5), reine Web-App für Capacitor (B·4), eingebauter Service Worker (B·3); 8 direkte Abhängigkeiten (B·8); seit 10/2024 keine kritische Sicherheitsmeldung (B·9); offizieller MCP-Server für KI-Assistenten (B·6) | Svelte kennen 7 % der Entwickler (B·1), npm-Downloads ein Zwanzigstel von Next.js (B·2); KI-Modelle lösten Aufgaben 2025 mit Svelte teils deutlich seltener als mit React (B·7); Version 3 erst seit 10/2026 stabil (B·8) |
+| **B · React Router (ex Remix)** | React kennen 45 % (B·1), beste KI-Abdeckung (B·7); reine Web-App offiziell möglich (B·11) | Jährliche Hauptversion mit Umbauten, vorher Remix → v7 → v8 (B·12); 1 kritische Sicherheitsmeldung seit 10/2024, A: 0 (B·9) |
+| **C · Next.js** | Am weitesten verbreitet (21 %, B·1) | Als reine Web-App fallen Server Actions und Middleware weg — also was es auszeichnet (B·13); 192 MB, 7 kritische Meldungen seit 10/2024 (B·8, B·9), darunter eine aktiv ausgenutzte Login-Umgehung (B·17) |
 | **D · Nuxt (Vue)** | Mittel verbreitet (4 %, B·1) | 66 direkte Abhängigkeiten (B·8), viel Automatik (S); kein Vorteil gegenüber A |
 | **E · TypeScript-Oberfläche + Python-Server** | Python/FastAPI aus früheren Projekten vertraut | Zwei Sprachen, zwei Auslieferungen — widerspricht der Übergabe |
 | **F · Fertiger Backend-Dienst** (z. B. Supabase) | Wenig Server-Code | Rechte und Turnierlogik in den Regeln des Dienstes; Bindung an den Anbieter; verwaltete Angebote in CH/EU teuer (ADR-003) |
@@ -67,7 +67,8 @@ reine Web-App (SPA) bauen lassen (B·4):
 
 - Der Server bietet nur **API-Endpunkte** (`+server.ts`); die Fachlogik liegt in
   Server-Modulen, nicht in Seiten.
-- **Nicht verwendet:** Form Actions, `+page.server.ts`-Loader und experimentelle Remote
+- **Nicht verwendet:** Form Actions, Server-Loader (`+page.server.ts`, `+layout.server.ts` —
+  alle `*.server.ts` unter `src/routes` ausser `+server.ts`) und experimentelle Remote
   Functions — sie funktionieren in der Hülle nicht.
 - Die Berechtigung prüft immer der API-Endpunkt (ADR-001).
 
@@ -82,7 +83,8 @@ prüft das, statt sich darauf zu verlassen:
 | Fehler und veraltete Muster finden | `svelte-check` und ESLint mit Svelte-Regeln in `make check` und in der CI |
 | Assistenten nutzen die aktuelle Doku | Offizieller Svelte-MCP-Server (B·6) nach Prüfung gemäss Regel für fremde MCP-Server einbinden; Regel in `CLAUDE.md`, sobald das Code-Verbot fällt |
 | Versionen bleiben aktuell | Dependabot für `npm` und die Docker-Images; Hauptversionen fest in `package.json` |
-| Bauregel eingehalten | CI-Prüfung, dass keine `+page.server.ts` und keine Form Actions existieren, und ein SPA-Build in der CI (S) |
+| Bauregel eingehalten | CI-Prüfung, dass unter `src/routes` keine `*.server.ts` ausser `+server.ts` und keine Form Actions existieren, und ein SPA-Build in der CI (S) |
+| Keine Inhalte von fremden Servern (DS-03) | Schriften, Icons und Skripte im Build mitliefern, kein Tracking; Content-Security-Policy nur mit eigener Adresse → #6 |
 
 ## Konsequenzen
 
@@ -92,7 +94,7 @@ ohne Umbau; Datenbank und Jobs ohne zusätzlichen Dienst.
 **Schwerer:** Weniger Svelte-Kenner und weniger fertige Admin-Bausteine als bei React (S).
 KI-Assistenten brauchen die aktuelle Doku, sonst schreiben sie Code der Vorversion. Die
 Bauregel verzichtet auf Komfort, den SvelteKit eigentlich bietet. Die Hülle läuft später
-unter eigener Adresse (`capacitor://localhost`, V) — Folgen für Cookies und CORS klärt
+unter eigener Adresse (`capacitor://localhost` auf iOS, `https://localhost` auf Android, V) — Folgen für Cookies und CORS klärt
 das Sicherheitskonzept (#6).
 
 **Kosten:** keine; alle Bausteine sind Open Source. Hosting → [ADR-003](adr-003-hosting-infomaniak-vps.md).
@@ -113,7 +115,7 @@ das Sicherheitskonzept (#6).
 Abgerufen am 30.10.2026.
 
 1. [Stack Overflow Developer Survey 2025](https://survey.stackoverflow.co/2025/technology) — Svelte 7.2 %, React 44.7 %, Next.js 20.8 %, Nuxt 4.0 %, PostgreSQL 55.6 %, SQLite 37.5 %
-2. [npm-Downloads](https://api.npmjs.org/downloads/point/last-week/@sveltejs/kit) — `@sveltejs/kit` 4.5 Mio. pro Woche
+2. [npm-Downloads](https://api.npmjs.org/downloads/point/last-week/@sveltejs/kit) — `@sveltejs/kit` 4.5 Mio., `next` 91.5 Mio. pro Woche
 3. [SvelteKit: Service Workers](https://svelte.dev/docs/kit/service-workers)
 4. [SvelteKit: Single-page apps](https://svelte.dev/docs/kit/single-page-apps) — reine Web-App ohne Server-Dateien, Anwendungsfall App-Hülle
 5. [SvelteKit: adapter-node](https://svelte.dev/docs/kit/adapter-node)
@@ -128,3 +130,4 @@ Abgerufen am 30.10.2026.
 14. [SQLite: When to use](https://www.sqlite.org/whentouse.html)
 15. [Drizzle: Migrationen](https://orm.drizzle.team/docs/migrations)
 16. [pg-boss](https://github.com/timgit/pg-boss) — Jobs, Cron und Wiederholung auf PostgreSQL
+17. [Truesec: CVE-2025-29927](https://www.truesec.com/hub/blog/cve-2025-29927-nextjs-authorization-bypass-vulnerability) — Umgehung der Next.js-Middleware, aktiv ausgenutzt

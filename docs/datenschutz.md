@@ -85,7 +85,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | ID | Vorgabe |
 |----|---------|
 | DS-01 | Server, Datenbank, Backups und E-Mail-Versand in der Schweiz oder in der EU/EWR (Art. 16 nDSG) |
-| DS-02 | Hoster und E-Mail-Dienst mit Auftragsbearbeitungsvertrag oder passenden AGB (K-09) |
+| DS-02 | Hoster und E-Mail-Dienst mit Auftragsbearbeitungsvertrag oder passenden AGB (Infomaniak: [ADR-003](adr/adr-003-hosting-infomaniak-vps.md); Metanet-Postfach: K-09) |
 | DS-03 | Kein Tracking, keine Werbung, keine Inhalte von fremden Servern (CDN, Google Fonts); nur technisch nötige Cookies, deshalb kein Cookie-Banner |
 | DS-04 | Nur Felder aus [Welche Daten](#welche-daten); Exporte nur mit den Feldern, die Swiss Tennis braucht |
 | DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“; Empfänger in BCC) |
@@ -97,8 +97,8 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 
 ## Offene Fragen an den Verein
 
-K-06 (Ansprechperson), K-07 (Datenumfang), K-08 (Junioren), K-09 (Vertrag mit dem
-Hoster), K-14 (Austritte), K-31 (Kontaktdaten), K-38 (Löschfrist), K-39 (öffentlicher
+K-06 (Ansprechperson), K-07 (Datenumfang), K-08 (Junioren), K-09 (Vertrag mit Metanet
+für E-Mail), K-14 (Austritte), K-31 (Kontaktdaten), K-38 (Löschfrist), K-39 (öffentlicher
 Spielplan), K-40 (Jahrgang), K-42 (Kontaktdaten für die Verantwortlichen) — alle in den [Abklärungen](abklaerungen.md).
 
 ## Änderungen an diesem Konzept

@@ -10,7 +10,7 @@
 einen Dienst für den E-Mail-Versand. Randbedingungen:
 
 - **Datenschutz:** Server, Datenbank, Backups und E-Mail-Versand in CH oder EU/EWR (DS-01),
-  Vertrag zur Auftragsbearbeitung (DS-02), Logs und Backups höchstens 30 Tage (DS-06) —
+  Vertrag zur Auftragsbearbeitung (DS-02), Logs und Backups höchstens 30 Tage (DS-06), keine Inhalte von fremden Servern (DS-03, umgesetzt in [ADR-002](adr-002-sveltekit-postgresql.md)) —
   siehe [Datenschutzkonzept](../datenschutz.md#vorgaben-für-technik-und-hosting).
 - **Kosten:** laufend im niedrigen dreistelligen Bereich pro Jahr (N-KOSTEN-01).
 - **Übergabe:** Konto soll auf den Verein laufen können (K-04), Anbieter austauschbar.
@@ -23,28 +23,30 @@ Preise exkl. MwSt, wo nicht anders vermerkt; MwSt 8.1 %; 1 EUR ≈ 0.94 CHF, 1 U
 
 | Option | CHF/Jahr | Dafür | Dagegen |
 |--------|----------|-------|---------|
-| **A · Eigener Server CH** — Infomaniak VPS Lite, App, PostgreSQL und Webserver in Docker | ca. 120–190 (S) | Schweizer Firma und Rechenzentrum (B·1); DPA vorhanden (B·3); PostgreSQL ohne Aufpreis; dieselbe Docker-Konfiguration läuft bei jedem Hoster | Updates und Sicherung in eigener Verantwortung; keine Snapshots, kein SLA (B·1) |
+| **A · Eigener Server CH** — Infomaniak VPS Lite, App, PostgreSQL und Webserver in Docker | ca. 110–230 (S) | Schweizer Firma und Rechenzentrum (B·1); DPA vorhanden (B·3); PostgreSQL ohne Aufpreis; dieselbe Docker-Konfiguration läuft bei jedem Hoster | Updates und Sicherung in eigener Verantwortung; keine Snapshots, kein SLA (B·1) |
 | **B · Verwaltete Plattform EU** — Scaleway Paris, Container und PostgreSQL | ca. 400 (S, B·7) | Kaum Betrieb, tägliche Backups vom Anbieter (B·7) | Am Budgetrand; EU statt CH |
 | **C · Render oder fly.io** — Rechenzentrum Frankfurt | Render ca. 130–200 (S, B·8); fly.io mit verwaltetem PostgreSQL ca. 440 (S aus B·9) | Kaum Betrieb; fly.io aus früheren Projekten vertraut | US-Firmen: Zugriff von US-Behörden möglich, DS-01 nur dem Standort nach erfüllt (V); fly.io-PostgreSQL in Vorschau (B·9) |
-| **D · Metanet** | Webhosting: untauglich; Cloud Server S ca. 290 inkl. MwSt (B·5) | Bestehende Kundenbeziehung des Vereins | Webhosting ohne Node.js, nur MariaDB (B·4); Cloud Server: gleicher Aufwand wie A, doppelte Kosten |
-| **E · Infomaniak Node.js-Hosting** | ca. 140 inkl. MwSt (B·2) | Verwaltet, Schweiz | Nur MariaDB, kein PostgreSQL (B·2); Hintergrundprozesse unklar (V) |
-| **F · Exoscale** (CH) | ca. 650 (B·6) | Verwaltetes PostgreSQL in der Schweiz | Datenbank allein ca. CHF 510/Jahr (B·6) |
+| **D · Metanet** | Webhosting: untauglich; Cloud Server S ca. 290 inkl. MwSt (B·5) | Bestehende Kundenbeziehung des Vereins | Webhosting ohne Node.js, nur MariaDB (B·4); Cloud Server: gleicher Aufwand wie A, rund dreifache Serverkosten |
+| **E · Infomaniak Node.js-Hosting** | ca. 140 (S aus B·2) | Verwaltet, Schweiz | Nur MariaDB, kein PostgreSQL (B·2); Hintergrundprozesse unklar (V) |
+| **F · Exoscale** (CH) | ca. 650 (S aus B·6) | Verwaltetes PostgreSQL in der Schweiz | Datenbank allein ca. CHF 510/Jahr (B·6) |
 
 **E-Mail-Versand:** Ein Postfach von @tcolten.ch bei Metanet (K-11; Business Mail CHF 5.90
 pro Monat, B·10) oder bei Infomaniak (Limit 200–500 Mails pro Tag und Absender, B·11), oder
 ein Versanddienst in der EU wie Scaleway (300 Mails/Monat gratis, danach EUR 0.25 pro
-1000, B·12). US-Dienste fallen weg; Postmark bewahrt Daten zudem 45 Tage auf (B·13).
+1000, B·12; Vertrag zur Auftragsbearbeitung V, prüfen in #9). US-Dienste fallen weg; Postmark bewahrt Daten zudem 45 Tage auf (B·13).
 
 ## Entscheidung
 
 **MyTCO läuft auf einem Infomaniak VPS Lite in der Schweiz: App, PostgreSQL und ein
 Webserver mit automatischem HTTPS als Docker-Container; die Datenbank wird jede Nacht auf
-einen Speicher ausserhalb des Servers in CH/EU gesichert. E-Mails verschickt MyTCO über
+einen Speicher ausserhalb des Servers in der Schweiz gesichert. E-Mails verschickt MyTCO über
 ein Postfach von @tcolten.ch, wenn K-11 das mit ausreichendem Limit erlaubt — sonst über
 Scaleway (EU).**
 
 Begründung:
 
+- **Vom Projektleiter gewählt** (VPS Lite und der bedingte E-Mail-Weg), nachdem er
+  verwaltete Plattformen in der EU und US-Anbieter wie fly.io verworfen hatte.
 - **Datenschutz ohne Umweg:** Schweizer Firma, Schweizer Rechenzentrum, DPA (B·3).
 - **Günstigste Variante mit PostgreSQL** — ein verwaltetes PostgreSQL in der Schweiz gibt
   es im Budget nicht (Optionen E, F).
@@ -59,7 +61,7 @@ Begründung:
 |-------|-----------|
 | Server | VPS Lite 2 vCPU / 4 GB (B·1), Linux mit automatischen Sicherheits-Updates |
 | Container | App (Node), PostgreSQL, Webserver mit automatischem HTTPS (z. B. Caddy, S) |
-| Sicherung | Nächtlich `pg_dump`, verschlüsselt auf Speicher in CH/EU ausserhalb des Servers, 30 Tage Rotation (DS-06); Ziel und Preis → #10 |
+| Sicherung | Nächtlich `pg_dump`, verschlüsselt auf Speicher in der Schweiz ausserhalb des Servers, bei einem Anbieter mit Vertrag zur Auftragsbearbeitung (DS-02), 30 Tage Rotation (DS-06); Ziel und Preis → #10 |
 | Logs | Rotation auf höchstens 30 Tage, ohne Inhalte (DS-06) |
 | E-Mail | Versand über Port 587 beim gewählten Dienst — der VPS sperrt Port 25 (B·1) |
 
@@ -75,13 +77,13 @@ hängt an K-15.
 
 **Kosten** (Details und Freigabe → #9):
 
-| Posten | CHF/Jahr | Status |
+| Posten | CHF/Jahr inkl. MwSt | Status |
 |--------|----------|--------|
-| VPS Lite 2 vCPU / 4 GB, 12 Monate | ca. 93 inkl. MwSt (CHF 7.20/Monat exkl., B·1) | belegt |
+| VPS Lite 2 vCPU / 4 GB, 12 Monate | ca. 93 (CHF 7.20/Monat exkl., B·1) | belegt |
 | Sicherungsspeicher ausserhalb des Servers | ca. 20–60 | S |
-| E-Mail-Versand | 0–70 (Scaleway fast gratis bis Metanet-Postfach) | S, hängt an K-11 |
+| E-Mail-Versand | 0–80 (Scaleway fast gratis bis Metanet-Postfach CHF 5.90/Monat, B·10) | S, hängt an K-11 |
 | Domain | 0 (Subdomain von tcolten.ch) | V, hängt an K-10 |
-| **Total** | **ca. 120–190** | S |
+| **Total** | **ca. 110–230** | S |
 
 ## Reevaluations-Trigger
 
