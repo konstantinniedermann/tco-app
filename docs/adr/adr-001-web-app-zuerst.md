@@ -64,7 +64,7 @@ Begründung:
   PC ausgelegt, funktionieren aber auch auf dem Handy. Die Berechtigung prüft immer der
   Server, nie nur die Oberfläche.
 
-Das konkrete Web-Framework ist **nicht** Teil dieser Entscheidung; es fällt zusammen mit
+Das konkrete Web-Framework ist **nicht** Teil dieser Entscheidung (→ [ADR-002](adr-002-sveltekit-postgresql.md)); es fällt zusammen mit
 Backend und Hosting in Issue #8, weil verbreitete Web-Frameworks beides abdecken. Bedingung
 aus dieser ADR: Es muss eine PWA mit Service Worker und Web Push erlauben und sich mit
 Capacitor verpacken lassen.
@@ -116,7 +116,7 @@ Push-Weg, ein Firebase-Projekt mit Google-Konto und einen APNs-Schlüssel von Ap
 Konten gehören in die Kontenübersicht (#10), der Datenfluss zu Google und Apple ins
 Datenschutzkonzept (#5).
 
-**Kosten** (nur App-Plattform; Hosting und E-Mail-Versand → Issues #8 und #9):
+**Kosten** (nur App-Plattform; Hosting und E-Mail-Versand → [ADR-003](adr-003-hosting-infomaniak-vps.md) und Issue #9):
 
 | Posten | Einmalig | Wiederkehrend | Ab wann |
 |--------|----------|---------------|---------|

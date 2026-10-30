@@ -173,3 +173,17 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** Issue #5, Merge nach `dev`.
 
 **Einschätzung:** Gering; ein Satz in Schritt 4 („vorher `ExitWorktree` mit `keep`“) würde den Fehlversuch vermeiden.
+
+**Erledigt 2026-10-30:** Bei #8 erneut aufgetreten; Hinweis in Schritt 4 des Skills ergänzt (Trivial-Fix). Bei der nächsten Auswertung ins Archiv.
+
+### 2026-10-30 — Vorstandsseite nennt Hosting noch als offen
+
+**Thema:** Doku-Darstellung
+
+**Fundort:** `docs/recherche/2026-10-29-app-varianten-vorstand.html`, Abschnitt *Budget und Kosten* und *Offene Fragen*.
+
+**Beobachtung:** Die Seite schätzt Hosting auf CHF 60–300 pro Jahr, nennt das Metanet-Hosting als mögliche Variante und fragt, ob MyTCO dort laufen darf. Seit ADR-003 ist entschieden: Infomaniak VPS Lite, ca. CHF 110–230 pro Jahr; das Metanet-Webhosting kann keine Node-App betreiben.
+
+**Ursprung:** Issue #8, Abgleich beim Wrap-up.
+
+**Einschätzung:** Gering bis mittel — relevant, sobald die Seite im Gespräch mit dem Vorstand verwendet wird. Als datierte Entscheidungsgrundlage darf sie den alten Stand zeigen; dann ein Hinweis „Hosting inzwischen entschieden → ADR-003“ oder die Kostenübersicht (#9) als aktuelle Quelle.

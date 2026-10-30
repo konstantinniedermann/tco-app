@@ -43,8 +43,9 @@ gehören in den Feature-Branch. Zieht `dev` weiter: `git merge origin/dev` im Wo
 
 **3 — Review:** `make check` grün, Agent `cas-reviewer`, Befunde klären.
 
-**4 — Nach `dev` mergen (im Hauptordner):** Zuerst prüfen, dass keine andere Session dort
-gerade mergt — sonst warten, nicht eingreifen:
+**4 — Nach `dev` mergen (im Hauptordner):** Vorher den Worktree mit `ExitWorktree` (`keep`)
+verlassen — aus dem Worktree heraus verweigert Claude Code Git-Befehle auf den Hauptordner.
+Dann prüfen, dass keine andere Session dort gerade mergt — sonst warten, nicht eingreifen:
 
 ```bash
 git -C $M status --short                          # muss leer sein
