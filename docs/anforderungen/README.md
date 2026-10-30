@@ -40,6 +40,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 | 29.10.2026 | Technik der App entschieden: zuerst installierbare Web-App mit Admin-Bereich und Web Push, Store-App bei Bedarf ([ADR-001](../adr/adr-001-web-app-zuerst.md)); beantwortet die Frage „Store oder Browser zum Mitglieder-Login“ vorläufig | Projektleiter |
 | 29.10.2026 | Fachmodell ([`fachmodell.md`](../fachmodell.md)): Junioren vorerst ausgeklammert, alle Mitglieder wie Volljährige (K-08 bleibt offen); neu der Wildcard-Antrag für Kategorien ausserhalb des eigenen Klassierungsbereichs (A-ANMELDUNG-10) | Projektleiter |
 | 29.10.2026 | [Rollen und Rechte](../rollen-und-rechte.md): neue Rollen CM-Verantwortlicher (A-ROLLE-07) und Lizenzverantwortlicher (A-ROLLE-08); sie übernehmen die CM- bzw. Lizenzaufgaben, der Admin vertritt sie (A-ANMELDUNG-06, A-RESULTAT-07, N-APP-03 angepasst). Anlässe-Veranstalter auf *später* verschoben (A-ROLLE-04) | Projektleiter |
+| 30.10.2026 | Erste Antworten aus den [Abklärungen](../abklaerungen.md#beantwortet): N-BETRIEB-01 ohne festen Zielwert (K-15); Kontaktdaten für Gegner, Doppelpartner und Verantwortliche wie vorgeschlagen (K-31, K-42); kein Nenngeld (K-25); *Fundament* neu bis 26.11.2026 ([Roadmap](../roadmap.md)) | Projektleiter |
 
 ## Offene Fragen an den Verein
 

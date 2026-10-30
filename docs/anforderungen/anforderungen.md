@@ -201,7 +201,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 | N-DATENSCHUTZ-01 | Die Bearbeitung der Mitgliederdaten entspricht dem Schweizer Datenschutzgesetz (nDSG) | PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
 | N-DATENSCHUTZ-02 | Kontaktdaten anderer Mitglieder sind nur sichtbar, soweit der Verein es festlegt (z. B. Gegner, Doppelpartner) | PDF 5d, PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | offen |
 | N-SICHERHEIT-01 | Weitere Sicherheitsmassnahmen werden mit den zuständigen Personen festgelegt | PDF 2 | Fundament (Sicherheitskonzept, #6) | geplant |
-| N-BETRIEB-01 | Verfügbarkeit: MyTCO ist besonders während Anmeldephase, Gruppenspielen und Finalwochenende erreichbar; der Zielwert ist mit dem Verein festzulegen | PL | Fundament (Betrieb, #10) | offen |
+| N-BETRIEB-01 | Verfügbarkeit: MyTCO ist besonders während Anmeldephase, Gruppenspielen und Finalwochenende erreichbar; kein fester Zielwert, ein kurzer Ausfall wird in Kauf genommen (K-15) | PL | Fundament (Betrieb, #10) | geplant |
 | N-BARRIEREFREI-01 | MyTCO ist für Mitglieder jeden Alters bedienbar; Zielniveau WCAG 2.1 AA\* | PL | durchgehend | geplant |
 | N-KOSTEN-01 | Laufende Kosten im niedrigen dreistelligen Bereich pro Jahr | Ziel | Fundament (Kosten, #9) | geplant |
 | N-KOSTEN-02 | Die Kosten werden im Detail dokumentiert und analysiert | Ziel | Fundament (Kosten, #9) | geplant |

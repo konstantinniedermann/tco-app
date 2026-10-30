@@ -44,10 +44,10 @@ Bankdaten.
 |-----|-------|
 | Mitglied | alle eigenen Daten |
 | Admin | alle Daten der Mitglieder ausser Passwörtern |
-| CM-Verantwortlicher | Name, E-Mail und Telefon aller Mitglieder (**Vorschlag K-42**); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
-| Lizenzverantwortlicher | Name, E-Mail und Telefon aller Mitglieder (**Vorschlag K-42**); Lizenzanträge |
+| CM-Verantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
+| Lizenzverantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
 | Alle Mitglieder | Name, Kategorien und Resultate der Clubmeisterschaft; bei der Wahl des Doppelpartners die Namen der Mitglieder, die für die Kategorie passen |
-| Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM (**Vorschlag K-31**) |
+| Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31) |
 | Alle, ohne Login | Spielplan des Finalwochenendes mit Name, Kategorie, Platz, Zeit, Resultat (**Vorschlag K-39**, spätere Etappe) |
 | Swiss Tennis | Anmeldungen, Resultate und Lizenzanträge, als Export von Hand |
 
