@@ -39,3 +39,7 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   `RR-01` bis `RR-08` und Matrix Rolle × Daten bis zur Etappe *Lizenzanträge*. CM-Aufgaben in
   Fachmodell und Anforderungen vom Admin zum CM-Verantwortlichen verschoben; Kontaktdaten
   für die Verantwortlichen im Datenschutzkonzept ergänzt (K-42).
+- ADR-002: MyTCO wird in TypeScript mit SvelteKit gebaut, Daten in PostgreSQL (Drizzle,
+  pg-boss); Bauregel „Server liefert Daten“ für die spätere Store-App, CI-Vorgaben gegen
+  veralteten KI-Code. ADR-003: eigener Server bei Infomaniak in der Schweiz, E-Mail-Versand
+  je nach K-11 über Metanet oder Scaleway.
