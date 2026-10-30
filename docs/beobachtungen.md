@@ -114,6 +114,18 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-10-30 — Impressum von tcolten.ch nennt eine frühere Finanzverantwortliche Person
+
+**Thema:** Verein
+
+**Fundort:** tcolten.ch/impressum, Abschnitt «Vertretungsberechtigte Personen».
+
+**Beobachtung:** Das Impressum führt für Finanzen und Mitgliederverwaltung noch die frühere Person; laut Clubleitung und Projektleiter hat die Aufgabe inzwischen jemand anderes übernommen. Das Impressum stammt laut eigener Angabe von 2020.
+
+**Ursprung:** Recherche für das Blatt «Wer ist wer» der Fragen-Tabelle.
+
+**Einschätzung:** Sache des Vereins, nicht von MyTCO. Wird relevant, wenn die Datenschutzerklärung von MyTCO an tcolten.ch anschliesst (K-06); bei Gelegenheit dem Website-Betreuer melden.
+
 ### 2026-10-29 — Push-Auslöser sind nirgends festgelegt
 
 **Thema:** Fachmodell
