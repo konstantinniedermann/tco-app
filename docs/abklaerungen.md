@@ -18,7 +18,9 @@ ist, bei wem und bis wann. Fragen haben eine feste ID (`K-NN`), auf die Issues v
 
 **Einsammeln über die Tabelle:** Die Fragen gehen nicht als Liste an den Verein, sondern
 über die Google-Tabelle *MyTCO – Fragen an den Verein* im Drive des Projektleiters. Die
-Adressaten füllen sie selbst aus, ein Konto braucht es nicht. Diese Seite bleibt die
+Adressaten füllen sie selbst aus. Dafür braucht es ein Google-Konto und eine Einladung als
+Bearbeiter: Die Sperre wirkt nur bei angemeldeten Personen, anonyme Bearbeiter über den Link
+können alles ändern. Der Link allein erlaubt deshalb nur Lesen. Diese Seite bleibt die
 Hauptliste. Die Tabelle dient nur zum Einsammeln.
 
 - **Ein Blatt pro Adressat:** Vorstand, Website & Hoster, Clubmeisterschaft, Lizenzen.
@@ -30,8 +32,9 @@ Hauptliste. Die Tabelle dient nur zum Einsammeln.
   3 = später. Das entspricht den Abschnitten unten.
 - **Wer ist wer:** Welche Person im Verein welche Aufgabe hat, steht nur in der Tabelle,
   nicht im Repo. Die Adressaten korrigieren das Blatt selbst.
-- **Gesperrt:** Fragen und Auswahl sind gegen Überschreiben gesperrt, offen sind nur die
-  Antwortspalten.
+- **Gesperrt:** Jedes Blatt ist als Ganzes gesperrt. Frei sind nur die Antwortspalten der
+  vorhandenen Fragen und die Einträge auf *Wer ist wer*. Bei neuen Zeilen den freien
+  Bereich anpassen.
 - **Rückfluss:** Beantwortete Fragen verschiebt der Projektleiter ins ausgeblendete Blatt
   *Beantwortet* (wer, wann, Runde). Hier landen sie im Abschnitt *Beantwortet*, mit Rolle
   statt Namen.
