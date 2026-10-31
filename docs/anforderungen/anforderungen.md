@@ -32,14 +32,17 @@ nicht festlegen. Vom Verein zu bestätigen.
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-LOGIN-01 | Mitglieder erhalten ihre Zugangsdaten per Post in zwei getrennten Briefen | PDF 2, Ziel | Mitglieder-Login | geplant |
-| A-LOGIN-02 | Das Einmalpasswort muss beim ersten Login ersetzt werden | PDF 2, Ziel | Mitglieder-Login | geplant |
+| A-LOGIN-01 | Mitglieder erhalten ihren Zugang per Post in einem Brief: QR-Code zur App-Adresse, Einmal-Code als Text, kurze Anleitung zum Startbildschirm (ursprünglich zwei getrennte Briefe) | PDF 2, Ziel, PL | Mitglieder-Login | geplant\* |
+| A-LOGIN-02 | Das Einmalpasswort muss beim ersten Login ersetzt werden | PDF 2, Ziel | — | verworfen — MyTCO hat kein Passwort, Login per Einmal-Code (A-LOGIN-08) |
 | A-LOGIN-03 | Beim ersten Login ergänzt das Mitglied fehlende Daten, insbesondere die Lizenznummer | PDF 3b-i | Mitglieder-Login | geplant |
 | A-LOGIN-04 | Direktes Login in MyTCO, ohne Umweg über tcolten.ch (z. B. über `my.tcolten.ch`) | PDF 3b | Mitglieder-Login | geplant |
 | A-LOGIN-05 | Login-Feld oben rechts auf tcolten.ch, das nach dem Login zu MyTCO weiterleitet | PDF 3b | später | später |
 | A-LOGIN-06 | Zwei-Faktor-Login (App oder SMS/E-Mail, zwingend oder freiwillig) | PDF 2 | später | später |
 | A-LOGIN-07 | Login mit Passkey | PDF 2 | später | später |
-| A-LOGIN-08 | Login nur per SMS- oder App-Code, ohne Passwort | PDF 2 | später\* | später |
+| A-LOGIN-08 | Login ohne Passwort, nur per Einmal-Code: aus dem Brief, später per E-Mail (A-LOGIN-10) | PDF 2, PL | Mitglieder-Login | geplant\* |
+| A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Admin seine Sitzungen beendet | PL | Mitglieder-Login | geplant\* |
+| A-LOGIN-10 | Wer ausgeloggt ist (lange Pause, neues Handy, Brief verloren), erhält nach Eingabe seiner E-Mail-Adresse einen neuen Code per E-Mail | PL | Mitglieder-Login | geplant\* |
+| A-LOGIN-11 | Einmal-Code per SMS oder App statt per Brief oder E-Mail (abgespalten aus A-LOGIN-08) | PDF 2 | später | später |
 
 ### MITGLIED — Mitgliederverwaltung durch den Admin
 
