@@ -17,7 +17,7 @@ nicht angebunden ist.
 | Milestone | Fällig | Umfang |
 |-----------|--------|--------|
 | **Fundament** | 26.11.2026 | Anforderungen mit IDs, Glossar, Fachmodell, Rollen und Rechte, Datenschutz- und Sicherheitskonzept, Technik-ADRs, Kosten, Betrieb und Übergabe, Test- und Release-Konzept, arc42, UI-Leitbild. Danach das leere Code-Gerüst mit CI |
-| **Mitglieder-Login** | 28.02.2027 | Admin-Rolle mit einer Seite zur Mitgliederverwaltung (Mitglieder von Hand anlegen und bearbeiten). Login für Mitglieder ohne Passwort: Einmal-Code per Brief, beim ersten Login Pflicht zum Ergänzen fehlender Daten, danach angemeldet bleiben; neuer Code per E-Mail ([#29](https://github.com/konstantinniedermann/tco-app/issues/29)) |
+| **Mitglieder-Login** | 28.02.2027 | Admin-Rolle mit einer Seite zur Mitgliederverwaltung (Mitglieder von Hand anlegen und bearbeiten). Login für Mitglieder ohne Passwort: Einmal-Code per Brief, beim ersten Login Pflicht zum Ergänzen fehlender Daten, danach eingeloggt bleiben; neuer Code per E-Mail ([#29](https://github.com/konstantinniedermann/tco-app/issues/29)) |
 | **CM-Anmeldung** | 15.05.2027 | Anmeldung zur Clubmeisterschaft ist offen |
 | **CM-Betrieb** | 30.06.2027 | Datenaustausch mit Swiss Tennis in beide Richtungen, Spieler melden ihre Resultate selbst |
 | **Lizenzanträge** | 01.10.2027 | Mitglieder beantragen eine Lizenz oder deren Storno. Der Lizenzverantwortliche sieht zu einem Stichtag die Liste der Anträge, exportiert sie und trägt sie von Hand bei Swiss Tennis ein |

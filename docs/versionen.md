@@ -50,6 +50,6 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   in Anforderungen, Datenschutz, Fachmodell und Glossar übernommen. *Fundament* neu bis
   26.11.2026.
 - Login ohne Passwort (#29): ein Brief mit QR-Code und Einmal-Code, kein Passwortwechsel,
-  angemeldet bleiben bis ein Jahr ohne Nutzung, neuer Code per E-Mail. Nachgeführt in
-  Anforderungen (A-LOGIN-01/02/08, neu 09/10), Glossar, Fachmodell (FR-24), Rollen und
+  eingeloggt bleiben bis ein Jahr ohne Nutzung, neuer Code per E-Mail. Nachgeführt in
+  Anforderungen (A-LOGIN-01/02/08, neu 09–11), Glossar, Fachmodell (FR-24), Rollen und
   Rechte, Roadmap, Abklärungen, Datenschutzkonzept und Datenschutzerklärung.

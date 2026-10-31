@@ -109,8 +109,8 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Mitgliederverwaltung | Seite, auf der der Admin Mitglieder von Hand anlegt, bearbeitet und löscht | Mitgliederverwaltung | Ziel; PDF 4a |
 | Konto | Zugang eines Mitglieds zu MyTCO mit seinen Daten | Konto | PDF 3e, 4a |
 | Login | Einloggen in MyTCO | Login | PDF 2, 3b |
-| Einmal-Code | Code zum Eintippen, gilt für ein einziges Login. Kommt per Brief (lange gültig) oder auf Anfrage per E-Mail (kurz gültig). Ersetzt das *Einmalpasswort* aus dem PDF; ein Passwort gibt es in MyTCO nicht | Code | PDF 2; [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
-| Sitzung | Zeitraum, in dem ein Gerät nach dem Login angemeldet bleibt. Endet nach einem Jahr ohne Nutzung, beim Logout oder wenn der Admin sie beendet | Sitzung | [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
+| Einmal-Code | Code zum Eintippen, gilt für ein einziges Login. Kommt per Brief (lange gültig) oder auf Anfrage per E-Mail (kurz gültig). Ersetzt das *Einmalpasswort* aus dem PDF; ein Passwort gibt es in MyTCO nicht | Einmal-Code | PDF 2; [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
+| Sitzung | Zeitraum, in dem ein Gerät nach dem Login eingeloggt bleibt. Endet nach einem Jahr ohne Nutzung, beim Logout oder wenn der Admin sie beendet | Sitzung | [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
 | Erstes Login | Erstes Einloggen mit dem Code aus dem Brief; das Mitglied ergänzt dabei fehlende Daten | Erstes Login | PDF 3b-i; Ziel |
 | Startseite | Erste Seite nach dem Login mit Shortcuts, Konto und Logout | Startseite | PDF 3c |
 | Newsfeed | Bereich für Neuigkeiten des Vereins auf der Startseite | Newsfeed | PDF 3c |
