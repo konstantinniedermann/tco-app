@@ -27,7 +27,7 @@ Wer diese Rollen im Verein übernimmt, klärt K-18.
 | RR-01 | Jedes Konto hat die Rolle *Mitglied*; weitere vergibt der Admin. Eine Person kann mehrere Rollen haben, ihre Rechte addieren sich (FR-03) |
 | RR-02 | Der Admin darf alles, was CM- und Lizenzverantwortlicher dürfen — als Stellvertretung, ohne sich die Rolle zu geben |
 | RR-03 | Der letzte Admin kann sich die Rolle *Admin* nicht entziehen und sein Konto nicht löschen |
-| RR-04 | Niemand sieht Passwörter. Der Admin kann nur ein neues Einmalpasswort ausstellen; wie es zum Mitglied kommt, klären K-16 und das [Sicherheitskonzept](https://github.com/konstantinniedermann/tco-app/issues/6) |
+| RR-04 | Einmal-Codes sind nur als Hash gespeichert und nach der Ausgabe für niemanden abrufbar, auch nicht für den Admin. Er kann einen neuen Code für einen Brief ausstellen und alle Sitzungen eines Kontos beenden; einen Code per E-Mail holt sich das Mitglied selbst (A-LOGIN-10, [#29](https://github.com/konstantinniedermann/tco-app/issues/29)) |
 | RR-05 | Für die Rolle *Mitglied* gibt es kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM und bei der Wahl des Doppelpartners (nur Mitglieder, die für die Kategorie passen und noch frei sind) |
 | RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist |
 | RR-07 | Die Admin-Oberfläche sieht nur, wer mindestens eine Rolle über *Mitglied* hinaus hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03) |
@@ -43,10 +43,10 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 |------------------|:----------:|:--------:|:-------------------:|:----------------------:|:-----:|
 | **Mitglieder-Login** | | | | | |
 | Datenschutzerklärung, Login-Seite (DS-09) | L | L | L | L | L |
-| Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Passwort, Benachrichtigungen (FR-02) | – | S eigene | S eigene | S eigene | S eigene |
+| Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Benachrichtigungen (FR-02) | – | S eigene | S eigene | S eigene | S eigene |
 | Eigener Name, Adresse, Geschlecht, Jahrgang (Adresse ändern: K-19) | – | L eigene | L eigene | L eigene | S |
 | Mitglieder anlegen, bearbeiten, löschen, exportieren (DS-07) | – | – | – | – | S |
-| Konto sperren, neues Einmalpasswort | – | – | – | – | S |
+| Konto sperren, neuer Code für einen Brief, Sitzungen beenden | – | – | – | – | S |
 | Rollen vergeben | – | – | – | – | S |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S |
 | E-Mail und Telefon anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L alle (K-42) | L alle (K-42) | S |
@@ -79,6 +79,6 @@ Neue Rollen und Rechte kommen erst in diese Matrix und, wo sie Personendaten zei
 
 ## Offene Fragen an den Verein
 
-K-08 (Junioren), K-16 (neues Passwort), K-18 (wer übernimmt welche Rolle) — alle in den
+K-08 (Junioren), K-16 (Briefversand, neuer Code), K-18 (wer übernimmt welche Rolle) — alle in den
 [Abklärungen](abklaerungen.md). K-42 (Kontaktdaten für die Verantwortlichen) ist entschieden, siehe
 [Beantwortet](abklaerungen.md#beantwortet).

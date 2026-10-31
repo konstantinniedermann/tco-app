@@ -52,7 +52,7 @@ classDiagram
 | Objekt | Attribute | P |
 |--------|-----------|---|
 | **Mitglied** | Vorname, Nachname, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang (K-40), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum | alle ausser Status |
-| **Konto** | Benutzername, Passwort (nur als Hash), Einmalpasswort aktiv ja/nein, Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein | alle |
+| **Konto** | Einmal-Code (nur als Hash, mit Ablauf und Zahl der Fehlversuche), Sitzungsversion, Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein | alle |
 | **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](rollen-und-rechte.md) fest | — |
 
 ### Clubmeisterschaft
@@ -80,8 +80,8 @@ classDiagram
 
 | ID | Regel | Anforderung |
 |----|-------|-------------|
-| FR-01 | Ein Mitglied hat genau ein Konto. Der Admin legt beides zusammen an; das Konto startet mit Einmalpasswort | A-MITGLIED-01, A-LOGIN-01 |
-| FR-02 | Beim ersten Login ersetzt das Mitglied das Einmalpasswort und ergänzt fehlende Daten (u. a. Lizenznummer, Klassierung), bevor es etwas anderes tun kann | A-LOGIN-02, A-LOGIN-03 |
+| FR-01 | Ein Mitglied hat genau ein Konto. Der Admin legt beides zusammen an; das Konto startet mit einem Einmal-Code für den Brief | A-MITGLIED-01, A-LOGIN-01 |
+| FR-02 | Beim ersten Login ergänzt das Mitglied fehlende Daten (u. a. Lizenznummer, Klassierung), bevor es etwas anderes tun kann | A-LOGIN-03 |
 | FR-03 | Ein Konto hat mindestens die Rolle *Mitglied*; der Admin vergibt weitere | A-ROLLE-01 |
 | FR-04 | Austritt: Konto sofort gesperrt. Nach 3 Monaten wird das Konto gelöscht und das Mitglied auf Vor- und Nachname reduziert (Status *gelöscht*), damit vergangene Resultate lesbar bleiben | [Datenschutz](datenschutz.md#löschen), Annahme K-38 |
 | FR-05 | Anmelden geht nur, solange das Turnier den Status *Anmeldung offen* hat (bis Anmeldeschluss) | A-ANMELDUNG-07 |
@@ -103,6 +103,7 @@ classDiagram
 | FR-21 | Ein Antrag gehört zur nächsten Lizenzrunde, deren Stichtag noch nicht vorbei ist. Storno entspricht der Sistierung bei Swiss Tennis (Annahme K-34) | A-LIZENZ-03 |
 | FR-22 | Der Export einer Lizenzrunde setzt alle ihre beantragten Anträge auf *exportiert*; der Lizenzverantwortliche hakt sie nach dem Eintragen bei Swiss Tennis als *erledigt* ab | A-LIZENZ-04 |
 | FR-23 | Exporte an Swiss Tennis enthalten nur die Felder, die Swiss Tennis braucht (vor allem Lizenznummern) | A-ADVANTAGE-01, A-ADVANTAGE-04, A-LIZENZ-04, DS-04 |
+| FR-24 | Ein Einmal-Code gilt nur einmal. Danach bleibt das Gerät eingeloggt, bis die Sitzung ein Jahr nicht genutzt wurde. Erhöht der Admin die Sitzungsversion, enden alle Sitzungen des Kontos | A-LOGIN-08, A-LOGIN-09 |
 
 ## Lebenszyklen
 
