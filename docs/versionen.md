@@ -49,3 +49,7 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   Kosten), K-44 (Code der Website) und K-45 (Export aus Fairgate); erste Antworten zu K-15, K-16, K-25, K-31, K-42
   in Anforderungen, Datenschutz, Fachmodell und Glossar übernommen. *Fundament* neu bis
   26.11.2026.
+- Login ohne Passwort (#29): ein Brief mit QR-Code und Einmal-Code, kein Passwortwechsel,
+  angemeldet bleiben bis ein Jahr ohne Nutzung, neuer Code per E-Mail. Nachgeführt in
+  Anforderungen (A-LOGIN-01/02/08, neu 09/10), Glossar, Fachmodell (FR-24), Rollen und
+  Rechte, Roadmap, Abklärungen, Datenschutzkonzept und Datenschutzerklärung.
