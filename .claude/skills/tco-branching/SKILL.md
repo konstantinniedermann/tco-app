@@ -31,6 +31,9 @@ git -C $M worktree add .claude/worktrees/issue-NNN -b <typ>/issue-NNN origin/dev
 gh issue edit NNN -R konstantinniedermann/tco-app --add-label in-arbeit
 ```
 
+Shell-Variablen wie `M` überleben zwischen zwei Bash-Aufrufen nicht: jeden Block als einen
+Aufruf ausführen (er setzt `M` selbst), einzelne Befehle mit ausgeschriebenem Pfad.
+
 Bei mehreren Issues in einem Branch (`issue-1-2`) das Label für jedes Issue setzen.
 
 `<typ>` folgt dem Issue-Präfix (`feat`, `fix`, `docs`, `chore`). Mehrere Issues in einem
@@ -52,6 +55,7 @@ Dann prüfen, ob der Hauptordner frei ist (das Label `in-arbeit` bleibt auch nac
 nach `dev` bis zum Schliessen des Issues):
 
 ```bash
+M=/Users/KN/CAS/projekte/tco-app
 git -C $M status --short                          # muss leer sein
 git -C $M rev-parse -q --verify MERGE_HEAD        # muss leer sein
 git -C $M pull --ff-only origin dev
@@ -92,6 +96,7 @@ Merge nicht an ihn delegieren.
 **6 — Realign statt Reset:** `main` enthält jetzt einen Merge-Commit, den `dev` nicht hat.
 
 ```bash
+M=/Users/KN/CAS/projekte/tco-app
 git -C $M fetch origin
 git -C $M merge --no-edit origin/main && git -C $M push origin dev
 ```
@@ -102,11 +107,11 @@ git -C $M merge --no-edit origin/main && git -C $M push origin dev
   (`Blocked by` im Body), dort `blocked` entfernen, wenn kein weiterer Blocker bleibt.
 - Label entfernen (bei `issue-1-2` für jedes Issue): `gh issue edit NNN -R konstantinniedermann/tco-app --remove-label in-arbeit`.
 - Worktree verlassen (`ExitWorktree` mit `keep`), dann
-  `git -C $M worktree remove .claude/worktrees/issue-NNN` — nur, wenn das Lagebild den
+  `git -C /Users/KN/CAS/projekte/tco-app worktree remove .claude/worktrees/issue-NNN` — nur, wenn das Lagebild den
   Worktree nicht als belegt zeigt (der Guard verweigert es sonst ohnehin); dann stehen
   lassen und im Bericht nennen.
-- Branch löschen: `git -C $M branch -d <typ>/issue-NNN` und
-  `git -C $M push origin --delete <typ>/issue-NNN`.
+- Branch löschen: `git -C /Users/KN/CAS/projekte/tco-app branch -d <typ>/issue-NNN` und
+  `git -C /Users/KN/CAS/projekte/tco-app push origin --delete <typ>/issue-NNN`.
 
 ## Session-Ende
 
