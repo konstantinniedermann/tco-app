@@ -14,7 +14,9 @@ on:
 
 concurrency:
   group: check-${{ github.ref }}
-  cancel-in-progress: true
+  # Nur PR-Läufe werden abgebrochen: Ein Push-Lauf auf dev/main darf nicht von einem
+  # späteren Doku-Push verdrängt werden (dessen Diff sähe den Code des ersten nicht).
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -24,10 +26,16 @@ jobs:
     name: Doku (make docs)
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # Nur für die Test-ID-Prüfung (Node-Bordmittel); kein npm ci, kein Cache.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
       - run: make docs
 
   # Entscheidet, ob die Code-Jobs laufen. Fail closed: Im Zweifel (manueller Lauf,
@@ -105,6 +113,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci --ignore-scripts
+      - run: npm exec --no -- svelte-kit sync
       - run: npm run lint
       - run: npm run check:svelte
       - run: npm run pruefungen
@@ -145,6 +154,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci --ignore-scripts
+      - run: npm exec --no -- svelte-kit sync
       - run: npm run e2e:browser
       - run: npm run e2e
       - name: Ergebnisse und Screenshots sichern

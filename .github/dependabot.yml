@@ -40,6 +40,10 @@ updates:
       - 'chore'
       - 'infra'
       - 'P2'
+    ignore:
+      # Node-Hauptversion steuert `engines`/.nvmrc bewusst von Hand.
+      - dependency-name: 'node'
+        update-types: ['version-update:semver-major']
     groups:
       minor-und-patch:
         update-types:

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Lokaler pre-commit-Hook (aktivieren: make hooks).
 # Feature-Branches laufen erst beim PR durch den CI-Secret-Scan, daher schon hier.
-# Reine Doku-Commits: Secret-Scan + Doku-Check. Sobald Code dabei ist: make check-schnell.
+# Reine Doku-Commits: Secret-Scan + make docs (Doku-Check, Test-IDs). Sobald Code dabei ist: make check-schnell.
 set -euo pipefail
 
 if ! command -v gitleaks >/dev/null 2>&1; then
@@ -12,7 +12,7 @@ gitleaks git --pre-commit --staged --no-banner --redact --exit-code 1
 
 # Exit 0 = nur Doku; jeder andere Exit (Code oder Fehler) zählt als Code.
 if git diff --cached --name-only --no-renames | node scripts/pruefungen/nur-doku.ts; then
-  bash scripts/check-docs.sh
+  make docs
 else
   make check-schnell
 fi
