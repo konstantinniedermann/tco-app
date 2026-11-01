@@ -95,7 +95,7 @@ ohne Umbau; Datenbank und Jobs ohne zusätzlichen Dienst.
 KI-Assistenten brauchen die aktuelle Doku, sonst schreiben sie Code der Vorversion. Die
 Bauregel verzichtet auf Komfort, den SvelteKit eigentlich bietet. Die Hülle läuft später
 unter eigener Adresse (`capacitor://localhost` auf iOS, `https://localhost` auf Android, V) — Folgen für Cookies und CORS klärt
-das Sicherheitskonzept (#6).
+der Entscheid zur Store-App ([Sicherheitskonzept](../sicherheitskonzept.md#später)).
 
 **Kosten:** keine; alle Bausteine sind Open Source. Hosting → [ADR-003](adr-003-hosting-infomaniak-vps.md).
 
