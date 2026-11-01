@@ -114,6 +114,18 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-11-01 — Für den Aufbau von Server und Auslieferung gibt es kein Issue
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** `docs/ci-cd-und-release.md` (Abschnitt *Umgebungen*, „Wer baut die Auslieferung“); DoD von #15.
+
+**Beobachtung:** #15 baut nur die CI-Prüfungen. Server, Test- und Live-Umgebung, Auslieferungs-Skript, Statusabfrage, Mindestversion und Tag-Job hat kein Issue; sie fallen zwischen #15 und #29 durch.
+
+**Ursprung:** Review von #12 (cas-reviewer).
+
+**Einschätzung:** Aufwand über eine Session, braucht Antworten zu K-04 und K-10 — Kandidat für ein Issue im Milestone *Mitglieder-Login*, sobald die Antworten da sind (nur mit Zustimmung des Projektleiters).
+
 ### 2026-10-31 — Fragen-Tabelle spricht von «Anmelden», das Glossar verlangt «Login»
 
 **Thema:** Verein
