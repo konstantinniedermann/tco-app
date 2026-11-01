@@ -17,3 +17,6 @@ playwright-report/
 intern/
 .githooks/
 .github/
+
+# Von drizzle-kit erzeugt
+drizzle/meta/

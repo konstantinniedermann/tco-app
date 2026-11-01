@@ -11,6 +11,9 @@
 		"build:spa": "MYTCO_SPA=1 vite build",
 		"check:svelte": "svelte-kit sync && svelte-check --fail-on-warnings",
 		"test:einheit": "vitest run --project einheit",
+		"test:db": "vitest run --project datenbank",
+		"db:migrate": "node scripts/migrate.ts",
+		"db:generate": "drizzle-kit generate",
 		"test": "vitest run --coverage",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write ."

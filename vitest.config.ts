@@ -19,6 +19,15 @@ export default mergeConfig(
 						include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
 						exclude: ['src/**/*.db.test.ts']
 					}
+				},
+				{
+					extends: true,
+					test: {
+						name: 'datenbank',
+						include: ['src/**/*.db.test.ts'],
+						globalSetup: ['tests/setup/datenbank-global.ts'],
+						setupFiles: ['tests/setup/datenbank-worker.ts']
+					}
 				}
 			]
 		}
