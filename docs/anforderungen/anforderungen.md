@@ -54,6 +54,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-MITGLIED-03 | Der Admin löscht Mitgliederkonten | PDF 4a | Mitglieder-Login\* | geplant |
 | A-MITGLIED-04 | Selbstregistrierung über die Website tcolten.ch, damit der Briefversand entfallen kann (mit der zuständigen Person) | PDF 4a | später\* | später |
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
+| A-MITGLIED-06 | Der Admin sieht im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Admin, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | geplant |
 
 ### ROLLE — Benutzerrollen
 
@@ -204,7 +205,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |
 | N-DATENSCHUTZ-01 | Die Bearbeitung der Mitgliederdaten entspricht dem Schweizer Datenschutzgesetz (nDSG) | PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
 | N-DATENSCHUTZ-02 | Kontaktdaten anderer Mitglieder sind nur sichtbar, soweit der Verein es festlegt: Gegner und Doppelpartner bis zum Ende der CM (K-31), CM- und Lizenzverantwortliche von allen (K-42) | PDF 5d, PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
-| N-SICHERHEIT-01 | Weitere Sicherheitsmassnahmen werden mit den zuständigen Personen festgelegt | PDF 2 | Fundament (Sicherheitskonzept, #6) | geplant |
+| N-SICHERHEIT-01 | Weitere Sicherheitsmassnahmen werden mit den zuständigen Personen festgelegt | PDF 2 | Fundament ([Sicherheitskonzept](../sicherheitskonzept.md), #6) | geplant |
 | N-BETRIEB-01 | Verfügbarkeit: MyTCO ist besonders während Anmeldephase, Gruppenspielen und Finalwochenende erreichbar; kein fester Zielwert, ein kurzer Ausfall wird in Kauf genommen (K-15) | PL | Fundament (Betrieb, #10) | geplant |
 | N-BARRIEREFREI-01 | MyTCO ist für Mitglieder jeden Alters bedienbar; Zielniveau WCAG 2.1 AA\* | PL | durchgehend | geplant |
 | N-KOSTEN-01 | Laufende Kosten im niedrigen dreistelligen Bereich pro Jahr | Ziel | Fundament (Kosten, #9) | geplant |

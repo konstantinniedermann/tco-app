@@ -25,6 +25,7 @@ Issue im Milestone *Fundament*.
 | [Rollen und Rechte](rollen-und-rechte.md) | Rollen bis zur Etappe *Lizenzanträge*, Grundsätze `RR-NN` und Matrix, wer was sehen und ändern darf |
 | [Datenschutzerklärung (Entwurf)](datenschutzerklaerung.md) | Text für die Mitglieder in der App und in den Login-Briefen |
 | [CI/CD und Release](ci-cd-und-release.md) | Test- und Live-Umgebung, Ablauf bis live, Prüfungen in der CI, Versionen, alte App-Versionen, Actions-Minuten |
+| [Sicherheitskonzept](sicherheitskonzept.md) | Bedrohungen und Massnahmen, Login mit Einmal-Code, Vorgaben `SI-NN`, Restrisiken |
 | [Testkonzept](testkonzept.md) | Testebenen und Werkzeuge, Abdeckung, Zuordnung Anforderung → Test, Testdaten, Checkliste vor dem Release |
 
 ## Arbeitsweise
@@ -38,5 +39,4 @@ Issue im Milestone *Fundament*.
 
 ## Geplant (Milestone *Fundament*)
 
-Sicherheitskonzept ·
 Kosten · Betrieb und Übergabe · arc42 · UI-Leitbild

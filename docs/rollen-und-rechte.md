@@ -32,6 +32,7 @@ Wer diese Rollen im Verein übernimmt, klärt K-18.
 | RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist |
 | RR-07 | Die Admin-Oberfläche sieht nur, wer mindestens eine Rolle über *Mitglied* hinaus hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03) |
 | RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) |
+| RR-09 | Die Admin-Oberfläche verlangt höchstens einmal pro 24 Stunden einen frischen Code per E-Mail ([SI-08](sicherheitskonzept.md#vorgaben), **Vorschlag K-12**) |
 
 ## Matrix
 
@@ -48,6 +49,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Mitglieder anlegen, bearbeiten, löschen, exportieren (DS-07) | – | – | – | – | S |
 | Konto sperren, neuer Code für einen Brief, Sitzungen beenden | – | – | – | – | S |
 | Rollen vergeben | – | – | – | – | S |
+| Änderungsverlauf (FR-26) | – | – | – | – | L |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S |
 | E-Mail und Telefon anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L alle (K-42) | L alle (K-42) | S |
 | **CM-Anmeldung** | | | | | |
