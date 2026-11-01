@@ -10,6 +10,8 @@
 		"build": "vite build",
 		"build:spa": "MYTCO_SPA=1 vite build",
 		"check:svelte": "svelte-kit sync && svelte-check --fail-on-warnings",
+		"test:einheit": "vitest run --project einheit",
+		"test": "vitest run --coverage",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write ."
 	},
