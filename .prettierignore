@@ -15,8 +15,6 @@ playwright-report/
 .superpowers/
 .claude/
 intern/
-.githooks/
-.github/
 
 # Von drizzle-kit erzeugt
 drizzle/meta/

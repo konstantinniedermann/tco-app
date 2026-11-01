@@ -1,15 +1,63 @@
 version: 2
 updates:
-  # Hält die SHA-gepinnten GitHub Actions aktuell. Weitere Ökosysteme (App, Backend)
-  # kommen mit dem Code-Gerüst dazu.
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    target-branch: "dev"
+  # Hält die SHA-gepinnten GitHub Actions aktuell.
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    target-branch: 'dev'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
     commit-message:
-      prefix: "chore"
+      prefix: 'chore'
     labels:
-      - "chore"
-      - "infra"
-      - "P2"
+      - 'chore'
+      - 'infra'
+      - 'P2'
+  # Abhängigkeiten der App, des Docker-Images und der Compose-Datei.
+  - package-ecosystem: 'npm'
+    directory: '/'
+    target-branch: 'dev'
+    schedule:
+      interval: 'weekly'
+    commit-message:
+      prefix: 'chore'
+    labels:
+      - 'chore'
+      - 'infra'
+      - 'P2'
+    groups:
+      minor-und-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+  - package-ecosystem: 'docker'
+    directory: '/'
+    target-branch: 'dev'
+    schedule:
+      interval: 'weekly'
+    commit-message:
+      prefix: 'chore'
+    labels:
+      - 'chore'
+      - 'infra'
+      - 'P2'
+    groups:
+      minor-und-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+  - package-ecosystem: 'docker-compose'
+    directory: '/'
+    target-branch: 'dev'
+    schedule:
+      interval: 'weekly'
+    commit-message:
+      prefix: 'chore'
+    labels:
+      - 'chore'
+      - 'infra'
+      - 'P2'
+    groups:
+      minor-und-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
