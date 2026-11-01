@@ -10,4 +10,5 @@ Welche Pfade bei welcher Aufgabe geladen werden. Die Tabelle wächst mit dem Cod
 | Architektur-Dokumente | `docs/`, insbesondere `docs/adr/`, `docs/anforderungen/`, `docs/glossar.md` | `.github/` |
 | Neue Funktion planen, Datenschutz | `docs/fachmodell.md`, `docs/rollen-und-rechte.md`, `docs/datenschutz.md`, `docs/datenschutzerklaerung.md`, `docs/anforderungen/anforderungen.md`, `docs/abklaerungen.md` | `docs/recherche/` |
 | Arbeitsweise, Issues | `docs/issue-konventionen.md`, `docs/abklaerungen.md`, `.github/ISSUE_TEMPLATE/`, `CLAUDE.md`, `.claude/skills/tco-branching/` | `docs/recherche/` |
+| Tests planen und schreiben | `docs/testkonzept.md`, `docs/fachmodell.md`, `docs/rollen-und-rechte.md`, `docs/anforderungen/anforderungen.md`, `docs/datenschutz.md` | `docs/recherche/` |
 | CI und Prüfungen | `Makefile`, `scripts/`, `.githooks/`, `.github/workflows/`, `.github/dependabot.yml` | `docs/recherche/` |
