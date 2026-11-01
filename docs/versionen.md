@@ -5,6 +5,18 @@
 Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Release:
 [CI/CD und Release](ci-cd-und-release.md#versionen).
 
+## 0.1.0 — Code-Gerüst, nicht ausgeliefert
+
+- SvelteKit 3 mit TypeScript 6, Runes und PostgreSQL (Drizzle, leere Start-Migration);
+  Server-Code nur in `+server.ts` und `src/lib/server/`, Bauregel per Prüfskript.
+- Tests: Vitest (Einheit und Datenbank, Abdeckung mindestens 90 % auf `src/lib/server`),
+  Playwright mit axe; Prüfungen für Test-IDs, Testdaten und übersprungene Tests.
+- `make check` und Git-Hooks (`make check-schnell` vor dem Commit, `make check` vor dem Push).
+- CI: Doku-Check immer, Code-Jobs nur bei Codeänderungen (Prüfen, Ende-zu-Ende, Image,
+  Malware-Prüfung); Dependabot für npm, Docker und Actions.
+- Dockerfile und `docker-compose.yml` für die lokale Datenbank; Svelte-MCP-Server in `.mcp.json`.
+- CSP nur mit `'self'` (eine Ausnahme für den Screenreader-Hinweis von SvelteKit).
+
 ## Unveröffentlicht
 
 - Repo aufgesetzt: Arbeitsweise, Issue-Konventionen, Roadmap, Doku-Check und Secret-Scan

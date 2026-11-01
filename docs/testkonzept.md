@@ -63,9 +63,12 @@ Die CI prüft, dass jede dieser IDs mindestens einen Test hat:
   A-LOGIN-01, Brief per Post), zählt ihr Punkt in der
   [Checkliste vor dem Release](#checkliste-vor-dem-release) als Test.
 
-Fachregeln und Grundsätze von Etappen, die noch nicht gebaut sind, nimmt die Prüfung aus;
-wie, legt das Code-Gerüst ([#15](https://github.com/konstantinniedermann/tco-app/issues/15))
-fest. Nicht-funktionale Anforderungen (`N-…`), Datenschutz-Vorgaben (`DS-NN`) und
+Als Test zählt nur eine Datei, die Vitest oder Playwright auch ausführt; eine Testdatei
+ausserhalb ihrer Muster (`scripts/pruefungen/testmuster.ts`) ist ein Fehler.
+
+Fachregeln und Grundsätze von Etappen, die noch nicht gebaut sind, nimmt die Prüfung aus.
+Massgebend ist die Spalte *Status*: Die CI verlangt einen Test nur für `umgesetzt`.
+Nicht-funktionale Anforderungen (`N-…`), Datenschutz-Vorgaben (`DS-NN`) und
 Sicherheits-Vorgaben (`SI-NN`, [Sicherheitskonzept](sicherheitskonzept.md)) erhalten
 Tests, wo sie prüfbar sind (z. B. DS-06: keine Einmal-Codes im Log), ohne Pflicht.
 
@@ -109,6 +112,5 @@ Falls der Verein eine Testgruppe stellt (K-20), prüft sie vor dem ersten Releas
 
 ## Werkzeuge
 
-Vitest (mit Abdeckungsmessung), Playwright und axe für Playwright. Sie werden mit dem
-Code-Gerüst (#15) zur Freigabe vorgelegt und installiert; vorher kommt keine Abhängigkeit
-ins Repo.
+Vitest (mit Abdeckungsmessung), Playwright und axe für Playwright. Sie werden
+installiert mit dem Code-Gerüst; vorher kommt keine Abhängigkeit ins Repo.

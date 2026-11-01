@@ -89,7 +89,9 @@ prüft das, statt sich darauf zu verlassen:
 ## Konsequenzen
 
 **Leichter:** Eine Codebasis, eine Sprache, ein Testwerkzeug (Vitest, Playwright); Store-App
-ohne Umbau; Datenbank und Jobs ohne zusätzlichen Dienst.
+ohne Umbau; Datenbank und Jobs ohne zusätzlichen Dienst. Die Oberfläche läuft ohne
+serverseitiges Rendern (`ssr = false`), damit Node- und SPA-Build gleich laufen;
+Ladefunktionen laufen nur im Browser.
 
 **Schwerer:** Weniger Svelte-Kenner und weniger fertige Admin-Bausteine als bei React (S).
 KI-Assistenten brauchen die aktuelle Doku, sonst schreiben sie Code der Vorversion. Die

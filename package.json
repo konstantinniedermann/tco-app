@@ -1,0 +1,53 @@
+{
+	"name": "mytco",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"engines": {
+		"node": ">=26 <27"
+	},
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"build:spa": "MYTCO_SPA=1 vite build",
+		"check:svelte": "svelte-kit sync && svelte-check --fail-on-warnings",
+		"test:einheit": "vitest run --project einheit",
+		"test:db": "vitest run --project datenbank",
+		"db:migrate": "node scripts/migrate.ts",
+		"db:generate": "drizzle-kit generate",
+		"test": "vitest run --coverage",
+		"e2e": "playwright test",
+		"e2e:browser": "playwright install --with-deps chromium webkit",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write .",
+		"pruefungen": "node scripts/pruefungen/bauregel.ts && node scripts/pruefungen/test-ids.ts && node scripts/pruefungen/testdaten.ts && node scripts/pruefungen/skip.ts"
+	},
+	"dependencies": {
+		"@sveltejs/adapter-node": "^6.0.1",
+		"@sveltejs/kit": "^3.1.1",
+		"drizzle-orm": "^0.45.4",
+		"pg": "^8.23.1",
+		"svelte": "^5.57.3"
+	},
+	"devDependencies": {
+		"@axe-core/playwright": "^4.14.0",
+		"@eslint/js": "^10.0.1",
+		"@playwright/test": "^1.64.1",
+		"@sveltejs/adapter-static": "^4.0.1",
+		"@sveltejs/vite-plugin-svelte": "^7.3.1",
+		"@types/pg": "^8.23.1",
+		"@vitest/coverage-v8": "^5.0.5",
+		"drizzle-kit": "^0.31.11",
+		"eslint": "^10.14.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-svelte": "^3.23.1",
+		"globals": "^17.14.0",
+		"prettier": "^3.9.10",
+		"prettier-plugin-svelte": "^4.1.1",
+		"svelte-check": "^4.7.7",
+		"typescript": "6.0.3",
+		"typescript-eslint": "^8.72.1",
+		"vite": "^8.3.5",
+		"vitest": "^5.0.5"
+	}
+}

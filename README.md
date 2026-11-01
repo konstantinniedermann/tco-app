@@ -10,8 +10,8 @@ Mitgliederverwaltung Fairgate oder die Website tcolten.ch.
 
 ## Stand
 
-Phase **Fundament**: Architektur und Grundlagen werden dokumentiert, bevor Code
-entsteht. Termine und Umfang der Etappen → [`docs/roadmap.md`](docs/roadmap.md).
+Phase **Fundament**: Architektur und Grundlagen werden dokumentiert; das Code-Gerüst
+(Version 0.1.0) steht, Funktionen folgen mit den Etappen. Termine und Umfang der Etappen → [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Einstieg
 
@@ -23,6 +23,22 @@ entsteht. Termine und Umfang der Etappen → [`docs/roadmap.md`](docs/roadmap.md
 | Architektur-Entscheidungen | [`docs/adr/adr-index.md`](docs/adr/adr-index.md) |
 | Wie Issues angelegt werden | [`docs/issue-konventionen.md`](docs/issue-konventionen.md) |
 | Arbeitsregeln für Claude Code | [`CLAUDE.md`](CLAUDE.md) |
+
+## Lokal starten
+
+Voraussetzungen: Node 26 (genau die Hauptversion aus `.nvmrc`; Make und Hooks brechen sonst ab),
+Docker Desktop, gitleaks.
+
+```bash
+npm ci --ignore-scripts
+npm exec --no -- playwright install chromium webkit
+make hooks   # einmalig: Git-Hooks aktivieren
+make db      # lokale PostgreSQL starten
+make dev     # Entwicklungsserver
+make check   # alle Prüfungen (braucht Docker)
+```
+
+Alle weiteren Befehle: `make help`.
 
 ## Arbeitsweise
 

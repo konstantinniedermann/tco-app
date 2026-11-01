@@ -26,7 +26,7 @@ Beide Adressen richtet der Website-Betreuer ein (K-10). Auf der Test-Umgebung l�
 [Checkliste vor dem Release](testkonzept.md#checkliste-vor-dem-release). Echte Daten kommen
 dort nie hin (DS-08).
 
-**Wer baut die Auslieferung:** Das Code-Gerüst (#15) baut die CI-Prüfungen. Server,
+**Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut. Server,
 Umgebungen und Auslieferung baut [#32](https://github.com/konstantinniedermann/tco-app/issues/32),
 sobald Konten und Adresse geklärt sind (K-04, K-10), spätestens vor dem Release
 *Mitglieder-Login*.
@@ -59,8 +59,7 @@ flowchart LR
 - **Fehlerbehebungen** nehmen denselben Weg über `dev`; ein eigener Hotfix-Weg lohnt bei
   diesem Umfang nicht.
 - Released wird, wenn ein Stand es wert ist, nicht nach jedem Issue: Jedes Release braucht
-  die Checkliste. Bis zum Code-Gerüst gibt es nur Doku; diese Releases erhalten keine
-  Versionsnummer.
+  die Checkliste. Die Doku-Stände vor dem Code-Gerüst haben keine Versionsnummer.
 
 ## Auslieferung
 
@@ -125,28 +124,32 @@ Nichts davon steht im Repo. Wo die Geheimnisse für eine Nachfolge dokumentiert 
 
 ## Prüfungen in der CI
 
-`make check` führt lokal dieselben Prüfungen aus wie die CI; nur der Secret-Scan läuft lokal
-über den Hook bzw. `make secrets`. Die CI läuft bei PRs und auf `dev` und `main`, nicht auf
-Issue-Branches (dort decken die Git-Hooks ab).
+`make check` führt lokal dieselben Prüfungen aus wie die CI, ausser der Malware-Prüfung (nur
+CI); der Secret-Scan läuft lokal über den Hook bzw. `make secrets`. Die CI läuft bei PRs und
+auf `dev` und `main`, nicht auf Issue-Branches (dort decken die Git-Hooks ab). Änderungen nur
+an der Doku führen trotzdem `make docs` aus, inklusive Test-ID-Prüfung. Ob eine Änderung
+nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 
 | Prüfung | Quelle | Stand |
 |---------|--------|-------|
 | Doku-Check (Links, Konfliktmarker, Mermaid) | — | vorhanden |
-| Secret-Scan über die ganze Historie (gitleaks) | — | vorhanden |
-| ESLint mit Svelte-Regeln, Prettier | ADR-002, Arbeitsregeln | mit #15 |
-| `svelte-check`, Runes-Modus fest eingeschaltet | ADR-002 | mit #15 |
-| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions | ADR-002 | mit #15 |
-| Build als reine Web-App (für die spätere Store-App) | ADR-002 | mit #15 |
-| Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | mit #15 |
-| Jede `FR-`, `RR-` und umgesetzte `A-`-ID hat einen Test | Testkonzept | mit #15 |
-| Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | mit #15 |
-| Playwright Ende-zu-Ende in drei Umgebungen mit axe; Screenshots 30 Tage, im PR verlinkt | Testkonzept | mit #15 |
-| Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | mit #15 |
-| Docker-Image baut | ADR-003 | mit #15 |
+| Secret-Scan über die ganze Historie (gitleaks) | — | Hook und CI |
+| ESLint mit Svelte-Regeln, Prettier | ADR-002, Arbeitsregeln | vorhanden |
+| `svelte-check`, Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
+| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions | ADR-002 | vorhanden |
+| Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
+| Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
+| Jede `FR-`, `RR-` und umgesetzte `A-`-ID hat einen Test | Testkonzept | vorhanden |
+| Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
+| Playwright Ende-zu-Ende in drei Umgebungen mit axe; Screenshots als Artefakt des Laufs, 30 Tage | Testkonzept | vorhanden |
+| Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
+| Docker-Image baut | ADR-003 | vorhanden |
 
 ## Abhängigkeiten
 
-- **Neue Pakete** nur nach Freigabe durch den Projektleiter (Hook `dep-guard`).
+- **Neue Pakete** nur nach Freigabe durch den Projektleiter (Hook `dep-guard`). Er prüft
+  auch Runner-Befehle (`npx`, `npm exec`/`create`/`init`, `pnpm dlx`, `yarn dlx`, `bunx`):
+  erlaubt sind nur Pakete aus `package.json` oder bereits installierte.
 - **Installieren** mit `npm ci --ignore-scripts`: genau die Versionen aus der Lock-Datei,
   ohne Installationsskripte der Pakete. Was das eigene Projekt beim Installieren braucht
   (z. B. `svelte-kit sync`), läuft als eigener Schritt.
@@ -183,10 +186,12 @@ privaten Repos** (B: Messung in Munica, Stand 10/2026). Munica allein braucht fe
 Budget erschöpft, startet GitHub keine Jobs mehr, also auch keine Auslieferung.
 
 - CI nur bei PRs und auf `dev`/`main`; Issue-Branches prüfen lokal.
-- Läufe derselben Branch brechen den vorherigen ab.
+- Nur PR-Läufe brechen den vorherigen ab. Jeder Push auf `dev`/`main` läuft für sich, auch
+  wenn weitere folgen; sonst könnte ein späterer Push den wartenden Lauf eines Code-Pushs
+  verdrängen und ihn ungetestet lassen.
 - Änderungen nur an der Doku lösen weder Ende-zu-Ende-Tests noch eine Auslieferung aus.
 - Grob 8 Minuten pro Merge nach `dev` mit Code (S), bei rund 30 im Monat etwa 250 Minuten
-  (S). Mit #15 wird gemessen; reicht das Kontingent nicht, laufen die Ende-zu-Ende-Tests nur
+  (S). Gemessen wird ab den ersten Läufen; reicht das Kontingent nicht, laufen die Ende-zu-Ende-Tests nur
   beim PR nach `main`.
 - **Notfall ohne Minuten:** Der Projektleiter startet das Auslieferungs-Skript von Hand auf
   dem Server, oder das Budget des Kontos wird erhöht.
