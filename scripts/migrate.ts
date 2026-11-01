@@ -13,8 +13,12 @@ const pool = new pg.Pool({ connectionString: url });
 try {
 	await migrate(drizzle(pool), { migrationsFolder: 'drizzle' });
 	console.log('Migrationen angewendet');
-} catch {
-	console.error('Migration fehlgeschlagen');
+} catch (fehler) {
+	// Code und Meldung des pg-Fehlers (Drizzle verpackt ihn in `cause`); die URL nie ausgeben.
+	const ursache = fehler instanceof Error && fehler.cause instanceof Error ? fehler.cause : fehler;
+	const { code, message } = (ursache ?? {}) as { code?: unknown; message?: unknown };
+	const meldung = String(message ?? '').replaceAll(url, '[DATABASE_URL]');
+	console.error(`Migration fehlgeschlagen: ${String(code ?? 'ohne Code')} ${meldung}`);
 	process.exitCode = 1;
 } finally {
 	await pool.end();
