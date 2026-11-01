@@ -114,6 +114,66 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-11-01 — Test-ID-Prüfung zählt IDs in Kommentaren und übersprungenen Tests
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `scripts/pruefungen/test-ids.ts` (`fehlendeTests`).
+
+**Beobachtung:** Eine ID gilt als abgedeckt, sobald sie irgendwo in einer ausgeführten Testdatei steht, auch in einem Kommentar oder einem Test mit `// skip: Grund`.
+
+**Ursprung:** #15 Abschluss-Review.
+
+**Einschätzung:** Vor der ersten Fachregel mit Status `umgesetzt` beheben ([#29](https://github.com/konstantinniedermann/tco-app/issues/29)), z. B. nur Testnamen zählen.
+
+### 2026-11-01 — adapter-node liefert `/_app/*` vor `handle` aus, ohne HSTS und nosniff
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/hooks.server.ts`, `build/` (adapter-node).
+
+**Beobachtung:** Statische Dateien unter `/_app/*` beantwortet adapter-node, bevor `handle` läuft; sie tragen die Header aus `hooks.server.ts` nicht.
+
+**Ursprung:** #15 Abschluss-Review.
+
+**Einschätzung:** Header im Reverse-Proxy setzen ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)).
+
+### 2026-11-01 — CI: PostgreSQL-Service nur per Tag, Playwright-Browser ohne Cache
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `.github/workflows/check.yml` (Jobs `pruefen`, `e2e`).
+
+**Beobachtung:** Der Service `postgres:18-alpine` ist nur per Tag festgelegt; Dependabot aktualisiert Service-Container in Workflows nicht. Die Playwright-Browser werden in jedem Lauf neu geladen.
+
+**Ursprung:** #15 Abschluss-Review.
+
+**Einschätzung:** Digest pinnen, wenn Dependabot oder ein eigener Schritt ihn nachzieht; Browser-Cache, falls die Actions-Minuten knapp werden.
+
+### 2026-11-01 — E2E nutzt die gemeinsame lokale Datenbank `mytco`
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `playwright.config.ts` (`DATABASE_URL`), `docker-compose.yml`.
+
+**Beobachtung:** Die E2E-Tests laufen gegen die Datenbank `mytco` des gemeinsamen Containers; parallele Läufe aus mehreren Worktrees teilen sie.
+
+**Ursprung:** #15 Abschluss-Review.
+
+**Einschätzung:** Unkritisch, solange E2E nur `select 1` ausführt; eigene Datenbank pro Lauf, sobald E2E Daten schreibt ([#29](https://github.com/konstantinniedermann/tco-app/issues/29)).
+
+### 2026-11-01 — Start des Images und `node scripts/migrate.ts` ohne Rauchtest in der CI
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `Dockerfile`, `.github/workflows/check.yml` (Job `image`).
+
+**Beobachtung:** Die CI baut das Image nur; ob es startet und die Migration darin läuft, prüft kein Schritt.
+
+**Ursprung:** #15 Abschluss-Review.
+
+**Einschätzung:** Rauchtest (Container starten, Migration, `/api/status`) mit Server und Auslieferung ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)).
+
 ### 2026-11-01 — `$app/env/private` passt nicht zur Test-Datenbank pro Lauf
 
 **Thema:** Code-Gerüst

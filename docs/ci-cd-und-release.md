@@ -141,7 +141,7 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede `FR-`, `RR-` und umgesetzte `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
-| Playwright Ende-zu-Ende in drei Umgebungen mit axe; Screenshots 30 Tage, im PR verlinkt | Testkonzept | vorhanden |
+| Playwright Ende-zu-Ende in drei Umgebungen mit axe; Screenshots als Artefakt des Laufs, 30 Tage | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
 | Docker-Image baut | ADR-003 | vorhanden |
 
