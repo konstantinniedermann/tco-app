@@ -127,7 +127,8 @@ Nichts davon steht im Repo. Wo die Geheimnisse für eine Nachfolge dokumentiert 
 `make check` führt lokal dieselben Prüfungen aus wie die CI, ausser der Malware-Prüfung (nur
 CI); der Secret-Scan läuft lokal über den Hook bzw. `make secrets`. Die CI läuft bei PRs und
 auf `dev` und `main`, nicht auf Issue-Branches (dort decken die Git-Hooks ab). Änderungen nur
-an der Doku führen trotzdem `make docs` aus, inklusive Test-ID-Prüfung.
+an der Doku führen trotzdem `make docs` aus, inklusive Test-ID-Prüfung. Ob eine Änderung
+nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 
 | Prüfung | Quelle | Stand |
 |---------|--------|-------|
@@ -185,8 +186,9 @@ privaten Repos** (B: Messung in Munica, Stand 10/2026). Munica allein braucht fe
 Budget erschöpft, startet GitHub keine Jobs mehr, also auch keine Auslieferung.
 
 - CI nur bei PRs und auf `dev`/`main`; Issue-Branches prüfen lokal.
-- Nur PR-Läufe brechen den vorherigen ab; Pushes auf `dev`/`main` nie, sonst könnte ein
-  Doku-Push den Lauf eines früheren Code-Pushs abbrechen und ihn ungetestet lassen.
+- Nur PR-Läufe brechen den vorherigen ab. Jeder Push auf `dev`/`main` läuft für sich, auch
+  wenn weitere folgen; sonst könnte ein späterer Push den wartenden Lauf eines Code-Pushs
+  verdrängen und ihn ungetestet lassen.
 - Änderungen nur an der Doku lösen weder Ende-zu-Ende-Tests noch eine Auslieferung aus.
 - Grob 8 Minuten pro Merge nach `dev` mit Code (S), bei rund 30 im Monat etwa 250 Minuten
   (S). Gemessen wird ab den ersten Läufen; reicht das Kontingent nicht, laufen die Ende-zu-Ende-Tests nur

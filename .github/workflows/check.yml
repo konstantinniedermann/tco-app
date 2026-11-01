@@ -13,9 +13,10 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: check-${{ github.ref }}
-  # Nur PR-Läufe werden abgebrochen: Ein Push-Lauf auf dev/main darf nicht von einem
-  # späteren Doku-Push verdrängt werden (dessen Diff sähe den Code des ersten nicht).
+  # PR-Läufe teilen sich eine Gruppe pro Branch und brechen den vorherigen ab. Jeder
+  # Push-Lauf hat eine eigene Gruppe: Eine Gruppe hält nur einen wartenden Lauf, ein dritter
+  # Push würde den wartenden sonst verdrängen (dessen Code bliebe ungetestet).
+  group: check-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
@@ -56,6 +57,9 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+      # Die Einordnung läuft mit nur-doku.ts aus dem Basis-Commit, nicht aus dem geprüften
+      # Stand: Eine Änderung kann sich so nicht selbst zur Doku erklären. Fehlt die Datei in
+      # der Basis, gilt die Änderung als Code. nur-doku.ts darf daher nichts Lokales importieren.
       - name: Änderung erkennen
         id: erkennen
         env:
@@ -71,8 +75,9 @@ jobs:
           code=true
           if [ -n "$basis" ] && [ "$basis" != "0000000000000000000000000000000000000000" ] \
             && git cat-file -e "${basis}^{commit}" 2>/dev/null; then
-            if git diff --name-only --no-renames "$basis" HEAD > /tmp/geaendert.txt; then
-              if node scripts/pruefungen/nur-doku.ts < /tmp/geaendert.txt; then
+            if git show "${basis}:scripts/pruefungen/nur-doku.ts" > "$RUNNER_TEMP/nur-doku.ts" \
+              && git diff --name-only --no-renames "$basis" HEAD > "$RUNNER_TEMP/geaendert.txt"; then
+              if node "$RUNNER_TEMP/nur-doku.ts" < "$RUNNER_TEMP/geaendert.txt"; then
                 code=false
               fi
             fi
