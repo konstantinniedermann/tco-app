@@ -190,9 +190,11 @@ Budget erschöpft, startet GitHub keine Jobs mehr, also auch keine Auslieferung.
   wenn weitere folgen; sonst könnte ein späterer Push den wartenden Lauf eines Code-Pushs
   verdrängen und ihn ungetestet lassen.
 - Änderungen nur an der Doku lösen weder Ende-zu-Ende-Tests noch eine Auslieferung aus.
-- Grob 8 Minuten pro Merge nach `dev` mit Code (S), bei rund 30 im Monat etwa 250 Minuten
-  (S). Gemessen wird ab den ersten Läufen; reicht das Kontingent nicht, laufen die Ende-zu-Ende-Tests nur
-  beim PR nach `main`.
+- **Gemessen** (erster Lauf auf `dev`, 01.11.2026, B): ein Merge mit Code dauert rund
+  3 Minuten und kostet 11 abgerechnete Minuten. GitHub rundet jeden Job auf ganze Minuten
+  auf, gezählt werden 7 Jobs inklusive Secret-Scan. Ein reiner Doku-Merge kostet 3 Minuten.
+  Bei rund 30 Code-Merges im Monat sind das etwa 330 Minuten (S). Reicht das Kontingent
+  nicht, laufen die Ende-zu-Ende-Tests nur beim PR nach `main`.
 - **Notfall ohne Minuten:** Der Projektleiter startet das Auslieferungs-Skript von Hand auf
   dem Server, oder das Budget des Kontos wird erhöht.
 
