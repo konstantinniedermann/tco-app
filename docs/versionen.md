@@ -2,8 +2,8 @@
 
 # Versionen
 
-Versionshistorie von MyTCO, neueste zuerst. Das Versionsschema wird im CI/CD- und
-Release-Konzept festgelegt (Milestone *Fundament*).
+Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Release:
+[CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
@@ -59,3 +59,8 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   nennt seine ID, die CI prüft Fachregeln, Grundsätze `RR-NN` und umgesetzte Anforderungen
   auf Tests. Nur erfundene Testdaten (`@example.org`), Checkliste auf echten Handys vor jedem
   Release. Neuer Anforderungs-Status `umgesetzt`.
+- CI/CD und Release (`docs/ci-cd-und-release.md`, #12): Test-Umgebung (`test.my.tcolten.ch`,
+  nur erfundene Daten) und Live auf demselben Server; Merge nach `dev` liefert auf Test aus,
+  Merge nach `main` live, mit Sicherung, Statusprüfung und automatischem Rückfall. Liste der
+  CI-Prüfungen für das Code-Gerüst, Versionen ab `1.0.0` mit dem Login-Release, alte
+  App-Versionen laden neu, Actions-Minuten im Blick. K-10 um die Testadresse ergänzt.

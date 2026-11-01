@@ -24,6 +24,7 @@ Issue im Milestone *Fundament*.
 | [Datenschutzkonzept](datenschutz.md) | Was MyTCO mit Personendaten tut, nach nDSG; Vorgaben `DS-NN` für Technik und Hosting; Grundlage für jede neue Funktion |
 | [Rollen und Rechte](rollen-und-rechte.md) | Rollen bis zur Etappe *Lizenzanträge*, Grundsätze `RR-NN` und Matrix, wer was sehen und ändern darf |
 | [Datenschutzerklärung (Entwurf)](datenschutzerklaerung.md) | Text für die Mitglieder in der App und in den Login-Briefen |
+| [CI/CD und Release](ci-cd-und-release.md) | Test- und Live-Umgebung, Ablauf bis live, Prüfungen in der CI, Versionen, alte App-Versionen, Actions-Minuten |
 | [Testkonzept](testkonzept.md) | Testebenen und Werkzeuge, Abdeckung, Zuordnung Anforderung → Test, Testdaten, Checkliste vor dem Release |
 
 ## Arbeitsweise
@@ -38,4 +39,4 @@ Issue im Milestone *Fundament*.
 ## Geplant (Milestone *Fundament*)
 
 Sicherheitskonzept ·
-Kosten · Betrieb und Übergabe · CI/CD und Release · arc42 · UI-Leitbild
+Kosten · Betrieb und Übergabe · arc42 · UI-Leitbild
