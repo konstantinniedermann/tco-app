@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pruefeBauregel } from './bauregel.ts';
+import { betrifftBauregel, pruefeBauregel } from './bauregel.ts';
 
 describe('pruefeBauregel', () => {
 	it('meldet Server-Dateien neben Seiten', () => {
@@ -49,5 +49,17 @@ describe('pruefeBauregel', () => {
 	it('lässt eine saubere Konfiguration durch', () => {
 		expect(pruefeBauregel(new Map([['vite.config.ts', 'sveltekit({})']]))).toEqual([]);
 		expect(pruefeBauregel(new Map([['src/routes/+page.svelte', '<p>hi</p>']]))).toEqual([]);
+	});
+});
+
+describe('betrifftBauregel', () => {
+	it.each(['src/routes/+page.ts', 'vite.config.ts', 'src/lib/a.remote.ts', 'lib/b.remote.js'])(
+		'prüft %s',
+		(pfad) => {
+			expect(betrifftBauregel(pfad)).toBe(true);
+		}
+	);
+	it('lässt andere Dateien aus', () => {
+		expect(betrifftBauregel('src/lib/server/status.ts')).toBe(false);
 	});
 });

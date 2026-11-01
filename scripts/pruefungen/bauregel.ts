@@ -39,9 +39,16 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 	return befunde;
 }
 
-if (import.meta.main) {
-	const pfade = versionierteDateien().filter(
-		(pfad) => pfad.startsWith('src/routes/') || /^(vite|svelte)\.config\.[cm]?[tj]s$/.test(pfad)
+/** Dateien, die die Bauregel betreffen: Routen, Konfiguration und jede `*.remote.*`. */
+export function betrifftBauregel(pfad: string): boolean {
+	return (
+		pfad.startsWith('src/routes/') ||
+		/^(vite|svelte)\.config\.[cm]?[tj]s$/.test(pfad) ||
+		/\.remote\.(ts|js)$/.test(pfad)
 	);
+}
+
+if (import.meta.main) {
+	const pfade = versionierteDateien().filter(betrifftBauregel);
 	meldeErgebnis('bauregel', pruefeBauregel(leseDateien(pfade)));
 }
