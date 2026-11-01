@@ -53,8 +53,8 @@ Release-Konzept festgelegt (Milestone *Fundament*).
   eingeloggt bleiben bis ein Jahr ohne Nutzung, neuer Code per E-Mail. Nachgeführt in
   Anforderungen (A-LOGIN-01/02/08, neu 09–11), Glossar, Fachmodell (FR-24), Rollen und
   Rechte, Roadmap, Abklärungen, Datenschutzkonzept und Datenschutzerklärung.
-- Testkonzept (`docs/testkonzept.md`, #11): Fachlogik und Rechte mit Vitest gegen echte
-  PostgreSQL, mindestens 90 % Abdeckung; Ende-zu-Ende mit Playwright in Safari-Engine,
+- Testkonzept (`docs/testkonzept.md`, #11): Fachlogik mit Vitest ohne Datenbank, Rechte
+  pro Schnittstelle gegen echte PostgreSQL, mindestens 90 % Abdeckung; Ende-zu-Ende mit Playwright in Safari-Engine,
   Chrome und Desktop, mit Barrierefreiheits-Prüfung und Screenshots als Nachweis. Jeder Test
   nennt seine ID, die CI prüft Fachregeln, Grundsätze `RR-NN` und umgesetzte Anforderungen
   auf Tests. Nur erfundene Testdaten (`@example.org`), Checkliste auf echten Handys vor jedem
