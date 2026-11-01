@@ -14,7 +14,7 @@ Blick sehen, **was** ein Issue ist, **wo** es hingehört, **wie dringend** es is
 | **Typ** — was für eine Änderung? | genau 1 | `bug` · `enhancement` · `refactor` · `documentation` · `chore` |
 | **Bereich** — wo im System? | 1 oder mehr | `app` · `admin` · `backend` · `architektur` · `infra` · `security` · `verein` |
 | **Priorität** — wie dringend? | genau 1 | `P0` · `P1` · `P2` |
-| **Status** — Sonderzustand? | 0 oder mehr | `blocked` · `needs-input` · `win` · `verein-feedback` |
+| **Status** — Sonderzustand? | 0 oder mehr | `blocked` · `needs-input` · `win` · `verein-feedback` · `in-arbeit` |
 | **Milestone** — welche Etappe? | genau 1 | siehe [Roadmap](roadmap.md) |
 
 ## Typ (folgt dem Titel-Präfix)
@@ -61,6 +61,7 @@ Sind mehr als etwa ein Drittel der offenen Issues `P1`, ist eine Triage fällig.
 | `needs-input` | Braucht eine Entscheidung des Projektleiters oder des Vereins, die keine KI liefern kann |
 | `win` | Hoher Nutzen bei geringem Aufwand — Kandidat zum Vorziehen |
 | `verein-feedback` | Stammt aus einer Rückmeldung oder Sitzung mit dem Verein |
+| `in-arbeit` | Eine Session arbeitet daran; gesetzt beim Übernehmen, bleibt bis zum Schliessen (auch nach dem Merge nach `dev`). Wer ein Issue unfertig abgibt, entfernt es. |
 
 ## Milestones = Etappen
 
