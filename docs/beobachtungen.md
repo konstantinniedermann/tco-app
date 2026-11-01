@@ -114,6 +114,18 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-11-01 — Label `in-arbeit` fehlt in der Issue-Vorlage, Kleinkram in tco-branching
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** `.github/ISSUE_TEMPLATE/aufgabe.md` (Status-Liste), `.gitattributes` (Kommentar), `.claude/skills/tco-branching/SKILL.md` Schritt 4 und 7.
+
+**Beobachtung:** Die Issue-Vorlage listet die Status-Labels ohne `in-arbeit` (das Label setzen Sessions, nicht Menschen beim Anlegen). Der Kommentar in `.gitattributes` liest sich, als gelte er für die ganze Datei, obwohl nur `beobachtungen.md` `merge=union` hat. In Schritt 4 stehen Prüfung und Merge im selben Codeblock; Schritt 7 verweist auf das Lagebild vom Session-Start, das Stunden alt sein kann (entscheidend ist der Guard-Hook). Der Commit f73fd96 nennt noch „versionen.md union“, das wurde im Folgecommit zurückgenommen.
+
+**Ursprung:** Task-Review, `cas-reviewer` und Abschluss-Review der Umsetzung „parallele Sessions“ (`~/CAS/projekte/docs/plans/2026-11-01-parallele-sessions.md`).
+
+**Einschätzung:** Rein kosmetisch bzw. Lesbarkeit; bei der nächsten Überarbeitung des Skills mitnehmen.
+
 ### 2026-11-01 — Testgruppe: Handymodell in der Fragen-Tabelle, Löschzeitpunkt fehlt
 
 **Thema:** Verein
