@@ -6,7 +6,6 @@ export default mergeConfig(
 	defineConfig({
 		test: {
 			allowOnly: false,
-			passWithNoTests: true,
 			coverage: {
 				provider: 'v8',
 				include: ['src/lib/server/**'],
