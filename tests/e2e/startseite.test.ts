@@ -18,19 +18,18 @@ test('Startseite zeigt die Version, ohne Barrierefreiheits-Verstösse und ohne K
 	await page.screenshot({ path: info.outputPath('startseite.png'), fullPage: true });
 });
 
-test('Sicherheits-Header auf der Startseite', async ({ request }) => {
-	const res = await request.get('/');
-	expect(res.headers()['content-security-policy']).toContain("default-src 'self'");
-	expect(res.headers()['content-security-policy']).not.toContain("'unsafe-inline'");
-	expect(res.headers()['strict-transport-security']).toContain('max-age=31536000');
-	expect(res.headers()['x-content-type-options']).toBe('nosniff');
-});
-
 test('Sicherheits-Header auf der Startseite und der Status-Schnittstelle', async ({ request }) => {
 	for (const pfad of ['/', '/api/status']) {
 		const res = await request.get(pfad);
 		expect(res.headers()['strict-transport-security'], pfad).toContain('max-age=31536000');
 		expect(res.headers()['x-content-type-options'], pfad).toBe('nosniff');
 		expect(res.headers()['referrer-policy'], pfad).toBe('same-origin');
+		if (pfad === '/') {
+			const csp = res.headers()['content-security-policy'];
+			expect(csp).toContain("default-src 'self'");
+			expect(csp).toContain("frame-ancestors 'none'");
+			expect(csp).toContain("object-src 'none'");
+			expect(csp).not.toContain("'unsafe-inline'");
+		}
 	}
 });
