@@ -71,7 +71,8 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 
 Vorerst behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Wie Junioren und ihre
 Eltern erfasst werden, wird mit den Junioren-Funktionen (ab 2028) geklärt (K-08) und dann
-hier ergänzt.
+hier ergänzt. Spielen Junioren schon an der Clubmeisterschaft 2027 mit (K-46), muss das
+vor der CM-Anmeldung geschehen.
 
 ## Rechte der Mitglieder
 
@@ -101,7 +102,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 
 ## Offene Fragen an den Verein
 
-K-06 (Ansprechperson), K-07 (Datenumfang), K-08 (Junioren), K-09 (Vertrag mit Metanet
+K-06 (Ansprechperson), K-07 (Datenumfang), K-08 und K-46 (Junioren), K-09 (Vertrag mit Metanet
 für E-Mail), K-14 (Austritte), K-38 (Löschfrist), K-39 (öffentlicher Spielplan), K-40
 (Jahrgang) — alle in den [Abklärungen](abklaerungen.md). K-31 und K-42 (Kontaktdaten) hat der
 Projektleiter entschieden, siehe [Beantwortet](abklaerungen.md#beantwortet).

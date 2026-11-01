@@ -260,3 +260,15 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** Issue #8, Abgleich beim Wrap-up.
 
 **Einschätzung:** Gering bis mittel — relevant, sobald die Seite im Gespräch mit dem Vorstand verwendet wird. Als datierte Entscheidungsgrundlage darf sie den alten Stand zeigen; dann ein Hinweis „Hosting inzwischen entschieden → ADR-003“ oder die Kostenübersicht (#9) als aktuelle Quelle.
+
+### 2026-11-01 — Fachmodell kennt keinen Lizenzstatus für die Liste „aktueller Lizenzen“
+
+**Thema:** Fachmodell
+
+**Fundort:** `docs/fachmodell.md`, Objekte *Mitglied* und *Lizenzantrag*; A-LIZENZ-05 (PDF 4b).
+
+**Beobachtung:** Das Anforderungsdokument verlangt jährlich eine Liste aller aktuellen Lizenzen mit den Änderungen zum Vorjahr. Das Fachmodell führt pro Mitglied nur die Lizenznummer (bleibt auch bei Sistierung bestehen) und die Lizenzanträge einer Lizenzrunde. Ob eine Lizenz gerade aktiv oder sistiert ist, lässt sich daraus nicht ableiten, solange nicht jedes Mitglied jedes Jahr einen Antrag stellt.
+
+**Ursprung:** Abgleich des Anforderungsdokuments v1.2 mit dem Doku-Stand, Session vom 01.11.2026.
+
+**Einschätzung:** Gering, solange A-LIZENZ-05 *später* ist. Spätestens beim Fachmodell-Feinschliff vor *Lizenzanträge* entscheiden, z. B. mit einem Lizenzstatus beim Mitglied, den die exportierten Anträge nachführen. Hängt mit K-34 (Storno = Sistierung?) zusammen.

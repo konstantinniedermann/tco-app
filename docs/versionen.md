@@ -75,3 +75,5 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   CI/CD (Restrisiko ohne GitHub Pro angenommen) nachgeführt.
 - Änderung der E-Mail-Adresse braucht je einen Code an die alte und die neue Adresse; ist die
   alte nicht erreichbar, ändert der Admin nach Rückfrage (SI-09, FR-25). Kein SMS-Code.
+- Abgleich mit dem Anforderungsdokument v1.2: neue Fragen an den Verein zu Junioren an der
+  Clubmeisterschaft 2027 (K-46) und zu einer Beispieldatei aus Advantage (K-47).
