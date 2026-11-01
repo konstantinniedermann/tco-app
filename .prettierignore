@@ -1,0 +1,19 @@
+# Doku prüft scripts/check-docs.sh
+docs/
+*.md
+
+# Lock-Datei, Build-Ausgaben
+package-lock.json
+node_modules/
+.svelte-kit/
+build/
+coverage/
+test-results/
+playwright-report/
+
+# Nicht Teil des Codes
+.superpowers/
+.claude/
+intern/
+.githooks/
+.github/
