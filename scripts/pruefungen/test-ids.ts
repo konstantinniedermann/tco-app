@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
+import { istTestquelle, leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
 
 export type Dokus = {
 	fachmodell: string;
@@ -18,7 +18,7 @@ function umgesetzteIds(markdown: string, idMuster: RegExp): string[] {
 			.split('|')
 			.map((zelle) => zelle.trim());
 		const id = zellen[0];
-		const status = (zellen.at(-1) ?? '').replace(/\\?\*/g, '').trim();
+		const status = (zellen.at(-1) ?? '').replace(/\\?\*/g, '').trim().toLowerCase();
 		if (zellen.length > 1 && idMuster.test(id) && status.startsWith('umgesetzt')) ids.push(id);
 	}
 	return ids;
@@ -59,7 +59,7 @@ if (import.meta.main) {
 		anforderungen: lies('docs/anforderungen/anforderungen.md'),
 		testkonzept: lies('docs/testkonzept.md')
 	});
-	const testpfade = versionierteDateien().filter((pfad) => pfad.endsWith('.test.ts'));
+	const testpfade = versionierteDateien().filter(istTestquelle);
 	const quellen = [...leseDateien(testpfade).values()];
 	meldeErgebnis(
 		'test-ids',

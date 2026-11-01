@@ -1,6 +1,6 @@
-import { leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
+import { istTestquelle, leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
 
-const SKIP = /\.(skip|fixme)\(/;
+const SKIP = /\.(skip|fixme|skipIf|todo)\b|\bx(it|test|describe)\(/;
 const BEGRUENDET = /\/\/.*\bskip:/;
 
 /** `.skip(`/`.fixme(` verlangt in derselben Zeile einen Kommentar `skip: <Grund>`. */
@@ -17,6 +17,6 @@ export function pruefeSkip(dateien: Map<string, string>): string[] {
 }
 
 if (import.meta.main) {
-	const pfade = versionierteDateien().filter((pfad) => pfad.endsWith('.test.ts'));
+	const pfade = versionierteDateien().filter(istTestquelle);
 	meldeErgebnis('skip', pruefeSkip(leseDateien(pfade)));
 }

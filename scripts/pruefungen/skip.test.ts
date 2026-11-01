@@ -11,6 +11,22 @@ describe('pruefeSkip', () => {
 			[]
 		);
 	});
+	it.each([
+		"test.skip.each([1])('x', () => {})",
+		"describe.skip.each([1])('x', () => {})",
+		"it.skipIf(cond)('x', () => {})",
+		"describe.skipIf(cond)('x', () => {})",
+		"test.todo('x')",
+		"xit('x')",
+		"xtest('x')",
+		"xdescribe('x')",
+		"describe\n\t.skip('x', () => {})"
+	])('meldet auch %j', (code) => {
+		expect(pruefeSkip(new Map([['a.test.ts', code]]))).toHaveLength(1);
+	});
+	it('lässt Wörter wie skipped oder text.todo-Liste nicht anschlagen', () => {
+		expect(pruefeSkip(new Map([['a.test.ts', "const skipped = 1; mix('x')"]]))).toEqual([]);
+	});
 	it('nennt Datei und Zeile', () => {
 		expect(pruefeSkip(new Map([['a.test.ts', "ok\ntest.skip('x')"]]))[0]).toContain('a.test.ts:2');
 	});

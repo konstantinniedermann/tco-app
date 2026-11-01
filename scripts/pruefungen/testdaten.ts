@@ -1,10 +1,16 @@
-import { leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
+import { istTestquelle, leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
 
 const MAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
 
 function istTestdatei(pfad: string): boolean {
-	const name = pfad.split('/').pop() ?? pfad;
-	return pfad.endsWith('.test.ts') || pfad.startsWith('tests/') || name.startsWith('seed');
+	const teile = pfad.split('/');
+	const name = teile.at(-1) ?? pfad;
+	return (
+		istTestquelle(pfad) ||
+		pfad.startsWith('tests/') ||
+		name.startsWith('seed') ||
+		teile.slice(0, -1).some((verzeichnis) => /^seeds?$/.test(verzeichnis))
+	);
 }
 
 /** Mailadressen in Test- und Seed-Dateien dürfen nur die Domain `example.org` haben. */

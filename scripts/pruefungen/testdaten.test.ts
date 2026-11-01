@@ -13,6 +13,13 @@ describe('pruefeTestdaten', () => {
 		expect(pruefeTestdaten(new Map([['db/seed.ts', 'bob@gmail.com']]))).toHaveLength(1);
 		expect(pruefeTestdaten(new Map([['db/seed-dev.sql', 'bob@gmail.com']]))).toHaveLength(1);
 	});
+	it('prüft spec-Dateien und Seed-Verzeichnisse', () => {
+		expect(pruefeTestdaten(new Map([['src/a.spec.ts', 'bob@gmail.com']]))).toHaveLength(1);
+		expect(pruefeTestdaten(new Map([['src/a.test.js', 'bob@gmail.com']]))).toHaveLength(1);
+		expect(pruefeTestdaten(new Map([['db/seed/mitglieder.ts', 'bob@gmail.com']]))).toHaveLength(1);
+		expect(pruefeTestdaten(new Map([['db/seeds/a.sql', 'bob@gmail.com']]))).toHaveLength(1);
+		expect(pruefeTestdaten(new Map([['db/seeder-notizen/a.ts', 'bob@gmail.com']]))).toEqual([]);
+	});
 	it('zählt Verbindungs-URLs nicht als Mailadresse', () => {
 		expect(
 			pruefeTestdaten(new Map([['tests/a.test.ts', 'postgres://user:pass@localhost:55432/db']]))

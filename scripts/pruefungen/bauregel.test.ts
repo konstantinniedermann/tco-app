@@ -15,6 +15,25 @@ describe('pruefeBauregel', () => {
 			pruefeBauregel(new Map([['src/routes/+page.ts', 'export const actions = {}']]))
 		).toHaveLength(1);
 	});
+	it.each([
+		'export let actions = {}',
+		'export var actions = {}',
+		'export function actions() {}',
+		'export async function actions() {}',
+		'export { actions }',
+		'export { x as actions }',
+		'export { a, x as actions, b }',
+		'export {\n\ta,\n\tactions\n}'
+	])('meldet Form Actions als %j', (code) => {
+		expect(pruefeBauregel(new Map([['src/routes/+page.ts', code]]))).toHaveLength(1);
+	});
+	it('meldet keine ähnlichen Namen', () => {
+		expect(
+			pruefeBauregel(
+				new Map([['src/routes/+page.ts', 'export const actionsList = 1\nexport { other }']])
+			)
+		).toEqual([]);
+	});
 	it('meldet Remote Functions', () => {
 		expect(pruefeBauregel(new Map([['src/lib/a.remote.ts', '']]))).toHaveLength(1);
 		expect(pruefeBauregel(new Map([['src/routes/a.remote.js', '']]))).toHaveLength(1);

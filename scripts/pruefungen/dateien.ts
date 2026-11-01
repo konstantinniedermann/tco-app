@@ -9,6 +9,11 @@ export function versionierteDateien(): string[] {
 		.filter((pfad) => pfad !== '' && !pfad.startsWith('scripts/pruefungen/'));
 }
 
+/** Test-Quellen von Vitest und Playwright: `*.test.*` und `*.spec.*` in ts/js. */
+export function istTestquelle(pfad: string): boolean {
+	return /\.(test|spec)\.[tj]s$/.test(pfad);
+}
+
 export function leseDateien(pfade: string[]): Map<string, string> {
 	return new Map(pfade.map((pfad) => [pfad, readFileSync(pfad, 'utf-8')]));
 }

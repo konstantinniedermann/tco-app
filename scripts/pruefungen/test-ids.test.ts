@@ -41,6 +41,9 @@ describe('faelligeIds', () => {
 			})
 		).toEqual(['A-LOGIN-01']);
 	});
+	it('ignoriert Gross-/Kleinschreibung beim Status', () => {
+		expect(faelligeIds({ ...leer, rollen: '| RR-01 | Regel | Umgesetzt |' })).toEqual(['RR-01']);
+	});
 	it('ignoriert Status ausser umgesetzt', () => {
 		expect(
 			faelligeIds({ ...leer, anforderungen: '| A-X-01 | x | q | e | verworfen — nicht nötig |' })
