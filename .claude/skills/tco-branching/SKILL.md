@@ -58,6 +58,12 @@ gh run list -R konstantinniedermann/tco-app --branch dev --limit 3   # CI grün?
 
 ## Release `dev` → `main` (am Session-Ende, bewusste Entscheidung)
 
+**Sobald es eine Auslieferung gibt** (Merge nach `dev` = Test-Umgebung, Merge nach `main` =
+live mit Mitgliederdaten, `docs/ci-cd-und-release.md`): vor dem PR muss der Projektleiter die
+Checkliste auf Test abgehakt und genau dieses Release freigegeben haben; dazu ein Commit auf
+`dev`, der die Version in `package.json` und `docs/versionen.md` setzt. Den Tag setzt die
+CI. Bis dahin (nur Doku) gilt der Ablauf unten ohne Checkliste und ohne Version.
+
 **5 — PR anlegen und mergen:**
 
 ```bash
