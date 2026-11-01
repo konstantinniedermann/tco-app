@@ -46,8 +46,8 @@ nach 3 Monaten gelöscht; Ihr Name bleibt in vergangenen Resultaten.
 Ihr Gerät das Login mit einem Cookie, bis Sie MyTCO ein Jahr nicht genutzt haben. Fordern
 Sie einen neuen Code an, schickt MyTCO ihn an Ihre E-Mail-Adresse. Ihre IP-Adresse wird dabei
 höchstens 24 Stunden gespeichert, damit niemand Codes durchprobieren kann. Ändern Sie Ihre
-E-Mail-Adresse, bestätigen Sie die neue mit einem Code. Wird Ihre Adresse geändert, von Ihnen
-oder vom Admin, erhält die alte einen Hinweis.
+E-Mail-Adresse, bestätigen Sie die Änderung mit je einem Code an die alte und die neue
+Adresse. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis.
 
 **Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login nötig ist. Keine Werbung,
 keine Analyse-Dienste.
