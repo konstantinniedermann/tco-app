@@ -107,7 +107,7 @@ classDiagram
 | FR-22 | Der Export einer Lizenzrunde setzt alle ihre beantragten Anträge auf *exportiert*; der Lizenzverantwortliche hakt sie nach dem Eintragen bei Swiss Tennis als *erledigt* ab | A-LIZENZ-04 |
 | FR-23 | Exporte an Swiss Tennis enthalten nur die Felder, die Swiss Tennis braucht (vor allem Lizenznummern) | A-ADVANTAGE-01, A-ADVANTAGE-04, A-LIZENZ-04, DS-04 |
 | FR-24 | Ein Einmal-Code gilt nur einmal. Danach bleibt das Gerät eingeloggt, bis die Sitzung ein Jahr nicht genutzt wurde. Erhöht der Admin die Sitzungsversion, enden alle Sitzungen des Kontos | A-LOGIN-08, A-LOGIN-09 |
-| FR-25 | Eine E-Mail-Adresse gehört zu höchstens einem Mitglied. Ändert das Mitglied sie, gilt die neue erst nach Eingabe eines Codes, der an sie geschickt wurde. Ändert sie das Mitglied oder der Admin, erhält die alte Adresse einen Hinweis | A-LOGIN-10, [SI-09](sicherheitskonzept.md#vorgaben) |
+| FR-25 | Eine E-Mail-Adresse gehört zu höchstens einem Mitglied. Ändert das Mitglied sie, gilt die neue erst nach Eingabe je eines Codes von der alten und von der neuen Adresse. Ist die alte nicht erreichbar, ändert der Admin sie nach Rückfrage; die alte erhält dann einen Hinweis | A-LOGIN-10, [SI-09](sicherheitskonzept.md#vorgaben) |
 | FR-26 | Einen Eintrag im Änderungsverlauf erzeugen, egal ob durch Admin, Mitglied oder automatisch: jede Änderung an den Feldern des Mitglieds, an Rollen und an *gesperrt*, sowie die Aktionen neuer Brief-Code, Sitzungen beendet und Export. Login-Vorgänge (Codes, Fehlversuche, Sitzungen) erzeugen keinen Eintrag (SI-05). Einträge werden nach 12 Monaten gelöscht, beim Status *gelöscht* des Mitglieds (FR-04) schon früher | A-MITGLIED-06, [SI-12](sicherheitskonzept.md#vorgaben) |
 
 ## Lebenszyklen

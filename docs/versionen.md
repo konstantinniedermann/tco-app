@@ -73,3 +73,5 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   K-12), E-Mail-Adresse je Mitglied eindeutig (FR-25), neuer Änderungsverlauf für Admins
   (FR-26, A-MITGLIED-06); Datenschutzkonzept, -erklärung, Rollen und Rechte, Glossar und
   CI/CD (Restrisiko ohne GitHub Pro angenommen) nachgeführt.
+- Änderung der E-Mail-Adresse braucht je einen Code an die alte und die neue Adresse; ist die
+  alte nicht erreichbar, ändert der Admin nach Rückfrage (SI-09, FR-25). Kein SMS-Code.
