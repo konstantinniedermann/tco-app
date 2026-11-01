@@ -18,7 +18,8 @@ Begriffe stehen im [Glossar](glossar.md), Anforderungs-IDs in den
 ([RR-02](rollen-und-rechte.md#grundsätze)).
 
 **Junioren:** Im MVP behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Junioren,
-Eltern und Konten für Minderjährige kommen mit den Junioren-Funktionen (K-08).
+Eltern und Konten für Minderjährige kommen mit den Junioren-Funktionen (K-08) — oder früher,
+falls Junioren schon an der Clubmeisterschaft 2027 mitspielen (K-46).
 
 ## Überblick
 

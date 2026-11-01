@@ -87,6 +87,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-37 | Reichen für Benachrichtigungen E-Mail und Push, oder braucht es SMS oder WhatsApp? Die beiden kosten pro Nachricht. | Vorstand | N-APP-02, A-ANMELDUNG-08, A-ANMELDUNG-09, #9 |
 | K-38 | Wie lange bleiben Daten nach einem Austritt in MyTCO, und was muss der Verein aufbewahren (z. B. Resultate, Lizenzanträge)? | Vorstand, Ansprechperson Datenschutz | #5, [Datenschutz](datenschutz.md) |
 | K-40 | Reicht für Alterskategorien und Lizenzanträge der Jahrgang, oder verlangt Swiss Tennis das volle Geburtsdatum? | Lizenzverantwortlicher, Verantwortliche CM | K-07, #3, [Datenschutz](datenschutz.md) |
+| K-46 | Spielen Junioren schon an der Clubmeisterschaft 2027 mit (das Anforderungsdokument nennt Alterskategorien und Junioren-Kategorien mit kürzerer Spieldauer)? Wenn ja: Melden sie sich selbst in MyTCO an, oder tun das Eltern oder der CM-Verantwortliche für sie? Bisher behandelt MyTCO alle Mitglieder wie Volljährige; Konten für Minderjährige müssten bis zur CM-Anmeldung stehen und ins Datenschutzkonzept. | Vorstand, Verantwortliche CM | K-08, A-ANMELDUNG-01, A-TURNIER-03, [Datenschutz](datenschutz.md#junioren), [Fachmodell](fachmodell.md) |
 
 ## Vor dem ersten Release *Mitglieder-Login* (28.02.2027)
 
@@ -95,6 +96,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-19 | Dürfen Mitglieder E-Mail und Telefon selbst ändern? Auch die Adresse, solange Fairgate nicht angebunden ist, und wer überträgt sie dann nach Fairgate? | Vorstand | A-KONTO-01, A-KONTO-02 |
 | K-20 | Stellt der Verein eine Testgruppe von 5–10 Mitgliedern unterschiedlichen Alters, mit iPhone und Android, die Brief, Login und Installation vor dem Start ausprobiert? Freiwillige unter den Ausfüllenden melden sich zusätzlich auf *Wer ist wer* (siehe oben); der Vorstand ergänzt mit Mitgliedern ohne Vorwissen. | Vorstand | #11, [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-21 | An wen wenden sich Mitglieder bei Fragen (Login klappt nicht, Installation auf dem Handy)? | Vorstand | #10 |
+| K-47 | Kann der CM-Verantwortliche eine Excel-Datei aus Advantage schicken, so wie Advantage sie für Gruppen und KO-Tableaus ausgibt, mit erfundenen oder geschwärzten Namen? Gebraucht wird nur der Aufbau (Spalten, Blätter), damit MyTCO die Übernahme rechtzeitig vor der CM bauen kann. Echte Daten kommen nicht ins Repo. | Verantwortliche CM | A-ADVANTAGE-02, A-ADVANTAGE-03, [Fachmodell](fachmodell.md) |
 
 ## Vor CM-Anmeldung (15.05.2027)
 
