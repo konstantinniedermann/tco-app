@@ -1,4 +1,6 @@
 # Nur lokale Entwicklung und Tests. Kein echtes Passwort.
+# Fester Projektname: alle Worktrees teilen denselben Container (Port 55432).
+name: mytco
 services:
   db:
     image: postgres:18-alpine
