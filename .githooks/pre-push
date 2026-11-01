@@ -15,6 +15,9 @@ while read -r _lokal_ref lokal_sha remote_ref remote_sha; do
   refs+=("$lokal_sha $remote_sha")
 done
 
+# Falsche Node-Version: Abbruch, sonst endet nur-doku.ts still mit Exit 0.
+bash scripts/pruefe-node.sh
+
 code=0
 for eintrag in "${refs[@]+"${refs[@]}"}"; do
   read -r lokal_sha remote_sha <<<"$eintrag"

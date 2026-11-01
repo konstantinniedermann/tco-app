@@ -26,7 +26,8 @@ Phase **Fundament**: Architektur und Grundlagen werden dokumentiert; das Code-Ge
 
 ## Lokal starten
 
-Voraussetzungen: Node 26, Docker Desktop, gitleaks.
+Voraussetzungen: Node 26 (genau die Hauptversion aus `.nvmrc`; Make und Hooks brechen sonst ab),
+Docker Desktop, gitleaks.
 
 ```bash
 npm ci --ignore-scripts

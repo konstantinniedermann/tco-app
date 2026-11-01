@@ -10,6 +10,9 @@ if ! command -v gitleaks >/dev/null 2>&1; then
 fi
 gitleaks git --pre-commit --staged --no-banner --redact --exit-code 1
 
+# Falsche Node-Version: Abbruch, sonst endet nur-doku.ts still mit Exit 0.
+bash scripts/pruefe-node.sh
+
 # Exit 0 = nur Doku; jeder andere Exit (Code oder Fehler) zählt als Code.
 if git diff --cached --name-only --no-renames | node scripts/pruefungen/nur-doku.ts; then
   make docs

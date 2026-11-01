@@ -21,10 +21,12 @@ check-schnell: docs voraussetzungen ## Schnellprüfung ohne Datenbank (Doku, Lin
 	npm run test:einheit
 
 docs: ## Doku-Prüfung (Links, Struktur, Test-IDs; braucht nur Node, kein node_modules)
+	@bash scripts/pruefe-node.sh
 	@bash scripts/check-docs.sh
 	@node scripts/pruefungen/test-ids.ts
 
-voraussetzungen: ## Prüft, ob node_modules vorhanden ist (installiert nichts)
+voraussetzungen: ## Prüft Node-Version (.nvmrc) und node_modules (installiert nichts)
+	@bash scripts/pruefe-node.sh
 	@test -d node_modules || { echo "Abbruch: node_modules fehlt — «npm ci --ignore-scripts» ausführen." >&2; exit 1; }
 
 voraussetzungen-docker: ## Prüft, ob Docker erreichbar ist (installiert nichts)
