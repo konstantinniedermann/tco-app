@@ -1,5 +1,11 @@
 import { readFileSync } from 'node:fs';
-import { istTestquelle, leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
+import {
+	istTestquelle,
+	leseDateien,
+	meldeErgebnis,
+	versionierteDateien,
+	wirdAusgefuehrt
+} from './dateien.ts';
 
 export type Dokus = {
 	fachmodell: string;
@@ -51,6 +57,13 @@ export function fehlendeTests(ids: string[], testquellen: string[]): string[] {
 	);
 }
 
+/** Testdateien, die weder Vitest noch Playwright ausführt — sie dürfen keine ID abdecken. */
+export function nichtAusgefuehrteTests(testpfade: string[]): string[] {
+	return testpfade
+		.filter((pfad) => !wirdAusgefuehrt(pfad))
+		.map((pfad) => `${pfad}: Testdatei wird von keinem Testprogramm ausgeführt`);
+}
+
 if (import.meta.main) {
 	const lies = (pfad: string) => readFileSync(pfad, 'utf-8');
 	const ids = faelligeIds({
@@ -60,9 +73,9 @@ if (import.meta.main) {
 		testkonzept: lies('docs/testkonzept.md')
 	});
 	const testpfade = versionierteDateien().filter(istTestquelle);
-	const quellen = [...leseDateien(testpfade).values()];
-	meldeErgebnis(
-		'test-ids',
-		fehlendeTests(ids, quellen).map((id) => `${id} ist umgesetzt, aber kein Test nennt die ID`)
-	);
+	const quellen = [...leseDateien(testpfade.filter(wirdAusgefuehrt)).values()];
+	meldeErgebnis('test-ids', [
+		...nichtAusgefuehrteTests(testpfade),
+		...fehlendeTests(ids, quellen).map((id) => `${id} ist umgesetzt, aber kein Test nennt die ID`)
+	]);
 }

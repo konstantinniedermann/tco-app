@@ -63,6 +63,9 @@ Die CI prüft, dass jede dieser IDs mindestens einen Test hat:
   A-LOGIN-01, Brief per Post), zählt ihr Punkt in der
   [Checkliste vor dem Release](#checkliste-vor-dem-release) als Test.
 
+Als Test zählt nur eine Datei, die Vitest oder Playwright auch ausführt; eine Testdatei
+ausserhalb ihrer Muster (`scripts/pruefungen/testmuster.ts`) ist ein Fehler.
+
 Fachregeln und Grundsätze von Etappen, die noch nicht gebaut sind, nimmt die Prüfung aus.
 Massgebend ist die Spalte *Status*: Die CI verlangt einen Test nur für `umgesetzt`.
 Nicht-funktionale Anforderungen (`N-…`), Datenschutz-Vorgaben (`DS-NN`) und

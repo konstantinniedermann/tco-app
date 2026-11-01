@@ -5,7 +5,9 @@ const datenbankUrl =
 	process.env.DATABASE_URL ?? 'postgres://mytco:mytco_lokal@localhost:55432/mytco';
 
 export default defineConfig({
+	// Entspricht E2E in scripts/pruefungen/testmuster.ts.
 	testDir: 'tests/e2e',
+	testMatch: '**/*.test.ts',
 	outputDir: 'test-results',
 	forbidOnly: !!process.env.CI,
 	use: {

@@ -1,4 +1,5 @@
 import { defineConfig, mergeConfig } from 'vitest/config';
+import { DATENBANK, EINHEIT } from './scripts/pruefungen/testmuster.ts';
 import viteConfig from './vite.config.ts';
 
 export default mergeConfig(
@@ -16,15 +17,14 @@ export default mergeConfig(
 					extends: true,
 					test: {
 						name: 'einheit',
-						include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
-						exclude: ['src/**/*.db.test.ts']
+						...EINHEIT
 					}
 				},
 				{
 					extends: true,
 					test: {
 						name: 'datenbank',
-						include: ['src/**/*.db.test.ts'],
+						...DATENBANK,
 						globalSetup: ['tests/setup/datenbank-global.ts'],
 						setupFiles: ['tests/setup/datenbank-worker.ts']
 					}

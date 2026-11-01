@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { faelligeIds, fehlendeTests } from './test-ids.ts';
+import { faelligeIds, fehlendeTests, nichtAusgefuehrteTests } from './test-ids.ts';
+
+describe('nichtAusgefuehrteTests', () => {
+	it('meldet Testdateien ausserhalb der Muster der Testprogramme', () => {
+		expect(
+			nichtAusgefuehrteTests(['src/a.test.ts', 'lib/b.test.ts', 'tests/e2e/c.spec.ts'])
+		).toEqual([
+			'lib/b.test.ts: Testdatei wird von keinem Testprogramm ausgeführt',
+			'tests/e2e/c.spec.ts: Testdatei wird von keinem Testprogramm ausgeführt'
+		]);
+	});
+});
 
 describe('fehlendeTests', () => {
 	it('beachtet die Wortgrenze', () => {
