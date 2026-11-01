@@ -7,8 +7,7 @@ Fehler wird zuerst mit einem Test nachgestellt, dann behoben. Fertig ist eine Ä
 wenn die CI grün ist und, bei Änderungen an der Oberfläche, Screenshots sie zeigen.
 
 Technik nach [ADR-002](adr/adr-002-sveltekit-postgresql.md). Wie die CI aufgebaut ist und
-wann ausgeliefert wird, regelt das CI/CD- und Release-Konzept
-([#12](https://github.com/konstantinniedermann/tco-app/issues/12)).
+wann ausgeliefert wird, regelt [CI/CD und Release](ci-cd-und-release.md).
 
 ## Testebenen
 
@@ -90,16 +89,19 @@ blockieren keine gewollte Design-Änderung.
 
 ## Checkliste vor dem Release
 
-Auf einem iPhone (Safari) und einem Android-Handy (Chrome), mit einem erfundenen Testkonto
-auf dem Server. Damit der Code per E-Mail ankommt, nutzt es die Adresse des Projektleiters;
-nach der Prüfung wird es gesperrt (RR-08). Jeder Punkt nennt die IDs, die er prüft:
+Auf der [Test-Umgebung](ci-cd-und-release.md#umgebungen) `test.my.tcolten.ch`, mit einem
+iPhone (Safari) und einem Android-Handy (Chrome) und einem erfundenen Testkonto. Es entsteht
+bei jeder Auslieferung neu und nutzt die Adresse des Projektleiters, damit der Code per
+E-Mail ankommt. Jeder Punkt nennt die IDs, die er prüft:
 
-- [ ] QR-Code aus dem Brief öffnet MyTCO unter `my.tcolten.ch` (A-LOGIN-01, A-LOGIN-04)
+- [ ] QR-Code aus einem Testbrief öffnet MyTCO; im Brief für Live steht `my.tcolten.ch` (A-LOGIN-01, A-LOGIN-04)
 - [ ] MyTCO lässt sich auf den Startbildschirm legen und startet von dort
 - [ ] Login mit Einmal-Code klappt; nach Neustart des Handys weiterhin eingeloggt (A-LOGIN-08, A-LOGIN-09)
 - [ ] Neuer Code per E-Mail kommt an und landet nicht im Spam (A-LOGIN-10)
 - [ ] Push einschalten und erhalten (ab Etappe *CM-Betrieb*)
 - [ ] Admin-Seite am PC: die geänderten Funktionen einmal durchgehen
+
+Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 
 Falls der Verein eine Testgruppe stellt (K-20), prüft sie vor dem ersten Release
 *Mitglieder-Login* Brief, Installation und Login, ebenfalls mit erfundenen Testkonten.
