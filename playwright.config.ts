@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const port = 4173;
+const port = Number(process.env.E2E_PORT ?? 4173);
 const datenbankUrl =
 	process.env.DATABASE_URL ?? 'postgres://mytco:mytco_lokal@localhost:55432/mytco';
 
@@ -21,7 +21,7 @@ export default defineConfig({
 		command: 'npm run build && node build',
 		url: `http://localhost:${port}`,
 		env: { PORT: String(port), DATABASE_URL: datenbankUrl },
-		reuseExistingServer: !process.env.CI,
+		reuseExistingServer: false,
 		timeout: 180_000
 	}
 });

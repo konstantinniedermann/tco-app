@@ -25,3 +25,12 @@ test('Sicherheits-Header auf der Startseite', async ({ request }) => {
 	expect(res.headers()['strict-transport-security']).toContain('max-age=31536000');
 	expect(res.headers()['x-content-type-options']).toBe('nosniff');
 });
+
+test('Sicherheits-Header auf der Startseite und der Status-Schnittstelle', async ({ request }) => {
+	for (const pfad of ['/', '/api/status']) {
+		const res = await request.get(pfad);
+		expect(res.headers()['strict-transport-security'], pfad).toContain('max-age=31536000');
+		expect(res.headers()['x-content-type-options'], pfad).toBe('nosniff');
+		expect(res.headers()['referrer-policy'], pfad).toBe('same-origin');
+	}
+});
