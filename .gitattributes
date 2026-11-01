@@ -1,4 +1,5 @@
 # Parallele Sessions hängen Einträge an dieselbe Datei an: beide Seiten behalten.
 docs/beobachtungen.md merge=union
+docs/versionen.md merge=union
 
 *.pdf binary

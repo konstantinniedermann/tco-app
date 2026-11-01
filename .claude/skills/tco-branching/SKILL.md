@@ -28,6 +28,7 @@ M=/Users/KN/CAS/projekte/tco-app
 [ "$(git -C $M rev-parse --is-shallow-repository)" = true ] && git -C $M fetch --unshallow origin
 git -C $M fetch origin
 git -C $M worktree add .claude/worktrees/issue-NNN -b <typ>/issue-NNN origin/dev
+gh issue edit NNN -R konstantinniedermann/tco-app --add-label in-arbeit
 ```
 
 `<typ>` folgt dem Issue-Präfix (`feat`, `fix`, `docs`, `chore`). Mehrere Issues in einem
@@ -45,7 +46,7 @@ gehören in den Feature-Branch. Zieht `dev` weiter: `git merge origin/dev` im Wo
 
 **4 — Nach `dev` mergen (im Hauptordner):** Vorher den Worktree mit `ExitWorktree` (`keep`)
 verlassen — aus dem Worktree heraus verweigert Claude Code Git-Befehle auf den Hauptordner.
-Dann prüfen, dass keine andere Session dort gerade mergt — sonst warten, nicht eingreifen:
+Dann prüfen, ob der Hauptordner frei ist:
 
 ```bash
 git -C $M status --short                          # muss leer sein
@@ -55,6 +56,16 @@ git -C $M merge --no-ff <typ>/issue-NNN
 git -C $M push origin dev
 gh run list -R konstantinniedermann/tco-app --branch dev --limit 3   # CI grün?
 ```
+
+**Hauptordner besetzt** heisst: `status --short` zeigt etwas oder `MERGE_HEAD` existiert. Dann
+einige Minuten (Richtwert 5) wiederholt prüfen, nichts anfassen. Bleibt er besetzt: anderes
+erledigen (Wrap-up, Doku) und später erneut versuchen. Am Session-Ende noch besetzt: Branch
+ist gepusht, den Merge im Bericht als offen nennen. Auf eine andere Session wird nie
+unbegrenzt gewartet.
+
+**Konflikt** beim Merge (oder beim Einmergen von `origin/dev`): selbst inhaltlich
+zusammenführen, `make check`, im Bericht nennen. Den Nutzer nur bei einem echten inhaltlichen
+Widerspruch fragen.
 
 ## Release `dev` → `main` (am Session-Ende, bewusste Entscheidung)
 
@@ -86,20 +97,23 @@ git -C $M merge --no-edit origin/main && git -C $M push origin dev
 
 - Issues schliessen mit Verweis auf die Commits; prüfen, welche Issues dadurch frei werden
   (`Blocked by` im Body), dort `blocked` entfernen, wenn kein weiterer Blocker bleibt.
+- Label entfernen: `gh issue edit NNN -R konstantinniedermann/tco-app --remove-label in-arbeit`.
 - Worktree verlassen (`ExitWorktree` mit `keep`), dann
-  `git -C $M worktree remove .claude/worktrees/issue-NNN`.
+  `git -C $M worktree remove .claude/worktrees/issue-NNN` — nur, wenn das Lagebild den
+  Worktree nicht als belegt zeigt (der Guard verweigert es sonst ohnehin); dann stehen
+  lassen und im Bericht nennen.
 - Branch löschen: `git -C $M branch -d <typ>/issue-NNN` und
   `git -C $M push origin --delete <typ>/issue-NNN`.
 
 ## Session-Ende
 
 Skill `session-wrap-up` gilt, aber **ohne** dessen `git push origin main` — stattdessen
-Schritte 4–7. Nicht fertige Arbeit: Branch pushen, Worktree bleibt stehen, im Bericht nennen.
+Schritte 4–7. Nicht fertige Arbeit: Branch pushen, Worktree bleibt stehen, im Bericht
+nennen und das Label `in-arbeit` entfernen (unfertig abgegeben).
 
 ## Reibungspunkte bei Parallel-Arbeit
 
-- `docs/versionen.md`: Beide Sessions schreiben unter „Unveröffentlicht“ → beim Merge beide
-  Einträge behalten.
-- `docs/beobachtungen.md` hat `merge=union` (`.gitattributes`) und löst sich selbst.
+- `docs/versionen.md` und `docs/beobachtungen.md` haben `merge=union` (`.gitattributes`) und
+  lösen sich selbst.
 - Nachrichten zwischen Sessions (`SendMessage`) können vom Empfänger zurückgehalten werden —
   Abschlussberichte daher in der eigenen Antwort ausgeben, nicht nur per Nachricht.
