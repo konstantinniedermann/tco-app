@@ -4,10 +4,10 @@
 
 ## Code — Dauerregeln
 
-- Vor Svelte- oder SvelteKit-Code die aktuelle Doku über den Svelte-MCP-Server holen
-  (`.mcp.json`); nie aus dem Gedächtnis.
-- Server-Code nur in API-Endpunkten (`+server.ts`) und `src/lib/server/`; keine Form Actions,
-  keine Server-Loader, keine Remote Functions (Bauregel → ADR-002).
+- Vor Svelte- oder SvelteKit-Code die aktuelle Doku holen: über den Svelte-MCP-Server
+  (`.mcp.json`), ohne ihn über svelte.dev/llms.txt; nie aus dem Gedächtnis.
+- Unter `src/routes` keine Server-Dateien ausser `+server.ts`; keine Form Actions,
+  keine Remote Functions (Bauregel → ADR-002).
 
 ## Mitgliederdaten — Dauerverbote
 
