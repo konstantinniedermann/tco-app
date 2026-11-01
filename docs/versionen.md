@@ -68,7 +68,7 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   Live-Auslieferung automatisch, der Live-Schlüssel nur im Auslieferungs-Job; Server und
   Auslieferung als eigenes Issue (#32).
 - Sicherheitskonzept (`docs/sicherheitskonzept.md`, #6): Bedrohungen mit Massnahmen,
-  Login-Ablauf mit Werten für Brief- und Mail-Code, Vorgaben `SI-01` bis `SI-15`,
+  Login-Ablauf mit Werten für Brief- und Mail-Code, Vorgaben `SI-01` bis `SI-16`,
   Restrisiken. Admin-Oberfläche mit frischem Mail-Code statt Zwei-Faktor-App (Vorschlag
   K-12), E-Mail-Adresse je Mitglied eindeutig (FR-25), neuer Änderungsverlauf für Admins
   (FR-26, A-MITGLIED-06); Datenschutzkonzept, -erklärung, Rollen und Rechte, Glossar und

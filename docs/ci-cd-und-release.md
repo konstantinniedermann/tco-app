@@ -100,8 +100,9 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   Antwort der API). Der Projektleiter verzichtet darauf, um laufende Kosten auf seinem
   Privatkonto zu vermeiden; das Restrisiko ist im Sicherheitskonzept bewertet. Die Auslieferung bleibt
   automatisch.
-- **Restrisiko** (angenommen im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), mit
-  Zwei-Faktor-Login auf allen Konten mit Schreibrecht, SI-15):
+- **Restrisiko** (angenommen im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
+  Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
+  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten mit K-04):
   - Wer ins Repo pushen kann, kann direkt auf `main` pushen (davor schützt nur der lokale
     Hook des Projektleiters) oder einen Workflow schreiben, der den Live-Schlüssel nutzt
     (davor schützt nichts). Pushen können der Projektleiter und die Hauptansprechperson

@@ -35,7 +35,7 @@ Konzept angepasst, dann die Funktion ([Änderungen](#änderungen-an-diesem-konze
 | IP-Adresse bei Login-Versuchen | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; nur im Arbeitsspeicher oder höchstens 24 Stunden | — |
 | Anmeldungen (mit Kommentar zum Wildcard-Antrag), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
 | Austrittsdatum | Löschfrist nach Austritt | — |
-| Änderungsverlauf: wer hat wann welches Feld geändert, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (K-14) | — |
+| Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (K-14) | — |
 
 Keine Gesundheitsdaten (auch nicht als Grund für eine Abmeldung), keine Fotos, keine
 Bankdaten.
@@ -44,7 +44,7 @@ Bankdaten.
 
 | Wer | Sieht |
 |-----|-------|
-| Mitglied | alle eigenen Daten |
+| Mitglied | alle eigenen Daten; den Änderungsverlauf zum eigenen Konto auf Anfrage bei der Ansprechperson |
 | Admin | alle Daten der Mitglieder und den Änderungsverlauf; Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
 | CM-Verantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
 | Lizenzverantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
@@ -64,7 +64,7 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Logs und Backups:** höchstens 30 Tage.
-- **Änderungsverlauf:** 12 Monate; Einträge zu einem gelöschten Mitglied mit ihm.
+- **Änderungsverlauf:** 12 Monate; Einträge zu einem Mitglied früher, sobald es den Status *gelöscht* hat (FR-04).
 - **IP-Adressen** (Schutz vor Durchprobieren von Codes, Logs): höchstens 24 Stunden.
 
 ## Junioren
