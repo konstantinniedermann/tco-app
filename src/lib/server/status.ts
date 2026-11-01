@@ -9,10 +9,11 @@ export type StatusAntwort = {
 	mindestversion: string;
 };
 
-export async function ermittleStatus(db: Db): Promise<StatusAntwort> {
+/** `holeDb` läuft in der Fehlerbehandlung: Auch ohne gültige DATABASE_URL gilt `fehler`. */
+export async function ermittleStatus(holeDb: () => Db): Promise<StatusAntwort> {
 	let status: StatusAntwort['status'] = 'ok';
 	try {
-		await db.execute(sql`select 1`);
+		await holeDb().execute(sql`select 1`);
 	} catch {
 		status = 'fehler';
 		console.error('Datenbank nicht erreichbar');

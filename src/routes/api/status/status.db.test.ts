@@ -46,6 +46,49 @@ describe('/api/status', () => {
 		});
 	});
 
+	test('GET /api/status ohne DATABASE_URL → 503 ohne Details', async () => {
+		const url = process.env.DATABASE_URL;
+		const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+		vi.resetModules();
+		delete process.env.DATABASE_URL;
+		try {
+			const { GET: frischesGet } = await import('./+server.ts');
+			const res = await frischesGet();
+			expect(res.status).toBe(503);
+			expect(res.headers.get('cache-control')).toBe('no-store');
+			expect(await res.json()).toEqual({
+				status: 'fehler',
+				version: APP_VERSION,
+				mindestversion: MINDESTVERSION
+			});
+		} finally {
+			process.env.DATABASE_URL = url;
+			log.mockRestore();
+		}
+	});
+
+	test('GET /api/status mit unerreichbarer Datenbank → 503 ohne Details', async () => {
+		const url = process.env.DATABASE_URL;
+		const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+		vi.resetModules();
+		process.env.DATABASE_URL = 'postgres://mytco:x@127.0.0.1:1/keine';
+		try {
+			const { GET: frischesGet } = await import('./+server.ts');
+			const res = await frischesGet();
+			offeneDbs.push((await import('../../../lib/server/db/index.ts')).holeDb());
+			expect(res.status).toBe(503);
+			expect(res.headers.get('cache-control')).toBe('no-store');
+			expect(await res.json()).toEqual({
+				status: 'fehler',
+				version: APP_VERSION,
+				mindestversion: MINDESTVERSION
+			});
+		} finally {
+			process.env.DATABASE_URL = url;
+			log.mockRestore();
+		}
+	});
+
 	test('holeDb liefert eine wiederverwendete Verbindung und braucht DATABASE_URL', async () => {
 		const url = process.env.DATABASE_URL;
 		vi.resetModules();
@@ -75,7 +118,7 @@ describe('/api/status', () => {
 
 	test('Datenbank nicht erreichbar → fehler ohne Details', async () => {
 		const tot = erstelleDb('postgres://mytco:x@127.0.0.1:1/keine');
-		const antwort = await ermittleStatus(tot);
+		const antwort = await ermittleStatus(() => tot);
 		expect(antwort).toEqual({
 			status: 'fehler',
 			version: APP_VERSION,
