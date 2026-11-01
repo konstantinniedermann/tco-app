@@ -31,7 +31,10 @@ Hauptliste. Die Tabelle dient nur zum Einsammeln.
 - **Priorität 1 bis 3:** 1 = gebraucht bis zum Ende *Fundament*, 2 = bis zum ersten Release,
   3 = später. Das entspricht den Abschnitten unten.
 - **Wer ist wer:** Welche Person im Verein welche Aufgabe hat, steht nur in der Tabelle,
-  nicht im Repo. Die Adressaten korrigieren das Blatt selbst.
+  nicht im Repo. Die Adressaten korrigieren das Blatt selbst. Dort fragen zwei Spalten,
+  ob jemand in der Testgruppe mitmacht (iPhone/Android) und mit welchem Handymodell
+  (freiwillig). Ins Repo kommen davon nur Anzahl, Verteilung iPhone/Android und ob ein
+  älteres Handy dabei ist (K-20).
 - **Gesperrt:** Jedes Blatt ist als Ganzes gesperrt. Frei sind nur die Antwortspalten der
   vorhandenen Fragen und die Einträge auf *Wer ist wer*. Bei neuen Zeilen den freien
   Bereich anpassen.
@@ -69,7 +72,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-08 | Ab wann kommen Junioren in MyTCO, und wer loggt sich für Minderjährige ein (Eltern)? | Vorstand | [Rollen und Rechte](rollen-und-rechte.md), #5, [Datenschutz](datenschutz.md) |
 | K-44 | Liegt der Programmcode der Website tcolten.ch auf GitHub oder einer ähnlichen Plattform, und kann der Projektleiter Lesezugang erhalten? So lässt sich prüfen, was MyTCO davon mitnutzen kann (Logo, Farben, Anmeldung). | Website-Betreuer | N-DESIGN-01, #13 |
 | K-09 | Metanet: Was kostet das heutige Paket des Vereins, und gibt es einen Auftragsbearbeitungsvertrag nach nDSG, der auch die E-Mail-Postfächer von tcolten.ch abdeckt? (Das Webhosting kann MyTCO selbst nicht betreiben, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md).) | Website-Betreuer, Hoster | [ADR-003](adr/adr-003-hosting-infomaniak-vps.md), #9, [Datenschutz](datenschutz.md) |
-| K-10 | Darf MyTCO unter `my.tcolten.ch` laufen (Server bei Infomaniak), und wer verwaltet die DNS-Einträge? | Website-Betreuer | A-LOGIN-04, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md) |
+| K-10 | Darf MyTCO unter `my.tcolten.ch` laufen (Server bei Infomaniak), dazu eine Test-Umgebung unter `test.my.tcolten.ch`, und wer verwaltet die DNS-Einträge? | Website-Betreuer | A-LOGIN-04, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md), [CI/CD und Release](ci-cd-und-release.md) |
 | K-11 | E-Mail-Versand: Darf MyTCO von einer Adresse @tcolten.ch senden (z. B. Bestätigungen und Einmal-Codes fürs Login, A-LOGIN-10)? Geht das über ein Postfach bei Metanet, und reicht das Tageslimit für eine Mail an alle Mitglieder? Wer setzt die nötigen DNS-Einträge gegen Spam-Verdacht? Sonst versendet MyTCO über Scaleway (EU). | Website-Betreuer, Hoster | N-APP-02, A-LOGIN-10, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md), #9, #29 |
 | K-12 | Ist ein zweiter Login-Faktor für Admins zumutbar? Hat der Verein weitere Sicherheitsvorgaben? | Vorstand | N-SICHERHEIT-01, #6 |
 | K-13 | Darf MyTCO Logo, Farben und Schriften von tcolten.ch verwenden, und wer liefert die Dateien? Wie stark soll sich MyTCO farblich abgrenzen? | Website-Betreuer, Vorstand | N-DESIGN-01, #13 |
@@ -90,7 +93,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
 | K-19 | Dürfen Mitglieder E-Mail und Telefon selbst ändern? Auch die Adresse, solange Fairgate nicht angebunden ist, und wer überträgt sie dann nach Fairgate? | Vorstand | A-KONTO-01, A-KONTO-02 |
-| K-20 | Stellt der Verein eine Testgruppe von 5–10 Mitgliedern unterschiedlichen Alters, mit iPhone und Android, die Brief, Login und Installation vor dem Start ausprobiert? | Vorstand | #11, [ADR-001](adr/adr-001-web-app-zuerst.md) |
+| K-20 | Stellt der Verein eine Testgruppe von 5–10 Mitgliedern unterschiedlichen Alters, mit iPhone und Android, die Brief, Login und Installation vor dem Start ausprobiert? Freiwillige unter den Ausfüllenden melden sich zusätzlich auf *Wer ist wer* (siehe oben); der Vorstand ergänzt mit Mitgliedern ohne Vorwissen. | Vorstand | #11, [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-21 | An wen wenden sich Mitglieder bei Fragen (Login klappt nicht, Installation auf dem Handy)? | Vorstand | #10 |
 
 ## Vor CM-Anmeldung (15.05.2027)

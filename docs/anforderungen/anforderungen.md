@@ -21,6 +21,7 @@ Anforderungen bekommen die nächste freie Nummer im Bereich.
 *durchgehend* heisst: gilt ab der ersten Etappe mit Produktcode für alles Weitere.
 
 **Status:** `geplant` · `später` · `offen` (wartet auf eine Antwort des Vereins) ·
+`umgesetzt` (mit Test, siehe [Testkonzept](../testkonzept.md#anforderung--testfall)) ·
 `verworfen` (mit Begründung).
 
 **\*** = Etappe oder Status ist ein Vorschlag des Projektleiters, weil die Quellen ihn

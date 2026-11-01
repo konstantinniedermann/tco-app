@@ -114,6 +114,53 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-11-01 — Testgruppe: Handymodell in der Fragen-Tabelle, Löschzeitpunkt fehlt
+
+**Thema:** Verein
+
+**Fundort:** Fragen-Tabelle, Blatt *Wer ist wer*, Spalten D/E; `docs/abklaerungen.md` (Wer ist wer, K-20).
+
+**Beobachtung:** Neben dem Namen steht freiwillig das genaue Handymodell. Gebraucht wird nur, ob ein älteres Handy dabei ist. Die Tabelle kann jeder mit dem Link lesen. Wann die beiden Spalten wieder geleert werden, ist nicht festgehalten.
+
+**Ursprung:** Review (`cas-reviewer`) zur K-20-Notiz; Spalte auf Wunsch des Nutzers eingeführt.
+
+**Einschätzung:** Risiko klein, Name und Aufgabe stehen dort ohnehin. Denkbar: Spalten nach dem Release *Mitglieder-Login* leeren, oder statt Modell nur «älteres Handy ja/nein».
+
+### 2026-11-01 — «Älteres Handy» für die Testgruppe nicht definiert
+
+**Thema:** Verein
+
+**Fundort:** `docs/abklaerungen.md` (K-20 / Wer ist wer), `docs/testkonzept.md` (Testgruppe).
+
+**Beobachtung:** Ins Repo soll kommen, ob ein älteres Handy dabei ist, aber keine Grenze ist festgelegt. Gemeint ist vermutlich die iOS-Version, ab der Web Push klappt.
+
+**Ursprung:** Review (`cas-reviewer`) zur K-20-Notiz.
+
+**Einschätzung:** Festlegen, wenn die Antworten eingehen; gehört dann ins Testkonzept unter *Testgruppe*.
+### 2026-11-01 — Für den Aufbau von Server und Auslieferung gibt es kein Issue
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** `docs/ci-cd-und-release.md` (Abschnitt *Umgebungen*, „Wer baut die Auslieferung“); DoD von #15.
+
+**Beobachtung:** #15 baut nur die CI-Prüfungen. Server, Test- und Live-Umgebung, Auslieferungs-Skript, Statusabfrage, Mindestversion und Tag-Job hat kein Issue; sie fallen zwischen #15 und #29 durch.
+
+**Ursprung:** Review von #12 (cas-reviewer).
+
+**Einschätzung:** Aufwand über eine Session, braucht Antworten zu K-04 und K-10 — Kandidat für ein Issue im Milestone *Mitglieder-Login*, sobald die Antworten da sind (nur mit Zustimmung des Projektleiters).
+
+### 2026-10-31 — Fragen-Tabelle spricht von «Anmelden», das Glossar verlangt «Login»
+
+**Thema:** Verein
+
+**Fundort:** Fragen-Tabelle an den Verein, Blatt «Vorstand»: K-02.1 («Anmeldecode», «bleibt angemeldet»), K-12.1 («Zwei-Faktor-Anmeldung»), K-16.1, K-16.3, K-21; Sprachregel in `docs/glossar.md` («Login statt Anmelden»).
+
+**Beobachtung:** Das Glossar reserviert *Anmeldung* für die Teilnahme an CM oder Anlass. Die Tabelle verwendet für das Einloggen trotzdem «Anmelden» und «Anmeldecode», auch schon vor #29. In der Repo-Doku ist das seit #29 bereinigt, in der Tabelle nicht.
+
+**Ursprung:** Review `cas-reviewer` zu #29 (Sprachregel), beim Anpassen der Tabelle bemerkt.
+
+**Einschätzung:** Für Vereinsleute ist «Anmeldecode» verständlicher als «Login-Code». Zu entscheiden: Gilt die Sprachregel auch für Texte an den Verein, oder nur für App und Doku? Spätestens bei den Texten im Brief und in der App klären.
+
 ### 2026-10-30 — Impressum von tcolten.ch nennt eine frühere Finanzverantwortliche Person
 
 **Thema:** Verein
