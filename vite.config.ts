@@ -24,6 +24,13 @@ export default defineConfig({
 					'default-src': ['self'],
 					'script-src': ['self'],
 					'style-src': ['self'],
+					// Hash des festen Styles von SvelteKits Screenreader-Hinweis (#svelte-announcer).
+					// Ändert ein Kit-Update diesen Style, schlägt der E2E-Test (Konsolenfehler) an;
+					// dann den Hash aus root.svelte neu berechnen.
+					'style-src-attr': [
+						'unsafe-hashes',
+						'sha256-S8qMpvofolR8Mpjy4kQvEm7m1q8clzU4dfDH0AmvZjo='
+					],
 					'img-src': ['self'],
 					'font-src': ['self'],
 					'connect-src': ['self'],

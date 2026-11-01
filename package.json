@@ -15,6 +15,8 @@
 		"db:migrate": "node scripts/migrate.ts",
 		"db:generate": "drizzle-kit generate",
 		"test": "vitest run --coverage",
+		"e2e": "playwright test",
+		"e2e:browser": "playwright install --with-deps chromium webkit",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write ."
 	},
