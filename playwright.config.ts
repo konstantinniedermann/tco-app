@@ -1,6 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const port = Number(process.env.E2E_PORT ?? 4173);
+// `make e2e` wählt einen freien Port; leer oder ungültig gilt als nicht gesetzt.
+const e2ePort = process.env.E2E_PORT ?? '';
+const port =
+	/^\d{1,5}$/.test(e2ePort) && Number(e2ePort) > 0 && Number(e2ePort) < 65536
+		? Number(e2ePort)
+		: 4173;
 const datenbankUrl =
 	process.env.DATABASE_URL ?? 'postgres://mytco:mytco_lokal@localhost:55432/mytco';
 
@@ -9,7 +14,7 @@ export default defineConfig({
 	testDir: 'tests/e2e',
 	testMatch: '**/*.test.ts',
 	outputDir: 'test-results',
-	forbidOnly: !!process.env.CI,
+	forbidOnly: true,
 	use: {
 		baseURL: `http://localhost:${port}`,
 		screenshot: 'on'

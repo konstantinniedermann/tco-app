@@ -11,7 +11,7 @@ check: docs voraussetzungen voraussetzungen-docker ## Alle Prüfungen wie in der
 	$(MAKE) test
 	npm run build
 	npm run build:spa
-	npm run e2e
+	$(MAKE) e2e
 	$(MAKE) image
 
 check-schnell: docs voraussetzungen ## Schnellprüfung ohne Datenbank (Doku, Lint, Svelte-Check, Prüfskripte, Einheitstests) — pre-commit bei Code
@@ -39,8 +39,11 @@ dev: db ## Entwicklungsserver starten (mit Datenbank)
 test: db ## Einheits- und Datenbanktests mit Abdeckung
 	npm test
 
-e2e: db ## Ende-zu-Ende-Tests (Playwright)
-	npm run e2e
+e2e: db ## Ende-zu-Ende-Tests (Playwright, freier Port ausser E2E_PORT ist gesetzt)
+	@port="$${E2E_PORT:-}"; \
+	[ -n "$$port" ] || port=$$(node -e "const s=require('node:net').createServer();s.listen(0,()=>{console.log(s.address().port);s.close()})"); \
+	echo "E2E auf Port $$port"; \
+	E2E_PORT=$$port npm run e2e
 
 build: ## Produktions-Build
 	npm run build
