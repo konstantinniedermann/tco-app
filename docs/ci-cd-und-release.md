@@ -89,18 +89,27 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   der eigenen Container-Ablage. Beides wird streng geprüft und nie über eine Shell
   ausgewertet.
 - Der Live-Lauf startet nur bei einem Push auf `main`.
-- Nur der Auslieferungs-Job fordert den SSH-Schlüssel an, und er führt keine npm-Pakete
-  aus. GitHub gibt ein Geheimnis nur an Schritte, die es anfordern; ein Schadpaket in den
-  Tests kommt so nicht an den Schlüssel. Alle anderen Jobs haben nur Leserechte aufs Repo.
+- Nur der Auslieferungs-Job fordert den SSH-Schlüssel an. Er führt keine npm-Pakete, keine
+  fremden Actions und nichts aus Caches oder Artefakten anderer Jobs aus. GitHub gibt ein
+  Geheimnis nur an Schritte, die es anfordern; ein Schadpaket in den Tests kommt so nicht
+  an den Schlüssel. Die übrigen Jobs haben nur Leserechte aufs Repo, der Bau-Job dazu
+  Schreibrecht auf die Container-Ablage.
 - **Kein GitHub Pro:** Schutz von `main` auf GitHub, Geheimnisse nur für eine Umgebung und
   „nur `main` darf ausliefern“ gibt es für private Repos erst ab Pro (B:
   [GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments),
-  Antwort der API). Der Projektleiter hat sich dagegen entschieden; die Auslieferung bleibt
+  Antwort der API). Der Projektleiter verzichtet darauf, um laufende Kosten auf seinem
+  Privatkonto zu vermeiden, vorbehaltlich der Bewertung in #6. Die Auslieferung bleibt
   automatisch.
-- **Restrisiko:** Wer ins Repo pushen kann (heute nur der Projektleiter), kann einen
-  Workflow schreiben, der den Live-Schlüssel nutzt, oder direkt auf `main` pushen; davor
-  schützt nur der lokale Hook. Das bewertet das Sicherheitskonzept
-  ([#6](https://github.com/konstantinniedermann/tco-app/issues/6)).
+- **Restrisiko** (Bewertung im Sicherheitskonzept,
+  [#6](https://github.com/konstantinniedermann/tco-app/issues/6)):
+  - Wer ins Repo pushen kann, kann direkt auf `main` pushen (davor schützt nur der lokale
+    Hook des Projektleiters) oder einen Workflow schreiben, der den Live-Schlüssel nutzt
+    (davor schützt nichts). Pushen können der Projektleiter und die Hauptansprechperson
+    im Vorstand: Mitarbeitende eines privaten Repos auf einem Privatkonto haben immer
+    Schreibrecht (B: [GitHub Docs](https://docs.github.com/en/account-and-profile/reference/permission-levels-for-a-personal-account-repository)).
+    Eine reine Leserolle gibt es erst in einer Organisation (K-04).
+  - Ein Schadpaket im Bau landet im Image und läuft damit live, auch ohne den Schlüssel.
+    Dagegen helfen nur die Malware-Prüfung und die Prüfung der Pakete vor der Aufnahme.
 
 ### Geheimnisse
 
