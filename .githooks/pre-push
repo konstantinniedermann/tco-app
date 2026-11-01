@@ -2,11 +2,41 @@
 # Lokaler pre-push-Hook (aktivieren: make hooks).
 # Branch-Schutz für private Repos gibt es auf GitHub nur mit Pro — daher lokal:
 # Der Weg auf main ist immer ein PR aus dev, nie ein direkter Push.
+# Enthält ein gepushter Bereich Code, läuft vor dem Push make check (wie die CI).
 set -euo pipefail
 
-while read -r _lokal_ref _lokal_sha remote_ref _remote_sha; do
+nullsha=0000000000000000000000000000000000000000
+refs=()
+while read -r _lokal_ref lokal_sha remote_ref remote_sha; do
   if [ "$remote_ref" = "refs/heads/main" ]; then
     echo "Abbruch: Direkter Push auf main ist verboten — Release per PR dev → main." >&2
     exit 1
   fi
+  refs+=("$lokal_sha $remote_sha")
 done
+
+# Falsche Node-Version: Abbruch, sonst endet nur-doku.ts still mit Exit 0.
+bash scripts/pruefe-node.sh
+
+code=0
+for eintrag in "${refs[@]+"${refs[@]}"}"; do
+  read -r lokal_sha remote_sha <<<"$eintrag"
+  [ "$lokal_sha" = "$nullsha" ] && continue # Löschung
+  if [ "$remote_sha" = "$nullsha" ]; then
+    if ! basis=$(git merge-base origin/dev "$lokal_sha" 2>/dev/null); then
+      code=1 # Basis unbekannt: wie Code behandeln
+      continue
+    fi
+    bereich="$basis..$lokal_sha"
+  else
+    bereich="$remote_sha..$lokal_sha"
+  fi
+  if ! git diff --name-only --no-renames "$bereich" | node scripts/pruefungen/nur-doku.ts; then
+    code=1
+  fi
+done
+
+if [ "$code" -ne 0 ]; then
+  echo "Code im Push — make check läuft vor dem Push."
+  make check
+fi

@@ -1,8 +1,10 @@
 name: Check
 
-# Dieselben Prüfungen wie lokal `make check`. Nur PRs und die beiden dauerhaften
-# Branches — Feature-Branches deckt der lokale pre-commit-Hook ab (Actions-Minuten
-# werden über alle privaten Repos geteilt).
+# Dieselben Prüfungen wie lokal `make check`, aber ohne docker compose (die DB kommt
+# als Service-Container) und mit der OSV-Malware-Prüfung zusätzlich. Nur PRs und die
+# beiden dauerhaften Branches — Feature-Branches deckt der lokale Hook ab (Actions-
+# Minuten werden über alle privaten Repos geteilt). Reine Doku-Änderungen laufen nur
+# durch den Job `doku`; die Code-Jobs hängen an `aenderung`.
 on:
   pull_request:
     branches: [dev, main]
@@ -11,19 +13,206 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: check-${{ github.ref }}
-  cancel-in-progress: true
+  # PR-Läufe teilen sich eine Gruppe pro Branch und brechen den vorherigen ab. Jeder
+  # Push-Lauf hat eine eigene Gruppe: Eine Gruppe hält nur einen wartenden Lauf, ein dritter
+  # Push würde den wartenden sonst verdrängen (dessen Code bliebe ungetestet).
+  group: check-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 jobs:
-  check:
-    name: make check
+  doku:
+    name: Doku (make docs)
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - run: make check
+      # Nur für die Test-ID-Prüfung (Node-Bordmittel); kein npm ci, kein Cache.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - run: make docs
+
+  # Entscheidet, ob die Code-Jobs laufen. Fail closed: Im Zweifel (manueller Lauf,
+  # neuer Branch, Basis-Commit fehlt) gilt die Änderung als Code.
+  aenderung:
+    name: Änderung (Code oder nur Doku)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      code: ${{ steps.erkennen.outputs.code }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      # Die Einordnung läuft mit nur-doku.ts aus dem Basis-Commit, nicht aus dem geprüften
+      # Stand: Eine Änderung kann sich so nicht selbst zur Doku erklären. Fehlt die Datei in
+      # der Basis, gilt die Änderung als Code. nur-doku.ts darf daher nichts Lokales importieren.
+      - name: Änderung erkennen
+        id: erkennen
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASIS: ${{ github.event.pull_request.base.sha }}
+          PUSH_BASIS: ${{ github.event.before }}
+        run: |
+          basis=""
+          case "$EVENT" in
+            pull_request) basis="$PR_BASIS" ;;
+            push) basis="$PUSH_BASIS" ;;
+          esac
+          code=true
+          if [ -n "$basis" ] && [ "$basis" != "0000000000000000000000000000000000000000" ] \
+            && git cat-file -e "${basis}^{commit}" 2>/dev/null; then
+            if git show "${basis}:scripts/pruefungen/nur-doku.ts" > "$RUNNER_TEMP/nur-doku.ts" \
+              && git diff --name-only --no-renames "$basis" HEAD > "$RUNNER_TEMP/geaendert.txt"; then
+              if node "$RUNNER_TEMP/nur-doku.ts" < "$RUNNER_TEMP/geaendert.txt"; then
+                code=false
+              fi
+            fi
+          fi
+          echo "Basis: ${basis:-keine} -> code=${code}"
+          echo "code=${code}" >> "$GITHUB_OUTPUT"
+
+  pruefen:
+    name: Prüfen (Lint, Tests, Build)
+    needs: aenderung
+    if: needs.aenderung.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: mytco
+          POSTGRES_PASSWORD: mytco_lokal
+          POSTGRES_DB: mytco
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U mytco -d mytco"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgres://mytco:mytco_lokal@localhost:55432/mytco
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm exec --no -- svelte-kit sync
+      - run: npm run lint
+      - run: npm run check:svelte
+      - run: npm run pruefungen
+      - run: npm test
+      - run: npm run build
+      - run: npm run build:spa
+
+  e2e:
+    name: E2E (Playwright)
+    needs: aenderung
+    if: needs.aenderung.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: mytco
+          POSTGRES_PASSWORD: mytco_lokal
+          POSTGRES_DB: mytco
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U mytco -d mytco"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgres://mytco:mytco_lokal@localhost:55432/mytco
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm exec --no -- svelte-kit sync
+      - run: npm run e2e:browser
+      - run: npm run e2e
+      - name: Ergebnisse und Screenshots sichern
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 30
+          if-no-files-found: warn
+
+  malware:
+    name: Malware-Prüfung (OSV)
+    needs: aenderung
+    if: needs.aenderung.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Malware-Gate übers ganze Lockfile (inkl. Dev- und transitive Deps): blockt nur
+      # OSV-Einträge mit Prefix MAL-. Binary gepinnt und per SHA-256 verifiziert,
+      # gleiche Version wie Munica.
+      - name: osv-scanner installieren
+        run: |
+          curl -sSfL -o /tmp/osv-scanner \
+            https://github.com/google/osv-scanner/releases/download/v2.4.0/osv-scanner_linux_amd64
+          chmod +x /tmp/osv-scanner
+          echo "15314940c10d26af9c6649f150b8a47c1262e8fc7e17b1d1029b0e479e8ed8a0  /tmp/osv-scanner" | sha256sum -c -
+      - name: package-lock.json scannen
+        run: |
+          ec=0
+          /tmp/osv-scanner scan --lockfile=package-lock.json --format json > /tmp/osv.json || ec=$?
+          # exit 1 = "Findings vorhanden" (normal, wird vom Gate gefiltert);
+          # alles > 1 = echter Scanner-Fehler -> fail closed.
+          if [ "$ec" -gt 1 ]; then
+            echo "osv-scanner fehlgeschlagen (exit $ec)"; exit "$ec"
+          fi
+          python3 scripts/ci/osv_malware_gate.py /tmp/osv.json
+
+  image:
+    name: Docker-Image
+    needs: aenderung
+    if: needs.aenderung.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: docker build -t mytco:ci .

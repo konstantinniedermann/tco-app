@@ -2,12 +2,12 @@
 
 > Für alle Aktionen → `make help`. Worum es geht → `README.md`, Etappen → `docs/roadmap.md`.
 
-## Doku zuerst — Dauerverbot dieser Phase
+## Code — Dauerregeln
 
-Kein Produktcode, solange der Milestone *Fundament* offen ist. Einzige Ausnahme ist das
-Code-Gerüst-Issue dieses Milestones; es ist von Fachmodell, Sicherheitskonzept,
-Technik-ADRs, Test- und Release-Konzept blockiert und hebt dieses Verbot mit seiner
-Definition of Done auf.
+- Vor Svelte- oder SvelteKit-Code die aktuelle Doku holen: über den Svelte-MCP-Server
+  (`.mcp.json`), ohne ihn über svelte.dev/llms.txt; nie aus dem Gedächtnis.
+- Unter `src/routes` keine Server-Dateien ausser `+server.ts`; keine Form Actions,
+  keine Remote Functions (Bauregel → ADR-002).
 
 ## Mitgliederdaten — Dauerverbote
 

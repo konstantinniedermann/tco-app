@@ -13,3 +13,11 @@ NOTES.local.md
 
 # System
 .DS_Store
+
+# Code
+node_modules/
+.svelte-kit/
+build/
+coverage/
+test-results/
+playwright-report/
