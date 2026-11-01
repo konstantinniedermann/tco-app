@@ -5,19 +5,26 @@ import * as schema from './schema.ts';
 export type Db = ReturnType<typeof erstelleDb>;
 
 export function erstelleDb(url: string) {
-	const pool = new pg.Pool({ connectionString: url, connectionTimeoutMillis: 3000 });
+	const pool = new pg.Pool({
+		connectionString: url,
+		connectionTimeoutMillis: 3000,
+		query_timeout: 5000
+	});
+	// Ein abgebrochener Leerlauf-Client darf den Server nicht beenden; keine Details loggen (SI-05).
+	pool.on('error', () => {
+		console.error('Datenbankverbindung unterbrochen');
+	});
 	return drizzle(pool, { schema });
 }
 
 let db: Db | undefined;
 
 export function holeDb(): Db {
-	if (!db) {
-		// Fallback: `$env/dynamic/private` liefert unter SvelteKit 3 ohne src/env.ts nichts
-		// (auch nicht in Vitest, siehe Task-4-Bericht); process.env gilt im Node-Server und im Test.
-		const url = process.env.DATABASE_URL;
-		if (!url) throw new Error('DATABASE_URL fehlt');
-		db = erstelleDb(url);
-	}
+	// process.env statt `$app/env/private`: SvelteKit 3 liest src/env.ts beim Laden aus einem
+	// Schnappschuss der Umgebung zum Konfigurationszeitpunkt (siehe Task-4-Bericht). Die
+	// Test-Datenbank entsteht erst im Global-Setup, daher passt das unter Vitest nicht.
+	const url = process.env.DATABASE_URL;
+	if (!url) throw new Error('DATABASE_URL fehlt');
+	db ??= erstelleDb(url);
 	return db;
 }

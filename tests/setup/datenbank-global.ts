@@ -16,8 +16,11 @@ export default async function setup(project: TestProject) {
 
 	const admin = new pg.Client({ connectionString: basisUrl });
 	await admin.connect();
-	await admin.query(`CREATE DATABASE ${name}`);
-	await admin.end();
+	try {
+		await admin.query(`CREATE DATABASE ${name}`);
+	} finally {
+		await admin.end();
+	}
 
 	const testUrl = new URL(basisUrl);
 	testUrl.pathname = `/${name}`;
@@ -26,7 +29,10 @@ export default async function setup(project: TestProject) {
 	return async () => {
 		const abbau = new pg.Client({ connectionString: basisUrl });
 		await abbau.connect();
-		await abbau.query(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`);
-		await abbau.end();
+		try {
+			await abbau.query(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`);
+		} finally {
+			await abbau.end();
+		}
 	};
 }

@@ -1,11 +1,23 @@
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pg from 'pg';
-import { describe, expect, test, vi } from 'vitest';
+import { afterAll, describe, expect, test, vi } from 'vitest';
 import { APP_VERSION } from '../../../lib/version.ts';
-import { erstelleDb, holeDb } from '../../../lib/server/db/index.ts';
+import { erstelleDb as erstelleDbRoh, holeDb, type Db } from '../../../lib/server/db/index.ts';
 import { ermittleStatus } from '../../../lib/server/status.ts';
 import { MINDESTVERSION } from '../../../lib/server/version.ts';
 import { GET } from './+server.ts';
+
+const offeneDbs: Db[] = [];
+
+function erstelleDb(url: string) {
+	const db = erstelleDbRoh(url);
+	offeneDbs.push(db);
+	return db;
+}
+
+afterAll(async () => {
+	await Promise.all(offeneDbs.map((db) => db.$client.end()));
+});
 
 async function roh(sql: string) {
 	const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
@@ -42,7 +54,23 @@ describe('/api/status', () => {
 		expect(() => modul.holeDb()).toThrow('DATABASE_URL fehlt');
 		process.env.DATABASE_URL = url;
 		expect(modul.holeDb()).toBe(modul.holeDb());
+		offeneDbs.push(modul.holeDb());
 		expect(holeDb()).toBe(holeDb());
+		offeneDbs.push(holeDb());
+	});
+
+	test('error-Event auf dem Pool löst keinen Absturz aus und loggt keine Details', () => {
+		const db = erstelleDb(process.env.DATABASE_URL!);
+		const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+		expect(() => db.$client.emit('error', new Error('geheim://passwort'))).not.toThrow();
+		expect(log).toHaveBeenCalledTimes(1);
+		expect(log.mock.calls[0]).toEqual(['Datenbankverbindung unterbrochen']);
+		log.mockRestore();
+	});
+
+	test('query_timeout bricht eine hängende Abfrage ab', async () => {
+		const db = erstelleDb(process.env.DATABASE_URL!);
+		expect(db.$client.options.query_timeout).toBe(5000);
 	});
 
 	test('Datenbank nicht erreichbar → fehler ohne Details', async () => {
