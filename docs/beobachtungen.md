@@ -149,6 +149,8 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 **Einschätzung:** Aufwand über eine Session, braucht Antworten zu K-04 und K-10 — Kandidat für ein Issue im Milestone *Mitglieder-Login*, sobald die Antworten da sind (nur mit Zustimmung des Projektleiters).
 
+**Erledigt 2026-11-01:** Mit Zustimmung des Projektleiters als #32 angelegt (blocked by #6, #15; blocks #29). Bei der nächsten Auswertung ins Archiv.
+
 ### 2026-10-31 — Fragen-Tabelle spricht von «Anmelden», das Glossar verlangt «Login»
 
 **Thema:** Verein

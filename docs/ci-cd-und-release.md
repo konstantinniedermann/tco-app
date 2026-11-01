@@ -27,8 +27,9 @@ Beide Adressen richtet der Website-Betreuer ein (K-10). Auf der Test-Umgebung l�
 dort nie hin (DS-08).
 
 **Wer baut die Auslieferung:** Das Code-Gerüst (#15) baut die CI-Prüfungen. Server,
-Umgebungen und Auslieferung entstehen, sobald Konten und Adresse geklärt sind (K-04, K-10),
-spätestens vor dem Release *Mitglieder-Login*.
+Umgebungen und Auslieferung baut [#32](https://github.com/konstantinniedermann/tco-app/issues/32),
+sobald Konten und Adresse geklärt sind (K-04, K-10), spätestens vor dem Release
+*Mitglieder-Login*.
 
 ## Ablauf
 
@@ -52,6 +53,9 @@ flowchart LR
   aus *Unveröffentlicht* in den [Versionen](versionen.md) die neue Nummer. Nach der
   erfolgreichen Live-Auslieferung setzt die CI den Tag und das GitHub-Release; nur dieser
   Schritt darf ins Repo schreiben.
+- **Merge:** Auf GitHub ist nur der Merge-Commit erlaubt (Squash und Rebase abgeschaltet).
+  „Branch nach dem Merge löschen“ bleibt aus, sonst löscht der PR `dev` → `main` den
+  Branch `dev`.
 - **Fehlerbehebungen** nehmen denselben Weg über `dev`; ein eigener Hotfix-Weg lohnt bei
   diesem Umfang nicht.
 - Released wird, wenn ein Stand es wert ist, nicht nach jedem Issue: Jedes Release braucht
@@ -85,9 +89,18 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   der eigenen Container-Ablage. Beides wird streng geprüft und nie über eine Shell
   ausgewertet.
 - Der Live-Lauf startet nur bei einem Push auf `main`.
-- **Restrisiko:** Im Gratisplan stehen Repo-Geheimnisse jedem Workflow auf jeder gepushten
-  Branch zur Verfügung (V); wer ins Repo pushen kann, könnte den Live-Schlüssel nutzen. Das
-  bewertet das Sicherheitskonzept ([#6](https://github.com/konstantinniedermann/tco-app/issues/6)).
+- Nur der Auslieferungs-Job fordert den SSH-Schlüssel an, und er führt keine npm-Pakete
+  aus. GitHub gibt ein Geheimnis nur an Schritte, die es anfordern; ein Schadpaket in den
+  Tests kommt so nicht an den Schlüssel. Alle anderen Jobs haben nur Leserechte aufs Repo.
+- **Kein GitHub Pro:** Schutz von `main` auf GitHub, Geheimnisse nur für eine Umgebung und
+  „nur `main` darf ausliefern“ gibt es für private Repos erst ab Pro (B:
+  [GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments),
+  Antwort der API). Der Projektleiter hat sich dagegen entschieden; die Auslieferung bleibt
+  automatisch.
+- **Restrisiko:** Wer ins Repo pushen kann (heute nur der Projektleiter), kann einen
+  Workflow schreiben, der den Live-Schlüssel nutzt, oder direkt auf `main` pushen; davor
+  schützt nur der lokale Hook. Das bewertet das Sicherheitskonzept
+  ([#6](https://github.com/konstantinniedermann/tco-app/issues/6)).
 
 ### Geheimnisse
 

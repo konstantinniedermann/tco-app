@@ -64,3 +64,6 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   Merge nach `main` live, mit Sicherung, Statusprüfung und automatischem Rückfall. Liste der
   CI-Prüfungen für das Code-Gerüst, Versionen ab `1.0.0` mit dem Login-Release, alte
   App-Versionen laden neu, Actions-Minuten im Blick. K-10 um die Testadresse ergänzt.
+- CI/CD nachgeschärft: auf GitHub nur noch Merge-Commit; ohne GitHub Pro bleibt die
+  Live-Auslieferung automatisch, der Live-Schlüssel nur im Auslieferungs-Job; Server und
+  Auslieferung als eigenes Issue (#32).
