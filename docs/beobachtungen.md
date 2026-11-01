@@ -114,6 +114,24 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-11-01 — Kleinbefunde aus den Task-Reviews des Code-Gerüsts
+
+**Thema:** Code-Gerüst
+
+**Fundort:** siehe Liste.
+
+**Beobachtung:**
+- `docs/adr/adr-001-web-app-zuerst.md` (Randbedingungen, Optionen B/C, Konsequenzen) und `adr-002` (Kontext): «`dep-guard` deckt `npm` ab» bzw. «nicht `npx expo install`» ist überholt. Der Hook prüft jetzt auch `npx`, `npm exec` usw.
+- `scripts/pruefungen/skip.ts`: `\.fails?\b` meldet auch `assert.fail(`/`expect.fail(`. Ausgefallene Exportformen (`export * as actions`, Destrukturierung) erkennt `bauregel.ts` nicht. Der Test zur Eigenständigkeit von `nur-doku.ts` übersieht reine Seiteneffekt-Imports.
+- `Makefile`: `voraussetzungen-docker` und `db` laufen in `check` doppelt. Bei `make -j` ist die Reihenfolge nicht garantiert. Die Hilfe zu `make hooks` erwähnt den Doku-Check nicht mehr.
+- `Dockerfile`: `svelte-kit sync` ist redundant, und es gibt keinen `HEALTHCHECK` (→ #32).
+- Die Ersatz-`DATABASE_URL` steht mehrfach (`.env.example`, `playwright.config.ts`, Test-Setup, CI).
+- Doku-Kosmetik: unruhige Zeilenumbrüche in `docs/ci-cd-und-release.md` (Actions-Minuten) und `README.md` (Stand). In `docs/context-scopes.md` (Zeile CI) sind Unterordner neben `scripts/` doppelt genannt.
+
+**Ursprung:** #15, Task-Reviews und Abschluss-Review, als Minor eingestuft.
+
+**Einschätzung:** Keiner davon lässt eine Prüfung falsch durch. Mitnehmen, wenn die Datei ohnehin angefasst wird. Die ADR-Sätze beschreiben den Stand beim Entscheid, ein kurzer Nachtrag genügt.
+
 ### 2026-11-01 — Test-ID-Prüfung zählt IDs in Kommentaren und übersprungenen Tests
 
 **Thema:** Code-Gerüst
