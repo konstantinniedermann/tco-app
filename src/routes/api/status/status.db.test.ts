@@ -111,7 +111,7 @@ describe('/api/status', () => {
 		log.mockRestore();
 	});
 
-	test('query_timeout bricht eine hängende Abfrage ab', async () => {
+	test('setzt query_timeout auf 5 s', async () => {
 		const db = erstelleDb(process.env.DATABASE_URL!);
 		expect(db.$client.options.query_timeout).toBe(5000);
 	});
