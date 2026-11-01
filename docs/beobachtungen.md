@@ -114,6 +114,54 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-11-01 — `$app/env/private` passt nicht zur Test-Datenbank pro Lauf
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `src/lib/server/db/index.ts` (`holeDb`), `vitest.config.ts` (Global-Setup).
+
+**Beobachtung:** SvelteKit 3 prüft die Umgebung gegen einen Schnappschuss vor dem Global-Setup von Vitest; die Test-Datenbank pro Lauf entsteht erst danach (`env_invalid … DATABASE_URL - Value is missing`). Deshalb liest der Code `process.env.DATABASE_URL`.
+
+**Ursprung:** #15 Code-Gerüst.
+
+**Einschätzung:** Umweg bewusst; neu bewerten, wenn Kit die Umgebungsprüfung ändert.
+
+### 2026-11-01 — SPA-Build: CSP nur als Meta-Tag, `frame-ancestors` wirkt dort nicht
+
+**Thema:** Sicherheit
+
+**Fundort:** `vite.config.ts` (CSP), Build mit `MYTCO_SPA=1`.
+
+**Beobachtung:** Der SPA-Build legt die CSP als Meta-Tag ab; `frame-ancestors` ignoriert der Browser dort. Die Direktive muss als Header vom Server kommen.
+
+**Ursprung:** #15 Code-Gerüst.
+
+**Einschätzung:** Gehört zu Server und Auslieferung ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)); dort den Header setzen.
+
+### 2026-11-01 — 22 bekannte Schwachstellen in Entwicklungs- und Build-Werkzeugen, kein Audit-Gate
+
+**Thema:** Sicherheit
+
+**Fundort:** `package.json`, `.github/workflows/check.yml`.
+
+**Beobachtung:** `npm install` meldete 22 bekannte Schwachstellen (5 niedrig, 17 mittel) in Entwicklungs- und Build-Werkzeugen. Das OSV-Gate bricht nur bei Malware ab; ein Audit-Gate ist nicht beschlossen.
+
+**Ursprung:** #15 Code-Gerüst.
+
+**Einschätzung:** `npm audit --omit=dev` als Gate prüfen (Laufzeit-Pakete); Werkzeuge über Dependabot aktuell halten.
+
+### 2026-11-01 — Hash der Screenreader-Hinweis-Regel nach Kit-Updates nachziehen
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `vite.config.ts` (`style-src-attr` mit `sha256-…`), SI-10.
+
+**Beobachtung:** Der Hash gilt für das feste Style-Attribut des Screenreader-Hinweises von SvelteKit. Ändert ein Kit-Update es, bricht die CSP; der E2E-Lauf fängt das ab.
+
+**Ursprung:** #15 Code-Gerüst.
+
+**Einschätzung:** Bei Fehlschlag nach einem Kit-Update den Hash neu berechnen; sonst kein Handlungsbedarf.
+
 ### 2026-11-01 — Label `in-arbeit` fehlt in der Issue-Vorlage, Kleinkram in tco-branching
 
 **Thema:** Arbeitsablauf

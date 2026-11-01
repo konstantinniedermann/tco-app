@@ -21,7 +21,7 @@ let db: Db | undefined;
 
 export function holeDb(): Db {
 	// process.env statt `$app/env/private`: SvelteKit 3 liest src/env.ts beim Laden aus einem
-	// Schnappschuss der Umgebung zum Konfigurationszeitpunkt (siehe Task-4-Bericht). Die
+	// Schnappschuss der Umgebung zum Konfigurationszeitpunkt (siehe docs/beobachtungen.md). Die
 	// Test-Datenbank entsteht erst im Global-Setup, daher passt das unter Vitest nicht.
 	const url = process.env.DATABASE_URL;
 	if (!url) throw new Error('DATABASE_URL fehlt');
