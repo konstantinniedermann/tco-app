@@ -27,7 +27,7 @@ Konzept angepasst, dann die Funktion ([Änderungen](#änderungen-an-diesem-konze
 |------|------|---------|
 | Vorname, Nachname | Konto, Anmeldung, Resultate | ja |
 | Postadresse | Login-Briefe | ja |
-| E-Mail-Adresse | Bestätigungen, Benachrichtigungen, neuer Einmal-Code (A-LOGIN-10) | ja |
+| E-Mail-Adresse | Bestätigungen, Benachrichtigungen, neuer Einmal-Code (A-LOGIN-10); je Mitglied eine eigene (FR-25) | ja |
 | Telefonnummer | Absprache der Gruppenspiele | für die CM ja |
 | Geschlecht, Jahrgang | Zulassung zu Kategorien; volles Geburtsdatum nur, falls Swiss Tennis es verlangt (K-40) | ja |
 | Lizenznummer, Klassierung | Anmeldung, Lizenzanträge, Export an Swiss Tennis | nein |
@@ -35,6 +35,7 @@ Konzept angepasst, dann die Funktion ([Änderungen](#änderungen-an-diesem-konze
 | IP-Adresse bei Login-Versuchen | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; nur im Arbeitsspeicher oder höchstens 24 Stunden | — |
 | Anmeldungen (mit Kommentar zum Wildcard-Antrag), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
 | Austrittsdatum | Löschfrist nach Austritt | — |
+| Änderungsverlauf: wer hat wann welches Feld geändert, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (K-14) | — |
 
 Keine Gesundheitsdaten (auch nicht als Grund für eine Abmeldung), keine Fotos, keine
 Bankdaten.
@@ -44,7 +45,7 @@ Bankdaten.
 | Wer | Sieht |
 |-----|-------|
 | Mitglied | alle eigenen Daten |
-| Admin | alle Daten der Mitglieder; Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
+| Admin | alle Daten der Mitglieder und den Änderungsverlauf; Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
 | CM-Verantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
 | Lizenzverantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
 | Alle Mitglieder | Name, Kategorien und Resultate der Clubmeisterschaft; bei der Wahl des Doppelpartners die Namen der Mitglieder, die für die Kategorie passen |
@@ -63,6 +64,7 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Logs und Backups:** höchstens 30 Tage.
+- **Änderungsverlauf:** 12 Monate; Einträge zu einem gelöschten Mitglied mit ihm.
 - **IP-Adressen** (Schutz vor Durchprobieren von Codes, Logs): höchstens 24 Stunden.
 
 ## Junioren
@@ -95,7 +97,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | DS-07 | Der Admin kann die Daten eines Mitglieds exportieren und löschen |
 | DS-08 | Entwicklung und Tests nur mit erfundenen Daten |
 | DS-09 | Die Datenschutzerklärung ist in MyTCO auch ohne Login erreichbar |
-| DS-10 | Datensicherheit (verschlüsselte Verbindung, Einmal-Codes nur als Hash, Zugriff nach Rolle) regelt das [Sicherheitskonzept](https://github.com/konstantinniedermann/tco-app/issues/6) |
+| DS-10 | Datensicherheit (verschlüsselte Verbindung, Einmal-Codes nur als Hash, Zugriff nach Rolle) regelt das [Sicherheitskonzept](sicherheitskonzept.md) |
 
 ## Offene Fragen an den Verein
 

@@ -24,7 +24,8 @@ Sie selbst einschalten. Für nichts anderes.
 
 **Wer sieht was:**
 
-- Der Admin sieht alle Ihre Daten. Ihren Einmal-Code kann nach dem Versand niemand mehr abrufen. Die Verantwortlichen von
+- Der Admin sieht alle Ihre Daten und, ohne Inhalt, wer wann welche Angabe geändert hat
+  (12 Monate). Ihren Einmal-Code kann nach dem Versand niemand mehr abrufen. Die Verantwortlichen von
   Clubmeisterschaft und Lizenzen sehen Ihren Namen, Ihre E-Mail und Telefonnummer und was
   sie für ihre Aufgabe brauchen.
 - Alle Mitglieder sehen Name, Kategorien und Resultate der Clubmeisterschaft. Wer einen
@@ -44,7 +45,8 @@ nach 3 Monaten gelöscht; Ihr Name bleibt in vergangenen Resultaten.
 **Login:** Sie loggen sich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 Ihr Gerät das Login mit einem Cookie, bis Sie MyTCO ein Jahr nicht genutzt haben. Fordern
 Sie einen neuen Code an, schickt MyTCO ihn an Ihre E-Mail-Adresse. Ihre IP-Adresse wird dabei
-höchstens 24 Stunden gespeichert, damit niemand Codes durchprobieren kann.
+höchstens 24 Stunden gespeichert, damit niemand Codes durchprobieren kann. Ändern Sie Ihre
+E-Mail-Adresse, bestätigen Sie die neue mit einem Code; die alte erhält einen Hinweis.
 
 **Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login nötig ist. Keine Werbung,
 keine Analyse-Dienste.

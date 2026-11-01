@@ -65,7 +65,8 @@ Die CI prüft, dass jede dieser IDs mindestens einen Test hat:
 
 Fachregeln und Grundsätze von Etappen, die noch nicht gebaut sind, nimmt die Prüfung aus;
 wie, legt das Code-Gerüst ([#15](https://github.com/konstantinniedermann/tco-app/issues/15))
-fest. Nicht-funktionale Anforderungen (`N-…`) und Datenschutz-Vorgaben (`DS-NN`) erhalten
+fest. Nicht-funktionale Anforderungen (`N-…`), Datenschutz-Vorgaben (`DS-NN`) und
+Sicherheits-Vorgaben (`SI-NN`, [Sicherheitskonzept](sicherheitskonzept.md)) erhalten
 Tests, wo sie prüfbar sind (z. B. DS-06: keine Einmal-Codes im Log), ohne Pflicht.
 
 ## Testdaten
