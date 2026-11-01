@@ -31,7 +31,10 @@ Hauptliste. Die Tabelle dient nur zum Einsammeln.
 - **Priorität 1 bis 3:** 1 = gebraucht bis zum Ende *Fundament*, 2 = bis zum ersten Release,
   3 = später. Das entspricht den Abschnitten unten.
 - **Wer ist wer:** Welche Person im Verein welche Aufgabe hat, steht nur in der Tabelle,
-  nicht im Repo. Die Adressaten korrigieren das Blatt selbst.
+  nicht im Repo. Die Adressaten korrigieren das Blatt selbst. Dort fragen zwei Spalten,
+  ob jemand in der Testgruppe mitmacht (iPhone/Android) und mit welchem Handymodell
+  (freiwillig). Ins Repo kommen davon nur Anzahl, Verteilung iPhone/Android und ob ein
+  älteres Handy dabei ist (K-20).
 - **Gesperrt:** Jedes Blatt ist als Ganzes gesperrt. Frei sind nur die Antwortspalten der
   vorhandenen Fragen und die Einträge auf *Wer ist wer*. Bei neuen Zeilen den freien
   Bereich anpassen.
@@ -90,7 +93,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
 | K-19 | Dürfen Mitglieder E-Mail und Telefon selbst ändern? Auch die Adresse, solange Fairgate nicht angebunden ist, und wer überträgt sie dann nach Fairgate? | Vorstand | A-KONTO-01, A-KONTO-02 |
-| K-20 | Stellt der Verein eine Testgruppe von 5–10 Mitgliedern unterschiedlichen Alters, mit iPhone und Android, die Brief, Login und Installation vor dem Start ausprobiert? | Vorstand | #11, [ADR-001](adr/adr-001-web-app-zuerst.md) |
+| K-20 | Stellt der Verein eine Testgruppe von 5–10 Mitgliedern unterschiedlichen Alters, mit iPhone und Android, die Brief, Login und Installation vor dem Start ausprobiert? Freiwillige unter den Ausfüllenden melden sich zusätzlich auf *Wer ist wer* (siehe oben); der Vorstand ergänzt mit Mitgliedern ohne Vorwissen. | Vorstand | #11, [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-21 | An wen wenden sich Mitglieder bei Fragen (Login klappt nicht, Installation auf dem Handy)? | Vorstand | #10 |
 
 ## Vor CM-Anmeldung (15.05.2027)
