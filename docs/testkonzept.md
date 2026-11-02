@@ -108,7 +108,9 @@ E-Mail ankommt. Jeder Punkt nennt die IDs, die er prüft:
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 
 Falls der Verein eine Testgruppe stellt (K-20), prüft sie vor dem ersten Release
-*Mitglieder-Login* Brief, Installation und Login, ebenfalls mit erfundenen Testkonten.
+*Mitglieder-Login* Brief, Installation und Login als Pilot auf Live, mit ihren eigenen
+echten Daten. Das ist Betrieb, kein Test im Sinne von DS-08; vorher muss die
+Datenschutzerklärung gelten. Ablauf → [#40](https://github.com/konstantinniedermann/tco-app/issues/40).
 
 ## Werkzeuge
 
