@@ -56,12 +56,12 @@
 	--schatten-karte: 0 1px 3px rgb(0 0 0 / 0.13);
 	--breite-inhalt: 40rem;
 
-	/* Brief (Druck) — Masse auf dem Papier in mm */
+	/* Brief (Druck) — Werte auf dem Papier in mm und pt */
 	/* Annahme K-16.1: Fensterkuvert C5/6 mit Fenster rechts, Lage des Adressfelds fest */
 	--brief-rand: 20mm;
 	--brief-fenster-oben: 45mm;
 	--brief-fenster-links: 118mm;
 	--brief-fenster-breite: 80mm;
 	--brief-qr: 35mm;
-	--brief-schrift: 10.5pt;
+	--brief-schrift: 12pt;
 }

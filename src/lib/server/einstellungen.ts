@@ -10,7 +10,8 @@ export type Einstellungen = {
 	adresse: string;
 };
 
-const STANDARD_ADRESSE = 'https://my.tcolten.ch';
+/** Annahme K-10: App-Adresse my.tcolten.ch, wenn MYTCO_ADRESSE fehlt */
+export const STANDARD_ADRESSE = 'https://my.tcolten.ch';
 
 /**
  * process.env statt `$app/env/private`, Begründung wie bei `holeDb` in `db/index.ts`.

@@ -191,7 +191,8 @@ Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter d
 
 Der Brief mit dem Einmal-Code (A-LOGIN-01) ist eine A4-Seite ohne Seitenrand des Druckers
 (`@page { size: A4; margin: 0 }`). Er nutzt dieselben Farb-, Schrift- und Abstands-Tokens wie
-die App; nur die Masse des Papiers stehen in `mm`, deshalb in eigenen Tokens. Die Symbole der
+die App; nur Werte auf dem Papier stehen in absoluten Einheiten (Masse in `mm`, die
+Grundschrift in `pt`), deshalb in eigenen Tokens. Die Symbole der
 Anleitung (Teilen, Drei-Punkte-Menü) folgen dem Baustein *Symbol*: 24er-Raster, Strich 2,
 Farbe `currentColor`, immer mit Text.
 
@@ -209,7 +210,7 @@ passt.
 | `--brief-fenster-links` | `118mm` | Abstand des Adressfelds vom linken Blattrand |
 | `--brief-fenster-breite` | `80mm` | Breite des Adressfelds |
 | `--brief-qr` | `35mm` | Kantenlänge des QR-Codes |
-| `--brief-schrift` | `10.5pt` | Grundschrift des Briefs (1 rem auf Papier) |
+| `--brief-schrift` | `12pt` | Grundschrift des Briefs (1 rem auf Papier) |
 
 ## Sprache
 

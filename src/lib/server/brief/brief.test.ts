@@ -49,6 +49,18 @@ describe('baueBriefHtml', () => {
 		expect(html).toContain(TOKENS);
 	});
 
+	test('gültig bis in Schweizer Zeit: kurz vor Mitternacht UTC ist schon der nächste Tag', () => {
+		const html = baueBriefHtml(daten({ gueltigBis: new Date('2027-01-31T23:30:00Z') }), TOKENS);
+		expect(html).toContain('gültig bis 01.02.2027');
+	});
+
+	test('Datenschutz-Hinweis maskiert die Adresse', () => {
+		const html = baueBriefHtml(daten({ adresse: 'https://my.example.org/?a=1&b=2' }), TOKENS);
+		expect(html).toContain(
+			'Wie MyTCO mit deinen Daten umgeht: https://my.example.org/?a=1&amp;b=2/datenschutz'
+		);
+	});
+
 	test('Brief maskiert alle eingesetzten Werte', () => {
 		const html = baueBriefHtml(
 			daten({
