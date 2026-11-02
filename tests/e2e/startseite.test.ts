@@ -66,6 +66,19 @@ test('Bei 200 % Schrift kein waagrechtes Scrollen (UI-02)', async ({ page }, inf
 	await page.screenshot({ path: info.outputPath('startseite-200.png'), fullPage: true });
 });
 
+test('Lange Wörter im Titel werden bei 200 % Schrift getrennt statt abgeschnitten (UI-02)', async ({
+	page
+}) => {
+	await page.goto('/');
+	const titel = page.getByRole('heading', { level: 1 });
+	await titel.evaluate((h) => {
+		document.documentElement.style.fontSize = '200%';
+		h.textContent = 'Clubmeisterschaftsanmeldung';
+	});
+	const breiten = await titel.evaluate((h) => ({ inhalt: h.scrollWidth, sichtbar: h.clientWidth }));
+	expect(breiten.inhalt).toBeLessThanOrEqual(breiten.sichtbar);
+});
+
 test('Sicherheits-Header auf der Startseite und der Status-Schnittstelle', async ({ request }) => {
 	for (const pfad of ['/', '/api/status']) {
 		const res = await request.get(pfad);

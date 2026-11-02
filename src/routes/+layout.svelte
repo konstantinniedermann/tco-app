@@ -7,15 +7,17 @@
 	let { children } = $props();
 </script>
 
-<header class="kopf">
-	<img class="kopf-wappen" src={asset('wappen.svg')} alt="" />
-	MyTCO
-</header>
+<div class="app">
+	<header class="kopf">
+		<img class="kopf-wappen" src={asset('wappen.svg')} alt="" />
+		MyTCO
+	</header>
 
-<main class="inhalt">
-	{@render children()}
-</main>
+	<main class="inhalt">
+		{@render children()}
+	</main>
 
-<footer class="inhalt leise">
-	<p data-testid="version">Version {APP_VERSION}</p>
-</footer>
+	<footer class="inhalt leise">
+		<p data-testid="version">Version {APP_VERSION}</p>
+	</footer>
+</div>

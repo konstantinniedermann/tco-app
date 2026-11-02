@@ -25,6 +25,9 @@ body {
 	line-height: var(--zeilenhoehe-text);
 	color: var(--farbe-text);
 	background: var(--farbe-hintergrund);
+	/* Lange deutsche Wörter trennen statt abschneiden, auch bei grosser Schrift (UI-02) */
+	hyphens: auto;
+	overflow-wrap: break-word;
 }
 
 h1,
@@ -61,8 +64,25 @@ img {
 	max-width: 100%;
 }
 
-/* Seitenaufbau */
+/*
+ * Seitenaufbau. .app ist der Rahmen der ganzen App und ein Container: Das PC-Layout richtet
+ * sich nach seiner Breite, nicht nach dem Fenster (so zeigen auch die Mockups das richtige
+ * Layout). Layout-Einschluss: Überlagerungen nur mit <dialog>, nicht mit position: fixed.
+ */
+.app {
+	container: app / inline-size;
+	display: flex;
+	flex-direction: column;
+	min-height: 100dvh;
+}
+
+.app > main {
+	flex: 1;
+}
+
 .inhalt {
+	/* width: 100 %, sonst schrumpft der Bereich in der Flex-Spalte von .app auf seinen Inhalt */
+	width: 100%;
 	max-width: var(--breite-inhalt);
 	margin: 0 auto;
 	padding: var(--abstand-5) var(--abstand-4) var(--abstand-6);
@@ -262,7 +282,7 @@ img {
 }
 
 .kachel > :first-child {
-	flex: 1 1 12em;
+	flex: 1 1 8em;
 }
 
 .kachel-pfeil {
@@ -373,25 +393,72 @@ img {
 	stroke-linejoin: round;
 }
 
-/* PC-Layout (Medienabfragen erlauben keine Tokens; Wert steht im Leitbild) */
-@media (min-width: 60em) {
+/* Leiste: Suche, Filter und Tasten nebeneinander, bricht bei Platzmangel um */
+.leiste {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: var(--abstand-3);
+	margin-bottom: var(--abstand-4);
+}
+
+.leiste .feld {
+	margin-bottom: 0;
+	flex: 1 1 10em;
+}
+
+/* Verwaltung: Seitenleiste und Inhalt; auf schmalem Bildschirm untereinander */
+.verwaltung {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+/* PC-Layout ab 60em Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
+@container app (min-width: 60em) {
 	.inhalt {
 		padding: var(--abstand-6);
 	}
 
+	.kopf {
+		order: -2;
+	}
+
+	/* Reiter wandern als Textlinks direkt unter die Kopfleiste */
 	.reiter {
+		order: -1;
 		position: static;
+		justify-content: flex-start;
+		gap: var(--abstand-2);
+		padding: 0 var(--abstand-4);
 		border-top: 0;
-		background: transparent;
+		background: var(--farbe-marke);
 	}
 
 	.reiter a {
+		flex: none;
 		flex-direction: row;
+		padding: var(--abstand-2) var(--abstand-4);
 		color: var(--farbe-flaeche);
 		font-size: var(--groesse-text);
 	}
 
+	.reiter a[aria-current='page'] {
+		color: var(--farbe-flaeche);
+		box-shadow: inset 0 calc(-1 * var(--fokus-breite)) 0 var(--farbe-marke-hell);
+	}
+
 	.reiter a .symbol {
 		display: none;
+	}
+
+	.verwaltung {
+		display: grid;
+		grid-template-columns: 15rem 1fr;
+	}
+
+	.verwaltung .inhalt {
+		max-width: none;
+		margin: 0;
 	}
 }

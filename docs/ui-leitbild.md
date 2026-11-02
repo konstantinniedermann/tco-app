@@ -119,8 +119,11 @@ Mitglied an seinem Gerät eingestellt hat:**
 | `--schatten-karte` | `0 1px 3px rgb(0 0 0 / 0.13)` | Karten, Tabellen |
 | `--breite-inhalt` | `40rem` | maximale Breite des Inhalts |
 
-Ab einer Breite von `60em` gilt das PC-Layout. Der Wert steht nur in `basis.css`, weil
-Medienabfragen keine Tokens erlauben.
+Ab einer Breite von `60em` gilt das PC-Layout. Massgebend ist die Breite des App-Rahmens
+`.app` (Container-Abfrage), nicht die des Fensters; so zeigen auch die Mockups im
+Handy-Rahmen das Handy-Layout. Der Wert steht nur in `basis.css`, weil Abfragen keine Tokens
+erlauben. Weil `.app` ein Container ist, gehen Überlagerungen nur mit `<dialog>`, nicht mit
+`position: fixed`.
 
 ## Bausteine
 
@@ -146,7 +149,10 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06) |
 | Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm waagrecht scrollbar |
 | Symbol | `.symbol` | eigene SVG-Symbole, 24er-Raster, Strich 2, immer mit Text |
+| App-Rahmen | `.app` | umschliesst Kopfleiste, Inhalt und Reiter; misst die Breite fürs PC-Layout |
 | Inhaltsbereich | `.inhalt` | eine Spalte, höchstens `--breite-inhalt`, Seitenrand |
+| Leiste | `.leiste` | Suche, Filter und Tasten nebeneinander, bricht bei Platzmangel um |
+| Verwaltungsrahmen | `.verwaltung` | Seitenleiste links, Inhalt rechts; auf schmalem Bildschirm untereinander |
 | Nebentext | `.leise` | kleiner und leiser, für Hilfen und Nebeninfos |
 | Breite Taste | `.taste-breit` | Zusatz zu einer Taste: volle Breite (Formulare auf dem Handy) |
 
@@ -195,3 +201,16 @@ Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter d
 | UI-05 | Bedeutung nie nur über Farbe: Status als Plakette mit Text, Symbole immer mit Text. |
 | UI-06 | Fehlermeldungen stehen beim Feld, in Worten, mit Lösungsweg. |
 | UI-07 | Codes werden unabhängig von Gross-/Kleinschreibung, Leerzeichen und Bindestrich angenommen. |
+
+Lange Wörter („Clubmeisterschaft") werden getrennt statt abgeschnitten (`hyphens: auto`
+auf `body`, Sprache `de-CH` in `src/app.html`).
+
+## Mockups
+
+Vorlagen für die ersten Bildschirme (Abnahme durch den Projektleiter in #13). Sie binden `tokens.css`
+und `basis.css` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im Browser öffnen:
+
+- [Mockups](ui-mockups/index.html): Login, erstes Login (Schritt 2 von 3), Startseite mit
+  Reitern, CM-Anmeldung, Mitgliederverwaltung am PC
+- [Grosse Schrift](ui-mockups/grosse-schrift.html): Startseite und CM-Anmeldung bei 150 %
+  Systemschrift

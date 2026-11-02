@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de-CH" class="gross">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>MyTCO — Mockups mit grosser Schrift</title>
+		<link rel="stylesheet" href="../../src/lib/design/tokens.css" />
+		<link rel="stylesheet" href="../../src/lib/design/basis.css" />
+		<link rel="stylesheet" href="mockup.css" />
+	</head>
+	<body class="mockup-seite">
+		<svg width="0" height="0" aria-hidden="true">
+			<symbol id="s-start" viewBox="0 0 24 24">
+				<path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />
+			</symbol>
+			<symbol id="s-cm" viewBox="0 0 24 24">
+				<path
+					d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 21h8"
+				/>
+			</symbol>
+			<symbol id="s-profil" viewBox="0 0 24 24">
+				<circle cx="12" cy="8" r="4" />
+				<path d="M4 21a8 8 0 0 1 16 0" />
+			</symbol>
+		</svg>
+
+		<h1>Grosse Schrift (150 %)</h1>
+		<p>
+			So sieht MyTCO aus, wenn ein Mitglied am Handy die Systemschrift auf 150 % stellt (UI-02).
+			Der Rahmen ist gleich breit wie in den <a href="index.html">übrigen Mockups</a>: Alles
+			wächst mit, Tasten rutschen unter den Text, man scrollt nach unten, nie zur Seite.
+		</p>
+
+		<div class="mockup-reihe">
+			<figure class="mockup-geraet">
+				<div class="handy app">
+					<header class="kopf">
+						<img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO
+					</header>
+					<main class="inhalt">
+						<h1>Hoi Beat</h1>
+						<h2>Jetzt aktuell</h2>
+						<a class="karte kachel hervor" href="#cm">
+							<span><strong>Clubmeisterschaft 2027</strong><br /><span class="leise">Anmeldung offen bis 15. Mai</span></span>
+							<span class="kachel-pfeil" aria-hidden="true">›</span>
+						</a>
+					</main>
+					<nav class="reiter" aria-label="Hauptnavigation">
+						<a href="#start" aria-current="page"><svg class="symbol" aria-hidden="true"><use href="#s-start" /></svg>Start</a>
+						<a href="#cm"><svg class="symbol" aria-hidden="true"><use href="#s-cm" /></svg>CM</a>
+						<a href="#profil"><svg class="symbol" aria-hidden="true"><use href="#s-profil" /></svg>Profil</a>
+					</nav>
+				</div>
+				<figcaption class="leise">Startseite</figcaption>
+			</figure>
+
+			<figure class="mockup-geraet">
+				<div class="handy app">
+					<header class="kopf">
+						<img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO
+					</header>
+					<main class="inhalt">
+						<h1>Clubmeisterschaft 2027</h1>
+						<div class="zaehler">
+							<div class="zaehler-balken"><span class="voll"></span><span></span><span></span></div>
+							<div class="zaehler-text">1 von 3 Anmeldungen</div>
+						</div>
+						<div class="karte kachel">
+							<span><strong>Herren 65+ Einzel</strong><br /><span class="leise">Jahrgang 1962 und älter</span></span>
+							<button class="taste-haupt">Anmelden</button>
+						</div>
+					</main>
+					<nav class="reiter" aria-label="Hauptnavigation">
+						<a href="#start"><svg class="symbol" aria-hidden="true"><use href="#s-start" /></svg>Start</a>
+						<a href="#cm" aria-current="page"><svg class="symbol" aria-hidden="true"><use href="#s-cm" /></svg>CM</a>
+						<a href="#profil"><svg class="symbol" aria-hidden="true"><use href="#s-profil" /></svg>Profil</a>
+					</nav>
+				</div>
+				<figcaption class="leise">CM-Anmeldung</figcaption>
+			</figure>
+		</div>
+	</body>
+</html>
