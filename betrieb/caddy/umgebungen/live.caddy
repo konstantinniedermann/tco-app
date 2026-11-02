@@ -1,5 +1,7 @@
 {$MYTCO_ADRESSE_LIVE} {
 	import tls_{$MYTCO_TLS:automatisch}
 	import sicherheit
-	reverse_proxy app-live:3000
+	reverse_proxy app-live:3000 {
+		import app_ohne_sicherheit
+	}
 }

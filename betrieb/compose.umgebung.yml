@@ -38,7 +38,8 @@ services:
       # Postgres 18: Daten liegen in einem Unterordner von /var/lib/postgresql.
       - daten:/var/lib/postgresql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U mytco -d mytco']
+      # TCP statt Socket: der Init-Server beim ersten Start lauscht nur auf dem Socket.
+      test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -U mytco -d mytco']
       interval: 2s
       timeout: 3s
       retries: 20

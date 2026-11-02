@@ -1,4 +1,7 @@
-# Gemeinsame Sicherheits-Kopfzeilen für alle Adressen.
+# Gemeinsame Sicherheits-Kopfzeilen für alle Adressen. Sie gelten auch für Antworten, die Caddy
+# selbst gibt (401 der Test-Anmeldung). Die App setzt einige dieselben Köpfe: reverse_proxy
+# hängt Upstream-Köpfe an, statt zu ersetzen. Darum entfernt `app_ohne_sicherheit` sie aus der
+# Upstream-Antwort, und nur Caddys Werte bleiben (je Kopf genau einmal).
 (sicherheit) {
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
@@ -6,6 +9,13 @@
 		Referrer-Policy same-origin
 		Content-Security-Policy "frame-ancestors 'none'"
 	}
+}
+
+(app_ohne_sicherheit) {
+	header_down -Strict-Transport-Security
+	header_down -X-Content-Type-Options
+	header_down -Referrer-Policy
+	header_down -Content-Security-Policy
 }
 
 # TLS-Wahl über MYTCO_TLS (Caddy kennt keine Bedingungen, daher Snippets nach Name):
