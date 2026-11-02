@@ -101,6 +101,12 @@ Kopfzeile lesen, sonst teilen alle Mitglieder eine IP und damit die Bremsen
 - Beim Mail-Code zählt die IP-Grenze jeden Versuch, auch erfolgreiche. Im gemeinsamen WLAN
   des Clubhauses sind so höchstens 10 Logins per Mail-Code pro Stunde möglich. Der Brief-Code
   zählt nur Fehlversuche.
+- Im selben WLAN (Clubhaus, etwa an einem Abend «App einrichten») teilen alle eine IP: Nach
+  10 vertippten Brief-Codes in einer Stunde ist der Login mit Brief-Code für alle gesperrt.
+- Antwortzeit bei `POST /api/login/mail`: Hat eine Adresse einen offenen Mail-Code, schreibt
+  die Reservierung des Versuchs in die Datenbank (Commit), bei einer unbekannten Adresse nicht.
+  Die Antwortzeit kann so auf ein Konto hindeuten. Dafür muss zuerst eine Mail ausgelöst
+  werden, die das Mitglied sieht, und die Messung kostet einen der 5 Versuche; akzeptiert.
 - Ein Neustart setzt die Bremsen zurück.
 
 **Kosten:** keine neuen; der Mail-Versand hängt an K-11 ([ADR-003](adr-003-hosting-infomaniak-vps.md)).
