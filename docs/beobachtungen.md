@@ -550,3 +550,75 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #29, abschliessendes Review.
 
 **Einschätzung:** Gering bis mittel; der Brief-Code bleibt durch seine Länge geschützt, Mail-Codes durch die Grenze von 5 Versuchen pro Code. Mit #32 (Betrieb) IPv6-Clients vor dem Zählen auf ihr /64 zusammenfassen, im Proxy oder in der App.
+
+### 2026-11-02 — Ein Mail-Code-Test kann mit Wahrscheinlichkeit 1 zu einer Million scheitern
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `src/lib/server/login/mailcode.db.test.ts`, Test «neuer Mail-Code ersetzt nur den alten».
+
+**Beobachtung:** Der Test stellt zwei Mail-Codes nacheinander aus und erwartet, dass der erste danach nicht mehr gilt. Sind beide zufällig gleich (6 Ziffern), schlägt er fehl.
+
+**Ursprung:** #29, abschliessendes Review.
+
+**Einschätzung:** Sehr gering. Bei Gelegenheit den zweiten Code neu ziehen, falls er dem ersten gleicht.
+
+### 2026-11-02 — Die E2E-Tests brauchen schon 6 der 10 Code-Anfragen pro IP und Stunde
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `tests/e2e/login.test.ts`, Grenzen in `src/lib/server/login/bremse.ts`.
+
+**Beobachtung:** Alle drei Browser-Projekte kommen von 127.0.0.1 an denselben Server. Die Login-Tests verbrauchen pro Lauf 6 der 10 erlaubten Code-Anfragen pro IP und Stunde; zwei weitere Mail-Code-Tests reichen, um an die Grenze zu stossen.
+
+**Ursprung:** #29, abschliessendes Review.
+
+**Einschätzung:** Gering, aber absehbar. Vor dem nächsten Mail-Code-E2E die Grenzen für den E2E-Server einstellbar machen (Einstellung, kein Sonderweg im Code).
+
+### 2026-11-02 — Login-Seiten zeigen nicht, dass eine Anfrage läuft
+
+**Thema:** UI-Leitbild
+
+**Fundort:** `src/routes/login/+page.svelte`, `src/routes/login/mail/+page.svelte`, `src/routes/+page.svelte`.
+
+**Beobachtung:** Tasten bleiben während einer Anfrage aktiv (damit der Fokus nicht verloren geht), doppelte Klicks werden still ignoriert. Bei langsamem Netz sieht das Mitglied keine Rückmeldung.
+
+**Ursprung:** #29, Review Task 9.
+
+**Einschätzung:** Gering bis mittel für die Bedienung. Mit #13 einen «läuft»-Zustand für Tasten ins Leitbild aufnehmen (z. B. `aria-busy` mit sichtbarem Hinweis).
+
+### 2026-11-02 — Beim Einlösen eines Mail-Codes wird die Sperre nicht nochmals geprüft
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/login/dienst.ts`, `loginMitMailCode` (bedingtes Verbrauchen nach der Reservierung).
+
+**Beobachtung:** Die Reservierung prüft, ob das Konto gesperrt und das Mitglied aktiv ist, das anschliessende Verbrauchen nicht mehr. Wird ein Konto genau in den Millisekunden dazwischen gesperrt, entsteht trotzdem eine Sitzung.
+
+**Ursprung:** #29, Re-Review Task 7.
+
+**Einschätzung:** Sehr gering. Die Sitzung wäre beim nächsten Aufruf ungültig (Prüfung der Sitzung schaut auf `gesperrt`). Bei Gelegenheit die Bedingung ins Verbrauchen übernehmen.
+
+### 2026-11-02 — Login-Dienst zieht nodemailer in seinen Modulgraphen
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `src/lib/server/login/dienst.ts` (Import `baueCodeMail` aus `mail.ts`), `src/lib/server/login/mail.ts` (Typ `Mailer` aus `dienst.ts`).
+
+**Beobachtung:** Der Mailversand wird in den Dienst hineingereicht, trotzdem importiert der Dienst `mail.ts` und damit nodemailer. Zwischen den beiden Dateien besteht ein Zyklus über Typen.
+
+**Ursprung:** #29, Review Task 7.
+
+**Einschätzung:** Gering, ohne Folge im Betrieb. Beim nächsten Umbau `Mailer` und `baueCodeMail` in ein Modul ohne nodemailer legen.
+
+### 2026-11-02 — Manifest ohne `id` und ohne Symbol für Android-Masken
+
+**Thema:** UI-Leitbild
+
+**Fundort:** `static/manifest.webmanifest`.
+
+**Beobachtung:** Es fehlt ein Symbol mit `purpose: "maskable"`; Android zeigt das App-Symbol deshalb mit weissem Rand. Ohne `id` leitet Chrome die Identität der App aus `start_url` ab.
+
+**Ursprung:** #29, Review Task 10.
+
+**Einschätzung:** Gering. Mit der PWA-Arbeit (Service Worker) ein maskierbares Symbol gestalten und `"id": "/"` setzen.
