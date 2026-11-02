@@ -902,10 +902,11 @@ p7_fehlerseite() {
 # zusätzlich die wirksame Konfiguration: Der Standard-Logger entfernt die Felder jedes Eintrags.
 # Ohne Filter trägt u. a. jeder Eintrag der Admin-Schnittstelle remote_ip (im Lauf gesehen).
 p7_keine_ip() {
-	local log konfig feld netz ip
+	local log konfig feld netz ip gateways
 	konfig=$(docker exec mytco-proxy-caddy-1 wget -qO- http://127.0.0.1:2019/config/logging/logs/default)
 	for feld in remote_ip remote_port 'request\u003eremote_ip' 'request\u003eremote_port' \
-		'request\u003eclient_ip' 'request\u003eheaders\u003eX-Forwarded-For'; do
+		'request\u003eclient_ip' 'request\u003eheaders\u003eX-Forwarded-For' \
+		'request\u003eheaders\u003eX-Real-Ip' 'request\u003eheaders\u003eForwarded'; do
 		grep -qF "\"$feld\":{\"filter\":\"delete\"}" <<<"$konfig" || {
 			echo "Standard-Logger entfernt $feld nicht: $konfig"
 			return 1
@@ -918,7 +919,7 @@ p7_keine_ip() {
 		echo "keine Einträge der Admin-Schnittstelle im Log, die Prüfung hätte nichts gesehen"
 		return 1
 	}
-	for feld in '"remote_ip"' '"client_ip"' 'X-Forwarded-For'; do
+	for feld in '"remote_ip"' '"client_ip"' 'X-Forwarded-For' 'X-Real-Ip' '"Forwarded"'; do
 		if grep -qF "$feld" <<<"$log"; then
 			echo "Log enthält $feld:"
 			grep -F "$feld" <<<"$log" | head -n 3
@@ -933,7 +934,15 @@ p7_keine_ip() {
 	fi
 	# Die Adresse, unter der Docker die Anfragen an den Proxy weiterreicht (Gateway der Netze).
 	for netz in mytco-proxy-test mytco-proxy-live; do
-		for ip in $(docker network inspect -f '{{range .IPAM.Config}}{{.Gateway}} {{end}}' "$netz"); do
+		gateways=$(docker network inspect -f '{{range .IPAM.Config}}{{.Gateway}} {{end}}' "$netz") || {
+			echo "Netz $netz nicht lesbar"
+			return 1
+		}
+		[ -n "${gateways// /}" ] || {
+			echo "Netz $netz ohne Gateway-Adresse"
+			return 1
+		}
+		for ip in $gateways; do
 			if grep -qF "$ip" <<<"$log"; then
 				echo "Log enthält die Gateway-Adresse $ip"
 				return 1

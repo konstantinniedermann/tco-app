@@ -142,8 +142,11 @@ alles_zuruecksetzen() {
 	if [ -d "$SICHERUNG/betrieb-alt" ]; then
 		rm -rf "$U/betrieb"
 		mv "$SICHERUNG/betrieb-alt" "$U/betrieb"
+		# Die alte Einrichtung ist wieder da; ein weiteres Zurücksetzen darf sie nie löschen.
+		BETRIEB_NEU=0
 	elif [ "$BETRIEB_NEU" = 1 ]; then
 		rm -rf "$U/betrieb"
+		BETRIEB_NEU=0
 	fi
 	rm -rf "$U/betrieb.neu"
 	# Erledigt: ende darf nicht ein zweites Mal zurücksetzen.
