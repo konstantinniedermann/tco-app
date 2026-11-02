@@ -5,7 +5,9 @@ declare global {
 
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			konto?: import('./lib/server/login/sitzung.ts').AngemeldetesKonto;
+		}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
