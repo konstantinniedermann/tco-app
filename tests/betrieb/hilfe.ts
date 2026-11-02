@@ -18,6 +18,8 @@ export type Ergebnis = {
 	stderr: string;
 	// Argumentzeilen, die der Ersatz-docker protokolliert hat
 	aufrufe: string[];
+	// Pro Aufruf die geerbten Werte von MYTCO_IMAGE und MYTCO_UMGEBUNG (gleicher Index wie aufrufe)
+	umwelt: { image: string; umgebung: string }[];
 	// Temp-Ordner, der als MYTCO_BASIS diente
 	basis: string;
 };
@@ -46,11 +48,24 @@ export function fuehreAus(skript: string, args: string[], optionen: Optionen = {
 	} catch {
 		// Ersatz-docker wurde nie aufgerufen
 	}
+	let umwelt: { image: string; umgebung: string }[] = [];
+	try {
+		umwelt = readFileSync(`${protokoll}.umwelt`, 'utf-8')
+			.split('\n')
+			.filter(Boolean)
+			.map((zeile) => {
+				const [image, umgebung] = zeile.split('|');
+				return { image, umgebung };
+			});
+	} catch {
+		// Ersatz-docker wurde nie aufgerufen
+	}
 	return {
 		status: lauf.status ?? -1,
 		stdout: lauf.stdout,
 		stderr: lauf.stderr,
 		aufrufe,
+		umwelt,
 		basis
 	};
 }

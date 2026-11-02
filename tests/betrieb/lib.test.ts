@@ -140,6 +140,17 @@ describe('compose', () => {
 		expect(lauf.aufrufe).toEqual([
 			`compose -p mytco-live -f ${b}/live/betrieb/compose.umgebung.yml --env-file ${b}/live/geheim.env up -d`
 		]);
+		expect(lauf.umwelt[0].umgebung).toBe('live');
+	});
+});
+
+describe('compose_proxy', () => {
+	test('ruft docker compose mit Projekt mytco-proxy, Datei und proxy.env auf', () => {
+		const lauf = lib('compose_proxy', 'up', '-d');
+		const b = lauf.basis;
+		expect(lauf.aufrufe).toEqual([
+			`compose -p mytco-proxy -f ${b}/proxy/compose.proxy.yml --env-file ${b}/proxy/proxy.env up -d`
+		]);
 	});
 });
 

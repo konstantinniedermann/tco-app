@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Ersatz-docker für die Tests der Betriebsskripte (von allen Tests in tests/betrieb geteilt).
 #  - hängt die Argumente als eine Zeile ("$*") an $STUB_PROTOKOLL an
+#  - hängt MYTCO_IMAGE und MYTCO_UMGEBUNG zeilengleich an $STUB_PROTOKOLL.umwelt an
 #  - schreibt immer STUB-GEHEIM-LOG auf stderr (Ausgabetests suchen damit Lecks)
 #  - STUB_FEHLER_BEI=<muster>: Exit 1, wenn die Argumente das Muster enthalten
 #  - STUB_AUSGABE_<NAME>=<text> mit STUB_MUSTER_<NAME>=<muster>: gibt <text> auf stdout aus,
@@ -10,6 +11,10 @@
 set -euo pipefail
 
 echo "$*" >>"${STUB_PROTOKOLL:-/dev/null}"
+# Zeilengleich dazu: die Umgebungsvariablen, die Compose aus dem Aufrufer erbt ("image|umgebung")
+if [ -n "${STUB_PROTOKOLL:-}" ]; then
+	echo "${MYTCO_IMAGE-}|${MYTCO_UMGEBUNG-}" >>"$STUB_PROTOKOLL.umwelt"
+fi
 echo "STUB-GEHEIM-LOG" >&2
 
 if [ -n "${STUB_FEHLER_BEI:-}" ]; then

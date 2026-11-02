@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# zurueck <umgebung>: startet das vorherige Image und tauscht aktuell und vorher.
+# Ausgabe nur "schritt: …", "ok" oder "fehler". Die Datenbank wird nicht zurückmigriert.
+set -euo pipefail
+
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+UMGEBUNG="${1-}"
+MYTCO_REPO="${MYTCO_REPO:-ghcr.io/konstantinniedermann/tco-app}"
+MYTCO_WARTEZEIT="${MYTCO_WARTEZEIT:-60}"
+
+pruefe_umgebung "$UMGEBUNG" || exit 1
+
+U="$MYTCO_BASIS/$UMGEBUNG"
+LOG="$U/protokoll.log"
+GESPERRT=0
+GEMELDET=0
+
+ende() {
+	local rc=$?
+	if [ "$GESPERRT" = 1 ]; then sperre_freigeben "$UMGEBUNG"; fi
+	# Jeder unerwartete Abbruch (set -e) endet mit genau einem "fehler".
+	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then
+		echo fehler
+	fi
+	if [ "$rc" != 0 ]; then exit 1; fi
+	exit 0
+}
+trap ende EXIT
+
+scheitern() {
+	echo "zurueck: $1" >>"$LOG"
+	GEMELDET=1
+	echo fehler
+	exit 1
+}
+
+# Datei atomar mit Inhalt ersetzen.
+schreibe_zustand() {
+	printf '%s\n' "$2" >"$1.neu.$$"
+	mv "$1.neu.$$" "$1"
+}
+
+schritt "pruefen"
+if ! sperre_nehmen "$UMGEBUNG"; then
+	GEMELDET=1
+	echo fehler
+	exit 1
+fi
+GESPERRT=1
+
+[ -s "$U/zustand/vorher" ] || scheitern "kein vorheriges Image"
+VORHER=$(head -n 1 "$U/zustand/vorher")
+AKTUELL=""
+if [ -s "$U/zustand/aktuell" ]; then
+	AKTUELL=$(head -n 1 "$U/zustand/aktuell")
+fi
+
+schritt "app starten"
+export MYTCO_IMAGE="$MYTCO_REPO@$VORHER"
+protokoll "$UMGEBUNG" compose "$UMGEBUNG" up -d --wait --wait-timeout "$MYTCO_WARTEZEIT" app ||
+	scheitern "App startet nicht"
+
+schreibe_zustand "$U/zustand/aktuell" "$VORHER"
+if [ -n "$AKTUELL" ]; then
+	schreibe_zustand "$U/zustand/vorher" "$AKTUELL"
+else
+	rm -f "$U/zustand/vorher"
+fi
+GEMELDET=1
+echo ok

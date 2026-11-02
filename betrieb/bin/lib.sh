@@ -95,9 +95,17 @@ sperre_freigeben() {
 compose() {
 	local umgebung="$1"
 	shift
+	export MYTCO_UMGEBUNG="$umgebung"
 	docker compose -p "mytco-$umgebung" \
 		-f "$MYTCO_BASIS/$umgebung/betrieb/compose.umgebung.yml" \
 		--env-file "$MYTCO_BASIS/$umgebung/geheim.env" "$@"
+}
+
+# Compose-Aufruf für den gemeinsamen Webserver (Projekt mytco-proxy, Dateien unter proxy/).
+compose_proxy() {
+	docker compose -p mytco-proxy \
+		-f "$MYTCO_BASIS/proxy/compose.proxy.yml" \
+		--env-file "$MYTCO_BASIS/proxy/proxy.env" "$@"
 }
 
 # Je Tabelle "schema.tabelle|anzahl", sortiert (für den Vorher-Nachher-Vergleich).

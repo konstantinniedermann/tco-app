@@ -1,0 +1,201 @@
+#!/usr/bin/env bash
+# ausliefern <umgebung> <digest>: übernimmt die Einrichtung aus dem Image, sichert Live,
+# migriert, startet die neue App und fällt bei Fehlern auf das vorherige Image zurück.
+# Läuft aus fassungen/<digest>/betrieb/bin/. Ausgabe nur "schritt: …", "ok" oder "fehler";
+# alles von docker steht im Protokoll der Umgebung.
+set -euo pipefail
+
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+UMGEBUNG="${1-}"
+DIGEST="${2-}"
+MYTCO_REPO="${MYTCO_REPO:-ghcr.io/konstantinniedermann/tco-app}"
+MYTCO_WARTEZEIT="${MYTCO_WARTEZEIT:-60}"
+
+pruefe_umgebung "$UMGEBUNG" || exit 1
+pruefe_digest "$DIGEST" || exit 1
+
+U="$MYTCO_BASIS/$UMGEBUNG"
+FASSUNG="$MYTCO_BASIS/fassungen/$DIGEST/betrieb"
+PROXY="$MYTCO_BASIS/proxy"
+GEMEINSAM="$MYTCO_BASIS/gemeinsam/bin"
+LOG="$U/protokoll.log"
+SICHERUNG=""
+GESPERRT=0
+GEMELDET=0
+ALT_DIGEST=""
+
+ende() {
+	local rc=$?
+	if [ -n "$SICHERUNG" ]; then rm -rf "$SICHERUNG"; fi
+	if [ "$GESPERRT" = 1 ]; then sperre_freigeben "$UMGEBUNG"; fi
+	# Jeder unerwartete Abbruch (set -e) endet mit genau einem "fehler".
+	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then
+		echo fehler
+	fi
+	if [ "$rc" != 0 ]; then exit 1; fi
+	exit 0
+}
+trap ende EXIT
+
+scheitern() {
+	echo "ausliefern: $1" >>"$LOG"
+	GEMELDET=1
+	echo fehler
+	exit 1
+}
+
+# Fällt auf das bisher laufende Image zurück (nur wenn es eines gab); endet immer mit "fehler".
+rueckfall() {
+	if [ -n "$ALT_DIGEST" ]; then
+		schritt "rueckfall"
+		MYTCO_IMAGE="$MYTCO_REPO@$ALT_DIGEST" protokoll "$UMGEBUNG" \
+			compose "$UMGEBUNG" up -d --wait --wait-timeout "$MYTCO_WARTEZEIT" app || true
+	fi
+	scheitern "App nicht gesund"
+}
+
+# Datei atomar mit Inhalt ersetzen.
+schreibe_zustand() {
+	printf '%s\n' "$2" >"$1.neu.$$"
+	mv "$1.neu.$$" "$1"
+}
+
+schritt "pruefen"
+if ! sperre_nehmen "$UMGEBUNG"; then
+	GEMELDET=1
+	echo fehler
+	exit 1
+fi
+GESPERRT=1
+mkdir -p "$U/zustand"
+if [ -s "$U/zustand/aktuell" ]; then
+	ALT_DIGEST=$(head -n 1 "$U/zustand/aktuell")
+fi
+[ -d "$FASSUNG" ] || scheitern "Fassung fehlt: $FASSUNG"
+export MYTCO_IMAGE="$MYTCO_REPO@$DIGEST"
+
+# --- Einrichtung übernehmen ---------------------------------------------------------------
+schritt "einrichtung uebernehmen"
+GEMEINSAME_TEILE=0
+if [ "$UMGEBUNG" = live ] || [ ! -e "$MYTCO_BASIS/live/zustand/aktuell" ]; then
+	GEMEINSAME_TEILE=1
+fi
+
+# Sicherungskopie der Proxy-Dateien, falls die neue Caddy-Konfiguration ungültig ist.
+SICHERUNG="$PROXY/.sicherung.$$"
+rm -rf "$SICHERUNG"
+mkdir -p "$SICHERUNG" "$PROXY/caddy/umgebungen"
+if [ -d "$PROXY/caddy" ]; then cp -R "$PROXY/caddy" "$SICHERUNG/caddy"; fi
+if [ -f "$PROXY/compose.proxy.yml" ]; then cp -p "$PROXY/compose.proxy.yml" "$SICHERUNG/compose.proxy.yml"; fi
+
+# Einrichtung der Umgebung: ersetzen, nicht mischen.
+rm -rf "$U/betrieb.neu"
+cp -R "$FASSUNG" "$U/betrieb.neu"
+rm -rf "$U/betrieb"
+mv "$U/betrieb.neu" "$U/betrieb"
+cp -p "$FASSUNG/caddy/umgebungen/$UMGEBUNG.caddy" "$PROXY/caddy/umgebungen/$UMGEBUNG.caddy"
+
+if [ "$GEMEINSAME_TEILE" = 1 ]; then
+	cp -p "$FASSUNG/caddy/Caddyfile" "$PROXY/caddy/Caddyfile"
+	cp -p "$FASSUNG/compose.proxy.yml" "$PROXY/compose.proxy.yml"
+	mkdir -p "$GEMEINSAM"
+	for datei in sichern wiederherstellen probe lib.sh; do
+		if [ -f "$FASSUNG/bin/$datei" ]; then
+			cp -p "$FASSUNG/bin/$datei" "$GEMEINSAM/$datei"
+			chmod +x "$GEMEINSAM/$datei"
+		fi
+	done
+fi
+
+# Caddy prüfen (im laufenden Proxy oder in einem Wegwerf-Container), erst dann laden.
+LAUFEND=$(compose_proxy ps --status running -q caddy 2>>"$LOG" || true)
+GUELTIG=0
+if [ -n "$LAUFEND" ]; then
+	protokoll "$UMGEBUNG" compose_proxy exec -T caddy caddy validate \
+		--config /etc/caddy/Caddyfile --adapter caddyfile && GUELTIG=1
+else
+	protokoll "$UMGEBUNG" compose_proxy run --rm --no-deps caddy caddy validate \
+		--config /etc/caddy/Caddyfile --adapter caddyfile && GUELTIG=1
+fi
+if [ "$GUELTIG" != 1 ]; then
+	rm -rf "$PROXY/caddy"
+	if [ -d "$SICHERUNG/caddy" ]; then cp -R "$SICHERUNG/caddy" "$PROXY/caddy"; fi
+	rm -f "$PROXY/compose.proxy.yml"
+	if [ -f "$SICHERUNG/compose.proxy.yml" ]; then cp -p "$SICHERUNG/compose.proxy.yml" "$PROXY/compose.proxy.yml"; fi
+	scheitern "Caddy-Konfiguration ungültig, alte Dateien wiederhergestellt"
+fi
+if [ -n "$LAUFEND" ]; then
+	protokoll "$UMGEBUNG" compose_proxy exec -T caddy caddy reload \
+		--config /etc/caddy/Caddyfile --adapter caddyfile ||
+		scheitern "Caddy konnte nicht neu geladen werden"
+else
+	protokoll "$UMGEBUNG" compose_proxy up -d || scheitern "Proxy konnte nicht gestartet werden"
+fi
+rm -rf "$SICHERUNG"
+SICHERUNG=""
+
+# --- Live sichern, solange die Datenbank läuft ---------------------------------------------
+if [ "$UMGEBUNG" = live ]; then
+	DB_LAEUFT=$(compose live ps --status running -q db 2>>"$LOG") ||
+		scheitern "Zustand der Datenbank unbekannt"
+	if [ -n "$DB_LAEUFT" ]; then
+		schritt "sichern"
+		protokoll live "$GEMEINSAM/sichern" live || scheitern "Sicherung gescheitert"
+	fi
+fi
+
+# --- Test zurücksetzen --------------------------------------------------------------------
+if [ "$UMGEBUNG" = test ]; then
+	schritt "test zuruecksetzen"
+	protokoll test compose test down --volumes || scheitern "down gescheitert"
+fi
+
+# --- Datenbank und Migration --------------------------------------------------------------
+schritt "migrieren"
+protokoll "$UMGEBUNG" compose "$UMGEBUNG" up -d --wait db || scheitern "Datenbank startet nicht"
+protokoll "$UMGEBUNG" compose "$UMGEBUNG" run --rm --no-deps app node scripts/migrate.ts ||
+	scheitern "Migration gescheitert"
+
+# --- Testdaten (nur Test, nur wenn das Image sie enthält) ---------------------------------
+if [ "$UMGEBUNG" = test ] &&
+	protokoll test compose test run --rm --no-deps app test -f scripts/testdaten.ts; then
+	schritt "testdaten laden"
+	protokoll test compose test run --rm --no-deps app node scripts/testdaten.ts ||
+		scheitern "Testdaten gescheitert"
+fi
+
+# --- App starten --------------------------------------------------------------------------
+schritt "app starten"
+protokoll "$UMGEBUNG" compose "$UMGEBUNG" up -d --wait --wait-timeout "$MYTCO_WARTEZEIT" app ||
+	rueckfall
+
+# --- Zustand festhalten, aufräumen --------------------------------------------------------
+schritt "abschliessen"
+if [ -n "$ALT_DIGEST" ] && [ "$ALT_DIGEST" != "$DIGEST" ]; then
+	schreibe_zustand "$U/zustand/vorher" "$ALT_DIGEST"
+fi
+schreibe_zustand "$U/zustand/aktuell" "$DIGEST"
+
+# Images des Repos löschen, ausser aktuell/vorher beider Umgebungen. Fehler nur ins Protokoll.
+BEHALTEN=""
+for datei in test/zustand/aktuell test/zustand/vorher live/zustand/aktuell live/zustand/vorher; do
+	if [ -s "$MYTCO_BASIS/$datei" ]; then
+		BEHALTEN="$BEHALTEN $(head -n 1 "$MYTCO_BASIS/$datei")"
+	fi
+done
+VORHANDEN=$(docker image ls --digests --format '{{.Digest}}' "$MYTCO_REPO" 2>>"$LOG" || true)
+for kandidat in $VORHANDEN; do
+	case "$kandidat" in
+	sha256:*) ;;
+	*) continue ;;
+	esac
+	case " $BEHALTEN " in
+	*" $kandidat "*) continue ;;
+	esac
+	protokoll "$UMGEBUNG" docker image rm "$MYTCO_REPO@$kandidat" || true
+done
+
+GEMELDET=1
+echo ok
