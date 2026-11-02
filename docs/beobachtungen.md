@@ -458,4 +458,4 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 **Ursprung:** Review von #9 (Kostenübersicht).
 
-**Einschätzung:** Mittel. Vor dem Bau des Versands (#29) klären: Bedingungen von Scaleway (Specific Conditions TEM) lesen, ob sich Protokolle löschen lassen, oder das Postfach-Weg nach K-11 vorziehen; Ergebnis ins Datenschutzkonzept.
+**Einschätzung:** Mittel. Vor dem Bau des Versands (#29) klären: Bedingungen von Scaleway (Specific Conditions TEM) lesen, ob sich Protokolle löschen lassen, oder den Weg über das Postfach nach K-11 vorziehen; Ergebnis ins Datenschutzkonzept.
