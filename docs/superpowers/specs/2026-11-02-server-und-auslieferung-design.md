@@ -210,9 +210,11 @@ Ohne Variable gelten die Jobs als übersprungen, nicht als fehlgeschlagen. *(Zwe
 Entscheid Claude)*
 
 **Live bekommt genau das Image, das auf Test lief.** Gebaut wird nur auf `dev`. Das Image
-erhält zusätzlich das Tag `baum-<tree-sha>` (Git-Tree des Commits). Weil `main` nach dem
-Release-Merge denselben Tree hat wie `dev`, sucht der Lauf auf `main` das Image über diesen
-Tree, statt neu zu bauen. Fehlt es, bricht die Live-Auslieferung mit `fehler` ab, und es wird
+erhält zusätzlich das Tag `code-<hash>`. Der Hash wird über alle versionierten Dateien
+ausser der Doku gebildet, mit derselben Regel wie in `nur-doku.ts`: Pfade unter `docs/` und
+Dateien mit `.md`. Ein reiner Doku-Merge nach dem letzten Code-Merge baut kein Image und
+ändert den Hash nicht. Weil `main` nach dem Release-Merge denselben Code-Stand hat wie `dev`,
+sucht der Lauf auf `main` das Image über diesen Hash, statt neu zu bauen. Fehlt es, bricht die Live-Auslieferung mit `fehler` ab, und es wird
 nicht neu gebaut: Live bekommt nie ein Image, das nicht auf Test lief und nicht durch die
 Checkliste ging. Docker-Builds sind nicht bitgenau wiederholbar, ein Neubau ergäbe einen
 anderen Digest. *(Entscheid Claude, folgt aus dem Release-Ablauf im Konzept)*
@@ -220,8 +222,8 @@ anderen Digest. *(Entscheid Claude, folgt aus dem Release-Ablauf im Konzept)*
 | Job | Rechte | Was |
 |-----|--------|-----|
 | `image` (bestehend, erweitert) | `contents: read` | Bauen wie bisher, dazu **Rauchtest**: Container mit PostgreSQL starten, Migration, `/api/status` = `ok`. Sofort aktiv |
-| `bauen` | `contents: read`, `packages: write` | Nur `dev`: Image bauen und in die Container-Ablage schieben (Tags `baum-<tree-sha>` und Commit), Digest als Ausgabe |
-| `finden` | `contents: read`, `packages: read` | Nur `main`: Digest des Images zum Tree von `main` ermitteln, sonst `fehler` |
+| `bauen` | `contents: read`, `packages: write` | Nur `dev`: Image bauen und in die Container-Ablage schieben (Tags `code-<hash>` und Commit), Digest als Ausgabe |
+| `finden` | `contents: read`, `packages: read` | Nur `main`: Digest des Images zum Code-Stand von `main` ermitteln, sonst `fehler` |
 | `ausliefern` | `packages: read`, sonst nichts | Kein Checkout, kein `uses:`, kein npm. SSH mit dem Schlüssel der Umgebung (`dev` → Test, `main` → Live) und dem Fingerabdruck des Servers aus den Geheimnissen, Digest als Befehl, Token über die Standardeingabe. Gruppe je Umgebung, kein Abbruch |
 | `release` | `contents: write` | Nur nach Live: Tag `vX.Y.Z` aus `package.json` und GitHub-Release mit dem Abschnitt aus `docs/versionen.md` (mit `gh`, ohne npm) |
 
