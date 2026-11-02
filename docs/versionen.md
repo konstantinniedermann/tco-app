@@ -93,3 +93,8 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   Navigation, Du-Form und Barrierefreiheit `UI-NN`; Prüfungen gegen Abweichung zwischen
   Leitbild und Tokens und gegen Farb- und px-Werte im Code; Kopfleiste mit Wappen und
   App-Symbol (Annahmen K-13, K-13.2); Schrift folgt der Systemeinstellung des Geräts; Mockups.
+- Kosten (`docs/kosten.md`, #9): laufend ca. CHF 95–175 pro Jahr (VPS, Sicherungsablage,
+  E-Mail über Scaleway), einmalig nur der Druck des Login-Briefs (Porto entfällt, der Brief
+  geht mit dem Versand der Vereinsdokumente mit); Szenarien für 100, 200 und 300 Mitglieder,
+  Store-App und SMS nur als «falls»; jährliche Überprüfung vor dem Vereinsbudget;
+  Freigabe offen (K-03).
