@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { konto } from '../db/schema.ts';
+import { konto, mitglied } from '../db/schema.ts';
 import { erstelleBremsen } from './bremse.ts';
 import { MAIL_CODE_GUELTIG_MS } from './codes.ts';
 import { erstelleLoginDienst, type Mailer } from './dienst.ts';
@@ -91,15 +91,24 @@ describe('Mail-Code', () => {
 		expect(bekannt.annahme).toBe('ok');
 		expect({ annahme: bekannt.annahme }).toEqual({ annahme: unbekannt.annahme });
 		expect(d.post).toHaveLength(1);
-		expect(d.dienst.fordereMailCodeAn(42, 'ip-4').annahme).toBe('ok');
+		const ungueltig = d.dienst.fordereMailCodeAn(42, 'ip-4');
+		expect(ungueltig.annahme).toBe('ok');
+		await ungueltig.arbeit;
 	});
 
 	test('SI-04: Annahme wartet nicht auf die Arbeit', async () => {
-		const d = baue(() => new Promise<void>(() => {}));
+		let aufgerufen!: () => void;
+		const imMailer = new Promise<void>((r) => (aufgerufen = r));
+		const d = baue(() => {
+			aufgerufen();
+			return new Promise<void>(() => {});
+		});
 		const { email } = await legeMitgliedAn(db);
 		const r = d.dienst.fordereMailCodeAn(email, 'ip-5');
 		expect(r.annahme).toBe('ok');
 		expect(r.arbeit).toBeInstanceOf(Promise);
+		// Die DB-Arbeit ist beendet, sobald der hängende Mailer erreicht ist.
+		await imMailer;
 	});
 
 	test('SI-04: höchstens 3 Mails pro Adresse und Stunde, 10 pro Tag', async () => {
@@ -124,11 +133,13 @@ describe('Mail-Code', () => {
 
 	test('SI-04: 10 Anfragen pro IP und Stunde, dann zu-viele', async () => {
 		const d = baue();
-		for (let i = 0; i < 10; i++) {
-			expect(d.dienst.fordereMailCodeAn(`x${i}@example.org`, 'ip-7').annahme).toBe('ok');
-		}
+		const rs = [];
+		for (let i = 0; i < 10; i++) rs.push(d.dienst.fordereMailCodeAn(`x${i}@example.org`, 'ip-7'));
+		expect(rs.every((r) => r.annahme === 'ok')).toBe(true);
 		expect(d.dienst.fordereMailCodeAn('x@example.org', 'ip-7').annahme).toBe('zu-viele');
-		expect(d.dienst.fordereMailCodeAn('x@example.org', 'ip-8').annahme).toBe('ok');
+		const anderer = d.dienst.fordereMailCodeAn('x@example.org', 'ip-8');
+		expect(anderer.annahme).toBe('ok');
+		await Promise.all([...rs.map((r) => r.arbeit), anderer.arbeit]);
 	});
 
 	test('gesperrtes Konto oder nicht aktives Mitglied → keine Mail', async () => {
@@ -232,5 +243,114 @@ describe('Mail-Code', () => {
 		const r = d.dienst.fordereMailCodeAn(email, 'ip-18');
 		await expect(r.arbeit).resolves.toBeUndefined();
 		expect(fehler.mock.calls).toEqual([['Code-Mail nicht versandt']]);
+	});
+
+	test('SI-03: parallele Fehlversuche überschreiten die 5 nicht', async () => {
+		const d = baue();
+		const { email, kontoId } = await legeMitgliedAn(db);
+		await fordereAn(d, email);
+		const code = codeAus(d.post[0]);
+		const falsch = code === '000000' ? '111111' : '000000';
+		const antworten = await Promise.all(
+			Array.from({ length: 20 }, (_, i) => d.dienst.loginMitMailCode(email, falsch, `ip-p-${i}`))
+		);
+		expect(antworten.every((a) => a.ergebnis === 'falsch')).toBe(true);
+		expect((await holeKonto(kontoId)).mailCodeFehlversuche).toBe(5);
+		expect(await d.dienst.loginMitMailCode(email, code, 'ip-p-x')).toEqual({ ergebnis: 'falsch' });
+	});
+
+	test('SI-03: 15 parallele Versuche von einer IP ergeben höchstens 10 Antworten ausser zu-viele', async () => {
+		const d = baue();
+		const { email } = await legeMitgliedAn(db);
+		await fordereAn(d, email);
+		const antworten = await Promise.all(
+			Array.from({ length: 15 }, () => d.dienst.loginMitMailCode(email, '000000', 'ip-q'))
+		);
+		expect(antworten.filter((a) => a.ergebnis !== 'zu-viele').length).toBeLessThanOrEqual(10);
+		expect(antworten.some((a) => a.ergebnis === 'zu-viele')).toBe(true);
+	});
+
+	test('Adresse mit Grossbuchstaben in der Datenbank wird gefunden', async () => {
+		const d = baue();
+		const { email, mitgliedId } = await legeMitgliedAn(db);
+		await db
+			.update(mitglied)
+			.set({ email: email.replace('test-', 'TEST-').replace('@example', '@EXAMPLE') })
+			.where(eq(mitglied.id, mitgliedId));
+		await fordereAn(d, email);
+		expect(d.post).toHaveLength(1);
+		expect((await d.dienst.loginMitMailCode(email, codeAus(d.post[0]), 'ip-r')).ergebnis).toBe(
+			'ok'
+		);
+	});
+
+	test('Anfragen für eine unbekannte Adresse verbrauchen das Adressbudget', async () => {
+		const d = baue();
+		const email = `test-spaeter-${Date.now()}@example.org`;
+		for (let i = 0; i < 3; i++) await fordereAn(d, email, `ip-s-${i}`);
+		const [m] = await db
+			.insert(mitglied)
+			.values({
+				vorname: 'Spaet',
+				nachname: 'Muster',
+				strasse: 'Erfundenweg 1',
+				plz: '4600',
+				ort: 'Olten',
+				email
+			})
+			.returning({ id: mitglied.id });
+		await db.insert(konto).values({ mitgliedId: m.id });
+		await fordereAn(d, email, 'ip-s-x');
+		expect(d.post).toHaveLength(0);
+	});
+
+	test('neuer Mail-Code setzt die Fehlversuche zurück', async () => {
+		const d = baue();
+		const { email, kontoId } = await legeMitgliedAn(db);
+		await fordereAn(d, email);
+		await d.dienst.loginMitMailCode(email, '000000', 'ip-t');
+		await d.dienst.loginMitMailCode(email, '000001', 'ip-t');
+		expect((await holeKonto(kontoId)).mailCodeFehlversuche).toBe(2);
+		await fordereAn(d, email);
+		expect((await holeKonto(kontoId)).mailCodeFehlversuche).toBe(0);
+	});
+
+	test('gesperrt oder inaktiv nach Ausgabe: richtiger Code → falsch, nicht verbraucht', async () => {
+		const d = baue();
+		const a = await legeMitgliedAn(db);
+		const b = await legeMitgliedAn(db);
+		await fordereAn(d, a.email, 'ip-u-1');
+		await fordereAn(d, b.email, 'ip-u-2');
+		await db.update(konto).set({ gesperrt: true }).where(eq(konto.id, a.kontoId));
+		await db.update(mitglied).set({ status: 'ausgetreten' }).where(eq(mitglied.id, b.mitgliedId));
+		expect(await d.dienst.loginMitMailCode(a.email, codeAus(d.post[0]), 'ip-u-3')).toEqual({
+			ergebnis: 'falsch'
+		});
+		expect(await d.dienst.loginMitMailCode(b.email, codeAus(d.post[1]), 'ip-u-3')).toEqual({
+			ergebnis: 'falsch'
+		});
+		expect((await holeKonto(a.kontoId)).mailCodeHash).not.toBeNull();
+		expect((await holeKonto(b.kontoId)).mailCodeHash).not.toBeNull();
+	});
+
+	test('Brief-Code-Login macht einen offenen Mail-Code ungültig', async () => {
+		const d = baue();
+		const { email, kontoId } = await legeMitgliedAn(db);
+		const { code: brief } = await d.dienst.stelleBriefCodeAus(kontoId);
+		await fordereAn(d, email);
+		expect((await d.dienst.loginMitBriefCode(brief, 'ip-v')).ergebnis).toBe('ok');
+		expect(await d.dienst.loginMitMailCode(email, codeAus(d.post[0]), 'ip-v')).toEqual({
+			ergebnis: 'falsch'
+		});
+	});
+
+	test('falsche Codes für ein bekanntes Konto erreichen zu-viele pro IP', async () => {
+		const d = baue();
+		const { email } = await legeMitgliedAn(db);
+		await fordereAn(d, email);
+		for (let i = 0; i < 10; i++) await d.dienst.loginMitMailCode(email, '000000', 'ip-w');
+		expect(await d.dienst.loginMitMailCode(email, '000000', 'ip-w')).toEqual({
+			ergebnis: 'zu-viele'
+		});
 	});
 });

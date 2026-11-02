@@ -1,4 +1,4 @@
-import { and, eq, gt, inArray, isNotNull, isNull, lt, sql } from 'drizzle-orm';
+import { and, eq, gt, inArray, isNotNull, isNull, lt, lte, sql } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { konto, mitglied } from '../db/schema.ts';
 import type { Bremsen } from './bremse.ts';
@@ -165,7 +165,7 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 				db
 					.select({ id: mitglied.id })
 					.from(mitglied)
-					.where(and(eq(mitglied.status, 'aktiv'), eq(mitglied.email, adresse)))
+					.where(and(eq(mitglied.status, 'aktiv'), sql`lower(${mitglied.email}) = ${adresse}`))
 			),
 			eq(konto.gesperrt, false)
 		);
@@ -216,17 +216,17 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 		alteKennung?: string
 	): Promise<LoginErgebnis> {
 		if (!bremsen.mailFehlerProIp.erlaubt(ip)) return { ergebnis: 'zu-viele' };
-		const falsch = (): LoginErgebnis => {
-			bremsen.mailFehlerProIp.zaehle(ip);
-			return { ergebnis: 'falsch' };
-		};
+		// Jeder Versuch zählt sofort, vor dem ersten await: parallele Anfragen umgehen die Grenze nicht.
+		bremsen.mailFehlerProIp.zaehle(ip);
+		const falsch = (): LoginErgebnis => ({ ergebnis: 'falsch' });
 		const adresse = normalisiereAdresse(email);
 		const code = typeof eingabe === 'string' ? normalisiereMailCode(eingabe) : null;
 		if (adresse === null || code === null) return falsch();
 		const t = jetzt();
+		// SI-03: Der Versuch wird atomar reserviert; mehr als 5 sind auch parallel nicht möglich.
 		const [k] = await db
-			.select({ id: konto.id, hash: konto.mailCodeHash })
-			.from(konto)
+			.update(konto)
+			.set({ mailCodeFehlversuche: sql`${konto.mailCodeFehlversuche} + 1` })
 			.where(
 				and(
 					aktivesKonto(adresse),
@@ -234,16 +234,11 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 					gt(konto.mailCodeAblauf, t),
 					lt(konto.mailCodeFehlversuche, MAIL_CODE_MAX_FEHLVERSUCHE)
 				)
-			);
+			)
+			.returning({ id: konto.id, hash: konto.mailCodeHash });
 		if (!k?.hash) return falsch();
 		const hash = hashMailCode(schluessel, k.id, code);
-		if (!gleich(hash, k.hash)) {
-			await db
-				.update(konto)
-				.set({ mailCodeFehlversuche: sql`${konto.mailCodeFehlversuche} + 1` })
-				.where(and(eq(konto.id, k.id), eq(konto.mailCodeHash, k.hash)));
-			return falsch();
-		}
+		if (!gleich(hash, k.hash)) return falsch();
 		// Bedingtes UPDATE: der Code wird atomar nur einmal verbraucht.
 		const [eingeloest] = await db
 			.update(konto)
@@ -257,8 +252,8 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 				and(
 					eq(konto.id, k.id),
 					eq(konto.mailCodeHash, hash),
-					lt(konto.mailCodeFehlversuche, MAIL_CODE_MAX_FEHLVERSUCHE),
-					gt(konto.mailCodeAblauf, t)
+					gt(konto.mailCodeAblauf, t),
+					lte(konto.mailCodeFehlversuche, MAIL_CODE_MAX_FEHLVERSUCHE)
 				)
 			)
 			.returning({ id: konto.id });
