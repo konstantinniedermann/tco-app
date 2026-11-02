@@ -81,7 +81,7 @@ damit ein Datenbank-Leck die 50 Bit des Brief-Codes nicht durchrechenbar macht.
 | SI-10 | Nur HTTPS mit HSTS. Content-Security-Policy erlaubt nur die eigene Adresse (DS-03); einzige Ausnahme ist der feste Style von SvelteKits Screenreader-Hinweis, erlaubt über seinen Hash (`style-src-attr`). Ändernde Anfragen nur mit passender Herkunft (Schutz vor gefälschten Anfragen fremder Seiten); Eingaben von Mitgliedern werden nie als HTML ausgegeben |
 | SI-11 | Rechte prüft der Server bei jedem Zugriff nach Rolle und Objektbezug (RR-06); die Oberfläche blendet nur aus |
 | SI-12 | Der Änderungsverlauf hält fest, wer (Admin, Mitglied oder automatisch) bei welchem Mitglied wann welches Feld geändert oder welche Aktion ausgelöst hat (Umfang FR-26: z. B. neuer Brief-Code, Sitzungen beendet, Export); ohne alte oder neue Werte, ohne Login-Vorgänge. Nur Admins sehen ihn; Aufbewahrung 12 Monate (FR-26, [Löschen](datenschutz.md#löschen)) |
-| SI-13 | Server ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)): SSH nur mit Schlüssel, kein Root-Login über SSH, Firewall offen nur für 22, 80, 443; automatische Sicherheits-Updates; Datenbanken nur im internen Docker-Netz; Test und Live getrennt ([CI/CD](ci-cd-und-release.md#umgebungen)) |
+| SI-13 | Server ([#39](https://github.com/konstantinniedermann/tco-app/issues/39)): SSH nur mit Schlüssel, kein Root-Login über SSH, Firewall offen nur für 22, 80, 443; automatische Sicherheits-Updates; Datenbanken nur im internen Docker-Netz; Test und Live getrennt ([CI/CD](ci-cd-und-release.md#umgebungen)) |
 | SI-14 | Abhängigkeiten, Auslieferung und Geheimnisse nach [CI/CD](ci-cd-und-release.md#abhängigkeiten): neue Pakete nur mit Freigabe, Installation ohne Paket-Skripte, Malware-Prüfung, nur der Auslieferungs-Job hat den Schlüssel, Geheimnisse nie im Repo (Secret-Scan); die CI meldet nur «ok» oder «Fehler», keine App-Logs (Logs liegen bei GitHub in den USA) |
 | SI-15 | Zwei-Faktor-Login auf allen Konten für Betrieb und Code: GitHub (alle mit Schreibrecht), Infomaniak, E-Mail-Versand, Domain |
 | SI-16 | Direkter Zugriff auf die Live-Datenbank nur über SSH auf den Server, nur der Projektleiter und seine Stellvertretung (K-05), nur für Betrieb und Fehlersuche; keine Kopien der Daten auf eigene Geräte (DS-08). Er steht nicht in der Matrix von [Rollen und Rechte](rollen-und-rechte.md), weil er ausserhalb der App liegt |
@@ -100,7 +100,11 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
   Handy (Projektleiter, 01.11.2026).
 - **Schreibrecht auf GitHub reicht bis Live.** Ohne GitHub Pro kann jedes Konto mit
   Schreibrecht direkt auf `main` pushen oder einen Workflow mit dem Live-Schlüssel schreiben
-  ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Angenommen unter zwei
+  ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Weil die Einrichtung des Servers im
+  Image mitreist, reicht das bis auf den Server: Ein Image kann Skripte liefern, die ausserhalb
+  der Container laufen und an die Geheimnisse beider Umgebungen und an den Sicherungszugang
+  kommen. Nur der Türsteher (Eingabeprüfung, Zwangsbefehl) bleibt von Hand eingerichtet und ist
+  damit nicht über ein Image veränderbar. Angenommen unter zwei
   Bedingungen: Zwei-Faktor-Login auf beiden Konten (SI-15), und die Hauptansprechperson im
   Vorstand nutzt ihren Zugang nur zum Lesen (Absprache). Neu bewerten: hängt an K-04 (wem
   gehören die Konten).

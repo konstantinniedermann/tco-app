@@ -16,20 +16,27 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 
 | | Test | Live |
 |---|------|------|
-| Adresse | `test.my.tcolten.ch`, nur mit Passwort | `my.tcolten.ch` |
+| Adresse | `test.my.tcolten.ch`, nur mit Passwort (Annahme K-10) | `my.tcolten.ch` (Annahme K-10) |
+| Rolle | Demo und Checkliste | Testgruppe (Pilotphase), später alle Mitglieder |
 | Ausgeliefert bei | Merge nach `dev` | Merge des PR `dev` → `main` |
 | Daten | nur erfundene Testdaten; bei jeder Auslieferung neu aufgesetzt | Mitgliederdaten |
-| E-Mail | nur an die Adresse des Projektleiters, alle anderen werden verworfen | an die Mitglieder |
+| E-Mail | nur an die Adresse des Projektleiters, alle anderen werden verworfen (hängt an K-11) | an die Mitglieder |
 | Push, Schlüssel | eigene | eigene |
 
-Beide Adressen richtet der Website-Betreuer ein (Annahme K-10). Auf der Test-Umgebung läuft die
+Beide Adressen richtet der Website-Betreuer ein (Annahme K-10: Test und Live unter `tcolten.ch`).
+Bis dahin gilt eine Übergangsadresse, die sich aus der IP des Servers bildet; die Adressen sind
+Einstellungen, am Code ändert sich dafür nichts. Die Demo läuft auf Test, Live bleibt leer bis zur
+Testgruppe. Auf der Test-Umgebung läuft die
 [Checkliste vor dem Release](testkonzept.md#checkliste-vor-dem-release). Echte Daten kommen
 dort nie hin (DS-08).
 
-**Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut. Server,
-Umgebungen und Auslieferung baut [#32](https://github.com/konstantinniedermann/tco-app/issues/32),
-sobald Konten und Adresse geklärt sind (hängt an K-04 und K-10), spätestens vor dem Release
-*Mitglieder-Login*.
+**Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut.
+[#32](https://github.com/konstantinniedermann/tco-app/issues/32) baut den lokal belegbaren Teil:
+Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
+(29 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
+[#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
+#29, Konten und Adresse hängen an K-04 und K-10), spätestens vor dem Release *Mitglieder-Login*.
+Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
 
 ## Ablauf
 
@@ -63,22 +70,69 @@ flowchart LR
 
 ## Auslieferung
 
-1. **Bauen:** Die CI baut das Docker-Image und legt es in der privaten Container-Ablage von
-   GitHub ab.
-2. **Verbinden:** Die CI meldet sich per SSH auf dem Server an, mit je einem eigenen
-   Schlüssel für Test und Live. Der Schlüssel darf nur das Auslieferungs-Skript starten.
-3. **Auf dem Server:** Bei Live zuerst eine Sicherung der Datenbank, mit denselben Regeln wie
-   die nächtliche Sicherung (verschlüsselt, Schweiz, 30 Tage, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md)).
-   Dann neues Image holen, Migrationen ausführen, Container neu starten.
-4. **Prüfen:** Antwortet die App nicht innert einer Minute (S) auf ihre Statusabfrage,
-   startet das Skript wieder das vorherige Image. Der CI meldet es nur „ok“ oder „Fehler“,
+Gebaut wird einmal, auf `dev`. Live bekommt **nur das Image, das zuvor auf Test erfolgreich
+ausgeliefert wurde** (Docker-Builds sind nicht bitgenau wiederholbar, ein Neubau wäre ein
+anderes Image). Dafür trägt ein Image das Kennzeichen `code-<Hash>`; der Hash bildet sich über
+alle versionierten Dateien ausser der Doku (gleiche Regel wie `nur-doku.ts`). Ein reiner
+Doku-Merge ändert ihn nicht.
+
+1. **Prüfen:** Job `image` baut das Image und startet es im Rauchtest (Container mit
+   PostgreSQL, Migration, `/api/status` = `ok`). Das läuft bei jeder Codeänderung und ist
+   sofort aktiv.
+2. **Bauen (`bauen`, nur `dev`):** Image bauen und mit dem Commit als Kennzeichen
+   (`commit-<sha>`) in die private Container-Ablage von GitHub legen.
+3. **Verbinden (`ausliefern`):** Die CI meldet sich per SSH beim **Türsteher** auf dem Server,
+   mit je einem eigenen Schlüssel für Test und Live. Der Schlüssel darf nur den Türsteher
+   starten; die Umgebung steht im Schlüssel, nicht in der Anfrage. Übergeben wird nur der
+   Digest des Images. Der Schlüssel wird je Zweig gewählt, ohne Rückfall auf den anderen; ein
+   leeres Geheimnis ergibt `fehler`.
+4. **Auf dem Server:** Das Image holen und **die Einrichtung daraus entnehmen** (Compose-Dateien,
+   Caddy-Teil der Umgebung, Skripte). Sie reist im Image mit, das Image wird dafür nicht
+   gestartet. Bei Live zuerst eine Sicherung der Datenbank, **bevor** irgendetwas übernommen
+   wird; scheitert sie, bleibt alles, wie es war. Dann die Einrichtung übernehmen (gemeinsame
+   Teile wie die Caddy-Grundkonfiguration nur bei Live, vorher prüft `caddy validate`; eine
+   ungültige Konfiguration wird abgewiesen, die alte bleibt aktiv), Migrationen ausführen,
+   Container neu starten. Auf Test wird die Datenbank dabei neu aufgesetzt.
+5. **Prüfen:** Antwortet die App nicht innert einer Minute (S) auf ihre Statusabfrage,
+   startet das Skript wieder das vorherige Image. Die CI erfährt nur `ok` oder `fehler`,
    keine Logs der App, denn CI-Logs liegen bei GitHub in den USA (DS-01, DS-06).
-5. **Abschluss Live:** Tag `vX.Y.Z` auf `main` und GitHub-Release mit dem Text aus den
+6. **Freigeben (`freigeben`, nur `dev`):** Erst nach einer geglückten Auslieferung auf Test
+   setzt dieser Job das Kennzeichen `code-<Hash>`. Ohne Auslieferung auf Test gibt es kein
+   solches Kennzeichen, also auch nichts für Live.
+7. **Live (`finden`, nur `main`):** Der Job sucht über `code-<Hash>` das Image, das auf Test lief.
+   Fehlt es, endet der Lauf mit `fehler`, es wird nicht neu gebaut. **Vorab** prüft `finden`
+   das Release (Version gültig, Abschnitt in den [Versionen](versionen.md) vorhanden, Tag noch
+   frei), damit Live nie ausgeliefert wird und danach das Release scheitert. Dann liefert
+   `ausliefern` an Live.
+8. **Abschluss Live (`release`):** Tag `vX.Y.Z` auf `main` und GitHub-Release mit dem Text aus den
    [Versionen](versionen.md).
 
-**Zurück auf die vorherige Version:** Das vorherige Image bleibt auf dem Server; ein Befehl
-startet es wieder. Damit das ohne Datenverlust geht, fügen Migrationen nur hinzu. Was die
-alte Version noch braucht, wird erst ein Release später entfernt.
+**Zwei Schalter:** Die Jobs `bauen`, `finden`, `ausliefern`, `freigeben` und `release` laufen nur,
+wenn die Repo-Variable der Umgebung auf `an` steht: `AUSLIEFERUNG_TEST` (für `dev`) bzw.
+`AUSLIEFERUNG_LIVE` (für `main`). So kann die Demo auf Test laufen, während Live noch aus ist.
+Stehen sie nicht auf `an`, gelten die Jobs als übersprungen, nicht als fehlgeschlagen. Aktiv ist
+nur der Rauchtest.
+
+**Sicherung und Probe:** `sichern` schreibt die Datenbank verschlüsselt mit restic ins
+Sicherungsziel, ohne unverschlüsselte Datei, und löscht Sicherungen nach 30 Tagen
+(DS-06, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md)). Nächtlich läuft das für Live über einen
+Timer, danach prüft `probe` die frische Sicherung in einer Wegwerf-Datenbank ohne Verbindung nach
+aussen. Eingespielt und zurückgespielt werden nur vollständige Läufe. Die Daten verlassen den
+Server nicht (SI-16).
+
+**Befehle auf dem Server** (Einzelheiten in `betrieb/README.md`):
+
+| Befehl | Zweck |
+|--------|-------|
+| `zurueck` | Zurück auf das vorherige Image. Migrationen fügen nur hinzu, darum geht das ohne Datenverlust; was die alte Version noch braucht, wird erst ein Release später entfernt |
+| `wiederherstellen` | Eine Sicherung derselben Umgebung zurückspielen. Eine Live-Sicherung wird auf Test abgewiesen (DS-08) |
+| `probe` | Sicherung in einer Wegwerf-Datenbank einspielen, mit der Zählung vergleichen, `ok` oder `fehler` |
+
+**Netz und Header:** Ein Caddy-Proxy nimmt 80 und 443 an und erreicht beide Apps; die Datenbanken
+hängen nur an ihrem internen Netz, die Test-App erreicht Live nicht. Caddy behält die
+Content-Security-Policy der App und setzt `frame-ancestors 'none'` nur, wo keine besteht;
+HSTS, `nosniff` und Referrer-Policy setzt er genau einmal, auch für `/_app/*`. Er führt kein
+Zugriffsprotokoll (keine IP-Adressen, DS-06). Test verlangt ein Passwort.
 
 ### Schutz des Auslieferungswegs
 
@@ -87,7 +141,13 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 - Das Skript nimmt nur zwei Angaben an: `test` oder `live` und den Digest eines Images aus
   der eigenen Container-Ablage. Beides wird streng geprüft und nie über eine Shell
   ausgewertet.
-- Der Live-Lauf startet nur bei einem Push auf `main`.
+- Der Live-Lauf startet nur bei einem Push auf `main` und nur mit einem Image, das auf Test
+  ausgeliefert wurde.
+- Der Türsteher und seine Eingabeprüfung werden **von Hand** eingerichtet und nie von der CI
+  geändert; ein Image kann sie nicht ersetzen.
+- Die Rechte der Workflows prüft `workflow-rechte.ts` in der CI: Jeder Job hat eigene Rechte,
+  `packages: write` nur `bauen` und `freigeben`, `contents: write` nur `release`, die SSH-Geheimnisse
+  nur `ausliefern`.
 - Nur der Auslieferungs-Job fordert den SSH-Schlüssel an. Er führt keine npm-Pakete, keine
   fremden Actions und nichts aus Caches oder Artefakten anderer Jobs aus. GitHub gibt ein
   Geheimnis nur an Schritte, die es anfordern; ein Schadpaket in den Tests kommt so nicht
@@ -104,7 +164,8 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten, hängt an K-04):
   - Wer ins Repo pushen kann, kann direkt auf `main` pushen (davor schützt nur der lokale
     Hook des Projektleiters) oder einen Workflow schreiben, der den Live-Schlüssel nutzt
-    (davor schützt nichts). Pushen können der Projektleiter und die Hauptansprechperson
+    (davor schützt nichts); weil die Einrichtung im Image mitreist, reicht das bis auf den Server
+    (Geheimnisse beider Umgebungen, Sicherungszugang). Pushen können der Projektleiter und die Hauptansprechperson
     im Vorstand: Mitarbeitende eines privaten Repos auf einem Privatkonto haben immer
     Schreibrecht (B: [GitHub Docs](https://docs.github.com/en/account-and-profile/reference/permission-levels-for-a-personal-account-repository)).
     Eine reine Leserolle gibt es erst in einer Organisation (K-04).
@@ -115,11 +176,14 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 
 | Wo | Was |
 |----|-----|
-| GitHub | SSH-Schlüssel für Test und für Live, Fingerabdruck des Servers |
+| GitHub (Secrets) | `SSH_SCHLUESSEL_TEST`, `SSH_SCHLUESSEL_LIVE`, `SSH_BEKANNTE_HOSTS` (Fingerabdruck des Servers), `SERVER_ADRESSE` |
+| GitHub (Variablen, keine Geheimnisse) | `AUSLIEFERUNG_TEST`, `AUSLIEFERUNG_LIVE` |
 | CI-Lauf | kurzlebiges Token zum Lesen der Container-Ablage, das die CI für den Pull mitgibt; auf dem Server bleibt kein dauerhaftes Token |
-| Server | Datenbank-Passwörter, Schlüssel für Push, Zugang zum E-Mail-Versand, Passwort der Test-Umgebung |
+| Server, je Umgebung | `geheim.env`: Datenbank-Passwörter, Schlüssel für Push, Zugang zum E-Mail-Versand (Test: Empfänger nur der Projektleiter) |
+| Server, gemeinsam | `proxy.env` (Adressen, Passwort-Hash für Test), `sicherung.env` (Ziel und Zugang der Sicherung) |
 
-Nichts davon steht im Repo. Wo die Geheimnisse für eine Nachfolge dokumentiert sind, regelt
+Die Dateien liegen nur auf dem Server (Rechte 600), im Repo stehen Vorlagen ohne Werte. Wo die
+Geheimnisse für eine Nachfolge dokumentiert sind, regelt
 [#10](https://github.com/konstantinniedermann/tco-app/issues/10).
 
 ## Prüfungen in der CI
@@ -144,6 +208,8 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 | Playwright Ende-zu-Ende in drei Umgebungen mit axe; Screenshots als Artefakt des Laufs, 30 Tage | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
 | Docker-Image baut | ADR-003 | vorhanden |
+| Rauchtest des Images (Start, Migration, `/api/status`) | ADR-003 | vorhanden |
+| Rechte der Workflows (`workflow-rechte.ts`) | dieses Konzept | vorhanden |
 
 ## Abhängigkeiten
 

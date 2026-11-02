@@ -114,6 +114,40 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-11-02 — Betrieb: Grenzen von Header, Protokoll und Wiederherstellung
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/hooks.server.ts`, `betrieb/caddy/`, `betrieb/bin/wiederherstellen`, `betrieb/bin/probe`.
+
+**Beobachtung:**
+- Die Sicherheits-Header sind doppelt definiert, in `hooks.server.ts` und in Caddy. Ändert man eine Stelle, driftet die andere.
+- `pg_restore`- und `psql`-Fehlerzeilen können Zeilendaten enthalten und landen im Protokoll auf dem Server (DS-06).
+- `wiederherstellen` legt vor dem Überschreiben keine Sicherheitssicherung des aktuellen Stands an.
+
+**Ursprung:** #32 Task-Reviews.
+
+**Einschätzung:** Alle drei gering, solange nur der Projektleiter und seine Stellvertretung den Server bedienen. Beim Protokoll vor der Testgruppe prüfen, ob Fehlerzeilen gekürzt werden müssen; bei `wiederherstellen` vor dem ersten Einsatz auf Live eine Sicherung vorschalten (Inbetriebnahme, [#39](https://github.com/konstantinniedermann/tco-app/issues/39)).
+
+### 2026-11-02 — Kleinbefunde aus den Task-Reviews der Auslieferung (#32)
+
+**Thema:** Code-Gerüst
+
+**Fundort:** siehe Liste.
+
+**Beobachtung:**
+- `betrieb/bin/ausliefern`: Das Aufräumen alter Images kann ein Image löschen, das die andere Umgebung gerade holt; die Sperre gilt nur je Umgebung.
+- CI: Zwei schnelle Pushes auf `dev` können Test auf einen älteren Stand ausliefern, wenn der Lauf des älteren später fertig wird.
+- `fassungen/<digest>/` und die Zwischenordner `fassungen/.neu.*` auf dem Server werden nie aufgeräumt.
+- `scripts/pruefungen/workflow-rechte.ts`: Der Nachschlag in `JOB_RECHTE` nutzt kein `Object.hasOwn`; ein Jobname wie `constructor` träfe die Prototyp-Eigenschaft.
+- `.github/dependabot.yml`: Dependabot erkennt die Compose-Dateien unter `betrieb/` womöglich nicht (auf GitHub prüfen).
+- `betrieb/bin/lib.sh`, `betrieb/bin/sichern`: Das Lesen der Snapshot-JSON hängt an der Feldreihenfolge von restic. Bei jedem restic-Update `make betrieb-nachweis` (Sicherung und Aufbewahrung) erneut laufen lassen.
+- `betrieb/bin/sichern`: Die restic-Aufbewahrung (`--keep-within 30d`) zählt ab dem neuesten Snapshot, nicht ab heute; bleibt die Sicherung aus, bleiben auch alte Sicherungen.
+
+**Ursprung:** #32 Task-Reviews.
+
+**Einschätzung:** Keiner davon bricht den Nachweis. Beim Betrieb auf dem Server (#39) mitnehmen, die Dependabot-Frage sofort auf GitHub klären.
+
 ### 2026-11-01 — Kleinbefunde aus den Task-Reviews des Code-Gerüsts
 
 **Thema:** Code-Gerüst
@@ -131,6 +165,8 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** #15, Task-Reviews und Abschluss-Review, als Minor eingestuft.
 
 **Einschätzung:** Keiner davon lässt eine Prüfung falsch durch. Mitnehmen, wenn die Datei ohnehin angefasst wird. Die ADR-Sätze beschreiben den Stand beim Entscheid, ein kurzer Nachtrag genügt.
+
+**Erledigt 2026-11-02 (#32):** Der Punkt zum `Dockerfile` (`svelte-kit sync` entfernt, `HEALTHCHECK` ergänzt) ist behoben; die übrigen Punkte bleiben offen. Bei der nächsten Auswertung den Punkt streichen.
 
 ### 2026-11-01 — Test-ID-Prüfung zählt IDs in Kommentaren und übersprungenen Tests
 
@@ -155,6 +191,8 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** #15 Abschluss-Review.
 
 **Einschätzung:** Header im Reverse-Proxy setzen ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)).
+
+**Erledigt 2026-11-02 (#32):** Caddy setzt die Header für alle Antworten, auch `/_app/*`; belegt mit `make betrieb-nachweis`. Bei der nächsten Auswertung ins Archiv.
 
 ### 2026-11-01 — CI: PostgreSQL-Service nur per Tag, Playwright-Browser ohne Cache
 
@@ -192,6 +230,8 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 **Einschätzung:** Rauchtest (Container starten, Migration, `/api/status`) mit Server und Auslieferung ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)).
 
+**Erledigt 2026-11-02 (#32):** Der Rauchtest läuft im Job `image` der CI. Bei der nächsten Auswertung ins Archiv.
+
 ### 2026-11-01 — `$app/env/private` passt nicht zur Test-Datenbank pro Lauf
 
 **Thema:** Code-Gerüst
@@ -215,6 +255,8 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** #15 Code-Gerüst.
 
 **Einschätzung:** Gehört zu Server und Auslieferung ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)); dort den Header setzen.
+
+**Erledigt 2026-11-02 (#32):** Caddy setzt `frame-ancestors 'none'` überall, wo die App keine eigene CSP mitgibt. Bei der nächsten Auswertung ins Archiv.
 
 ### 2026-11-01 — 22 bekannte Schwachstellen in Entwicklungs- und Build-Werkzeugen, kein Audit-Gate
 

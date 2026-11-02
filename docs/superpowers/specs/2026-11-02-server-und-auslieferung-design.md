@@ -329,3 +329,30 @@ Make-Ziel ausserhalb von `make check`. Token über die Standardeingabe.
 Nur Docker-Images, keine npm-Pakete. Alle per Digest gepinnt und Dependabot unterstellt:
 `caddy`, `restic/restic`, `registry` (nur lokaler Nachweis). Alle drei vom Projektleiter
 freigegeben (2026-11-02).
+
+## Nachtrag 2026-11-02 (nach der Umsetzung)
+
+Der Entwurf oben bleibt unverändert; was die Umsetzung anders gelöst hat, nach Abschnitt:
+
+- **Aufbau (Header):** Caddy behält die CSP der App und setzt `frame-ancestors 'none'` nur, wo
+  keine CSP besteht; HSTS, `nosniff` und Referrer-Policy setzt er genau einmal. Kein Zugriffsprotokoll.
+  Auf dem Server liegt `proxy/` mit `compose.proxy.yml`, `caddy/…` und `proxy.env`; Türsteher und
+  `lib.sh` liegen in `bin/` und werden von Hand eingerichtet. Die Vorlagen heissen
+  `geheim.env.example`, `proxy.env.example`, `sicherung.env.example`.
+- **Auslieferung, Schritt 2:** Die Live-Sicherung läuft **vor** der Übernahme der Einrichtung.
+  Scheitert sie, ändert sich nichts.
+- **Auslieferung, Schlüssel:** Der Schlüssel wird je Zweig gewählt, ohne Rückfall auf den anderen;
+  ein leeres Geheimnis ergibt `fehler`.
+- **Sicherung:** restic läuft mit festem Rechnernamen `mytco` (sonst greift die Aufbewahrung
+  nicht) und `--log-driver none` (kein Klartext in den Docker-Logs). Wiederhergestellt werden nur
+  vollständige Läufe (mit Zählung), in einer Transaktion.
+- **CI, Jobs:** `image` (Rauchtest, immer bei Code), `bauen`, `ausliefern`, `freigeben`, `finden`,
+  `release`. `bauen` schiebt nur `commit-<sha>`. Neu ist `freigeben` (nur `dev`, nach geglückter
+  Auslieferung auf Test, Recht nur `packages: write`): Es setzt das Kennzeichen `code-<hash>`.
+  Live kann so nur ein Image bekommen, das auf Test erfolgreich ausgeliefert wurde.
+  `finden` prüft zusätzlich vorab das Release (Version, Abschnitt in `versionen.md`, Tag noch
+  frei), bevor Live angefasst wird.
+- **Lokaler Nachweis:** `make betrieb-nachweis` umfasst 29 Prüfungen, alle ok (letzter Lauf nach
+  den Review-Korrekturen).
+- **Inbetriebnahme-Issue:** Der Schnitt ist vollzogen: #32 = lokaler Teil, #39 = Server in
+  Betrieb nehmen (hängt an #32, blockiert #29).

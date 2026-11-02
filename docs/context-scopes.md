@@ -14,4 +14,5 @@ Welche Pfade bei welcher Aufgabe geladen werden. Die Tabelle wächst mit dem Cod
 | Datenbank und Migrationen | `src/lib/server/db/`, `drizzle/`, `drizzle.config.ts`, `scripts/migrate.ts`, `docker-compose.yml` | `docs/recherche/` |
 | Arbeitsweise, Issues | `docs/issue-konventionen.md`, `docs/abklaerungen.md`, `.github/ISSUE_TEMPLATE/`, `CLAUDE.md`, `.claude/skills/tco-branching/` | `docs/recherche/` |
 | Tests planen und schreiben | `tests/`, `**/*.test.ts`, `vitest.config.ts`, `playwright.config.ts`, `scripts/pruefungen/testmuster.ts`, `docs/testkonzept.md`, `docs/fachmodell.md`, `docs/rollen-und-rechte.md`, `docs/anforderungen/anforderungen.md`, `docs/datenschutz.md` | `docs/recherche/` |
+| Betrieb und Auslieferung | `betrieb/`, `tests/betrieb/`, `scripts/ci/`, `.github/workflows/`, `Dockerfile`, `docs/ci-cd-und-release.md`, `docs/sicherheitskonzept.md` | `docs/recherche/` |
 | CI und Prüfungen | `docs/ci-cd-und-release.md`, `Makefile`, `scripts/`, `scripts/pruefungen/`, `scripts/ci/`, `Dockerfile`, `.githooks/`, `.github/workflows/`, `.github/dependabot.yml` | `docs/recherche/` |

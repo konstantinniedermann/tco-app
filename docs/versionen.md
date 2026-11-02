@@ -19,6 +19,12 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+- Umgebungen, Auslieferung und Sicherung (#32, lokal nachgewiesen mit `make betrieb-nachweis`):
+  Test und Live als getrennte Stapel hinter einem Caddy-Proxy, Auslieferung per SSH über einen
+  Türsteher mit Rückfall und Vorab-Sicherung bei Live, Live nur mit dem Image, das auf Test lief,
+  verschlüsselte Sicherung mit Wiederherstellung und Probe. CI-Jobs dafür hinter zwei Schaltern
+  (ausgeschaltet), Rauchtest des Images und Rechteprüfung der Workflows aktiv. Server und
+  Inbetriebnahme: #39.
 - Repo aufgesetzt: Arbeitsweise, Issue-Konventionen, Roadmap, Doku-Check und Secret-Scan
   in der CI, Anforderungsdokument v1.2 und Recherche zur Systemlandschaft abgelegt.
 - Anforderungen mit IDs erfasst (`docs/anforderungen/anforderungen.md`), funktional und
