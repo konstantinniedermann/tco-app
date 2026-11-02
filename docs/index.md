@@ -37,6 +37,7 @@ Issue im Milestone *Fundament*.
 | [Issue-Konventionen](issue-konventionen.md) | Labels, Milestones, Definition of Done |
 | [Context-Scopes](context-scopes.md) | Welche Pfade bei welcher Aufgabe relevant sind |
 | [Beobachtungen](beobachtungen.md) | Posteingang für Befunde ausserhalb des Scopes |
+| [Beobachtungen — Archiv](beobachtungen-archiv.md) | Ausgewertete Beobachtungen mit Ausgang |
 | [Versionen](versionen.md) | Versionshistorie |
 
 ## Geplant (Milestone *Fundament*)
