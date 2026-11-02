@@ -16,6 +16,7 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Werte (Farben, Schrift, Abstände, Formen) | `src/lib/design/tokens.css` |
 | Grundstil und Bausteine | `src/lib/design/basis.css` |
 | Wappen und App-Symbol (Farben fest in der Datei) | `static/wappen.svg`, `static/favicon.svg`, `static/*.png` |
+| Manifest (Name, Farben fest in der Datei; `theme_color` und `background_color` stimmen von Hand mit `--farbe-marke` und `--farbe-hintergrund` überein) | `static/manifest.webmanifest` |
 | Farbe der Browserleiste, Systemschrift-Einstellung | `src/app.html` |
 | Kopfleiste, Seitenaufbau | `src/routes/+layout.svelte` |
 

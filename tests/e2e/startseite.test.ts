@@ -43,6 +43,29 @@ test('App-Symbole sind gültige Bilder', async ({ request }) => {
 	}
 });
 
+test('Manifest ist gültig und macht MyTCO zur eigenständigen App', async ({ page, request }) => {
+	const res = await request.get('/manifest.webmanifest');
+	expect(res.status()).toBe(200);
+	const manifest = JSON.parse(await res.text());
+	expect(manifest).toMatchObject({
+		name: 'MyTCO',
+		display: 'standalone',
+		start_url: '/',
+		scope: '/'
+	});
+	const groessen = manifest.icons.map((symbol: { sizes: string }) => symbol.sizes);
+	expect(groessen).toEqual(expect.arrayContaining(['192x192', '512x512']));
+	for (const symbol of manifest.icons) {
+		const bild = await request.get(symbol.src);
+		expect(bild.status(), symbol.src).toBe(200);
+	}
+
+	const fehler = sammleKonsolenfehler(page);
+	await oeffneLoginSeite(page);
+	await expect(page.locator('link[rel=manifest]')).toHaveCount(1);
+	expect(fehler).toEqual([]); // fängt u. a. CSP-Verletzungen
+});
+
 test('Schrift folgt der Grundgrösse des Geräts (UI-02)', async ({ page }) => {
 	await oeffneLoginSeite(page);
 	await expect(page.locator('meta[name="text-scale"]')).toHaveAttribute('content', 'scale');
