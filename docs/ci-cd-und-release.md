@@ -90,7 +90,7 @@ Doku-Merge ändert ihn nicht.
    Caddy-Teil der Umgebung, Skripte). Sie reist im Image mit, das Image wird dafür nicht
    gestartet. Bei Live zuerst eine Sicherung der Datenbank, **bevor** irgendetwas übernommen
    wird; scheitert sie, bleibt alles, wie es war. Dann die Einrichtung übernehmen (gemeinsame
-   Teile wie die Caddy-Grundkonfiguration nur bei Live, vorher prüft `caddy validate`; eine
+   Teile wie die Caddy-Grundkonfiguration nur bei Live oder solange Live noch nie ausgeliefert wurde, vorher prüft `caddy validate`; eine
    ungültige Konfiguration wird abgewiesen, die alte bleibt aktiv), Migrationen ausführen,
    Container neu starten. Auf Test wird die Datenbank dabei neu aufgesetzt.
 5. **Prüfen:** Antwortet die App nicht innert einer Minute (S) auf ihre Statusabfrage,
@@ -114,18 +114,20 @@ Stehen sie nicht auf `an`, gelten die Jobs als übersprungen, nicht als fehlgesc
 nur der Rauchtest.
 
 **Sicherung und Probe:** `sichern` schreibt die Datenbank verschlüsselt mit restic ins
-Sicherungsziel, ohne unverschlüsselte Datei, und löscht Sicherungen nach 30 Tagen
+Sicherungsziel, ohne unverschlüsselte Datei, und löscht Sicherungen nach 30 Tagen, gezählt ab der neuesten Sicherung
 (DS-06, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md)). Nächtlich läuft das für Live über einen
 Timer, danach prüft `probe` die frische Sicherung in einer Wegwerf-Datenbank ohne Verbindung nach
-aussen. Eingespielt und zurückgespielt werden nur vollständige Läufe. Die Daten verlassen den
-Server nicht (SI-16).
+aussen. Eingespielt und zurückgespielt werden nur vollständige Läufe. Die Probe-Daten bleiben
+auf dem Server (SI-16); die Sicherung selbst verlässt ihn nur verschlüsselt, Richtung
+S3-kompatiblem Ziel (Ziel legt [#10](https://github.com/konstantinniedermann/tco-app/issues/10) fest).
+Zur Zählung der 30 Tage siehe `docs/beobachtungen.md`.
 
 **Befehle auf dem Server** (Einzelheiten in `betrieb/README.md`):
 
 | Befehl | Zweck |
 |--------|-------|
 | `zurueck` | Zurück auf das vorherige Image. Migrationen fügen nur hinzu, darum geht das ohne Datenverlust; was die alte Version noch braucht, wird erst ein Release später entfernt |
-| `wiederherstellen` | Eine Sicherung derselben Umgebung zurückspielen. Eine Live-Sicherung wird auf Test abgewiesen (DS-08) |
+| `wiederherstellen` | Eine Sicherung derselben Umgebung zurückspielen. Auf Test findet der Befehl keinen Snapshot einer Live-Sicherung (DS-08) |
 | `probe` | Sicherung in einer Wegwerf-Datenbank einspielen, mit der Zählung vergleichen, `ok` oder `fehler` |
 
 **Netz und Header:** Ein Caddy-Proxy nimmt 80 und 443 an und erreicht beide Apps; die Datenbanken
@@ -151,8 +153,8 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 - Nur der Auslieferungs-Job fordert den SSH-Schlüssel an. Er führt keine npm-Pakete, keine
   fremden Actions und nichts aus Caches oder Artefakten anderer Jobs aus. GitHub gibt ein
   Geheimnis nur an Schritte, die es anfordern; ein Schadpaket in den Tests kommt so nicht
-  an den Schlüssel. Die übrigen Jobs haben nur Leserechte aufs Repo, der Bau-Job dazu
-  Schreibrecht auf die Container-Ablage.
+  an den Schlüssel. Welche Rechte die einzelnen Jobs haben, legt der Punkt zu
+  `workflow-rechte.ts` oben fest.
 - **Kein GitHub Pro:** Schutz von `main` auf GitHub, Geheimnisse nur für eine Umgebung und
   „nur `main` darf ausliefern“ gibt es für private Repos erst ab Pro (B:
   [GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments),
