@@ -10,7 +10,8 @@
 #    erste Treffer in alphabetischer Reihenfolge der NAMEn. Ohne Treffer keine Ausgabe.
 #  - `create …` gibt ohne Treffer die feste Container-ID 0123456789ab aus
 #  - `cp <id>:/app/betrieb <ziel>` legt <ziel>/betrieb/bin/ausliefern an: ein kleines
-#    ausführbares Skript, das seine Argumente an $STUB_PROTOKOLL.exec anhängt und `ok` druckt (mit STUB_AUSLIEFERN_FEHLER: `fehler`, Exit 1)
+#    ausführbares Skript, das seine Argumente an $STUB_PROTOKOLL.exec anhängt und `ok` druckt (mit STUB_AUSLIEFERN_FEHLER: `fehler`, Exit 1;
+#    mit STUB_CP_LEER: nur ein leerer Ordner betrieb/bin)
 set -euo pipefail
 
 echo "$*" >>"${STUB_PROTOKOLL:-/dev/null}"
@@ -46,6 +47,8 @@ cp)
 	case "${2-}" in
 	*:/app/betrieb)
 		mkdir -p "${3%/}/betrieb/bin"
+		# STUB_CP_LEER: Image ohne ausliefern (nur leerer Ordner)
+		[ -z "${STUB_CP_LEER:-}" ] || exit 0
 		# shellcheck disable=SC2016 # das Skript soll die Variablen erst beim Aufruf auswerten
 		printf '#!/usr/bin/env bash\necho "$*" >>"${STUB_PROTOKOLL:-/dev/null}.exec"\nif [ -n "${STUB_AUSLIEFERN_FEHLER:-}" ]; then echo fehler; exit 1; fi\necho ok\n' \
 			>"${3%/}/betrieb/bin/ausliefern"

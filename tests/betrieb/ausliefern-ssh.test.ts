@@ -174,15 +174,25 @@ describe('ausliefern-ssh: Ablauf', () => {
 		expect(readdirSync(join(basis, 'fassungen'))).toEqual([DIGEST]);
 	});
 
-	test('unvollständige Reste am Zielort werden ersetzt, kein Temp-Ordner bleibt', () => {
+	test('Image ohne ausliefern -> fehler, Zielort unberührt, kein Temp-Ordner', () => {
+		const basis = baue();
+		const lauf = tuersteher({ args: ['test'], ssh: DIGEST, stub: { STUB_CP_LEER: '1' } }, basis);
+		expect(lauf.status).toBe(1);
+		expect(lauf.stdout.trim().split('\n').pop()).toBe('fehler');
+		expect(readdirSync(join(basis, 'fassungen'))).toEqual([]);
+	});
+
+	test('bestehender Zielort wird nie gelöscht, auch nicht unvollständig', () => {
 		const basis = baue();
 		mkdirSync(join(basis, 'fassungen', DIGEST), { recursive: true });
 		const altlast = join(basis, 'fassungen', DIGEST, 'altlast');
 		copyFileSync('betrieb/bin/lib.sh', altlast);
 		const lauf = tuersteher({ args: ['test'], ssh: DIGEST }, basis);
-		expect(lauf.status).toBe(0);
-		expect(existsSync(altlast)).toBe(false);
+		expect(lauf.status).toBe(1);
+		expect(lauf.stdout.trim().split('\n').pop()).toBe('fehler');
+		expect(existsSync(altlast)).toBe(true);
 		expect(readdirSync(join(basis, 'fassungen'))).toEqual([DIGEST]);
+		expect(readdirSync(join(basis, 'fassungen', DIGEST))).toEqual(['altlast']);
 	});
 
 	test.each([['pull'], ['create'], ['cp ']])(
@@ -208,6 +218,7 @@ describe('ausliefern-ssh: Ablauf', () => {
 	test('login und pull laufen mit dem Temp-DOCKER_CONFIG, das danach weg ist', () => {
 		const tmp = mkdtempSync(join(tmpdir(), 'mytco-tmpdir-'));
 		const lauf = tuersteher({ args: ['test'], ssh: DIGEST, stdin: TOKEN, env: { TMPDIR: tmp } });
+		expect(lauf.status).toBe(0);
 		const [login, pull, , cp] = lauf.dockerConfig;
 		expect(login.startsWith(tmp)).toBe(true);
 		expect(pull).toBe(login);

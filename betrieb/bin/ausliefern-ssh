@@ -95,9 +95,10 @@ esac
 CONTAINER="$ID"
 ZIEL="$MYTCO_BASIS/fassungen/$DIGEST"
 FERTIG="$ZIEL/betrieb/bin/ausliefern"
-# Erst in einen eigenen Ordner entnehmen und fertig an den Platz verschieben: ein gleichzeitiger
-# Lauf mit demselben Digest sieht nie eine halbe Fassung und löscht nie eine genutzte.
-# Der Inhalt hängt allein am Digest; eine vollständige Fassung wird deshalb wiederverwendet.
+# Erst in einen eigenen Ordner entnehmen, dort auf Vollständigkeit prüfen und nur dann an den
+# Platz verschieben. Am Zielort wird nie etwas gelöscht: existiert er schon, wird er
+# wiederverwendet (der Inhalt hängt allein am Digest). Taucht er zwischen Prüfung und mv auf,
+# verschachtelt mv den Temp-Ordner hinein; dieses Nest wird wieder entfernt.
 mkdir -p "$MYTCO_BASIS/fassungen"
 TEMP_FASSUNG="$MYTCO_BASIS/fassungen/.neu.$$"
 rm -rf "$TEMP_FASSUNG"
@@ -105,14 +106,14 @@ mkdir "$TEMP_FASSUNG"
 protokoll "$UMGEBUNG" docker cp "$CONTAINER:/app/betrieb" "$TEMP_FASSUNG/" || scheitern "cp gescheitert"
 protokoll "$UMGEBUNG" docker rm "$CONTAINER" || true
 CONTAINER=""
-if [ ! -x "$FERTIG" ]; then
-	# Unvollständige Reste (abgestürzter früherer Lauf) wegräumen, dann atomar umbenennen.
-	[ -e "$ZIEL" ] && rm -rf "$ZIEL"
-	mv "$TEMP_FASSUNG" "$ZIEL" 2>/dev/null || [ -x "$FERTIG" ] || scheitern "Fassung nicht übernommen"
+[ -x "$TEMP_FASSUNG/betrieb/bin/ausliefern" ] || scheitern "ausliefern fehlt im Image"
+if [ ! -e "$ZIEL" ]; then
+	mv "$TEMP_FASSUNG" "$ZIEL" 2>/dev/null || [ -e "$ZIEL" ] || scheitern "Fassung nicht übernommen"
+	rm -rf "${ZIEL:?}/${TEMP_FASSUNG##*/}"
 fi
 rm -rf "$TEMP_FASSUNG"
 TEMP_FASSUNG=""
-[ -x "$FERTIG" ] || scheitern "ausliefern fehlt im Image"
+[ -x "$FERTIG" ] || scheitern "Fassung unvollständig"
 
 # Zugangsdaten gehören nicht in den weiteren Ablauf; exec führt den EXIT-Trap nicht aus.
 if [ -n "$DOCKER_CONFIG_TEMP" ]; then
