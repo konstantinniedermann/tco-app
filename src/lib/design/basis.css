@@ -1,0 +1,397 @@
+/*
+ * Grundstil und Bausteine von MyTCO — Regeln: docs/ui-leitbild.md.
+ * Nur Tokens aus tokens.css (var(--…)) und relative Einheiten; die CI prüft das (design-festwerte).
+ * Neue Bausteine erst ins Leitbild, dann hierher.
+ */
+
+/* Grundstil — html setzt keine Schriftgrösse, damit die Systemeinstellung wirkt (UI-02) */
+@supports (font: -apple-system-body) {
+	html {
+		/* iPhone: übernimmt die Dynamic-Type-Grösse */
+		font: -apple-system-body;
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: var(--schrift-text);
+	font-size: var(--groesse-text);
+	line-height: var(--zeilenhoehe-text);
+	color: var(--farbe-text);
+	background: var(--farbe-hintergrund);
+}
+
+h1,
+h2 {
+	line-height: var(--zeilenhoehe-titel);
+	margin: 0 0 var(--abstand-2);
+}
+
+h1 {
+	font-size: var(--groesse-titel);
+	color: var(--farbe-marke);
+}
+
+h2 {
+	font-size: var(--groesse-gross);
+	margin-top: var(--abstand-5);
+}
+
+p {
+	margin: 0 0 var(--abstand-4);
+}
+
+a {
+	color: var(--farbe-marke);
+	text-decoration: underline;
+}
+
+:focus-visible {
+	outline: var(--fokus-breite) solid var(--farbe-marke);
+	outline-offset: var(--fokus-abstand);
+}
+
+img {
+	max-width: 100%;
+}
+
+/* Seitenaufbau */
+.inhalt {
+	max-width: var(--breite-inhalt);
+	margin: 0 auto;
+	padding: var(--abstand-5) var(--abstand-4) var(--abstand-6);
+}
+
+.leise {
+	color: var(--farbe-text-leise);
+	font-size: var(--groesse-klein);
+}
+
+/* Kopfleiste */
+.kopf {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--abstand-3);
+	padding: var(--abstand-3) var(--abstand-4);
+	background: var(--farbe-marke);
+	color: var(--farbe-flaeche);
+	font-size: var(--groesse-gross);
+	font-weight: 700;
+}
+
+.kopf-wappen {
+	height: 1.8em;
+	width: auto;
+}
+
+.kopf a {
+	color: var(--farbe-flaeche);
+}
+
+/* Reiter (unten auf dem Handy, ab 60em als Textlinks in der Kopfleiste) */
+.reiter {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	background: var(--farbe-flaeche);
+	border-top: var(--rand-duenn) solid var(--farbe-linie);
+}
+
+.reiter a {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--abstand-1);
+	min-height: var(--tippflaeche);
+	padding: var(--abstand-2) var(--abstand-1);
+	color: var(--farbe-text-leise);
+	font-size: var(--groesse-klein);
+	line-height: var(--zeilenhoehe-titel);
+	text-align: center;
+	text-decoration: none;
+}
+
+.reiter a[aria-current='page'] {
+	color: var(--farbe-marke);
+	font-weight: 700;
+	box-shadow: inset 0 var(--fokus-breite) 0 var(--farbe-marke);
+}
+
+/* Seitenleiste (nur Verwaltung) */
+.seitenleiste {
+	background: var(--farbe-marke-dunkel);
+	color: var(--farbe-flaeche);
+	padding: var(--abstand-4) 0;
+}
+
+.seitenleiste-bereich {
+	padding: var(--abstand-3) var(--abstand-4) var(--abstand-1);
+	color: var(--farbe-marke-hell);
+	font-size: var(--groesse-klein);
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.seitenleiste a {
+	display: flex;
+	align-items: center;
+	min-height: var(--tippflaeche);
+	padding: var(--abstand-2) var(--abstand-4);
+	color: var(--farbe-flaeche);
+	text-decoration: none;
+}
+
+.seitenleiste a[aria-current='page'] {
+	background: var(--farbe-marke);
+	box-shadow: inset var(--fokus-breite) 0 0 var(--farbe-marke-hell);
+	font-weight: 700;
+}
+
+/* Tasten (UI-04: höchstens eine Haupttaste pro Bildschirm) */
+.taste-haupt,
+.taste-neben {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: var(--tippflaeche);
+	padding: var(--abstand-3) var(--abstand-4);
+	border-radius: var(--radius);
+	font: inherit;
+	font-weight: 700;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.taste-haupt {
+	background: var(--farbe-aktion);
+	color: var(--farbe-flaeche);
+	border: var(--rand-dick) solid var(--farbe-aktion);
+}
+
+.taste-haupt:hover,
+.taste-haupt:active {
+	background: var(--farbe-aktion-dunkel);
+	border-color: var(--farbe-aktion-dunkel);
+}
+
+.taste-neben {
+	background: var(--farbe-flaeche);
+	color: var(--farbe-marke);
+	border: var(--rand-dick) solid var(--farbe-marke);
+}
+
+.taste-breit {
+	display: flex;
+	width: 100%;
+}
+
+.zurueck {
+	display: inline-block;
+	margin-bottom: var(--abstand-3);
+}
+
+/* Eingabefelder */
+.feld {
+	margin-bottom: var(--abstand-4);
+}
+
+.feld label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: var(--abstand-1);
+}
+
+.feld-hilfe {
+	display: block;
+	color: var(--farbe-text-leise);
+	font-size: var(--groesse-klein);
+	margin-bottom: var(--abstand-1);
+}
+
+.feld input,
+.feld select {
+	display: block;
+	width: 100%;
+	min-height: var(--tippflaeche);
+	padding: var(--abstand-3);
+	border: var(--rand-dick) solid var(--farbe-rand);
+	border-radius: var(--radius);
+	background: var(--farbe-flaeche);
+	color: var(--farbe-text);
+	font: inherit;
+}
+
+.feld-code input {
+	font-family: var(--schrift-code);
+	font-size: var(--groesse-gross);
+	letter-spacing: 0.12em;
+}
+
+.fehler {
+	color: var(--farbe-fehler);
+	font-weight: 600;
+	margin-top: var(--abstand-1);
+}
+
+/* Karten und Kacheln */
+.karte {
+	background: var(--farbe-flaeche);
+	border-radius: var(--radius);
+	padding: var(--abstand-4);
+	margin-bottom: var(--abstand-3);
+	box-shadow: var(--schatten-karte);
+}
+
+.kachel {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--abstand-3);
+	color: var(--farbe-text);
+	text-decoration: none;
+}
+
+.kachel > :first-child {
+	flex: 1 1 12em;
+}
+
+.kachel-pfeil {
+	color: var(--farbe-marke);
+	font-size: var(--groesse-gross);
+}
+
+.kachel.hervor {
+	border-left: var(--abstand-1) solid var(--farbe-aktion);
+}
+
+/* Zähler: Schritte eines Formulars oder ein Kontingent */
+.zaehler {
+	margin-bottom: var(--abstand-4);
+}
+
+.zaehler-balken {
+	display: flex;
+	gap: var(--abstand-1);
+	margin-bottom: var(--abstand-1);
+}
+
+.zaehler-balken span {
+	flex: 1;
+	height: var(--abstand-2);
+	border-radius: var(--radius-rund);
+	background: var(--farbe-linie);
+}
+
+.zaehler-balken span.voll {
+	background: var(--farbe-marke);
+}
+
+.zaehler-text {
+	color: var(--farbe-text-leise);
+	font-size: var(--groesse-klein);
+	font-weight: 600;
+}
+
+/* Plaketten (UI-05: Status immer mit Text) */
+.plakette {
+	display: inline-block;
+	padding: 0 var(--abstand-2);
+	border-radius: var(--radius-rund);
+	font-size: var(--groesse-klein);
+	font-weight: 600;
+}
+
+.plakette-ok {
+	background: var(--farbe-marke-zart);
+	color: var(--farbe-marke);
+}
+
+.plakette-offen {
+	background: var(--farbe-hinweis-flaeche);
+	color: var(--farbe-hinweis);
+}
+
+.plakette-gesperrt {
+	background: var(--farbe-flaeche);
+	color: var(--farbe-fehler);
+	border: var(--rand-duenn) solid var(--farbe-fehler);
+}
+
+/* Hinweis */
+.hinweis {
+	background: var(--farbe-hinweis-flaeche);
+	border-left: var(--abstand-1) solid var(--farbe-hinweis);
+	border-radius: var(--radius);
+	padding: var(--abstand-3);
+	font-size: var(--groesse-klein);
+	margin-bottom: var(--abstand-4);
+}
+
+/* Tabelle (nur Verwaltung) — Behälter scrollt waagrecht, die Seite nicht */
+.tabelle {
+	overflow-x: auto;
+	border-radius: var(--radius);
+	box-shadow: var(--schatten-karte);
+}
+
+.tabelle table {
+	width: 100%;
+	border-collapse: collapse;
+	background: var(--farbe-flaeche);
+	font-size: var(--groesse-klein);
+}
+
+.tabelle th {
+	background: var(--farbe-marke-zart);
+	text-align: left;
+	padding: var(--abstand-3);
+}
+
+.tabelle td {
+	padding: var(--abstand-3);
+	border-top: var(--rand-duenn) solid var(--farbe-linie);
+}
+
+/* Symbole: eigene SVGs im 24er-Raster, immer mit Text */
+.symbol {
+	width: var(--groesse-symbol);
+	height: var(--groesse-symbol);
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* PC-Layout (Medienabfragen erlauben keine Tokens; Wert steht im Leitbild) */
+@media (min-width: 60em) {
+	.inhalt {
+		padding: var(--abstand-6);
+	}
+
+	.reiter {
+		position: static;
+		border-top: 0;
+		background: transparent;
+	}
+
+	.reiter a {
+		flex-direction: row;
+		color: var(--farbe-flaeche);
+		font-size: var(--groesse-text);
+	}
+
+	.reiter a .symbol {
+		display: none;
+	}
+}

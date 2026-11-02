@@ -146,6 +146,13 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06) |
 | Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm waagrecht scrollbar |
 | Symbol | `.symbol` | eigene SVG-Symbole, 24er-Raster, Strich 2, immer mit Text |
+| Inhaltsbereich | `.inhalt` | eine Spalte, höchstens `--breite-inhalt`, Seitenrand |
+| Nebentext | `.leise` | kleiner und leiser, für Hilfen und Nebeninfos |
+| Breite Taste | `.taste-breit` | Zusatz zu einer Taste: volle Breite (Formulare auf dem Handy) |
+
+Teile eines Bausteins heissen `<baustein>-<teil>`, z. B. `.kopf-wappen`, `.feld-hilfe`,
+`.zaehler-balken`, `.zaehler-text`, `.kachel-pfeil`, `.seitenleiste-bereich`. Der aktive Reiter
+und der aktive Eintrag der Seitenleiste tragen `aria-current="page"`, keine eigene Klasse.
 
 ## Layout und Navigation
 
