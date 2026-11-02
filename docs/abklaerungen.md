@@ -18,8 +18,9 @@ ist, bei wem und bis wann. Fragen haben eine feste ID (`K-NN`), auf die Issues v
 
 **Annahmen bis zur Antwort:** Wer ohne Antwort weiterarbeitet, markiert die Annahme dort,
 wo sie wirkt, in der Doku oder im Code-Kommentar: `Annahme K-NN: <was angenommen ist>`.
-Ebenso gelten `Vorschlag K-NN` und `hängt an K-NN` sowie jeder Verweis in einem Abschnitt
-*Offene Fragen*. Eine Unterfrage aus der Tabelle wird mit ihrer ID markiert (`K-25.4`).
+Ebenso gelten `Vorschlag K-NN`, `Vermutung K-NN` und `hängt an K-NN` sowie jeder Verweis in
+einem Abschnitt *Offene Fragen*. Eine Unterfrage aus der Tabelle wird mit ihrer ID markiert
+(`K-25.4`). Ein blosser Verweis `(K-NN)` ohne Stichwort gilt nicht als Annahme.
 
 - `make annahmen` listet alle Annahmen pro Frage, `make annahmen K=K-11` nur die zu einer Frage.
 - Die Prüfung in `make docs`, `make check` und der CI schlägt fehl, sobald eine markierte Frage
@@ -29,8 +30,10 @@ Ebenso gelten `Vorschlag K-NN` und `hängt an K-NN` sowie jeder Verweis in einem
   vergleichen und Abweichungen dem Projektleiter zeigen, dann die Frage nach *Beantwortet*
   verschieben. Jede gemeldete Stelle wird aufgelöst: Die Antwort ersetzt die Annahme, der
   Verweis bleibt als `(K-NN)` ohne Stichwort stehen.
-- Teilantworten stehen unter *Beantwortet* mit der ID der Unterfrage (`K-16.2`), nicht als
-  „Teil“.
+- Teilantworten stehen unter *Beantwortet* mit der ID der Unterfrage (`K-16.2`), eine Zeile
+  pro ID. Andere Schreibweisen dort meldet die Prüfung als Fehler.
+- Grenze: Die Unterfragen stehen nur in der Tabelle. Eine erfundene Unterfrage einer
+  bestehenden Frage (`K-16.9`) fällt der Prüfung nicht auf.
 
 **Einsammeln über die Tabelle:** Die Fragen gehen nicht als Liste an den Verein, sondern
 über die Google-Tabelle *MyTCO – Fragen an den Verein* im Drive des Projektleiters. Die

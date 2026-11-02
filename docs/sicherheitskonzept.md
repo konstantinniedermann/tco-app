@@ -102,8 +102,8 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
   Schreibrecht direkt auf `main` pushen oder einen Workflow mit dem Live-Schlüssel schreiben
   ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Angenommen unter zwei
   Bedingungen: Zwei-Faktor-Login auf beiden Konten (SI-15), und die Hauptansprechperson im
-  Vorstand nutzt ihren Zugang nur zum Lesen (Absprache). Neu bewerten, sobald K-04 (wem
-  gehören die Konten) beantwortet ist.
+  Vorstand nutzt ihren Zugang nur zum Lesen (Absprache). Neu bewerten: hängt an K-04 (wem
+  gehören die Konten).
 - **Ein Schadpaket im Bau** landet im Image und läuft live, auch ohne Schlüssel; dagegen
   hilft nur SI-14.
 

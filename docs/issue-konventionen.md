@@ -100,8 +100,10 @@ jedes Issue mit einer Entscheidung oder einer Annahme über den Verein:
   und als Reevaluations-Trigger. Die Annahme wird dort markiert, wo sie wirkt
   (`Annahme K-NN: …`); eine Prüfung meldet sie, sobald die Antwort da ist
   ([Ablauf](abklaerungen.md)).
-- Annahmen nur, wo eine andere Antwort später ohne grossen Umbau umzusetzen ist; nie zu
-  Geld, Konten oder Recht.
+- Annahmen nur, wo eine andere Antwort später ohne grossen Umbau umzusetzen ist. Eine
+  Annahme ersetzt keine Freigabe: Geld ausgeben, Konten anlegen und Personendaten live
+  bearbeiten erst mit Antwort oder Entscheid des Projektleiters. Ein Vorschlag an den Verein
+  (z. B. Löschfrist K-38) darf bis dahin in Konzept und Code stehen.
 
 ## Datenschutz
 

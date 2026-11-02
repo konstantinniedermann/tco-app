@@ -89,10 +89,10 @@ genommen, ein VPS ohne SLA reicht.
 ## Reevaluations-Trigger
 
 1. **Betrieb wird zu viel:** Server-Pflege ist im Jahr mehr als ca. 2 Personentage (S),
-   oder niemand übernimmt sie (K-05) → verwaltete Plattform (Option B).
+   oder niemand übernimmt sie (hängt an K-05) → verwaltete Plattform (Option B).
 2. **Infomaniak bietet verwaltetes PostgreSQL** im Budget an.
-3. **Ausfall während der CM-Anmeldung oder am Finalwochenende**, oder K-15 verlangt eine
-   Verfügbarkeit, die ein VPS ohne SLA nicht hergibt.
+3. **Ausfall während der CM-Anmeldung oder am Finalwochenende**, der den Verein stärker
+   stört, als K-15 (kurzer Ausfall wird in Kauf genommen) erwarten liess.
 4. **Preis** des VPS steigt über das Budget, oder Infomaniak streicht VPS Lite.
 
 ## Quellen

@@ -32,9 +32,9 @@ Was nicht belegt ist, steht als *Vermutung* da.
 
 | Begriff | Bedeutung | In MyTCO | Quelle |
 |---------|-----------|----------|--------|
-| Clubmeisterschaft (CM) | Jährliches Turnier des TCO für seine Mitglieder. Heute Anmeldung per E-Mail, Gruppenspiele organisieren die Spieler selbst. Ablauf: Anmeldeschluss Anfang Juni, Gruppenspiele bis Anfang August, Finalwochenende Mitte August. *Vermutung:* 2027 gilt derselbe Kalender | Clubmeisterschaft; in der Doku kurz CM | PDF 5, Recherche |
+| Clubmeisterschaft (CM) | Jährliches Turnier des TCO für seine Mitglieder. Heute Anmeldung per E-Mail, Gruppenspiele organisieren die Spieler selbst. Ablauf: Anmeldeschluss Anfang Juni, Gruppenspiele bis Anfang August, Finalwochenende Mitte August. *Annahme K-24.1:* 2027 gilt derselbe Kalender | Clubmeisterschaft; in der Doku kurz CM | PDF 5, Recherche |
 | Turnier | Bei Swiss Tennis das ganze Turnier mit Plätzen und Konkurrenzen; durchläuft die Status *in Bearbeitung*, *zur Kontrolle bei Swiss Tennis*, *publiziert*, *zu Ende*. Im PDF ist das Turnier die Clubmeisterschaft eines Jahres | Turnier | ADV 5–6, 13–14, 43; PDF 5a |
-| Turniernummer | Nummer, unter der Swiss Tennis ein Turnier führt. Das PDF spricht von mehreren Turniernummern je Clubmeisterschaft. Im Advantage-Handbuch nicht erklärt. *Vermutung:* eine Nummer je Advantage-Turnier, z. B. getrennt für Gruppenphase und Finalwochenende | Turniernummer | PDF 5a, 5e-i |
+| Turniernummer | Nummer, unter der Swiss Tennis ein Turnier führt. Das PDF spricht von mehreren Turniernummern je Clubmeisterschaft. Im Advantage-Handbuch nicht erklärt. *Annahme K-25.4:* eine Nummer je Advantage-Turnier, z. B. getrennt für Gruppenphase und Finalwochenende | Turniernummer | PDF 5a, 5e-i |
 | Internes Turnier | Turnierkategorie in Advantage: zählt nicht für die Klassierung und erscheint nicht im Turnierkalender. *Vermutung:* die CM ist **kein** internes Turnier, weil ihre Resultate an Swiss Tennis gehen | — (nur Hintergrund) | ADV 11, 15 |
 | Kategorie | Einzelner Wettbewerb innerhalb der Clubmeisterschaft, eingeteilt nach Geschlecht, Alter, Stärke und Einzel/Doppel. Entspricht in Advantage einer **Konkurrenz** | Kategorie | PDF 5a |
 | Konkurrenz | Advantage-Begriff für einen Wettbewerb im Turnier, festgelegt durch Begegnungsart, Alterskategorie, Klassierungsbereich und Form. Anmeldung, Tableau, Spielplan und Status laufen je Konkurrenz. „Kategorie“ ist in Advantage nur ein Merkmal (Alterskategorie, Turnierkategorie) | Kategorie (siehe Sprachregeln) | ADV 7, 9–10, 15, 27–28, 39, 43 |
@@ -74,8 +74,8 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Lizenznummer | Nummer, unter der Swiss Tennis einen lizenzierten Spieler führt. Advantage nimmt eine ganze Spalte Lizenznummern per Copy-Paste an. Das Mitglied ergänzt sie beim ersten Login | Lizenznummer | ADV 17–18; PDF 3b-i |
 | Lizenzantrag | Antrag eines Mitglieds in MyTCO, eine Lizenz zu bestellen bzw. zu aktualisieren oder zu stornieren | Lizenzantrag | Ziel; PDF 3e |
 | Storno | Antrag, die Lizenz abzubestellen. *Annahme K-34:* entspricht der Sistierung bei Swiss Tennis (siehe [Abklärungen](abklaerungen.md#vor-lizenzanträgen-01102027)) | Storno | Ziel; PDF 3e |
-| Sistierung | Beim TCO bis Ende Februar möglich. *Vermutung:* die Lizenz ruht für die folgende Saison. Im Advantage-Handbuch nicht erwähnt | Sistierung | Recherche |
-| Stichtag | Datum, zu dem der Lizenzverantwortliche die Liste der Lizenzanträge sieht und exportiert. *Vermutung:* liegt vor der Sistierungsfrist Ende Februar | Stichtag | Ziel |
+| Sistierung | Beim TCO bis Ende Februar möglich. *Annahme K-34.1:* die Lizenz ruht für die folgende Saison. Im Advantage-Handbuch nicht erwähnt | Sistierung | Recherche |
+| Stichtag | Datum, zu dem der Lizenzverantwortliche die Liste der Lizenzanträge sieht und exportiert. *Annahme K-34.2:* liegt vor der Sistierungsfrist Ende Februar | Stichtag | Ziel |
 | Lizenzrunde | Alle Lizenzanträge eines Jahres bis zu einem Stichtag; der Lizenzverantwortliche exportiert sie gesammelt | Lizenzrunde | [Fachmodell](fachmodell.md) |
 | Lizenzliste | Jährliche Liste aller aktuellen Lizenzen als PDF, mit den Änderungen zum Vorjahr | Lizenzliste | PDF 4b |
 | Lizenzverantwortlicher | Person im Verein, die die Lizenzanträge bei Swiss Tennis von Hand einträgt. Keine der fünf Rollen im PDF | Lizenzverantwortlicher (Rolle) | Ziel |

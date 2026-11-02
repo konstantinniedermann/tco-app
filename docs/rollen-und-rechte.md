@@ -47,7 +47,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | **Mitglieder-Login** | | | | | |
 | Datenschutzerklärung, Login-Seite (DS-09) | L | L | L | L | L |
 | Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Benachrichtigungen (FR-02) | – | S eigene | S eigene | S eigene | S eigene |
-| Eigener Name, Adresse, Geschlecht, Jahrgang (Adresse ändern: K-19) | – | L eigene | L eigene | L eigene | S |
+| Eigener Name, Adresse, Geschlecht, Jahrgang (Adresse ändern: hängt an K-19) | – | L eigene | L eigene | L eigene | S |
 | Mitglieder anlegen, bearbeiten, löschen, exportieren (DS-07) | – | – | – | – | S |
 | Konto sperren, neuer Code für einen Brief, Sitzungen beenden | – | – | – | – | S |
 | Rollen vergeben | – | – | – | – | S |

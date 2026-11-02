@@ -71,7 +71,7 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 
 Vorerst behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Wie Junioren und ihre
 Eltern erfasst werden, wird mit den Junioren-Funktionen (ab 2028) geklärt (Annahme K-08) und dann
-hier ergänzt. Spielen Junioren schon an der Clubmeisterschaft 2027 mit (K-46), muss das
+hier ergänzt. Spielen Junioren schon an der Clubmeisterschaft 2027 mit (hängt an K-46), muss das
 vor der CM-Anmeldung geschehen.
 
 ## Rechte der Mitglieder

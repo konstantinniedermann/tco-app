@@ -19,7 +19,7 @@ Begriffe stehen im [Glossar](glossar.md), Anforderungs-IDs in den
 
 **Junioren:** Im MVP behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Junioren,
 Eltern und Konten für Minderjährige kommen mit den Junioren-Funktionen (Annahme K-08: ab 2028) — oder früher,
-falls Junioren schon an der Clubmeisterschaft 2027 mitspielen (K-46).
+falls Junioren schon an der Clubmeisterschaft 2027 mitspielen (hängt an K-46).
 
 ## Überblick
 

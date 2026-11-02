@@ -24,7 +24,7 @@ nicht angebunden ist.
 | **Backlog / Optional** | — | Alles ohne festen Termin |
 
 **Termin-Annahmen:** *Fundament* bis zur ausserordentlichen GV am 26.11.2026 ist ein
-Vorschlag K-01 des Projektleiters: Dort kann der Verein den Plan sehen, und bis Ende Februar
+Vorschlag des Projektleiters (Vorschlag K-01): Dort kann der Verein den Plan sehen, und bis Ende Februar
 bleibt genug Zeit für die Umsetzung. *CM-Betrieb* bis Ende Juni ist eine
 Annahme K-24: Die Gruppenspiele laufen erfahrungsgemäss bis Anfang August, die Funktionen
 müssen vorher stehen. Beide Termine werden in der nächsten Sitzung mit dem Verein
