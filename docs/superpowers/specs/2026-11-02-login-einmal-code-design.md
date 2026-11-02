@@ -1,7 +1,7 @@
 # Design: Login per Einmal-Code (#29, Variante A)
 
 **Datum:** 2026-11-02 · **Issue:** [#29](https://github.com/konstantinniedermann/tco-app/issues/29)
-· **Status:** zur Freigabe
+· **Status:** freigegeben (Projektleiter, 02.11.2026)
 
 ## Absicht
 
