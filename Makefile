@@ -24,6 +24,7 @@ docs: ## Doku-Prüfung (Links, Struktur, Test-IDs; braucht nur Node, kein node_m
 	@bash scripts/pruefe-node.sh
 	@bash scripts/check-docs.sh
 	@node scripts/pruefungen/test-ids.ts
+	@node scripts/pruefungen/design-tokens.ts
 
 voraussetzungen: ## Prüft Node-Version (.nvmrc) und node_modules (installiert nichts)
 	@bash scripts/pruefe-node.sh
