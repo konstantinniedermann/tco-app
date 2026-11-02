@@ -98,6 +98,12 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
   schützen vor allem gegen ein gestohlenes Cookie auf einem anderen Gerät; dagegen hilft erst
   ein Faktor wie ein Passkey (A-LOGIN-07). Ein SMS-Code hilft nicht, die SMS käme aufs selbe
   Handy (Projektleiter, 01.11.2026).
+
+### Neu zu bestätigen (Stand 2026-11-02)
+
+Beim Gesamt-Review von #32 richtiggestellt; die frühere Annahme deckt die neue Reichweite nicht.
+Bis der Projektleiter bestätigt, gelten diese beiden Punkte als nicht angenommen.
+
 - **Schreibrecht auf GitHub reicht bis root auf dem Server.** Ohne GitHub Pro kann jedes Konto
   mit Schreibrecht direkt auf `main` pushen oder einen Workflow mit dem Live-Schlüssel schreiben
   ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Weil die Einrichtung des Servers im

@@ -114,6 +114,42 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-11-02 — Doppelte Zeile `RESTIC_REPOSITORY`: geprüft wird die erste, genutzt die letzte
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `betrieb/bin/lib.sh` (`sicherungsziel`, `restic_docker`).
+
+**Beobachtung:** `sicherungsziel` liest die erste Zeile `RESTIC_REPOSITORY=` aus `sicherung.env`; `docker run --env-file` nimmt bei doppelten Schlüsseln die letzte. Steht das Ziel zweimal in der Datei, wird ein anderes Ziel geprüft (und eingehängt) als restic benutzt.
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Gering, die Datei wird von Hand einmal angelegt. Abhilfe: mehr als eine Zeile `RESTIC_REPOSITORY=` als ungültig abweisen.
+
+### 2026-11-02 — Large Objects würden die Transaktion beim Wiederherstellen vorzeitig bestätigen
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `betrieb/bin/wiederherstellen` (`sql_zum_einspielen`).
+
+**Beobachtung:** Enthält ein Dump Large Objects, schreibt `pg_restore -f -` dafür eigene `BEGIN`/`COMMIT`-Blöcke. Ein solches `COMMIT` bestätigte die äussere Transaktion samt geleerten Schemas vorzeitig; ein späterer Fehler liesse dann einen halben Stand zurück.
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Heute ohne Folgen, die App nutzt keine Large Objects. Wieder aufnehmen, falls Dateien je in der Datenbank landen (dann eher `bytea` nehmen).
+
+### 2026-11-02 — Fehlerzeilen von psql beim Wiederherstellen können Zeilendaten ins Protokoll tragen
+
+**Thema:** Sicherheit
+
+**Fundort:** `betrieb/bin/wiederherstellen` (psql-Ausgabe nach `protokoll.log`).
+
+**Beobachtung:** Scheitert eine Anweisung beim Einspielen, schreibt psql `CONTEXT`-Zeilen, die bei `COPY` die betroffene Datenzeile enthalten können (z. B. eine E-Mail-Adresse). Sie landen in `<umgebung>/protokoll.log` auf dem Server (DS-06).
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Gering, nur im Fehlerfall und nur auf dem Server. In #39 zusammen mit der Rotation von `protokoll.log` behandeln (z. B. `CONTEXT`-Zeilen kürzen oder `VERBOSITY terse`); ergänzt den bestehenden Eintrag «Betrieb: Grenzen von Header, Protokoll und Wiederherstellung».
+
 ### 2026-11-02 — Das ausgelieferte Image ist nicht das Image aus dem Rauchtest
 
 **Thema:** Code-Gerüst

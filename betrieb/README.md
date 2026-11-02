@@ -79,7 +79,9 @@ Ohne Minuten baut die CI auch kein Image. Dann von Hand:
 
 1. Persönliches Token (classic) bei GitHub anlegen, nur mit `write:packages`, kurze Laufzeit.
 2. Lokal bauen und in die Ablage schieben:
-   `docker build -t ghcr.io/konstantinniedermann/tco-app:hand-<datum> .`, anmelden mit
+   `docker build --platform linux/amd64 -t ghcr.io/konstantinniedermann/tco-app:hand-<datum> .`
+   (der Server ist x86_64; ohne `--platform` baut ein Mac mit Apple-Chip ein arm64-Image, das
+   auf dem Server nicht startet), anmelden mit
    `printf %s "$TOKEN" | docker login ghcr.io -u <github-name> --password-stdin`, dann
    `docker push …` und den Digest lesen:
    `docker buildx imagetools inspect ghcr.io/konstantinniedermann/tco-app:hand-<datum> --format '{{.Manifest.Digest}}'`.

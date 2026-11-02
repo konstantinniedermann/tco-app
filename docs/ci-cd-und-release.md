@@ -302,7 +302,8 @@ Budget erschöpft, startet GitHub keine Jobs mehr, also auch keine Auslieferung.
   Bei rund 30 Code-Merges im Monat sind das etwa 330 Minuten (S). Reicht das Kontingent
   nicht, laufen die Ende-zu-Ende-Tests nur beim PR nach `main`.
 - **Notfall ohne Minuten:** Ohne Minuten baut die CI auch kein Image. Der Projektleiter baut
-  es dann lokal, schiebt es mit einem eigenen, kurzlebigen Token (nur `packages: write`) in
+  es dann lokal für den Server (`--platform linux/amd64`, sein Mac baut sonst für arm64),
+  schiebt es mit einem eigenen, kurzlebigen Token (nur `packages: write`) in
   die Container-Ablage und startet die Auslieferung mit dem Digest von Hand auf dem Server
   (Ablauf in `betrieb/README.md`). Die Regel «Live nur mit dem Image, das auf Test lief» prüft
   dann niemand automatisch; sie liegt bei ihm. Oder das Budget des Kontos wird erhöht.
