@@ -486,6 +486,8 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 **Einschätzung:** Heute ohne Folge, Adressen kommen nur aus Seed-Daten. Mit dem Import oder der Verwaltung der Mitglieder einen eindeutigen Index auf `lower(email)` anlegen (FR-25).
 
+**Erledigt 2026-11-02:** In #29 eindeutiger Index `mitglied_email_klein_unique` auf `lower(email)` (Migration `drizzle/0002_email_klein.sql`, Test in `src/lib/server/db/schema.db.test.ts`). Bei der nächsten Auswertung ins Archiv.
+
 ### 2026-11-02 — Brief verweist auf eine Datenschutzerklärung, die es in der App noch nicht gibt
 
 **Thema:** Datenschutz
@@ -533,3 +535,15 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** #29, Task 11.
 
 **Einschätzung:** Gering, solange nur der Musterbrief existiert. Wenn der Admin Briefe aus der Verwaltung druckt, braucht dieser Weg dieselbe Prüfung, am besten als Test.
+
+### 2026-11-02 — Wechselnde IPv6-Adressen umgehen die Grenzen pro IP
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/login/bremse.ts` (`briefFehlerProIp`, `mailFehlerProIp`, `anfragenProIp`), `src/lib/server/login/dienst.ts`.
+
+**Beobachtung:** Die Grenzen zählen pro einzelner IP-Adresse. Ein Anschluss mit IPv6 hat meist ein ganzes /64-Netz und kann die Adresse bei jedem Versuch wechseln; so greifen die Grenzen pro IP nicht.
+
+**Ursprung:** #29, abschliessendes Review.
+
+**Einschätzung:** Gering bis mittel; der Brief-Code bleibt durch seine Länge geschützt, Mail-Codes durch die Grenze von 5 Versuchen pro Code. Mit #32 (Betrieb) IPv6-Clients vor dem Zählen auf ihr /64 zusammenfassen, im Proxy oder in der App.

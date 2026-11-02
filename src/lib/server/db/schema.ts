@@ -7,7 +7,8 @@ import {
 	pgTable,
 	serial,
 	text,
-	timestamp
+	timestamp,
+	uniqueIndex
 } from 'drizzle-orm/pg-core';
 
 export const mitglied = pgTable(
@@ -22,7 +23,11 @@ export const mitglied = pgTable(
 		email: text('email').notNull().unique('mitglied_email_unique'),
 		status: text('status').notNull().default('aktiv')
 	},
-	(t) => [check('mitglied_status_check', sql`${t.status} in ('aktiv', 'ausgetreten', 'geloescht')`)]
+	(t) => [
+		check('mitglied_status_check', sql`${t.status} in ('aktiv', 'ausgetreten', 'geloescht')`),
+		// Der Login sucht die Adresse ohne Rücksicht auf Gross-/Kleinschreibung: sie muss auch so eindeutig sein.
+		uniqueIndex('mitglied_email_klein_unique').on(sql`lower(${t.email})`)
+	]
 );
 
 export const konto = pgTable('konto', {
