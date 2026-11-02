@@ -3,7 +3,9 @@
 # Baut in einem Temp-Ordner einen Wegwerf-Server (MYTCO_BASIS) auf, schiebt das Image in eine
 # lokale Registry und liefert über den Türsteher bin/ausliefern-ssh nach Test und Live aus,
 # so wie es der Server tut. Prüft HTTPS über Caddy, die Trennung der Umgebungen, den Rückfall,
-# Sicherung/Probe/Wiederherstellung und das Abweisen einer kaputten Einrichtung.
+# Sicherung/Probe/Wiederherstellung (auch einer älteren Sicherung nach einer neuen Migration),
+# die Sicherung vor einer Live-Auslieferung, das Abweisen einer kaputten Einrichtung und dass
+# der Proxy keine IP-Adressen protokolliert.
 # Ausgabe je Prüfung "prüfung: <name> … ok|fehler", am Ende die Summe; Exit 1 bei einem Fehler.
 # Alle Werte sind erfunden. Bei jedem Ende wird aufgeräumt: Compose-Projekte mytco-test,
 # mytco-live, mytco-proxy samt Netzen und Volumes, Registry, gebaute Images, Temp-Ordner.
@@ -25,7 +27,7 @@ CADDY_IMAGE=$(sed -n 's/^[[:space:]]*image:[[:space:]]*\(caddy:[^[:space:]]*\)[[
 	"$BETRIEB/compose.proxy.yml" | sed -n 1p)
 KENNUNG="nachweis-$$"
 REGISTRY_NAME="mytco-$KENNUNG-registry"
-EIGENE_IMAGES="$BILD mytco-nachweis:d2-$$ mytco-nachweis:d3-$$ mytco-nachweis:d4-$$"
+EIGENE_IMAGES="$BILD mytco-nachweis:d2-$$ mytco-nachweis:d3-$$ mytco-nachweis:d4-$$ mytco-nachweis:d5-$$"
 PROJEKTE="mytco-test mytco-live mytco-proxy"
 NETZE="mytco-proxy-test mytco-proxy-live"
 WARTEZEIT=60
@@ -282,6 +284,26 @@ container_ip() {
 
 psql_live() {
 	docker exec mytco-live-db-1 psql -U mytco -d mytco -At -c "$1"
+}
+
+# restic wie auf dem Server: über restic_docker aus der von Hand eingerichteten lib.sh.
+restic_nachweis() {
+	(
+		MYTCO_BASIS="$BASIS"
+		# shellcheck source=../bin/lib.sh
+		source "$BASIS/bin/lib.sh"
+		restic_docker "$@" </dev/null
+	)
+}
+
+# Läufe, die sichern im Protokoll von Live als abgelegt meldet (der neueste zuletzt).
+abgelegte_laeufe() {
+	sed -n 's/^sichern: \(lauf-[0-9]\{8\}T[0-9]\{6\}Z\) abgelegt$/\1/p' "$BASIS/live/protokoll.log"
+}
+
+# Zählung (schema.tabelle|anzahl) eines Laufs von Live aus dem Sicherungsziel.
+zaehlung_von() {
+	restic_nachweis dump --tag "live,$1" --path /zaehlung.txt latest /zaehlung.txt
 }
 
 # Manifest-Abrufe eines Digests im Zugriffsprotokoll der Registry.
@@ -576,11 +598,43 @@ insert into nachweis (email) values ('nachweis@example.org');" >/dev/null
 	[ "$(psql_live "select count(*) from nachweis")" = 1 ]
 }
 
+# Das Sicherungsziel ist noch nicht angelegt: sichern meldet fehler und legt nichts an (auch
+# nicht in einem Wegwerf-Container, der danach gelöscht würde).
+p5_ohne_ziel() {
+	local ausgabe rc=0
+	ausgabe=$(gemeinsam sichern live) || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe"
+	grep -qF "sichern: Sicherungsziel nicht erreichbar oder nicht angelegt" "$BASIS/live/protokoll.log" || {
+		echo "keine Meldung 'nicht angelegt' im Protokoll"
+		return 1
+	}
+	[ ! -e "$BASIS/sicherung/config" ] || {
+		echo "sichern hat das Repo selbst angelegt"
+		return 1
+	}
+	[ -z "$(abgelegte_laeufe)" ] || {
+		echo "ein Lauf wurde trotzdem als abgelegt gemeldet"
+		return 1
+	}
+}
+
+# Einmaliger Handschritt des Betriebs (README): das restic-Repo anlegen.
+p5_ziel_anlegen() {
+	restic_nachweis init >>"$LOG" 2>&1 || {
+		echo "restic init gescheitert"
+		return 1
+	}
+	[ -f "$BASIS/sicherung/config" ] || {
+		echo "kein Repo unter $BASIS/sicherung"
+		return 1
+	}
+}
+
 p5_sichern() {
 	local ausgabe rc=0 lauf
 	ausgabe=$(gemeinsam sichern live) || rc=$?
 	erwarte_ausgabe ok "$rc" "$ausgabe"
-	lauf=$(sed -n 's/^sichern: \(lauf-[0-9]\{8\}T[0-9]\{6\}Z\) abgelegt$/\1/p' "$BASIS/live/protokoll.log" | tail -n 1)
+	lauf=$(abgelegte_laeufe | tail -n 1)
 	[ -n "$lauf" ] || {
 		echo "kein Lauf im Protokoll"
 		return 1
@@ -638,6 +692,108 @@ p5_fremder_lauf() {
 		return 1
 	}
 	test_status_ok
+}
+
+# D5: dasselbe Image mit einer zusätzlichen Migration (neue Tabelle), wie ein späteres Release.
+p5_bauen_d5() {
+	printf '%s\n' 'CREATE TABLE "nachweis_spaeter" ("id" serial PRIMARY KEY);' >"$TEMP/0001_nachweis.sql"
+	node -e "
+const fs = require('fs');
+const j = JSON.parse(fs.readFileSync(process.argv[1], 'utf-8'));
+const letzte = j.entries[j.entries.length - 1];
+j.entries.push({ idx: letzte.idx + 1, version: letzte.version, when: letzte.when + 1000, tag: '0001_nachweis', breakpoints: true });
+fs.writeFileSync(process.argv[2], JSON.stringify(j, null, 2));
+" "$BETRIEB/../drizzle/meta/_journal.json" "$TEMP/_journal.json"
+	baue d5 "FROM $BILD
+COPY 0001_nachweis.sql /app/drizzle/0001_nachweis.sql
+COPY _journal.json /app/drizzle/meta/_journal.json" "$TEMP/0001_nachweis.sql" "$TEMP/_journal.json"
+	schiebe "mytco-nachweis:d5-$$" d5
+}
+
+migrationen_live() {
+	psql_live "select count(*) from drizzle.__drizzle_migrations"
+}
+
+# Zweite Live-Auslieferung auf eine Datenbank mit Daten: Vorher läuft eine vollständige
+# Sicherung, deren Zählung die erfundene Zeile enthält; danach gibt es die neue Tabelle.
+p5_live_d5() {
+	local vorher nachher lauf zaehlung
+	vorher=$(abgelegte_laeufe | wc -l | tr -d ' ')
+	erwarte_lauf ok live "$(lies d5)"
+	nachher=$(abgelegte_laeufe | wc -l | tr -d ' ')
+	[ "$nachher" -eq $((vorher + 1)) ] || {
+		echo "erwartet einen neuen abgelegten Lauf, gezählt $vorher -> $nachher"
+		return 1
+	}
+	lauf=$(abgelegte_laeufe | tail -n 1)
+	zaehlung=$(zaehlung_von "$lauf") || {
+		echo "Zählung von $lauf nicht lesbar"
+		return 1
+	}
+	echo "Zählung von $lauf:"
+	printf '%s\n' "$zaehlung"
+	grep -qxF 'public.nachweis|1' <<<"$zaehlung" || {
+		echo "Zählung enthält public.nachweis|1 nicht"
+		return 1
+	}
+	if grep -qF nachweis_spaeter <<<"$zaehlung"; then
+		echo "Sicherung lief nach der Migration statt davor"
+		return 1
+	fi
+	[ "$(psql_live "select to_regclass('public.nachweis_spaeter')")" = nachweis_spaeter ] || {
+		echo "Migration von D5 lief nicht"
+		return 1
+	}
+	merke_wert lauf_vor_d5 "$lauf"
+	live_status_ok
+}
+
+# Die ältere Sicherung (vor der Migration) zurückspielen: Die spätere Tabelle und ihr Eintrag
+# in der Migrationstabelle verschwinden, die Daten der Sicherung sind da.
+p5_alt_zurueck() {
+	local ausgabe rc=0 lauf
+	lauf=$(lies lauf_vor_d5)
+	[ -n "$lauf" ] || {
+		echo "Lauf vor D5 fehlt"
+		return 1
+	}
+	[ "$(migrationen_live)" = 2 ] || {
+		echo "vor dem Zurückspielen nicht 2 Migrationen: $(migrationen_live)"
+		return 1
+	}
+	ausgabe=$(gemeinsam wiederherstellen live "$lauf") || rc=$?
+	erwarte_ausgabe ok "$rc" "$ausgabe"
+	[ -z "$(psql_live "select to_regclass('public.nachweis_spaeter')")" ] || {
+		echo "Tabelle der späteren Migration ist stehen geblieben"
+		return 1
+	}
+	[ "$(migrationen_live)" = 1 ] || {
+		echo "Migrationstabelle nicht auf dem Stand der Sicherung: $(migrationen_live)"
+		return 1
+	}
+	[ "$(psql_live "select email from nachweis")" = "nachweis@example.org" ] || {
+		echo "Zeile der Sicherung fehlt"
+		return 1
+	}
+	live_status_ok
+}
+
+# Danach läuft dieselbe Migration bei der nächsten Auslieferung wieder durch.
+p5_live_d5_erneut() {
+	erwarte_lauf ok live "$(lies d5)"
+	[ "$(psql_live "select to_regclass('public.nachweis_spaeter')")" = nachweis_spaeter ] || {
+		echo "Migration lief nicht erneut"
+		return 1
+	}
+	[ "$(migrationen_live)" = 2 ] || {
+		echo "erwartet 2 Migrationen, gezählt $(migrationen_live)"
+		return 1
+	}
+	[ "$(psql_live "select email from nachweis")" = "nachweis@example.org" ] || {
+		echo "Zeile fehlt nach der Auslieferung"
+		return 1
+	}
+	live_status_ok
 }
 
 # --- 6 Einrichtung ------------------------------------------------------------------------
@@ -741,6 +897,51 @@ p7_fehlerseite() {
 	live_status_ok
 }
 
+# Kein Eintrag im Docker-Log des Proxys darf eine IP-Adresse oder ein Feld dafür tragen. Fehler,
+# die handle_errors beantwortet (wie der 502 oben), schreibt Caddy nur auf Stufe debug; darum
+# zusätzlich die wirksame Konfiguration: Der Standard-Logger entfernt die Felder jedes Eintrags.
+# Ohne Filter trägt u. a. jeder Eintrag der Admin-Schnittstelle remote_ip (im Lauf gesehen).
+p7_keine_ip() {
+	local log konfig feld netz ip
+	konfig=$(docker exec mytco-proxy-caddy-1 wget -qO- http://127.0.0.1:2019/config/logging/logs/default)
+	for feld in remote_ip remote_port 'request\u003eremote_ip' 'request\u003eremote_port' \
+		'request\u003eclient_ip' 'request\u003eheaders\u003eX-Forwarded-For'; do
+		grep -qF "\"$feld\":{\"filter\":\"delete\"}" <<<"$konfig" || {
+			echo "Standard-Logger entfernt $feld nicht: $konfig"
+			return 1
+		}
+	done
+	log=$(docker logs mytco-proxy-caddy-1 2>&1)
+	# Gegenprobe: Es gibt Einträge, die ohne Filter eine Adresse trügen (Anfragen an die
+	# Admin-Schnittstelle bei jedem caddy reload und die Abfrage eben).
+	grep -qF '"logger":"admin.api","msg":"received request"' <<<"$log" || {
+		echo "keine Einträge der Admin-Schnittstelle im Log, die Prüfung hätte nichts gesehen"
+		return 1
+	}
+	for feld in '"remote_ip"' '"client_ip"' 'X-Forwarded-For'; do
+		if grep -qF "$feld" <<<"$log"; then
+			echo "Log enthält $feld:"
+			grep -F "$feld" <<<"$log" | head -n 3
+			return 1
+		fi
+	done
+	# 127.0.0.1:2019 ist Caddys eigene Admin-Schnittstelle (Startmeldung, Host-Kopf der Abfrage
+	# oben), keine Client-Adresse; jedes andere Vorkommen von 127.0.0.1 wäre eine.
+	if grep -E '(^|[^0-9.])127\.0\.0\.1([^0-9]|$)' <<<"${log//127.0.0.1:2019/}"; then
+		echo "Log enthält 127.0.0.1 (Zeilen oben)"
+		return 1
+	fi
+	# Die Adresse, unter der Docker die Anfragen an den Proxy weiterreicht (Gateway der Netze).
+	for netz in mytco-proxy-test mytco-proxy-live; do
+		for ip in $(docker network inspect -f '{{range .IPAM.Config}}{{.Gateway}} {{end}}' "$netz"); do
+			if grep -qF "$ip" <<<"$log"; then
+				echo "Log enthält die Gateway-Adresse $ip"
+				return 1
+			fi
+		done
+	done
+}
+
 # --- Ablauf -------------------------------------------------------------------------------
 pruefung "0 wegwerf-server einrichten" einrichten
 [ "$ANZAHL_FEHLER" = 0 ] || summe
@@ -772,11 +973,17 @@ pruefung "4 ausliefern-ssh test D2 → fehler mit rückfall" p4_rueckfall
 pruefung "4 test danach ok, aktuell = D1" p4_danach
 
 pruefung "5 erfundene zeile in live-db" p5_zeile
+pruefung "5 sichern live ohne angelegtes ziel → fehler, nichts angelegt" p5_ohne_ziel
+pruefung "5 sicherungsziel von hand anlegen (restic init)" p5_ziel_anlegen
 pruefung "5 sichern live → ok" p5_sichern
 pruefung "5 probe live → ok" p5_probe
 pruefung "5 wiederherstellen live → zeile wieder da" p5_wiederherstellen
 pruefung "5 probe live <lauf> → ok (lauf gültig)" p5_probe "$(lies lauf)"
 pruefung "5 wiederherstellen test <lauf von live> → fehler" p5_fremder_lauf
+pruefung "5 image mit neuer migration (D5)" p5_bauen_d5
+pruefung "5 ausliefern-ssh live D5 → ok, vorher vollständig gesichert (mit zeile)" p5_live_d5
+pruefung "5 wiederherstellen live <lauf vor D5> → spätere tabelle weg" p5_alt_zurueck
+pruefung "5 ausliefern-ssh live D5 erneut → ok, migration läuft wieder durch" p5_live_d5_erneut
 
 pruefung "6 images mit kaputtem test.caddy (D3) und geändertem Caddyfile (D4)" p6_bauen
 pruefung "6 ausliefern-ssh test D3 → fehler, test.caddy zurückgesetzt" p6_kaputt
@@ -784,5 +991,6 @@ pruefung "6 live und test antworten weiter" p6_antworten
 pruefung "6 test-auslieferung (D4) lässt proxy/Caddyfile unverändert" p6_caddyfile
 
 pruefung "7 app gestoppt → caddy antwortet mit 502" p7_fehlerseite
+pruefung "7 proxy-log ohne ip-adressen" p7_keine_ip
 
 summe

@@ -1,3 +1,24 @@
+# Globale Optionen. Caddy schreibt kein Zugriffsprotokoll (kein `log` in den Adressen), aber
+# Fehler und Warnungen ins Standard-Log (Docker-Log des Proxys). Dort stünden zu einer Anfrage
+# die Adresse des Clients und seine Köpfe; DS-06 erlaubt IP-Adressen höchstens 24 Stunden.
+# Darum entfernt der Filter diese Felder aus jedem Eintrag, bevor er geschrieben wird; die
+# Felder ohne `request>` stehen in den Einträgen der Admin-Schnittstelle (z. B. caddy reload).
+# Cookie und Authorization schwärzt Caddy von selbst.
+{
+	log default {
+		format filter {
+			remote_ip delete
+			remote_port delete
+			request>remote_ip delete
+			request>remote_port delete
+			request>client_ip delete
+			request>headers>X-Forwarded-For delete
+			request>headers>X-Real-Ip delete
+			request>headers>Forwarded delete
+		}
+	}
+}
+
 # Gemeinsame Sicherheits-Kopfzeilen für alle Adressen. Sie gelten auch für Antworten, die Caddy
 # selbst gibt (401 der Test-Anmeldung). Die App setzt einige dieselben Köpfe: reverse_proxy
 # hängt Upstream-Köpfe an, statt zu ersetzen. Darum entfernt `app_ohne_sicherheit` sie aus der
@@ -31,5 +52,5 @@
 	tls internal
 }
 
-# Kein log-Block: Zugriffsprotokolle werden nicht geschrieben (Datenschutz).
+# Kein log-Block in den Adressen: Zugriffsprotokolle werden nicht geschrieben (Datenschutz).
 import umgebungen/*.caddy
