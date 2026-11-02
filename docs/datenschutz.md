@@ -29,7 +29,7 @@ Konzept angepasst, dann die Funktion ([Änderungen](#änderungen-an-diesem-konze
 | Postadresse | Login-Briefe | ja |
 | E-Mail-Adresse | Bestätigungen, Benachrichtigungen, neuer Einmal-Code (A-LOGIN-10); je Mitglied eine eigene (FR-25) | ja |
 | Telefonnummer | Absprache der Gruppenspiele | für die CM ja |
-| Geschlecht, Jahrgang | Zulassung zu Kategorien; volles Geburtsdatum nur, falls Swiss Tennis es verlangt (K-40) | ja |
+| Geschlecht, Jahrgang | Zulassung zu Kategorien; volles Geburtsdatum nur, falls Swiss Tennis es verlangt (Annahme K-40) | ja |
 | Lizenznummer, Klassierung | Anmeldung, Lizenzanträge, Export an Swiss Tennis | nein |
 | Konto, Rollen, Benachrichtigungs-Einstellungen | Login, Berechtigungen, Push | ja |
 | IP-Adresse bei Login-Versuchen | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; nur im Arbeitsspeicher oder höchstens 24 Stunden | — |
@@ -70,8 +70,8 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 ## Junioren
 
 Vorerst behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Wie Junioren und ihre
-Eltern erfasst werden, wird mit den Junioren-Funktionen (ab 2028) geklärt (K-08) und dann
-hier ergänzt. Spielen Junioren schon an der Clubmeisterschaft 2027 mit (K-46), muss das
+Eltern erfasst werden, wird mit den Junioren-Funktionen (ab 2028) geklärt (Annahme K-08) und dann
+hier ergänzt. Spielen Junioren schon an der Clubmeisterschaft 2027 mit (hängt an K-46), muss das
 vor der CM-Anmeldung geschehen.
 
 ## Rechte der Mitglieder
@@ -104,8 +104,8 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 
 K-06 (Ansprechperson), K-07 (Datenumfang), K-08 und K-46 (Junioren), K-09 (Vertrag mit Metanet
 für E-Mail), K-14 (Austritte), K-38 (Löschfrist), K-39 (öffentlicher Spielplan), K-40
-(Jahrgang) — alle in den [Abklärungen](abklaerungen.md). K-31 und K-42 (Kontaktdaten) hat der
-Projektleiter entschieden, siehe [Beantwortet](abklaerungen.md#beantwortet).
+(Jahrgang) — alle in den [Abklärungen](abklaerungen.md). Was schon entschieden ist, steht unter
+[Beantwortet](abklaerungen.md#beantwortet).
 
 ## Änderungen an diesem Konzept
 

@@ -41,7 +41,7 @@ ein Versanddienst in der EU wie Scaleway (300 Mails/Monat gratis, danach EUR 0.2
 Webserver mit automatischem HTTPS als Docker-Container; die Datenbank wird jede Nacht auf
 einen Speicher ausserhalb des Servers in der Schweiz gesichert. E-Mails verschickt MyTCO über
 ein Postfach von @tcolten.ch, wenn K-11 das mit ausreichendem Limit erlaubt — sonst über
-Scaleway (EU).**
+Scaleway (EU).** (hängt an K-11)
 
 Begründung:
 
@@ -89,10 +89,10 @@ genommen, ein VPS ohne SLA reicht.
 ## Reevaluations-Trigger
 
 1. **Betrieb wird zu viel:** Server-Pflege ist im Jahr mehr als ca. 2 Personentage (S),
-   oder niemand übernimmt sie (K-05) → verwaltete Plattform (Option B).
+   oder niemand übernimmt sie (hängt an K-05) → verwaltete Plattform (Option B).
 2. **Infomaniak bietet verwaltetes PostgreSQL** im Budget an.
-3. **Ausfall während der CM-Anmeldung oder am Finalwochenende**, oder K-15 verlangt eine
-   Verfügbarkeit, die ein VPS ohne SLA nicht hergibt.
+3. **Ausfall während der CM-Anmeldung oder am Finalwochenende**, der den Verein stärker
+   stört, als K-15 (kurzer Ausfall wird in Kauf genommen) erwarten liess.
 4. **Preis** des VPS steigt über das Budget, oder Infomaniak streicht VPS Lite.
 
 ## Quellen

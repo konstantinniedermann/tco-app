@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs voraussetzungen voraussetzungen-docker db dev test e2e build image secrets hooks
+.PHONY: help check check-schnell docs annahmen voraussetzungen voraussetzungen-docker db dev test e2e build image secrets hooks
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -24,6 +24,10 @@ docs: ## Doku-Prüfung (Links, Struktur, Test-IDs; braucht nur Node, kein node_m
 	@bash scripts/pruefe-node.sh
 	@bash scripts/check-docs.sh
 	@node scripts/pruefungen/test-ids.ts
+	@node scripts/pruefungen/annahmen.ts
+
+annahmen: ## Annahmen zu offenen Fragen an den Verein auflisten (alle, oder nur eine: make annahmen K=K-11)
+	@node scripts/pruefungen/annahmen.ts --liste $(K)
 
 voraussetzungen: ## Prüft Node-Version (.nvmrc) und node_modules (installiert nichts)
 	@bash scripts/pruefe-node.sh

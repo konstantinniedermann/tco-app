@@ -70,7 +70,7 @@ damit ein Datenbank-Leck die 50 Bit des Brief-Codes nicht durchrechenbar macht.
 | ID | Vorgabe |
 |----|---------|
 | SI-01 | Codes und Sitzungskennungen stammen aus einem kryptografisch sicheren Zufallsgenerator; Codes nur als HMAC gespeichert. Werte wie in der Tabelle [Login](#login) |
-| SI-02 | Der Brief-Code ist an kein eingegebenes Konto gebunden, darum gibt es keine Sperre pro Konto, sondern höchstens 10 Fehlversuche pro IP und Stunde. Ein schon benutzter Code meldet «Code schon benutzt — wende dich an [Kontakt, K-21]» |
+| SI-02 | Der Brief-Code ist an kein eingegebenes Konto gebunden, darum gibt es keine Sperre pro Konto, sondern höchstens 10 Fehlversuche pro IP und Stunde. Ein schon benutzter Code meldet «Code schon benutzt — wende dich an [Kontakt, hängt an K-21]» |
 | SI-03 | Ein Mail-Code ist nach 5 Fehlversuchen ungültig; das Mitglied fordert einen neuen an |
 | SI-04 | Code anfordern: für bekannte und unbekannte Adressen dieselbe Antwort und dieselbe Antwortzeit; höchstens 3 Code-Mails pro Adresse und Stunde und 10 pro Tag, 10 Anfragen pro IP und Stunde. IP-Adressen nur dafür, höchstens 24 Stunden (DS-06) |
 | SI-05 | Logs enthalten keine Codes, Sitzungskennungen oder Kontaktdaten (DS-06); Fehlversuche werden gezählt, nicht mit Inhalt geloggt |
@@ -102,8 +102,8 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
   Schreibrecht direkt auf `main` pushen oder einen Workflow mit dem Live-Schlüssel schreiben
   ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Angenommen unter zwei
   Bedingungen: Zwei-Faktor-Login auf beiden Konten (SI-15), und die Hauptansprechperson im
-  Vorstand nutzt ihren Zugang nur zum Lesen (Absprache). Neu bewerten, sobald K-04 (wem
-  gehören die Konten) beantwortet ist.
+  Vorstand nutzt ihren Zugang nur zum Lesen (Absprache). Neu bewerten: hängt an K-04 (wem
+  gehören die Konten).
 - **Ein Schadpaket im Bau** landet im Image und läuft live, auch ohne Schlüssel; dagegen
   hilft nur SI-14.
 
@@ -116,6 +116,6 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
 
 ## Offene Fragen an den Verein
 
-K-04 (Konten), K-05 (Stellvertretung), K-12 (Admin-Bestätigung, weitere Vorgaben), K-16
-(Briefversand, Weg zurück per Mail-Code), K-18 (wer welche Rolle), K-21 (Kontakt bei Login-Problemen) — alle in den
+K-04 (Konten), K-05 (Stellvertretung), K-12 (Admin-Bestätigung, weitere Vorgaben), K-16.1 und
+K-16.3 (Briefversand, Weg zurück per Mail-Code), K-18 (wer welche Rolle), K-21 (Kontakt bei Login-Problemen) — alle in den
 [Abklärungen](abklaerungen.md).
