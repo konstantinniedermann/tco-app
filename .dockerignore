@@ -12,4 +12,5 @@ coverage
 .env*
 !.env.example
 intern
+betrieb/**/*.env
 musterbrief

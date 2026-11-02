@@ -1,0 +1,11 @@
+# Nächtliche Sicherung von Live mit anschliessender Probe (von Hand einrichten, siehe README).
+[Unit]
+Description=MyTCO: Sicherung von Live und Wiederherstellungsprobe
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=mytco
+ExecStart=/opt/mytco/gemeinsam/bin/sichern live
+ExecStartPost=/opt/mytco/gemeinsam/bin/probe live

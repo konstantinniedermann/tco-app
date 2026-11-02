@@ -116,6 +116,114 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-02 — Doppelte Zeile `RESTIC_REPOSITORY`: geprüft wird die erste, genutzt die letzte
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `betrieb/bin/lib.sh` (`sicherungsziel`, `restic_docker`).
+
+**Beobachtung:** `sicherungsziel` liest die erste Zeile `RESTIC_REPOSITORY=` aus `sicherung.env`; `docker run --env-file` nimmt bei doppelten Schlüsseln die letzte. Steht das Ziel zweimal in der Datei, wird ein anderes Ziel geprüft (und eingehängt) als restic benutzt.
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Gering, die Datei wird von Hand einmal angelegt. Abhilfe: mehr als eine Zeile `RESTIC_REPOSITORY=` als ungültig abweisen.
+
+### 2026-11-02 — Large Objects würden die Transaktion beim Wiederherstellen vorzeitig bestätigen
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `betrieb/bin/wiederherstellen` (`sql_zum_einspielen`).
+
+**Beobachtung:** Enthält ein Dump Large Objects, schreibt `pg_restore -f -` dafür eigene `BEGIN`/`COMMIT`-Blöcke. Ein solches `COMMIT` bestätigte die äussere Transaktion samt geleerten Schemas vorzeitig; ein späterer Fehler liesse dann einen halben Stand zurück.
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Heute ohne Folgen, die App nutzt keine Large Objects. Wieder aufnehmen, falls Dateien je in der Datenbank landen (dann eher `bytea` nehmen).
+
+### 2026-11-02 — Fehlerzeilen von psql beim Wiederherstellen können Zeilendaten ins Protokoll tragen
+
+**Thema:** Sicherheit
+
+**Fundort:** `betrieb/bin/wiederherstellen` (psql-Ausgabe nach `protokoll.log`).
+
+**Beobachtung:** Scheitert eine Anweisung beim Einspielen, schreibt psql `CONTEXT`-Zeilen, die bei `COPY` die betroffene Datenzeile enthalten können (z. B. eine E-Mail-Adresse). Sie landen in `<umgebung>/protokoll.log` auf dem Server (DS-06).
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Gering, nur im Fehlerfall und nur auf dem Server. In #39 zusammen mit der Rotation von `protokoll.log` behandeln (z. B. `CONTEXT`-Zeilen kürzen oder `VERBOSITY terse`); ergänzt den bestehenden Eintrag «Betrieb: Grenzen von Header, Protokoll und Wiederherstellung».
+
+### 2026-11-02 — Das ausgelieferte Image ist nicht das Image aus dem Rauchtest
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `.github/workflows/check.yml`, Jobs `image` und `bauen`.
+
+**Beobachtung:** `image` baut `mytco:ci` und prüft es im Rauchtest; `bauen` baut auf `dev` ein zweites Mal und schiebt diesen Neubau nach GHCR. Docker-Builds sind nicht bitgleich, ausgeliefert wird also ein Image, das den Rauchtest nie gesehen hat. Geprüft wird es erst auf Test über die Statusabfrage der Auslieferung.
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Gering: Test fängt ein nicht startendes Image ab, Live bekommt nur, was auf Test lief. Bei Gelegenheit `bauen` das Image aus `image` übernehmen lassen (z. B. als Artefakt oder Bau einmal mit Push) und dafür einen Bau-Lauf sparen.
+
+### 2026-11-02 — Digests von restic und Registry stehen ausserhalb von Dependabot
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `betrieb/bin/lib.sh` (`RESTIC_IMAGE`), `betrieb/nachweis/nachweis.sh` (`REGISTRY_IMAGE`).
+
+**Beobachtung:** Beide Images sind per Digest in Shell-Dateien gepinnt. Dependabot liest nur Dockerfile und Compose-Dateien und schlägt dafür nie ein Update vor; Sicherheits-Updates von restic kämen so nie an.
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Gering bis mittel für restic (läuft nächtlich mit dem Sicherungszugang), gering für die Registry (nur lokaler Nachweis). Bis zu einer Lösung von Hand prüfen, z. B. mit jedem Release; Abhilfe wäre, restic als Dienst in eine Compose-Datei zu legen, die Dependabot liest.
+
+### 2026-11-02 — Idee: Migrationen vor der Live-Auslieferung gegen eine Live-Sicherung proben
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `betrieb/bin/ausliefern` (Migration), `betrieb/bin/probe`.
+
+**Beobachtung:** Test startet bei jeder Auslieferung mit leerer Datenbank und erfundenen Testdaten. Eine Migration, die an echten Daten scheitert (z. B. eine neue Pflichtspalte oder ein eindeutiger Index über doppelte Werte), fällt erst bei der Live-Auslieferung auf. Dann greift zwar der Rückfall, aber Live steht kurz.
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Idee, kein Fehler. Möglich wäre, vor der Live-Migration die frische Sicherung wie bei `probe` in eine Wegwerf-Datenbank einzuspielen und die Migration dort zuerst laufen zu lassen. Wieder aufnehmen, sobald die erste Migration Daten umbaut.
+
+### 2026-11-02 — Betrieb: Grenzen von Header, Protokoll und Wiederherstellung
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/hooks.server.ts`, `betrieb/caddy/`, `betrieb/bin/wiederherstellen`, `betrieb/bin/probe`.
+
+**Beobachtung:**
+- Die Sicherheits-Header sind doppelt definiert, in `hooks.server.ts` und in Caddy. Ändert man eine Stelle, driftet die andere.
+- `pg_restore`- und `psql`-Fehlerzeilen können Zeilendaten enthalten und landen im Protokoll auf dem Server (DS-06).
+- `wiederherstellen` legt vor dem Überschreiben keine Sicherheitssicherung des aktuellen Stands an.
+
+**Ursprung:** #32 Task-Reviews.
+
+**Einschätzung:** Alle drei gering, solange nur der Projektleiter und seine Stellvertretung den Server bedienen. Beim Protokoll vor der Testgruppe prüfen, ob Fehlerzeilen gekürzt werden müssen; bei `wiederherstellen` vor dem ersten Einsatz auf Live eine Sicherung vorschalten (Inbetriebnahme, [#39](https://github.com/konstantinniedermann/tco-app/issues/39)).
+
+### 2026-11-02 — Kleinbefunde aus den Task-Reviews der Auslieferung (#32)
+
+**Thema:** Code-Gerüst
+
+**Fundort:** siehe Liste.
+
+**Beobachtung:**
+- `betrieb/bin/ausliefern`: Das Aufräumen alter Images kann ein Image löschen, das die andere Umgebung gerade holt; die Sperre gilt nur je Umgebung.
+- CI: Zwei schnelle Pushes auf `dev` können Test auf einen älteren Stand ausliefern, wenn der Lauf des älteren später fertig wird.
+- `fassungen/<digest>/` und die Zwischenordner `fassungen/.neu.*` auf dem Server werden nie aufgeräumt.
+- `scripts/pruefungen/workflow-rechte.ts`: Der Nachschlag in `JOB_RECHTE` nutzt kein `Object.hasOwn`; ein Jobname wie `constructor` träfe die Prototyp-Eigenschaft.
+- `.github/dependabot.yml`: Dependabot erkennt die Compose-Dateien unter `betrieb/` womöglich nicht (auf GitHub prüfen).
+- `betrieb/bin/lib.sh`, `betrieb/bin/sichern`: Das Lesen der Snapshot-JSON hängt an der Feldreihenfolge von restic. Bei jedem restic-Update `make betrieb-nachweis` (Sicherung und Aufbewahrung) erneut laufen lassen.
+- `betrieb/bin/sichern`: Die restic-Aufbewahrung (`--keep-within 30d`) zählt ab dem neuesten Snapshot, nicht ab heute; bleibt die Sicherung aus, bleiben auch alte Sicherungen.
+
+**Ursprung:** #32 Task-Reviews.
+
+**Einschätzung:** Keiner davon bricht den Nachweis. Beim Betrieb auf dem Server (#39) mitnehmen, die Dependabot-Frage sofort auf GitHub klären.
+
+**Erledigt 2026-11-02 (#32 Gesamt-Review):** `workflow-rechte.ts` nutzt jetzt `Object.hasOwn` (mit Test für einen Job `constructor`); die Zählung der 30 Tage steht als Fakt in `docs/ci-cd-und-release.md`. Bei der nächsten Auswertung beide Punkte streichen.
+
 *Keine offenen Einträge.*
 ### 2026-11-01 — Kleinbefunde aus den Task-Reviews des Code-Gerüsts
 
@@ -134,6 +242,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #15, Task-Reviews und Abschluss-Review, als Minor eingestuft.
 
 **Einschätzung:** Keiner davon lässt eine Prüfung falsch durch. Mitnehmen, wenn die Datei ohnehin angefasst wird. Die ADR-Sätze beschreiben den Stand beim Entscheid, ein kurzer Nachtrag genügt.
+
+**Erledigt 2026-11-02 (#32):** Der Punkt zum `Dockerfile` (`svelte-kit sync` entfernt, `HEALTHCHECK` ergänzt) ist behoben; die übrigen Punkte bleiben offen. Bei der nächsten Auswertung den Punkt streichen.
 
 ### 2026-11-01 — Test-ID-Prüfung zählt IDs in Kommentaren und übersprungenen Tests
 
@@ -158,6 +268,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #15 Abschluss-Review.
 
 **Einschätzung:** Header im Reverse-Proxy setzen ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)).
+
+**Erledigt 2026-11-02 (#32):** Caddy setzt die Header für alle Antworten, auch `/_app/*`; belegt mit `make betrieb-nachweis`. Bei der nächsten Auswertung ins Archiv.
 
 ### 2026-11-01 — CI: PostgreSQL-Service nur per Tag, Playwright-Browser ohne Cache
 
@@ -197,6 +309,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Rauchtest (Container starten, Migration, `/api/status`) mit Server und Auslieferung ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)).
 
+**Erledigt 2026-11-02 (#32):** Der Rauchtest läuft im Job `image` der CI. Bei der nächsten Auswertung ins Archiv.
+
 ### 2026-11-01 — `$app/env/private` passt nicht zur Test-Datenbank pro Lauf
 
 **Thema:** Code-Gerüst
@@ -220,6 +334,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #15 Code-Gerüst.
 
 **Einschätzung:** Gehört zu Server und Auslieferung ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)); dort den Header setzen.
+
+**Erledigt 2026-11-02 (#32):** Caddy setzt `frame-ancestors 'none'` überall, wo die App keine eigene CSP mitgibt. Bei der nächsten Auswertung ins Archiv.
 
 ### 2026-11-01 — 22 bekannte Schwachstellen in Entwicklungs- und Build-Werkzeugen, kein Audit-Gate
 
@@ -453,6 +569,29 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Gering. Mit dem ersten echten Formular (Login, #29) ergänzen, z. B. Fehlermeldung „Code schon benutzt“.
 
+### 2026-11-02 — Einheitstests der Betriebsskripte lassen ihre Temp-Ordner liegen
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `tests/betrieb/hilfe.ts` (`fuehreAus`), `tests/betrieb/sicherung.test.ts` (`baue`) und weitere `mkdtempSync`-Aufrufe in `tests/betrieb/`.
+
+**Beobachtung:** Jeder Lauf von `npx vitest run tests/betrieb/` legt pro Test einen Ordner `mytco-basis-*` in `$TMPDIR` an und entfernt ihn nicht; lokal liegen davon schon Hunderte.
+
+**Ursprung:** #32, Task 6 (Aufräumprüfung nach `make betrieb-nachweis`).
+
+**Einschätzung:** Gering, nur Platz im Temp-Ordner. Mit einem `afterEach`, das die angelegten Ordner löscht, beheben, wenn die Tests ohnehin angefasst werden.
+
+### 2026-11-02 — `mytco:lokal` ist ein gemeinsamer Tag aller Worktrees
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `Makefile` (`image`, `rauchtest`, `betrieb-nachweis`).
+
+**Beobachtung:** Alle Worktrees bauen in dasselbe Docker unter demselben Tag `mytco:lokal`. Während eines `make betrieb-nachweis` hat eine parallele Session den Tag mit einem Stand ohne `betrieb/` neu gebaut; Images, die danach `FROM mytco:lokal` bauten, waren falsch. Der Nachweis markiert das Image darum beim Start mit einem eigenen Tag. `make rauchtest` und das kurze Fenster zwischen `make image` und dem Start des Nachweises sind weiter betroffen.
+
+**Ursprung:** #32, Task 6 (zweiter Lauf von `make betrieb-nachweis`).
+
+**Einschätzung:** Gering, nur lokal. Abhilfe wäre ein Tag je Worktree (z. B. aus dem Ordnernamen), wenn es öfter zuschlägt.
 ### 2026-11-02 — Fehlversuche mit dem Brief-Code zählen erst nach der Datenbankabfrage
 
 **Thema:** Sicherheit
@@ -622,3 +761,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #29, Review Task 10.
 
 **Einschätzung:** Gering. Mit der PWA-Arbeit (Service Worker) ein maskierbares Symbol gestalten und `"id": "/"` setzen.
+
+### 2026-11-02 — MAIL_NUR_AN wird von der App nicht ausgewertet
+
+**Thema:** Test-Umgebung
+
+**Fundort:** `betrieb/compose.umgebung.yml`, `betrieb/geheim.env.example`; in `src/` kein Zugriff auf `MAIL_NUR_AN`.
+
+**Beobachtung:** Test verschickt Codes an jede Mitglieds-Adresse der Test-Datenbank (nur erfundene Daten). Der Filter fehlt vor der Demo.
+
+**Ursprung:** #32 Merge mit #29.
+
+**Einschätzung:** Mittel, vor der Demo mit echten Adressen nötig. Filter im Mail-Versand der App einbauen.
+
+### 2026-11-02 — Bremsen pro IP: IPv6 nicht auf /64 zusammengefasst
+
+**Thema:** Login-Bremsen
+
+**Fundort:** Bremsen pro IP in der App, Caddy-Konfiguration.
+
+**Beobachtung:** IPv6 sollte auf /64 zusammengefasst werden — weder Caddy noch die App tun es. Ein Wechsel der Adresse im selben Netz umgeht die Bremse.
+
+**Ursprung:** #32 Merge mit #29.
+
+**Einschätzung:** Gering bis mittel; Umsetzung in der App beim Bestimmen des Schlüssels.

@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed test e2e build image secrets hooks musterbrief
+.PHONY: help check check-schnell docs annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -68,6 +68,12 @@ musterbrief: voraussetzungen ## Musterbrief als PDF mit erfundenen Daten (muster
 
 image: voraussetzungen-docker ## Docker-Image bauen (mytco:lokal)
 	docker build -t mytco:lokal .
+
+rauchtest: image ## Rauchtest: Image mit Datenbank starten, migrieren, auf "healthy" warten
+	bash betrieb/nachweis/rauchtest.sh mytco:lokal
+
+betrieb-nachweis: voraussetzungen-docker image ## Lokaler Gesamtnachweis auf Docker Desktop: Auslieferung Test/Live, HTTPS, Trennung, Rückfall, Sicherung (nicht Teil von check)
+	bash betrieb/nachweis/nachweis.sh mytco:lokal
 
 secrets: ## Secret-Scan über die ganze Git-Historie (gitleaks)
 	@gitleaks git --no-banner --redact --exit-code 1 .

@@ -44,13 +44,22 @@ updates:
       # Node-Hauptversion steuert `engines`/.nvmrc bewusst von Hand.
       - dependency-name: 'node'
         update-types: ['version-update:semver-major']
+      # Eine neue PostgreSQL-Hauptversion liest die Daten von Live nicht: Test (leeres Volume)
+      # bestünde, Live fiele aus. Braucht einen eigenen Plan mit Dump und Wiederherstellung.
+      - dependency-name: 'postgres'
+        update-types: ['version-update:semver-major']
+      # Caddy-Hauptversionen können die Caddyfile-Syntax ändern: einzeln prüfen.
+      - dependency-name: 'caddy'
+        update-types: ['version-update:semver-major']
     groups:
       minor-und-patch:
         update-types:
           - 'minor'
           - 'patch'
   - package-ecosystem: 'docker-compose'
-    directory: '/'
+    directories:
+      - '/'
+      - '/betrieb'
     target-branch: 'dev'
     schedule:
       interval: 'weekly'
@@ -60,6 +69,12 @@ updates:
       - 'chore'
       - 'infra'
       - 'P2'
+    # Wie beim Ökosystem docker: Hauptversionen von PostgreSQL und Caddy nur mit eigenem Plan.
+    ignore:
+      - dependency-name: 'postgres'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'caddy'
+        update-types: ['version-update:semver-major']
     groups:
       minor-und-patch:
         update-types:
