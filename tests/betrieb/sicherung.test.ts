@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
@@ -24,6 +24,7 @@ const SNAP = (umgebung: string, ...laeufe: string[]) =>
 const SNAP_OHNE_ZAEHLUNG = (umgebung: string, lauf: string) =>
 	JSON.stringify([eintrag(umgebung, lauf, `/mytco-${umgebung}.dump`, 'd0')]);
 const SNAP_LEER = '[]';
+const AKTUELL = `sha256:${'a'.repeat(64)}`;
 
 // MYTCO_BASIS mit sicherung.env und der Einrichtung der Umgebungen (für die Postgres-Fassung).
 function baue(repository = 's3:https://beispiel.invalid/bucket'): string {
@@ -35,6 +36,8 @@ function baue(repository = 's3:https://beispiel.invalid/bucket'): string {
 	for (const u of ['test', 'live']) {
 		mkdirSync(join(basis, u, 'betrieb'), { recursive: true });
 		copyFileSync('betrieb/compose.umgebung.yml', join(basis, u, 'betrieb', 'compose.umgebung.yml'));
+		mkdirSync(join(basis, u, 'zustand'), { recursive: true });
+		writeFileSync(join(basis, u, 'zustand', 'aktuell'), `${AKTUELL}\n`);
 	}
 	return basis;
 }
@@ -309,6 +312,27 @@ describe('wiederherstellen', () => {
 		expect(x.status).toBe(1);
 		expect(letzteZeile(x)).toBe('fehler');
 		expect(index(x, 'start app')).toBeGreaterThan(index(x, 'pg_restore'));
+	});
+
+	// Compose löst MYTCO_IMAGE (Pflichtwert) bei jedem Befehl auf, der den Dienst app betrifft.
+	test('stop und start der App laufen mit dem Image aus zustand/aktuell', () => {
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], SNAP_TEST);
+		expect(letzteZeile(x)).toBe('ok');
+		for (const teil of ['stop app', 'start app']) {
+			expect(x.umwelt[index(x, teil)].image).toBe(
+				`ghcr.io/konstantinniedermann/tco-app@${AKTUELL}`
+			);
+		}
+	});
+
+	test('ohne zustand/aktuell: fehler, App bleibt unberührt', () => {
+		const basis = baue();
+		rmSync(join(basis, 'test', 'zustand', 'aktuell'));
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], SNAP_TEST, basis);
+		expect(x.status).toBe(1);
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(index(x, 'stop app')).toBe(-1);
+		expect(index(x, 'pg_restore')).toBe(-1);
 	});
 
 	test('ungültiger Lauf-Name: fehler, kein docker', () => {
