@@ -33,8 +33,8 @@ DS-01 und DS-02 erfüllt. Den Inhalt einer Mail löscht Scaleway nach dem Versan
 Versandprotokolle mit Empfängeradresse bleiben aber, solange die Absender-Domain aktiv ist;
 eine Verkürzung ist für 2027 angekündigt (B·6). Löschen lassen sich einzelne Einträge nur per
 Support-Ticket. Ob das zu den Löschfristen im [Datenschutzkonzept](datenschutz.md#löschen)
-passt, ist offen und wird mit dem Mailweg in
-[#29](https://github.com/konstantinniedermann/tco-app/issues/29) entschieden. Scaleway stellt keine
+passt, ist offen; Hinweis dazu in
+[#29](https://github.com/konstantinniedermann/tco-app/issues/29) (Wahl des Mailwegs). Scaleway stellt keine
 Schweizer MwSt in Rechnung (V).
 
 **Künftig eventuell wenige Franken pro Jahr:** GitHub und der E-Mail-Versand kosten heute
@@ -127,7 +127,7 @@ Abgerufen am 02.11.2026, wo nicht anders vermerkt.
 3. [webtesten.ch: Swiss Backup Test](https://webtesten.ch/swiss-backup-test/), geprüft am 19.08.2026: 1 TB für CHF 4.18 pro Monat, Cloud-Sicherung per S3, Swift oder SFTP für CHF 1.84 pro Gerät und Monat, bei Jahresvertrag, exkl. MwSt. Die [Preisseite von Infomaniak](https://www.infomaniak.com/de/swiss-backup/preise) lässt sich nicht automatisch abrufen
 4. [Scaleway: Transactional Email](https://www.scaleway.com/en/transactional-email-tem/): EUR 0.25 pro 1000 Mails, 300 Mails pro Monat gratis, jede Empfängerin und jeder Empfänger zählt einzeln
 5. [WebKit: Web Push for Web Apps on iOS and iPadOS](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/): kein Entwicklerkonto nötig (aus ADR-001, abgerufen am 29.10.2026)
-6. [Scaleway: Transactional Email, Datenschutz](https://www.scaleway.com/en/docs/transactional-email/reference-content/data-privacy/) (Wortlaut über den Quelltext [scaleway/docs-content](https://github.com/scaleway/docs-content/blob/main/pages/transactional-email/reference-content/data-privacy.mdx), geprüft am 02.11.2026): Verarbeitung nur in Paris, nichts ausserhalb der EU; Mail-Inhalt nach dem Versand gelöscht, Versandprotokolle mit Empfängeradresse solange die Domain aktiv ist, Verkürzung 2027 angekündigt; einzelne Protokolle oder Adressen lassen sich per Support-Ticket löschen; es gelten der Vertrag zur Auftragsbearbeitung (DPA) und die [Vertragsbedingungen](https://www.scaleway.com/en/contracts/)
+6. [Scaleway: Transactional Email, Datenschutz](https://www.scaleway.com/en/docs/transactional-email/reference-content/data-privacy/) (Wortlaut über den Quelltext [scaleway/docs-content](https://github.com/scaleway/docs-content/blob/main/pages/transactional-email/reference-content/data-privacy.mdx), geprüft am 02.11.2026): Verarbeitung nur in Paris, nichts ausserhalb der EU; Mail-Inhalt nach dem Versand gelöscht (verschlüsselte Backups 7 Tage), Versandprotokolle mit Empfängeradresse solange die Domain aktiv ist, Verkürzung 2027 angekündigt; einzelne Protokolle oder Adressen lassen sich per Support-Ticket löschen; es gelten der Vertrag zur Auftragsbearbeitung (DPA) und die [Vertragsbedingungen](https://www.scaleway.com/en/contracts/)
 7. [Metanet: Business Mail](https://www.metanet.ch/de/e-mail-und-domains/business-mail): CHF 5.90 pro Monat (aus ADR-003, abgerufen am 30.10.2026)
 8. [SRF: Preise für A- und B-Post-Briefe steigen](https://www.srf.ch/news/wirtschaft/post-passt-preise-an-preise-fuer-a-und-b-post-briefe-steigen) und [Post: Briefe Schweiz](https://www.post.ch/de/briefe-versenden/briefe-schweiz): ab 01.01.2027 A-Post CHF 1.40, B-Post CHF 1.10 für Standardbriefe bis 50 g, B-Post-Midibrief CHF 1.35
 9. [Apple: Enrollment](https://developer.apple.com/programs/enroll/): USD 99 pro Mitgliedsjahr (aus ADR-001, abgerufen am 29.10.2026)
