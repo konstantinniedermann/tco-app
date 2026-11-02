@@ -1,13 +1,20 @@
-import { and, eq, gt, inArray, isNull } from 'drizzle-orm';
+import { and, eq, gt, inArray, isNotNull, isNull, lt, sql } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { konto, mitglied } from '../db/schema.ts';
 import type { Bremsen } from './bremse.ts';
 import {
 	BRIEF_CODE_GUELTIG_MS,
+	MAIL_CODE_GUELTIG_MS,
+	MAIL_CODE_MAX_FEHLVERSUCHE,
 	erzeugeBriefCode,
+	erzeugeMailCode,
+	gleich,
 	hashBriefCode,
-	normalisiereBriefCode
+	hashMailCode,
+	normalisiereBriefCode,
+	normalisiereMailCode
 } from './codes.ts';
+import { baueCodeMail } from './mail.ts';
 import { beendeAlleSitzungen, beendeSitzung, erstelleSitzung, pruefeSitzung } from './sitzung.ts';
 
 export type Mailer = (n: { an: string; betreff: string; text: string }) => Promise<void>;
@@ -31,12 +38,31 @@ export type LoginDienst = {
 	// RR-04: einziger Moment, in dem der Brief-Code im Klartext existiert.
 	stelleBriefCodeAus(kontoId: number): Promise<{ code: string; gueltigBis: Date }>;
 	loginMitBriefCode(eingabe: unknown, ip: string, alteKennung?: string): Promise<LoginErgebnis>;
+	// SI-04: `annahme` hängt nie vom Konto ab; `arbeit` läuft ohne Warten des Aufrufers und lehnt nie ab.
+	fordereMailCodeAn(
+		email: unknown,
+		ip: string
+	): { annahme: 'ok' | 'zu-viele'; arbeit: Promise<void> };
+	// B-02: liefert nie 'benutzt'.
+	loginMitMailCode(
+		email: unknown,
+		eingabe: unknown,
+		ip: string,
+		alteKennung?: string
+	): Promise<LoginErgebnis>;
 	beendeAlleSitzungen(kontoId: number): Promise<void>;
 	pruefeSitzung(kennung: string): ReturnType<typeof pruefeSitzung>;
 	beendeSitzung(kennung: string): Promise<void>;
 };
 
 const MAX_VERSUCHE_AUSSTELLEN = 3;
+const MAX_ADRESSE = 254;
+
+function normalisiereAdresse(email: unknown): string | null {
+	if (typeof email !== 'string') return null;
+	const adresse = email.trim().toLowerCase();
+	return adresse === '' || adresse.length > MAX_ADRESSE ? null : adresse;
+}
 
 // Postgres-Fehlercode 23505 (unique_violation); Drizzle verpackt den Treiberfehler in `cause`.
 function istEindeutigkeitsfehler(fehler: unknown): boolean {
@@ -132,9 +158,120 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 		return { ergebnis: 'falsch' };
 	}
 
+	const aktivesKonto = (adresse: string) =>
+		and(
+			inArray(
+				konto.mitgliedId,
+				db
+					.select({ id: mitglied.id })
+					.from(mitglied)
+					.where(and(eq(mitglied.status, 'aktiv'), eq(mitglied.email, adresse)))
+			),
+			eq(konto.gesperrt, false)
+		);
+
+	async function versendeMailCode(adresse: string): Promise<void> {
+		try {
+			const [k] = await db.select({ id: konto.id }).from(konto).where(aktivesKonto(adresse));
+			if (!k) return;
+			const code = erzeugeMailCode();
+			await db
+				.update(konto)
+				.set({
+					mailCodeHash: hashMailCode(schluessel, k.id, code),
+					mailCodeAblauf: new Date(jetzt().getTime() + MAIL_CODE_GUELTIG_MS),
+					mailCodeFehlversuche: 0
+				})
+				.where(eq(konto.id, k.id));
+			await abh.mailer({ an: adresse, ...baueCodeMail(code) });
+		} catch {
+			// SI-05: feste Zeile, keine Fehlerdetails (können Adresse oder Zugangsdaten enthalten).
+			console.error('Code-Mail nicht versandt');
+		}
+	}
+
+	function fordereMailCodeAn(email: unknown, ip: string) {
+		if (!bremsen.anfragenProIp.erlaubt(ip)) {
+			return { annahme: 'zu-viele' as const, arbeit: Promise.resolve() };
+		}
+		bremsen.anfragenProIp.zaehle(ip);
+		const adresse = normalisiereAdresse(email);
+		let arbeit: Promise<void> = Promise.resolve();
+		if (
+			adresse !== null &&
+			bremsen.mailsProAdresseStunde.erlaubt(adresse) &&
+			bremsen.mailsProAdresseTag.erlaubt(adresse)
+		) {
+			bremsen.mailsProAdresseStunde.zaehle(adresse);
+			bremsen.mailsProAdresseTag.zaehle(adresse);
+			arbeit = versendeMailCode(adresse);
+		}
+		return { annahme: 'ok' as const, arbeit };
+	}
+
+	async function loginMitMailCode(
+		email: unknown,
+		eingabe: unknown,
+		ip: string,
+		alteKennung?: string
+	): Promise<LoginErgebnis> {
+		if (!bremsen.mailFehlerProIp.erlaubt(ip)) return { ergebnis: 'zu-viele' };
+		const falsch = (): LoginErgebnis => {
+			bremsen.mailFehlerProIp.zaehle(ip);
+			return { ergebnis: 'falsch' };
+		};
+		const adresse = normalisiereAdresse(email);
+		const code = typeof eingabe === 'string' ? normalisiereMailCode(eingabe) : null;
+		if (adresse === null || code === null) return falsch();
+		const t = jetzt();
+		const [k] = await db
+			.select({ id: konto.id, hash: konto.mailCodeHash })
+			.from(konto)
+			.where(
+				and(
+					aktivesKonto(adresse),
+					isNotNull(konto.mailCodeHash),
+					gt(konto.mailCodeAblauf, t),
+					lt(konto.mailCodeFehlversuche, MAIL_CODE_MAX_FEHLVERSUCHE)
+				)
+			);
+		if (!k?.hash) return falsch();
+		const hash = hashMailCode(schluessel, k.id, code);
+		if (!gleich(hash, k.hash)) {
+			await db
+				.update(konto)
+				.set({ mailCodeFehlversuche: sql`${konto.mailCodeFehlversuche} + 1` })
+				.where(and(eq(konto.id, k.id), eq(konto.mailCodeHash, k.hash)));
+			return falsch();
+		}
+		// Bedingtes UPDATE: der Code wird atomar nur einmal verbraucht.
+		const [eingeloest] = await db
+			.update(konto)
+			.set({
+				mailCodeHash: null,
+				mailCodeAblauf: null,
+				mailCodeFehlversuche: 0,
+				briefCodeBenutztAm: sql`COALESCE(${konto.briefCodeBenutztAm}, ${t})`
+			})
+			.where(
+				and(
+					eq(konto.id, k.id),
+					eq(konto.mailCodeHash, hash),
+					lt(konto.mailCodeFehlversuche, MAIL_CODE_MAX_FEHLVERSUCHE),
+					gt(konto.mailCodeAblauf, t)
+				)
+			)
+			.returning({ id: konto.id });
+		if (!eingeloest) return falsch();
+		const kennung = await erstelleSitzung(db, eingeloest.id, t, alteKennung);
+		return { ergebnis: 'ok', kennung };
+	}
+
 	return {
 		stelleBriefCodeAus,
 		loginMitBriefCode,
+		fordereMailCodeAn,
+		loginMitMailCode,
 		beendeAlleSitzungen: (kontoId) => beendeAlleSitzungen(db, kontoId),
 		pruefeSitzung: (kennung) => pruefeSitzung(db, kennung, jetzt()),
 		beendeSitzung: (kennung) => beendeSitzung(db, kennung)
