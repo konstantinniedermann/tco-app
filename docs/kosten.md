@@ -35,6 +35,12 @@ eine Verkürzung ist für 2027 angekündigt (B·6). Ob das zu den Löschfristen 
 [Datenschutzkonzept](datenschutz.md#löschen) passt, ist offen (Eintrag in den
 [Beobachtungen](beobachtungen.md)). Scaleway stellt keine Schweizer MwSt in Rechnung (V).
 
+**Künftig eventuell wenige Franken pro Jahr:** GitHub und der E-Mail-Versand kosten heute
+nichts, weil sie Gratiskontingente nutzen. Das Kontingent an Actions-Minuten teilt MyTCO mit
+anderen privaten Repos des Projektleiters ([Actions-Minuten](ci-cd-und-release.md#actions-minuten)).
+Bei Scaleway fallen ohne Gratiskontingent bei 300 Mitgliedern ca. CHF 2.50 pro Jahr an (S).
+Reicht ein Kontingent nicht mehr, entstehen Kosten von wenigen Franken pro Jahr (S).
+
 Annahme K-11: MyTCO verschickt seine E-Mails über Scaleway, nicht über ein Postfach von
 @tcolten.ch. ADR-003 gibt dem Postfach Vorrang, wenn K-11 es erlaubt; dessen Kosten stehen
 unter [Nur falls](#nur-falls). Damit stiege die Obergrenze auf ca. CHF 250 pro Jahr.
