@@ -9,9 +9,9 @@
 	/* Annahme K-13.2: Farbkonzept Variante C (eigenes Grün + Sandplatz-Rot) als Abgrenzung von tcolten.ch */
 	--farbe-marke: #0f6b4f;
 	--farbe-marke-dunkel: #0b5640;
+	--farbe-marke-zart: #e3efdc;
 	/* Annahme K-13: Lindgrün von tcolten.ch, Freigabe des Vereins steht aus */
 	--farbe-marke-hell: #cde3b9;
-	--farbe-marke-zart: #e3efdc;
 	/* Annahme K-13.2: Sandplatz-Rot nur für die Haupttaste */
 	--farbe-aktion: #a84f1f;
 	--farbe-aktion-dunkel: #8c4018;
@@ -52,6 +52,7 @@
 	--rand-dick: 2px;
 	--fokus-breite: 3px;
 	--fokus-abstand: 2px;
+	--rand-akzent: 4px;
 	--schatten-karte: 0 1px 3px rgb(0 0 0 / 0.13);
 	--breite-inhalt: 40rem;
 }

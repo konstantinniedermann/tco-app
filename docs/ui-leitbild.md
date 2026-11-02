@@ -93,10 +93,11 @@ Die px-Angaben gelten bei Standardeinstellung. **MyTCO folgt der Schriftgrösse,
 Mitglied an seinem Gerät eingestellt hat:**
 
 - Alle Grössen und Abstände sind in `rem`, nie in `px` (UI-02). `html` setzt keine
-  Schriftgrösse; die Grundgrösse sitzt auf `body`.
+  Schriftgrösse in px; die Grundgrösse sitzt auf `body`.
 - Android (Chrome ab Version 146): `<meta name="text-scale" content="scale">` in `src/app.html`.
-- iPhone (Safari): `html { font: -apple-system-body; }` in `basis.css` übernimmt die
-  Dynamic-Type-Grösse.
+- iPhone und iPad (Safari): `html { font: -apple-system-body; }` in `basis.css` übernimmt die
+  Dynamic-Type-Grösse (Standard 17 px statt 16 px, Grundschrift also gut 19 px). Die Regel
+  greift nur auf iOS (`-webkit-touch-callout`); Safari am Mac setzte sonst 13 px.
 - PC: Zoom und Schriftgrösse des Browsers wirken über `rem`.
 
 ## Abstände und Formen
@@ -116,10 +117,12 @@ Mitglied an seinem Gerät eingestellt hat:**
 | `--rand-dick` | `2px` | Rand von Feldern und Nebentasten |
 | `--fokus-breite` | `3px` | Fokusrahmen |
 | `--fokus-abstand` | `2px` | Abstand des Fokusrahmens |
+| `--rand-akzent` | `4px` | Akzentbalken: aktiver Reiter, Rand von hervorgehobener Kachel und Hinweis |
 | `--schatten-karte` | `0 1px 3px rgb(0 0 0 / 0.13)` | Karten, Tabellen |
 | `--breite-inhalt` | `40rem` | maximale Breite des Inhalts |
 
-Ab einer Breite von `60em` gilt das PC-Layout. Massgebend ist die Breite des App-Rahmens
+Ab einer Breite von `60rem` (960 px bei Standardschrift, also auch Tablets quer) gilt das
+PC-Layout. Massgebend ist die Breite des App-Rahmens
 `.app` (Container-Abfrage), nicht die des Fensters; so zeigen auch die Mockups im
 Handy-Rahmen das Handy-Layout. Der Wert steht nur in `basis.css`, weil Abfragen keine Tokens
 erlauben. Weil `.app` ein Container ist, gehen Überlagerungen nur mit `<dialog>`, nicht mit
@@ -157,13 +160,13 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Breite Taste | `.taste-breit` | Zusatz zu einer Taste: volle Breite (Formulare auf dem Handy) |
 
 Teile eines Bausteins heissen `<baustein>-<teil>`, z. B. `.kopf-wappen`, `.feld-hilfe`,
-`.zaehler-balken`, `.zaehler-text`, `.kachel-pfeil`, `.seitenleiste-bereich`. Der aktive Reiter
+`.zaehler-balken`, `.zaehler-voll`, `.zaehler-text`, `.kachel-pfeil`, `.seitenleiste-bereich`. Der aktive Reiter
 und der aktive Eintrag der Seitenleiste tragen `aria-current="page"`, keine eigene Klasse.
 
 ## Layout und Navigation
 
 **Mitglieder-App (Handy zuerst):** Kopfleiste oben, Inhalt in einer Spalte (höchstens
-`--breite-inhalt`), Reiter unten. Ab `60em` Breite wandern die Reiter als Textlinks in die
+`--breite-inhalt`), Reiter unten. Ab `60rem` Breite wandern die Reiter als Textlinks in die
 Kopfleiste.
 
 - **Reiter:** Start · CM · Profil; *Lizenz* kommt mit der Etappe *Lizenzanträge*. Höchstens
@@ -196,7 +199,7 @@ Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter d
 |----|-------|
 | UI-01 | WCAG 2.2 Stufe AA ist die Untergrenze; die E2E-Tests prüfen jeden Bildschirm mit axe auf iPhone, Android und PC. |
 | UI-02 | Schrift folgt der Systemeinstellung des Geräts; Grössen und Abstände nur in `rem`. Bis 200 % Schrift wird nichts abgeschnitten und nichts waagrecht gescrollt, ausser Tabellen der Verwaltung. |
-| UI-03 | Tasten, Felder und Reiter sind mindestens 48 × 48 px gross (`--tippflaeche`). Der Fokus ist immer sichtbar (`--farbe-marke`, `--fokus-breite`). |
+| UI-03 | Tasten, Felder und Reiter sind mindestens 48 × 48 px gross (`--tippflaeche`). Der Fokus ist immer sichtbar (`--farbe-marke`, `--fokus-breite`); auf grünen Flächen (Kopfleiste, Seitenleiste, Reiter am PC) in `--farbe-marke-hell`. |
 | UI-04 | Höchstens eine Haupttaste pro Bildschirm. |
 | UI-05 | Bedeutung nie nur über Farbe: Status als Plakette mit Text, Symbole immer mit Text. |
 | UI-06 | Fehlermeldungen stehen beim Feld, in Worten, mit Lösungsweg. |

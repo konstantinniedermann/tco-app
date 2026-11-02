@@ -4,10 +4,14 @@
  * Neue Bausteine erst ins Leitbild, dann hierher.
  */
 
-/* Grundstil — html setzt keine Schriftgrösse, damit die Systemeinstellung wirkt (UI-02) */
-@supports (font: -apple-system-body) {
+/*
+ * Grundstil — html setzt keine Schriftgrösse, damit die Systemeinstellung wirkt (UI-02).
+ * Einzige Ausnahme iPhone/iPad: -apple-system-body übernimmt die Dynamic-Type-Grösse.
+ * -webkit-touch-callout gibt es nur auf iOS; ohne diese Bedingung griffe die Regel auch in
+ * Safari am Mac und setzte dort 13 statt 16 px.
+ */
+@supports (font: -apple-system-body) and (-webkit-touch-callout: default) {
 	html {
-		/* iPhone: übernimmt die Dynamic-Type-Grösse */
 		font: -apple-system-body;
 	}
 }
@@ -60,8 +64,15 @@ a {
 	outline-offset: var(--fokus-abstand);
 }
 
+/* Auf grünen Flächen wäre ein grüner Rahmen unsichtbar (UI-03) */
+.kopf :focus-visible,
+.seitenleiste :focus-visible {
+	outline-color: var(--farbe-marke-hell);
+}
+
 img {
 	max-width: 100%;
+	height: auto;
 }
 
 /*
@@ -142,7 +153,7 @@ img {
 .reiter a[aria-current='page'] {
 	color: var(--farbe-marke);
 	font-weight: 700;
-	box-shadow: inset 0 var(--fokus-breite) 0 var(--farbe-marke);
+	box-shadow: inset 0 var(--rand-akzent) 0 var(--farbe-marke);
 }
 
 /* Seitenleiste (nur Verwaltung) */
@@ -172,7 +183,7 @@ img {
 
 .seitenleiste a[aria-current='page'] {
 	background: var(--farbe-marke);
-	box-shadow: inset var(--fokus-breite) 0 0 var(--farbe-marke-hell);
+	box-shadow: inset var(--rand-akzent) 0 0 var(--farbe-marke-hell);
 	font-weight: 700;
 }
 
@@ -291,7 +302,7 @@ img {
 }
 
 .kachel.hervor {
-	border-left: var(--abstand-1) solid var(--farbe-aktion);
+	border-left: var(--rand-akzent) solid var(--farbe-aktion);
 }
 
 /* Zähler: Schritte eines Formulars oder ein Kontingent */
@@ -312,7 +323,7 @@ img {
 	background: var(--farbe-linie);
 }
 
-.zaehler-balken span.voll {
+.zaehler-balken .zaehler-voll {
 	background: var(--farbe-marke);
 }
 
@@ -350,7 +361,7 @@ img {
 /* Hinweis */
 .hinweis {
 	background: var(--farbe-hinweis-flaeche);
-	border-left: var(--abstand-1) solid var(--farbe-hinweis);
+	border-left: var(--rand-akzent) solid var(--farbe-hinweis);
 	border-radius: var(--radius);
 	padding: var(--abstand-3);
 	font-size: var(--groesse-klein);
@@ -415,7 +426,7 @@ img {
 }
 
 /* PC-Layout ab 60em Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
-@container app (min-width: 60em) {
+@container app (min-width: 60rem) {
 	.inhalt {
 		padding: var(--abstand-6);
 	}
@@ -445,7 +456,11 @@ img {
 
 	.reiter a[aria-current='page'] {
 		color: var(--farbe-flaeche);
-		box-shadow: inset 0 calc(-1 * var(--fokus-breite)) 0 var(--farbe-marke-hell);
+		box-shadow: inset 0 calc(-1 * var(--rand-akzent)) 0 var(--farbe-marke-hell);
+	}
+
+	.reiter a:focus-visible {
+		outline-color: var(--farbe-marke-hell);
 	}
 
 	.reiter a .symbol {

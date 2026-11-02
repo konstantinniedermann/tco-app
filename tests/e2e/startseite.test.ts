@@ -53,6 +53,12 @@ test('Schrift folgt der Grundgrösse des Geräts (UI-02)', async ({ page }) => {
 	expect(verhaeltnis).toBeCloseTo(1.125, 2);
 });
 
+test('Grundschrift mindestens 18 px bei Standardeinstellung (UI-02)', async ({ page }) => {
+	await page.goto('/');
+	const groesse = await page.evaluate(() => parseFloat(getComputedStyle(document.body).fontSize));
+	expect(groesse).toBeGreaterThanOrEqual(18);
+});
+
 test('Bei 200 % Schrift kein waagrechtes Scrollen (UI-02)', async ({ page }, info) => {
 	await page.goto('/');
 	await page.evaluate(() => {

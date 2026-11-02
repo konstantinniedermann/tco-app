@@ -13,7 +13,13 @@ describe('pruefeDesignFestwerte', () => {
 		'.a { color: rgba(0,0,0,.1); }',
 		'.a { color: hsl(1 2% 3%); }',
 		'.a { padding: 12px; }',
-		'.a { font-size: 0.5px; }'
+		'.a { font-size: 0.5px; }',
+		'.a { color: white; }',
+		'.a { background: black }',
+		'.a { background: color-mix(in srgb, var(--a), var(--b)); }',
+		'.a { color: light-dark(var(--a), var(--b)); }',
+		'.a { font-size: 12pt; }',
+		'.a { width: 3cm; }'
 	])('meldet Festwert in CSS: %j', (inhalt) => {
 		expect(css(inhalt)).toHaveLength(1);
 	});
@@ -43,6 +49,14 @@ describe('pruefeDesignFestwerte', () => {
 		expect(
 			css(
 				'.a { padding: var(--abstand-2); font-size: 1rem; width: 100%; margin: 0; }\n@media (min-width: 60em) { .a { gap: 1em; } }'
+			)
+		).toEqual([]);
+	});
+
+	it('erlaubt Schlüsselwörter ohne eigene Farbe und Farbwörter in Selektoren', () => {
+		expect(
+			css(
+				'.a { color: currentColor; background: transparent; border-color: inherit; fill: none; }\n.red:not(.white) { color: var(--farbe-text); }'
 			)
 		).toEqual([]);
 	});

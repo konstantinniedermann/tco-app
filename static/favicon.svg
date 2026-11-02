@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 	<!-- Annahme K-13: Wappen aus dem Vereinslogo von tcolten.ch (öffentliche Website), Freigabe des Vereins steht aus. Farben: siehe docs/ui-leitbild.md -->
-	<!-- Hintergrund = Token farbe-marke, Wappen = Token farbe-marke-hell -->
+	<!-- Hintergrund = Token farbe-marke (Annahme K-13.2: Farbkonzept Variante C), Wappen = Token farbe-marke-hell -->
 	<rect width="512" height="512" fill="#0f6b4f"/>
 	<svg x="162" y="102" width="188" height="308" viewBox="11 11 82 134" fill="#cde3b9">
 		<path d="M60.37,57.72l-3.9-9.92a.2.2,0,0,1,.27-.25L59,48.62a.2.2,0,0,0,.28-.27l-5-10.19a.13.13,0,0,1,.17-.17l2.51.93a.21.21,0,0,0,.26-.28l-4-8.14a.12.12,0,0,1,.15-.17c.65.19,1.31.44,2,.69a.21.21,0,0,0,.27-.28l-3.84-7.83a.43.43,0,0,0-.33-.23h0a.43.43,0,0,0-.34.23l-4,7.83a.21.21,0,0,0,.27.28c.68-.25,1.35-.5,2-.69a.13.13,0,0,1,.16.17l-4.11,8.14a.21.21,0,0,0,.27.28L48.3,38a.13.13,0,0,1,.17.17L43.33,48.35a.21.21,0,0,0,.29.27l2.3-1.07a.2.2,0,0,1,.27.25l-4,9.92c-.66,1.49,2.93,0,4.57-.51a19.34,19.34,0,0,0,2.39-.85s0,0,0,0V68.62a0,0,0,0,0,0,0h4.13a0,0,0,0,0,0,0V56.32a0,0,0,0,1,.05,0,17.54,17.54,0,0,0,2.48.92C57.52,57.67,61,59.21,60.37,57.72Z"/>
