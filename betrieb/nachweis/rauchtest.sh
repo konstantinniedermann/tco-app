@@ -32,10 +32,15 @@ aufraeumen() {
 trap aufraeumen EXIT
 
 # Erfundene Werte, keine echten Geheimnisse.
-cat >"$temp/geheim.env" <<'EOF'
+schluessel=$(openssl rand -base64 48 | tr -d '\n/+=')
+cat >"$temp/geheim.env" <<EOF
 POSTGRES_PASSWORD=rauchtest-erfunden
 ORIGIN=http://localhost:3000
 MAIL_NUR_AN=
+MYTCO_CODE_SCHLUESSEL=$schluessel
+MYTCO_SMTP_URL=smtp://mail.invalid:25
+MYTCO_MAIL_ABSENDER=MyTCO <mytco@example.org>
+MYTCO_KONTAKT=Sekretariat (erfunden), sekretariat@example.org
 EOF
 
 if {

@@ -14,6 +14,12 @@ services:
       # Hinter Caddy: echte Client-Adresse aus dem letzten X-Forwarded-For-Eintrag.
       ADDRESS_HEADER: X-Forwarded-For
       XFF_DEPTH: '1'
+      # Login mit Einmal-Codes (#29); ohne diese Werte startet die App nicht.
+      MYTCO_CODE_SCHLUESSEL: ${MYTCO_CODE_SCHLUESSEL:?MYTCO_CODE_SCHLUESSEL fehlt}
+      MYTCO_SMTP_URL: ${MYTCO_SMTP_URL:?MYTCO_SMTP_URL fehlt}
+      MYTCO_MAIL_ABSENDER: ${MYTCO_MAIL_ABSENDER:?MYTCO_MAIL_ABSENDER fehlt}
+      MYTCO_KONTAKT: ${MYTCO_KONTAKT:?MYTCO_KONTAKT fehlt}
+      MYTCO_ADRESSE: ${MYTCO_ADRESSE:-}
       # Nur auf Test gesetzt: Mails gehen ausschliesslich an diese Adresse (hängt an K-11).
       MAIL_NUR_AN: ${MAIL_NUR_AN:-}
     networks:

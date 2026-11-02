@@ -391,13 +391,21 @@ einrichten() {
 		echo "MYTCO_HTTP_PORT=127.0.0.1:$HTTP_PORT"
 		echo "MYTCO_HTTPS_PORT=127.0.0.1:$HTTPS_PORT"
 	} >"$BASIS/proxy/proxy.env"
+	login_einstellungen() {
+		echo "MYTCO_CODE_SCHLUESSEL=$(openssl rand -base64 48 | tr -d '\n/+=')"
+		echo "MYTCO_SMTP_URL=smtp://mail.invalid:25"
+		echo "MYTCO_MAIL_ABSENDER=MyTCO <mytco@example.org>"
+		echo "MYTCO_KONTAKT=Sekretariat (erfunden), sekretariat@example.org"
+	}
 	{
 		echo "POSTGRES_PASSWORD=nachweis-erfunden-test"
+		login_einstellungen
 		echo "ORIGIN=https://test.mytco.localhost:$HTTPS_PORT"
 		echo "MAIL_NUR_AN=nachweis@example.org"
 	} >"$BASIS/test/geheim.env"
 	{
 		echo "POSTGRES_PASSWORD=nachweis-erfunden-live"
+		login_einstellungen
 		echo "ORIGIN=https://mytco.localhost:$HTTPS_PORT"
 		echo "MAIL_NUR_AN="
 	} >"$BASIS/live/geheim.env"
@@ -710,6 +718,11 @@ COPY _journal.json /app/drizzle/meta/_journal.json" "$TEMP/0001_nachweis.sql" "$
 	schiebe "mytco-nachweis:d5-$$" d5
 }
 
+# Anzahl der Migrationen im Image ohne D5 (aus dem Journal), damit der Nachweis neue Migrationen übersteht.
+migrationen_basis() {
+	node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1], 'utf-8')).entries.length)" "$BETRIEB/../drizzle/meta/_journal.json"
+}
+
 migrationen_live() {
 	psql_live "select count(*) from drizzle.__drizzle_migrations"
 }
@@ -757,8 +770,8 @@ p5_alt_zurueck() {
 		echo "Lauf vor D5 fehlt"
 		return 1
 	}
-	[ "$(migrationen_live)" = 2 ] || {
-		echo "vor dem Zurückspielen nicht 2 Migrationen: $(migrationen_live)"
+	[ "$(migrationen_live)" = "$(($(migrationen_basis) + 1))" ] || {
+		echo "vor dem Zurückspielen nicht $(($(migrationen_basis) + 1)) Migrationen: $(migrationen_live)"
 		return 1
 	}
 	ausgabe=$(gemeinsam wiederherstellen live "$lauf") || rc=$?
@@ -767,7 +780,7 @@ p5_alt_zurueck() {
 		echo "Tabelle der späteren Migration ist stehen geblieben"
 		return 1
 	}
-	[ "$(migrationen_live)" = 1 ] || {
+	[ "$(migrationen_live)" = "$(migrationen_basis)" ] || {
 		echo "Migrationstabelle nicht auf dem Stand der Sicherung: $(migrationen_live)"
 		return 1
 	}
@@ -785,8 +798,8 @@ p5_live_d5_erneut() {
 		echo "Migration lief nicht erneut"
 		return 1
 	}
-	[ "$(migrationen_live)" = 2 ] || {
-		echo "erwartet 2 Migrationen, gezählt $(migrationen_live)"
+	[ "$(migrationen_live)" = "$(($(migrationen_basis) + 1))" ] || {
+		echo "erwartet $(($(migrationen_basis) + 1)) Migrationen, gezählt $(migrationen_live)"
 		return 1
 	}
 	[ "$(psql_live "select email from nachweis")" = "nachweis@example.org" ] || {
