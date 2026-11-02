@@ -33,7 +33,7 @@ Preise exkl. MwSt, wo nicht anders vermerkt; MwSt 8.1 %; 1 EUR ≈ 0.94 CHF, 1 U
 **E-Mail-Versand:** Ein Postfach von @tcolten.ch bei Metanet (K-11; Business Mail CHF 5.90
 pro Monat, B·10) oder bei Infomaniak (Limit 200–500 Mails pro Tag und Absender, B·11), oder
 ein Versanddienst in der EU wie Scaleway (300 Mails/Monat gratis, danach EUR 0.25 pro
-1000, B·12; Vertrag zur Auftragsbearbeitung V, prüfen in #9). US-Dienste fallen weg; Postmark bewahrt Daten zudem 45 Tage auf (B·13).
+1000, B·12; Vertrag zur Auftragsbearbeitung V, prüfen in #9; *Nachtrag 02.11.2026:* vorhanden, Aufbewahrung der Versandprotokolle offen → [Kosten](../kosten.md)). US-Dienste fallen weg; Postmark bewahrt Daten zudem 45 Tage auf (B·13).
 
 ## Entscheidung
 

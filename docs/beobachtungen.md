@@ -447,3 +447,15 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** Code-Review von #13.
 
 **Einschätzung:** Gering. Mit dem ersten echten Formular (Login, #29) ergänzen, z. B. Fehlermeldung „Code schon benutzt“.
+
+### 2026-11-02 — Scaleway bewahrt Versandprotokolle auf, solange die Domain aktiv ist
+
+**Thema:** Datenschutz, E-Mail-Versand
+
+**Fundort:** `docs/kosten.md` (E-Mail-Versand), `docs/datenschutz.md` (Löschen, DS-06), ADR-003.
+
+**Beobachtung:** Laut der Datenschutzseite von Scaleway Transactional Email (nur Suchauszug) wird der Mail-Inhalt nach dem Versand gelöscht, Metadaten und Versandprotokolle mit Empfängeradresse bleiben aber, solange die Absender-Domain aktiv ist; eine Verkürzung ist für 2027 angekündigt, später einstellbar. Unser Konzept löscht Daten ausgetretener Mitglieder nach 3 Monaten; beim Dienstleister blieben die Adressen länger.
+
+**Ursprung:** Review von #9 (Kostenübersicht).
+
+**Einschätzung:** Mittel. Vor dem Bau des Versands (#29) klären: Bedingungen von Scaleway (Specific Conditions TEM) lesen, ob sich Protokolle löschen lassen, oder das Postfach-Weg nach K-11 vorziehen; Ergebnis ins Datenschutzkonzept.

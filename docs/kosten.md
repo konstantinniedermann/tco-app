@@ -4,7 +4,8 @@
 
 Was MyTCO den Verein kostet, mit der Technik aus [ADR-001](adr/adr-001-web-app-zuerst.md)
 und [ADR-003](adr/adr-003-hosting-infomaniak-vps.md). Den Rahmen gibt N-KOSTEN-01 vor:
-laufend im niedrigen dreistelligen Bereich pro Jahr. Alle Kosten trägt der Verein.
+laufend im niedrigen dreistelligen Bereich pro Jahr. Die Kosten trägt der Verein; einzig
+GitHub läuft auf dem Privatkonto des Projektleiters (siehe unten).
 
 **Legende:** **B·n** = belegt mit Quelle n · **S** = Schätzung · **V** = Vermutung.
 Beträge in CHF inkl. MwSt 8.1 %, wo nicht anders vermerkt; 1 EUR ≈ 0.94 CHF,
@@ -20,17 +21,23 @@ Die Mitgliederzahl ändert diese Kosten kaum, weil Server und Sicherung pauschal
 | Sicherungsablage in der Schweiz: Infomaniak Object Storage, Abrechnung nach Verbrauch | monatlich | unter 1 (CHF 11.21 pro TiB und Monat exkl. MwSt, Preisstand 2021, B·2; Sicherungen unter 1 GB, S) | Schätzung |
 | oder Infomaniak Swiss Backup, 1 TB plus 1 Gerät für Cloud-Sicherung | jährlich | 78 (CHF 4.18 + 1.84 pro Monat exkl. MwSt, B·3) | belegt über Drittquelle |
 | E-Mail-Versand über Scaleway (EU) | nach Verbrauch | unter 5 (300 Mails/Monat gratis, danach EUR 0.25 pro 1000, B·4; Mengen siehe [Szenarien](#szenarien)) | belegt, Menge geschätzt |
+| Datenbank (PostgreSQL) und Test-Umgebung | — | 0 (Container auf demselben VPS, [ADR-002](adr/adr-002-sveltekit-postgresql.md), [CI/CD und Release](ci-cd-und-release.md)) | belegt |
 | Domain: Subdomain `my.tcolten.ch` | — | 0 | Annahme K-10: MyTCO läuft auf einer Subdomain der bestehenden Domain, keine eigene Domain |
 | Push-Benachrichtigungen (Web Push) | — | 0 (Push-Dienste der Browser, ohne Konto, B·5) | belegt |
-| **Total laufend** | | **ca. 95–180** | Schätzung |
+| Code-Ablage und CI: GitHub im Gratisplan | — | 0 auf dem Privatkonto des Projektleiters; reicht das Kontingent an Actions-Minuten nicht, wird das Budget des Kontos erhöht ([CI/CD und Release](ci-cd-und-release.md)) | belegt |
+| **Total laufend** | | **ca. 95–175** | Schätzung |
 
 Die Wahl der Sicherungsablage fällt in #10; bis dahin gilt die Spanne. Scaleway hat einen
 Vertrag zur Auftragsbearbeitung und verarbeitet E-Mails nur in Frankreich (B·6), damit sind
-DS-01 und DS-02 erfüllt. Scaleway stellt keine Schweizer MwSt in Rechnung (V).
+DS-01 und DS-02 erfüllt. Den Inhalt einer Mail löscht Scaleway nach dem Versand, die
+Versandprotokolle mit Empfängeradresse bleiben aber, solange die Absender-Domain aktiv ist;
+eine Verkürzung ist für 2027 angekündigt (B·6). Ob das zu den Löschfristen im
+[Datenschutzkonzept](datenschutz.md#löschen) passt, ist offen (Eintrag in den
+[Beobachtungen](beobachtungen.md)). Scaleway stellt keine Schweizer MwSt in Rechnung (V).
 
 Annahme K-11: MyTCO verschickt seine E-Mails über Scaleway, nicht über ein Postfach von
-@tcolten.ch. Ginge es über ein Business-Mail-Postfach bei Metanet, kämen ca. CHF 71 pro Jahr
-dazu (CHF 5.90/Monat, B·7), ausser das heutige Paket des Vereins enthält es schon (K-09).
+@tcolten.ch. ADR-003 gibt dem Postfach Vorrang, wenn K-11 es erlaubt; dessen Kosten stehen
+unter [Nur falls](#nur-falls). Damit stiege die Obergrenze auf ca. CHF 250 pro Jahr.
 
 ## Einmalige Kosten
 
@@ -47,15 +54,18 @@ pro Standardbrief bis 50 g, gültig ab 01.01.2027 (B·8). Vermutung: Das zusätz
 hebt den gemeinsamen Versand nicht über 50 g. Sonst kostet er als Midibrief mehr
 (B-Post CHF 1.35, B·8).
 
-In den Folgejahren fallen keine Briefkosten an. Wer ausgeloggt ist, erhält einen neuen Code
-per E-Mail (A-LOGIN-10).
+Die Folgejahre sind ohne Briefkosten gerechnet (Vorgabe des Projektleiters). Wer ausgeloggt
+ist, erhält einen neuen Code per E-Mail (A-LOGIN-10). Neumitglieder erhalten ebenfalls einen
+Brief (A-LOGIN-01); geht er nicht mit dem Vereinsversand mit, kostet er einzeln
+CHF 1.10–1.40 Porto plus Druck.
 
 ## Nur falls
 
 | Posten | Falls | CHF | Status |
 |--------|-------|----:|--------|
-| Apple Developer Program | Store-App ([ADR-001](adr/adr-001-web-app-zuerst.md)) | ca. 80 pro Jahr (USD 99, B·9); 0 mit Gebührenerlass für Non-Profits (B·10), ob der TCO berechtigt ist: offen | belegt |
-| Google Play Console | Store-App | ca. 20 einmalig (USD 25, B·11) | belegt |
+| Postfach @tcolten.ch, Business Mail bei Metanet | K-11 erlaubt den Versand darüber, und das heutige Paket enthält es nicht schon (K-09) | ca. 71–77 pro Jahr (CHF 5.90/Monat, ob inkl. MwSt: offen, B·7) | belegt |
+| Apple Developer Program | Store-App ([ADR-001](adr/adr-001-web-app-zuerst.md)) | ca. 80 pro Jahr (USD 99, B·9, ohne MwSt umgerechnet); 0 mit Gebührenerlass für Non-Profits (B·10), ob der TCO berechtigt ist: offen | belegt |
+| Google Play Console | Store-App | ca. 20 einmalig (USD 25, B·11, ohne MwSt umgerechnet) | belegt |
 | SMS | SMS als Kanal (hängt an K-37) | ca. 0.05–0.10 pro Nachricht | Schätzung aus der [Recherche Systemlandschaft](recherche/README.md) |
 
 ## Szenarien
@@ -74,15 +84,15 @@ ca. 3 Mails pro Mitglied und Monat für Mitteilungen, Bestätigungen und Login-C
 | Porto, falls einzeln verschickt (B- bis A-Post) | 110–140 | 220–280 | 330–420 |
 
 Die untere Grenze gilt mit Object Storage, die obere mit Swiss Backup. Monate mit
-Clubmeisterschaft können ein Mehrfaches an Mails bringen. Selbst das Dreifache bleibt unter
-CHF 5 pro Jahr (S).
+Clubmeisterschaft können ein Mehrfaches an Mails bringen. Selbst das Dreifache in diesen
+Monaten bleibt unter CHF 5 pro Jahr (S).
 
 ## Vergleich
 
 Sollte Fairgate den Mitglieder-Teil abdecken, müsste der Verein Intranet und Kurs- und
 Eventmodul Lite dazubuchen: ca. CHF 280–400 pro Jahr, dazu ca. 280–400 einmalig (S, aus der
 [Recherche Systemlandschaft](recherche/README.md), Stand 29.10.2026). MyTCO bleibt mit
-ca. 95–180 pro Jahr darunter, weil die Entwicklung ehrenamtlich ist.
+ca. 95–175 pro Jahr darunter, weil die Entwicklung ehrenamtlich ist.
 
 ## Jährliche Überprüfung
 
@@ -109,7 +119,7 @@ Abgerufen am 02.11.2026, wo nicht anders vermerkt.
 3. [webtesten.ch: Swiss Backup Test](https://webtesten.ch/swiss-backup-test/), geprüft am 19.08.2026: 1 TB für CHF 4.18 pro Monat, Cloud-Sicherung per S3, Swift oder SFTP für CHF 1.84 pro Gerät und Monat, bei Jahresvertrag, exkl. MwSt. Die [Preisseite von Infomaniak](https://www.infomaniak.com/de/swiss-backup/preise) lässt sich nicht automatisch abrufen
 4. [Scaleway: Transactional Email](https://www.scaleway.com/en/transactional-email-tem/): EUR 0.25 pro 1000 Mails, 300 Mails pro Monat gratis, jede Empfängerin und jeder Empfänger zählt einzeln
 5. [WebKit: Web Push for Web Apps on iOS and iPadOS](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/): kein Entwicklerkonto nötig (aus ADR-001, abgerufen am 29.10.2026)
-6. [Scaleway: Transactional Email, Datenschutz](https://www.scaleway.com/en/docs/transactional-email/reference-content/data-privacy/): Verarbeitung nur in Paris, nichts ausserhalb der EU; es gelten der Vertrag zur Auftragsbearbeitung (DPA) und die [Vertragsbedingungen](https://www.scaleway.com/en/contracts/)
+6. [Scaleway: Transactional Email, Datenschutz](https://www.scaleway.com/en/docs/transactional-email/reference-content/data-privacy/) (nur aus Suchauszug, Seite sperrt automatischen Abruf): Verarbeitung nur in Paris, nichts ausserhalb der EU; Mail-Inhalt nach dem Versand gelöscht, Versandprotokolle solange die Domain aktiv ist, Verkürzung 2027 angekündigt; es gelten der Vertrag zur Auftragsbearbeitung (DPA) und die [Vertragsbedingungen](https://www.scaleway.com/en/contracts/)
 7. [Metanet: Business Mail](https://www.metanet.ch/de/e-mail-und-domains/business-mail): CHF 5.90 pro Monat (aus ADR-003, abgerufen am 30.10.2026)
 8. [SRF: Preise für A- und B-Post-Briefe steigen](https://www.srf.ch/news/wirtschaft/post-passt-preise-an-preise-fuer-a-und-b-post-briefe-steigen) und [Post: Briefe Schweiz](https://www.post.ch/de/briefe-versenden/briefe-schweiz): ab 01.01.2027 A-Post CHF 1.40, B-Post CHF 1.10 für Standardbriefe bis 50 g, B-Post-Midibrief CHF 1.35
 9. [Apple: Enrollment](https://developer.apple.com/programs/enroll/): USD 99 pro Mitgliedsjahr (aus ADR-001, abgerufen am 29.10.2026)
