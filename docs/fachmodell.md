@@ -18,7 +18,7 @@ Begriffe stehen im [Glossar](glossar.md), Anforderungs-IDs in den
 ([RR-02](rollen-und-rechte.md#grundsätze)).
 
 **Junioren:** Im MVP behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Junioren,
-Eltern und Konten für Minderjährige kommen mit den Junioren-Funktionen (K-08) — oder früher,
+Eltern und Konten für Minderjährige kommen mit den Junioren-Funktionen (Annahme K-08: ab 2028) — oder früher,
 falls Junioren schon an der Clubmeisterschaft 2027 mitspielen (K-46).
 
 ## Überblick
@@ -54,7 +54,7 @@ classDiagram
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Mitglied** | Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25), Telefon, Geschlecht, Jahrgang (K-40), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum | alle ausser Status |
+| **Mitglied** | Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25), Telefon, Geschlecht, Jahrgang (Annahme K-40), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum | alle ausser Status |
 | **Konto** | Einmal-Code (nur als Hash, mit Ablauf und Zahl der Fehlversuche), Sitzungsversion, Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein | alle |
 | **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](rollen-und-rechte.md) fest | — |
 | **Aenderung** | Eintrag im Änderungsverlauf: Mitglied, von (Konto; leer bei automatischen Änderungen oder wenn das Konto gelöscht ist, dann angezeigt als *MyTCO* bzw. Name), Feld oder Aktion, Zeitpunkt; ohne alte und neue Werte (FR-26) | Mitglied, von |
@@ -64,7 +64,7 @@ classDiagram
 | Objekt | Attribute | P |
 |--------|-----------|---|
 | **Turnier** | Jahr, Name, Anmeldeschluss, Status (siehe [Lebenszyklen](#lebenszyklen)) | — |
-| **Turniernummer** | Nummer bei Swiss Tennis, Bezeichnung (z. B. Gruppenphase, Finalwochenende — Annahme K-25) | — |
+| **Turniernummer** | Nummer bei Swiss Tennis, Bezeichnung (z. B. Gruppenphase, Finalwochenende — Annahme K-25.4) | — |
 | **Kategorie** | Name, Geschlecht (Herren / Damen / Mixed / offen), Jahrgang von–bis (Alterskategorie, optional), Klassierung von–bis (Klassierungsbereich), Einzel oder Doppel | — |
 | **Anmeldung** | Kategorie, 1 Spieler (Einzel) oder 2 (Doppel), Wildcard-Antrag ja/nein, Kommentar, Status, angemeldet am, Gruppe (nach Auslosung), Rang-Korrektur (optional) | Spieler, Kommentar |
 | **Gruppe** | Kategorie, Name, Turniernummer. Die Rangliste wird aus den Resultaten berechnet, nicht gespeichert | — |

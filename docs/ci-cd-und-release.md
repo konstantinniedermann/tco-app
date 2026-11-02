@@ -22,13 +22,13 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 | E-Mail | nur an die Adresse des Projektleiters, alle anderen werden verworfen | an die Mitglieder |
 | Push, Schlüssel | eigene | eigene |
 
-Beide Adressen richtet der Website-Betreuer ein (K-10). Auf der Test-Umgebung läuft die
+Beide Adressen richtet der Website-Betreuer ein (Annahme K-10). Auf der Test-Umgebung läuft die
 [Checkliste vor dem Release](testkonzept.md#checkliste-vor-dem-release). Echte Daten kommen
 dort nie hin (DS-08).
 
 **Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut. Server,
 Umgebungen und Auslieferung baut [#32](https://github.com/konstantinniedermann/tco-app/issues/32),
-sobald Konten und Adresse geklärt sind (K-04, K-10), spätestens vor dem Release
+sobald Konten und Adresse geklärt sind (hängt an K-04 und K-10), spätestens vor dem Release
 *Mitglieder-Login*.
 
 ## Ablauf

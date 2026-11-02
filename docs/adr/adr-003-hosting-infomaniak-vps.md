@@ -41,7 +41,7 @@ ein Versanddienst in der EU wie Scaleway (300 Mails/Monat gratis, danach EUR 0.2
 Webserver mit automatischem HTTPS als Docker-Container; die Datenbank wird jede Nacht auf
 einen Speicher ausserhalb des Servers in der Schweiz gesichert. E-Mails verschickt MyTCO über
 ein Postfach von @tcolten.ch, wenn K-11 das mit ausreichendem Limit erlaubt — sonst über
-Scaleway (EU).**
+Scaleway (EU).** (hängt an K-11)
 
 Begründung:
 

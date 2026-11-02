@@ -54,7 +54,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Begegnung | Advantage-Wort für ein einzelnes Match | Spiel | ADV 10, 32, 41; PDF 5d |
 | Anmeldung | Teilnahme eines Spielers (Einzel) oder eines Doppelteams an einer Kategorie. In Advantage meldet man sich online über myTennis an und landet in der Anmeldeliste; ins Tableau kommt man erst, wenn die Anmeldung *bestätigt* ist. In MyTCO höchstens 3 gleichzeitig | Anmeldung | PDF 5b; ADV 18, 20–23, 28–29 |
 | Anmeldeschluss | Datum, nach dem keine Anmeldungen mehr möglich sind; in Advantage je Turnier oder Konkurrenz. Beim TCO Anfang Juni | Anmeldeschluss | ADV 7, 10, 13, 28; Recherche |
-| Nenngeld | Startgebühr in Advantage, je Spieler mit Vermerk „bezahlt“. Die CM hat kein Nenngeld (K-25) | Nenngeld | ADV 7, 28 |
+| Nenngeld | Startgebühr in Advantage, je Spieler mit Vermerk „bezahlt“. Die CM hat kein Nenngeld (K-25.2) | Nenngeld | ADV 7, 28 |
 | Wildcard-Antrag | Anmeldung für eine Kategorie ausserhalb des eigenen Klassierungsbereichs, mit Kommentar; der CM-Verantwortliche entscheidet | Wildcard-Antrag | [A-ANMELDUNG-10](anforderungen/anforderungen.md#anmeldung--anmeldung-zur-clubmeisterschaft) |
 | Folgespiel | Spiel der nächsten KO-Runde, in das der Sieger eines Spiels nachrückt | Folgespiel | [Fachmodell](fachmodell.md) |
 | Resultat | Ergebnis eines Spiels. In MyTCO melden die Spieler es selbst. In Advantage erfasst nur der Organisator, von Hand pro Runde oder Spiel; einen Import gibt es nicht | Resultat; der Vorgang heisst *Resultat melden* | PDF 5d; ADV 37, 41, 43 |
@@ -73,7 +73,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Lizenz | Spielberechtigung von Swiss Tennis, Pflicht für offizielle Turniere. Beim TCO macht der Club das Inkasso, die Lizenz verlängert sich automatisch | Lizenz | ADV 15, 20, 22, 25; Recherche |
 | Lizenznummer | Nummer, unter der Swiss Tennis einen lizenzierten Spieler führt. Advantage nimmt eine ganze Spalte Lizenznummern per Copy-Paste an. Das Mitglied ergänzt sie beim ersten Login | Lizenznummer | ADV 17–18; PDF 3b-i |
 | Lizenzantrag | Antrag eines Mitglieds in MyTCO, eine Lizenz zu bestellen bzw. zu aktualisieren oder zu stornieren | Lizenzantrag | Ziel; PDF 3e |
-| Storno | Antrag, die Lizenz abzubestellen. *Vermutung:* entspricht der Sistierung bei Swiss Tennis (siehe [K-34](abklaerungen.md#vor-lizenzanträgen-01102027)) | Storno | Ziel; PDF 3e |
+| Storno | Antrag, die Lizenz abzubestellen. *Annahme K-34:* entspricht der Sistierung bei Swiss Tennis (siehe [Abklärungen](abklaerungen.md#vor-lizenzanträgen-01102027)) | Storno | Ziel; PDF 3e |
 | Sistierung | Beim TCO bis Ende Februar möglich. *Vermutung:* die Lizenz ruht für die folgende Saison. Im Advantage-Handbuch nicht erwähnt | Sistierung | Recherche |
 | Stichtag | Datum, zu dem der Lizenzverantwortliche die Liste der Lizenzanträge sieht und exportiert. *Vermutung:* liegt vor der Sistierungsfrist Ende Februar | Stichtag | Ziel |
 | Lizenzrunde | Alle Lizenzanträge eines Jahres bis zu einem Stichtag; der Lizenzverantwortliche exportiert sie gesammelt | Lizenzrunde | [Fachmodell](fachmodell.md) |

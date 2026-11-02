@@ -83,6 +83,6 @@ Neue Rollen und Rechte kommen erst in diese Matrix und, wo sie Personendaten zei
 
 ## Offene Fragen an den Verein
 
-K-08 (Junioren), K-16 (Briefversand, neuer Code), K-18 (wer übernimmt welche Rolle) — alle in den
-[Abklärungen](abklaerungen.md). K-42 (Kontaktdaten für die Verantwortlichen) ist entschieden, siehe
+K-08 (Junioren), K-16.1 und K-16.3 (Briefversand, neuer Code), K-18 (wer übernimmt welche Rolle) —
+alle in den [Abklärungen](abklaerungen.md). Was schon entschieden ist, steht unter
 [Beantwortet](abklaerungen.md#beantwortet).
