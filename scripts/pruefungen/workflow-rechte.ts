@@ -12,6 +12,8 @@ const JOB_RECHTE: Record<string, string[]> = {
 };
 const STANDARD_RECHTE = ['contents: read'];
 const AUSLIEFERN = 'ausliefern';
+// Nur diese Datei darf die Sonderjobs (JOB_RECHTE, ausliefern) enthalten; sonst gilt überall der Standard.
+const CI_DATEI = '.github/workflows/check.yml';
 const VERBOTENE_WOERTER = ['npm', 'npx', 'node', 'cache', 'artifact'];
 
 type Zeile = { einzug: number; text: string };
@@ -56,15 +58,15 @@ function secretNamen(text: string): (string | null)[] {
 	const namen: (string | null)[] = [];
 	for (const ausdruck of text.match(/\$\{\{[\s\S]*?\}\}/g) ?? []) {
 		const rest = ausdruck.replace(
-			/\bsecrets(?:\.([A-Za-z_][\w-]*)|\[\s*['"]([^'"]+)['"]\s*\])/g,
+			/\bsecrets(?:\.([A-Za-z_][\w-]*)|\[\s*['"]([^'"]+)['"]\s*\])/gi,
 			(_, punkt, klammer) => {
-				namen.push(punkt ?? klammer);
+				namen.push((punkt ?? klammer).toUpperCase());
 				return '';
 			}
 		);
-		if (/\bsecrets\b/.test(rest)) namen.push(null);
+		if (/\bsecrets\b/i.test(rest)) namen.push(null);
 	}
-	if (/^\s*secrets:\s*inherit\b/m.test(text)) namen.push(null);
+	if (/^\s*secrets:\s*inherit\b/im.test(text)) namen.push(null);
 	return namen;
 }
 
@@ -144,13 +146,14 @@ export function pruefeWorkflow(pfad: string, yaml: string): string[] {
 				job(name, '`permissions:` nicht lesbar');
 			} else wirksam = gelesen;
 		}
-		const soll = JOB_RECHTE[name] ?? STANDARD_RECHTE;
+		const sonderjobs = pfad === CI_DATEI;
+		const soll = (sonderjobs && JOB_RECHTE[name]) || STANDARD_RECHTE;
 		if (lesbar && !gleich(wirksam, soll)) {
 			job(name, `Rechte [${wirksam.join(', ')}] statt [${soll.join(', ')}]`);
 		}
 
 		const text = [z.text, ...koerper.map((k) => k.text)].join('\n');
-		if (name !== AUSLIEFERN) {
+		if (!(sonderjobs && name === AUSLIEFERN)) {
 			for (const secret of secretNamen(text)) {
 				if (secret !== 'GITHUB_TOKEN') {
 					job(
@@ -160,7 +163,7 @@ export function pruefeWorkflow(pfad: string, yaml: string): string[] {
 				}
 			}
 		} else {
-			if (/\buses\s*:/.test(text)) job(name, 'darf kein `uses:` enthalten');
+			if (/\buses["']?\s*:/.test(text)) job(name, 'darf kein `uses:` enthalten');
 			for (const wort of VERBOTENE_WOERTER) {
 				if (new RegExp(`\\b${wort}\\b`).test(text)) job(name, `enthält verbotenes Wort «${wort}»`);
 			}
