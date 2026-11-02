@@ -7,4 +7,10 @@
 	reverse_proxy app-test:3000 {
 		import app_ohne_sicherheit
 	}
+	# Antworten von Caddy selbst (401, 502) tragen die CSP-Vorgabe ebenfalls: `?` greift dort nicht.
+	# Die CSP der App bleibt unangetastet; Caddy setzt `frame-ancestors 'none'` nur, wo keine kommt.
+	handle_errors {
+		header Content-Security-Policy "frame-ancestors 'none'"
+		respond "{err.status_code} {err.status_text}"
+	}
 }

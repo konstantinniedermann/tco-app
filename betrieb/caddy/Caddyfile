@@ -1,13 +1,14 @@
 # Gemeinsame Sicherheits-Kopfzeilen für alle Adressen. Sie gelten auch für Antworten, die Caddy
 # selbst gibt (401 der Test-Anmeldung). Die App setzt einige dieselben Köpfe: reverse_proxy
 # hängt Upstream-Köpfe an, statt zu ersetzen. Darum entfernt `app_ohne_sicherheit` sie aus der
-# Upstream-Antwort, und nur Caddys Werte bleiben (je Kopf genau einmal).
+# Upstream-Antwort, und nur Caddys Werte bleiben (je Kopf genau einmal). Die CSP der App (strenger,
+# mit Nonce) bleibt dagegen unangetastet: Caddy setzt `frame-ancestors 'none'` nur, wenn keine kommt (`?`).
 (sicherheit) {
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options nosniff
 		Referrer-Policy same-origin
-		Content-Security-Policy "frame-ancestors 'none'"
+		?Content-Security-Policy "frame-ancestors 'none'"
 	}
 }
 
@@ -15,7 +16,6 @@
 	header_down -Strict-Transport-Security
 	header_down -X-Content-Type-Options
 	header_down -Referrer-Policy
-	header_down -Content-Security-Policy
 }
 
 # TLS-Wahl über MYTCO_TLS (Caddy kennt keine Bedingungen, daher Snippets nach Name):
