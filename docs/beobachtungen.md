@@ -398,3 +398,52 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** Abgleich des Anforderungsdokuments v1.2 mit dem Doku-Stand, Session vom 01.11.2026.
 
 **Einschätzung:** Gering, solange A-LIZENZ-05 *später* ist. Spätestens beim Fachmodell-Feinschliff vor *Lizenzanträge* entscheiden, z. B. mit einem Lizenzstatus beim Mitglied, den die exportierten Anträge nachführen. Hängt mit K-34 (Storno = Sistierung?) zusammen.
+
+
+### 2026-11-02 — Prüfung `design-festwerte` meldet Fehlalarme bei Kommentaren und ID-Selektoren
+
+**Thema:** Prüfskripte, UI-Leitbild
+
+**Fundort:** `scripts/pruefungen/design-festwerte.ts`, Funktionen `markup()` und `REGELN`.
+
+**Beobachtung:** HTML-Kommentare im Markup werden nicht entfernt (`<!-- <div style="x"> -->` wird gemeldet), Fliesstext wie „style: modern“ gilt als style-Attribut, und ID-Selektoren oder Verweise aus Hex-Buchstaben (`#add`, `url(#cafe)`) gelten als Farbwert.
+
+**Ursprung:** Code-Review von #13.
+
+**Einschätzung:** Gering; Fehlalarme sind lästig, aber sicher. Beheben, sobald einer auftritt: Kommentare vor der Suche entfernen, Attribut nur innerhalb eines Tags suchen.
+
+### 2026-11-02 — Abgleich Leitbild ↔ Tokens: doppelte Zeilen und Werte mit Zusatz unklar gemeldet
+
+**Thema:** Prüfskripte, UI-Leitbild
+
+**Fundort:** `scripts/pruefungen/design-tokens.ts`, `leseLeitbildTokens()`.
+
+**Beobachtung:** Steht ein Token zweimal im Leitbild, gewinnt still die letzte Zeile. Eine Wertzelle mit Zusatz („`10px` (Karten)“) wird übergangen; die Meldung lautet dann irreführend „fehlt im Leitbild“.
+
+**Ursprung:** Code-Review von #13.
+
+**Einschätzung:** Gering. Doppelte Tokens und Token-Zeilen ohne erkennbaren Wert als eigenen Befund melden.
+
+### 2026-11-02 — Kein Check, ob `var(--…)` auf ein existierendes Token zeigt
+
+**Thema:** Prüfskripte, UI-Leitbild
+
+**Fundort:** `src/lib/design/basis.css`, `docs/ui-mockups/`, künftige Svelte-Dateien.
+
+**Beobachtung:** Wird ein Token im Leitbild und in `tokens.css` gleich umbenannt, aber nicht dort, wo es benutzt wird, bleiben beide Prüfungen grün; `var(--alt)` greift still nicht mehr (z. B. Tasten ohne Farbe).
+
+**Ursprung:** Code-Review von #13.
+
+**Einschätzung:** Mittel, sobald es mehr Bildschirme gibt. Billige Ergänzung: jedes `var(--x)` in `src/**` und `docs/ui-mockups/` muss in `tokens.css` stehen.
+
+### 2026-11-02 — Mockups zeigen Hinweis und Fehlermeldung noch nicht
+
+**Thema:** UI-Leitbild
+
+**Fundort:** `docs/ui-mockups/index.html`; Bausteine `.hinweis`, `.fehler`.
+
+**Beobachtung:** Beide Bausteine sind im Leitbild beschrieben und in `basis.css` gebaut, kommen aber in keinem Mockup vor; die Referenz für ihr Aussehen fehlt.
+
+**Ursprung:** Code-Review von #13.
+
+**Einschätzung:** Gering. Mit dem ersten echten Formular (Login, #29) ergänzen, z. B. Fehlermeldung „Code schon benutzt“.
