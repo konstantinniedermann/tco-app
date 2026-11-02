@@ -16,7 +16,7 @@ wann ausgeliefert wird, regelt [CI/CD und Release](ci-cd-und-release.md).
 | Fachlogik | Fachregeln `FR-NN` aus dem [Fachmodell](fachmodell.md): Fristen, Grenzen, Zustände, Berechnungen | Vitest | `make check`, CI |
 | Schnittstellen und Rechte | Jede Schnittstelle (`+server.ts`) gegen eine echte PostgreSQL; für jede Rolle, ob sie zugreifen darf ([Rollen und Rechte](rollen-und-rechte.md), `RR-NN`) | Vitest, PostgreSQL im Container | `make check`, CI |
 | Ende-zu-Ende | Wichtige Abläufe durch die Oberfläche, mit Barrierefreiheits-Prüfung (N-BARRIEREFREI-01) | Playwright, axe | `make check`, CI |
-| Echte Geräte | Installation, Push, E-Mail auf echten Handys | von Hand, [Checkliste](#checkliste-vor-dem-release) | vor jedem Release |
+| Echte Geräte | Installation, Push, E-Mail auf echten Handys | von Hand, [Checkliste](#checkliste-vor-dem-release) | vor jedem Release, sobald Test läuft |
 
 **Fachlogik** liegt in Server-Modulen (Bauregel in ADR-002). Vorgabe dieses Konzepts: Die
 Fachregeln selbst greifen nicht auf Datenbank oder Oberfläche zu, sondern erhalten ihre
@@ -96,7 +96,8 @@ blockieren keine gewollte Design-Änderung.
 Auf der [Test-Umgebung](ci-cd-und-release.md#umgebungen) `test.my.tcolten.ch`, mit einem
 iPhone (Safari) und einem Android-Handy (Chrome) und einem erfundenen Testkonto. Es entsteht
 bei jeder Auslieferung neu und nutzt die Adresse des Projektleiters, damit der Code per
-E-Mail ankommt. Jeder Punkt nennt die IDs, die er prüft:
+E-Mail ankommt (gebaut mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39),
+bis dahin gibt es keine Test-Umgebung). Jeder Punkt nennt die IDs, die er prüft:
 
 - [ ] QR-Code aus einem Testbrief öffnet MyTCO; im Brief für Live steht `my.tcolten.ch` (A-LOGIN-01, A-LOGIN-04)
 - [ ] MyTCO lässt sich auf den Startbildschirm legen und startet von dort

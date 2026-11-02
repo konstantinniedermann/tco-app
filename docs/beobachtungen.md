@@ -785,3 +785,75 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #32 Merge mit #29.
 
 **Einschätzung:** Gering bis mittel; Umsetzung in der App beim Bestimmen des Schlüssels.
+
+### 2026-11-02 — Setup-Doku nennt einige Befehle, Hooks und Pfade nicht
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** `README.md` (Hooks), `docs/ci-cd-und-release.md` (Tabelle *Prüfungen in der CI*), `docs/context-scopes.md`, `.claude/skills/tco-branching/SKILL.md` (Schritt 1).
+
+**Beobachtung:** Das README nennt beim Commit nur Secret-Scan und Doku-Check, tatsächlich laufen `make check-schnell` bzw. beim Push `make check`. In der Prüfungstabelle fehlen `skip.ts`, `annahmen.ts` und `pruefe-node.sh`. In den Context-Scopes fehlen `scripts/seed-lokal.ts`, `eslint.config.js`, `.prettierrc` und `tsconfig.json`. `npm run db:generate` für neue Migrationen steht nirgends. Ein neuer Worktree hat keine `.env`, darum brechen `make dev` und `make seed` dort ab; der Skill nennt nur `npm ci`.
+
+**Ursprung:** Doku-Audit vor Release 0.2.0.
+
+**Einschätzung:** Gering, in einem Doku-Durchgang nachführbar.
+
+### 2026-11-02 — A-LOGIN-08 bis -10 stehen auf «geplant», obwohl gebaut und getestet
+
+**Thema:** Fachmodell
+
+**Fundort:** `docs/anforderungen/anforderungen.md` (A-LOGIN-08/09/10), `tests/e2e/login.test.ts`, `docs/testkonzept.md`.
+
+**Beobachtung:** Code und E2E-Tests mit diesen IDs gibt es, FR-24 steht im Fachmodell auf `umgesetzt`. Wann eine Anforderung auf `umgesetzt` wechselt (gebaut, oder erst nach dem Test auf echten Handys aus der DoD von #29), ist nirgends festgelegt.
+
+**Ursprung:** Doku-Audit vor Release 0.2.0.
+
+**Einschätzung:** Mittel. Regel im Testkonzept festlegen, dann den Status nachführen; spätestens beim Abschluss von #29.
+
+### 2026-11-02 — Login: drei kleine Abweichungen vom Sicherheitskonzept
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/login/sitzung.ts`, `src/lib/server/einstellungen.ts`, `src/lib/server/login/mail.ts`; `docs/sicherheitskonzept.md` (SI-06, SI-07), `docs/ci-cd-und-release.md` (Mail nur mit TLS).
+
+**Beobachtung:** (1) SI-07 verlangt, dass Sperre und Austritt die Sitzungsversion erhöhen; der Code prüft stattdessen `gesperrt` und `status` bei jedem Aufruf, nach einem Entsperren wären alte Sitzungen wieder gültig. Eine Sperr-Funktion gibt es noch nicht. (2) Eine `smtp://`-URL ohne TLS wird auch in Produktion nicht abgelehnt, die Vorgabe hängt nur an der Konfiguration. (3) Die Sitzung verlängert sich höchstens einmal pro Tag, das «Jahr ohne Nutzung» kann bis zu einen Tag früher enden; SI-06 sagt das nicht.
+
+**Ursprung:** Doku-Audit vor Release 0.2.0.
+
+**Einschätzung:** Gering. (1) beim Bau der Admin-Seite, (2) Prüfung in `einstellungen.ts` oder Doku klarstellen, (3) Halbsatz in SI-06.
+
+### 2026-11-02 — Sitzung speichert `erstellt_am` ohne Zweck; Datenschutzerklärung siezt
+
+**Thema:** Datenschutz
+
+**Fundort:** `src/lib/server/db/schema.ts` (Tabelle `sitzung`), `docs/fachmodell.md`; `docs/datenschutzerklaerung.md`, `docs/ui-leitbild.md` (Du-Form).
+
+**Beobachtung:** `sitzung.erstellt_am` wird geschrieben, aber nur im Test gelesen; Fachmodell und SI-06 nennen nur *zuletzt genutzt*. Die Datenschutzerklärung ist in der Sie-Form geschrieben, das Leitbild verlangt Du für jede Oberfläche, und die Erklärung soll in der App stehen (DS-09).
+
+**Ursprung:** Doku-Audit vor Release 0.2.0.
+
+**Einschätzung:** Gering. Spalte streichen oder im Fachmodell begründen; Erklärung vor der Freigabe durch den Vorstand auf Du umstellen.
+
+### 2026-11-02 — Testdaten-Regel im Testkonzept passt nicht zur Praxis
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `docs/testkonzept.md` (Testdaten), `tests/hilfen/mitglieder.ts`, `scripts/musterbrief.ts`, `scripts/pruefungen/testdaten.ts`.
+
+**Beobachtung:** Das Testkonzept verlangt wenige feste Personen ohne Generator, auch im Seed. Die Tests erzeugen eindeutige Adressen mit UUID, Seed und Musterbrief nutzen eigene Personen. `scripts/musterbrief.ts` fällt nicht unter die Prüfung auf `@example.org`. Alle Daten sind erfunden.
+
+**Ursprung:** Doku-Audit vor Release 0.2.0.
+
+**Einschätzung:** Gering. Regel an die Praxis anpassen (eindeutige Adressen pro Test sind sinnvoll), Prüfung auf die Musterbrief-Daten ausweiten.
+
+### 2026-11-02 — Caddy schreibt INFO statt nur Fehler und Warnungen; Dependabot schliesst auch Node-Hauptversionen aus
+
+**Thema:** Sicherheit
+
+**Fundort:** `betrieb/caddy/Caddyfile` (`log default` ohne `level`), `.github/dependabot.yml`; `docs/ci-cd-und-release.md` (*Netz und Header*, *Updates*).
+
+**Beobachtung:** Ohne `level` gilt Caddys Standard INFO, die Doku nennt nur Fehler und Warnungen; der IP-Filter wirkt auf alle Einträge. Dependabot schliesst ausser PostgreSQL und Caddy auch Node-Hauptversionen aus, die Doku nennt nur die zwei.
+
+**Ursprung:** Doku-Audit vor Release 0.2.0.
+
+**Einschätzung:** Gering. `level WARN` setzen (zur Doku passend, weniger Log) und einen Halbsatz zu Node ergänzen.
