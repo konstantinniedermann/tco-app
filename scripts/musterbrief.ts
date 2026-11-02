@@ -7,7 +7,9 @@ import { baueBriefHtml } from '../src/lib/server/brief/brief.ts';
 import { STANDARD_ADRESSE } from '../src/lib/server/einstellungen.ts';
 import { BRIEF_CODE_GUELTIG_MS, erzeugeBriefCode } from '../src/lib/server/login/codes.ts';
 
-const ZIEL = 'build/musterbrief.pdf';
+// Eigener Ordner: `build/` leert jeder Build.
+const ORDNER = 'musterbrief';
+const ZIEL = `${ORDNER}/musterbrief.pdf`;
 
 const html = baueBriefHtml(
 	{
@@ -31,7 +33,7 @@ function zaehleSeiten(pdf: Buffer): number {
 	return (pdf.toString('latin1').match(/\/Type\s*\/Page(?!s)/g) ?? []).length;
 }
 
-mkdirSync('build', { recursive: true });
+mkdirSync(ORDNER, { recursive: true });
 rmSync(ZIEL, { force: true });
 const browser = await chromium.launch();
 try {

@@ -63,7 +63,7 @@ e2e: db ## Ende-zu-Ende-Tests (Playwright, freier Port ausser E2E_PORT ist geset
 build: ## Produktions-Build
 	npm run build
 
-musterbrief: voraussetzungen ## Musterbrief als PDF mit erfundenen Daten (build/musterbrief.pdf)
+musterbrief: voraussetzungen ## Musterbrief als PDF mit erfundenen Daten (musterbrief/musterbrief.pdf)
 	node scripts/musterbrief.ts
 
 image: voraussetzungen-docker ## Docker-Image bauen (mytco:lokal)

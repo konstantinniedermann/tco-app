@@ -41,7 +41,7 @@ make check   # alle Prüfungen (braucht Docker)
 ```
 
 Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make musterbrief` erzeugt
-einen Musterbrief als PDF unter `build/musterbrief.pdf`.
+einen Musterbrief als PDF unter `musterbrief/musterbrief.pdf`.
 
 Alle weiteren Befehle: `make help`.
 

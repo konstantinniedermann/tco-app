@@ -283,7 +283,7 @@ nur lokal und mit erfundenen Daten erlaubt.
     Datenschutzerklärung (Art. 19 nDSG).
 - Die Farben und Schriften kommen aus `tokens.css`, wie beim Leitbild.
 - `make musterbrief` erzeugt mit Playwright (`page.setContent`, `page.pdf`) die Datei
-  `build/musterbrief.pdf` (gitignoriert) aus einem erfundenen Mitglied und einem frisch
+  `musterbrief/musterbrief.pdf` (gitignoriert; nicht unter `build/`, das jeder Build leert) aus einem erfundenen Mitglied und einem frisch
   erzeugten, nirgends gespeicherten Code.
 - Später druckt der Admin denselben Brief aus der Verwaltung. Dafür wandert
   `qrcode-generator` zu den `dependencies`. Das gehört nicht zu diesem Issue.
