@@ -180,6 +180,8 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 **Einschätzung:** Unkritisch, solange E2E nur `select 1` ausführt; eigene Datenbank pro Lauf, sobald E2E Daten schreibt ([#29](https://github.com/konstantinniedermann/tco-app/issues/29)).
 
+**Nachtrag (02.11.2026, #29):** Jetzt schreibt E2E: erfundene Konten und die Migrationen des eigenen Branches landen in der gemeinsamen lokalen Datenbank (`tests/e2e/hilfen/umgebung.ts`, `DATENBANK_URL`). Die Vitest-Tests haben schon eine eigene Datenbank pro Lauf (`tests/setup/datenbank-global.ts`); dasselbe für E2E würde es lösen.
+
 ### 2026-11-01 — Start des Images und `node scripts/migrate.ts` ohne Rauchtest in der CI
 
 **Thema:** Code-Gerüst
@@ -447,3 +449,87 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** Code-Review von #13.
 
 **Einschätzung:** Gering. Mit dem ersten echten Formular (Login, #29) ergänzen, z. B. Fehlermeldung „Code schon benutzt“.
+
+### 2026-11-02 — Fehlversuche mit dem Brief-Code zählen erst nach der Datenbankabfrage
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/login/dienst.ts` (Login mit Brief-Code), `src/lib/server/login/bremse.ts` (`briefFehlerProIp`).
+
+**Beobachtung:** Die Grenze von 10 Fehlversuchen pro IP und Stunde wird vor der Abfrage geprüft, der Fehlversuch aber erst danach gezählt. Ein paralleler Schwall von Anfragen einer IP kann die 10 so einmal pro Fenster überschreiten. Beim Mail-Code ist das behoben (Versuch wird vorher gezählt).
+
+**Ursprung:** #29, Review von Task 6.
+
+**Einschätzung:** Bei rund 50 Bit pro Brief-Code unerheblich. Angleichen, falls die Bremse ohnehin umgebaut wird (z. B. in die Datenbank, ADR-004 Trigger 2).
+
+### 2026-11-02 — Bremse vergisst Einträge erst bis zu 24 h 10 min nach dem letzten Ereignis
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/login/bremse.ts` (`erstelleBremsen`, Aufräumen alle 10 Minuten); DS-06 in `docs/datenschutz.md`.
+
+**Beobachtung:** Das Tagesfenster pro Adresse ist 24 h lang, der Zeitgeber räumt alle 10 Minuten auf. Ein Eintrag, der nicht mehr abgefragt wird, liegt so im ungünstigsten Fall rund 24 h 10 min im Arbeitsspeicher. DS-06 sagt «höchstens 24 Stunden». Die IP-Zähler haben nur 1-Stunden-Fenster und sind nicht betroffen.
+
+**Ursprung:** #29, Review.
+
+**Einschätzung:** Gering, nur Arbeitsspeicher und nur die normalisierte Adresse. Wenn es streng gelten soll: Fenster auf 24 h minus Aufräumabstand setzen oder öfter aufräumen.
+
+### 2026-11-02 — E-Mail-Adresse ist eindeutig mit Gross-/Kleinschreibung, der Login sucht ohne
+
+**Thema:** Fachmodell
+
+**Fundort:** `src/lib/server/db/schema.ts` (`mitglied_email_unique`), `src/lib/server/login/dienst.ts` (Suche über `lower(email)`).
+
+**Beobachtung:** Der eindeutige Index auf `mitglied.email` unterscheidet Gross- und Kleinschreibung, die Suche beim Mail-Code vergleicht klein geschrieben. Zwei Mitglieder mit `A@…` und `a@…` wären möglich, der Login fände beide.
+
+**Ursprung:** #29, Review von Task 7.
+
+**Einschätzung:** Heute ohne Folge, Adressen kommen nur aus Seed-Daten. Mit dem Import oder der Verwaltung der Mitglieder einen eindeutigen Index auf `lower(email)` anlegen (FR-25).
+
+### 2026-11-02 — Brief verweist auf eine Datenschutzerklärung, die es in der App noch nicht gibt
+
+**Thema:** Datenschutz
+
+**Fundort:** `src/lib/server/brief/brief.ts` (Verweis auf `<App-Adresse>/datenschutz`), Login-Seite ohne Link «Datenschutz»; DS-09.
+
+**Beobachtung:** Der Musterbrief nennt die Adresse der Datenschutzerklärung, die Seite fehlt aber. Die Login-Seite lässt den Link aus dem Mockup deshalb weg. DS-09 verlangt die Erklärung auch ohne Login erreichbar.
+
+**Ursprung:** #29 (Entscheide des Controllers während der Umsetzung).
+
+**Einschätzung:** Muss vor dem ersten Live-Release gebaut sein, sonst stimmt der Brief nicht (Text ist Entwurf, Freigabe K-06). Dann den Link auf der Login-Seite ergänzen.
+
+### 2026-11-02 — Prüfung `testdaten` hält Zugangsdaten in URLs für E-Mail-Adressen
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `scripts/pruefungen/testdaten.ts` (Muster `MAIL`).
+
+**Beobachtung:** Eine Verbindungs-URL mit Benutzer vor dem `@` (z. B. für SMTP oder die Datenbank) gilt als E-Mail-Adresse mit fremder Domain und wird gemeldet. In #29 wurden die Tests darum umgeschrieben.
+
+**Ursprung:** #29, Review von Task 9.
+
+**Einschätzung:** Gering, Fehlalarm in sicherer Richtung. Beheben, wenn er wieder stört: Treffer direkt nach `://` ausnehmen.
+
+### 2026-11-02 — Abstand vor Nebenaktionen mit `<p><br/>`, das Leitbild hat keinen Baustein
+
+**Thema:** UI-Leitbild
+
+**Fundort:** `src/routes/login/+page.svelte`, `src/routes/login/mail/+page.svelte`; `docs/ui-mockups/index.html`.
+
+**Beobachtung:** Der Abstand vor «Kein Brief zur Hand?» und «Neuen Code schicken» entsteht wie im Mockup mit einem Zeilenumbruch. Einen Baustein oder ein Token für diesen Abstand gibt es im Leitbild nicht.
+
+**Ursprung:** #29, Login-Seite.
+
+**Einschätzung:** Gering. Mit #13 einen Baustein für Nebenaktionen ins Leitbild aufnehmen, dann Mockup und Seiten umstellen.
+
+### 2026-11-02 — Ein-Seiten-Prüfung des Briefs läuft nur in `make musterbrief`
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `scripts/musterbrief.ts` (`zaehleSeiten`).
+
+**Beobachtung:** Dass der Brief auf eine A4-Seite passt, prüft nur das Skript. Die CI erzeugt das PDF nicht, eine Änderung an Text oder Schrift kann den Brief unbemerkt auf zwei Seiten bringen.
+
+**Ursprung:** #29, Task 11.
+
+**Einschätzung:** Gering, solange nur der Musterbrief existiert. Wenn der Admin Briefe aus der Verwaltung druckt, braucht dieser Weg dieselbe Prüfung, am besten als Test.

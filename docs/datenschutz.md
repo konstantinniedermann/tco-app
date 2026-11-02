@@ -66,6 +66,10 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Logs und Backups:** höchstens 30 Tage.
 - **Änderungsverlauf:** 12 Monate; Einträge zu einem Mitglied früher, sobald es den Status *gelöscht* hat (FR-04).
 - **IP-Adressen** (Schutz vor Durchprobieren von Codes, Logs): höchstens 24 Stunden.
+- **Sitzungen:** beim Abmelden, beim Widerruf oder nach einem Jahr ohne Nutzung (dann beim
+  nächsten Login eines Mitglieds).
+- **E-Mail-Adresse im Gerätespeicher** während einer Code-Anfrage: nach dem Login, sonst beim
+  nächsten Start der App, sobald die Anfrage älter als 15 Minuten ist.
 
 ## Junioren
 

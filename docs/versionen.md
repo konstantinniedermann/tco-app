@@ -93,3 +93,11 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   Navigation, Du-Form und Barrierefreiheit `UI-NN`; Prüfungen gegen Abweichung zwischen
   Leitbild und Tokens und gegen Farb- und px-Werte im Code; Kopfleiste mit Wappen und
   App-Symbol (Annahmen K-13, K-13.2); Schrift folgt der Systemeinstellung des Geräts; Mockups.
+- Login per Einmal-Code (#29, lokal, noch nicht ausgeliefert): Brief-Code und Mail-Code,
+  Sitzung ein Jahr gleitend in einer Tabelle, Abmelden und Widerruf, Bremsen gegen
+  Durchprobieren; Code-Mails lokal und in der CI über Mailpit. Begründung in ADR-004;
+  Fachmodell (FR-24 umgesetzt), Sicherheits- und Datenschutzkonzept nachgeführt.
+- Web-App-Manifest, damit MyTCO vom Startbildschirm als eigene App startet (noch ohne
+  Service Worker).
+- Musterbrief mit QR-Code, Brief-Code und Anleitung als PDF aus erfundenen Daten
+  (`make musterbrief`); `make seed` legt erfundene Mitglieder an und gibt einen Brief-Code aus.

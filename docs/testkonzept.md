@@ -113,4 +113,5 @@ Falls der Verein eine Testgruppe stellt (K-20), prüft sie vor dem ersten Releas
 ## Werkzeuge
 
 Vitest (mit Abdeckungsmessung), Playwright und axe für Playwright. Sie werden
-installiert mit dem Code-Gerüst; vorher kommt keine Abhängigkeit ins Repo.
+installiert mit dem Code-Gerüst; vorher kommt keine Abhängigkeit ins Repo. Mails fängt
+Mailpit ab (lokal und in der CI); die Ende-zu-Ende-Tests lesen Codes über seine Schnittstelle.
