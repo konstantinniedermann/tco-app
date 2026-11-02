@@ -11,7 +11,8 @@ Mitgliederverwaltung Fairgate oder die Website tcolten.ch.
 ## Stand
 
 Phase **Fundament**: Architektur und Grundlagen werden dokumentiert; das Code-Gerüst
-(Version 0.1.0) steht, Funktionen folgen mit den Etappen. Termine und Umfang der Etappen → [`docs/roadmap.md`](docs/roadmap.md).
+(Version 0.1.0) steht, Funktionen folgen mit den Etappen. Termine und Umfang der Etappen
+→ [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Einstieg
 

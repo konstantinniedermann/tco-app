@@ -21,6 +21,8 @@ Was nicht belegt ist, steht als *Vermutung* da.
 
 - **Login statt Anmelden:** Einloggen heisst in MyTCO *Login*. *Anmeldung* steht nur für
   die Teilnahme an Clubmeisterschaft oder Anlass. So bleibt „Anmeldung“ eindeutig.
+  Die Regel gilt für App, Brief und Doku. Fragen und Texte an den Verein dürfen beim
+  vertrauten «Anmelden» bleiben.
 - **Kategorie statt Konkurrenz:** Der Verein sagt *Kategorie*, Advantage *Konkurrenz*.
   MyTCO folgt dem Verein; beim Datenaustausch entspricht eine Kategorie einer Konkurrenz.
 - **Klassierung statt Stärkekategorie:** Das PDF sagt *Stärkekategorie*, Swiss Tennis
