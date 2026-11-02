@@ -1,4 +1,4 @@
-# Parallele Sessions hängen Einträge an dieselbe Datei an: beide Seiten behalten.
+# Nur beobachtungen.md: Parallele Sessions hängen dort Einträge an, beide Seiten behalten.
 docs/beobachtungen.md merge=union
 
 *.pdf binary
