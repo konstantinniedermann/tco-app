@@ -1,0 +1,59 @@
+# App und Datenbank einer Umgebung (test, live). Aufruf immer mit
+# `-p mytco-<umgebung>`, `--env-file <umgebung>/geheim.env` und gesetztem
+# MYTCO_UMGEBUNG und MYTCO_IMAGE (der Rauchtest nutzt dieselbe Datei mit Umgebung "rauch").
+services:
+  app:
+    image: ${MYTCO_IMAGE:?MYTCO_IMAGE fehlt}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://mytco:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt}@db:5432/mytco
+      ORIGIN: ${ORIGIN:?ORIGIN fehlt}
+      # Hinter Caddy: echte Client-Adresse aus dem letzten X-Forwarded-For-Eintrag.
+      ADDRESS_HEADER: X-Forwarded-For
+      XFF_DEPTH: '1'
+      # Nur auf Test gesetzt: Mails gehen ausschliesslich an diese Adresse (hängt an K-11).
+      MAIL_NUR_AN: ${MAIL_NUR_AN:-}
+    networks:
+      intern:
+      proxy:
+        aliases:
+          - app-${MYTCO_UMGEBUNG:?MYTCO_UMGEBUNG fehlt}
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '5'
+
+  db:
+    image: postgres:18-alpine@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mytco
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt}
+      POSTGRES_DB: mytco
+    volumes:
+      # Postgres 18: Daten liegen in einem Unterordner von /var/lib/postgresql.
+      - daten:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U mytco -d mytco']
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    networks:
+      - intern
+    logging: *logging
+
+volumes:
+  daten:
+
+networks:
+  # Kein Weg nach aussen: die Datenbank bleibt in diesem Netz.
+  intern:
+    internal: true
+  # Vom Proxy-Stapel angelegt; nur die App hängt daran.
+  proxy:
+    external: true
+    name: mytco-proxy-${MYTCO_UMGEBUNG:?MYTCO_UMGEBUNG fehlt}

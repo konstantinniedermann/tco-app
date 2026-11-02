@@ -50,7 +50,9 @@ updates:
           - 'minor'
           - 'patch'
   - package-ecosystem: 'docker-compose'
-    directory: '/'
+    directories:
+      - '/'
+      - '/betrieb'
     target-branch: 'dev'
     schedule:
       interval: 'weekly'

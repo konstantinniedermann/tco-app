@@ -1,0 +1,8 @@
+{$MYTCO_ADRESSE_TEST} {
+	import tls_{$MYTCO_TLS:automatisch}
+	import sicherheit
+	basic_auth {
+		{$MYTCO_TEST_BENUTZER} {$MYTCO_TEST_PASSWORT_HASH}
+	}
+	reverse_proxy app-test:3000
+}

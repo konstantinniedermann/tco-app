@@ -1,0 +1,25 @@
+# Gemeinsame Sicherheits-Kopfzeilen für alle Adressen.
+(sicherheit) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+		Content-Security-Policy "frame-ancestors 'none'"
+	}
+}
+
+# TLS-Wahl über MYTCO_TLS (Caddy kennt keine Bedingungen, daher Snippets nach Name):
+#   leer/ungesetzt -> öffentliches Zertifikat, keine tls-Zeile (Standard)
+#   internal       -> lokale CA, nur für den lokalen Nachweis
+# Caddy setzt den Vorgabewert nur bei ungesetzter, nicht bei leerer Variable ein;
+# deshalb gibt es das leere Snippet zweimal (tls_ für leer, tls_automatisch für ungesetzt).
+(tls_) {
+}
+(tls_automatisch) {
+}
+(tls_internal) {
+	tls internal
+}
+
+# Kein log-Block: Zugriffsprotokolle werden nicht geschrieben (Datenschutz).
+import umgebungen/*.caddy
