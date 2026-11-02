@@ -57,7 +57,7 @@ if ! pruefe_umgebung "$UMGEBUNG" || ! pruefe_digest "$DIGEST"; then
 	exit 1
 fi
 
-MYTCO_REPO="${MYTCO_REPO:-ghcr.io/konstantinniedermann/tco-app}"
+MYTCO_REPO="${MYTCO_REPO:-$MYTCO_REPO_STANDARD}"
 export MYTCO_BASIS MYTCO_REPO
 REGISTRY="${MYTCO_REPO%%/*}"
 LOG="$MYTCO_BASIS/$UMGEBUNG/protokoll.log"

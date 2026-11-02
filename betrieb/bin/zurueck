@@ -7,7 +7,7 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 UMGEBUNG="${1-}"
-MYTCO_REPO="${MYTCO_REPO:-ghcr.io/konstantinniedermann/tco-app}"
+MYTCO_REPO="${MYTCO_REPO:-$MYTCO_REPO_STANDARD}"
 MYTCO_WARTEZEIT="${MYTCO_WARTEZEIT:-60}"
 
 pruefe_umgebung "$UMGEBUNG" || exit 1

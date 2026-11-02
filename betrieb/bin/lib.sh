@@ -4,6 +4,9 @@
 set -euo pipefail
 
 MYTCO_BASIS="${MYTCO_BASIS:-/opt/mytco}"
+# Repo der Images, wenn MYTCO_REPO nicht gesetzt ist (auf dem Server immer).
+# shellcheck disable=SC2034 # wird von den Skripten genutzt, die lib.sh laden
+MYTCO_REPO_STANDARD="ghcr.io/konstantinniedermann/tco-app"
 
 # Eingabeprüfung: bei Abweichung genau "fehler" auf stdout, Exit 1.
 pruefe_umgebung() {

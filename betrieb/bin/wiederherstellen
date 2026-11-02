@@ -45,7 +45,7 @@ LAUF=$(finde_lauf "$UMGEBUNG" "$LAUF_WUNSCH") || scheitern "kein Snapshot dieser
 # Compose verlangt MYTCO_IMAGE bei jedem Befehl, der den Dienst app betrifft: das laufende Image.
 AKTUELL="$MYTCO_BASIS/$UMGEBUNG/zustand/aktuell"
 [ -s "$AKTUELL" ] || scheitern "keine ausgelieferte Fassung (zustand/aktuell fehlt)"
-MYTCO_IMAGE="${MYTCO_REPO:-ghcr.io/konstantinniedermann/tco-app}@$(head -n 1 "$AKTUELL")"
+MYTCO_IMAGE="${MYTCO_REPO:-$MYTCO_REPO_STANDARD}@$(head -n 1 "$AKTUELL")"
 export MYTCO_IMAGE
 
 # Keine Auslieferung gleichzeitig.
