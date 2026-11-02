@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# probe <umgebung> [lauf]: spielt die Sicherung in eine Wegwerf-Datenbank ein und vergleicht
+# die Zeilenzahlen mit der Zählung des Laufs. Die echte Datenbank bleibt unberührt.
+# Container und Netz (ohne Weg nach aussen) werden bei jedem Ende entfernt.
+set -euo pipefail
+
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+UMGEBUNG="${1-}"
+pruefe_umgebung "$UMGEBUNG" || exit 1
+LAUF_WUNSCH="${2-}"
+
+LOG="$MYTCO_BASIS/$UMGEBUNG/protokoll.log"
+NAME="mytco-probe-$UMGEBUNG-$$"
+GEMELDET=0
+
+ende() {
+	local rc=$?
+	docker rm -f "$NAME" >>"$LOG" 2>&1 || true
+	docker network rm "$NAME" >>"$LOG" 2>&1 || true
+	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then
+		echo fehler
+	fi
+	if [ "$rc" != 0 ]; then exit 1; fi
+	exit 0
+}
+trap ende EXIT
+
+scheitern() {
+	echo "probe: $1" >>"$LOG"
+	GEMELDET=1
+	echo fehler
+	exit 1
+}
+
+mkdir -p "$MYTCO_BASIS/$UMGEBUNG"
+exec 2>>"$LOG"
+[ -f "$MYTCO_BASIS/sicherung.env" ] || scheitern "sicherung.env fehlt"
+
+# Dieselbe Postgres-Fassung wie die Datenbank der Umgebung (steht nur in compose.umgebung.yml).
+PG_IMAGE=$(sed -n 's/^[[:space:]]*image:[[:space:]]*\(postgres:[^[:space:]]*\)[[:space:]]*$/\1/p' \
+	"$MYTCO_BASIS/$UMGEBUNG/betrieb/compose.umgebung.yml" 2>/dev/null | head -n 1 || true)
+[ -n "$PG_IMAGE" ] || scheitern "Postgres-Image nicht in compose.umgebung.yml gefunden"
+
+schritt "snapshot suchen"
+LAUF=$(finde_lauf "$UMGEBUNG" "$LAUF_WUNSCH") || scheitern "kein Snapshot dieser Umgebung gefunden"
+
+schritt "wegwerf-datenbank starten"
+docker network create --internal "$NAME" >>"$LOG" || scheitern "Netz nicht anzulegen"
+docker run -d --name "$NAME" --network "$NAME" \
+	-e POSTGRES_USER=mytco -e POSTGRES_PASSWORD=wegwerf -e POSTGRES_DB=mytco \
+	"$PG_IMAGE" >>"$LOG" || scheitern "Wegwerf-Datenbank startet nicht"
+
+BEREIT=0
+VERSUCHE="${MYTCO_WARTEZEIT:-60}"
+while [ "$VERSUCHE" -gt 0 ]; do
+	if docker exec "$NAME" pg_isready -h 127.0.0.1 -U mytco -d mytco >>"$LOG"; then
+		BEREIT=1
+		break
+	fi
+	VERSUCHE=$((VERSUCHE - 1))
+	sleep 1
+done
+[ "$BEREIT" = 1 ] || scheitern "Wegwerf-Datenbank wird nicht bereit"
+
+schritt "einspielen"
+restic_docker dump --tag "$UMGEBUNG,$LAUF" --path "/mytco-$UMGEBUNG.dump" latest \
+	"/mytco-$UMGEBUNG.dump" </dev/null |
+	docker exec -i "$NAME" pg_restore --clean --if-exists -U mytco -d mytco >>"$LOG" ||
+	scheitern "Einspielen gescheitert"
+
+schritt "vergleichen"
+SOLL=$(restic_docker dump --tag "$UMGEBUNG,$LAUF" --path /zaehlung.txt latest /zaehlung.txt </dev/null) ||
+	scheitern "Zählung des Laufs nicht lesbar"
+IST=$(docker exec "$NAME" psql -U mytco -d mytco -At -c "$ZAEHL_SQL") ||
+	scheitern "Zählung der Wegwerf-Datenbank gescheitert"
+[ -n "$SOLL" ] || scheitern "Zählung des Laufs leer"
+[ "$SOLL" = "$IST" ] || scheitern "Zeilenzahlen weichen ab"
+
+echo "probe: $LAUF stimmt überein" >>"$LOG"
+echo ok

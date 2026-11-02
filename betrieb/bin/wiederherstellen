@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# wiederherstellen <umgebung> [lauf]: spielt eine Sicherung derselben Umgebung ein.
+# Ohne Lauf der neueste. Snapshots anderer Umgebungen werden nie angefasst (DS-08).
+# Die App ist während des Einspielens gestoppt und läuft danach wieder, auch bei Fehlern.
+set -euo pipefail
+
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+UMGEBUNG="${1-}"
+pruefe_umgebung "$UMGEBUNG" || exit 1
+LAUF_WUNSCH="${2-}"
+
+LOG="$MYTCO_BASIS/$UMGEBUNG/protokoll.log"
+GEMELDET=0
+GESPERRT=0
+GESTOPPT=0
+
+ende() {
+	local rc=$?
+	if [ "$GESTOPPT" = 1 ]; then compose "$UMGEBUNG" start app >>"$LOG" 2>&1 || true; fi
+	if [ "$GESPERRT" = 1 ]; then sperre_freigeben "$UMGEBUNG"; fi
+	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then
+		echo fehler
+	fi
+	if [ "$rc" != 0 ]; then exit 1; fi
+	exit 0
+}
+trap ende EXIT
+
+scheitern() {
+	echo "wiederherstellen: $1" >>"$LOG"
+	GEMELDET=1
+	echo fehler
+	exit 1
+}
+
+mkdir -p "$MYTCO_BASIS/$UMGEBUNG"
+exec 2>>"$LOG"
+[ -f "$MYTCO_BASIS/sicherung.env" ] || scheitern "sicherung.env fehlt"
+
+schritt "snapshot suchen"
+LAUF=$(finde_lauf "$UMGEBUNG" "$LAUF_WUNSCH") || scheitern "kein Snapshot dieser Umgebung gefunden"
+
+# Keine Auslieferung gleichzeitig.
+sperre_nehmen "$UMGEBUNG" || scheitern "Umgebung ist gesperrt"
+GESPERRT=1
+
+schritt "app stoppen"
+GESTOPPT=1
+compose "$UMGEBUNG" stop app >>"$LOG" || scheitern "App nicht zu stoppen"
+
+schritt "einspielen"
+restic_docker dump --tag "$UMGEBUNG,$LAUF" --path "/mytco-$UMGEBUNG.dump" latest \
+	"/mytco-$UMGEBUNG.dump" </dev/null |
+	compose "$UMGEBUNG" exec -T db pg_restore --clean --if-exists -U mytco -d mytco >>"$LOG" ||
+	scheitern "Einspielen gescheitert"
+
+schritt "app starten"
+GESTOPPT=0
+compose "$UMGEBUNG" start app >>"$LOG" || scheitern "App startet nicht"
+
+echo "wiederherstellen: $LAUF eingespielt" >>"$LOG"
+echo ok

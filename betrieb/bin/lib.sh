@@ -108,6 +108,47 @@ compose_proxy() {
 		--env-file "$MYTCO_BASIS/proxy/proxy.env" "$@"
 }
 
+# restic-Image, per Digest gepinnt (Index-Digest von restic/restic:0.18.1).
+# shellcheck disable=SC2034 # wird von sichern, wiederherstellen und probe genutzt
+RESTIC_IMAGE="restic/restic:0.18.1@sha256:39d9072fb5651c80d75c7a811612eb60b4c06b32ffe87c2e9f3c7222e1797e76"
+
+# restic im Container. Ein lokales Ziel (RESTIC_REPOSITORY beginnt mit /) wird am selben Pfad
+# eingehängt. Stdin wird durchgereicht (-i); Aufrufer ohne Eingabe leiten </dev/null um.
+restic_docker() {
+	local env_datei="$MYTCO_BASIS/sicherung.env" ziel=""
+	ziel=$(sed -n 's/^RESTIC_REPOSITORY=//p' "$env_datei" | head -n 1)
+	case "$ziel" in
+	/*)
+		docker run --rm -i --env-file "$env_datei" -v "$ziel:$ziel" "$RESTIC_IMAGE" "$@"
+		;;
+	*)
+		docker run --rm -i --env-file "$env_datei" "$RESTIC_IMAGE" "$@"
+		;;
+	esac
+}
+
+# finde_lauf <umgebung> [lauf]: gibt die Lauf-ID aus. Nur Snapshots mit dem Tag der Umgebung
+# zählen (ein Live-Stand darf nie auf Test landen, DS-08). Ohne Lauf der neueste dieser
+# Umgebung; kein Treffer: Exit 1.
+finde_lauf() {
+	local umgebung="$1" lauf="${2-}" json=""
+	if [ -n "$lauf" ]; then
+		case "$lauf" in
+		*$'\n'*) return 1 ;;
+		esac
+		printf '%s\n' "$lauf" | grep -qxE 'lauf-[0-9A-Za-z]+' || return 1
+		json=$(restic_docker snapshots --tag "$umgebung,$lauf" --json </dev/null) || return 1
+		# Gegenprobe: beide Tags müssen im Ergebnis stehen, auch wenn restic mehr lieferte.
+		printf '%s\n' "$json" | grep -q "\"$umgebung\"" || return 1
+		printf '%s\n' "$json" | grep -q "\"$lauf\"" || return 1
+	else
+		json=$(restic_docker snapshots --tag "$umgebung" --json </dev/null) || return 1
+		lauf=$(printf '%s\n' "$json" | grep -o 'lauf-[0-9]\{8\}T[0-9]\{6\}Z' | sort -u | tail -n 1 || true)
+		[ -n "$lauf" ] || return 1
+	fi
+	echo "$lauf"
+}
+
 # Je Tabelle "schema.tabelle|anzahl", sortiert (für den Vorher-Nachher-Vergleich).
 # shellcheck disable=SC2034 # wird von den Skripten genutzt, die lib.sh laden
 ZAEHL_SQL="SELECT table_schema || '.' || table_name || '|' || (xpath('/row/c/text()', query_to_xml(format('SELECT count(*) AS c FROM %I.%I', table_schema, table_name), false, true, '')))[1]::text FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema') ORDER BY table_schema, table_name"
