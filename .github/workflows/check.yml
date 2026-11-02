@@ -376,9 +376,11 @@ jobs:
   freigeben:
     name: Freigeben (Code-Stand-Kennzeichen setzen)
     needs: [bauen, ausliefern]
+    # Ausdrücklich über die Ergebnisse statt des stillen success(): Das prüft die ganze Kette
+    # der Vorgänger, und auf dev ist `finden` (Vorgänger von `ausliefern`) übersprungen.
     if: >-
-      github.event_name == 'push' && github.ref == 'refs/heads/dev'
-      && needs.ausliefern.result == 'success'
+      ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/dev'
+      && needs.bauen.result == 'success' && needs.ausliefern.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -403,7 +405,11 @@ jobs:
   release:
     name: Release (Tag und GitHub-Release)
     needs: ausliefern
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Wie bei `freigeben`: Auf main ist `bauen` übersprungen, das stille success() würde das
+    # Release dauerhaft überspringen.
+    if: >-
+      ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+      && needs.ausliefern.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
