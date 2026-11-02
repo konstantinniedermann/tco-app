@@ -5,6 +5,37 @@
 Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Release:
 [CI/CD und Release](ci-cd-und-release.md#versionen).
 
+## Unveröffentlicht
+
+## 0.2.0 — Login und Auslieferung, nicht ausgeliefert
+
+Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test
+([Versionen](ci-cd-und-release.md#versionen)).
+
+- Login per Einmal-Code (#29, lokal, noch nicht ausgeliefert): Brief-Code und Mail-Code,
+  Sitzung ein Jahr gleitend in einer Tabelle, Abmelden und Widerruf, Bremsen gegen
+  Durchprobieren; Code-Mails lokal und in der CI über Mailpit. Begründung in ADR-004;
+  Fachmodell (FR-24 umgesetzt), Sicherheits- und Datenschutzkonzept nachgeführt.
+- Web-App-Manifest, damit MyTCO vom Startbildschirm als eigene App startet (noch ohne
+  Service Worker).
+- Musterbrief mit QR-Code, Brief-Code und Anleitung als PDF aus erfundenen Daten
+  (`make musterbrief`); `make seed` legt erfundene Mitglieder an und gibt einen Brief-Code aus.
+- Umgebungen, Auslieferung und Sicherung (#32, lokal nachgewiesen mit `make betrieb-nachweis`):
+  Test und Live als getrennte Stapel hinter einem Caddy-Proxy, Auslieferung per SSH über einen
+  Türsteher mit Rückfall und Vorab-Sicherung bei Live, Live nur mit dem Image, das auf Test lief,
+  verschlüsselte Sicherung mit Wiederherstellung und Probe. CI-Jobs dafür hinter zwei Schaltern
+  (ausgeschaltet), Rauchtest des Images und Rechteprüfung der Workflows aktiv. Server und
+  Inbetriebnahme: #39.
+- UI-Leitbild (`docs/ui-leitbild.md`, #13): Corporate Design mit Design-Tokens, Bausteinen,
+  Navigation, Du-Form und Barrierefreiheit `UI-NN`; Prüfungen gegen Abweichung zwischen
+  Leitbild und Tokens und gegen Farb- und px-Werte im Code; Kopfleiste mit Wappen und
+  App-Symbol (Annahmen K-13, K-13.2); Schrift folgt der Systemeinstellung des Geräts; Mockups.
+- Kosten (`docs/kosten.md`, #9): laufend ca. CHF 95–175 pro Jahr (VPS, Sicherungsablage,
+  E-Mail über Scaleway), einmalig nur der Druck des Login-Briefs (Porto entfällt, der Brief
+  geht mit dem Versand der Vereinsdokumente mit); Szenarien für 100, 200 und 300 Mitglieder,
+  Store-App und SMS nur als «falls»; jährliche Überprüfung vor dem Vereinsbudget;
+  Freigabe offen (K-03).
+
 ## 0.1.0 — Code-Gerüst, nicht ausgeliefert
 
 - SvelteKit 3 mit TypeScript 6, Runes und PostgreSQL (Drizzle, leere Start-Migration);
@@ -17,14 +48,10 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 - Dockerfile und `docker-compose.yml` für die lokale Datenbank; Svelte-MCP-Server in `.mcp.json`.
 - CSP nur mit `'self'` (eine Ausnahme für den Screenreader-Hinweis von SvelteKit).
 
-## Unveröffentlicht
+## Doku-Stände vor 0.1.0
 
-- Umgebungen, Auslieferung und Sicherung (#32, lokal nachgewiesen mit `make betrieb-nachweis`):
-  Test und Live als getrennte Stapel hinter einem Caddy-Proxy, Auslieferung per SSH über einen
-  Türsteher mit Rückfall und Vorab-Sicherung bei Live, Live nur mit dem Image, das auf Test lief,
-  verschlüsselte Sicherung mit Wiederherstellung und Probe. CI-Jobs dafür hinter zwei Schaltern
-  (ausgeschaltet), Rauchtest des Images und Rechteprüfung der Workflows aktiv. Server und
-  Inbetriebnahme: #39.
+Ohne Versionsnummer.
+
 - Repo aufgesetzt: Arbeitsweise, Issue-Konventionen, Roadmap, Doku-Check und Secret-Scan
   in der CI, Anforderungsdokument v1.2 und Recherche zur Systemlandschaft abgelegt.
 - Anforderungen mit IDs erfasst (`docs/anforderungen/anforderungen.md`), funktional und
@@ -95,20 +122,3 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   alte nicht erreichbar, ändert der Admin nach Rückfrage (SI-09, FR-25). Kein SMS-Code.
 - Abgleich mit dem Anforderungsdokument v1.2: neue Fragen an den Verein zu Junioren an der
   Clubmeisterschaft 2027 (K-46) und zu einer Beispieldatei aus Advantage (K-47).
-- UI-Leitbild (`docs/ui-leitbild.md`, #13): Corporate Design mit Design-Tokens, Bausteinen,
-  Navigation, Du-Form und Barrierefreiheit `UI-NN`; Prüfungen gegen Abweichung zwischen
-  Leitbild und Tokens und gegen Farb- und px-Werte im Code; Kopfleiste mit Wappen und
-  App-Symbol (Annahmen K-13, K-13.2); Schrift folgt der Systemeinstellung des Geräts; Mockups.
-- Kosten (`docs/kosten.md`, #9): laufend ca. CHF 95–175 pro Jahr (VPS, Sicherungsablage,
-  E-Mail über Scaleway), einmalig nur der Druck des Login-Briefs (Porto entfällt, der Brief
-  geht mit dem Versand der Vereinsdokumente mit); Szenarien für 100, 200 und 300 Mitglieder,
-  Store-App und SMS nur als «falls»; jährliche Überprüfung vor dem Vereinsbudget;
-  Freigabe offen (K-03).
-- Login per Einmal-Code (#29, lokal, noch nicht ausgeliefert): Brief-Code und Mail-Code,
-  Sitzung ein Jahr gleitend in einer Tabelle, Abmelden und Widerruf, Bremsen gegen
-  Durchprobieren; Code-Mails lokal und in der CI über Mailpit. Begründung in ADR-004;
-  Fachmodell (FR-24 umgesetzt), Sicherheits- und Datenschutzkonzept nachgeführt.
-- Web-App-Manifest, damit MyTCO vom Startbildschirm als eigene App startet (noch ohne
-  Service Worker).
-- Musterbrief mit QR-Code, Brief-Code und Anleitung als PDF aus erfundenen Daten
-  (`make musterbrief`); `make seed` legt erfundene Mitglieder an und gibt einen Brief-Code aus.
