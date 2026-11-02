@@ -3,11 +3,14 @@ import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { erstelleBremsen } from './bremse.ts';
-import { erstelleLoginDienst } from './dienst.ts';
+import { erzeugeBriefCode, erzeugeMailCode } from './codes.ts';
+import { erstelleLoginDienst, type LoginDienst } from './dienst.ts';
 import { holeLoginDienst } from './index.ts';
 import {
+	behandleFehler,
 	getSitzung,
 	ladeSitzung,
+	ladeSitzungSicher,
 	postBrief,
 	postLogout,
 	postMail,
@@ -29,6 +32,13 @@ const geheimnisse: string[] = [];
 afterAll(async () => {
 	await db.$client.end();
 });
+
+// Ein erzeugter Mail-Code, der nicht der ausgestellte ist.
+function andererMailCode(ausgestellt: string): string {
+	let c = erzeugeMailCode();
+	while (c === ausgestellt) c = erzeugeMailCode();
+	return c;
+}
 
 function baue() {
 	const zeit = { t: start };
@@ -83,7 +93,7 @@ describe('Schnittstellen', () => {
 		});
 
 		test('falsch: 400', async () => {
-			const r = await postBrief(baue().dienst, ereignis({ body: { code: 'AAAAAAAAAA' } }));
+			const r = await postBrief(baue().dienst, ereignis({ body: { code: erzeugeBriefCode() } }));
 			expect(r.status).toBe(400);
 			expect(await r.json()).toEqual({ fehler: 'falsch' });
 		});
@@ -92,7 +102,10 @@ describe('Schnittstellen', () => {
 			const d = baue().dienst;
 			let r!: Response;
 			for (let i = 0; i < 11; i++) {
-				r = await postBrief(d, ereignis({ body: { code: 'AAAAAAAAAA' }, ip: '198.51.100.9' }));
+				r = await postBrief(
+					d,
+					ereignis({ body: { code: erzeugeBriefCode() }, ip: '198.51.100.9' })
+				);
 			}
 			expect(r.status).toBe(429);
 			expect(await r.json()).toEqual({ fehler: 'zu-viele' });
@@ -116,10 +129,7 @@ describe('Schnittstellen', () => {
 			['mail', postMail],
 			['logout', postLogout]
 		])('%s: text/plain gibt 415', async (_n, f) => {
-			const r = await f(
-				baue().dienst,
-				ereignis({ body: { code: 'x' }, contentType: 'text/plain' })
-			);
+			const r = await f(baue().dienst, ereignis({ body: { code: 42 }, contentType: 'text/plain' }));
 			expect(r.status).toBe(415);
 			expect(await r.json()).toEqual({ fehler: 'format' });
 			expect(r.headers.get('cache-control')).toBe('no-store');
@@ -186,7 +196,7 @@ describe('Schnittstellen', () => {
 			geheimnisse.push(code, m.email);
 			const falsch = await postMail(
 				b.dienst,
-				ereignis({ body: { email: m.email, code: code === '000000' ? '111111' : '000000' } })
+				ereignis({ body: { email: m.email, code: andererMailCode(code) } })
 			);
 			expect(falsch.status).toBe(400);
 			const e = ereignis({ body: { email: m.email, code } });
@@ -280,31 +290,83 @@ describe('Schnittstellen', () => {
 	});
 
 	describe('holeLoginDienst', () => {
-		const alt = { ...process.env };
+		const neu = {
+			MYTCO_CODE_SCHLUESSEL: 'y'.repeat(40),
+			MYTCO_SMTP_URL: 'smtp://localhost:2525',
+			MYTCO_MAIL_ABSENDER: 'mytco@example.org',
+			MYTCO_KONTAKT: 'kontakt@example.org'
+		};
+		const alt = Object.fromEntries(Object.keys(neu).map((k) => [k, process.env[k]]));
 		afterEach(() => {
-			process.env = { ...alt };
+			for (const [k, v] of Object.entries(alt)) {
+				if (v === undefined) delete process.env[k];
+				else process.env[k] = v;
+			}
 		});
 		test('liefert dieselbe Instanz', () => {
-			Object.assign(process.env, {
-				MYTCO_CODE_SCHLUESSEL: 'y'.repeat(40),
-				MYTCO_SMTP_URL: 'smtp://localhost:2525',
-				MYTCO_MAIL_ABSENDER: 'mytco@example.org',
-				MYTCO_KONTAKT: 'kontakt@example.org'
-			});
+			Object.assign(process.env, neu);
 			expect(holeLoginDienst()).toBe(holeLoginDienst());
 		});
 	});
 
-	describe('SI-05: Logs', () => {
-		test('kein Log enthält Code, Kennung, Adresse oder IP', () => {
-			geheimnisse.push('203.0.113.7', '198.51.100.9', '198.51.100.20');
-			const aufrufe = [logs.error, logs.warn, logs.log].flatMap((s) =>
-				s.mock.calls.map((a) => JSON.stringify(a))
+	describe('Fehlerbehandlung (SI-05)', () => {
+		const geheimeMeldung = () => {
+			const m = `insert ... params: ${'geheim-' + erzeugeMailCode()}@example.org, ${erzeugeBriefCode()}`;
+			geheimnisse.push(m);
+			return m;
+		};
+
+		test('behandleFehler loggt nur einen festen Text', () => {
+			const vorher = logs.error.mock.calls.length;
+			const r = behandleFehler();
+			expect(r).toEqual({ message: 'Interner Fehler' });
+			expect(logs.error.mock.calls.slice(vorher)).toEqual([['Interner Fehler']]);
+		});
+
+		test('ein werfender Dienst: der Handler loggt nichts und reicht den Fehler weiter', async () => {
+			const meldung = geheimeMeldung();
+			const vorher = logs.error.mock.calls.length + logs.warn.mock.calls.length;
+			const kaputt = {
+				loginMitMailCode: async () => {
+					throw new Error(meldung);
+				}
+			} as unknown as LoginDienst;
+			await expect(postMail(kaputt, ereignis({ body: { email: 42, code: 42 } }))).rejects.toThrow(
+				meldung
 			);
-			for (const g of geheimnisse) {
-				for (const a of aufrufe) expect(a).not.toContain(g);
-			}
-			expect(geheimnisse.length).toBeGreaterThan(5);
+			expect(logs.error.mock.calls.length + logs.warn.mock.calls.length).toBe(vorher);
+		});
+
+		test('ladeSitzungSicher: Fehler gilt als nicht angemeldet, ohne Inhalt im Log', async () => {
+			const meldung = geheimeMeldung();
+			const kaputt = {
+				pruefeSitzung: async () => {
+					throw new Error(meldung);
+				}
+			} as unknown as LoginDienst;
+			const e = ereignis({ cookie: 'kennung-test' });
+			await expect(ladeSitzungSicher(() => kaputt, e)).resolves.toBeUndefined();
+			expect(e.locals.konto).toBeUndefined();
+			const e2 = ereignis({ cookie: 'kennung-test' });
+			await expect(
+				ladeSitzungSicher(() => {
+					throw new Error(meldung);
+				}, e2)
+			).resolves.toBeUndefined();
 		});
 	});
+});
+
+// SI-05: Über die ganze Datei darf kein Log ein Geheimnis enthalten. Als `afterAll`, damit das
+// Ergebnis nicht von der Reihenfolge der Tests abhängt; vorher laufende `arbeit` abwarten.
+afterAll(async () => {
+	await new Promise((r) => setTimeout(r, 200));
+	geheimnisse.push('203.0.113.7', '198.51.100.9', '198.51.100.20');
+	const aufrufe = [logs.error, logs.warn, logs.log].flatMap((s) =>
+		s.mock.calls.map((a) => JSON.stringify(a))
+	);
+	expect(geheimnisse.length).toBeGreaterThan(5);
+	for (const g of geheimnisse) {
+		for (const a of aufrufe) expect(a).not.toContain(g);
+	}
 });

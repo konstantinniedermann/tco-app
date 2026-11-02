@@ -93,6 +93,24 @@ export async function postLogout(d: LoginDienst, e: Ereignis): Promise<Response>
 	return antwort(204);
 }
 
+// Fehlerbehandlung ohne Inhalt: Fehlermeldungen der Datenbank können Parameter enthalten,
+// also Adressen oder Codes (SI-05). Darum nur feste Texte, weder Meldung noch Stack.
+export function behandleFehler(): { message: string } {
+	console.error('Interner Fehler');
+	return { message: 'Interner Fehler' };
+}
+
+// Ein Fehler beim Laden der Sitzung darf die Antwort nicht verhindern (Sicherheits-Header):
+// Die Anfrage gilt dann als nicht angemeldet.
+export async function ladeSitzungSicher(holeDienst: () => LoginDienst, e: Ereignis): Promise<void> {
+	try {
+		await ladeSitzung(holeDienst(), e);
+	} catch {
+		console.error('Sitzung konnte nicht geladen werden');
+		delete e.locals.konto;
+	}
+}
+
 export async function ladeSitzung(d: LoginDienst, e: Ereignis): Promise<void> {
 	const kennung = e.cookies.get(SITZUNG_COOKIE);
 	if (kennung === undefined) return;
