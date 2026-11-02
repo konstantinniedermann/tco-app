@@ -20,7 +20,7 @@ ende() {
 	docker rm -f "$NAME" >>"$LOG" 2>&1 || true
 	docker network rm "$NAME" >>"$LOG" 2>&1 || true
 	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then
-		echo fehler
+		melde fehler
 	fi
 	if [ "$rc" != 0 ]; then exit 1; fi
 	exit 0
@@ -30,13 +30,14 @@ trap ende EXIT
 scheitern() {
 	echo "probe: $1" >>"$LOG"
 	GEMELDET=1
-	echo fehler
+	melde fehler
 	exit 1
 }
 
 mkdir -p "$MYTCO_BASIS/$UMGEBUNG"
 exec 2>>"$LOG"
 [ -f "$MYTCO_BASIS/sicherung.env" ] || scheitern "sicherung.env fehlt"
+sicherungsziel >/dev/null || scheitern "Sicherungsziel ungültig"
 
 # Dieselbe Postgres-Fassung wie die Datenbank der Umgebung (steht nur in compose.umgebung.yml).
 PG_IMAGE=$(sed -n 's/^[[:space:]]*image:[[:space:]]*\(postgres:[^[:space:]]*\)[[:space:]]*$/\1/p' \
@@ -79,4 +80,4 @@ IST=$(docker exec "$NAME" psql -U mytco -d mytco -At -c "$ZAEHL_SQL") ||
 [ "$SOLL" = "$IST" ] || scheitern "Zeilenzahlen weichen ab"
 
 echo "probe: $LAUF stimmt überein" >>"$LOG"
-echo ok
+melde ok

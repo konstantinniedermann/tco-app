@@ -11,6 +11,8 @@
 #  - STUB_FOLGE_<NAME>=<a>@@<b>@@<c>: statt STUB_AUSGABE_<NAME> (gleiches STUB_MUSTER_<NAME>);
 #    der n-te Treffer gibt den n-ten Text aus, danach wiederholt sich der letzte. Der Zähler liegt
 #    in $STUB_PROTOKOLL.folge.<NAME>.
+#  - STUB_STDIN_BEI=<muster>: liest bei passender Argumentzeile die ganze Standardeingabe und hängt
+#    sie an $STUB_PROTOKOLL.stdin an (vor allen anderen Regeln, auch vor STUB_FEHLER_BEI)
 #  - `create …` gibt ohne Treffer die feste Container-ID 0123456789ab aus
 #  - `cp <id>:/app/betrieb <ziel>` legt <ziel>/betrieb/bin/ausliefern an: ein kleines
 #    ausführbares Skript, das seine Argumente an $STUB_PROTOKOLL.exec anhängt und `ok` druckt (mit STUB_AUSLIEFERN_FEHLER: `fehler`, Exit 1;
@@ -23,6 +25,12 @@ if [ -n "${STUB_PROTOKOLL:-}" ]; then
 	echo "${MYTCO_IMAGE-}|${MYTCO_UMGEBUNG-}|${DOCKER_CONFIG-}" >>"$STUB_PROTOKOLL.umwelt"
 fi
 echo "STUB-GEHEIM-LOG" >&2
+
+if [ -n "${STUB_STDIN_BEI:-}" ]; then
+	case "$*" in
+	*"$STUB_STDIN_BEI"*) cat >>"$STUB_PROTOKOLL.stdin" ;;
+	esac
+fi
 
 if [ -n "${STUB_FEHLER_BEI:-}" ]; then
 	case "$*" in

@@ -7,6 +7,9 @@
 # übergibt an das entnommene `ausliefern`. Von Hand eingerichtet neben lib.sh, nie von der CI.
 # Ausgabe nur "schritt: …", "ok" oder "fehler"; alles von docker steht im Protokoll.
 set -euo pipefail
+# Bricht die SSH-Verbindung ab, läuft die Auslieferung zu Ende (Ausgaben gehen dann ins Leere).
+# Die ignorierten Signale bleiben über exec für ausliefern erhalten.
+trap '' PIPE HUP
 
 # Der Client kann über AcceptEnv LANG/LC_* setzen; feste Ausgabe und Zeichenprüfung.
 export LC_ALL=C
@@ -28,7 +31,7 @@ ende() {
 	if [ -n "$CONTAINER" ]; then docker rm "$CONTAINER" >>"${LOG:-/dev/null}" 2>&1 || true; fi
 	if [ -n "$TEMP_FASSUNG" ]; then rm -rf "$TEMP_FASSUNG"; fi
 	if [ -n "$DOCKER_CONFIG_TEMP" ]; then rm -rf "$DOCKER_CONFIG_TEMP"; fi
-	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then echo fehler; fi
+	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then melde fehler; fi
 	if [ "$rc" != 0 ]; then exit 1; fi
 	exit 0
 }
@@ -40,14 +43,14 @@ if [ -n "${SSH_ORIGINAL_COMMAND+x}" ]; then
 	# Der ganze Wert muss genau ein Digest sein; ein zweites Argument ist nicht vorgesehen.
 	[ "$#" -eq 1 ] || {
 		GEMELDET=1
-		echo fehler
+		melde fehler
 		exit 1
 	}
 	DIGEST="$SSH_ORIGINAL_COMMAND"
 else
 	[ "$#" -eq 2 ] || {
 		GEMELDET=1
-		echo fehler
+		melde fehler
 		exit 1
 	}
 	DIGEST="$2"
@@ -68,7 +71,7 @@ exec 2>>"$LOG"
 scheitern() {
 	echo "ausliefern-ssh: $1" >>"$LOG"
 	GEMELDET=1
-	echo fehler
+	melde fehler
 	exit 1
 }
 

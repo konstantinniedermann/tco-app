@@ -2,6 +2,8 @@
 # zurueck <umgebung>: startet das vorherige Image und tauscht aktuell und vorher.
 # Ausgabe nur "schritt: …", "ok" oder "fehler". Die Datenbank wird nicht zurückmigriert.
 set -euo pipefail
+# Bricht die Verbindung ab, läuft der Rückfall zu Ende (Ausgaben gehen dann ins Leere).
+trap '' PIPE HUP
 
 # shellcheck source=lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
@@ -22,7 +24,7 @@ ende() {
 	if [ "$GESPERRT" = 1 ]; then sperre_freigeben "$UMGEBUNG"; fi
 	# Jeder unerwartete Abbruch (set -e) endet mit genau einem "fehler".
 	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then
-		echo fehler
+		melde fehler
 	fi
 	if [ "$rc" != 0 ]; then exit 1; fi
 	exit 0
@@ -32,7 +34,7 @@ trap ende EXIT
 scheitern() {
 	echo "zurueck: $1" >>"$LOG"
 	GEMELDET=1
-	echo fehler
+	melde fehler
 	exit 1
 }
 
@@ -45,7 +47,7 @@ schreibe_zustand() {
 schritt "pruefen"
 if ! sperre_nehmen "$UMGEBUNG"; then
 	GEMELDET=1
-	echo fehler
+	melde fehler
 	exit 1
 fi
 GESPERRT=1
@@ -82,4 +84,4 @@ else
 	rm -f "$U/zustand/vorher"
 fi
 GEMELDET=1
-echo ok
+melde ok

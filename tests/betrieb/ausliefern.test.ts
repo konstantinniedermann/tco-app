@@ -4,14 +4,16 @@ import {
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
+	readdirSync,
 	readFileSync,
+	rmSync,
 	statSync,
 	writeFileSync
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { fuehreAus, type Ergebnis } from './hilfe.ts';
+import { fuehreAus, fuehreAusOhneLeser, type Ergebnis } from './hilfe.ts';
 
 const NEU = 'sha256:' + 'a1'.repeat(32);
 const ALT = 'sha256:' + 'b2'.repeat(32);
@@ -372,19 +374,45 @@ describe('ausliefern: Caddy', () => {
 		expect(gibt(basis, 'proxy/caddy/umgebungen/test.caddy')).toBe(false);
 	});
 
-	test('läuft der Proxy, wird im Container validiert und neu geladen', () => {
+	const PROXY_LAEUFT = {
+		STUB_MUSTER_B: 'ps --status running -q caddy',
+		STUB_AUSGABE_B: 'caddy-container'
+	};
+	const proxyUp = (lauf: Ergebnis) =>
+		lauf.aufrufe
+			.map((a, i) => ({ a, i }))
+			.filter(({ a }) => a.includes('-p mytco-proxy') && a.endsWith(' up -d'));
+
+	// Neu geladen wird sofort; `up -d` erstellt den Container danach nur neu, wenn sich
+	// compose.proxy.yml (z. B. der Caddy-Digest) oder proxy.env geändert hat.
+	test('läuft der Proxy: im Container validiert, neu geladen, dann up -d', () => {
 		const basis = baue();
-		const lauf = ausliefern('test', basis, {
-			STUB_MUSTER_B: 'ps --status running -q caddy',
-			STUB_AUSGABE_B: 'caddy-container'
-		});
+		const lauf = ausliefern('test', basis, PROXY_LAEUFT);
 		expect(letzteZeile(lauf)).toBe('ok');
 		const validate = index(lauf, 'exec -T caddy caddy validate --config /etc/caddy/Caddyfile');
 		const reload = index(lauf, 'exec -T caddy caddy reload --config /etc/caddy/Caddyfile');
 		expect(validate).toBeGreaterThanOrEqual(0);
 		expect(reload).toBeGreaterThan(validate);
 		expect(index(lauf, 'run --rm --no-deps caddy')).toBe(-1);
-		expect(lauf.aufrufe.some((a) => a.includes('mytco-proxy') && a.includes('up -d'))).toBe(false);
+		const up = proxyUp(lauf);
+		expect(up).toHaveLength(1);
+		expect(up[0].i).toBeGreaterThan(reload);
+	});
+
+	test('up -d des Proxys scheitert: alles zurück, alte Konfiguration neu geladen, fehler', () => {
+		const basis = baue({ dateien: alt });
+		const lauf = ausliefern('live', basis, {
+			...PROXY_LAEUFT,
+			STUB_FEHLER_BEI: 'proxy.env up -d'
+		});
+		expect(lauf.status).toBe(1);
+		expect(letzteZeile(lauf)).toBe('fehler');
+		expect(lies(basis, 'proxy/caddy/Caddyfile')).toBe('ALT-CADDYFILE');
+		expect(lies(basis, 'proxy/compose.proxy.yml')).toBe('ALT-COMPOSE');
+		const reloads = lauf.aufrufe.filter((a) => a.includes('caddy reload'));
+		expect(reloads).toHaveLength(2);
+		expect(appStarts(lauf)).toHaveLength(0);
+		expect(gibt(basis, 'live/sperre')).toBe(false);
 	});
 });
 
@@ -437,6 +465,84 @@ describe('ausliefern: Zustand und Aufräumen', () => {
 		});
 		expect(lauf.status).toBe(0);
 		expect(letzteZeile(lauf)).toBe('ok');
+	});
+});
+
+describe('ausliefern: Abbruch mitten in der Übernahme', () => {
+	// Fehlt eine Datei im Image, bricht cp (set -e) mitten in der Übernahme ab. Das Ende-Handling
+	// setzt alles zurück, statt die Sicherung nur zu löschen.
+	test('fehlende Datei im Image: alles zurück, alte Einrichtung bleibt, fehler', () => {
+		const basis = baue(BESTEHENDES_LIVE);
+		rmSync(join(basis, 'fassungen', NEU, 'betrieb', 'compose.proxy.yml'));
+		const vorher = BESTEHENDES_LIVE_PFADE.map((p) => lies(basis, p));
+		const lauf = ausliefern('live', basis);
+		expect(lauf.status).toBe(1);
+		expect(letzteZeile(lauf)).toBe('fehler');
+		expect(BESTEHENDES_LIVE_PFADE.map((p) => lies(basis, p))).toEqual(vorher);
+		expect(gibt(basis, 'live/betrieb.neu')).toBe(false);
+		expect(gibt(basis, 'gemeinsam/bin/wiederherstellen')).toBe(false);
+		expect(lies(basis, 'live/zustand/aktuell')).toBe(ALT);
+		expect(appStarts(lauf)).toHaveLength(0);
+		expect(gibt(basis, 'live/sperre')).toBe(false);
+		// Die Sicherung der Übernahme ist danach weg.
+		expect(readdirSync(join(basis, 'proxy')).filter((n) => n.startsWith('.sicherung'))).toEqual([]);
+	});
+
+	test('erster Lauf: Abbruch entfernt die halb übernommene Einrichtung wieder', () => {
+		const basis = baue();
+		rmSync(join(basis, 'fassungen', NEU, 'betrieb', 'compose.proxy.yml'));
+		const lauf = ausliefern('test', basis);
+		expect(letzteZeile(lauf)).toBe('fehler');
+		expect(gibt(basis, 'test/betrieb')).toBe(false);
+		expect(gibt(basis, 'proxy/caddy/Caddyfile')).toBe(false);
+		expect(gibt(basis, 'proxy/caddy/umgebungen/test.caddy')).toBe(false);
+	});
+});
+
+describe('ausliefern: Rechte der Dateien', () => {
+	const modus = (basis: string, pfad: string) => statSync(join(basis, pfad)).mode & 0o777;
+
+	test('Protokoll und Zustand nur für den Betriebsbenutzer, Caddy-Dateien lesbar für den Proxy', () => {
+		const basis = baue();
+		expect(letzteZeile(ausliefern('test', basis))).toBe('ok');
+		expect(modus(basis, 'test/protokoll.log')).toBe(0o600);
+		expect(modus(basis, 'test/zustand/aktuell')).toBe(0o600);
+		expect(modus(basis, 'test/zustand')).toBe(0o700);
+		for (const ordner of ['proxy/caddy', 'proxy/caddy/umgebungen']) {
+			expect(modus(basis, ordner)).toBe(0o755);
+		}
+		for (const datei of ['proxy/caddy/Caddyfile', 'proxy/caddy/umgebungen/test.caddy']) {
+			expect(modus(basis, datei)).toBe(0o644);
+		}
+	});
+});
+
+describe('Verbindung zum Aufrufer bricht ab', () => {
+	// Niemand liest mehr mit (SSH getrennt): Jede Ausgabe scheitert, der Lauf geht trotzdem zu Ende.
+	test('ausliefern läuft zu Ende und hält den Zustand fest', async () => {
+		const basis = baue({ dateien: { 'test/zustand/aktuell': `${ALT}\n` } });
+		const lauf = await fuehreAusOhneLeser(
+			join(basis, 'fassungen', NEU, 'betrieb', 'bin', 'ausliefern'),
+			['test', NEU],
+			{ basis }
+		);
+		expect(lauf.status).toBe(0);
+		expect(lies(basis, 'test/zustand/aktuell')).toBe(NEU);
+		expect(lies(basis, 'test/zustand/vorher')).toBe(ALT);
+		expect(appStarts(lauf)).toHaveLength(1);
+		expect(gibt(basis, 'test/sperre')).toBe(false);
+	});
+
+	test('zurueck läuft zu Ende und tauscht die Zustände', async () => {
+		const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+		mkdirSync(join(basis, 'test/zustand'), { recursive: true });
+		writeFileSync(join(basis, 'test/zustand/aktuell'), `${NEU}\n`);
+		writeFileSync(join(basis, 'test/zustand/vorher'), `${ALT}\n`);
+		const lauf = await fuehreAusOhneLeser('betrieb/bin/zurueck', ['test'], { basis });
+		expect(lauf.status).toBe(0);
+		expect(lies(basis, 'test/zustand/aktuell')).toBe(ALT);
+		expect(lies(basis, 'test/zustand/vorher')).toBe(NEU);
+		expect(gibt(basis, 'test/sperre')).toBe(false);
 	});
 });
 

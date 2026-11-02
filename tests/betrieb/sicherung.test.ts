@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
@@ -50,7 +50,13 @@ function lauf(
 ): Ergebnis {
 	const erg = fuehreAus(`betrieb/bin/${skript}`, args, {
 		basis,
-		stub: { STUB_MUSTER_P: 'psql', STUB_AUSGABE_P: ZAEHLUNG, ...stub }
+		// Wie das echte psql liest die Wiederherstellung ihre ganze Eingabe.
+		stub: {
+			STUB_MUSTER_P: 'psql',
+			STUB_AUSGABE_P: ZAEHLUNG,
+			STUB_STDIN_BEI: 'exec -T db psql -X',
+			...stub
+		}
 	});
 	// Nur Schritt-, ok- und fehler-Zeilen, nie Ausgabe von docker.
 	for (const zeile of erg.stdout.split('\n').filter(Boolean)) {
@@ -125,18 +131,68 @@ describe('sichern', () => {
 		}
 	});
 
-	test('legt das Repo nicht an, wenn es schon da ist', () => {
+	test('legt das Repo nie an', () => {
 		expect(index(e, ' init')).toBe(-1);
+	});
+
+	// Compose verlangt MYTCO_IMAGE; der nächtliche Lauf aus systemd hat es nicht von selbst.
+	test('setzt MYTCO_IMAGE aus zustand/aktuell für die Compose-Aufrufe', () => {
+		const compose = e.aufrufe.map((a, i) => ({ a, i })).filter(({ a }) => a.startsWith('compose '));
+		expect(compose.length).toBeGreaterThan(0);
+		for (const { i } of compose) {
+			expect(e.umwelt[i].image).toBe(`ghcr.io/konstantinniedermann/tco-app@${AKTUELL}`);
+		}
 	});
 });
 
 describe('sichern: Sonderfälle', () => {
-	test('fehlendes Repo wird vor dem ersten backup angelegt', () => {
+	// Das Repo legt der Betrieb einmal von Hand an. Ein automatisches init würde bei einem
+	// falschen Ziel im Wegwerf-Container landen und trotzdem ok melden.
+	test('fehlendes Repo: fehler, kein init, kein backup', () => {
 		const x = lauf('sichern', ['test'], { STUB_FEHLER_BEI: 'cat config' });
+		expect(x.status).toBe(1);
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(index(x, ' init')).toBe(-1);
+		expect(index(x, ' backup ')).toBe(-1);
+	});
+
+	test.each([
+		['doppelte Anführungszeichen', '"/srv/sicherung"'],
+		['einfache Anführungszeichen', "'/srv/sicherung'"],
+		['relativer Pfad', 'srv/sicherung'],
+		['Punkt-Pfad', './sicherung'],
+		['leer', ''],
+		['unbekanntes Schema', 'ftp:beispiel.invalid/x'],
+		['Leerzeichen', '/srv/sicher ung'],
+		['Leerzeichen hinten', '/srv/sicherung ']
+	])('ungültiges Ziel (%s): fehler, kein restic', (_name, ziel) => {
+		const x = lauf('sichern', ['live'], {}, baue(ziel));
+		expect(x.status).toBe(1);
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(mit(x, 'restic/restic')).toHaveLength(0);
+		expect(readFileSync(`${x.basis}/live/protokoll.log`, 'utf-8')).toContain('Sicherungsziel');
+	});
+
+	test.each([
+		's3:https://beispiel.invalid/bucket',
+		'sftp:beispiel.invalid:/srv/x',
+		'rest:https://beispiel.invalid/',
+		'b2:eimer:pfad',
+		'azure:behaelter:/',
+		'gs:eimer:/',
+		'swift:behaelter:/pfad',
+		'rclone:ziel:pfad',
+		'/srv/sicherung'
+	])('gültiges Ziel %s: ok', (ziel) => {
+		const x = lauf('sichern', ['live'], {}, baue(ziel));
 		expect(letzteZeile(x)).toBe('ok');
-		const init = index(x, ' init');
-		expect(init).toBeGreaterThan(-1);
-		expect(init).toBeLessThan(index(x, ' backup '));
+	});
+
+	test('ohne zustand/aktuell trotzdem ok (MYTCO_IMAGE bleibt, wie es ist)', () => {
+		const basis = baue();
+		rmSync(join(basis, 'live', 'zustand', 'aktuell'));
+		const x = lauf('sichern', ['live'], {}, basis);
+		expect(letzteZeile(x)).toBe('ok');
 	});
 
 	test('Ziel nicht erreichbar: fehler', () => {
@@ -146,7 +202,7 @@ describe('sichern: Sonderfälle', () => {
 		expect(index(x, 'forget --tag live --keep-within')).toBe(-1);
 	});
 
-	test('Ziel und Anlegen scheitern: fehler, kein backup', () => {
+	test('Ziel nicht erreichbar: fehler, kein backup', () => {
 		const x = lauf('sichern', ['live'], { STUB_FEHLER_BEI: 'restic/restic' });
 		expect(letzteZeile(x)).toBe('fehler');
 		expect(index(x, ' backup ')).toBe(-1);
@@ -221,18 +277,79 @@ describe('wiederherstellen', () => {
 		expect(letzteZeile(x)).toBe('ok');
 		expect(mit(x, 'dump --tag test,lauf-x').length).toBeGreaterThan(0);
 		const stop = index(x, 'stop app');
-		const restore = index(x, 'pg_restore --clean --if-exists');
+		const restore = index(x, 'pg_restore -f -');
 		const start = index(x, 'start app');
 		expect(stop).toBeGreaterThan(-1);
 		expect(restore).toBeGreaterThan(stop);
 		expect(start).toBeGreaterThan(restore);
 	});
 
-	test('spielt in einer Transaktion ein und bricht beim ersten Fehler ab', () => {
-		const x = lauf('wiederherstellen', ['test', 'lauf-x'], SNAP_TEST);
-		expect(mit(x, 'pg_restore')[0]).toContain(
-			'pg_restore --clean --if-exists --single-transaction --exit-on-error'
+	// Eine ältere Sicherung kennt spätere Tabellen nicht; pg_restore --clean liesse sie stehen,
+	// und die nächste Migration scheiterte an CREATE TABLE. Darum: Schemas leeren, dann
+	// einspielen, alles in einer Transaktion, die nur bei vollständigem Dump bestätigt wird.
+	const SQL_DUMP = 'CREATE TABLE public.mitglied ();';
+	const MIT_SQL = {
+		...SNAP_TEST,
+		STUB_MUSTER_R: 'pg_restore -f -',
+		STUB_AUSGABE_R: SQL_DUMP
+	};
+	const eingabe = (x: Ergebnis) => readFileSync(`${x.basis}/stub-protokoll.stdin`, 'utf-8');
+
+	test('leert public und drizzle und spielt in einer Transaktion ein', () => {
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], MIT_SQL);
+		expect(letzteZeile(x)).toBe('ok');
+		expect(mit(x, 'pg_restore')).toEqual([expect.stringMatching(/exec -T db pg_restore -f -$/)]);
+		const psql = mit(x, 'psql');
+		expect(psql).toHaveLength(1);
+		expect(psql[0]).toContain('exec -T db psql -X -q -v ON_ERROR_STOP=1 -U mytco -d mytco');
+		expect(eingabe(x)).toBe(
+			[
+				'BEGIN;',
+				'DROP SCHEMA IF EXISTS public CASCADE;',
+				'DROP SCHEMA IF EXISTS drizzle CASCADE;',
+				'CREATE SCHEMA public;',
+				SQL_DUMP,
+				'COMMIT;',
+				''
+			].join('\n')
 		);
+		expect(index(x, 'psql')).toBeLessThan(index(x, 'start app'));
+	});
+
+	test('Dump aus restic scheitert: kein COMMIT, fehler, App läuft wieder', () => {
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], {
+			...MIT_SQL,
+			STUB_FEHLER_BEI: 'dump --tag test,lauf-x'
+		});
+		expect(x.status).toBe(1);
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(eingabe(x)).not.toContain('COMMIT');
+		expect(index(x, 'start app')).toBeGreaterThan(index(x, 'psql'));
+	});
+
+	test('pg_restore scheitert: kein COMMIT, fehler', () => {
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], {
+			...MIT_SQL,
+			STUB_FEHLER_BEI: 'pg_restore'
+		});
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(eingabe(x)).not.toContain('COMMIT');
+	});
+
+	test('psql scheitert: fehler, App läuft wieder', () => {
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], {
+			...SNAP_TEST,
+			STUB_FEHLER_BEI: 'exec -T db psql'
+		});
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(index(x, 'start app')).toBeGreaterThan(index(x, 'exec -T db psql'));
+	});
+
+	test('ungültiges Sicherungsziel: fehler, App bleibt unberührt', () => {
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], SNAP_TEST, baue('"/srv/x"'));
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(mit(x, 'restic/restic')).toHaveLength(0);
+		expect(index(x, 'stop app')).toBe(-1);
 	});
 
 	test('unvollständiger Lauf (ohne Zählung) wird nicht eingespielt', () => {
@@ -386,6 +503,13 @@ describe('probe', () => {
 		expect(letzteZeile(x)).toBe('fehler');
 		expect(mit(x, 'rm -f mytco-probe-live-')).toHaveLength(1);
 		expect(mit(x, 'network rm mytco-probe-live-')).toHaveLength(1);
+	});
+
+	test('ungültiges Sicherungsziel: fehler, kein restic, nichts gestartet', () => {
+		const x = lauf('probe', ['live', 'lauf-p'], { ...SNAP_LIVE, ...ZAEHL_DATEI }, baue('srv/x'));
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(mit(x, 'restic/restic')).toHaveLength(0);
+		expect(index(x, 'run -d')).toBe(-1);
 	});
 
 	test('Snapshot einer anderen Umgebung: fehler, nichts gestartet', () => {

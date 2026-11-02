@@ -4,6 +4,8 @@
 # Läuft aus fassungen/<digest>/betrieb/bin/. Ausgabe nur "schritt: …", "ok" oder "fehler";
 # alles von docker steht im Protokoll der Umgebung.
 set -euo pipefail
+# Bricht die SSH-Verbindung ab, läuft die Auslieferung zu Ende (Ausgaben gehen dann ins Leere).
+trap '' PIPE HUP
 
 # shellcheck source=lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
@@ -22,17 +24,24 @@ PROXY="$MYTCO_BASIS/proxy"
 GEMEINSAM="$MYTCO_BASIS/gemeinsam/bin"
 LOG="$U/protokoll.log"
 SICHERUNG=""
+BETRIEB_NEU=0
+LAUFEND=""
 GESPERRT=0
 GEMELDET=0
 ALT_DIGEST=""
 
 ende() {
 	local rc=$?
-	if [ -n "$SICHERUNG" ]; then rm -rf "$SICHERUNG"; fi
+	# Abbruch (Signal, set -e) mitten in der Übernahme: alles zurück wie bei einem Fehler.
+	if [ -n "$SICHERUNG" ]; then
+		set +e
+		alles_zuruecksetzen
+		proxy_neu_laden
+	fi
 	if [ "$GESPERRT" = 1 ]; then sperre_freigeben "$UMGEBUNG"; fi
 	# Jeder unerwartete Abbruch (set -e) endet mit genau einem "fehler".
 	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then
-		echo fehler
+		melde fehler
 	fi
 	if [ "$rc" != 0 ]; then exit 1; fi
 	exit 0
@@ -42,7 +51,7 @@ trap ende EXIT
 scheitern() {
 	echo "ausliefern: $1" >>"$LOG"
 	GEMELDET=1
-	echo fehler
+	melde fehler
 	exit 1
 }
 
@@ -67,7 +76,7 @@ schreibe_zustand() {
 schritt "pruefen"
 if ! sperre_nehmen "$UMGEBUNG"; then
 	GEMELDET=1
-	echo fehler
+	melde fehler
 	exit 1
 fi
 GESPERRT=1
@@ -100,14 +109,6 @@ if [ "$UMGEBUNG" = live ] || [ ! -e "$MYTCO_BASIS/live/zustand/aktuell" ]; then
 	GEMEINSAME_TEILE=1
 fi
 
-# Sicherung dessen, was dieser Schritt überschreibt. Dateien werden an Ort und Stelle
-# überschrieben und zurückgeschrieben (gleicher Inode), weil der laufende Proxy sie per
-# Bind-Mount sieht; Ordner werden nie gelöscht und neu angelegt.
-SICHERUNG="$PROXY/.sicherung.$$"
-rm -rf "$SICHERUNG"
-mkdir -p "$SICHERUNG/dateien"
-: >"$SICHERUNG/liste"
-
 # merke <pfad relativ zu MYTCO_BASIS>: Zustand vor der Übernahme festhalten.
 merke() {
 	echo "$1" >>"$SICHERUNG/liste"
@@ -125,29 +126,64 @@ uebernimm() {
 }
 
 # Stellt alles zurück, was dieser Schritt übernommen hat: gemerkte Dateien an Ort und Stelle,
-# neu hinzugekommene entfernt, die Einrichtung der Umgebung aus der Sicherung.
+# neu hinzugekommene entfernt, die Einrichtung der Umgebung aus der Sicherung. Läuft auch nach
+# einem Abbruch an beliebiger Stelle der Übernahme (aus ende).
 alles_zuruecksetzen() {
 	local rel
-	while IFS= read -r rel; do
-		if [ -f "$SICHERUNG/dateien/$rel" ]; then
-			cp -p "$SICHERUNG/dateien/$rel" "$MYTCO_BASIS/$rel"
-		else
-			rm -f "$MYTCO_BASIS/$rel"
-		fi
-	done <"$SICHERUNG/liste"
-	rm -rf "$U/betrieb"
-	if [ -d "$SICHERUNG/betrieb-alt" ]; then mv "$SICHERUNG/betrieb-alt" "$U/betrieb"; fi
+	if [ -f "$SICHERUNG/liste" ]; then
+		while IFS= read -r rel; do
+			if [ -f "$SICHERUNG/dateien/$rel" ]; then
+				cp -p "$SICHERUNG/dateien/$rel" "$MYTCO_BASIS/$rel"
+			else
+				rm -f "$MYTCO_BASIS/$rel"
+			fi
+		done <"$SICHERUNG/liste"
+	fi
+	if [ -d "$SICHERUNG/betrieb-alt" ]; then
+		rm -rf "$U/betrieb"
+		mv "$SICHERUNG/betrieb-alt" "$U/betrieb"
+	elif [ "$BETRIEB_NEU" = 1 ]; then
+		rm -rf "$U/betrieb"
+	fi
+	rm -rf "$U/betrieb.neu"
+	# Erledigt: ende darf nicht ein zweites Mal zurücksetzen.
+	rm -rf "$SICHERUNG"
+	SICHERUNG=""
 }
+
+# Lädt die (zurückgesetzte) Konfiguration in den laufenden Proxy; nur ins Protokoll.
+proxy_neu_laden() {
+	if [ -n "$LAUFEND" ]; then
+		protokoll "$UMGEBUNG" compose_proxy exec -T caddy caddy reload \
+			--config /etc/caddy/Caddyfile --adapter caddyfile || true
+	fi
+}
+
+# Sicherung dessen, was dieser Schritt überschreibt. Dateien werden an Ort und Stelle
+# überschrieben und zurückgeschrieben (gleicher Inode), weil der laufende Proxy sie per
+# Bind-Mount sieht; Ordner werden nie gelöscht und neu angelegt.
+SICHERUNG="$PROXY/.sicherung.$$"
+rm -rf "$SICHERUNG"
+mkdir -p "$SICHERUNG/dateien"
+: >"$SICHERUNG/liste"
+
+# Der Proxy-Container liest die Caddy-Dateien über Bind-Mounts. Trotz umask 077 (lib.sh) für
+# alle lesbar; Geheimnisse stehen darin keine (die liegen in proxy.env).
+mkdir -p "$PROXY/caddy/umgebungen"
+chmod 755 "$PROXY/caddy" "$PROXY/caddy/umgebungen"
 
 # Einrichtung der Umgebung: ersetzen, nicht mischen (alte bleibt in der Sicherung).
 rm -rf "$U/betrieb.neu"
 cp -R "$FASSUNG" "$U/betrieb.neu"
 if [ -d "$U/betrieb" ]; then mv "$U/betrieb" "$SICHERUNG/betrieb-alt"; fi
 mv "$U/betrieb.neu" "$U/betrieb"
+BETRIEB_NEU=1
 uebernimm "$FASSUNG/caddy/umgebungen/$UMGEBUNG.caddy" "proxy/caddy/umgebungen/$UMGEBUNG.caddy"
+chmod 644 "$PROXY/caddy/umgebungen/$UMGEBUNG.caddy"
 
 if [ "$GEMEINSAME_TEILE" = 1 ]; then
 	uebernimm "$FASSUNG/caddy/Caddyfile" "proxy/caddy/Caddyfile"
+	chmod 644 "$PROXY/caddy/Caddyfile"
 	uebernimm "$FASSUNG/compose.proxy.yml" "proxy/compose.proxy.yml"
 	for datei in sichern wiederherstellen probe lib.sh; do
 		if [ -f "$FASSUNG/bin/$datei" ]; then
@@ -171,18 +207,22 @@ if [ "$GUELTIG" != 1 ]; then
 	alles_zuruecksetzen
 	scheitern "Caddy-Konfiguration ungültig, alles zurückgesetzt"
 fi
+# Neue Konfiguration sofort laden; `up -d` danach erstellt den Container nur neu, wenn sich
+# compose.proxy.yml (z. B. der Caddy-Digest) oder proxy.env geändert hat, und startet ihn, wenn
+# er nicht läuft.
 if [ -n "$LAUFEND" ]; then
 	protokoll "$UMGEBUNG" compose_proxy exec -T caddy caddy reload \
 		--config /etc/caddy/Caddyfile --adapter caddyfile || {
 		alles_zuruecksetzen
 		scheitern "Caddy konnte nicht neu geladen werden, alles zurückgesetzt"
 	}
-else
-	protokoll "$UMGEBUNG" compose_proxy up -d || {
-		alles_zuruecksetzen
-		scheitern "Proxy konnte nicht gestartet werden, alles zurückgesetzt"
-	}
 fi
+protokoll "$UMGEBUNG" compose_proxy up -d || {
+	alles_zuruecksetzen
+	protokoll "$UMGEBUNG" compose_proxy up -d || true
+	proxy_neu_laden
+	scheitern "Proxy konnte nicht gestartet werden, alles zurückgesetzt"
+}
 rm -rf "$SICHERUNG"
 SICHERUNG=""
 
@@ -238,4 +278,4 @@ for kandidat in $VORHANDEN; do
 done
 
 GEMELDET=1
-echo ok
+melde ok

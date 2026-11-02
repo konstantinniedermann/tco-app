@@ -11,7 +11,7 @@ import {
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { fuehreAus, type Ergebnis } from './hilfe.ts';
+import { fuehreAus, fuehreAusOhneLeser, type Ergebnis } from './hilfe.ts';
 
 const DIGEST = 'sha256:' + 'a1'.repeat(32);
 const REPO = 'ghcr.io/konstantinniedermann/tco-app';
@@ -255,5 +255,22 @@ describe('ausliefern-ssh: Ablauf', () => {
 		expect(lauf.stdout.trim().split('\n').pop()).toBe('fehler');
 		expect(lauf.aufrufe.some((a) => a.startsWith('pull'))).toBe(false);
 		expect(readdirSync(tmp)).toEqual([]);
+	});
+});
+
+describe('ausliefern-ssh: Verbindung bricht ab', () => {
+	// Niemand liest mehr mit (SSH getrennt): Der Türsteher holt das Image trotzdem und übergibt.
+	test('läuft bis zur Übergabe an ausliefern durch', async () => {
+		delete process.env.SSH_ORIGINAL_COMMAND;
+		const basis = baue();
+		const lauf = await fuehreAusOhneLeser(join(basis, 'bin', 'ausliefern-ssh'), ['test'], {
+			basis,
+			stdin: TOKEN,
+			env: { SSH_ORIGINAL_COMMAND: DIGEST }
+		});
+		// Der Exit-Code stammt vom Ersatz-ausliefern (sein `echo ok` trifft ebenfalls ins Leere);
+		// geprüft wird, dass der Türsteher bis zur Übergabe kam.
+		expect(lauf.aufrufe).toContain(`pull ${REPO}@${DIGEST}`);
+		expect(readFileSync(join(basis, 'stub-protokoll.exec'), 'utf-8').trim()).toBe(`test ${DIGEST}`);
 	});
 });

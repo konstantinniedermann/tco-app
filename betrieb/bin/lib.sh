@@ -2,6 +2,9 @@
 # Gemeinsame Funktionen der Betriebsskripte; wird mit `source` geladen.
 # Bash-3.2-tauglich: kein flock, kein mapfile, keine assoziativen Arrays.
 set -euo pipefail
+# Protokolle, Zustand und Sicherungsordner nur für den Betriebsbenutzer. Was ein Container
+# lesen muss (Caddy-Dateien), gibt ausliefern gezielt frei.
+umask 077
 
 MYTCO_BASIS="${MYTCO_BASIS:-/opt/mytco}"
 # Repo der Images, wenn MYTCO_REPO nicht gesetzt ist (auf dem Server immer).
@@ -13,7 +16,7 @@ pruefe_umgebung() {
 	case "${1-}" in
 	test | live) return 0 ;;
 	*)
-		echo fehler
+		melde fehler
 		return 1
 		;;
 	esac
@@ -24,19 +27,27 @@ pruefe_digest() {
 	local wert="${1-}"
 	case "$wert" in
 	*$'\n'*)
-		echo fehler
+		melde fehler
 		return 1
 		;;
 	esac
 	if printf '%s\n' "$wert" | grep -qxE 'sha256:[0-9a-f]{64}'; then
 		return 0
 	fi
-	echo fehler
+	melde fehler
 	return 1
 }
 
+# Bricht die Verbindung zum Aufrufer ab, läuft der Vorgang trotzdem zu Ende: eine Ausgabe,
+# die nicht mehr ankommt, ist kein Fehler (zusammen mit `trap '' PIPE HUP` in den Skripten).
+# Externes printf statt des eingebauten: Bash behielte eine gescheiterte Ausgabe im Puffer und
+# schriebe sie bei der nächsten Umleitung in eine Datei (z. B. in zustand/aktuell).
+melde() {
+	env printf '%s\n' "$1" 2>/dev/null || true
+}
+
 schritt() {
-	echo "schritt: $1"
+	melde "schritt: $1"
 }
 
 # Führt den Befehl aus; stdout und stderr gehen nur ins Protokoll der Umgebung.
@@ -115,14 +126,31 @@ compose_proxy() {
 # shellcheck disable=SC2034 # wird von sichern, wiederherstellen und probe genutzt
 RESTIC_IMAGE="restic/restic:0.18.1@sha256:39d9072fb5651c80d75c7a811612eb60b4c06b32ffe87c2e9f3c7222e1797e76"
 
-# restic im Container. Ein lokales Ziel (RESTIC_REPOSITORY beginnt mit /) wird am selben Pfad
-# eingehängt. Stdin wird durchgereicht (-i); Aufrufer ohne Eingabe leiten </dev/null um.
+# Sicherungsziel aus sicherung.env. `docker run --env-file` übernimmt Anführungszeichen und
+# Leerzeichen wörtlich; ein solches Ziel oder ein relativer Pfad würde nicht eingehängt, und
+# restic schriebe in den Wegwerf-Container. Erlaubt: absoluter Pfad oder ein Schema von restic.
+sicherungsziel() {
+	local ziel=""
+	ziel=$(sed -n 's/^RESTIC_REPOSITORY=//p' "$MYTCO_BASIS/sicherung.env" | head -n 1)
+	case "$ziel" in
+	*[\"\'[:space:]]* | "") ;;
+	/* | s3:?* | sftp:?* | rest:?* | b2:?* | azure:?* | gs:?* | swift:?* | rclone:?*)
+		printf '%s\n' "$ziel"
+		return 0
+		;;
+	esac
+	echo "Sicherungsziel ungültig (absoluter Pfad oder s3:, sftp:, rest:, b2:, azure:, gs:, swift:, rclone:; ohne Anführungszeichen und Leerzeichen)" >&2
+	return 1
+}
+
+# restic im Container. Ein lokales Ziel (beginnt mit /) wird am selben Pfad eingehängt.
+# Stdin wird durchgereicht (-i); Aufrufer ohne Eingabe leiten </dev/null um.
 # --hostname: fester Host, sonst gruppiert forget je zufälligem Container-Namen und löscht nie.
 # --log-driver none: Docker darf die Standardausgabe (z. B. restic dump) nicht mitschreiben.
 # --retry-lock: kurz auf ein Repo-Schloss warten, statt sofort zu scheitern.
 restic_docker() {
 	local env_datei="$MYTCO_BASIS/sicherung.env" ziel=""
-	ziel=$(sed -n 's/^RESTIC_REPOSITORY=//p' "$env_datei" | head -n 1)
+	ziel=$(sicherungsziel) || return 1
 	case "$ziel" in
 	/*)
 		docker run --rm -i --hostname mytco --log-driver none --env-file "$env_datei" \
@@ -133,6 +161,15 @@ restic_docker() {
 			"$RESTIC_IMAGE" --retry-lock 2m "$@"
 		;;
 	esac
+}
+
+# Setzt MYTCO_IMAGE auf das laufende Image der Umgebung (Compose verlangt es bei jedem Aufruf).
+# Ohne zustand/aktuell bleibt der Wert, wie er ist.
+image_aus_zustand() {
+	local datei="$MYTCO_BASIS/$1/zustand/aktuell"
+	[ -s "$datei" ] || return 0
+	MYTCO_IMAGE="${MYTCO_REPO:-$MYTCO_REPO_STANDARD}@$(head -n 1 "$datei")"
+	export MYTCO_IMAGE
 }
 
 # Snapshots als eine Zeile je Eintrag (restic liefert ein JSON-Array; Einträge beginnen mit "time").

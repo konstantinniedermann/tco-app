@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -28,22 +28,20 @@ export type Ergebnis = {
 
 const STUBS = resolve(import.meta.dirname, 'stubs');
 
-// Führt ein Bash-Skript mit Ersatz-docker vor dem PATH und eigenem MYTCO_BASIS aus.
-export function fuehreAus(skript: string, args: string[], optionen: Optionen = {}): Ergebnis {
-	const basis = optionen.basis ?? mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+function umwelt(basis: string, optionen: Optionen): NodeJS.ProcessEnv {
+	return {
+		...process.env,
+		PATH: `${STUBS}:${process.env.PATH ?? ''}`,
+		MYTCO_BASIS: basis,
+		STUB_PROTOKOLL: join(basis, 'stub-protokoll'),
+		...optionen.stub,
+		...optionen.env
+	};
+}
+
+// Liest die Protokolle des Ersatz-docker nach einem Lauf.
+function ergebnis(basis: string, status: number, stdout: string, stderr: string): Ergebnis {
 	const protokoll = join(basis, 'stub-protokoll');
-	const lauf = spawnSync('bash', [resolve(skript), ...args], {
-		input: optionen.stdin,
-		encoding: 'utf-8',
-		env: {
-			...process.env,
-			PATH: `${STUBS}:${process.env.PATH ?? ''}`,
-			MYTCO_BASIS: basis,
-			STUB_PROTOKOLL: protokoll,
-			...optionen.stub,
-			...optionen.env
-		}
-	});
 	let aufrufe: string[] = [];
 	try {
 		aufrufe = readFileSync(protokoll, 'utf-8').split('\n').filter(Boolean);
@@ -64,13 +62,39 @@ export function fuehreAus(skript: string, args: string[], optionen: Optionen = {
 	} catch {
 		// Ersatz-docker wurde nie aufgerufen
 	}
-	return {
-		status: lauf.status ?? -1,
-		stdout: lauf.stdout,
-		stderr: lauf.stderr,
-		aufrufe,
-		umwelt,
-		dockerConfig,
-		basis
-	};
+	return { status, stdout, stderr, aufrufe, umwelt, dockerConfig, basis };
+}
+
+// Führt ein Bash-Skript mit Ersatz-docker vor dem PATH und eigenem MYTCO_BASIS aus.
+export function fuehreAus(skript: string, args: string[], optionen: Optionen = {}): Ergebnis {
+	const basis = optionen.basis ?? mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+	const lauf = spawnSync('bash', [resolve(skript), ...args], {
+		input: optionen.stdin,
+		encoding: 'utf-8',
+		env: umwelt(basis, optionen)
+	});
+	return ergebnis(basis, lauf.status ?? -1, lauf.stdout, lauf.stderr);
+}
+
+// Wie fuehreAus, aber niemand liest die Standardausgabe: das Leseende der Pipe wird sofort
+// geschlossen, jede Ausgabe trifft auf eine abgebrochene Verbindung (SIGPIPE/EPIPE).
+export function fuehreAusOhneLeser(
+	skript: string,
+	args: string[],
+	optionen: Optionen = {}
+): Promise<Ergebnis> {
+	const basis = optionen.basis ?? mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+	return new Promise((fertig, scheitern) => {
+		const kind = spawn('bash', [resolve(skript), ...args], {
+			env: umwelt(basis, optionen),
+			stdio: ['pipe', 'pipe', 'pipe']
+		});
+		kind.stdout.destroy();
+		let stderr = '';
+		kind.stderr.setEncoding('utf-8');
+		kind.stderr.on('data', (teil: string) => (stderr += teil));
+		kind.on('error', scheitern);
+		kind.on('close', (status) => fertig(ergebnis(basis, status ?? -1, '', stderr)));
+		kind.stdin.end(optionen.stdin ?? '');
+	});
 }

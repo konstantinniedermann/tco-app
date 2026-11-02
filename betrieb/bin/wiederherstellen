@@ -2,6 +2,9 @@
 # wiederherstellen <umgebung> [lauf]: spielt eine Sicherung derselben Umgebung ein.
 # Ohne Lauf der neueste. Snapshots anderer Umgebungen werden nie angefasst (DS-08).
 # Die App ist während des Einspielens gestoppt und läuft danach wieder, auch bei Fehlern.
+# Die Schemas der App (public, drizzle mit der Migrationstabelle) werden vorher geleert, damit
+# keine Tabelle einer späteren Migration stehen bleibt. Alles in einer Transaktion: Nur ein
+# vollständiger Dump wird bestätigt, sonst bleibt der alte Stand.
 set -euo pipefail
 
 # shellcheck source=lib.sh
@@ -21,7 +24,7 @@ ende() {
 	if [ "$GESTOPPT" = 1 ]; then compose "$UMGEBUNG" start app >>"$LOG" 2>&1 || true; fi
 	if [ "$GESPERRT" = 1 ]; then sperre_freigeben "$UMGEBUNG"; fi
 	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then
-		echo fehler
+		melde fehler
 	fi
 	if [ "$rc" != 0 ]; then exit 1; fi
 	exit 0
@@ -31,13 +34,14 @@ trap ende EXIT
 scheitern() {
 	echo "wiederherstellen: $1" >>"$LOG"
 	GEMELDET=1
-	echo fehler
+	melde fehler
 	exit 1
 }
 
 mkdir -p "$MYTCO_BASIS/$UMGEBUNG"
 exec 2>>"$LOG"
 [ -f "$MYTCO_BASIS/sicherung.env" ] || scheitern "sicherung.env fehlt"
+sicherungsziel >/dev/null || scheitern "Sicherungsziel ungültig"
 
 schritt "snapshot suchen"
 LAUF=$(finde_lauf "$UMGEBUNG" "$LAUF_WUNSCH") || scheitern "kein Snapshot dieser Umgebung gefunden"
@@ -45,8 +49,7 @@ LAUF=$(finde_lauf "$UMGEBUNG" "$LAUF_WUNSCH") || scheitern "kein Snapshot dieser
 # Compose verlangt MYTCO_IMAGE bei jedem Befehl, der den Dienst app betrifft: das laufende Image.
 AKTUELL="$MYTCO_BASIS/$UMGEBUNG/zustand/aktuell"
 [ -s "$AKTUELL" ] || scheitern "keine ausgelieferte Fassung (zustand/aktuell fehlt)"
-MYTCO_IMAGE="${MYTCO_REPO:-$MYTCO_REPO_STANDARD}@$(head -n 1 "$AKTUELL")"
-export MYTCO_IMAGE
+image_aus_zustand "$UMGEBUNG"
 
 # Keine Auslieferung gleichzeitig.
 sperre_nehmen "$UMGEBUNG" || scheitern "Umgebung ist gesperrt"
@@ -56,10 +59,23 @@ schritt "app stoppen"
 GESTOPPT=1
 compose "$UMGEBUNG" stop app >>"$LOG" || scheitern "App nicht zu stoppen"
 
+# SQL für psql: Schemas leeren, Dump als SQL (pg_restore -f -), COMMIT nur bei Erfolg.
+# Endet die Eingabe ohne COMMIT, verwirft PostgreSQL die offene Transaktion. Der Dump fliesst
+# nur durch Pipes, nie als Datei auf die Platte.
+sql_zum_einspielen() {
+	printf '%s\n' 'BEGIN;' \
+		'DROP SCHEMA IF EXISTS public CASCADE;' \
+		'DROP SCHEMA IF EXISTS drizzle CASCADE;' \
+		'CREATE SCHEMA public;'
+	restic_docker dump --tag "$UMGEBUNG,$LAUF" --path "/mytco-$UMGEBUNG.dump" latest \
+		"/mytco-$UMGEBUNG.dump" </dev/null |
+		compose "$UMGEBUNG" exec -T db pg_restore -f - || return 1
+	printf '%s\n' 'COMMIT;'
+}
+
 schritt "einspielen"
-restic_docker dump --tag "$UMGEBUNG,$LAUF" --path "/mytco-$UMGEBUNG.dump" latest \
-	"/mytco-$UMGEBUNG.dump" </dev/null |
-	compose "$UMGEBUNG" exec -T db pg_restore --clean --if-exists --single-transaction --exit-on-error -U mytco -d mytco >>"$LOG" ||
+sql_zum_einspielen |
+	compose "$UMGEBUNG" exec -T db psql -X -q -v ON_ERROR_STOP=1 -U mytco -d mytco >>"$LOG" ||
 	scheitern "Einspielen gescheitert"
 
 schritt "app starten"
@@ -67,4 +83,4 @@ GESTOPPT=0
 compose "$UMGEBUNG" start app >>"$LOG" || scheitern "App startet nicht"
 
 echo "wiederherstellen: $LAUF eingespielt" >>"$LOG"
-echo ok
+melde ok
