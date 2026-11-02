@@ -4,8 +4,9 @@
 set -euo pipefail
 # shellcheck source=../../betrieb/bin/lib.sh
 source "$(dirname "$0")/../../betrieb/bin/lib.sh"
-if [ "$1" = "zeige" ]; then
-	printf '%s\n' "${!2}"
-else
-	"$@"
-fi
+case "$1" in
+zeige) printf '%s\n' "${!2}" ;;
+# nimmt und gibt die Sperre im selben Prozess wieder frei
+sperre_zyklus) sperre_nehmen "$2" && sperre_freigeben "$2" ;;
+*) "$@" ;;
+esac

@@ -47,25 +47,49 @@ protokoll() {
 	return "$rc"
 }
 
+# Übernimmt eine Sperre mit toter PID atomar: umbenennen (nur ein Übernehmer gewinnt),
+# prüfen, dass noch die beobachtete PID drinsteht, erst dann aufräumen und neu anlegen.
+# Steht eine andere PID drin, war die Sperre inzwischen neu vergeben: zurücklegen, Exit 1.
+sperre_uebernehmen() {
+	local dir="$MYTCO_BASIS/$1/sperre" gesehen="$2"
+	local alt="$dir.alt.$$"
+	mv "$dir" "$alt" 2>/dev/null || return 1
+	local jetzt=""
+	[ -f "$alt/pid" ] && jetzt=$(cat "$alt/pid" 2>/dev/null || true)
+	if [ "$jetzt" != "$gesehen" ]; then
+		mv "$alt" "$dir" 2>/dev/null || true
+		return 1
+	fi
+	rm -rf "$alt"
+	mkdir "$dir" 2>/dev/null || return 1
+	echo "$$" >"$dir/pid"
+}
+
 # Sperre per mkdir (atomar). Eine Sperre, deren PID nicht mehr lebt, wird übernommen.
 # Eine Sperre ohne lesbare PID gilt als belegt (der Halter schreibt sie gerade).
 sperre_nehmen() {
 	local dir="$MYTCO_BASIS/$1/sperre"
 	mkdir -p "$MYTCO_BASIS/$1"
-	if ! mkdir "$dir" 2>/dev/null; then
-		local pid=""
-		[ -f "$dir/pid" ] && pid=$(cat "$dir/pid" 2>/dev/null || true)
-		if [ -z "$pid" ] || kill -0 "$pid" 2>/dev/null; then
-			return 1
-		fi
-		rm -rf "$dir"
-		mkdir "$dir" 2>/dev/null || return 1
+	if mkdir "$dir" 2>/dev/null; then
+		echo "$$" >"$dir/pid"
+		return 0
 	fi
-	echo "$$" >"$dir/pid"
+	local pid=""
+	[ -f "$dir/pid" ] && pid=$(cat "$dir/pid" 2>/dev/null || true)
+	if [ -z "$pid" ] || kill -0 "$pid" 2>/dev/null; then
+		return 1
+	fi
+	sperre_uebernehmen "$1" "$pid"
 }
 
+# Gibt nur eine Sperre frei, die dieser Prozess selbst hält.
 sperre_freigeben() {
-	rm -rf "$MYTCO_BASIS/$1/sperre"
+	local dir="$MYTCO_BASIS/$1/sperre" pid=""
+	[ -f "$dir/pid" ] && pid=$(cat "$dir/pid" 2>/dev/null || true)
+	if [ "$pid" = "$$" ]; then
+		rm -rf "$dir"
+	fi
+	return 0
 }
 
 compose() {

@@ -68,13 +68,49 @@ describe('Sperre', () => {
 		expect(readFileSync(join(dir, 'pid'), 'utf-8').trim()).not.toBe(String(tot));
 	});
 
-	test('nehmen legt die Sperre an, freigeben entfernt sie', () => {
+	test('Übernahme schlägt fehl, wenn sich die PID seit dem Lesen geändert hat', () => {
+		const tot = spawnSync('true').pid;
+		const basis = fuehreAus(TREIBER, ['true']).basis;
+		const dir = join(basis, 'test', 'sperre');
+		mkdirSync(dir, { recursive: true });
+		writeFileSync(join(dir, 'pid'), String(process.pid) + '\n');
+		// beobachtet wurde die tote PID, inzwischen hält ein anderer Prozess die Sperre
+		const lauf = fuehreAus(TREIBER, ['sperre_uebernehmen', 'test', String(tot)], { basis });
+		expect(lauf.status).toBe(1);
+		expect(readFileSync(join(dir, 'pid'), 'utf-8').trim()).toBe(String(process.pid));
+	});
+
+	test('Übernahme gelingt bei unveränderter toter PID', () => {
+		const tot = String(spawnSync('true').pid);
+		const basis = fuehreAus(TREIBER, ['true']).basis;
+		const dir = join(basis, 'test', 'sperre');
+		mkdirSync(dir, { recursive: true });
+		writeFileSync(join(dir, 'pid'), tot + '\n');
+		const lauf = fuehreAus(TREIBER, ['sperre_uebernehmen', 'test', tot], { basis });
+		expect(lauf.status).toBe(0);
+		expect(readFileSync(join(dir, 'pid'), 'utf-8').trim()).not.toBe(tot);
+	});
+
+	test('freigeben lässt eine fremde Sperre stehen', () => {
+		const basis = fuehreAus(TREIBER, ['true']).basis;
+		const dir = join(basis, 'test', 'sperre');
+		mkdirSync(dir, { recursive: true });
+		writeFileSync(join(dir, 'pid'), String(process.pid) + '\n');
+		expect(fuehreAus(TREIBER, ['sperre_freigeben', 'test'], { basis }).status).toBe(0);
+		expect(existsSync(dir)).toBe(true);
+	});
+
+	test('nehmen und freigeben im selben Prozess räumt die Sperre ab', () => {
+		const lauf = lib('sperre_zyklus', 'test');
+		expect(lauf.status).toBe(0);
+		expect(existsSync(join(lauf.basis, 'test', 'sperre'))).toBe(false);
+	});
+
+	test('nehmen legt die Sperre an', () => {
 		const { basis } = lib('true');
 		const lauf = (f: string) => fuehreAus(TREIBER, [f, 'test'], { basis });
 		expect(lauf('sperre_nehmen').status).toBe(0);
 		expect(existsSync(join(basis, 'test', 'sperre', 'pid'))).toBe(true);
-		expect(lauf('sperre_freigeben').status).toBe(0);
-		expect(existsSync(join(basis, 'test', 'sperre'))).toBe(false);
 	});
 });
 
@@ -108,12 +144,19 @@ describe('compose', () => {
 });
 
 describe('Ersatz-docker', () => {
-	test('wählt die Ausgabe nach Argumentzeile, mit Kürzen vom Ende', () => {
-		const stub = { STUB_AUSGABE_COMPOSE_PS: 'laeuft', STUB_AUSGABE_INSPECT: 'kurz' };
-		const ps = fuehreAus(TREIBER, ['docker', 'compose', 'ps', '-q'], { stub });
+	test('wählt die Ausgabe je Unterbefehl einer compose()-Zeile', () => {
+		const stub = {
+			STUB_MUSTER_A_PS: 'geheim.env ps',
+			STUB_AUSGABE_A_PS: 'laeuft',
+			STUB_MUSTER_B_PSQL: 'exec -T db psql',
+			STUB_AUSGABE_B_PSQL: 'public.a|3'
+		};
+		const ps = fuehreAus(TREIBER, ['compose', 'test', 'ps', '-q'], { stub });
 		expect(ps.stdout).toBe('laeuft\n');
-		const inspect = fuehreAus(TREIBER, ['docker', 'inspect', 'x'], { stub });
-		expect(inspect.stdout).toBe('kurz\n');
+		const psql = fuehreAus(TREIBER, ['compose', 'test', 'exec', '-T', 'db', 'psql'], { stub });
+		expect(psql.stdout).toBe('public.a|3\n');
+		const sonst = fuehreAus(TREIBER, ['compose', 'test', 'up'], { stub });
+		expect(sonst.stdout).toBe('');
 	});
 });
 
