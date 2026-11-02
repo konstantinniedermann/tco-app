@@ -48,7 +48,8 @@ abmelden; MyTCO speichert dazu je Gerät einen Eintrag ohne IP-Adresse und Gerä
 Sie einen neuen Code an, schickt MyTCO ihn an Ihre E-Mail-Adresse. Bis Sie den Code
 eingetippt haben, merkt sich Ihr Gerät diese Adresse; ist die Anfrage älter als 15 Minuten,
 löscht MyTCO sie spätestens beim nächsten Start. Ihre IP-Adresse wird dabei höchstens
-24 Stunden gespeichert, damit niemand Codes durchprobieren kann. Ändern Sie Ihre
+24 Stunden gespeichert, damit niemand Codes durchprobieren kann; ebenso die eingetippte
+E-Mail-Adresse, nur im Arbeitsspeicher und nur, um die Zahl der Code-Mails zu begrenzen. Ändern Sie Ihre
 E-Mail-Adresse, bestätigen Sie die Änderung mit je einem Code an die alte und die neue
 Adresse. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis.
 
