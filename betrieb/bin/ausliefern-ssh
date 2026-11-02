@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+# Türsteher der Auslieferung: ausliefern-ssh <umgebung> [<digest>]
+# Aufruf über authorized_keys (command="…/ausliefern-ssh test",restrict …). Die Umgebung
+# steckt im Schlüssel (nur $1); aus der Anfrage kommt allein der Digest ($SSH_ORIGINAL_COMMAND,
+# ohne SSH-Anfrage $2 für den Handbetrieb). Das Token der Registry kommt über die
+# Standardeingabe. Holt das Image, entnimmt /app/betrieb ohne das Image zu starten und
+# übergibt an das entnommene `ausliefern`. Von Hand eingerichtet neben lib.sh, nie von der CI.
+# Ausgabe nur "schritt: …", "ok" oder "fehler"; alles von docker steht im Protokoll.
+set -euo pipefail
+
+# Vor der Prüfung der Eingaben darf nichts ausser "fehler" nach aussen.
+exec 2>/dev/null
+
+# lib.sh aus dem eigenen Ordner (von Hand eingerichtet), nie aus dem Image.
+# shellcheck source=lib.sh
+source "$(dirname "$0")/lib.sh"
+
+DOCKER_CONFIG_TEMP=""
+CONTAINER=""
+GEMELDET=0
+
+ende() {
+	local rc=$?
+	if [ -n "$CONTAINER" ]; then docker rm "$CONTAINER" >>"${LOG:-/dev/null}" 2>&1 || true; fi
+	if [ -n "$DOCKER_CONFIG_TEMP" ]; then rm -rf "$DOCKER_CONFIG_TEMP"; fi
+	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then echo fehler; fi
+	if [ "$rc" != 0 ]; then exit 1; fi
+	exit 0
+}
+trap ende EXIT
+
+# --- Eingaben prüfen, bevor irgendetwas anderes geschieht ---------------------------------
+UMGEBUNG="${1-}"
+if [ -n "${SSH_ORIGINAL_COMMAND+x}" ]; then
+	# Der ganze Wert muss genau ein Digest sein; ein zweites Argument ist nicht vorgesehen.
+	[ "$#" -eq 1 ] || {
+		GEMELDET=1
+		echo fehler
+		exit 1
+	}
+	DIGEST="$SSH_ORIGINAL_COMMAND"
+else
+	[ "$#" -eq 2 ] || {
+		GEMELDET=1
+		echo fehler
+		exit 1
+	}
+	DIGEST="$2"
+fi
+if ! pruefe_umgebung "$UMGEBUNG" || ! pruefe_digest "$DIGEST"; then
+	GEMELDET=1
+	exit 1
+fi
+
+MYTCO_REPO="${MYTCO_REPO:-ghcr.io/konstantinniedermann/tco-app}"
+export MYTCO_BASIS MYTCO_REPO
+REGISTRY="${MYTCO_REPO%%/*}"
+LOG="$MYTCO_BASIS/$UMGEBUNG/protokoll.log"
+mkdir -p "$MYTCO_BASIS/$UMGEBUNG"
+# Eigene Fehlermeldungen der Werkzeuge nie an den Aufrufer, nur ins Protokoll.
+exec 2>>"$LOG"
+
+scheitern() {
+	echo "ausliefern-ssh: $1" >>"$LOG"
+	GEMELDET=1
+	echo fehler
+	exit 1
+}
+
+# --- Anmelden (nur mit Token) und Image holen ---------------------------------------------
+schritt "image holen"
+# Das Token nur in einer Variable der Shell, nie in Argumenten oder der Umgebung.
+TOKEN=""
+if [ ! -t 0 ]; then TOKEN=$(cat || true); fi
+if [ -n "$TOKEN" ]; then
+	DOCKER_CONFIG_TEMP=$(mktemp -d)
+	export DOCKER_CONFIG="$DOCKER_CONFIG_TEMP"
+	protokoll "$UMGEBUNG" docker login "$REGISTRY" -u mytco --password-stdin <<<"$TOKEN" ||
+		scheitern "Anmeldung gescheitert"
+fi
+TOKEN=""
+protokoll "$UMGEBUNG" docker pull "$MYTCO_REPO@$DIGEST" || scheitern "pull gescheitert"
+
+# --- Einrichtung entnehmen, ohne das Image zu starten --------------------------------------
+schritt "einrichtung entnehmen"
+ID=$(docker create "$MYTCO_REPO@$DIGEST" 2>>"$LOG") || scheitern "create gescheitert"
+case "$ID" in
+'' | *[!0-9a-f]*) scheitern "keine Container-ID" ;;
+esac
+CONTAINER="$ID"
+ZIEL="$MYTCO_BASIS/fassungen/$DIGEST"
+rm -rf "$ZIEL"
+mkdir -p "$ZIEL"
+protokoll "$UMGEBUNG" docker cp "$CONTAINER:/app/betrieb" "$ZIEL/" || scheitern "cp gescheitert"
+protokoll "$UMGEBUNG" docker rm "$CONTAINER" || true
+CONTAINER=""
+[ -x "$ZIEL/betrieb/bin/ausliefern" ] || scheitern "ausliefern fehlt im Image"
+
+# Zugangsdaten gehören nicht in den weiteren Ablauf; exec führt den EXIT-Trap nicht aus.
+unset DOCKER_CONFIG
+rm -rf "$DOCKER_CONFIG_TEMP"
+DOCKER_CONFIG_TEMP=""
+
+exec "$ZIEL/betrieb/bin/ausliefern" "$UMGEBUNG" "$DIGEST"
