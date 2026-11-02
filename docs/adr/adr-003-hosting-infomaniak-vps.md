@@ -76,7 +76,7 @@ Sicherung geübt sein (#10). Kein SLA; ob das für Anmeldung und Finalwochenende
 hing an K-15. *Nachtrag 30.10.2026:* K-15 ist beantwortet — ein kurzer Ausfall wird in Kauf
 genommen, ein VPS ohne SLA reicht.
 
-**Kosten** (Details und Freigabe → #9):
+**Kosten** (Stand 30.10.2026; aktuell, mit Szenarien und Freigabe → [Kosten](../kosten.md)):
 
 | Posten | CHF/Jahr inkl. MwSt | Status |
 |--------|----------|--------|
