@@ -27,8 +27,9 @@ async function leseKoerper(e: Ereignis): Promise<Record<string, unknown>> {
 	}
 }
 
-// Keine explizite `secure`-Option: SvelteKit setzt sie standardmässig, ausser auf
-// http://localhost. So läuft auch der lokale E2E-Test in WebKit.
+// Keine explizite `secure`-Option: SvelteKit setzt sie, ausser die Anfrage-URL ist
+// http://localhost. adapter-node nimmt ohne PROTOCOL_HEADER immer https an; der E2E-Test für
+// WebKit meldet darum http über einen Proxy-Kopf (playwright.config.ts).
 function setzeCookie(e: Pick<Ereignis, 'cookies'>, kennung: string): void {
 	e.cookies.set(SITZUNG_COOKIE, kennung, {
 		path: '/',

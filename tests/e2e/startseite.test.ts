@@ -1,25 +1,26 @@
-import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import pkg from '../../package.json' with { type: 'json' };
+import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
-test('Startseite zeigt die Version, ohne Barrierefreiheits-Verstösse und ohne Konsolenfehler', async ({
+// Ohne Sitzung zeigt jede Seite die Login-Seite; dort prüfen die Tests den Rahmen der App.
+async function oeffneLoginSeite(page: Page) {
+	await page.goto('/login');
+	await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+}
+
+test('Startseite ohne Sitzung leitet auf die Login-Seite; Version sichtbar, ohne Barrierefreiheits-Verstösse und ohne Konsolenfehler', async ({
 	page
 }, info) => {
-	const fehler: string[] = [];
-	page.on('console', (m) => {
-		if (m.type() === 'error') fehler.push(m.text());
-	});
-	page.on('pageerror', (e) => fehler.push(e.message));
+	const fehler = sammleKonsolenfehler(page);
 	await page.goto('/');
+	await expect(page).toHaveURL(/\/login$/);
 	await expect(page.getByTestId('version')).toHaveText(`Version ${pkg.version}`);
-	const axe = await new AxeBuilder({ page }).analyze();
-	expect(axe.violations).toEqual([]);
+	await pruefeBildschirm(page, info, 'startseite');
 	expect(fehler).toEqual([]); // fängt u. a. CSP-Verletzungen
-	await page.screenshot({ path: info.outputPath('startseite.png'), fullPage: true });
 });
 
 test('Kopfleiste mit Wappen und MyTCO', async ({ page }) => {
-	await page.goto('/');
+	await oeffneLoginSeite(page);
 	const kopf = page.getByRole('banner');
 	await expect(kopf).toContainText('MyTCO');
 	// Wappen ist Schmuck neben dem Namen: leerer Alternativtext
@@ -43,7 +44,7 @@ test('App-Symbole sind gültige Bilder', async ({ request }) => {
 });
 
 test('Schrift folgt der Grundgrösse des Geräts (UI-02)', async ({ page }) => {
-	await page.goto('/');
+	await oeffneLoginSeite(page);
 	await expect(page.locator('meta[name="text-scale"]')).toHaveAttribute('content', 'scale');
 	const verhaeltnis = await page.evaluate(
 		() =>
@@ -54,13 +55,13 @@ test('Schrift folgt der Grundgrösse des Geräts (UI-02)', async ({ page }) => {
 });
 
 test('Grundschrift mindestens 18 px bei Standardeinstellung (UI-02)', async ({ page }) => {
-	await page.goto('/');
+	await oeffneLoginSeite(page);
 	const groesse = await page.evaluate(() => parseFloat(getComputedStyle(document.body).fontSize));
 	expect(groesse).toBeGreaterThanOrEqual(18);
 });
 
 test('Bei 200 % Schrift kein waagrechtes Scrollen (UI-02)', async ({ page }, info) => {
-	await page.goto('/');
+	await oeffneLoginSeite(page);
 	await page.evaluate(() => {
 		document.documentElement.style.fontSize = '200%';
 	});
@@ -69,13 +70,13 @@ test('Bei 200 % Schrift kein waagrechtes Scrollen (UI-02)', async ({ page }, inf
 		fenster: window.innerWidth
 	}));
 	expect(breiten.inhalt).toBeLessThanOrEqual(breiten.fenster);
-	await page.screenshot({ path: info.outputPath('startseite-200.png'), fullPage: true });
+	await page.screenshot({ path: info.outputPath('login-200.png'), fullPage: true });
 });
 
 test('Lange Wörter im Titel werden bei 200 % Schrift getrennt statt abgeschnitten (UI-02)', async ({
 	page
 }) => {
-	await page.goto('/');
+	await oeffneLoginSeite(page);
 	const titel = page.getByRole('heading', { level: 1 });
 	await titel.evaluate((h) => {
 		document.documentElement.style.fontSize = '200%';
