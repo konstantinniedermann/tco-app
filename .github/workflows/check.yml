@@ -148,8 +148,25 @@ jobs:
           --health-interval 2s
           --health-timeout 3s
           --health-retries 20
+      # Fängt die Code-Mails; die Login-Tests lesen sie über die API (Port 58025).
+      mail:
+        image: axllent/mailpit:v1.33
+        ports:
+          - 51025:1025
+          - 58025:8025
+        options: >-
+          --health-cmd "/mailpit readyz"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+    # Wie .env.example; MYTCO_ADRESSE ist die baseURL von Playwright (Port 4173 ohne E2E_PORT).
     env:
       DATABASE_URL: postgres://mytco:mytco_lokal@localhost:55432/mytco
+      MYTCO_CODE_SCHLUESSEL: nur-lokal-nicht-fuer-produktion-0123456789abcdef
+      MYTCO_SMTP_URL: smtp://localhost:51025
+      MYTCO_MAIL_ABSENDER: 'MyTCO <mytco@example.org>'
+      MYTCO_KONTAKT: 'das Sekretariat (erfunden), sekretariat@example.org'
+      MYTCO_ADRESSE: http://localhost:4173
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

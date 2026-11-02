@@ -1,10 +1,17 @@
 <script lang="ts">
 	import '../lib/design/tokens.css';
 	import '../lib/design/basis.css';
+	import { onMount } from 'svelte';
 	import { asset } from '$app/paths';
+	import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 	import { APP_VERSION } from '../lib/version';
 
 	let { children } = $props();
+
+	// Beim Start der App: abgelaufene oder kaputte Mail-Anfragen aus dem Gerätespeicher löschen.
+	onMount(() => {
+		leseMailanfrage(holeSpeicher(), Date.now());
+	});
 </script>
 
 <div class="app">

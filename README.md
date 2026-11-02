@@ -34,10 +34,15 @@ Docker Desktop, gitleaks.
 npm ci --ignore-scripts
 npm exec --no -- playwright install chromium webkit
 make hooks   # einmalig: Git-Hooks aktivieren
-make db      # lokale PostgreSQL starten
+cp .env.example .env   # einmalig: lokale Einstellungen (nur erfundene Werte)
+make db      # lokale PostgreSQL und Mail-Fänger Mailpit starten
+make seed    # erfundene Mitglieder anlegen, gibt einen Brief-Code zum Anmelden aus
 make dev     # Entwicklungsserver
 make check   # alle Prüfungen (braucht Docker)
 ```
+
+Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make musterbrief` erzeugt
+einen Musterbrief als PDF unter `musterbrief/musterbrief.pdf`.
 
 Alle weiteren Befehle: `make help`.
 
