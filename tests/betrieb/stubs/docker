@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Ersatz-docker für die Tests der Betriebsskripte (von allen Tests in tests/betrieb geteilt).
+#  - hängt die Argumente als eine Zeile ("$*") an $STUB_PROTOKOLL an
+#  - schreibt immer STUB-GEHEIM-LOG auf stderr (Ausgabetests suchen damit Lecks)
+#  - STUB_FEHLER_BEI=<muster>: Exit 1, wenn die Argumente das Muster enthalten
+#  - STUB_AUSGABE_<NAME>=<text>: gibt <text> auf stdout aus. NAME ist die Argumentzeile in
+#    Grossbuchstaben, jede Folge von Zeichen ausser A-Z, 0-9 als "_" (z. B. "compose -p x ps"
+#    -> COMPOSE_P_X_PS). Passt kein Name, wird je ein Wort vom Ende gekürzt (COMPOSE_P_X,
+#    COMPOSE_P, COMPOSE); der erste Treffer gewinnt.
+set -euo pipefail
+
+echo "$*" >>"${STUB_PROTOKOLL:-/dev/null}"
+echo "STUB-GEHEIM-LOG" >&2
+
+if [ -n "${STUB_FEHLER_BEI:-}" ]; then
+	case "$*" in
+	*"$STUB_FEHLER_BEI"*) exit 1 ;;
+	esac
+fi
+
+name=$(printf '%s' "$*" | tr '[:lower:]' '[:upper:]' | tr -c 'A-Z0-9' '_' | sed 's/__*/_/g; s/^_//; s/_$//')
+while [ -n "$name" ]; do
+	var="STUB_AUSGABE_$name"
+	if [ -n "${!var+x}" ]; then
+		printf '%s\n' "${!var}"
+		exit 0
+	fi
+	case "$name" in
+	*_*) name=${name%_*} ;;
+	*) name="" ;;
+	esac
+done
+exit 0
