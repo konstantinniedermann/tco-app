@@ -84,15 +84,16 @@ Widerspruch fragen.
 
 ## Release `dev` → `main` (am Session-Ende, bewusste Entscheidung)
 
-**Sobald es eine Auslieferung gibt** (Merge nach `dev` = Test-Umgebung, Merge nach `main` =
+**Sobald Test und Live ausgeliefert werden** (Merge nach `dev` = Test-Umgebung, Merge nach `main` =
 live mit Mitgliederdaten, `docs/ci-cd-und-release.md`): vor dem PR muss der Projektleiter die
 Checkliste auf Test abgehakt und genau dieses Release freigegeben haben; dazu ein Commit auf
 `dev`, der die Version in `package.json` und `docs/versionen.md` setzt. Den Tag setzt die
 CI.
 
 **Code, aber noch keine Live-Auslieferung** (`AUSLIEFERUNG_LIVE` nicht `an`): Versions-Commit
-auf `dev` wie oben, in `docs/versionen.md` als «nicht ausgeliefert» gekennzeichnet; keine
-Checkliste (noch keine Test-Umgebung), kein Tag, kein GitHub-Release, auch nicht von Hand
+auf `dev` wie oben, in `docs/versionen.md` als «nicht ausgeliefert» gekennzeichnet; kein Tag,
+kein GitHub-Release, auch nicht von Hand. Die Checkliste entfällt nur, solange auch
+`AUSLIEFERUNG_TEST` aus ist; läuft Test schon, wird sie dort abgehakt
 (`docs/ci-cd-und-release.md#versionen`). Freigabe des Projektleiters für genau dieses Release
 trotzdem einholen.
 

@@ -4,7 +4,7 @@
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
 
-check: docs voraussetzungen voraussetzungen-docker ## Alle Prüfungen wie in der CI, ausser Secret-Scan (Hook) und OSV-Malware-Prüfung (nur CI)
+check: docs voraussetzungen voraussetzungen-docker ## Alle Prüfungen wie in der CI, ausser Secret-Scan (Hook), OSV-Malware-Prüfung und Rauchtest (nur CI)
 	npm run lint
 	npm run check:svelte
 	npm run pruefungen

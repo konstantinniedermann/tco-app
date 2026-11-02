@@ -55,7 +55,7 @@ flowchart LR
 
 - **Freigabe:** Der Merge des PR nach `main` geht ohne weiteren Knopf live; `main` ist
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
-  abgehakt und das Release freigegeben hat.
+  abgehakt und das Release freigegeben hat (ohne Server: Ausnahmen unter [Versionen](#versionen)).
 - **Version:** Vor dem PR erhöht ein Commit auf `dev` die Version in `package.json` und macht
   aus *Unveröffentlicht* in den [Versionen](versionen.md) die neue Nummer. Nach der
   erfolgreichen Live-Auslieferung setzt die CI den Tag und das GitHub-Release; nur dieser
@@ -67,7 +67,7 @@ flowchart LR
 - **Fehlerbehebungen** nehmen denselben Weg über `dev`; ein eigener Hotfix-Weg lohnt bei
   diesem Umfang nicht.
 - Released wird, wenn ein Stand es wert ist, nicht nach jedem Issue: Jedes Release braucht
-  die Checkliste. Die Doku-Stände vor dem Code-Gerüst haben keine Versionsnummer.
+  die Checkliste, sobald Test läuft. Die Doku-Stände vor dem Code-Gerüst haben keine Versionsnummer.
 
 ## Auslieferung
 
@@ -305,12 +305,13 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
   Store-App).
 - Die Version steht in `package.json`, in der Fusszeile der App und, sobald Live ausgeliefert
   wird, als Tag auf `main`.
-- **Solange `AUSLIEFERUNG_LIVE` aus ist** (kein Server), gibt es keinen Tag und kein
-  GitHub-Release, denn der Job `release` läuft dann nicht. Ein Release besteht aus dem
-  Versions-Commit auf `dev` (Version in `package.json`, Abschnitt in den
-  [Versionen](versionen.md) mit «nicht ausgeliefert») und dem PR nach `main`. Die Checkliste
-  entfällt, weil es noch keine Test-Umgebung gibt. Tags werden nicht von Hand gesetzt, auch
-  nicht nachträglich; den ersten setzt die CI bei der ersten Live-Auslieferung.
+- **Solange `AUSLIEFERUNG_LIVE` aus ist,** gibt es keinen Tag und kein GitHub-Release, denn
+  der Job `release` läuft dann nicht. Ein Release besteht aus dem Versions-Commit auf `dev`
+  (Version in `package.json`, Abschnitt in den [Versionen](versionen.md) mit «nicht
+  ausgeliefert») und dem PR nach `main`. Tags werden nicht von Hand gesetzt, auch nicht
+  nachträglich; den ersten setzt die CI bei der ersten Live-Auslieferung.
+- **Die Checkliste entfällt nur, solange `AUSLIEFERUNG_TEST` aus ist** (es gibt kein Test).
+  Läuft Test schon und Live noch nicht, wird sie vor dem Release auf Test abgehakt.
 
 ## Alte Versionen auf dem Handy
 
