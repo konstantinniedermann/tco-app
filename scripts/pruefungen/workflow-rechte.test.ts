@@ -37,6 +37,12 @@ describe('pruefeWorkflow', () => {
 		expect(befunde).toHaveLength(1);
 		expect(befunde[0]).toContain(': Job pruefen:');
 	});
+	it('nimmt für einen Job namens constructor den Standard, nicht die Prototyp-Eigenschaft', () => {
+		const job = `  constructor:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo x`;
+		expect(pruefeWorkflow(W, workflow([job]))).toEqual([]);
+		const mitRecht = `  constructor:\n${perm('contents: read, packages: write')}\n    steps: []`;
+		expect(pruefeWorkflow(W, workflow([mitRecht]))).toHaveLength(1);
+	});
 	it('akzeptiert einen Job ohne Block bei Workflow-Ebene contents: read', () => {
 		expect(pruefeWorkflow(W, workflow([PRUEFEN]))).toEqual([]);
 	});

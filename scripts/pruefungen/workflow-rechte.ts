@@ -148,7 +148,7 @@ export function pruefeWorkflow(pfad: string, yaml: string): string[] {
 			} else wirksam = gelesen;
 		}
 		const sonderjobs = pfad === CI_DATEI;
-		const soll = (sonderjobs && JOB_RECHTE[name]) || STANDARD_RECHTE;
+		const soll = sonderjobs && Object.hasOwn(JOB_RECHTE, name) ? JOB_RECHTE[name] : STANDARD_RECHTE;
 		if (lesbar && !gleich(wirksam, soll)) {
 			job(name, `Rechte [${wirksam.join(', ')}] statt [${soll.join(', ')}]`);
 		}
