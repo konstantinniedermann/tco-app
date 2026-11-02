@@ -8,8 +8,16 @@ const SKRIPT = resolve(import.meta.dirname, 'code-stand.sh');
 
 let repo: string;
 
+// Im Pre-Commit-Hook setzt git GIT_INDEX_FILE und GIT_DIR; ohne Bereinigung träfen die
+// Aufrufe das echte Repo statt des Temp-Repos.
+function sauberesEnv(): NodeJS.ProcessEnv {
+	return Object.fromEntries(
+		Object.entries(process.env).filter(([name]) => !name.startsWith('GIT_'))
+	);
+}
+
 function git(...args: string[]): void {
-	execFileSync('git', args, { cwd: repo, stdio: 'ignore' });
+	execFileSync('git', args, { cwd: repo, stdio: 'ignore', env: sauberesEnv() });
 }
 
 function schreibe(pfad: string, inhalt: string): void {
@@ -19,7 +27,7 @@ function schreibe(pfad: string, inhalt: string): void {
 }
 
 function codeStand(): string {
-	return execFileSync('bash', [SKRIPT], { cwd: repo, encoding: 'utf-8' });
+	return execFileSync('bash', [SKRIPT], { cwd: repo, encoding: 'utf-8', env: sauberesEnv() });
 }
 
 beforeEach(() => {
@@ -44,6 +52,7 @@ describe('code-stand.sh', () => {
 		schreibe('docs/unter/y.png', 'bild\n');
 		schreibe('README.md', 'neu\n');
 		schreibe('src/hinweis.md', 'neu\n');
+		schreibe('docs/übersicht.md', 'neu\n');
 		expect(codeStand()).toBe(vorher);
 	});
 	it('ändert sich bei Änderungen an Code', () => {

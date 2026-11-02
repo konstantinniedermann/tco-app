@@ -15,7 +15,7 @@ fi
 
 # `git ls-files -s`: "<modus> <blob> <stufe><TAB><pfad>" — die Zeile enthält Modus, Blob,
 # Stufe und Pfad; die Pfade der Doku fallen heraus.
-git ls-files -s \
+git -c core.quotePath=false ls-files -s \
 	| awk -F '\t' '{ pfad = substr($0, index($0, "\t") + 1) } pfad !~ /^docs\// && pfad !~ /\.md$/' \
 	| hash_256 \
 	| cut -c1-40
