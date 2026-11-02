@@ -99,3 +99,16 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   Navigation, Du-Form und Barrierefreiheit `UI-NN`; Prüfungen gegen Abweichung zwischen
   Leitbild und Tokens und gegen Farb- und px-Werte im Code; Kopfleiste mit Wappen und
   App-Symbol (Annahmen K-13, K-13.2); Schrift folgt der Systemeinstellung des Geräts; Mockups.
+- Kosten (`docs/kosten.md`, #9): laufend ca. CHF 95–175 pro Jahr (VPS, Sicherungsablage,
+  E-Mail über Scaleway), einmalig nur der Druck des Login-Briefs (Porto entfällt, der Brief
+  geht mit dem Versand der Vereinsdokumente mit); Szenarien für 100, 200 und 300 Mitglieder,
+  Store-App und SMS nur als «falls»; jährliche Überprüfung vor dem Vereinsbudget;
+  Freigabe offen (K-03).
+- Login per Einmal-Code (#29, lokal, noch nicht ausgeliefert): Brief-Code und Mail-Code,
+  Sitzung ein Jahr gleitend in einer Tabelle, Abmelden und Widerruf, Bremsen gegen
+  Durchprobieren; Code-Mails lokal und in der CI über Mailpit. Begründung in ADR-004;
+  Fachmodell (FR-24 umgesetzt), Sicherheits- und Datenschutzkonzept nachgeführt.
+- Web-App-Manifest, damit MyTCO vom Startbildschirm als eigene App startet (noch ohne
+  Service Worker).
+- Musterbrief mit QR-Code, Brief-Code und Anleitung als PDF aus erfundenen Daten
+  (`make musterbrief`); `make seed` legt erfundene Mitglieder an und gibt einen Brief-Code aus.

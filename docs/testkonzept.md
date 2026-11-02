@@ -102,15 +102,20 @@ E-Mail ankommt. Jeder Punkt nennt die IDs, die er prüft:
 - [ ] MyTCO lässt sich auf den Startbildschirm legen und startet von dort
 - [ ] Login mit Einmal-Code klappt; nach Neustart des Handys weiterhin eingeloggt (A-LOGIN-08, A-LOGIN-09)
 - [ ] Neuer Code per E-Mail kommt an und landet nicht im Spam (A-LOGIN-10)
+- [ ] iPhone, App vom Startbildschirm: Code per E-Mail anfordern, App ganz schliessen, wieder öffnen → das Feld «Code aus der Mail» steht da (A-LOGIN-10)
+- [ ] Steht ein Einrichtungsabend an: mobile Daten statt Club-WLAN, oder die Grenzen pro IP vorher prüfen ([ADR-004](adr/adr-004-login-einmal-code.md), Restrisiken)
 - [ ] Push einschalten und erhalten (ab Etappe *CM-Betrieb*)
 - [ ] Admin-Seite am PC: die geänderten Funktionen einmal durchgehen
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 
-Falls der Verein eine Testgruppe stellt (K-20), prüft sie vor dem ersten Release
-*Mitglieder-Login* Brief, Installation und Login, ebenfalls mit erfundenen Testkonten.
+Falls der Verein eine Testgruppe stellt (K-20), prüft sie Brief, Installation und Login
+als Pilot auf Live, mit ihren eigenen echten Daten, bevor alle Mitglieder einen Brief
+bekommen. Mit welcher Version und Checkliste der Pilot live geht, klärt #40 zusammen mit #39. Das ist Betrieb, kein Test im Sinne von DS-08; vorher muss die
+Datenschutzerklärung gelten. Ablauf → [#40](https://github.com/konstantinniedermann/tco-app/issues/40).
 
 ## Werkzeuge
 
 Vitest (mit Abdeckungsmessung), Playwright und axe für Playwright. Sie werden
-installiert mit dem Code-Gerüst; vorher kommt keine Abhängigkeit ins Repo.
+installiert mit dem Code-Gerüst; vorher kommt keine Abhängigkeit ins Repo. Mails fängt
+Mailpit ab (lokal und in der CI); die Ende-zu-Ende-Tests lesen Codes über seine Schnittstelle.

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "mitglied_email_klein_unique" ON "mitglied" USING btree (lower("email"));

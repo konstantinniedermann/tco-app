@@ -60,6 +60,12 @@ nach `dev` bis zum Schliessen des Issues):
 M=/Users/KN/CAS/projekte/tco-app
 git -C $M status --short                          # muss leer sein
 git -C $M rev-parse -q --verify MERGE_HEAD        # muss leer sein
+```
+
+Erst wenn beide Prüfungen leer sind, mergen:
+
+```bash
+M=/Users/KN/CAS/projekte/tco-app
 git -C $M pull --ff-only origin dev
 git -C $M merge --no-ff <typ>/issue-NNN
 git -C $M push origin dev
@@ -109,9 +115,10 @@ git -C $M merge --no-edit origin/main && git -C $M push origin dev
   (`Blocked by` im Body), dort `blocked` entfernen, wenn kein weiterer Blocker bleibt.
 - Label entfernen (bei `issue-1-2` für jedes Issue): `gh issue edit NNN -R konstantinniedermann/tco-app --remove-label in-arbeit`.
 - Worktree verlassen (`ExitWorktree` mit `keep`), dann
-  `git -C /Users/KN/CAS/projekte/tco-app worktree remove .claude/worktrees/issue-NNN` — nur, wenn das Lagebild den
-  Worktree nicht als belegt zeigt (der Guard verweigert es sonst ohnehin); dann stehen
-  lassen und im Bericht nennen.
+  `git -C /Users/KN/CAS/projekte/tco-app worktree remove .claude/worktrees/issue-NNN` — nur, wenn keine andere
+  Session ihn belegt. Das Lagebild vom Session-Start kann Stunden alt sein, und der
+  Guard-Hook blockt nur bei sicher erkannter Belegung (fail-open) — er ist kein harter Schutz.
+  Belegt oder im Zweifel: stehen lassen und im Bericht nennen.
 - Branch löschen: `git -C /Users/KN/CAS/projekte/tco-app branch -d <typ>/issue-NNN` und
   `git -C /Users/KN/CAS/projekte/tco-app push origin --delete <typ>/issue-NNN`.
 

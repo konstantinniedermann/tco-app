@@ -15,3 +15,15 @@ services:
       interval: 2s
       timeout: 3s
       retries: 20
+  # Fängt alle Mails ab, die die App lokal und in den E2E-Tests verschickt (SMTP 51025).
+  # Ansehen unter http://localhost:58025; die E2E-Tests lesen die Codes über die API dort.
+  mail:
+    image: axllent/mailpit:v1.33
+    ports:
+      - '51025:1025'
+      - '58025:8025'
+    healthcheck:
+      test: ['CMD', '/mailpit', 'readyz']
+      interval: 2s
+      timeout: 3s
+      retries: 20

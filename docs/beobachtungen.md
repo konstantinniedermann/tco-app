@@ -50,7 +50,7 @@ jeder Eintrag genau einen von sechs Ausgängen:
 
 | Ausgang | Bedeutung |
 |---------|-----------|
-| **Verworfen** | Die Behauptung trifft nicht zu. Eintrag wandert mit **Gegenbeleg** ins Archiv — der Beleg verhindert, dass derselbe Fund wiederkommt |
+| **Verworfen** | Die Behauptung trifft nicht zu. Eintrag wandert mit **Gegenbeleg** ins [Archiv](beobachtungen-archiv.md) — der Beleg verhindert, dass derselbe Fund wiederkommt |
 | **Abhaken** | Trifft zu, wir tun bewusst nichts. Mit Begründung, und wo sinnvoll mit **Reevaluations-Trigger** („kommt zurück, wenn …") |
 | **Mitmachen** | Trivial-Fix, sofort erledigt, eigener Commit |
 | **Doku / Regel / Memory** | Erkenntnis ohne Vorgang — ADR, arc42, `CLAUDE.md` oder Memory |
@@ -106,9 +106,11 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 - **„Notieren" ist kein Ausgang.** Es klingt nach Entscheidung, ist aber
   Vertagung, und genau daran wächst die Datei. Wo etwas später wieder relevant
   wird, ist der richtige Ausgang „Abhaken **mit Trigger**".
-- **Erledigtes wird eingedampft** und wandert ins Archiv: eine Zeile mit Ausgang
-  und Verweis; die Begründung lebt dort, wo sie hingehört (Issue-Body, Commit,
+- **Erledigtes wird eingedampft** und wandert ins [Archiv](beobachtungen-archiv.md),
+  als neuer Block pro Auswertung (neuester oben): eine Zeile mit Ausgang und Verweis; die Begründung lebt dort, wo sie hingehört (Issue-Body, Commit,
   Memory). Ausnahme sind verworfene Einträge — die behalten ihren Gegenbeleg.
+
+Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ---
 
@@ -222,6 +224,7 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 **Erledigt 2026-11-02 (#32 Gesamt-Review):** `workflow-rechte.ts` nutzt jetzt `Object.hasOwn` (mit Test für einen Job `constructor`); die Zählung der 30 Tage steht als Fakt in `docs/ci-cd-und-release.md`. Bei der nächsten Auswertung beide Punkte streichen.
 
+*Keine offenen Einträge.*
 ### 2026-11-01 — Kleinbefunde aus den Task-Reviews des Code-Gerüsts
 
 **Thema:** Code-Gerüst
@@ -291,6 +294,8 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** #15 Abschluss-Review.
 
 **Einschätzung:** Unkritisch, solange E2E nur `select 1` ausführt; eigene Datenbank pro Lauf, sobald E2E Daten schreibt ([#29](https://github.com/konstantinniedermann/tco-app/issues/29)).
+
+**Nachtrag (02.11.2026, #29):** Jetzt schreibt E2E: erfundene Konten und die Migrationen des eigenen Branches landen in der gemeinsamen lokalen Datenbank (`tests/e2e/hilfen/umgebung.ts`, `DATENBANK_URL`). Die Vitest-Tests haben schon eine eigene Datenbank pro Lauf (`tests/setup/datenbank-global.ts`); dasselbe für E2E würde es lösen.
 
 ### 2026-11-01 — Start des Images und `node scripts/migrate.ts` ohne Rauchtest in der CI
 
@@ -587,3 +592,172 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** #32, Task 6 (zweiter Lauf von `make betrieb-nachweis`).
 
 **Einschätzung:** Gering, nur lokal. Abhilfe wäre ein Tag je Worktree (z. B. aus dem Ordnernamen), wenn es öfter zuschlägt.
+### 2026-11-02 — Fehlversuche mit dem Brief-Code zählen erst nach der Datenbankabfrage
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/login/dienst.ts` (Login mit Brief-Code), `src/lib/server/login/bremse.ts` (`briefFehlerProIp`).
+
+**Beobachtung:** Die Grenze von 10 Fehlversuchen pro IP und Stunde wird vor der Abfrage geprüft, der Fehlversuch aber erst danach gezählt. Ein paralleler Schwall von Anfragen einer IP kann die 10 so einmal pro Fenster überschreiten. Beim Mail-Code ist das behoben (Versuch wird vorher gezählt).
+
+**Ursprung:** #29, Review von Task 6.
+
+**Einschätzung:** Bei rund 50 Bit pro Brief-Code unerheblich. Angleichen, falls die Bremse ohnehin umgebaut wird (z. B. in die Datenbank, ADR-004 Trigger 2).
+
+### 2026-11-02 — Bremse vergisst Einträge erst bis zu 24 h 10 min nach dem letzten Ereignis
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/login/bremse.ts` (`erstelleBremsen`, Aufräumen alle 10 Minuten); DS-06 in `docs/datenschutz.md`.
+
+**Beobachtung:** Das Tagesfenster pro Adresse ist 24 h lang, der Zeitgeber räumt alle 10 Minuten auf. Ein Eintrag, der nicht mehr abgefragt wird, liegt so im ungünstigsten Fall rund 24 h 10 min im Arbeitsspeicher. DS-06 sagt «höchstens 24 Stunden». Die IP-Zähler haben nur 1-Stunden-Fenster und sind nicht betroffen.
+
+**Ursprung:** #29, Review.
+
+**Einschätzung:** Gering, nur Arbeitsspeicher und nur die normalisierte Adresse. Wenn es streng gelten soll: Fenster auf 24 h minus Aufräumabstand setzen oder öfter aufräumen.
+
+### 2026-11-02 — E-Mail-Adresse ist eindeutig mit Gross-/Kleinschreibung, der Login sucht ohne
+
+**Thema:** Fachmodell
+
+**Fundort:** `src/lib/server/db/schema.ts` (`mitglied_email_unique`), `src/lib/server/login/dienst.ts` (Suche über `lower(email)`).
+
+**Beobachtung:** Der eindeutige Index auf `mitglied.email` unterscheidet Gross- und Kleinschreibung, die Suche beim Mail-Code vergleicht klein geschrieben. Zwei Mitglieder mit `A@…` und `a@…` wären möglich, der Login fände beide.
+
+**Ursprung:** #29, Review von Task 7.
+
+**Einschätzung:** Heute ohne Folge, Adressen kommen nur aus Seed-Daten. Mit dem Import oder der Verwaltung der Mitglieder einen eindeutigen Index auf `lower(email)` anlegen (FR-25).
+
+**Erledigt 2026-11-02:** In #29 eindeutiger Index `mitglied_email_klein_unique` auf `lower(email)` (Migration `drizzle/0002_email_klein.sql`, Test in `src/lib/server/db/schema.db.test.ts`). Bei der nächsten Auswertung ins Archiv.
+
+### 2026-11-02 — Brief verweist auf eine Datenschutzerklärung, die es in der App noch nicht gibt
+
+**Thema:** Datenschutz
+
+**Fundort:** `src/lib/server/brief/brief.ts` (Verweis auf `<App-Adresse>/datenschutz`), Login-Seite ohne Link «Datenschutz»; DS-09.
+
+**Beobachtung:** Der Musterbrief nennt die Adresse der Datenschutzerklärung, die Seite fehlt aber. Die Login-Seite lässt den Link aus dem Mockup deshalb weg. DS-09 verlangt die Erklärung auch ohne Login erreichbar.
+
+**Ursprung:** #29 (Entscheide des Controllers während der Umsetzung).
+
+**Einschätzung:** Muss vor dem ersten Live-Release gebaut sein, sonst stimmt der Brief nicht (Text ist Entwurf, Freigabe K-06). Dann den Link auf der Login-Seite ergänzen.
+
+### 2026-11-02 — Prüfung `testdaten` hält Zugangsdaten in URLs für E-Mail-Adressen
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `scripts/pruefungen/testdaten.ts` (Muster `MAIL`).
+
+**Beobachtung:** Eine Verbindungs-URL mit Benutzer vor dem `@` (z. B. für SMTP oder die Datenbank) gilt als E-Mail-Adresse mit fremder Domain und wird gemeldet. In #29 wurden die Tests darum umgeschrieben.
+
+**Ursprung:** #29, Review von Task 9.
+
+**Einschätzung:** Gering, Fehlalarm in sicherer Richtung. Beheben, wenn er wieder stört: Treffer direkt nach `://` ausnehmen.
+
+### 2026-11-02 — Abstand vor Nebenaktionen mit `<p><br/>`, das Leitbild hat keinen Baustein
+
+**Thema:** UI-Leitbild
+
+**Fundort:** `src/routes/login/+page.svelte`, `src/routes/login/mail/+page.svelte`; `docs/ui-mockups/index.html`.
+
+**Beobachtung:** Der Abstand vor «Kein Brief zur Hand?» und «Neuen Code schicken» entsteht wie im Mockup mit einem Zeilenumbruch. Einen Baustein oder ein Token für diesen Abstand gibt es im Leitbild nicht.
+
+**Ursprung:** #29, Login-Seite.
+
+**Einschätzung:** Gering. Mit #13 einen Baustein für Nebenaktionen ins Leitbild aufnehmen, dann Mockup und Seiten umstellen.
+
+### 2026-11-02 — Ein-Seiten-Prüfung des Briefs läuft nur in `make musterbrief`
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `scripts/musterbrief.ts` (`zaehleSeiten`).
+
+**Beobachtung:** Dass der Brief auf eine A4-Seite passt, prüft nur das Skript. Die CI erzeugt das PDF nicht, eine Änderung an Text oder Schrift kann den Brief unbemerkt auf zwei Seiten bringen.
+
+**Ursprung:** #29, Task 11.
+
+**Einschätzung:** Gering, solange nur der Musterbrief existiert. Wenn der Admin Briefe aus der Verwaltung druckt, braucht dieser Weg dieselbe Prüfung, am besten als Test.
+
+### 2026-11-02 — Wechselnde IPv6-Adressen umgehen die Grenzen pro IP
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/login/bremse.ts` (`briefFehlerProIp`, `mailFehlerProIp`, `anfragenProIp`), `src/lib/server/login/dienst.ts`.
+
+**Beobachtung:** Die Grenzen zählen pro einzelner IP-Adresse. Ein Anschluss mit IPv6 hat meist ein ganzes /64-Netz und kann die Adresse bei jedem Versuch wechseln; so greifen die Grenzen pro IP nicht.
+
+**Ursprung:** #29, abschliessendes Review.
+
+**Einschätzung:** Gering bis mittel; der Brief-Code bleibt durch seine Länge geschützt, Mail-Codes durch die Grenze von 5 Versuchen pro Code. Mit #32 (Betrieb) IPv6-Clients vor dem Zählen auf ihr /64 zusammenfassen, im Proxy oder in der App.
+
+### 2026-11-02 — Ein Mail-Code-Test kann mit Wahrscheinlichkeit 1 zu einer Million scheitern
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `src/lib/server/login/mailcode.db.test.ts`, Test «neuer Mail-Code ersetzt nur den alten».
+
+**Beobachtung:** Der Test stellt zwei Mail-Codes nacheinander aus und erwartet, dass der erste danach nicht mehr gilt. Sind beide zufällig gleich (6 Ziffern), schlägt er fehl.
+
+**Ursprung:** #29, abschliessendes Review.
+
+**Einschätzung:** Sehr gering. Bei Gelegenheit den zweiten Code neu ziehen, falls er dem ersten gleicht.
+
+### 2026-11-02 — Die E2E-Tests brauchen schon 6 der 10 Code-Anfragen pro IP und Stunde
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `tests/e2e/login.test.ts`, Grenzen in `src/lib/server/login/bremse.ts`.
+
+**Beobachtung:** Alle drei Browser-Projekte kommen von 127.0.0.1 an denselben Server. Die Login-Tests verbrauchen pro Lauf 6 der 10 erlaubten Code-Anfragen pro IP und Stunde; zwei weitere Mail-Code-Tests reichen, um an die Grenze zu stossen.
+
+**Ursprung:** #29, abschliessendes Review.
+
+**Einschätzung:** Gering, aber absehbar. Vor dem nächsten Mail-Code-E2E die Grenzen für den E2E-Server einstellbar machen (Einstellung, kein Sonderweg im Code).
+
+### 2026-11-02 — Login-Seiten zeigen nicht, dass eine Anfrage läuft
+
+**Thema:** UI-Leitbild
+
+**Fundort:** `src/routes/login/+page.svelte`, `src/routes/login/mail/+page.svelte`, `src/routes/+page.svelte`.
+
+**Beobachtung:** Tasten bleiben während einer Anfrage aktiv (damit der Fokus nicht verloren geht), doppelte Klicks werden still ignoriert. Bei langsamem Netz sieht das Mitglied keine Rückmeldung.
+
+**Ursprung:** #29, Review Task 9.
+
+**Einschätzung:** Gering bis mittel für die Bedienung. Mit #13 einen «läuft»-Zustand für Tasten ins Leitbild aufnehmen (z. B. `aria-busy` mit sichtbarem Hinweis).
+
+### 2026-11-02 — Beim Einlösen eines Mail-Codes wird die Sperre nicht nochmals geprüft
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/login/dienst.ts`, `loginMitMailCode` (bedingtes Verbrauchen nach der Reservierung).
+
+**Beobachtung:** Die Reservierung prüft, ob das Konto gesperrt und das Mitglied aktiv ist, das anschliessende Verbrauchen nicht mehr. Wird ein Konto genau in den Millisekunden dazwischen gesperrt, entsteht trotzdem eine Sitzung.
+
+**Ursprung:** #29, Re-Review Task 7.
+
+**Einschätzung:** Sehr gering. Die Sitzung wäre beim nächsten Aufruf ungültig (Prüfung der Sitzung schaut auf `gesperrt`). Bei Gelegenheit die Bedingung ins Verbrauchen übernehmen.
+
+### 2026-11-02 — Login-Dienst zieht nodemailer in seinen Modulgraphen
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `src/lib/server/login/dienst.ts` (Import `baueCodeMail` aus `mail.ts`), `src/lib/server/login/mail.ts` (Typ `Mailer` aus `dienst.ts`).
+
+**Beobachtung:** Der Mailversand wird in den Dienst hineingereicht, trotzdem importiert der Dienst `mail.ts` und damit nodemailer. Zwischen den beiden Dateien besteht ein Zyklus über Typen.
+
+**Ursprung:** #29, Review Task 7.
+
+**Einschätzung:** Gering, ohne Folge im Betrieb. Beim nächsten Umbau `Mailer` und `baueCodeMail` in ein Modul ohne nodemailer legen.
+
+### 2026-11-02 — Manifest ohne `id` und ohne Symbol für Android-Masken
+
+**Thema:** UI-Leitbild
+
+**Fundort:** `static/manifest.webmanifest`.
+
+**Beobachtung:** Es fehlt ein Symbol mit `purpose: "maskable"`; Android zeigt das App-Symbol deshalb mit weissem Rand. Ohne `id` leitet Chrome die Identität der App aus `start_url` ab.
+
+**Ursprung:** #29, Review Task 10.
+
+**Einschätzung:** Gering. Mit der PWA-Arbeit (Service Worker) ein maskierbares Symbol gestalten und `"id": "/"` setzen.

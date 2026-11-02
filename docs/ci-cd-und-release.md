@@ -211,12 +211,40 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 | GitHub (Secrets) | `SSH_SCHLUESSEL_TEST`, `SSH_SCHLUESSEL_LIVE`, `SSH_BEKANNTE_HOSTS` (die `known_hosts`-Zeile des Servers mit seinem öffentlichen Schlüssel, kein Fingerabdruck), `SERVER_ADRESSE` |
 | GitHub (Variablen, keine Geheimnisse) | `AUSLIEFERUNG_TEST`, `AUSLIEFERUNG_LIVE` |
 | CI-Lauf | kurzlebiges Token zum Lesen der Container-Ablage, das die CI für den Pull mitgibt; auf dem Server bleibt kein dauerhaftes Token |
-| Server, je Umgebung | `geheim.env`: Datenbank-Passwort, Adresse der Umgebung, auf Test der einzige Mail-Empfänger (Projektleiter); ab [#29](https://github.com/konstantinniedermann/tco-app/issues/29) dazu Schlüssel für Push und Zugang zum E-Mail-Versand (die Vorlage hat sie noch nicht) |
+| Server, je Umgebung | `geheim.env`: Datenbank-Passwort, Schlüssel für die Codes (`MYTCO_CODE_SCHLUESSEL`, je eigener für Test und Live), Zugang zum E-Mail-Versand (`MYTCO_SMTP_URL`), Absender, Kontakt, Adresse der Umgebung, auf Test der einzige Mail-Empfänger (Projektleiter); Schlüssel für Push folgt mit der Push-Funktion |
 | Server, gemeinsam | `proxy.env` (Adressen, Passwort-Hash für Test), `sicherung.env` (Ziel und Zugang der Sicherung) |
 
 Die Dateien liegen nur auf dem Server (Rechte 600), im Repo stehen Vorlagen ohne Werte. Wo die
 Geheimnisse für eine Nachfolge dokumentiert sind, regelt
 [#10](https://github.com/konstantinniedermann/tco-app/issues/10).
+
+## Einstellungen der App
+
+Die App liest ihre Einstellungen aus Umgebungsvariablen. Lokal stehen sie in `.env` (Vorlage
+`.env.example`, kopieren); `make dev` und `make seed` brechen ohne diese Datei ab. Fehlt ein
+Pflichtwert, startet der Server nicht. Beim Bauen werden sie nicht geprüft.
+
+| Variable | Inhalt | Pflicht |
+|----------|--------|---------|
+| `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
+| `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
+| `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
+| `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text, steht im Brief und in der Meldung «Code schon benutzt» (Annahme K-21) | ja |
+| `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
+
+**Schnittstelle zu [#32](https://github.com/konstantinniedermann/tco-app/issues/32):**
+Hinter dem Reverse Proxy muss `adapter-node` die Client-IP aus einer Kopfzeile lesen, die nur
+der Proxy setzt (`ADDRESS_HEADER`, bei `X-Forwarded-For` dazu `XFF_DEPTH`). Sonst teilen alle
+Mitglieder die IP des Proxys, und die Bremsen pro IP sperren alle zusammen. `PROTOCOL_HEADER`
+nur setzen, wenn der Proxy die Kopfzeile zuverlässig setzt. Die E2E-Tests setzen sie nur,
+damit WebKit das Cookie auf `http://localhost` annimmt. IPv6-Clients vor dem Zählen auf ihr
+/64-Netz zusammenfassen (im Proxy oder in der App), sonst umgeht ein Wechsel der Adresse die
+Bremsen pro IP. Mail-Versand nur mit TLS: `smtps://` oder STARTTLS erzwungen.
+
+**Mails lokal und in der CI:** Mailpit (`axllent/mailpit:v1.33`) fängt alle Mails ab, lokal
+über `docker-compose.yml` (`make db`; SMTP auf Port 51025, Oberfläche auf
+`http://localhost:58025`), in der CI als Service des E2E-Jobs. Die E2E-Tests lesen den
+Mail-Code über die Schnittstelle von Mailpit.
 
 ## Prüfungen in der CI
 
