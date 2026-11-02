@@ -95,7 +95,13 @@ export async function postLogout(d: LoginDienst, e: Ereignis): Promise<Response>
 
 // Fehlerbehandlung ohne Inhalt: Fehlermeldungen der Datenbank können Parameter enthalten,
 // also Adressen oder Codes (SI-05). Darum nur feste Texte, weder Meldung noch Stack.
-export function behandleFehler(): { message: string } {
+// Nur 'unknown' ist ein Fehler aus unserem Code; 'app' (error()) und 'framework' (404, 405 …)
+// tragen eine sichere Meldung und gehen unverändert durch, ohne Log.
+export function behandleFehler(
+	kind: 'app' | 'framework' | 'validation' | 'unknown',
+	error: unknown
+): { status?: number; message?: string } {
+	if (kind !== 'unknown') return error as { status?: number; message?: string };
 	console.error('Interner Fehler');
 	return { message: 'Interner Fehler' };
 }

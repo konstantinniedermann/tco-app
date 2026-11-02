@@ -316,12 +316,22 @@ describe('Schnittstellen', () => {
 			return m;
 		};
 
-		test('behandleFehler loggt nur einen festen Text', () => {
+		test('behandleFehler: unbekannter Fehler loggt nur einen festen Text', () => {
 			const vorher = logs.error.mock.calls.length;
-			const r = behandleFehler();
+			const r = behandleFehler('unknown', new Error(geheimeMeldung()));
 			expect(r).toEqual({ message: 'Interner Fehler' });
 			expect(logs.error.mock.calls.slice(vorher)).toEqual([['Interner Fehler']]);
 		});
+
+		test.each(['framework', 'app'] as const)(
+			'behandleFehler: %s-Fehler bleibt unverändert und ohne Log',
+			(kind) => {
+				const vorher = logs.error.mock.calls.length;
+				const fehler = { status: 404, message: 'Not Found' };
+				expect(behandleFehler(kind, fehler)).toBe(fehler);
+				expect(logs.error.mock.calls.length).toBe(vorher);
+			}
+		);
 
 		test('ein werfender Dienst: der Handler loggt nichts und reicht den Fehler weiter', async () => {
 			const meldung = geheimeMeldung();

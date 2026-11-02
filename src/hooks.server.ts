@@ -11,7 +11,7 @@ export const init: ServerInit = () => {
 };
 
 // SvelteKits Standard loggt den Stack samt Meldung; die kann Adressen und Codes enthalten.
-export const handleError: HandleServerError = () => behandleFehler();
+export const handleError: HandleServerError = ({ kind, error }) => behandleFehler(kind, error);
 
 export const handle: Handle = async ({ event, resolve }) => {
 	if (event.url.pathname.startsWith('/api/')) {
