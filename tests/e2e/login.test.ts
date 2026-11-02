@@ -176,7 +176,11 @@ test('A-LOGIN-10: Code per E-Mail, mit Neuladen zwischen Anfrage und Eingabe', a
 	expect(fehler).toEqual([]);
 });
 
-test('Gerätespeicher: Login mit Brief-Code löscht eine offene Mail-Anfrage', async ({ page }) => {
+// Eine Anfrage pro Projekt für beide Fälle: die Grenze von 10 Code-Anfragen pro IP und Stunde
+// gilt für den ganzen Lauf über alle drei Projekte.
+test('Kaltstart mit offener Mail-Anfrage zeigt das Feld «Code aus der Mail»; Login mit Brief-Code löscht die Anfrage', async ({
+	page
+}) => {
 	const fehler = sammleKonsolenfehler(page);
 	const konto = await legeKontoMitBriefCodeAn('Rina');
 	await page.goto('/login/mail');
@@ -185,8 +189,18 @@ test('Gerätespeicher: Login mit Brief-Code löscht eine offene Mail-Anfrage', a
 	await expect(page.getByLabel('Code aus der Mail')).toBeVisible();
 	expect(await leseMailanfrage(page)).toContain(konto.email);
 
+	// iOS beendet die Startbildschirm-App beim Wechsel in die Mail-App; sie startet neu auf `/`.
+	await page.goto('/');
+	await expect(page).toHaveURL(/\/login\/mail$/);
+	await expect(page.getByLabel('Code aus der Mail')).toBeVisible();
+
+	// «‹ Zurück» führt zur Brief-Seite und springt nicht wieder zurück.
+	await page.getByRole('link', { name: '‹ Zurück' }).click();
+	await expect(page).toHaveURL(/\/login$/);
+	await expect(page.getByLabel('Code aus dem Brief')).toBeVisible();
+	await expect(page).toHaveURL(/\/login$/);
+
 	// Doch noch den Brief gefunden.
-	await page.goto('/login');
 	await page.getByLabel('Code aus dem Brief').fill(konto.code);
 	await page.getByRole('button', { name: 'Anmelden' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Rina' })).toBeVisible();
