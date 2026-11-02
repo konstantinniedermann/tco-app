@@ -447,3 +447,27 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** Code-Review von #13.
 
 **Einschätzung:** Gering. Mit dem ersten echten Formular (Login, #29) ergänzen, z. B. Fehlermeldung „Code schon benutzt“.
+
+### 2026-11-02 — Einheitstests der Betriebsskripte lassen ihre Temp-Ordner liegen
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `tests/betrieb/hilfe.ts` (`fuehreAus`), `tests/betrieb/sicherung.test.ts` (`baue`) und weitere `mkdtempSync`-Aufrufe in `tests/betrieb/`.
+
+**Beobachtung:** Jeder Lauf von `npx vitest run tests/betrieb/` legt pro Test einen Ordner `mytco-basis-*` in `$TMPDIR` an und entfernt ihn nicht; lokal liegen davon schon Hunderte.
+
+**Ursprung:** #32, Task 6 (Aufräumprüfung nach `make betrieb-nachweis`).
+
+**Einschätzung:** Gering, nur Platz im Temp-Ordner. Mit einem `afterEach`, das die angelegten Ordner löscht, beheben, wenn die Tests ohnehin angefasst werden.
+
+### 2026-11-02 — `mytco:lokal` ist ein gemeinsamer Tag aller Worktrees
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `Makefile` (`image`, `rauchtest`, `betrieb-nachweis`).
+
+**Beobachtung:** Alle Worktrees bauen in dasselbe Docker unter demselben Tag `mytco:lokal`. Während eines `make betrieb-nachweis` hat eine parallele Session den Tag mit einem Stand ohne `betrieb/` neu gebaut; Images, die danach `FROM mytco:lokal` bauten, waren falsch. Der Nachweis markiert das Image darum beim Start mit einem eigenen Tag. `make rauchtest` und das kurze Fenster zwischen `make image` und dem Start des Nachweises sind weiter betroffen.
+
+**Ursprung:** #32, Task 6 (zweiter Lauf von `make betrieb-nachweis`).
+
+**Einschätzung:** Gering, nur lokal. Abhilfe wäre ein Tag je Worktree (z. B. aus dem Ordnernamen), wenn es öfter zuschlägt.
