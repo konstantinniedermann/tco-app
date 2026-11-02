@@ -89,3 +89,7 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   alte nicht erreichbar, ändert der Admin nach Rückfrage (SI-09, FR-25). Kein SMS-Code.
 - Abgleich mit dem Anforderungsdokument v1.2: neue Fragen an den Verein zu Junioren an der
   Clubmeisterschaft 2027 (K-46) und zu einer Beispieldatei aus Advantage (K-47).
+- UI-Leitbild (`docs/ui-leitbild.md`, #13): Corporate Design mit Design-Tokens, Bausteinen,
+  Navigation, Du-Form und Barrierefreiheit `UI-NN`; Prüfungen gegen Abweichung zwischen
+  Leitbild und Tokens und gegen Farb- und px-Werte im Code; Kopfleiste mit Wappen und
+  App-Symbol (Annahmen K-13, K-13.2); Schrift folgt der Systemeinstellung des Geräts; Mockups.

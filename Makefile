@@ -25,6 +25,7 @@ docs: ## Doku-Prüfung (Links, Struktur, Test-IDs; braucht nur Node, kein node_m
 	@bash scripts/check-docs.sh
 	@node scripts/pruefungen/test-ids.ts
 	@node scripts/pruefungen/annahmen.ts
+	@node scripts/pruefungen/design-tokens.ts
 
 annahmen: ## Annahmen zu offenen Fragen an den Verein auflisten (alle, oder nur eine: make annahmen K=K-11)
 	@node scripts/pruefungen/annahmen.ts --liste $(K)

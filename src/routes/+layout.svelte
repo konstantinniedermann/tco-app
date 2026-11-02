@@ -1,13 +1,23 @@
 <script lang="ts">
+	import '../lib/design/tokens.css';
+	import '../lib/design/basis.css';
+	import { asset } from '$app/paths';
 	import { APP_VERSION } from '../lib/version';
 
 	let { children } = $props();
 </script>
 
-<main>
-	{@render children()}
-</main>
+<div class="app">
+	<header class="kopf">
+		<img class="kopf-wappen" src={asset('wappen.svg')} alt="" />
+		MyTCO
+	</header>
 
-<footer>
-	<p data-testid="version">Version {APP_VERSION}</p>
-</footer>
+	<main class="inhalt">
+		{@render children()}
+	</main>
+
+	<footer class="inhalt leise">
+		<p data-testid="version">Version {APP_VERSION}</p>
+	</footer>
+</div>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="de-CH">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>MyTCO — Mockups</title>
+		<link rel="stylesheet" href="../../src/lib/design/tokens.css" />
+		<link rel="stylesheet" href="../../src/lib/design/basis.css" />
+		<link rel="stylesheet" href="mockup.css" />
+	</head>
+	<body class="mockup-seite">
+		<svg width="0" height="0" aria-hidden="true">
+			<symbol id="s-start" viewBox="0 0 24 24">
+				<path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />
+			</symbol>
+			<symbol id="s-cm" viewBox="0 0 24 24">
+				<path
+					d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 21h8"
+				/>
+			</symbol>
+			<symbol id="s-profil" viewBox="0 0 24 24">
+				<circle cx="12" cy="8" r="4" />
+				<path d="M4 21a8 8 0 0 1 16 0" />
+			</symbol>
+		</svg>
+
+		<h1>MyTCO — Mockups</h1>
+		<p>
+			Gebaut aus denselben Dateien wie die App (<code>tokens.css</code>, <code>basis.css</code>);
+			Regeln im <a href="../ui-leitbild.md">UI-Leitbild</a>. Alle Namen und Adressen sind
+			erfunden. Dieselben Bildschirme mit grosser Systemschrift:
+			<a href="grosse-schrift.html">grosse-schrift.html</a>.
+		</p>
+
+		<div class="mockup-reihe">
+			<!-- 1 Login -->
+			<figure class="mockup-geraet">
+				<div class="handy app">
+					<header class="kopf">
+						<img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO
+					</header>
+					<main class="inhalt">
+						<h1>Anmelden</h1>
+						<p>Tipp den Code aus deinem Brief ein.</p>
+						<div class="feld feld-code">
+							<label for="code">Code aus dem Brief</label>
+							<span class="feld-hilfe">10 Zeichen, gross oder klein ist egal</span>
+							<input id="code" value="K7MXP-4Q9RT" autocomplete="one-time-code" />
+						</div>
+						<button class="taste-haupt taste-breit">Anmelden</button>
+						<p><br /><a href="#mail">Kein Brief zur Hand? Code per E-Mail</a></p>
+						<p class="leise"><a href="#datenschutz">Datenschutz</a></p>
+					</main>
+				</div>
+				<figcaption class="leise">1 · Login mit Brief-Code (noch ohne Reiter)</figcaption>
+			</figure>
+
+			<!-- 2 Erstes Login -->
+			<figure class="mockup-geraet">
+				<div class="handy app">
+					<header class="kopf">
+						<img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO
+					</header>
+					<main class="inhalt">
+						<a class="zurueck" href="#schritt-1">‹ Zurück</a>
+						<div class="zaehler">
+							<div class="zaehler-balken"><span class="zaehler-voll"></span><span class="zaehler-voll"></span><span></span></div>
+							<div class="zaehler-text">Schritt 2 von 3 · Kontakt</div>
+						</div>
+						<h1>Wie erreicht man dich?</h1>
+						<p>Gegner und Doppelpartner sehen das während der Clubmeisterschaft, um Spiele abzumachen.</p>
+						<div class="feld">
+							<label for="mail">E-Mail</label>
+							<input id="mail" type="email" value="anna.muster@example.org" />
+						</div>
+						<div class="feld">
+							<label for="tel">Telefon</label>
+							<input id="tel" type="tel" value="079 000 00 00" />
+						</div>
+						<button class="taste-haupt taste-breit">Weiter</button>
+					</main>
+				</div>
+				<figcaption class="leise">
+					2 · Erstes Login in 3 Schritten: 1 Angaben prüfen · 2 Kontakt · 3 Tennis
+				</figcaption>
+			</figure>
+
+			<!-- 3 Startseite -->
+			<figure class="mockup-geraet">
+				<div class="handy app">
+					<header class="kopf">
+						<img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO
+					</header>
+					<main class="inhalt">
+						<h1>Hoi Beat</h1>
+						<h2>Jetzt aktuell</h2>
+						<a class="karte kachel hervor" href="#cm">
+							<span><strong>Clubmeisterschaft 2027</strong><br /><span class="leise">Anmeldung offen bis 15. Mai</span></span>
+							<span class="kachel-pfeil" aria-hidden="true">›</span>
+						</a>
+						<h2>Du bist angemeldet</h2>
+						<a class="karte kachel" href="#anmeldung">
+							<span><strong>Herren Einzel R6–R9</strong><br /><span class="plakette plakette-ok">✓ bestätigt</span></span>
+							<span class="kachel-pfeil" aria-hidden="true">›</span>
+						</a>
+					</main>
+					<nav class="reiter" aria-label="Hauptnavigation">
+						<a href="#start" aria-current="page"><svg class="symbol" aria-hidden="true"><use href="#s-start" /></svg>Start</a>
+						<a href="#cm"><svg class="symbol" aria-hidden="true"><use href="#s-cm" /></svg>CM</a>
+						<a href="#profil"><svg class="symbol" aria-hidden="true"><use href="#s-profil" /></svg>Profil</a>
+					</nav>
+				</div>
+				<figcaption class="leise">3 · Startseite mit Reitern unten</figcaption>
+			</figure>
+
+			<!-- 4 CM-Anmeldung -->
+			<figure class="mockup-geraet">
+				<div class="handy app">
+					<header class="kopf">
+						<img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO
+					</header>
+					<main class="inhalt">
+						<h1>Clubmeisterschaft 2027</h1>
+						<p class="leise">Anmeldeschluss: Samstag, 15. Mai 2027</p>
+						<div class="zaehler">
+							<div class="zaehler-balken"><span class="zaehler-voll"></span><span></span><span></span></div>
+							<div class="zaehler-text">1 von 3 Anmeldungen</div>
+						</div>
+						<h2>Deine Anmeldungen</h2>
+						<div class="karte kachel">
+							<span><strong>Herren Einzel R6–R9</strong><br /><span class="plakette plakette-ok">✓ bestätigt</span></span>
+							<a class="leise" href="#zurueckziehen">Zurückziehen</a>
+						</div>
+						<h2>Passt zu dir</h2>
+						<div class="karte kachel">
+							<span><strong>Herren 65+ Einzel</strong><br /><span class="leise">Jahrgang 1962 und älter</span></span>
+							<button class="taste-haupt">Anmelden</button>
+						</div>
+						<div class="karte kachel">
+							<span><strong>Herren Doppel</strong><br /><span class="leise">Partner wählst du danach</span></span>
+							<button class="taste-neben">Anmelden</button>
+						</div>
+						<p><a href="#wildcard">Andere Kategorie mit Wildcard beantragen</a></p>
+					</main>
+					<nav class="reiter" aria-label="Hauptnavigation">
+						<a href="#start"><svg class="symbol" aria-hidden="true"><use href="#s-start" /></svg>Start</a>
+						<a href="#cm" aria-current="page"><svg class="symbol" aria-hidden="true"><use href="#s-cm" /></svg>CM</a>
+						<a href="#profil"><svg class="symbol" aria-hidden="true"><use href="#s-profil" /></svg>Profil</a>
+					</nav>
+				</div>
+				<figcaption class="leise">4 · CM-Anmeldung mit Mengen-Zähler</figcaption>
+			</figure>
+		</div>
+
+		<!-- 5 Mitgliederverwaltung -->
+		<figure class="mockup-geraet">
+			<div class="pc app">
+				<div class="verwaltung">
+					<nav class="seitenleiste" aria-label="Verwaltung">
+						<div class="kopf">
+							<img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO Verwaltung
+						</div>
+						<div class="seitenleiste-bereich">Admin</div>
+						<a href="#mitglieder" aria-current="page">Mitglieder</a>
+						<a href="#verlauf">Änderungsverlauf</a>
+						<div class="seitenleiste-bereich">Clubmeisterschaft</div>
+						<a href="#turnier">Turnier und Kategorien</a>
+						<a href="#anmeldungen">Anmeldungen</a>
+						<div class="seitenleiste-bereich">&nbsp;</div>
+						<a href="#app">‹ Zur App</a>
+					</nav>
+					<main class="inhalt">
+						<h1>Mitglieder</h1>
+						<p class="leise">142 Mitglieder · 9 Briefe noch nicht eingelöst</p>
+						<div class="leiste">
+							<div class="feld">
+								<label for="suche">Suchen</label>
+								<input id="suche" type="search" placeholder="Name oder E-Mail" />
+							</div>
+							<div class="feld">
+								<label for="status">Status</label>
+								<select id="status"><option>Alle</option></select>
+							</div>
+							<button class="taste-neben">Exportieren</button>
+							<button class="taste-haupt">Mitglied anlegen</button>
+						</div>
+						<div class="tabelle">
+							<table>
+								<thead>
+									<tr><th>Name</th><th>E-Mail</th><th>Jahrgang</th><th>Rollen</th><th>Konto</th><th><span class="leise">Aktion</span></th></tr>
+								</thead>
+								<tbody>
+									<tr><td><strong>Beispiel, Beat</strong></td><td>beat.beispiel@example.org</td><td>1960</td><td>Mitglied</td><td><span class="plakette plakette-ok">aktiv</span></td><td><a href="#b">Bearbeiten</a></td></tr>
+									<tr><td><strong>Demo, Doris</strong></td><td>doris.demo@example.org</td><td>1984</td><td>CM-Verantwortliche</td><td><span class="plakette plakette-ok">aktiv</span></td><td><a href="#d">Bearbeiten</a></td></tr>
+									<tr><td><strong>Exempel, Erich</strong></td><td>erich.exempel@example.org</td><td>1949</td><td>Mitglied</td><td><span class="plakette plakette-offen">Brief offen</span></td><td><a href="#e">Bearbeiten</a></td></tr>
+									<tr><td><strong>Fantasie, Franz</strong></td><td>franz.fantasie@example.org</td><td>1971</td><td>Admin</td><td><span class="plakette plakette-ok">aktiv</span></td><td><a href="#f">Bearbeiten</a></td></tr>
+									<tr><td><strong>Gedacht, Gina</strong></td><td>gina.gedacht@example.org</td><td>1999</td><td>Mitglied</td><td><span class="plakette plakette-gesperrt">gesperrt</span></td><td><a href="#g">Bearbeiten</a></td></tr>
+									<tr><td><strong>Muster, Anna</strong></td><td>anna.muster@example.org</td><td>1956</td><td>Mitglied</td><td><span class="plakette plakette-offen">Brief offen</span></td><td><a href="#a">Bearbeiten</a></td></tr>
+								</tbody>
+							</table>
+						</div>
+					</main>
+				</div>
+			</div>
+			<figcaption class="leise">5 · Mitgliederverwaltung (Admin, PC)</figcaption>
+		</figure>
+	</body>
+</html>

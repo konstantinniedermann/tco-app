@@ -8,6 +8,8 @@
   (`.mcp.json`), ohne ihn über svelte.dev/llms.txt; nie aus dem Gedächtnis.
 - Unter `src/routes` keine Server-Dateien ausser `+server.ts`; keine Form Actions,
   keine Remote Functions (Bauregel → ADR-002).
+- Oberfläche nur aus den Tokens und Bausteinen von `docs/ui-leitbild.md`; was dort fehlt,
+  kommt erst ins Leitbild, dann in den Code.
 
 ## Mitgliederdaten — Dauerverbote
 

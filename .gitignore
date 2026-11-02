@@ -14,6 +14,9 @@ NOTES.local.md
 # System
 .DS_Store
 
+# Arbeitsdateien von superpowers (Browser-Entwürfe, Ausführungs-Protokolle)
+.superpowers/
+
 # Code
 node_modules/
 .svelte-kit/
