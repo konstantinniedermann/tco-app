@@ -761,3 +761,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #29, Review Task 10.
 
 **Einschätzung:** Gering. Mit der PWA-Arbeit (Service Worker) ein maskierbares Symbol gestalten und `"id": "/"` setzen.
+
+### 2026-11-02 — MAIL_NUR_AN wird von der App nicht ausgewertet
+
+**Thema:** Test-Umgebung
+
+**Fundort:** `betrieb/compose.umgebung.yml`, `betrieb/geheim.env.example`; in `src/` kein Zugriff auf `MAIL_NUR_AN`.
+
+**Beobachtung:** Test verschickt Codes an jede Mitglieds-Adresse der Test-Datenbank (nur erfundene Daten). Der Filter fehlt vor der Demo.
+
+**Ursprung:** #32 Merge mit #29.
+
+**Einschätzung:** Mittel, vor der Demo mit echten Adressen nötig. Filter im Mail-Versand der App einbauen.
+
+### 2026-11-02 — Bremsen pro IP: IPv6 nicht auf /64 zusammengefasst
+
+**Thema:** Login-Bremsen
+
+**Fundort:** Bremsen pro IP in der App, Caddy-Konfiguration.
+
+**Beobachtung:** IPv6 sollte auf /64 zusammengefasst werden — weder Caddy noch die App tun es. Ein Wechsel der Adresse im selben Netz umgeht die Bremse.
+
+**Ursprung:** #32 Merge mit #29.
+
+**Einschätzung:** Gering bis mittel; Umsetzung in der App beim Bestimmen des Schlüssels.
