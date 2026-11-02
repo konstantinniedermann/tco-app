@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# Ersatz-docker für die Tests der Betriebsskripte (von allen Tests in tests/betrieb geteilt).
+#  - hängt die Argumente als eine Zeile ("$*") an $STUB_PROTOKOLL an
+#  - hängt MYTCO_IMAGE und MYTCO_UMGEBUNG zeilengleich an $STUB_PROTOKOLL.umwelt an
+#  - schreibt immer STUB-GEHEIM-LOG auf stderr (Ausgabetests suchen damit Lecks)
+#  - STUB_FEHLER_BEI=<muster>: Exit 1, wenn die Argumente das Muster enthalten
+#  - STUB_AUSGABE_<NAME>=<text> mit STUB_MUSTER_<NAME>=<muster>: gibt <text> auf stdout aus,
+#    wenn die Argumentzeile ("$*") das Muster als Teilstring enthält (Shell-Muster erlaubt,
+#    z. B. "exec*psql"). NAME ist frei wählbar (A-Z, 0-9, _). Mehrere Paare: es gewinnt der
+#    erste Treffer in alphabetischer Reihenfolge der NAMEn. Ohne Treffer keine Ausgabe.
+#  - STUB_FOLGE_<NAME>=<a>@@<b>@@<c>: statt STUB_AUSGABE_<NAME> (gleiches STUB_MUSTER_<NAME>);
+#    der n-te Treffer gibt den n-ten Text aus, danach wiederholt sich der letzte. Der Zähler liegt
+#    in $STUB_PROTOKOLL.folge.<NAME>.
+#  - STUB_STDIN_BEI=<muster>: liest bei passender Argumentzeile die ganze Standardeingabe und hängt
+#    sie an $STUB_PROTOKOLL.stdin an (vor allen anderen Regeln, auch vor STUB_FEHLER_BEI)
+#  - `create …` gibt ohne Treffer die feste Container-ID 0123456789ab aus
+#  - `cp <id>:/app/betrieb <ziel>` legt <ziel>/betrieb/bin/ausliefern an: ein kleines
+#    ausführbares Skript, das seine Argumente an $STUB_PROTOKOLL.exec anhängt und `ok` druckt (mit STUB_AUSLIEFERN_FEHLER: `fehler`, Exit 1;
+#    mit STUB_CP_LEER: nur ein leerer Ordner betrieb/bin)
+set -euo pipefail
+
+echo "$*" >>"${STUB_PROTOKOLL:-/dev/null}"
+# Zeilengleich dazu: die Umgebungsvariablen, die Compose aus dem Aufrufer erbt ("image|umgebung|docker_config")
+if [ -n "${STUB_PROTOKOLL:-}" ]; then
+	echo "${MYTCO_IMAGE-}|${MYTCO_UMGEBUNG-}|${DOCKER_CONFIG-}" >>"$STUB_PROTOKOLL.umwelt"
+fi
+echo "STUB-GEHEIM-LOG" >&2
+
+if [ -n "${STUB_STDIN_BEI:-}" ]; then
+	case "$*" in
+	*"$STUB_STDIN_BEI"*) cat >>"$STUB_PROTOKOLL.stdin" ;;
+	esac
+fi
+
+if [ -n "${STUB_FEHLER_BEI:-}" ]; then
+	case "$*" in
+	*"$STUB_FEHLER_BEI"*) exit 1 ;;
+	esac
+fi
+
+for muster_var in $(compgen -A variable STUB_MUSTER_ | sort); do
+	muster="${!muster_var}"
+	case "$*" in
+	*$muster*)
+		name="${muster_var#STUB_MUSTER_}"
+		folge_var="STUB_FOLGE_$name"
+		if [ -n "${!folge_var-}" ]; then
+			zaehler="$STUB_PROTOKOLL.folge.$name"
+			n=$(($(cat "$zaehler" 2>/dev/null || echo 0) + 1))
+			echo "$n" >"$zaehler"
+			rest="${!folge_var}@@"
+			text=""
+			i=0
+			while [ "$i" -lt "$n" ] && [ -n "$rest" ]; do
+				text="${rest%%@@*}"
+				rest="${rest#*@@}"
+				i=$((i + 1))
+			done
+			printf '%s\n' "$text"
+			exit 0
+		fi
+		ausgabe_var="STUB_AUSGABE_$name"
+		printf '%s\n' "${!ausgabe_var-}"
+		exit 0
+		;;
+	esac
+done
+
+# Ohne Treffer: Standardverhalten einzelner Unterbefehle
+case "${1-}" in
+create)
+	echo 0123456789ab
+	;;
+cp)
+	case "${2-}" in
+	*:/app/betrieb)
+		mkdir -p "${3%/}/betrieb/bin"
+		# STUB_CP_LEER: Image ohne ausliefern (nur leerer Ordner)
+		[ -z "${STUB_CP_LEER:-}" ] || exit 0
+		# shellcheck disable=SC2016 # das Skript soll die Variablen erst beim Aufruf auswerten
+		printf '#!/usr/bin/env bash\necho "$*" >>"${STUB_PROTOKOLL:-/dev/null}.exec"\nif [ -n "${STUB_AUSLIEFERN_FEHLER:-}" ]; then echo fehler; exit 1; fi\necho ok\n' \
+			>"${3%/}/betrieb/bin/ausliefern"
+		chmod +x "${3%/}/betrieb/bin/ausliefern"
+		;;
+	esac
+	;;
+esac
+exit 0

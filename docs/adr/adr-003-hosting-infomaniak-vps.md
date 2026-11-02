@@ -33,7 +33,7 @@ Preise exkl. MwSt, wo nicht anders vermerkt; MwSt 8.1 %; 1 EUR ≈ 0.94 CHF, 1 U
 **E-Mail-Versand:** Ein Postfach von @tcolten.ch bei Metanet (K-11; Business Mail CHF 5.90
 pro Monat, B·10) oder bei Infomaniak (Limit 200–500 Mails pro Tag und Absender, B·11), oder
 ein Versanddienst in der EU wie Scaleway (300 Mails/Monat gratis, danach EUR 0.25 pro
-1000, B·12; Vertrag zur Auftragsbearbeitung V, prüfen in #9). US-Dienste fallen weg; Postmark bewahrt Daten zudem 45 Tage auf (B·13).
+1000, B·12; Vertrag zur Auftragsbearbeitung V, prüfen in #9; *Nachtrag 02.11.2026:* vorhanden, Aufbewahrung der Versandprotokolle offen → [Kosten](../kosten.md)). US-Dienste fallen weg; Postmark bewahrt Daten zudem 45 Tage auf (B·13).
 
 ## Entscheidung
 
@@ -41,7 +41,7 @@ ein Versanddienst in der EU wie Scaleway (300 Mails/Monat gratis, danach EUR 0.2
 Webserver mit automatischem HTTPS als Docker-Container; die Datenbank wird jede Nacht auf
 einen Speicher ausserhalb des Servers in der Schweiz gesichert. E-Mails verschickt MyTCO über
 ein Postfach von @tcolten.ch, wenn K-11 das mit ausreichendem Limit erlaubt — sonst über
-Scaleway (EU).**
+Scaleway (EU).** (hängt an K-11)
 
 Begründung:
 
@@ -65,6 +65,9 @@ Begründung:
 | Logs | Rotation auf höchstens 30 Tage, ohne Inhalte (DS-06) |
 | E-Mail | Versand über Port 587 beim gewählten Dienst — der VPS sperrt Port 25 (B·1) |
 
+*Nachtrag 02.11.2026:* Webserver ist Caddy, gesichert wird mit restic (verschlüsselt, 30 Tage);
+entschieden vom Projektleiter im Design zu [#32](https://github.com/konstantinniedermann/tco-app/issues/32).
+
 ## Konsequenzen
 
 **Leichter:** Datenschutzerklärung kann „Infomaniak, Schweiz“ nennen; volle Kontrolle,
@@ -76,7 +79,7 @@ Sicherung geübt sein (#10). Kein SLA; ob das für Anmeldung und Finalwochenende
 hing an K-15. *Nachtrag 30.10.2026:* K-15 ist beantwortet — ein kurzer Ausfall wird in Kauf
 genommen, ein VPS ohne SLA reicht.
 
-**Kosten** (Details und Freigabe → #9):
+**Kosten** (Stand 30.10.2026; aktuell, mit Szenarien und Freigabe → [Kosten](../kosten.md)):
 
 | Posten | CHF/Jahr inkl. MwSt | Status |
 |--------|----------|--------|
@@ -89,10 +92,10 @@ genommen, ein VPS ohne SLA reicht.
 ## Reevaluations-Trigger
 
 1. **Betrieb wird zu viel:** Server-Pflege ist im Jahr mehr als ca. 2 Personentage (S),
-   oder niemand übernimmt sie (K-05) → verwaltete Plattform (Option B).
+   oder niemand übernimmt sie (hängt an K-05) → verwaltete Plattform (Option B).
 2. **Infomaniak bietet verwaltetes PostgreSQL** im Budget an.
-3. **Ausfall während der CM-Anmeldung oder am Finalwochenende**, oder K-15 verlangt eine
-   Verfügbarkeit, die ein VPS ohne SLA nicht hergibt.
+3. **Ausfall während der CM-Anmeldung oder am Finalwochenende**, der den Verein stärker
+   stört, als K-15 (kurzer Ausfall wird in Kauf genommen) erwarten liess.
 4. **Preis** des VPS steigt über das Budget, oder Infomaniak streicht VPS Lite.
 
 ## Quellen

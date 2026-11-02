@@ -1,0 +1,56 @@
+# Globale Optionen. Caddy schreibt kein Zugriffsprotokoll (kein `log` in den Adressen), aber
+# Fehler und Warnungen ins Standard-Log (Docker-Log des Proxys). Dort stünden zu einer Anfrage
+# die Adresse des Clients und seine Köpfe; DS-06 erlaubt IP-Adressen höchstens 24 Stunden.
+# Darum entfernt der Filter diese Felder aus jedem Eintrag, bevor er geschrieben wird; die
+# Felder ohne `request>` stehen in den Einträgen der Admin-Schnittstelle (z. B. caddy reload).
+# Cookie und Authorization schwärzt Caddy von selbst.
+{
+	log default {
+		format filter {
+			remote_ip delete
+			remote_port delete
+			request>remote_ip delete
+			request>remote_port delete
+			request>client_ip delete
+			request>headers>X-Forwarded-For delete
+			request>headers>X-Real-Ip delete
+			request>headers>Forwarded delete
+		}
+	}
+}
+
+# Gemeinsame Sicherheits-Kopfzeilen für alle Adressen. Sie gelten auch für Antworten, die Caddy
+# selbst gibt (401 der Test-Anmeldung). Die App setzt einige dieselben Köpfe: reverse_proxy
+# hängt Upstream-Köpfe an, statt zu ersetzen. Darum entfernt `app_ohne_sicherheit` sie aus der
+# Upstream-Antwort, und nur Caddys Werte bleiben (je Kopf genau einmal). Die CSP der App (strenger,
+# mit Nonce) bleibt dagegen unangetastet: Caddy setzt `frame-ancestors 'none'` nur, wenn keine kommt (`?`).
+(sicherheit) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+		?Content-Security-Policy "frame-ancestors 'none'"
+	}
+}
+
+(app_ohne_sicherheit) {
+	header_down -Strict-Transport-Security
+	header_down -X-Content-Type-Options
+	header_down -Referrer-Policy
+}
+
+# TLS-Wahl über MYTCO_TLS (Caddy kennt keine Bedingungen, daher Snippets nach Name):
+#   leer/ungesetzt -> öffentliches Zertifikat, keine tls-Zeile (Standard)
+#   internal       -> lokale CA, nur für den lokalen Nachweis
+# Caddy setzt den Vorgabewert nur bei ungesetzter, nicht bei leerer Variable ein;
+# deshalb gibt es das leere Snippet zweimal (tls_ für leer, tls_automatisch für ungesetzt).
+(tls_) {
+}
+(tls_automatisch) {
+}
+(tls_internal) {
+	tls internal
+}
+
+# Kein log-Block in den Adressen: Zugriffsprotokolle werden nicht geschrieben (Datenschutz).
+import umgebungen/*.caddy

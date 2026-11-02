@@ -18,8 +18,8 @@ Begriffe stehen im [Glossar](glossar.md), Anforderungs-IDs in den
 ([RR-02](rollen-und-rechte.md#grundsätze)).
 
 **Junioren:** Im MVP behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Junioren,
-Eltern und Konten für Minderjährige kommen mit den Junioren-Funktionen (K-08) — oder früher,
-falls Junioren schon an der Clubmeisterschaft 2027 mitspielen (K-46).
+Eltern und Konten für Minderjährige kommen mit den Junioren-Funktionen (Annahme K-08: ab 2028) — oder früher,
+falls Junioren schon an der Clubmeisterschaft 2027 mitspielen (hängt an K-46).
 
 ## Überblick
 
@@ -54,8 +54,8 @@ classDiagram
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Mitglied** | Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25), Telefon, Geschlecht, Jahrgang (K-40), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum | alle ausser Status |
-| **Konto** | Einmal-Code (nur als Hash, mit Ablauf und Zahl der Fehlversuche), Sitzungsversion, Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein | alle |
+| **Mitglied** | Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25), Telefon, Geschlecht, Jahrgang (Annahme K-40), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum | alle ausser Status |
+| **Konto** | Brief-Code und Mail-Code getrennt, je nur als Hash mit Ablauf; beim Brief-Code dazu *benutzt am*, beim Mail-Code die Zahl der Fehlversuche (FR-24). Sitzungsversion, Sitzungen (eine je Gerät, mit *zuletzt genutzt*), Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein | alle |
 | **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](rollen-und-rechte.md) fest | — |
 | **Aenderung** | Eintrag im Änderungsverlauf: Mitglied, von (Konto; leer bei automatischen Änderungen oder wenn das Konto gelöscht ist, dann angezeigt als *MyTCO* bzw. Name), Feld oder Aktion, Zeitpunkt; ohne alte und neue Werte (FR-26) | Mitglied, von |
 
@@ -64,7 +64,7 @@ classDiagram
 | Objekt | Attribute | P |
 |--------|-----------|---|
 | **Turnier** | Jahr, Name, Anmeldeschluss, Status (siehe [Lebenszyklen](#lebenszyklen)) | — |
-| **Turniernummer** | Nummer bei Swiss Tennis, Bezeichnung (z. B. Gruppenphase, Finalwochenende — Annahme K-25) | — |
+| **Turniernummer** | Nummer bei Swiss Tennis, Bezeichnung (z. B. Gruppenphase, Finalwochenende — Annahme K-25.4) | — |
 | **Kategorie** | Name, Geschlecht (Herren / Damen / Mixed / offen), Jahrgang von–bis (Alterskategorie, optional), Klassierung von–bis (Klassierungsbereich), Einzel oder Doppel | — |
 | **Anmeldung** | Kategorie, 1 Spieler (Einzel) oder 2 (Doppel), Wildcard-Antrag ja/nein, Kommentar, Status, angemeldet am, Gruppe (nach Auslosung), Rang-Korrektur (optional) | Spieler, Kommentar |
 | **Gruppe** | Kategorie, Name, Turniernummer. Die Rangliste wird aus den Resultaten berechnet, nicht gespeichert | — |
@@ -109,7 +109,7 @@ classDiagram
 | FR-21 | Ein Antrag gehört zur nächsten Lizenzrunde, deren Stichtag noch nicht vorbei ist. Storno entspricht der Sistierung bei Swiss Tennis (Annahme K-34) | A-LIZENZ-03 | geplant |
 | FR-22 | Der Export einer Lizenzrunde setzt alle ihre beantragten Anträge auf *exportiert*; der Lizenzverantwortliche hakt sie nach dem Eintragen bei Swiss Tennis als *erledigt* ab | A-LIZENZ-04 | geplant |
 | FR-23 | Exporte an Swiss Tennis enthalten nur die Felder, die Swiss Tennis braucht (vor allem Lizenznummern) | A-ADVANTAGE-01, A-ADVANTAGE-04, A-LIZENZ-04, DS-04 | geplant |
-| FR-24 | Ein Einmal-Code gilt nur einmal. Danach bleibt das Gerät eingeloggt, bis die Sitzung ein Jahr nicht genutzt wurde. Erhöht der Admin die Sitzungsversion, enden alle Sitzungen des Kontos | A-LOGIN-08, A-LOGIN-09 | geplant |
+| FR-24 | Ein Einmal-Code gilt nur einmal. Ein neuer Code ersetzt nur den alten derselben Art (Brief-Code oder Mail-Code); ein Login mit einem der beiden macht beide ungültig, der Brief-Code gilt dann als benutzt. Danach bleibt das Gerät eingeloggt, bis die Sitzung ein Jahr nicht genutzt wurde. Erhöht der Admin die Sitzungsversion, enden alle Sitzungen des Kontos | A-LOGIN-08, A-LOGIN-09 | umgesetzt |
 | FR-25 | Eine E-Mail-Adresse gehört zu höchstens einem Mitglied. Ändert das Mitglied sie, gilt die neue erst nach Eingabe je eines Codes von der alten und von der neuen Adresse. Ist die alte nicht erreichbar, ändert der Admin sie nach Rückfrage; die alte erhält dann einen Hinweis | A-LOGIN-10, [SI-09](sicherheitskonzept.md#vorgaben) | geplant |
 | FR-26 | Einen Eintrag im Änderungsverlauf erzeugen, egal ob durch Admin, Mitglied oder automatisch: jede Änderung an den Feldern des Mitglieds, an Rollen und an *gesperrt*, sowie die Aktionen neuer Brief-Code, Sitzungen beendet und Export. Login-Vorgänge (Codes, Fehlversuche, Sitzungen) erzeugen keinen Eintrag (SI-05). Einträge werden nach 12 Monaten gelöscht, beim Status *gelöscht* des Mitglieds (FR-04) schon früher | A-MITGLIED-06, [SI-12](sicherheitskonzept.md#vorgaben) | geplant |
 

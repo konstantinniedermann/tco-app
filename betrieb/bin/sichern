@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# sichern <umgebung>: verschlüsselte Sicherung der Datenbank mit restic (30 Tage Aufbewahrung).
+# Nimmt bewusst keine Umgebungssperre: ausliefern ruft es auf, während es die Sperre hält.
+# Das restic-Repo legt der Betrieb einmal von Hand an (README); fehlt es, meldet sichern fehler.
+# Der Dump geht per Pipe in restic, nie unverschlüsselt auf die Platte. Ausgabe nur
+# "schritt: …", "ok" oder "fehler"; alles von docker steht im Protokoll der Umgebung.
+set -euo pipefail
+
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+UMGEBUNG="${1-}"
+pruefe_umgebung "$UMGEBUNG" || exit 1
+
+LOG="$MYTCO_BASIS/$UMGEBUNG/protokoll.log"
+LAUF="lauf-$(date -u +%Y%m%dT%H%M%SZ)"
+GEMELDET=0
+
+ende() {
+	local rc=$?
+	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then
+		melde fehler
+	fi
+	if [ "$rc" != 0 ]; then exit 1; fi
+	exit 0
+}
+trap ende EXIT
+
+scheitern() {
+	echo "sichern: $1" >>"$LOG"
+	GEMELDET=1
+	melde fehler
+	exit 1
+}
+
+mkdir -p "$MYTCO_BASIS/$UMGEBUNG"
+exec 2>>"$LOG"
+[ -f "$MYTCO_BASIS/sicherung.env" ] || scheitern "sicherung.env fehlt"
+sicherungsziel >/dev/null || scheitern "Sicherungsziel ungültig"
+# Compose verlangt MYTCO_IMAGE; der nächtliche Lauf aus systemd bringt es nicht mit.
+image_aus_zustand "$UMGEBUNG"
+
+# Zeilen "schema.tabelle|anzahl" aus der laufenden Datenbank.
+zaehle() {
+	compose "$UMGEBUNG" exec -T db psql -U mytco -d mytco -At -c "$ZAEHL_SQL"
+}
+
+# Dump direkt in restic; scheitert eine Seite der Pipe, scheitert die Funktion (pipefail).
+dump_sichern() {
+	compose "$UMGEBUNG" exec -T db pg_dump -U mytco -Fc mytco |
+		restic_docker backup --stdin --stdin-filename "mytco-$UMGEBUNG.dump" \
+			--tag "$UMGEBUNG" --tag "$LAUF" >>"$LOG"
+}
+
+# Entfernt die Snapshots dieses Laufs wieder (unvollständiger oder uneinheitlicher Dump).
+verwirf_lauf() {
+	local ids id
+	ids=$(restic_docker snapshots --tag "$UMGEBUNG,$LAUF" --json </dev/null |
+		grep -o '"short_id":"[0-9a-f]*"' | cut -d'"' -f4) || return 0
+	for id in $ids; do
+		restic_docker forget "$id" </dev/null >>"$LOG" || true
+	done
+}
+
+schritt "ziel pruefen"
+restic_docker cat config </dev/null >>"$LOG" ||
+	scheitern "Sicherungsziel nicht erreichbar oder nicht angelegt (Anlage von Hand, siehe README)"
+
+schritt "sichern"
+VERSUCH=1
+while :; do
+	VOR=$(zaehle) || scheitern "Zählung vor dem Dump gescheitert"
+	[ -n "$VOR" ] || scheitern "Zählung leer"
+	dump_sichern || {
+		verwirf_lauf
+		scheitern "Dump oder Ablage gescheitert"
+	}
+	NACH=$(zaehle) || scheitern "Zählung nach dem Dump gescheitert"
+	if [ "$VOR" = "$NACH" ]; then break; fi
+	verwirf_lauf
+	[ "$VERSUCH" -lt 3 ] || scheitern "Datenbank änderte sich während des Dumps (3 Versuche)"
+	VERSUCH=$((VERSUCH + 1))
+done
+
+printf '%s\n' "$VOR" |
+	restic_docker backup --stdin --stdin-filename zaehlung.txt \
+		--tag "$UMGEBUNG" --tag "$LAUF" >>"$LOG" ||
+	{
+		verwirf_lauf
+		scheitern "Ablage der Zählung gescheitert"
+	}
+
+schritt "aufraeumen"
+restic_docker forget --tag "$UMGEBUNG" --keep-within 30d --prune </dev/null >>"$LOG" ||
+	scheitern "Aufbewahrung (forget) gescheitert"
+
+echo "sichern: $LAUF abgelegt" >>"$LOG"
+melde ok

@@ -97,7 +97,13 @@ jedes Issue mit einer Entscheidung oder einer Annahme über den Verein:
 - Wenn ja, die Frage in [`abklaerungen.md`](abklaerungen.md) mit ID, Ansprechperson und
   Fälligkeit eintragen und im Issue auf die ID verweisen (`Abklärung: K-09`).
 - Entscheidungen, die ohne Antwort getroffen werden, nennen die offene Frage als Annahme
-  und als Reevaluations-Trigger.
+  und als Reevaluations-Trigger. Die Annahme wird dort markiert, wo sie wirkt
+  (`Annahme K-NN: …`); eine Prüfung meldet sie, sobald die Antwort da ist
+  ([Ablauf](abklaerungen.md)).
+- Annahmen nur, wo eine andere Antwort später ohne grossen Umbau umzusetzen ist. Eine
+  Annahme ersetzt keine Freigabe: Geld ausgeben, Konten anlegen und Personendaten live
+  bearbeiten erst mit Antwort oder Entscheid des Projektleiters. Ein Vorschlag an den Verein
+  (z. B. Löschfrist K-38) darf bis dahin in Konzept und Code stehen.
 
 ## Datenschutz
 

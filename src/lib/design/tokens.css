@@ -1,0 +1,67 @@
+/*
+ * Design-Tokens von MyTCO — die einzige Stelle im Code mit Farb-, Grössen- und Abstandswerten.
+ * Bedeutung und Regeln: docs/ui-leitbild.md. Die CI gleicht beide ab (design-tokens);
+ * ausserhalb dieser Datei sind Farbwerte und px verboten (design-festwerte).
+ * Ändern: zuerst das Leitbild, dann hier.
+ */
+:root {
+	/* Farben */
+	/* Annahme K-13.2: Farbkonzept Variante C (eigenes Grün + Sandplatz-Rot) als Abgrenzung von tcolten.ch */
+	--farbe-marke: #0f6b4f;
+	--farbe-marke-dunkel: #0b5640;
+	--farbe-marke-zart: #e3efdc;
+	/* Annahme K-13: Lindgrün von tcolten.ch, Freigabe des Vereins steht aus */
+	--farbe-marke-hell: #cde3b9;
+	/* Annahme K-13.2: Sandplatz-Rot nur für die Haupttaste */
+	--farbe-aktion: #a84f1f;
+	--farbe-aktion-dunkel: #8c4018;
+	--farbe-flaeche: #ffffff;
+	--farbe-hintergrund: #f4f7f2;
+	--farbe-text: #1f2a2a;
+	--farbe-text-leise: #4a5a58;
+	--farbe-rand: #4a5a58;
+	--farbe-linie: #d5ddd9;
+	--farbe-fehler: #b3261e;
+	--farbe-hinweis: #7a5200;
+	--farbe-hinweis-flaeche: #fdf3e7;
+
+	/* Schrift — Grössen in rem, damit sie der Systemeinstellung folgen */
+	--schrift-text: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+	--schrift-code: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+	--groesse-klein: 1rem;
+	--groesse-text: 1.125rem;
+	--groesse-gross: 1.375rem;
+	--groesse-titel: 1.75rem;
+	--groesse-symbol: 1.5rem;
+	--zeilenhoehe-text: 1.5;
+	--zeilenhoehe-titel: 1.25;
+
+	/* Abstände */
+	--abstand-1: 0.25rem;
+	--abstand-2: 0.5rem;
+	--abstand-3: 0.75rem;
+	--abstand-4: 1rem;
+	--abstand-5: 1.5rem;
+	--abstand-6: 2rem;
+
+	/* Formen */
+	--radius: 10px;
+	--radius-rund: 999px;
+	--tippflaeche: 3rem;
+	--rand-duenn: 1px;
+	--rand-dick: 2px;
+	--fokus-breite: 3px;
+	--fokus-abstand: 2px;
+	--rand-akzent: 4px;
+	--schatten-karte: 0 1px 3px rgb(0 0 0 / 0.13);
+	--breite-inhalt: 40rem;
+
+	/* Brief (Druck) — Werte auf dem Papier in mm und pt */
+	/* Annahme K-16.1: Fensterkuvert C5/6 mit Fenster rechts, Lage des Adressfelds fest */
+	--brief-rand: 20mm;
+	--brief-fenster-oben: 45mm;
+	--brief-fenster-links: 118mm;
+	--brief-fenster-breite: 80mm;
+	--brief-qr: 35mm;
+	--brief-schrift: 12pt;
+}

@@ -59,29 +59,31 @@ flowchart TD
 | Form | 10 Zeichen ohne verwechselbare Zeichen (kein 0/O/1/I/L), rund 50 Bit | 6 Ziffern |
 | Gültig | 90 Tage | 15 Minuten |
 | Eingabe | ohne E-Mail-Adresse | nach Eingabe der E-Mail-Adresse |
-| Bremse | 10 Fehlversuche pro IP und Stunde | 5 Fehlversuche, dann ungültig; höchstens 3 Code-Mails pro Stunde und 10 pro Tag je Adresse |
+| Ersetzt | nur den alten Brief-Code | nur den alten Mail-Code |
+| Bremse | 10 Fehlversuche pro IP und Stunde | 5 Fehlversuche, dann ungültig; 10 Versuche pro IP und Stunde; höchstens 3 Code-Mails pro Stunde und 10 pro Tag je Adresse |
 
-Beide Codes gelten nur einmal, sind nur als Hash gespeichert, und ein neuer Code ersetzt den
-alten desselben Kontos (RR-04, FR-24). «Hash» heisst mit geheimem Server-Schlüssel (HMAC),
-damit ein Datenbank-Leck die 50 Bit des Brief-Codes nicht durchrechenbar macht.
+Beide Codes gelten nur einmal und sind nur als Hash gespeichert. Ein Login mit einem der
+beiden macht beide ungültig; der Brief-Code gilt dann als benutzt (RR-04, FR-24). «Hash»
+heisst mit geheimem Server-Schlüssel (HMAC), damit ein Datenbank-Leck die 50 Bit des
+Brief-Codes nicht durchrechenbar macht.
 
 ## Vorgaben
 
 | ID | Vorgabe |
 |----|---------|
 | SI-01 | Codes und Sitzungskennungen stammen aus einem kryptografisch sicheren Zufallsgenerator; Codes nur als HMAC gespeichert. Werte wie in der Tabelle [Login](#login) |
-| SI-02 | Der Brief-Code ist an kein eingegebenes Konto gebunden, darum gibt es keine Sperre pro Konto, sondern höchstens 10 Fehlversuche pro IP und Stunde. Ein schon benutzter Code meldet «Code schon benutzt — wende dich an [Kontakt, K-21]» |
-| SI-03 | Ein Mail-Code ist nach 5 Fehlversuchen ungültig; das Mitglied fordert einen neuen an |
+| SI-02 | Der Brief-Code ist an kein eingegebenes Konto gebunden, darum gibt es keine Sperre pro Konto, sondern höchstens 10 Fehlversuche pro IP und Stunde. Ein schon benutzter Code meldet «Code schon benutzt — wende dich an [Kontakt, hängt an K-21]» |
+| SI-03 | Ein Mail-Code ist nach 5 Fehlversuchen ungültig; das Mitglied fordert einen neuen an. Falscher, abgelaufener oder ungültiger Code und unbekannte Adresse erhalten immer dieselbe Meldung (SI-04). Jeder Versuch wird vor dem Vergleich gezählt, damit parallele Anfragen die Grenzen nicht umgehen |
 | SI-04 | Code anfordern: für bekannte und unbekannte Adressen dieselbe Antwort und dieselbe Antwortzeit; höchstens 3 Code-Mails pro Adresse und Stunde und 10 pro Tag, 10 Anfragen pro IP und Stunde. IP-Adressen nur dafür, höchstens 24 Stunden (DS-06) |
-| SI-05 | Logs enthalten keine Codes, Sitzungskennungen oder Kontaktdaten (DS-06); Fehlversuche werden gezählt, nicht mit Inhalt geloggt |
-| SI-06 | Sitzung: Cookie `HttpOnly`, `Secure`, `SameSite=Lax`, ein Jahr gleitend (A-LOGIN-09); beim Login eine neue Kennung; Logout beendet die Sitzung auf diesem Gerät |
+| SI-05 | Logs enthalten keine Codes, Sitzungskennungen oder Kontaktdaten (DS-06); Fehlversuche werden gezählt, nicht mit Inhalt geloggt. Unerwartete Fehler loggt der Server nur mit festem Text, weil Meldungen der Datenbank Adressen enthalten können |
+| SI-06 | Sitzung: Das Cookie trägt eine zufällige Kennung, die Datenbank nur ihren Hash, eine Zeile je Gerät ohne IP-Adresse und Gerätename ([ADR-004](adr/adr-004-login-einmal-code.md)). Cookie `HttpOnly`, `Secure`, `SameSite=Lax`, ein Jahr gleitend (A-LOGIN-09); beim Login eine neue Kennung; Logout löscht Zeile und Cookie |
 | SI-07 | Widerruf über die Sitzungsversion (FR-24): Sperre und Austritt erhöhen sie automatisch, der Admin von Hand (Handy verloren, Code gestohlen) |
 | SI-08 | Wer die Admin-Oberfläche öffnet (alle Rollen über *Mitglied*, RR-07), bestätigt höchstens einmal pro 24 Stunden mit einem frischen Mail-Code. Gilt für die Sitzung auf diesem Gerät (Projektleiter, 01.11.2026; **Vorschlag K-12**) |
 | SI-09 | Eine E-Mail-Adresse gehört zu höchstens einem Mitglied (FR-25). Ändert ein Mitglied seine Adresse, gilt die neue erst, wenn es je einen Code von der alten und von der neuen Adresse eingetippt hat (Werte wie beim Mail-Code). Ist die alte nicht mehr erreichbar, ändert der Admin die Adresse nach Rückfrage beim Mitglied, z. B. per Telefon; die alte erhält dann einen Hinweis «Falls du das nicht warst, melde dich bei …» |
-| SI-10 | Nur HTTPS mit HSTS. Content-Security-Policy erlaubt nur die eigene Adresse (DS-03); einzige Ausnahme ist der feste Style von SvelteKits Screenreader-Hinweis, erlaubt über seinen Hash (`style-src-attr`). Ändernde Anfragen nur mit passender Herkunft (Schutz vor gefälschten Anfragen fremder Seiten); Eingaben von Mitgliedern werden nie als HTML ausgegeben |
+| SI-10 | Nur HTTPS mit HSTS. Content-Security-Policy erlaubt nur die eigene Adresse (DS-03); einzige Ausnahme ist der feste Style von SvelteKits Screenreader-Hinweis, erlaubt über seinen Hash (`style-src-attr`). Ändernde Anfragen nur mit passender Herkunft (Schutz vor gefälschten Anfragen fremder Seiten): Sie nehmen nur JSON an, sonst Status 415, fremde Seiten scheitern am CORS-Preflight ([ADR-004](adr/adr-004-login-einmal-code.md#herkunftsschutz)); Eingaben von Mitgliedern werden nie als HTML ausgegeben |
 | SI-11 | Rechte prüft der Server bei jedem Zugriff nach Rolle und Objektbezug (RR-06); die Oberfläche blendet nur aus |
 | SI-12 | Der Änderungsverlauf hält fest, wer (Admin, Mitglied oder automatisch) bei welchem Mitglied wann welches Feld geändert oder welche Aktion ausgelöst hat (Umfang FR-26: z. B. neuer Brief-Code, Sitzungen beendet, Export); ohne alte oder neue Werte, ohne Login-Vorgänge. Nur Admins sehen ihn; Aufbewahrung 12 Monate (FR-26, [Löschen](datenschutz.md#löschen)) |
-| SI-13 | Server ([#32](https://github.com/konstantinniedermann/tco-app/issues/32)): SSH nur mit Schlüssel, kein Root-Login über SSH, Firewall offen nur für 22, 80, 443; automatische Sicherheits-Updates; Datenbanken nur im internen Docker-Netz; Test und Live getrennt ([CI/CD](ci-cd-und-release.md#umgebungen)) |
+| SI-13 | Server ([#39](https://github.com/konstantinniedermann/tco-app/issues/39)): SSH nur mit Schlüssel, kein Root-Login über SSH, Firewall offen nur für 22, 80, 443; automatische Sicherheits-Updates; Datenbanken nur im internen Docker-Netz; Test und Live getrennt ([CI/CD](ci-cd-und-release.md#umgebungen)) |
 | SI-14 | Abhängigkeiten, Auslieferung und Geheimnisse nach [CI/CD](ci-cd-und-release.md#abhängigkeiten): neue Pakete nur mit Freigabe, Installation ohne Paket-Skripte, Malware-Prüfung, nur der Auslieferungs-Job hat den Schlüssel, Geheimnisse nie im Repo (Secret-Scan); die CI meldet nur «ok» oder «Fehler», keine App-Logs (Logs liegen bei GitHub in den USA) |
 | SI-15 | Zwei-Faktor-Login auf allen Konten für Betrieb und Code: GitHub (alle mit Schreibrecht), Infomaniak, E-Mail-Versand, Domain |
 | SI-16 | Direkter Zugriff auf die Live-Datenbank nur über SSH auf den Server, nur der Projektleiter und seine Stellvertretung (K-05), nur für Betrieb und Fehlersuche; keine Kopien der Daten auf eigene Geräte (DS-08). Er steht nicht in der Matrix von [Rollen und Rechte](rollen-und-rechte.md), weil er ausserhalb der App liegt |
@@ -98,14 +100,30 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
   schützen vor allem gegen ein gestohlenes Cookie auf einem anderen Gerät; dagegen hilft erst
   ein Faktor wie ein Passkey (A-LOGIN-07). Ein SMS-Code hilft nicht, die SMS käme aufs selbe
   Handy (Projektleiter, 01.11.2026).
-- **Schreibrecht auf GitHub reicht bis Live.** Ohne GitHub Pro kann jedes Konto mit
-  Schreibrecht direkt auf `main` pushen oder einen Workflow mit dem Live-Schlüssel schreiben
-  ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Angenommen unter zwei
-  Bedingungen: Zwei-Faktor-Login auf beiden Konten (SI-15), und die Hauptansprechperson im
-  Vorstand nutzt ihren Zugang nur zum Lesen (Absprache). Neu bewerten, sobald K-04 (wem
-  gehören die Konten) beantwortet ist.
-- **Ein Schadpaket im Bau** landet im Image und läuft live, auch ohne Schlüssel; dagegen
-  hilft nur SI-14.
+
+### Neu zu bestätigen (Stand 2026-11-02)
+
+Beim Gesamt-Review von #32 richtiggestellt; die frühere Annahme deckt die neue Reichweite nicht.
+Bis der Projektleiter bestätigt, gelten diese beiden Punkte als nicht angenommen.
+
+- **Schreibrecht auf GitHub reicht bis root auf dem Server.** Ohne GitHub Pro kann jedes Konto
+  mit Schreibrecht direkt auf `main` pushen oder einen Workflow mit dem Live-Schlüssel schreiben
+  ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Weil die Einrichtung des Servers im
+  Image mitreist, läuft das `ausliefern` eines Images auf dem Server selbst, als Benutzer
+  `mytco` mit Zugang zu Docker. Das reicht so weit wie root: an die Geheimnisse beider
+  Umgebungen und an den Sicherungszugang, aber auch an den Türsteher, die Schlüssel in
+  `authorized_keys` und die systemd-Einheiten. Der Türsteher schützt nur den Eingang (er nimmt
+  nur einen Digest an, die Umgebung kommt aus dem Schlüssel), nicht gegen ein schädliches
+  Image. Getrennte Schlüssel für Test und Live helfen nur gegen einen gestohlenen Schlüssel
+  allein; ein schädliches Image, das nur auf Test kommt, erreicht über denselben Server
+  trotzdem Live. Die Annahme vom 01.11.2026 ging von einer kleineren Reichweite aus (Türsteher
+  unveränderbar) und galt unter zwei Bedingungen: Zwei-Faktor-Login auf beiden Konten (SI-15),
+  und die Hauptansprechperson im Vorstand nutzt ihren Zugang nur zum Lesen (Absprache).
+  **Neu zu bestätigen durch den Projektleiter (Stand 2026-11-02).** Neu bewerten auch: hängt
+  an K-04 (wem gehören die Konten).
+- **Ein Schadpaket im Bau** landet im Image und läuft live, auch ohne Schlüssel, und über das
+  `ausliefern` des Images mit derselben Reichweite auf dem Server; dagegen hilft nur SI-14.
+  Mit der Richtigstellung oben ebenfalls neu zu bestätigen.
 
 ## Später
 
@@ -116,6 +134,6 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
 
 ## Offene Fragen an den Verein
 
-K-04 (Konten), K-05 (Stellvertretung), K-12 (Admin-Bestätigung, weitere Vorgaben), K-16
-(Briefversand, Weg zurück per Mail-Code), K-18 (wer welche Rolle), K-21 (Kontakt bei Login-Problemen) — alle in den
+K-04 (Konten), K-05 (Stellvertretung), K-12 (Admin-Bestätigung, weitere Vorgaben), K-16.1 und
+K-16.3 (Briefversand, Weg zurück per Mail-Code), K-18 (wer welche Rolle), K-21 (Kontakt bei Login-Problemen) — alle in den
 [Abklärungen](abklaerungen.md).

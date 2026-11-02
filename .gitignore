@@ -7,12 +7,19 @@ NOTES.local.md
 .env.*
 !.env.example
 
+# Betrieb: echte Geheimnisse nur auf dem Server, im Repo nur die Vorlagen
+betrieb/**/*.env
+!betrieb/**/*.env.example
+
 # Git-Worktrees paralleler Sessions (Standardort von Claude Code) und lokale Einstellungen
 .claude/worktrees/
 .claude/settings.local.json
 
 # System
 .DS_Store
+
+# Arbeitsdateien von superpowers (Browser-Entwürfe, Ausführungs-Protokolle)
+.superpowers/
 
 # Code
 node_modules/
@@ -21,3 +28,4 @@ build/
 coverage/
 test-results/
 playwright-report/
+musterbrief/

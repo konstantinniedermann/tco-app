@@ -16,7 +16,7 @@ wann ausgeliefert wird, regelt [CI/CD und Release](ci-cd-und-release.md).
 | Fachlogik | Fachregeln `FR-NN` aus dem [Fachmodell](fachmodell.md): Fristen, Grenzen, Zustände, Berechnungen | Vitest | `make check`, CI |
 | Schnittstellen und Rechte | Jede Schnittstelle (`+server.ts`) gegen eine echte PostgreSQL; für jede Rolle, ob sie zugreifen darf ([Rollen und Rechte](rollen-und-rechte.md), `RR-NN`) | Vitest, PostgreSQL im Container | `make check`, CI |
 | Ende-zu-Ende | Wichtige Abläufe durch die Oberfläche, mit Barrierefreiheits-Prüfung (N-BARRIEREFREI-01) | Playwright, axe | `make check`, CI |
-| Echte Geräte | Installation, Push, E-Mail auf echten Handys | von Hand, [Checkliste](#checkliste-vor-dem-release) | vor jedem Release |
+| Echte Geräte | Installation, Push, E-Mail auf echten Handys | von Hand, [Checkliste](#checkliste-vor-dem-release) | vor jedem Release, sobald Test läuft |
 
 **Fachlogik** liegt in Server-Modulen (Bauregel in ADR-002). Vorgabe dieses Konzepts: Die
 Fachregeln selbst greifen nicht auf Datenbank oder Oberfläche zu, sondern erhalten ihre
@@ -96,21 +96,27 @@ blockieren keine gewollte Design-Änderung.
 Auf der [Test-Umgebung](ci-cd-und-release.md#umgebungen) `test.my.tcolten.ch`, mit einem
 iPhone (Safari) und einem Android-Handy (Chrome) und einem erfundenen Testkonto. Es entsteht
 bei jeder Auslieferung neu und nutzt die Adresse des Projektleiters, damit der Code per
-E-Mail ankommt. Jeder Punkt nennt die IDs, die er prüft:
+E-Mail ankommt (gebaut mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39),
+bis dahin gibt es keine Test-Umgebung). Jeder Punkt nennt die IDs, die er prüft:
 
 - [ ] QR-Code aus einem Testbrief öffnet MyTCO; im Brief für Live steht `my.tcolten.ch` (A-LOGIN-01, A-LOGIN-04)
 - [ ] MyTCO lässt sich auf den Startbildschirm legen und startet von dort
 - [ ] Login mit Einmal-Code klappt; nach Neustart des Handys weiterhin eingeloggt (A-LOGIN-08, A-LOGIN-09)
 - [ ] Neuer Code per E-Mail kommt an und landet nicht im Spam (A-LOGIN-10)
+- [ ] iPhone, App vom Startbildschirm: Code per E-Mail anfordern, App ganz schliessen, wieder öffnen → das Feld «Code aus der Mail» steht da (A-LOGIN-10)
+- [ ] Steht ein Einrichtungsabend an: mobile Daten statt Club-WLAN, oder die Grenzen pro IP vorher prüfen ([ADR-004](adr/adr-004-login-einmal-code.md), Restrisiken)
 - [ ] Push einschalten und erhalten (ab Etappe *CM-Betrieb*)
 - [ ] Admin-Seite am PC: die geänderten Funktionen einmal durchgehen
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 
-Falls der Verein eine Testgruppe stellt (K-20), prüft sie vor dem ersten Release
-*Mitglieder-Login* Brief, Installation und Login, ebenfalls mit erfundenen Testkonten.
+Falls der Verein eine Testgruppe stellt (K-20), prüft sie Brief, Installation und Login
+als Pilot auf Live, mit ihren eigenen echten Daten, bevor alle Mitglieder einen Brief
+bekommen. Mit welcher Version und Checkliste der Pilot live geht, klärt #40 zusammen mit #39. Das ist Betrieb, kein Test im Sinne von DS-08; vorher muss die
+Datenschutzerklärung gelten. Ablauf → [#40](https://github.com/konstantinniedermann/tco-app/issues/40).
 
 ## Werkzeuge
 
 Vitest (mit Abdeckungsmessung), Playwright und axe für Playwright. Sie werden
-installiert mit dem Code-Gerüst; vorher kommt keine Abhängigkeit ins Repo.
+installiert mit dem Code-Gerüst; vorher kommt keine Abhängigkeit ins Repo. Mails fängt
+Mailpit ab (lokal und in der CI); die Ende-zu-Ende-Tests lesen Codes über seine Schnittstelle.

@@ -16,6 +16,25 @@ ist, bei wem und bis wann. Fragen haben eine feste ID (`K-NN`), auf die Issues v
   sich an den Anforderungen ändert, kommt ins [Änderungsprotokoll](anforderungen/README.md#änderungsprotokoll).
 - Personen werden mit ihrer Rolle benannt, nicht mit Namen.
 
+**Annahmen bis zur Antwort:** Wer ohne Antwort weiterarbeitet, markiert die Annahme dort,
+wo sie wirkt, in der Doku oder im Code-Kommentar: `Annahme K-NN: <was angenommen ist>`.
+Ebenso gelten `Vorschlag K-NN`, `Vermutung K-NN` und `hängt an K-NN` sowie jeder Verweis in
+einem Abschnitt *Offene Fragen*. Eine Unterfrage aus der Tabelle wird mit ihrer ID markiert
+(`K-25.4`). Ein blosser Verweis `(K-NN)` ohne Stichwort gilt nicht als Annahme.
+
+- `make annahmen` listet alle Annahmen pro Frage, `make annahmen K=K-11` nur die zu einer Frage.
+- Die Prüfung in `make docs`, `make check` und der CI schlägt fehl, sobald eine markierte Frage
+  unter *Beantwortet* steht. Das gilt auch für die ganze Frage, wenn erst eine Unterfrage
+  beantwortet ist. Ebenso schlägt sie bei einer ID fehl, die es hier nicht gibt.
+- **Wenn eine Antwort eintrifft:** zuerst `make annahmen K=K-NN`, jede Stelle mit der Antwort
+  vergleichen und Abweichungen dem Projektleiter zeigen, dann die Frage nach *Beantwortet*
+  verschieben. Jede gemeldete Stelle wird aufgelöst: Die Antwort ersetzt die Annahme, der
+  Verweis bleibt als `(K-NN)` ohne Stichwort stehen.
+- Teilantworten stehen unter *Beantwortet* mit der ID der Unterfrage (`K-16.2`), eine Zeile
+  pro ID. Andere Schreibweisen dort meldet die Prüfung als Fehler.
+- Grenze: Die Unterfragen stehen nur in der Tabelle. Eine erfundene Unterfrage einer
+  bestehenden Frage (`K-16.9`) fällt der Prüfung nicht auf.
+
 **Einsammeln über die Tabelle:** Die Fragen gehen nicht als Liste an den Verein, sondern
 über die Google-Tabelle *MyTCO – Fragen an den Verein* im Drive des Projektleiters. Die
 Adressaten füllen sie selbst aus. Dafür braucht es ein Google-Konto und eine Einladung als
@@ -141,7 +160,8 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | ID | Frage | Antwort | Von, am | Folgen |
 |----|-------|---------|---------|--------|
 | K-15 | Wie gut muss MyTCO erreichbar sein? | Keine besonderen Anforderungen. Der TCO ist ein Hobbyverein, alle arbeiten ehrenamtlich; ist MyTCO einmal kurz nicht erreichbar, nimmt man das in Kauf. | Projektleiter, 30.10.2026 | N-BETRIEB-01; Server ohne SLA reicht ([ADR-003](adr/adr-003-hosting-infomaniak-vps.md)), #10 |
-| K-16 (Teil) | Wer trägt das Porto für die Briefe? | Der Verein | Projektleiter, 30.10.2026 | #9 |
-| K-25 (Teil) | Gibt es ein Nenngeld, und soll MyTCO festhalten, wer bezahlt hat? | Kein Nenngeld, also auch nichts festzuhalten | Projektleiter, 30.10.2026 | [Glossar](glossar.md) |
+| K-16.2 | Wer trägt das Porto für die Briefe? | Der Verein | Projektleiter, 30.10.2026 | #9 |
+| K-25.2 | Gibt es ein Nenngeld? | Nein | Projektleiter, 30.10.2026 | [Glossar](glossar.md) |
+| K-25.3 | Soll MyTCO festhalten, wer das Nenngeld bezahlt hat? | Nein, es gibt keins | Projektleiter, 30.10.2026 | [Glossar](glossar.md) |
 | K-31 | Dürfen Spieler die Kontaktdaten ihrer Gegner und Doppelpartner sehen, und braucht es dafür eine Einwilligung? | Ja, E-Mail und Telefon bis zum Ende der CM, ohne weitere Einwilligung | Projektleiter, 30.10.2026 | FR-19, [Datenschutz](datenschutz.md) |
 | K-42 | Dürfen CM-Verantwortlicher und Lizenzverantwortlicher E-Mail und Telefon aller Mitglieder sehen? | Ja, von allen Mitgliedern | Projektleiter, 30.10.2026 | [Rollen und Rechte](rollen-und-rechte.md), [Datenschutz](datenschutz.md) |

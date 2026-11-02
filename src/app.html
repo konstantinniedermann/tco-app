@@ -3,6 +3,15 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- Android/Chrome: Schrift folgt der Systemeinstellung (UI-02, docs/ui-leitbild.md) -->
+		<meta name="text-scale" content="scale" />
+		<!-- Farbe = --farbe-marke (HTML kennt keine Tokens); Annahme K-13.2: Farbkonzept Variante C -->
+		<meta name="theme-color" content="#0f6b4f" />
+		<!-- Annahme K-13: Wappen von tcolten.ch als App-Symbol, Freigabe des Vereins steht aus -->
+		<link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png" />
+		<!-- Manifest: ohne es öffnet der Startbildschirm-Eintrag nur ein Lesezeichen statt der eigenständigen App -->
+		<link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

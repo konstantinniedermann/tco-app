@@ -10,8 +10,10 @@ Mitgliederverwaltung Fairgate oder die Website tcolten.ch.
 
 ## Stand
 
-Phase **Fundament**: Architektur und Grundlagen werden dokumentiert; das Code-Gerüst
-(Version 0.1.0) steht, Funktionen folgen mit den Etappen. Termine und Umfang der Etappen → [`docs/roadmap.md`](docs/roadmap.md).
+Phase **Fundament**, Version 0.2.0 (noch nicht ausgeliefert): Login per Einmal-Code mit
+Musterbrief sowie Auslieferung und Sicherung sind gebaut und lokal nachgewiesen; der Server
+folgt, weitere Funktionen kommen mit den Etappen. Termine und Umfang der Etappen
+→ [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Einstieg
 
@@ -33,10 +35,15 @@ Docker Desktop, gitleaks.
 npm ci --ignore-scripts
 npm exec --no -- playwright install chromium webkit
 make hooks   # einmalig: Git-Hooks aktivieren
-make db      # lokale PostgreSQL starten
+cp .env.example .env   # einmalig: lokale Einstellungen (nur erfundene Werte)
+make db      # lokale PostgreSQL und Mail-Fänger Mailpit starten
+make seed    # erfundene Mitglieder anlegen, gibt einen Brief-Code zum Anmelden aus
 make dev     # Entwicklungsserver
 make check   # alle Prüfungen (braucht Docker)
 ```
+
+Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make musterbrief` erzeugt
+einen Musterbrief als PDF unter `musterbrief/musterbrief.pdf`.
 
 Alle weiteren Befehle: `make help`.
 

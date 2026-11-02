@@ -1,0 +1,49 @@
+/*
+ * Nur Geräterahmen und Anordnung der Mockups. Farben, Schrift und Bausteine kommen
+ * ausschliesslich aus src/lib/design/tokens.css und basis.css (docs/ui-leitbild.md).
+ */
+.mockup-seite {
+	padding: 24px;
+}
+
+.mockup-seite > h1,
+.mockup-seite > p {
+	max-width: 60rem;
+}
+
+.mockup-reihe {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 32px;
+	align-items: flex-start;
+	margin: 24px 0 48px;
+}
+
+.mockup-geraet figcaption {
+	max-width: 360px;
+	margin-top: 8px;
+}
+
+.handy {
+	width: 376px;
+	height: 760px;
+	border: 8px solid #222;
+	border-radius: 32px;
+	overflow: hidden auto;
+	min-height: 0;
+	background: var(--farbe-hintergrund);
+}
+
+.pc {
+	width: 1136px;
+	min-height: 640px;
+	border: 8px solid #222;
+	border-radius: 12px;
+	overflow: hidden;
+	background: var(--farbe-hintergrund);
+}
+
+/* Seite «grosse Schrift»: wie wenn das Handy die Systemschrift auf 150 % stellt */
+html.gross {
+	font-size: 150%;
+}

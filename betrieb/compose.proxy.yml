@@ -1,0 +1,32 @@
+# Gemeinsamer Webserver für Test und Live. Die Proxy-Netze werden hier angelegt,
+# die App-Stapel der Umgebungen hängen sich als externe Netze daran.
+services:
+  caddy:
+    image: caddy:2-alpine@sha256:e70b164da81ef698b3ad19af799ea6086ce6d9e48ed4079eb9fe26f6fbf14ee5
+    restart: unless-stopped
+    env_file:
+      - proxy.env
+    ports:
+      - '${MYTCO_HTTP_PORT:-80}:80'
+      - '${MYTCO_HTTPS_PORT:-443}:443'
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/umgebungen:/etc/caddy/umgebungen:ro
+      - caddy-daten:/data
+    networks:
+      - proxy-test
+      - proxy-live
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '5'
+
+volumes:
+  caddy-daten:
+
+networks:
+  proxy-test:
+    name: mytco-proxy-test
+  proxy-live:
+    name: mytco-proxy-live

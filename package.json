@@ -1,6 +1,6 @@
 {
 	"name": "mytco",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"private": true,
 	"type": "module",
 	"engines": {
@@ -20,12 +20,13 @@
 		"e2e:browser": "playwright install --with-deps chromium webkit",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"pruefungen": "node scripts/pruefungen/bauregel.ts && node scripts/pruefungen/test-ids.ts && node scripts/pruefungen/testdaten.ts && node scripts/pruefungen/skip.ts"
+		"pruefungen": "node scripts/pruefungen/bauregel.ts && node scripts/pruefungen/test-ids.ts && node scripts/pruefungen/testdaten.ts && node scripts/pruefungen/skip.ts && node scripts/pruefungen/annahmen.ts && node scripts/pruefungen/design-festwerte.ts && node scripts/pruefungen/workflow-rechte.ts"
 	},
 	"dependencies": {
 		"@sveltejs/adapter-node": "^6.0.1",
 		"@sveltejs/kit": "^3.1.1",
 		"drizzle-orm": "^0.45.4",
+		"nodemailer": "^10.3.1",
 		"pg": "^8.23.1",
 		"svelte": "^5.57.3"
 	},
@@ -44,6 +45,7 @@
 		"globals": "^17.14.0",
 		"prettier": "^3.9.10",
 		"prettier-plugin-svelte": "^4.1.1",
+		"qrcode-generator": "^2.0.4",
 		"svelte-check": "^4.7.7",
 		"typescript": "6.0.3",
 		"typescript-eslint": "^8.72.1",

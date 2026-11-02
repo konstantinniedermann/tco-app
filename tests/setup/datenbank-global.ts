@@ -1,4 +1,6 @@
 import { randomBytes } from 'node:crypto';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pg from 'pg';
 import type { TestProject } from 'vitest/node';
 
@@ -24,6 +26,13 @@ export default async function setup(project: TestProject) {
 
 	const testUrl = new URL(basisUrl);
 	testUrl.pathname = `/${name}`;
+	// Einmal hier migrieren, damit parallele Testdateien nicht gleichzeitig migrieren.
+	const pool = new pg.Pool({ connectionString: testUrl.toString() });
+	try {
+		await migrate(drizzle(pool), { migrationsFolder: 'drizzle' });
+	} finally {
+		await pool.end();
+	}
 	project.provide('datenbankUrl', testUrl.toString());
 
 	return async () => {

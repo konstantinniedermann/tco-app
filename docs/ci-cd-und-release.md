@@ -16,20 +16,27 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 
 | | Test | Live |
 |---|------|------|
-| Adresse | `test.my.tcolten.ch`, nur mit Passwort | `my.tcolten.ch` |
+| Adresse | `test.my.tcolten.ch`, nur mit Passwort (Annahme K-10) | `my.tcolten.ch` (Annahme K-10) |
+| Rolle | Demo und Checkliste | Testgruppe (Pilotphase), später alle Mitglieder |
 | Ausgeliefert bei | Merge nach `dev` | Merge des PR `dev` → `main` |
 | Daten | nur erfundene Testdaten; bei jeder Auslieferung neu aufgesetzt | Mitgliederdaten |
-| E-Mail | nur an die Adresse des Projektleiters, alle anderen werden verworfen | an die Mitglieder |
+| E-Mail | nur an die Adresse des Projektleiters, alle anderen werden verworfen (hängt an K-11) | an die Mitglieder |
 | Push, Schlüssel | eigene | eigene |
 
-Beide Adressen richtet der Website-Betreuer ein (K-10). Auf der Test-Umgebung läuft die
+Beide Adressen richtet der Website-Betreuer ein (Annahme K-10: Test und Live unter `tcolten.ch`).
+Bis dahin gilt eine Übergangsadresse, die sich aus der IP des Servers bildet; die Adressen sind
+Einstellungen, am Code ändert sich dafür nichts. Die Demo läuft auf Test, Live bleibt leer bis zur
+Testgruppe. Auf der Test-Umgebung läuft die
 [Checkliste vor dem Release](testkonzept.md#checkliste-vor-dem-release). Echte Daten kommen
 dort nie hin (DS-08).
 
-**Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut. Server,
-Umgebungen und Auslieferung baut [#32](https://github.com/konstantinniedermann/tco-app/issues/32),
-sobald Konten und Adresse geklärt sind (K-04, K-10), spätestens vor dem Release
-*Mitglieder-Login*.
+**Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut.
+[#32](https://github.com/konstantinniedermann/tco-app/issues/32) baut den lokal belegbaren Teil:
+Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
+(36 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
+[#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
+#29, Konten und Adresse hängen an K-04 und K-10), spätestens vor dem Release *Mitglieder-Login*.
+Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
 
 ## Ablauf
 
@@ -48,37 +55,107 @@ flowchart LR
 
 - **Freigabe:** Der Merge des PR nach `main` geht ohne weiteren Knopf live; `main` ist
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
-  abgehakt und das Release freigegeben hat.
+  abgehakt und das Release freigegeben hat (ohne Server: Ausnahmen unter [Versionen](#versionen)).
 - **Version:** Vor dem PR erhöht ein Commit auf `dev` die Version in `package.json` und macht
   aus *Unveröffentlicht* in den [Versionen](versionen.md) die neue Nummer. Nach der
   erfolgreichen Live-Auslieferung setzt die CI den Tag und das GitHub-Release; nur dieser
-  Schritt darf ins Repo schreiben.
+  Schritt darf ins Repo schreiben. Solange Live ausgeschaltet ist, gilt ein eigener Ablauf
+  (siehe [Versionen](#versionen)).
 - **Merge:** Auf GitHub ist nur der Merge-Commit erlaubt (Squash und Rebase abgeschaltet).
   „Branch nach dem Merge löschen“ bleibt aus, sonst löscht der PR `dev` → `main` den
   Branch `dev`.
 - **Fehlerbehebungen** nehmen denselben Weg über `dev`; ein eigener Hotfix-Weg lohnt bei
   diesem Umfang nicht.
 - Released wird, wenn ein Stand es wert ist, nicht nach jedem Issue: Jedes Release braucht
-  die Checkliste. Die Doku-Stände vor dem Code-Gerüst haben keine Versionsnummer.
+  die Checkliste, sobald Test läuft. Die Doku-Stände vor dem Code-Gerüst haben keine Versionsnummer.
 
 ## Auslieferung
 
-1. **Bauen:** Die CI baut das Docker-Image und legt es in der privaten Container-Ablage von
-   GitHub ab.
-2. **Verbinden:** Die CI meldet sich per SSH auf dem Server an, mit je einem eigenen
-   Schlüssel für Test und Live. Der Schlüssel darf nur das Auslieferungs-Skript starten.
-3. **Auf dem Server:** Bei Live zuerst eine Sicherung der Datenbank, mit denselben Regeln wie
-   die nächtliche Sicherung (verschlüsselt, Schweiz, 30 Tage, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md)).
-   Dann neues Image holen, Migrationen ausführen, Container neu starten.
-4. **Prüfen:** Antwortet die App nicht innert einer Minute (S) auf ihre Statusabfrage,
-   startet das Skript wieder das vorherige Image. Der CI meldet es nur „ok“ oder „Fehler“,
+Gebaut wird einmal, auf `dev`. Live bekommt **nur das Image, das zuvor auf Test erfolgreich
+ausgeliefert wurde** (Docker-Builds sind nicht bitgenau wiederholbar, ein Neubau wäre ein
+anderes Image). Dafür trägt ein Image das Kennzeichen `code-<Hash>`; der Hash bildet sich über
+alle versionierten Dateien ausser der Doku (gleiche Regel wie `nur-doku.ts`). Ein reiner
+Doku-Merge ändert ihn nicht.
+
+1. **Prüfen:** Job `image` baut das Image und startet es im Rauchtest (Container mit
+   PostgreSQL, Migration, `/api/status` = `ok`). Das läuft bei jeder Codeänderung und ist
+   sofort aktiv.
+2. **Bauen (`bauen`, nur `dev`):** Image bauen und mit dem Commit als Kennzeichen
+   (`commit-<sha>`) in die private Container-Ablage von GitHub legen.
+3. **Verbinden (`ausliefern`):** Die CI meldet sich per SSH beim **Türsteher** auf dem Server,
+   mit je einem eigenen Schlüssel für Test und Live. Der Schlüssel darf nur den Türsteher
+   starten; die Umgebung steht im Schlüssel, nicht in der Anfrage. Übergeben wird nur der
+   Digest des Images. Der Schlüssel wird je Zweig gewählt, ohne Rückfall auf den anderen; ein
+   leeres Geheimnis ergibt `fehler`.
+4. **Auf dem Server:** Das Image holen und **die Einrichtung daraus entnehmen** (Compose-Dateien,
+   Caddy-Teil der Umgebung, Skripte). Sie reist im Image mit, das Image wird dafür nicht
+   gestartet. Bei Live zuerst eine Sicherung der Datenbank, **bevor** irgendetwas übernommen
+   wird; scheitert sie, bleibt alles, wie es war. Dann die Einrichtung übernehmen (gemeinsame
+   Teile wie die Caddy-Grundkonfiguration nur bei Live oder solange Live noch nie ausgeliefert wurde, vorher prüft `caddy validate`; eine
+   ungültige Konfiguration wird abgewiesen, die alte bleibt aktiv). Danach lädt Caddy die neue
+   Konfiguration, und der Proxy-Container wird neu erstellt, wenn sich sein Image (z. B. ein
+   Update von Dependabot) oder `proxy.env` geändert hat. Dann Migrationen ausführen, Container
+   neu starten. Auf Test wird die Datenbank dabei neu aufgesetzt. Bricht der Lauf mitten in der
+   Übernahme ab, wird alles Übernommene zurückgesetzt.
+5. **Prüfen:** Antwortet die App nicht innert einer Minute (S) auf ihre Statusabfrage,
+   startet das Skript wieder das vorherige Image. Die CI erfährt nur `ok` oder `fehler`,
    keine Logs der App, denn CI-Logs liegen bei GitHub in den USA (DS-01, DS-06).
-5. **Abschluss Live:** Tag `vX.Y.Z` auf `main` und GitHub-Release mit dem Text aus den
+6. **Freigeben (`freigeben`, nur `dev`):** Erst nach einer geglückten Auslieferung auf Test
+   setzt dieser Job das Kennzeichen `code-<Hash>`. Ohne Auslieferung auf Test gibt es kein
+   solches Kennzeichen, also auch nichts für Live.
+7. **Live (`finden`, nur `main`):** Der Job sucht über `code-<Hash>` das Image, das auf Test lief.
+   Fehlt es, endet der Lauf mit `fehler`, es wird nicht neu gebaut. **Vorab** prüft `finden`
+   das Release (Version gültig, Abschnitt in den [Versionen](versionen.md) vorhanden, Tag noch
+   frei), damit Live nie ausgeliefert wird und danach das Release scheitert. Dann liefert
+   `ausliefern` an Live.
+8. **Abschluss Live (`release`):** Tag `vX.Y.Z` auf `main` und GitHub-Release mit dem Text aus den
    [Versionen](versionen.md).
 
-**Zurück auf die vorherige Version:** Das vorherige Image bleibt auf dem Server; ein Befehl
-startet es wieder. Damit das ohne Datenverlust geht, fügen Migrationen nur hinzu. Was die
-alte Version noch braucht, wird erst ein Release später entfernt.
+**Zwei Schalter:** Die Jobs `bauen`, `finden`, `ausliefern`, `freigeben` und `release` laufen nur,
+wenn die Repo-Variable der Umgebung auf `an` steht: `AUSLIEFERUNG_TEST` (für `dev`) bzw.
+`AUSLIEFERUNG_LIVE` (für `main`). So kann die Demo auf Test laufen, während Live noch aus ist.
+Stehen sie nicht auf `an`, gelten die Jobs als übersprungen, nicht als fehlgeschlagen. Aktiv ist
+nur der Rauchtest.
+
+**Sicherung und Probe:** `sichern` schreibt die Datenbank verschlüsselt mit restic ins
+Sicherungsziel, ohne unverschlüsselte Datei, und löscht Sicherungen nach 30 Tagen, gezählt ab der neuesten Sicherung
+(DS-06, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md)). Nächtlich läuft das für Live über einen
+Timer, danach prüft `probe` die frische Sicherung in einer Wegwerf-Datenbank ohne Verbindung nach
+aussen. Eingespielt und zurückgespielt werden nur vollständige Läufe. Die Probe-Daten bleiben
+auf dem Server (SI-16); die Sicherung selbst verlässt ihn nur verschlüsselt, Richtung
+S3-kompatiblem Ziel (Ziel legt [#10](https://github.com/konstantinniedermann/tco-app/issues/10) fest).
+
+- **30 Tage:** restic zählt sie je Umgebung und Datei (Dump, Zählung) ab der neuesten Sicherung,
+  nicht ab heute. Bleibt die Sicherung aus, bleiben auch die alten erhalten.
+- **Sicherungsziel:** Das Ziel legt der Betrieb einmal von Hand an (`betrieb/README.md`).
+  `sichern` legt nie selbst eines an; fehlt es oder ist es falsch eingetragen, meldet es
+  `fehler`, und eine Live-Auslieferung bricht vor jeder Änderung ab.
+- **Wiederherstellen:** Vor dem Einspielen werden die Tabellen der App samt der Liste der
+  Migrationen geleert, alles in einer Transaktion. So bleibt keine Tabelle einer späteren
+  Migration stehen, und die nächste Auslieferung migriert wieder sauber. Scheitert etwas,
+  bleibt der alte Stand.
+
+**Befehle auf dem Server** (Einzelheiten in `betrieb/README.md`):
+
+| Befehl | Zweck |
+|--------|-------|
+| `zurueck` | Zurück auf das vorherige Image. Migrationen fügen nur hinzu, darum geht das ohne Datenverlust; was die alte Version noch braucht, wird erst ein Release später entfernt |
+| `wiederherstellen` | Eine Sicherung derselben Umgebung zurückspielen. Auf Test findet der Befehl keinen Snapshot einer Live-Sicherung (DS-08) |
+| `probe` | Sicherung in einer Wegwerf-Datenbank einspielen, mit der Zählung vergleichen, `ok` oder `fehler` |
+
+**Netz und Header:** Ein Caddy-Proxy nimmt 80 und 443 an und erreicht beide Apps; die Datenbanken
+hängen nur an ihrem internen Netz, die Test-App erreicht Live nicht. Caddy behält die
+Content-Security-Policy der App und setzt `frame-ancestors 'none'` nur, wo keine besteht;
+HSTS, `nosniff` und Referrer-Policy setzt er genau einmal, auch für `/_app/*`. Er führt kein
+Zugriffsprotokoll. Fehler und Warnungen schreibt er ins Docker-Log des Proxys; ein Filter
+entfernt daraus Client-Adresse und Weiterleitungs-Köpfe jedes Eintrags, es bleiben keine
+IP-Adressen (DS-06). Test verlangt ein Passwort.
+
+**Protokolle auf dem Server:** Was docker, psql und die App bei Auslieferung und Sicherung
+ausgeben, steht nur in `<umgebung>/protokoll.log` (je Umgebung, nur für den Betriebsbenutzer
+lesbar). Docker-Logs der Container rotieren nach Grösse (5 × 10 MB). Eine Rotation nach Zeit
+(höchstens 30 Tage, DS-06) für beide richtet
+[#39](https://github.com/konstantinniedermann/tco-app/issues/39) ein.
 
 ### Schutz des Auslieferungswegs
 
@@ -87,45 +164,96 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 - Das Skript nimmt nur zwei Angaben an: `test` oder `live` und den Digest eines Images aus
   der eigenen Container-Ablage. Beides wird streng geprüft und nie über eine Shell
   ausgewertet.
-- Der Live-Lauf startet nur bei einem Push auf `main`.
+- Der Live-Lauf startet nur bei einem Push auf `main` und nur mit einem Image, das auf Test
+  ausgeliefert wurde.
+- Der Türsteher und seine Eingabeprüfung werden **von Hand** eingerichtet und nie von der CI
+  geändert. Er schützt den **Eingang**: Er nimmt nur einen Digest an, die Umgebung kommt aus
+  dem Schlüssel. **Gegen ein schädliches Image schützt er nicht.** Das `ausliefern` aus dem
+  Image läuft auf dem Server als Benutzer `mytco` mit Zugang zu Docker, und das reicht so weit
+  wie root. Ein solches Image kann auch den Türsteher selbst, die Schlüssel in
+  `authorized_keys` und die systemd-Einheiten umschreiben.
+- Die Rechte der Workflows prüft `workflow-rechte.ts` in der CI: Jeder Job hat eigene Rechte,
+  `packages: write` nur `bauen` und `freigeben`, `contents: write` nur `release`, die SSH-Geheimnisse
+  nur `ausliefern`.
 - Nur der Auslieferungs-Job fordert den SSH-Schlüssel an. Er führt keine npm-Pakete, keine
   fremden Actions und nichts aus Caches oder Artefakten anderer Jobs aus. GitHub gibt ein
   Geheimnis nur an Schritte, die es anfordern; ein Schadpaket in den Tests kommt so nicht
-  an den Schlüssel. Die übrigen Jobs haben nur Leserechte aufs Repo, der Bau-Job dazu
-  Schreibrecht auf die Container-Ablage.
+  an den Schlüssel. Welche Rechte die einzelnen Jobs haben, legt der Punkt zu
+  `workflow-rechte.ts` oben fest.
 - **Kein GitHub Pro:** Schutz von `main` auf GitHub, Geheimnisse nur für eine Umgebung und
   „nur `main` darf ausliefern“ gibt es für private Repos erst ab Pro (B:
   [GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments),
   Antwort der API). Der Projektleiter verzichtet darauf, um laufende Kosten auf seinem
   Privatkonto zu vermeiden; das Restrisiko ist im Sicherheitskonzept bewertet. Die Auslieferung bleibt
   automatisch.
-- **Restrisiko** (angenommen im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
+- **Restrisiko** (bewertet im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
   Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
-  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten mit K-04):
+  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten, hängt an K-04). Die
+  Reichweite ist dort am 02.11.2026 richtiggestellt worden und **vom Projektleiter neu zu
+  bestätigen**:
   - Wer ins Repo pushen kann, kann direkt auf `main` pushen (davor schützt nur der lokale
     Hook des Projektleiters) oder einen Workflow schreiben, der den Live-Schlüssel nutzt
-    (davor schützt nichts). Pushen können der Projektleiter und die Hauptansprechperson
+    (davor schützt nichts). Weil das `ausliefern` aus dem Image auf dem Server läuft, reicht
+    das bis zu root auf dem Server: Geheimnisse beider Umgebungen, Sicherungszugang,
+    Türsteher und Schlüssel. Getrennte Schlüssel für Test und Live helfen nur gegen einen
+    gestohlenen Schlüssel allein; ein schädliches Image, das nur auf Test kommt, erreicht über
+    denselben Server trotzdem Live. Pushen können der Projektleiter und die Hauptansprechperson
     im Vorstand: Mitarbeitende eines privaten Repos auf einem Privatkonto haben immer
     Schreibrecht (B: [GitHub Docs](https://docs.github.com/en/account-and-profile/reference/permission-levels-for-a-personal-account-repository)).
     Eine reine Leserolle gibt es erst in einer Organisation (K-04).
-  - Ein Schadpaket im Bau landet im Image und läuft damit live, auch ohne den Schlüssel.
+  - Ein Schadpaket im Bau landet im Image und läuft damit live, auch ohne den Schlüssel, und
+    mit dem `ausliefern` des Images auch als root-gleicher Benutzer auf dem Server.
     Dagegen helfen nur die Malware-Prüfung und die Prüfung der Pakete vor der Aufnahme.
 
 ### Geheimnisse
 
 | Wo | Was |
 |----|-----|
-| GitHub | SSH-Schlüssel für Test und für Live, Fingerabdruck des Servers |
+| GitHub (Secrets) | `SSH_SCHLUESSEL_TEST`, `SSH_SCHLUESSEL_LIVE`, `SSH_BEKANNTE_HOSTS` (die `known_hosts`-Zeile des Servers mit seinem öffentlichen Schlüssel, kein Fingerabdruck), `SERVER_ADRESSE` |
+| GitHub (Variablen, keine Geheimnisse) | `AUSLIEFERUNG_TEST`, `AUSLIEFERUNG_LIVE` |
 | CI-Lauf | kurzlebiges Token zum Lesen der Container-Ablage, das die CI für den Pull mitgibt; auf dem Server bleibt kein dauerhaftes Token |
-| Server | Datenbank-Passwörter, Schlüssel für Push, Zugang zum E-Mail-Versand, Passwort der Test-Umgebung |
+| Server, je Umgebung | `geheim.env`: Datenbank-Passwort, Schlüssel für die Codes (`MYTCO_CODE_SCHLUESSEL`, je eigener für Test und Live), Zugang zum E-Mail-Versand (`MYTCO_SMTP_URL`), Absender, Kontakt, Adresse der Umgebung, auf Test der einzige Mail-Empfänger (Projektleiter); Schlüssel für Push folgt mit der Push-Funktion |
+| Server, gemeinsam | `proxy.env` (Adressen, Passwort-Hash für Test), `sicherung.env` (Ziel und Zugang der Sicherung) |
 
-Nichts davon steht im Repo. Wo die Geheimnisse für eine Nachfolge dokumentiert sind, regelt
+Die Dateien liegen nur auf dem Server (Rechte 600), im Repo stehen Vorlagen ohne Werte. Wo die
+Geheimnisse für eine Nachfolge dokumentiert sind, regelt
 [#10](https://github.com/konstantinniedermann/tco-app/issues/10).
+
+## Einstellungen der App
+
+Die App liest ihre Einstellungen aus Umgebungsvariablen. Lokal stehen sie in `.env` (Vorlage
+`.env.example`, kopieren); `make dev` und `make seed` brechen ohne diese Datei ab. Fehlt ein
+`MYTCO_*`-Pflichtwert, startet der Server nicht. Fehlt `DATABASE_URL`, startet er zwar, aber
+`/api/status` meldet einen Fehler und der Login antwortet mit einem Serverfehler. Beim Bauen
+werden sie nicht geprüft.
+
+| Variable | Inhalt | Pflicht |
+|----------|--------|---------|
+| `DATABASE_URL` | Verbindung zur PostgreSQL-Datenbank der Umgebung | ja |
+| `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
+| `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
+| `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
+| `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text, steht im Brief und in der Meldung «Code schon benutzt» (Annahme K-21) | ja |
+| `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
+
+**Schnittstelle zu [#32](https://github.com/konstantinniedermann/tco-app/issues/32):**
+Hinter dem Reverse Proxy muss `adapter-node` die Client-IP aus einer Kopfzeile lesen, die nur
+der Proxy setzt (`ADDRESS_HEADER`, bei `X-Forwarded-For` dazu `XFF_DEPTH`). Sonst teilen alle
+Mitglieder die IP des Proxys, und die Bremsen pro IP sperren alle zusammen. `PROTOCOL_HEADER`
+nur setzen, wenn der Proxy die Kopfzeile zuverlässig setzt. Die E2E-Tests setzen sie nur,
+damit WebKit das Cookie auf `http://localhost` annimmt. IPv6-Clients vor dem Zählen auf ihr
+/64-Netz zusammenfassen (im Proxy oder in der App), sonst umgeht ein Wechsel der Adresse die
+Bremsen pro IP. Mail-Versand nur mit TLS: `smtps://` oder STARTTLS erzwungen.
+
+**Mails lokal und in der CI:** Mailpit (`axllent/mailpit:v1.33`) fängt alle Mails ab, lokal
+über `docker-compose.yml` (`make db`; SMTP auf Port 51025, Oberfläche auf
+`http://localhost:58025`), in der CI als Service des E2E-Jobs. Die E2E-Tests lesen den
+Mail-Code über die Schnittstelle von Mailpit.
 
 ## Prüfungen in der CI
 
-`make check` führt lokal dieselben Prüfungen aus wie die CI, ausser der Malware-Prüfung (nur
-CI); der Secret-Scan läuft lokal über den Hook bzw. `make secrets`. Die CI läuft bei PRs und
+`make check` führt lokal dieselben Prüfungen aus wie die CI, ausser der Malware-Prüfung und
+dem Rauchtest des Images (beide nur CI; den Rauchtest gibt es lokal einzeln als `make rauchtest`); der Secret-Scan läuft lokal über den Hook bzw. `make secrets`. Die CI läuft bei PRs und
 auf `dev` und `main`, nicht auf Issue-Branches (dort decken die Git-Hooks ab). Änderungen nur
 an der Doku führen trotzdem `make docs` aus, inklusive Test-ID-Prüfung. Ob eine Änderung
 nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
@@ -139,11 +267,13 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 | Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions | ADR-002 | vorhanden |
 | Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
-| Jede `FR-`, `RR-` und umgesetzte `A-`-ID hat einen Test | Testkonzept | vorhanden |
+| Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
 | Playwright Ende-zu-Ende in drei Umgebungen mit axe; Screenshots als Artefakt des Laufs, 30 Tage | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
 | Docker-Image baut | ADR-003 | vorhanden |
+| Rauchtest des Images (Start, Migration, `/api/status`) | ADR-003 | vorhanden |
+| Rechte der Workflows (`workflow-rechte.ts`) | dieses Konzept | vorhanden |
 
 ## Abhängigkeiten
 
@@ -157,6 +287,14 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
   Schadpakete und bricht die CI ab.
 - **Updates:** Dependabot schlägt wöchentlich Updates für npm, Docker-Images und GitHub
   Actions vor, als PR auf `dev`. Hauptversionen werden einzeln geprüft.
+- **Keine Hauptversionen von PostgreSQL und Caddy** über Dependabot (dort ausgeschlossen).
+  Eine neue Hauptversion von PostgreSQL liest die Daten von Live nicht: Auf Test (leere
+  Datenbank) ginge sie durch, Live fiele aus. Sie braucht einen eigenen Plan mit Sicherung,
+  Dump und Wiederherstellung in die neue Version. Caddy-Hauptversionen können die
+  Konfiguration ändern.
+- **Nicht von Dependabot erfasst:** die Digests von restic (`betrieb/bin/lib.sh`) und der
+  Registry des Nachweises (`betrieb/nachweis/nachweis.sh`) stehen in Shell-Dateien. Sie werden
+  von Hand geprüft (siehe [Beobachtungen](beobachtungen.md)).
 
 ## Versionen
 
@@ -165,7 +303,15 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 - **Nebenversion** für eine neue Etappe oder Funktion, **Korrektur** für Fehlerbehebungen,
   **Hauptversion** nur, wenn Mitglieder etwas umstellen müssen (z. B. Umstieg auf die
   Store-App).
-- Die Version steht in `package.json`, in der Fusszeile der App und als Tag auf `main`.
+- Die Version steht in `package.json`, in der Fusszeile der App und, sobald Live ausgeliefert
+  wird, als Tag auf `main`.
+- **Solange `AUSLIEFERUNG_LIVE` aus ist,** gibt es keinen Tag und kein GitHub-Release, denn
+  der Job `release` läuft dann nicht. Ein Release besteht aus dem Versions-Commit auf `dev`
+  (Version in `package.json`, Abschnitt in den [Versionen](versionen.md) mit «nicht
+  ausgeliefert») und dem PR nach `main`. Tags werden nicht von Hand gesetzt, auch nicht
+  nachträglich; den ersten setzt die CI bei der ersten Live-Auslieferung.
+- **Die Checkliste entfällt nur, solange `AUSLIEFERUNG_TEST` aus ist** (es gibt kein Test).
+  Läuft Test schon und Live noch nicht, wird sie vor dem Release auf Test abgehakt.
 
 ## Alte Versionen auf dem Handy
 
@@ -195,8 +341,12 @@ Budget erschöpft, startet GitHub keine Jobs mehr, also auch keine Auslieferung.
   auf, gezählt werden 7 Jobs inklusive Secret-Scan. Ein reiner Doku-Merge kostet 3 Minuten.
   Bei rund 30 Code-Merges im Monat sind das etwa 330 Minuten (S). Reicht das Kontingent
   nicht, laufen die Ende-zu-Ende-Tests nur beim PR nach `main`.
-- **Notfall ohne Minuten:** Der Projektleiter startet das Auslieferungs-Skript von Hand auf
-  dem Server, oder das Budget des Kontos wird erhöht.
+- **Notfall ohne Minuten:** Ohne Minuten baut die CI auch kein Image. Der Projektleiter baut
+  es dann lokal für den Server (`--platform linux/amd64`, sein Mac baut sonst für arm64),
+  schiebt es mit einem eigenen, kurzlebigen Token (nur `packages: write`) in
+  die Container-Ablage und startet die Auslieferung mit dem Digest von Hand auf dem Server
+  (Ablauf in `betrieb/README.md`). Die Regel «Live nur mit dem Image, das auf Test lief» prüft
+  dann niemand automatisch; sie liegt bei ihm. Oder das Budget des Kontos wird erhöht.
 
 ## Ausblick: Store-App
 
