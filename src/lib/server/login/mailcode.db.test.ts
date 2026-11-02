@@ -43,6 +43,9 @@ function baue(mailer?: Mailer) {
 }
 
 const codeAus = (n: Nachricht) => n.text.slice(0, 6);
+/** Sicher falscher Code: um `versatz` (1 bis 999 999) neben dem richtigen. */
+const falscherCode = (code: string, versatz = 1) =>
+	String((Number(code) + versatz) % 1_000_000).padStart(6, '0');
 const holeKonto = async (id: number) => (await db.select().from(konto).where(eq(konto.id, id)))[0];
 
 async function fordereAn(d: ReturnType<typeof baue>, email: string, ip = 'ip-1') {
@@ -187,7 +190,7 @@ describe('Mail-Code', () => {
 		const { email, kontoId } = await legeMitgliedAn(db);
 		await fordereAn(d, email);
 		const code = codeAus(d.post[0]);
-		const falsch = code === '000000' ? '111111' : '000000';
+		const falsch = falscherCode(code);
 		for (let i = 0; i < 5; i++) {
 			expect(await d.dienst.loginMitMailCode(email, falsch, `ip-13-${i}`)).toEqual({
 				ergebnis: 'falsch'
@@ -250,7 +253,7 @@ describe('Mail-Code', () => {
 		const { email, kontoId } = await legeMitgliedAn(db);
 		await fordereAn(d, email);
 		const code = codeAus(d.post[0]);
-		const falsch = code === '000000' ? '111111' : '000000';
+		const falsch = falscherCode(code);
 		const antworten = await Promise.all(
 			Array.from({ length: 20 }, (_, i) => d.dienst.loginMitMailCode(email, falsch, `ip-p-${i}`))
 		);
@@ -263,8 +266,9 @@ describe('Mail-Code', () => {
 		const d = baue();
 		const { email } = await legeMitgliedAn(db);
 		await fordereAn(d, email);
+		const falsch = falscherCode(codeAus(d.post[0]));
 		const antworten = await Promise.all(
-			Array.from({ length: 15 }, () => d.dienst.loginMitMailCode(email, '000000', 'ip-q'))
+			Array.from({ length: 15 }, () => d.dienst.loginMitMailCode(email, falsch, 'ip-q'))
 		);
 		expect(antworten.filter((a) => a.ergebnis !== 'zu-viele').length).toBeLessThanOrEqual(10);
 		expect(antworten.some((a) => a.ergebnis === 'zu-viele')).toBe(true);
@@ -308,8 +312,9 @@ describe('Mail-Code', () => {
 		const d = baue();
 		const { email, kontoId } = await legeMitgliedAn(db);
 		await fordereAn(d, email);
-		await d.dienst.loginMitMailCode(email, '000000', 'ip-t');
-		await d.dienst.loginMitMailCode(email, '000001', 'ip-t');
+		const code = codeAus(d.post[0]);
+		await d.dienst.loginMitMailCode(email, falscherCode(code, 1), 'ip-t');
+		await d.dienst.loginMitMailCode(email, falscherCode(code, 2), 'ip-t');
 		expect((await holeKonto(kontoId)).mailCodeFehlversuche).toBe(2);
 		await fordereAn(d, email);
 		expect((await holeKonto(kontoId)).mailCodeFehlversuche).toBe(0);
@@ -348,8 +353,9 @@ describe('Mail-Code', () => {
 		const d = baue();
 		const { email } = await legeMitgliedAn(db);
 		await fordereAn(d, email);
-		for (let i = 0; i < 10; i++) await d.dienst.loginMitMailCode(email, '000000', 'ip-w');
-		expect(await d.dienst.loginMitMailCode(email, '000000', 'ip-w')).toEqual({
+		const falsch = falscherCode(codeAus(d.post[0]));
+		for (let i = 0; i < 10; i++) await d.dienst.loginMitMailCode(email, falsch, 'ip-w');
+		expect(await d.dienst.loginMitMailCode(email, falsch, 'ip-w')).toEqual({
 			ergebnis: 'zu-viele'
 		});
 	});

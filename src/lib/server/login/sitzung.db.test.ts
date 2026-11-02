@@ -68,6 +68,9 @@ describe('Sitzungen', () => {
 		const a = await erstelleSitzung(db, kontoId, jetzt);
 		const b = await erstelleSitzung(db, kontoId, jetzt);
 		await beendeAlleSitzungen(db, kontoId);
+		// Die Zeilen sind gelöscht, nicht nur über die Sitzungsversion ungültig.
+		expect(await zeile(a)).toBeUndefined();
+		expect(await zeile(b)).toBeUndefined();
 		expect(await pruefeSitzung(db, a, jetzt)).toBeNull();
 		expect(await pruefeSitzung(db, b, jetzt)).toBeNull();
 		const [k] = await db.select().from(konto).where(eq(konto.id, kontoId));

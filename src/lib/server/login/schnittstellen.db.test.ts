@@ -258,7 +258,12 @@ describe('Schnittstellen', () => {
 			await ladeSitzung(s.dienst, lang);
 			const c = lang.gesetzt.get(SITZUNG_COOKIE)!;
 			expect(c.wert).toBe(s.kennung);
-			expect(c.opt).toMatchObject({ httpOnly: true, sameSite: 'lax', path: '/' });
+			expect(c.opt).toMatchObject({
+				httpOnly: true,
+				sameSite: 'lax',
+				path: '/',
+				maxAge: 365 * 24 * 60 * 60
+			});
 		});
 
 		test('ohne Cookie bleibt alles leer', async () => {
