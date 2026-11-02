@@ -59,7 +59,8 @@ flowchart LR
 - **Version:** Vor dem PR erhöht ein Commit auf `dev` die Version in `package.json` und macht
   aus *Unveröffentlicht* in den [Versionen](versionen.md) die neue Nummer. Nach der
   erfolgreichen Live-Auslieferung setzt die CI den Tag und das GitHub-Release; nur dieser
-  Schritt darf ins Repo schreiben.
+  Schritt darf ins Repo schreiben. Solange Live ausgeschaltet ist, gilt ein eigener Ablauf
+  (siehe [Versionen](#versionen)).
 - **Merge:** Auf GitHub ist nur der Merge-Commit erlaubt (Squash und Rebase abgeschaltet).
   „Branch nach dem Merge löschen“ bleibt aus, sonst löscht der PR `dev` → `main` den
   Branch `dev`.
@@ -222,10 +223,13 @@ Geheimnisse für eine Nachfolge dokumentiert sind, regelt
 
 Die App liest ihre Einstellungen aus Umgebungsvariablen. Lokal stehen sie in `.env` (Vorlage
 `.env.example`, kopieren); `make dev` und `make seed` brechen ohne diese Datei ab. Fehlt ein
-Pflichtwert, startet der Server nicht. Beim Bauen werden sie nicht geprüft.
+`MYTCO_*`-Pflichtwert, startet der Server nicht. Fehlt `DATABASE_URL`, startet er zwar, aber
+`/api/status` meldet einen Fehler und der Login antwortet mit einem Serverfehler. Beim Bauen
+werden sie nicht geprüft.
 
 | Variable | Inhalt | Pflicht |
 |----------|--------|---------|
+| `DATABASE_URL` | Verbindung zur PostgreSQL-Datenbank der Umgebung | ja |
 | `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
 | `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
 | `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
@@ -248,8 +252,8 @@ Mail-Code über die Schnittstelle von Mailpit.
 
 ## Prüfungen in der CI
 
-`make check` führt lokal dieselben Prüfungen aus wie die CI, ausser der Malware-Prüfung (nur
-CI); der Secret-Scan läuft lokal über den Hook bzw. `make secrets`. Die CI läuft bei PRs und
+`make check` führt lokal dieselben Prüfungen aus wie die CI, ausser der Malware-Prüfung und
+dem Rauchtest des Images (beide nur CI; den Rauchtest gibt es lokal einzeln als `make rauchtest`); der Secret-Scan läuft lokal über den Hook bzw. `make secrets`. Die CI läuft bei PRs und
 auf `dev` und `main`, nicht auf Issue-Branches (dort decken die Git-Hooks ab). Änderungen nur
 an der Doku führen trotzdem `make docs` aus, inklusive Test-ID-Prüfung. Ob eine Änderung
 nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
@@ -263,7 +267,7 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 | Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions | ADR-002 | vorhanden |
 | Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
-| Jede `FR-`, `RR-` und umgesetzte `A-`-ID hat einen Test | Testkonzept | vorhanden |
+| Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
 | Playwright Ende-zu-Ende in drei Umgebungen mit axe; Screenshots als Artefakt des Laufs, 30 Tage | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
@@ -299,7 +303,14 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 - **Nebenversion** für eine neue Etappe oder Funktion, **Korrektur** für Fehlerbehebungen,
   **Hauptversion** nur, wenn Mitglieder etwas umstellen müssen (z. B. Umstieg auf die
   Store-App).
-- Die Version steht in `package.json`, in der Fusszeile der App und als Tag auf `main`.
+- Die Version steht in `package.json`, in der Fusszeile der App und, sobald Live ausgeliefert
+  wird, als Tag auf `main`.
+- **Solange `AUSLIEFERUNG_LIVE` aus ist** (kein Server), gibt es keinen Tag und kein
+  GitHub-Release, denn der Job `release` läuft dann nicht. Ein Release besteht aus dem
+  Versions-Commit auf `dev` (Version in `package.json`, Abschnitt in den
+  [Versionen](versionen.md) mit «nicht ausgeliefert») und dem PR nach `main`. Die Checkliste
+  entfällt, weil es noch keine Test-Umgebung gibt. Tags werden nicht von Hand gesetzt, auch
+  nicht nachträglich; den ersten setzt die CI bei der ersten Live-Auslieferung.
 
 ## Alte Versionen auf dem Handy
 

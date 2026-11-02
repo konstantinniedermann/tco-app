@@ -88,7 +88,15 @@ Widerspruch fragen.
 live mit Mitgliederdaten, `docs/ci-cd-und-release.md`): vor dem PR muss der Projektleiter die
 Checkliste auf Test abgehakt und genau dieses Release freigegeben haben; dazu ein Commit auf
 `dev`, der die Version in `package.json` und `docs/versionen.md` setzt. Den Tag setzt die
-CI. Bis dahin (nur Doku) gilt der Ablauf unten ohne Checkliste und ohne Version.
+CI.
+
+**Code, aber noch keine Live-Auslieferung** (`AUSLIEFERUNG_LIVE` nicht `an`): Versions-Commit
+auf `dev` wie oben, in `docs/versionen.md` als «nicht ausgeliefert» gekennzeichnet; keine
+Checkliste (noch keine Test-Umgebung), kein Tag, kein GitHub-Release, auch nicht von Hand
+(`docs/ci-cd-und-release.md#versionen`). Freigabe des Projektleiters für genau dieses Release
+trotzdem einholen.
+
+**Nur Doku:** Ablauf unten ohne Checkliste und ohne Version.
 
 **5 — PR anlegen und mergen:**
 

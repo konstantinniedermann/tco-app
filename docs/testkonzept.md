@@ -96,7 +96,8 @@ blockieren keine gewollte Design-Änderung.
 Auf der [Test-Umgebung](ci-cd-und-release.md#umgebungen) `test.my.tcolten.ch`, mit einem
 iPhone (Safari) und einem Android-Handy (Chrome) und einem erfundenen Testkonto. Es entsteht
 bei jeder Auslieferung neu und nutzt die Adresse des Projektleiters, damit der Code per
-E-Mail ankommt. Jeder Punkt nennt die IDs, die er prüft:
+E-Mail ankommt (gebaut mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39),
+bis dahin gibt es keine Test-Umgebung). Jeder Punkt nennt die IDs, die er prüft:
 
 - [ ] QR-Code aus einem Testbrief öffnet MyTCO; im Brief für Live steht `my.tcolten.ch` (A-LOGIN-01, A-LOGIN-04)
 - [ ] MyTCO lässt sich auf den Startbildschirm legen und startet von dort
