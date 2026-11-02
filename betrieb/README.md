@@ -49,7 +49,8 @@ Alle geben nur `schritt: …` und am Ende `ok` oder `fehler` aus; Einzelheiten s
 | Probe in einer Wegwerf-Datenbank | `/opt/mytco/gemeinsam/bin/probe <umgebung> [lauf-…]` |
 
 `zurueck` migriert die Datenbank nicht zurück. `wiederherstellen` spielt nur Sicherungen
-derselben Umgebung ein.
+derselben Umgebung ein und braucht eine ausgelieferte Fassung (`<umgebung>/zustand/aktuell`);
+ohne sie meldet es `fehler`.
 
 ## Störungen
 

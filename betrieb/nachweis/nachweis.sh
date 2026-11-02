@@ -429,6 +429,8 @@ p2_test_ohne_passwort() {
 		return 1
 	}
 	erwarte_kopf_einmal Strict-Transport-Security
+	erwarte_kopf_einmal X-Content-Type-Options
+	erwarte_kopf_einmal Referrer-Policy
 }
 
 p2_app_datei() {
@@ -481,6 +483,24 @@ p3_gegenprobe() {
 		echo "live-app erreicht live-db ($live_ip) nicht: $ergebnis"
 		return 1
 	}
+	# Gegenprobe zur Prüfung per Name: der Containername löst im eigenen Netz auf.
+	ergebnis=$(tcp_versuch mytco-live-app-1 mytco-live-db-1)
+	[ "$ergebnis" = verbunden ] || {
+		echo "live-app erreicht mytco-live-db-1 per Name nicht: $ergebnis"
+		return 1
+	}
+}
+
+# Ergebnis eines TCP-Versuchs muss ein Scheitern sein (leer heisst: Versuch lief gar nicht).
+erwarte_gescheitert() {
+	[ -n "$1" ] || {
+		echo "kein Ergebnis des Verbindungsversuchs"
+		return 1
+	}
+	[ "$1" != verbunden ] || {
+		echo "Verbindung gelang, obwohl sie scheitern muss"
+		return 1
+	}
 }
 
 p3_ip() {
@@ -492,7 +512,7 @@ p3_ip() {
 	}
 	ergebnis=$(tcp_versuch mytco-test-app-1 "$live_ip")
 	echo "test-app -> $live_ip:5432: $ergebnis"
-	[ -n "$ergebnis" ] && [ "$ergebnis" != verbunden ]
+	erwarte_gescheitert "$ergebnis"
 }
 
 p3_db_name() {
@@ -502,14 +522,21 @@ p3_db_name() {
 	test_ip=$(container_ip mytco-test-db-1)
 	live_ip=$(container_ip mytco-live-db-1)
 	echo "db -> $aufgeloest, test-db $test_ip, live-db $live_ip"
-	[ "$aufgeloest" = "$test_ip" ] && [ "$aufgeloest" != "$live_ip" ]
+	[ -n "$test_ip" ] && [ "$aufgeloest" = "$test_ip" ] || {
+		echo "db löst nicht auf die Test-DB auf"
+		return 1
+	}
+	[ "$aufgeloest" != "$live_ip" ] || {
+		echo "db löst auf die Live-DB auf"
+		return 1
+	}
 }
 
 p3_live_name() {
 	local ergebnis
 	ergebnis=$(tcp_versuch mytco-test-app-1 mytco-live-db-1)
 	echo "test-app -> mytco-live-db-1:5432: $ergebnis"
-	[ -n "$ergebnis" ] && [ "$ergebnis" != verbunden ]
+	erwarte_gescheitert "$ergebnis"
 }
 
 # --- 4 Rückfall ---------------------------------------------------------------------------
@@ -583,15 +610,29 @@ p5_wiederherstellen() {
 	live_status_ok
 }
 
+snapshot_abweisungen() {
+	grep -cxF "wiederherstellen: kein Snapshot dieser Umgebung gefunden" "$BASIS/test/protokoll.log" 2>/dev/null || true
+}
+
 p5_fremder_lauf() {
-	local ausgabe rc=0 lauf
+	local ausgabe rc=0 lauf vorher
 	lauf=$(lies lauf)
 	[ -n "$lauf" ] || {
 		echo "Lauf fehlt"
 		return 1
 	}
+	vorher=$(snapshot_abweisungen)
 	ausgabe=$(gemeinsam wiederherstellen test "$lauf") || rc=$?
 	erwarte_ausgabe fehler "$rc" "$ausgabe"
+	# Abgewiesen schon bei der Suche nach dem Snapshot, bevor die App angehalten wird.
+	[ "$(grep '^schritt: ' <<<"$ausgabe")" = "schritt: snapshot suchen" ] || {
+		echo "nicht bei der Snapshot-Suche abgewiesen"
+		return 1
+	}
+	[ "$(snapshot_abweisungen)" -eq $((vorher + 1)) ] || {
+		echo "keine neue Meldung 'kein Snapshot dieser Umgebung' im Protokoll"
+		return 1
+	}
 	[ -z "$(docker exec mytco-test-db-1 psql -U mytco -d mytco -At -c "select to_regclass('public.nachweis')")" ] || {
 		echo "Live-Tabelle ist in der Test-Datenbank gelandet"
 		return 1
@@ -616,14 +657,43 @@ COPY Caddyfile /app/betrieb/caddy/Caddyfile" "$TEMP/Caddyfile"
 }
 
 p6_kaputt() {
-	local vorher
+	local vorher ausgabe rc=0 meldungen_vorher meldungen_nachher d3
+	d3=$(lies d3)
+	[ -n "$d3" ] || {
+		echo "Digest D3 fehlt"
+		return 1
+	}
 	vorher=$(pruefsumme "$BASIS/proxy/caddy/umgebungen/test.caddy")
-	erwarte_lauf fehler test "$(lies d3)"
+	meldungen_vorher=$(caddy_abweisungen)
+	ausgabe=$(tuersteher test "$d3") || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe"
+	# Abgewiesen hat die Prüfung von Caddy, nicht schon das Holen oder Entnehmen: die kaputte
+	# Datei war entnommen, der letzte Schritt war die Übernahme, das Protokoll nennt Caddy.
+	grep -qF diese_direktive_gibt_es_nicht "$BASIS/fassungen/$d3/betrieb/caddy/umgebungen/test.caddy" || {
+		echo "kaputtes test.caddy nicht in fassungen/D3 entnommen"
+		return 1
+	}
+	[ "$(grep '^schritt: ' <<<"$ausgabe" | tail -n 1)" = "schritt: einrichtung uebernehmen" ] || {
+		echo "letzter Schritt war nicht die Übernahme der Einrichtung"
+		return 1
+	}
+	meldungen_nachher=$(caddy_abweisungen)
+	[ "$meldungen_nachher" -eq $((meldungen_vorher + 1)) ] || {
+		echo "keine neue Meldung 'Caddy-Konfiguration ungültig' im Protokoll"
+		return 1
+	}
 	[ "$(pruefsumme "$BASIS/proxy/caddy/umgebungen/test.caddy")" = "$vorher" ] || {
 		echo "test.caddy wurde nicht zurückgesetzt"
 		return 1
 	}
-	[ "$(head -n 1 "$BASIS/test/zustand/aktuell")" = "$(lies d1)" ]
+	[ "$(head -n 1 "$BASIS/test/zustand/aktuell")" = "$(lies d1)" ] || {
+		echo "aktuell ist nicht mehr D1"
+		return 1
+	}
+}
+
+caddy_abweisungen() {
+	grep -cxF "ausliefern: Caddy-Konfiguration ungültig, alles zurückgesetzt" "$BASIS/test/protokoll.log" || true
 }
 
 p6_antworten() {
@@ -655,8 +725,18 @@ p7_fehlerseite() {
 	status=$(abfrage test.mytco.localhost /api/status -u "$BENUTZER:$PASSWORT")
 	echo "Status bei gestoppter App: $status, Inhalt: $(head -c 100 "$TEMP/inhalt")"
 	# Caddy erreicht app-test nicht: 502 aus handle_errors, nicht 200.
-	[ "$status" = 502 ] && grep -q '^502 ' "$TEMP/inhalt"
-	[ "$(kopf_wert Content-Security-Policy)" = "frame-ancestors 'none'" ]
+	[ "$status" = 502 ] || {
+		echo "erwartet 502, erhalten $status"
+		return 1
+	}
+	grep -q '^502 ' "$TEMP/inhalt" || {
+		echo "Inhalt stammt nicht aus handle_errors"
+		return 1
+	}
+	[ "$(kopf_wert Content-Security-Policy)" = "frame-ancestors 'none'" ] || {
+		echo "502 ohne frame-ancestors: $(kopf_wert Content-Security-Policy)"
+		return 1
+	}
 	erwarte_kopf_einmal Strict-Transport-Security
 	live_status_ok
 }
