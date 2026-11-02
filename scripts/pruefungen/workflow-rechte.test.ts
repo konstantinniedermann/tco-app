@@ -19,13 +19,14 @@ const perm = (rechte: string) =>
 
 const BAUEN = `  bauen:\n${perm('contents: read, packages: write')}\n    steps:\n      - run: echo bauen`;
 const FINDEN = `  finden:\n${perm('contents: read, packages: read')}\n    steps:\n      - run: echo finden`;
+const FREIGEBEN = `  freigeben:\n${perm('packages: write')}\n    steps:\n      - run: echo freigeben`;
 const AUSLIEFERN = `  ausliefern:\n${perm('packages: read')}\n    steps:\n      - run: ssh host\n        env:\n          K: \${{ secrets.SSH_SCHLUESSEL_TEST }}`;
 const RELEASE = `  release:\n${perm('contents: write')}\n    steps:\n      - run: echo release`;
 const PRUEFEN = `  pruefen:\n    runs-on: ubuntu-latest\n    steps:\n      - run: npm ci`;
 
 describe('pruefeWorkflow', () => {
-	it('akzeptiert einen korrekten Workflow mit allen vier Jobs', () => {
-		const yaml = workflow([BAUEN, FINDEN, AUSLIEFERN, RELEASE, PRUEFEN]);
+	it('akzeptiert einen korrekten Workflow mit allen Sonderjobs', () => {
+		const yaml = workflow([BAUEN, FINDEN, FREIGEBEN, AUSLIEFERN, RELEASE, PRUEFEN]);
 		expect(pruefeWorkflow(W, yaml)).toEqual([]);
 	});
 	it('meldet pruefen mit packages: write', () => {
@@ -81,6 +82,12 @@ describe('pruefeWorkflow', () => {
 	it('ignoriert Kommentare im Job ausliefern', () => {
 		const ausliefern = `${AUSLIEFERN}\n      # kein npm, kein uses: hier\n`;
 		expect(pruefeWorkflow(W, workflow([ausliefern]))).toEqual([]);
+	});
+	it('meldet freigeben mit contents: read zusätzlich zu packages: write', () => {
+		const job = `  freigeben:\n${perm('contents: read, packages: write')}\n    steps: []`;
+		const befunde = pruefeWorkflow(W, workflow([job]));
+		expect(befunde).toHaveLength(1);
+		expect(befunde[0]).toContain('Job freigeben');
 	});
 	it('meldet release mit contents: read statt write', () => {
 		const release = `  release:\n${perm('contents: read')}\n    steps: []`;

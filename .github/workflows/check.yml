@@ -223,8 +223,10 @@ jobs:
   # --- Auslieferung ---------------------------------------------------------------------
   # Alle folgenden Jobs sind ausgeschaltet, solange die Repo-Variablen AUSLIEFERUNG_TEST
   # bzw. AUSLIEFERUNG_LIVE nicht auf `an` stehen. Test und Live bekommen dasselbe Image:
-  # `bauen` (dev) baut es und kennzeichnet es mit dem Code-Stand, `finden` (main) sucht genau
-  # dieses Image wieder, `ausliefern` übergibt nur den Digest an den Türsteher des Servers.
+  # `bauen` (dev) baut und pusht es unter dem Commit, `ausliefern` übergibt nur den Digest an
+  # den Türsteher des Servers, `freigeben` setzt erst nach geglückter Auslieferung auf Test das
+  # Kennzeichen des Code-Stands, `finden` (main) sucht über dieses Kennzeichen genau das
+  # Image wieder, das auf Test lief.
 
   bauen:
     name: Bauen (Image nach GHCR, für Test)
@@ -239,6 +241,7 @@ jobs:
       packages: write
     outputs:
       digest: ${{ steps.pushen.outputs.digest }}
+      stand: ${{ steps.pushen.outputs.stand }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -252,17 +255,16 @@ jobs:
         run: |
           repo="ghcr.io/$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
           stand=$(bash scripts/ci/code-stand.sh)
-          docker build -t "$repo:code-$stand" -t "$repo:commit-$COMMIT" .
+          docker build -t "$repo:commit-$COMMIT" .
           printf '%s' "$TOKEN" | docker login ghcr.io -u "$AKTEUR" --password-stdin
-          docker push "$repo:code-$stand"
           docker push "$repo:commit-$COMMIT"
-          digest=$(docker inspect --format '{{range .RepoDigests}}{{println .}}{{end}}' "$repo:code-$stand" \
-            | sed -n "s|^$repo@||p" | head -n 1)
-          case "$digest" in
-            sha256:????????????????????????????????????????????????????????????????) ;;
-            *) echo "Digest nicht lesbar"; exit 1 ;;
-          esac
+          digest=$(docker buildx imagetools inspect "$repo:commit-$COMMIT" --format '{{.Manifest.Digest}}')
+          if ! printf '%s\n' "$digest" | grep -Eqx 'sha256:[0-9a-f]{64}'; then
+            echo "Digest nicht lesbar"
+            exit 1
+          fi
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "stand=$stand" >> "$GITHUB_OUTPUT"
 
   finden:
     name: Finden (Image von Test, für Live)
@@ -291,18 +293,41 @@ jobs:
           stand=$(bash scripts/ci/code-stand.sh)
           printf '%s' "$TOKEN" | docker login ghcr.io -u "$AKTEUR" --password-stdin
           digest=$(docker buildx imagetools inspect "$repo:code-$stand" --format '{{.Manifest.Digest}}' 2>/dev/null) || digest=""
-          case "$digest" in
-            sha256:????????????????????????????????????????????????????????????????) ;;
-            *) echo "Kein auf Test ausgeliefertes Image zu diesem Code-Stand"; exit 1 ;;
-          esac
+          if ! printf '%s\n' "$digest" | grep -Eqx 'sha256:[0-9a-f]{64}'; then
+            echo "Kein auf Test ausgeliefertes Image zu diesem Code-Stand"
+            exit 1
+          fi
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
+      # Vorab, noch vor der Auslieferung auf Live: Das Release muss sich danach anlegen lassen.
+      # Version gültig, Text in docs/versionen.md vorhanden, Tag noch frei.
+      - name: Release vorab prüfen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if ! printf '%s\n' "$version" | grep -Eqx '[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "Version in package.json nicht lesbar: $version"
+            exit 1
+          fi
+          if ! bash scripts/ci/versionsnotizen.sh "$version" | grep -q '[^[:space:]]'; then
+            echo "Kein Abschnitt für Version $version in docs/versionen.md"
+            exit 1
+          fi
+          if ausgabe=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v$version" 2>&1); then
+            echo "Der Tag v$version existiert bereits; Version in package.json erhöhen"
+            exit 1
+          fi
+          case "$ausgabe" in
+            *"HTTP 404"*) ;;
+            *) echo "Tag-Prüfung gescheitert: $ausgabe"; exit 1 ;;
+          esac
 
   # Nur `run:`-Schritte, keine Fremd-Actions: Dieser Job hält die SSH-Schlüssel (geprüft von
   # scripts/pruefungen/workflow-rechte.ts). Ausgabe ausschliesslich `ok` oder `fehler`.
   ausliefern:
     name: Ausliefern (SSH an den Türsteher)
     needs: [bauen, finden]
-    if: always() && (needs.bauen.result == 'success' || needs.finden.result == 'success')
+    if: ${{ !cancelled() && (needs.bauen.result == 'success' || needs.finden.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
@@ -313,27 +338,67 @@ jobs:
     steps:
       - name: Digest übergeben
         env:
-          SCHLUESSEL: ${{ github.ref_name == 'main' && secrets.SSH_SCHLUESSEL_LIVE || secrets.SSH_SCHLUESSEL_TEST }}
+          ZWEIG: ${{ github.ref_name }}
+          SCHLUESSEL_TEST: ${{ secrets.SSH_SCHLUESSEL_TEST }}
+          SCHLUESSEL_LIVE: ${{ secrets.SSH_SCHLUESSEL_LIVE }}
           BEKANNTE_HOSTS: ${{ secrets.SSH_BEKANNTE_HOSTS }}
           SERVER: ${{ secrets.SERVER_ADRESSE }}
           TOKEN: ${{ github.token }}
-          DIGEST: ${{ needs.bauen.outputs.digest || needs.finden.outputs.digest }}
+          DIGEST_BAUEN: ${{ needs.bauen.outputs.digest }}
+          DIGEST_FINDEN: ${{ needs.finden.outputs.digest }}
         run: |
           umask 077
           ordner=$(mktemp -d)
           trap 'rm -rf "$ordner"' EXIT
-          printf '%s\n' "$SCHLUESSEL" > "$ordner/schluessel"
-          printf '%s\n' "$BEKANNTE_HOSTS" > "$ordner/hosts"
-          if [ -n "$SERVER" ] && [ -n "$DIGEST" ] \
-            && printf '%s' "$TOKEN" | ssh -i "$ordner/schluessel" \
+          # Der Zweig bestimmt Schlüssel und Digest; es gibt keinen Rückfall auf den anderen.
+          schluessel=""
+          digest=""
+          case "$ZWEIG" in
+            dev) schluessel="$SCHLUESSEL_TEST"; digest="$DIGEST_BAUEN" ;;
+            main) schluessel="$SCHLUESSEL_LIVE"; digest="$DIGEST_FINDEN" ;;
+          esac
+          if [ -n "$schluessel" ] && [ -n "$digest" ] && [ -n "$SERVER" ] && [ -n "$BEKANNTE_HOSTS" ]; then
+            printf '%s\n' "$schluessel" > "$ordner/schluessel"
+            printf '%s\n' "$BEKANNTE_HOSTS" > "$ordner/hosts"
+            if printf '%s' "$TOKEN" | ssh -i "$ordner/schluessel" \
               -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$ordner/hosts" \
               -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20 \
-              mytco@"$SERVER" "$DIGEST" >/dev/null 2>&1; then
-            echo ok
-          else
-            echo fehler
+              mytco@"$SERVER" "$digest" >/dev/null 2>&1; then
+              echo ok
+              exit 0
+            fi
+          fi
+          echo fehler
+          exit 1
+
+  # Erst nach geglückter Auslieferung auf Test bekommt das Image das Kennzeichen seines
+  # Code-Stands; `finden` sieht so nur Images, die auf Test wirklich liefen.
+  freigeben:
+    name: Freigeben (Code-Stand-Kennzeichen setzen)
+    needs: [bauen, ausliefern]
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/dev'
+      && needs.ausliefern.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      packages: write
+    steps:
+      - name: Kennzeichen setzen
+        env:
+          TOKEN: ${{ github.token }}
+          AKTEUR: ${{ github.actor }}
+          DIGEST: ${{ needs.bauen.outputs.digest }}
+          STAND: ${{ needs.bauen.outputs.stand }}
+        run: |
+          if ! printf '%s\n' "$DIGEST" | grep -Eqx 'sha256:[0-9a-f]{64}' \
+            || ! printf '%s\n' "$STAND" | grep -Eqx '[0-9a-f]{40}'; then
+            echo "Digest oder Code-Stand nicht lesbar"
             exit 1
           fi
+          repo="ghcr.io/$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
+          printf '%s' "$TOKEN" | docker login ghcr.io -u "$AKTEUR" --password-stdin
+          docker buildx imagetools create -t "$repo:code-$STAND" "$repo@$DIGEST"
 
   release:
     name: Release (Tag und GitHub-Release)
@@ -353,11 +418,7 @@ jobs:
           COMMIT: ${{ github.sha }}
         run: |
           version=$(node -p "require('./package.json').version")
-          # Text der Version: Abschnitt `## <version>` bis zur nächsten `## `-Überschrift.
-          awk -v kopf="## $version" '
-            /^## / { an = (index($0, kopf) == 1 && (length($0) == length(kopf) || substr($0, length(kopf) + 1, 1) == " ")); next }
-            an { print }
-          ' docs/versionen.md > "$RUNNER_TEMP/notizen.md"
+          bash scripts/ci/versionsnotizen.sh "$version" > "$RUNNER_TEMP/notizen.md"
           if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notizen.md"; then
             echo "Kein Abschnitt für Version $version in docs/versionen.md"
             exit 1

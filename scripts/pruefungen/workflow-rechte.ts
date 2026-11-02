@@ -7,6 +7,7 @@ const WORKFLOW_RECHTE = ['contents: read'];
 const JOB_RECHTE: Record<string, string[]> = {
 	bauen: ['contents: read', 'packages: write'],
 	finden: ['contents: read', 'packages: read'],
+	freigeben: ['packages: write'],
 	ausliefern: ['packages: read'],
 	release: ['contents: write']
 };
