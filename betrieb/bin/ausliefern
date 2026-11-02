@@ -51,7 +51,9 @@ rueckfall() {
 	if [ -n "$ALT_DIGEST" ]; then
 		schritt "rueckfall"
 		MYTCO_IMAGE="$MYTCO_REPO@$ALT_DIGEST" protokoll "$UMGEBUNG" \
-			compose "$UMGEBUNG" up -d --wait --wait-timeout "$MYTCO_WARTEZEIT" app || true
+			compose "$UMGEBUNG" up -d --wait --wait-timeout "$MYTCO_WARTEZEIT" app &&
+			echo "ausliefern: Rückfall auf $ALT_DIGEST läuft gesund" >>"$LOG" ||
+			echo "ausliefern: Rückfall auf $ALT_DIGEST ebenfalls nicht gesund" >>"$LOG"
 	fi
 	scheitern "App nicht gesund"
 }
@@ -70,11 +72,26 @@ if ! sperre_nehmen "$UMGEBUNG"; then
 fi
 GESPERRT=1
 mkdir -p "$U/zustand"
+# Eigene Fehlermeldungen der Werkzeuge nie an den Aufrufer, nur ins Protokoll.
+exec 2>>"$LOG"
 if [ -s "$U/zustand/aktuell" ]; then
 	ALT_DIGEST=$(head -n 1 "$U/zustand/aktuell")
 fi
 [ -d "$FASSUNG" ] || scheitern "Fassung fehlt: $FASSUNG"
 export MYTCO_IMAGE="$MYTCO_REPO@$DIGEST"
+
+# --- Live sichern, bevor irgendetwas geändert wird -----------------------------------------
+# Mit der bisherigen Einrichtung und dem bisherigen Sicherungsskript; ohne laufende
+# Datenbank (erster Lauf) gibt es nichts zu sichern.
+if [ "$UMGEBUNG" = live ] && [ -f "$U/betrieb/compose.umgebung.yml" ]; then
+	DB_LAEUFT=$(compose live ps --status running -q db 2>>"$LOG") ||
+		scheitern "Zustand der Datenbank unbekannt"
+	if [ -n "$DB_LAEUFT" ]; then
+		schritt "sichern"
+		[ -x "$GEMEINSAM/sichern" ] || scheitern "gemeinsam/bin/sichern fehlt"
+		protokoll live "$GEMEINSAM/sichern" live || scheitern "Sicherung gescheitert"
+	fi
+fi
 
 # --- Einrichtung übernehmen ---------------------------------------------------------------
 schritt "einrichtung uebernehmen"
@@ -83,27 +100,58 @@ if [ "$UMGEBUNG" = live ] || [ ! -e "$MYTCO_BASIS/live/zustand/aktuell" ]; then
 	GEMEINSAME_TEILE=1
 fi
 
-# Sicherungskopie der Proxy-Dateien, falls die neue Caddy-Konfiguration ungültig ist.
+# Sicherung dessen, was dieser Schritt überschreibt. Dateien werden an Ort und Stelle
+# überschrieben und zurückgeschrieben (gleicher Inode), weil der laufende Proxy sie per
+# Bind-Mount sieht; Ordner werden nie gelöscht und neu angelegt.
 SICHERUNG="$PROXY/.sicherung.$$"
 rm -rf "$SICHERUNG"
-mkdir -p "$SICHERUNG" "$PROXY/caddy/umgebungen"
-if [ -d "$PROXY/caddy" ]; then cp -R "$PROXY/caddy" "$SICHERUNG/caddy"; fi
-if [ -f "$PROXY/compose.proxy.yml" ]; then cp -p "$PROXY/compose.proxy.yml" "$SICHERUNG/compose.proxy.yml"; fi
+mkdir -p "$SICHERUNG/dateien"
+: >"$SICHERUNG/liste"
 
-# Einrichtung der Umgebung: ersetzen, nicht mischen.
+# merke <pfad relativ zu MYTCO_BASIS>: Zustand vor der Übernahme festhalten.
+merke() {
+	echo "$1" >>"$SICHERUNG/liste"
+	if [ -f "$MYTCO_BASIS/$1" ]; then
+		mkdir -p "$SICHERUNG/dateien/$(dirname "$1")"
+		cp -p "$MYTCO_BASIS/$1" "$SICHERUNG/dateien/$1"
+	fi
+}
+
+# uebernimm <quelle> <pfad relativ zu MYTCO_BASIS>
+uebernimm() {
+	merke "$2"
+	mkdir -p "$(dirname "$MYTCO_BASIS/$2")"
+	cp -p "$1" "$MYTCO_BASIS/$2"
+}
+
+# Stellt alles zurück, was dieser Schritt übernommen hat: gemerkte Dateien an Ort und Stelle,
+# neu hinzugekommene entfernt, die Einrichtung der Umgebung aus der Sicherung.
+alles_zuruecksetzen() {
+	local rel
+	while IFS= read -r rel; do
+		if [ -f "$SICHERUNG/dateien/$rel" ]; then
+			cp -p "$SICHERUNG/dateien/$rel" "$MYTCO_BASIS/$rel"
+		else
+			rm -f "$MYTCO_BASIS/$rel"
+		fi
+	done <"$SICHERUNG/liste"
+	rm -rf "$U/betrieb"
+	if [ -d "$SICHERUNG/betrieb-alt" ]; then mv "$SICHERUNG/betrieb-alt" "$U/betrieb"; fi
+}
+
+# Einrichtung der Umgebung: ersetzen, nicht mischen (alte bleibt in der Sicherung).
 rm -rf "$U/betrieb.neu"
 cp -R "$FASSUNG" "$U/betrieb.neu"
-rm -rf "$U/betrieb"
+if [ -d "$U/betrieb" ]; then mv "$U/betrieb" "$SICHERUNG/betrieb-alt"; fi
 mv "$U/betrieb.neu" "$U/betrieb"
-cp -p "$FASSUNG/caddy/umgebungen/$UMGEBUNG.caddy" "$PROXY/caddy/umgebungen/$UMGEBUNG.caddy"
+uebernimm "$FASSUNG/caddy/umgebungen/$UMGEBUNG.caddy" "proxy/caddy/umgebungen/$UMGEBUNG.caddy"
 
 if [ "$GEMEINSAME_TEILE" = 1 ]; then
-	cp -p "$FASSUNG/caddy/Caddyfile" "$PROXY/caddy/Caddyfile"
-	cp -p "$FASSUNG/compose.proxy.yml" "$PROXY/compose.proxy.yml"
-	mkdir -p "$GEMEINSAM"
+	uebernimm "$FASSUNG/caddy/Caddyfile" "proxy/caddy/Caddyfile"
+	uebernimm "$FASSUNG/compose.proxy.yml" "proxy/compose.proxy.yml"
 	for datei in sichern wiederherstellen probe lib.sh; do
 		if [ -f "$FASSUNG/bin/$datei" ]; then
-			cp -p "$FASSUNG/bin/$datei" "$GEMEINSAM/$datei"
+			uebernimm "$FASSUNG/bin/$datei" "gemeinsam/bin/$datei"
 			chmod +x "$GEMEINSAM/$datei"
 		fi
 	done
@@ -120,31 +168,23 @@ else
 		--config /etc/caddy/Caddyfile --adapter caddyfile && GUELTIG=1
 fi
 if [ "$GUELTIG" != 1 ]; then
-	rm -rf "$PROXY/caddy"
-	if [ -d "$SICHERUNG/caddy" ]; then cp -R "$SICHERUNG/caddy" "$PROXY/caddy"; fi
-	rm -f "$PROXY/compose.proxy.yml"
-	if [ -f "$SICHERUNG/compose.proxy.yml" ]; then cp -p "$SICHERUNG/compose.proxy.yml" "$PROXY/compose.proxy.yml"; fi
-	scheitern "Caddy-Konfiguration ungültig, alte Dateien wiederhergestellt"
+	alles_zuruecksetzen
+	scheitern "Caddy-Konfiguration ungültig, alles zurückgesetzt"
 fi
 if [ -n "$LAUFEND" ]; then
 	protokoll "$UMGEBUNG" compose_proxy exec -T caddy caddy reload \
-		--config /etc/caddy/Caddyfile --adapter caddyfile ||
-		scheitern "Caddy konnte nicht neu geladen werden"
+		--config /etc/caddy/Caddyfile --adapter caddyfile || {
+		alles_zuruecksetzen
+		scheitern "Caddy konnte nicht neu geladen werden, alles zurückgesetzt"
+	}
 else
-	protokoll "$UMGEBUNG" compose_proxy up -d || scheitern "Proxy konnte nicht gestartet werden"
+	protokoll "$UMGEBUNG" compose_proxy up -d || {
+		alles_zuruecksetzen
+		scheitern "Proxy konnte nicht gestartet werden, alles zurückgesetzt"
+	}
 fi
 rm -rf "$SICHERUNG"
 SICHERUNG=""
-
-# --- Live sichern, solange die Datenbank läuft ---------------------------------------------
-if [ "$UMGEBUNG" = live ]; then
-	DB_LAEUFT=$(compose live ps --status running -q db 2>>"$LOG") ||
-		scheitern "Zustand der Datenbank unbekannt"
-	if [ -n "$DB_LAEUFT" ]; then
-		schritt "sichern"
-		protokoll live "$GEMEINSAM/sichern" live || scheitern "Sicherung gescheitert"
-	fi
-fi
 
 # --- Test zurücksetzen --------------------------------------------------------------------
 if [ "$UMGEBUNG" = test ]; then

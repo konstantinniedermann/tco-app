@@ -5,6 +5,7 @@ import {
 	mkdirSync,
 	mkdtempSync,
 	readFileSync,
+	statSync,
 	writeFileSync
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -24,7 +25,29 @@ const REPO = 'ghcr.io/konstantinniedermann/tco-app';
 type Aufbau = {
 	// Dateien relativ zu MYTCO_BASIS (Inhalt)
 	dateien?: Record<string, string>;
+	// ausführbare Dateien relativ zu MYTCO_BASIS
+	ausfuehrbar?: Record<string, string>;
 };
+
+const FAKE_SICHERN =
+	'#!/usr/bin/env bash\necho "sichern $*" >>"$MYTCO_BASIS/sichern-aufrufe"\nexit "${STUB_SICHERN_EXIT:-0}"\n';
+
+// Ein bereits ausgeliefertes Live: Einrichtung, gemeinsame Teile, Proxy-Dateien, Zustand.
+const BESTEHENDES_LIVE: Aufbau = {
+	dateien: {
+		'live/zustand/aktuell': `${ALT}\n`,
+		'live/betrieb/compose.umgebung.yml': 'ALT-LIVE-BETRIEB',
+		'gemeinsam/bin/lib.sh': 'ALT-LIB',
+		'proxy/caddy/Caddyfile': 'ALT-CADDYFILE',
+		'proxy/caddy/umgebungen/live.caddy': 'ALT-LIVE-CADDY',
+		'proxy/compose.proxy.yml': 'ALT-COMPOSE'
+	},
+	ausfuehrbar: { 'gemeinsam/bin/sichern': FAKE_SICHERN }
+};
+const BESTEHENDES_LIVE_PFADE = [
+	...Object.keys(BESTEHENDES_LIVE.dateien ?? {}),
+	'gemeinsam/bin/sichern'
+];
 
 // Baut ein MYTCO_BASIS mit der Einrichtung des Repos als entnommene Fassung (mit Ersatz-sichern).
 function baue(aufbau: Aufbau = {}): string {
@@ -33,15 +56,18 @@ function baue(aufbau: Aufbau = {}): string {
 	mkdirSync(dirname(betrieb), { recursive: true });
 	cpSync('betrieb', betrieb, { recursive: true });
 	const sichern = join(betrieb, 'bin', 'sichern');
-	writeFileSync(
-		sichern,
-		'#!/usr/bin/env bash\necho "sichern $*" >>"$MYTCO_BASIS/sichern-aufrufe"\nexit "${STUB_SICHERN_EXIT:-0}"\n'
-	);
+	writeFileSync(sichern, FAKE_SICHERN);
 	chmodSync(sichern, 0o755);
 	for (const [pfad, inhalt] of Object.entries(aufbau.dateien ?? {})) {
 		const ziel = join(basis, pfad);
 		mkdirSync(dirname(ziel), { recursive: true });
 		writeFileSync(ziel, inhalt);
+	}
+	for (const [pfad, inhalt] of Object.entries(aufbau.ausfuehrbar ?? {})) {
+		const ziel = join(basis, pfad);
+		mkdirSync(dirname(ziel), { recursive: true });
+		writeFileSync(ziel, inhalt);
+		chmodSync(ziel, 0o755);
 	}
 	return basis;
 }
@@ -78,6 +104,7 @@ function pruefeAusgabe(lauf: Ergebnis) {
 
 const letzteZeile = (lauf: Ergebnis) => lauf.stdout.trim().split('\n').pop();
 const lies = (basis: string, pfad: string) => readFileSync(join(basis, pfad), 'utf-8').trim();
+const inode = (basis: string, pfad: string) => statSync(join(basis, pfad)).ino;
 const gibt = (basis: string, pfad: string) => existsSync(join(basis, pfad));
 const index = (lauf: Ergebnis, teil: string) => lauf.aufrufe.findIndex((a) => a.includes(teil));
 const appStarts = (lauf: Ergebnis) =>
@@ -164,23 +191,39 @@ describe('ausliefern: Live und Sicherung', () => {
 		expect(lies(basis, 'live/zustand/aktuell')).toBe(NEU);
 	});
 
-	test('läuft die Datenbank, wird vor der Migration gesichert', () => {
-		const basis = baue();
+	test('läuft die Datenbank, wird vor jeder Änderung gesichert', () => {
+		const basis = baue(BESTEHENDES_LIVE);
 		const lauf = ausliefern('live', basis, MIT_DB_UP);
 		expect(letzteZeile(lauf)).toBe('ok');
 		expect(lies(basis, 'sichern-aufrufe')).toBe('sichern live');
+		// die Sicherung läuft vor Caddy-Prüfung und Migration
+		expect(index(lauf, 'ps --status running -q db')).toBeLessThan(index(lauf, 'caddy validate'));
 		expect(index(lauf, 'down --volumes')).toBe(-1);
 	});
 
-	test('scheitert die Sicherung: fehler, App unberührt, aktuell unverändert', () => {
-		const basis = baue({ dateien: { 'live/zustand/aktuell': `${ALT}\n` } });
+	test('scheitert die Sicherung: fehler, nichts verändert', () => {
+		const basis = baue(BESTEHENDES_LIVE);
+		const vorher = BESTEHENDES_LIVE_PFADE.map((p) => lies(basis, p));
 		const lauf = ausliefern('live', basis, { ...MIT_DB_UP, STUB_SICHERN_EXIT: '1' });
 		expect(lauf.status).toBe(1);
 		expect(letzteZeile(lauf)).toBe('fehler');
 		expect(appStarts(lauf)).toHaveLength(0);
 		expect(index(lauf, 'migrate.ts')).toBe(-1);
+		expect(index(lauf, 'caddy')).toBe(-1);
+		expect(BESTEHENDES_LIVE_PFADE.map((p) => lies(basis, p))).toEqual(vorher);
 		expect(lies(basis, 'live/zustand/aktuell')).toBe(ALT);
+		expect(gibt(basis, 'proxy/caddy/umgebungen/test.caddy')).toBe(false);
 		expect(gibt(basis, 'live/sperre')).toBe(false);
+	});
+
+	test('läuft die Datenbank, aber gemeinsam/bin/sichern fehlt: fehler, nichts verändert', () => {
+		const basis = baue({ dateien: BESTEHENDES_LIVE.dateien });
+		const lauf = ausliefern('live', basis, MIT_DB_UP);
+		expect(lauf.status).toBe(1);
+		expect(letzteZeile(lauf)).toBe('fehler');
+		expect(lies(basis, 'live/betrieb/compose.umgebung.yml')).toBe('ALT-LIVE-BETRIEB');
+		expect(gibt(basis, 'gemeinsam/bin/sichern')).toBe(false);
+		expect(index(lauf, 'caddy')).toBe(-1);
 	});
 });
 
@@ -264,7 +307,7 @@ describe('ausliefern: Caddy', () => {
 		'proxy/compose.proxy.yml': 'ALT-COMPOSE'
 	};
 
-	test('ungültige Konfiguration: alte Dateien zurück, fehler, kein Start der App', () => {
+	test('ungültige Konfiguration: alles zurück, fehler, kein Start der App', () => {
 		const basis = baue({ dateien: alt });
 		const lauf = ausliefern('test', basis, { STUB_FEHLER_BEI: 'caddy validate' });
 		expect(lauf.status).toBe(1);
@@ -274,6 +317,51 @@ describe('ausliefern: Caddy', () => {
 		expect(lies(basis, 'proxy/compose.proxy.yml')).toBe('ALT-COMPOSE');
 		expect(appStarts(lauf)).toHaveLength(0);
 		expect(gibt(basis, 'test/sperre')).toBe(false);
+	});
+
+	test('läuft der Proxy, bleiben die Inodes der gemounteten Dateien und Ordner beim Zurücksetzen', () => {
+		const basis = baue({ dateien: alt });
+		const pfade = [
+			'proxy/caddy',
+			'proxy/caddy/umgebungen',
+			'proxy/caddy/Caddyfile',
+			'proxy/caddy/umgebungen/test.caddy'
+		];
+		const vorher = pfade.map((p) => inode(basis, p));
+		const lauf = ausliefern('test', basis, {
+			STUB_FEHLER_BEI: 'caddy validate',
+			STUB_MUSTER_B: 'ps --status running -q caddy',
+			STUB_AUSGABE_B: 'caddy-container'
+		});
+		expect(letzteZeile(lauf)).toBe('fehler');
+		expect(index(lauf, 'exec -T caddy caddy validate')).toBeGreaterThanOrEqual(0);
+		expect(pfade.map((p) => inode(basis, p))).toEqual(vorher);
+		expect(lies(basis, 'proxy/caddy/Caddyfile')).toBe('ALT-CADDYFILE');
+		expect(lies(basis, 'proxy/caddy/umgebungen/test.caddy')).toBe('ALT-TEST');
+	});
+
+	test('gelungene Übernahme überschreibt die gemounteten Dateien an Ort und Stelle', () => {
+		const basis = baue({ dateien: alt });
+		const pfade = ['proxy/caddy', 'proxy/caddy/umgebungen', 'proxy/caddy/Caddyfile'];
+		const vorher = pfade.map((p) => inode(basis, p));
+		const lauf = ausliefern('live', basis, {
+			STUB_MUSTER_B: 'ps --status running -q caddy',
+			STUB_AUSGABE_B: 'caddy-container'
+		});
+		expect(letzteZeile(lauf)).toBe('ok');
+		expect(pfade.map((p) => inode(basis, p))).toEqual(vorher);
+		expect(lies(basis, 'proxy/caddy/Caddyfile')).not.toBe('ALT-CADDYFILE');
+	});
+
+	test('ungültige Konfiguration setzt auch gemeinsame Teile und Einrichtung zurück', () => {
+		const basis = baue(BESTEHENDES_LIVE);
+		const vorher = BESTEHENDES_LIVE_PFADE.map((p) => lies(basis, p));
+		const lauf = ausliefern('live', basis, { STUB_FEHLER_BEI: 'caddy validate' });
+		expect(letzteZeile(lauf)).toBe('fehler');
+		expect(BESTEHENDES_LIVE_PFADE.map((p) => lies(basis, p))).toEqual(vorher);
+		expect(gibt(basis, 'gemeinsam/bin/wiederherstellen')).toBe(false);
+		expect(gibt(basis, 'live/betrieb.neu')).toBe(false);
+		expect(appStarts(lauf)).toHaveLength(0);
 	});
 
 	test('ungültige Konfiguration beim ersten Mal: neue Dateien werden wieder entfernt', () => {
@@ -387,6 +475,11 @@ describe('zurueck', () => {
 		const lauf = zurueck('test', basis, { STUB_FEHLER_BEI: '--wait-timeout' });
 		expect(lauf.status).toBe(1);
 		expect(letzteZeile(lauf)).toBe('fehler');
+		// zweiter Start mit dem bisherigen Image (aktuell)
+		const starts = appStarts(lauf);
+		expect(starts).toHaveLength(2);
+		expect(lauf.umwelt[starts[0].i].image).toBe(`${REPO}@${ALT}`);
+		expect(lauf.umwelt[starts[1].i].image).toBe(`${REPO}@${NEU}`);
 		expect(lies(basis, 'test/zustand/aktuell')).toBe(NEU);
 		expect(lies(basis, 'test/zustand/vorher')).toBe(ALT);
 	});

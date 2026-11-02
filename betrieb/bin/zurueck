@@ -49,6 +49,8 @@ if ! sperre_nehmen "$UMGEBUNG"; then
 	exit 1
 fi
 GESPERRT=1
+# Eigene Fehlermeldungen der Werkzeuge nie an den Aufrufer, nur ins Protokoll.
+exec 2>>"$LOG"
 
 [ -s "$U/zustand/vorher" ] || scheitern "kein vorheriges Image"
 VORHER=$(head -n 1 "$U/zustand/vorher")
@@ -59,8 +61,19 @@ fi
 
 schritt "app starten"
 export MYTCO_IMAGE="$MYTCO_REPO@$VORHER"
-protokoll "$UMGEBUNG" compose "$UMGEBUNG" up -d --wait --wait-timeout "$MYTCO_WARTEZEIT" app ||
+if ! protokoll "$UMGEBUNG" compose "$UMGEBUNG" up -d --wait --wait-timeout "$MYTCO_WARTEZEIT" app; then
+	# Das bisherige Image wieder starten (Ergebnis nur ins Protokoll), dann fehler.
+	if [ -n "$AKTUELL" ]; then
+		schritt "rueckfall"
+		if MYTCO_IMAGE="$MYTCO_REPO@$AKTUELL" protokoll "$UMGEBUNG" \
+			compose "$UMGEBUNG" up -d --wait --wait-timeout "$MYTCO_WARTEZEIT" app; then
+			echo "zurueck: bisheriges Image läuft wieder gesund" >>"$LOG"
+		else
+			echo "zurueck: bisheriges Image ebenfalls nicht gesund" >>"$LOG"
+		fi
+	fi
 	scheitern "App startet nicht"
+fi
 
 schreibe_zustand "$U/zustand/aktuell" "$VORHER"
 if [ -n "$AKTUELL" ]; then
