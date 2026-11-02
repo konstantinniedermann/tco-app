@@ -19,6 +19,7 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Manifest (Name, Farben fest in der Datei; `theme_color` und `background_color` stimmen von Hand mit `--farbe-marke` und `--farbe-hintergrund` überein) | `static/manifest.webmanifest` |
 | Farbe der Browserleiste, Systemschrift-Einstellung | `src/app.html` |
 | Kopfleiste, Seitenaufbau | `src/routes/+layout.svelte` |
+| Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
 
 Zwei Prüfungen halten Leitbild und Code beisammen:
 
@@ -185,6 +186,30 @@ Kopfleiste.
 Konten mit einer Rolle über *Mitglied* hinaus (RR-07). Dunkelgrüne Seitenleiste mit
 „MyTCO Verwaltung", den Bereichen der eigenen Rollen und „‹ Zur App". Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
+
+## Brief (Druck)
+
+Der Brief mit dem Einmal-Code (A-LOGIN-01) ist eine A4-Seite ohne Seitenrand des Druckers
+(`@page { size: A4; margin: 0 }`). Er nutzt dieselben Farb-, Schrift- und Abstands-Tokens wie
+die App; nur die Masse des Papiers stehen in `mm`, deshalb in eigenen Tokens. Die Symbole der
+Anleitung (Teilen, Drei-Punkte-Menü) folgen dem Baustein *Symbol*: 24er-Raster, Strich 2,
+Farbe `currentColor`, immer mit Text.
+
+**Annahme K-16.1:** Fensterkuvert C5/6 mit Fenster rechts. Die Lage des Adressfelds ist eine
+Konstante; ändert sich das Kuvert, ändern sich nur diese Tokens.
+
+Der Brief setzt seine Grundschrift `--brief-schrift` auf `html`; alle Schrift- und
+Abstands-Tokens in `rem` werden damit auf Briefgrösse verkleinert, damit alles auf eine Seite
+passt.
+
+| Token | Wert | Verwendung |
+|-------|------|------------|
+| `--brief-rand` | `20mm` | Seitenrand des Briefs |
+| `--brief-fenster-oben` | `45mm` | Abstand des Adressfelds vom oberen Blattrand |
+| `--brief-fenster-links` | `118mm` | Abstand des Adressfelds vom linken Blattrand |
+| `--brief-fenster-breite` | `80mm` | Breite des Adressfelds |
+| `--brief-qr` | `35mm` | Kantenlänge des QR-Codes |
+| `--brief-schrift` | `10.5pt` | Grundschrift des Briefs (1 rem auf Papier) |
 
 ## Sprache
 

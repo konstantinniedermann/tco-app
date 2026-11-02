@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed test e2e build image secrets hooks
+.PHONY: help check check-schnell docs annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed test e2e build image secrets hooks musterbrief
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -62,6 +62,9 @@ e2e: db ## Ende-zu-Ende-Tests (Playwright, freier Port ausser E2E_PORT ist geset
 
 build: ## Produktions-Build
 	npm run build
+
+musterbrief: voraussetzungen ## Musterbrief als PDF mit erfundenen Daten (build/musterbrief.pdf)
+	node scripts/musterbrief.ts
 
 image: voraussetzungen-docker ## Docker-Image bauen (mytco:lokal)
 	docker build -t mytco:lokal .
