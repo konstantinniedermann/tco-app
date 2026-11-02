@@ -1,10 +1,12 @@
 import {
+	chmodSync,
 	copyFileSync,
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
 	readdirSync,
-	readFileSync
+	readFileSync,
+	writeFileSync
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -114,7 +116,9 @@ describe('ausliefern-ssh: Ablauf', () => {
 			'login ghcr.io -u mytco --password-stdin',
 			`pull ${REPO}@${DIGEST}`,
 			`create ${REPO}@${DIGEST}`,
-			`cp 0123456789ab:/app/betrieb ${basis}/fassungen/${DIGEST}/`,
+			expect.stringMatching(
+				new RegExp(`^cp 0123456789ab:/app/betrieb ${basis}/fassungen/\\.neu\\.\\d+/$`)
+			),
 			'rm 0123456789ab'
 		]);
 		// Das entnommene ausliefern lief mit Umgebung und Digest
@@ -157,7 +161,20 @@ describe('ausliefern-ssh: Ablauf', () => {
 		expect(lauf.aufrufe).toContain(`pull ${REPO}@${DIGEST}`);
 	});
 
-	test('erneute Auslieferung desselben Digests ersetzt die alte Fassung', () => {
+	test('vollständige Fassung desselben Digests wird wiederverwendet, nicht gelöscht', () => {
+		const basis = baue();
+		const ausl = join(basis, 'fassungen', DIGEST, 'betrieb', 'bin', 'ausliefern');
+		mkdirSync(join(basis, 'fassungen', DIGEST, 'betrieb', 'bin'), { recursive: true });
+		writeFileSync(ausl, '#!/usr/bin/env bash\necho BESTEHEND >"$MYTCO_BASIS/marke"\necho ok\n');
+		chmodSync(ausl, 0o755);
+		const lauf = tuersteher({ args: ['test'], ssh: DIGEST }, basis);
+		expect(lauf.status).toBe(0);
+		expect(readFileSync(join(basis, 'marke'), 'utf-8').trim()).toBe('BESTEHEND');
+		expect(existsSync(join(basis, 'stub-protokoll.exec'))).toBe(false);
+		expect(readdirSync(join(basis, 'fassungen'))).toEqual([DIGEST]);
+	});
+
+	test('unvollständige Reste am Zielort werden ersetzt, kein Temp-Ordner bleibt', () => {
 		const basis = baue();
 		mkdirSync(join(basis, 'fassungen', DIGEST), { recursive: true });
 		const altlast = join(basis, 'fassungen', DIGEST, 'altlast');
@@ -165,6 +182,38 @@ describe('ausliefern-ssh: Ablauf', () => {
 		const lauf = tuersteher({ args: ['test'], ssh: DIGEST }, basis);
 		expect(lauf.status).toBe(0);
 		expect(existsSync(altlast)).toBe(false);
+		expect(readdirSync(join(basis, 'fassungen'))).toEqual([DIGEST]);
+	});
+
+	test.each([['pull'], ['create'], ['cp ']])(
+		'%s scheitert -> kein Temp-Ordner, keine Fassung',
+		(s) => {
+			const basis = baue();
+			tuersteher({ args: ['test'], ssh: DIGEST, stub: { STUB_FEHLER_BEI: s } }, basis);
+			const dir = join(basis, 'fassungen');
+			expect(existsSync(dir) ? readdirSync(dir) : []).toEqual([]);
+		}
+	);
+
+	test('fehlschlagendes ausliefern: Exit 1 und fehler wird durchgereicht', () => {
+		const lauf = tuersteher({
+			args: ['test'],
+			ssh: DIGEST,
+			stub: { STUB_AUSLIEFERN_FEHLER: '1' }
+		});
+		expect(lauf.status).toBe(1);
+		expect(lauf.stdout.trim().split('\n').pop()).toBe('fehler');
+	});
+
+	test('login und pull laufen mit dem Temp-DOCKER_CONFIG, das danach weg ist', () => {
+		const tmp = mkdtempSync(join(tmpdir(), 'mytco-tmpdir-'));
+		const lauf = tuersteher({ args: ['test'], ssh: DIGEST, stdin: TOKEN, env: { TMPDIR: tmp } });
+		const [login, pull, , cp] = lauf.dockerConfig;
+		expect(login.startsWith(tmp)).toBe(true);
+		expect(pull).toBe(login);
+		expect(cp).toBe(login);
+		expect(existsSync(login)).toBe(false);
+		expect(readdirSync(tmp)).toEqual([]);
 	});
 
 	test.each([['pull'], ['create'], ['cp ']])('%s scheitert -> fehler, kein exec', (schritt) => {

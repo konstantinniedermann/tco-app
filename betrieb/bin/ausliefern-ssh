@@ -8,6 +8,9 @@
 # Ausgabe nur "schritt: …", "ok" oder "fehler"; alles von docker steht im Protokoll.
 set -euo pipefail
 
+# Der Client kann über AcceptEnv LANG/LC_* setzen; feste Ausgabe und Zeichenprüfung.
+export LC_ALL=C
+
 # Vor der Prüfung der Eingaben darf nichts ausser "fehler" nach aussen.
 exec 2>/dev/null
 
@@ -16,12 +19,14 @@ exec 2>/dev/null
 source "$(dirname "$0")/lib.sh"
 
 DOCKER_CONFIG_TEMP=""
+TEMP_FASSUNG=""
 CONTAINER=""
 GEMELDET=0
 
 ende() {
 	local rc=$?
 	if [ -n "$CONTAINER" ]; then docker rm "$CONTAINER" >>"${LOG:-/dev/null}" 2>&1 || true; fi
+	if [ -n "$TEMP_FASSUNG" ]; then rm -rf "$TEMP_FASSUNG"; fi
 	if [ -n "$DOCKER_CONFIG_TEMP" ]; then rm -rf "$DOCKER_CONFIG_TEMP"; fi
 	if [ "$GEMELDET" = 0 ] && [ "$rc" != 0 ]; then echo fehler; fi
 	if [ "$rc" != 0 ]; then exit 1; fi
@@ -73,7 +78,7 @@ schritt "image holen"
 TOKEN=""
 if [ ! -t 0 ]; then TOKEN=$(cat || true); fi
 if [ -n "$TOKEN" ]; then
-	DOCKER_CONFIG_TEMP=$(mktemp -d)
+	DOCKER_CONFIG_TEMP=$(mktemp -d "${TMPDIR:-/tmp}/mytco-docker.XXXXXX")
 	export DOCKER_CONFIG="$DOCKER_CONFIG_TEMP"
 	protokoll "$UMGEBUNG" docker login "$REGISTRY" -u mytco --password-stdin <<<"$TOKEN" ||
 		scheitern "Anmeldung gescheitert"
@@ -89,16 +94,31 @@ case "$ID" in
 esac
 CONTAINER="$ID"
 ZIEL="$MYTCO_BASIS/fassungen/$DIGEST"
-rm -rf "$ZIEL"
-mkdir -p "$ZIEL"
-protokoll "$UMGEBUNG" docker cp "$CONTAINER:/app/betrieb" "$ZIEL/" || scheitern "cp gescheitert"
+FERTIG="$ZIEL/betrieb/bin/ausliefern"
+# Erst in einen eigenen Ordner entnehmen und fertig an den Platz verschieben: ein gleichzeitiger
+# Lauf mit demselben Digest sieht nie eine halbe Fassung und löscht nie eine genutzte.
+# Der Inhalt hängt allein am Digest; eine vollständige Fassung wird deshalb wiederverwendet.
+mkdir -p "$MYTCO_BASIS/fassungen"
+TEMP_FASSUNG="$MYTCO_BASIS/fassungen/.neu.$$"
+rm -rf "$TEMP_FASSUNG"
+mkdir "$TEMP_FASSUNG"
+protokoll "$UMGEBUNG" docker cp "$CONTAINER:/app/betrieb" "$TEMP_FASSUNG/" || scheitern "cp gescheitert"
 protokoll "$UMGEBUNG" docker rm "$CONTAINER" || true
 CONTAINER=""
-[ -x "$ZIEL/betrieb/bin/ausliefern" ] || scheitern "ausliefern fehlt im Image"
+if [ ! -x "$FERTIG" ]; then
+	# Unvollständige Reste (abgestürzter früherer Lauf) wegräumen, dann atomar umbenennen.
+	[ -e "$ZIEL" ] && rm -rf "$ZIEL"
+	mv "$TEMP_FASSUNG" "$ZIEL" 2>/dev/null || [ -x "$FERTIG" ] || scheitern "Fassung nicht übernommen"
+fi
+rm -rf "$TEMP_FASSUNG"
+TEMP_FASSUNG=""
+[ -x "$FERTIG" ] || scheitern "ausliefern fehlt im Image"
 
 # Zugangsdaten gehören nicht in den weiteren Ablauf; exec führt den EXIT-Trap nicht aus.
-unset DOCKER_CONFIG
-rm -rf "$DOCKER_CONFIG_TEMP"
-DOCKER_CONFIG_TEMP=""
+if [ -n "$DOCKER_CONFIG_TEMP" ]; then
+	unset DOCKER_CONFIG
+	rm -rf "$DOCKER_CONFIG_TEMP"
+	DOCKER_CONFIG_TEMP=""
+fi
 
 exec "$ZIEL/betrieb/bin/ausliefern" "$UMGEBUNG" "$DIGEST"
