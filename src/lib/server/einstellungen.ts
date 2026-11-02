@@ -13,6 +13,9 @@ export type Einstellungen = {
 /** Annahme K-10: App-Adresse my.tcolten.ch, wenn MYTCO_ADRESSE fehlt */
 export const STANDARD_ADRESSE = 'https://my.tcolten.ch';
 
+/** Schlüssel aus `.env.example`; öffentlich im Repo, darum in Produktion verboten. */
+export const BEISPIEL_SCHLUESSEL = 'nur-lokal-nicht-fuer-produktion-0123456789abcdef';
+
 /**
  * process.env statt `$app/env/private`, Begründung wie bei `holeDb` in `db/index.ts`.
  * Fehlertexte nennen nur den Namen der Variablen, nie ihren Wert (SI-05).
@@ -23,6 +26,9 @@ export function leseEinstellungen(
 	const codeSchluessel = env.MYTCO_CODE_SCHLUESSEL;
 	if (!codeSchluessel || codeSchluessel.length < 32) {
 		throw new Error('MYTCO_CODE_SCHLUESSEL fehlt oder ist kürzer als 32 Zeichen');
+	}
+	if (env.NODE_ENV === 'production' && codeSchluessel === BEISPIEL_SCHLUESSEL) {
+		throw new Error('MYTCO_CODE_SCHLUESSEL ist der Beispielwert aus .env.example');
 	}
 	return {
 		codeSchluessel,

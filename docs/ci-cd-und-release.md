@@ -130,7 +130,7 @@ Pflichtwert, startet der Server nicht. Beim Bauen werden sie nicht geprüft.
 
 | Variable | Inhalt | Pflicht |
 |----------|--------|---------|
-| `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig | ja |
+| `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
 | `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
 | `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
 | `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text, steht im Brief und in der Meldung «Code schon benutzt» (Annahme K-21) | ja |
@@ -141,7 +141,9 @@ Hinter dem Reverse Proxy muss `adapter-node` die Client-IP aus einer Kopfzeile l
 der Proxy setzt (`ADDRESS_HEADER`, bei `X-Forwarded-For` dazu `XFF_DEPTH`). Sonst teilen alle
 Mitglieder die IP des Proxys, und die Bremsen pro IP sperren alle zusammen. `PROTOCOL_HEADER`
 nur setzen, wenn der Proxy die Kopfzeile zuverlässig setzt. Die E2E-Tests setzen sie nur,
-damit WebKit das Cookie auf `http://localhost` annimmt.
+damit WebKit das Cookie auf `http://localhost` annimmt. IPv6-Clients vor dem Zählen auf ihr
+/64-Netz zusammenfassen (im Proxy oder in der App), sonst umgeht ein Wechsel der Adresse die
+Bremsen pro IP. Mail-Versand nur mit TLS: `smtps://` oder STARTTLS erzwungen.
 
 **Mails lokal und in der CI:** Mailpit (`axllent/mailpit:v1.33`) fängt alle Mails ab, lokal
 über `docker-compose.yml` (`make db`; SMTP auf Port 51025, Oberfläche auf
