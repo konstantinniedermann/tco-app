@@ -216,3 +216,151 @@ jobs:
         with:
           persist-credentials: false
       - run: docker build -t mytco:ci .
+      # Das gebaute Image muss starten und seine Prüfpunkte bestehen, bevor es je ausgeliefert wird.
+      - name: Rauchtest
+        run: bash betrieb/nachweis/rauchtest.sh mytco:ci
+
+  # --- Auslieferung ---------------------------------------------------------------------
+  # Alle folgenden Jobs sind ausgeschaltet, solange die Repo-Variablen AUSLIEFERUNG_TEST
+  # bzw. AUSLIEFERUNG_LIVE nicht auf `an` stehen. Test und Live bekommen dasselbe Image:
+  # `bauen` (dev) baut es und kennzeichnet es mit dem Code-Stand, `finden` (main) sucht genau
+  # dieses Image wieder, `ausliefern` übergibt nur den Digest an den Türsteher des Servers.
+
+  bauen:
+    name: Bauen (Image nach GHCR, für Test)
+    needs: [aenderung, doku, pruefen, e2e, malware, image]
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/dev'
+      && needs.aenderung.outputs.code == 'true' && vars.AUSLIEFERUNG_TEST == 'an'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest: ${{ steps.pushen.outputs.digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Bauen und pushen
+        id: pushen
+        env:
+          TOKEN: ${{ github.token }}
+          AKTEUR: ${{ github.actor }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          repo="ghcr.io/$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
+          stand=$(bash scripts/ci/code-stand.sh)
+          docker build -t "$repo:code-$stand" -t "$repo:commit-$COMMIT" .
+          printf '%s' "$TOKEN" | docker login ghcr.io -u "$AKTEUR" --password-stdin
+          docker push "$repo:code-$stand"
+          docker push "$repo:commit-$COMMIT"
+          digest=$(docker inspect --format '{{range .RepoDigests}}{{println .}}{{end}}' "$repo:code-$stand" \
+            | sed -n "s|^$repo@||p" | head -n 1)
+          case "$digest" in
+            sha256:????????????????????????????????????????????????????????????????) ;;
+            *) echo "Digest nicht lesbar"; exit 1 ;;
+          esac
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+
+  finden:
+    name: Finden (Image von Test, für Live)
+    needs: [aenderung, doku, pruefen, e2e, malware, image]
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main'
+      && needs.aenderung.outputs.code == 'true' && vars.AUSLIEFERUNG_LIVE == 'an'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      digest: ${{ steps.suchen.outputs.digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Image zum Code-Stand suchen
+        id: suchen
+        env:
+          TOKEN: ${{ github.token }}
+          AKTEUR: ${{ github.actor }}
+        run: |
+          repo="ghcr.io/$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
+          stand=$(bash scripts/ci/code-stand.sh)
+          printf '%s' "$TOKEN" | docker login ghcr.io -u "$AKTEUR" --password-stdin
+          digest=$(docker buildx imagetools inspect "$repo:code-$stand" --format '{{.Manifest.Digest}}' 2>/dev/null) || digest=""
+          case "$digest" in
+            sha256:????????????????????????????????????????????????????????????????) ;;
+            *) echo "Kein auf Test ausgeliefertes Image zu diesem Code-Stand"; exit 1 ;;
+          esac
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+
+  # Nur `run:`-Schritte, keine Fremd-Actions: Dieser Job hält die SSH-Schlüssel (geprüft von
+  # scripts/pruefungen/workflow-rechte.ts). Ausgabe ausschliesslich `ok` oder `fehler`.
+  ausliefern:
+    name: Ausliefern (SSH an den Türsteher)
+    needs: [bauen, finden]
+    if: always() && (needs.bauen.result == 'success' || needs.finden.result == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: ausliefern-${{ github.ref_name }}
+      cancel-in-progress: false
+    permissions:
+      packages: read
+    steps:
+      - name: Digest übergeben
+        env:
+          SCHLUESSEL: ${{ github.ref_name == 'main' && secrets.SSH_SCHLUESSEL_LIVE || secrets.SSH_SCHLUESSEL_TEST }}
+          BEKANNTE_HOSTS: ${{ secrets.SSH_BEKANNTE_HOSTS }}
+          SERVER: ${{ secrets.SERVER_ADRESSE }}
+          TOKEN: ${{ github.token }}
+          DIGEST: ${{ needs.bauen.outputs.digest || needs.finden.outputs.digest }}
+        run: |
+          umask 077
+          ordner=$(mktemp -d)
+          trap 'rm -rf "$ordner"' EXIT
+          printf '%s\n' "$SCHLUESSEL" > "$ordner/schluessel"
+          printf '%s\n' "$BEKANNTE_HOSTS" > "$ordner/hosts"
+          if [ -n "$SERVER" ] && [ -n "$DIGEST" ] \
+            && printf '%s' "$TOKEN" | ssh -i "$ordner/schluessel" \
+              -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$ordner/hosts" \
+              -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20 \
+              mytco@"$SERVER" "$DIGEST" >/dev/null 2>&1; then
+            echo ok
+          else
+            echo fehler
+            exit 1
+          fi
+
+  release:
+    name: Release (Tag und GitHub-Release)
+    needs: ausliefern
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Release anlegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          # Text der Version: Abschnitt `## <version>` bis zur nächsten `## `-Überschrift.
+          awk -v kopf="## $version" '
+            /^## / { an = (index($0, kopf) == 1 && (length($0) == length(kopf) || substr($0, length(kopf) + 1, 1) == " ")); next }
+            an { print }
+          ' docs/versionen.md > "$RUNNER_TEMP/notizen.md"
+          if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notizen.md"; then
+            echo "Kein Abschnitt für Version $version in docs/versionen.md"
+            exit 1
+          fi
+          gh release create "v$version" --target "$COMMIT" --title "v$version" \
+            --notes-file "$RUNNER_TEMP/notizen.md"
