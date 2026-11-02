@@ -20,7 +20,7 @@
 		"e2e:browser": "playwright install --with-deps chromium webkit",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"pruefungen": "node scripts/pruefungen/bauregel.ts && node scripts/pruefungen/test-ids.ts && node scripts/pruefungen/testdaten.ts && node scripts/pruefungen/skip.ts"
+		"pruefungen": "node scripts/pruefungen/bauregel.ts && node scripts/pruefungen/test-ids.ts && node scripts/pruefungen/testdaten.ts && node scripts/pruefungen/skip.ts && node scripts/pruefungen/design-festwerte.ts"
 	},
 	"dependencies": {
 		"@sveltejs/adapter-node": "^6.0.1",
