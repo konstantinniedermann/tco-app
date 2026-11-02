@@ -8,6 +8,9 @@
 #    wenn die Argumentzeile ("$*") das Muster als Teilstring enthält (Shell-Muster erlaubt,
 #    z. B. "exec*psql"). NAME ist frei wählbar (A-Z, 0-9, _). Mehrere Paare: es gewinnt der
 #    erste Treffer in alphabetischer Reihenfolge der NAMEn. Ohne Treffer keine Ausgabe.
+#  - STUB_FOLGE_<NAME>=<a>@@<b>@@<c>: statt STUB_AUSGABE_<NAME> (gleiches STUB_MUSTER_<NAME>);
+#    der n-te Treffer gibt den n-ten Text aus, danach wiederholt sich der letzte. Der Zähler liegt
+#    in $STUB_PROTOKOLL.folge.<NAME>.
 #  - `create …` gibt ohne Treffer die feste Container-ID 0123456789ab aus
 #  - `cp <id>:/app/betrieb <ziel>` legt <ziel>/betrieb/bin/ausliefern an: ein kleines
 #    ausführbares Skript, das seine Argumente an $STUB_PROTOKOLL.exec anhängt und `ok` druckt (mit STUB_AUSLIEFERN_FEHLER: `fehler`, Exit 1;
@@ -31,7 +34,24 @@ for muster_var in $(compgen -A variable STUB_MUSTER_ | sort); do
 	muster="${!muster_var}"
 	case "$*" in
 	*$muster*)
-		ausgabe_var="STUB_AUSGABE_${muster_var#STUB_MUSTER_}"
+		name="${muster_var#STUB_MUSTER_}"
+		folge_var="STUB_FOLGE_$name"
+		if [ -n "${!folge_var-}" ]; then
+			zaehler="$STUB_PROTOKOLL.folge.$name"
+			n=$(($(cat "$zaehler" 2>/dev/null || echo 0) + 1))
+			echo "$n" >"$zaehler"
+			rest="${!folge_var}@@"
+			text=""
+			i=0
+			while [ "$i" -lt "$n" ] && [ -n "$rest" ]; do
+				text="${rest%%@@*}"
+				rest="${rest#*@@}"
+				i=$((i + 1))
+			done
+			printf '%s\n' "$text"
+			exit 0
+		fi
+		ausgabe_var="STUB_AUSGABE_$name"
 		printf '%s\n' "${!ausgabe_var-}"
 		exit 0
 		;;

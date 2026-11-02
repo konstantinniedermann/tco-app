@@ -114,36 +114,53 @@ RESTIC_IMAGE="restic/restic:0.18.1@sha256:39d9072fb5651c80d75c7a811612eb60b4c06b
 
 # restic im Container. Ein lokales Ziel (RESTIC_REPOSITORY beginnt mit /) wird am selben Pfad
 # eingehängt. Stdin wird durchgereicht (-i); Aufrufer ohne Eingabe leiten </dev/null um.
+# --hostname: fester Host, sonst gruppiert forget je zufälligem Container-Namen und löscht nie.
+# --log-driver none: Docker darf die Standardausgabe (z. B. restic dump) nicht mitschreiben.
+# --retry-lock: kurz auf ein Repo-Schloss warten, statt sofort zu scheitern.
 restic_docker() {
 	local env_datei="$MYTCO_BASIS/sicherung.env" ziel=""
 	ziel=$(sed -n 's/^RESTIC_REPOSITORY=//p' "$env_datei" | head -n 1)
 	case "$ziel" in
 	/*)
-		docker run --rm -i --env-file "$env_datei" -v "$ziel:$ziel" "$RESTIC_IMAGE" "$@"
+		docker run --rm -i --hostname mytco --log-driver none --env-file "$env_datei" \
+			-v "$ziel:$ziel" "$RESTIC_IMAGE" --retry-lock 2m "$@"
 		;;
 	*)
-		docker run --rm -i --env-file "$env_datei" "$RESTIC_IMAGE" "$@"
+		docker run --rm -i --hostname mytco --log-driver none --env-file "$env_datei" \
+			"$RESTIC_IMAGE" --retry-lock 2m "$@"
 		;;
 	esac
 }
 
+# Snapshots als eine Zeile je Eintrag (restic liefert ein JSON-Array; Einträge beginnen mit "time").
+snapshot_zeilen() {
+	awk '{ gsub(/\},\{"time":/, "}\n{\"time\":"); print }'
+}
+
 # finde_lauf <umgebung> [lauf]: gibt die Lauf-ID aus. Nur Snapshots mit dem Tag der Umgebung
-# zählen (ein Live-Stand darf nie auf Test landen, DS-08). Ohne Lauf der neueste dieser
-# Umgebung; kein Treffer: Exit 1.
+# zählen (ein Live-Stand darf nie auf Test landen, DS-08). Vollständig ist ein Lauf erst mit
+# seinem zaehlung.txt-Snapshot (wird zuletzt geschrieben). Ohne Lauf der neueste vollständige
+# dieser Umgebung; kein Treffer: Exit 1.
 finde_lauf() {
-	local umgebung="$1" lauf="${2-}" json=""
+	local umgebung="$1" lauf="${2-}" json="" treffer=""
 	if [ -n "$lauf" ]; then
 		case "$lauf" in
 		*$'\n'*) return 1 ;;
 		esac
 		printf '%s\n' "$lauf" | grep -qxE 'lauf-[0-9A-Za-z]+' || return 1
 		json=$(restic_docker snapshots --tag "$umgebung,$lauf" --json </dev/null) || return 1
-		# Gegenprobe: beide Tags müssen im Ergebnis stehen, auch wenn restic mehr lieferte.
-		printf '%s\n' "$json" | grep -q "\"$umgebung\"" || return 1
-		printf '%s\n' "$json" | grep -q "\"$lauf\"" || return 1
+		# Gegenprobe im selben Eintrag: Pfad der Zählung und beide Tags.
+		treffer=$(printf '%s\n' "$json" | snapshot_zeilen |
+			grep -F '"paths":["/zaehlung.txt"]' |
+			grep -E "\"tags\":\[[^]]*\"$umgebung\"" |
+			grep -E "\"tags\":\[[^]]*\"$lauf\"" || true)
+		[ -n "$treffer" ] || return 1
 	else
 		json=$(restic_docker snapshots --tag "$umgebung" --json </dev/null) || return 1
-		lauf=$(printf '%s\n' "$json" | grep -o 'lauf-[0-9]\{8\}T[0-9]\{6\}Z' | sort -u | tail -n 1 || true)
+		lauf=$(printf '%s\n' "$json" | snapshot_zeilen |
+			grep -F '"paths":["/zaehlung.txt"]' |
+			grep -E "\"tags\":\[[^]]*\"$umgebung\"" |
+			grep -o 'lauf-[0-9]\{8\}T[0-9]\{6\}Z' | sort -u | tail -n 1 || true)
 		[ -n "$lauf" ] || return 1
 	fi
 	echo "$lauf"

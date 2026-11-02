@@ -53,7 +53,7 @@ compose "$UMGEBUNG" stop app >>"$LOG" || scheitern "App nicht zu stoppen"
 schritt "einspielen"
 restic_docker dump --tag "$UMGEBUNG,$LAUF" --path "/mytco-$UMGEBUNG.dump" latest \
 	"/mytco-$UMGEBUNG.dump" </dev/null |
-	compose "$UMGEBUNG" exec -T db pg_restore --clean --if-exists -U mytco -d mytco >>"$LOG" ||
+	compose "$UMGEBUNG" exec -T db pg_restore --clean --if-exists --single-transaction --exit-on-error -U mytco -d mytco >>"$LOG" ||
 	scheitern "Einspielen gescheitert"
 
 schritt "app starten"

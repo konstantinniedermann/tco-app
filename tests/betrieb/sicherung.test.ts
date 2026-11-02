@@ -5,8 +5,24 @@ import { describe, expect, test } from 'vitest';
 import { fuehreAus, type Ergebnis } from './hilfe.ts';
 
 const ZAEHLUNG = 'public.mitglied|3\npublic.rolle|2';
+// Wie restic: je Lauf ein Dump- und ein Zählungs-Snapshot, "time" zuerst.
+const eintrag = (umgebung: string, lauf: string, pfad: string, id: string) => ({
+	time: '2026-01-01T02:30:00Z',
+	paths: [pfad],
+	hostname: 'mytco',
+	tags: [umgebung, lauf],
+	short_id: id
+});
 const SNAP = (umgebung: string, ...laeufe: string[]) =>
-	JSON.stringify(laeufe.map((l, i) => ({ short_id: `abc${i}`, tags: [umgebung, l] })));
+	JSON.stringify(
+		laeufe.flatMap((l, i) => [
+			eintrag(umgebung, l, `/mytco-${umgebung}.dump`, `d${i}`),
+			eintrag(umgebung, l, '/zaehlung.txt', `z${i}`)
+		])
+	);
+// Nur der Dump, die Zählung fehlt: der Lauf ist nicht abgeschlossen.
+const SNAP_OHNE_ZAEHLUNG = (umgebung: string, lauf: string) =>
+	JSON.stringify([eintrag(umgebung, lauf, `/mytco-${umgebung}.dump`, 'd0')]);
 const SNAP_LEER = '[]';
 
 // MYTCO_BASIS mit sicherung.env und der Einrichtung der Umgebungen (für die Postgres-Fassung).
@@ -99,6 +115,10 @@ describe('sichern', () => {
 			expect(a).toContain('--env-file');
 			expect(a).toContain('sicherung.env');
 			expect(a).not.toContain(' -v ');
+			// fester Host (sonst löscht forget nie), kein Docker-Log der Ausgabe, Schloss abwarten
+			expect(a).toContain('--hostname mytco');
+			expect(a).toContain('--log-driver none');
+			expect(a).toContain('--retry-lock 2m');
 		}
 	});
 
@@ -129,10 +149,42 @@ describe('sichern: Sonderfälle', () => {
 		expect(index(x, ' backup ')).toBe(-1);
 	});
 
-	test('Dump scheitert: fehler, keine Zählung abgelegt', () => {
-		const x = lauf('sichern', ['live'], { STUB_FEHLER_BEI: 'pg_dump' });
+	test('Dump scheitert: fehler, keine Zählung abgelegt, Snapshots des Laufs verworfen', () => {
+		const x = lauf('sichern', ['live'], {
+			STUB_FEHLER_BEI: 'pg_dump',
+			STUB_MUSTER_S: 'snapshots',
+			STUB_AUSGABE_S: SNAP_OHNE_ZAEHLUNG('live', 'lauf-x')
+		});
 		expect(letzteZeile(x)).toBe('fehler');
 		expect(index(x, 'zaehlung.txt')).toBe(-1);
+		expect(mit(x, 'snapshots --tag live,lauf-').length).toBeGreaterThan(0);
+		expect(mit(x, ' forget d0')).toHaveLength(1);
+	});
+
+	test('Zählung ändert sich einmal: zweiter Versuch, erster Dump verworfen, dann ok', () => {
+		const x = lauf('sichern', ['live'], {
+			STUB_MUSTER_P: 'psql',
+			STUB_FOLGE_P: 'a|1@@a|2@@a|2@@a|2',
+			STUB_MUSTER_S: 'snapshots',
+			STUB_AUSGABE_S: SNAP_OHNE_ZAEHLUNG('live', 'lauf-x')
+		});
+		expect(letzteZeile(x)).toBe('ok');
+		expect(mit(x, '--stdin-filename mytco-live.dump')).toHaveLength(2);
+		expect(mit(x, ' forget d0')).toHaveLength(1);
+		expect(mit(x, '--stdin-filename zaehlung.txt')).toHaveLength(1);
+	});
+
+	test('Zählung ändert sich immer: nach 3 Versuchen fehler, keine Zählung abgelegt', () => {
+		const x = lauf('sichern', ['live'], {
+			STUB_MUSTER_P: 'psql',
+			STUB_FOLGE_P: 'a|1@@a|2@@a|3@@a|4@@a|5@@a|6',
+			STUB_MUSTER_S: 'snapshots',
+			STUB_AUSGABE_S: SNAP_OHNE_ZAEHLUNG('live', 'lauf-x')
+		});
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(mit(x, '--stdin-filename mytco-live.dump')).toHaveLength(3);
+		expect(index(x, 'zaehlung.txt')).toBe(-1);
+		expect(mit(x, ' forget d0')).toHaveLength(3);
 	});
 
 	test('lokales Ziel wird am selben Pfad gemountet', () => {
@@ -171,6 +223,47 @@ describe('wiederherstellen', () => {
 		expect(stop).toBeGreaterThan(-1);
 		expect(restore).toBeGreaterThan(stop);
 		expect(start).toBeGreaterThan(restore);
+	});
+
+	test('spielt in einer Transaktion ein und bricht beim ersten Fehler ab', () => {
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], SNAP_TEST);
+		expect(mit(x, 'pg_restore')[0]).toContain(
+			'pg_restore --clean --if-exists --single-transaction --exit-on-error'
+		);
+	});
+
+	test('unvollständiger Lauf (ohne Zählung) wird nicht eingespielt', () => {
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], {
+			STUB_MUSTER_S: 'snapshots',
+			STUB_AUSGABE_S: SNAP_OHNE_ZAEHLUNG('test', 'lauf-x')
+		});
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(index(x, 'pg_restore')).toBe(-1);
+	});
+
+	test('beide Tags müssen im selben Snapshot stehen', () => {
+		const gemischt = JSON.stringify([
+			eintrag('live', 'lauf-x', '/zaehlung.txt', 'a'),
+			eintrag('test', 'lauf-y', '/zaehlung.txt', 'b')
+		]);
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], {
+			STUB_MUSTER_S: 'snapshots',
+			STUB_AUSGABE_S: gemischt
+		});
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(index(x, 'pg_restore')).toBe(-1);
+	});
+
+	test('ohne Lauf wird ein unvollständiger, neuerer Lauf übergangen', () => {
+		const x = lauf('wiederherstellen', ['live'], {
+			STUB_MUSTER_S: 'snapshots',
+			STUB_AUSGABE_S: JSON.stringify([
+				eintrag('live', 'lauf-20260101T020000Z', '/zaehlung.txt', 'z0'),
+				eintrag('live', 'lauf-20260301T020000Z', '/mytco-live.dump', 'd1')
+			])
+		});
+		expect(letzteZeile(x)).toBe('ok');
+		expect(mit(x, 'dump --tag live,lauf-20260101T020000Z').length).toBeGreaterThan(0);
 	});
 
 	test('Snapshot trägt nur live: fehler, kein pg_restore, App bleibt unberührt', () => {
