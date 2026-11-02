@@ -178,7 +178,7 @@ Jeder Baustein ist im Leitbild beschrieben und genau einmal als CSS-Klasse in
 | `src/routes/+layout.svelte` | bindet beide Dateien global ein |
 | `src/app.html` | `meta text-scale`, Favicon- und Touch-Icon-Links, `theme-color` |
 | `static/favicon.svg`, `static/apple-touch-icon.png` (180), `static/icon-192.png`, `static/icon-512.png` | Wappen lindgrün auf `--farbe-marke`; Kommentar/Doku `Annahme K-13` |
-| `src/lib/design/wappen.svg` | Wappen als Form (`currentColor`), für Kopfleiste und Mockups |
+| `static/wappen.svg` | Wappen lindgrün ohne Hintergrund, für Kopfleiste (`<img>`) und Mockups. Symbol-Dateien haben ihre Farben fest eingebrannt; das Leitbild nennt sie als Code-Stelle der betroffenen Farben |
 | `docs/ui-mockups/*.html` | abgenommene Mockups; binden `tokens.css` und `basis.css` per relativem Pfad ein, eigenes CSS nur für den Geräterahmen |
 | `scripts/pruefungen/design-tokens.ts` (+ Test) | Abgleich: jede Token-Zeile im Leitbild (`` `--name` `` + Wert) existiert mit gleichem Wert in `tokens.css` und umgekehrt |
 | `scripts/pruefungen/design-festwerte.ts` (+ Test) | in `src/**/*.svelte` und `src/**/*.css` ausser `tokens.css`: keine Farbwerte (`#…`, `rgb(`, `hsl(`) und keine `px`-Angaben |
