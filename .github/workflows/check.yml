@@ -216,7 +216,9 @@ jobs:
         with:
           persist-credentials: false
       - run: docker build -t mytco:ci .
-      # Das gebaute Image muss starten und seine Prüfpunkte bestehen, bevor es je ausgeliefert wird.
+      # Rauchtest des Codes: Das hier gebaute Image muss starten und seine Prüfpunkte bestehen.
+      # Ausgeliefert wird ein Neubau aus `bauen` (nicht bitgleich); dieses Image prüft auf Test die
+      # Statusabfrage der Auslieferung, bevor `freigeben` es für Live kennzeichnet.
       - name: Rauchtest
         run: bash betrieb/nachweis/rauchtest.sh mytco:ci
 
