@@ -33,7 +33,7 @@ dort nie hin (DS-08).
 **Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut.
 [#32](https://github.com/konstantinniedermann/tco-app/issues/32) baut den lokal belegbaren Teil:
 Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
-(29 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
+(36 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
 #29, Konten und Adresse hängen an K-04 und K-10), spätestens vor dem Release *Mitglieder-Login*.
 Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
@@ -91,8 +91,11 @@ Doku-Merge ändert ihn nicht.
    gestartet. Bei Live zuerst eine Sicherung der Datenbank, **bevor** irgendetwas übernommen
    wird; scheitert sie, bleibt alles, wie es war. Dann die Einrichtung übernehmen (gemeinsame
    Teile wie die Caddy-Grundkonfiguration nur bei Live oder solange Live noch nie ausgeliefert wurde, vorher prüft `caddy validate`; eine
-   ungültige Konfiguration wird abgewiesen, die alte bleibt aktiv), Migrationen ausführen,
-   Container neu starten. Auf Test wird die Datenbank dabei neu aufgesetzt.
+   ungültige Konfiguration wird abgewiesen, die alte bleibt aktiv). Danach lädt Caddy die neue
+   Konfiguration, und der Proxy-Container wird neu erstellt, wenn sich sein Image (z. B. ein
+   Update von Dependabot) oder `proxy.env` geändert hat. Dann Migrationen ausführen, Container
+   neu starten. Auf Test wird die Datenbank dabei neu aufgesetzt. Bricht der Lauf mitten in der
+   Übernahme ab, wird alles Übernommene zurückgesetzt.
 5. **Prüfen:** Antwortet die App nicht innert einer Minute (S) auf ihre Statusabfrage,
    startet das Skript wieder das vorherige Image. Die CI erfährt nur `ok` oder `fehler`,
    keine Logs der App, denn CI-Logs liegen bei GitHub in den USA (DS-01, DS-06).
@@ -120,7 +123,16 @@ Timer, danach prüft `probe` die frische Sicherung in einer Wegwerf-Datenbank oh
 aussen. Eingespielt und zurückgespielt werden nur vollständige Läufe. Die Probe-Daten bleiben
 auf dem Server (SI-16); die Sicherung selbst verlässt ihn nur verschlüsselt, Richtung
 S3-kompatiblem Ziel (Ziel legt [#10](https://github.com/konstantinniedermann/tco-app/issues/10) fest).
-Zur Zählung der 30 Tage siehe `docs/beobachtungen.md`.
+
+- **30 Tage:** restic zählt sie je Umgebung und Datei (Dump, Zählung) ab der neuesten Sicherung,
+  nicht ab heute. Bleibt die Sicherung aus, bleiben auch die alten erhalten.
+- **Sicherungsziel:** Das Ziel legt der Betrieb einmal von Hand an (`betrieb/README.md`).
+  `sichern` legt nie selbst eines an; fehlt es oder ist es falsch eingetragen, meldet es
+  `fehler`, und eine Live-Auslieferung bricht vor jeder Änderung ab.
+- **Wiederherstellen:** Vor dem Einspielen werden die Tabellen der App samt der Liste der
+  Migrationen geleert, alles in einer Transaktion. So bleibt keine Tabelle einer späteren
+  Migration stehen, und die nächste Auslieferung migriert wieder sauber. Scheitert etwas,
+  bleibt der alte Stand.
 
 **Befehle auf dem Server** (Einzelheiten in `betrieb/README.md`):
 
@@ -134,7 +146,15 @@ Zur Zählung der 30 Tage siehe `docs/beobachtungen.md`.
 hängen nur an ihrem internen Netz, die Test-App erreicht Live nicht. Caddy behält die
 Content-Security-Policy der App und setzt `frame-ancestors 'none'` nur, wo keine besteht;
 HSTS, `nosniff` und Referrer-Policy setzt er genau einmal, auch für `/_app/*`. Er führt kein
-Zugriffsprotokoll (keine IP-Adressen, DS-06). Test verlangt ein Passwort.
+Zugriffsprotokoll. Fehler und Warnungen schreibt er ins Docker-Log des Proxys; ein Filter
+entfernt daraus Client-Adresse und Weiterleitungs-Köpfe jedes Eintrags, es bleiben keine
+IP-Adressen (DS-06). Test verlangt ein Passwort.
+
+**Protokolle auf dem Server:** Was docker, psql und die App bei Auslieferung und Sicherung
+ausgeben, steht nur in `<umgebung>/protokoll.log` (je Umgebung, nur für den Betriebsbenutzer
+lesbar). Docker-Logs der Container rotieren nach Grösse (5 × 10 MB). Eine Rotation nach Zeit
+(höchstens 30 Tage, DS-06) für beide richtet
+[#39](https://github.com/konstantinniedermann/tco-app/issues/39) ein.
 
 ### Schutz des Auslieferungswegs
 
@@ -146,7 +166,11 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 - Der Live-Lauf startet nur bei einem Push auf `main` und nur mit einem Image, das auf Test
   ausgeliefert wurde.
 - Der Türsteher und seine Eingabeprüfung werden **von Hand** eingerichtet und nie von der CI
-  geändert; ein Image kann sie nicht ersetzen.
+  geändert. Er schützt den **Eingang**: Er nimmt nur einen Digest an, die Umgebung kommt aus
+  dem Schlüssel. **Gegen ein schädliches Image schützt er nicht.** Das `ausliefern` aus dem
+  Image läuft auf dem Server als Benutzer `mytco` mit Zugang zu Docker, und das reicht so weit
+  wie root. Ein solches Image kann auch den Türsteher selbst, die Schlüssel in
+  `authorized_keys` und die systemd-Einheiten umschreiben.
 - Die Rechte der Workflows prüft `workflow-rechte.ts` in der CI: Jeder Job hat eigene Rechte,
   `packages: write` nur `bauen` und `freigeben`, `contents: write` nur `release`, die SSH-Geheimnisse
   nur `ausliefern`.
@@ -161,27 +185,33 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   Antwort der API). Der Projektleiter verzichtet darauf, um laufende Kosten auf seinem
   Privatkonto zu vermeiden; das Restrisiko ist im Sicherheitskonzept bewertet. Die Auslieferung bleibt
   automatisch.
-- **Restrisiko** (angenommen im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
+- **Restrisiko** (bewertet im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
   Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
-  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten, hängt an K-04):
+  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten, hängt an K-04). Die
+  Reichweite ist dort am 02.11.2026 richtiggestellt worden und **vom Projektleiter neu zu
+  bestätigen**:
   - Wer ins Repo pushen kann, kann direkt auf `main` pushen (davor schützt nur der lokale
     Hook des Projektleiters) oder einen Workflow schreiben, der den Live-Schlüssel nutzt
-    (davor schützt nichts); weil die Einrichtung im Image mitreist, reicht das bis auf den Server
-    (Geheimnisse beider Umgebungen, Sicherungszugang). Pushen können der Projektleiter und die Hauptansprechperson
+    (davor schützt nichts). Weil das `ausliefern` aus dem Image auf dem Server läuft, reicht
+    das bis zu root auf dem Server: Geheimnisse beider Umgebungen, Sicherungszugang,
+    Türsteher und Schlüssel. Getrennte Schlüssel für Test und Live helfen nur gegen einen
+    gestohlenen Schlüssel allein; ein schädliches Image, das nur auf Test kommt, erreicht über
+    denselben Server trotzdem Live. Pushen können der Projektleiter und die Hauptansprechperson
     im Vorstand: Mitarbeitende eines privaten Repos auf einem Privatkonto haben immer
     Schreibrecht (B: [GitHub Docs](https://docs.github.com/en/account-and-profile/reference/permission-levels-for-a-personal-account-repository)).
     Eine reine Leserolle gibt es erst in einer Organisation (K-04).
-  - Ein Schadpaket im Bau landet im Image und läuft damit live, auch ohne den Schlüssel.
+  - Ein Schadpaket im Bau landet im Image und läuft damit live, auch ohne den Schlüssel, und
+    mit dem `ausliefern` des Images auch als root-gleicher Benutzer auf dem Server.
     Dagegen helfen nur die Malware-Prüfung und die Prüfung der Pakete vor der Aufnahme.
 
 ### Geheimnisse
 
 | Wo | Was |
 |----|-----|
-| GitHub (Secrets) | `SSH_SCHLUESSEL_TEST`, `SSH_SCHLUESSEL_LIVE`, `SSH_BEKANNTE_HOSTS` (Fingerabdruck des Servers), `SERVER_ADRESSE` |
+| GitHub (Secrets) | `SSH_SCHLUESSEL_TEST`, `SSH_SCHLUESSEL_LIVE`, `SSH_BEKANNTE_HOSTS` (die `known_hosts`-Zeile des Servers mit seinem öffentlichen Schlüssel, kein Fingerabdruck), `SERVER_ADRESSE` |
 | GitHub (Variablen, keine Geheimnisse) | `AUSLIEFERUNG_TEST`, `AUSLIEFERUNG_LIVE` |
 | CI-Lauf | kurzlebiges Token zum Lesen der Container-Ablage, das die CI für den Pull mitgibt; auf dem Server bleibt kein dauerhaftes Token |
-| Server, je Umgebung | `geheim.env`: Datenbank-Passwörter, Schlüssel für Push, Zugang zum E-Mail-Versand (Test: Empfänger nur der Projektleiter) |
+| Server, je Umgebung | `geheim.env`: Datenbank-Passwort, Adresse der Umgebung, auf Test der einzige Mail-Empfänger (Projektleiter); ab [#29](https://github.com/konstantinniedermann/tco-app/issues/29) dazu Schlüssel für Push und Zugang zum E-Mail-Versand (die Vorlage hat sie noch nicht) |
 | Server, gemeinsam | `proxy.env` (Adressen, Passwort-Hash für Test), `sicherung.env` (Ziel und Zugang der Sicherung) |
 
 Die Dateien liegen nur auf dem Server (Rechte 600), im Repo stehen Vorlagen ohne Werte. Wo die
@@ -225,6 +255,14 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
   Schadpakete und bricht die CI ab.
 - **Updates:** Dependabot schlägt wöchentlich Updates für npm, Docker-Images und GitHub
   Actions vor, als PR auf `dev`. Hauptversionen werden einzeln geprüft.
+- **Keine Hauptversionen von PostgreSQL und Caddy** über Dependabot (dort ausgeschlossen).
+  Eine neue Hauptversion von PostgreSQL liest die Daten von Live nicht: Auf Test (leere
+  Datenbank) ginge sie durch, Live fiele aus. Sie braucht einen eigenen Plan mit Sicherung,
+  Dump und Wiederherstellung in die neue Version. Caddy-Hauptversionen können die
+  Konfiguration ändern.
+- **Nicht von Dependabot erfasst:** die Digests von restic (`betrieb/bin/lib.sh`) und der
+  Registry des Nachweises (`betrieb/nachweis/nachweis.sh`) stehen in Shell-Dateien. Sie werden
+  von Hand geprüft (siehe [Beobachtungen](beobachtungen.md)).
 
 ## Versionen
 
@@ -263,8 +301,11 @@ Budget erschöpft, startet GitHub keine Jobs mehr, also auch keine Auslieferung.
   auf, gezählt werden 7 Jobs inklusive Secret-Scan. Ein reiner Doku-Merge kostet 3 Minuten.
   Bei rund 30 Code-Merges im Monat sind das etwa 330 Minuten (S). Reicht das Kontingent
   nicht, laufen die Ende-zu-Ende-Tests nur beim PR nach `main`.
-- **Notfall ohne Minuten:** Der Projektleiter startet das Auslieferungs-Skript von Hand auf
-  dem Server, oder das Budget des Kontos wird erhöht.
+- **Notfall ohne Minuten:** Ohne Minuten baut die CI auch kein Image. Der Projektleiter baut
+  es dann lokal, schiebt es mit einem eigenen, kurzlebigen Token (nur `packages: write`) in
+  die Container-Ablage und startet die Auslieferung mit dem Digest von Hand auf dem Server
+  (Ablauf in `betrieb/README.md`). Die Regel «Live nur mit dem Image, das auf Test lief» prüft
+  dann niemand automatisch; sie liegt bei ihm. Oder das Budget des Kontos wird erhöht.
 
 ## Ausblick: Store-App
 

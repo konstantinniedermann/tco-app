@@ -336,23 +336,51 @@ Der Entwurf oben bleibt unverändert; was die Umsetzung anders gelöst hat, nach
 
 - **Aufbau (Header):** Caddy behält die CSP der App und setzt `frame-ancestors 'none'` nur, wo
   keine CSP besteht; HSTS, `nosniff` und Referrer-Policy setzt er genau einmal. Kein Zugriffsprotokoll.
+  «Keine IP-Adressen» stimmte so nicht: Fehler schreibt Caddy mit der Client-Adresse ins
+  Docker-Log. Ein Filter im Standard-Logger entfernt diese Felder jetzt aus jedem Eintrag.
   Auf dem Server liegt `proxy/` mit `compose.proxy.yml`, `caddy/…` und `proxy.env`; Türsteher und
   `lib.sh` liegen in `bin/` und werden von Hand eingerichtet. Die Vorlagen heissen
   `geheim.env.example`, `proxy.env.example`, `sicherung.env.example`.
 - **Auslieferung, Schritt 2:** Die Live-Sicherung läuft **vor** der Übernahme der Einrichtung.
   Scheitert sie, ändert sich nichts.
+- **Gemeinsame Teile:** Test liefert sie mit, solange Live noch nie ausgeliefert wurde (sonst
+  hätte der Proxy vor der ersten Live-Auslieferung keine Konfiguration); danach nur Live. Nach
+  dem Neuladen von Caddy folgt immer `docker compose up -d` für den Proxy, damit ein neues
+  Caddy-Image oder eine geänderte `proxy.env` wirkt. Bricht ein Lauf mitten in der Übernahme ab,
+  setzt das Skript alles zurück.
+- **Handauslieferung:** über den Türsteher selbst (`bin/ausliefern-ssh <umgebung> <digest>`),
+  nicht über ein eigenes Skript; das Token für ein privates Image kommt über die
+  Standardeingabe (`betrieb/README.md`).
+- **Sperre:** per `mkdir` statt `flock` (läuft so auch mit der Bash 3.2 des lokalen Nachweises).
 - **Auslieferung, Schlüssel:** Der Schlüssel wird je Zweig gewählt, ohne Rückfall auf den anderen;
   ein leeres Geheimnis ergibt `fehler`.
 - **Sicherung:** restic läuft mit festem Rechnernamen `mytco` (sonst greift die Aufbewahrung
   nicht) und `--log-driver none` (kein Klartext in den Docker-Logs). Wiederhergestellt werden nur
   vollständige Läufe (mit Zählung), in einer Transaktion.
+- **Kein automatisches Anlegen des Sicherungsziels:** Anders als im Plan vorgesehen legt
+  `sichern` ein noch nicht angelegtes Repo nicht mehr selbst an. Ein falsch eingetragenes Ziel (z. B.
+  in Anführungszeichen) hätte das Repo in einem Wegwerf-Container angelegt, und die Sicherung
+  hätte `ok` gemeldet, ohne etwas zu speichern. Das Ziel legt der Betrieb einmal von Hand an;
+  fehlt es oder ist es ungültig, meldet `sichern` `fehler`.
+- **Wiederherstellen leert die Schemas:** Vor dem Einspielen werden `public` und `drizzle`
+  (Liste der Migrationen) geleert, in derselben Transaktion. `pg_restore --clean` allein liess
+  Tabellen späterer Migrationen stehen, und die nächste Auslieferung scheiterte an der
+  Migration.
 - **CI, Jobs:** `image` (Rauchtest, immer bei Code), `bauen`, `ausliefern`, `freigeben`, `finden`,
   `release`. `bauen` schiebt nur `commit-<sha>`. Neu ist `freigeben` (nur `dev`, nach geglückter
   Auslieferung auf Test, Recht nur `packages: write`): Es setzt das Kennzeichen `code-<hash>`.
   Live kann so nur ein Image bekommen, das auf Test erfolgreich ausgeliefert wurde.
   `finden` prüft zusätzlich vorab das Release (Version, Abschnitt in `versionen.md`, Tag noch
   frei), bevor Live angefasst wird.
-- **Lokaler Nachweis:** `make betrieb-nachweis` umfasst 29 Prüfungen, alle ok (letzter Lauf nach
-  den Review-Korrekturen).
+- **Abhängigkeiten:** Die Digests von restic und der Registry des Nachweises stehen in
+  Shell-Dateien, die Dependabot nicht liest; sie werden von Hand geprüft (Beobachtung).
+  Hauptversionen von PostgreSQL und Caddy schliesst Dependabot aus.
+- **Restrisiko, Korrektur:** Der Abschnitt «Ausnahme Türsteher» oben stimmt so nicht. Das
+  `ausliefern` aus dem Image läuft auf dem Server als `mytco` mit Zugang zu Docker, also
+  root-gleich; ein Image kann damit auch Türsteher, `authorized_keys` und systemd-Einheiten
+  umschreiben. Der Türsteher schützt nur den Eingang. Im Sicherheitskonzept richtiggestellt,
+  vom Projektleiter neu zu bestätigen.
+- **Lokaler Nachweis:** `make betrieb-nachweis` umfasst 36 Prüfungen, alle ok (letzter Lauf nach
+  den Korrekturen des Gesamt-Reviews).
 - **Inbetriebnahme-Issue:** Der Schnitt ist vollzogen: #32 = lokaler Teil, #39 = Server in
   Betrieb nehmen (hängt an #32, blockiert #29).

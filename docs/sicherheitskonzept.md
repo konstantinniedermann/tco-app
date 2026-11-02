@@ -98,18 +98,24 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
   schützen vor allem gegen ein gestohlenes Cookie auf einem anderen Gerät; dagegen hilft erst
   ein Faktor wie ein Passkey (A-LOGIN-07). Ein SMS-Code hilft nicht, die SMS käme aufs selbe
   Handy (Projektleiter, 01.11.2026).
-- **Schreibrecht auf GitHub reicht bis Live.** Ohne GitHub Pro kann jedes Konto mit
-  Schreibrecht direkt auf `main` pushen oder einen Workflow mit dem Live-Schlüssel schreiben
+- **Schreibrecht auf GitHub reicht bis root auf dem Server.** Ohne GitHub Pro kann jedes Konto
+  mit Schreibrecht direkt auf `main` pushen oder einen Workflow mit dem Live-Schlüssel schreiben
   ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Weil die Einrichtung des Servers im
-  Image mitreist, reicht das bis auf den Server: Ein Image kann Skripte liefern, die ausserhalb
-  der Container laufen und an die Geheimnisse beider Umgebungen und an den Sicherungszugang
-  kommen. Nur der Türsteher (Eingabeprüfung, Zwangsbefehl) bleibt von Hand eingerichtet und ist
-  damit nicht über ein Image veränderbar. Angenommen unter zwei
-  Bedingungen: Zwei-Faktor-Login auf beiden Konten (SI-15), und die Hauptansprechperson im
-  Vorstand nutzt ihren Zugang nur zum Lesen (Absprache). Neu bewerten: hängt an K-04 (wem
-  gehören die Konten).
-- **Ein Schadpaket im Bau** landet im Image und läuft live, auch ohne Schlüssel; dagegen
-  hilft nur SI-14.
+  Image mitreist, läuft das `ausliefern` eines Images auf dem Server selbst, als Benutzer
+  `mytco` mit Zugang zu Docker. Das reicht so weit wie root: an die Geheimnisse beider
+  Umgebungen und an den Sicherungszugang, aber auch an den Türsteher, die Schlüssel in
+  `authorized_keys` und die systemd-Einheiten. Der Türsteher schützt nur den Eingang (er nimmt
+  nur einen Digest an, die Umgebung kommt aus dem Schlüssel), nicht gegen ein schädliches
+  Image. Getrennte Schlüssel für Test und Live helfen nur gegen einen gestohlenen Schlüssel
+  allein; ein schädliches Image, das nur auf Test kommt, erreicht über denselben Server
+  trotzdem Live. Die Annahme vom 01.11.2026 ging von einer kleineren Reichweite aus (Türsteher
+  unveränderbar) und galt unter zwei Bedingungen: Zwei-Faktor-Login auf beiden Konten (SI-15),
+  und die Hauptansprechperson im Vorstand nutzt ihren Zugang nur zum Lesen (Absprache).
+  **Neu zu bestätigen durch den Projektleiter (Stand 2026-11-02).** Neu bewerten auch: hängt
+  an K-04 (wem gehören die Konten).
+- **Ein Schadpaket im Bau** landet im Image und läuft live, auch ohne Schlüssel, und über das
+  `ausliefern` des Images mit derselben Reichweite auf dem Server; dagegen hilft nur SI-14.
+  Mit der Richtigstellung oben ebenfalls neu zu bestätigen.
 
 ## Später
 

@@ -65,6 +65,9 @@ Begründung:
 | Logs | Rotation auf höchstens 30 Tage, ohne Inhalte (DS-06) |
 | E-Mail | Versand über Port 587 beim gewählten Dienst — der VPS sperrt Port 25 (B·1) |
 
+*Nachtrag 02.11.2026:* Webserver ist Caddy, gesichert wird mit restic (verschlüsselt, 30 Tage);
+entschieden vom Projektleiter im Design zu [#32](https://github.com/konstantinniedermann/tco-app/issues/32).
+
 ## Konsequenzen
 
 **Leichter:** Datenschutzerklärung kann „Infomaniak, Schweiz“ nennen; volle Kontrolle,

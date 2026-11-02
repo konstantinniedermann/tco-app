@@ -114,6 +114,42 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 
 ## Offen
 
+### 2026-11-02 — Das ausgelieferte Image ist nicht das Image aus dem Rauchtest
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `.github/workflows/check.yml`, Jobs `image` und `bauen`.
+
+**Beobachtung:** `image` baut `mytco:ci` und prüft es im Rauchtest; `bauen` baut auf `dev` ein zweites Mal und schiebt diesen Neubau nach GHCR. Docker-Builds sind nicht bitgleich, ausgeliefert wird also ein Image, das den Rauchtest nie gesehen hat. Geprüft wird es erst auf Test über die Statusabfrage der Auslieferung.
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Gering: Test fängt ein nicht startendes Image ab, Live bekommt nur, was auf Test lief. Bei Gelegenheit `bauen` das Image aus `image` übernehmen lassen (z. B. als Artefakt oder Bau einmal mit Push) und dafür einen Bau-Lauf sparen.
+
+### 2026-11-02 — Digests von restic und Registry stehen ausserhalb von Dependabot
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `betrieb/bin/lib.sh` (`RESTIC_IMAGE`), `betrieb/nachweis/nachweis.sh` (`REGISTRY_IMAGE`).
+
+**Beobachtung:** Beide Images sind per Digest in Shell-Dateien gepinnt. Dependabot liest nur Dockerfile und Compose-Dateien und schlägt dafür nie ein Update vor; Sicherheits-Updates von restic kämen so nie an.
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Gering bis mittel für restic (läuft nächtlich mit dem Sicherungszugang), gering für die Registry (nur lokaler Nachweis). Bis zu einer Lösung von Hand prüfen, z. B. mit jedem Release; Abhilfe wäre, restic als Dienst in eine Compose-Datei zu legen, die Dependabot liest.
+
+### 2026-11-02 — Idee: Migrationen vor der Live-Auslieferung gegen eine Live-Sicherung proben
+
+**Thema:** Code-Gerüst
+
+**Fundort:** `betrieb/bin/ausliefern` (Migration), `betrieb/bin/probe`.
+
+**Beobachtung:** Test startet bei jeder Auslieferung mit leerer Datenbank und erfundenen Testdaten. Eine Migration, die an echten Daten scheitert (z. B. eine neue Pflichtspalte oder ein eindeutiger Index über doppelte Werte), fällt erst bei der Live-Auslieferung auf. Dann greift zwar der Rückfall, aber Live steht kurz.
+
+**Ursprung:** #32 Gesamt-Review.
+
+**Einschätzung:** Idee, kein Fehler. Möglich wäre, vor der Live-Migration die frische Sicherung wie bei `probe` in eine Wegwerf-Datenbank einzuspielen und die Migration dort zuerst laufen zu lassen. Wieder aufnehmen, sobald die erste Migration Daten umbaut.
+
 ### 2026-11-02 — Betrieb: Grenzen von Header, Protokoll und Wiederherstellung
 
 **Thema:** Sicherheit
@@ -147,6 +183,8 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 **Ursprung:** #32 Task-Reviews.
 
 **Einschätzung:** Keiner davon bricht den Nachweis. Beim Betrieb auf dem Server (#39) mitnehmen, die Dependabot-Frage sofort auf GitHub klären.
+
+**Erledigt 2026-11-02 (#32 Gesamt-Review):** `workflow-rechte.ts` nutzt jetzt `Object.hasOwn` (mit Test für einen Job `constructor`); die Zählung der 30 Tage steht als Fakt in `docs/ci-cd-und-release.md`. Bei der nächsten Auswertung beide Punkte streichen.
 
 ### 2026-11-01 — Kleinbefunde aus den Task-Reviews des Code-Gerüsts
 
