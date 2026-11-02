@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	MAILANFRAGE_SCHLUESSEL,
+	holeSpeicher,
 	leseMailanfrage,
 	merkeMailanfrage,
 	vergissMailanfrage
@@ -83,5 +84,21 @@ describe('Mail-Anfrage im Speicher des Browsers', () => {
 
 	it('Review Focus 5: removeItem, der wirft, ergibt keinen Wurf', () => {
 		expect(() => vergissMailanfrage({ removeItem: wirft })).not.toThrow();
+	});
+});
+
+describe('Speicher des Browsers holen', () => {
+	it('nimmt den übergebenen Speicher', () => {
+		const s = speicher();
+		expect(holeSpeicher(() => s as unknown as Storage)).toBe(s);
+	});
+
+	it.each([
+		['Zugriff wirft', () => wirft()],
+		['kein Speicher', () => undefined as unknown as Storage]
+	])('%s: Ersatz ohne Wirkung, der nie wirft', (_, hole) => {
+		const s = holeSpeicher(hole);
+		expect(() => merkeMailanfrage(s, 'anna@example.org', START)).not.toThrow();
+		expect(leseMailanfrage(s, START)).toBeNull();
 	});
 });

@@ -1,4 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
+import { MELDUNG } from '../../src/lib/login/anmelden.ts';
+import { MAILANFRAGE_SCHLUESSEL } from '../../src/lib/login/mailanfrage.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
 	beendeAlleSitzungen,
@@ -17,6 +19,11 @@ const KONTAKT = e2eEinstellungen('').MYTCO_KONTAKT;
 test.afterAll(async () => {
 	await schliesseLoginHilfen();
 });
+
+/** Roher Eintrag der Mail-Anfrage im localStorage der Seite. */
+function leseMailanfrage(page: Page): Promise<string | null> {
+	return page.evaluate((schluessel) => localStorage.getItem(schluessel), MAILANFRAGE_SCHLUESSEL);
+}
 
 /** Brief-Code klein und mit Bindestrich eintippen (UI-07). */
 async function meldeMitBriefAn(page: Page, vorname: string) {
@@ -71,6 +78,22 @@ test('SI-06: Abmelden führt zur Login-Seite', async ({ page }) => {
 	expect(fehler).toEqual([]);
 });
 
+test('Abmelden ohne Antwort des Servers zeigt die Störung und bleibt angemeldet', async ({
+	page
+}) => {
+	const fehler = sammleKonsolenfehler(page);
+	await meldeMitBriefAn(page, 'Jonas');
+	await page.route('**/api/logout', (route) => route.fulfill({ status: 503, body: '' }));
+	const taste = page.getByRole('button', { name: 'Abmelden' });
+	await taste.click();
+	await expect(page.getByText(MELDUNG.stoerung)).toBeVisible();
+	await expect(taste).toHaveAccessibleDescription(MELDUNG.stoerung);
+	await expect(page).toHaveURL(/\/$/);
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Jonas' })).toBeVisible();
+	// Die nachgestellte 503 meldet der Browser selbst in der Konsole.
+	expect(fehler.filter((f) => !/status of 503\b/.test(f))).toEqual([]);
+});
+
 test('SI-02: benutzter Brief-Code zeigt «Dieser Code wurde schon benutzt. Wende dich an <Kontakt>.»', async ({
 	page,
 	request
@@ -89,6 +112,7 @@ test('SI-02: benutzter Brief-Code zeigt «Dieser Code wurde schon benutzt. Wende
 	await expect(page.getByText(meldung)).toBeVisible();
 	// UI-06: die Meldung steht beim Feld und ist mit ihm verknüpft.
 	await expect(feld).toHaveAccessibleDescription(new RegExp(meldung.replace(/[.()]/g, '\\$&')));
+	await expect(feld).toBeFocused();
 	await expect(page).toHaveURL(/\/login$/);
 	await pruefeBildschirm(page, info, 'login-code-benutzt');
 	expect(fehler).toEqual([]);
@@ -107,6 +131,7 @@ test('UI-06: falscher Brief-Code zeigt die Meldung mit Lösungsweg beim Feld', a
 		'Dieser Code stimmt nicht. Prüf ihn oder lass dir einen neuen per E-Mail schicken.';
 	await expect(page.getByText(meldung)).toBeVisible();
 	await expect(feld).toHaveAccessibleDescription(new RegExp(meldung.replace(/[.]/g, '\\.')));
+	await expect(feld).toBeFocused();
 	await pruefeBildschirm(page, info, 'login-code-falsch');
 	expect(fehler).toEqual([]);
 });
@@ -123,18 +148,70 @@ test('A-LOGIN-10: Code per E-Mail, mit Neuladen zwischen Anfrage und Eingabe', a
 
 	await page.getByLabel('E-Mail-Adresse').fill(konto.email);
 	await page.getByRole('button', { name: 'Code schicken' }).click();
-	await expect(
-		page.getByText('Falls ein Konto zu dieser Adresse besteht, ist eine Mail unterwegs')
-	).toBeVisible();
+	// UI-01 (WCAG 4.1.3): Hinweis als Statusmeldung, Fokus im neuen Feld.
+	await expect(page.getByRole('status')).toHaveText(
+		'Falls ein Konto zu dieser Adresse besteht, ist eine Mail unterwegs.'
+	);
+	await expect(page.getByLabel('Code aus der Mail')).toBeFocused();
 	await pruefeBildschirm(page, info, 'login-mail-code');
 
 	// Wechsel in die Mail-App: das iPhone lädt MyTCO danach oft neu.
 	await page.reload();
 	const feld = page.getByLabel('Code aus der Mail');
 	await expect(feld).toBeVisible();
-	await feld.fill(await holeMailCode(konto.email));
+	const code = await holeMailCode(konto.email);
+
+	// Ein Tippfehler: Meldung beim Feld, Fokus zurück im Feld (zählt als 1 von 10 Versuchen).
+	await feld.fill(String((Number(code) + 1) % 1_000_000).padStart(6, '0'));
+	await page.getByRole('button', { name: 'Anmelden' }).click();
+	await expect(page.getByText(MELDUNG.mailFalsch)).toBeVisible();
+	await expect(feld).toHaveAccessibleDescription(/Dieser Code stimmt nicht\. Prüf ihn/);
+	await expect(feld).toBeFocused();
+	await pruefeBildschirm(page, info, 'login-mail-code-falsch');
+
+	await feld.fill(code);
 	await page.getByRole('button', { name: 'Anmelden' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Sara' })).toBeVisible();
+	expect(await leseMailanfrage(page)).toBeNull();
+	expect(fehler).toEqual([]);
+});
+
+test('Gerätespeicher: Login mit Brief-Code löscht eine offene Mail-Anfrage', async ({ page }) => {
+	const fehler = sammleKonsolenfehler(page);
+	const konto = await legeKontoMitBriefCodeAn('Rina');
+	await page.goto('/login/mail');
+	await page.getByLabel('E-Mail-Adresse').fill(konto.email);
+	await page.getByRole('button', { name: 'Code schicken' }).click();
+	await expect(page.getByLabel('Code aus der Mail')).toBeVisible();
+	expect(await leseMailanfrage(page)).toContain(konto.email);
+
+	// Doch noch den Brief gefunden.
+	await page.goto('/login');
+	await page.getByLabel('Code aus dem Brief').fill(konto.code);
+	await page.getByRole('button', { name: 'Anmelden' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Rina' })).toBeVisible();
+	expect(await leseMailanfrage(page)).toBeNull();
+	expect(fehler).toEqual([]);
+});
+
+test('Gerätespeicher: abgelaufene Mail-Anfrage wird beim Start der App gelöscht', async ({
+	page
+}) => {
+	const fehler = sammleKonsolenfehler(page);
+	await page.goto('/login');
+	// Erst fertig laden lassen; ein Neuladen mitten im Laden bricht Modul-Importe ab (WebKit).
+	const titel = page.getByRole('heading', { level: 1, name: 'Anmelden' });
+	await expect(titel).toBeVisible();
+	await page.evaluate(
+		([schluessel, eintrag]) => localStorage.setItem(schluessel, eintrag),
+		[
+			MAILANFRAGE_SCHLUESSEL,
+			JSON.stringify({ email: 'alt@example.org', zeit: Date.now() - 16 * 60_000 })
+		]
+	);
+	await page.reload();
+	await expect(titel).toBeVisible();
+	await expect.poll(() => leseMailanfrage(page)).toBeNull();
 	expect(fehler).toEqual([]);
 });
 

@@ -9,6 +9,19 @@ export const MAILANFRAGE_SCHLUESSEL = 'mytco-mailanfrage';
 /** So lange gilt ein Mail-Code (wie MAIL_CODE_GUELTIG_MS auf dem Server). */
 const GUELTIG_MS = 15 * 60_000;
 
+export type Speicher = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
+
+const OHNE_SPEICHER: Speicher = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
+
+/** localStorage des Browsers; schon der Zugriff kann werfen (gesperrter Speicher). */
+export function holeSpeicher(hole: () => Storage = () => localStorage): Speicher {
+	try {
+		return hole() ?? OHNE_SPEICHER;
+	} catch {
+		return OHNE_SPEICHER;
+	}
+}
+
 export function merkeMailanfrage(s: Pick<Storage, 'setItem'>, email: string, jetzt: number): void {
 	try {
 		s.setItem(MAILANFRAGE_SCHLUESSEL, JSON.stringify({ email, zeit: jetzt }));

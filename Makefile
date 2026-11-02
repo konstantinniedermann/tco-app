@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs annahmen voraussetzungen voraussetzungen-docker db dev seed test e2e build image secrets hooks
+.PHONY: help check check-schnell docs annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed test e2e build image secrets hooks
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -37,16 +37,19 @@ voraussetzungen: ## Prüft Node-Version (.nvmrc) und node_modules (installiert n
 voraussetzungen-docker: ## Prüft, ob Docker erreichbar ist (installiert nichts)
 	@docker info >/dev/null 2>&1 || { echo "Abbruch: Docker ist nicht erreichbar — Docker Desktop starten." >&2; exit 1; }
 
+voraussetzungen-env: ## Prüft, ob die lokalen Einstellungen (.env) da sind (legt nichts an)
+	@test -f .env || { echo "Abbruch: .env fehlt — «cp .env.example .env» ausführen." >&2; exit 1; }
+
 db: voraussetzungen-docker ## Lokale Datenbank und Mail-Fänger Mailpit starten (Docker, wartet bis bereit)
 	docker compose up -d --wait db mail
 
 # .env über Node statt über die Shell laden: Werte enthalten «<», Leerzeichen und Kommas.
-dev: db ## Entwicklungsserver starten (mit Datenbank, Einstellungen aus .env)
-	node --env-file-if-exists=.env node_modules/vite/bin/vite.js dev
+dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einstellungen aus .env)
+	node --env-file=.env node_modules/vite/bin/vite.js dev
 
-seed: db ## Lokale Datenbank migrieren, 2 erfundene Mitglieder anlegen, Brief-Code ausgeben (Einstellungen aus .env)
-	node --env-file-if-exists=.env scripts/migrate.ts
-	node --env-file-if-exists=.env scripts/seed-lokal.ts
+seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 2 erfundene Mitglieder anlegen, Brief-Code ausgeben (Einstellungen aus .env)
+	node --env-file=.env scripts/migrate.ts
+	node --env-file=.env scripts/seed-lokal.ts
 
 test: db ## Einheits- und Datenbanktests mit Abdeckung
 	npm test

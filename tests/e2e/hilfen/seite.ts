@@ -7,7 +7,10 @@ const ERWARTETE_ANTWORT =
 	/^Failed to load resource: the server responded with a status of 4(00|01|29)\b/;
 
 function istErwarteteApiAntwort(text: string, url: string): boolean {
-	return ERWARTETE_ANTWORT.test(text) && new URL(url).pathname.startsWith('/api/');
+	// Ohne Ort (leere URL) ist es keine Antwort einer Schnittstelle.
+	return (
+		ERWARTETE_ANTWORT.test(text) && URL.canParse(url) && new URL(url).pathname.startsWith('/api/')
+	);
 }
 
 // WebKit: Für den Screenshot legt Playwright ein eigenes Stylesheet an (Quelle
