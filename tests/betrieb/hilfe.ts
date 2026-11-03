@@ -1,7 +1,21 @@
 import { spawn, spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { afterAll } from 'vitest';
+
+// Temp-Ordner der Testdatei; nach dem letzten Test der Datei wieder gelöscht. Der Hook hängt an
+// der Testdatei, die dieses Modul importiert (jede Datei lädt es neu).
+const tempOrdnerListe: string[] = [];
+afterAll(() => {
+	for (const ordner of tempOrdnerListe.splice(0)) rmSync(ordner, { recursive: true, force: true });
+});
+
+export function tempOrdner(praefix: string): string {
+	const ordner = mkdtempSync(join(tmpdir(), praefix));
+	tempOrdnerListe.push(ordner);
+	return ordner;
+}
 
 export type Optionen = {
 	stdin?: string;
@@ -67,7 +81,7 @@ function ergebnis(basis: string, status: number, stdout: string, stderr: string)
 
 // Führt ein Bash-Skript mit Ersatz-docker vor dem PATH und eigenem MYTCO_BASIS aus.
 export function fuehreAus(skript: string, args: string[], optionen: Optionen = {}): Ergebnis {
-	const basis = optionen.basis ?? mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+	const basis = optionen.basis ?? tempOrdner('mytco-basis-');
 	const lauf = spawnSync('bash', [resolve(skript), ...args], {
 		input: optionen.stdin,
 		encoding: 'utf-8',
@@ -83,7 +97,7 @@ export function fuehreAusOhneLeser(
 	args: string[],
 	optionen: Optionen = {}
 ): Promise<Ergebnis> {
-	const basis = optionen.basis ?? mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+	const basis = optionen.basis ?? tempOrdner('mytco-basis-');
 	return new Promise((fertig, scheitern) => {
 		const kind = spawn('bash', [resolve(skript), ...args], {
 			env: umwelt(basis, optionen),

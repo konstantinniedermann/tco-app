@@ -1,8 +1,7 @@
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { fuehreAus, type Ergebnis } from './hilfe.ts';
+import { fuehreAus, tempOrdner, type Ergebnis } from './hilfe.ts';
 
 const ZAEHLUNG = 'public.mitglied|3\npublic.rolle|2';
 // Wie restic: je Lauf ein Dump- und ein Zählungs-Snapshot, "time" zuerst.
@@ -28,7 +27,7 @@ const AKTUELL = `sha256:${'a'.repeat(64)}`;
 
 // MYTCO_BASIS mit sicherung.env und der Einrichtung der Umgebungen (für die Postgres-Fassung).
 function baue(repository = 's3:https://beispiel.invalid/bucket'): string {
-	const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+	const basis = tempOrdner('mytco-basis-');
 	writeFileSync(
 		join(basis, 'sicherung.env'),
 		`RESTIC_REPOSITORY=${repository}\nRESTIC_PASSWORD=test\n`

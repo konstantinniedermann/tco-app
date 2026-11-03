@@ -3,17 +3,15 @@ import {
 	cpSync,
 	existsSync,
 	mkdirSync,
-	mkdtempSync,
 	readdirSync,
 	readFileSync,
 	rmSync,
 	statSync,
 	writeFileSync
 } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { fuehreAus, fuehreAusOhneLeser, type Ergebnis } from './hilfe.ts';
+import { fuehreAus, fuehreAusOhneLeser, tempOrdner, type Ergebnis } from './hilfe.ts';
 
 const NEU = 'sha256:' + 'a1'.repeat(32);
 const ALT = 'sha256:' + 'b2'.repeat(32);
@@ -53,7 +51,7 @@ const BESTEHENDES_LIVE_PFADE = [
 
 // Baut ein MYTCO_BASIS mit der Einrichtung des Repos als entnommene Fassung (mit Ersatz-sichern).
 function baue(aufbau: Aufbau = {}): string {
-	const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+	const basis = tempOrdner('mytco-basis-');
 	const betrieb = join(basis, 'fassungen', NEU, 'betrieb');
 	mkdirSync(dirname(betrieb), { recursive: true });
 	cpSync('betrieb', betrieb, { recursive: true });
@@ -534,7 +532,7 @@ describe('Verbindung zum Aufrufer bricht ab', () => {
 	});
 
 	test('zurueck läuft zu Ende und tauscht die Zustände', async () => {
-		const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+		const basis = tempOrdner('mytco-basis-');
 		mkdirSync(join(basis, 'test/zustand'), { recursive: true });
 		writeFileSync(join(basis, 'test/zustand/aktuell'), `${NEU}\n`);
 		writeFileSync(join(basis, 'test/zustand/vorher'), `${ALT}\n`);
@@ -548,7 +546,7 @@ describe('Verbindung zum Aufrufer bricht ab', () => {
 
 describe('zurueck', () => {
 	test('ohne vorher: fehler, kein Start', () => {
-		const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+		const basis = tempOrdner('mytco-basis-');
 		mkdirSync(join(basis, 'test/zustand'), { recursive: true });
 		writeFileSync(join(basis, 'test/zustand/aktuell'), `${NEU}\n`);
 		const lauf = zurueck('test', basis);
@@ -560,7 +558,7 @@ describe('zurueck', () => {
 	});
 
 	test('mit vorher: startet diesen Digest und tauscht die Zustände', () => {
-		const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+		const basis = tempOrdner('mytco-basis-');
 		mkdirSync(join(basis, 'test/zustand'), { recursive: true });
 		writeFileSync(join(basis, 'test/zustand/aktuell'), `${NEU}\n`);
 		writeFileSync(join(basis, 'test/zustand/vorher'), `${ALT}\n`);
@@ -574,7 +572,7 @@ describe('zurueck', () => {
 	});
 
 	test('App startet nicht: fehler, Zustände unverändert', () => {
-		const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+		const basis = tempOrdner('mytco-basis-');
 		mkdirSync(join(basis, 'test/zustand'), { recursive: true });
 		writeFileSync(join(basis, 'test/zustand/aktuell'), `${NEU}\n`);
 		writeFileSync(join(basis, 'test/zustand/vorher'), `${ALT}\n`);
@@ -591,7 +589,7 @@ describe('zurueck', () => {
 	});
 
 	test('ungültige Umgebung: fehler ohne docker-Aufruf', () => {
-		const lauf = zurueck('prod', mkdtempSync(join(tmpdir(), 'mytco-basis-')));
+		const lauf = zurueck('prod', tempOrdner('mytco-basis-'));
 		expect(lauf.stdout).toBe('fehler\n');
 		expect(lauf.aufrufe).toHaveLength(0);
 	});

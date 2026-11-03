@@ -3,15 +3,13 @@ import {
 	copyFileSync,
 	existsSync,
 	mkdirSync,
-	mkdtempSync,
 	readdirSync,
 	readFileSync,
 	writeFileSync
 } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { fuehreAus, fuehreAusOhneLeser, type Ergebnis } from './hilfe.ts';
+import { fuehreAus, fuehreAusOhneLeser, tempOrdner, type Ergebnis } from './hilfe.ts';
 
 const DIGEST = 'sha256:' + 'a1'.repeat(32);
 const REPO = 'ghcr.io/konstantinniedermann/tco-app';
@@ -19,7 +17,7 @@ const TOKEN = 'ghp_GEHEIMES-TOKEN-123';
 
 // Temp-Basis mit von Hand eingerichtetem bin/ (Türsteher und lib.sh), wie auf dem Server.
 function baue(): string {
-	const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+	const basis = tempOrdner('mytco-basis-');
 	mkdirSync(join(basis, 'bin'));
 	copyFileSync('betrieb/bin/ausliefern-ssh', join(basis, 'bin', 'ausliefern-ssh'));
 	copyFileSync('betrieb/bin/lib.sh', join(basis, 'bin', 'lib.sh'));
@@ -130,7 +128,7 @@ describe('ausliefern-ssh: Ablauf', () => {
 	});
 
 	test('Token nie in einer Argumentzeile; Temp-DOCKER_CONFIG danach weg', () => {
-		const tmp = mkdtempSync(join(tmpdir(), 'mytco-tmpdir-'));
+		const tmp = tempOrdner('mytco-tmpdir-');
 		const lauf = tuersteher({ args: ['live'], ssh: DIGEST, stdin: TOKEN, env: { TMPDIR: tmp } });
 		expect(lauf.status).toBe(0);
 		expect(lauf.aufrufe.join('\n')).not.toContain(TOKEN);
@@ -216,7 +214,7 @@ describe('ausliefern-ssh: Ablauf', () => {
 	});
 
 	test('login und pull laufen mit dem Temp-DOCKER_CONFIG, das danach weg ist', () => {
-		const tmp = mkdtempSync(join(tmpdir(), 'mytco-tmpdir-'));
+		const tmp = tempOrdner('mytco-tmpdir-');
 		const lauf = tuersteher({ args: ['test'], ssh: DIGEST, stdin: TOKEN, env: { TMPDIR: tmp } });
 		expect(lauf.status).toBe(0);
 		const [login, pull, , cp] = lauf.dockerConfig;
@@ -244,7 +242,7 @@ describe('ausliefern-ssh: Ablauf', () => {
 	});
 
 	test('login scheitert -> fehler, kein pull, Temp-DOCKER_CONFIG weg', () => {
-		const tmp = mkdtempSync(join(tmpdir(), 'mytco-tmpdir-'));
+		const tmp = tempOrdner('mytco-tmpdir-');
 		const lauf = tuersteher({
 			args: ['test'],
 			ssh: DIGEST,
