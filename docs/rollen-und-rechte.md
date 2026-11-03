@@ -18,7 +18,7 @@ Welche Rollen MyTCO kennt und wer was sehen und ändern darf — für die Etappe
 | **CM-Verantwortlicher** | CM-Anmeldung | Turnier und Kategorien anlegen, Wildcard-Anträge entscheiden, Anmeldungen von Hand, Gruppen und Tableaus aus Advantage übernehmen, Resultate erfassen und Streitfälle entscheiden | A-ROLLE-07 |
 | **Lizenzverantwortlicher** | Lizenzanträge | Stichtag der Lizenzrunde setzen, Anträge ansehen, exportieren und abhaken | A-ROLLE-08 |
 
-Der Vorstand hat die Rollen bestätigt und will zwei Admins (K-18.1, K-18.3). Wer diese Rollen im Verein übernimmt, klärt K-18.
+Der Vorstand hat die Rollen bestätigt und will zwei Admins (K-18.1, K-18.3). Wer diese Rollen im Verein übernimmt, klärt K-18.2.
 
 ## Grundsätze
 

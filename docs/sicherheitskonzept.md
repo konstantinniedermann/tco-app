@@ -96,10 +96,10 @@ Prüfbare Vorgaben erhalten Tests, wie die `DS-NN` ([Testkonzept](testkonzept.md
 Bewusst angenommen (Projektleiter, 01.11.2026):
 
 - **Wer das Postfach hat, hat das Konto.** Folge des Logins ohne Passwort; Zwei-Faktor-Login
-  für alle kommt später (A-LOGIN-06). Der Vorstand hat danach gefragt (K-16.3). Ein Passwort
-  hilft nicht, weil es sich ebenfalls per Mail zurücksetzen liesse. Wer sich schützen will,
-  richtet ab *Mitglieder-Login* freiwillig einen Passkey ein (A-LOGIN-07; Projektleiter,
-  03.11.2026).
+  für alle kommt später (A-LOGIN-06). Der Vorstand hat danach gefragt (K-16.3). Weder ein
+  Passwort noch der freiwillige Passkey (A-LOGIN-07) helfen, solange sich das Konto per Mail
+  zurückholen lässt; der Passkey ist nur Komfort (Projektleiter, 03.11.2026). Schutz brächte
+  erst ein Passkey, der den Mail-Code für das Konto sperrt.
 - **Ein entsperrtes Handy mit offenem Mailprogramm** überwindet auch SI-08 und SI-09. Beide
   schützen vor allem gegen ein gestohlenes Cookie auf einem anderen Gerät; dagegen hilft erst
   ein Faktor wie ein Passkey (A-LOGIN-07). Ein SMS-Code hilft nicht, die SMS käme aufs selbe
@@ -132,7 +132,8 @@ Bis der Projektleiter bestätigt, gelten diese beiden Punkte als nicht angenomme
 
 ## Später
 
-- Zwei-Faktor-Login für alle (A-LOGIN-06); Passkey als Pflicht statt freiwillig (A-LOGIN-07).
+- Zwei-Faktor-Login für alle (A-LOGIN-06); ein Passkey, der den Mail-Code für das Konto sperrt
+  (Weiterführung von A-LOGIN-07; Weg zurück bei verlorenem Gerät dann über den Admin).
 - Store-App: Cookies und CORS unter der Adresse der Hülle
   ([ADR-002](adr/adr-002-sveltekit-postgresql.md#konsequenzen)) klärt der Entscheid zur
   Store-App, nicht dieses Konzept.

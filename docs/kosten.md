@@ -9,7 +9,7 @@ GitHub läuft auf dem Privatkonto des Projektleiters (siehe unten).
 
 **Legende:** **B·n** = belegt mit Quelle n · **S** = Schätzung · **V** = Vermutung.
 Beträge in CHF inkl. MwSt 8.1 %, wo nicht anders vermerkt; 1 EUR ≈ 0.94 CHF,
-1 USD ≈ 0.80 CHF (S, wie ADR-003). Stand: 02.11.2026.
+1 USD ≈ 0.80 CHF (S, wie ADR-003). Preise Stand 02.11.2026, Mitgliederzahl 03.11.2026.
 
 ## Laufende Kosten
 

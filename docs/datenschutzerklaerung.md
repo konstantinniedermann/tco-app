@@ -51,7 +51,9 @@ löscht MyTCO sie spätestens beim nächsten Start. Ihre IP-Adresse wird dabei h
 24 Stunden gespeichert, damit niemand Codes durchprobieren kann; ebenso die eingetippte
 E-Mail-Adresse, nur im Arbeitsspeicher und nur, um die Zahl der Code-Mails zu begrenzen. Ändern Sie Ihre
 E-Mail-Adresse, bestätigen Sie die Änderung mit je einem Code an die alte und die neue
-Adresse. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis.
+Adresse. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis. Richten Sie freiwillig einen
+Passkey ein, speichert MyTCO je Gerät nur dessen öffentlichen Schlüssel und eine Kennung, bis Sie
+ihn entfernen.
 
 **Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login nötig ist. Keine Werbung,
 keine Analyse-Dienste.

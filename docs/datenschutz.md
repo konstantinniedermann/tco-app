@@ -33,10 +33,11 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Geschlecht, Jahrgang | Zulassung zu Kategorien; für die CM reicht der Jahrgang (K-40.2); volles Geburtsdatum nur, falls Swiss Tennis es für Lizenzanträge verlangt (hängt an K-40.1) | ja |
 | Lizenznummer, Klassierung | Anmeldung, Lizenzanträge, Export an Swiss Tennis | nein |
 | Konto, Rollen, Benachrichtigungs-Einstellungen | Login, Berechtigungen, Push | ja |
+| Passkey: je Gerät öffentlicher Schlüssel und Kennung (A-LOGIN-07) | Login ohne Code | nein |
 | IP-Adresse bei Login-Versuchen; eingetippte E-Mail-Adresse einer Code-Anfrage | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
 | Anmeldungen (mit Kommentar zum Wildcard-Antrag), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
 | Austrittsdatum | Löschfrist nach Austritt | — |
-| Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (K-14) | — |
+| Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (A-MITGLIED-07) | — |
 
 Keine Gesundheitsdaten (auch nicht als Grund für eine Abmeldung), keine Fotos, keine
 Bankdaten.
@@ -61,7 +62,7 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 ## Löschen
 
 - **Austritt:** Konto sofort gesperrt, Daten nach 3 Monaten gelöscht; der Name bleibt in
-  vergangenen Resultaten (**Vorschlag K-38**). Wie MyTCO vom Austritt erfährt, klärt K-14.
+  vergangenen Resultaten (**Vorschlag K-38**). Vom Austritt erfährt MyTCO über die eingelesene Mitgliederliste (A-MITGLIED-07, K-17.1).
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Eingelesene Mitgliederliste** (A-MITGLIED-07): wird nach dem Einlesen nicht aufbewahrt;
@@ -70,6 +71,7 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Änderungsverlauf:** 12 Monate; Einträge zu einem Mitglied früher, sobald es den Status *gelöscht* hat (FR-04).
 - **IP-Adressen** (Schutz vor Durchprobieren von Codes, Logs): höchstens 24 Stunden.
 - **E-Mail-Adresse einer Code-Anfrage** (Grenze pro Adresse): nur im Arbeitsspeicher, höchstens 24 Stunden.
+- **Passkeys:** wenn das Mitglied ihn entfernt, sonst mit dem Konto.
 - **Sitzungen:** beim Abmelden, beim Widerruf oder nach einem Jahr ohne Nutzung (dann beim
   nächsten Login eines Mitglieds).
 - **E-Mail-Adresse im Gerätespeicher** während einer Code-Anfrage: nach dem Login, sonst beim
@@ -79,7 +81,8 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 
 Junioren spielen ab der Clubmeisterschaft 2027 mit und erhalten ein Konto wie alle Mitglieder
 (K-46): dieselben Felder, dieselben Rechte, der Login-Brief geht an ihre Postadresse. Über
-Junioren speichert MyTCO nicht mehr als über Erwachsene. Das gilt ab der CM-Anmeldung.
+Junioren speichert MyTCO nicht mehr als über Erwachsene. Sie werden zum Start mit allen Mitgliedern erfasst (K-17.1), spätestens
+bis zur CM-Anmeldung.
 
 Offen (hängt an K-08): Führt das Kind das Konto selbst oder die Eltern? Davon hängt ab, wessen
 E-Mail und Telefon im Konto stehen und was Gegner und Doppelpartner sehen (K-31). Eine
@@ -115,7 +118,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 ## Offene Fragen an den Verein
 
 K-06.1 (Ansprechperson), K-08 (Konten der Junioren), K-09 (Vertrag mit Metanet
-für E-Mail), K-14 (Austritte), K-38 (Löschfrist), K-39 (öffentlicher Spielplan), K-40.1
+für E-Mail), K-38 (Löschfrist), K-39 (öffentlicher Spielplan), K-40.1
 (Jahrgang für Lizenzanträge) — alle in den [Abklärungen](abklaerungen.md). Was schon entschieden ist, steht unter
 [Beantwortet](abklaerungen.md#beantwortet).
 
