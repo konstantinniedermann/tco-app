@@ -2,7 +2,7 @@ import { leseEinstellungen } from '../einstellungen.ts';
 import { holeDb } from '../db/index.ts';
 import { erstelleBremsen } from './bremse.ts';
 import { erstelleLoginDienst, type LoginDienst } from './dienst.ts';
-import { erstelleSmtpMailer } from './mail.ts';
+import { erstelleSmtpMailer, leiteUm } from './mail.ts';
 
 let dienst: LoginDienst | undefined;
 
@@ -14,7 +14,10 @@ export function holeLoginDienst(): LoginDienst {
 			db: holeDb(),
 			schluessel: einstellungen.codeSchluessel,
 			kontakt: einstellungen.kontakt,
-			mailer: erstelleSmtpMailer(einstellungen.smtpUrl, einstellungen.mailAbsender),
+			mailer: leiteUm(
+				erstelleSmtpMailer(einstellungen.smtpUrl, einstellungen.mailAbsender),
+				einstellungen.mailNurAn
+			),
 			bremsen: erstelleBremsen()
 		});
 	}

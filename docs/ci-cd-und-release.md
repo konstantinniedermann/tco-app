@@ -20,7 +20,7 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 | Rolle | Demo und Checkliste | Testgruppe (Pilotphase), später alle Mitglieder |
 | Ausgeliefert bei | Merge nach `dev` | Merge des PR `dev` → `main` |
 | Daten | nur erfundene Testdaten; bei jeder Auslieferung neu aufgesetzt | Mitgliederdaten |
-| E-Mail | nur an die Adresse des Projektleiters, alle anderen werden verworfen (hängt an K-11) | an die Mitglieder |
+| E-Mail | alle Mails gehen an die Adresse des Projektleiters, der Betreff nennt den ursprünglichen Empfänger (hängt an K-11) | an die Mitglieder |
 | Push, Schlüssel | eigene | eigene |
 
 Beide Adressen richtet der Website-Betreuer ein (Annahme K-10: Test und Live unter `tcolten.ch`).
@@ -241,7 +241,7 @@ werden sie nicht geprüft.
 | `DATABASE_URL` | Verbindung zur PostgreSQL-Datenbank der Umgebung | ja |
 | `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
 | `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
-| `MAIL_NUR_AN` | Nur Test: alle Mails gehen an diese eine Adresse. Auf Live leer. Ein Wert, der keine Mail-Adresse ist, lässt die App nicht starten | nein |
+| `MAIL_NUR_AN` | Nur Test: alle Mails werden an diese eine Adresse umgeleitet. Auf Live leer. Ein Wert, der keine Mail-Adresse ist, lässt die App nicht starten | nein |
 | `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
 | `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text, steht im Brief und in der Meldung «Code schon benutzt» (Annahme K-21) | ja |
 | `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
