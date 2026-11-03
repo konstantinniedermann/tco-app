@@ -109,20 +109,41 @@ Widerspruch fragen.
 
 **Sobald Test und Live ausgeliefert werden** (Merge nach `dev` = Test-Umgebung, Merge nach `main` =
 live mit Mitgliederdaten, `docs/ci-cd-und-release.md`): vor dem PR muss der Projektleiter die
-Checkliste auf Test abgehakt und genau dieses Release freigegeben haben; dazu ein Commit auf
-`dev`, der die Version in `package.json` und `docs/versionen.md` setzt. Den Tag setzt die
-CI.
+Checkliste auf Test abgehakt und genau dieses Release freigegeben haben; dazu der
+Versions-Commit im Release-Branch (Schritt 4a), der die Version in `package.json` und
+`docs/versionen.md` setzt und mit ihm nach `dev` kommt. Den Tag setzt die CI.
 
 **Code, aber noch keine Live-Auslieferung** (`AUSLIEFERUNG_LIVE` nicht `an`): Versions-Commit
-auf `dev` wie oben, in `docs/versionen.md` als «nicht ausgeliefert» gekennzeichnet; kein Tag,
+wie oben, in `docs/versionen.md` als «nicht ausgeliefert» gekennzeichnet; kein Tag,
 kein GitHub-Release, auch nicht von Hand. Die Checkliste entfällt nur, solange auch
 `AUSLIEFERUNG_TEST` aus ist; läuft Test schon, wird sie dort abgehakt
 (`docs/ci-cd-und-release.md#versionen`). Freigabe des Projektleiters für genau dieses Release
 trotzdem einholen.
 
-**Nur Doku:** Ablauf unten ohne Checkliste und ohne Version.
+**Nur Doku** (seit `main` keine Datei ausser Doku geändert, Regel aus `nur-doku.ts`): Ablauf
+unten ohne Checkliste und ohne Version. Enthält das Release Code, muss die Version steigen —
+auch bei Werkzeugen wie Skripten oder Workflows.
 
-**5 — PR anlegen und mergen:**
+**4a — Doku-Abgleich (vor jedem Release, auch nur Doku):** im Worktree eines Release-Branches
+ab `origin/dev` (`chore/release-X.Y.Z`, bei nur Doku `docs/release-<datum>`), Start wie Schritt 1, ohne Label.
+
+1. Skill `doku-audit` über alle Domänen. Abweichend vom Skill **keine Issues**: Kleinigkeiten
+   als eigener Commit (`docs: Doku-Abgleich vor Release …`), alles andere in
+   `docs/beobachtungen.md`. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre
+   führt oder blockiert, hält das Release auf, bis er behoben ist — übersteuern nur mit
+   ausdrücklicher Freigabe des Nutzers.
+2. Versions-Commit (siehe oben), bei nur Doku keiner.
+3. `make release-check` muss grün sein: Version aus `package.json` hat genau einen Abschnitt
+   in `docs/versionen.md`; die Version sinkt nicht und steigt, sobald Code dabei ist; ändert sie
+   sich, ist «Unveröffentlicht» leer; «nicht ausgeliefert» und Tags passen in beide Richtungen.
+4. Jede Issue-Nummer im neuen Versionsabschnitt mit `gh issue view NNN -R konstantinniedermann/tco-app`
+   gegen den echten Titel halten — nicht der Formulierung früherer Einträge vertrauen.
+5. Nach `dev` mergen und aufräumen wie Schritt 4. Das Ergebnis (Fixes, Beobachtungen,
+   Befunde auf hoch) kommt kurz in den Text des Release-PR.
+
+**5 — PR anlegen und mergen:** Direkt davor im Hauptordner `make release-check` noch einmal —
+andere Sessions können seit 4a Einträge unter «Unveröffentlicht» nach `dev` gemergt haben.
+Rot: wie 4a über einen Release-Branch nachziehen.
 
 ```bash
 gh pr create -R konstantinniedermann/tco-app --base main --head dev --title "Release: …" --body-file <datei>
@@ -178,7 +199,7 @@ den Bericht.
 ## Session-Ende
 
 Skill `session-wrap-up` gilt, aber **ohne** dessen `git push origin main` — stattdessen
-Schritt 4, dann **Reste anderer Sessions**. Die Schritte 5–7 nur, wenn ein Release
+Schritt 4, dann **Reste anderer Sessions**. Die Schritte 4a–7 nur, wenn ein Release
 beschlossen ist. Fertige Arbeit ist nach dem Merge schon aufgeräumt. Am Ende steht kein
 gemergter Worktree und kein gemergter Branch dieser Session mehr. Fertig, aber der Merge ist
 noch offen (Hauptordner besetzt): Branch pushen, Worktree und `in-arbeit` bleiben, Merge im
