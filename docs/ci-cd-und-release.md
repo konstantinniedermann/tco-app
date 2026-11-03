@@ -33,7 +33,7 @@ dort nie hin (DS-08).
 **Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut.
 [#32](https://github.com/konstantinniedermann/tco-app/issues/32) baut den lokal belegbaren Teil:
 Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
-(36 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
+(43 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
 #29, Konten und Adresse hängen an K-04 und K-10), spätestens vor dem Release *Mitglieder-Login*.
 Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
@@ -174,8 +174,8 @@ ausgeben, steht nur in `<umgebung>/protokoll.log` (je Umgebung, nur für den Bet
 lesbar). Werte aus der Datenbank kommen dort nicht hin: Scheitert das Einspielen, schreibt
 `wiederherstellen` nur den Fehlercode (`psql` mit `VERBOSITY=sqlstate`) und `probe` nur die Zahl
 der Fehlerzeilen von `pg_restore`; Hauptzeile, `DETAIL` und `CONTEXT` der Meldungen werden
-verworfen (DS-06). Docker-Logs der Container rotieren nach Grösse (5 × 10 MB). Eine Rotation nach Zeit
-(höchstens 30 Tage, DS-06) für beide richtet
+verworfen (DS-06). Docker-Logs der Container rotieren nach Grösse (5 × 10 MB). Eine Rotation
+nach Zeit (höchstens 30 Tage, DS-06) für beide richtet
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) ein.
 
 ### Schutz des Auslieferungswegs

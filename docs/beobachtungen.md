@@ -116,6 +116,30 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-03 — Datenbank-Container loggen bei scheiterndem Einspielen Werte
+
+**Thema:** Betrieb
+
+**Fundort:** `docker logs` der db-Dienste (Test und Live), Einspielen in `betrieb/wiederherstellen`.
+
+**Beobachtung:** Scheitert das Einspielen, schreibt der Postgres-Server in sein eigenes Log `DETAIL: Failing row contains (…)` und `STATEMENT: COPY …` mit Werten aus der Datenbank. Das liegt ausserhalb von `protokoll.log`, das die Werte bewusst nicht enthält.
+
+**Ursprung:** #39, Review Task 6.
+
+**Einschätzung:** Betrifft DS-06 und die zeitliche Begrenzung der Docker-Logs (offener Teil von #39, Rotation nach Zeit). Vorläufig: beim Einrichten des Servers klären, ob `log_error_verbosity` oder die Log-Aufbewahrung reicht.
+
+### 2026-11-03 — Nächtliche Sicherung nimmt keine Sperre gegenüber `wiederherstellen`
+
+**Thema:** Betrieb
+
+**Fundort:** `betrieb/sichern` (`forget --prune`), `betrieb/wiederherstellen` (zwischen `snapshot suchen` und `einspielen`).
+
+**Beobachtung:** Der nächtliche `sichern`-Lauf nimmt keine Sperre. Läuft er zwischen `snapshot suchen` und `einspielen` von `wiederherstellen`, kann sein `forget --prune` einen knapp 30 Tage alten, gerade gewählten Lauf entfernen.
+
+**Ursprung:** #39, Review Task 6.
+
+**Einschätzung:** Selten (enges Zeitfenster, nur bei ältestem Lauf). Vorläufig: bewusst nichts tun, wieder ansehen, wenn Wiederherstellungen häufiger werden.
+
 ### 2026-11-03 — `make release-check`: zwei Restlücken aus dem Review
 
 **Thema:** Arbeitsablauf
