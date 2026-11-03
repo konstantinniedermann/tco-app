@@ -37,7 +37,8 @@ export function leseEinstellungen(
 		throw new Error('MYTCO_SMTP_URL ohne TLS (smtps:// oder requireTLS=true)');
 	}
 	const mailNurAn = env.MAIL_NUR_AN?.trim() || undefined;
-	if (mailNurAn !== undefined && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mailNurAn)) {
+	// Genau eine nackte Adresse: keine Listentrenner (, ;) und keine Form «Name <a@b>».
+	if (mailNurAn !== undefined && !/^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]+$/.test(mailNurAn)) {
 		throw new Error('MAIL_NUR_AN ist keine Mail-Adresse');
 	}
 	return {

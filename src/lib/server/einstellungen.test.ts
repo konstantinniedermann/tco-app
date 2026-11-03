@@ -99,6 +99,19 @@ describe('leseEinstellungen', () => {
 			const env = { ...vollstaendig, MAIL_NUR_AN: 'keine adresse' };
 			expect(() => leseEinstellungen(env)).toThrow(new Error('MAIL_NUR_AN ist keine Mail-Adresse'));
 		});
+
+		// Genau eine Adresse: Trennzeichen einer Liste und Teile der Form «Name <a@b>» sind
+		// nicht erlaubt, sonst ginge die Umleitung an mehrere oder unerwartete Empfänger.
+		test.each([
+			'b,a@example.org',
+			'a;b@example.org',
+			'<pl@example.org>',
+			'"pl"@example.org',
+			'pl@example.org,x@example.org'
+		])('wirft bei %j', (wert) => {
+			const env = { ...vollstaendig, MAIL_NUR_AN: wert };
+			expect(() => leseEinstellungen(env)).toThrow(new Error('MAIL_NUR_AN ist keine Mail-Adresse'));
+		});
 	});
 
 	describe('TLS-Pflicht in Produktion', () => {

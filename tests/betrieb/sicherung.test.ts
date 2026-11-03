@@ -341,6 +341,22 @@ describe('wiederherstellen', () => {
 		expect(index(x, 'psql')).toBeLessThan(index(x, 'start app'));
 	});
 
+	// Die Standardausgabe von psql (z. B. die setval-Ergebnisse aus dem Dump) trägt Werte aus
+	// der Datenbank; sie wird verworfen. Die Fehlerausgabe (nur SQLSTATE) bleibt im Protokoll.
+	test('Standardausgabe von psql landet nicht im Protokoll, die Fehlerausgabe schon', () => {
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], {
+			...MIT_SQL,
+			// A vor P (Zählungen): der erste Treffer in alphabetischer Reihenfolge gewinnt
+			STUB_MUSTER_A: 'exec -T db psql -X',
+			STUB_AUSGABE_A: 'setval 4711'
+		});
+		expect(letzteZeile(x)).toBe('ok');
+		const log = readFileSync(`${x.basis}/test/protokoll.log`, 'utf-8');
+		expect(log).not.toContain('setval 4711');
+		expect(log).toContain('STUB-GEHEIM-LOG');
+		expect(x.stdout).not.toContain('setval 4711');
+	});
+
 	test('Dump aus restic scheitert: kein COMMIT, fehler, App läuft wieder', () => {
 		const x = lauf('wiederherstellen', ['test', 'lauf-x'], {
 			...MIT_SQL,

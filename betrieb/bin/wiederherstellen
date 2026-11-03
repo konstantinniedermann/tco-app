@@ -108,8 +108,10 @@ sql_zum_einspielen() {
 }
 
 schritt "einspielen"
+# Die Standardausgabe von psql (u. a. die setval-Ergebnisse des Dumps) trägt Werte aus der
+# Datenbank und wird verworfen; Fehler (nur SQLSTATE) gehen über stderr ins Protokoll.
 sql_zum_einspielen |
-	compose "$UMGEBUNG" exec -T db psql -X -q -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U mytco -d mytco >>"$LOG" ||
+	compose "$UMGEBUNG" exec -T db psql -X -q -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U mytco -d mytco >/dev/null ||
 	scheitern "Einspielen gescheitert"
 
 schritt "app starten"

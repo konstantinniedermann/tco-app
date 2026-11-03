@@ -68,7 +68,10 @@ trotzdem zu Ende.
 | Probe in einer Wegwerf-Datenbank | `/opt/mytco/gemeinsam/bin/probe <umgebung> [lauf-…]` |
 
 Ist in `live/geheim.env` `MAIL_NUR_AN` gesetzt (Leerzeichen und Anführungszeichen zählen
-nicht), verweigern `ausliefern live` und `zurueck live` ihre Arbeit und melden `fehler`.
+nicht; erkannt wird jede Zeilenform, die Compose liest, auch `export MAIL_NUR_AN=…` und
+`MAIL_NUR_AN: …`), verweigern `ausliefern live` und `zurueck live` ihre Arbeit und melden
+`fehler`. Ein `MAIL_NUR_AN` aus der Shell des Aufrufers kommt nie bei Compose an: Massgebend
+ist allein `geheim.env`.
 
 `zurueck` migriert die Datenbank nicht zurück. `wiederherstellen` spielt nur Sicherungen
 derselben Umgebung ein und braucht eine ausgelieferte Fassung (`<umgebung>/zustand/aktuell`);
