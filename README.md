@@ -10,9 +10,10 @@ Mitgliederverwaltung Fairgate oder die Website tcolten.ch.
 
 ## Stand
 
-Phase **Fundament**, Version 0.2.0 (noch nicht ausgeliefert): Login per Einmal-Code mit
-Musterbrief sowie Auslieferung und Sicherung sind gebaut und lokal nachgewiesen; der Server
-folgt, weitere Funktionen kommen mit den Etappen. Termine und Umfang der Etappen
+Phase **Fundament**, Version 0.3.0 (noch nicht ausgeliefert): Login per Einmal-Code mit
+Musterbrief, Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene
+Testdaten) sind gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
+den Etappen. Termine und Umfang der Etappen
 → [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Einstieg
@@ -58,6 +59,7 @@ Alle weiteren Befehle: `make help`.
   `.claude/worktrees/issue-NNN` (gitignoriert); Ablauf im Skill
   [`tco-branching`](.claude/skills/tco-branching/SKILL.md).
 - Jede Änderung hängt an einem Issue mit Definition of Done.
+- Release dev → main: Doku-Abgleich und `make release-check`, Ablauf im Skill `tco-branching`.
 - Fertig heisst nachgewiesen: Tests, CI oder Screenshot belegen die Änderung.
 - Vor jedem Commit: `make check` (dasselbe prüft die CI). Einmalig `make hooks` aktiviert
   die versionierten Git-Hooks: vor jedem Commit Secret-Scan und `make docs` (nur Doku) bzw.

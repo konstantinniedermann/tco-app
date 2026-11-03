@@ -7,6 +7,13 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+## 0.3.0 — Test-Umgebung und Absicherungen, nicht ausgeliefert
+
+Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test
+([Versionen](ci-cd-und-release.md#versionen)). Doku-Abgleich vor dem Release: keine Befunde
+auf hoch; Kleinigkeiten behoben, drei Beobachtungen eingetragen (u. a. fehlende Seite
+`/datenschutz`, nötig vor dem Versand echter Briefe).
+
 - Test ohne Server (#39, Teil ohne Server, lokal nachgewiesen): `MAIL_NUR_AN` leitet alle Mails
   um (Empfänger im Betreff) und sperrt Auslieferung und Rückfall auf Live; Mail-Versand in
   Produktion nur mit TLS; Testdaten auf Test mit Brief-Code per umgeleiteter Mail; Rate-Limits

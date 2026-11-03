@@ -175,3 +175,39 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Einführung von `make release-check`.
 
 **Einschätzung:** Die Regel ist gleich wie in der CI (Code-Jobs, Auslieferung), darum bewusst so gewählt. Führt das zu vielen Korrekturversionen ohne Änderung an der App, eine engere Regel prüfen (z. B. nur Dateien, die ins Image gehen).
+
+### 2026-11-03 — Die Seite `/datenschutz` gibt es nicht, Brief und Erklärung verweisen darauf
+
+**Thema:** Datenschutz
+
+**Fundort:** `src/lib/server/brief/brief.ts` (Link `<Adresse>/datenschutz`), `docs/datenschutzerklaerung.md`, Login-Seite, DS-09, Matrix in `docs/rollen-und-rechte.md`.
+
+**Beobachtung:** Der Brief und die Datenschutzerklärung nennen `<Adresse>/datenschutz`. Unter `src/routes` gibt es die Seite nicht, und die Login-Seite verlinkt sie nicht, obwohl DS-09 und die Matrix von Rollen und Rechte sie vorsehen.
+
+**Ursprung:** Doku-Abgleich vor Release 0.3.0.
+
+**Einschätzung:** Blockiert den Versand echter Briefe an Mitglieder, nicht das Release ohne Server. Vor #40 (Testgruppe) bauen.
+
+### 2026-11-03 — `ausliefern` auf Test: Fehler nach `down --volumes` führt nicht zum Rückfall
+
+**Thema:** Betrieb
+
+**Fundort:** `betrieb/bin/ausliefern`, Schritte «migrieren» und «testdaten laden».
+
+**Beobachtung:** Auf Test wird die Datenbank vorher mit `down --volumes` verworfen. Scheitert danach «migrieren» oder «testdaten laden», endet der Lauf mit `scheitern`, nicht mit `rueckfall`; Test bleibt ohne laufende App. Die Doku sagt nur «scheitert».
+
+**Ursprung:** Doku-Abgleich vor Release 0.3.0.
+
+**Einschätzung:** Auf Test vertretbar, da es keine Daten zu schützen gibt. Beim Inbetriebnehmen (#39) entscheiden und die Doku entsprechend präzisieren.
+
+### 2026-11-03 — `probe` ignoriert Zusatzargumente still
+
+**Thema:** Betrieb
+
+**Fundort:** `betrieb/bin/probe` gegen `betrieb/bin/sichern` und `betrieb/bin/wiederherstellen`.
+
+**Beobachtung:** `sichern` und `wiederherstellen` weisen überzählige Argumente mit `fehler` ab, `probe` ignoriert sie ohne Meldung.
+
+**Ursprung:** Doku-Abgleich vor Release 0.3.0.
+
+**Einschätzung:** Niedrig. Bei der nächsten Änderung an `probe` angleichen.

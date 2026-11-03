@@ -104,10 +104,10 @@ Doku-Merge ändert ihn nicht.
    Update von Dependabot) oder `proxy.env` geändert hat. Dann Migrationen ausführen, Container
    neu starten. Auf Test wird die Datenbank dabei neu aufgesetzt. Bricht der Lauf mitten in der
    Übernahme ab, wird alles Übernommene zurückgesetzt.
-   **Testdaten (nur Test, Schritt «testdaten laden»):** Nach der Migration legt
+   **Testdaten (nur Test, nur wenn das Image das Skript enthält, Schritt «testdaten laden»):** Nach der Migration legt
    `scripts/testdaten.ts` die erfundenen Mitglieder samt Konto an und schickt für Erika Beispiel
    einen Brief-Code per Mail («Brief-Code für die Test-Umgebung», mit Code, Gültigkeit und
-   Adresse der App); durch die Umleitung landet sie beim Projektleiter. Das Skript bricht ab,
+   Adresse der App); durch die Umleitung («[Test für <Adresse>] » vor dem Betreff) landet sie beim Projektleiter. Das Skript bricht ab,
    ohne etwas zu schreiben, wenn `MAIL_NUR_AN` leer ist (also nie auf Live, auch nicht von Hand)
    oder schon Mitglieder da sind; dann scheitert die Auslieferung. Scheitert nur die Mail,
    bleiben die Testdaten, und das Protokoll hält «Mail mit Brief-Code nicht versandt» fest. Code
@@ -144,7 +144,7 @@ S3-kompatiblem Ziel (Ziel legt [#10](https://github.com/konstantinniedermann/tco
   nicht ab heute. Bleibt die Sicherung aus, bleiben auch die alten erhalten.
 - **Sicherungsziel:** Das Ziel legt der Betrieb einmal von Hand an (`betrieb/README.md`).
   `sichern` legt nie selbst eines an; fehlt es oder ist es falsch eingetragen, meldet es
-  `fehler`, und eine Live-Auslieferung bricht vor jeder Änderung ab.
+  `fehler`, und eine Live-Auslieferung bricht vor jeder Änderung ab (ausser bei der ersten, solange noch keine Live-Datenbank läuft).
 - **Wiederherstellen:** Vor dem Einspielen werden die Tabellen der App samt der Liste der
   Migrationen geleert, alles in einer Transaktion. So bleibt keine Tabelle einer späteren
   Migration stehen, und die nächste Auslieferung migriert wieder sauber. Scheitert etwas,
@@ -154,7 +154,7 @@ S3-kompatiblem Ziel (Ziel legt [#10](https://github.com/konstantinniedermann/tco
 
 | Befehl | Zweck |
 |--------|-------|
-| `zurueck` | Zurück auf das vorherige Image. Migrationen fügen nur hinzu, darum geht das ohne Datenverlust; was die alte Version noch braucht, wird erst ein Release später entfernt |
+| `zurueck <umgebung>` | Zurück auf das vorherige Image. Migrationen fügen nur hinzu, darum geht das ohne Datenverlust; was die alte Version noch braucht, wird erst ein Release später entfernt |
 | `sichern <umgebung> [ohne-aufraeumen]` | Datenbank sichern; mit `ohne-aufraeumen` ohne das Löschen nach 30 Tagen (`forget --prune`) |
 | `wiederherstellen <umgebung> [lauf] [ohne-sicherung]` | Eine Sicherung derselben Umgebung zurückspielen. Sichert vorher den jetzigen Stand (ohne Aufräumen; scheitert das, ändert sich nichts); ohne Lauf der bis dahin neueste. Der Notschalter `ohne-sicherung` lässt diese Sicherung weg und steht im Protokoll; nur von Hand auf dem Server, nie aus der CI oder dem Türsteher. Auf Test findet der Befehl keinen Snapshot einer Live-Sicherung (DS-08) |
 | `probe <umgebung> [lauf]` | Sicherung in einer Wegwerf-Datenbank einspielen, mit der Zählung vergleichen, `ok` oder `fehler` |

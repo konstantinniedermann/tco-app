@@ -87,6 +87,7 @@ Brief-Codes nicht durchrechenbar macht.
 | SI-14 | Abhängigkeiten, Auslieferung und Geheimnisse nach [CI/CD](ci-cd-und-release.md#abhängigkeiten): neue Pakete nur mit Freigabe, Installation ohne Paket-Skripte, Malware-Prüfung, nur der Auslieferungs-Job hat den Schlüssel, Geheimnisse nie im Repo (Secret-Scan); die CI meldet nur «ok» oder «Fehler», keine App-Logs (Logs liegen bei GitHub in den USA) |
 | SI-15 | Zwei-Faktor-Login auf allen Konten für Betrieb und Code: GitHub (alle mit Schreibrecht), Infomaniak, E-Mail-Versand, Domain |
 | SI-16 | Direkter Zugriff auf die Live-Datenbank nur über SSH auf den Server, nur der Projektleiter und seine Stellvertretung (K-05), nur für Betrieb und Fehlersuche; keine Kopien der Daten auf eigene Geräte (DS-08). Er steht nicht in der Matrix von [Rollen und Rechte](rollen-und-rechte.md), weil er ausserhalb der App liegt |
+| SI-17 | Mail-Versand nur mit TLS (`smtps://` oder `requireTLS=true`); in Produktion lehnt die App jede andere SMTP-URL ab, ausser Loopback und `.invalid`. Die Umleitung `MAIL_NUR_AN` gilt nur für Test; `ausliefern live` und `zurueck live` verweigern sich bei gesetztem Wert ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)) |
 
 Prüfbare Vorgaben erhalten Tests, wie die `DS-NN` ([Testkonzept](testkonzept.md#anforderung--testfall)).
 
