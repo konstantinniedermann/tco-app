@@ -92,6 +92,7 @@ entfernen.
 | Was in der Definition of Done noch offen ist | Label |
 |---|---|
 | nichts, das Issue wartet nur aufs Release | `in-arbeit` bleibt bis zum Schliessen (Schritt 7) |
+| Nacharbeit, die diese Session gleich im neuen Worktree macht | `in-arbeit` bleibt |
 | Punkte, die auf Äusseres warten (Freigabe, Server, Verein, anderes Issue) | `in-arbeit` entfernen, `blocked` (mit `Blocked by:` im Body, im anderen Issue `Blocks:`) bzw. `needs-input` setzen, im Issue kommentieren, was offen ist |
 
 **Hauptordner besetzt** heisst: `status --short` zeigt etwas oder `MERGE_HEAD` existiert. Dann
@@ -155,18 +156,21 @@ Bei jedem Release, Wrap-up und Session-Start: Jede Lagebild-Zeile
 `gemergt, sauber: Worktree und Branch entfernen` wird sofort erledigt (Befehle aus Schritt 4).
 Das gilt auch, wenn eine andere Session den Worktree angelegt hat. Ein gemergter, sauberer
 Worktree, in dem keine Session sitzt, gehört niemandem mehr; er fällt nicht unter „Fremdes nie
-anfassen“. Dazu gemergte Branches ohne Worktree:
+anfassen“. Dazu gemergte Branches ohne Worktree. Als gemergt gilt nur ein Branch, dessen Name
+in einem Merge-Commit auf `origin/dev` steht. `--merged` allein zählt auch frische Branches
+ohne eigene Commits mit.
 
 ```bash
 M=/Users/KN/CAS/projekte/tco-app
 git -C $M fetch --prune origin
-git -C $M branch --merged origin/dev                 # ausser dev und main: branch -d
-git -C $M branch -r --merged origin/dev              # ausser dev, main, HEAD und Branches aus
-                                                     # `worktree list`: push origin --delete
+git -C $M log origin/dev --merges --format=%s | grep "^Merge branch '"   # gemergte Namen
+git -C $M branch --merged origin/dev                 # lokal
+git -C $M branch -r --merged origin/dev              # remote
 ```
 
-`branch -d` verweigert Branches, die in einem Worktree ausgecheckt sind. Damit bleibt laufende
-Arbeit geschützt. Das Lagebild vom Session-Start kann Stunden alt sein, und der Guard-Hook
+Löschen (`branch -d` bzw. `push origin --delete`) nur, was in der ersten Liste und in einer
+der beiden anderen steht, ausser `dev`, `main` und Branches aus `git worktree list`.
+`branch -d` verweigert ohnehin Branches, die in einem Worktree ausgecheckt sind. Das Lagebild vom Session-Start kann Stunden alt sein, und der Guard-Hook
 blockt nur bei sicher erkannter Belegung (fail-open). Darum direkt vor dem Entfernen
 `git status --short` im Worktree erneut prüfen. Zeilen `belegt` oder `uncommittete Änderungen` bleiben stehen und kommen in
 den Bericht.
@@ -176,9 +180,11 @@ den Bericht.
 Skill `session-wrap-up` gilt, aber **ohne** dessen `git push origin main` — stattdessen
 Schritt 4, dann **Reste anderer Sessions**. Die Schritte 5–7 nur, wenn ein Release
 beschlossen ist. Fertige Arbeit ist nach dem Merge schon aufgeräumt. Am Ende steht kein
-gemergter Worktree und kein gemergter Branch dieser Session mehr. Nicht fertige Arbeit:
-Branch pushen, der Worktree bleibt stehen, im Bericht nennen; bei unfertig abgegebener Arbeit
-(niemand führt sie weiter) `in-arbeit` entfernen.
+gemergter Worktree und kein gemergter Branch dieser Session mehr. Fertig, aber der Merge ist
+noch offen (Hauptordner besetzt): Branch pushen, Worktree und `in-arbeit` bleiben, Merge im
+Bericht als offen nennen. Nicht fertige Arbeit: Branch pushen, der Worktree bleibt stehen,
+im Bericht nennen; bei unfertig abgegebener Arbeit (niemand führt sie weiter) `in-arbeit`
+entfernen.
 
 ## Reibungspunkte bei Parallel-Arbeit
 
