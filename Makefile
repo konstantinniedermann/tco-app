@@ -20,7 +20,7 @@ check-schnell: docs voraussetzungen ## Schnellprüfung ohne Datenbank (Doku, Lin
 	npm run pruefungen
 	npm run test:einheit
 
-docs: ## Doku-Prüfung (Links, Struktur, Test-IDs; braucht nur Node, kein node_modules)
+docs: ## Doku-Prüfung (Links, Struktur, Test-IDs, Annahmen, Design-Tokens; braucht nur Node, kein node_modules)
 	@bash scripts/pruefe-node.sh
 	@bash scripts/check-docs.sh
 	@node scripts/pruefungen/test-ids.ts

@@ -58,6 +58,7 @@ Alle weiteren Befehle: `make help`.
   `.claude/worktrees/issue-NNN` (gitignoriert); Ablauf im Skill
   [`tco-branching`](.claude/skills/tco-branching/SKILL.md).
 - Jede Änderung hängt an einem Issue mit Definition of Done.
+- Release dev → main: Doku-Abgleich und `make release-check`, Ablauf im Skill `tco-branching`.
 - Fertig heisst nachgewiesen: Tests, CI oder Screenshot belegen die Änderung.
 - Vor jedem Commit: `make check` (dasselbe prüft die CI). Einmalig `make hooks` aktiviert
   die versionierten Git-Hooks: vor jedem Commit Secret-Scan und `make docs` (nur Doku) bzw.

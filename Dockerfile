@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY . .
-# Kein eigener `svelte-kit sync`: der Vite-Build synchronisiert selbst (Nachweis: gleiche 103 Dateien,
+# Kein eigener `svelte-kit sync`: der Vite-Build synchronisiert selbst (Nachweis: gleiche Dateien,
 # Unterschied nur im Bauzeitstempel von version.json).
 RUN npm run build
 

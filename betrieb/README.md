@@ -125,5 +125,5 @@ automatisch; sie liegt beim Betreiber.
 `make betrieb-nachweis` spielt den ganzen Ablauf auf Docker Desktop mit erfundenen Werten durch
 (Wegwerf-Server im Temp-Ordner, lokale Registry, Test und Live über den Türsteher, HTTPS über
 Caddy, Trennung, Rückfall, Anlegen des Sicherungsziels, Sicherung vor einer Live-Auslieferung,
-Wiederherstellung auch einer älteren Sicherung, kaputte Einrichtung, Proxy-Log ohne
+Wiederherstellung auch einer älteren Sicherung, Testdaten auf Test, Sperre von `MAIL_NUR_AN` auf Live, Sicherung vor dem Zurückspielen und Notschalter, keine Datenbankwerte im Protokoll, kaputte Einrichtung, Proxy-Log ohne
 IP-Adressen) und räumt danach alles ab.
