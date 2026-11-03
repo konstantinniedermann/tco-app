@@ -154,9 +154,11 @@ S3-kompatiblem Ziel (Ziel legt [#10](https://github.com/konstantinniedermann/tco
 hängen nur an ihrem internen Netz, die Test-App erreicht Live nicht. Caddy behält die
 Content-Security-Policy der App und setzt `frame-ancestors 'none'` nur, wo keine besteht;
 HSTS, `nosniff` und Referrer-Policy setzt er genau einmal, auch für `/_app/*`. Er führt kein
-Zugriffsprotokoll. Fehler und Warnungen schreibt er ins Docker-Log des Proxys; ein Filter
-entfernt daraus Client-Adresse und Weiterleitungs-Köpfe jedes Eintrags, es bleiben keine
-IP-Adressen (DS-06). Test verlangt ein Passwort.
+Zugriffsprotokoll. Sein Betriebslog (Stufe INFO: Start, Zertifikate, Anfragen an die
+Admin-Schnittstelle, Fehler und Warnungen) geht ins Docker-Log des Proxys; ein Filter entfernt
+daraus Client-Adresse und Weiterleitungs-Köpfe jedes Eintrags, es bleiben keine IP-Adressen
+(DS-06). Die INFO-Einträge der Admin-Schnittstelle braucht `make betrieb-nachweis` als
+Gegenprobe, dass der Filter etwas zu filtern hatte. Test verlangt ein Passwort.
 
 **Protokolle auf dem Server:** Was docker, psql und die App bei Auslieferung und Sicherung
 ausgeben, steht nur in `<umgebung>/protokoll.log` (je Umgebung, nur für den Betriebsbenutzer
@@ -294,14 +296,18 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
   Schadpakete und bricht die CI ab.
 - **Updates:** Dependabot schlägt wöchentlich Updates für npm, Docker-Images und GitHub
   Actions vor, als PR auf `dev`. Hauptversionen werden einzeln geprüft.
-- **Keine Hauptversionen von PostgreSQL und Caddy** über Dependabot (dort ausgeschlossen).
+- **Keine Hauptversionen von Node, PostgreSQL und Caddy** über Dependabot (dort ausgeschlossen).
+  Die Node-Hauptversion wird mit `engines` (`package.json`) und `.nvmrc` von Hand gewechselt.
   Eine neue Hauptversion von PostgreSQL liest die Daten von Live nicht: Auf Test (leere
   Datenbank) ginge sie durch, Live fiele aus. Sie braucht einen eigenen Plan mit Sicherung,
   Dump und Wiederherstellung in die neue Version. Caddy-Hauptversionen können die
   Konfiguration ändern.
 - **Nicht von Dependabot erfasst:** die Digests von restic (`betrieb/bin/lib.sh`) und der
   Registry des Nachweises (`betrieb/nachweis/nachweis.sh`) stehen in Shell-Dateien. Sie werden
-  von Hand geprüft (siehe [Beobachtungen](beobachtungen.md)).
+  von Hand geprüft. Nach einem restic-Update `make betrieb-nachweis` laufen lassen: Das Lesen
+  der Snapshot-Liste (`lib.sh` → `snapshot_zeilen`) hängt an der Feldreihenfolge von restic, und
+  `sicherungsziel` liest wie restic die erste Zeile `RESTIC_REPOSITORY=`. Startet ein neues
+  Image restic über ein Shell-Skript statt direkt, kann restic die letzte nehmen.
 
 ## Versionen
 
