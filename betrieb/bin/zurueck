@@ -54,6 +54,9 @@ GESPERRT=1
 # Eigene Fehlermeldungen der Werkzeuge nie an den Aufrufer, nur ins Protokoll.
 exec 2>>"$LOG"
 
+if [ "$UMGEBUNG" = live ] && mail_umleitung_gesetzt live; then
+	scheitern "MAIL_NUR_AN ist auf Live gesetzt"
+fi
 [ -s "$U/zustand/vorher" ] || scheitern "kein vorheriges Image"
 VORHER=$(head -n 1 "$U/zustand/vorher")
 AKTUELL=""

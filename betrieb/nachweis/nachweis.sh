@@ -2,10 +2,11 @@
 # Lokaler Gesamtnachweis auf Docker Desktop: nachweis.sh [image] (Standard mytco:lokal).
 # Baut in einem Temp-Ordner einen Wegwerf-Server (MYTCO_BASIS) auf, schiebt das Image in eine
 # lokale Registry und liefert über den Türsteher bin/ausliefern-ssh nach Test und Live aus,
-# so wie es der Server tut. Prüft HTTPS über Caddy, die Trennung der Umgebungen, den Rückfall,
-# Sicherung/Probe/Wiederherstellung (auch einer älteren Sicherung nach einer neuen Migration),
-# die Sicherung vor einer Live-Auslieferung, das Abweisen einer kaputten Einrichtung und dass
-# der Proxy keine IP-Adressen protokolliert.
+# so wie es der Server tut. Prüft die Testdaten auf Test, HTTPS über Caddy, die Trennung der
+# Umgebungen, den Rückfall, Sicherung/Probe/Wiederherstellung (auch einer älteren Sicherung nach
+# einer neuen Migration; vorher gesichert, Notschalter ohne-sicherung, kein Wert aus der
+# Datenbank im Protokoll), die Sicherung vor einer Live-Auslieferung, das Abweisen einer kaputten
+# Einrichtung und dass der Proxy keine IP-Adressen protokolliert.
 # Ausgabe je Prüfung "prüfung: <name> … ok|fehler", am Ende die Summe; Exit 1 bei einem Fehler.
 # Alle Werte sind erfunden. Bei jedem Ende wird aufgeräumt: Compose-Projekte mytco-test,
 # mytco-live, mytco-proxy samt Netzen und Volumes, Registry, gebaute Images, Temp-Ordner.
@@ -301,6 +302,20 @@ abgelegte_laeufe() {
 	sed -n 's/^sichern: \(lauf-[0-9]\{8\}T[0-9]\{6\}Z\) abgelegt$/\1/p' "$BASIS/live/protokoll.log"
 }
 
+anzahl_laeufe() {
+	abgelegte_laeufe | wc -l | tr -d ' '
+}
+
+# Läufe, die wiederherstellen im Protokoll von Live als eingespielt meldet (der letzte zuletzt).
+eingespielte_laeufe() {
+	sed -n 's/^wiederherstellen: \(lauf-[0-9]\{8\}T[0-9]\{6\}Z\) eingespielt$/\1/p' "$BASIS/live/protokoll.log"
+}
+
+# zaehle_zeilen <grep -E-Muster>: Treffer im Protokoll von Live.
+zaehle_zeilen() {
+	grep -cE "$1" "$BASIS/live/protokoll.log" || true
+}
+
 # Zählung (schema.tabelle|anzahl) eines Laufs von Live aus dem Sicherungsziel.
 zaehlung_von() {
 	restic_nachweis dump --tag "live,$1" --path /zaehlung.txt latest /zaehlung.txt
@@ -444,6 +459,90 @@ p1_laeuft() {
 			return 1
 		}
 	done
+}
+
+psql_test() {
+	docker exec mytco-test-db-1 psql -U mytco -d mytco -At -c "$1"
+}
+
+# Testdaten nach dem Zurücksetzen von Test: Mitglieder angelegt, der Mail-Versuch scheitert
+# (smtp://mail.invalid), und das Protokoll nennt keine Adresse (DS-06).
+p1_testdaten() {
+	local log="$BASIS/test/protokoll.log" anzahl adressen
+	grep -qxF "testdaten: 3 erfundene Mitglieder angelegt" "$log" || {
+		echo "Zeile «3 erfundene Mitglieder angelegt» fehlt in test/protokoll.log"
+		return 1
+	}
+	grep -qxF "testdaten: Mail mit Brief-Code nicht versandt" "$log" || {
+		echo "Zeile «Mail mit Brief-Code nicht versandt» fehlt in test/protokoll.log"
+		return 1
+	}
+	anzahl=$(psql_test "select count(*) from mitglied")
+	[ "$anzahl" = 3 ] || {
+		echo "test-db hat $anzahl Mitglieder, erwartet 3"
+		return 1
+	}
+	adressen=$(grep -c '@example\.org' "$log" || true)
+	[ "$adressen" = 0 ] || {
+		echo "test/protokoll.log enthält $adressen Zeilen mit einer Adresse"
+		return 1
+	}
+	[ "$(psql_live "select count(*) from mitglied")" = 0 ] || {
+		echo "live-db hat Mitglieder"
+		return 1
+	}
+}
+
+# Von Hand ein zweites Mal: bricht ab, weil schon Mitglieder da sind; nichts doppelt.
+p1_testdaten_zweimal() {
+	local ausgabe rc=0
+	ausgabe=$(docker exec mytco-test-app-1 node scripts/testdaten.ts 2>&1) || rc=$?
+	echo "$ausgabe"
+	[ "$rc" != 0 ] || {
+		echo "zweiter Lauf endete mit Exit 0"
+		return 1
+	}
+	[ "$ausgabe" = "testdaten: Mitglieder schon vorhanden: testdaten laufen nur auf einer leeren Datenbank" ] || {
+		echo "unerwartete Ausgabe"
+		return 1
+	}
+	[ "$(psql_test "select count(*) from mitglied")" = 3 ]
+}
+
+# Live-Sperre: ist MAIL_NUR_AN auf Live gesetzt, verweigern ausliefern und zurueck jede Änderung.
+# Ohne set -e im Aufruf: jeder Schritt prüft sein Ergebnis selbst.
+p1_live_umleitung_pruefen() {
+	local vorher="$1" ausgabe rc=0
+	erwarte_lauf fehler live "$(lies d1)" || return 1
+	ausgabe=$(MYTCO_BASIS="$BASIS" MYTCO_REPO="$REPO" "$BASIS/live/betrieb/bin/zurueck" live </dev/null) || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe" || return 1
+	[ "$(head -n 1 "$BASIS/live/zustand/aktuell")" = "$vorher" ] || {
+		echo "live/zustand/aktuell hat sich geändert"
+		return 1
+	}
+	grep -qxF "ausliefern: MAIL_NUR_AN ist auf Live gesetzt" "$BASIS/live/protokoll.log" || {
+		echo "Meldung von ausliefern fehlt in live/protokoll.log"
+		return 1
+	}
+	grep -qxF "zurueck: MAIL_NUR_AN ist auf Live gesetzt" "$BASIS/live/protokoll.log" || {
+		echo "Meldung von zurueck fehlt in live/protokoll.log"
+		return 1
+	}
+}
+
+# Setzt den Wert vorübergehend und leert ihn danach auch bei einem Fehlschlag wieder.
+p1_live_umleitung() {
+	local env="$BASIS/live/geheim.env" vorher rc=0
+	vorher=$(head -n 1 "$BASIS/live/zustand/aktuell")
+	sed 's/^MAIL_NUR_AN=.*/MAIL_NUR_AN=nachweis@example.org/' "$env" >"$env.neu"
+	mv "$env.neu" "$env"
+	chmod 600 "$env"
+	p1_live_umleitung_pruefen "$vorher" || rc=$?
+	sed 's/^MAIL_NUR_AN=.*/MAIL_NUR_AN=/' "$env" >"$env.neu"
+	mv "$env.neu" "$env"
+	chmod 600 "$env"
+	[ "$rc" = 0 ] || return 1
+	live_status_ok
 }
 
 # --- 2 HTTPS über Caddy -------------------------------------------------------------------
@@ -656,8 +755,46 @@ p5_probe() {
 	erwarte_ausgabe ok "$rc" "$ausgabe"
 }
 
+# Mit dem Notschalter: kein neuer Lauf, die Protokollzeile hält es fest, eingespielt wird der
+# neueste Lauf (mit der Zeile).
+p5_notschalter() {
+	local ausgabe rc=0 vorher neuester eingespielt
+	vorher=$(anzahl_laeufe)
+	neuester=$(abgelegte_laeufe | tail -n 1)
+	eingespielt=$(eingespielte_laeufe | wc -l | tr -d ' ')
+	psql_live "delete from nachweis" >/dev/null
+	ausgabe=$(gemeinsam wiederherstellen live ohne-sicherung) || rc=$?
+	erwarte_ausgabe ok "$rc" "$ausgabe"
+	if grep -qxF "schritt: sichern" <<<"$ausgabe"; then
+		echo "trotz Notschalter gesichert"
+		return 1
+	fi
+	[ "$(anzahl_laeufe)" = "$vorher" ] || {
+		echo "Laufzahl verändert: $vorher -> $(anzahl_laeufe)"
+		return 1
+	}
+	grep -qxF "wiederherstellen: ohne Sicherung vorher (Notschalter)" "$BASIS/live/protokoll.log" || {
+		echo "Protokollzeile des Notschalters fehlt"
+		return 1
+	}
+	[ "$(eingespielte_laeufe | wc -l | tr -d ' ')" = $((eingespielt + 1)) ] &&
+		[ "$(eingespielte_laeufe | tail -n 1)" = "$neuester" ] || {
+		echo "nicht der neueste Lauf $neuester eingespielt"
+		return 1
+	}
+	[ "$(psql_live "select email from nachweis")" = "nachweis@example.org" ] || {
+		echo "Zeile nicht wieder da"
+		return 1
+	}
+	live_status_ok
+}
+
+# Ohne Notschalter wird vorher gesichert (ein Lauf mehr, ohne die gelöschte Zeile), eingespielt
+# wird aber der vorher neueste Lauf: Die Zeile ist wieder da.
 p5_wiederherstellen() {
-	local ausgabe rc=0
+	local ausgabe rc=0 vorher neuester
+	vorher=$(anzahl_laeufe)
+	neuester=$(abgelegte_laeufe | tail -n 1)
 	psql_live "delete from nachweis" >/dev/null
 	[ "$(psql_live "select count(*) from nachweis")" = 0 ] || {
 		echo "Zeile nicht gelöscht"
@@ -665,6 +802,18 @@ p5_wiederherstellen() {
 	}
 	ausgabe=$(gemeinsam wiederherstellen live) || rc=$?
 	erwarte_ausgabe ok "$rc" "$ausgabe"
+	grep -qxF "schritt: sichern" <<<"$ausgabe" || {
+		echo "kein Schritt sichern"
+		return 1
+	}
+	[ "$(anzahl_laeufe)" = $((vorher + 1)) ] || {
+		echo "erwartet einen Lauf mehr, gezählt $vorher -> $(anzahl_laeufe)"
+		return 1
+	}
+	[ "$(eingespielte_laeufe | tail -n 1)" = "$neuester" ] || {
+		echo "eingespielt $(eingespielte_laeufe | tail -n 1), erwartet der vorher neueste $neuester"
+		return 1
+	}
 	[ "$(psql_live "select email from nachweis")" = "nachweis@example.org" ] || {
 		echo "Zeile nicht wieder da"
 		return 1
@@ -700,6 +849,132 @@ p5_fremder_lauf() {
 		return 1
 	}
 	test_status_ok
+}
+
+# Unbekannte oder zu viele Angaben: fehler, bevor etwas geschieht (kein Schritt, kein Lauf, kein
+# Einspielen), die App läuft weiter.
+p5_unbekanntes_argument() {
+	local ausgabe rc laeufe eingespielt
+	laeufe=$(anzahl_laeufe)
+	eingespielt=$(eingespielte_laeufe | wc -l | tr -d ' ')
+	rc=0
+	ausgabe=$(gemeinsam wiederherstellen live etwas) || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe"
+	[ "$ausgabe" = fehler ] || {
+		echo "live etwas: nicht vor dem ersten Schritt abgewiesen"
+		return 1
+	}
+	rc=0
+	ausgabe=$(gemeinsam wiederherstellen live lauf-x ohne-sicherung zuviel) || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe"
+	[ "$ausgabe" = fehler ] || {
+		echo "drei Zusatzangaben: nicht vor dem ersten Schritt abgewiesen"
+		return 1
+	}
+	[ "$(anzahl_laeufe)" = "$laeufe" ] && [ "$(eingespielte_laeufe | wc -l | tr -d ' ')" = "$eingespielt" ] || {
+		echo "trotz Abweisung gesichert oder eingespielt"
+		return 1
+	}
+	live_status_ok
+}
+
+# sichern ohne-aufraeumen: ein Lauf mehr, aber kein forget (restic meldet sonst "Applying Policy").
+# Ein unbekanntes zweites Argument: fehler, nichts gesichert.
+p5_sichern_ohne_aufraeumen() {
+	local ausgabe rc=0 vorher zeilen neu
+	grep -qF "Applying Policy" "$BASIS/live/protokoll.log" || {
+		echo "Gegenprobe: das gewöhnliche sichern hat keine forget-Zeile hinterlassen"
+		return 1
+	}
+	vorher=$(anzahl_laeufe)
+	zeilen=$(wc -l <"$BASIS/live/protokoll.log" | tr -d ' ')
+	ausgabe=$(gemeinsam sichern live ohne-aufraeumen) || rc=$?
+	erwarte_ausgabe ok "$rc" "$ausgabe"
+	if grep -qxF "schritt: aufraeumen" <<<"$ausgabe"; then
+		echo "trotz ohne-aufraeumen aufgeräumt"
+		return 1
+	fi
+	[ "$(anzahl_laeufe)" = $((vorher + 1)) ] || {
+		echo "kein neuer Lauf"
+		return 1
+	}
+	neu=$(tail -n +$((zeilen + 1)) "$BASIS/live/protokoll.log")
+	if grep -qF "Applying Policy" <<<"$neu"; then
+		echo "forget lief trotz ohne-aufraeumen"
+		return 1
+	fi
+	rc=0
+	ausgabe=$(gemeinsam sichern live falsch) || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe"
+	[ "$ausgabe" = fehler ] && [ "$(anzahl_laeufe)" = $((vorher + 1)) ] || {
+		echo "sichern live falsch nicht vor dem ersten Schritt abgewiesen"
+		return 1
+	}
+}
+
+# Ein erfundener Wert, den das Einspielen nicht annimmt: Die CHECK-Bedingung ruft eine Funktion,
+# die nach dem Einfügen auf "immer falsch" umgestellt wird. Der Dump enthält die Zeile, und das
+# COPY scheitert in jeder frischen Datenbank (23514); DETAIL und CONTEXT trügen den Wert.
+WERT_GEHEIM="geheim-nachweis-wert@example.org"
+
+p5_keine_werte_pruefen() {
+	local ausgabe rc lauf sqlstate fehlerzahl
+	psql_live "create function nachweis_pruefung(text) returns boolean language sql immutable as 'select true';
+create table nachweis_geheim (email text not null unique check (nachweis_pruefung(email)));
+insert into nachweis_geheim values ('$WERT_GEHEIM');
+create or replace function nachweis_pruefung(text) returns boolean language sql immutable as 'select false';" >/dev/null || return 1
+	rc=0
+	ausgabe=$(gemeinsam sichern live) || rc=$?
+	erwarte_ausgabe ok "$rc" "$ausgabe" || return 1
+	lauf=$(abgelegte_laeufe | tail -n 1)
+	sqlstate=$(zaehle_zeilen 'ERROR: +23514$')
+	fehlerzahl=$(zaehle_zeilen '^probe: [0-9]+ Fehlerzeilen von pg_restore \(Inhalt verworfen\)$')
+
+	rc=0
+	ausgabe=$(gemeinsam wiederherstellen live) || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe" || return 1
+	grep -qxF "schritt: einspielen" <<<"$ausgabe" || {
+		echo "wiederherstellen scheiterte nicht beim Einspielen"
+		return 1
+	}
+	rc=0
+	ausgabe=$(gemeinsam probe live "$lauf") || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe" || return 1
+	grep -qxF "schritt: einspielen" <<<"$ausgabe" || {
+		echo "probe scheiterte nicht beim Einspielen"
+		return 1
+	}
+
+	[ "$(zaehle_zeilen geheim-nachweis-wert)" = 0 ] || {
+		echo "der erfundene Wert steht in live/protokoll.log"
+		return 1
+	}
+	# Gegenprobe: Beide Fehler traten wirklich auf und hinterliessen nur Code bzw. Zahl.
+	[ "$(zaehle_zeilen 'ERROR: +23514$')" = $((sqlstate + 1)) ] || {
+		echo "keine neue SQLSTATE-Zeile 23514 von wiederherstellen"
+		return 1
+	}
+	[ "$(zaehle_zeilen '^probe: [0-9]+ Fehlerzeilen von pg_restore \(Inhalt verworfen\)$')" = $((fehlerzahl + 1)) ] || {
+		echo "keine neue Fehlerzahl-Zeile von probe"
+		return 1
+	}
+	# Die gescheiterte Transaktion hat nichts geändert.
+	[ "$(psql_live "select email from nachweis")" = "nachweis@example.org" ] || {
+		echo "Zeile nach gescheitertem Einspielen verändert"
+		return 1
+	}
+}
+
+# Räumt die erfundenen Objekte auch bei einem Fehlschlag weg und sichert den sauberen Stand,
+# damit der neueste Lauf wieder einspielbar ist.
+p5_keine_werte() {
+	local rc=0 ausgabe rc_sichern=0
+	p5_keine_werte_pruefen || rc=$?
+	psql_live "drop table if exists nachweis_geheim; drop function if exists nachweis_pruefung(text);" >/dev/null
+	ausgabe=$(gemeinsam sichern live) || rc_sichern=$?
+	erwarte_ausgabe ok "$rc_sichern" "$ausgabe"
+	[ "$rc" = 0 ] || return 1
+	live_status_ok
 }
 
 # D5: dasselbe Image mit einer zusätzlichen Migration (neue Tabelle), wie ein späteres Release.
@@ -976,6 +1251,9 @@ pruefung "1 ausliefern-ssh test D1 → ok" erwarte_lauf ok test "$D1"
 pruefung "1 ausliefern-ssh live D1 → ok" erwarte_lauf ok live "$D1"
 pruefung "1 image per digest aus der registry geholt" p1_pull "$ABRUFE_VORHER"
 pruefung "1 test und live laufen mit D1" p1_laeuft
+pruefung "1 testdaten auf test geladen, mail-versuch protokolliert" p1_testdaten
+pruefung "1 testdaten zweiter lauf → abgebrochen, nichts doppelt" p1_testdaten_zweimal
+pruefung "1 live-sperre: MAIL_NUR_AN gesetzt → ausliefern und zurueck verweigert" p1_live_umleitung
 # Ohne laufende Umgebungen sind alle weiteren Prüfungen ohne Aussage.
 [ "$ANZAHL_FEHLER" = 0 ] || summe
 
@@ -999,9 +1277,13 @@ pruefung "5 sichern live ohne angelegtes ziel → fehler, nichts angelegt" p5_oh
 pruefung "5 sicherungsziel von hand anlegen (restic init)" p5_ziel_anlegen
 pruefung "5 sichern live → ok" p5_sichern
 pruefung "5 probe live → ok" p5_probe
-pruefung "5 wiederherstellen live → zeile wieder da" p5_wiederherstellen
+pruefung "5 wiederherstellen live ohne-sicherung → ok, kein neuer lauf, notschalter protokolliert" p5_notschalter
+pruefung "5 wiederherstellen live → vorher gesichert, vorher neuester lauf eingespielt, zeile wieder da" p5_wiederherstellen
 pruefung "5 probe live <lauf> → ok (lauf gültig)" p5_probe "$(lies lauf)"
 pruefung "5 wiederherstellen test <lauf von live> → fehler" p5_fremder_lauf
+pruefung "5 wiederherstellen live mit unbekannter oder überzähliger angabe → fehler, nichts geändert" p5_unbekanntes_argument
+pruefung "5 sichern live ohne-aufraeumen → ok ohne forget; sichern live falsch → fehler" p5_sichern_ohne_aufraeumen
+pruefung "5 scheiterndes einspielen (wiederherstellen, probe) → kein wert im protokoll" p5_keine_werte
 pruefung "5 image mit neuer migration (D5)" p5_bauen_d5
 pruefung "5 ausliefern-ssh live D5 → ok, vorher vollständig gesichert (mit zeile)" p5_live_d5
 pruefung "5 wiederherstellen live <lauf vor D5> → spätere tabelle weg" p5_alt_zurueck

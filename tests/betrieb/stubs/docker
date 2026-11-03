@@ -20,9 +20,10 @@
 set -euo pipefail
 
 echo "$*" >>"${STUB_PROTOKOLL:-/dev/null}"
-# Zeilengleich dazu: die Umgebungsvariablen, die Compose aus dem Aufrufer erbt ("image|umgebung|docker_config")
+# Zeilengleich dazu: die Umgebungsvariablen, die Compose aus dem Aufrufer erbt
+# ("image|umgebung|docker_config|mail_nur_an"; mail_nur_an mit "=" vorne, wenn gesetzt)
 if [ -n "${STUB_PROTOKOLL:-}" ]; then
-	echo "${MYTCO_IMAGE-}|${MYTCO_UMGEBUNG-}|${DOCKER_CONFIG-}" >>"$STUB_PROTOKOLL.umwelt"
+	echo "${MYTCO_IMAGE-}|${MYTCO_UMGEBUNG-}|${DOCKER_CONFIG-}|${MAIL_NUR_AN+=}${MAIL_NUR_AN-}" >>"$STUB_PROTOKOLL.umwelt"
 fi
 echo "STUB-GEHEIM-LOG" >&2
 

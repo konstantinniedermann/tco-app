@@ -3,17 +3,15 @@ import {
 	cpSync,
 	existsSync,
 	mkdirSync,
-	mkdtempSync,
 	readdirSync,
 	readFileSync,
 	rmSync,
 	statSync,
 	writeFileSync
 } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { fuehreAus, fuehreAusOhneLeser, type Ergebnis } from './hilfe.ts';
+import { fuehreAus, fuehreAusOhneLeser, tempOrdner, type Ergebnis } from './hilfe.ts';
 
 const NEU = 'sha256:' + 'a1'.repeat(32);
 const ALT = 'sha256:' + 'b2'.repeat(32);
@@ -53,7 +51,7 @@ const BESTEHENDES_LIVE_PFADE = [
 
 // Baut ein MYTCO_BASIS mit der Einrichtung des Repos als entnommene Fassung (mit Ersatz-sichern).
 function baue(aufbau: Aufbau = {}): string {
-	const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+	const basis = tempOrdner('mytco-basis-');
 	const betrieb = join(basis, 'fassungen', NEU, 'betrieb');
 	mkdirSync(dirname(betrieb), { recursive: true });
 	cpSync('betrieb', betrieb, { recursive: true });
@@ -216,6 +214,26 @@ describe('ausliefern: Live und Sicherung', () => {
 		expect(lies(basis, 'live/zustand/aktuell')).toBe(ALT);
 		expect(gibt(basis, 'proxy/caddy/umgebungen/test.caddy')).toBe(false);
 		expect(gibt(basis, 'live/sperre')).toBe(false);
+	});
+
+	test('MAIL_NUR_AN auf Live gesetzt: fehler gleich nach pruefen, nichts verändert', () => {
+		const basis = baue({
+			...BESTEHENDES_LIVE,
+			dateien: { ...BESTEHENDES_LIVE.dateien, 'live/geheim.env': "MAIL_NUR_AN='pl@example.org'\n" }
+		});
+		const lauf = ausliefern('live', basis, MIT_DB_UP);
+		expect(lauf.status).toBe(1);
+		expect(lauf.stdout).toBe('schritt: pruefen\nfehler\n');
+		expect(gibt(basis, 'sichern-aufrufe')).toBe(false);
+		expect(appStarts(lauf)).toHaveLength(0);
+		expect(lies(basis, 'live/zustand/aktuell')).toBe(ALT);
+		expect(lies(basis, 'live/protokoll.log')).toContain('MAIL_NUR_AN ist auf Live gesetzt');
+		expect(gibt(basis, 'live/sperre')).toBe(false);
+	});
+
+	test('MAIL_NUR_AN auf Test gesetzt stört die Auslieferung nicht', () => {
+		const basis = baue({ dateien: { 'test/geheim.env': 'MAIL_NUR_AN=pl@example.org\n' } });
+		expect(letzteZeile(ausliefern('test', basis))).toBe('ok');
 	});
 
 	test('läuft die Datenbank, aber gemeinsam/bin/sichern fehlt: fehler, nichts verändert', () => {
@@ -534,7 +552,7 @@ describe('Verbindung zum Aufrufer bricht ab', () => {
 	});
 
 	test('zurueck läuft zu Ende und tauscht die Zustände', async () => {
-		const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+		const basis = tempOrdner('mytco-basis-');
 		mkdirSync(join(basis, 'test/zustand'), { recursive: true });
 		writeFileSync(join(basis, 'test/zustand/aktuell'), `${NEU}\n`);
 		writeFileSync(join(basis, 'test/zustand/vorher'), `${ALT}\n`);
@@ -548,7 +566,7 @@ describe('Verbindung zum Aufrufer bricht ab', () => {
 
 describe('zurueck', () => {
 	test('ohne vorher: fehler, kein Start', () => {
-		const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+		const basis = tempOrdner('mytco-basis-');
 		mkdirSync(join(basis, 'test/zustand'), { recursive: true });
 		writeFileSync(join(basis, 'test/zustand/aktuell'), `${NEU}\n`);
 		const lauf = zurueck('test', basis);
@@ -559,8 +577,26 @@ describe('zurueck', () => {
 		expect(gibt(basis, 'test/sperre')).toBe(false);
 	});
 
+	test('MAIL_NUR_AN auf Live gesetzt: fehler, kein Start, Zustand unverändert', () => {
+		const basis = tempOrdner('mytco-basis-');
+		mkdirSync(join(basis, 'live/zustand'), { recursive: true });
+		writeFileSync(join(basis, 'live/zustand/aktuell'), `${NEU}\n`);
+		writeFileSync(join(basis, 'live/zustand/vorher'), `${ALT}\n`);
+		writeFileSync(join(basis, 'live/geheim.env'), 'MAIL_NUR_AN=pl@example.org\n');
+		const lauf = zurueck('live', basis);
+		expect(lauf.status).toBe(1);
+		expect(letzteZeile(lauf)).toBe('fehler');
+		expect(appStarts(lauf)).toHaveLength(0);
+		expect(lies(basis, 'live/zustand/aktuell')).toBe(NEU);
+		expect(lies(basis, 'live/zustand/vorher')).toBe(ALT);
+		expect(lies(basis, 'live/protokoll.log')).toContain(
+			'zurueck: MAIL_NUR_AN ist auf Live gesetzt'
+		);
+		expect(gibt(basis, 'live/sperre')).toBe(false);
+	});
+
 	test('mit vorher: startet diesen Digest und tauscht die Zustände', () => {
-		const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+		const basis = tempOrdner('mytco-basis-');
 		mkdirSync(join(basis, 'test/zustand'), { recursive: true });
 		writeFileSync(join(basis, 'test/zustand/aktuell'), `${NEU}\n`);
 		writeFileSync(join(basis, 'test/zustand/vorher'), `${ALT}\n`);
@@ -574,7 +610,7 @@ describe('zurueck', () => {
 	});
 
 	test('App startet nicht: fehler, Zustände unverändert', () => {
-		const basis = mkdtempSync(join(tmpdir(), 'mytco-basis-'));
+		const basis = tempOrdner('mytco-basis-');
 		mkdirSync(join(basis, 'test/zustand'), { recursive: true });
 		writeFileSync(join(basis, 'test/zustand/aktuell'), `${NEU}\n`);
 		writeFileSync(join(basis, 'test/zustand/vorher'), `${ALT}\n`);
@@ -591,7 +627,7 @@ describe('zurueck', () => {
 	});
 
 	test('ungültige Umgebung: fehler ohne docker-Aufruf', () => {
-		const lauf = zurueck('prod', mkdtempSync(join(tmpdir(), 'mytco-basis-')));
+		const lauf = zurueck('prod', tempOrdner('mytco-basis-'));
 		expect(lauf.stdout).toBe('fehler\n');
 		expect(lauf.aufrufe).toHaveLength(0);
 	});

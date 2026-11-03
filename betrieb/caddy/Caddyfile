@@ -1,5 +1,5 @@
 # Globale Optionen. Caddy schreibt kein Zugriffsprotokoll (kein `log` in den Adressen), aber
-# Fehler und Warnungen ins Standard-Log (Docker-Log des Proxys). Dort stünden zu einer Anfrage
+# sein Betriebslog (Stufe INFO) ins Standard-Log (Docker-Log des Proxys). Dort stünden zu einer Anfrage
 # die Adresse des Clients und seine Köpfe; DS-06 erlaubt IP-Adressen höchstens 24 Stunden.
 # Darum entfernt der Filter diese Felder aus jedem Eintrag, bevor er geschrieben wird; die
 # Felder ohne `request>` stehen in den Einträgen der Admin-Schnittstelle (z. B. caddy reload).

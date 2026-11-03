@@ -9,11 +9,14 @@ function istTestdatei(pfad: string): boolean {
 		istTestquelle(pfad) ||
 		pfad.startsWith('tests/') ||
 		name.startsWith('seed') ||
+		name.startsWith('musterbrief') ||
+		pfad === 'scripts/testdaten.ts' ||
+		name.startsWith('erfundene-') ||
 		teile.slice(0, -1).some((verzeichnis) => /^seeds?$/.test(verzeichnis))
 	);
 }
 
-/** Mailadressen in Test- und Seed-Dateien dürfen nur die Domain `example.org` haben. */
+/** Mailadressen in Test-, Seed-, Testdaten- und Musterbrief-Dateien dürfen nur die Domain `example.org` haben. */
 export function pruefeTestdaten(dateien: Map<string, string>): string[] {
 	const befunde: string[] = [];
 	for (const [pfad, inhalt] of dateien) {

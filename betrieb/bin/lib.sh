@@ -5,6 +5,9 @@ set -euo pipefail
 # Protokolle, Zustand und Sicherungsordner nur für den Betriebsbenutzer. Was ein Container
 # lesen muss (Caddy-Dateien), gibt ausliefern gezielt frei.
 umask 077
+# MAIL_NUR_AN kommt nur aus <umgebung>/geheim.env: Compose zöge einen Wert aus der Shell des
+# Aufrufers der env-Datei vor, die Live-Sperre (mail_umleitung_gesetzt) liest aber nur die Datei.
+unset MAIL_NUR_AN
 
 MYTCO_BASIS="${MYTCO_BASIS:-/opt/mytco}"
 # Repo der Images, wenn MYTCO_REPO nicht gesetzt ist (auf dem Server immer).
@@ -177,6 +180,15 @@ snapshot_zeilen() {
 	awk '{ gsub(/\},\{"time":/, "}\n{\"time\":"); print }'
 }
 
+# Exit 0, wenn der ganze Wert ein Lauf-Name ist (lauf-…, nur Buchstaben und Ziffern). grep -x
+# prüft zeilenweise, daher Umbrüche vorab abfangen.
+ist_lauf_name() {
+	case "${1-}" in
+	*$'\n'*) return 1 ;;
+	esac
+	printf '%s\n' "${1-}" | grep -qxE 'lauf-[0-9A-Za-z]+'
+}
+
 # finde_lauf <umgebung> [lauf]: gibt die Lauf-ID aus. Nur Snapshots mit dem Tag der Umgebung
 # zählen (ein Live-Stand darf nie auf Test landen, DS-08). Vollständig ist ein Lauf erst mit
 # seinem zaehlung.txt-Snapshot (wird zuletzt geschrieben). Ohne Lauf der neueste vollständige
@@ -184,10 +196,7 @@ snapshot_zeilen() {
 finde_lauf() {
 	local umgebung="$1" lauf="${2-}" json="" treffer=""
 	if [ -n "$lauf" ]; then
-		case "$lauf" in
-		*$'\n'*) return 1 ;;
-		esac
-		printf '%s\n' "$lauf" | grep -qxE 'lauf-[0-9A-Za-z]+' || return 1
+		ist_lauf_name "$lauf" || return 1
 		json=$(restic_docker snapshots --tag "$umgebung,$lauf" --json </dev/null) || return 1
 		# Gegenprobe im selben Eintrag: Pfad der Zählung und beide Tags.
 		treffer=$(printf '%s\n' "$json" | snapshot_zeilen |
@@ -209,3 +218,29 @@ finde_lauf() {
 # Je Tabelle "schema.tabelle|anzahl", sortiert (für den Vorher-Nachher-Vergleich).
 # shellcheck disable=SC2034 # wird von den Skripten genutzt, die lib.sh laden
 ZAEHL_SQL="SELECT table_schema || '.' || table_name || '|' || (xpath('/row/c/text()', query_to_xml(format('SELECT count(*) AS c FROM %I.%I', table_schema, table_name), false, true, '')))[1]::text FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema') ORDER BY table_schema, table_name"
+
+# Exit 0, wenn in <umgebung>/geheim.env MAIL_NUR_AN einen Wert hat. Erkannt wird jede Zeilenform,
+# die Compose annimmt: eingerückt, mit `export `, Leerzeichen um `=`, `:` statt `=`; Zeilen mit
+# `#` vorne nicht. Leerzeichen und umschliessende ' oder " zählen nicht (Compose entfernt die
+# Anführungszeichen, die App die Leerzeichen). Bei mehreren Zeilen gilt die letzte (wie bei
+# Compose). Fehlt die Datei: Exit 1.
+mail_umleitung_gesetzt() {
+	local datei="$MYTCO_BASIS/$1/geheim.env" wert
+	[ -f "$datei" ] || return 1
+	wert=$(sed -nE 's/^[[:space:]]*(export[[:space:]]+)?MAIL_NUR_AN[[:space:]]*[=:][[:space:]]*//p' "$datei" |
+		tail -n 1 | tr -d ' \t\r"'"'"'')
+	[ -n "$wert" ]
+}
+
+# nur_fehlerzahl <präfix>: liest die Ausgabe von pg_restore von stdin und gibt nur die Zahl der
+# Zeilen "pg_restore: error: …" aus, als eine Zeile "<präfix>: <n> Fehlerzeilen von pg_restore
+# (Inhalt verworfen)"; ohne Fehlerzeile nichts. Fehlermeldungen samt DETAIL und CONTEXT tragen
+# Werte aus der Datenbank; ins Protokoll kommt keiner davon (DS-06).
+nur_fehlerzahl() {
+	local n
+	n=$(grep -c '^pg_restore: error:' || true)
+	if [ "${n:-0}" -gt 0 ]; then
+		printf '%s: %s Fehlerzeilen von pg_restore (Inhalt verworfen)\n' "$1" "$n"
+	fi
+	return 0
+}

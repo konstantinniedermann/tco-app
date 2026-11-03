@@ -162,6 +162,8 @@ describe('Mail-Code', () => {
 		const { code: brief } = await d.dienst.stelleBriefCodeAus(kontoId);
 		await fordereAn(d, email);
 		await fordereAn(d, email);
+		// Zufällig gleicher Code (1 zu 1 Million): nochmals anfordern, sonst gälte der alte weiter.
+		if (codeAus(d.post[1]) === codeAus(d.post[0])) await fordereAn(d, email);
 		expect(await d.dienst.loginMitMailCode(email, codeAus(d.post[0]), 'ip-10')).toEqual({
 			ergebnis: 'falsch'
 		});

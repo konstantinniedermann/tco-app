@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
+.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -20,12 +20,16 @@ check-schnell: docs voraussetzungen ## Schnellprüfung ohne Datenbank (Doku, Lin
 	npm run pruefungen
 	npm run test:einheit
 
-docs: ## Doku-Prüfung (Links, Struktur, Test-IDs; braucht nur Node, kein node_modules)
+docs: ## Doku-Prüfung (Links, Struktur, Test-IDs, Annahmen, Design-Tokens; braucht nur Node, kein node_modules)
 	@bash scripts/pruefe-node.sh
 	@bash scripts/check-docs.sh
 	@node scripts/pruefungen/test-ids.ts
 	@node scripts/pruefungen/annahmen.ts
 	@node scripts/pruefungen/design-tokens.ts
+
+release-check: ## Vor dem Release dev → main: Version, docs/versionen.md und Tags abgleichen (holt Tags und origin/main)
+	@bash scripts/pruefe-node.sh
+	@node scripts/pruefungen/release.ts
 
 annahmen: ## Annahmen zu offenen Fragen an den Verein auflisten (alle, oder nur eine: make annahmen K=K-11)
 	@node scripts/pruefungen/annahmen.ts --liste $(K)
@@ -47,7 +51,7 @@ db: voraussetzungen-docker ## Lokale Datenbank und Mail-Fänger Mailpit starten 
 dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einstellungen aus .env)
 	node --env-file=.env node_modules/vite/bin/vite.js dev
 
-seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 2 erfundene Mitglieder anlegen, Brief-Code ausgeben (Einstellungen aus .env)
+seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 3 erfundene Mitglieder anlegen, Brief-Code ausgeben (Einstellungen aus .env)
 	node --env-file=.env scripts/migrate.ts
 	node --env-file=.env scripts/seed-lokal.ts
 

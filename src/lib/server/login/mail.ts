@@ -21,3 +21,10 @@ export function erstelleSmtpMailer(transport: string | object, absender: string)
 		await transporter.sendMail({ from: absender, to: an, subject: betreff, text });
 	};
 }
+
+// Test-Umgebung: jede Mail geht an das Ziel, der Betreff nennt den ursprünglichen Empfänger.
+export function leiteUm(mailer: Mailer, ziel: string | undefined): Mailer {
+	if (!ziel) return mailer;
+	return ({ an, betreff, text }) =>
+		mailer({ an: ziel, betreff: `[Test für ${an}] ${betreff}`, text });
+}

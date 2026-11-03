@@ -43,7 +43,7 @@ Tabelle, die Bremsen gegen Durchprobieren liegen im Arbeitsspeicher.**
 | Zwei Codes je Konto | Brief-Code und Mail-Code in getrennten Feldern. Ein neuer Code ersetzt nur den alten derselben Art; ein Login mit einem der beiden macht beide ungültig, der Brief-Code gilt dann als «benutzt» | Ein angeforderter Mail-Code entwertet keinen ungeöffneten Brief. Ein gestohlener und benutzter Brief fällt auf (B-03) |
 | Speicherung | Beide Codes als HMAC-SHA-256 mit Server-Schlüssel | Ein Leck der Datenbank macht die rund 50 Bit des Brief-Codes nicht durchrechenbar (SI-01) |
 | Meldung beim Mail-Code | Falsch, abgelaufen, nach 5 Fehlversuchen ungültig oder unbekannte Adresse: immer dieselbe Meldung | Eine eigene Meldung verriete, dass zur Adresse ein Konto besteht (B-02, SI-04) |
-| Bremsen | Zähler pro IP und pro Adresse nur im Arbeitsspeicher; ein Neustart setzt sie zurück. Die 5 Fehlversuche je Mail-Code stehen in der Datenbank | Keine IP-Adresse auf der Festplatte (DS-06), kein Aufräum-Job; ein Prozess genügt |
+| Bremsen | Zähler pro IP und pro Adresse nur im Arbeitsspeicher; ein Neustart setzt sie zurück. Die 5 Fehlversuche je Mail-Code stehen in der Datenbank. Schlüssel pro IP: IPv4 unverändert, IPv6 pro /64-Netz (`ip-schluessel.ts`), damit ein Adresswechsel im selben Netz die Grenze nicht umgeht | Keine IP-Adresse auf der Festplatte (DS-06), kein Aufräum-Job; ein Prozess genügt |
 | Sitzung | Tabelle statt signiertem Cookie, siehe unten | Abmelden und Widerruf wirken sofort |
 | Herkunftsschutz | Ändernde Schnittstellen nehmen nur JSON an, siehe unten | SvelteKits eigene Prüfung greift bei JSON nicht |
 

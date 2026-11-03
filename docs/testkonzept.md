@@ -16,6 +16,7 @@ wann ausgeliefert wird, regelt [CI/CD und Release](ci-cd-und-release.md).
 | Fachlogik | Fachregeln `FR-NN` aus dem [Fachmodell](fachmodell.md): Fristen, Grenzen, Zustände, Berechnungen | Vitest | `make check`, CI |
 | Schnittstellen und Rechte | Jede Schnittstelle (`+server.ts`) gegen eine echte PostgreSQL; für jede Rolle, ob sie zugreifen darf ([Rollen und Rechte](rollen-und-rechte.md), `RR-NN`) | Vitest, PostgreSQL im Container | `make check`, CI |
 | Ende-zu-Ende | Wichtige Abläufe durch die Oberfläche, mit Barrierefreiheits-Prüfung (N-BARRIEREFREI-01) | Playwright, axe | `make check`, CI |
+| Betrieb | Einrichtungs- und Auslieferungsskripte (`betrieb/bin`) mit Ersatz-docker; Gesamtnachweis auf Docker Desktop | Vitest (`tests/betrieb`), `make betrieb-nachweis` | `make check` (Vitest-Teil), Nachweis von Hand |
 | Echte Geräte | Installation, Push, E-Mail auf echten Handys | von Hand, [Checkliste](#checkliste-vor-dem-release) | vor jedem Release, sobald Test läuft |
 
 **Fachlogik** liegt in Server-Modulen (Bauregel in ADR-002). Vorgabe dieses Konzepts: Die
@@ -77,11 +78,15 @@ Tests, wo sie prüfbar sind (z. B. DS-06: keine Einmal-Codes im Log), ohne Pflic
 Nur erfundene Daten (DS-08), nie echte Mitgliederdaten, auch nicht zur Fehlersuche und nie
 eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
 
-- Wenige erfundene Personen, von Hand geschrieben und fest im Repo, ohne Generator. Für die
-  Seed-Daten der lokalen Entwicklung dieselben Personen.
+- Wenige erfundene Personen, von Hand geschrieben und fest im Repo, ohne Generator für Namen
+  oder Adressen. Seed-Daten und Testdaten der Test-Umgebung
+  (beide aus `scripts/erfundene-mitglieder.ts`); der Musterbrief nimmt dieselbe erste Person, aber mit eigener Adresse.
+- Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
+  (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
 - E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern im Format
   `+41 00 …`, das es nicht gibt. Strassen erfunden.
-- Die CI meldet in Testdaten und Seed-Daten jede andere Mail-Domain.
+- Die CI meldet in Testdaten (auch denen der Test-Umgebung), Seed-Daten und Musterbrief jede
+  andere Mail-Domain.
 - Einmal-Codes und Sitzungen in Tests sind erzeugt, nie fest eingetragen.
 
 ## Screenshots als Nachweis
@@ -94,10 +99,12 @@ blockieren keine gewollte Design-Änderung.
 ## Checkliste vor dem Release
 
 Auf der [Test-Umgebung](ci-cd-und-release.md#umgebungen) `test.my.tcolten.ch`, mit einem
-iPhone (Safari) und einem Android-Handy (Chrome) und einem erfundenen Testkonto. Es entsteht
-bei jeder Auslieferung neu und nutzt die Adresse des Projektleiters, damit der Code per
-E-Mail ankommt (gebaut mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39),
-bis dahin gibt es keine Test-Umgebung). Jeder Punkt nennt die IDs, die er prüft:
+iPhone (Safari) und einem Android-Handy (Chrome) und den erfundenen Mitgliedern der
+Test-Umgebung (Erika Beispiel, Kurt Erfunden, Hanna Muster, alle `@example.org`). Sie entstehen
+bei jeder Auslieferung neu; nach jeder Auslieferung kommt ein Brief-Code für Erika Beispiel per
+E-Mail. Alle Mails von Test, auch die Codes per E-Mail für die erfundenen Mitglieder, gehen über
+die Umleitung (`MAIL_NUR_AN`) an den Projektleiter; der Betreff nennt den ursprünglichen
+Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39); bis dahin lässt sich die Checkliste nur lokal (`make betrieb-nachweis`) vorbereiten. Jeder Punkt nennt die IDs, die er prüft:
 
 - [ ] QR-Code aus einem Testbrief öffnet MyTCO; im Brief für Live steht `my.tcolten.ch` (A-LOGIN-01, A-LOGIN-04)
 - [ ] MyTCO lässt sich auf den Startbildschirm legen und startet von dort
@@ -112,11 +119,10 @@ Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Ve
 
 Falls der Verein eine Testgruppe stellt (K-20), prüft sie Brief, Installation und Login
 als Pilot auf Live, mit ihren eigenen echten Daten, bevor alle Mitglieder einen Brief
-bekommen. Mit welcher Version und Checkliste der Pilot live geht, klärt #40 zusammen mit #39. Das ist Betrieb, kein Test im Sinne von DS-08; vorher muss die
-Datenschutzerklärung gelten. Ablauf → [#40](https://github.com/konstantinniedermann/tco-app/issues/40).
+bekommen. Mit welcher Version und Checkliste der Pilot live geht, klärt #40 zusammen mit #39. Das ist Betrieb, kein Test im Sinne von DS-08;
+vorher muss die Datenschutzerklärung gelten. Ablauf → [#40](https://github.com/konstantinniedermann/tco-app/issues/40).
 
 ## Werkzeuge
 
-Vitest (mit Abdeckungsmessung), Playwright und axe für Playwright. Sie werden
-installiert mit dem Code-Gerüst; vorher kommt keine Abhängigkeit ins Repo. Mails fängt
+Vitest (mit Abdeckungsmessung), Playwright und axe für Playwright. Mails fängt
 Mailpit ab (lokal und in der CI); die Ende-zu-Ende-Tests lesen Codes über seine Schnittstelle.

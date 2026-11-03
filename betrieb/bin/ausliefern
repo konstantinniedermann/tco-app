@@ -87,6 +87,10 @@ if [ -s "$U/zustand/aktuell" ]; then
 	ALT_DIGEST=$(head -n 1 "$U/zustand/aktuell")
 fi
 [ -d "$FASSUNG" ] || scheitern "Fassung fehlt: $FASSUNG"
+# Test-Umleitung der Mails gehört nicht auf Live: nichts anfassen, solange sie dort gesetzt ist.
+if [ "$UMGEBUNG" = live ] && mail_umleitung_gesetzt live; then
+	scheitern "MAIL_NUR_AN ist auf Live gesetzt"
+fi
 export MYTCO_IMAGE="$MYTCO_REPO@$DIGEST"
 
 # --- Live sichern, bevor irgendetwas geändert wird -----------------------------------------

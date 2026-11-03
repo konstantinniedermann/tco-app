@@ -40,9 +40,9 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-LOGIN-05 | Login-Feld oben rechts auf tcolten.ch, das nach dem Login zu MyTCO weiterleitet | PDF 3b | später | später |
 | A-LOGIN-06 | Zwei-Faktor-Login (App oder SMS/E-Mail, zwingend oder freiwillig) | PDF 2 | später | später |
 | A-LOGIN-07 | Login mit Passkey | PDF 2 | später | später |
-| A-LOGIN-08 | Login ohne Passwort, nur per Einmal-Code: aus dem Brief, später per E-Mail (A-LOGIN-10) | PDF 2, PL | Mitglieder-Login | geplant\* |
-| A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Admin seine Sitzungen beendet | PL | Mitglieder-Login | geplant\* |
-| A-LOGIN-10 | Wer ausgeloggt ist (lange Pause, neues Handy, Brief verloren), erhält nach Eingabe seiner E-Mail-Adresse einen neuen Code per E-Mail | PL | Mitglieder-Login | geplant\* |
+| A-LOGIN-08 | Login ohne Passwort, nur per Einmal-Code: aus dem Brief, später per E-Mail (A-LOGIN-10) | PDF 2, PL | Mitglieder-Login | umgesetzt\* |
+| A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Admin seine Sitzungen beendet | PL | Mitglieder-Login | umgesetzt\* (Dienst; Admin-Bedienung kommt mit der Admin-Oberfläche) |
+| A-LOGIN-10 | Wer ausgeloggt ist (lange Pause, neues Handy, Brief verloren), erhält nach Eingabe seiner E-Mail-Adresse einen neuen Code per E-Mail | PL | Mitglieder-Login | umgesetzt\* |
 | A-LOGIN-11 | Einmal-Code per SMS oder App statt per Brief oder E-Mail (abgespalten aus A-LOGIN-08) | PDF 2 | später | später |
 
 ### MITGLIED — Mitgliederverwaltung durch den Admin
