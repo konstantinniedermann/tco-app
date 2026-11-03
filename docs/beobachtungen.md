@@ -116,6 +116,30 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-03 — `make release-check`: zwei Restlücken aus dem Review
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** `scripts/pruefungen/release.ts` (`pruefeRelease`, Tag-Abfrage im Hauptteil).
+
+**Beobachtung:** (1) Die Version, die gerade released wird, ist von der Marker-Prüfung ausgenommen. Fehlt bei ausgeschaltetem Live der Marker «nicht ausgeliefert», meldet die Prüfung das erst beim nächsten Release. (2) Gezählt werden die lokalen Tags: Lokal gesetzte Tags zählen mit, auf GitHub gelöschte bleiben lokal stehen.
+
+**Ursprung:** cas-reviewer zu `feat/release-abgleich`, bewusst nicht umgesetzt.
+
+**Einschätzung:** (1) liesse sich mit `gh variable get AUSLIEFERUNG_LIVE` schliessen, dann hinge die Prüfung aber an GitHub. (2) ist ohne Folgen, solange nur die CI Tags setzt. Wieder ansehen, wenn Live eingeschaltet wird.
+
+### 2026-11-03 — Releases nur mit Werkzeug-Änderungen erzwingen eine neue Version
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** `scripts/pruefungen/release.ts` (Regel aus `nur-doku.ts`), Skill `tco-branching` Schritt 4a.
+
+**Beobachtung:** `make release-check` verlangt eine höhere Version, sobald seit `main` irgendeine Datei ausser Doku geändert wurde, also auch bei Skripten, Makefile oder Workflows, die die App nicht verändern. Mit dem Merge von `feat/release-abgleich` gilt das bereits für das nächste Release.
+
+**Ursprung:** Einführung von `make release-check`.
+
+**Einschätzung:** Die Regel ist gleich wie in der CI (Code-Jobs, Auslieferung), darum bewusst so gewählt. Führt das zu vielen Korrekturversionen ohne Änderung an der App, eine engere Regel prüfen (z. B. nur Dateien, die ins Image gehen).
+
 ### 2026-11-02 — Doppelte Zeile `RESTIC_REPOSITORY`: geprüft wird die erste, genutzt die letzte
 
 **Thema:** Code-Gerüst
