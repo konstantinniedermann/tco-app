@@ -74,8 +74,9 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 
 - **Gast** (A-ROLLE-06): nur für die Registrierung über tcolten.ch.
 - **Junioren-Leiter** (A-ROLLE-05), vom Vorstand als Juniorenverantwortliche angeregt
-  (K-18.1): mit den Junioren-Funktionen. Konten für Junioren gibt es schon ab der CM 2027,
-  mit denselben Rechten wie *Mitglied* (K-46); ob Eltern sie führen, hängt an K-08.
+  (K-18.1): mit den Junioren-Funktionen. Junioren gibt es schon ab der CM 2027 (K-46).
+  Vorschlag K-08: Ein Mitglied handelt für sein Kind mit den Rechten von *Mitglied*, bis das
+  Kind ab der Altersgrenze des Vereins ein eigenes Login hat.
 - **Anlässe-Veranstalter** (A-ROLLE-04): kommt mit allgemeinen Anlässen. Die CM leitet
   bis dahin der CM-Verantwortliche.
 

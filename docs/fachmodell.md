@@ -17,9 +17,10 @@ Begriffe stehen im [Glossar](glossar.md), Anforderungs-IDs in den
 **Rollen:** Was CM- und Lizenzverantwortlicher dürfen, darf auch der Admin
 ([RR-02](rollen-und-rechte.md#grundsätze)).
 
-**Junioren:** Junioren sind Mitglieder mit eigenem Konto und melden sich ab der
-Clubmeisterschaft 2027 selbst an; der CM-Verantwortliche kann sie auch anmelden
-(A-ANMELDUNG-06, K-46). Ob Eltern das Konto führen, hängt an K-08.
+**Junioren:** Junioren sind Mitglieder und spielen ab der Clubmeisterschaft 2027 mit; der
+CM-Verantwortliche kann sie auch anmelden (A-ANMELDUNG-06, K-46). Vorschlag K-08: Ein Mitglied
+führt das Konto seines Kindes (*verwaltet von*, ohne eigene E-Mail und ohne eigenes Login); ab
+einer Altersgrenze des Vereins erhält der Junior ein eigenes Login.
 
 ## Überblick
 
@@ -54,7 +55,7 @@ classDiagram
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Mitglied** | Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25), Telefon, Geschlecht, Jahrgang (K-40.2; für Lizenzanträge hängt an K-40.1), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum | alle ausser Status |
+| **Mitglied** | Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25), Telefon, Geschlecht, Jahrgang (K-40.2; für Lizenzanträge hängt an K-40.1), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum, *verwaltet von* (Mitglied, nur bei Junioren ohne eigenes Login, Vorschlag K-08) | alle ausser Status |
 | **Konto** | Brief-Code und Mail-Code getrennt, je nur als Hash mit Ablauf; beim Brief-Code dazu *benutzt am*, beim Mail-Code die Zahl der Fehlversuche (FR-24). Sitzungsversion, Sitzungen (eine je Gerät, mit *zuletzt genutzt*), Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein, Passkeys (je Gerät öffentlicher Schlüssel und Kennung, freiwillig, A-LOGIN-07) | alle |
 | **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](rollen-und-rechte.md) fest | — |
 | **Aenderung** | Eintrag im Änderungsverlauf: Mitglied, von (Konto; leer bei automatischen Änderungen oder wenn das Konto gelöscht ist, dann angezeigt als *MyTCO* bzw. Name), Feld oder Aktion, Zeitpunkt; ohne alte und neue Werte (FR-26) | Mitglied, von |
@@ -89,7 +90,7 @@ classDiagram
 | FR-01 | Ein Mitglied hat genau ein Konto. Der Admin legt beides zusammen an; das Konto startet mit einem Einmal-Code für den Brief | A-MITGLIED-01, A-LOGIN-01 | geplant |
 | FR-02 | Beim ersten Login ergänzt das Mitglied fehlende Daten (u. a. Lizenznummer, Klassierung), bevor es etwas anderes tun kann | A-LOGIN-03 | geplant |
 | FR-03 | Ein Konto hat mindestens die Rolle *Mitglied*; der Admin vergibt weitere | A-ROLLE-01 | geplant |
-| FR-04 | Austritt: Konto sofort gesperrt. Nach 3 Monaten wird das Konto gelöscht und das Mitglied auf Vor- und Nachname reduziert (Status *gelöscht*), damit vergangene Resultate lesbar bleiben | [Datenschutz](datenschutz.md#löschen), Annahme K-38 | geplant |
+| FR-04 | Austritt: Konto sofort gesperrt, Status *ausgetreten* (inaktiv). Tritt das Mitglied innert der Frist wieder ein, wird es wieder *aktiv*. Nach der Frist wird das Konto gelöscht und das Mitglied auf Vor- und Nachname reduziert (Status *gelöscht*), damit vergangene Resultate lesbar bleiben (Vorschlag K-38: Frist 1 Jahr) | [Datenschutz](datenschutz.md#löschen) | geplant |
 | FR-05 | Anmelden geht nur, solange das Turnier den Status *Anmeldung offen* hat (bis Anmeldeschluss) | A-ANMELDUNG-07 | geplant |
 | FR-06 | Ein Spieler hat je Turnier höchstens 3 Anmeldungen, die nicht *abgelehnt* oder *zurückgezogen* sind. Wildcard-Anträge zählen mit; ein Doppel zählt für beide Partner (Annahme K-27) | A-ANMELDUNG-02 | geplant |
 | FR-07 | MyTCO schlägt nur Kategorien vor, die nach Geschlecht, Jahrgang und Klassierung passen; im Doppel muss auch der Partner passen (Annahme K-27) | A-ANMELDUNG-03 | geplant |
@@ -121,7 +122,7 @@ classDiagram
 | Anmeldung | *bestätigt* (ohne Wildcard sofort) · *beantragt* → *bestätigt* / *abgelehnt* (mit Wildcard) · jederzeit → *zurückgezogen* (FR-10) |
 | Resultat | *gemeldet* → *bestätigt* / *bestritten* → *bestätigt* (Entscheid des CM-Verantwortlichen) |
 | Lizenzantrag | *beantragt* → *exportiert* → *erledigt* · *beantragt* → *zurückgezogen* |
-| Mitglied | *aktiv* → *ausgetreten* → *gelöscht* nach 3 Monaten, nur noch der Name (FR-04) |
+| Mitglied | *aktiv* → *ausgetreten* (inaktiv) → *gelöscht* nach der Frist, nur noch der Name · *ausgetreten* → *aktiv* bei Wiedereintritt (FR-04) |
 
 ## Ausblick
 

@@ -99,7 +99,10 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
   für alle kommt später (A-LOGIN-06). Der Vorstand hat danach gefragt (K-16.3). Weder ein
   Passwort noch der freiwillige Passkey (A-LOGIN-07) helfen, solange sich das Konto per Mail
   zurückholen lässt; der Passkey ist nur Komfort (Projektleiter, 03.11.2026). Schutz brächte
-  erst ein Passkey, der den Mail-Code für das Konto sperrt.
+  erst ein Passkey, der den Mail-Code für das Konto sperrt. Darum die Bitte an Admins und
+  Verantwortliche, ihr E-Mail-Postfach mit einer Zwei-Faktor-Anmeldung zu schützen; ihr
+  Postfach öffnet auch den Admin-Bereich (SI-08). Der Projektleiter sagt das bei der Vergabe
+  der Rolle (Projektleiter, 03.11.2026).
 - **Ein entsperrtes Handy mit offenem Mailprogramm** überwindet auch SI-08 und SI-09. Beide
   schützen vor allem gegen ein gestohlenes Cookie auf einem anderen Gerät; dagegen hilft erst
   ein Faktor wie ein Passkey (A-LOGIN-07). Ein SMS-Code hilft nicht, die SMS käme aufs selbe

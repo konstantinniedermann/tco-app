@@ -39,8 +39,9 @@ Sie selbst einschalten. Für nichts anderes.
 Push-Nachrichten stellt der Hersteller Ihres Browsers oder Handys zu (z. B. Google, Apple);
 sie enthalten keine Daten anderer Mitglieder.
 
-**Wie lange:** Solange Sie Mitglied sind. Nach einem Austritt wird Ihr Konto gesperrt und
-nach 3 Monaten gelöscht; Ihr Name bleibt in vergangenen Resultaten.
+**Wie lange:** Solange Sie Mitglied sind. Nach einem Austritt wird Ihr Konto gesperrt; Ihre
+Daten bleiben noch eine Frist lang, falls Sie zurückkommen (**Vorschlag K-38:** 1 Jahr), und werden
+dann gelöscht. Ihr Name bleibt in vergangenen Resultaten.
 
 **Login:** Sie loggen sich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 Ihr Gerät das Login mit einem Cookie, bis Sie MyTCO ein Jahr nicht genutzt haben oder sich

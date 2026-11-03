@@ -57,6 +57,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
 | A-MITGLIED-06 | Der Admin sieht im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Admin, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | geplant |
 | A-MITGLIED-07 | Der Admin, der die Mitgliederverwaltung macht, liest die Mitgliederliste aus Fairgate ein (Excel oder CSV) und führt so Ein- und Austritte nach; zum Start erfasst der Projektleiter die Mitglieder | K-17.1 | CM-Anmeldung\* | offen (hängt an K-45) |
+| A-MITGLIED-08 | Ein Mitglied erfasst sein Kind und erledigt für es das Administrative (Daten, CM-Anmeldung), bis das Kind ab der Altersgrenze des Vereins ein eigenes Login hat (Vorschlag K-08) | K-46, PL | CM-Anmeldung\* | offen (hängt an K-08) |
 
 ### ROLLE — Benutzerrollen
 

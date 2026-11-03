@@ -10,6 +10,8 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 - Antworten des Vorstands vom 03.11.2026 übertragen: neue Termine der Etappen, Junioren ab der
   CM 2027, Passkey freiwillig als Komfort ab *Mitglieder-Login*, Einlesen der Mitgliederliste geplant,
   Kosten für 300–500 Mitglieder.
+- Vorschläge an den Verein: Eltern führen das Konto ihres Kindes bis zu einer Altersgrenze (K-08),
+  ausgetretene Mitglieder bleiben eine Frist lang inaktiv (K-38).
 
 ## 0.3.0 — Test-Umgebung und Absicherungen, nicht ausgeliefert
 

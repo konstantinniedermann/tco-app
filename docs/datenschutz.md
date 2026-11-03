@@ -61,8 +61,9 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 
 ## Löschen
 
-- **Austritt:** Konto sofort gesperrt, Daten nach 3 Monaten gelöscht; der Name bleibt in
-  vergangenen Resultaten (**Vorschlag K-38**). Vom Austritt erfährt MyTCO über die eingelesene Mitgliederliste (A-MITGLIED-07, K-17.1).
+- **Austritt:** Konto sofort inaktiv (Login gesperrt). Die Daten bleiben eine Frist lang, falls
+  das Mitglied zurückkommt, dann werden sie gelöscht; der Name bleibt in vergangenen
+  Resultaten (**Vorschlag K-38:** 1 Jahr; die Frist legt der Verein fest). Vom Austritt erfährt MyTCO über die eingelesene Mitgliederliste (A-MITGLIED-07, K-17.1).
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Eingelesene Mitgliederliste** (A-MITGLIED-07): wird nach dem Einlesen nicht aufbewahrt;
@@ -79,15 +80,18 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 
 ## Junioren
 
-Junioren spielen ab der Clubmeisterschaft 2027 mit und erhalten ein Konto wie alle Mitglieder
-(K-46): dieselben Felder, dieselben Rechte, der Login-Brief geht an ihre Postadresse. Über
-Junioren speichert MyTCO nicht mehr als über Erwachsene. Sie werden zum Start mit allen Mitgliedern erfasst (K-17.1), spätestens
-bis zur CM-Anmeldung.
+Junioren spielen ab der Clubmeisterschaft 2027 mit (K-46). Über Junioren speichert MyTCO nicht
+mehr als über Erwachsene. Sie werden zum Start mit allen Mitgliedern erfasst (K-17.1),
+spätestens bis zur CM-Anmeldung.
 
-Offen (hängt an K-08): Führt das Kind das Konto selbst oder die Eltern? Davon hängt ab, wessen
-E-Mail und Telefon im Konto stehen und was Gegner und Doppelpartner sehen (K-31). Eine
-E-Mail-Adresse gehört zu höchstens einem Mitglied (FR-25); eine Familienadresse für mehrere
-Kinder geht so nicht.
+**Vorschlag K-08:**
+
+- Ein Mitglied erfasst sein Kind und erledigt für es das Administrative (Daten, CM-Anmeldung).
+  Das Kind braucht dann weder eigene E-Mail noch eigenes Login; für Gegner und Doppelpartner
+  gelten E-Mail und Telefon des Elternteils (K-31).
+- Ab einem Alter, das der Verein festlegt, erhält der Junior ein eigenes Login.
+- Die Altersgrenze steht danach hier und in der Datenschutzerklärung. Offen ist auch, was gilt,
+  wenn die Eltern nicht Mitglied sind.
 
 ## Rechte der Mitglieder
 
