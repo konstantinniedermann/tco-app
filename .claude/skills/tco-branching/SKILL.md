@@ -43,7 +43,8 @@ nicht von `origin/dev`. Ab da gelten Pfade relativ zum Worktree; der Hauptordner
 zum Merge nicht angefasst. Einmal pro Worktree `make hooks` ist nicht nötig — die
 Git-Konfiguration (`core.hooksPath`) gilt für alle Worktrees.
 Wer Code ändert: im neuen Worktree `npm ci --ignore-scripts` (Hooks brauchen `node_modules`;
-`make check` zusätzlich Docker Desktop).
+`make check` zusätzlich Docker Desktop). Für `make dev` und `make seed` braucht der Worktree eine
+eigene `.env` (`cp .env.example .env`); sie ist gitignoriert und fehlt in jedem neuen Worktree.
 
 **2 — Arbeiten:** TDD bzw. Doku, Dateien einzeln stagen, committen, Branch pushen
 (`git push -u origin <typ>/issue-NNN` — löst kein Deploy aus). Spec- und Plan-Dateien

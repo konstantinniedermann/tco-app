@@ -35,12 +35,16 @@ Docker Desktop, gitleaks.
 npm ci --ignore-scripts
 npm exec --no -- playwright install chromium webkit
 make hooks   # einmalig: Git-Hooks aktivieren
-cp .env.example .env   # einmalig: lokale Einstellungen (nur erfundene Werte)
+cp .env.example .env   # je Ordner bzw. Worktree: lokale Einstellungen (nur erfundene Werte)
 make db      # lokale PostgreSQL und Mail-Fänger Mailpit starten
 make seed    # erfundene Mitglieder anlegen, gibt einen Brief-Code zum Anmelden aus
 make dev     # Entwicklungsserver
 make check   # alle Prüfungen (braucht Docker)
 ```
+
+Neue Migration nach einer Änderung an `src/lib/server/db/schema.ts`: `npm run db:generate`
+(schreibt sie nach `drizzle/`); eingespielt wird sie lokal mit `make seed`, in den Tests und
+beim Ausliefern von selbst.
 
 Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make musterbrief` erzeugt
 einen Musterbrief als PDF unter `musterbrief/musterbrief.pdf`.
@@ -56,8 +60,9 @@ Alle weiteren Befehle: `make help`.
 - Jede Änderung hängt an einem Issue mit Definition of Done.
 - Fertig heisst nachgewiesen: Tests, CI oder Screenshot belegen die Änderung.
 - Vor jedem Commit: `make check` (dasselbe prüft die CI). Einmalig `make hooks` aktiviert
-  die versionierten Git-Hooks: Secret-Scan und Doku-Check vor jedem Commit, kein direkter
-  Push auf `main`.
+  die versionierten Git-Hooks: vor jedem Commit Secret-Scan und `make docs` (nur Doku) bzw.
+  `make check-schnell` (mit Code), vor dem Push `make check`, wenn Code dabei ist; kein
+  direkter Push auf `main`.
 
 ## Datenschutz
 

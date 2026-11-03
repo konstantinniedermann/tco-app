@@ -283,6 +283,10 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 | Docker-Image baut | ADR-003 | vorhanden |
 | Rauchtest des Images (Start, Migration, `/api/status`) | ADR-003 | vorhanden |
 | Rechte der Workflows (`workflow-rechte.ts`) | dieses Konzept | vorhanden |
+| Übersprungene oder bedingte Tests nur mit Kommentar `skip: <Grund>` (`skip.ts`) | Testkonzept | vorhanden |
+| Annahmen zu beantworteten Fragen an den Verein aufgelöst (`annahmen.ts`) | Abklärungen | vorhanden |
+| Oberfläche nur aus Tokens des Leitbilds (`design-tokens.ts`, `design-festwerte.ts`) | UI-Leitbild | vorhanden |
+| Node-Hauptversion wie in `.nvmrc`, sonst enden Prüfskripte still (`pruefe-node.sh`) | — | vorhanden |
 
 ## Abhängigkeiten
 
