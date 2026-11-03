@@ -46,7 +46,8 @@ flowchart LR
   D --> C1[CI]
   C1 -->|grün| T[Test-Umgebung]
   T --> K[Checkliste auf echten Handys]
-  K --> R[Version erhöhen auf dev]
+  K --> A[Doku-Abgleich auf dev]
+  A --> R[Version erhöhen auf dev]
   R --> P[PR dev → main]
   P --> C2[CI]
   C2 -->|grün, Merge| L[Live]
@@ -56,6 +57,11 @@ flowchart LR
 - **Freigabe:** Der Merge des PR nach `main` geht ohne weiteren Knopf live; `main` ist
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
   abgehakt und das Release freigegeben hat (ohne Server: Ausnahmen unter [Versionen](#versionen)).
+- **Doku-Abgleich:** Vor jedem Release, auch einem reinen Doku-Release, wird die Doku gegen
+  Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Nach
+  dem Versions-Commit prüft `make release-check`, ob Version, [Versionen](versionen.md) und
+  Tags zusammenpassen. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre führt,
+  hält das Release auf. Ablauf im Skill `tco-branching`.
 - **Version:** Vor dem PR erhöht ein Commit auf `dev` die Version in `package.json` und macht
   aus *Unveröffentlicht* in den [Versionen](versionen.md) die neue Nummer. Nach der
   erfolgreichen Live-Auslieferung setzt die CI den Tag und das GitHub-Release; nur dieser

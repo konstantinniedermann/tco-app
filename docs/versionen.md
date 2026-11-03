@@ -7,6 +7,10 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+- Doku-Abgleich vor jedem Release dev → main (aus Munica übernommen): Doku-Audit gegen Code
+  und Konfiguration, Issue-Nummern gegen die echten Titel, dazu `make release-check` für
+  Version, Versionen und Tags in beide Richtungen; Ablauf im Skill `tco-branching`.
+
 ## 0.2.0 — Login und Auslieferung, nicht ausgeliefert
 
 Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test
