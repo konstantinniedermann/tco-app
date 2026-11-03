@@ -14,6 +14,7 @@ import {
 	normalisiereBriefCode,
 	normalisiereMailCode
 } from './codes.ts';
+import { ipSchluessel } from './ip-schluessel.ts';
 import { baueCodeMail } from './mail.ts';
 import { beendeAlleSitzungen, beendeSitzung, erstelleSitzung, pruefeSitzung } from './sitzung.ts';
 
@@ -110,10 +111,11 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 		ip: string,
 		alteKennung?: string
 	): Promise<LoginErgebnis> {
-		if (!bremsen.briefFehlerProIp.erlaubt(ip)) return { ergebnis: 'zu-viele' };
+		const ipKey = ipSchluessel(ip);
+		if (!bremsen.briefFehlerProIp.erlaubt(ipKey)) return { ergebnis: 'zu-viele' };
 		const code = typeof eingabe === 'string' ? normalisiereBriefCode(eingabe) : null;
 		if (code === null) {
-			bremsen.briefFehlerProIp.zaehle(ip);
+			bremsen.briefFehlerProIp.zaehle(ipKey);
 			return { ergebnis: 'falsch' };
 		}
 		const hash = hashBriefCode(schluessel, code);
@@ -154,7 +156,7 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 				)
 			);
 		if (verbraucht) return { ergebnis: 'benutzt', kontakt };
-		bremsen.briefFehlerProIp.zaehle(ip);
+		bremsen.briefFehlerProIp.zaehle(ipKey);
 		return { ergebnis: 'falsch' };
 	}
 
@@ -191,10 +193,11 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 	}
 
 	function fordereMailCodeAn(email: unknown, ip: string) {
-		if (!bremsen.anfragenProIp.erlaubt(ip)) {
+		const ipKey = ipSchluessel(ip);
+		if (!bremsen.anfragenProIp.erlaubt(ipKey)) {
 			return { annahme: 'zu-viele' as const, arbeit: Promise.resolve() };
 		}
-		bremsen.anfragenProIp.zaehle(ip);
+		bremsen.anfragenProIp.zaehle(ipKey);
 		const adresse = normalisiereAdresse(email);
 		let arbeit: Promise<void> = Promise.resolve();
 		if (
@@ -215,9 +218,10 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 		ip: string,
 		alteKennung?: string
 	): Promise<LoginErgebnis> {
-		if (!bremsen.mailFehlerProIp.erlaubt(ip)) return { ergebnis: 'zu-viele' };
+		const ipKey = ipSchluessel(ip);
+		if (!bremsen.mailFehlerProIp.erlaubt(ipKey)) return { ergebnis: 'zu-viele' };
 		// Jeder Versuch zählt sofort, vor dem ersten await: parallele Anfragen umgehen die Grenze nicht.
-		bremsen.mailFehlerProIp.zaehle(ip);
+		bremsen.mailFehlerProIp.zaehle(ipKey);
 		const falsch = (): LoginErgebnis => ({ ergebnis: 'falsch' });
 		const adresse = normalisiereAdresse(email);
 		const code = typeof eingabe === 'string' ? normalisiereMailCode(eingabe) : null;

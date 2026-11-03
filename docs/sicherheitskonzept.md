@@ -21,7 +21,7 @@ naheliegende Angriffe, kein Hochsicherheitsbetrieb.
 
 | Nr | Bedrohung | Massnahme |
 |----|-----------|-----------|
-| B-01 | Ein Bot probiert Brief-Codes durch | 50 Bit pro Code, Limit pro IP (SI-01, SI-02) |
+| B-01 | Ein Bot probiert Brief-Codes durch | 50 Bit pro Code, Limit pro IP, IPv6 pro /64-Netz (SI-01, SI-02) |
 | B-02 | Jemand fordert massenhaft Mail-Codes an oder prüft, ob eine Adresse Mitglied ist | Immer dieselbe Antwort, Limits pro Adresse und IP (SI-04) |
 | B-03 | Ein Brief wird aus dem Briefkasten gestohlen und der Code zuerst benutzt | Das Mitglied sieht beim eigenen Versuch «Code schon benutzt» und meldet sich; der Admin beendet die fremde Sitzung und stellt einen neuen Brief aus (SI-02, SI-07) |
 | B-04 | Ein Handy mit offener Sitzung gerät in fremde Hände | Admin beendet alle Sitzungen des Kontos; der Admin-Bereich verlangt zusätzlich einen frischen Mail-Code (SI-07, SI-08) |
@@ -60,7 +60,7 @@ flowchart TD
 | Gültig | 90 Tage | 15 Minuten |
 | Eingabe | ohne E-Mail-Adresse | nach Eingabe der E-Mail-Adresse |
 | Ersetzt | nur den alten Brief-Code | nur den alten Mail-Code |
-| Bremse | 10 Fehlversuche pro IP und Stunde | 5 Fehlversuche, dann ungültig; 10 Versuche pro IP und Stunde; höchstens 3 Code-Mails pro Stunde und 10 pro Tag je Adresse |
+| Bremse | 10 Fehlversuche pro IP (IPv6: pro /64-Netz) und Stunde | 5 Fehlversuche, dann ungültig; 10 Versuche pro IP und Stunde; höchstens 3 Code-Mails pro Stunde und 10 pro Tag je Adresse |
 
 Beide Codes gelten nur einmal und sind nur als Hash gespeichert. Ein Login mit einem der
 beiden macht beide ungültig; der Brief-Code gilt dann als benutzt (RR-04, FR-24). «Hash»
@@ -72,9 +72,9 @@ Brief-Codes nicht durchrechenbar macht.
 | ID | Vorgabe |
 |----|---------|
 | SI-01 | Codes und Sitzungskennungen stammen aus einem kryptografisch sicheren Zufallsgenerator; Codes nur als HMAC gespeichert. Werte wie in der Tabelle [Login](#login) |
-| SI-02 | Der Brief-Code ist an kein eingegebenes Konto gebunden, darum gibt es keine Sperre pro Konto, sondern höchstens 10 Fehlversuche pro IP und Stunde. Ein schon benutzter Code meldet «Code schon benutzt — wende dich an [Kontakt, hängt an K-21]» |
+| SI-02 | Der Brief-Code ist an kein eingegebenes Konto gebunden, darum gibt es keine Sperre pro Konto, sondern höchstens 10 Fehlversuche pro IP und Stunde (IPv6 pro /64-Netz). Ein schon benutzter Code meldet «Code schon benutzt — wende dich an [Kontakt, hängt an K-21]» |
 | SI-03 | Ein Mail-Code ist nach 5 Fehlversuchen ungültig; das Mitglied fordert einen neuen an. Falscher, abgelaufener oder ungültiger Code und unbekannte Adresse erhalten immer dieselbe Meldung (SI-04). Jeder Versuch wird vor dem Vergleich gezählt, damit parallele Anfragen die Grenzen nicht umgehen |
-| SI-04 | Code anfordern: für bekannte und unbekannte Adressen dieselbe Antwort und dieselbe Antwortzeit; höchstens 3 Code-Mails pro Adresse und Stunde und 10 pro Tag, 10 Anfragen pro IP und Stunde. IP-Adressen nur dafür, höchstens 24 Stunden (DS-06) |
+| SI-04 | Code anfordern: für bekannte und unbekannte Adressen dieselbe Antwort und dieselbe Antwortzeit; höchstens 3 Code-Mails pro Adresse und Stunde und 10 pro Tag, 10 Anfragen pro IP (IPv6: pro /64-Netz) und Stunde. IP-Adressen nur dafür, höchstens 24 Stunden (DS-06) |
 | SI-05 | Logs enthalten keine Codes, Sitzungskennungen oder Kontaktdaten (DS-06); Fehlversuche werden gezählt, nicht mit Inhalt geloggt. Unerwartete Fehler loggt der Server nur mit festem Text, weil Meldungen der Datenbank Adressen enthalten können |
 | SI-06 | Sitzung: Das Cookie trägt eine zufällige Kennung, die Datenbank nur ihren Hash, eine Zeile je Gerät ohne IP-Adresse und Gerätename ([ADR-004](adr/adr-004-login-einmal-code.md)). Cookie `HttpOnly`, `Secure`, `SameSite=Lax`, ein Jahr gleitend (A-LOGIN-09), verlängert höchstens einmal am Tag, darum endet sie bis zu einen Tag früher; beim Login eine neue Kennung; Logout löscht Zeile und Cookie |
 | SI-07 | Widerruf über die Sitzungsversion (FR-24): Sperre und Austritt erhöhen sie automatisch, der Admin von Hand (Handy verloren, Code gestohlen) |

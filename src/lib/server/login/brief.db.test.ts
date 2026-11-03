@@ -182,6 +182,20 @@ describe('Brief-Code', () => {
 		expect((await dienst.loginMitBriefCode(code, 'ip-12')).ergebnis).toBe('ok');
 	});
 
+	test('SI-02: zwei Adressen desselben IPv6-/64-Netzes teilen sich die 10 Fehlversuche', async () => {
+		const { dienst } = baueDienst();
+		for (let i = 0; i < 10; i++) {
+			const ip = `2001:db8:a:b::${i + 1}`;
+			expect((await dienst.loginMitBriefCode('AAAAAAAAAA', ip)).ergebnis).toBe('falsch');
+		}
+		expect((await dienst.loginMitBriefCode('AAAAAAAAAA', '2001:db8:a:b:ffff::9')).ergebnis).toBe(
+			'zu-viele'
+		);
+		expect((await dienst.loginMitBriefCode('AAAAAAAAAA', '2001:db8:a:c::1')).ergebnis).toBe(
+			'falsch'
+		);
+	});
+
 	test('erfolgreiche und benutzte Logins zählen nicht in der Bremse', async () => {
 		const { dienst } = baueDienst();
 		const { kontoId } = await legeMitgliedAn(db);

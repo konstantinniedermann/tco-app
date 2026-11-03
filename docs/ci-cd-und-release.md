@@ -250,9 +250,9 @@ Hinter dem Reverse Proxy muss `adapter-node` die Client-IP aus einer Kopfzeile l
 der Proxy setzt (`ADDRESS_HEADER`, bei `X-Forwarded-For` dazu `XFF_DEPTH`). Sonst teilen alle
 Mitglieder die IP des Proxys, und die Bremsen pro IP sperren alle zusammen. `PROTOCOL_HEADER`
 nur setzen, wenn der Proxy die Kopfzeile zuverlässig setzt. Die E2E-Tests setzen sie nur,
-damit WebKit das Cookie auf `http://localhost` annimmt. IPv6-Clients vor dem Zählen auf ihr
-/64-Netz zusammenfassen (im Proxy oder in der App), sonst umgeht ein Wechsel der Adresse die
-Bremsen pro IP. Mail-Versand nur mit TLS: `smtps://` oder STARTTLS erzwungen.
+damit WebKit das Cookie auf `http://localhost` annimmt. IPv6-Clients fasst die App vor dem
+Zählen selbst auf ihr /64-Netz zusammen (`ip-schluessel.ts`), der Proxy muss das nicht tun.
+Mail-Versand nur mit TLS: `smtps://` oder STARTTLS erzwungen.
 
 **Mails lokal und in der CI:** Mailpit (`axllent/mailpit:v1.33`) fängt alle Mails ab, lokal
 über `docker-compose.yml` (`make db`; SMTP auf Port 51025, Oberfläche auf
