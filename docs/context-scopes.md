@@ -13,7 +13,7 @@ Welche Pfade bei welcher Aufgabe geladen werden. Die Tabelle wächst mit dem Cod
 | Server-Fachlogik und Schnittstellen | `src/lib/server/`, `src/routes/api/`, `src/hooks.server.ts`, `docs/fachmodell.md`, `docs/rollen-und-rechte.md` | `docs/recherche/` |
 | Login und Sitzung | `src/lib/server/login/`, `src/routes/api/login/`, `src/routes/login/`, `src/lib/login/`, `src/routes/api/sitzung/`, `src/routes/api/logout/`, `src/hooks.server.ts`, `src/lib/server/einstellungen.ts`, `docs/sicherheitskonzept.md`, `docs/adr/adr-004-login-einmal-code.md` | `docs/recherche/` |
 | Brief | `src/lib/server/brief/`, `scripts/musterbrief.ts` | `docs/recherche/` |
-| Datenbank und Migrationen | `src/lib/server/db/`, `drizzle/`, `drizzle.config.ts`, `scripts/migrate.ts`, `scripts/seed-lokal.ts`, `docker-compose.yml` | `docs/recherche/` |
+| Datenbank und Migrationen | `src/lib/server/db/`, `drizzle/`, `drizzle.config.ts`, `scripts/migrate.ts`, `scripts/seed-lokal.ts`, `scripts/testdaten.ts`, `scripts/erfundene-mitglieder.ts`, `docker-compose.yml` | `docs/recherche/` |
 | Arbeitsweise, Issues | `docs/issue-konventionen.md`, `docs/abklaerungen.md`, `.github/ISSUE_TEMPLATE/`, `CLAUDE.md`, `.claude/skills/tco-branching/` | `docs/recherche/` |
 | Tests planen und schreiben | `tests/`, `**/*.test.ts`, `vitest.config.ts`, `playwright.config.ts`, `scripts/pruefungen/testmuster.ts`, `docs/testkonzept.md`, `docs/fachmodell.md`, `docs/rollen-und-rechte.md`, `docs/anforderungen/anforderungen.md`, `docs/datenschutz.md` | `docs/recherche/` |
 | Betrieb und Auslieferung | `betrieb/`, `tests/betrieb/`, `scripts/ci/`, `.github/workflows/`, `Dockerfile`, `docs/ci-cd-und-release.md`, `docs/sicherheitskonzept.md` | `docs/recherche/` |

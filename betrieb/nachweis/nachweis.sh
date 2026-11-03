@@ -2,10 +2,10 @@
 # Lokaler Gesamtnachweis auf Docker Desktop: nachweis.sh [image] (Standard mytco:lokal).
 # Baut in einem Temp-Ordner einen Wegwerf-Server (MYTCO_BASIS) auf, schiebt das Image in eine
 # lokale Registry und liefert über den Türsteher bin/ausliefern-ssh nach Test und Live aus,
-# so wie es der Server tut. Prüft HTTPS über Caddy, die Trennung der Umgebungen, den Rückfall,
-# Sicherung/Probe/Wiederherstellung (auch einer älteren Sicherung nach einer neuen Migration),
-# die Sicherung vor einer Live-Auslieferung, das Abweisen einer kaputten Einrichtung und dass
-# der Proxy keine IP-Adressen protokolliert.
+# so wie es der Server tut. Prüft die Testdaten auf Test, HTTPS über Caddy, die Trennung der
+# Umgebungen, den Rückfall, Sicherung/Probe/Wiederherstellung (auch einer älteren Sicherung nach
+# einer neuen Migration), die Sicherung vor einer Live-Auslieferung, das Abweisen einer kaputten
+# Einrichtung und dass der Proxy keine IP-Adressen protokolliert.
 # Ausgabe je Prüfung "prüfung: <name> … ok|fehler", am Ende die Summe; Exit 1 bei einem Fehler.
 # Alle Werte sind erfunden. Bei jedem Ende wird aufgeräumt: Compose-Projekte mytco-test,
 # mytco-live, mytco-proxy samt Netzen und Volumes, Registry, gebaute Images, Temp-Ordner.
@@ -444,6 +444,54 @@ p1_laeuft() {
 			return 1
 		}
 	done
+}
+
+psql_test() {
+	docker exec mytco-test-db-1 psql -U mytco -d mytco -At -c "$1"
+}
+
+# Testdaten nach dem Zurücksetzen von Test: Mitglieder angelegt, der Mail-Versuch scheitert
+# (smtp://mail.invalid), und das Protokoll nennt keine Adresse (DS-06).
+p1_testdaten() {
+	local log="$BASIS/test/protokoll.log" anzahl adressen
+	grep -qxF "testdaten: 3 erfundene Mitglieder angelegt" "$log" || {
+		echo "Zeile «3 erfundene Mitglieder angelegt» fehlt in test/protokoll.log"
+		return 1
+	}
+	grep -qxF "testdaten: Mail mit Brief-Code nicht versandt" "$log" || {
+		echo "Zeile «Mail mit Brief-Code nicht versandt» fehlt in test/protokoll.log"
+		return 1
+	}
+	anzahl=$(psql_test "select count(*) from mitglied")
+	[ "$anzahl" = 3 ] || {
+		echo "test-db hat $anzahl Mitglieder, erwartet 3"
+		return 1
+	}
+	adressen=$(grep -c '@example\.org' "$log" || true)
+	[ "$adressen" = 0 ] || {
+		echo "test/protokoll.log enthält $adressen Zeilen mit einer Adresse"
+		return 1
+	}
+	[ "$(psql_live "select count(*) from mitglied")" = 0 ] || {
+		echo "live-db hat Mitglieder"
+		return 1
+	}
+}
+
+# Von Hand ein zweites Mal: bricht ab, weil schon Mitglieder da sind; nichts doppelt.
+p1_testdaten_zweimal() {
+	local ausgabe rc=0
+	ausgabe=$(docker exec mytco-test-app-1 node scripts/testdaten.ts 2>&1) || rc=$?
+	echo "$ausgabe"
+	[ "$rc" != 0 ] || {
+		echo "zweiter Lauf endete mit Exit 0"
+		return 1
+	}
+	[ "$ausgabe" = "testdaten: Mitglieder schon vorhanden: testdaten laufen nur auf einer leeren Datenbank" ] || {
+		echo "unerwartete Ausgabe"
+		return 1
+	}
+	[ "$(psql_test "select count(*) from mitglied")" = 3 ]
 }
 
 # --- 2 HTTPS über Caddy -------------------------------------------------------------------
@@ -976,6 +1024,8 @@ pruefung "1 ausliefern-ssh test D1 → ok" erwarte_lauf ok test "$D1"
 pruefung "1 ausliefern-ssh live D1 → ok" erwarte_lauf ok live "$D1"
 pruefung "1 image per digest aus der registry geholt" p1_pull "$ABRUFE_VORHER"
 pruefung "1 test und live laufen mit D1" p1_laeuft
+pruefung "1 testdaten auf test geladen, mail-versuch protokolliert" p1_testdaten
+pruefung "1 testdaten zweiter lauf → abgebrochen, nichts doppelt" p1_testdaten_zweimal
 # Ohne laufende Umgebungen sind alle weiteren Prüfungen ohne Aussage.
 [ "$ANZAHL_FEHLER" = 0 ] || summe
 

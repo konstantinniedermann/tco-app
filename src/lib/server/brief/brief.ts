@@ -1,4 +1,5 @@
 import qrcode from 'qrcode-generator';
+import { formatiereDatum } from '../datum.ts';
 import { formatiereBriefCode } from '../login/codes.ts';
 import { SYMBOL_MENUE, SYMBOL_TEILEN } from './symbole.ts';
 
@@ -89,13 +90,6 @@ function maskiere(text: string): string {
 	return text.replace(/[&<>"']/g, (zeichen) => ZEICHEN[zeichen]);
 }
 
-const DATUM = new Intl.DateTimeFormat('de-CH', {
-	day: '2-digit',
-	month: '2-digit',
-	year: 'numeric',
-	timeZone: 'Europe/Zurich'
-});
-
 /** QR-Code als skalierbares SVG; Ruhezone 4 Module (cellSize 1, margin 4). */
 function qrSvg(adresse: string): string {
 	const qr = qrcode(0, 'M');
@@ -140,7 +134,7 @@ ${DRUCK_CSS}
 <div>
 <p class="brief-code-titel">Dein persönlicher Code</p>
 <p class="brief-code">${code}</p>
-<p>gültig bis ${DATUM.format(d.gueltigBis)}</p>
+<p>gültig bis ${formatiereDatum(d.gueltigBis)}</p>
 </div>
 </div>
 <div class="brief-anleitung">

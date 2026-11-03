@@ -104,6 +104,14 @@ Doku-Merge ändert ihn nicht.
    Update von Dependabot) oder `proxy.env` geändert hat. Dann Migrationen ausführen, Container
    neu starten. Auf Test wird die Datenbank dabei neu aufgesetzt. Bricht der Lauf mitten in der
    Übernahme ab, wird alles Übernommene zurückgesetzt.
+   **Testdaten (nur Test, Schritt «testdaten laden»):** Nach der Migration legt
+   `scripts/testdaten.ts` die erfundenen Mitglieder samt Konto an und schickt für Erika Beispiel
+   einen Brief-Code per Mail («Brief-Code für die Test-Umgebung», mit Code, Gültigkeit und
+   Adresse der App); durch die Umleitung landet sie beim Projektleiter. Das Skript bricht ab,
+   ohne etwas zu schreiben, wenn `MAIL_NUR_AN` leer ist (also nie auf Live, auch nicht von Hand)
+   oder schon Mitglieder da sind; dann scheitert die Auslieferung. Scheitert nur die Mail,
+   bleiben die Testdaten, und das Protokoll hält «Mail mit Brief-Code nicht versandt» fest. Code
+   und Adressen stehen nie im Protokoll.
 5. **Prüfen:** Antwortet die App nicht innert einer Minute (S) auf ihre Statusabfrage,
    startet das Skript wieder das vorherige Image. Die CI erfährt nur `ok` oder `fehler`,
    keine Logs der App, denn CI-Logs liegen bei GitHub in den USA (DS-01, DS-06).
@@ -241,7 +249,7 @@ werden sie nicht geprüft.
 | `DATABASE_URL` | Verbindung zur PostgreSQL-Datenbank der Umgebung | ja |
 | `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
 | `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
-| `MAIL_NUR_AN` | Nur Test: alle Mails werden an diese eine Adresse umgeleitet. Auf Live leer. Ein Wert, der keine Mail-Adresse ist, lässt die App nicht starten | nein |
+| `MAIL_NUR_AN` | Nur Test: alle Mails werden an diese eine Adresse umgeleitet. Auf Live leer. Ein Wert, der keine Mail-Adresse ist, lässt die App nicht starten. Ohne sie lädt `scripts/testdaten.ts` nichts | nein |
 | `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
 | `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text, steht im Brief und in der Meldung «Code schon benutzt» (Annahme K-21) | ja |
 | `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
