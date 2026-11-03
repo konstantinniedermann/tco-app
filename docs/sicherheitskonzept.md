@@ -60,7 +60,7 @@ flowchart TD
 | Gültig | 90 Tage | 15 Minuten |
 | Eingabe | ohne E-Mail-Adresse | nach Eingabe der E-Mail-Adresse |
 | Ersetzt | nur den alten Brief-Code | nur den alten Mail-Code |
-| Bremse | 10 Fehlversuche pro IP (IPv6: pro /64-Netz) und Stunde | 5 Fehlversuche, dann ungültig; 10 Versuche pro IP und Stunde; höchstens 3 Code-Mails pro Stunde und 10 pro Tag je Adresse |
+| Bremse | 10 Fehlversuche pro IP (IPv6: pro /64-Netz) und Stunde | 5 Fehlversuche, dann ungültig; 10 Versuche pro IP (IPv6: pro /64-Netz) und Stunde; höchstens 3 Code-Mails pro Stunde und 10 pro Tag je Adresse |
 
 Beide Codes gelten nur einmal und sind nur als Hash gespeichert. Ein Login mit einem der
 beiden macht beide ungültig; der Brief-Code gilt dann als benutzt (RR-04, FR-24). «Hash»
