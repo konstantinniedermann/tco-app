@@ -241,6 +241,7 @@ werden sie nicht geprüft.
 | `DATABASE_URL` | Verbindung zur PostgreSQL-Datenbank der Umgebung | ja |
 | `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
 | `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
+| `MAIL_NUR_AN` | Nur Test: alle Mails gehen an diese eine Adresse. Auf Live leer. Ein Wert, der keine Mail-Adresse ist, lässt die App nicht starten | nein |
 | `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
 | `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text, steht im Brief und in der Meldung «Code schon benutzt» (Annahme K-21) | ja |
 | `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
@@ -252,7 +253,9 @@ Mitglieder die IP des Proxys, und die Bremsen pro IP sperren alle zusammen. `PRO
 nur setzen, wenn der Proxy die Kopfzeile zuverlässig setzt. Die E2E-Tests setzen sie nur,
 damit WebKit das Cookie auf `http://localhost` annimmt. IPv6-Clients fasst die App vor dem
 Zählen selbst auf ihr /64-Netz zusammen (`ip-schluessel.ts`), der Proxy muss das nicht tun.
-Mail-Versand nur mit TLS: `smtps://` oder STARTTLS erzwungen.
+Mail-Versand nur mit TLS: `smtps://` oder `smtp://…?requireTLS=true`. Mit `NODE_ENV=production`
+lehnt die App jede andere SMTP-URL ab. Ausnahme sind Hosts, die nie zu einem echten Empfänger
+führen: `localhost`, `127.0.0.1`, `[::1]` und Namen auf `.invalid` (so läuft das Image im Rauchtest).
 
 **Mails lokal und in der CI:** Mailpit (`axllent/mailpit:v1.33`) fängt alle Mails ab, lokal
 über `docker-compose.yml` (`make db`; SMTP auf Port 51025, Oberfläche auf

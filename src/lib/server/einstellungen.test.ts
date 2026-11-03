@@ -51,9 +51,12 @@ describe('leseEinstellungen', () => {
 	});
 
 	test('nimmt in Produktion einen eigenen Schlüssel an', () => {
-		expect(leseEinstellungen({ ...vollstaendig, NODE_ENV: 'production' }).codeSchluessel).toBe(
-			schluessel
-		);
+		const env = {
+			...vollstaendig,
+			MYTCO_SMTP_URL: 'smtps://mail.example.org:465',
+			NODE_ENV: 'production'
+		};
+		expect(leseEinstellungen(env).codeSchluessel).toBe(schluessel);
 	});
 
 	test('Standardadresse ist https://my.tcolten.ch', () => {
@@ -80,4 +83,59 @@ describe('leseEinstellungen', () => {
 			}
 		}
 	);
+
+	describe('MAIL_NUR_AN', () => {
+		test('ohne Angabe oder leer ist mailNurAn undefined', () => {
+			expect(leseEinstellungen(vollstaendig).mailNurAn).toBeUndefined();
+			expect(leseEinstellungen({ ...vollstaendig, MAIL_NUR_AN: '' }).mailNurAn).toBeUndefined();
+		});
+
+		test('nimmt eine Adresse an', () => {
+			const env = { ...vollstaendig, MAIL_NUR_AN: 'pl@example.org' };
+			expect(leseEinstellungen(env).mailNurAn).toBe('pl@example.org');
+		});
+
+		test('wirft bei einem Wert ohne Adresse; der Fehlertext nennt keinen Wert', () => {
+			const env = { ...vollstaendig, MAIL_NUR_AN: 'keine adresse' };
+			expect(() => leseEinstellungen(env)).toThrow(new Error('MAIL_NUR_AN ist keine Mail-Adresse'));
+		});
+	});
+
+	describe('TLS-Pflicht in Produktion', () => {
+		const prod = (MYTCO_SMTP_URL: string) => ({
+			...vollstaendig,
+			MYTCO_SMTP_URL,
+			NODE_ENV: 'production'
+		});
+		const fehler = new Error('MYTCO_SMTP_URL ohne TLS (smtps:// oder requireTLS=true)');
+
+		test.each(['smtp://mail.example.org:587', 'smtp://mail.example.org:587?requireTLS=false'])(
+			'weist %s ab',
+			(url) => {
+				expect(() => leseEinstellungen(prod(url))).toThrow(fehler);
+			}
+		);
+
+		test.each([
+			'smtps://mail.example.org:465',
+			'smtp://mail.example.org:587?requireTLS=true',
+			'SMTPS://MAIL.EXAMPLE.ORG'
+		])('nimmt %s an', (url) => {
+			expect(leseEinstellungen(prod(url)).smtpUrl).toBe(url);
+		});
+
+		test.each([
+			'smtp://localhost:51025',
+			'smtp://127.0.0.1:25',
+			'smtp://[::1]:25',
+			'smtp://mail.invalid:25'
+		])('nimmt %s ohne TLS an (Ausnahme: nie ein echter Empfänger)', (url) => {
+			expect(leseEinstellungen(prod(url)).smtpUrl).toBe(url);
+		});
+
+		test('ausserhalb von Produktion ist smtp:// ohne TLS erlaubt', () => {
+			const env = { ...vollstaendig, MYTCO_SMTP_URL: 'smtp://mail.example.org:25' };
+			expect(leseEinstellungen(env).smtpUrl).toBe('smtp://mail.example.org:25');
+		});
+	});
 });
