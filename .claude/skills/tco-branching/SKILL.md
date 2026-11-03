@@ -211,6 +211,10 @@ entfernen.
 
 - `docs/versionen.md`: Beide Sessions schreiben unter „Unveröffentlicht“ → bei Konflikt beide
   Einträge behalten (Konfliktregel in Schritt 4).
-- `docs/beobachtungen.md` hat `merge=union` (`.gitattributes`) und löst sich selbst.
+- `docs/beobachtungen.md`: Beide Sessions hängen unter „Offen“ an → bei Konflikt beide neuen
+  Einträge behalten. Einträge, die auf der anderen Seite gelöscht sind, bleiben gelöscht: Das ist
+  eine Auswertung, die sie ins Archiv verschoben hat. Ein Nachtrag des eigenen Branches zu einem
+  solchen Eintrag kommt als neuer Eintrag zurück, nicht der alte Eintrag. Kein `merge=union` — es holt
+  bei Konflikten gelöschte Einträge still zurück.
 - Nachrichten zwischen Sessions (`SendMessage`) können vom Empfänger zurückgehalten werden —
   Abschlussberichte daher in der eigenen Antwort ausgeben, nicht nur per Nachricht.
