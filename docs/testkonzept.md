@@ -77,11 +77,13 @@ Tests, wo sie prüfbar sind (z. B. DS-06: keine Einmal-Codes im Log), ohne Pflic
 Nur erfundene Daten (DS-08), nie echte Mitgliederdaten, auch nicht zur Fehlersuche und nie
 eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
 
-- Wenige erfundene Personen, von Hand geschrieben und fest im Repo, ohne Generator. Für die
-  Seed-Daten der lokalen Entwicklung dieselben Personen.
+- Wenige erfundene Personen, von Hand geschrieben und fest im Repo, ohne Generator für Namen
+  oder Adressen. Seed-Daten der lokalen Entwicklung und Musterbrief nehmen dieselben Personen.
+- Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
+  (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
 - E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern im Format
   `+41 00 …`, das es nicht gibt. Strassen erfunden.
-- Die CI meldet in Testdaten und Seed-Daten jede andere Mail-Domain.
+- Die CI meldet in Testdaten, Seed-Daten und Musterbrief jede andere Mail-Domain.
 - Einmal-Codes und Sitzungen in Tests sind erzeugt, nie fest eingetragen.
 
 ## Screenshots als Nachweis
