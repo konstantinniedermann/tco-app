@@ -40,7 +40,7 @@ Push-Nachrichten stellt der Hersteller Ihres Browsers oder Handys zu (z. B. Goog
 sie enthalten keine Daten anderer Mitglieder.
 
 **Wie lange:** Solange Sie Mitglied sind. Nach einem Austritt wird Ihr Konto gesperrt; Ihre
-Daten bleiben noch eine Frist lang, falls Sie zurückkommen (**Vorschlag K-38:** 1 Jahr), und werden
+Daten bleiben noch eine Frist lang, falls Sie zurückkommen [Frist, **Vorschlag K-38:** 1 Jahr], und werden
 dann gelöscht. Ihr Name bleibt in vergangenen Resultaten.
 
 **Login:** Sie loggen sich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
