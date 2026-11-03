@@ -177,6 +177,15 @@ snapshot_zeilen() {
 	awk '{ gsub(/\},\{"time":/, "}\n{\"time\":"); print }'
 }
 
+# Exit 0, wenn der ganze Wert ein Lauf-Name ist (lauf-…, nur Buchstaben und Ziffern). grep -x
+# prüft zeilenweise, daher Umbrüche vorab abfangen.
+ist_lauf_name() {
+	case "${1-}" in
+	*$'\n'*) return 1 ;;
+	esac
+	printf '%s\n' "${1-}" | grep -qxE 'lauf-[0-9A-Za-z]+'
+}
+
 # finde_lauf <umgebung> [lauf]: gibt die Lauf-ID aus. Nur Snapshots mit dem Tag der Umgebung
 # zählen (ein Live-Stand darf nie auf Test landen, DS-08). Vollständig ist ein Lauf erst mit
 # seinem zaehlung.txt-Snapshot (wird zuletzt geschrieben). Ohne Lauf der neueste vollständige
@@ -184,10 +193,7 @@ snapshot_zeilen() {
 finde_lauf() {
 	local umgebung="$1" lauf="${2-}" json="" treffer=""
 	if [ -n "$lauf" ]; then
-		case "$lauf" in
-		*$'\n'*) return 1 ;;
-		esac
-		printf '%s\n' "$lauf" | grep -qxE 'lauf-[0-9A-Za-z]+' || return 1
+		ist_lauf_name "$lauf" || return 1
 		json=$(restic_docker snapshots --tag "$umgebung,$lauf" --json </dev/null) || return 1
 		# Gegenprobe im selben Eintrag: Pfad der Zählung und beide Tags.
 		treffer=$(printf '%s\n' "$json" | snapshot_zeilen |
@@ -218,4 +224,17 @@ mail_umleitung_gesetzt() {
 	[ -f "$datei" ] || return 1
 	wert=$(sed -n 's/^MAIL_NUR_AN=//p' "$datei" | tail -n 1 | tr -d ' \t\r"'"'"'')
 	[ -n "$wert" ]
+}
+
+# nur_fehlerzahl <präfix>: liest die Ausgabe von pg_restore von stdin und gibt nur die Zahl der
+# Zeilen "pg_restore: error: …" aus, als eine Zeile "<präfix>: <n> Fehlerzeilen von pg_restore
+# (Inhalt verworfen)"; ohne Fehlerzeile nichts. Fehlermeldungen samt DETAIL und CONTEXT tragen
+# Werte aus der Datenbank; ins Protokoll kommt keiner davon (DS-06).
+nur_fehlerzahl() {
+	local n
+	n=$(grep -c '^pg_restore: error:' || true)
+	if [ "${n:-0}" -gt 0 ]; then
+		printf '%s: %s Fehlerzeilen von pg_restore (Inhalt verworfen)\n' "$1" "$n"
+	fi
+	return 0
 }

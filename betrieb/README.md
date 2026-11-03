@@ -63,8 +63,8 @@ trotzdem zu Ende.
 |-------|--------|
 | Auslieferung von Hand (Token für die private Ablage über die Standardeingabe) | `printf %s "$TOKEN" \| /opt/mytco/bin/ausliefern-ssh <umgebung> <digest>` |
 | Auf das vorherige Image zurück | `/opt/mytco/<umgebung>/betrieb/bin/zurueck <umgebung>` |
-| Sichern | `/opt/mytco/gemeinsam/bin/sichern <umgebung>` |
-| Wiederherstellen (neuester oder bestimmter Lauf) | `/opt/mytco/gemeinsam/bin/wiederherstellen <umgebung> [lauf-…]` |
+| Sichern (mit `ohne-aufraeumen` ohne `forget --prune`) | `/opt/mytco/gemeinsam/bin/sichern <umgebung> [ohne-aufraeumen]` |
+| Wiederherstellen (neuester oder bestimmter Lauf; sichert vorher) | `/opt/mytco/gemeinsam/bin/wiederherstellen <umgebung> [lauf-…] [ohne-sicherung]` |
 | Probe in einer Wegwerf-Datenbank | `/opt/mytco/gemeinsam/bin/probe <umgebung> [lauf-…]` |
 
 Ist in `live/geheim.env` `MAIL_NUR_AN` gesetzt (Leerzeichen und Anführungszeichen zählen
@@ -75,6 +75,19 @@ derselben Umgebung ein und braucht eine ausgelieferte Fassung (`<umgebung>/zusta
 ohne sie meldet es `fehler`. Es leert vorher die Tabellen der App samt der Liste der
 Migrationen, alles in einer Transaktion: Nach dem Zurückspielen einer älteren Sicherung läuft
 die nächste Auslieferung ihre Migrationen wieder sauber durch.
+
+Vor dem Einspielen sichert `wiederherstellen` den jetzigen Stand (`sichern <umgebung>
+ohne-aufraeumen`, damit der gewählte Lauf nicht weggeräumt wird); scheitert das, bricht es ab,
+ohne etwas zu ändern. Der Lauf wird vorher bestimmt: Ohne Angabe wird der bis dahin neueste
+eingespielt, nicht die eben angelegte Sicherung. Ist die Datenbank so kaputt, dass gerade diese
+Sicherung scheitert, gibt es den Notschalter `ohne-sicherung` (vor oder nach dem Lauf); dann wird
+nicht gesichert, und `protokoll.log` hält es fest. Nur von Hand auf dem Server; der Türsteher
+und die CI rufen `wiederherstellen` nie auf. Jede andere Angabe weist der Befehl mit `fehler` ab,
+bevor er etwas tut.
+
+Scheitert das Einspielen, steht im Protokoll nur der Fehlercode (SQLSTATE) bzw. bei `probe` die
+Zahl der Fehlerzeilen, nie ein Wert aus der Datenbank (DS-06). Zum Nachsehen bleibt die
+Sicherung selbst.
 
 ## Auslieferung ohne CI (keine Actions-Minuten)
 

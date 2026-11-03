@@ -155,8 +155,9 @@ S3-kompatiblem Ziel (Ziel legt [#10](https://github.com/konstantinniedermann/tco
 | Befehl | Zweck |
 |--------|-------|
 | `zurueck` | Zurück auf das vorherige Image. Migrationen fügen nur hinzu, darum geht das ohne Datenverlust; was die alte Version noch braucht, wird erst ein Release später entfernt |
-| `wiederherstellen` | Eine Sicherung derselben Umgebung zurückspielen. Auf Test findet der Befehl keinen Snapshot einer Live-Sicherung (DS-08) |
-| `probe` | Sicherung in einer Wegwerf-Datenbank einspielen, mit der Zählung vergleichen, `ok` oder `fehler` |
+| `sichern <umgebung> [ohne-aufraeumen]` | Datenbank sichern; mit `ohne-aufraeumen` ohne das Löschen nach 30 Tagen (`forget --prune`) |
+| `wiederherstellen <umgebung> [lauf] [ohne-sicherung]` | Eine Sicherung derselben Umgebung zurückspielen. Sichert vorher den jetzigen Stand (ohne Aufräumen; scheitert das, ändert sich nichts); ohne Lauf der bis dahin neueste. Der Notschalter `ohne-sicherung` lässt diese Sicherung weg und steht im Protokoll; nur von Hand auf dem Server, nie aus der CI oder dem Türsteher. Auf Test findet der Befehl keinen Snapshot einer Live-Sicherung (DS-08) |
+| `probe <umgebung> [lauf]` | Sicherung in einer Wegwerf-Datenbank einspielen, mit der Zählung vergleichen, `ok` oder `fehler` |
 
 **Netz und Header:** Ein Caddy-Proxy nimmt 80 und 443 an und erreicht beide Apps; die Datenbanken
 hängen nur an ihrem internen Netz, die Test-App erreicht Live nicht. Caddy behält die
@@ -170,7 +171,10 @@ Gegenprobe, dass der Filter etwas zu filtern hatte. Test verlangt ein Passwort.
 
 **Protokolle auf dem Server:** Was docker, psql und die App bei Auslieferung und Sicherung
 ausgeben, steht nur in `<umgebung>/protokoll.log` (je Umgebung, nur für den Betriebsbenutzer
-lesbar). Docker-Logs der Container rotieren nach Grösse (5 × 10 MB). Eine Rotation nach Zeit
+lesbar). Werte aus der Datenbank kommen dort nicht hin: Scheitert das Einspielen, schreibt
+`wiederherstellen` nur den Fehlercode (`psql` mit `VERBOSITY=sqlstate`) und `probe` nur die Zahl
+der Fehlerzeilen von `pg_restore`; Hauptzeile, `DETAIL` und `CONTEXT` der Meldungen werden
+verworfen (DS-06). Docker-Logs der Container rotieren nach Grösse (5 × 10 MB). Eine Rotation nach Zeit
 (höchstens 30 Tage, DS-06) für beide richtet
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) ein.
 

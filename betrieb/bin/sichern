@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# sichern <umgebung>: verschlüsselte Sicherung der Datenbank mit restic (30 Tage Aufbewahrung).
+# sichern <umgebung> [ohne-aufraeumen]: verschlüsselte Sicherung der Datenbank mit restic
+# (30 Tage Aufbewahrung). Mit ohne-aufraeumen entfällt nur das Aufräumen (forget --prune); so
+# ruft es wiederherstellen vor dem Einspielen auf, damit der gewählte Lauf nicht verschwindet.
 # Nimmt bewusst keine Umgebungssperre: ausliefern ruft es auf, während es die Sperre hält.
 # Das restic-Repo legt der Betrieb einmal von Hand an (README); fehlt es, meldet sichern fehler.
 # Der Dump geht per Pipe in restic, nie unverschlüsselt auf die Platte. Ausgabe nur
@@ -11,6 +13,14 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 UMGEBUNG="${1-}"
 pruefe_umgebung "$UMGEBUNG" || exit 1
+AUFRAEUMEN=1
+if [ "$#" -gt 1 ]; then
+	if [ "$#" -ne 2 ] || [ "$2" != ohne-aufraeumen ]; then
+		melde fehler
+		exit 1
+	fi
+	AUFRAEUMEN=0
+fi
 
 LOG="$MYTCO_BASIS/$UMGEBUNG/protokoll.log"
 LAUF="lauf-$(date -u +%Y%m%dT%H%M%SZ)"
@@ -90,9 +100,11 @@ printf '%s\n' "$VOR" |
 		scheitern "Ablage der Zählung gescheitert"
 	}
 
-schritt "aufraeumen"
-restic_docker forget --tag "$UMGEBUNG" --keep-within 30d --prune </dev/null >>"$LOG" ||
-	scheitern "Aufbewahrung (forget) gescheitert"
+if [ "$AUFRAEUMEN" = 1 ]; then
+	schritt "aufraeumen"
+	restic_docker forget --tag "$UMGEBUNG" --keep-within 30d --prune </dev/null >>"$LOG" ||
+		scheitern "Aufbewahrung (forget) gescheitert"
+fi
 
 echo "sichern: $LAUF abgelegt" >>"$LOG"
 melde ok

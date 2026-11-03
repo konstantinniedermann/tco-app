@@ -216,3 +216,37 @@ describe('mail_umleitung_gesetzt', () => {
 		expect(mitEnv(inhalt)).toBe(0);
 	});
 });
+
+// Von der Fehlerausgabe von pg_restore kommt nur die Zahl ins Protokoll (DS-06): DETAIL- und
+// CONTEXT-Zeilen tragen Werte aus der Datenbank.
+describe('nur_fehlerzahl', () => {
+	const zaehle = (eingabe: string) =>
+		fuehreAus(TREIBER, ['nur_fehlerzahl', 'probe'], { stdin: eingabe });
+
+	test.each([
+		['leere Eingabe', ''],
+		['ohne Fehlerzeile', 'pg_restore: warning: nichts\nirgendwas\n'],
+		['Fehlertext nicht am Zeilenanfang', 'DETAIL:  pg_restore: error: (x@example.org)\n']
+	])('0 Fehlerzeilen (%s): keine Ausgabe', (_name, eingabe) => {
+		const x = zaehle(eingabe);
+		expect(x.status).toBe(0);
+		expect(x.stdout).toBe('');
+	});
+
+	test('zwei Fehlerzeilen: genau eine Zeile mit der Zahl, ohne Werte', () => {
+		const x = zaehle(
+			[
+				'pg_restore: error: COPY failed for table "mitglied": ERROR:  duplicate key value',
+				'DETAIL:  Key (email)=(x@example.org) already exists.',
+				'CONTEXT:  COPY mitglied, line 1: "x@example.org"',
+				'pg_restore: error: could not execute query: ERROR:  x@example.org',
+				'pg_restore: warning: errors ignored on restore: 2',
+				''
+			].join('\n')
+		);
+		expect(x.status).toBe(0);
+		expect(x.stdout).toBe('probe: 2 Fehlerzeilen von pg_restore (Inhalt verworfen)\n');
+		expect(x.stdout).not.toContain('x@example.org');
+		expect(x.stderr).not.toContain('x@example.org');
+	});
+});
