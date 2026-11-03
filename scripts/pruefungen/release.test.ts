@@ -32,7 +32,8 @@ describe('pruefeRelease', () => {
 		version: '0.2.0',
 		versionMain: '0.1.0',
 		versionen: versionen(UNVEROEFFENTLICHT_LEER, V020_NICHT, V010_NICHT, VOR_010),
-		tags: []
+		tags: [],
+		nurDoku: false
 	};
 
 	it('meldet nichts bei einem stimmigen Stand', () => {
@@ -60,7 +61,21 @@ describe('pruefeRelease', () => {
 
 	it('lässt «Unveröffentlicht» stehen, wenn die Version gleich bleibt (Release nur Doku)', () => {
 		const md = versionen('## Unveröffentlicht\n\n- Doku.', V020_NICHT, V010_NICHT);
-		expect(pruefeRelease({ ...sauber, versionMain: '0.2.0', versionen: md })).toEqual([]);
+		expect(
+			pruefeRelease({ ...sauber, versionMain: '0.2.0', versionen: md, nurDoku: true })
+		).toEqual([]);
+	});
+
+	it('verlangt eine höhere Version, sobald das Release Code enthält', () => {
+		expect(pruefeRelease({ ...sauber, versionMain: '0.2.0' })).toEqual([
+			expect.stringContaining('Release enthält Code, aber die Version bleibt 0.2.0')
+		]);
+	});
+
+	it('meldet eine Version, die gegenüber main sinkt', () => {
+		expect(pruefeRelease({ ...sauber, versionMain: '0.10.0', nurDoku: true })).toEqual([
+			expect.stringContaining('Version sinkt von 0.10.0 auf 0.2.0')
+		]);
 	});
 
 	it('verlangt den Abschnitt «Unveröffentlicht»', () => {

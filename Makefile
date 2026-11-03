@@ -28,6 +28,7 @@ docs: ## Doku-Prüfung (Links, Struktur, Test-IDs; braucht nur Node, kein node_m
 	@node scripts/pruefungen/design-tokens.ts
 
 release-check: ## Vor dem Release dev → main: Version, docs/versionen.md und Tags abgleichen (holt Tags und origin/main)
+	@bash scripts/pruefe-node.sh
 	@node scripts/pruefungen/release.ts
 
 annahmen: ## Annahmen zu offenen Fragen an den Verein auflisten (alle, oder nur eine: make annahmen K=K-11)

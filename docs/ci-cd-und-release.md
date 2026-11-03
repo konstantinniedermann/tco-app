@@ -60,7 +60,8 @@ flowchart LR
 - **Doku-Abgleich:** Vor jedem Release, auch einem reinen Doku-Release, wird die Doku gegen
   Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Nach
   dem Versions-Commit prüft `make release-check`, ob Version, [Versionen](versionen.md) und
-  Tags zusammenpassen. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre führt,
+  Tags zusammenpassen; enthält das Release Code (auch Skripte oder Workflows), muss die
+  Version steigen, nur bei reiner Doku bleibt sie. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre führt,
   hält das Release auf. Ablauf im Skill `tco-branching`.
 - **Version:** Vor dem PR erhöht ein Commit auf `dev` die Version in `package.json` und macht
   aus *Unveröffentlicht* in den [Versionen](versionen.md) die neue Nummer. Nach der

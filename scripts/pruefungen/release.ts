@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { meldeErgebnis } from './dateien.ts';
+import { istNurDoku } from './nur-doku.ts';
 
 // Abgleich vor dem Release dev → main (`make release-check`, Ablauf im Skill tco-branching):
 // Version in package.json, Abschnitte in docs/versionen.md und Tags müssen zusammenpassen, in
@@ -23,7 +24,17 @@ export type Releasestand = {
 	/** Inhalt von docs/versionen.md. */
 	versionen: string;
 	tags: string[];
+	/** Ob origin/main...HEAD nur Doku ändert (Regel aus nur-doku.ts). */
+	nurDoku: boolean;
 };
+
+/** Negativ, null oder positiv wie bei sort: a kleiner, gleich oder grösser als b. */
+function vergleicheVersionen(a: string, b: string): number {
+	const teileA = a.split('.').map(Number);
+	const teileB = b.split('.').map(Number);
+	for (let i = 0; i < 3; i++) if (teileA[i] !== teileB[i]) return teileA[i] - teileB[i];
+	return 0;
+}
 
 type Ueberschrift = { text: string; zeile: number; inhalt: string[] };
 
@@ -68,6 +79,15 @@ export function pruefeRelease(stand: Releasestand): string[] {
 			`${VERSIONEN}: Kein Abschnitt «## ${stand.version}» für die Version aus package.json`
 		);
 
+	const vergleich = vergleicheVersionen(stand.version, stand.versionMain);
+	if (vergleich < 0)
+		befunde.push(`package.json: Version sinkt von ${stand.versionMain} auf ${stand.version}`);
+	else if (vergleich === 0 && !stand.nurDoku)
+		befunde.push(
+			`package.json: Release enthält Code, aber die Version bleibt ${stand.version} — ` +
+				`Versions-Commit fehlt (Skill tco-branching, Schritt 4a)`
+		);
+
 	const unveroeffentlicht = ueberschriften(stand.versionen).find(
 		({ text }) => text.trim() === '## Unveröffentlicht'
 	);
@@ -78,8 +98,8 @@ export function pruefeRelease(stand: Releasestand): string[] {
 		unveroeffentlicht.inhalt.some((zeile) => zeile.trim() !== '')
 	) {
 		befunde.push(
-			`${VERSIONEN}:${unveroeffentlicht.zeile}: «Unveröffentlicht» ist nicht leer, obwohl die Version ` +
-				`von ${stand.versionMain} auf ${stand.version} steigt — Einträge in den Abschnitt der neuen Version`
+			`${VERSIONEN}:${unveroeffentlicht.zeile}: «Unveröffentlicht» ist nicht leer, obwohl sich die Version ` +
+				`von ${stand.versionMain} auf ${stand.version} ändert — Einträge in den Abschnitt der neuen Version`
 		);
 	}
 
@@ -115,7 +135,10 @@ if (import.meta.main) {
 			version: versionAus(readFileSync('package.json', 'utf-8')),
 			versionMain: versionAus(git('show', 'origin/main:package.json')),
 			versionen: readFileSync(VERSIONEN, 'utf-8'),
-			tags: git('tag', '--list', 'v*').split('\n').filter(Boolean)
+			tags: git('tag', '--list', 'v*').split('\n').filter(Boolean),
+			nurDoku: istNurDoku(
+				git('diff', '--name-only', 'origin/main...HEAD').split('\n').filter(Boolean)
+			)
 		})
 	);
 }
