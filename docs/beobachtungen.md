@@ -116,6 +116,25 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-03 — Dependabot-PR #38 (TypeScript 7) rot wegen Peer-Abhängigkeiten
+
+**Thema:** Betrieb
+
+**Fundort:** PR #38, CI-Lauf 41442207777 (Jobs „Prüfen", „E2E", „Docker-Image");
+`package.json` (`typescript`, `svelte-check`, `typescript-eslint`, `@sveltejs/kit`).
+
+**Beobachtung:** `npm ci` bricht mit ERESOLVE ab, bevor Lint, Tests oder Build laufen.
+Stand 03.11.: `svelte-check` 4.7.8 verlangt TypeScript `^5 || ^6`, `typescript-eslint`
+8.72.1 `>=4.8.4 <6.1.0`, `@sveltejs/kit` 3.1.1 `^6`. Keine dieser Fassungen erlaubt
+TypeScript 7 (Neufassung des Compilers in Go). Am eigenen Code liegt es nicht.
+
+**Ursprung:** Nutzerhinweis „PR #38 weiterhin rot", Diagnose in der Session vom 03.11.
+
+**Einschätzung:** PR bleibt nach Entscheid des Nutzers offen, bis die drei Pakete
+TypeScript 7 erlauben; dann `@dependabot rebase` und CI erneut laufen lassen.
+Nicht mit `--legacy-peer-deps` umgehen. Prüfen mit
+`npm view svelte-check typescript-eslint @sveltejs/kit peerDependencies`.
+
 ### 2026-11-03 — SMTP-Verbindung: Zertifikatsprüfung abschaltbar, kein eigenes Zeitlimit
 
 **Thema:** Betrieb
