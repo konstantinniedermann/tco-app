@@ -211,3 +211,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Doku-Abgleich vor Release 0.3.0.
 
 **Einschätzung:** Niedrig. Bei der nächsten Änderung an `probe` angleichen.
+
+### 2026-11-03 — Live-Sperre und `geheim.env`: zwei Restlücken
+
+**Thema:** Betrieb
+
+**Fundort:** `betrieb/bin/lib.sh` → `mail_umleitung_gesetzt`, `compose()`; `betrieb/nachweis/rauchtest.sh`.
+
+**Beobachtung:** Ein Wert in Anführungszeichen über zwei Zeilen (`MAIL_NUR_AN="` und die Adresse auf der nächsten Zeile) sieht die Sperre als leer; ob Compose so einen Wert durchreicht, ist nicht geprüft. Ausserdem ist nur `MAIL_NUR_AN` vor der Shell-Umgebung geschützt (`unset`): Andere Werte aus `geheim.env` (z. B. `ORIGIN`, `POSTGRES_PASSWORD`) kann eine gesetzte Shell-Variable beim Aufruf weiterhin überschreiben. `rauchtest.sh` lädt `lib.sh` nicht (nur lokal).
+
+**Ursprung:** #39, Final-Review und Nachprüfung der Korrekturrunde.
+
+**Einschätzung:** Beides nur bei absichtlich verbogener Datei oder Shell auf dem Server. Beim Härten des Servers (#39) prüfen, ob `compose()` die Werte von `geheim.env` generell vor der Shell schützen soll.
