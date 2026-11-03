@@ -216,6 +216,26 @@ describe('ausliefern: Live und Sicherung', () => {
 		expect(gibt(basis, 'live/sperre')).toBe(false);
 	});
 
+	test('MAIL_NUR_AN auf Live gesetzt: fehler gleich nach pruefen, nichts verändert', () => {
+		const basis = baue({
+			...BESTEHENDES_LIVE,
+			dateien: { ...BESTEHENDES_LIVE.dateien, 'live/geheim.env': "MAIL_NUR_AN='pl@example.org'\n" }
+		});
+		const lauf = ausliefern('live', basis, MIT_DB_UP);
+		expect(lauf.status).toBe(1);
+		expect(lauf.stdout).toBe('schritt: pruefen\nfehler\n');
+		expect(gibt(basis, 'sichern-aufrufe')).toBe(false);
+		expect(appStarts(lauf)).toHaveLength(0);
+		expect(lies(basis, 'live/zustand/aktuell')).toBe(ALT);
+		expect(lies(basis, 'live/protokoll.log')).toContain('MAIL_NUR_AN ist auf Live gesetzt');
+		expect(gibt(basis, 'live/sperre')).toBe(false);
+	});
+
+	test('MAIL_NUR_AN auf Test gesetzt stört die Auslieferung nicht', () => {
+		const basis = baue({ dateien: { 'test/geheim.env': 'MAIL_NUR_AN=pl@example.org\n' } });
+		expect(letzteZeile(ausliefern('test', basis))).toBe('ok');
+	});
+
 	test('läuft die Datenbank, aber gemeinsam/bin/sichern fehlt: fehler, nichts verändert', () => {
 		const basis = baue({ dateien: BESTEHENDES_LIVE.dateien });
 		const lauf = ausliefern('live', basis, MIT_DB_UP);
@@ -555,6 +575,24 @@ describe('zurueck', () => {
 		expect(appStarts(lauf)).toHaveLength(0);
 		expect(lies(basis, 'test/zustand/aktuell')).toBe(NEU);
 		expect(gibt(basis, 'test/sperre')).toBe(false);
+	});
+
+	test('MAIL_NUR_AN auf Live gesetzt: fehler, kein Start, Zustand unverändert', () => {
+		const basis = tempOrdner('mytco-basis-');
+		mkdirSync(join(basis, 'live/zustand'), { recursive: true });
+		writeFileSync(join(basis, 'live/zustand/aktuell'), `${NEU}\n`);
+		writeFileSync(join(basis, 'live/zustand/vorher'), `${ALT}\n`);
+		writeFileSync(join(basis, 'live/geheim.env'), 'MAIL_NUR_AN=pl@example.org\n');
+		const lauf = zurueck('live', basis);
+		expect(lauf.status).toBe(1);
+		expect(letzteZeile(lauf)).toBe('fehler');
+		expect(appStarts(lauf)).toHaveLength(0);
+		expect(lies(basis, 'live/zustand/aktuell')).toBe(NEU);
+		expect(lies(basis, 'live/zustand/vorher')).toBe(ALT);
+		expect(lies(basis, 'live/protokoll.log')).toContain(
+			'zurueck: MAIL_NUR_AN ist auf Live gesetzt'
+		);
+		expect(gibt(basis, 'live/sperre')).toBe(false);
 	});
 
 	test('mit vorher: startet diesen Digest und tauscht die Zustände', () => {

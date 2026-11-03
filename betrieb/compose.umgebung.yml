@@ -20,7 +20,7 @@ services:
       MYTCO_MAIL_ABSENDER: ${MYTCO_MAIL_ABSENDER:?MYTCO_MAIL_ABSENDER fehlt}
       MYTCO_KONTAKT: ${MYTCO_KONTAKT:?MYTCO_KONTAKT fehlt}
       MYTCO_ADRESSE: ${MYTCO_ADRESSE:-}
-      # Nur auf Test gesetzt: Mails gehen ausschliesslich an diese Adresse (hängt an K-11).
+      # Nur auf Test gesetzt: Mails werden an diese Adresse umgeleitet (hängt an K-11).
       MAIL_NUR_AN: ${MAIL_NUR_AN:-}
     networks:
       intern:

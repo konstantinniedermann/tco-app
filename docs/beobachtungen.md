@@ -116,6 +116,42 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-03 — SMTP-Verbindung: Zertifikatsprüfung abschaltbar, kein eigenes Zeitlimit
+
+**Thema:** Betrieb
+
+**Fundort:** `src/lib/server/einstellungen.ts` → `tlsErzwungen`, Mail-Versand über `MYTCO_SMTP_URL`.
+
+**Beobachtung:** `tlsErzwungen` prüft nur das Schema und `requireTLS`. nodemailer übernimmt weitere Optionen aus der Query der URL; `tls.rejectUnauthorized=false` schaltete die Prüfung des Zertifikats ab. Ein eigenes Zeitlimit für SMTP fehlt (Vorgaben von nodemailer: 2 Minuten Verbindungsaufbau, 10 Minuten Leerlauf); ein hängender Mailserver verzögert auf Test den Schritt «testdaten laden».
+
+**Ursprung:** #39, Final-Review.
+
+**Einschätzung:** Tritt nur bei absichtlicher Fehleinstellung durch den Betreiber auf. Vorläufig: Einstellungssache des Betreibers; in `betrieb/README.md` dokumentieren, wenn der Mail-Anbieter gewählt ist (K-11).
+
+### 2026-11-03 — Datenbank-Container loggen bei scheiterndem Einspielen Werte
+
+**Thema:** Betrieb
+
+**Fundort:** `docker logs` der db-Dienste (Test und Live), Einspielen in `betrieb/bin/wiederherstellen`.
+
+**Beobachtung:** Scheitert das Einspielen, schreibt der Postgres-Server in sein eigenes Log `DETAIL: Failing row contains (…)` und `STATEMENT: COPY …` mit Werten aus der Datenbank. Das liegt ausserhalb von `protokoll.log`, das die Werte bewusst nicht enthält.
+
+**Ursprung:** #39, Review Task 6.
+
+**Einschätzung:** Betrifft DS-06 und die zeitliche Begrenzung der Docker-Logs (offener Teil von #39, Rotation nach Zeit). Vorläufig: beim Einrichten des Servers klären, ob `log_error_verbosity` oder die Log-Aufbewahrung reicht.
+
+### 2026-11-03 — Nächtliche Sicherung nimmt keine Sperre gegenüber `wiederherstellen`
+
+**Thema:** Betrieb
+
+**Fundort:** `betrieb/bin/sichern` (`forget --prune`), `betrieb/bin/wiederherstellen` (zwischen `snapshot suchen` und `einspielen`).
+
+**Beobachtung:** Der nächtliche `sichern`-Lauf nimmt keine Sperre. Läuft er zwischen `snapshot suchen` und `einspielen` von `wiederherstellen`, kann sein `forget --prune` einen knapp 30 Tage alten, gerade gewählten Lauf entfernen.
+
+**Ursprung:** #39, Review Task 6.
+
+**Einschätzung:** Selten (enges Zeitfenster, nur bei ältestem Lauf). Vorläufig: bewusst nichts tun, wieder ansehen, wenn Wiederherstellungen häufiger werden.
+
 ### 2026-11-03 — `make release-check`: zwei Restlücken aus dem Review
 
 **Thema:** Arbeitsablauf

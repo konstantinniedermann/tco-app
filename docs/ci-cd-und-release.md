@@ -20,7 +20,7 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 | Rolle | Demo und Checkliste | Testgruppe (Pilotphase), später alle Mitglieder |
 | Ausgeliefert bei | Merge nach `dev` | Merge des PR `dev` → `main` |
 | Daten | nur erfundene Testdaten; bei jeder Auslieferung neu aufgesetzt | Mitgliederdaten |
-| E-Mail | nur an die Adresse des Projektleiters, alle anderen werden verworfen (hängt an K-11) | an die Mitglieder |
+| E-Mail | alle Mails gehen an die Adresse des Projektleiters, der Betreff nennt den ursprünglichen Empfänger (hängt an K-11) | an die Mitglieder |
 | Push, Schlüssel | eigene | eigene |
 
 Beide Adressen richtet der Website-Betreuer ein (Annahme K-10: Test und Live unter `tcolten.ch`).
@@ -33,7 +33,7 @@ dort nie hin (DS-08).
 **Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut.
 [#32](https://github.com/konstantinniedermann/tco-app/issues/32) baut den lokal belegbaren Teil:
 Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
-(36 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
+(43 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
 #29, Konten und Adresse hängen an K-04 und K-10), spätestens vor dem Release *Mitglieder-Login*.
 Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
@@ -104,6 +104,14 @@ Doku-Merge ändert ihn nicht.
    Update von Dependabot) oder `proxy.env` geändert hat. Dann Migrationen ausführen, Container
    neu starten. Auf Test wird die Datenbank dabei neu aufgesetzt. Bricht der Lauf mitten in der
    Übernahme ab, wird alles Übernommene zurückgesetzt.
+   **Testdaten (nur Test, Schritt «testdaten laden»):** Nach der Migration legt
+   `scripts/testdaten.ts` die erfundenen Mitglieder samt Konto an und schickt für Erika Beispiel
+   einen Brief-Code per Mail («Brief-Code für die Test-Umgebung», mit Code, Gültigkeit und
+   Adresse der App); durch die Umleitung landet sie beim Projektleiter. Das Skript bricht ab,
+   ohne etwas zu schreiben, wenn `MAIL_NUR_AN` leer ist (also nie auf Live, auch nicht von Hand)
+   oder schon Mitglieder da sind; dann scheitert die Auslieferung. Scheitert nur die Mail,
+   bleiben die Testdaten, und das Protokoll hält «Mail mit Brief-Code nicht versandt» fest. Code
+   und Adressen stehen nie im Protokoll.
 5. **Prüfen:** Antwortet die App nicht innert einer Minute (S) auf ihre Statusabfrage,
    startet das Skript wieder das vorherige Image. Die CI erfährt nur `ok` oder `fehler`,
    keine Logs der App, denn CI-Logs liegen bei GitHub in den USA (DS-01, DS-06).
@@ -147,8 +155,9 @@ S3-kompatiblem Ziel (Ziel legt [#10](https://github.com/konstantinniedermann/tco
 | Befehl | Zweck |
 |--------|-------|
 | `zurueck` | Zurück auf das vorherige Image. Migrationen fügen nur hinzu, darum geht das ohne Datenverlust; was die alte Version noch braucht, wird erst ein Release später entfernt |
-| `wiederherstellen` | Eine Sicherung derselben Umgebung zurückspielen. Auf Test findet der Befehl keinen Snapshot einer Live-Sicherung (DS-08) |
-| `probe` | Sicherung in einer Wegwerf-Datenbank einspielen, mit der Zählung vergleichen, `ok` oder `fehler` |
+| `sichern <umgebung> [ohne-aufraeumen]` | Datenbank sichern; mit `ohne-aufraeumen` ohne das Löschen nach 30 Tagen (`forget --prune`) |
+| `wiederherstellen <umgebung> [lauf] [ohne-sicherung]` | Eine Sicherung derselben Umgebung zurückspielen. Sichert vorher den jetzigen Stand (ohne Aufräumen; scheitert das, ändert sich nichts); ohne Lauf der bis dahin neueste. Der Notschalter `ohne-sicherung` lässt diese Sicherung weg und steht im Protokoll; nur von Hand auf dem Server, nie aus der CI oder dem Türsteher. Auf Test findet der Befehl keinen Snapshot einer Live-Sicherung (DS-08) |
+| `probe <umgebung> [lauf]` | Sicherung in einer Wegwerf-Datenbank einspielen, mit der Zählung vergleichen, `ok` oder `fehler` |
 
 **Netz und Header:** Ein Caddy-Proxy nimmt 80 und 443 an und erreicht beide Apps; die Datenbanken
 hängen nur an ihrem internen Netz, die Test-App erreicht Live nicht. Caddy behält die
@@ -162,8 +171,11 @@ Gegenprobe, dass der Filter etwas zu filtern hatte. Test verlangt ein Passwort.
 
 **Protokolle auf dem Server:** Was docker, psql und die App bei Auslieferung und Sicherung
 ausgeben, steht nur in `<umgebung>/protokoll.log` (je Umgebung, nur für den Betriebsbenutzer
-lesbar). Docker-Logs der Container rotieren nach Grösse (5 × 10 MB). Eine Rotation nach Zeit
-(höchstens 30 Tage, DS-06) für beide richtet
+lesbar). Werte aus der Datenbank kommen dort nicht hin: Scheitert das Einspielen, schreibt
+`wiederherstellen` nur den Fehlercode (`psql` mit `VERBOSITY=sqlstate`) und `probe` nur die Zahl
+der Fehlerzeilen von `pg_restore`; Hauptzeile, `DETAIL` und `CONTEXT` der Meldungen werden
+verworfen (DS-06). Docker-Logs der Container rotieren nach Grösse (5 × 10 MB). Eine Rotation
+nach Zeit (höchstens 30 Tage, DS-06) für beide richtet
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) ein.
 
 ### Schutz des Auslieferungswegs
@@ -173,6 +185,9 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 - Das Skript nimmt nur zwei Angaben an: `test` oder `live` und den Digest eines Images aus
   der eigenen Container-Ablage. Beides wird streng geprüft und nie über eine Shell
   ausgewertet.
+- Auf Live ist die Umleitung der Mails (`MAIL_NUR_AN`, nur für Test) gesperrt: Steht in
+  `live/geheim.env` ein Wert, verweigern `ausliefern live` und `zurueck live` jede Änderung
+  und melden `fehler`; der Grund steht nur im Protokoll.
 - Der Live-Lauf startet nur bei einem Push auf `main` und nur mit einem Image, das auf Test
   ausgeliefert wurde.
 - Der Türsteher und seine Eingabeprüfung werden **von Hand** eingerichtet und nie von der CI
@@ -241,6 +256,7 @@ werden sie nicht geprüft.
 | `DATABASE_URL` | Verbindung zur PostgreSQL-Datenbank der Umgebung | ja |
 | `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
 | `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
+| `MAIL_NUR_AN` | Nur Test: alle Mails werden an diese eine Adresse umgeleitet. Auf Live leer. Ein Wert, der keine Mail-Adresse ist, lässt die App nicht starten. Ohne sie lädt `scripts/testdaten.ts` nichts | nein |
 | `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
 | `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text, steht im Brief und in der Meldung «Code schon benutzt» (Annahme K-21) | ja |
 | `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
@@ -250,9 +266,11 @@ Hinter dem Reverse Proxy muss `adapter-node` die Client-IP aus einer Kopfzeile l
 der Proxy setzt (`ADDRESS_HEADER`, bei `X-Forwarded-For` dazu `XFF_DEPTH`). Sonst teilen alle
 Mitglieder die IP des Proxys, und die Bremsen pro IP sperren alle zusammen. `PROTOCOL_HEADER`
 nur setzen, wenn der Proxy die Kopfzeile zuverlässig setzt. Die E2E-Tests setzen sie nur,
-damit WebKit das Cookie auf `http://localhost` annimmt. IPv6-Clients vor dem Zählen auf ihr
-/64-Netz zusammenfassen (im Proxy oder in der App), sonst umgeht ein Wechsel der Adresse die
-Bremsen pro IP. Mail-Versand nur mit TLS: `smtps://` oder STARTTLS erzwungen.
+damit WebKit das Cookie auf `http://localhost` annimmt. IPv6-Clients fasst die App vor dem
+Zählen selbst auf ihr /64-Netz zusammen (`ip-schluessel.ts`), der Proxy muss das nicht tun.
+Mail-Versand nur mit TLS: `smtps://` oder `smtp://…?requireTLS=true`. Mit `NODE_ENV=production`
+lehnt die App jede andere SMTP-URL ab. Ausnahme sind Hosts, die nie zu einem echten Empfänger
+führen: `localhost`, `127.0.0.1`, `[::1]` und Namen auf `.invalid` (so läuft das Image im Rauchtest).
 
 **Mails lokal und in der CI:** Mailpit (`axllent/mailpit:v1.33`) fängt alle Mails ab, lokal
 über `docker-compose.yml` (`make db`; SMTP auf Port 51025, Oberfläche auf

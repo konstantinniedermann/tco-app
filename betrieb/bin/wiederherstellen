@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
-# wiederherstellen <umgebung> [lauf]: spielt eine Sicherung derselben Umgebung ein.
-# Ohne Lauf der neueste. Snapshots anderer Umgebungen werden nie angefasst (DS-08).
+# wiederherstellen <umgebung> [lauf] [ohne-sicherung]: spielt eine Sicherung derselben Umgebung
+# ein. Ohne Lauf der neueste. Snapshots anderer Umgebungen werden nie angefasst (DS-08).
+# Vor dem Einspielen sichert es den jetzigen Stand (ohne Aufräumen); scheitert das, ändert es
+# nichts. Der Notschalter ohne-sicherung (für eine kaputte Datenbank, nur von Hand auf dem
+# Server) lässt diese Sicherung weg; das Protokoll hält es fest.
 # Die App ist während des Einspielens gestoppt und läuft danach wieder, auch bei Fehlern.
 # Die Schemas der App (public, drizzle mit der Migrationstabelle) werden vorher geleert, damit
 # keine Tabelle einer späteren Migration stehen bleibt. Alles in einer Transaktion: Nur ein
-# vollständiger Dump wird bestätigt, sonst bleibt der alte Stand.
+# vollständiger Dump wird bestätigt, sonst bleibt der alte Stand. psql meldet Fehler nur mit
+# ihrem SQLSTATE: Hauptzeile, DETAIL und CONTEXT tragen sonst Werte ins Protokoll (DS-06).
 set -euo pipefail
 
 # shellcheck source=lib.sh
@@ -12,7 +16,26 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 UMGEBUNG="${1-}"
 pruefe_umgebung "$UMGEBUNG" || exit 1
-LAUF_WUNSCH="${2-}"
+shift
+
+# Danach höchstens ein Lauf und der Notschalter, in beliebiger Reihenfolge. Alles andere wird
+# abgewiesen, bevor etwas geschieht.
+LAUF_WUNSCH=""
+OHNE_SICHERUNG=0
+[ "$#" -le 2 ] || {
+	melde fehler
+	exit 1
+}
+for angabe in "$@"; do
+	if [ "$angabe" = ohne-sicherung ] && [ "$OHNE_SICHERUNG" = 0 ]; then
+		OHNE_SICHERUNG=1
+	elif [ -z "$LAUF_WUNSCH" ] && ist_lauf_name "$angabe"; then
+		LAUF_WUNSCH="$angabe"
+	else
+		melde fehler
+		exit 1
+	fi
+done
 
 LOG="$MYTCO_BASIS/$UMGEBUNG/protokoll.log"
 GEMELDET=0
@@ -43,6 +66,8 @@ exec 2>>"$LOG"
 [ -f "$MYTCO_BASIS/sicherung.env" ] || scheitern "sicherung.env fehlt"
 sicherungsziel >/dev/null || scheitern "Sicherungsziel ungültig"
 
+# Der Lauf wird vor der Sicherung bestimmt, sonst wäre ohne Lauf-Angabe der eben gesicherte
+# Stand der neueste.
 schritt "snapshot suchen"
 LAUF=$(finde_lauf "$UMGEBUNG" "$LAUF_WUNSCH") || scheitern "kein Snapshot dieser Umgebung gefunden"
 
@@ -54,6 +79,15 @@ image_aus_zustand "$UMGEBUNG"
 # Keine Auslieferung gleichzeitig.
 sperre_nehmen "$UMGEBUNG" || scheitern "Umgebung ist gesperrt"
 GESPERRT=1
+
+# Ohne Aufräumen: Ein knapp 30 Tage alter, gerade gewählter Lauf bleibt bis zum Einspielen da.
+if [ "$OHNE_SICHERUNG" = 1 ]; then
+	echo "wiederherstellen: ohne Sicherung vorher (Notschalter)" >>"$LOG"
+else
+	schritt "sichern"
+	"$(dirname "${BASH_SOURCE[0]}")/sichern" "$UMGEBUNG" ohne-aufraeumen </dev/null >>"$LOG" ||
+		scheitern "Sicherung vor dem Einspielen gescheitert"
+fi
 
 schritt "app stoppen"
 GESTOPPT=1
@@ -74,8 +108,10 @@ sql_zum_einspielen() {
 }
 
 schritt "einspielen"
+# Die Standardausgabe von psql (u. a. die setval-Ergebnisse des Dumps) trägt Werte aus der
+# Datenbank und wird verworfen; Fehler (nur SQLSTATE) gehen über stderr ins Protokoll.
 sql_zum_einspielen |
-	compose "$UMGEBUNG" exec -T db psql -X -q -v ON_ERROR_STOP=1 -U mytco -d mytco >>"$LOG" ||
+	compose "$UMGEBUNG" exec -T db psql -X -q -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U mytco -d mytco >/dev/null ||
 	scheitern "Einspielen gescheitert"
 
 schritt "app starten"

@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { fuehreAus } from './hilfe.ts';
+import { fuehreAus, tempOrdner } from './hilfe.ts';
 
 const TREIBER = 'tests/betrieb/lib-treiber.sh';
 const lib = (...args: string[]) => fuehreAus(TREIBER, args);
@@ -142,6 +142,16 @@ describe('compose', () => {
 		]);
 		expect(lauf.umwelt[0].umgebung).toBe('live');
 	});
+
+	// Compose zöge MAIL_NUR_AN aus der Shell der env-Datei vor; die Live-Sperre liest nur die Datei.
+	test('ein in der Shell exportiertes MAIL_NUR_AN erreicht Compose nicht', () => {
+		const lauf = fuehreAus(TREIBER, ['compose', 'live', 'up', '-d'], {
+			env: { MAIL_NUR_AN: 'shell@example.org' }
+		});
+		expect(lauf.status).toBe(0);
+		expect(lauf.aufrufe).toHaveLength(1);
+		expect(lauf.mailNurAn).toEqual([null]);
+	});
 });
 
 describe('compose_proxy', () => {
@@ -179,5 +189,88 @@ describe('ZAEHL_SQL', () => {
 		expect(sql).toContain('pg_catalog');
 		expect(sql).toContain('information_schema');
 		expect(sql).toContain('ORDER BY');
+	});
+});
+
+describe('mail_umleitung_gesetzt', () => {
+	const mitEnv = (inhalt: string | null) => {
+		const basis = tempOrdner('mytco-basis-');
+		if (inhalt !== null) {
+			mkdirSync(join(basis, 'live'), { recursive: true });
+			writeFileSync(join(basis, 'live/geheim.env'), inhalt);
+		}
+		return fuehreAus(TREIBER, ['mail_umleitung_gesetzt', 'live'], { basis }).status;
+	};
+
+	test.each([
+		['leer', 'MAIL_NUR_AN=\n'],
+		['zwei einfache Anführungszeichen', "MAIL_NUR_AN=''\n"],
+		['Leerzeichen in Anführungszeichen', 'MAIL_NUR_AN=" "\n'],
+		['nur Leerzeichen', 'MAIL_NUR_AN=   \n'],
+		['keine Zeile', 'ORIGIN=https://x\n'],
+		['auskommentiert', '#MAIL_NUR_AN=pl@example.org\n'],
+		['auskommentiert mit export', '# export MAIL_NUR_AN=pl@example.org\n'],
+		['anderer Name', 'MAIL_NUR_AN_X=pl@example.org\n'],
+		['letzte Zeile leer', 'MAIL_NUR_AN=pl@example.org\nexport MAIL_NUR_AN=\n'],
+		// dieselben Formen wie unten bei «gesetzt», ohne Wert
+		['export, leer', 'export MAIL_NUR_AN=\n'],
+		['eingerückt, leer', '  MAIL_NUR_AN=\n'],
+		['Leerzeichen um =, leer', 'MAIL_NUR_AN = \n'],
+		['Doppelpunkt, leer', 'MAIL_NUR_AN:\n']
+	])('gilt als leer: %s', (_name, inhalt) => {
+		expect(mitEnv(inhalt)).toBe(1);
+	});
+
+	test('Datei fehlt: nicht gesetzt', () => {
+		expect(mitEnv(null)).toBe(1);
+	});
+
+	test.each([
+		['ohne Anführungszeichen', 'MAIL_NUR_AN=pl@example.org\n'],
+		['einfache Anführungszeichen', "MAIL_NUR_AN='pl@example.org'\n"],
+		['doppelte Anführungszeichen', 'MAIL_NUR_AN="pl@example.org"\n'],
+		['zwischen anderen Zeilen', 'A=1\nMAIL_NUR_AN=pl@example.org\nB=2\n'],
+		// Formen, die Docker Compose ebenfalls als MAIL_NUR_AN liest (geprüft mit `compose config`)
+		['export', 'export MAIL_NUR_AN=pl@example.org\n'],
+		['eingerückt', '  MAIL_NUR_AN=pl@example.org\n'],
+		['Leerzeichen um =', 'MAIL_NUR_AN = pl@example.org\n'],
+		['Doppelpunkt', 'MAIL_NUR_AN: pl@example.org\n'],
+		['letzte Zeile mit export gesetzt', 'MAIL_NUR_AN=\nexport MAIL_NUR_AN=pl@example.org\n']
+	])('gilt als gesetzt: %s', (_name, inhalt) => {
+		expect(mitEnv(inhalt)).toBe(0);
+	});
+});
+
+// Von der Fehlerausgabe von pg_restore kommt nur die Zahl ins Protokoll (DS-06): DETAIL- und
+// CONTEXT-Zeilen tragen Werte aus der Datenbank.
+describe('nur_fehlerzahl', () => {
+	const zaehle = (eingabe: string) =>
+		fuehreAus(TREIBER, ['nur_fehlerzahl', 'probe'], { stdin: eingabe });
+
+	test.each([
+		['leere Eingabe', ''],
+		['ohne Fehlerzeile', 'pg_restore: warning: nichts\nirgendwas\n'],
+		['Fehlertext nicht am Zeilenanfang', 'DETAIL:  pg_restore: error: (x@example.org)\n']
+	])('0 Fehlerzeilen (%s): keine Ausgabe', (_name, eingabe) => {
+		const x = zaehle(eingabe);
+		expect(x.status).toBe(0);
+		expect(x.stdout).toBe('');
+	});
+
+	test('zwei Fehlerzeilen: genau eine Zeile mit der Zahl, ohne Werte', () => {
+		const x = zaehle(
+			[
+				'pg_restore: error: COPY failed for table "mitglied": ERROR:  duplicate key value',
+				'DETAIL:  Key (email)=(x@example.org) already exists.',
+				'CONTEXT:  COPY mitglied, line 1: "x@example.org"',
+				'pg_restore: error: could not execute query: ERROR:  x@example.org',
+				'pg_restore: warning: errors ignored on restore: 2',
+				''
+			].join('\n')
+		);
+		expect(x.status).toBe(0);
+		expect(x.stdout).toBe('probe: 2 Fehlerzeilen von pg_restore (Inhalt verworfen)\n');
+		expect(x.stdout).not.toContain('x@example.org');
+		expect(x.stderr).not.toContain('x@example.org');
 	});
 });

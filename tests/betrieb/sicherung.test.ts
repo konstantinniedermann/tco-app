@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { fuehreAus, tempOrdner, type Ergebnis } from './hilfe.ts';
@@ -259,6 +259,28 @@ describe('sichern: Sonderfälle', () => {
 		expect(x.aufrufe).toEqual([]);
 	});
 
+	// Die Sicherung vor dem Zurückspielen räumt nicht auf: Ein knapp 30 Tage alter, gerade
+	// gewählter Lauf darf zwischen Auswahl und Einspielen nicht verschwinden.
+	test('ohne-aufraeumen: ok, Dump und Zählung abgelegt, kein forget', () => {
+		const x = lauf('sichern', ['live', 'ohne-aufraeumen']);
+		expect(x.status).toBe(0);
+		expect(letzteZeile(x)).toBe('ok');
+		expect(mit(x, ' backup ')).toHaveLength(2);
+		expect(mit(x, 'forget')).toHaveLength(0);
+		expect(x.stdout).not.toContain('schritt: aufraeumen');
+	});
+
+	test.each([
+		['unbekanntes Argument', ['live', 'falsch']],
+		['leeres Argument', ['live', '']],
+		['ohne-aufraeumen mit Zusatz', ['live', 'ohne-aufraeumen', 'x']]
+	])('%s: fehler, kein docker', (_name, args) => {
+		const x = lauf('sichern', args);
+		expect(x.status).toBe(1);
+		expect(x.stdout.trim()).toBe('fehler');
+		expect(x.aufrufe).toEqual([]);
+	});
+
 	test('nimmt keine Umgebungssperre (ausliefern hält sie)', () => {
 		const basis = baue();
 		mkdirSync(join(basis, 'live', 'sperre'), { recursive: true });
@@ -298,9 +320,13 @@ describe('wiederherstellen', () => {
 		const x = lauf('wiederherstellen', ['test', 'lauf-x'], MIT_SQL);
 		expect(letzteZeile(x)).toBe('ok');
 		expect(mit(x, 'pg_restore')).toEqual([expect.stringMatching(/exec -T db pg_restore -f -$/)]);
-		const psql = mit(x, 'psql');
+		// Die Zählungen der Sicherung vorher laufen ohne -X; eingespielt wird genau einmal.
+		const psql = mit(x, 'psql -X');
 		expect(psql).toHaveLength(1);
-		expect(psql[0]).toContain('exec -T db psql -X -q -v ON_ERROR_STOP=1 -U mytco -d mytco');
+		// Fehler nur als SQLSTATE: DETAIL, CONTEXT und Hauptzeile tragen sonst Werte (DS-06).
+		expect(psql[0]).toContain(
+			'exec -T db psql -X -q -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U mytco -d mytco'
+		);
 		expect(eingabe(x)).toBe(
 			[
 				'BEGIN;',
@@ -313,6 +339,22 @@ describe('wiederherstellen', () => {
 			].join('\n')
 		);
 		expect(index(x, 'psql')).toBeLessThan(index(x, 'start app'));
+	});
+
+	// Die Standardausgabe von psql (z. B. die setval-Ergebnisse aus dem Dump) trägt Werte aus
+	// der Datenbank; sie wird verworfen. Die Fehlerausgabe (nur SQLSTATE) bleibt im Protokoll.
+	test('Standardausgabe von psql landet nicht im Protokoll, die Fehlerausgabe schon', () => {
+		const x = lauf('wiederherstellen', ['test', 'lauf-x'], {
+			...MIT_SQL,
+			// A vor P (Zählungen): der erste Treffer in alphabetischer Reihenfolge gewinnt
+			STUB_MUSTER_A: 'exec -T db psql -X',
+			STUB_AUSGABE_A: 'setval 4711'
+		});
+		expect(letzteZeile(x)).toBe('ok');
+		const log = readFileSync(`${x.basis}/test/protokoll.log`, 'utf-8');
+		expect(log).not.toContain('setval 4711');
+		expect(log).toContain('STUB-GEHEIM-LOG');
+		expect(x.stdout).not.toContain('setval 4711');
 	});
 
 	test('Dump aus restic scheitert: kein COMMIT, fehler, App läuft wieder', () => {
@@ -338,10 +380,10 @@ describe('wiederherstellen', () => {
 	test('psql scheitert: fehler, App läuft wieder', () => {
 		const x = lauf('wiederherstellen', ['test', 'lauf-x'], {
 			...SNAP_TEST,
-			STUB_FEHLER_BEI: 'exec -T db psql'
+			STUB_FEHLER_BEI: 'exec -T db psql -X'
 		});
 		expect(letzteZeile(x)).toBe('fehler');
-		expect(index(x, 'start app')).toBeGreaterThan(index(x, 'exec -T db psql'));
+		expect(index(x, 'start app')).toBeGreaterThan(index(x, 'exec -T db psql -X'));
 	});
 
 	test('ungültiges Sicherungsziel: fehler, App bleibt unberührt', () => {
@@ -458,6 +500,90 @@ describe('wiederherstellen', () => {
 	});
 });
 
+describe('wiederherstellen: Sicherung vorher, Notschalter ohne-sicherung', () => {
+	const L = 'lauf-20260101T020000Z';
+	const SNAP_L = { STUB_MUSTER_S: 'snapshots', STUB_AUSGABE_S: SNAP('live', L) };
+	const NOTSCHALTER = 'wiederherstellen: ohne Sicherung vorher (Notschalter)';
+	const protokoll = (x: Ergebnis) => readFileSync(`${x.basis}/live/protokoll.log`, 'utf-8');
+	const schritte = (x: Ergebnis) =>
+		x.stdout
+			.split('\n')
+			.filter((z) => z.startsWith('schritt: '))
+			.map((z) => z.slice('schritt: '.length));
+
+	test.each([
+		[['live'], true],
+		[['live', L], true],
+		[['live', 'ohne-sicherung'], false],
+		[['live', L, 'ohne-sicherung'], false],
+		[['live', 'ohne-sicherung', L], false]
+	])('%j: ok, Sicherung vorher: %s', (args, gesichert) => {
+		const x = lauf('wiederherstellen', args, SNAP_L);
+		expect(x.status).toBe(0);
+		expect(letzteZeile(x)).toBe('ok');
+		expect(mit(x, `dump --tag live,${L}`).length).toBeGreaterThan(0);
+		expect(mit(x, ' backup ')).toHaveLength(gesichert ? 2 : 0);
+		expect(protokoll(x).includes(NOTSCHALTER)).toBe(!gesichert);
+	});
+
+	test.each([
+		['unbekanntes Argument', ['live', 'etwas']],
+		['drei Zusatzargumente', ['live', 'lauf-x', 'ohne-sicherung', 'zuviel']],
+		['zwei Läufe', ['live', L, 'lauf-y']],
+		['Notschalter doppelt', ['live', 'ohne-sicherung', 'ohne-sicherung']],
+		['leeres Argument', ['live', '']],
+		['Notschalter mit Zusatz', ['live', 'ohne-sicherung=ja']]
+	])('%s: fehler, bevor etwas passiert', (_name, args) => {
+		const x = lauf('wiederherstellen', args, SNAP_L);
+		expect(x.status).toBe(1);
+		expect(x.stdout.trim()).toBe('fehler');
+		expect(x.aufrufe).toEqual([]);
+	});
+
+	test('Schritte: snapshot suchen, sichern, app stoppen, einspielen, app starten', () => {
+		const x = lauf('wiederherstellen', ['live'], SNAP_L);
+		expect(schritte(x)).toEqual([
+			'snapshot suchen',
+			'sichern',
+			'app stoppen',
+			'einspielen',
+			'app starten'
+		]);
+	});
+
+	test('Schritte mit Notschalter: ohne sichern', () => {
+		const x = lauf('wiederherstellen', ['live', 'ohne-sicherung'], SNAP_L);
+		expect(schritte(x)).toEqual(['snapshot suchen', 'app stoppen', 'einspielen', 'app starten']);
+		expect(mit(x, ' backup ')).toHaveLength(0);
+	});
+
+	// Ohne Lauf-Angabe würde sonst der eben gesicherte Stand eingespielt.
+	test('Lauf wird vor der Sicherung bestimmt, gesichert wird vor dem Anhalten der App', () => {
+		const x = lauf('wiederherstellen', ['live'], SNAP_L);
+		const suche = index(x, 'snapshots --tag live');
+		const sicherung = index(x, ' backup ');
+		expect(suche).toBeGreaterThan(-1);
+		expect(sicherung).toBeGreaterThan(suche);
+		expect(index(x, 'stop app')).toBeGreaterThan(index(x, '--stdin-filename zaehlung.txt'));
+	});
+
+	test('die Sicherung vorher räumt nicht auf (kein forget)', () => {
+		const x = lauf('wiederherstellen', ['live'], SNAP_L);
+		expect(mit(x, 'forget')).toHaveLength(0);
+	});
+
+	test('Sicherung scheitert: fehler, App und Datenbank unberührt', () => {
+		const x = lauf('wiederherstellen', ['live'], { ...SNAP_L, STUB_FEHLER_BEI: ' backup ' });
+		expect(x.status).toBe(1);
+		expect(letzteZeile(x)).toBe('fehler');
+		expect(x.stdout.match(/^(ok|fehler)$/gm)).toEqual(['fehler']);
+		expect(index(x, 'stop app')).toBe(-1);
+		expect(index(x, 'pg_restore')).toBe(-1);
+		expect(protokoll(x)).toContain('wiederherstellen: Sicherung vor dem Einspielen gescheitert');
+		expect(existsSync(`${x.basis}/live/sperre`)).toBe(false);
+	});
+});
+
 describe('probe', () => {
 	const SNAP_LIVE = { STUB_MUSTER_S: 'snapshots', STUB_AUSGABE_S: SNAP('live', 'lauf-p') };
 	const ZAEHL_DATEI = { STUB_MUSTER_Z: 'zaehlung.txt', STUB_AUSGABE_Z: ZAEHLUNG };
@@ -502,6 +628,22 @@ describe('probe', () => {
 		expect(letzteZeile(x)).toBe('fehler');
 		expect(mit(x, 'rm -f mytco-probe-live-')).toHaveLength(1);
 		expect(mit(x, 'network rm mytco-probe-live-')).toHaveLength(1);
+	});
+
+	// Von der Ausgabe von pg_restore kommt nur die Zahl der Fehlerzeilen ins Protokoll (DS-06).
+	test('Ausgabe von pg_restore: nur die Fehlerzahl im Protokoll, keine Werte', () => {
+		const x = lauf('probe', ['live', 'lauf-p'], {
+			...SNAP_LIVE,
+			...ZAEHL_DATEI,
+			STUB_MUSTER_R: 'pg_restore',
+			STUB_AUSGABE_R: [
+				'pg_restore: error: COPY failed for table "mitglied": ERROR:  duplicate key value',
+				'DETAIL:  Key (email)=(x@example.org) already exists.'
+			].join('\n')
+		});
+		const log = readFileSync(`${x.basis}/live/protokoll.log`, 'utf-8');
+		expect(log).not.toContain('x@example.org');
+		expect(log).toContain('probe: 1 Fehlerzeilen von pg_restore (Inhalt verworfen)');
 	});
 
 	test('ungültiges Sicherungsziel: fehler, kein restic, nichts gestartet', () => {

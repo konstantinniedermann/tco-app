@@ -65,10 +65,14 @@ while [ "$VERSUCHE" -gt 0 ]; do
 done
 [ "$BEREIT" = 1 ] || scheitern "Wegwerf-Datenbank wird nicht bereit"
 
+# Von der Ausgabe von pg_restore kommt nur die Zahl der Fehlerzeilen ins Protokoll: Meldungen
+# samt DETAIL und CONTEXT tragen Werte aus der Datenbank (DS-06). Der Exit-Code von pg_restore
+# bleibt über pipefail erhalten; nichts davon landet in einer Datei.
 schritt "einspielen"
 restic_docker dump --tag "$UMGEBUNG,$LAUF" --path "/mytco-$UMGEBUNG.dump" latest \
 	"/mytco-$UMGEBUNG.dump" </dev/null |
-	docker exec -i "$NAME" pg_restore --clean --if-exists -U mytco -d mytco >>"$LOG" ||
+	docker exec -i "$NAME" pg_restore --clean --if-exists -U mytco -d mytco 2>&1 |
+	nur_fehlerzahl probe >>"$LOG" ||
 	scheitern "Einspielen gescheitert"
 
 schritt "vergleichen"

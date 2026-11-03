@@ -36,6 +36,8 @@ export type Ergebnis = {
 	umwelt: { image: string; umgebung: string }[];
 	// Pro Aufruf der geerbte Wert von DOCKER_CONFIG (gleicher Index wie aufrufe)
 	dockerConfig: string[];
+	// Pro Aufruf der geerbte Wert von MAIL_NUR_AN, null wenn nicht gesetzt (gleicher Index wie aufrufe)
+	mailNurAn: (string | null)[];
 	// Temp-Ordner, der als MYTCO_BASIS diente
 	basis: string;
 };
@@ -64,19 +66,21 @@ function ergebnis(basis: string, status: number, stdout: string, stderr: string)
 	}
 	let umwelt: { image: string; umgebung: string }[] = [];
 	const dockerConfig: string[] = [];
+	const mailNurAn: (string | null)[] = [];
 	try {
 		umwelt = readFileSync(`${protokoll}.umwelt`, 'utf-8')
 			.split('\n')
 			.filter(Boolean)
 			.map((zeile) => {
-				const [image, umgebung, config = ''] = zeile.split('|');
+				const [image, umgebung, config = '', mail = ''] = zeile.split('|');
 				dockerConfig.push(config);
+				mailNurAn.push(mail.startsWith('=') ? mail.slice(1) : null);
 				return { image, umgebung };
 			});
 	} catch {
 		// Ersatz-docker wurde nie aufgerufen
 	}
-	return { status, stdout, stderr, aufrufe, umwelt, dockerConfig, basis };
+	return { status, stdout, stderr, aufrufe, umwelt, dockerConfig, mailNurAn, basis };
 }
 
 // Führt ein Bash-Skript mit Ersatz-docker vor dem PATH und eigenem MYTCO_BASIS aus.

@@ -23,6 +23,12 @@ describe('pruefeTestdaten', () => {
 	it('prüft die Daten des Musterbriefs', () => {
 		expect(pruefeTestdaten(new Map([['scripts/musterbrief.ts', 'bob@gmail.com']]))).toHaveLength(1);
 	});
+	it('prüft die Testdaten für die Test-Umgebung', () => {
+		expect(pruefeTestdaten(new Map([['scripts/testdaten.ts', 'bob@gmail.com']]))).toHaveLength(1);
+		expect(
+			pruefeTestdaten(new Map([['scripts/erfundene-mitglieder.ts', 'bob@gmail.com']]))
+		).toHaveLength(1);
+	});
 	it('zählt Verbindungs-URLs nicht als Mailadresse', () => {
 		expect(
 			pruefeTestdaten(new Map([['tests/a.test.ts', 'postgres://user:pass@localhost:55432/db']]))
