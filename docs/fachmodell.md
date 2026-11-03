@@ -17,9 +17,9 @@ Begriffe stehen im [Glossar](glossar.md), Anforderungs-IDs in den
 **Rollen:** Was CM- und Lizenzverantwortlicher dürfen, darf auch der Admin
 ([RR-02](rollen-und-rechte.md#grundsätze)).
 
-**Junioren:** Im MVP behandelt MyTCO alle Mitglieder gleich, wie Volljährige. Junioren,
-Eltern und Konten für Minderjährige kommen mit den Junioren-Funktionen (Annahme K-08: ab 2028) — oder früher,
-falls Junioren schon an der Clubmeisterschaft 2027 mitspielen (hängt an K-46).
+**Junioren:** Junioren sind Mitglieder mit eigenem Konto und melden sich ab der
+Clubmeisterschaft 2027 selbst an; der CM-Verantwortliche kann sie auch anmelden
+(A-ANMELDUNG-06, K-46). Ob Eltern das Konto führen, hängt an K-08.
 
 ## Überblick
 
@@ -54,8 +54,8 @@ classDiagram
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Mitglied** | Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25), Telefon, Geschlecht, Jahrgang (Annahme K-40), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum | alle ausser Status |
-| **Konto** | Brief-Code und Mail-Code getrennt, je nur als Hash mit Ablauf; beim Brief-Code dazu *benutzt am*, beim Mail-Code die Zahl der Fehlversuche (FR-24). Sitzungsversion, Sitzungen (eine je Gerät, mit *zuletzt genutzt*), Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein | alle |
+| **Mitglied** | Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25), Telefon, Geschlecht, Jahrgang (K-40.2; für Lizenzanträge hängt an K-40.1), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / gelöscht*, Austrittsdatum | alle ausser Status |
+| **Konto** | Brief-Code und Mail-Code getrennt, je nur als Hash mit Ablauf; beim Brief-Code dazu *benutzt am*, beim Mail-Code die Zahl der Fehlversuche (FR-24). Sitzungsversion, Sitzungen (eine je Gerät, mit *zuletzt genutzt*), Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein, Passkeys (je Gerät öffentlicher Schlüssel und Kennung, freiwillig, A-LOGIN-07) | alle |
 | **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](rollen-und-rechte.md) fest | — |
 | **Aenderung** | Eintrag im Änderungsverlauf: Mitglied, von (Konto; leer bei automatischen Änderungen oder wenn das Konto gelöscht ist, dann angezeigt als *MyTCO* bzw. Name), Feld oder Aktion, Zeitpunkt; ohne alte und neue Werte (FR-26) | Mitglied, von |
 
@@ -130,7 +130,8 @@ Nicht Teil dieser Etappen, aber so angelegt, dass sie andocken
 
 - **Anlässe** (Junioren-Training, weitere Turniere): eigenes Objekt *Anlass* mit
   Anmeldungen; das Turnier bleibt eigenständig.
-- **Junioren:** Mitglied ohne Konto oder Konto der Eltern (K-08).
+- **Junioren-Funktionen** (Training, Turniere, Junioren-Leiter). Konten für Junioren gibt es
+  schon ab der CM 2027, siehe oben.
 - **Spielplan fürs Finalwochenende:** *Platz* und Termin am Spiel (A-SPIELPLAN).
 - **Newsfeed, Lizenzliste als PDF, Registrierung:** eigene Objekte, keine Änderung an den
   bestehenden.

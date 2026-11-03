@@ -14,7 +14,8 @@ wenn sich die Anforderung verschiebt; eine gestrichene ID wird nie neu vergeben.
 Anforderungen bekommen die nächste freie Nummer im Bereich.
 
 **Quelle:** `PDF 5b` = Abschnitt im Anforderungsdokument v1.2 · `Ziel` = Zielsetzung vom
-29.10.2026 · `PL` = Vorgabe des Projektleiters ausserhalb beider Dokumente.
+29.10.2026 · `PL` = Vorgabe des Projektleiters ausserhalb beider Dokumente · `K-NN` = Antwort des Vereins
+in den [Abklärungen](../abklaerungen.md#beantwortet).
 
 **Etappe:** Milestone laut [Roadmap](../roadmap.md) — *Fundament*, *Mitglieder-Login*,
 *CM-Anmeldung*, *CM-Betrieb*, *Lizenzanträge* — oder *später* (Backlog / Optional).
@@ -39,7 +40,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-LOGIN-04 | Direktes Login in MyTCO, ohne Umweg über tcolten.ch (z. B. über `my.tcolten.ch`) | PDF 3b | Mitglieder-Login | geplant |
 | A-LOGIN-05 | Login-Feld oben rechts auf tcolten.ch, das nach dem Login zu MyTCO weiterleitet | PDF 3b | später | später |
 | A-LOGIN-06 | Zwei-Faktor-Login (App oder SMS/E-Mail, zwingend oder freiwillig) | PDF 2 | später | später |
-| A-LOGIN-07 | Login mit Passkey | PDF 2 | später | später |
+| A-LOGIN-07 | Login mit Passkey, freiwillig neben dem Einmal-Code: bequemer am PC und auf weiteren Geräten. Der Mail-Code bleibt gültig, der Passkey schützt also nicht gegen ein gehacktes Postfach | PDF 2, K-02.1 | Mitglieder-Login\* | geplant |
 | A-LOGIN-08 | Login ohne Passwort, nur per Einmal-Code: aus dem Brief, später per E-Mail (A-LOGIN-10) | PDF 2, PL | Mitglieder-Login | umgesetzt\* |
 | A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Admin seine Sitzungen beendet | PL | Mitglieder-Login | umgesetzt\* (Dienst; Admin-Bedienung kommt mit der Admin-Oberfläche) |
 | A-LOGIN-10 | Wer ausgeloggt ist (lange Pause, neues Handy, Brief verloren), erhält nach Eingabe seiner E-Mail-Adresse einen neuen Code per E-Mail | PL | Mitglieder-Login | umgesetzt\* |
@@ -55,6 +56,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-MITGLIED-04 | Selbstregistrierung über die Website tcolten.ch, damit der Briefversand entfallen kann (mit der zuständigen Person) | PDF 4a | später\* | später |
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
 | A-MITGLIED-06 | Der Admin sieht im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Admin, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | geplant |
+| A-MITGLIED-07 | Der Admin, der die Mitgliederverwaltung macht, liest die Mitgliederliste aus Fairgate ein (Excel oder CSV) und führt so Ein- und Austritte nach; zum Start erfasst der Projektleiter die Mitglieder | K-17.1 | CM-Anmeldung\* | offen (hängt an K-45) |
 
 ### ROLLE — Benutzerrollen
 

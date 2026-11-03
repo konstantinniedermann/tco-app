@@ -30,7 +30,7 @@ Randbedingungen:
 | **B · Login-QR im Brief, vor dem Hinzufügen zum Startbildschirm scannen** | Nichts abtippen | Ob die Sitzung auf dem iPhone in die App übergeht, ist offen |
 | **C · Link in der Mail** | Ein Tipp | Der Link öffnet Safari oder die Mail-App, nicht die App auf dem Startbildschirm |
 | **D · Passwort** | Vertraut | Wer es vergisst, braucht ohnehin einen Weg per Mail; A-LOGIN-02 ist verworfen |
-| **E · Passkey** | Am sichersten | Nicht auf jedem Gerät der Mitglieder; kommt später als Zusatz (A-LOGIN-07) |
+| **E · Passkey** | Am sichersten | Nicht auf jedem Gerät der Mitglieder; kommt als freiwilliger Zusatz (A-LOGIN-07, siehe Nachtrag) |
 
 ## Entscheidung
 
@@ -89,7 +89,7 @@ auf der Test-Umgebung (#32).
 **Leichter:** Kein Passwort, also kein Zurücksetzen und kein Passwortspeicher. Abmelden und
 Widerruf wirken beim nächsten Aufruf.
 
-**Schwerer:** Jedes Mitglied braucht einen Brief (K-16) und eine erreichbare E-Mail-Adresse
+**Schwerer:** Jedes Mitglied braucht einen Brief (K-16.1) und eine erreichbare E-Mail-Adresse
 (K-11). Hinter dem Reverse Proxy muss die App die Client-IP aus einer vertrauenswürdigen
 Kopfzeile lesen, sonst teilen alle Mitglieder eine IP und damit die Bremsen
 ([Schnittstelle zu #32](../ci-cd-und-release.md#einstellungen-der-app)).
@@ -111,13 +111,29 @@ Kopfzeile lesen, sonst teilen alle Mitglieder eine IP und damit die Bremsen
 
 **Kosten:** keine neuen; der Mail-Versand hängt an K-11 ([ADR-003](adr-003-hosting-infomaniak-vps.md)).
 
+### Nachtrag 03.11.2026: Passwort-Wunsch des Vorstands
+
+Der Vorstand wünscht beim ersten Login ein Passwort, damit man auch vom PC hineinkommt und das
+Handy wechseln kann, und fragt nach dem Schutz bei einem gehackten Postfach (K-02.1, K-16.3).
+Entscheid des Projektleiters: **Die Entscheidung bleibt, kein Passwort.** PC und neues Handy
+gehen schon per Mail-Code (A-LOGIN-10). Ein Passwort liesse sich nur per Mail zurücksetzen und
+schützt deshalb nicht besser.
+
+Dazu kommt ab *Mitglieder-Login* ein **freiwilliger Passkey als Komfort** (A-LOGIN-07): Er
+ist ein weiterer Weg zur selben Sitzung, der Mail-Code bleibt gültig. Gegen ein gehacktes
+Postfach hilft er so nicht. Das wäre erst ein Passkey, der den Mail-Code für das Konto sperrt,
+mit dem Weg zurück über den Admin; das bleibt *später*. Wie der Passkey gebaut wird und mit
+welchem Paket, entscheidet ein eigener ADR. Ein neues Paket braucht die Freigabe des
+Projektleiters.
+
 ## Reevaluations-Trigger
 
 1. Der Test in reflexionsinstrument#41 oder die Checkliste vor dem Release zeigt, dass B oder
    C auf dem iPhone zuverlässig klappt, oder dass A scheitert.
 2. MyTCO läuft in mehr als einem App-Prozess: Dann hat jeder Prozess eigene Zähler, und die
    Bremsen gehören in die Datenbank.
-3. Zwei-Faktor-Login oder Passkeys werden verlangt (A-LOGIN-06, A-LOGIN-07).
+3. Zwei-Faktor-Login oder Passkeys werden verlangt (A-LOGIN-06, A-LOGIN-07). Für den
+   freiwilligen Passkey ausgelöst, siehe Nachtrag; offen bleibt ein Passkey, der den Mail-Code sperrt.
 
 ## Quellen
 

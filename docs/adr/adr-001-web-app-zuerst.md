@@ -13,7 +13,7 @@ Das Anforderungsdokument v1.2 spricht dagegen von einer Web-App mit möglicher A
 Randbedingungen:
 
 - **Termin:** Admin-Seite und Mitglieder-Login bis 28.02.2027 (Roadmap). Push wird
-  frühestens mit *CM-Betrieb* (30.06.2027) gebraucht (A-ANMELDUNG-08).
+  frühestens mit *CM-Betrieb* (01.06.2027) gebraucht (A-ANMELDUNG-08).
 - **Ehrenamt:** Entwicklung und Betrieb ehrenamtlich, langfristig, eventuell mit weiteren
   Mitbetreuenden; Übergabe muss möglich sein (Issue #10).
 - **Kosten:** laufend im niedrigen dreistelligen Bereich pro Jahr (N-KOSTEN-01).

@@ -13,7 +13,7 @@ einen Dienst für den E-Mail-Versand. Randbedingungen:
   Vertrag zur Auftragsbearbeitung (DS-02), Logs und Backups höchstens 30 Tage (DS-06), keine Inhalte von fremden Servern (DS-03, umgesetzt in [ADR-002](adr-002-sveltekit-postgresql.md)) —
   siehe [Datenschutzkonzept](../datenschutz.md#vorgaben-für-technik-und-hosting).
 - **Kosten:** laufend im niedrigen dreistelligen Bereich pro Jahr (N-KOSTEN-01).
-- **Übergabe:** Konto soll auf den Verein laufen können (K-04), Anbieter austauschbar.
+- **Übergabe:** Konto soll auf den Verein laufen können (Vereinsadresse, K-04.1), Anbieter austauschbar.
 - Der Verein hat Webhosting für tcolten.ch bei Metanet (K-09).
 
 **Legende:** **B·n** = belegt mit Quelle n · **S** = Schätzung · **V** = Vermutung.
@@ -92,7 +92,9 @@ genommen, ein VPS ohne SLA reicht.
 ## Reevaluations-Trigger
 
 1. **Betrieb wird zu viel:** Server-Pflege ist im Jahr mehr als ca. 2 Personentage (S),
-   oder niemand übernimmt sie (hängt an K-05) → verwaltete Plattform (Option B).
+   oder niemand übernimmt sie → verwaltete Plattform (Option B). Stand K-05 (03.11.2026):
+   vorerst niemand; im Notfall übernimmt die Hauptansprechperson übergangsweise und sucht
+   eine Nachfolge. Der Trigger greift spätestens, wenn der Projektleiter ausfällt.
 2. **Infomaniak bietet verwaltetes PostgreSQL** im Budget an.
 3. **Ausfall während der CM-Anmeldung oder am Finalwochenende**, der den Verein stärker
    stört, als K-15 (kurzer Ausfall wird in Kauf genommen) erwarten liess.
