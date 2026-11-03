@@ -28,7 +28,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 |------|------|---------|
 | Vorname, Nachname | Konto, Anmeldung, Resultate | ja |
 | Postadresse | Login-Briefe | ja |
-| E-Mail-Adresse | Bestätigungen, Benachrichtigungen, neuer Einmal-Code (A-LOGIN-10); je Mitglied eine eigene (FR-25) | ja |
+| E-Mail-Adresse | Bestätigungen, Benachrichtigungen, neuer Einmal-Code (A-LOGIN-10); je Mitglied eine eigene (FR-25) | ja, ausser bei Junioren, die ein Elternteil führt (Vorschlag K-08) |
 | Telefonnummer | Absprache der Gruppenspiele | für die CM ja |
 | Geschlecht, Jahrgang | Zulassung zu Kategorien; für die CM reicht der Jahrgang (K-40.2); volles Geburtsdatum nur, falls Swiss Tennis es für Lizenzanträge verlangt (hängt an K-40.1) | ja |
 | Lizenznummer, Klassierung | Anmeldung, Lizenzanträge, Export an Swiss Tennis | nein |
@@ -37,6 +37,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | IP-Adresse bei Login-Versuchen; eingetippte E-Mail-Adresse einer Code-Anfrage | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
 | Anmeldungen (mit Kommentar zum Wildcard-Antrag), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
 | Austrittsdatum | Löschfrist nach Austritt | — |
+| *Verwaltet von*: Elternteil, der das Konto eines Juniors führt (Vorschlag K-08) | Kind ohne eigenes Login | — |
 | Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (A-MITGLIED-07) | — |
 
 Keine Gesundheitsdaten (auch nicht als Grund für eine Abmeldung), keine Fotos, keine
@@ -47,6 +48,7 @@ Bankdaten.
 | Wer | Sieht |
 |-----|-------|
 | Mitglied | alle eigenen Daten; den Änderungsverlauf zum eigenen Konto auf Anfrage bei der Ansprechperson |
+| Elternteil, der ein Kind führt | alle Daten des Kindes, ändert sie und meldet es an (Vorschlag K-08) |
 | Admin | alle Daten der Mitglieder und den Änderungsverlauf; Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
 | CM-Verantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
 | Lizenzverantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
@@ -61,8 +63,9 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 
 ## Löschen
 
-- **Austritt:** Konto sofort gesperrt, Daten nach 3 Monaten gelöscht; der Name bleibt in
-  vergangenen Resultaten (**Vorschlag K-38**). Vom Austritt erfährt MyTCO über die eingelesene Mitgliederliste (A-MITGLIED-07, K-17.1).
+- **Austritt:** Konto sofort inaktiv (Login gesperrt). Die Daten bleiben eine Frist lang, falls
+  das Mitglied zurückkommt, dann werden sie gelöscht; der Name bleibt in vergangenen
+  Resultaten (**Vorschlag K-38:** 1 Jahr; die Frist legt der Verein fest). Vom Austritt erfährt MyTCO über die eingelesene Mitgliederliste (A-MITGLIED-07, K-17.1).
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Eingelesene Mitgliederliste** (A-MITGLIED-07): wird nach dem Einlesen nicht aufbewahrt;
@@ -79,15 +82,19 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 
 ## Junioren
 
-Junioren spielen ab der Clubmeisterschaft 2027 mit und erhalten ein Konto wie alle Mitglieder
-(K-46): dieselben Felder, dieselben Rechte, der Login-Brief geht an ihre Postadresse. Über
-Junioren speichert MyTCO nicht mehr als über Erwachsene. Sie werden zum Start mit allen Mitgliedern erfasst (K-17.1), spätestens
-bis zur CM-Anmeldung.
+Junioren spielen ab der Clubmeisterschaft 2027 mit (K-46). Über Junioren speichert MyTCO nicht
+mehr als über Erwachsene. Sie werden zum Start mit allen Mitgliedern erfasst (K-17.1),
+spätestens bis zur CM-Anmeldung.
 
-Offen (hängt an K-08): Führt das Kind das Konto selbst oder die Eltern? Davon hängt ab, wessen
-E-Mail und Telefon im Konto stehen und was Gegner und Doppelpartner sehen (K-31). Eine
-E-Mail-Adresse gehört zu höchstens einem Mitglied (FR-25); eine Familienadresse für mehrere
-Kinder geht so nicht.
+**Vorschlag K-08:**
+
+- Ein Mitglied erfasst sein Kind und erledigt für es das Administrative (Daten, CM-Anmeldung).
+  Das Kind braucht dann weder eigene E-Mail noch eigenes Login; für Gegner und Doppelpartner
+  gelten E-Mail und Telefon des Elternteils (K-31).
+- Ab einem Alter, das der Verein festlegt, erhält der Junior ein eigenes Login und braucht
+  dann eine eigene E-Mail-Adresse (FR-25).
+- Die Altersgrenze steht danach hier und in der Datenschutzerklärung. Offen ist auch, was gilt,
+  wenn die Eltern nicht Mitglied sind.
 
 ## Rechte der Mitglieder
 

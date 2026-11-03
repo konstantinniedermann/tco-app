@@ -116,6 +116,30 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-03 — ADR-003: Reevaluations-Trigger 1 steht kurz vor dem Auslösen (Stellvertretung)
+
+**Thema:** Betrieb
+
+**Fundort:** `docs/adr/adr-003-hosting-infomaniak-vps.md`, Reevaluations-Trigger 1; Antwort K-05.
+
+**Beobachtung:** Laut K-05 übernimmt vorerst niemand den Betrieb, im Notfall springt die Hauptansprechperson übergangsweise ein. Der Trigger «niemand übernimmt die Server-Pflege → verwaltete Plattform» greift damit, sobald der Projektleiter ausfällt.
+
+**Ursprung:** Übertragung der Antworten vom 03.11.2026, Review.
+
+**Einschätzung:** Keine sofortige Folge. Wieder ansehen, wenn sich der Vorstand zur Stellvertretung äussert oder vor dem ersten Live-Release.
+
+### 2026-11-03 — Mockups zeigen noch Termine nach dem alten Fahrplan
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** `docs/ui-mockups/index.html` (Zeilen 98, 124), `docs/ui-mockups/grosse-schrift.html` (Zeile 44): «Anmeldung offen bis 15. Mai».
+
+**Beobachtung:** Die Beispieldaten passen knapp noch zum neuen Fahrplan (Anmeldung ab Mitte April, Auslosung Anfang Juni), stammen aber aus dem alten. Beim Vorzeigen vor dem Vorstand kann das irritieren.
+
+**Ursprung:** Review der Übertragung vom 03.11.2026.
+
+**Einschätzung:** Kosmetik. Beim nächsten Anfassen der Mockups oder nach der Antwort zu K-24.2 (Anmeldeschluss) angleichen.
+
 ### 2026-11-03 — Dependabot-PR #38 (TypeScript 7) rot wegen Peer-Abhängigkeiten
 
 **Thema:** Betrieb
