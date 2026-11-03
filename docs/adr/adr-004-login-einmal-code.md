@@ -89,7 +89,7 @@ auf der Test-Umgebung (#32).
 **Leichter:** Kein Passwort, also kein Zurücksetzen und kein Passwortspeicher. Abmelden und
 Widerruf wirken beim nächsten Aufruf.
 
-**Schwerer:** Jedes Mitglied braucht einen Brief (K-16) und eine erreichbare E-Mail-Adresse
+**Schwerer:** Jedes Mitglied braucht einen Brief (K-16.1) und eine erreichbare E-Mail-Adresse
 (K-11). Hinter dem Reverse Proxy muss die App die Client-IP aus einer vertrauenswürdigen
 Kopfzeile lesen, sonst teilen alle Mitglieder eine IP und damit die Bremsen
 ([Schnittstelle zu #32](../ci-cd-und-release.md#einstellungen-der-app)).

@@ -3,7 +3,7 @@
 # Datenschutzerklärung MyTCO — Entwurf
 
 Text für die Mitglieder, in MyTCO und als Verweis auf den Login-Briefen. Folgt dem
-[Datenschutzkonzept](datenschutz.md). Entwurf, Freigabe durch den Vorstand (K-06);
+[Datenschutzkonzept](datenschutz.md). Entwurf, Freigabe durch den Gesamtvorstand (K-06.2);
 Platzhalter in eckigen Klammern füllt der Verein aus.
 
 ---

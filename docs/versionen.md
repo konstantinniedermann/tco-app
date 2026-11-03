@@ -7,6 +7,10 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+- Antworten des Vorstands vom 03.11.2026 übertragen: neue Termine der Etappen, Junioren ab der
+  CM 2027, Passkey freiwillig ab *Mitglieder-Login*, Einlesen der Mitgliederliste geplant,
+  Kosten für 300–500 Mitglieder.
+
 ## 0.3.0 — Test-Umgebung und Absicherungen, nicht ausgeliefert
 
 Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test

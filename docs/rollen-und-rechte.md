@@ -18,7 +18,7 @@ Welche Rollen MyTCO kennt und wer was sehen und ändern darf — für die Etappe
 | **CM-Verantwortlicher** | CM-Anmeldung | Turnier und Kategorien anlegen, Wildcard-Anträge entscheiden, Anmeldungen von Hand, Gruppen und Tableaus aus Advantage übernehmen, Resultate erfassen und Streitfälle entscheiden | A-ROLLE-07 |
 | **Lizenzverantwortlicher** | Lizenzanträge | Stichtag der Lizenzrunde setzen, Anträge ansehen, exportieren und abhaken | A-ROLLE-08 |
 
-Wer diese Rollen im Verein übernimmt, klärt K-18.
+Der Vorstand hat die Rollen bestätigt und will zwei Admins (K-18.1, K-18.3). Wer diese Rollen im Verein übernimmt, klärt K-18.
 
 ## Grundsätze
 
@@ -34,7 +34,7 @@ Wer diese Rollen im Verein übernimmt, klärt K-18.
 | RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist | geplant |
 | RR-07 | Die Admin-Oberfläche sieht nur, wer mindestens eine Rolle über *Mitglied* hinaus hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03) | geplant |
 | RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | geplant |
-| RR-09 | Die Admin-Oberfläche verlangt höchstens einmal pro 24 Stunden einen frischen Code per E-Mail ([SI-08](sicherheitskonzept.md#vorgaben), **Vorschlag K-12**) | geplant |
+| RR-09 | Die Admin-Oberfläche verlangt höchstens einmal pro 24 Stunden einen frischen Code per E-Mail ([SI-08](sicherheitskonzept.md#vorgaben), K-12.1) | geplant |
 
 ## Matrix
 
@@ -73,8 +73,9 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 ## Später
 
 - **Gast** (A-ROLLE-06): nur für die Registrierung über tcolten.ch.
-- **Junioren-Leiter** (A-ROLLE-05) und Konten für Junioren oder Eltern: mit den
-  Junioren-Funktionen (K-08).
+- **Junioren-Leiter** (A-ROLLE-05), vom Vorstand als Juniorenverantwortliche angeregt
+  (K-18.1): mit den Junioren-Funktionen. Konten für Junioren gibt es schon ab der CM 2027,
+  mit denselben Rechten wie *Mitglied* (K-46); ob Eltern sie führen, hängt an K-08.
 - **Anlässe-Veranstalter** (A-ROLLE-04): kommt mit allgemeinen Anlässen. Die CM leitet
   bis dahin der CM-Verantwortliche.
 
@@ -83,6 +84,6 @@ Neue Rollen und Rechte kommen erst in diese Matrix und, wo sie Personendaten zei
 
 ## Offene Fragen an den Verein
 
-K-08 (Junioren), K-16.1 und K-16.3 (Briefversand, neuer Code), K-18 (wer übernimmt welche Rolle) —
+K-08 (Konten der Junioren), K-16.1 (Briefversand), K-18.2 (wer übernimmt welche Rolle) —
 alle in den [Abklärungen](abklaerungen.md). Was schon entschieden ist, steht unter
 [Beantwortet](abklaerungen.md#beantwortet).

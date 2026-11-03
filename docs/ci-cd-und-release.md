@@ -35,7 +35,7 @@ dort nie hin (DS-08).
 Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
 (43 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
-#29, Konten und Adresse hängen an K-04 und K-10), spätestens vor dem Release *Mitglieder-Login*.
+#29; die Konten laufen auf eine Vereinsadresse, K-04.1; die Adresse hängt an K-10), spätestens vor dem Release *Mitglieder-Login*.
 Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
 
 ## Ablauf
@@ -212,7 +212,8 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   automatisch.
 - **Restrisiko** (bewertet im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
   Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
-  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten, hängt an K-04). Die
+  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten, sobald die Konten auf die
+  Vereinsadresse wechseln, K-04.1). Die
   Reichweite ist dort am 02.11.2026 richtiggestellt worden und **vom Projektleiter neu zu
   bestätigen**:
   - Wer ins Repo pushen kann, kann direkt auf `main` pushen (davor schützt nur der lokale
@@ -224,7 +225,8 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
     denselben Server trotzdem Live. Pushen können der Projektleiter und die Hauptansprechperson
     im Vorstand: Mitarbeitende eines privaten Repos auf einem Privatkonto haben immer
     Schreibrecht (B: [GitHub Docs](https://docs.github.com/en/account-and-profile/reference/permission-levels-for-a-personal-account-repository)).
-    Eine reine Leserolle gibt es erst in einer Organisation (K-04).
+    Eine reine Leserolle gibt es erst in einer Organisation; ob das Repo mit dem Wechsel auf die
+    Vereinsadresse (K-04.1) in eine Organisation zieht, ist offen.
   - Ein Schadpaket im Bau landet im Image und läuft damit live, auch ohne den Schlüssel, und
     mit dem `ausliefern` des Images auch als root-gleicher Benutzer auf dem Server.
     Dagegen helfen nur die Malware-Prüfung und die Prüfung der Pakete vor der Aufnahme.

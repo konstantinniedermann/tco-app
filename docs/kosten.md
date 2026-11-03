@@ -40,7 +40,7 @@ Schweizer MwSt in Rechnung (V).
 **Künftig eventuell wenige Franken pro Jahr:** GitHub und der E-Mail-Versand kosten heute
 nichts, weil sie Gratiskontingente nutzen. Das Kontingent an Actions-Minuten teilt MyTCO mit
 anderen privaten Repos des Projektleiters ([Actions-Minuten](ci-cd-und-release.md#actions-minuten)).
-Bei Scaleway fallen ohne Gratiskontingent bei 300 Mitgliedern ca. CHF 2.50 pro Jahr an (S).
+Bei Scaleway fallen ohne Gratiskontingent bei 500 Mitgliedern ca. CHF 4 pro Jahr an (S).
 Reicht ein Kontingent nicht mehr, entstehen Kosten von wenigen Franken pro Jahr (S).
 
 Annahme K-11: MyTCO verschickt seine E-Mails über Scaleway, nicht über ein Postfach von
@@ -78,22 +78,22 @@ CHF 1.10–1.40 Porto plus Druck.
 
 ## Szenarien
 
-Die Mitgliederzahl ist offen (hängt an K-17.2). Gerechnet sind drei Grössen. Mail-Menge:
+Der Verein hat 300 bis 500 Mitglieder (K-17.2). Gerechnet sind drei Grössen. Mail-Menge:
 ca. 3 Mails pro Mitglied und Monat für Mitteilungen, Bestätigungen und Login-Codes (S).
 
-| | 100 Mitglieder | 200 Mitglieder | 300 Mitglieder |
+| | 300 Mitglieder | 400 Mitglieder | 500 Mitglieder |
 |-|---------------:|---------------:|---------------:|
-| Mails pro Monat (S) | ca. 300 | ca. 600 | ca. 900 |
-| E-Mail-Versand Scaleway pro Jahr | 0 | ca. 1 | ca. 2 |
+| Mails pro Monat (S) | ca. 900 | ca. 1200 | ca. 1500 |
+| E-Mail-Versand Scaleway pro Jahr | ca. 2 | ca. 3 | ca. 3 |
 | Laufend pro Jahr | ca. 95–175 | ca. 95–175 | ca. 95–175 |
-| Druck Login-Brief, Startjahr | ca. 5–10 | ca. 10–20 | ca. 15–30 |
-| **Total Startjahr** | **ca. 100–185** | **ca. 105–195** | **ca. 110–205** |
+| Druck Login-Brief, Startjahr | ca. 15–30 | ca. 20–40 | ca. 25–50 |
+| **Total Startjahr** | **ca. 110–205** | **ca. 115–215** | **ca. 120–225** |
 | **Total Folgejahre** | **ca. 95–175** | **ca. 95–175** | **ca. 95–175** |
-| Porto, falls einzeln verschickt (B- bis A-Post) | 110–140 | 220–280 | 330–420 |
+| Porto, falls einzeln verschickt (B- bis A-Post) | 330–420 | 440–560 | 550–700 |
 
 Die untere Grenze gilt mit Object Storage, die obere mit Swiss Backup. Monate mit
 Clubmeisterschaft können ein Mehrfaches an Mails bringen. Selbst das Dreifache in diesen
-Monaten bleibt unter CHF 5 pro Jahr (S).
+Monaten bleibt unter CHF 10 pro Jahr (S).
 
 ## Vergleich
 
@@ -112,7 +112,8 @@ Ausserhalb des Takts löst eine Preiserhöhung beim VPS eine Überprüfung aus
 ## Offene Fragen
 
 - **K-03:** Gilt der Budgetrahmen, wer gibt die Posten frei, und wie bezahlt der Verein
-  Online-Dienste (Rechnung, Kreditkarte)? Die Freigabe der Kosten durch den Verein steht aus.
+  Online-Dienste (Rechnung, Kreditkarte)? Die Freigabe der Kosten durch den Verein steht aus;
+  der Vorstand entscheidet am 16.11.2026, im Gespräch sind CHF 300–500 pro Jahr.
 - **K-09:** Was kostet das heutige Paket des Vereins bei Metanet, und enthält es schon
   E-Mail-Postfächer?
 - **K-43:** Welche Online-Dienste nutzt der Verein heute und zu welchen Kosten? Davon hängt
