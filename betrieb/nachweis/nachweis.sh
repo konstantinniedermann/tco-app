@@ -494,6 +494,42 @@ p1_testdaten_zweimal() {
 	[ "$(psql_test "select count(*) from mitglied")" = 3 ]
 }
 
+# Live-Sperre: ist MAIL_NUR_AN auf Live gesetzt, verweigern ausliefern und zurueck jede Änderung.
+# Ohne set -e im Aufruf: jeder Schritt prüft sein Ergebnis selbst.
+p1_live_umleitung_pruefen() {
+	local vorher="$1" ausgabe rc=0
+	erwarte_lauf fehler live "$(lies d1)" || return 1
+	ausgabe=$(MYTCO_BASIS="$BASIS" MYTCO_REPO="$REPO" "$BASIS/live/betrieb/bin/zurueck" live </dev/null) || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe" || return 1
+	[ "$(head -n 1 "$BASIS/live/zustand/aktuell")" = "$vorher" ] || {
+		echo "live/zustand/aktuell hat sich geändert"
+		return 1
+	}
+	grep -qxF "ausliefern: MAIL_NUR_AN ist auf Live gesetzt" "$BASIS/live/protokoll.log" || {
+		echo "Meldung von ausliefern fehlt in live/protokoll.log"
+		return 1
+	}
+	grep -qxF "zurueck: MAIL_NUR_AN ist auf Live gesetzt" "$BASIS/live/protokoll.log" || {
+		echo "Meldung von zurueck fehlt in live/protokoll.log"
+		return 1
+	}
+}
+
+# Setzt den Wert vorübergehend und leert ihn danach auch bei einem Fehlschlag wieder.
+p1_live_umleitung() {
+	local env="$BASIS/live/geheim.env" vorher rc=0
+	vorher=$(head -n 1 "$BASIS/live/zustand/aktuell")
+	sed 's/^MAIL_NUR_AN=.*/MAIL_NUR_AN=nachweis@example.org/' "$env" >"$env.neu"
+	mv "$env.neu" "$env"
+	chmod 600 "$env"
+	p1_live_umleitung_pruefen "$vorher" || rc=$?
+	sed 's/^MAIL_NUR_AN=.*/MAIL_NUR_AN=/' "$env" >"$env.neu"
+	mv "$env.neu" "$env"
+	chmod 600 "$env"
+	[ "$rc" = 0 ] || return 1
+	live_status_ok
+}
+
 # --- 2 HTTPS über Caddy -------------------------------------------------------------------
 p2_test_ohne_passwort() {
 	local status
@@ -1026,6 +1062,7 @@ pruefung "1 image per digest aus der registry geholt" p1_pull "$ABRUFE_VORHER"
 pruefung "1 test und live laufen mit D1" p1_laeuft
 pruefung "1 testdaten auf test geladen, mail-versuch protokolliert" p1_testdaten
 pruefung "1 testdaten zweiter lauf → abgebrochen, nichts doppelt" p1_testdaten_zweimal
+pruefung "1 live-sperre: MAIL_NUR_AN gesetzt → ausliefern und zurueck verweigert" p1_live_umleitung
 # Ohne laufende Umgebungen sind alle weiteren Prüfungen ohne Aussage.
 [ "$ANZAHL_FEHLER" = 0 ] || summe
 

@@ -67,6 +67,9 @@ trotzdem zu Ende.
 | Wiederherstellen (neuester oder bestimmter Lauf) | `/opt/mytco/gemeinsam/bin/wiederherstellen <umgebung> [lauf-…]` |
 | Probe in einer Wegwerf-Datenbank | `/opt/mytco/gemeinsam/bin/probe <umgebung> [lauf-…]` |
 
+Ist in `live/geheim.env` `MAIL_NUR_AN` gesetzt (Leerzeichen und Anführungszeichen zählen
+nicht), verweigern `ausliefern live` und `zurueck live` ihre Arbeit und melden `fehler`.
+
 `zurueck` migriert die Datenbank nicht zurück. `wiederherstellen` spielt nur Sicherungen
 derselben Umgebung ein und braucht eine ausgelieferte Fassung (`<umgebung>/zustand/aktuell`);
 ohne sie meldet es `fehler`. Es leert vorher die Tabellen der App samt der Liste der

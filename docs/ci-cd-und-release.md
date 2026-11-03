@@ -181,6 +181,9 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 - Das Skript nimmt nur zwei Angaben an: `test` oder `live` und den Digest eines Images aus
   der eigenen Container-Ablage. Beides wird streng geprüft und nie über eine Shell
   ausgewertet.
+- Auf Live ist die Umleitung der Mails (`MAIL_NUR_AN`, nur für Test) gesperrt: Steht in
+  `live/geheim.env` ein Wert, verweigern `ausliefern live` und `zurueck live` jede Änderung
+  und melden `fehler`; der Grund steht nur im Protokoll.
 - Der Live-Lauf startet nur bei einem Push auf `main` und nur mit einem Image, das auf Test
   ausgeliefert wurde.
 - Der Türsteher und seine Eingabeprüfung werden **von Hand** eingerichtet und nie von der CI

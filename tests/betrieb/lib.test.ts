@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { fuehreAus } from './hilfe.ts';
+import { fuehreAus, tempOrdner } from './hilfe.ts';
 
 const TREIBER = 'tests/betrieb/lib-treiber.sh';
 const lib = (...args: string[]) => fuehreAus(TREIBER, args);
@@ -179,5 +179,40 @@ describe('ZAEHL_SQL', () => {
 		expect(sql).toContain('pg_catalog');
 		expect(sql).toContain('information_schema');
 		expect(sql).toContain('ORDER BY');
+	});
+});
+
+describe('mail_umleitung_gesetzt', () => {
+	const mitEnv = (inhalt: string | null) => {
+		const basis = tempOrdner('mytco-basis-');
+		if (inhalt !== null) {
+			mkdirSync(join(basis, 'live'), { recursive: true });
+			writeFileSync(join(basis, 'live/geheim.env'), inhalt);
+		}
+		return fuehreAus(TREIBER, ['mail_umleitung_gesetzt', 'live'], { basis }).status;
+	};
+
+	test.each([
+		['leer', 'MAIL_NUR_AN=\n'],
+		['zwei einfache Anführungszeichen', "MAIL_NUR_AN=''\n"],
+		['Leerzeichen in Anführungszeichen', 'MAIL_NUR_AN=" "\n'],
+		['nur Leerzeichen', 'MAIL_NUR_AN=   \n'],
+		['keine Zeile', 'ORIGIN=https://x\n'],
+		['auskommentiert', '#MAIL_NUR_AN=pl@example.org\n']
+	])('gilt als leer: %s', (_name, inhalt) => {
+		expect(mitEnv(inhalt)).toBe(1);
+	});
+
+	test('Datei fehlt: nicht gesetzt', () => {
+		expect(mitEnv(null)).toBe(1);
+	});
+
+	test.each([
+		['ohne Anführungszeichen', 'MAIL_NUR_AN=pl@example.org\n'],
+		['einfache Anführungszeichen', "MAIL_NUR_AN='pl@example.org'\n"],
+		['doppelte Anführungszeichen', 'MAIL_NUR_AN="pl@example.org"\n'],
+		['zwischen anderen Zeilen', 'A=1\nMAIL_NUR_AN=pl@example.org\nB=2\n']
+	])('gilt als gesetzt: %s', (_name, inhalt) => {
+		expect(mitEnv(inhalt)).toBe(0);
 	});
 });
