@@ -250,7 +250,7 @@ describe('Passkey einrichten', () => {
 		expect(await passkeysVon(kontoId)).toEqual(vorher);
 	});
 
-	test('Einrichten für ein unbekanntes Konto wirft', async () => {
+	test('A-LOGIN-07: Optionen zum Einrichten für ein unbekanntes Konto werfen', async () => {
 		const d = baue();
 		await expect(d.dienst.optionenEinrichten(-1, ORT)).rejects.toThrow();
 	});
