@@ -9,10 +9,10 @@ import {
 import { browserKannPasskey, virtuellerAuthenticator } from './hilfen/passkey.ts';
 import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
-// Rate-Limits gelten pro IP für den ganzen Lauf: höchstens ein Fehlversuch pro Test und Projekt.
-// Die Passkey-Prüfung vergleicht die Herkunft; der Testserver ohne Proxy-Kopf meldet https statt http.
+// Der Testserver ohne Proxy-Kopf meldet https statt http; die Passkey-Prüfung vergleicht die Herkunft.
 test.use({ extraHTTPHeaders: { 'x-forwarded-proto': 'http' } });
 
+// Rate-Limits gelten pro IP für den ganzen Lauf: höchstens ein Fehlversuch pro Test und Projekt.
 test.afterAll(async () => {
 	await schliesseLoginHilfen();
 });
@@ -164,6 +164,9 @@ test('A-LOGIN-08: Profil-Bildschirm ohne Passkey ohne axe-Verstösse', async ({ 
 	const fehler = sammleKonsolenfehler(page);
 	const konto = await legeKontoMitBriefCodeAn('Rea');
 	await meldeMitBriefCodeAn(page, konto.code, 'Rea');
+	// Der Hinweis erscheint nur, wo der Browser Passkeys kann (auch WebKit).
+	if (await browserKannPasskey(page)) await expect(page.getByText(HINWEIS)).toBeVisible();
+	else await expect(page.getByText(HINWEIS)).toHaveCount(0);
 	await page
 		.getByRole('navigation', { name: 'Hauptnavigation' })
 		.getByRole('link', { name: 'Profil' })
