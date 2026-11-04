@@ -2,7 +2,7 @@ CREATE TABLE "passkey" (
 	"kennung" text PRIMARY KEY NOT NULL,
 	"konto_id" integer NOT NULL,
 	"oeffentlicher_schluessel" text NOT NULL,
-	"zaehler" integer DEFAULT 0 NOT NULL,
+	"zaehler" bigint DEFAULT 0 NOT NULL,
 	"transporte" text[] DEFAULT '{}'::text[] NOT NULL,
 	"rp_id" text NOT NULL,
 	"geraet" text NOT NULL,

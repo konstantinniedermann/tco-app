@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+	bigint,
 	boolean,
 	check,
 	index,
@@ -73,7 +74,7 @@ export const passkey = pgTable(
 			.references(() => konto.id, { onDelete: 'cascade' }),
 		// base64url
 		oeffentlicherSchluessel: text('oeffentlicher_schluessel').notNull(),
-		zaehler: integer('zaehler').notNull().default(0),
+		zaehler: bigint('zaehler', { mode: 'number' }).notNull().default(0),
 		transporte: text('transporte')
 			.array()
 			.notNull()
