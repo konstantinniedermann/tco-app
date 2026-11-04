@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
+.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -54,6 +54,9 @@ dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einste
 seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 3 erfundene Mitglieder anlegen, Brief-Code ausgeben (Einstellungen aus .env)
 	node --env-file=.env scripts/migrate.ts
 	node --env-file=.env scripts/seed-lokal.ts
+
+admin: voraussetzungen-env db ## Ersten Admin festlegen, z. B. make admin ARGS='--mitgliedernummer 1 --vorname … --nachname … --strasse … --plz … --ort … --email …'
+	node --env-file=.env scripts/admin-festlegen.ts $(ARGS)
 
 test: db ## Einheits- und Datenbanktests mit Abdeckung
 	npm test
