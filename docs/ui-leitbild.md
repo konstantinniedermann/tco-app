@@ -147,10 +147,11 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
 | Karte | `.karte` | weisse Fläche auf Hintergrund |
-| Kachel | `.kachel` | Karte als Link mit „›"; `.hervor` = Rand in Aktion-Farbe für das Wichtigste |
+| Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile |
+| Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste |
 | Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt" oder „1 von 3 Anmeldungen" |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05) |
-| Hinweis | `.hinweis` | ocker, Rand links |
+| Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen") |
 | Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06) |
 | Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm waagrecht scrollbar |
 | Symbol | `.symbol` | eigene SVG-Symbole, 24er-Raster, Strich 2, immer mit Text |
@@ -161,8 +162,25 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Nebentext | `.leise` | kleiner und leiser, für Hilfen und Nebeninfos |
 | Breite Taste | `.taste-breit` | Zusatz zu einer Taste: volle Breite (Formulare auf dem Handy) |
 
+### Welche Fläche wofür
+
+**UI-08: Jedes Thema einer Seite steht in einer eigenen Fläche.** Wer eine Seite öffnet, soll
+sich an den Flächen zurechtfinden, ohne den ganzen Text zu lesen. Welche Fläche es ist, sagt
+ihre Funktion und wie lange sie bleibt; Farbe und Balken zeigen das an. Eine neue Art Fläche
+kommt nur hierher, wenn sie sich in Funktion oder Lebensdauer von allen bestehenden
+unterscheidet.
+
+| Fläche | Bedeutung | Lebensdauer |
+|--------|-----------|-------------|
+| Karte | ein festes Thema der Seite (Login: *Mit Passkey*, *Mit Code*) | bleibt immer |
+| Aufklappbereich | ein festes Thema auf einer langen Seite (Profil) | bleibt immer |
+| Kachel | führt weiter oder löst eine Aktion für einen Eintrag aus (*Clubmeisterschaft 2027 ›*, *iPhone · Entfernen*) | so lange, wie es den Eintrag gibt |
+| Kachel hervorgehoben (roter Balken) | das Wichtigste, was gerade läuft; man kann sie nicht wegklicken | solange es aktuell ist |
+| Hinweis (ocker Balken) | eine Mitteilung oder ein Angebot an das Mitglied (*Passkey einrichten*, *Brief-Code läuft bald ab*) | vorübergehend: verschwindet, wenn erledigt oder weggeklickt |
+
 Teile eines Bausteins heissen `<baustein>-<teil>`, z. B. `.kopf-wappen`, `.feld-hilfe`,
-`.zaehler-balken`, `.zaehler-voll`, `.zaehler-text`, `.kachel-pfeil`, `.seitenleiste-bereich`. Der aktive Reiter
+`.zaehler-balken`, `.zaehler-voll`, `.zaehler-text`, `.kachel-pfeil`, `.seitenleiste-bereich`,
+`.klappe-titel`. Der aktive Reiter
 und der aktive Eintrag der Seitenleiste tragen `aria-current="page"`, keine eigene Klasse.
 
 ## Layout und Navigation
