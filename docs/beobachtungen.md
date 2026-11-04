@@ -410,3 +410,15 @@ Nicht mit `--legacy-peer-deps` umgehen. Prüfen mit
 **Ursprung:** #44, Merge nach `dev`.
 
 **Einschätzung:** Niedrig. `make voraussetzungen` könnte prüfen, ob `node_modules` zur Lock-Datei passt, oder der Branching-Skill nennt `npm ci` nach Merges mit Paketänderungen.
+
+### 2026-11-04 — K-48 Website-Umzug: Antwort zieht ADR-003, Kosten und Sicherheitskonzept nach sich
+
+**Thema:** Betrieb
+
+**Fundort:** `docs/abklaerungen.md` K-48; `docs/adr/adr-003-hosting-infomaniak-vps.md`, `docs/kosten.md`, `docs/sicherheitskonzept.md`.
+
+**Beobachtung:** K-48 ist nirgends als `Annahme K-48` markiert, `make annahmen` meldet bei einer Antwort also nichts. Zieht die Website auf den MyTCO-Server, braucht es einen Nachtrag zu ADR-003 (eigener Container, abgeschottet von Datenbank und Netz von MyTCO), neue Posten in `kosten.md` (Postfächer, wegfallendes Metanet-Paket) und eine Bedrohung im Sicherheitskonzept (Lücke im Admin-Bereich der Website auf demselben Server).
+
+**Ursprung:** Nutzerhinweis, Session vom 04.11.2026 (Website weg von Metanet).
+
+**Einschätzung:** Erst relevant, wenn K-09.1 und K-48 beantwortet sind. Dann zusammen bewerten: gleicher Server oder eigenes Webhosting bei Infomaniak.
