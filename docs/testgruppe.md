@@ -22,7 +22,7 @@ Lauf.
 - [ ] Live in Betrieb ([#39](https://github.com/konstantinniedermann/tco-app/issues/39))
 - [ ] Login per Einmal-Code auf Live ([#29](https://github.com/konstantinniedermann/tco-app/issues/29))
 - [ ] Brief-Code und Brief als PDF in der Mitgliederverwaltung ([#43](https://github.com/konstantinniedermann/tco-app/issues/43), Etappe 2)
-- [ ] Hilfe beim Start: Hilfe-Seite und Anleitung zum Startbildschirm (A-HILFE-01, -02)
+- [ ] Hilfe beim Start: Hilfe-Seite und Anleitung zum Startbildschirm (A-HILFE-01, -02, [#47](https://github.com/konstantinniedermann/tco-app/issues/47))
 - [ ] Datenschutzerklärung auf Live erreichbar (DS-09), Hinweis an die alte E-Mail-Adresse gebaut (FR-25)
 - [ ] Kontaktangabe für Fragen geklärt (K-21)
 - [ ] Vorabversion 0.x auf Live, Checkliste auf Test abgehakt

@@ -15,7 +15,7 @@ Nach dem Anlegen Labels + Milestone setzen (docs/issue-konventionen.md):
   • Priorität (genau 1): P0 | P1 | P2
   • Status (optional):   blocked | needs-input | win | verein-feedback
                          (in-arbeit setzt die Session, die das Issue übernimmt — nicht beim Anlegen)
-  • Milestone (genau 1): Fundament | Mitglieder-Login | CM-Anmeldung | CM-Betrieb | Lizenzanträge | Backlog / Optional
+  • Milestone (genau 1): Fundament | Pilot | Mitglieder-Login | CM-Anmeldung | CM-Betrieb | Lizenzanträge | Backlog / Optional
 
 Keine echten Mitgliederdaten in Issues — Personen mit ihrer Rolle benennen.
 -->
