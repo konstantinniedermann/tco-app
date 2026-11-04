@@ -83,8 +83,13 @@ test.describe('mit virtuellem Authenticator', () => {
 		await meldeMitBriefCodeAn(page, konto.code, 'Ben');
 
 		await expect(page.getByText(HINWEIS)).toBeVisible();
+		// Die Seite blendet sofort aus und speichert danach; erst neu laden, wenn gespeichert ist.
+		const gespeichert = page.waitForResponse(
+			(r) => r.url().endsWith('/api/passkey/hinweis') && r.ok()
+		);
 		await page.getByRole('button', { name: 'Nein, danke' }).click();
 		await expect(page.getByText(HINWEIS)).toBeHidden();
+		await gespeichert;
 		await page.reload();
 		await expect(page.getByRole('heading', { level: 1, name: 'Hoi Ben' })).toBeVisible();
 		await expect(page.getByText(HINWEIS)).toBeHidden();
