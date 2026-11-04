@@ -10,6 +10,9 @@ export default mergeConfig(
 			coverage: {
 				provider: 'v8',
 				include: ['src/lib/server/**'],
+				// Dünner Anschluss an @simplewebauthn/server; belegt durch tests/e2e/passkey.test.ts
+				// (echte Registrierung und Anmeldung mit virtuellem Authenticator).
+				exclude: ['src/lib/server/login/passkey-pruefer.ts'],
 				thresholds: { lines: 90, branches: 90, functions: 90, statements: 90 }
 			},
 			projects: [
