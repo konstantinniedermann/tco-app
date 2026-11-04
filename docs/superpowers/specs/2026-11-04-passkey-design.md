@@ -1,7 +1,7 @@
 # Design: Freiwilliger Passkey (#44, A-LOGIN-07)
 
 **Datum:** 2026-11-04 · **Issue:** [#44](https://github.com/konstantinniedermann/tco-app/issues/44)
-· **Status:** Entwurf
+· **Status:** freigegeben (Projektleiter, 04.11.2026)
 
 ## Absicht
 
