@@ -30,7 +30,7 @@ async function leereRollen() {
 }
 
 describe('Rollen', () => {
-	test('A-ROLLE-01, RR-01, FR-03: Admin vergibt und entzieht Rollen, Verlauf je Rolle', async () => {
+	test('A-ROLLE-01, A-ROLLE-03, RR-01, FR-03: Admin vergibt und entzieht Rollen, Verlauf je Rolle', async () => {
 		await leereRollen();
 		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
 		const ziel = await legeMitgliedAn(db);

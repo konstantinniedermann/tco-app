@@ -123,6 +123,8 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] Push einschalten und erhalten (ab Etappe *CM-Betrieb*)
 - [ ] Erika Beispiel öffnet auf Test die Verwaltung mit Code per Mail (SI-08, A-ROLLE-02)
 - [ ] Admin-Seite am PC: die geänderten Funktionen einmal durchgehen
+- [ ] Vor dem ersten Live-Release mit Mitgliedern: Hinweis an die alte E-Mail-Adresse (FR-25, SI-09) ist gebaut, sonst Datenschutzerklärung anpassen
+- [ ] `admin-festlegen` einmal auf Test über `docker compose exec` ausgeführt
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 

@@ -67,7 +67,7 @@ Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 |----|-------------|--------|--------|--------|
 | A-ROLLE-01 | Der Admin vergibt Benutzerrollen mit den zugehörigen Berechtigungen | PDF 4a | Mitglieder-Login | umgesetzt |
 | A-ROLLE-02 | Rolle *Admin*: Zugang zur Mitgliederverwaltung | PDF 4a, Ziel | Mitglieder-Login | umgesetzt |
-| A-ROLLE-03 | Rolle *Mitglied* | PDF 4a | Mitglieder-Login | geplant |
+| A-ROLLE-03 | Rolle *Mitglied* | PDF 4a | Mitglieder-Login | umgesetzt |
 | A-ROLLE-04 | Rolle *Anlässe-Veranstalter*; die CM leitet bis dahin der CM-Verantwortliche (A-ROLLE-07) | PDF 4a | später\* | später |
 | A-ROLLE-05 | Rolle *Junioren-Leiter* | PDF 4a | später\* | später |
 | A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später\* | später |

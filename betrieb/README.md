@@ -106,7 +106,8 @@ cd /opt/mytco && MYTCO_UMGEBUNG=live docker compose -p mytco-live \
 
 Der Befehl legt nur den Admin selbst an; alle anderen Mitglieder kommen danach über die
 Verwaltung. Gibt es das Mitglied schon (gleiche Nummer oder E-Mail), erhält es nur die Rolle.
-Die Ausgabe nennt das Ergebnis und bei Fehlern Feldnamen mit Grund, nie Werte. Danach meldet
+Die Angaben landen im Shell-Verlauf: Befehl mit führendem Leerzeichen eingeben (bei
+`HISTCONTROL=ignorespace`) oder den Verlauf danach bereinigen. Die Ausgabe nennt das Ergebnis und bei Fehlern Feldnamen mit Grund, nie Werte. Danach meldet
 sich der Admin über «Code per E-Mail» an. Auf Test ist Erika Beispiel (erfunden) automatisch
 Admin.
 
