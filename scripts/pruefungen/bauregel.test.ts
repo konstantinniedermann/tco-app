@@ -54,13 +54,25 @@ describe('pruefeBauregel', () => {
 
 describe('Admin-Routen', () => {
 	const route = 'src/routes/api/admin/mitglieder/[id]/+server.ts';
+	const liste = [
+		'src/lib/server/admin/schnittstellen.ts',
+		[
+			'export const ADMIN_SCHNITTSTELLEN = {',
+			'\tgetMitglied,',
+			'\tpostMitglied',
+			'} satisfies Record<string, unknown>;'
+		].join('\n')
+	] as const;
 	const gut = [
 		"import { holeAdminDienste } from '../../../../../lib/server/admin/index.ts';",
 		"import { getMitglied } from '../../../../../lib/server/admin/schnittstellen.ts';",
-		"import type { RequestHandler } from './$types';"
+		"import type { RequestHandler } from './$types';",
+		'export const GET: RequestHandler = (e) => getMitglied(holeAdminDienste(), e);'
 	].join('\n');
+	const pruefe = (inhalt: string, weitere: [string, string][] = []) =>
+		pruefeBauregel(new Map([liste, [route, inhalt], ...weitere]));
 	it('jede +server.ts unter api/admin importiert nur aus admin/index.ts und admin/schnittstellen.ts', () => {
-		expect(pruefeBauregel(new Map([[route, gut]]))).toEqual([]);
+		expect(pruefe(gut)).toEqual([]);
 		for (const schlecht of [
 			"import { holeDb } from '../../../lib/server/db/index.ts';",
 			"import { listeMitglieder } from '../../../lib/server/admin/mitglieder.ts';",
@@ -68,7 +80,7 @@ describe('Admin-Routen', () => {
 			"export { y } from '../../../lib/server/login/index.ts';",
 			"import '../../../lib/server/db/schema.ts';"
 		]) {
-			expect(pruefeBauregel(new Map([[route, `${gut}\n${schlecht}`]]))).toHaveLength(1);
+			expect(pruefe(`${gut}\n${schlecht}`)).toHaveLength(1);
 		}
 	});
 	it('erkennt dynamische Importe in Admin-Routen', () => {
@@ -77,24 +89,97 @@ describe('Admin-Routen', () => {
 			'const m = await import("../../../lib/server/admin/mitglieder.ts");',
 			"const m = await import(\n\t'../../../lib/server/db/schema.ts'\n);"
 		]) {
-			expect(pruefeBauregel(new Map([[route, `${gut}\n${schlecht}`]]))).toHaveLength(1);
+			expect(pruefe(`${gut}\n${schlecht}`)).toHaveLength(1);
 		}
-		const erlaubt = "const m = await import('../../../lib/server/admin/schnittstellen.ts');";
-		expect(pruefeBauregel(new Map([[route, `${gut}\n${erlaubt}`]]))).toEqual([]);
+		// Auch die Schnittstellen nicht dynamisch: Dann liesse sich nicht prüfen, welche Funktion
+		// die Route nutzt.
+		const dynamisch = "const m = await import('../../../lib/server/admin/schnittstellen.ts');";
+		expect(pruefe(`${gut}\n${dynamisch}`)).toHaveLength(1);
+	});
+
+	it('RR-07: nur Funktionen aus ADMIN_SCHNITTSTELLEN (die der Rechte-Test abdeckt)', () => {
+		const fremd = gut.replace('{ getMitglied }', '{ getMitglied, mitAdmin }');
+		expect(pruefe(fremd)).toEqual([
+			`${route}: Admin-Route nutzt 'mitAdmin'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
+		]);
+		expect(pruefe(gut.replace('{ getMitglied }', '{ getMitglied as get, postMitglied }'))).toEqual(
+			[]
+		);
+		for (const schlecht of [
+			"import * as s from '../../../../../lib/server/admin/schnittstellen.ts';",
+			"import s from '../../../../../lib/server/admin/schnittstellen.ts';",
+			"import { holeDb } from '../../../../../lib/server/admin/index.ts';"
+		]) {
+			expect(pruefe(`${gut}\n${schlecht}`)).toHaveLength(1);
+		}
+	});
+
+	it('RR-07: holeAdminDienste() nur als Argument, nie die Datenbank daraus', () => {
+		for (const schlecht of [
+			'const db = holeAdminDienste().db;',
+			'const { db } = holeAdminDienste();',
+			"const x = holeAdminDienste()['db'];",
+			'const h = holeAdminDienste;'
+		]) {
+			expect(pruefe(`${gut}\n${schlecht}`)).toEqual([
+				`${route}: holeAdminDienste() nur direkt als Argument einer Schnittstelle übergeben`
+			]);
+		}
+	});
+
+	it('meldet eine fehlende Liste ADMIN_SCHNITTSTELLEN', () => {
+		expect(pruefeBauregel(new Map([[route, gut]]))).toEqual([
+			'src/lib/server/admin/schnittstellen.ts: ADMIN_SCHNITTSTELLEN nicht gefunden'
+		]);
 	});
 	it('gilt nur unter api/admin', () => {
 		const fremd = "import { holeDb } from '../../../lib/server/db/index.ts';";
 		expect(pruefeBauregel(new Map([['src/routes/api/sitzung/+server.ts', fremd]]))).toEqual([]);
 	});
+
+	it('RR-07: ausserhalb von api/admin importiert keine Route aus lib/server/admin', () => {
+		for (const [pfad, inhalt] of [
+			[
+				'src/routes/api/verwaltung/+server.ts',
+				"import { holeAdminDienste } from '../../../lib/server/admin/index.ts';"
+			],
+			[
+				'src/routes/verwaltung/+page.ts',
+				"import { listeMitglieder } from '$lib/server/admin/mitglieder.ts';"
+			],
+			[
+				'src/routes/api/x/+server.ts',
+				"const m = await import('../../../lib/server/admin/rollen.ts');"
+			]
+		]) {
+			expect(pruefeBauregel(new Map([[pfad, inhalt]]))).toEqual([
+				`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
+			]);
+		}
+		// Typen der Verwaltungsseiten (lib/verwaltung) sind kein Server-Zugriff.
+		expect(
+			pruefeBauregel(
+				new Map([
+					[
+						'src/routes/verwaltung/+page.ts',
+						"import { ladeMitglieder } from '../../lib/verwaltung/api.ts';"
+					]
+				])
+			)
+		).toEqual([]);
+	});
 });
 
 describe('betrifftBauregel', () => {
-	it.each(['src/routes/+page.ts', 'vite.config.ts', 'src/lib/a.remote.ts', 'lib/b.remote.js'])(
-		'prüft %s',
-		(pfad) => {
-			expect(betrifftBauregel(pfad)).toBe(true);
-		}
-	);
+	it.each([
+		'src/routes/+page.ts',
+		'vite.config.ts',
+		'src/lib/a.remote.ts',
+		'lib/b.remote.js',
+		'src/lib/server/admin/schnittstellen.ts'
+	])('prüft %s', (pfad) => {
+		expect(betrifftBauregel(pfad)).toBe(true);
+	});
 	it('lässt andere Dateien aus', () => {
 		expect(betrifftBauregel('src/lib/server/status.ts')).toBe(false);
 	});
