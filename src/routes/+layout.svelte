@@ -2,7 +2,7 @@
 	import '../lib/design/tokens.css';
 	import '../lib/design/basis.css';
 	import { onMount } from 'svelte';
-	import { asset } from '$app/paths';
+	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
 	import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
@@ -36,7 +36,12 @@
 		</main>
 
 		<footer class="inhalt leise">
-			<p data-testid="version">Version {APP_VERSION}</p>
+			<p>
+				<a href={resolve('/hilfe')} aria-current={page.route.id === '/hilfe' ? 'page' : undefined}
+					>Hilfe</a
+				>
+				· <span data-testid="version">Version {APP_VERSION}</span>
+			</p>
 		</footer>
 
 		{#if mitReiter}
