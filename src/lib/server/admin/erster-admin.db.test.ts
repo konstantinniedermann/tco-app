@@ -76,6 +76,32 @@ describe('Erster Admin', () => {
 		expect(zeilen).toHaveLength(1);
 	});
 
+	test('legeAdminFest: Nummer in anderer Gross-/Kleinschreibung findet dasselbe Mitglied', async () => {
+		const b = angaben();
+		const { kontoId } = await legeBestehendesAn(b);
+		const r = await legeAdminFest(
+			db,
+			{ ...b, mitgliedernummer: b.mitgliedernummer.toLowerCase() },
+			jetzt
+		);
+		expect(r).toEqual({ ergebnis: 'rolle-vergeben' });
+		expect(await ladeRollen(db, kontoId)).toEqual(['admin']);
+		const zeilen = await db.select().from(mitglied).where(eq(mitglied.email, b.email));
+		expect(zeilen).toHaveLength(1);
+	});
+
+	test('legeAdminFest: E-Mail passt, Nummer in der Datenbank anders geschrieben → Rolle', async () => {
+		const b = angaben();
+		const { kontoId } = await legeBestehendesAn(b);
+		const r = await legeAdminFest(
+			db,
+			{ ...b, mitgliedernummer: b.mitgliedernummer.toLowerCase(), email: b.email.toUpperCase() },
+			jetzt
+		);
+		expect(r).toEqual({ ergebnis: 'rolle-vergeben' });
+		expect(await ladeRollen(db, kontoId)).toEqual(['admin']);
+	});
+
 	test('legeAdminFest: gleiche E-Mail, Nummer in der Datenbank leer → Rolle', async () => {
 		const b = angaben();
 		const [m] = await db

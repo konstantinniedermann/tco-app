@@ -77,8 +77,25 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			{ art: 'eingabe', felder }
 		);
 		expect(
-			await speichereAngaben(7, {}, holer(json(409, { fehler: 'vergeben', feld: 'email' })).holen)
+			await speichereAngaben(
+				7,
+				{},
+				{},
+				holer(json(409, { fehler: 'vergeben', feld: 'email' })).holen
+			)
 		).toEqual({ art: 'vergeben', feld: 'email' });
+	});
+
+	it('A-MITGLIED-02: Speichern schickt den geladenen Stand mit, 409 veraltet wird veraltet', async () => {
+		const { aufrufe, holen } = holer(json(409, { fehler: 'veraltet' }));
+		expect(await speichereAngaben(7, { ort: 'Aarau' }, { ort: 'Olten' }, holen)).toEqual({
+			art: 'veraltet'
+		});
+		expect(aufrufe[0].pfad).toBe('/api/admin/mitglieder/7');
+		expect(JSON.parse(String(aufrufe[0].init.body))).toEqual({
+			ort: 'Aarau',
+			vorher: { ort: 'Olten' }
+		});
 	});
 
 	it('RR-03: 409 letzter-admin, 404 nicht-gefunden', async () => {

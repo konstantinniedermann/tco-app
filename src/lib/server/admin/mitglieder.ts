@@ -39,6 +39,8 @@ export type Detail = {
 		zuletztGenutzt: Date | null;
 	};
 	verlauf: VerlaufZeile[];
+	/** Es gibt mehr Einträge als `verlauf` zeigt (nur die letzten `VERLAUF_GRENZE`). */
+	verlaufGekuerzt: boolean;
 };
 
 type Vergeben = { ergebnis: 'vergeben'; feld: 'email' | 'mitgliedernummer' };
@@ -49,7 +51,7 @@ const VERLAUF_GRENZE = 50;
 const INDEX_FELD: Record<string, Vergeben['feld']> = {
 	mitglied_email_unique: 'email',
 	mitglied_email_klein_unique: 'email',
-	mitglied_mitgliedernummer_unique: 'mitgliedernummer'
+	mitglied_mitgliedernummer_klein_unique: 'mitgliedernummer'
 };
 
 // Gibt das betroffene Feld zurück, wenn `fehler` (auch in `cause` verpackt) eine bekannte
@@ -212,7 +214,8 @@ export async function ladeMitglied(db: Db, id: number, jetzt: Date): Promise<Det
 	const [rollen, sitzungen, verlauf] = await Promise.all([
 		ladeRollen(db, zeile.k.id),
 		gueltigeSitzungen(db, [zeile.k.id], jetzt),
-		ladeVerlauf(db, { mitgliedId: id, grenze: VERLAUF_GRENZE })
+		// Ein Eintrag mehr zeigt, ob gekürzt wurde.
+		ladeVerlauf(db, { mitgliedId: id, grenze: VERLAUF_GRENZE + 1 })
 	]);
 	const zeiten = sitzungen.get(zeile.k.id) ?? [];
 	const zuletzt = zeiten.reduce<Date | null>((a, b) => (a === null || b > a ? b : a), null);
@@ -228,7 +231,8 @@ export async function ladeMitglied(db: Db, id: number, jetzt: Date): Promise<Det
 			geraete: zeiten.length,
 			zuletztGenutzt: zuletzt
 		},
-		verlauf
+		verlauf: verlauf.slice(0, VERLAUF_GRENZE),
+		verlaufGekuerzt: verlauf.length > VERLAUF_GRENZE
 	};
 }
 
@@ -253,18 +257,32 @@ export async function legeMitgliedAn(
 	}
 }
 
+/**
+ * Speichert die Angaben, wenn das Mitglied noch so aussieht wie `vorher` (der Stand, den die
+ * Seite geladen hat). Sonst `veraltet`: Ein anderer hat inzwischen gespeichert, und die Seite
+ * würde seine Änderung mit dem alten Stand überschreiben.
+ */
 export async function aendereAngaben(
 	db: Db,
 	urheber: Urheber,
 	id: number,
 	angaben: Angaben,
+	vorher: Angaben,
 	jetzt: Date
-): Promise<{ ergebnis: 'ok'; geaendert: Feld[] } | Vergeben | { ergebnis: 'nicht-gefunden' }> {
+): Promise<
+	| { ergebnis: 'ok'; geaendert: Feld[] }
+	| Vergeben
+	| { ergebnis: 'nicht-gefunden' }
+	| { ergebnis: 'veraltet' }
+> {
 	try {
 		return await db.transaction(async (tx) => {
 			const [alt] = await tx.select().from(mitglied).where(eq(mitglied.id, id)).for('update');
 			if (!alt) return { ergebnis: 'nicht-gefunden' as const };
-			const geaendert = geaenderteFelder(angabenAusZeile(alt), angaben);
+			const gespeichert = angabenAusZeile(alt);
+			if (geaenderteFelder(gespeichert, vorher).length > 0)
+				return { ergebnis: 'veraltet' as const };
+			const geaendert = geaenderteFelder(gespeichert, angaben);
 			if (geaendert.length === 0) return { ergebnis: 'ok' as const, geaendert };
 			await tx.update(mitglied).set(angaben).where(eq(mitglied.id, id));
 			await schreibeVerlauf(

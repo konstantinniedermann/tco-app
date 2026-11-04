@@ -2,8 +2,9 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, type TestInfo } from '@playwright/test';
 
 // Browser melden jede 4xx-Antwort in der Konsole. Bei den Schnittstellen sind 400 (Code
-// falsch), 401 (nicht angemeldet), 403 (kein Admin), 409 (vergeben, letzter Admin) und 429
-// (Grenze) Antworten, die die App behandelt.
+// falsch), 401 (nicht angemeldet), 403 (kein Admin), 409 (vergeben, letzter Admin, veraltet)
+// und 429 (Grenze) Antworten, die die App behandelt. Eine 404 lässt nur der Test durch, der sie
+// absichtlich auslöst.
 const ERWARTETE_ANTWORT =
 	/^Failed to load resource: the server responded with a status of 4(00|01|03|09|29)\b/;
 

@@ -82,6 +82,16 @@ const ANGABEN = {
 	email: 'erika.beispiel@example.org'
 };
 
+// Vollständiger Stand wie in `Detail.angaben`, für `vorher` beim Speichern.
+const STAND = {
+	mitgliedernummer: null,
+	...ANGABEN,
+	telefon: null,
+	geschlecht: null,
+	jahrgang: null,
+	lizenznummer: null
+};
+
 const eindeutig = () => ({ ...ANGABEN, email: `neu-${crypto.randomUUID()}@example.org` });
 
 describe('Admin-Schnittstellen', () => {
@@ -204,18 +214,41 @@ describe('Admin-Schnittstellen', () => {
 			ereignis({ method: 'GET', params: { id: String(id) }, konto: admin.konto })
 		);
 		expect(detail.status).toBe(200);
-		expect(await detail.json()).toMatchObject({ id, angaben: { vorname: 'Erika' } });
+		const geladen = (await detail.json()) as { angaben: Record<string, unknown> };
+		expect(geladen).toMatchObject({ id, angaben: { vorname: 'Erika' } });
 
 		const geaendert = await postMitglied(
 			s.d,
 			ereignis({
-				body: { ...angaben, ort: 'Aarau' },
+				body: { ...angaben, ort: 'Aarau', vorher: geladen.angaben },
 				params: { id: String(id) },
 				konto: admin.konto
 			})
 		);
 		expect(geaendert.status).toBe(200);
 		expect(await geaendert.json()).toEqual({ geaendert: ['ort'] });
+
+		// Ein zweiter Admin mit dem alten Stand überschreibt nicht.
+		const veraltet = await postMitglied(
+			s.d,
+			ereignis({
+				body: { ...angaben, telefon: '+41 00 000 00 01', vorher: geladen.angaben },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect(veraltet.status).toBe(409);
+		expect(await veraltet.json()).toEqual({ fehler: 'veraltet' });
+
+		// Ohne oder mit kaputtem alten Stand → 400.
+		for (const vorher of [undefined, { vorname: 'Erika' }]) {
+			const ohne = await postMitglied(
+				s.d,
+				ereignis({ body: { ...angaben, vorher }, params: { id: String(id) }, konto: admin.konto })
+			);
+			expect(ohne.status).toBe(400);
+			expect(await ohne.json()).toEqual({ fehler: 'eingabe' });
+		}
 
 		const kaputt = await postMitglied(
 			s.d,
@@ -323,7 +356,10 @@ describe('Admin-Schnittstellen', () => {
 		const k = admin.konto;
 		const antworten = [
 			await getMitglied(s.d, ereignis({ method: 'GET', params: p, konto: k })),
-			await postMitglied(s.d, ereignis({ body: eindeutig(), params: p, konto: k })),
+			await postMitglied(
+				s.d,
+				ereignis({ body: { ...eindeutig(), vorher: STAND }, params: p, konto: k })
+			),
 			await postRollen(s.d, ereignis({ body: { rollen: [] }, params: p, konto: k })),
 			await postSitzungen(s.d, ereignis({ body: {}, params: p, konto: k }))
 		];

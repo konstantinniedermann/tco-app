@@ -7,7 +7,7 @@ import {
 	leseKoerper,
 	type Ereignis
 } from '../login/schnittstellen.ts';
-import { pruefeAngaben } from './angaben.ts';
+import { leseStand, pruefeAngaben } from './angaben.ts';
 import {
 	aendereAngaben,
 	beendeSitzungenVon,
@@ -153,11 +153,20 @@ export function postMitglied(d: AdminDienste, e: AdminEreignis): Promise<Respons
 		const t = jetzt(d);
 		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: t.getFullYear() });
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.fehler });
-		const r = await aendereAngaben(d.db, urheber, id, p.angaben, t);
-		if (r.ergebnis === 'ok') return antwort(200, { geaendert: r.geaendert });
-		return r.ergebnis === 'vergeben'
-			? antwort(409, { fehler: 'vergeben', feld: r.feld })
-			: nichtGefunden();
+		// Der Stand, den die Seite geladen hat: schützt vor dem Überschreiben fremder Änderungen.
+		const vorher = leseStand(koerper.vorher);
+		if (vorher === null) return eingabeFehler();
+		const r = await aendereAngaben(d.db, urheber, id, p.angaben, vorher, t);
+		switch (r.ergebnis) {
+			case 'ok':
+				return antwort(200, { geaendert: r.geaendert });
+			case 'vergeben':
+				return antwort(409, { fehler: 'vergeben', feld: r.feld });
+			case 'veraltet':
+				return antwort(409, { fehler: 'veraltet' });
+			default:
+				return nichtGefunden();
+		}
 	});
 }
 

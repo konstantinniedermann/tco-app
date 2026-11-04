@@ -127,3 +127,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Beobachtungs-Auswertung vom 04.11.2026 (Prüfung des PR-Eintrags).
 
 **Einschätzung:** Ohne Folge, solange der PR offen bleibt. Die Ursache ist unbekannt. Kommt Dependabot mit einer Fassung, die TypeScript 7 erlaubt, fehlt sonst die Prüfung; dann `@dependabot rebase` und kontrollieren, ob `Check` läuft.
+
+### 2026-11-04 — «Ganzer Verlauf» zeigt höchstens 100 Einträge, ohne es zu sagen
+
+**Thema:** Verwaltung
+
+**Fundort:** `src/routes/verwaltung/verlauf/+page.svelte` (ruft `ladeVerlauf` ohne `grenze`), `getVerlauf` in `src/lib/server/admin/schnittstellen.ts` (`VERLAUF_STANDARD = 100`).
+
+**Beobachtung:** Die Seite eines Mitglieds sagt jetzt «die letzten 50 Einträge» und verlinkt «Ganzer Verlauf ›». Die Verlaufsseite holt aber standardmässig nur 100 Einträge und zeigt nicht an, wenn es mehr gibt. Die Seite ohne Filter (alle Mitglieder) ist genauso gekürzt.
+
+**Ursprung:** Nacharbeit zu #43 (Kurzinfo «die letzten 50»).
+
+**Einschätzung:** Heute ohne Folge, kaum ein Mitglied hat über 100 Einträge. Mit dem Einlesen (Etappe 2) wächst der Gesamtverlauf schnell; dann braucht die Verlaufsseite die gleiche ehrliche Anzeige oder ein Weiterblättern.
+
+### 2026-11-04 — «Rollen speichern» überschreibt Rollen, die ein anderer Admin inzwischen vergeben hat
+
+**Thema:** Verwaltung
+
+**Fundort:** `setzeRollen` in `src/lib/server/admin/rollen.ts`, `speichereRollen` in `src/lib/verwaltung/api.ts`.
+
+**Beobachtung:** Die Seite schickt die ganze Rollenliste, der Server ersetzt die gespeicherten Rollen ohne Vergleich mit dem geladenen Stand. Admin A vergibt «CM»; Admin B hat die Seite noch offen, vergibt «Lizenz» und entzieht damit As «CM» still. Der Schutz für den letzten Admin (RR-03) hält, der Verlauf zeigt das Entziehen. Bei den Angaben ist dasselbe seit der Nacharbeit zu #43 geschützt (409 «veraltet»).
+
+**Ursprung:** Review (cas-reviewer) der Nacharbeit zu #43.
+
+**Einschätzung:** Bei zwei bis drei Admins selten. Ein Fix übernimmt das Muster der Angaben (geladene Rollen mitschicken, in der Transaktion vergleichen, 409).

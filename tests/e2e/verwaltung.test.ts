@@ -5,6 +5,7 @@ import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
 	holeMailCode,
 	legeAdminMitBriefCodeAn,
+	legeKontoAn,
 	legeKontoMitBriefCodeAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
@@ -227,4 +228,95 @@ test('SI-08: falscher Code zeigt die Meldung, «Neuen Code schicken» führt wei
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
 	expect(fehler).toEqual([]);
+});
+
+test('A-MITGLIED-02: zwei Admins am selben Mitglied – die zweite Änderung überschreibt nicht, «Neuen Stand laden»', async ({
+	page
+}, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeAdminMitBriefCodeAn('Greta');
+	const mitglied = await legeKontoAn('Hugo');
+	await oeffneVerwaltung(page, admin);
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	await expect(page.getByRole('heading', { level: 1, name: /Hugo/ })).toBeVisible();
+
+	// Ein anderer Admin speichert inzwischen einen neuen Ort (gleiche Schnittstelle wie die Seite).
+	const pfad = `/api/admin/mitglieder/${mitglied.mitgliedId}`;
+	const { angaben } = (await (await page.request.get(pfad)).json()) as {
+		angaben: Record<string, unknown>;
+	};
+	const anderer = await page.request.post(pfad, {
+		data: { ...angaben, ort: 'Aarau', vorher: angaben }
+	});
+	expect(anderer.status()).toBe(200);
+
+	// Diese Seite hat noch den alten Stand: Speichern wird abgelehnt, die Eingabe bleibt stehen.
+	const meldung = page.getByText('Inzwischen hat jemand anderes dieses Mitglied geändert.');
+	const telefon = page.getByLabel('Telefon', { exact: false });
+	await telefon.fill('+41 00 000 00 02');
+	await page.getByRole('button', { name: 'Angaben speichern' }).click();
+	await expect(meldung).toBeVisible();
+	await expect(telefon).toHaveValue('+41 00 000 00 02');
+	await expect(page.getByLabel('Ort', { exact: true })).not.toHaveValue('Aarau');
+	await pruefeBildschirm(page, info, 'verwaltung-mitglied-veraltet');
+
+	await page.getByRole('button', { name: 'Neuen Stand laden' }).click();
+	await expect(page.getByLabel('Ort', { exact: true })).toHaveValue('Aarau');
+	await expect(telefon).toHaveValue('');
+	await expect(meldung).toBeHidden();
+	const verlauf = page.getByRole('table', { name: 'Verlauf' });
+	await expect(verlauf).toContainText('Ort geändert');
+	await expect(verlauf).not.toContainText('Telefon geändert');
+
+	// Zweiter Konflikt, danach «Rollen speichern»: die Seite lädt den neuen Stand, die Meldung
+	// passt nicht mehr und verschwindet.
+	const { angaben: stand2 } = (await (await page.request.get(pfad)).json()) as {
+		angaben: Record<string, unknown>;
+	};
+	await page.request.post(pfad, { data: { ...stand2, ort: 'Baden', vorher: stand2 } });
+	await telefon.fill('+41 00 000 00 03');
+	await page.getByRole('button', { name: 'Angaben speichern' }).click();
+	await expect(meldung).toBeVisible();
+	await page.locator('summary', { hasText: 'Rollen' }).click();
+	await page.getByLabel('CM-Verantwortliche').check();
+	await page.getByRole('button', { name: 'Rollen speichern' }).click();
+	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
+	await expect(page.getByLabel('Ort', { exact: true })).toHaveValue('Baden');
+	await expect(meldung).toBeHidden();
+
+	// Ein Mitglied, das es nicht gibt: Fehlerseite mit Rahmen und Weg zurück zur Verwaltung.
+	await page.goto('/verwaltung/mitglieder/2147483000');
+	await expect(page.getByRole('heading', { level: 1, name: 'Nicht gefunden' })).toBeVisible();
+	await expect(page.getByText('Dieses Mitglied gibt es nicht.')).toBeVisible();
+	await expect(page.getByRole('banner')).toContainText('MyTCO');
+	await pruefeBildschirm(page, info, 'fehlerseite-verwaltung-404');
+	await page.getByRole('link', { name: '‹ Zur Verwaltung' }).click();
+	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
+	// Nur die absichtliche 404 des fehlenden Mitglieds steht in der Konsole.
+	expect(fehler.filter((f) => !/status of 404\b/.test(f))).toEqual([]);
+});
+
+test('UI-06: Verwaltung nicht erreichbar – Fehlerseite mit Rahmen, Meldung in Worten und Weg zurück', async ({
+	page
+}, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeAdminMitBriefCodeAn('Ines');
+	await meldeAn(page, admin);
+	// Vorgetäuschte Störung: die Zugangsprüfung antwortet 503.
+	await page.route('**/api/admin/zugang', (r) => r.fulfill({ status: 503, json: {} }));
+	await page.goto('/verwaltung/mitglieder');
+	await expect(
+		page.getByRole('heading', { level: 1, name: 'Gerade nicht erreichbar' })
+	).toBeVisible();
+	await expect(page.getByText('Die Verwaltung lässt sich gerade nicht öffnen.')).toBeVisible();
+	await expect(page.getByRole('banner')).toContainText('MyTCO');
+	await expect(page.getByRole('main')).toHaveCount(1);
+	await pruefeBildschirm(page, info, 'fehlerseite-verwaltung-503');
+
+	await page.goto('/gibt-es-nicht');
+	await expect(page.getByText('Diese Seite gibt es nicht.')).toBeVisible();
+	await page.getByRole('link', { name: '‹ Zur Startseite' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${admin.vorname}` })).toBeVisible();
+	// In der Konsole stehen nur die vorgetäuschte 503 und die 404 der Seite, die es nicht gibt.
+	expect(fehler.filter((f) => !/status of (503|404)\b/.test(f))).toEqual([]);
 });

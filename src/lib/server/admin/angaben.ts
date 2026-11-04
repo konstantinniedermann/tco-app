@@ -36,7 +36,8 @@ const MAX_EMAIL = 254;
 
 // Domain aus Teilen ohne Punkt: keine leeren Teile wie in «a@example..org».
 const ADRESSE = /^[^\s@,;<>]+@[^\s@,;<>.]+(?:\.[^\s@,;<>.]+)+$/;
-const STEUERZEICHEN = /\p{Cc}/u;
+// Steuerzeichen (Cc) und unsichtbare Formatzeichen (Cf, z. B. Nullbreite, Schreibrichtung).
+const STEUERZEICHEN = /[\p{Cc}\p{Cf}]/u;
 
 /**
  * Prüft und normalisiert Mitgliederangaben aus Formular, CSV oder Befehl. Leere freiwillige
@@ -78,6 +79,8 @@ export function pruefeAngaben(
 		if (fehler[feld]) return '';
 		if (wert === '') fehler[feld] = 'fehlt';
 		else if (wert.length > max) fehler[feld] = `höchstens ${max} Zeichen`;
+		else if (STEUERZEICHEN.test(wert))
+			fehler[feld] = 'unsichtbares Sonderzeichen, bitte neu eintippen';
 		return wert;
 	};
 
@@ -154,4 +157,27 @@ export function pruefeAngaben(
 			lizenznummer
 		}
 	};
+}
+
+const TEXT_ODER_LEER = new Set<Feld>(['mitgliedernummer', 'telefon', 'lizenznummer']);
+
+/**
+ * Liest den Stand, den die Seite beim Laden erhalten hat (`Detail.angaben`, mitgeschickt beim
+ * Speichern). Er wird nur verglichen, nicht gespeichert, darum ohne Normalisierung; `null`, wenn
+ * die Form nicht stimmt.
+ */
+export function leseStand(roh: unknown): Angaben | null {
+	if (roh === null || typeof roh !== 'object' || Array.isArray(roh)) return null;
+	const s = roh as Record<string, unknown>;
+	for (const feld of FELDER) {
+		const wert = s[feld];
+		const ok =
+			feld === 'jahrgang'
+				? wert === null || typeof wert === 'number'
+				: feld === 'geschlecht'
+					? wert === null || wert === 'w' || wert === 'm'
+					: typeof wert === 'string' || (wert === null && TEXT_ODER_LEER.has(feld));
+		if (!ok) return null;
+	}
+	return Object.fromEntries(FELDER.map((f) => [f, s[f]])) as Angaben;
 }

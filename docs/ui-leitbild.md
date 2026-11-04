@@ -152,7 +152,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt" oder „1 von 3 Anmeldungen" |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05) |
 | Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen") |
-| Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06) |
+| Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06); betrifft sie das ganze Formular (z. B. *Inzwischen hat jemand anderes dieses Mitglied geändert*), unter dem Formular, mit dem Lösungsweg als Nebentaste daneben (*Neuen Stand laden*) |
 | Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm waagrecht scrollbar |
 | Symbol | `.symbol` | eigene SVG-Symbole, 24er-Raster, Strich 2, immer mit Text |
 | App-Rahmen | `.app` | umschliesst Kopfleiste, Inhalt und Reiter; misst die Breite fürs PC-Layout |
@@ -198,6 +198,9 @@ Kopfleiste.
 - **Startseite:** „Hoi <Vorname>", darunter „Jetzt aktuell" (Kacheln, die wichtigste
   hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04).
 - **Unterseiten:** „‹ Zurück" oben links.
+- **Fehlerseite** (Seite nicht gefunden oder gerade nicht erreichbar): Kopfleiste und Inhalt
+  wie in der Mitglieder-App, auch unter der Verwaltung; oben links „‹ Zur Startseite" bzw.
+  „‹ Zur Verwaltung", darunter eine Karte mit Titel und Meldung in Worten (UI-06).
 - **Formulare:** mehr als etwa 4 Felder werden in Schritte geteilt, mit Schritt-Zähler. Das
   erste Login hat 3 Schritte: 1 Angaben prüfen (vom Verein erfasst, nur lesen) · 2 Kontakt ·
   3 Tennis (Lizenznummer, Klassierung).
