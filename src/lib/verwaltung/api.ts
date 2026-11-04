@@ -86,7 +86,7 @@ const schicke = <T>(pfad: string, inhalt: object, holen: Holen) =>
 const ADMIN = '/api/admin';
 
 export const ladeZugang = (holen: Holen = fetch) =>
-	lese<{ bestaetigt: boolean }>(`${ADMIN}/zugang`, holen);
+	lese<{ bestaetigt: boolean; mitgliedId?: number }>(`${ADMIN}/zugang`, holen);
 
 export const fordereCodeAn = (holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/zugang/code`, {}, holen);

@@ -90,7 +90,9 @@ export async function getZugang(d: AdminDienste, e: AdminEreignis): Promise<Resp
 	const z = await d.zugang.pruefe(e.locals.konto);
 	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
 	if (z.stufe === 'kein-admin') return antwort(403, { fehler: 'kein-admin' });
-	return antwort(200, { bestaetigt: z.stufe === 'bestaetigt' });
+	// Nur die Nummer des Angemeldeten, damit die Seite eine Rückfrage beim eigenen Konto stellen kann.
+	if (z.stufe === 'bestaetigt') return antwort(200, { bestaetigt: true, mitgliedId: z.mitgliedId });
+	return antwort(200, { bestaetigt: false });
 }
 
 export async function postZugangCode(d: AdminDienste, e: AdminEreignis): Promise<Response> {

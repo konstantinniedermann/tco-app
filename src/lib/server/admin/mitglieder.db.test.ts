@@ -147,6 +147,16 @@ describe('listeMitglieder', () => {
 		expect(zeile.name).toBe(`Suchbar${u}, Vera`);
 	});
 
+	test('A-MITGLIED-02: Suche nach «Nachname, Vorname» findet das Mitglied', async () => {
+		const u = randomUUID().slice(0, 8);
+		const id = await anlegen({ vorname: 'Erika', nachname: `Beispiel${u}` });
+		const ids = async (suche: string) =>
+			(await listeMitglieder(db, { suche }, jetzt)).map((z) => z.id);
+		expect(await ids(`Beispiel${u}, Erika`)).toEqual([id]);
+		expect(await ids(`beispiel${u}, erika`)).toEqual([id]);
+		expect(await ids(`Beispiel${u}, Kurt`)).toEqual([]);
+	});
+
 	test('Liste ohne Statusfilter blendet gelöschte aus, mit Filter zeigt sie', async () => {
 		const u = randomUUID().slice(0, 8);
 		const id = await anlegen({ nachname: `Weg${u}` });

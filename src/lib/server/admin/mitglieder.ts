@@ -144,6 +144,7 @@ export async function listeMitglieder(
 			or(
 				sql`${mitglied.vorname} || ' ' || ${mitglied.nachname} ilike ${muster}`,
 				sql`${mitglied.nachname} || ' ' || ${mitglied.vorname} ilike ${muster}`,
+				sql`${mitglied.nachname} || ', ' || ${mitglied.vorname} ilike ${muster}`,
 				sql`${mitglied.email} ilike ${muster}`,
 				sql`${mitglied.mitgliedernummer} ilike ${muster}`
 			)

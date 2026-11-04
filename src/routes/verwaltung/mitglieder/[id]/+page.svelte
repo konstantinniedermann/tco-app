@@ -29,8 +29,10 @@
 	const angaben = $derived(detail.angaben);
 	const stand = $derived(plakette({ login: detail.login.stand, status: detail.status }));
 
-	// Das Formular wird neu aufgebaut, wenn sich die gespeicherten Angaben ändern.
-	const angabenSchluessel = $derived(JSON.stringify(angaben));
+	// Das Formular wird neu aufgebaut, wenn sich die gespeicherten Angaben ändern und nach jedem
+	// Speichern (auch wenn der Server nur Leerzeichen bereinigt hat und die Angaben gleich bleiben).
+	let nachSpeichern = $state(0);
+	const angabenSchluessel = $derived(`${nachSpeichern}:${JSON.stringify(angaben)}`);
 
 	// Angaben
 	let angabenFehler = $state<Partial<Record<Feld, string>>>({});
@@ -47,6 +49,7 @@
 		if (a.art === 'ok') {
 			angabenMeldung = 'Gespeichert';
 			await invalidateAll();
+			nachSpeichern += 1;
 		} else if (a.art === 'eingabe') {
 			angabenFehler = a.felder;
 		} else if (a.art === 'vergeben') {
@@ -85,7 +88,21 @@
 		gewaehlt = an ? [...gewaehlt, rolle] : gewaehlt.filter((r) => r !== rolle);
 	}
 
-	const speichereDieRollen = () => einzeln(schickeRollen);
+	// Wer sich selbst die Rolle Admin entzieht, verliert den Zugang: vorher eine Rückfrage.
+	let rollenRueckfrage = $state<HTMLDialogElement>();
+	const verliertAdmin = $derived(
+		data.eigeneMitgliedId === detail.id &&
+			detail.rollen.includes('admin') &&
+			!gewaehlt.includes('admin')
+	);
+	function speichereDieRollen() {
+		if (verliertAdmin) rollenRueckfrage?.showModal();
+		else void einzeln(schickeRollen);
+	}
+	function entziehe() {
+		rollenRueckfrage?.close();
+		void einzeln(schickeRollen);
+	}
 	async function schickeRollen() {
 		rollenMeldung = null;
 		rollenFehler = null;
@@ -250,6 +267,17 @@
 		</details>
 	</div>
 </div>
+
+<dialog class="karte" bind:this={rollenRueckfrage} aria-labelledby="rollen-titel">
+	<h2 id="rollen-titel">Rolle Admin entziehen?</h2>
+	<p>Du verlierst den Zugang zur Verwaltung.</p>
+	<div class="leiste">
+		<button type="button" class="taste-neben" onclick={() => rollenRueckfrage?.close()}
+			>Abbrechen</button
+		>
+		<button type="button" class="taste-haupt" onclick={entziehe}>Rolle entziehen</button>
+	</div>
+</dialog>
 
 <dialog class="karte" bind:this={rueckfrage} aria-labelledby="sitzungen-titel">
 	<h2 id="sitzungen-titel">Alle Sitzungen beenden?</h2>

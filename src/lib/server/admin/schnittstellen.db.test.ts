@@ -161,7 +161,7 @@ describe('Admin-Schnittstellen', () => {
 		expect(await falsch.json()).toEqual({ fehler: 'falsch' });
 		const ok = await postZugang(s.d, ereignis({ body: { code }, konto }));
 		expect(ok.status).toBe(200);
-		expect(await status()).toEqual({ bestaetigt: true });
+		expect(await status()).toEqual({ bestaetigt: true, mitgliedId: m.mitgliedId });
 	});
 
 	test('SI-08: zu viele Code-Anforderungen → 429 zu-viele', async () => {

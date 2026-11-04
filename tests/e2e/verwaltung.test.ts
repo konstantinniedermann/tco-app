@@ -88,6 +88,12 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 	await speichern.click();
 	await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
 	await expect(speichern).toBeDisabled();
+	// Nur Leerzeichen geändert: der Server bereinigt, die Rückmeldung kommt trotzdem.
+	await page.getByLabel('Ort', { exact: true }).fill('Olten  ');
+	await speichern.click();
+	await expect(page.getByLabel('Ort', { exact: true })).toHaveValue('Olten');
+	await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
+	await expect(speichern).toBeDisabled();
 
 	// A-ROLLE-01: Rolle vergeben.
 	await page.getByLabel('CM-Verantwortliche').check();
@@ -180,6 +186,13 @@ test('RR-03: der letzte Admin sieht die Meldung beim Entzug seiner Rolle', async
 	);
 	await page.getByLabel('Admin', { exact: true }).uncheck();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
+	// Wer sich selbst die Rolle entzieht, wird vorher gefragt; «Abbrechen» schickt nichts.
+	const rueckfrage = page.getByRole('dialog', { name: 'Rolle Admin entziehen?' });
+	await expect(rueckfrage.getByText('Du verlierst den Zugang zur Verwaltung.')).toBeVisible();
+	await rueckfrage.getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(rueckfrage).toBeHidden();
+	await page.getByRole('button', { name: 'Rollen speichern' }).click();
+	await rueckfrage.getByRole('button', { name: 'Rolle entziehen' }).click();
 	const meldung = 'Du bist der letzte Admin. Gib zuerst jemand anderem die Rolle Admin.';
 	await expect(page.getByText(meldung)).toBeVisible();
 	await pruefeBildschirm(page, info, 'verwaltung-letzter-admin');

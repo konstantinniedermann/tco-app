@@ -12,5 +12,5 @@ export const load: LayoutLoad = async ({ fetch, url }) => {
 	const aufBestaetigen = url.pathname === '/verwaltung/bestaetigen';
 	if (!z.daten.bestaetigt && !aufBestaetigen) redirect(307, '/verwaltung/bestaetigen');
 	if (z.daten.bestaetigt && aufBestaetigen) redirect(307, '/verwaltung/mitglieder');
-	return {};
+	return { eigeneMitgliedId: z.daten.mitgliedId ?? null };
 };
