@@ -4,6 +4,7 @@
 import { erstelleDb, type Db } from '../../../src/lib/server/db/index.ts';
 import { erstelleBremsen } from '../../../src/lib/server/login/bremse.ts';
 import { erstelleLoginDienst, type LoginDienst } from '../../../src/lib/server/login/dienst.ts';
+import { machAdmin } from '../../../src/lib/server/admin/erster-admin.ts';
 import { legeMitgliedAn } from '../../hilfen/mitglieder.ts';
 import { DATENBANK_URL, MAILPIT_URL, e2eEinstellungen } from './umgebung.ts';
 
@@ -37,6 +38,13 @@ export async function legeKontoMitBriefCodeAn(vorname: string) {
 	const konto = await legeKontoAn(vorname);
 	const { code } = await hole().dienst.stelleBriefCodeAus(konto.kontoId);
 	return { ...konto, code };
+}
+
+/** Wie `legeKontoMitBriefCodeAn`, das Konto hat zusätzlich die Rolle Admin (Code-Bestätigung fehlt noch). */
+export async function legeAdminMitBriefCodeAn(vorname: string) {
+	const konto = await legeKontoMitBriefCodeAn(vorname);
+	await machAdmin(hole().db, konto.kontoId, new Date());
+	return konto;
 }
 
 /** Stellt für ein bestehendes Konto einen weiteren Brief-Code aus (ohne Bindestrich). */

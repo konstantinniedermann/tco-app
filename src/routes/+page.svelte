@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { hinweisErledigt, kannPasskey, richtePasskeyEin } from '../lib/login/passkey.ts';
 	import type { PageProps } from './$types';
@@ -34,6 +35,13 @@
 </svelte:head>
 
 <h1>Hoi {data.vorname}</h1>
+
+{#if data.verwaltung}
+	<a class="karte kachel" href={resolve('/verwaltung')}>
+		<strong>Verwaltung</strong>
+		<span class="kachel-pfeil" aria-hidden="true">›</span>
+	</a>
+{/if}
 
 {#if sichtbar}
 	<div class="hinweis">

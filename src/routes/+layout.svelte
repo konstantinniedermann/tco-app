@@ -10,6 +10,8 @@
 
 	let { children } = $props();
 	const mitReiter = $derived(page.route.id === '/' || page.route.id === '/profil');
+	// Die Verwaltung bringt Seitenleiste und Inhalt selbst mit (eigenes Layout).
+	const verwaltung = $derived(page.route.id?.startsWith('/verwaltung') ?? false);
 
 	// Beim Start der App: abgelaufene oder kaputte Mail-Anfragen aus dem Gerätespeicher löschen.
 	onMount(() => {
@@ -18,20 +20,24 @@
 </script>
 
 <div class="app">
-	<header class="kopf">
-		<img class="kopf-wappen" src={asset('wappen.svg')} alt="" />
-		MyTCO
-	</header>
-
-	<main class="inhalt">
+	{#if verwaltung}
 		{@render children()}
-	</main>
+	{:else}
+		<header class="kopf">
+			<img class="kopf-wappen" src={asset('wappen.svg')} alt="" />
+			MyTCO
+		</header>
 
-	<footer class="inhalt leise">
-		<p data-testid="version">Version {APP_VERSION}</p>
-	</footer>
+		<main class="inhalt">
+			{@render children()}
+		</main>
 
-	{#if mitReiter}
-		<Reiter />
+		<footer class="inhalt leise">
+			<p data-testid="version">Version {APP_VERSION}</p>
+		</footer>
+
+		{#if mitReiter}
+			<Reiter />
+		{/if}
 	{/if}
 </div>
