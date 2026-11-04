@@ -398,3 +398,99 @@ Nicht mit `--legacy-peer-deps` umgehen. Prüfen mit
 **Ursprung:** Final-Review #43 Etappe 1.
 
 **Einschätzung:** Beim Planen von Etappe 3 mitnehmen; den ADR-Nachtrag vor dem Bauen schreiben.
+
+### 2026-11-04 — Profil: erneutes Einrichten auf einem Gerät mit Passkey bleibt ohne Rückmeldung
+
+**Thema:** Login
+
+**Fundort:** `src/routes/profil/+page.svelte` → `einrichten` (Ergebnis `'vorhanden'`).
+
+**Beobachtung:** Tippt ein Mitglied im Profil «Passkey auf diesem Gerät einrichten», obwohl das Gerät schon einen hat, passiert sichtbar nichts. Die Taste steht auch unter der Kachel des eigenen Geräts. Ein eigener Text («Auf diesem Gerät ist schon ein Passkey eingerichtet.») bräuchte die Freigabe des Projektleiters.
+
+**Ursprung:** #44, Final-Review (Entscheid beim Fix: wie Abbruch behandeln).
+
+**Einschätzung:** Niedrig bis mittel. Mit der Testgruppe (#40) prüfen, ob es verwirrt; dann Text freigeben lassen.
+
+### 2026-11-04 — Profil: «Entfernen» nennt für Screenreader nicht das Gerät
+
+**Thema:** Barrierefreiheit
+
+**Fundort:** `src/routes/profil/+page.svelte`, Taste «Entfernen» je Kachel.
+
+**Beobachtung:** Bei mehreren Passkeys heissen alle Tasten gleich. Wer mit dem Screenreader die Tasten durchgeht, hört nicht, welches Gerät gemeint ist.
+
+**Ursprung:** #44, Review Task 7.
+
+**Einschätzung:** Niedrig. `aria-label="<Gerät> entfernen"` wäre ein Einzeiler.
+
+### 2026-11-04 — Startseite: Scheitert «Nein, danke» am Server, kommt der Hinweis zurück
+
+**Thema:** Login
+
+**Fundort:** `src/routes/+page.svelte` → `neinDanke`.
+
+**Beobachtung:** Der Hinweis verschwindet sofort; scheitert der Aufruf an den Server, merkt das niemand, und nach dem Neuladen ist er wieder da.
+
+**Ursprung:** #44, Final-Review.
+
+**Einschätzung:** Sehr niedrig, harmlos. Nur angehen, wenn gemeldet.
+
+### 2026-11-04 — Kleine Doppelungen im Login-Code
+
+**Thema:** Login
+
+**Fundort:** `src/routes/+page.ts` und `src/routes/profil/+page.ts` (Sitzungsprüfung mit Umleitung); `post` in `src/lib/login/passkey.ts` neben `sende` in `src/lib/login/anmelden.ts` (JSON-Kopf); `istEindeutigkeitsfehler` aus `dienst.ts` in `passkey.ts`.
+
+**Beobachtung:** Drei kleine Doppelungen bzw. Kopplungen ohne Verhaltensfehler. Die Sitzungsprüfung steht zweimal, der JSON-Kopf zweimal, und der Passkey-Dienst holt eine Hilfsfunktion aus dem Code-Login-Dienst.
+
+**Ursprung:** #44, Task-Reviews und cas-reviewer.
+
+**Einschätzung:** Niedrig. Zusammenlegen, wenn eine dritte Seite oder ein dritter Aufrufer dazukommt.
+
+### 2026-11-04 — E2E: Profil-Navigation mehrfach kopiert, Fehlversuche pro IP nicht zentral gezählt
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/passkey.test.ts`, `tests/e2e/login.test.ts`.
+
+**Beobachtung:** Der Klick auf den Reiter «Profil» steht in mehreren Tests einzeln. Alle Browser kommen von 127.0.0.1, die Grenzen (10 Fehlversuche pro Stunde) gelten für den ganzen Lauf; wie viele Fehlversuche alle E2E-Dateien zusammen verbrauchen, prüft niemand. Heute 4 Passkey-Zählungen pro Lauf.
+
+**Ursprung:** #44, Review Task 8.
+
+**Einschätzung:** Niedrig. Ein gemeinsamer Helfer in `tests/e2e/hilfen/seite.ts`; die Zählung wird erst eng, wenn weitere Fehlversuch-Tests dazukommen.
+
+### 2026-11-04 — Neue Migration auf einem Branch setzt die geteilte lokale Datenbank zurück
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** lokale Docker-Datenbank `mytco` (`make db`), von allen Worktrees geteilt.
+
+**Beobachtung:** In #44 wurde die noch nicht ausgelieferte Migration 0003 neu erzeugt. Die lokale Datenbank hatte die alte Fassung schon eingespielt; ein Subagent hat sie darum gelöscht und neu angelegt. Eine parallele Session (Worktree `issue-043`) nutzt dieselbe Datenbank und kann davon unbemerkt betroffen sein.
+
+**Ursprung:** #44, Fix nach dem Final-Review.
+
+**Einschätzung:** Mittel bei Parallelarbeit. Optionen: eigene Datenbank je Worktree (Name aus dem Worktree) oder Regel «Migrationen nie neu erzeugen, sobald sie migriert wurden».
+
+### 2026-11-04 — Nach einem Merge mit neuen Paketen ist der Pre-Push-Hook im Hauptordner rot
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** Hauptordner `tco-app`, `.githooks/pre-push` → `make check`.
+
+**Beobachtung:** Der Hauptordner hatte `node_modules` vom alten Stand. Nach dem Merge von #44 (zwei neue Pakete) scheiterte `svelte-check` beim Push von `dev`, bis `npm ci --ignore-scripts` lief.
+
+**Ursprung:** #44, Merge nach `dev`.
+
+**Einschätzung:** Niedrig. `make voraussetzungen` könnte prüfen, ob `node_modules` zur Lock-Datei passt, oder der Branching-Skill nennt `npm ci` nach Merges mit Paketänderungen.
+
+### 2026-11-04 — K-48 Website-Umzug: Antwort zieht ADR-003, Kosten und Sicherheitskonzept nach sich
+
+**Thema:** Betrieb
+
+**Fundort:** `docs/abklaerungen.md` K-48; `docs/adr/adr-003-hosting-infomaniak-vps.md`, `docs/kosten.md`, `docs/sicherheitskonzept.md`.
+
+**Beobachtung:** K-48 ist nirgends als `Annahme K-48` markiert, `make annahmen` meldet bei einer Antwort also nichts. Zieht die Website auf den MyTCO-Server, braucht es einen Nachtrag zu ADR-003 (eigener Container, abgeschottet von Datenbank und Netz von MyTCO), neue Posten in `kosten.md` (Postfächer, wegfallendes Metanet-Paket) und eine Bedrohung im Sicherheitskonzept (Lücke im Admin-Bereich der Website auf demselben Server).
+
+**Ursprung:** Nutzerhinweis, Session vom 04.11.2026 (Website weg von Metanet).
+
+**Einschätzung:** Erst relevant, wenn K-09.1 und K-48 beantwortet sind. Dann zusammen bewerten: gleicher Server oder eigenes Webhosting bei Infomaniak.
