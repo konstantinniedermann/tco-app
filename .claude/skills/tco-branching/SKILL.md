@@ -45,6 +45,9 @@ Git-Konfiguration (`core.hooksPath`) gilt für alle Worktrees.
 Wer Code ändert: im neuen Worktree `npm ci --ignore-scripts` (Hooks brauchen `node_modules`;
 `make check` zusätzlich Docker Desktop). Für `make dev` und `make seed` braucht der Worktree eine
 eigene `.env` (`cp .env.example .env`); sie ist gitignoriert und fehlt in jedem neuen Worktree.
+Alle Worktrees teilen die lokale Datenbank `mytco`; `make dev`, `make seed` und `make e2e`
+spielen dort die Migrationen des eigenen Branches ein. Eine Migration, die schon eingespielt
+wurde, wird darum nie neu erzeugt — eine Änderung kommt als neue Migration dazu.
 
 **2 — Arbeiten:** TDD bzw. Doku, Dateien einzeln stagen, committen, Branch pushen
 (`git push -u origin <typ>/issue-NNN` — löst kein Deploy aus). Spec- und Plan-Dateien
@@ -71,6 +74,9 @@ git -C $M merge --no-ff <typ>/issue-NNN
 git -C $M push origin dev
 gh run list -R konstantinniedermann/tco-app --branch dev --limit 3   # CI grün?
 ```
+
+Brachte der Merge eine geänderte `package-lock.json`, vor dem nächsten Push im Hauptordner
+`npm ci --ignore-scripts` — sonst prüft der Pre-Push-Hook mit alten `node_modules` und wird rot.
 
 **Direkt nach dem Merge aufräumen, nicht erst nach dem Release.** Der Worktree und der Branch
 haben nach dem Merge keinen Zweck mehr. Das gilt auch, wenn in der Definition of Done noch
