@@ -230,7 +230,7 @@
 			{/if}
 		</details>
 
-		<details class="karte klappe" open>
+		<details class="karte klappe">
 			<summary class="klappe-titel"
 				>Rollen <span class="leise"
 					>{['Mitglied', ...detail.rollen.map((r) => ROLLEN_NAMEN[r])].join(' · ')}</span

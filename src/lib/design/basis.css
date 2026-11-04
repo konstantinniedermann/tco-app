@@ -262,6 +262,13 @@ img {
 .feld input,
 .feld select {
 	display: block;
+}
+
+/* Gemeinsames Aussehen der Felder, auch in der Feld-Zeile der Verwaltung */
+.feld input,
+.feld select,
+.feld-zeile input,
+.feld-zeile select {
 	width: 100%;
 	min-height: var(--tippflaeche);
 	padding: var(--abstand-3);
@@ -293,18 +300,6 @@ img {
 
 .feld-zeile label {
 	font-weight: 600;
-}
-
-.feld-zeile input,
-.feld-zeile select {
-	width: 100%;
-	min-height: var(--tippflaeche);
-	padding: var(--abstand-3);
-	border: var(--rand-dick) solid var(--farbe-rand);
-	border-radius: var(--radius);
-	background: var(--farbe-flaeche);
-	color: var(--farbe-text);
-	font: inherit;
 }
 
 .feld-zeile .fehler {
@@ -465,6 +460,8 @@ dialog.karte {
 .tabelle th {
 	background: var(--farbe-marke-zart);
 	text-align: left;
+	/* Kein «Num-mer»: die Tabelle scrollt waagrecht (Leitbild, Ausnahme zu UI-02) */
+	hyphens: manual;
 	padding: var(--abstand-3);
 }
 

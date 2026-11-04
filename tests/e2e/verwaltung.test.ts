@@ -95,7 +95,8 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 	await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
 	await expect(speichern).toBeDisabled();
 
-	// A-ROLLE-01: Rolle vergeben.
+	// A-ROLLE-01: Rolle vergeben. Die Klappe «Rollen» ist zu wie in Mockup 6.
+	await page.locator('summary', { hasText: 'Rollen' }).click();
 	await page.getByLabel('CM-Verantwortliche').check();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
 	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
@@ -184,6 +185,7 @@ test('RR-03: der letzte Admin sieht die Meldung beim Entzug seiner Rolle', async
 	await page.route('**/api/admin/mitglieder/*/rollen', (route) =>
 		route.fulfill({ status: 409, json: { fehler: 'letzter-admin' } })
 	);
+	await page.locator('summary', { hasText: 'Rollen' }).click();
 	await page.getByLabel('Admin', { exact: true }).uncheck();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
 	// Wer sich selbst die Rolle entzieht, wird vorher gefragt; «Abbrechen» schickt nichts.
