@@ -7,6 +7,14 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+## 0.4.0 — Hilfe beim Start, Mitgliederverwaltung und Passkey, nicht ausgeliefert
+
+Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test
+([Versionen](ci-cd-und-release.md#versionen)). Doku-Abgleich vor dem Release: zwei Befunde auf
+hoch behoben (Befehl für den ersten Admin auf Live, Türsteher nach einem Umzug des Repos neu
+einspielen), Kleinigkeiten behoben, der Rest als Beobachtung eingetragen (u. a. gescheiterte
+Migration beim Ausliefern, Ort des Eintrags «Verwaltung»).
+
 - Betrieb und Übergabe (#10): neue Seite [Betrieb und Übergabe](betrieb-und-uebergabe.md) mit
   Konten und Eigentum, Geheimnissen (was ausserhalb des Servers liegen muss), Grundsätzen für
   Sicherung und Überwachung und Übergabe-Checkliste; Sicherungsablage als Vorschlag; neue Frage
@@ -23,7 +31,7 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   um die Testgruppe ergänzt; K-20.1 vom Projektleiter beantwortet.
 - Mitgliederverwaltung für Admins, Etappe 1 von #43 (A-MITGLIED-01, -02, -06, A-ROLLE-01, -02,
   SI-08): Bestätigung mit Mail-Code (24 Stunden), Mitglieder anlegen, suchen und bearbeiten, Rollen
-  vergeben (der letzte Admin bleibt), Änderungsverlauf ohne Werte (die letzten 50, auf der Seite
+  vergeben (der letzte Admin bleibt), alle Sitzungen eines Mitglieds beenden, Änderungsverlauf ohne Werte (die letzten 50, auf der Seite
   Änderungsverlauf die letzten 100), erster Admin per Befehl `admin-festlegen`. Der Hinweis an die alte E-Mail-Adresse bei einer Änderung durch den Admin fehlt noch
   (kommt mit FR-25, SI-09). Neuer Brief-Code und Brief-Serie folgen mit
   Etappe 2, Austritt (Login gesperrt), Löschen und Export mit Etappe 3.
