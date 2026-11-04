@@ -1,8 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import type { Db } from '../../src/lib/server/db/index.ts';
-import { konto, mitglied } from '../../src/lib/server/db/schema.ts';
+import { konto, kontoRolle, mitglied } from '../../src/lib/server/db/schema.ts';
 
-type Teil = Partial<{ vorname: string; nachname: string; status: string; gesperrt: boolean }>;
+type Teil = Partial<{
+	vorname: string;
+	nachname: string;
+	status: string;
+	gesperrt: boolean;
+	rollen: string[];
+}>;
 
 // Legt ein erfundenes Mitglied samt Konto an; die Adresse ist pro Aufruf eindeutig.
 export async function legeMitgliedAn(db: Db, teil: Teil = {}) {
@@ -24,5 +30,8 @@ export async function legeMitgliedAn(db: Db, teil: Teil = {}) {
 		.insert(konto)
 		.values({ mitgliedId: m.id, gesperrt: teil.gesperrt ?? false })
 		.returning({ id: konto.id });
+	if (teil.rollen?.length) {
+		await db.insert(kontoRolle).values(teil.rollen.map((rolle) => ({ kontoId: k.id, rolle })));
+	}
 	return { mitgliedId: m.id, kontoId: k.id, email, vorname };
 }
