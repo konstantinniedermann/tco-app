@@ -326,3 +326,75 @@ Nicht mit `--legacy-peer-deps` umgehen. Prüfen mit
 **Ursprung:** #44, Final-Review.
 
 **Einschätzung:** Sehr niedrig; das Mitglied versucht es einfach neu. Nur angehen, wenn es in der Praxis gemeldet wird.
+
+### 2026-11-04 — Zwei Admins überschreiben sich beim Speichern der Angaben still
+
+**Thema:** Tests
+
+**Fundort:** `aendereAngaben` in `src/lib/server/admin/mitglieder.ts`, Seite *Mitglied* der Verwaltung.
+
+**Beobachtung:** Das Speichern schreibt alle Felder. Öffnen zwei Admins (oder zwei Tabs) dasselbe Mitglied, überschreibt der zweite Speichern die Änderung des ersten ohne Hinweis.
+
+**Ursprung:** Final-Review #43 Etappe 1.
+
+**Einschätzung:** Bei wenigen Admins selten. Abhilfe: nur geänderte Felder schicken, oder den alten Stand mitschicken und bei Abweichung mit 409 antworten.
+
+### 2026-11-04 — Fehlerseite unter /verwaltung ohne Rahmen
+
+**Thema:** Barrierefreiheit
+
+**Fundort:** `src/routes/verwaltung/+layout.svelte`, Fehlerfall im `+layout.ts`.
+
+**Beobachtung:** Bei einem Fehler (z. B. 503 beim Laden des Zugangs) zeigt die Fehlerseite keinen Rahmen: kein `main`, kein Weg zurück.
+
+**Ursprung:** Final-Review #43 Etappe 1.
+
+**Einschätzung:** Selten, aber eine Sackgasse. Beim nächsten Anfassen der Verwaltungs-Oberfläche eine `+error.svelte` mit Rahmen und Link anlegen.
+
+### 2026-11-04 — Mitgliedernummer ist nur bei gleicher Gross-/Kleinschreibung eindeutig
+
+**Thema:** Datenschutz
+
+**Fundort:** Eindeutigkeit der Mitgliedernummer in `src/lib/server/db/schema.ts` und `src/lib/server/admin/mitglieder.ts`.
+
+**Beobachtung:** «A12» und «a12» gelten als verschiedene Nummern. Die E-Mail-Adresse wird dagegen ohne Rücksicht auf Gross-/Kleinschreibung verglichen (FR-25).
+
+**Ursprung:** Final-Review #43 Etappe 1.
+
+**Einschätzung:** Vor Etappe 2 (Einlesen der Mitgliederliste, A-MITGLIED-07) entscheiden, sonst entstehen beim Abgleich Doppelte.
+
+### 2026-11-04 — Bauregel prüft nicht, ob Admin-Routen nur Funktionen aus ADMIN_SCHNITTSTELLEN nutzen
+
+**Thema:** Tests
+
+**Fundort:** `scripts/pruefungen/bauregel.ts`, `ADMIN_SCHNITTSTELLEN` in `src/lib/server/admin/schnittstellen.ts`.
+
+**Beobachtung:** Die Bauregel prüft, woher eine Admin-Route importiert, aber nicht, dass jede importierte Funktion in `ADMIN_SCHNITTSTELLEN` steht. Nur diese Liste deckt der Test «ohne Sitzung 401, ohne Rolle 403, unbestätigt 403» ab.
+
+**Ursprung:** Final-Review #43 Etappe 1.
+
+**Einschätzung:** Vor der ersten neuen Admin-Route in Etappe 2 schliessen, sonst kann eine Route ohne Rechteprüfung unbemerkt bleiben.
+
+### 2026-11-04 — Login-Schnittstellen importieren admin/rollen.ts: Kopplung in beide Richtungen
+
+**Thema:** Login
+
+**Fundort:** `src/lib/server/login/schnittstellen.ts` importiert `src/lib/server/admin/rollen.ts`.
+
+**Beobachtung:** Der Login kennt die Rollen der Verwaltung, und die Verwaltung kennt den Login: Die Module sind in beide Richtungen gekoppelt.
+
+**Ursprung:** Final-Review #43 Etappe 1.
+
+**Einschätzung:** Funktioniert. Bei der nächsten grösseren Änderung an Rollen die Rollenabfrage in ein gemeinsames Modul verschieben.
+
+### 2026-11-04 — Etappe 3: Austritt und Löschen müssen die Sperre aus rollen.ts nehmen
+
+**Thema:** Arbeitsablauf
+
+**Fundort:** `src/lib/server/admin/rollen.ts` (RR-03, letzter Admin), Etappe 3 von #43 (Austritt, Löschen).
+
+**Beobachtung:** Austritt und Löschen eines Mitglieds mit der Rolle Admin müssen die Sperre «der letzte Admin bleibt» berücksichtigen. Die Löschfrist (Bedenkzeit) braucht einen Zeitgeber; ohne pg-boss ist das ein Nachtrag zu ADR-002.
+
+**Ursprung:** Final-Review #43 Etappe 1.
+
+**Einschätzung:** Beim Planen von Etappe 3 mitnehmen; den ADR-Nachtrag vor dem Bauen schreiben.

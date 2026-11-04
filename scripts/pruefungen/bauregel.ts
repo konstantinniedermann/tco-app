@@ -22,8 +22,8 @@ const ERLAUBTER_IMPORT = /(?:^|\/)lib\/server\/admin\/(?:index|schnittstellen)\.
 
 function importe(inhalt: string): string[] {
 	const muster =
-		/\b(?:import|export)\b[^'"]*?\bfrom\s*['"]([^'"]+)['"]|\bimport\s*['"]([^'"]+)['"]/g;
-	return [...inhalt.matchAll(muster)].map((m) => m[1] ?? m[2]);
+		/\b(?:import|export)\b[^'"]*?\bfrom\s*['"]([^'"]+)['"]|\bimport\s*['"]([^'"]+)['"]|\bimport\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
+	return [...inhalt.matchAll(muster)].map((m) => m[1] ?? m[2] ?? m[3]);
 }
 
 /** Prüft die Bauregel: nur API-Routen (`+server.ts`), keine Server-Dateien neben Seiten, Form Actions oder Remote Functions. */

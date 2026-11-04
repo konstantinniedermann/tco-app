@@ -71,6 +71,17 @@ describe('Admin-Routen', () => {
 			expect(pruefeBauregel(new Map([[route, `${gut}\n${schlecht}`]]))).toHaveLength(1);
 		}
 	});
+	it('erkennt dynamische Importe in Admin-Routen', () => {
+		for (const schlecht of [
+			"const m = await import('../../../lib/server/db/index.ts');",
+			'const m = await import("../../../lib/server/admin/mitglieder.ts");',
+			"const m = await import(\n\t'../../../lib/server/db/schema.ts'\n);"
+		]) {
+			expect(pruefeBauregel(new Map([[route, `${gut}\n${schlecht}`]]))).toHaveLength(1);
+		}
+		const erlaubt = "const m = await import('../../../lib/server/admin/schnittstellen.ts');";
+		expect(pruefeBauregel(new Map([[route, `${gut}\n${erlaubt}`]]))).toEqual([]);
+	});
 	it('gilt nur unter api/admin', () => {
 		const fremd = "import { holeDb } from '../../../lib/server/db/index.ts';";
 		expect(pruefeBauregel(new Map([['src/routes/api/sitzung/+server.ts', fremd]]))).toEqual([]);
