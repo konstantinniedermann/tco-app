@@ -234,7 +234,7 @@ describe('Schnittstellen', () => {
 			await ladeSitzung(s.dienst, mit);
 			const r1 = getSitzung(mit);
 			expect(r1.status).toBe(200);
-			expect(await r1.json()).toEqual({ vorname: 'Erika' });
+			expect(await r1.json()).toEqual({ vorname: 'Erika', passkeyHinweis: true });
 
 			await s.dienst.beendeAlleSitzungen(s.kontoId);
 			const danach = ereignis({ cookie: s.kennung });
