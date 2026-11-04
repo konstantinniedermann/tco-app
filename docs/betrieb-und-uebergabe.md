@@ -100,7 +100,10 @@ Nachfolge (K-05).
    - Alte Links leiten weiter; Issues, Labels und Milestones ziehen mit.
    - Die Container-Ablage heisst danach `ghcr.io/<neues-konto>/tco-app`. Alle Stellen mit dem
      alten Kontonamen anpassen (`git grep konstantinniedermann`), auch die `-R`-Angaben in den
-     Skills, dann neu bauen und auf Test ausliefern.
+     Skills und `MYTCO_REPO_STANDARD` in `betrieb/bin/lib.sh`. Dann `bin/lib.sh` und
+     `bin/ausliefern-ssh` als root auf dem Server neu einspielen (von Hand eingerichtet, siehe
+     [`betrieb/README.md`](../betrieb/README.md)), sonst holt der Türsteher weiter aus der alten
+     Ablage. Erst danach neu bauen und auf Test ausliefern.
    - Ob Geheimnisse, Variablen und Container-Images beim Transfer mitkommen, beim Transfer
      prüfen und sonst neu eintragen (Vermutung: Images bleiben im alten Konto).
    - Mitarbeitende im Repo prüfen: Die Hauptansprechperson bleibt, der Projektleiter geht.

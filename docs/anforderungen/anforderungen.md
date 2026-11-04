@@ -44,7 +44,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-LOGIN-06 | Zwei-Faktor-Login (App oder SMS/E-Mail, zwingend oder freiwillig) | PDF 2 | später | später |
 | A-LOGIN-07 | Login mit Passkey, freiwillig neben dem Einmal-Code: bequemer am PC und auf weiteren Geräten. Der Mail-Code bleibt gültig, der Passkey schützt also nicht gegen ein gehacktes Postfach ([#44](https://github.com/konstantinniedermann/tco-app/issues/44)) | PDF 2, K-02.1 | Mitglieder-Login\* | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
 | A-LOGIN-08 | Login ohne Passwort, nur per Einmal-Code: aus dem Brief, später per E-Mail (A-LOGIN-10) | PDF 2, PL | Mitglieder-Login | umgesetzt\* |
-| A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Admin seine Sitzungen beendet | PL | Mitglieder-Login | umgesetzt\* (Dienst; Admin-Bedienung kommt mit der Admin-Oberfläche) |
+| A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Admin seine Sitzungen beendet | PL | Mitglieder-Login | umgesetzt (Admin beendet die Sitzungen in der Verwaltung, #43) |
 | A-LOGIN-10 | Wer ausgeloggt ist (lange Pause, neues Handy, Brief verloren), erhält nach Eingabe seiner E-Mail-Adresse einen neuen Code per E-Mail | PL | Mitglieder-Login | umgesetzt\* |
 | A-LOGIN-11 | Einmal-Code per SMS oder App statt per Brief oder E-Mail (abgespalten aus A-LOGIN-08) | PDF 2 | später | später |
 
@@ -211,7 +211,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 |----|-------------|--------|--------|--------|
 | N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später. Zuerst als installierbare Web-App, die Store-App ist N-APP-04 | Ziel, PDF 1 | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
 | N-APP-02 | Benachrichtigungen per Push und E-Mail | Ziel, PDF 5b | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
-| N-APP-03 | Admin und Verantwortliche arbeiten in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Funktionen zeigt | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
+| N-APP-03 | Admin und Verantwortliche arbeiten in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Funktionen zeigt | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | umgesetzt\* (Verwaltung nur für Admins; CM und Lizenz mit ihren Etappen) |
 | N-APP-04 | MyTCO ist als App im App Store und bei Google Play erhältlich | Ziel | später ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | später |
 | N-DESIGN-01 | Das Design lehnt sich an die Website tcolten.ch an, mit abgeändertem Farbkonzept zur Abgrenzung | PDF 3a | Fundament (UI-Leitbild, #13) | geplant |
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |

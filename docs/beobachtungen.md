@@ -116,6 +116,18 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-04 — Doku-Abgleich vor 0.4.0: offene Punkte ohne Sofort-Fix
+
+**Thema:** Betrieb
+
+**Fundort:** `betrieb/bin/ausliefern:233-246`, `docs/ci-cd-und-release.md` (Rückfall, Ausblick, Actions-Minuten), `docs/testkonzept.md:30-32, 47-49`, `src/lib/server/admin/schnittstellen.db.test.ts`, `src/lib/server/admin/mitglieder.db.test.ts:73, 82, 177`, `src/lib/server/db/schema.ts:58`, `docs/fachmodell.md:59, 61`, `docs/ui-leitbild.md:214`, `src/routes/+page.svelte:39-44`, `docs/datenschutz.md` (Sitzungen).
+
+**Beobachtung:** (1) Scheitert die Migration beim Ausliefern, wird Test vorher geleert und bleibt ohne App; auf Live läuft die alte App weiter, die neue Einrichtung bleibt aber unter `live/betrieb/`. Die Doku beschreibt den Rückfall nur für «App antwortet nicht». (2) Das Testkonzept verspricht pro Schnittstelle den Fall «gesperrtes Konto»; die Schnittstellen-Tests der Verwaltung prüfen ihn nicht, nur der Rollen-Dienst. (3) Die Verwaltung ist eine Kachel auf der Startseite, laut UI-Leitbild ein Eintrag unter *Profil* — Entscheid des Projektleiters offen. (4) Kleinigkeiten: Tests zur Mitgliedernummer tragen die ID FR-25 statt A-MITGLIED-07; FR-25 ist teilweise umgesetzt (eindeutige E-Mail), steht auf geplant; Fachmodell nennt beim Passkey nur Schlüssel und Kennung (Datenschutz ist vollständig) und beim Verlauf nicht «gelöschtes Konto»; Datenschutz nennt den Zeitpunkt der Anmeldung je Sitzung nicht ausdrücklich; Testkonzept nennt als ersten E2E-Ablauf «Daten ergänzen» (FR-02, noch geplant); Kommentar `schema.ts:58` zur Passkey-Kennung ungenau; `proxy.env`-Werte `MYTCO_TEST_BENUTZER`, `MYTCO_TLS`, `MYTCO_HTTP_PORT`/`HTTPS_PORT`, Uhrzeit des Timers (02:30), Wiederholung von `sichern` und Aufräumen alter Images nicht dokumentiert; «innert einer Minute (S)» ist belegt (B); `secret-scan.yml` bricht vorherige Läufe ab, anders als in «Actions-Minuten» gesagt.
+
+**Ursprung:** Doku-Abgleich vor Release 0.4.0 (Bereiche App, Setup, Betrieb, Daten/Tests).
+
+**Einschätzung:** Nichts davon führt Mitglieder oder Vorstand in die Irre. (1) vor der ersten Auslieferung mit #39 klären; (2) mit der nächsten Etappe von #43; (3) braucht eine Entscheidung; (4) gesammelt bei Gelegenheit.
+
 ### 2026-11-04 — Ein Teil der Arbeitsweise liegt nicht im Repo und ginge bei einer Übergabe verloren
 
 **Thema:** Betrieb

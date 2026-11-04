@@ -256,6 +256,7 @@ werden sie nicht geprüft.
 | Variable | Inhalt | Pflicht |
 |----------|--------|---------|
 | `DATABASE_URL` | Verbindung zur PostgreSQL-Datenbank der Umgebung | ja |
+| `ORIGIN` | Öffentliche Adresse der Umgebung (z. B. `https://my.tcolten.ch`). Daraus leitet der Server die Adresse für Passkeys ab: Ein Wechsel macht alle Passkeys ungültig. Bei einem Adresswechsel (K-10) zusammen mit `MYTCO_ADRESSE` und den Adressen in `proxy.env` ändern | ja (auf dem Server) |
 | `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
 | `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
 | `MAIL_NUR_AN` | Nur Test: alle Mails werden an diese eine Adresse umgeleitet. Auf Live leer. Ein Wert, der keine Mail-Adresse ist, lässt die App nicht starten. Ohne sie lädt `scripts/testdaten.ts` nichts | nein |
