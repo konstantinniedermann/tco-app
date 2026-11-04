@@ -7,6 +7,11 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+- Betrieb und Übergabe (#10): neue Seite [Betrieb und Übergabe](betrieb-und-uebergabe.md) mit
+  Konten und Eigentum, Geheimnissen (was ausserhalb des Servers liegen muss), Grundsätzen für
+  Sicherung und Überwachung und Übergabe-Checkliste; Sicherungsablage als Vorschlag; neue Frage
+  K-49 (Ablage der Geheimnisse). Dazu die [Recherche tcolten.ch](recherche/2026-11-04-tcolten-website.md)
+  (Anbieter und Domain, Statuten) mit Stand-Vermerken in den Abklärungen.
 - Hilfe beim Start (#47, A-HILFE-01, -02): im Handy-Browser zeigt eine Einstiegsseite zuerst die
   Anleitung zum Startbildschirm als Animation (iPhone, Android mit Taste «MyTCO installieren»),
   danach den Login; Seite Hilfe ohne Login, Link «Hilfe» in der Fusszeile; Baustein Anleitung

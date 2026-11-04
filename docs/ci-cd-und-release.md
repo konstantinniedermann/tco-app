@@ -241,9 +241,9 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 | Server, je Umgebung | `geheim.env`: Datenbank-Passwort, Schlüssel für die Codes (`MYTCO_CODE_SCHLUESSEL`, je eigener für Test und Live), Zugang zum E-Mail-Versand (`MYTCO_SMTP_URL`), Absender, Kontakt, Adresse der Umgebung, auf Test der einzige Mail-Empfänger (Projektleiter); Schlüssel für Push folgt mit der Push-Funktion |
 | Server, gemeinsam | `proxy.env` (Adressen, Passwort-Hash für Test), `sicherung.env` (Ziel und Zugang der Sicherung) |
 
-Die Dateien liegen nur auf dem Server (Rechte 600), im Repo stehen Vorlagen ohne Werte. Wo die
-Geheimnisse für eine Nachfolge dokumentiert sind, regelt
-[#10](https://github.com/konstantinniedermann/tco-app/issues/10).
+Die Dateien liegen nur auf dem Server (Rechte 600), im Repo stehen Vorlagen ohne Werte. Welche davon
+ausserhalb des Servers aufbewahrt werden müssen und wo, steht in
+[Betrieb und Übergabe](betrieb-und-uebergabe.md#geheimnisse).
 
 ## Einstellungen der App
 

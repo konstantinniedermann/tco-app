@@ -116,6 +116,18 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-04 — Ein Teil der Arbeitsweise liegt nicht im Repo und ginge bei einer Übergabe verloren
+
+**Thema:** Betrieb
+
+**Fundort:** `CLAUDE.md` (verweist auf die übergeordnete CLAUDE.md und auf Skills ausserhalb), `docs/betrieb-und-uebergabe.md` (Übergabe-Checkliste, Schritt 1).
+
+**Beobachtung:** Die Nachfolge soll wie der Projektleiter mit Claude Code arbeiten. Das Repo bringt aber nur die Projekt-`CLAUDE.md` und den Skill `tco-branching` mit. Nur auf dem Mac des Projektleiters liegen: die übergeordnete CLAUDE.md (Workflow, Dependencies, Commit-Konvention, Umgang mit Befunden), die Skills `session-start` und `session-wrap-up`, der Agent `cas-reviewer`, der Hook `dep-guard`, das superpowers-Plugin und die Memories mit den Fallen (z. B. WebKit in der CI, Worktree-Isolation, Einstiegsseite im E2E).
+
+**Ursprung:** #10, Brainstorming zur Übergabe; vom Projektleiter bewusst aus #10 ausgeklammert.
+
+**Einschätzung:** Vor einer Übergabe nötig, vorher ohne Folge. Was nur für tco-app gilt, liesse sich ins Repo holen (`.claude/`, Fallen nach `docs/`); berührt die gemeinsamen Regeln der anderen CAS-Projekte.
+
 ### 2026-11-04 — Hilfe beim Start: Kleinigkeiten aus dem Review
 
 **Thema:** App
