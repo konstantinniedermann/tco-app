@@ -19,14 +19,14 @@ Lauf 1 hat kein festes Datum. Er startet, sobald diese Punkte erfüllt sind. Get
 was bis dahin gebaut ist; ein Auftrag, dessen Funktion noch fehlt, wandert in einen späteren
 Lauf.
 
-- [ ] Live in Betrieb ([#39](https://github.com/konstantinniedermann/tco-app/issues/39))
+- [ ] Live in Betrieb ([#39](https://github.com/konstantinniedermann/tco-app/issues/39)), unter der endgültigen Adresse (K-10). Unter einer Übergangsadresse müssten die Testpersonen nach dem Umzug Startbildschirm und Passkey neu einrichten ([Sicherheitskonzept](sicherheitskonzept.md))
 - [ ] Login per Einmal-Code auf Live ([#29](https://github.com/konstantinniedermann/tco-app/issues/29))
 - [ ] Brief-Code und Brief als PDF in der Mitgliederverwaltung ([#43](https://github.com/konstantinniedermann/tco-app/issues/43), Etappe 2)
 - [ ] Hilfe beim Start: Hilfe-Seite und Anleitung zum Startbildschirm (A-HILFE-01, -02, [#47](https://github.com/konstantinniedermann/tco-app/issues/47))
 - [ ] Datenschutzerklärung auf Live erreichbar (DS-09), Hinweis an die alte E-Mail-Adresse gebaut (FR-25)
 - [ ] Kontaktangabe für Fragen geklärt (K-21)
 - [ ] Vorabversion 0.x auf Live, Checkliste auf Test abgehakt
-- [ ] Liste der Testpersonen in `intern/` (Projektleiter gibt sie durch: Name, Gerät, Softwareversion, Mailanbieter, Altersgruppe grob)
+- [ ] Liste der Testpersonen in `intern/`, vom Projektleiter selbst angelegt. Claude bekommt daraus nur Gerät, Softwareversion, Mailanbieter und Altersgruppe grob, ohne Namen ([Datenschutz](datenschutz.md#testgruppe))
 
 ## Ablauf Lauf 1
 
@@ -64,13 +64,14 @@ ein echtes Konto, und die Admin-Seite prüft die Checkliste vor dem Release.
 
 - Zuerst alleine mit Mail, Brief und Hilfe versuchen, wie es ein Mitglied ohne Testgruppe
   auch müsste. Erst dann im Chat fragen.
-- Im Chat sagen, bei welchem Auftrag es hakt, gern mit Screenshot, möglichst ohne fremde Daten.
+- Im Chat sagen, bei welchem Auftrag es hakt, gern mit Screenshot. Kein Code und keine Adresse auf dem Screenshot; sonst privat an den Projektleiter. Im Gruppenchat sehen alle die Telefonnummern der anderen.
 - Der Projektleiter notiert jede Frage als Befund, auch wenn sie sich sofort klären lässt.
 
 ## Mail an die Testpersonen
 
 Über das private Postfach des Projektleiters, mit dem Brief der Person als PDF im Anhang.
-Nach dem Versand die Mails im Ordner «Gesendet» löschen. `[…]` vor dem Versand ersetzen.
+Nach dem Versand die Mails im Ordner «Gesendet» und im Papierkorb löschen, ebenso lokale
+Kopien der PDFs. `[…]` vor dem Versand ersetzen.
 
 ```text
 Betreff: MyTCO – dein Zugang für den Testlauf
@@ -84,17 +85,20 @@ ob man mit Brief und Anleitung alleine zurechtkommt – und wo es hakt.
 
 So gehts:
 - Im Anhang ist dein Brief. Beim echten Start kommt er per Post.
-- Öffne ihn am Laptop (oder druck ihn aus) und scanne den QR-Code mit deinem Handy.
-- Dein Code gilt nur, bis du dich das erste Mal angemeldet hast.
-- Die Aufträge schicke ich dir im WhatsApp-Chat.
+- Öffne ihn am Laptop oder Tablet (oder druck ihn aus) und scanne den QR-Code
+  mit deinem Handy.
+- Dein Code gilt einmal, höchstens 90 Tage. Lösch die Mail und das PDF,
+  sobald du angemeldet bist.
+- Die Aufträge schicke ich im WhatsApp-Chat. Testlauf bis [Datum].
 
 Wichtig: Probier zuerst alleine, mit Brief und Hilfe in MyTCO. Frag erst im Chat,
 wenn du nicht weiterkommst. Jede Frage zeigt uns, wo die Anleitung noch fehlt.
 
 Deine Daten: Dein Konto in MyTCO ist echt und bleibt nach dem Test bestehen.
-Die Rückmeldungen im Formular sind ohne Namen und werden nach der Auswertung
-gelöscht. Deine Angaben für den Test (Name, Handy) habe nur ich, nach dem
-letzten Testlauf lösche ich sie.
+Das Formular ist ohne Namen und wird nach der Auswertung gelöscht. Für den Test
+notiere ich mir Handy, Mailanbieter und grob dein Alter; das lösche ich nach dem
+letzten Testlauf. Im WhatsApp-Chat sehen alle deine Nummer. Bitte keinen Code
+und keine Adresse in den Chat.
 
 Merci und Gruess
 [Projektleiter]
@@ -107,19 +111,20 @@ Merci und Gruess
 ```text
 Hoi zäme 👋 Willkommen im Testlauf von MyTCO! Hier koordinieren wir.
 Regel Nr. 1: zuerst alleine probieren, mit Brief und Hilfe in MyTCO.
-Wenn's hakt: hier melden, mit Nummer vom Auftrag und gern mit Screenshot.
+Wenn's hakt: hier melden, mit Nummer vom Auftrag und gern mit Screenshot –
+aber ohne Code und Adresse drauf (sonst privat an mich).
 ```
 
 **Start Lauf 1**
 
 ```text
-Los geht's! Deine Mail mit dem Brief ist unterwegs. Die Aufträge:
+Los geht's! Eure Mails mit dem Brief sind unterwegs. Die Aufträge:
 1. Brief am Laptop öffnen, QR-Code mit dem Handy scannen, MyTCO auf den Startbildschirm legen
 2. MyTCO öffnen, Code eintippen, fehlende Angaben ergänzen
 3. E-Mail-Adresse oder Telefonnummer ändern
 4. Passkey einrichten
 5. Handy neu starten – bist du noch angemeldet?
-6. Ausloggen und einen neuen Code per Mail anfordern
+6. Ausloggen, einen neuen Code per Mail anfordern und damit einloggen
 7. Freiwillig: MyTCO am Laptop öffnen, mit dem Passkey vom Handy anmelden
 Am Schluss bitte das Formular ausfüllen (2 Minuten): [Link]
 ```
@@ -135,7 +140,8 @@ Und bitte das Formular nicht vergessen: [Link]. Merci!
 
 ```text
 Merci vielmal fürs Testen! Wir arbeiten eure Rückmeldungen ein.
-Euer Konto bleibt bestehen – ihr seid also schon drin, wenn es für alle losgeht.
+Euer Konto bleibt bestehen. Vor der CM-Anmeldung melde ich mich nochmals
+für einen kurzen zweiten Testlauf.
 ```
 
 Die Liste der Aufträge im Chat folgt der Tabelle oben; fehlt eine Funktion beim Start des
@@ -143,9 +149,10 @@ Laufs, fällt der Auftrag auch im Chat weg.
 
 ## Formular
 
-Google Formular, eines pro Lauf. Ohne Name und ohne E-Mail-Adresse («E-Mail-Adressen
-erfassen» aus, keine Anmeldung nötig). Angelegt wird es, sobald die Aufträge für den Lauf
-feststehen.
+Google Formular, eines pro Lauf. Ohne Name und ohne E-Mail-Adresse: «E-Mail-Adressen
+erfassen» aus, Antworten nicht auf eine pro Person begrenzen (das verlangt eine
+Google-Anmeldung). Über den Freitextfeldern: «Bitte keine Namen». Angelegt wird es, sobald
+die Aufträge für den Lauf feststehen.
 
 1. Handy: iPhone / Android
 2. Mailanbieter: Bluewin / Gmail / GMX / iCloud / anderer / weiss nicht

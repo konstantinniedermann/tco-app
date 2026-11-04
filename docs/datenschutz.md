@@ -85,8 +85,9 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
   nächsten Login eines Mitglieds).
 - **E-Mail-Adresse im Gerätespeicher** während einer Code-Anfrage: nach dem Login, sonst beim
   nächsten Start der App, sobald die Anfrage älter als 15 Minuten ist.
-- **Testgruppe:** Liste der Testpersonen nach Lauf 2, Formularantworten nach der Auswertung
-  des jeweiligen Laufs ([Testgruppe](#testgruppe)).
+- **Testgruppe:** Liste der Testpersonen nach Lauf 2, spätestens zu Beginn der
+  CM-Anmeldung; Formularantworten nach der Auswertung des jeweiligen Laufs; Spalten zur
+  Testgruppe in der Fragen-Tabelle bei der Übernahme in die Liste ([Testgruppe](#testgruppe)).
 
 ## Testgruppe
 
@@ -95,19 +96,27 @@ Vor dem Briefversand prüft eine Testgruppe den Start auf Live ([Testgruppe](tes
 - **Daten auf Live** sind Betrieb, kein Test: DS-08 gilt nicht. Die Konten der Testpersonen
   bleiben nach dem Pilot bestehen.
 - **Liste der Testpersonen** (Name, Gerät, Softwareversion, Mailanbieter, Altersgruppe grob)
-  nur im gitignorierten Ordner `intern/`. Ins Repo kommen nur Anzahl und Verteilung.
+  nur im gitignorierten Ordner `intern/`, vom Projektleiter selbst angelegt. An Claude
+  (Anthropic, USA) gehen nur die Angaben ohne Namen. Ins Repo kommen nur Anzahl und Verteilung.
+- **Fragen-Tabelle** (Google): Wer aus dem Vorstand mitmachen will, trägt sich auf *Wer ist
+  wer* mit Handymodell ein. Die Spalten werden bei der Übernahme in die Liste geleert.
 - **Formular** (Google, ausserhalb CH/EU): ohne Name, ohne E-Mail-Adresse, ohne Jahrgang.
   Bei wenigen Personen lässt sich eine Antwort manchmal trotzdem zuordnen; deshalb nur grobe
   Angaben.
-- **Chat** (WhatsApp) ist privat beim Projektleiter, nicht Teil von MyTCO. Inhalte kommen
-  nur als Befund ohne Namen ins Repo.
+- **Chat** (WhatsApp-Gruppe des Projektleiters) ist nicht Teil von MyTCO. In der Gruppe sehen
+  alle die Telefonnummern der anderen; das sagt die Mail. Codes und Adressen gehören nicht in
+  den Chat. Inhalte kommen nur als Befund ohne Namen ins Repo.
 - **Mail mit dem Brief als PDF** (Name, Adresse, Einmal-Code der Person an sie selbst) geht
-  über das private Postfach des Projektleiters. Der Code gilt nur bis zum ersten Login; die
-  gesendeten Mails werden danach gelöscht.
+  über das private Postfach des Projektleiters (Google, USA), nicht über den Mailversand von
+  MyTCO, für den DS-01 gilt. Vertretbar, weil es nur die eigenen Daten der Person sind, nur
+  wenige Personen im Pilot, und der Code einmal und höchstens 90 Tage gilt. Der Projektleiter
+  löscht die gesendeten Mails und lokalen PDFs nach dem Versand, die Testpersonen Mail und
+  PDF nach dem ersten Login. Beim echten Start kommt der Brief per Post.
 
 Die [Datenschutzerklärung](datenschutzerklaerung.md) bleibt unverändert: Liste, Formular,
 Chat und Mail sind Organisation des Pilots durch den Projektleiter, nicht Funktionen von
-MyTCO. Die Testpersonen erfahren in der Mail, was damit geschieht und wann es gelöscht wird.
+MyTCO. Die Testpersonen erfahren in der [Mail](testgruppe.md#mail-an-die-testpersonen), was
+damit geschieht und wann es gelöscht wird.
 
 ## Junioren
 

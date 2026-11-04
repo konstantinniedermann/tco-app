@@ -132,7 +132,7 @@ Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Ve
 
 Eine Testgruppe des Projektleiters prüft vor dem Briefversand, ob Mitglieder mit Brief,
 Anleitung und Hilfe alleine zurechtkommen (Etappe *Pilot*). Sie nutzt MyTCO auf Live mit
-ihren eigenen echten Daten, mit der letzten Vorabversion 0.x vor 1.0.0; davor gilt die
+ihren eigenen echten Daten, mit einer Vorabversion 0.x vor 1.0.0; davor gilt die
 Checkliste oben auf Test. Das ist Betrieb, kein Test im Sinne von DS-08; vorher muss die
 Datenschutzerklärung gelten.
 

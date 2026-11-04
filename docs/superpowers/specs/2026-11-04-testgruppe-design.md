@@ -31,7 +31,7 @@ alleine zurechtkommen** und wo Anleitung oder Hilfe fehlen.
    Google Formular. Gefragt wird auch, ob es mehr oder andere Doku braucht.
 5. Zugang per **Mail mit dem Brief als PDF**, mit dem Hinweis: am Laptop öffnen und mit dem
    Handy einrichten. Getestet wird vor allem auf dem Smartphone.
-6. Der Pilot läuft auf Live mit einer **Vorabversion 0.x** (der letzten vor 1.0.0, keine feste
+6. Der Pilot läuft auf Live mit einer **Vorabversion 0.x** (vor 1.0.0, keine feste
    Nummer). Befunde werden eingearbeitet, dann folgt 1.0.0 für alle Mitglieder zusammen mit
    dem Briefversand.
 7. Die Hilfe beim Start (Hilfe-Seite in MyTCO, Anleitung zum Startbildschirm mit Animation)
@@ -45,7 +45,7 @@ Betrieb, kein Test im Sinne von DS-08. Die Konten bleiben danach bestehen.
 
 ## Ablauf
 
-### Lauf 1 — Vorabversion 0.x (*Mitglieder-Login*), ohne festes Datum
+### Lauf 1 — Vorabversion 0.x (Etappe *Pilot*), ohne festes Datum
 
 Lauf 1 startet, sobald die Voraussetzungen erfüllt sind, möglicherweise schon im November
 oder Dezember 2026 (Entscheid Projektleiter, 04.11.2026). Getestet wird, was bis dahin
@@ -117,8 +117,8 @@ nötig.
 
 - **Liste der Testpersonen** (Name, Handymodell, Softwareversion, Mailanbieter,
   Altersgruppe grob nach Einschätzung des Projektleiters, z. B. unter 30 / 30–60 / über 60)
-  nur in `intern/`. Der Projektleiter gibt sie Claude vor Lauf 1 durch (Entscheid
-  04.11.2026); Claude legt die Datei an.
+  nur in `intern/`, vom Projektleiter selbst angelegt. Claude bekommt vor Lauf 1 nur Gerät,
+  Softwareversion, Mailanbieter und Altersgruppe ohne Namen (nach Review 04.11.2026).
   Gelöscht nach Lauf 2. Ins Repo kommen nur Anzahl, Verteilung iPhone/Android, Altersspanne
   grob und ob ein älteres Handy dabei ist.
 - **Formularantworten** liegen bei Google (ausserhalb CH/EU) und haben deshalb keinen
@@ -176,7 +176,7 @@ Beobachtung bzw. eigenes Issue dazu, sobald die CM-Anmeldung gebaut wird.
 | `docs/testgruppe.md` (neu) | Ablauf, Voraussetzungen, Aufträge, Regeln, Mailtext zum Kopieren, Chat-Nachrichten zum Kopieren (Begrüssung, Start Lauf, Erinnerung, Dank), Formularfragen, Auswertung (leer bis Lauf 1) |
 | `docs/datenschutz.md` | Abschnitt *Testgruppe*, Einträge unter *Löschen* |
 | `docs/testkonzept.md` | Abschnitt *Testgruppe*: Verweis auf `testgruppe.md`, Definition «älteres Handy», Vorabversion 0.x |
-| `docs/ci-cd-und-release.md` | Pilot mit der letzten Vorabversion 0.x auf Live, 1.0.0 nach dem Pilot für alle |
+| `docs/ci-cd-und-release.md` | Pilot mit Vorabversion 0.x auf Live, 1.0.0 nach dem Pilot für alle |
 | `docs/roadmap.md` | Neue Etappe *Pilot* ohne Datum vor *Mitglieder-Login* (Vorabversion 0.x, Lauf 1); *Mitglieder-Login* = 1.0.0 und Briefversand bis 28.02.2027 |
 | `docs/issue-konventionen.md` | nur falls dort Etappen aufgezählt sind |
 | `docs/anforderungen/anforderungen.md` + Änderungsprotokoll | Neue Anforderungen zu Vorhaben B: Hilfe-Seite in MyTCO; Anleitung zum Startbildschirm mit Animation auf der Einstiegsseite, je nach iPhone/Android, nur solange MyTCO im Browser läuft |
@@ -184,7 +184,7 @@ Beobachtung bzw. eigenes Issue dazu, sobald die CM-Anmeldung gebaut wird.
 | Fragen-Tabelle | K-20 umformuliert: Wer vom Vorstand mitmachen will, trägt sich auf *Wer ist wer* ein. Spalten D/E bleiben bis zur Übernahme nach `intern/` |
 | `docs/versionen.md` | Eintrag unter *Unveröffentlicht* |
 | Issue #40 | Body auf diesen Stand bringen, `Blocked by:` Issue für B. Die Punkte, die auf Lauf 1 warten, bleiben offen |
-| Neues Issue B | Hilfe-Seite in MyTCO und Anleitung zum Startbildschirm mit Animation; Milestone *Mitglieder-Login*, `Blocks: #40`. Wird in einer eigenen Session gebrainstormt |
+| Neues Issue B | Hilfe-Seite in MyTCO und Anleitung zum Startbildschirm mit Animation; Milestone *Pilot*, `Blocks: #40` (#47). Wird in einer eigenen Session gebrainstormt |
 
 Das Google Formular legt Claude über den Chrome-Browser des Projektleiters an und spielt es
 einmal durch (Screenshot), sobald `testgruppe.md` steht.

@@ -35,7 +35,7 @@ dort nie hin (DS-08).
 Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
 (43 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
-#29; die Konten laufen auf eine Vereinsadresse, K-04.1; die Adresse hängt an K-10), spätestens vor dem Release *Mitglieder-Login*.
+#29; die Konten laufen auf eine Vereinsadresse, K-04.1; die Adresse hängt an K-10), spätestens vor dem Pilot der [Testgruppe](testgruppe.md) (Etappe *Pilot*).
 Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
 
 ## Ablauf
@@ -336,7 +336,7 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 ## Versionen
 
 - Schema `Hauptversion.Nebenversion.Korrektur`. Die erste Version mit Code ist `0.1.0`, das
-  erste Release *Mitglieder-Login* wird `1.0.0`. Davor geht die letzte Vorabversion 0.x für den
+  erste Release *Mitglieder-Login* wird `1.0.0`. Davor gehen eine oder mehrere Vorabversionen 0.x für den
   Pilot der [Testgruppe](testgruppe.md) auf Live (Etappe *Pilot*), mit Checkliste auf Test wie
   jedes Release.
 - **Nebenversion** für eine neue Etappe oder Funktion, **Korrektur** für Fehlerbehebungen,
