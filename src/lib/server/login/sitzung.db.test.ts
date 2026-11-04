@@ -7,6 +7,7 @@ import { konto, mitglied, sitzung } from '../db/schema.ts';
 import {
 	SITZUNG_GUELTIG_MS,
 	beendeAlleSitzungen,
+	beendePasskeyHinweis,
 	beendeSitzung,
 	erstelleSitzung,
 	pruefeSitzung
@@ -49,10 +50,24 @@ describe('Sitzungen', () => {
 		const { kontoId, vorname } = await legeMitgliedAn(db, { vorname: 'Erfunden' });
 		const kennung = await erstelleSitzung(db, kontoId, jetzt);
 		expect(await pruefeSitzung(db, kennung, jetzt)).toEqual({
-			konto: { kontoId, vorname },
+			konto: { kontoId, vorname, passkeyHinweis: false },
 			verlaengert: false
 		});
 		expect(await pruefeSitzung(db, 'unbekannt', jetzt)).toBeNull();
+	});
+
+	test('A-LOGIN-07: neue Sitzung ohne Angabe hat keinen Passkey-Hinweis', async () => {
+		const { kontoId } = await legeMitgliedAn(db);
+		const kennung = await erstelleSitzung(db, kontoId, jetzt);
+		expect((await pruefeSitzung(db, kennung, jetzt))?.konto.passkeyHinweis).toBe(false);
+	});
+
+	test('A-LOGIN-07: Sitzung mit passkeyHinweis zeigt ihn, beendePasskeyHinweis nimmt ihn weg', async () => {
+		const { kontoId } = await legeMitgliedAn(db);
+		const kennung = await erstelleSitzung(db, kontoId, jetzt, undefined, { passkeyHinweis: true });
+		expect((await pruefeSitzung(db, kennung, jetzt))?.konto.passkeyHinweis).toBe(true);
+		await beendePasskeyHinweis(db, kennung);
+		expect((await pruefeSitzung(db, kennung, jetzt))?.konto.passkeyHinweis).toBe(false);
 	});
 
 	test('SI-06: Login mit altem Cookie löscht dessen Sitzung', async () => {

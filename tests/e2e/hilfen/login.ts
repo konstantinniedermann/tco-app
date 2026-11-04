@@ -39,6 +39,11 @@ export async function legeKontoMitBriefCodeAn(vorname: string) {
 	return { ...konto, code };
 }
 
+/** Stellt für ein bestehendes Konto einen weiteren Brief-Code aus (ohne Bindestrich). */
+export async function stelleBriefCodeAus(kontoId: number): Promise<string> {
+	return (await hole().dienst.stelleBriefCodeAus(kontoId)).code;
+}
+
 export async function beendeAlleSitzungen(kontoId: number): Promise<void> {
 	await hole().dienst.beendeAlleSitzungen(kontoId);
 }

@@ -12,6 +12,9 @@ export const load: PageLoad = async ({ fetch }) => {
 		redirect(307, wartend ? '/login/mail' : '/login');
 	}
 	if (!antwort.ok) error(503, 'Die Anmeldung lässt sich gerade nicht prüfen.');
-	const { vorname } = (await antwort.json()) as { vorname: string };
-	return { vorname };
+	const { vorname, passkeyHinweis } = (await antwort.json()) as {
+		vorname: string;
+		passkeyHinweis: boolean;
+	};
+	return { vorname, passkeyHinweis };
 };

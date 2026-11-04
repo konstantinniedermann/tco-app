@@ -29,6 +29,20 @@ describe('Bremse', () => {
 		expect(briefFehlerProIp.erlaubt('ip')).toBe(true);
 	});
 
+	it('SI-18: passkeyFehlerProIp hat Grenze 10 und Fenster 1 h', () => {
+		const uhr = zeit();
+		const { passkeyFehlerProIp } = erstelleBremsen(uhr.jetzt);
+		for (let i = 0; i < 10; i++) {
+			expect(passkeyFehlerProIp.erlaubt('ip')).toBe(true);
+			passkeyFehlerProIp.zaehle('ip');
+		}
+		expect(passkeyFehlerProIp.erlaubt('ip')).toBe(false);
+		uhr.setze(STUNDE);
+		expect(passkeyFehlerProIp.erlaubt('ip')).toBe(false);
+		uhr.setze(STUNDE + 1);
+		expect(passkeyFehlerProIp.erlaubt('ip')).toBe(true);
+	});
+
 	it('SI-04: 3 Mails pro Adresse und Stunde, 10 pro Tag', () => {
 		const uhr = zeit();
 		const { mailsProAdresseStunde, mailsProAdresseTag } = erstelleBremsen(uhr.jetzt);

@@ -33,6 +33,7 @@ naheliegende Angriffe, kein Hochsicherheitsbetrieb.
 | B-10 | Ein Schadpaket gelangt über eine Abhängigkeit in die App oder die CI | Prüfung der Pakete und getrennter Auslieferungs-Job (SI-14) |
 | B-11 | Ein GitHub-, Hosting- oder Mailkonto wird geknackt | Zwei-Faktor-Login auf allen Betriebskonten (SI-15); Restrisiko siehe unten |
 | B-12 | Wer Zugang zum Server hat, liest die Live-Datenbank direkt | Zugang nur für den Betrieb, keine Kopien (SI-16) |
+| B-13 | Ein Bot probiert Passkey-Antworten durch oder spielt eine abgefangene Antwort noch einmal ab | Challenge einmalig und höchstens 5 Minuten, Bestätigung am Gerät verlangt, Limit pro IP, nur aktive und ungesperrte Konten (SI-18) |
 
 ## Login
 
@@ -88,6 +89,7 @@ Brief-Codes nicht durchrechenbar macht.
 | SI-15 | Zwei-Faktor-Login auf allen Konten für Betrieb und Code: GitHub (alle mit Schreibrecht), Infomaniak, E-Mail-Versand, Domain |
 | SI-16 | Direkter Zugriff auf die Live-Datenbank nur über SSH auf den Server, nur der Projektleiter und im Notfall seine Stellvertretung (vorerst die Hauptansprechperson, K-05), nur für Betrieb und Fehlersuche; keine Kopien der Daten auf eigene Geräte (DS-08). Er steht nicht in der Matrix von [Rollen und Rechte](rollen-und-rechte.md), weil er ausserhalb der App liegt |
 | SI-17 | Mail-Versand nur mit TLS (`smtps://` oder `requireTLS=true`); in Produktion lehnt die App jede andere SMTP-URL ab, ausser Loopback und `.invalid`. Die Umleitung `MAIL_NUR_AN` gilt nur für Test; `ausliefern live` und `zurueck live` verweigern sich bei gesetztem Wert ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)) |
+| SI-18 | Passkey (A-LOGIN-07, [ADR-005](adr/adr-005-passkey-simplewebauthn.md)): Der Server verlangt die Bestätigung am Gerät (`userVerification` `required`) und keine Bescheinigung (`attestationType` `none`). Die Challenge gilt einmal, höchstens 5 Minuten, liegt im Arbeitsspeicher (höchstens 1000 offene, die älteste fällt weg) und ist mit jedem Versuch verbraucht, auch mit einem kaputten; dieselbe Antwort ein zweites Mal ergibt keine Sitzung. Jeder Anmeldeversuch zählt vor dem ersten `await` zur Grenze von 10 pro IP (IPv6: pro /64-Netz) und Stunde; ist sie erreicht, gibt es auch keine Optionen mehr. Hinein kommen nur Konten, die nicht gesperrt sind und deren Mitglied aktiv ist. Ein Passkey gilt nur für die Adresse (Relying-Party-ID), unter der er eingerichtet wurde. Entfernen geht nur für Passkeys des eigenen Kontos; ein fremder bleibt, die Antwort ist wie bei einem unbekannten. Die Sitzung entsteht wie beim Code (SI-06); ein Passkey-Login macht keinen Code ungültig. Logs nur mit festem Text (SI-05). Restrisiken unten |
 
 Prüfbare Vorgaben erhalten Tests, wie die `DS-NN` ([Testkonzept](testkonzept.md#anforderung--testfall)).
 
@@ -107,6 +109,23 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
   schützen vor allem gegen ein gestohlenes Cookie auf einem anderen Gerät; dagegen hilft erst
   ein Faktor wie ein Passkey (A-LOGIN-07). Ein SMS-Code hilft nicht, die SMS käme aufs selbe
   Handy (Projektleiter, 01.11.2026).
+
+**Passkey** (SI-18, [ADR-005](adr/adr-005-passkey-simplewebauthn.md), Projektleiter, 04.11.2026):
+
+- Das Anfordern der Anmelde-Optionen zählt nicht zur Grenze, wird aber abgelehnt, sobald sie
+  erreicht ist; darunter ist es nicht begrenzt. Wer es massenhaft tut, füllt die
+  höchstens 1000 offenen Challenges und verdrängt echte; das blockiert nur den Passkey-Weg,
+  der Code-Login bleibt.
+- Auch erfolgreiche Passkey-Anmeldungen zählen zu den 10 pro IP und Stunde (gezählt wird vor dem
+  ersten `await`, parallele Anfragen umgehen die Grenze nicht). Mitglieder hinter einer
+  gemeinsamen Verbindung fallen dann auf den Code zurück.
+- Die Antwortzeit unterscheidet einen unbekannten von einem bekannten Passkey; messbar ist nur,
+  ob eine zufällige Credential-ID existiert. Die IDs sind nicht erratbar, die Bremse gilt.
+- Ein Konto, das in den Millisekunden zwischen Laden und Anlegen der Sitzung gelöscht wird,
+  ergibt einen Fehler 500, keine Sitzung.
+- Die Relying-Party-ID ist die Adresse, unter der die App läuft (in Produktion aus `ORIGIN`).
+  Ein Adresswechsel (Übergangsadresse zu `my.tcolten.ch`, K-10) macht alle Passkeys ungültig:
+  Mitglieder melden sich mit dem Code an und sehen den Hinweis wieder.
 
 ### Neu zu bestätigen (Stand 2026-11-02)
 

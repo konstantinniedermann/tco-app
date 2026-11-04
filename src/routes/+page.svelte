@@ -1,22 +1,31 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
-	import { MELDUNG, meldung, sende } from '../lib/login/anmelden.ts';
+	import { MELDUNG } from '../lib/login/anmelden.ts';
+	import { hinweisErledigt, kannPasskey, richtePasskeyEin } from '../lib/login/passkey.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let erledigt = $state(false);
+	const sichtbar = $derived(data.passkeyHinweis && kannPasskey() && !erledigt);
 	let laeuft = $state(false);
 	let fehler = $state<string | null>(null);
 
-	// Ohne Antwort des Servers bleibt die Sitzung gültig: dann Meldung statt Login-Seite.
-	async function abmelden() {
+	async function einrichten() {
 		if (laeuft) return;
 		laeuft = true;
 		fehler = null;
-		const r = await sende('/api/logout', {});
+		const r = await richtePasskeyEin();
 		laeuft = false;
-		if (r.ergebnis === 'ok') await goto(resolve('/login'));
-		else fehler = meldung(r, MELDUNG.stoerung);
+		if (r === 'ok') erledigt = true;
+		else if (r === 'vorhanden') {
+			// Das Gerät hat schon einen Passkey: Hinweis ist erledigt, wie nach «Nein, danke».
+			erledigt = true;
+			await hinweisErledigt();
+		} else if (r === 'fehler') fehler = MELDUNG.passkeyEinrichten;
+	}
+
+	async function neinDanke() {
+		erledigt = true;
+		await hinweisErledigt();
 	}
 </script>
 
@@ -25,12 +34,23 @@
 </svelte:head>
 
 <h1>Hoi {data.vorname}</h1>
-<button
-	type="button"
-	class="taste-neben"
-	onclick={abmelden}
-	aria-describedby={fehler ? 'abmelden-fehler' : undefined}>Abmelden</button
->
-{#if fehler}
-	<p class="fehler" id="abmelden-fehler" role="alert">{fehler}</p>
+
+{#if sichtbar}
+	<div class="hinweis">
+		<strong>Nächstes Mal ohne Code?</strong><br />
+		Mit einem Passkey meldest du dich mit Face ID, Fingerabdruck oder der Handy-PIN an. Das empfehlen
+		wir: Es ist schneller und sicherer als ein Code.
+		<p>
+			<button
+				type="button"
+				class="taste-haupt"
+				onclick={einrichten}
+				aria-describedby={fehler ? 'passkey-fehler' : undefined}>Passkey einrichten</button
+			>
+			<button type="button" class="taste-neben" onclick={neinDanke}>Nein, danke</button>
+		</p>
+		{#if fehler}
+			<p class="fehler" id="passkey-fehler" role="alert">{fehler}</p>
+		{/if}
+	</div>
 {/if}

@@ -66,7 +66,7 @@ function normalisiereAdresse(email: unknown): string | null {
 }
 
 // Postgres-Fehlercode 23505 (unique_violation); Drizzle verpackt den Treiberfehler in `cause`.
-function istEindeutigkeitsfehler(fehler: unknown): boolean {
+export function istEindeutigkeitsfehler(fehler: unknown): boolean {
 	let aktuell: unknown = fehler;
 	for (let i = 0; i < 3 && aktuell instanceof Error; i++) {
 		if ((aktuell as { code?: unknown }).code === '23505') return true;
@@ -140,7 +140,9 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 			)
 			.returning({ id: konto.id });
 		if (eingeloest) {
-			const kennung = await erstelleSitzung(db, eingeloest.id, t, alteKennung);
+			const kennung = await erstelleSitzung(db, eingeloest.id, t, alteKennung, {
+				passkeyHinweis: true
+			});
 			return { ergebnis: 'ok', kennung };
 		}
 		// Nichts eingelöst: «benutzt» nur für einen gültigen, bereits verbrauchten Code.
@@ -262,7 +264,9 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 			)
 			.returning({ id: konto.id });
 		if (!eingeloest) return falsch();
-		const kennung = await erstelleSitzung(db, eingeloest.id, t, alteKennung);
+		const kennung = await erstelleSitzung(db, eingeloest.id, t, alteKennung, {
+			passkeyHinweis: true
+		});
 		return { ergebnis: 'ok', kennung };
 	}
 
