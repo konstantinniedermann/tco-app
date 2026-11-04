@@ -175,6 +175,8 @@ sequenceDiagram
   und fällt auf `my.tcolten.ch` zurück, was auf der Übergangsadresse jedes Einrichten scheitern
   liesse. So haben Test (`test.my.tcolten.ch` bzw. Übergangsadresse) und Live (`my.tcolten.ch`)
   getrennte IDs, und Passkeys von Test tauchen auf Live nicht auf.) Keine neue Einstellung.
+  Im Code kommt die ID aus der Adresse der Anfrage (`event.url`), die adapter-node in Produktion
+  aus `ORIGIN` bildet; lokal und im E2E-Test, wo `ORIGIN` fehlt, ist es `localhost`.
   Jeder Passkey speichert die ID, für die er eingerichtet wurde.
   Wechselt die Adresse (Übergangsadresse → `my.tcolten.ch`, K-10), gelten alte Passkeys nicht
   mehr; die Mitglieder melden sich per Code an und sehen den Hinweis erneut. Das kommt als
