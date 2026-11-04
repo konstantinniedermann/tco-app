@@ -125,7 +125,7 @@ nötig.
   Personenbezug. Bei 5–10 Personen lässt sich eine Antwort trotzdem manchmal einer Person
   zuordnen. Deshalb gibt es nur grobe Angaben und keinen Jahrgang. Die Antworten werden nach
   der Auswertung des Laufs gelöscht, die Auswertung ohne Namen bleibt im Repo.
-- **WhatsApp-Chat** ist privat beim Projektleiter, nicht Teil von MyTCO. Inhalte daraus
+- **WhatsApp-Chat** ist eine Gruppe des Projektleiters, nicht Teil von MyTCO; alle sehen die Nummern der anderen, keine Codes oder Adressen in den Chat. Inhalte daraus
   kommen nur als Befund ohne Namen ins Repo.
 - **Daten auf Live** sind Betrieb (DS-08 gilt nicht). Die Konten bleiben nach dem Pilot.
 - **Mail mit Brief-PDF:** Das PDF enthält Name, Adresse und Einmal-Code der Testperson und
