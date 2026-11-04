@@ -34,7 +34,8 @@ export type Pruefung =
 const MAX_TEXT = 100;
 const MAX_EMAIL = 254;
 
-const ADRESSE = /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/;
+// Domain aus Teilen ohne Punkt: keine leeren Teile wie in «a@example..org».
+const ADRESSE = /^[^\s@,;<>]+@[^\s@,;<>.]+(?:\.[^\s@,;<>.]+)+$/;
 const STEUERZEICHEN = /\p{Cc}/u;
 
 /**

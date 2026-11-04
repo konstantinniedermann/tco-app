@@ -177,7 +177,10 @@ describe('pruefeAngaben', () => {
 			'<a@example.org>',
 			'a@localhost',
 			'@example.org',
-			'a@example.org\u0000'
+			'a@example.org\u0000',
+			'a@example..org',
+			'a@.example.org',
+			'a@example.org.'
 		];
 		for (const email of schlecht) {
 			expect(fehlerVon({ ...gueltig, email }).email, email).toBe('keine gültige E-Mail-Adresse');
