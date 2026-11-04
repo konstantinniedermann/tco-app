@@ -283,6 +283,35 @@ img {
 	box-shadow: var(--schatten-karte);
 }
 
+.klappe-titel {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--abstand-3);
+	min-height: var(--tippflaeche);
+	font-weight: 700;
+	cursor: pointer;
+	list-style: none;
+}
+
+.klappe-titel::-webkit-details-marker {
+	display: none;
+}
+
+.klappe-titel::after {
+	content: '›';
+	color: var(--farbe-marke);
+	font-size: var(--groesse-gross);
+}
+
+.klappe[open] > .klappe-titel::after {
+	transform: rotate(90deg);
+}
+
+.klappe[open] > .klappe-titel {
+	margin-bottom: var(--abstand-3);
+}
+
 .kachel {
 	display: flex;
 	flex-wrap: wrap;

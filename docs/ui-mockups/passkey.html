@@ -15,16 +15,6 @@
 	die Login-Seite, rechts das Profil mit aufklappbaren Bereichen. Alle Namen sind erfunden.
 </p>
 
-<style>
-	details.klappe > summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; justify-content: space-between; }
-	details.klappe > summary::after { content: "›"; transform: rotate(90deg); }
-	details.klappe:not([open]) > summary::after { transform: none; }
-	details.klappe > summary + * { margin-top: var(--abstand-3, 0.75rem); }
-	.karte + .karte, .karte + details, details + details, details + .karte { margin-top: var(--abstand-4, 1rem); }
-	.karte h2 { margin-top: 0; }
-	.mitte { text-align: center; }
-</style>
-
 <div class="mockup-reihe">
 	<figure class="mockup-geraet">
 		<div class="handy app">
@@ -87,11 +77,11 @@
 			<main class="inhalt">
 				<h1>Profil</h1>
 				<details class="karte klappe">
-					<summary>Meine Angaben</summary>
+					<summary class="klappe-titel">Meine Angaben</summary>
 					<p class="leise">Kommt später (Adresse, Telefon, Lizenz …)</p>
 				</details>
 				<details class="karte klappe" open>
-					<summary>Anmelden mit Passkey</summary>
+					<summary class="klappe-titel">Anmelden mit Passkey</summary>
 					<div>
 						<div class="kachel">
 							<span><strong>iPhone</strong><br /><span class="leise">eingerichtet am 4.11.2026 · zuletzt heute</span></span>
