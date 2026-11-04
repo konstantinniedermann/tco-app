@@ -116,6 +116,18 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-04 — E2E im iPhone-Profil (WebKit, Linux-CI) scheitert vereinzelt, ohne sich zu wiederholen
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/hilfe.test.ts:23` (Klick auf «Hilfe» in der Fusszeile), CI-Lauf 41900100215 auf `dev`.
+
+**Beobachtung:** Beim Merge des Releases 0.4.0 nach `dev` blieb der Klick 30 Sekunden bei «waiting for element to be visible, enabled and stable» hängen; Screenshot und Seitenbaum zeigen die Login-Seite normal, auf `/login` läuft keine Animation. Der Neustart desselben Jobs und der PR-Lauf auf demselben Code waren grün. Früher am selben Tag trafen zwei rote Läufe ebenfalls nur das iPhone-Profil, aber andere Tests (`verwaltung.test.ts:177`, `passkey.test.ts:145`).
+
+**Ursprung:** Release 0.4.0, CI auf `dev`.
+
+**Einschätzung:** Vermutlich die Stabilitätsprüfung von Playwright unter WebKit auf einer ausgelasteten Linux-Maschine, nicht die App; nicht belegt. Häufen sich solche Ausreisser, lohnt ein Blick auf Wiederholungen (`retries`) nur in der CI oder auf die Zahl paralleler Worker im iPhone-Profil.
+
 ### 2026-11-04 — Doku-Abgleich vor 0.4.0: offene Punkte ohne Sofort-Fix
 
 **Thema:** Betrieb
