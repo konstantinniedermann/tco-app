@@ -138,7 +138,7 @@ Sicherungsziel, ohne unverschlüsselte Datei, und löscht Sicherungen nach 30 Ta
 Timer, danach prüft `probe` die frische Sicherung in einer Wegwerf-Datenbank ohne Verbindung nach
 aussen. Eingespielt und zurückgespielt werden nur vollständige Läufe. Die Probe-Daten bleiben
 auf dem Server (SI-16); die Sicherung selbst verlässt ihn nur verschlüsselt, Richtung
-S3-kompatiblem Ziel (Ziel legt [#10](https://github.com/konstantinniedermann/tco-app/issues/10) fest).
+S3-kompatiblem Ziel (Vorschlag in [Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung), festgelegt mit dem Hosting).
 
 - **30 Tage:** restic zählt sie je Umgebung und Datei (Dump, Zählung) ab der neuesten Sicherung,
   nicht ab heute. Bleibt die Sicherung aus, bleiben auch die alten erhalten.
@@ -212,8 +212,8 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   automatisch.
 - **Restrisiko** (bewertet im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
   Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
-  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten, sobald die Konten auf die
-  Vereinsadresse wechseln, K-04.1). Die
+  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten bei einer Übergabe, wenn das
+  Repo das Konto wechselt, [Betrieb und Übergabe](betrieb-und-uebergabe.md#übergabe-checkliste)). Die
   Reichweite ist dort am 02.11.2026 richtiggestellt worden und **vom Projektleiter neu zu
   bestätigen**:
   - Wer ins Repo pushen kann, kann direkt auf `main` pushen (davor schützt nur der lokale
@@ -225,8 +225,8 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
     denselben Server trotzdem Live. Pushen können der Projektleiter und die Hauptansprechperson
     im Vorstand: Mitarbeitende eines privaten Repos auf einem Privatkonto haben immer
     Schreibrecht (B: [GitHub Docs](https://docs.github.com/en/account-and-profile/reference/permission-levels-for-a-personal-account-repository)).
-    Eine reine Leserolle gibt es erst in einer Organisation; ob das Repo mit dem Wechsel auf die
-    Vereinsadresse (K-04.1) in eine Organisation zieht, ist offen.
+    Eine reine Leserolle gibt es erst in einer Organisation; das Repo bleibt bis zu einer
+    Übergabe auf dem Privatkonto ([Betrieb und Übergabe](betrieb-und-uebergabe.md#konten)).
   - Ein Schadpaket im Bau landet im Image und läuft damit live, auch ohne den Schlüssel, und
     mit dem `ausliefern` des Images auch als root-gleicher Benutzer auf dem Server.
     Dagegen helfen nur die Malware-Prüfung und die Prüfung der Pakete vor der Aufnahme.
@@ -241,9 +241,9 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 | Server, je Umgebung | `geheim.env`: Datenbank-Passwort, Schlüssel für die Codes (`MYTCO_CODE_SCHLUESSEL`, je eigener für Test und Live), Zugang zum E-Mail-Versand (`MYTCO_SMTP_URL`), Absender, Kontakt, Adresse der Umgebung, auf Test der einzige Mail-Empfänger (Projektleiter); Schlüssel für Push folgt mit der Push-Funktion |
 | Server, gemeinsam | `proxy.env` (Adressen, Passwort-Hash für Test), `sicherung.env` (Ziel und Zugang der Sicherung) |
 
-Die Dateien liegen nur auf dem Server (Rechte 600), im Repo stehen Vorlagen ohne Werte. Wo die
-Geheimnisse für eine Nachfolge dokumentiert sind, regelt
-[#10](https://github.com/konstantinniedermann/tco-app/issues/10).
+Die Dateien liegen nur auf dem Server (Rechte 600), im Repo stehen Vorlagen ohne Werte. Welche davon
+ausserhalb des Servers aufbewahrt werden müssen und wo, steht in
+[Betrieb und Übergabe](betrieb-und-uebergabe.md#geheimnisse).
 
 ## Einstellungen der App
 

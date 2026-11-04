@@ -146,8 +146,9 @@ Bis der Projektleiter bestätigt, gelten diese beiden Punkte als nicht angenomme
   unveränderbar) und galt unter zwei Bedingungen: Zwei-Faktor-Login auf beiden Konten (SI-15),
   und die Hauptansprechperson im Vorstand nutzt ihren Zugang nur zum Lesen (Absprache).
   **Neu zu bestätigen durch den Projektleiter (Stand 2026-11-02).** Neu bewerten auch: Die
-  Konten laufen künftig auf eine Vereinsadresse, den zweiten Zugang hat die
-  Hauptansprechperson (K-04.1, K-04.2).
+  Konten des Betriebs laufen künftig auf eine Vereinsadresse, den zweiten Zugang hat die
+  Hauptansprechperson (K-04.1, K-04.2); das Repo bleibt bis zu einer Übergabe auf dem
+  Privatkonto ([Betrieb und Übergabe](betrieb-und-uebergabe.md#konten)).
 - **Ein Schadpaket im Bau** landet im Image und läuft live, auch ohne Schlüssel, und über das
   `ausliefern` des Images mit derselben Reichweite auf dem Server; dagegen hilft nur SI-14.
   Mit der Richtigstellung oben ebenfalls neu zu bestätigen.
