@@ -47,3 +47,8 @@
 html.gross {
 	font-size: 150%;
 }
+
+/* Hinweise des Projektleiters in den Bildunterschriften */
+.mockup-hinweis {
+	color: var(--farbe-hinweis);
+}
