@@ -78,6 +78,25 @@ test('A-HILFE-02: Animation hält an und läuft weiter', async ({ page }) => {
 	await expect(anleitung.getByRole('button', { name: 'Anhalten' })).toBeVisible();
 });
 
+test('A-HILFE-02: zugeklappte Anleitung beginnt beim Aufklappen bei Schritt 1', async ({
+	page
+}) => {
+	await page.clock.install();
+	await oeffneHilfe(page);
+	// Eine Minute lesen, ohne das Thema zu öffnen: drei Durchläufe wären vorbei.
+	await page.clock.runFor(70_000);
+	await themen(page).first().click();
+	const anleitung = page.locator('details[open] .anleitung');
+	await expect(anleitung.locator('li').first()).toHaveClass(/aktiv/);
+	await expect(anleitung.getByRole('button', { name: 'Animation anhalten' })).toBeVisible();
+});
+
+test('A-HILFE-01: Link mit Anker öffnet das Thema', async ({ page }) => {
+	await page.goto('/hilfe#neuer-code');
+	await expect(page.locator('details#neuer-code')).toHaveAttribute('open', '');
+	await expect(page.locator('details#passkey')).not.toHaveAttribute('open', '');
+});
+
 test.describe('Einstiegsseite', () => {
 	test.afterAll(async () => {
 		await schliesseLoginHilfen();
@@ -150,6 +169,14 @@ test.describe('Einstiegsseite', () => {
 		const menue = page.locator('details.klappe', { hasText: 'Klappt nicht? Über das Menü' });
 		await expect(menue).toHaveAttribute('open', '');
 		await expect(menue).toContainText('Installieren und Verknüpfung erstellen');
+
+		await page.reload();
+		const fehler = sammleKonsolenfehler(page);
+		await bietetInstallationAn(page, 'fehler');
+		await page.getByRole('button', { name: 'MyTCO installieren' }).click();
+		await expect(menue).toHaveAttribute('open', '');
+		await expect(menue).toContainText('Installieren und Verknüpfung erstellen');
+		expect(fehler).toEqual([]);
 
 		await page.reload();
 		await bietetInstallationAn(page, 'accepted');

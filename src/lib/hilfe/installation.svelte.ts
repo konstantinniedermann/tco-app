@@ -29,7 +29,12 @@ export async function installiere(): Promise<'angenommen' | 'abgelehnt' | 'nicht
 	if (!angebot) return 'nicht-moeglich';
 	gemerkt = null;
 	installation.angebot = false;
-	await angebot.prompt();
-	const { outcome } = await angebot.userChoice;
-	return outcome === 'accepted' ? 'angenommen' : 'abgelehnt';
+	try {
+		await angebot.prompt();
+		const { outcome } = await angebot.userChoice;
+		return outcome === 'accepted' ? 'angenommen' : 'abgelehnt';
+	} catch {
+		// Der Dialog kam nicht zustande: wie abgelehnt, es bleibt der Weg über das Menü.
+		return 'abgelehnt';
+	}
 }

@@ -57,7 +57,13 @@
 	{/if}
 
 	{#if !ruhig}
-		<button type="button" class="taste-neben anleitung-taste" onclick={taste}>{tastenText}</button>
+		<!-- Die Zeichnung ist für Screenreader verborgen; der Name sagt, was die Taste anhält. -->
+		<button
+			type="button"
+			class="taste-neben anleitung-taste"
+			aria-label="Animation {tastenText.toLowerCase()}"
+			onclick={taste}>{tastenText}</button
+		>
 	{/if}
 
 	<ol class="anleitung-schritte">

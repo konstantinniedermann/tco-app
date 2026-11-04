@@ -10,6 +10,12 @@
 	const androidZuerst = erkenneGeraet(navigator.userAgent) === 'android';
 	// Adresse der jeweiligen Umgebung (Test oder Live), nicht fest eingetragen.
 	const adresse = location.host;
+	// Ein Link wie /hilfe#neuer-code öffnet das Thema gleich.
+	const anker = location.hash.slice(1);
+	// Die Anleitung entsteht erst beim Aufklappen: so beginnt sie bei Bild 1, und zugeklappt
+	// läuft kein Takt im Verborgenen.
+	let iphoneOffen = $state(anker === 'startbildschirm-iphone');
+	let androidOffen = $state(anker === 'startbildschirm-android');
 </script>
 
 <svelte:head>
@@ -17,18 +23,22 @@
 </svelte:head>
 
 {#snippet iphone()}
-	<details class="karte klappe" id="startbildschirm-iphone">
+	<details class="karte klappe" id="startbildschirm-iphone" bind:open={iphoneOffen}>
 		<summary class="klappe-titel">Auf den Startbildschirm: iPhone</summary>
 		<p>Öffne {adresse} in Safari, dann:</p>
-		<Anleitung geraet="iphone" />
+		{#if iphoneOffen}
+			<Anleitung geraet="iphone" />
+		{/if}
 	</details>
 {/snippet}
 
 {#snippet android()}
-	<details class="karte klappe" id="startbildschirm-android">
+	<details class="karte klappe" id="startbildschirm-android" bind:open={androidOffen}>
 		<summary class="klappe-titel">Auf den Startbildschirm: Android</summary>
 		<p>Öffne {adresse} in Chrome, dann:</p>
-		<Anleitung geraet="android" />
+		{#if androidOffen}
+			<Anleitung geraet="android" />
+		{/if}
 	</details>
 {/snippet}
 
@@ -43,7 +53,7 @@
 	{@render android()}
 {/if}
 
-<details class="karte klappe" id="neuer-code">
+<details class="karte klappe" id="neuer-code" open={anker === 'neuer-code'}>
 	<summary class="klappe-titel">Neuer Code per E-Mail</summary>
 	<p>Für dich, wenn du ausgeloggt bist, ein neues Handy hast oder den Brief nicht mehr findest.</p>
 	<ol>
@@ -54,7 +64,7 @@
 	<p class="leise">Keine Mail da? Schau im Spam-Ordner nach.</p>
 </details>
 
-<details class="karte klappe" id="passkey">
+<details class="karte klappe" id="passkey" open={anker === 'passkey'}>
 	<summary class="klappe-titel">Mit Passkey anmelden</summary>
 	<p>Mit einem Passkey meldest du dich mit Face ID, Fingerabdruck oder Handy-PIN an, ohne Code.</p>
 	<ol>

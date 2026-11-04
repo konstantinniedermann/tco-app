@@ -12,9 +12,15 @@
 		data.geraet === 'android' && !fertig && (installation.angebot || ergebnis === 'abgelehnt')
 	);
 
+	// Die Anleitung über das Menü entsteht erst beim Aufklappen (beginnt bei Bild 1, kein Takt im
+	// Verborgenen); nach «Abbrechen» im Dialog von Android ist sie gleich offen.
+	let menueOffen = $state(false);
+
 	async function installieren() {
 		const r = await installiere();
-		if (r !== 'nicht-moeglich') ergebnis = r;
+		if (r === 'nicht-moeglich') return;
+		ergebnis = r;
+		if (r === 'abgelehnt') menueOffen = true;
 	}
 </script>
 
@@ -50,9 +56,11 @@
 </div>
 
 {#if menueZeigen}
-	<details class="karte klappe" open={ergebnis === 'abgelehnt'}>
+	<details class="karte klappe" bind:open={menueOffen}>
 		<summary class="klappe-titel">Klappt nicht? Über das Menü</summary>
-		<Anleitung geraet="android" />
+		{#if menueOffen}
+			<Anleitung geraet="android" />
+		{/if}
 	</details>
 {/if}
 

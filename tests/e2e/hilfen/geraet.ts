@@ -18,16 +18,24 @@ export async function startetVomSymbol(page: Page): Promise<void> {
 	});
 }
 
-/** Chrome bietet die Installation an; das Mitglied nimmt sie im Dialog an oder lehnt ab. */
+/**
+ * Chrome bietet die Installation an; das Mitglied nimmt sie im Dialog an oder lehnt ab.
+ * `fehler`: Der Dialog lässt sich nicht öffnen (`prompt()` wirft).
+ */
 export async function bietetInstallationAn(
 	page: Page,
-	wahl: 'accepted' | 'dismissed'
+	wahl: 'accepted' | 'dismissed' | 'fehler'
 ): Promise<void> {
-	await page.evaluate((outcome) => {
+	await page.evaluate((wahl) => {
 		const ereignis = new Event('beforeinstallprompt', { cancelable: true });
 		Object.assign(ereignis, {
-			prompt: async () => {},
-			userChoice: Promise.resolve({ outcome, platform: 'web' })
+			prompt: async () => {
+				if (wahl === 'fehler') throw new Error('Dialog nicht verfügbar');
+			},
+			userChoice: Promise.resolve({
+				outcome: wahl === 'accepted' ? 'accepted' : 'dismissed',
+				platform: 'web'
+			})
 		});
 		window.dispatchEvent(ereignis);
 	}, wahl);
