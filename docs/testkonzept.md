@@ -121,6 +121,7 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] Anmeldung am PC mit dem Passkey vom Handy per QR-Code (A-LOGIN-07). Offen, bis #39 steht
 - [ ] Steht ein Einrichtungsabend an: mobile Daten statt Club-WLAN, oder die Grenzen pro IP vorher prüfen ([ADR-004](adr/adr-004-login-einmal-code.md), Restrisiken)
 - [ ] Push einschalten und erhalten (ab Etappe *CM-Betrieb*)
+- [ ] Erika Beispiel öffnet auf Test die Verwaltung mit Code per Mail (SI-08, A-ROLLE-02)
 - [ ] Admin-Seite am PC: die geänderten Funktionen einmal durchgehen
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.

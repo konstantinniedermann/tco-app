@@ -87,9 +87,9 @@ classDiagram
 
 | ID | Regel | Anforderung | Status |
 |----|-------|-------------|--------|
-| FR-01 | Ein Mitglied hat genau ein Konto. Der Admin legt beides zusammen an; das Konto startet mit einem Einmal-Code für den Brief, ausser bei Junioren, die ein Elternteil führt (Vorschlag K-08) | A-MITGLIED-01, A-LOGIN-01 | geplant |
+| FR-01 | Ein Mitglied hat genau ein Konto. Der Admin legt beides zusammen an; das Konto startet mit einem Einmal-Code für den Brief, ausser bei Junioren, die ein Elternteil führt (Vorschlag K-08) | A-MITGLIED-01, A-LOGIN-01 | umgesetzt |
 | FR-02 | Beim ersten Login ergänzt das Mitglied fehlende Daten (u. a. Lizenznummer, Klassierung), bevor es etwas anderes tun kann | A-LOGIN-03 | geplant |
-| FR-03 | Ein Konto hat mindestens die Rolle *Mitglied*; der Admin vergibt weitere | A-ROLLE-01 | geplant |
+| FR-03 | Ein Konto hat mindestens die Rolle *Mitglied*; der Admin vergibt weitere | A-ROLLE-01 | umgesetzt |
 | FR-04 | Austritt: Konto sofort gesperrt, Status *ausgetreten* (inaktiv). Tritt das Mitglied innert der Frist wieder ein, wird es wieder *aktiv*. Nach der Frist wird das Konto gelöscht und das Mitglied auf Vor- und Nachname reduziert (Status *gelöscht*), damit vergangene Resultate lesbar bleiben (Vorschlag K-38: Frist 1 Jahr). Löschen: Login sofort gesperrt, eine Woche rückgängig machbar (zurück in den Zustand davor), danach wie nach der Frist | [Datenschutz](datenschutz.md#löschen) | geplant |
 | FR-05 | Anmelden geht nur, solange das Turnier den Status *Anmeldung offen* hat (bis Anmeldeschluss) | A-ANMELDUNG-07 | geplant |
 | FR-06 | Ein Spieler hat je Turnier höchstens 3 Anmeldungen, die nicht *abgelehnt* oder *zurückgezogen* sind. Wildcard-Anträge zählen mit; ein Doppel zählt für beide Partner (Annahme K-27) | A-ANMELDUNG-02 | geplant |
@@ -112,7 +112,7 @@ classDiagram
 | FR-23 | Exporte an Swiss Tennis enthalten nur die Felder, die Swiss Tennis braucht (vor allem Lizenznummern) | A-ADVANTAGE-01, A-ADVANTAGE-04, A-LIZENZ-04, DS-04 | geplant |
 | FR-24 | Ein Einmal-Code gilt nur einmal. Ein neuer Code ersetzt nur den alten derselben Art (Brief-Code oder Mail-Code); ein Login mit einem der beiden macht beide ungültig, der Brief-Code gilt dann als benutzt. Danach bleibt das Gerät eingeloggt, bis die Sitzung ein Jahr nicht genutzt wurde. Erhöht der Admin die Sitzungsversion, enden alle Sitzungen des Kontos (Dienst vorhanden, Bedienung kommt mit der Admin-Oberfläche) | A-LOGIN-08, A-LOGIN-09 | umgesetzt |
 | FR-25 | Eine E-Mail-Adresse gehört zu höchstens einem Mitglied. Ändert das Mitglied sie, gilt die neue erst nach Eingabe je eines Codes von der alten und von der neuen Adresse. Ist die alte nicht erreichbar, ändert der Admin sie nach Rückfrage; die alte erhält dann einen Hinweis | A-LOGIN-10, [SI-09](sicherheitskonzept.md#vorgaben) | geplant |
-| FR-26 | Einen Eintrag im Änderungsverlauf erzeugen, egal ob durch Admin, Mitglied oder automatisch: jede Änderung an den Feldern des Mitglieds, an Rollen, sowie die Aktionen neuer Brief-Code, Sitzungen beendet und Export. Login-Vorgänge (Codes, Fehlversuche, Sitzungen) erzeugen keinen Eintrag (SI-05). Einträge werden nach 12 Monaten gelöscht, beim Status *gelöscht* des Mitglieds (FR-04) schon früher | A-MITGLIED-06, [SI-12](sicherheitskonzept.md#vorgaben) | geplant |
+| FR-26 | Einen Eintrag im Änderungsverlauf erzeugen, egal ob durch Admin, Mitglied oder automatisch: jede Änderung an den Feldern des Mitglieds, an Rollen, sowie die Aktionen neuer Brief-Code, Sitzungen beendet und Export. Login-Vorgänge (Codes, Fehlversuche, Sitzungen) erzeugen keinen Eintrag (SI-05). Einträge werden nach 12 Monaten gelöscht, beim Status *gelöscht* des Mitglieds (FR-04) schon früher | A-MITGLIED-06, [SI-12](sicherheitskonzept.md#vorgaben) | geplant (Einträge und Verlauf für Felder und Rollen seit Etappe 1 von #43; Löschung nach 12 Monaten kommt mit Etappe 3) |
 
 ## Lebenszyklen
 
