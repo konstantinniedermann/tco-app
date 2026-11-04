@@ -49,7 +49,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Benachrichtigungen (FR-02) | – | S eigene | S eigene | S eigene | S eigene |
 | Eigener Name, Adresse, Geschlecht, Jahrgang (Adresse ändern: hängt an K-19) | – | L eigene | L eigene | L eigene | S |
 | Mitglieder anlegen, bearbeiten, löschen, exportieren (DS-07) | – | – | – | – | S |
-| Konto sperren, neuer Code für einen Brief, Sitzungen beenden | – | – | – | – | S |
+| Neuer Code für einen Brief, Sitzungen beenden | – | – | – | – | S |
 | Rollen vergeben | – | – | – | – | S |
 | Änderungsverlauf (FR-26) | – | – | – | – | L |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S |

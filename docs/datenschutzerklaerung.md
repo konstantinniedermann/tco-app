@@ -15,8 +15,8 @@ Stand: [Datum]
 MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Fragen zum Datenschutz an:
 [Ansprechperson], [E-Mail-Adresse des Vereins].
 
-**Welche Daten:** Name, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Lizenznummer
-und Klassierung, Ihre Anmeldungen, Resultate und Lizenzanträge. Ihre Grunddaten übernimmt
+**Welche Daten:** Name, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Mitgliedernummer,
+Lizenznummer und Klassierung, Ihre Anmeldungen, Resultate und Lizenzanträge. Ihre Grunddaten übernimmt
 der Verein aus seiner Mitgliederliste.
 
 **Wozu:** für Ihr Konto, die Clubmeisterschaft, Lizenzanträge und Benachrichtigungen, die
@@ -41,7 +41,8 @@ sie enthalten keine Daten anderer Mitglieder.
 
 **Wie lange:** Solange Sie Mitglied sind. Nach einem Austritt wird Ihr Konto gesperrt; Ihre
 Daten bleiben noch eine Frist lang, falls Sie zurückkommen [Frist, **Vorschlag K-38:** 1 Jahr], und werden
-dann gelöscht. Ihr Name bleibt in vergangenen Resultaten.
+dann gelöscht. Ihr Name bleibt in vergangenen Resultaten. Löscht der Verein Ihr Mitglied auf
+Ihren Wunsch, ist Ihr Konto sofort gesperrt und nach einer Woche gelöscht.
 
 **Login:** Sie loggen sich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 Ihr Gerät das Login mit einem Cookie, bis Sie MyTCO ein Jahr nicht genutzt haben oder sich

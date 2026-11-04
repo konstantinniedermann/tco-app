@@ -204,5 +204,78 @@
 			</div>
 			<figcaption class="leise">5 · Mitgliederverwaltung (Admin, PC)</figcaption>
 		</figure>
+
+		<!-- 6 Mitglied im Admin-Bereich -->
+		<figure class="mockup-geraet">
+			<div class="pc app">
+				<div class="verwaltung">
+					<nav class="seitenleiste" aria-label="Verwaltung">
+						<div class="kopf">
+							<img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO Verwaltung
+						</div>
+						<div class="seitenleiste-bereich">Admin</div>
+						<a href="#mitglieder" aria-current="page">Mitglieder</a>
+						<a href="#verlauf">Änderungsverlauf</a>
+						<div class="seitenleiste-bereich">&nbsp;</div>
+						<a href="#app">‹ Zur App</a>
+					</nav>
+					<main class="inhalt">
+						<a class="zurueck" href="#liste">‹ Zurück</a>
+						<h1>Beispiel, Erika <span class="plakette plakette-ok">aktiv</span></h1>
+						<p class="leise">Mitgliedernummer 10234 · erfasst 12.11.2026 durch Einlesen</p>
+						<div class="spalten">
+							<div>
+								<details class="karte klappe" open>
+									<summary class="klappe-titel">Angaben</summary>
+									<form>
+										<div class="feld-zeile"><label for="m6-v">Vorname</label><input id="m6-v" value="Erika" /></div>
+										<div class="feld-zeile"><label for="m6-n">Nachname</label><input id="m6-n" value="Beispiel" /></div>
+										<div class="feld-zeile"><label for="m6-s">Strasse</label><input id="m6-s" value="Erfundenweg 7" /></div>
+										<div class="feld-zeile"><label for="m6-p">PLZ, Ort</label><input id="m6-p" value="4600 Olten" /></div>
+										<div class="feld-zeile"><label for="m6-m">E-Mail</label><input id="m6-m" value="erika.beispiel@example.org" /></div>
+										<div class="feld-zeile"><label for="m6-t">Telefon</label><input id="m6-t" value="+41 00 000 00 00" /></div>
+										<div class="feld-zeile"><label for="m6-j">Jahrgang</label><input id="m6-j" value="1962" /></div>
+										<div class="feld-zeile"><label for="m6-l">Lizenznummer</label><input id="m6-l" placeholder="(freiwillig)" /></div>
+										<button type="button" class="taste-haupt" disabled>Angaben speichern</button>
+									</form>
+								</details>
+								<details class="karte klappe" open>
+									<summary class="klappe-titel">Verlauf <span class="leise">3 Einträge</span></summary>
+									<div class="tabelle">
+										<table>
+											<tbody>
+												<tr><td>14.11.2026</td><td>Admin F. Fantasie</td><td>Telefon geändert</td></tr>
+												<tr><td>13.11.2026</td><td>Admin F. Fantasie</td><td>Brief-Code ausgestellt</td></tr>
+												<tr><td>12.11.2026</td><td>Admin F. Fantasie</td><td>angelegt (Einlesen)</td></tr>
+											</tbody>
+										</table>
+									</div>
+									<p class="leise">Ohne alte und neue Werte. Einträge bleiben 12 Monate.</p>
+								</details>
+							</div>
+							<div>
+								<details class="karte klappe" open>
+									<summary class="klappe-titel">Login <span class="leise">Brief offen · kein Gerät</span></summary>
+									<p>Brief-Code gültig bis 31.01.2027, noch nicht eingelöst. Noch kein Gerät eingeloggt.</p>
+									<div class="leiste">
+										<button class="taste-neben">Alle Sitzungen beenden</button>
+									</div>
+								</details>
+								<details class="karte klappe">
+									<summary class="klappe-titel">Rollen <span class="leise">Mitglied</span></summary>
+									<label><input type="checkbox" checked disabled /> Mitglied (immer)</label><br />
+									<label><input type="checkbox" /> Admin</label><br />
+									<label><input type="checkbox" /> CM-Verantwortliche</label>
+									<div class="leiste">
+										<button class="taste-haupt" disabled>Rollen speichern</button>
+									</div>
+								</details>
+							</div>
+						</div>
+					</main>
+				</div>
+			</div>
+			<figcaption class="leise">6 · Mitglied (Admin, PC)</figcaption>
+		</figure>
 	</body>
 </html>
