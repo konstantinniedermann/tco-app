@@ -26,7 +26,9 @@ export type AdminDienste = { db: Db; zugang: ZugangDienst; jetzt?: () => Date };
 
 type AdminUrheber = Extract<Urheber, { art: 'admin' | 'mitglied' }> & { art: 'admin' };
 
-const STATUS: readonly string[] = ['aktiv', 'ausgetreten', 'geloescht'];
+// Record statt Liste: Kommt ein Status dazu, meldet der Compiler die Lücke hier.
+const STATUS: Record<MitgliedStatus, true> = { aktiv: true, ausgetreten: true, geloescht: true };
+const istStatus = (s: string): s is MitgliedStatus => Object.hasOwn(STATUS, s);
 const VERLAUF_STANDARD = 100;
 const VERLAUF_MAX = 500;
 
@@ -118,12 +120,8 @@ export function getMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Respon
 		const suche = e.url.searchParams.get('suche') ?? undefined;
 		// Leer heisst «Alle» (Filter der Oberfläche) und wirkt wie ein fehlender Status.
 		const status = e.url.searchParams.get('status') || undefined;
-		if (status !== undefined && !STATUS.includes(status)) return eingabeFehler();
-		const zeilen = await listeMitglieder(
-			d.db,
-			{ suche, status: status as MitgliedStatus | undefined },
-			jetzt(d)
-		);
+		if (status !== undefined && !istStatus(status)) return eingabeFehler();
+		const zeilen = await listeMitglieder(d.db, { suche, status }, jetzt(d));
 		return antwort(200, zeilen);
 	});
 }
