@@ -18,7 +18,7 @@ export async function machAdmin(db: Db, kontoId: number, jetzt: Date): Promise<v
 
 type Treffer = { id: number; email: string; mitgliedernummer: string | null };
 
-// Liest nur: Mitglied mit dieser Mitgliedernummer bzw. dieser E-Mail (ohne Gross-/Kleinschreibung).
+// Liest nur: Mitglied mit dieser Mitgliedernummer bzw. dieser E-Mail (beide ohne Gross-/Kleinschreibung).
 async function findeMitglied(db: Db, bedingung: SQL): Promise<Treffer | null> {
 	const [m] = await db
 		.select({ id: mitglied.id, email: mitglied.email, mitgliedernummer: mitglied.mitgliedernummer })
@@ -38,7 +38,7 @@ async function findeBestehendes(
 	email: string
 ): Promise<number | null | 'widerspruch'> {
 	const ueberNummer = nummer
-		? await findeMitglied(db, eq(mitglied.mitgliedernummer, nummer))
+		? await findeMitglied(db, sql`lower(${mitglied.mitgliedernummer}) = lower(${nummer})`)
 		: null;
 	const ueberEmail = await findeMitglied(db, sql`lower(${mitglied.email}) = lower(${email})`);
 	if (ueberNummer && ueberEmail)
@@ -48,7 +48,9 @@ async function findeBestehendes(
 	}
 	if (ueberEmail) {
 		const dbNummer = ueberEmail.mitgliedernummer;
-		return dbNummer === null || dbNummer === nummer ? ueberEmail.id : 'widerspruch';
+		return dbNummer === null || dbNummer.toLowerCase() === nummer?.toLowerCase()
+			? ueberEmail.id
+			: 'widerspruch';
 	}
 	return null;
 }

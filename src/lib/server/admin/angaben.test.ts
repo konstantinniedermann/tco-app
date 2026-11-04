@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pruefeAngaben } from './angaben.ts';
+import { leseStand, pruefeAngaben } from './angaben.ts';
 
 const OPT = { nummerPflicht: false, jahr: 2026 };
 
@@ -244,5 +244,69 @@ describe('pruefeAngaben', () => {
 
 	it('Jahrgang als unendliche Zahl → Fehler', () => {
 		expect(fehlerVon({ ...gueltig, jahrgang: Infinity }).jahrgang).toBeTruthy();
+	});
+
+	it('Steuer- und unsichtbare Formatzeichen in Name, Strasse und Ort → Fehler beim Feld', () => {
+		for (const zeichen of ['\u0000', '\u0007', '\u001b', '\u007f', '\u200b', '\u202e']) {
+			const f = fehlerVon({
+				...gueltig,
+				vorname: `Er${zeichen}ika`,
+				nachname: `Bei${zeichen}spiel`,
+				strasse: `Muster${zeichen}weg 1`,
+				ort: `Ol${zeichen}ten`
+			});
+			expect(f).toEqual({
+				vorname: 'unsichtbares Sonderzeichen, bitte neu eintippen',
+				nachname: 'unsichtbares Sonderzeichen, bitte neu eintippen',
+				strasse: 'unsichtbares Sonderzeichen, bitte neu eintippen',
+				ort: 'unsichtbares Sonderzeichen, bitte neu eintippen'
+			});
+		}
+	});
+
+	it('Umlaute, Akzente, Bindestrich und Apostroph bleiben erlaubt', () => {
+		const r = pruefeAngaben(
+			{ ...gueltig, vorname: 'Zoë-Anaïs', nachname: "D'Ämmerli", ort: 'Saint-Ursanne' },
+			OPT
+		);
+		expect(r.ok).toBe(true);
+	});
+});
+
+describe('leseStand', () => {
+	const stand = {
+		mitgliedernummer: null,
+		vorname: 'Erika',
+		nachname: 'Beispiel',
+		strasse: 'Musterweg 1',
+		plz: '4600',
+		ort: 'Olten',
+		email: 'erika.beispiel@example.org',
+		telefon: null,
+		geschlecht: 'w',
+		jahrgang: 1990,
+		lizenznummer: null
+	};
+
+	it('übernimmt den mitgeschickten Stand unverändert, ohne ihn zu normalisieren', () => {
+		expect(leseStand({ ...stand, vorname: ' Erika ' })).toEqual({ ...stand, vorname: ' Erika ' });
+	});
+
+	it('kein Objekt, fehlendes Feld oder falscher Typ → null', () => {
+		const ohneOrt: Record<string, unknown> = { ...stand };
+		delete ohneOrt.ort;
+		for (const roh of [
+			undefined,
+			null,
+			'x',
+			[],
+			ohneOrt,
+			{ ...stand, jahrgang: '1990' },
+			{ ...stand, vorname: null },
+			{ ...stand, telefon: 5 },
+			{ ...stand, geschlecht: 'x' }
+		]) {
+			expect(leseStand(roh)).toBeNull();
+		}
 	});
 });

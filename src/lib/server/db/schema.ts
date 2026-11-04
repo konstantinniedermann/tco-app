@@ -24,7 +24,8 @@ export const mitglied = pgTable(
 		ort: text('ort').notNull(),
 		email: text('email').notNull().unique('mitglied_email_unique'),
 		status: text('status').notNull().default('aktiv'),
-		// Leer erlaubt (mehrere Mitglieder ohne Nummer); gesetzt ist sie eindeutig.
+		// Leer erlaubt (mehrere Mitglieder ohne Nummer); gesetzt ist sie eindeutig, ohne Rücksicht auf
+		// Gross-/Kleinschreibung («A12» = «a12»), gespeichert wie eingegeben.
 		mitgliedernummer: text('mitgliedernummer'),
 		telefon: text('telefon'),
 		geschlecht: text('geschlecht'),
@@ -34,7 +35,7 @@ export const mitglied = pgTable(
 	(t) => [
 		check('mitglied_status_check', sql`${t.status} in ('aktiv', 'ausgetreten', 'geloescht')`),
 		check('mitglied_geschlecht_check', sql`${t.geschlecht} in ('w', 'm')`),
-		uniqueIndex('mitglied_mitgliedernummer_unique').on(t.mitgliedernummer),
+		uniqueIndex('mitglied_mitgliedernummer_klein_unique').on(sql`lower(${t.mitgliedernummer})`),
 		// Der Login sucht die Adresse ohne Rücksicht auf Gross-/Kleinschreibung: sie muss auch so eindeutig sein.
 		uniqueIndex('mitglied_email_klein_unique').on(sql`lower(${t.email})`)
 	]

@@ -13,7 +13,7 @@ import {
 	legeMitgliedAn,
 	listeMitglieder
 } from './mitglieder.ts';
-import { ladeVerlauf } from './verlauf.ts';
+import { ladeVerlauf, schreibeVerlauf } from './verlauf.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 
@@ -78,6 +78,21 @@ describe('legeMitgliedAn', () => {
 	});
 });
 
+describe('Mitgliedernummer', () => {
+	test('FR-25: gleiche Mitgliedernummer in anderer Gross-/Kleinschreibung → vergeben; gespeichert wie eingegeben', async () => {
+		const n = `Ab${nummer()}`;
+		const id = await anlegen({ mitgliedernummer: n });
+		expect((await ladeMitglied(db, id, jetzt))!.angaben.mitgliedernummer).toBe(n);
+		const r = await legeMitgliedAn(
+			db,
+			urheber,
+			angaben({ mitgliedernummer: n.toUpperCase() }),
+			jetzt
+		);
+		expect(r).toEqual({ ergebnis: 'vergeben', feld: 'mitgliedernummer' });
+	});
+});
+
 describe('aendereAngaben', () => {
 	test('A-MITGLIED-02, FR-26: Bearbeiten schreibt je geändertem Feld einen Eintrag', async () => {
 		const id = await anlegen();
@@ -87,6 +102,7 @@ describe('aendereAngaben', () => {
 			urheber,
 			id,
 			{ ...d!.angaben, ort: 'Aarau', telefon: '+41 00 000 00 00' },
+			d!.angaben,
 			jetzt
 		);
 		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['ort', 'telefon'] });
@@ -99,7 +115,7 @@ describe('aendereAngaben', () => {
 	test('FR-26: Speichern ohne echte Änderung schreibt nichts', async () => {
 		const id = await anlegen();
 		const d = await ladeMitglied(db, id, jetzt);
-		const r = await aendereAngaben(db, urheber, id, { ...d!.angaben }, jetzt);
+		const r = await aendereAngaben(db, urheber, id, { ...d!.angaben }, d!.angaben, jetzt);
 		expect(r).toEqual({ ergebnis: 'ok', geaendert: [] });
 		const verlauf = await ladeVerlauf(db, { mitgliedId: id, grenze: 10 });
 		expect(verlauf.map((v) => v.aktion)).toEqual(['angelegt']);
@@ -115,13 +131,67 @@ describe('aendereAngaben', () => {
 			urheber,
 			id,
 			{ ...d!.angaben, email: fremd.email.toUpperCase() },
+			d!.angaben,
 			jetzt
 		);
 		expect(r).toEqual({ ergebnis: 'vergeben', feld: 'email' });
 	});
 
+	test('A-MITGLIED-02: Stand seit dem Laden geändert → veraltet, nichts gespeichert, kein Eintrag', async () => {
+		const id = await anlegen();
+		const geladen = (await ladeMitglied(db, id, jetzt))!.angaben;
+		// Admin A speichert eine neue Adresse …
+		const a = await aendereAngaben(db, urheber, id, { ...geladen, ort: 'Aarau' }, geladen, jetzt);
+		expect(a).toEqual({ ergebnis: 'ok', geaendert: ['ort'] });
+		// … Admin B hat noch den alten Stand und ändert das Telefon.
+		const b = await aendereAngaben(
+			db,
+			urheber,
+			id,
+			{ ...geladen, telefon: '+41 00 000 00 01' },
+			geladen,
+			jetzt
+		);
+		expect(b).toEqual({ ergebnis: 'veraltet' });
+		const jetztStand = (await ladeMitglied(db, id, jetzt))!;
+		expect(jetztStand.angaben).toMatchObject({ ort: 'Aarau', telefon: null });
+		expect(jetztStand.verlauf.map((v) => v.detail)).toEqual(['ort', null]);
+	});
+
+	test('A-MITGLIED-02: mit dem neuen Stand gelingt das Speichern wieder', async () => {
+		const id = await anlegen();
+		const geladen = (await ladeMitglied(db, id, jetzt))!.angaben;
+		await aendereAngaben(db, urheber, id, { ...geladen, ort: 'Aarau' }, geladen, jetzt);
+		const neu = (await ladeMitglied(db, id, jetzt))!.angaben;
+		const r = await aendereAngaben(
+			db,
+			urheber,
+			id,
+			{ ...neu, telefon: '+41 00 000 00 01' },
+			neu,
+			jetzt
+		);
+		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['telefon'] });
+	});
+
+	test('FR-25: Mitgliedernummer eines anderen in anderer Schreibweise → vergeben', async () => {
+		const n = `A${nummer()}`;
+		await anlegen({ mitgliedernummer: n });
+		const id = await anlegen();
+		const d = (await ladeMitglied(db, id, jetzt))!;
+		const r = await aendereAngaben(
+			db,
+			urheber,
+			id,
+			{ ...d.angaben, mitgliedernummer: n.toLowerCase() },
+			d.angaben,
+			jetzt
+		);
+		expect(r).toEqual({ ergebnis: 'vergeben', feld: 'mitgliedernummer' });
+	});
+
 	test('unbekannte ID → nicht-gefunden', async () => {
-		expect(await aendereAngaben(db, urheber, 2147483000, angaben(), jetzt)).toEqual({
+		expect(await aendereAngaben(db, urheber, 2147483000, angaben(), angaben(), jetzt)).toEqual({
 			ergebnis: 'nicht-gefunden'
 		});
 		expect(await ladeMitglied(db, 2147483000, jetzt)).toBeNull();
@@ -198,6 +268,27 @@ describe('listeMitglieder', () => {
 		expect(d?.login.geraete).toBe(2);
 		expect(d?.login.zuletztGenutzt).toEqual(new Date(jetzt.getTime() + MIN));
 		expect(d?.kontoId).toBe(m.kontoId);
+	});
+});
+
+describe('Verlauf im Detail', () => {
+	test('A-MITGLIED-06: zeigt höchstens die letzten 50 Einträge und meldet, wenn gekürzt', async () => {
+		const id = await anlegen();
+		const sitzungenBeendet = (anzahl: number) =>
+			schreibeVerlauf(
+				db,
+				id,
+				urheber,
+				Array.from({ length: anzahl }, () => ({ aktion: 'sitzungen-beendet' as const })),
+				jetzt
+			);
+		// «angelegt» + 49 = 50 Einträge: alles sichtbar
+		await sitzungenBeendet(49);
+		const voll = (await ladeMitglied(db, id, jetzt))!;
+		expect([voll.verlauf.length, voll.verlaufGekuerzt]).toEqual([50, false]);
+		await sitzungenBeendet(1);
+		const gekuerzt = (await ladeMitglied(db, id, jetzt))!;
+		expect([gekuerzt.verlauf.length, gekuerzt.verlaufGekuerzt]).toEqual([50, true]);
 	});
 });
 

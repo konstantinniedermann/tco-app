@@ -38,13 +38,16 @@
 	let angabenFehler = $state<Partial<Record<Feld, string>>>({});
 	let angabenMeldung = $state<string | null>(null);
 	let angabenStoerung = $state<string | null>(null);
+	// Ein anderer hat seit dem Laden gespeichert: nichts gespeichert, die Eingaben bleiben stehen.
+	let angabenVeraltet = $state(false);
 
 	const speichereWerte = (werte: Werte) => einzeln(() => schickeAngaben(werte));
 	async function schickeAngaben(werte: Werte) {
 		angabenFehler = {};
 		angabenMeldung = null;
 		angabenStoerung = null;
-		const a = await speichereAngaben(detail.id, werte);
+		angabenVeraltet = false;
+		const a = await speichereAngaben(detail.id, werte, detail.angaben);
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok') {
 			angabenMeldung = 'Gespeichert';
@@ -54,10 +57,20 @@
 			angabenFehler = a.felder;
 		} else if (a.art === 'vergeben') {
 			angabenFehler = { [a.feld]: VERGEBEN[a.feld as 'email' | 'mitgliedernummer'] };
+		} else if (a.art === 'veraltet') {
+			angabenVeraltet = true;
 		} else {
 			angabenStoerung = MELDUNG.stoerung;
 		}
 	}
+
+	// Verwirft die Eingaben und baut das Formular mit dem gespeicherten Stand neu auf.
+	const ladeNeuenStand = () =>
+		einzeln(async () => {
+			await invalidateAll();
+			angabenVeraltet = false;
+			nachSpeichern += 1;
+		});
 
 	// Rollen: «Mitglied» hat jedes Konto, die übrigen wählt der Admin.
 	const WAHL: Rolle[] = ['admin', 'cm', 'lizenz'];
@@ -184,6 +197,17 @@
 					onspeichern={speichereWerte}
 				/>
 			{/key}
+			{#if angabenVeraltet}
+				<p class="fehler" role="alert">
+					Inzwischen hat jemand anderes dieses Mitglied geändert. Nichts gespeichert: Lade den neuen
+					Stand und gib deine Änderung nochmals ein.
+				</p>
+				<div class="leiste">
+					<button type="button" class="taste-neben" onclick={ladeNeuenStand}
+						>Neuen Stand laden</button
+					>
+				</div>
+			{/if}
 			{#if angabenStoerung}
 				<p class="fehler" role="alert">{angabenStoerung}</p>
 			{/if}
@@ -192,7 +216,9 @@
 		<details class="karte klappe" open>
 			<summary class="klappe-titel"
 				>Verlauf <span class="leise"
-					>{detail.verlauf.length} {detail.verlauf.length === 1 ? 'Eintrag' : 'Einträge'}</span
+					>{detail.verlaufGekuerzt
+						? `die letzten ${detail.verlauf.length} Einträge`
+						: `${detail.verlauf.length} ${detail.verlauf.length === 1 ? 'Eintrag' : 'Einträge'}`}</span
 				></summary
 			>
 			<div class="tabelle">

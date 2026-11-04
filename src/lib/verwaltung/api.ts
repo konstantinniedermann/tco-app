@@ -31,6 +31,7 @@ export type Antwort<T> =
 	| { art: 'eingabe'; felder: Partial<Record<Feld, string>> }
 	| { art: 'vergeben'; feld: Feld }
 	| { art: 'letzter-admin' }
+	| { art: 'veraltet' }
 	| { art: 'stoerung' };
 
 export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
@@ -54,6 +55,7 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 	}
 	if (status === 409) {
 		if (k.fehler === 'letzter-admin') return { art: 'letzter-admin' };
+		if (k.fehler === 'veraltet') return { art: 'veraltet' };
 		if (k.fehler === 'vergeben' && typeof k.feld === 'string')
 			return { art: 'vergeben', feld: k.feld as Feld };
 	}
@@ -103,8 +105,13 @@ export const legeMitgliedAn = (angaben: object, holen: Holen = fetch) =>
 export const ladeMitglied = (id: number, holen: Holen = fetch) =>
 	lese<MitgliedDetail>(`${ADMIN}/mitglieder/${id}`, holen);
 
-export const speichereAngaben = (id: number, angaben: object, holen: Holen = fetch) =>
-	schicke<{ geaendert: string[] }>(`${ADMIN}/mitglieder/${id}`, angaben, holen);
+/** `vorher`: die Angaben, wie die Seite sie geladen hat; der Server speichert nur, wenn sie noch gelten. */
+export const speichereAngaben = (
+	id: number,
+	angaben: object,
+	vorher: object,
+	holen: Holen = fetch
+) => schicke<{ geaendert: string[] }>(`${ADMIN}/mitglieder/${id}`, { ...angaben, vorher }, holen);
 
 export const speichereRollen = (id: number, rollen: Rolle[], holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/mitglieder/${id}/rollen`, { rollen }, holen);
