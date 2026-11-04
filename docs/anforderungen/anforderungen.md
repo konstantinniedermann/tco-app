@@ -55,7 +55,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-MITGLIED-03 | Der Admin löscht Mitgliederkonten | PDF 4a | Mitglieder-Login\* | geplant |
 | A-MITGLIED-04 | Selbstregistrierung über die Website tcolten.ch, damit der Briefversand entfallen kann (mit der zuständigen Person) | PDF 4a | später\* | später |
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
-| A-MITGLIED-06 | Der Admin sieht im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Admin, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | umgesetzt |
+| A-MITGLIED-06 | Der Admin sieht im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Admin, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | umgesetzt\* (Verlauf der Admin-Änderungen; Löschung nach 12 Monaten folgt mit Etappe 3) |
 | A-MITGLIED-07 | Der Admin, der die Mitgliederverwaltung macht, liest die Mitgliederliste aus Fairgate ein (Excel oder CSV) und führt so Ein- und Austritte nach; zum Start erfasst der Projektleiter die Mitglieder ([#46](https://github.com/konstantinniedermann/tco-app/issues/46)) | K-17.1 | CM-Anmeldung\* | offen (hängt an K-45) |
 | A-MITGLIED-08 | Ein Mitglied erfasst sein Kind und erledigt für es das Administrative (Daten, CM-Anmeldung), bis das Kind ab der Altersgrenze des Vereins ein eigenes Login hat (Vorschlag K-08) ([#45](https://github.com/konstantinniedermann/tco-app/issues/45)) | K-46, PL | CM-Anmeldung\* | offen (hängt an K-08) |
 
