@@ -1,6 +1,8 @@
 // Anfragen der Login-Seiten an die Schnittstellen und die Meldungen dazu (UI-06).
 // Texte wörtlich aus der Spec «Login per Einmal-Code», Abschnitt «Ablauf in der App».
 
+import { jsonPost } from '../json-post';
+
 export type Ergebnis =
 	| { ergebnis: 'ok' }
 	| { ergebnis: 'falsch' }
@@ -20,14 +22,9 @@ export const MELDUNG = {
 
 export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
 
-/** Ändernde Anfragen schicken immer JSON (Herkunftsschutz, sonst 415). */
 export async function sende(pfad: string, inhalt: object, holen: Holen = fetch): Promise<Ergebnis> {
 	try {
-		const antwort = await holen(pfad, {
-			method: 'POST',
-			headers: { 'content-type': 'application/json' },
-			body: JSON.stringify(inhalt)
-		});
+		const antwort = await holen(pfad, jsonPost(inhalt));
 		if (antwort.ok) return { ergebnis: 'ok' };
 		if (antwort.status === 429) return { ergebnis: 'zu-viele' };
 		if (antwort.status === 400) {

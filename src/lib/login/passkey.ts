@@ -7,6 +7,7 @@ import {
 	startAuthentication,
 	startRegistration
 } from '@simplewebauthn/browser';
+import { jsonPost } from '../json-post';
 import { sende, type Holen } from './anmelden';
 
 export type Webauthn = {
@@ -46,12 +47,10 @@ const istAbbruch = (fehler: unknown) => hatName(fehler, 'NotAllowedError');
 /** Das Gerät hat schon einen Passkey für dieses Konto (excludeCredentials). */
 const istVorhanden = (fehler: unknown) => hatName(fehler, 'InvalidStateError');
 
-const JSON_KOPF = { 'content-type': 'application/json' };
-
 /** POST mit JSON-Körper; null bei Netzfehler. */
 async function post(pfad: string, inhalt: object, holen: Holen): Promise<Response | null> {
 	try {
-		return await holen(pfad, { method: 'POST', headers: JSON_KOPF, body: JSON.stringify(inhalt) });
+		return await holen(pfad, jsonPost(inhalt));
 	} catch {
 		return null;
 	}

@@ -1,5 +1,6 @@
 // Anfragen der Verwaltungsseiten an `/api/admin/…` und ihre Antworten als typisierte Ergebnisse.
 // Die Seiten zeigen die Meldungen; hier steht nur, was die Statuscodes bedeuten.
+import { jsonPost } from '../json-post.ts';
 import type { Angaben, Feld } from '../server/admin/angaben.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { Rolle } from '../server/admin/rollen.ts';
@@ -71,17 +72,8 @@ async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<A
 
 const lese = <T>(pfad: string, holen: Holen) => rufe<T>(pfad, { method: 'GET' }, holen);
 
-/** Ändernde Anfragen schicken immer JSON (SI-10, sonst 415). */
 const schicke = <T>(pfad: string, inhalt: object, holen: Holen) =>
-	rufe<T>(
-		pfad,
-		{
-			method: 'POST',
-			headers: { 'content-type': 'application/json' },
-			body: JSON.stringify(inhalt)
-		},
-		holen
-	);
+	rufe<T>(pfad, jsonPost(inhalt), holen);
 
 const ADMIN = '/api/admin';
 
