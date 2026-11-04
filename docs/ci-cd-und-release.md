@@ -336,7 +336,9 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 ## Versionen
 
 - Schema `Hauptversion.Nebenversion.Korrektur`. Die erste Version mit Code ist `0.1.0`, das
-  erste Release *Mitglieder-Login* wird `1.0.0`.
+  erste Release *Mitglieder-Login* wird `1.0.0`. Davor geht die letzte Vorabversion 0.x für den
+  Pilot der [Testgruppe](testgruppe.md) auf Live (Etappe *Pilot*), mit Checkliste auf Test wie
+  jedes Release.
 - **Nebenversion** für eine neue Etappe oder Funktion, **Korrektur** für Fehlerbehebungen,
   **Hauptversion** nur, wenn Mitglieder etwas umstellen müssen (z. B. Umstieg auf die
   Store-App).
