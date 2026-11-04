@@ -1,7 +1,7 @@
 # Design: Admin-Oberfläche Mitgliederverwaltung (#43)
 
 **Datum:** 2026-11-04 · **Issue:** [#43](https://github.com/konstantinniedermann/tco-app/issues/43)
-· **Status:** Entwurf
+· **Status:** freigegeben (Projektleiter, 04.11.2026)
 
 ## Absicht
 
@@ -83,7 +83,7 @@ SPA), [ADR-004](../../adr/adr-004-login-einmal-code.md) (Login),
 - **E-Mail ist beim Einlesen Pflicht.** Zeilen ohne E-Mail sind Fehler.
 - **Umsetzung in Etappen:** ein Design, ein Plan, drei Bauetappen mit je eigenem Merge nach
   `dev`; #43 bleibt ein Issue.
-- **Brief-Code beim Drucken**, nicht beim Einlesen.
+- **Brief-Code beim Erzeugen der Briefe**, nicht beim Einlesen: «Briefe erzeugen» stellt die Codes aus und öffnet die Druckansicht, die der Browser druckt oder als PDF speichert.
 - **Löschen mit Bedenkzeit:** Ein gelöschtes Mitglied ist eine Woche lang wiederherstellbar.
   Erst danach sind Konto und Angaben weg, und nur der Name bleibt (wie nach der Austrittsfrist).
 - **Seite eines Mitglieds:** Variante A v3, siehe *Oberfläche*.
