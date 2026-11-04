@@ -3,6 +3,7 @@
 // `node scripts/testdaten.ts` (betrieb/bin/ausliefern, Schritt «testdaten laden»).
 // Die Ausgabe landet in protokoll.log: nie Code, Adresse oder Werte aus der Datenbank (DS-06).
 import { count } from 'drizzle-orm';
+import { machAdmin } from '../src/lib/server/admin/erster-admin.ts';
 import { formatiereDatum } from '../src/lib/server/datum.ts';
 import { erstelleDb } from '../src/lib/server/db/index.ts';
 import { mitglied } from '../src/lib/server/db/schema.ts';
@@ -84,6 +85,8 @@ async function ladeTestdaten(env: Record<string, string | undefined>): Promise<v
 		}
 		const kontoIds = await legeErfundeneMitgliederAn(db);
 		console.log(`testdaten: ${kontoIds.length} erfundene Mitglieder angelegt`);
+		// Das erste erfundene Mitglied ist auf Test Admin; es meldet sich mit dem Brief-Code an.
+		await machAdmin(db, kontoIds[0], new Date());
 
 		const dienst = erstelleLoginDienst({
 			db,

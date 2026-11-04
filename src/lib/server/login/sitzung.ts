@@ -1,13 +1,20 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { eq, lt, sql } from 'drizzle-orm';
-import type { Db } from '../db/index.ts';
+import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, mitglied, sitzung } from '../db/schema.ts';
 
 export const SITZUNG_COOKIE = 'mytco_sitzung';
 export const SITZUNG_GUELTIG_MS = 365 * 24 * 60 * 60 * 1000;
 export const VERLAENGERN_NACH_MS = 24 * 60 * 60 * 1000;
 
-export type AngemeldetesKonto = { kontoId: number; vorname: string };
+export type AngemeldetesKonto = {
+	kontoId: number;
+	mitgliedId: number;
+	vorname: string;
+	passkeyHinweis: boolean;
+	// Hash der Sitzungskennung; ordnet Zugangs-Daten (SI-08) dieser Sitzung zu.
+	sitzungHash: string;
+};
 
 export function sitzungAbgelaufen(zuletztGenutzt: Date, jetzt: Date): boolean {
 	return jetzt.getTime() - zuletztGenutzt.getTime() > SITZUNG_GUELTIG_MS;
@@ -28,7 +35,8 @@ export async function erstelleSitzung(
 	db: Db,
 	kontoId: number,
 	jetzt: Date,
-	alteKennung?: string
+	alteKennung?: string,
+	optionen?: { passkeyHinweis?: boolean }
 ): Promise<string> {
 	const kennung = randomBytes(32).toString('base64url');
 	await db.transaction(async (tx) => {
@@ -47,7 +55,8 @@ export async function erstelleSitzung(
 			kontoId,
 			sitzungsversion: k.sitzungsversion,
 			erstelltAm: jetzt,
-			zuletztGenutzt: jetzt
+			zuletztGenutzt: jetzt,
+			passkeyHinweis: optionen?.passkeyHinweis ?? false
 		});
 	});
 	return kennung;
@@ -62,8 +71,10 @@ export async function pruefeSitzung(
 	const [zeile] = await db
 		.select({
 			kontoId: konto.id,
+			mitgliedId: mitglied.id,
 			vorname: mitglied.vorname,
 			zuletztGenutzt: sitzung.zuletztGenutzt,
+			passkeyHinweis: sitzung.passkeyHinweis,
 			sitzungsversion: sitzung.sitzungsversion,
 			kontoVersion: konto.sitzungsversion,
 			gesperrt: konto.gesperrt,
@@ -89,7 +100,24 @@ export async function pruefeSitzung(
 			.set({ zuletztGenutzt: jetzt })
 			.where(eq(sitzung.kennungHash, kennungHash));
 	}
-	return { konto: { kontoId: zeile.kontoId, vorname: zeile.vorname }, verlaengert };
+	return {
+		konto: {
+			kontoId: zeile.kontoId,
+			mitgliedId: zeile.mitgliedId,
+			vorname: zeile.vorname,
+			passkeyHinweis: zeile.passkeyHinweis,
+			sitzungHash: kennungHash
+		},
+		verlaengert
+	};
+}
+
+// Nimmt den Passkey-Hinweis von der Sitzung weg (nach Einrichten oder "Nein, danke").
+export async function beendePasskeyHinweis(db: Db, kennung: string): Promise<void> {
+	await db
+		.update(sitzung)
+		.set({ passkeyHinweis: false })
+		.where(eq(sitzung.kennungHash, hashe(kennung)));
 }
 
 export async function beendeSitzung(db: Db, kennung: string): Promise<void> {
@@ -97,7 +125,7 @@ export async function beendeSitzung(db: Db, kennung: string): Promise<void> {
 }
 
 // SI-07: Erhöht die Sitzungsversion und löscht die Zeilen; beides in einer Transaktion.
-export async function beendeAlleSitzungen(db: Db, kontoId: number): Promise<void> {
+export async function beendeAlleSitzungen(db: DbOderTx, kontoId: number): Promise<void> {
 	await db.transaction(async (tx) => {
 		await tx
 			.update(konto)

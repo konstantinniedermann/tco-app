@@ -26,6 +26,9 @@ sie, Geheimnisse stehen darin keine).
 - `bin/ausliefern-ssh` und `bin/lib.sh` aus diesem Ordner, Ordner und Dateien `root:root` mit
   Rechten 0755: `mytco` kann sie so nicht versehentlich ändern. Ein schädliches Image kann das
   über den Docker-Zugang von `mytco` trotzdem umgehen (Restrisiko im Sicherheitskonzept).
+  Ändert sich eine der beiden Dateien im Repo, spielt der Betrieb sie als root neu ein; die CI
+  tut das nie. `lib.sh` enthält fest die Container-Ablage (`MYTCO_REPO_STANDARD`), nach einem
+  Umzug des Repos also immer.
 - `geheim.env` je Umgebung, `proxy/proxy.env`, `sicherung.env`, alle mit Rechten 600.
 - `~/.ssh/authorized_keys` des Benutzers `mytco`, ein Schlüssel je Umgebung:
   `command="/opt/mytco/bin/ausliefern-ssh test",restrict ssh-ed25519 …` (für Live `live`).
@@ -91,6 +94,29 @@ bevor er etwas tut.
 Scheitert das Einspielen, steht im Protokoll nur der Fehlercode (SQLSTATE) bzw. bei `probe` die
 Zahl der Fehlerzeilen, nie ein Wert aus der Datenbank (DS-06). Zum Nachsehen bleibt die
 Sicherung selbst.
+
+## Ersten Admin festlegen
+
+Auf Live ist die Datenbank anfangs leer. Der Projektleiter wird einmal per Befehl als Mitglied
+angelegt und bekommt die Rolle Admin (Mitgliedernummer, Name, Adresse und E-Mail sind Pflicht):
+
+```
+cd /opt/mytco && MYTCO_UMGEBUNG=live \
+  MYTCO_IMAGE="ghcr.io/konstantinniedermann/tco-app@$(head -n 1 live/zustand/aktuell)" \
+  docker compose -p mytco-live \
+  -f live/betrieb/compose.umgebung.yml --env-file live/geheim.env \
+  exec app node scripts/admin-festlegen.ts --mitgliedernummer … --vorname … \
+  --nachname … --strasse … --plz … --ort … --email …
+```
+
+Als Benutzer `mytco` ausführen (er liest `live/zustand/aktuell`); `MYTCO_IMAGE` verlangt die
+Compose-Datei bei jedem Aufruf, hier das laufende Image von Live, Ablage wie `MYTCO_REPO_STANDARD`
+in `bin/lib.sh`. Der Befehl legt nur den Admin selbst an; alle anderen Mitglieder kommen danach über die
+Verwaltung. Gibt es das Mitglied schon (gleiche Nummer oder E-Mail), erhält es nur die Rolle.
+Die Angaben landen im Shell-Verlauf: Befehl mit führendem Leerzeichen eingeben (bei
+`HISTCONTROL=ignorespace`) oder den Verlauf danach bereinigen. Die Ausgabe nennt das Ergebnis und bei Fehlern Feldnamen mit Grund, nie Werte. Danach meldet
+sich der Admin über «Code per E-Mail» an. Auf Test ist Erika Beispiel (erfunden) automatisch
+Admin.
 
 ## Auslieferung ohne CI (keine Actions-Minuten)
 

@@ -39,6 +39,11 @@ gesperrtem Konto (RR-08) und mit dem Konto eines anderen Mitglieds (RR-06: *eige
 | Chrome, Handygrösse | Android |
 | Chrome, Desktop | Admin am PC |
 
+**Passkey:** Die Ende-zu-Ende-Tests nutzen einen virtuellen Authenticator (Chrome DevTools
+Protocol) und laufen darum nur in Chrome. WebKit bietet das nicht, die Safari-Engine prüft
+den Passkey-Ablauf also nicht. Wie sich ein echter Authenticator auf iPhone und Android
+verhält, zeigt allein die [Checkliste](#checkliste-vor-dem-release).
+
 Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelheit; zuerst
 Login per Einmal-Code, Daten ergänzen und eingeloggt bleiben (die geplanten
 A-LOGIN-Anforderungen der Etappe *Mitglieder-Login*).
@@ -111,16 +116,34 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] Login mit Einmal-Code klappt; nach Neustart des Handys weiterhin eingeloggt (A-LOGIN-08, A-LOGIN-09)
 - [ ] Neuer Code per E-Mail kommt an und landet nicht im Spam (A-LOGIN-10)
 - [ ] iPhone, App vom Startbildschirm: Code per E-Mail anfordern, App ganz schliessen, wieder öffnen → das Feld «Code aus der Mail» steht da (A-LOGIN-10)
+- [ ] Passkey auf einem echten iPhone **in der App vom Startbildschirm**: nach einem Code-Login einrichten (die Passkey-Abfrage erscheint beim ersten Tippen), abmelden, mit Passkey anmelden; die Abfrage darf sich nicht wiederholen oder hängen (A-LOGIN-07, [ADR-005](adr/adr-005-passkey-simplewebauthn.md), Restrisiken). Offen, bis die Test-Umgebung (#39) steht
+- [ ] Passkey auf einem Android-Handy (Chrome): einrichten und anmelden (A-LOGIN-07). Offen, bis #39 steht
+- [ ] Anmeldung am PC mit dem Passkey vom Handy per QR-Code (A-LOGIN-07). Offen, bis #39 steht
+- [ ] iPhone (Safari): QR-Code scannen → Einstiegsseite mit Anleitung; die Schritte und Beschriftungen stimmen mit Safari überein; nach dem Ablegen startet MyTCO vom Symbol direkt mit dem Login (A-HILFE-02)
+- [ ] Android (Chrome): Taste «MyTCO installieren» öffnet den Dialog von Android; die Anleitung über das Menü stimmt mit Chrome überein; im Samsung-Browser beobachten, ob die Anleitung passt (A-HILFE-02)
+- [ ] Seite Hilfe ohne Login über die Fusszeile erreichbar, der Kontakt stimmt (A-HILFE-01)
 - [ ] Steht ein Einrichtungsabend an: mobile Daten statt Club-WLAN, oder die Grenzen pro IP vorher prüfen ([ADR-004](adr/adr-004-login-einmal-code.md), Restrisiken)
 - [ ] Push einschalten und erhalten (ab Etappe *CM-Betrieb*)
+- [ ] Erika Beispiel öffnet auf Test die Verwaltung mit Code per Mail (SI-08, A-ROLLE-02)
 - [ ] Admin-Seite am PC: die geänderten Funktionen einmal durchgehen
+- [ ] Vor dem ersten Live-Release mit Mitgliedern: Hinweis an die alte E-Mail-Adresse (FR-25, SI-09) ist gebaut, sonst Datenschutzerklärung anpassen
+- [ ] `admin-festlegen` einmal auf Test über `docker compose exec` ausgeführt
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 
-Falls der Verein eine Testgruppe stellt (K-20), prüft sie Brief, Installation und Login
-als Pilot auf Live, mit ihren eigenen echten Daten, bevor alle Mitglieder einen Brief
-bekommen. Mit welcher Version und Checkliste der Pilot live geht, klärt #40 zusammen mit #39. Das ist Betrieb, kein Test im Sinne von DS-08;
-vorher muss die Datenschutzerklärung gelten. Ablauf → [#40](https://github.com/konstantinniedermann/tco-app/issues/40).
+## Testgruppe
+
+Eine Testgruppe des Projektleiters prüft vor dem Briefversand, ob Mitglieder mit Brief,
+Anleitung und Hilfe alleine zurechtkommen (Etappe *Pilot*). Sie nutzt MyTCO auf Live mit
+ihren eigenen echten Daten, mit einer Vorabversion 0.x vor 1.0.0; davor gilt die
+Checkliste oben auf Test. Das ist Betrieb, kein Test im Sinne von DS-08; vorher muss die
+Datenschutzerklärung gelten.
+
+**Älteres Handy:** ein iPhone mit iOS 16 oder 17 oder ein Android-Handy mit Android 9 bis 11
+(darunter gibt es keine Passkeys). Eine Untergrenze für MyTCO ist damit nicht festgelegt;
+die Testgruppe liefert Erfahrungswerte.
+
+Ablauf, Aufträge, Texte und Auswertung → [Testgruppe](testgruppe.md).
 
 ## Werkzeuge
 

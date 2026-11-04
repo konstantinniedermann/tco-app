@@ -96,9 +96,12 @@ describe('baueBriefHtml', () => {
 		for (const liste of listen) expect(liste.match(/<li[\s>]/g)).toHaveLength(5);
 		expect(html).toContain('iPhone');
 		expect(html).toContain('Android');
-		expect(html).toContain('Zum Home-Bildschirm');
-		expect(html).toContain('App installieren');
-		expect(html).toContain('Zum Startbildschirm hinzufügen');
+		// Beschriftungen wie in der Hilfe von Apple und Google (A-HILFE-02, Stand iOS 26 / Chrome)
+		expect(html).toContain('«Zu Home-Bildschirm hinzufügen»');
+		expect(html).toContain('«Als Web-App öffnen»');
+		expect(html).toContain('«Installieren und Verknüpfung erstellen»');
+		expect(html).not.toContain('Zum Home-Bildschirm');
+		expect(html).not.toContain('Zum Startbildschirm hinzufügen');
 		// Symbole immer mit Text (UI-05): je ein SVG-Symbol in jeder Anleitung.
 		for (const liste of listen) expect(liste).toMatch(/<svg class="symbol"/);
 	});

@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { konto, mitglied } from '../db/schema.ts';
+import { konto, mitglied, sitzung } from '../db/schema.ts';
 import { erstelleBremsen } from './bremse.ts';
 import { MAIL_CODE_GUELTIG_MS } from './codes.ts';
 import { erstelleLoginDienst, type Mailer } from './dienst.ts';
@@ -55,6 +55,18 @@ async function fordereAn(d: ReturnType<typeof baue>, email: string, ip = 'ip-1')
 }
 
 describe('Mail-Code', () => {
+	test('A-LOGIN-07: Login mit Mail-Code setzt den Passkey-Hinweis', async () => {
+		const d = baue();
+		const { email, kontoId } = await legeMitgliedAn(db);
+		await fordereAn(d, email);
+		expect(
+			(await d.dienst.loginMitMailCode(email, codeAus(d.post[0]), 'ip-hinweis')).ergebnis
+		).toBe('ok');
+		const zeilen = await db.select().from(sitzung).where(eq(sitzung.kontoId, kontoId));
+		expect(zeilen).toHaveLength(1);
+		expect(zeilen[0].passkeyHinweis).toBe(true);
+	});
+
 	test('A-LOGIN-10: bekannte Adresse erhält einen 6-stelligen Code, der einmal gilt', async () => {
 		const d = baue();
 		const { email, kontoId } = await legeMitgliedAn(db);

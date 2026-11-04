@@ -18,7 +18,8 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Wappen und App-Symbol (Farben fest in der Datei) | `static/wappen.svg`, `static/favicon.svg`, `static/*.png` |
 | Manifest (Name, Farben fest in der Datei; `theme_color` und `background_color` stimmen von Hand mit `--farbe-marke` und `--farbe-hintergrund` überein) | `static/manifest.webmanifest` |
 | Farbe der Browserleiste, Systemschrift-Einstellung | `src/app.html` |
-| Kopfleiste, Seitenaufbau | `src/routes/+layout.svelte` |
+| Kopfleiste, Fusszeile, Seitenaufbau | `src/routes/+layout.svelte` |
+| Baustein Anleitung (Zeichnung, Ablauf) | `src/lib/ui/Anleitung.svelte`, `src/lib/ui/ZeichnungIphone.svelte`, `src/lib/ui/ZeichnungAndroid.svelte` |
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
 
 Zwei Prüfungen halten Leitbild und Code beisammen:
@@ -56,7 +57,7 @@ Alle Paare von Text und Hintergrund erfüllen mindestens WCAG AA (gemessen).
 | `--farbe-marke-dunkel` | `#0b5640` | Seitenleiste der Verwaltung | Weiss 8.7 : 1 |
 | `--farbe-marke-hell` | `#cde3b9` | Wappen auf Grün, Bereichstitel der Verwaltung | auf marke-dunkel 6.3 : 1 |
 | `--farbe-marke-zart` | `#e3efdc` | Plakette *aktiv*, Tabellenkopf | marke darauf 5.5 : 1 |
-| `--farbe-aktion` | `#a84f1f` | nur die Haupttaste (UI-04), Hervorhebung „Jetzt aktuell" | Weiss 5.5 : 1 |
+| `--farbe-aktion` | `#a84f1f` | nur die Haupttaste (UI-04), Hervorhebung „Jetzt aktuell", Tipp-Kreis der Anleitung (sagt wie die Haupttaste „hier tippen") | Weiss 5.5 : 1 |
 | `--farbe-aktion-dunkel` | `#8c4018` | Haupttaste gedrückt | Weiss 7.3 : 1 |
 | `--farbe-flaeche` | `#ffffff` | Karten, Eingabefelder, Reiter | — |
 | `--farbe-hintergrund` | `#f4f7f2` | Seitenhintergrund | Text 13 : 1 |
@@ -146,23 +147,46 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Zurück | `.zurueck` | „‹ Zurück" oben links auf Unterseiten |
 | Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
-| Karte | `.karte` | weisse Fläche auf Hintergrund |
-| Kachel | `.kachel` | Karte als Link mit „›"; `.hervor` = Rand in Aktion-Farbe für das Wichtigste |
+| Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm |
+| Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen |
+| Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste |
 | Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt" oder „1 von 3 Anmeldungen" |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05) |
-| Hinweis | `.hinweis` | ocker, Rand links |
-| Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06) |
+| Anleitung | `.anleitung` | gezeichnetes Handy (`.anleitung-film`, ein `.anleitung-bild` pro Schritt), darunter die Taste (`.anleitung-taste`) und die nummerierten Schritte (`.anleitung-schritte`), am Schluss ein Eintrag „Fertig!" (`.anleitung-fertig`, mit ✓ statt Nummer); die Zeichnung ist für Screenreader verborgen, die Schritte tragen die Bedeutung; ein Schritt gehört zu genau einem Bild; in der Zeichnung nur Beschriftungen, die in der Hilfe von Apple bzw. Google belegt sind, sonst graue Balken (`.anleitung-eintrag.leer`); der Tipp-Kreis (`.anleitung-tipp`) zeigt, wo man tippt; Bewegung nach UI-09 |
+| Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen") |
+| Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06); betrifft sie das ganze Formular (z. B. *Inzwischen hat jemand anderes dieses Mitglied geändert*), unter dem Formular, mit dem Lösungsweg als Nebentaste daneben (*Neuen Stand laden*) |
 | Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm waagrecht scrollbar |
 | Symbol | `.symbol` | eigene SVG-Symbole, 24er-Raster, Strich 2, immer mit Text |
 | App-Rahmen | `.app` | umschliesst Kopfleiste, Inhalt und Reiter; misst die Breite fürs PC-Layout |
 | Inhaltsbereich | `.inhalt` | eine Spalte, höchstens `--breite-inhalt`, Seitenrand |
 | Leiste | `.leiste` | Suche, Filter und Tasten nebeneinander, bricht bei Platzmangel um |
 | Verwaltungsrahmen | `.verwaltung` | Seitenleiste links, Inhalt rechts; auf schmalem Bildschirm untereinander |
+| Fusszeile | `footer.inhalt.leise` | auf jeder Seite der Mitglieder-App, auch vor dem Login, nicht in der Verwaltung: Link „Hilfe" · Version |
 | Nebentext | `.leise` | kleiner und leiser, für Hilfen und Nebeninfos |
 | Breite Taste | `.taste-breit` | Zusatz zu einer Taste: volle Breite (Formulare auf dem Handy) |
+| Feld-Zeile | `.feld-zeile` | nur Verwaltung: Bezeichnung links, Eingabe rechts, gleiche Schriftgrösse; unter `60rem` steht die Bezeichnung über dem Feld |
+| Inaktive Taste | `.taste-haupt:disabled`, `.taste-neben:disabled` | nur Verwaltung: grau, solange es nichts zu speichern gibt; die Taste nennt, was sie speichert («Angaben speichern», «Rollen speichern»); Haupt- und Nebentaste sehen inaktiv gleich aus |
+| Spalten | `.spalten` | nur Verwaltung: zwei Spalten ab `60rem` |
+
+### Welche Fläche wofür
+
+**UI-08: Jedes Thema einer Seite steht in einer eigenen Fläche.** Wer eine Seite öffnet, soll
+sich an den Flächen zurechtfinden, ohne den ganzen Text zu lesen. Welche Fläche es ist, sagt
+ihre Funktion und wie lange sie bleibt; Farbe und Balken zeigen das an. Eine neue Art Fläche
+kommt nur hierher, wenn sie sich in Funktion oder Lebensdauer von allen bestehenden
+unterscheidet.
+
+| Fläche | Bedeutung | Lebensdauer |
+|--------|-----------|-------------|
+| Karte | ein festes Thema der Seite (Login: *Mit Passkey*, *Mit Code*) | bleibt immer |
+| Aufklappbereich | ein festes Thema auf einer langen Seite (Profil) | bleibt immer |
+| Kachel | führt weiter oder löst eine Aktion für einen Eintrag aus (*Clubmeisterschaft 2027 ›*, *iPhone · Entfernen*) | so lange, wie es den Eintrag gibt |
+| Kachel hervorgehoben (roter Balken) | das Wichtigste, was gerade läuft; man kann sie nicht wegklicken | solange es aktuell ist |
+| Hinweis (ocker Balken) | eine Mitteilung oder ein Angebot an das Mitglied (*Passkey einrichten*, *Brief-Code läuft bald ab*) | vorübergehend: verschwindet, wenn erledigt oder weggeklickt |
 
 Teile eines Bausteins heissen `<baustein>-<teil>`, z. B. `.kopf-wappen`, `.feld-hilfe`,
-`.zaehler-balken`, `.zaehler-voll`, `.zaehler-text`, `.kachel-pfeil`, `.seitenleiste-bereich`. Der aktive Reiter
+`.zaehler-balken`, `.zaehler-voll`, `.zaehler-text`, `.kachel-pfeil`, `.seitenleiste-bereich`,
+`.klappe-titel`. Der aktive Reiter
 und der aktive Eintrag der Seitenleiste tragen `aria-current="page"`, keine eigene Klasse.
 
 ## Layout und Navigation
@@ -177,6 +201,11 @@ Kopfleiste.
 - **Startseite:** „Hoi <Vorname>", darunter „Jetzt aktuell" (Kacheln, die wichtigste
   hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04).
 - **Unterseiten:** „‹ Zurück" oben links.
+- **Einstiegsseite** (nur im Handy-Browser, nicht vom Symbol aus): „Willkommen bei MyTCO", eine Karte „Zuerst auf den Startbildschirm" mit der Anleitung bzw. auf Android der Haupttaste „MyTCO installieren", darunter der Link „Ohne Startbildschirm weiter" zum Login.
+- **Hilfe:** ohne Login, über die Fusszeile; jedes Thema ein Aufklappbereich, der Kontakt eine Karte.
+- **Fehlerseite** (Seite nicht gefunden oder gerade nicht erreichbar): Kopfleiste und Inhalt
+  wie in der Mitglieder-App, auch unter der Verwaltung; oben links „‹ Zur Startseite" bzw.
+  „‹ Zur Verwaltung", darunter eine Karte mit Titel und Meldung in Worten (UI-06).
 - **Formulare:** mehr als etwa 4 Felder werden in Schritte geteilt, mit Schritt-Zähler. Das
   erste Login hat 3 Schritte: 1 Angaben prüfen (vom Verein erfasst, nur lesen) · 2 Kontakt ·
   3 Tennis (Lizenznummer, Klassierung).
@@ -231,9 +260,11 @@ passt.
 | UI-05 | Bedeutung nie nur über Farbe: Status als Plakette mit Text, Symbole immer mit Text. |
 | UI-06 | Fehlermeldungen stehen beim Feld, in Worten, mit Lösungsweg. |
 | UI-07 | Codes werden unabhängig von Gross-/Kleinschreibung, Leerzeichen und Bindestrich angenommen. |
+| UI-09 | Bewegung gibt es nur im Baustein Anleitung: weiche Überblendung, 3,5 s pro Schritt, 6 s für „Fertig", höchstens 3 Durchläufe, danach steht sie bei „Fertig". Eine Taste hält an (Anhalten · Abspielen · Nochmals abspielen). Bei „Bewegung reduzieren" keine Bewegung und keine Taste; die Bilder stehen nummeriert still nebeneinander. |
 
 Lange Wörter („Clubmeisterschaft") werden getrennt statt abgeschnitten (`hyphens: auto`
-auf `body`, Sprache `de-CH` in `src/app.html`).
+auf `body`, Sprache `de-CH` in `src/app.html`). Ausnahme sind Tabellenköpfe (`.tabelle th`):
+Sie trennen nicht, weil die Tabelle auf schmalem Bildschirm ohnehin waagrecht scrollt.
 
 ## Mockups
 
@@ -242,5 +273,9 @@ und `basis.css` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im
 
 - [Mockups](ui-mockups/index.html): Login, erstes Login (Schritt 2 von 3), Startseite mit
   Reitern, CM-Anmeldung, Mitgliederverwaltung am PC
+- [Passkey](ui-mockups/passkey.html): Hinweis nach dem Login, Login in zwei Karten, Profil mit
+  Aufklappbereich
+- [Hilfe beim Start](ui-mockups/hilfe.html): Einstiegsseite auf iPhone und Android (mit und
+  ohne Taste), „Bewegung reduzieren", Seite Hilfe, Login mit Fusszeile
 - [Grosse Schrift](ui-mockups/grosse-schrift.html): Startseite und CM-Anmeldung bei 150 %
   Systemschrift

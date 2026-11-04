@@ -9,6 +9,7 @@ import {
 	legeKontoMitBriefCodeAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { startetVomSymbol } from './hilfen/geraet.ts';
 import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 import { e2eEinstellungen } from './hilfen/umgebung.ts';
 
@@ -25,12 +26,21 @@ function leseMailanfrage(page: Page): Promise<string | null> {
 	return page.evaluate((schluessel) => localStorage.getItem(schluessel), MAILANFRAGE_SCHLUESSEL);
 }
 
+/** Öffnet das Profil über den Reiter; dort sitzt «Abmelden». */
+async function oeffneProfil(page: Page) {
+	await page
+		.getByRole('navigation', { name: 'Hauptnavigation' })
+		.getByRole('link', { name: 'Profil' })
+		.click();
+	await expect(page).toHaveURL(/\/profil$/);
+}
+
 /** Brief-Code klein und mit Bindestrich eintippen (UI-07). */
 async function meldeMitBriefAn(page: Page, vorname: string) {
 	const konto = await legeKontoMitBriefCodeAn(vorname);
 	await page.goto('/login');
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code).toLowerCase());
-	await page.getByRole('button', { name: 'Anmelden' }).click();
+	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${vorname}` })).toBeVisible();
 	return konto;
 }
@@ -38,13 +48,15 @@ async function meldeMitBriefAn(page: Page, vorname: string) {
 test('A-LOGIN-08: Login mit Brief-Code', async ({ page }, info) => {
 	const fehler = sammleKonsolenfehler(page);
 	const konto = await legeKontoMitBriefCodeAn('Lea');
+	// Der echte Weg führt vom Symbol zum Login; im Handy-Browser käme die Einstiegsseite (A-HILFE-02).
+	await startetVomSymbol(page);
 	await page.goto('/');
 	await expect(page).toHaveURL(/\/login$/);
 	await expect(page.getByRole('heading', { level: 1, name: 'Anmelden' })).toBeVisible();
 	await pruefeBildschirm(page, info, 'login');
 
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code).toLowerCase());
-	await page.getByRole('button', { name: 'Anmelden' }).click();
+	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Lea' })).toBeVisible();
 	await expect(page).toHaveURL(/\/$/);
 	await pruefeBildschirm(page, info, 'startseite-angemeldet');
@@ -69,7 +81,9 @@ test('A-LOGIN-09: nach Neuladen und in neuem Tab weiterhin angemeldet', async ({
 
 test('SI-06: Abmelden führt zur Login-Seite', async ({ page }) => {
 	const fehler = sammleKonsolenfehler(page);
+	await startetVomSymbol(page);
 	await meldeMitBriefAn(page, 'Mia');
+	await oeffneProfil(page);
 	await page.getByRole('button', { name: 'Abmelden' }).click();
 	await expect(page).toHaveURL(/\/login$/);
 	await page.goto('/');
@@ -83,13 +97,14 @@ test('Abmelden ohne Antwort des Servers zeigt die Störung und bleibt angemeldet
 }) => {
 	const fehler = sammleKonsolenfehler(page);
 	await meldeMitBriefAn(page, 'Jonas');
+	await oeffneProfil(page);
 	await page.route('**/api/logout', (route) => route.fulfill({ status: 503, body: '' }));
 	const taste = page.getByRole('button', { name: 'Abmelden' });
 	await taste.click();
 	await expect(page.getByText(MELDUNG.stoerung)).toBeVisible();
 	await expect(taste).toHaveAccessibleDescription(MELDUNG.stoerung);
-	await expect(page).toHaveURL(/\/$/);
-	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Jonas' })).toBeVisible();
+	await expect(page).toHaveURL(/\/profil$/);
+	await expect(page.getByRole('heading', { level: 1, name: 'Profil' })).toBeVisible();
 	// Die nachgestellte 503 meldet der Browser selbst in der Konsole.
 	expect(fehler.filter((f) => !/status of 503\b/.test(f))).toEqual([]);
 });
@@ -107,7 +122,7 @@ test('SI-02: benutzter Brief-Code zeigt «Dieser Code wurde schon benutzt. Wende
 	await page.goto('/login');
 	const feld = page.getByLabel('Code aus dem Brief');
 	await feld.fill(formatiereBriefCode(konto.code));
-	await page.getByRole('button', { name: 'Anmelden' }).click();
+	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	const meldung = `Dieser Code wurde schon benutzt. Wende dich an ${KONTAKT}.`;
 	await expect(page.getByText(meldung)).toBeVisible();
 	// UI-06: die Meldung steht beim Feld und ist mit ihm verknüpft.
@@ -126,7 +141,7 @@ test('UI-06: falscher Brief-Code zeigt die Meldung mit Lösungsweg beim Feld', a
 	await page.goto('/login');
 	const feld = page.getByLabel('Code aus dem Brief');
 	await feld.fill('AAAAA-AAAAA');
-	await page.getByRole('button', { name: 'Anmelden' }).click();
+	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	const meldung =
 		'Dieser Code stimmt nicht. Prüf ihn oder lass dir einen neuen per E-Mail schicken.';
 	await expect(page.getByText(meldung)).toBeVisible();
@@ -163,14 +178,14 @@ test('A-LOGIN-10: Code per E-Mail, mit Neuladen zwischen Anfrage und Eingabe', a
 
 	// Ein Tippfehler: Meldung beim Feld, Fokus zurück im Feld (zählt als 1 von 10 Versuchen).
 	await feld.fill(String((Number(code) + 1) % 1_000_000).padStart(6, '0'));
-	await page.getByRole('button', { name: 'Anmelden' }).click();
+	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByText(MELDUNG.mailFalsch)).toBeVisible();
 	await expect(feld).toHaveAccessibleDescription(/Dieser Code stimmt nicht\. Prüf ihn/);
 	await expect(feld).toBeFocused();
 	await pruefeBildschirm(page, info, 'login-mail-code-falsch');
 
 	await feld.fill(code);
-	await page.getByRole('button', { name: 'Anmelden' }).click();
+	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Sara' })).toBeVisible();
 	expect(await leseMailanfrage(page)).toBeNull();
 	expect(fehler).toEqual([]);
@@ -202,7 +217,7 @@ test('Kaltstart mit offener Mail-Anfrage zeigt das Feld «Code aus der Mail»; L
 
 	// Doch noch den Brief gefunden.
 	await page.getByLabel('Code aus dem Brief').fill(konto.code);
-	await page.getByRole('button', { name: 'Anmelden' }).click();
+	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Rina' })).toBeVisible();
 	expect(await leseMailanfrage(page)).toBeNull();
 	expect(fehler).toEqual([]);
@@ -233,6 +248,7 @@ test('SI-07: nach beendeAlleSitzungen führt der nächste Aufruf zur Login-Seite
 	page
 }) => {
 	const fehler = sammleKonsolenfehler(page);
+	await startetVomSymbol(page);
 	const konto = await meldeMitBriefAn(page, 'Ueli');
 	await beendeAlleSitzungen(konto.kontoId);
 	await page.reload();

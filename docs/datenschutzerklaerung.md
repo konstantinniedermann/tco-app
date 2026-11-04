@@ -3,7 +3,7 @@
 # Datenschutzerklärung MyTCO — Entwurf
 
 Text für die Mitglieder, in MyTCO und als Verweis auf den Login-Briefen. Folgt dem
-[Datenschutzkonzept](datenschutz.md). Entwurf, Freigabe durch den Vorstand (K-06);
+[Datenschutzkonzept](datenschutz.md). Entwurf, Freigabe durch den Gesamtvorstand (K-06.2);
 Platzhalter in eckigen Klammern füllt der Verein aus.
 
 ---
@@ -15,8 +15,8 @@ Stand: [Datum]
 MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Fragen zum Datenschutz an:
 [Ansprechperson], [E-Mail-Adresse des Vereins].
 
-**Welche Daten:** Name, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Lizenznummer
-und Klassierung, Ihre Anmeldungen, Resultate und Lizenzanträge. Ihre Grunddaten übernimmt
+**Welche Daten:** Name, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Mitgliedernummer,
+Lizenznummer und Klassierung, Ihre Anmeldungen, Resultate und Lizenzanträge. Ihre Grunddaten übernimmt
 der Verein aus seiner Mitgliederliste.
 
 **Wozu:** für Ihr Konto, die Clubmeisterschaft, Lizenzanträge und Benachrichtigungen, die
@@ -39,8 +39,11 @@ Sie selbst einschalten. Für nichts anderes.
 Push-Nachrichten stellt der Hersteller Ihres Browsers oder Handys zu (z. B. Google, Apple);
 sie enthalten keine Daten anderer Mitglieder.
 
-**Wie lange:** Solange Sie Mitglied sind. Nach einem Austritt wird Ihr Konto gesperrt und
-nach 3 Monaten gelöscht; Ihr Name bleibt in vergangenen Resultaten.
+**Wie lange:** Solange Sie Mitglied sind. Nach einem Austritt wird Ihr Konto gesperrt; Ihre
+Daten bleiben noch eine Frist lang, falls Sie zurückkommen [Frist, **Vorschlag K-38:** 1 Jahr], und werden
+dann gelöscht. Löscht der Verein Ihr Mitglied, zum Beispiel auf Ihren Wunsch, ist Ihr Konto
+sofort gesperrt, und Ihre Daten werden nach einer Woche gelöscht. In beiden Fällen bleibt Ihr
+Name in vergangenen Resultaten.
 
 **Login:** Sie loggen sich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 Ihr Gerät das Login mit einem Cookie, bis Sie MyTCO ein Jahr nicht genutzt haben oder sich
@@ -51,7 +54,14 @@ löscht MyTCO sie spätestens beim nächsten Start. Ihre IP-Adresse wird dabei h
 24 Stunden gespeichert, damit niemand Codes durchprobieren kann; ebenso die eingetippte
 E-Mail-Adresse, nur im Arbeitsspeicher und nur, um die Zahl der Code-Mails zu begrenzen. Ändern Sie Ihre
 E-Mail-Adresse, bestätigen Sie die Änderung mit je einem Code an die alte und die neue
-Adresse. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis.
+Adresse. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis. Richten Sie freiwillig einen
+Passkey ein, speichert MyTCO je Passkey nur dessen öffentlichen Schlüssel, eine Kennung, einen
+Zähler, die Adresse der App, eine grobe Gerätebezeichnung (z. B. «iPhone») sowie wann Sie ihn
+eingerichtet und zuletzt benutzt haben. Diese Angaben löschen wir, sobald Sie den Passkey
+entfernen. Dazu kommt eine zufällige Kennung Ihres Kontos; sie entsteht, sobald Sie das erste Mal
+einen Passkey einrichten wollen (auch wenn Sie abbrechen), und bleibt, bis Ihr Konto gelöscht wird. Ihren Namen und Ihre E-Mail-Adresse zeigt Ihr Gerät aus dem eigenen
+Schlüsselbund an, MyTCO speichert sie dafür nicht zusätzlich. Ob der Hinweis auf den Passkey
+noch erscheint, merkt sich MyTCO an Ihrer Sitzung.
 
 **Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login nötig ist. Keine Werbung,
 keine Analyse-Dienste.

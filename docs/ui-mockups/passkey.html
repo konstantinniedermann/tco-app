@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="de-CH">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>MyTCO — Passkey</title>
+		<link rel="stylesheet" href="../../src/lib/design/tokens.css" />
+		<link rel="stylesheet" href="../../src/lib/design/basis.css" />
+		<link rel="stylesheet" href="mockup.css" />
+	</head>
+	<body class="mockup-seite">
+<h1>MyTCO — Passkey (#44)</h1>
+<p>
+	Jedes Thema hat jetzt seine eigene Fläche. Links das Angebot (B, wie gewählt), in der Mitte
+	die Login-Seite, rechts das Profil mit aufklappbaren Bereichen. Alle Namen sind erfunden.
+</p>
+
+<div class="mockup-reihe">
+	<figure class="mockup-geraet">
+		<div class="handy app">
+			<header class="kopf"><img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO</header>
+			<main class="inhalt">
+				<h1>Hoi Beat</h1>
+				<div class="hinweis">
+					<strong>Nächstes Mal ohne Code?</strong><br />
+					Mit einem Passkey meldest du dich mit Face ID, Fingerabdruck oder der Handy-PIN an.
+					Das empfehlen wir: Es ist schneller und sicherer als ein Code.
+					<p><button class="taste-haupt">Passkey einrichten</button> &nbsp; <button class="taste-neben">Nein, danke</button></p>
+				</div>
+				<h2>Jetzt aktuell</h2>
+				<a class="karte kachel hervor" href="#cm">
+					<span><strong>Clubmeisterschaft 2027</strong><br /><span class="leise">Anmeldung offen bis 15. Mai</span></span>
+					<span class="kachel-pfeil" aria-hidden="true">›</span>
+				</a>
+			</main>
+		</div>
+		<figcaption class="leise">
+			<strong>1 · Angebot (B)</strong>, jetzt mit Empfehlung. Erscheint nach jedem Login per Code,
+			bis man einen Passkey einrichtet. «Nein, danke» blendet es aus, bis man sich das nächste Mal
+			per Code anmeldet (meine Annahme).
+		</figcaption>
+	</figure>
+
+	<figure class="mockup-geraet">
+		<div class="handy app">
+			<header class="kopf"><img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO</header>
+			<main class="inhalt">
+				<h1>Anmelden</h1>
+				<div class="karte">
+					<h2>Mit Passkey</h2>
+					<p>Am schnellsten: mit Face ID, Fingerabdruck oder Handy-PIN.</p>
+					<button class="taste-neben taste-breit">Mit Passkey anmelden</button>
+					<p class="leise">Noch keinen? Nach dem Login richtest du ihn mit einem Tipp ein.</p>
+				</div>
+				<div class="karte">
+					<h2>Mit Code</h2>
+					<p>Tipp den Code aus deinem Brief ein.</p>
+					<div class="feld feld-code">
+						<label for="code">Code aus dem Brief</label>
+						<span class="feld-hilfe">10 Zeichen, gross oder klein ist egal</span>
+						<input id="code" value="" autocomplete="one-time-code" />
+					</div>
+					<button class="taste-haupt taste-breit">Anmelden</button>
+					<p><br /><a href="#mail">Kein Brief zur Hand? Code per E-Mail</a></p>
+				</div>
+			</main>
+		</div>
+		<figcaption class="leise">
+			<strong>2 · Login</strong> in zwei Flächen. Die rote Haupttaste bleibt beim Code, weil jedes
+			Mitglied das erste Mal mit dem Brief kommt und pro Bildschirm nur eine Haupttaste erlaubt ist
+			(UI-04). Der Passkey steht oben und wird empfohlen.
+		</figcaption>
+	</figure>
+
+	<figure class="mockup-geraet">
+		<div class="handy app">
+			<header class="kopf"><img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO</header>
+			<main class="inhalt">
+				<h1>Profil</h1>
+				<details class="karte klappe">
+					<summary class="klappe-titel">Meine Angaben</summary>
+					<p class="leise">Kommt später (Adresse, Telefon, Lizenz …)</p>
+				</details>
+				<details class="karte klappe" open>
+					<summary class="klappe-titel">Anmelden mit Passkey</summary>
+					<div>
+						<div class="kachel">
+							<span><strong>iPhone</strong><br /><span class="leise">eingerichtet am 4.11.2026 · zuletzt heute</span></span>
+							<button class="taste-neben">Entfernen</button>
+						</div>
+						<div class="kachel">
+							<span><strong>Windows-PC</strong><br /><span class="leise">eingerichtet am 6.11.2026 · zuletzt vor 3 Tagen</span></span>
+							<button class="taste-neben">Entfernen</button>
+						</div>
+						<button class="taste-neben taste-breit">Passkey auf diesem Gerät einrichten</button>
+						<p class="leise">Gilt für alle Geräte mit demselben Apple- bzw. Google-Konto. Der Code per E-Mail funktioniert immer.</p>
+					</div>
+				</details>
+				<div class="karte">
+					<button class="taste-neben">Abmelden</button>
+				</div>
+			</main>
+			<nav class="reiter" aria-label="Hauptnavigation">
+				<a href="#start">Start</a>
+				<a href="#profil" aria-current="page">Profil</a>
+			</nav>
+		</div>
+		<figcaption class="leise">
+			<strong>3 · Profil</strong>: Bereiche zum Auf- und Zuklappen. Den Baustein «Aufklappbereich»
+			gibt es im UI-Leitbild noch nicht. Er kommt zuerst dorthin, dann in den Code. Reiter vorerst
+			nur Start und Profil.
+		</figcaption>
+	</figure>
+</div>
+	</body>
+</html>

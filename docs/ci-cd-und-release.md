@@ -35,7 +35,7 @@ dort nie hin (DS-08).
 Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
 (43 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
-#29, Konten und Adresse hängen an K-04 und K-10), spätestens vor dem Release *Mitglieder-Login*.
+#29; die Konten laufen auf eine Vereinsadresse, K-04.1; die Adresse hängt an K-10), spätestens vor dem Pilot der [Testgruppe](testgruppe.md) (Etappe *Pilot*).
 Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
 
 ## Ablauf
@@ -138,7 +138,7 @@ Sicherungsziel, ohne unverschlüsselte Datei, und löscht Sicherungen nach 30 Ta
 Timer, danach prüft `probe` die frische Sicherung in einer Wegwerf-Datenbank ohne Verbindung nach
 aussen. Eingespielt und zurückgespielt werden nur vollständige Läufe. Die Probe-Daten bleiben
 auf dem Server (SI-16); die Sicherung selbst verlässt ihn nur verschlüsselt, Richtung
-S3-kompatiblem Ziel (Ziel legt [#10](https://github.com/konstantinniedermann/tco-app/issues/10) fest).
+S3-kompatiblem Ziel (Vorschlag in [Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung), festgelegt mit dem Hosting).
 
 - **30 Tage:** restic zählt sie je Umgebung und Datei (Dump, Zählung) ab der neuesten Sicherung,
   nicht ab heute. Bleibt die Sicherung aus, bleiben auch die alten erhalten.
@@ -212,7 +212,8 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   automatisch.
 - **Restrisiko** (bewertet im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
   Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
-  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten, hängt an K-04). Die
+  Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten bei einer Übergabe, wenn das
+  Repo das Konto wechselt, [Betrieb und Übergabe](betrieb-und-uebergabe.md#übergabe-checkliste)). Die
   Reichweite ist dort am 02.11.2026 richtiggestellt worden und **vom Projektleiter neu zu
   bestätigen**:
   - Wer ins Repo pushen kann, kann direkt auf `main` pushen (davor schützt nur der lokale
@@ -224,7 +225,8 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
     denselben Server trotzdem Live. Pushen können der Projektleiter und die Hauptansprechperson
     im Vorstand: Mitarbeitende eines privaten Repos auf einem Privatkonto haben immer
     Schreibrecht (B: [GitHub Docs](https://docs.github.com/en/account-and-profile/reference/permission-levels-for-a-personal-account-repository)).
-    Eine reine Leserolle gibt es erst in einer Organisation (K-04).
+    Eine reine Leserolle gibt es erst in einer Organisation; das Repo bleibt bis zu einer
+    Übergabe auf dem Privatkonto ([Betrieb und Übergabe](betrieb-und-uebergabe.md#konten)).
   - Ein Schadpaket im Bau landet im Image und läuft damit live, auch ohne den Schlüssel, und
     mit dem `ausliefern` des Images auch als root-gleicher Benutzer auf dem Server.
     Dagegen helfen nur die Malware-Prüfung und die Prüfung der Pakete vor der Aufnahme.
@@ -239,9 +241,9 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 | Server, je Umgebung | `geheim.env`: Datenbank-Passwort, Schlüssel für die Codes (`MYTCO_CODE_SCHLUESSEL`, je eigener für Test und Live), Zugang zum E-Mail-Versand (`MYTCO_SMTP_URL`), Absender, Kontakt, Adresse der Umgebung, auf Test der einzige Mail-Empfänger (Projektleiter); Schlüssel für Push folgt mit der Push-Funktion |
 | Server, gemeinsam | `proxy.env` (Adressen, Passwort-Hash für Test), `sicherung.env` (Ziel und Zugang der Sicherung) |
 
-Die Dateien liegen nur auf dem Server (Rechte 600), im Repo stehen Vorlagen ohne Werte. Wo die
-Geheimnisse für eine Nachfolge dokumentiert sind, regelt
-[#10](https://github.com/konstantinniedermann/tco-app/issues/10).
+Die Dateien liegen nur auf dem Server (Rechte 600), im Repo stehen Vorlagen ohne Werte. Welche davon
+ausserhalb des Servers aufbewahrt werden müssen und wo, steht in
+[Betrieb und Übergabe](betrieb-und-uebergabe.md#geheimnisse).
 
 ## Einstellungen der App
 
@@ -254,11 +256,12 @@ werden sie nicht geprüft.
 | Variable | Inhalt | Pflicht |
 |----------|--------|---------|
 | `DATABASE_URL` | Verbindung zur PostgreSQL-Datenbank der Umgebung | ja |
+| `ORIGIN` | Öffentliche Adresse der Umgebung (z. B. `https://my.tcolten.ch`). Daraus leitet der Server die Adresse für Passkeys ab: Ein Wechsel macht alle Passkeys ungültig. Bei einem Adresswechsel (K-10) zusammen mit `MYTCO_ADRESSE` und den Adressen in `proxy.env` ändern | ja (auf dem Server) |
 | `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
 | `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
 | `MAIL_NUR_AN` | Nur Test: alle Mails werden an diese eine Adresse umgeleitet. Auf Live leer. Ein Wert, der keine Mail-Adresse ist, lässt die App nicht starten. Ohne sie lädt `scripts/testdaten.ts` nichts | nein |
 | `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
-| `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text, steht im Brief und in der Meldung «Code schon benutzt» (Annahme K-21) | ja |
+| `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text für «Wende dich an …», steht im Brief, in der Meldung «Code schon benutzt» und auf der Seite Hilfe (ohne Login lesbar, `/api/kontakt`; darum eine Vereins-Adresse, keine private Nummer; Annahme K-21) | ja |
 | `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
 
 **Schnittstelle zu [#32](https://github.com/konstantinniedermann/tco-app/issues/32):**
@@ -291,12 +294,12 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 | Secret-Scan über die ganze Historie (gitleaks) | — | Hook und CI |
 | ESLint mit Svelte-Regeln, Prettier | ADR-002, Arbeitsregeln | vorhanden |
 | `svelte-check`, Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
-| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions | ADR-002 | vorhanden |
+| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN` (die der Rechte-Test abdeckt) und reichen `holeAdminDienste()` nur weiter; andere Routen nutzen `lib/server/admin` nicht | ADR-002, RR-07 | vorhanden |
 | Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
-| Playwright Ende-zu-Ende in drei Umgebungen mit axe; Screenshots als Artefakt des Laufs, 30 Tage | Testkonzept | vorhanden |
+| Playwright Ende-zu-Ende in drei Umgebungen mit axe; Screenshots als Artefakt des Laufs, 30 Tage; Browser-Download je Versuch höchstens 5 Minuten, bis zu 3 Versuche | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
 | Docker-Image baut | ADR-003 | vorhanden |
 | Rauchtest des Images (Start, Migration, `/api/status`) | ADR-003 | vorhanden |
@@ -334,7 +337,9 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 ## Versionen
 
 - Schema `Hauptversion.Nebenversion.Korrektur`. Die erste Version mit Code ist `0.1.0`, das
-  erste Release *Mitglieder-Login* wird `1.0.0`.
+  erste Release *Mitglieder-Login* wird `1.0.0`. Davor gehen eine oder mehrere Vorabversionen 0.x für den
+  Pilot der [Testgruppe](testgruppe.md) auf Live (Etappe *Pilot*), mit Checkliste auf Test wie
+  jedes Release.
 - **Nebenversion** für eine neue Etappe oder Funktion, **Korrektur** für Fehlerbehebungen,
   **Hauptversion** nur, wenn Mitglieder etwas umstellen müssen (z. B. Umstieg auf die
   Store-App).

@@ -116,98 +116,86 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
-### 2026-11-03 — SMTP-Verbindung: Zertifikatsprüfung abschaltbar, kein eigenes Zeitlimit
+### 2026-11-04 — Doku-Abgleich vor 0.4.0: offene Punkte ohne Sofort-Fix
 
 **Thema:** Betrieb
 
-**Fundort:** `src/lib/server/einstellungen.ts` → `tlsErzwungen`, Mail-Versand über `MYTCO_SMTP_URL`.
+**Fundort:** `betrieb/bin/ausliefern:233-246`, `docs/ci-cd-und-release.md` (Rückfall, Ausblick, Actions-Minuten), `docs/testkonzept.md:30-32, 47-49`, `src/lib/server/admin/schnittstellen.db.test.ts`, `src/lib/server/admin/mitglieder.db.test.ts:73, 82, 177`, `src/lib/server/db/schema.ts:58`, `docs/fachmodell.md:59, 61`, `docs/ui-leitbild.md:214`, `src/routes/+page.svelte:39-44`, `docs/datenschutz.md` (Sitzungen).
 
-**Beobachtung:** `tlsErzwungen` prüft nur das Schema und `requireTLS`. nodemailer übernimmt weitere Optionen aus der Query der URL; `tls.rejectUnauthorized=false` schaltete die Prüfung des Zertifikats ab. Ein eigenes Zeitlimit für SMTP fehlt (Vorgaben von nodemailer: 2 Minuten Verbindungsaufbau, 10 Minuten Leerlauf); ein hängender Mailserver verzögert auf Test den Schritt «testdaten laden».
+**Beobachtung:** (1) Scheitert die Migration beim Ausliefern, wird Test vorher geleert und bleibt ohne App; auf Live läuft die alte App weiter, die neue Einrichtung bleibt aber unter `live/betrieb/`. Die Doku beschreibt den Rückfall nur für «App antwortet nicht». (2) Das Testkonzept verspricht pro Schnittstelle den Fall «gesperrtes Konto»; die Schnittstellen-Tests der Verwaltung prüfen ihn nicht, nur der Rollen-Dienst. (3) Die Verwaltung ist eine Kachel auf der Startseite, laut UI-Leitbild ein Eintrag unter *Profil* — Entscheid des Projektleiters offen. (4) Kleinigkeiten: Tests zur Mitgliedernummer tragen die ID FR-25 statt A-MITGLIED-07; FR-25 ist teilweise umgesetzt (eindeutige E-Mail), steht auf geplant; Fachmodell nennt beim Passkey nur Schlüssel und Kennung (Datenschutz ist vollständig) und beim Verlauf nicht «gelöschtes Konto»; Datenschutz nennt den Zeitpunkt der Anmeldung je Sitzung nicht ausdrücklich; Testkonzept nennt als ersten E2E-Ablauf «Daten ergänzen» (FR-02, noch geplant); Kommentar `schema.ts:58` zur Passkey-Kennung ungenau; `proxy.env`-Werte `MYTCO_TEST_BENUTZER`, `MYTCO_TLS`, `MYTCO_HTTP_PORT`/`HTTPS_PORT`, Uhrzeit des Timers (02:30), Wiederholung von `sichern` und Aufräumen alter Images nicht dokumentiert; «innert einer Minute (S)» ist belegt (B); `secret-scan.yml` bricht vorherige Läufe ab, anders als in «Actions-Minuten» gesagt.
 
-**Ursprung:** #39, Final-Review.
+**Ursprung:** Doku-Abgleich vor Release 0.4.0 (Bereiche App, Setup, Betrieb, Daten/Tests).
 
-**Einschätzung:** Tritt nur bei absichtlicher Fehleinstellung durch den Betreiber auf. Vorläufig: Einstellungssache des Betreibers; in `betrieb/README.md` dokumentieren, wenn der Mail-Anbieter gewählt ist (K-11).
+**Einschätzung:** Nichts davon führt Mitglieder oder Vorstand in die Irre. (1) vor der ersten Auslieferung mit #39 klären; (2) mit der nächsten Etappe von #43; (3) braucht eine Entscheidung; (4) gesammelt bei Gelegenheit.
 
-### 2026-11-03 — Datenbank-Container loggen bei scheiterndem Einspielen Werte
-
-**Thema:** Betrieb
-
-**Fundort:** `docker logs` der db-Dienste (Test und Live), Einspielen in `betrieb/bin/wiederherstellen`.
-
-**Beobachtung:** Scheitert das Einspielen, schreibt der Postgres-Server in sein eigenes Log `DETAIL: Failing row contains (…)` und `STATEMENT: COPY …` mit Werten aus der Datenbank. Das liegt ausserhalb von `protokoll.log`, das die Werte bewusst nicht enthält.
-
-**Ursprung:** #39, Review Task 6.
-
-**Einschätzung:** Betrifft DS-06 und die zeitliche Begrenzung der Docker-Logs (offener Teil von #39, Rotation nach Zeit). Vorläufig: beim Einrichten des Servers klären, ob `log_error_verbosity` oder die Log-Aufbewahrung reicht.
-
-### 2026-11-03 — Nächtliche Sicherung nimmt keine Sperre gegenüber `wiederherstellen`
+### 2026-11-04 — Ein Teil der Arbeitsweise liegt nicht im Repo und ginge bei einer Übergabe verloren
 
 **Thema:** Betrieb
 
-**Fundort:** `betrieb/bin/sichern` (`forget --prune`), `betrieb/bin/wiederherstellen` (zwischen `snapshot suchen` und `einspielen`).
+**Fundort:** `CLAUDE.md` (verweist auf die übergeordnete CLAUDE.md und auf Skills ausserhalb), `docs/betrieb-und-uebergabe.md` (Übergabe-Checkliste, Schritt 1).
 
-**Beobachtung:** Der nächtliche `sichern`-Lauf nimmt keine Sperre. Läuft er zwischen `snapshot suchen` und `einspielen` von `wiederherstellen`, kann sein `forget --prune` einen knapp 30 Tage alten, gerade gewählten Lauf entfernen.
+**Beobachtung:** Die Nachfolge soll wie der Projektleiter mit Claude Code arbeiten. Das Repo bringt aber nur die Projekt-`CLAUDE.md` und den Skill `tco-branching` mit. Nur auf dem Mac des Projektleiters liegen: die übergeordnete CLAUDE.md (Workflow, Dependencies, Commit-Konvention, Umgang mit Befunden), die Skills `session-start` und `session-wrap-up`, der Agent `cas-reviewer`, der Hook `dep-guard`, das superpowers-Plugin und die Memories mit den Fallen (z. B. WebKit in der CI, Worktree-Isolation, Einstiegsseite im E2E).
 
-**Ursprung:** #39, Review Task 6.
+**Ursprung:** #10, Brainstorming zur Übergabe; vom Projektleiter bewusst aus #10 ausgeklammert.
 
-**Einschätzung:** Selten (enges Zeitfenster, nur bei ältestem Lauf). Vorläufig: bewusst nichts tun, wieder ansehen, wenn Wiederherstellungen häufiger werden.
+**Einschätzung:** Vor einer Übergabe nötig, vorher ohne Folge. Was nur für tco-app gilt, liesse sich ins Repo holen (`.claude/`, Fallen nach `docs/`); berührt die gemeinsamen Regeln der anderen CAS-Projekte.
 
-### 2026-11-03 — `make release-check`: zwei Restlücken aus dem Review
+### 2026-11-04 — Hilfe beim Start: Kleinigkeiten aus dem Review
 
-**Thema:** Arbeitsablauf
+**Thema:** App
 
-**Fundort:** `scripts/pruefungen/release.ts` (`pruefeRelease`, Tag-Abfrage im Hauptteil).
+**Fundort:** `src/lib/ui/Zeichnung*.svelte`, `src/lib/ui/Anleitung.svelte`, `src/lib/server/brief/symbole.ts`, `src/routes/willkommen/+page.svelte`, `src/routes/hilfe/+page.svelte`, `src/lib/hilfe/installation.svelte.ts`.
 
-**Beobachtung:** (1) Die Version, die gerade released wird, ist von der Marker-Prüfung ausgenommen. Fehlt bei ausgeschaltetem Live der Marker «nicht ausgeliefert», meldet die Prüfung das erst beim nächsten Release. (2) Gezählt werden die lokalen Tags: Lokal gesetzte Tags zählen mit, auf GitHub gelöschte bleiben lokal stehen.
+**Beobachtung:** (1) Die Zeichnung der Anleitung zeigt fest `my.tcolten.ch`, auch auf Test. (2) Teilen- und Menü-Symbol stehen in Anleitung, Zeichnung und Brief je einzeln; ändert Apple oder Google ein Symbol, sind drei Stellen nachzuziehen. (3) Nach «Abbrechen» im Android-Dialog ist die Karte «Zuerst auf den Startbildschirm» bis auf Titel und Satz leer, die Anleitung steht im offenen Bereich «Klappt nicht?» darunter. (4) Solange der Android-Dialog offen ist, baut die Seite kurz um (Anleitung in der Karte, Bereich «Klappt nicht?» weg). (5) MyTCO hält Chromes eigenen Install-Hinweis auf jeder Seite zurück, die Taste gibt es nur auf der Einstiegsseite. (6) «‹ Zurück» auf der Hilfe führt immer nach `/`, im Handy-Browser also zur Einstiegsseite statt zurück zum Login. (7) Annahme des Projektleiters für die Anleitung: iPhones mit iOS 26 oder neuer, Android-Handys höchstens 5 Jahre alt; betrifft den Eintrag zur Untergrenze unten.
 
-**Ursprung:** cas-reviewer zu `feat/release-abgleich`, bewusst nicht umgesetzt.
+**Ursprung:** #47, abschliessendes Code-Review und cas-reviewer.
 
-**Einschätzung:** (1) liesse sich mit `gh variable get AUSLIEFERUNG_LIVE` schliessen, dann hinge die Prüfung aber an GitHub. (2) ist ohne Folgen, solange nur die CI Tags setzt. Wieder ansehen, wenn Live eingeschaltet wird.
+**Einschätzung:** Für den Pilot ohne Folge. Was die Testgruppe dazu meldet, entscheidet über (3), (5) und (6); (2) lohnt sich, sobald ein Symbol sich ändert.
 
-### 2026-11-03 — Releases nur mit Werkzeug-Änderungen erzwingen eine neue Version
-
-**Thema:** Arbeitsablauf
-
-**Fundort:** `scripts/pruefungen/release.ts` (Regel aus `nur-doku.ts`), Skill `tco-branching` Schritt 4a.
-
-**Beobachtung:** `make release-check` verlangt eine höhere Version, sobald seit `main` irgendeine Datei ausser Doku geändert wurde, also auch bei Skripten, Makefile oder Workflows, die die App nicht verändern. Mit dem Merge von `feat/release-abgleich` gilt das bereits für das nächste Release.
-
-**Ursprung:** Einführung von `make release-check`.
-
-**Einschätzung:** Die Regel ist gleich wie in der CI (Code-Jobs, Auslieferung), darum bewusst so gewählt. Führt das zu vielen Korrekturversionen ohne Änderung an der App, eine engere Regel prüfen (z. B. nur Dateien, die ins Image gehen).
-
-### 2026-11-03 — Die Seite `/datenschutz` gibt es nicht, Brief und Erklärung verweisen darauf
-
-**Thema:** Datenschutz
-
-**Fundort:** `src/lib/server/brief/brief.ts` (Link `<Adresse>/datenschutz`), `docs/datenschutzerklaerung.md`, Login-Seite, DS-09, Matrix in `docs/rollen-und-rechte.md`.
-
-**Beobachtung:** Der Brief und die Datenschutzerklärung nennen `<Adresse>/datenschutz`. Unter `src/routes` gibt es die Seite nicht, und die Login-Seite verlinkt sie nicht, obwohl DS-09 und die Matrix von Rollen und Rechte sie vorsehen.
-
-**Ursprung:** Doku-Abgleich vor Release 0.3.0.
-
-**Einschätzung:** Blockiert den Versand echter Briefe an Mitglieder, nicht das Release ohne Server. Vor #40 (Testgruppe) bauen.
-
-### 2026-11-03 — `ausliefern` auf Test: Fehler nach `down --volumes` führt nicht zum Rückfall
+### 2026-11-04 — Keine Untergrenze für iOS- und Android-Versionen festgelegt
 
 **Thema:** Betrieb
 
-**Fundort:** `betrieb/bin/ausliefern`, Schritte «migrieren» und «testdaten laden».
+**Fundort:** `docs/testkonzept.md` (*Testgruppe*), `docs/anforderungen/anforderungen.md` (N-APP).
 
-**Beobachtung:** Auf Test wird die Datenbank vorher mit `down --volumes` verworfen. Scheitert danach «migrieren» oder «testdaten laden», endet der Lauf mit `scheitern`, nicht mit `rueckfall`; Test bleibt ohne laufende App. Die Doku sagt nur «scheitert».
+**Beobachtung:** Das Testkonzept definiert «älteres Handy» (iOS 16/17, Android 9–11), aber kein Dokument sagt, ab welcher Version MyTCO unterstützt wird. Passkeys gibt es erst ab iOS 16 und Android 9, Web Push auf dem iPhone erst ab iOS 16.4.
 
-**Ursprung:** Doku-Abgleich vor Release 0.3.0.
+**Ursprung:** #40, Brainstorming und Review der Testgruppe.
 
-**Einschätzung:** Auf Test vertretbar, da es keine Daten zu schützen gibt. Beim Inbetriebnehmen (#39) entscheiden und die Doku entsprechend präzisieren.
+**Einschätzung:** Bis zum Pilot ohne Folge, die Testgruppe liefert Erfahrungswerte. Vor dem Briefversand (#48) sollte feststehen, was die Hilfe Mitgliedern mit älteren Handys sagt.
 
-### 2026-11-03 — `probe` ignoriert Zusatzargumente still
+### 2026-11-04 — Dependabot-PR #38 hat seit dem Neuaufsetzen keinen CI-Lauf
 
 **Thema:** Betrieb
 
-**Fundort:** `betrieb/bin/probe` gegen `betrieb/bin/sichern` und `betrieb/bin/wiederherstellen`.
+**Fundort:** PR #38, Head `7fc79b06` (neu aufgesetzt am 04.11.2026 um 09:48 UTC); `.github/workflows/check.yml` (`pull_request` auf `dev`).
 
-**Beobachtung:** `sichern` und `wiederherstellen` weisen überzählige Argumente mit `fehler` ab, `probe` ignoriert sie ohne Meldung.
+**Beobachtung:** `gh pr checks 38` meldet «no checks reported», `mergeable` steht auf UNKNOWN. Der Head liegt 40 Commits hinter `dev`. Ein roter Lauf wäre wegen der Peer-Abhängigkeiten zu erwarten, aber es läuft gar keiner.
 
-**Ursprung:** Doku-Abgleich vor Release 0.3.0.
+**Ursprung:** Beobachtungs-Auswertung vom 04.11.2026 (Prüfung des PR-Eintrags).
 
-**Einschätzung:** Niedrig. Bei der nächsten Änderung an `probe` angleichen.
+**Einschätzung:** Ohne Folge, solange der PR offen bleibt. Die Ursache ist unbekannt. Kommt Dependabot mit einer Fassung, die TypeScript 7 erlaubt, fehlt sonst die Prüfung; dann `@dependabot rebase` und kontrollieren, ob `Check` läuft.
+
+### 2026-11-04 — «Ganzer Verlauf» zeigt höchstens 100 Einträge, ohne es zu sagen
+
+**Thema:** Verwaltung
+
+**Fundort:** `src/routes/verwaltung/verlauf/+page.svelte` (ruft `ladeVerlauf` ohne `grenze`), `getVerlauf` in `src/lib/server/admin/schnittstellen.ts` (`VERLAUF_STANDARD = 100`).
+
+**Beobachtung:** Die Seite eines Mitglieds sagt jetzt «die letzten 50 Einträge» und verlinkt «Ganzer Verlauf ›». Die Verlaufsseite holt aber standardmässig nur 100 Einträge und zeigt nicht an, wenn es mehr gibt. Die Seite ohne Filter (alle Mitglieder) ist genauso gekürzt.
+
+**Ursprung:** Nacharbeit zu #43 (Kurzinfo «die letzten 50»).
+
+**Einschätzung:** Heute ohne Folge, kaum ein Mitglied hat über 100 Einträge. Mit dem Einlesen (Etappe 2) wächst der Gesamtverlauf schnell; dann braucht die Verlaufsseite die gleiche ehrliche Anzeige oder ein Weiterblättern.
+
+### 2026-11-04 — «Rollen speichern» überschreibt Rollen, die ein anderer Admin inzwischen vergeben hat
+
+**Thema:** Verwaltung
+
+**Fundort:** `setzeRollen` in `src/lib/server/admin/rollen.ts`, `speichereRollen` in `src/lib/verwaltung/api.ts`.
+
+**Beobachtung:** Die Seite schickt die ganze Rollenliste, der Server ersetzt die gespeicherten Rollen ohne Vergleich mit dem geladenen Stand. Admin A vergibt «CM»; Admin B hat die Seite noch offen, vergibt «Lizenz» und entzieht damit As «CM» still. Der Schutz für den letzten Admin (RR-03) hält, der Verlauf zeigt das Entziehen. Bei den Angaben ist dasselbe seit der Nacharbeit zu #43 geschützt (409 «veraltet»).
+
+**Ursprung:** Review (cas-reviewer) der Nacharbeit zu #43.
+
+**Einschätzung:** Bei zwei bis drei Admins selten. Ein Fix übernimmt das Muster der Angaben (geladene Rollen mitschicken, in der Transaktion vergleichen, 409).

@@ -1,22 +1,27 @@
 import type { RequestEvent } from '@sveltejs/kit';
+import type { Db } from '../db/index.ts';
+import { istAdmin } from '../admin/rollen.ts';
 import type { LoginDienst, LoginErgebnis } from './dienst.ts';
 import { SITZUNG_COOKIE, SITZUNG_GUELTIG_MS } from './sitzung.ts';
 
-export type Ereignis = Pick<RequestEvent, 'request' | 'cookies' | 'getClientAddress' | 'locals'>;
+export type Ereignis = Pick<
+	RequestEvent,
+	'request' | 'cookies' | 'getClientAddress' | 'locals' | 'url'
+>;
 
 const KOPF = { 'cache-control': 'no-store' };
 
-function antwort(status: number, inhalt?: object): Response {
+export function antwort(status: number, inhalt?: object): Response {
 	if (inhalt === undefined) return new Response(null, { status, headers: KOPF });
 	return Response.json(inhalt, { status, headers: KOPF });
 }
 
-function istJson(e: Ereignis): boolean {
+export function istJson(e: Ereignis): boolean {
 	return (e.request.headers.get('content-type') ?? '').toLowerCase().startsWith('application/json');
 }
 
 // Ein kaputter oder fremdartiger Körper zählt als leer; er wird nie geloggt (SI-05).
-async function leseKoerper(e: Ereignis): Promise<Record<string, unknown>> {
+export async function leseKoerper(e: Ereignis): Promise<Record<string, unknown>> {
 	try {
 		const roh: unknown = await e.request.json();
 		return typeof roh === 'object' && roh !== null && !Array.isArray(roh)
@@ -39,7 +44,7 @@ function setzeCookie(e: Pick<Ereignis, 'cookies'>, kennung: string): void {
 	});
 }
 
-function loginAntwort(e: Ereignis, r: LoginErgebnis): Response {
+export function loginAntwort(e: Ereignis, r: LoginErgebnis): Response {
 	switch (r.ergebnis) {
 		case 'ok':
 			setzeCookie(e, r.kennung);
@@ -53,7 +58,7 @@ function loginAntwort(e: Ereignis, r: LoginErgebnis): Response {
 	}
 }
 
-const formatFehler = () => antwort(415, { fehler: 'format' });
+export const formatFehler = () => antwort(415, { fehler: 'format' });
 
 export async function postBrief(d: LoginDienst, e: Ereignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
@@ -81,9 +86,16 @@ export async function postMail(d: LoginDienst, e: Ereignis): Promise<Response> {
 	);
 }
 
-export function getSitzung(e: Ereignis): Response {
+// RR-07: `verwaltung` blendet nur die Navigation ein; durchgesetzt wird es an den Admin-Schnittstellen.
+// Weder `mitgliedId` noch `sitzungHash` gehen an den Browser.
+export async function getSitzung(e: Ereignis, db: Db): Promise<Response> {
 	const konto = e.locals.konto;
-	return konto ? antwort(200, { vorname: konto.vorname }) : antwort(401, {});
+	if (!konto) return antwort(401, {});
+	return antwort(200, {
+		vorname: konto.vorname,
+		passkeyHinweis: konto.passkeyHinweis,
+		verwaltung: await istAdmin(db, konto.kontoId)
+	});
 }
 
 export async function postLogout(d: LoginDienst, e: Ereignis): Promise<Response> {

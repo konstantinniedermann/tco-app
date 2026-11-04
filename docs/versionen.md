@@ -7,6 +7,51 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+## 0.4.0 — Hilfe beim Start, Mitgliederverwaltung und Passkey, nicht ausgeliefert
+
+Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test
+([Versionen](ci-cd-und-release.md#versionen)). Doku-Abgleich vor dem Release: zwei Befunde auf
+hoch behoben (Befehl für den ersten Admin auf Live, Türsteher nach einem Umzug des Repos neu
+einspielen), Kleinigkeiten behoben, der Rest als Beobachtung eingetragen (u. a. gescheiterte
+Migration beim Ausliefern, Ort des Eintrags «Verwaltung»).
+
+- Betrieb und Übergabe (#10): neue Seite [Betrieb und Übergabe](betrieb-und-uebergabe.md) mit
+  Konten und Eigentum, Geheimnissen (was ausserhalb des Servers liegen muss), Grundsätzen für
+  Sicherung und Überwachung und Übergabe-Checkliste; Sicherungsablage als Vorschlag; neue Frage
+  K-49 (Ablage der Geheimnisse). Dazu die [Recherche tcolten.ch](recherche/2026-11-04-tcolten-website.md)
+  (Anbieter und Domain, Statuten) mit Stand-Vermerken in den Abklärungen.
+- Hilfe beim Start (#47, A-HILFE-01, -02): im Handy-Browser zeigt eine Einstiegsseite zuerst die
+  Anleitung zum Startbildschirm als Animation (iPhone, Android mit Taste «MyTCO installieren»),
+  danach den Login; Seite Hilfe ohne Login, Link «Hilfe» in der Fusszeile; Baustein Anleitung
+  und Regel UI-09 im UI-Leitbild; Kurzanleitung im Brief auf die aktuellen Beschriftungen von
+  iPhone und Android gebracht.
+- Testgruppe vorbereitet (#40): neue Seite [Testgruppe](testgruppe.md) mit Ablauf, Aufträgen,
+  Texten für Mail und Chat und Formularfragen; neue Etappe *Pilot* mit Vorabversion 0.x auf
+  Live vor 1.0.0; neue Anforderungen zur Hilfe beim Start (A-HILFE-01, -02); Datenschutzkonzept
+  um die Testgruppe ergänzt; K-20.1 vom Projektleiter beantwortet.
+- Mitgliederverwaltung für Admins, Etappe 1 von #43 (A-MITGLIED-01, -02, -06, A-ROLLE-01, -02,
+  SI-08): Bestätigung mit Mail-Code (24 Stunden), Mitglieder anlegen, suchen und bearbeiten, Rollen
+  vergeben (der letzte Admin bleibt), alle Sitzungen eines Mitglieds beenden, Änderungsverlauf ohne Werte (die letzten 50, auf der Seite
+  Änderungsverlauf die letzten 100), erster Admin per Befehl `admin-festlegen`. Der Hinweis an die alte E-Mail-Adresse bei einer Änderung durch den Admin fehlt noch
+  (kommt mit FR-25, SI-09). Neuer Brief-Code und Brief-Serie folgen mit
+  Etappe 2, Austritt (Login gesperrt), Löschen und Export mit Etappe 3.
+- Nacharbeit zu #43 vor Etappe 2: Speichern zweier Admins am selben Mitglied überschreibt nichts
+  mehr still (Meldung, «Neuen Stand laden»); Fehlerseite mit Rahmen und Weg zurück, auch in der
+  Verwaltung; Mitgliedernummer eindeutig ohne Rücksicht auf Gross-/Kleinschreibung (Migration
+  `0005`); unsichtbare Sonderzeichen in Name, Strasse und Ort abgelehnt; Kurzinfo «die letzten
+  50 Einträge», wenn der Verlauf gekürzt ist; Bauregel prüft die Admin-Routen genauer.
+- CI: Der Browser-Download für die E2E-Tests bricht nach 5 Minuten ab und versucht es bis zu
+  dreimal, statt bis zum Job-Limit von 20 Minuten zu hängen.
+- Freiwilliger Passkey als zweiter Login-Weg (#44, A-LOGIN-07, [ADR-005](adr/adr-005-passkey-simplewebauthn.md)):
+  Hinweis nach dem Code-Login, Login in zwei Karten, neue Seite *Profil* mit den Passkeys,
+  Reiter *Start* und *Profil*. Neue Pakete `@simplewebauthn/server` und `/browser`. Nachweis mit
+  virtuellem Authenticator in Chrome; Prüfung auf echten Geräten offen bis #39.
+- Antworten des Vorstands vom 03.11.2026 übertragen: neue Termine der Etappen, Junioren ab der
+  CM 2027, Passkey freiwillig als Komfort ab *Mitglieder-Login*, Einlesen der Mitgliederliste geplant,
+  Kosten für 300–500 Mitglieder.
+- Vorschläge an den Verein: Eltern führen das Konto ihres Kindes bis zu einer Altersgrenze (K-08),
+  ausgetretene Mitglieder bleiben eine Frist lang inaktiv (K-38).
+
 ## 0.3.0 — Test-Umgebung und Absicherungen, nicht ausgeliefert
 
 Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test

@@ -7,6 +7,92 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Auswertung vom 04.11.2026 — 34 Einträge, gegen `dev` (a694133) verifiziert
+
+Bilanz: 0 verworfen (1 teilweise widerlegt, 1 überholt) · 18 abgehakt · 3 mitgemacht · 4 Doku ·
+8 an Issues (#39, #43) · 1 auf drei Ausgänge verteilt (Kleinigkeiten der Mitgliederverwaltung),
+dazu 2 Nebenbefunde (einer mitgemacht, einer an #46). Bei 19 trug die Begründung ganz oder
+teilweise nicht, bei 3 weiteren war sie unvollständig (Tabelle unten). Abschnitt «Offen» danach leer.
+
+**An Issues angehängt**
+
+- 2026-11-03 — SMTP-Verbindung: Zertifikatsprüfung abschaltbar, kein eigenes Zeitlimit → [Kommentar in #39](https://github.com/konstantinniedermann/tco-app/issues/39#issuecomment-6635363278)
+- 2026-11-03 — Datenbank-Container loggen bei scheiterndem Einspielen Werte → [Kommentar in #39](https://github.com/konstantinniedermann/tco-app/issues/39#issuecomment-6635363278)
+- 2026-11-03 — `ausliefern` auf Test: Fehler nach `down --volumes` führt nicht zum Rückfall → [Kommentar in #39](https://github.com/konstantinniedermann/tco-app/issues/39#issuecomment-6635363278)
+- 2026-11-03 — Live-Sperre und `geheim.env`: zwei Restlücken → [Kommentar in #39](https://github.com/konstantinniedermann/tco-app/issues/39#issuecomment-6635363278)
+- 2026-11-04 — Zwei Admins überschreiben sich beim Speichern der Angaben still → [Kommentar in #43](https://github.com/konstantinniedermann/tco-app/issues/43#issuecomment-6635363761)
+- 2026-11-04 — Fehlerseite unter /verwaltung ohne Rahmen → [Kommentar in #43](https://github.com/konstantinniedermann/tco-app/issues/43#issuecomment-6635363761); Ursache im Wurzel-Layout
+- 2026-11-04 — Mitgliedernummer ist nur bei gleicher Gross-/Kleinschreibung eindeutig → [Kommentar in #43](https://github.com/konstantinniedermann/tco-app/issues/43#issuecomment-6635363761), hängt an K-45
+- 2026-11-04 — Bauregel prüft nicht, ob Admin-Routen nur Funktionen aus ADMIN_SCHNITTSTELLEN nutzen → [Kommentar in #43](https://github.com/konstantinniedermann/tco-app/issues/43#issuecomment-6635363761), mit zwei weiteren Wegen
+- Nebenbefund — Austritte über das Einlesen der Liste müssen RR-03 beachten → [Kommentar in #46](https://github.com/konstantinniedermann/tco-app/issues/46#issuecomment-6635364268)
+
+**Mitgemacht** (Commits direkt auf `dev`)
+
+- 2026-11-04 — DB-Test mit späterem «jetzt» löscht Sitzungen anderer Testdateien → a5853c6, Aufräum-Test mit eigener Datenbank; Gegenprobe mit abgeschaltetem Aufräumen rot
+- 2026-11-04 — Passkey: Zähler wird ohne Vergleich geschrieben → 7cf37f1 (`GREATEST`), Test zuerst rot
+- 2026-11-04 — Kleine Doppelungen im Login-Code → JSON-Kopf zusammengelegt (269d0cc), Trigger «dritter Aufrufer» war erreicht (`verwaltung/api.ts`). Sitzungsprüfung (2 Stellen) und `istEindeutigkeitsfehler` (auch `vergebenesFeld` in `mitglieder.ts`) abgehakt. Trigger: dritte Seite bzw. dritter Aufrufer
+- Nebenbefund — `release-check` verglich ohne `--no-renames` → a3fc82f
+
+**Doku**
+
+- 2026-11-04 — Neue Migration auf einem Branch setzt die geteilte lokale Datenbank zurück → Regel im Skill `tco-branching` (bd924ae); auch `make e2e` migriert die geteilte Datenbank
+- 2026-11-04 — Nach einem Merge mit neuen Paketen ist der Pre-Push-Hook im Hauptordner rot → Satz im Skill `tco-branching` (bd924ae); Memory `falle_hauptordner_node_modules` bestand schon
+- 2026-11-04 — K-48 Website-Umzug: Antwort zieht ADR-003, Kosten und Sicherheitskonzept nach sich → Folgen in `kosten.md` beim Eintrag K-48 (23ed87a); siehe Verworfen
+- 2026-11-04 — Datenschutzerklärung sagt bei «nach einer Woche gelöscht» nicht, dass der Name bleibt → a822d30
+
+**Auf drei Ausgänge verteilt**
+
+- 2026-11-04 — Kleinigkeiten in Oberfläche und Code der Mitgliederverwaltung → mitgemacht: E-Mail mit leeren Domain-Teilen (d79d53f), `STATUS` an `MitgliedStatus` gebunden (4668e3f), Klappe *Rollen* zu, Tabellenköpfe ohne Trennung (Leitbild-Ausnahme), doppeltes CSS (c75eb9d). An #43: Steuerzeichen in Textfeldern, Kurzinfo «50 Einträge» (braucht ein Feld vom Server, darum nicht Kleinkram). Abgehakt: gemeinsames `laeuft`-Flag, `legeAdminFest` ohne Transaktion, `Eintrag.detail` frei, `aenderung.aktion` ohne DB-Check, Höhe des Auswahlfelds auf dem iPhone (nicht gemessen). Trigger: nächste Arbeit an der Stelle
+
+**Abgehakt** — mit Begründung; wo der Punkt zurückkommen kann, mit Trigger
+
+- 2026-11-03 — ADR-003: Reevaluations-Trigger 1 steht kurz vor dem Auslösen → steht wörtlich in ADR-003 und im Kommentar in #10
+- 2026-11-03 — Mockups zeigen noch Termine nach dem alten Fahrplan → passt zum neuen Fahrplan (siehe Prämissen). Trigger: Antwort zu K-24.2; 4 Stellen (auch `passkey.html`)
+- 2026-11-03 — Dependabot-PR #38 (TypeScript 7) rot → der PR ist der Vorgang; Peers erlauben TS 7 weiterhin nicht. Prüfen je Paket: `npm view svelte-check peerDependencies` usw.
+- 2026-11-03 — Nächtliche Sicherung nimmt keine Sperre gegenüber `wiederherstellen` → kein Datenverlust, nur Live; als Info im [Kommentar in #39](https://github.com/konstantinniedermann/tco-app/issues/39#issuecomment-6635363278). Trigger: Wiederherstellungen werden häufiger
+- 2026-11-03 — `make release-check`: zwei Restlücken → Trigger: Live wird eingeschaltet
+- 2026-11-03 — Releases nur mit Werkzeug-Änderungen erzwingen eine neue Version → bewusste Regel (Skill, `ci-cd-und-release.md`); eine engere Regel betrifft `nur-doku.ts`, `code-stand.sh` und die Image-Kennung. Trigger: viele Korrekturversionen ohne App-Änderung
+- 2026-11-03 — Die Seite `/datenschutz` gibt es nicht → Checkliste von #40 («Datenschutzerklärung ist auf Live erreichbar») und Kommentar in #29 (Link auf der Login-Seite)
+- 2026-11-03 — `probe` ignoriert Zusatzargumente still → erst ab dem 3. Argument; `ausliefern` und `zurueck` ebenso. Trigger: nächste Änderung an `betrieb/bin`
+- 2026-11-04 — Passkey: Zahl der Passkeys je Konto unbegrenzt → Trigger: Missbrauch oder lange Liste
+- 2026-11-04 — Passkey: Einrichten-Challenge gilt je Konto → Folge schärfer als notiert (siehe Prämissen), trotzdem selten. Trigger: Meldung aus der Praxis
+- 2026-11-04 — Login-Schnittstellen importieren admin/rollen.ts → einziger Import in diese Richtung (`istAdmin`). Trigger: Planung von Etappe 3 (#43), die `rollen.ts` ohnehin umbaut
+- 2026-11-04 — Etappe 3: Austritt und Löschen müssen die Sperre aus rollen.ts nehmen → überholt, steht wörtlich in der DoD von #43
+- 2026-11-04 — Startseite: Fokus landet nach dem Passkey-Hinweis auf dem Seitenrumpf · Startseite: Scheitert «Nein, danke» am Server, kommt der Hinweis zurück · Profil: erneutes Einrichten bleibt ohne Rückmeldung · Profil: «Entfernen» nennt für Screenreader nicht das Gerät → Entscheid: jetzt nicht. Beide Startseiten-Lücken gelten auch im Zweig `'vorhanden'`. Trigger: Rückmeldung der Testgruppe (#40)
+- 2026-11-04 — E2E: Profil-Navigation mehrfach kopiert, Fehlversuche pro IP nicht zentral gezählt → 5 Stellen. Trigger: nächster Test, der Passkey- oder Fehlversuche verbraucht
+- 2026-11-04 — Testlücken aus den Task-Reviews der Mitgliederverwaltung → 9 Lücken belegt, Cascades und 404 teilweise getestet. Trigger: Fehler in einem dieser Wege
+
+**Verworfen** — Teilpunkte
+
+- *K-48: `make annahmen` meldet bei einer Antwort nichts* → `scripts/pruefungen/annahmen.ts` zählt jede ID in einem Abschnitt «Offene Fragen»; `make annahmen K=K-48` listet `docs/kosten.md` (Eintrag K-48), nach der Antwort meldet `make docs` «K-48 ist beantwortet — Annahme prüfen»
+- *Nebenbefund der Prüfung: «K-09.1 gibt es nicht»* → Unterfragen stehen nur in der Fragen-Tabelle (`abklaerungen.md`, Abschnitt zu Unterfragen); dort Blatt *Website & Hoster*, ebenso K-24.2 auf *Clubmeisterschaft*
+
+**Falsche Prämissen**
+
+| Eintrag | Behauptet | Gemessen |
+|---|---|---|
+| Mockups alter Fahrplan | Datum stammt aus dem alten Fahrplan | dort war der 15.05.2027 die Öffnung der Anmeldung; als Anmeldeschluss passt es zum neuen |
+| PR #38 | CI rot; Prüfbefehl mit drei Paketen | neu aufgesetzt, ohne CI-Lauf; `npm view a b c peerDependencies` zeigt nur `a` |
+| DB-Log mit Werten | `STATEMENT: COPY …` trägt Werte | bei `COPY … FROM stdin` nur der Befehl; Werte in DETAIL/CONTEXT (nicht gemessen) |
+| Sicherung ohne Sperre | enges Zeitfenster | so lang wie die ganze Vorab-Sicherung; nur Live; kein Datenverlust |
+| Release nur Werkzeuge | gilt für das nächste Release | 0.3.0 ist erschienen; das nächste enthält App-Code |
+| `/datenschutz` fehlt | Erklärung nennt die Adresse; DS-09 sieht den Link vor | Erklärung nennt keine Adresse; DS-09 verlangt Erreichbarkeit, den Link zeigt das Mockup |
+| `ausliefern` auf Test | zwei Schritte ohne Rückfall | drei (auch DB-Start) |
+| `probe` | ignoriert Zusatzargumente | 2. Argument wird geprüft, erst ab dem 3. still |
+| Live-Sperre | `rauchtest.sh` nur lokal | läuft auch in der CI (`check.yml`) |
+| DB-Test «jetzt» | alle DB-Tests teilen eine Datenbank; erst bei weit entferntem Datum | 13 von 17 teilen; Opfer ist `frisch`, schon ab gut einem Tag Abstand |
+| Passkey-Zähler | ohne Vergleich | die Bibliothek vergleicht, nur nicht atomar mit dem Update |
+| Challenge je Konto | das erste Gerät scheitert | schickt das erste Gerät zuerst ab, scheitern beide |
+| Zwei Admins | ohne Hinweis; Abhilfe: nur geänderte Felder | der Verlauf zeigt es; `pruefeAngaben` verlangt alle Pflichtfelder |
+| Fehlerseite Verwaltung | Fundort `verwaltung/+layout.svelte`; eine `+error.svelte` dort | Ursache Wurzel-Layout; nötig ist `src/routes/+error.svelte` |
+| Mitgliedernummer | E-Mail nach FR-25; Abgleich in Etappe 2 | Kleinschreibung kommt vom Index, nicht von FR-25; Abgleich erst mit #46 |
+| Profil erneut einrichten | Taste unter der Kachel des eigenen Geräts | eine Taste unter der ganzen Liste |
+| Doppelungen Login | JSON-Kopf zweimal | dreimal (auch `verwaltung/api.ts`); 23505-Erkennung zusätzlich in `mitglieder.ts` |
+| E2E Fehlversuche | Fehlversuche zählen | beim Passkey zählt jeder Versuch, auch ein erfolgreicher |
+| K-48 | `make annahmen` meldet nichts; K-09.1 | meldet über `kosten.md`; K-09.1 steht in der Tabelle |
+
+Unvollständig, aber nicht falsch: Fokus und «Nein, danke» auf der Startseite (auch Zweig `'vorhanden'`), Bauregel (zwei weitere Wege an der Rechteprüfung vorbei).
+
 ### Auswertung vom 03.11.2026 — 32 Einträge, gegen `dev` (bcc921f) verifiziert
 
 Bilanz: 0 ganz verworfen (3 Teilpunkte verworfen) · 1 erledigt · 15 abgehakt · 6 mitgemacht ·

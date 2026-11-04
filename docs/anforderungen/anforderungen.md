@@ -14,10 +14,13 @@ wenn sich die Anforderung verschiebt; eine gestrichene ID wird nie neu vergeben.
 Anforderungen bekommen die nächste freie Nummer im Bereich.
 
 **Quelle:** `PDF 5b` = Abschnitt im Anforderungsdokument v1.2 · `Ziel` = Zielsetzung vom
-29.10.2026 · `PL` = Vorgabe des Projektleiters ausserhalb beider Dokumente.
+29.10.2026 · `PL` = Vorgabe des Projektleiters ausserhalb beider Dokumente · `K-NN` = Antwort des Vereins
+in den [Abklärungen](../abklaerungen.md#beantwortet).
 
 **Etappe:** Milestone laut [Roadmap](../roadmap.md) — *Fundament*, *Mitglieder-Login*,
 *CM-Anmeldung*, *CM-Betrieb*, *Lizenzanträge* — oder *später* (Backlog / Optional).
+*Pilot* ist die Vorstufe von *Mitglieder-Login*: Deren Anforderungen stehen unter
+*Mitglieder-Login*, auch wenn ihr Issue im Milestone *Pilot* liegt.
 *durchgehend* heisst: gilt ab der ersten Etappe mit Produktcode für alles Weitere.
 
 **Status:** `geplant` · `später` · `offen` (wartet auf eine Antwort des Vereins) ·
@@ -39,9 +42,9 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-LOGIN-04 | Direktes Login in MyTCO, ohne Umweg über tcolten.ch (z. B. über `my.tcolten.ch`) | PDF 3b | Mitglieder-Login | geplant |
 | A-LOGIN-05 | Login-Feld oben rechts auf tcolten.ch, das nach dem Login zu MyTCO weiterleitet | PDF 3b | später | später |
 | A-LOGIN-06 | Zwei-Faktor-Login (App oder SMS/E-Mail, zwingend oder freiwillig) | PDF 2 | später | später |
-| A-LOGIN-07 | Login mit Passkey | PDF 2 | später | später |
+| A-LOGIN-07 | Login mit Passkey, freiwillig neben dem Einmal-Code: bequemer am PC und auf weiteren Geräten. Der Mail-Code bleibt gültig, der Passkey schützt also nicht gegen ein gehacktes Postfach ([#44](https://github.com/konstantinniedermann/tco-app/issues/44)) | PDF 2, K-02.1 | Mitglieder-Login\* | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
 | A-LOGIN-08 | Login ohne Passwort, nur per Einmal-Code: aus dem Brief, später per E-Mail (A-LOGIN-10) | PDF 2, PL | Mitglieder-Login | umgesetzt\* |
-| A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Admin seine Sitzungen beendet | PL | Mitglieder-Login | umgesetzt\* (Dienst; Admin-Bedienung kommt mit der Admin-Oberfläche) |
+| A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Admin seine Sitzungen beendet | PL | Mitglieder-Login | umgesetzt (Admin beendet die Sitzungen in der Verwaltung, #43) |
 | A-LOGIN-10 | Wer ausgeloggt ist (lange Pause, neues Handy, Brief verloren), erhält nach Eingabe seiner E-Mail-Adresse einen neuen Code per E-Mail | PL | Mitglieder-Login | umgesetzt\* |
 | A-LOGIN-11 | Einmal-Code per SMS oder App statt per Brief oder E-Mail (abgespalten aus A-LOGIN-08) | PDF 2 | später | später |
 
@@ -49,12 +52,14 @@ nicht festlegen. Vom Verein zu bestätigen.
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-MITGLIED-01 | Der Admin legt Mitgliederkonten nach manueller Prüfung einfach und schnell von Hand an | PDF 4a, Ziel | Mitglieder-Login | geplant |
-| A-MITGLIED-02 | Der Admin bearbeitet die Daten eines Mitglieds | Ziel | Mitglieder-Login | geplant |
+| A-MITGLIED-01 | Der Admin legt Mitgliederkonten nach manueller Prüfung einfach und schnell von Hand an | PDF 4a, Ziel | Mitglieder-Login | umgesetzt |
+| A-MITGLIED-02 | Der Admin bearbeitet die Daten eines Mitglieds | Ziel | Mitglieder-Login | umgesetzt |
 | A-MITGLIED-03 | Der Admin löscht Mitgliederkonten | PDF 4a | Mitglieder-Login\* | geplant |
 | A-MITGLIED-04 | Selbstregistrierung über die Website tcolten.ch, damit der Briefversand entfallen kann (mit der zuständigen Person) | PDF 4a | später\* | später |
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
-| A-MITGLIED-06 | Der Admin sieht im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Admin, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | geplant |
+| A-MITGLIED-06 | Der Admin sieht im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Admin, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | umgesetzt\* (Verlauf der Admin-Änderungen; Löschung nach 12 Monaten folgt mit Etappe 3) |
+| A-MITGLIED-07 | Der Admin, der die Mitgliederverwaltung macht, liest die Mitgliederliste aus Fairgate ein (Excel oder CSV) und führt so Ein- und Austritte nach; zum Start erfasst der Projektleiter die Mitglieder ([#46](https://github.com/konstantinniedermann/tco-app/issues/46)) | K-17.1 | CM-Anmeldung\* | offen (hängt an K-45) |
+| A-MITGLIED-08 | Ein Mitglied erfasst sein Kind und erledigt für es das Administrative (Daten, CM-Anmeldung), bis das Kind ab der Altersgrenze des Vereins ein eigenes Login hat (Vorschlag K-08) ([#45](https://github.com/konstantinniedermann/tco-app/issues/45)) | K-46, PL | CM-Anmeldung\* | offen (hängt an K-08) |
 
 ### ROLLE — Benutzerrollen
 
@@ -62,9 +67,9 @@ Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-ROLLE-01 | Der Admin vergibt Benutzerrollen mit den zugehörigen Berechtigungen | PDF 4a | Mitglieder-Login | geplant |
-| A-ROLLE-02 | Rolle *Admin*: Zugang zur Mitgliederverwaltung | PDF 4a, Ziel | Mitglieder-Login | geplant |
-| A-ROLLE-03 | Rolle *Mitglied* | PDF 4a | Mitglieder-Login | geplant |
+| A-ROLLE-01 | Der Admin vergibt Benutzerrollen mit den zugehörigen Berechtigungen | PDF 4a | Mitglieder-Login | umgesetzt |
+| A-ROLLE-02 | Rolle *Admin*: Zugang zur Mitgliederverwaltung | PDF 4a, Ziel | Mitglieder-Login | umgesetzt |
+| A-ROLLE-03 | Rolle *Mitglied* | PDF 4a | Mitglieder-Login | umgesetzt |
 | A-ROLLE-04 | Rolle *Anlässe-Veranstalter*; die CM leitet bis dahin der CM-Verantwortliche (A-ROLLE-07) | PDF 4a | später\* | später |
 | A-ROLLE-05 | Rolle *Junioren-Leiter* | PDF 4a | später\* | später |
 | A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später\* | später |
@@ -93,6 +98,13 @@ auf dem Handy aussieht, klärt das UI-Leitbild (Issue #13).
 | A-STARTSEITE-02 | Die Startseite bietet Shortcuts zu den wichtigsten Funktionen | PDF 3c | CM-Anmeldung\* | geplant |
 | A-STARTSEITE-03 | Die Shortcuts lassen sich später einfach ändern (z. B. für die Anmeldung zu einem bestimmten Anlass) | PDF 3c | CM-Anmeldung\* | geplant |
 | A-STARTSEITE-04 | Die Startseite zeigt die Anlässe, für die das Mitglied angemeldet ist | PDF 3c | CM-Anmeldung\* | geplant |
+
+### HILFE — Hilfe beim Start
+
+| ID | Anforderung | Quelle | Etappe | Status |
+|----|-------------|--------|--------|--------|
+| A-HILFE-01 | MyTCO hat eine Seite *Hilfe*, ohne Login erreichbar über den Link «Hilfe» in der Fusszeile: MyTCO auf den Startbildschirm legen, neuen Code anfordern, Passkey einrichten, Kontakt für Fragen (K-21); eigene Angaben ändern kommt mit A-KONTO-01 ([#47](https://github.com/konstantinniedermann/tco-app/issues/47)) | PL | Mitglieder-Login | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
+| A-HILFE-02 | Solange MyTCO auf dem Handy im Browser statt vom Startbildschirm läuft, zeigt eine eigene Einstiegsseite zuerst die Anleitung zum Startbildschirm mit Animation, je nach iPhone oder Android, und erst danach den Login. Auf Android öffnet die Taste «MyTCO installieren» den Dialog von Android, wenn Chrome ihn anbietet. Der Brief behält seine Kurzanleitung (A-LOGIN-01) ([Design](../superpowers/specs/2026-11-04-hilfe-beim-start-design.md)) | PL | Mitglieder-Login | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
 
 ### NEWSFEED
 
@@ -199,7 +211,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 |----|-------------|--------|--------|--------|
 | N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später. Zuerst als installierbare Web-App, die Store-App ist N-APP-04 | Ziel, PDF 1 | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
 | N-APP-02 | Benachrichtigungen per Push und E-Mail | Ziel, PDF 5b | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
-| N-APP-03 | Admin und Verantwortliche arbeiten in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Funktionen zeigt | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
+| N-APP-03 | Admin und Verantwortliche arbeiten in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Funktionen zeigt | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | umgesetzt\* (Verwaltung nur für Admins; CM und Lizenz mit ihren Etappen) |
 | N-APP-04 | MyTCO ist als App im App Store und bei Google Play erhältlich | Ziel | später ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | später |
 | N-DESIGN-01 | Das Design lehnt sich an die Website tcolten.ch an, mit abgeändertem Farbkonzept zur Abgrenzung | PDF 3a | Fundament (UI-Leitbild, #13) | geplant |
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |

@@ -225,21 +225,25 @@ describe('Schnittstellen', () => {
 			const s = await meldeAn();
 			const ohne = ereignis();
 			await ladeSitzung(s.dienst, ohne);
-			const r0 = getSitzung(ohne);
+			const r0 = await getSitzung(ohne, db);
 			expect(r0.status).toBe(401);
 			expect(await r0.json()).toEqual({});
 			expect(r0.headers.get('cache-control')).toBe('no-store');
 
 			const mit = ereignis({ cookie: s.kennung });
 			await ladeSitzung(s.dienst, mit);
-			const r1 = getSitzung(mit);
+			const r1 = await getSitzung(mit, db);
 			expect(r1.status).toBe(200);
-			expect(await r1.json()).toEqual({ vorname: 'Erika' });
+			expect(await r1.json()).toEqual({
+				vorname: 'Erika',
+				passkeyHinweis: true,
+				verwaltung: false
+			});
 
 			await s.dienst.beendeAlleSitzungen(s.kontoId);
 			const danach = ereignis({ cookie: s.kennung });
 			await ladeSitzung(s.dienst, danach);
-			expect(getSitzung(danach).status).toBe(401);
+			expect((await getSitzung(danach, db)).status).toBe(401);
 			expect(danach.geloescht).toEqual([SITZUNG_COOKIE]);
 		});
 	});
@@ -285,7 +289,7 @@ describe('Schnittstellen', () => {
 			expect(e.geloescht).toEqual([SITZUNG_COOKIE]);
 			const danach = ereignis({ cookie: s.kennung });
 			await ladeSitzung(s.dienst, danach);
-			expect(getSitzung(danach).status).toBe(401);
+			expect((await getSitzung(danach, db)).status).toBe(401);
 		});
 
 		test('ohne Cookie: 204', async () => {

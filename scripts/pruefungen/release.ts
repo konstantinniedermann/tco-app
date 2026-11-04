@@ -137,7 +137,7 @@ if (import.meta.main) {
 			versionen: readFileSync(VERSIONEN, 'utf-8'),
 			tags: git('tag', '--list', 'v*').split('\n').filter(Boolean),
 			nurDoku: istNurDoku(
-				git('diff', '--name-only', 'origin/main...HEAD').split('\n').filter(Boolean)
+				git('diff', '--name-only', '--no-renames', 'origin/main...HEAD').split('\n').filter(Boolean)
 			)
 		})
 	);

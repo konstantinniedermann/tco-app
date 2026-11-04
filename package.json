@@ -1,6 +1,6 @@
 {
 	"name": "mytco",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"private": true,
 	"type": "module",
 	"engines": {
@@ -23,6 +23,8 @@
 		"pruefungen": "node scripts/pruefungen/bauregel.ts && node scripts/pruefungen/test-ids.ts && node scripts/pruefungen/testdaten.ts && node scripts/pruefungen/skip.ts && node scripts/pruefungen/annahmen.ts && node scripts/pruefungen/design-festwerte.ts && node scripts/pruefungen/workflow-rechte.ts"
 	},
 	"dependencies": {
+		"@simplewebauthn/browser": "^14.0.0",
+		"@simplewebauthn/server": "^14.0.3",
 		"@sveltejs/adapter-node": "^6.0.1",
 		"@sveltejs/kit": "^3.1.1",
 		"drizzle-orm": "^0.45.4",

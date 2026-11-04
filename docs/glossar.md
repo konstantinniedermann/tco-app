@@ -34,7 +34,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 
 | Begriff | Bedeutung | In MyTCO | Quelle |
 |---------|-----------|----------|--------|
-| Clubmeisterschaft (CM) | Jährliches Turnier des TCO für seine Mitglieder. Heute Anmeldung per E-Mail, Gruppenspiele organisieren die Spieler selbst. Ablauf: Anmeldeschluss Anfang Juni, Gruppenspiele bis Anfang August, Finalwochenende Mitte August. *Annahme K-24.1:* 2027 gilt derselbe Kalender | Clubmeisterschaft; in der Doku kurz CM | PDF 5, Recherche |
+| Clubmeisterschaft (CM) | Jährliches Turnier des TCO für seine Mitglieder. Heute Anmeldung per E-Mail, Gruppenspiele organisieren die Spieler selbst. Ablauf bisher: Anmeldeschluss Anfang Juni, Gruppenspiele bis Anfang August, Finalwochenende Mitte August. 2027: Anmeldung ab Mitte April, Auslosung Anfang Juni (K-01). *Annahme K-24.1:* Gruppenspiele und Finalwochenende wie bisher | Clubmeisterschaft; in der Doku kurz CM | PDF 5, Recherche |
 | Turnier | Bei Swiss Tennis das ganze Turnier mit Plätzen und Konkurrenzen; durchläuft die Status *in Bearbeitung*, *zur Kontrolle bei Swiss Tennis*, *publiziert*, *zu Ende*. Im PDF ist das Turnier die Clubmeisterschaft eines Jahres | Turnier | ADV 5–6, 13–14, 43; PDF 5a |
 | Turniernummer | Nummer, unter der Swiss Tennis ein Turnier führt. Das PDF spricht von mehreren Turniernummern je Clubmeisterschaft. Im Advantage-Handbuch nicht erklärt. *Annahme K-25.4:* eine Nummer je Advantage-Turnier, z. B. getrennt für Gruppenphase und Finalwochenende | Turniernummer | PDF 5a, 5e-i |
 | Internes Turnier | Turnierkategorie in Advantage: zählt nicht für die Klassierung und erscheint nicht im Turnierkalender. *Vermutung:* die CM ist **kein** internes Turnier, weil ihre Resultate an Swiss Tennis gehen | — (nur Hintergrund) | ADV 11, 15 |
@@ -55,7 +55,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Runde | Stufe im Tableau; Spielplan und Resultate werden je Runde erfasst | Runde | ADV 30, 32, 37 |
 | Begegnung | Advantage-Wort für ein einzelnes Match | Spiel | ADV 10, 32, 41; PDF 5d |
 | Anmeldung | Teilnahme eines Spielers (Einzel) oder eines Doppelteams an einer Kategorie. In Advantage meldet man sich online über myTennis an und landet in der Anmeldeliste; ins Tableau kommt man erst, wenn die Anmeldung *bestätigt* ist. In MyTCO höchstens 3 gleichzeitig | Anmeldung | PDF 5b; ADV 18, 20–23, 28–29 |
-| Anmeldeschluss | Datum, nach dem keine Anmeldungen mehr möglich sind; in Advantage je Turnier oder Konkurrenz. Beim TCO Anfang Juni | Anmeldeschluss | ADV 7, 10, 13, 28; Recherche |
+| Anmeldeschluss | Datum, nach dem keine Anmeldungen mehr möglich sind; in Advantage je Turnier oder Konkurrenz. Beim TCO bisher Anfang Juni, 2027 vor der Auslosung Anfang Juni (hängt an K-24.2) | Anmeldeschluss | ADV 7, 10, 13, 28; Recherche |
 | Nenngeld | Startgebühr in Advantage, je Spieler mit Vermerk „bezahlt“. Die CM hat kein Nenngeld (K-25.2) | Nenngeld | ADV 7, 28 |
 | Wildcard-Antrag | Anmeldung für eine Kategorie ausserhalb des eigenen Klassierungsbereichs, mit Kommentar; der CM-Verantwortliche entscheidet | Wildcard-Antrag | [A-ANMELDUNG-10](anforderungen/anforderungen.md#anmeldung--anmeldung-zur-clubmeisterschaft) |
 | Folgespiel | Spiel der nächsten KO-Runde, in das der Sieger eines Spiels nachrückt | Folgespiel | [Fachmodell](fachmodell.md) |
@@ -114,6 +114,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Einmal-Code | Code zum Eintippen, gilt für ein einziges Login. Kommt per Brief (lange gültig) oder auf Anfrage per E-Mail (kurz gültig). Ersetzt das *Einmalpasswort* aus dem PDF; ein Passwort gibt es in MyTCO nicht | Einmal-Code | PDF 2; [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
 | Sitzung | Zeitraum, in dem ein Gerät nach dem Login eingeloggt bleibt. Endet nach einem Jahr ohne Nutzung, beim Logout oder wenn der Admin sie beendet | Sitzung | [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
 | Änderungsverlauf | Liste für Admins, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat, ohne alte und neue Werte. Nicht zu verwechseln mit dem *Änderungsprotokoll* der Anforderungen | Änderungsverlauf | [SI-12](sicherheitskonzept.md#vorgaben) |
+| Passkey | Freiwilliger Zugang statt Code: Das Gerät bestätigt mit Face ID, Fingerabdruck oder Handy-PIN. Ein weiterer Weg zur selben Sitzung; der Einmal-Code bleibt immer gültig, das Konto per Mail zurückholbar | Passkey | [#44](https://github.com/konstantinniedermann/tco-app/issues/44), [ADR-005](adr/adr-005-passkey-simplewebauthn.md) |
 | Erstes Login | Erstes Einloggen mit dem Code aus dem Brief; das Mitglied ergänzt dabei fehlende Daten | Erstes Login | PDF 3b-i; Ziel |
 | Startseite | Erste Seite nach dem Login mit Shortcuts, Konto und Logout | Startseite | PDF 3c |
 | Newsfeed | Bereich für Neuigkeiten des Vereins auf der Startseite | Newsfeed | PDF 3c |
