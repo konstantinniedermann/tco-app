@@ -85,5 +85,10 @@
 			{/if}
 		</div>
 		<button type="submit" class="taste-haupt taste-breit">Bestätigen</button>
+		<p>
+			<button type="button" class="taste-neben taste-breit" onclick={schicken}
+				>Neuen Code schicken</button
+			>
+		</p>
 	</form>
 {/if}

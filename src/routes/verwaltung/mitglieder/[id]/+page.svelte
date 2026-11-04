@@ -37,7 +37,8 @@
 	let angabenMeldung = $state<string | null>(null);
 	let angabenStoerung = $state<string | null>(null);
 
-	async function speichereWerte(werte: Werte) {
+	const speichereWerte = (werte: Werte) => einzeln(() => schickeAngaben(werte));
+	async function schickeAngaben(werte: Werte) {
 		angabenFehler = {};
 		angabenMeldung = null;
 		angabenStoerung = null;
@@ -57,7 +58,23 @@
 
 	// Rollen: «Mitglied» hat jedes Konto, die übrigen wählt der Admin.
 	const WAHL: Rolle[] = ['admin', 'cm', 'lizenz'];
-	let gewaehlt = $derived<Rolle[]>(detail.rollen);
+	// Die Auswahl wird nur neu gesetzt, wenn sich die gespeicherten Rollen ändern; ungespeicherte
+	// Häkchen überstehen ein Neuladen nach «Angaben speichern».
+	const rollenSchluessel = $derived([...detail.rollen].sort().join(','));
+	let gewaehlt = $derived<Rolle[]>(
+		rollenSchluessel === '' ? [] : (rollenSchluessel.split(',') as Rolle[])
+	);
+	// Eine Anfrage nach der anderen: ein Doppelklick schickt nicht zwei Mal (Verlaufseinträge).
+	let laeuft = false;
+	async function einzeln(aktion: () => Promise<void>) {
+		if (laeuft) return;
+		laeuft = true;
+		try {
+			await aktion();
+		} finally {
+			laeuft = false;
+		}
+	}
 	let rollenMeldung = $state<string | null>(null);
 	let rollenFehler = $state<string | null>(null);
 	const rollenGeaendert = $derived(
@@ -68,7 +85,8 @@
 		gewaehlt = an ? [...gewaehlt, rolle] : gewaehlt.filter((r) => r !== rolle);
 	}
 
-	async function speichereDieRollen() {
+	const speichereDieRollen = () => einzeln(schickeRollen);
+	async function schickeRollen() {
 		rollenMeldung = null;
 		rollenFehler = null;
 		const a = await speichereRollen(detail.id, gewaehlt);
@@ -88,7 +106,8 @@
 	let sitzungenMeldung = $state<string | null>(null);
 	let sitzungenFehler = $state<string | null>(null);
 
-	async function beende() {
+	const beende = () => einzeln(schickeSitzungen);
+	async function schickeSitzungen() {
 		sitzungenMeldung = null;
 		sitzungenFehler = null;
 		const a = await beendeSitzungen(detail.id);
@@ -125,7 +144,7 @@
 </script>
 
 <svelte:head>
-	<title>{angaben.nachname}, {angaben.vorname} – MyTCO</title>
+	<title>Mitglied – MyTCO</title>
 </svelte:head>
 
 <a class="zurueck" href={resolve('/verwaltung/mitglieder')}>‹ Zurück</a>

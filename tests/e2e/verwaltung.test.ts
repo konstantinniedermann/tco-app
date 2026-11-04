@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
+import { MELDUNG } from '../../src/lib/login/anmelden.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
 	holeMailCode,
@@ -182,5 +183,33 @@ test('RR-03: der letzte Admin sieht die Meldung beim Entzug seiner Rolle', async
 	const meldung = 'Du bist der letzte Admin. Gib zuerst jemand anderem die Rolle Admin.';
 	await expect(page.getByText(meldung)).toBeVisible();
 	await pruefeBildschirm(page, info, 'verwaltung-letzter-admin');
+	expect(fehler).toEqual([]);
+});
+
+test('SI-08: falscher Code zeigt die Meldung, «Neuen Code schicken» führt weiter', async ({
+	page
+}) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeAdminMitBriefCodeAn('Fritz');
+	await meldeAn(page, admin);
+	await page.goto('/verwaltung');
+	await page.getByRole('button', { name: 'Code schicken' }).click();
+	const erster = await holeMailCode(admin.email);
+	const feld = page.getByLabel('Code aus der Mail');
+	await feld.fill(erster === '000000' ? '111111' : '000000');
+	await page.getByRole('button', { name: 'Bestätigen' }).click();
+	await expect(page.getByText(MELDUNG.mailFalsch)).toBeVisible();
+
+	await page.getByRole('button', { name: 'Neuen Code schicken' }).click();
+	// Die neue Mail trifft kurz nach der Antwort ein; die neueste Mail trägt einen anderen Code.
+	let neu = erster;
+	for (let i = 0; i < 20 && neu === erster; i++) {
+		await page.waitForTimeout(250);
+		neu = await holeMailCode(admin.email);
+	}
+	expect(neu).not.toBe(erster);
+	await feld.fill(neu);
+	await page.getByRole('button', { name: 'Bestätigen' }).click();
+	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
 	expect(fehler).toEqual([]);
 });
