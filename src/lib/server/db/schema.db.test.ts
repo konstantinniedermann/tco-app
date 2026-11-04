@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from './index.ts';
-import { konto, mitglied } from './schema.ts';
+import { aenderung, konto, kontoRolle, mitglied } from './schema.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 
@@ -63,5 +63,62 @@ describe('Schema Mitglied und Konto', () => {
 		const [k] = await db.select().from(konto).where(eq(konto.id, kontoId));
 		expect(m.status).toBe('aktiv');
 		expect(k).toMatchObject({ sitzungsversion: 1, gesperrt: false, mailCodeFehlversuche: 0 });
+	});
+});
+
+function code(f: unknown) {
+	return (f as { cause?: { code?: string } }).cause?.code;
+}
+
+describe('Schema Rollen und Änderungsverlauf', () => {
+	test('Mitgliedernummer ist eindeutig, leer mehrfach erlaubt', async () => {
+		const a = await legeMitgliedAn(db);
+		const b = await legeMitgliedAn(db);
+		const c = await legeMitgliedAn(db);
+		await expect(
+			db.update(mitglied).set({ mitgliedernummer: null }).where(eq(mitglied.id, a.mitgliedId))
+		).resolves.toBeDefined();
+		await db.update(mitglied).set({ mitgliedernummer: null }).where(eq(mitglied.id, b.mitgliedId));
+		const nr = String(10000 + Math.floor(Math.random() * 80000));
+		await db.update(mitglied).set({ mitgliedernummer: nr }).where(eq(mitglied.id, b.mitgliedId));
+		const fehler = await db
+			.update(mitglied)
+			.set({ mitgliedernummer: nr })
+			.where(eq(mitglied.id, c.mitgliedId))
+			.then(
+				() => null,
+				(f: unknown) => f
+			);
+		expect(code(fehler)).toBe('23505');
+	});
+
+	test('konto_rolle: unbekannte Rolle wird abgewiesen', async () => {
+		const { kontoId } = await legeMitgliedAn(db);
+		const fehler = await db
+			.insert(kontoRolle)
+			.values({ kontoId, rolle: 'chef' })
+			.then(
+				() => null,
+				(f: unknown) => f
+			);
+		expect(code(fehler)).toBe('23514');
+	});
+
+	test('aenderung: Urheber wird leer, wenn sein Mitglied verschwindet; der Eintrag bleibt', async () => {
+		const ziel = await legeMitgliedAn(db);
+		const urheber = await legeMitgliedAn(db);
+		const [e] = await db
+			.insert(aenderung)
+			.values({
+				mitgliedId: ziel.mitgliedId,
+				urheberArt: 'admin',
+				urheberMitgliedId: urheber.mitgliedId,
+				aktion: 'feld'
+			})
+			.returning({ id: aenderung.id });
+		await db.delete(mitglied).where(eq(mitglied.id, urheber.mitgliedId));
+		const [rest] = await db.select().from(aenderung).where(eq(aenderung.id, e.id));
+		expect(rest.urheberMitgliedId).toBeNull();
+		expect(rest.mitgliedId).toBe(ziel.mitgliedId);
 	});
 });
