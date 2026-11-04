@@ -71,7 +71,8 @@ Die Typen der Bibliothek ändern sich zwischen Hauptversionen; die Feldnamen von
   gewollt (Quelle 4).
 - Challenges im Arbeitsspeicher: Ein Neustart verwirft offene Vorgänge; das Mitglied
   versucht es neu.
-- Das Anfordern der Anmelde-Optionen zählt nicht zur Grenze, wird aber abgelehnt, sobald sie erreicht ist; darunter ist es nicht begrenzt: Wer es massenhaft tut, füllt die
+- Das Anfordern der Anmelde-Optionen zählt nicht zur Grenze, wird aber abgelehnt, sobald sie
+  erreicht ist; darunter ist es nicht begrenzt: Wer es massenhaft tut, füllt die
   höchstens 1000 offenen Challenges und verdrängt echte. Das blockiert nur den Passkey-Weg,
   der Login per Code bleibt (bewusst in Kauf genommen, #44).
 - Auch erfolgreiche Passkey-Anmeldungen zählen zur Grenze von 10 pro IP und Stunde. Gezählt

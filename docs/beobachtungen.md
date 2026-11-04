@@ -278,3 +278,51 @@ Nicht mit `--legacy-peer-deps` umgehen. Prüfen mit
 **Ursprung:** #44, Passkey (04.11.2026).
 
 **Einschätzung:** Niedrig, solange alle Tests ähnliche Daten nehmen. Kommt zurück, wenn ein Test mit weit entferntem Datum flackert; dann das Aufräumen auf das eigene Konto beschränken.
+
+### 2026-11-04 — Passkey: Zähler wird ohne Vergleich geschrieben
+
+**Thema:** Login
+
+**Fundort:** `src/lib/server/login/passkey.ts` → `anmelden`, Update von `zaehler`.
+
+**Beobachtung:** Der neue Zähler wird ohne Vergleich mit dem gespeicherten Wert geschrieben. Zwei parallele Anmeldungen mit demselben Passkey könnten den Zähler senken. Abhilfe wäre `GREATEST(zaehler, neu)` im Update.
+
+**Ursprung:** #44, Final-Review.
+
+**Einschätzung:** Niedrig. Synchronisierte Passkeys melden ohnehin immer 0; der Zähler schützt hier kaum.
+
+### 2026-11-04 — Passkey: Zahl der Passkeys je Konto unbegrenzt
+
+**Thema:** Login
+
+**Fundort:** `src/lib/server/login/passkey.ts` → `einrichten`.
+
+**Beobachtung:** Ein Mitglied kann beliebig viele Passkeys einrichten. Betroffen ist nur das eigene Konto (Liste, Speicher).
+
+**Ursprung:** #44, Final-Review.
+
+**Einschätzung:** Niedrig. Eine Obergrenze (z. B. 20) erst, wenn Missbrauch oder eine lange Liste auffällt.
+
+### 2026-11-04 — Startseite: Fokus landet nach dem Passkey-Hinweis auf dem Seitenrumpf
+
+**Thema:** Barrierefreiheit
+
+**Fundort:** `src/routes/+page.svelte` → `neinDanke`, `einrichten`.
+
+**Beobachtung:** Verschwindet der Hinweis nach «Nein, danke» oder nach dem Einrichten, landet der Fokus auf dem `body`. Tastatur- und Screenreader-Nutzer verlieren ihre Stelle.
+
+**Ursprung:** #44, Final-Review.
+
+**Einschätzung:** Niedrig bis mittel. Fokus auf die Überschrift «Hoi …» setzen, sobald der Hinweis weg ist.
+
+### 2026-11-04 — Passkey: Einrichten-Challenge gilt je Konto, nicht je Gerät
+
+**Thema:** Login
+
+**Fundort:** `src/lib/server/login/challenge.ts`, `optionenEinrichten` in `src/lib/server/login/passkey.ts`.
+
+**Beobachtung:** Die Challenge zum Einrichten wird je Konto abgelegt. Richtet dasselbe Mitglied auf zwei Geräten gleichzeitig ein, überschreibt die zweite Anfrage die erste, und das erste Gerät scheitert (Meldung «Das hat nicht geklappt»).
+
+**Ursprung:** #44, Final-Review.
+
+**Einschätzung:** Sehr niedrig; das Mitglied versucht es einfach neu. Nur angehen, wenn es in der Praxis gemeldet wird.

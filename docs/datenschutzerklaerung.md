@@ -55,8 +55,9 @@ E-Mail-Adresse, bestätigen Sie die Änderung mit je einem Code an die alte und 
 Adresse. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis. Richten Sie freiwillig einen
 Passkey ein, speichert MyTCO je Passkey nur dessen öffentlichen Schlüssel, eine Kennung, einen
 Zähler, die Adresse der App, eine grobe Gerätebezeichnung (z. B. «iPhone») sowie wann Sie ihn
-eingerichtet und zuletzt benutzt haben, dazu eine zufällige Kennung Ihres Kontos; das bis Sie
-den Passkey entfernen. Ihren Namen und Ihre E-Mail-Adresse zeigt Ihr Gerät aus dem eigenen
+eingerichtet und zuletzt benutzt haben. Diese Angaben löschen wir, sobald Sie den Passkey
+entfernen. Dazu kommt eine zufällige Kennung Ihres Kontos; sie entsteht, sobald Sie das erste Mal
+einen Passkey einrichten wollen (auch wenn Sie abbrechen), und bleibt, bis Ihr Konto gelöscht wird. Ihren Namen und Ihre E-Mail-Adresse zeigt Ihr Gerät aus dem eigenen
 Schlüsselbund an, MyTCO speichert sie dafür nicht zusätzlich. Ob der Hinweis auf den Passkey
 noch erscheint, merkt sich MyTCO an Ihrer Sitzung.
 

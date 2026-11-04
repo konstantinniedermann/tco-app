@@ -112,7 +112,8 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
 
 **Passkey** (SI-18, [ADR-005](adr/adr-005-passkey-simplewebauthn.md), Projektleiter, 04.11.2026):
 
-- Das Anfordern der Anmelde-Optionen zählt nicht zur Grenze, wird aber abgelehnt, sobald sie erreicht ist; darunter ist es nicht begrenzt. Wer es massenhaft tut, füllt die
+- Das Anfordern der Anmelde-Optionen zählt nicht zur Grenze, wird aber abgelehnt, sobald sie
+  erreicht ist; darunter ist es nicht begrenzt. Wer es massenhaft tut, füllt die
   höchstens 1000 offenen Challenges und verdrängt echte; das blockiert nur den Passkey-Weg,
   der Code-Login bleibt.
 - Auch erfolgreiche Passkey-Anmeldungen zählen zu den 10 pro IP und Stunde (gezählt wird vor dem

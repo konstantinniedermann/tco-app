@@ -116,7 +116,7 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] Login mit Einmal-Code klappt; nach Neustart des Handys weiterhin eingeloggt (A-LOGIN-08, A-LOGIN-09)
 - [ ] Neuer Code per E-Mail kommt an und landet nicht im Spam (A-LOGIN-10)
 - [ ] iPhone, App vom Startbildschirm: Code per E-Mail anfordern, App ganz schliessen, wieder öffnen → das Feld «Code aus der Mail» steht da (A-LOGIN-10)
-- [ ] Passkey auf einem echten iPhone **in der App vom Startbildschirm**: nach einem Code-Login einrichten, abmelden, mit Passkey anmelden; die Abfrage darf sich nicht wiederholen oder hängen (A-LOGIN-07, [ADR-005](adr/adr-005-passkey-simplewebauthn.md), Restrisiken). Offen, bis die Test-Umgebung (#39) steht
+- [ ] Passkey auf einem echten iPhone **in der App vom Startbildschirm**: nach einem Code-Login einrichten (die Passkey-Abfrage erscheint beim ersten Tippen), abmelden, mit Passkey anmelden; die Abfrage darf sich nicht wiederholen oder hängen (A-LOGIN-07, [ADR-005](adr/adr-005-passkey-simplewebauthn.md), Restrisiken). Offen, bis die Test-Umgebung (#39) steht
 - [ ] Passkey auf einem Android-Handy (Chrome): einrichten und anmelden (A-LOGIN-07). Offen, bis #39 steht
 - [ ] Anmeldung am PC mit dem Passkey vom Handy per QR-Code (A-LOGIN-07). Offen, bis #39 steht
 - [ ] Steht ein Einrichtungsabend an: mobile Daten statt Club-WLAN, oder die Grenzen pro IP vorher prüfen ([ADR-004](adr/adr-004-login-einmal-code.md), Restrisiken)

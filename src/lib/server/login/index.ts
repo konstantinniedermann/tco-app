@@ -11,7 +11,7 @@ let dienst: LoginDienst | undefined;
 let passkeyDienst: PasskeyDienst | undefined;
 let bremsen: Bremsen | undefined;
 
-// Eine Instanz für Login- und Passkey-Dienst: Fehlversuche zählen gemeinsam.
+// Eine Instanz für Login- und Passkey-Dienst: jeder Dienst zählt eigene Fehlversuche, nur die Instanz ist geteilt.
 function holeBremsen(): Bremsen {
 	bremsen ??= erstelleBremsen();
 	return bremsen;

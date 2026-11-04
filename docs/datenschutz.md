@@ -74,7 +74,7 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Änderungsverlauf:** 12 Monate; Einträge zu einem Mitglied früher, sobald es den Status *gelöscht* hat (FR-04).
 - **IP-Adressen** (Schutz vor Durchprobieren von Codes, Logs): höchstens 24 Stunden.
 - **E-Mail-Adresse einer Code-Anfrage** (Grenze pro Adresse): nur im Arbeitsspeicher, höchstens 24 Stunden.
-- **Passkeys:** wenn das Mitglied ihn entfernt, sonst mit dem Konto; ebenso die zufällige Passkey-Kennung des Kontos.
+- **Passkeys:** wenn das Mitglied ihn entfernt, sonst mit dem Konto. Die zufällige Passkey-Kennung des Kontos entsteht beim ersten Einrichten-Versuch (auch bei Abbruch) und bleibt, bis das Konto gelöscht wird.
 - **Sitzungen:** beim Abmelden, beim Widerruf oder nach einem Jahr ohne Nutzung (dann beim
   nächsten Login eines Mitglieds).
 - **E-Mail-Adresse im Gerätespeicher** während einer Code-Anfrage: nach dem Login, sonst beim
