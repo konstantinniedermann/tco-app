@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { MELDUNG, meldung, sende } from '../../lib/login/anmelden.ts';
@@ -14,10 +15,18 @@
 	let { data }: PageProps = $props();
 	// Nach Einrichten oder Entfernen steht hier die neu geladene Liste; bis dahin die aus `load`.
 	let neueListe = $state<PasskeyAnzeige[] | null>(null);
-	const passkeys = $derived(neueListe ?? data.passkeys ?? []);
+	let neuLadenFehlt = $state(false);
+	// `null` aus `load` heisst: die Liste liess sich nicht laden (Störung), nicht «keine Passkeys».
+	const passkeys = $derived(neueListe ?? data.passkeys);
+	const listeGestoert = $derived(neuLadenFehlt || passkeys === null);
 	const passkeyMoeglich = kannPasskey();
 
 	let fragtNach = $state<string | null>(null);
+	// Fokus-Ziele: Der Fokus darf beim Umschalten der Nachfrage nicht verloren gehen.
+	let titel: HTMLElement | undefined;
+	let abbrechenKnopf = $state<HTMLButtonElement>();
+	let einrichtenKnopf = $state<HTMLButtonElement>();
+	const entfernenKnoepfe: Record<string, HTMLButtonElement | undefined> = {};
 	let passkeyFehler = $state<string | null>(null);
 	let passkeyLaeuft = $state(false);
 
@@ -44,7 +53,22 @@
 
 	async function neuLaden() {
 		const liste = await ladePasskeys();
-		if (liste) neueListe = liste;
+		if (liste) {
+			neueListe = liste;
+			neuLadenFehlt = false;
+		} else neuLadenFehlt = true;
+	}
+
+	async function nachfragen(kennung: string) {
+		fragtNach = kennung;
+		await tick();
+		abbrechenKnopf?.focus();
+	}
+
+	async function abbrechen(kennung: string) {
+		fragtNach = null;
+		await tick();
+		entfernenKnoepfe[kennung]?.focus();
 	}
 
 	async function einrichten() {
@@ -65,6 +89,8 @@
 		if (r === 'ok') {
 			fragtNach = null;
 			await neuLaden();
+			await tick();
+			(einrichtenKnopf ?? titel)?.focus();
 		} else passkeyFehler = MELDUNG.stoerung;
 		passkeyLaeuft = false;
 	}
@@ -88,42 +114,53 @@
 <h1>Profil</h1>
 
 <details class="karte klappe" open>
-	<summary class="klappe-titel">Anmelden mit Passkey</summary>
+	<summary class="klappe-titel" bind:this={titel}>Anmelden mit Passkey</summary>
 	<div>
-		{#each passkeys as p (p.kennung)}
-			<div class="kachel">
-				<span>
-					<strong>{p.geraet}</strong><br />
-					<span class="leise"
-						>eingerichtet am {datum(p.eingerichtetAm)} · zuletzt {zuletzt(p.zuletztBenutzt)}</span
-					>
-				</span>
-				{#if fragtNach === p.kennung}
+		{#if listeGestoert}
+			<p class="fehler" role="alert">{MELDUNG.stoerung}</p>
+		{:else if passkeys}
+			{#each passkeys as p (p.kennung)}
+				<div class="kachel">
 					<span>
-						Wirklich entfernen?
-						<button type="button" class="taste-neben" onclick={() => entfernen(p.kennung)}
-							>Entfernen</button
-						>
-						<button type="button" class="taste-neben" onclick={() => (fragtNach = null)}
-							>Abbrechen</button
+						<strong>{p.geraet}</strong><br />
+						<span class="leise"
+							>eingerichtet am {datum(p.eingerichtetAm)} · zuletzt {zuletzt(p.zuletztBenutzt)}</span
 						>
 					</span>
-				{:else}
-					<button type="button" class="taste-neben" onclick={() => (fragtNach = p.kennung)}
-						>Entfernen</button
-					>
-				{/if}
-			</div>
-		{:else}
-			<p>
-				Mit einem Passkey meldest du dich ohne Code an: mit Face ID, Fingerabdruck oder der
-				Handy-PIN.
-			</p>
-		{/each}
+					{#if fragtNach === p.kennung}
+						<span role="group" aria-labelledby="nachfrage-{p.kennung}">
+							<span id="nachfrage-{p.kennung}">Wirklich entfernen?</span>
+							<button type="button" class="taste-neben" onclick={() => entfernen(p.kennung)}
+								>Entfernen</button
+							>
+							<button
+								type="button"
+								class="taste-neben"
+								bind:this={abbrechenKnopf}
+								onclick={() => abbrechen(p.kennung)}>Abbrechen</button
+							>
+						</span>
+					{:else}
+						<button
+							type="button"
+							class="taste-neben"
+							bind:this={entfernenKnoepfe[p.kennung]}
+							onclick={() => nachfragen(p.kennung)}>Entfernen</button
+						>
+					{/if}
+				</div>
+			{:else}
+				<p>
+					Mit einem Passkey meldest du dich ohne Code an: mit Face ID, Fingerabdruck oder der
+					Handy-PIN.
+				</p>
+			{/each}
+		{/if}
 		{#if passkeyMoeglich}
 			<button
 				type="button"
 				class="taste-neben taste-breit"
+				bind:this={einrichtenKnopf}
 				onclick={einrichten}
 				aria-describedby={passkeyFehler ? 'passkey-fehler' : undefined}
 				>Passkey auf diesem Gerät einrichten</button
