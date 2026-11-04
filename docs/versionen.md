@@ -13,6 +13,11 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   Änderungsverlauf die letzten 100), erster Admin per Befehl `admin-festlegen`. Der Hinweis an die alte E-Mail-Adresse bei einer Änderung durch den Admin fehlt noch
   (kommt mit FR-25, SI-09). Neuer Brief-Code und Brief-Serie folgen mit
   Etappe 2, Austritt (Login gesperrt), Löschen und Export mit Etappe 3.
+- Nacharbeit zu #43 vor Etappe 2: Speichern zweier Admins am selben Mitglied überschreibt nichts
+  mehr still (Meldung, «Neuen Stand laden»); Fehlerseite mit Rahmen und Weg zurück, auch in der
+  Verwaltung; Mitgliedernummer eindeutig ohne Rücksicht auf Gross-/Kleinschreibung (Migration
+  `0005`); unsichtbare Sonderzeichen in Name, Strasse und Ort abgelehnt; Kurzinfo «die letzten
+  50 Einträge», wenn der Verlauf gekürzt ist; Bauregel prüft die Admin-Routen genauer.
 - Freiwilliger Passkey als zweiter Login-Weg (#44, A-LOGIN-07, [ADR-005](adr/adr-005-passkey-simplewebauthn.md)):
   Hinweis nach dem Code-Login, Login in zwei Karten, neue Seite *Profil* mit den Passkeys,
   Reiter *Start* und *Profil*. Neue Pakete `@simplewebauthn/server` und `/browser`. Nachweis mit

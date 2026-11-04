@@ -293,7 +293,7 @@ nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
 | Secret-Scan über die ganze Historie (gitleaks) | — | Hook und CI |
 | ESLint mit Svelte-Regeln, Prettier | ADR-002, Arbeitsregeln | vorhanden |
 | `svelte-check`, Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
-| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions | ADR-002 | vorhanden |
+| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN` (die der Rechte-Test abdeckt) und reichen `holeAdminDienste()` nur weiter; andere Routen nutzen `lib/server/admin` nicht | ADR-002, RR-07 | vorhanden |
 | Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
