@@ -45,7 +45,12 @@ Betrieb, kein Test im Sinne von DS-08. Die Konten bleiben danach bestehen.
 
 ## Ablauf
 
-### Lauf 1 — Vorabversion 0.x (*Mitglieder-Login*), Ziel Januar 2027
+### Lauf 1 — Vorabversion 0.x (*Mitglieder-Login*), ohne festes Datum
+
+Lauf 1 startet, sobald die Voraussetzungen erfüllt sind, möglicherweise schon im November
+oder Dezember 2026 (Entscheid Projektleiter, 04.11.2026). Getestet wird, was bis dahin
+gebaut ist: Ein Auftrag, dessen Funktion noch fehlt, entfällt in Lauf 1 und wandert in
+einen späteren Lauf.
 
 Voraussetzungen (alles vor dem ersten Mail):
 - Live in Betrieb (#39), Login per Einmal-Code auf Live (#29)
@@ -85,7 +90,6 @@ Lauf 1 im Detail fest.
 | 6 | Ausloggen, einen neuen Code per Mail anfordern und damit einloggen | A-LOGIN-10 |
 | 7 | Freiwillig: MyTCO am Laptop öffnen und mit dem Passkey vom Handy anmelden | A-LOGIN-07 |
 
-Ist Auftrag 3 wegen K-19.1 bis dahin nicht gebaut, entfällt er in Lauf 1.
 
 Aufträge nach Rolle (z. B. Admin legt ein Mitglied an) gibt es in Lauf 1 nicht: Auf Live
 entstünde ein echtes Konto, und die Admin-Seite prüft die Checkliste vor dem Release.
@@ -104,16 +108,17 @@ Ohne Name und ohne E-Mail-Adresse, Option «E-Mail-Adressen erfassen» aus, kein
 nötig.
 
 1. Handy: iPhone / Android
-2. Ist dein Handy älter? (Definition unten, als Hilfe im Formular erklärt): ja / nein / weiss nicht
-3. Mailanbieter: Bluewin / Gmail / GMX / iCloud / anderer / weiss nicht
-4. Pro Auftrag: ging ohne Hilfe / ging mit Mühe / ging nicht / nicht gemacht
-5. Was hat in Brief, Mail oder Hilfe gefehlt oder war unklar? (Freitext)
-6. Was sollten wir sonst noch wissen? (Freitext)
+2. Mailanbieter: Bluewin / Gmail / GMX / iCloud / anderer / weiss nicht
+3. Pro Auftrag: ging ohne Hilfe / ging mit Mühe / ging nicht / nicht gemacht
+4. Was hat in Brief, Mail oder Hilfe gefehlt oder war unklar? (Freitext)
+5. Was sollten wir sonst noch wissen? (Freitext)
 
 ## Datenschutz
 
-- **Liste der Testpersonen** (Name, Handymodell, Mailanbieter, Altersgruppe grob nach
-  Einschätzung des Projektleiters, z. B. unter 30 / 30–60 / über 60) nur in `intern/`.
+- **Liste der Testpersonen** (Name, Handymodell, Softwareversion, Mailanbieter,
+  Altersgruppe grob nach Einschätzung des Projektleiters, z. B. unter 30 / 30–60 / über 60)
+  nur in `intern/`. Der Projektleiter gibt sie Claude vor Lauf 1 durch (Entscheid
+  04.11.2026); Claude legt die Datei an.
   Gelöscht nach Lauf 2. Ins Repo kommen nur Anzahl, Verteilung iPhone/Android, Altersspanne
   grob und ob ein älteres Handy dabei ist.
 - **Formularantworten** liegen bei Google (ausserhalb CH/EU) und haben deshalb keinen
@@ -135,7 +140,9 @@ nötig.
 
 ## «Älteres Handy» (Festlegung)
 
-Für Lauf 1 zählt, was Startbildschirm und Passkey brauchen. Ein Handy gilt als älter, wenn
+Für Lauf 1 zählt, was Startbildschirm und Passkey brauchen. Claude ordnet die Handys anhand
+der Softwareversion in der Liste ein; im Formular wird nicht danach gefragt, weil viele ihre
+Version nicht kennen. Ein Handy gilt als älter, wenn
 es ein iPhone mit iOS 16 oder 17 ist oder ein Android-Handy mit Android 9 bis 11. Darunter
 gibt es keine Passkeys. Eine Untergrenze für MyTCO legt bisher kein Dokument fest; das
 bleibt so, die Testgruppe liefert nur Erfahrungswerte. Steht so im Testkonzept unter
@@ -148,6 +155,20 @@ Mühe / ging nicht), dazu die Befunde ohne Namen mit Einordnung (Doku fehlt / Ap
 passt) und wohin sie gingen. Befunde aus dem Chat und dem Formular landen in derselben
 Liste.
 
+## Milestone *Pilot* (Entscheid Projektleiter, 04.11.2026)
+
+Neue Etappe **Pilot** ohne Datum, vor *Mitglieder-Login*. Sie ist erreicht, wenn Lauf 1
+ausgewertet ist.
+
+| Milestone | Issues |
+|-----------|--------|
+| *Pilot* (neu, ohne Datum) | #29, #39, #44, Issue B (neu), #40 |
+| *Mitglieder-Login* (28.02.2027) | #43 (Etappe 3 kommt erst danach), neues Issue «Release 1.0.0 und Briefversand an alle» (Zustimmung des Projektleiters) |
+
+#43 bleibt in *Mitglieder-Login*, steht aber in #40 unter `Blocked by` (Etappe 2: Brief-Code
+und Brief als PDF). #40 deckt Lauf 1 ab. Lauf 2 kommt vor der *CM-Anmeldung* als
+Beobachtung bzw. eigenes Issue dazu, sobald die CM-Anmeldung gebaut wird.
+
 ## Was in welche Datei kommt
 
 | Datei | Inhalt |
@@ -156,7 +177,8 @@ Liste.
 | `docs/datenschutz.md` | Abschnitt *Testgruppe*, Einträge unter *Löschen* |
 | `docs/testkonzept.md` | Abschnitt *Testgruppe*: Verweis auf `testgruppe.md`, Definition «älteres Handy», Vorabversion 0.x |
 | `docs/ci-cd-und-release.md` | Pilot mit der letzten Vorabversion 0.x auf Live, 1.0.0 nach dem Pilot für alle |
-| `docs/roadmap.md` | Etappe *Mitglieder-Login*: Pilot mit Vorabversion im Januar, dann 1.0.0 und Briefversand bis 28.02.2027 (bleibt); Risiko, dass Befunde den Termin schieben, offen benannt |
+| `docs/roadmap.md` | Neue Etappe *Pilot* ohne Datum vor *Mitglieder-Login* (Vorabversion 0.x, Lauf 1); *Mitglieder-Login* = 1.0.0 und Briefversand bis 28.02.2027 |
+| `docs/issue-konventionen.md` | nur falls dort Etappen aufgezählt sind |
 | `docs/anforderungen/anforderungen.md` + Änderungsprotokoll | Neue Anforderungen zu Vorhaben B: Hilfe-Seite in MyTCO; Anleitung zum Startbildschirm mit Animation auf der Einstiegsseite, je nach iPhone/Android, nur solange MyTCO im Browser läuft |
 | `docs/abklaerungen.md` | K-20 nach *Beantwortet*: Der Projektleiter stellt die Gruppe selbst zusammen, der Vorstand kann mitmachen |
 | Fragen-Tabelle | K-20 umformuliert: Wer vom Vorstand mitmachen will, trägt sich auf *Wer ist wer* ein. Spalten D/E bleiben bis zur Übernahme nach `intern/` |
