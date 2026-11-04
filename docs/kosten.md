@@ -118,7 +118,9 @@ Ausserhalb des Takts löst eine Preiserhöhung beim VPS eine Überprüfung aus
   E-Mail-Postfächer?
 - **K-48:** Lohnt es sich, die Website von Metanet zu Infomaniak umzuziehen, damit Website
   und MyTCO bei einem Anbieter laufen? Das hängt an den Kosten aus K-09 und daran, ob die
-  E-Mail-Postfächer mitziehen.
+  E-Mail-Postfächer mitziehen. Zieht die Website auf den MyTCO-Server, braucht es zusätzlich
+  einen Nachtrag zu ADR-003 (eigener Container, getrennt von Datenbank und Netz von MyTCO) und
+  eine Bedrohung im Sicherheitskonzept (Lücke im Admin-Bereich der Website auf demselben Server).
 - **K-43:** Welche Online-Dienste nutzt der Verein heute und zu welchen Kosten? Davon hängt
   ab, ob MyTCO etwas mitnutzen kann.
 
