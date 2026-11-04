@@ -45,8 +45,8 @@ Git-Konfiguration (`core.hooksPath`) gilt für alle Worktrees.
 Wer Code ändert: im neuen Worktree `npm ci --ignore-scripts` (Hooks brauchen `node_modules`;
 `make check` zusätzlich Docker Desktop). Für `make dev` und `make seed` braucht der Worktree eine
 eigene `.env` (`cp .env.example .env`); sie ist gitignoriert und fehlt in jedem neuen Worktree.
-Alle Worktrees teilen die lokale Datenbank `mytco`; `make dev`, `make seed` und `make e2e`
-spielen dort die Migrationen des eigenen Branches ein. Eine Migration, die schon eingespielt
+Alle Worktrees teilen die lokale Datenbank `mytco`; `make seed` und `make e2e` spielen dort die
+Migrationen des eigenen Branches ein (`make dev` nicht: vorher einmal `make seed`). Eine Migration, die schon eingespielt
 wurde, wird darum nie neu erzeugt — eine Änderung kommt als neue Migration dazu.
 
 **2 — Arbeiten:** TDD bzw. Doku, Dateien einzeln stagen, committen, Branch pushen
