@@ -40,7 +40,7 @@ kann also an nichts anschliessen (K-06.3).
 |---------|--------|---------------------|
 | Art. 3 | Das Vereinsjahr ist das Kalenderjahr | Fristen und Beiträge laufen auf den 31.12. |
 | Art. 5–13 | Kategorien: Aktive; Studierende/Lernende (bis Ende des Jahres des 27. Geburtstags, in Ausbildung); Junioren (ab dem Jahr nach dem 12. bis Ende des Jahres des 18. Geburtstags); Schüler (bis Ende des Jahres des 12. Geburtstags); Ehren-, Frei-, Passiv- und Interclub-Mitglieder | Mögliche Mitgliederkategorie im Fachmodell; naheliegende Altersgrenze fürs eigene Login (K-08) |
-| Art. 17 | Passiv- und Interclub-Mitglieder spielen nur als Gast | Vermutung: nicht CM-berechtigt (K-25) |
+| Art. 13, 17 | Passivmitglieder spielen nur als Gast; Interclub-Mitglieder sind bis zum Abschluss der Interclub-Spiele spielberechtigt | Vermutung: beide nicht CM-berechtigt (K-25) |
 | Art. 23 | Austritt oder Kategorienwechsel nur auf Ende eines Vereinsjahres, mindestens einen Monat vorher, schriftlich an den Vorstand. Lizenzen müssen zusätzlich gekündigt werden | Weicht vom Fachmodell ab (FR-04 sperrt sofort), siehe K-38 |
 | Art. 35 | Amtsdauer im Vorstand zwei Jahre, Wiederwahl möglich | Wer ein Konto führt, wechselt regelmässig: Übergabe (#10) |
 | Art. 38 | Kollektivunterschrift: Präsident mit einem weiteren Vorstandsmitglied; Zahlungsverkehr Finanzen mit Präsident oder Vizepräsident | Verträge (Hoster, Mailversand, Store-Konten) unterschreiben zwei Personen (K-35, #10) |

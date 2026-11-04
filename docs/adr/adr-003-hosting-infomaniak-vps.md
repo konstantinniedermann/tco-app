@@ -68,6 +68,11 @@ Begründung:
 *Nachtrag 02.11.2026:* Webserver ist Caddy, gesichert wird mit restic (verschlüsselt, 30 Tage);
 entschieden vom Projektleiter im Design zu [#32](https://github.com/konstantinniedermann/tco-app/issues/32).
 
+*Nachtrag 04.11.2026:* Konten, Geheimnisse und Übergabe stehen in
+[Betrieb und Übergabe](../betrieb-und-uebergabe.md). Ziel der Sicherung ist dort ein
+Vorschlag (Infomaniak Object Storage); festgelegt wird es erst, wenn das Hosting abschliessend
+geklärt ist.
+
 ## Konsequenzen
 
 **Leichter:** Datenschutzerklärung kann „Infomaniak, Schweiz“ nennen; volle Kontrolle,
