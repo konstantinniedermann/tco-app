@@ -9,6 +9,7 @@ import {
 	legeKontoMitBriefCodeAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { startetVomSymbol } from './hilfen/geraet.ts';
 import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
 // Alle Browser kommen von 127.0.0.1 an denselben Server (Grenzen pro IP). Jeder Test braucht
@@ -145,6 +146,8 @@ test('SI-07: Alle Sitzungen beenden meldet das Mitglied auf seinem Gerät ab', a
 		extraHTTPHeaders: { 'x-forwarded-proto': 'http' }
 	});
 	const seite = await geraet.newPage();
+	// Das Mitglied nutzt MyTCO vom Symbol aus; im Handy-Browser käme die Einstiegsseite (A-HILFE-02).
+	await startetVomSymbol(seite);
 	// Konsolenmeldungen prüft nur die Admin-Seite: WebKit meldet im zweiten Kontext eine CSP-Meldung
 	// zu einem eigenen Stylesheet des Browsers.
 	await meldeAn(seite, mitglied);

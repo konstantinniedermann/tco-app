@@ -7,6 +7,11 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+- Hilfe beim Start (#47, A-HILFE-01, -02): im Handy-Browser zeigt eine Einstiegsseite zuerst die
+  Anleitung zum Startbildschirm als Animation (iPhone, Android mit Taste «MyTCO installieren»),
+  danach den Login; Seite Hilfe ohne Login, Link «Hilfe» in der Fusszeile; Baustein Anleitung
+  und Regel UI-09 im UI-Leitbild; Kurzanleitung im Brief auf die aktuellen Beschriftungen von
+  iPhone und Android gebracht.
 - Testgruppe vorbereitet (#40): neue Seite [Testgruppe](testgruppe.md) mit Ablauf, Aufträgen,
   Texten für Mail und Chat und Formularfragen; neue Etappe *Pilot* mit Vorabversion 0.x auf
   Live vor 1.0.0; neue Anforderungen zur Hilfe beim Start (A-HILFE-01, -02); Datenschutzkonzept

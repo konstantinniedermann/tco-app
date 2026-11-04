@@ -142,8 +142,8 @@ ${DRUCK_CSS}
 <h2>iPhone (Safari)</h2>
 <ol>
 <li>Scanne den QR-Code mit der Kamera oder tippe die Adresse in Safari ein.</li>
-<li>Tippe auf ${SYMBOL_TEILEN} «Teilen», dann auf «Zum Home-Bildschirm».</li>
-<li>Bestätige mit «Hinzufügen».</li>
+<li>Tippe auf ••• und dann auf ${SYMBOL_TEILEN} «Teilen», dann auf «Zu Home-Bildschirm hinzufügen».</li>
+<li>Lass «Als Web-App öffnen» an und tippe auf «Hinzufügen».</li>
 <li>Öffne MyTCO über das neue Symbol auf dem Home-Bildschirm.</li>
 <li>Tippe den Code ein. Danach bleibst du angemeldet.</li>
 </ol>
@@ -152,8 +152,8 @@ ${DRUCK_CSS}
 <h2>Android (Chrome)</h2>
 <ol>
 <li>Scanne den QR-Code mit der Kamera oder tippe die Adresse in Chrome ein.</li>
-<li>Tippe auf ${SYMBOL_MENUE} «Menü», dann auf «App installieren» bzw. «Zum Startbildschirm hinzufügen».</li>
-<li>Bestätige mit «Installieren» bzw. «Hinzufügen».</li>
+<li>Tippe auf ${SYMBOL_MENUE} «Menü», dann auf «Installieren und Verknüpfung erstellen».</li>
+<li>Bestätige mit «Installieren».</li>
 <li>Öffne MyTCO über das neue Symbol auf dem Startbildschirm.</li>
 <li>Tippe den Code ein. Danach bleibst du angemeldet.</li>
 </ol>
