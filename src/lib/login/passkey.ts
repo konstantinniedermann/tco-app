@@ -32,13 +32,19 @@ export function kannPasskey(w: Webauthn = browserWebauthn): boolean {
 	return w.unterstuetzt();
 }
 
-/** Nutzer hat den Dialog des Geräts geschlossen (NotAllowedError, evtl. als `cause`). */
-function istAbbruch(fehler: unknown): boolean {
+/** Hat der Fehler (evtl. als `cause`) diesen Namen? */
+function hatName(fehler: unknown, name: string): boolean {
 	for (let f = fehler, i = 0; f instanceof Error && i < 5; f = f.cause, i++) {
-		if (f.name === 'NotAllowedError') return true;
+		if (f.name === name) return true;
 	}
 	return false;
 }
+
+/** Nutzer hat den Dialog des Geräts geschlossen. */
+const istAbbruch = (fehler: unknown) => hatName(fehler, 'NotAllowedError');
+
+/** Das Gerät hat schon einen Passkey für dieses Konto (excludeCredentials). */
+const istVorhanden = (fehler: unknown) => hatName(fehler, 'InvalidStateError');
 
 const JSON_KOPF = { 'content-type': 'application/json' };
 
@@ -66,7 +72,7 @@ function istObjekt(x: unknown): x is Record<string, unknown> {
 export async function richtePasskeyEin(
 	holen: Holen = fetch,
 	w: Webauthn = browserWebauthn
-): Promise<'ok' | 'abgebrochen' | 'fehler'> {
+): Promise<'ok' | 'vorhanden' | 'abgebrochen' | 'fehler'> {
 	const optionen = await post('/api/passkey/einrichten/optionen', {}, holen);
 	if (!optionen?.ok) return 'fehler';
 	const opt = await leseJson(optionen);
@@ -75,6 +81,7 @@ export async function richtePasskeyEin(
 	try {
 		antwort = await w.registriere(opt);
 	} catch (fehler) {
+		if (istVorhanden(fehler)) return 'vorhanden';
 		return istAbbruch(fehler) ? 'abgebrochen' : 'fehler';
 	}
 	const r = await sende('/api/passkey/einrichten', { antwort }, holen);

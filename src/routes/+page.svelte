@@ -16,7 +16,11 @@
 		const r = await richtePasskeyEin();
 		laeuft = false;
 		if (r === 'ok') erledigt = true;
-		else if (r === 'fehler') fehler = MELDUNG.passkeyEinrichten;
+		else if (r === 'vorhanden') {
+			// Das Gerät hat schon einen Passkey: Hinweis ist erledigt, wie nach «Nein, danke».
+			erledigt = true;
+			await hinweisErledigt();
+		} else if (r === 'fehler') fehler = MELDUNG.passkeyEinrichten;
 	}
 
 	async function neinDanke() {

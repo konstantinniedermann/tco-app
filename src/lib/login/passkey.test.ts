@@ -71,6 +71,19 @@ describe('richtePasskeyEin', () => {
 		}
 	});
 
+	it('A-LOGIN-07: Gerät hat schon einen Passkey (InvalidStateError, auch verpackt) ist vorhanden', async () => {
+		const ungueltig = () => Object.assign(new Error('da'), { name: 'InvalidStateError' });
+		for (const fehler of [
+			ungueltig(),
+			Object.assign(new Error('verpackt'), { cause: ungueltig() })
+		]) {
+			const { holen, aufrufe } = fakeHolen(json({}));
+			const w = fakeWebauthn({ registriere: () => Promise.reject(fehler) });
+			expect(await richtePasskeyEin(holen, w)).toBe('vorhanden');
+			expect(aufrufe).toHaveLength(1);
+		}
+	});
+
 	it('A-LOGIN-07: anderer Browserfehler ist Fehler', async () => {
 		const { holen } = fakeHolen(json({}));
 		const w = fakeWebauthn({ registriere: () => Promise.reject(new Error('kaputt')) });
