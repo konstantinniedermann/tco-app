@@ -7,7 +7,14 @@ export const SITZUNG_COOKIE = 'mytco_sitzung';
 export const SITZUNG_GUELTIG_MS = 365 * 24 * 60 * 60 * 1000;
 export const VERLAENGERN_NACH_MS = 24 * 60 * 60 * 1000;
 
-export type AngemeldetesKonto = { kontoId: number; vorname: string; passkeyHinweis: boolean };
+export type AngemeldetesKonto = {
+	kontoId: number;
+	mitgliedId: number;
+	vorname: string;
+	passkeyHinweis: boolean;
+	// Hash der Sitzungskennung; ordnet Zugangs-Daten (SI-08) dieser Sitzung zu.
+	sitzungHash: string;
+};
 
 export function sitzungAbgelaufen(zuletztGenutzt: Date, jetzt: Date): boolean {
 	return jetzt.getTime() - zuletztGenutzt.getTime() > SITZUNG_GUELTIG_MS;
@@ -64,6 +71,7 @@ export async function pruefeSitzung(
 	const [zeile] = await db
 		.select({
 			kontoId: konto.id,
+			mitgliedId: mitglied.id,
 			vorname: mitglied.vorname,
 			zuletztGenutzt: sitzung.zuletztGenutzt,
 			passkeyHinweis: sitzung.passkeyHinweis,
@@ -95,8 +103,10 @@ export async function pruefeSitzung(
 	return {
 		konto: {
 			kontoId: zeile.kontoId,
+			mitgliedId: zeile.mitgliedId,
 			vorname: zeile.vorname,
-			passkeyHinweis: zeile.passkeyHinweis
+			passkeyHinweis: zeile.passkeyHinweis,
+			sitzungHash: kennungHash
 		},
 		verlaengert
 	};
