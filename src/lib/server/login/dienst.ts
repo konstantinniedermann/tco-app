@@ -66,7 +66,7 @@ function normalisiereAdresse(email: unknown): string | null {
 }
 
 // Postgres-Fehlercode 23505 (unique_violation); Drizzle verpackt den Treiberfehler in `cause`.
-function istEindeutigkeitsfehler(fehler: unknown): boolean {
+export function istEindeutigkeitsfehler(fehler: unknown): boolean {
 	let aktuell: unknown = fehler;
 	for (let i = 0; i < 3 && aktuell instanceof Error; i++) {
 		if ((aktuell as { code?: unknown }).code === '23505') return true;
