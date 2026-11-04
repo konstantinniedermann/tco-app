@@ -33,7 +33,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Geschlecht, Jahrgang | Zulassung zu Kategorien; für die CM reicht der Jahrgang (K-40.2); volles Geburtsdatum nur, falls Swiss Tennis es für Lizenzanträge verlangt (hängt an K-40.1) | ja |
 | Lizenznummer, Klassierung | Anmeldung, Lizenzanträge, Export an Swiss Tennis | nein |
 | Konto, Rollen, Benachrichtigungs-Einstellungen | Login, Berechtigungen, Push | ja |
-| Passkey: je Gerät öffentlicher Schlüssel und Kennung (A-LOGIN-07) | Login ohne Code | nein |
+| Passkey (A-LOGIN-07): je Passkey Kennung, öffentlicher Schlüssel, Zähler, Übertragungswege, Adresse der App (Relying-Party-ID), grobe Gerätebezeichnung (nur das Etikett aus dem Browser, z. B. *iPhone*), eingerichtet am, zuletzt benutzt; je Konto eine zufällige Passkey-Kennung (keine Personendaten); je Sitzung ein Merker, ob der Passkey-Hinweis noch erscheint. Name und E-Mail-Adresse liegen nur im Schlüsselbund des Mitglieds (sein Gerät zeigt sie an), MyTCO speichert sie dafür nicht zusätzlich | Login ohne Code | nein |
 | IP-Adresse bei Login-Versuchen; eingetippte E-Mail-Adresse einer Code-Anfrage | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
 | Anmeldungen (mit Kommentar zum Wildcard-Antrag), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
 | Austrittsdatum | Löschfrist nach Austritt | — |
@@ -74,7 +74,7 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Änderungsverlauf:** 12 Monate; Einträge zu einem Mitglied früher, sobald es den Status *gelöscht* hat (FR-04).
 - **IP-Adressen** (Schutz vor Durchprobieren von Codes, Logs): höchstens 24 Stunden.
 - **E-Mail-Adresse einer Code-Anfrage** (Grenze pro Adresse): nur im Arbeitsspeicher, höchstens 24 Stunden.
-- **Passkeys:** wenn das Mitglied ihn entfernt, sonst mit dem Konto.
+- **Passkeys:** wenn das Mitglied ihn entfernt, sonst mit dem Konto. Die zufällige Passkey-Kennung des Kontos entsteht beim ersten Einrichten-Versuch (auch bei Abbruch) und bleibt, bis das Konto gelöscht wird.
 - **Sitzungen:** beim Abmelden, beim Widerruf oder nach einem Jahr ohne Nutzung (dann beim
   nächsten Login eines Mitglieds).
 - **E-Mail-Adresse im Gerätespeicher** während einer Code-Anfrage: nach dem Login, sonst beim

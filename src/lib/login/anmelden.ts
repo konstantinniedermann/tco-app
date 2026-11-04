@@ -13,10 +13,12 @@ export const MELDUNG = {
 	mailFalsch: 'Dieser Code stimmt nicht. Prüf ihn oder lass dir einen neuen schicken.',
 	zuViele: 'Zu viele Versuche. Versuch es in einer Stunde nochmals.',
 	// Nicht in der Spec: Netz weg oder Server gestört.
-	stoerung: 'Das hat nicht geklappt. Prüf die Verbindung und versuch es nochmals.'
+	stoerung: 'Das hat nicht geklappt. Prüf die Verbindung und versuch es nochmals.',
+	passkeyFalsch: 'Mit diesem Passkey klappt es nicht. Melde dich mit einem Code an.',
+	passkeyEinrichten: 'Das hat nicht geklappt. Du kannst dich weiterhin mit einem Code anmelden.'
 } as const;
 
-type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
+export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
 
 /** Ändernde Anfragen schicken immer JSON (Herkunftsschutz, sonst 415). */
 export async function sende(pfad: string, inhalt: object, holen: Holen = fetch): Promise<Ergebnis> {

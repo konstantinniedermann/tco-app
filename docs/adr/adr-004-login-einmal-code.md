@@ -123,8 +123,7 @@ Dazu kommt ab *Mitglieder-Login* ein **freiwilliger Passkey als Komfort** (A-LOG
 ist ein weiterer Weg zur selben Sitzung, der Mail-Code bleibt gültig. Gegen ein gehacktes
 Postfach hilft er so nicht. Das wäre erst ein Passkey, der den Mail-Code für das Konto sperrt,
 mit dem Weg zurück über den Admin; das bleibt *später*. Wie der Passkey gebaut wird und mit
-welchem Paket, entscheidet ein eigener ADR. Ein neues Paket braucht die Freigabe des
-Projektleiters.
+welchem Paket, entscheidet [ADR-005](adr-005-passkey-simplewebauthn.md) (SimpleWebAuthn).
 
 ## Reevaluations-Trigger
 

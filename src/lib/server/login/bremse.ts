@@ -64,6 +64,7 @@ export type Bremsen = {
 	anfragenProIp: Bremse;
 	mailsProAdresseStunde: Bremse;
 	mailsProAdresseTag: Bremse;
+	passkeyFehlerProIp: Bremse;
 };
 
 /** Alle Fenster sind höchstens 24 h lang; nach spätestens 24 h ist jeder Eintrag vergessen. */
@@ -73,7 +74,8 @@ export function erstelleBremsen(jetzt?: () => number): Bremsen {
 		mailFehlerProIp: new Bremse({ grenze: 10, fensterMs: STUNDE_MS, jetzt }),
 		anfragenProIp: new Bremse({ grenze: 10, fensterMs: STUNDE_MS, jetzt }),
 		mailsProAdresseStunde: new Bremse({ grenze: 3, fensterMs: STUNDE_MS, jetzt }),
-		mailsProAdresseTag: new Bremse({ grenze: 10, fensterMs: TAG_MS, jetzt })
+		mailsProAdresseTag: new Bremse({ grenze: 10, fensterMs: TAG_MS, jetzt }),
+		passkeyFehlerProIp: new Bremse({ grenze: 10, fensterMs: STUNDE_MS, jetzt })
 	};
 	setInterval(() => {
 		for (const bremse of Object.values(bremsen)) bremse.raeumeAuf();

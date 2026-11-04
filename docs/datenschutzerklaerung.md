@@ -53,8 +53,13 @@ löscht MyTCO sie spätestens beim nächsten Start. Ihre IP-Adresse wird dabei h
 E-Mail-Adresse, nur im Arbeitsspeicher und nur, um die Zahl der Code-Mails zu begrenzen. Ändern Sie Ihre
 E-Mail-Adresse, bestätigen Sie die Änderung mit je einem Code an die alte und die neue
 Adresse. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis. Richten Sie freiwillig einen
-Passkey ein, speichert MyTCO je Gerät nur dessen öffentlichen Schlüssel und eine Kennung, bis Sie
-ihn entfernen.
+Passkey ein, speichert MyTCO je Passkey nur dessen öffentlichen Schlüssel, eine Kennung, einen
+Zähler, die Adresse der App, eine grobe Gerätebezeichnung (z. B. «iPhone») sowie wann Sie ihn
+eingerichtet und zuletzt benutzt haben. Diese Angaben löschen wir, sobald Sie den Passkey
+entfernen. Dazu kommt eine zufällige Kennung Ihres Kontos; sie entsteht, sobald Sie das erste Mal
+einen Passkey einrichten wollen (auch wenn Sie abbrechen), und bleibt, bis Ihr Konto gelöscht wird. Ihren Namen und Ihre E-Mail-Adresse zeigt Ihr Gerät aus dem eigenen
+Schlüsselbund an, MyTCO speichert sie dafür nicht zusätzlich. Ob der Hinweis auf den Passkey
+noch erscheint, merkt sich MyTCO an Ihrer Sitzung.
 
 **Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login nötig ist. Keine Werbung,
 keine Analyse-Dienste.

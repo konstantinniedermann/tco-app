@@ -40,7 +40,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-LOGIN-04 | Direktes Login in MyTCO, ohne Umweg über tcolten.ch (z. B. über `my.tcolten.ch`) | PDF 3b | Mitglieder-Login | geplant |
 | A-LOGIN-05 | Login-Feld oben rechts auf tcolten.ch, das nach dem Login zu MyTCO weiterleitet | PDF 3b | später | später |
 | A-LOGIN-06 | Zwei-Faktor-Login (App oder SMS/E-Mail, zwingend oder freiwillig) | PDF 2 | später | später |
-| A-LOGIN-07 | Login mit Passkey, freiwillig neben dem Einmal-Code: bequemer am PC und auf weiteren Geräten. Der Mail-Code bleibt gültig, der Passkey schützt also nicht gegen ein gehacktes Postfach ([#44](https://github.com/konstantinniedermann/tco-app/issues/44)) | PDF 2, K-02.1 | Mitglieder-Login\* | geplant |
+| A-LOGIN-07 | Login mit Passkey, freiwillig neben dem Einmal-Code: bequemer am PC und auf weiteren Geräten. Der Mail-Code bleibt gültig, der Passkey schützt also nicht gegen ein gehacktes Postfach ([#44](https://github.com/konstantinniedermann/tco-app/issues/44)) | PDF 2, K-02.1 | Mitglieder-Login\* | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
 | A-LOGIN-08 | Login ohne Passwort, nur per Einmal-Code: aus dem Brief, später per E-Mail (A-LOGIN-10) | PDF 2, PL | Mitglieder-Login | umgesetzt\* |
 | A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Admin seine Sitzungen beendet | PL | Mitglieder-Login | umgesetzt\* (Dienst; Admin-Bedienung kommt mit der Admin-Oberfläche) |
 | A-LOGIN-10 | Wer ausgeloggt ist (lange Pause, neues Handy, Brief verloren), erhält nach Eingabe seiner E-Mail-Adresse einen neuen Code per E-Mail | PL | Mitglieder-Login | umgesetzt\* |
