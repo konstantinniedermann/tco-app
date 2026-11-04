@@ -116,4 +116,14 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
-Keine offenen Einträge (Auswertung vom 04.11.2026, siehe [Archiv](beobachtungen-archiv.md)).
+### 2026-11-04 — Dependabot-PR #38 hat seit dem Neuaufsetzen keinen CI-Lauf
+
+**Thema:** Betrieb
+
+**Fundort:** PR #38, Head `7fc79b06` (neu aufgesetzt am 04.11.2026 um 09:48 UTC); `.github/workflows/check.yml` (`pull_request` auf `dev`).
+
+**Beobachtung:** `gh pr checks 38` meldet «no checks reported», `mergeable` steht auf UNKNOWN. Der Head liegt 40 Commits hinter `dev`. Ein roter Lauf wäre wegen der Peer-Abhängigkeiten zu erwarten, aber es läuft gar keiner.
+
+**Ursprung:** Beobachtungs-Auswertung vom 04.11.2026 (Prüfung des PR-Eintrags).
+
+**Einschätzung:** Ohne Folge, solange der PR offen bleibt. Die Ursache ist unbekannt. Kommt Dependabot mit einer Fassung, die TypeScript 7 erlaubt, fehlt sonst die Prüfung; dann `@dependabot rebase` und kontrollieren, ob `Check` läuft.
