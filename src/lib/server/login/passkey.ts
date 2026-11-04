@@ -178,10 +178,11 @@ export function erstellePasskeyDienst(abh: PasskeyAbh): PasskeyDienst {
 		const geprueft = await pruefer.pruefeAnmelden({ ort, challenge, antwort, passkey: p });
 		if (geprueft === null) return falsch();
 		const t = jetzt();
-		// Wurde der Passkey inzwischen entfernt, entsteht keine Sitzung.
+		// Wurde der Passkey inzwischen entfernt, entsteht keine Sitzung. GREATEST: Eine parallele
+		// Anmeldung mit demselben Passkey kann den Zähler nicht senken.
 		const [benutzt] = await db
 			.update(passkey)
-			.set({ zaehler: geprueft.zaehler, zuletztBenutzt: t })
+			.set({ zaehler: sql`GREATEST(${passkey.zaehler}, ${geprueft.zaehler})`, zuletztBenutzt: t })
 			.where(eq(passkey.kennung, kennung))
 			.returning({ kennung: passkey.kennung });
 		if (!benutzt) return falsch();

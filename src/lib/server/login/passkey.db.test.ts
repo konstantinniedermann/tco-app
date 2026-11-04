@@ -221,6 +221,34 @@ describe('Mit Passkey anmelden', () => {
 		expect(p.zaehler).toBe(1);
 	});
 
+	test('A-LOGIN-07: eine parallele Anmeldung senkt den gespeicherten Zähler nicht', async () => {
+		const d = baue();
+		const { kontoId } = await legeMitgliedAn(db);
+		const { kennung } = await richteEin(d, kontoId);
+		// Während der Prüfung schreibt eine zweite Anmeldung einen höheren Zähler.
+		const { pruefer } = testPruefer();
+		const dienst = erstellePasskeyDienst({
+			db,
+			pruefer: {
+				...pruefer,
+				pruefeAnmelden: async (eingabe) => {
+					const r = await pruefer.pruefeAnmelden(eingabe);
+					await db.update(passkey).set({ zaehler: 7 }).where(eq(passkey.kennung, kennung));
+					return r;
+				}
+			},
+			bremsen: d.bremsen,
+			challenges: new ChallengeSpeicher({ jetzt: () => d.zeit.t.getTime() }),
+			jetzt: () => d.zeit.t
+		});
+
+		const r = await meldeAn({ ...d, dienst }, kennung);
+
+		expect(r.ergebnis).toBe('ok');
+		const [p] = await passkeysVon(kontoId);
+		expect(p.zaehler).toBe(7);
+	});
+
 	test('A-LOGIN-07: Anmelden ersetzt die alte Sitzung dieses Geräts', async () => {
 		const d = baue();
 		const { kontoId } = await legeMitgliedAn(db);
