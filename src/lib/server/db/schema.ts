@@ -43,7 +43,9 @@ export const konto = pgTable('konto', {
 	briefCodeBenutztAm: timestamp('brief_code_benutzt_am', { withTimezone: true }),
 	mailCodeHash: text('mail_code_hash'),
 	mailCodeAblauf: timestamp('mail_code_ablauf', { withTimezone: true }),
-	mailCodeFehlversuche: integer('mail_code_fehlversuche').notNull().default(0)
+	mailCodeFehlversuche: integer('mail_code_fehlversuche').notNull().default(0),
+	// Zufällige Konto-Kennung für WebAuthn (base64url aus 32 Zufallsbytes), erst beim ersten Passkey gesetzt.
+	passkeyKennung: text('passkey_kennung').unique('konto_passkey_kennung_unique')
 });
 
 export const sitzung = pgTable(
@@ -55,7 +57,31 @@ export const sitzung = pgTable(
 			.references(() => konto.id, { onDelete: 'cascade' }),
 		sitzungsversion: integer('sitzungsversion').notNull(),
 		erstelltAm: timestamp('erstellt_am', { withTimezone: true }).notNull(),
-		zuletztGenutzt: timestamp('zuletzt_genutzt', { withTimezone: true }).notNull()
+		zuletztGenutzt: timestamp('zuletzt_genutzt', { withTimezone: true }).notNull(),
+		passkeyHinweis: boolean('passkey_hinweis').notNull().default(false)
 	},
 	(t) => [index('sitzung_konto_id_idx').on(t.kontoId)]
+);
+
+export const passkey = pgTable(
+	'passkey',
+	{
+		// Credential-ID, base64url
+		kennung: text('kennung').primaryKey(),
+		kontoId: integer('konto_id')
+			.notNull()
+			.references(() => konto.id, { onDelete: 'cascade' }),
+		// base64url
+		oeffentlicherSchluessel: text('oeffentlicher_schluessel').notNull(),
+		zaehler: integer('zaehler').notNull().default(0),
+		transporte: text('transporte')
+			.array()
+			.notNull()
+			.default(sql`'{}'::text[]`),
+		rpId: text('rp_id').notNull(),
+		geraet: text('geraet').notNull(),
+		eingerichtetAm: timestamp('eingerichtet_am', { withTimezone: true }).notNull(),
+		zuletztBenutzt: timestamp('zuletzt_benutzt', { withTimezone: true })
+	},
+	(t) => [index('passkey_konto_id_idx').on(t.kontoId)]
 );

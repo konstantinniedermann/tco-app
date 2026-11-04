@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { konto, mitglied } from '../db/schema.ts';
+import { konto, mitglied, sitzung } from '../db/schema.ts';
 import { erstelleBremsen } from './bremse.ts';
 import { BRIEF_CODE_GUELTIG_MS, formatiereBriefCode } from './codes.ts';
 import { erstelleLoginDienst } from './dienst.ts';
@@ -50,6 +50,16 @@ describe('Brief-Code', () => {
 			await dienst.beendeSitzung(erster.kennung);
 			expect(await dienst.pruefeSitzung(erster.kennung)).toBeNull();
 		}
+	});
+
+	test('A-LOGIN-07: Login mit Brief-Code setzt den Passkey-Hinweis', async () => {
+		const { dienst } = baueDienst();
+		const { kontoId } = await legeMitgliedAn(db);
+		const { code } = await dienst.stelleBriefCodeAus(kontoId);
+		expect((await dienst.loginMitBriefCode(code, 'ip-hinweis')).ergebnis).toBe('ok');
+		const zeilen = await db.select().from(sitzung).where(eq(sitzung.kontoId, kontoId));
+		expect(zeilen).toHaveLength(1);
+		expect(zeilen[0].passkeyHinweis).toBe(true);
 	});
 
 	test('RR-04: Datenbank enthält den Brief-Code nicht im Klartext', async () => {

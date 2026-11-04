@@ -140,7 +140,9 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 			)
 			.returning({ id: konto.id });
 		if (eingeloest) {
-			const kennung = await erstelleSitzung(db, eingeloest.id, t, alteKennung);
+			const kennung = await erstelleSitzung(db, eingeloest.id, t, alteKennung, {
+				passkeyHinweis: true
+			});
 			return { ergebnis: 'ok', kennung };
 		}
 		// Nichts eingelöst: «benutzt» nur für einen gültigen, bereits verbrauchten Code.
@@ -262,7 +264,9 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 			)
 			.returning({ id: konto.id });
 		if (!eingeloest) return falsch();
-		const kennung = await erstelleSitzung(db, eingeloest.id, t, alteKennung);
+		const kennung = await erstelleSitzung(db, eingeloest.id, t, alteKennung, {
+			passkeyHinweis: true
+		});
 		return { ergebnis: 'ok', kennung };
 	}
 
