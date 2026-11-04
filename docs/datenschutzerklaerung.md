@@ -41,8 +41,9 @@ sie enthalten keine Daten anderer Mitglieder.
 
 **Wie lange:** Solange Sie Mitglied sind. Nach einem Austritt wird Ihr Konto gesperrt; Ihre
 Daten bleiben noch eine Frist lang, falls Sie zurückkommen [Frist, **Vorschlag K-38:** 1 Jahr], und werden
-dann gelöscht. Ihr Name bleibt in vergangenen Resultaten. Löscht der Verein Ihr Mitglied auf
-Ihren Wunsch, ist Ihr Konto sofort gesperrt und nach einer Woche gelöscht.
+dann gelöscht. Löscht der Verein Ihr Mitglied, zum Beispiel auf Ihren Wunsch, ist Ihr Konto
+sofort gesperrt, und Ihre Daten werden nach einer Woche gelöscht. In beiden Fällen bleibt Ihr
+Name in vergangenen Resultaten.
 
 **Login:** Sie loggen sich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 Ihr Gerät das Login mit einem Cookie, bis Sie MyTCO ein Jahr nicht genutzt haben oder sich
