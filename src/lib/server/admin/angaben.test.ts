@@ -166,10 +166,80 @@ describe('pruefeAngaben', () => {
 		}
 	});
 
-	it('Werte ohne Zeichenkette → Fehler statt Ausnahme', () => {
-		expect(fehlerVon({ ...gueltig, vorname: 5, ort: {} })).toMatchObject({
-			vorname: 'fehlt',
-			ort: 'fehlt'
+	it('SI-08: E-Mail ist genau eine Adresse, keine Mehrfach- oder Header-Einschleusung', () => {
+		const schlecht = [
+			'@',
+			'a@b@c',
+			'a b@example.org',
+			'a@example.org\r\nBcc: b@example.org',
+			'a@example.org, b@example.org',
+			'a@example.org;b@example.org',
+			'<a@example.org>',
+			'a@localhost',
+			'@example.org',
+			'a@example.org\u0000'
+		];
+		for (const email of schlecht) {
+			expect(fehlerVon({ ...gueltig, email }).email, email).toBe('keine gültige E-Mail-Adresse');
+		}
+		const grenze = `${'a'.repeat(242)}@example.org`;
+		expect(grenze).toHaveLength(254);
+		expect(pruefeAngaben({ ...gueltig, email: grenze }, OPT).ok).toBe(true);
+		expect(fehlerVon({ ...gueltig, email: `a${grenze}` }).email).toBe(
+			'keine gültige E-Mail-Adresse'
+		);
+	});
+
+	it('freiwillige Felder: falscher Typ → "ungültig" statt stillem null', () => {
+		const f = fehlerVon({
+			...gueltig,
+			telefon: 123456,
+			geschlecht: true,
+			jahrgang: [],
+			mitgliedernummer: {},
+			lizenznummer: false
 		});
+		expect(f).toEqual({
+			telefon: 'ungültig',
+			geschlecht: 'ungültig',
+			jahrgang: 'ungültig',
+			mitgliedernummer: 'ungültig',
+			lizenznummer: 'ungültig'
+		});
+	});
+
+	it('Pflichtfelder: falscher Typ → "ungültig" statt "fehlt"', () => {
+		const f = fehlerVon({
+			...gueltig,
+			vorname: 5,
+			nachname: [],
+			strasse: {},
+			plz: 4600,
+			ort: true,
+			email: 1
+		});
+		expect(f).toEqual({
+			vorname: 'ungültig',
+			nachname: 'ungültig',
+			strasse: 'ungültig',
+			plz: 'ungültig',
+			ort: 'ungültig',
+			email: 'ungültig'
+		});
+	});
+
+	it('Mitglieds- und Lizenznummer als nicht negative ganze Zahl → Dezimalzeichenkette', () => {
+		const r = pruefeAngaben({ ...gueltig, mitgliedernummer: 42, lizenznummer: 0 }, OPT);
+		expect(r.ok && [r.angaben.mitgliedernummer, r.angaben.lizenznummer]).toEqual(['42', '0']);
+		for (const n of [-1, 1.5, NaN, 2 ** 60]) {
+			expect(
+				fehlerVon({ ...gueltig, mitgliedernummer: n }).mitgliedernummer,
+				String(n)
+			).toBeTruthy();
+		}
+	});
+
+	it('Jahrgang als unendliche Zahl → Fehler', () => {
+		expect(fehlerVon({ ...gueltig, jahrgang: Infinity }).jahrgang).toBeTruthy();
 	});
 });
