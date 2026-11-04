@@ -397,7 +397,7 @@ describe('Passkeys verwalten', () => {
 
 		expect(await d.dienst.entferne(kontoId, kennung)).toBe('ok');
 
-		expect(await d.dienst.liste(kontoId)).toEqual([]);
+		expect(await d.dienst.liste(kontoId, ORT)).toEqual([]);
 		expect(await meldeAn(d, kennung)).toEqual({ ergebnis: 'falsch' });
 		expect(await d.dienst.entferne(kontoId, kennung)).toBe('nicht-gefunden');
 	});
@@ -429,10 +429,20 @@ describe('Passkeys verwalten', () => {
 		d.zeit.t = benutzt;
 		expect((await meldeAn(d, aelter.kennung)).ergebnis).toBe('ok');
 
-		expect(await d.dienst.liste(kontoId)).toEqual([
+		expect(await d.dienst.liste(kontoId, ORT)).toEqual([
 			{ kennung: neuer.kennung, geraet: 'Mac', eingerichtetAm: zweiteZeit, zuletztBenutzt: null },
 			{ kennung: aelter.kennung, geraet: 'iPhone', eingerichtetAm: start, zuletztBenutzt: benutzt }
 		]);
+	});
+
+	test('SI-18: Liste zeigt keinen Passkey einer anderen rpId', async () => {
+		const d = baue();
+		const { kontoId } = await legeMitgliedAn(db);
+		const hier = await richteEin(d, kontoId, { geraet: 'iPhone' });
+		await richteEin(d, kontoId, { ort: ANDERER_ORT, geraet: 'Mac' });
+
+		const liste = await d.dienst.liste(kontoId, ORT);
+		expect(liste.map((p) => p.kennung)).toEqual([hier.kennung]);
 	});
 
 	test('A-LOGIN-07: «Nein, danke» beendet den Hinweis der Sitzung', async () => {

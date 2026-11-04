@@ -46,7 +46,7 @@ export type PasskeyDienst = {
 		alteKennung?: string
 	): Promise<LoginErgebnis>;
 	// Neueste zuerst.
-	liste(kontoId: number): Promise<PasskeyEintrag[]>;
+	liste(kontoId: number, ort: Ort): Promise<PasskeyEintrag[]>;
 	entferne(kontoId: number, kennung: unknown): Promise<'ok' | 'nicht-gefunden'>;
 	hinweisErledigt(sitzungKennung: string): Promise<void>;
 };
@@ -189,7 +189,8 @@ export function erstellePasskeyDienst(abh: PasskeyAbh): PasskeyDienst {
 		return { ergebnis: 'ok', kennung: sitzungKennung };
 	}
 
-	async function liste(kontoId: number): Promise<PasskeyEintrag[]> {
+	// Nur Passkeys der aktuellen rpId: nach einem Adresswechsel gelten die alten nicht mehr.
+	async function liste(kontoId: number, ort: Ort): Promise<PasskeyEintrag[]> {
 		return db
 			.select({
 				kennung: passkey.kennung,
@@ -198,7 +199,7 @@ export function erstellePasskeyDienst(abh: PasskeyAbh): PasskeyDienst {
 				zuletztBenutzt: passkey.zuletztBenutzt
 			})
 			.from(passkey)
-			.where(eq(passkey.kontoId, kontoId))
+			.where(and(eq(passkey.kontoId, kontoId), eq(passkey.rpId, ort.rpId)))
 			.orderBy(desc(passkey.eingerichtetAm), passkey.kennung);
 	}
 

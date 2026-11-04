@@ -70,7 +70,7 @@ export async function postAnmelden(d: PasskeyDienst, e: Ereignis): Promise<Respo
 export async function getPasskeys(d: PasskeyDienst, e: Ereignis): Promise<Response> {
 	const s = angemeldet(e);
 	if (!s) return nichtAngemeldet();
-	const liste = await d.liste(s.kontoId);
+	const liste = await d.liste(s.kontoId, ort(e));
 	return antwort(200, {
 		passkeys: liste.map((p) => ({
 			kennung: p.kennung,
