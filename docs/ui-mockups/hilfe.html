@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="de-CH">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>MyTCO — Hilfe beim Start</title>
+		<link rel="stylesheet" href="../../src/lib/design/tokens.css" />
+		<link rel="stylesheet" href="../../src/lib/design/basis.css" />
+		<link rel="stylesheet" href="mockup.css" />
+		<style>
+			/*
+			 * Entwurf des neuen Bausteins «Anleitung» (#47). Farben nur aus den Tokens.
+			 * Die Zeichnung ist ein vereinfachtes Handy und für Screenreader verborgen;
+			 * die Bedeutung tragen die nummerierten Schritte. Beschriftungen in der Zeichnung
+			 * nur dort, wo sie belegt sind (Apple- und Google-Hilfe); alles andere graue Balken.
+			 *
+			 * Ablauf: Ein kleines Skript schaltet alle 3,5 s den nächsten Schritt aktiv
+			 * (.aktiv auf Bild und Listeneintrag). Die Bilder blenden weich über, Menü,
+			 * Liste und Tipp-Kreis bewegen sich innerhalb eines Schritts. Ohne Skript und bei
+			 * «Bewegung reduzieren» steht jedes Bild in seinem Endzustand still.
+			 */
+			.anleitung {
+				display: grid;
+				gap: var(--abstand-3);
+				margin-top: var(--abstand-3);
+			}
+			.anleitung-film {
+				position: relative;
+				width: 10rem;
+				aspect-ratio: 9 / 17;
+				margin: 0 auto;
+				border: var(--rand-dick) solid var(--farbe-text);
+				border-radius: 1.4rem;
+				overflow: hidden;
+				background: var(--farbe-hintergrund);
+				font-size: 0.6rem;
+				line-height: 1.3;
+				hyphens: manual;
+			}
+			.anleitung-bild {
+				position: absolute;
+				inset: 0;
+				opacity: 0;
+				transition: opacity 0.7s ease-in-out;
+			}
+			.anleitung-bild.aktiv { opacity: 1; }
+			.anleitung-schritte {
+				display: grid;
+				gap: var(--abstand-1);
+				padding-left: 0;
+				list-style: none;
+				counter-reset: schritt;
+			}
+			.anleitung-schritte li {
+				counter-increment: schritt;
+				display: grid;
+				grid-template-columns: 1.75rem 1fr;
+				gap: var(--abstand-2);
+				padding: var(--abstand-2);
+				border-radius: var(--radius);
+				border-left: var(--rand-akzent) solid transparent;
+				transition: background-color 0.7s ease-in-out, border-color 0.7s ease-in-out;
+			}
+			.anleitung-schritte li::before {
+				content: counter(schritt);
+				font-weight: 700;
+				color: var(--farbe-marke);
+			}
+			.anleitung-schritte li.anleitung-fertig { counter-increment: none; }
+			.anleitung-schritte li.anleitung-fertig::before { content: '✓'; }
+			.anleitung-schritte li.aktiv {
+				background: var(--farbe-marke-zart);
+				border-left-color: var(--farbe-marke);
+			}
+			.anleitung .symbol {
+				width: 1.1em;
+				height: 1.1em;
+				vertical-align: -0.15em;
+			}
+			.anleitung-pause { justify-self: center; }
+			.anleitung.angehalten * { animation-play-state: paused !important; }
+
+			/* Bewegungen innerhalb eines Schritts: Endzustand ist der normale Stil */
+			.aktiv .rein-unten { animation: rein-unten 0.8s ease-out 0.5s both; }
+			.aktiv .rein-oben { animation: rein-oben 0.8s ease-out 0.5s both; }
+			.aktiv .rein-blatt { animation: rein-blatt 0.9s ease-out 0.4s both; }
+			.aktiv .rein-dialog { animation: rein-dialog 0.8s ease-out 0.4s both; }
+			.aktiv .rein-symbol { animation: rein-symbol 0.9s ease-out 0.6s both; }
+			.aktiv .scrollt { animation: scrollt 1.2s ease-in-out 1.1s both; }
+			.aktiv .zeichnung-tipp { animation: tipp 1.6s ease-in-out 1.6s both; }
+			.aktiv .rein-blatt ~ .zeichnung-tipp { animation-delay: 2.4s; }
+			@keyframes rein-unten { from { opacity: 0; transform: translateY(0.6rem) scale(0.92); } }
+			@keyframes rein-oben { from { opacity: 0; transform: translateY(-0.6rem) scale(0.92); } }
+			@keyframes rein-blatt { from { transform: translateY(100%); } }
+			@keyframes rein-dialog { from { opacity: 0; transform: scale(0.94); } }
+			@keyframes rein-symbol { from { opacity: 0; transform: scale(0.4); } }
+			@keyframes scrollt { from { transform: translateY(2.6rem); } }
+			@keyframes tipp {
+				0% { opacity: 0; transform: scale(1.8); }
+				35% { opacity: 1; transform: scale(1); }
+				55% { transform: scale(0.8); }
+				75%, 100% { opacity: 1; transform: scale(1); }
+			}
+
+			/* «Bewegung reduzieren»: alle Bilder still und nummeriert nebeneinander */
+			@media (prefers-reduced-motion: reduce) {
+				.anleitung * { animation: none !important; transition: none !important; }
+			}
+			.ruhig .anleitung * { animation: none !important; transition: none !important; }
+			.ruhig .anleitung-film {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: var(--abstand-3);
+				width: 100%;
+				aspect-ratio: auto;
+				border: none;
+				border-radius: 0;
+				background: none;
+				overflow: visible;
+				counter-reset: bild;
+			}
+			.ruhig .anleitung-bild {
+				position: relative;
+				opacity: 1;
+				aspect-ratio: 9 / 17;
+				border: var(--rand-dick) solid var(--farbe-text);
+				border-radius: 1rem;
+				overflow: hidden;
+				background: var(--farbe-hintergrund);
+				counter-increment: bild;
+			}
+			.ruhig .anleitung-bild::after {
+				content: counter(bild);
+				position: absolute;
+				bottom: 0.3rem;
+				left: 0.3rem;
+				width: 1.4rem;
+				height: 1.4rem;
+				border-radius: 50%;
+				background: var(--farbe-text);
+				color: var(--farbe-flaeche);
+				font-size: var(--groesse-klein);
+				font-weight: 700;
+				display: grid;
+				place-items: center;
+			}
+			.ruhig .anleitung-schritte li { background: none; border-left-color: transparent; }
+			.ruhig .anleitung-pause { display: none; }
+
+			/* Zeichnung */
+			.zeichnung-kopf {
+				background: var(--farbe-marke);
+				color: var(--farbe-flaeche);
+				font-weight: 700;
+				padding: 1rem 0.5rem 0.35rem;
+			}
+			.zeichnung-zeile {
+				height: 0.35rem;
+				margin: 0.5rem;
+				border-radius: var(--radius-rund);
+				background: var(--farbe-linie);
+			}
+			.zeichnung-zeile.kurz { width: 55%; }
+			.zeichnung-leiste {
+				position: absolute;
+				left: 0.4rem;
+				right: 0.4rem;
+				display: flex;
+				align-items: center;
+				gap: 0.3rem;
+				padding: 0.3rem 0.5rem;
+				border-radius: var(--radius-rund);
+				background: var(--farbe-flaeche);
+				box-shadow: var(--schatten-karte);
+			}
+			.zeichnung-leiste.unten { bottom: 0.7rem; }
+			.zeichnung-leiste.oben { top: 0.8rem; border-radius: var(--radius); }
+			.zeichnung-leiste .adresse { flex: 1; text-align: center; color: var(--farbe-text-leise); }
+			.zeichnung-leiste .knopf { font-weight: 700; }
+			.zeichnung-menue,
+			.zeichnung-blatt,
+			.zeichnung-dialog {
+				position: absolute;
+				background: var(--farbe-flaeche);
+				box-shadow: var(--schatten-karte);
+				border-radius: var(--radius);
+			}
+			.zeichnung-menue { right: 0.4rem; width: 7.4rem; }
+			.zeichnung-menue.unten { bottom: 2.5rem; transform-origin: bottom right; }
+			.zeichnung-menue.oben { top: 0.8rem; transform-origin: top right; }
+			.zeichnung-eintrag {
+				min-height: 1.45rem;
+				padding: 0.3rem 0.5rem;
+				border-bottom: var(--rand-duenn) solid var(--farbe-linie);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 0.3rem;
+				font-weight: 700;
+			}
+			.zeichnung-eintrag:last-child { border-bottom: none; }
+			.zeichnung-eintrag.leer::before {
+				content: '';
+				height: 0.3rem;
+				width: 60%;
+				border-radius: var(--radius-rund);
+				background: var(--farbe-linie);
+			}
+			.zeichnung-blatt {
+				left: 0;
+				right: 0;
+				bottom: 0;
+				height: 58%;
+				overflow: hidden;
+				border-radius: var(--radius) var(--radius) 0 0;
+			}
+			.zeichnung-blatt .titel {
+				justify-content: center;
+				font-weight: 400;
+				color: var(--farbe-text-leise);
+				background: var(--farbe-flaeche);
+				position: relative;
+				z-index: 1;
+			}
+			.zeichnung-dialog {
+				left: 0.4rem;
+				right: 0.4rem;
+				top: 1.2rem;
+				padding: 0.5rem;
+				display: grid;
+				gap: 0.5rem;
+			}
+			.zeichnung-dialog .kopfzeile {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				font-weight: 700;
+			}
+			.zeichnung-rund {
+				width: 1.1rem;
+				height: 1.1rem;
+				border-radius: 50%;
+				background: var(--farbe-linie);
+			}
+			.zeichnung-app { display: flex; align-items: center; gap: 0.45rem; }
+			.zeichnung-schalter { display: flex; justify-content: space-between; align-items: center; }
+			.zeichnung-schalter i {
+				width: 1.4rem;
+				height: 0.8rem;
+				border-radius: var(--radius-rund);
+				background: var(--farbe-marke);
+				position: relative;
+			}
+			.zeichnung-schalter i::after {
+				content: '';
+				position: absolute;
+				right: 0.1rem;
+				top: 0.1rem;
+				width: 0.6rem;
+				height: 0.6rem;
+				border-radius: 50%;
+				background: var(--farbe-flaeche);
+			}
+			.zeichnung-dialog .tasten {
+				display: flex;
+				justify-content: flex-end;
+				align-items: center;
+				gap: 0.6rem;
+				font-weight: 700;
+				color: var(--farbe-marke);
+			}
+			.zeichnung-dialog .tasten .zeichnung-eintrag { border: none; padding: 0; min-height: 0; width: 2.5rem; }
+			.zeichnung-symbol { width: 1.6rem; height: 1.6rem; border-radius: 0.4rem; }
+			.zeichnung-home {
+				position: absolute;
+				inset: 0;
+				background: var(--farbe-marke-dunkel);
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				align-content: start;
+				gap: 0.6rem 0.35rem;
+				padding: 1.3rem 0.5rem;
+				color: var(--farbe-flaeche);
+				text-align: center;
+			}
+			.zeichnung-home > span {
+				aspect-ratio: 1;
+				border-radius: 0.4rem;
+				background: var(--farbe-marke-hell);
+				opacity: 0.4;
+			}
+			.zeichnung-home > .zeichnung-fertig {
+				aspect-ratio: auto;
+				opacity: 1;
+				grid-column: 1 / -1;
+				margin-top: 2rem;
+				justify-self: center;
+				padding: 0.3rem 0.7rem;
+				border-radius: var(--radius-rund);
+				background: var(--farbe-flaeche);
+				color: var(--farbe-marke);
+				font-weight: 700;
+				font-size: 0.75rem;
+			}
+			.aktiv .zeichnung-fertig { animation: rein-symbol 0.8s ease-out 2.6s both; }
+			.zeichnung-home figure { margin: 0; display: grid; justify-items: center; gap: 0.1rem; }
+			.zeichnung-home figure img { width: 100%; border-radius: 0.4rem; }
+			.zeichnung-tipp {
+				position: absolute;
+				width: 1.6rem;
+				height: 1.6rem;
+				margin: -0.8rem 0 0 -0.8rem;
+				border-radius: 50%;
+				border: 0.2rem solid var(--farbe-aktion);
+			}
+			/* Lage des Tipp-Kreises pro Bild */
+			.tipp-ios-1 { left: 88%; top: 92%; }
+			.tipp-ios-2 { left: 75%; top: 79%; }
+			.tipp-ios-3 { left: 45%; top: 82%; }
+			.tipp-ios-4 { left: 79%; top: 12%; }
+			.tipp-home { left: 38%; top: 12%; }
+			.tipp-and-1 { left: 90%; top: 7.5%; }
+			.tipp-and-2 { left: 62%; top: 16%; }
+			.tipp-and-3 { left: 78%; top: 54%; }
+			.zeichnung-dialog.mitte { top: 38%; }
+
+			.mockup-hinweis { color: var(--farbe-hinweis); }
+			.weiter { text-align: center; }
+		</style>
+	</head>
+	<body class="mockup-seite">
+<h1>MyTCO — Hilfe beim Start (#47), Entwurf 2</h1>
+<p>
+	Einstiegsseite mit Anleitung zum Startbildschirm (A-HILFE-02) und Seite <em>Hilfe</em>
+	(A-HILFE-01). Neu gegenüber Entwurf 1: weiche Animation, 3,5 Sekunden pro Schritt;
+	Beschriftungen wie in der Hilfe von <a href="https://support.apple.com/de-ch/guide/iphone/iphea86e5236/ios">Apple</a>
+	und <a href="https://support.google.com/chrome/answer/9658361?hl=de&amp;co=GENIE.Platform%3DAndroid">Google</a>
+	(Stand 04.11.2026); was dort nicht steht, ist als grauer Balken gezeichnet. Statt der Karte
+	«Lieber im Browser?» ein kleiner Link. Namen und Adressen sind erfunden.
+</p>
+
+<template id="film-ios">
+	<div class="anleitung-film" aria-hidden="true">
+		<div class="anleitung-bild">
+			<div class="zeichnung-kopf">MyTCO</div>
+			<div class="zeichnung-zeile"></div><div class="zeichnung-zeile kurz"></div><div class="zeichnung-zeile"></div>
+			<div class="zeichnung-leiste unten"><span class="knopf">‹</span><span class="adresse">my.tcolten.ch</span><span class="knopf">•••</span></div>
+			<i class="zeichnung-tipp tipp-ios-1"></i>
+		</div>
+		<div class="anleitung-bild">
+			<div class="zeichnung-kopf">MyTCO</div>
+			<div class="zeichnung-zeile"></div><div class="zeichnung-zeile kurz"></div>
+			<div class="zeichnung-menue unten rein-unten">
+				<div class="zeichnung-eintrag leer"></div>
+				<div class="zeichnung-eintrag leer"></div>
+				<div class="zeichnung-eintrag">Teilen<svg class="symbol" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2"/></svg></div>
+			</div>
+			<div class="zeichnung-leiste unten"><span class="knopf">‹</span><span class="adresse">my.tcolten.ch</span><span class="knopf">•••</span></div>
+			<i class="zeichnung-tipp tipp-ios-2"></i>
+		</div>
+		<div class="anleitung-bild">
+			<div class="zeichnung-kopf">MyTCO</div>
+			<div class="zeichnung-blatt rein-blatt">
+				<div class="zeichnung-eintrag titel">my.tcolten.ch</div>
+				<div class="scrollt">
+					<div class="zeichnung-eintrag leer"></div>
+					<div class="zeichnung-eintrag leer"></div>
+					<div class="zeichnung-eintrag leer"></div>
+					<div class="zeichnung-eintrag">Zu Home-Bildschirm hinzufügen</div>
+					<div class="zeichnung-eintrag leer"></div>
+				</div>
+			</div>
+			<i class="zeichnung-tipp tipp-ios-3"></i>
+		</div>
+		<div class="anleitung-bild">
+			<div class="zeichnung-dialog rein-dialog">
+				<div class="kopfzeile"><span class="zeichnung-rund"></span><span>Hinzufügen</span></div>
+				<div class="zeichnung-app"><img class="zeichnung-symbol" src="../../static/favicon.svg" alt="" /><strong>MyTCO</strong></div>
+				<div class="zeichnung-schalter"><span>Als Web-App öffnen</span><i></i></div>
+			</div>
+			<i class="zeichnung-tipp tipp-ios-4"></i>
+		</div>
+		<div class="anleitung-bild">
+			<div class="zeichnung-home">
+				<span></span>
+				<figure class="rein-symbol"><img src="../../static/favicon.svg" alt="" />MyTCO</figure>
+				<span></span><span></span><span></span><span></span><span></span><span></span>
+				<span class="zeichnung-fertig">✓ Fertig</span>
+			</div>
+			<i class="zeichnung-tipp tipp-home"></i>
+		</div>
+	</div>
+</template>
+
+<template id="film-android">
+	<div class="anleitung-film" aria-hidden="true">
+		<div class="anleitung-bild">
+			<div class="zeichnung-leiste oben"><span class="adresse">my.tcolten.ch</span><span class="knopf">⋮</span></div>
+			<div class="zeichnung-kopf">&nbsp;</div>
+			<div class="zeichnung-zeile"></div><div class="zeichnung-zeile kurz"></div><div class="zeichnung-zeile"></div>
+			<i class="zeichnung-tipp tipp-and-1"></i>
+		</div>
+		<div class="anleitung-bild">
+			<div class="zeichnung-leiste oben"><span class="adresse">my.tcolten.ch</span><span class="knopf">⋮</span></div>
+			<div class="zeichnung-kopf">&nbsp;</div>
+			<div class="zeichnung-zeile"></div><div class="zeichnung-zeile kurz"></div>
+			<div class="zeichnung-menue oben rein-oben">
+				<div class="zeichnung-eintrag leer"></div>
+				<div class="zeichnung-eintrag">Installieren und Verknüpfung erstellen</div>
+				<div class="zeichnung-eintrag leer"></div>
+				<div class="zeichnung-eintrag leer"></div>
+			</div>
+			<i class="zeichnung-tipp tipp-and-2"></i>
+		</div>
+		<div class="anleitung-bild">
+			<div class="zeichnung-kopf">&nbsp;</div>
+			<div class="zeichnung-dialog mitte rein-dialog">
+				<div class="zeichnung-app"><img class="zeichnung-symbol" src="../../static/favicon.svg" alt="" /><span><strong>MyTCO</strong><br />my.tcolten.ch</span></div>
+				<div class="tasten"><span class="zeichnung-eintrag leer"></span><span>Installieren</span></div>
+			</div>
+			<i class="zeichnung-tipp tipp-and-3"></i>
+		</div>
+		<div class="anleitung-bild">
+			<div class="zeichnung-home">
+				<span></span>
+				<figure class="rein-symbol"><img src="../../static/favicon.svg" alt="" />MyTCO</figure>
+				<span></span><span></span><span></span><span></span><span></span><span></span>
+				<span class="zeichnung-fertig">✓ Fertig</span>
+			</div>
+			<i class="zeichnung-tipp tipp-home"></i>
+		</div>
+	</div>
+</template>
+
+<template id="schritte-ios">
+	<ol class="anleitung-schritte">
+		<li><span>Tippe unten rechts auf <strong>•••</strong>.</span></li>
+		<li><span>Tippe auf <svg class="symbol" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2"/></svg> «Teilen».</span></li>
+		<li><span>Scrolle nach unten und tippe auf «Zu Home-Bildschirm hinzufügen».</span></li>
+		<li><span>«Als Web-App öffnen» muss eingeschaltet sein. Tippe auf «Hinzufügen».</span></li>
+		<li class="anleitung-fertig"><span><strong>Fertig!</strong> Verlass jetzt den Browser und starte MyTCO über das neue Symbol auf deinem Startbildschirm.</span></li>
+	</ol>
+	<p class="leise">Siehst du das Teilen-Symbol schon direkt in der Leiste? Dann tipp gleich darauf.</p>
+</template>
+
+<template id="schritte-android">
+	<ol class="anleitung-schritte">
+		<li><span>Tippe oben rechts auf <svg class="symbol" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg> «Menü».</span></li>
+		<li><span>Tippe auf «Installieren und Verknüpfung erstellen».</span></li>
+		<li><span>Tippe auf «Installieren».</span></li>
+		<li class="anleitung-fertig"><span><strong>Fertig!</strong> Verlass jetzt den Browser und starte MyTCO über das neue Symbol auf deinem Startbildschirm.</span></li>
+	</ol>
+</template>
+
+<h2>Einstiegsseite im Handy-Browser</h2>
+<div class="mockup-reihe">
+	<figure class="mockup-geraet">
+		<div class="handy app">
+			<header class="kopf"><img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO</header>
+			<main class="inhalt">
+				<h1>Willkommen bei MyTCO</h1>
+				<div class="karte">
+					<h2>Zuerst auf den Startbildschirm</h2>
+					<p>Dann öffnest du MyTCO mit einem Tipp, wie eine App. Erst danach meldest du dich an.</p>
+					<div class="anleitung" data-film="ios"></div>
+				</div>
+				<p class="weiter"><a href="#login">Ohne Startbildschirm weiter</a></p>
+			</main>
+			<footer class="inhalt leise"><p><a href="#hilfe">Hilfe</a> · Version 0.5.0</p></footer>
+		</div>
+		<figcaption class="leise">
+			<strong>1 · iPhone (Safari).</strong> Nur im Handy-Browser; vom Symbol aus und am PC geht es
+			direkt zum Login. Der laufende Schritt ist in der Liste hervorgehoben. «Ohne Startbildschirm
+			weiter» führt zum Login im Browser.
+		</figcaption>
+	</figure>
+
+	<figure class="mockup-geraet">
+		<div class="handy app">
+			<header class="kopf"><img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO</header>
+			<main class="inhalt">
+				<h1>Willkommen bei MyTCO</h1>
+				<div class="karte">
+					<h2>Zuerst auf den Startbildschirm</h2>
+					<p>Dann öffnest du MyTCO mit einem Tipp, wie eine App. Erst danach meldest du dich an.</p>
+					<button class="taste-haupt taste-breit">MyTCO installieren</button>
+					<p class="leise">Android fragt nach. Tippe dort auf «Installieren», dann öffne MyTCO über das neue Symbol.</p>
+				</div>
+				<details class="karte klappe">
+					<summary class="klappe-titel">Klappt nicht? Über das Menü</summary>
+					<div class="anleitung" data-film="android"></div>
+				</details>
+				<p class="weiter"><a href="#login">Ohne Startbildschirm weiter</a></p>
+			</main>
+			<footer class="inhalt leise"><p><a href="#hilfe">Hilfe</a> · Version 0.5.0</p></footer>
+		</div>
+		<figcaption class="leise">
+			<strong>2 · Android, Chrome bietet die Installation an.</strong> Die Taste öffnet den Dialog
+			von Android. Die Anleitung über das Menü liegt zugeklappt darunter (zum Ausprobieren
+			aufklappen). Einzige Haupttaste auf dem Bildschirm (UI-04).
+		</figcaption>
+	</figure>
+
+	<figure class="mockup-geraet">
+		<div class="handy app">
+			<header class="kopf"><img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO</header>
+			<main class="inhalt">
+				<h1>Willkommen bei MyTCO</h1>
+				<div class="karte">
+					<h2>Zuerst auf den Startbildschirm</h2>
+					<p>Dann öffnest du MyTCO mit einem Tipp, wie eine App. Erst danach meldest du dich an.</p>
+					<div class="anleitung" data-film="android"></div>
+				</div>
+				<p class="weiter"><a href="#login">Ohne Startbildschirm weiter</a></p>
+			</main>
+			<footer class="inhalt leise"><p><a href="#hilfe">Hilfe</a> · Version 0.5.0</p></footer>
+		</div>
+		<figcaption class="leise">
+			<strong>3 · Android ohne Taste</strong> (z. B. Samsung-Browser, oder Chrome bietet es gerade
+			nicht an): dieselbe Seite wie beim iPhone, mit der Android-Animation.
+			<span class="mockup-hinweis">Der Samsung-Browser hat ein anderes Menü; ob es dafür eine eigene
+			Anleitung braucht, zeigt der Test auf echten Geräten.</span>
+		</figcaption>
+	</figure>
+
+	<figure class="mockup-geraet">
+		<div class="handy app ruhig">
+			<header class="kopf"><img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO</header>
+			<main class="inhalt">
+				<h1>Willkommen bei MyTCO</h1>
+				<div class="karte">
+					<h2>Zuerst auf den Startbildschirm</h2>
+					<p>Dann öffnest du MyTCO mit einem Tipp, wie eine App. Erst danach meldest du dich an.</p>
+					<div class="anleitung" data-film="ios"></div>
+				</div>
+				<p class="weiter"><a href="#login">Ohne Startbildschirm weiter</a></p>
+			</main>
+		</div>
+		<figcaption class="leise">
+			<strong>4 · «Bewegung reduzieren» ist eingeschaltet.</strong> Keine Animation, keine Taste
+			«Anhalten». Jedes Bild steht nummeriert still im Endzustand des Schritts.
+		</figcaption>
+	</figure>
+</div>
+
+<h2>Seite Hilfe</h2>
+<div class="mockup-reihe">
+	<figure class="mockup-geraet">
+		<div class="handy app">
+			<header class="kopf"><img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO</header>
+			<main class="inhalt">
+				<a class="zurueck" href="#zurueck">‹ Zurück</a>
+				<h1>Hilfe</h1>
+				<details class="karte klappe">
+					<summary class="klappe-titel">Auf den Startbildschirm: iPhone</summary>
+					<p>Öffne my.tcolten.ch in Safari, dann:</p>
+					<div class="anleitung" data-film="ios"></div>
+				</details>
+				<details class="karte klappe">
+					<summary class="klappe-titel">Auf den Startbildschirm: Android</summary>
+					<p>Öffne my.tcolten.ch in Chrome, dann:</p>
+					<div class="anleitung" data-film="android"></div>
+				</details>
+				<details class="karte klappe" open>
+					<summary class="klappe-titel">Neuer Code per E-Mail</summary>
+					<p>Für dich, wenn du ausgeloggt bist, ein neues Handy hast oder den Brief nicht mehr findest.</p>
+					<ol>
+						<li>Öffne MyTCO und tippe auf «Kein Brief zur Hand? Code per E-Mail».</li>
+						<li>Gib die E-Mail-Adresse ein, die der Verein von dir hat.</li>
+						<li>Tippe den Code aus der Mail ein. Er gilt 15 Minuten.</li>
+					</ol>
+					<p class="leise">Keine Mail da? Schau im Spam-Ordner nach.</p>
+				</details>
+				<details class="karte klappe">
+					<summary class="klappe-titel">Mit Passkey anmelden</summary>
+					<p>Mit einem Passkey meldest du dich mit Face ID, Fingerabdruck oder Handy-PIN an, ohne Code.</p>
+					<ol>
+						<li>Melde dich an.</li>
+						<li>Tippe im Hinweis auf der Startseite auf «Passkey einrichten». Oder unter Profil › Anmelden mit Passkey auf «Passkey auf diesem Gerät einrichten».</li>
+						<li>Bestätige mit Face ID, Fingerabdruck oder PIN.</li>
+					</ol>
+				</details>
+				<div class="karte">
+					<h2>Fragen?</h2>
+					<p>Klappt etwas nicht? Melde dich bei <a href="#kontakt">[Kontakt aus K-21]</a>.</p>
+				</div>
+			</main>
+			<footer class="inhalt leise"><p><a href="#hilfe" aria-current="page">Hilfe</a> · Version 0.5.0</p></footer>
+		</div>
+		<figcaption class="leise">
+			<strong>5 · Hilfe</strong>, ohne Login erreichbar, über den Link «Hilfe» in der Fusszeile
+			jeder Seite. Jedes Thema ein Aufklappbereich (zum Ausprobieren aufklappen), das Thema fürs
+			eigene Handy zuoberst. Kontakt als eigene Karte.
+			<span class="mockup-hinweis">«Eigene Angaben ändern» kommt mit A-KONTO-01. Kontakt offen (K-21).</span>
+		</figcaption>
+	</figure>
+
+	<figure class="mockup-geraet">
+		<div class="handy app">
+			<header class="kopf"><img class="kopf-wappen" src="../../static/wappen.svg" alt="" />MyTCO</header>
+			<main class="inhalt">
+				<h1>Anmelden</h1>
+				<div class="karte">
+					<h2>Mit Code</h2>
+					<p>Tipp den Code aus deinem Brief ein.</p>
+					<div class="feld feld-code">
+						<label for="code">Code aus dem Brief</label>
+						<span class="feld-hilfe">10 Zeichen, gross oder klein ist egal</span>
+						<input id="code" value="" />
+					</div>
+					<button class="taste-haupt taste-breit">Anmelden</button>
+					<p><br /><a href="#mail">Kein Brief zur Hand? Code per E-Mail</a></p>
+				</div>
+			</main>
+			<footer class="inhalt leise"><p><a href="#hilfe">Hilfe</a> · Version 0.5.0</p></footer>
+		</div>
+		<figcaption class="leise">
+			<strong>6 · Login, wie er vom Symbol aus aufgeht.</strong> Einzige Änderung: der Link
+			«Hilfe» in der Fusszeile. (Karte «Mit Passkey» hier weggelassen.)
+		</figcaption>
+	</figure>
+</div>
+
+<script>
+	// Nur im Mockup: Filme aus den Vorlagen einsetzen und abspielen.
+	const SCHRITT_MS = 3500;
+	const FERTIG_MS = 6000;
+	for (const a of document.querySelectorAll('[data-film]')) {
+		const art = a.dataset.film;
+		a.append(document.getElementById('film-' + art).content.cloneNode(true));
+		const taste = document.createElement('button');
+		taste.type = 'button';
+		taste.className = 'taste-neben anleitung-pause';
+		taste.textContent = 'Anhalten';
+		a.append(taste);
+		a.append(document.getElementById('schritte-' + art).content.cloneNode(true));
+		const bilder = a.querySelectorAll('.anleitung-bild');
+		const punkte = a.querySelectorAll('.anleitung-schritte li');
+		let k = 0;
+		const zeige = () => {
+			bilder.forEach((b, i) => b.classList.toggle('aktiv', i === k));
+			punkte.forEach((p, i) => p.classList.toggle('aktiv', i === k));
+		};
+		zeige();
+		const ruhig = a.closest('.ruhig') || matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (ruhig) {
+			punkte.forEach((p) => p.classList.remove('aktiv'));
+			continue;
+		}
+		// Letztes Bild («Fertig») bleibt länger stehen; nach drei Durchläufen hält der Film dort an.
+		const letztes = bilder.length - 1;
+		let durchlauf = 1;
+		let uhr = null;
+		const weiter = () => {
+			uhr = setTimeout(() => {
+				if (k === letztes) {
+					if (durchlauf >= 3) {
+						a.classList.add('angehalten');
+						taste.textContent = 'Nochmals abspielen';
+						uhr = null;
+						return;
+					}
+					durchlauf++;
+				}
+				k = k === letztes ? 0 : k + 1;
+				zeige();
+				weiter();
+			}, k === letztes ? FERTIG_MS : SCHRITT_MS);
+		};
+		weiter();
+		taste.addEventListener('click', () => {
+			if (uhr) {
+				clearTimeout(uhr);
+				uhr = null;
+				a.classList.add('angehalten');
+				taste.textContent = 'Abspielen';
+				return;
+			}
+			if (taste.textContent === 'Nochmals abspielen') {
+				k = 0;
+				durchlauf = 1;
+				zeige();
+			}
+			a.classList.remove('angehalten');
+			taste.textContent = 'Anhalten';
+			weiter();
+		});
+	}
+</script>
+	</body>
+</html>
