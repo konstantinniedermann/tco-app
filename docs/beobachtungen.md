@@ -494,3 +494,39 @@ Nicht mit `--legacy-peer-deps` umgehen. Prüfen mit
 **Ursprung:** Nutzerhinweis, Session vom 04.11.2026 (Website weg von Metanet).
 
 **Einschätzung:** Erst relevant, wenn K-09.1 und K-48 beantwortet sind. Dann zusammen bewerten: gleicher Server oder eigenes Webhosting bei Infomaniak.
+
+### 2026-11-04 — Datenschutzerklärung sagt bei «nach einer Woche gelöscht» nicht, dass der Name bleibt
+
+**Thema:** Datenschutz
+
+**Fundort:** `docs/datenschutzerklaerung.md`, Abschnitt Löschen (Bedenkzeit beim Löschen durch den Admin).
+
+**Beobachtung:** Der Satz liest sich, als bleibe nach der Woche nichts übrig. Gebaut wird mit Etappe 3, dass Vor- und Nachname in vergangenen Resultaten bleiben (FR-04). «Auf Ihren Wunsch» schränkt zudem den Anlass ein, obwohl der Admin auch ohne Wunsch löschen kann.
+
+**Ursprung:** Task-Review 1 von #43 Etappe 1.
+
+**Einschätzung:** Text geht an die Mitglieder; vor dem Bau von Etappe 3 angleichen.
+
+### 2026-11-04 — Testlücken aus den Task-Reviews der Mitgliederverwaltung
+
+**Thema:** Tests
+
+**Fundort:** `src/lib/server/admin/*.db.test.ts`, `src/lib/server/db/schema.db.test.ts`, `tests/scripts/admin-festlegen.db.test.ts`, `tests/e2e/verwaltung.test.ts`.
+
+**Beobachtung:** Belegt durch Code, aber ohne eigenen Test: parallele falsche Admin-Codes (höchstens 5), Tagesgrenze der Admin-Code-Mails, «neuer Code macht alten ungültig»; Checks auf `geschlecht`/`urheber_art` und die Cascades; `_` und `\` in der Suche; Rollback von `legeMitgliedAn`; Kappung von `grenze`; `POST mitglieder/[id]` mit unbekannter Id → 404; `finally` von `starte`; Doppelklick-Sperre und ungespeicherte Rollen-Häkchen im E2E.
+
+**Ursprung:** Task-Reviews 2, 6, 7, 8, 9 und 10 von #43 Etappe 1.
+
+**Einschätzung:** Niedrig; beim nächsten Arbeiten an der Datei mitnehmen.
+
+### 2026-11-04 — Kleinigkeiten in Oberfläche und Code der Mitgliederverwaltung
+
+**Thema:** Mitgliederverwaltung
+
+**Fundort:** `src/routes/verwaltung/`, `src/lib/design/basis.css`, `src/lib/server/admin/`.
+
+**Beobachtung:** Kurzinfo zeigt «50 Einträge», auch wenn der Verlauf gekürzt ist; Klappe *Rollen* ist offen, im Mockup 6 zu; auf dem iPhone ist das Auswahlfeld Geschlecht niedriger als die Textfelder, Tabellenköpfe trennen («Num-mer»); ein gemeinsames `laeuft`-Flag verwirft eine zweite Aktion still; `.feld-zeile input` wiederholt `.feld input`; `legeAdminFest` läuft ohne Transaktion; `Eintrag.detail` ist freier Text und `aenderung.aktion` hat keinen DB-Check; `STATUS` in `schnittstellen.ts` ist nicht an `MitgliedStatus` gebunden; E-Mail-Prüfung lässt leere Domain-Teile zu (`a@example..org`); Textfelder lassen Steuerzeichen im Inneren zu (vor dem CSV-Einlesen in Etappe 2 prüfen).
+
+**Ursprung:** Task-Reviews und Final-Review von #43 Etappe 1.
+
+**Einschätzung:** Je für sich klein. Die Steuerzeichen gehören in den Plan von Etappe 2, der Rest beim nächsten Arbeiten an der Stelle.
