@@ -10,8 +10,11 @@
 
 	let { children } = $props();
 	const mitReiter = $derived(page.route.id === '/' || page.route.id === '/profil');
-	// Die Verwaltung bringt Seitenleiste und Inhalt selbst mit (eigenes Layout).
-	const verwaltung = $derived(page.route.id?.startsWith('/verwaltung') ?? false);
+	// Die Verwaltung bringt Seitenleiste und Inhalt selbst mit (eigenes Layout). Die Fehlerseite
+	// steht ausserhalb dieses Layouts und bekommt darum auch dort den Rahmen hier.
+	const verwaltung = $derived(
+		(page.route.id?.startsWith('/verwaltung') ?? false) && page.error === null
+	);
 
 	// Beim Start der App: abgelaufene oder kaputte Mail-Anfragen aus dem Gerätespeicher löschen.
 	onMount(() => {
