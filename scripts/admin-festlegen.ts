@@ -5,7 +5,7 @@
 import { parseArgs } from 'node:util';
 import { legeAdminFest } from '../src/lib/server/admin/erster-admin.ts';
 import { FELDER } from '../src/lib/server/admin/angaben.ts';
-import { erstelleDb } from '../src/lib/server/db/index.ts';
+import { erstelleDb, type Db } from '../src/lib/server/db/index.ts';
 
 const TEXT: Record<'angelegt' | 'rolle-vergeben' | 'schon-admin', string> = {
 	angelegt: 'admin: Mitglied angelegt, Rolle admin vergeben',
@@ -13,7 +13,7 @@ const TEXT: Record<'angelegt' | 'rolle-vergeben' | 'schon-admin', string> = {
 	'schon-admin': 'admin: Mitglied war schon Admin, nichts geändert'
 };
 
-async function festlegen(args: string[], env: Record<string, string | undefined>): Promise<void> {
+export async function festlegen(args: string[], db: Db): Promise<void> {
 	let roh: Record<string, string | undefined>;
 	try {
 		const optionen = Object.fromEntries(FELDER.map((f) => [f, { type: 'string' as const }]));
@@ -24,12 +24,6 @@ async function festlegen(args: string[], env: Record<string, string | undefined>
 		process.exitCode = 1;
 		return;
 	}
-	if (!env.DATABASE_URL) {
-		console.error('admin: DATABASE_URL fehlt');
-		process.exitCode = 1;
-		return;
-	}
-	const db = erstelleDb(env.DATABASE_URL);
 	try {
 		const r = await legeAdminFest(db, roh, new Date());
 		if (r.ergebnis === 'fehler') {
@@ -43,9 +37,21 @@ async function festlegen(args: string[], env: Record<string, string | undefined>
 		// Fehler aus der Datenbank nennen in der Meldung Parameter (= Werte): nichts davon ausgeben.
 		console.error('admin: abgebrochen');
 		process.exitCode = 1;
+	}
+}
+
+export async function starte(args: string[], env: Record<string, string | undefined>) {
+	if (!env.DATABASE_URL) {
+		console.error('admin: DATABASE_URL fehlt');
+		process.exitCode = 1;
+		return;
+	}
+	const db = erstelleDb(env.DATABASE_URL);
+	try {
+		await festlegen(args, db);
 	} finally {
 		await db.$client.end();
 	}
 }
 
-if (import.meta.main) await festlegen(process.argv.slice(2), process.env);
+if (import.meta.main) await starte(process.argv.slice(2), process.env);

@@ -62,26 +62,82 @@ describe('Erster Admin', () => {
 		]);
 	});
 
-	test('legeAdminFest: bestehendes Mitglied (gleiche Nummer oder E-Mail) bekommt nur die Rolle', async () => {
+	test('legeAdminFest: bestehendes Mitglied (gleiche Nummer und E-Mail) bekommt nur die Rolle', async () => {
 		const b = angaben();
 		const { kontoId } = await legeBestehendesAn(b);
 
-		const ueberNummer = await legeAdminFest(
-			db,
-			{ ...angaben(), mitgliedernummer: b.mitgliedernummer },
-			jetzt
-		);
-		expect(ueberNummer).toEqual({ ergebnis: 'rolle-vergeben' });
+		const erst = await legeAdminFest(db, { ...b, vorname: 'Anders' }, jetzt);
+		expect(erst).toEqual({ ergebnis: 'rolle-vergeben' });
 		expect(await ladeRollen(db, kontoId)).toEqual(['admin']);
 
-		const ueberEmail = await legeAdminFest(
-			db,
-			{ ...angaben(), email: b.email.toUpperCase() },
-			jetzt
-		);
-		expect(ueberEmail).toEqual({ ergebnis: 'schon-admin' });
+		const nochmal = await legeAdminFest(db, { ...b, email: b.email.toUpperCase() }, jetzt);
+		expect(nochmal).toEqual({ ergebnis: 'schon-admin' });
 		const zeilen = await db.select().from(mitglied).where(eq(mitglied.email, b.email));
 		expect(zeilen).toHaveLength(1);
+	});
+
+	test('legeAdminFest: gleiche E-Mail, Nummer in der Datenbank leer → Rolle', async () => {
+		const b = angaben();
+		const [m] = await db
+			.insert(mitglied)
+			.values({ ...b, mitgliedernummer: null })
+			.returning({ id: mitglied.id });
+		const [k] = await db.insert(konto).values({ mitgliedId: m.id }).returning({ id: konto.id });
+		expect(await legeAdminFest(db, b, jetzt)).toEqual({ ergebnis: 'rolle-vergeben' });
+		expect(await ladeRollen(db, k.id)).toEqual(['admin']);
+	});
+
+	const WIDERSPRUCH = {
+		ergebnis: 'fehler',
+		fehler: {
+			mitgliedernummer: 'passt nicht zur E-Mail',
+			email: 'passt nicht zur Mitgliedernummer'
+		}
+	};
+
+	test('legeAdminFest: Nummer gehört A, E-Mail gehört B → fehler, niemand wird Admin', async () => {
+		const a = await legeBestehendesAn(angaben());
+		const b = await legeBestehendesAn(angaben());
+		const [ma] = await db
+			.select({ n: mitglied.mitgliedernummer })
+			.from(mitglied)
+			.where(eq(mitglied.id, a.mitgliedId));
+		const [mb] = await db
+			.select({ e: mitglied.email })
+			.from(mitglied)
+			.where(eq(mitglied.id, b.mitgliedId));
+		const roh = angaben({ mitgliedernummer: ma.n!, email: mb.e });
+		expect(await legeAdminFest(db, roh, jetzt)).toEqual(WIDERSPRUCH);
+		expect(await ladeRollen(db, a.kontoId)).toEqual([]);
+		expect(await ladeRollen(db, b.kontoId)).toEqual([]);
+	});
+
+	test('legeAdminFest: Nummer passt, E-Mail weicht ab → fehler, nichts geändert', async () => {
+		const b = angaben();
+		const { kontoId } = await legeBestehendesAn(b);
+		const r = await legeAdminFest(db, { ...b, email: angaben().email }, jetzt);
+		expect(r).toEqual(WIDERSPRUCH);
+		expect(await ladeRollen(db, kontoId)).toEqual([]);
+	});
+
+	test('legeAdminFest: E-Mail passt, andere Nummer in der Datenbank → fehler, nichts geändert', async () => {
+		const b = angaben();
+		const { kontoId } = await legeBestehendesAn(b);
+		const r = await legeAdminFest(
+			db,
+			{ ...b, mitgliedernummer: angaben().mitgliedernummer },
+			jetzt
+		);
+		expect(r).toEqual(WIDERSPRUCH);
+		expect(await ladeRollen(db, kontoId)).toEqual([]);
+	});
+
+	test('legeAdminFest: bestehendes Mitglied ohne Konto bekommt erst beim Vergeben eines', async () => {
+		const b = angaben();
+		const [m] = await db.insert(mitglied).values(b).returning({ id: mitglied.id });
+		expect(await legeAdminFest(db, b, jetzt)).toEqual({ ergebnis: 'rolle-vergeben' });
+		const [k] = await db.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, m.id));
+		expect(await ladeRollen(db, k.id)).toEqual(['admin']);
 	});
 
 	test('legeAdminFest: behält vorhandene Rollen beim Vergeben von admin', async () => {

@@ -1,4 +1,4 @@
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, type SQL } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { konto, mitglied } from '../db/schema.ts';
 import { pruefeAngaben, type Feld } from './angaben.ts';
@@ -16,20 +16,47 @@ export async function machAdmin(db: Db, kontoId: number, jetzt: Date): Promise<v
 	await setzeRollen(db, { art: 'automatisch' }, kontoId, [...rollen, 'admin'], jetzt);
 }
 
-// Bestehendes Mitglied: gleiche Mitgliedernummer oder gleiche E-Mail (ohne Gross-/Kleinschreibung).
-async function findeKonto(db: Db, nummer: string | null, email: string): Promise<number | null> {
-	const suche = async (bedingung: ReturnType<typeof eq> | ReturnType<typeof sql>) => {
-		const [m] = await db.select({ id: mitglied.id }).from(mitglied).where(bedingung);
-		if (!m) return null;
-		await db.insert(konto).values({ mitgliedId: m.id }).onConflictDoNothing();
-		const [k] = await db.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, m.id));
-		return k.id;
-	};
-	if (nummer) {
-		const ueberNummer = await suche(eq(mitglied.mitgliedernummer, nummer));
-		if (ueberNummer !== null) return ueberNummer;
+type Treffer = { id: number; email: string; mitgliedernummer: string | null };
+
+// Liest nur: Mitglied mit dieser Mitgliedernummer bzw. dieser E-Mail (ohne Gross-/Kleinschreibung).
+async function findeMitglied(db: Db, bedingung: SQL): Promise<Treffer | null> {
+	const [m] = await db
+		.select({ id: mitglied.id, email: mitglied.email, mitgliedernummer: mitglied.mitgliedernummer })
+		.from(mitglied)
+		.where(bedingung);
+	return m ?? null;
+}
+
+/**
+ * Welches bestehende Mitglied ist gemeint? `null`: keines. `'widerspruch'`: Nummer und E-Mail
+ * gehören zu verschiedenen Mitgliedern oder das andere Feld weicht ab; dann darf niemand die
+ * Rolle bekommen. Nur ein genauer Treffer gilt (das andere Feld gleich oder in der Datenbank leer).
+ */
+async function findeBestehendes(
+	db: Db,
+	nummer: string | null,
+	email: string
+): Promise<number | null | 'widerspruch'> {
+	const ueberNummer = nummer
+		? await findeMitglied(db, eq(mitglied.mitgliedernummer, nummer))
+		: null;
+	const ueberEmail = await findeMitglied(db, sql`lower(${mitglied.email}) = lower(${email})`);
+	if (ueberNummer && ueberEmail)
+		return ueberNummer.id === ueberEmail.id ? ueberNummer.id : 'widerspruch';
+	if (ueberNummer) {
+		return ueberNummer.email.toLowerCase() === email.toLowerCase() ? ueberNummer.id : 'widerspruch';
 	}
-	return suche(sql`lower(${mitglied.email}) = lower(${email})`);
+	if (ueberEmail) {
+		const dbNummer = ueberEmail.mitgliedernummer;
+		return dbNummer === null || dbNummer === nummer ? ueberEmail.id : 'widerspruch';
+	}
+	return null;
+}
+
+async function kontoVon(db: Db, mitgliedId: number): Promise<number> {
+	await db.insert(konto).values({ mitgliedId }).onConflictDoNothing();
+	const [k] = await db.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, mitgliedId));
+	return k.id;
 }
 
 /**
@@ -46,10 +73,20 @@ export async function legeAdminFest(
 	if (!pruefung.ok) return { ergebnis: 'fehler', fehler: pruefung.fehler };
 	const { angaben } = pruefung;
 
-	const vorhanden = await findeKonto(db, angaben.mitgliedernummer, angaben.email);
+	const vorhanden = await findeBestehendes(db, angaben.mitgliedernummer, angaben.email);
+	if (vorhanden === 'widerspruch') {
+		return {
+			ergebnis: 'fehler',
+			fehler: {
+				mitgliedernummer: 'passt nicht zur E-Mail',
+				email: 'passt nicht zur Mitgliedernummer'
+			}
+		};
+	}
 	if (vorhanden !== null) {
-		if ((await ladeRollen(db, vorhanden)).includes('admin')) return { ergebnis: 'schon-admin' };
-		await machAdmin(db, vorhanden, jetzt);
+		const kontoId = await kontoVon(db, vorhanden);
+		if ((await ladeRollen(db, kontoId)).includes('admin')) return { ergebnis: 'schon-admin' };
+		await machAdmin(db, kontoId, jetzt);
 		return { ergebnis: 'rolle-vergeben' };
 	}
 
@@ -57,7 +94,6 @@ export async function legeAdminFest(
 	if (neu.ergebnis === 'vergeben') {
 		return { ergebnis: 'fehler', fehler: { [neu.feld]: 'schon vergeben' } };
 	}
-	const [k] = await db.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, neu.id));
-	await machAdmin(db, k.id, jetzt);
+	await machAdmin(db, await kontoVon(db, neu.id), jetzt);
 	return { ergebnis: 'angelegt' };
 }
