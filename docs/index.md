@@ -28,6 +28,7 @@ Issue im Milestone *Fundament*.
 | [CI/CD und Release](ci-cd-und-release.md) | Test- und Live-Umgebung, Ablauf bis live, Prüfungen in der CI, Versionen, alte App-Versionen, Actions-Minuten |
 | [Sicherheitskonzept](sicherheitskonzept.md) | Bedrohungen und Massnahmen, Login mit Einmal-Code, Vorgaben `SI-NN`, Restrisiken |
 | [Testkonzept](testkonzept.md) | Testebenen und Werkzeuge, Abdeckung, Zuordnung Anforderung → Test, Testdaten, Checkliste vor dem Release |
+| [Testgruppe](testgruppe.md) | Pilot vor dem Briefversand: Ablauf, Aufträge, Texte für Mail und Chat, Formular, Auswertung |
 | [UI-Leitbild](ui-leitbild.md) | Corporate Design: Farben, Schrift, Bausteine, Navigation, Sprache, Barrierefreiheit `UI-NN`; Mockups |
 
 ## Arbeitsweise
