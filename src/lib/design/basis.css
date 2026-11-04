@@ -321,6 +321,10 @@ img {
 	text-decoration: none;
 }
 
+.klappe .kachel {
+	margin-bottom: var(--abstand-3);
+}
+
 .kachel > :first-child {
 	flex: 1 1 8em;
 }
