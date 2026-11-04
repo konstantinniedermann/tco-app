@@ -1,4 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
+import { bietetInstallationAn, startetVomSymbol } from './hilfen/geraet.ts';
+import { legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
 import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 import { e2eEinstellungen } from './hilfen/umgebung.ts';
 
@@ -74,4 +76,85 @@ test('A-HILFE-02: Animation hält an und läuft weiter', async ({ page }) => {
 	await expect(anleitung.locator('li.aktiv')).toHaveText(angehalten ?? '');
 	await anleitung.getByRole('button', { name: 'Abspielen' }).click();
 	await expect(anleitung.getByRole('button', { name: 'Anhalten' })).toBeVisible();
+});
+
+test.describe('Einstiegsseite', () => {
+	test.afterAll(async () => {
+		await schliesseLoginHilfen();
+	});
+
+	test('A-HILFE-02: im Handy-Browser führt die Startseite zur Einstiegsseite, am PC zum Login', async ({
+		page
+	}, info) => {
+		const fehler = sammleKonsolenfehler(page);
+		await page.goto('/');
+		if (info.project.name === 'desktop') {
+			await expect(page).toHaveURL(/\/login$/);
+			return;
+		}
+		await expect(page).toHaveURL(/\/willkommen$/);
+		await expect(
+			page.getByRole('heading', { level: 1, name: 'Willkommen bei MyTCO' })
+		).toBeVisible();
+		await expect(
+			page.getByRole('heading', { level: 2, name: 'Zuerst auf den Startbildschirm' })
+		).toBeVisible();
+		await pruefeBildschirm(page, info, 'willkommen');
+		expect(fehler).toEqual([]);
+	});
+
+	test('A-HILFE-02: vom Symbol und direkt aufgerufen am PC geht es zum Login', async ({
+		page
+	}, info) => {
+		if (info.project.name !== 'desktop') await startetVomSymbol(page);
+		await page.goto('/willkommen');
+		await expect(page).toHaveURL(/\/login$/);
+		await page.goto('/');
+		await expect(page).toHaveURL(/\/login$/);
+	});
+
+	test('A-HILFE-02: mit Sitzung zeigt die Startseite auch im Handy-Browser Hoi', async ({
+		page
+	}) => {
+		const konto = await legeKontoMitBriefCodeAn('Elin');
+		await page.goto('/login');
+		await page.getByLabel('Code aus dem Brief').fill(konto.code);
+		await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
+		await expect(page.getByRole('heading', { level: 1, name: 'Hoi Elin' })).toBeVisible();
+		await page.goto('/');
+		await expect(page.getByRole('heading', { level: 1, name: 'Hoi Elin' })).toBeVisible();
+	});
+
+	test('A-HILFE-02: iPhone zeigt die Safari-Schritte bis Fertig', async ({ page }, info) => {
+		test.skip(info.project.name !== 'iphone', 'nur iPhone'); // skip: Safari-Schritte gibt es nur auf dem iPhone
+		await page.goto('/');
+		const schritte = page.locator('.anleitung-schritte');
+		await expect(schritte).toContainText('Zu Home-Bildschirm hinzufügen');
+		await expect(schritte.locator('li.anleitung-fertig')).toContainText(
+			'Fertig! Verlass jetzt den Browser und starte MyTCO über das neue Symbol auf deinem Startbildschirm.'
+		);
+		await page.getByRole('link', { name: 'Ohne Startbildschirm weiter' }).click();
+		await expect(page).toHaveURL(/\/login$/);
+	});
+
+	test('A-HILFE-02: Android mit Angebot zeigt die Taste, nach Ablehnen die Anleitung über das Menü', async ({
+		page
+	}, info) => {
+		test.skip(info.project.name !== 'android', 'nur Android'); // skip: Install-Angebot gibt es nur in Chrome auf Android
+		await page.goto('/');
+		await expect(page.locator('.karte .anleitung')).toBeVisible();
+
+		await bietetInstallationAn(page, 'dismissed');
+		await page.getByRole('button', { name: 'MyTCO installieren' }).click();
+		await expect(page.getByRole('button', { name: 'MyTCO installieren' })).toHaveCount(0);
+		const menue = page.locator('details.klappe', { hasText: 'Klappt nicht? Über das Menü' });
+		await expect(menue).toHaveAttribute('open', '');
+		await expect(menue).toContainText('Installieren und Verknüpfung erstellen');
+
+		await page.reload();
+		await bietetInstallationAn(page, 'accepted');
+		await page.getByRole('button', { name: 'MyTCO installieren' }).click();
+		await expect(page.locator('.karte').first()).toContainText('Fertig!');
+		await expect(page.getByRole('button', { name: 'MyTCO installieren' })).toHaveCount(0);
+	});
 });

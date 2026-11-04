@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { laeuftVomSymbol, zeigeEinstieg } from '../lib/hilfe/geraet.ts';
 import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 import type { PageLoad } from './$types';
 
@@ -9,7 +10,10 @@ export const load: PageLoad = async ({ fetch }) => {
 	const antwort = await fetch('/api/sitzung');
 	if (antwort.status === 401) {
 		const wartend = leseMailanfrage(holeSpeicher(), Date.now());
-		redirect(307, wartend ? '/login/mail' : '/login');
+		if (wartend) redirect(307, '/login/mail');
+		// Im Handy-Browser zuerst auf den Startbildschirm, dann anmelden (A-HILFE-02).
+		const einstieg = zeigeEinstieg(navigator.userAgent, laeuftVomSymbol(window));
+		redirect(307, einstieg ? '/willkommen' : '/login');
 	}
 	if (!antwort.ok) error(503, 'Die Anmeldung lässt sich gerade nicht prüfen.');
 	const { vorname, passkeyHinweis, verwaltung } = (await antwort.json()) as {

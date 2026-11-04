@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import pkg from '../../package.json' with { type: 'json' };
+import { startetVomSymbol } from './hilfen/geraet.ts';
 import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
 // Ohne Sitzung zeigt jede Seite die Login-Seite; dort prüfen die Tests den Rahmen der App.
@@ -8,10 +9,12 @@ async function oeffneLoginSeite(page: Page) {
 	await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 }
 
-test('Startseite ohne Sitzung leitet auf die Login-Seite; Version sichtbar, ohne Barrierefreiheits-Verstösse und ohne Konsolenfehler', async ({
+test('Startseite ohne Sitzung leitet vom Symbol aus auf die Login-Seite; Version sichtbar, ohne Barrierefreiheits-Verstösse und ohne Konsolenfehler', async ({
 	page
 }, info) => {
 	const fehler = sammleKonsolenfehler(page);
+	// Im Handy-Browser käme zuerst die Einstiegsseite (A-HILFE-02, tests/e2e/hilfe.test.ts).
+	await startetVomSymbol(page);
 	await page.goto('/');
 	await expect(page).toHaveURL(/\/login$/);
 	await expect(page.getByTestId('version')).toHaveText(`Version ${pkg.version}`);

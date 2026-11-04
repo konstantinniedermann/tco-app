@@ -15,16 +15,17 @@ export function istAndererIphoneBrowser(userAgent: string): boolean {
 	return /CriOS|FxiOS|EdgiOS/.test(userAgent);
 }
 
+// `navigator.standalone` kennt nur Safari auf dem iPhone; TypeScript führt es nicht.
 type Fenster = {
 	matchMedia(abfrage: string): { matches: boolean };
-	navigator: { standalone?: boolean };
+	navigator: object;
 };
 
 /** Gestartet über das Symbol auf dem Startbildschirm statt im Browser. */
 export function laeuftVomSymbol(fenster: Fenster): boolean {
 	return (
 		fenster.matchMedia('(display-mode: standalone)').matches ||
-		fenster.navigator.standalone === true
+		('standalone' in fenster.navigator && fenster.navigator.standalone === true)
 	);
 }
 

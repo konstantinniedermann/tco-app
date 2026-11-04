@@ -9,6 +9,7 @@ import {
 	legeKontoMitBriefCodeAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { startetVomSymbol } from './hilfen/geraet.ts';
 import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 import { e2eEinstellungen } from './hilfen/umgebung.ts';
 
@@ -47,6 +48,8 @@ async function meldeMitBriefAn(page: Page, vorname: string) {
 test('A-LOGIN-08: Login mit Brief-Code', async ({ page }, info) => {
 	const fehler = sammleKonsolenfehler(page);
 	const konto = await legeKontoMitBriefCodeAn('Lea');
+	// Der echte Weg führt vom Symbol zum Login; im Handy-Browser käme die Einstiegsseite (A-HILFE-02).
+	await startetVomSymbol(page);
 	await page.goto('/');
 	await expect(page).toHaveURL(/\/login$/);
 	await expect(page.getByRole('heading', { level: 1, name: 'Anmelden' })).toBeVisible();
@@ -78,6 +81,7 @@ test('A-LOGIN-09: nach Neuladen und in neuem Tab weiterhin angemeldet', async ({
 
 test('SI-06: Abmelden führt zur Login-Seite', async ({ page }) => {
 	const fehler = sammleKonsolenfehler(page);
+	await startetVomSymbol(page);
 	await meldeMitBriefAn(page, 'Mia');
 	await oeffneProfil(page);
 	await page.getByRole('button', { name: 'Abmelden' }).click();
@@ -244,6 +248,7 @@ test('SI-07: nach beendeAlleSitzungen führt der nächste Aufruf zur Login-Seite
 	page
 }) => {
 	const fehler = sammleKonsolenfehler(page);
+	await startetVomSymbol(page);
 	const konto = await meldeMitBriefAn(page, 'Ueli');
 	await beendeAlleSitzungen(konto.kontoId);
 	await page.reload();
