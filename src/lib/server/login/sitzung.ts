@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { eq, lt, sql } from 'drizzle-orm';
-import type { Db } from '../db/index.ts';
+import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, mitglied, sitzung } from '../db/schema.ts';
 
 export const SITZUNG_COOKIE = 'mytco_sitzung';
@@ -125,7 +125,7 @@ export async function beendeSitzung(db: Db, kennung: string): Promise<void> {
 }
 
 // SI-07: Erhöht die Sitzungsversion und löscht die Zeilen; beides in einer Transaktion.
-export async function beendeAlleSitzungen(db: Db, kontoId: number): Promise<void> {
+export async function beendeAlleSitzungen(db: DbOderTx, kontoId: number): Promise<void> {
 	await db.transaction(async (tx) => {
 		await tx
 			.update(konto)

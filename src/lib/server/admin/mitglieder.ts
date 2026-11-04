@@ -289,9 +289,11 @@ export async function beendeSitzungenVon(
 	id: number,
 	jetzt: Date
 ): Promise<'ok' | 'nicht-gefunden'> {
-	const [k] = await db.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, id));
-	if (!k) return 'nicht-gefunden';
-	await beendeAlleSitzungen(db, k.id);
-	await schreibeVerlauf(db, id, urheber, [{ aktion: 'sitzungen-beendet' }], jetzt);
-	return 'ok';
+	return db.transaction(async (tx) => {
+		const [k] = await tx.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, id));
+		if (!k) return 'nicht-gefunden' as const;
+		await beendeAlleSitzungen(tx, k.id);
+		await schreibeVerlauf(tx, id, urheber, [{ aktion: 'sitzungen-beendet' }], jetzt);
+		return 'ok' as const;
+	});
 }
