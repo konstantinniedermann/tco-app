@@ -273,7 +273,7 @@ Nicht mit `--legacy-peer-deps` umgehen. Prüfen mit
 
 **Fundort:** `erstelleSitzung` in `src/lib/server/login/sitzung.ts`; Passkey-Tests in `src/lib/server/login/passkey.db.test.ts`.
 
-**Beobachtung:** Alle DB-Tests teilen dieselbe Datenbank. `erstelleSitzung` löscht abgelaufene Sitzungen global. Ein DB-Test mit einem späteren «jetzt» kann so bei parallelem Lauf Sitzungen anderer Testdateien löschen. Als Behelf wurden die Daten der Passkey-Tests auf 2026-11-02 angeglichen (Task 5).
+**Beobachtung:** Alle DB-Tests teilen dieselbe Datenbank. `erstelleSitzung` löscht abgelaufene Sitzungen global. Ein DB-Test mit einem späteren «jetzt» kann so bei parallelem Lauf Sitzungen anderer Testdateien löschen. Als Behelf wurden die Daten der Passkey-Tests auf 2026-11-02 angeglichen (#44).
 
 **Ursprung:** #44, Passkey (04.11.2026).
 

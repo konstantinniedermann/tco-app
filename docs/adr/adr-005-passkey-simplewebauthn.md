@@ -71,13 +71,13 @@ Die Typen der Bibliothek ändern sich zwischen Hauptversionen; die Feldnamen von
   gewollt (Quelle 4).
 - Challenges im Arbeitsspeicher: Ein Neustart verwirft offene Vorgänge; das Mitglied
   versucht es neu.
-- Das Anfordern der Anmelde-Optionen ist nicht begrenzt: Wer es massenhaft tut, füllt die
+- Das Anfordern der Anmelde-Optionen zählt nicht zur Grenze, wird aber abgelehnt, sobald sie erreicht ist; darunter ist es nicht begrenzt: Wer es massenhaft tut, füllt die
   höchstens 1000 offenen Challenges und verdrängt echte. Das blockiert nur den Passkey-Weg,
-  der Login per Code bleibt (Entscheid R3).
+  der Login per Code bleibt (bewusst in Kauf genommen, #44).
 - Auch erfolgreiche Passkey-Anmeldungen zählen zur Grenze von 10 pro IP und Stunde. Gezählt
   wird vor dem ersten `await`, damit parallele Anfragen die Grenze nicht umgehen. Mitglieder
   hinter einer gemeinsamen Verbindung (z. B. Club-WLAN) fallen dann auf den Code zurück
-  (Entscheid R4).
+  (bewusst in Kauf genommen, #44).
 - Die Antwortzeit unterscheidet einen unbekannten von einem bekannten Passkey; messbar wäre
   nur, ob eine zufällige Credential-ID existiert. Die IDs sind nicht erratbar, die Bremse
   gilt.
