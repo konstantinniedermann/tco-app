@@ -114,6 +114,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Einmal-Code | Code zum Eintippen, gilt für ein einziges Login. Kommt per Brief (lange gültig) oder auf Anfrage per E-Mail (kurz gültig). Ersetzt das *Einmalpasswort* aus dem PDF; ein Passwort gibt es in MyTCO nicht | Einmal-Code | PDF 2; [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
 | Sitzung | Zeitraum, in dem ein Gerät nach dem Login eingeloggt bleibt. Endet nach einem Jahr ohne Nutzung, beim Logout oder wenn der Admin sie beendet | Sitzung | [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
 | Änderungsverlauf | Liste für Admins, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat, ohne alte und neue Werte. Nicht zu verwechseln mit dem *Änderungsprotokoll* der Anforderungen | Änderungsverlauf | [SI-12](sicherheitskonzept.md#vorgaben) |
+| Passkey | Freiwilliger Zugang statt Code: Das Gerät bestätigt mit Face ID, Fingerabdruck oder Handy-PIN. Ein weiterer Weg zur selben Sitzung; der Einmal-Code bleibt immer gültig, das Konto per Mail zurückholbar | Passkey | [#44](https://github.com/konstantinniedermann/tco-app/issues/44), [ADR-005](adr/adr-005-passkey-simplewebauthn.md) |
 | Erstes Login | Erstes Einloggen mit dem Code aus dem Brief; das Mitglied ergänzt dabei fehlende Daten | Erstes Login | PDF 3b-i; Ziel |
 | Startseite | Erste Seite nach dem Login mit Shortcuts, Konto und Logout | Startseite | PDF 3c |
 | Newsfeed | Bereich für Neuigkeiten des Vereins auf der Startseite | Newsfeed | PDF 3c |

@@ -266,3 +266,15 @@ Nicht mit `--legacy-peer-deps` umgehen. Prüfen mit
 **Ursprung:** #39, Final-Review und Nachprüfung der Korrekturrunde.
 
 **Einschätzung:** Beides nur bei absichtlich verbogener Datei oder Shell auf dem Server. Beim Härten des Servers (#39) prüfen, ob `compose()` die Werte von `geheim.env` generell vor der Shell schützen soll.
+
+### 2026-11-04 — DB-Test mit späterem «jetzt» löscht Sitzungen anderer Testdateien
+
+**Thema:** Tests
+
+**Fundort:** `erstelleSitzung` in `src/lib/server/login/sitzung.ts`; Passkey-Tests in `src/lib/server/login/passkey.db.test.ts`.
+
+**Beobachtung:** Alle DB-Tests teilen dieselbe Datenbank. `erstelleSitzung` löscht abgelaufene Sitzungen global. Ein DB-Test mit einem späteren «jetzt» kann so bei parallelem Lauf Sitzungen anderer Testdateien löschen. Als Behelf wurden die Daten der Passkey-Tests auf 2026-11-02 angeglichen (Task 5).
+
+**Ursprung:** #44, Passkey (04.11.2026).
+
+**Einschätzung:** Niedrig, solange alle Tests ähnliche Daten nehmen. Kommt zurück, wenn ein Test mit weit entferntem Datum flackert; dann das Aufräumen auf das eigene Konto beschränken.

@@ -7,6 +7,10 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+- Freiwilliger Passkey als zweiter Login-Weg (#44, A-LOGIN-07, [ADR-005](adr/adr-005-passkey-simplewebauthn.md)):
+  Hinweis nach dem Code-Login, Login in zwei Karten, neue Seite *Profil* mit den Passkeys,
+  Reiter *Start* und *Profil*. Neue Pakete `@simplewebauthn/server` und `/browser`. Nachweis mit
+  virtuellem Authenticator in Chrome; Prüfung auf echten Geräten offen bis #39.
 - Antworten des Vorstands vom 03.11.2026 übertragen: neue Termine der Etappen, Junioren ab der
   CM 2027, Passkey freiwillig als Komfort ab *Mitglieder-Login*, Einlesen der Mitgliederliste geplant,
   Kosten für 300–500 Mitglieder.

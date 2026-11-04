@@ -260,5 +260,7 @@ und `basis.css` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im
 
 - [Mockups](ui-mockups/index.html): Login, erstes Login (Schritt 2 von 3), Startseite mit
   Reitern, CM-Anmeldung, Mitgliederverwaltung am PC
+- [Passkey](ui-mockups/passkey.html): Hinweis nach dem Login, Login in zwei Karten, Profil mit
+  Aufklappbereich
 - [Grosse Schrift](ui-mockups/grosse-schrift.html): Startseite und CM-Anmeldung bei 150 %
   Systemschrift

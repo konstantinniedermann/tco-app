@@ -28,8 +28,8 @@ Randbedingungen:
 |--------|-------|---------|
 | **A · Selbst bauen** (Web Crypto, eigener CBOR-Parser) | Keine Abhängigkeit | Kryptografie und Formatprüfung selbst zu pflegen ist das grösste Risiko des Vorhabens; Fehler fallen nicht auf |
 | **B · SimpleWebAuthn** (`@simplewebauthn/server`, `/browser`) | Verbreitet, gut dokumentiert, TypeScript, MIT; Server 14.0.3 vom 25.09.2026 gepflegt; Server und Browser passen zusammen | Zwei neue Pakete mit Unterpaketen |
-| **C · Andere Bibliothek** (z. B. `fido2-lib`, `@github/webauthn-json`) | Teils kleiner | Weniger verbreitet oder nur eine Hälfte (Browser oder Server); schlechter dokumentiert |
-| **D · Dienst eines Anbieters** (gehostete Passkey-Anmeldung) | Wenig Code | Laufende Kosten, Mitgliederdaten bei einem Dritten (DS-Vorgaben), Abhängigkeit für den Login |
+| **C · Andere Bibliothek** (z. B. `fido2-lib` nur für den Server, `@github/webauthn-json` nur für den Browser) | Teils kleiner | Weniger verbreitet oder nur eine Hälfte (Browser oder Server); schlechter dokumentiert |
+| **D · Dienst eines Anbieters** (gehostete Passkey-Anmeldung) | Wenig Code | Laufende Kosten, Mitgliederdaten bei einem Dritten (Vorgaben im [Datenschutzkonzept](../datenschutz.md)), Abhängigkeit für den Login |
 
 ## Entscheidung
 
@@ -71,6 +71,21 @@ Die Typen der Bibliothek ändern sich zwischen Hauptversionen; die Feldnamen von
   gewollt (Quelle 4).
 - Challenges im Arbeitsspeicher: Ein Neustart verwirft offene Vorgänge; das Mitglied
   versucht es neu.
+- Das Anfordern der Anmelde-Optionen ist nicht begrenzt: Wer es massenhaft tut, füllt die
+  höchstens 1000 offenen Challenges und verdrängt echte. Das blockiert nur den Passkey-Weg,
+  der Login per Code bleibt (Entscheid R3).
+- Auch erfolgreiche Passkey-Anmeldungen zählen zur Grenze von 10 pro IP und Stunde. Gezählt
+  wird vor dem ersten `await`, damit parallele Anfragen die Grenze nicht umgehen. Mitglieder
+  hinter einer gemeinsamen Verbindung (z. B. Club-WLAN) fallen dann auf den Code zurück
+  (Entscheid R4).
+- Die Antwortzeit unterscheidet einen unbekannten von einem bekannten Passkey; messbar wäre
+  nur, ob eine zufällige Credential-ID existiert. Die IDs sind nicht erratbar, die Bremse
+  gilt.
+- Wird ein Konto in den Millisekunden zwischen Laden und Anlegen der Sitzung gelöscht, ergibt
+  das einen Fehler 500 statt einer Sitzung.
+- Die Relying-Party-ID ist die Adresse, unter der die App läuft (in Produktion aus `ORIGIN`).
+  Der Wechsel von der Übergangsadresse zu `my.tcolten.ch` (K-10) macht darum alle Passkeys
+  ungültig: Mitglieder melden sich mit dem Code an und sehen den Hinweis wieder.
 
 **Kosten:** keine laufenden.
 
@@ -90,9 +105,14 @@ Abgerufen am 04.11.2026.
 
 1. Apple Developer Forums, Thread 815784 (Feb. 2026): Passkey-Abfragen wiederholen sich oder
    hängen bei einer vom Startbildschirm gestarteten Web-App, iOS 18.6.2
+   <https://developer.apple.com/forums/thread/815784>
 2. Swisscom Trust Services, Hilfeseite zu Passkeys: Voraussetzungen iOS 16 und Android 9 mit
    Bildschirmsperre
+   <https://trustservices.swisscom.com/en/support/help-center/what-do-i-need-to-use-passkey>
 3. Cathay Pacific, FAQ zu Passkeys: Geräte- und Systemvoraussetzungen
+   <https://www.cathaypacific.com/cx/en_AU/faqs/cathay-membership-programme/sign-in-account-security/passkey/what-do-i-need-to-create-a-passkey.html>
 4. FIDO Alliance, White Paper zu mehreren Authenticators und zur Kontowiederherstellung
+   <https://fidoalliance.org/white-paper-multiple-authenticators-for-reducing-account-recovery-needs-for-fido-enabled-consumer-accounts/>
 5. Yubico, Blog zu synchronisierten Passkeys und NIST AAL2
+   <https://yubico.com/blog/new-nist-guidance-on-passkeys-key-takeaways-for-enterprises>
 6. npm: `@simplewebauthn/server` 14.0.3 (geändert am 25.09.2026, MIT)
