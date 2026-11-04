@@ -23,7 +23,16 @@ export async function virtuellerAuthenticator(page: Page): Promise<() => Promise
 	};
 }
 
-/** Ob der Browser WebAuthn meldet; dieselbe Prüfung wie `kannPasskey` der App. */
+/**
+ * Ob der Browser WebAuthn meldet; wörtlich die Prüfung von `browserSupportsWebAuthn`
+ * (@simplewebauthn/browser), auf der `kannPasskey` der App beruht. Das WebKit der CI (Linux)
+ * kennt `PublicKeyCredential`, aber nicht als Funktion; eine lockerere Prüfung erwartet dort
+ * fälschlich die Passkey-Karte.
+ */
 export function browserKannPasskey(page: Page): Promise<boolean> {
-	return page.evaluate(() => typeof PublicKeyCredential !== 'undefined');
+	return page.evaluate(
+		() =>
+			globalThis.PublicKeyCredential !== undefined &&
+			typeof globalThis.PublicKeyCredential === 'function'
+	);
 }
