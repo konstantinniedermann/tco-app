@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto';
 import { eq, sql } from 'drizzle-orm';
-import { afterAll, describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import {
+	legeEigeneDatenbankAn,
+	type EigeneDatenbank
+} from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { konto, mitglied, sitzung } from '../db/schema.ts';
@@ -142,16 +146,6 @@ describe('Sitzungen', () => {
 		expect((await zeile(kennung)).zuletztGenutzt).toEqual(jetzt);
 	});
 
-	test('abgelaufene Sitzungen löscht erstelleSitzung', async () => {
-		const { kontoId } = await legeMitgliedAn(db);
-		const andere = await legeMitgliedAn(db);
-		const alt = await erstelleSitzung(db, kontoId, nach(-366 * TAG));
-		const frisch = await erstelleSitzung(db, andere.kontoId, nach(-364 * TAG));
-		await erstelleSitzung(db, kontoId, jetzt);
-		expect(await zeile(alt)).toBeUndefined();
-		expect(await zeile(frisch)).toBeDefined();
-	});
-
 	test('beendeSitzung löscht nur diese Zeile', async () => {
 		const { kontoId } = await legeMitgliedAn(db);
 		const a = await erstelleSitzung(db, kontoId, jetzt);
@@ -159,5 +153,38 @@ describe('Sitzungen', () => {
 		await beendeSitzung(db, a);
 		expect(await zeile(a)).toBeUndefined();
 		expect(await zeile(b)).toBeDefined();
+	});
+});
+
+// erstelleSitzung räumt global auf. In der gemeinsamen Test-Datenbank würde jede andere Datei,
+// die eine Sitzung mit einem um mehr als einen Tag späteren «jetzt» anlegt, die Sitzung `frisch`
+// löschen. Darum bekommt dieser Test eine eigene Datenbank.
+describe('Sitzungen aufräumen', () => {
+	let eigene: EigeneDatenbank | undefined;
+
+	beforeAll(async () => {
+		eigene = await legeEigeneDatenbankAn('sitzung');
+	});
+
+	afterAll(async () => {
+		await eigene?.abbauen();
+	});
+
+	test('abgelaufene Sitzungen löscht erstelleSitzung', async () => {
+		const edb = eigene!.db;
+		const zeileIn = async (kennung: string) =>
+			(
+				await edb
+					.select()
+					.from(sitzung)
+					.where(eq(sitzung.kennungHash, hash(kennung)))
+			)[0];
+		const { kontoId } = await legeMitgliedAn(edb);
+		const andere = await legeMitgliedAn(edb);
+		const alt = await erstelleSitzung(edb, kontoId, nach(-366 * TAG));
+		const frisch = await erstelleSitzung(edb, andere.kontoId, nach(-364 * TAG));
+		await erstelleSitzung(edb, kontoId, jetzt);
+		expect(await zeileIn(alt)).toBeUndefined();
+		expect(await zeileIn(frisch)).toBeDefined();
 	});
 });
