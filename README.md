@@ -13,7 +13,8 @@ Mitgliederverwaltung Fairgate oder die Website tcolten.ch.
 Phase **Fundament**, Version 0.3.0 (noch nicht ausgeliefert): Login per Einmal-Code mit
 Musterbrief, Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene
 Testdaten) sind gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
-den Etappen. Termine und Umfang der Etappen
+den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* aus
+([`docs/testgruppe.md`](docs/testgruppe.md)). Termine und Umfang der Etappen
 → [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Einstieg
