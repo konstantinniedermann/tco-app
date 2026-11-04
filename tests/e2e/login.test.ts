@@ -25,7 +25,6 @@ function leseMailanfrage(page: Page): Promise<string | null> {
 	return page.evaluate((schluessel) => localStorage.getItem(schluessel), MAILANFRAGE_SCHLUESSEL);
 }
 
-/** Brief-Code klein und mit Bindestrich eintippen (UI-07). */
 /** Öffnet das Profil über den Reiter; dort sitzt «Abmelden». */
 async function oeffneProfil(page: Page) {
 	await page
@@ -35,6 +34,7 @@ async function oeffneProfil(page: Page) {
 	await expect(page).toHaveURL(/\/profil$/);
 }
 
+/** Brief-Code klein und mit Bindestrich eintippen (UI-07). */
 async function meldeMitBriefAn(page: Page, vorname: string) {
 	const konto = await legeKontoMitBriefCodeAn(vorname);
 	await page.goto('/login');

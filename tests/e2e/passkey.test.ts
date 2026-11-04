@@ -10,6 +10,9 @@ import { browserKannPasskey, virtuellerAuthenticator } from './hilfen/passkey.ts
 import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
 // Rate-Limits gelten pro IP für den ganzen Lauf: höchstens ein Fehlversuch pro Test und Projekt.
+// Die Passkey-Prüfung vergleicht die Herkunft; der Testserver ohne Proxy-Kopf meldet https statt http.
+test.use({ extraHTTPHeaders: { 'x-forwarded-proto': 'http' } });
+
 test.afterAll(async () => {
 	await schliesseLoginHilfen();
 });
