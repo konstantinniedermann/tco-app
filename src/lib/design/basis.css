@@ -226,6 +226,16 @@ img {
 	width: 100%;
 }
 
+/* Inaktive Taste (nur Verwaltung): grau, solange es nichts zu speichern gibt */
+.taste-haupt:disabled,
+.taste-haupt:disabled:hover,
+.taste-neben:disabled {
+	background: var(--farbe-linie);
+	border-color: var(--farbe-linie);
+	color: var(--farbe-text-leise);
+	cursor: not-allowed;
+}
+
 .zurueck {
 	display: inline-block;
 	margin-bottom: var(--abstand-3);
@@ -274,6 +284,33 @@ img {
 	margin-top: var(--abstand-1);
 }
 
+/* Feld-Zeile (nur Verwaltung): Bezeichnung über dem Feld, ab 60rem links daneben */
+.feld-zeile {
+	display: grid;
+	gap: var(--abstand-1) var(--abstand-3);
+	margin-bottom: var(--abstand-3);
+}
+
+.feld-zeile label {
+	font-weight: 600;
+}
+
+.feld-zeile input,
+.feld-zeile select {
+	width: 100%;
+	min-height: var(--tippflaeche);
+	padding: var(--abstand-3);
+	border: var(--rand-dick) solid var(--farbe-rand);
+	border-radius: var(--radius);
+	background: var(--farbe-flaeche);
+	color: var(--farbe-text);
+	font: inherit;
+}
+
+.feld-zeile .fehler {
+	margin-top: 0;
+}
+
 /* Karten und Kacheln */
 .karte {
 	background: var(--farbe-flaeche);
@@ -281,6 +318,16 @@ img {
 	padding: var(--abstand-4);
 	margin-bottom: var(--abstand-3);
 	box-shadow: var(--schatten-karte);
+}
+
+.karte.klappe {
+	padding-block: var(--abstand-2);
+}
+
+dialog.karte {
+	border: 0;
+	max-width: var(--breite-inhalt);
+	color: var(--farbe-text);
 }
 
 .klappe-titel {
@@ -451,6 +498,11 @@ img {
 	flex: 1 1 10em;
 }
 
+/* Spalten (nur Verwaltung): untereinander, ab 60rem zwei Spalten */
+.spalten > * {
+	min-width: 0;
+}
+
 /* Verwaltung: Seitenleiste und Inhalt; auf schmalem Bildschirm untereinander */
 .verwaltung {
 	display: flex;
@@ -498,6 +550,23 @@ img {
 
 	.reiter a .symbol {
 		display: none;
+	}
+
+	.feld-zeile {
+		grid-template-columns: 11rem 1fr;
+		align-items: center;
+	}
+
+	.feld-zeile .fehler,
+	.feld-zeile .feld-hilfe {
+		grid-column: 2;
+	}
+
+	.spalten {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--abstand-5);
+		align-items: start;
 	}
 
 	.verwaltung {
