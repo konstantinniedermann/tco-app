@@ -92,6 +92,25 @@ Scheitert das Einspielen, steht im Protokoll nur der Fehlercode (SQLSTATE) bzw. 
 Zahl der Fehlerzeilen, nie ein Wert aus der Datenbank (DS-06). Zum Nachsehen bleibt die
 Sicherung selbst.
 
+## Ersten Admin festlegen
+
+Auf Live ist die Datenbank anfangs leer. Der Projektleiter wird einmal per Befehl als Mitglied
+angelegt und bekommt die Rolle Admin (Mitgliedernummer, Name, Adresse und E-Mail sind Pflicht):
+
+```
+cd /opt/mytco && MYTCO_UMGEBUNG=live docker compose -p mytco-live \
+  -f live/betrieb/compose.umgebung.yml --env-file live/geheim.env \
+  exec app node scripts/admin-festlegen.ts --mitgliedernummer … --vorname … \
+  --nachname … --strasse … --plz … --ort … --email …
+```
+
+Der Befehl legt nur den Admin selbst an; alle anderen Mitglieder kommen danach über die
+Verwaltung. Gibt es das Mitglied schon (gleiche Nummer oder E-Mail), erhält es nur die Rolle.
+Die Angaben landen im Shell-Verlauf: Befehl mit führendem Leerzeichen eingeben (bei
+`HISTCONTROL=ignorespace`) oder den Verlauf danach bereinigen. Die Ausgabe nennt das Ergebnis und bei Fehlern Feldnamen mit Grund, nie Werte. Danach meldet
+sich der Admin über «Code per E-Mail» an. Auf Test ist Erika Beispiel (erfunden) automatisch
+Admin.
+
 ## Auslieferung ohne CI (keine Actions-Minuten)
 
 Ohne Minuten baut die CI auch kein Image. Dann von Hand:

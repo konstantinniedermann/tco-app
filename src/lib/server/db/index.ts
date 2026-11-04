@@ -3,6 +3,7 @@ import pg from 'pg';
 import * as schema from './schema.ts';
 
 export type Db = ReturnType<typeof erstelleDb>;
+export type DbOderTx = Db | Parameters<Parameters<Db['transaction']>[0]>[0];
 
 export function erstelleDb(url: string) {
 	const pool = new pg.Pool({

@@ -1,0 +1,85 @@
+import { and, count, eq, inArray, ne, sql } from 'drizzle-orm';
+import type { Db, DbOderTx } from '../db/index.ts';
+import { konto, kontoRolle, mitglied } from '../db/schema.ts';
+import { schreibeVerlauf, type Eintrag, type Urheber } from './verlauf.ts';
+
+export const ROLLEN = ['admin', 'cm', 'lizenz'] as const;
+export type Rolle = (typeof ROLLEN)[number];
+
+// Schlüssel der Advisory-Sperre, die gleichzeitige Rollenänderungen hintereinander ordnet.
+const SPERRE_ROLLEN = 4301;
+
+export async function ladeRollen(db: DbOderTx, kontoId: number): Promise<Rolle[]> {
+	const zeilen = await db
+		.select({ rolle: kontoRolle.rolle })
+		.from(kontoRolle)
+		.where(eq(kontoRolle.kontoId, kontoId));
+	return zeilen.map((z) => z.rolle as Rolle);
+}
+
+// RR-08: Als Admin zählt nur ein Konto mit Rolle `admin`, nicht gesperrt, Mitglied aktiv.
+function zaehlendeAdmins(db: DbOderTx, ausser?: number, nur?: number) {
+	return db
+		.select({ n: count() })
+		.from(kontoRolle)
+		.innerJoin(konto, eq(konto.id, kontoRolle.kontoId))
+		.innerJoin(mitglied, eq(mitglied.id, konto.mitgliedId))
+		.where(
+			and(
+				eq(kontoRolle.rolle, 'admin'),
+				eq(konto.gesperrt, false),
+				eq(mitglied.status, 'aktiv'),
+				ausser === undefined ? undefined : ne(kontoRolle.kontoId, ausser),
+				nur === undefined ? undefined : eq(kontoRolle.kontoId, nur)
+			)
+		);
+}
+
+export async function istAdmin(db: DbOderTx, kontoId: number): Promise<boolean> {
+	const [zeile] = await zaehlendeAdmins(db, undefined, kontoId);
+	return zeile.n > 0;
+}
+
+export async function setzeRollen(
+	db: Db,
+	urheber: Urheber,
+	kontoId: number,
+	rollen: Rolle[],
+	jetzt: Date
+): Promise<'ok' | 'letzter-admin' | 'nicht-gefunden'> {
+	return db.transaction(async (tx) => {
+		// RR-03: Zählen und Schreiben müssen gegenüber anderen Änderungen atomar sein.
+		await tx.execute(sql`select pg_advisory_xact_lock(${SPERRE_ROLLEN})`);
+
+		const [ziel] = await tx
+			.select({ mitgliedId: konto.mitgliedId })
+			.from(konto)
+			.where(eq(konto.id, kontoId));
+		if (!ziel) return 'nicht-gefunden';
+
+		const alt = await ladeRollen(tx, kontoId);
+		const neu = [...new Set(rollen)];
+		const vergeben = neu.filter((r) => !alt.includes(r));
+		const entzogen = alt.filter((r) => !neu.includes(r));
+
+		if (entzogen.includes('admin') && (await istAdmin(tx, kontoId))) {
+			const [andere] = await zaehlendeAdmins(tx, kontoId);
+			if (andere.n === 0) return 'letzter-admin';
+		}
+
+		if (entzogen.length > 0) {
+			await tx
+				.delete(kontoRolle)
+				.where(and(eq(kontoRolle.kontoId, kontoId), inArray(kontoRolle.rolle, entzogen)));
+		}
+		if (vergeben.length > 0) {
+			await tx.insert(kontoRolle).values(vergeben.map((rolle) => ({ kontoId, rolle })));
+		}
+		const eintraege: Eintrag[] = [
+			...vergeben.map((r): Eintrag => ({ aktion: 'rolle-vergeben', detail: r })),
+			...entzogen.map((r): Eintrag => ({ aktion: 'rolle-entzogen', detail: r }))
+		];
+		await schreibeVerlauf(tx, ziel.mitgliedId, urheber, eintraege, jetzt);
+		return 'ok';
+	});
+}

@@ -64,6 +64,10 @@ export function hashMailCode(schluessel: string, kontoId: number, code: string):
 	return hmac(schluessel, `mail:${kontoId}:${code}`);
 }
 
+export function hashAdminCode(schluessel: string, sitzungHash: string, code: string): string {
+	return hmac(schluessel, `admin:${sitzungHash}:${code}`);
+}
+
 export function gleich(a: string, b: string): boolean {
 	const x = Buffer.from(a);
 	const y = Buffer.from(b);

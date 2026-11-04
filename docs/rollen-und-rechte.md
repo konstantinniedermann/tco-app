@@ -26,15 +26,15 @@ Der Vorstand hat die Rollen bestätigt und will zwei Admins (K-18.1, K-18.3). We
 
 | ID | Regel | Status |
 |----|-------|--------|
-| RR-01 | Jedes Konto hat die Rolle *Mitglied*; weitere vergibt der Admin. Eine Person kann mehrere Rollen haben, ihre Rechte addieren sich (FR-03) | geplant |
+| RR-01 | Jedes Konto hat die Rolle *Mitglied*; weitere vergibt der Admin. Eine Person kann mehrere Rollen haben, ihre Rechte addieren sich (FR-03) | umgesetzt |
 | RR-02 | Der Admin darf alles, was CM- und Lizenzverantwortlicher dürfen — als Stellvertretung, ohne sich die Rolle zu geben | geplant |
-| RR-03 | Der letzte Admin kann sich die Rolle *Admin* nicht entziehen und sein Konto nicht löschen | geplant |
+| RR-03 | Der letzte Admin kann sich die Rolle *Admin* nicht entziehen und sein Konto nicht löschen | umgesetzt\* (Entzug der Rolle; Austritt und Löschen mit Etappe 3) |
 | RR-04 | Einmal-Codes (Brief- und Mail-Code) sind nur als Hash gespeichert und nach der Ausgabe für niemanden abrufbar, auch nicht für den Admin. Er kann einen neuen Brief-Code ausstellen, der nur den alten Brief-Code ersetzt, und alle Sitzungen eines Kontos beenden; einen Code per E-Mail holt sich das Mitglied selbst (A-LOGIN-10, [#29](https://github.com/konstantinniedermann/tco-app/issues/29)) | geplant |
 | RR-05 | Für die Rolle *Mitglied* gibt es kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM und bei der Wahl des Doppelpartners (nur Mitglieder, die für die Kategorie passen und noch frei sind) | geplant |
 | RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist | geplant |
-| RR-07 | Die Admin-Oberfläche sieht nur, wer mindestens eine Rolle über *Mitglied* hinaus hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03) | geplant |
-| RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | geplant |
-| RR-09 | Die Admin-Oberfläche verlangt höchstens einmal pro 24 Stunden einen frischen Code per E-Mail ([SI-08](sicherheitskonzept.md#vorgaben), K-12.1) | geplant |
+| RR-07 | Die Admin-Oberfläche sieht nur, wer mindestens eine Rolle über *Mitglied* hinaus hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03) | umgesetzt |
+| RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | umgesetzt\* (für die Admin-Rechte; Sperre durch Austritt folgt mit Etappe 3) |
+| RR-09 | Die Admin-Oberfläche verlangt höchstens einmal pro 24 Stunden einen frischen Code per E-Mail ([SI-08](sicherheitskonzept.md#vorgaben), K-12.1) | umgesetzt |
 
 ## Matrix
 
@@ -49,7 +49,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Benachrichtigungen (FR-02) | – | S eigene | S eigene | S eigene | S eigene |
 | Eigener Name, Adresse, Geschlecht, Jahrgang (Adresse ändern: hängt an K-19) | – | L eigene | L eigene | L eigene | S |
 | Mitglieder anlegen, bearbeiten, löschen, exportieren (DS-07) | – | – | – | – | S |
-| Konto sperren, neuer Code für einen Brief, Sitzungen beenden | – | – | – | – | S |
+| Neuer Code für einen Brief, Sitzungen beenden | – | – | – | – | S |
 | Rollen vergeben | – | – | – | – | S |
 | Änderungsverlauf (FR-26) | – | – | – | – | L |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S |

@@ -11,8 +11,9 @@ let dienst: LoginDienst | undefined;
 let passkeyDienst: PasskeyDienst | undefined;
 let bremsen: Bremsen | undefined;
 
-// Eine Instanz für Login- und Passkey-Dienst: jeder Dienst zählt eigene Fehlversuche, nur die Instanz ist geteilt.
-function holeBremsen(): Bremsen {
+// Eine Instanz für Login-, Passkey- und Admin-Zugangsdienst: jeder Dienst zählt eigene Fehlversuche,
+// nur die Instanz ist geteilt (Adress-Grenzen zählen Login- und Admin-Mails zusammen).
+export function holeBremsen(): Bremsen {
 	bremsen ??= erstelleBremsen();
 	return bremsen;
 }

@@ -47,10 +47,10 @@ describe('Sitzungen', () => {
 	});
 
 	test('pruefeSitzung liefert Konto und Vorname', async () => {
-		const { kontoId, vorname } = await legeMitgliedAn(db, { vorname: 'Erfunden' });
+		const { kontoId, mitgliedId, vorname } = await legeMitgliedAn(db, { vorname: 'Erfunden' });
 		const kennung = await erstelleSitzung(db, kontoId, jetzt);
 		expect(await pruefeSitzung(db, kennung, jetzt)).toEqual({
-			konto: { kontoId, vorname, passkeyHinweis: false },
+			konto: { kontoId, mitgliedId, vorname, passkeyHinweis: false, sitzungHash: hash(kennung) },
 			verlaengert: false
 		});
 		expect(await pruefeSitzung(db, 'unbekannt', jetzt)).toBeNull();

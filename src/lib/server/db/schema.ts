@@ -6,6 +6,7 @@ import {
 	index,
 	integer,
 	pgTable,
+	primaryKey,
 	serial,
 	text,
 	timestamp,
@@ -22,10 +23,18 @@ export const mitglied = pgTable(
 		plz: text('plz').notNull(),
 		ort: text('ort').notNull(),
 		email: text('email').notNull().unique('mitglied_email_unique'),
-		status: text('status').notNull().default('aktiv')
+		status: text('status').notNull().default('aktiv'),
+		// Leer erlaubt (mehrere Mitglieder ohne Nummer); gesetzt ist sie eindeutig.
+		mitgliedernummer: text('mitgliedernummer'),
+		telefon: text('telefon'),
+		geschlecht: text('geschlecht'),
+		jahrgang: integer('jahrgang'),
+		lizenznummer: text('lizenznummer')
 	},
 	(t) => [
 		check('mitglied_status_check', sql`${t.status} in ('aktiv', 'ausgetreten', 'geloescht')`),
+		check('mitglied_geschlecht_check', sql`${t.geschlecht} in ('w', 'm')`),
+		uniqueIndex('mitglied_mitgliedernummer_unique').on(t.mitgliedernummer),
 		// Der Login sucht die Adresse ohne Rücksicht auf Gross-/Kleinschreibung: sie muss auch so eindeutig sein.
 		uniqueIndex('mitglied_email_klein_unique').on(sql`lower(${t.email})`)
 	]
@@ -59,7 +68,11 @@ export const sitzung = pgTable(
 		sitzungsversion: integer('sitzungsversion').notNull(),
 		erstelltAm: timestamp('erstellt_am', { withTimezone: true }).notNull(),
 		zuletztGenutzt: timestamp('zuletzt_genutzt', { withTimezone: true }).notNull(),
-		passkeyHinweis: boolean('passkey_hinweis').notNull().default(false)
+		passkeyHinweis: boolean('passkey_hinweis').notNull().default(false),
+		adminBestaetigtAm: timestamp('admin_bestaetigt_am', { withTimezone: true }),
+		adminCodeHash: text('admin_code_hash'),
+		adminCodeAblauf: timestamp('admin_code_ablauf', { withTimezone: true }),
+		adminCodeFehlversuche: integer('admin_code_fehlversuche').notNull().default(0)
 	},
 	(t) => [index('sitzung_konto_id_idx').on(t.kontoId)]
 );
@@ -85,4 +98,44 @@ export const passkey = pgTable(
 		zuletztBenutzt: timestamp('zuletzt_benutzt', { withTimezone: true })
 	},
 	(t) => [index('passkey_konto_id_idx').on(t.kontoId)]
+);
+
+export const kontoRolle = pgTable(
+	'konto_rolle',
+	{
+		kontoId: integer('konto_id')
+			.notNull()
+			.references(() => konto.id, { onDelete: 'cascade' }),
+		rolle: text('rolle').notNull()
+	},
+	(t) => [
+		primaryKey({ columns: [t.kontoId, t.rolle] }),
+		check('konto_rolle_rolle_check', sql`${t.rolle} in ('admin', 'cm', 'lizenz')`)
+	]
+);
+
+// Änderungsverlauf ohne alte und neue Werte (FR-26); `detail` nennt nur Feld- oder Rollennamen.
+export const aenderung = pgTable(
+	'aenderung',
+	{
+		id: serial('id').primaryKey(),
+		mitgliedId: integer('mitglied_id')
+			.notNull()
+			.references(() => mitglied.id, { onDelete: 'cascade' }),
+		zeitpunkt: timestamp('zeitpunkt', { withTimezone: true }).notNull().defaultNow(),
+		urheberArt: text('urheber_art').notNull(),
+		urheberMitgliedId: integer('urheber_mitglied_id').references(() => mitglied.id, {
+			onDelete: 'set null'
+		}),
+		aktion: text('aktion').notNull(),
+		detail: text('detail')
+	},
+	(t) => [
+		check(
+			'aenderung_urheber_art_check',
+			sql`${t.urheberArt} in ('admin', 'mitglied', 'automatisch')`
+		),
+		index('aenderung_mitglied_zeitpunkt_idx').on(t.mitgliedId, t.zeitpunkt),
+		index('aenderung_zeitpunkt_idx').on(t.zeitpunkt)
+	]
 );

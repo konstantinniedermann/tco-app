@@ -1,5 +1,6 @@
 // Nur lokal: legt erfundene Mitglieder an und gibt für das erste einmal einen Brief-Code aus.
 // Aufruf über `make seed` (lädt .env). Bricht ab, wenn die Datenbank nicht lokal ist.
+import { machAdmin } from '../src/lib/server/admin/erster-admin.ts';
 import { erstelleDb } from '../src/lib/server/db/index.ts';
 import { leseEinstellungen } from '../src/lib/server/einstellungen.ts';
 import { erstelleBremsen } from '../src/lib/server/login/bremse.ts';
@@ -28,6 +29,7 @@ async function seed(): Promise<void> {
 	try {
 		// Die Adressen gehen nur an Mailpit.
 		const kontoIds = await legeErfundeneMitgliederAn(db);
+		await machAdmin(db, kontoIds[0], new Date());
 		const dienst = erstelleLoginDienst({
 			db,
 			schluessel: einstellungen.codeSchluessel,
