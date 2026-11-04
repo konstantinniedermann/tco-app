@@ -16,6 +16,16 @@ function exportiertActions(inhalt: string): boolean {
 	return false;
 }
 
+// Admin-Routen sind dünn: Sie importieren nur den Dienst-Einstieg und die Schnittstellen.
+const ADMIN_ROUTE = /^src\/routes\/api\/admin\/(?:.*\/)?\+server\.(ts|js)$/;
+const ERLAUBTER_IMPORT = /(?:^|\/)lib\/server\/admin\/(?:index|schnittstellen)\.ts$|^\.\/\$types$/;
+
+function importe(inhalt: string): string[] {
+	const muster =
+		/\b(?:import|export)\b[^'"]*?\bfrom\s*['"]([^'"]+)['"]|\bimport\s*['"]([^'"]+)['"]/g;
+	return [...inhalt.matchAll(muster)].map((m) => m[1] ?? m[2]);
+}
+
 /** Prüft die Bauregel: nur API-Routen (`+server.ts`), keine Server-Dateien neben Seiten, Form Actions oder Remote Functions. */
 export function pruefeBauregel(dateien: Map<string, string>): string[] {
 	const befunde: string[] = [];
@@ -28,6 +38,15 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 		}
 		if (inRoutes && (ACTIONS_DEKLARATION.test(inhalt) || exportiertActions(inhalt))) {
 			befunde.push(`${pfad}: Form Actions sind nicht vorgesehen`);
+		}
+		if (ADMIN_ROUTE.test(pfad)) {
+			for (const quelle of importe(inhalt)) {
+				if (!ERLAUBTER_IMPORT.test(quelle)) {
+					befunde.push(
+						`${pfad}: Admin-Route importiert '${quelle}'; erlaubt sind nur lib/server/admin/index.ts und schnittstellen.ts`
+					);
+				}
+			}
 		}
 		if (/\.remote\.(ts|js)$/.test(name)) {
 			befunde.push(`${pfad}: Remote Functions sind nicht vorgesehen`);

@@ -122,12 +122,12 @@ describe('Passkey-Schnittstellen', () => {
 		const d = baue();
 		const { kontoId } = await legeMitgliedAn(db);
 		const { kennung, e } = await angemeldet(kontoId);
-		const vorher = getSitzung(e);
+		const vorher = await getSitzung(e, db);
 		expect(await vorher.json()).toMatchObject({ passkeyHinweis: true });
 
 		const r = await postHinweis(d.dienst, await mitSitzung(kennung, { body: {} }));
 		expect(r.status).toBe(204);
-		const nachher = getSitzung(await mitSitzung(kennung));
+		const nachher = await getSitzung(await mitSitzung(kennung), db);
 		expect(await nachher.json()).toMatchObject({ passkeyHinweis: false });
 	});
 
