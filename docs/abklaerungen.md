@@ -53,7 +53,7 @@ Hauptliste. Die Tabelle dient nur zum Einsammeln.
   nicht im Repo. Die Adressaten korrigieren das Blatt selbst. Dort fragen zwei Spalten,
   ob jemand in der Testgruppe mitmacht (iPhone/Android) und mit welchem Handymodell
   (freiwillig). Ins Repo kommen davon nur Anzahl, Verteilung iPhone/Android und ob ein
-  älteres Handy dabei ist (K-20).
+  älteres Handy dabei ist (K-20, [Testgruppe](testgruppe.md#zusammensetzung)).
 - **Gesperrt:** Jedes Blatt ist als Ganzes gesperrt. Frei sind nur die Antwortspalten der
   vorhandenen Fragen und die Einträge auf *Wer ist wer*. Bei neuen Zeilen den freien
   Bereich anpassen.
@@ -107,7 +107,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
 | K-19 | Dürfen Mitglieder E-Mail und Telefon selbst ändern? Auch die Adresse, solange Fairgate nicht angebunden ist, und wer überträgt sie dann nach Fairgate? | Vorstand | A-KONTO-01, A-KONTO-02 |
-| K-20 | Stellt der Verein eine Testgruppe von 5–10 Mitgliedern unterschiedlichen Alters, mit iPhone und Android, die Brief, Login und Installation vor dem Start ausprobiert? Freiwillige unter den Ausfüllenden melden sich zusätzlich auf *Wer ist wer* (siehe oben); der Vorstand ergänzt mit Mitgliedern ohne Vorwissen. | Vorstand | #11, [ADR-001](adr/adr-001-web-app-zuerst.md) |
+| K-20 | Wer vom Vorstand macht in der [Testgruppe](testgruppe.md) mit? Stand 04.11.2026: Die Testgruppe stellt der Projektleiter selbst zusammen (K-20.1 beantwortet); in der Tabelle als K-20.2, Freiwillige tragen sich auf *Wer ist wer* ein. | Vorstand | #40, [ADR-001](adr/adr-001-web-app-zuerst.md) |
 | K-21 | An wen wenden sich Mitglieder bei Fragen (Login klappt nicht, Installation auf dem Handy)? | Vorstand | #10 |
 | K-47 | Kann der CM-Verantwortliche eine Excel-Datei aus Advantage schicken, so wie Advantage sie für Gruppen und KO-Tableaus ausgibt, mit erfundenen oder geschwärzten Namen? Gebraucht wird nur der Aufbau (Spalten, Blätter), damit MyTCO die Übernahme rechtzeitig vor der CM bauen kann. Echte Daten kommen nicht ins Repo. | Verantwortliche CM | A-ADVANTAGE-02, A-ADVANTAGE-03, [Fachmodell](fachmodell.md) |
 
@@ -176,3 +176,4 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-40.2 | Reicht für die Alterskategorien der CM der Jahrgang? | Ja (Reglemente Swiss Tennis) | Hauptansprechperson im Vorstand, 03.11.2026 | [Datenschutz](datenschutz.md#welche-daten), [Fachmodell](fachmodell.md) |
 | K-46 | Spielen Junioren schon an der CM 2027 mit, und wer meldet sie an? | Ja, sie melden sich selbst an. Junioren sind Mitglieder und erhalten ein Login; ob sie oder die Eltern es führen, bleibt offen. Der CM-Verantwortliche soll ein Mitglied auch selbst einer Kategorie zuteilen können | Hauptansprechperson im Vorstand, 03.11.2026 | Konten für Junioren bis zur CM-Anmeldung ([Datenschutz](datenschutz.md#junioren), [Fachmodell](fachmodell.md)); Anmeldung durch den CM-Verantwortlichen ist A-ANMELDUNG-06; Kontoführung bleibt bei K-08 |
 | K-14 | Wer überträgt Ein- und Austritte und Adressänderungen zwischen Fairgate und MyTCO? | Aufgegangen in K-17.1 (Ein- und Austritte liest die Mitgliederverwaltung ein) und K-19.2 (Adressänderungen); gemeinsame Familienadressen löst der Vorschlag K-08 bis zur Altersgrenze | Projektleiter, 03.11.2026 | A-MITGLIED-07 |
+| K-20.1 | Stellt der Verein eine Testgruppe von 5–10 Mitgliedern, die Brief, Login und Installation vor dem Start ausprobiert? | Der Projektleiter stellt sie selbst zusammen, eine Handvoll hat zugesagt; der Vorstand kann mitmachen | Projektleiter, 04.11.2026 | [Testgruppe](testgruppe.md), Etappe *Pilot* ([Roadmap](roadmap.md)) |

@@ -7,6 +7,10 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+- Testgruppe vorbereitet (#40): neue Seite [Testgruppe](testgruppe.md) mit Ablauf, Aufträgen,
+  Texten für Mail und Chat und Formularfragen; neue Etappe *Pilot* mit Vorabversion 0.x auf
+  Live vor 1.0.0; neue Anforderungen zur Hilfe beim Start (A-HILFE-01, -02); Datenschutzkonzept
+  um die Testgruppe ergänzt; K-20.1 vom Projektleiter beantwortet.
 - Mitgliederverwaltung für Admins, Etappe 1 von #43 (A-MITGLIED-01, -02, -06, A-ROLLE-01, -02,
   SI-08): Bestätigung mit Mail-Code (24 Stunden), Mitglieder anlegen, suchen und bearbeiten, Rollen
   vergeben (der letzte Admin bleibt), Änderungsverlauf ohne Werte (die letzten 50, auf der Seite

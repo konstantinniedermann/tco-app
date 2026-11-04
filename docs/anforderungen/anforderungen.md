@@ -19,6 +19,8 @@ in den [Abklärungen](../abklaerungen.md#beantwortet).
 
 **Etappe:** Milestone laut [Roadmap](../roadmap.md) — *Fundament*, *Mitglieder-Login*,
 *CM-Anmeldung*, *CM-Betrieb*, *Lizenzanträge* — oder *später* (Backlog / Optional).
+*Pilot* ist die Vorstufe von *Mitglieder-Login*: Deren Anforderungen stehen unter
+*Mitglieder-Login*, auch wenn ihr Issue im Milestone *Pilot* liegt.
 *durchgehend* heisst: gilt ab der ersten Etappe mit Produktcode für alles Weitere.
 
 **Status:** `geplant` · `später` · `offen` (wartet auf eine Antwort des Vereins) ·
@@ -96,6 +98,13 @@ auf dem Handy aussieht, klärt das UI-Leitbild (Issue #13).
 | A-STARTSEITE-02 | Die Startseite bietet Shortcuts zu den wichtigsten Funktionen | PDF 3c | CM-Anmeldung\* | geplant |
 | A-STARTSEITE-03 | Die Shortcuts lassen sich später einfach ändern (z. B. für die Anmeldung zu einem bestimmten Anlass) | PDF 3c | CM-Anmeldung\* | geplant |
 | A-STARTSEITE-04 | Die Startseite zeigt die Anlässe, für die das Mitglied angemeldet ist | PDF 3c | CM-Anmeldung\* | geplant |
+
+### HILFE — Hilfe beim Start
+
+| ID | Anforderung | Quelle | Etappe | Status |
+|----|-------------|--------|--------|--------|
+| A-HILFE-01 | MyTCO hat eine Seite *Hilfe*: MyTCO auf den Startbildschirm legen, neuen Code anfordern, Passkey einrichten, eigene Angaben ändern, Kontakt für Fragen (K-21) | PL | Mitglieder-Login | geplant |
+| A-HILFE-02 | Solange MyTCO im Browser statt vom Startbildschirm läuft, zeigt die Einstiegsseite eine Anleitung zum Startbildschirm mit Animation, je nach iPhone oder Android. Der Brief behält seine Kurzanleitung (A-LOGIN-01) | PL | Mitglieder-Login | geplant |
 
 ### NEWSFEED
 

@@ -67,6 +67,8 @@ Sind mehr als etwa ein Drittel der offenen Issues `P1`, ist eine Triage fällig.
 
 Jedes offene Issue sitzt in **genau einem** Milestone; die Etappen mit Termin und Umfang
 stehen in der [Roadmap](roadmap.md). Was keinen Termin hat, kommt nach *Backlog / Optional*.
+Ausnahme ist *Pilot*: Die Etappe hat bewusst kein Datum, sie gilt als Vorstufe von
+*Mitglieder-Login*, und P1 misst sich dort an deren Termin.
 
 ## Definition of Done
 

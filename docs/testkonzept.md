@@ -128,10 +128,19 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 
-Falls der Verein eine Testgruppe stellt (K-20), prüft sie Brief, Installation und Login
-als Pilot auf Live, mit ihren eigenen echten Daten, bevor alle Mitglieder einen Brief
-bekommen. Mit welcher Version und Checkliste der Pilot live geht, klärt #40 zusammen mit #39. Das ist Betrieb, kein Test im Sinne von DS-08;
-vorher muss die Datenschutzerklärung gelten. Ablauf → [#40](https://github.com/konstantinniedermann/tco-app/issues/40).
+## Testgruppe
+
+Eine Testgruppe des Projektleiters prüft vor dem Briefversand, ob Mitglieder mit Brief,
+Anleitung und Hilfe alleine zurechtkommen (Etappe *Pilot*). Sie nutzt MyTCO auf Live mit
+ihren eigenen echten Daten, mit einer Vorabversion 0.x vor 1.0.0; davor gilt die
+Checkliste oben auf Test. Das ist Betrieb, kein Test im Sinne von DS-08; vorher muss die
+Datenschutzerklärung gelten.
+
+**Älteres Handy:** ein iPhone mit iOS 16 oder 17 oder ein Android-Handy mit Android 9 bis 11
+(darunter gibt es keine Passkeys). Eine Untergrenze für MyTCO ist damit nicht festgelegt;
+die Testgruppe liefert Erfahrungswerte.
+
+Ablauf, Aufträge, Texte und Auswertung → [Testgruppe](testgruppe.md).
 
 ## Werkzeuge
 
