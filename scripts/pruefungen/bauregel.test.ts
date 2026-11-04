@@ -102,9 +102,18 @@ describe('Admin-Routen', () => {
 		expect(pruefe(fremd)).toEqual([
 			`${route}: Admin-Route nutzt 'mitAdmin'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
 		]);
-		expect(pruefe(gut.replace('{ getMitglied }', '{ getMitglied as get, postMitglied }'))).toEqual(
-			[]
+		const umbenannt = gut
+			.replace('{ getMitglied }', '{ getMitglied as get, postMitglied }')
+			.replace('getMitglied(holeAdminDienste()', 'get(holeAdminDienste()');
+		expect(pruefe(umbenannt)).toEqual([]);
+		// Ein Kommentar mit Apostroph im Import verschluckt den Import nicht.
+		const mitKommentar = gut.replace(
+			'{ getMitglied }',
+			"{\n\tgetMitglied, // geht's\n\tmitAdmin\n}"
 		);
+		expect(pruefe(mitKommentar)).toEqual([
+			`${route}: Admin-Route nutzt 'mitAdmin'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
+		]);
 		for (const schlecht of [
 			"import * as s from '../../../../../lib/server/admin/schnittstellen.ts';",
 			"import s from '../../../../../lib/server/admin/schnittstellen.ts';",
@@ -114,17 +123,29 @@ describe('Admin-Routen', () => {
 		}
 	});
 
-	it('RR-07: holeAdminDienste() nur als Argument, nie die Datenbank daraus', () => {
+	it('RR-07: holeAdminDienste() nur als erstes Argument einer Schnittstelle, nie die Datenbank daraus', () => {
 		for (const schlecht of [
 			'const db = holeAdminDienste().db;',
 			'const { db } = holeAdminDienste();',
 			"const x = holeAdminDienste()['db'];",
-			'const h = holeAdminDienste;'
+			'const h = holeAdminDienste;',
+			'const raus = (d) => d.db;\nexport const POST = () => raus(holeAdminDienste()).execute();'
 		]) {
 			expect(pruefe(`${gut}\n${schlecht}`)).toEqual([
-				`${route}: holeAdminDienste() nur direkt als Argument einer Schnittstelle übergeben`
+				`${route}: holeAdminDienste() nur direkt als erstes Argument einer Schnittstelle übergeben`
 			]);
 		}
+	});
+
+	it('RR-07: dynamischer Import mit berechnetem Pfad wird gemeldet', () => {
+		const schlecht = "const p = '../../../lib/server/db/index.ts';\nconst m = await import(p);";
+		expect(pruefe(`${gut}\n${schlecht}`)).toEqual([
+			`${route}: Admin-Route lädt '(berechnet)' dynamisch; nur statische Importe`
+		]);
+		const ausserhalb = 'src/routes/api/x/+server.ts';
+		expect(pruefeBauregel(new Map([[ausserhalb, 'const m = await import(p);']]))).toEqual([
+			`${ausserhalb}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`
+		]);
 	});
 
 	it('meldet eine fehlende Liste ADMIN_SCHNITTSTELLEN', () => {
@@ -150,6 +171,12 @@ describe('Admin-Routen', () => {
 			[
 				'src/routes/api/x/+server.ts',
 				"const m = await import('../../../lib/server/admin/rollen.ts');"
+			],
+			// Ordner-Import: Vite löst ihn auf index.ts auf.
+			['src/routes/api/y/+server.ts', "import { holeAdminDienste } from '$lib/server/admin';"],
+			[
+				'src/routes/api/z/+server.ts',
+				"import { holeAdminDienste } from '../../../lib/server/admin';"
 			]
 		]) {
 			expect(pruefeBauregel(new Map([[pfad, inhalt]]))).toEqual([

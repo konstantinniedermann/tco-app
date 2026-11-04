@@ -268,6 +268,22 @@ test('A-MITGLIED-02: zwei Admins am selben Mitglied – die zweite Änderung üb
 	await expect(verlauf).toContainText('Ort geändert');
 	await expect(verlauf).not.toContainText('Telefon geändert');
 
+	// Zweiter Konflikt, danach «Rollen speichern»: die Seite lädt den neuen Stand, die Meldung
+	// passt nicht mehr und verschwindet.
+	const { angaben: stand2 } = (await (await page.request.get(pfad)).json()) as {
+		angaben: Record<string, unknown>;
+	};
+	await page.request.post(pfad, { data: { ...stand2, ort: 'Baden', vorher: stand2 } });
+	await telefon.fill('+41 00 000 00 03');
+	await page.getByRole('button', { name: 'Angaben speichern' }).click();
+	await expect(meldung).toBeVisible();
+	await page.locator('summary', { hasText: 'Rollen' }).click();
+	await page.getByLabel('CM-Verantwortliche').check();
+	await page.getByRole('button', { name: 'Rollen speichern' }).click();
+	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
+	await expect(page.getByLabel('Ort', { exact: true })).toHaveValue('Baden');
+	await expect(meldung).toBeHidden();
+
 	// Ein Mitglied, das es nicht gibt: Fehlerseite mit Rahmen und Weg zurück zur Verwaltung.
 	await page.goto('/verwaltung/mitglieder/2147483000');
 	await expect(page.getByRole('heading', { level: 1, name: 'Nicht gefunden' })).toBeVisible();
@@ -276,7 +292,8 @@ test('A-MITGLIED-02: zwei Admins am selben Mitglied – die zweite Änderung üb
 	await pruefeBildschirm(page, info, 'fehlerseite-verwaltung-404');
 	await page.getByRole('link', { name: '‹ Zur Verwaltung' }).click();
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
-	expect(fehler).toEqual([]);
+	// Nur die absichtliche 404 des fehlenden Mitglieds steht in der Konsole.
+	expect(fehler.filter((f) => !/status of 404\b/.test(f))).toEqual([]);
 });
 
 test('UI-06: Verwaltung nicht erreichbar – Fehlerseite mit Rahmen, Meldung in Worten und Weg zurück', async ({

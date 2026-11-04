@@ -39,14 +39,17 @@
 	let angabenMeldung = $state<string | null>(null);
 	let angabenStoerung = $state<string | null>(null);
 	// Ein anderer hat seit dem Laden gespeichert: nichts gespeichert, die Eingaben bleiben stehen.
-	let angabenVeraltet = $state(false);
+	// Die Meldung gilt nur für den Stand, bei dem sie kam; lädt die Seite neue Angaben (auch über
+	// «Rollen speichern»), verschwindet sie.
+	let veraltetBei = $state<string | null>(null);
+	const angabenVeraltet = $derived(veraltetBei === JSON.stringify(angaben));
 
 	const speichereWerte = (werte: Werte) => einzeln(() => schickeAngaben(werte));
 	async function schickeAngaben(werte: Werte) {
 		angabenFehler = {};
 		angabenMeldung = null;
 		angabenStoerung = null;
-		angabenVeraltet = false;
+		veraltetBei = null;
 		const a = await speichereAngaben(detail.id, werte, detail.angaben);
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok') {
@@ -58,7 +61,7 @@
 		} else if (a.art === 'vergeben') {
 			angabenFehler = { [a.feld]: VERGEBEN[a.feld as 'email' | 'mitgliedernummer'] };
 		} else if (a.art === 'veraltet') {
-			angabenVeraltet = true;
+			veraltetBei = JSON.stringify(angaben);
 		} else {
 			angabenStoerung = MELDUNG.stoerung;
 		}
@@ -68,7 +71,7 @@
 	const ladeNeuenStand = () =>
 		einzeln(async () => {
 			await invalidateAll();
-			angabenVeraltet = false;
+			veraltetBei = null;
 			nachSpeichern += 1;
 		});
 
