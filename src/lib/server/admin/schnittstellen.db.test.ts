@@ -275,7 +275,7 @@ describe('Admin-Schnittstellen', () => {
 		expect(weg.status).toBe(404);
 	});
 
-	test('FR-25: Liste mit Suche und Status; ungültiger Status → 400', async () => {
+	test('A-MITGLIED-02: Liste mit Suche und Status; ungültiger Status → 400', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
 		const eins = await legeMitgliedAn(db, { nachname: 'Zufallsname-Qwxz' });
@@ -299,7 +299,7 @@ describe('Admin-Schnittstellen', () => {
 		expect(alle.status).toBe(200);
 	});
 
-	test('FR-25: leerer Status-Filter («Alle») wirkt wie kein Filter', async () => {
+	test('A-MITGLIED-02: leerer Status-Filter («Alle») wirkt wie kein Filter', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
 		const eins = await legeMitgliedAn(db, { nachname: 'Leerfilter-Qwxy' });
@@ -315,7 +315,7 @@ describe('Admin-Schnittstellen', () => {
 		expect(((await r.json()) as { id: number }[]).map((z) => z.id)).toEqual([eins.mitgliedId]);
 	});
 
-	test('RR-07: Ids über dem Wertebereich der Datenbank → 404, bei ?mitglied= → 400', async () => {
+	test('Ids über dem Wertebereich der Datenbank → 404, bei ?mitglied= → 400', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
 		const gross = '2147483648';
