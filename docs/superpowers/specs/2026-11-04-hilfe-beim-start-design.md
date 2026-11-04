@@ -1,7 +1,7 @@
 # Design: Hilfe beim Start (#47, A-HILFE-01, A-HILFE-02)
 
 **Datum:** 2026-11-04 · **Issue:** [#47](https://github.com/konstantinniedermann/tco-app/issues/47)
-· **Status:** Entwurf, Freigabe durch den Projektleiter ausstehend
+· **Status:** freigegeben (Projektleiter, 04.11.2026)
 
 ## Absicht
 
