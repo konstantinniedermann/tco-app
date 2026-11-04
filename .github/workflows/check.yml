@@ -177,7 +177,15 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm exec --no -- svelte-kit sync
-      - run: npm run e2e:browser
+      # Der Download von Browsern und Systempaketen hängt selten fest (sonst unter 3 Minuten).
+      # Statt bis zum Job-Limit zu warten: je Versuch höchstens 5 Minuten, bis zu 3 Versuche.
+      - name: Browser installieren (bis 3 Versuche)
+        run: |
+          for versuch in 1 2 3; do
+            if timeout --kill-after=10s 5m npm run e2e:browser; then exit 0; fi
+            echo "::warning::Browser-Download, Versuch $versuch abgebrochen oder fehlgeschlagen"
+          done
+          exit 1
       - run: npm run e2e
       - name: Ergebnisse und Screenshots sichern
         if: always()

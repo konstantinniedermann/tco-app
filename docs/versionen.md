@@ -22,6 +22,8 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   Verwaltung; Mitgliedernummer eindeutig ohne Rücksicht auf Gross-/Kleinschreibung (Migration
   `0005`); unsichtbare Sonderzeichen in Name, Strasse und Ort abgelehnt; Kurzinfo «die letzten
   50 Einträge», wenn der Verlauf gekürzt ist; Bauregel prüft die Admin-Routen genauer.
+- CI: Der Browser-Download für die E2E-Tests bricht nach 5 Minuten ab und versucht es bis zu
+  dreimal, statt bis zum Job-Limit von 20 Minuten zu hängen.
 - Freiwilliger Passkey als zweiter Login-Weg (#44, A-LOGIN-07, [ADR-005](adr/adr-005-passkey-simplewebauthn.md)):
   Hinweis nach dem Code-Login, Login in zwei Karten, neue Seite *Profil* mit den Passkeys,
   Reiter *Start* und *Profil*. Neue Pakete `@simplewebauthn/server` und `/browser`. Nachweis mit

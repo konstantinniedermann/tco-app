@@ -35,6 +35,10 @@ async function bestaetige(page: Page, konto: Konto) {
 	await page.getByLabel('Code aus der Mail').fill(code);
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
+	// Erst weiter, wenn die Liste steht (das Layout hat die Zugangsprüfung dann abgeschlossen):
+	// Ein folgendes page.goto bricht sonst die laufende Anfrage ab, und WebKit unter Linux meldet
+	// das als Konsolenfehler.
+	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
 }
 
 async function oeffneVerwaltung(page: Page, konto: Konto) {
