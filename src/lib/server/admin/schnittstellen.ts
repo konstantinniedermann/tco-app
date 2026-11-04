@@ -33,9 +33,13 @@ const VERLAUF_MAX = 500;
 const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
 const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });
 
+const INTEGER_MAX = 2_147_483_647;
+
 function parseId(roh: string | null | undefined): number | null {
 	if (roh === null || roh === undefined || !/^[1-9]\d{0,14}$/.test(roh)) return null;
-	return Number(roh);
+	const n = Number(roh);
+	// Grösser als ein Postgres-integer würde die Abfrage mit 22003 abbrechen (500).
+	return n <= INTEGER_MAX ? n : null;
 }
 
 const jetzt = (d: AdminDienste) => (d.jetzt ?? (() => new Date()))();
@@ -110,7 +114,8 @@ export async function postZugang(d: AdminDienste, e: AdminEreignis): Promise<Res
 export function getMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	return mitAdmin(d, e, async () => {
 		const suche = e.url.searchParams.get('suche') ?? undefined;
-		const status = e.url.searchParams.get('status') ?? undefined;
+		// Leer heisst «Alle» (Filter der Oberfläche) und wirkt wie ein fehlender Status.
+		const status = e.url.searchParams.get('status') || undefined;
 		if (status !== undefined && !STATUS.includes(status)) return eingabeFehler();
 		const zeilen = await listeMitglieder(
 			d.db,

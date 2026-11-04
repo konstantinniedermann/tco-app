@@ -2,7 +2,6 @@ import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { kontoRolle } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { getSitzung } from '../login/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
@@ -32,8 +31,13 @@ const logs = [
 	vi.spyOn(console, 'warn').mockImplementation(() => {}),
 	vi.spyOn(console, 'log').mockImplementation(() => {})
 ];
+// SI-05: Jeder Test dieser Datei beweist, dass die Schnittstellen nichts loggen.
 afterEach(() => {
-	for (const l of logs) l.mockClear();
+	try {
+		for (const l of logs) expect(l).not.toHaveBeenCalled();
+	} finally {
+		for (const l of logs) l.mockClear();
+	}
 });
 
 const start = new Date('2026-11-02T12:00:00Z');
@@ -252,22 +256,6 @@ describe('Admin-Schnittstellen', () => {
 		expect(((await detail.json()) as { rollen: string[] }).rollen.sort()).toEqual(['cm', 'lizenz']);
 	});
 
-	test('RR-03: der letzte Admin kann sich die Rolle nicht entziehen → 409 letzter-admin', async () => {
-		await db.delete(kontoRolle);
-		const s = baue();
-		const admin = await bestaetigterAdmin(s);
-		const r = await postRollen(
-			s.d,
-			ereignis({
-				body: { rollen: [] },
-				params: { id: String(admin.mitgliedId) },
-				konto: admin.konto
-			})
-		);
-		expect(r.status).toBe(409);
-		expect(await r.json()).toEqual({ fehler: 'letzter-admin' });
-	});
-
 	test('SI-07, FR-24: Sitzungen beenden; unbekanntes Mitglied → 404', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
@@ -311,6 +299,47 @@ describe('Admin-Schnittstellen', () => {
 		expect(alle.status).toBe(200);
 	});
 
+	test('FR-25: leerer Status-Filter («Alle») wirkt wie kein Filter', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const eins = await legeMitgliedAn(db, { nachname: 'Leerfilter-Qwxy' });
+		const r = await getMitglieder(
+			s.d,
+			ereignis({
+				method: 'GET',
+				url: 'http://localhost/api/admin/mitglieder?suche=Qwxy&status=',
+				konto: admin.konto
+			})
+		);
+		expect(r.status).toBe(200);
+		expect(((await r.json()) as { id: number }[]).map((z) => z.id)).toEqual([eins.mitgliedId]);
+	});
+
+	test('RR-07: Ids über dem Wertebereich der Datenbank → 404, bei ?mitglied= → 400', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const gross = '2147483648';
+		const p = { id: gross };
+		const k = admin.konto;
+		const antworten = [
+			await getMitglied(s.d, ereignis({ method: 'GET', params: p, konto: k })),
+			await postMitglied(s.d, ereignis({ body: eindeutig(), params: p, konto: k })),
+			await postRollen(s.d, ereignis({ body: { rollen: [] }, params: p, konto: k })),
+			await postSitzungen(s.d, ereignis({ body: {}, params: p, konto: k }))
+		];
+		expect(antworten.map((r) => r.status)).toEqual([404, 404, 404, 404]);
+		const v = await getVerlauf(
+			s.d,
+			ereignis({ method: 'GET', url: `http://localhost/x?mitglied=${gross}`, konto: k })
+		);
+		expect(v.status).toBe(400);
+		const grenze = await getMitglied(
+			s.d,
+			ereignis({ method: 'GET', params: { id: '2147483647' }, konto: k })
+		);
+		expect(grenze.status).toBe(404);
+	});
+
 	test('FR-26: Verlauf: Grenze wird begrenzt, ungültige Werte fallen auf Standard, mitglied ungültig → 400', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
@@ -338,9 +367,5 @@ describe('Admin-Schnittstellen', () => {
 		expect(await ra.json()).toEqual({ vorname: 'Test', passkeyHinweis: false, verwaltung: true });
 		expect(await rn.json()).toMatchObject({ verwaltung: false });
 		expect((await getSitzung(ereignis(), db)).status).toBe(401);
-	});
-
-	test('SI-05: Admin-Schnittstellen loggen nichts', () => {
-		for (const l of logs) expect(l).not.toHaveBeenCalled();
 	});
 });

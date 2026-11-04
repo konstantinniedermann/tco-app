@@ -1,37 +1,26 @@
-import { randomBytes } from 'node:crypto';
 import { eq } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import {
+	legeEigeneDatenbankAn,
+	type EigeneDatenbank
+} from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
-import { erstelleDb, type Db } from '../db/index.ts';
+import type { Db } from '../db/index.ts';
 import { aenderung, kontoRolle } from '../db/schema.ts';
 import { istAdmin, ladeRollen, setzeRollen } from './rollen.ts';
 
 // «Letzter Admin» ist eine globale Eigenschaft; die gemeinsame Test-Datenbank teilen sich
 // mehrere Dateien. Darum bekommt diese Datei eine eigene Datenbank.
-const basisUrl = process.env.DATABASE_URL!;
-const name = `mytco_rollen_${randomBytes(4).toString('hex')}`;
+let eigene: EigeneDatenbank | undefined;
 let db: Db;
 
 beforeAll(async () => {
-	const admin = new pg.Client({ connectionString: basisUrl });
-	await admin.connect();
-	await admin.query(`CREATE DATABASE ${name}`);
-	await admin.end();
-	const url = new URL(basisUrl);
-	url.pathname = `/${name}`;
-	db = erstelleDb(url.toString());
-	await migrate(drizzle(db.$client), { migrationsFolder: 'drizzle' });
+	eigene = await legeEigeneDatenbankAn('rollen');
+	db = eigene.db;
 });
 
 afterAll(async () => {
-	await db.$client.end();
-	const admin = new pg.Client({ connectionString: basisUrl });
-	await admin.connect();
-	await admin.query(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`);
-	await admin.end();
+	await eigene?.abbauen();
 });
 
 const jetzt = new Date('2026-11-02T12:00:00Z');
