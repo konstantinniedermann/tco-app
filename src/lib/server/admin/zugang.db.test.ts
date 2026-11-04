@@ -54,7 +54,7 @@ async function bestaetigt(
 	z: ReturnType<typeof baue>,
 	konto: Awaited<ReturnType<typeof einloggen>>
 ) {
-	const r = z.dienst.fordereCodeAn(konto);
+	const r = await z.dienst.fordereCodeAn(konto);
 	await r.arbeit;
 	return z.dienst.bestaetige(konto, codeAus(z.post.at(-1)!));
 }
@@ -66,7 +66,7 @@ describe('Zugang zur Verwaltung', () => {
 		const konto = await einloggen(admin.kontoId);
 		expect((await z.dienst.pruefe(konto)).stufe).toBe('unbestaetigt');
 
-		const r = z.dienst.fordereCodeAn(konto);
+		const r = await z.dienst.fordereCodeAn(konto);
 		expect(r.annahme).toBe('ok');
 		await r.arbeit;
 		expect(z.post).toHaveLength(1);
@@ -106,7 +106,9 @@ describe('Zugang zur Verwaltung', () => {
 		const z = baue();
 		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
 		const konto = await einloggen(admin.kontoId);
-		await z.dienst.fordereCodeAn(konto).arbeit;
+		await (
+			await z.dienst.fordereCodeAn(konto)
+		).arbeit;
 		const richtig = codeAus(z.post[0]);
 		for (let i = 0; i < 5; i++) {
 			expect(await z.dienst.bestaetige(konto, falscherCode(richtig))).toBe('falsch');
@@ -120,7 +122,9 @@ describe('Zugang zur Verwaltung', () => {
 		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
 		const konto = await einloggen(admin.kontoId);
 		expect(await z.dienst.bestaetige(konto, '123456')).toBe('falsch');
-		await z.dienst.fordereCodeAn(konto).arbeit;
+		await (
+			await z.dienst.fordereCodeAn(konto)
+		).arbeit;
 		const code = codeAus(z.post[0]);
 		expect(await z.dienst.bestaetige(konto, 42)).toBe('falsch');
 		expect(await z.dienst.bestaetige(konto, 'abc')).toBe('falsch');
@@ -181,7 +185,9 @@ describe('Zugang zur Verwaltung', () => {
 		expect(await z.dienst.bestaetige(konto, codeAus(z.post[0]))).toBe('falsch');
 		expect((await z.dienst.pruefe(konto)).stufe).toBe('unbestaetigt');
 
-		await z.dienst.fordereCodeAn(konto).arbeit;
+		await (
+			await z.dienst.fordereCodeAn(konto)
+		).arbeit;
 		const r = await login.loginMitMailCode(admin.email, codeAus(z.post[1]), 'ip-2');
 		expect(r.ergebnis).toBe('falsch');
 	});
@@ -191,7 +197,7 @@ describe('Zugang zur Verwaltung', () => {
 		const m = await legeMitgliedAn(db, { rollen: ['cm'] });
 		const konto = await einloggen(m.kontoId);
 		expect(await z.dienst.pruefe(konto)).toEqual({ stufe: 'kein-admin' });
-		const r = z.dienst.fordereCodeAn(konto);
+		const r = await z.dienst.fordereCodeAn(konto);
 		expect(r.annahme).toBe('ok');
 		await r.arbeit;
 		expect(z.post).toHaveLength(0);
@@ -207,11 +213,15 @@ describe('Zugang zur Verwaltung', () => {
 		expect(await z.dienst.pruefe(konto)).toEqual({ stufe: 'kein-admin' });
 	});
 
-	test('SI-08: Mails zählen in den Adress-Bremsen (3 pro Stunde)', async () => {
+	test('SI-08: vierte Code-Anfrage in einer Stunde → zu-viele, keine Mail', async () => {
 		const z = baue();
 		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
 		const konto = await einloggen(admin.kontoId);
-		for (let i = 0; i < 4; i++) await z.dienst.fordereCodeAn(konto).arbeit;
+		for (let i = 0; i < 3; i++) await (await z.dienst.fordereCodeAn(konto)).arbeit;
+		expect(z.post).toHaveLength(3);
+		const vierte = await z.dienst.fordereCodeAn(konto);
+		await vierte.arbeit;
+		expect(vierte.annahme).toBe('zu-viele');
 		expect(z.post).toHaveLength(3);
 	});
 
@@ -219,7 +229,9 @@ describe('Zugang zur Verwaltung', () => {
 		const z = baue();
 		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
 		const konto = await einloggen(admin.kontoId);
-		await z.dienst.fordereCodeAn(konto).arbeit;
+		await (
+			await z.dienst.fordereCodeAn(konto)
+		).arbeit;
 		const code = codeAus(z.post[0]);
 		const [zeile] = await db
 			.select()
@@ -247,7 +259,9 @@ describe('Zugang zur Verwaltung', () => {
 		const orig = console.error;
 		console.error = (...a: unknown[]) => void log.push(a);
 		try {
-			await kaputt.fordereCodeAn(konto).arbeit;
+			await (
+				await kaputt.fordereCodeAn(konto)
+			).arbeit;
 		} finally {
 			console.error = orig;
 		}

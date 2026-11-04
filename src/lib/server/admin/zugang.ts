@@ -26,8 +26,10 @@ export type Zugang =
 export type ZugangDienst = {
 	pruefe(konto: AngemeldetesKonto | undefined): Promise<Zugang>;
 	// `arbeit` läuft ohne Warten des Aufrufers und lehnt nie ab. Kein Admin: keine Mail.
-	fordereCodeAn(konto: AngemeldetesKonto): { annahme: 'ok' | 'zu-viele'; arbeit: Promise<void> };
-	bestaetige(konto: AngemeldetesKonto, eingabe: unknown): Promise<'ok' | 'falsch' | 'zu-viele'>;
+	fordereCodeAn(
+		konto: AngemeldetesKonto
+	): Promise<{ annahme: 'ok' | 'zu-viele'; arbeit: Promise<void> }>;
+	bestaetige(konto: AngemeldetesKonto, eingabe: unknown): Promise<'ok' | 'falsch'>;
 };
 
 export type ZugangAbh = {
@@ -72,24 +74,8 @@ export function erstelleZugangDienst(abh: ZugangAbh): ZugangDienst {
 		return { stufe: 'bestaetigt', kontoId: k.kontoId, mitgliedId: k.mitgliedId };
 	}
 
-	async function versendeCode(k: AngemeldetesKonto): Promise<void> {
+	async function speichereUndSende(k: AngemeldetesKonto, an: string): Promise<void> {
 		try {
-			if (!(await istAdmin(db, k.kontoId))) return;
-			const [m] = await db
-				.select({ email: mitglied.email })
-				.from(konto)
-				.innerJoin(mitglied, eq(mitglied.id, konto.mitgliedId))
-				.where(eq(konto.id, k.kontoId));
-			if (!m?.email) return;
-			const adresse = m.email.trim().toLowerCase();
-			if (
-				!bremsen.mailsProAdresseStunde.erlaubt(adresse) ||
-				!bremsen.mailsProAdresseTag.erlaubt(adresse)
-			) {
-				return;
-			}
-			bremsen.mailsProAdresseStunde.zaehle(adresse);
-			bremsen.mailsProAdresseTag.zaehle(adresse);
 			const code = erzeugeMailCode();
 			const zeilen = await db
 				.update(sitzung)
@@ -101,21 +87,38 @@ export function erstelleZugangDienst(abh: ZugangAbh): ZugangDienst {
 				.where(eq(sitzung.kennungHash, k.sitzungHash))
 				.returning({ h: sitzung.kennungHash });
 			if (zeilen.length === 0) return;
-			await abh.mailer({ an: m.email, ...baueAdminCodeMail(code, kontakt) });
+			await abh.mailer({ an, ...baueAdminCodeMail(code, kontakt) });
 		} catch {
 			// SI-05: feste Zeile, keine Fehlerdetails (können Adresse oder Zugangsdaten enthalten).
 			console.error('Admin-Code-Mail nicht versandt');
 		}
 	}
 
-	function fordereCodeAn(k: AngemeldetesKonto) {
-		return { annahme: 'ok' as const, arbeit: versendeCode(k) };
+	// Die Grenze darf hier sichtbar werden: Der Aufrufer ist angemeldeter Admin, die Adresse seine eigene.
+	async function fordereCodeAn(
+		k: AngemeldetesKonto
+	): Promise<{ annahme: 'ok' | 'zu-viele'; arbeit: Promise<void> }> {
+		const keineMail = { annahme: 'ok' as const, arbeit: Promise.resolve() };
+		if (!(await istAdmin(db, k.kontoId))) return keineMail;
+		const [m] = await db
+			.select({ email: mitglied.email })
+			.from(konto)
+			.innerJoin(mitglied, eq(mitglied.id, konto.mitgliedId))
+			.where(eq(konto.id, k.kontoId));
+		if (!m?.email) return keineMail;
+		const adresse = m.email.trim().toLowerCase();
+		if (
+			!bremsen.mailsProAdresseStunde.erlaubt(adresse) ||
+			!bremsen.mailsProAdresseTag.erlaubt(adresse)
+		) {
+			return { annahme: 'zu-viele', arbeit: Promise.resolve() };
+		}
+		bremsen.mailsProAdresseStunde.zaehle(adresse);
+		bremsen.mailsProAdresseTag.zaehle(adresse);
+		return { annahme: 'ok', arbeit: speichereUndSende(k, m.email) };
 	}
 
-	async function bestaetige(
-		k: AngemeldetesKonto,
-		eingabe: unknown
-	): Promise<'ok' | 'falsch' | 'zu-viele'> {
+	async function bestaetige(k: AngemeldetesKonto, eingabe: unknown): Promise<'ok' | 'falsch'> {
 		const code = typeof eingabe === 'string' ? normalisiereMailCode(eingabe) : null;
 		if (code === null || !(await istAdmin(db, k.kontoId))) return 'falsch';
 		const t = jetzt();
