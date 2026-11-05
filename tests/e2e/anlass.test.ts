@@ -39,6 +39,9 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	browser,
 	baseURL
 }, info) => {
+	// Langer Ablauf (zwei Geräte, Code per Mail, acht Bildschirmprüfungen): unter WebKit in der
+	// CI länger als die üblichen 30 s.
+	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
 	const admin = await legeAdminMitBriefCodeAn('Greta');
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
@@ -74,6 +77,9 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 		extraHTTPHeaders: { 'x-forwarded-proto': 'http' }
 	});
 	const seite = await geraet.newPage();
+	// WebKit unter Linux bremst Seiten im Hintergrund: Ein Seitenwechsel (View Transition) liefe
+	// dort nie zu Ende. Die Seite, mit der der Test gerade arbeitet, steht darum vorn.
+	await seite.bringToFront();
 	await startetVomSymbol(seite);
 	await meldeAn(seite, mitglied);
 	await expect(seite.getByRole('heading', { level: 2, name: 'Jetzt aktuell' })).toBeVisible();
@@ -115,9 +121,11 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	await fremd.close();
 
 	// FR-32: Der Admin verschiebt den Ort; das Mitglied wird gebeten, die Antwort zu prüfen.
+	await page.bringToFront();
 	await page.getByLabel('Ort').fill('Halle, Musterweg 2, Olten');
 	await page.getByRole('button', { name: 'Angaben speichern' }).click();
 	await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
+	await seite.bringToFront();
 	await seite.reload();
 	const hinweis = seite.getByRole('status').filter({ hasText: 'Datum oder Ort geändert' });
 	await expect(hinweis).toContainText('bitte prüfe deine Antwort');
@@ -137,6 +145,7 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	await geraet.close();
 
 	// Admin sieht die Antwort.
+	await page.bringToFront();
 	await page.reload();
 	const tabelle = page.getByRole('table');
 	await expect(tabelle).toContainText(`Hugo ${nachname}`);
