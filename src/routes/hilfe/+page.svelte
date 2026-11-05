@@ -77,6 +77,25 @@
 	</ol>
 </details>
 
+<!-- Annahme K-19.1 (Telefon, Lizenznummer, E-Mail) und K-19.2 (Adresse): das Mitglied ändert sie selbst. -->
+<details class="karte klappe" id="eigene-angaben" open={anker === 'eigene-angaben'}>
+	<summary class="klappe-titel">Eigene Angaben ändern</summary>
+	<p>
+		E-Mail, Telefon, Adresse und Lizenznummer änderst du selbst: unter Profil › Meine Angaben bei
+		der Angabe auf «Ändern» tippen.
+	</p>
+	<p>Deine E-Mail ist zugleich dein Login. Darum braucht eine neue E-Mail zwei Codes:</p>
+	<ol>
+		<li>Gib die neue Adresse ein und tippe auf «Codes senden».</li>
+		<li>Je ein Code geht an die bisherige und an die neue Adresse.</li>
+		<li>Tippe beide Codes ein. Sie gelten 15 Minuten.</li>
+	</ol>
+	<p class="leise">
+		Kommst du nicht mehr an die bisherige Adresse, oder stimmen Name oder Jahrgang nicht? Dann
+		ändert der Admin es für dich. Wende dich an den Kontakt unten.
+	</p>
+</details>
+
 <div class="karte">
 	<h2>Fragen?</h2>
 	{#if data.kontakt}

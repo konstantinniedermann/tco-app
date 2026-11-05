@@ -66,14 +66,17 @@ wird sie erst mit der CM-Anmeldung (#51).
 1. Das Mitglied gibt die neue Adresse ein.
 2. MyTCO schickt einen Code an die **alte** und einen anderen Code an die **neue** Adresse.
    Die Antwort ist immer gleich, egal ob die neue Adresse frei ist.
-3. Das Mitglied tippt beide Codes ein. Erst dann wird die neue Adresse gespeichert und ist ab
-   sofort das Login.
+3. Das Mitglied tippt beide Codes ein. Erst dann wird die neue Adresse gespeichert, klein
+   geschrieben wie jede Adresse in MyTCO (`pruefeAngaben`, eindeutig ohne Rücksicht auf
+   Gross-/Kleinschreibung), und ist ab sofort das Login.
 4. Änderungsverlauf: `feld-geaendert` / `email`, Urheber `mitglied`. Das Mitglied ist ab da
    «für Fairgate offen».
 
 Werte wie beim Login-Mail-Code (SI-03, SI-04): 15 Minuten gültig, nach 5 Fehlversuchen ungültig,
 Codes nur als HMAC gespeichert, höchstens 3 Wechsel-Anfragen pro Konto und Stunde und 10 pro Tag.
 Ein neuer Wechsel ersetzt einen angefangenen. Die bisherige Adresse bleibt bis zur Bestätigung das Login.
+Damit Schritt 2 ein Neuladen übersteht (Wechsel in die Mail-App), merkt sich das Gerät die neue
+Adresse 15 Minuten, wie beim Login die Code-Anfrage *(Entscheid Claude beim Bau)*.
 
 **Grenzen** *(Entscheid Claude)*: Beide Mails eines Wechsels (auch der Hinweis «schon in Gebrauch»)
 zählen gegen die bestehende Grenze **pro Empfänger-Adresse** (3 pro Stunde, 10 pro Tag, gemeinsam mit
@@ -101,6 +104,9 @@ Kontaktangaben, nicht nur die Adresse).
 - Knopf **«In Fairgate übertragen»** je Zeile: Die Markierung wird gelöscht, die Zeile verschwindet,
   und der Änderungsverlauf erhält eine neue Aktion `fairgate-uebertragen` mit Urheber `admin`.
   Bei zwei Admins ist so klar, wer es erledigt hat.
+- Das Abhaken gilt dem angezeigten Stand *(Entscheid Claude beim Bau)*: Hat das Mitglied seither
+  weiter geändert, lehnt MyTCO ab (`veraltet`), und die Liste zeigt den neuen Stand. Sonst
+  überträgt der Admin alte Werte, und die neue Änderung verschwindet ungesehen.
 - Ändert ein Mitglied vor dem Abhaken mehrmals etwas, bleibt es **ein** Eintrag je Mitglied mit
   allen seither geänderten Angaben, den aktuellen Werten und dem neuesten Datum.
 - Ändert der Admin selbst eine Angabe in der Verwaltung, entsteht **kein** Eintrag (er trägt sie
@@ -136,11 +142,13 @@ auf dem [Design System «MyTCO»](https://claude.ai/artifact/B9WzQ6CmeP3QUq1NYAb
   Adresse, E-Mail oder Telefon, gelöscht beim Abhaken. Welche Felder geändert wurden, muss die Liste
   zeigen können (z. B. aus dem Änderungsverlauf seit dem Zeitpunkt oder als eigene Feldliste —
   dem Bauenden überlassen).
-- Für den laufenden E-Mail-Wechsel je Konto höchstens ein Datensatz: neue Adresse, zwei Code-Hashes,
-  Ablauf, Fehlversuche. Er wird bei Bestätigung, Ablauf oder neuem Wechsel gelöscht bzw. ersetzt.
-  Abgelaufene Datensätze räumt MyTCO spätestens nach 24 Stunden weg.
+- Für den laufenden E-Mail-Wechsel je Konto höchstens ein Eintrag: neue Adresse, zwei Code-Hashes,
+  Ablauf, Fehlversuche. Er liegt nur im Arbeitsspeicher des Servers, nicht in der Datenbank
+  *(Entscheid Claude beim Bau)*, und wird bei Bestätigung, nach 5 Fehlversuchen oder bei neuem
+  Wechsel gelöscht bzw. ersetzt; abgelaufene (15 Minuten) räumt MyTCO spätestens 10 Minuten später
+  weg, ein Neustart löscht alle.
 - Änderungsverlauf: neue Aktion `fairgate-uebertragen`.
-- Migration nur additiv (neue Spalte, neue Tabelle bzw. neue Spalten); keine bestehende Migration ändern.
+- Migration nur additiv (eine neue Spalte); keine bestehende Migration ändern.
 
 ## Datenschutz und Sicherheit
 
@@ -148,8 +156,9 @@ Geprüft gegen `docs/datenschutz.md`. Keine neue Datenart: E-Mail, Telefon und A
 unter *Welche Daten*, der Admin sieht Adressen schon heute. Nachzuführen:
 
 - **Datenschutzkonzept:** Selbständerung von Adresse und Lizenznummer (Annahme K-19.2, FR-02);
-  Markierung «für Fairgate offen»; die neue Adresse eines laufenden Wechsels (höchstens 15 Minuten gültig, nach 24 Stunden
-  gelöscht) unter *Welche Daten* und *Löschen*.
+  Markierung «für Fairgate offen»; die neue Adresse eines laufenden Wechsels (nur im Arbeitsspeicher,
+  höchstens 15 Minuten gültig, weg nach Ablauf oder Neustart; dazu 15 Minuten im Gerätespeicher des
+  eigenen Geräts) unter *Welche Daten* und *Löschen*.
 - **Datenschutzerklärung,** Abschnitt *Ihre Rechte*: «E-Mail, Telefon, Adresse und Lizenznummer
   ändern Sie selbst in der App»; geänderte Kontaktangaben überträgt der Verein von Hand nach Fairgate.
 - **Sicherheitskonzept:** SI-09 ist damit für die Selbständerung umgesetzt; die Grenzen oben (pro
@@ -171,7 +180,7 @@ dass die E-Mail zwei Codes braucht und an wen man sich wendet, wenn die alte Adr
   bei Lizenznummer, nicht bei Admin-Änderung), zeigt die geänderten Felder, verschwindet nach
   Abhaken, Verlauf `fairgate-uebertragen`, nur mit Admin-Zugang.
 - E2E mit Screenshots iPhone/Android, axe ohne Verstösse; Bildvergleich mit dem Design-Artifact.
-- Anforderungen (A-KONTO-02 von *offen/später* auf geplant mit Annahme, Änderungsprotokoll),
+- Anforderungen (A-KONTO-01 auf *umgesetzt\**, A-KONTO-02 von *offen/später* auf *umgesetzt\** mit Annahme, Änderungsprotokoll),
   Fachmodell, Rollen und Rechte (Zeilen Adresse und Lizenznummer), Datenschutz, Datenschutzerklärung,
   Sicherheitskonzept, Testkonzept und Hilfe nachgeführt.
 

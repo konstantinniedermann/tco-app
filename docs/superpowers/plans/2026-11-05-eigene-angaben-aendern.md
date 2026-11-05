@@ -157,7 +157,7 @@ Ablauf `starte`: Adresse prüfen wie `pruefeAngaben` (`ungueltig`); gleich der b
 Rücksicht auf Gross-/Kleinschreibung → `gleich` (nichts zählen). Sonst IP-, Konto- und
 Adressgrenzen prüfen; ist die Grenze pro IP, pro Konto oder der **alten** Adresse erreicht →
 `zu-viele`. Zählen, Eintrag im Speicher ersetzen (Schlüssel `kontoId`: bisherige Adresse, neue
-Adresse wie eingegeben, zwei Hashes, `bis`, Fehlversuche 0, `vergeben`). Ist die Grenze der
+Adresse klein geschrieben wie bei `pruefeAngaben`, zwei Hashes, `bis`, Fehlversuche 0, `vergeben`). Ist die Grenze der
 **neuen** Adresse erreicht, geht still keine Mail an sie (Antwort trotzdem `ok`). Gehört die neue
 Adresse einem anderen Mitglied (`lower(email)`), erhält sie `baueAdresseVergebenMail` statt eines
 Codes und der Eintrag trägt `vergeben: true`. Mails in `arbeit`, Fehler nur als feste Logzeile.
