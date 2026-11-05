@@ -34,8 +34,6 @@ zurückgebaut (z. B. die Adresse wieder gesperrt).
 - Mails an den Admin bei Änderungen.
 - Angaben anderer Mitglieder ändern (Junioren: #45).
 - Anbindung an Fairgate oder Abgleich beim Einlesen der Mitgliederliste (#46, siehe Hinweis unten).
-- Die Oberfläche im Detail: Sie folgt vor der Umsetzung als Design-Artifact (Entscheid Projektleiter:
-  erst Text, dann Design).
 
 ## Anti-Ziele
 
@@ -113,6 +111,24 @@ Kontaktangaben, nicht nur die Adresse).
 **Hinweis für #46 (Einlesen der Fairgate-Liste):** Angaben eines Mitglieds, das «für Fairgate offen»
 ist, darf das Einlesen nicht überschreiben — sie sind neuer als Fairgate. Das gilt besonders für die
 E-Mail-Adresse (Login).
+
+## Oberfläche
+
+Visueller Entwurf: [Design-Artifact «MyTCO Profil bearbeiten»](https://claude.ai/artifact/GFs8jg4p9W4V1UxRNdnsjF)
+auf dem [Design System «MyTCO»](https://claude.ai/artifact/B9WzQ6CmeP3QUq1NYAbSsi), nur mit erfundenen Daten.
+
+- **Profil, Variante A** (Entscheid Projektleiter): Aufklappbereich «Meine Angaben» oben, geöffnet.
+  Jede änderbare Angabe (E-Mail, Telefon, Adresse, Lizenznummer) steht als Text mit einer Nebentaste
+  «Ändern»; «Ändern» öffnet die Felder dieser einen Angabe an Ort und Stelle mit Haupttaste
+  «… speichern» und «Abbrechen» (höchstens eine Haupttaste, UI-04). Name, Jahrgang und
+  Mitgliedernummer als Nebentext darunter mit «ändert der Admin» und Kontakt (K-21). Darunter wie
+  heute «Anmelden mit Passkey» und «Abmelden». Variante B (alle Felder direkt) ist verworfen.
+- **E-Mail ändern:** eigene Unterseite mit «‹ Zurück» und Zähler, Schritt 1 neue Adresse
+  («Codes senden»), Schritt 2 zwei Code-Felder (bisherige / neue Adresse, «E-Mail ändern», «Neue
+  Codes senden»). Danach zurück im Profil mit Hinweis «E-Mail geändert» und «Schliessen».
+- **Verwaltung «Für Fairgate»:** Punkt in der Seitenleiste mit Anzahl offener Einträge; Tabelle
+  Mitglied · Nr. · Geändert · Neue Angaben · Seit · «In Fairgate übertragen».
+- Abnahme per Bildvergleich: Screenshot der App neben dem jeweiligen Artboard.
 
 ## Daten
 
