@@ -19,6 +19,9 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   beim Scrollen oben stehen, seitliche Abstände fürs Querformat. Gegen den Schleier von iOS 26
   oben in der App vom Startbildschirm ein festes, deckendes Statusleisten-Band (am iPhone zu
   bestätigen; mitlaufende Kopfleiste allein reichte nicht).
+- Anleitung zum Startbildschirm (iPhone): deutlicher Hinweis für die Safari-Layouts «Oben» und
+  «Unten» (dort gleich auf «Teilen», weiter bei Schritt 3), im Brief «••• (falls da)». Die
+  Animation zeigt weiterhin nur das Vorgabe-Layout «Kompakt» (Entscheid Projektleiter).
 
 ## 0.4.0 — Hilfe beim Start, Mitgliederverwaltung und Passkey, nicht ausgeliefert
 
