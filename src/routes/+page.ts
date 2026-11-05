@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { holeAnlaesse } from '../lib/anlass/api.ts';
 import { laeuftVomSymbol, zeigeEinstieg } from '../lib/hilfe/geraet.ts';
 import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 import type { PageLoad } from './$types';
@@ -21,5 +22,12 @@ export const load: PageLoad = async ({ fetch }) => {
 		passkeyHinweis: boolean;
 		verwaltung: boolean;
 	};
-	return { vorname, passkeyHinweis, verwaltung };
+	// Lassen sich die Anlässe nicht laden, bleibt die Startseite trotzdem nutzbar.
+	const anlaesse = await holeAnlaesse(fetch);
+	return {
+		vorname,
+		passkeyHinweis,
+		verwaltung,
+		anlaesse: anlaesse.art === 'ok' ? anlaesse.daten : []
+	};
 };
