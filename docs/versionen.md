@@ -24,6 +24,19 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 - Anleitung zum Startbildschirm (iPhone): deutlicher Hinweis für die Safari-Tablayouts «Unten» und
   «Oben» (dort gleich auf «Teilen», weiter bei Schritt 3), im Brief «••• (falls da)». Die
   Animation zeigt weiterhin nur das Vorgabe-Layout «Kompakt» (Entscheid Projektleiter).
+- Ruhiges App-Gefühl (#54): Der angetippte Reiter ist sofort aktiv, sein Balken gleitet hinüber,
+  der Inhalt blendet über; Unterseiten schieben sich von rechts herein und mit «‹ Zurück»
+  wieder hinaus. Jeder Reiter merkt sich die Scrollposition, nochmals antippen führt nach oben.
+  Aufklappbereiche und Rückfrage öffnen weich. Kein grauer Tipp-Blitz, Gedrückt-Zustände,
+  Bedienelemente nicht markierbar, kein Zoom per Doppeltipp, immer hell. Bei «Bewegung
+  reduzieren» alles ohne Bewegung (UI-09 erweitert, neue Bewegungs-Tokens). Die Fusszeile steht
+  nur noch vor dem Login und auf der Startseite.
+- Eigene Angaben ändern (#50, Annahmen K-19.1 und K-19.2): Im Profil unter «Meine Angaben»
+  ändert das Mitglied Telefon, Adresse und Lizenznummer selbst; die E-Mail auf einer eigenen
+  Seite mit je einem Code an die bisherige und die neue Adresse (SI-09, Grenzen pro Konto,
+  Adresse und IP). Neu in der Verwaltung die Liste «Für Fairgate»: selbst geänderte
+  Kontaktangaben zum Übertragen nach Fairgate, abhaken mit Eintrag im Änderungsverlauf. Hilfe
+  um «Eigene Angaben ändern» ergänzt.
 
 ## 0.4.0 — Hilfe beim Start, Mitgliederverwaltung und Passkey, nicht ausgeliefert
 

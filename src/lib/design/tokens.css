@@ -56,6 +56,13 @@
 	--schatten-karte: 0 1px 3px rgb(0 0 0 / 0.13);
 	--breite-inhalt: 40rem;
 
+	/* Bewegung (UI-09) — nur für Seitenwechsel, Reiter, Aufklappbereich und Rückfrage */
+	--dauer-kurz: 150ms;
+	--dauer-mittel: 250ms;
+	--dauer-schieben: 350ms;
+	--kurve-standard: cubic-bezier(0.2, 0, 0, 1);
+	--kurve-schieben: cubic-bezier(0.32, 0.72, 0, 1);
+
 	/* Brief (Druck) — Werte auf dem Papier in mm und pt */
 	/* Annahme K-16.1: Fensterkuvert C5/6 mit Fenster rechts, Lage des Adressfelds fest */
 	--brief-rand: 20mm;

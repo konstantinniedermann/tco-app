@@ -35,12 +35,16 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Lizenznummer, Klassierung | Anmeldung, Lizenzanträge, Export an Swiss Tennis | nein |
 | Konto, Rollen, Benachrichtigungs-Einstellungen | Login, Berechtigungen, Push | ja |
 | Passkey (A-LOGIN-07): je Passkey Kennung, öffentlicher Schlüssel, Zähler, Übertragungswege, Adresse der App (Relying-Party-ID), grobe Gerätebezeichnung (nur das Etikett aus dem Browser, z. B. *iPhone*), eingerichtet am, zuletzt benutzt; je Konto eine zufällige Passkey-Kennung (keine Personendaten); je Sitzung ein Merker, ob der Passkey-Hinweis noch erscheint. Name und E-Mail-Adresse liegen nur im Schlüsselbund des Mitglieds (sein Gerät zeigt sie an), MyTCO speichert sie dafür nicht zusätzlich | Login ohne Code | nein |
-| IP-Adresse bei Login-Versuchen; eingetippte E-Mail-Adresse einer Code-Anfrage | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
+| IP-Adresse bei Login-Versuchen und E-Mail-Wechseln; eingetippte E-Mail-Adresse einer Code-Anfrage, Empfänger-Adressen eines E-Mail-Wechsels | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
+| Laufender E-Mail-Wechsel (A-KONTO-01, SI-09): neue Adresse, beide Codes nur als Hash, Ablauf, Fehlversuche; nur im Arbeitsspeicher des Servers, gültig höchstens 15 Minuten. Die neue Adresse liegt dazu im Gerätespeicher des eigenen Geräts, damit Schritt 2 ein Neuladen übersteht (wie die Code-Anfrage beim Login); gelöscht nach Bestätigung, bei «‹ Zurück», beim Abmelden, sonst nach Ablauf (15 Minuten) spätestens beim nächsten Start der App | Neue Adresse mit je einem Code an die alte und die neue bestätigen | — |
+| Markierung *für Fairgate offen seit* (Annahme K-19.2) | Der Admin sieht, welche selbst geänderten Kontaktangaben (Adresse, E-Mail, Telefon) er noch von Hand nach Fairgate übertragen muss (Liste *Für Fairgate*, A-KONTO-02) | — |
 | Anmeldungen (mit Kommentar zum Wildcard-Antrag), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
 | Anmeldungen zu Anlässen: Antwort *kommt* / *kommt nicht*, freiwillige Bemerkung (ohne Angaben zur Gesundheit) | Planung des Anlasses, z. B. der Generalversammlung (A-ANLASS-01) | nein |
 | Austrittsdatum | Löschfrist nach Austritt | — |
 | *Verwaltet von*: Elternteil, der das Konto eines Juniors führt (Vorschlag K-08) | Kind ohne eigenes Login | — |
 | Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (A-MITGLIED-07) | — |
+
+E-Mail, Telefon und Lizenznummer (Annahme K-19.1, FR-02) sowie die Adresse (Annahme K-19.2) ändert das Mitglied selbst im Profil; die E-Mail erst nach je einem Code an die alte und die neue Adresse (SI-09). Name, Geschlecht, Jahrgang und Mitgliedernummer ändert weiterhin der Admin. Neue Datenarten entstehen dadurch nicht.
 
 Der Befehl *Admin festlegen* legt nur den Admin selbst an; alle anderen Mitglieder kommen über das Einlesen oder die Verwaltung.
 
@@ -53,7 +57,7 @@ Bankdaten.
 |-----|-------|
 | Mitglied | alle eigenen Daten, auch die eigenen Anmeldungen zu Anlässen; den Änderungsverlauf zum eigenen Konto auf Anfrage bei der Ansprechperson |
 | Elternteil, der ein Kind führt | alle Daten des Kindes, ändert sie und meldet es an (Vorschlag K-08) |
-| Admin | alle Daten der Mitglieder und den Änderungsverlauf; alle Anmeldungen zu Anlässen mit Bemerkung (**Annahme K-50:** nur die Admins, nicht der ganze Vorstand); Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
+| Admin | alle Daten der Mitglieder und den Änderungsverlauf; in der Liste *Für Fairgate* die selbst geänderten Kontaktangaben, bis er sie abhakt; alle Anmeldungen zu Anlässen mit Bemerkung (**Annahme K-50:** nur die Admins, nicht der ganze Vorstand); Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
 | CM-Verantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
 | Lizenzverantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
 | Alle Mitglieder | Name, Kategorien und Resultate der Clubmeisterschaft; bei der Wahl des Doppelpartners die Namen der Mitglieder, die für die Kategorie passen |
@@ -89,6 +93,14 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
   nächsten Login eines Mitglieds).
 - **E-Mail-Adresse im Gerätespeicher** während einer Code-Anfrage: nach dem Login, sonst beim
   nächsten Start der App, sobald die Anfrage älter als 15 Minuten ist.
+- **Laufender E-Mail-Wechsel** (neue Adresse, Code-Hashes): nur im Arbeitsspeicher; weg bei
+  Bestätigung oder neuem Wechsel, nach 5 Fehlversuchen, abgelaufen (15 Minuten) spätestens
+  10 Minuten später, und mit jedem Neustart von MyTCO.
+- **Neue E-Mail-Adresse im Gerätespeicher** während eines E-Mail-Wechsels: nach der
+  Bestätigung, bei «‹ Zurück» zu Schritt 1, beim Abmelden, sonst nach Ablauf (15 Minuten)
+  spätestens beim nächsten Start der App.
+- **Markierung für Fairgate offen:** sobald der Admin die Angaben als übertragen abhakt; das
+  Abhaken steht im Änderungsverlauf.
 - **Testgruppe:** Liste der Testpersonen nach Lauf 2, spätestens zu Beginn der
   CM-Anmeldung; Formularantworten nach der Auswertung des jeweiligen Laufs; Spalten zur
   Testgruppe in der Fragen-Tabelle bei der Übernahme in die Liste ([Testgruppe](#testgruppe)).
