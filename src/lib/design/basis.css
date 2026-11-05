@@ -111,6 +111,8 @@ img {
 	align-items: center;
 	gap: var(--abstand-3);
 	padding: var(--abstand-3) var(--abstand-4);
+	/* Bis unter die Statusleiste (viewport-fit=cover in app.html); am PC ist der Abstand 0. */
+	padding-top: calc(var(--abstand-3) + env(safe-area-inset-top));
 	background: var(--farbe-marke);
 	color: var(--farbe-flaeche);
 	font-size: var(--groesse-gross);
@@ -131,6 +133,8 @@ img {
 	position: sticky;
 	bottom: 0;
 	display: flex;
+	/* Über dem Home-Balken des iPhones */
+	padding-bottom: env(safe-area-inset-bottom);
 	background: var(--farbe-flaeche);
 	border-top: var(--rand-duenn) solid var(--farbe-linie);
 }

@@ -17,7 +17,7 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Grundstil und Bausteine | `src/lib/design/basis.css` |
 | Wappen und App-Symbol (Farben fest in der Datei) | `static/wappen.svg`, `static/favicon.svg`, `static/*.png` |
 | Manifest (Name, Farben fest in der Datei; `theme_color` und `background_color` stimmen von Hand mit `--farbe-marke` und `--farbe-hintergrund` überein) | `static/manifest.webmanifest` |
-| Farbe der Browserleiste, Systemschrift-Einstellung | `src/app.html` |
+| Farbe der Browserleiste, Systemschrift-Einstellung, Inhalt bis unter die Statusleiste (`viewport-fit=cover`, Statusleiste durchsichtig) | `src/app.html` |
 | Kopfleiste, Fusszeile, Seitenaufbau | `src/routes/+layout.svelte` |
 | Baustein Anleitung (Zeichnung, Ablauf) | `src/lib/ui/Anleitung.svelte`, `src/lib/ui/ZeichnungIphone.svelte`, `src/lib/ui/ZeichnungAndroid.svelte` |
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
@@ -138,8 +138,8 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 
 | Baustein | Klasse | Regel |
 |----------|--------|-------|
-| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks |
-| Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben |
+| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit dort kein durchscheinender Streifen bleibt |
+| Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben; Abstand `env(safe-area-inset-bottom)` über dem Home-Balken |
 | Seitenleiste | `.seitenleiste` | nur Verwaltung, Bereiche nach Rolle |
 | Haupttaste | `.taste-haupt` | Sandplatz-Rot, höchstens eine pro Bildschirm (UI-04) |
 | Nebentaste | `.taste-neben` | weiss mit grünem Rand |
