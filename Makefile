@@ -51,18 +51,10 @@ db: voraussetzungen-docker ## Lokale Datenbank und Mail-Fänger Mailpit starten 
 dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einstellungen aus .env)
 	node --env-file=.env node_modules/vite/bin/vite.js dev
 
-# Nur der Entwicklungsserver: Dort setzt SvelteKit das Login-Cookie ohne `Secure`, darum klappt
-# der Login per Code über http. Passkey braucht HTTPS und geht hier nicht.
-dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs Handy im selben WLAN (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
-	@ip=$$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null); \
-	[ -n "$$ip" ] || { echo "Abbruch: keine WLAN-Adresse gefunden — ist der Laptop im WLAN?" >&2; exit 1; }; \
-	echo ""; \
-	echo "  Am Handy öffnen:   http://$$ip:5173"; \
-	echo "  Mails (am Laptop): http://localhost:58025"; \
-	echo ""; \
-	MYTCO_ADRESSE=http://$$ip:5173 node --env-file=.env node_modules/vite/bin/vite.js dev --host $$ip --port 5173 --strictPort
+dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs iPhone im selben WLAN mit festen Namen für Erika und Kurt (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
+	./scripts/dev-handy.sh
 
-seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 3 erfundene Mitglieder anlegen, Brief-Code ausgeben (Einstellungen aus .env)
+seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 3 erfundene Mitglieder anlegen, Brief-Codes für Erika (Admin) und Kurt (Mitglied) ausgeben (Einstellungen aus .env)
 	node --env-file=.env scripts/migrate.ts
 	node --env-file=.env scripts/seed-lokal.ts
 

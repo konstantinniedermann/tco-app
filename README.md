@@ -40,7 +40,7 @@ npm exec --no -- playwright install chromium webkit
 make hooks   # einmalig: Git-Hooks aktivieren
 cp .env.example .env   # je Ordner bzw. Worktree: lokale Einstellungen (nur erfundene Werte)
 make db      # lokale PostgreSQL und Mail-Fänger Mailpit starten
-make seed    # erfundene Mitglieder anlegen (das erste ist Admin), gibt einen Brief-Code zum Anmelden aus
+make seed    # erfundene Mitglieder anlegen, gibt Brief-Codes für Erika (Admin) und Kurt (Mitglied) aus
 make dev     # Entwicklungsserver
 make check   # alle Prüfungen (braucht Docker)
 ```
@@ -50,8 +50,10 @@ Neue Migration nach einer Änderung an `src/lib/server/db/schema.ts`: `npm run d
 beim Ausliefern von selbst.
 
 Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make dev-handy` startet den
-Entwicklungsserver stattdessen fürs Handy im selben WLAN (macOS, nur im eigenen WLAN) und zeigt die Adresse an; Login per
-Code klappt dort, Passkey nicht (braucht HTTPS). `make musterbrief` erzeugt
+Entwicklungsserver stattdessen fürs iPhone im selben WLAN (macOS, nur im eigenen WLAN), mit
+festen Namen `mytco-admin.local` (Erika) und `mytco-mitglied.local` (Kurt): je Name eine
+Verknüpfung auf dem Startbildschirm mit eigenem Login. Login per Code klappt dort, Passkey nicht
+(braucht HTTPS). `make musterbrief` erzeugt
 einen Musterbrief als PDF unter `musterbrief/musterbrief.pdf`.
 
 Alle weiteren Befehle: `make help`.

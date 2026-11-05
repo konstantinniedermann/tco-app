@@ -6,6 +6,10 @@ Text für die Mitglieder, in MyTCO und als Verweis auf den Login-Briefen. Folgt 
 [Datenschutzkonzept](datenschutz.md). Entwurf, Freigabe durch den Gesamtvorstand (K-06.2);
 Platzhalter in eckigen Klammern füllt der Verein aus.
 
+Die App zeigt den Teil nach der Trennlinie unter «Datenschutz» an (`src/lib/datenschutz/erklaerung.ts`).
+Dort nur: eine Überschrift `##`, Absätze, Aufzählungen mit `- ` und `**fett**`; keine Links,
+keine nummerierten Listen, keine weitere Trennlinie.
+
 ---
 
 ## Datenschutz in MyTCO

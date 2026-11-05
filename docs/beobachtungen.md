@@ -211,3 +211,26 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (cas-reviewer) der Nacharbeit zu #43.
 
 **Einschätzung:** Bei zwei bis drei Admins selten. Ein Fix übernimmt das Muster der Angaben (geladene Rollen mitschicken, in der Transaktion vergleichen, 409).
+### 2026-11-05 — Datenschutz-Seite zeigt Platzhalter und interne Kennungen
+
+**Thema:** App
+
+**Fundort:** `/datenschutz` (Text aus `docs/datenschutzerklaerung.md`)
+
+**Beobachtung:** Die Seite zeigt «[Ansprechperson]», «[Datum]», «[E-Mail-Dienst]» und «Vorschlag K-38», sichtbar als Entwurf markiert.
+
+**Ursprung:** Review (cas-reviewer) zum Handy-Feedback, Session vom 05.11.2026.
+
+**Einschätzung:** Für lokale Tests passend. Vor einer Auslieferung auf Live ausfüllen und freigeben lassen (K-06.2, DS-09; DoD von #40 und #48).
+
+### 2026-11-05 — Verwaltung am Handy: Kopfleiste bleibt nicht oben stehen
+
+**Thema:** Verwaltung
+
+**Fundort:** `src/routes/verwaltung/+layout.svelte`, `.seitenleiste .kopf` in `basis.css`
+
+**Beobachtung:** In der Mitglieder-App bleibt die Kopfleiste beim Scrollen oben stehen, damit nichts unter der Statusleiste durchläuft. In der Verwaltung steckt sie in der Seitenleiste; auf dem schmalen Bildschirm scrollt der Inhalt nach der Seitenleiste unter Uhr und Akku durch.
+
+**Ursprung:** Review (cas-reviewer) zum Handy-Feedback, Session vom 05.11.2026.
+
+**Einschätzung:** Die Verwaltung ist vor allem für den PC gedacht. Am iPhone prüfen; falls störend, die Seitenleiste auf dem Handy als Kopf mit Menü neu denken (gehört in den Design-Ablauf).
