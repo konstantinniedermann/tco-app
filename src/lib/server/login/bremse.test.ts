@@ -67,6 +67,32 @@ describe('Bremse', () => {
 		expect(gesendet).toBe(10);
 	});
 
+	it('SI-09: 3 Wechsel-Anfragen pro Konto und Stunde, 10 pro Tag', () => {
+		const uhr = zeit();
+		const { wechselProKontoStunde, wechselProKontoTag } = erstelleBremsen(uhr.jetzt);
+		const starte = (konto: string): boolean => {
+			if (!wechselProKontoStunde.erlaubt(konto) || !wechselProKontoTag.erlaubt(konto)) {
+				return false;
+			}
+			wechselProKontoStunde.zaehle(konto);
+			wechselProKontoTag.zaehle(konto);
+			return true;
+		};
+
+		expect([1, 2, 3, 4].map(() => starte('7'))).toEqual([true, true, true, false]);
+		uhr.setze(STUNDE);
+		expect(starte('7')).toBe(false);
+
+		let gestartet = 3;
+		for (let stunde = 1; stunde < 6; stunde++) {
+			uhr.setze(stunde * (STUNDE + 1));
+			for (let i = 0; i < 5; i++) if (starte('7')) gestartet++;
+		}
+		expect(gestartet).toBe(10);
+		uhr.setze(24 * STUNDE + 1);
+		expect(starte('7')).toBe(true);
+	});
+
 	it('DS-06: raeumeAuf vergisst Schlüssel ohne Eintrag im Fenster', () => {
 		const uhr = zeit();
 		const bremse = new Bremse({ grenze: 10, fensterMs: 24 * STUNDE, jetzt: uhr.jetzt });

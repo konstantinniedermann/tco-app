@@ -39,6 +39,15 @@ const ADRESSE = /^[^\s@,;<>]+@[^\s@,;<>.]+(?:\.[^\s@,;<>.]+)+$/;
 // Steuerzeichen (Cc) und unsichtbare Formatzeichen (Cf, z. B. Nullbreite, Schreibrichtung).
 const STEUERZEICHEN = /[\p{Cc}\p{Cf}]/u;
 
+/** Fehlertext für eine getrimmte, klein geschriebene E-Mail-Adresse, `null` wenn sie gültig ist. */
+export function emailFehler(email: string): string | null {
+	if (email === '') return 'fehlt';
+	if (email.length > MAX_EMAIL || !ADRESSE.test(email) || STEUERZEICHEN.test(email)) {
+		return 'keine gültige E-Mail-Adresse';
+	}
+	return null;
+}
+
 /**
  * Prüft und normalisiert Mitgliederangaben aus Formular, CSV oder Befehl. Leere freiwillige
  * Felder werden `null` (die Datenbank kennt keine leeren Zeichenketten). Unbekannte Schlüssel
@@ -111,11 +120,9 @@ export function pruefeAngaben(
 	else if (!/^\d{4}$/.test(plz)) fehler.plz = '4 Ziffern';
 
 	const email = lies('email').toLowerCase();
-	if (fehler.email) {
-		// bereits als ungültig markiert
-	} else if (email === '') fehler.email = 'fehlt';
-	else if (email.length > MAX_EMAIL || !ADRESSE.test(email) || STEUERZEICHEN.test(email)) {
-		fehler.email = 'keine gültige E-Mail-Adresse';
+	if (!fehler.email) {
+		const f = emailFehler(email);
+		if (f) fehler.email = f;
 	}
 
 	let telefon: string | null = lies('telefon');

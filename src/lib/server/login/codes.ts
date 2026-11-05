@@ -64,6 +64,16 @@ export function hashMailCode(schluessel: string, kontoId: number, code: string):
 	return hmac(schluessel, `mail:${kontoId}:${code}`);
 }
 
+// SI-09: Die Art gehört in den Hash, damit vertauschte Codes nicht passen.
+export function hashWechselCode(
+	schluessel: string,
+	kontoId: number,
+	art: 'alt' | 'neu',
+	code: string
+): string {
+	return hmac(schluessel, `wechsel:${art}:${kontoId}:${code}`);
+}
+
 export function hashAdminCode(schluessel: string, sitzungHash: string, code: string): string {
 	return hmac(schluessel, `admin:${sitzungHash}:${code}`);
 }
