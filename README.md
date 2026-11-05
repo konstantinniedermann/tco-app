@@ -49,7 +49,9 @@ Neue Migration nach einer Änderung an `src/lib/server/db/schema.ts`: `npm run d
 (schreibt sie nach `drizzle/`); eingespielt wird sie lokal mit `make seed`, in den Tests und
 beim Ausliefern von selbst.
 
-Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make musterbrief` erzeugt
+Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make dev-handy` startet den
+Entwicklungsserver stattdessen fürs Handy im selben WLAN und zeigt die Adresse an; Login per
+Code klappt dort, Passkey nicht (braucht HTTPS). `make musterbrief` erzeugt
 einen Musterbrief als PDF unter `musterbrief/musterbrief.pdf`.
 
 Alle weiteren Befehle: `make help`.
