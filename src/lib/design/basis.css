@@ -431,15 +431,18 @@ html {
 }
 
 .feld input,
-.feld select {
+.feld select,
+.feld textarea {
 	display: block;
 }
 
 /* Gemeinsames Aussehen der Felder, auch in der Feld-Zeile der Verwaltung */
 .feld input,
 .feld select,
+.feld textarea,
 .feld-zeile input,
-.feld-zeile select {
+.feld-zeile select,
+.feld-zeile textarea {
 	width: 100%;
 	min-height: var(--tippflaeche);
 	padding: var(--abstand-3);
@@ -475,6 +478,79 @@ html {
 
 .feld-zeile .fehler {
 	margin-top: 0;
+}
+
+.feld textarea,
+.feld-zeile textarea {
+	resize: vertical;
+}
+
+/* Auswahlfläche: eine Wahl aus wenigen als Fläche (Radio) */
+.auswahl {
+	display: flex;
+	align-items: center;
+	gap: var(--abstand-3);
+	min-height: var(--tippflaeche);
+	padding: var(--abstand-2) var(--abstand-3);
+	margin-bottom: var(--abstand-2);
+	border: var(--rand-dick) solid var(--farbe-rand);
+	border-radius: var(--radius);
+	background: var(--farbe-flaeche);
+	cursor: pointer;
+}
+
+.auswahl input {
+	width: var(--groesse-symbol);
+	height: var(--groesse-symbol);
+	margin: 0;
+	flex-shrink: 0;
+	accent-color: var(--farbe-marke);
+}
+
+.auswahl:has(input:checked) {
+	border-color: var(--farbe-marke);
+	background: var(--farbe-marke-zart);
+	font-weight: 700;
+}
+
+fieldset.auswahl-gruppe {
+	margin: 0 0 var(--abstand-3);
+	padding: 0;
+	border: 0;
+}
+
+fieldset.auswahl-gruppe legend {
+	padding: 0;
+	margin-bottom: var(--abstand-2);
+	font-weight: 600;
+}
+
+/* Mehrzeiliger Text, wie eingegeben (Einladung eines Anlasses) */
+.mehrzeilig {
+	white-space: pre-line;
+}
+
+/* Kennzahlen (nur Verwaltung) */
+.kennzahlen {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--abstand-3);
+	margin-bottom: var(--abstand-4);
+}
+
+.kennzahl {
+	flex: 1 1 10em;
+	background: var(--farbe-flaeche);
+	border-radius: var(--radius);
+	padding: var(--abstand-3) var(--abstand-4);
+	box-shadow: var(--schatten-karte);
+}
+
+.kennzahl strong {
+	display: block;
+	font-size: var(--groesse-titel);
+	line-height: var(--zeilenhoehe-titel);
+	font-variant-numeric: tabular-nums;
 }
 
 /* Karten und Kacheln */
