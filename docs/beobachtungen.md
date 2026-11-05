@@ -229,7 +229,7 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Fundort:** `src/routes/verwaltung/+layout.svelte`, `.seitenleiste .kopf` in `basis.css`
 
-**Beobachtung:** In der Mitglieder-App bleibt die Kopfleiste beim Scrollen oben stehen, damit nichts unter der Statusleiste durchläuft. In der Verwaltung steckt sie in der Seitenleiste; auf dem schmalen Bildschirm scrollt der Inhalt nach der Seitenleiste unter Uhr und Akku durch.
+**Beobachtung:** In der Mitglieder-App bleibt die Kopfleiste beim Scrollen oben stehen. In der Verwaltung steckt sie in der Seitenleiste und scrollt auf dem schmalen Bildschirm mit weg; unter Uhr und Akku liegt dann nur noch das grüne Statusleisten-Band. Dazu: In der Mitglieder-App kann die mitlaufende Kopfleiste ein fokussiertes Element verdecken (WCAG 2.4.11), `scroll-padding-top` deckt nur das Band ab, nicht die Höhe der Kopfleiste.
 
 **Ursprung:** Review (cas-reviewer) zum Handy-Feedback, Session vom 05.11.2026.
 

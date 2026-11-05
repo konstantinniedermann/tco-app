@@ -16,8 +16,9 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 - Datenschutzerklärung in der App (DS-09): Seite «Datenschutz» ohne Login, Link in der Fusszeile,
   Text direkt aus `docs/datenschutzerklaerung.md` (als Entwurf markiert, Freigabe K-06.2 offen).
 - Kopfleiste und Reiter reichen auf dem iPhone unter Status- und Home-Balken, die Kopfleiste bleibt
-  beim Scrollen oben stehen, seitliche Abstände fürs Querformat (gegen den durchscheinenden
-  Streifen oben in der App vom Startbildschirm; am iPhone zu bestätigen).
+  beim Scrollen oben stehen, seitliche Abstände fürs Querformat. Gegen den Schleier von iOS 26
+  oben in der App vom Startbildschirm ein festes, deckendes Statusleisten-Band (am iPhone zu
+  bestätigen; mitlaufende Kopfleiste allein reichte nicht).
 
 ## 0.4.0 — Hilfe beim Start, Mitgliederverwaltung und Passkey, nicht ausgeliefert
 

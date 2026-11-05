@@ -78,7 +78,8 @@ img {
 /*
  * Seitenaufbau. .app ist der Rahmen der ganzen App und ein Container: Das PC-Layout richtet
  * sich nach seiner Breite, nicht nach dem Fenster (so zeigen auch die Mockups das richtige
- * Layout). Layout-Einschluss: Überlagerungen nur mit <dialog>, nicht mit position: fixed.
+ * Layout). Layout-Einschluss: Überlagerungen nur mit <dialog>, nicht mit position: fixed
+ * (Ausnahme: .statusleiste ausserhalb von .app).
  */
 .app {
 	container: app / inline-size;
@@ -110,6 +111,27 @@ img {
 .leise {
 	color: var(--farbe-text-leise);
 	font-size: var(--groesse-klein);
+}
+
+/*
+ * Statusleisten-Band (UI-Leitbild): iOS 26 legt über Web-Apps vom Startbildschirm oben einen
+ * Schleier, ausser ein fester, deckender, einfarbiger Streifen liegt am oberen Rand. Ein
+ * mitlaufender Kopf (sticky) reicht dafür nicht. Steht ausserhalb von .app (Container), darum
+ * darf es hier position: fixed sein. Am PC ist es 0 hoch.
+ */
+.statusleiste {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 2;
+	height: env(safe-area-inset-top);
+	background: var(--farbe-marke);
+}
+
+/* Ein Fokussprung landet nicht unter dem Band (WCAG 2.4.11) */
+html {
+	scroll-padding-top: env(safe-area-inset-top);
 }
 
 /* Kopfleiste */
