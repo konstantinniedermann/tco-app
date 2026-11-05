@@ -103,8 +103,9 @@ img {
 		max(var(--abstand-4), env(safe-area-inset-right));
 }
 
-/* Ohne Reiter ist die Fusszeile zuunterst: Abstand über dem Home-Balken */
-.app > footer.inhalt:last-child {
+/* Ohne Reiter ist die Fusszeile zuunterst, ohne beide der Inhalt: Abstand über dem Home-Balken */
+.app > footer.inhalt:last-child,
+.app > main.inhalt:last-child {
 	padding-bottom: calc(var(--abstand-6) + env(safe-area-inset-bottom));
 }
 

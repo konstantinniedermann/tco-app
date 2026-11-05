@@ -5,11 +5,14 @@
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
+	import { istReiterSeite, zeigtFusszeile } from '../lib/ui/navigation.ts';
 	import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 	import { APP_VERSION } from '../lib/version';
 
 	let { children } = $props();
-	const mitReiter = $derived(page.route.id === '/' || page.route.id === '/profil');
+	const mitReiter = $derived(istReiterSeite(page.route.id));
+	// Fusszeile nur vor dem Login und auf der Startseite (UI-Leitbild, Baustein Fusszeile).
+	const mitFusszeile = $derived(zeigtFusszeile(page.route.id, page.error !== null));
 	// Die Verwaltung bringt Seitenleiste und Inhalt selbst mit (eigenes Layout). Die Fehlerseite
 	// steht ausserhalb dieses Layouts und bekommt darum auch dort den Rahmen hier.
 	const verwaltung = $derived(
@@ -37,19 +40,16 @@
 			{@render children()}
 		</main>
 
-		<footer class="inhalt leise">
-			<p>
-				<a href={resolve('/hilfe')} aria-current={page.route.id === '/hilfe' ? 'page' : undefined}
-					>Hilfe</a
-				>
-				·
-				<a
-					href={resolve('/datenschutz')}
-					aria-current={page.route.id === '/datenschutz' ? 'page' : undefined}>Datenschutz</a
-				>
-				· <span data-testid="version">Version {APP_VERSION}</span>
-			</p>
-		</footer>
+		{#if mitFusszeile}
+			<footer class="inhalt leise">
+				<p>
+					<a href={resolve('/hilfe')}>Hilfe</a>
+					·
+					<a href={resolve('/datenschutz')}>Datenschutz</a>
+					· <span data-testid="version">Version {APP_VERSION}</span>
+				</p>
+			</footer>
+		{/if}
 
 		{#if mitReiter}
 			<Reiter />
