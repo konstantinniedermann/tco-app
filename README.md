@@ -50,7 +50,7 @@ Neue Migration nach einer Änderung an `src/lib/server/db/schema.ts`: `npm run d
 beim Ausliefern von selbst.
 
 Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make dev-handy` startet den
-Entwicklungsserver stattdessen fürs Handy im selben WLAN und zeigt die Adresse an; Login per
+Entwicklungsserver stattdessen fürs Handy im selben WLAN (macOS, nur im eigenen WLAN) und zeigt die Adresse an; Login per
 Code klappt dort, Passkey nicht (braucht HTTPS). `make musterbrief` erzeugt
 einen Musterbrief als PDF unter `musterbrief/musterbrief.pdf`.
 

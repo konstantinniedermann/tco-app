@@ -53,7 +53,7 @@ dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einste
 
 # Nur der Entwicklungsserver: Dort setzt SvelteKit das Login-Cookie ohne `Secure`, darum klappt
 # der Login per Code über http. Passkey braucht HTTPS und geht hier nicht.
-dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs Handy im selben WLAN (nur erfundene Daten, Login per Code, ohne Passkey)
+dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs Handy im selben WLAN (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
 	@ip=$$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null); \
 	[ -n "$$ip" ] || { echo "Abbruch: keine WLAN-Adresse gefunden — ist der Laptop im WLAN?" >&2; exit 1; }; \
 	echo ""; \
