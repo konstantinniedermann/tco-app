@@ -131,9 +131,10 @@ den Bereich *Anlässe*.
 
 - Zwei neue Tabellen mit einer neuen Migration; keine Änderung an bestehenden.
 - Schnittstellen nur als `+server.ts` (ADR-002): `GET /api/anlaesse`, `GET /api/anlaesse/[id]`,
-  `PUT /api/anlaesse/[id]/anmeldung`, `GET /api/kalender/[kennung]` (`text/calendar`, ohne
+  `POST /api/anlaesse/[id]/anmeldung`, `GET /api/kalender/[kennung]` (`text/calendar`, ohne
   Login; Kennung aus 32 Zufallsbytes, base64url);
-  `GET`/`POST /api/admin/anlaesse`, `GET`/`PUT`/`DELETE /api/admin/anlaesse/[id]`.
+  `GET`/`POST /api/admin/anlaesse`, `GET`/`POST /api/admin/anlaesse/[id]`,
+  `POST /api/admin/anlaesse/[id]/loeschen` (ändernde Anfragen nur als `POST` mit JSON, SI-10).
 - Kalenderdatei von Hand nach RFC 5545 (UID, DTSTART/DTEND in UTC, SUMMARY, LOCATION,
   DESCRIPTION). Annahme: Dauer 2 Stunden, weil der Anlass kein Ende kennt.
 - Anzeige der Zeiten in Schweizer Zeit (`Europe/Zurich`).
