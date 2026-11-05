@@ -135,6 +135,18 @@ describe('Anlässe', () => {
 		});
 	});
 
+	test('FR-32: nach dem Anmeldeschluss ist nichts mehr zu prüfen', async () => {
+		const { id, w } = await neu();
+		const m = await legeMitgliedAn(db);
+		await melde(db, id, m.mitgliedId, { antwort: 'kommt', bemerkung: null }, JETZT);
+		await aendereAnlass(db, id, { ...w, ort: 'Halle' }, new Date(JETZT.getTime() + MINUTE));
+		const danach = new Date(w.anmeldeschluss.getTime() + 2 * MINUTE);
+		expect(await ladeAnlassFuerMitglied(db, id, m.mitgliedId, danach)).toMatchObject({
+			offen: false,
+			zuPruefen: false
+		});
+	});
+
 	test('FR-32: Ändern nur des Titels markiert nichts', async () => {
 		const { id, w } = await neu();
 		const m = await legeMitgliedAn(db);

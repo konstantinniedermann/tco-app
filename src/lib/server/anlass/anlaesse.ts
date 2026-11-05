@@ -103,10 +103,13 @@ type Zeile = Awaited<ReturnType<typeof fuerMitglied>>[number];
 
 function alsAnsicht(z: Zeile, jetzt: Date): AnlassMitglied {
 	const { terminGeaendertAm, geaendertAm, ...rest } = z;
+	const offen = istOffen(z.anmeldeschluss, jetzt);
 	return {
 		...rest,
-		offen: istOffen(z.anmeldeschluss, jetzt),
+		offen,
+		// Nach dem Anmeldeschluss lässt sich nichts mehr ändern, also auch nichts mehr prüfen.
 		zuPruefen:
+			offen &&
 			geaendertAm !== null &&
 			terminGeaendertAm !== null &&
 			geaendertAm.getTime() < terminGeaendertAm.getTime()

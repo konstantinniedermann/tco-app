@@ -100,14 +100,40 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	await seite.getByRole('button', { name: 'Antwort senden' }).click();
 	await expect(seite.getByText('Du kommst', { exact: true })).toBeVisible();
 
-	// SI-19: Kalenderdatei über den Link, ohne Personendaten.
+	// SI-19: Kalenderdatei über den Link, auch ohne Sitzung, ohne Personendaten.
 	const href = await seite.getByRole('link', { name: 'In den Kalender' }).getAttribute('href');
-	const ics = await seite.request.get(href!);
+	const fremd = await browser.newContext({
+		baseURL,
+		extraHTTPHeaders: { 'x-forwarded-proto': 'http' }
+	});
+	const ics = await fremd.request.get(href!);
 	expect(ics.headers()['content-type']).toBe('text/calendar; charset=utf-8');
 	const text = await ics.text();
 	expect(text).toContain(`SUMMARY:${titel}`);
 	expect(text).toContain('DTSTART:20990319T183000Z');
 	expect(text).not.toContain('Hugo');
+	await fremd.close();
+
+	// FR-32: Der Admin verschiebt den Ort; das Mitglied wird gebeten, die Antwort zu prüfen.
+	await page.getByLabel('Ort').fill('Halle, Musterweg 2, Olten');
+	await page.getByRole('button', { name: 'Angaben speichern' }).click();
+	await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
+	await seite.reload();
+	const hinweis = seite.getByRole('status').filter({ hasText: 'Datum oder Ort geändert' });
+	await expect(hinweis).toContainText('bitte prüfe deine Antwort');
+	await pruefeBildschirm(seite, info, 'anlass-zu-pruefen');
+	// Schliesst die Anmeldung inzwischen, sagt die Seite es, statt still nichts zu tun.
+	await seite.route('**/api/anlaesse/*/anmeldung', (r) =>
+		r.fulfill({ status: 409, json: { fehler: 'geschlossen' } })
+	);
+	await seite.getByRole('button', { name: 'Antwort stimmt so' }).click();
+	await expect(seite.getByRole('alert')).toHaveText('Die Anmeldung ist geschlossen.');
+	await expect(seite.getByRole('button', { name: 'Antwort stimmt so' })).toBeHidden();
+	await seite.unroute('**/api/anlaesse/*/anmeldung');
+	await seite.reload();
+	await seite.getByRole('button', { name: 'Antwort stimmt so' }).click();
+	await expect(hinweis).toBeHidden();
+	await expect(seite.getByText('Du kommst', { exact: true })).toBeVisible();
 	await geraet.close();
 
 	// Admin sieht die Antwort.

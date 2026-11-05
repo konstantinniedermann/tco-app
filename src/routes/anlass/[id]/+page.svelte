@@ -60,6 +60,9 @@
 				anlass = null;
 				return;
 			case 'geschlossen':
+				// Inzwischen abgelaufen: Die Seite zeigt den Stand ohne Formular und ohne Prüf-Hinweis.
+				anlass = { ...anlass, offen: false, zuPruefen: false };
+				bearbeiten = false;
 				fehler = { feld: 'formular', text: 'Die Anmeldung ist geschlossen.' };
 				return;
 			case 'eingabe':
@@ -155,9 +158,6 @@
 			<button type="button" class="taste-haupt taste-breit" onclick={senden} disabled={laeuft}
 				>Antwort senden</button
 			>
-			{#if fehler?.feld === 'formular'}
-				<p class="fehler" role="alert">{fehler.text}</p>
-			{/if}
 		</section>
 	{:else if anlass.antwort}
 		<section class="karte" aria-labelledby="antwort">
@@ -183,5 +183,10 @@
 			<h2 id="geschlossen">Anmeldung geschlossen</h2>
 			<p class="leise">Für diesen Anlass kannst du dich nicht mehr an- oder abmelden.</p>
 		</section>
+	{/if}
+
+	<!-- Auch ohne sichtbares Formular, z. B. nach «Antwort stimmt so». -->
+	{#if fehler?.feld === 'formular'}
+		<p class="fehler" role="alert">{fehler.text}</p>
 	{/if}
 {/if}
