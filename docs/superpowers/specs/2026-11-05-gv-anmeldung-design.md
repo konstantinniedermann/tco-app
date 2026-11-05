@@ -87,9 +87,26 @@ ausserhalb von MyTCO). Danach in die Datenschutzerklärung.
 
 ## Oberfläche
 
-Entwurf als Design-Artifact auf dem Design System *MyTCO* (Handy-Artboards), nach dem
-[UI-Leitbild](../../ui-leitbild.md): eine eigene Karte für die GV auf der Startseite, Antrag und
-Frage als aufklappbarer Bereich. Fehlende Bausteine kommen erst ins Leitbild.
+Erster Entwurf als Design-Artifact
+[MyTCO GV-Anmeldung](https://claude.ai/artifact/K3oLGEXvEbqPDWnobf2jA6) (privat, nur für den
+Projektleiter), gebaut aus den Werten von `tokens.css` und den Bausteinen des
+[UI-Leitbilds](../../ui-leitbild.md). Das Design System *MyTCO* war noch leer.
+
+1. **Startseite:** GV als hervorgehobene Kachel unter «Jetzt aktuell».
+2. **GV-Seite:** Karte *Einladung* (Datum, Ort, Traktanden, PDF, «Du bist stimmberechtigt»), Karte
+   *Kommst du?* mit zwei Auswahlflächen, Aufklappbereich *Antrag oder Frage an den Vorstand
+   (freiwillig)*, Haupttaste «Antwort senden».
+3. **Abmelden:** «Ich komme nicht» gewählt, darunter *Bemerkung (freiwillig)*, «Die Bemerkung
+   liest nur der Vorstand».
+4. **Nach dem Senden:** Karte *Deine Antwort* mit Plakette und Nebentaste «Antwort ändern»,
+   Karte mit der eingereichten Frage.
+5. **Verwaltung (PC):** Kennzahlen (kommen, davon stimmberechtigt, kommen nicht, keine Antwort),
+   Karte *Anträge und Fragen*, Leiste mit Suche, Filter, «Liste exportieren», Tabelle mit
+   Stimmrecht und Bemerkung.
+
+**Bausteine, die im Leitbild fehlen** (vor dem Bau dort aufnehmen): Auswahlfläche (Radio als
+Fläche mit Rand, gewählt in `--farbe-marke-zart`), mehrzeiliges Eingabefeld, Kennzahl-Kachel der
+Verwaltung, Plakette *kommt nicht* bzw. *keine Antwort*.
 
 ## Offen für die spätere Session
 
