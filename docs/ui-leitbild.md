@@ -13,12 +13,15 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 
 | Was | Code-Stelle |
 |-----|-------------|
-| Werte (Farben, Schrift, Abstände, Formen) | `src/lib/design/tokens.css` |
+| Werte (Farben, Schrift, Abstände, Formen, Bewegung) | `src/lib/design/tokens.css` |
 | Grundstil und Bausteine | `src/lib/design/basis.css` |
 | Wappen und App-Symbol (Farben fest in der Datei) | `static/wappen.svg`, `static/favicon.svg`, `static/*.png` |
 | Manifest (Name, Farben fest in der Datei; `theme_color` und `background_color` stimmen von Hand mit `--farbe-marke` und `--farbe-hintergrund` überein) | `static/manifest.webmanifest` |
 | Farbe der Browserleiste, Systemschrift-Einstellung, sichere Abstände zu Statusleiste und Notch über `env(safe-area-inset-*)` (`viewport-fit=cover`; nie `apple-mobile-web-app-status-bar-style` `black-translucent`, das schaltet den Schutz vor dem Schleier von iOS ab) | `src/app.html` |
-| Kopfleiste, Fusszeile, Seitenaufbau | `src/routes/+layout.svelte` |
+| Kopfleiste, Fusszeile, Seitenaufbau, Seitenwechsel, Scrollposition der Reiter | `src/routes/+layout.svelte` |
+| Welcher Übergang, welcher Reiter aktiv, wo die Fusszeile steht | `src/lib/ui/navigation.ts` |
+| Reiter (sofort aktiv, gleitende Markierung, nochmals antippen → nach oben) | `src/lib/ui/Reiter.svelte` |
+| Weiches Auf- und Zuklappen | `src/lib/ui/klappe.ts` |
 | Baustein Anleitung (Zeichnung, Ablauf) | `src/lib/ui/Anleitung.svelte`, `src/lib/ui/ZeichnungIphone.svelte`, `src/lib/ui/ZeichnungAndroid.svelte` |
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
 
@@ -131,6 +134,20 @@ Handy-Rahmen das Handy-Layout. Der Wert steht nur in `basis.css`, weil Abfragen 
 erlauben. Weil `.app` ein Container ist, gehen Überlagerungen nur mit `<dialog>`, nicht mit
 `position: fixed`. Einzige Ausnahme ist das Statusleisten-Band; es steht ausserhalb von `.app`.
 
+## Bewegung
+
+Dauern und Kurven aller Bewegungen ausser der Anleitung (UI-09). Die Werte sind einem
+iPhone nachempfunden und am Muster abgenommen (#54). Wo Bewegung vorkommt, steht unter
+[Bewegung und Bedienung](#bewegung-und-bedienung).
+
+| Token | Wert | Verwendung |
+|-------|------|------------|
+| `--dauer-kurz` | `150ms` | Überblenden beim Reiterwechsel, Gedrückt-Zustand, Schliessen der Rückfrage |
+| `--dauer-mittel` | `250ms` | Markierung des Reiters, Aufklappbereich, Öffnen der Rückfrage |
+| `--dauer-schieben` | `350ms` | Unterseite hinein und zurück |
+| `--kurve-standard` | `cubic-bezier(0.2, 0, 0, 1)` | alles ausser Schieben und Überblenden (dieses linear) |
+| `--kurve-schieben` | `cubic-bezier(0.32, 0.72, 0, 1)` | Schieben, ähnlich der Feder-Bewegung von iOS |
+
 ## Bausteine
 
 Jeder Baustein ist genau einmal als Klasse in `src/lib/design/basis.css` gebaut. Svelte-
@@ -141,17 +158,17 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und bleibt beim Scrollen oben stehen (`sticky`), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch) |
 | Statusleisten-Band | `.statusleiste` | ausserhalb von `.app`, fest oben, deckend in `--farbe-marke` wie die Kopfleiste darunter (auch in der Verwaltung). Im Browser so hoch wie `env(safe-area-inset-top)` (am PC 0); in der iPhone-App vom Startbildschirm (`display-mode: standalone`, nur iOS) zusätzlich `--abstand-3` hoch, also über dem oberen Rand der Kopfleiste und über 10 px; nicht in der Verwaltung (`.statusleiste-verwaltung`), weil deren Kopfleiste mit der Seitenleiste wegscrollt. iOS legt sonst über Web-Apps vom Startbildschirm einen hellen Schleier über die Statusleiste; iOS lässt ihn nur weg, wenn oben in der Mitte ein fester oder mitlaufender, deckender, fast bildschirmbreiter Streifen liegt |
 | Seitenhintergrund (iPhone-App vom Startbildschirm) | `html`, `body` in `display-mode: standalone`, nur iOS | `--farbe-marke`; `.app` trägt dann `--farbe-hintergrund`. Was beim Scrollen an Schleier bleibt, ist so grün statt hell; beim Überziehen unten erscheint Grün unter den Reitern bzw. der Fusszeile |
-| Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben; Abstand `env(safe-area-inset-bottom)` über dem Home-Balken |
+| Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben (`.reiter-balken`, gleitet zum gewählten Reiter); Abstand `env(safe-area-inset-bottom)` über dem Home-Balken; reagiert beim Antippen sofort, nicht markierbar ([Bewegung und Bedienung](#bewegung-und-bedienung)) |
 | Seitenleiste | `.seitenleiste` | nur Verwaltung, Bereiche nach Rolle |
 | Haupttaste | `.taste-haupt` | Sandplatz-Rot, höchstens eine pro Bildschirm (UI-04) |
-| Nebentaste | `.taste-neben` | weiss mit grünem Rand |
+| Nebentaste | `.taste-neben` | weiss mit grünem Rand; gedrückt `--farbe-marke-zart` |
 | Link | `a` | grün, unterstrichen |
 | Zurück | `.zurueck` | „‹ Zurück" oben links auf Unterseiten |
 | Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
-| Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm |
-| Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen |
-| Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste |
+| Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
+| Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; klappt weich auf und zu (`--dauer-mittel`) |
+| Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste; gedrückt `--farbe-marke-zart` und leicht verkleinert |
 | Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt" oder „1 von 3 Anmeldungen" |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05) |
 | Anleitung | `.anleitung` | gezeichnetes Handy (`.anleitung-film`, ein `.anleitung-bild` pro Schritt), darunter die Taste (`.anleitung-taste`) und die nummerierten Schritte (`.anleitung-schritte`), am Schluss ein Eintrag „Fertig!" (`.anleitung-fertig`, mit ✓ statt Nummer); die Zeichnung ist für Screenreader verborgen, die Schritte tragen die Bedeutung; ein Schritt gehört zu genau einem Bild; in der Zeichnung nur Beschriftungen, die in der Hilfe von Apple bzw. Google belegt sind, sonst graue Balken (`.anleitung-eintrag.leer`); der Tipp-Kreis (`.anleitung-tipp`) zeigt, wo man tippt; Bewegung nach UI-09 |
@@ -163,7 +180,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Inhaltsbereich | `.inhalt` | eine Spalte, höchstens `--breite-inhalt`, Seitenrand, im Querformat mindestens der sichere Bereich (`env(safe-area-inset-left/right)`) |
 | Leiste | `.leiste` | Suche, Filter und Tasten nebeneinander, bricht bei Platzmangel um |
 | Verwaltungsrahmen | `.verwaltung` | Seitenleiste links, Inhalt rechts; auf schmalem Bildschirm untereinander |
-| Fusszeile | `footer.inhalt.leise` | auf jeder Seite der Mitglieder-App, auch vor dem Login, nicht in der Verwaltung: Links „Hilfe" · „Datenschutz" · Version; als letztes Element (ohne Reiter) mit Abstand über dem Home-Balken |
+| Fusszeile | `footer.inhalt.leise` | nur vor dem Login (Einstiegsseite, Login, Login mit Mail-Code) und auf der Startseite: Links „Hilfe" · „Datenschutz" · Version; nicht auf Profil, Hilfe, Datenschutz, Fehlerseite und in der Verwaltung; als letztes Element (ohne Reiter) mit Abstand über dem Home-Balken |
 | Nebentext | `.leise` | kleiner und leiser, für Hilfen und Nebeninfos |
 | Breite Taste | `.taste-breit` | Zusatz zu einer Taste: volle Breite (Formulare auf dem Handy) |
 | Feld-Zeile | `.feld-zeile` | nur Verwaltung: Bezeichnung links, Eingabe rechts, gleiche Schriftgrösse; unter `60rem` steht die Bezeichnung über dem Feld |
@@ -202,7 +219,7 @@ Kopfleiste.
   grosser Schrift nicht in den Reiter passt; Seitentitel schreiben es aus.
 - **Startseite:** „Hoi <Vorname>", darunter „Jetzt aktuell" (Kacheln, die wichtigste
   hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04).
-- **Unterseiten:** „‹ Zurück" oben links.
+- **Unterseiten:** „‹ Zurück" oben links, keine Reiter (bei der CM-Anmeldung neu prüfen).
 - **Einstiegsseite** (nur im Handy-Browser, nicht vom Symbol aus): „Willkommen bei MyTCO", eine Karte „Zuerst auf den Startbildschirm" mit der Anleitung bzw. auf Android der Haupttaste „MyTCO installieren", darunter der Link „Ohne Startbildschirm weiter" zum Login.
 - **Hilfe:** ohne Login, über die Fusszeile; jedes Thema ein Aufklappbereich, der Kontakt eine Karte.
 - **Datenschutz:** ohne Login, über die Fusszeile (DS-09); Text der Datenschutzerklärung in einer Karte, solange er nicht freigegeben ist mit dem leisen Vermerk «Entwurf».
@@ -218,6 +235,42 @@ Kopfleiste.
 Konten mit einer Rolle über *Mitglied* hinaus (RR-07). Dunkelgrüne Seitenleiste mit
 „MyTCO Verwaltung", den Bereichen der eigenen Rollen und „‹ Zur App". Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
+
+### Bewegung und Bedienung
+
+MyTCO soll sich anfühlen wie eine App auf dem iPhone: Was man antippt, reagiert sofort, und
+die Bewegung zeigt, wohin man gegangen ist. Dauern und Kurven stehen unter
+[Bewegung](#bewegung).
+
+**Seitenwechsel** (View Transitions; ohne Unterstützung im Browser sofort):
+
+| Wechsel | Beispiele | Bewegung |
+|---------|-----------|----------|
+| gleiche Ebene | Start ↔ Profil, Einstiegsseite → Login, Login → Start | Inhalt blendet über (`--dauer-kurz`, linear) |
+| eine Ebene tiefer | Start → Hilfe, Login → Datenschutz, Login → Login mit Mail-Code | neue Seite schiebt sich von rechts herein, alte Seite und Reiter weichen um 28 % nach links (`--dauer-schieben`, `--kurve-schieben`) |
+| zurück | „‹ Zurück" | umgekehrt: Seite schiebt sich nach rechts weg |
+| Zurück-Taste oder -Geste des Browsers, Verwaltung, Fehlerseite | | keine; die Geste animiert der Browser selbst |
+
+Kopfleiste und Statusleisten-Band stehen beim Wechsel still, die Reiter auch, solange sie
+auf beiden Seiten stehen.
+
+**Reiter:** Der angetippte Reiter wird sofort aktiv, auch wenn die Seite noch lädt; der
+Balken gleitet hinüber (`--dauer-mittel`). Jeder Reiter merkt sich, wie weit man gescrollt
+hat, solange die App offen ist; nach dem Abmelden beginnt alles wieder oben. Wer den aktiven
+Reiter nochmals antippt, kommt nach oben.
+
+**Antippen:** kein grauer Blitz des Browsers, dafür ein Gedrückt-Zustand (`--dauer-kurz`):
+Reiter in `--farbe-marke` mit etwas kleinerem Symbol; Kachel in `--farbe-marke-zart`, leicht
+verkleinert; Nebentaste, „‹ Zurück", Titelzeile des Aufklappbereichs und Textlinks in
+`--farbe-marke-zart`; Haupttaste in `--farbe-aktion-dunkel`.
+
+**Markieren:** Kopfleiste, Reiter, Tasten, „‹ Zurück", Kacheln und Titelzeilen der
+Aufklappbereiche lassen sich nicht markieren und öffnen beim langen Drücken kein Link-Menü.
+Fliesstext, Codes, Angaben und Tabellen bleiben markier- und kopierbar.
+
+**Grundeinstellungen:** Doppeltippen zoomt nicht; Zoomen mit zwei Fingern bleibt. MyTCO ist
+immer hell (`color-scheme: light`), auch wenn das Gerät dunkel eingestellt ist. Im
+Querformat bläht der Browser die Schrift nicht auf.
 
 ## Brief (Druck)
 
@@ -263,7 +316,7 @@ passt.
 | UI-05 | Bedeutung nie nur über Farbe: Status als Plakette mit Text, Symbole immer mit Text. |
 | UI-06 | Fehlermeldungen stehen beim Feld, in Worten, mit Lösungsweg. |
 | UI-07 | Codes werden unabhängig von Gross-/Kleinschreibung, Leerzeichen und Bindestrich angenommen. |
-| UI-09 | Bewegung gibt es nur im Baustein Anleitung: weiche Überblendung, 3,5 s pro Schritt, 6 s für „Fertig", höchstens 3 Durchläufe, danach steht sie bei „Fertig". Eine Taste hält an (Anhalten · Abspielen · Nochmals abspielen). Bei „Bewegung reduzieren" keine Bewegung und keine Taste; die Bilder stehen nummeriert still nebeneinander. |
+| UI-09 | Bewegung gibt es nur, wo sie Orientierung gibt: beim Seitenwechsel, an der Markierung des Reiters, beim Auf- und Zuklappen, bei der Rückfrage ([Bewegung und Bedienung](#bewegung-und-bedienung), Dauern unter [Bewegung](#bewegung)) und im Baustein Anleitung. Bei „Bewegung reduzieren" wechselt alles sofort. Die Anleitung: weiche Überblendung, 3,5 s pro Schritt, 6 s für „Fertig", höchstens 3 Durchläufe, danach steht sie bei „Fertig". Eine Taste hält an (Anhalten · Abspielen · Nochmals abspielen). Bei „Bewegung reduzieren" keine Bewegung und keine Taste; die Bilder stehen nummeriert still nebeneinander. |
 
 Lange Wörter („Clubmeisterschaft") werden getrennt statt abgeschnitten (`hyphens: auto`
 auf `body`, Sprache `de-CH` in `src/app.html`). Ausnahme sind Tabellenköpfe (`.tabelle th`):
