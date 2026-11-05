@@ -7,6 +7,15 @@ import {
 	leseKoerper,
 	type Ereignis
 } from '../login/schnittstellen.ts';
+import { utcZuZuerich } from '../../anlass/zeit.ts';
+import { pruefeAnlass } from '../anlass/angaben.ts';
+import {
+	aendereAnlass,
+	ladeAnlassAdmin,
+	legeAnlassAn,
+	listeAnlaesse,
+	loescheAnlass
+} from '../anlass/anlaesse.ts';
 import { listeFuerFairgate, markiereUebertragen } from './fairgate.ts';
 import { leseStand, pruefeAngaben } from './angaben.ts';
 import {
@@ -38,7 +47,7 @@ const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });
 
 const INTEGER_MAX = 2_147_483_647;
 
-function parseId(roh: string | null | undefined): number | null {
+export function parseId(roh: string | null | undefined): number | null {
 	if (roh === null || roh === undefined || !/^[1-9]\d{0,14}$/.test(roh)) return null;
 	const n = Number(roh);
 	// Grösser als ein Postgres-integer würde die Abfrage mit 22003 abbrechen (500).
@@ -235,6 +244,51 @@ export function postFairgate(d: AdminDienste, e: AdminEreignis): Promise<Respons
 	});
 }
 
+export function getAdminAnlaesse(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return mitAdmin(d, e, async () => antwort(200, await listeAnlaesse(d.db)));
+}
+
+export function postAdminAnlaesse(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return aendernd(d, e, async (urheber, koerper) => {
+		const p = pruefeAnlass(koerper);
+		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.felder });
+		return antwort(201, { id: await legeAnlassAn(d.db, urheber.mitgliedId, p.werte) });
+	});
+}
+
+export function getAdminAnlass(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return mitAdmin(d, e, async () => {
+		const id = parseId(e.params.id);
+		const a = id === null ? null : await ladeAnlassAdmin(d.db, id);
+		if (!a) return nichtGefunden();
+		// Für das Formular in Schweizer Zeit, wie <input type="datetime-local"> sie erwartet.
+		return antwort(200, {
+			...a,
+			beginnLokal: utcZuZuerich(a.beginn),
+			schlussLokal: utcZuZuerich(a.anmeldeschluss)
+		});
+	});
+}
+
+export function postAdminAnlass(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return aendernd(d, e, async (_urheber, koerper) => {
+		const id = parseId(e.params.id);
+		if (id === null) return nichtGefunden();
+		const p = pruefeAnlass(koerper);
+		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.felder });
+		const r = await aendereAnlass(d.db, id, p.werte, jetzt(d));
+		return r === 'ok' ? antwort(200, {}) : nichtGefunden();
+	});
+}
+
+export function postAdminAnlassLoeschen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return aendernd(d, e, async () => {
+		const id = parseId(e.params.id);
+		if (id === null) return nichtGefunden();
+		return (await loescheAnlass(d.db, id)) === 'ok' ? antwort(200, {}) : nichtGefunden();
+	});
+}
+
 export const ADMIN_SCHNITTSTELLEN = {
 	getZugang,
 	postZugangCode,
@@ -247,5 +301,10 @@ export const ADMIN_SCHNITTSTELLEN = {
 	postSitzungen,
 	getVerlauf,
 	getFairgate,
-	postFairgate
+	postFairgate,
+	getAdminAnlaesse,
+	postAdminAnlaesse,
+	getAdminAnlass,
+	postAdminAnlass,
+	postAdminAnlassLoeschen
 } satisfies Record<string, (d: AdminDienste, e: AdminEreignis) => Promise<Response>>;
