@@ -12,6 +12,7 @@ Mitgliederverwaltung Fairgate oder die Website tcolten.ch.
 
 Phase **Fundament**, Version 0.4.0 (noch nicht ausgeliefert): Login per Einmal-Code mit
 Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung für Admins,
+Anmeldung zu Anlässen wie der Generalversammlung (Vorschlag für den Vorstand, K-50),
 Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene Testdaten) sind
 gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
 den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* aus
