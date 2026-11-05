@@ -13,9 +13,8 @@ test('DS-09: Datenschutzerklärung ohne Login über die Fusszeile erreichbar', a
 	await expect(page.getByRole('heading', { level: 1, name: 'Datenschutz in MyTCO' })).toBeVisible();
 	await expect(page.getByText('Entwurf: Der Vorstand gibt diesen Text noch frei.')).toBeVisible();
 	await expect(page.getByText('Kein Tracking:')).toBeVisible();
-	await expect(
-		page.getByRole('contentinfo').getByRole('link', { name: 'Datenschutz' })
-	).toHaveAttribute('aria-current', 'page');
+	// Die Seite selbst hat keine Fusszeile (UI-Leitbild, Baustein Fusszeile).
+	await expect(page.getByRole('contentinfo')).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'datenschutz');
 	expect(fehler).toEqual([]);
 });

@@ -129,6 +129,11 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 | A-ANLASS-03 | Anmeldung zu Junioren-Turnieren (ab 2028) | PDF 3d | später | später |
 | A-ANLASS-04 | Teilnehmerlisten für Junioren-Training und weitere Turniere, ähnlich der Lizenzliste | PDF 4b | später | später |
 
+A-ANLASS-01: Erster Anlass neben der Clubmeisterschaft ist die Generalversammlung ([#52](https://github.com/konstantinniedermann/tco-app/issues/52),
+[Design](../superpowers/specs/2026-11-05-gv-anmeldung-design.md)). Vorschlag K-50: An- oder Abmelden
+mit Bemerkung, beim Anmelden freiwillig ein Antrag oder eine Frage an den Vorstand, Liste nur für
+Admins, Anträge per Mail auch ans Präsidium. Die Etappe folgt aus der Antwort.
+
 ### LIZENZ — Lizenzanträge und Lizenzliste
 
 | ID | Anforderung | Quelle | Etappe | Status |

@@ -24,6 +24,13 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 - Anleitung zum Startbildschirm (iPhone): deutlicher Hinweis für die Safari-Tablayouts «Unten» und
   «Oben» (dort gleich auf «Teilen», weiter bei Schritt 3), im Brief «••• (falls da)». Die
   Animation zeigt weiterhin nur das Vorgabe-Layout «Kompakt» (Entscheid Projektleiter).
+- Ruhiges App-Gefühl (#54): Der angetippte Reiter ist sofort aktiv, sein Balken gleitet hinüber,
+  der Inhalt blendet über; Unterseiten schieben sich von rechts herein und mit «‹ Zurück»
+  wieder hinaus. Jeder Reiter merkt sich die Scrollposition, nochmals antippen führt nach oben.
+  Aufklappbereiche und Rückfrage öffnen weich. Kein grauer Tipp-Blitz, Gedrückt-Zustände,
+  Bedienelemente nicht markierbar, kein Zoom per Doppeltipp, immer hell. Bei «Bewegung
+  reduzieren» alles ohne Bewegung (UI-09 erweitert, neue Bewegungs-Tokens). Die Fusszeile steht
+  nur noch vor dem Login und auf der Startseite.
 
 ## 0.4.0 — Hilfe beim Start, Mitgliederverwaltung und Passkey, nicht ausgeliefert
 

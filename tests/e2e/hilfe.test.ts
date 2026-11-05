@@ -30,10 +30,8 @@ test('A-HILFE-01: Hilfe ohne Login über die Fusszeile erreichbar', async ({ pag
 	await oeffneHilfe(page);
 	await expect(themen(page)).toHaveCount(4);
 	await expect(page.locator('.karte', { hasText: 'Fragen?' })).toContainText(KONTAKT);
-	await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Hilfe' })).toHaveAttribute(
-		'aria-current',
-		'page'
-	);
+	// Die Hilfe selbst hat keine Fusszeile (UI-Leitbild, Baustein Fusszeile).
+	await expect(page.getByRole('contentinfo')).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'hilfe');
 	expect(fehler).toEqual([]);
 });

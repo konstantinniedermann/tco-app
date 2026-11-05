@@ -48,6 +48,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 | 04.11.2026 | [Testgruppe](../testgruppe.md) (#40): neu die Hilfe beim Start (A-HILFE-01, -02), weil die Testgruppe auch die Hilfe prüft, die beim Start mitgeht; Etappe *Pilot* als Vorstufe von *Mitglieder-Login* ([Roadmap](../roadmap.md)) | Projektleiter |
 | 04.11.2026 | Hilfe beim Start ([#47](https://github.com/konstantinniedermann/tco-app/issues/47), [Design](../superpowers/specs/2026-11-04-hilfe-beim-start-design.md)): A-HILFE-01, -02 auf *umgesetzt\**; A-HILFE-02 präzisiert (eigene Einstiegsseite im Handy-Browser, Android-Taste); «eigene Angaben ändern» kommt mit A-KONTO-01 in die Hilfe | Projektleiter |
 | 04.11.2026 | Freiwilliger Passkey ([#44](https://github.com/konstantinniedermann/tco-app/issues/44), [ADR-005](../adr/adr-005-passkey-simplewebauthn.md)): A-LOGIN-07 auf *umgesetzt\**; die Prüfung auf echten Geräten steht in der Release-Checkliste | Projektleiter |
+| 05.11.2026 | A-ANLASS-01 für die Generalversammlung präzisiert: An- und Abmelden, Antrag oder Frage an den Vorstand beim Anmelden, Liste für Admins ([Design](../superpowers/specs/2026-11-05-gv-anmeldung-design.md), Vorschlag an den Vorstand mit K-50); Etappe bleibt *später* bis zur Antwort | Projektleiter |
 
 ## Offene Fragen an den Verein
 
