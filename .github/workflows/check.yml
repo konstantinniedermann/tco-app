@@ -307,9 +307,11 @@ jobs:
     outputs:
       digest: ${{ steps.suchen.outputs.digest }}
     steps:
+      # Tiefe 2: HEAD^1 ist der vorherige Stand von main, also das letzte Release.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 2
       - name: Image zum Code-Stand suchen
         id: suchen
         env:
@@ -332,12 +334,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version=$(node -p "require('./package.json').version")
-          if ! printf '%s\n' "$version" | grep -Eqx '[0-9]+\.[0-9]+\.[0-9]+'; then
-            echo "Version in package.json nicht lesbar: $version"
-            exit 1
-          fi
-          if ! bash scripts/ci/versionsnotizen.sh "$version" | grep -q '[^[:space:]]'; then
-            echo "Kein Abschnitt für Version $version in docs/versionen.md"
+          vorher=$(git show HEAD^1:package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf-8')).version")
+          for v in "$version" "$vorher"; do
+            if ! printf '%s\n' "$v" | grep -Eqx '[0-9]+\.[0-9]+\.[0-9]+'; then
+              echo "Version in package.json nicht lesbar: $v"
+              exit 1
+            fi
+          done
+          if ! bash scripts/ci/versionsnotizen.sh "$version" "$vorher" | grep -q '[^[:space:]]'; then
+            echo "Kein Abschnitt zwischen $vorher und $version in docs/versionen.md"
             exit 1
           fi
           if ausgabe=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v$version" 2>&1); then
@@ -442,18 +447,22 @@ jobs:
     permissions:
       contents: write
     steps:
+      # Tiefe 2: HEAD^1 ist der vorherige Stand von main, also das letzte Release.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 2
       - name: Release anlegen
         env:
           GH_TOKEN: ${{ github.token }}
           COMMIT: ${{ github.sha }}
         run: |
           version=$(node -p "require('./package.json').version")
-          bash scripts/ci/versionsnotizen.sh "$version" > "$RUNNER_TEMP/notizen.md"
+          vorher=$(git show HEAD^1:package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf-8')).version")
+          # Alle Abschnitte seit dem letzten Release, denn jeder Merge nach dev mit Code hat seine Nummer.
+          bash scripts/ci/versionsnotizen.sh "$version" "$vorher" > "$RUNNER_TEMP/notizen.md"
           if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notizen.md"; then
-            echo "Kein Abschnitt für Version $version in docs/versionen.md"
+            echo "Kein Abschnitt zwischen $vorher und $version in docs/versionen.md"
             exit 1
           fi
           gh release create "v$version" --target "$COMMIT" --title "v$version" \
