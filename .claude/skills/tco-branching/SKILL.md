@@ -103,12 +103,26 @@ gh run list -R konstantinniedermann/tco-app --branch dev --limit 3   # CI grün?
 
 Der Pre-Push-Hook weist den Push ab, wenn ein Merge mit Code die Version nicht um genau
 einen Schritt erhöht, ihr Abschnitt nicht zuoberst steht oder reine Doku die Version erhöht
-(`version-merge.ts`). Scheitert der Push, weil eine andere Session inzwischen dieselbe Nummer
-gepusht hat: nichts zurücksetzen (kein Reset auf `dev`), sondern
-`git -C $M pull --no-rebase origin dev`. Im Konflikt in `package.json`, `package-lock.json` und
-`docs/versionen.md` bekommt die eigene Arbeit die nächste freie Nummer: der fremde Abschnitt
-bleibt, der eigene kommt mit der neuen Nummer darüber. Dann `git -C $M commit --no-edit` und
-erneut pushen; der Hook prüft diesen Zusammenführungs-Commit wie einen Merge.
+(`version-merge.ts`). Was schon auf `main` liegt, prüft er nicht (Realign nach dem Release).
+
+Wird der Push abgewiesen, weil `origin/dev` inzwischen weitergezogen ist: nichts
+zurücksetzen (kein Reset auf `dev`), sondern
+
+```bash
+M=/Users/KN/CAS/projekte/tco-app
+git -C $M pull --no-rebase --no-commit origin dev
+```
+
+Dann bekommt die eigene Arbeit die nächste freie Nummer über der neuesten von `origin/dev`,
+ausdrücklich gesetzt (`cd $M && npm version X.Y.Z --no-git-tag-version --ignore-scripts
+--allow-same-version`), auch wenn Git `package.json` ohne Konflikt zusammengeführt hat. In
+`docs/versionen.md` bleibt der fremde Abschnitt, der eigene kommt mit der neuen Nummer darüber.
+Stagen und committen wie oben, erneut pushen; der Hook prüft diesen Commit wie einen Merge.
+
+**Dependabot-PRs** werden nicht auf GitHub gemergt, sondern wie ein Branch über diesen Schritt:
+`git -C $M fetch origin`, dann `git -C $M merge --no-ff --no-commit origin/<branch des PR>` und
+weiter wie oben (Korrektur, Abschnitt «Abhängigkeiten aktualisiert»). GitHub schliesst den PR
+nach dem Push von selbst als gemergt. Ein Merge auf GitHub ginge am Hook vorbei.
 
 Brachte der Merge eine geänderte `package-lock.json`, vor dem nächsten Push im Hauptordner
 `npm ci --ignore-scripts` — sonst prüft der Pre-Push-Hook mit alten `node_modules` und wird rot.
@@ -205,6 +219,9 @@ M=/Users/KN/CAS/projekte/tco-app
 git -C $M fetch origin
 git -C $M merge --no-edit origin/main && git -C $M push origin dev
 ```
+
+Meist ein Vorspulen auf den Merge-Commit von `main`; der Pre-Push-Hook lässt ihn durch, weil
+er auf `main` liegt.
 
 **7 — Issues abschliessen** (nach dem Release):
 

@@ -65,7 +65,8 @@ flowchart LR
 - **Version:** Das Release erhöht die Version nicht, Live bekommt die Nummer, die `dev` gerade
   trägt (Vergabe beim Merge, siehe [Versionen](#versionen)). Nach der erfolgreichen
   Live-Auslieferung setzt die CI den Tag und das GitHub-Release; dessen Text fasst alle
-  Abschnitte der [Versionen](versionen.md) seit dem letzten Release zusammen. Nur dieser
+  Abschnitte der [Versionen](versionen.md) seit dem letzten GitHub-Release zusammen (beim
+  ersten alle). Nur dieser
   Schritt darf ins Repo schreiben. Solange Live ausgeschaltet ist, gilt ein eigener Ablauf
   (siehe [Versionen](#versionen)).
 - **Merge:** Auf GitHub ist nur der Merge-Commit erlaubt (Squash und Rebase abgeschaltet).
@@ -349,7 +350,8 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
   Die Nummer vergibt, wer mergt, nicht der Feature-Branch: So beanspruchen zwei parallele
   Sessions nie dieselbe Nummer. Der Pre-Push-Hook weist einen Push auf `dev` ab, in dem ein
   Merge mit Code die Version nicht um genau einen Schritt erhöht oder sein Abschnitt fehlt
-  (`version-merge.ts`).
+  (`version-merge.ts`); was schon auf `main` liegt, prüft er nicht. Weil der Hook nur lokal
+  läuft, werden auch die PRs von Dependabot im Hauptordner gemergt, nicht auf GitHub.
 - **Korrektur** (`0.5.X`) ist der Normalfall bei jedem Merge mit Code. **Nebenversion**
   (`0.X.0`, Korrektur zurück auf 0) setzt Claude, wenn etwas Grösseres dazukommt: eine neue
   Etappe oder eine spürbare neue Funktion. **Hauptversion** (`X.0.0`) nur im Auftrag des

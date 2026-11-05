@@ -10,7 +10,7 @@ Mitgliederverwaltung Fairgate oder die Website tcolten.ch.
 
 ## Stand
 
-Phase **Fundament**, Version 0.5.0 (noch nicht ausgeliefert): Login per Einmal-Code mit
+Phase **Fundament**, noch nicht ausgeliefert (aktuelle Nummer: [Versionen](docs/versionen.md)): Login per Einmal-Code mit
 Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung für Admins mit
 Liste «Für Fairgate», eigene Angaben im Profil ändern, Datenschutzerklärung in der App,
 Anmeldung zu Anlässen wie der Generalversammlung (Vorschlag für den Vorstand, K-50),
