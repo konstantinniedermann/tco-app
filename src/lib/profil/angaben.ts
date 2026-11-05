@@ -27,8 +27,22 @@ export const MELDUNG_PROFIL = {
 	emailUngueltig: 'Das ist keine gültige E-Mail-Adresse. Prüf die Schreibweise.',
 	codesFalsch:
 		'Mindestens ein Code stimmt nicht oder ist abgelaufen. Prüfe beide Mails oder fordere neue Codes an.',
-	neueCodes: 'Neue Codes sind unterwegs.'
+	neueCodes: 'Neue Codes sind unterwegs.',
+	emailFehlt: 'Tipp deine neue E-Mail-Adresse ein.',
+	codesFehlen: 'Tipp beide Codes ein, je 6 Ziffern aus den zwei Mails.'
 } as const;
+
+/**
+ * Prüfung im Browser, bevor etwas zum Server geht (UI-06: Meldung beim Feld statt Browser-Blase).
+ * Nur «fehlt»; ob eine Adresse gültig ist oder ein Code stimmt, entscheidet der Server.
+ */
+export function emailEingabeFehler(email: string): string | null {
+	return email.trim() === '' ? MELDUNG_PROFIL.emailFehlt : null;
+}
+
+export function codeEingabeFehler(codeAlt: string, codeNeu: string): string | null {
+	return codeAlt.trim() === '' || codeNeu.trim() === '' ? MELDUNG_PROFIL.codesFehlen : null;
+}
 
 /** Meldung, wenn Altdaten in einem Feld des Admins das Speichern verhindern. */
 export function fremdMeldung(kontakt: string | null): string {

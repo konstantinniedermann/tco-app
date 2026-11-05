@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+	MELDUNG_PROFIL,
 	bestaetigeWechsel,
+	codeEingabeFehler,
+	emailEingabeFehler,
 	fremdMeldung,
 	mitAenderung,
 	ladeAngaben,
@@ -163,5 +166,18 @@ describe('A-KONTO-02: Meldungen und Stand', () => {
 			{ telefon: ' ', lizenznummer: '', ort: ' Trimbach ' }
 		);
 		expect(stand).toEqual({ ...LEA, telefon: null, lizenznummer: null, ort: 'Trimbach' });
+	});
+});
+
+describe('UI-06: Prüfung im Browser vor dem E-Mail-Wechsel', () => {
+	it('leere Adresse → Meldung, sonst entscheidet der Server', () => {
+		expect(emailEingabeFehler('  ')).toBe(MELDUNG_PROFIL.emailFehlt);
+		expect(emailEingabeFehler('kein-at')).toBeNull();
+	});
+
+	it('fehlt einer der zwei Codes → Meldung', () => {
+		expect(codeEingabeFehler('123456', '')).toBe(MELDUNG_PROFIL.codesFehlen);
+		expect(codeEingabeFehler(' ', '123456')).toBe(MELDUNG_PROFIL.codesFehlen);
+		expect(codeEingabeFehler('123456', '654321')).toBeNull();
 	});
 });

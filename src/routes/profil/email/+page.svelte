@@ -3,20 +3,32 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
+	import { holeSpeicher } from '../../../lib/login/mailanfrage.ts';
 	import {
 		MELDUNG_PROFIL,
 		bestaetigeWechsel,
+		codeEingabeFehler,
+		emailEingabeFehler,
 		starteWechsel,
 		type Ergebnis
 	} from '../../../lib/profil/angaben.ts';
+	import {
+		merkeWechsel,
+		startZustand,
+		vergissWechsel
+	} from '../../../lib/profil/wechselanfrage.ts';
 	import type { PageProps } from './$types';
 
 	// E-Mail ändern (A-KONTO-01). Annahme K-19.1: Das Mitglied ändert die E-Mail selbst; sie gilt
 	// erst, wenn es je einen Code an die bisherige und an die neue Adresse eingetippt hat.
 	let { data }: PageProps = $props();
 
-	let schritt = $state<'adresse' | 'codes'>('adresse');
-	let email = $state('');
+	const speicher = holeSpeicher();
+	// Nach dem Wechsel in die Mail-App lädt das Handy die Seite oft neu: dann gleich Schritt 2.
+	const start = startZustand(speicher, Date.now());
+
+	let schritt = $state(start.schritt);
+	let email = $state(start.email);
 	let codeAlt = $state('');
 	let codeNeu = $state('');
 	let fehler = $state<string | null>(null);
@@ -43,11 +55,16 @@
 	async function codesSenden(event: SubmitEvent) {
 		event.preventDefault();
 		if (laeuft) return;
+		fehler = emailEingabeFehler(email);
+		if (fehler) {
+			adressfeld?.focus();
+			return;
+		}
 		laeuft = true;
-		fehler = null;
 		const r = await starteWechsel(email);
 		laeuft = false;
 		if (r === 'ok') {
+			merkeWechsel(speicher, email, Date.now());
 			codeAlt = '';
 			codeNeu = '';
 			schritt = 'codes';
@@ -59,15 +76,28 @@
 		}
 	}
 
+	// «‹ Zurück» in Schritt 2 führt zu Schritt 1 (andere Adresse eingeben).
+	async function zuSchritt1(event: MouseEvent) {
+		event.preventDefault();
+		vergissWechsel(speicher);
+		fehler = null;
+		status = null;
+		schritt = 'adresse';
+		await tick();
+		adressfeld?.focus();
+	}
+
 	// Ein neuer Wechsel ersetzt den angefangenen: beide Adressen bekommen neue Codes.
 	async function neueCodes() {
 		if (laeuft) return;
 		laeuft = true;
 		fehler = null;
 		status = null;
+		vergissWechsel(speicher);
 		const r = await starteWechsel(email);
 		laeuft = false;
 		if (r === 'ok') {
+			merkeWechsel(speicher, email, Date.now());
 			codeAlt = '';
 			codeNeu = '';
 			status = MELDUNG_PROFIL.neueCodes;
@@ -78,11 +108,16 @@
 	async function aendern(event: SubmitEvent) {
 		event.preventDefault();
 		if (laeuft) return;
-		laeuft = true;
-		fehler = null;
 		status = null;
+		fehler = codeEingabeFehler(codeAlt, codeNeu);
+		if (fehler) {
+			codefeld?.focus();
+			return;
+		}
+		laeuft = true;
 		const r = await bestaetigeWechsel(codeAlt, codeNeu);
 		if (r === 'ok') {
+			vergissWechsel(speicher);
 			await goto(resolve('/profil?email=geaendert'));
 			return;
 		}
@@ -96,7 +131,11 @@
 	<title>E-Mail ändern – MyTCO</title>
 </svelte:head>
 
-<a class="zurueck" href={resolve('/profil')}>‹ Zurück</a>
+{#if schritt === 'adresse'}
+	<a class="zurueck" href={resolve('/profil')}>‹ Zurück</a>
+{:else}
+	<a class="zurueck" href={resolve('/profil/email')} onclick={zuSchritt1}>‹ Zurück</a>
+{/if}
 <div class="zaehler">
 	<div class="zaehler-balken" aria-hidden="true">
 		<span class="zaehler-voll"></span><span class={{ 'zaehler-voll': schritt === 'codes' }}></span>
@@ -114,7 +153,7 @@
 	</p>
 	<div class="karte">
 		<p><strong>Bisher</strong><br />{data.bisher}</p>
-		<form onsubmit={codesSenden}>
+		<form onsubmit={codesSenden} novalidate>
 			<div class="feld">
 				<label for="neue-email">Neue E-Mail-Adresse</label>
 				<input
@@ -141,7 +180,7 @@
 {:else}
 	<h1>Zwei Codes eintippen</h1>
 	<div class="karte">
-		<form onsubmit={aendern}>
+		<form onsubmit={aendern} novalidate>
 			<div class="feld feld-code">
 				<label for="code-alt">Code an die bisherige Adresse</label>
 				<span class="feld-hilfe" id="code-alt-hilfe">{data.bisher}</span>

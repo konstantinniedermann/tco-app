@@ -58,9 +58,9 @@
 		lizenznummer: 'off'
 	};
 
-	// Nach Speichern oder «veraltet» steht hier der neu geladene Stand; bis dahin der aus `load`.
-	let neueAngaben = $state<EigeneAngaben | null>(null);
-	const angaben = $derived(neueAngaben ?? data.angaben);
+	// Stand aus `load`; nach Speichern oder «veraltet» mit dem neu geladenen überschrieben. Lädt
+	// `load` neu (neues `data`), gilt wieder dessen Stand.
+	let angaben = $derived<EigeneAngaben | null>(data.angaben);
 	let offen = $state<Angabe | null>(null);
 	let werte = $state<Record<EigenesFeld, string>>({
 		telefon: '',
@@ -126,12 +126,12 @@
 		const neu = Object.fromEntries(FELDER[a].map((f) => [f, werte[f]]));
 		const r = await speichereAngaben(neu, angaben);
 		if (r.ergebnis === 'ok') {
-			neueAngaben = (await ladeAngaben()) ?? mitAenderung(angaben, neu);
+			angaben = (await ladeAngaben()) ?? mitAenderung(angaben, neu);
 			await schliesse();
 		} else if (r.ergebnis === 'veraltet') {
 			const frisch = await ladeAngaben();
 			if (frisch) {
-				neueAngaben = frisch;
+				angaben = frisch;
 				await schliesse();
 				veraltetBei = a;
 			} else formularFehler = MELDUNG.stoerung;
