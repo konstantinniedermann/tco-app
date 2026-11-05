@@ -91,8 +91,12 @@ test('Bei 200 % Schrift kein waagrechtes Scrollen (UI-02)', async ({ page }, inf
 	await page.evaluate(() => {
 		document.documentElement.style.fontSize = '200%';
 	});
+	// Auch im Rollbereich, dem einzigen Bereich, der scrollt (UI-Leitbild).
 	const breiten = await page.evaluate(() => ({
-		inhalt: document.documentElement.scrollWidth,
+		inhalt: Math.max(
+			document.documentElement.scrollWidth,
+			document.querySelector('.rollbereich')?.scrollWidth ?? 0
+		),
 		fenster: window.innerWidth
 	}));
 	expect(breiten.inhalt).toBeLessThanOrEqual(breiten.fenster);

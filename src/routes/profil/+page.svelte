@@ -22,6 +22,7 @@
 	} from '../../lib/profil/angaben.ts';
 	import { vergissWechsel } from '../../lib/profil/wechselanfrage.ts';
 	import { feldMeldung } from '../../lib/verwaltung/anzeige.ts';
+	import { istKlappeOffen, merkeKlappe } from '../../lib/ui/klappe.ts';
 	import type { FullAutoFill } from 'svelte/elements';
 	import type { PageProps } from './$types';
 
@@ -265,7 +266,12 @@
 	</div>
 {/if}
 
-<details class="karte klappe" open>
+<!-- Anfangs zu; offen bleibt, was man offen gelassen hat (UI-Leitbild, Bewegung und Bedienung) -->
+<details
+	class="karte klappe"
+	open={istKlappeOffen('profil-angaben')}
+	ontoggle={(e) => merkeKlappe('profil-angaben', e.currentTarget.open)}
+>
 	<summary class="klappe-titel" bind:this={angabenTitel}>Meine Angaben</summary>
 	<div>
 		{#if !angaben}
@@ -348,7 +354,11 @@
 	{/if}
 {/snippet}
 
-<details class="karte klappe" open>
+<details
+	class="karte klappe"
+	open={istKlappeOffen('profil-passkey')}
+	ontoggle={(e) => merkeKlappe('profil-passkey', e.currentTarget.open)}
+>
 	<summary class="klappe-titel" bind:this={titel}>Anmelden mit Passkey</summary>
 	<div>
 		{#if listeGestoert}

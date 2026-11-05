@@ -34,7 +34,10 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   Animation zeigt weiterhin nur das Vorgabe-Layout «Kompakt» (Entscheid Projektleiter).
 - Ruhiges App-Gefühl (#54): Der angetippte Reiter ist sofort aktiv, sein Balken gleitet hinüber,
   der Inhalt blendet über; Unterseiten schieben sich von rechts herein und mit «‹ Zurück»
-  wieder hinaus. Jeder Reiter merkt sich die Scrollposition, nochmals antippen führt nach oben.
+  wieder hinaus. Kopfleiste und Reiter stehen fest, nur der Inhalt scrollt; ein Tipp auf einen
+  Reiter wirkt auch, während der Inhalt nachläuft. Jeder Reiter beginnt oben. Im Profil sind die
+  Aufklappbereiche anfangs zu und bleiben offen, was man offen lässt. Mit offener Tastatur sind
+  die Reiter weg, die Eingabetaste springt mit «Weiter» ins nächste Feld.
   Aufklappbereiche und Rückfrage öffnen weich. Kein grauer Tipp-Blitz, Gedrückt-Zustände,
   Bedienelemente nicht markierbar, kein Zoom per Doppeltipp, immer hell. Bei «Bewegung
   reduzieren» alles ohne Bewegung (UI-09 erweitert, neue Bewegungs-Tokens). Die Fusszeile steht

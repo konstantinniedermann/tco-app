@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	aktiverReiter,
 	istReiterSeite,
-	stellStandWiederHer,
+	stelltStandWiederHer,
 	uebergang,
 	vergisstStand,
 	zeigtFusszeile
@@ -20,6 +20,7 @@ describe('Übergänge beim Seitenwechsel (UI-09)', () => {
 		expect(uebergang('/', '/hilfe', 'link')).toBe('tiefer');
 		expect(uebergang('/login', '/datenschutz', 'link')).toBe('tiefer');
 		expect(uebergang('/login', '/login/mail', 'link')).toBe('tiefer');
+		expect(uebergang('/profil', '/profil/email', 'link')).toBe('tiefer');
 	});
 
 	it('schiebt zurück nach rechts weg', () => {
@@ -50,13 +51,16 @@ describe('Reiter', () => {
 		expect(aktiverReiter('/profil', null)).toBe('/profil');
 	});
 
-	it('stellt die Scrollposition nur beim Tippen auf einen Reiter wieder her', () => {
-		expect(stellStandWiederHer('/', 'link')).toBe(true);
-		expect(stellStandWiederHer('/profil', 'popstate')).toBe(false);
-		expect(stellStandWiederHer('/hilfe', 'link')).toBe(false);
+	it('beginnt oben, ausser bei «‹ Zurück» und der Zurück-Taste des Browsers', () => {
+		expect(stelltStandWiederHer('/profil', '/', 'link')).toBe(false);
+		expect(stelltStandWiederHer('/', '/', 'link')).toBe(false);
+		expect(stelltStandWiederHer('/', '/hilfe', 'link')).toBe(false);
+		expect(stelltStandWiederHer('/hilfe', '/', 'link')).toBe(true);
+		expect(stelltStandWiederHer('/profil', '/', 'popstate')).toBe(true);
+		expect(stelltStandWiederHer(null, '/', 'enter')).toBe(false);
 	});
 
-	it('vergisst die Scrollpositionen beim Weg zum Login', () => {
+	it('vergisst Positionen und Aufklappbereiche beim Weg zum Login', () => {
 		expect(vergisstStand('/login')).toBe(true);
 		expect(vergisstStand('/login/mail')).toBe(true);
 		expect(vergisstStand('/willkommen')).toBe(true);

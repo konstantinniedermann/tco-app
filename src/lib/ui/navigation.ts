@@ -15,7 +15,8 @@ const EBENE: Record<string, number> = {
 	'/willkommen': 0,
 	'/hilfe': 1,
 	'/datenschutz': 1,
-	'/login/mail': 1
+	'/login/mail': 1,
+	'/profil/email': 1
 };
 
 const FUSSZEILE = new Set(['/', '/login', '/login/mail', '/willkommen']);
@@ -49,12 +50,19 @@ export function zeigtFusszeile(routeId: string | null, fehler: boolean): boolean
 	return !fehler && routeId !== null && FUSSZEILE.has(routeId);
 }
 
-/** Wer auf einen Reiter tippt, kommt dorthin zurück, wo er auf dieser Seite war. */
-export function stellStandWiederHer(nach: string | null, typ: string): boolean {
-	return typ === 'link' && istReiterSeite(nach);
+/**
+ * Jede Seite beginnt oben (auch jeder Reiter). Nur «‹ Zurück» und die Zurück-Taste oder -Geste
+ * des Browsers bringen eine Seite dorthin zurück, wo man sie verlassen hat.
+ */
+export function stelltStandWiederHer(
+	von: string | null,
+	nach: string | null,
+	typ: string
+): boolean {
+	return typ === 'popstate' || uebergang(von, nach, typ) === 'zurueck';
 }
 
-/** Auf dem Weg zum Login (z. B. nach dem Abmelden) gehen die gemerkten Positionen verloren. */
+/** Auf dem Weg zum Login (z. B. nach dem Abmelden) gehen gemerkte Positionen und Klappen verloren. */
 export function vergisstStand(nach: string | null): boolean {
 	return nach !== null && LOGIN_SEITEN.has(nach);
 }

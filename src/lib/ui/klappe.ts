@@ -3,6 +3,24 @@
 // dem Dokument (+layout.svelte) gilt für jede `details.klappe`; Tastatur (Enter, Leertaste)
 // löst denselben Klick aus. Bei «Bewegung reduzieren» klappt der Browser wie gewohnt sofort.
 
+// Welche Aufklappbereiche offen sind, solange die App offen ist (UI-Leitbild, Bewegung und
+// Bedienung). Nur ein Speicher: Die Seite liest ihn beim Aufbau, nichts hängt reaktiv daran.
+let offen: Record<string, boolean> = {};
+
+/** Ob der Aufklappbereich `name` offen ist; anfangs zu. */
+export function istKlappeOffen(name: string): boolean {
+	return offen[name] ?? false;
+}
+
+export function merkeKlappe(name: string, istOffen: boolean): void {
+	offen[name] = istOffen;
+}
+
+/** Beim Weg zum Login (Abmelden) gilt wieder der Anfang. */
+export function vergissKlappen(): void {
+	offen = {};
+}
+
 type Lauf = { animation: Animation | null; oeffnet: boolean };
 
 const laeufe = new WeakMap<HTMLDetailsElement, Lauf>();

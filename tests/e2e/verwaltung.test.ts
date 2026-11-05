@@ -10,7 +10,7 @@ import {
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import { klappeAuf, pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
 // Alle Browser kommen von 127.0.0.1 an denselben Server (Grenzen pro IP). Jeder Test braucht
 // darum nur die nötigen Anfragen: ein Brief-Login, ein Admin-Code.
@@ -319,6 +319,7 @@ test('A-KONTO-02: Admin sieht die Selbständerung unter Für Fairgate und hakt a
 	const seite = await geraet.newPage();
 	await meldeAn(seite, mitglied);
 	await seite.goto('/profil');
+	await klappeAuf(seite, 'Meine Angaben');
 	await seite
 		.locator('.kachel')
 		.filter({ has: seite.getByText('Adresse', { exact: true }) })

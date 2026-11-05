@@ -259,7 +259,7 @@ die Bewegung zeigt, wohin man gegangen ist. Dauern und Kurven stehen unter
 | Wechsel | Beispiele | Bewegung |
 |---------|-----------|----------|
 | gleiche Ebene | Start ↔ Profil, Einstiegsseite → Login, Login → Start | Inhalt blendet über (`--dauer-kurz`, linear) |
-| eine Ebene tiefer | Start → Hilfe, Login → Datenschutz, Login → Login mit Mail-Code | neue Seite schiebt sich von rechts herein, alte Seite und Reiter weichen um 28 % nach links (`--dauer-schieben`, `--kurve-schieben`) |
+| eine Ebene tiefer | Start → Hilfe, Login → Datenschutz, Login → Login mit Mail-Code, Profil → E-Mail ändern | neue Seite schiebt sich von rechts herein, alte Seite und Reiter weichen um 28 % nach links (`--dauer-schieben`, `--kurve-schieben`) |
 | zurück | „‹ Zurück" | umgekehrt: Seite schiebt sich nach rechts weg |
 | Zurück-Taste oder -Geste des Browsers, Verwaltung, unbekannte Adresse | | keine; die Geste animiert der Browser selbst, eine unbekannte Adresse lädt die Seite neu. Lässt sich eine bekannte Seite nicht laden, bewegt sich die Fehlerseite wie die Seite, die sie ersetzt |
 
@@ -269,11 +269,11 @@ auf beiden Seiten stehen.
 **Reiter:** Der angetippte Reiter wird sofort aktiv, auch wenn die Seite noch lädt; der
 Balken gleitet hinüber (`--dauer-mittel`). Weil nur der Rollbereich scrollt, wirkt der Tipp
 auch, während der Inhalt noch nachläuft. Jeder Reiter beginnt oben; wer den aktiven Reiter
-nochmals antippt, kommt ebenfalls nach oben. Nur die Zurück-Taste oder -Geste des Browsers
-bringt eine Seite dorthin zurück, wo man sie verlassen hat.
+nochmals antippt, kommt ebenfalls nach oben. Nur «‹ Zurück» und die Zurück-Taste oder -Geste
+des Browsers bringen eine Seite dorthin zurück, wo man sie verlassen hat.
 
-**Aufklappbereiche** merken sich, ob sie offen sind, solange die App offen ist; nach dem
-Abmelden gilt wieder der Anfang. Im Profil sind sie anfangs zu.
+**Aufklappbereiche im Profil** sind anfangs zu und merken sich, ob sie offen sind, solange die
+App offen ist; nach dem Abmelden sind sie wieder zu.
 
 **Antippen:** kein grauer Blitz des Browsers, dafür ein Gedrückt-Zustand (`--dauer-kurz`):
 Reiter in `--farbe-marke` mit etwas kleinerem Symbol; Kachel als Link in `--farbe-marke-zart`, leicht
