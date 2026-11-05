@@ -171,7 +171,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | DS-04 | Nur Felder aus [Welche Daten](#welche-daten); Exporte nur mit den Feldern, die Swiss Tennis braucht |
 | DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“; Empfänger in BCC) |
 | DS-06 | Löschfristen aus [Löschen](#löschen) sind umgesetzt; Logs ohne Inhalte (keine Einmal-Codes, Kontaktdaten, Resultate); IP-Adressen höchstens 24 Stunden, auch in Logs |
-| DS-07 | Der Admin kann die Daten eines Mitglieds exportieren und löschen (Stand 0.4.0: noch nicht gebaut, kommt mit Etappe 3 von #43; bis dahin Auskunft und Löschung von Hand) |
+| DS-07 | Der Admin kann die Daten eines Mitglieds exportieren und löschen (Stand 0.5.0: noch nicht gebaut, kommt mit Etappe 3 von #43; bis dahin Auskunft und Löschung von Hand) |
 | DS-08 | Entwicklung und Tests nur mit erfundenen Daten |
 | DS-09 | Die Datenschutzerklärung ist in MyTCO auch ohne Login erreichbar |
 | DS-10 | Datensicherheit (verschlüsselte Verbindung, Einmal-Codes nur als Hash, Zugriff nach Rolle) regelt das [Sicherheitskonzept](sicherheitskonzept.md) |

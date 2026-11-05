@@ -2,8 +2,8 @@
 # Code-Stand: SHA-256 (die ersten 40 Hex-Zeichen) über alle versionierten Dateien ausser
 # Doku. Dieselbe Image-Kennung gilt für Test und Live: Zwei Commits mit gleichem Code-Stand
 # ergeben dasselbe Image. Die Doku-Regel ist dieselbe wie `istNurDoku` in
-# scripts/pruefungen/nur-doku.ts (Pfad unter `docs/` oder Endung `.md`); ändert sich eine
-# Stelle, muss die andere mit.
+# scripts/pruefungen/nur-doku.ts (Pfad unter `docs/` oder Endung `.md`, ausser der
+# Datenschutzerklärung, die die App einliest); ändert sich eine Stelle, muss die andere mit.
 # Aufruf im Wurzelordner des Repos; Ausgabe: 40 Hex-Zeichen und ein Zeilenumbruch.
 set -euo pipefail
 
@@ -16,6 +16,6 @@ fi
 # `git ls-files -s`: "<modus> <blob> <stufe><TAB><pfad>" — die Zeile enthält Modus, Blob,
 # Stufe und Pfad; die Pfade der Doku fallen heraus.
 git -c core.quotePath=false ls-files -s \
-	| awk -F '\t' '{ pfad = substr($0, index($0, "\t") + 1) } pfad !~ /^docs\// && pfad !~ /\.md$/' \
+	| awk -F '\t' '{ pfad = substr($0, index($0, "\t") + 1) } pfad == "docs/datenschutzerklaerung.md" || (pfad !~ /^docs\// && pfad !~ /\.md$/)' \
 	| hash_256 \
 	| cut -c1-40

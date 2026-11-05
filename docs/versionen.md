@@ -7,6 +7,16 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+## 0.5.0 — Anlässe, eigene Angaben und ruhiges App-Gefühl, nicht ausgeliefert
+
+Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test
+([Versionen](ci-cd-und-release.md#versionen)). Doku-Abgleich vor dem Release: ein Befund auf
+hoch behoben (die Datenschutzerklärung, die die App einbaut, zählte in der CI als reine Doku
+und wäre bei einer reinen Textänderung nie ausgeliefert worden); die Erklärung präzisiert
+(Grenze der Code-Mails, Gerätespeicher beim E-Mail-Wechsel); die Release-Checkliste verlangt
+vor dem ersten Live-Release mit Mitgliedern die versprochenen Löschfristen und den Hinweis an
+die alte Adresse; Kleinigkeiten behoben, der Rest als Beobachtung eingetragen.
+
 - Anlässe ([#52](https://github.com/konstantinniedermann/tco-app/issues/52), A-ANLASS-01, als
   Vorschlag für den Vorstand, K-50): Der Admin erstellt in der Verwaltung einen Anlass, z. B. die
   Generalversammlung; er erscheint bei allen Mitgliedern unter «Jetzt aktuell». Mitglieder melden
