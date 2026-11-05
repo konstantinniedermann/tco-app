@@ -1153,6 +1153,108 @@ dialog.karte {
 	top: 12%;
 }
 
+/*
+ * Seitenwechsel (UI-09, Leitbild «Bewegung und Bedienung»): View Transitions, gesteuert über
+ * html[data-uebergang] aus +layout.svelte. Kopfleiste und Statusleisten-Band stehen still.
+ * Reiter stehen beim Überblenden still; beim Schieben gehören sie zur Seite und gleiten mit.
+ */
+.kopf {
+	view-transition-name: kopf;
+}
+
+.statusleiste {
+	view-transition-name: statusleiste;
+}
+
+.reiter {
+	view-transition-name: reiter;
+}
+
+html[data-uebergang='tiefer'] .reiter,
+html[data-uebergang='zurueck'] .reiter {
+	view-transition-name: none;
+}
+
+::view-transition-group(kopf),
+::view-transition-group(statusleiste),
+::view-transition-new(kopf),
+::view-transition-new(statusleiste) {
+	animation: none;
+}
+
+::view-transition-old(kopf),
+::view-transition-old(statusleiste) {
+	display: none;
+}
+
+html[data-uebergang='blende']::view-transition-old(root),
+html[data-uebergang='blende']::view-transition-new(root) {
+	animation-duration: var(--dauer-kurz);
+	animation-timing-function: linear;
+}
+
+/* Der Balken gleitet live im neuen Bild; das alte Bild der Reiter würde ihn doppelt zeigen */
+html[data-uebergang='blende']::view-transition-group(reiter),
+html[data-uebergang='blende']::view-transition-new(reiter) {
+	animation: none;
+}
+
+html[data-uebergang='blende']::view-transition-old(reiter) {
+	display: none;
+}
+
+html[data-uebergang='tiefer']::view-transition-old(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-weicht-links;
+}
+
+html[data-uebergang='tiefer']::view-transition-new(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-von-rechts;
+}
+
+/* Zurück: Die Unterseite liegt oben und schiebt sich nach rechts weg */
+html[data-uebergang='zurueck']::view-transition-old(root) {
+	z-index: 1;
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-nach-rechts;
+}
+
+html[data-uebergang='zurueck']::view-transition-new(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-von-links;
+}
+
+@keyframes uebergang-weicht-links {
+	to {
+		transform: translateX(-28%);
+		filter: brightness(0.92);
+	}
+}
+
+@keyframes uebergang-von-rechts {
+	from {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes uebergang-nach-rechts {
+	to {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes uebergang-von-links {
+	from {
+		transform: translateX(-28%);
+		filter: brightness(0.92);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+}
+
 /* PC-Layout ab 60em Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
 @container app (min-width: 60rem) {
 	.inhalt {

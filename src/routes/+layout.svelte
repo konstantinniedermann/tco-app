@@ -2,13 +2,19 @@
 	import '../lib/design/tokens.css';
 	import '../lib/design/basis.css';
 	import { onMount } from 'svelte';
-	import { afterNavigate, beforeNavigate, disableScrollHandling } from '$app/navigation';
+	import {
+		afterNavigate,
+		beforeNavigate,
+		disableScrollHandling,
+		onNavigate
+	} from '$app/navigation';
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
 	import {
 		istReiterSeite,
 		stellStandWiederHer,
+		uebergang,
 		vergisstStand,
 		zeigtFusszeile
 	} from '../lib/ui/navigation.ts';
@@ -40,6 +46,38 @@
 		if (!stellStandWiederHer(nach, type) || wert === undefined) return;
 		disableScrollHandling();
 		window.scrollTo(0, wert);
+	});
+
+	// Seitenwechsel mit View Transitions (UI-09): Die Bewegung steht in basis.css und hängt am
+	// Attribut data-uebergang. Die Callback-Form, weil Safari vor 18.2 keine `types` kennt.
+	// Ohne Unterstützung oder bei «Bewegung reduzieren» wechselt die Seite sofort.
+	let laufend: ViewTransition | null = null;
+	onNavigate((navigation) => {
+		const art = uebergang(
+			navigation.from?.route.id ?? null,
+			navigation.to?.route.id ?? null,
+			navigation.type
+		);
+		if (art === null || !('startViewTransition' in document)) return;
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		laufend?.skipTransition();
+		const wurzel = document.documentElement;
+		wurzel.dataset.uebergang = art;
+		return new Promise<void>((bereit) => {
+			const uebergangJetzt = document.startViewTransition(async () => {
+				bereit();
+				// Eine abgebrochene Navigation beendet nur den Übergang, sie ist kein Fehler.
+				await navigation.complete.catch(() => {});
+			});
+			laufend = uebergangJetzt;
+			uebergangJetzt.finished
+				.catch(() => {})
+				.finally(() => {
+					if (laufend !== uebergangJetzt) return;
+					laufend = null;
+					delete wurzel.dataset.uebergang;
+				});
+		});
 	});
 
 	// Beim Start der App: abgelaufene oder kaputte Mail-Anfragen aus dem Gerätespeicher löschen.

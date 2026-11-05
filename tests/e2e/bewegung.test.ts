@@ -3,7 +3,7 @@ import pkg from '../../package.json' with { type: 'json' };
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import { legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
-import { pruefeBildschirm } from './hilfen/seite.ts';
+import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
 // Ruhiges App-Gefühl (#54): Fusszeile, Reiter, Seitenwechsel, Bedienung, Aufklappen.
 // Regeln: docs/ui-leitbild.md, Abschnitt «Bewegung und Bedienung», UI-09.
@@ -119,4 +119,74 @@ test('Nach Abmelden und neuem Login beginnt Start oben', async ({ page }) => {
 	await meldeAn(page, 'Zoe');
 	await machLang(page);
 	await expect.poll(() => scrollY(page)).toBe(0);
+});
+
+/**
+ * Zeichnet jeden Aufruf von document.startViewTransition mit der gewählten Bewegung auf
+ * (Attribut data-uebergang). Kennt der Browser keine View Transitions, bleibt die Liste leer.
+ */
+async function zeichneUebergaengeAuf(page: Page): Promise<void> {
+	await page.addInitScript(() => {
+		const liste: string[] = [];
+		Object.assign(window, { __uebergaenge: liste });
+		if (!('startViewTransition' in document)) return;
+		const echt = document.startViewTransition.bind(document);
+		document.startViewTransition = ((callback: ViewTransitionUpdateCallback) => {
+			liste.push(document.documentElement.dataset.uebergang ?? '');
+			return echt(callback);
+		}) as typeof document.startViewTransition;
+	});
+}
+
+const uebergaenge = (page: Page) =>
+	page.evaluate(() => (window as unknown as { __uebergaenge: string[] }).__uebergaenge);
+const kenntUebergaenge = (page: Page) => page.evaluate(() => 'startViewTransition' in document);
+
+test('Übergänge: Reiter blenden über, Unterseiten schieben (UI-09)', async ({ page }) => {
+	const fehler = sammleKonsolenfehler(page);
+	await zeichneUebergaengeAuf(page);
+	await meldeAn(page, 'Mara');
+	const vorher = (await uebergaenge(page)).length;
+	await reiter(page, 'Profil').click();
+	await expect(page).toHaveURL(/\/profil$/);
+	await reiter(page, 'Start').click();
+	await expect(page).toHaveURL(/\/$/);
+	await page.getByRole('contentinfo').getByRole('link', { name: 'Hilfe' }).click();
+	await expect(page).toHaveURL(/\/hilfe$/);
+	await page.getByRole('link', { name: '‹ Zurück' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Mara' })).toBeVisible();
+	const erwartet = (await kenntUebergaenge(page)) ? ['blende', 'blende', 'tiefer', 'zurueck'] : [];
+	expect((await uebergaenge(page)).slice(vorher)).toEqual(erwartet);
+	expect(fehler).toEqual([]);
+});
+
+test('Bewegung reduzieren: kein Übergang (UI-09)', async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await zeichneUebergaengeAuf(page);
+	await meldeAn(page, 'Rita');
+	await reiter(page, 'Profil').click();
+	await expect(page).toHaveURL(/\/profil$/);
+	await reiter(page, 'Start').click();
+	await expect(page).toHaveURL(/\/$/);
+	expect(await uebergaenge(page)).toEqual([]);
+});
+
+test('Zwei schnelle Reiter-Klicks hintereinander', async ({ page }) => {
+	const fehler = sammleKonsolenfehler(page);
+	await meldeAn(page, 'Lia');
+	await reiter(page, 'Profil').click();
+	await reiter(page, 'Start').click();
+	await expect(page).toHaveURL(/\/$/);
+	await expect(reiter(page, 'Start')).toHaveAttribute('aria-current', 'page');
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Lia' })).toBeVisible();
+	expect(fehler).toEqual([]);
+});
+
+test('Unbekannte Adresse aus einem Reiter: Fehlerseite ohne Fusszeile', async ({ page }) => {
+	const fehler = sammleKonsolenfehler(page);
+	await meldeAn(page, 'Ava');
+	await page.goto('/gibt-es-nicht');
+	await expect(page.getByRole('heading', { level: 1, name: 'Nicht gefunden' })).toBeVisible();
+	await expect(page.getByRole('contentinfo')).toHaveCount(0);
+	expect(fehler.filter((f) => !/status of 404\b/.test(f))).toEqual([]);
 });
