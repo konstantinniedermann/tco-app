@@ -71,8 +71,6 @@ test('A-KONTO-01, A-KONTO-02: Mitglied ändert Telefon und Adresse im Profil', a
 	await page.getByRole('button', { name: 'Adresse speichern' }).click();
 	await expect(kachel(page, 'Adresse')).toContainText('Probeweg 9, 4632 Trimbach');
 	await expect(page.getByRole('button', { name: 'Adresse speichern' })).toHaveCount(0);
-	// Der Fokus springt zurück auf «Ändern» und scrollt; der Screenshot zeigt die Seite von oben.
-	await page.evaluate(() => window.scrollTo(0, 0));
 	await pruefeBildschirm(page, info, 'profil');
 
 	// Die Änderung gilt sofort und steht nach dem Neuladen noch da.

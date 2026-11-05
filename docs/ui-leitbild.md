@@ -300,7 +300,8 @@ schiebt sich über die Reiter, das Feld steht ruhig darüber.
   Tastatur. Das Feld rückt mit seiner Bezeichnung einmal ins Blickfeld; danach bewegt sich
   nur, was man selbst scrollt.
 - **Eingabetaste:** «Weiter» springt ins nächste Feld desselben Formulars, im letzten Feld
-  sendet «Fertig» das Formular ab.
+  sendet «Fertig» das Formular ab (Bedienung per Finger). Am PC, auch in der Verwaltung,
+  sendet die Eingabetaste wie gewohnt sofort ab.
 - **Nach dem Absenden** geht die Tastatur zu, der Fokus geht zum Ergebnis (z. B. zu
   «Ändern» der gespeicherten Angabe).
 - **Jedes Feld** hat die passende Tastatur (`type`, `inputmode`) und `autocomplete`.

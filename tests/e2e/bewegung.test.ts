@@ -202,7 +202,7 @@ test('Tastatur: Reiter weg, solange ein Feld den Fokus hat (Handy)', async ({ pa
 	await expect(navigation).toBeVisible();
 });
 
-test('Tastatur: «Weiter» springt ins nächste Feld, «Fertig» sendet ab', async ({ page }) => {
+test('Tastatur: «Weiter» springt ins nächste Feld, «Fertig» sendet ab', async ({ page }, info) => {
 	await meldeAn(page, 'Selma');
 	await reiter(page, 'Profil').click();
 	await profilKlappe(page, 'Meine Angaben').locator('summary').click();
@@ -211,6 +211,13 @@ test('Tastatur: «Weiter» springt ins nächste Feld, «Fertig» sendet ab', asy
 	const strasse = page.getByLabel('Strasse und Nr.');
 	const plz = page.getByLabel('PLZ');
 	const ort = page.getByLabel('Ort');
+	if (info.project.name === 'desktop') {
+		// Am PC (Maus, auch in der Verwaltung) sendet die Eingabetaste wie gewohnt ab.
+		await strasse.fill('Probeweg 5');
+		await strasse.press('Enter');
+		await expect(kachel).toContainText('Probeweg 5');
+		return;
+	}
 	await strasse.fill('Probeweg 3');
 	await expect(strasse).toHaveAttribute('enterkeyhint', 'next');
 	await strasse.press('Enter');

@@ -100,7 +100,8 @@ export function beobachteTastatur(): () => void {
 	}
 
 	function taste(ereignis: KeyboardEvent) {
-		if (ereignis.key !== 'Enter' || ereignis.isComposing) return;
+		// Nur per Finger: Am PC (auch in der Verwaltung) sendet die Eingabetaste wie gewohnt ab.
+		if (ereignis.key !== 'Enter' || ereignis.isComposing || !finger.matches) return;
 		if (ereignis.shiftKey || ereignis.altKey || ereignis.ctrlKey || ereignis.metaKey) return;
 		const feld = ereignis.target;
 		if (!(feld instanceof HTMLInputElement) || !istFeld(feld)) return;
