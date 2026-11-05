@@ -4,9 +4,10 @@ import { meldeErgebnis } from './dateien.ts';
 import { istNurDoku } from './nur-doku.ts';
 
 // Abgleich vor dem Release dev → main (`make release-check`, Ablauf im Skill tco-branching):
-// Version in package.json, Abschnitte in docs/versionen.md und Tags müssen zusammenpassen, in
-// beide Richtungen. Nicht Teil von `make check`, denn zwischen zwei Releases ist der Stand
-// absichtlich offen (Einträge unter «Unveröffentlicht»).
+// Version in package.json, Abschnitte in docs/versionen.md und Tags müssen zusammenpassen.
+// Jeder Merge nach dev mit Code hat eine eigene Nummer (Prüfung beim Push: version-merge.ts);
+// das Release übernimmt die Nummer von dev und erhöht sie nicht. Nicht Teil von `make check`,
+// denn zwischen zwei Releases ist der Stand absichtlich offen (Einträge unter «Unveröffentlicht»).
 
 const VERSIONEN = 'docs/versionen.md';
 const VERSION = String.raw`\d+\.\d+\.\d+`;
@@ -29,7 +30,7 @@ export type Releasestand = {
 };
 
 /** Negativ, null oder positiv wie bei sort: a kleiner, gleich oder grösser als b. */
-function vergleicheVersionen(a: string, b: string): number {
+export function vergleicheVersionen(a: string, b: string): number {
 	const teileA = a.split('.').map(Number);
 	const teileB = b.split('.').map(Number);
 	for (let i = 0; i < 3; i++) if (teileA[i] !== teileB[i]) return teileA[i] - teileB[i];
@@ -78,14 +79,19 @@ export function pruefeRelease(stand: Releasestand): string[] {
 		befunde.push(
 			`${VERSIONEN}: Kein Abschnitt «## ${stand.version}» für die Version aus package.json`
 		);
+	else if (abschnitte[0].version !== stand.version)
+		befunde.push(
+			`${VERSIONEN}:${abschnitte[0].zeile}: oberste Version ist ${abschnitte[0].version}, ` +
+				`package.json sagt ${stand.version} — neueste Version gehört nach oben`
+		);
 
 	const vergleich = vergleicheVersionen(stand.version, stand.versionMain);
 	if (vergleich < 0)
 		befunde.push(`package.json: Version sinkt von ${stand.versionMain} auf ${stand.version}`);
 	else if (vergleich === 0 && !stand.nurDoku)
 		befunde.push(
-			`package.json: Release enthält Code, aber die Version bleibt ${stand.version} — ` +
-				`Versions-Commit fehlt (Skill tco-branching, Schritt 4a)`
+			`package.json: Release enthält Code, aber die Version bleibt ${stand.version} — beim Merge ` +
+				`nach dev nicht erhöht (Skill tco-branching, Schritt 4)`
 		);
 
 	const unveroeffentlicht = ueberschriften(stand.versionen).find(
@@ -99,22 +105,18 @@ export function pruefeRelease(stand: Releasestand): string[] {
 	) {
 		befunde.push(
 			`${VERSIONEN}:${unveroeffentlicht.zeile}: «Unveröffentlicht» ist nicht leer, obwohl sich die Version ` +
-				`von ${stand.versionMain} auf ${stand.version} ändert — Einträge in den Abschnitt der neuen Version`
+				`von ${stand.versionMain} auf ${stand.version} ändert — Einträge in den Abschnitt «## ${stand.version}»`
 		);
 	}
 
-	for (const { version, nichtAusgeliefert, zeile } of abschnitte) {
+	// Ohne Tag und ohne Marker ist erlaubt: Zwischenstände von dev gehen mit dem nächsten Release
+	// live, getaggt wird nur die Nummer, mit der das Release ausgeliefert wird.
+	for (const { version, nichtAusgeliefert, zeile } of abschnitte)
 		if (nichtAusgeliefert && getaggt.has(version))
 			befunde.push(
 				`${VERSIONEN}:${zeile}: ${version} ist als «nicht ausgeliefert» markiert, aber Tag v${version} ` +
 					`existiert — Marker entfernen`
 			);
-		if (!nichtAusgeliefert && !getaggt.has(version) && version !== stand.version)
-			befunde.push(
-				`${VERSIONEN}:${zeile}: ${version} ist nicht als «nicht ausgeliefert» markiert, hat aber keinen ` +
-					`Tag v${version} — Marker setzen oder Tag prüfen`
-			);
-	}
 
 	for (const version of getaggt)
 		if (!anzahl.has(version)) befunde.push(`Tag v${version} hat keinen Abschnitt in ${VERSIONEN}`);

@@ -562,3 +562,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Doku-Abgleich vor 0.5.0 (Bereich App).
 
 **Einschätzung:** Entscheid des Projektleiters bzw. Vorstands zusammen mit der Freigabe der Erklärung (K-06.2).
+
+### 2026-11-05 — E2E RR-03 auf dem iPhone-Profil einmal mit «Importing a module script failed»
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/verwaltung.test.ts:184` (RR-03, letzter Admin), Profil `iphone` (WebKit)
+
+**Beobachtung:** In `make check` schlug der Test fehl, weil `fehler` den Seitenfehler «TypeError: Importing a module script failed.» enthielt. Einzeln mit `--repeat-each=3` lief die Datei dreimal grün durch. Der Branch änderte keinen App-Code (nur Versionsregel, Skripte, Doku).
+
+**Ursprung:** Umstellung der Versionsnummern (Branch `chore/versionsregel`).
+
+**Einschätzung:** Vermutlich ein Wettlauf zwischen Laden eines Moduls und Seitenwechsel unter Last (paralleler Lauf). Beobachten; wiederholt er sich, das Sammeln der Seitenfehler im Test robuster machen.

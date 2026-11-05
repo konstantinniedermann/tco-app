@@ -68,7 +68,7 @@ describe('pruefeRelease', () => {
 
 	it('verlangt eine höhere Version, sobald das Release Code enthält', () => {
 		expect(pruefeRelease({ ...sauber, versionMain: '0.2.0' })).toEqual([
-			expect.stringContaining('Release enthält Code, aber die Version bleibt 0.2.0')
+			expect.stringContaining('Release enthält Code, aber die Version bleibt 0.2.0 — beim Merge')
 		]);
 	});
 
@@ -91,14 +91,21 @@ describe('pruefeRelease', () => {
 		]);
 	});
 
-	it('meldet eine ausgelieferte Version ohne Tag, ausser der, die gerade released wird', () => {
-		const md = versionen(UNVEROEFFENTLICHT_LEER, '## 0.2.0 — Login', '## 0.1.0 — Gerüst');
-		expect(pruefeRelease({ ...sauber, versionen: md, tags: [] })).toEqual([
-			expect.stringContaining(
-				'0.1.0 ist nicht als «nicht ausgeliefert» markiert, hat aber keinen Tag'
-			)
+	it('lässt Zwischenstände ohne Tag und ohne Marker zu (jeder Merge nach dev hat seine Nummer)', () => {
+		const md = versionen(
+			UNVEROEFFENTLICHT_LEER,
+			'## 0.2.1 — Korrektur\n\n- Fix.',
+			'## 0.2.0 — Login\n\n- Login.',
+			V010_NICHT
+		);
+		expect(pruefeRelease({ ...sauber, version: '0.2.1', versionen: md, tags: [] })).toEqual([]);
+	});
+
+	it('verlangt, dass der oberste Versionsabschnitt die Version aus package.json ist', () => {
+		const md = versionen(UNVEROEFFENTLICHT_LEER, '## 0.2.1 — Neuer', V020_NICHT, V010_NICHT);
+		expect(pruefeRelease({ ...sauber, versionen: md })).toEqual([
+			expect.stringContaining('oberste Version ist 0.2.1, package.json sagt 0.2.0')
 		]);
-		expect(pruefeRelease({ ...sauber, versionen: md, tags: ['v0.1.0'] })).toEqual([]);
 	});
 
 	it('meldet einen Tag ohne Abschnitt', () => {
