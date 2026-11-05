@@ -234,3 +234,39 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (cas-reviewer) zum Handy-Feedback, Session vom 05.11.2026.
 
 **Einschätzung:** Die Verwaltung ist vor allem für den PC gedacht. Am iPhone prüfen; falls störend, die Seitenleiste auf dem Handy als Kopf mit Menü neu denken (gehört in den Design-Ablauf).
+
+### 2026-11-05 — Datenschutz-Seite ist am Handy eine lange Textwand
+
+**Thema:** App
+
+**Fundort:** `/datenschutz` (`src/routes/datenschutz/+page.svelte`)
+
+**Beobachtung:** Die ganze Erklärung steht in einer Karte; am iPhone sind das mehrere Bildschirmlängen ohne Gliederung (Screenshot im E2E `datenschutz.test.ts`).
+
+**Ursprung:** Handy-Test des Projektleiters, Session vom 05.11.2026.
+
+**Einschätzung:** Passt zur Vorgabe «grosse Seiten aufklappbar»: jeder fette Abschnittsanfang («Welche Daten:», «Wozu:» …) ein Aufklappbereich wie in der Hilfe. Über den Design-Ablauf, vor der Freigabe durch den Vorstand (K-06.2).
+
+### 2026-11-05 — Lokale Logins hängen am unbenannten Docker-Speicher
+
+**Thema:** Betrieb
+
+**Fundort:** `docker-compose.yml` (Service `db`, kein benanntes Volume)
+
+**Beobachtung:** Die lokale Datenbank liegt in einem anonymen Volume. `docker compose down` oder ein Zurücksetzen von Docker Desktop legt beim nächsten `make db` eine leere Datenbank an; die Handy-Verknüpfungen aus `make dev-handy` sind dann abgemeldet, Brief-Codes weg.
+
+**Ursprung:** Frage des Projektleiters, ob die Verknüpfungen später wieder gehen, Session vom 05.11.2026.
+
+**Einschätzung:** Für erfundene Daten verkraftbar (`make seed` gibt neue Codes). Ein benanntes Volume würde es robuster machen, kostet beim Umstellen einmal die vorhandenen Daten.
+
+### 2026-11-05 — CI: Browser-Installation scheitert an gesperrtem apt
+
+**Thema:** Betrieb
+
+**Fundort:** `.github/workflows/check.yml`, Job «E2E (Playwright)», Schritt Browser-Installation (`--with-deps`)
+
+**Beobachtung:** Lauf 41999966173 auf `dev` (Merge `fix/anleitung-hinweis`) brach ab mit «Could not get lock /var/lib/dpkg/lock-frontend. It is held by process … (apt-get)», Code 100. Der nächste Lauf auf demselben Code lief durch.
+
+**Ursprung:** Wrap-up der Session vom 05.11.2026.
+
+**Einschätzung:** Störung des GitHub-Runners (apt läuft im Hintergrund), nicht des Codes. Häuft es sich: vor der Installation auf die apt-Sperre warten oder den Job neu starten lassen.
