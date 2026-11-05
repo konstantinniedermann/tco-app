@@ -92,7 +92,7 @@ html {
 .taste-haupt,
 .taste-neben,
 .zurueck,
-.kachel,
+a.kachel,
 .klappe-titel {
 	-webkit-user-select: none;
 	user-select: none;
@@ -101,6 +101,12 @@ html {
 
 a:active {
 	background-color: var(--farbe-marke-zart);
+}
+
+/* Auf grünen Flächen wäre das helle Grün unter weisser Schrift kaum lesbar */
+.kopf a:active,
+.seitenleiste a:active {
+	background-color: transparent;
 }
 
 img {
@@ -508,6 +514,11 @@ dialog.karte[open] {
 	opacity: 1;
 	transform: none;
 	transition-duration: var(--dauer-mittel);
+}
+
+/* Beim Ausblenden nimmt die Rückfrage keinen zweiten Tipp auf «Bestätigen» mehr an */
+dialog.karte:not([open]) {
+	pointer-events: none;
 }
 
 dialog.karte::backdrop {
@@ -1368,11 +1379,24 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	}
 }
 
+/* «Bewegung reduzieren» (UI-09): alles wechselt sofort, auch Balken, Symbol, Kachel und Pfeil */
 @media (prefers-reduced-motion: reduce) {
 	::view-transition-group(*),
 	::view-transition-old(*),
 	::view-transition-new(*) {
 		animation: none !important;
+	}
+
+	.reiter-balken,
+	.reiter a .symbol,
+	.kachel,
+	.klappe-titel::after {
+		transition: none;
+	}
+
+	.reiter a:active .symbol,
+	a.kachel:active {
+		transform: none;
 	}
 }
 

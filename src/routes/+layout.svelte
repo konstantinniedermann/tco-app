@@ -2,12 +2,7 @@
 	import '../lib/design/tokens.css';
 	import '../lib/design/basis.css';
 	import { onMount } from 'svelte';
-	import {
-		afterNavigate,
-		beforeNavigate,
-		disableScrollHandling,
-		onNavigate
-	} from '$app/navigation';
+	import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
@@ -45,7 +40,8 @@
 		const nach = to?.route.id ?? null;
 		const wert = nach === null ? undefined : stand[nach];
 		if (!stellStandWiederHer(nach, type) || wert === undefined) return;
-		disableScrollHandling();
+		// Kein disableScrollHandling(): SvelteKit hat hier schon gescrollt, der Aufruf würde erst
+		// die nächste Navigation treffen (die dann nicht oben beginnt).
 		window.scrollTo(0, wert);
 	});
 

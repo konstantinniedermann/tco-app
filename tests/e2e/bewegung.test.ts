@@ -109,15 +109,35 @@ test('Jeder Reiter merkt sich die Scrollposition; aktiver Reiter führt nach obe
 	await expect.poll(() => scrollY(page)).toBe(200);
 });
 
-test('Nach Abmelden und neuem Login beginnt Start oben', async ({ page }) => {
+test('Nach Abmelden und neuem Login beginnen die Reiter oben', async ({ page }) => {
 	await meldeAn(page, 'Ella');
 	await machLang(page);
 	await page.evaluate(() => window.scrollTo(0, 400));
-	await reiter(page, 'Profil').click();
+	await tippeOhneScrollen(page, 'Profil');
+	await expect(page).toHaveURL(/\/profil$/);
+	await page.evaluate(() => window.scrollTo(0, 200));
 	await page.getByRole('button', { name: 'Abmelden' }).click();
 	await expect(page).toHaveURL(/\/login$/);
 	await meldeAn(page, 'Zoe');
 	await machLang(page);
+	await expect.poll(() => scrollY(page)).toBe(0);
+	// Ohne Vergessen käme das Profil von Ella auf 200 zurück.
+	await tippeOhneScrollen(page, 'Profil');
+	await expect(page).toHaveURL(/\/profil$/);
+	await expect.poll(() => scrollY(page)).toBe(0);
+});
+
+test('Nach einer wiederhergestellten Position öffnet ein neuer Reiter oben', async ({ page }) => {
+	await meldeAn(page, 'Jana');
+	await machLang(page);
+	await page.evaluate(() => window.scrollTo(0, 300));
+	await page.getByRole('contentinfo').getByRole('link', { name: 'Hilfe' }).click();
+	await expect(page).toHaveURL(/\/hilfe$/);
+	await page.getByRole('link', { name: '‹ Zurück' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Jana' })).toBeVisible();
+	await expect.poll(() => scrollY(page)).toBeGreaterThan(0);
+	await tippeOhneScrollen(page, 'Profil');
+	await expect(page).toHaveURL(/\/profil$/);
 	await expect.poll(() => scrollY(page)).toBe(0);
 });
 
@@ -169,6 +189,22 @@ test('Bewegung reduzieren: kein Übergang (UI-09)', async ({ page }) => {
 	await reiter(page, 'Start').click();
 	await expect(page).toHaveURL(/\/$/);
 	expect(await uebergaenge(page)).toEqual([]);
+	// Auch Balken, Symbol, Kachel und Pfeil des Aufklappbereichs bewegen sich nicht (im Profil;
+	// eine Kachel als Link hat ein normales Mitglied nicht, darum eine zum Prüfen).
+	await reiter(page, 'Profil').click();
+	await expect(page).toHaveURL(/\/profil$/);
+	const dauern = await page.evaluate(() => {
+		const kachel = document.createElement('a');
+		kachel.className = 'kachel';
+		document.querySelector('main')?.append(kachel);
+		return ['.reiter-balken', '.reiter a .symbol', 'a.kachel', '.klappe-titel'].map((wahl) => {
+			const el = document.querySelector(wahl);
+			if (!el) return `${wahl} fehlt`;
+			const s = getComputedStyle(el, wahl === '.klappe-titel' ? '::after' : null);
+			return `${wahl}: ${s.transitionDuration}`;
+		});
+	});
+	expect(dauern.filter((d) => !/: 0s(, 0s)*$/.test(d))).toEqual([]);
 });
 
 test('Zwei schnelle Reiter-Klicks hintereinander', async ({ page }) => {
