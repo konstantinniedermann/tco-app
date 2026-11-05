@@ -18,10 +18,11 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Wappen und App-Symbol (Farben fest in der Datei) | `static/wappen.svg`, `static/favicon.svg`, `static/*.png` |
 | Manifest (Name, Farben fest in der Datei; `theme_color` und `background_color` stimmen von Hand mit `--farbe-marke` und `--farbe-hintergrund` überein) | `static/manifest.webmanifest` |
 | Farbe der Browserleiste, Systemschrift-Einstellung, sichere Abstände zu Statusleiste und Notch über `env(safe-area-inset-*)` (`viewport-fit=cover`; nie `apple-mobile-web-app-status-bar-style` `black-translucent`, das schaltet den Schutz vor dem Schleier von iOS ab) | `src/app.html` |
-| Kopfleiste, Fusszeile, Seitenaufbau, Seitenwechsel, Scrollposition der Reiter | `src/routes/+layout.svelte` |
+| Kopfleiste, Fusszeile, Seitenaufbau mit Rollbereich, Seitenwechsel, Scrollposition | `src/routes/+layout.svelte` |
 | Welcher Übergang, welcher Reiter aktiv, wo die Fusszeile steht | `src/lib/ui/navigation.ts` |
 | Reiter (sofort aktiv, gleitende Markierung, nochmals antippen → nach oben) | `src/lib/ui/Reiter.svelte` |
-| Weiches Auf- und Zuklappen | `src/lib/ui/klappe.ts` |
+| Weiches Auf- und Zuklappen, gemerkte Aufklappbereiche | `src/lib/ui/klappe.ts` |
+| Eingabe mit Tastatur (Reiter weg, Feld ins Blickfeld, «Weiter») | `src/lib/ui/tastatur.ts` |
 | Baustein Anleitung (Zeichnung, Ablauf) | `src/lib/ui/Anleitung.svelte`, `src/lib/ui/ZeichnungIphone.svelte`, `src/lib/ui/ZeichnungAndroid.svelte` |
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
 
@@ -134,6 +135,10 @@ Handy-Rahmen das Handy-Layout. Der Wert steht nur in `basis.css`, weil Abfragen 
 erlauben. Weil `.app` ein Container ist, gehen Überlagerungen nur mit `<dialog>`, nicht mit
 `position: fixed`. Einzige Ausnahme ist das Statusleisten-Band; es steht ausserhalb von `.app`.
 
+In der Mitglieder-App (nicht in der Verwaltung) ist `.app` genau so hoch wie der sichtbare
+Bildschirm (`.schale`): Kopfleiste oben und Reiter unten stehen fest, nur der Rollbereich
+dazwischen scrollt. Die Seite als Ganzes scrollt nie.
+
 ## Bewegung
 
 Dauern und Kurven aller Bewegungen ausser der Anleitung (UI-09). Die Werte sind einem
@@ -155,16 +160,17 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 
 | Baustein | Klasse | Regel |
 |----------|--------|-------|
-| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und bleibt beim Scrollen oben stehen (`sticky`), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch) |
+| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und steht fest oben (nur der Rollbereich darunter scrollt, in der Verwaltung `sticky`), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch) |
 | Statusleisten-Band | `.statusleiste` | ausserhalb von `.app`, fest oben, deckend in `--farbe-marke` wie die Kopfleiste darunter (auch in der Verwaltung). Im Browser so hoch wie `env(safe-area-inset-top)` (am PC 0); in der iPhone-App vom Startbildschirm (`display-mode: standalone`, nur iOS) zusätzlich `--abstand-3` hoch, also über dem oberen Rand der Kopfleiste und über 10 px; nicht in der Verwaltung (`.statusleiste-verwaltung`), weil deren Kopfleiste mit der Seitenleiste wegscrollt. iOS legt sonst über Web-Apps vom Startbildschirm einen hellen Schleier über die Statusleiste; iOS lässt ihn nur weg, wenn oben in der Mitte ein fester oder mitlaufender, deckender, fast bildschirmbreiter Streifen liegt |
-| Seitenhintergrund (iPhone-App vom Startbildschirm) | `html`, `body` in `display-mode: standalone`, nur iOS | `--farbe-marke`; `.app` trägt dann `--farbe-hintergrund`. Was beim Scrollen an Schleier bleibt, ist so grün statt hell; beim Überziehen unten erscheint Grün unter den Reitern bzw. der Fusszeile |
-| Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben (`.reiter-balken`, gleitet zum gewählten Reiter); Abstand `env(safe-area-inset-bottom)` über dem Home-Balken; reagiert beim Antippen sofort, nicht markierbar ([Bewegung und Bedienung](#bewegung-und-bedienung)) |
+| Rollbereich | `.rollbereich` | Mitglieder-App: der einzige Bereich, der scrollt, zwischen Kopfleiste und Reitern; enthält Inhalt und Fusszeile. Beim Überziehen federt nur er, Kopfleiste und Reiter bleiben stehen |
+| Seitenhintergrund (iPhone-App vom Startbildschirm) | `html`, `body` in `display-mode: standalone`, nur iOS | `--farbe-marke`; `.app` trägt dann `--farbe-hintergrund`. Was an Schleier bleibt, ist so grün statt hell |
+| Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben (`.reiter-balken`, gleitet zum gewählten Reiter); Abstand `env(safe-area-inset-bottom)` über dem Home-Balken; reagiert beim Antippen sofort, auch wenn der Inhalt noch nachläuft; nicht markierbar; weg, solange die Tastatur offen ist ([Eingabe mit Tastatur](#eingabe-mit-tastatur)) ([Bewegung und Bedienung](#bewegung-und-bedienung)) |
 | Seitenleiste | `.seitenleiste` | nur Verwaltung, Bereiche nach Rolle |
 | Haupttaste | `.taste-haupt` | Sandplatz-Rot, höchstens eine pro Bildschirm (UI-04) |
 | Nebentaste | `.taste-neben` | weiss mit grünem Rand; gedrückt `--farbe-marke-zart` |
 | Link | `a` | grün, unterstrichen |
 | Zurück | `.zurueck` | „‹ Zurück" oben links auf Unterseiten |
-| Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`) |
+| Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
 | Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>` |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
 | Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
@@ -261,9 +267,13 @@ Kopfleiste und Statusleisten-Band stehen beim Wechsel still, die Reiter auch, so
 auf beiden Seiten stehen.
 
 **Reiter:** Der angetippte Reiter wird sofort aktiv, auch wenn die Seite noch lädt; der
-Balken gleitet hinüber (`--dauer-mittel`). Jeder Reiter merkt sich, wie weit man gescrollt
-hat, solange die App offen ist; nach dem Abmelden beginnt alles wieder oben. Wer den aktiven
-Reiter nochmals antippt, kommt nach oben.
+Balken gleitet hinüber (`--dauer-mittel`). Weil nur der Rollbereich scrollt, wirkt der Tipp
+auch, während der Inhalt noch nachläuft. Jeder Reiter beginnt oben; wer den aktiven Reiter
+nochmals antippt, kommt ebenfalls nach oben. Nur die Zurück-Taste oder -Geste des Browsers
+bringt eine Seite dorthin zurück, wo man sie verlassen hat.
+
+**Aufklappbereiche** merken sich, ob sie offen sind, solange die App offen ist; nach dem
+Abmelden gilt wieder der Anfang. Im Profil sind sie anfangs zu.
 
 **Antippen:** kein grauer Blitz des Browsers, dafür ein Gedrückt-Zustand (`--dauer-kurz`):
 Reiter in `--farbe-marke` mit etwas kleinerem Symbol; Kachel als Link in `--farbe-marke-zart`, leicht
@@ -277,6 +287,24 @@ Fliesstext, Codes, Angaben und Tabellen bleiben markier- und kopierbar.
 **Grundeinstellungen:** Doppeltippen zoomt nicht; Zoomen mit zwei Fingern bleibt. MyTCO ist
 immer hell (`color-scheme: light`), auch wenn das Gerät dunkel eingestellt ist. Im
 Querformat bläht der Browser die Schrift nicht auf.
+
+### Eingabe mit Tastatur
+
+Gilt für jedes Feld, das die Tastatur des Handys öffnet: Profil, Login, Anmeldung zu
+Anlässen, später CM und Lizenzen. Vorbild sind Formulare in iOS-Apps: Die Tastatur
+schiebt sich über die Reiter, das Feld steht ruhig darüber.
+
+- **Reiter weg:** Solange ein Feld den Fokus hat, sind die Reiter weg (Handy-Layout, Bedienung
+  per Finger). Am PC und mit Maus bleiben sie.
+- **Nichts springt:** Die Kopfleiste bleibt oben stehen, der Rollbereich endet über der
+  Tastatur. Das Feld rückt mit seiner Bezeichnung einmal ins Blickfeld; danach bewegt sich
+  nur, was man selbst scrollt.
+- **Eingabetaste:** «Weiter» springt ins nächste Feld desselben Formulars, im letzten Feld
+  sendet «Fertig» das Formular ab.
+- **Nach dem Absenden** geht die Tastatur zu, der Fokus geht zum Ergebnis (z. B. zu
+  «Ändern» der gespeicherten Angabe).
+- **Jedes Feld** hat die passende Tastatur (`type`, `inputmode`) und `autocomplete`.
+  Schrift in Feldern nie unter 16 px (`--groesse-text`), sonst zoomt das iPhone hinein.
 
 ## Brief (Druck)
 
