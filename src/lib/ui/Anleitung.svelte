@@ -113,7 +113,7 @@
 
 	{#if geraet === 'iphone'}
 		<p class="leise">
-			<strong>Kein ••• unten rechts?</strong> Ist in Safari das Layout «Oben» oder «Unten»
+			<strong>Kein ••• unten rechts?</strong> Ist in Safari das Tablayout «Unten» oder «Oben»
 			eingestellt, tippst du direkt auf
 			<svg class="symbol" aria-hidden="true" viewBox="0 0 24 24"
 				><path d="M12 3v12" /><path d="M8 7l4-4 4 4" /><path
