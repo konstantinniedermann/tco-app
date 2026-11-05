@@ -286,7 +286,9 @@ Mail-Code über die Schnittstelle von Mailpit.
 dem Rauchtest des Images (beide nur CI; den Rauchtest gibt es lokal einzeln als `make rauchtest`); der Secret-Scan läuft lokal über den Hook bzw. `make secrets`. Die CI läuft bei PRs und
 auf `dev` und `main`, nicht auf Issue-Branches (dort decken die Git-Hooks ab). Änderungen nur
 an der Doku führen trotzdem `make docs` aus, inklusive Test-ID-Prüfung. Ob eine Änderung
-nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
+nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits. Doku ist, was unter
+`docs/` liegt oder auf `.md` endet, **ausser `docs/datenschutzerklaerung.md`**: Die App baut
+sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, Image, Version).
 
 | Prüfung | Quelle | Stand |
 |---------|--------|-------|

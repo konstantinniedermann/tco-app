@@ -11,6 +11,10 @@ describe('istNurDoku', () => {
 		expect(istNurDoku(['docs/a.md', 'scripts/x.sh'])).toBe(false);
 		expect(istNurDoku(['.github/workflows/check.yml'])).toBe(false);
 	});
+	it('zählt die Datenschutzerklärung als Code (die App baut sie ein, DS-09)', () => {
+		expect(istNurDoku(['docs/datenschutzerklaerung.md'])).toBe(false);
+		expect(istNurDoku(['docs/datenschutz.md'])).toBe(true);
+	});
 	it('behandelt die leere Liste als Doku', () => {
 		expect(istNurDoku([])).toBe(true);
 	});
