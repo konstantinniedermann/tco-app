@@ -476,3 +476,17 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Einschätzung:** Vermutlich Wettlauf zwischen dem nachgestellten Install-Angebot und dem Laden der Seite. Bei der nächsten Arbeit an #54 oder der Einstiegsseite ansehen.
 
 **Nachtrag 2026-11-05:** In der CI auf `dev` (Lauf 42041712102) scheiterte im Projekt `iphone` einmal auch `bewegung.test.ts:210` «Zwei schnelle Reiter-Klicks hintereinander» (`toHaveURL` nach 5 s); der erneute Lauf war grün. Die Tests zu den weichen Seitenwechseln wirken unter WebKit in der CI zeitempfindlich.
+
+**Nachtrag 2026-11-05 (Nacharbeit #54):** Lokal nicht nachgestellt: zwei volle E2E-Läufe und `bewegung.test.ts` mit `--repeat-each 4` auf `iphone` und `android` waren grün, auch beide Tests oben. Seit der Nacharbeit scrollt nur noch der Rollbereich; ob das die Zeitempfindlichkeit in der CI ändert, zeigen erst die nächsten CI-Läufe.
+
+### 2026-11-05 — Mockups zeigen den Rollbereich noch nicht
+
+**Thema:** App
+
+**Fundort:** `docs/ui-mockups/*.html` (Handy-Rahmen `.handy` in `mockup.css`)
+
+**Beobachtung:** Seit der Nacharbeit zu #54 scrollt in der App nur der Rollbereich (`.app.schale` mit `.rollbereich`), Kopfleiste und Reiter stehen fest. Die Mockups bauen die Seite noch ohne `.schale` und `.rollbereich`; im Handy-Rahmen scrollt der ganze Rahmen samt Kopfleiste und Reiter.
+
+**Ursprung:** Nacharbeit #54 (Test am iPhone), beim Abschluss.
+
+**Einschätzung:** Nur Darstellung der Mockups, die App ist richtig. Beim nächsten Mockup-Umbau `.schale` und `.rollbereich` übernehmen und den Rahmen auf `height: 100 %` der Schale stellen.

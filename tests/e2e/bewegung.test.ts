@@ -64,11 +64,17 @@ async function machLang(page: Page): Promise<void> {
 	});
 }
 
-const scrollY = (page: Page) => page.evaluate(() => Math.round(window.scrollY));
+/** Der einzige Bereich der Mitglieder-App, der scrollt (UI-Leitbild, Baustein Rollbereich). */
+const rollbereich = (page: Page) => page.locator('.rollbereich');
+const rolle = (page: Page, y: number) =>
+	rollbereich(page).evaluate((el, wert) => {
+		el.scrollTop = wert;
+	}, y);
+const gerollt = (page: Page) => rollbereich(page).evaluate((el) => Math.round(el.scrollTop));
 
 /**
- * Tippt einen Reiter an, ohne vorher hinzuscrollen: Am PC stehen die Reiter oben in der
- * Kopfleiste, und Playwright würde vor dem Klick nach oben scrollen.
+ * Tippt einen Link an, ohne vorher hinzuscrollen: Playwright würde den Rollbereich sonst zum
+ * Ziel scrollen, und am PC stehen die Reiter oben in der Kopfleiste.
  */
 async function tippeOhneScrollen(page: Page, name: 'Start' | 'Profil'): Promise<void> {
 	await reiter(page, name).evaluate((a: HTMLElement) => a.click());
@@ -90,55 +96,141 @@ test('Reiter ist beim Antippen sofort aktiv, auch wenn der Server langsam antwor
 	await pruefeBildschirm(page, info, 'reiter-profil');
 });
 
-test('Jeder Reiter merkt sich die Scrollposition; aktiver Reiter führt nach oben', async ({
-	page
-}) => {
+test('Nur der Rollbereich scrollt, Kopfleiste und Reiter stehen fest', async ({ page }) => {
+	await meldeAn(page, 'Vera');
+	await machLang(page);
+	await rolle(page, 600);
+	expect(await gerollt(page)).toBe(600);
+	// Die Seite als Ganzes scrollt nie.
+	await page.evaluate(() => window.scrollTo(0, 400));
+	expect(await page.evaluate(() => window.scrollY)).toBe(0);
+	const hoehe = page.viewportSize()?.height ?? 0;
+	const kopf = await page.getByRole('banner').boundingBox();
+	const leiste = await page.getByRole('navigation', { name: 'Hauptnavigation' }).boundingBox();
+	expect(kopf?.y).toBe(0);
+	expect(leiste).not.toBeNull();
+	// Handy: Reiter unten am Bildschirm; PC: als Textlinks direkt unter der Kopfleiste.
+	if (leiste && kopf && leiste.y > kopf.height) {
+		expect(Math.round(leiste.y + leiste.height)).toBe(hoehe);
+	} else {
+		expect(Math.round(leiste?.y ?? -1)).toBe(Math.round(kopf?.height ?? 0));
+	}
+});
+
+test('Jeder Reiter beginnt oben; aktiver Reiter führt nach oben', async ({ page }) => {
 	await meldeAn(page, 'Ida');
 	await machLang(page);
-	await page.evaluate(() => window.scrollTo(0, 400));
+	await rolle(page, 400);
 	await tippeOhneScrollen(page, 'Profil');
 	await expect(page).toHaveURL(/\/profil$/);
-	await expect.poll(() => scrollY(page)).toBe(0);
-	await page.evaluate(() => window.scrollTo(0, 200));
+	await expect.poll(() => gerollt(page)).toBe(0);
+	await machLang(page);
+	await rolle(page, 200);
 	await tippeOhneScrollen(page, 'Start');
 	await expect(page).toHaveURL(/\/$/);
-	await expect.poll(() => scrollY(page)).toBe(400);
+	await expect.poll(() => gerollt(page)).toBe(0);
+	await machLang(page);
+	await rolle(page, 300);
 	await tippeOhneScrollen(page, 'Start');
-	await expect.poll(() => scrollY(page)).toBe(0);
-	await tippeOhneScrollen(page, 'Profil');
-	await expect.poll(() => scrollY(page)).toBe(200);
+	await expect.poll(() => gerollt(page)).toBe(0);
 });
 
-test('Nach Abmelden und neuem Login beginnen die Reiter oben', async ({ page }) => {
-	await meldeAn(page, 'Ella');
-	await machLang(page);
-	await page.evaluate(() => window.scrollTo(0, 400));
-	await tippeOhneScrollen(page, 'Profil');
-	await expect(page).toHaveURL(/\/profil$/);
-	await page.evaluate(() => window.scrollTo(0, 200));
-	await page.getByRole('button', { name: 'Abmelden' }).click();
-	await expect(page).toHaveURL(/\/login$/);
-	await meldeAn(page, 'Zoe');
-	await machLang(page);
-	await expect.poll(() => scrollY(page)).toBe(0);
-	// Ohne Vergessen käme das Profil von Ella auf 200 zurück.
-	await tippeOhneScrollen(page, 'Profil');
-	await expect(page).toHaveURL(/\/profil$/);
-	await expect.poll(() => scrollY(page)).toBe(0);
-});
-
-test('Nach einer wiederhergestellten Position öffnet ein neuer Reiter oben', async ({ page }) => {
+test('«‹ Zurück» und Zurück des Browsers bringen die Seite an die alte Stelle', async ({
+	page
+}) => {
 	await meldeAn(page, 'Jana');
 	await machLang(page);
-	await page.evaluate(() => window.scrollTo(0, 300));
-	await page.getByRole('contentinfo').getByRole('link', { name: 'Hilfe' }).click();
+	await rolle(page, 300);
+	const hilfe = page.getByRole('contentinfo').getByRole('link', { name: 'Hilfe' });
+	await hilfe.evaluate((a: HTMLElement) => a.click());
 	await expect(page).toHaveURL(/\/hilfe$/);
+	await expect.poll(() => gerollt(page)).toBe(0);
 	await page.getByRole('link', { name: '‹ Zurück' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Jana' })).toBeVisible();
-	await expect.poll(() => scrollY(page)).toBeGreaterThan(0);
-	await tippeOhneScrollen(page, 'Profil');
+	await machLang(page);
+	await expect.poll(() => gerollt(page)).toBe(300);
+	await hilfe.evaluate((a: HTMLElement) => a.click());
+	await expect(page).toHaveURL(/\/hilfe$/);
+	await page.goBack();
+	await expect(page).toHaveURL(/\/$/);
+	await machLang(page);
+	await expect.poll(() => gerollt(page)).toBe(300);
+});
+
+/** Aufklappbereich im Profil mit dem Titel `titel`. */
+const profilKlappe = (page: Page, titel: string) =>
+	page.locator('details.klappe', { has: page.locator('summary', { hasText: titel }) });
+
+test('Profil: Aufklappbereiche anfangs zu, offene bleiben offen bis zum Abmelden', async ({
+	page
+}) => {
+	await meldeAn(page, 'Lou');
+	await reiter(page, 'Profil').click();
 	await expect(page).toHaveURL(/\/profil$/);
-	await expect.poll(() => scrollY(page)).toBe(0);
+	await expect(profilKlappe(page, 'Meine Angaben')).not.toHaveAttribute('open');
+	await expect(profilKlappe(page, 'Anmelden mit Passkey')).not.toHaveAttribute('open');
+	await profilKlappe(page, 'Meine Angaben').locator('summary').click();
+	await expect(profilKlappe(page, 'Meine Angaben')).toHaveAttribute('open', '');
+	await reiter(page, 'Start').click();
+	await expect(page).toHaveURL(/\/$/);
+	await reiter(page, 'Profil').click();
+	await expect(page).toHaveURL(/\/profil$/);
+	await expect(profilKlappe(page, 'Meine Angaben')).toHaveAttribute('open', '');
+	await expect(profilKlappe(page, 'Anmelden mit Passkey')).not.toHaveAttribute('open');
+	await page.getByRole('button', { name: 'Abmelden' }).click();
+	await expect(page).toHaveURL(/\/login$/);
+	await meldeAn(page, 'Max');
+	await reiter(page, 'Profil').click();
+	await expect(page).toHaveURL(/\/profil$/);
+	await expect(profilKlappe(page, 'Meine Angaben')).not.toHaveAttribute('open');
+});
+
+test('Tastatur: Reiter weg, solange ein Feld den Fokus hat (Handy)', async ({ page }, info) => {
+	await meldeAn(page, 'Ronja');
+	await reiter(page, 'Profil').click();
+	await profilKlappe(page, 'Meine Angaben').locator('summary').click();
+	await page.getByRole('button', { name: 'Ändern' }).first().click();
+	const navigation = page.getByRole('navigation', { name: 'Hauptnavigation' });
+	await page.getByLabel('Telefon (freiwillig)').focus();
+	if (info.project.name === 'desktop') {
+		// Am PC (Maus) bleiben die Reiter.
+		await expect(navigation).toBeVisible();
+	} else {
+		await expect(navigation).toBeHidden();
+	}
+	await page.getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(navigation).toBeVisible();
+});
+
+test('Tastatur: «Weiter» springt ins nächste Feld, «Fertig» sendet ab', async ({ page }, info) => {
+	await meldeAn(page, 'Selma');
+	await reiter(page, 'Profil').click();
+	await profilKlappe(page, 'Meine Angaben').locator('summary').click();
+	const kachel = page.locator('.kachel', { hasText: 'Adresse' });
+	await kachel.getByRole('button', { name: 'Ändern' }).click();
+	const strasse = page.getByLabel('Strasse und Nr.');
+	const plz = page.getByLabel('PLZ');
+	const ort = page.getByLabel('Ort');
+	if (info.project.name === 'desktop') {
+		// Am PC (Maus, auch in der Verwaltung) sendet die Eingabetaste wie gewohnt ab.
+		await strasse.fill('Probeweg 5');
+		await strasse.press('Enter');
+		await expect(kachel).toContainText('Probeweg 5');
+		return;
+	}
+	await strasse.fill('Probeweg 3');
+	await expect(strasse).toHaveAttribute('enterkeyhint', 'next');
+	await strasse.press('Enter');
+	await expect(plz).toBeFocused();
+	await expect(page.getByRole('button', { name: 'Adresse speichern' })).toBeVisible();
+	await plz.fill('4632');
+	await plz.press('Enter');
+	await expect(ort).toBeFocused();
+	await expect(ort).toHaveAttribute('enterkeyhint', 'done');
+	await ort.fill('Trimbach');
+	await ort.press('Enter');
+	await expect(page.getByRole('button', { name: 'Adresse speichern' })).toHaveCount(0);
+	await expect(kachel).toContainText('Probeweg 3, 4632 Trimbach');
 });
 
 /**

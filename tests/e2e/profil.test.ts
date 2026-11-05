@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import { holeMailCode, legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import { klappeAuf, pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
 // Eigene Angaben im Profil (A-KONTO-01, A-KONTO-02) am Handy. Alle Browser kommen von 127.0.0.1
 // an denselben Server; die Grenze von 10 Code-Anfragen pro IP und Stunde gilt für den ganzen
@@ -34,6 +34,7 @@ async function oeffneProfil(page: Page) {
 		.getByRole('link', { name: 'Profil' })
 		.click();
 	await expect(page).toHaveURL(/\/profil$/);
+	await klappeAuf(page, 'Meine Angaben');
 	await expect(page.getByText('zugleich dein Login')).toBeVisible();
 }
 
@@ -70,8 +71,6 @@ test('A-KONTO-01, A-KONTO-02: Mitglied ändert Telefon und Adresse im Profil', a
 	await page.getByRole('button', { name: 'Adresse speichern' }).click();
 	await expect(kachel(page, 'Adresse')).toContainText('Probeweg 9, 4632 Trimbach');
 	await expect(page.getByRole('button', { name: 'Adresse speichern' })).toHaveCount(0);
-	// Der Fokus springt zurück auf «Ändern» und scrollt; der Screenshot zeigt die Seite von oben.
-	await page.evaluate(() => window.scrollTo(0, 0));
 	await pruefeBildschirm(page, info, 'profil');
 
 	// Die Änderung gilt sofort und steht nach dem Neuladen noch da.

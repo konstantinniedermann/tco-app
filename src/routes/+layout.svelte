@@ -6,14 +6,15 @@
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
-	import { klappeWeich } from '../lib/ui/klappe.ts';
+	import { klappeWeich, vergissKlappen } from '../lib/ui/klappe.ts';
 	import {
 		istReiterSeite,
-		stellStandWiederHer,
+		stelltStandWiederHer,
 		uebergang,
 		vergisstStand,
 		zeigtFusszeile
 	} from '../lib/ui/navigation.ts';
+	import { beobachteTastatur } from '../lib/ui/tastatur.ts';
 	import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 	import { raeumeWechselAuf } from '../lib/profil/wechselanfrage.ts';
 	import { APP_VERSION } from '../lib/version';
@@ -28,22 +29,23 @@
 		(page.route.id?.startsWith('/verwaltung') ?? false) && page.error === null
 	);
 
-	// Jeder Reiter merkt sich die Scrollposition, solange die App offen ist (UI-Leitbild,
-	// Bewegung und Bedienung); auf dem Weg zum Login (Abmelden) geht sie verloren.
+	// Nur der Rollbereich scrollt (UI-Leitbild, Baustein Rollbereich), darum führt die App die
+	// Position selbst: Jede Seite beginnt oben, «‹ Zurück» und die Zurück-Taste des Browsers
+	// bringen sie an die alte Stelle. SvelteKit scrollt nur das Dokument, das hier nie scrollt.
 	// Nur ein Speicher, nicht reaktiv: Nichts in der Anzeige hängt davon ab.
+	let rollbereich = $state<HTMLElement>();
 	let stand: Record<string, number> = {};
 	beforeNavigate(({ from, to }) => {
-		const von = from?.route.id ?? null;
-		if (von !== null && istReiterSeite(von)) stand[von] = window.scrollY;
-		if (vergisstStand(to?.route.id ?? null)) stand = {};
+		if (from && rollbereich) stand[from.url.pathname] = rollbereich.scrollTop;
+		if (vergisstStand(to?.route.id ?? null)) {
+			stand = {};
+			vergissKlappen();
+		}
 	});
-	afterNavigate(({ to, type }) => {
-		const nach = to?.route.id ?? null;
-		const wert = nach === null ? undefined : stand[nach];
-		if (!stellStandWiederHer(nach, type) || wert === undefined) return;
-		// Kein disableScrollHandling(): SvelteKit hat hier schon gescrollt, der Aufruf würde erst
-		// die nächste Navigation treffen (die dann nicht oben beginnt).
-		window.scrollTo(0, wert);
+	afterNavigate(({ from, to, type }) => {
+		if (!rollbereich || !to) return;
+		const zurueck = stelltStandWiederHer(from?.route.id ?? null, to.route.id, type);
+		rollbereich.scrollTop = zurueck ? (stand[to.url.pathname] ?? 0) : 0;
 	});
 
 	// Seitenwechsel mit View Transitions (UI-09): Die Bewegung steht in basis.css und hängt am
@@ -90,11 +92,14 @@
 		document.addEventListener('click', klappeWeich);
 		return () => document.removeEventListener('click', klappeWeich);
 	});
+
+	// Eingabe mit Tastatur: Reiter weg, App über der Tastatur, «Weiter» (src/lib/ui/tastatur.ts).
+	onMount(beobachteTastatur);
 </script>
 
 <div class={['statusleiste', { 'statusleiste-verwaltung': verwaltung }]}></div>
 
-<div class="app">
+<div class={['app', { schale: !verwaltung }]}>
 	{#if verwaltung}
 		{@render children()}
 	{:else}
@@ -103,20 +108,22 @@
 			MyTCO
 		</header>
 
-		<main class="inhalt">
-			{@render children()}
-		</main>
+		<div class="rollbereich" bind:this={rollbereich}>
+			<main class="inhalt">
+				{@render children()}
+			</main>
 
-		{#if mitFusszeile}
-			<footer class="inhalt leise">
-				<p>
-					<a href={resolve('/hilfe')}>Hilfe</a>
-					·
-					<a href={resolve('/datenschutz')}>Datenschutz</a>
-					· <span data-testid="version">Version {APP_VERSION}</span>
-				</p>
-			</footer>
-		{/if}
+			{#if mitFusszeile}
+				<footer class="inhalt leise">
+					<p>
+						<a href={resolve('/hilfe')}>Hilfe</a>
+						·
+						<a href={resolve('/datenschutz')}>Datenschutz</a>
+						· <span data-testid="version">Version {APP_VERSION}</span>
+					</p>
+				</footer>
+			{/if}
+		</div>
 
 		{#if mitReiter}
 			<Reiter />

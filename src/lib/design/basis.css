@@ -131,6 +131,44 @@ img {
 	flex: 1;
 }
 
+/*
+ * Mitglieder-App (UI-Leitbild, Layout): genau so hoch wie der sichtbare Bildschirm, Kopfleiste
+ * und Reiter stehen fest, nur der Rollbereich scrollt. So wirkt ein Tipp auf einen Reiter auch,
+ * während der Inhalt nachläuft (Safari hält beim Nachlaufen sonst nur das Scrollen an). Mit
+ * offener Tastatur setzt src/lib/ui/tastatur.ts --hoehe-sichtbar: die App endet darüber.
+ */
+.schale {
+	height: var(--hoehe-sichtbar, 100dvh);
+	min-height: 0;
+	overflow: hidden;
+}
+
+html:has(.schale) {
+	overscroll-behavior: none;
+}
+
+.rollbereich {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	overscroll-behavior-y: contain;
+}
+
+.rollbereich > main {
+	flex: 1;
+}
+
+/* Eingabe mit Tastatur: Die Tastatur steht an Stelle der Reiter (nur Handy-Layout, Finger) */
+@media (pointer: coarse) {
+	@container app (width < 60rem) {
+		html[data-tastatur] .reiter {
+			display: none;
+		}
+	}
+}
+
 .inhalt {
 	/* width: 100 %, sonst schrumpft der Bereich in der Flex-Spalte von .app auf seinen Inhalt */
 	width: 100%;
@@ -144,7 +182,8 @@ img {
 
 /* Ohne Reiter ist die Fusszeile zuunterst, ohne beide der Inhalt: Abstand über dem Home-Balken */
 .app > footer.inhalt:last-child,
-.app > main.inhalt:last-child {
+.app > main.inhalt:last-child,
+.rollbereich:last-child > .inhalt:last-child {
 	padding-bottom: calc(var(--abstand-6) + env(safe-area-inset-bottom));
 }
 

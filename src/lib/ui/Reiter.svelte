@@ -13,7 +13,10 @@
 		if (pfad !== aktiv || navigating.to) return;
 		ereignis.preventDefault();
 		const ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
-		window.scrollTo({ top: 0, behavior: ruhig ? 'auto' : 'smooth' });
+		// Es scrollt nur der Rollbereich des Layouts (UI-Leitbild, Baustein Rollbereich).
+		document
+			.querySelector('.rollbereich')
+			?.scrollTo({ top: 0, behavior: ruhig ? 'auto' : 'smooth' });
 	}
 </script>
 
