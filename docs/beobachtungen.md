@@ -490,3 +490,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Nacharbeit #54 (Test am iPhone), beim Abschluss.
 
 **Einschätzung:** Nur Darstellung der Mockups, die App ist richtig. Beim nächsten Mockup-Umbau `.schale` und `.rollbereich` übernehmen und den Rahmen auf `height: 100 %` der Schale stellen.
+
+### 2026-11-05 — E2E A-LOGIN-09 «nach Neuladen weiterhin angemeldet» scheiterte einmal auf dem iPhone
+
+**Thema:** App
+
+**Fundort:** `tests/e2e/login.test.ts` (A-LOGIN-09, Projekt `iphone`)
+
+**Beobachtung:** Im vollen E2E-Lauf des Pre-Push-Hooks einmal rot; einzeln mit `--repeat-each 5` fünfmal grün, in drei vollen Läufen davor ebenfalls grün.
+
+**Ursprung:** Fix-Branch zu #54 (Beschriftung der Eingabetaste), beim Pushen.
+
+**Einschätzung:** Zeitempfindlich unter Last wie die schon erfassten Ausreisser der Seitenwechsel-Tests; zusammen mit diesen ansehen.

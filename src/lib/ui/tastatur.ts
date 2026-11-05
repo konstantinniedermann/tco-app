@@ -69,8 +69,11 @@ export function beobachteTastatur(): () => void {
 		const feld = ereignis.target;
 		if (!istFeld(feld)) return;
 		if (finger.matches) wurzel.dataset.tastatur = '';
-		// Beschriftung der Eingabetaste: «Weiter» oder im letzten Feld «Fertig».
-		if (feld instanceof HTMLInputElement) feld.enterKeyHint = folgeFeld(feld) ? 'next' : 'done';
+		// Beschriftung der Eingabetaste: «Weiter» oder im letzten Feld «Fertig». Als Attribut, weil
+		// nicht jedes WebKit die Eigenschaft `enterKeyHint` kennt (z. B. unter Linux in der CI).
+		if (feld instanceof HTMLInputElement) {
+			feld.setAttribute('enterkeyhint', folgeFeld(feld) ? 'next' : 'done');
+		}
 	}
 
 	function schliesse() {
