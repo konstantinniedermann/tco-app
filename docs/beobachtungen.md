@@ -474,3 +474,5 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Abschluss-Prüfung zu #52 (der Branch ändert Einstiegsseite und Test nicht).
 
 **Einschätzung:** Vermutlich Wettlauf zwischen dem nachgestellten Install-Angebot und dem Laden der Seite. Bei der nächsten Arbeit an #54 oder der Einstiegsseite ansehen.
+
+**Nachtrag 2026-11-05:** In der CI auf `dev` (Lauf 42041712102) scheiterte im Projekt `iphone` einmal auch `bewegung.test.ts:210` «Zwei schnelle Reiter-Klicks hintereinander» (`toHaveURL` nach 5 s); der erneute Lauf war grün. Die Tests zu den weichen Seitenwechseln wirken unter WebKit in der CI zeitempfindlich.
