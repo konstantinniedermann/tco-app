@@ -11,6 +11,7 @@
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
+	import { klappeWeich } from '../lib/ui/klappe.ts';
 	import {
 		istReiterSeite,
 		stellStandWiederHer,
@@ -83,6 +84,12 @@
 	// Beim Start der App: abgelaufene oder kaputte Mail-Anfragen aus dem Gerätespeicher löschen.
 	onMount(() => {
 		leseMailanfrage(holeSpeicher(), Date.now());
+	});
+
+	// Aufklappbereiche klappen überall weich auf und zu (src/lib/ui/klappe.ts).
+	onMount(() => {
+		document.addEventListener('click', klappeWeich);
+		return () => document.removeEventListener('click', klappeWeich);
 	});
 </script>
 

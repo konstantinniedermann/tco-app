@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import pkg from '../../package.json' with { type: 'json' };
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
-import { startetVomSymbol } from './hilfen/geraet.ts';
+import { bietetInstallationAn, startetVomSymbol } from './hilfen/geraet.ts';
 import { legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
 import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
@@ -201,6 +201,71 @@ test('Bedienelemente wie in einer App, Text bleibt markierbar', async ({ page })
 	// Nur Browser mit Tipp-Blitz (WebKit, Chrome auf dem Handy) kennen die Eigenschaft.
 	const blitz = await stil(html, '-webkit-tap-highlight-color');
 	if (blitz !== '') expect(blitz).toBe('rgba(0, 0, 0, 0)');
+});
+
+/** Aufklappbereich «Neuer Code per E-Mail» der Hilfe (ohne Login erreichbar). */
+function klappe(page: Page) {
+	return page.locator('details.klappe', { hasText: 'Neuer Code per E-Mail' });
+}
+
+/** Tippt die Titelzeile an und meldet sofort danach, ob die Klappe sich weich bewegt. */
+const tippeTitel = (page: Page) =>
+	klappe(page).evaluate((details) => {
+		details.querySelector('summary')?.click();
+		return details.classList.contains('klappe-bewegt');
+	});
+
+test('Aufklappbereich öffnet und schliesst weich (UI-09)', async ({ page }) => {
+	const fehler = sammleKonsolenfehler(page);
+	await page.goto('/hilfe');
+	expect(await tippeTitel(page)).toBe(true);
+	await expect(klappe(page)).toHaveAttribute('open', '');
+	await expect(klappe(page)).not.toHaveClass(/klappe-bewegt/);
+	expect(await tippeTitel(page)).toBe(true);
+	await expect(klappe(page)).not.toHaveAttribute('open');
+	await expect(klappe(page)).not.toHaveClass(/klappe-bewegt/);
+	expect(fehler).toEqual([]);
+});
+
+test('Aufklappbereich bei «Bewegung reduzieren» sofort', async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await page.goto('/hilfe');
+	expect(await tippeTitel(page)).toBe(false);
+	await expect(klappe(page)).toHaveAttribute('open', '');
+});
+
+test('Aufklappbereich mit der Tastatur', async ({ page }) => {
+	await page.goto('/hilfe');
+	const titel = klappe(page).locator('summary');
+	await titel.focus();
+	await page.keyboard.press('Enter');
+	await expect(klappe(page)).toHaveAttribute('open', '');
+	await page.keyboard.press(' ');
+	await expect(klappe(page)).not.toHaveAttribute('open');
+});
+
+test('Menü auf der Einstiegsseite bleibt beim weichen Aufklappen richtig gebunden', async ({
+	page
+}, info) => {
+	test.skip(info.project.name !== 'android', 'nur Android'); // skip: Das Menü erscheint nur nach abgelehntem Install-Angebot von Chrome auf Android
+	await page.goto('/willkommen');
+	await bietetInstallationAn(page, 'dismissed');
+	await page.getByRole('button', { name: 'MyTCO installieren' }).click();
+	const menue = page.locator('details.klappe', { hasText: 'Klappt nicht? Über das Menü' });
+	const titel = menue.locator('summary');
+	const inhalt = menue.locator('summary ~ *');
+	await expect(menue).toHaveAttribute('open', '');
+	await titel.click();
+	await expect(menue).not.toHaveAttribute('open');
+	await expect(inhalt).toHaveCount(0);
+	await titel.click();
+	await expect(menue).toHaveAttribute('open', '');
+	await expect(inhalt.first()).toBeVisible();
+	await expect(menue).not.toHaveClass(/klappe-bewegt/);
+	// Nach dem Aufklappen ist die ganze Anleitung zu sehen, nicht nur die Titelzeile.
+	const hoehe = await menue.evaluate((d) => d.getBoundingClientRect().height);
+	const titelHoehe = await titel.evaluate((s) => s.getBoundingClientRect().height);
+	expect(hoehe).toBeGreaterThan(titelHoehe * 2);
 });
 
 test('Unbekannte Adresse aus einem Reiter: Fehlerseite ohne Fusszeile', async ({ page }) => {

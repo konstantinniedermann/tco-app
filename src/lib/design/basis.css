@@ -490,6 +490,61 @@ dialog.karte {
 	color: var(--farbe-text);
 }
 
+/*
+ * Rückfrage blendet weich ein und schneller aus (UI-09). Wo der Browser `@starting-style`
+ * oder `allow-discrete` nicht kennt, erscheint und verschwindet sie wie bisher sofort.
+ */
+dialog.karte {
+	opacity: 0;
+	transform: scale(0.94);
+	transition:
+		opacity var(--dauer-kurz) linear,
+		transform var(--dauer-kurz) var(--kurve-standard),
+		overlay var(--dauer-kurz) allow-discrete,
+		display var(--dauer-kurz) allow-discrete;
+}
+
+dialog.karte[open] {
+	opacity: 1;
+	transform: none;
+	transition-duration: var(--dauer-mittel);
+}
+
+dialog.karte::backdrop {
+	opacity: 0;
+	transition:
+		opacity var(--dauer-kurz) linear,
+		overlay var(--dauer-kurz) allow-discrete,
+		display var(--dauer-kurz) allow-discrete;
+}
+
+dialog.karte[open]::backdrop {
+	opacity: 1;
+}
+
+@starting-style {
+	dialog.karte[open],
+	dialog.karte[open]::backdrop {
+		opacity: 0;
+	}
+
+	dialog.karte[open] {
+		transform: scale(0.94);
+	}
+}
+
+/* Während der Bewegung schneidet der Aufklappbereich ab, was noch nicht Platz hat */
+.klappe-bewegt {
+	overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	dialog.karte,
+	dialog.karte::backdrop {
+		transition: none;
+	}
+}
+
 .klappe-titel {
 	display: flex;
 	align-items: center;
