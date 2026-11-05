@@ -1,7 +1,7 @@
 # Design: Anmeldung zu Anlässen am Beispiel der GV (#52, A-ANLASS-01)
 
 **Datum:** 2026-11-05 · **Issue:** [#52](https://github.com/konstantinniedermann/tco-app/issues/52)
-· **Status:** Entwurf zur Freigabe durch den Projektleiter
+· **Status:** freigegeben (Projektleiter, 05.11.2026)
 
 ## Absicht
 
