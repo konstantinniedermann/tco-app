@@ -1,7 +1,7 @@
 // Schnittstellen der Mitglieder zu Anlässen (A-ANLASS-01). Ohne Sitzung nur die Kalenderdatei,
 // über ihre nicht erratbare Kennung (SI-19).
 import type { RequestEvent } from '@sveltejs/kit';
-import { parseId } from '../admin/schnittstellen.ts';
+import { parseId } from '../parse-id.ts';
 import type { Db } from '../db/index.ts';
 import {
 	antwort,

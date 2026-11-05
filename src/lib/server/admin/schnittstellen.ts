@@ -8,6 +8,7 @@ import {
 	type Ereignis
 } from '../login/schnittstellen.ts';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
+import { parseId } from '../parse-id.ts';
 import { pruefeAnlass } from '../anlass/angaben.ts';
 import {
 	aendereAnlass,
@@ -44,15 +45,6 @@ const VERLAUF_MAX = 500;
 
 const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
 const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });
-
-const INTEGER_MAX = 2_147_483_647;
-
-export function parseId(roh: string | null | undefined): number | null {
-	if (roh === null || roh === undefined || !/^[1-9]\d{0,14}$/.test(roh)) return null;
-	const n = Number(roh);
-	// Grösser als ein Postgres-integer würde die Abfrage mit 22003 abbrechen (500).
-	return n <= INTEGER_MAX ? n : null;
-}
 
 const jetzt = (d: AdminDienste) => (d.jetzt ?? (() => new Date()))();
 
