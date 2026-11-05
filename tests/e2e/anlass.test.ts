@@ -39,6 +39,9 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	browser,
 	baseURL
 }, info) => {
+	// Langer Ablauf (zwei Geräte, Code per Mail, acht Bildschirmprüfungen): unter WebKit in der
+	// CI länger als die üblichen 30 s.
+	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
 	const admin = await legeAdminMitBriefCodeAn('Greta');
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
