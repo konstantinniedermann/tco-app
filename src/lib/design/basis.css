@@ -129,8 +129,9 @@ img {
 	background: var(--farbe-marke);
 }
 
-.statusleiste.dunkel {
-	background: var(--farbe-marke-dunkel);
+/* Ein Fokussprung landet nicht unter dem Band (WCAG 2.4.11) */
+html {
+	scroll-padding-top: env(safe-area-inset-top);
 }
 
 /* Kopfleiste */
