@@ -129,7 +129,7 @@ PC-Layout. Massgebend ist die Breite des App-Rahmens
 `.app` (Container-Abfrage), nicht die des Fensters; so zeigen auch die Mockups im
 Handy-Rahmen das Handy-Layout. Der Wert steht nur in `basis.css`, weil Abfragen keine Tokens
 erlauben. Weil `.app` ein Container ist, gehen Überlagerungen nur mit `<dialog>`, nicht mit
-`position: fixed`.
+`position: fixed`. Einzige Ausnahme ist das Statusleisten-Band; es steht ausserhalb von `.app`.
 
 ## Bausteine
 
@@ -139,6 +139,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Baustein | Klasse | Regel |
 |----------|--------|-------|
 | Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit dort kein durchscheinender Streifen bleibt, und bleibt beim Scrollen oben stehen (`sticky`), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch) |
+| Statusleisten-Band | `.statusleiste` | ausserhalb von `.app`, fest oben, so hoch wie `env(safe-area-inset-top)` (am PC 0), deckend in `--farbe-marke` (in der Verwaltung `--farbe-marke-dunkel`). iOS 26 legt sonst über Web-Apps vom Startbildschirm einen hellen Schleier über die Statusleiste; nur ein fester, deckender, einfarbiger Streifen am oberen Rand verhindert ihn |
 | Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben; Abstand `env(safe-area-inset-bottom)` über dem Home-Balken |
 | Seitenleiste | `.seitenleiste` | nur Verwaltung, Bereiche nach Rolle |
 | Haupttaste | `.taste-haupt` | Sandplatz-Rot, höchstens eine pro Bildschirm (UI-04) |

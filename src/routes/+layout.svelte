@@ -22,6 +22,8 @@
 	});
 </script>
 
+<div class={['statusleiste', { dunkel: verwaltung }]}></div>
+
 <div class="app">
 	{#if verwaltung}
 		{@render children()}
