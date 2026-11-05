@@ -15,6 +15,15 @@ function istErwarteteApiAntwort(text: string, url: string): boolean {
 	);
 }
 
+/** Klappt den Aufklappbereich mit dem Titel `titel` auf, falls er zu ist (im Profil anfangs zu). */
+export async function klappeAuf(page: Page, titel: string): Promise<void> {
+	const klappe = page.locator('details.klappe', {
+		has: page.locator('summary', { hasText: titel })
+	});
+	if ((await klappe.getAttribute('open')) === null) await klappe.locator('summary').click();
+	await expect(klappe).toHaveAttribute('open', '');
+}
+
 // WebKit: Für den Screenshot legt Playwright ein eigenes Stylesheet an (Quelle
 // web-inspector://), das an der CSP der App scheitert. Nur während des Screenshots ignoriert.
 const SCREENSHOT_STIL = /^Refused to apply a stylesheet because its hash/;
@@ -32,16 +41,56 @@ export function sammleKonsolenfehler(page: Page): string[] {
 	return fehler;
 }
 
+/**
+ * Wartet, bis kurze Bewegungen (UI-09) fertig sind: CSS-Übergänge wie das Einblenden der
+ * Rückfrage und Seitenwechsel. Mitten im Einblenden misst axe sonst zu wenig Kontrast.
+ * Die Anleitung (CSS-Animationen, mehrere Sekunden) zählt nicht dazu.
+ */
+async function wartetAufRuhe(page: Page): Promise<void> {
+	await page.evaluate(() =>
+		Promise.all(
+			document
+				.getAnimations()
+				.filter(
+					(a) =>
+						a instanceof CSSTransition ||
+						((a.effect as KeyframeEffect | null)?.pseudoElement ?? '').startsWith(
+							'::view-transition'
+						)
+				)
+				.map((a) => a.finished.catch(() => undefined))
+		)
+	);
+}
+
 /** UI-01: jeder Bildschirm ohne axe-Verstösse; dazu ein Screenshot als Nachweis. */
 export async function pruefeBildschirm(page: Page, info: TestInfo, name: string): Promise<void> {
+	await wartetAufRuhe(page);
 	const axe = await new AxeBuilder({ page }).analyze();
 	expect(axe.violations, name).toEqual([]);
 	screenshotLaeuft.add(page);
 	try {
+		await rolleAus(page, true);
 		await page.screenshot({ path: info.outputPath(`${name}.png`), fullPage: true });
 		// Eine Runde zur Seite: Konsolenmeldungen aus dem Screenshot sind danach eingetroffen.
 		await page.evaluate(() => 0);
 	} finally {
+		await rolleAus(page, false);
 		screenshotLaeuft.delete(page);
 	}
+}
+
+/**
+ * Nur der Rollbereich scrollt (UI-Leitbild); für den Screenshot der ganzen Seite wird er kurz
+ * so lang wie sein Inhalt. Über das CSSOM, weil die CSP Stylesheets aus dem Test abweist.
+ */
+async function rolleAus(page: Page, aus: boolean): Promise<void> {
+	await page.evaluate((an) => {
+		for (const wahl of ['.schale', '.rollbereich']) {
+			const el = document.querySelector<HTMLElement>(wahl);
+			if (!el) continue;
+			el.style.height = an ? 'auto' : '';
+			el.style.overflow = an ? 'visible' : '';
+		}
+	}, aus);
 }

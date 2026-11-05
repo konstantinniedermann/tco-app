@@ -1,7 +1,9 @@
+import { eq } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
+import { mitglied } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { getSitzung } from '../login/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
@@ -14,11 +16,19 @@ import {
 	getMitglied,
 	getMitglieder,
 	getVerlauf,
+	getFairgate,
+	postFairgate,
 	getZugang,
 	postZugang,
 	postZugangCode,
+	getAdminAnlaesse,
+	getAdminAnlass,
+	postAdminAnlaesse,
+	postAdminAnlass,
+	postAdminAnlassLoeschen,
 	type AdminDienste
 } from './schnittstellen.ts';
+import { getAnlaesse } from '../anlass/schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
@@ -102,7 +112,7 @@ describe('Admin-Schnittstellen', () => {
 		const geschuetzt = Object.entries(ADMIN_SCHNITTSTELLEN).filter(
 			([name]) => !['getZugang', 'postZugang', 'postZugangCode'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(7);
+		expect(geschuetzt).toHaveLength(14);
 		for (const [name, fn] of geschuetzt) {
 			const mach = (konto?: AngemeldetesKonto) =>
 				ereignis({
@@ -134,7 +144,11 @@ describe('Admin-Schnittstellen', () => {
 			postMitglieder,
 			postMitglied,
 			postRollen,
-			postSitzungen
+			postSitzungen,
+			postFairgate,
+			postAdminAnlaesse,
+			postAdminAnlass,
+			postAdminAnlassLoeschen
 		];
 		for (const fn of aendernde) {
 			const r = await fn(
@@ -403,5 +417,102 @@ describe('Admin-Schnittstellen', () => {
 		expect(await ra.json()).toEqual({ vorname: 'Test', passkeyHinweis: false, verwaltung: true });
 		expect(await rn.json()).toMatchObject({ verwaltung: false });
 		expect((await getSitzung(ereignis(), db)).status).toBe(401);
+	});
+
+	test('A-KONTO-02: Liste Für Fairgate lesen und abhaken, ungültige und unbekannte Nummer 404', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const m = await legeMitgliedAn(db);
+		await db
+			.update(mitglied)
+			.set({ fairgateOffenSeit: start })
+			.where(eq(mitglied.id, m.mitgliedId));
+		const liste = await getFairgate(s.d, ereignis({ method: 'GET', konto: admin.konto }));
+		expect(liste.status).toBe(200);
+		const zeilen = (await liste.json()) as { id: number }[];
+		expect(zeilen.map((z) => z.id)).toContain(m.mitgliedId);
+		const abhaken = (id: string, seit: unknown = start.toISOString()) =>
+			postFairgate(s.d, ereignis({ body: { seit }, params: { id }, konto: admin.konto }));
+		const ohneSeit = await abhaken(String(m.mitgliedId), null);
+		expect(ohneSeit.status).toBe(400);
+		expect(await ohneSeit.json()).toEqual({ fehler: 'eingabe' });
+		expect((await abhaken(String(m.mitgliedId), 'gestern')).status).toBe(400);
+		const veraltet = await abhaken(String(m.mitgliedId), new Date(+start - 1000).toISOString());
+		expect(veraltet.status).toBe(409);
+		expect(await veraltet.json()).toEqual({ fehler: 'veraltet' });
+		expect((await abhaken(String(m.mitgliedId))).status).toBe(200);
+		const nochmal = await abhaken(String(m.mitgliedId));
+		expect(nochmal.status).toBe(404);
+		expect(await nochmal.json()).toEqual({ fehler: 'nicht-gefunden' });
+		expect((await abhaken('abc')).status).toBe(404);
+	});
+
+	test('A-ANLASS-01: Admin legt Anlass an, ändert ihn, Mitglied sieht ihn, Admin löscht ihn', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const titel = `GV ${crypto.randomUUID()}`;
+		const angaben = {
+			titel,
+			beginn: '2027-03-19T19:30',
+			ort: 'Clubhaus',
+			einladung: 'Traktanden',
+			anmeldeschluss: '2027-03-16T23:59'
+		};
+		const fehlt = await postAdminAnlaesse(
+			s.d,
+			ereignis({ body: { ...angaben, titel: ' ' }, konto: admin.konto })
+		);
+		expect([fehlt.status, await fehlt.json()]).toEqual([
+			400,
+			{ fehler: 'eingabe', felder: { titel: 'Bitte einen Titel angeben.' } }
+		]);
+		const neu = await postAdminAnlaesse(s.d, ereignis({ body: angaben, konto: admin.konto }));
+		expect(neu.status).toBe(201);
+		const { id } = await neu.json();
+
+		const mitglied = await einloggen((await legeMitgliedAn(db)).kontoId);
+		const sicht = await (
+			await getAnlaesse({ db, jetzt: () => start }, ereignis({ method: 'GET', konto: mitglied }))
+		).json();
+		expect(sicht.map((a: { titel: string }) => a.titel)).toContain(titel);
+
+		const geaendert = await postAdminAnlass(
+			s.d,
+			ereignis({
+				body: { ...angaben, ort: 'Halle' },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect(geaendert.status).toBe(200);
+		const detail = await (
+			await getAdminAnlass(
+				s.d,
+				ereignis({ method: 'GET', params: { id: String(id) }, konto: admin.konto })
+			)
+		).json();
+		expect(detail).toMatchObject({
+			titel,
+			ort: 'Halle',
+			beginnLokal: '2027-03-19T19:30',
+			schlussLokal: '2027-03-16T23:59',
+			zahlen: { kommen: 0, kommenNicht: 0 },
+			anmeldungen: []
+		});
+		const liste = await (
+			await getAdminAnlaesse(s.d, ereignis({ method: 'GET', konto: admin.konto }))
+		).json();
+		expect(liste.map((a: { id: number }) => a.id)).toContain(id);
+
+		const weg = await postAdminAnlassLoeschen(
+			s.d,
+			ereignis({ body: {}, params: { id: String(id) }, konto: admin.konto })
+		);
+		expect(weg.status).toBe(200);
+		const nochmal = await postAdminAnlassLoeschen(
+			s.d,
+			ereignis({ body: {}, params: { id: String(id) }, konto: admin.konto })
+		);
+		expect([nochmal.status, await nochmal.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
 	});
 });

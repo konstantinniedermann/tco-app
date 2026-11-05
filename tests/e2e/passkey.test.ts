@@ -7,7 +7,7 @@ import {
 	stelleBriefCodeAus
 } from './hilfen/login.ts';
 import { browserKannPasskey, virtuellerAuthenticator } from './hilfen/passkey.ts';
-import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import { klappeAuf, pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
 // Der Testserver ohne Proxy-Kopf meldet https statt http; die Passkey-Prüfung vergleicht die Herkunft.
 test.use({ extraHTTPHeaders: { 'x-forwarded-proto': 'http' } });
@@ -59,6 +59,7 @@ test.describe('mit virtuellem Authenticator', () => {
 			.getByRole('link', { name: 'Profil' })
 			.click();
 		await expect(page.getByRole('heading', { level: 1, name: 'Profil' })).toBeVisible();
+		await klappeAuf(page, 'Anmelden mit Passkey');
 		await expect(
 			page.getByText(/eingerichtet am \d+\.\d+\.\d{4} · zuletzt noch nie/)
 		).toBeVisible();
@@ -115,6 +116,7 @@ test.describe('mit virtuellem Authenticator', () => {
 			.getByRole('navigation', { name: 'Hauptnavigation' })
 			.getByRole('link', { name: 'Profil' })
 			.click();
+		await klappeAuf(page, 'Anmelden mit Passkey');
 
 		// Fokus: beim Öffnen der Nachfrage auf «Abbrechen», nach «Abbrechen» zurück auf «Entfernen».
 		const entfernen = page.getByRole('button', { name: 'Entfernen', exact: true });
@@ -177,7 +179,7 @@ test('A-LOGIN-08: Profil-Bildschirm ohne Passkey ohne axe-Verstösse', async ({ 
 		.getByRole('link', { name: 'Profil' })
 		.click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Profil' })).toBeVisible();
-	await expect(page.getByText('Anmelden mit Passkey')).toBeVisible();
+	await klappeAuf(page, 'Anmelden mit Passkey');
 	await expect(
 		page.getByText('Mit einem Passkey meldest du dich ohne Code an', { exact: false })
 	).toBeVisible();

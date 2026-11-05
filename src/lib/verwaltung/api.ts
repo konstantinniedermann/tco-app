@@ -2,12 +2,15 @@
 // Die Seiten zeigen die Meldungen; hier steht nur, was die Statuscodes bedeuten.
 import { jsonPost } from '../json-post.ts';
 import type { Angaben, Feld } from '../server/admin/angaben.ts';
+import type { AnlassFeld } from '../server/anlass/angaben.ts';
+import type { AnlassAdmin, AnlassListe } from '../server/anlass/anlaesse.ts';
+import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairgate.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { Rolle } from '../server/admin/rollen.ts';
 import type { VerlaufZeile } from '../server/admin/verlauf.ts';
 
 // Was nach JSON im Browser ankommt: Zeitpunkte sind Zeichenketten.
-type Json<T> = T extends Date
+export type Json<T> = T extends Date
 	? string
 	: T extends (infer U)[]
 		? Json<U>[]
@@ -18,6 +21,10 @@ type Json<T> = T extends Date
 export type MitgliedDetail = Json<Detail>;
 export type MitgliedZeile = Json<Listenzeile>;
 export type VerlaufEintrag = Json<VerlaufZeile>;
+export type AnlassZeile = Json<AnlassListe>;
+export type AnlassDetail = Json<AnlassAdmin> & { beginnLokal: string; schlussLokal: string };
+export type { AnlassFeld };
+export type FairgateZeile = Json<ServerFairgateZeile>;
 export type { Angaben, Feld, MitgliedStatus, Rolle };
 
 export type Antwort<T> =
@@ -28,7 +35,7 @@ export type Antwort<T> =
 	| { art: 'falsch' }
 	| { art: 'zu-viele' }
 	| { art: 'nicht-gefunden' }
-	| { art: 'eingabe'; felder: Partial<Record<Feld, string>> }
+	| { art: 'eingabe'; felder: Partial<Record<Feld | AnlassFeld, string>> }
 	| { art: 'vergeben'; feld: Feld }
 	| { art: 'letzter-admin' }
 	| { art: 'veraltet' }
@@ -51,7 +58,7 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 	if (status === 400) {
 		if (k.fehler === 'falsch') return { art: 'falsch' };
 		if (k.fehler === 'eingabe' && k.felder && typeof k.felder === 'object')
-			return { art: 'eingabe', felder: k.felder as Partial<Record<Feld, string>> };
+			return { art: 'eingabe', felder: k.felder as Partial<Record<Feld | AnlassFeld, string>> };
 	}
 	if (status === 409) {
 		if (k.fehler === 'letzter-admin') return { art: 'letzter-admin' };
@@ -126,3 +133,26 @@ export function ladeVerlauf(
 	const abfrage = filter.mitglied === undefined ? '' : `?mitglied=${filter.mitglied}`;
 	return lese(`${ADMIN}/verlauf${abfrage}`, holen);
 }
+
+export const ladeFairgate = (holen: Holen = fetch) =>
+	lese<FairgateZeile[]>(`${ADMIN}/fairgate`, holen);
+
+/** `seit`: der Stand der Zeile, wie die Liste ihn zeigte; hat das Mitglied inzwischen mehr geändert, antwortet der Server «veraltet». */
+export const uebertrageFairgate = (id: number, seit: string, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/fairgate/${id}`, { seit }, holen);
+
+export const ladeAnlaesseAdmin = (holen: Holen = fetch) =>
+	lese<AnlassZeile[]>(`${ADMIN}/anlaesse`, holen);
+
+export const ladeAnlassAdmin = (id: number, holen: Holen = fetch) =>
+	lese<AnlassDetail>(`${ADMIN}/anlaesse/${id}`, holen);
+
+/** `angaben`: Titel, Ort, Einladung und Zeiten in Schweizer Zeit (`YYYY-MM-DDTHH:MM`). */
+export const legeAnlassAn = (angaben: object, holen: Holen = fetch) =>
+	schicke<{ id: number }>(`${ADMIN}/anlaesse`, angaben, holen);
+
+export const aendereAnlass = (id: number, angaben: object, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/anlaesse/${id}`, angaben, holen);
+
+export const loescheAnlass = (id: number, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/anlaesse/${id}/loeschen`, {}, holen);

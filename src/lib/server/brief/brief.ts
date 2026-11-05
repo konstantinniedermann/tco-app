@@ -142,7 +142,7 @@ ${DRUCK_CSS}
 <h2>iPhone (Safari)</h2>
 <ol>
 <li>Scanne den QR-Code mit der Kamera oder tippe die Adresse in Safari ein.</li>
-<li>Tippe auf ••• und dann auf ${SYMBOL_TEILEN} «Teilen», dann auf «Zu Home-Bildschirm hinzufügen».</li>
+<li>Tippe auf ••• (falls da) und dann auf ${SYMBOL_TEILEN} «Teilen», dann auf «Zu Home-Bildschirm hinzufügen».</li>
 <li>Lass «Als Web-App öffnen» an und tippe auf «Hinzufügen».</li>
 <li>Öffne MyTCO über das neue Symbol auf dem Home-Bildschirm.</li>
 <li>Tippe den Code ein. Danach bleibst du angemeldet.</li>

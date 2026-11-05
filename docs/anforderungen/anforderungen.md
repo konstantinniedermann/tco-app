@@ -80,8 +80,8 @@ Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-KONTO-01 | Das Mitglied ändert E-Mail-Adresse und Telefonnummer selbst | PDF 3e | Mitglieder-Login\* | geplant |
-| A-KONTO-02 | Das Mitglied ändert seine Adresse selbst | PDF 3e | später\* | offen |
+| A-KONTO-01 | Das Mitglied ändert E-Mail-Adresse und Telefonnummer selbst, dazu die Lizenznummer (FR-02); die E-Mail erst nach Bestätigung mit je einem Code an die alte und die neue Adresse (SI-09). Annahme K-19.1 ([#50](https://github.com/konstantinniedermann/tco-app/issues/50)) | PDF 3e | Mitglieder-Login\* | umgesetzt\* |
+| A-KONTO-02 | Das Mitglied ändert seine Adresse selbst; selbst geänderte Kontaktangaben (Adresse, E-Mail, Telefon) sieht der Admin in der Liste *Für Fairgate* und hakt sie nach dem Übertragen ab. Annahme K-19.2 ([#50](https://github.com/konstantinniedermann/tco-app/issues/50)) | PDF 3e | Mitglieder-Login\* | umgesetzt\* |
 | A-KONTO-03 | Das Mitglied wählt die Zustellart der Jahresrechnung | PDF 3e | später\* | später |
 | A-KONTO-04 | Das Mitglied ändert seine Mitgliedschaft | PDF 1 | später\* | offen |
 
@@ -103,7 +103,7 @@ auf dem Handy aussieht, klärt das UI-Leitbild (Issue #13).
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-HILFE-01 | MyTCO hat eine Seite *Hilfe*, ohne Login erreichbar über den Link «Hilfe» in der Fusszeile: MyTCO auf den Startbildschirm legen, neuen Code anfordern, Passkey einrichten, Kontakt für Fragen (K-21); eigene Angaben ändern kommt mit A-KONTO-01 ([#47](https://github.com/konstantinniedermann/tco-app/issues/47)) | PL | Mitglieder-Login | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
+| A-HILFE-01 | MyTCO hat eine Seite *Hilfe*, ohne Login erreichbar über den Link «Hilfe» in der Fusszeile: MyTCO auf den Startbildschirm legen, neuen Code anfordern, Passkey einrichten, eigene Angaben ändern (A-KONTO-01, [#50](https://github.com/konstantinniedermann/tco-app/issues/50)), Kontakt für Fragen (K-21) ([#47](https://github.com/konstantinniedermann/tco-app/issues/47)) | PL | Mitglieder-Login | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
 | A-HILFE-02 | Solange MyTCO auf dem Handy im Browser statt vom Startbildschirm läuft, zeigt eine eigene Einstiegsseite zuerst die Anleitung zum Startbildschirm mit Animation, je nach iPhone oder Android, und erst danach den Login. Auf Android öffnet die Taste «MyTCO installieren» den Dialog von Android, wenn Chrome ihn anbietet. Der Brief behält seine Kurzanleitung (A-LOGIN-01) ([Design](../superpowers/specs/2026-11-04-hilfe-beim-start-design.md)) | PL | Mitglieder-Login | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
 
 ### NEWSFEED
@@ -124,10 +124,18 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-ANLASS-01 | Mitglieder melden sich direkt in MyTCO für Anlässe an | PDF 3d | später | später |
+| A-ANLASS-01 | Mitglieder melden sich direkt in MyTCO für Anlässe an | PDF 3d | Mitglieder-Login\* | umgesetzt\* |
 | A-ANLASS-02 | Anmeldung zum Junioren-Training (evtl. ab 2028) | PDF 3d | später | später |
 | A-ANLASS-03 | Anmeldung zu Junioren-Turnieren (ab 2028) | PDF 3d | später | später |
 | A-ANLASS-04 | Teilnehmerlisten für Junioren-Training und weitere Turniere, ähnlich der Lizenzliste | PDF 4b | später | später |
+
+A-ANLASS-01: Erster Anlass neben der Clubmeisterschaft ist die Generalversammlung ([#52](https://github.com/konstantinniedermann/tco-app/issues/52),
+[Design](../superpowers/specs/2026-11-05-gv-anmeldung-design.md)). Gebaut als Vorschlag für den
+Vorstand: Der Admin erstellt einen Anlass, alle Mitglieder sehen ihn auf der Startseite, melden
+sich an oder ab (mit freiwilliger Bemerkung) und speichern ihn im Kalender. Vorschlag K-50:
+Liste nur für Admins; Anträge, Zielgruppen und Stimmrecht später. Etappe und Status mit \*: Der
+Bau ist ein Vorschlag, der Vorstand bestätigt ihn mit K-50; den Kalendereintrag auf echten
+Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vor-dem-release).
 
 ### LIZENZ — Lizenzanträge und Lizenzliste
 

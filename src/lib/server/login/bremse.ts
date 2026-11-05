@@ -65,6 +65,9 @@ export type Bremsen = {
 	mailsProAdresseStunde: Bremse;
 	mailsProAdresseTag: Bremse;
 	passkeyFehlerProIp: Bremse;
+	/** SI-09: E-Mail-Wechsel-Anfragen pro Konto (Schlüssel: Konto-ID). */
+	wechselProKontoStunde: Bremse;
+	wechselProKontoTag: Bremse;
 };
 
 /** Alle Fenster sind höchstens 24 h lang; nach spätestens 24 h ist jeder Eintrag vergessen. */
@@ -75,7 +78,9 @@ export function erstelleBremsen(jetzt?: () => number): Bremsen {
 		anfragenProIp: new Bremse({ grenze: 10, fensterMs: STUNDE_MS, jetzt }),
 		mailsProAdresseStunde: new Bremse({ grenze: 3, fensterMs: STUNDE_MS, jetzt }),
 		mailsProAdresseTag: new Bremse({ grenze: 10, fensterMs: TAG_MS, jetzt }),
-		passkeyFehlerProIp: new Bremse({ grenze: 10, fensterMs: STUNDE_MS, jetzt })
+		passkeyFehlerProIp: new Bremse({ grenze: 10, fensterMs: STUNDE_MS, jetzt }),
+		wechselProKontoStunde: new Bremse({ grenze: 3, fensterMs: STUNDE_MS, jetzt }),
+		wechselProKontoTag: new Bremse({ grenze: 10, fensterMs: TAG_MS, jetzt })
 	};
 	setInterval(() => {
 		for (const bremse of Object.values(bremsen)) bremse.raeumeAuf();

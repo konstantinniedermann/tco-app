@@ -55,6 +55,11 @@ describe('code-stand.sh', () => {
 		schreibe('docs/übersicht.md', 'neu\n');
 		expect(codeStand()).toBe(vorher);
 	});
+	it('ändert sich bei der Datenschutzerklärung (die App baut sie ein, DS-09)', () => {
+		const vorher = codeStand();
+		schreibe('docs/datenschutzerklaerung.md', 'neu\n');
+		expect(codeStand()).not.toBe(vorher);
+	});
 	it('ändert sich bei Änderungen an Code', () => {
 		const vorher = codeStand();
 		schreibe('src/a.ts', 'export const a = 2;\n');

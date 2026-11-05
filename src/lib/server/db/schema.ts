@@ -30,7 +30,10 @@ export const mitglied = pgTable(
 		telefon: text('telefon'),
 		geschlecht: text('geschlecht'),
 		jahrgang: integer('jahrgang'),
-		lizenznummer: text('lizenznummer')
+		lizenznummer: text('lizenznummer'),
+		// Annahme K-19.2: Gesetzt, sobald das Mitglied eine Angabe selbst geändert hat, die der Verein noch in Fairgate
+		// nachführen muss; leer = nichts offen.
+		fairgateOffenSeit: timestamp('fairgate_offen_seit', { withTimezone: true })
 	},
 	(t) => [
 		check('mitglied_status_check', sql`${t.status} in ('aktiv', 'ausgetreten', 'geloescht')`),
@@ -138,5 +141,51 @@ export const aenderung = pgTable(
 		),
 		index('aenderung_mitglied_zeitpunkt_idx').on(t.mitgliedId, t.zeitpunkt),
 		index('aenderung_zeitpunkt_idx').on(t.zeitpunkt)
+	]
+);
+
+export type Antwort = 'kommt' | 'kommt-nicht';
+
+// Anlass für alle aktiven Mitglieder (FR-27, A-ANLASS-01). Die Kalender-Kennung macht die
+// Kalenderdatei ohne Login abrufbar (SI-19); sie enthält keine Personendaten.
+export const anlass = pgTable(
+	'anlass',
+	{
+		id: serial('id').primaryKey(),
+		titel: text('titel').notNull(),
+		beginn: timestamp('beginn', { withTimezone: true }).notNull(),
+		ort: text('ort').notNull(),
+		einladung: text('einladung').notNull().default(''),
+		anmeldeschluss: timestamp('anmeldeschluss', { withTimezone: true }).notNull(),
+		kalenderKennung: text('kalender_kennung').notNull().unique('anlass_kalender_kennung_unique'),
+		// Gesetzt, sobald der Admin Beginn oder Ort ändert (FR-32).
+		terminGeaendertAm: timestamp('termin_geaendert_am', { withTimezone: true }),
+		erstelltVon: integer('erstellt_von').references(() => mitglied.id, { onDelete: 'set null' }),
+		erstelltAm: timestamp('erstellt_am', { withTimezone: true }).notNull().defaultNow()
+	},
+	(t) => [check('anlass_schluss_check', sql`${t.anmeldeschluss} <= ${t.beginn}`)]
+);
+
+// Antwort eines Mitglieds zu einem Anlass; auch die Abmeldung heisst Anmeldung (Glossar).
+export const anlassAnmeldung = pgTable(
+	'anlass_anmeldung',
+	{
+		anlassId: integer('anlass_id')
+			.notNull()
+			.references(() => anlass.id, { onDelete: 'cascade' }),
+		mitgliedId: integer('mitglied_id')
+			.notNull()
+			.references(() => mitglied.id, { onDelete: 'cascade' }),
+		antwort: text('antwort').$type<Antwort>().notNull(),
+		bemerkung: text('bemerkung'),
+		geaendertAm: timestamp('geaendert_am', { withTimezone: true }).notNull()
+	},
+	(t) => [
+		primaryKey({ columns: [t.anlassId, t.mitgliedId] }),
+		check('anlass_anmeldung_antwort_check', sql`${t.antwort} in ('kommt', 'kommt-nicht')`),
+		check(
+			'anlass_anmeldung_bemerkung_check',
+			sql`${t.antwort} = 'kommt-nicht' or ${t.bemerkung} is null`
+		)
 	]
 );

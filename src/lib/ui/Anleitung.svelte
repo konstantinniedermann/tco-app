@@ -113,7 +113,13 @@
 
 	{#if geraet === 'iphone'}
 		<p class="leise">
-			Siehst du das Teilen-Symbol schon direkt in der Leiste? Dann tipp gleich darauf.
+			<strong>Kein ••• unten rechts?</strong> Ist in Safari das Tablayout «Unten» oder «Oben»
+			eingestellt, tippst du direkt auf
+			<svg class="symbol" aria-hidden="true" viewBox="0 0 24 24"
+				><path d="M12 3v12" /><path d="M8 7l4-4 4 4" /><path
+					d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2"
+				/></svg
+			> «Teilen» und machst bei Schritt 3 weiter.
 		</p>
 	{/if}
 </div>

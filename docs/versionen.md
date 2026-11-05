@@ -7,6 +7,58 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+## 0.5.0 — Anlässe, eigene Angaben und ruhiges App-Gefühl, nicht ausgeliefert
+
+Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test
+([Versionen](ci-cd-und-release.md#versionen)). Doku-Abgleich vor dem Release: ein Befund auf
+hoch behoben (die Datenschutzerklärung, die die App einbaut, zählte in der CI als reine Doku
+und wäre bei einer reinen Textänderung nie ausgeliefert worden); die Erklärung präzisiert
+(Grenze der Code-Mails, Gerätespeicher beim E-Mail-Wechsel); die Release-Checkliste verlangt
+vor dem ersten Live-Release mit Mitgliedern die versprochenen Löschfristen und den Hinweis an
+die alte Adresse; Kleinigkeiten behoben, der Rest als Beobachtung eingetragen.
+
+- Anlässe ([#52](https://github.com/konstantinniedermann/tco-app/issues/52), A-ANLASS-01, als
+  Vorschlag für den Vorstand, K-50): Der Admin erstellt in der Verwaltung einen Anlass, z. B. die
+  Generalversammlung; er erscheint bei allen Mitgliedern unter «Jetzt aktuell». Mitglieder melden
+  sich an oder ab (mit freiwilliger Bemerkung), bis zum Anmeldeschluss änderbar, und speichern den
+  Termin über «In den Kalender». Ändert der Admin Datum oder Ort, bittet MyTCO um eine Prüfung der
+  Antwort (FR-27 bis FR-32). Die Kalenderdatei ist ohne Login über einen nicht erratbaren Link
+  abrufbar (SI-19). Datenschutzkonzept, -erklärung, Fachmodell, Rollen und Rechte, Leitbild
+  (Auswahlfläche, mehrzeiliges Feld, Kennzahl) nachgeführt; `make seed` legt eine Beispiel-GV an.
+- Handy im WLAN: `make dev-handy` startet den Entwicklungsserver für ein Handy im selben WLAN
+  (Login per Code, ohne Passkey); ein E2E-Test belegt, dass der Produktions-Build das
+  Login-Cookie weiterhin nur über HTTPS schickt (SI-06). Feste Namen `mytco-admin.local` und
+  `mytco-mitglied.local` für zwei Verknüpfungen mit getrenntem Login, Links auf die Mails der
+  beiden Personas in Mailpit; `make seed` gibt Brief-Codes für Erika (Admin) und Kurt (Mitglied) aus. Datenbank und
+  Mailpit lokal nur noch auf dem Laptop erreichbar.
+- Datenschutzerklärung in der App (DS-09): Seite «Datenschutz» ohne Login, Link in der Fusszeile,
+  Text direkt aus `docs/datenschutzerklaerung.md` (als Entwurf markiert, Freigabe K-06.2 offen).
+- Kopfleiste und Reiter reichen auf dem iPhone unter Status- und Home-Balken, die Kopfleiste bleibt
+  beim Scrollen oben stehen, seitliche Abstände fürs Querformat. Gegen den Schleier von iOS 26
+  oben in der App vom Startbildschirm ein festes, deckendes Statusleisten-Band; ohne
+  `black-translucent`, das den Schutz abschaltete. In der App vom Startbildschirm grüner
+  Seitenhintergrund, damit beim Scrollen kein heller Schleier bleibt. Am iPhone bestätigt;
+  bestehende Verknüpfungen müssen einmal neu auf den Home-Bildschirm.
+- Anleitung zum Startbildschirm (iPhone): deutlicher Hinweis für die Safari-Tablayouts «Unten» und
+  «Oben» (dort gleich auf «Teilen», weiter bei Schritt 3), im Brief «••• (falls da)». Die
+  Animation zeigt weiterhin nur das Vorgabe-Layout «Kompakt» (Entscheid Projektleiter).
+- Ruhiges App-Gefühl (#54): Der angetippte Reiter ist sofort aktiv, sein Balken gleitet hinüber,
+  der Inhalt blendet über; Unterseiten schieben sich von rechts herein und mit «‹ Zurück»
+  wieder hinaus. Kopfleiste und Reiter stehen fest, nur der Inhalt scrollt; ein Tipp auf einen
+  Reiter wirkt auch, während der Inhalt nachläuft. Jeder Reiter beginnt oben. Im Profil sind die
+  Aufklappbereiche anfangs zu und bleiben offen, was man offen lässt. Mit offener Tastatur sind
+  die Reiter weg, die Eingabetaste springt mit «Weiter» ins nächste Feld.
+  Aufklappbereiche und Rückfrage öffnen weich. Kein grauer Tipp-Blitz, Gedrückt-Zustände,
+  Bedienelemente nicht markierbar, kein Zoom per Doppeltipp, immer hell. Bei «Bewegung
+  reduzieren» alles ohne Bewegung (UI-09 erweitert, neue Bewegungs-Tokens). Die Fusszeile steht
+  nur noch vor dem Login und auf der Startseite.
+- Eigene Angaben ändern (#50, Annahmen K-19.1 und K-19.2): Im Profil unter «Meine Angaben»
+  ändert das Mitglied Telefon, Adresse und Lizenznummer selbst; die E-Mail auf einer eigenen
+  Seite mit je einem Code an die bisherige und die neue Adresse (SI-09, Grenzen pro Konto,
+  Adresse und IP). Neu in der Verwaltung die Liste «Für Fairgate»: selbst geänderte
+  Kontaktangaben zum Übertragen nach Fairgate, abhaken mit Eintrag im Änderungsverlauf. Hilfe
+  um «Eigene Angaben ändern» ergänzt.
+
 ## 0.4.0 — Hilfe beim Start, Mitgliederverwaltung und Passkey, nicht ausgeliefert
 
 Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test

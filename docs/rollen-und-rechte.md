@@ -46,12 +46,14 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 |------------------|:----------:|:--------:|:-------------------:|:----------------------:|:-----:|
 | **Mitglieder-Login** | | | | | |
 | Datenschutzerklärung, Login-Seite (DS-09) | L | L | L | L | L |
-| Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Benachrichtigungen (FR-02) | – | S eigene | S eigene | S eigene | S eigene |
-| Eigener Name, Adresse, Geschlecht, Jahrgang (Adresse ändern: hängt an K-19) | – | L eigene | L eigene | L eigene | S |
+| Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Benachrichtigungen (FR-02; E-Mail, Telefon und Lizenznummer: Annahme K-19.1, die E-Mail erst nach zwei Codes, SI-09) | – | S eigene | S eigene | S eigene | S eigene |
+| Eigene Adresse (Annahme K-19.2) | – | S eigene | S eigene | S eigene | S |
+| Eigener Name, Geschlecht, Jahrgang, Mitgliedernummer | – | L eigene | L eigene | L eigene | S |
 | Mitglieder anlegen, bearbeiten, löschen, exportieren (DS-07) | – | – | – | – | S |
 | Neuer Code für einen Brief, Sitzungen beenden | – | – | – | – | S |
 | Rollen vergeben | – | – | – | – | S |
 | Änderungsverlauf (FR-26) | – | – | – | – | L |
+| Liste *Für Fairgate*: selbst geänderte Kontaktangaben sehen und abhaken (A-KONTO-02, Annahme K-19.2) | – | – | – | – | S |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S |
 | E-Mail und Telefon anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L alle (K-42) | L alle (K-42) | S |
 | **CM-Anmeldung** | | | | | |
@@ -69,6 +71,11 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | **Lizenzanträge** | | | | | |
 | Eigener Lizenzantrag (FR-20) | – | S eigene | S eigene | S eigene | S eigene |
 | Lizenzrunde, Antragsliste, Export, abhaken (FR-22) | – | – | – | S | S |
+| **Anlässe** | | | | | |
+| Kommende Anlässe (FR-27) | – | L | L | L | S (erstellen, ändern, löschen) |
+| Eigene Anmeldung zum Anlass, bis Anmeldeschluss (FR-28) | – | S eigene | S eigene | S eigene | S eigene |
+| Anmeldungen aller zum Anlass: Name, Antwort, Bemerkung (Annahme K-50) | – | – | – | – | L |
+| Kalenderdatei eines Anlasses, ohne Personendaten (SI-19) | L über den Link | L | L | L | L |
 
 ## Später
 

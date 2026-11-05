@@ -10,7 +10,7 @@ import {
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import { klappeAuf, pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 
 // Alle Browser kommen von 127.0.0.1 an denselben Server (Grenzen pro IP). Jeder Test braucht
 // darum nur die nötigen Anfragen: ein Brief-Login, ein Admin-Code.
@@ -301,6 +301,64 @@ test('A-MITGLIED-02: zwei Admins am selben Mitglied – die zweite Änderung üb
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
 	// Nur die absichtliche 404 des fehlenden Mitglieds steht in der Konsole.
 	expect(fehler.filter((f) => !/status of 404\b/.test(f))).toEqual([]);
+});
+
+test('A-KONTO-02: Admin sieht die Selbständerung unter Für Fairgate und hakt ab', async ({
+	page,
+	browser,
+	baseURL
+}, info) => {
+	test.skip(info.project.name !== 'desktop', 'nur Desktop'); // skip: Die Verwaltung ist für den Computer gebaut; das Profil am Handy prüft profil.test.ts
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeAdminMitBriefCodeAn('Jana');
+	const nachname = `Probe${randomUUID().slice(0, 8)}`;
+	const mitglied = await legeKontoMitBriefCodeAn('Kurt', nachname);
+
+	// Das Mitglied ändert auf seinem Gerät die Adresse selbst (Annahme K-19.2).
+	const geraet = await browser.newContext({ baseURL });
+	const seite = await geraet.newPage();
+	await meldeAn(seite, mitglied);
+	await seite.goto('/profil');
+	await klappeAuf(seite, 'Meine Angaben');
+	await seite
+		.locator('.kachel')
+		.filter({ has: seite.getByText('Adresse', { exact: true }) })
+		.getByRole('button', { name: 'Ändern' })
+		.click();
+	await seite.getByLabel('Strasse und Nr.').fill('Probeweg 3');
+	await seite.getByLabel('PLZ').fill('4614');
+	await seite.getByLabel('Ort').fill('Hägendorf');
+	await seite.getByRole('button', { name: 'Adresse speichern' }).click();
+	await expect(seite.getByText('Probeweg 3, 4614 Hägendorf')).toBeVisible();
+	await geraet.close();
+
+	// Der Admin sieht den Eintrag mit der geänderten Angabe und ihrem neuen Wert.
+	await oeffneVerwaltung(page, admin);
+	await seitenleiste(page)
+		.getByRole('link', { name: /^Für Fairgate/ })
+		.click();
+	await expect(page).toHaveURL(/\/verwaltung\/fairgate$/);
+	await expect(page.getByRole('heading', { level: 1, name: 'Für Fairgate' })).toBeVisible();
+	const zeile = page.getByRole('row', { name: new RegExp(nachname) });
+	await expect(zeile).toHaveCount(1);
+	await expect(zeile).toContainText(`${nachname}, Kurt`);
+	await expect(zeile).toContainText('Adresse');
+	await expect(zeile).toContainText('Probeweg 3, 4614 Hägendorf');
+	await pruefeBildschirm(page, info, 'fairgate');
+
+	// Abhaken: Die Zeile verschwindet, der Verlauf nennt, wer übertragen hat.
+	await zeile.getByRole('button', { name: 'In Fairgate übertragen' }).click();
+	await expect(zeile).toHaveCount(0);
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	const verlauf = page.getByRole('table', { name: 'Verlauf' });
+	await expect(verlauf.getByRole('row', { name: /In Fairgate übertragen/ })).toContainText(
+		'Jana Muster'
+	);
+	await expect(verlauf.getByRole('row', { name: /Strasse geändert/ })).toContainText(
+		`Kurt ${nachname} (selbst)`
+	);
+	await expect(verlauf).not.toContainText('Probeweg 3');
+	expect(fehler).toEqual([]);
 });
 
 test('UI-06: Verwaltung nicht erreichbar – Fehlerseite mit Rahmen, Meldung in Worten und Weg zurück', async ({

@@ -116,6 +116,18 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-04 — E2E im iPhone-Profil (WebKit, Linux-CI) scheitert vereinzelt, ohne sich zu wiederholen
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/hilfe.test.ts:23` (Klick auf «Hilfe» in der Fusszeile), CI-Lauf 41900100215 auf `dev`.
+
+**Beobachtung:** Beim Merge des Releases 0.4.0 nach `dev` blieb der Klick 30 Sekunden bei «waiting for element to be visible, enabled and stable» hängen; Screenshot und Seitenbaum zeigen die Login-Seite normal, auf `/login` läuft keine Animation. Der Neustart desselben Jobs und der PR-Lauf auf demselben Code waren grün. Früher am selben Tag trafen zwei rote Läufe ebenfalls nur das iPhone-Profil, aber andere Tests (`verwaltung.test.ts:177`, `passkey.test.ts:145`).
+
+**Ursprung:** Release 0.4.0, CI auf `dev`.
+
+**Einschätzung:** Vermutlich die Stabilitätsprüfung von Playwright unter WebKit auf einer ausgelasteten Linux-Maschine, nicht die App; nicht belegt. Häufen sich solche Ausreisser, lohnt ein Blick auf Wiederholungen (`retries`) nur in der CI oder auf die Zahl paralleler Worker im iPhone-Profil.
+
 ### 2026-11-04 — Doku-Abgleich vor 0.4.0: offene Punkte ohne Sofort-Fix
 
 **Thema:** Betrieb
@@ -146,7 +158,7 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Fundort:** `src/lib/ui/Zeichnung*.svelte`, `src/lib/ui/Anleitung.svelte`, `src/lib/server/brief/symbole.ts`, `src/routes/willkommen/+page.svelte`, `src/routes/hilfe/+page.svelte`, `src/lib/hilfe/installation.svelte.ts`.
 
-**Beobachtung:** (1) Die Zeichnung der Anleitung zeigt fest `my.tcolten.ch`, auch auf Test. (2) Teilen- und Menü-Symbol stehen in Anleitung, Zeichnung und Brief je einzeln; ändert Apple oder Google ein Symbol, sind drei Stellen nachzuziehen. (3) Nach «Abbrechen» im Android-Dialog ist die Karte «Zuerst auf den Startbildschirm» bis auf Titel und Satz leer, die Anleitung steht im offenen Bereich «Klappt nicht?» darunter. (4) Solange der Android-Dialog offen ist, baut die Seite kurz um (Anleitung in der Karte, Bereich «Klappt nicht?» weg). (5) MyTCO hält Chromes eigenen Install-Hinweis auf jeder Seite zurück, die Taste gibt es nur auf der Einstiegsseite. (6) «‹ Zurück» auf der Hilfe führt immer nach `/`, im Handy-Browser also zur Einstiegsseite statt zurück zum Login. (7) Annahme des Projektleiters für die Anleitung: iPhones mit iOS 26 oder neuer, Android-Handys höchstens 5 Jahre alt; betrifft den Eintrag zur Untergrenze unten.
+**Beobachtung:** (1) Die Zeichnung der Anleitung zeigt fest `my.tcolten.ch`, auch auf Test. (2) Teilen- und Menü-Symbol stehen in Anleitung, Zeichnung und Brief je einzeln; ändert Apple oder Google ein Symbol, sind vier Stellen nachzuziehen (das Teilen-Symbol steht seit dem Layout-Hinweis zweimal in der Anleitung). (3) Nach «Abbrechen» im Android-Dialog ist die Karte «Zuerst auf den Startbildschirm» bis auf Titel und Satz leer, die Anleitung steht im offenen Bereich «Klappt nicht?» darunter. (4) Solange der Android-Dialog offen ist, baut die Seite kurz um (Anleitung in der Karte, Bereich «Klappt nicht?» weg). (5) MyTCO hält Chromes eigenen Install-Hinweis auf jeder Seite zurück, die Taste gibt es nur auf der Einstiegsseite. (6) «‹ Zurück» auf der Hilfe führt immer nach `/`, im Handy-Browser also zur Einstiegsseite statt zurück zum Login. (7) Annahme des Projektleiters für die Anleitung: iPhones mit iOS 26 oder neuer, Android-Handys höchstens 5 Jahre alt; betrifft den Eintrag zur Untergrenze unten.
 
 **Ursprung:** #47, abschliessendes Code-Review und cas-reviewer.
 
@@ -199,3 +211,354 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (cas-reviewer) der Nacharbeit zu #43.
 
 **Einschätzung:** Bei zwei bis drei Admins selten. Ein Fix übernimmt das Muster der Angaben (geladene Rollen mitschicken, in der Transaktion vergleichen, 409).
+### 2026-11-05 — Datenschutz-Seite zeigt Platzhalter und interne Kennungen
+
+**Thema:** App
+
+**Fundort:** `/datenschutz` (Text aus `docs/datenschutzerklaerung.md`)
+
+**Beobachtung:** Die Seite zeigt «[Ansprechperson]», «[Datum]», «[E-Mail-Dienst]» und «Vorschlag K-38», sichtbar als Entwurf markiert.
+
+**Ursprung:** Review (cas-reviewer) zum Handy-Feedback, Session vom 05.11.2026.
+
+**Einschätzung:** Für lokale Tests passend. Vor einer Auslieferung auf Live ausfüllen und freigeben lassen (K-06.2, DS-09; DoD von #40 und #48).
+
+### 2026-11-05 — Verwaltung am Handy: Kopfleiste bleibt nicht oben stehen
+
+**Thema:** Verwaltung
+
+**Fundort:** `src/routes/verwaltung/+layout.svelte`, `.seitenleiste .kopf` in `basis.css`
+
+**Beobachtung:** In der Mitglieder-App bleibt die Kopfleiste beim Scrollen oben stehen. In der Verwaltung steckt sie in der Seitenleiste und scrollt auf dem schmalen Bildschirm mit weg; unter Uhr und Akku liegt dann nur noch das grüne Statusleisten-Band. Dazu: In der Mitglieder-App kann die mitlaufende Kopfleiste ein fokussiertes Element verdecken (WCAG 2.4.11), `scroll-padding-top` deckt nur das Band ab, nicht die Höhe der Kopfleiste.
+
+**Ursprung:** Review (cas-reviewer) zum Handy-Feedback, Session vom 05.11.2026.
+
+**Einschätzung:** Die Verwaltung ist vor allem für den PC gedacht. Am iPhone prüfen; falls störend, die Seitenleiste auf dem Handy als Kopf mit Menü neu denken (gehört in den Design-Ablauf).
+
+### 2026-11-05 — Datenschutz-Seite ist am Handy eine lange Textwand
+
+**Thema:** App
+
+**Fundort:** `/datenschutz` (`src/routes/datenschutz/+page.svelte`)
+
+**Beobachtung:** Die ganze Erklärung steht in einer Karte; am iPhone sind das mehrere Bildschirmlängen ohne Gliederung (Screenshot im E2E `datenschutz.test.ts`).
+
+**Ursprung:** Handy-Test des Projektleiters, Session vom 05.11.2026.
+
+**Einschätzung:** Passt zur Vorgabe «grosse Seiten aufklappbar»: jeder fette Abschnittsanfang («Welche Daten:», «Wozu:» …) ein Aufklappbereich wie in der Hilfe. Über den Design-Ablauf, vor der Freigabe durch den Vorstand (K-06.2).
+
+### 2026-11-05 — Lokale Logins hängen am unbenannten Docker-Speicher
+
+**Thema:** Betrieb
+
+**Fundort:** `docker-compose.yml` (Service `db`, kein benanntes Volume)
+
+**Beobachtung:** Die lokale Datenbank liegt in einem anonymen Volume. `docker compose down` oder ein Zurücksetzen von Docker Desktop legt beim nächsten `make db` eine leere Datenbank an; die Handy-Verknüpfungen aus `make dev-handy` sind dann abgemeldet, Brief-Codes weg.
+
+**Ursprung:** Frage des Projektleiters, ob die Verknüpfungen später wieder gehen, Session vom 05.11.2026.
+
+**Einschätzung:** Für erfundene Daten verkraftbar (`make seed` gibt neue Codes). Ein benanntes Volume würde es robuster machen, kostet beim Umstellen einmal die vorhandenen Daten.
+
+### 2026-11-05 — CI: Browser-Installation scheitert an gesperrtem apt
+
+**Thema:** Betrieb
+
+**Fundort:** `.github/workflows/check.yml`, Job «E2E (Playwright)», Schritt Browser-Installation (`--with-deps`)
+
+**Beobachtung:** Lauf 41999966173 auf `dev` (Merge `fix/anleitung-hinweis`) brach ab mit «Could not get lock /var/lib/dpkg/lock-frontend. It is held by process … (apt-get)», Code 100. Der nächste Lauf auf demselben Code lief durch.
+
+**Ursprung:** Wrap-up der Session vom 05.11.2026.
+
+**Einschätzung:** Störung des GitHub-Runners (apt läuft im Hintergrund), nicht des Codes. Häuft es sich: vor der Installation auf die apt-Sperre warten oder den Job neu starten lassen.
+
+### 2026-11-05 — Leitbild sagt «Verwaltung über Profil», die App zeigt sie auf der Startseite
+
+**Thema:** Verwaltung
+
+**Fundort:** `docs/ui-leitbild.md` (Layout und Navigation, «Verwaltung … erreichbar über einen Eintrag unter *Profil*»), `src/routes/+page.svelte:39`
+
+**Beobachtung:** Das Leitbild nennt einen Eintrag unter Profil als Weg in die Verwaltung. Im Code steht die Kachel «Verwaltung» auf der Startseite; im Profil gibt es keinen solchen Eintrag.
+
+**Ursprung:** #54 (Ruhiges App-Gefühl), beim Nachführen des Leitbilds.
+
+**Einschätzung:** Doku-Drift, keine Funktionsstörung. Entscheiden, wo der Eintrag hingehört, dann Leitbild oder Code angleichen.
+
+### 2026-11-05 — Mockup «Hilfe beim Start» zeigt die Fusszeile ohne «Datenschutz»
+
+**Thema:** App
+
+**Fundort:** `docs/ui-mockups/hilfe.html` (Fusszeilen der Bildschirme Einstiegsseite und Login)
+
+**Beobachtung:** Die Mockups zeigen «Hilfe · Version», die App seit DS-09 «Hilfe · Datenschutz · Version». Die Abweichung ist älter als #54.
+
+**Ursprung:** Review (cas-reviewer) zu #54.
+
+**Einschätzung:** Kosmetik in der Doku. Beim nächsten Umbau der Mockups (Design-Ablauf mit Artifacts) mitnehmen.
+
+### 2026-11-05 — Reiter: aria-current wechselt, bevor die neue Seite da ist
+
+**Thema:** App
+
+**Fundort:** `src/lib/ui/Reiter.svelte` (`aktiv` folgt `navigating.to`)
+
+**Beobachtung:** Damit der Reiter sofort reagiert, folgt auch `aria-current` dem Ziel der Navigation. Ein Screenreader kann «Profil, aktuelle Seite» ansagen, während noch Start zu sehen ist; leitet das Laden um, springt es zurück. Sauberer wäre: `aria-current` an `page.route.id`, nur Farbe und Balken (`data-aktiv`) folgen dem Ziel.
+
+**Ursprung:** Code-Review zu #54.
+
+**Einschätzung:** Kurze Zeitspanne (Ladezeit), kein Fehler im Ablauf. Bei der nächsten Arbeit an den Reitern trennen; braucht eine eigene Markierung fürs Aussehen.
+
+### 2026-11-05 — Rückfrage: Ausblenden ohne `overlay` an falscher Stelle
+
+**Thema:** Verwaltung
+
+**Fundort:** `dialog.karte` in `src/lib/design/basis.css`
+
+**Beobachtung:** Browser ohne die CSS-Eigenschaft `overlay` (Firefox, wohl auch Safari) nehmen die Rückfrage beim Schliessen sofort aus der obersten Ebene; die 150 ms Ausblenden laufen dann an ihrer Stelle im Seitenfluss. Ein zweiter Tipp ist abgefangen (`pointer-events: none`).
+
+**Ursprung:** Code-Review zu #54.
+
+**Einschätzung:** Kurz und nur in der Verwaltung. Am Mac in Safari ansehen; stört es, das Ausblenden nur dort zeigen, wo `overlay` unterstützt ist (`@supports`).
+
+### 2026-11-05 — «Für Fairgate» zeigt auch ausgetretene und gelöschte Mitglieder
+
+**Thema:** Verwaltung
+
+**Fundort:** `listeFuerFairgate` in `src/lib/server/admin/fairgate.ts`
+
+**Beobachtung:** Die Liste filtert nicht nach Status. Tritt ein Mitglied aus, nachdem es Angaben selbst geändert hat, bleibt es mit «für Fairgate offen» in der Liste, bis der Admin abhakt.
+
+**Ursprung:** Gesamtreview zu #50.
+
+**Einschätzung:** Hängt am Austritt und Löschen (FR-04, Etappe 3 von #43). Dort entscheiden, ob der Austritt die Markierung löscht oder die Liste nur aktive Mitglieder zeigt.
+
+### 2026-11-05 — «Für Fairgate»: Feinschliff aus den Reviews
+
+**Thema:** Verwaltung
+
+**Fundort:** `src/routes/verwaltung/+layout.ts`, `src/routes/verwaltung/fairgate/+page.svelte`, `src/lib/server/admin/fairgate.ts`
+
+**Beobachtung:** Der Zähler in der Seitenleiste lädt die ganze Liste, nur um sie zu zählen. Hat ein anderer Admin schon abgehakt, verschwindet die Zeile ohne Rückmeldung. Liegt die letzte Selbständerung länger als die Aufbewahrung des Verlaufs zurück, bleiben «Geändert» und «Neue Angaben» leer. Namen erscheinen als «Nachname, Vorname», der Entwurf zeigte «Vorname Nachname».
+
+**Ursprung:** Task- und Gesamtreview zu #50.
+
+**Einschätzung:** Bei der Vereinsgrösse ohne Folgen. Bei der nächsten Arbeit an der Verwaltung mitnehmen.
+
+### 2026-11-05 — Passkey zeigt nach dem E-Mail-Wechsel weiter die alte Adresse
+
+**Thema:** App
+
+**Fundort:** Schlüsselbund des Geräts (Name des Passkeys), `src/lib/server/profil/email-wechsel.ts`
+
+**Beobachtung:** Der Passkey trägt im Schlüsselbund die Adresse, die beim Einrichten galt. Nach einem E-Mail-Wechsel steht dort weiter die alte. Das Anmelden klappt, weil der Passkey an seiner Kennung hängt.
+
+**Ursprung:** Gesamtreview zu #50.
+
+**Einschätzung:** Nur kosmetisch. Prüfen, ob WebAuthn den Namen nachführen kann (Signal-API), sonst in der Hilfe erwähnen.
+
+### 2026-11-05 — Profil: abgelaufene Sitzung beim Speichern zeigt «Störung» statt Login
+
+**Thema:** App
+
+**Fundort:** `src/routes/profil/+page.svelte`, `src/lib/profil/angaben.ts`
+
+**Beobachtung:** Läuft die Sitzung während des Bearbeitens ab, meldet die Seite eine Störung und leitet nicht zur Anmeldung. Die Seite ist zudem auf rund 430 Zeilen gewachsen; ein eigener Baustein «Meine Angaben» wäre leichter zu lesen.
+
+**Ursprung:** Task-Review zu #50 (Verhalten bestand schon vorher bei Passkey und Abmelden).
+
+**Einschätzung:** Selten, die Sitzung hält ein Jahr. Beim nächsten Umbau der Profilseite beides angehen.
+
+### 2026-11-05 — Wartende Login-Mailanfrage bleibt nach dem Abmelden im Gerätespeicher
+
+**Thema:** App
+
+**Fundort:** `abmelden()` in `src/routes/profil/+page.svelte`, `src/lib/login/mailanfrage.ts`
+
+**Beobachtung:** Der E-Mail-Wechsel räumt seinen Eintrag beim Abmelden jetzt ab, die wartende Login-Mailanfrage nicht. Sie verfällt nach 15 Minuten und wird beim nächsten Start der App gelöscht.
+
+**Ursprung:** Gesamtreview zu #50.
+
+**Einschätzung:** Altbestand, kurze Frist. Der Konsequenz halber beim Abmelden ebenfalls löschen; eine Zeile.
+
+### 2026-11-05 — Leitbild hat keinen Baustein für zwei Felder nebeneinander
+
+**Thema:** App
+
+**Fundort:** `docs/ui-leitbild.md`, Adresse im Profil (`src/routes/profil/+page.svelte`)
+
+**Beobachtung:** PLZ und Ort stehen im Profil untereinander, der Entwurf zeigte sie nebeneinander. Ohne Inline-Stile fehlt dafür ein Baustein im Leitbild.
+
+**Ursprung:** Bildvergleich zu #50.
+
+**Einschätzung:** Kein Fehler. Kommt ein zweiter Fall dazu (z. B. Formulare der CM-Anmeldung), einen Baustein «Feldzeile» ins Leitbild aufnehmen.
+
+### 2026-11-05 — E2E: gemeinsame IP-Grenze und geteilte Testdatenbank
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/profil.test.ts`, `tests/e2e/verwaltung.test.ts`, `docs/testkonzept.md`
+
+**Beobachtung:** Alle E2E-Läufe teilen sich die Grenze von 10 Code-Anfragen pro IP und Stunde. Darum prüft nur das iPhone-Projekt den Login mit der neuen Adresse. Die geteilte Testdatenbank füllt zudem die Liste «Für Fairgate» mit Einträgen aus anderen Tests, was den Screenshot unruhig macht.
+
+**Ursprung:** Task 8 zu #50.
+
+**Einschätzung:** Hält, solange die Zahl der Mail-Tests klein bleibt. Kommen weitere dazu, eine Testeinstellung für die Grenzen oder eine IP je Projekt vorsehen.
+
+### 2026-11-05 — Anlass: Kachel und Seite nennen den Anmeldeschluss zu ungenau
+
+**Thema:** App
+
+**Fundort:** `src/lib/anlass/stand.ts`, `src/routes/anlass/[id]/+page.svelte`
+
+**Beobachtung:** Die Kachel sagt nur den Tag («Bitte bis Di, 16. März …»); setzt der Admin den Schluss auf 12.00 Uhr, schliesst die Anmeldung schon mittags. Auf der Anlass-Seite steht nirgends, bis wann sich die Antwort ändern lässt.
+
+**Ursprung:** Code-Review und cas-reviewer zu #52.
+
+**Einschätzung:** Klein. Uhrzeit nennen, wenn sie nicht 23.59 ist; auf der Seite «Antwort änderbar bis …» ergänzen. Mit der Überarbeitung des Vorschlags nach K-50 erledigen.
+
+### 2026-11-05 — Anlass: Kalenderdatei ohne SEQUENCE, Steuerzeichen nicht entfernt, 404 als rohes JSON
+
+**Thema:** App
+
+**Fundort:** `src/lib/server/anlass/kalender.ts`, `src/lib/server/anlass/schnittstellen.ts` (`getKalender`)
+
+**Beobachtung:** Nach einer Terminänderung (FR-32) ersetzen manche Kalender den alten Eintrag beim erneuten Import nicht, weil `SEQUENCE`/`LAST-MODIFIED` fehlen. Steuerzeichen ausser Zeilenumbrüchen werden nicht entfernt (RFC 5545). Für einen gelöschten Anlass zeigt der Browser `{"fehler":"nicht-gefunden"}`, weil der Link ausserhalb der App öffnet.
+
+**Ursprung:** Code-Review und cas-reviewer zu #52.
+
+**Einschätzung:** Klein. `LAST-MODIFIED` aus *Termin geändert am*, Steuerzeichen in `maskiere` entfernen, für 404 kurzen Text liefern. Bei der Handprüfung auf echten Geräten (Release-Checkliste) mit ansehen.
+
+### 2026-11-05 — Verwaltung Anlässe: Meldung bei Zeitumstellung, «Gespeichert» und Zählung ausgetretener Mitglieder
+
+**Thema:** Verwaltung
+
+**Fundort:** `src/lib/server/anlass/angaben.ts`, `src/routes/verwaltung/anlaesse/[id]/+page.svelte`, `ladeAnlassAdmin`
+
+**Beobachtung:** Eine Zeit in der Lücke der Umstellung meldet «Bitte Datum und Zeit angeben.», obwohl beides angegeben ist. Scheitert nach dem Speichern das Neuladen, fehlt «Gespeichert». *kommen* und *kommen nicht* zählen auch Antworten von Mitgliedern, die inzwischen ausgetreten sind; *noch keine Antwort* zählt nur aktive.
+
+**Ursprung:** Code-Review und cas-reviewer zu #52.
+
+**Einschätzung:** Klein. Eigene Meldung für die Umstellung; bei Neuladefehler trotzdem rückmelden; Zählung auf aktive Mitglieder beschränken, sobald der Austritt gebaut ist (Etappe 3 von #43).
+
+### 2026-11-05 — Löschfrist für Anmeldungen zu Anlässen ist versprochen, aber nicht gebaut
+
+**Thema:** Betrieb
+
+**Fundort:** `docs/datenschutz.md` (*Löschen*), `docs/datenschutzerklaerung.md`, DS-06
+
+**Beobachtung:** Datenschutzkonzept und -erklärung nennen «ein Jahr nach dem Anlass» (Vorschlag K-50). Gebaut ist nur das Löschen von Hand mit dem Anlass; das ist im Design so entschieden.
+
+**Ursprung:** Code-Review und cas-reviewer zu #52.
+
+**Einschätzung:** Mit den übrigen Löschfristen bauen (Austritt, K-38). Bis dahin löscht der Admin vergangene Anlässe. Vor dem Live-Gang mit Mitgliederdaten prüfen, ob DS-06 dafür erfüllt sein muss.
+
+### 2026-11-05 — Beispiel-GV in make seed läuft im März 2027 ab
+
+**Thema:** Betrieb
+
+**Fundort:** `scripts/beispiel-anlass.ts`
+
+**Beobachtung:** Die Daten sind fest (Beginn 19.03.2027). Nach dem Anmeldeschluss legt das Skript keine Antworten mehr an, nach dem Beginn erscheint die GV nicht mehr auf der Startseite.
+
+**Ursprung:** Code-Review und cas-reviewer zu #52.
+
+**Einschätzung:** Klein, nur lokal. Daten relativ zu `jetzt` berechnen, wenn der Vorschlag nach dem März 2027 noch vorgezeigt wird.
+
+### 2026-11-05 — E2E «Menü auf der Einstiegsseite bleibt beim weichen Aufklappen richtig gebunden» schlägt auf Android gelegentlich fehl
+
+**Thema:** App
+
+**Fundort:** `tests/e2e/bewegung.test.ts:283` (Projekt `android`)
+
+**Beobachtung:** Lokal in `make check` einmal, bei `--repeat-each 3` einmal von drei Läufen: Die Taste «MyTCO installieren» erscheint nicht innerhalb von 30 s nach `bietetInstallationAn(page, 'dismissed')`. Die übrigen Läufe und die CI auf `dev` sind grün.
+
+**Ursprung:** Abschluss-Prüfung zu #52 (der Branch ändert Einstiegsseite und Test nicht).
+
+**Einschätzung:** Vermutlich Wettlauf zwischen dem nachgestellten Install-Angebot und dem Laden der Seite. Bei der nächsten Arbeit an #54 oder der Einstiegsseite ansehen.
+
+**Nachtrag 2026-11-05:** In der CI auf `dev` (Lauf 42041712102) scheiterte im Projekt `iphone` einmal auch `bewegung.test.ts:210` «Zwei schnelle Reiter-Klicks hintereinander» (`toHaveURL` nach 5 s); der erneute Lauf war grün. Die Tests zu den weichen Seitenwechseln wirken unter WebKit in der CI zeitempfindlich.
+
+**Nachtrag 2026-11-05 (Nacharbeit #54):** Lokal nicht nachgestellt: zwei volle E2E-Läufe und `bewegung.test.ts` mit `--repeat-each 4` auf `iphone` und `android` waren grün, auch beide Tests oben. Seit der Nacharbeit scrollt nur noch der Rollbereich; ob das die Zeitempfindlichkeit in der CI ändert, zeigen erst die nächsten CI-Läufe.
+
+### 2026-11-05 — Mockups zeigen den Rollbereich noch nicht
+
+**Thema:** App
+
+**Fundort:** `docs/ui-mockups/*.html` (Handy-Rahmen `.handy` in `mockup.css`)
+
+**Beobachtung:** Seit der Nacharbeit zu #54 scrollt in der App nur der Rollbereich (`.app.schale` mit `.rollbereich`), Kopfleiste und Reiter stehen fest. Die Mockups bauen die Seite noch ohne `.schale` und `.rollbereich`; im Handy-Rahmen scrollt der ganze Rahmen samt Kopfleiste und Reiter.
+
+**Ursprung:** Nacharbeit #54 (Test am iPhone), beim Abschluss.
+
+**Einschätzung:** Nur Darstellung der Mockups, die App ist richtig. Beim nächsten Mockup-Umbau `.schale` und `.rollbereich` übernehmen und den Rahmen auf `height: 100 %` der Schale stellen.
+
+### 2026-11-05 — E2E A-LOGIN-09 «nach Neuladen weiterhin angemeldet» scheiterte einmal auf dem iPhone
+
+**Thema:** App
+
+**Fundort:** `tests/e2e/login.test.ts` (A-LOGIN-09, Projekt `iphone`)
+
+**Beobachtung:** Im vollen E2E-Lauf des Pre-Push-Hooks einmal rot; einzeln mit `--repeat-each 5` fünfmal grün, in drei vollen Läufen davor ebenfalls grün.
+
+**Ursprung:** Fix-Branch zu #54 (Beschriftung der Eingabetaste), beim Pushen.
+
+**Einschätzung:** Zeitempfindlich unter Last wie die schon erfassten Ausreisser der Seitenwechsel-Tests; zusammen mit diesen ansehen.
+
+### 2026-11-05 — Datenschutzerklärung verspricht Löschung des Änderungsverlaufs nach 12 Monaten, nicht gebaut
+
+**Thema:** Betrieb
+
+**Fundort:** `docs/datenschutzerklaerung.md` (Änderungsverlauf «12 Monate»), FR-26 (geplant), DS-06
+
+**Beobachtung:** Die Erklärung in der App nennt 12 Monate für den Änderungsverlauf; gelöscht wird nichts. Ebenso sind die Fristen bei Austritt und Löschen (FR-04) nicht gebaut. Nur die Zeile zu den Anlässen trägt in `docs/datenschutz.md` den Vermerk «bis die Löschfristen gebaut sind».
+
+**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereiche App sowie Daten/Tests).
+
+**Einschätzung:** Heute ohne Folge (nicht ausgeliefert, Erklärung als Entwurf markiert). Die Release-Checkliste in `docs/testkonzept.md` verlangt jetzt vor dem ersten Live-Release mit Mitgliedern, dass Hinweis an die alte Adresse, Verlauf-Löschung und Anlass-Löschung gebaut sind oder die Erklärung angepasst ist. Mit dem Eintrag zur Löschfrist der Anlass-Anmeldungen zusammen bauen.
+
+### 2026-11-05 — «erstellt von» am Anlass ist ein Personenbezug ohne aufgeführten Zweck
+
+**Thema:** Verwaltung
+
+**Fundort:** `src/lib/server/db/schema.ts` (`anlass.erstellt_von`), `docs/fachmodell.md` (Objekt Anlass, Personendaten «—»), `docs/datenschutz.md` (*Welche Daten*)
+
+**Beobachtung:** Die Spalte verweist auf den Admin, der den Anlass anlegt; sie wird geschrieben, aber nirgends gelesen oder angezeigt. Fachmodell und Datenschutzkonzept führen sie nicht als Personendatum (DS-04: nur aufgeführte Felder).
+
+**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereiche App sowie Daten/Tests).
+
+**Einschätzung:** Entweder streichen (neue Migration) oder mit Zweck ins Konzept und Fachmodell. Entscheid bei der nächsten Arbeit an den Anlässen.
+
+### 2026-11-05 — Test-IDs und Testdaten-Regel weichen vom Testkonzept ab
+
+**Thema:** App
+
+**Fundort:** `src/lib/login/passkey.test.ts` (Tests mit A-LOGIN-10 und A-LOGIN-11), `scripts/pruefungen/test-ids.ts`, `scripts/pruefungen/testdaten.ts`, `scripts/beispiel-anlass.ts`, `docs/testkonzept.md`
+
+**Beobachtung:** Zwei Passkey-Tests nennen A-LOGIN-10 bzw. A-LOGIN-11 (SMS/App, «später»), prüfen aber Passkey-Funktionen (A-LOGIN-07). Die Prüfung `test-ids` lässt die ID irgendwo in der Datei genügen, auch im Kommentar, strenger klingt das Testkonzept («jeder Test nennt im Namen die ID»). `scripts/beispiel-anlass.ts` legt fünf weitere erfundene Mitglieder an; das Testkonzept nennt nur `scripts/erfundene-mitglieder.ts`, und `testdaten` prüft die Datei nicht (nur Dateinamen `seed*`, `erfundene-*`). Die Daten selbst sind erfunden (`@example.org`).
+
+**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereich Daten/Tests).
+
+**Einschätzung:** Kleinere Prüf-Lücken ohne Folge für Mitglieder. IDs umbenennen (prüfen, ob A-LOGIN-10 dann noch einen Test hat), Prüfung `testdaten` um die Datei erweitern, Satz im Testkonzept angleichen.
+
+### 2026-11-05 — Fachmodell und Anforderungen bei den Anlässen nicht ganz nachgeführt
+
+**Thema:** App
+
+**Fundort:** `docs/fachmodell.md` (Überblick-Diagramm), `docs/anforderungen/anforderungen.md` (A-STARTSEITE-04), FR-27, `src/lib/server/anlass/` (`ladeAnlassFuerMitglied`)
+
+**Beobachtung:** Im Überblick-Diagramm fehlen `Anlass` und die Anmeldung (Code-Name `anlassAnmeldung`). A-STARTSEITE-04 steht auf «geplant», die Startseite zeigt aber schon kommende Anlässe mit dem eigenen Stand. FR-27 sagt «sichtbar, solange der Beginn nicht vorbei ist»; die Detailseite liefert auch vergangene Anlässe aus (nur mit der eigenen Antwort).
+
+**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereich Daten/Tests).
+
+**Einschätzung:** Nur Doku-Stand, ohne Datenschutzfolge. Bei der nächsten Arbeit an den Anlässen nachziehen; FR-27 klären (Detailseite nach dem Anlass sperren oder Satz anpassen).
+
+### 2026-11-05 — Datenschutzerklärung siezt, die App duzt
+
+**Thema:** App
+
+**Fundort:** `docs/datenschutzerklaerung.md` gegen `docs/ui-leitbild.md` (Sprache: Du-Form)
+
+**Beobachtung:** Die Erklärung (in der App unter «Datenschutz») spricht die Mitglieder mit «Sie» an, Leitbild, Hilfe und App duzen.
+
+**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereich App).
+
+**Einschätzung:** Entscheid des Projektleiters bzw. Vorstands zusammen mit der Freigabe der Erklärung (K-06.2).

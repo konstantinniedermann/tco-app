@@ -120,7 +120,7 @@
 		<li><span>«Als Web-App öffnen» muss eingeschaltet sein. Tippe auf «Hinzufügen».</span></li>
 		<li class="anleitung-fertig"><span><strong>Fertig!</strong> Verlass jetzt den Browser und starte MyTCO über das neue Symbol auf deinem Startbildschirm.</span></li>
 	</ol>
-	<p class="leise">Siehst du das Teilen-Symbol schon direkt in der Leiste? Dann tipp gleich darauf.</p>
+	<p class="leise"><strong>Kein ••• unten rechts?</strong> Ist in Safari das Tablayout «Unten» oder «Oben» eingestellt, tippst du direkt auf <svg class="symbol" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2"/></svg> «Teilen» und machst bei Schritt 3 weiter.</p>
 </template>
 
 <template id="schritte-android">
@@ -260,18 +260,28 @@
 						<li>Bestätige mit Face ID, Fingerabdruck oder PIN.</li>
 					</ol>
 				</details>
+				<details class="karte klappe">
+					<summary class="klappe-titel">Eigene Angaben ändern</summary>
+					<p>E-Mail, Telefon, Adresse und Lizenznummer änderst du selbst: unter Profil › Meine Angaben bei der Angabe auf «Ändern» tippen.</p>
+					<p>Deine E-Mail ist zugleich dein Login. Darum braucht eine neue E-Mail zwei Codes:</p>
+					<ol>
+						<li>Gib die neue Adresse ein und tippe auf «Codes senden».</li>
+						<li>Je ein Code geht an die bisherige und an die neue Adresse.</li>
+						<li>Tippe beide Codes ein. Sie gelten 15 Minuten.</li>
+					</ol>
+					<p class="leise">Kommst du nicht mehr an die bisherige Adresse, oder stimmen Name oder Jahrgang nicht? Dann ändert der Admin es für dich. Wende dich an den Kontakt unten.</p>
+				</details>
 				<div class="karte">
 					<h2>Fragen?</h2>
 					<p>Klappt etwas nicht? Melde dich bei <a href="#kontakt">[Kontakt aus K-21]</a>.</p>
 				</div>
 			</main>
-			<footer class="inhalt leise"><p><a href="#hilfe" aria-current="page">Hilfe</a> · Version 0.5.0</p></footer>
 		</div>
 		<figcaption class="leise">
 			<strong>5 · Hilfe</strong>, ohne Login erreichbar, über den Link «Hilfe» in der Fusszeile
-			jeder Seite. Jedes Thema ein Aufklappbereich (zum Ausprobieren aufklappen), das Thema fürs
+			vor dem Login und auf der Startseite; die Hilfe selbst hat keine Fusszeile (#54). Jedes Thema ein Aufklappbereich (zum Ausprobieren aufklappen), das Thema fürs
 			eigene Handy zuoberst. Kontakt als eigene Karte.
-			<span class="mockup-hinweis">«Eigene Angaben ändern» kommt mit A-KONTO-01. Kontakt offen (K-21).</span>
+			<span class="mockup-hinweis">«Eigene Angaben ändern» mit A-KONTO-01 (#50, Annahmen K-19.1 und K-19.2). Kontakt offen (K-21).</span>
 		</figcaption>
 	</figure>
 

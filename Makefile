@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
+.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev dev-handy seed admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -51,7 +51,10 @@ db: voraussetzungen-docker ## Lokale Datenbank und Mail-Fänger Mailpit starten 
 dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einstellungen aus .env)
 	node --env-file=.env node_modules/vite/bin/vite.js dev
 
-seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 3 erfundene Mitglieder anlegen, Brief-Code ausgeben (Einstellungen aus .env)
+dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs iPhone im selben WLAN mit festen Namen für Erika und Kurt (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
+	./scripts/dev-handy.sh
+
+seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 3 erfundene Mitglieder und eine Beispiel-GV anlegen, Brief-Codes für Erika (Admin) und Kurt (Mitglied) ausgeben (Einstellungen aus .env)
 	node --env-file=.env scripts/migrate.ts
 	node --env-file=.env scripts/seed-lokal.ts
 

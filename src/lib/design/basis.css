@@ -70,6 +70,45 @@ a {
 	outline-color: var(--farbe-marke-hell);
 }
 
+/*
+ * Bedienung wie in einer App (Leitbild «Bewegung und Bedienung»): MyTCO ist immer hell, kein
+ * grauer Tipp-Blitz (dafür Gedrückt-Zustände bei den Bausteinen), Doppeltipp zoomt nicht
+ * (zwei Finger schon), die Schrift bläht sich im Querformat nicht auf.
+ */
+:root {
+	color-scheme: light;
+}
+
+html {
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
+/* Bedienelemente lassen sich nicht markieren und öffnen beim langen Drücken kein Link-Menü */
+.kopf,
+.reiter,
+.taste-haupt,
+.taste-neben,
+.zurueck,
+a.kachel,
+.klappe-titel {
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none;
+}
+
+a:active {
+	background-color: var(--farbe-marke-zart);
+}
+
+/* Auf grünen Flächen wäre das helle Grün unter weisser Schrift kaum lesbar */
+.kopf a:active,
+.seitenleiste a:active {
+	background-color: transparent;
+}
+
 img {
 	max-width: 100%;
 	height: auto;
@@ -78,7 +117,8 @@ img {
 /*
  * Seitenaufbau. .app ist der Rahmen der ganzen App und ein Container: Das PC-Layout richtet
  * sich nach seiner Breite, nicht nach dem Fenster (so zeigen auch die Mockups das richtige
- * Layout). Layout-Einschluss: Überlagerungen nur mit <dialog>, nicht mit position: fixed.
+ * Layout). Layout-Einschluss: Überlagerungen nur mit <dialog>, nicht mit position: fixed
+ * (Ausnahme: .statusleiste ausserhalb von .app).
  */
 .app {
 	container: app / inline-size;
@@ -91,17 +131,115 @@ img {
 	flex: 1;
 }
 
+/*
+ * Mitglieder-App (UI-Leitbild, Layout): genau so hoch wie der sichtbare Bildschirm, Kopfleiste
+ * und Reiter stehen fest, nur der Rollbereich scrollt. So wirkt ein Tipp auf einen Reiter auch,
+ * während der Inhalt nachläuft (Safari hält beim Nachlaufen sonst nur das Scrollen an). Mit
+ * offener Tastatur setzt src/lib/ui/tastatur.ts --hoehe-sichtbar: die App endet darüber.
+ */
+.schale {
+	height: var(--hoehe-sichtbar, 100dvh);
+	min-height: 0;
+	overflow: hidden;
+}
+
+html:has(.schale) {
+	overscroll-behavior: none;
+}
+
+.rollbereich {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	overscroll-behavior-y: contain;
+}
+
+.rollbereich > main {
+	flex: 1;
+}
+
+/* Eingabe mit Tastatur: Die Tastatur steht an Stelle der Reiter (nur Handy-Layout, Finger) */
+@media (pointer: coarse) {
+	@container app (width < 60rem) {
+		html[data-tastatur] .reiter {
+			display: none;
+		}
+	}
+}
+
 .inhalt {
 	/* width: 100 %, sonst schrumpft der Bereich in der Flex-Spalte von .app auf seinen Inhalt */
 	width: 100%;
 	max-width: var(--breite-inhalt);
 	margin: 0 auto;
 	padding: var(--abstand-5) var(--abstand-4) var(--abstand-6);
+	/* Querformat: nicht unter Notch oder Dynamic Island (viewport-fit=cover in app.html) */
+	padding-inline: max(var(--abstand-4), env(safe-area-inset-left))
+		max(var(--abstand-4), env(safe-area-inset-right));
+}
+
+/* Ohne Reiter ist die Fusszeile zuunterst, ohne beide der Inhalt: Abstand über dem Home-Balken */
+.app > footer.inhalt:last-child,
+.app > main.inhalt:last-child,
+.rollbereich:last-child > .inhalt:last-child {
+	padding-bottom: calc(var(--abstand-6) + env(safe-area-inset-bottom));
 }
 
 .leise {
 	color: var(--farbe-text-leise);
 	font-size: var(--groesse-klein);
+}
+
+/*
+ * Statusleisten-Band (UI-Leitbild): iOS legt über Web-Apps vom Startbildschirm oben einen
+ * Schleier, ausser oben in der Mitte liegt ein fester oder mitlaufender (sticky), deckender, fast
+ * bildschirmbreiter Streifen über 10 px. Steht ausserhalb von .app (Container), darum darf es hier position: fixed sein.
+ * Im Browser ist es so hoch wie die Statusleiste (am PC 0).
+ */
+.statusleiste {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 2;
+	height: env(safe-area-inset-top);
+	background: var(--farbe-marke);
+}
+
+/* Ein Fokussprung landet nicht unter dem Band (WCAG 2.4.11) */
+html {
+	scroll-padding-top: env(safe-area-inset-top);
+}
+
+/*
+ * Nur in der iPhone-App vom Startbildschirm (standalone; -webkit-touch-callout gibt es nur auf
+ * iOS, so bleiben installierte Apps auf Android und am PC unverändert): Das Band reicht über den
+ * oberen Rand der Kopfleiste (gleiches Grün, unsichtbar) und bleibt so über 10 px, auch wenn iOS
+ * den Abstand als 0 meldet. Der grüne Seitenhintergrund färbt den Rest-Schleier beim Scrollen
+ * grün. Am iPhone geprüft (Spike 05.11.2026). In der Verwaltung scrollt die Kopfleiste mit der
+ * Seitenleiste weg, dort bleibt das Band so hoch wie die Statusleiste.
+ */
+@supports (-webkit-touch-callout: default) {
+	@media (display-mode: standalone) {
+		.statusleiste:not(.statusleiste-verwaltung) {
+			height: calc(env(safe-area-inset-top) + var(--abstand-3));
+		}
+
+		html:has(.statusleiste:not(.statusleiste-verwaltung)) {
+			scroll-padding-top: calc(env(safe-area-inset-top) + var(--abstand-3));
+		}
+
+		html,
+		body {
+			background: var(--farbe-marke);
+		}
+
+		.app {
+			background: var(--farbe-hintergrund);
+		}
+	}
 }
 
 /* Kopfleiste */
@@ -111,6 +249,14 @@ img {
 	align-items: center;
 	gap: var(--abstand-3);
 	padding: var(--abstand-3) var(--abstand-4);
+	/* Bis unter die Statusleiste (viewport-fit=cover in app.html); am PC ist der Abstand 0.
+	   Bleibt oben stehen, sonst läuft beim Scrollen Inhalt unter Uhr und Akku durch. */
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	padding-top: calc(var(--abstand-3) + env(safe-area-inset-top));
+	padding-inline: max(var(--abstand-4), env(safe-area-inset-left))
+		max(var(--abstand-4), env(safe-area-inset-right));
 	background: var(--farbe-marke);
 	color: var(--farbe-flaeche);
 	font-size: var(--groesse-gross);
@@ -131,6 +277,8 @@ img {
 	position: sticky;
 	bottom: 0;
 	display: flex;
+	/* Über dem Home-Balken des iPhones */
+	padding-bottom: env(safe-area-inset-bottom);
 	background: var(--farbe-flaeche);
 	border-top: var(--rand-duenn) solid var(--farbe-linie);
 }
@@ -153,7 +301,62 @@ img {
 .reiter a[aria-current='page'] {
 	color: var(--farbe-marke);
 	font-weight: 700;
-	box-shadow: inset 0 var(--rand-akzent) 0 var(--farbe-marke);
+}
+
+/* Gedrückt: grün, Symbol etwas kleiner; kein Hintergrund wie bei Textlinks */
+.reiter a:active {
+	color: var(--farbe-marke);
+	background-color: transparent;
+}
+
+.reiter a .symbol {
+	transition: transform var(--dauer-kurz) var(--kurve-standard);
+}
+
+.reiter a:active .symbol {
+	transform: scale(0.9);
+}
+
+/*
+ * Balken über dem aktiven Reiter: ein einziges Element, das zum gewählten Reiter gleitet
+ * (UI-09). Breite und Lage aus data-anzahl und data-aktiv am <nav>; style-Attribute sind
+ * im Markup verboten (design-festwerte).
+ */
+.reiter-balken {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: var(--rand-akzent);
+	background: var(--farbe-marke);
+	transition: transform var(--dauer-mittel) var(--kurve-standard);
+}
+
+.reiter[data-anzahl='2'] .reiter-balken {
+	width: 50%;
+}
+
+.reiter[data-anzahl='3'] .reiter-balken {
+	width: calc(100% / 3);
+}
+
+.reiter[data-anzahl='4'] .reiter-balken {
+	width: 25%;
+}
+
+.reiter[data-aktiv='-1'] .reiter-balken {
+	display: none;
+}
+
+.reiter[data-aktiv='1'] .reiter-balken {
+	transform: translateX(100%);
+}
+
+.reiter[data-aktiv='2'] .reiter-balken {
+	transform: translateX(200%);
+}
+
+.reiter[data-aktiv='3'] .reiter-balken {
+	transform: translateX(300%);
 }
 
 /* Seitenleiste (nur Verwaltung) */
@@ -161,6 +364,8 @@ img {
 	background: var(--farbe-marke-dunkel);
 	color: var(--farbe-flaeche);
 	padding: var(--abstand-4) 0;
+	/* Querformat auf dem iPhone: Links nicht unter der Notch */
+	padding-left: env(safe-area-inset-left);
 }
 
 .seitenleiste-bereich {
@@ -221,6 +426,10 @@ img {
 	border: var(--rand-dick) solid var(--farbe-marke);
 }
 
+.taste-neben:active {
+	background: var(--farbe-marke-zart);
+}
+
 .taste-breit {
 	display: flex;
 	width: 100%;
@@ -239,6 +448,7 @@ img {
 .zurueck {
 	display: inline-block;
 	margin-bottom: var(--abstand-3);
+	border-radius: var(--radius);
 }
 
 /* Eingabefelder */
@@ -260,15 +470,18 @@ img {
 }
 
 .feld input,
-.feld select {
+.feld select,
+.feld textarea {
 	display: block;
 }
 
 /* Gemeinsames Aussehen der Felder, auch in der Feld-Zeile der Verwaltung */
 .feld input,
 .feld select,
+.feld textarea,
 .feld-zeile input,
-.feld-zeile select {
+.feld-zeile select,
+.feld-zeile textarea {
 	width: 100%;
 	min-height: var(--tippflaeche);
 	padding: var(--abstand-3);
@@ -306,6 +519,79 @@ img {
 	margin-top: 0;
 }
 
+.feld textarea,
+.feld-zeile textarea {
+	resize: vertical;
+}
+
+/* Auswahlfläche: eine Wahl aus wenigen als Fläche (Radio) */
+.auswahl {
+	display: flex;
+	align-items: center;
+	gap: var(--abstand-3);
+	min-height: var(--tippflaeche);
+	padding: var(--abstand-2) var(--abstand-3);
+	margin-bottom: var(--abstand-2);
+	border: var(--rand-dick) solid var(--farbe-rand);
+	border-radius: var(--radius);
+	background: var(--farbe-flaeche);
+	cursor: pointer;
+}
+
+.auswahl input {
+	width: var(--groesse-symbol);
+	height: var(--groesse-symbol);
+	margin: 0;
+	flex-shrink: 0;
+	accent-color: var(--farbe-marke);
+}
+
+.auswahl:has(input:checked) {
+	border-color: var(--farbe-marke);
+	background: var(--farbe-marke-zart);
+	font-weight: 700;
+}
+
+fieldset.auswahl-gruppe {
+	margin: 0 0 var(--abstand-3);
+	padding: 0;
+	border: 0;
+}
+
+fieldset.auswahl-gruppe legend {
+	padding: 0;
+	margin-bottom: var(--abstand-2);
+	font-weight: 600;
+}
+
+/* Mehrzeiliger Text, wie eingegeben (Einladung eines Anlasses) */
+.mehrzeilig {
+	white-space: pre-line;
+}
+
+/* Kennzahlen (nur Verwaltung) */
+.kennzahlen {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--abstand-3);
+	margin-bottom: var(--abstand-4);
+}
+
+.kennzahl {
+	flex: 1 1 10em;
+	background: var(--farbe-flaeche);
+	border-radius: var(--radius);
+	padding: var(--abstand-3) var(--abstand-4);
+	box-shadow: var(--schatten-karte);
+}
+
+.kennzahl strong {
+	display: block;
+	font-size: var(--groesse-titel);
+	line-height: var(--zeilenhoehe-titel);
+	font-variant-numeric: tabular-nums;
+}
+
 /* Karten und Kacheln */
 .karte {
 	background: var(--farbe-flaeche);
@@ -323,6 +609,66 @@ dialog.karte {
 	border: 0;
 	max-width: var(--breite-inhalt);
 	color: var(--farbe-text);
+}
+
+/*
+ * Rückfrage blendet weich ein und schneller aus (UI-09). Wo der Browser `@starting-style`
+ * oder `allow-discrete` nicht kennt, erscheint und verschwindet sie wie bisher sofort.
+ */
+dialog.karte {
+	opacity: 0;
+	transform: scale(0.94);
+	transition:
+		opacity var(--dauer-kurz) linear,
+		transform var(--dauer-kurz) var(--kurve-standard),
+		overlay var(--dauer-kurz) allow-discrete,
+		display var(--dauer-kurz) allow-discrete;
+}
+
+dialog.karte[open] {
+	opacity: 1;
+	transform: none;
+	transition-duration: var(--dauer-mittel);
+}
+
+/* Beim Ausblenden nimmt die Rückfrage keinen zweiten Tipp auf «Bestätigen» mehr an */
+dialog.karte:not([open]) {
+	pointer-events: none;
+}
+
+dialog.karte::backdrop {
+	opacity: 0;
+	transition:
+		opacity var(--dauer-kurz) linear,
+		overlay var(--dauer-kurz) allow-discrete,
+		display var(--dauer-kurz) allow-discrete;
+}
+
+dialog.karte[open]::backdrop {
+	opacity: 1;
+}
+
+@starting-style {
+	dialog.karte[open],
+	dialog.karte[open]::backdrop {
+		opacity: 0;
+	}
+
+	dialog.karte[open] {
+		transform: scale(0.94);
+	}
+}
+
+/* Während der Bewegung schneidet der Aufklappbereich ab, was noch nicht Platz hat */
+.klappe-bewegt {
+	overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	dialog.karte,
+	dialog.karte::backdrop {
+		transition: none;
+	}
 }
 
 .klappe-titel {
@@ -344,6 +690,11 @@ dialog.karte {
 	content: '›';
 	color: var(--farbe-marke);
 	font-size: var(--groesse-gross);
+	transition: transform var(--dauer-mittel) var(--kurve-standard);
+}
+
+.klappe-titel:active {
+	background-color: var(--farbe-marke-zart);
 }
 
 .klappe[open] > .klappe-titel::after {
@@ -361,6 +712,15 @@ dialog.karte {
 	gap: var(--abstand-3);
 	color: var(--farbe-text);
 	text-decoration: none;
+	transition:
+		transform var(--dauer-kurz) var(--kurve-standard),
+		background-color var(--dauer-kurz) linear;
+}
+
+/* Nur die ganze Kachel als Link wird gedrückt; eine Kachel mit eigener Taste bleibt ruhig */
+a.kachel:active {
+	background-color: var(--farbe-marke-zart);
+	transform: scale(0.98);
 }
 
 .klappe .kachel {
@@ -1040,6 +1400,121 @@ dialog.karte {
 	top: 12%;
 }
 
+/*
+ * Seitenwechsel (UI-09, Leitbild «Bewegung und Bedienung»): View Transitions, gesteuert über
+ * html[data-uebergang] aus +layout.svelte. Kopfleiste und Statusleisten-Band stehen still.
+ * Reiter stehen beim Überblenden still; beim Schieben gehören sie zur Seite und gleiten mit.
+ */
+.kopf {
+	view-transition-name: kopf;
+}
+
+.statusleiste {
+	view-transition-name: statusleiste;
+}
+
+.reiter {
+	view-transition-name: reiter;
+}
+
+html[data-uebergang='tiefer'] .reiter,
+html[data-uebergang='zurueck'] .reiter {
+	view-transition-name: none;
+}
+
+::view-transition-group(kopf),
+::view-transition-group(statusleiste),
+::view-transition-new(kopf),
+::view-transition-new(statusleiste) {
+	animation: none;
+}
+
+::view-transition-old(kopf),
+::view-transition-old(statusleiste) {
+	display: none;
+}
+
+html[data-uebergang='blende']::view-transition-old(root),
+html[data-uebergang='blende']::view-transition-new(root) {
+	animation-duration: var(--dauer-kurz);
+	animation-timing-function: linear;
+}
+
+/* Der Balken gleitet live im neuen Bild; das alte Bild der Reiter würde ihn doppelt zeigen */
+html[data-uebergang='blende']::view-transition-group(reiter),
+html[data-uebergang='blende']::view-transition-new(reiter) {
+	animation: none;
+}
+
+html[data-uebergang='blende']::view-transition-old(reiter) {
+	display: none;
+}
+
+html[data-uebergang='tiefer']::view-transition-old(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-weicht-links;
+}
+
+html[data-uebergang='tiefer']::view-transition-new(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-von-rechts;
+}
+
+/* Zurück: Die Unterseite liegt oben und schiebt sich nach rechts weg */
+html[data-uebergang='zurueck']::view-transition-old(root) {
+	z-index: 1;
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-nach-rechts;
+}
+
+html[data-uebergang='zurueck']::view-transition-new(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-von-links;
+}
+
+@keyframes uebergang-weicht-links {
+	to {
+		transform: translateX(-28%);
+		filter: brightness(0.92);
+	}
+}
+
+@keyframes uebergang-von-rechts {
+	from {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes uebergang-nach-rechts {
+	to {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes uebergang-von-links {
+	from {
+		transform: translateX(-28%);
+		filter: brightness(0.92);
+	}
+}
+
+/* «Bewegung reduzieren» (UI-09): alles wechselt sofort, auch Balken, Symbol, Kachel und Pfeil */
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+
+	.reiter-balken,
+	.reiter a .symbol,
+	.kachel,
+	.klappe-titel::after {
+		transition: none;
+	}
+
+	.reiter a:active .symbol,
+	a.kachel:active {
+		transform: none;
+	}
+}
+
 /* PC-Layout ab 60em Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
 @container app (min-width: 60rem) {
 	.inhalt {
@@ -1072,6 +1547,11 @@ dialog.karte {
 	.reiter a[aria-current='page'] {
 		color: var(--farbe-flaeche);
 		box-shadow: inset 0 calc(-1 * var(--rand-akzent)) 0 var(--farbe-marke-hell);
+	}
+
+	/* Am PC unterstreicht der aktive Textlink selbst; der gleitende Balken gehört zum Handy */
+	.reiter .reiter-balken {
+		display: none;
 	}
 
 	.reiter a:focus-visible {

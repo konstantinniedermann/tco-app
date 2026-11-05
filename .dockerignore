@@ -3,6 +3,8 @@ node_modules
 build
 .git
 docs
+# Die Seite «Datenschutz» liest ihren Text beim Bauen von hier (DS-09).
+!docs/datenschutzerklaerung.md
 tests
 test-results
 playwright-report

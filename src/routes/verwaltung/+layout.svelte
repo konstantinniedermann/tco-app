@@ -2,7 +2,7 @@
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 
-	let { children } = $props();
+	let { children, data } = $props();
 	const aktuell = (pfad: string) => (page.route.id?.startsWith(pfad) ? 'page' : undefined);
 </script>
 
@@ -18,6 +18,12 @@
 		<div class="seitenleiste-bereich">Admin</div>
 		<a href={resolve('/verwaltung/mitglieder')} aria-current={aktuell('/verwaltung/mitglieder')}
 			>Mitglieder</a
+		>
+		<a href={resolve('/verwaltung/anlaesse')} aria-current={aktuell('/verwaltung/anlaesse')}
+			>Anlässe</a
+		>
+		<a href={resolve('/verwaltung/fairgate')} aria-current={aktuell('/verwaltung/fairgate')}
+			>Für Fairgate{data.fairgateAnzahl === null ? '' : ` (${data.fairgateAnzahl})`}</a
 		>
 		<a href={resolve('/verwaltung/verlauf')} aria-current={aktuell('/verwaltung/verlauf')}
 			>Änderungsverlauf</a

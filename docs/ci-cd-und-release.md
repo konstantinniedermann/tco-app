@@ -248,7 +248,7 @@ ausserhalb des Servers aufbewahrt werden müssen und wo, steht in
 ## Einstellungen der App
 
 Die App liest ihre Einstellungen aus Umgebungsvariablen. Lokal stehen sie in `.env` (Vorlage
-`.env.example`, kopieren); `make dev` und `make seed` brechen ohne diese Datei ab. Fehlt ein
+`.env.example`, kopieren); `make dev`, `make dev-handy`, `make seed` und `make admin` brechen ohne diese Datei ab. Fehlt ein
 `MYTCO_*`-Pflichtwert, startet der Server nicht. Fehlt `DATABASE_URL`, startet er zwar, aber
 `/api/status` meldet einen Fehler und der Login antwortet mit einem Serverfehler. Beim Bauen
 werden sie nicht geprüft.
@@ -286,7 +286,9 @@ Mail-Code über die Schnittstelle von Mailpit.
 dem Rauchtest des Images (beide nur CI; den Rauchtest gibt es lokal einzeln als `make rauchtest`); der Secret-Scan läuft lokal über den Hook bzw. `make secrets`. Die CI läuft bei PRs und
 auf `dev` und `main`, nicht auf Issue-Branches (dort decken die Git-Hooks ab). Änderungen nur
 an der Doku führen trotzdem `make docs` aus, inklusive Test-ID-Prüfung. Ob eine Änderung
-nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits.
+nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits. Doku ist, was unter
+`docs/` liegt oder auf `.md` endet, **ausser `docs/datenschutzerklaerung.md`**: Die App baut
+sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, Image, Version).
 
 | Prüfung | Quelle | Stand |
 |---------|--------|-------|

@@ -2,7 +2,11 @@
 <html lang="de-CH">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- viewport-fit=cover: Die Kopfleiste reicht unter die Statusleiste (UI-Leitbild, Kopfleiste) -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<!-- Kein apple-mobile-web-app-status-bar-style «black-translucent»: Es schaltet ab, dass iOS die
+		     Statusleiste in der Farbe der Kopfleiste füllt, und der Schleier bleibt. iOS liest es nur
+		     beim Hinzufügen zum Home-Bildschirm (UI-Leitbild, Statusleisten-Band). -->
 		<!-- Android/Chrome: Schrift folgt der Systemeinstellung (UI-02, docs/ui-leitbild.md) -->
 		<meta name="text-scale" content="scale" />
 		<!-- Farbe = --farbe-marke (HTML kennt keine Tokens); Annahme K-13.2: Farbkonzept Variante C -->

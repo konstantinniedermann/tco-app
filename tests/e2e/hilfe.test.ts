@@ -10,7 +10,8 @@ const THEMEN_IPHONE_ZUERST = [
 	'Auf den Startbildschirm: iPhone',
 	'Auf den Startbildschirm: Android',
 	'Neuer Code per E-Mail',
-	'Mit Passkey anmelden'
+	'Mit Passkey anmelden',
+	'Eigene Angaben ändern'
 ];
 
 function themen(page: Page) {
@@ -28,12 +29,10 @@ async function oeffneHilfe(page: Page) {
 test('A-HILFE-01: Hilfe ohne Login über die Fusszeile erreichbar', async ({ page }, info) => {
 	const fehler = sammleKonsolenfehler(page);
 	await oeffneHilfe(page);
-	await expect(themen(page)).toHaveCount(4);
+	await expect(themen(page)).toHaveCount(THEMEN_IPHONE_ZUERST.length);
 	await expect(page.locator('.karte', { hasText: 'Fragen?' })).toContainText(KONTAKT);
-	await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Hilfe' })).toHaveAttribute(
-		'aria-current',
-		'page'
-	);
+	// Die Hilfe selbst hat keine Fusszeile (UI-Leitbild, Baustein Fusszeile).
+	await expect(page.getByRole('contentinfo')).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'hilfe');
 	expect(fehler).toEqual([]);
 });
