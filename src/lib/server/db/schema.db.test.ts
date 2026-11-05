@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from './index.ts';
-import { aenderung, konto, kontoRolle, mitglied } from './schema.ts';
+import { aenderung, anlass, anlassAnmeldung, konto, kontoRolle, mitglied } from './schema.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 
@@ -120,5 +120,70 @@ describe('Schema Rollen und Änderungsverlauf', () => {
 		const [rest] = await db.select().from(aenderung).where(eq(aenderung.id, e.id));
 		expect(rest.urheberMitgliedId).toBeNull();
 		expect(rest.mitgliedId).toBe(ziel.mitgliedId);
+	});
+});
+
+describe('Schema Anlass und Anmeldung', () => {
+	const fehlerCode = (f: unknown) => (f as Error & { cause?: { code?: string } }).cause?.code;
+	const fang = (p: Promise<unknown>) =>
+		p.then(
+			() => null,
+			(f: unknown) => f
+		);
+	async function neuerAnlass(werte: Partial<typeof anlass.$inferInsert> = {}) {
+		const [a] = await db
+			.insert(anlass)
+			.values({
+				titel: 'Testanlass',
+				beginn: new Date('2027-03-19T18:30:00Z'),
+				ort: 'Clubhaus',
+				anmeldeschluss: new Date('2027-03-16T22:59:00Z'),
+				kalenderKennung: randomUUID(),
+				...werte
+			})
+			.returning({ id: anlass.id });
+		return a.id;
+	}
+
+	test('FR-29: je Mitglied und Anlass höchstens eine Anmeldung', async () => {
+		const anlassId = await neuerAnlass();
+		const { mitgliedId } = await legeMitgliedAn(db);
+		const zeile = { anlassId, mitgliedId, antwort: 'kommt' as const, geaendertAm: new Date() };
+		await db.insert(anlassAnmeldung).values(zeile);
+		expect(fehlerCode(await fang(db.insert(anlassAnmeldung).values(zeile)))).toBe('23505');
+	});
+
+	test('FR-30: Bemerkung nur bei kommt-nicht', async () => {
+		const anlassId = await neuerAnlass();
+		const { mitgliedId } = await legeMitgliedAn(db);
+		const f = await fang(
+			db.insert(anlassAnmeldung).values({
+				anlassId,
+				mitgliedId,
+				antwort: 'kommt',
+				bemerkung: 'Hallo',
+				geaendertAm: new Date()
+			})
+		);
+		expect(fehlerCode(f)).toBe('23514');
+	});
+
+	test('FR-28: Anmeldeschluss nach Beginn wird abgewiesen', async () => {
+		const f = await fang(neuerAnlass({ anmeldeschluss: new Date('2027-03-20T00:00:00Z') }));
+		expect(fehlerCode(f)).toBe('23514');
+	});
+
+	test('FR-31: Löschen des Anlasses löscht seine Anmeldungen', async () => {
+		const anlassId = await neuerAnlass();
+		const { mitgliedId } = await legeMitgliedAn(db);
+		await db
+			.insert(anlassAnmeldung)
+			.values({ anlassId, mitgliedId, antwort: 'kommt-nicht', geaendertAm: new Date() });
+		await db.delete(anlass).where(eq(anlass.id, anlassId));
+		const rest = await db
+			.select()
+			.from(anlassAnmeldung)
+			.where(eq(anlassAnmeldung.anlassId, anlassId));
+		expect(rest).toHaveLength(0);
 	});
 });
