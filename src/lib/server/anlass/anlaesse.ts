@@ -36,6 +36,11 @@ export type AnlassAdmin = AnlassWerte & {
 };
 
 const neueKennung = () => randomBytes(32).toString('base64url');
+const MINUTE_MS = 60 * 1000;
+
+/** FR-28: Der Anmeldeschluss ist minutengenau; seine Minute zählt ganz dazu. */
+export const istOffen = (anmeldeschluss: Date, jetzt: Date) =>
+	jetzt.getTime() < anmeldeschluss.getTime() + MINUTE_MS;
 
 export async function legeAnlassAn(db: Db, erstelltVon: number, w: AnlassWerte): Promise<number> {
 	const [a] = await db
@@ -100,7 +105,7 @@ function alsAnsicht(z: Zeile, jetzt: Date): AnlassMitglied {
 	const { terminGeaendertAm, geaendertAm, ...rest } = z;
 	return {
 		...rest,
-		offen: jetzt.getTime() <= z.anmeldeschluss.getTime(),
+		offen: istOffen(z.anmeldeschluss, jetzt),
 		zuPruefen:
 			geaendertAm !== null &&
 			terminGeaendertAm !== null &&
@@ -145,7 +150,7 @@ export async function melde(
 			.where(eq(anlass.id, anlassId))
 			.for('share');
 		if (!z) return 'nicht-gefunden';
-		if (jetzt.getTime() > z.anmeldeschluss.getTime()) return 'geschlossen';
+		if (!istOffen(z.anmeldeschluss, jetzt)) return 'geschlossen';
 		const werte = {
 			antwort: a.antwort,
 			bemerkung: a.antwort === 'kommt' ? null : a.bemerkung,

@@ -72,6 +72,21 @@ describe('Anlässe', () => {
 		expect(a).toMatchObject({ antwort: 'kommt', offen: false });
 	});
 
+	test('FR-28: die Minute des Anmeldeschlusses zählt ganz, 59 Sekunden danach geht noch', async () => {
+		const { id, w } = await neu();
+		const m = await legeMitgliedAn(db);
+		const sekunde = (n: number) => new Date(w.anmeldeschluss.getTime() + n * 1000);
+		expect(
+			await melde(db, id, m.mitgliedId, { antwort: 'kommt', bemerkung: null }, sekunde(59))
+		).toBe('ok');
+		expect(await ladeAnlassFuerMitglied(db, id, m.mitgliedId, sekunde(59))).toMatchObject({
+			offen: true
+		});
+		expect(await ladeAnlassFuerMitglied(db, id, m.mitgliedId, sekunde(60))).toMatchObject({
+			offen: false
+		});
+	});
+
 	test('FR-29: neue Antwort ersetzt die alte', async () => {
 		const { id } = await neu();
 		const m = await legeMitgliedAn(db);
