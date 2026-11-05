@@ -9,7 +9,14 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 - Handy im WLAN: `make dev-handy` startet den Entwicklungsserver für ein Handy im selben WLAN
   (Login per Code, ohne Passkey); ein E2E-Test belegt, dass der Produktions-Build das
-  Login-Cookie weiterhin nur über HTTPS schickt (SI-06).
+  Login-Cookie weiterhin nur über HTTPS schickt (SI-06). Feste Namen `mytco-admin.local` und
+  `mytco-mitglied.local` für zwei Verknüpfungen mit getrenntem Login, Mailpit wird beim Start
+  geleert; `make seed` gibt Brief-Codes für Erika (Admin) und Kurt (Mitglied) aus. Datenbank und
+  Mailpit lokal nur noch auf dem Laptop erreichbar.
+- Datenschutzerklärung in der App (DS-09): Seite «Datenschutz» ohne Login, Link in der Fusszeile,
+  Text direkt aus `docs/datenschutzerklaerung.md` (als Entwurf markiert, Freigabe K-06.2 offen).
+- Kopfleiste und Reiter reichen auf dem iPhone unter Status- und Home-Balken (Versuch gegen den
+  durchscheinenden Streifen oben in der App vom Startbildschirm).
 
 ## 0.4.0 — Hilfe beim Start, Mitgliederverwaltung und Passkey, nicht ausgeliefert
 

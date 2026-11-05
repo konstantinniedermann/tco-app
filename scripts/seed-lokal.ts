@@ -1,4 +1,4 @@
-// Nur lokal: legt erfundene Mitglieder an und gibt für das erste einmal einen Brief-Code aus.
+// Nur lokal: legt erfundene Mitglieder an und gibt Brief-Codes für Erika (Admin) und Kurt aus.
 // Aufruf über `make seed` (lädt .env). Bricht ab, wenn die Datenbank nicht lokal ist.
 import { machAdmin } from '../src/lib/server/admin/erster-admin.ts';
 import { erstelleDb } from '../src/lib/server/db/index.ts';
@@ -37,10 +37,14 @@ async function seed(): Promise<void> {
 			mailer: async () => {},
 			bremsen: erstelleBremsen()
 		});
-		const { code } = await dienst.stelleBriefCodeAus(kontoIds[0]);
 		console.log(`Erfundene Mitglieder: ${ERFUNDENE_MITGLIEDER.map((m) => m.email).join(', ')}`);
-		console.log(`Brief-Code für ${ERFUNDENE_MITGLIEDER[0].vorname} (nur lokal, 90 Tage gültig):`);
-		console.log(formatiereBriefCode(code));
+		console.log('Brief-Codes (nur lokal, 90 Tage gültig, je einmal verwendbar):');
+		// Zwei Personas: Erika sieht die Verwaltung, Kurt nur, was jedes Mitglied sieht.
+		for (const [index, rolle] of ['Admin', 'Mitglied'].entries()) {
+			const { code } = await dienst.stelleBriefCodeAus(kontoIds[index]);
+			const { vorname, nachname } = ERFUNDENE_MITGLIEDER[index];
+			console.log(`  ${vorname} ${nachname} (${rolle}): ${formatiereBriefCode(code)}`);
+		}
 	} finally {
 		await db.$client.end();
 	}
