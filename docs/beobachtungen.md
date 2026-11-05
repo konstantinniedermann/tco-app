@@ -234,3 +234,51 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (cas-reviewer) zum Handy-Feedback, Session vom 05.11.2026.
 
 **Einschätzung:** Die Verwaltung ist vor allem für den PC gedacht. Am iPhone prüfen; falls störend, die Seitenleiste auf dem Handy als Kopf mit Menü neu denken (gehört in den Design-Ablauf).
+
+### 2026-11-05 — Leitbild sagt «Verwaltung über Profil», die App zeigt sie auf der Startseite
+
+**Thema:** Verwaltung
+
+**Fundort:** `docs/ui-leitbild.md` (Layout und Navigation, «Verwaltung … erreichbar über einen Eintrag unter *Profil*»), `src/routes/+page.svelte:39`
+
+**Beobachtung:** Das Leitbild nennt einen Eintrag unter Profil als Weg in die Verwaltung. Im Code steht die Kachel «Verwaltung» auf der Startseite; im Profil gibt es keinen solchen Eintrag.
+
+**Ursprung:** #54 (Ruhiges App-Gefühl), beim Nachführen des Leitbilds.
+
+**Einschätzung:** Doku-Drift, keine Funktionsstörung. Entscheiden, wo der Eintrag hingehört, dann Leitbild oder Code angleichen.
+
+### 2026-11-05 — Mockup «Hilfe beim Start» zeigt die Fusszeile ohne «Datenschutz»
+
+**Thema:** App
+
+**Fundort:** `docs/ui-mockups/hilfe.html` (Fusszeilen der Bildschirme Einstiegsseite und Login)
+
+**Beobachtung:** Die Mockups zeigen «Hilfe · Version», die App seit DS-09 «Hilfe · Datenschutz · Version». Die Abweichung ist älter als #54.
+
+**Ursprung:** Review (cas-reviewer) zu #54.
+
+**Einschätzung:** Kosmetik in der Doku. Beim nächsten Umbau der Mockups (Design-Ablauf mit Artifacts) mitnehmen.
+
+### 2026-11-05 — Reiter: aria-current wechselt, bevor die neue Seite da ist
+
+**Thema:** App
+
+**Fundort:** `src/lib/ui/Reiter.svelte` (`aktiv` folgt `navigating.to`)
+
+**Beobachtung:** Damit der Reiter sofort reagiert, folgt auch `aria-current` dem Ziel der Navigation. Ein Screenreader kann «Profil, aktuelle Seite» ansagen, während noch Start zu sehen ist; leitet das Laden um, springt es zurück. Sauberer wäre: `aria-current` an `page.route.id`, nur Farbe und Balken (`data-aktiv`) folgen dem Ziel.
+
+**Ursprung:** Code-Review zu #54.
+
+**Einschätzung:** Kurze Zeitspanne (Ladezeit), kein Fehler im Ablauf. Bei der nächsten Arbeit an den Reitern trennen; braucht eine eigene Markierung fürs Aussehen.
+
+### 2026-11-05 — Rückfrage: Ausblenden ohne `overlay` an falscher Stelle
+
+**Thema:** Verwaltung
+
+**Fundort:** `dialog.karte` in `src/lib/design/basis.css`
+
+**Beobachtung:** Browser ohne die CSS-Eigenschaft `overlay` (Firefox, wohl auch Safari) nehmen die Rückfrage beim Schliessen sofort aus der obersten Ebene; die 150 ms Ausblenden laufen dann an ihrer Stelle im Seitenfluss. Ein zweiter Tipp ist abgefangen (`pointer-events: none`).
+
+**Ursprung:** Code-Review zu #54.
+
+**Einschätzung:** Kurz und nur in der Verwaltung. Am Mac in Safari ansehen; stört es, das Ausblenden nur dort zeigen, wo `overlay` unterstützt ist (`@supports`).

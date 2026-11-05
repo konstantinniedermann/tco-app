@@ -168,7 +168,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
 | Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
 | Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; klappt weich auf und zu (`--dauer-mittel`) |
-| Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste; gedrückt `--farbe-marke-zart` und leicht verkleinert |
+| Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste; ist der ganze Eintrag ein Link, gedrückt `--farbe-marke-zart` und leicht verkleinert und nicht markierbar; eine Kachel mit eigener Aktion bleibt ruhig und markierbar |
 | Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt" oder „1 von 3 Anmeldungen" |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05) |
 | Anleitung | `.anleitung` | gezeichnetes Handy (`.anleitung-film`, ein `.anleitung-bild` pro Schritt), darunter die Taste (`.anleitung-taste`) und die nummerierten Schritte (`.anleitung-schritte`), am Schluss ein Eintrag „Fertig!" (`.anleitung-fertig`, mit ✓ statt Nummer); die Zeichnung ist für Screenreader verborgen, die Schritte tragen die Bedeutung; ein Schritt gehört zu genau einem Bild; in der Zeichnung nur Beschriftungen, die in der Hilfe von Apple bzw. Google belegt sind, sonst graue Balken (`.anleitung-eintrag.leer`); der Tipp-Kreis (`.anleitung-tipp`) zeigt, wo man tippt; Bewegung nach UI-09 |
@@ -249,7 +249,7 @@ die Bewegung zeigt, wohin man gegangen ist. Dauern und Kurven stehen unter
 | gleiche Ebene | Start ↔ Profil, Einstiegsseite → Login, Login → Start | Inhalt blendet über (`--dauer-kurz`, linear) |
 | eine Ebene tiefer | Start → Hilfe, Login → Datenschutz, Login → Login mit Mail-Code | neue Seite schiebt sich von rechts herein, alte Seite und Reiter weichen um 28 % nach links (`--dauer-schieben`, `--kurve-schieben`) |
 | zurück | „‹ Zurück" | umgekehrt: Seite schiebt sich nach rechts weg |
-| Zurück-Taste oder -Geste des Browsers, Verwaltung, Fehlerseite | | keine; die Geste animiert der Browser selbst |
+| Zurück-Taste oder -Geste des Browsers, Verwaltung, unbekannte Adresse | | keine; die Geste animiert der Browser selbst, eine unbekannte Adresse lädt die Seite neu. Lässt sich eine bekannte Seite nicht laden, bewegt sich die Fehlerseite wie die Seite, die sie ersetzt |
 
 Kopfleiste und Statusleisten-Band stehen beim Wechsel still, die Reiter auch, solange sie
 auf beiden Seiten stehen.
@@ -260,11 +260,11 @@ hat, solange die App offen ist; nach dem Abmelden beginnt alles wieder oben. Wer
 Reiter nochmals antippt, kommt nach oben.
 
 **Antippen:** kein grauer Blitz des Browsers, dafür ein Gedrückt-Zustand (`--dauer-kurz`):
-Reiter in `--farbe-marke` mit etwas kleinerem Symbol; Kachel in `--farbe-marke-zart`, leicht
+Reiter in `--farbe-marke` mit etwas kleinerem Symbol; Kachel als Link in `--farbe-marke-zart`, leicht
 verkleinert; Nebentaste, „‹ Zurück", Titelzeile des Aufklappbereichs und Textlinks in
 `--farbe-marke-zart`; Haupttaste in `--farbe-aktion-dunkel`.
 
-**Markieren:** Kopfleiste, Reiter, Tasten, „‹ Zurück", Kacheln und Titelzeilen der
+**Markieren:** Kopfleiste, Reiter, Tasten, „‹ Zurück", Kacheln als Link und Titelzeilen der
 Aufklappbereiche lassen sich nicht markieren und öffnen beim langen Drücken kein Link-Menü.
 Fliesstext, Codes, Angaben und Tabellen bleiben markier- und kopierbar.
 
