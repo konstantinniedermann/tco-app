@@ -599,14 +599,14 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Ein Satz in Schritt 7 («Haken der DoD im Body setzen, Nachweis im Abschlusskommentar») würde reichen. Klein, aber es betrifft jedes Issue.
 
-### 2026-11-05 — #29: Vorschläge für die DoD aus der Auswertung vom 03.11. stehen nur im Kommentar, Blocked by nennt noch geschlossene Issues
+### 2026-11-05 — #29: Vorschläge für die DoD aus der Auswertung vom 03.11. stehen nur im Kommentar
 
 **Thema:** Betrieb
 
-**Fundort:** Issue #29, Kommentar vom 03.11.2026 (vier Punkte: Seite `/datenschutz`, Du-Form der Erklärung, Spalte `sitzung.erstellt_am`, Fenster der Bremse); Body-Zeile `Blocked by: #6, #15, #39`
+**Fundort:** Issue #29, Kommentar vom 03.11.2026 (vier Punkte: Seite `/datenschutz`, Du-Form der Erklärung, Spalte `sitzung.erstellt_am`, Fenster der Bremse)
 
-**Beobachtung:** Der Kommentar schlägt vier Punkte für die Definition of Done vor («über die Aufnahme entscheidet, wer #29 führt»). Im Body steht keiner davon, und dass darüber entschieden wurde, ist nirgends vermerkt. Ein Teil davon ist inzwischen vermutlich gebaut (die Datenschutzerklärung ist seit 0.5.0 in der App). Ausserdem sind #6 und #15 längst geschlossen, stehen aber noch in «Blocked by».
+**Beobachtung:** Der Kommentar schlägt vier Punkte für die Definition of Done vor («über die Aufnahme entscheidet, wer #29 führt»). Im Body steht keiner davon, und dass darüber entschieden wurde, ist nirgends vermerkt. Ein Teil davon ist inzwischen vermutlich gebaut (die Datenschutzerklärung ist seit 0.5.0 in der App).
 
 **Ursprung:** Prüfung der Issue-Labels.
 
-**Einschätzung:** Beim nächsten Arbeiten an #29 die vier Punkte am Code prüfen und entweder in die DoD übernehmen (erledigt bzw. offen) oder bewusst verwerfen. «Blocked by» auf #39 kürzen.
+**Einschätzung:** Beim nächsten Arbeiten an #29 die vier Punkte am Code prüfen und entweder in die DoD übernehmen (erledigt bzw. offen) oder bewusst verwerfen.
