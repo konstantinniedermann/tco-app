@@ -502,3 +502,63 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Fix-Branch zu #54 (Beschriftung der Eingabetaste), beim Pushen.
 
 **Einschätzung:** Zeitempfindlich unter Last wie die schon erfassten Ausreisser der Seitenwechsel-Tests; zusammen mit diesen ansehen.
+
+### 2026-11-05 — Datenschutzerklärung verspricht Löschung des Änderungsverlaufs nach 12 Monaten, nicht gebaut
+
+**Thema:** Betrieb
+
+**Fundort:** `docs/datenschutzerklaerung.md` (Änderungsverlauf «12 Monate»), FR-26 (geplant), DS-06
+
+**Beobachtung:** Die Erklärung in der App nennt 12 Monate für den Änderungsverlauf; gelöscht wird nichts. Ebenso sind die Fristen bei Austritt und Löschen (FR-04) nicht gebaut. Nur die Zeile zu den Anlässen trägt in `docs/datenschutz.md` den Vermerk «bis die Löschfristen gebaut sind».
+
+**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereiche App sowie Daten/Tests).
+
+**Einschätzung:** Heute ohne Folge (nicht ausgeliefert, Erklärung als Entwurf markiert). Die Release-Checkliste in `docs/testkonzept.md` verlangt jetzt vor dem ersten Live-Release mit Mitgliedern, dass Hinweis an die alte Adresse, Verlauf-Löschung und Anlass-Löschung gebaut sind oder die Erklärung angepasst ist. Mit dem Eintrag zur Löschfrist der Anlass-Anmeldungen zusammen bauen.
+
+### 2026-11-05 — «erstellt von» am Anlass ist ein Personenbezug ohne aufgeführten Zweck
+
+**Thema:** Verwaltung
+
+**Fundort:** `src/lib/server/db/schema.ts` (`anlass.erstellt_von`), `docs/fachmodell.md` (Objekt Anlass, Personendaten «—»), `docs/datenschutz.md` (*Welche Daten*)
+
+**Beobachtung:** Die Spalte verweist auf den Admin, der den Anlass anlegt; sie wird geschrieben, aber nirgends gelesen oder angezeigt. Fachmodell und Datenschutzkonzept führen sie nicht als Personendatum (DS-04: nur aufgeführte Felder).
+
+**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereiche App sowie Daten/Tests).
+
+**Einschätzung:** Entweder streichen (neue Migration) oder mit Zweck ins Konzept und Fachmodell. Entscheid bei der nächsten Arbeit an den Anlässen.
+
+### 2026-11-05 — Test-IDs und Testdaten-Regel weichen vom Testkonzept ab
+
+**Thema:** App
+
+**Fundort:** `src/lib/login/passkey.test.ts` (Tests mit A-LOGIN-10 und A-LOGIN-11), `scripts/pruefungen/test-ids.ts`, `scripts/pruefungen/testdaten.ts`, `scripts/beispiel-anlass.ts`, `docs/testkonzept.md`
+
+**Beobachtung:** Zwei Passkey-Tests nennen A-LOGIN-10 bzw. A-LOGIN-11 (SMS/App, «später»), prüfen aber Passkey-Funktionen (A-LOGIN-07). Die Prüfung `test-ids` lässt die ID irgendwo in der Datei genügen, auch im Kommentar, strenger klingt das Testkonzept («jeder Test nennt im Namen die ID»). `scripts/beispiel-anlass.ts` legt fünf weitere erfundene Mitglieder an; das Testkonzept nennt nur `scripts/erfundene-mitglieder.ts`, und `testdaten` prüft die Datei nicht (nur Dateinamen `seed*`, `erfundene-*`). Die Daten selbst sind erfunden (`@example.org`).
+
+**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereich Daten/Tests).
+
+**Einschätzung:** Kleinere Prüf-Lücken ohne Folge für Mitglieder. IDs umbenennen (prüfen, ob A-LOGIN-10 dann noch einen Test hat), Prüfung `testdaten` um die Datei erweitern, Satz im Testkonzept angleichen.
+
+### 2026-11-05 — Fachmodell und Anforderungen bei den Anlässen nicht ganz nachgeführt
+
+**Thema:** App
+
+**Fundort:** `docs/fachmodell.md` (Überblick-Diagramm), `docs/anforderungen/anforderungen.md` (A-STARTSEITE-04), FR-27, `src/lib/server/anlass/` (`ladeAnlassFuerMitglied`)
+
+**Beobachtung:** Im Überblick-Diagramm fehlen `Anlass` und die Anmeldung (Code-Name `anlassAnmeldung`). A-STARTSEITE-04 steht auf «geplant», die Startseite zeigt aber schon kommende Anlässe mit dem eigenen Stand. FR-27 sagt «sichtbar, solange der Beginn nicht vorbei ist»; die Detailseite liefert auch vergangene Anlässe aus (nur mit der eigenen Antwort).
+
+**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereich Daten/Tests).
+
+**Einschätzung:** Nur Doku-Stand, ohne Datenschutzfolge. Bei der nächsten Arbeit an den Anlässen nachziehen; FR-27 klären (Detailseite nach dem Anlass sperren oder Satz anpassen).
+
+### 2026-11-05 — Datenschutzerklärung siezt, die App duzt
+
+**Thema:** App
+
+**Fundort:** `docs/datenschutzerklaerung.md` gegen `docs/ui-leitbild.md` (Sprache: Du-Form)
+
+**Beobachtung:** Die Erklärung (in der App unter «Datenschutz») spricht die Mitglieder mit «Sie» an, Leitbild, Hilfe und App duzen.
+
+**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereich App).
+
+**Einschätzung:** Entscheid des Projektleiters bzw. Vorstands zusammen mit der Freigabe der Erklärung (K-06.2).
