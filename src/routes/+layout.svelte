@@ -2,10 +2,16 @@
 	import '../lib/design/tokens.css';
 	import '../lib/design/basis.css';
 	import { onMount } from 'svelte';
+	import { afterNavigate, beforeNavigate, disableScrollHandling } from '$app/navigation';
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
-	import { istReiterSeite, zeigtFusszeile } from '../lib/ui/navigation.ts';
+	import {
+		istReiterSeite,
+		stellStandWiederHer,
+		vergisstStand,
+		zeigtFusszeile
+	} from '../lib/ui/navigation.ts';
 	import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 	import { APP_VERSION } from '../lib/version';
 
@@ -18,6 +24,23 @@
 	const verwaltung = $derived(
 		(page.route.id?.startsWith('/verwaltung') ?? false) && page.error === null
 	);
+
+	// Jeder Reiter merkt sich die Scrollposition, solange die App offen ist (UI-Leitbild,
+	// Bewegung und Bedienung); auf dem Weg zum Login (Abmelden) geht sie verloren.
+	// Nur ein Speicher, nicht reaktiv: Nichts in der Anzeige hängt davon ab.
+	let stand: Record<string, number> = {};
+	beforeNavigate(({ from, to }) => {
+		const von = from?.route.id ?? null;
+		if (von !== null && istReiterSeite(von)) stand[von] = window.scrollY;
+		if (vergisstStand(to?.route.id ?? null)) stand = {};
+	});
+	afterNavigate(({ to, type }) => {
+		const nach = to?.route.id ?? null;
+		const wert = nach === null ? undefined : stand[nach];
+		if (!stellStandWiederHer(nach, type) || wert === undefined) return;
+		disableScrollHandling();
+		window.scrollTo(0, wert);
+	});
 
 	// Beim Start der App: abgelaufene oder kaputte Mail-Anfragen aus dem Gerätespeicher löschen.
 	onMount(() => {

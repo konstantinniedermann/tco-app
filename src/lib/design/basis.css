@@ -223,7 +223,48 @@ html {
 .reiter a[aria-current='page'] {
 	color: var(--farbe-marke);
 	font-weight: 700;
-	box-shadow: inset 0 var(--rand-akzent) 0 var(--farbe-marke);
+}
+
+/*
+ * Balken über dem aktiven Reiter: ein einziges Element, das zum gewählten Reiter gleitet
+ * (UI-09). Breite und Lage aus data-anzahl und data-aktiv am <nav>; style-Attribute sind
+ * im Markup verboten (design-festwerte).
+ */
+.reiter-balken {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: var(--rand-akzent);
+	background: var(--farbe-marke);
+	transition: transform var(--dauer-mittel) var(--kurve-standard);
+}
+
+.reiter[data-anzahl='2'] .reiter-balken {
+	width: 50%;
+}
+
+.reiter[data-anzahl='3'] .reiter-balken {
+	width: calc(100% / 3);
+}
+
+.reiter[data-anzahl='4'] .reiter-balken {
+	width: 25%;
+}
+
+.reiter[data-aktiv='-1'] .reiter-balken {
+	display: none;
+}
+
+.reiter[data-aktiv='1'] .reiter-balken {
+	transform: translateX(100%);
+}
+
+.reiter[data-aktiv='2'] .reiter-balken {
+	transform: translateX(200%);
+}
+
+.reiter[data-aktiv='3'] .reiter-balken {
+	transform: translateX(300%);
 }
 
 /* Seitenleiste (nur Verwaltung) */
@@ -1144,6 +1185,11 @@ dialog.karte {
 	.reiter a[aria-current='page'] {
 		color: var(--farbe-flaeche);
 		box-shadow: inset 0 calc(-1 * var(--rand-akzent)) 0 var(--farbe-marke-hell);
+	}
+
+	/* Am PC unterstreicht der aktive Textlink selbst; der gleitende Balken gehört zum Handy */
+	.reiter .reiter-balken {
+		display: none;
 	}
 
 	.reiter a:focus-visible {
