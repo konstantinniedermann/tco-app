@@ -1,5 +1,5 @@
 // Texte der Verwaltung: Namen von Feldern, Rollen und Verlaufseinträgen, Zeitangaben.
-import type { Feld, MitgliedZeile, Rolle, VerlaufEintrag } from './api.ts';
+import type { FairgateZeile, Feld, MitgliedZeile, Rolle, VerlaufEintrag } from './api.ts';
 
 export const FELD_NAMEN: Record<Feld, string> = {
 	mitgliedernummer: 'Mitgliedernummer',
@@ -53,6 +53,27 @@ export function aktionText(z: Pick<VerlaufEintrag, 'aktion' | 'detail'>): string
 		default:
 			return z.aktion;
 	}
+}
+
+const ADRESSE: readonly Feld[] = ['strasse', 'plz', 'ort'];
+
+/** Spalte «Geändert» der Liste Für Fairgate: Adressfelder zusammengefasst, «Adresse, E-Mail». */
+export function geaendertText(felder: readonly Feld[]): string {
+	const namen = felder.map((f) => (ADRESSE.includes(f) ? 'Adresse' : FELD_NAMEN[f]));
+	return [...new Set(namen)].join(', ');
+}
+
+/** Spalte «Neue Angaben»: die Werte der geänderten Angaben, eine Zeile je Angabe. */
+export function neueAngaben(z: Pick<FairgateZeile, 'felder' | 'angaben'>): string[] {
+	const a = z.angaben;
+	const zeilen: string[] = [];
+	if (z.felder.some((f) => ADRESSE.includes(f))) {
+		const ortZeile = [a.plz, a.ort].filter(Boolean).join(' ');
+		zeilen.push([a.strasse, ortZeile].filter(Boolean).join(', ') || '(leer)');
+	}
+	if (z.felder.includes('email')) zeilen.push(a.email);
+	if (z.felder.includes('telefon')) zeilen.push(a.telefon || '(leer)');
+	return zeilen;
 }
 
 /** Plakette der Mitgliederliste: Status des Kontos, bei Austritt oder Löschung der Status. */

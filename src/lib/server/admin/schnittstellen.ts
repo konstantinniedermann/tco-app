@@ -224,10 +224,13 @@ export function getFairgate(d: AdminDienste, e: AdminEreignis): Promise<Response
 }
 
 export function postFairgate(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return aendernd(d, e, async (urheber) => {
+	return aendernd(d, e, async (urheber, koerper) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
-		const r = await markiereUebertragen(d.db, urheber, id, jetzt(d));
+		const seit = typeof koerper.seit === 'string' ? new Date(koerper.seit) : null;
+		if (seit === null || Number.isNaN(seit.getTime())) return eingabeFehler();
+		const r = await markiereUebertragen(d.db, urheber, id, seit, jetzt(d));
+		if (r === 'veraltet') return antwort(409, { fehler: 'veraltet' });
 		return r === 'ok' ? antwort(200, {}) : nichtGefunden();
 	});
 }

@@ -107,13 +107,13 @@ describe('Liste Für Fairgate', () => {
 		const { mitgliedId: adminId } = await legeMitgliedAn(db, { rollen: ['admin'] });
 		await selbst(mitgliedId, { telefon: '079 123 45 67' }, t1);
 		const urheber = { art: 'admin', mitgliedId: adminId } as const;
-		expect(await markiereUebertragen(db, urheber, mitgliedId, t2)).toBe('ok');
+		expect(await markiereUebertragen(db, urheber, mitgliedId, t1, t2)).toBe('ok');
 		expect(await zeileVon(mitgliedId)).toBeUndefined();
 		const v = await db.select().from(aenderung).where(eq(aenderung.mitgliedId, mitgliedId));
 		expect(v.filter((e) => e.aktion === 'fairgate-uebertragen')).toMatchObject([
 			{ urheberArt: 'admin', urheberMitgliedId: adminId, detail: null, zeitpunkt: t2 }
 		]);
-		expect(await markiereUebertragen(db, urheber, mitgliedId, t3)).toBe('nicht-offen');
+		expect(await markiereUebertragen(db, urheber, mitgliedId, t1, t3)).toBe('nicht-offen');
 		const danach = await db.select().from(aenderung).where(eq(aenderung.mitgliedId, mitgliedId));
 		expect(danach.filter((e) => e.aktion === 'fairgate-uebertragen')).toHaveLength(1);
 	});
@@ -121,7 +121,7 @@ describe('Liste Für Fairgate', () => {
 	test('A-KONTO-02: unbekanntes Mitglied ist nicht offen', async () => {
 		const { mitgliedId: adminId } = await legeMitgliedAn(db, { rollen: ['admin'] });
 		expect(
-			await markiereUebertragen(db, { art: 'admin', mitgliedId: adminId }, 2_000_000_000, t1)
+			await markiereUebertragen(db, { art: 'admin', mitgliedId: adminId }, 2_000_000_000, t1, t1)
 		).toBe('nicht-offen');
 	});
 
@@ -129,7 +129,7 @@ describe('Liste Für Fairgate', () => {
 		const { mitgliedId } = await neuesMitglied();
 		const { mitgliedId: adminId } = await legeMitgliedAn(db, { rollen: ['admin'] });
 		await selbst(mitgliedId, { telefon: '079 123 45 67' }, t1);
-		await markiereUebertragen(db, { art: 'admin', mitgliedId: adminId }, mitgliedId, t2);
+		await markiereUebertragen(db, { art: 'admin', mitgliedId: adminId }, mitgliedId, t1, t2);
 		await selbst(mitgliedId, { ort: 'Aarau' }, t3);
 		const z = await zeileVon(mitgliedId);
 		expect(z!.felder).toEqual(['ort']);
@@ -143,5 +143,19 @@ describe('Liste Für Fairgate', () => {
 		await selbst(frueh, { telefon: '079 222 22 22' }, t1);
 		const ids = (await listeFuerFairgate(db)).map((z) => z.id);
 		expect(ids.indexOf(frueh)).toBeLessThan(ids.indexOf(spaet));
+	});
+
+	test('A-KONTO-02: Abhaken nach neuerer Änderung des Mitglieds ist veraltet und lässt die Zeile stehen', async () => {
+		const { mitgliedId } = await neuesMitglied();
+		const { mitgliedId: adminId } = await legeMitgliedAn(db, { rollen: ['admin'] });
+		await selbst(mitgliedId, { telefon: '079 123 45 67' }, t1);
+		await selbst(mitgliedId, { ort: 'Aarau' }, t3);
+		const urheber = { art: 'admin', mitgliedId: adminId } as const;
+		expect(await markiereUebertragen(db, urheber, mitgliedId, t1, t4)).toBe('veraltet');
+		const z = await zeileVon(mitgliedId);
+		expect(z!.seit).toEqual(t3);
+		const v = await db.select().from(aenderung).where(eq(aenderung.mitgliedId, mitgliedId));
+		expect(v.filter((e) => e.aktion === 'fairgate-uebertragen')).toHaveLength(0);
+		expect(await markiereUebertragen(db, urheber, mitgliedId, t3, t4)).toBe('ok');
 	});
 });

@@ -2,6 +2,7 @@
 // Die Seiten zeigen die Meldungen; hier steht nur, was die Statuscodes bedeuten.
 import { jsonPost } from '../json-post.ts';
 import type { Angaben, Feld } from '../server/admin/angaben.ts';
+import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairgate.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { Rolle } from '../server/admin/rollen.ts';
 import type { VerlaufZeile } from '../server/admin/verlauf.ts';
@@ -18,6 +19,7 @@ type Json<T> = T extends Date
 export type MitgliedDetail = Json<Detail>;
 export type MitgliedZeile = Json<Listenzeile>;
 export type VerlaufEintrag = Json<VerlaufZeile>;
+export type FairgateZeile = Json<ServerFairgateZeile>;
 export type { Angaben, Feld, MitgliedStatus, Rolle };
 
 export type Antwort<T> =
@@ -126,3 +128,10 @@ export function ladeVerlauf(
 	const abfrage = filter.mitglied === undefined ? '' : `?mitglied=${filter.mitglied}`;
 	return lese(`${ADMIN}/verlauf${abfrage}`, holen);
 }
+
+export const ladeFairgate = (holen: Holen = fetch) =>
+	lese<FairgateZeile[]>(`${ADMIN}/fairgate`, holen);
+
+/** `seit`: der Stand der Zeile, wie die Liste ihn zeigte; hat das Mitglied inzwischen mehr geändert, antwortet der Server «veraltet». */
+export const uebertrageFairgate = (id: number, seit: string, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/fairgate/${id}`, { seit }, holen);

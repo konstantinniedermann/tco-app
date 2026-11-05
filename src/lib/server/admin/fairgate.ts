@@ -69,20 +69,29 @@ export async function listeFuerFairgate(db: DbOderTx): Promise<FairgateZeile[]> 
 	});
 }
 
+/** `gesehenSeit`: der Stand, den der Admin in der Liste sah; hat das Mitglied danach etwas geändert, gilt das Abhaken nicht. */
 export async function markiereUebertragen(
 	db: Db,
 	urheber: Urheber,
 	mitgliedId: number,
+	gesehenSeit: Date,
 	jetzt: Date
-): Promise<'ok' | 'nicht-offen'> {
+): Promise<'ok' | 'nicht-offen' | 'veraltet'> {
 	return db.transaction(async (tx) => {
-		// Bedingtes Update: ein zweites, gleichzeitiges Abhaken findet nichts mehr.
+		// Bedingtes Update: ein zweites, gleichzeitiges Abhaken findet nichts mehr, und ein Abhaken
+		// nach einer neueren Änderung des Mitglieds ebenso.
 		const zeilen = await tx
 			.update(mitglied)
 			.set({ fairgateOffenSeit: null })
-			.where(and(eq(mitglied.id, mitgliedId), isNotNull(mitglied.fairgateOffenSeit)))
+			.where(and(eq(mitglied.id, mitgliedId), eq(mitglied.fairgateOffenSeit, gesehenSeit)))
 			.returning({ id: mitglied.id });
-		if (zeilen.length === 0) return 'nicht-offen' as const;
+		if (zeilen.length === 0) {
+			const [offen] = await tx
+				.select({ seit: mitglied.fairgateOffenSeit })
+				.from(mitglied)
+				.where(and(eq(mitglied.id, mitgliedId), isNotNull(mitglied.fairgateOffenSeit)));
+			return offen ? ('veraltet' as const) : ('nicht-offen' as const);
+		}
 		await schreibeVerlauf(tx, mitgliedId, urheber, [{ aktion: 'fairgate-uebertragen' }], jetzt);
 		return 'ok' as const;
 	});

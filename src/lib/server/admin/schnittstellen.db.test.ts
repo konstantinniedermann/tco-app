@@ -422,8 +422,15 @@ describe('Admin-Schnittstellen', () => {
 		expect(liste.status).toBe(200);
 		const zeilen = (await liste.json()) as { id: number }[];
 		expect(zeilen.map((z) => z.id)).toContain(m.mitgliedId);
-		const abhaken = (id: string) =>
-			postFairgate(s.d, ereignis({ body: {}, params: { id }, konto: admin.konto }));
+		const abhaken = (id: string, seit: unknown = start.toISOString()) =>
+			postFairgate(s.d, ereignis({ body: { seit }, params: { id }, konto: admin.konto }));
+		const ohneSeit = await abhaken(String(m.mitgliedId), null);
+		expect(ohneSeit.status).toBe(400);
+		expect(await ohneSeit.json()).toEqual({ fehler: 'eingabe' });
+		expect((await abhaken(String(m.mitgliedId), 'gestern')).status).toBe(400);
+		const veraltet = await abhaken(String(m.mitgliedId), new Date(+start - 1000).toISOString());
+		expect(veraltet.status).toBe(409);
+		expect(await veraltet.json()).toEqual({ fehler: 'veraltet' });
 		expect((await abhaken(String(m.mitgliedId))).status).toBe(200);
 		const nochmal = await abhaken(String(m.mitgliedId));
 		expect(nochmal.status).toBe(404);
