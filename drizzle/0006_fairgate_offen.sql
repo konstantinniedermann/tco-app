@@ -1,0 +1,1 @@
+ALTER TABLE "mitglied" ADD COLUMN "fairgate_offen_seit" timestamp with time zone;

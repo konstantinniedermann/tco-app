@@ -30,7 +30,10 @@ export const mitglied = pgTable(
 		telefon: text('telefon'),
 		geschlecht: text('geschlecht'),
 		jahrgang: integer('jahrgang'),
-		lizenznummer: text('lizenznummer')
+		lizenznummer: text('lizenznummer'),
+		// Gesetzt, sobald das Mitglied eine Angabe selbst geändert hat, die der Verein noch in Fairgate
+		// nachführen muss; leer = nichts offen.
+		fairgateOffenSeit: timestamp('fairgate_offen_seit', { withTimezone: true })
 	},
 	(t) => [
 		check('mitglied_status_check', sql`${t.status} in ('aktiv', 'ausgetreten', 'geloescht')`),

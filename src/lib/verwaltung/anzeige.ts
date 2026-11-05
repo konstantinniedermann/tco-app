@@ -48,6 +48,8 @@ export function aktionText(z: Pick<VerlaufEintrag, 'aktion' | 'detail'>): string
 			return `Rolle ${nameVon(ROLLEN_NAMEN, z.detail)} entzogen`;
 		case 'sitzungen-beendet':
 			return 'alle Sitzungen beendet';
+		case 'fairgate-uebertragen':
+			return 'In Fairgate übertragen';
 		default:
 			return z.aktion;
 	}

@@ -9,6 +9,9 @@ describe('Texte der Verwaltung', () => {
 		);
 		expect(aktionText({ aktion: 'rolle-entzogen', detail: 'admin' })).toBe('Rolle Admin entzogen');
 		expect(aktionText({ aktion: 'angelegt', detail: null })).toBe('angelegt');
+		expect(aktionText({ aktion: 'fairgate-uebertragen', detail: null })).toBe(
+			'In Fairgate übertragen'
+		);
 	});
 
 	it('UI-06: Fehlertext des Servers wird ein Satz', () => {
