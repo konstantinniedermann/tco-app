@@ -119,4 +119,17 @@ describe('Änderungsverlauf', () => {
 		const alle = await ladeVerlauf(db, { grenze: 1 });
 		expect(alle).toHaveLength(1);
 	});
+
+	test('A-MITGLIED-06: Änderung durch das Mitglied selbst heisst «(selbst)»', async () => {
+		const m = await legeMitgliedAn(db, { vorname: 'Lea', nachname: 'Beispiel' });
+		await schreibeVerlauf(
+			db,
+			m.mitgliedId,
+			{ art: 'mitglied', mitgliedId: m.mitgliedId },
+			[{ aktion: 'feld-geaendert', detail: 'telefon' }],
+			t0
+		);
+		const zeilen = await ladeVerlauf(db, { mitgliedId: m.mitgliedId, grenze: 10 });
+		expect(zeilen[0].urheber).toBe('Lea Beispiel (selbst)');
+	});
 });

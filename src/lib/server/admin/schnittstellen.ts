@@ -7,6 +7,7 @@ import {
 	leseKoerper,
 	type Ereignis
 } from '../login/schnittstellen.ts';
+import { listeFuerFairgate, markiereUebertragen } from './fairgate.ts';
 import { leseStand, pruefeAngaben } from './angaben.ts';
 import {
 	aendereAngaben,
@@ -218,6 +219,22 @@ export function getVerlauf(d: AdminDienste, e: AdminEreignis): Promise<Response>
 	});
 }
 
+export function getFairgate(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return mitAdmin(d, e, async () => antwort(200, await listeFuerFairgate(d.db)));
+}
+
+export function postFairgate(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return aendernd(d, e, async (urheber, koerper) => {
+		const id = parseId(e.params.id);
+		if (id === null) return nichtGefunden();
+		const seit = typeof koerper.seit === 'string' ? new Date(koerper.seit) : null;
+		if (seit === null || Number.isNaN(seit.getTime())) return eingabeFehler();
+		const r = await markiereUebertragen(d.db, urheber, id, seit, jetzt(d));
+		if (r === 'veraltet') return antwort(409, { fehler: 'veraltet' });
+		return r === 'ok' ? antwort(200, {}) : nichtGefunden();
+	});
+}
+
 export const ADMIN_SCHNITTSTELLEN = {
 	getZugang,
 	postZugangCode,
@@ -228,5 +245,7 @@ export const ADMIN_SCHNITTSTELLEN = {
 	postMitglied,
 	postRollen,
 	postSitzungen,
-	getVerlauf
+	getVerlauf,
+	getFairgate,
+	postFairgate
 } satisfies Record<string, (d: AdminDienste, e: AdminEreignis) => Promise<Response>>;

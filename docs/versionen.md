@@ -31,6 +31,12 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   Bedienelemente nicht markierbar, kein Zoom per Doppeltipp, immer hell. Bei «Bewegung
   reduzieren» alles ohne Bewegung (UI-09 erweitert, neue Bewegungs-Tokens). Die Fusszeile steht
   nur noch vor dem Login und auf der Startseite.
+- Eigene Angaben ändern (#50, Annahmen K-19.1 und K-19.2): Im Profil unter «Meine Angaben»
+  ändert das Mitglied Telefon, Adresse und Lizenznummer selbst; die E-Mail auf einer eigenen
+  Seite mit je einem Code an die bisherige und die neue Adresse (SI-09, Grenzen pro Konto,
+  Adresse und IP). Neu in der Verwaltung die Liste «Für Fairgate»: selbst geänderte
+  Kontaktangaben zum Übertragen nach Fairgate, abhaken mit Eintrag im Änderungsverlauf. Hilfe
+  um «Eigene Angaben ändern» ergänzt.
 
 ## 0.4.0 — Hilfe beim Start, Mitgliederverwaltung und Passkey, nicht ausgeliefert
 

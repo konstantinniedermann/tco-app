@@ -80,8 +80,8 @@ Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-KONTO-01 | Das Mitglied ändert E-Mail-Adresse und Telefonnummer selbst | PDF 3e | Mitglieder-Login\* | geplant |
-| A-KONTO-02 | Das Mitglied ändert seine Adresse selbst | PDF 3e | später\* | offen |
+| A-KONTO-01 | Das Mitglied ändert E-Mail-Adresse und Telefonnummer selbst, dazu die Lizenznummer (FR-02); die E-Mail erst nach Bestätigung mit je einem Code an die alte und die neue Adresse (SI-09). Annahme K-19.1 ([#50](https://github.com/konstantinniedermann/tco-app/issues/50)) | PDF 3e | Mitglieder-Login\* | umgesetzt\* |
+| A-KONTO-02 | Das Mitglied ändert seine Adresse selbst; selbst geänderte Kontaktangaben (Adresse, E-Mail, Telefon) sieht der Admin in der Liste *Für Fairgate* und hakt sie nach dem Übertragen ab. Annahme K-19.2 ([#50](https://github.com/konstantinniedermann/tco-app/issues/50)) | PDF 3e | Mitglieder-Login\* | umgesetzt\* |
 | A-KONTO-03 | Das Mitglied wählt die Zustellart der Jahresrechnung | PDF 3e | später\* | später |
 | A-KONTO-04 | Das Mitglied ändert seine Mitgliedschaft | PDF 1 | später\* | offen |
 
@@ -103,7 +103,7 @@ auf dem Handy aussieht, klärt das UI-Leitbild (Issue #13).
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-HILFE-01 | MyTCO hat eine Seite *Hilfe*, ohne Login erreichbar über den Link «Hilfe» in der Fusszeile: MyTCO auf den Startbildschirm legen, neuen Code anfordern, Passkey einrichten, Kontakt für Fragen (K-21); eigene Angaben ändern kommt mit A-KONTO-01 ([#47](https://github.com/konstantinniedermann/tco-app/issues/47)) | PL | Mitglieder-Login | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
+| A-HILFE-01 | MyTCO hat eine Seite *Hilfe*, ohne Login erreichbar über den Link «Hilfe» in der Fusszeile: MyTCO auf den Startbildschirm legen, neuen Code anfordern, Passkey einrichten, eigene Angaben ändern (A-KONTO-01, [#50](https://github.com/konstantinniedermann/tco-app/issues/50)), Kontakt für Fragen (K-21) ([#47](https://github.com/konstantinniedermann/tco-app/issues/47)) | PL | Mitglieder-Login | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
 | A-HILFE-02 | Solange MyTCO auf dem Handy im Browser statt vom Startbildschirm läuft, zeigt eine eigene Einstiegsseite zuerst die Anleitung zum Startbildschirm mit Animation, je nach iPhone oder Android, und erst danach den Login. Auf Android öffnet die Taste «MyTCO installieren» den Dialog von Android, wenn Chrome ihn anbietet. Der Brief behält seine Kurzanleitung (A-LOGIN-01) ([Design](../superpowers/specs/2026-11-04-hilfe-beim-start-design.md)) | PL | Mitglieder-Login | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
 
 ### NEWSFEED

@@ -2,7 +2,7 @@
 // Mail-App und lädt MyTCO danach neu, steht wieder das Feld «Code aus der Mail» da.
 // Der Speicher wird übergeben, damit das ohne Browser testbar ist. Speicher kann fehlen oder
 // gesperrt sein (privates Fenster): jeder Zugriff steht in try/catch, ein Fehler gilt als
-// «kein Eintrag».
+// «kein Eintrag». Der E-Mail-Wechsel im Profil nutzt dasselbe mit eigenem Schlüssel.
 
 export const MAILANFRAGE_SCHLUESSEL = 'mytco-mailanfrage';
 
@@ -22,9 +22,14 @@ export function holeSpeicher(hole: () => Storage = () => localStorage): Speicher
 	}
 }
 
-export function merkeMailanfrage(s: Pick<Storage, 'setItem'>, email: string, jetzt: number): void {
+export function merkeMailanfrage(
+	s: Pick<Storage, 'setItem'>,
+	email: string,
+	jetzt: number,
+	schluessel = MAILANFRAGE_SCHLUESSEL
+): void {
 	try {
-		s.setItem(MAILANFRAGE_SCHLUESSEL, JSON.stringify({ email, zeit: jetzt }));
+		s.setItem(schluessel, JSON.stringify({ email, zeit: jetzt }));
 	} catch {
 		// Ohne Speicher fragt die Seite nach dem Neuladen einfach wieder nach der Adresse.
 	}
@@ -33,10 +38,11 @@ export function merkeMailanfrage(s: Pick<Storage, 'setItem'>, email: string, jet
 /** Gemerkte Adresse oder null; abgelaufene und kaputte Einträge werden gelöscht. */
 export function leseMailanfrage(
 	s: Pick<Storage, 'getItem' | 'removeItem'>,
-	jetzt: number
+	jetzt: number,
+	schluessel = MAILANFRAGE_SCHLUESSEL
 ): string | null {
 	try {
-		const roh = s.getItem(MAILANFRAGE_SCHLUESSEL);
+		const roh = s.getItem(schluessel);
 		if (roh === null) return null;
 		const eintrag: unknown = JSON.parse(roh);
 		if (typeof eintrag === 'object' && eintrag !== null && !Array.isArray(eintrag)) {
@@ -49,13 +55,16 @@ export function leseMailanfrage(
 	} catch {
 		// Kaputter Eintrag oder gesperrter Speicher: wie kein Eintrag.
 	}
-	vergissMailanfrage(s);
+	vergissMailanfrage(s, schluessel);
 	return null;
 }
 
-export function vergissMailanfrage(s: Pick<Storage, 'removeItem'>): void {
+export function vergissMailanfrage(
+	s: Pick<Storage, 'removeItem'>,
+	schluessel = MAILANFRAGE_SCHLUESSEL
+): void {
 	try {
-		s.removeItem(MAILANFRAGE_SCHLUESSEL);
+		s.removeItem(schluessel);
 	} catch {
 		// Nichts zu tun: ohne Speicher gibt es auch keinen Eintrag.
 	}

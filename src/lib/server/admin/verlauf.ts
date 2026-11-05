@@ -8,7 +8,12 @@ export type Urheber = { art: 'admin' | 'mitglied'; mitgliedId: number } | { art:
 
 // Etappen 2 und 3 ergänzen weitere Aktionen.
 export type Aktion =
-	'angelegt' | 'feld-geaendert' | 'rolle-vergeben' | 'rolle-entzogen' | 'sitzungen-beendet';
+	| 'angelegt'
+	| 'feld-geaendert'
+	| 'rolle-vergeben'
+	| 'rolle-entzogen'
+	| 'sitzungen-beendet'
+	| 'fairgate-uebertragen';
 
 // FR-26: `detail` enthält nur einen Feld- oder Rollennamen, nie einen Wert.
 export type Eintrag = { aktion: Aktion; detail?: string };
@@ -60,6 +65,7 @@ export async function ladeVerlauf(
 			mitgliedId: mitglied.id,
 			nachname: mitglied.nachname,
 			vorname: mitglied.vorname,
+			urheberId: urheber.id,
 			urheberVorname: urheber.vorname,
 			urheberNachname: urheber.nachname
 		})
@@ -78,7 +84,9 @@ export async function ladeVerlauf(
 				? 'MyTCO'
 				: z.urheberVorname === null
 					? 'gelöschtes Konto'
-					: `${z.urheberVorname} ${z.urheberNachname}`,
+					: z.urheberArt === 'mitglied' && z.urheberId === z.mitgliedId
+						? `${z.urheberVorname} ${z.urheberNachname} (selbst)`
+						: `${z.urheberVorname} ${z.urheberNachname}`,
 		aktion: z.aktion as Aktion,
 		detail: z.detail,
 		mitglied: { id: z.mitgliedId, name: `${z.nachname}, ${z.vorname}` }

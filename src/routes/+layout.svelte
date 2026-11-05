@@ -15,6 +15,7 @@
 		zeigtFusszeile
 	} from '../lib/ui/navigation.ts';
 	import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
+	import { raeumeWechselAuf } from '../lib/profil/wechselanfrage.ts';
 	import { APP_VERSION } from '../lib/version';
 
 	let { children } = $props();
@@ -79,7 +80,9 @@
 
 	// Beim Start der App: abgelaufene oder kaputte Mail-Anfragen aus dem Gerätespeicher löschen.
 	onMount(() => {
-		leseMailanfrage(holeSpeicher(), Date.now());
+		const speicher = holeSpeicher();
+		leseMailanfrage(speicher, Date.now());
+		raeumeWechselAuf(speicher, Date.now());
 	});
 
 	// Aufklappbereiche klappen überall weich auf und zu (src/lib/ui/klappe.ts).

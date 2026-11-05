@@ -29,13 +29,13 @@ function hole() {
 }
 
 /** Erfundenes Mitglied mit Konto; die Adresse ist pro Aufruf eindeutig. */
-export async function legeKontoAn(vorname: string) {
-	return legeMitgliedAn(hole().db, { vorname });
+export async function legeKontoAn(vorname: string, nachname?: string) {
+	return legeMitgliedAn(hole().db, { vorname, nachname });
 }
 
 /** Erfundenes Mitglied mit Konto und frisch ausgestelltem Brief-Code (ohne Bindestrich). */
-export async function legeKontoMitBriefCodeAn(vorname: string) {
-	const konto = await legeKontoAn(vorname);
+export async function legeKontoMitBriefCodeAn(vorname: string, nachname?: string) {
+	const konto = await legeKontoAn(vorname, nachname);
 	const { code } = await hole().dienst.stelleBriefCodeAus(konto.kontoId);
 	return { ...konto, code };
 }

@@ -188,7 +188,7 @@ export async function listeMitglieder(
 	}));
 }
 
-function angabenAusZeile(z: typeof mitglied.$inferSelect): Angaben {
+export function angabenAusZeile(z: typeof mitglied.$inferSelect): Angaben {
 	return {
 		mitgliedernummer: z.mitgliedernummer,
 		vorname: z.vorname,
