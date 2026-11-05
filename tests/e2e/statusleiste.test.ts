@@ -36,18 +36,26 @@ test('Statusleisten-Band: in der App vom Startbildschirm höher und grüner Seit
 	await page.goto('/login');
 	const regeln = await page.evaluate(() => {
 		const gefunden: string[] = [];
-		for (const blatt of Array.from(document.styleSheets)) {
-			for (const regel of Array.from(blatt.cssRules)) {
-				if (regel instanceof CSSMediaRule && regel.conditionText.includes('standalone')) {
+		// Die Regel steckt in @supports (nur iOS) und darin in @media (standalone).
+		const durchsuche = (liste: CSSRuleList, inIos: boolean) => {
+			for (const regel of Array.from(liste)) {
+				if (regel instanceof CSSSupportsRule) {
+					durchsuche(regel.cssRules, inIos || regel.conditionText.includes('touch-callout'));
+				} else if (
+					regel instanceof CSSMediaRule &&
+					regel.conditionText.includes('standalone') &&
+					inIos
+				) {
 					gefunden.push(regel.cssText.replace(/\s+/g, ' '));
 				}
 			}
-		}
+		};
+		for (const blatt of Array.from(document.styleSheets)) durchsuche(blatt.cssRules, false);
 		return gefunden.join(' ');
 	});
-	expect(regeln).toContain('.statusleiste');
-	expect(regeln).toMatch(/height: calc\(env\(safe-area-inset-top\) \+ var\(--abstand-3\)\)/);
+	expect(regeln).toMatch(/\.statusleiste:not\(\.statusleiste-verwaltung\) \{ height: calc\(/);
 	expect(regeln).toMatch(/html, body \{ background: var\(--farbe-marke\)/);
+	expect(regeln).toMatch(/\.app \{ background: var\(--farbe-hintergrund\)/);
 	const hintergrund = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 	expect(hintergrund).not.toBe('rgb(15, 107, 79)');
 });
