@@ -70,6 +70,45 @@ a {
 	outline-color: var(--farbe-marke-hell);
 }
 
+/*
+ * Bedienung wie in einer App (Leitbild «Bewegung und Bedienung»): MyTCO ist immer hell, kein
+ * grauer Tipp-Blitz (dafür Gedrückt-Zustände bei den Bausteinen), Doppeltipp zoomt nicht
+ * (zwei Finger schon), die Schrift bläht sich im Querformat nicht auf.
+ */
+:root {
+	color-scheme: light;
+}
+
+html {
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
+/* Bedienelemente lassen sich nicht markieren und öffnen beim langen Drücken kein Link-Menü */
+.kopf,
+.reiter,
+.taste-haupt,
+.taste-neben,
+.zurueck,
+a.kachel,
+.klappe-titel {
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none;
+}
+
+a:active {
+	background-color: var(--farbe-marke-zart);
+}
+
+/* Auf grünen Flächen wäre das helle Grün unter weisser Schrift kaum lesbar */
+.kopf a:active,
+.seitenleiste a:active {
+	background-color: transparent;
+}
+
 img {
 	max-width: 100%;
 	height: auto;
@@ -103,8 +142,9 @@ img {
 		max(var(--abstand-4), env(safe-area-inset-right));
 }
 
-/* Ohne Reiter ist die Fusszeile zuunterst: Abstand über dem Home-Balken */
-.app > footer.inhalt:last-child {
+/* Ohne Reiter ist die Fusszeile zuunterst, ohne beide der Inhalt: Abstand über dem Home-Balken */
+.app > footer.inhalt:last-child,
+.app > main.inhalt:last-child {
 	padding-bottom: calc(var(--abstand-6) + env(safe-area-inset-bottom));
 }
 
@@ -222,7 +262,62 @@ html {
 .reiter a[aria-current='page'] {
 	color: var(--farbe-marke);
 	font-weight: 700;
-	box-shadow: inset 0 var(--rand-akzent) 0 var(--farbe-marke);
+}
+
+/* Gedrückt: grün, Symbol etwas kleiner; kein Hintergrund wie bei Textlinks */
+.reiter a:active {
+	color: var(--farbe-marke);
+	background-color: transparent;
+}
+
+.reiter a .symbol {
+	transition: transform var(--dauer-kurz) var(--kurve-standard);
+}
+
+.reiter a:active .symbol {
+	transform: scale(0.9);
+}
+
+/*
+ * Balken über dem aktiven Reiter: ein einziges Element, das zum gewählten Reiter gleitet
+ * (UI-09). Breite und Lage aus data-anzahl und data-aktiv am <nav>; style-Attribute sind
+ * im Markup verboten (design-festwerte).
+ */
+.reiter-balken {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: var(--rand-akzent);
+	background: var(--farbe-marke);
+	transition: transform var(--dauer-mittel) var(--kurve-standard);
+}
+
+.reiter[data-anzahl='2'] .reiter-balken {
+	width: 50%;
+}
+
+.reiter[data-anzahl='3'] .reiter-balken {
+	width: calc(100% / 3);
+}
+
+.reiter[data-anzahl='4'] .reiter-balken {
+	width: 25%;
+}
+
+.reiter[data-aktiv='-1'] .reiter-balken {
+	display: none;
+}
+
+.reiter[data-aktiv='1'] .reiter-balken {
+	transform: translateX(100%);
+}
+
+.reiter[data-aktiv='2'] .reiter-balken {
+	transform: translateX(200%);
+}
+
+.reiter[data-aktiv='3'] .reiter-balken {
+	transform: translateX(300%);
 }
 
 /* Seitenleiste (nur Verwaltung) */
@@ -292,6 +387,10 @@ html {
 	border: var(--rand-dick) solid var(--farbe-marke);
 }
 
+.taste-neben:active {
+	background: var(--farbe-marke-zart);
+}
+
 .taste-breit {
 	display: flex;
 	width: 100%;
@@ -310,6 +409,7 @@ html {
 .zurueck {
 	display: inline-block;
 	margin-bottom: var(--abstand-3);
+	border-radius: var(--radius);
 }
 
 /* Eingabefelder */
@@ -396,6 +496,66 @@ dialog.karte {
 	color: var(--farbe-text);
 }
 
+/*
+ * Rückfrage blendet weich ein und schneller aus (UI-09). Wo der Browser `@starting-style`
+ * oder `allow-discrete` nicht kennt, erscheint und verschwindet sie wie bisher sofort.
+ */
+dialog.karte {
+	opacity: 0;
+	transform: scale(0.94);
+	transition:
+		opacity var(--dauer-kurz) linear,
+		transform var(--dauer-kurz) var(--kurve-standard),
+		overlay var(--dauer-kurz) allow-discrete,
+		display var(--dauer-kurz) allow-discrete;
+}
+
+dialog.karte[open] {
+	opacity: 1;
+	transform: none;
+	transition-duration: var(--dauer-mittel);
+}
+
+/* Beim Ausblenden nimmt die Rückfrage keinen zweiten Tipp auf «Bestätigen» mehr an */
+dialog.karte:not([open]) {
+	pointer-events: none;
+}
+
+dialog.karte::backdrop {
+	opacity: 0;
+	transition:
+		opacity var(--dauer-kurz) linear,
+		overlay var(--dauer-kurz) allow-discrete,
+		display var(--dauer-kurz) allow-discrete;
+}
+
+dialog.karte[open]::backdrop {
+	opacity: 1;
+}
+
+@starting-style {
+	dialog.karte[open],
+	dialog.karte[open]::backdrop {
+		opacity: 0;
+	}
+
+	dialog.karte[open] {
+		transform: scale(0.94);
+	}
+}
+
+/* Während der Bewegung schneidet der Aufklappbereich ab, was noch nicht Platz hat */
+.klappe-bewegt {
+	overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	dialog.karte,
+	dialog.karte::backdrop {
+		transition: none;
+	}
+}
+
 .klappe-titel {
 	display: flex;
 	align-items: center;
@@ -415,6 +575,11 @@ dialog.karte {
 	content: '›';
 	color: var(--farbe-marke);
 	font-size: var(--groesse-gross);
+	transition: transform var(--dauer-mittel) var(--kurve-standard);
+}
+
+.klappe-titel:active {
+	background-color: var(--farbe-marke-zart);
 }
 
 .klappe[open] > .klappe-titel::after {
@@ -432,6 +597,15 @@ dialog.karte {
 	gap: var(--abstand-3);
 	color: var(--farbe-text);
 	text-decoration: none;
+	transition:
+		transform var(--dauer-kurz) var(--kurve-standard),
+		background-color var(--dauer-kurz) linear;
+}
+
+/* Nur die ganze Kachel als Link wird gedrückt; eine Kachel mit eigener Taste bleibt ruhig */
+a.kachel:active {
+	background-color: var(--farbe-marke-zart);
+	transform: scale(0.98);
 }
 
 .klappe .kachel {
@@ -1111,6 +1285,121 @@ dialog.karte {
 	top: 12%;
 }
 
+/*
+ * Seitenwechsel (UI-09, Leitbild «Bewegung und Bedienung»): View Transitions, gesteuert über
+ * html[data-uebergang] aus +layout.svelte. Kopfleiste und Statusleisten-Band stehen still.
+ * Reiter stehen beim Überblenden still; beim Schieben gehören sie zur Seite und gleiten mit.
+ */
+.kopf {
+	view-transition-name: kopf;
+}
+
+.statusleiste {
+	view-transition-name: statusleiste;
+}
+
+.reiter {
+	view-transition-name: reiter;
+}
+
+html[data-uebergang='tiefer'] .reiter,
+html[data-uebergang='zurueck'] .reiter {
+	view-transition-name: none;
+}
+
+::view-transition-group(kopf),
+::view-transition-group(statusleiste),
+::view-transition-new(kopf),
+::view-transition-new(statusleiste) {
+	animation: none;
+}
+
+::view-transition-old(kopf),
+::view-transition-old(statusleiste) {
+	display: none;
+}
+
+html[data-uebergang='blende']::view-transition-old(root),
+html[data-uebergang='blende']::view-transition-new(root) {
+	animation-duration: var(--dauer-kurz);
+	animation-timing-function: linear;
+}
+
+/* Der Balken gleitet live im neuen Bild; das alte Bild der Reiter würde ihn doppelt zeigen */
+html[data-uebergang='blende']::view-transition-group(reiter),
+html[data-uebergang='blende']::view-transition-new(reiter) {
+	animation: none;
+}
+
+html[data-uebergang='blende']::view-transition-old(reiter) {
+	display: none;
+}
+
+html[data-uebergang='tiefer']::view-transition-old(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-weicht-links;
+}
+
+html[data-uebergang='tiefer']::view-transition-new(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-von-rechts;
+}
+
+/* Zurück: Die Unterseite liegt oben und schiebt sich nach rechts weg */
+html[data-uebergang='zurueck']::view-transition-old(root) {
+	z-index: 1;
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-nach-rechts;
+}
+
+html[data-uebergang='zurueck']::view-transition-new(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-von-links;
+}
+
+@keyframes uebergang-weicht-links {
+	to {
+		transform: translateX(-28%);
+		filter: brightness(0.92);
+	}
+}
+
+@keyframes uebergang-von-rechts {
+	from {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes uebergang-nach-rechts {
+	to {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes uebergang-von-links {
+	from {
+		transform: translateX(-28%);
+		filter: brightness(0.92);
+	}
+}
+
+/* «Bewegung reduzieren» (UI-09): alles wechselt sofort, auch Balken, Symbol, Kachel und Pfeil */
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+
+	.reiter-balken,
+	.reiter a .symbol,
+	.kachel,
+	.klappe-titel::after {
+		transition: none;
+	}
+
+	.reiter a:active .symbol,
+	a.kachel:active {
+		transform: none;
+	}
+}
+
 /* PC-Layout ab 60em Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
 @container app (min-width: 60rem) {
 	.inhalt {
@@ -1143,6 +1432,11 @@ dialog.karte {
 	.reiter a[aria-current='page'] {
 		color: var(--farbe-flaeche);
 		box-shadow: inset 0 calc(-1 * var(--rand-akzent)) 0 var(--farbe-marke-hell);
+	}
+
+	/* Am PC unterstreicht der aktive Textlink selbst; der gleitende Balken gehört zum Handy */
+	.reiter .reiter-balken {
+		display: none;
 	}
 
 	.reiter a:focus-visible {
