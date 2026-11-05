@@ -20,10 +20,11 @@ MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Fragen zum Datenschutz
 [Ansprechperson], [E-Mail-Adresse des Vereins].
 
 **Welche Daten:** Name, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Mitgliedernummer,
-Lizenznummer und Klassierung, Ihre Anmeldungen, Resultate und Lizenzanträge. Ihre Grunddaten übernimmt
+Lizenznummer und Klassierung, Ihre Anmeldungen, Resultate und Lizenzanträge, Ihre An- oder
+Abmeldung zu Anlässen wie der Generalversammlung mit einer freiwilligen Bemerkung. Ihre Grunddaten übernimmt
 der Verein aus seiner Mitgliederliste.
 
-**Wozu:** für Ihr Konto, die Clubmeisterschaft, Lizenzanträge und Benachrichtigungen, die
+**Wozu:** für Ihr Konto, die Clubmeisterschaft, Anlässe, Lizenzanträge und Benachrichtigungen, die
 Sie selbst einschalten. Für nichts anderes.
 
 **Wer sieht was:**
@@ -31,12 +32,15 @@ Sie selbst einschalten. Für nichts anderes.
 - Der Admin sieht alle Ihre Daten und, ohne Inhalt, wer wann welche Angabe geändert oder
   welche Aktion ausgelöst hat (12 Monate). Ihren Einmal-Code kann nach dem Versand niemand mehr abrufen. Die Verantwortlichen von
   Clubmeisterschaft und Lizenzen sehen Ihren Namen, Ihre E-Mail und Telefonnummer und was
-  sie für ihre Aufgabe brauchen.
+  sie für ihre Aufgabe brauchen. Ihre An- oder Abmeldung zu einem Anlass und Ihre Bemerkung sehen
+  nur Sie und der Admin. Schreiben Sie in die Bemerkung bitte keine Angaben zur Gesundheit.
 - Alle Mitglieder sehen Name, Kategorien und Resultate der Clubmeisterschaft. Wer einen
   Doppelpartner sucht, sieht die Namen der Mitglieder, die für die Kategorie in Frage kommen.
 - Ihre Gegner und Ihr Doppelpartner sehen während der Clubmeisterschaft Ihre E-Mail und
   Telefonnummer, damit Sie die Spiele absprechen können.
 - Den Spielplan des Finalwochenendes sehen alle, auch ohne Login.
+- Die Kalenderdatei eines Anlasses (Titel, Zeit, Ort, Einladung) ist über ihren Link auch ohne
+  Login abrufbar; sie enthält keine Angaben zu Personen.
 - Swiss Tennis erhält Anmeldungen, Resultate und Lizenzanträge.
 
 **Wo:** Die Daten liegen bei Infomaniak in der Schweiz; E-Mails versendet [E-Mail-Dienst].
@@ -47,7 +51,8 @@ sie enthalten keine Daten anderer Mitglieder.
 Daten bleiben noch eine Frist lang, falls Sie zurückkommen [Frist, **Vorschlag K-38:** 1 Jahr], und werden
 dann gelöscht. Löscht der Verein Ihr Mitglied, zum Beispiel auf Ihren Wunsch, ist Ihr Konto
 sofort gesperrt, und Ihre Daten werden nach einer Woche gelöscht. In beiden Fällen bleibt Ihr
-Name in vergangenen Resultaten.
+Name in vergangenen Resultaten. Ihre An- oder Abmeldung zu einem Anlass löschen wir ein Jahr
+nach dem Anlass [**Vorschlag K-50**].
 
 **Login:** Sie loggen sich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 Ihr Gerät das Login mit einem Cookie, bis Sie MyTCO ein Jahr nicht genutzt haben oder sich

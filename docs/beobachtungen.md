@@ -402,3 +402,75 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Task 8 zu #50.
 
 **Einschätzung:** Hält, solange die Zahl der Mail-Tests klein bleibt. Kommen weitere dazu, eine Testeinstellung für die Grenzen oder eine IP je Projekt vorsehen.
+
+### 2026-11-05 — Anlass: Kachel und Seite nennen den Anmeldeschluss zu ungenau
+
+**Thema:** App
+
+**Fundort:** `src/lib/anlass/stand.ts`, `src/routes/anlass/[id]/+page.svelte`
+
+**Beobachtung:** Die Kachel sagt nur den Tag («Bitte bis Di, 16. März …»); setzt der Admin den Schluss auf 12.00 Uhr, schliesst die Anmeldung schon mittags. Auf der Anlass-Seite steht nirgends, bis wann sich die Antwort ändern lässt.
+
+**Ursprung:** Code-Review und cas-reviewer zu #52.
+
+**Einschätzung:** Klein. Uhrzeit nennen, wenn sie nicht 23.59 ist; auf der Seite «Antwort änderbar bis …» ergänzen. Mit der Überarbeitung des Vorschlags nach K-50 erledigen.
+
+### 2026-11-05 — Anlass: Kalenderdatei ohne SEQUENCE, Steuerzeichen nicht entfernt, 404 als rohes JSON
+
+**Thema:** App
+
+**Fundort:** `src/lib/server/anlass/kalender.ts`, `src/lib/server/anlass/schnittstellen.ts` (`getKalender`)
+
+**Beobachtung:** Nach einer Terminänderung (FR-32) ersetzen manche Kalender den alten Eintrag beim erneuten Import nicht, weil `SEQUENCE`/`LAST-MODIFIED` fehlen. Steuerzeichen ausser Zeilenumbrüchen werden nicht entfernt (RFC 5545). Für einen gelöschten Anlass zeigt der Browser `{"fehler":"nicht-gefunden"}`, weil der Link ausserhalb der App öffnet.
+
+**Ursprung:** Code-Review und cas-reviewer zu #52.
+
+**Einschätzung:** Klein. `LAST-MODIFIED` aus *Termin geändert am*, Steuerzeichen in `maskiere` entfernen, für 404 kurzen Text liefern. Bei der Handprüfung auf echten Geräten (Release-Checkliste) mit ansehen.
+
+### 2026-11-05 — Verwaltung Anlässe: Meldung bei Zeitumstellung, «Gespeichert» und Zählung ausgetretener Mitglieder
+
+**Thema:** Verwaltung
+
+**Fundort:** `src/lib/server/anlass/angaben.ts`, `src/routes/verwaltung/anlaesse/[id]/+page.svelte`, `ladeAnlassAdmin`
+
+**Beobachtung:** Eine Zeit in der Lücke der Umstellung meldet «Bitte Datum und Zeit angeben.», obwohl beides angegeben ist. Scheitert nach dem Speichern das Neuladen, fehlt «Gespeichert». *kommen* und *kommen nicht* zählen auch Antworten von Mitgliedern, die inzwischen ausgetreten sind; *noch keine Antwort* zählt nur aktive.
+
+**Ursprung:** Code-Review und cas-reviewer zu #52.
+
+**Einschätzung:** Klein. Eigene Meldung für die Umstellung; bei Neuladefehler trotzdem rückmelden; Zählung auf aktive Mitglieder beschränken, sobald der Austritt gebaut ist (Etappe 3 von #43).
+
+### 2026-11-05 — Löschfrist für Anmeldungen zu Anlässen ist versprochen, aber nicht gebaut
+
+**Thema:** Betrieb
+
+**Fundort:** `docs/datenschutz.md` (*Löschen*), `docs/datenschutzerklaerung.md`, DS-06
+
+**Beobachtung:** Datenschutzkonzept und -erklärung nennen «ein Jahr nach dem Anlass» (Vorschlag K-50). Gebaut ist nur das Löschen von Hand mit dem Anlass; das ist im Design so entschieden.
+
+**Ursprung:** Code-Review und cas-reviewer zu #52.
+
+**Einschätzung:** Mit den übrigen Löschfristen bauen (Austritt, K-38). Bis dahin löscht der Admin vergangene Anlässe. Vor dem Live-Gang mit Mitgliederdaten prüfen, ob DS-06 dafür erfüllt sein muss.
+
+### 2026-11-05 — Beispiel-GV in make seed läuft im März 2027 ab
+
+**Thema:** Betrieb
+
+**Fundort:** `scripts/beispiel-anlass.ts`
+
+**Beobachtung:** Die Daten sind fest (Beginn 19.03.2027). Nach dem Anmeldeschluss legt das Skript keine Antworten mehr an, nach dem Beginn erscheint die GV nicht mehr auf der Startseite.
+
+**Ursprung:** Code-Review und cas-reviewer zu #52.
+
+**Einschätzung:** Klein, nur lokal. Daten relativ zu `jetzt` berechnen, wenn der Vorschlag nach dem März 2027 noch vorgezeigt wird.
+
+### 2026-11-05 — E2E «Menü auf der Einstiegsseite bleibt beim weichen Aufklappen richtig gebunden» schlägt auf Android gelegentlich fehl
+
+**Thema:** App
+
+**Fundort:** `tests/e2e/bewegung.test.ts:283` (Projekt `android`)
+
+**Beobachtung:** Lokal in `make check` einmal, bei `--repeat-each 3` einmal von drei Läufen: Die Taste «MyTCO installieren» erscheint nicht innerhalb von 30 s nach `bietetInstallationAn(page, 'dismissed')`. Die übrigen Läufe und die CI auf `dev` sind grün.
+
+**Ursprung:** Abschluss-Prüfung zu #52 (der Branch ändert Einstiegsseite und Test nicht).
+
+**Einschätzung:** Vermutlich Wettlauf zwischen dem nachgestellten Install-Angebot und dem Laden der Seite. Bei der nächsten Arbeit an #54 oder der Einstiegsseite ansehen.

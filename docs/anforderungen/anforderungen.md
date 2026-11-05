@@ -124,15 +124,18 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-ANLASS-01 | Mitglieder melden sich direkt in MyTCO für Anlässe an | PDF 3d | später | später |
+| A-ANLASS-01 | Mitglieder melden sich direkt in MyTCO für Anlässe an | PDF 3d | Mitglieder-Login\* | umgesetzt\* |
 | A-ANLASS-02 | Anmeldung zum Junioren-Training (evtl. ab 2028) | PDF 3d | später | später |
 | A-ANLASS-03 | Anmeldung zu Junioren-Turnieren (ab 2028) | PDF 3d | später | später |
 | A-ANLASS-04 | Teilnehmerlisten für Junioren-Training und weitere Turniere, ähnlich der Lizenzliste | PDF 4b | später | später |
 
 A-ANLASS-01: Erster Anlass neben der Clubmeisterschaft ist die Generalversammlung ([#52](https://github.com/konstantinniedermann/tco-app/issues/52),
-[Design](../superpowers/specs/2026-11-05-gv-anmeldung-design.md)). Vorschlag K-50: An- oder Abmelden
-mit Bemerkung, beim Anmelden freiwillig ein Antrag oder eine Frage an den Vorstand, Liste nur für
-Admins, Anträge per Mail auch ans Präsidium. Die Etappe folgt aus der Antwort.
+[Design](../superpowers/specs/2026-11-05-gv-anmeldung-design.md)). Gebaut als Vorschlag für den
+Vorstand: Der Admin erstellt einen Anlass, alle Mitglieder sehen ihn auf der Startseite, melden
+sich an oder ab (mit freiwilliger Bemerkung) und speichern ihn im Kalender. Vorschlag K-50:
+Liste nur für Admins; Anträge, Zielgruppen und Stimmrecht später. Etappe und Status mit \*: Der
+Bau ist ein Vorschlag, der Vorstand bestätigt ihn mit K-50; den Kalendereintrag auf echten
+Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vor-dem-release).
 
 ### LIZENZ — Lizenzanträge und Lizenzliste
 

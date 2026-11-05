@@ -1,134 +1,164 @@
-# Design: Anmeldung zur Generalversammlung (#52, A-ANLASS-01)
+# Design: Anmeldung zu Anlässen am Beispiel der GV (#52, A-ANLASS-01)
 
 **Datum:** 2026-11-05 · **Issue:** [#52](https://github.com/konstantinniedermann/tco-app/issues/52)
-· **Status:** Vorschlag des Projektleiters, wird in einer späteren Session verbessert; hängt an K-50
+· **Status:** freigegeben (Projektleiter, 05.11.2026)
 
 ## Absicht
 
-Ein Mitglied meldet sich mit wenigen Tipps zur Generalversammlung (GV) an oder ab. Die Admins
-sehen jederzeit, wer kommt. Die GV ist der erste Anlass neben der Clubmeisterschaft und die
-**Vorlage für weitere Anlässe** (Saisoneröffnung, Clubabend): Was hier entsteht, heisst
-allgemein *Anlass*, nicht *GV*.
+Der Projektleiter will dem Vorstand **in der laufenden App** zeigen, wie eine Anmeldung zur
+Generalversammlung (GV) in MyTCO aussehen könnte. Der Admin erstellt einen Anlass, z. B. die GV.
+Er erscheint bei allen Mitgliedern auf der Startseite. Das Mitglied meldet sich mit wenigen Tipps
+an oder ab und speichert den Termin in seinem Kalender. Die Admins sehen jederzeit, wer kommt.
 
-Wie der Verein die GV-Anmeldung heute führt, ist nicht bekannt. Das fragt K-50. Bis zur Antwort
-gilt dieser Vorschlag; jede Annahme ist markiert.
+Gezeigt wird lokal beim Projektleiter (`make dev`, `make dev-handy`), mit erfundenen Daten. Test
+und Live sind noch nicht in Betrieb. Gebaut wird trotzdem normal, ohne Schalter: Was hier
+entsteht, geht mit dem nächsten Release mit (Entscheid Projektleiter).
+
+Die GV ist der erste Anlass neben der Clubmeisterschaft. Gebaut wird allgemein *Anlass*, nicht
+*GV*, damit Saisoneröffnung oder Clubabend ohne Umbau folgen können.
 
 ## Was die Statuten 2026 vorgeben
 
-| Artikel | Vorgabe | Folge für MyTCO |
-|---------|---------|-----------------|
-| Art. 27 | Ordentliche GV jährlich, üblicherweise im Frühling; Einladung mit Traktandenliste mindestens 21 Tage vorher, per E-Mail erlaubt | Einladung und Traktanden beim Anlass zeigen |
-| Art. 18 | Stimmberechtigt: Aktiv-, Frei-, Ehrenmitglieder, Studierende/Lernende. Junioren und Passivmitglieder mit beratender Stimme. Keine Stellvertretung | Liste zeigt die Stimmberechtigten getrennt |
-| Art. 30 | Anträge schriftlich und kurz begründet an den Präsidenten, mindestens 12 Tage vor der GV | Antragsfrist eigener Termin, früher als der Anmeldeschluss möglich |
-
-Eine Anmeldung oder Entschuldigung verlangen die Statuten nicht; sie ist Brauch des Vereins.
+| Artikel | Vorgabe | Folge |
+|---------|---------|-------|
+| Art. 27 | Ordentliche GV jährlich, üblicherweise im Frühling; Einladung mit Traktandenliste mindestens 21 Tage vorher, per E-Mail erlaubt | Einladung und Traktanden stehen als Text beim Anlass; der Versand bleibt beim Vorstand |
+| Art. 18 | Stimmrecht nur für einen Teil der Kategorien | Nicht gebaut: MyTCO kennt die Mitgliederkategorie nicht (siehe Nicht-Ziele) |
+| Art. 30 | Anträge schriftlich an den Präsidenten, 12 Tage vorher | Nicht gebaut (siehe Nicht-Ziele) |
 
 ## Ziele
 
-1. Das Mitglied sieht auf der Startseite eine eigene Karte zur GV mit Datum, Ort und dem Link zu
-   Einladung und Traktanden.
-2. Es sagt mit einem Tipp **«Ich komme»** oder **«Ich komme nicht»**; bei der Abmeldung kann es
-   eine Bemerkung dazuschreiben (Entschuldigung). Das Feld sagt, dass kein Grund wie eine
-   Krankheit nötig ist ([Datenschutz](../../datenschutz.md): keine Gesundheitsdaten, auch nicht
-   als Grund für eine Abmeldung). Bis zum Anmeldeschluss lässt sich die Antwort ändern.
-3. Wer sich anmeldet, kann **freiwillig** einen **Antrag** an die GV (Art. 30) oder eine
-   **Frage an den Vorstand** einreichen (Opt-in, standardmässig zugeklappt).
-4. Der Admin legt den Anlass an (Titel, Datum, Zeit, Ort, Einladung als Text oder PDF,
-   Anmeldeschluss, Antragsfrist) und sieht die Liste: kommt, kommt nicht, keine Antwort; dazu
-   Bemerkungen, Anträge und Fragen.
-5. Geht ein Antrag oder eine Frage ein, erhalten die Admins und eine beim Anlass hinterlegte
-   Adresse des Präsidiums eine E-Mail; so erreicht ein Antrag den Präsidenten, wie es Art. 30
-   verlangt. Anmeldungen allein lösen keine Mail aus.
+1. **Admin erstellt einen Anlass** in der Verwaltung: Titel, Beginn (Datum und Zeit), Ort,
+   Einladung (Freitext, z. B. Traktanden), Anmeldeschluss. Er kann ihn ändern und löschen.
+2. **Startseite:** Jeder kommende Anlass erscheint bei **allen Mitgliedern** als hervorgehobene
+   Kachel unter «Jetzt aktuell» mit Datum und dem eigenen Stand («Bitte bis … an- oder
+   abmelden», «Du kommst», «Du kommst nicht»). Ein vergangener Anlass verschwindet.
+3. **Anlass-Seite:** Karte *Einladung*, Karte *Kommst du?* mit zwei Auswahlflächen «Ich komme» /
+   «Ich komme nicht», Haupttaste «Antwort senden». Bei «Ich komme nicht» erscheint das Feld
+   *Bemerkung (freiwillig)*. Bis zum Anmeldeschluss lässt sich die Antwort ändern; danach zeigt
+   die Seite sie nur noch an.
+4. **Kalender:** Nebentaste «In den Kalender» öffnet eine `.ics`-Datei; iPhone und Android
+   übernehmen sie in den Kalender des Geräts. Ohne neue Abhängigkeit. Der Link funktioniert
+   **ohne Login**, weil die App vom Startbildschirm auf dem iPhone ihre Anmeldung nicht an die
+   Ansicht weitergibt, die die Datei öffnet. Jeder Anlass hat dafür eine eigene, nicht
+   erratbare Kalender-Kennung; die Datei enthält nur Titel, Beginn, Ort und Einladung, keine
+   Personendaten.
+5. **Verwaltung, Anlass ansehen:** Kennzahlen *kommen*, *kommen nicht*, *noch keine Antwort*
+   (alle aktiven Mitglieder ohne Antwort, auch solche ohne Login); Tabelle nur mit den Antworten:
+   Name, Antwort, Bemerkung, geändert am.
+6. **Termin geändert:** Ändert der Admin Beginn oder Ort, bleiben die Antworten. Wer schon
+   geantwortet hat, sieht auf Startseite und Anlass-Seite «Datum oder Ort geändert, bitte prüfe
+   deine Antwort», bis er erneut antwortet.
+7. **Erfundene Beispieldaten:** `make seed` legt eine GV 2027 mit einigen Antworten erfundener
+   Mitglieder an, damit die Ansichten beim Vorzeigen nicht leer sind.
 
 ## Nicht-Ziele
 
-- Kein Abstimmen und keine Wahlen in MyTCO.
-- Die Einladung selbst verschickt weiterhin der Vorstand wie heute (Art. 27). MyTCO zeigt sie
-  zusätzlich an.
-- Kein Entscheid über Anträge in MyTCO; ob ein Antrag traktandiert wird, klärt der Vorstand
-  ausserhalb.
-- Keine Begleitpersonen, keine Essens- oder Menüwahl. Weitere Anlässe brauchen das vielleicht;
-  dann kommt es als Zusatzfeld des Anlasses dazu.
-- Keine neue Rolle *Vorstand* oder *Präsident*.
+- Kein Antrag und keine Frage an den Vorstand über MyTCO (bleibt in K-50).
+- Keine Zielgruppe: Jeder Anlass gilt für alle aktiven Mitglieder. Kein Stimmrecht, keine
+  Mitgliederkategorie.
+- Keine Mails oder Push-Mitteilungen zum Anlass; keine Erinnerungen.
+- Kein Export der Liste (DS-04).
+- Keine Begleitpersonen, kein Essen, keine Teilnehmerbegrenzung.
+- Kein Schalter, keine Entwurfs-Stufe: Ein erstellter Anlass ist sofort sichtbar.
 
-## Annahmen bis zur Antwort auf K-50
+## Regeln
 
-- Annahme K-50: Anmelden geht ab dem Versand der Einladung bis zum Anmeldeschluss, den der Admin
-  setzt (Vorschlag: 3 Tage vor der GV).
-- Annahme K-50: Anträge und Fragen gehen bis zur Antragsfrist ein, standardmässig 12 Tage vor
-  der GV (Art. 30); danach ist nur noch An- und Abmelden möglich.
-- Annahme K-50: Ein Antrag über MyTCO gilt als «schriftlich» im Sinne von Art. 30.
-- Annahme K-50: Liste, Bemerkungen und Eingaben sehen nur die Admins von MyTCO (laut K-18 der
-  Projektleiter und die Hauptansprechperson), nicht der ganze Vorstand. Der Präsident ist
-  nicht zwingend Admin; Anträge und Fragen erhält er per Mail an die Adresse des Präsidiums.
-  Wo die App sagt, wer etwas liest, nennt sie genau «Admins» bzw. «Präsidium».
-- Annahme K-50: Mitglieder sehen nur ihre eigene Antwort, nicht wer sonst kommt (RR-05).
-- Annahme K-50: Eingeladen sind alle Mitglieder; Junioren und Passivmitglieder sind in der Liste
-  als «beratend» markiert (Art. 18). Ob Schüler und Interclub-Mitglieder eingeladen sind, lassen
-  die Statuten offen.
-- Annahme K-50: Juniorenkonten meldet nach Vorschlag K-08 ein Elternteil an.
+| ID | Regel |
+|----|-------|
+| FR-27 | Ein Anlass ist für alle aktiven Mitglieder sichtbar, solange sein Beginn nicht vorbei ist |
+| FR-28 | An- und abmelden geht bis zum Anmeldeschluss (einschliesslich der Minute); der Anmeldeschluss liegt nicht nach dem Beginn |
+| FR-29 | Je Mitglied und Anlass gibt es höchstens eine Antwort, *kommt* oder *kommt nicht*; eine neue Antwort ersetzt die alte |
+| FR-30 | Eine Bemerkung gibt es nur bei *kommt nicht*, höchstens 500 Zeichen; wechselt die Antwort auf *kommt*, wird sie gelöscht |
+| FR-31 | Löscht der Admin einen Anlass, sind alle Antworten dazu mit gelöscht |
+| FR-32 | Ändert der Admin Beginn oder Ort, bleiben die Antworten; eine Antwort, die älter ist als die Änderung, gilt als *zu prüfen*, bis das Mitglied erneut antwortet |
 
-## Fachmodell (Skizze)
+Die Nummern FR-27 bis FR-32 folgen auf die letzte im Fachmodell; vor dem Bau dort prüfen.
 
-Das Fachmodell sieht schon ein eigenes Objekt *Anlass* mit Anmeldungen vor, getrennt vom
-Turnier. Nach dem [Glossar](../../glossar.md) heisst auch die Antwort zur GV *Anmeldung*.
-Vorschlag:
+## Fachmodell
 
-| Objekt | Angaben |
-|--------|---------|
-| **Anlass** | Titel, Datum und Zeit, Ort, Einladung (Text, optional PDF), Anmeldeschluss, Antragsfrist (optional), Adresse für Eingaben (optional), Status *Entwurf* → *offen* → *geschlossen* → *vorbei* |
-| **Anmeldung** (zum Anlass) | Anlass, Mitglied, Antwort *kommt* / *kommt nicht*, Bemerkung (optional), geändert am |
-| **Eingabe** (neuer Begriff, ins Glossar) | Anlass, Mitglied, Art *Antrag* / *Frage*, Text, eingereicht am |
+| Objekt | Angaben | Personendaten |
+|--------|---------|---------------|
+| **Anlass** | Titel, Beginn, Ort, Einladung (Text), Anmeldeschluss, Kalender-Kennung, Termin geändert am, erstellt von, erstellt am | — |
+| **Anmeldung** (zum Anlass) | Anlass, Mitglied, Antwort *kommt* / *kommt nicht*, Bemerkung (optional), geändert am | Antwort, Bemerkung |
 
-Die Antragsfrist ist optional, weil spätere Anlässe keine Anträge kennen.
+Nach dem [Glossar](../../glossar.md) heisst auch die Antwort zur GV *Anmeldung*, auch die
+Abmeldung. Im Code `anlass` und `anlass_anmeldung`, getrennt von der künftigen CM-Anmeldung.
 
-**Stimmrecht:** «Du bist stimmberechtigt» und die Spalte *Stimmrecht* brauchen die
-Mitgliederkategorie (Aktiv, Passiv, Junior …, Statuten Art. 5–13). Sie steht heute weder im
-Fachmodell noch unter *Welche Daten*. Annahme K-50: Sie kommt mit dem Einlesen aus Fairgate
-(K-45) oder wird von Hand gepflegt; ohne sie entfällt die Anzeige des Stimmrechts.
+## Rechte
+
+| Daten / Funktion | Mitglied | Admin |
+|------------------|----------|-------|
+| Kommende Anlässe | L | S (erstellen, ändern, löschen) |
+| Eigene Anmeldung zum Anlass, bis Anmeldeschluss | S eigene | S eigene |
+| Anmeldungen aller (Name, Antwort, Bemerkung) | – | L |
+| Kalenderdatei eines Anlasses (ohne Personendaten) | wer den Link hat, auch ohne Login | wer den Link hat |
+
+Die Verwaltung der Anlässe verlangt wie die Mitgliederverwaltung die Bestätigung per Mail-Code
+(RR-09). CM- und Lizenzverantwortliche sehen nichts Zusätzliches.
 
 ## Datenschutz (vor dem Bau nachführen)
 
-Neu sind die Anmeldung zum Anlass mit Bemerkung, die Eingaben und die Mitgliederkategorie. Vor
-der Umsetzung in [`datenschutz.md`](../../datenschutz.md) aufnehmen: *Welche Daten* (Antwort,
-Bemerkung, Eingaben, Mitgliederkategorie), *Wer sieht was* (Mitglied eigene, Admin alle,
-Eingaben zusätzlich per Mail ans Präsidium), *Löschen* (Vorschlag: Anmeldungen und Bemerkungen
-nach der GV mit dem Protokoll, spätestens nach einem Jahr; Anträge bleiben beim Vorstand
-ausserhalb von MyTCO). Der Export der Liste («Liste exportieren») widerspricht heute DS-04
-(Exporte nur mit den Feldern für Swiss Tennis): DS-04 erweitern oder den Export weglassen.
-Danach in die Datenschutzerklärung.
+- *Welche Daten:* neue Zeile «Anmeldungen zu Anlässen (Antwort, freiwillige Bemerkung)».
+- Die Bemerkung sagt im Hilfetext: «Ein Grund ist nicht nötig, bitte keine Angaben zur
+  Gesundheit. Die Bemerkung lesen nur die Admins.» (keine Gesundheitsdaten, auch nicht als Grund
+  für eine Abmeldung).
+- *Wer sieht was:* Mitglied die eigene; Admin alle.
+- *Löschen:* Anmeldungen ein Jahr nach dem Anlass löschen (Vorschlag K-50). Gebaut wird die
+  automatische Löschung mit den übrigen Löschfristen, nicht in diesem Issue; bis dahin löscht der
+  Admin den Anlass.
+- Die Kalenderdatei ist ohne Login abrufbar, enthält aber keine Personendaten (nur Anlassdaten).
+- Datenschutzerklärung entsprechend ergänzen.
 
 ## Oberfläche
 
-Erster Entwurf als Design-Artifact
-[MyTCO GV-Anmeldung](https://claude.ai/artifact/K3oLGEXvEbqPDWnobf2jA6) (privat, nur für den
-Projektleiter), gebaut aus den Werten von `tokens.css` und den Bausteinen des
-[UI-Leitbilds](../../ui-leitbild.md). Das Design System *MyTCO* war noch leer.
+Nach dem [UI-Leitbild](../../ui-leitbild.md) und dem Entwurf
+[MyTCO GV-Anmeldung](https://claude.ai/artifact/K3oLGEXvEbqPDWnobf2jA6) (Bildschirme 1–4; der
+Bildschirm Verwaltung ohne Stimmrecht, Export und Anträge).
 
-1. **Startseite:** GV als hervorgehobene Kachel unter «Jetzt aktuell».
-2. **GV-Seite:** Karte *Einladung* (Datum, Ort, Traktanden, PDF, «Du bist stimmberechtigt»), Karte
-   *Kommst du?* mit zwei Auswahlflächen, Aufklappbereich *Antrag oder Frage an den Vorstand
-   (freiwillig)*, Haupttaste «Antwort senden».
-3. **Abmelden:** «Ich komme nicht» gewählt, darunter *Bemerkung (freiwillig)* mit dem Hilfetext
-   «Ein Grund ist nicht nötig, bitte keine Angaben zur Gesundheit. Die Bemerkung lesen nur die
-   Admins von MyTCO.»
-4. **Nach dem Senden:** Karte *Deine Antwort* mit Plakette und Nebentaste «Antwort ändern»,
-   Karte mit der eingereichten Frage.
-5. **Verwaltung (PC):** Kennzahlen (kommen, davon stimmberechtigt, kommen nicht, keine Antwort),
-   Karte *Anträge und Fragen*, Leiste mit Suche, Filter, «Liste exportieren», Tabelle mit
-   Stimmrecht und Bemerkung.
+| Seite | Inhalt |
+|-------|--------|
+| Startseite `/` | Kachel je kommendem Anlass unter «Jetzt aktuell» |
+| Anlass `/anlass/[id]` | Einladung, Kommst du?, Bemerkung, «Antwort senden», «In den Kalender» |
+| Verwaltung `/verwaltung/anlaesse` | Liste der Anlässe, Haupttaste «Neuer Anlass» |
+| Verwaltung `/verwaltung/anlaesse/neu` und `/[id]` | Formular; bei `/[id]` Kennzahlen und Tabelle der Antworten, «Anlass löschen» mit Rückfrage |
 
-**Bausteine, die im Leitbild fehlen** (vor dem Bau dort aufnehmen): Auswahlfläche (Radio als
-Fläche mit Rand, gewählt in `--farbe-marke-zart`), mehrzeiliges Eingabefeld, Kennzahl-Kachel der
-Verwaltung, Plakette *kommt nicht* bzw. *keine Antwort*.
+Neue Bausteine, die zuerst ins Leitbild kommen: **Auswahlfläche** (Radio als Fläche mit Rand,
+gewählt in `--farbe-marke-zart`), **mehrzeiliges Feld** (`textarea` im Baustein *Eingabefeld*),
+**Kennzahl** (Zahl und Text in einer Karte, Verwaltung). Die Seitenleiste der Verwaltung erhält
+den Bereich *Anlässe*.
 
-## Offen für die spätere Session
+## Technik
 
-- Entwurf mit dem Projektleiter verbessern und freigeben.
-- Antwort auf K-50 einarbeiten, Etappe von A-ANLASS-01 festlegen (Kandidat: GV 2027, sofern sie
-  nach dem Release *Mitglieder-Login* am 28.02.2027 liegt).
-- Datenschutz, Rollen und Rechte (Matrix), Fachmodell und Glossar (*Eingabe*) nachführen; dann
-  Plan.
-- `make annahmen` prüft diese Notiz nicht (Ordner `docs/superpowers/` gilt als Historie). Kommt
-  die Antwort auf K-50, die Annahmen oben von Hand abgleichen; die lebende Markierung steht
-  unter A-ANLASS-01 in den Anforderungen.
+- Zwei neue Tabellen mit einer neuen Migration; keine Änderung an bestehenden.
+- Schnittstellen nur als `+server.ts` (ADR-002): `GET /api/anlaesse`, `GET /api/anlaesse/[id]`,
+  `POST /api/anlaesse/[id]/anmeldung`, `GET /api/kalender/[kennung]` (`text/calendar`, ohne
+  Login; Kennung aus 32 Zufallsbytes, base64url);
+  `GET`/`POST /api/admin/anlaesse`, `GET`/`POST /api/admin/anlaesse/[id]`,
+  `POST /api/admin/anlaesse/[id]/loeschen` (ändernde Anfragen nur als `POST` mit JSON, SI-10).
+- Kalenderdatei von Hand nach RFC 5545 (UID, DTSTART/DTEND in UTC, SUMMARY, LOCATION,
+  DESCRIPTION). Annahme: Dauer 2 Stunden, weil der Anlass kein Ende kennt.
+- Anzeige der Zeiten in Schweizer Zeit (`Europe/Zurich`).
+
+## Nachweis
+
+Einheiten- und Datenbanktests für Regeln und Schnittstellen (TDD), E2E für Admin erstellt →
+Mitglied sieht Kachel → meldet sich an → Admin sieht Antwort, mit Screenshot auf iPhone, Android
+und PC und axe ohne Verstösse. Den Kalendereintrag prüft der Projektleiter von Hand auf einem
+echten iPhone und Android-Gerät (`make dev-handy`); der E2E-Test prüft nur die Datei.
+
+## Entscheide des Bauenden
+
+- Die Einladung ist reiner Text, kein PDF (keine Datei-Ablage).
+- Admins sehen auch vergangene Anlässe in der Verwaltung; Mitglieder nicht.
+- Kacheln auf der Startseite nach Beginn sortiert, der nächste zuerst.
+- Nach dem Senden zeigt die Anlass-Seite die Antwort mit Plakette und «Antwort ändern» (Entwurf,
+  Bildschirm 4).
+
+## Annahmen bis zur Antwort auf K-50
+
+- Annahme K-50: Anmeldeschluss setzt der Admin frei (Vorschlag in der Maske: 3 Tage vor Beginn).
+- Annahme K-50: Liste und Bemerkungen sehen nur die Admins von MyTCO, nicht der ganze Vorstand.
+- Annahme K-50: Jeder Anlass gilt für alle aktiven Mitglieder.
+
+`make annahmen` prüft diese Notiz nicht (Historie); die lebenden Markierungen stehen in
+Anforderungen, Datenschutz und Fachmodell.

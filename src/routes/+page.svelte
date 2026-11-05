@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { standText } from '../lib/anlass/stand.ts';
+	import { formatiereBeginn } from '../lib/anlass/zeit.ts';
 	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { hinweisErledigt, kannPasskey, richtePasskeyEin } from '../lib/login/passkey.ts';
 	import type { PageProps } from './$types';
@@ -61,4 +63,17 @@
 			<p class="fehler" id="passkey-fehler" role="alert">{fehler}</p>
 		{/if}
 	</div>
+{/if}
+
+{#if data.anlaesse.length > 0}
+	<h2>Jetzt aktuell</h2>
+	{#each data.anlaesse as a (a.id)}
+		<a class="karte kachel hervor" href={resolve('/anlass/[id]', { id: String(a.id) })}>
+			<span>
+				<strong>{a.titel}</strong><br />
+				<span class="leise">{formatiereBeginn(a.beginn)}<br />{standText(a)}</span>
+			</span>
+			<span class="kachel-pfeil" aria-hidden="true">›</span>
+		</a>
+	{/each}
 {/if}
