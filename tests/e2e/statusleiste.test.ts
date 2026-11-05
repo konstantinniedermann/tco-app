@@ -26,3 +26,28 @@ test('Statusleisten-Band: fest, deckend, ausserhalb des App-Rahmens, ohne Status
 		imRahmen: false
 	});
 });
+
+// Die Regeln für die App vom Startbildschirm kann Playwright nicht auslösen (kein
+// display-mode standalone); geprüft wird, dass sie im ausgelieferten Stil stehen und dass ohne
+// sie (Browser, Mockups) der helle Seitenhintergrund bleibt. Am iPhone bestätigt.
+test('Statusleisten-Band: in der App vom Startbildschirm höher und grüner Seitenhintergrund', async ({
+	page
+}) => {
+	await page.goto('/login');
+	const regeln = await page.evaluate(() => {
+		const gefunden: string[] = [];
+		for (const blatt of Array.from(document.styleSheets)) {
+			for (const regel of Array.from(blatt.cssRules)) {
+				if (regel instanceof CSSMediaRule && regel.conditionText.includes('standalone')) {
+					gefunden.push(regel.cssText.replace(/\s+/g, ' '));
+				}
+			}
+		}
+		return gefunden.join(' ');
+	});
+	expect(regeln).toContain('.statusleiste');
+	expect(regeln).toMatch(/height: calc\(env\(safe-area-inset-top\) \+ var\(--abstand-3\)\)/);
+	expect(regeln).toMatch(/html, body \{ background: var\(--farbe-marke\)/);
+	const hintergrund = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+	expect(hintergrund).not.toBe('rgb(15, 107, 79)');
+});

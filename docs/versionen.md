@@ -17,8 +17,10 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
   Text direkt aus `docs/datenschutzerklaerung.md` (als Entwurf markiert, Freigabe K-06.2 offen).
 - Kopfleiste und Reiter reichen auf dem iPhone unter Status- und Home-Balken, die Kopfleiste bleibt
   beim Scrollen oben stehen, seitliche Abstände fürs Querformat. Gegen den Schleier von iOS 26
-  oben in der App vom Startbildschirm ein festes, deckendes Statusleisten-Band (am iPhone zu
-  bestätigen; mitlaufende Kopfleiste allein reichte nicht).
+  oben in der App vom Startbildschirm ein festes, deckendes Statusleisten-Band; ohne
+  `black-translucent`, das den Schutz abschaltete. In der App vom Startbildschirm grüner
+  Seitenhintergrund, damit beim Scrollen kein heller Schleier bleibt. Am iPhone bestätigt;
+  bestehende Verknüpfungen müssen einmal neu auf den Home-Bildschirm.
 - Anleitung zum Startbildschirm (iPhone): deutlicher Hinweis für die Safari-Tablayouts «Unten» und
   «Oben» (dort gleich auf «Teilen», weiter bei Schritt 3), im Brief «••• (falls da)». Die
   Animation zeigt weiterhin nur das Vorgabe-Layout «Kompakt» (Entscheid Projektleiter).
