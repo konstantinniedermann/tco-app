@@ -182,6 +182,27 @@ test('Zwei schnelle Reiter-Klicks hintereinander', async ({ page }) => {
 	expect(fehler).toEqual([]);
 });
 
+test('Bedienelemente wie in einer App, Text bleibt markierbar', async ({ page }) => {
+	await meldeAn(page, 'Pia');
+	const stil = (ort: ReturnType<Page['locator']>, eigenschaft: string) =>
+		ort.evaluate((el, e) => getComputedStyle(el).getPropertyValue(e), eigenschaft);
+	// WebKit wertet nur die Schreibweise mit Präfix aus; Chromium kennt beide.
+	const markieren = (ort: ReturnType<Page['locator']>) =>
+		ort.evaluate((el) => {
+			const s = getComputedStyle(el);
+			return s.getPropertyValue('-webkit-user-select') || s.getPropertyValue('user-select');
+		});
+	expect(await markieren(reiter(page, 'Start'))).toBe('none');
+	expect(await markieren(page.getByRole('banner'))).toBe('none');
+	expect(await markieren(page.getByRole('heading', { level: 1 }))).not.toBe('none');
+	const html = page.locator('html');
+	expect(await stil(html, 'touch-action')).toBe('manipulation');
+	expect(await stil(html, 'color-scheme')).toBe('light');
+	// Nur Browser mit Tipp-Blitz (WebKit, Chrome auf dem Handy) kennen die Eigenschaft.
+	const blitz = await stil(html, '-webkit-tap-highlight-color');
+	if (blitz !== '') expect(blitz).toBe('rgba(0, 0, 0, 0)');
+});
+
 test('Unbekannte Adresse aus einem Reiter: Fehlerseite ohne Fusszeile', async ({ page }) => {
 	const fehler = sammleKonsolenfehler(page);
 	await meldeAn(page, 'Ava');

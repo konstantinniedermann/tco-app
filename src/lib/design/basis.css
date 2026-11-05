@@ -70,6 +70,39 @@ a {
 	outline-color: var(--farbe-marke-hell);
 }
 
+/*
+ * Bedienung wie in einer App (Leitbild «Bewegung und Bedienung»): MyTCO ist immer hell, kein
+ * grauer Tipp-Blitz (dafür Gedrückt-Zustände bei den Bausteinen), Doppeltipp zoomt nicht
+ * (zwei Finger schon), die Schrift bläht sich im Querformat nicht auf.
+ */
+:root {
+	color-scheme: light;
+}
+
+html {
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
+/* Bedienelemente lassen sich nicht markieren und öffnen beim langen Drücken kein Link-Menü */
+.kopf,
+.reiter,
+.taste-haupt,
+.taste-neben,
+.zurueck,
+.kachel,
+.klappe-titel {
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none;
+}
+
+a:active {
+	background-color: var(--farbe-marke-zart);
+}
+
 img {
 	max-width: 100%;
 	height: auto;
@@ -225,6 +258,20 @@ html {
 	font-weight: 700;
 }
 
+/* Gedrückt: grün, Symbol etwas kleiner; kein Hintergrund wie bei Textlinks */
+.reiter a:active {
+	color: var(--farbe-marke);
+	background-color: transparent;
+}
+
+.reiter a .symbol {
+	transition: transform var(--dauer-kurz) var(--kurve-standard);
+}
+
+.reiter a:active .symbol {
+	transform: scale(0.9);
+}
+
 /*
  * Balken über dem aktiven Reiter: ein einziges Element, das zum gewählten Reiter gleitet
  * (UI-09). Breite und Lage aus data-anzahl und data-aktiv am <nav>; style-Attribute sind
@@ -334,6 +381,10 @@ html {
 	border: var(--rand-dick) solid var(--farbe-marke);
 }
 
+.taste-neben:active {
+	background: var(--farbe-marke-zart);
+}
+
 .taste-breit {
 	display: flex;
 	width: 100%;
@@ -352,6 +403,7 @@ html {
 .zurueck {
 	display: inline-block;
 	margin-bottom: var(--abstand-3);
+	border-radius: var(--radius);
 }
 
 /* Eingabefelder */
@@ -457,6 +509,11 @@ dialog.karte {
 	content: '›';
 	color: var(--farbe-marke);
 	font-size: var(--groesse-gross);
+	transition: transform var(--dauer-mittel) var(--kurve-standard);
+}
+
+.klappe-titel:active {
+	background-color: var(--farbe-marke-zart);
 }
 
 .klappe[open] > .klappe-titel::after {
@@ -474,6 +531,15 @@ dialog.karte {
 	gap: var(--abstand-3);
 	color: var(--farbe-text);
 	text-decoration: none;
+	transition:
+		transform var(--dauer-kurz) var(--kurve-standard),
+		background-color var(--dauer-kurz) linear;
+}
+
+/* Nur die ganze Kachel als Link wird gedrückt; eine Kachel mit eigener Taste bleibt ruhig */
+a.kachel:active {
+	background-color: var(--farbe-marke-zart);
+	transform: scale(0.98);
 }
 
 .klappe .kachel {
