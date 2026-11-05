@@ -378,3 +378,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Code-Review und cas-reviewer zu #52.
 
 **Einschätzung:** Klein, nur lokal. Daten relativ zu `jetzt` berechnen, wenn der Vorschlag nach dem März 2027 noch vorgezeigt wird.
+
+### 2026-11-05 — E2E «Menü auf der Einstiegsseite bleibt beim weichen Aufklappen richtig gebunden» schlägt auf Android gelegentlich fehl
+
+**Thema:** App
+
+**Fundort:** `tests/e2e/bewegung.test.ts:283` (Projekt `android`)
+
+**Beobachtung:** Lokal in `make check` einmal, bei `--repeat-each 3` einmal von drei Läufen: Die Taste «MyTCO installieren» erscheint nicht innerhalb von 30 s nach `bietetInstallationAn(page, 'dismissed')`. Die übrigen Läufe und die CI auf `dev` sind grün.
+
+**Ursprung:** Abschluss-Prüfung zu #52 (der Branch ändert Einstiegsseite und Test nicht).
+
+**Einschätzung:** Vermutlich Wettlauf zwischen dem nachgestellten Install-Angebot und dem Laden der Seite. Bei der nächsten Arbeit an #54 oder der Einstiegsseite ansehen.
