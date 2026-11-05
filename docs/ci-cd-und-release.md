@@ -248,7 +248,7 @@ ausserhalb des Servers aufbewahrt werden müssen und wo, steht in
 ## Einstellungen der App
 
 Die App liest ihre Einstellungen aus Umgebungsvariablen. Lokal stehen sie in `.env` (Vorlage
-`.env.example`, kopieren); `make dev` und `make seed` brechen ohne diese Datei ab. Fehlt ein
+`.env.example`, kopieren); `make dev`, `make dev-handy`, `make seed` und `make admin` brechen ohne diese Datei ab. Fehlt ein
 `MYTCO_*`-Pflichtwert, startet der Server nicht. Fehlt `DATABASE_URL`, startet er zwar, aber
 `/api/status` meldet einen Fehler und der Login antwortet mit einem Serverfehler. Beim Bauen
 werden sie nicht geprüft.

@@ -125,7 +125,7 @@ classDiagram
 | FR-29 | Je Mitglied und Anlass gibt es höchstens eine Antwort, *kommt* oder *kommt nicht*; eine neue Antwort ersetzt die alte | A-ANLASS-01 | umgesetzt |
 | FR-30 | Eine Bemerkung gibt es nur bei *kommt nicht*, höchstens 500 Zeichen; wechselt die Antwort auf *kommt*, wird sie gelöscht | A-ANLASS-01 | umgesetzt |
 | FR-31 | Löscht der Admin einen Anlass, sind alle Antworten dazu mit gelöscht | A-ANLASS-01 | umgesetzt |
-| FR-32 | Ändert der Admin Beginn oder Ort, bleiben die Antworten; eine Antwort, die älter ist als die Änderung, gilt als *zu prüfen*, bis das Mitglied erneut antwortet | A-ANLASS-01 | umgesetzt |
+| FR-32 | Ändert der Admin Beginn oder Ort, bleiben die Antworten; eine Antwort, die älter ist als die Änderung, gilt als *zu prüfen*, bis das Mitglied erneut antwortet oder der Anmeldeschluss vorbei ist | A-ANLASS-01 | umgesetzt |
 
 ## Lebenszyklen
 

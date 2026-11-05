@@ -223,7 +223,8 @@ und der aktive Eintrag der Seitenleiste tragen `aria-current="page"`, keine eige
 `--breite-inhalt`), Reiter unten. Ab `60rem` Breite wandern die Reiter als Textlinks in die
 Kopfleiste.
 
-- **Reiter:** Start · CM · Profil; *Lizenz* kommt mit der Etappe *Lizenzanträge*. Höchstens
+- **Reiter:** Start · CM · Profil (heute Start · Profil, *CM* kommt mit der Etappe
+  *CM-Anmeldung*); *Lizenz* kommt mit der Etappe *Lizenzanträge*. Höchstens
   4 Reiter, kein verstecktes Menü (☰). „CM" ist die Kurzform, weil „Clubmeisterschaft" bei
   grosser Schrift nicht in den Reiter passt; Seitentitel schreiben es aus.
 - **Startseite:** „Hoi <Vorname>", darunter „Jetzt aktuell" (Kacheln, die wichtigste
@@ -245,7 +246,7 @@ Kopfleiste.
 **Verwaltung (vor allem am PC):** erreichbar über einen Eintrag unter *Profil*, nur für
 Konten mit einer Rolle über *Mitglied* hinaus (RR-07). Dunkelgrüne Seitenleiste mit
 „MyTCO Verwaltung", den Bereichen der eigenen Rollen (Admin: Mitglieder, Anlässe,
-Änderungsverlauf) und „‹ Zur App". Inhalt: Titel,
+Für Fairgate mit Zahl der offenen, Änderungsverlauf) und „‹ Zur App". Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
 
 ### Bewegung und Bedienung
@@ -259,7 +260,7 @@ die Bewegung zeigt, wohin man gegangen ist. Dauern und Kurven stehen unter
 | Wechsel | Beispiele | Bewegung |
 |---------|-----------|----------|
 | gleiche Ebene | Start ↔ Profil, Einstiegsseite → Login, Login → Start | Inhalt blendet über (`--dauer-kurz`, linear) |
-| eine Ebene tiefer | Start → Hilfe, Login → Datenschutz, Login → Login mit Mail-Code, Profil → E-Mail ändern | neue Seite schiebt sich von rechts herein, alte Seite und Reiter weichen um 28 % nach links (`--dauer-schieben`, `--kurve-schieben`) |
+| eine Ebene tiefer | Start → Hilfe, Login → Datenschutz, Login → Login mit Mail-Code, Profil → E-Mail ändern, Start → Anlass | neue Seite schiebt sich von rechts herein, alte Seite und Reiter weichen um 28 % nach links (`--dauer-schieben`, `--kurve-schieben`) |
 | zurück | „‹ Zurück" | umgekehrt: Seite schiebt sich nach rechts weg |
 | Zurück-Taste oder -Geste des Browsers, Verwaltung, unbekannte Adresse | | keine; die Geste animiert der Browser selbst, eine unbekannte Adresse lädt die Seite neu. Lässt sich eine bekannte Seite nicht laden, bewegt sich die Fehlerseite wie die Seite, die sie ersetzt |
 

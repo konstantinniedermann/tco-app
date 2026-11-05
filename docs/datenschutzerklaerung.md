@@ -65,7 +65,8 @@ E-Mail-Adresse, nur im Arbeitsspeicher und nur, um die Zahl der Code-Mails zu be
 E-Mail-Adresse, bestätigen Sie die Änderung mit je einem Code an die alte und die neue
 Adresse. Bis Sie beide Codes eingetippt haben, merkt sich Ihr Gerät die neue Adresse; ist die
 Änderung bestätigt, mit «‹ Zurück» abgebrochen oder Sie melden sich ab, löscht MyTCO sie sofort; sonst nach 15 Minuten spätestens beim nächsten Start der App. Auf
-dem Server liegt die neue Adresse bis dahin nur im Arbeitsspeicher und verfällt nach 15 Minuten. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis. Richten Sie freiwillig einen
+dem Server liegt die neue Adresse bis dahin nur im Arbeitsspeicher und verfällt nach 15 Minuten;
+für die Grenze der Code-Mails merkt sich MyTCO sie dort höchstens 24 Stunden. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis. Richten Sie freiwillig einen
 Passkey ein, speichert MyTCO je Passkey nur dessen öffentlichen Schlüssel, eine Kennung, einen
 Zähler, die Adresse der App, eine grobe Gerätebezeichnung (z. B. «iPhone») sowie wann Sie ihn
 eingerichtet und zuletzt benutzt haben. Diese Angaben löschen wir, sobald Sie den Passkey
@@ -74,7 +75,7 @@ einen Passkey einrichten wollen (auch wenn Sie abbrechen), und bleibt, bis Ihr K
 Schlüsselbund an, MyTCO speichert sie dafür nicht zusätzlich. Ob der Hinweis auf den Passkey
 noch erscheint, merkt sich MyTCO an Ihrer Sitzung.
 
-**Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login nötig ist. Keine Werbung,
+**Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login und den Wechsel der E-Mail-Adresse nötig ist. Keine Werbung,
 keine Analyse-Dienste.
 
 **Ihre Rechte:** Sie können jederzeit erfahren, welche Daten MyTCO über Sie hat, und sie

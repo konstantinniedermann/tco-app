@@ -127,7 +127,7 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] iPhone (Safari): QR-Code scannen → Einstiegsseite mit Anleitung; die Schritte und Beschriftungen stimmen mit Safari überein; nach dem Ablegen startet MyTCO vom Symbol direkt mit dem Login (A-HILFE-02)
 - [ ] Android (Chrome): Taste «MyTCO installieren» öffnet den Dialog von Android; die Anleitung über das Menü stimmt mit Chrome überein; im Samsung-Browser beobachten, ob die Anleitung passt (A-HILFE-02)
 - [ ] Seite Hilfe ohne Login über die Fusszeile erreichbar, der Kontakt stimmt (A-HILFE-01)
-- [ ] Anlass: «In den Kalender» auf einem echten iPhone **in der App vom Startbildschirm** und auf einem Android-Handy; der Termin landet mit Datum, Zeit und Ort im Kalender des Geräts (A-ANLASS-01, SI-19)
+- [ ] Anlass: «In den Kalender» auf einem echten iPhone **in der App vom Startbildschirm** und auf einem Android-Handy; der Termin landet mit Datum, Zeit und Ort im Kalender des Geräts (A-ANLASS-01, SI-19); vorher als Erika in der Verwaltung einen Anlass anlegen (Test ist nach jeder Auslieferung ohne Anlass)
 - [ ] iPhone, App vom Startbildschirm: Telefon und Adresse im Profil ändern; E-Mail ändern, in die Mail-App wechseln und zurück → Schritt 2 mit den zwei Code-Feldern steht da, beide Mails kommen an (über die Umleitung), danach Login mit der neuen Adresse (A-KONTO-01, A-KONTO-02, SI-09)
 - [ ] Admin-Seite am PC: die Selbständerung erscheint unter *Für Fairgate* und verschwindet nach dem Abhaken (A-KONTO-02)
 - [ ] iPhone (App vom Startbildschirm) und Android: Reiterwechsel blendet über, Hilfe schiebt sich herein und mit «‹ Zurück» hinaus, Aufklappbereich öffnet weich; kein grauer Tipp-Blitz, kein Link-Menü beim langen Drücken auf Reiter und Tasten; mit «Bewegung reduzieren» alles ohne Bewegung (UI-09, #54)
@@ -136,7 +136,7 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] Push einschalten und erhalten (ab Etappe *CM-Betrieb*)
 - [ ] Erika Beispiel öffnet auf Test die Verwaltung mit Code per Mail (SI-08, A-ROLLE-02)
 - [ ] Admin-Seite am PC: die geänderten Funktionen einmal durchgehen
-- [ ] Vor dem ersten Live-Release mit Mitgliedern: Hinweis an die alte E-Mail-Adresse (FR-25, SI-09) ist gebaut, sonst Datenschutzerklärung anpassen
+- [ ] Vor dem ersten Live-Release mit Mitgliedern: Hinweis an die alte E-Mail-Adresse (FR-25, SI-09), Löschung des Änderungsverlaufs nach 12 Monaten (FR-26) und der Anlass-Antworten ein Jahr nach dem Anlass (K-50) sind gebaut, sonst Datenschutzerklärung anpassen
 - [ ] `admin-festlegen` einmal auf Test über `docker compose exec` ausgeführt
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
