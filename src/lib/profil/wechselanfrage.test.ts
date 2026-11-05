@@ -3,6 +3,7 @@ import { MAILANFRAGE_SCHLUESSEL, merkeMailanfrage } from '../login/mailanfrage.t
 import {
 	WECHSEL_SCHLUESSEL,
 	merkeWechsel,
+	raeumeWechselAuf,
 	startZustand,
 	vergissWechsel
 } from './wechselanfrage.ts';
@@ -66,6 +67,34 @@ describe('A-KONTO-01: E-Mail-Wechsel übersteht Neuladen', () => {
 		expect(startZustand(s, START)).toEqual({ schritt: 'adresse', email: '' });
 		merkeWechsel(s, 'lea.neu@example.org', START);
 		vergissWechsel(s);
+		expect(s.daten.has(MAILANFRAGE_SCHLUESSEL)).toBe(true);
+	});
+
+	it('Start der App räumt einen abgelaufenen Eintrag weg, einen gültigen nicht', () => {
+		const s = speicher();
+		merkeWechsel(s, 'lea.neu@example.org', START);
+		raeumeWechselAuf(s, START + 15 * MINUTE_MS);
+		expect(s.daten.has(WECHSEL_SCHLUESSEL)).toBe(true);
+		raeumeWechselAuf(s, START + 15 * MINUTE_MS + 1);
+		expect(s.daten.has(WECHSEL_SCHLUESSEL)).toBe(false);
+	});
+
+	it('Start der App räumt einen kaputten Eintrag weg und fasst die Login-Anfrage nicht an', () => {
+		const s = speicher();
+		s.daten.set(WECHSEL_SCHLUESSEL, 'kein json');
+		merkeMailanfrage(s, 'lea.beispiel@example.org', START);
+		raeumeWechselAuf(s, START);
+		expect(s.daten.has(WECHSEL_SCHLUESSEL)).toBe(false);
+		expect(s.daten.has(MAILANFRAGE_SCHLUESSEL)).toBe(true);
+	});
+
+	it('Abmelden: vergissWechsel entfernt den gültigen Eintrag, die Login-Anfrage bleibt', () => {
+		const s = speicher();
+		merkeWechsel(s, 'lea.neu@example.org', START);
+		merkeMailanfrage(s, 'lea.beispiel@example.org', START);
+		vergissWechsel(s);
+		expect(s.daten.has(WECHSEL_SCHLUESSEL)).toBe(false);
+		expect(startZustand(s, START)).toEqual({ schritt: 'adresse', email: '' });
 		expect(s.daten.has(MAILANFRAGE_SCHLUESSEL)).toBe(true);
 	});
 });

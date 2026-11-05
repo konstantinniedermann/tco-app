@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { MELDUNG, meldung, sende } from '../../lib/login/anmelden.ts';
+	import { holeSpeicher } from '../../lib/login/mailanfrage.ts';
 	import {
 		entfernePasskey,
 		kannPasskey,
@@ -19,13 +20,14 @@
 		type EigeneAngaben,
 		type EigenesFeld
 	} from '../../lib/profil/angaben.ts';
+	import { vergissWechsel } from '../../lib/profil/wechselanfrage.ts';
 	import { feldMeldung } from '../../lib/verwaltung/anzeige.ts';
 	import type { FullAutoFill } from 'svelte/elements';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
-	// Meine Angaben (A-KONTO-02, Variante A): jede Angabe als Text mit «Ändern»; «Ändern» öffnet
+	// Meine Angaben (A-KONTO-01, A-KONTO-02, Variante A): jede Angabe als Text mit «Ändern»; «Ändern» öffnet
 	// die Felder dieser einen Angabe an Ort und Stelle, nie zwei zugleich (UI-04).
 	// Annahme K-19.1: Telefon und Lizenznummer, Annahme K-19.2: Adresse ändert das Mitglied selbst.
 	type Angabe = 'telefon' | 'adresse' | 'lizenznummer';
@@ -242,8 +244,11 @@
 		abmeldenFehler = null;
 		const r = await sende('/api/logout', {});
 		abmeldenLaeuft = false;
-		if (r.ergebnis === 'ok') await goto(resolve('/login'));
-		else abmeldenFehler = meldung(r, MELDUNG.stoerung);
+		if (r.ergebnis === 'ok') {
+			// A-KONTO-01: Die gemerkte neue Adresse eines laufenden E-Mail-Wechsels bleibt nicht liegen.
+			vergissWechsel(holeSpeicher());
+			await goto(resolve('/login'));
+		} else abmeldenFehler = meldung(r, MELDUNG.stoerung);
 	}
 </script>
 

@@ -22,6 +22,11 @@ export function vergissWechsel(s: Pick<Storage, 'removeItem'>): void {
 	vergissMailanfrage(s, WECHSEL_SCHLUESSEL);
 }
 
+/** Beim Start der App: abgelaufene oder kaputte Einträge löschen (gültige bleiben). */
+export function raeumeWechselAuf(s: Speicher, jetzt: number): void {
+	leseMailanfrage(s, jetzt, WECHSEL_SCHLUESSEL);
+}
+
 /** Womit die Unterseite startet: mit gültigem Eintrag gleich bei den Codes. */
 export function startZustand(s: Speicher, jetzt: number): WechselZustand {
 	const email = leseMailanfrage(s, jetzt, WECHSEL_SCHLUESSEL);

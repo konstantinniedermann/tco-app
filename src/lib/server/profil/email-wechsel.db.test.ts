@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { afterAll, describe, expect, test } from 'vitest';
+import { afterAll, describe, expect, test, vi } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { aenderung, mitglied } from '../db/schema.ts';
@@ -68,11 +68,11 @@ describe('E-Mail-Wechsel', () => {
 		expect(codes.mails).toHaveLength(2);
 		expect(codes.mails.find((n) => n.an === l.email)).toEqual({
 			an: l.email,
-			...baueWechselCodeMail(codes.alt, 'alt')
+			...baueWechselCodeMail(codes.alt, 'alt', KONTAKT)
 		});
 		expect(codes.mails.find((n) => n.an === neu)).toEqual({
 			an: neu,
-			...baueWechselCodeMail(codes.neu!, 'neu')
+			...baueWechselCodeMail(codes.neu!, 'neu', KONTAKT)
 		});
 
 		expect(await z.dienst.bestaetige(l.konto, codes.alt, codes.neu)).toBe('ok');
@@ -295,6 +295,49 @@ describe('E-Mail-Wechsel', () => {
 		await db.update(mitglied).set({ email: neu }).where(eq(mitglied.id, andere.mitgliedId));
 		expect(await z.dienst.bestaetige(l.konto, codes.alt, codes.neu)).toBe('falsch');
 		expect(await emailVon(l.mitgliedId)).toBe(l.email);
+	});
+
+	test('A-KONTO-01: Prüfung der vergebenen Adresse scheitert → feste Logzeile, Bestätigung falsch', async () => {
+		const zeit = { t: start };
+		const post: Nachricht[] = [];
+		let selects = 0;
+		// Das erste select (Mitglied laden) geht durch, das zweite (Adresse vergeben?) wirft.
+		const kaputt = new Proxy(db, {
+			get(ziel, name) {
+				if (name === 'select') {
+					return (...a: unknown[]) => {
+						selects += 1;
+						if (selects >= 2) throw new Error('db an lea@example.org kaputt');
+						return (ziel.select as (...b: unknown[]) => unknown)(...a);
+					};
+				}
+				return Reflect.get(ziel, name, ziel);
+			}
+		});
+		const fehler: unknown[][] = [];
+		const spaeher = vi.spyOn(console, 'error').mockImplementation((...a) => void fehler.push(a));
+		try {
+			const dienst = erstelleEmailWechselDienst({
+				db: kaputt,
+				schluessel: SCHLUESSEL,
+				kontakt: KONTAKT,
+				mailer: async (n) => void post.push(n),
+				bremsen: erstelleBremsen(() => zeit.t.getTime()),
+				jetzt: () => zeit.t
+			});
+			const l = await lea();
+			const r = await dienst.starte(l.konto, neueAdresse(), 'ip-1');
+			expect(r.annahme).toBe('ok');
+			await r.arbeit;
+			expect(selects).toBe(2);
+			expect(post).toHaveLength(0);
+			expect(fehler).toEqual([['Wechsel-Prüfung nicht möglich']]);
+			// Der Eintrag bleibt «vergeben»: auch beliebige Codes bestätigen nichts.
+			expect(await dienst.bestaetige(l.konto, '123456', '654321')).toBe('falsch');
+			expect(await emailVon(l.mitgliedId)).toBe(l.email);
+		} finally {
+			spaeher.mockRestore();
+		}
 	});
 
 	test('SI-05: Mail-Fehler nur als feste Logzeile', async () => {

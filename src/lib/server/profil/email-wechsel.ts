@@ -19,7 +19,7 @@ import type { AngemeldetesKonto } from '../login/sitzung.ts';
 import { FAIRGATE_FELDER } from './angaben.ts';
 
 export const WECHSEL_MAX = 1000;
-const AUFRAEUMEN_MS = 10 * 60 * 1000;
+export const AUFRAEUMEN_MS = 10 * 60 * 1000;
 
 export type EmailWechselDienst = {
 	// `arbeit` läuft ohne Warten des Aufrufers und lehnt nie ab. `annahme` verrät nie, ob die
@@ -41,7 +41,7 @@ export type EmailWechselAbh = {
 	jetzt?: () => Date;
 };
 
-type Wechsel = {
+export type Wechsel = {
 	/** Adresse beim Start, getrimmt und klein; stimmt sie bei der Bestätigung nicht mehr, gilt nichts. */
 	bisherige: string;
 	/** Neue Adresse, wie `pruefeAngaben` sie speichern würde (getrimmt, klein). */
@@ -55,18 +55,24 @@ type Wechsel = {
 };
 
 /** Höchstens ein laufender Wechsel pro Konto; Einfügereihenfolge der Map = Alter. */
-class WechselSpeicher {
+export class WechselSpeicher {
 	readonly #eintraege = new Map<number, Wechsel>();
 	readonly #jetzt: () => number;
+	readonly #max: number;
 
-	constructor(jetzt: () => number) {
+	constructor(jetzt: () => number, max = WECHSEL_MAX) {
 		this.#jetzt = jetzt;
+		this.#max = max;
+	}
+
+	get groesse(): number {
+		return this.#eintraege.size;
 	}
 
 	lege(kontoId: number, wechsel: Wechsel): void {
 		this.#eintraege.delete(kontoId);
 		this.#eintraege.set(kontoId, wechsel);
-		while (this.#eintraege.size > WECHSEL_MAX) {
+		while (this.#eintraege.size > this.#max) {
 			const aeltester = this.#eintraege.keys().next();
 			if (aeltester.done) break;
 			this.#eintraege.delete(aeltester.value);
@@ -131,13 +137,13 @@ export function erstelleEmailWechselDienst(abh: EmailWechselAbh): EmailWechselDi
 			console.error('Wechsel-Prüfung nicht möglich');
 			return;
 		}
-		const mails = [sende({ an: an.alt, ...baueWechselCodeMail(codes.alt, 'alt') })];
+		const mails = [sende({ an: an.alt, ...baueWechselCodeMail(codes.alt, 'alt', kontakt) })];
 		if (an.neu) {
 			mails.push(
 				sende(
 					wechsel.vergeben
 						? { an: wechsel.neue, ...baueAdresseVergebenMail(kontakt) }
-						: { an: wechsel.neue, ...baueWechselCodeMail(codes.neu, 'neu') }
+						: { an: wechsel.neue, ...baueWechselCodeMail(codes.neu, 'neu', kontakt) }
 				)
 			);
 		}

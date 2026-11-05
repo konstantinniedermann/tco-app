@@ -17,7 +17,8 @@ export function baueCodeMail(code: string): { betreff: string; text: string } {
 // SI-09: Je ein Code an die bisherige und an die neue Adresse; erst beide zusammen ändern die Adresse.
 export function baueWechselCodeMail(
 	code: string,
-	art: 'alt' | 'neu'
+	art: 'alt' | 'neu',
+	kontakt: string
 ): { betreff: string; text: string } {
 	const fuer = art === 'alt' ? 'die bisherige Adresse' : 'die neue Adresse';
 	const anderer = art === 'alt' ? 'an deine neue Adresse' : 'an deine bisherige Adresse';
@@ -30,7 +31,9 @@ export function baueWechselCodeMail(
 			'',
 			'Der Code gilt 15 Minuten und nur einmal.',
 			'',
-			'Hast du keine Änderung angefordert? Dann kannst du diese Mail ignorieren, deine Adresse bleibt, wie sie ist.'
+			art === 'alt'
+				? `Warst du das nicht? Dann melde dich bei ${kontakt}, damit fremde Anmeldungen beendet werden können. Deine Adresse bleibt, wie sie ist, solange kein Code eingegeben wird.`
+				: 'Hast du keine Änderung angefordert? Dann kannst du diese Mail ignorieren, deine Adresse bleibt, wie sie ist.'
 		].join('\n')
 	};
 }

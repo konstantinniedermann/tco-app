@@ -41,17 +41,19 @@ describe('baueCodeMail', () => {
 
 describe('baueWechselCodeMail', () => {
 	test('SI-09: Mail an die bisherige Adresse nennt Code und «bisherige»', () => {
-		const { betreff, text } = baueWechselCodeMail('123456', 'alt');
+		const { betreff, text } = baueWechselCodeMail('123456', 'alt', 'kontakt@example.org');
 		expect(betreff).not.toBe('');
 		expect(text.startsWith('123456')).toBe(true);
 		expect(text).toContain('bisherige');
 		expect(text).toContain('15 Minuten');
+		expect(text).toContain('Warst du das nicht? Dann melde dich bei kontakt@example.org');
+		expect(text).not.toContain('ignorieren');
 		expect(text).not.toContain('http');
 		expect(text).not.toContain('ß');
 	});
 
 	test('SI-09: Mail an die neue Adresse nennt Code und «neue»', () => {
-		const { text } = baueWechselCodeMail('654321', 'neu');
+		const { text } = baueWechselCodeMail('654321', 'neu', 'kontakt@example.org');
 		expect(text.startsWith('654321')).toBe(true);
 		expect(text).toContain('neue Adresse');
 		expect(text).not.toContain('http');

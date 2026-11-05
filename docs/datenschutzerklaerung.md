@@ -59,7 +59,7 @@ löscht MyTCO sie spätestens beim nächsten Start. Ihre IP-Adresse wird dabei h
 E-Mail-Adresse, nur im Arbeitsspeicher und nur, um die Zahl der Code-Mails zu begrenzen. Ändern Sie Ihre
 E-Mail-Adresse, bestätigen Sie die Änderung mit je einem Code an die alte und die neue
 Adresse. Bis Sie beide Codes eingetippt haben, merkt sich Ihr Gerät die neue Adresse; ist die
-Änderung älter als 15 Minuten, löscht MyTCO sie spätestens beim nächsten Öffnen der Seite. Auf
+Änderung bestätigt, mit «‹ Zurück» abgebrochen oder Sie melden sich ab, löscht MyTCO sie sofort; sonst nach 15 Minuten spätestens beim nächsten Start der App. Auf
 dem Server liegt die neue Adresse bis dahin nur im Arbeitsspeicher und verfällt nach 15 Minuten. Ändert der Admin Ihre Adresse, erhält die alte einen Hinweis. Richten Sie freiwillig einen
 Passkey ein, speichert MyTCO je Passkey nur dessen öffentlichen Schlüssel, eine Kennung, einen
 Zähler, die Adresse der App, eine grobe Gerätebezeichnung (z. B. «iPhone») sowie wann Sie ihn

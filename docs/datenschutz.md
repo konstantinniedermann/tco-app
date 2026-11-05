@@ -36,7 +36,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Konto, Rollen, Benachrichtigungs-Einstellungen | Login, Berechtigungen, Push | ja |
 | Passkey (A-LOGIN-07): je Passkey Kennung, öffentlicher Schlüssel, Zähler, Übertragungswege, Adresse der App (Relying-Party-ID), grobe Gerätebezeichnung (nur das Etikett aus dem Browser, z. B. *iPhone*), eingerichtet am, zuletzt benutzt; je Konto eine zufällige Passkey-Kennung (keine Personendaten); je Sitzung ein Merker, ob der Passkey-Hinweis noch erscheint. Name und E-Mail-Adresse liegen nur im Schlüsselbund des Mitglieds (sein Gerät zeigt sie an), MyTCO speichert sie dafür nicht zusätzlich | Login ohne Code | nein |
 | IP-Adresse bei Login-Versuchen und E-Mail-Wechseln; eingetippte E-Mail-Adresse einer Code-Anfrage, Empfänger-Adressen eines E-Mail-Wechsels | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
-| Laufender E-Mail-Wechsel (A-KONTO-01, SI-09): neue Adresse, beide Codes nur als Hash, Ablauf, Fehlversuche; nur im Arbeitsspeicher des Servers, gültig höchstens 15 Minuten. Die neue Adresse liegt dazu 15 Minuten im Gerätespeicher des eigenen Geräts, damit Schritt 2 ein Neuladen übersteht (wie die Code-Anfrage beim Login) | Neue Adresse mit je einem Code an die alte und die neue bestätigen | — |
+| Laufender E-Mail-Wechsel (A-KONTO-01, SI-09): neue Adresse, beide Codes nur als Hash, Ablauf, Fehlversuche; nur im Arbeitsspeicher des Servers, gültig höchstens 15 Minuten. Die neue Adresse liegt dazu im Gerätespeicher des eigenen Geräts, damit Schritt 2 ein Neuladen übersteht (wie die Code-Anfrage beim Login); gelöscht nach Bestätigung, bei «‹ Zurück», beim Abmelden, sonst nach Ablauf (15 Minuten) spätestens beim nächsten Start der App | Neue Adresse mit je einem Code an die alte und die neue bestätigen | — |
 | Markierung *für Fairgate offen seit* (Annahme K-19.2) | Der Admin sieht, welche selbst geänderten Kontaktangaben (Adresse, E-Mail, Telefon) er noch von Hand nach Fairgate übertragen muss (Liste *Für Fairgate*, A-KONTO-02) | — |
 | Anmeldungen (mit Kommentar zum Wildcard-Antrag), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
 | Austrittsdatum | Löschfrist nach Austritt | — |
@@ -93,8 +93,8 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
   Bestätigung oder neuem Wechsel, nach 5 Fehlversuchen, abgelaufen (15 Minuten) spätestens
   10 Minuten später, und mit jedem Neustart von MyTCO.
 - **Neue E-Mail-Adresse im Gerätespeicher** während eines E-Mail-Wechsels: nach der
-  Bestätigung, bei «‹ Zurück» zu Schritt 1, sonst beim nächsten Öffnen der Seite, sobald der
-  Wechsel älter als 15 Minuten ist.
+  Bestätigung, bei «‹ Zurück» zu Schritt 1, beim Abmelden, sonst nach Ablauf (15 Minuten)
+  spätestens beim nächsten Start der App.
 - **Markierung für Fairgate offen:** sobald der Admin die Angaben als übertragen abhakt; das
   Abhaken steht im Änderungsverlauf.
 - **Testgruppe:** Liste der Testpersonen nach Lauf 2, spätestens zu Beginn der
