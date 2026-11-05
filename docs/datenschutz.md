@@ -37,6 +37,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Passkey (A-LOGIN-07): je Passkey Kennung, öffentlicher Schlüssel, Zähler, Übertragungswege, Adresse der App (Relying-Party-ID), grobe Gerätebezeichnung (nur das Etikett aus dem Browser, z. B. *iPhone*), eingerichtet am, zuletzt benutzt; je Konto eine zufällige Passkey-Kennung (keine Personendaten); je Sitzung ein Merker, ob der Passkey-Hinweis noch erscheint. Name und E-Mail-Adresse liegen nur im Schlüsselbund des Mitglieds (sein Gerät zeigt sie an), MyTCO speichert sie dafür nicht zusätzlich | Login ohne Code | nein |
 | IP-Adresse bei Login-Versuchen; eingetippte E-Mail-Adresse einer Code-Anfrage | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
 | Anmeldungen (mit Kommentar zum Wildcard-Antrag), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
+| Anmeldungen zu Anlässen: Antwort *kommt* / *kommt nicht*, freiwillige Bemerkung (ohne Angaben zur Gesundheit) | Planung des Anlasses, z. B. der Generalversammlung (A-ANLASS-01) | nein |
 | Austrittsdatum | Löschfrist nach Austritt | — |
 | *Verwaltet von*: Elternteil, der das Konto eines Juniors führt (Vorschlag K-08) | Kind ohne eigenes Login | — |
 | Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (A-MITGLIED-07) | — |
@@ -50,13 +51,14 @@ Bankdaten.
 
 | Wer | Sieht |
 |-----|-------|
-| Mitglied | alle eigenen Daten; den Änderungsverlauf zum eigenen Konto auf Anfrage bei der Ansprechperson |
+| Mitglied | alle eigenen Daten, auch die eigenen Anmeldungen zu Anlässen; den Änderungsverlauf zum eigenen Konto auf Anfrage bei der Ansprechperson |
 | Elternteil, der ein Kind führt | alle Daten des Kindes, ändert sie und meldet es an (Vorschlag K-08) |
-| Admin | alle Daten der Mitglieder und den Änderungsverlauf; Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
+| Admin | alle Daten der Mitglieder und den Änderungsverlauf; alle Anmeldungen zu Anlässen mit Bemerkung (**Annahme K-50:** nur die Admins, nicht der ganze Vorstand); Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
 | CM-Verantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
 | Lizenzverantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
 | Alle Mitglieder | Name, Kategorien und Resultate der Clubmeisterschaft; bei der Wahl des Doppelpartners die Namen der Mitglieder, die für die Kategorie passen |
 | Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31) |
+| Alle, ohne Login | Kalenderdatei eines Anlasses über einen nicht erratbaren Link: Titel, Beginn, Ort, Einladung, keine Personendaten |
 | Alle, ohne Login | Spielplan des Finalwochenendes mit Name, Kategorie, Platz, Zeit, Resultat (**Vorschlag K-39**, spätere Etappe) |
 | Swiss Tennis | Anmeldungen, Resultate und Lizenzanträge, als Export von Hand |
 
@@ -74,6 +76,8 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
   rückgängig machen; dann gilt wieder der Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum). Nach der Woche wird gelöscht wie nach der Frist beim Austritt.
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
+- **Anmeldungen zu Anlässen:** ein Jahr nach dem Anlass (**Vorschlag K-50**). Bis die Löschfristen
+  gebaut sind, löscht der Admin den Anlass; mit ihm sind alle Anmeldungen dazu gelöscht.
 - **Eingelesene Mitgliederliste** (A-MITGLIED-07): wird nach dem Einlesen nicht aufbewahrt;
   übernommen werden nur Felder aus [Welche Daten](#welche-daten).
 - **Logs und Backups:** höchstens 30 Tage.

@@ -147,7 +147,8 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Nebentaste | `.taste-neben` | weiss mit grünem Rand |
 | Link | `a` | grün, unterstrichen |
 | Zurück | `.zurueck` | „‹ Zurück" oben links auf Unterseiten |
-| Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern |
+| Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`) |
+| Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset>` |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
 | Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm |
 | Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen |
@@ -169,6 +170,8 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Feld-Zeile | `.feld-zeile` | nur Verwaltung: Bezeichnung links, Eingabe rechts, gleiche Schriftgrösse; unter `60rem` steht die Bezeichnung über dem Feld |
 | Inaktive Taste | `.taste-haupt:disabled`, `.taste-neben:disabled` | nur Verwaltung: grau, solange es nichts zu speichern gibt; die Taste nennt, was sie speichert («Angaben speichern», «Rollen speichern»); Haupt- und Nebentaste sehen inaktiv gleich aus |
 | Spalten | `.spalten` | nur Verwaltung: zwei Spalten ab `60rem` |
+| Kennzahl | `.kennzahl` in `.kennzahlen` | nur Verwaltung: Karte mit einer Zahl in `--groesse-titel` und dem Text darunter in `.leise` (*kommen*, *noch keine Antwort*); mehrere nebeneinander, brechen um |
+| Mehrzeiliger Text | `.mehrzeilig` | Freitext mit Zeilenumbrüchen anzeigen, wie eingegeben (Einladung eines Anlasses) |
 
 ### Welche Fläche wofür
 
@@ -201,7 +204,9 @@ Kopfleiste.
   4 Reiter, kein verstecktes Menü (☰). „CM" ist die Kurzform, weil „Clubmeisterschaft" bei
   grosser Schrift nicht in den Reiter passt; Seitentitel schreiben es aus.
 - **Startseite:** „Hoi <Vorname>", darunter „Jetzt aktuell" (Kacheln, die wichtigste
-  hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04).
+  hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
+  stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
+  (A-ANLASS-01).
 - **Unterseiten:** „‹ Zurück" oben links.
 - **Einstiegsseite** (nur im Handy-Browser, nicht vom Symbol aus): „Willkommen bei MyTCO", eine Karte „Zuerst auf den Startbildschirm" mit der Anleitung bzw. auf Android der Haupttaste „MyTCO installieren", darunter der Link „Ohne Startbildschirm weiter" zum Login.
 - **Hilfe:** ohne Login, über die Fusszeile; jedes Thema ein Aufklappbereich, der Kontakt eine Karte.
@@ -216,7 +221,8 @@ Kopfleiste.
 
 **Verwaltung (vor allem am PC):** erreichbar über einen Eintrag unter *Profil*, nur für
 Konten mit einer Rolle über *Mitglied* hinaus (RR-07). Dunkelgrüne Seitenleiste mit
-„MyTCO Verwaltung", den Bereichen der eigenen Rollen und „‹ Zur App". Inhalt: Titel,
+„MyTCO Verwaltung", den Bereichen der eigenen Rollen (Admin: Mitglieder, Anlässe,
+Änderungsverlauf) und „‹ Zur App". Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
 
 ## Brief (Druck)

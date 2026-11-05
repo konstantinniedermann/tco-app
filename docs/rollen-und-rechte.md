@@ -69,6 +69,11 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | **Lizenzanträge** | | | | | |
 | Eigener Lizenzantrag (FR-20) | – | S eigene | S eigene | S eigene | S eigene |
 | Lizenzrunde, Antragsliste, Export, abhaken (FR-22) | – | – | – | S | S |
+| **Anlässe** | | | | | |
+| Kommende Anlässe (FR-27) | – | L | L | L | S (erstellen, ändern, löschen) |
+| Eigene Anmeldung zum Anlass, bis Anmeldeschluss (FR-28) | – | S eigene | S eigene | S eigene | S eigene |
+| Anmeldungen aller zum Anlass: Name, Antwort, Bemerkung (Annahme K-50) | – | – | – | – | L |
+| Kalenderdatei eines Anlasses, ohne Personendaten (SI-19) | L über den Link | L | L | L | L |
 
 ## Später
 
