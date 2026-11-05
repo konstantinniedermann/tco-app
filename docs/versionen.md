@@ -7,6 +7,10 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+- Handy im WLAN: `make dev-handy` startet den Entwicklungsserver für ein Handy im selben WLAN
+  (Login per Code, ohne Passkey); ein E2E-Test belegt, dass der Produktions-Build das
+  Login-Cookie weiterhin nur über HTTPS schickt (SI-06).
+
 ## 0.4.0 — Hilfe beim Start, Mitgliederverwaltung und Passkey, nicht ausgeliefert
 
 Noch kein Server, die Auslieferung ist ausgeschaltet: ohne Tag und ohne Checkliste auf Test

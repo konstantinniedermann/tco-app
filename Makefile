@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev seed admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
+.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev dev-handy seed admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -50,6 +50,17 @@ db: voraussetzungen-docker ## Lokale Datenbank und Mail-Fänger Mailpit starten 
 # .env über Node statt über die Shell laden: Werte enthalten «<», Leerzeichen und Kommas.
 dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einstellungen aus .env)
 	node --env-file=.env node_modules/vite/bin/vite.js dev
+
+# Nur der Entwicklungsserver: Dort setzt SvelteKit das Login-Cookie ohne `Secure`, darum klappt
+# der Login per Code über http. Passkey braucht HTTPS und geht hier nicht.
+dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs Handy im selben WLAN (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
+	@ip=$$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null); \
+	[ -n "$$ip" ] || { echo "Abbruch: keine WLAN-Adresse gefunden — ist der Laptop im WLAN?" >&2; exit 1; }; \
+	echo ""; \
+	echo "  Am Handy öffnen:   http://$$ip:5173"; \
+	echo "  Mails (am Laptop): http://localhost:58025"; \
+	echo ""; \
+	MYTCO_ADRESSE=http://$$ip:5173 node --env-file=.env node_modules/vite/bin/vite.js dev --host $$ip --port 5173 --strictPort
 
 seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 3 erfundene Mitglieder anlegen, Brief-Code ausgeben (Einstellungen aus .env)
 	node --env-file=.env scripts/migrate.ts
