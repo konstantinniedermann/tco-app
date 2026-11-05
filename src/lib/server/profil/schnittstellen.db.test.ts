@@ -159,15 +159,17 @@ describe('Profil-Schnittstellen', () => {
 		]);
 	});
 
-	test('A-KONTO-02: postEmail antwortet 202 sofort, ohne auf den Mailversand zu warten', async () => {
+	test('A-KONTO-01: postEmail antwortet 202 sofort, ohne auf den Mailversand zu warten', async () => {
 		const s = baue();
 		const l = await lea();
 		const neu = `lea.neu-${crypto.randomUUID()}@example.org`;
 		const r = await postEmail(s.d, ereignis({ body: { email: neu }, konto: l.konto }));
 		expect([r.status, await r.json()]).toEqual([202, {}]);
+		// Die Mails laufen im Hintergrund; warten, damit nichts nach dem Test weiterläuft.
+		await vi.waitFor(() => expect(s.post).toHaveLength(2));
 	});
 
-	test('A-KONTO-02: postEmail meldet gleiche und ungültige Adresse mit 400', async () => {
+	test('A-KONTO-01: postEmail meldet gleiche und ungültige Adresse mit 400', async () => {
 		const { d } = baue();
 		const l = await lea();
 		const gleich = await postEmail(
@@ -179,8 +181,8 @@ describe('Profil-Schnittstellen', () => {
 		expect([kaputt.status, await kaputt.json()]).toEqual([400, { fehler: 'eingabe' }]);
 	});
 
-	test('A-KONTO-02: postEmail bremst nach 3 Anfragen pro Stunde mit 429', async () => {
-		const { d } = baue();
+	test('A-KONTO-01: postEmail bremst nach 3 Anfragen pro Stunde mit 429', async () => {
+		const { d, post } = baue();
 		const l = await lea();
 		const stati: number[] = [];
 		for (let i = 0; i < 4; i++) {
@@ -188,9 +190,10 @@ describe('Profil-Schnittstellen', () => {
 			stati.push((await postEmail(d, ereignis({ body: { email }, konto: l.konto }))).status);
 		}
 		expect(stati).toEqual([202, 202, 202, 429]);
+		await vi.waitFor(() => expect(post).toHaveLength(6));
 	});
 
-	test('A-KONTO-02: Wechsel mit beiden Codes über die Schnittstellen ändert die Adresse', async () => {
+	test('A-KONTO-01: Wechsel mit beiden Codes über die Schnittstellen ändert die Adresse', async () => {
 		const s = baue();
 		const l = await lea();
 		const neu = `lea.neu-${crypto.randomUUID()}@example.org`;

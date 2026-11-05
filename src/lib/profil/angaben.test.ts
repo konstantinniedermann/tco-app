@@ -41,7 +41,7 @@ const LEA: EigeneAngaben = {
 	lizenznummer: null
 };
 
-describe('A-KONTO-02: eigene Angaben laden', () => {
+describe('A-KONTO-01: eigene Angaben laden', () => {
 	it('liefert die Angaben aus GET /api/profil', async () => {
 		const { aufrufe, holen } = holer(json(200, { angaben: LEA }));
 		expect(await ladeAngaben(holen)).toEqual(LEA);
@@ -62,7 +62,7 @@ describe('A-KONTO-02: eigene Angaben laden', () => {
 	});
 });
 
-describe('A-KONTO-02: eigene Angaben speichern', () => {
+describe('A-KONTO-01: eigene Angaben speichern', () => {
 	it('schickt Änderung und geladenen Stand als JSON', async () => {
 		const { aufrufe, holen } = holer(json(200, { geaendert: ['telefon'] }));
 		const r = await speichereAngaben({ telefon: '079 000 00 00' }, LEA, holen);
@@ -152,7 +152,7 @@ describe('A-KONTO-01: E-Mail-Wechsel', () => {
 	});
 });
 
-describe('A-KONTO-02: Meldungen und Stand', () => {
+describe('A-KONTO-01: Meldungen und Stand', () => {
 	it('fremd nennt den Kontakt, ohne Kontakt den Brief', () => {
 		expect(fremdMeldung('K')).toBe(
 			'Deine Angaben lassen sich gerade nicht speichern. Bitte melde dich bei K.'
