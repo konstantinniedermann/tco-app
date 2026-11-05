@@ -318,3 +318,87 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Code-Review zu #54.
 
 **Einschätzung:** Kurz und nur in der Verwaltung. Am Mac in Safari ansehen; stört es, das Ausblenden nur dort zeigen, wo `overlay` unterstützt ist (`@supports`).
+
+### 2026-11-05 — «Für Fairgate» zeigt auch ausgetretene und gelöschte Mitglieder
+
+**Thema:** Verwaltung
+
+**Fundort:** `listeFuerFairgate` in `src/lib/server/admin/fairgate.ts`
+
+**Beobachtung:** Die Liste filtert nicht nach Status. Tritt ein Mitglied aus, nachdem es Angaben selbst geändert hat, bleibt es mit «für Fairgate offen» in der Liste, bis der Admin abhakt.
+
+**Ursprung:** Gesamtreview zu #50.
+
+**Einschätzung:** Hängt am Austritt und Löschen (FR-04, Etappe 3 von #43). Dort entscheiden, ob der Austritt die Markierung löscht oder die Liste nur aktive Mitglieder zeigt.
+
+### 2026-11-05 — «Für Fairgate»: Feinschliff aus den Reviews
+
+**Thema:** Verwaltung
+
+**Fundort:** `src/routes/verwaltung/+layout.ts`, `src/routes/verwaltung/fairgate/+page.svelte`, `src/lib/server/admin/fairgate.ts`
+
+**Beobachtung:** Der Zähler in der Seitenleiste lädt die ganze Liste, nur um sie zu zählen. Hat ein anderer Admin schon abgehakt, verschwindet die Zeile ohne Rückmeldung. Liegt die letzte Selbständerung länger als die Aufbewahrung des Verlaufs zurück, bleiben «Geändert» und «Neue Angaben» leer. Namen erscheinen als «Nachname, Vorname», der Entwurf zeigte «Vorname Nachname».
+
+**Ursprung:** Task- und Gesamtreview zu #50.
+
+**Einschätzung:** Bei der Vereinsgrösse ohne Folgen. Bei der nächsten Arbeit an der Verwaltung mitnehmen.
+
+### 2026-11-05 — Passkey zeigt nach dem E-Mail-Wechsel weiter die alte Adresse
+
+**Thema:** App
+
+**Fundort:** Schlüsselbund des Geräts (Name des Passkeys), `src/lib/server/profil/email-wechsel.ts`
+
+**Beobachtung:** Der Passkey trägt im Schlüsselbund die Adresse, die beim Einrichten galt. Nach einem E-Mail-Wechsel steht dort weiter die alte. Das Anmelden klappt, weil der Passkey an seiner Kennung hängt.
+
+**Ursprung:** Gesamtreview zu #50.
+
+**Einschätzung:** Nur kosmetisch. Prüfen, ob WebAuthn den Namen nachführen kann (Signal-API), sonst in der Hilfe erwähnen.
+
+### 2026-11-05 — Profil: abgelaufene Sitzung beim Speichern zeigt «Störung» statt Login
+
+**Thema:** App
+
+**Fundort:** `src/routes/profil/+page.svelte`, `src/lib/profil/angaben.ts`
+
+**Beobachtung:** Läuft die Sitzung während des Bearbeitens ab, meldet die Seite eine Störung und leitet nicht zur Anmeldung. Die Seite ist zudem auf rund 430 Zeilen gewachsen; ein eigener Baustein «Meine Angaben» wäre leichter zu lesen.
+
+**Ursprung:** Task-Review zu #50 (Verhalten bestand schon vorher bei Passkey und Abmelden).
+
+**Einschätzung:** Selten, die Sitzung hält ein Jahr. Beim nächsten Umbau der Profilseite beides angehen.
+
+### 2026-11-05 — Wartende Login-Mailanfrage bleibt nach dem Abmelden im Gerätespeicher
+
+**Thema:** App
+
+**Fundort:** `abmelden()` in `src/routes/profil/+page.svelte`, `src/lib/login/mailanfrage.ts`
+
+**Beobachtung:** Der E-Mail-Wechsel räumt seinen Eintrag beim Abmelden jetzt ab, die wartende Login-Mailanfrage nicht. Sie verfällt nach 15 Minuten und wird beim nächsten Start der App gelöscht.
+
+**Ursprung:** Gesamtreview zu #50.
+
+**Einschätzung:** Altbestand, kurze Frist. Der Konsequenz halber beim Abmelden ebenfalls löschen; eine Zeile.
+
+### 2026-11-05 — Leitbild hat keinen Baustein für zwei Felder nebeneinander
+
+**Thema:** App
+
+**Fundort:** `docs/ui-leitbild.md`, Adresse im Profil (`src/routes/profil/+page.svelte`)
+
+**Beobachtung:** PLZ und Ort stehen im Profil untereinander, der Entwurf zeigte sie nebeneinander. Ohne Inline-Stile fehlt dafür ein Baustein im Leitbild.
+
+**Ursprung:** Bildvergleich zu #50.
+
+**Einschätzung:** Kein Fehler. Kommt ein zweiter Fall dazu (z. B. Formulare der CM-Anmeldung), einen Baustein «Feldzeile» ins Leitbild aufnehmen.
+
+### 2026-11-05 — E2E: gemeinsame IP-Grenze und geteilte Testdatenbank
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/profil.test.ts`, `tests/e2e/verwaltung.test.ts`, `docs/testkonzept.md`
+
+**Beobachtung:** Alle E2E-Läufe teilen sich die Grenze von 10 Code-Anfragen pro IP und Stunde. Darum prüft nur das iPhone-Projekt den Login mit der neuen Adresse. Die geteilte Testdatenbank füllt zudem die Liste «Für Fairgate» mit Einträgen aus anderen Tests, was den Screenshot unruhig macht.
+
+**Ursprung:** Task 8 zu #50.
+
+**Einschätzung:** Hält, solange die Zahl der Mail-Tests klein bleibt. Kommen weitere dazu, eine Testeinstellung für die Grenzen oder eine IP je Projekt vorsehen.
