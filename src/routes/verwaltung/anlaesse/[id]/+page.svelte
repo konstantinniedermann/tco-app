@@ -99,7 +99,9 @@
 {#if detail.anmeldungen.length === 0}
 	<p>Noch keine Antworten.</p>
 {:else}
-	<div class="tabelle">
+	<!-- Ohne Links in der Tabelle: der Bereich selbst ist per Tastatur scrollbar (WCAG 2.1.1). -->
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<div class="tabelle" role="region" aria-label="Antworten" tabindex="0">
 		<table>
 			<thead>
 				<tr><th>Name</th><th>Antwort</th><th>Bemerkung</th><th>Geändert</th></tr>

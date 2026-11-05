@@ -7,6 +7,14 @@ Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Relea
 
 ## Unveröffentlicht
 
+- Anlässe ([#52](https://github.com/konstantinniedermann/tco-app/issues/52), A-ANLASS-01, als
+  Vorschlag für den Vorstand, K-50): Der Admin erstellt in der Verwaltung einen Anlass, z. B. die
+  Generalversammlung; er erscheint bei allen Mitgliedern unter «Jetzt aktuell». Mitglieder melden
+  sich an oder ab (mit freiwilliger Bemerkung), bis zum Anmeldeschluss änderbar, und speichern den
+  Termin über «In den Kalender». Ändert der Admin Datum oder Ort, bittet MyTCO um eine Prüfung der
+  Antwort (FR-27 bis FR-32). Die Kalenderdatei ist ohne Login über einen nicht erratbaren Link
+  abrufbar (SI-19). Datenschutzkonzept, -erklärung, Fachmodell, Rollen und Rechte, Leitbild
+  (Auswahlfläche, mehrzeiliges Feld, Kennzahl) nachgeführt; `make seed` legt eine Beispiel-GV an.
 - Handy im WLAN: `make dev-handy` startet den Entwicklungsserver für ein Handy im selben WLAN
   (Login per Code, ohne Passkey); ein E2E-Test belegt, dass der Produktions-Build das
   Login-Cookie weiterhin nur über HTTPS schickt (SI-06). Feste Namen `mytco-admin.local` und

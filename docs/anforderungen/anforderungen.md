@@ -124,7 +124,7 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-ANLASS-01 | Mitglieder melden sich direkt in MyTCO für Anlässe an | PDF 3d | Mitglieder-Login | geplant |
+| A-ANLASS-01 | Mitglieder melden sich direkt in MyTCO für Anlässe an | PDF 3d | Mitglieder-Login | umgesetzt |
 | A-ANLASS-02 | Anmeldung zum Junioren-Training (evtl. ab 2028) | PDF 3d | später | später |
 | A-ANLASS-03 | Anmeldung zu Junioren-Turnieren (ab 2028) | PDF 3d | später | später |
 | A-ANLASS-04 | Teilnehmerlisten für Junioren-Training und weitere Turniere, ähnlich der Lizenzliste | PDF 4b | später | später |
