@@ -97,6 +97,14 @@ img {
 	max-width: var(--breite-inhalt);
 	margin: 0 auto;
 	padding: var(--abstand-5) var(--abstand-4) var(--abstand-6);
+	/* Querformat: nicht unter Notch oder Dynamic Island (viewport-fit=cover in app.html) */
+	padding-inline: max(var(--abstand-4), env(safe-area-inset-left))
+		max(var(--abstand-4), env(safe-area-inset-right));
+}
+
+/* Ohne Reiter ist die Fusszeile zuunterst: Abstand über dem Home-Balken */
+.app > footer.inhalt:last-child {
+	padding-bottom: calc(var(--abstand-6) + env(safe-area-inset-bottom));
 }
 
 .leise {
@@ -111,8 +119,14 @@ img {
 	align-items: center;
 	gap: var(--abstand-3);
 	padding: var(--abstand-3) var(--abstand-4);
-	/* Bis unter die Statusleiste (viewport-fit=cover in app.html); am PC ist der Abstand 0. */
+	/* Bis unter die Statusleiste (viewport-fit=cover in app.html); am PC ist der Abstand 0.
+	   Bleibt oben stehen, sonst läuft beim Scrollen Inhalt unter Uhr und Akku durch. */
+	position: sticky;
+	top: 0;
+	z-index: 1;
 	padding-top: calc(var(--abstand-3) + env(safe-area-inset-top));
+	padding-inline: max(var(--abstand-4), env(safe-area-inset-left))
+		max(var(--abstand-4), env(safe-area-inset-right));
 	background: var(--farbe-marke);
 	color: var(--farbe-flaeche);
 	font-size: var(--groesse-gross);
@@ -165,6 +179,8 @@ img {
 	background: var(--farbe-marke-dunkel);
 	color: var(--farbe-flaeche);
 	padding: var(--abstand-4) 0;
+	/* Querformat auf dem iPhone: Links nicht unter der Notch */
+	padding-left: env(safe-area-inset-left);
 }
 
 .seitenleiste-bereich {

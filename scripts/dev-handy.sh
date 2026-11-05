@@ -19,10 +19,6 @@ if [ -z "$ip" ]; then
 	exit 1
 fi
 
-# Alte Mails (z. B. aus den E2E-Tests) weg, damit der eigene Code leicht zu finden ist.
-curl -fsS -X DELETE "$MAILPIT/api/v1/messages" >/dev/null ||
-	echo "Hinweis: Mailpit liess sich nicht leeren." >&2
-
 dns-sd -P "MyTCO Admin" _http._tcp local "$PORT" "$ADMIN" "$ip" >/dev/null 2>&1 &
 admin_pid=$!
 dns-sd -P "MyTCO Mitglied" _http._tcp local "$PORT" "$MITGLIED" "$ip" >/dev/null 2>&1 &
@@ -34,7 +30,11 @@ echo "  Am iPhone öffnen (je eine Verknüpfung auf dem Startbildschirm):"
 echo "    Erika (Admin):   http://$ADMIN:$PORT"
 echo "    Kurt (Mitglied): http://$MITGLIED:$PORT"
 echo "  Ohne festen Namen: http://$ip:$PORT"
-echo "  Mails (nur am Laptop): $MAILPIT"
+# Mailpit wird nicht geleert: Andere Worktrees lesen dort gerade ihre E2E-Codes. Die Links
+# zeigen nur die Mails der beiden Personas.
+echo "  Mails (nur am Laptop):"
+echo "    Erika: $MAILPIT/search?q=to%3Aerika.beispiel%40example.org"
+echo "    Kurt:  $MAILPIT/search?q=to%3Akurt.erfunden%40example.org"
 echo ""
 
 MYTCO_ADRESSE="http://$MITGLIED:$PORT" \
