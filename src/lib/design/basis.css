@@ -114,10 +114,10 @@ img {
 }
 
 /*
- * Statusleisten-Band (UI-Leitbild): iOS 26 legt über Web-Apps vom Startbildschirm oben einen
- * Schleier, ausser ein fester, deckender, einfarbiger Streifen liegt am oberen Rand. Ein
- * mitlaufender Kopf (sticky) reicht dafür nicht. Steht ausserhalb von .app (Container), darum
- * darf es hier position: fixed sein. Am PC ist es 0 hoch.
+ * Statusleisten-Band (UI-Leitbild): iOS legt über Web-Apps vom Startbildschirm oben einen
+ * Schleier, ausser oben in der Mitte liegt ein fester oder mitlaufender (sticky), deckender, fast
+ * bildschirmbreiter Streifen über 10 px. Steht ausserhalb von .app (Container), darum darf es hier position: fixed sein.
+ * Im Browser ist es so hoch wie die Statusleiste (am PC 0).
  */
 .statusleiste {
 	position: fixed;
@@ -132,6 +132,35 @@ img {
 /* Ein Fokussprung landet nicht unter dem Band (WCAG 2.4.11) */
 html {
 	scroll-padding-top: env(safe-area-inset-top);
+}
+
+/*
+ * Nur in der iPhone-App vom Startbildschirm (standalone; -webkit-touch-callout gibt es nur auf
+ * iOS, so bleiben installierte Apps auf Android und am PC unverändert): Das Band reicht über den
+ * oberen Rand der Kopfleiste (gleiches Grün, unsichtbar) und bleibt so über 10 px, auch wenn iOS
+ * den Abstand als 0 meldet. Der grüne Seitenhintergrund färbt den Rest-Schleier beim Scrollen
+ * grün. Am iPhone geprüft (Spike 05.11.2026). In der Verwaltung scrollt die Kopfleiste mit der
+ * Seitenleiste weg, dort bleibt das Band so hoch wie die Statusleiste.
+ */
+@supports (-webkit-touch-callout: default) {
+	@media (display-mode: standalone) {
+		.statusleiste:not(.statusleiste-verwaltung) {
+			height: calc(env(safe-area-inset-top) + var(--abstand-3));
+		}
+
+		html:has(.statusleiste:not(.statusleiste-verwaltung)) {
+			scroll-padding-top: calc(env(safe-area-inset-top) + var(--abstand-3));
+		}
+
+		html,
+		body {
+			background: var(--farbe-marke);
+		}
+
+		.app {
+			background: var(--farbe-hintergrund);
+		}
+	}
 }
 
 /* Kopfleiste */

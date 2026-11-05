@@ -22,7 +22,7 @@
 	});
 </script>
 
-<div class="statusleiste"></div>
+<div class={['statusleiste', { 'statusleiste-verwaltung': verwaltung }]}></div>
 
 <div class="app">
 	{#if verwaltung}
