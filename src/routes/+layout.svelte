@@ -40,6 +40,11 @@
 				<a href={resolve('/hilfe')} aria-current={page.route.id === '/hilfe' ? 'page' : undefined}
 					>Hilfe</a
 				>
+				·
+				<a
+					href={resolve('/datenschutz')}
+					aria-current={page.route.id === '/datenschutz' ? 'page' : undefined}>Datenschutz</a
+				>
 				· <span data-testid="version">Version {APP_VERSION}</span>
 			</p>
 		</footer>
