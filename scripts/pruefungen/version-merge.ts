@@ -65,7 +65,16 @@ if (import.meta.main) {
 	}
 	const versionBei = (commit: string): string =>
 		JSON.parse(git('show', `${commit}:package.json`)).version;
-	const commits = git('rev-list', '--first-parent', '--reverse', bereich)
+	// Was schon auf main liegt, ist ein Release: Das Realign nach dem Release spult dev auf den
+	// Merge-Commit von main vor, der alle Nummern seit dem letzten Release auf einmal bringt.
+	let ohneMain: string[] = [];
+	try {
+		git('rev-parse', '--verify', '--quiet', 'origin/main');
+		ohneMain = ['^origin/main'];
+	} catch {
+		// Ohne origin/main (frischer Klon ohne Fetch) wird alles geprüft.
+	}
+	const commits = git('rev-list', '--first-parent', '--reverse', bereich, ...ohneMain)
 		.split('\n')
 		.filter(Boolean);
 	const schritte = commits.flatMap((commit): Versionsschritt[] => {

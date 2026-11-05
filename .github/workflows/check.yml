@@ -307,11 +307,9 @@ jobs:
     outputs:
       digest: ${{ steps.suchen.outputs.digest }}
     steps:
-      # Tiefe 2: HEAD^1 ist der vorherige Stand von main, also das letzte Release.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          fetch-depth: 2
       - name: Image zum Code-Stand suchen
         id: suchen
         env:
@@ -334,10 +332,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version=$(node -p "require('./package.json').version")
-          vorher=$(git show HEAD^1:package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf-8')).version")
+          # Untergrenze für den Text: das letzte GitHub-Release; ohne eines (erstes Live-Release) alles.
+          if vorher=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name 2>&1); then
+            vorher=${vorher#v}
+          else
+            case "$vorher" in
+              *"HTTP 404"*) vorher=0.0.0 ;;
+              *) echo "Letztes Release nicht lesbar: $vorher"; exit 1 ;;
+            esac
+          fi
           for v in "$version" "$vorher"; do
             if ! printf '%s\n' "$v" | grep -Eqx '[0-9]+\.[0-9]+\.[0-9]+'; then
-              echo "Version in package.json nicht lesbar: $v"
+              echo "Version nicht lesbar: $v"
               exit 1
             fi
           done
@@ -447,19 +453,26 @@ jobs:
     permissions:
       contents: write
     steps:
-      # Tiefe 2: HEAD^1 ist der vorherige Stand von main, also das letzte Release.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          fetch-depth: 2
       - name: Release anlegen
         env:
           GH_TOKEN: ${{ github.token }}
           COMMIT: ${{ github.sha }}
         run: |
           version=$(node -p "require('./package.json').version")
-          vorher=$(git show HEAD^1:package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf-8')).version")
+          # Untergrenze für den Text: das letzte GitHub-Release; ohne eines (erstes Live-Release) alles.
+          if vorher=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name 2>&1); then
+            vorher=${vorher#v}
+          else
+            case "$vorher" in
+              *"HTTP 404"*) vorher=0.0.0 ;;
+              *) echo "Letztes Release nicht lesbar: $vorher"; exit 1 ;;
+            esac
+          fi
           # Alle Abschnitte seit dem letzten Release, denn jeder Merge nach dev mit Code hat seine Nummer.
+          # Nur bei Live: Releases ohne Live-Auslieferung legen kein GitHub-Release an.
           bash scripts/ci/versionsnotizen.sh "$version" "$vorher" > "$RUNNER_TEMP/notizen.md"
           if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notizen.md"; then
             echo "Kein Abschnitt zwischen $vorher und $version in docs/versionen.md"
