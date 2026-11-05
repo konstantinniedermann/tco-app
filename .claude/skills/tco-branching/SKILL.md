@@ -65,15 +65,50 @@ git -C $M status --short                          # muss leer sein
 git -C $M rev-parse -q --verify MERGE_HEAD        # muss leer sein
 ```
 
-Erst wenn beide Prüfungen leer sind, mergen:
+Erst wenn beide Prüfungen leer sind, mergen — ohne Commit, denn die Versionsnummer kommt
+in den Merge-Commit selbst:
 
 ```bash
 M=/Users/KN/CAS/projekte/tco-app
 git -C $M pull --ff-only origin dev
-git -C $M merge --no-ff <typ>/issue-NNN
+git -C $M merge --no-ff --no-commit <typ>/issue-NNN
+git -C $M diff --cached --name-only --no-renames HEAD | node $M/scripts/pruefungen/nur-doku.ts && echo nur-doku || echo code
+```
+
+**Versionsnummer** (`docs/ci-cd-und-release.md#versionen`): Bei `nur-doku` bleibt sie, weiter
+mit dem Commit. Bei `code` vergibt sie jetzt, wer mergt — nie der Feature-Branch:
+
+- **Korrektur** (`patch`) bei jedem Merge mit Code, der Normalfall.
+- **Nebenversion** (`minor`, Korrektur zurück auf 0), wenn etwas Grösseres dazukommt: neue
+  Etappe oder spürbare neue Funktion. Im Bericht nennen, dass und warum.
+- **Hauptversion** (`major`) nur im Auftrag des Projektleiters.
+
+```bash
+M=/Users/KN/CAS/projekte/tco-app
+cd $M && npm version patch --no-git-tag-version --ignore-scripts   # bzw. minor / major
+```
+
+Dann in `docs/versionen.md` zuoberst unter «Unveröffentlicht» einen Abschnitt
+`## X.Y.Z — <Kurztitel>` anlegen und die Einträge aus «Unveröffentlicht» hineinschieben
+(auch liegengebliebene aus Doku-Merges); «Unveröffentlicht» bleibt leer stehen. Hat der
+Branch keinen Eintrag geschrieben, einen kurzen ergänzen. Dann abschliessen:
+
+```bash
+M=/Users/KN/CAS/projekte/tco-app
+git -C $M add package.json package-lock.json docs/versionen.md
+git -C $M commit --no-edit
 git -C $M push origin dev
 gh run list -R konstantinniedermann/tco-app --branch dev --limit 3   # CI grün?
 ```
+
+Der Pre-Push-Hook weist den Push ab, wenn ein Merge mit Code die Version nicht um genau
+einen Schritt erhöht, ihr Abschnitt nicht zuoberst steht oder reine Doku die Version erhöht
+(`version-merge.ts`). Scheitert der Push, weil eine andere Session inzwischen dieselbe Nummer
+gepusht hat: nichts zurücksetzen (kein Reset auf `dev`), sondern
+`git -C $M pull --no-rebase origin dev`. Im Konflikt in `package.json`, `package-lock.json` und
+`docs/versionen.md` bekommt die eigene Arbeit die nächste freie Nummer: der fremde Abschnitt
+bleibt, der eigene kommt mit der neuen Nummer darüber. Dann `git -C $M commit --no-edit` und
+erneut pushen; der Hook prüft diesen Zusammenführungs-Commit wie einen Merge.
 
 Brachte der Merge eine geänderte `package-lock.json`, vor dem nächsten Push im Hauptordner
 `npm ci --ignore-scripts` — sonst prüft der Pre-Push-Hook mit alten `node_modules` und wird rot.
@@ -116,40 +151,42 @@ Widerspruch fragen.
 
 **Sobald Test und Live ausgeliefert werden** (Merge nach `dev` = Test-Umgebung, Merge nach `main` =
 live mit Mitgliederdaten, `docs/ci-cd-und-release.md`): vor dem PR muss der Projektleiter die
-Checkliste auf Test abgehakt und genau dieses Release freigegeben haben; dazu der
-Versions-Commit im Release-Branch (Schritt 4a), der die Version in `package.json` und
-`docs/versionen.md` setzt und mit ihm nach `dev` kommt. Den Tag setzt die CI.
+Checkliste auf Test abgehakt und genau dieses Release freigegeben haben. Das Release erhöht
+die Version nicht: Live bekommt die Nummer, die `dev` trägt (vergeben beim Merge, Schritt 4).
+Den Tag und den Text des GitHub-Release (alle Abschnitte seit dem letzten Release) setzt die CI.
 
-**Code, aber noch keine Live-Auslieferung** (`AUSLIEFERUNG_LIVE` nicht `an`): Versions-Commit
-wie oben, in `docs/versionen.md` als «nicht ausgeliefert» gekennzeichnet; kein Tag,
-kein GitHub-Release, auch nicht von Hand. Die Checkliste entfällt nur, solange auch
+**Code, aber noch keine Live-Auslieferung** (`AUSLIEFERUNG_LIVE` nicht `an`): Ablauf wie oben,
+ohne Marker in `docs/versionen.md`; kein Tag, kein GitHub-Release, auch nicht von Hand. Die Checkliste entfällt nur, solange auch
 `AUSLIEFERUNG_TEST` aus ist; läuft Test schon, wird sie dort abgehakt
 (`docs/ci-cd-und-release.md#versionen`). Freigabe des Projektleiters für genau dieses Release
 trotzdem einholen.
 
 **Nur Doku** (seit `main` keine Datei ausser Doku geändert, Regel aus `nur-doku.ts`): Ablauf
-unten ohne Checkliste und ohne Version. Enthält das Release Code, muss die Version steigen —
-auch bei Werkzeugen wie Skripten oder Workflows.
+unten ohne Checkliste. Enthält das Release Code, ist die Version seit `main` schon gestiegen —
+auch bei Werkzeugen wie Skripten oder Workflows; sonst fehlt eine Nummer aus Schritt 4.
 
 **4a — Doku-Abgleich (vor jedem Release, auch nur Doku):** im Worktree eines Release-Branches
-ab `origin/dev` (`chore/release-X.Y.Z`, bei nur Doku `docs/release-<datum>`), Start wie Schritt 1, ohne Label.
+ab `origin/dev` (`docs/release-<datum>`), Start wie Schritt 1, ohne Label. Bringt der Abgleich
+Code mit (Kleinigkeit in einem Skript), bekommt sein Merge eine Korrektur wie in Schritt 4.
 
 1. Skill `doku-audit` über alle Domänen. Abweichend vom Skill **keine Issues**: Kleinigkeiten
    als eigener Commit (`docs: Doku-Abgleich vor Release …`), alles andere in
    `docs/beobachtungen.md`. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre
    führt oder blockiert, hält das Release auf, bis er behoben ist — übersteuern nur mit
    ausdrücklicher Freigabe des Nutzers.
-2. Versions-Commit (siehe oben), bei nur Doku keiner.
+2. Liegengebliebene Einträge unter «Unveröffentlicht» (aus Doku-Merges) in den obersten
+   Versionsabschnitt schieben.
 3. `make release-check` muss grün sein: Version aus `package.json` hat genau einen Abschnitt
-   in `docs/versionen.md`; die Version sinkt nicht und steigt, sobald Code dabei ist; ändert sie
-   sich, ist «Unveröffentlicht» leer; «nicht ausgeliefert» und Tags passen in beide Richtungen.
-4. Jede Issue-Nummer im neuen Versionsabschnitt mit `gh issue view NNN -R konstantinniedermann/tco-app`
+   in `docs/versionen.md`, und er steht zuoberst; die Version sinkt nicht und ist gestiegen,
+   sobald Code dabei ist; ändert sie sich, ist «Unveröffentlicht» leer; keine als «nicht
+   ausgeliefert» markierte Version hat einen Tag.
+4. Jede Issue-Nummer in den Versionsabschnitten seit dem letzten Release mit `gh issue view NNN -R konstantinniedermann/tco-app`
    gegen den echten Titel halten — nicht der Formulierung früherer Einträge vertrauen.
 5. Nach `dev` mergen und aufräumen wie Schritt 4. Das Ergebnis (Fixes, Beobachtungen,
    Befunde auf hoch) kommt kurz in den Text des Release-PR.
 
 **5 — PR anlegen und mergen:** Direkt davor im Hauptordner `make release-check` noch einmal —
-andere Sessions können seit 4a Einträge unter «Unveröffentlicht» nach `dev` gemergt haben.
+andere Sessions können seit 4a nach `dev` gemergt haben.
 Rot: wie 4a über einen Release-Branch nachziehen.
 
 ```bash
@@ -217,7 +254,8 @@ entfernen.
 ## Reibungspunkte bei Parallel-Arbeit
 
 - `docs/versionen.md`: Beide Sessions schreiben unter „Unveröffentlicht“ → bei Konflikt beide
-  Einträge behalten (Konfliktregel in Schritt 4).
+  Einträge behalten (Konfliktregel in Schritt 4). Versionsnummern schreibt nur der Merge nach
+  `dev`, nie der Feature-Branch.
 - `docs/beobachtungen.md`: Beide Sessions hängen unter „Offen“ an → bei Konflikt beide neuen
   Einträge behalten. Einträge, die auf der anderen Seite gelöscht sind, bleiben gelöscht: Das ist
   eine Auswertung, die sie ins Archiv verschoben hat. Ein Nachtrag des eigenen Branches zu einem

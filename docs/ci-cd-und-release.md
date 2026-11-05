@@ -42,13 +42,12 @@ Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
 
 ```mermaid
 flowchart LR
-  B[Issue-Branch] -->|make check, Hooks| D[Merge nach dev]
+  B[Issue-Branch] -->|make check, Hooks| D[Merge nach dev, neue Nummer]
   D --> C1[CI]
   C1 -->|grün| T[Test-Umgebung]
   T --> K[Checkliste auf echten Handys]
   K --> A[Doku-Abgleich auf dev]
-  A --> R[Version erhöhen auf dev]
-  R --> P[PR dev → main]
+  A --> P[PR dev → main]
   P --> C2[CI]
   C2 -->|grün, Merge| L[Live]
   L --> V[Tag vX.Y.Z und GitHub-Release]
@@ -58,14 +57,15 @@ flowchart LR
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
   abgehakt und das Release freigegeben hat (ohne Server: Ausnahmen unter [Versionen](#versionen)).
 - **Doku-Abgleich:** Vor jedem Release, auch einem reinen Doku-Release, wird die Doku gegen
-  Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Nach
-  dem Versions-Commit prüft `make release-check`, ob Version, [Versionen](versionen.md) und
-  Tags zusammenpassen; enthält das Release Code (auch Skripte oder Workflows), muss die
-  Version steigen, nur bei reiner Doku bleibt sie. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre führt,
+  Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Danach
+  prüft `make release-check`, ob Version, [Versionen](versionen.md) und Tags zusammenpassen;
+  enthält das Release Code (auch Skripte oder Workflows), muss die Version seit dem letzten
+  Release gestiegen sein, nur bei reiner Doku bleibt sie. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre führt,
   hält das Release auf. Ablauf im Skill `tco-branching`.
-- **Version:** Vor dem PR erhöht ein Commit auf `dev` die Version in `package.json` und macht
-  aus *Unveröffentlicht* in den [Versionen](versionen.md) die neue Nummer. Nach der
-  erfolgreichen Live-Auslieferung setzt die CI den Tag und das GitHub-Release; nur dieser
+- **Version:** Das Release erhöht die Version nicht, Live bekommt die Nummer, die `dev` gerade
+  trägt (Vergabe beim Merge, siehe [Versionen](#versionen)). Nach der erfolgreichen
+  Live-Auslieferung setzt die CI den Tag und das GitHub-Release; dessen Text fasst alle
+  Abschnitte der [Versionen](versionen.md) seit dem letzten Release zusammen. Nur dieser
   Schritt darf ins Repo schreiben. Solange Live ausgeschaltet ist, gilt ein eigener Ablauf
   (siehe [Versionen](#versionen)).
 - **Merge:** Auf GitHub ist nur der Merge-Commit erlaubt (Squash und Rebase abgeschaltet).
@@ -310,6 +310,7 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Annahmen zu beantworteten Fragen an den Verein aufgelöst (`annahmen.ts`) | Abklärungen | vorhanden |
 | Oberfläche nur aus Tokens des Leitbilds (`design-tokens.ts`, `design-festwerte.ts`) | UI-Leitbild | vorhanden |
 | Node-Hauptversion wie in `.nvmrc`, sonst enden Prüfskripte still (`pruefe-node.sh`) | — | vorhanden |
+| Jeder Merge nach `dev` mit Code erhöht die Version um einen Schritt, mit Abschnitt in den Versionen (`version-merge.ts`) | dieses Konzept | nur Hook (Push auf `dev`) |
 
 ## Abhängigkeiten
 
@@ -342,15 +343,25 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
   erste Release *Mitglieder-Login* wird `1.0.0`. Davor gehen eine oder mehrere Vorabversionen 0.x für den
   Pilot der [Testgruppe](testgruppe.md) auf Live (Etappe *Pilot*), mit Checkliste auf Test wie
   jedes Release.
-- **Nebenversion** für eine neue Etappe oder Funktion, **Korrektur** für Fehlerbehebungen,
-  **Hauptversion** nur, wenn Mitglieder etwas umstellen müssen (z. B. Umstieg auf die
-  Store-App).
+- **Jeder Merge nach `dev` mit Code bekommt eine neue Nummer**, im Merge-Commit selbst
+  (`package.json`, `package-lock.json` und ein eigener Abschnitt zuoberst in den
+  [Versionen](versionen.md)). Reine Doku (Regel aus `nur-doku.ts`) lässt die Nummer stehen.
+  Die Nummer vergibt, wer mergt, nicht der Feature-Branch: So beanspruchen zwei parallele
+  Sessions nie dieselbe Nummer. Der Pre-Push-Hook weist einen Push auf `dev` ab, in dem ein
+  Merge mit Code die Version nicht um genau einen Schritt erhöht oder sein Abschnitt fehlt
+  (`version-merge.ts`).
+- **Korrektur** (`0.5.X`) ist der Normalfall bei jedem Merge mit Code. **Nebenversion**
+  (`0.X.0`, Korrektur zurück auf 0) setzt Claude, wenn etwas Grösseres dazukommt: eine neue
+  Etappe oder eine spürbare neue Funktion. **Hauptversion** (`X.0.0`) nur im Auftrag des
+  Projektleiters.
+- Getaggt wird nur die Nummer, mit der ein Release live geht. Die Zwischenstände davor haben
+  keinen Tag und keinen Marker; sie gehen mit diesem Release live.
 - Die Version steht in `package.json`, in der Fusszeile der App und, sobald Live ausgeliefert
   wird, als Tag auf `main`.
 - **Solange `AUSLIEFERUNG_LIVE` aus ist,** gibt es keinen Tag und kein GitHub-Release, denn
-  der Job `release` läuft dann nicht. Ein Release besteht aus dem Versions-Commit auf `dev`
-  (Version in `package.json`, Abschnitt in den [Versionen](versionen.md) mit «nicht
-  ausgeliefert») und dem PR nach `main`. Tags werden nicht von Hand gesetzt, auch nicht
+  der Job `release` läuft dann nicht. Ein Release besteht aus dem Doku-Abgleich und dem PR
+  nach `main`. Die Releases 0.1.0 bis 0.5.0 tragen in den [Versionen](versionen.md) noch den
+  Marker «nicht ausgeliefert» aus dem früheren Ablauf; neue Abschnitte bekommen ihn nicht. Tags werden nicht von Hand gesetzt, auch nicht
   nachträglich; den ersten setzt die CI bei der ersten Live-Auslieferung.
 - **Die Checkliste entfällt nur, solange `AUSLIEFERUNG_TEST` aus ist** (es gibt kein Test).
   Läuft Test schon und Live noch nicht, wird sie vor dem Release auf Test abgehakt.

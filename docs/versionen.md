@@ -2,10 +2,17 @@
 
 # Versionen
 
-Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Release:
-[CI/CD und Release](ci-cd-und-release.md#versionen).
+Versionshistorie von MyTCO, neueste zuerst. Jeder Merge nach `dev` mit Code bekommt hier
+seinen eigenen Abschnitt; ein Release fasst alle Abschnitte seit dem letzten Release zusammen.
+Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
+
+- Versionsnummern: Jeder Merge nach `dev` mit Code bekommt eine eigene Korrekturnummer, im
+  Merge-Commit selbst; grössere Schritte eine Nebenversion, die Hauptversion nur im Auftrag des
+  Projektleiters. Das Release erhöht nicht mehr selbst, sein Text auf GitHub fasst alle
+  Abschnitte seit dem letzten Release zusammen. Der Pre-Push-Hook weist einen Push auf `dev`
+  ohne passende Nummer ab (`version-merge.ts`).
 
 ## 0.5.0 — Anlässe, eigene Angaben und ruhiges App-Gefühl, nicht ausgeliefert
 
