@@ -31,7 +31,7 @@ export const mitglied = pgTable(
 		geschlecht: text('geschlecht'),
 		jahrgang: integer('jahrgang'),
 		lizenznummer: text('lizenznummer'),
-		// Gesetzt, sobald das Mitglied eine Angabe selbst geändert hat, die der Verein noch in Fairgate
+		// Annahme K-19.2: Gesetzt, sobald das Mitglied eine Angabe selbst geändert hat, die der Verein noch in Fairgate
 		// nachführen muss; leer = nichts offen.
 		fairgateOffenSeit: timestamp('fairgate_offen_seit', { withTimezone: true })
 	},
