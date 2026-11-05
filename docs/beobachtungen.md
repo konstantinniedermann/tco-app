@@ -574,3 +574,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Umstellung der Versionsnummern (Branch `chore/versionsregel`).
 
 **Einschätzung:** Vermutlich ein Wettlauf zwischen Laden eines Moduls und Seitenwechsel unter Last (paralleler Lauf). Beobachten; wiederholt er sich, das Sammeln der Seitenfehler im Test robuster machen.
+
+### 2026-11-05 — Versionsregel ohne ADR, Begründung steht in der Release-Doku
+
+**Thema:** Betrieb
+
+**Fundort:** `docs/ci-cd-und-release.md#versionen`, `docs/adr/`
+
+**Beobachtung:** Die neue Vergabe der Versionsnummern (Korrektur bei jedem Merge nach `dev` mit Code, Nummer im Merge-Commit, Release erhöht nicht mehr) begründet sich nur in einem Satz der Release-Doku («So beanspruchen zwei parallele Sessions nie dieselbe Nummer»). Nach der Ablageregel gehört ein «Warum» in eine ADR. Das frühere Versionsschema hatte auch keine.
+
+**Ursprung:** Review (`cas-reviewer`) der Umstellung der Versionsnummern.
+
+**Einschätzung:** Ermessensfrage. Eine kurze ADR lohnt, falls die Regel noch einmal umgebaut wird oder die Begründung in der Release-Doku zu wachsen beginnt.
