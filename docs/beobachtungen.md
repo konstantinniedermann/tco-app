@@ -116,6 +116,18 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-06 — Speichern ohne Seitenwechsel lässt Vorgeladenes stehen (Anlass- und CM-Seite)
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/routes/clubmeisterschaft/[id]/+page.svelte` (Angaben, An-/Abmelden), `src/routes/anlass/[id]/+page.svelte` (Anmeldung), Ziel jeweils die Startseite mit Zähler bzw. Stand
+
+**Beobachtung:** Seiten werden beim Antippen vorgeladen. Berührt man am Handy den Rücklink, ohne ihn zu öffnen (Scrollen), und meldet sich danach auf der Seite an oder ab, behält SvelteKit die vorgeladene Startseite; ein Tippen auf denselben Link zeigt den alten Stand. Auf der Kategorieseite der Verwaltung belegt (E2E rot) und dort mit `refreshAll()` nach dem Speichern behoben; die beiden Mitgliederseiten übernehmen den neuen Stand selbst (aus der Antwort oder per Nachladen) und verwerfen das Vorgeladene nicht.
+
+**Ursprung:** Merge von dev (Vorladen beim Antippen, `refreshAll`) in #58
+
+**Einschätzung:** Gleiches Muster wie auf der Kategorieseite, aber `refreshAll()` zeigt bei einem gescheiterten Nachladen die Fehlerseite statt der heutigen Meldung (`MELDUNG.stoerung`); das ist eine Abwägung für beide Seiten zusammen, kein Mitnehmen im Merge.
+
 ### 2026-11-06 — Kleinbefunde aus den Reviews von #58 (CM Teil 2 Einzel-Anmeldung)
 
 **Thema:** Turnier-Verwaltung
