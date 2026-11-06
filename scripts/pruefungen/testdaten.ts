@@ -12,6 +12,7 @@ function istTestdatei(pfad: string): boolean {
 		name.startsWith('musterbrief') ||
 		pfad === 'scripts/testdaten.ts' ||
 		name.startsWith('erfundene-') ||
+		name.startsWith('beispiel-') ||
 		teile.slice(0, -1).some((verzeichnis) => /^seeds?$/.test(verzeichnis))
 	);
 }

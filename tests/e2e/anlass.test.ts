@@ -148,7 +148,7 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	await page.bringToFront();
 	await page.reload();
 	const tabelle = page.getByRole('table');
-	await expect(tabelle).toContainText(`Hugo ${nachname}`);
+	await expect(tabelle).toContainText(`${nachname}, Hugo`);
 	await expect(tabelle).toContainText('kommt');
 	await expect(tabelle).not.toContainText('Bin in den Ferien.');
 	await pruefeBildschirm(page, info, 'anlass-verwaltung');

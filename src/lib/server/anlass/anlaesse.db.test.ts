@@ -174,8 +174,8 @@ describe('Anlässe', () => {
 			const a = await ladeAnlassAdmin(edb, id);
 			expect(a?.zahlen).toEqual({ kommen: 1, kommenNicht: 1, keineAntwort: 1 });
 			expect(a?.anmeldungen.map((z) => [z.name, z.antwort, z.bemerkung])).toEqual([
-				['Test Aaa', 'kommt', null],
-				['Test Bbb', 'kommt-nicht', 'x']
+				['Aaa, Test', 'kommt', null],
+				['Bbb, Test', 'kommt-nicht', 'x']
 			]);
 			expect(await listeAnlaesse(edb)).toEqual([
 				expect.objectContaining({ id, kommen: 1, kommenNicht: 1 })

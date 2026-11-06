@@ -67,7 +67,8 @@ Jeder Test nennt im Namen die ID, die er prüft, z. B.
 `FR-24: Einmal-Code gilt nur einmal` oder `RR-04: Admin kann keinen Code abrufen`.
 Ein Test darf mehrere IDs nennen.
 
-Die CI prüft, dass jede dieser IDs mindestens einen Test hat:
+Die CI prüft, dass jede dieser IDs mindestens einen Test hat (sie sucht die ID irgendwo in
+einer Testdatei; dass sie im Namen des richtigen Tests steht, sichert das Review):
 
 - jede Fachregel `FR-NN` aus dem Fachmodell,
 - jeder Grundsatz `RR-NN` aus Rollen und Rechte,
@@ -93,11 +94,13 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
 - Wenige erfundene Personen, von Hand geschrieben und fest im Repo, ohne Generator für Namen
   oder Adressen. Seed-Daten und Testdaten der Test-Umgebung
   (beide aus `scripts/erfundene-mitglieder.ts`); der Musterbrief nimmt dieselbe erste Person, aber mit eigener Adresse.
+  Die Beispiel-GV (`scripts/beispiel-anlass.ts`) legt für `make seed` fünf weitere erfundene
+  Mitglieder an.
 - Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
   (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
 - E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern im Format
   `+41 00 …`, das es nicht gibt. Strassen erfunden.
-- Die CI meldet in Testdaten (auch denen der Test-Umgebung), Seed-Daten und Musterbrief jede
+- Die CI meldet in Testdaten (auch denen der Test-Umgebung), Seed-Daten, Beispieldaten und Musterbrief jede
   andere Mail-Domain.
 - Einmal-Codes und Sitzungen in Tests sind erzeugt, nie fest eingetragen.
 

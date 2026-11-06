@@ -111,7 +111,7 @@ describe('richtePasskeyEin', () => {
 describe('meldeMitPasskeyAn', () => {
 	const optionen = () => json({ optionen: { challenge: 'c' }, vorgang: 'v1' });
 
-	it('A-LOGIN-08: schickt Vorgang und Antwort', async () => {
+	it('A-LOGIN-07: schickt Vorgang und Antwort', async () => {
 		const { holen, aufrufe } = fakeHolen(optionen(), json({}));
 		const melde = vi.fn(async () => ({ id: 'alt' }));
 		expect(await meldeMitPasskeyAn(holen, fakeWebauthn({ melde }))).toBe('ok');
@@ -126,31 +126,31 @@ describe('meldeMitPasskeyAn', () => {
 		});
 	});
 
-	it('A-LOGIN-08: Abbruch (auch verpackt) ist abgebrochen', async () => {
+	it('A-LOGIN-07: Abbruch (auch verpackt) ist abgebrochen', async () => {
 		for (const fehler of [abbruch(), verpackterAbbruch()]) {
 			const w = fakeWebauthn({ melde: () => Promise.reject(fehler) });
 			expect(await meldeMitPasskeyAn(fakeHolen(optionen()).holen, w)).toBe('abgebrochen');
 		}
 	});
 
-	it('A-LOGIN-08: anderer Browserfehler ist falsch', async () => {
+	it('A-LOGIN-07: anderer Browserfehler ist falsch', async () => {
 		const w = fakeWebauthn({ melde: () => Promise.reject(new Error('kaputt')) });
 		expect(await meldeMitPasskeyAn(fakeHolen(optionen()).holen, w)).toBe('falsch');
 	});
 
-	it('A-LOGIN-08: Server sagt falsch', async () => {
+	it('A-LOGIN-07: Server sagt falsch', async () => {
 		const { holen } = fakeHolen(optionen(), json({ fehler: 'falsch' }, 400));
 		expect(await meldeMitPasskeyAn(holen, fakeWebauthn())).toBe('falsch');
 	});
 
-	it('A-LOGIN-08: 429 bei Optionen oder Antwort ist zu-viele', async () => {
+	it('A-LOGIN-07: 429 bei Optionen oder Antwort ist zu-viele', async () => {
 		const w = fakeWebauthn();
 		const zuViele = () => json({ fehler: 'zu-viele' }, 429);
 		expect(await meldeMitPasskeyAn(fakeHolen(zuViele()).holen, w)).toBe('zu-viele');
 		expect(await meldeMitPasskeyAn(fakeHolen(optionen(), zuViele()).holen, w)).toBe('zu-viele');
 	});
 
-	it('A-LOGIN-08: Serverfehler, kaputte Optionen und Netzfehler sind stoerung', async () => {
+	it('A-LOGIN-07: Serverfehler, kaputte Optionen und Netzfehler sind stoerung', async () => {
 		const w = fakeWebauthn();
 		expect(await meldeMitPasskeyAn(fakeHolen(leer(500)).holen, w)).toBe('stoerung');
 		expect(await meldeMitPasskeyAn(fakeHolen(json({ unsinn: 1 })).holen, w)).toBe('stoerung');
@@ -163,7 +163,7 @@ describe('meldeMitPasskeyAn', () => {
 });
 
 describe('ladePasskeys', () => {
-	it('A-LOGIN-09: wandelt Zeitangaben in Date um', async () => {
+	it('A-LOGIN-07: wandelt Zeitangaben in Date um', async () => {
 		const { holen, aufrufe } = fakeHolen(
 			json({
 				passkeys: [
@@ -200,7 +200,7 @@ describe('ladePasskeys', () => {
 		]);
 	});
 
-	it('A-LOGIN-09: leere Liste bleibt leer, Störung gibt null', async () => {
+	it('A-LOGIN-07: leere Liste bleibt leer, Störung gibt null', async () => {
 		expect(await ladePasskeys(fakeHolen(json({ passkeys: [] })).holen)).toEqual([]);
 		expect(await ladePasskeys(fakeHolen(leer(401)).holen)).toBeNull();
 		expect(await ladePasskeys(fakeHolen(json({ unsinn: 1 })).holen)).toBeNull();
@@ -214,7 +214,7 @@ describe('entfernePasskey', () => {
 		vi.stubGlobal('PublicKeyCredential', pkc);
 	}
 
-	it('A-LOGIN-10: 204 ist ok, Anfrage trägt die Kennung', async () => {
+	it('A-LOGIN-07: 204 ist ok, Anfrage trägt die Kennung', async () => {
 		umgebung(undefined);
 		const { holen, aufrufe } = fakeHolen(leer(204));
 		expect(await entfernePasskey('k1', holen)).toBe('ok');
@@ -222,7 +222,7 @@ describe('entfernePasskey', () => {
 		expect(JSON.parse(aufrufe[0].init.body as string)).toEqual({ kennung: 'k1' });
 	});
 
-	it('A-LOGIN-10: 404, 401, 500 und Netzfehler sind fehler, kein Signal', async () => {
+	it('A-LOGIN-07: 404, 401, 500 und Netzfehler sind fehler, kein Signal', async () => {
 		const signal = vi.fn();
 		umgebung({ signalUnknownCredential: signal });
 		for (const a of [leer(404), leer(401), leer(500), new TypeError('netz')]) {
@@ -231,14 +231,14 @@ describe('entfernePasskey', () => {
 		expect(signal).not.toHaveBeenCalled();
 	});
 
-	it('A-LOGIN-10: meldet dem Browser die entfernte Kennung, wenn er das kann', async () => {
+	it('A-LOGIN-07: meldet dem Browser die entfernte Kennung, wenn er das kann', async () => {
 		const signal = vi.fn(async () => {});
 		umgebung({ signalUnknownCredential: signal });
 		expect(await entfernePasskey('k1', fakeHolen(leer(204)).holen)).toBe('ok');
 		expect(signal).toHaveBeenCalledWith({ rpId: 'mytco.example.org', credentialId: 'k1' });
 	});
 
-	it('A-LOGIN-10: fehlendes oder fehlschlagendes Signal wirft nie', async () => {
+	it('A-LOGIN-07: fehlendes oder fehlschlagendes Signal wirft nie', async () => {
 		umgebung({});
 		expect(await entfernePasskey('k1', fakeHolen(leer(204)).holen)).toBe('ok');
 		umgebung({ signalUnknownCredential: () => Promise.reject(new Error('x')) });
@@ -253,7 +253,7 @@ describe('entfernePasskey', () => {
 });
 
 describe('hinweisErledigt', () => {
-	it('A-LOGIN-11: meldet es dem Server und wirft nie', async () => {
+	it('A-LOGIN-07: meldet es dem Server und wirft nie', async () => {
 		const { holen, aufrufe } = fakeHolen(leer(204));
 		await hinweisErledigt(holen);
 		expect(aufrufe[0].pfad).toBe('/api/passkey/hinweis');
