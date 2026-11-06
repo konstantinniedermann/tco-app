@@ -26,8 +26,11 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 		).toBe('Herren · R1–R6 · ab Jahrgang 2009');
 		expect(kategorieText(regel({ geschlecht: 'damen' }))).toBe('Damen');
 		expect(kategorieText(regel({ geschlecht: 'offen', jahrgangBis: 1976 }))).toBe(
-			'offen · bis Jahrgang 1976'
+			'bis Jahrgang 1976'
 		);
+		expect(
+			kategorieText(regel({ geschlecht: 'offen', klassierungVon: 'R1', klassierungBis: 'R9' }))
+		).toBe('R1–R9');
 		expect(
 			kategorieText(
 				regel({

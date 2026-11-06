@@ -19,7 +19,11 @@ export function kategorieText(k: KategorieRegel): string {
 		k.klassierungVon !== null && k.klassierungBis !== null
 			? `${k.klassierungVon}–${k.klassierungBis}`
 			: '';
-	return [geschlechtText(k.geschlecht), klassierung, jahrgang(k.jahrgangVon, k.jahrgangBis)]
+	return [
+		k.geschlecht === 'offen' ? '' : geschlechtText(k.geschlecht),
+		klassierung,
+		jahrgang(k.jahrgangVon, k.jahrgangBis)
+	]
 		.filter((teil) => teil !== '')
 		.join(' · ');
 }
