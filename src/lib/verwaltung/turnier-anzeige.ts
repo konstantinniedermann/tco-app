@@ -63,8 +63,6 @@ export function klassierungText(
 	return `${k.klassierungVon}–${k.klassierungBis}`;
 }
 
-export const anmeldungenText = (n: number) => `${n} ${n === 1 ? 'Anmeldung' : 'Anmeldungen'}`;
-
 /** FR-36: Rückfrage beim Ändern einer Kategorie, deren Anmeldungen nicht mehr passen. */
 export const unpassendText = (n: number) =>
 	n === 1

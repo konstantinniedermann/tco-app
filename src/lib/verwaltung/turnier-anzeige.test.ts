@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
 	absageSperreText,
-	anmeldungenText,
 	datumKurz,
 	datumLang,
 	geschlechtText,
@@ -61,11 +60,6 @@ describe('Anzeigehilfen für Turniere', () => {
 	});
 
 	it('FR-35, FR-36: Texte zu Anmeldungen mit richtiger Einzahl und Mehrzahl', () => {
-		expect([anmeldungenText(0), anmeldungenText(1), anmeldungenText(2)]).toEqual([
-			'0 Anmeldungen',
-			'1 Anmeldung',
-			'2 Anmeldungen'
-		]);
 		expect(unpassendText(1)).toBe(
 			'1 Anmeldung passt nach der Änderung nicht mehr zu dieser Kategorie. Sie bleibt trotzdem stehen.'
 		);
