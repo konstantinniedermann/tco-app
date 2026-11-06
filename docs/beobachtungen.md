@@ -188,4 +188,16 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Ursprung:** Session «Actions-Minuten», Wechsel des Repos auf öffentlich.
 
-**Einschätzung:** Lohnt sich vor der ersten Live-Auslieferung (`AUSLIEFERUNG_LIVE`); Änderung am Workflow zählt als Code und braucht einen Probelauf auf `dev` und `main`.
+**Einschätzung:** Lohnt sich vor der ersten Live-Auslieferung (`AUSLIEFERUNG_LIVE`); Änderung am Workflow zählt als Code und braucht einen Probelauf auf `dev` und `main`. Der Kern (Umgebungen für die Schlüssel) ist mit Zustimmung des Projektleiters jetzt Issue [#61](https://github.com/konstantinniedermann/tco-app/issues/61), wartet auf das Hosting (#39); offen hier bleiben nur die veralteten Kommentare und die Nachfolger-Einstellung.
+
+### 2026-11-06 — Repo öffentlich: Entscheid ohne ADR, Vereinsunterlagen jetzt einsehbar
+
+**Thema:** Betrieb
+
+**Fundort:** `docs/ci-cd-und-release.md` («Öffentliches Repo, `main` auf GitHub geschützt»), `docs/anforderungen/` (Anforderungs-PDF, Autorfeld in den Metadaten), `CLAUDE.md` (Ausnahme für das Anforderungsdokument)
+
+**Beobachtung:** Der Wechsel auf öffentlich kehrt den früheren Entscheid «privat, kein GitHub Pro» um und lässt sich nicht ganz zurücknehmen. Begründung und Alternativen (Budget erhöhen, GitHub Pro, CI-Minuten senken) stehen nur in einem Nebensatz der CI/CD-Doku, nicht als ADR. Öffentlich sind jetzt auch Anforderungs-PDF, Abklärungen, Recherchen, Issues und CI-Logs. Im Autorfeld des PDFs steht der volle Name der verfassenden Person aus dem Vorstand; der Projektleiter hat entschieden, es so zu lassen und den Vorstand nicht zu informieren. Die Ausnahme in `CLAUDE.md` für das Anforderungsdokument stammt aus der Zeit, als das Repo privat war.
+
+**Ursprung:** Review (`cas-reviewer`) des Branches `docs/repo-oeffentlich`.
+
+**Einschätzung:** Ein kurzes ADR würde den Entscheid und die Alternativen festhalten (ähnlich ADR-007). Neue Vereinsdokumente vor dem Einchecken auf Metadaten prüfen.
