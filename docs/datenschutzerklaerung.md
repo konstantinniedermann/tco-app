@@ -90,4 +90,6 @@ keine Analyse-Dienste.
 **Deine Rechte:** Du kannst jederzeit erfahren, welche Daten MyTCO über dich hat, und sie
 berichtigen oder löschen lassen. E-Mail, Telefon, Adresse und Lizenznummer änderst du selbst in
 der App; geänderte Kontaktangaben überträgt der Verein von Hand in seine Mitgliederliste
-(Fairgate).
+(Fairgate). Deine Klassierung änderst du jederzeit im Profil.
+Geschlecht und Jahrgang trägst du einmal auf der Seite der Clubmeisterschaft ein, falls sie
+fehlen; danach ändert sie nur die Mitgliederverwaltung.
