@@ -216,6 +216,7 @@
 						<td>{geschlechtText(k.geschlecht)}</td>
 						<td>{jahrgangText(k.jahrgangVon, k.jahrgangBis)}</td>
 						<td>{klassierungText(k)}</td>
+						<td>{k.status === 'abgesagt' ? '' : k.anmeldungen}</td>
 					</tr>
 				{/each}
 			</tbody>

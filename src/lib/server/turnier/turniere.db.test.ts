@@ -214,7 +214,15 @@ describe('Kategorien', () => {
 		expect((await ladeKategorie(db, t.kid))?.klassierungBis).toBe('R2');
 		const d = await ladeTurnier(db, t.id, jetztVor(t.w));
 		expect(d?.kategorien[0].anmeldungen).toBe(1);
-		// Doppel hat keine Passung zu prüfen, ohne Anmeldungen ist alles ok.
+		// Wechsel auf Doppel: kein Einzel-Spieler passt mehr, die aktive Einzel-Anmeldung zählt.
+		const doppel = einzel('Herren A', {
+			art: 'doppel',
+			klassierungVon: null,
+			klassierungBis: null,
+			mindestsumme: 9
+		});
+		expect(await aendereKategorie(db, t.kid, doppel, false)).toEqual({ unpassend: 1 });
+		// Ohne Anmeldungen ist alles ok.
 		const leer = await legeKategorieAn(db, t.id, einzel('Herren B'));
 		if (leer.ergebnis !== 'ok') throw new Error('anlegen');
 		expect(

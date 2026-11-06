@@ -88,7 +88,6 @@
 			await goto(resolve('/verwaltung/turniere/[id]', { id: String(kategorie.turnierId) }));
 		} else if (a.art === 'hat-anmeldungen') {
 			// Jemand hat sich inzwischen angemeldet: der neue Stand zeigt die Sperre als Satz.
-			absageFehler = absageSperreText(a.anzahl);
 			await neuLaden();
 		} else {
 			absageFehler = fehlerText(a);
