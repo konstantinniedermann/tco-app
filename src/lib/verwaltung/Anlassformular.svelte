@@ -72,7 +72,12 @@
 	}
 </script>
 
-<form bind:this={formular} onsubmit={abschicken} novalidate>
+<form
+	bind:this={formular}
+	onsubmit={abschicken}
+	novalidate
+	data-ungespeichert={geaendert ? '' : undefined}
+>
 	{#each REIHE as f (f)}
 		<div class="feld-zeile">
 			<label for="anlass-{f}">{NAMEN[f]}</label>

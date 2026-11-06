@@ -259,7 +259,7 @@
 			{/if}
 		</details>
 
-		<details class="karte klappe">
+		<details class="karte klappe" data-ungespeichert={rollenGeaendert ? '' : undefined}>
 			<summary class="klappe-titel"
 				>Rollen <span class="leise"
 					>{['Mitglied', ...detail.rollen.map((r) => ROLLEN_NAMEN[r])].join(' · ')}</span

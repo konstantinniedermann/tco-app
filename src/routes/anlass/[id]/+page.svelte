@@ -18,6 +18,13 @@
 	const zeigeFormular = $derived(
 		anlass !== null && anlass.offen && (anlass.antwort === null || bearbeiten)
 	);
+	// Ungespeichert (UI-Leitbild): Die Wahl oder die Bemerkung, die mitgeschickt würde, weicht
+	// von der gespeicherten Antwort ab.
+	const geaendert = $derived(
+		zeigeFormular &&
+			(wahl !== (anlass?.antwort ?? null) ||
+				(wahl === 'kommt-nicht' && bemerkung !== (anlass?.bemerkung ?? '')))
+	);
 
 	function aendern() {
 		if (!anlass) return;
@@ -118,7 +125,7 @@
 	{/if}
 
 	{#if zeigeFormular}
-		<section class="karte" aria-labelledby="kommst">
+		<section class="karte" aria-labelledby="kommst" data-ungespeichert={geaendert ? '' : undefined}>
 			<h2 id="kommst">Kommst du?</h2>
 			<fieldset
 				class="auswahl-gruppe"

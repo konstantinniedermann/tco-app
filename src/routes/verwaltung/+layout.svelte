@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { schliesstNurTastatur } from '../../lib/ui/tastatur.ts';
 
 	let { children, data } = $props();
 	const aktuell = (pfad: string) => (page.route.id?.startsWith(pfad) ? 'page' : undefined);
@@ -14,7 +15,13 @@
 <div class="verwaltung">
 	<nav class="seitenleiste" aria-label="Verwaltung">
 		<div class="kopf">
-			<img class="kopf-wappen" src={asset('wappen.svg')} alt="" />MyTCO Verwaltung
+			<a
+				class="kopf-start"
+				href={resolve('/verwaltung')}
+				aria-label="Zur Startseite"
+				onclick={schliesstNurTastatur}
+				><img class="kopf-wappen" src={asset('wappen.svg')} alt="" /></a
+			>MyTCO Verwaltung
 		</div>
 		{#if istAdmin}
 			<div class="seitenleiste-bereich">Admin</div>

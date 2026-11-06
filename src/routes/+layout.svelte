@@ -2,7 +2,7 @@
 	import '../lib/design/tokens.css';
 	import '../lib/design/basis.css';
 	import { onMount } from 'svelte';
-	import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
+	import { afterNavigate, beforeNavigate, goto, onNavigate } from '$app/navigation';
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
@@ -14,7 +14,8 @@
 		vergisstStand,
 		zeigtFusszeile
 	} from '../lib/ui/navigation.ts';
-	import { beobachteTastatur } from '../lib/ui/tastatur.ts';
+	import { beobachteTastatur, schliesstNurTastatur } from '../lib/ui/tastatur.ts';
+	import { fragtVorWechsel, hatUngespeichertes } from '../lib/ui/ungespeichert.ts';
 	import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 	import { raeumeWechselAuf } from '../lib/profil/wechselanfrage.ts';
 	import { APP_VERSION } from '../lib/version';
@@ -35,7 +36,28 @@
 	// Nur ein Speicher, nicht reaktiv: Nichts in der Anzeige hängt davon ab.
 	let rollbereich = $state<HTMLElement>();
 	let stand: Record<string, number> = {};
-	beforeNavigate(({ from, to }) => {
+
+	// Ungespeicherte Änderungen (UI-Leitbild): Ein Link der App weg von einem geänderten
+	// Formular wartet auf die Rückfrage. «Verlassen» geht mit `goto` zum Ziel; das fragt nicht
+	// noch einmal. Gilt auch in der Verwaltung, die in diesem Layout steckt.
+	let rueckfrage = $state<HTMLDialogElement>();
+	let ziel: URL | null = null;
+	function verlassen() {
+		rueckfrage?.close();
+		// Ziel ist ein Link der App, schon aufgelöst.
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
+		if (ziel) void goto(ziel);
+		ziel = null;
+	}
+
+	beforeNavigate((navigation) => {
+		const { from, to } = navigation;
+		if (to && fragtVorWechsel(navigation, hatUngespeichertes(document))) {
+			navigation.cancel();
+			ziel = to.url;
+			rueckfrage?.showModal();
+			return;
+		}
 		if (from && rollbereich) stand[from.url.pathname] = rollbereich.scrollTop;
 		if (vergisstStand(to?.route.id ?? null)) {
 			stand = {};
@@ -104,7 +126,13 @@
 		{@render children()}
 	{:else}
 		<header class="kopf">
-			<img class="kopf-wappen" src={asset('wappen.svg')} alt="" />
+			<a
+				class="kopf-start"
+				href={resolve('/')}
+				aria-label="Zur Startseite"
+				onclick={schliesstNurTastatur}
+				><img class="kopf-wappen" src={asset('wappen.svg')} alt="" /></a
+			>
 			MyTCO
 		</header>
 
@@ -130,3 +158,11 @@
 		{/if}
 	{/if}
 </div>
+
+<dialog class="karte" bind:this={rueckfrage} aria-labelledby="ungespeichert-titel">
+	<h2 id="ungespeichert-titel">Nicht gespeichert – trotzdem verlassen?</h2>
+	<div class="leiste">
+		<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}>Abbrechen</button>
+		<button type="button" class="taste-haupt" onclick={verlassen}>Verlassen</button>
+	</div>
+</dialog>

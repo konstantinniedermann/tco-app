@@ -298,3 +298,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
 
 **Einschätzung:** Alles klein, Code-Änderungen mit `make check` und Korrekturnummer; nicht im reinen Doku-Release mitgemacht. Abdeckung: entweder `src/lib/turnier/**` mitmessen oder die Ausnahme im Testkonzept festhalten.
+
+### 2026-11-06 — «Importing a module script failed» auch einzeln reproduzierbar (SI-07, iPhone)
+
+**Thema:** Betrieb
+
+**Fundort:** Profil `iphone` (WebKit), `tests/e2e/verwaltung.test.ts:134` (SI-07), Seitenfehler-Sammlung `fehler` der Admin-Seite
+
+**Beobachtung:** Nachtrag zum Eintrag «lokal in make check: zwei rote von drei vollen Läufen»: SI-07 ist nicht nur unter Last rot. Einzeln mit `--project=iphone --repeat-each=10` auf dem Code von `origin/dev` 2 von 10 rot, nur durch «TypeError: Importing a module script failed.»; im vollen `make check` einmal rot, einmal grün. Der Test öffnet einen zweiten Browser-Kontext neben der Admin-Seite.
+
+**Ursprung:** Branch `feat/wappen-start`, Nachweisläufe von `make check`.
+
+**Einschätzung:** Gut reproduzierbar, damit untersuchbar: Mit `--repeat-each` lässt sich eine Ursache (z. B. ein Modul, das während eines Seitenwechsels nachgeladen und abgebrochen wird) eingrenzen. Bis dahin kostet er Wiederholungen von `make check`.
+
+### 2026-11-06 — Rückfrage «Nicht gespeichert» nach Speichern, wenn das Nachladen scheitert
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/routes/verwaltung/turniere/[id]/+page.svelte` (Speichern; Status setzen, Fall «unzulässig»), `src/routes/verwaltung/turniere/[id]/kategorien/[kid]/+page.svelte`, `src/routes/verwaltung/anlaesse/[id]/+page.svelte`; Marker `data-ungespeichert`
+
+**Beobachtung:** Scheitert nach erfolgreichem Speichern das Nachladen des Stands, wird das Formular nicht neu aufgebaut; es gilt weiter als geändert, und beim Verlassen kommt die Rückfrage, obwohl gespeichert ist. Wird beim Turnier ein Status-Wechsel als «unzulässig» abgewiesen, lädt die Seite den neuen Stand, baut das Formular aber nicht neu auf: Hat inzwischen ein anderer Admin etwas geändert, gilt das unberührte Formular als geändert. Die graue Speichern-Taste verhält sich schon bisher genauso.
+
+**Ursprung:** Review (`cas-reviewer`) des Branches `feat/wappen-start`.
+
+**Einschätzung:** Nur bei Störungen oder gleichzeitiger Bearbeitung; die Rückfrage schadet dann nicht (Verlassen geht). Beheben, wenn diese Seiten ohnehin angefasst werden: das Formular nach jedem Nachladen neu aufbauen wie bei den Angaben eines Mitglieds (`nachSpeichern`).
