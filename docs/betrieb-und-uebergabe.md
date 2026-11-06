@@ -5,8 +5,9 @@
 Wem die Konten von MyTCO gehören, wo die Geheimnisse liegen, wie Sicherung und Überwachung
 gedacht sind und wie der Projektleiter MyTCO an eine Nachfolge übergibt. Geschrieben für eine
 **geplante Übergabe** an jemanden, der wie der Projektleiter mit Claude Code arbeitet: Die
-Arbeitsweise steckt im Repo (`CLAUDE.md`, `.claude/`, `make help`), hier steht, was nicht im
-Code steht. Die Befehle auf dem Server stehen in [`betrieb/README.md`](../betrieb/README.md),
+Arbeitsweise steckt zum grössten Teil im Repo (`CLAUDE.md`, `.claude/`, `make help`); was nur
+auf dem Rechner des Projektleiters liegt, nennt Schritt 1 der Checkliste. Hier steht, was nicht
+im Code steht. Die Befehle auf dem Server stehen in [`betrieb/README.md`](../betrieb/README.md),
 Auslieferung und Geheimnisse im Einzelnen in [CI/CD und Release](ci-cd-und-release.md).
 
 Personen sind mit ihrer Rolle genannt. Wer die Rollen heute innehat, steht in der
@@ -88,7 +89,13 @@ Für eine geplante Übergabe vom Projektleiter an eine Nachfolge. Der Vorstand b
 Nachfolge (K-05).
 
 1. **Arbeitsumgebung:** Die Nachfolge installiert Claude Code, klont das Repo und startet mit
-   `make help`, [`README.md`](../README.md) und dieser Datei.
+   `make help`, [`README.md`](../README.md) und dieser Datei. Im Repo liegen nur die
+   Projekt-`CLAUDE.md` und der Skill `tco-branching`. Nur auf dem Rechner des Projektleiters
+   (unter `~/.claude/` bzw. eine Ebene über dem Repo) liegen und gehen sonst verloren: die
+   übergeordnete `CLAUDE.md` (Workflow, Dependencies, Commit-Konvention, Umgang mit Befunden),
+   die Skills `session-start`, `session-wrap-up`, `beobachtungen-auswerten` und `doku-audit`,
+   der Agent `cas-reviewer`, der Hook `dep-guard`, das Plugin *superpowers* und die Memories mit
+   den bekannten Fallen. Vor der Übergabe entscheiden, was davon ins Repo kommt.
 2. **Tresor:** Die Nachfolge erhält Zugang zu den Geheimnissen (K-49).
 3. **Infomaniak und Mailversand:** Die Nachfolge wird Benutzer in den Konten; der
    Projektleiter wird entfernt. Die Vereinsadresse bleibt Inhaberin.
