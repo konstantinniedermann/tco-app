@@ -15,7 +15,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 ## Zielsetzung vom 29.10.2026
 
 - MyTCO wird **unabhängig von Fairgate und der heutigen Website** aufgebaut.
-- **Bis März 2027:** Admin-Rolle mit einer Seite zur Mitgliederverwaltung. Mitglieder
+- **Bis März 2027:** Rolle Mitglieder-Admin mit einer Seite zur Mitgliederverwaltung. Mitglieder
   werden von Hand hinzugefügt, solange Fairgate nicht angebunden ist. Das Login für
   Mitglieder funktioniert: Die Zugangsdaten gehen per Brief raus, beim ersten Login
   wird das Einmalpasswort ersetzt.

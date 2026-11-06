@@ -27,7 +27,7 @@ Blick sehen, **was** ein Issue ist, **wo** es hingehört, **wie dringend** es is
 | `docs:` | `documentation` | Nur Dokumentation |
 | `chore:` / `ops:` / `test:` | `chore` | Wartung, Infrastruktur, Tests, Tooling |
 
-Faustregel: Merkt ein Mitglied oder eine Admin-Rolle in der App einen Unterschied? → `bug` oder
+Faustregel: Merkt ein Mitglied oder ein Admin (MyTCO-, Mitglieder-, CM- oder Lizenz-Admin) in der App einen Unterschied? → `bug` oder
 `enhancement`. Reine Werkstattarbeit? → `refactor` oder `chore`. Reiner Text? → `documentation`.
 
 ## Bereich (mindestens ein Label)
