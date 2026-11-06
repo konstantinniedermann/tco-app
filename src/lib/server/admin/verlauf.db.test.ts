@@ -60,7 +60,7 @@ describe('Änderungsverlauf', () => {
 		expect(zeilen).toEqual([
 			{
 				zeitpunkt: nach(5),
-				urheber: 'Uma Urheber',
+				urheber: 'Urheber, Uma',
 				aktion: 'feld-geaendert',
 				detail: 'ort',
 				mitglied: { id: m.mitgliedId, name: 'Mitglied, Max' }
@@ -130,6 +130,6 @@ describe('Änderungsverlauf', () => {
 			t0
 		);
 		const zeilen = await ladeVerlauf(db, { mitgliedId: m.mitgliedId, grenze: 10 });
-		expect(zeilen[0].urheber).toBe('Lea Beispiel (selbst)');
+		expect(zeilen[0].urheber).toBe('Beispiel, Lea (selbst)');
 	});
 });

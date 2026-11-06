@@ -85,8 +85,8 @@ export async function ladeVerlauf(
 				: z.urheberVorname === null
 					? 'gelöschtes Konto'
 					: z.urheberArt === 'mitglied' && z.urheberId === z.mitgliedId
-						? `${z.urheberVorname} ${z.urheberNachname} (selbst)`
-						: `${z.urheberVorname} ${z.urheberNachname}`,
+						? `${z.urheberNachname}, ${z.urheberVorname} (selbst)`
+						: `${z.urheberNachname}, ${z.urheberVorname}`,
 		aktion: z.aktion as Aktion,
 		detail: z.detail,
 		mitglied: { id: z.mitgliedId, name: `${z.nachname}, ${z.vorname}` }

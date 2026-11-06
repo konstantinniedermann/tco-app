@@ -134,7 +134,9 @@ jobs:
     needs: aenderung
     if: needs.aenderung.outputs.code == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Das Limit lässt Platz für den schlimmsten Fall der Installation (Systempakete 8 Minuten,
+    # dazu 3 Download-Versuche à 5 Minuten); es kostet nur, wenn etwas hängt.
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
@@ -190,15 +192,22 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm exec --no -- svelte-kit sync
-      # Der Download von Browsern und Systempaketen hängt selten fest (sonst unter 3 Minuten).
-      # Statt bis zum Job-Limit zu warten: je Versuch höchstens 5 Minuten, bis zu 3 Versuche.
-      # Nur der Browser dieses Geräts.
-      - name: Browser installieren (bis 3 Versuche)
+      # Systempakete einmal, ohne Wiederholung: Bricht ein Versuch ab, läuft sein apt-get weiter
+      # und hält die dpkg-Sperre, ein zweiter Versuch scheitert dann sicher. Ein langsamer
+      # Spiegelserver bekommt darum Zeit, statt abgebrochen zu werden. Nur für den Browser dieses Geräts.
+      - name: Systempakete für den Browser
+        timeout-minutes: 8
+        env:
+          BROWSER: ${{ matrix.browser }}
+        run: npm exec --no -- playwright install-deps "$BROWSER"
+      # Der Download des Browsers hängt selten fest (sonst unter 2 Minuten). Statt bis zum
+      # Job-Limit zu warten: je Versuch höchstens 5 Minuten, bis zu 3 Versuche.
+      - name: Browser herunterladen (bis 3 Versuche)
         env:
           BROWSER: ${{ matrix.browser }}
         run: |
           for versuch in 1 2 3; do
-            if timeout --kill-after=10s 5m npm exec --no -- playwright install --with-deps "$BROWSER"; then exit 0; fi
+            if timeout --kill-after=10s 5m npm exec --no -- playwright install "$BROWSER"; then exit 0; fi
             echo "::warning::Browser-Download, Versuch $versuch abgebrochen oder fehlgeschlagen"
           done
           exit 1

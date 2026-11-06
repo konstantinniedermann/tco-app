@@ -352,10 +352,10 @@ test('A-KONTO-02: Admin sieht die Selbständerung unter Für Fairgate und hakt a
 	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
 	const verlauf = page.getByRole('table', { name: 'Verlauf' });
 	await expect(verlauf.getByRole('row', { name: /In Fairgate übertragen/ })).toContainText(
-		'Jana Muster'
+		'Muster, Jana'
 	);
 	await expect(verlauf.getByRole('row', { name: /Strasse geändert/ })).toContainText(
-		`Kurt ${nachname} (selbst)`
+		`${nachname}, Kurt (selbst)`
 	);
 	await expect(verlauf).not.toContainText('Probeweg 3');
 	expect(fehler).toEqual([]);

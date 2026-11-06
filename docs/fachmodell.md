@@ -49,6 +49,7 @@ classDiagram
     Lizenzantrag "*" --> "1" Mitglied
     Anlass "1" *-- "*" AnmeldungAnlass
     AnmeldungAnlass "*" --> "1" Mitglied
+    Anlass "*" --> "0..1" Mitglied : erstellt von
 ```
 
 `AnmeldungAnlass` ist im Diagramm die *Anmeldung (Anlass)*, zur Unterscheidung von der
@@ -69,7 +70,7 @@ Anmeldung zu einem Turnier.
 
 | Objekt | Attribute | Personendaten |
 |--------|-----------|---|
-| **Anlass** | Titel, Beginn, Ort, Einladung (Text), Anmeldeschluss, Kalender-Kennung (zufällig, für den Link ohne Login), Termin geändert am, erstellt von, erstellt am. Gilt für alle aktiven Mitglieder (**Annahme K-50**) | — |
+| **Anlass** | Titel, Beginn, Ort, Einladung (Text), Anmeldeschluss, Kalender-Kennung (zufällig, für den Link ohne Login), Termin geändert am, erstellt von (Admin), erstellt am. Gilt für alle aktiven Mitglieder (**Annahme K-50**) | erstellt von |
 | **Anmeldung (Anlass)** | Anlass, Mitglied, Antwort *kommt* / *kommt nicht*, Bemerkung (optional, nur bei *kommt nicht*), geändert am. Auch die Abmeldung heisst *Anmeldung* (Glossar) | Antwort, Bemerkung |
 
 ### Clubmeisterschaft

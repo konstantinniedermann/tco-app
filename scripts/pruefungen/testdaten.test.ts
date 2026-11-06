@@ -29,6 +29,11 @@ describe('pruefeTestdaten', () => {
 			pruefeTestdaten(new Map([['scripts/erfundene-mitglieder.ts', 'bob@gmail.com']]))
 		).toHaveLength(1);
 	});
+	it('prüft die Beispieldaten, die make seed dazulegt', () => {
+		expect(
+			pruefeTestdaten(new Map([['scripts/beispiel-anlass.ts', 'bob@gmail.com']]))
+		).toHaveLength(1);
+	});
 	it('zählt Verbindungs-URLs nicht als Mailadresse', () => {
 		expect(
 			pruefeTestdaten(new Map([['tests/a.test.ts', 'postgres://user:pass@localhost:55432/db']]))

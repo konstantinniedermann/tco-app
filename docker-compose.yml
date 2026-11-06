@@ -12,6 +12,11 @@ services:
       POSTGRES_DB: mytco
     ports:
       - '127.0.0.1:55432:5432'
+    # Benannter Speicher: übersteht `docker compose down` (ohne -v) und neue Container, sonst
+    # wären Seed-Daten und Handy-Logins aus `make dev-handy` weg. Ab Postgres 18 liegen die
+    # Daten unter /var/lib/postgresql, nicht mehr unter …/data.
+    volumes:
+      - daten:/var/lib/postgresql
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U mytco -d mytco']
       interval: 2s
@@ -29,3 +34,6 @@ services:
       interval: 2s
       timeout: 3s
       retries: 20
+
+volumes:
+  daten:

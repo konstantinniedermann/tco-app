@@ -8,6 +8,16 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Schnellere Merges: Die E2E-Tests laufen in der CI als drei parallele Jobs (iPhone, Android,
+  Desktop) statt nacheinander. Lokal merkt sich ein grünes `make check` den geprüften Stand;
+  der Pre-Push-Hook prüft ihn nicht noch einmal voll, wenn seither nur Doku und die
+  Versionsnummer dazukamen (`gruener-stand.ts`).
+- Entwurf für die Anmeldung zur Clubmeisterschaft, geschnitten in vier Teile: Turnier anlegen,
+  Einzel-Anmeldung, Doppel, Anmeldungen verwalten (#51; Teil-Issues #57 bis #60). Neue Frage
+  K-51 an den Verein: Doppel nach Summe der Klassierungen.
+
+## 0.5.2 — arc42, ADRs und Nacharbeit aus der Beobachtungs-Auswertung
+
 - Architektur als arc42 in `docs/arc42.md`: Ziele, Kontext mit Nachbarsystemen, Lösungsstrategie,
   Bausteine, Server, Querschnittskonzepte und Risiken, mit Verweisen auf die Einzeldokumente (#14).
 - Warum MyTCO ohne Anbindung an Fairgate läuft, steht jetzt als
@@ -15,10 +25,15 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   Reevaluations-Triggern (#16).
 - Warum jeder Merge nach `dev` mit Code eine eigene Versionsnummer bekommt, steht jetzt als
   [ADR-007](adr/adr-007-version-pro-merge.md).
-- Schnellere Merges: Die E2E-Tests laufen in der CI als drei parallele Jobs (iPhone, Android,
-  Desktop) statt nacheinander. Lokal merkt sich ein grünes `make check` den geprüften Stand;
-  der Pre-Push-Hook prüft ihn nicht noch einmal voll, wenn seither nur Doku und die
-  Versionsnummer dazukamen (`gruener-stand.ts`).
+- Datenschutzerklärung in der Du-Form wie App, Hilfe und Brief; sie nennt jetzt auch die
+  Zeitpunkte je angemeldetem Gerät und wer einen Anlass angelegt hat.
+- Verwaltung: Namen überall als «Nachname, Vorname», auch in der Antwortliste der Anlässe und
+  beim Urheber im Änderungsverlauf.
+- CI: Systempakete für die Browser einmal, nur der Browser-Download wird wiederholt; ein
+  abgebrochener Versuch sperrte vorher apt für alle weiteren.
+- Lokale Datenbank in einem benannten Docker-Speicher; einmal `make seed` nach dem Update.
+- Test-IDs der Passkey- und Mitgliedernummer-Tests richtiggestellt, Beispieldaten von
+  `make seed` in der Prüfung der Testdaten.
 
 ## 0.5.1 — Versionsnummer bei jedem Merge
 

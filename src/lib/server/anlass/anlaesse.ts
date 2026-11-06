@@ -206,7 +206,7 @@ export async function ladeAnlassAdmin(db: Db, id: number): Promise<AnlassAdmin |
 	if (!a) return null;
 	const anmeldungen = await db
 		.select({
-			name: sql<string>`${mitglied.vorname} || ' ' || ${mitglied.nachname}`,
+			name: sql<string>`${mitglied.nachname} || ', ' || ${mitglied.vorname}`,
 			antwort: anlassAnmeldung.antwort,
 			bemerkung: anlassAnmeldung.bemerkung,
 			geaendertAm: anlassAnmeldung.geaendertAm

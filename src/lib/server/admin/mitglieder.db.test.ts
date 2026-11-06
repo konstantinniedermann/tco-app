@@ -70,7 +70,7 @@ describe('legeMitgliedAn', () => {
 		expect(r).toEqual({ ergebnis: 'vergeben', feld: 'email' });
 	});
 
-	test('FR-25: gleiche Mitgliedernummer → vergeben (mitgliedernummer)', async () => {
+	test('A-MITGLIED-07: gleiche Mitgliedernummer → vergeben (mitgliedernummer)', async () => {
 		const n = nummer();
 		await anlegen({ mitgliedernummer: n });
 		const r = await legeMitgliedAn(db, urheber, angaben({ mitgliedernummer: n }), jetzt);
@@ -79,7 +79,7 @@ describe('legeMitgliedAn', () => {
 });
 
 describe('Mitgliedernummer', () => {
-	test('FR-25: gleiche Mitgliedernummer in anderer Gross-/Kleinschreibung → vergeben; gespeichert wie eingegeben', async () => {
+	test('A-MITGLIED-07: gleiche Mitgliedernummer in anderer Gross-/Kleinschreibung → vergeben; gespeichert wie eingegeben', async () => {
 		const n = `Ab${nummer()}`;
 		const id = await anlegen({ mitgliedernummer: n });
 		expect((await ladeMitglied(db, id, jetzt))!.angaben.mitgliedernummer).toBe(n);
@@ -174,7 +174,7 @@ describe('aendereAngaben', () => {
 		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['telefon'] });
 	});
 
-	test('FR-25: Mitgliedernummer eines anderen in anderer Schreibweise → vergeben', async () => {
+	test('A-MITGLIED-07: Mitgliedernummer eines anderen in anderer Schreibweise → vergeben', async () => {
 		const n = `A${nummer()}`;
 		await anlegen({ mitgliedernummer: n });
 		const id = await anlegen();
