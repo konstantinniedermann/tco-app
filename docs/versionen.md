@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- CI: Die E2E-Jobs laufen im offiziellen Playwright-Image, Browser und Systempakete sind
+  schon drin. Die Installation über apt fällt weg; sie hing immer wieder am langsamen
+  Ubuntu-Spiegel. Die Image-Version folgt Playwright aus `package-lock.json`.
+
 ## 0.7.0 — Rollen schärfen
 
 - Rollen geschärft (#43): Statt «Admin» gibt es vier Admin-Rollen, einzeln vergeben:
