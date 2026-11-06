@@ -7,6 +7,8 @@ import {
 	aenderung,
 	anlass,
 	anlassAnmeldung,
+	anmeldung,
+	anmeldungSpieler,
 	kategorie,
 	konto,
 	kontoRolle,
@@ -305,5 +307,55 @@ describe('Schema Turnier und Kategorie', () => {
 		await db.delete(turnier).where(eq(turnier.id, t.id));
 		const rest = await db.select().from(kategorie).where(eq(kategorie.turnierId, t.id));
 		expect(rest).toHaveLength(0);
+	});
+
+	test('FR-37: Klassierung nur aus der Skala', async () => {
+		const { mitgliedId } = await legeMitgliedAn(db);
+		const f = await fang(
+			db.update(mitglied).set({ klassierung: 'R10' }).where(eq(mitglied.id, mitgliedId))
+		);
+		expect(constraint(f)).toBe('mitglied_klassierung_check');
+		await db.update(mitglied).set({ klassierung: 'keine' }).where(eq(mitglied.id, mitgliedId));
+		await db.update(mitglied).set({ klassierung: 'R9' }).where(eq(mitglied.id, mitgliedId));
+	});
+
+	test('FR-06: Anmeldestatus nur aus der Liste', async () => {
+		const t = await neuesTurnier();
+		const [k] = await db
+			.insert(kategorie)
+			.values({ ...einzel, turnierId: t.id })
+			.returning();
+		const jetzt = new Date();
+		const f = await fang(
+			db.insert(anmeldung).values({
+				kategorieId: k.id,
+				status: 'offen' as 'bestaetigt',
+				angemeldetAm: jetzt,
+				geaendertAm: jetzt
+			})
+		);
+		expect(constraint(f)).toBe('anmeldung_status_check');
+	});
+
+	test('FR-04: Turnier löschen räumt Anmeldungen mit, Mitglied bleibt', async () => {
+		const { mitgliedId } = await legeMitgliedAn(db);
+		const t = await neuesTurnier();
+		const [k] = await db
+			.insert(kategorie)
+			.values({ ...einzel, turnierId: t.id })
+			.returning();
+		const jetzt = new Date();
+		const [a] = await db
+			.insert(anmeldung)
+			.values({ kategorieId: k.id, angemeldetAm: jetzt, geaendertAm: jetzt })
+			.returning();
+		expect(a.status).toBe('bestaetigt');
+		await db.insert(anmeldungSpieler).values({ anmeldungId: a.id, mitgliedId });
+		await db.delete(turnier).where(eq(turnier.id, t.id));
+		expect(await db.select().from(anmeldung).where(eq(anmeldung.id, a.id))).toHaveLength(0);
+		expect(
+			await db.select().from(anmeldungSpieler).where(eq(anmeldungSpieler.anmeldungId, a.id))
+		).toHaveLength(0);
+		expect(await db.select().from(mitglied).where(eq(mitglied.id, mitgliedId))).toHaveLength(1);
 	});
 });
