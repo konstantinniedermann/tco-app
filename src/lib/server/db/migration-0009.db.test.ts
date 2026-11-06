@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
@@ -6,7 +7,6 @@ import {
 	legeEigeneDatenbankAn,
 	type EigeneDatenbank
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
-import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { kontoRolle } from './schema.ts';
 
 // Die Datenbank beginnt auf dem Stand vor dem Umbau der Rollen (0008) und spielt 0009 selbst ein.
@@ -19,6 +19,27 @@ beforeAll(async () => {
 afterAll(async () => {
 	await eigene?.abbauen();
 });
+
+// Auf dem Stand 0008 kennt die Tabelle mitglied die späteren Spalten (z. B. klassierung) noch nicht;
+// das aktuelle Drizzle-Schema würde sie mitschreiben. Darum hier reines SQL mit den Spalten von damals.
+async function legeMitgliedAn(db: EigeneDatenbank['db'], teil: { rollen: string[] }) {
+	const m = await db.$client.query<{ id: number }>(
+		`insert into mitglied (vorname, nachname, strasse, plz, ort, email)
+		 values ('Test', 'Muster', 'Erfundenweg 1', '4600', 'Olten', $1) returning id`,
+		[`test-${randomUUID()}@example.org`]
+	);
+	const k = await db.$client.query<{ id: number }>(
+		`insert into konto (mitglied_id) values ($1) returning id`,
+		[m.rows[0].id]
+	);
+	for (const rolle of teil.rollen) {
+		await db.$client.query(`insert into konto_rolle (konto_id, rolle) values ($1, $2)`, [
+			k.rows[0].id,
+			rolle
+		]);
+	}
+	return { mitgliedId: m.rows[0].id, kontoId: k.rows[0].id };
+}
 
 const rollenVon = async (kontoId: number) =>
 	(
