@@ -24,6 +24,27 @@ export async function klappeAuf(page: Page, titel: string): Promise<void> {
 	await expect(klappe).toHaveAttribute('open', '');
 }
 
+/**
+ * Wartet, bis der Browser eine Weile nichts mehr lädt. Die Reiter laden den Code der anderen
+ * Seiten gleich beim Anzeigen vor (`data-sveltekit-preload-code="eager"`); ein `page.goto`
+ * mitten hinein bricht das Laden ab, und WebKit meldet das als Konsolenfehler («Importing a
+ * module script failed»).
+ */
+export async function wartetAufRuhigesNetz(page: Page, ruheMs = 300): Promise<void> {
+	await new Promise<void>((fertig) => {
+		const ende = () => {
+			page.off('request', neu).off('requestfinished', neu).off('requestfailed', neu);
+			fertig();
+		};
+		let uhr = setTimeout(ende, ruheMs);
+		function neu() {
+			clearTimeout(uhr);
+			uhr = setTimeout(ende, ruheMs);
+		}
+		page.on('request', neu).on('requestfinished', neu).on('requestfailed', neu);
+	});
+}
+
 // WebKit: Für den Screenshot legt Playwright ein eigenes Stylesheet an (Quelle
 // web-inspector://), das an der CSP der App scheitert. Nur während des Screenshots ignoriert.
 const SCREENSHOT_STIL = /^Refused to apply a stylesheet because its hash/;
