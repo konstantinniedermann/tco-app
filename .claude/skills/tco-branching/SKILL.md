@@ -226,7 +226,9 @@ er auf `main` liegt.
 **7 — Issues abschliessen** (nach dem Release):
 
 - Jedes Issue, dessen Definition of Done jetzt vollständig auf `main` steht, schliessen, mit
-  Verweis auf das Release. Prüfen, welche Issues dadurch frei werden (`Blocked by` im Body),
+  Verweis auf das Release. Vorher die Haken der Definition of Done im Body setzen
+  (`gh issue edit NNN --body-file …`); ein bewusst nicht erfüllter Punkt bleibt offen und wird
+  im Abschlusskommentar begründet. Prüfen, welche Issues dadurch frei werden (`Blocked by` im Body),
   und dort `blocked` entfernen, wenn kein weiterer Blocker bleibt.
 - Label entfernen (bei `issue-1-2` für jedes Issue): `gh issue edit NNN -R konstantinniedermann/tco-app --remove-label in-arbeit`.
 - Ist ein Issue im Release, aber noch nicht fertig: Label wie in der Tabelle in Schritt 4.
