@@ -78,6 +78,13 @@
       "when": 1793964801387,
       "tag": "0010_ansicht",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793982935815,
+      "tag": "0011_mitteilungen",
+      "breakpoints": true
     }
   ]
 }
