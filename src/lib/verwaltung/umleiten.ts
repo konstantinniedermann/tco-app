@@ -19,3 +19,15 @@ export async function leiteUm(a: Antwort<unknown>): Promise<boolean> {
 			return false;
 	}
 }
+
+/** Erste Seite der Verwaltung: Admins beginnen bei den Mitgliedern, nur `cm` bei den Turnieren. */
+export const startziel = (rollen: readonly string[]) =>
+	rollen.includes('admin')
+		? ('/verwaltung/mitglieder' as const)
+		: ('/verwaltung/turniere' as const);
+
+/** Seiten, die auch `cm` ohne Admin-Rolle öffnen darf. */
+export const offenFuerCm = (pfad: string) =>
+	pfad === '/verwaltung/bestaetigen' ||
+	pfad === '/verwaltung/turniere' ||
+	pfad.startsWith('/verwaltung/turniere/');

@@ -6,7 +6,15 @@ import type { AnlassFeld } from '../server/anlass/angaben.ts';
 import type { AnlassAdmin, AnlassListe } from '../server/anlass/anlaesse.ts';
 import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairgate.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
-import type { Rolle } from '../server/admin/rollen.ts';
+import type { Rolle, VerwaltungsRolle } from '../server/admin/rollen.ts';
+import type { TurnierStatus } from '../server/db/schema.ts';
+import type { KategorieFeld, TurnierFeld } from '../server/turnier/angaben.ts';
+import type {
+	KategorieZeile,
+	TurnierDetail,
+	TurnierZeile,
+	ladeKategorie as ServerLadeKategorie
+} from '../server/turnier/turniere.ts';
 import type { VerlaufZeile } from '../server/admin/verlauf.ts';
 
 // Was nach JSON im Browser ankommt: Zeitpunkte sind Zeichenketten.
@@ -24,6 +32,11 @@ export type VerlaufEintrag = Json<VerlaufZeile>;
 export type AnlassZeile = Json<AnlassListe>;
 export type AnlassDetail = Json<AnlassAdmin> & { beginnLokal: string; schlussLokal: string };
 export type { AnlassFeld };
+export type TurnierListe = Json<TurnierZeile>[];
+export type TurnierAnsicht = Json<TurnierDetail>;
+export type KategorieAnsicht = Json<NonNullable<Awaited<ReturnType<typeof ServerLadeKategorie>>>>;
+export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus, VerwaltungsRolle };
+type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld;
 export type FairgateZeile = Json<ServerFairgateZeile>;
 export type { Angaben, Feld, MitgliedStatus, Rolle };
 
@@ -35,10 +48,14 @@ export type Antwort<T> =
 	| { art: 'falsch' }
 	| { art: 'zu-viele' }
 	| { art: 'nicht-gefunden' }
-	| { art: 'eingabe'; felder: Partial<Record<Feld | AnlassFeld, string>> }
-	| { art: 'vergeben'; feld: Feld }
+	| { art: 'eingabe'; felder: Partial<Record<AlleFelder, string>> }
+	| { art: 'vergeben'; feld: Feld | 'jahr' | 'name' }
 	| { art: 'letzter-admin' }
 	| { art: 'veraltet' }
+	| { art: 'schluss-vorbei' }
+	| { art: 'keine-kategorie' }
+	| { art: 'unzulaessig' }
+	| { art: 'abgesagt' }
 	| { art: 'stoerung' };
 
 export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
@@ -58,13 +75,17 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 	if (status === 400) {
 		if (k.fehler === 'falsch') return { art: 'falsch' };
 		if (k.fehler === 'eingabe' && k.felder && typeof k.felder === 'object')
-			return { art: 'eingabe', felder: k.felder as Partial<Record<Feld | AnlassFeld, string>> };
+			return { art: 'eingabe', felder: k.felder as Partial<Record<AlleFelder, string>> };
 	}
 	if (status === 409) {
 		if (k.fehler === 'letzter-admin') return { art: 'letzter-admin' };
 		if (k.fehler === 'veraltet') return { art: 'veraltet' };
+		if (k.fehler === 'schluss-vorbei') return { art: 'schluss-vorbei' };
+		if (k.fehler === 'keine-kategorie') return { art: 'keine-kategorie' };
+		if (k.fehler === 'unzulaessig') return { art: 'unzulaessig' };
+		if (k.fehler === 'abgesagt') return { art: 'abgesagt' };
 		if (k.fehler === 'vergeben' && typeof k.feld === 'string')
-			return { art: 'vergeben', feld: k.feld as Feld };
+			return { art: 'vergeben', feld: k.feld as Feld | 'jahr' | 'name' };
 	}
 	return STOERUNG;
 }
@@ -87,7 +108,10 @@ const schicke = <T>(pfad: string, inhalt: object, holen: Holen) =>
 const ADMIN = '/api/admin';
 
 export const ladeZugang = (holen: Holen = fetch) =>
-	lese<{ bestaetigt: boolean; mitgliedId?: number }>(`${ADMIN}/zugang`, holen);
+	lese<{ bestaetigt: boolean; mitgliedId?: number; rollen: VerwaltungsRolle[] }>(
+		`${ADMIN}/zugang`,
+		holen
+	);
 
 export const fordereCodeAn = (holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/zugang/code`, {}, holen);
@@ -156,3 +180,34 @@ export const aendereAnlass = (id: number, angaben: object, holen: Holen = fetch)
 
 export const loescheAnlass = (id: number, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/anlaesse/${id}/loeschen`, {}, holen);
+
+export const ladeTurniere = (holen: Holen = fetch) =>
+	lese<TurnierListe>(`${ADMIN}/turniere`, holen);
+
+/** `angaben`: Jahr, Name, Anmeldeschluss (`YYYY-MM-DD`) und die ganze Liste der Turniernummern. */
+export const legeTurnierAn = (angaben: object, holen: Holen = fetch) =>
+	schicke<{ id: number }>(`${ADMIN}/turniere`, angaben, holen);
+
+export const ladeTurnier = (id: number, holen: Holen = fetch) =>
+	lese<TurnierAnsicht>(`${ADMIN}/turniere/${id}`, holen);
+
+export const aendereTurnier = (id: number, angaben: object, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/turniere/${id}`, angaben, holen);
+
+export const setzeTurnierStatus = (
+	id: number,
+	status: 'offen' | 'geschlossen',
+	holen: Holen = fetch
+) => schicke<Record<string, never>>(`${ADMIN}/turniere/${id}/status`, { status }, holen);
+
+export const legeKategorieAn = (turnierId: number, angaben: object, holen: Holen = fetch) =>
+	schicke<{ id: number }>(`${ADMIN}/turniere/${turnierId}/kategorien`, angaben, holen);
+
+export const ladeKategorie = (id: number, holen: Holen = fetch) =>
+	lese<KategorieAnsicht>(`${ADMIN}/kategorien/${id}`, holen);
+
+export const aendereKategorie = (id: number, angaben: object, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/kategorien/${id}`, angaben, holen);
+
+export const sageKategorieAb = (id: number, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/kategorien/${id}/absagen`, {}, holen);

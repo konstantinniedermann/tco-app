@@ -74,6 +74,10 @@ die niemand bearbeiten kann.
    *zurückgezogen* oder *abgelehnt* sind. Hat sie welche, verschiebt der CM-Verantwortliche sie
    zuerst in andere Kategorien (bevorzugt) oder löscht sie (Teil 4), dann sagt er die Kategorie
    ab (Entscheid Projektleiter). Eine abgesagte Kategorie verschwindet für Mitglieder.
+
+   Ziel 5 und 6 brauchen Anmeldungen, die es erst ab Teil 2 gibt. Teil 1 baut darum Ändern
+   und Absagen ohne diese Prüfung (es kann noch niemand angemeldet sein); Teil 2 ergänzt
+   Warnung und Prüfung zusammen mit den Anmeldungen (Entscheid Projektleiter, 06.11.2026).
 7. **Seed:** `make seed` legt ein erfundenes Turnier 2027 mit offener Anmeldung an: Herren,
    Damen, Mixed, Junioren (mit Jahrgang), Senioren, Einzel und Doppel, verschiedene
    Klassierungsbereiche (z. B. R1–R6, R7–R9) und Doppel mit Mindestsumme 9. Die Teile 2 bis 4 ergänzen erfundene Anmeldungen.
@@ -219,6 +223,17 @@ Design System *MyTCO*, Handy-Artboards, mit erfundenen Daten; Abnahme per Bildve
 (Playwright-Screenshot iPhone/Android neben dem Entwurf, axe). Jedes Thema bekommt eine eigene
 Fläche; der Wildcard-Bereich ist eingeklappt. Fehlt ein Baustein, kommt er erst ins
 [UI-Leitbild](../../ui-leitbild.md).
+
+**Teil 1 (freigegeben 06.11.2026):** Design-Artifact
+[MyTCO CM Turnier anlegen](https://claude.ai/artifact/HLSqjEwFmHVRD7QWChziPF). Eine
+Turnierseite: oben die Karte *Anmeldung* mit Status-Plakette und Taste (*Anmeldung öffnen* ist
+die Haupttaste, *jetzt schliessen* und *Wieder öffnen* sind Nebentasten), darunter die
+Kategorien als Tabelle, unten die Angaben mit den Turniernummern als Zeilen (Bezeichnung,
+Nummer, *Entfernen*; *Weitere Turniernummer*). Eine Kategorie bearbeitet man auf eigener
+Seite; *Kategorie absagen* steht dort in einer eigenen Karte. Seitenleiste: Bereich
+*Clubmeisterschaft* mit dem Eintrag *Turniere*; wer nur `cm` hat, sieht nur diesen Bereich.
+Status-Plaketten: *in Vorbereitung* `plakette-offen`, *Anmeldung offen* `plakette-ok`,
+*Anmeldung geschlossen* `plakette-gesperrt`. Kein neuer Baustein.
 
 ## Nicht-Ziele
 

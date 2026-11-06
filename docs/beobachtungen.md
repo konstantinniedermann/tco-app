@@ -201,3 +201,39 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) des Branches `docs/repo-oeffentlich`.
 
 **Einschätzung:** Ein kurzes ADR würde den Entscheid und die Alternativen festhalten (ähnlich ADR-007). Neue Vereinsdokumente vor dem Einchecken auf Metadaten prüfen.
+
+### 2026-11-06 — Turnierjahr ändern prüft bestehende Kategorien nicht gegen das neue Jahr
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/turnier/turniere.ts`, `aendereTurnier`
+
+**Beobachtung:** Wird das Turnierjahr geändert, werden bestehende Kategorien nicht gegen das neue Jahr geprüft. Ein Jahrgang bis kann dadurch grösser als das Turnierjahr werden.
+
+**Ursprung:** Review #57.
+
+**Einschätzung:** Niedrig; in der Praxis bleibt das Jahr eines Turniers fest.
+
+### 2026-11-06 — Letzte Kategorie absagen kann ein offenes Turnier ohne aktive Kategorie hinterlassen
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/turnier/turniere.ts`, `sageKategorieAb`
+
+**Beobachtung:** `sageKategorieAb` sperrt die Turnierzeile nicht. Zusammen mit dem Absagen der letzten Kategorie kann ein offenes Turnier ohne aktive Kategorie entstehen.
+
+**Ursprung:** Review #57.
+
+**Einschätzung:** Mit #58 (Absage-Sperre) mitlösen.
+
+### 2026-11-06 — Kategorientabelle am Handy: Klassierung nur durch seitliches Schieben erreichbar
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/routes/verwaltung/turniere/[id]/+page.svelte`, Tabelle *Kategorien*
+
+**Beobachtung:** Am Handy ist die Spalte Klassierung nur durch seitliches Schieben erreichbar; «Einzel» und «Doppel» werden getrennt umbrochen (Ein-zel, Dop-pel).
+
+**Ursprung:** Review #57.
+
+**Einschätzung:** Mit der Spalte Anmeldungen in #58 neu ansehen.

@@ -3,7 +3,16 @@ import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from './index.ts';
-import { aenderung, anlass, anlassAnmeldung, konto, kontoRolle, mitglied } from './schema.ts';
+import {
+	aenderung,
+	anlass,
+	anlassAnmeldung,
+	kategorie,
+	konto,
+	kontoRolle,
+	mitglied,
+	turnier
+} from './schema.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 
@@ -184,6 +193,117 @@ describe('Schema Anlass und Anmeldung', () => {
 			.select()
 			.from(anlassAnmeldung)
 			.where(eq(anlassAnmeldung.anlassId, anlassId));
+		expect(rest).toHaveLength(0);
+	});
+});
+
+describe('Schema Turnier und Kategorie', () => {
+	const fang = (p: Promise<unknown>) =>
+		p.then(
+			() => null,
+			(f: unknown) => f
+		);
+	const constraint = (f: unknown) => {
+		const c = (f as { cause?: { constraint_name?: string; constraint?: string } } | null)?.cause;
+		return c?.constraint_name ?? c?.constraint;
+	};
+	async function neuesTurnier(jahr = 3000 + Math.floor(Math.random() * 90000)) {
+		const [t] = await db
+			.insert(turnier)
+			.values({ jahr, name: `Testturnier ${jahr}`, anmeldeschluss: `${jahr}-05-31` })
+			.returning();
+		return t;
+	}
+	const einzel = {
+		name: 'Herren R1-R6',
+		geschlecht: 'herren',
+		art: 'einzel',
+		klassierungVon: 'R1',
+		klassierungBis: 'R6'
+	} as const;
+
+	test('FR-33: pro Jahr ein Turnier', async () => {
+		const t = await neuesTurnier();
+		const f = await fang(
+			db
+				.insert(turnier)
+				.values({ jahr: t.jahr, name: 'Zweites', anmeldeschluss: `${t.jahr}-05-31` })
+		);
+		expect(constraint(f)).toBe('turnier_jahr_unique');
+	});
+
+	test('FR-33: Status ausserhalb von vorbereitung, offen, geschlossen wird abgewiesen', async () => {
+		const jahr = 3000 + Math.floor(Math.random() * 90000);
+		const f = await fang(
+			db.insert(turnier).values({
+				jahr,
+				name: 'X',
+				anmeldeschluss: `${jahr}-05-31`,
+				status: 'unbekannt' as 'offen'
+			})
+		);
+		expect(constraint(f)).toBe('turnier_status_check');
+	});
+
+	test('FR-34: Einzel mit Mixed oder ohne Klassierung verletzt kategorie_art_check', async () => {
+		const t = await neuesTurnier();
+		const mixed = await fang(
+			db.insert(kategorie).values({ ...einzel, turnierId: t.id, geschlecht: 'mixed' })
+		);
+		expect(constraint(mixed)).toBe('kategorie_art_check');
+		const ohne = await fang(
+			db.insert(kategorie).values({ ...einzel, turnierId: t.id, klassierungBis: null })
+		);
+		expect(constraint(ohne)).toBe('kategorie_art_check');
+		const mitSumme = await fang(
+			db.insert(kategorie).values({ ...einzel, turnierId: t.id, mindestsumme: 9 })
+		);
+		expect(constraint(mitSumme)).toBe('kategorie_art_check');
+	});
+
+	test('FR-34: Doppel mit Klassierung oder ohne Mindestsumme verletzt kategorie_art_check', async () => {
+		const t = await neuesTurnier();
+		const doppel = { name: 'Doppel', geschlecht: 'mixed', art: 'doppel', turnierId: t.id } as const;
+		const mitKlass = await fang(
+			db.insert(kategorie).values({ ...doppel, mindestsumme: 9, klassierungVon: 'R1' })
+		);
+		expect(constraint(mitKlass)).toBe('kategorie_art_check');
+		const ohneSumme = await fang(db.insert(kategorie).values(doppel));
+		expect(constraint(ohneSumme)).toBe('kategorie_art_check');
+		await db.insert(kategorie).values({ ...doppel, mindestsumme: 9 });
+	});
+
+	test('FR-34: Geschlecht und Status ausserhalb der Werte werden abgewiesen', async () => {
+		const t = await neuesTurnier();
+		const g = await fang(
+			db.insert(kategorie).values({ ...einzel, turnierId: t.id, geschlecht: 'x' as 'offen' })
+		);
+		expect(constraint(g)).toBe('kategorie_geschlecht_check');
+		const s = await fang(
+			db.insert(kategorie).values({ ...einzel, turnierId: t.id, status: 'x' as 'aktiv' })
+		);
+		expect(constraint(s)).toBe('kategorie_status_check');
+	});
+
+	test('FR-34: Name unter aktiven Kategorien eindeutig ohne Gross-/Kleinschreibung', async () => {
+		const t = await neuesTurnier();
+		const [erste] = await db
+			.insert(kategorie)
+			.values({ ...einzel, turnierId: t.id, name: 'Herren Offen' })
+			.returning();
+		const f = await fang(
+			db.insert(kategorie).values({ ...einzel, turnierId: t.id, name: 'HERREN offen' })
+		);
+		expect(constraint(f)).toBe('kategorie_name_aktiv_unique');
+		await db.update(kategorie).set({ status: 'abgesagt' }).where(eq(kategorie.id, erste.id));
+		await db.insert(kategorie).values({ ...einzel, turnierId: t.id, name: 'HERREN offen' });
+	});
+
+	test('FR-33: Löschen des Turniers löscht seine Kategorien', async () => {
+		const t = await neuesTurnier();
+		await db.insert(kategorie).values({ ...einzel, turnierId: t.id });
+		await db.delete(turnier).where(eq(turnier.id, t.id));
+		const rest = await db.select().from(kategorie).where(eq(kategorie.turnierId, t.id));
 		expect(rest).toHaveLength(0);
 	});
 });
