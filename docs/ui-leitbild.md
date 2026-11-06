@@ -243,11 +243,14 @@ Kopfleiste.
   3 Tennis (Lizenznummer, Klassierung).
 - **Kontingente** zeigt der Mengen-Zähler, z. B. „1 von 3 Anmeldungen" (FR-06).
 
-**Verwaltung (vor allem am PC):** erreichbar über einen Eintrag unter *Profil*, nur für
-Konten mit einer Rolle über *Mitglied* hinaus (RR-07). Dunkelgrüne Seitenleiste mit
+**Verwaltung (vor allem am PC):** erreichbar über die Kachel „Verwaltung ›" auf der
+Startseite, direkt unter der Begrüssung, nur für Konten mit einer Rolle über *Mitglied* hinaus
+(RR-07). Dunkelgrüne Seitenleiste mit
 „MyTCO Verwaltung", den Bereichen der eigenen Rollen (Admin: Mitglieder, Anlässe,
 Für Fairgate mit Zahl der offenen, Änderungsverlauf) und „‹ Zur App". Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
+Namen von Mitgliedern stehen in allen Tabellen und Listen der Verwaltung als „Nachname,
+Vorname", damit sie sich gleich lesen und sortieren.
 
 ### Bewegung und Bedienung
 
