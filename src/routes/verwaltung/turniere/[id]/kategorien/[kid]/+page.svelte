@@ -72,7 +72,9 @@
 		laeuft = false;
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok' || a.art === 'nicht-gefunden') {
-			await goto(resolve('/verwaltung/turniere/[id]', { id: String(kategorie.turnierId) }));
+			await goto(resolve('/verwaltung/turniere/[id]', { id: String(kategorie.turnierId) }), {
+				refreshAll: true
+			});
 		} else {
 			absageFehler = fehlerText(a);
 		}
