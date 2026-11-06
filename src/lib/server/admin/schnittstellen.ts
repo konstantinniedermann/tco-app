@@ -54,7 +54,7 @@ const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });
 
 const jetzt = (d: AdminDienste) => (d.jetzt ?? (() => new Date()))();
 
-// Sitzung und eine Verwaltungsrolle (admin oder cm) genügen; die Bestätigung per Code ist hier
+// Sitzung und eine Verwaltungsrolle (mytco, mitglieder oder cm) genügen; die Bestätigung per Code ist hier
 // noch nicht nötig (SI-08: auch ein reiner CM muss den Code anfordern und einlösen können).
 async function mitKonto(
 	d: AdminDienste,
@@ -86,33 +86,52 @@ async function mitRolle(
 	return fn(z.mitgliedId);
 }
 
-// RR-07, RR-09: nur Admins mit gültiger Code-Bestätigung; `cm` allein genügt nicht.
+// Wie `mitRolle`, mit dem Angemeldeten als Urheber für den Änderungsverlauf.
+function alsAdmin(
+	d: AdminDienste,
+	e: AdminEreignis,
+	erlaubt: readonly VerwaltungsRolle[],
+	fn: (urheber: AdminUrheber) => Promise<Response>
+): Promise<Response> {
+	return mitRolle(d, e, erlaubt, (mitgliedId) => fn({ art: 'admin', mitgliedId }));
+}
+
+// RR-07, RR-09: nur Mitglieder-Admins mit gültiger Code-Bestätigung; `cm` allein genügt nicht.
+// Vorläufig wie die alte Rolle admin, bis der Bereichsschutz je Rolle steht (MyTCO-Admin liest, #43).
 export function mitAdmin(
 	d: AdminDienste,
 	e: AdminEreignis,
 	fn: (urheber: AdminUrheber) => Promise<Response>
 ): Promise<Response> {
-	return mitRolle(d, e, ['admin'], (mitgliedId) => fn({ art: 'admin', mitgliedId }));
+	return alsAdmin(d, e, ['mitglieder'], fn);
 }
 
-// RR-07, RR-09: Bereich Clubmeisterschaft — Admins und CMs mit gültiger Code-Bestätigung.
+// RR-07, RR-09: Bereich Clubmeisterschaft — Mitglieder-Admins und CMs mit gültiger
+// Code-Bestätigung (vorläufig, siehe `mitAdmin`).
 export function mitCm(
 	d: AdminDienste,
 	e: AdminEreignis,
 	fn: (mitgliedId: number) => Promise<Response>
 ): Promise<Response> {
-	return mitRolle(d, e, ['admin', 'cm'], fn);
+	return mitRolle(d, e, ['mitglieder', 'cm'], fn);
 }
 
 // SI-10: ändernde Anfragen nur als JSON.
-async function aendernd(
+async function aenderndAls(
 	d: AdminDienste,
 	e: AdminEreignis,
+	erlaubt: readonly VerwaltungsRolle[],
 	fn: (urheber: AdminUrheber, koerper: Record<string, unknown>) => Promise<Response>
 ): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
-	return mitAdmin(d, e, async (u) => fn(u, await leseKoerper(e)));
+	return alsAdmin(d, e, erlaubt, async (u) => fn(u, await leseKoerper(e)));
 }
+
+const aendernd = (
+	d: AdminDienste,
+	e: AdminEreignis,
+	fn: (urheber: AdminUrheber, koerper: Record<string, unknown>) => Promise<Response>
+) => aenderndAls(d, e, ['mitglieder'], fn);
 
 // SI-10 wie `aendernd`, für den Bereich Clubmeisterschaft.
 export async function aenderndCm(
@@ -219,18 +238,28 @@ function leseRollen(roh: unknown): Rolle[] | null {
 	return roh as Rolle[];
 }
 
+// Nur der MyTCO-Admin vergibt und entzieht Rollen (#43). `vorher`: die Rollen, wie die
+// Seite sie geladen hat; schützt vor dem Überschreiben fremder Änderungen.
 export function postRollen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return aendernd(d, e, async (urheber, koerper) => {
+	return aenderndAls(d, e, ['mytco'], async (urheber, koerper) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const rollen = leseRollen(koerper.rollen);
-		if (rollen === null) return eingabeFehler();
+		const vorher = leseRollen(koerper.vorher);
+		if (rollen === null || vorher === null) return eingabeFehler();
 		const t = jetzt(d);
 		const detail = await ladeMitglied(d.db, id, t);
 		if (!detail) return nichtGefunden();
-		const r = await setzeRollen(d.db, urheber, detail.kontoId, rollen, t);
-		if (r === 'ok') return antwort(200, {});
-		return r === 'letzter-admin' ? antwort(409, { fehler: 'letzter-admin' }) : nichtGefunden();
+		const r = await setzeRollen(d.db, urheber, detail.kontoId, rollen, vorher, t);
+		switch (r) {
+			case 'ok':
+				return antwort(200, {});
+			case 'letzter-mytco':
+			case 'veraltet':
+				return antwort(409, { fehler: r });
+			default:
+				return nichtGefunden();
+		}
 	});
 }
 

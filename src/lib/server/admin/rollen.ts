@@ -3,7 +3,7 @@ import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, kontoRolle, mitglied } from '../db/schema.ts';
 import { schreibeVerlauf, type Eintrag, type Urheber } from './verlauf.ts';
 
-export const ROLLEN = ['admin', 'cm', 'lizenz'] as const;
+export const ROLLEN = ['mytco', 'mitglieder', 'cm', 'lizenz'] as const;
 export type Rolle = (typeof ROLLEN)[number];
 
 // Schlüssel der Advisory-Sperre, die gleichzeitige Rollenänderungen hintereinander ordnet.
@@ -17,8 +17,8 @@ export async function ladeRollen(db: DbOderTx, kontoId: number): Promise<Rolle[]
 	return zeilen.map((z) => z.rolle as Rolle);
 }
 
-// RR-08: Als Admin zählt nur ein Konto mit Rolle `admin`, nicht gesperrt, Mitglied aktiv.
-function zaehlendeAdmins(db: DbOderTx, ausser?: number, nur?: number) {
+// RR-08: Als MyTCO-Admin zählt nur ein Konto mit Rolle `mytco`, nicht gesperrt, Mitglied aktiv.
+function zaehlendeMytcoAdmins(db: DbOderTx, ausser?: number, nur?: number) {
 	return db
 		.select({ n: count() })
 		.from(kontoRolle)
@@ -26,7 +26,7 @@ function zaehlendeAdmins(db: DbOderTx, ausser?: number, nur?: number) {
 		.innerJoin(mitglied, eq(mitglied.id, konto.mitgliedId))
 		.where(
 			and(
-				eq(kontoRolle.rolle, 'admin'),
+				eq(kontoRolle.rolle, 'mytco'),
 				eq(konto.gesperrt, false),
 				eq(mitglied.status, 'aktiv'),
 				ausser === undefined ? undefined : ne(kontoRolle.kontoId, ausser),
@@ -35,12 +35,12 @@ function zaehlendeAdmins(db: DbOderTx, ausser?: number, nur?: number) {
 		);
 }
 
-export async function istAdmin(db: DbOderTx, kontoId: number): Promise<boolean> {
-	const [zeile] = await zaehlendeAdmins(db, undefined, kontoId);
+export async function istMytcoAdmin(db: DbOderTx, kontoId: number): Promise<boolean> {
+	const [zeile] = await zaehlendeMytcoAdmins(db, undefined, kontoId);
 	return zeile.n > 0;
 }
 
-export const VERWALTUNGSROLLEN = ['admin', 'cm'] as const satisfies readonly Rolle[];
+export const VERWALTUNGSROLLEN = ['mytco', 'mitglieder', 'cm'] as const satisfies readonly Rolle[];
 export type VerwaltungsRolle = (typeof VERWALTUNGSROLLEN)[number];
 
 // RR-07, RR-08: Rollen, die die Verwaltung öffnen, für ein Konto, das nicht gesperrt ist und
@@ -66,15 +66,23 @@ export async function verwaltungsrollen(
 	return VERWALTUNGSROLLEN.filter((r) => vorhanden.has(r));
 }
 
+const gleicheMenge = (a: readonly Rolle[], b: readonly Rolle[]) =>
+	new Set(a).size === new Set(b).size && a.every((r) => b.includes(r));
+
+/**
+ * Setzt die Rollen eines Kontos. `vorher`: die Rollen, wie die Seite sie geladen hat; weichen sie
+ * vom gespeicherten Stand ab, ändert sich nichts (`veraltet`).
+ */
 export async function setzeRollen(
 	db: Db,
 	urheber: Urheber,
 	kontoId: number,
 	rollen: Rolle[],
+	vorher: Rolle[],
 	jetzt: Date
-): Promise<'ok' | 'letzter-admin' | 'nicht-gefunden'> {
+): Promise<'ok' | 'letzter-mytco' | 'veraltet' | 'nicht-gefunden'> {
 	return db.transaction(async (tx) => {
-		// RR-03: Zählen und Schreiben müssen gegenüber anderen Änderungen atomar sein.
+		// RR-03: Vergleichen, Zählen und Schreiben müssen gegenüber anderen Änderungen atomar sein.
 		await tx.execute(sql`select pg_advisory_xact_lock(${SPERRE_ROLLEN})`);
 
 		const [ziel] = await tx
@@ -84,13 +92,15 @@ export async function setzeRollen(
 		if (!ziel) return 'nicht-gefunden';
 
 		const alt = await ladeRollen(tx, kontoId);
+		if (!gleicheMenge(alt, vorher)) return 'veraltet';
 		const neu = [...new Set(rollen)];
 		const vergeben = neu.filter((r) => !alt.includes(r));
 		const entzogen = alt.filter((r) => !neu.includes(r));
 
-		if (entzogen.includes('admin') && (await istAdmin(tx, kontoId))) {
-			const [andere] = await zaehlendeAdmins(tx, kontoId);
-			if (andere.n === 0) return 'letzter-admin';
+		// RR-03: Mindestens ein MyTCO-Admin bleibt; für die übrigen Rollen gilt keine Untergrenze.
+		if (entzogen.includes('mytco') && (await istMytcoAdmin(tx, kontoId))) {
+			const [andere] = await zaehlendeMytcoAdmins(tx, kontoId);
+			if (andere.n === 0) return 'letzter-mytco';
 		}
 
 		if (entzogen.length > 0) {

@@ -43,7 +43,10 @@ export async function legeKontoMitBriefCodeAn(vorname: string, nachname?: string
 	return { ...konto, code };
 }
 
-/** Wie `legeKontoMitBriefCodeAn`, das Konto hat zusätzlich die Rolle Admin (Code-Bestätigung fehlt noch). */
+/**
+ * Wie `legeKontoMitBriefCodeAn`, das Konto hat zusätzlich die Rollen des ersten Admins, MyTCO-Admin
+ * und Mitglieder-Admin (Code-Bestätigung fehlt noch).
+ */
 export async function legeAdminMitBriefCodeAn(vorname: string) {
 	const konto = await legeKontoMitBriefCodeAn(vorname);
 	await machAdmin(hole().db, konto.kontoId, new Date());
@@ -53,7 +56,7 @@ export async function legeAdminMitBriefCodeAn(vorname: string) {
 /** Wie `legeKontoMitBriefCodeAn`, das Konto hat nur die Rolle CM (Code-Bestätigung fehlt noch). */
 export async function legeCmMitBriefCodeAn(vorname: string) {
 	const konto = await legeKontoMitBriefCodeAn(vorname);
-	await setzeRollen(hole().db, { art: 'automatisch' }, konto.kontoId, ['cm'], new Date());
+	await setzeRollen(hole().db, { art: 'automatisch' }, konto.kontoId, ['cm'], [], new Date());
 	return konto;
 }
 

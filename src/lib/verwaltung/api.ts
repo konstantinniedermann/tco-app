@@ -50,7 +50,7 @@ export type Antwort<T> =
 	| { art: 'nicht-gefunden' }
 	| { art: 'eingabe'; felder: Partial<Record<AlleFelder, string>> }
 	| { art: 'vergeben'; feld: Feld | 'jahr' | 'name' }
-	| { art: 'letzter-admin' }
+	| { art: 'letzter-mytco' }
 	| { art: 'veraltet' }
 	| { art: 'schluss-vorbei' }
 	| { art: 'keine-kategorie' }
@@ -78,7 +78,7 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 			return { art: 'eingabe', felder: k.felder as Partial<Record<AlleFelder, string>> };
 	}
 	if (status === 409) {
-		if (k.fehler === 'letzter-admin') return { art: 'letzter-admin' };
+		if (k.fehler === 'letzter-mytco') return { art: 'letzter-mytco' };
 		if (k.fehler === 'veraltet') return { art: 'veraltet' };
 		if (k.fehler === 'schluss-vorbei') return { art: 'schluss-vorbei' };
 		if (k.fehler === 'keine-kategorie') return { art: 'keine-kategorie' };
@@ -144,8 +144,13 @@ export const speichereAngaben = (
 	holen: Holen = fetch
 ) => schicke<{ geaendert: string[] }>(`${ADMIN}/mitglieder/${id}`, { ...angaben, vorher }, holen);
 
-export const speichereRollen = (id: number, rollen: Rolle[], holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/mitglieder/${id}/rollen`, { rollen }, holen);
+/** `vorher`: die Rollen, wie die Seite sie geladen hat; der Server speichert nur, wenn sie noch gelten. */
+export const speichereRollen = (
+	id: number,
+	rollen: Rolle[],
+	vorher: Rolle[],
+	holen: Holen = fetch
+) => schicke<Record<string, never>>(`${ADMIN}/mitglieder/${id}/rollen`, { rollen, vorher }, holen);
 
 export const beendeSitzungen = (id: number, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/mitglieder/${id}/sitzungen`, {}, holen);

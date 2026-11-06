@@ -78,7 +78,10 @@ async function einloggen(kontoId: number): Promise<AngemeldetesKonto> {
 	return (await pruefeSitzung(db, kennung, start))!.konto;
 }
 
-async function bestaetigterAdmin(s: ReturnType<typeof baue>, rollen: string[] = ['admin']) {
+async function bestaetigterAdmin(
+	s: ReturnType<typeof baue>,
+	rollen: string[] = ['mytco', 'mitglieder']
+) {
 	const m = await legeMitgliedAn(db, { rollen });
 	const konto = await einloggen(m.kontoId);
 	await (
@@ -113,7 +116,9 @@ describe('Admin-Schnittstellen', () => {
 	test('RR-07, RR-09: jede Admin-Schnittstelle antwortet ohne Sitzung 401, ohne Rolle 403, unbestätigt 403', async () => {
 		const s = baue();
 		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
-		const unbestaetigt = await einloggen((await legeMitgliedAn(db, { rollen: ['admin'] })).kontoId);
+		const unbestaetigt = await einloggen(
+			(await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] })).kontoId
+		);
 		const geschuetzt = Object.entries(ADMIN_SCHNITTSTELLEN).filter(
 			([name]) => !['getZugang', 'postZugang', 'postZugangCode'].includes(name)
 		);
@@ -144,10 +149,10 @@ describe('Admin-Schnittstellen', () => {
 		const s = baue();
 		const cm = await bestaetigterAdmin(s, ['cm']);
 		// War Admin und CM; Admin wird entzogen: die bestätigte Sitzung verliert die Admin-Endpunkte sofort.
-		const ehemals = await bestaetigterAdmin(s, ['admin', 'cm']);
+		const ehemals = await bestaetigterAdmin(s, ['mitglieder', 'cm']);
 		await db
 			.delete(kontoRolle)
-			.where(and(eq(kontoRolle.kontoId, ehemals.kontoId), eq(kontoRolle.rolle, 'admin')));
+			.where(and(eq(kontoRolle.kontoId, ehemals.kontoId), eq(kontoRolle.rolle, 'mitglieder')));
 		const geschuetzt = Object.entries(ADMIN_SCHNITTSTELLEN).filter(
 			([name]) => !['getZugang', 'postZugang', 'postZugangCode'].includes(name)
 		);
@@ -177,11 +182,11 @@ describe('Admin-Schnittstellen', () => {
 			bestaetigt: false,
 			rollen: ['cm']
 		});
-		const beide = await bestaetigterAdmin(s, ['cm', 'admin', 'lizenz']);
+		const beide = await bestaetigterAdmin(s, ['cm', 'mitglieder', 'lizenz', 'mytco']);
 		expect(await status(beide.konto)).toEqual({
 			bestaetigt: true,
 			mitgliedId: beide.mitgliedId,
-			rollen: ['admin', 'cm']
+			rollen: ['mytco', 'mitglieder', 'cm']
 		});
 		const lizenz = await einloggen((await legeMitgliedAn(db, { rollen: ['lizenz'] })).kontoId);
 		const r = await getZugang(s.d, ereignis({ method: 'GET', konto: lizenz }));
@@ -201,7 +206,7 @@ describe('Admin-Schnittstellen', () => {
 				(id, koerper) => ok(id, koerper)
 			);
 
-		const admin = await bestaetigterAdmin(s, ['admin']);
+		const admin = await bestaetigterAdmin(s, ['mytco', 'mitglieder']);
 		const cm = await bestaetigterAdmin(s, ['cm']);
 		for (const m of [admin, cm]) {
 			const r = await lesen(m.konto);
@@ -258,10 +263,10 @@ describe('Admin-Schnittstellen', () => {
 
 	test('SI-08: Zugang: Status, Code anfordern, bestätigen, falscher Code', async () => {
 		const s = baue();
-		const m = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const m = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(m.kontoId);
 		const status = async () => (await getZugang(s.d, ereignis({ method: 'GET', konto }))).json();
-		expect(await status()).toEqual({ bestaetigt: false, rollen: ['admin'] });
+		expect(await status()).toEqual({ bestaetigt: false, rollen: ['mytco', 'mitglieder'] });
 
 		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
 		expect((await getZugang(s.d, ereignis({ method: 'GET', konto: normal }))).status).toBe(403);
@@ -284,13 +289,13 @@ describe('Admin-Schnittstellen', () => {
 		expect(await status()).toEqual({
 			bestaetigt: true,
 			mitgliedId: m.mitgliedId,
-			rollen: ['admin']
+			rollen: ['mytco', 'mitglieder']
 		});
 	});
 
 	test('SI-08: zu viele Code-Anforderungen → 429 zu-viele', async () => {
 		const s = baue();
-		const m = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const m = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(m.kontoId);
 		const stati: number[] = [];
 		for (let i = 0; i < 4; i++) {
@@ -449,19 +454,20 @@ describe('Admin-Schnittstellen', () => {
 		]);
 	});
 
-	test('RR-03: Rollen setzen; ungültige Namen → 400; letzter Admin → 409; unbekannt → 404', async () => {
+	test('RR-03: Rollen setzen; ungültige Namen → 400; unbekannt → 404', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
 		const ziel = await legeMitgliedAn(db);
-		const roll = (rollen: unknown, id = String(ziel.mitgliedId)) =>
-			postRollen(s.d, ereignis({ body: { rollen }, params: { id }, konto: admin.konto }));
+		const roll = (rollen: unknown, vorher: unknown, id = String(ziel.mitgliedId)) =>
+			postRollen(s.d, ereignis({ body: { rollen, vorher }, params: { id }, konto: admin.konto }));
 
-		expect((await roll(['cm', 'lizenz'])).status).toBe(200);
-		for (const schlecht of ['admin', ['root'], ['cm', 'cm'], [1], undefined]) {
-			expect((await roll(schlecht)).status).toBe(400);
+		expect((await roll(['cm', 'lizenz'], [])).status).toBe(200);
+		// Die alte Rolle admin gibt es nicht mehr.
+		for (const schlecht of ['admin', ['admin'], ['root'], ['cm', 'cm'], [1], undefined]) {
+			expect((await roll(schlecht, ['cm', 'lizenz'])).status).toBe(400);
 		}
-		expect((await roll(['cm'], '999999999')).status).toBe(404);
-		expect((await roll(['cm'], 'abc')).status).toBe(404);
+		expect((await roll(['cm'], [], '999999999')).status).toBe(404);
+		expect((await roll(['cm'], [], 'abc')).status).toBe(404);
 
 		const detail = await getMitglied(
 			s.d,
@@ -541,7 +547,7 @@ describe('Admin-Schnittstellen', () => {
 				s.d,
 				ereignis({ body: { ...eindeutig(), vorher: STAND }, params: p, konto: k })
 			),
-			await postRollen(s.d, ereignis({ body: { rollen: [] }, params: p, konto: k })),
+			await postRollen(s.d, ereignis({ body: { rollen: [], vorher: [] }, params: p, konto: k })),
 			await postSitzungen(s.d, ereignis({ body: {}, params: p, konto: k }))
 		];
 		expect(antworten.map((r) => r.status)).toEqual([404, 404, 404, 404]);
@@ -577,7 +583,7 @@ describe('Admin-Schnittstellen', () => {
 	});
 
 	test('RR-07: GET /api/sitzung meldet verwaltung: true mit Rolle admin, ohne mitgliedId und sitzungHash', async () => {
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const normal = await legeMitgliedAn(db);
 		const ra = await getSitzung(ereignis({ konto: await einloggen(admin.kontoId) }), db);
 		const rn = await getSitzung(ereignis({ konto: await einloggen(normal.kontoId) }), db);

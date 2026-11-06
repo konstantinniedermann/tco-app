@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import { ladeFairgate, ladeZugang } from '../../lib/verwaltung/api.ts';
-import { offenFuerCm, startziel } from '../../lib/verwaltung/umleiten.ts';
+import { offenFuerCm, siehtMitglieder, startziel } from '../../lib/verwaltung/umleiten.ts';
 import type { LayoutLoad } from './$types';
 
 // Läuft nur im Browser (ssr = false). Ohne Sitzung zur Anmeldung, ohne Verwaltungsrolle zur
@@ -13,7 +13,7 @@ export const load: LayoutLoad = async ({ fetch, url, depends }) => {
 	if (z.art === 'kein-admin') redirect(307, '/');
 	if (z.art !== 'ok') error(503, 'Die Verwaltung lässt sich gerade nicht öffnen.');
 	const { bestaetigt, rollen } = z.daten;
-	const istAdmin = rollen.includes('admin');
+	const istAdmin = siehtMitglieder(rollen);
 	const aufBestaetigen = url.pathname === '/verwaltung/bestaetigen';
 	if (!bestaetigt && !aufBestaetigen) redirect(307, '/verwaltung/bestaetigen');
 	if (bestaetigt && aufBestaetigen) redirect(307, startziel(rollen));

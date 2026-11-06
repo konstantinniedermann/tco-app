@@ -268,7 +268,7 @@ describe('Turnier-Schnittstellen', () => {
 		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
 		const unbestaetigt = await einloggen((await legeMitgliedAn(db, { rollen: ['cm'] })).kontoId);
 		const cm = await bestaetigt(s, ['cm']);
-		const admin = await bestaetigt(s, ['admin']);
+		const admin = await bestaetigt(s, ['mytco', 'mitglieder']);
 		const mach = (name: string, konto?: AngemeldetesKonto) =>
 			ereignis({
 				method: name.startsWith('get') ? 'GET' : 'POST',

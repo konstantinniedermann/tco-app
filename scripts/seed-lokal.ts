@@ -1,8 +1,11 @@
-// Nur lokal: legt erfundene Mitglieder an und gibt Brief-Codes für Erika (Admin), Kurt und Hanna (CM) aus.
+// Nur lokal: legt erfundene Mitglieder an und gibt Brief-Codes für die Personas aus: Erika
+// (MyTCO-Admin und Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage
+// (nur Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin).
 // Aufruf über `make seed` (lädt .env). Bricht ab, wenn die Datenbank nicht lokal ist.
 import { eq } from 'drizzle-orm';
 import { machAdmin } from '../src/lib/server/admin/erster-admin.ts';
 import { erstelleDb } from '../src/lib/server/db/index.ts';
+import type { Rolle } from '../src/lib/server/admin/rollen.ts';
 import { konto, kontoRolle } from '../src/lib/server/db/schema.ts';
 import { leseEinstellungen } from '../src/lib/server/einstellungen.ts';
 import { erstelleBremsen } from '../src/lib/server/login/bremse.ts';
@@ -11,6 +14,13 @@ import { erstelleLoginDienst } from '../src/lib/server/login/dienst.ts';
 import { legeBeispielAnlassAn } from './beispiel-anlass.ts';
 import { legeBeispielTurnierAn } from './beispiel-turnier.ts';
 import { ERFUNDENE_MITGLIEDER, legeErfundeneMitgliederAn } from './erfundene-mitglieder.ts';
+
+// Nur lokal, nicht auf Test (testdaten.ts legt nur ERFUNDENE_MITGLIEDER an).
+const NUR_LOKAL = [
+	{ vorname: 'Mona', nachname: 'Vorlage', email: 'mona.vorlage@example.org' },
+	{ vorname: 'Theo', nachname: 'Platzhalter', email: 'theo.platzhalter@example.org' }
+] as const;
+const PERSONAS = [...ERFUNDENE_MITGLIEDER, ...NUR_LOKAL];
 
 export function istLokaleDatenbank(url: string | undefined): boolean {
 	if (!url) return false;
@@ -32,7 +42,7 @@ async function seed(): Promise<void> {
 	const db = erstelleDb(url as string);
 	try {
 		// Die Adressen gehen nur an Mailpit.
-		const kontoIds = await legeErfundeneMitgliederAn(db);
+		const kontoIds = await legeErfundeneMitgliederAn(db, PERSONAS);
 		await machAdmin(db, kontoIds[0], new Date());
 		// Eine Beispiel-GV, damit Startseite und Verwaltung etwas zeigen (A-ANLASS-01).
 		const [erika] = await db
@@ -40,9 +50,17 @@ async function seed(): Promise<void> {
 			.from(konto)
 			.where(eq(konto.id, kontoIds[0]));
 		await legeBeispielAnlassAn(db, erika.id, new Date());
-		// Eine Beispiel-Clubmeisterschaft und Hanna als Clubmeisterschafts-Verantwortliche (cm).
+		// Eine Beispiel-Clubmeisterschaft und Hanna als CM-Admin.
 		await legeBeispielTurnierAn(db, new Date());
-		await db.insert(kontoRolle).values({ kontoId: kontoIds[2], rolle: 'cm' }).onConflictDoNothing();
+		// Je eine Persona mit nur einer Admin-Rolle, damit sich die Bereiche einzeln ausprobieren lassen.
+		const einzelrollen: [number, Rolle][] = [
+			[2, 'cm'],
+			[3, 'mitglieder'],
+			[4, 'mytco']
+		];
+		for (const [index, rolle] of einzelrollen) {
+			await db.insert(kontoRolle).values({ kontoId: kontoIds[index], rolle }).onConflictDoNothing();
+		}
 		const dienst = erstelleLoginDienst({
 			db,
 			schluessel: einstellungen.codeSchluessel,
@@ -50,13 +68,20 @@ async function seed(): Promise<void> {
 			mailer: async () => {},
 			bremsen: erstelleBremsen()
 		});
-		console.log(`Erfundene Mitglieder: ${ERFUNDENE_MITGLIEDER.map((m) => m.email).join(', ')}`);
+		console.log(`Erfundene Mitglieder: ${PERSONAS.map((m) => m.email).join(', ')}`);
 		console.log('Brief-Codes (nur lokal, 90 Tage gültig, je einmal verwendbar):');
-		// Drei Personas: Erika sieht die Verwaltung, Kurt nur, was jedes Mitglied sieht,
-		// Hanna die Clubmeisterschaft.
-		for (const [index, rolle] of ['Admin', 'Mitglied', 'CM'].entries()) {
+		// Fünf Personas: Erika hat MyTCO-Admin und Mitglieder-Admin, Kurt sieht nur, was jedes Mitglied
+		// sieht, Hanna die Clubmeisterschaft, Mona und Theo je eine Admin-Rolle.
+		const personas = [
+			'MyTCO-Admin und Mitglieder-Admin',
+			'Mitglied',
+			'CM-Admin',
+			'Mitglieder-Admin',
+			'MyTCO-Admin'
+		];
+		for (const [index, rolle] of personas.entries()) {
 			const { code } = await dienst.stelleBriefCodeAus(kontoIds[index]);
-			const { vorname, nachname } = ERFUNDENE_MITGLIEDER[index];
+			const { vorname, nachname } = PERSONAS[index];
 			console.log(`  ${vorname} ${nachname} (${rolle}): ${formatiereBriefCode(code)}`);
 		}
 	} finally {

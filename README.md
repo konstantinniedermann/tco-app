@@ -43,7 +43,7 @@ npm exec --no -- playwright install chromium webkit
 make hooks   # einmalig: Git-Hooks aktivieren
 cp .env.example .env   # je Ordner bzw. Worktree: lokale Einstellungen (nur erfundene Werte)
 make db      # lokale PostgreSQL und Mail-Fänger Mailpit starten
-make seed    # erfundene Mitglieder und eine Beispiel-GV anlegen, gibt Brief-Codes für Erika (Admin) und Kurt (Mitglied) aus
+make seed    # erfundene Mitglieder, eine Beispiel-GV und ein Beispielturnier anlegen, gibt Brief-Codes für die Personas aus (make help)
 make dev     # Entwicklungsserver
 make check   # alle Prüfungen (braucht Docker)
 ```

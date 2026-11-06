@@ -3,17 +3,22 @@ import type { Db } from '../db/index.ts';
 import { konto, mitglied } from '../db/schema.ts';
 import { pruefeAngaben, type Feld } from './angaben.ts';
 import { legeMitgliedAn } from './mitglieder.ts';
-import { ladeRollen, setzeRollen } from './rollen.ts';
+import { ladeRollen, setzeRollen, type Rolle } from './rollen.ts';
 
 export type AdminFestgelegt =
 	| { ergebnis: 'angelegt' | 'rolle-vergeben' | 'schon-admin' }
 	| { ergebnis: 'fehler'; fehler: Partial<Record<Feld, string>> };
 
-/** Gibt dem Konto die Rolle admin und behält die übrigen Rollen. Urheber: automatisch. */
+// Annahme K-18.4: Der erste Admin ist MyTCO-Admin und Mitglieder-Admin, bis der Verein die
+// Rollen verteilt; danach nimmt der MyTCO-Admin sie von Hand auseinander.
+const ERSTER_ADMIN: readonly Rolle[] = ['mytco', 'mitglieder'];
+
+/** Gibt dem Konto die Rollen des ersten Admins und behält die übrigen. Urheber: automatisch. */
 export async function machAdmin(db: Db, kontoId: number, jetzt: Date): Promise<void> {
 	const rollen = await ladeRollen(db, kontoId);
-	if (rollen.includes('admin')) return;
-	await setzeRollen(db, { art: 'automatisch' }, kontoId, [...rollen, 'admin'], jetzt);
+	const fehlend = ERSTER_ADMIN.filter((r) => !rollen.includes(r));
+	if (fehlend.length === 0) return;
+	await setzeRollen(db, { art: 'automatisch' }, kontoId, [...rollen, ...fehlend], rollen, jetzt);
 }
 
 type Treffer = { id: number; email: string; mitgliedernummer: string | null };
@@ -62,9 +67,10 @@ async function kontoVon(db: Db, mitgliedId: number): Promise<number> {
 }
 
 /**
- * Serverbefehl für den ersten Admin: legt das Mitglied an und gibt ihm die Rolle admin. Gibt es
- * das Mitglied schon (Nummer oder E-Mail), bekommt es nur die Rolle. Prüfung wie beim Anlegen
- * durch einen Admin, die Mitgliedernummer ist Pflicht.
+ * Serverbefehl für den ersten Admin: legt das Mitglied an und gibt ihm die Rollen MyTCO-Admin und
+ * Mitglieder-Admin. Gibt es das Mitglied schon (Nummer oder E-Mail), bekommt es nur die Rollen;
+ * ist es schon MyTCO-Admin, ändert sich nichts. Prüfung wie beim Anlegen durch einen Admin, die
+ * Mitgliedernummer ist Pflicht.
  */
 export async function legeAdminFest(
 	db: Db,
@@ -87,7 +93,7 @@ export async function legeAdminFest(
 	}
 	if (vorhanden !== null) {
 		const kontoId = await kontoVon(db, vorhanden);
-		if ((await ladeRollen(db, kontoId)).includes('admin')) return { ergebnis: 'schon-admin' };
+		if ((await ladeRollen(db, kontoId)).includes('mytco')) return { ergebnis: 'schon-admin' };
 		await machAdmin(db, kontoId, jetzt);
 		return { ergebnis: 'rolle-vergeben' };
 	}

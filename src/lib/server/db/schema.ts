@@ -115,7 +115,7 @@ export const kontoRolle = pgTable(
 	},
 	(t) => [
 		primaryKey({ columns: [t.kontoId, t.rolle] }),
-		check('konto_rolle_rolle_check', sql`${t.rolle} in ('admin', 'cm', 'lizenz')`)
+		check('konto_rolle_rolle_check', sql`${t.rolle} in ('mytco', 'mitglieder', 'cm', 'lizenz')`)
 	]
 );
 

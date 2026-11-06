@@ -109,10 +109,19 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 		});
 	});
 
-	it('RR-03: 409 letzter-admin, 404 nicht-gefunden', async () => {
+	it('RR-03: Rollen schicken den geladenen Stand mit; 409 letzter-mytco und veraltet, 404 nicht-gefunden', async () => {
+		const { aufrufe, holen } = holer(json(409, { fehler: 'letzter-mytco' }));
+		expect(await speichereRollen(7, ['cm'], ['mytco', 'cm'], holen)).toEqual({
+			art: 'letzter-mytco'
+		});
+		expect(aufrufe[0].pfad).toBe('/api/admin/mitglieder/7/rollen');
+		expect(JSON.parse(String(aufrufe[0].init.body))).toEqual({
+			rollen: ['cm'],
+			vorher: ['mytco', 'cm']
+		});
 		expect(
-			await speichereRollen(7, [], holer(json(409, { fehler: 'letzter-admin' })).holen)
-		).toEqual({ art: 'letzter-admin' });
+			await speichereRollen(7, [], [], holer(json(409, { fehler: 'veraltet' })).holen)
+		).toEqual({ art: 'veraltet' });
 		expect(await ladeMitglied(9, holer(json(404, { fehler: 'nicht-gefunden' })).holen)).toEqual({
 			art: 'nicht-gefunden'
 		});

@@ -4,9 +4,11 @@ import { aktionText, feldMeldung, geaendertText, neueAngaben, plakette } from '.
 describe('Texte der Verwaltung', () => {
 	it('FR-26: Verlaufstexte nennen Feld oder Rolle, nie einen Wert', () => {
 		expect(aktionText({ aktion: 'feld-geaendert', detail: 'telefon' })).toBe('Telefon geändert');
-		expect(aktionText({ aktion: 'rolle-vergeben', detail: 'cm' })).toBe(
-			'Rolle CM-Verantwortliche vergeben'
+		expect(aktionText({ aktion: 'rolle-vergeben', detail: 'cm' })).toBe('Rolle CM-Admin vergeben');
+		expect(aktionText({ aktion: 'rolle-vergeben', detail: 'mytco' })).toBe(
+			'Rolle MyTCO-Admin vergeben'
 		);
+		// Einträge von vor dem Umbau der Rollen nennen die alte Rolle.
 		expect(aktionText({ aktion: 'rolle-entzogen', detail: 'admin' })).toBe('Rolle Admin entzogen');
 		expect(aktionText({ aktion: 'angelegt', detail: null })).toBe('angelegt');
 		expect(aktionText({ aktion: 'fairgate-uebertragen', detail: null })).toBe(

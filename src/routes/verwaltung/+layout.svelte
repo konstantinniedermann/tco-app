@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { siehtMitglieder } from '../../lib/verwaltung/umleiten.ts';
 
 	let { children, data } = $props();
 	const aktuell = (pfad: string) => (page.route.id?.startsWith(pfad) ? 'page' : undefined);
-	const istAdmin = $derived(data.rollen.includes('admin'));
+	const istAdmin = $derived(siehtMitglieder(data.rollen));
 </script>
 
 <svelte:head>

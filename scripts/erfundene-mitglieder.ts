@@ -11,10 +11,15 @@ export const ERFUNDENE_MITGLIEDER: readonly { vorname: string; nachname: string;
 		{ vorname: 'Hanna', nachname: 'Muster', email: 'hanna.muster@example.org' }
 	];
 
+type Erfunden = (typeof ERFUNDENE_MITGLIEDER)[number];
+
 /** Legt die erfundenen Mitglieder samt Konto an und gibt die Konto-IDs in derselben Reihenfolge. */
-export async function legeErfundeneMitgliederAn(db: Db): Promise<number[]> {
+export async function legeErfundeneMitgliederAn(
+	db: Db,
+	liste: readonly Erfunden[] = ERFUNDENE_MITGLIEDER
+): Promise<number[]> {
 	const kontoIds: number[] = [];
-	for (const m of ERFUNDENE_MITGLIEDER) {
+	for (const m of liste) {
 		// Mehrfach ausführbar: vorhandene Mitglieder und Konten bleiben, wie sie sind.
 		await db
 			.insert(mitglied)

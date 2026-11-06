@@ -103,7 +103,7 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 
 	// A-ROLLE-01: Rolle vergeben. Die Klappe «Rollen» ist zu wie in Mockup 6.
 	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('CM-Verantwortliche').check();
+	await page.getByLabel('CM-Admin').check();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
 	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
 
@@ -111,7 +111,7 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 	const verlauf = page.getByRole('table', { name: 'Verlauf' });
 	await expect(verlauf).toContainText('angelegt');
 	await expect(verlauf).toContainText('Telefon geändert');
-	await expect(verlauf).toContainText('Rolle CM-Verantwortliche vergeben');
+	await expect(verlauf).toContainText('Rolle CM-Admin vergeben');
 	await expect(verlauf).not.toContainText('+41 00 000 00 00');
 	await pruefeBildschirm(page, info, 'verwaltung-mitglied');
 
@@ -181,29 +181,30 @@ test('RR-07: Mitglied ohne Rolle sieht keine Kachel und landet bei /verwaltung a
 	expect(fehler).toEqual([]);
 });
 
-test('RR-03: der letzte Admin sieht die Meldung beim Entzug seiner Rolle', async ({
+test('RR-03: der letzte MyTCO-Admin sieht die Meldung beim Entzug seiner Rolle', async ({
 	page
 }, info) => {
-	// In der gemeinsamen Testdatenbank gibt es weitere Admins; die Antwort des Servers ist hier
+	// In der gemeinsamen Testdatenbank gibt es weitere MyTCO-Admins; die Antwort des Servers ist hier
 	// gestellt. Die Regel selbst prüfen die Datenbanktests (schnittstellen-letzter-admin).
 	const fehler = sammleKonsolenfehler(page);
 	const admin = await legeAdminMitBriefCodeAn('Emil');
 	await oeffneVerwaltung(page, admin);
 	await page.goto(`/verwaltung/mitglieder/${admin.mitgliedId}`);
 	await page.route('**/api/admin/mitglieder/*/rollen', (route) =>
-		route.fulfill({ status: 409, json: { fehler: 'letzter-admin' } })
+		route.fulfill({ status: 409, json: { fehler: 'letzter-mytco' } })
 	);
 	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('Admin', { exact: true }).uncheck();
+	await page.getByLabel('MyTCO-Admin', { exact: true }).uncheck();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
 	// Wer sich selbst die Rolle entzieht, wird vorher gefragt; «Abbrechen» schickt nichts.
-	const rueckfrage = page.getByRole('dialog', { name: 'Rolle Admin entziehen?' });
-	await expect(rueckfrage.getByText('Du verlierst den Zugang zur Verwaltung.')).toBeVisible();
+	const rueckfrage = page.getByRole('dialog', { name: 'Rolle MyTCO-Admin entziehen?' });
+	await expect(rueckfrage.getByText('Du kannst danach keine Rollen mehr vergeben.')).toBeVisible();
 	await rueckfrage.getByRole('button', { name: 'Abbrechen' }).click();
 	await expect(rueckfrage).toBeHidden();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
 	await rueckfrage.getByRole('button', { name: 'Rolle entziehen' }).click();
-	const meldung = 'Du bist der letzte Admin. Gib zuerst jemand anderem die Rolle Admin.';
+	const meldung =
+		'Du bist der letzte MyTCO-Admin. Gib zuerst jemand anderem die Rolle MyTCO-Admin.';
 	await expect(page.getByText(meldung)).toBeVisible();
 	await pruefeBildschirm(page, info, 'verwaltung-letzter-admin');
 	expect(fehler).toEqual([]);
@@ -285,7 +286,7 @@ test('A-MITGLIED-02: zwei Admins am selben Mitglied – die zweite Änderung üb
 	await page.getByRole('button', { name: 'Angaben speichern' }).click();
 	await expect(meldung).toBeVisible();
 	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('CM-Verantwortliche').check();
+	await page.getByLabel('CM-Admin').check();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
 	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
 	await expect(page.getByLabel('Ort', { exact: true })).toHaveValue('Baden');

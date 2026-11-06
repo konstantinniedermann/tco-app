@@ -20,13 +20,18 @@ export async function leiteUm(a: Antwort<unknown>): Promise<boolean> {
 	}
 }
 
-/** Erste Seite der Verwaltung: Admins beginnen bei den Mitgliedern, nur `cm` bei den Turnieren. */
-export const startziel = (rollen: readonly string[]) =>
-	rollen.includes('admin')
-		? ('/verwaltung/mitglieder' as const)
-		: ('/verwaltung/turniere' as const);
+/** Bereich Mitglieder, vorläufig bis zum Bereichsschutz je Rolle: MyTCO- oder Mitglieder-Admin. */
+export const siehtMitglieder = (rollen: readonly string[]) =>
+	rollen.includes('mitglieder') || rollen.includes('mytco');
 
-/** Seiten, die auch `cm` ohne Admin-Rolle öffnen darf. */
+/**
+ * Erste Seite der Verwaltung: MyTCO- und Mitglieder-Admins beginnen bei den Mitgliedern, nur `cm`
+ * bei den Turnieren.
+ */
+export const startziel = (rollen: readonly string[]) =>
+	siehtMitglieder(rollen) ? ('/verwaltung/mitglieder' as const) : ('/verwaltung/turniere' as const);
+
+/** Seiten, die auch `cm` ohne Mitglieder-Admin öffnen darf. */
 export const offenFuerCm = (pfad: string) =>
 	pfad === '/verwaltung/bestaetigen' ||
 	pfad === '/verwaltung/turniere' ||
