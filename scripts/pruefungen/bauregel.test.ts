@@ -117,21 +117,18 @@ describe('Admin-Routen', () => {
 		]);
 	});
 	it('RR-07: nur Funktionen aus ADMIN_SCHNITTSTELLEN (die der Rechte-Test abdeckt)', () => {
-		const fremd = gut.replace('{ getMitglied }', '{ getMitglied, mitAdmin }');
+		const fremd = gut.replace('{ getMitglied }', '{ getMitglied, liest }');
 		expect(pruefe(fremd)).toEqual([
-			`${route}: Admin-Route nutzt 'mitAdmin'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
+			`${route}: Admin-Route nutzt 'liest'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
 		]);
 		const umbenannt = gut
 			.replace('{ getMitglied }', '{ getMitglied as get, postMitglied }')
 			.replace('getMitglied(holeAdminDienste()', 'get(holeAdminDienste()');
 		expect(pruefe(umbenannt)).toEqual([]);
 		// Ein Kommentar mit Apostroph im Import verschluckt den Import nicht.
-		const mitKommentar = gut.replace(
-			'{ getMitglied }',
-			"{\n\tgetMitglied, // geht's\n\tmitAdmin\n}"
-		);
+		const mitKommentar = gut.replace('{ getMitglied }', "{\n\tgetMitglied, // geht's\n\tliest\n}");
 		expect(pruefe(mitKommentar)).toEqual([
-			`${route}: Admin-Route nutzt 'mitAdmin'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
+			`${route}: Admin-Route nutzt 'liest'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
 		]);
 		for (const schlecht of [
 			"import * as s from '../../../../../lib/server/admin/schnittstellen.ts';",

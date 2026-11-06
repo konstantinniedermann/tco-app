@@ -263,12 +263,13 @@ describe('Turnier-Schnittstellen', () => {
 		expect((await postKategorieAbsagen(s.d, post(cm, {}, { id: 'x' }))).status).toBe(404);
 	});
 
-	test('RR-07: ohne Rolle 403, unbestätigt 403 unbestaetigt, ändernd ohne JSON 415', async () => {
+	test('RR-07: ohne Rolle 403, unbestätigt 403 unbestaetigt, MyTCO-Admin nur lesend, ändernd ohne JSON 415', async () => {
 		const s = baue();
 		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
 		const unbestaetigt = await einloggen((await legeMitgliedAn(db, { rollen: ['cm'] })).kontoId);
 		const cm = await bestaetigt(s, ['cm']);
-		const admin = await bestaetigt(s, ['mytco', 'mitglieder']);
+		const mytco = await bestaetigt(s, ['mytco']);
+		const mitglieder = await bestaetigt(s, ['mitglieder']);
 		const mach = (name: string, konto?: AngemeldetesKonto) =>
 			ereignis({
 				method: name.startsWith('get') ? 'GET' : 'POST',
@@ -288,11 +289,18 @@ describe('Turnier-Schnittstellen', () => {
 			]);
 			const unb = await fn(s.d, mach(name, unbestaetigt));
 			expect([name, unb.status, await unb.json()]).toEqual([name, 403, { fehler: 'unbestaetigt' }]);
-			for (const konto of [cm, admin]) {
-				const a = await fn(s.d, mach(name, konto));
-				expect([name, a.status]).not.toContain(401);
-				expect([name, a.status]).not.toContain(403);
+			const a = await fn(s.d, mach(name, cm));
+			expect([name, a.status]).not.toContain(401);
+			expect([name, a.status]).not.toContain(403);
+			// Regel 3: Der MyTCO-Admin liest; Regel 4: Der Mitglieder-Admin vertritt den CM-Admin nicht.
+			const m = await fn(s.d, mach(name, mytco));
+			if (name.startsWith('post')) {
+				expect([name, m.status, await m.json()]).toEqual([name, 403, { fehler: 'kein-recht' }]);
+			} else {
+				expect([name, m.status]).not.toContain(403);
 			}
+			const v = await fn(s.d, mach(name, mitglieder));
+			expect([name, v.status, await v.json()]).toEqual([name, 403, { fehler: 'kein-admin' }]);
 			if (name.startsWith('post')) {
 				const roh = ereignis({
 					konto: cm,

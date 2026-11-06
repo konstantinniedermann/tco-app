@@ -26,8 +26,8 @@ import {
 	postAdminAnlaesse,
 	postAdminAnlass,
 	postAdminAnlassLoeschen,
-	aenderndCm,
-	mitCm,
+	liest,
+	schreibt,
 	type AdminDienste
 } from './schnittstellen.ts';
 import { getAnlaesse } from '../anlass/schnittstellen.ts';
@@ -122,7 +122,7 @@ describe('Admin-Schnittstellen', () => {
 		const geschuetzt = Object.entries(ADMIN_SCHNITTSTELLEN).filter(
 			([name]) => !['getZugang', 'postZugang', 'postZugangCode'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(14);
+		expect(geschuetzt).toHaveLength(15);
 		for (const [name, fn] of geschuetzt) {
 			const mach = (konto?: AngemeldetesKonto) =>
 				ereignis({
@@ -156,7 +156,7 @@ describe('Admin-Schnittstellen', () => {
 		const geschuetzt = Object.entries(ADMIN_SCHNITTSTELLEN).filter(
 			([name]) => !['getZugang', 'postZugang', 'postZugangCode'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(14);
+		expect(geschuetzt).toHaveLength(15);
 		for (const [name, fn] of geschuetzt) {
 			for (const konto of [cm.konto, ehemals.konto]) {
 				const r = await fn(
@@ -193,33 +193,40 @@ describe('Admin-Schnittstellen', () => {
 		expect([r.status, await r.json()]).toEqual([403, { fehler: 'kein-admin' }]);
 	});
 
-	test('RR-07, RR-09: mitCm und aenderndCm lassen bestätigte Admins und CMs durch, sonst wie mitAdmin', async () => {
+	test('RR-07, RR-09: liest und schreibt prüfen den Bereich, schreibt nur mit JSON', async () => {
 		const s = baue();
 		const ok = async (mitgliedId: number, koerper?: Record<string, unknown>) =>
 			antwort(200, { mitgliedId, koerper });
 		const lesen = (konto?: AngemeldetesKonto) =>
-			mitCm(s.d, ereignis({ method: 'GET', konto }), (id) => ok(id));
+			liest(s.d, ereignis({ method: 'GET', konto }), 'cm', (id) => ok(id));
 		const aendern = (konto?: AngemeldetesKonto, contentType?: string) =>
-			aenderndCm(
+			schreibt(
 				s.d,
 				ereignis({ body: contentType ? '{}' : { a: 1 }, contentType, konto }),
-				(id, koerper) => ok(id, koerper)
+				'cm',
+				(urheber, koerper) => ok(urheber.mitgliedId, koerper)
 			);
 
-		const admin = await bestaetigterAdmin(s, ['mytco', 'mitglieder']);
 		const cm = await bestaetigterAdmin(s, ['cm']);
-		for (const m of [admin, cm]) {
-			const r = await lesen(m.konto);
-			expect([r.status, await r.json()]).toEqual([200, { mitgliedId: m.mitgliedId }]);
-			const a = await aendern(m.konto);
-			expect([a.status, await a.json()]).toEqual([
-				200,
-				{ mitgliedId: m.mitgliedId, koerper: { a: 1 } }
-			]);
-			const t = await aendern(m.konto, 'text/plain');
-			expect([t.status, await t.json()]).toEqual([415, { fehler: 'format' }]);
-		}
+		const r = await lesen(cm.konto);
+		expect([r.status, await r.json()]).toEqual([200, { mitgliedId: cm.mitgliedId }]);
+		const a = await aendern(cm.konto);
+		expect([a.status, await a.json()]).toEqual([
+			200,
+			{ mitgliedId: cm.mitgliedId, koerper: { a: 1 } }
+		]);
+		const t = await aendern(cm.konto, 'text/plain');
+		expect([t.status, await t.json()]).toEqual([415, { fehler: 'format' }]);
 
+		// Regel 3: Der MyTCO-Admin liest den CM-Bereich, schreiben darf er dort nicht.
+		const mytco = await bestaetigterAdmin(s, ['mytco']);
+		const l = await lesen(mytco.konto);
+		expect([l.status, await l.json()]).toEqual([200, { mitgliedId: mytco.mitgliedId }]);
+		const w = await aendern(mytco.konto);
+		expect([w.status, await w.json()]).toEqual([403, { fehler: 'kein-recht' }]);
+
+		// Regel 4: Der Mitglieder-Admin vertritt den CM-Admin nicht.
+		const mitglieder = await bestaetigterAdmin(s, ['mitglieder']);
 		const lizenz = await einloggen((await legeMitgliedAn(db, { rollen: ['lizenz'] })).kontoId);
 		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
 		const unbestaetigt = await einloggen((await legeMitgliedAn(db, { rollen: ['cm'] })).kontoId);
@@ -227,6 +234,7 @@ describe('Admin-Schnittstellen', () => {
 			[undefined, 401, 'abgemeldet'],
 			[normal, 403, 'kein-admin'],
 			[lizenz, 403, 'kein-admin'],
+			[mitglieder.konto, 403, 'kein-admin'],
 			[unbestaetigt, 403, 'unbestaetigt']
 		];
 		for (const [konto, status, fehler] of faelle) {

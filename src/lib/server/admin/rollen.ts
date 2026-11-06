@@ -1,4 +1,4 @@
-import { and, count, eq, inArray, ne, sql } from 'drizzle-orm';
+import { and, asc, count, eq, inArray, ne, sql } from 'drizzle-orm';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, kontoRolle, mitglied } from '../db/schema.ts';
 import { schreibeVerlauf, type Eintrag, type Urheber } from './verlauf.ts';
@@ -64,6 +64,31 @@ export async function verwaltungsrollen(
 		);
 	const vorhanden = new Set(zeilen.map((z) => z.rolle));
 	return VERWALTUNGSROLLEN.filter((r) => vorhanden.has(r));
+}
+
+export type RollenListe = { rolle: Rolle; mitglieder: { id: number; name: string }[] }[];
+
+// Regel 2: Wer welche Rolle hat, für die Rollenvergabe. RR-08: nur Konten, die nicht gesperrt sind
+// und deren Mitglied aktiv ist. Nur Nummer und Name; jede Rolle steht da, auch ohne Mitglieder.
+export async function listeRollen(db: DbOderTx): Promise<RollenListe> {
+	const zeilen = await db
+		.select({
+			rolle: kontoRolle.rolle,
+			id: mitglied.id,
+			vorname: mitglied.vorname,
+			nachname: mitglied.nachname
+		})
+		.from(kontoRolle)
+		.innerJoin(konto, eq(konto.id, kontoRolle.kontoId))
+		.innerJoin(mitglied, eq(mitglied.id, konto.mitgliedId))
+		.where(and(eq(konto.gesperrt, false), eq(mitglied.status, 'aktiv')))
+		.orderBy(asc(mitglied.nachname), asc(mitglied.vorname), asc(mitglied.id));
+	return ROLLEN.map((rolle) => ({
+		rolle,
+		mitglieder: zeilen
+			.filter((z) => z.rolle === rolle)
+			.map((z) => ({ id: z.id, name: `${z.nachname}, ${z.vorname}` }))
+	}));
 }
 
 const gleicheMenge = (a: readonly Rolle[], b: readonly Rolle[]) =>

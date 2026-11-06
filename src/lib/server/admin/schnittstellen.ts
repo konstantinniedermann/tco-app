@@ -27,9 +27,10 @@ import {
 	listeMitglieder,
 	type MitgliedStatus
 } from './mitglieder.ts';
-import { ROLLEN, setzeRollen, type Rolle, type VerwaltungsRolle } from './rollen.ts';
+import { ROLLEN, listeRollen, setzeRollen, type Rolle } from './rollen.ts';
 import { ladeVerlauf, type Urheber } from './verlauf.ts';
 import type { ZugangDienst } from './zugang.ts';
+import { darf, type Art, type Bereich } from '../../verwaltung/bereiche.ts';
 
 export type AdminEreignis = Ereignis & Pick<RequestEvent, 'params'>;
 
@@ -41,7 +42,7 @@ export type AdminDienste = {
 	jetzt?: () => Date;
 };
 
-type AdminUrheber = Extract<Urheber, { art: 'admin' | 'mitglied' }> & { art: 'admin' };
+export type AdminUrheber = Extract<Urheber, { art: 'admin' | 'mitglied' }> & { art: 'admin' };
 
 // Record statt Liste: Kommt ein Status dazu, meldet der Compiler die Lücke hier.
 const STATUS: Record<MitgliedStatus, true> = { aktiv: true, ausgetreten: true, geloescht: true };
@@ -68,79 +69,51 @@ async function mitKonto(
 	return fn(konto);
 }
 
-// RR-07, RR-09: bestätigte Sitzung mit einer der erlaubten Rollen. Die Rolle wird vor der Bestätigung
-// geprüft: Wer den Bereich nicht hat, bekommt `kein-admin` (der Code für «dieser Bereich ist dir
-// nicht offen»), nicht die Aufforderung zum Bestätigen.
+// RR-07, RR-09: bestätigte Sitzung mit einer Rolle, die den Bereich so nutzen darf. Reihenfolge:
+// Wer den Bereich nicht einmal lesen darf, bekommt `kein-admin` (der Code für «dieser Bereich ist
+// dir nicht offen»), nicht die Aufforderung zum Bestätigen. Wer ihn nur lesen darf und schreiben
+// will, bekommt nach der Bestätigung `kein-recht` (Regel 3: der MyTCO-Admin liest).
 async function mitRolle(
 	d: AdminDienste,
 	e: AdminEreignis,
-	erlaubt: readonly VerwaltungsRolle[],
+	bereich: Bereich,
+	art: Art,
 	fn: (mitgliedId: number) => Promise<Response>
 ): Promise<Response> {
 	const z = await d.zugang.pruefe(e.locals.konto);
 	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
-	if (z.stufe === 'keine-rolle' || !z.rollen.some((r) => erlaubt.includes(r))) {
+	if (z.stufe === 'keine-rolle' || !darf(z.rollen, bereich, 'lesen')) {
 		return antwort(403, { fehler: 'kein-admin' });
 	}
 	if (z.stufe === 'unbestaetigt') return antwort(403, { fehler: 'unbestaetigt' });
+	if (!darf(z.rollen, bereich, art)) return antwort(403, { fehler: 'kein-recht' });
 	return fn(z.mitgliedId);
 }
 
-// Wie `mitRolle`, mit dem Angemeldeten als Urheber für den Änderungsverlauf.
-function alsAdmin(
+/** Lesende Schnittstelle eines Bereichs (BEREICHE). */
+export function liest(
 	d: AdminDienste,
 	e: AdminEreignis,
-	erlaubt: readonly VerwaltungsRolle[],
-	fn: (urheber: AdminUrheber) => Promise<Response>
-): Promise<Response> {
-	return mitRolle(d, e, erlaubt, (mitgliedId) => fn({ art: 'admin', mitgliedId }));
-}
-
-// RR-07, RR-09: nur Mitglieder-Admins mit gültiger Code-Bestätigung; `cm` allein genügt nicht.
-// Vorläufig wie die alte Rolle admin, bis der Bereichsschutz je Rolle steht (MyTCO-Admin liest, #43).
-export function mitAdmin(
-	d: AdminDienste,
-	e: AdminEreignis,
-	fn: (urheber: AdminUrheber) => Promise<Response>
-): Promise<Response> {
-	return alsAdmin(d, e, ['mitglieder'], fn);
-}
-
-// RR-07, RR-09: Bereich Clubmeisterschaft — Mitglieder-Admins und CMs mit gültiger
-// Code-Bestätigung (vorläufig, siehe `mitAdmin`).
-export function mitCm(
-	d: AdminDienste,
-	e: AdminEreignis,
+	bereich: Bereich,
 	fn: (mitgliedId: number) => Promise<Response>
 ): Promise<Response> {
-	return mitRolle(d, e, ['mitglieder', 'cm'], fn);
+	return mitRolle(d, e, bereich, 'lesen', fn);
 }
 
-// SI-10: ändernde Anfragen nur als JSON.
-async function aenderndAls(
+/**
+ * Schreibende Schnittstelle eines Bereichs (BEREICHE), mit dem Angemeldeten als Urheber für den
+ * Änderungsverlauf. SI-10: nur als JSON; der Körper wird erst nach der Prüfung der Rechte gelesen.
+ */
+export async function schreibt(
 	d: AdminDienste,
 	e: AdminEreignis,
-	erlaubt: readonly VerwaltungsRolle[],
+	bereich: Bereich,
 	fn: (urheber: AdminUrheber, koerper: Record<string, unknown>) => Promise<Response>
 ): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
-	return alsAdmin(d, e, erlaubt, async (u) => fn(u, await leseKoerper(e)));
-}
-
-const aendernd = (
-	d: AdminDienste,
-	e: AdminEreignis,
-	fn: (urheber: AdminUrheber, koerper: Record<string, unknown>) => Promise<Response>
-) => aenderndAls(d, e, ['mitglieder'], fn);
-
-// SI-10 wie `aendernd`, für den Bereich Clubmeisterschaft.
-export async function aenderndCm(
-	d: AdminDienste,
-	e: AdminEreignis,
-	fn: (mitgliedId: number, koerper: Record<string, unknown>) => Promise<Response>
-): Promise<Response> {
-	if (!istJson(e)) return formatFehler();
-	return mitCm(d, e, async (id) => fn(id, await leseKoerper(e)));
+	return mitRolle(d, e, bereich, 'schreiben', async (mitgliedId) =>
+		fn({ art: 'admin', mitgliedId }, await leseKoerper(e))
+	);
 }
 
 // RR-07: `rollen` sagt der Oberfläche, welche Bereiche sie zeigt; durchgesetzt wird an den Schnittstellen.
@@ -174,7 +147,7 @@ export async function postZugang(d: AdminDienste, e: AdminEreignis): Promise<Res
 }
 
 export function getMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return mitAdmin(d, e, async () => {
+	return liest(d, e, 'mitglieder', async () => {
 		const suche = e.url.searchParams.get('suche') ?? undefined;
 		// Leer heisst «Alle» (Filter der Oberfläche) und wirkt wie ein fehlender Status.
 		const status = e.url.searchParams.get('status') || undefined;
@@ -185,7 +158,7 @@ export function getMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Respon
 }
 
 export function postMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return aendernd(d, e, async (urheber, koerper) => {
+	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
 		const t = jetzt(d);
 		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: t.getFullYear() });
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.fehler });
@@ -197,7 +170,7 @@ export function postMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Respo
 }
 
 export function getMitglied(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return mitAdmin(d, e, async () => {
+	return liest(d, e, 'mitglieder', async () => {
 		const id = parseId(e.params.id);
 		const detail = id === null ? null : await ladeMitglied(d.db, id, jetzt(d));
 		return detail ? antwort(200, detail) : nichtGefunden();
@@ -205,7 +178,7 @@ export function getMitglied(d: AdminDienste, e: AdminEreignis): Promise<Response
 }
 
 export function postMitglied(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return aendernd(d, e, async (urheber, koerper) => {
+	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const t = jetzt(d);
@@ -241,7 +214,7 @@ function leseRollen(roh: unknown): Rolle[] | null {
 // Nur der MyTCO-Admin vergibt und entzieht Rollen (#43). `vorher`: die Rollen, wie die
 // Seite sie geladen hat; schützt vor dem Überschreiben fremder Änderungen.
 export function postRollen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return aenderndAls(d, e, ['mytco'], async (urheber, koerper) => {
+	return schreibt(d, e, 'rollen', async (urheber, koerper) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const rollen = leseRollen(koerper.rollen);
@@ -263,8 +236,13 @@ export function postRollen(d: AdminDienste, e: AdminEreignis): Promise<Response>
 	});
 }
 
+// Regel 2: Übersicht, wer welche Rolle hat; nur für den, der die Rollen vergibt.
+export function getRollen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return liest(d, e, 'rollen', async () => antwort(200, await listeRollen(d.db)));
+}
+
 export function postSitzungen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return aendernd(d, e, async (urheber) => {
+	return schreibt(d, e, 'mitglieder', async (urheber) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const r = await beendeSitzungenVon(d.db, urheber, id, jetzt(d));
@@ -273,7 +251,7 @@ export function postSitzungen(d: AdminDienste, e: AdminEreignis): Promise<Respon
 }
 
 export function getVerlauf(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return mitAdmin(d, e, async () => {
+	return liest(d, e, 'mitglieder', async () => {
 		const q = e.url.searchParams;
 		const mitgliedRoh = q.get('mitglied');
 		const mitgliedId = mitgliedRoh === null ? undefined : parseId(mitgliedRoh);
@@ -289,11 +267,11 @@ export function getVerlauf(d: AdminDienste, e: AdminEreignis): Promise<Response>
 }
 
 export function getFairgate(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return mitAdmin(d, e, async () => antwort(200, await listeFuerFairgate(d.db)));
+	return liest(d, e, 'mitglieder', async () => antwort(200, await listeFuerFairgate(d.db)));
 }
 
 export function postFairgate(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return aendernd(d, e, async (urheber, koerper) => {
+	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const seit = typeof koerper.seit === 'string' ? new Date(koerper.seit) : null;
@@ -305,11 +283,11 @@ export function postFairgate(d: AdminDienste, e: AdminEreignis): Promise<Respons
 }
 
 export function getAdminAnlaesse(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return mitAdmin(d, e, async () => antwort(200, await listeAnlaesse(d.db)));
+	return liest(d, e, 'mitglieder', async () => antwort(200, await listeAnlaesse(d.db)));
 }
 
 export function postAdminAnlaesse(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return aendernd(d, e, async (urheber, koerper) => {
+	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
 		const p = pruefeAnlass(koerper);
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.felder });
 		return antwort(201, { id: await legeAnlassAn(d.db, urheber.mitgliedId, p.werte) });
@@ -317,7 +295,7 @@ export function postAdminAnlaesse(d: AdminDienste, e: AdminEreignis): Promise<Re
 }
 
 export function getAdminAnlass(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return mitAdmin(d, e, async () => {
+	return liest(d, e, 'mitglieder', async () => {
 		const id = parseId(e.params.id);
 		const a = id === null ? null : await ladeAnlassAdmin(d.db, id);
 		if (!a) return nichtGefunden();
@@ -331,7 +309,7 @@ export function getAdminAnlass(d: AdminDienste, e: AdminEreignis): Promise<Respo
 }
 
 export function postAdminAnlass(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return aendernd(d, e, async (_urheber, koerper) => {
+	return schreibt(d, e, 'mitglieder', async (_urheber, koerper) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const p = pruefeAnlass(koerper);
@@ -342,7 +320,7 @@ export function postAdminAnlass(d: AdminDienste, e: AdminEreignis): Promise<Resp
 }
 
 export function postAdminAnlassLoeschen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return aendernd(d, e, async () => {
+	return schreibt(d, e, 'mitglieder', async () => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		return (await loescheAnlass(d.db, id)) === 'ok' ? antwort(200, {}) : nichtGefunden();
@@ -358,6 +336,7 @@ export const ADMIN_SCHNITTSTELLEN = {
 	getMitglied,
 	postMitglied,
 	postRollen,
+	getRollen,
 	postSitzungen,
 	getVerlauf,
 	getFairgate,
