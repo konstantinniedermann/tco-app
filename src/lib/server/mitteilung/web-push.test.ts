@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 const { sendNotification } = vi.hoisted(() => ({ sendNotification: vi.fn() }));
 vi.mock('web-push', () => ({ sendNotification }));
 
-import { erstelleWebPush } from './web-push.ts';
+import { erstelleWebPush, kontaktFuerPush } from './web-push.ts';
 
 const VAPID = { oeffentlich: 'oeffentlicher-schluessel', privat: 'privater-schluessel' };
 const ABO = { endpunkt: 'https://fcm.googleapis.com/fcm/send/erfunden', p256dh: 'p', auth: 'a' };
@@ -53,5 +53,18 @@ describe('Web-Push-Adapter', () => {
 			throw new Error('sofort');
 		});
 		expect(await sende(ABO, 'x')).toBe('fehler');
+	});
+
+	test('FR-44: Kontakt für den Push-Dienst: https-Adresse, sonst mailto mit der Absender-Adresse', () => {
+		const absender = 'MyTCO <mytco@example.org>';
+		expect(kontaktFuerPush('https://my.tcolten.ch', absender)).toBe('https://my.tcolten.ch');
+		// Lokal ist die Adresse http:, das lehnt web-push ab.
+		expect(kontaktFuerPush('http://localhost:5173', absender)).toBe('mailto:mytco@example.org');
+		expect(kontaktFuerPush('http://localhost:5173', ' mytco@example.org ')).toBe(
+			'mailto:mytco@example.org'
+		);
+		expect(kontaktFuerPush('', '"MyTCO, Verein" <verein@example.org>')).toBe(
+			'mailto:verein@example.org'
+		);
 	});
 });

@@ -6,6 +6,17 @@ import type { PushSender } from './versand.ts';
 // Ein Push, der einen Tag nicht zugestellt werden konnte, ist veraltet.
 const TTL_SEKUNDEN = 24 * 60 * 60;
 
+/**
+ * Kontakt für den Push-Dienst (VAPID `subject`): die Adresse von MyTCO, wenn sie `https:` ist,
+ * sonst `mailto:` mit der nackten Adresse des Mail-Absenders (`MyTCO <a@b>` → `mailto:a@b`).
+ * `web-push` lehnt `http:` ab, und lokal läuft MyTCO unter `http://localhost`.
+ */
+export function kontaktFuerPush(adresse: string, mailAbsender: string): string {
+	if (adresse.startsWith('https:')) return adresse;
+	const inKlammern = /<([^<>]+)>\s*$/.exec(mailAbsender);
+	return `mailto:${(inKlammern ? inKlammern[1] : mailAbsender).trim()}`;
+}
+
 /** `subject`: Kontakt für den Push-Dienst, eine `https:`- oder `mailto:`-Adresse. */
 export function erstelleWebPush(
 	vapid: { oeffentlich: string; privat: string },

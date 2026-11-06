@@ -49,14 +49,20 @@ export function vorschau(
 }
 
 // Pushes gehen an verschiedene Push-Dienste; einige gleichzeitig verkürzen den Versand.
-const GLEICHZEITIG = 10;
+const PUSHES_GLEICHZEITIG = 10;
+/** Mails gleichzeitig; so viele Verbindungen hält auch der Mailer der Mitteilungen offen. */
+export const MAILS_GLEICHZEITIG = 5;
 
-async function nebeneinander<T>(liste: T[], fn: (x: T) => Promise<void>): Promise<void> {
+async function nebeneinander<T>(
+	liste: T[],
+	hoechstens: number,
+	fn: (x: T) => Promise<void>
+): Promise<void> {
 	let naechster = 0;
 	const arbeiter = async () => {
 		while (naechster < liste.length) await fn(liste[naechster++]);
 	};
-	await Promise.all(Array.from({ length: Math.min(GLEICHZEITIG, liste.length) }, arbeiter));
+	await Promise.all(Array.from({ length: Math.min(hoechstens, liste.length) }, arbeiter));
 }
 
 /** Gelungen ja/nein; ein ungültiges Abo wird gelöscht. Wirft nie. */
@@ -94,14 +100,15 @@ export async function versende(
 	const gelungen = new Set<Empfaenger>();
 	const push = d.push;
 	if (push !== null) {
-		await nebeneinander(empf, async (e) => {
+		await nebeneinander(empf, PUSHES_GLEICHZEITIG, async (e) => {
 			const r = await Promise.all(e.abos.map((a) => sendePush(d.db, push, a, nutzlast)));
 			if (r.includes(true)) gelungen.add(e);
 		});
 	}
 	const fuss = `Diese Mitteilungen kannst du im Profil abschalten: ${d.adresse.replace(/\/+$/, '')}/profil`;
 	const text = `${m.text}\n\n${m.link}\n\n${fuss}`;
-	for (const e of empf) {
+	// DS-05: weiterhin eine Mail je Empfänger, nur einige gleichzeitig.
+	await nebeneinander(empf, MAILS_GLEICHZEITIG, async (e) => {
 		const mitPush = gelungen.has(e);
 		if (mitPush) z.push++;
 		// Ersatz: hatte ein Abo, Push war möglich, und jeder Push scheiterte.
@@ -113,6 +120,6 @@ export async function versende(
 		if (mail && ersatz) z.ersatzMails++;
 		else if (mail) z.mails++;
 		if (!mitPush && !mail) z.nichtErreichbar++;
-	}
+	});
 	return z;
 }

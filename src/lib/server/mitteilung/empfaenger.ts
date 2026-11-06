@@ -3,18 +3,10 @@
 // für sie gelten die Themen wie für neue Konten als an (FR-41). Wer das Thema abgeschaltet hat,
 // fällt weg, für Push und Mail.
 import { and, asc, eq, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
+import type { AnlassAuswahl } from '../../mitteilung/auswahl.ts';
 import { istOffen, zuPruefen } from '../anlass/anlaesse.ts';
 import type { Db } from '../db/index.ts';
 import { anlass, anlassAnmeldung, konto, mitglied, pushAbo } from '../db/schema.ts';
-
-export type AnlassAuswahl = 'alle' | 'keine-antwort' | 'kommt' | 'kommt-nicht' | 'zu-pruefen';
-export const ANLASS_AUSWAHLEN: readonly AnlassAuswahl[] = [
-	'alle',
-	'keine-antwort',
-	'kommt',
-	'kommt-nicht',
-	'zu-pruefen'
-];
 
 export type Empfaenger = {
 	mitgliedId: number;

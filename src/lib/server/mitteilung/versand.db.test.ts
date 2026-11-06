@@ -297,4 +297,30 @@ describe('Versand einer Mitteilung', () => {
 		);
 		expect(reihenfolge).toEqual(['push', 'mail', 'mail']);
 	});
+
+	test('DS-05: Mails gehen zu fünft gleichzeitig, jede an genau eine Adresse', async () => {
+		const liste = Array.from({ length: 12 }, () => empf());
+		const offen = new Set<string>();
+		let hoechstens = 0;
+		const an: string[] = [];
+		const z = await versende(
+			{
+				push: null,
+				mailer: async (n) => {
+					an.push(n.an);
+					offen.add(n.an);
+					hoechstens = Math.max(hoechstens, offen.size);
+					await new Promise((r) => setTimeout(r, 5));
+					offen.delete(n.an);
+				},
+				db,
+				adresse: ADRESSE
+			},
+			liste,
+			{ ...M, weg: 'push-und-mail' }
+		);
+		expect(hoechstens).toBe(5);
+		expect(an).toEqual(liste.map((e) => e.email));
+		expect(z).toEqual({ push: 0, mails: 12, ersatzMails: 0, nichtErreichbar: 0 });
+	});
 });
