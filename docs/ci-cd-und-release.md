@@ -299,7 +299,7 @@ Mail-Code über die Schnittstelle von Mailpit.
 
 `make check` führt lokal dieselben Prüfungen aus wie die CI, ausser der Malware-Prüfung und
 dem Rauchtest des Images (beide nur CI; den Rauchtest gibt es lokal einzeln als `make rauchtest`); der Secret-Scan läuft lokal über den Hook bzw. `make secrets`. Die CI läuft bei PRs und
-auf `dev` und `main`, nicht auf Issue-Branches (dort decken die Git-Hooks ab). Änderungen nur
+auf `dev` und `main`, nicht auf Issue-Branches (dort decken die Git-Hooks ab). Von Hand lässt sich ein Lauf für jeden Branch starten (`gh workflow run check.yml --ref <branch>`); er prüft wie bei Code und liefert nie aus. Änderungen nur
 an der Doku führen trotzdem `make docs` aus, inklusive Test-ID-Prüfung. Ob eine Änderung
 nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits. Doku ist, was unter
 `docs/` liegt oder auf `.md` endet, **ausser `docs/datenschutzerklaerung.md`**: Die App baut
@@ -309,9 +309,10 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 |---------|--------|-------|
 | Doku-Check (Links, Konfliktmarker, Mermaid) | — | vorhanden |
 | Secret-Scan über die ganze Historie (gitleaks) | — | Hook und CI |
+| Secret-Scanning von GitHub mit Sperre beim Push (Einstellung im Repo, gratis für öffentliche Repos) | — | GitHub |
 | ESLint mit Svelte-Regeln, Prettier | ADR-002, Arbeitsregeln | vorhanden |
 | `svelte-check`, Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
-| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN` (die der Rechte-Test abdeckt) und reichen `holeAdminDienste()` nur weiter; andere Routen nutzen `lib/server/admin` nicht | ADR-002, RR-07 | vorhanden |
+| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN` bzw. `TURNIER_SCHNITTSTELLEN` (Clubmeisterschaft, auch für `cm`; beide deckt der Rechte-Test ab) und reichen `holeAdminDienste()` nur weiter; andere Routen nutzen `lib/server/admin` nicht | ADR-002, RR-07 | vorhanden |
 | Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
@@ -375,10 +376,10 @@ unabhängig davon.
   Die Nummer vergibt, wer mergt, nicht der Feature-Branch: So beanspruchen zwei parallele
   Sessions nie dieselbe Nummer (Begründung:
   [ADR-007](adr/adr-007-version-pro-merge.md)). Der Pre-Push-Hook weist einen Push auf `dev` ab, in dem ein
-  Merge mit Code die Version nicht um genau einen Schritt erhöht oder sein Abschnitt fehlt
-  (`version-merge.ts`); was schon auf `main` liegt, prüft er nicht. Weil der Hook nur lokal
+  Merge mit Code die Version nicht um genau einen Schritt erhöht, sein Abschnitt nicht zuoberst
+  steht oder reine Doku die Version erhöht (`version-merge.ts`); was schon auf `main` liegt, prüft er nicht. Weil der Hook nur lokal
   läuft, werden auch die PRs von Dependabot im Hauptordner gemergt, nicht auf GitHub.
-- **Korrektur** (`0.5.X`) ist der Normalfall bei jedem Merge mit Code. **Nebenversion**
+- **Korrektur** (`x.y.Z`) ist der Normalfall bei jedem Merge mit Code. **Nebenversion**
   (`0.X.0`, Korrektur zurück auf 0) setzt Claude, wenn etwas Grösseres dazukommt: eine neue
   Etappe oder eine spürbare neue Funktion. **Hauptversion** (`X.0.0`) nur im Auftrag des
   Projektleiters.

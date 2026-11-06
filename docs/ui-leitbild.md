@@ -22,7 +22,8 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Welcher Übergang, welcher Reiter aktiv, wo die Fusszeile steht | `src/lib/ui/navigation.ts` |
 | Reiter (sofort aktiv, gleitende Markierung, nochmals antippen → nach oben) | `src/lib/ui/Reiter.svelte` |
 | Weiches Auf- und Zuklappen, gemerkte Aufklappbereiche | `src/lib/ui/klappe.ts` |
-| Eingabe mit Tastatur (Reiter weg, Feld ins Blickfeld, «Weiter») | `src/lib/ui/tastatur.ts` |
+| Eingabe mit Tastatur (Reiter weg, Feld ins Blickfeld, «Weiter», Wappen schliesst die Tastatur) | `src/lib/ui/tastatur.ts` |
+| Rückfrage bei ungespeicherten Änderungen (wann sie kommt), Wappen als Weg zur Startseite | `src/lib/ui/ungespeichert.ts`, `src/routes/+layout.svelte`, `src/routes/verwaltung/+layout.svelte` |
 | Baustein Anleitung (Zeichnung, Ablauf) | `src/lib/ui/Anleitung.svelte`, `src/lib/ui/ZeichnungIphone.svelte`, `src/lib/ui/ZeichnungAndroid.svelte` |
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
 
@@ -160,7 +161,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 
 | Baustein | Klasse | Regel |
 |----------|--------|-------|
-| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und steht fest oben (nur der Rollbereich darunter scrollt, in der Verwaltung `sticky`), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch) |
+| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und steht fest oben (nur der Rollbereich darunter scrollt, in der Verwaltung `sticky`), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch). Das Wappen ist ein Link zur Startseite (`.kopf-start`, zugänglicher Name «Zur Startseite»): in der App zu Start, in der Verwaltung zu deren erster Seite. Die Kopfleiste sieht aus wie ohne Link; die Tippfläche reicht unsichtbar über das Wappen hinaus auf `--tippflaeche` (UI-03). Bei offener Tastatur schliesst der Tipp nur die Tastatur ([Eingabe mit Tastatur](#eingabe-mit-tastatur)), bei ungespeicherten Änderungen kommt zuerst die Rückfrage ([Ungespeicherte Änderungen](#ungespeicherte-änderungen)) |
 | Statusleisten-Band | `.statusleiste` | ausserhalb von `.app`, fest oben, deckend in `--farbe-marke` wie die Kopfleiste darunter (auch in der Verwaltung). Im Browser so hoch wie `env(safe-area-inset-top)` (am PC 0); in der iPhone-App vom Startbildschirm (`display-mode: standalone`, nur iOS) zusätzlich `--abstand-3` hoch, also über dem oberen Rand der Kopfleiste und über 10 px; nicht in der Verwaltung (`.statusleiste-verwaltung`), weil deren Kopfleiste mit der Seitenleiste wegscrollt. iOS legt sonst über Web-Apps vom Startbildschirm einen hellen Schleier über die Statusleiste; iOS lässt ihn nur weg, wenn oben in der Mitte ein fester oder mitlaufender, deckender, fast bildschirmbreiter Streifen liegt |
 | Rollbereich | `.rollbereich` | Mitglieder-App: der einzige Bereich, der scrollt, zwischen Kopfleiste und Reitern; enthält Inhalt und Fusszeile. Beim Überziehen federt nur er, Kopfleiste und Reiter bleiben stehen |
 | Seitenhintergrund (iPhone-App vom Startbildschirm) | `html`, `body` in `display-mode: standalone`, nur iOS | `--farbe-marke`; `.app` trägt dann `--farbe-hintergrund`. Was an Schleier bleibt, ist so grün statt hell |
@@ -307,10 +308,33 @@ schiebt sich über die Reiter, das Feld steht ruhig darüber.
 - **Eingabetaste:** «Weiter» springt ins nächste Feld desselben Formulars, im letzten Feld
   sendet «Fertig» das Formular ab (Bedienung per Finger). Am PC, auch in der Verwaltung,
   sendet die Eingabetaste wie gewohnt sofort ab.
+- **Wappen:** Ein Tipp aufs Wappen schliesst bei offener Tastatur nur die Tastatur, wie ein
+  Tipp auf den Hintergrund; er führt nicht zur Startseite. Erst der nächste Tipp führt weiter.
 - **Nach dem Absenden** geht die Tastatur zu, der Fokus geht zum Ergebnis (z. B. zu
   «Ändern» der gespeicherten Angabe).
 - **Jedes Feld** hat die passende Tastatur (`type`, `inputmode`) und `autocomplete`.
   Schrift in Feldern nie unter 16 px (`--groesse-text`), sonst zoomt das iPhone hinein.
+
+### Ungespeicherte Änderungen
+
+Wer in einem Formular etwas geändert und nicht gespeichert hat und die Seite in der App
+verlässt (Wappen, Reiter, «‹ Zurück», Seitenleiste und andere Links der Verwaltung), bekommt
+zuerst die Rückfrage als `<dialog class="karte">`: **«Nicht gespeichert – trotzdem
+verlassen?»** mit *Abbrechen* (Nebentaste: bleibt auf der Seite, die Eingaben bleiben) ·
+*Verlassen* (Haupttaste: die Eingaben verfallen, die App geht zum Ziel).
+
+- **Ungespeichert** ist ein Formular nur, solange ein Feld vom geladenen Stand abweicht. Wer
+  etwas tippt und es wieder zurücksetzt, wird nicht gefragt; nach dem Speichern auch nicht.
+- **Welche Formulare:** alle, die Angaben speichern: *Meine Angaben* im Profil, die Antwort auf
+  einen Anlass, in der Verwaltung Mitglied (Angaben und Rollen), Anlass, Turnier und
+  Kategorie, jeweils beim Anlegen und Bearbeiten. Login, Codes und E-Mail-Wechsel nicht: Sie haben keinen
+  gespeicherten Stand, nur einen Ablauf. Im Code trägt das Formular `data-ungespeichert`,
+  solange es abweicht.
+- **Ohne Rückfrage:** Wechsel, die die App selbst auslöst (nach dem Speichern zur neuen Seite,
+  abgelaufene Sitzung, Abmelden), Links aus der App hinaus (Kalender), die Zurück-Taste oder
+  -Geste des Browsers oder Handys (auch am PC) und das Schliessen der App. Bei der Geste
+  zeigt der Browser die vorige Seite schon an, bevor die App davon erfährt; beim Schliessen gibt es nur den Dialog des
+  Browsers, nicht diese Rückfrage.
 
 ## Brief (Druck)
 

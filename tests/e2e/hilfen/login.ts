@@ -6,6 +6,7 @@ import { erstelleBremsen } from '../../../src/lib/server/login/bremse.ts';
 import { erstelleLoginDienst, type LoginDienst } from '../../../src/lib/server/login/dienst.ts';
 import { eq } from 'drizzle-orm';
 import { machAdmin } from '../../../src/lib/server/admin/erster-admin.ts';
+import { legeAnlassAn } from '../../../src/lib/server/anlass/anlaesse.ts';
 import { setzeRollen } from '../../../src/lib/server/admin/rollen.ts';
 import { turnier } from '../../../src/lib/server/db/schema.ts';
 import { legeMitgliedAn } from '../../hilfen/mitglieder.ts';
@@ -66,6 +67,17 @@ export async function legeCmMitBriefCodeAn(vorname: string) {
  */
 export async function loescheTurnier(jahr: number): Promise<void> {
 	await hole().db.delete(turnier).where(eq(turnier.jahr, jahr));
+}
+
+/** Erfundener Anlass weit in der Zukunft mit offener Anmeldung; gibt seine Nummer zurück. */
+export async function legeOffenenAnlassAn(erstelltVon: number, titel: string): Promise<number> {
+	return legeAnlassAn(hole().db, erstelltVon, {
+		titel,
+		beginn: new Date('2099-05-20T17:00:00Z'),
+		ort: 'Clubhaus, Musterweg 1, Olten',
+		einladung: '',
+		anmeldeschluss: new Date('2099-05-17T21:59:00Z')
+	});
 }
 
 /** Stellt für ein bestehendes Konto einen weiteren Brief-Code aus (ohne Bindestrich). */

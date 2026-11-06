@@ -268,6 +268,26 @@ html {
 	width: auto;
 }
 
+/* Das Wappen als Link zur Startseite: sieht aus wie das Wappen allein; die Tippfläche reicht
+   unsichtbar auf --tippflaeche (UI-03), ohne die Kopfleiste zu vergrössern. Mit `.kopf`
+   davor, damit die Links der Seitenleiste (Verwaltung) ihm kein Polster geben. */
+.kopf .kopf-start {
+	position: relative;
+	display: flex;
+	min-height: 0;
+	padding: 0;
+}
+
+.kopf .kopf-start::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: max(100%, var(--tippflaeche));
+	height: max(100%, var(--tippflaeche));
+	translate: -50% -50%;
+}
+
 .kopf a {
 	color: var(--farbe-flaeche);
 }

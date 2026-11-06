@@ -79,6 +79,12 @@
 	let veraltetBei = $state<Angabe | null>(null);
 	let speichert = $state(false);
 	let formular = $state<HTMLFormElement>();
+	// Ungespeichert (UI-Leitbild): ein Feld der offenen Angabe weicht vom geladenen Stand ab.
+	const geaendert = $derived(
+		offen !== null &&
+			angaben !== null &&
+			FELDER[offen].some((f) => werte[f] !== (angaben?.[f] ?? ''))
+	);
 	const aendernKnoepfe: Partial<Record<Angabe, HTMLButtonElement>> = {};
 
 	// Hinweis nach dem E-Mail-Wechsel, bis «Schliessen».
@@ -303,7 +309,12 @@
 
 {#snippet angabe(a: Angabe, titelText: string, wert: string | null, freiwillig: boolean)}
 	{#if offen === a}
-		<form bind:this={formular} onsubmit={speichern} novalidate>
+		<form
+			bind:this={formular}
+			onsubmit={speichern}
+			novalidate
+			data-ungespeichert={geaendert ? '' : undefined}
+		>
 			{#if FELDER[a].length > 1}<strong>{titelText}</strong>{/if}
 			{#each FELDER[a] as f (f)}
 				<div class="feld">

@@ -130,7 +130,12 @@
 	const ungueltig = (f: KategorieFeld) => (fehler[f] ? 'true' : undefined);
 </script>
 
-<form bind:this={formular} onsubmit={abschicken} novalidate>
+<form
+	bind:this={formular}
+	onsubmit={abschicken}
+	novalidate
+	data-ungespeichert={geaendert ? '' : undefined}
+>
 	<div class="feld-zeile">
 		<label for="kategorie-name">Name</label>
 		<input

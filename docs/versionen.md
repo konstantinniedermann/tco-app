@@ -8,13 +8,22 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.6.1 — Wappen führt zum Start
+
+- Wappen führt zum Start: Ein Tipp aufs Wappen in der Kopfleiste führt zur Startseite, in der
+  Verwaltung zu deren erster Seite; bei offener Tastatur schliesst er nur die Tastatur. Wer
+  ein Formular geändert und nicht gespeichert hat, wird vor dem Verlassen über einen Link der
+  App gefragt: «Nicht gespeichert – trotzdem verlassen?» (Abbrechen · Verlassen). Die
+  Zurück-Taste oder -Geste und das Schliessen der App fragen nicht. UI-Leitbild nachgeführt.
+
 ## 0.6.0 — Clubmeisterschaft: Turnier anlegen
 
 - Clubmeisterschaft: Der CM-Verantwortliche (Rolle `cm`) öffnet die Verwaltung und sieht dort
   nur den Bereich *Clubmeisterschaft*; er legt das Turnier mit Turniernummern und Kategorien
   an (Einzel mit Klassierungsbereich, Doppel mit Mindestsumme), öffnet die Anmeldung von Hand
   und schliesst sie früher oder lässt sie am Anmeldeschluss von selbst schliessen. `make seed`
-  legt ein erfundenes Turnier 2027 und eine CM-Persona an (#57). Fachmodell und Rollen
+  legt ein erfundenes Turnier 2027 und eine CM-Persona an (#57). Mitglieder sehen das Turnier
+  noch nicht; die Anmeldung selbst kommt mit Teil 2 (#58). Fachmodell und Rollen
   nachgeführt: FR-33 bis FR-35, Turniernummern freiwillig, Doppel nach Mindestsumme.
 - Repo öffentlich gemacht (Actions-Minuten gratis); `main` auf GitHub geschützt: nur über
   PR mit Merge-Commit, Prüfungen grün, kein Force-Push. Workflows aus Forks laufen erst nach

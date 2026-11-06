@@ -257,3 +257,68 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Task- und Gesamt-Review #57.
 
 **Einschätzung:** Alles klein. «keine Lizenz» und die Anzeige am Handy mit Teil 2 (#58) angleichen; RR-08 doppelt fällt beim Rollen-Umbau (Entwurf «Rollen schärfen») ohnehin an.
+
+### 2026-11-06 — Abgewiesener Push nach dev: «nächste freie Nummer» scheitert am eigenen Pre-Push-Hook, wenn dev zwei Schritte weiter ist
+
+**Thema:** Betrieb
+
+**Fundort:** `.claude/skills/tco-branching/SKILL.md` (Schritt 4, «Wird der Push abgewiesen …»), `docs/adr/adr-007-version-pro-merge.md`, `scripts/pruefungen/version-merge.ts` (Vergleich mit dem ersten Elternteil)
+
+**Beobachtung:** Der Hook vergleicht jeden Commit mit seinem ersten Elternteil. Nach `pull --no-commit origin dev` ist das der eigene, noch nicht gepushte Merge-Commit. Hat `dev` inzwischen zwei Code-Merges oder eine Nebenversion bekommen, ist die nächste freie Nummer kein einzelner Schritt mehr, und der Push wird dauerhaft abgewiesen; zurücksetzen verbietet der Ablauf. In einem Wegwerf-Repo nachgestellt: `version-merge: …: 0.6.1 → 0.6.3 ist kein einzelner Schritt`, Exit 1. Kein Test deckt den Fall ab.
+
+**Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
+
+**Einschätzung:** Randfall, blockiert nur den Merge nach `dev`. Lösungsweg: bei einem Merge-Commit gegen die höchste Version aller Elternteile prüfen, mit eigenem Test.
+
+### 2026-11-06 — Turnierseite verspricht eine Anmeldung der Mitglieder, die es noch nicht gibt
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/routes/verwaltung/turniere/[id]/+page.svelte` (Texte bei *Anmeldung offen* «Mitglieder melden sich bis … an» und bei *geschlossen* «Mitglieder sehen ihre Anmeldungen …»)
+
+**Beobachtung:** Für Mitglieder gibt es weder Seite noch Schnittstelle zum Turnier; die kommt mit Teil 2 (#58). Der CM-Verantwortliche liest aber, Mitglieder könnten sich jetzt anmelden. In `docs/versionen.md` (0.6.0) ist der Stand jetzt nachgetragen.
+
+**Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
+
+**Einschätzung:** Heute ohne Wirkung, weil weder Test noch Live ausgeliefert werden. Text anpassen oder bis #58 so lassen; spätestens bevor ein CM-Verantwortlicher die Verwaltung auf Test oder Live sieht.
+
+### 2026-11-06 — Kleinbefunde aus dem Doku-Abgleich vor dem Release (Code-Kommentare, Tests)
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/verwaltung/Kategorieformular.svelte`, `src/lib/turnier/klassierung.ts`, `src/lib/server/turnier/schnittstellen.db.test.ts`, `vitest.config.ts`, `.githooks/pre-push`, `Makefile` (Ziel `hooks`), `docs/fachmodell.md`
+
+**Beobachtung:**
+- Annahmen nicht dort markiert, wo sie wirken: Vorbelegung der Mindestsumme 9 (K-51) im Kategorieformular, Skala N1–N4/R1–R9 (K-25.1) in `klassierung.ts`; `make annahmen` findet sie nicht.
+- Rechte-Test der Turnier-Schnittstellen spielt die Rolle `lizenz` nicht durch (Testkonzept: «jede Rolle»); `lizenz` ist anderswo als Nicht-Verwaltungsrolle getestet.
+- `src/lib/turnier/` (Status FR-33, Klassierungsreihenfolge FR-34) liegt ausserhalb der Abdeckungsmessung (`src/lib/server/**`), wie schon `src/lib/anlass/`.
+- `.githooks/pre-push` begründet den lokalen Schutz noch mit «Branch-Schutz für private Repos nur mit Pro»; `make help` beim Ziel `hooks` nennt die Versionsprüfung beim Push auf `dev` nicht.
+- Fachmodell-Diagramm nennt `AnmeldungAnlass`, der Code `anlassAnmeldung` / `anlass_anmeldung`, obwohl die Namen im Code dem Diagramm folgen sollen.
+
+**Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
+
+**Einschätzung:** Alles klein, Code-Änderungen mit `make check` und Korrekturnummer; nicht im reinen Doku-Release mitgemacht. Abdeckung: entweder `src/lib/turnier/**` mitmessen oder die Ausnahme im Testkonzept festhalten.
+
+### 2026-11-06 — «Importing a module script failed» auch einzeln reproduzierbar (SI-07, iPhone)
+
+**Thema:** Betrieb
+
+**Fundort:** Profil `iphone` (WebKit), `tests/e2e/verwaltung.test.ts:134` (SI-07), Seitenfehler-Sammlung `fehler` der Admin-Seite
+
+**Beobachtung:** Nachtrag zum Eintrag «lokal in make check: zwei rote von drei vollen Läufen»: SI-07 ist nicht nur unter Last rot. Einzeln mit `--project=iphone --repeat-each=10` auf dem Code von `origin/dev` 2 von 10 rot, nur durch «TypeError: Importing a module script failed.»; im vollen `make check` einmal rot, einmal grün. Der Test öffnet einen zweiten Browser-Kontext neben der Admin-Seite.
+
+**Ursprung:** Branch `feat/wappen-start`, Nachweisläufe von `make check`.
+
+**Einschätzung:** Gut reproduzierbar, damit untersuchbar: Mit `--repeat-each` lässt sich eine Ursache (z. B. ein Modul, das während eines Seitenwechsels nachgeladen und abgebrochen wird) eingrenzen. Bis dahin kostet er Wiederholungen von `make check`.
+
+### 2026-11-06 — Rückfrage «Nicht gespeichert» nach Speichern, wenn das Nachladen scheitert
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/routes/verwaltung/turniere/[id]/+page.svelte` (Speichern; Status setzen, Fall «unzulässig»), `src/routes/verwaltung/turniere/[id]/kategorien/[kid]/+page.svelte`, `src/routes/verwaltung/anlaesse/[id]/+page.svelte`; Marker `data-ungespeichert`
+
+**Beobachtung:** Scheitert nach erfolgreichem Speichern das Nachladen des Stands, wird das Formular nicht neu aufgebaut; es gilt weiter als geändert, und beim Verlassen kommt die Rückfrage, obwohl gespeichert ist. Wird beim Turnier ein Status-Wechsel als «unzulässig» abgewiesen, lädt die Seite den neuen Stand, baut das Formular aber nicht neu auf: Hat inzwischen ein anderer Admin etwas geändert, gilt das unberührte Formular als geändert. Die graue Speichern-Taste verhält sich schon bisher genauso.
+
+**Ursprung:** Review (`cas-reviewer`) des Branches `feat/wappen-start`.
+
+**Einschätzung:** Nur bei Störungen oder gleichzeitiger Bearbeitung; die Rückfrage schadet dann nicht (Verlassen geht). Beheben, wenn diese Seiten ohnehin angefasst werden: das Formular nach jedem Nachladen neu aufbauen wie bei den Angaben eines Mitglieds (`nachSpeichern`).
