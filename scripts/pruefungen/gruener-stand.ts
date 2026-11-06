@@ -6,7 +6,8 @@ import { istNurDoku } from './nur-doku.ts';
 
 // Grüner Stand: `make check` merkt sich am Ende den geprüften Prüfstand, der Pre-Push-Hook
 // überspringt das volle `make check` für einen schon grün geprüften Prüfstand.
-// Prüfstand = SHA-256 über alle Dateien eines Commits ausser Doku (Regel aus nur-doku.ts) und
+// Prüfstand = SHA-256 über alle Dateien eines Commits ausser Doku (Regel aus nur-doku.ts, aber
+// mit den Mockups, die ein Test liest) und
 // ohne die Versionsnummer in package.json/package-lock.json: Der Merge nach dev bringt die neue
 // Nummer, der Code bleibt derselbe. Die Liste liegt im gemeinsamen Git-Ordner (alle Worktrees),
 // unversioniert; die CI prüft unabhängig davon jeden Push auf dev.
@@ -24,13 +25,27 @@ function git(...argumente: string[]): string {
 	return execFileSync('git', argumente, { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 });
 }
 
-/** package.json bzw. package-lock.json ohne die eigene Versionsnummer; andere Dateien unverändert. */
+// Doku, die ein Test liest (tests/e2e/mockups.test.ts, UI-03): zählt hier als Code.
+const VON_TESTS_GELESEN = 'docs/ui-mockups/';
+
+function zaehltAlsDoku(pfad: string): boolean {
+	return !pfad.startsWith(VON_TESTS_GELESEN) && istNurDoku([pfad]);
+}
+
+/**
+ * package.json bzw. package-lock.json ohne die eigene Versionsnummer, sonst wörtlich (Prettier
+ * prüft auch die Form); andere Dateien unverändert. Die eigene Nummer steht in package.json
+ * zuerst, in package-lock.json zuerst oben und dann unter `packages[""]`.
+ */
 export function ohneVersion(pfad: string, inhalt: string): string {
 	if (!OHNE_VERSION.has(pfad)) return inhalt;
-	const daten = JSON.parse(inhalt);
-	delete daten.version;
-	if (pfad === 'package-lock.json' && daten.packages?.['']) delete daten.packages[''].version;
-	return JSON.stringify(daten);
+	const version = JSON.parse(inhalt).version;
+	if (typeof version !== 'string') return inhalt;
+	const eintrag = `"version": ${JSON.stringify(version)}`;
+	let text = inhalt;
+	for (let i = 0; i < (pfad === 'package-lock.json' ? 2 : 1); i++)
+		text = text.replace(eintrag, '"version": "…"');
+	return text;
 }
 
 /** Prüfstand eines Commits (64 Hex-Zeichen). Wirft, wenn package.json o. ä. unlesbar ist. */
@@ -43,7 +58,7 @@ export function pruefstand(rev: string): string {
 			const [modus, , blob] = zeile.slice(0, tab).split(' ');
 			return { modus, blob, pfad: zeile.slice(tab + 1) };
 		})
-		.filter(({ pfad }) => !istNurDoku([pfad]))
+		.filter(({ pfad }) => !zaehltAlsDoku(pfad))
 		.map(({ modus, blob, pfad }) => {
 			if (!OHNE_VERSION.has(pfad)) return `${modus} ${blob} ${pfad}`;
 			const inhalt = ohneVersion(pfad, git('show', `${rev}:${pfad}`));

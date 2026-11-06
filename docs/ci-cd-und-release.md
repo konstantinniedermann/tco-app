@@ -316,8 +316,9 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 **Grüner Stand** (`gruener-stand.ts`): Ein grünes `make check` merkt sich den geprüften Stand,
 aber nur, wenn vor und nach der Prüfung nichts Uncommittetes herumlag und kein Commit dazukam.
 Der Pre-Push-Hook lässt `make check` aus, wenn der gepushte Stand schon grün geprüft ist und
-seither nur Doku und die Versionsnummer (in `package.json` und `package-lock.json`)
-dazukamen. Das ist der Normalfall beim Push des Feature-Branches nach dem Review und beim
+seither nur Doku und die Versionsnummer (in `package.json` und `package-lock.json`, sonst
+wörtlich verglichen) dazukamen. Die Mockups unter `docs/ui-mockups/` zählen dabei als Code,
+weil ein E2E-Test sie liest. Das ist der Normalfall beim Push des Feature-Branches nach dem Review und beim
 Push des Merge-Commits auf `dev`. Kam fremder Code von `dev` dazu, prüft der Hook voll, und
 ebenso im Zweifel (keine Liste, unlesbare Datei). Die Liste liegt unversioniert im
 gemeinsamen Git-Ordner, gilt also für alle Worktrees. Die CI prüft jeden Push auf `dev`

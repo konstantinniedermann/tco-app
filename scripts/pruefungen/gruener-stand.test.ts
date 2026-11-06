@@ -145,6 +145,18 @@ describe('gruener-stand.ts', () => {
 		expect(skript('pruefen', neu).code).toBe(1);
 	});
 
+	it('ist nicht mehr grün bei den Mockups (ein E2E-Test liest sie, UI-03)', () => {
+		gruenMerken();
+		const neu = committe({ 'docs/ui-mockups/mockup.css': 'a { color: red }\n' });
+		expect(skript('pruefen', neu).code).toBe(1);
+	});
+
+	it('ist nicht mehr grün, wenn package.json nur anders formatiert ist (Prettier prüft sie)', () => {
+		gruenMerken();
+		const neu = committe({ 'package.json': JSON.stringify({ name: 'mytco', version: '0.1.0' }) });
+		expect(skript('pruefen', neu).code).toBe(1);
+	});
+
 	it('merkt nichts, wenn beim Beginn Uncommittetes herumlag', () => {
 		schreibe('src/a.ts', 'export const a = 3;\n');
 		expect(skript('beginn').code).toBe(0);
