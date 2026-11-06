@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { MELDUNG } from '../../../../../../lib/login/anmelden.ts';
 	import Kategorieformular, {
 		anfrage,
 		werteAusKategorie,
@@ -14,10 +13,12 @@
 		type KategorieAnsicht,
 		type KategorieFeld
 	} from '../../../../../../lib/verwaltung/api.ts';
+	import { fehlerText } from '../../../../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	const nurLesen = $derived(!data.darfSchreiben.cm);
 
 	// Nach dem Speichern lädt die Seite den neuen Stand, ohne neu zu navigieren.
 	let kategorie = $derived<KategorieAnsicht>(data.kategorie);
@@ -57,7 +58,7 @@
 		} else if (a.art === 'nicht-gefunden') {
 			allgemein = 'Diese Kategorie gibt es nicht mehr.';
 		} else {
-			allgemein = MELDUNG.stoerung;
+			allgemein = fehlerText(a);
 		}
 		laeuft = false;
 	}
@@ -73,7 +74,7 @@
 		if (a.art === 'ok' || a.art === 'nicht-gefunden') {
 			await goto(resolve('/verwaltung/turniere/[id]', { id: String(kategorie.turnierId) }));
 		} else {
-			absageFehler = MELDUNG.stoerung;
+			absageFehler = fehlerText(a);
 		}
 	}
 </script>
@@ -101,6 +102,7 @@
 				knopf="Kategorie speichern"
 				nurBeiAenderung
 				{rueckmeldung}
+				{nurLesen}
 				onspeichern={speichern}
 			/>
 		{/key}
@@ -109,25 +111,27 @@
 		{/if}
 	</div>
 
-	<h2>Kategorie absagen</h2>
-	<div class="karte">
-		<p>Mitglieder sehen eine abgesagte Kategorie nicht mehr.</p>
-		{#if absageFehler}
-			<p class="fehler" role="alert">{absageFehler}</p>
-		{/if}
-		<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}
-			>Kategorie absagen</button
-		>
-	</div>
-
-	<dialog class="karte" bind:this={rueckfrage} aria-labelledby="absagen-titel">
-		<h2 id="absagen-titel">Kategorie absagen?</h2>
-		<p>Das lässt sich nicht rückgängig machen.</p>
-		<div class="leiste">
-			<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}
-				>Abbrechen</button
+	{#if !nurLesen}
+		<h2>Kategorie absagen</h2>
+		<div class="karte">
+			<p>Mitglieder sehen eine abgesagte Kategorie nicht mehr.</p>
+			{#if absageFehler}
+				<p class="fehler" role="alert">{absageFehler}</p>
+			{/if}
+			<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}
+				>Kategorie absagen</button
 			>
-			<button type="button" class="taste-haupt" onclick={absagen}>Absagen</button>
 		</div>
-	</dialog>
+
+		<dialog class="karte" bind:this={rueckfrage} aria-labelledby="absagen-titel">
+			<h2 id="absagen-titel">Kategorie absagen?</h2>
+			<p>Das lässt sich nicht rückgängig machen.</p>
+			<div class="leiste">
+				<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}
+					>Abbrechen</button
+				>
+				<button type="button" class="taste-haupt" onclick={absagen}>Absagen</button>
+			</div>
+		</dialog>
+	{/if}
 {/if}

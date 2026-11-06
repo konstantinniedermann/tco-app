@@ -6,7 +6,7 @@ import type { AnlassFeld } from '../server/anlass/angaben.ts';
 import type { AnlassAdmin, AnlassListe } from '../server/anlass/anlaesse.ts';
 import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairgate.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
-import type { Rolle, VerwaltungsRolle } from '../server/admin/rollen.ts';
+import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
 import type { TurnierStatus } from '../server/db/schema.ts';
 import type { KategorieFeld, TurnierFeld } from '../server/turnier/angaben.ts';
 import type {
@@ -38,13 +38,15 @@ export type KategorieAnsicht = Json<NonNullable<Awaited<ReturnType<typeof Server
 export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus, VerwaltungsRolle };
 type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld;
 export type FairgateZeile = Json<ServerFairgateZeile>;
-export type { Angaben, Feld, MitgliedStatus, Rolle };
+export type { Angaben, AnsichtRolle, Feld, MitgliedStatus, Rolle, RollenListe };
 
 export type Antwort<T> =
 	| { art: 'ok'; daten: T }
 	| { art: 'abgemeldet' }
 	| { art: 'kein-admin' }
 	| { art: 'unbestaetigt' }
+	| { art: 'kein-recht' }
+	| { art: 'nur-ansehen' }
 	| { art: 'falsch' }
 	| { art: 'zu-viele' }
 	| { art: 'nicht-gefunden' }
@@ -69,6 +71,8 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 	if (status === 403) {
 		if (k.fehler === 'kein-admin') return { art: 'kein-admin' };
 		if (k.fehler === 'unbestaetigt') return { art: 'unbestaetigt' };
+		if (k.fehler === 'kein-recht') return { art: 'kein-recht' };
+		if (k.fehler === 'nur-ansehen') return { art: 'nur-ansehen' };
 	}
 	if (status === 404) return { art: 'nicht-gefunden' };
 	if (status === 429) return { art: 'zu-viele' };
@@ -118,6 +122,30 @@ export const fordereCodeAn = (holen: Holen = fetch) =>
 
 export const bestaetige = (code: string, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/zugang`, { code }, holen);
+
+/** Regel 2: wer welche Rolle hat (nur MyTCO-Admin). */
+export const ladeRollenListe = (holen: Holen = fetch) =>
+	lese<RollenListe>(`${ADMIN}/rollen`, holen);
+
+/**
+ * Schaltet «Ansicht als …» ein. Läuft schon eine Ansicht, beendet die Seite sie zuerst: Von einer
+ * Ansicht direkt in eine andere weist der Server ab (`nur-ansehen`).
+ */
+export async function schaueAls(
+	rolle: AnsichtRolle,
+	laufend: AnsichtRolle | null,
+	holen: Holen = fetch
+): Promise<Antwort<Record<string, never>>> {
+	if (laufend !== null) {
+		const ende = await beendeAnsicht(holen);
+		if (ende.art !== 'ok') return ende;
+	}
+	return schicke<Record<string, never>>(`${ADMIN}/ansicht`, { rolle }, holen);
+}
+
+/** Beendet die Ansicht dieser Sitzung; geht immer, auch ohne laufende Ansicht. */
+export const beendeAnsicht = (holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/ansicht/beenden`, {}, holen);
 
 export function ladeMitglieder(
 	filter: { suche?: string; status?: string },

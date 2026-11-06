@@ -6,6 +6,8 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	// «Ansicht als …» ist nur ansehen (UI-Leitbild, Baustein Nur lesen): Stand ohne Formular und Tasten.
+	const nurAnsehen = $derived(data.ansicht !== null);
 
 	// Nach dem Senden zeigt die Seite die neue Antwort, ohne neu zu laden.
 	let anlass = $derived<AnlassAnsicht | null>(data.anlass);
@@ -16,7 +18,7 @@
 	let fehler = $state<{ feld: 'antwort' | 'bemerkung' | 'formular'; text: string } | null>(null);
 
 	const zeigeFormular = $derived(
-		anlass !== null && anlass.offen && (anlass.antwort === null || bearbeiten)
+		!nurAnsehen && anlass !== null && anlass.offen && (anlass.antwort === null || bearbeiten)
 	);
 	// Ungespeichert (UI-Leitbild): Die Wahl oder die Bemerkung, die mitgeschickt würde, weicht
 	// von der gespeicherten Antwort ab.
@@ -113,7 +115,7 @@
 	{#if anlass.zuPruefen && !bearbeiten}
 		<div class="hinweis" role="status">
 			<strong>Datum oder Ort geändert, bitte prüfe deine Antwort</strong>
-			{#if anlass.offen}
+			{#if anlass.offen && !nurAnsehen}
 				<p>
 					<button type="button" class="taste-neben" onclick={bestaetige} disabled={laeuft}
 						>Antwort stimmt so</button
@@ -179,11 +181,16 @@
 			{#if anlass.bemerkung}
 				<p class="mehrzeilig">{anlass.bemerkung}</p>
 			{/if}
-			{#if anlass.offen && !anlass.zuPruefen}
+			{#if anlass.offen && !anlass.zuPruefen && !nurAnsehen}
 				<button type="button" class="taste-neben" onclick={aendern}>Antwort ändern</button>
 			{:else if !anlass.offen}
 				<p class="leise">Die Anmeldung ist geschlossen.</p>
 			{/if}
+		</section>
+	{:else if anlass.offen}
+		<section class="karte" aria-labelledby="kommst">
+			<h2 id="kommst">Kommst du?</h2>
+			<p class="leise">Noch keine Antwort.</p>
 		</section>
 	{:else}
 		<section class="karte" aria-labelledby="geschlossen">

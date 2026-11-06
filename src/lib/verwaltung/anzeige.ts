@@ -1,6 +1,20 @@
 // Texte der Verwaltung: Namen von Feldern, Rollen und Verlaufseinträgen, Zeitangaben.
-import type { FairgateZeile, Feld, MitgliedZeile, VerlaufEintrag } from './api.ts';
+import { MELDUNG } from '../login/anmelden.ts';
+import type { Antwort, FairgateZeile, Feld, MitgliedZeile, VerlaufEintrag } from './api.ts';
 import { ROLLEN_NAME } from './rollen-namen.ts';
+
+export const NUR_ANSEHEN = 'In der Ansicht kannst du nichts speichern.';
+const KEIN_RECHT = 'Das darfst du hier nur ansehen, nicht ändern.';
+
+/**
+ * Meldung für eine Antwort, die keine Seite eigens behandelt: In der Ansicht oder ohne
+ * Schreibrecht sagt sie, warum nichts gespeichert ist; sonst die Störung (UI-06).
+ */
+export function fehlerText(a: Antwort<unknown>): string {
+	if (a.art === 'nur-ansehen') return NUR_ANSEHEN;
+	if (a.art === 'kein-recht') return KEIN_RECHT;
+	return MELDUNG.stoerung;
+}
 
 export const FELD_NAMEN: Record<Feld, string> = {
 	mitgliedernummer: 'Mitgliedernummer',

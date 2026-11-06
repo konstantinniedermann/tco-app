@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { MELDUNG } from '../../../../../../lib/login/anmelden.ts';
 	import Kategorieformular, {
 		NEUE_KATEGORIE,
 		anfrage,
 		type KategorieWerte
 	} from '../../../../../../lib/verwaltung/Kategorieformular.svelte';
 	import { legeKategorieAn, type KategorieFeld } from '../../../../../../lib/verwaltung/api.ts';
+	import { fehlerText } from '../../../../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';
 
@@ -34,7 +34,7 @@
 		} else if (a.art === 'nicht-gefunden') {
 			allgemein = 'Dieses Turnier gibt es nicht mehr.';
 		} else {
-			allgemein = MELDUNG.stoerung;
+			allgemein = fehlerText(a);
 		}
 	}
 </script>

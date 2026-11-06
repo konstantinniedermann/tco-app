@@ -6,6 +6,7 @@
 	import { ROLLEN_NAME } from '../../../lib/verwaltung/rollen-namen.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 
+	let { data } = $props();
 	let suche = $state('');
 	let status = $state('');
 	let zeilen = $state<MitgliedZeile[]>([]);
@@ -62,7 +63,9 @@
 			<option value="geloescht">gelöscht</option>
 		</select>
 	</div>
-	<a class="taste-haupt" href={resolve('/verwaltung/mitglieder/neu')}>Mitglied anlegen</a>
+	{#if data.darfSchreiben.mitglieder}
+		<a class="taste-haupt" href={resolve('/verwaltung/mitglieder/neu')}>Mitglied anlegen</a>
+	{/if}
 </div>
 
 {#if fehler}

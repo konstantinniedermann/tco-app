@@ -2,7 +2,7 @@
 	import '../lib/design/tokens.css';
 	import '../lib/design/basis.css';
 	import { onMount } from 'svelte';
-	import { afterNavigate, beforeNavigate, goto, onNavigate } from '$app/navigation';
+	import { afterNavigate, beforeNavigate, goto, onNavigate, refreshAll } from '$app/navigation';
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
@@ -16,11 +16,14 @@
 	} from '../lib/ui/navigation.ts';
 	import { beobachteTastatur, schliesstNurTastatur } from '../lib/ui/tastatur.ts';
 	import { fragtVorWechsel, hatUngespeichertes } from '../lib/ui/ungespeichert.ts';
+	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 	import { raeumeWechselAuf } from '../lib/profil/wechselanfrage.ts';
 	import { APP_VERSION } from '../lib/version';
+	import { beendeAnsicht } from '../lib/verwaltung/api.ts';
+	import { ANSICHT_NAME } from '../lib/verwaltung/rollen-namen.ts';
 
-	let { children } = $props();
+	let { children, data } = $props();
 	const mitReiter = $derived(istReiterSeite(page.route.id));
 	// Fusszeile nur vor dem Login und auf der Startseite (UI-Leitbild, Baustein Fusszeile).
 	const mitFusszeile = $derived(zeigtFusszeile(page.route.id, page.error !== null));
@@ -102,6 +105,20 @@
 		});
 	});
 
+	// Band «Ansicht als …» (UI-Leitbild): «Beenden» kehrt zu den eigenen Rollen zurück, die Seite
+	// bleibt und lädt neu. Ist die Sitzung inzwischen weg, gibt es auch nichts mehr zu beenden.
+	let beendenLaeuft = false;
+	let beendenFehler = $state<string | null>(null);
+	async function beende() {
+		if (beendenLaeuft) return;
+		beendenLaeuft = true;
+		beendenFehler = null;
+		const a = await beendeAnsicht();
+		if (a.art === 'ok' || a.art === 'abgemeldet') await refreshAll();
+		else beendenFehler = MELDUNG.stoerung;
+		beendenLaeuft = false;
+	}
+
 	// Beim Start der App: abgelaufene oder kaputte Mail-Anfragen aus dem Gerätespeicher löschen.
 	onMount(() => {
 		const speicher = holeSpeicher();
@@ -122,6 +139,15 @@
 <div class={['statusleiste', { 'statusleiste-verwaltung': verwaltung }]}></div>
 
 <div class={['app', { schale: !verwaltung }]}>
+	{#if data.ansicht}
+		<aside class="ansicht-band" aria-label="Ansicht">
+			<p>Ansicht als {ANSICHT_NAME[data.ansicht]} — nur ansehen</p>
+			<button type="button" class="taste-neben" onclick={beende}>Beenden</button>
+			{#if beendenFehler}
+				<p class="fehler" role="alert">{beendenFehler}</p>
+			{/if}
+		</aside>
+	{/if}
 	{#if verwaltung}
 		{@render children()}
 	{:else}

@@ -18,7 +18,10 @@ import {
 	setzeTurnierStatus,
 	legeKategorieAn,
 	sageKategorieAb,
-	aendereKategorie
+	aendereKategorie,
+	beendeAnsicht,
+	ladeRollenListe,
+	schaueAls
 } from './api.ts';
 
 type Aufruf = { pfad: string; init: RequestInit };
@@ -36,6 +39,48 @@ function holer(antwort: Response | Error) {
 const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
 
 describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
+	it('Regel 3: 403 kein-recht und nur-ansehen kommen als eigene Antwort an', async () => {
+		const a = await speichereRollen(
+			1,
+			['cm'],
+			[],
+			holer(json(403, { fehler: 'kein-recht' })).holen
+		);
+		const b = await legeTurnierAn({}, holer(json(403, { fehler: 'nur-ansehen' })).holen);
+		expect([a, b]).toEqual([{ art: 'kein-recht' }, { art: 'nur-ansehen' }]);
+	});
+
+	it('Regel 2: Rollen-Übersicht liest /api/admin/rollen', async () => {
+		const liste = [{ rolle: 'cm', mitglieder: [{ id: 3, name: 'Muster, Hanna' }] }];
+		const h = holer(json(200, liste));
+		expect(await ladeRollenListe(h.holen)).toEqual({ art: 'ok', daten: liste });
+		expect(h.aufrufe[0].pfad).toBe('/api/admin/rollen');
+	});
+
+	it('Ansicht als …: einschalten schickt die Rolle; läuft schon eine, wird sie zuerst beendet', async () => {
+		const ohne = holer(json(200, {}));
+		expect(await schaueAls('cm', null, ohne.holen)).toEqual({ art: 'ok', daten: {} });
+		expect(ohne.aufrufe.map((a) => [a.pfad, a.init.body])).toEqual([
+			['/api/admin/ansicht', JSON.stringify({ rolle: 'cm' })]
+		]);
+
+		const mit = holer(json(200, {}));
+		await schaueAls('mitglied', 'cm', mit.holen);
+		expect(mit.aufrufe.map((a) => a.pfad)).toEqual([
+			'/api/admin/ansicht/beenden',
+			'/api/admin/ansicht'
+		]);
+
+		// Lässt sich die laufende Ansicht nicht beenden, schaltet die Seite keine neue ein.
+		const kaputt = holer(new Error('Netz weg'));
+		expect(await schaueAls('mitglied', 'cm', kaputt.holen)).toEqual({ art: 'stoerung' });
+		expect(kaputt.aufrufe).toHaveLength(1);
+
+		const ende = holer(json(200, {}));
+		expect(await beendeAnsicht(ende.holen)).toEqual({ art: 'ok', daten: {} });
+		expect(ende.aufrufe[0].init.method).toBe('POST');
+	});
+
 	it('RR-07: 401 wird abgemeldet, 403 kein-admin und unbestaetigt bleiben getrennt', async () => {
 		const a = await ladeZugang(holer(json(401, { fehler: 'abgemeldet' })).holen);
 		const b = await ladeZugang(holer(json(403, { fehler: 'kein-admin' })).holen);

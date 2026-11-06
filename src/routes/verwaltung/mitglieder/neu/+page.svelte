@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { MELDUNG } from '../../../../lib/login/anmelden.ts';
 	import Angabenformular, {
 		LEERE_WERTE,
 		type Werte
 	} from '../../../../lib/verwaltung/Angabenformular.svelte';
 	import { legeMitgliedAn, type Feld } from '../../../../lib/verwaltung/api.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
-	import { VERGEBEN } from '../../../../lib/verwaltung/anzeige.ts';
+	import { VERGEBEN, fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
 
 	let fehler = $state<Partial<Record<Feld, string>>>({});
 	let allgemein = $state<string | null>(null);
@@ -29,7 +28,7 @@
 		} else if (a.art === 'vergeben') {
 			fehler = { [a.feld]: VERGEBEN[a.feld as 'email' | 'mitgliedernummer'] };
 		} else {
-			allgemein = MELDUNG.stoerung;
+			allgemein = fehlerText(a);
 		}
 	}
 </script>

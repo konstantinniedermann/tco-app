@@ -2,11 +2,17 @@
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { schliesstNurTastatur } from '../../lib/ui/tastatur.ts';
-	import { siehtMitglieder, startziel } from '../../lib/verwaltung/umleiten.ts';
+	import { BEREICHE } from '../../lib/verwaltung/bereiche.ts';
+	import { ROLLEN_NAME } from '../../lib/verwaltung/rollen-namen.ts';
+	import { nurAnsehen, startziel } from '../../lib/verwaltung/umleiten.ts';
 
 	let { children, data } = $props();
 	const aktuell = (pfad: string) => (page.route.id?.startsWith(pfad) ? 'page' : undefined);
-	const istAdmin = $derived(siehtMitglieder(data.rollen));
+	// Hinweis «Nur ansehen» (UI-Leitbild): die Rolle liest den Bereich dieser Seite, schreibt aber nicht.
+	const nurLesend = $derived(nurAnsehen(page.url.pathname, data.rollen, data.ansicht !== null));
+	const schreibtHier = $derived(
+		nurLesend === null ? null : ROLLEN_NAME[BEREICHE[nurLesend].schreiben[0]]
+	);
 </script>
 
 <svelte:head>
@@ -24,8 +30,8 @@
 				><img class="kopf-wappen" src={asset('wappen.svg')} alt="" /></a
 			>MyTCO Verwaltung
 		</div>
-		{#if istAdmin}
-			<div class="seitenleiste-bereich">Admin</div>
+		{#if data.darfLesen.mitglieder}
+			<div class="seitenleiste-bereich">Mitgliederverwaltung</div>
 			<a href={resolve('/verwaltung/mitglieder')} aria-current={aktuell('/verwaltung/mitglieder')}
 				>Mitglieder</a
 			>
@@ -39,14 +45,26 @@
 				>Änderungsverlauf</a
 			>
 		{/if}
-		<div class="seitenleiste-bereich">Clubmeisterschaft</div>
-		<a href={resolve('/verwaltung/turniere')} aria-current={aktuell('/verwaltung/turniere')}
-			>Turniere</a
-		>
+		{#if data.darfLesen.cm}
+			<div class="seitenleiste-bereich">Clubmeisterschaft</div>
+			<a href={resolve('/verwaltung/turniere')} aria-current={aktuell('/verwaltung/turniere')}
+				>Turniere</a
+			>
+		{/if}
+		{#if data.darfLesen.rollen}
+			<div class="seitenleiste-bereich">MyTCO</div>
+			<a href={resolve('/verwaltung/rollen')} aria-current={aktuell('/verwaltung/rollen')}>Rollen</a
+			>
+		{/if}
 		<div class="seitenleiste-bereich">&nbsp;</div>
 		<a href={resolve('/')}>‹ Zur App</a>
 	</nav>
 	<main class="inhalt">
+		{#if schreibtHier}
+			<div class="hinweis">
+				<p><strong>Nur ansehen.</strong> Ändern kann hier nur der {schreibtHier}.</p>
+			</div>
+		{/if}
 		{@render children()}
 	</main>
 </div>

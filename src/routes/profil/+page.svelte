@@ -27,6 +27,8 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	// «Ansicht als …» ist nur ansehen (UI-Leitbild, Baustein Nur lesen): keine Taste, die speichert.
+	const nurAnsehen = $derived(data.ansicht !== null);
 
 	// Meine Angaben (A-KONTO-01, A-KONTO-02, Variante A): jede Angabe als Text mit «Ändern»; «Ändern» öffnet
 	// die Felder dieser einen Angabe an Ort und Stelle, nie zwei zugleich (UI-04).
@@ -289,7 +291,9 @@
 					<span class="leise">zugleich dein Login</span>
 				</span>
 				<!-- Annahme K-19.1: Die E-Mail ändert das Mitglied selbst, mit zwei Codes. -->
-				<a class="taste-neben" href={resolve('/profil/email')}>Ändern</a>
+				{#if !nurAnsehen}
+					<a class="taste-neben" href={resolve('/profil/email')}>Ändern</a>
+				{/if}
 			</div>
 			{@render angabe('telefon', 'Telefon', angaben.telefon, false)}
 			{@render angabe(
@@ -351,13 +355,15 @@
 				{#if freiwillig}<span class="leise">(freiwillig)</span>{/if}<br />
 				{#if wert}{wert}{:else}<span class="leise">nicht erfasst</span>{/if}
 			</span>
-			<button
-				type="button"
-				class="taste-neben"
-				bind:this={aendernKnoepfe[a]}
-				onclick={() => oeffne(a)}
-				aria-describedby={veraltetBei === a ? 'angaben-veraltet' : undefined}>Ändern</button
-			>
+			{#if !nurAnsehen}
+				<button
+					type="button"
+					class="taste-neben"
+					bind:this={aendernKnoepfe[a]}
+					onclick={() => oeffne(a)}
+					aria-describedby={veraltetBei === a ? 'angaben-veraltet' : undefined}>Ändern</button
+				>
+			{/if}
 		</div>
 		{#if veraltetBei === a}
 			<p class="fehler" id="angaben-veraltet" role="alert">{MELDUNG_PROFIL.veraltet}</p>
@@ -383,7 +389,9 @@
 							>eingerichtet am {datum(p.eingerichtetAm)} · zuletzt {zuletzt(p.zuletztBenutzt)}</span
 						>
 					</span>
-					{#if fragtNach === p.kennung}
+					{#if nurAnsehen}
+						<!-- Nur ansehen: kein Entfernen -->
+					{:else if fragtNach === p.kennung}
 						<span role="group" aria-labelledby="nachfrage-{p.kennung}">
 							<span id="nachfrage-{p.kennung}">Wirklich entfernen?</span>
 							<button type="button" class="taste-neben" onclick={() => entfernen(p.kennung)}
@@ -412,7 +420,7 @@
 				</p>
 			{/each}
 		{/if}
-		{#if passkeyMoeglich}
+		{#if passkeyMoeglich && !nurAnsehen}
 			<button
 				type="button"
 				class="taste-neben taste-breit"

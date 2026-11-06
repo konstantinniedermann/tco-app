@@ -139,9 +139,9 @@ test('RR-07, A-ROLLE-07, A-TURNIER-01, A-TURNIER-02, A-TURNIER-03, A-ANMELDUNG-0
 	expect(fehler).toEqual([]);
 });
 
-test('RR-07: cm ohne Admin wird von /verwaltung/mitglieder zu den Turnieren geleitet', async ({
+test('RR-07: cm ohne Admin wird von /verwaltung/mitglieder zu den Turnieren geleitet, auch das Wappen führt dorthin', async ({
 	page
-}) => {
+}, info) => {
 	const fehler = sammleKonsolenfehler(page);
 	const cm = await legeCmMitBriefCodeAn('Dario');
 	await meldeAn(page, cm);
@@ -159,5 +159,14 @@ test('RR-07: cm ohne Admin wird von /verwaltung/mitglieder zu den Turnieren gele
 	await expect(page).toHaveURL(/\/verwaltung\/turniere$/);
 	await expect(page.getByRole('heading', { level: 1, name: 'Clubmeisterschaft' })).toBeVisible();
 	await expect(seitenleiste(page).getByRole('link', { name: 'Mitglieder' })).toHaveCount(0);
+	await expect(seitenleiste(page).getByRole('link', { name: 'Rollen' })).toHaveCount(0);
+
+	// Das Wappen führt zur ersten Seite der Verwaltung, für nur `cm` zu den Turnieren.
+	await page.getByRole('link', { name: 'Neues Turnier' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Neues Turnier' })).toBeVisible();
+	await page.getByRole('link', { name: 'Zur Startseite', exact: true }).click();
+	await expect(page).toHaveURL(/\/verwaltung\/turniere$/);
+	await expect(page.getByRole('heading', { level: 1, name: 'Clubmeisterschaft' })).toBeVisible();
+	await pruefeBildschirm(page, info, 'cm-wappen-turniere');
 	expect(fehler).toEqual([]);
 });

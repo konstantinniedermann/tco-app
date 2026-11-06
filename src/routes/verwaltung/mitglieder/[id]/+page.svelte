@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { MELDUNG } from '../../../../lib/login/anmelden.ts';
 	import Angabenformular, {
 		werteAus,
 		type Werte
@@ -18,7 +17,8 @@
 		aktionText,
 		plakette,
 		tagText,
-		zeitText
+		zeitText,
+		fehlerText
 	} from '../../../../lib/verwaltung/anzeige.ts';
 	import { ROLLEN_NAME } from '../../../../lib/verwaltung/rollen-namen.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
@@ -65,7 +65,7 @@
 		} else if (a.art === 'veraltet') {
 			veraltetBei = JSON.stringify(angaben);
 		} else {
-			angabenStoerung = MELDUNG.stoerung;
+			angabenStoerung = fehlerText(a);
 		}
 	}
 
@@ -79,7 +79,9 @@
 
 	// Rollen: «Mitglied» hat jedes Konto, die übrigen vergibt nur der MyTCO-Admin.
 	const WAHL: Rolle[] = ['mytco', 'mitglieder', 'cm', 'lizenz'];
-	const darfRollen = $derived(data.rollen.includes('mytco'));
+	const darfRollen = $derived(data.darfSchreiben.rollen);
+	// Regel 3: Der MyTCO-Admin liest die Angaben, ändern kann sie nur der Mitglieder-Admin.
+	const nurLesen = $derived(!data.darfSchreiben.mitglieder);
 	// Die Auswahl wird nur neu gesetzt, wenn sich die gespeicherten Rollen ändern; ungespeicherte
 	// Häkchen überstehen ein Neuladen nach «Angaben speichern».
 	const rollenSchluessel = $derived([...detail.rollen].sort().join(','));
@@ -142,7 +144,7 @@
 		} else if (a.art === 'veraltet') {
 			rollenVeraltetBei = rollenSchluessel;
 		} else {
-			rollenFehler = MELDUNG.stoerung;
+			rollenFehler = fehlerText(a);
 		}
 	}
 
@@ -162,7 +164,7 @@
 			sitzungenMeldung = 'Alle Sitzungen beendet.';
 			await invalidateAll();
 		} else {
-			sitzungenFehler = MELDUNG.stoerung;
+			sitzungenFehler = fehlerText(a);
 		}
 	}
 
@@ -209,6 +211,7 @@
 					knopf="Angaben speichern"
 					nurBeiAenderung
 					rueckmeldung={angabenMeldung}
+					{nurLesen}
 					onspeichern={speichereWerte}
 				/>
 			{/key}
@@ -257,14 +260,16 @@
 				></summary
 			>
 			<p>{loginText} {geraeteText}</p>
-			<div class="leiste">
-				<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}
-					>Alle Sitzungen beenden</button
-				>
-			</div>
-			<p class="leise" role="status">{sitzungenMeldung ?? ''}</p>
-			{#if sitzungenFehler}
-				<p class="fehler" role="alert">{sitzungenFehler}</p>
+			{#if !nurLesen}
+				<div class="leiste">
+					<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}
+						>Alle Sitzungen beenden</button
+					>
+				</div>
+				<p class="leise" role="status">{sitzungenMeldung ?? ''}</p>
+				{#if sitzungenFehler}
+					<p class="fehler" role="alert">{sitzungenFehler}</p>
+				{/if}
 			{/if}
 		</details>
 

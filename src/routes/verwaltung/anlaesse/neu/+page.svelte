@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { MELDUNG } from '../../../../lib/login/anmelden.ts';
 	import Anlassformular, {
 		LEERER_ANLASS,
 		type AnlassWerte
 	} from '../../../../lib/verwaltung/Anlassformular.svelte';
 	import { legeAnlassAn, type AnlassFeld } from '../../../../lib/verwaltung/api.ts';
+	import { fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 
 	let fehler = $state<Partial<Record<AnlassFeld, string>>>({});
@@ -26,7 +26,7 @@
 		} else if (a.art === 'eingabe') {
 			fehler = a.felder;
 		} else {
-			allgemein = MELDUNG.stoerung;
+			allgemein = fehlerText(a);
 		}
 	}
 </script>
