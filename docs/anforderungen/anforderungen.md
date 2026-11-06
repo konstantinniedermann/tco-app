@@ -218,7 +218,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später. Zuerst als installierbare Web-App, die Store-App ist N-APP-04 | Ziel, PDF 1 | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
+| N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später. Zuerst als installierbare Web-App, die Store-App ist N-APP-04 | Ziel, PDF 1 | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)); Mitteilungen an Anlass und Verein: #63 (FR-40 bis FR-45), die Clubmeisterschaft folgt | geplant |
 | N-APP-02 | Benachrichtigungen per Push und E-Mail | Ziel, PDF 5b | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
 | N-APP-03 | Die Admin-Rollen arbeiten in einer eigenen Verwaltung, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Bereiche zeigt (RR-07) | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | umgesetzt\* (Mitglieder-, CM- und MyTCO-Admin, #43, #57; Lizenz mit ihrer Etappe) |
 | N-APP-04 | MyTCO ist als App im App Store und bei Google Play erhältlich | Ziel | später ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | später |

@@ -102,6 +102,9 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Eigene Anmeldung zum Anlass, bis Anmeldeschluss (FR-28) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Anmeldungen aller zum Anlass: Name, Antwort, Bemerkung (Annahme K-50) | – | – | – | – | L | L |
 | Kalenderdatei eines Anlasses, ohne Personendaten (SI-19) | L über den Link | L | L | L | L | L |
+| Mitteilung zum Anlass senden, Verlauf (FR-42) | – | – | – | – | S | L |
+| **Verein** | | | | | | |
+| Mitteilung an den Verein senden, Verlauf (FR-42) | – | – | – | – | S | L |
 
 Beim MyTCO-Admin heisst **L**: in der Verwaltung lesen, nicht absenden; als Mitglied hat er
 daneben die Rechte der Spalte *Mitglied*.
