@@ -8,6 +8,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Architektur als arc42 in `docs/arc42.md`: Ziele, Kontext mit Nachbarsystemen, Lösungsstrategie,
+  Bausteine, Server, Querschnittskonzepte und Risiken, mit Verweisen auf die Einzeldokumente (#14).
 - Warum MyTCO ohne Anbindung an Fairgate läuft, steht jetzt als
   [ADR-006](adr/adr-006-eigenstaendig-ohne-fairgate.md) mit Optionen, Konsequenzen und
   Reevaluations-Triggern (#16).
