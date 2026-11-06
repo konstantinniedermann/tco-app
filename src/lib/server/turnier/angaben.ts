@@ -51,7 +51,7 @@ const MELDUNG = {
 	nummern: 'Die Turniernummern kommen als Liste mit Bezeichnung und Nummer.',
 	bezeichnung: `Bitte eine Bezeichnung angeben (höchstens ${MAX_BEZEICHNUNG} Zeichen).`,
 	nummer: `Turniernummern bestehen nur aus Ziffern (höchstens ${MAX_NUMMER}).`,
-	geschlecht: 'Bitte Herren, Damen, Mixed oder Offen wählen.',
+	geschlecht: 'Bitte ein Geschlecht wählen.',
 	art: 'Bitte Einzel oder Doppel wählen.',
 	mixed: 'Mixed gibt es nur im Doppel.',
 	klassierung: 'Bitte eine Klassierung von N1 bis R9 wählen.',
