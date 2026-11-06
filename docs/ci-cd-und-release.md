@@ -348,7 +348,8 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
   (`package.json`, `package-lock.json` und ein eigener Abschnitt zuoberst in den
   [Versionen](versionen.md)). Reine Doku (Regel aus `nur-doku.ts`) lässt die Nummer stehen.
   Die Nummer vergibt, wer mergt, nicht der Feature-Branch: So beanspruchen zwei parallele
-  Sessions nie dieselbe Nummer. Der Pre-Push-Hook weist einen Push auf `dev` ab, in dem ein
+  Sessions nie dieselbe Nummer (Begründung:
+  [ADR-007](adr/adr-007-version-pro-merge.md)). Der Pre-Push-Hook weist einen Push auf `dev` ab, in dem ein
   Merge mit Code die Version nicht um genau einen Schritt erhöht oder sein Abschnitt fehlt
   (`version-merge.ts`); was schon auf `main` liegt, prüft er nicht. Weil der Hook nur lokal
   läuft, werden auch die PRs von Dependabot im Hauptordner gemergt, nicht auf GitHub.
