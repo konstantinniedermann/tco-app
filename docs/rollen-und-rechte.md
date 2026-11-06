@@ -20,6 +20,13 @@ Welche Rollen MyTCO kennt und wer was sehen und ändern darf — für die Etappe
 
 Der Vorstand hat die Rollen bestätigt und will zwei Admins (K-18.1, K-18.3). Wer diese Rollen im Verein übernimmt, klärt K-18.2.
 
+**Geplant (Vorschlag K-18.4):** «Admin» teilt sich in vier Admin-Rollen, die einzeln vergeben
+werden: *MyTCO-Admin* (technischer Betrieb, vergibt Rollen, sieht alles, ändert nichts, *Ansicht
+als …*), *Mitglieder-Admin* (Mitgliederdaten, Briefe, Anlässe), *CM-Admin* (heute
+CM-Verantwortlicher) und *Lizenz-Admin* (heute Lizenzverantwortlicher). Die Stellvertretung
+nach RR-02 entfällt dann. Bis zum Umbau gelten die Tabellen hier unverändert; Einzelheiten im
+[Design Rollen schärfen](superpowers/specs/2026-11-06-rollen-schaerfen-design.md).
+
 ## Grundsätze
 
 **Status:** `geplant` · `umgesetzt` (mit Test, siehe [Testkonzept](testkonzept.md#anforderung--testfall))
@@ -92,6 +99,6 @@ Neue Rollen und Rechte kommen erst in diese Matrix und, wo sie Personendaten zei
 
 ## Offene Fragen an den Verein
 
-K-08 (Konten der Junioren), K-16.1 (Briefversand), K-18.2 (wer übernimmt welche Rolle) —
+K-08 (Konten der Junioren), K-16.1 (Briefversand), K-18.2 und K-18.4 (Admin-Rollen und wer sie übernimmt) —
 alle in den [Abklärungen](abklaerungen.md). Was schon entschieden ist, steht unter
 [Beantwortet](abklaerungen.md#beantwortet).
