@@ -45,7 +45,8 @@ Nummern beim Nachführen dort vergeben.
    Schnittstellen prüfen das selbst; ein ausgeblendeter Knopf reicht nicht.
 4. **Keine stille Stellvertretung:** Die Regel «Admin darf alles, was die Verantwortlichen
    dürfen» (RR-02) entfällt. Muss jemand einspringen, gibt der MyTCO-Admin sich oder einer
-   anderen Person die Rolle. Das steht dann im Änderungsverlauf.
+   anderen Person die Rolle. Das steht dann im Änderungsverlauf. Das ändert die Antwort des
+   Vorstands auf K-18.1 («der Admin vertritt die anderen»); K-18.4 sagt das ausdrücklich.
 5. **Mindestens ein MyTCO-Admin:** Der letzte kann sich die Rolle nicht entziehen und sein Konto
    nicht löschen (wie RR-03). Technisch geprüft wird nur diese Untergrenze von einem. Dass der
    Verein zwei MyTCO-Admins will (K-18.3), ist eine Abmachung, keine Sperre (Entscheid des
@@ -66,6 +67,9 @@ Nummern beim Nachführen dort vergeben.
    Sitzungen beenden, Austritt erfassen und löschen. Damit könnte er sich in das Konto eines
    MyTCO-Admins einloggen und sich Rollen geben. Unter Vereinsmitgliedern angenommen; ins
    Sicherheitskonzept als Restrisiko, der Änderungsverlauf zeigt jede solche Aktion.
+   **Voraussetzung für den Umbau:** der Hinweis an die alte Adresse, wenn jemand anders die
+   E-Mail eines Kontos ändert (SI-09, heute noch nicht gebaut). So merkt der Betroffene die
+   Übernahme, statt dass sie nur im Verlauf steht.
 
 ## Ansicht als …
 
@@ -76,7 +80,8 @@ dieser Rolle sieht, mit seinem eigenen Konto als Person.
 - **Nur ansehen,** in jeder Umgebung gleich (lokal, Test, Live). Die Ansicht ist ein Zustand der
   Sitzung auf dem Server. Solange sie läuft, weist jede Schnittstelle, die etwas speichert, die
   Anfrage ab, auch ausserhalb der Verwaltung und auch Eigenes (eigene Angaben, eigene
-  Anmeldung). Es reicht nicht, sich auf Regel 3 zu verlassen: Ein Konto kann zusätzlich
+  Anmeldung). Ausgenommen sind nur *Beenden* der Ansicht, Logout und die Bestätigung der
+  Verwaltung per Mail-Code (SI-08). Es reicht nicht, sich auf Regel 3 zu verlassen: Ein Konto kann zusätzlich
   Mitglieder-Admin sein und hat immer die Rechte von *Mitglied* (Entscheid des Bauenden, aus
   «nur ansehen» abgeleitet). Zum Ausprobieren mit Klicken dienen die erfundenen Testkonten
   (`make seed`, Test).
@@ -96,17 +101,21 @@ Die Spalte *Admin* in [Rollen und Rechte](../../rollen-und-rechte.md#matrix) tei
 | Änderungsverlauf | L | L |
 | Liste *Für Fairgate* | S | L |
 | E-Mail und Telefon aller Mitglieder | S | L |
-| Anlässe erstellen, Anmeldungen aller sehen | S | L |
+| Anlässe erstellen, ändern, löschen | S | L |
+| Anmeldungen aller zum Anlass (Name, Antwort, Bemerkung) | L | L |
 | CM- und Lizenzbereich | wie Mitglied | L |
 
 CM-Admin und Lizenz-Admin übernehmen die Spalten der heutigen Verantwortlichen unverändert.
 
 ## Datenschutz (vor dem Bau nachführen)
 
-- *Wer sieht was:* Neu sieht der MyTCO-Admin alle Daten, ohne sie ändern zu dürfen. Das ist
-  vertretbar, weil diese Personen über den Server ohnehin Zugriff auf die Datenbank haben. In
-  der App wird der Zugriff nur sichtbar und begrenzt. In die Datenschutzerklärung: wer die
-  Rollen hat und was sie sehen.
+- *Wer sieht was:* Neu sieht der MyTCO-Admin alle Daten, ohne sie ändern zu dürfen, auch
+  Bemerkungen zur GV und Wildcard-Kommentare. **Zweck:** Unterstützung der anderen Rollen,
+  Fehlersuche und Prüfung der Rollenvergabe (DS «nur für ihre Aufgabe»). Darum erhalten die
+  Rolle nur Personen, die MyTCO auch technisch betreuen (Projektleiter und seine Stellvertretung
+  nach K-04.2/K-05, vgl. SI-16), nicht weitere Vorstandsmitglieder. Diese Regel gilt für den
+  Verein; die App erzwingt sie nicht (Entscheid des Bauenden). In die Datenschutzerklärung: wer
+  die Rollen hat, was sie sehen und wozu.
 - Die Mitglieder-Admins sehen, was heute der Admin sieht, ausser der Rollenvergabe.
 - Briefe: Hinweis zum Löschen einer gesicherten Datei nach dem Druck (Regel 8).
 - Sicherheitskonzept: Restrisiko aus Regel 9 aufnehmen.
@@ -129,8 +138,10 @@ CM-Admin und Lizenz-Admin übernehmen die Spalten der heutigen Verantwortlichen 
 (A-ROLLE-01, -02 umschreiben, A-ROLLE-07, -08 umbenennen, neue Anforderung *Ansicht als*;
 Änderungsprotokoll), [Glossar](../../glossar.md), [Fachmodell](../../fachmodell.md),
 [Datenschutz](../../datenschutz.md), [Datenschutzerklärung](../../datenschutzerklaerung.md),
-[Sicherheitskonzept](../../sicherheitskonzept.md) (SI-08). Oberfläche: Band *Ansicht als* erst
-ins [UI-Leitbild](../../ui-leitbild.md).
+[Sicherheitskonzept](../../sicherheitskonzept.md) (SI-08, SI-09, SI-12, B-04, B-08, Restrisiko
+aus Regel 9), [Design GV-Anmeldung](2026-11-05-gv-anmeldung-design.md) (Admin → Mitglieder-Admin),
+[Design CM-Anmeldung](2026-11-06-cm-anmeldung-design.md) («darf auch der Admin» → nur lesen).
+Oberfläche: Band *Ansicht als* erst ins [UI-Leitbild](../../ui-leitbild.md).
 
 ## Nicht-Ziele
 
@@ -148,5 +159,6 @@ Ansicht. Screenshot, axe ohne Verstösse.
 
 ## Offene Fragen an den Verein
 
-K-18.4 (wer übernimmt welche der neuen Rollen; ersetzt den ersten Vorschlag in K-18.2),
+K-18.4 (wer übernimmt welche der neuen Rollen; ersetzt den ersten Vorschlag in K-18.2 und
+ändert die Antwort auf K-18.1, weil die Stellvertretung durch den Admin entfällt),
 K-16.1 (Briefversand ohne Rolle, Vorschlag).
