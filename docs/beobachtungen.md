@@ -211,6 +211,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Entweder als lokaler Einrichtungsbefehl in README/Makefile nennen oder entfernen; eine Änderung an `package.json` zählt als Code und bringt eine Versionsnummer, daher mit dem nächsten Code-Merge erledigen.
 
+**Nachtrag (06.11.2026):** Die CI installiert gar nichts mehr, die E2E-Jobs laufen im Playwright-Image (`fix/ci-playwright-container`). `e2e:browser` bleibt damit erst recht ungenutzt; lokal installiert die README die Browser mit `playwright install chromium webkit`.
+
 ### 2026-11-06 — Live-Schlüssel könnte jetzt in einer Deployment-Umgebung nur für main liegen
 
 **Thema:** Betrieb

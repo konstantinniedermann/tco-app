@@ -86,12 +86,13 @@ jobs:
           echo "Basis: ${basis:-keine} -> code=${code}"
           echo "code=${code}" >> "$GITHUB_OUTPUT"
       # Version für das Image der E2E-Jobs, aus dem geprüften Stand: So zieht das Image mit, wenn
-      # Dependabot Playwright aktualisiert. Nur eine reine Versionsnummer wird weitergegeben.
+      # Dependabot Playwright aktualisiert. Nur eine reine Versionsnummer wird weitergegeben
+      # (Prüfung über den ganzen Wert: grep liesse eine zweite Zeile durch).
       - name: Playwright-Version lesen
         id: playwright
         run: |
           version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")
-          if ! printf '%s\n' "$version" | grep -Eqx '[0-9]+\.[0-9]+\.[0-9]+'; then
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Playwright-Version nicht lesbar: $version"
             exit 1
           fi

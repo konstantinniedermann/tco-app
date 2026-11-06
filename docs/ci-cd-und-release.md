@@ -351,6 +351,11 @@ unabhängig davon.
   Schadpakete und bricht die CI ab.
 - **Updates:** Dependabot schlägt wöchentlich Updates für npm, Docker-Images und GitHub
   Actions vor, als PR auf `dev`. Hauptversionen werden einzeln geprüft.
+- **Playwright-Image in der CI** (`mcr.microsoft.com/playwright:v<Version>-noble`, freigegeben
+  vom Projektleiter am 06.11.2026): Die E2E-Jobs laufen darin, weil die Installation der
+  Systempakete über apt immer wieder am langsamen Ubuntu-Spiegel hing. Die Version liest der
+  Job `aenderung` aus der Lock-Datei (`@playwright/test`); ein Update von Playwright durch
+  Dependabot zieht das Image also mit. Kein eigener Eintrag bei Dependabot.
 - **Keine Hauptversionen von Node, PostgreSQL und Caddy** über Dependabot (dort ausgeschlossen).
   Die Node-Hauptversion wird mit `engines` (`package.json`) und `.nvmrc` von Hand gewechselt.
   Eine neue Hauptversion von PostgreSQL liest die Daten von Live nicht: Auf Test (leere
