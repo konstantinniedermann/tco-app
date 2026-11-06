@@ -111,6 +111,22 @@ die niemand bearbeiten kann.
 8. **Abmelden:** bis zum Anmeldeschluss selbst (FR-10, Annahme K-29); danach zeigt die Seite die
    Anmeldungen nur an.
 
+**Präzisierungen vor dem Bau (06.11.2026):**
+
+- **Geschlecht und Jahrgang sind Pflicht** wie die Klassierung: Fehlt eines, erscheinen die
+  Kategorien erst nach dem Eintrag. Wer nicht will, lässt sich vom CM-Admin anmelden (Teil 4)
+  (Entscheid Projektleiter).
+- **Doppel-Kategorien sind ausgeblendet**, bis Teil 3 das Doppel bringt (Entscheid
+  Projektleiter).
+- **Früher geschlossen sperrt auch das Abmelden:** Massgeblich ist der wirksame Status
+  *Anmeldung geschlossen* (von Hand oder durch den Anmeldeschluss), nicht nur das Datum
+  (Entscheid Claude; `wirksamerStatus` aus Teil 1).
+- **Nicht auf die Liste «Für Fairgate»:** Selbst eingetragenes Geschlecht und Jahrgang erscheinen
+  dort nicht; Fairgate hat beides schon (Entscheid Claude).
+- **Übergang bis Teil 4:** Der CM-Admin sieht die Anmeldungen noch nicht als Liste und kann eine
+  Kategorie mit aktiven Anmeldungen nicht absagen. Das wird in Kauf genommen; live geht MyTCO
+  erst mit dem Server (#39), und Teil 3 und 4 kommen vor dem 15.04.2027 (Entscheid Claude).
+
 ### Teil 3 — Doppel
 
 1. **Partner wählen:** In einer Doppelkategorie wählt der Spieler den Partner über ein Suchfeld.
@@ -212,8 +228,10 @@ und der Hinweis zu den Kontaktdaten. Neu und nachzuführen (Konzept und Datensch
   geht bis zum Anmeldeschluss (Entscheid Projektleiter). Ergänzt *Kontaktdaten* im Konzept.
 - Mitglieder tragen fehlendes Geschlecht und fehlenden Jahrgang einmal selbst ein (beides steht
   schon unter *Welche Daten*).
-- **Löschfrist für CM-Anmeldungen** ist im Konzept nicht festgelegt. Vorschlag: wie Resultate,
-  der Name bleibt in vergangenen Turnieren. Klären, bevor Teil 2 live geht.
+- **Löschfrist für CM-Anmeldungen** (Entscheid Projektleiter, 06.11.2026, vor Teil 2): Die
+  Anmeldungen bleiben beim vergangenen Turnier, wie Resultate. Wird ein Mitglied gelöscht,
+  bleibt in seinen Anmeldungen nur der Name. Grund: Die Turniergeschichte mit Namen und
+  Resultaten ist ohnehin jahrelang öffentlich bei Swiss Tennis einsehbar.
 
 Alle Testdaten sind erfunden (DS-08).
 
@@ -235,6 +253,12 @@ Seite; *Kategorie absagen* steht dort in einer eigenen Karte. Seitenleiste: Bere
 *Clubmeisterschaft* mit dem Eintrag *Turniere*; wer nur `cm` hat, sieht nur diesen Bereich.
 Status-Plaketten: *in Vorbereitung* `plakette-offen`, *Anmeldung offen* `plakette-ok`,
 *Anmeldung geschlossen* `plakette-gesperrt`. Kein neuer Baustein.
+
+**Teil 2 (Entscheid Projektleiter, 06.11.2026):** ohne eigenen Design-Entwurf. Die
+Startseiten-Kachel, die CM-Seite, die Abfrage von Klassierung, Geschlecht und Jahrgang und die
+Warnung im Kategorie-Formular entstehen direkt aus den Bausteinen des UI-Leitbilds. Nachweis
+per Playwright-Screenshot auf iPhone und Android und mit axe. Fehlt ein Baustein, kommt er
+trotzdem zuerst ins Leitbild.
 
 ## Nicht-Ziele
 
