@@ -12,6 +12,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   schon drin. Die Installation über apt fällt weg; sie hing immer wieder am langsamen
   Ubuntu-Spiegel. Die Image-Version folgt Playwright aus `package-lock.json`.
 
+## 0.7.1 — Kein alter Stand nach dem Speichern
+
+- Korrektur: Nach dem Speichern zeigte die nächste Seite manchmal noch den alten Stand, etwa
+  eine eben abgesagte Kategorie als offen. Die App lud Seiten schon beim Überfahren eines
+  Links mit der Maus vor; jetzt erst beim Antippen bzw. Klicken, und die Rücksprünge nach dem
+  Speichern laden immer frisch.
+
 ## 0.7.0 — Rollen schärfen
 
 - Rollen geschärft (#43): Statt «Admin» gibt es vier Admin-Rollen, einzeln vergeben:

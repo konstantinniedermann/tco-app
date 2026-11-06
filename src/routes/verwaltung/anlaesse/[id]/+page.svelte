@@ -69,7 +69,7 @@
 		laeuft = false;
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok' || a.art === 'nicht-gefunden') {
-			await goto(resolve('/verwaltung/anlaesse'));
+			await goto(resolve('/verwaltung/anlaesse'), { refreshAll: true });
 		} else {
 			allgemein = fehlerText(a);
 		}
