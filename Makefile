@@ -4,7 +4,10 @@
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
 
-check: docs voraussetzungen voraussetzungen-docker ## Alle Prüfungen wie in der CI, ausser Secret-Scan (Hook), OSV-Malware-Prüfung und Rauchtest (nur CI)
+# Grün gemerkt wird nur ein sauberer, während der Prüfung unveränderter Stand (scripts/pruefungen/gruener-stand.ts);
+# der Pre-Push-Hook lässt make check für ihn aus.
+check: docs voraussetzungen voraussetzungen-docker ## Alle Prüfungen wie in der CI, ausser Secret-Scan (Hook), OSV-Malware-Prüfung und Rauchtest (nur CI); merkt sich den Stand, wenn grün
+	@node scripts/pruefungen/gruener-stand.ts beginn
 	npm run lint
 	npm run check:svelte
 	npm run pruefungen
@@ -13,6 +16,7 @@ check: docs voraussetzungen voraussetzungen-docker ## Alle Prüfungen wie in der
 	npm run build:spa
 	$(MAKE) e2e
 	$(MAKE) image
+	@node scripts/pruefungen/gruener-stand.ts merken
 
 check-schnell: docs voraussetzungen ## Schnellprüfung ohne Datenbank (Doku, Lint, Svelte-Check, Prüfskripte, Einheitstests) — pre-commit bei Code
 	npm run lint
