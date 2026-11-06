@@ -393,3 +393,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #43, Screenshots der Seite *Rollen*.
 
 **Einschätzung:** Zusammen mit dem Eintrag oben lösen: Eine eigene Datenbank pro Worktree oder pro Lauf hält die Listen klein; sonst Screenshots auf einer frisch mit `make seed` aufgesetzten Datenbank machen.
+
+### 2026-11-06 — Doppel-Kategorien erlauben Jahrgang von/bis, obwohl es im Doppel keine Alterskategorien gibt
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/verwaltung/Kategorieformular.svelte` (Felder Jahrgang auch bei *Doppel*), FR-34 in `docs/fachmodell.md`
+
+**Beobachtung:** Laut Projektleiter gibt es im Doppel nur Herren, Damen und Mixed, keine Alterskategorien. Formular und FR-34 lassen Jahrgang von/bis aber auch bei Doppel zu. Der Entwurf zu Mitteilungen (#63) prüft die Spielberechtigung im Doppel deshalb nur nach Geschlecht.
+
+**Ursprung:** Brainstorming #63 (Mitteilungen per Push und E-Mail).
+
+**Einschätzung:** Niedrig. Bei Doppel die Jahrgang-Felder ausblenden und FR-34 anpassen, am besten zusammen mit der Spielberechtigung aus #58.
