@@ -52,7 +52,7 @@ aufgeführt, Teile verteilter Einträge bei ihrem jeweiligen Ausgang. Abschnitt 
 - 2026-11-05 — Issues ohne DoD-Haken geschlossen → 5a870fb (Skill `tco-branching` Schritt 7, Issue-Konventionen); alte Issues nicht nachgeführt
 - 2026-11-04 — Arbeitsweise liegt nicht im Repo → 8437e8a, 1dff4b5 (Übergabe-Doku nennt die Teile ausserhalb). Abgehakt: das Hereinholen selbst. Trigger: Übergabe wird geplant
 - 2026-11-05 — Datenschutzerklärung siezt → d1a6b15 (Du-Form, Entscheid des Projektleiters)
-- 2026-11-05 — CI: Browser-Installation scheitert an gesperrtem apt → 6fea09a, af3848a (Systempakete einmal, nur der Browser-Download wiederholt, Job-Limit 35 Minuten; Nachweis CI-Lauf 42184874324 auf dem Branch; Ursache siehe Prämissen)
+- 2026-11-05 — CI: Browser-Installation scheitert an gesperrtem apt → 6fea09a, af3848a (Systempakete einmal, nur der Browser-Download wiederholt, Job-Limit 35 Minuten; Nachweis CI-Lauf 42184874324 auf dem Branch; Ursache siehe Prämissen). Behoben ist die Selbstsperre, nicht der langsame Spiegel dahinter: neuer Eintrag vom 06.11. in den Beobachtungen
 - 2026-11-05 — Lokale Logins hängen am unbenannten Docker-Speicher → fcac8c7 (Volume `mytco_daten`)
 
 **Doku**

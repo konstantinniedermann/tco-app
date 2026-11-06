@@ -115,3 +115,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 ---
 
 ## Offen
+
+### 2026-11-06 — CI: langsamer Ubuntu-Spiegel macht den E2E-Lauf rot, auch nach dem Fix der apt-Sperre
+
+**Thema:** Betrieb
+
+**Fundort:** `.github/workflows/check.yml`, Job «E2E (Playwright)», Schritt «Systempakete für die Browser» (`playwright install-deps`, höchstens 8 Minuten)
+
+**Beobachtung:** Lauf 42186755560 auf `dev` (Merge 0.5.2): Die Paketlisten kamen in einer Sekunde, danach lieferte `azure.archive.ubuntu.com` die Pakete im Minutentakt (Get:2 bis Get:6 in gut 5 Minuten, dann nichts mehr); nach 8 Minuten brach der Schritt ab. Derselbe langsame Spiegel stand hinter den beiden apt-Sperren vom 05.11. (Läufe 41999966173, 42058627189), also 3-mal in rund 57 Läufen. Der Lauf auf dem Branch eine Viertelstunde vorher brauchte für denselben Schritt 1½ Minuten. Der Fix 6fea09a beseitigt nur die Selbstsperre, nicht den langsamen Spiegel.
+
+**Ursprung:** Beobachtungs-Auswertung vom 06.11.2026, CI nach dem Merge.
+
+**Einschätzung:** Ein Neustart des Jobs hilft meist. Dauerhaft wohl nur ohne apt: den E2E-Job im offiziellen Playwright-Container laufen lassen (Image mit Browsern und Systempaketen) — eine neue Abhängigkeit, braucht Freigabe. Alternativ apt mit eigenem Zeitlimit je Verbindung und einem zweiten Versuch, der den ersten sicher beendet (`sudo timeout …`).
