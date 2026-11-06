@@ -8,8 +8,15 @@ import { eq } from 'drizzle-orm';
 import { machAdmin } from '../../../src/lib/server/admin/erster-admin.ts';
 import { legeAnlassAn, melde } from '../../../src/lib/server/anlass/anlaesse.ts';
 import { setzeRollen, type Rolle } from '../../../src/lib/server/admin/rollen.ts';
-import { turnier } from '../../../src/lib/server/db/schema.ts';
-import { legeTurnierAn as legeTurnierInDbAn } from '../../../src/lib/server/turnier/turniere.ts';
+import { meldeAn as meldeZurCmAnInDb } from '../../../src/lib/server/cm/anmeldungen.ts';
+import { mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
+import type { KategorieWerte } from '../../../src/lib/server/turnier/angaben.ts';
+import {
+	legeKategorieAn,
+	legeTurnierAn as legeTurnierInDbAn,
+	setzeStatus
+} from '../../../src/lib/server/turnier/turniere.ts';
+import type { Klassierung } from '../../../src/lib/turnier/klassierung.ts';
 import { legeMitgliedAn } from '../../hilfen/mitglieder.ts';
 import { DATENBANK_URL, MAILPIT_URL, e2eEinstellungen } from './umgebung.ts';
 
@@ -93,6 +100,41 @@ export async function legeTurnierAn(jahr: number): Promise<number> {
  */
 export async function loescheTurnier(jahr: number): Promise<void> {
 	await hole().db.delete(turnier).where(eq(turnier.jahr, jahr));
+}
+
+/**
+ * Wie `legeTurnierAn`, dazu diese Kategorien und offene Anmeldung (Anmeldeschluss 31. Mai des
+ * Jahres). Gibt die Nummern von Turnier und Kategorien zurück, in der Reihenfolge der Werte.
+ */
+export async function legeOffenesTurnierAn(
+	jahr: number,
+	kategorien: KategorieWerte[]
+): Promise<{ turnierId: number; kategorieIds: number[] }> {
+	const turnierId = await legeTurnierAn(jahr);
+	const kategorieIds: number[] = [];
+	for (const werte of kategorien) {
+		const r = await legeKategorieAn(hole().db, turnierId, werte);
+		if (r.ergebnis !== 'ok') throw new Error(`Kategorie ${werte.name} liess sich nicht anlegen`);
+		kategorieIds.push(r.id);
+	}
+	if ((await setzeStatus(hole().db, turnierId, 'offen', new Date())) !== 'ok') {
+		throw new Error(`Anmeldung zum Turnier ${jahr} liess sich nicht öffnen`);
+	}
+	return { turnierId, kategorieIds };
+}
+
+/** Setzt die CM-Angaben eines erfundenen Mitglieds (FR-37); nicht genannte bleiben, wie sie sind. */
+export async function setzeSpielerangaben(
+	mitgliedId: number,
+	angaben: Partial<{ geschlecht: 'w' | 'm'; jahrgang: number; klassierung: Klassierung }>
+): Promise<void> {
+	await hole().db.update(mitglied).set(angaben).where(eq(mitglied.id, mitgliedId));
+}
+
+/** Meldet ein Mitglied über die Fachlogik zu einer Einzel-Kategorie an (ohne Mail). */
+export async function meldeZurCmAn(kategorieId: number, mitgliedId: number): Promise<void> {
+	const r = await meldeZurCmAnInDb(hole().db, kategorieId, mitgliedId, new Date());
+	if (r !== 'ok') throw new Error(`Anmeldung zur Kategorie ${kategorieId}: ${r}`);
 }
 
 /** Erfundener Anlass weit in der Zukunft mit offener Anmeldung; gibt seine Nummer zurück. */

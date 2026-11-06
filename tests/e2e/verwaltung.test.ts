@@ -13,7 +13,12 @@ import {
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import { klappeAuf, pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import {
+	klappeAuf,
+	pruefeBildschirm,
+	sammleKonsolenfehler,
+	wartetAufVorladen
+} from './hilfen/seite.ts';
 
 // Alle Browser kommen von 127.0.0.1 an denselben Server (Grenzen pro IP). Jeder Test braucht
 // darum nur die nötigen Anfragen: ein Brief-Login, ein Admin-Code.
@@ -29,6 +34,8 @@ async function meldeAn(page: Page, konto: Konto) {
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${konto.vorname}` })).toBeVisible();
+	// Die Reiter laden den Code ihrer Seiten vor; ein folgendes page.goto bräche das ab.
+	await wartetAufVorladen(page);
 }
 
 /** Schickt den Admin-Code, liest ihn aus Mailpit und bestätigt (SI-08). */

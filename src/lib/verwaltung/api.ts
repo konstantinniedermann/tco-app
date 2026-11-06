@@ -59,6 +59,8 @@ export type Antwort<T> =
 	| { art: 'keine-kategorie' }
 	| { art: 'unzulaessig' }
 	| { art: 'abgesagt' }
+	| { art: 'unpassend'; anzahl: number }
+	| { art: 'hat-anmeldungen'; anzahl: number }
 	| { art: 'stoerung' };
 
 export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
@@ -66,7 +68,12 @@ export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
 const STOERUNG: Antwort<never> = { art: 'stoerung' };
 
 function deute<T>(status: number, koerper: unknown): Antwort<T> {
-	const k = (koerper ?? {}) as { fehler?: unknown; felder?: unknown; feld?: unknown };
+	const k = (koerper ?? {}) as {
+		fehler?: unknown;
+		felder?: unknown;
+		feld?: unknown;
+		anzahl?: unknown;
+	};
 	if (status >= 200 && status < 300) return { art: 'ok', daten: koerper as T };
 	if (status === 401) return { art: 'abgemeldet' };
 	if (status === 403) {
@@ -89,6 +96,10 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 		if (k.fehler === 'keine-kategorie') return { art: 'keine-kategorie' };
 		if (k.fehler === 'unzulaessig') return { art: 'unzulaessig' };
 		if (k.fehler === 'abgesagt') return { art: 'abgesagt' };
+		if (k.fehler === 'unpassend' && typeof k.anzahl === 'number')
+			return { art: 'unpassend', anzahl: k.anzahl };
+		if (k.fehler === 'hat-anmeldungen' && typeof k.anzahl === 'number')
+			return { art: 'hat-anmeldungen', anzahl: k.anzahl };
 		if (k.fehler === 'vergeben' && typeof k.feld === 'string')
 			return { art: 'vergeben', feld: k.feld as Feld | 'jahr' | 'name' };
 	}
@@ -240,8 +251,18 @@ export const legeKategorieAn = (turnierId: number, angaben: object, holen: Holen
 export const ladeKategorie = (id: number, holen: Holen = fetch) =>
 	lese<KategorieAnsicht>(`${ADMIN}/kategorien/${id}`, holen);
 
-export const aendereKategorie = (id: number, angaben: object, holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/kategorien/${id}`, angaben, holen);
+/** `trotzdem`: speichert auch, wenn aktive Anmeldungen nach der Änderung nicht mehr passen (FR-36). */
+export const aendereKategorie = (
+	id: number,
+	angaben: object,
+	trotzdem = false,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/kategorien/${id}`,
+		trotzdem ? { ...angaben, trotzdem: true } : angaben,
+		holen
+	);
 
 export const sageKategorieAb = (id: number, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/kategorien/${id}/absagen`, {}, holen);

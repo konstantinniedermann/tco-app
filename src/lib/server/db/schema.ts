@@ -31,6 +31,8 @@ export const mitglied = pgTable(
 		telefon: text('telefon'),
 		geschlecht: text('geschlecht'),
 		jahrgang: integer('jahrgang'),
+		// Swiss-Tennis-Klassierung (FR-37): N1..N4, R1..R9 oder «keine»; leer = nicht erfasst.
+		klassierung: text('klassierung'),
 		lizenznummer: text('lizenznummer'),
 		// Annahme K-19.2: Gesetzt, sobald das Mitglied eine Angabe selbst geändert hat, die der Verein noch in Fairgate
 		// nachführen muss; leer = nichts offen.
@@ -39,6 +41,10 @@ export const mitglied = pgTable(
 	(t) => [
 		check('mitglied_status_check', sql`${t.status} in ('aktiv', 'ausgetreten', 'geloescht')`),
 		check('mitglied_geschlecht_check', sql`${t.geschlecht} in ('w', 'm')`),
+		check(
+			'mitglied_klassierung_check',
+			sql`${t.klassierung} is null or ${t.klassierung} in ('N1', 'N2', 'N3', 'N4', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'keine')`
+		),
 		uniqueIndex('mitglied_mitgliedernummer_klein_unique').on(sql`lower(${t.mitgliedernummer})`),
 		// Der Login sucht die Adresse ohne Rücksicht auf Gross-/Kleinschreibung: sie muss auch so eindeutig sein.
 		uniqueIndex('mitglied_email_klein_unique').on(sql`lower(${t.email})`)
@@ -321,5 +327,47 @@ export const mitteilung = pgTable(
 		check('mitteilung_weg_check', sql`${t.weg} in ('push', 'push-sonst-mail', 'push-und-mail')`),
 		index('mitteilung_anlass_id_gesendet_am_idx').on(t.anlassId, t.gesendetAm),
 		index('mitteilung_gesendet_am_idx').on(t.gesendetAm)
+	]
+);
+
+export type AnmeldungStatus = 'bestaetigt' | 'beantragt' | 'abgelehnt' | 'zurueckgezogen';
+
+// Anmeldung zu einer Kategorie (FR-04, FR-06); Einzel mit einem, Doppel mit zwei Spielern.
+export const anmeldung = pgTable(
+	'anmeldung',
+	{
+		id: serial('id').primaryKey(),
+		kategorieId: integer('kategorie_id')
+			.notNull()
+			.references(() => kategorie.id, { onDelete: 'cascade' }),
+		status: text('status').$type<AnmeldungStatus>().notNull().default('bestaetigt'),
+		// Wildcard-Begründung (Teil 4).
+		kommentar: text('kommentar'),
+		angemeldetAm: timestamp('angemeldet_am', { withTimezone: true }).notNull(),
+		geaendertAm: timestamp('geaendert_am', { withTimezone: true }).notNull()
+	},
+	(t) => [
+		check(
+			'anmeldung_status_check',
+			sql`${t.status} in ('bestaetigt', 'beantragt', 'abgelehnt', 'zurueckgezogen')`
+		),
+		index('anmeldung_kategorie_idx').on(t.kategorieId)
+	]
+);
+
+// Spieler einer Anmeldung. Das Mitglied wird nicht mitgelöscht: die Anmeldung bleibt bestehen.
+export const anmeldungSpieler = pgTable(
+	'anmeldung_spieler',
+	{
+		anmeldungId: integer('anmeldung_id')
+			.notNull()
+			.references(() => anmeldung.id, { onDelete: 'cascade' }),
+		mitgliedId: integer('mitglied_id')
+			.notNull()
+			.references(() => mitglied.id)
+	},
+	(t) => [
+		primaryKey({ columns: [t.anmeldungId, t.mitgliedId] }),
+		index('anmeldung_spieler_mitglied_idx').on(t.mitgliedId)
 	]
 );

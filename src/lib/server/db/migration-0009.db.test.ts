@@ -20,24 +20,25 @@ afterAll(async () => {
 	await eigene?.abbauen();
 });
 
-// Die Hilfe `legeMitgliedAn` kennt das neueste Schema; auf dem Stand 0008 geht nur rohes SQL.
-async function legeMitgliedAn(_db: unknown, teil: { rollen: string[] }) {
-	const c = eigene!.db.$client;
-	const email = `test-${randomUUID()}@example.org`;
-	const m = await c.query<{ id: number }>(
+// Auf dem Stand 0008 kennt die Tabelle mitglied die späteren Spalten (z. B. klassierung) noch nicht;
+// das aktuelle Drizzle-Schema würde sie mitschreiben. Darum hier reines SQL mit den Spalten von damals.
+async function legeMitgliedAn(db: EigeneDatenbank['db'], teil: { rollen: string[] }) {
+	const m = await db.$client.query<{ id: number }>(
 		`insert into mitglied (vorname, nachname, strasse, plz, ort, email)
 		 values ('Test', 'Muster', 'Erfundenweg 1', '4600', 'Olten', $1) returning id`,
-		[email]
+		[`test-${randomUUID()}@example.org`]
 	);
-	const k = await c.query<{ id: number }>(
-		'insert into konto (mitglied_id) values ($1) returning id',
+	const k = await db.$client.query<{ id: number }>(
+		`insert into konto (mitglied_id) values ($1) returning id`,
 		[m.rows[0].id]
 	);
-	const kontoId = k.rows[0].id;
 	for (const rolle of teil.rollen) {
-		await c.query('insert into konto_rolle (konto_id, rolle) values ($1, $2)', [kontoId, rolle]);
+		await db.$client.query(`insert into konto_rolle (konto_id, rolle) values ($1, $2)`, [
+			k.rows[0].id,
+			rolle
+		]);
 	}
-	return { kontoId };
+	return { mitgliedId: m.rows[0].id, kontoId: k.rows[0].id };
 }
 
 const rollenVon = async (kontoId: number) =>

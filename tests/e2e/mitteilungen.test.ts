@@ -10,7 +10,12 @@ import {
 	meldeZumAnlass,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
-import { klappeAuf, pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import {
+	klappeAuf,
+	pruefeBildschirm,
+	sammleKonsolenfehler,
+	wartetAufVorladen
+} from './hilfen/seite.ts';
 import { MAILPIT_URL } from './hilfen/umgebung.ts';
 
 // Mitteilungen der Verwaltung (FR-42, FR-43). Gesendet wird nur an Mitglieder, die der Test selbst
@@ -28,6 +33,8 @@ async function meldeAn(page: Page, konto: Konto) {
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${konto.vorname}` })).toBeVisible();
+	// Die Reiter laden den Code ihrer Seiten vor; ein folgendes page.goto bräche das ab.
+	await wartetAufVorladen(page);
 }
 
 /** Schickt den Admin-Code, liest ihn aus Mailpit und bestätigt (SI-08); `ziel`: erste Seite. */
@@ -42,18 +49,14 @@ async function bestaetige(page: Page, konto: Konto, ziel: RegExp, titel: string)
 	await expect(page.getByRole('heading', { level: 1, name: titel })).toBeVisible();
 }
 
-/**
- * Über die Kachel statt `page.goto`: Die Reiter der Startseite laden den Code ihrer Seiten gleich
- * vor; ein `page.goto` mitten hinein bricht das ab, und WebKit meldet «Importing a module script
- * failed» in der Konsole. Ein Klick wechselt in der App, ohne das Laden abzubrechen.
- */
+/** Meldet an und öffnet die Verwaltung; `erste`: die Seite, auf der sie landet. */
 async function oeffneVerwaltung(
 	page: Page,
 	konto: Konto,
 	erste = { url: /\/verwaltung\/mitglieder$/, titel: 'Mitglieder' }
 ) {
 	await meldeAn(page, konto);
-	await page.getByRole('link', { name: 'Verwaltung' }).click();
+	await page.goto('/verwaltung');
 	await bestaetige(page, konto, erste.url, erste.titel);
 }
 

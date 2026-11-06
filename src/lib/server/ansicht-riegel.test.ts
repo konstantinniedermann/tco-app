@@ -14,6 +14,18 @@ describe('Ansicht als …: Riegel für speichernde Anfragen', () => {
 		expect(riegel('POST', '/api/admin/ansicht', 'lizenz')?.status).toBe(403);
 	});
 
+	test('A-ROLLE-09: in der Ansicht als … ist Anmelden, Abmelden und Klassierung gesperrt', () => {
+		for (const pfad of [
+			'/api/cm/kategorien/1/anmeldung',
+			'/api/cm/anmeldungen/1/abmelden',
+			'/api/cm/angaben',
+			'/api/profil/klassierung'
+		]) {
+			expect(riegel('POST', pfad, 'mitglied')?.status).toBe(403);
+		}
+		expect(riegel('GET', '/api/cm/1', 'mitglied')).toBeNull();
+	});
+
 	test('Beenden, Logout und die Bestätigung per Mail-Code bleiben offen', () => {
 		expect(riegel('POST', '/api/logout', 'cm')).toBeNull();
 		for (const pfad of ERLAUBT_IN_ANSICHT) expect(riegel('POST', pfad, 'mitglied')).toBeNull();

@@ -19,6 +19,9 @@ describe('Texte der Verwaltung', () => {
 
 	it('FR-26: Verlaufstexte nennen Feld oder Rolle, nie einen Wert', () => {
 		expect(aktionText({ aktion: 'feld-geaendert', detail: 'telefon' })).toBe('Telefon geändert');
+		expect(aktionText({ aktion: 'feld-geaendert', detail: 'klassierung' })).toBe(
+			'Klassierung geändert'
+		);
 		expect(aktionText({ aktion: 'rolle-vergeben', detail: 'cm' })).toBe('Rolle CM-Admin vergeben');
 		expect(aktionText({ aktion: 'rolle-vergeben', detail: 'mytco' })).toBe(
 			'Rolle MyTCO-Admin vergeben'

@@ -74,7 +74,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Datenschutzerklärung, Login-Seite (DS-09) | L | L | L | L | L | L |
 | Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Benachrichtigungen (FR-02; E-Mail, Telefon und Lizenznummer: Annahme K-19.1, die E-Mail erst nach zwei Codes, SI-09) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Eigene Adresse (Annahme K-19.2) | – | S eigene | S eigene | S eigene | S | S eigene |
-| Eigener Name, Geschlecht, Jahrgang, Mitgliedernummer | – | L eigene | L eigene | L eigene | S | L |
+| Eigener Name, Geschlecht, Jahrgang, Mitgliedernummer (Geschlecht und Jahrgang einmal selbst, wenn leer, FR-37) | – | L eigene | L eigene | L eigene | S | L |
 | Mitglieder anlegen, bearbeiten, löschen, exportieren (DS-07) | – | – | – | – | S | L |
 | Neuer Code für einen Brief, Briefe auslösen, Sitzungen beenden | – | – | – | – | S | – |
 | Rollen vergeben | – | – | – | – | – | S |

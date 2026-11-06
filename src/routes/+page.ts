@@ -1,5 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import { holeAnlaesse } from '../lib/anlass/api.ts';
+import { holeCmTurniere } from '../lib/cm/api.ts';
 import { laeuftVomSymbol, zeigeEinstieg } from '../lib/hilfe/geraet.ts';
 import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 import type { PageLoad } from './$types';
@@ -22,12 +23,13 @@ export const load: PageLoad = async ({ fetch }) => {
 		passkeyHinweis: boolean;
 		verwaltung: boolean;
 	};
-	// Lassen sich die Anlässe nicht laden, bleibt die Startseite trotzdem nutzbar.
-	const anlaesse = await holeAnlaesse(fetch);
+	// Lassen sich Anlässe oder Turniere nicht laden, bleibt die Startseite trotzdem nutzbar.
+	const [anlaesse, turniere] = await Promise.all([holeAnlaesse(fetch), holeCmTurniere(fetch)]);
 	return {
 		vorname,
 		passkeyHinweis,
 		verwaltung,
-		anlaesse: anlaesse.art === 'ok' ? anlaesse.daten : []
+		anlaesse: anlaesse.art === 'ok' ? anlaesse.daten : [],
+		turniere: turniere.art === 'ok' ? turniere.daten : []
 	};
 };

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, refreshAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import Kategorieformular, {
 		anfrage,
@@ -14,6 +14,10 @@
 		type KategorieFeld
 	} from '../../../../../../lib/verwaltung/api.ts';
 	import { fehlerText } from '../../../../../../lib/verwaltung/anzeige.ts';
+	import {
+		absageSperreText,
+		unpassendText
+	} from '../../../../../../lib/verwaltung/turnier-anzeige.ts';
 	import { leiteUm } from '../../../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';
 
@@ -29,6 +33,10 @@
 	let rueckmeldung = $state<string | null>(null);
 	let laeuft = $state(false);
 	let rueckfrage = $state<HTMLDialogElement>();
+	// FR-36: Werte, die erst nach der Rückfrage «Trotzdem speichern» gelten, und wie viele Anmeldungen nicht mehr passen.
+	let warnung = $state<HTMLDialogElement>();
+	let ausstehend = $state<KategorieWerte | null>(null);
+	let unpassend = $state(0);
 
 	const start = $derived<KategorieWerte>(werteAusKategorie(kategorie));
 
@@ -38,16 +46,24 @@
 		return neu.art === 'ok';
 	}
 
-	async function speichern(werte: KategorieWerte) {
+	async function speichern(werte: KategorieWerte, trotzdem = false) {
 		if (laeuft) return;
 		laeuft = true;
 		fehler = {};
 		allgemein = null;
 		rueckmeldung = null;
-		const a = await aendereKategorie(kategorie.id, anfrage(werte));
+		const a = await aendereKategorie(kategorie.id, anfrage(werte), trotzdem);
+		warnung?.close();
 		if (await leiteUm(a)) return;
-		if (a.art === 'ok') {
-			if (await neuLaden()) schluessel++;
+		if (a.art === 'unpassend') {
+			ausstehend = werte;
+			unpassend = a.anzahl;
+			warnung?.showModal();
+		} else if (a.art === 'ok') {
+			// refreshAll lädt den neuen Stand und verwirft Vorgeladenes: Eine Berührung des Rücklinks
+			// ohne Seitenwechsel hätte die Turnierseite sonst mit dem Stand vor dem Speichern behalten.
+			await refreshAll();
+			schluessel++;
 			rueckmeldung = 'Gespeichert';
 		} else if (a.art === 'eingabe') {
 			fehler = a.felder;
@@ -75,6 +91,9 @@
 			await goto(resolve('/verwaltung/turniere/[id]', { id: String(kategorie.turnierId) }), {
 				refreshAll: true
 			});
+		} else if (a.art === 'hat-anmeldungen') {
+			// Jemand hat sich inzwischen angemeldet: der neue Stand zeigt die Sperre als Satz.
+			await neuLaden();
 		} else {
 			absageFehler = fehlerText(a);
 		}
@@ -116,13 +135,17 @@
 	{#if !nurLesen}
 		<h2>Kategorie absagen</h2>
 		<div class="karte">
-			<p>Mitglieder sehen eine abgesagte Kategorie nicht mehr.</p>
-			{#if absageFehler}
-				<p class="fehler" role="alert">{absageFehler}</p>
+			{#if kategorie.anmeldungen > 0}
+				<p class="fehler">{absageSperreText(kategorie.anmeldungen)}</p>
+			{:else}
+				<p>Mitglieder sehen eine abgesagte Kategorie nicht mehr.</p>
+				{#if absageFehler}
+					<p class="fehler" role="alert">{absageFehler}</p>
+				{/if}
+				<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}
+					>Kategorie absagen</button
+				>
 			{/if}
-			<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}
-				>Kategorie absagen</button
-			>
 		</div>
 
 		<dialog class="karte" bind:this={rueckfrage} aria-labelledby="absagen-titel">
@@ -133,6 +156,20 @@
 					>Abbrechen</button
 				>
 				<button type="button" class="taste-haupt" onclick={absagen}>Absagen</button>
+			</div>
+		</dialog>
+
+		<dialog class="karte" bind:this={warnung} aria-labelledby="warnung-titel">
+			<h2 id="warnung-titel">Anmeldungen passen nicht mehr</h2>
+			<p>{unpassendText(unpassend)}</p>
+			<div class="leiste">
+				<button type="button" class="taste-neben" onclick={() => warnung?.close()}>Abbrechen</button
+				>
+				<button
+					type="button"
+					class="taste-haupt"
+					onclick={() => ausstehend && speichern(ausstehend, true)}>Trotzdem speichern</button
+				>
 			</div>
 		</dialog>
 	{/if}

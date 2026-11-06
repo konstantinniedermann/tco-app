@@ -82,8 +82,15 @@
     {
       "idx": 11,
       "version": "7",
-      "when": 1793982935815,
-      "tag": "0011_mitteilungen",
+      "when": 1793980155450,
+      "tag": "0011_cm_anmeldung",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793989624943,
+      "tag": "0012_mitteilungen",
       "breakpoints": true
     }
   ]

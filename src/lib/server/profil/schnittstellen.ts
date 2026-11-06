@@ -1,4 +1,6 @@
+import { eq } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
+import { mitglied } from '../db/schema.ts';
 import { leseStand } from '../admin/angaben.ts';
 import {
 	antwort,
@@ -8,6 +10,7 @@ import {
 	type Ereignis
 } from '../login/schnittstellen.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
+import { setzeKlassierung } from '../cm/angaben.ts';
 import { EIGENE_FELDER, aendereEigeneAngaben, ladeEigeneAngaben } from './angaben.ts';
 import type { EmailWechselDienst } from './email-wechsel.ts';
 
@@ -37,7 +40,13 @@ async function aendernd(
 export function getProfil(d: ProfilDienste, e: Ereignis): Promise<Response> {
 	return mitKonto(e, async (konto) => {
 		const angaben = await ladeEigeneAngaben(d.db, konto.mitgliedId);
-		return angaben ? antwort(200, { angaben }) : antwort(404, { fehler: 'nicht-gefunden' });
+		if (!angaben) return antwort(404, { fehler: 'nicht-gefunden' });
+		// FR-37: Die Klassierung gehört nicht zu den Angaben der Verwaltung, das Profil zeigt sie extra.
+		const [m] = await d.db
+			.select({ klassierung: mitglied.klassierung })
+			.from(mitglied)
+			.where(eq(mitglied.id, konto.mitgliedId));
+		return antwort(200, { angaben, klassierung: m?.klassierung ?? null });
 	});
 }
 
@@ -72,6 +81,23 @@ export function postProfil(d: ProfilDienste, e: Ereignis): Promise<Response> {
 					? antwort(400, { fehler: 'eingabe', felder })
 					: antwort(400, { fehler: 'eingabe', felder: {}, fremd: true });
 			}
+		}
+	});
+}
+
+export function postKlassierung(d: ProfilDienste, e: Ereignis): Promise<Response> {
+	return aendernd(e, async (konto, koerper) => {
+		const r = await setzeKlassierung(d.db, konto.mitgliedId, koerper.klassierung, jetzt(d));
+		switch (r) {
+			case 'ok':
+				return antwort(200, {});
+			case 'eingabe':
+				return antwort(400, {
+					fehler: 'eingabe',
+					felder: { klassierung: 'Bitte deine Klassierung wählen.' }
+				});
+			case 'nicht-gefunden':
+				return antwort(404, { fehler: 'nicht-gefunden' });
 		}
 	});
 }

@@ -38,7 +38,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 |----|-------------|--------|--------|--------|
 | A-LOGIN-01 | Mitglieder erhalten ihren Zugang per Post in einem Brief: QR-Code zur App-Adresse, Einmal-Code als Text, kurze Anleitung zum Startbildschirm (ursprünglich zwei getrennte Briefe) | PDF 2, Ziel, PL | Mitglieder-Login | geplant\* |
 | A-LOGIN-02 | Das Einmalpasswort muss beim ersten Login ersetzt werden | PDF 2, Ziel | — | verworfen — MyTCO hat kein Passwort, Login per Einmal-Code (A-LOGIN-08) |
-| A-LOGIN-03 | Beim ersten Login ergänzt das Mitglied fehlende Daten, insbesondere die Lizenznummer | PDF 3b-i | Mitglieder-Login | geplant |
+| A-LOGIN-03 | Beim ersten Login ergänzt das Mitglied fehlende Daten, insbesondere die Lizenznummer; die Klassierung fragt die CM-Seite ab (FR-37) | PDF 3b-i | Mitglieder-Login | geplant |
 | A-LOGIN-04 | Direktes Login in MyTCO, ohne Umweg über tcolten.ch (z. B. über `my.tcolten.ch`) | PDF 3b | Mitglieder-Login | geplant |
 | A-LOGIN-05 | Login-Feld oben rechts auf tcolten.ch, das nach dem Login zu MyTCO weiterleitet | PDF 3b | später | später |
 | A-LOGIN-06 | Zwei-Faktor-Login (App oder SMS/E-Mail, zwingend oder freiwillig) | PDF 2 | später | später |
@@ -160,11 +160,11 @@ Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vo
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-ANMELDUNG-01 | Alle Mitglieder können sich zur Clubmeisterschaft anmelden | PDF 5b, Ziel | CM-Anmeldung | geplant |
-| A-ANMELDUNG-02 | Ein Spieler hat höchstens 3 Anmeldungen gleichzeitig | PDF 5b | CM-Anmeldung | geplant |
-| A-ANMELDUNG-03 | MyTCO zeigt nur die Kategorien an, die für den Spieler möglich sind (Klassierung evtl. ausgenommen, weil die Klassierung nicht automatisch von Swiss Tennis kommt) | PDF 5b | CM-Anmeldung | geplant |
+| A-ANMELDUNG-01 | Alle Mitglieder können sich zur Clubmeisterschaft anmelden | PDF 5b, Ziel | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
+| A-ANMELDUNG-02 | Ein Spieler hat höchstens 3 Anmeldungen gleichzeitig | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
+| A-ANMELDUNG-03 | MyTCO zeigt nur die Kategorien an, die für den Spieler möglich sind (Klassierung evtl. ausgenommen, weil die Klassierung nicht automatisch von Swiss Tennis kommt) | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
 | A-ANMELDUNG-04 | Bei einer Doppelkategorie zeigt MyTCO sofort alle verfügbaren Spieler des Clubs zur Wahl des Doppelpartners | PDF 5b | CM-Anmeldung | geplant |
-| A-ANMELDUNG-05 | Nach der Anmeldung erhält der Spieler eine automatische Bestätigung mit seinen Kategorien | PDF 5b | CM-Anmeldung | geplant |
+| A-ANMELDUNG-05 | Nach der Anmeldung erhält der Spieler eine automatische Bestätigung mit seinen Kategorien | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
 | A-ANMELDUNG-06 | Der CM-Admin fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-07 | Die Anmeldung schliesst zu einem Anmeldeschluss | PDF 5c (abgeleitet) | CM-Anmeldung\* | umgesetzt |
 | A-ANMELDUNG-08 | Der Spieler wählt, ob er bei Neuigkeiten, die ihn betreffen (neue Spiele, geänderter Spielplan), benachrichtigt wird | PDF 5b | CM-Betrieb\* | geplant |

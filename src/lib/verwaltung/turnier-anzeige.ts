@@ -62,3 +62,15 @@ export function klassierungText(
 	if (k.art === 'doppel') return `Summe ab ${k.mindestsumme}`;
 	return `${k.klassierungVon}–${k.klassierungBis}`;
 }
+
+/** FR-36: Rückfrage beim Ändern einer Kategorie, deren Anmeldungen nicht mehr passen. */
+export const unpassendText = (n: number) =>
+	n === 1
+		? '1 Anmeldung passt nach der Änderung nicht mehr zu dieser Kategorie. Sie bleibt trotzdem stehen.'
+		: `${n} Anmeldungen passen nach der Änderung nicht mehr zu dieser Kategorie. Sie bleiben trotzdem stehen.`;
+
+/** FR-35: Absagen geht erst ohne aktive Anmeldungen. */
+export const absageSperreText = (n: number) =>
+	n === 1
+		? 'Diese Kategorie hat 1 aktive Anmeldung. Absagen geht erst, wenn keine mehr da ist.'
+		: `Diese Kategorie hat ${n} aktive Anmeldungen. Absagen geht erst, wenn keine mehr da sind.`;

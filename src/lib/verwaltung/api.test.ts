@@ -229,13 +229,25 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			'geschlossen',
 			holer(json(409, { fehler: 'unzulaessig' })).holen
 		);
-		const d = await aendereKategorie(2, {}, holer(json(409, { fehler: 'abgesagt' })).holen);
+		const d = await aendereKategorie(2, {}, false, holer(json(409, { fehler: 'abgesagt' })).holen);
 		expect([a, b, c, d]).toEqual([
 			{ art: 'schluss-vorbei' },
 			{ art: 'keine-kategorie' },
 			{ art: 'unzulaessig' },
 			{ art: 'abgesagt' }
 		]);
+	});
+
+	it('FR-36: 409 unpassend wird eigenes Ergebnis mit anzahl', async () => {
+		const u = holer(json(409, { fehler: 'unpassend', anzahl: 3 }));
+		expect(await aendereKategorie(2, {}, false, u.holen)).toEqual({ art: 'unpassend', anzahl: 3 });
+		const h = holer(json(409, { fehler: 'hat-anmeldungen', anzahl: 2 }));
+		expect(await sageKategorieAb(2, h.holen)).toEqual({ art: 'hat-anmeldungen', anzahl: 2 });
+		const t = holer(json(200, {}));
+		await aendereKategorie(2, { name: 'x' }, true, t.holen);
+		expect(JSON.parse(String(t.aufrufe[0].init.body))).toEqual({ name: 'x', trotzdem: true });
+		await aendereKategorie(2, { name: 'x' }, false, t.holen);
+		expect(JSON.parse(String(t.aufrufe[1].init.body))).toEqual({ name: 'x' });
 	});
 
 	it('FR-33: 409 vergeben nennt Jahr oder Name', async () => {

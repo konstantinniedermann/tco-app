@@ -11,6 +11,7 @@ import {
 	getProfil,
 	postEmail,
 	postEmailBestaetigen,
+	postKlassierung,
 	postProfil,
 	type ProfilDienste
 } from './schnittstellen.ts';
@@ -63,7 +64,8 @@ const schnittstellen = [
 	['getProfil', getProfil, 'GET'],
 	['postProfil', postProfil, 'POST'],
 	['postEmail', postEmail, 'POST'],
-	['postEmailBestaetigen', postEmailBestaetigen, 'POST']
+	['postEmailBestaetigen', postEmailBestaetigen, 'POST'],
+	['postKlassierung', postKlassierung, 'POST']
 ] as const;
 
 describe('Profil-Schnittstellen', () => {
@@ -218,5 +220,24 @@ describe('Profil-Schnittstellen', () => {
 			.from(mitglied)
 			.where(eq(mitglied.id, l.mitgliedId));
 		expect(zeile.email).toBe(neu);
+	});
+
+	test('FR-37: Klassierung im Profil speichern, ungültiger Wert ergibt Feldfehler', async () => {
+		const { d } = baue();
+		const l = await lea();
+		const ok = await postKlassierung(d, ereignis({ body: { klassierung: 'R4' }, konto: l.konto }));
+		expect([ok.status, await ok.json()]).toEqual([200, {}]);
+		const profil = await (await getProfil(d, ereignis({ method: 'GET', konto: l.konto }))).json();
+		expect(profil.klassierung).toBe('R4');
+		expect(profil.angaben).not.toHaveProperty('klassierung');
+		const schlecht = await postKlassierung(
+			d,
+			ereignis({ body: { klassierung: 'R10' }, konto: l.konto })
+		);
+		expect(schlecht.status).toBe(400);
+		expect(await schlecht.json()).toEqual({
+			fehler: 'eingabe',
+			felder: { klassierung: 'Bitte deine Klassierung wählen.' }
+		});
 	});
 });
