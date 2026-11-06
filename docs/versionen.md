@@ -8,6 +8,7 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Clubmeisterschaft: Turnier und Kategorien anlegen (#57). Fachmodell und Rollen nachgeführt: FR-33 bis FR-35, Turniernummern freiwillig, Doppel nach Mindestsumme.
 - Entwurf für die Anmeldung zur Clubmeisterschaft, geschnitten in vier Teile: Turnier anlegen,
   Einzel-Anmeldung, Doppel, Anmeldungen verwalten (#51; Teil-Issues #57 bis #60). Neue Frage
   K-51 an den Verein: Doppel nach Summe der Klassierungen.

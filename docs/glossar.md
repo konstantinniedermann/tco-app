@@ -58,6 +58,8 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Anmeldeschluss | Datum, nach dem keine Anmeldungen mehr möglich sind; in Advantage je Turnier oder Konkurrenz. Beim TCO bisher Anfang Juni, 2027 vor der Auslosung Anfang Juni (hängt an K-24.2) | Anmeldeschluss | ADV 7, 10, 13, 28; Recherche |
 | Nenngeld | Startgebühr in Advantage, je Spieler mit Vermerk „bezahlt“. Die CM hat kein Nenngeld (K-25.2) | Nenngeld | ADV 7, 28 |
 | Wildcard-Antrag | Anmeldung für eine Kategorie ausserhalb des eigenen Klassierungsbereichs, mit Kommentar; der CM-Verantwortliche entscheidet | Wildcard-Antrag | [A-ANMELDUNG-10](anforderungen/anforderungen.md#anmeldung--anmeldung-zur-clubmeisterschaft) |
+| Mindestsumme | Bei einer Doppelkategorie die kleinste Summe der Klassierungen beider Spieler (R1 = 1 … R9 = 9, *keine Lizenz* = 10, N1–N4 = 0), vorbelegt 9. *Annahme K-51* | Mindestsumme | [FR-34](fachmodell.md#fachregeln) |
+| abgesagt | Status einer Kategorie, die nicht stattfindet; ohne Rückweg, für Mitglieder nur noch als Plakette sichtbar | abgesagt | [FR-35](fachmodell.md#fachregeln) |
 | Folgespiel | Spiel der nächsten KO-Runde, in das der Sieger eines Spiels nachrückt | Folgespiel | [Fachmodell](fachmodell.md) |
 | Resultat | Ergebnis eines Spiels. In MyTCO melden die Spieler es selbst. In Advantage erfasst nur der Organisator, von Hand pro Runde oder Spiel; einen Import gibt es nicht | Resultat; der Vorgang heisst *Resultat melden* | PDF 5d; ADV 37, 41, 43 |
 | Rangliste | Reihenfolge in einer Gruppe nach gewonnenen Begegnungen. Bei Gleichstand gilt: 1. Direktbegegnung, 2. bessere Satzdifferenz, 3. bessere Gamedifferenz; danach manuelle Anpassung möglich. Das PDF nennt das „Einreihung“ | Rangliste | ADV 41; PDF 5d |
