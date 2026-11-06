@@ -47,11 +47,13 @@ const einzel = (name: string, teil: Partial<KategorieWerte> = {}): KategorieWert
 	...teil
 });
 
-async function neuesTurnier(teil: Partial<TurnierWerte> = {}) {
-	const w = werte(teil);
-	const r = await legeTurnierAn(db, w);
-	if (r.ergebnis !== 'ok') throw new Error('Jahr schon vergeben');
-	return { id: r.id, w };
+/** Turnier in einem freien Zufallsjahr: Ein schon vergebenes Jahr (anderer Test) wird neu gezogen. */
+async function neuesTurnier(teil: Omit<Partial<TurnierWerte>, 'jahr'> = {}) {
+	for (;;) {
+		const w = werte(teil);
+		const r = await legeTurnierAn(db, w);
+		if (r.ergebnis === 'ok') return { id: r.id, w };
+	}
 }
 const jetztVor = (w: TurnierWerte) => new Date(`${w.jahr}-05-01T10:00:00Z`);
 const jetztNach = (w: TurnierWerte) => new Date(`${w.jahr}-06-15T10:00:00Z`);
