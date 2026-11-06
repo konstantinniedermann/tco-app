@@ -7,6 +7,118 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Auswertung vom 06.11.2026 — 41 Einträge, gegen `dev` (3bb0636) verifiziert
+
+Bilanz je Eintrag: 0 ganz verworfen (2 Teilaussagen widerlegt) · 16 abgehakt (2 überholt) ·
+7 mitgemacht · 3 Doku · 11 an Issues (#29, #39, #40, #43, #48, #52) · 4 auf mehrere Ausgänge
+verteilt (Doku-Abgleich vor 0.4.0, Fairgate-Feinschliff, Verwaltung Anlässe, Fachmodell
+Anlässe); dazu Nebenbefunde, einer davon ein Vereinsthema. Bei 17 trug die Begründung ganz oder
+teilweise nicht (Tabelle unten). Gleich lautende Einträge sind unten bei ihrem Hauptausgang
+aufgeführt, Teile verteilter Einträge bei ihrem jeweiligen Ausgang. Abschnitt «Offen» danach leer.
+
+**Verworfen**
+
+- 2026-11-04 — Doku-Abgleich vor 0.4.0, Teil `proxy.env`: `MYTCO_TEST_BENUTZER` und `MYTCO_TLS`
+  seien nicht dokumentiert → beide stehen mit Kommentar in `betrieb/proxy.env.example`
+  («# Zugang zur Testumgebung. Hash erzeugen mit: caddy hash-password», «# Leer lassen für
+  öffentliche Zertifikate; "internal" nur für den lokalen Nachweis.»). Teil FR-25 überholt
+  (371e18e). Übrige Teile siehe Mitgemacht und #39
+
+**An Issues angehängt**
+
+- 2026-11-04 — «Rollen speichern» überschreibt Rollen eines anderen Admins → [Kommentar in #43](https://github.com/konstantinniedermann/tco-app/issues/43#issuecomment-6680004017)
+- 2026-11-05 — «Für Fairgate» zeigt auch ausgetretene Mitglieder → ebenda; heute nicht auslösbar (kein Code setzt den Status)
+- 2026-11-05 — «Für Fairgate» Feinschliff, Teil leere Spalten nach Löschung des Verlaufs → ebenda; übrige Teile abgehakt
+- 2026-11-05 — Verwaltung Anlässe, Teil Zählung ausgetretener Mitglieder → ebenda (auch `listeAnlaesse`); übrige Teile an #52
+- 2026-11-05 — Löschfrist der Anmeldungen zu Anlässen nicht gebaut → ebenda, mit dem Verlauf zusammengelegt
+- 2026-11-05 — Löschung des Änderungsverlaufs nach 12 Monaten nicht gebaut → ebenda
+- 2026-11-05 — Datenschutz-Seite zeigt Platzhalter → [Kommentar in #40](https://github.com/konstantinniedermann/tco-app/issues/40#issuecomment-6680478816): heute verlangt keine DoD Freigabe und gefüllte Platzhalter
+- 2026-11-05 — Datenschutz-Seite am Handy eine Textwand → ebenda; das Leitbild verlangt «eine Karte», also zuerst Leitbild
+- 2026-11-05 — #29: DoD-Vorschläge nur im Kommentar → [Kommentar in #29](https://github.com/konstantinniedermann/tco-app/issues/29#issuecomment-6680479087): Punkt 1 gebaut, 2 erledigt (Du-Form), 3 neu entschieden (behalten), 4 offen
+- 2026-11-04 — Doku-Abgleich vor 0.4.0, Teil Rückfall bei scheiternder Migration → [Kommentar in #39](https://github.com/konstantinniedermann/tco-app/issues/39#issuecomment-6680004399) (Live-Teil; der Test-Teil stand schon im Kommentar vom 04.11.)
+- 2026-11-04 — Keine Untergrenze für iOS und Android → [Kommentar in #48](https://github.com/konstantinniedermann/tco-app/issues/48#issuecomment-6680004800), mit Punkt (7) aus «Hilfe beim Start»
+- 2026-11-05 — Anlass: Anmeldeschluss zu ungenau → [Kommentar in #52](https://github.com/konstantinniedermann/tco-app/issues/52#issuecomment-6680005292)
+- 2026-11-05 — Anlass: Kalenderdatei ohne SEQUENCE, Steuerzeichen, 404 als JSON → ebenda
+- 2026-11-05 — Verwaltung Anlässe, Teile Meldung bei Zeitumstellung und «Gespeichert» → ebenda
+- 2026-11-05 — Fachmodell und Anforderungen bei den Anlässen, Teile FR-27 und A-STARTSEITE-04 → ebenda; Diagramm mitgemacht
+- 2026-11-05 — Beispiel-GV läuft im März 2027 ab → ebenda
+
+**Mitgemacht**
+
+- 2026-11-04 — Doku-Abgleich vor 0.4.0, Kleinigkeiten → 3688760 (Testkonzept, Fachmodell, Release-Doku, Betrieb-README), Test-IDs und Schema-Kommentar in b24b557; Teil «Verwaltung über Profil» siehe Doku
+- 2026-11-05 — Test-IDs und Testdaten-Regel → b24b557 (5 Passkey-Tests und die verwandten auf A-LOGIN-07, 3 Mitgliedernummer-Tests auf A-MITGLIED-07, `beispiel-*` in der Prüfung `testdaten`, Gegenprobe rot)
+- 2026-11-05 — Fachmodell ohne Anlass im Diagramm → 3688760
+- 2026-11-05 — Mockup «Hilfe beim Start» ohne «Datenschutz» → 665830a (auch `index.html`)
+- 2026-11-05 — Issues ohne DoD-Haken geschlossen → 5a870fb (Skill `tco-branching` Schritt 7, Issue-Konventionen); alte Issues nicht nachgeführt
+- 2026-11-04 — Arbeitsweise liegt nicht im Repo → 8437e8a, 1dff4b5 (Übergabe-Doku nennt die Teile ausserhalb). Abgehakt: das Hereinholen selbst. Trigger: Übergabe wird geplant
+- 2026-11-05 — Datenschutzerklärung siezt → d1a6b15 (Du-Form, Entscheid des Projektleiters)
+- 2026-11-05 — CI: Browser-Installation scheitert an gesperrtem apt → 6fea09a, af3848a (Systempakete einmal, nur der Browser-Download wiederholt, Job-Limit 35 Minuten; Nachweis CI-Lauf 42184874324 auf dem Branch; Ursache siehe Prämissen)
+- 2026-11-05 — Lokale Logins hängen am unbenannten Docker-Speicher → fcac8c7 (Volume `mytco_daten`)
+
+**Doku**
+
+- 2026-11-05 — Leitbild «Verwaltung über Profil» (auch Punkt (3) im Abgleich vor 0.4.0) → 0e4a92d, Entscheid: Kachel bleibt
+- 2026-11-05 — «Für Fairgate», Teil Namensformat → 0e4a92d (Leitbild: überall «Nachname, Vorname»), umgesetzt in 8ad7c56 (Anlässe) und 7ecb217 (Urheber im Verlauf)
+- 2026-11-05 — Versionsregel ohne ADR → ADR-007 (40d04e3)
+- 2026-11-05 — «erstellt von» am Anlass ohne Zweck → behalten, Zweck in Konzept, Fachmodell und Erklärung (d1a6b15); ebenso `sitzung.erstellt_am`
+
+**Vereinsthema**
+
+- Nebenbefund — K-50 fragte nicht nach der Löschfrist, die Konzept und Erklärung als «Vorschlag K-50» führen → Frage ergänzt (a2c49e8)
+
+**Abgehakt** — mit Begründung; wo der Punkt zurückkommen kann, mit Trigger
+
+- 2026-11-04 — Dependabot-PR #38 ohne CI-Lauf → überholt: Der neue Head hat einen Lauf, rot wie erwartet (ERESOLVE). Trigger: Dependabot bietet eine Fassung, die zu den Peers passt
+- 2026-11-05 — Verwaltung am Handy: Kopfleiste → Teil WCAG 2.4.11 überholt (8e84b3e: Kopfleiste ausserhalb des Rollbereichs). Trigger: Design «Verwaltung mobil» oder Klage eines Admins
+- 2026-11-04 — E2E iPhone `hilfe.test.ts` vereinzelt rot, mit 2026-11-05 «bewegung.test.ts» (Teil Seitenwechsel) und RR-03 «Importing a module script failed» → zusammen ein Thema: seit 04.11. 7 von 54 CI-Läufen rot, nur iPhone; 5 mit echter Ursache und behoben, 2 ungeklärt. Entscheid: keine Wiederholung in der CI. Trigger: der 3. ungeklärte rote CI-Lauf, dann `retries: 1` nur in der CI
+- 2026-11-05 — E2E Android «Menü auf der Einstiegsseite» → in der CI nie rot. Trigger: nächste Arbeit an der Einstiegsseite (Test wartet vor dem Ereignis auf die Hydration)
+- 2026-11-05 — E2E A-LOGIN-09 einmal rot → ohne Fehlertext, in der CI nie rot. Trigger: zweiter Fehlschlag, dann mit Fehlertext neu erfassen
+- 2026-11-05 — E2E: gemeinsame IP-Grenze → 9 von 10 Anfragen je Lauf belegt. Trigger: nächster E2E-Test mit einer Code-Anfrage
+- 2026-11-04 — «Ganzer Verlauf» höchstens 100 → nur die Ansicht eines Mitglieds sagt es nicht. Trigger: Etappe 2 (Einlesen), steht schon als Hinweis in #43
+- 2026-11-05 — «Für Fairgate» Feinschliff, Teile Zähler und stilles Verschwinden → Verschwinden ist gewollt (zweiter Tab). Trigger: die Liste wächst (dann auch: die Verwaltung lädt sie bei jeder Navigation neu, `uses.url`)
+- 2026-11-05 — Rückfrage ohne `overlay` → nur im Code geprüft. Trigger: Sichtung in Safari bei der nächsten Arbeit an der Verwaltung
+- 2026-11-05 — Reiter: `aria-current` zu früh → der Vorschlag widerspräche dem Leitbild (`aria-current` trägt auch die Farbe). Trigger: nächste Arbeit an den Reitern, zuerst Leitbild
+- 2026-11-04 — Hilfe beim Start: Kleinigkeiten (1)–(6) → Trigger: Rückmeldung der Testgruppe (#40) oder Geräteprüfung (#47); (2) erst, wenn sich ein Symbol ändert (je 4 Stellen im Code, 3 im Mockup)
+- 2026-11-05 — Profil: abgelaufene Sitzung zeigt «Störung» → Abmelden ist nicht betroffen; Achtung, auch ein DB-Fehler gibt 401. Trigger: nächster Umbau der Profilseite
+- 2026-11-05 — Wartende Login-Mailanfrage nach dem Abmelden → Fix braucht einen Test und die Erklärung. Trigger: wie oben, zusammen
+- 2026-11-05 — Passkey zeigt die alte Adresse → `signalCurrentUserDetails` gibt es nur in Chrome/Edge verlässlich und bräuchte die Passkey-Kennung im Browser. Trigger: nächste Arbeit an #44
+- 2026-11-05 — Leitbild ohne Baustein für zwei Felder nebeneinander → kein zweiter Fall. Trigger: ein Entwurf zeigt zwei Eingaben in einer Zeile (z. B. #51)
+- 2026-11-05 — Mockups zeigen den Rollbereich nicht → alle 4 Dateien. Trigger: nächster Mockup-Umbau
+- Nebenbefund — 73 verwaiste Docker-Volumes auf dem Mac des Projektleiters → Folge des anonymen Volumes (fcac8c7); Aufräumen (`docker volume prune`) nur auf Wunsch
+- Nebenbefund — Bremse hält Adressen bis 24 h 10 min auch beim E-Mail-Wechsel und Admin-Zugang → im Kommentar in #29 (Punkt 4)
+
+**Falsche Prämissen**
+
+| Eintrag | Behauptet | Gemessen |
+|---|---|---|
+| E2E iPhone `hilfe.test.ts` | zwei frühere rote Läufe ebenfalls Ausreisser; Hebel «weniger Worker» | beide hatten Ursachen und sind behoben (243c345, d2f6365); die CI läuft schon mit 1 Worker |
+| CI apt-Sperre | Störung des Runners, nächster Lauf auf demselben Code grün, einmal | das eigene apt-get des abgebrochenen ersten Versuchs hält die Sperre; nächster Lauf war anderer Code; 2-mal |
+| Doku-Abgleich 0.4.0 (2) | nur der Rollen-Dienst prüft das gesperrte Konto | auch Sitzung, Brief-, Mail-Code- und Passkey-Tests; gesperrt wird zentral in `pruefeSitzung` |
+| «Ganzer Verlauf» | auch die Seite ohne Filter sagt es nicht | sie sagt «Die letzten 100 Einträge» |
+| Datenschutz-Seite Platzhalter | vier Platzhalter; DoD von #40 und #48 | sechs; keine DoD verlangt sie gefüllt |
+| Datenschutz-Seite Textwand | passt zu «grosse Seiten aufklappbar» | das Leitbild verlangt ausdrücklich «eine Karte» |
+| Verwaltung am Handy | Kopfleiste kann Fokus verdecken (WCAG 2.4.11) | seit 8e84b3e liegt die Kopfleiste ausserhalb des Rollbereichs |
+| Reiter `aria-current` | nur Farbe und Balken folgen `data-aktiv` | die Farbe hängt an `aria-current`, das Leitbild verlangt es so |
+| Fairgate Namen | der Code weicht vom Entwurf ab | der Entwurf weicht ab; uneinheitlich waren Anlässe und Urheber im Verlauf |
+| Passkey alte Adresse | Fundort `email-wechsel.ts` | die Signal-API läuft im Browser, nicht auf dem Server |
+| Profil abgelaufene Sitzung | auch beim Abmelden | `postLogout` antwortet ohne Sitzung 204 |
+| Login-Mailanfrage | eine Zeile | dazu ein Test und die Erklärung |
+| Verwaltung Anlässe, «Gespeichert» | fehlt | wird gesetzt, aber nicht gezeigt |
+| E2E A-LOGIN-09 | wie die Seitenwechsel-Ausreisser | der Test wechselt keine Seite; ohne Fehlertext nicht zuzuordnen |
+| Test-IDs | zwei Tests; A-LOGIN-10 = SMS/App; Prüfung nur `seed*`, `erfundene-*` | fünf; A-LOGIN-10 ist der Mail-Code; die Prüfung erfasst mehr |
+| Fachmodell Anlässe | A-STARTSEITE-04 ist gebaut | es verlangt angemeldete Anlässe, die Startseite zeigt alle kommenden |
+| #29 DoD-Vorschläge | über die Punkte ist nirgends entschieden | Punkt 3 trug den Entscheid «streichen»; das Fachmodell hat ihn danach still überholt |
+
+**Gekippte Empfehlungen:**
+
+- Namensformat: Die Frage sagte «nur die Antwortliste der Anlässe wird angepasst». Der erste
+  `make check` war rot, weil ein E2E das alte Format erwartete; die Suche danach fand eine
+  zweite Stelle (Urheber im Verlauf, 7ecb217). Der Grep der Verifikation hatte Template-Strings
+  übersehen.
+- apt-Sperre: Der Fix liess das Job-Limit bei 20 Minuten; der cas-reviewer rechnete nach, dass
+  der schlimmste Fall der Installation so am Job-Limit stirbt statt an der gezielten Grenze
+  (af3848a).
+
 ### Auswertung vom 04.11.2026 — 34 Einträge, gegen `dev` (a694133) verifiziert
 
 Bilanz: 0 verworfen (1 teilweise widerlegt, 1 überholt) · 18 abgehakt · 3 mitgemacht · 4 Doku ·
