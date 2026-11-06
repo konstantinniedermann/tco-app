@@ -575,7 +575,7 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Vermutlich ein Wettlauf zwischen Laden eines Moduls und Seitenwechsel unter Last (paralleler Lauf). Beobachten; wiederholt er sich, das Sammeln der Seitenfehler im Test robuster machen.
 
-**Nachtrag 2026-11-06:** Wiederholt, diesmal in `tests/e2e/verwaltung.test.ts:212` (SI-08), wieder `iphone`, wieder in `make check` mit 5 Workern; einzeln mit `--repeat-each 5` grün. Branch `feat/schnellere-merges` ohne App-Code. Damit trifft der Trigger «wiederholt sich» zu.
+**Nachtrag 2026-11-06:** Wiederholt, diesmal in `tests/e2e/verwaltung.test.ts:212` (SI-08), wieder `iphone`, wieder in `make check` mit 5 Workern; einzeln mit `--repeat-each 5` grün. Branch `feat/schnellere-merges` ohne App-Code. Damit trifft der Trigger «wiederholt sich» zu. Im nächsten vollen Lauf derselben Session gleich noch einmal, in `tests/e2e/anlass.test.ts:158` (A-ANLASS-01): zwei rote von drei vollen Läufen, jeder Fehlversuch kostet einen ganzen `make check`. In der CI (1 Worker pro Gerät) bisher nicht aufgetreten.
 
 ### 2026-11-05 — Versionsregel ohne ADR, Begründung steht in der Release-Doku
 
