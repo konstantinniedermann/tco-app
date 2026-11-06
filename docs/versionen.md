@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.7.2 — E2E-Tests im Playwright-Container
+
+- CI: Die E2E-Jobs laufen im offiziellen Playwright-Image, Browser und Systempakete sind
+  schon drin. Die Installation über apt fällt weg; sie hing immer wieder am langsamen
+  Ubuntu-Spiegel. Die Image-Version folgt Playwright aus `package-lock.json`.
+
 ## 0.7.1 — Kein alter Stand nach dem Speichern
 
 - Korrektur: Nach dem Speichern zeigte die nächste Seite manchmal noch den alten Stand, etwa

@@ -317,7 +317,7 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
-| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI als ein Job pro Umgebung parallel (je nur mit ihrem Browser); Screenshots als Artefakt pro Umgebung, 30 Tage; Systempakete einmal (höchstens 8 Minuten), Browser-Download je Versuch höchstens 5 Minuten, bis zu 3 Versuche | Testkonzept | vorhanden |
+| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI als ein Job pro Umgebung parallel (je nur mit ihrem Browser); Screenshots als Artefakt pro Umgebung, 30 Tage; im offiziellen Playwright-Image (Browser und Systempakete schon drin, Version aus `package-lock.json`), Datenbank und Mailpit über die Service-Namen | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
 | Docker-Image baut | ADR-003 | vorhanden |
 | Rauchtest des Images (Start, Migration, `/api/status`) | ADR-003 | vorhanden |
@@ -351,6 +351,11 @@ unabhängig davon.
   Schadpakete und bricht die CI ab.
 - **Updates:** Dependabot schlägt wöchentlich Updates für npm, Docker-Images und GitHub
   Actions vor, als PR auf `dev`. Hauptversionen werden einzeln geprüft.
+- **Playwright-Image in der CI** (`mcr.microsoft.com/playwright:v<Version>-noble`, freigegeben
+  vom Projektleiter am 06.11.2026): Die E2E-Jobs laufen darin, weil die Installation der
+  Systempakete über apt immer wieder am langsamen Ubuntu-Spiegel hing. Die Version liest der
+  Job `aenderung` aus der Lock-Datei (`@playwright/test`); ein Update von Playwright durch
+  Dependabot zieht das Image also mit. Kein eigener Eintrag bei Dependabot.
 - **Keine Hauptversionen von Node, PostgreSQL und Caddy** über Dependabot (dort ausgeschlossen).
   Die Node-Hauptversion wird mit `engines` (`package.json`) und `.nvmrc` von Hand gewechselt.
   Eine neue Hauptversion von PostgreSQL liest die Daten von Live nicht: Auf Test (leere
