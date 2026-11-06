@@ -8,6 +8,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Clubmeisterschaft: Mitglieder melden sich selbst an (#58)
+
 ## 0.7.0 — Rollen schärfen
 
 - Rollen geschärft (#43): Statt «Admin» gibt es vier Admin-Rollen, einzeln vergeben:

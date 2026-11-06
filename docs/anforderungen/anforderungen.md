@@ -38,7 +38,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 |----|-------------|--------|--------|--------|
 | A-LOGIN-01 | Mitglieder erhalten ihren Zugang per Post in einem Brief: QR-Code zur App-Adresse, Einmal-Code als Text, kurze Anleitung zum Startbildschirm (ursprünglich zwei getrennte Briefe) | PDF 2, Ziel, PL | Mitglieder-Login | geplant\* |
 | A-LOGIN-02 | Das Einmalpasswort muss beim ersten Login ersetzt werden | PDF 2, Ziel | — | verworfen — MyTCO hat kein Passwort, Login per Einmal-Code (A-LOGIN-08) |
-| A-LOGIN-03 | Beim ersten Login ergänzt das Mitglied fehlende Daten, insbesondere die Lizenznummer | PDF 3b-i | Mitglieder-Login | geplant |
+| A-LOGIN-03 | Beim ersten Login ergänzt das Mitglied fehlende Daten, insbesondere die Lizenznummer; die Klassierung fragt die CM-Seite ab (FR-37) | PDF 3b-i | Mitglieder-Login | geplant |
 | A-LOGIN-04 | Direktes Login in MyTCO, ohne Umweg über tcolten.ch (z. B. über `my.tcolten.ch`) | PDF 3b | Mitglieder-Login | geplant |
 | A-LOGIN-05 | Login-Feld oben rechts auf tcolten.ch, das nach dem Login zu MyTCO weiterleitet | PDF 3b | später | später |
 | A-LOGIN-06 | Zwei-Faktor-Login (App oder SMS/E-Mail, zwingend oder freiwillig) | PDF 2 | später | später |
