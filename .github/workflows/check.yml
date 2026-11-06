@@ -177,12 +177,18 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm exec --no -- svelte-kit sync
-      # Der Download von Browsern und Systempaketen hängt selten fest (sonst unter 3 Minuten).
-      # Statt bis zum Job-Limit zu warten: je Versuch höchstens 5 Minuten, bis zu 3 Versuche.
-      - name: Browser installieren (bis 3 Versuche)
+      # Systempakete einmal, ohne Wiederholung: Bricht ein Versuch ab, läuft sein apt-get weiter
+      # und hält die dpkg-Sperre, ein zweiter Versuch scheitert dann sicher. Ein langsamer
+      # Spiegelserver bekommt darum Zeit, statt abgebrochen zu werden.
+      - name: Systempakete für die Browser
+        timeout-minutes: 8
+        run: npm exec --no -- playwright install-deps chromium webkit
+      # Der Download der Browser hängt selten fest (sonst unter 2 Minuten). Statt bis zum
+      # Job-Limit zu warten: je Versuch höchstens 5 Minuten, bis zu 3 Versuche.
+      - name: Browser herunterladen (bis 3 Versuche)
         run: |
           for versuch in 1 2 3; do
-            if timeout --kill-after=10s 5m npm run e2e:browser; then exit 0; fi
+            if timeout --kill-after=10s 5m npm exec --no -- playwright install chromium webkit; then exit 0; fi
             echo "::warning::Browser-Download, Versuch $versuch abgebrochen oder fehlgeschlagen"
           done
           exit 1
