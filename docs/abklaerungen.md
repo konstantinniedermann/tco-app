@@ -123,6 +123,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | K-27 | Höchstens 3 Anmeldungen: Zählt ein Doppel für beide Partner? Muss der Doppelpartner zustimmen, und wer gilt als „verfügbar“? | Verantwortliche CM | A-ANMELDUNG-02, A-ANMELDUNG-04 |
 | K-28 | Wie wird die Klassierung bei der Anmeldung festgelegt: gibt der Spieler sie an, oder prüft der CM-Verantwortliche? | Verantwortliche CM | A-ANMELDUNG-03, A-ANMELDUNG-06 |
 | K-29 | Dürfen Spieler sich bis zum Anmeldeschluss selbst wieder abmelden oder ummelden? | Verantwortliche CM | A-ANMELDUNG-07 |
+| K-51 | Im Doppel zählt laut Projektleiter die Summe der Klassierungen beider Spieler. Muss sie mindestens 9 sein (R4+R5 oder R1+R8 gehen, R3+R5 nicht)? Gilt der Wert für alle Doppelkategorien gleich? Wie zählen N-Spieler und Spieler ohne Lizenz? | Verantwortliche CM | A-ANMELDUNG-03, A-ANMELDUNG-04, [Entwurf CM-Anmeldung](superpowers/specs/2026-11-06-cm-anmeldung-design.md) |
 
 ## Vor CM-Betrieb (01.06.2027)
 

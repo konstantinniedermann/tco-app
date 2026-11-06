@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Entwurf für die Anmeldung zur Clubmeisterschaft, geschnitten in vier Teile: Turnier anlegen,
+  Einzel-Anmeldung, Doppel, Anmeldungen verwalten (#51; Teil-Issues #57 bis #60). Neue Frage
+  K-51 an den Verein: Doppel nach Summe der Klassierungen.
+
 ## 0.5.2 — arc42, ADRs und Nacharbeit aus der Beobachtungs-Auswertung
 
 - Architektur als arc42 in `docs/arc42.md`: Ziele, Kontext mit Nachbarsystemen, Lösungsstrategie,
