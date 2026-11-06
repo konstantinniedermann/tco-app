@@ -116,6 +116,39 @@ describe('Admin-Routen', () => {
 			`${turnierRoute}: Admin-Route nutzt 'hilfe'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
 		]);
 	});
+	it('RR-07: Mitteilungen der Verwaltung nur aus MITTEILUNG_ADMIN_SCHNITTSTELLEN mit ihren Diensten', () => {
+		const mRoute = 'src/routes/api/admin/mitteilungen/+server.ts';
+		const mListe: [string, string] = [
+			'src/lib/server/mitteilung/schnittstellen.ts',
+			'export const MITTEILUNG_ADMIN_SCHNITTSTELLEN = {\n\tgetVereinMitteilungen\n} satisfies Record<string, unknown>;'
+		];
+		const rumpf = (namen: string, dienst = 'holeMitteilungAdminDienste', zeile = '') =>
+			[
+				`import { ${dienst} } from '../../../../lib/server/mitteilung/index.ts';`,
+				`import { ${namen} } from '../../../../lib/server/mitteilung/schnittstellen.ts';`,
+				`export const GET = (e) => getVereinMitteilungen(${dienst}(), e);`,
+				zeile
+			].join('\n');
+		const mit = (inhalt: string) => pruefeBauregel(new Map([liste, mListe, [mRoute, inhalt]]));
+		expect(mit(rumpf('getVereinMitteilungen'))).toEqual([]);
+		// Die Schnittstellen der Mitglieder prüfen keine Verwaltungsrolle.
+		expect(mit(rumpf('getVereinMitteilungen, postThemen'))).toEqual([
+			`${mRoute}: Admin-Route nutzt 'postThemen'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
+		]);
+		expect(mit(rumpf('getVereinMitteilungen', 'holeMitteilungDienste'))).toEqual([
+			`${mRoute}: Admin-Route importiert 'holeMitteilungDienste' aus ../../../../lib/server/mitteilung/index.ts; erlaubt ist nur holeMitteilungAdminDienste`
+		]);
+		expect(
+			mit(rumpf('getVereinMitteilungen', undefined, 'const db = holeMitteilungAdminDienste().db;'))
+		).toEqual([
+			`${mRoute}: holeMitteilungAdminDienste() nur direkt als erstes Argument einer Schnittstelle übergeben`
+		]);
+		// Aus admin/index.ts bleibt nur holeAdminDienste erlaubt.
+		const quer = rumpf('getVereinMitteilungen').replace('mitteilung/index.ts', 'admin/index.ts');
+		expect(mit(quer)).toEqual([
+			`${mRoute}: Admin-Route importiert 'holeMitteilungAdminDienste' aus ../../../../lib/server/admin/index.ts; erlaubt ist nur holeAdminDienste`
+		]);
+	});
 	it('RR-07: nur Funktionen aus ADMIN_SCHNITTSTELLEN (die der Rechte-Test abdeckt)', () => {
 		const fremd = gut.replace('{ getMitglied }', '{ getMitglied, liest }');
 		expect(pruefe(fremd)).toEqual([
