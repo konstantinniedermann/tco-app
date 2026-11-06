@@ -159,6 +159,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Entscheid Nutzer (06.11.2026):** vorerst nichts ändern, Container allenfalls später. Abwägung: deutlich stabiler (kein Ubuntu-Download mehr), kaum schneller (der Pull des Images frisst den Gewinn grösstenteils), Image-Version muss mit Playwright mitgezogen werden.
 
+**Nachtrag (06.11.2026, nachmittags):** Nach dem Entscheid noch dreimal am selben Tag, jedes Mal mit demselben Abbruch nach 8 Minuten und nach einem Neustart des Jobs grün: Release-PR #62 (desktop), Merge 0.6.1 auf `dev` (android), Merge 0.7.0 auf `dev`, Lauf 42223464675 (iphone).
+
 ### 2026-11-06 — make check baut die App doppelt: einmal selbst, einmal im Webserver der E2E-Tests
 
 **Thema:** Betrieb
