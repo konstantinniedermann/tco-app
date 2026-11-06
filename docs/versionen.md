@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Warum MyTCO ohne Anbindung an Fairgate läuft, steht jetzt als
+  [ADR-006](adr/adr-006-eigenstaendig-ohne-fairgate.md) mit Optionen, Konsequenzen und
+  Reevaluations-Triggern (#16).
+
 ## 0.5.1 — Versionsnummer bei jedem Merge
 
 - Versionsnummern: Jeder Merge nach `dev` mit Code bekommt eine eigene Korrekturnummer, im

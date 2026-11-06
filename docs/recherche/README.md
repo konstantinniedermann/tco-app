@@ -12,7 +12,8 @@ was daraus gilt, steht in ADRs, Roadmap oder Anforderungen.
 | 04.11.2026 | **tcolten.ch, Statuten und Domain:** Anbieter und Konten rund um die Website (Domain bei hosttech, DNS, Website und Mail bei Metanet, Mailversand auch über Fairgate), keine Datenschutzerklärung auf tcolten.ch, was die Statuten zu Kategorien, Austritt, Zeichnungsberechtigung und Ausgaben sagen, Lizenzfristen im Juniorenreglement | [`2026-11-04-tcolten-website.md`](2026-11-04-tcolten-website.md) |
 
 **Hinweis zur Systemlandschaft:** Sie entstand vor dem Entscheid, MyTCO unabhängig von
-Fairgate aufzubauen; die dortige Empfehlung „Weg A“ ist damit überholt. Weiter gültig
+Fairgate aufzubauen; die dortige Empfehlung „Weg A“ ist damit überholt (Begründung:
+[ADR-006](../adr/adr-006-eigenstaendig-ohne-fairgate.md)). Weiter gültig
 sind die Befunde zu Swiss Tennis Advantage (Import per Lizenznummern-Spalte, Export als
 Excel, kein Resultat-Import), zu WhatsApp (kein automatisches Auslesen von Gruppen) und
 die Kostenangaben zu Fairgate.
