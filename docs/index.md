@@ -20,6 +20,7 @@ Issue im Milestone *Fundament*.
 
 | Dokument | Inhalt |
 |----------|--------|
+| [arc42](arc42.md) | Gesamtbild: Ziele, Kontext mit Nachbarsystemen, Bausteine, Server, Querschnittskonzepte, Risiken — mit Verweisen auf die Einzeldokumente |
 | [ADR-Index](adr/adr-index.md) | Architektur-Entscheidungen mit Begründung |
 | [Fachmodell](fachmodell.md) | Objekte, Beziehungen, Fachregeln `FR-NN` und Lebenszyklen bis zur Etappe *Lizenzanträge*; Grundlage für Datenbank und Code |
 | [Datenschutzkonzept](datenschutz.md) | Was MyTCO mit Personendaten tut, nach nDSG; Vorgaben `DS-NN` für Technik und Hosting; Grundlage für jede neue Funktion |
@@ -41,7 +42,3 @@ Issue im Milestone *Fundament*.
 | [Beobachtungen](beobachtungen.md) | Posteingang für Befunde ausserhalb des Scopes |
 | [Beobachtungen — Archiv](beobachtungen-archiv.md) | Ausgewertete Beobachtungen mit Ausgang |
 | [Versionen](versionen.md) | Versionshistorie |
-
-## Geplant (Milestone *Fundament*)
-
-arc42
