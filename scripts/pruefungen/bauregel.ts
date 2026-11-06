@@ -35,6 +35,14 @@ const AUS_INDEX: [RegExp, string][] = [
 	[/(?:^|\/)lib\/server\/mitteilung\/index\.ts$/, 'holeMitteilungAdminDienste']
 ];
 const DIENSTE = AUS_INDEX.map(([, name]) => name);
+const ERLAUBT_IMPORT =
+	'erlaubt sind nur admin/index.ts, mitteilung/index.ts und die Schnittstellen aus admin/, turnier/ und mitteilung/';
+const ERLAUBT_LISTEN =
+	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN und MITTEILUNG_ADMIN_SCHNITTSTELLEN';
+// Ausserhalb von api/admin: aus den Mitteilungen nur, was den Mitgliedern dient (Ordner-Import
+// `$lib/server/mitteilung` löst Vite auf index.ts auf).
+const MITTEILUNG_INDEX = /(?:^|\/|^\$)lib\/server\/mitteilung(?:\/index(?:\.ts)?)?$/;
+const MITTEILUNG_SCHNITTSTELLEN = /(?:^|\/|^\$)lib\/server\/mitteilung\/schnittstellen(?:\.ts)?$/;
 
 // Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
 // weiterreicht, fällt hier nicht auf; das bleibt Aufgabe des Reviews.
@@ -120,9 +128,7 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 			continue;
 		}
 		if (!ERLAUBTER_IMPORT.test(imp.quelle)) {
-			befunde.push(
-				`${pfad}: Admin-Route importiert '${imp.quelle}'; erlaubt sind nur lib/server/admin/index.ts und schnittstellen.ts`
-			);
+			befunde.push(`${pfad}: Admin-Route importiert '${imp.quelle}'; ${ERLAUBT_IMPORT}`);
 			continue;
 		}
 		const ausListe = SCHNITTSTELLEN_IMPORT.test(imp.quelle);
@@ -140,7 +146,7 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 			}
 			befunde.push(
 				ausListe
-					? `${pfad}: Admin-Route nutzt '${name}'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
+					? `${pfad}: Admin-Route nutzt '${name}'; ${ERLAUBT_LISTEN}`
 					: `${pfad}: Admin-Route importiert '${name}' aus ${imp.quelle}; erlaubt ist nur ${dienst}`
 			);
 		}
@@ -159,10 +165,42 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 	return befunde;
 }
 
+/** Ausserhalb von api/admin: keine Dienste und Schnittstellen der Verwaltung aus den Mitteilungen. */
+function pruefeMitteilungImporte(
+	pfad: string,
+	imp: Import[],
+	verwaltung: Set<string> | null
+): string[] {
+	const befunde: string[] = [];
+	for (const i of imp) {
+		if (i.quelle === null) continue;
+		const ausIndex = MITTEILUNG_INDEX.test(i.quelle);
+		if (!ausIndex && !MITTEILUNG_SCHNITTSTELLEN.test(i.quelle)) continue;
+		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
+		if (namen === null) {
+			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
+			continue;
+		}
+		for (const [name] of namen) {
+			const nurVerwaltung = ausIndex
+				? name === 'holeMitteilungAdminDienste'
+				: (verwaltung?.has(name) ?? false);
+			if (nurVerwaltung) {
+				befunde.push(`${pfad}: nur Routen unter src/routes/api/admin/ dürfen '${name}' nutzen`);
+			}
+		}
+	}
+	return befunde;
+}
+
 /** Prüft die Bauregel: nur API-Routen (`+server.ts`), keine Server-Dateien neben Seiten, Form Actions oder Remote Functions. */
 export function pruefeBauregel(dateien: Map<string, string>): string[] {
 	const befunde: string[] = [];
 	const liste = adminSchnittstellen(dateien);
+	const mitteilungVerwaltung = schnittstellenListe(
+		dateien.get(MITTEILUNG_DATEI) ?? '',
+		'MITTEILUNG_ADMIN_SCHNITTSTELLEN'
+	);
 	const mitAdminRoute = [...dateien.keys()].some((p) => ADMIN_ROUTE.test(p));
 	if (mitAdminRoute && liste === null) {
 		befunde.push(`${SCHNITTSTELLEN_DATEI}: ADMIN_SCHNITTSTELLEN nicht gefunden`);
@@ -186,6 +224,7 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
 				);
 			}
+			befunde.push(...pruefeMitteilungImporte(pfad, imp, mitteilungVerwaltung));
 			if (imp.some((i) => i.quelle === null)) {
 				befunde.push(`${pfad}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`);
 			}
