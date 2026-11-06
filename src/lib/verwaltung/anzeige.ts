@@ -16,7 +16,7 @@ export function fehlerText(a: Antwort<unknown>): string {
 	return MELDUNG.stoerung;
 }
 
-export const FELD_NAMEN: Record<Feld, string> = {
+export const FELD_NAMEN: Record<Feld | 'klassierung', string> = {
 	mitgliedernummer: 'Mitgliedernummer',
 	vorname: 'Vorname',
 	nachname: 'Nachname',
@@ -27,6 +27,7 @@ export const FELD_NAMEN: Record<Feld, string> = {
 	telefon: 'Telefon',
 	geschlecht: 'Geschlecht',
 	jahrgang: 'Jahrgang',
+	klassierung: 'Klassierung',
 	lizenznummer: 'Lizenznummer'
 };
 
