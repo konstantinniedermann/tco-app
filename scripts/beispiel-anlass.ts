@@ -1,9 +1,12 @@
 // Nur lokal (make seed): eine erfundene Generalversammlung mit einigen Antworten erfundener
-// Mitglieder, damit Startseite und Verwaltung beim Vorzeigen nicht leer sind (DS-08).
+// Mitglieder und einer verschickten Erinnerung im Verlauf der Mitteilungen, damit Startseite und
+// Verwaltung beim Vorzeigen nicht leer sind (DS-08).
 import { eq } from 'drizzle-orm';
 import { zuerichZuUtc } from '../src/lib/anlass/zeit.ts';
 import { legeAnlassAn, melde } from '../src/lib/server/anlass/anlaesse.ts';
+import { vorlagenAnlass } from '../src/lib/mitteilung/vorlagen.ts';
 import type { Db } from '../src/lib/server/db/index.ts';
+import { speichereMitteilung } from '../src/lib/server/mitteilung/verlauf.ts';
 import { anlass, mitglied, type Antwort } from '../src/lib/server/db/schema.ts';
 
 const TITEL = 'Generalversammlung 2027';
@@ -61,16 +64,36 @@ export async function legeBeispielAnlassAn(
 		.from(anlass)
 		.where(eq(anlass.titel, TITEL));
 	if (vorhanden) return;
+	const beginn = zuerichZuUtc('2027-03-19T19:30')!;
+	const anmeldeschluss = zuerichZuUtc('2027-03-16T23:59')!;
 	const id = await legeAnlassAn(db, erstelltVon, {
 		titel: TITEL,
-		beginn: zuerichZuUtc('2027-03-19T19:30')!,
+		beginn,
 		ort: 'Clubhaus, Musterweg 1, Olten',
 		einladung: EINLADUNG,
-		anmeldeschluss: zuerichZuUtc('2027-03-16T23:59')!
+		anmeldeschluss
 	});
 	for (const a of ANTWORTEN) {
 		const mitgliedId = await erfundenesMitglied(db, a.vorname, a.nachname);
 		await melde(db, id, mitgliedId, { antwort: a.antwort, bemerkung: a.bemerkung ?? null }, jetzt);
 	}
 	await erfundenesMitglied(db, OHNE_ANTWORT.vorname, OHNE_ANTWORT.nachname);
+	// Eine erfundene Erinnerung im Verlauf (nur Zahlen, nie Empfängernamen); verschickt wird nichts.
+	const erinnerung = vorlagenAnlass({ titel: TITEL, beginn, anmeldeschluss })[0];
+	await speichereMitteilung(
+		db,
+		{ art: 'anlass', anlassId: id },
+		{
+			absenderId: erstelltVon,
+			titel: erinnerung.titel,
+			text: erinnerung.text,
+			auswahl: 'keine-antwort',
+			weg: 'push-sonst-mail',
+			push: 1,
+			mails: 1,
+			ersatzMails: 0,
+			nichtErreichbar: 0
+		},
+		jetzt
+	);
 }

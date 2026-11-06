@@ -8,6 +8,7 @@ import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairg
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
 import type { TurnierStatus } from '../server/db/schema.ts';
+import type { MitteilungFeld } from '../server/mitteilung/angaben.ts';
 import type { KategorieFeld, TurnierFeld } from '../server/turnier/angaben.ts';
 import type {
 	KategorieZeile,
@@ -36,7 +37,7 @@ export type TurnierListe = Json<TurnierZeile>[];
 export type TurnierAnsicht = Json<TurnierDetail>;
 export type KategorieAnsicht = Json<NonNullable<Awaited<ReturnType<typeof ServerLadeKategorie>>>>;
 export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus, VerwaltungsRolle };
-type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld;
+type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld | MitteilungFeld;
 export type FairgateZeile = Json<ServerFairgateZeile>;
 export type { Angaben, AnsichtRolle, Feld, MitgliedStatus, Rolle, RollenListe };
 
@@ -104,9 +105,9 @@ async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<A
 	}
 }
 
-const lese = <T>(pfad: string, holen: Holen) => rufe<T>(pfad, { method: 'GET' }, holen);
+export const lese = <T>(pfad: string, holen: Holen) => rufe<T>(pfad, { method: 'GET' }, holen);
 
-const schicke = <T>(pfad: string, inhalt: object, holen: Holen) =>
+export const schicke = <T>(pfad: string, inhalt: object, holen: Holen) =>
 	rufe<T>(pfad, jsonPost(inhalt), holen);
 
 const ADMIN = '/api/admin';

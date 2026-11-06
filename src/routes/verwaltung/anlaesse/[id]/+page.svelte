@@ -13,6 +13,10 @@
 		type AnlassFeld
 	} from '../../../../lib/verwaltung/api.ts';
 	import { fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
+	import { ladeMitteilungen } from '../../../../lib/verwaltung/mitteilung-api.ts';
+	import Mitteilungsformular from '../../../../lib/verwaltung/Mitteilungsformular.svelte';
+	import Mitteilungsverlauf from '../../../../lib/verwaltung/Mitteilungsverlauf.svelte';
+	import { MELDUNG } from '../../../../lib/login/anmelden.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';
 
@@ -27,6 +31,13 @@
 	let rueckmeldung = $state<string | null>(null);
 	let laeuft = $state(false);
 	let rueckfrage = $state<HTMLDialogElement>();
+	// Mitteilungen (FR-42): nach dem Senden lädt die Seite den Verlauf neu.
+	let mitteilungen = $derived(data.mitteilungen);
+
+	async function verlaufNeuLaden() {
+		const m = await ladeMitteilungen({ art: 'anlass', anlassId: detail.id });
+		if (m.art === 'ok') mitteilungen = m.daten;
+	}
 
 	const start = $derived<AnlassWerte>({
 		titel: detail.titel,
@@ -144,6 +155,20 @@
 		<p class="fehler" role="alert">{allgemein}</p>
 	{/if}
 </div>
+
+<h2>Mitteilungen</h2>
+{#if mitteilungen === null}
+	<p class="fehler" role="alert">{MELDUNG.stoerung}</p>
+{:else}
+	{#if !nurLesen}
+		<Mitteilungsformular
+			bezug={{ art: 'anlass', anlassId: detail.id }}
+			vorlagen={mitteilungen.vorlagen}
+			ongesendet={verlaufNeuLaden}
+		/>
+	{/if}
+	<Mitteilungsverlauf eintraege={mitteilungen.verlauf} />
+{/if}
 
 {#if !nurLesen}
 	<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}

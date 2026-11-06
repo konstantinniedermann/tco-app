@@ -38,6 +38,10 @@
 			<a href={resolve('/verwaltung/anlaesse')} aria-current={aktuell('/verwaltung/anlaesse')}
 				>Anlässe</a
 			>
+			<a
+				href={resolve('/verwaltung/mitteilungen')}
+				aria-current={aktuell('/verwaltung/mitteilungen')}>Mitteilungen</a
+			>
 			<a href={resolve('/verwaltung/fairgate')} aria-current={aktuell('/verwaltung/fairgate')}
 				>Für Fairgate{data.fairgateAnzahl === null ? '' : ` (${data.fairgateAnzahl})`}</a
 			>
