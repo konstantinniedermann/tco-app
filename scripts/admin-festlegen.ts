@@ -1,4 +1,5 @@
-// Serverbefehl für den ersten Admin: legt das Mitglied an und gibt ihm die Rolle admin.
+// Serverbefehl für den ersten Admin: legt das Mitglied an und gibt ihm die Rollen MyTCO-Admin und
+// Mitglieder-Admin.
 // Auf Live: `docker compose exec app node scripts/admin-festlegen.ts --mitgliedernummer … --vorname …`
 // (siehe betrieb/README.md); lokal über `make admin ARGS='…'`.
 // Ausgabe: nur das Ergebnis, bei Fehlern Feldnamen mit Grund, nie Werte (DS-06, SI-05).
@@ -8,9 +9,10 @@ import { FELDER } from '../src/lib/server/admin/angaben.ts';
 import { erstelleDb, type Db } from '../src/lib/server/db/index.ts';
 
 const TEXT: Record<'angelegt' | 'rolle-vergeben' | 'schon-admin', string> = {
-	angelegt: 'admin: Mitglied angelegt, Rolle admin vergeben',
-	'rolle-vergeben': 'admin: Mitglied war schon da, Rolle admin vergeben',
-	'schon-admin': 'admin: Mitglied war schon Admin, nichts geändert'
+	angelegt: 'admin: Mitglied angelegt, Rollen MyTCO-Admin und Mitglieder-Admin vergeben',
+	'rolle-vergeben':
+		'admin: Mitglied war schon da, Rollen MyTCO-Admin und Mitglieder-Admin vergeben',
+	'schon-admin': 'admin: Mitglied war schon MyTCO-Admin, nichts geändert'
 };
 
 export async function festlegen(args: string[], db: Db): Promise<void> {

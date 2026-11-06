@@ -1,0 +1,2 @@
+ALTER TABLE "sitzung" ADD COLUMN "ansicht_rolle" text;--> statement-breakpoint
+ALTER TABLE "sitzung" ADD CONSTRAINT "sitzung_ansicht_rolle_check" CHECK ("sitzung"."ansicht_rolle" is null or "sitzung"."ansicht_rolle" in ('mitglied', 'mitglieder', 'cm', 'lizenz'));

@@ -45,6 +45,8 @@
 		/** Die Taste ist grau, solange nichts geändert ist (Bearbeiten). */
 		nurBeiAenderung?: boolean;
 		rueckmeldung?: string | null;
+		/** Die Rolle darf nur lesen: Felder gesperrt, ohne Tasten (UI-Leitbild, Baustein Nur lesen). */
+		nurLesen?: boolean;
 		onspeichern: (werte: Werte) => void;
 	};
 	let {
@@ -53,6 +55,7 @@
 		knopf,
 		nurBeiAenderung = false,
 		rueckmeldung = null,
+		nurLesen = false,
 		onspeichern
 	}: Props = $props();
 
@@ -110,6 +113,20 @@
 	novalidate
 	data-ungespeichert={geaendert ? '' : undefined}
 >
+	{#if nurLesen}
+		<fieldset class="nur-lesen" disabled>{@render felder()}</fieldset>
+	{:else}
+		{@render felder()}
+		<button type="submit" class="taste-haupt" disabled={nurBeiAenderung && !geaendert}
+			>{knopf}</button
+		>
+		<span class="leise" role="status"
+			>{#if rueckmeldung && !geaendert}{rueckmeldung}{/if}</span
+		>
+	{/if}
+</form>
+
+{#snippet felder()}
 	{#each REIHE as f (f)}
 		<div class="feld-zeile">
 			<label for="feld-{f}">{bezeichnung(f)}</label>
@@ -140,9 +157,4 @@
 			{/if}
 		</div>
 	{/each}
-	<button type="submit" class="taste-haupt" disabled={nurBeiAenderung && !geaendert}>{knopf}</button
-	>
-	<span class="leise" role="status"
-		>{#if rueckmeldung && !geaendert}{rueckmeldung}{/if}</span
-	>
-</form>
+{/snippet}

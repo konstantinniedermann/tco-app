@@ -237,7 +237,8 @@ describe('Schnittstellen', () => {
 			expect(await r1.json()).toEqual({
 				vorname: 'Erika',
 				passkeyHinweis: true,
-				verwaltung: false
+				verwaltung: false,
+				ansicht: null
 			});
 
 			await s.dienst.beendeAlleSitzungen(s.kontoId);

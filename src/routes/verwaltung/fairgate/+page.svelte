@@ -1,11 +1,16 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { uebertrageFairgate } from '../../../lib/verwaltung/api.ts';
-	import { geaendertText, neueAngaben, tagText } from '../../../lib/verwaltung/anzeige.ts';
+	import {
+		geaendertText,
+		neueAngaben,
+		tagText,
+		fehlerText
+	} from '../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 
 	let { data } = $props();
+	const darfAbhaken = $derived(data.darfSchreiben.mitglieder);
 
 	let meldung = $state<string | null>(null);
 	let fehler = $state<string | null>(null);
@@ -22,7 +27,7 @@
 			meldung = 'Das Mitglied hat inzwischen weitere Angaben geändert. Hier ist der neue Stand.';
 		} else if (a.art !== 'ok' && a.art !== 'nicht-gefunden') {
 			// «nicht gefunden»: schon abgehakt (zweiter Tab); die Liste zeigt dann den aktuellen Stand.
-			fehler = MELDUNG.stoerung;
+			fehler = fehlerText(a);
 			return;
 		}
 		await invalidate('app:fairgate');
@@ -35,8 +40,8 @@
 
 <h1>Für Fairgate</h1>
 <p class="leise">
-	Diese Mitglieder haben Angaben in MyTCO selbst geändert. Trag die neuen Werte in Fairgate nach und
-	hake dann ab.
+	Diese Mitglieder haben Angaben in MyTCO selbst geändert.
+	{#if darfAbhaken}Trag die neuen Werte in Fairgate nach und hake dann ab.{/if}
 </p>
 
 {#if meldung}
@@ -54,7 +59,7 @@
 			<thead>
 				<tr>
 					<th>Mitglied</th><th>Nr.</th><th>Geändert</th><th>Neue Angaben</th><th>Seit</th>
-					<th><span class="leise">Erledigt</span></th>
+					{#if darfAbhaken}<th><span class="leise">Erledigt</span></th>{/if}
 				</tr>
 			</thead>
 			<tbody>
@@ -69,14 +74,16 @@
 							{/each}
 						</td>
 						<td>{tagText(z.seit)}</td>
-						<td>
-							<button
-								type="button"
-								class="taste-neben"
-								disabled={laeuft !== null}
-								onclick={() => hake(z.id, z.seit)}>In Fairgate übertragen</button
-							>
-						</td>
+						{#if darfAbhaken}
+							<td>
+								<button
+									type="button"
+									class="taste-neben"
+									disabled={laeuft !== null}
+									onclick={() => hake(z.id, z.seit)}>In Fairgate übertragen</button
+								>
+							</td>
+						{/if}
 					</tr>
 				{/each}
 			</tbody>

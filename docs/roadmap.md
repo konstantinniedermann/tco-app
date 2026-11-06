@@ -9,7 +9,7 @@ einzelnen Aufgaben stehen als Issues darin.
 ([`anforderungen/`](anforderungen/README.md)).
 
 **Grundsatz:** MyTCO wird vorerst eigenständig aufgebaut — ohne Anbindung an Fairgate
-und ohne Einbindung in tcolten.ch. Mitglieder pflegt der Admin in MyTCO, von Hand oder per
+und ohne Einbindung in tcolten.ch. Mitglieder pflegt der Mitglieder-Admin in MyTCO, von Hand oder per
 Datei aus Fairgate (A-MITGLIED-07); warum: [ADR-006](adr/adr-006-eigenstaendig-ohne-fairgate.md).
 
 ## Etappen
@@ -18,7 +18,7 @@ Datei aus Fairgate (A-MITGLIED-07); warum: [ADR-006](adr/adr-006-eigenstaendig-o
 |-----------|--------|--------|
 | **Fundament** | 26.11.2026 | Anforderungen mit IDs, Glossar, Fachmodell, Rollen und Rechte, Datenschutz- und Sicherheitskonzept, Technik-ADRs, Kosten, Betrieb und Übergabe, Test- und Release-Konzept, arc42, UI-Leitbild. Danach das leere Code-Gerüst mit CI |
 | **Pilot** | — (sobald bereit) | Server und Live in Betrieb, Login per Einmal-Code, freiwilliger Passkey, Hilfe beim Start (Hilfe-Seite, Anleitung zum Startbildschirm), Brief-Code und Brief als PDF aus der Mitgliederverwaltung ([#43](https://github.com/konstantinniedermann/tco-app/issues/43), Etappe 2). Eine [Testgruppe](testgruppe.md) probiert den Start mit einer Vorabversion 0.x auf Live aus; Lauf 1 startet, sobald die Voraussetzungen erfüllt sind |
-| **Mitglieder-Login** | 28.02.2027 | Version 1.0.0 für alle Mitglieder: Befunde aus dem Pilot eingearbeitet, Mitgliederverwaltung für Admins fertig (Mitglieder von Hand anlegen, bearbeiten, Austritt), Briefversand mit Einmal-Code an alle. Was im Pilot schon läuft: Login ohne Passwort per Einmal-Code, beim ersten Login Pflicht zum Ergänzen fehlender Daten, danach eingeloggt bleiben; neuer Code per E-Mail ([#29](https://github.com/konstantinniedermann/tco-app/issues/29)); freiwillig ein Passkey (A-LOGIN-07) |
+| **Mitglieder-Login** | 28.02.2027 | Version 1.0.0 für alle Mitglieder: Befunde aus dem Pilot eingearbeitet, Mitgliederverwaltung für Mitglieder-Admins fertig (Mitglieder von Hand anlegen, bearbeiten, Austritt), Briefversand mit Einmal-Code an alle. Was im Pilot schon läuft: Login ohne Passwort per Einmal-Code, beim ersten Login Pflicht zum Ergänzen fehlender Daten, danach eingeloggt bleiben; neuer Code per E-Mail ([#29](https://github.com/konstantinniedermann/tco-app/issues/29)); freiwillig ein Passkey (A-LOGIN-07) |
 | **CM-Anmeldung** | 15.04.2027 | Anmeldung zur Clubmeisterschaft ist offen, auch für Junioren (K-46) |
 | **CM-Betrieb** | 01.06.2027 | Datenaustausch mit Swiss Tennis in beide Richtungen, Spieler melden ihre Resultate selbst |
 | **Lizenzanträge** | 01.04.2028 | Mitglieder beantragen eine Lizenz oder deren Storno. Der Lizenzverantwortliche sieht zu einem Stichtag die Liste der Anträge, exportiert sie und trägt sie von Hand bei Swiss Tennis ein |

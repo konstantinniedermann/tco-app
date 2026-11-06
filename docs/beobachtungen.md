@@ -116,6 +116,35 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-06 — Kleinbefunde aus den Reviews von #43 (Rollen schärfen)
+
+**Thema:** Rollen und Rechte
+
+**Fundort:** `src/lib/server/admin/`, `src/lib/verwaltung/`, `src/routes/`, `scripts/`, `tests/e2e/`, `drizzle/0009_rollen_schaerfen.sql`
+
+**Beobachtung:** Aus den Task- und Schluss-Reviews, als «nicht vor dem Merge» eingestuft:
+- `postMitglied` (`src/lib/server/admin/schnittstellen.ts`): Dass der Hinweis an die alte Adresse bei `vergeben`/`veraltet` ausbleibt, ist ungetestet.
+- `src/lib/server/admin`: einmaliger, nicht reproduzierter Flake in den DB-Tests (vermutlich die geteilte DB).
+- `machAdmin` (`src/lib/server/admin/erster-admin.ts`) wertet das Ergebnis `veraltet` von `setzeRollen` nicht aus.
+- `src/lib/server/admin/schnittstellen-letzter-admin.db.test.ts` hängt von der Reihenfolge ab.
+- Migrationstest 0009 schreibt die Ausgangsdaten mit dem aktuellen TS-Schema; er altert mit jedem Schema-Wechsel.
+- `scripts/seed-lokal.ts` koppelt Rollen und Personas über Indizes.
+- Rechte-Matrix-Test (`src/lib/server/admin/rechte-matrix.db.test.ts`): Der Spread zweier Listen kann eine Namenskollision verdecken; Aufbau mit gleichen IDs; Testnamen ohne RR-/SI-Kennung.
+- `ANSICHT_ROLLEN` steht doppelt (Schema-Literal in `src/lib/server/db/schema.ts` und `src/lib/server/admin/rollen.ts`).
+- `ansicht_rolle` wird nur in `setzeRollen` gelöscht (`src/lib/server/admin/rollen.ts`); vor Etappe 3 beachten.
+- Ansicht als …: Eine Störung von `/api/sitzung` lässt die Tasten wieder erscheinen (der Server weist ab); zwei Quellen für denselben Zustand.
+- `src/routes/anlass/[id]/+page.svelte`: Hinweis «Datum oder Ort geändert» steht in der Ansicht ohne Aktion.
+- `nur-ansehen` ausserhalb der Verwaltung (zweiter Tab) ohne eigene Meldung.
+- Root-Load (`src/routes/+layout.ts`) fragt `/api/sitzung` auch auf öffentlichen Seiten ab; doppelte Anfrage in `src/routes/+page.ts` und `src/routes/profil/+page.ts`.
+- `fieldset.nur-lesen` ohne Erklärung für Screenreader; Band-Name «Ansicht» knapp.
+- Sperrmuster in 4 Formularen kopiert; Name `nurAnsehen` doppeldeutig; Export `NUR_ANSEHEN` (`src/lib/verwaltung/anzeige.ts`) ausserhalb der Datei unbenutzt.
+- E2E (`tests/e2e/verwaltung.test.ts`): axe nicht ganz am Testende; kein E2E für «keine Rückfrage in der Ansicht».
+- Befehlsname «Admin festlegen» (`make admin`, `scripts/admin-festlegen.ts`) passt nicht mehr zum Wortgebrauch der vier Rollen.
+
+**Ursprung:** #43 Reviews Rollen-Umbau.
+
+**Einschätzung:** Alles klein. `ansicht_rolle` und die doppelte Quelle für die Ansicht vor Etappe 3 ansehen; der Befehlsname lässt sich mit der nächsten Arbeit an den Skripten angleichen.
+
 ### 2026-11-06 — CI: langsamer Ubuntu-Spiegel macht den E2E-Lauf rot, auch nach dem Fix der apt-Sperre
 
 **Thema:** Betrieb
@@ -322,3 +351,39 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) des Branches `feat/wappen-start`.
 
 **Einschätzung:** Nur bei Störungen oder gleichzeitiger Bearbeitung; die Rückfrage schadet dann nicht (Verlassen geht). Beheben, wenn diese Seiten ohnehin angefasst werden: das Formular nach jedem Nachladen neu aufbauen wie bei den Angaben eines Mitglieds (`nachSpeichern`).
+
+### 2026-11-06 — Auswahlfeld «Geschlecht» ist im iPhone-Profil der Verwaltung nur halb so hoch wie die Textfelder
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/design/basis.css` (`.feld-zeile select`), sichtbar in `src/lib/verwaltung/Angabenformular.svelte` auf iPhone (WebKit)
+
+**Beobachtung:** Im E2E-Screenshot (iPhone-Profil) zeigt WebKit das `<select>` mit eigenem Aussehen (`menulist`): schmal, ohne den dicken Rand und ohne `--tippflaeche` als Mindesthöhe. Das gilt gesperrt (Baustein *Nur lesen*) wie bearbeitbar; das Kategorieformular hat dieselben Felder. Im selben Bild läuft auch die lange E-Mail-Adresse im Feld abgeschnitten.
+
+**Ursprung:** Screenshots zu #43 (Task 5, Rollen-Umbau der Oberfläche).
+
+**Einschätzung:** Vermutlich verletzt es UI-03 (48 px) am iPhone; die Abhilfe wäre wahrscheinlich `appearance: none` mit einem eigenen Pfeil. Das trifft alle Auswahlfelder, darum erst ins Leitbild und dann am Gerät prüfen.
+
+### 2026-11-06 — Migration, die alte Werte verbietet, legt Seed und E2E paralleler Worktrees lahm
+
+**Thema:** Betrieb
+
+**Fundort:** gemeinsame lokale Datenbank `mytco` aller Worktrees; `drizzle/0009_rollen_schaerfen.sql` (`konto_rolle_rolle_check` ohne `admin`)
+
+**Beobachtung:** Eine Migration, die alte Werte verbietet (hier die Rolle `admin`), lässt Seed und E2E paralleler Worktrees mit älterem Code scheitern, sobald ein Worktree sie in die gemeinsame Datenbank eingespielt hat. Zurück geht es nur mit einer neu aufgesetzten Datenbank. Die Wappen-Session musste auf eine eigene Datenbank `mytco_wappen` ausweichen.
+
+**Ursprung:** #43, Rollen-Umbau.
+
+**Einschätzung:** Eigene Datenbank pro Worktree für E2E erwägen, z. B. `DATABASE_URL` aus dem Namen des Worktrees ableiten, oder den Ausweg im Skill `tco-branching` beschreiben.
+
+### 2026-11-06 — Testkonten aus E2E-Läufen sammeln sich in der gemeinsamen Datenbank an
+
+**Thema:** Betrieb
+
+**Fundort:** gemeinsame lokale Datenbank `mytco`; Seite `/verwaltung/rollen`
+
+**Beobachtung:** Jeder E2E-Lauf legt neue erfundene Konten mit Rollen an, aufgeräumt wird nicht. Auf der Seite *Rollen* stehen z. B. 474 MyTCO-Admins. Das stört Screenshots als Nachweis, weil Listen und Zahlen nicht nach dem Verein aussehen.
+
+**Ursprung:** #43, Screenshots der Seite *Rollen*.
+
+**Einschätzung:** Zusammen mit dem Eintrag oben lösen: Eine eigene Datenbank pro Worktree oder pro Lauf hält die Listen klein; sonst Screenshots auf einer frisch mit `make seed` aufgesetzten Datenbank machen.

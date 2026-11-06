@@ -77,9 +77,17 @@ export const sitzung = pgTable(
 		adminBestaetigtAm: timestamp('admin_bestaetigt_am', { withTimezone: true }),
 		adminCodeHash: text('admin_code_hash'),
 		adminCodeAblauf: timestamp('admin_code_ablauf', { withTimezone: true }),
-		adminCodeFehlversuche: integer('admin_code_fehlversuche').notNull().default(0)
+		adminCodeFehlversuche: integer('admin_code_fehlversuche').notNull().default(0),
+		// «Ansicht als …» des MyTCO-Admins, nur für diese Sitzung; null heisst keine Ansicht.
+		ansichtRolle: text('ansicht_rolle')
 	},
-	(t) => [index('sitzung_konto_id_idx').on(t.kontoId)]
+	(t) => [
+		index('sitzung_konto_id_idx').on(t.kontoId),
+		check(
+			'sitzung_ansicht_rolle_check',
+			sql`${t.ansichtRolle} is null or ${t.ansichtRolle} in ('mitglied', 'mitglieder', 'cm', 'lizenz')`
+		)
+	]
 );
 
 export const passkey = pgTable(
@@ -115,7 +123,7 @@ export const kontoRolle = pgTable(
 	},
 	(t) => [
 		primaryKey({ columns: [t.kontoId, t.rolle] }),
-		check('konto_rolle_rolle_check', sql`${t.rolle} in ('admin', 'cm', 'lizenz')`)
+		check('konto_rolle_rolle_check', sql`${t.rolle} in ('mytco', 'mitglieder', 'cm', 'lizenz')`)
 	]
 );
 

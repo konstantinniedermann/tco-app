@@ -15,7 +15,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 ## Zielsetzung vom 29.10.2026
 
 - MyTCO wird **unabhängig von Fairgate und der heutigen Website** aufgebaut.
-- **Bis März 2027:** Admin-Rolle mit einer Seite zur Mitgliederverwaltung. Mitglieder
+- **Bis März 2027:** Rolle Mitglieder-Admin mit einer Seite zur Mitgliederverwaltung. Mitglieder
   werden von Hand hinzugefügt, solange Fairgate nicht angebunden ist. Das Login für
   Mitglieder funktioniert: Die Zugangsdaten gehen per Brief raus, beim ersten Login
   wird das Einmalpasswort ersetzt.
@@ -53,6 +53,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 | 06.11.2026 | Begründung zu N-EIGENSTAENDIG-01 als [ADR-006](../adr/adr-006-eigenstaendig-ohne-fairgate.md) festgehalten ([#16](https://github.com/konstantinniedermann/tco-app/issues/16)): eigene Mitgliederliste ohne Anbindung an Fairgate, mit Reevaluations-Triggern; A-MITGLIED-05 bleibt *später* | Projektleiter |
 | 06.11.2026 | CM Teil 1, Turnier und Kategorien anlegen ([#57](https://github.com/konstantinniedermann/tco-app/issues/57), [Design](../superpowers/specs/2026-11-06-cm-anmeldung-design.md)): Turniernummern freiwillig (A-TURNIER-02; Swiss Tennis vergibt sie oft erst später); Doppelkategorien nach Mindestsumme der Klassierungen statt Klassierungsbereich (A-TURNIER-03, Annahme K-51); Kategorien lassen sich absagen; FR-33 bis FR-35 | Projektleiter |
 | 06.11.2026 | CM Teil 1 umgesetzt ([#57](https://github.com/konstantinniedermann/tco-app/issues/57)): A-TURNIER-01 bis -03 und A-ANMELDUNG-07 auf *umgesetzt*, A-ROLLE-07 auf *umgesetzt\** (Turnier und Kategorien); A-TURNIER-03 präzisiert: Klassierungsbereich im Einzel, Mindestsumme im Doppel | Projektleiter |
+| 06.11.2026 | Rollen schärfen ([#43](https://github.com/konstantinniedermann/tco-app/issues/43), [Design](../superpowers/specs/2026-11-06-rollen-schaerfen-design.md)): statt «Admin» vier Admin-Rollen, einzeln vergeben (Vorschlag K-18.4). A-ROLLE-01 neu *MyTCO-Admin* (vergibt Rollen, sieht alles, ändert nichts), A-ROLLE-02 neu *Mitglieder-Admin*; A-ROLLE-07 und -08 heissen *CM-Admin* und *Lizenz-Admin*; neu A-ROLLE-09 *Ansicht als …*. Die Stellvertretung durch den Admin entfällt (RR-02 verworfen); A-LOGIN-09, A-MITGLIED-01 bis -07, A-KONTO-02, A-ANLASS-01 und N-APP-03 nennen die neue Rolle | Projektleiter |
 
 ## Offene Fragen an den Verein
 

@@ -92,6 +92,10 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	await expect(seite.getByRole('heading', { level: 1, name: titel })).toBeVisible();
 	await expect(seite.getByText('2. Wahlen', { exact: false })).toBeVisible();
 	await seite.getByLabel('Ich komme nicht').check();
+	// Wie in der Datenschutzerklärung: wer die Bemerkung sieht, in Worten für Mitglieder.
+	await expect(
+		seite.getByText('Die Bemerkung sehen nur du, die Mitgliederverwaltung und wer MyTCO')
+	).toBeVisible();
 	await seite.getByLabel('Bemerkung (freiwillig)').fill('Bin in den Ferien.');
 	await pruefeBildschirm(seite, info, 'anlass-abmelden');
 	await seite.getByRole('button', { name: 'Antwort senden' }).click();

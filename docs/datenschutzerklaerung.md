@@ -22,7 +22,7 @@ MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Fragen zum Datenschutz
 **Welche Daten:** Name, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Mitgliedernummer,
 Lizenznummer und Klassierung, deine Anmeldungen, Resultate und Lizenzanträge, deine An- oder
 Abmeldung zu Anlässen wie der Generalversammlung mit einer freiwilligen Bemerkung. Deine Grunddaten übernimmt
-der Verein aus seiner Mitgliederliste. Legt ein Admin einen Anlass an, speichert MyTCO, wer ihn
+der Verein aus seiner Mitgliederliste. Legt die Verwaltung einen Anlass an, speichert MyTCO, wer ihn
 angelegt hat, damit sich Rückfragen klären lassen.
 
 **Wozu:** für dein Konto, die Clubmeisterschaft, Anlässe, Lizenzanträge und Benachrichtigungen, die
@@ -30,11 +30,18 @@ du selbst einschaltest. Für nichts anderes.
 
 **Wer sieht was:**
 
-- Der Admin sieht alle deine Daten und, ohne Inhalt, wer wann welche Angabe geändert oder
-  welche Aktion ausgelöst hat (12 Monate). Deinen Einmal-Code kann nach dem Versand niemand mehr abrufen. Die Verantwortlichen von
-  Clubmeisterschaft und Lizenzen sehen deinen Namen, deine E-Mail und Telefonnummer und was
-  sie für ihre Aufgabe brauchen. Deine An- oder Abmeldung zu einem Anlass und deine Bemerkung sehen
-  nur du und der Admin. Schreib in die Bemerkung bitte keine Angaben zur Gesundheit.
+- Die **Mitglieder-Admins** führen die Mitgliederliste. Sie sehen alle deine Daten und, ohne
+  Inhalt, wer wann welche Angabe geändert oder welche Aktion ausgelöst hat (12 Monate).
+- Die **MyTCO-Admins** betreuen MyTCO technisch und vergeben die Rollen
+  [Personen, **Vorschlag K-18.4:** Projektleiter und Stellvertretung]. Sie sehen dieselben
+  Daten wie alle anderen Rollen, ändern sie aber nicht. Das brauchen sie, um den anderen zu
+  helfen, Fehler zu finden und die Vergabe der Rollen zu prüfen.
+- Die **CM-Admins** und **Lizenz-Admins** sehen deinen Namen, deine E-Mail und Telefonnummer
+  und was sie für die Clubmeisterschaft bzw. die Lizenzen brauchen.
+- Deinen Einmal-Code kann nach dem Versand niemand mehr abrufen.
+- Deine An- oder Abmeldung zu einem Anlass und deine Bemerkung sehen nur du, die
+  Mitglieder-Admins und die MyTCO-Admins. Schreib in die Bemerkung bitte keine Angaben zur
+  Gesundheit.
 - Alle Mitglieder sehen Name, Kategorien und Resultate der Clubmeisterschaft. Wer einen
   Doppelpartner sucht, sieht die Namen der Mitglieder, die für die Kategorie in Frage kommen.
 - Deine Gegner und dein Doppelpartner sehen während der Clubmeisterschaft deine E-Mail und
@@ -68,7 +75,7 @@ E-Mail-Adresse, bestätigst du die Änderung mit je einem Code an die alte und d
 Adresse. Bis du beide Codes eingetippt hast, merkt sich dein Gerät die neue Adresse; ist die
 Änderung bestätigt, mit «‹ Zurück» abgebrochen oder du meldest dich ab, löscht MyTCO sie sofort; sonst nach 15 Minuten spätestens beim nächsten Start der App. Auf
 dem Server liegt die neue Adresse bis dahin nur im Arbeitsspeicher und verfällt nach 15 Minuten;
-für die Grenze der Code-Mails merkt sich MyTCO sie dort höchstens 24 Stunden. Ändert der Admin deine Adresse, erhält die alte einen Hinweis. Richtest du freiwillig einen
+für die Grenze der Code-Mails merkt sich MyTCO sie dort höchstens 24 Stunden. Ändert ein Mitglieder-Admin deine Adresse, erhält die alte einen Hinweis. Richtest du freiwillig einen
 Passkey ein, speichert MyTCO je Passkey nur dessen öffentlichen Schlüssel, eine Kennung, einen
 Zähler, die Adresse der App, eine grobe Gerätebezeichnung (z. B. «iPhone») sowie wann du ihn
 eingerichtet und zuletzt benutzt hast. Diese Angaben löschen wir, sobald du den Passkey

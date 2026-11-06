@@ -62,7 +62,7 @@ async function bestaetigt(
 describe('Zugang zur Verwaltung', () => {
 	test('SI-08, RR-09: Admin bestätigt mit Code, danach 24 Stunden bestätigt', async () => {
 		const z = baue();
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(admin.kontoId);
 		expect((await z.dienst.pruefe(konto)).stufe).toBe('unbestaetigt');
 
@@ -78,7 +78,7 @@ describe('Zugang zur Verwaltung', () => {
 			stufe: 'bestaetigt',
 			kontoId: admin.kontoId,
 			mitgliedId: admin.mitgliedId,
-			rollen: ['admin']
+			rollen: ['mytco', 'mitglieder']
 		});
 		z.zeit.t = new Date(start.getTime() + ADMIN_BESTAETIGUNG_MS - MINUTE);
 		expect((await z.dienst.pruefe(konto)).stufe).toBe('bestaetigt');
@@ -105,7 +105,7 @@ describe('Zugang zur Verwaltung', () => {
 
 	test('SI-08: falscher Code fünfmal → auch der richtige gilt nicht mehr', async () => {
 		const z = baue();
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(admin.kontoId);
 		await (
 			await z.dienst.fordereCodeAn(konto)
@@ -120,7 +120,7 @@ describe('Zugang zur Verwaltung', () => {
 
 	test('SI-08: ohne Code, ungültige Eingabe oder nach 15 Minuten → falsch', async () => {
 		const z = baue();
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(admin.kontoId);
 		expect(await z.dienst.bestaetige(konto, '123456')).toBe('falsch');
 		await (
@@ -135,7 +135,7 @@ describe('Zugang zur Verwaltung', () => {
 
 	test('SI-08: Admin-Code gilt nur einmal', async () => {
 		const z = baue();
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(admin.kontoId);
 		expect(await bestaetigt(z, konto)).toBe('ok');
 		const [zeile] = await db
@@ -150,7 +150,7 @@ describe('Zugang zur Verwaltung', () => {
 
 	test('SI-08: Bestätigung gilt nur für diese Sitzung', async () => {
 		const z = baue();
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const a = await einloggen(admin.kontoId);
 		const b = await einloggen(admin.kontoId);
 		expect(await bestaetigt(z, a)).toBe('ok');
@@ -161,7 +161,7 @@ describe('Zugang zur Verwaltung', () => {
 
 	test('SI-07, SI-08: nach «Alle Sitzungen beenden» ist eine neue Sitzung unbestätigt', async () => {
 		const z = baue();
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const alt = await einloggen(admin.kontoId);
 		expect(await bestaetigt(z, alt)).toBe('ok');
 		await beendeAlleSitzungen(db, admin.kontoId);
@@ -179,7 +179,7 @@ describe('Zugang zur Verwaltung', () => {
 			bremsen: z.bremsen,
 			jetzt: () => z.zeit.t
 		});
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(admin.kontoId);
 
 		await login.fordereMailCodeAn(admin.email, 'ip-1').arbeit;
@@ -248,22 +248,22 @@ describe('Zugang zur Verwaltung', () => {
 
 	test('RR-07: entzogene Rolle hebt eine bestehende Bestätigung auf', async () => {
 		const z = baue();
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(admin.kontoId);
 		expect(await bestaetigt(z, konto)).toBe('ok');
 		await db.delete(kontoRolle).where(eq(kontoRolle.kontoId, admin.kontoId));
 		expect(await z.dienst.pruefe(konto)).toEqual({ stufe: 'keine-rolle' });
 	});
 
-	test('RR-07: entzogenes admin bei verbleibendem cm wirkt sofort, Bestätigung bleibt für cm', async () => {
+	test('RR-07: entzogenes mitglieder bei verbleibendem cm wirkt sofort, Bestätigung bleibt für cm', async () => {
 		const z = baue();
-		const m = await legeMitgliedAn(db, { rollen: ['admin', 'cm'] });
+		const m = await legeMitgliedAn(db, { rollen: ['mitglieder', 'cm'] });
 		const konto = await einloggen(m.kontoId);
 		expect(await bestaetigt(z, konto)).toBe('ok');
-		expect(await z.dienst.pruefe(konto)).toMatchObject({ rollen: ['admin', 'cm'] });
+		expect(await z.dienst.pruefe(konto)).toMatchObject({ rollen: ['mitglieder', 'cm'] });
 		await db
 			.delete(kontoRolle)
-			.where(and(eq(kontoRolle.kontoId, m.kontoId), eq(kontoRolle.rolle, 'admin')));
+			.where(and(eq(kontoRolle.kontoId, m.kontoId), eq(kontoRolle.rolle, 'mitglieder')));
 		expect(await z.dienst.pruefe(konto)).toEqual<Zugang>({
 			stufe: 'bestaetigt',
 			kontoId: m.kontoId,
@@ -274,7 +274,7 @@ describe('Zugang zur Verwaltung', () => {
 
 	test('SI-08: vierte Code-Anfrage in einer Stunde → zu-viele, keine Mail', async () => {
 		const z = baue();
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(admin.kontoId);
 		for (let i = 0; i < 3; i++) await (await z.dienst.fordereCodeAn(konto)).arbeit;
 		expect(z.post).toHaveLength(3);
@@ -286,7 +286,7 @@ describe('Zugang zur Verwaltung', () => {
 
 	test('SI-05: Admin-Code steht nur als Hash in der Datenbank', async () => {
 		const z = baue();
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(admin.kontoId);
 		await (
 			await z.dienst.fordereCodeAn(konto)
@@ -302,7 +302,7 @@ describe('Zugang zur Verwaltung', () => {
 
 	test('SI-05: Fehler beim Versand erscheint nur als feste Logzeile', async () => {
 		const z = baue();
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(admin.kontoId);
 		const kaputt = erstelleZugangDienst({
 			db,

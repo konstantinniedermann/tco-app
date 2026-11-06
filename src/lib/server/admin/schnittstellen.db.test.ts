@@ -26,12 +26,14 @@ import {
 	postAdminAnlaesse,
 	postAdminAnlass,
 	postAdminAnlassLoeschen,
-	aenderndCm,
-	mitCm,
+	liest,
+	schreibt,
 	type AdminDienste
 } from './schnittstellen.ts';
 import { getAnlaesse } from '../anlass/schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
+import { erstelleHinweis } from './hinweis-mail.ts';
+import { ladeMitglied } from './mitglieder.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {
@@ -66,8 +68,9 @@ function baue() {
 		bremsen: erstelleBremsen(),
 		jetzt: () => start
 	});
-	const d: AdminDienste = { db, zugang, jetzt: () => start };
-	return { d, post };
+	const hinweis = vi.fn<AdminDienste['hinweis']>(async () => {});
+	const d: AdminDienste = { db, zugang, hinweis, jetzt: () => start };
+	return { d, post, hinweis };
 }
 
 async function einloggen(kontoId: number): Promise<AngemeldetesKonto> {
@@ -75,7 +78,10 @@ async function einloggen(kontoId: number): Promise<AngemeldetesKonto> {
 	return (await pruefeSitzung(db, kennung, start))!.konto;
 }
 
-async function bestaetigterAdmin(s: ReturnType<typeof baue>, rollen: string[] = ['admin']) {
+async function bestaetigterAdmin(
+	s: ReturnType<typeof baue>,
+	rollen: string[] = ['mytco', 'mitglieder']
+) {
 	const m = await legeMitgliedAn(db, { rollen });
 	const konto = await einloggen(m.kontoId);
 	await (
@@ -110,11 +116,14 @@ describe('Admin-Schnittstellen', () => {
 	test('RR-07, RR-09: jede Admin-Schnittstelle antwortet ohne Sitzung 401, ohne Rolle 403, unbestätigt 403', async () => {
 		const s = baue();
 		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
-		const unbestaetigt = await einloggen((await legeMitgliedAn(db, { rollen: ['admin'] })).kontoId);
-		const geschuetzt = Object.entries(ADMIN_SCHNITTSTELLEN).filter(
-			([name]) => !['getZugang', 'postZugang', 'postZugangCode'].includes(name)
+		const unbestaetigt = await einloggen(
+			(await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] })).kontoId
 		);
-		expect(geschuetzt).toHaveLength(14);
+		const geschuetzt = Object.entries(ADMIN_SCHNITTSTELLEN).filter(
+			([name]) =>
+				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
+		);
+		expect(geschuetzt).toHaveLength(16);
 		for (const [name, fn] of geschuetzt) {
 			const mach = (konto?: AngemeldetesKonto) =>
 				ereignis({
@@ -141,14 +150,15 @@ describe('Admin-Schnittstellen', () => {
 		const s = baue();
 		const cm = await bestaetigterAdmin(s, ['cm']);
 		// War Admin und CM; Admin wird entzogen: die bestätigte Sitzung verliert die Admin-Endpunkte sofort.
-		const ehemals = await bestaetigterAdmin(s, ['admin', 'cm']);
+		const ehemals = await bestaetigterAdmin(s, ['mitglieder', 'cm']);
 		await db
 			.delete(kontoRolle)
-			.where(and(eq(kontoRolle.kontoId, ehemals.kontoId), eq(kontoRolle.rolle, 'admin')));
+			.where(and(eq(kontoRolle.kontoId, ehemals.kontoId), eq(kontoRolle.rolle, 'mitglieder')));
 		const geschuetzt = Object.entries(ADMIN_SCHNITTSTELLEN).filter(
-			([name]) => !['getZugang', 'postZugang', 'postZugangCode'].includes(name)
+			([name]) =>
+				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(14);
+		expect(geschuetzt).toHaveLength(16);
 		for (const [name, fn] of geschuetzt) {
 			for (const konto of [cm.konto, ehemals.konto]) {
 				const r = await fn(
@@ -174,44 +184,51 @@ describe('Admin-Schnittstellen', () => {
 			bestaetigt: false,
 			rollen: ['cm']
 		});
-		const beide = await bestaetigterAdmin(s, ['cm', 'admin', 'lizenz']);
+		const beide = await bestaetigterAdmin(s, ['cm', 'mitglieder', 'lizenz', 'mytco']);
 		expect(await status(beide.konto)).toEqual({
 			bestaetigt: true,
 			mitgliedId: beide.mitgliedId,
-			rollen: ['admin', 'cm']
+			rollen: ['mytco', 'mitglieder', 'cm']
 		});
 		const lizenz = await einloggen((await legeMitgliedAn(db, { rollen: ['lizenz'] })).kontoId);
 		const r = await getZugang(s.d, ereignis({ method: 'GET', konto: lizenz }));
 		expect([r.status, await r.json()]).toEqual([403, { fehler: 'kein-admin' }]);
 	});
 
-	test('RR-07, RR-09: mitCm und aenderndCm lassen bestätigte Admins und CMs durch, sonst wie mitAdmin', async () => {
+	test('RR-07, RR-09: liest und schreibt prüfen den Bereich, schreibt nur mit JSON', async () => {
 		const s = baue();
 		const ok = async (mitgliedId: number, koerper?: Record<string, unknown>) =>
 			antwort(200, { mitgliedId, koerper });
 		const lesen = (konto?: AngemeldetesKonto) =>
-			mitCm(s.d, ereignis({ method: 'GET', konto }), (id) => ok(id));
+			liest(s.d, ereignis({ method: 'GET', konto }), 'cm', (id) => ok(id));
 		const aendern = (konto?: AngemeldetesKonto, contentType?: string) =>
-			aenderndCm(
+			schreibt(
 				s.d,
 				ereignis({ body: contentType ? '{}' : { a: 1 }, contentType, konto }),
-				(id, koerper) => ok(id, koerper)
+				'cm',
+				(urheber, koerper) => ok(urheber.mitgliedId, koerper)
 			);
 
-		const admin = await bestaetigterAdmin(s, ['admin']);
 		const cm = await bestaetigterAdmin(s, ['cm']);
-		for (const m of [admin, cm]) {
-			const r = await lesen(m.konto);
-			expect([r.status, await r.json()]).toEqual([200, { mitgliedId: m.mitgliedId }]);
-			const a = await aendern(m.konto);
-			expect([a.status, await a.json()]).toEqual([
-				200,
-				{ mitgliedId: m.mitgliedId, koerper: { a: 1 } }
-			]);
-			const t = await aendern(m.konto, 'text/plain');
-			expect([t.status, await t.json()]).toEqual([415, { fehler: 'format' }]);
-		}
+		const r = await lesen(cm.konto);
+		expect([r.status, await r.json()]).toEqual([200, { mitgliedId: cm.mitgliedId }]);
+		const a = await aendern(cm.konto);
+		expect([a.status, await a.json()]).toEqual([
+			200,
+			{ mitgliedId: cm.mitgliedId, koerper: { a: 1 } }
+		]);
+		const t = await aendern(cm.konto, 'text/plain');
+		expect([t.status, await t.json()]).toEqual([415, { fehler: 'format' }]);
 
+		// Regel 3: Der MyTCO-Admin liest den CM-Bereich, schreiben darf er dort nicht.
+		const mytco = await bestaetigterAdmin(s, ['mytco']);
+		const l = await lesen(mytco.konto);
+		expect([l.status, await l.json()]).toEqual([200, { mitgliedId: mytco.mitgliedId }]);
+		const w = await aendern(mytco.konto);
+		expect([w.status, await w.json()]).toEqual([403, { fehler: 'kein-recht' }]);
+
+		// Regel 4: Der Mitglieder-Admin vertritt den CM-Admin nicht.
+		const mitglieder = await bestaetigterAdmin(s, ['mitglieder']);
 		const lizenz = await einloggen((await legeMitgliedAn(db, { rollen: ['lizenz'] })).kontoId);
 		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
 		const unbestaetigt = await einloggen((await legeMitgliedAn(db, { rollen: ['cm'] })).kontoId);
@@ -219,6 +236,7 @@ describe('Admin-Schnittstellen', () => {
 			[undefined, 401, 'abgemeldet'],
 			[normal, 403, 'kein-admin'],
 			[lizenz, 403, 'kein-admin'],
+			[mitglieder.konto, 403, 'kein-admin'],
 			[unbestaetigt, 403, 'unbestaetigt']
 		];
 		for (const [konto, status, fehler] of faelle) {
@@ -255,10 +273,10 @@ describe('Admin-Schnittstellen', () => {
 
 	test('SI-08: Zugang: Status, Code anfordern, bestätigen, falscher Code', async () => {
 		const s = baue();
-		const m = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const m = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(m.kontoId);
 		const status = async () => (await getZugang(s.d, ereignis({ method: 'GET', konto }))).json();
-		expect(await status()).toEqual({ bestaetigt: false, rollen: ['admin'] });
+		expect(await status()).toEqual({ bestaetigt: false, rollen: ['mytco', 'mitglieder'] });
 
 		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
 		expect((await getZugang(s.d, ereignis({ method: 'GET', konto: normal }))).status).toBe(403);
@@ -281,13 +299,13 @@ describe('Admin-Schnittstellen', () => {
 		expect(await status()).toEqual({
 			bestaetigt: true,
 			mitgliedId: m.mitgliedId,
-			rollen: ['admin']
+			rollen: ['mytco', 'mitglieder']
 		});
 	});
 
 	test('SI-08: zu viele Code-Anforderungen → 429 zu-viele', async () => {
 		const s = baue();
-		const m = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const m = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(m.kontoId);
 		const stati: number[] = [];
 		for (let i = 0; i < 4; i++) {
@@ -306,6 +324,73 @@ describe('Admin-Schnittstellen', () => {
 		const koerper = (await r.json()) as { fehler: string; felder: Record<string, string> };
 		expect(koerper.fehler).toBe('eingabe');
 		expect(koerper.felder).toHaveProperty('plz');
+	});
+
+	async function angelegt(s: ReturnType<typeof baue>, konto: AngemeldetesKonto) {
+		const angaben = eindeutig();
+		const neu = await postMitglieder(s.d, ereignis({ body: angaben, konto }));
+		const { id } = (await neu.json()) as { id: number };
+		const vorher = (await ladeMitglied(db, id, start))!.angaben;
+		return { angaben, id, vorher };
+	}
+
+	test('SI-09: postMitglied schickt den Hinweis an die alte Adresse', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const { angaben, id, vorher } = await angelegt(s, admin.konto);
+		const ohneEmail = await postMitglied(
+			s.d,
+			ereignis({
+				body: { ...angaben, ort: 'Aarau', vorher },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect(ohneEmail.status).toBe(200);
+		expect(s.hinweis).not.toHaveBeenCalled();
+
+		const neueEmail = `neu-${id}@example.org`;
+		const mitEmail = await postMitglied(
+			s.d,
+			ereignis({
+				body: { ...angaben, ort: 'Aarau', email: neueEmail, vorher: { ...vorher, ort: 'Aarau' } },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect(mitEmail.status).toBe(200);
+		expect(s.hinweis).toHaveBeenCalledTimes(1);
+		expect(s.hinweis).toHaveBeenCalledWith(angaben.email);
+	});
+
+	test('SI-09: scheitert der Hinweis, bleibt die Änderung gespeichert', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const { angaben, id, vorher } = await angelegt(s, admin.konto);
+		const hinweis = erstelleHinweis({
+			mailer: async () => {
+				throw new Error('SMTP-Fehler');
+			},
+			kontakt: 'kontakt@example.org',
+			bremsen: erstelleBremsen()
+		});
+		const neueEmail = `neu-${id}@example.org`;
+		const r = await postMitglied(
+			{ ...s.d, hinweis },
+			ereignis({
+				body: { ...angaben, email: neueEmail, vorher },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect(r.status).toBe(200);
+		const [gespeichert] = await db.select().from(mitglied).where(eq(mitglied.id, id));
+		expect(gespeichert.email).toBe(neueEmail);
+		// Der Hinweis läuft ohne Warten; die eine feste Logzeile erwarten und zurücksetzen.
+		const fehlerLog = logs[0];
+		await vi.waitFor(() => expect(fehlerLog).toHaveBeenCalledTimes(1));
+		expect(fehlerLog.mock.calls).toEqual([['Hinweis-Mail nicht versandt']]);
+		fehlerLog.mockClear();
 	});
 
 	test('FR-01, FR-26: Mitglied anlegen, lesen, ändern, doppelte E-Mail → 409, Verlauf', async () => {
@@ -379,19 +464,20 @@ describe('Admin-Schnittstellen', () => {
 		]);
 	});
 
-	test('RR-03: Rollen setzen; ungültige Namen → 400; letzter Admin → 409; unbekannt → 404', async () => {
+	test('RR-03: Rollen setzen; ungültige Namen → 400; unbekannt → 404', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
 		const ziel = await legeMitgliedAn(db);
-		const roll = (rollen: unknown, id = String(ziel.mitgliedId)) =>
-			postRollen(s.d, ereignis({ body: { rollen }, params: { id }, konto: admin.konto }));
+		const roll = (rollen: unknown, vorher: unknown, id = String(ziel.mitgliedId)) =>
+			postRollen(s.d, ereignis({ body: { rollen, vorher }, params: { id }, konto: admin.konto }));
 
-		expect((await roll(['cm', 'lizenz'])).status).toBe(200);
-		for (const schlecht of ['admin', ['root'], ['cm', 'cm'], [1], undefined]) {
-			expect((await roll(schlecht)).status).toBe(400);
+		expect((await roll(['cm', 'lizenz'], [])).status).toBe(200);
+		// Die alte Rolle admin gibt es nicht mehr.
+		for (const schlecht of ['admin', ['admin'], ['root'], ['cm', 'cm'], [1], undefined]) {
+			expect((await roll(schlecht, ['cm', 'lizenz'])).status).toBe(400);
 		}
-		expect((await roll(['cm'], '999999999')).status).toBe(404);
-		expect((await roll(['cm'], 'abc')).status).toBe(404);
+		expect((await roll(['cm'], [], '999999999')).status).toBe(404);
+		expect((await roll(['cm'], [], 'abc')).status).toBe(404);
 
 		const detail = await getMitglied(
 			s.d,
@@ -471,7 +557,7 @@ describe('Admin-Schnittstellen', () => {
 				s.d,
 				ereignis({ body: { ...eindeutig(), vorher: STAND }, params: p, konto: k })
 			),
-			await postRollen(s.d, ereignis({ body: { rollen: [] }, params: p, konto: k })),
+			await postRollen(s.d, ereignis({ body: { rollen: [], vorher: [] }, params: p, konto: k })),
 			await postSitzungen(s.d, ereignis({ body: {}, params: p, konto: k }))
 		];
 		expect(antworten.map((r) => r.status)).toEqual([404, 404, 404, 404]);
@@ -507,11 +593,16 @@ describe('Admin-Schnittstellen', () => {
 	});
 
 	test('RR-07: GET /api/sitzung meldet verwaltung: true mit Rolle admin, ohne mitgliedId und sitzungHash', async () => {
-		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
+		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const normal = await legeMitgliedAn(db);
 		const ra = await getSitzung(ereignis({ konto: await einloggen(admin.kontoId) }), db);
 		const rn = await getSitzung(ereignis({ konto: await einloggen(normal.kontoId) }), db);
-		expect(await ra.json()).toEqual({ vorname: 'Test', passkeyHinweis: false, verwaltung: true });
+		expect(await ra.json()).toEqual({
+			vorname: 'Test',
+			passkeyHinweis: false,
+			verwaltung: true,
+			ansicht: null
+		});
 		expect(await rn.json()).toMatchObject({ verwaltung: false });
 		expect((await getSitzung(ereignis(), db)).status).toBe(401);
 	});

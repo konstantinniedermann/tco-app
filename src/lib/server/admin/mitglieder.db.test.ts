@@ -105,18 +105,44 @@ describe('aendereAngaben', () => {
 			d!.angaben,
 			jetzt
 		);
-		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['ort', 'telefon'] });
+		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['ort', 'telefon'], alteEmail: null });
 		const verlauf = await ladeVerlauf(db, { mitgliedId: id, grenze: 10 });
 		const felder = verlauf.filter((v) => v.aktion === 'feld-geaendert').map((v) => v.detail);
 		expect(felder.sort()).toEqual(['ort', 'telefon']);
 		expect(JSON.stringify(verlauf)).not.toContain('Aarau');
 	});
 
+	test('SI-09: aendereAngaben meldet die alte Adresse nur bei geänderter E-Mail', async () => {
+		const id = await anlegen();
+		const d = (await ladeMitglied(db, id, jetzt))!;
+		const neueEmail = `neu-${randomUUID().slice(0, 8)}@example.org`;
+		const mitEmail = await aendereAngaben(
+			db,
+			urheber,
+			id,
+			{ ...d.angaben, email: neueEmail },
+			d.angaben,
+			jetzt
+		);
+		expect(mitEmail).toEqual({ ergebnis: 'ok', geaendert: ['email'], alteEmail: d.angaben.email });
+
+		const d2 = (await ladeMitglied(db, id, jetzt))!;
+		const nurTelefon = await aendereAngaben(
+			db,
+			urheber,
+			id,
+			{ ...d2.angaben, telefon: '+41 00 000 00 02' },
+			d2.angaben,
+			jetzt
+		);
+		expect(nurTelefon).toEqual({ ergebnis: 'ok', geaendert: ['telefon'], alteEmail: null });
+	});
+
 	test('FR-26: Speichern ohne echte Änderung schreibt nichts', async () => {
 		const id = await anlegen();
 		const d = await ladeMitglied(db, id, jetzt);
 		const r = await aendereAngaben(db, urheber, id, { ...d!.angaben }, d!.angaben, jetzt);
-		expect(r).toEqual({ ergebnis: 'ok', geaendert: [] });
+		expect(r).toEqual({ ergebnis: 'ok', geaendert: [], alteEmail: null });
 		const verlauf = await ladeVerlauf(db, { mitgliedId: id, grenze: 10 });
 		expect(verlauf.map((v) => v.aktion)).toEqual(['angelegt']);
 	});
@@ -142,7 +168,7 @@ describe('aendereAngaben', () => {
 		const geladen = (await ladeMitglied(db, id, jetzt))!.angaben;
 		// Admin A speichert eine neue Adresse …
 		const a = await aendereAngaben(db, urheber, id, { ...geladen, ort: 'Aarau' }, geladen, jetzt);
-		expect(a).toEqual({ ergebnis: 'ok', geaendert: ['ort'] });
+		expect(a).toEqual({ ergebnis: 'ok', geaendert: ['ort'], alteEmail: null });
 		// … Admin B hat noch den alten Stand und ändert das Telefon.
 		const b = await aendereAngaben(
 			db,
@@ -171,7 +197,7 @@ describe('aendereAngaben', () => {
 			neu,
 			jetzt
 		);
-		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['telefon'] });
+		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['telefon'], alteEmail: null });
 	});
 
 	test('A-MITGLIED-07: Mitgliedernummer eines anderen in anderer Schreibweise → vergeben', async () => {

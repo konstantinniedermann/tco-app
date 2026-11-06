@@ -92,7 +92,7 @@
 	</ol>
 	<p class="leise">
 		Kommst du nicht mehr an die bisherige Adresse, oder stimmen Name oder Jahrgang nicht? Dann
-		ändert der Admin es für dich. Wende dich an den Kontakt unten.
+		ändert die Mitgliederverwaltung es für dich. Wende dich an den Kontakt unten.
 	</p>
 </details>
 

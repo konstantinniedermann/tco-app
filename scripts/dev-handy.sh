@@ -19,7 +19,7 @@ if [ -z "$ip" ]; then
 	exit 1
 fi
 
-dns-sd -P "MyTCO Admin" _http._tcp local "$PORT" "$ADMIN" "$ip" >/dev/null 2>&1 &
+dns-sd -P "MyTCO-Admin" _http._tcp local "$PORT" "$ADMIN" "$ip" >/dev/null 2>&1 &
 admin_pid=$!
 dns-sd -P "MyTCO Mitglied" _http._tcp local "$PORT" "$MITGLIED" "$ip" >/dev/null 2>&1 &
 mitglied_pid=$!
@@ -27,7 +27,7 @@ trap 'kill "$admin_pid" "$mitglied_pid" 2>/dev/null || true' EXIT
 
 echo ""
 echo "  Am iPhone öffnen (je eine Verknüpfung auf dem Startbildschirm):"
-echo "    Erika (Admin):   http://$ADMIN:$PORT"
+echo "    Erika (MyTCO- und Mitglieder-Admin): http://$ADMIN:$PORT"
 echo "    Kurt (Mitglied): http://$MITGLIED:$PORT"
 echo "  Ohne festen Namen: http://$ip:$PORT"
 # Mailpit wird nicht geleert: Andere Worktrees lesen dort gerade ihre E2E-Codes. Die Links

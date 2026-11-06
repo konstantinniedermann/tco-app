@@ -15,8 +15,9 @@ Das Ganze ist zu gross für ein Issue. Es wird in vier Teile geschnitten, die in
 ihrer technischen Abhängigkeiten gebaut werden (Entscheid Projektleiter). Dieser Entwurf
 beschreibt alle vier; geplant und gebaut wird Teil für Teil.
 
-**Wörter:** *CM-Verantwortlicher* ist die Rolle `cm` (der Projektleiter sagt auch
-«CM-Organisator»). Was dort steht, darf auch der Admin. *Spieler* ist ein Mitglied in einer
+**Wörter:** *CM-Verantwortlicher* ist die Rolle `cm`, seit dem Rollen-Umbau
+([#43](2026-11-06-rollen-schaerfen-design.md)) *CM-Admin* genannt (der Projektleiter sagt auch
+«CM-Organisator»). Was dort steht, darf nur der CM-Admin; der MyTCO-Admin liest nur. *Spieler* ist ein Mitglied in einer
 Anmeldung. Begriffe sonst nach [Glossar](../../glossar.md).
 
 ## Schnitt und Reihenfolge
@@ -47,10 +48,10 @@ die niemand bearbeiten kann.
 
 ### Teil 1 — Turnier anlegen
 
-1. **Zugang:** Wer die Rolle `cm` hat, kommt in die Verwaltung, wie der Admin nur mit frischem
-   Mail-Code (SI-08). Er sieht dort nur den Bereich *Clubmeisterschaft*, nicht Mitglieder,
-   Anlässe, Fairgate oder den Verlauf. Der Admin sieht den Bereich zusätzlich. Heute lässt die
-   Verwaltung nur Admins hinein (`src/routes/verwaltung/+layout.ts`, RR-07).
+1. **Zugang:** Wer die Rolle `cm` hat, kommt in die Verwaltung, wie jede Admin-Rolle nur mit
+   frischem Mail-Code (SI-08). Er sieht dort nur den Bereich *Clubmeisterschaft*, nicht
+   Mitglieder, Anlässe, Fairgate oder den Verlauf. Der MyTCO-Admin sieht den Bereich auch, liest
+   aber nur (RR-07).
 2. **Turnier:** Jahr, Name, Anmeldeschluss (Datum) und eine oder mehrere Swiss-Tennis-
    Turniernummern mit Bezeichnung (z. B. *Gruppenphase*, *Finalwochenende*; ob es zwei sind,
    hängt an K-25.4, das Modell erlaubt beides). Ein Turnier pro Jahr; ältere bleiben lesbar.
@@ -92,7 +93,7 @@ die niemand bearbeiten kann.
    CM-Verantwortlichen darf das Mitglied wieder ändern; der Änderungsverlauf zeigt, wer es war.
 2. **Geschlecht und Jahrgang nachtragen:** Fehlt eines davon (beides ist beim Anlegen
    freiwillig), fragt die CM-Seite einmal danach, zusammen mit der Klassierung. Ist es
-   eingetragen, ändert es nur noch der Admin (Entscheid Projektleiter; Ausnahme in der
+   eingetragen, ändert es nur noch der Mitglieder-Admin (Entscheid Projektleiter; Ausnahme in der
    RR-Matrix).
 3. **Startseite:** Solange das Turnier *Anmeldung offen* ist, steht unter «Jetzt aktuell» eine
    Kachel *Clubmeisterschaft 2027* mit dem Anmeldeschluss und dem eigenen Stand (z. B.
@@ -158,8 +159,8 @@ die niemand bearbeiten kann.
    passen, und zwar nur nach oben: Der Spieler ist schwächer als der Bereich (z. B. R8 in
    R4–R6). In eine schwächere Kategorie kommt ein stärkerer Spieler nur, wenn der
    CM-Verantwortliche ihn von Hand anmeldet (Entscheid Projektleiter). Pflichtfeld Kommentar. Die Anmeldung ist *beantragt* und zählt bei der Grenze
-   von 3 mit (FR-06, FR-08). Kommentar und Wildcard sehen nur Spieler, CM-Verantwortlicher und
-   Admin.
+   von 3 mit (FR-06, FR-08). Kommentar und Wildcard sehen nur Spieler, CM-Verantwortlicher und,
+   nur lesend, der MyTCO-Admin.
 7. **Wildcard-Entscheid:** Der CM-Verantwortliche bekommt je Antrag eine Mail, bestätigt oder
    lehnt ab; der Spieler bekommt den Entscheid per Mail.
 8. **Kategorie absagen** nach Verschieben oder Löschen der Anmeldungen (Teil 1, Ziel 6).

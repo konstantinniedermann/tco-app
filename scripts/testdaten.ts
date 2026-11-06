@@ -85,7 +85,8 @@ async function ladeTestdaten(env: Record<string, string | undefined>): Promise<v
 		}
 		const kontoIds = await legeErfundeneMitgliederAn(db);
 		console.log(`testdaten: ${kontoIds.length} erfundene Mitglieder angelegt`);
-		// Das erste erfundene Mitglied ist auf Test Admin; es meldet sich mit dem Brief-Code an.
+		// Das erste erfundene Mitglied ist auf Test der erste Admin; es meldet sich mit dem Brief-Code an.
+		// Annahme K-18.4: Der erste Admin ist MyTCO-Admin und Mitglieder-Admin (machAdmin).
 		await machAdmin(db, kontoIds[0], new Date());
 
 		const dienst = erstelleLoginDienst({

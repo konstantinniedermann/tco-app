@@ -16,8 +16,8 @@ Konzept angepasst, dann die Funktion ([Änderungen](#änderungen-an-diesem-konze
 - Verantwortlich ist der **TC Olten**. Fragen von Mitgliedern gehen an eine Person, die der
   Vorstand bestimmt (**Vorschlag K-06.1:** Präsidium). Die Datenschutzerklärung gibt der
   Gesamtvorstand frei (K-06.2).
-- Projektleiter, Admins und Verantwortliche von CM und Lizenzen bearbeiten Daten nur für
-  ihre Aufgabe ([Rollen und Rechte](rollen-und-rechte.md)).
+- Projektleiter und die Admin-Rollen (MyTCO-, Mitglieder-, CM- und Lizenz-Admin) bearbeiten
+  Daten nur für ihre Aufgabe ([Rollen und Rechte](rollen-und-rechte.md)).
 - Hoster und E-Mail-Dienst bearbeiten Daten nur im Auftrag des Vereins (Art. 9 nDSG).
 
 ## Welche Daten
@@ -34,21 +34,21 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Mitgliedernummer aus Fairgate | Wiedererkennen beim Einlesen (A-MITGLIED-07) | Pflicht beim Einlesen und beim Befehl *Admin festlegen*, sonst freiwillig |
 | Lizenznummer, Klassierung | Anmeldung, Lizenzanträge, Export an Swiss Tennis | nein |
 | Konto, Rollen, Benachrichtigungs-Einstellungen | Login, Berechtigungen, Push | ja |
-| Sitzungen: je angemeldetes Gerät *angemeldet am* und *zuletzt genutzt*, ohne IP-Adresse und Gerätenamen | Login merken und nach einem Jahr ohne Nutzung beenden (*zuletzt genutzt*); *angemeldet am*, um Missbrauch nachzuvollziehen, etwa wenn ein Mitglied ein fremdes Gerät vermutet | — |
+| Sitzungen: je angemeldetes Gerät *angemeldet am* und *zuletzt genutzt*, ohne IP-Adresse und Gerätenamen; beim MyTCO-Admin die Rolle einer laufenden *Ansicht als …* | Login merken und nach einem Jahr ohne Nutzung beenden (*zuletzt genutzt*); *angemeldet am*, um Missbrauch nachzuvollziehen, etwa wenn ein Mitglied ein fremdes Gerät vermutet; die Ansicht, damit sie nur lesend bleibt | — |
 | Passkey (A-LOGIN-07): je Passkey Kennung, öffentlicher Schlüssel, Zähler, Übertragungswege, Adresse der App (Relying-Party-ID), grobe Gerätebezeichnung (nur das Etikett aus dem Browser, z. B. *iPhone*), eingerichtet am, zuletzt benutzt; je Konto eine zufällige Passkey-Kennung (keine Personendaten); je Sitzung ein Merker, ob der Passkey-Hinweis noch erscheint. Name und E-Mail-Adresse liegen nur im Schlüsselbund des Mitglieds (sein Gerät zeigt sie an), MyTCO speichert sie dafür nicht zusätzlich | Login ohne Code | nein |
-| IP-Adresse bei Login-Versuchen und E-Mail-Wechseln; eingetippte E-Mail-Adresse einer Code-Anfrage, Empfänger-Adressen eines E-Mail-Wechsels | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
+| IP-Adresse bei Login-Versuchen und E-Mail-Wechseln; eingetippte E-Mail-Adresse einer Code-Anfrage, Empfänger-Adressen eines E-Mail-Wechsels und des Hinweises an die alte Adresse | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
 | Laufender E-Mail-Wechsel (A-KONTO-01, SI-09): neue Adresse, beide Codes nur als Hash, Ablauf, Fehlversuche; nur im Arbeitsspeicher des Servers, gültig höchstens 15 Minuten. Die neue Adresse liegt dazu im Gerätespeicher des eigenen Geräts, damit Schritt 2 ein Neuladen übersteht (wie die Code-Anfrage beim Login); gelöscht nach Bestätigung, bei «‹ Zurück», beim Abmelden, sonst nach Ablauf (15 Minuten) spätestens beim nächsten Start der App | Neue Adresse mit je einem Code an die alte und die neue bestätigen | — |
-| Markierung *für Fairgate offen seit* (Annahme K-19.2) | Der Admin sieht, welche selbst geänderten Kontaktangaben (Adresse, E-Mail, Telefon) er noch von Hand nach Fairgate übertragen muss (Liste *Für Fairgate*, A-KONTO-02) | — |
+| Markierung *für Fairgate offen seit* (Annahme K-19.2) | Der Mitglieder-Admin sieht, welche selbst geänderten Kontaktangaben (Adresse, E-Mail, Telefon) er noch von Hand nach Fairgate übertragen muss (Liste *Für Fairgate*, A-KONTO-02) | — |
 | Anmeldungen (mit Kommentar zum Wildcard-Antrag), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
 | Anmeldungen zu Anlässen: Antwort *kommt* / *kommt nicht*, freiwillige Bemerkung (ohne Angaben zur Gesundheit) | Planung des Anlasses, z. B. der Generalversammlung (A-ANLASS-01) | nein |
-| *Erstellt von* am Anlass: der Admin, der ihn angelegt hat | Rückfragen zum Anlass: nachvollziehen, wer ihn angelegt hat | — |
+| *Erstellt von* am Anlass: der Mitglieder-Admin, der ihn angelegt hat | Rückfragen zum Anlass: nachvollziehen, wer ihn angelegt hat | — |
 | Austrittsdatum | Löschfrist nach Austritt | — |
 | *Verwaltet von*: Elternteil, der das Konto eines Juniors führt (Vorschlag K-08) | Kind ohne eigenes Login | — |
 | Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (A-MITGLIED-07) | — |
 
-E-Mail, Telefon und Lizenznummer (Annahme K-19.1, FR-02) sowie die Adresse (Annahme K-19.2) ändert das Mitglied selbst im Profil; die E-Mail erst nach je einem Code an die alte und die neue Adresse (SI-09). Name, Geschlecht, Jahrgang und Mitgliedernummer ändert weiterhin der Admin. Neue Datenarten entstehen dadurch nicht.
+E-Mail, Telefon und Lizenznummer (Annahme K-19.1, FR-02) sowie die Adresse (Annahme K-19.2) ändert das Mitglied selbst im Profil; die E-Mail erst nach je einem Code an die alte und die neue Adresse (SI-09). Name, Geschlecht, Jahrgang und Mitgliedernummer ändert weiterhin der Mitglieder-Admin. Ändert er die E-Mail-Adresse, erhält die alte einen Hinweis ohne Adressen (SI-09). Neue Datenarten entstehen dadurch nicht.
 
-Der Befehl *Admin festlegen* legt nur den Admin selbst an; alle anderen Mitglieder kommen über das Einlesen oder die Verwaltung.
+Der Befehl *Admin festlegen* legt nur den ersten Admin selbst an (MyTCO- und Mitglieder-Admin, Annahme K-18.4); alle anderen Mitglieder kommen über das Einlesen oder die Verwaltung.
 
 Keine Gesundheitsdaten (auch nicht als Grund für eine Abmeldung), keine Fotos, keine
 Bankdaten.
@@ -59,9 +59,10 @@ Bankdaten.
 |-----|-------|
 | Mitglied | alle eigenen Daten, auch die eigenen Anmeldungen zu Anlässen; den Änderungsverlauf zum eigenen Konto auf Anfrage bei der Ansprechperson |
 | Elternteil, der ein Kind führt | alle Daten des Kindes, ändert sie und meldet es an (Vorschlag K-08) |
-| Admin | alle Daten der Mitglieder und den Änderungsverlauf; in der Liste *Für Fairgate* die selbst geänderten Kontaktangaben, bis er sie abhakt; alle Anmeldungen zu Anlässen mit Bemerkung (**Annahme K-50:** nur die Admins, nicht der ganze Vorstand); Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
-| CM-Verantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
-| Lizenzverantwortlicher | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
+| Mitglieder-Admin | alle Daten der Mitglieder und den Änderungsverlauf; in der Liste *Für Fairgate* die selbst geänderten Kontaktangaben, bis er sie abhakt; alle Anmeldungen zu Anlässen mit Bemerkung (**Annahme K-50:** nur Mitglieder- und MyTCO-Admins, nicht der ganze Vorstand); Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
+| MyTCO-Admin | alles, was eine der anderen Rollen sieht, auch Bemerkungen zu Anlässen und Wildcard-Kommentare, und den Änderungsverlauf; nur lesend. **Zweck:** die anderen Rollen unterstützen, Fehler suchen, die Rollenvergabe prüfen. *Ansicht als …* zeigt ihm nichts darüber hinaus. **Annahme K-18.4:** Die Rolle erhalten nur Personen, die MyTCO technisch betreuen (Projektleiter und seine Stellvertretung, vgl. SI-16), nicht weitere Vorstandsmitglieder; eine Abmachung des Vereins, die App erzwingt sie nicht |
+| CM-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung der Spieler |
+| Lizenz-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
 | Alle Mitglieder | Name, Kategorien und Resultate der Clubmeisterschaft; bei der Wahl des Doppelpartners die Namen der Mitglieder, die für die Kategorie passen |
 | Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31) |
 | Alle, ohne Login | Kalenderdatei eines Anlasses über einen nicht erratbaren Link: Titel, Beginn, Ort, Einladung, keine Personendaten |
@@ -77,13 +78,13 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Austritt:** Konto sofort inaktiv (Login gesperrt). Die Daten bleiben eine Frist lang, falls
   das Mitglied zurückkommt, dann werden sie gelöscht; der Name bleibt in vergangenen
   Resultaten (**Vorschlag K-38:** 1 Jahr; die Frist legt der Verein fest). Vom Austritt erfährt MyTCO über die eingelesene Mitgliederliste (A-MITGLIED-07, K-17.1).
-- **Mitglied löschen** (Admin, DS-07): Bedenkzeit von 1 Woche. In dieser Zeit steht das Mitglied
-  im Zustand *Löschung vorgemerkt*, das Login ist gesperrt, und der Admin kann die Löschung
+- **Mitglied löschen** (Mitglieder-Admin, DS-07): Bedenkzeit von 1 Woche. In dieser Zeit steht das Mitglied
+  im Zustand *Löschung vorgemerkt*, das Login ist gesperrt, und der Mitglieder-Admin kann die Löschung
   rückgängig machen; dann gilt wieder der Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum). Nach der Woche wird gelöscht wie nach der Frist beim Austritt.
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Anmeldungen zu Anlässen:** ein Jahr nach dem Anlass (**Vorschlag K-50**). Bis die Löschfristen
-  gebaut sind, löscht der Admin den Anlass; mit ihm sind alle Anmeldungen dazu gelöscht.
+  gebaut sind, löscht der Mitglieder-Admin den Anlass; mit ihm sind alle Anmeldungen dazu gelöscht.
 - **Eingelesene Mitgliederliste** (A-MITGLIED-07): wird nach dem Einlesen nicht aufbewahrt;
   übernommen werden nur Felder aus [Welche Daten](#welche-daten).
 - **Logs und Backups:** höchstens 30 Tage.
@@ -92,8 +93,9 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **E-Mail-Adresse einer Code-Anfrage** (Grenze pro Adresse): nur im Arbeitsspeicher, höchstens 24 Stunden.
 - **Passkeys:** wenn das Mitglied ihn entfernt, sonst mit dem Konto. Die zufällige Passkey-Kennung des Kontos entsteht beim ersten Einrichten-Versuch (auch bei Abbruch) und bleibt, bis das Konto gelöscht wird.
 - **Sitzungen:** beim Abmelden, beim Widerruf oder nach einem Jahr ohne Nutzung (dann beim
-  nächsten Login eines Mitglieds).
-- ***Erstellt von* am Anlass:** mit dem Anlass; wird der Admin als Mitglied gelöscht, bleibt der
+  nächsten Login eines Mitglieds). Die Rolle einer *Ansicht als …* mit *Beenden*, beim Abmelden
+  oder mit dem Entzug der Rolle MyTCO-Admin.
+- ***Erstellt von* am Anlass:** mit dem Anlass; wird der Mitglieder-Admin als Mitglied gelöscht, bleibt der
   Anlass ohne diese Angabe.
 - **E-Mail-Adresse im Gerätespeicher** während einer Code-Anfrage: nach dem Login, sonst beim
   nächsten Start der App, sobald die Anfrage älter als 15 Minuten ist.
@@ -103,7 +105,7 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Neue E-Mail-Adresse im Gerätespeicher** während eines E-Mail-Wechsels: nach der
   Bestätigung, bei «‹ Zurück» zu Schritt 1, beim Abmelden, sonst nach Ablauf (15 Minuten)
   spätestens beim nächsten Start der App.
-- **Markierung für Fairgate offen:** sobald der Admin die Angaben als übertragen abhakt; das
+- **Markierung für Fairgate offen:** sobald der Mitglieder-Admin die Angaben als übertragen abhakt; das
   Abhaken steht im Änderungsverlauf.
 - **Testgruppe:** Liste der Testpersonen nach Lauf 2, spätestens zu Beginn der
   CM-Anmeldung; Formularantworten nach der Auswertung des jeweiligen Laufs; Spalten zur
@@ -175,7 +177,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | DS-04 | Nur Felder aus [Welche Daten](#welche-daten); Exporte nur mit den Feldern, die Swiss Tennis braucht |
 | DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“; Empfänger in BCC) |
 | DS-06 | Löschfristen aus [Löschen](#löschen) sind umgesetzt; Logs ohne Inhalte (keine Einmal-Codes, Kontaktdaten, Resultate); IP-Adressen höchstens 24 Stunden, auch in Logs |
-| DS-07 | Der Admin kann die Daten eines Mitglieds exportieren und löschen (Stand 0.5.0: noch nicht gebaut, kommt mit Etappe 3 von #43; bis dahin Auskunft und Löschung von Hand) |
+| DS-07 | Der Mitglieder-Admin kann die Daten eines Mitglieds exportieren und löschen (Stand 0.5.0: noch nicht gebaut, kommt mit Etappe 3 von #43; bis dahin Auskunft und Löschung von Hand) |
 | DS-08 | Entwicklung und Tests nur mit erfundenen Daten |
 | DS-09 | Die Datenschutzerklärung ist in MyTCO auch ohne Login erreichbar |
 | DS-10 | Datensicherheit (verschlüsselte Verbindung, Einmal-Codes nur als Hash, Zugriff nach Rolle) regelt das [Sicherheitskonzept](sicherheitskonzept.md) |
@@ -183,7 +185,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 ## Offene Fragen an den Verein
 
 K-06.1 (Ansprechperson), K-08 (Konten der Junioren), K-09 (Vertrag mit Metanet
-für E-Mail), K-38 (Löschfrist), K-39 (öffentlicher Spielplan), K-40.1
+für E-Mail), K-18.4 (wer die Admin-Rollen übernimmt), K-38 (Löschfrist), K-39 (öffentlicher Spielplan), K-40.1
 (Jahrgang für Lizenzanträge) — alle in den [Abklärungen](abklaerungen.md). Was schon entschieden ist, steht unter
 [Beantwortet](abklaerungen.md#beantwortet).
 

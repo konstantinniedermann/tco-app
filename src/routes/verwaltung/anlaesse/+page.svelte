@@ -5,6 +5,7 @@
 	import { ladeAnlaesseAdmin, type AnlassZeile } from '../../../lib/verwaltung/api.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 
+	let { data } = $props();
 	let zeilen = $state<AnlassZeile[]>([]);
 	let fehler = $state<string | null>(null);
 	let geladen = $state(false);
@@ -31,9 +32,11 @@
 	{#if geladen}{zeilen.length} {zeilen.length === 1 ? 'Anlass' : 'Anlässe'}{/if}
 </p>
 
-<div class="leiste">
-	<a class="taste-haupt" href={resolve('/verwaltung/anlaesse/neu')}>Neuer Anlass</a>
-</div>
+{#if data.darfSchreiben.mitglieder}
+	<div class="leiste">
+		<a class="taste-haupt" href={resolve('/verwaltung/anlaesse/neu')}>Neuer Anlass</a>
+	</div>
+{/if}
 
 {#if fehler}
 	<p class="fehler" role="alert">{fehler}</p>

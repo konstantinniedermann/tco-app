@@ -1,5 +1,20 @@
 // Texte der Verwaltung: Namen von Feldern, Rollen und Verlaufseinträgen, Zeitangaben.
-import type { FairgateZeile, Feld, MitgliedZeile, Rolle, VerlaufEintrag } from './api.ts';
+import { MELDUNG } from '../login/anmelden.ts';
+import type { Antwort, FairgateZeile, Feld, MitgliedZeile, VerlaufEintrag } from './api.ts';
+import { ROLLEN_NAME } from './rollen-namen.ts';
+
+export const NUR_ANSEHEN = 'In der Ansicht kannst du nichts speichern.';
+const KEIN_RECHT = 'Das darfst du hier nur ansehen, nicht ändern.';
+
+/**
+ * Meldung für eine Antwort, die keine Seite eigens behandelt: In der Ansicht oder ohne
+ * Schreibrecht sagt sie, warum nichts gespeichert ist; sonst die Störung (UI-06).
+ */
+export function fehlerText(a: Antwort<unknown>): string {
+	if (a.art === 'nur-ansehen') return NUR_ANSEHEN;
+	if (a.art === 'kein-recht') return KEIN_RECHT;
+	return MELDUNG.stoerung;
+}
 
 export const FELD_NAMEN: Record<Feld, string> = {
 	mitgliedernummer: 'Mitgliedernummer',
@@ -15,11 +30,8 @@ export const FELD_NAMEN: Record<Feld, string> = {
 	lizenznummer: 'Lizenznummer'
 };
 
-export const ROLLEN_NAMEN: Record<Rolle, string> = {
-	admin: 'Admin',
-	cm: 'CM-Verantwortliche',
-	lizenz: 'Lizenzverantwortliche/r'
-};
+// Verlaufseinträge von vor dem Umbau der Rollen nennen noch die alte Rolle admin.
+const VERLAUF_ROLLEN: Record<string, string> = { ...ROLLEN_NAME, admin: 'Admin' };
 
 /** Meldung beim Feld, wenn E-Mail oder Nummer schon einem anderen Mitglied gehört (409). */
 export const VERGEBEN = {
@@ -35,7 +47,7 @@ export function feldMeldung(text: string): string {
 const nameVon = <T extends string>(namen: Record<T, string>, roh: string | null) =>
 	roh !== null && roh in namen ? namen[roh as T] : (roh ?? '');
 
-/** «Telefon geändert», «Rolle Admin vergeben» … (FR-26: nie Werte). */
+/** «Telefon geändert», «Rolle CM-Admin vergeben» … (FR-26: nie Werte). */
 export function aktionText(z: Pick<VerlaufEintrag, 'aktion' | 'detail'>): string {
 	switch (z.aktion) {
 		case 'angelegt':
@@ -43,9 +55,9 @@ export function aktionText(z: Pick<VerlaufEintrag, 'aktion' | 'detail'>): string
 		case 'feld-geaendert':
 			return `${nameVon(FELD_NAMEN, z.detail)} geändert`;
 		case 'rolle-vergeben':
-			return `Rolle ${nameVon(ROLLEN_NAMEN, z.detail)} vergeben`;
+			return `Rolle ${nameVon(VERLAUF_ROLLEN, z.detail)} vergeben`;
 		case 'rolle-entzogen':
-			return `Rolle ${nameVon(ROLLEN_NAMEN, z.detail)} entzogen`;
+			return `Rolle ${nameVon(VERLAUF_ROLLEN, z.detail)} entzogen`;
 		case 'sitzungen-beendet':
 			return 'alle Sitzungen beendet';
 		case 'fairgate-uebertragen':

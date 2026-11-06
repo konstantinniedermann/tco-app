@@ -8,7 +8,10 @@
 
 	let { data }: PageProps = $props();
 	let erledigt = $state(false);
-	const sichtbar = $derived(data.passkeyHinweis && kannPasskey() && !erledigt);
+	// In der «Ansicht als …» kein Angebot: Einrichten und «Nein, danke» speichern etwas.
+	const sichtbar = $derived(
+		data.passkeyHinweis && kannPasskey() && !erledigt && data.ansicht === null
+	);
 	let laeuft = $state(false);
 	let fehler = $state<string | null>(null);
 

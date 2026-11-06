@@ -7,8 +7,9 @@ import { erstelleLoginDienst, type LoginDienst } from '../../../src/lib/server/l
 import { eq } from 'drizzle-orm';
 import { machAdmin } from '../../../src/lib/server/admin/erster-admin.ts';
 import { legeAnlassAn } from '../../../src/lib/server/anlass/anlaesse.ts';
-import { setzeRollen } from '../../../src/lib/server/admin/rollen.ts';
+import { setzeRollen, type Rolle } from '../../../src/lib/server/admin/rollen.ts';
 import { turnier } from '../../../src/lib/server/db/schema.ts';
+import { legeTurnierAn as legeTurnierInDbAn } from '../../../src/lib/server/turnier/turniere.ts';
 import { legeMitgliedAn } from '../../hilfen/mitglieder.ts';
 import { DATENBANK_URL, MAILPIT_URL, e2eEinstellungen } from './umgebung.ts';
 
@@ -44,18 +45,46 @@ export async function legeKontoMitBriefCodeAn(vorname: string, nachname?: string
 	return { ...konto, code };
 }
 
-/** Wie `legeKontoMitBriefCodeAn`, das Konto hat zusätzlich die Rolle Admin (Code-Bestätigung fehlt noch). */
+/**
+ * Wie `legeKontoMitBriefCodeAn`, das Konto hat zusätzlich die Rollen des ersten Admins, MyTCO-Admin
+ * und Mitglieder-Admin (Code-Bestätigung fehlt noch).
+ */
 export async function legeAdminMitBriefCodeAn(vorname: string) {
 	const konto = await legeKontoMitBriefCodeAn(vorname);
 	await machAdmin(hole().db, konto.kontoId, new Date());
 	return konto;
 }
 
+/** Wie `legeKontoMitBriefCodeAn`, das Konto hat genau diese Rollen (Code-Bestätigung fehlt noch). */
+export async function legeRollenkontoMitBriefCodeAn(
+	vorname: string,
+	rollen: Rolle[],
+	nachname?: string
+) {
+	const konto = await legeKontoMitBriefCodeAn(vorname, nachname);
+	await setzeRollen(hole().db, { art: 'automatisch' }, konto.kontoId, rollen, [], new Date());
+	return konto;
+}
+
 /** Wie `legeKontoMitBriefCodeAn`, das Konto hat nur die Rolle CM (Code-Bestätigung fehlt noch). */
 export async function legeCmMitBriefCodeAn(vorname: string) {
-	const konto = await legeKontoMitBriefCodeAn(vorname);
-	await setzeRollen(hole().db, { art: 'automatisch' }, konto.kontoId, ['cm'], new Date());
-	return konto;
+	return legeRollenkontoMitBriefCodeAn(vorname, ['cm']);
+}
+
+/**
+ * Erfundenes Turnier dieses Jahres in Vorbereitung, ohne Kategorien; ein altes desselben Jahres
+ * wird vorher gelöscht (pro Jahr gibt es nur eines). Gibt seine Nummer zurück.
+ */
+export async function legeTurnierAn(jahr: number): Promise<number> {
+	await loescheTurnier(jahr);
+	const r = await legeTurnierInDbAn(hole().db, {
+		jahr,
+		name: `Clubmeisterschaft ${jahr}`,
+		anmeldeschluss: `${jahr}-05-31`,
+		nummern: []
+	});
+	if (r.ergebnis !== 'ok') throw new Error(`Turnier ${jahr} liess sich nicht anlegen`);
+	return r.id;
 }
 
 /**

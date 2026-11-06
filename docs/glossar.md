@@ -57,7 +57,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Anmeldung | Teilnahme eines Spielers (Einzel) oder eines Doppelteams an einer Kategorie. In Advantage meldet man sich online über myTennis an und landet in der Anmeldeliste; ins Tableau kommt man erst, wenn die Anmeldung *bestätigt* ist. In MyTCO höchstens 3 gleichzeitig | Anmeldung | PDF 5b; ADV 18, 20–23, 28–29 |
 | Anmeldeschluss | Datum, nach dem keine Anmeldungen mehr möglich sind; in Advantage je Turnier oder Konkurrenz. Beim TCO bisher Anfang Juni, 2027 vor der Auslosung Anfang Juni (hängt an K-24.2) | Anmeldeschluss | ADV 7, 10, 13, 28; Recherche |
 | Nenngeld | Startgebühr in Advantage, je Spieler mit Vermerk „bezahlt“. Die CM hat kein Nenngeld (K-25.2) | Nenngeld | ADV 7, 28 |
-| Wildcard-Antrag | Anmeldung für eine Kategorie ausserhalb des eigenen Klassierungsbereichs, mit Kommentar; der CM-Verantwortliche entscheidet | Wildcard-Antrag | [A-ANMELDUNG-10](anforderungen/anforderungen.md#anmeldung--anmeldung-zur-clubmeisterschaft) |
+| Wildcard-Antrag | Anmeldung für eine Kategorie ausserhalb des eigenen Klassierungsbereichs, mit Kommentar; der CM-Admin entscheidet | Wildcard-Antrag | [A-ANMELDUNG-10](anforderungen/anforderungen.md#anmeldung--anmeldung-zur-clubmeisterschaft) |
 | Mindestsumme | Bei einer Doppelkategorie die kleinste Summe der Klassierungen beider Spieler (R1 = 1 … R9 = 9, *keine Lizenz* = 10, N1–N4 = 0), vorbelegt 9. *Annahme K-51* | Mindestsumme | [FR-34](fachmodell.md#fachregeln) |
 | abgesagt | Status einer Kategorie, die nicht stattfindet; ohne Rückweg; Mitglieder sehen sie nicht mehr, die Verwaltung zeigt sie mit Plakette *abgesagt* | abgesagt | [FR-35](fachmodell.md#fachregeln) |
 | Folgespiel | Spiel der nächsten KO-Runde, in das der Sieger eines Spiels nachrückt | Folgespiel | [Fachmodell](fachmodell.md) |
@@ -68,7 +68,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Spielzeitraster | Zeitraster, das Advantage aus Plätzen, Matchdauer und Spielbeginn erzeugt. Das PDF wünscht ein Raster in 30-Minuten-Schritten | Spielzeitraster | ADV 7, 34; PDF 5e-i |
 | Platz | Tennisplatz, auf dem gespielt wird; in Advantage vor der Spielplanung zu definieren. Plätze werden benannt, u. a. für die neue Anlage Gheid | Platz | ADV 7, 13, 31, 34; PDF 5e-i |
 | Spielplanüberprüfung | Prüfung in Advantage auf Abwesenheiten, gleichzeitige Spiele und zu kurze Pausen. Das PDF spricht von Konfliktsituationen | Konflikt | ADV 7, 26, 34; PDF 5e-i |
-| Organisator | Club oder Vereinigung, die ein Turnier in Advantage führt. Das PDF spricht vom „Verantwortlichen“ der CM | CM-Verantwortlicher (Rolle) | ADV 6–7, 11, 21, 30; PDF 5a |
+| Organisator | Club oder Vereinigung, die ein Turnier in Advantage führt. Das PDF spricht vom „Verantwortlichen“ der CM | CM-Admin (Rolle) | ADV 6–7, 11, 21, 30; PDF 5a |
 
 ## Lizenz
 
@@ -79,10 +79,10 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Lizenzantrag | Antrag eines Mitglieds in MyTCO, eine Lizenz zu bestellen bzw. zu aktualisieren oder zu stornieren | Lizenzantrag | Ziel; PDF 3e |
 | Storno | Antrag, die Lizenz abzubestellen. *Annahme K-34:* entspricht der Sistierung bei Swiss Tennis (siehe [Abklärungen](abklaerungen.md#vor-lizenzanträgen-01102027)) | Storno | Ziel; PDF 3e |
 | Sistierung | Beim TCO bis Ende Februar möglich. *Annahme K-34.1:* die Lizenz ruht für die folgende Saison. Im Advantage-Handbuch nicht erwähnt | Sistierung | Recherche |
-| Stichtag | Datum, zu dem der Lizenzverantwortliche die Liste der Lizenzanträge sieht und exportiert. *Annahme K-34.2:* liegt vor der Sistierungsfrist Ende Februar | Stichtag | Ziel |
-| Lizenzrunde | Alle Lizenzanträge eines Jahres bis zu einem Stichtag; der Lizenzverantwortliche exportiert sie gesammelt | Lizenzrunde | [Fachmodell](fachmodell.md) |
+| Stichtag | Datum, zu dem der Lizenz-Admin die Liste der Lizenzanträge sieht und exportiert. *Annahme K-34.2:* liegt vor der Sistierungsfrist Ende Februar | Stichtag | Ziel |
+| Lizenzrunde | Alle Lizenzanträge eines Jahres bis zu einem Stichtag; der Lizenz-Admin exportiert sie gesammelt | Lizenzrunde | [Fachmodell](fachmodell.md) |
 | Lizenzliste | Jährliche Liste aller aktuellen Lizenzen als PDF, mit den Änderungen zum Vorjahr | Lizenzliste | PDF 4b |
-| Lizenzverantwortlicher | Person im Verein, die die Lizenzanträge bei Swiss Tennis von Hand einträgt. Keine der fünf Rollen im PDF | Lizenzverantwortlicher (Rolle) | Ziel |
+| Lizenzverantwortlicher | Person im Verein, die die Lizenzanträge bei Swiss Tennis von Hand einträgt. Keine der fünf Rollen im PDF | Lizenz-Admin (Rolle) | Ziel |
 
 ## Systeme
 
@@ -99,23 +99,26 @@ Was nicht belegt ist, steht als *Vermutung* da.
 
 | Begriff | Bedeutung | In MyTCO | Quelle |
 |---------|-----------|----------|--------|
-| Rolle | Bündel von Berechtigungen, das der Admin einem Konto gibt: Gast, Mitglied, Junioren-Leiter, Anlässe-Veranstalter, Admin; dazu CM-Verantwortlicher und Lizenzverantwortlicher. Was jede Rolle darf, steht in [Rollen und Rechte](rollen-und-rechte.md) | Rolle | PDF 4a |
+| Rolle | Bündel von Berechtigungen, das der MyTCO-Admin einem Konto gibt. Das PDF nennt Gast, Mitglied, Junioren-Leiter, Anlässe-Veranstalter und Admin; MyTCO teilt «Admin» in MyTCO-, Mitglieder-, CM- und Lizenz-Admin. Was jede Rolle darf, steht in [Rollen und Rechte](rollen-und-rechte.md) | Rolle | PDF 4a |
 | Mitglied | Person, die Mitglied im TCO ist; zugleich die Grundrolle in MyTCO | Mitglied | PDF 1, 4a |
 | Mitgliedschaft | Zugehörigkeit eines Mitglieds zum TCO. Was ein Mitglied daran selbst ändern kann, ist offen | Mitgliedschaft | PDF 1 |
 | Spieler | Mitglied, das an der Clubmeisterschaft teilnimmt | Spieler | PDF 5b, 5d |
 | Gast | Rolle nur für die Registrierung, ohne Zugriff auf weitere Seiten | Gast | PDF 4a |
-| Admin | Rolle mit Zugang zur Mitgliederverwaltung und zu den Admin-Masken | Admin | PDF 4a; Ziel |
+| Admin | Im PDF die Rolle mit Zugang zur Mitgliederverwaltung und zu den Admin-Masken. In MyTCO kein Begriff ohne Zusatz, weil er Betrieb und Mitgliederdaten vermischt | MyTCO-Admin, Mitglieder-Admin, CM-Admin, Lizenz-Admin | PDF 4a; Ziel |
+| MyTCO-Admin | Rolle für die technische Betreuung: vergibt und entzieht Rollen, sieht alle Bereiche der Verwaltung, ändert dort nichts; *Ansicht als …* | MyTCO-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
+| Mitglieder-Admin | Rolle für die Mitgliederdaten: Mitglieder, Briefe, Sitzungen, Liste *Für Fairgate*, Anlässe | Mitglieder-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
+| Ansicht als … | Der MyTCO-Admin sieht App und Verwaltung wie eine gewählte Rolle, nur lesend; ein Band zeigt das an | Ansicht als … | [A-ROLLE-09](anforderungen/anforderungen.md#rolle--benutzerrollen) |
 | Junioren-Leiter | Rolle für die Betreuung der Junioren | Junioren-Leiter | PDF 4a |
-| Anlässe-Veranstalter | Rolle für die Organisation von Anlässen | Anlässe-Veranstalter, später; die CM leitet der CM-Verantwortliche | PDF 4a |
+| Anlässe-Veranstalter | Rolle für die Organisation von Anlässen | Anlässe-Veranstalter, später; bis dahin Mitglieder-Admin, die CM leitet der CM-Admin | PDF 4a |
 | Website-Betreuer | Vereinsmitglied, das tcolten.ch programmiert und betreut | Website-Betreuer | Recherche |
 | Registrierung | Ein neues Konto selbst anlegen statt per Brief zu erhalten; vorgesehen über tcolten.ch, später | Registrierung | PDF 4a |
-| Admin-Oberfläche | Teil von MyTCO für Admin und Verantwortliche. Das PDF nennt die einzelnen Eingabeseiten darin *Admin-Masken* | Admin-Oberfläche | PDF 5b, 5d; Ziel |
-| Mitgliederverwaltung | Seite, auf der der Admin Mitglieder von Hand anlegt, bearbeitet und löscht | Mitgliederverwaltung | Ziel; PDF 4a |
+| Admin-Oberfläche | Teil von MyTCO für die Admin-Rollen, nach Bereichen gegliedert. Das PDF nennt die einzelnen Eingabeseiten darin *Admin-Masken* | Verwaltung | PDF 5b, 5d; Ziel |
+| Mitgliederverwaltung | Bereich der Verwaltung, in dem der Mitglieder-Admin Mitglieder von Hand anlegt, bearbeitet und löscht | Mitgliederverwaltung | Ziel; PDF 4a |
 | Konto | Zugang eines Mitglieds zu MyTCO mit seinen Daten | Konto | PDF 3e, 4a |
 | Login | Einloggen in MyTCO | Login | PDF 2, 3b |
 | Einmal-Code | Code zum Eintippen, gilt für ein einziges Login. Kommt per Brief (lange gültig) oder auf Anfrage per E-Mail (kurz gültig). Ersetzt das *Einmalpasswort* aus dem PDF; ein Passwort gibt es in MyTCO nicht | Einmal-Code | PDF 2; [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
-| Sitzung | Zeitraum, in dem ein Gerät nach dem Login eingeloggt bleibt. Endet nach einem Jahr ohne Nutzung, beim Logout oder wenn der Admin sie beendet | Sitzung | [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
-| Änderungsverlauf | Liste für Admins, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat, ohne alte und neue Werte. Nicht zu verwechseln mit dem *Änderungsprotokoll* der Anforderungen | Änderungsverlauf | [SI-12](sicherheitskonzept.md#vorgaben) |
+| Sitzung | Zeitraum, in dem ein Gerät nach dem Login eingeloggt bleibt. Endet nach einem Jahr ohne Nutzung, beim Logout oder wenn der Mitglieder-Admin sie beendet | Sitzung | [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
+| Änderungsverlauf | Liste für Mitglieder- und MyTCO-Admin, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat, ohne alte und neue Werte. Nicht zu verwechseln mit dem *Änderungsprotokoll* der Anforderungen | Änderungsverlauf | [SI-12](sicherheitskonzept.md#vorgaben) |
 | Passkey | Freiwilliger Zugang statt Code: Das Gerät bestätigt mit Face ID, Fingerabdruck oder Handy-PIN. Ein weiterer Weg zur selben Sitzung; der Einmal-Code bleibt immer gültig, das Konto per Mail zurückholbar | Passkey | [#44](https://github.com/konstantinniedermann/tco-app/issues/44), [ADR-005](adr/adr-005-passkey-simplewebauthn.md) |
 | Erstes Login | Erstes Einloggen mit dem Code aus dem Brief; das Mitglied ergänzt dabei fehlende Daten | Erstes Login | PDF 3b-i; Ziel |
 | Startseite | Erste Seite nach dem Login mit Shortcuts, Konto und Logout | Startseite | PDF 3c |

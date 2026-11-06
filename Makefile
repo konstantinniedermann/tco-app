@@ -58,7 +58,7 @@ dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einste
 dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs iPhone im selben WLAN mit festen Namen für Erika und Kurt (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
 	./scripts/dev-handy.sh
 
-seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 3 erfundene Mitglieder, eine Beispiel-GV und ein Beispielturnier 2027 anlegen, Brief-Codes für Erika (Admin), Kurt (Mitglied) und Hanna Muster (CM) ausgeben (Einstellungen aus .env)
+seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 5 erfundene Mitglieder, eine Beispiel-GV und ein Beispielturnier 2027 anlegen, Brief-Codes ausgeben für Erika (MyTCO-Admin und Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin) (Einstellungen aus .env)
 	node --env-file=.env scripts/migrate.ts
 	node --env-file=.env scripts/seed-lokal.ts
 

@@ -36,6 +36,9 @@ async function oeffneProfil(page: Page) {
 	await expect(page).toHaveURL(/\/profil$/);
 	await klappeAuf(page, 'Meine Angaben');
 	await expect(page.getByText('zugleich dein Login')).toBeVisible();
+	await expect(
+		page.getByText('Name, Jahrgang und Nummer ändert die Mitgliederverwaltung.')
+	).toBeVisible();
 }
 
 /** Die Kachel einer Angabe im Aufklappbereich «Meine Angaben» (Text und «Ändern»). */
@@ -87,6 +90,7 @@ test('SI-09, A-KONTO-01: Mitglied wechselt die E-Mail mit zwei Codes', async ({ 
 	await kachel(page, 'E-Mail').getByRole('link', { name: 'Ändern' }).click();
 	await expect(page).toHaveURL(/\/profil\/email$/);
 	await expect(page.getByText('Schritt 1 von 2 · Neue Adresse')).toBeVisible();
+	await expect(page.getByText('Dann ändert die Mitgliederverwaltung sie für dich.')).toBeVisible();
 
 	const neu = `neu-${randomUUID()}@example.org`;
 	await page.getByLabel('Neue E-Mail-Adresse').fill(neu);

@@ -1,12 +1,29 @@
 import { describe, expect, it } from 'vitest';
-import { aktionText, feldMeldung, geaendertText, neueAngaben, plakette } from './anzeige.ts';
+import { MELDUNG } from '../login/anmelden.ts';
+import {
+	aktionText,
+	fehlerText,
+	feldMeldung,
+	geaendertText,
+	neueAngaben,
+	plakette
+} from './anzeige.ts';
 
 describe('Texte der Verwaltung', () => {
+	it('Ansicht als …: nur-ansehen und kein-recht sagen, warum nichts gespeichert ist', () => {
+		expect(fehlerText({ art: 'nur-ansehen' })).toBe('In der Ansicht kannst du nichts speichern.');
+		expect(fehlerText({ art: 'kein-recht' })).toBe('Das darfst du hier nur ansehen, nicht ändern.');
+		expect(fehlerText({ art: 'stoerung' })).toBe(MELDUNG.stoerung);
+		expect(fehlerText({ art: 'veraltet' })).toBe(MELDUNG.stoerung);
+	});
+
 	it('FR-26: Verlaufstexte nennen Feld oder Rolle, nie einen Wert', () => {
 		expect(aktionText({ aktion: 'feld-geaendert', detail: 'telefon' })).toBe('Telefon geändert');
-		expect(aktionText({ aktion: 'rolle-vergeben', detail: 'cm' })).toBe(
-			'Rolle CM-Verantwortliche vergeben'
+		expect(aktionText({ aktion: 'rolle-vergeben', detail: 'cm' })).toBe('Rolle CM-Admin vergeben');
+		expect(aktionText({ aktion: 'rolle-vergeben', detail: 'mytco' })).toBe(
+			'Rolle MyTCO-Admin vergeben'
 		);
+		// Einträge von vor dem Umbau der Rollen nennen die alte Rolle.
 		expect(aktionText({ aktion: 'rolle-entzogen', detail: 'admin' })).toBe('Rolle Admin entzogen');
 		expect(aktionText({ aktion: 'angelegt', detail: null })).toBe('angelegt');
 		expect(aktionText({ aktion: 'fairgate-uebertragen', detail: null })).toBe(

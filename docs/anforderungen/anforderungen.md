@@ -44,21 +44,21 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-LOGIN-06 | Zwei-Faktor-Login (App oder SMS/E-Mail, zwingend oder freiwillig) | PDF 2 | später | später |
 | A-LOGIN-07 | Login mit Passkey, freiwillig neben dem Einmal-Code: bequemer am PC und auf weiteren Geräten. Der Mail-Code bleibt gültig, der Passkey schützt also nicht gegen ein gehacktes Postfach ([#44](https://github.com/konstantinniedermann/tco-app/issues/44)) | PDF 2, K-02.1 | Mitglieder-Login\* | umgesetzt\* (Prüfung auf echten Geräten offen, siehe [Checkliste](../testkonzept.md#checkliste-vor-dem-release)) |
 | A-LOGIN-08 | Login ohne Passwort, nur per Einmal-Code: aus dem Brief, später per E-Mail (A-LOGIN-10) | PDF 2, PL | Mitglieder-Login | umgesetzt\* |
-| A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Admin seine Sitzungen beendet | PL | Mitglieder-Login | umgesetzt (Admin beendet die Sitzungen in der Verwaltung, #43) |
+| A-LOGIN-09 | Nach dem Login bleibt das Mitglied eingeloggt; ausgeloggt wird es erst nach einem Jahr ohne Nutzung, oder wenn der Mitglieder-Admin seine Sitzungen beendet | PL | Mitglieder-Login | umgesetzt (Sitzungen beenden in der Verwaltung, #43) |
 | A-LOGIN-10 | Wer ausgeloggt ist (lange Pause, neues Handy, Brief verloren), erhält nach Eingabe seiner E-Mail-Adresse einen neuen Code per E-Mail | PL | Mitglieder-Login | umgesetzt\* |
 | A-LOGIN-11 | Einmal-Code per SMS oder App statt per Brief oder E-Mail (abgespalten aus A-LOGIN-08) | PDF 2 | später | später |
 
-### MITGLIED — Mitgliederverwaltung durch den Admin
+### MITGLIED — Mitgliederverwaltung durch den Mitglieder-Admin
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-MITGLIED-01 | Der Admin legt Mitgliederkonten nach manueller Prüfung einfach und schnell von Hand an | PDF 4a, Ziel | Mitglieder-Login | umgesetzt |
-| A-MITGLIED-02 | Der Admin bearbeitet die Daten eines Mitglieds | Ziel | Mitglieder-Login | umgesetzt |
-| A-MITGLIED-03 | Der Admin löscht Mitgliederkonten | PDF 4a | Mitglieder-Login\* | geplant |
+| A-MITGLIED-01 | Der Mitglieder-Admin legt Mitgliederkonten nach manueller Prüfung einfach und schnell von Hand an | PDF 4a, Ziel | Mitglieder-Login | umgesetzt |
+| A-MITGLIED-02 | Der Mitglieder-Admin bearbeitet die Daten eines Mitglieds | Ziel | Mitglieder-Login | umgesetzt |
+| A-MITGLIED-03 | Der Mitglieder-Admin löscht Mitgliederkonten | PDF 4a | Mitglieder-Login\* | geplant |
 | A-MITGLIED-04 | Selbstregistrierung über die Website tcolten.ch, damit der Briefversand entfallen kann (mit der zuständigen Person) | PDF 4a | später\* | später |
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
-| A-MITGLIED-06 | Der Admin sieht im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Admin, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | umgesetzt\* (Verlauf der Admin-Änderungen; Löschung nach 12 Monaten folgt mit Etappe 3) |
-| A-MITGLIED-07 | Der Admin, der die Mitgliederverwaltung macht, liest die Mitgliederliste aus Fairgate ein (Excel oder CSV) und führt so Ein- und Austritte nach; zum Start erfasst der Projektleiter die Mitglieder ([#46](https://github.com/konstantinniedermann/tco-app/issues/46)) | K-17.1 | CM-Anmeldung\* | offen (hängt an K-45) |
+| A-MITGLIED-06 | Mitglieder- und MyTCO-Admin sehen im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Verwaltung, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | umgesetzt\* (Verlauf der Änderungen durch die Verwaltung; Löschung nach 12 Monaten folgt mit Etappe 3) |
+| A-MITGLIED-07 | Der Mitglieder-Admin liest die Mitgliederliste aus Fairgate ein (Excel oder CSV) und führt so Ein- und Austritte nach; zum Start erfasst der Projektleiter die Mitglieder ([#46](https://github.com/konstantinniedermann/tco-app/issues/46)) | K-17.1 | CM-Anmeldung\* | offen (hängt an K-45) |
 | A-MITGLIED-08 | Ein Mitglied erfasst sein Kind und erledigt für es das Administrative (Daten, CM-Anmeldung), bis das Kind ab der Altersgrenze des Vereins ein eigenes Login hat (Vorschlag K-08) ([#45](https://github.com/konstantinniedermann/tco-app/issues/45)) | K-46, PL | CM-Anmeldung\* | offen (hängt an K-08) |
 
 ### ROLLE — Benutzerrollen
@@ -67,21 +67,22 @@ Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-ROLLE-01 | Der Admin vergibt Benutzerrollen mit den zugehörigen Berechtigungen | PDF 4a | Mitglieder-Login | umgesetzt |
-| A-ROLLE-02 | Rolle *Admin*: Zugang zur Mitgliederverwaltung | PDF 4a, Ziel | Mitglieder-Login | umgesetzt |
+| A-ROLLE-01 | Rolle *MyTCO-Admin*: vergibt und entzieht die Benutzerrollen mit den zugehörigen Berechtigungen, als Einziger (RR-01); sieht alle Bereiche der Verwaltung, ändert dort nichts (RR-07) | PDF 4a, PL | Mitglieder-Login | umgesetzt |
+| A-ROLLE-02 | Rolle *Mitglieder-Admin*: Mitgliederverwaltung mit Briefen, Sitzungen, Liste *Für Fairgate* und Anlässen | PDF 4a, Ziel | Mitglieder-Login | umgesetzt |
 | A-ROLLE-03 | Rolle *Mitglied* | PDF 4a | Mitglieder-Login | umgesetzt |
-| A-ROLLE-04 | Rolle *Anlässe-Veranstalter*; die CM leitet bis dahin der CM-Verantwortliche (A-ROLLE-07) | PDF 4a | später\* | später |
+| A-ROLLE-04 | Rolle *Anlässe-Veranstalter*; bis dahin gehören die Anlässe zum Mitglieder-Admin (A-ROLLE-02), die CM leitet der CM-Admin (A-ROLLE-07) | PDF 4a | später\* | später |
 | A-ROLLE-05 | Rolle *Junioren-Leiter* | PDF 4a | später\* | später |
 | A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später\* | später |
-| A-ROLLE-07 | Rolle *CM-Verantwortlicher*: Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | umgesetzt\* (Turnier und Kategorien, #57; Anmeldungen, Gruppen und Resultate folgen mit ihren Etappen) |
-| A-ROLLE-08 | Rolle *Lizenzverantwortlicher*: Lizenzrunde und Lizenzanträge | PL | Lizenzanträge | geplant |
+| A-ROLLE-07 | Rolle *CM-Admin* (vorher *CM-Verantwortlicher*): Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | umgesetzt\* (Turnier und Kategorien, #57; Anmeldungen, Gruppen und Resultate folgen mit ihren Etappen) |
+| A-ROLLE-08 | Rolle *Lizenz-Admin* (vorher *Lizenzverantwortlicher*): Lizenzrunde und Lizenzanträge | PL | Lizenzanträge | geplant |
+| A-ROLLE-09 | *Ansicht als …*: Der MyTCO-Admin sieht App und Verwaltung so, wie sie eine gewählte Rolle sieht, nur lesend; der Server weist jedes Speichern ab ([Rollen und Rechte](../rollen-und-rechte.md#ansicht-als-), SI-20) | PL | Mitglieder-Login | umgesetzt |
 
 ### KONTO — Eigene Daten ändern
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
 | A-KONTO-01 | Das Mitglied ändert E-Mail-Adresse und Telefonnummer selbst, dazu die Lizenznummer (FR-02); die E-Mail erst nach Bestätigung mit je einem Code an die alte und die neue Adresse (SI-09). Annahme K-19.1 ([#50](https://github.com/konstantinniedermann/tco-app/issues/50)) | PDF 3e | Mitglieder-Login\* | umgesetzt\* |
-| A-KONTO-02 | Das Mitglied ändert seine Adresse selbst; selbst geänderte Kontaktangaben (Adresse, E-Mail, Telefon) sieht der Admin in der Liste *Für Fairgate* und hakt sie nach dem Übertragen ab. Annahme K-19.2 ([#50](https://github.com/konstantinniedermann/tco-app/issues/50)) | PDF 3e | Mitglieder-Login\* | umgesetzt\* |
+| A-KONTO-02 | Das Mitglied ändert seine Adresse selbst; selbst geänderte Kontaktangaben (Adresse, E-Mail, Telefon) sieht der Mitglieder-Admin in der Liste *Für Fairgate* und hakt sie nach dem Übertragen ab. Annahme K-19.2 ([#50](https://github.com/konstantinniedermann/tco-app/issues/50)) | PDF 3e | Mitglieder-Login\* | umgesetzt\* |
 | A-KONTO-03 | Das Mitglied wählt die Zustellart der Jahresrechnung | PDF 3e | später\* | später |
 | A-KONTO-04 | Das Mitglied ändert seine Mitgliedschaft | PDF 1 | später\* | offen |
 
@@ -131,9 +132,9 @@ Die Clubmeisterschaft ist der erste Anlass; ihre Anmeldung steht unter
 
 A-ANLASS-01: Erster Anlass neben der Clubmeisterschaft ist die Generalversammlung ([#52](https://github.com/konstantinniedermann/tco-app/issues/52),
 [Design](../superpowers/specs/2026-11-05-gv-anmeldung-design.md)). Gebaut als Vorschlag für den
-Vorstand: Der Admin erstellt einen Anlass, alle Mitglieder sehen ihn auf der Startseite, melden
+Vorstand: Der Mitglieder-Admin erstellt einen Anlass, alle Mitglieder sehen ihn auf der Startseite, melden
 sich an oder ab (mit freiwilliger Bemerkung) und speichern ihn im Kalender. Vorschlag K-50:
-Liste nur für Admins; Anträge, Zielgruppen und Stimmrecht später. Etappe und Status mit \*: Der
+Liste nur für Mitglieder- und MyTCO-Admins; Anträge, Zielgruppen und Stimmrecht später. Etappe und Status mit \*: Der
 Bau ist ein Vorschlag, der Vorstand bestätigt ihn mit K-50; den Kalendereintrag auf echten
 Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vor-dem-release).
 
@@ -151,7 +152,7 @@ Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vo
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-TURNIER-01 | Der CM-Verantwortliche legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | umgesetzt |
+| A-TURNIER-01 | Der CM-Admin legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | umgesetzt |
 | A-TURNIER-02 | Zum Turnier werden die Swiss-Tennis-Turniernummern erfasst | PDF 5a | CM-Anmeldung | umgesetzt |
 | A-TURNIER-03 | Zum Turnier werden alle Kategorien erfasst, eingeteilt nach Geschlecht, Alter, Klassierungsbereich (Einzel; im PDF: Stärkekategorie) bzw. Mindestsumme der Klassierungen (Doppel, Annahme K-51) und Einzel/Doppel | PDF 5a | CM-Anmeldung | umgesetzt |
 
@@ -164,11 +165,11 @@ Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vo
 | A-ANMELDUNG-03 | MyTCO zeigt nur die Kategorien an, die für den Spieler möglich sind (Klassierung evtl. ausgenommen, weil die Klassierung nicht automatisch von Swiss Tennis kommt) | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-04 | Bei einer Doppelkategorie zeigt MyTCO sofort alle verfügbaren Spieler des Clubs zur Wahl des Doppelpartners | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-05 | Nach der Anmeldung erhält der Spieler eine automatische Bestätigung mit seinen Kategorien | PDF 5b | CM-Anmeldung | geplant |
-| A-ANMELDUNG-06 | Der CM-Verantwortliche fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | geplant |
+| A-ANMELDUNG-06 | Der CM-Admin fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-07 | Die Anmeldung schliesst zu einem Anmeldeschluss | PDF 5c (abgeleitet) | CM-Anmeldung\* | umgesetzt |
 | A-ANMELDUNG-08 | Der Spieler wählt, ob er bei Neuigkeiten, die ihn betreffen (neue Spiele, geänderter Spielplan), benachrichtigt wird | PDF 5b | CM-Betrieb\* | geplant |
 | A-ANMELDUNG-09 | Benachrichtigung per SMS oder WhatsApp (zuerst E-Mail und Push, siehe N-APP-02) | PDF 5b | später\* | später |
-| A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der CM-Verantwortliche entscheidet | PL | CM-Anmeldung | geplant |
+| A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der CM-Admin entscheidet | PL | CM-Anmeldung | geplant |
 
 ### ADVANTAGE — Datenaustausch mit Swiss Tennis
 
@@ -194,7 +195,7 @@ Resultate importieren ([Recherche Systemlandschaft](../recherche/README.md)).
 | A-RESULTAT-04 | Der Gegner bestätigt ein gemeldetes Resultat | PDF 5d | CM-Betrieb | offen |
 | A-RESULTAT-05 | Alle Resultate der anderen Kategorien lassen sich mitverfolgen | PDF 5d | CM-Betrieb\* | geplant |
 | A-RESULTAT-06 | Für jede Gruppe entsteht live eine Rangliste nach den Regeln von Swiss Tennis | PDF 5d | CM-Betrieb\* | geplant |
-| A-RESULTAT-07 | Der CM-Verantwortliche erfasst Resultate von Hand | PDF 5d | CM-Betrieb\* | geplant |
+| A-RESULTAT-07 | Der CM-Admin erfasst Resultate von Hand | PDF 5d | CM-Betrieb\* | geplant |
 
 ### SPIELPLAN — Finalwochenende
 
@@ -211,7 +212,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 | A-SPIELPLAN-05 | Automatische Prüfung, ob Spieler gleichzeitig oder direkt hintereinander spielen müssten, auch für künftige Spiele (z. B. Finals); Konflikte farbig markiert | PDF 5e-i | später | später |
 | A-SPIELPLAN-06 | Schnelles Verschieben, z. B. bei Regen | PDF 5e-i | später | später |
 | A-SPIELPLAN-07 | Spieler sehen den finalisierten Plan jederzeit, mit Änderungen live | PDF 5e-ii | später | später |
-| A-SPIELPLAN-08 | Der Admin trägt per Klick auf ein Spiel das Resultat ein; es erscheint im Kalender der öffentlichen Seite | PDF 5e-ii | später | später |
+| A-SPIELPLAN-08 | Der CM-Admin trägt per Klick auf ein Spiel das Resultat ein; es erscheint im Kalender der öffentlichen Seite | PDF 5e-ii | später | später |
 
 ## Nicht-funktionale Anforderungen
 
@@ -219,12 +220,12 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 |----|-------------|--------|--------|--------|
 | N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später. Zuerst als installierbare Web-App, die Store-App ist N-APP-04 | Ziel, PDF 1 | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
 | N-APP-02 | Benachrichtigungen per Push und E-Mail | Ziel, PDF 5b | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
-| N-APP-03 | Admin und Verantwortliche arbeiten in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Funktionen zeigt | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | umgesetzt\* (Admin; `cm` mit nur dem Bereich *Clubmeisterschaft*, #57; Lizenz mit ihrer Etappe) |
+| N-APP-03 | Die Admin-Rollen arbeiten in einer eigenen Verwaltung, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Bereiche zeigt (RR-07) | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | umgesetzt\* (Mitglieder-, CM- und MyTCO-Admin, #43, #57; Lizenz mit ihrer Etappe) |
 | N-APP-04 | MyTCO ist als App im App Store und bei Google Play erhältlich | Ziel | später ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | später |
 | N-DESIGN-01 | Das Design lehnt sich an die Website tcolten.ch an, mit abgeändertem Farbkonzept zur Abgrenzung | PDF 3a | Fundament (UI-Leitbild, #13) | geplant |
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |
 | N-DATENSCHUTZ-01 | Die Bearbeitung der Mitgliederdaten entspricht dem Schweizer Datenschutzgesetz (nDSG) | PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
-| N-DATENSCHUTZ-02 | Kontaktdaten anderer Mitglieder sind nur sichtbar, soweit der Verein es festlegt: Gegner und Doppelpartner bis zum Ende der CM (K-31), CM- und Lizenzverantwortliche von allen (K-42) | PDF 5d, PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
+| N-DATENSCHUTZ-02 | Kontaktdaten anderer Mitglieder sind nur sichtbar, soweit der Verein es festlegt: Gegner und Doppelpartner bis zum Ende der CM (K-31), CM- und Lizenz-Admin von allen (K-42) | PDF 5d, PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
 | N-SICHERHEIT-01 | Weitere Sicherheitsmassnahmen werden mit den zuständigen Personen festgelegt | PDF 2 | Fundament ([Sicherheitskonzept](../sicherheitskonzept.md), #6) | geplant |
 | N-BETRIEB-01 | Verfügbarkeit: MyTCO ist besonders während Anmeldephase, Gruppenspielen und Finalwochenende erreichbar; kein fester Zielwert, ein kurzer Ausfall wird in Kauf genommen (K-15) | PL | Fundament (Betrieb, #10) | geplant |
 | N-BARRIEREFREI-01 | MyTCO ist für Mitglieder jeden Alters bedienbar; Zielniveau WCAG 2.1 AA\* | PL | durchgehend | geplant |
