@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.5.3 — Schnellere Merges
+
+- Schnellere Merges: Die E2E-Tests laufen in der CI als drei parallele Jobs (iPhone, Android,
+  Desktop) statt nacheinander. Lokal merkt sich ein grünes `make check` den geprüften Stand;
+  der Pre-Push-Hook prüft ihn nicht noch einmal voll, wenn seither nur Doku und die
+  Versionsnummer dazukamen (`gruener-stand.ts`).
 - Entwurf für die Anmeldung zur Clubmeisterschaft, geschnitten in vier Teile: Turnier anlegen,
   Einzel-Anmeldung, Doppel, Anmeldungen verwalten (#51; Teil-Issues #57 bis #60). Neue Frage
   K-51 an den Verein: Doppel nach Summe der Klassierungen.

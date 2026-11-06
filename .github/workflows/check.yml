@@ -126,14 +126,27 @@ jobs:
       - run: npm run build
       - run: npm run build:spa
 
+  # Ein Job pro Gerät (Playwright-Projekt): Der Runner hat 2 Kerne, Playwright nutzt davon einen
+  # Worker; nacheinander dauerten die drei Geräte gut 8 Minuten. Fällt ein Gerät durch, laufen
+  # die anderen zu Ende. Die Auslieferung wartet auf alle drei.
   e2e:
-    name: E2E (Playwright)
+    name: E2E (${{ matrix.geraet }})
     needs: aenderung
     if: needs.aenderung.outputs.code == 'true'
     runs-on: ubuntu-latest
-    # Normal rund 11 Minuten. Das Limit lässt Platz für den schlimmsten Fall der Installation
-    # (Systempakete 8 Minuten, dazu 3 Download-Versuche à 5 Minuten); es kostet nur, wenn etwas hängt.
+    # Das Limit lässt Platz für den schlimmsten Fall der Installation (Systempakete 8 Minuten,
+    # dazu 3 Download-Versuche à 5 Minuten); es kostet nur, wenn etwas hängt.
     timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - geraet: iphone
+            browser: webkit
+          - geraet: android
+            browser: chromium
+          - geraet: desktop
+            browser: chromium
     permissions:
       contents: read
     services:
@@ -181,25 +194,32 @@ jobs:
       - run: npm exec --no -- svelte-kit sync
       # Systempakete einmal, ohne Wiederholung: Bricht ein Versuch ab, läuft sein apt-get weiter
       # und hält die dpkg-Sperre, ein zweiter Versuch scheitert dann sicher. Ein langsamer
-      # Spiegelserver bekommt darum Zeit, statt abgebrochen zu werden.
-      - name: Systempakete für die Browser
+      # Spiegelserver bekommt darum Zeit, statt abgebrochen zu werden. Nur für den Browser dieses Geräts.
+      - name: Systempakete für den Browser
         timeout-minutes: 8
-        run: npm exec --no -- playwright install-deps chromium webkit
-      # Der Download der Browser hängt selten fest (sonst unter 2 Minuten). Statt bis zum
+        env:
+          BROWSER: ${{ matrix.browser }}
+        run: npm exec --no -- playwright install-deps "$BROWSER"
+      # Der Download des Browsers hängt selten fest (sonst unter 2 Minuten). Statt bis zum
       # Job-Limit zu warten: je Versuch höchstens 5 Minuten, bis zu 3 Versuche.
       - name: Browser herunterladen (bis 3 Versuche)
+        env:
+          BROWSER: ${{ matrix.browser }}
         run: |
           for versuch in 1 2 3; do
-            if timeout --kill-after=10s 5m npm exec --no -- playwright install chromium webkit; then exit 0; fi
+            if timeout --kill-after=10s 5m npm exec --no -- playwright install "$BROWSER"; then exit 0; fi
             echo "::warning::Browser-Download, Versuch $versuch abgebrochen oder fehlgeschlagen"
           done
           exit 1
-      - run: npm run e2e
+      - name: E2E-Tests
+        env:
+          GERAET: ${{ matrix.geraet }}
+        run: npm run e2e -- --project="$GERAET"
       - name: Ergebnisse und Screenshots sichern
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: test-results
+          name: test-results-${{ matrix.geraet }}
           path: test-results/
           retention-days: 30
           if-no-files-found: warn

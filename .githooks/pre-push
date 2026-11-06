@@ -2,7 +2,8 @@
 # Lokaler pre-push-Hook (aktivieren: make hooks).
 # Branch-Schutz für private Repos gibt es auf GitHub nur mit Pro — daher lokal:
 # Der Weg auf main ist immer ein PR aus dev, nie ein direkter Push.
-# Enthält ein gepushter Bereich Code, läuft vor dem Push make check (wie die CI).
+# Enthält ein gepushter Bereich Code, läuft vor dem Push make check (wie die CI) — ausser sein
+# Stand ist schon grün geprüft und seither kamen nur Doku und Versionsnummer dazu (gruener-stand.ts).
 set -euo pipefail
 
 nullsha=0000000000000000000000000000000000000000
@@ -41,7 +42,10 @@ for eintrag in "${refs[@]+"${refs[@]}"}"; do
     bereich="$remote_sha..$lokal_sha"
   fi
   if ! git diff --name-only --no-renames "$bereich" | node scripts/pruefungen/nur-doku.ts; then
-    code=1
+    # Jeder Fehler im Skript zählt als «nicht grün»: dann voll prüfen.
+    if ! node scripts/pruefungen/gruener-stand.ts pruefen "$lokal_sha"; then
+      code=1
+    fi
   fi
 done
 

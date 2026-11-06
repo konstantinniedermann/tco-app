@@ -127,3 +127,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Beobachtungs-Auswertung vom 06.11.2026, CI nach dem Merge.
 
 **Einschätzung:** Ein Neustart des Jobs hilft meist. Dauerhaft wohl nur ohne apt: den E2E-Job im offiziellen Playwright-Container laufen lassen (Image mit Browsern und Systempaketen) — eine neue Abhängigkeit, braucht Freigabe. Alternativ apt mit eigenem Zeitlimit je Verbindung und einem zweiten Versuch, der den ersten sicher beendet (`sudo timeout …`).
+
+### 2026-11-06 — make check baut die App doppelt: einmal selbst, einmal im Webserver der E2E-Tests
+
+**Thema:** Betrieb
+
+**Fundort:** `Makefile` (`check`: `npm run build`, dann `make e2e`), `playwright.config.ts` (`webServer.command`: `npm run build && …`)
+
+**Beobachtung:** `make check` baut die App mit `npm run build` und startet danach die E2E-Tests, deren Webserver noch einmal `npm run build` ausführt. In der CI baut jeder der drei E2E-Jobs ebenfalls selbst. Kostet lokal geschätzt 20–30 s pro voller Prüfung.
+
+**Ursprung:** Analyse, warum Merges lange dauern (Branch `feat/schnellere-merges`).
+
+**Einschätzung:** Kleine Ersparnis; ein Umbau müsste sicherstellen, dass die E2E-Tests nie gegen einen veralteten Build laufen. Erst angehen, wenn die Prüfdauer wieder stört.
+
+### 2026-11-06 — «Importing a module script failed» lokal in make check: zwei rote von drei vollen Läufen
+
+**Thema:** Betrieb
+
+**Fundort:** Profil `iphone` (WebKit), `tests/e2e/verwaltung.test.ts:212` (SI-08) und `tests/e2e/anlass.test.ts:158` (A-ANLASS-01); Seitenfehler-Sammlung `fehler`
+
+**Beobachtung:** Lokal mit 5 Workern zweimal am selben Vormittag rot, jeweils nur durch den Seitenfehler «TypeError: Importing a module script failed.»; einzeln mit `--repeat-each 5` grün, der dritte volle Lauf grün. Branch ohne App-Code. Das Archiv (Eintrag vom 04.11.) zählt nur CI-Läufe; lokal kostet jeder Fehlversuch ein ganzes `make check` und verlängert so den Merge.
+
+**Ursprung:** Branch `feat/schnellere-merges`, Nachweisläufe von `make check`.
+
+**Einschätzung:** Vermutlich derselbe Wettlauf wie im archivierten Thema, unter lokaler Last mit mehr Workern häufiger. Der Trigger im Archiv zählt nur CI; lokal wäre eine eigene Regel zu überlegen (z. B. den Seitenfehler gezielt ignorieren, wenn die Seite danach korrekt geladen ist).

@@ -73,8 +73,9 @@ Alle weiteren Befehle: `make help`.
 - Fertig heisst nachgewiesen: Tests, CI oder Screenshot belegen die Änderung.
 - Vor jedem Commit: `make check` (dasselbe prüft die CI). Einmalig `make hooks` aktiviert
   die versionierten Git-Hooks: vor jedem Commit Secret-Scan und `make docs` (nur Doku) bzw.
-  `make check-schnell` (mit Code), vor dem Push `make check`, wenn Code dabei ist; kein
-  direkter Push auf `main`.
+  `make check-schnell` (mit Code), vor dem Push `make check`, wenn Code dabei ist und der
+  Stand nicht schon grün geprüft ist ([Grüner Stand](docs/ci-cd-und-release.md#prüfungen-in-der-ci));
+  kein direkter Push auf `main`.
 
 ## Datenschutz
 

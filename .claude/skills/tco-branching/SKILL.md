@@ -53,7 +53,10 @@ wurde, wird darum nie neu erzeugt — eine Änderung kommt als neue Migration da
 (`git push -u origin <typ>/issue-NNN` — löst kein Deploy aus). Spec- und Plan-Dateien
 gehören in den Feature-Branch. Zieht `dev` weiter: `git merge origin/dev` im Worktree.
 
-**3 — Review:** `make check` grün, Agent `cas-reviewer`, Befunde klären.
+**3 — Review:** `make check` grün, Agent `cas-reviewer`, Befunde klären. `make check` zuletzt
+auf dem fertigen, committeten Stand laufen lassen: Dann merkt es sich den Stand, und die
+Pushes des Branches und des Merge-Commits auf `dev` prüfen nicht noch einmal voll
+(`docs/ci-cd-und-release.md`, «Grüner Stand»).
 
 **4 — Nach `dev` mergen (im Hauptordner):** Vorher den Worktree mit `ExitWorktree` (`keep`)
 verlassen — aus dem Worktree heraus verweigert Claude Code Git-Befehle auf den Hauptordner.
