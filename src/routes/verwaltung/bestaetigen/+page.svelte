@@ -4,8 +4,9 @@
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { bestaetige, fordereCodeAn } from '../../../lib/verwaltung/api.ts';
-	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
+	import { leiteUm, startziel } from '../../../lib/verwaltung/umleiten.ts';
 
+	let { data } = $props();
 	let schritt = $state<'start' | 'code'>('start');
 	let code = $state('');
 	let fehler = $state<string | null>(null);
@@ -38,7 +39,7 @@
 		const a = await bestaetige(code);
 		if (a.art === 'ok') {
 			// Eine vorgeladene Seite (Tippen auf einen Link) kennt die Bestätigung noch nicht.
-			await goto(resolve('/verwaltung/mitglieder'), { invalidateAll: true });
+			await goto(resolve(startziel(data.rollen)), { invalidateAll: true });
 			return;
 		}
 		laeuft = false;
