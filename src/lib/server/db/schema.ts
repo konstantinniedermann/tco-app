@@ -58,7 +58,7 @@ export const konto = pgTable('konto', {
 	mailCodeHash: text('mail_code_hash'),
 	mailCodeAblauf: timestamp('mail_code_ablauf', { withTimezone: true }),
 	mailCodeFehlversuche: integer('mail_code_fehlversuche').notNull().default(0),
-	// Zufällige Konto-Kennung für WebAuthn (base64url aus 32 Zufallsbytes), erst beim ersten Passkey gesetzt.
+	// Zufällige Konto-Kennung für WebAuthn (base64url aus 32 Zufallsbytes), gesetzt beim ersten Versuch, einen Passkey einzurichten.
 	passkeyKennung: text('passkey_kennung').unique('konto_passkey_kennung_unique')
 });
 
