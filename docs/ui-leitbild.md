@@ -247,7 +247,8 @@ Kopfleiste.
 Startseite, direkt unter der Begrüssung, nur für Konten mit einer Rolle über *Mitglied* hinaus
 (RR-07). Dunkelgrüne Seitenleiste mit
 „MyTCO Verwaltung", den Bereichen der eigenen Rollen (Admin: Mitglieder, Anlässe,
-Für Fairgate mit Zahl der offenen, Änderungsverlauf) und „‹ Zur App". Inhalt: Titel,
+Für Fairgate mit Zahl der offenen, Änderungsverlauf; Clubmeisterschaft: Turniere, für CM und
+Admin) und „‹ Zur App". Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
 Namen von Mitgliedern stehen in allen Tabellen und Listen der Verwaltung als „Nachname,
 Vorname", damit sie sich gleich lesen und sortieren.
