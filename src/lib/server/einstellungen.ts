@@ -10,6 +10,8 @@ export type Einstellungen = {
 	adresse: string;
 	/** Nur Test: alle Mails gehen an diese eine Adresse. Auf Live leer (undefined). */
 	mailNurAn: string | undefined;
+	/** SI-22: VAPID-Schlüsselpaar für Push. Ohne Paar ist Push aus, Mitteilungen gehen per E-Mail. */
+	vapid: { oeffentlich: string; privat: string } | undefined;
 };
 
 /** Annahme K-10: App-Adresse my.tcolten.ch, wenn MYTCO_ADRESSE fehlt */
@@ -41,14 +43,33 @@ export function leseEinstellungen(
 	if (mailNurAn !== undefined && !/^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]+$/.test(mailNurAn)) {
 		throw new Error('MAIL_NUR_AN ist keine Mail-Adresse');
 	}
+	const vapid = leseVapid(env);
 	return {
 		codeSchluessel,
 		smtpUrl,
 		mailAbsender: pflicht(env, 'MYTCO_MAIL_ABSENDER'),
 		kontakt: pflicht(env, 'MYTCO_KONTAKT'),
 		adresse: env.MYTCO_ADRESSE || STANDARD_ADRESSE,
-		mailNurAn
+		mailNurAn,
+		vapid
 	};
+}
+
+/** Beide leer: Push aus. Beide gesetzt: je base64url. Fehlertexte nennen nie den Wert (SI-05). */
+function leseVapid(env: Record<string, string | undefined>): Einstellungen['vapid'] {
+	const oeffentlich = env.MYTCO_VAPID_OEFFENTLICH?.trim() || undefined;
+	const privat = env.MYTCO_VAPID_PRIVAT?.trim() || undefined;
+	if (oeffentlich === undefined && privat === undefined) return undefined;
+	if (oeffentlich === undefined || privat === undefined) {
+		throw new Error('MYTCO_VAPID_OEFFENTLICH und MYTCO_VAPID_PRIVAT nur zusammen');
+	}
+	for (const [name, wert] of [
+		['MYTCO_VAPID_OEFFENTLICH', oeffentlich],
+		['MYTCO_VAPID_PRIVAT', privat]
+	]) {
+		if (!/^[A-Za-z0-9_-]+$/.test(wert)) throw new Error(`${name} ist nicht base64url`);
+	}
+	return { oeffentlich, privat };
 }
 
 function pflicht(env: Record<string, string | undefined>, name: string): string {

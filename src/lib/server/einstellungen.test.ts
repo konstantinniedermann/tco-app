@@ -151,4 +151,50 @@ describe('leseEinstellungen', () => {
 			expect(leseEinstellungen(env).smtpUrl).toBe('smtp://mail.example.org:25');
 		});
 	});
+
+	describe('VAPID-Schlüssel', () => {
+		const oeffentlich = 'B' + 'a1_-'.repeat(20);
+		const privat = 'A' + 'z9_-'.repeat(10);
+
+		test('SI-22: ohne VAPID-Schlüssel ist vapid undefined', () => {
+			expect(leseEinstellungen(vollstaendig).vapid).toBeUndefined();
+			const leer = { ...vollstaendig, MYTCO_VAPID_OEFFENTLICH: '', MYTCO_VAPID_PRIVAT: ' ' };
+			expect(leseEinstellungen(leer).vapid).toBeUndefined();
+		});
+
+		test('SI-22: nur ein VAPID-Schlüssel wirft', () => {
+			const nurOeffentlich = { ...vollstaendig, MYTCO_VAPID_OEFFENTLICH: oeffentlich };
+			const nurPrivat = { ...vollstaendig, MYTCO_VAPID_PRIVAT: privat };
+			for (const env of [nurOeffentlich, nurPrivat]) {
+				expect(() => leseEinstellungen(env)).toThrow(
+					'MYTCO_VAPID_OEFFENTLICH und MYTCO_VAPID_PRIVAT nur zusammen'
+				);
+			}
+		});
+
+		test('SI-22: beide gesetzt ergibt vapid', () => {
+			const env = {
+				...vollstaendig,
+				MYTCO_VAPID_OEFFENTLICH: oeffentlich,
+				MYTCO_VAPID_PRIVAT: privat
+			};
+			expect(leseEinstellungen(env).vapid).toEqual({ oeffentlich, privat });
+		});
+
+		test('SI-22: Fehlertext nennt keinen Wert', () => {
+			const geheim = 'kein base64url!/geheim';
+			const env = {
+				...vollstaendig,
+				MYTCO_VAPID_OEFFENTLICH: oeffentlich,
+				MYTCO_VAPID_PRIVAT: geheim
+			};
+			expect(() => leseEinstellungen(env)).toThrow(
+				new Error('MYTCO_VAPID_PRIVAT ist nicht base64url')
+			);
+			const andersrum = { ...env, MYTCO_VAPID_OEFFENTLICH: geheim, MYTCO_VAPID_PRIVAT: privat };
+			expect(() => leseEinstellungen(andersrum)).toThrow(
+				new Error('MYTCO_VAPID_OEFFENTLICH ist nicht base64url')
+			);
+		});
+	});
 });

@@ -22,6 +22,9 @@ services:
       MYTCO_ADRESSE: ${MYTCO_ADRESSE:-}
       # Nur auf Test gesetzt: Mails werden an diese Adresse umgeleitet (hängt an K-11).
       MAIL_NUR_AN: ${MAIL_NUR_AN:-}
+      # Push-Mitteilungen (#63, SI-22): optional, nur zusammen. Ohne Paar ist Push aus.
+      MYTCO_VAPID_OEFFENTLICH: ${MYTCO_VAPID_OEFFENTLICH:-}
+      MYTCO_VAPID_PRIVAT: ${MYTCO_VAPID_PRIVAT:-}
     networks:
       intern:
       proxy:
