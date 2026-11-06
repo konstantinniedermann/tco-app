@@ -212,10 +212,17 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   Die Regel «main schützen» lässt Änderungen an `main` nur über einen PR mit Merge-Commit
   zu, verlangt grüne Prüfungen (`Prüfen (Lint, Tests, Build)`, `Doku (make docs)`,
   `gitleaks (ganze Historie)`) und verbietet Force-Push und Löschen; Ausnahmen hat niemand.
-  Workflows aus Forks laufen erst nach Freigabe durch den Projektleiter. Geheimnisse nur
-  für eine Umgebung und „nur `main` darf ausliefern“ (Deployment-Umgebungen) wären für
-  öffentliche Repos ebenfalls gratis, sind aber noch nicht eingerichtet
-  ([Beobachtungen](beobachtungen.md)). Die Auslieferung bleibt automatisch.
+  Freigaben verlangt sie keine (0): Jedes Konto mit Schreibrecht kann selbst einen PR nach
+  `main` öffnen und mergen, auch von einem anderen Branch als `dev`; die Regel erzwingt nur
+  PR, Merge-Commit und grüne Prüfungen. Die Ende-zu-Ende-Tests sind bewusst keine verlangte
+  Prüfung: Läuft der Job nicht (nur Doku), meldet er sich unter einem anderen Namen, und eine
+  verlangte Prüfung, die nie kommt, sperrt den PR. Dass sie vor dem Release grün sind, sichert
+  der Ablauf «warten bis grün» (Skill `tco-branching`). Workflows aus Forks laufen erst nach
+  Freigabe durch den Projektleiter. Geheimnisse nur für eine Umgebung und „nur `main` darf
+  ausliefern“ (Deployment-Umgebungen) gibt es für öffentliche Repos ebenfalls gratis (B:
+  [GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments),
+  ebenso der Link oben); sie sind noch nicht eingerichtet ([Beobachtungen](beobachtungen.md)).
+  Die Auslieferung bleibt automatisch.
 - **Restrisiko** (bewertet im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
   Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
   Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten bei einer Übergabe, wenn das
@@ -223,7 +230,8 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   Reichweite ist dort am 02.11.2026 richtiggestellt worden und **vom Projektleiter neu zu
   bestätigen**:
   - Wer ins Repo pushen kann, kann zwar nicht mehr direkt auf `main` pushen (Regel «main
-    schützen» auf GitHub, zusätzlich der lokale Hook), aber auf `dev` einen Workflow
+    schützen» auf GitHub, zusätzlich der lokale Hook), aber selbst einen PR nach `main`
+    mergen, sobald die verlangten Prüfungen grün sind, und auf `dev` einen Workflow
     schreiben, der den Live-Schlüssel nutzt (davor schützt nichts, solange die Schlüssel
     nicht in Deployment-Umgebungen liegen). Weil das `ausliefern` aus dem Image auf dem Server läuft, reicht
     das bis zu root auf dem Server: Geheimnisse beider Umgebungen, Sicherungszugang,
