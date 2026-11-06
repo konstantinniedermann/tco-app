@@ -4,6 +4,7 @@
 	import { formatiereBeginn } from '../lib/anlass/zeit.ts';
 	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { hinweisErledigt, kannPasskey, richtePasskeyEin } from '../lib/login/passkey.ts';
+	import PushHinweis from '../lib/push/PushHinweis.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -67,6 +68,9 @@
 		{/if}
 	</div>
 {/if}
+
+<!-- Ein Angebot nach dem anderen: Push erst, wenn der Passkey-Hinweis weg ist (UI-04). -->
+<PushHinweis aktiv={!sichtbar && data.ansicht === null} />
 
 {#if data.anlaesse.length > 0}
 	<h2>Jetzt aktuell</h2>

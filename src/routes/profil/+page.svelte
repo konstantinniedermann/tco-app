@@ -21,6 +21,7 @@
 		type EigenesFeld
 	} from '../../lib/profil/angaben.ts';
 	import { vergissWechsel } from '../../lib/profil/wechselanfrage.ts';
+	import Benachrichtigungen from '../../lib/push/Benachrichtigungen.svelte';
 	import { feldMeldung } from '../../lib/verwaltung/anzeige.ts';
 	import { istKlappeOffen, merkeKlappe } from '../../lib/ui/klappe.ts';
 	import type { FullAutoFill } from 'svelte/elements';
@@ -440,6 +441,8 @@
 		</p>
 	</div>
 </details>
+
+<Benachrichtigungen {nurAnsehen} />
 
 <div class="karte">
 	<button

@@ -17,7 +17,11 @@ export default defineConfig({
 	forbidOnly: true,
 	use: {
 		baseURL,
-		screenshot: 'on'
+		screenshot: 'on',
+		// Der Service Worker (Push, #63) bliebe sonst zwischen Seite und Netz: WebKit leitet dann
+		// Anfragen an `page.route` vorbei, und Chrome hielte die App für installierbar. Er hat
+		// keinen `fetch`-Handler; die Tests prüfen Push ohne echtes Abo.
+		serviceWorkers: 'block'
 	},
 	projects: [
 		// WebKit speichert Cookies mit `Secure` auf http://localhost nicht. adapter-node nimmt ohne
