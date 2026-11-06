@@ -58,6 +58,25 @@ function folgeFeld(feld: Feld): Feld | null {
 	return naechstesFeld<unknown>([...formular.elements], feld, istFeld) as Feld | null;
 }
 
+// Ob die Tastatur beim letzten Fingerdruck offen war. Beim Loslassen ist sie oft schon im
+// Schliessen (das Feld verliert den Fokus vor dem Klick), darum zählt der Stand beim Druck.
+let offenBeimDruck = false;
+
+/**
+ * Wappen bei offener Tastatur: Der Tipp schliesst nur die Tastatur, wie ein Tipp auf den
+ * Hintergrund, und führt nicht weiter. Gibt `true` zurück, wenn der Klick so verbraucht ist.
+ * Ein Klick ohne Finger (Eingabetaste auf dem Link, `detail` 0) führt immer weiter.
+ */
+export function schliesstNurTastatur(ereignis: MouseEvent): boolean {
+	const offen = offenBeimDruck && ereignis.detail > 0;
+	offenBeimDruck = false;
+	if (!offen) return false;
+	ereignis.preventDefault();
+	const feld = document.activeElement;
+	if (istFeld(feld)) feld.blur();
+	return true;
+}
+
 /** Hängt das Verhalten an das Dokument; gibt die Funktion zum Abhängen zurück. */
 export function beobachteTastatur(): () => void {
 	const wurzel = document.documentElement;
@@ -88,6 +107,7 @@ export function beobachteTastatur(): () => void {
 	let wartet = false;
 	const runter = () => {
 		gedrueckt = true;
+		offenBeimDruck = 'tastatur' in wurzel.dataset;
 	};
 	function hoch() {
 		gedrueckt = false;
