@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
@@ -5,6 +6,7 @@ import {
 	holeMailCode,
 	legeAdminMitBriefCodeAn,
 	legeKontoMitBriefCodeAn,
+	legeOffenenAnlassAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { klappeAuf, pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
@@ -156,6 +158,39 @@ test('Keine Rückfrage nach dem Zurücksetzen und nach dem Speichern', async ({ 
 	await expect(page.locator('.kachel', { hasText: 'Telefon' })).toContainText('079 555 07 89');
 	await tippeWappen(page, finger);
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Vreni' })).toBeVisible();
+	await expect(rueckfrage(page)).toBeHidden();
+});
+
+test('Antwort auf einen Anlass: Rückfrage nur, solange die Antwort nicht gesendet ist', async ({
+	page
+}, info) => {
+	const finger = info.project.name !== 'desktop';
+	const konto = await legeKontoMitBriefCodeAn('Yvonne');
+	const titel = `Probeanlass ${randomUUID().slice(0, 8)}`;
+	const id = await legeOffenenAnlassAn(konto.mitgliedId, titel);
+	await meldeAn(page, konto);
+	await page.goto(`/anlass/${id}`);
+	await expect(page.getByRole('heading', { level: 1, name: titel })).toBeVisible();
+
+	// Noch nichts gewählt: keine Rückfrage.
+	await tippeWappen(page, finger);
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Yvonne' })).toBeVisible();
+
+	// Gewählt, nicht gesendet: das Wappen fragt; Abbrechen bleibt.
+	await page.goto(`/anlass/${id}`);
+	await page.getByRole('radio', { name: 'Ich komme nicht' }).check();
+	await page.getByLabel('Bemerkung (freiwillig)').fill('Bin in den Ferien.');
+	await schliesseTastatur(page);
+	await tippeWappen(page, finger);
+	await expect(rueckfrage(page)).toBeVisible();
+	await rueckfrage(page).getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(page.getByLabel('Bemerkung (freiwillig)')).toHaveValue('Bin in den Ferien.');
+
+	// Gesendet: nichts mehr ungespeichert.
+	await page.getByRole('button', { name: 'Antwort senden' }).click();
+	await expect(page.getByText('Du kommst nicht', { exact: true })).toBeVisible();
+	await tippeWappen(page, finger);
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Yvonne' })).toBeVisible();
 	await expect(rueckfrage(page)).toBeHidden();
 });
 
