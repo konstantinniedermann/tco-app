@@ -8,6 +8,15 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Rollen geschärft (#43): Statt «Admin» gibt es vier Admin-Rollen, einzeln vergeben:
+  MyTCO-Admin (vergibt Rollen, sieht alle Bereiche, ändert nichts), Mitglieder-Admin,
+  CM-Admin und Lizenz-Admin. Übergang: Bisherige Admins sind MyTCO- und Mitglieder-Admin.
+  Neu die Seite *Rollen* und *Ansicht als …*: Der MyTCO-Admin sieht MyTCO wie eine gewählte
+  Rolle, nur lesend, auf dem Server durchgesetzt. Ändert die Verwaltung eine E-Mail-Adresse,
+  erhält die alte einen Hinweis. «Rollen speichern» meldet, wenn jemand die Rollen inzwischen
+  geändert hat, statt sie zu überschreiben. Rollen und Rechte, Anforderungen, Datenschutz und
+  Sicherheitskonzept nachgeführt.
+
 ## 0.6.1 — Wappen führt zum Start
 
 - Wappen führt zum Start: Ein Tipp aufs Wappen in der Kopfleiste führt zur Startseite, in der

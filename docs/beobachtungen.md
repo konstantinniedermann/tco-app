@@ -334,3 +334,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Screenshots zu #43 (Task 5, Rollen-Umbau der Oberfläche).
 
 **Einschätzung:** Vermutlich verletzt es UI-03 (48 px) am iPhone; die Abhilfe wäre wahrscheinlich `appearance: none` mit einem eigenen Pfeil. Das trifft alle Auswahlfelder, darum erst ins Leitbild und dann am Gerät prüfen.
+
+### 2026-11-06 — Migration, die alte Werte verbietet, legt Seed und E2E paralleler Worktrees lahm
+
+**Thema:** Betrieb
+
+**Fundort:** gemeinsame lokale Datenbank `mytco` aller Worktrees; `drizzle/0009_rollen_schaerfen.sql` (`konto_rolle_rolle_check` ohne `admin`)
+
+**Beobachtung:** Eine Migration, die alte Werte verbietet (hier die Rolle `admin`), lässt Seed und E2E paralleler Worktrees mit älterem Code scheitern, sobald ein Worktree sie in die gemeinsame Datenbank eingespielt hat. Zurück geht es nur mit einer neu aufgesetzten Datenbank. Die Wappen-Session musste auf eine eigene Datenbank `mytco_wappen` ausweichen.
+
+**Ursprung:** #43, Rollen-Umbau.
+
+**Einschätzung:** Eigene Datenbank pro Worktree für E2E erwägen, z. B. `DATABASE_URL` aus dem Namen des Worktrees ableiten, oder den Ausweg im Skill `tco-branching` beschreiben.
+
+### 2026-11-06 — Testkonten aus E2E-Läufen sammeln sich in der gemeinsamen Datenbank an
+
+**Thema:** Betrieb
+
+**Fundort:** gemeinsame lokale Datenbank `mytco`; Seite `/verwaltung/rollen`
+
+**Beobachtung:** Jeder E2E-Lauf legt neue erfundene Konten mit Rollen an, aufgeräumt wird nicht. Auf der Seite *Rollen* stehen z. B. 474 MyTCO-Admins. Das stört Screenshots als Nachweis, weil Listen und Zahlen nicht nach dem Verein aussehen.
+
+**Ursprung:** #43, Screenshots der Seite *Rollen*.
+
+**Einschätzung:** Zusammen mit dem Eintrag oben lösen: Eine eigene Datenbank pro Worktree oder pro Lauf hält die Listen klein; sonst Screenshots auf einer frisch mit `make seed` aufgesetzten Datenbank machen.

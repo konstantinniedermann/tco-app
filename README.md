@@ -2,20 +2,20 @@
 
 Mitglieder-App des **Tennis-Club Olten (TCO)**. Mitglieder melden sich an, verwalten
 ihre Lizenzanträge und nehmen an der Clubmeisterschaft teil — Anmeldung, Spielplan,
-Resultate. Admins pflegen die Mitglieder und bereiten die Daten für Swiss Tennis auf.
+Resultate. Die Admin-Rollen pflegen die Mitglieder und bereiten die Daten für Swiss Tennis auf.
 
 Geplant als Mobile-App für Android und iOS (mit Push-Benachrichtigungen) und einer
-Admin-Oberfläche. MyTCO wird vorerst **eigenständig** aufgebaut, ohne Anbindung an die
+Verwaltung. MyTCO wird vorerst **eigenständig** aufgebaut, ohne Anbindung an die
 Mitgliederverwaltung Fairgate ([ADR-006](docs/adr/adr-006-eigenstaendig-ohne-fairgate.md))
 oder die Website tcolten.ch.
 
 ## Stand
 
 Phase **Fundament**, noch nicht ausgeliefert (aktuelle Nummer: [Versionen](docs/versionen.md)): Login per Einmal-Code mit
-Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung für Admins mit
-Liste «Für Fairgate», eigene Angaben im Profil ändern, Datenschutzerklärung in der App,
+Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung für Mitglieder-Admins mit
+Liste «Für Fairgate», Rollen mit *Ansicht als …* für MyTCO-Admins, eigene Angaben im Profil ändern, Datenschutzerklärung in der App,
 Anmeldung zu Anlässen wie der Generalversammlung (Vorschlag für den Vorstand, K-50),
-Turnier der Clubmeisterschaft mit Kategorien anlegen für die CM-Verantwortlichen (noch ohne
+Turnier der Clubmeisterschaft mit Kategorien anlegen für die CM-Admins (noch ohne
 Anmeldung der Mitglieder),
 Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene Testdaten) sind
 gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
@@ -56,7 +56,7 @@ beim Ausliefern von selbst.
 
 Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make dev-handy` startet den
 Entwicklungsserver stattdessen fürs iPhone im selben WLAN (macOS, nur im eigenen WLAN), mit
-festen Namen `mytco-admin.local` (Erika) und `mytco-mitglied.local` (Kurt): je Name eine
+festen Namen `mytco-admin.local` (Erika, MyTCO- und Mitglieder-Admin) und `mytco-mitglied.local` (Kurt): je Name eine
 Verknüpfung auf dem Startbildschirm mit eigenem Login. Login per Code klappt dort, Passkey nicht
 (braucht HTTPS); vorher einmal `make seed`, am Laptop dann über die WLAN-Adresse statt
 localhost. `make musterbrief` erzeugt

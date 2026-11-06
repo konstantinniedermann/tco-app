@@ -107,7 +107,8 @@ Sicherung selbst.
 ## Ersten Admin festlegen
 
 Auf Live ist die Datenbank anfangs leer. Der Projektleiter wird einmal per Befehl als Mitglied
-angelegt und bekommt die Rolle Admin (Mitgliedernummer, Name, Adresse und E-Mail sind Pflicht):
+angelegt und bekommt die Rollen MyTCO-Admin und Mitglieder-Admin (Mitgliedernummer, Name, Adresse
+und E-Mail sind Pflicht):
 
 ```
 cd /opt/mytco && MYTCO_UMGEBUNG=live \
@@ -120,12 +121,12 @@ cd /opt/mytco && MYTCO_UMGEBUNG=live \
 
 Als Benutzer `mytco` ausführen (er liest `live/zustand/aktuell`); `MYTCO_IMAGE` verlangt die
 Compose-Datei bei jedem Aufruf, hier das laufende Image von Live, Ablage wie `MYTCO_REPO_STANDARD`
-in `bin/lib.sh`. Der Befehl legt nur den Admin selbst an; alle anderen Mitglieder kommen danach über die
-Verwaltung. Gibt es das Mitglied schon (gleiche Nummer oder E-Mail), erhält es nur die Rolle.
+in `bin/lib.sh`. Der Befehl legt nur den ersten Admin selbst an; alle anderen Mitglieder kommen danach über die
+Verwaltung. Gibt es das Mitglied schon (gleiche Nummer oder E-Mail), erhält es nur die fehlenden Rollen.
 Die Angaben landen im Shell-Verlauf: Befehl mit führendem Leerzeichen eingeben (bei
 `HISTCONTROL=ignorespace`) oder den Verlauf danach bereinigen. Die Ausgabe nennt das Ergebnis und bei Fehlern Feldnamen mit Grund, nie Werte. Danach meldet
-sich der Admin über «Code per E-Mail» an. Auf Test ist Erika Beispiel (erfunden) automatisch
-Admin.
+sich der erste Admin über «Code per E-Mail» an und verteilt die Rollen auf der Seite *Rollen*. Auf Test
+ist Erika Beispiel (erfunden) automatisch MyTCO- und Mitglieder-Admin.
 
 ## Auslieferung ohne CI
 

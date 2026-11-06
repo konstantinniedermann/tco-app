@@ -10,8 +10,9 @@ was dort steht, gilt. Kapitel ohne eigene Aussage fehlen (Laufzeitsicht: Login-A
 ## 1 Ziele und Randbedingungen
 
 MyTCO ist die Mitglieder-App des Tennis-Club Olten: Login ohne Passwort, eigene Angaben,
-Anlässe, später Anmeldung und Resultate der Clubmeisterschaft und Lizenzanträge. Admins
-pflegen darin die Mitglieder. Umfang und Termine: [Roadmap](roadmap.md),
+Anlässe, später Anmeldung und Resultate der Clubmeisterschaft und Lizenzanträge.
+Mitglieder-Admins pflegen darin die Mitglieder, CM- und Lizenz-Admins ihre Bereiche, der
+MyTCO-Admin vergibt die Rollen. Umfang und Termine: [Roadmap](roadmap.md),
 [Anforderungen](anforderungen/anforderungen.md).
 
 | Qualitätsziel | Bedeutet | Anforderung |
@@ -31,14 +32,14 @@ entsteht mit Claude Code, die Regeln dafür erzwingen Prüfungen in Hook und CI.
 ```mermaid
 flowchart LR
   M([Mitglieder, Handy oder PC]) -->|Browser, App auf dem Startbildschirm| APP[MyTCO]
-  A([Admins und Verantwortliche]) -->|Verwaltung im selben Browser| APP
+  A([Admin-Rollen]) -->|Verwaltung im selben Browser| APP
   APP -->|Einmal-Codes, Bestätigungen| MAIL[Mail-Versand]
   MAIL --> M
   BRIEF[Login-Brief auf Papier] -->|Brief-Code, QR-Code| M
   APP -->|Druckansicht| BRIEF
   DNS[DNS von tcolten.ch bei Metanet] -.->|my.tcolten.ch zeigt auf den Server| APP
   FG[Fairgate] -.->|Mitgliederliste als Datei, geplant| APP
-  APP -.->|Liste Für Fairgate, Admin überträgt von Hand| FG
+  APP -.->|Liste Für Fairgate, Mitglieder-Admin überträgt von Hand| FG
   APP -.->|Lizenznummern, später| ST[Swiss Tennis Advantage]
   ST -.->|Gruppen und Tableaus als Excel, später| APP
   GH[GitHub: Code, CI, Container-Ablage] -->|Auslieferung| APP
@@ -79,12 +80,12 @@ flowchart TD
 
 | Baustein | Aufgabe | Regel |
 |----------|---------|-------|
-| **Seiten** (`src/routes/**/+page.*`) | Bildschirme für Mitglieder und `verwaltung/` für Admins; laden Daten im Browser | keine Server-Dateien ausser `+server.ts`, keine Form Actions, keine Remote Functions ([ADR-002](adr/adr-002-sveltekit-postgresql.md), Prüfung `bauregel`) |
-| **Schnittstellen** (`src/routes/api/**/+server.ts`) | JSON für die Seiten; `api/admin/` nur für Verwaltungsrollen (Turniere und Kategorien: `admin` und `cm`, alles andere nur `admin`) | Admin-Routen nutzen nur die Einträge aus `ADMIN_SCHNITTSTELLEN` (`src/lib/server/admin/schnittstellen.ts`) oder `TURNIER_SCHNITTSTELLEN` (`src/lib/server/turnier/schnittstellen.ts`), die Sitzung und Rolle prüfen, für den Admin-Bereich zusätzlich den frischen Mail-Code (SI-08) |
+| **Seiten** (`src/routes/**/+page.*`) | Bildschirme für Mitglieder und `verwaltung/` für die Admin-Rollen; laden Daten im Browser | keine Server-Dateien ausser `+server.ts`, keine Form Actions, keine Remote Functions ([ADR-002](adr/adr-002-sveltekit-postgresql.md), Prüfung `bauregel`) |
+| **Schnittstellen** (`src/routes/api/**/+server.ts`) | JSON für die Seiten; `api/admin/` nur für Verwaltungsrollen, je Bereich Lesen und Schreiben getrennt (`src/lib/verwaltung/bereiche.ts`: Mitglieder schreibt `mitglieder`, Clubmeisterschaft `cm`, Rollen `mytco`; `mytco` liest alle Bereiche) | Admin-Routen nutzen nur die Einträge aus `ADMIN_SCHNITTSTELLEN` (`src/lib/server/admin/schnittstellen.ts`) oder `TURNIER_SCHNITTSTELLEN` (`src/lib/server/turnier/schnittstellen.ts`), die Sitzung, Bereich und Art prüfen, dazu den frischen Mail-Code (SI-08); während *Ansicht als …* weist der Hook jedes Speichern ab (SI-20) |
 | **Fachmodule** (`src/lib/server/<thema>/`) | Fachregeln aus dem [Fachmodell](fachmodell.md) (`FR-NN`) und Rechte aus [Rollen und Rechte](rollen-und-rechte.md) (`RR-NN`) | Rechte prüft immer der Server |
 | **Datenbank** (`src/lib/server/db/`, `drizzle/`) | Schema und Migrationen | Migrationen fügen nur hinzu, damit der Rückfall auf das vorherige Image geht ([CI/CD und Release](ci-cd-und-release.md#auslieferung)) |
 | **Oberfläche** (`src/lib/` ohne `server/`) | Bausteine und Tokens (`ui/`, `design/`), Teile je Thema (`verwaltung/`, `login/`, `profil/`, `anlass/`, `turnier/`, `hilfe/`, `datenschutz/`) | nur aus dem [UI-Leitbild](ui-leitbild.md) |
-| **Skripte** (`scripts/`) | Admin festlegen, Seed, Testdaten, Musterbrief, Prüfungen für Hook und CI | Befehle über `make help` |
+| **Skripte** (`scripts/`) | Ersten Admin festlegen, Seed, Testdaten, Musterbrief, Prüfungen für Hook und CI | Befehle über `make help` |
 | **Betrieb** (`betrieb/`) | Einrichtung, Auslieferung und Sicherung auf dem Server | siehe Kapitel 7 |
 
 Welche Pfade zu welcher Aufgabe gehören: [Context-Scopes](context-scopes.md).
@@ -126,7 +127,7 @@ flowchart LR
 
 | Thema | Wo |
 |-------|-----|
-| Login, Sitzung, Admin-Zugang | [Sicherheitskonzept](sicherheitskonzept.md#login), [ADR-004](adr/adr-004-login-einmal-code.md) |
+| Login, Sitzung, Zugang zur Verwaltung | [Sicherheitskonzept](sicherheitskonzept.md#login), [ADR-004](adr/adr-004-login-einmal-code.md) |
 | Rollen und Rechte | [Rollen und Rechte](rollen-und-rechte.md) |
 | Personendaten, Löschen, Logs | [Datenschutzkonzept](datenschutz.md) (`DS-NN`), [Datenschutzerklärung](datenschutzerklaerung.md) |
 | Sicherheit | [Sicherheitskonzept](sicherheitskonzept.md) (`SI-NN`) |

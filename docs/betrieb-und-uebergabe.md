@@ -125,7 +125,7 @@ Nachfolge (K-05).
    Codes unterwegs sind.
 7. **Adressen umstellen:** Mail-Empfänger auf Test (`MAIL_NUR_AN`), Kontakt in der App
    (`MYTCO_KONTAKT`), falls er auf den Projektleiter lautet.
-8. **Rollen in MyTCO:** Die Nachfolge erhält Admin; die Rollen des Projektleiters vergibt der
+8. **Rollen in MyTCO:** Die Nachfolge erhält MyTCO-Admin; die übrigen Rollen des Projektleiters vergibt der
    Vorstand neu ([Rollen und Rechte](rollen-und-rechte.md)).
 9. **Fragen-Tabelle:** Besitz im Google Drive an die Nachfolge übertragen.
 10. **Abschluss:** Die Nachfolge liefert einmal selbst auf Test und Live aus, und die Probe der

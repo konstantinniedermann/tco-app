@@ -27,7 +27,7 @@ Blick sehen, **was** ein Issue ist, **wo** es hingehört, **wie dringend** es is
 | `docs:` | `documentation` | Nur Dokumentation |
 | `chore:` / `ops:` / `test:` | `chore` | Wartung, Infrastruktur, Tests, Tooling |
 
-Faustregel: Merkt ein Mitglied oder Admin in der App einen Unterschied? → `bug` oder
+Faustregel: Merkt ein Mitglied oder eine Admin-Rolle in der App einen Unterschied? → `bug` oder
 `enhancement`. Reine Werkstattarbeit? → `refactor` oder `chore`. Reiner Text? → `documentation`.
 
 ## Bereich (mindestens ein Label)
@@ -35,7 +35,7 @@ Faustregel: Merkt ein Mitglied oder Admin in der App einen Unterschied? → `bug
 | Label | Umfasst |
 |-------|---------|
 | `app` | Mobile-App für Mitglieder (Android, iOS), Push-Benachrichtigungen |
-| `admin` | Admin-Oberfläche: Mitgliederverwaltung, Clubmeisterschaft, Lizenzlisten |
+| `admin` | Verwaltung: Mitgliederverwaltung, Clubmeisterschaft, Lizenzlisten, Rollen |
 | `backend` | Server, Schnittstellen, Datenbank, Geschäftslogik |
 | `architektur` | Übergreifende Konzepte: Fachmodell, ADRs, arc42 |
 | `infra` | Hosting, CI/CD, Deployment, Store-Releases, Backups, Monitoring |
