@@ -126,12 +126,27 @@ jobs:
       - run: npm run build
       - run: npm run build:spa
 
+  # Ein Job pro Gerät (Playwright-Projekt): Der Runner hat 2 Kerne, Playwright nutzt davon einen
+  # Worker; nacheinander dauerten die drei Geräte gut 8 Minuten. Fällt ein Gerät durch, laufen
+  # die anderen zu Ende. Die Auslieferung wartet auf alle drei.
   e2e:
-    name: E2E (Playwright)
+    name: E2E (${{ matrix.geraet }})
     needs: aenderung
     if: needs.aenderung.outputs.code == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Das Limit lässt Platz für den schlimmsten Fall der Installation (Systempakete 8 Minuten,
+    # dazu 3 Download-Versuche à 5 Minuten); es kostet nur, wenn etwas hängt.
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - geraet: iphone
+            browser: webkit
+          - geraet: android
+            browser: chromium
+          - geraet: desktop
+            browser: chromium
     permissions:
       contents: read
     services:
@@ -177,21 +192,34 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm exec --no -- svelte-kit sync
-      # Der Download von Browsern und Systempaketen hängt selten fest (sonst unter 3 Minuten).
-      # Statt bis zum Job-Limit zu warten: je Versuch höchstens 5 Minuten, bis zu 3 Versuche.
-      - name: Browser installieren (bis 3 Versuche)
+      # Systempakete einmal, ohne Wiederholung: Bricht ein Versuch ab, läuft sein apt-get weiter
+      # und hält die dpkg-Sperre, ein zweiter Versuch scheitert dann sicher. Ein langsamer
+      # Spiegelserver bekommt darum Zeit, statt abgebrochen zu werden. Nur für den Browser dieses Geräts.
+      - name: Systempakete für den Browser
+        timeout-minutes: 8
+        env:
+          BROWSER: ${{ matrix.browser }}
+        run: npm exec --no -- playwright install-deps "$BROWSER"
+      # Der Download des Browsers hängt selten fest (sonst unter 2 Minuten). Statt bis zum
+      # Job-Limit zu warten: je Versuch höchstens 5 Minuten, bis zu 3 Versuche.
+      - name: Browser herunterladen (bis 3 Versuche)
+        env:
+          BROWSER: ${{ matrix.browser }}
         run: |
           for versuch in 1 2 3; do
-            if timeout --kill-after=10s 5m npm run e2e:browser; then exit 0; fi
+            if timeout --kill-after=10s 5m npm exec --no -- playwright install "$BROWSER"; then exit 0; fi
             echo "::warning::Browser-Download, Versuch $versuch abgebrochen oder fehlgeschlagen"
           done
           exit 1
-      - run: npm run e2e
+      - name: E2E-Tests
+        env:
+          GERAET: ${{ matrix.geraet }}
+        run: npm run e2e -- --project="$GERAET"
       - name: Ergebnisse und Screenshots sichern
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: test-results
+          name: test-results-${{ matrix.geraet }}
           path: test-results/
           retention-days: 30
           if-no-files-found: warn
@@ -332,12 +360,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version=$(node -p "require('./package.json').version")
-          if ! printf '%s\n' "$version" | grep -Eqx '[0-9]+\.[0-9]+\.[0-9]+'; then
-            echo "Version in package.json nicht lesbar: $version"
-            exit 1
+          # Untergrenze für den Text: das letzte GitHub-Release; ohne eines (erstes Live-Release) alles.
+          if vorher=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name 2>&1); then
+            vorher=${vorher#v}
+          else
+            case "$vorher" in
+              *"HTTP 404"*) vorher=0.0.0 ;;
+              *) echo "Letztes Release nicht lesbar: $vorher"; exit 1 ;;
+            esac
           fi
-          if ! bash scripts/ci/versionsnotizen.sh "$version" | grep -q '[^[:space:]]'; then
-            echo "Kein Abschnitt für Version $version in docs/versionen.md"
+          for v in "$version" "$vorher"; do
+            if ! printf '%s\n' "$v" | grep -Eqx '[0-9]+\.[0-9]+\.[0-9]+'; then
+              echo "Version nicht lesbar: $v"
+              exit 1
+            fi
+          done
+          if ! bash scripts/ci/versionsnotizen.sh "$version" "$vorher" | grep -q '[^[:space:]]'; then
+            echo "Kein Abschnitt zwischen $vorher und $version in docs/versionen.md"
             exit 1
           fi
           if ausgabe=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v$version" 2>&1); then
@@ -451,9 +490,20 @@ jobs:
           COMMIT: ${{ github.sha }}
         run: |
           version=$(node -p "require('./package.json').version")
-          bash scripts/ci/versionsnotizen.sh "$version" > "$RUNNER_TEMP/notizen.md"
+          # Untergrenze für den Text: das letzte GitHub-Release; ohne eines (erstes Live-Release) alles.
+          if vorher=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name 2>&1); then
+            vorher=${vorher#v}
+          else
+            case "$vorher" in
+              *"HTTP 404"*) vorher=0.0.0 ;;
+              *) echo "Letztes Release nicht lesbar: $vorher"; exit 1 ;;
+            esac
+          fi
+          # Alle Abschnitte seit dem letzten Release, denn jeder Merge nach dev mit Code hat seine Nummer.
+          # Nur bei Live: Releases ohne Live-Auslieferung legen kein GitHub-Release an.
+          bash scripts/ci/versionsnotizen.sh "$version" "$vorher" > "$RUNNER_TEMP/notizen.md"
           if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notizen.md"; then
-            echo "Kein Abschnitt für Version $version in docs/versionen.md"
+            echo "Kein Abschnitt zwischen $vorher und $version in docs/versionen.md"
             exit 1
           fi
           gh release create "v$version" --target "$COMMIT" --title "v$version" \

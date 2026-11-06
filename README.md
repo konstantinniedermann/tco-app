@@ -6,14 +6,17 @@ Resultate. Admins pflegen die Mitglieder und bereiten die Daten für Swiss Tenni
 
 Geplant als Mobile-App für Android und iOS (mit Push-Benachrichtigungen) und einer
 Admin-Oberfläche. MyTCO wird vorerst **eigenständig** aufgebaut, ohne Anbindung an die
-Mitgliederverwaltung Fairgate oder die Website tcolten.ch.
+Mitgliederverwaltung Fairgate ([ADR-006](docs/adr/adr-006-eigenstaendig-ohne-fairgate.md))
+oder die Website tcolten.ch.
 
 ## Stand
 
-Phase **Fundament**, Version 0.5.0 (noch nicht ausgeliefert): Login per Einmal-Code mit
+Phase **Fundament**, noch nicht ausgeliefert (aktuelle Nummer: [Versionen](docs/versionen.md)): Login per Einmal-Code mit
 Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung für Admins mit
 Liste «Für Fairgate», eigene Angaben im Profil ändern, Datenschutzerklärung in der App,
 Anmeldung zu Anlässen wie der Generalversammlung (Vorschlag für den Vorstand, K-50),
+Turnier der Clubmeisterschaft mit Kategorien anlegen für die CM-Verantwortlichen (noch ohne
+Anmeldung der Mitglieder),
 Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene Testdaten) sind
 gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
 den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* aus
@@ -42,7 +45,7 @@ npm exec --no -- playwright install chromium webkit
 make hooks   # einmalig: Git-Hooks aktivieren
 cp .env.example .env   # je Ordner bzw. Worktree: lokale Einstellungen (nur erfundene Werte)
 make db      # lokale PostgreSQL und Mail-Fänger Mailpit starten
-make seed    # erfundene Mitglieder und eine Beispiel-GV anlegen, gibt Brief-Codes für Erika (Admin) und Kurt (Mitglied) aus
+make seed    # erfundene Mitglieder, eine Beispiel-GV und ein Beispielturnier 2027 anlegen, gibt Brief-Codes für Erika (Admin), Kurt (Mitglied) und Hanna Muster (CM) aus
 make dev     # Entwicklungsserver
 make check   # alle Prüfungen (braucht Docker)
 ```
@@ -70,10 +73,12 @@ Alle weiteren Befehle: `make help`.
 - Jede Änderung hängt an einem Issue mit Definition of Done.
 - Release dev → main: Doku-Abgleich und `make release-check`, Ablauf im Skill `tco-branching`.
 - Fertig heisst nachgewiesen: Tests, CI oder Screenshot belegen die Änderung.
-- Vor jedem Commit: `make check` (dasselbe prüft die CI). Einmalig `make hooks` aktiviert
+- Vor dem Push: `make check` auf dem fertigen, committeten Stand (dasselbe prüft die CI); nur
+  dann merkt es sich den grünen Stand. Einmalig `make hooks` aktiviert
   die versionierten Git-Hooks: vor jedem Commit Secret-Scan und `make docs` (nur Doku) bzw.
-  `make check-schnell` (mit Code), vor dem Push `make check`, wenn Code dabei ist; kein
-  direkter Push auf `main`.
+  `make check-schnell` (mit Code), vor dem Push `make check`, wenn Code dabei ist und der
+  Stand nicht schon grün geprüft ist ([Grüner Stand](docs/ci-cd-und-release.md#prüfungen-in-der-ci));
+  kein direkter Push auf `main`.
 
 ## Datenschutz
 

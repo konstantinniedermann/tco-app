@@ -76,6 +76,10 @@ Jedes Issue enthält eine Checkliste, woran man erkennt, dass es fertig ist — 
 geschrieben", sondern „was ist danach nachweislich wahr" (Tests grün, Verhalten sichtbar,
 Dokument freigegeben, Doku nachgeführt).
 
+Vor dem Schliessen werden die Haken im Body gesetzt. Wer nur den Body liest, sieht sonst ein
+unfertiges Issue; ein bewusst nicht erfüllter Punkt bleibt offen und wird im
+Abschlusskommentar begründet.
+
 ## Abhängigkeiten
 
 Im Body notieren:

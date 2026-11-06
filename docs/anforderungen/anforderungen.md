@@ -73,7 +73,7 @@ Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 | A-ROLLE-04 | Rolle *Anlässe-Veranstalter*; die CM leitet bis dahin der CM-Verantwortliche (A-ROLLE-07) | PDF 4a | später\* | später |
 | A-ROLLE-05 | Rolle *Junioren-Leiter* | PDF 4a | später\* | später |
 | A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später\* | später |
-| A-ROLLE-07 | Rolle *CM-Verantwortlicher*: Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | geplant |
+| A-ROLLE-07 | Rolle *CM-Verantwortlicher*: Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | umgesetzt\* (Turnier und Kategorien, #57; Anmeldungen, Gruppen und Resultate folgen mit ihren Etappen) |
 | A-ROLLE-08 | Rolle *Lizenzverantwortlicher*: Lizenzrunde und Lizenzanträge | PL | Lizenzanträge | geplant |
 
 ### KONTO — Eigene Daten ändern
@@ -151,9 +151,9 @@ Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vo
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-TURNIER-01 | Der CM-Verantwortliche legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | geplant |
-| A-TURNIER-02 | Zum Turnier werden die Swiss-Tennis-Turniernummern erfasst | PDF 5a | CM-Anmeldung | geplant |
-| A-TURNIER-03 | Zum Turnier werden alle Kategorien erfasst, eingeteilt nach Geschlecht, Alter, Klassierungsbereich (im PDF: Stärkekategorie) und Einzel/Doppel | PDF 5a | CM-Anmeldung | geplant |
+| A-TURNIER-01 | Der CM-Verantwortliche legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | umgesetzt |
+| A-TURNIER-02 | Zum Turnier werden die Swiss-Tennis-Turniernummern erfasst | PDF 5a | CM-Anmeldung | umgesetzt |
+| A-TURNIER-03 | Zum Turnier werden alle Kategorien erfasst, eingeteilt nach Geschlecht, Alter, Klassierungsbereich (Einzel; im PDF: Stärkekategorie) bzw. Mindestsumme der Klassierungen (Doppel, Annahme K-51) und Einzel/Doppel | PDF 5a | CM-Anmeldung | umgesetzt |
 
 ### ANMELDUNG — Anmeldung zur Clubmeisterschaft
 
@@ -165,7 +165,7 @@ Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vo
 | A-ANMELDUNG-04 | Bei einer Doppelkategorie zeigt MyTCO sofort alle verfügbaren Spieler des Clubs zur Wahl des Doppelpartners | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-05 | Nach der Anmeldung erhält der Spieler eine automatische Bestätigung mit seinen Kategorien | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-06 | Der CM-Verantwortliche fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | geplant |
-| A-ANMELDUNG-07 | Die Anmeldung schliesst zu einem Anmeldeschluss | PDF 5c (abgeleitet) | CM-Anmeldung\* | geplant |
+| A-ANMELDUNG-07 | Die Anmeldung schliesst zu einem Anmeldeschluss | PDF 5c (abgeleitet) | CM-Anmeldung\* | umgesetzt |
 | A-ANMELDUNG-08 | Der Spieler wählt, ob er bei Neuigkeiten, die ihn betreffen (neue Spiele, geänderter Spielplan), benachrichtigt wird | PDF 5b | CM-Betrieb\* | geplant |
 | A-ANMELDUNG-09 | Benachrichtigung per SMS oder WhatsApp (zuerst E-Mail und Push, siehe N-APP-02) | PDF 5b | später\* | später |
 | A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der CM-Verantwortliche entscheidet | PL | CM-Anmeldung | geplant |
@@ -219,7 +219,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 |----|-------------|--------|--------|--------|
 | N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später. Zuerst als installierbare Web-App, die Store-App ist N-APP-04 | Ziel, PDF 1 | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
 | N-APP-02 | Benachrichtigungen per Push und E-Mail | Ziel, PDF 5b | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
-| N-APP-03 | Admin und Verantwortliche arbeiten in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Funktionen zeigt | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | umgesetzt\* (Verwaltung nur für Admins; CM und Lizenz mit ihren Etappen) |
+| N-APP-03 | Admin und Verantwortliche arbeiten in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Funktionen zeigt | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | umgesetzt\* (Admin; `cm` mit nur dem Bereich *Clubmeisterschaft*, #57; Lizenz mit ihrer Etappe) |
 | N-APP-04 | MyTCO ist als App im App Store und bei Google Play erhältlich | Ziel | später ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | später |
 | N-DESIGN-01 | Das Design lehnt sich an die Website tcolten.ch an, mit abgeändertem Farbkonzept zur Abgrenzung | PDF 3a | Fundament (UI-Leitbild, #13) | geplant |
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |
@@ -230,5 +230,5 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 | N-BARRIEREFREI-01 | MyTCO ist für Mitglieder jeden Alters bedienbar; Zielniveau WCAG 2.1 AA\* | PL | durchgehend | geplant |
 | N-KOSTEN-01 | Laufende Kosten im niedrigen dreistelligen Bereich pro Jahr | Ziel | Fundament (Kosten, #9) | geplant |
 | N-KOSTEN-02 | Die Kosten werden im Detail dokumentiert und analysiert | Ziel | Fundament (Kosten, #9) | geplant |
-| N-EIGENSTAENDIG-01 | MyTCO entsteht vorerst ohne Anbindung an Fairgate und ohne Einbindung in tcolten.ch | Ziel | durchgehend (ADR, #16) | geplant |
+| N-EIGENSTAENDIG-01 | MyTCO entsteht vorerst ohne Anbindung an Fairgate und ohne Einbindung in tcolten.ch | Ziel | durchgehend ([ADR-006](../adr/adr-006-eigenstaendig-ohne-fairgate.md)) | geplant |
 | N-ERWEITERBAR-01 | MyTCO ist modular aufgebaut: weitere Anlässe und Funktionen der Clubverwaltung lassen sich einfach ergänzen | PDF 1, 3d | Fundament (Fachmodell, #3) | geplant |

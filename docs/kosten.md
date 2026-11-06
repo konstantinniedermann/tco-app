@@ -24,7 +24,7 @@ Die Mitgliederzahl ändert diese Kosten kaum, weil Server und Sicherung pauschal
 | Datenbank (PostgreSQL) und Test-Umgebung | — | 0 (Container auf demselben VPS, [ADR-002](adr/adr-002-sveltekit-postgresql.md), [CI/CD und Release](ci-cd-und-release.md)) | belegt |
 | Domain: Subdomain `my.tcolten.ch` | — | 0 | Annahme K-10: MyTCO läuft auf einer Subdomain der bestehenden Domain, keine eigene Domain |
 | Push-Benachrichtigungen (Web Push) | — | 0 (Push-Dienste der Browser, ohne Konto, B·5) | belegt |
-| Code-Ablage und CI: GitHub im Gratisplan | — | 0 auf dem Privatkonto des Projektleiters; reicht das Kontingent an Actions-Minuten nicht, wird das Budget des Kontos erhöht ([CI/CD und Release](ci-cd-und-release.md)) | belegt |
+| Code-Ablage und CI: GitHub im Gratisplan | — | 0 auf dem Privatkonto des Projektleiters; das Repo ist öffentlich, Actions-Minuten sind dafür gratis und ohne Kontingent ([CI/CD und Release](ci-cd-und-release.md#actions-minuten)) | belegt |
 | **Total laufend** | | **ca. 95–175** | Schätzung |
 
 Vorschlag für die Sicherungsablage ist Object Storage ([Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung)); festgelegt wird sie, wenn das Hosting geklärt ist, bis dahin gilt die Spanne. Scaleway hat einen
@@ -38,8 +38,8 @@ passt, ist offen; Hinweis dazu in
 Schweizer MwSt in Rechnung (V).
 
 **Künftig eventuell wenige Franken pro Jahr:** GitHub und der E-Mail-Versand kosten heute
-nichts, weil sie Gratiskontingente nutzen. Das Kontingent an Actions-Minuten teilt MyTCO mit
-anderen privaten Repos des Projektleiters ([Actions-Minuten](ci-cd-und-release.md#actions-minuten)).
+nichts. Die Actions-Minuten sind gratis, solange das Repo öffentlich ist
+([Actions-Minuten](ci-cd-und-release.md#actions-minuten)).
 Bei Scaleway fallen ohne Gratiskontingent bei 500 Mitgliedern ca. CHF 4 pro Jahr an (S).
 Reicht ein Kontingent nicht mehr, entstehen Kosten von wenigen Franken pro Jahr (S).
 

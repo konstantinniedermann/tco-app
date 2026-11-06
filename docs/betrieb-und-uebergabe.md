@@ -5,8 +5,9 @@
 Wem die Konten von MyTCO gehören, wo die Geheimnisse liegen, wie Sicherung und Überwachung
 gedacht sind und wie der Projektleiter MyTCO an eine Nachfolge übergibt. Geschrieben für eine
 **geplante Übergabe** an jemanden, der wie der Projektleiter mit Claude Code arbeitet: Die
-Arbeitsweise steckt im Repo (`CLAUDE.md`, `.claude/`, `make help`), hier steht, was nicht im
-Code steht. Die Befehle auf dem Server stehen in [`betrieb/README.md`](../betrieb/README.md),
+Arbeitsweise steckt zum grössten Teil im Repo (`CLAUDE.md`, `.claude/`, `make help`); was nur
+auf dem Rechner des Projektleiters liegt, nennt Schritt 1 der Checkliste. Hier steht, was nicht
+im Code steht. Die Befehle auf dem Server stehen in [`betrieb/README.md`](../betrieb/README.md),
 Auslieferung und Geheimnisse im Einzelnen in [CI/CD und Release](ci-cd-und-release.md).
 
 Personen sind mit ihrer Rolle genannt. Wer die Rollen heute innehat, steht in der
@@ -88,7 +89,15 @@ Für eine geplante Übergabe vom Projektleiter an eine Nachfolge. Der Vorstand b
 Nachfolge (K-05).
 
 1. **Arbeitsumgebung:** Die Nachfolge installiert Claude Code, klont das Repo und startet mit
-   `make help`, [`README.md`](../README.md) und dieser Datei.
+   `make help`, [`README.md`](../README.md) und dieser Datei. Im Repo liegen die
+   Projekt-`CLAUDE.md`, der Skill `tco-branching`, die Hooks der Versionsverwaltung
+   (`.githooks/`) und der Eintrag für den Svelte-MCP-Server (`.mcp.json`). Nur auf dem Rechner
+   des Projektleiters (unter `~/.claude/` bzw. eine Ebene über dem Repo) liegen und gehen sonst
+   verloren: die übergeordnete `CLAUDE.md` (Workflow, Dependencies, Commit-Konvention, Umgang
+   mit Befunden), die Skills `session-start`, `session-wrap-up`, `beobachtungen-auswerten` und
+   `doku-audit`, der Agent `cas-reviewer`, die Hooks `dep-guard` (blockt unbekannte Pakete) und
+   `ps_hooks` (Lagebild und Schutz der Worktrees bei parallelen Sessions), das Plugin
+   *superpowers* und die Memories mit den bekannten Fallen. Vor der Übergabe entscheiden, was davon ins Repo kommt.
 2. **Tresor:** Die Nachfolge erhält Zugang zu den Geheimnissen (K-49).
 3. **Infomaniak und Mailversand:** Die Nachfolge wird Benutzer in den Konten; der
    Projektleiter wird entfernt. Die Vereinsadresse bleibt Inhaberin.
@@ -107,6 +116,9 @@ Nachfolge (K-05).
    - Ob Geheimnisse, Variablen und Container-Images beim Transfer mitkommen, beim Transfer
      prüfen und sonst neu eintragen (Vermutung: Images bleiben im alten Konto).
    - Mitarbeitende im Repo prüfen: Die Hauptansprechperson bleibt, der Projektleiter geht.
+   - Sichtbarkeit und Regel «main schützen» prüfen: Wird das Repo privat (auf einem Konto ohne
+     GitHub Pro), fallen der Schutz von `main` und die Gratisminuten weg
+     ([CI/CD und Release](ci-cd-und-release.md#actions-minuten)).
 6. **Geheimnisse wechseln, die nur der Projektleiter kannte:** neues Passwort für die
    Sicherung (restic kann einen Schlüssel hinzufügen und den alten entfernen), neues
    Test-Passwort. Den Schlüssel für die Codes nur wechseln, wenn keine Briefe mit offenen

@@ -27,9 +27,11 @@ Daten übergeben. So sind sie ohne Aufbau testbar; hier entstehen die meisten Te
 Fachlogik und wird über die Ende-zu-Ende-Tests und das Review geprüft.
 
 **Rechte:** Die Berechtigung prüft immer der Server (ADR-001), also wird sie dort getestet.
-Pro Schnittstelle gibt es einen Test, der jede Rolle durchspielt, auch ohne Login, mit
-gesperrtem Konto (RR-08) und mit dem Konto eines anderen Mitglieds (RR-06: *eigene* und
-*beteiligt*): erlaubte Rollen erhalten die Daten, alle anderen nicht.
+Pro Schnittstelle gibt es einen Test, der jede Rolle durchspielt, auch ohne Login und mit
+dem Konto eines anderen Mitglieds (RR-06: *eigene* und *beteiligt*): erlaubte Rollen erhalten
+die Daten, alle anderen nicht. Das gesperrte Konto (RR-08) wird nicht pro Schnittstelle
+geprüft, sondern einmal zentral: Die Sitzungsprüfung behandelt es wie «nicht angemeldet»
+(Tests in `sitzung.db.test.ts`), und jede Schnittstelle geht über sie.
 
 **Ende-zu-Ende** in drei Umgebungen:
 
@@ -45,8 +47,8 @@ den Passkey-Ablauf also nicht. Wie sich ein echter Authenticator auf iPhone und 
 verhält, zeigt allein die [Checkliste](#checkliste-vor-dem-release).
 
 Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelheit; zuerst
-Login per Einmal-Code, Daten ergänzen und eingeloggt bleiben (die geplanten
-A-LOGIN-Anforderungen der Etappe *Mitglieder-Login*).
+Login per Einmal-Code und eingeloggt bleiben, später *Daten ergänzen* beim ersten Login
+(FR-02, noch geplant).
 
 **Grenzen pro IP:** Alle Browser eines Laufs kommen von 127.0.0.1 an denselben Server; die
 Grenze von 10 Code-Anfragen pro IP und Stunde (SI-04) gilt für den ganzen Lauf, Login-Codes
@@ -65,7 +67,8 @@ Jeder Test nennt im Namen die ID, die er prüft, z. B.
 `FR-24: Einmal-Code gilt nur einmal` oder `RR-04: Admin kann keinen Code abrufen`.
 Ein Test darf mehrere IDs nennen.
 
-Die CI prüft, dass jede dieser IDs mindestens einen Test hat:
+Die CI prüft, dass jede dieser IDs mindestens einen Test hat (sie sucht die ID irgendwo in
+einer Testdatei; dass sie im Namen des richtigen Tests steht, sichert das Review):
 
 - jede Fachregel `FR-NN` aus dem Fachmodell,
 - jeder Grundsatz `RR-NN` aus Rollen und Rechte,
@@ -91,11 +94,13 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
 - Wenige erfundene Personen, von Hand geschrieben und fest im Repo, ohne Generator für Namen
   oder Adressen. Seed-Daten und Testdaten der Test-Umgebung
   (beide aus `scripts/erfundene-mitglieder.ts`); der Musterbrief nimmt dieselbe erste Person, aber mit eigener Adresse.
+  Die Beispiel-GV (`scripts/beispiel-anlass.ts`) legt für `make seed` fünf weitere erfundene
+  Mitglieder an.
 - Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
   (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
 - E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern im Format
   `+41 00 …`, das es nicht gibt. Strassen erfunden.
-- Die CI meldet in Testdaten (auch denen der Test-Umgebung), Seed-Daten und Musterbrief jede
+- Die CI meldet in Testdaten (auch denen der Test-Umgebung), Seed-Daten, Beispieldaten und Musterbrief jede
   andere Mail-Domain.
 - Einmal-Codes und Sitzungen in Tests sind erzeugt, nie fest eingetragen.
 

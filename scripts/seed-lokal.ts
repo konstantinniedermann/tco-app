@@ -1,14 +1,15 @@
-// Nur lokal: legt erfundene Mitglieder an und gibt Brief-Codes für Erika (Admin) und Kurt aus.
+// Nur lokal: legt erfundene Mitglieder an und gibt Brief-Codes für Erika (Admin), Kurt und Hanna (CM) aus.
 // Aufruf über `make seed` (lädt .env). Bricht ab, wenn die Datenbank nicht lokal ist.
 import { eq } from 'drizzle-orm';
 import { machAdmin } from '../src/lib/server/admin/erster-admin.ts';
 import { erstelleDb } from '../src/lib/server/db/index.ts';
-import { konto } from '../src/lib/server/db/schema.ts';
+import { konto, kontoRolle } from '../src/lib/server/db/schema.ts';
 import { leseEinstellungen } from '../src/lib/server/einstellungen.ts';
 import { erstelleBremsen } from '../src/lib/server/login/bremse.ts';
 import { formatiereBriefCode } from '../src/lib/server/login/codes.ts';
 import { erstelleLoginDienst } from '../src/lib/server/login/dienst.ts';
 import { legeBeispielAnlassAn } from './beispiel-anlass.ts';
+import { legeBeispielTurnierAn } from './beispiel-turnier.ts';
 import { ERFUNDENE_MITGLIEDER, legeErfundeneMitgliederAn } from './erfundene-mitglieder.ts';
 
 export function istLokaleDatenbank(url: string | undefined): boolean {
@@ -39,6 +40,9 @@ async function seed(): Promise<void> {
 			.from(konto)
 			.where(eq(konto.id, kontoIds[0]));
 		await legeBeispielAnlassAn(db, erika.id, new Date());
+		// Eine Beispiel-Clubmeisterschaft und Hanna als Clubmeisterschafts-Verantwortliche (cm).
+		await legeBeispielTurnierAn(db, new Date());
+		await db.insert(kontoRolle).values({ kontoId: kontoIds[2], rolle: 'cm' }).onConflictDoNothing();
 		const dienst = erstelleLoginDienst({
 			db,
 			schluessel: einstellungen.codeSchluessel,
@@ -48,8 +52,9 @@ async function seed(): Promise<void> {
 		});
 		console.log(`Erfundene Mitglieder: ${ERFUNDENE_MITGLIEDER.map((m) => m.email).join(', ')}`);
 		console.log('Brief-Codes (nur lokal, 90 Tage gültig, je einmal verwendbar):');
-		// Zwei Personas: Erika sieht die Verwaltung, Kurt nur, was jedes Mitglied sieht.
-		for (const [index, rolle] of ['Admin', 'Mitglied'].entries()) {
+		// Drei Personas: Erika sieht die Verwaltung, Kurt nur, was jedes Mitglied sieht,
+		// Hanna die Clubmeisterschaft.
+		for (const [index, rolle] of ['Admin', 'Mitglied', 'CM'].entries()) {
 			const { code } = await dienst.stelleBriefCodeAus(kontoIds[index]);
 			const { vorname, nachname } = ERFUNDENE_MITGLIEDER[index];
 			console.log(`  ${vorname} ${nachname} (${rolle}): ${formatiereBriefCode(code)}`);

@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Db } from '../db/index.ts';
-import { istAdmin } from '../admin/rollen.ts';
+import { verwaltungsrollen } from '../admin/rollen.ts';
 import type { LoginDienst, LoginErgebnis } from './dienst.ts';
 import { SITZUNG_COOKIE, SITZUNG_GUELTIG_MS } from './sitzung.ts';
 
@@ -88,7 +88,8 @@ export async function postMail(d: LoginDienst, e: Ereignis): Promise<Response> {
 	);
 }
 
-// RR-07: `verwaltung` blendet nur die Navigation ein; durchgesetzt wird es an den Admin-Schnittstellen.
+// RR-07: `verwaltung` (Rolle admin oder cm) blendet nur die Navigation ein; durchgesetzt wird es an den
+// Admin-Schnittstellen.
 // Weder `mitgliedId` noch `sitzungHash` gehen an den Browser.
 export async function getSitzung(e: Ereignis, db: Db): Promise<Response> {
 	const konto = e.locals.konto;
@@ -96,7 +97,7 @@ export async function getSitzung(e: Ereignis, db: Db): Promise<Response> {
 	return antwort(200, {
 		vorname: konto.vorname,
 		passkeyHinweis: konto.passkeyHinweis,
-		verwaltung: await istAdmin(db, konto.kontoId)
+		verwaltung: (await verwaltungsrollen(db, konto.kontoId)).length > 0
 	});
 }
 

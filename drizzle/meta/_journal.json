@@ -57,6 +57,13 @@
       "when": 1793883014847,
       "tag": "0007_anlass",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793956716963,
+      "tag": "0008_turnier",
+      "breakpoints": true
     }
   ]
 }

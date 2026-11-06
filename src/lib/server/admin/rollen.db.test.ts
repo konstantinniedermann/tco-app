@@ -7,7 +7,7 @@ import {
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import type { Db } from '../db/index.ts';
 import { aenderung, kontoRolle } from '../db/schema.ts';
-import { istAdmin, ladeRollen, setzeRollen } from './rollen.ts';
+import { istAdmin, ladeRollen, setzeRollen, verwaltungsrollen } from './rollen.ts';
 
 // «Letzter Admin» ist eine globale Eigenschaft; die gemeinsame Test-Datenbank teilen sich
 // mehrere Dateien. Darum bekommt diese Datei eine eigene Datenbank.
@@ -116,5 +116,21 @@ describe('Rollen', () => {
 		expect(await setzeRollen(db, { art: 'automatisch' }, aktiv.kontoId, [], jetzt)).toBe(
 			'letzter-admin'
 		);
+	});
+
+	test('RR-07, RR-08: Verwaltungsrollen nur admin und cm, nur ungesperrt und aktiv', async () => {
+		const beide = await legeMitgliedAn(db, { rollen: ['lizenz', 'cm', 'admin'] });
+		const cm = await legeMitgliedAn(db, { rollen: ['cm'] });
+		const lizenz = await legeMitgliedAn(db, { rollen: ['lizenz'] });
+		const ohne = await legeMitgliedAn(db);
+		const gesperrt = await legeMitgliedAn(db, { rollen: ['cm', 'admin'], gesperrt: true });
+		const ausgetreten = await legeMitgliedAn(db, { rollen: ['cm'], status: 'ausgetreten' });
+		expect(await verwaltungsrollen(db, beide.kontoId)).toEqual(['admin', 'cm']);
+		expect(await verwaltungsrollen(db, cm.kontoId)).toEqual(['cm']);
+		expect(await verwaltungsrollen(db, lizenz.kontoId)).toEqual([]);
+		expect(await verwaltungsrollen(db, ohne.kontoId)).toEqual([]);
+		expect(await verwaltungsrollen(db, gesperrt.kontoId)).toEqual([]);
+		expect(await verwaltungsrollen(db, ausgetreten.kontoId)).toEqual([]);
+		expect(await verwaltungsrollen(db, 2_000_000_000)).toEqual([]);
 	});
 });

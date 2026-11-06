@@ -2,10 +2,68 @@
 
 # Versionen
 
-Versionshistorie von MyTCO, neueste zuerst. Versionsschema und Ablauf beim Release:
-[CI/CD und Release](ci-cd-und-release.md#versionen).
+Versionshistorie von MyTCO, neueste zuerst. Jeder Merge nach `dev` mit Code bekommt hier
+seinen eigenen Abschnitt; ein Release fasst alle Abschnitte seit dem letzten Release zusammen.
+Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
+
+## 0.6.0 — Clubmeisterschaft: Turnier anlegen
+
+- Clubmeisterschaft: Der CM-Verantwortliche (Rolle `cm`) öffnet die Verwaltung und sieht dort
+  nur den Bereich *Clubmeisterschaft*; er legt das Turnier mit Turniernummern und Kategorien
+  an (Einzel mit Klassierungsbereich, Doppel mit Mindestsumme), öffnet die Anmeldung von Hand
+  und schliesst sie früher oder lässt sie am Anmeldeschluss von selbst schliessen. `make seed`
+  legt ein erfundenes Turnier 2027 und eine CM-Persona an (#57). Mitglieder sehen das Turnier
+  noch nicht; die Anmeldung selbst kommt mit Teil 2 (#58). Fachmodell und Rollen
+  nachgeführt: FR-33 bis FR-35, Turniernummern freiwillig, Doppel nach Mindestsumme.
+- Repo öffentlich gemacht (Actions-Minuten gratis); `main` auf GitHub geschützt: nur über
+  PR mit Merge-Commit, Prüfungen grün, kein Force-Push. Workflows aus Forks laufen erst nach
+  Freigabe; Secret-Scanning von GitHub mit Sperre beim Push an. Doku zu CI/CD, Sicherheit
+  und Kosten nachgeführt.
+- Entwurf «Rollen schärfen»: Statt eines «Admin» vier Admin-Rollen (MyTCO-, Mitglieder-, CM-,
+  Lizenz-Admin), einzeln vergeben; der MyTCO-Admin sieht alles, ändert nichts und kann MyTCO
+  «als» eine Rolle ansehen (#43). Neue Fragen an den Verein: K-18.4 (Besetzung der Rollen),
+  K-50.1 bis K-50.4 (GV-Anmeldung, frühestens zur GV 2028, #52); K-13.2 als
+  Vorschlag nach dem gebauten Stand; Briefe löst der Mitglieder-Admin als Serie für nicht
+  aktivierte Konten aus, Druck und Versand vertagt (K-16.1); K-06.3 selbst beantwortet.
+
+## 0.5.3 — Schnellere Merges
+
+- Schnellere Merges: Die E2E-Tests laufen in der CI als drei parallele Jobs (iPhone, Android,
+  Desktop) statt nacheinander. Lokal merkt sich ein grünes `make check` den geprüften Stand;
+  der Pre-Push-Hook prüft ihn nicht noch einmal voll, wenn seither nur Doku und die
+  Versionsnummer dazukamen (`gruener-stand.ts`).
+- Entwurf für die Anmeldung zur Clubmeisterschaft, geschnitten in vier Teile: Turnier anlegen,
+  Einzel-Anmeldung, Doppel, Anmeldungen verwalten (#51; Teil-Issues #57 bis #60). Neue Frage
+  K-51 an den Verein: Doppel nach Summe der Klassierungen.
+
+## 0.5.2 — arc42, ADRs und Nacharbeit aus der Beobachtungs-Auswertung
+
+- Architektur als arc42 in `docs/arc42.md`: Ziele, Kontext mit Nachbarsystemen, Lösungsstrategie,
+  Bausteine, Server, Querschnittskonzepte und Risiken, mit Verweisen auf die Einzeldokumente (#14).
+- Warum MyTCO ohne Anbindung an Fairgate läuft, steht jetzt als
+  [ADR-006](adr/adr-006-eigenstaendig-ohne-fairgate.md) mit Optionen, Konsequenzen und
+  Reevaluations-Triggern (#16).
+- Warum jeder Merge nach `dev` mit Code eine eigene Versionsnummer bekommt, steht jetzt als
+  [ADR-007](adr/adr-007-version-pro-merge.md).
+- Datenschutzerklärung in der Du-Form wie App, Hilfe und Brief; sie nennt jetzt auch die
+  Zeitpunkte je angemeldetem Gerät und wer einen Anlass angelegt hat.
+- Verwaltung: Namen überall als «Nachname, Vorname», auch in der Antwortliste der Anlässe und
+  beim Urheber im Änderungsverlauf.
+- CI: Systempakete für die Browser einmal, nur der Browser-Download wird wiederholt; ein
+  abgebrochener Versuch sperrte vorher apt für alle weiteren.
+- Lokale Datenbank in einem benannten Docker-Speicher; einmal `make seed` nach dem Update.
+- Test-IDs der Passkey- und Mitgliedernummer-Tests richtiggestellt, Beispieldaten von
+  `make seed` in der Prüfung der Testdaten.
+
+## 0.5.1 — Versionsnummer bei jedem Merge
+
+- Versionsnummern: Jeder Merge nach `dev` mit Code bekommt eine eigene Korrekturnummer, im
+  Merge-Commit selbst; grössere Schritte eine Nebenversion, die Hauptversion nur im Auftrag des
+  Projektleiters. Das Release erhöht nicht mehr selbst, sein Text auf GitHub fasst alle
+  Abschnitte seit dem letzten Release zusammen. Der Pre-Push-Hook weist einen Push auf `dev`
+  ohne passende Nummer ab (`version-merge.ts`).
 
 ## 0.5.0 — Anlässe, eigene Angaben und ruhiges App-Gefühl, nicht ausgeliefert
 

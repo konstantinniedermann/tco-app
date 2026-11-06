@@ -3,6 +3,7 @@ import {
 	bigint,
 	boolean,
 	check,
+	date,
 	index,
 	integer,
 	pgTable,
@@ -58,7 +59,7 @@ export const konto = pgTable('konto', {
 	mailCodeHash: text('mail_code_hash'),
 	mailCodeAblauf: timestamp('mail_code_ablauf', { withTimezone: true }),
 	mailCodeFehlversuche: integer('mail_code_fehlversuche').notNull().default(0),
-	// Zufällige Konto-Kennung für WebAuthn (base64url aus 32 Zufallsbytes), erst beim ersten Passkey gesetzt.
+	// Zufällige Konto-Kennung für WebAuthn (base64url aus 32 Zufallsbytes), gesetzt beim ersten Versuch, einen Passkey einzurichten.
 	passkeyKennung: text('passkey_kennung').unique('konto_passkey_kennung_unique')
 });
 
@@ -187,5 +188,76 @@ export const anlassAnmeldung = pgTable(
 			'anlass_anmeldung_bemerkung_check',
 			sql`${t.antwort} = 'kommt-nicht' or ${t.bemerkung} is null`
 		)
+	]
+);
+
+export type TurnierStatus = 'vorbereitung' | 'offen' | 'geschlossen';
+export type Geschlecht = 'herren' | 'damen' | 'mixed' | 'offen';
+export type Art = 'einzel' | 'doppel';
+export type KategorieStatus = 'aktiv' | 'abgesagt';
+
+// Clubmeisterschaft eines Jahres (FR-33). Der Anmeldeschluss ist ein Datum; offen bis und mit
+// 23:59 Schweizer Zeit dieses Tages.
+export const turnier = pgTable(
+	'turnier',
+	{
+		id: serial('id').primaryKey(),
+		jahr: integer('jahr').notNull().unique('turnier_jahr_unique'),
+		name: text('name').notNull(),
+		anmeldeschluss: date('anmeldeschluss', { mode: 'string' }).notNull(),
+		status: text('status').$type<TurnierStatus>().notNull().default('vorbereitung'),
+		erstelltAm: timestamp('erstellt_am', { withTimezone: true }).notNull().defaultNow()
+	},
+	(t) => [
+		check('turnier_status_check', sql`${t.status} in ('vorbereitung', 'offen', 'geschlossen')`)
+	]
+);
+
+// Turniernummern bei Swiss Tennis, freiwillig (0..n).
+export const turniernummer = pgTable(
+	'turniernummer',
+	{
+		id: serial('id').primaryKey(),
+		turnierId: integer('turnier_id')
+			.notNull()
+			.references(() => turnier.id, { onDelete: 'cascade' }),
+		bezeichnung: text('bezeichnung').notNull(),
+		nummer: text('nummer').notNull(),
+		reihenfolge: integer('reihenfolge').notNull()
+	},
+	(t) => [index('turniernummer_turnier_idx').on(t.turnierId)]
+);
+
+// Kategorie eines Turniers, Einzel oder Doppel (FR-34); Absagen ohne Rückweg (FR-35).
+export const kategorie = pgTable(
+	'kategorie',
+	{
+		id: serial('id').primaryKey(),
+		turnierId: integer('turnier_id')
+			.notNull()
+			.references(() => turnier.id, { onDelete: 'cascade' }),
+		name: text('name').notNull(),
+		geschlecht: text('geschlecht').$type<Geschlecht>().notNull(),
+		art: text('art').$type<Art>().notNull(),
+		jahrgangVon: integer('jahrgang_von'),
+		jahrgangBis: integer('jahrgang_bis'),
+		klassierungVon: text('klassierung_von'),
+		klassierungBis: text('klassierung_bis'),
+		mindestsumme: integer('mindestsumme'),
+		status: text('status').$type<KategorieStatus>().notNull().default('aktiv')
+	},
+	(t) => [
+		check(
+			'kategorie_geschlecht_check',
+			sql`${t.geschlecht} in ('herren', 'damen', 'mixed', 'offen')`
+		),
+		check(
+			'kategorie_art_check',
+			sql`(${t.art} = 'einzel' and ${t.klassierungVon} is not null and ${t.klassierungBis} is not null and ${t.mindestsumme} is null and ${t.geschlecht} <> 'mixed') or (${t.art} = 'doppel' and ${t.klassierungVon} is null and ${t.klassierungBis} is null and ${t.mindestsumme} is not null)`
+		),
+		check('kategorie_status_check', sql`${t.status} in ('aktiv', 'abgesagt')`),
+		uniqueIndex('kategorie_name_aktiv_unique')
+			.on(t.turnierId, sql`lower(${t.name})`)
+			.where(sql`${t.status} = 'aktiv'`)
 	]
 );

@@ -27,7 +27,7 @@ import {
 	listeMitglieder,
 	type MitgliedStatus
 } from './mitglieder.ts';
-import { ROLLEN, setzeRollen, type Rolle } from './rollen.ts';
+import { ROLLEN, setzeRollen, type Rolle, type VerwaltungsRolle } from './rollen.ts';
 import { ladeVerlauf, type Urheber } from './verlauf.ts';
 import type { ZugangDienst } from './zugang.ts';
 
@@ -48,7 +48,8 @@ const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });
 
 const jetzt = (d: AdminDienste) => (d.jetzt ?? (() => new Date()))();
 
-// Sitzung und Rolle genügen; die Bestätigung per Code ist hier noch nicht nötig.
+// Sitzung und eine Verwaltungsrolle (admin oder cm) genügen; die Bestätigung per Code ist hier
+// noch nicht nötig (SI-08: auch ein reiner CM muss den Code anfordern und einlösen können).
 async function mitKonto(
 	d: AdminDienste,
 	e: AdminEreignis,
@@ -57,27 +58,44 @@ async function mitKonto(
 	const konto = e.locals.konto;
 	const z = await d.zugang.pruefe(konto);
 	if (!konto || z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
-	if (z.stufe === 'kein-admin') return antwort(403, { fehler: 'kein-admin' });
+	if (z.stufe === 'keine-rolle') return antwort(403, { fehler: 'kein-admin' });
 	return fn(konto);
 }
 
-// RR-07, RR-09: nur Admins mit gültiger Code-Bestätigung.
-export async function mitAdmin(
+// RR-07, RR-09: bestätigte Sitzung mit einer der erlaubten Rollen. Die Rolle wird vor der Bestätigung
+// geprüft: Wer den Bereich nicht hat, bekommt `kein-admin` (der Code für «dieser Bereich ist dir
+// nicht offen»), nicht die Aufforderung zum Bestätigen.
+async function mitRolle(
+	d: AdminDienste,
+	e: AdminEreignis,
+	erlaubt: readonly VerwaltungsRolle[],
+	fn: (mitgliedId: number) => Promise<Response>
+): Promise<Response> {
+	const z = await d.zugang.pruefe(e.locals.konto);
+	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
+	if (z.stufe === 'keine-rolle' || !z.rollen.some((r) => erlaubt.includes(r))) {
+		return antwort(403, { fehler: 'kein-admin' });
+	}
+	if (z.stufe === 'unbestaetigt') return antwort(403, { fehler: 'unbestaetigt' });
+	return fn(z.mitgliedId);
+}
+
+// RR-07, RR-09: nur Admins mit gültiger Code-Bestätigung; `cm` allein genügt nicht.
+export function mitAdmin(
 	d: AdminDienste,
 	e: AdminEreignis,
 	fn: (urheber: AdminUrheber) => Promise<Response>
 ): Promise<Response> {
-	const z = await d.zugang.pruefe(e.locals.konto);
-	switch (z.stufe) {
-		case 'abgemeldet':
-			return antwort(401, { fehler: 'abgemeldet' });
-		case 'kein-admin':
-			return antwort(403, { fehler: 'kein-admin' });
-		case 'unbestaetigt':
-			return antwort(403, { fehler: 'unbestaetigt' });
-		default:
-			return fn({ art: 'admin', mitgliedId: z.mitgliedId });
-	}
+	return mitRolle(d, e, ['admin'], (mitgliedId) => fn({ art: 'admin', mitgliedId }));
+}
+
+// RR-07, RR-09: Bereich Clubmeisterschaft — Admins und CMs mit gültiger Code-Bestätigung.
+export function mitCm(
+	d: AdminDienste,
+	e: AdminEreignis,
+	fn: (mitgliedId: number) => Promise<Response>
+): Promise<Response> {
+	return mitRolle(d, e, ['admin', 'cm'], fn);
 }
 
 // SI-10: ändernde Anfragen nur als JSON.
@@ -90,13 +108,26 @@ async function aendernd(
 	return mitAdmin(d, e, async (u) => fn(u, await leseKoerper(e)));
 }
 
+// SI-10 wie `aendernd`, für den Bereich Clubmeisterschaft.
+export async function aenderndCm(
+	d: AdminDienste,
+	e: AdminEreignis,
+	fn: (mitgliedId: number, koerper: Record<string, unknown>) => Promise<Response>
+): Promise<Response> {
+	if (!istJson(e)) return formatFehler();
+	return mitCm(d, e, async (id) => fn(id, await leseKoerper(e)));
+}
+
+// RR-07: `rollen` sagt der Oberfläche, welche Bereiche sie zeigt; durchgesetzt wird an den Schnittstellen.
 export async function getZugang(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	const z = await d.zugang.pruefe(e.locals.konto);
 	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
-	if (z.stufe === 'kein-admin') return antwort(403, { fehler: 'kein-admin' });
+	if (z.stufe === 'keine-rolle') return antwort(403, { fehler: 'kein-admin' });
 	// Nur die Nummer des Angemeldeten, damit die Seite eine Rückfrage beim eigenen Konto stellen kann.
-	if (z.stufe === 'bestaetigt') return antwort(200, { bestaetigt: true, mitgliedId: z.mitgliedId });
-	return antwort(200, { bestaetigt: false });
+	if (z.stufe === 'bestaetigt') {
+		return antwort(200, { bestaetigt: true, mitgliedId: z.mitgliedId, rollen: z.rollen });
+	}
+	return antwort(200, { bestaetigt: false, rollen: z.rollen });
 }
 
 export async function postZugangCode(d: AdminDienste, e: AdminEreignis): Promise<Response> {

@@ -30,7 +30,7 @@ classDiagram
     Konto "*" -- "*" Rolle
     Mitglied "1" *-- "*" Aenderung
     Aenderung "*" --> "0..1" Mitglied : von
-    Turnier "1" *-- "1..*" Turniernummer
+    Turnier "1" *-- "0..*" Turniernummer
     Turnier "1" *-- "*" Kategorie
     Kategorie "1" *-- "*" Anmeldung
     Anmeldung "*" --> "1..2" Mitglied : Spieler
@@ -47,7 +47,13 @@ classDiagram
     Resultat "1" *-- "0..3" Satz
     Lizenzrunde "1" *-- "*" Lizenzantrag
     Lizenzantrag "*" --> "1" Mitglied
+    Anlass "1" *-- "*" AnmeldungAnlass
+    AnmeldungAnlass "*" --> "1" Mitglied
+    Anlass "*" --> "0..1" Mitglied : erstellt von
 ```
+
+`AnmeldungAnlass` ist im Diagramm die *Anmeldung (Anlass)*, zur Unterscheidung von der
+Anmeldung zu einem Turnier.
 
 ## Objekte
 
@@ -56,24 +62,24 @@ classDiagram
 | Objekt | Attribute | P |
 |--------|-----------|---|
 | **Mitglied** | Mitgliedernummer (aus Fairgate; Pflicht beim Einlesen und beim Befehl *Admin festlegen*, sonst freiwillig, A-MITGLIED-07; eindeutig ohne Rücksicht auf Gross-/Kleinschreibung, gespeichert wie eingegeben), Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25; fehlt bei Junioren, die ein Elternteil führt), Telefon, Geschlecht, Jahrgang (K-40.2; für Lizenzanträge hängt an K-40.1), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28), Status *aktiv / ausgetreten / Löschung vorgemerkt / gelöscht*, Austrittsdatum, *verwaltet von* (Mitglied, nur bei Junioren ohne eigenes Login, Vorschlag K-08), *für Fairgate offen seit* (Zeitpunkt, gesetzt, wenn das Mitglied Adresse, E-Mail oder Telefon selbst ändert; gelöscht, wenn der Admin die Angaben nach Fairgate übertragen hat — Annahme K-19.2, A-KONTO-02) | alle ausser Status |
-| **Konto** | Brief-Code und Mail-Code getrennt, je nur als Hash mit Ablauf; beim Brief-Code dazu *benutzt am*, beim Mail-Code die Zahl der Fehlversuche (FR-24). Sitzungsversion, Sitzungen (eine je Gerät, mit *angemeldet am* und *zuletzt genutzt*), Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein, Passkeys (je Gerät öffentlicher Schlüssel und Kennung, freiwillig, A-LOGIN-07). Je Sitzung die Bestätigung der Verwaltung mit Zeitpunkt, Admin-Code als Hash mit Ablauf und Fehlversuchen (SI-08) | alle |
+| **Konto** | Brief-Code und Mail-Code getrennt, je nur als Hash mit Ablauf; beim Brief-Code dazu *benutzt am*, beim Mail-Code die Zahl der Fehlversuche (FR-24). Sitzungsversion, Sitzungen (eine je Gerät, mit *angemeldet am* und *zuletzt genutzt*), Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein, Passkeys (je Gerät öffentlicher Schlüssel, Kennung, Zähler, Übertragungswege, Domain, Gerätename, eingerichtet am, zuletzt benutzt; freiwillig, A-LOGIN-07) und die zufällige Passkey-Kennung des Kontos (gesetzt beim ersten Versuch, einen Passkey einzurichten). Je Sitzung die Bestätigung der Verwaltung mit Zeitpunkt, Admin-Code als Hash mit Ablauf und Fehlversuchen (SI-08) | alle |
 | **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](rollen-und-rechte.md) fest | — |
-| **Aenderung** | Eintrag im Änderungsverlauf: Mitglied, von (Mitglied, das die Änderung ausgelöst hat; leer bei automatisch, dann *MyTCO*), Feld oder Aktion, Zeitpunkt; ohne alte und neue Werte (FR-26) | Mitglied, von |
+| **Aenderung** | Eintrag im Änderungsverlauf: Mitglied, von (Mitglied, das die Änderung ausgelöst hat; leer bei automatisch, dann *MyTCO*; ist das auslösende Konto gelöscht, *gelöschtes Konto*), Feld oder Aktion, Zeitpunkt; ohne alte und neue Werte (FR-26) | Mitglied, von |
 
 ### Anlässe
 
 | Objekt | Attribute | Personendaten |
 |--------|-----------|---|
-| **Anlass** | Titel, Beginn, Ort, Einladung (Text), Anmeldeschluss, Kalender-Kennung (zufällig, für den Link ohne Login), Termin geändert am, erstellt von, erstellt am. Gilt für alle aktiven Mitglieder (**Annahme K-50**) | — |
+| **Anlass** | Titel, Beginn, Ort, Einladung (Text), Anmeldeschluss, Kalender-Kennung (zufällig, für den Link ohne Login), Termin geändert am, erstellt von (Admin), erstellt am. Gilt für alle aktiven Mitglieder (**Annahme K-50**) | erstellt von |
 | **Anmeldung (Anlass)** | Anlass, Mitglied, Antwort *kommt* / *kommt nicht*, Bemerkung (optional, nur bei *kommt nicht*), geändert am. Auch die Abmeldung heisst *Anmeldung* (Glossar) | Antwort, Bemerkung |
 
 ### Clubmeisterschaft
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Turnier** | Jahr, Name, Anmeldeschluss, Status (siehe [Lebenszyklen](#lebenszyklen)) | — |
-| **Turniernummer** | Nummer bei Swiss Tennis, Bezeichnung (z. B. Gruppenphase, Finalwochenende — Annahme K-25.4) | — |
-| **Kategorie** | Name, Geschlecht (Herren / Damen / Mixed / offen), Jahrgang von–bis (Alterskategorie, optional), Klassierung von–bis (Klassierungsbereich), Einzel oder Doppel | — |
+| **Turnier** | Jahr (eindeutig), Name, Anmeldeschluss (Datum), Status, erstellt am; *Anmeldung offen* gilt nur bis zum Anmeldeschluss (FR-33, siehe [Lebenszyklen](#lebenszyklen)) | — |
+| **Turniernummer** | Nummer bei Swiss Tennis, Bezeichnung (z. B. Gruppenphase, Finalwochenende — Annahme K-25.4), Reihenfolge. Freiwillig, 0 bis n je Turnier: Swiss Tennis vergibt sie oft erst später | — |
+| **Kategorie** | Name, Geschlecht (Herren / Damen / Mixed nur im Doppel / offen), Jahrgang von–bis (Alterskategorie, je Ende optional), Einzel mit Klassierung von–bis (Klassierungsbereich) **oder** Doppel mit Mindestsumme (vorbelegt 9, Annahme K-51), Status *aktiv* / *abgesagt* | — |
 | **Anmeldung** | Kategorie, 1 Spieler (Einzel) oder 2 (Doppel), Wildcard-Antrag ja/nein, Kommentar, Status, angemeldet am, Gruppe (nach Auslosung), Rang-Korrektur (optional) | Spieler, Kommentar |
 | **Gruppe** | Kategorie, Name, Turniernummer. Die Rangliste wird aus den Resultaten berechnet, nicht gespeichert | — |
 | **KoTableau** | Kategorie, Grösse (Anzahl Positionen), Turniernummer. Kommt aus Advantage | — |
@@ -126,12 +132,16 @@ classDiagram
 | FR-30 | Eine Bemerkung gibt es nur bei *kommt nicht*, höchstens 500 Zeichen; wechselt die Antwort auf *kommt*, wird sie gelöscht | A-ANLASS-01 | umgesetzt |
 | FR-31 | Löscht der Admin einen Anlass, sind alle Antworten dazu mit gelöscht | A-ANLASS-01 | umgesetzt |
 | FR-32 | Ändert der Admin Beginn oder Ort, bleiben die Antworten; eine Antwort, die älter ist als die Änderung, gilt als *zu prüfen*, bis das Mitglied erneut antwortet oder der Anmeldeschluss vorbei ist | A-ANLASS-01 | umgesetzt |
+| FR-33 | Ein Turnier hat ein Jahr (2020–2100, je Jahr eines), einen Namen (1–120 Zeichen) und einen Anmeldeschluss im Turnierjahr. Turniernummern sind freiwillig (Ziffern, 1–12; Bezeichnung 1–60 Zeichen). Gespeichert wird *in Vorbereitung*, *Anmeldung offen* oder *Anmeldung geschlossen*; wirksam gilt *Anmeldung geschlossen*, wenn *offen* gespeichert ist und der Anmeldeschluss vorbei ist (offen bis und mit 23:59 Schweizer Zeit des Tages). Öffnen geht aus *in Vorbereitung* oder *Anmeldung geschlossen*, nur vor Ablauf des Anmeldeschlusses und mit mindestens einer nicht abgesagten Kategorie; schliessen nur aus wirksam *offen*; Jahr, Name, Anmeldeschluss und Turniernummern bleiben in jedem Status änderbar, wer nach Ablauf wieder öffnen will, verschiebt zuerst den Anmeldeschluss; zurück nach *in Vorbereitung* gibt es nicht | A-TURNIER-01, A-TURNIER-02, A-ANMELDUNG-07 | umgesetzt |
+| FR-34 | Eine Kategorie hat einen Namen (1–60 Zeichen, unter den nicht abgesagten des Turniers eindeutig ohne Gross-/Kleinschreibung) und Jahrgang von/bis (je freiwillig, 1900 bis Turnierjahr, von ≤ bis). Im Einzel gilt ein Klassierungsbereich (von/bis Pflicht, von nicht schwächer als bis; Reihenfolge stark nach schwach N1–N4, R1–R9); im Doppel eine Mindestsumme 0–20 (vorbelegt 9) ohne Klassierungsbereich. *Mixed* gibt es nur im Doppel | A-TURNIER-03 | umgesetzt |
+| FR-35 | Eine Kategorie sagt der CM-Verantwortliche ab (Rückfrage vorher); der Status *abgesagt* hat keinen Rückweg. Die Turnierseite zeigt sie mit Plakette *abgesagt* ohne Link. Die Sperre bei vorhandenen Anmeldungen kommt mit den Anmeldungen (#58) | A-TURNIER-03 | umgesetzt |
 
 ## Lebenszyklen
 
 | Objekt | Zustände |
 |--------|----------|
-| Turnier | *in Vorbereitung* → *Anmeldung offen* → *Anmeldung geschlossen* → *läuft* → *abgeschlossen* |
+| Turnier | *in Vorbereitung* → *Anmeldung offen* ⇄ *Anmeldung geschlossen* (wieder öffnen nur vor dem Anmeldeschluss, FR-33; von selbst geschlossen nach dem Anmeldeschluss) → *läuft* → *abgeschlossen* |
+| Kategorie | *aktiv* → *abgesagt* (FR-35) |
 | Anmeldung | *bestätigt* (ohne Wildcard sofort) · *beantragt* → *bestätigt* / *abgelehnt* (mit Wildcard) · jederzeit → *zurückgezogen* (FR-10) |
 | Resultat | *gemeldet* → *bestätigt* / *bestritten* → *bestätigt* (Entscheid des CM-Verantwortlichen) |
 | Lizenzantrag | *beantragt* → *exportiert* → *erledigt* · *beantragt* → *zurückgezogen* |

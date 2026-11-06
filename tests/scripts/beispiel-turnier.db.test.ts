@@ -1,0 +1,41 @@
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { legeBeispielTurnierAn } from '../../scripts/beispiel-turnier.ts';
+import { kategorie, turnier, turniernummer } from '../../src/lib/server/db/schema.ts';
+import { legeEigeneDatenbankAn, type EigeneDatenbank } from '../hilfen/eigene-datenbank.ts';
+
+let eigene: EigeneDatenbank;
+beforeAll(async () => {
+	eigene = await legeEigeneDatenbankAn('beispielturnier');
+});
+afterAll(async () => {
+	await eigene.abbauen();
+});
+
+describe('Beispielturnier für make seed', () => {
+	test('A-TURNIER-01: Beispielturnier 2027 mit 8 Kategorien, zweiter Lauf legt nichts doppelt an', async () => {
+		const jetzt = new Date('2026-11-06T10:00:00Z');
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		const turniere = await eigene.db.select().from(turnier);
+		expect(turniere).toHaveLength(1);
+		expect(turniere[0]).toMatchObject({
+			jahr: 2027,
+			name: 'Clubmeisterschaft 2027',
+			anmeldeschluss: '2027-05-31',
+			status: 'offen'
+		});
+		const nummern = await eigene.db.select().from(turniernummer);
+		expect(nummern.map((n) => n.nummer).sort()).toEqual(['123456', '123457']);
+		const kategorien = await eigene.db.select().from(kategorie);
+		expect(kategorien.map((k) => k.name).sort()).toEqual([
+			'Damen Doppel',
+			'Damen R4–R9',
+			'Herren Doppel',
+			'Herren R1–R6',
+			'Herren R7–R9',
+			'Junioren U18',
+			'Mixed Doppel',
+			'Senioren 45+'
+		]);
+	});
+});

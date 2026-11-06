@@ -42,13 +42,12 @@ Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
 
 ```mermaid
 flowchart LR
-  B[Issue-Branch] -->|make check, Hooks| D[Merge nach dev]
+  B[Issue-Branch] -->|make check, Hooks| D[Merge nach dev, neue Nummer]
   D --> C1[CI]
   C1 -->|grün| T[Test-Umgebung]
   T --> K[Checkliste auf echten Handys]
   K --> A[Doku-Abgleich auf dev]
-  A --> R[Version erhöhen auf dev]
-  R --> P[PR dev → main]
+  A --> P[PR dev → main]
   P --> C2[CI]
   C2 -->|grün, Merge| L[Live]
   L --> V[Tag vX.Y.Z und GitHub-Release]
@@ -58,14 +57,16 @@ flowchart LR
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
   abgehakt und das Release freigegeben hat (ohne Server: Ausnahmen unter [Versionen](#versionen)).
 - **Doku-Abgleich:** Vor jedem Release, auch einem reinen Doku-Release, wird die Doku gegen
-  Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Nach
-  dem Versions-Commit prüft `make release-check`, ob Version, [Versionen](versionen.md) und
-  Tags zusammenpassen; enthält das Release Code (auch Skripte oder Workflows), muss die
-  Version steigen, nur bei reiner Doku bleibt sie. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre führt,
+  Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Danach
+  prüft `make release-check`, ob Version, [Versionen](versionen.md) und Tags zusammenpassen;
+  enthält das Release Code (auch Skripte oder Workflows), muss die Version seit dem letzten
+  Release gestiegen sein, nur bei reiner Doku bleibt sie. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre führt,
   hält das Release auf. Ablauf im Skill `tco-branching`.
-- **Version:** Vor dem PR erhöht ein Commit auf `dev` die Version in `package.json` und macht
-  aus *Unveröffentlicht* in den [Versionen](versionen.md) die neue Nummer. Nach der
-  erfolgreichen Live-Auslieferung setzt die CI den Tag und das GitHub-Release; nur dieser
+- **Version:** Das Release erhöht die Version nicht, Live bekommt die Nummer, die `dev` gerade
+  trägt (Vergabe beim Merge, siehe [Versionen](#versionen)). Nach der erfolgreichen
+  Live-Auslieferung setzt die CI den Tag und das GitHub-Release; dessen Text fasst alle
+  Abschnitte der [Versionen](versionen.md) seit dem letzten GitHub-Release zusammen (beim
+  ersten alle). Nur dieser
   Schritt darf ins Repo schreiben. Solange Live ausgeschaltet ist, gilt ein eigener Ablauf
   (siehe [Versionen](#versionen)).
 - **Merge:** Auf GitHub ist nur der Merge-Commit erlaubt (Squash und Rebase abgeschaltet).
@@ -204,26 +205,40 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   Geheimnis nur an Schritte, die es anfordern; ein Schadpaket in den Tests kommt so nicht
   an den Schlüssel. Welche Rechte die einzelnen Jobs haben, legt der Punkt zu
   `workflow-rechte.ts` oben fest.
-- **Kein GitHub Pro:** Schutz von `main` auf GitHub, Geheimnisse nur für eine Umgebung und
-  „nur `main` darf ausliefern“ gibt es für private Repos erst ab Pro (B:
+- **Öffentliches Repo, `main` auf GitHub geschützt:** Das Repo ist öffentlich (seit
+  06.11.2026, Entscheid des Projektleiters wegen der Actions-Minuten). Damit gibt es den
+  Schutz von `main` ohne GitHub Pro (B:
+  [GitHub Docs](https://docs.github.com/en/get-started/learning-about-github/githubs-plans)).
+  Die Regel «main schützen» lässt Änderungen an `main` nur über einen PR mit Merge-Commit
+  zu, verlangt grüne Prüfungen (`Prüfen (Lint, Tests, Build)`, `Doku (make docs)`,
+  `gitleaks (ganze Historie)`) und verbietet Force-Push und Löschen; Ausnahmen hat niemand.
+  Freigaben verlangt sie keine (0): Jedes Konto mit Schreibrecht kann selbst einen PR nach
+  `main` öffnen und mergen, auch von einem anderen Branch als `dev`; die Regel erzwingt nur
+  PR, Merge-Commit und grüne Prüfungen. Die Ende-zu-Ende-Tests sind bewusst keine verlangte
+  Prüfung: Läuft der Job nicht (nur Doku), meldet er sich unter einem anderen Namen, und eine
+  verlangte Prüfung, die nie kommt, sperrt den PR. Dass sie vor dem Release grün sind, sichert
+  der Ablauf «warten bis grün» (Skill `tco-branching`). Workflows aus Forks laufen erst nach
+  Freigabe durch den Projektleiter. Geheimnisse nur für eine Umgebung und „nur `main` darf
+  ausliefern“ (Deployment-Umgebungen) gibt es für öffentliche Repos ebenfalls gratis (B:
   [GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments),
-  Antwort der API). Der Projektleiter verzichtet darauf, um laufende Kosten auf seinem
-  Privatkonto zu vermeiden; das Restrisiko ist im Sicherheitskonzept bewertet. Die Auslieferung bleibt
-  automatisch.
+  ebenso der Link oben); sie sind noch nicht eingerichtet ([Beobachtungen](beobachtungen.md)).
+  Die Auslieferung bleibt automatisch.
 - **Restrisiko** (bewertet im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
   Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
   Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten bei einer Übergabe, wenn das
   Repo das Konto wechselt, [Betrieb und Übergabe](betrieb-und-uebergabe.md#übergabe-checkliste)). Die
   Reichweite ist dort am 02.11.2026 richtiggestellt worden und **vom Projektleiter neu zu
   bestätigen**:
-  - Wer ins Repo pushen kann, kann direkt auf `main` pushen (davor schützt nur der lokale
-    Hook des Projektleiters) oder einen Workflow schreiben, der den Live-Schlüssel nutzt
-    (davor schützt nichts). Weil das `ausliefern` aus dem Image auf dem Server läuft, reicht
+  - Wer ins Repo pushen kann, kann zwar nicht mehr direkt auf `main` pushen (Regel «main
+    schützen» auf GitHub, zusätzlich der lokale Hook), aber selbst einen PR nach `main`
+    mergen, sobald die verlangten Prüfungen grün sind, und auf `dev` einen Workflow
+    schreiben, der den Live-Schlüssel nutzt (davor schützt nichts, solange die Schlüssel
+    nicht in Deployment-Umgebungen liegen). Weil das `ausliefern` aus dem Image auf dem Server läuft, reicht
     das bis zu root auf dem Server: Geheimnisse beider Umgebungen, Sicherungszugang,
     Türsteher und Schlüssel. Getrennte Schlüssel für Test und Live helfen nur gegen einen
     gestohlenen Schlüssel allein; ein schädliches Image, das nur auf Test kommt, erreicht über
     denselben Server trotzdem Live. Pushen können der Projektleiter und die Hauptansprechperson
-    im Vorstand: Mitarbeitende eines privaten Repos auf einem Privatkonto haben immer
+    im Vorstand: Mitarbeitende eines Repos auf einem Privatkonto haben immer
     Schreibrecht (B: [GitHub Docs](https://docs.github.com/en/account-and-profile/reference/permission-levels-for-a-personal-account-repository)).
     Eine reine Leserolle gibt es erst in einer Organisation; das Repo bleibt bis zu einer
     Übergabe auf dem Privatkonto ([Betrieb und Übergabe](betrieb-und-uebergabe.md#konten)).
@@ -284,7 +299,7 @@ Mail-Code über die Schnittstelle von Mailpit.
 
 `make check` führt lokal dieselben Prüfungen aus wie die CI, ausser der Malware-Prüfung und
 dem Rauchtest des Images (beide nur CI; den Rauchtest gibt es lokal einzeln als `make rauchtest`); der Secret-Scan läuft lokal über den Hook bzw. `make secrets`. Die CI läuft bei PRs und
-auf `dev` und `main`, nicht auf Issue-Branches (dort decken die Git-Hooks ab). Änderungen nur
+auf `dev` und `main`, nicht auf Issue-Branches (dort decken die Git-Hooks ab). Von Hand lässt sich ein Lauf für jeden Branch starten (`gh workflow run check.yml --ref <branch>`); er prüft wie bei Code und liefert nie aus. Änderungen nur
 an der Doku führen trotzdem `make docs` aus, inklusive Test-ID-Prüfung. Ob eine Änderung
 nur Doku ist, entscheidet `nur-doku.ts` in der Fassung des Basis-Commits. Doku ist, was unter
 `docs/` liegt oder auf `.md` endet, **ausser `docs/datenschutzerklaerung.md`**: Die App baut
@@ -294,14 +309,15 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 |---------|--------|-------|
 | Doku-Check (Links, Konfliktmarker, Mermaid) | — | vorhanden |
 | Secret-Scan über die ganze Historie (gitleaks) | — | Hook und CI |
+| Secret-Scanning von GitHub mit Sperre beim Push (Einstellung im Repo, gratis für öffentliche Repos) | — | GitHub |
 | ESLint mit Svelte-Regeln, Prettier | ADR-002, Arbeitsregeln | vorhanden |
 | `svelte-check`, Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
-| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN` (die der Rechte-Test abdeckt) und reichen `holeAdminDienste()` nur weiter; andere Routen nutzen `lib/server/admin` nicht | ADR-002, RR-07 | vorhanden |
+| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN` bzw. `TURNIER_SCHNITTSTELLEN` (Clubmeisterschaft, auch für `cm`; beide deckt der Rechte-Test ab) und reichen `holeAdminDienste()` nur weiter; andere Routen nutzen `lib/server/admin` nicht | ADR-002, RR-07 | vorhanden |
 | Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
-| Playwright Ende-zu-Ende in drei Umgebungen mit axe; Screenshots als Artefakt des Laufs, 30 Tage; Browser-Download je Versuch höchstens 5 Minuten, bis zu 3 Versuche | Testkonzept | vorhanden |
+| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI als ein Job pro Umgebung parallel (je nur mit ihrem Browser); Screenshots als Artefakt pro Umgebung, 30 Tage; Systempakete einmal (höchstens 8 Minuten), Browser-Download je Versuch höchstens 5 Minuten, bis zu 3 Versuche | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
 | Docker-Image baut | ADR-003 | vorhanden |
 | Rauchtest des Images (Start, Migration, `/api/status`) | ADR-003 | vorhanden |
@@ -310,6 +326,18 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Annahmen zu beantworteten Fragen an den Verein aufgelöst (`annahmen.ts`) | Abklärungen | vorhanden |
 | Oberfläche nur aus Tokens des Leitbilds (`design-tokens.ts`, `design-festwerte.ts`) | UI-Leitbild | vorhanden |
 | Node-Hauptversion wie in `.nvmrc`, sonst enden Prüfskripte still (`pruefe-node.sh`) | — | vorhanden |
+| Jeder Merge nach `dev` mit Code erhöht die Version um einen Schritt, mit Abschnitt in den Versionen (`version-merge.ts`) | dieses Konzept | nur Hook (Push auf `dev`) |
+
+**Grüner Stand** (`gruener-stand.ts`): Ein grünes `make check` merkt sich den geprüften Stand,
+aber nur, wenn vor und nach der Prüfung nichts Uncommittetes herumlag und kein Commit dazukam.
+Der Pre-Push-Hook lässt `make check` aus, wenn der gepushte Stand schon grün geprüft ist und
+seither nur Doku und die Versionsnummer (in `package.json` und `package-lock.json`, sonst
+wörtlich verglichen) dazukamen. Die Mockups unter `docs/ui-mockups/` zählen dabei als Code,
+weil ein E2E-Test sie liest. Das ist der Normalfall beim Push des Feature-Branches nach dem Review und beim
+Push des Merge-Commits auf `dev`. Kam fremder Code von `dev` dazu, prüft der Hook voll, und
+ebenso im Zweifel (keine Liste, unlesbare Datei). Die Liste liegt unversioniert im
+gemeinsamen Git-Ordner, gilt also für alle Worktrees. Die CI prüft jeden Push auf `dev`
+unabhängig davon.
 
 ## Abhängigkeiten
 
@@ -342,15 +370,27 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
   erste Release *Mitglieder-Login* wird `1.0.0`. Davor gehen eine oder mehrere Vorabversionen 0.x für den
   Pilot der [Testgruppe](testgruppe.md) auf Live (Etappe *Pilot*), mit Checkliste auf Test wie
   jedes Release.
-- **Nebenversion** für eine neue Etappe oder Funktion, **Korrektur** für Fehlerbehebungen,
-  **Hauptversion** nur, wenn Mitglieder etwas umstellen müssen (z. B. Umstieg auf die
-  Store-App).
+- **Jeder Merge nach `dev` mit Code bekommt eine neue Nummer**, im Merge-Commit selbst
+  (`package.json`, `package-lock.json` und ein eigener Abschnitt zuoberst in den
+  [Versionen](versionen.md)). Reine Doku (Regel aus `nur-doku.ts`) lässt die Nummer stehen.
+  Die Nummer vergibt, wer mergt, nicht der Feature-Branch: So beanspruchen zwei parallele
+  Sessions nie dieselbe Nummer (Begründung:
+  [ADR-007](adr/adr-007-version-pro-merge.md)). Der Pre-Push-Hook weist einen Push auf `dev` ab, in dem ein
+  Merge mit Code die Version nicht um genau einen Schritt erhöht, sein Abschnitt nicht zuoberst
+  steht oder reine Doku die Version erhöht (`version-merge.ts`); was schon auf `main` liegt, prüft er nicht. Weil der Hook nur lokal
+  läuft, werden auch die PRs von Dependabot im Hauptordner gemergt, nicht auf GitHub.
+- **Korrektur** (`x.y.Z`) ist der Normalfall bei jedem Merge mit Code. **Nebenversion**
+  (`0.X.0`, Korrektur zurück auf 0) setzt Claude, wenn etwas Grösseres dazukommt: eine neue
+  Etappe oder eine spürbare neue Funktion. **Hauptversion** (`X.0.0`) nur im Auftrag des
+  Projektleiters.
+- Getaggt wird nur die Nummer, mit der ein Release live geht. Die Zwischenstände davor haben
+  keinen Tag und keinen Marker; sie gehen mit diesem Release live.
 - Die Version steht in `package.json`, in der Fusszeile der App und, sobald Live ausgeliefert
   wird, als Tag auf `main`.
 - **Solange `AUSLIEFERUNG_LIVE` aus ist,** gibt es keinen Tag und kein GitHub-Release, denn
-  der Job `release` läuft dann nicht. Ein Release besteht aus dem Versions-Commit auf `dev`
-  (Version in `package.json`, Abschnitt in den [Versionen](versionen.md) mit «nicht
-  ausgeliefert») und dem PR nach `main`. Tags werden nicht von Hand gesetzt, auch nicht
+  der Job `release` läuft dann nicht. Ein Release besteht aus dem Doku-Abgleich und dem PR
+  nach `main`. Die Releases 0.1.0 bis 0.5.0 tragen in den [Versionen](versionen.md) noch den
+  Marker «nicht ausgeliefert» aus dem früheren Ablauf; neue Abschnitte bekommen ihn nicht. Tags werden nicht von Hand gesetzt, auch nicht
   nachträglich; den ersten setzt die CI bei der ersten Live-Auslieferung.
 - **Die Checkliste entfällt nur, solange `AUSLIEFERUNG_TEST` aus ist** (es gibt kein Test).
   Läuft Test schon und Live noch nicht, wird sie vor dem Release auf Test abgehakt.
@@ -368,22 +408,27 @@ alten Version arbeitet:
 
 ## Actions-Minuten
 
-Der Gratisplan des GitHub-Kontos hat 2000 Minuten pro Monat, **geteilt mit den anderen
-privaten Repos** (B: Messung in Munica, Stand 10/2026). Munica allein braucht fest über
-1200 Minuten; im September 2026 war das Kontingent aufgebraucht (B, ebenda). Ist auch das
-Budget erschöpft, startet GitHub keine Jobs mehr, also auch keine Auslieferung.
+Das Repo ist öffentlich; für öffentliche Repos sind die Standard-Runner von GitHub gratis
+und ohne Kontingent (B: Abrechnung des Kontos, öffentliche Repos mit 0 verrechnet). Bis
+06.11.2026 war es privat und teilte die 2000 Gratisminuten pro Monat mit den anderen
+privaten Repos des Kontos; MyTCO allein brauchte im November in sechs Tagen über 1100
+Minuten (B: Abrechnung des Kontos). Das war der Grund für den Wechsel. Die Regeln unten
+bleiben, weil sie auch die Wartezeit kurz halten.
 
 - CI nur bei PRs und auf `dev`/`main`; Issue-Branches prüfen lokal.
 - Nur PR-Läufe brechen den vorherigen ab. Jeder Push auf `dev`/`main` läuft für sich, auch
   wenn weitere folgen; sonst könnte ein späterer Push den wartenden Lauf eines Code-Pushs
-  verdrängen und ihn ungetestet lassen.
+  verdrängen und ihn ungetestet lassen. Ausnahme ist der Secret-Scan (`secret-scan.yml`): Er
+  bricht auch auf `dev`/`main` den vorherigen Lauf ab. Dabei geht nichts verloren, weil jeder
+  Lauf die ganze Historie prüft.
 - Änderungen nur an der Doku lösen weder Ende-zu-Ende-Tests noch eine Auslieferung aus.
 - **Gemessen** (erster Lauf auf `dev`, 01.11.2026, B): ein Merge mit Code dauert rund
   3 Minuten und kostet 11 abgerechnete Minuten. GitHub rundet jeden Job auf ganze Minuten
   auf, gezählt werden 7 Jobs inklusive Secret-Scan. Ein reiner Doku-Merge kostet 3 Minuten.
-  Bei rund 30 Code-Merges im Monat sind das etwa 330 Minuten (S). Reicht das Kontingent
-  nicht, laufen die Ende-zu-Ende-Tests nur beim PR nach `main`.
-- **Notfall ohne Minuten:** Ohne Minuten baut die CI auch kein Image. Der Projektleiter baut
+  Seit den Ende-zu-Ende-Tests auf drei Geräten kostet ein voller Lauf rund 20 abgerechnete
+  Minuten (B: Jobdauern auf `dev`, 06.11.2026).
+- **Notfall ohne CI** (GitHub-Ausfall oder das Repo wird wieder privat und die Minuten sind
+  aufgebraucht): Ohne CI gibt es auch kein Image. Der Projektleiter baut
   es dann lokal für den Server (`--platform linux/amd64`, sein Mac baut sonst für arm64),
   schiebt es mit einem eigenen, kurzlebigen Token (nur `packages: write`) in
   die Container-Ablage und startet die Auslieferung mit dem Digest von Hand auf dem Server

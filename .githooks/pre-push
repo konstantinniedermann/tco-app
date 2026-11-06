@@ -2,21 +2,31 @@
 # Lokaler pre-push-Hook (aktivieren: make hooks).
 # Branch-Schutz für private Repos gibt es auf GitHub nur mit Pro — daher lokal:
 # Der Weg auf main ist immer ein PR aus dev, nie ein direkter Push.
-# Enthält ein gepushter Bereich Code, läuft vor dem Push make check (wie die CI).
+# Enthält ein gepushter Bereich Code, läuft vor dem Push make check (wie die CI) — ausser sein
+# Stand ist schon grün geprüft und seither kamen nur Doku und Versionsnummer dazu (gruener-stand.ts).
 set -euo pipefail
 
 nullsha=0000000000000000000000000000000000000000
 refs=()
+dev_bereiche=()
 while read -r _lokal_ref lokal_sha remote_ref remote_sha; do
   if [ "$remote_ref" = "refs/heads/main" ]; then
     echo "Abbruch: Direkter Push auf main ist verboten — Release per PR dev → main." >&2
     exit 1
   fi
   refs+=("$lokal_sha $remote_sha")
+  # Auf dev bringt jeder Merge mit Code seine eigene Versionsnummer (Skill tco-branching, Schritt 4).
+  if [ "$remote_ref" = "refs/heads/dev" ] && [ "$lokal_sha" != "$nullsha" ] && [ "$remote_sha" != "$nullsha" ]; then
+    dev_bereiche+=("$remote_sha..$lokal_sha")
+  fi
 done
 
 # Falsche Node-Version: Abbruch, sonst endet nur-doku.ts still mit Exit 0.
 bash scripts/pruefe-node.sh
+
+for bereich in "${dev_bereiche[@]+"${dev_bereiche[@]}"}"; do
+  node scripts/pruefungen/version-merge.ts "$bereich"
+done
 
 code=0
 for eintrag in "${refs[@]+"${refs[@]}"}"; do
@@ -32,7 +42,10 @@ for eintrag in "${refs[@]+"${refs[@]}"}"; do
     bereich="$remote_sha..$lokal_sha"
   fi
   if ! git diff --name-only --no-renames "$bereich" | node scripts/pruefungen/nur-doku.ts; then
-    code=1
+    # Jeder Fehler im Skript zählt als «nicht grün»: dann voll prüfen.
+    if ! node scripts/pruefungen/gruener-stand.ts pruefen "$lokal_sha"; then
+      code=1
+    fi
   fi
 done
 

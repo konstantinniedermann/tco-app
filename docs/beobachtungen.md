@@ -116,449 +116,185 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
-### 2026-11-04 — E2E im iPhone-Profil (WebKit, Linux-CI) scheitert vereinzelt, ohne sich zu wiederholen
+### 2026-11-06 — CI: langsamer Ubuntu-Spiegel macht den E2E-Lauf rot, auch nach dem Fix der apt-Sperre
 
 **Thema:** Betrieb
 
-**Fundort:** `tests/e2e/hilfe.test.ts:23` (Klick auf «Hilfe» in der Fusszeile), CI-Lauf 41900100215 auf `dev`.
+**Fundort:** `.github/workflows/check.yml`, Job «E2E (Playwright)», Schritt «Systempakete für die Browser» (`playwright install-deps`, höchstens 8 Minuten)
 
-**Beobachtung:** Beim Merge des Releases 0.4.0 nach `dev` blieb der Klick 30 Sekunden bei «waiting for element to be visible, enabled and stable» hängen; Screenshot und Seitenbaum zeigen die Login-Seite normal, auf `/login` läuft keine Animation. Der Neustart desselben Jobs und der PR-Lauf auf demselben Code waren grün. Früher am selben Tag trafen zwei rote Läufe ebenfalls nur das iPhone-Profil, aber andere Tests (`verwaltung.test.ts:177`, `passkey.test.ts:145`).
+**Beobachtung:** Lauf 42186755560 auf `dev` (Merge 0.5.2): Die Paketlisten kamen in einer Sekunde, danach lieferte `azure.archive.ubuntu.com` die Pakete im Minutentakt (Get:2 bis Get:6 in gut 5 Minuten, dann nichts mehr); nach 8 Minuten brach der Schritt ab. Derselbe langsame Spiegel stand hinter den beiden apt-Sperren vom 05.11. (Läufe 41999966173, 42058627189), also 3-mal in rund 57 Läufen. Der Lauf auf dem Branch eine Viertelstunde vorher brauchte für denselben Schritt 1½ Minuten. Der Fix 6fea09a beseitigt nur die Selbstsperre, nicht den langsamen Spiegel.
 
-**Ursprung:** Release 0.4.0, CI auf `dev`.
+**Ursprung:** Beobachtungs-Auswertung vom 06.11.2026, CI nach dem Merge.
 
-**Einschätzung:** Vermutlich die Stabilitätsprüfung von Playwright unter WebKit auf einer ausgelasteten Linux-Maschine, nicht die App; nicht belegt. Häufen sich solche Ausreisser, lohnt ein Blick auf Wiederholungen (`retries`) nur in der CI oder auf die Zahl paralleler Worker im iPhone-Profil.
+**Einschätzung:** Ein Neustart des Jobs hilft meist. Dauerhaft wohl nur ohne apt: den E2E-Job im offiziellen Playwright-Container laufen lassen (Image mit Browsern und Systempaketen) — eine neue Abhängigkeit, braucht Freigabe. Alternativ apt mit eigenem Zeitlimit je Verbindung und einem zweiten Versuch, der den ersten sicher beendet (`sudo timeout …`).
 
-### 2026-11-04 — Doku-Abgleich vor 0.4.0: offene Punkte ohne Sofort-Fix
+**Entscheid Nutzer (06.11.2026):** vorerst nichts ändern, Container allenfalls später. Abwägung: deutlich stabiler (kein Ubuntu-Download mehr), kaum schneller (der Pull des Images frisst den Gewinn grösstenteils), Image-Version muss mit Playwright mitgezogen werden.
 
-**Thema:** Betrieb
-
-**Fundort:** `betrieb/bin/ausliefern:233-246`, `docs/ci-cd-und-release.md` (Rückfall, Ausblick, Actions-Minuten), `docs/testkonzept.md:30-32, 47-49`, `src/lib/server/admin/schnittstellen.db.test.ts`, `src/lib/server/admin/mitglieder.db.test.ts:73, 82, 177`, `src/lib/server/db/schema.ts:58`, `docs/fachmodell.md:59, 61`, `docs/ui-leitbild.md:214`, `src/routes/+page.svelte:39-44`, `docs/datenschutz.md` (Sitzungen).
-
-**Beobachtung:** (1) Scheitert die Migration beim Ausliefern, wird Test vorher geleert und bleibt ohne App; auf Live läuft die alte App weiter, die neue Einrichtung bleibt aber unter `live/betrieb/`. Die Doku beschreibt den Rückfall nur für «App antwortet nicht». (2) Das Testkonzept verspricht pro Schnittstelle den Fall «gesperrtes Konto»; die Schnittstellen-Tests der Verwaltung prüfen ihn nicht, nur der Rollen-Dienst. (3) Die Verwaltung ist eine Kachel auf der Startseite, laut UI-Leitbild ein Eintrag unter *Profil* — Entscheid des Projektleiters offen. (4) Kleinigkeiten: Tests zur Mitgliedernummer tragen die ID FR-25 statt A-MITGLIED-07; FR-25 ist teilweise umgesetzt (eindeutige E-Mail), steht auf geplant; Fachmodell nennt beim Passkey nur Schlüssel und Kennung (Datenschutz ist vollständig) und beim Verlauf nicht «gelöschtes Konto»; Datenschutz nennt den Zeitpunkt der Anmeldung je Sitzung nicht ausdrücklich; Testkonzept nennt als ersten E2E-Ablauf «Daten ergänzen» (FR-02, noch geplant); Kommentar `schema.ts:58` zur Passkey-Kennung ungenau; `proxy.env`-Werte `MYTCO_TEST_BENUTZER`, `MYTCO_TLS`, `MYTCO_HTTP_PORT`/`HTTPS_PORT`, Uhrzeit des Timers (02:30), Wiederholung von `sichern` und Aufräumen alter Images nicht dokumentiert; «innert einer Minute (S)» ist belegt (B); `secret-scan.yml` bricht vorherige Läufe ab, anders als in «Actions-Minuten» gesagt.
-
-**Ursprung:** Doku-Abgleich vor Release 0.4.0 (Bereiche App, Setup, Betrieb, Daten/Tests).
-
-**Einschätzung:** Nichts davon führt Mitglieder oder Vorstand in die Irre. (1) vor der ersten Auslieferung mit #39 klären; (2) mit der nächsten Etappe von #43; (3) braucht eine Entscheidung; (4) gesammelt bei Gelegenheit.
-
-### 2026-11-04 — Ein Teil der Arbeitsweise liegt nicht im Repo und ginge bei einer Übergabe verloren
+### 2026-11-06 — make check baut die App doppelt: einmal selbst, einmal im Webserver der E2E-Tests
 
 **Thema:** Betrieb
 
-**Fundort:** `CLAUDE.md` (verweist auf die übergeordnete CLAUDE.md und auf Skills ausserhalb), `docs/betrieb-und-uebergabe.md` (Übergabe-Checkliste, Schritt 1).
+**Fundort:** `Makefile` (`check`: `npm run build`, dann `make e2e`), `playwright.config.ts` (`webServer.command`: `npm run build && …`)
 
-**Beobachtung:** Die Nachfolge soll wie der Projektleiter mit Claude Code arbeiten. Das Repo bringt aber nur die Projekt-`CLAUDE.md` und den Skill `tco-branching` mit. Nur auf dem Mac des Projektleiters liegen: die übergeordnete CLAUDE.md (Workflow, Dependencies, Commit-Konvention, Umgang mit Befunden), die Skills `session-start` und `session-wrap-up`, der Agent `cas-reviewer`, der Hook `dep-guard`, das superpowers-Plugin und die Memories mit den Fallen (z. B. WebKit in der CI, Worktree-Isolation, Einstiegsseite im E2E).
+**Beobachtung:** `make check` baut die App mit `npm run build` und startet danach die E2E-Tests, deren Webserver noch einmal `npm run build` ausführt. In der CI baut jeder der drei E2E-Jobs ebenfalls selbst. Kostet lokal geschätzt 20–30 s pro voller Prüfung.
 
-**Ursprung:** #10, Brainstorming zur Übergabe; vom Projektleiter bewusst aus #10 ausgeklammert.
+**Ursprung:** Analyse, warum Merges lange dauern (Branch `feat/schnellere-merges`).
 
-**Einschätzung:** Vor einer Übergabe nötig, vorher ohne Folge. Was nur für tco-app gilt, liesse sich ins Repo holen (`.claude/`, Fallen nach `docs/`); berührt die gemeinsamen Regeln der anderen CAS-Projekte.
+**Einschätzung:** Kleine Ersparnis; ein Umbau müsste sicherstellen, dass die E2E-Tests nie gegen einen veralteten Build laufen. Erst angehen, wenn die Prüfdauer wieder stört.
 
-### 2026-11-04 — Hilfe beim Start: Kleinigkeiten aus dem Review
-
-**Thema:** App
-
-**Fundort:** `src/lib/ui/Zeichnung*.svelte`, `src/lib/ui/Anleitung.svelte`, `src/lib/server/brief/symbole.ts`, `src/routes/willkommen/+page.svelte`, `src/routes/hilfe/+page.svelte`, `src/lib/hilfe/installation.svelte.ts`.
-
-**Beobachtung:** (1) Die Zeichnung der Anleitung zeigt fest `my.tcolten.ch`, auch auf Test. (2) Teilen- und Menü-Symbol stehen in Anleitung, Zeichnung und Brief je einzeln; ändert Apple oder Google ein Symbol, sind vier Stellen nachzuziehen (das Teilen-Symbol steht seit dem Layout-Hinweis zweimal in der Anleitung). (3) Nach «Abbrechen» im Android-Dialog ist die Karte «Zuerst auf den Startbildschirm» bis auf Titel und Satz leer, die Anleitung steht im offenen Bereich «Klappt nicht?» darunter. (4) Solange der Android-Dialog offen ist, baut die Seite kurz um (Anleitung in der Karte, Bereich «Klappt nicht?» weg). (5) MyTCO hält Chromes eigenen Install-Hinweis auf jeder Seite zurück, die Taste gibt es nur auf der Einstiegsseite. (6) «‹ Zurück» auf der Hilfe führt immer nach `/`, im Handy-Browser also zur Einstiegsseite statt zurück zum Login. (7) Annahme des Projektleiters für die Anleitung: iPhones mit iOS 26 oder neuer, Android-Handys höchstens 5 Jahre alt; betrifft den Eintrag zur Untergrenze unten.
-
-**Ursprung:** #47, abschliessendes Code-Review und cas-reviewer.
-
-**Einschätzung:** Für den Pilot ohne Folge. Was die Testgruppe dazu meldet, entscheidet über (3), (5) und (6); (2) lohnt sich, sobald ein Symbol sich ändert.
-
-### 2026-11-04 — Keine Untergrenze für iOS- und Android-Versionen festgelegt
+### 2026-11-06 — «Importing a module script failed» lokal in make check: zwei rote von drei vollen Läufen
 
 **Thema:** Betrieb
 
-**Fundort:** `docs/testkonzept.md` (*Testgruppe*), `docs/anforderungen/anforderungen.md` (N-APP).
+**Fundort:** Profil `iphone` (WebKit), `tests/e2e/verwaltung.test.ts:212` (SI-08) und `tests/e2e/anlass.test.ts:158` (A-ANLASS-01); Seitenfehler-Sammlung `fehler`
 
-**Beobachtung:** Das Testkonzept definiert «älteres Handy» (iOS 16/17, Android 9–11), aber kein Dokument sagt, ab welcher Version MyTCO unterstützt wird. Passkeys gibt es erst ab iOS 16 und Android 9, Web Push auf dem iPhone erst ab iOS 16.4.
+**Beobachtung:** Lokal mit 5 Workern zweimal am selben Vormittag rot, jeweils nur durch den Seitenfehler «TypeError: Importing a module script failed.»; einzeln mit `--repeat-each 5` grün, der dritte volle Lauf grün. Branch ohne App-Code. Das Archiv (Eintrag vom 04.11.) zählt nur CI-Läufe; lokal kostet jeder Fehlversuch ein ganzes `make check` und verlängert so den Merge.
 
-**Ursprung:** #40, Brainstorming und Review der Testgruppe.
+**Ursprung:** Branch `feat/schnellere-merges`, Nachweisläufe von `make check`.
 
-**Einschätzung:** Bis zum Pilot ohne Folge, die Testgruppe liefert Erfahrungswerte. Vor dem Briefversand (#48) sollte feststehen, was die Hilfe Mitgliedern mit älteren Handys sagt.
+**Einschätzung:** Vermutlich derselbe Wettlauf wie im archivierten Thema, unter lokaler Last mit mehr Workern häufiger. Der Trigger im Archiv zählt nur CI; lokal wäre eine eigene Regel zu überlegen (z. B. den Seitenfehler gezielt ignorieren, wenn die Seite danach korrekt geladen ist).
 
-### 2026-11-04 — Dependabot-PR #38 hat seit dem Neuaufsetzen keinen CI-Lauf
-
-**Thema:** Betrieb
-
-**Fundort:** PR #38, Head `7fc79b06` (neu aufgesetzt am 04.11.2026 um 09:48 UTC); `.github/workflows/check.yml` (`pull_request` auf `dev`).
-
-**Beobachtung:** `gh pr checks 38` meldet «no checks reported», `mergeable` steht auf UNKNOWN. Der Head liegt 40 Commits hinter `dev`. Ein roter Lauf wäre wegen der Peer-Abhängigkeiten zu erwarten, aber es läuft gar keiner.
-
-**Ursprung:** Beobachtungs-Auswertung vom 04.11.2026 (Prüfung des PR-Eintrags).
-
-**Einschätzung:** Ohne Folge, solange der PR offen bleibt. Die Ursache ist unbekannt. Kommt Dependabot mit einer Fassung, die TypeScript 7 erlaubt, fehlt sonst die Prüfung; dann `@dependabot rebase` und kontrollieren, ob `Check` läuft.
-
-### 2026-11-04 — «Ganzer Verlauf» zeigt höchstens 100 Einträge, ohne es zu sagen
-
-**Thema:** Verwaltung
-
-**Fundort:** `src/routes/verwaltung/verlauf/+page.svelte` (ruft `ladeVerlauf` ohne `grenze`), `getVerlauf` in `src/lib/server/admin/schnittstellen.ts` (`VERLAUF_STANDARD = 100`).
-
-**Beobachtung:** Die Seite eines Mitglieds sagt jetzt «die letzten 50 Einträge» und verlinkt «Ganzer Verlauf ›». Die Verlaufsseite holt aber standardmässig nur 100 Einträge und zeigt nicht an, wenn es mehr gibt. Die Seite ohne Filter (alle Mitglieder) ist genauso gekürzt.
-
-**Ursprung:** Nacharbeit zu #43 (Kurzinfo «die letzten 50»).
-
-**Einschätzung:** Heute ohne Folge, kaum ein Mitglied hat über 100 Einträge. Mit dem Einlesen (Etappe 2) wächst der Gesamtverlauf schnell; dann braucht die Verlaufsseite die gleiche ehrliche Anzeige oder ein Weiterblättern.
-
-### 2026-11-04 — «Rollen speichern» überschreibt Rollen, die ein anderer Admin inzwischen vergeben hat
-
-**Thema:** Verwaltung
-
-**Fundort:** `setzeRollen` in `src/lib/server/admin/rollen.ts`, `speichereRollen` in `src/lib/verwaltung/api.ts`.
-
-**Beobachtung:** Die Seite schickt die ganze Rollenliste, der Server ersetzt die gespeicherten Rollen ohne Vergleich mit dem geladenen Stand. Admin A vergibt «CM»; Admin B hat die Seite noch offen, vergibt «Lizenz» und entzieht damit As «CM» still. Der Schutz für den letzten Admin (RR-03) hält, der Verlauf zeigt das Entziehen. Bei den Angaben ist dasselbe seit der Nacharbeit zu #43 geschützt (409 «veraltet»).
-
-**Ursprung:** Review (cas-reviewer) der Nacharbeit zu #43.
-
-**Einschätzung:** Bei zwei bis drei Admins selten. Ein Fix übernimmt das Muster der Angaben (geladene Rollen mitschicken, in der Transaktion vergleichen, 409).
-### 2026-11-05 — Datenschutz-Seite zeigt Platzhalter und interne Kennungen
-
-**Thema:** App
-
-**Fundort:** `/datenschutz` (Text aus `docs/datenschutzerklaerung.md`)
-
-**Beobachtung:** Die Seite zeigt «[Ansprechperson]», «[Datum]», «[E-Mail-Dienst]» und «Vorschlag K-38», sichtbar als Entwurf markiert.
-
-**Ursprung:** Review (cas-reviewer) zum Handy-Feedback, Session vom 05.11.2026.
-
-**Einschätzung:** Für lokale Tests passend. Vor einer Auslieferung auf Live ausfüllen und freigeben lassen (K-06.2, DS-09; DoD von #40 und #48).
-
-### 2026-11-05 — Verwaltung am Handy: Kopfleiste bleibt nicht oben stehen
-
-**Thema:** Verwaltung
-
-**Fundort:** `src/routes/verwaltung/+layout.svelte`, `.seitenleiste .kopf` in `basis.css`
-
-**Beobachtung:** In der Mitglieder-App bleibt die Kopfleiste beim Scrollen oben stehen. In der Verwaltung steckt sie in der Seitenleiste und scrollt auf dem schmalen Bildschirm mit weg; unter Uhr und Akku liegt dann nur noch das grüne Statusleisten-Band. Dazu: In der Mitglieder-App kann die mitlaufende Kopfleiste ein fokussiertes Element verdecken (WCAG 2.4.11), `scroll-padding-top` deckt nur das Band ab, nicht die Höhe der Kopfleiste.
-
-**Ursprung:** Review (cas-reviewer) zum Handy-Feedback, Session vom 05.11.2026.
-
-**Einschätzung:** Die Verwaltung ist vor allem für den PC gedacht. Am iPhone prüfen; falls störend, die Seitenleiste auf dem Handy als Kopf mit Menü neu denken (gehört in den Design-Ablauf).
-
-### 2026-11-05 — Datenschutz-Seite ist am Handy eine lange Textwand
-
-**Thema:** App
-
-**Fundort:** `/datenschutz` (`src/routes/datenschutz/+page.svelte`)
-
-**Beobachtung:** Die ganze Erklärung steht in einer Karte; am iPhone sind das mehrere Bildschirmlängen ohne Gliederung (Screenshot im E2E `datenschutz.test.ts`).
-
-**Ursprung:** Handy-Test des Projektleiters, Session vom 05.11.2026.
-
-**Einschätzung:** Passt zur Vorgabe «grosse Seiten aufklappbar»: jeder fette Abschnittsanfang («Welche Daten:», «Wozu:» …) ein Aufklappbereich wie in der Hilfe. Über den Design-Ablauf, vor der Freigabe durch den Vorstand (K-06.2).
-
-### 2026-11-05 — Lokale Logins hängen am unbenannten Docker-Speicher
+### 2026-11-06 — Grüner Stand: Abwägung «lokal weniger prüfen, CI fängt auf» ohne ADR
 
 **Thema:** Betrieb
 
-**Fundort:** `docker-compose.yml` (Service `db`, kein benanntes Volume)
+**Fundort:** `scripts/pruefungen/gruener-stand.ts`, `.githooks/pre-push`, `docs/ci-cd-und-release.md` («Grüner Stand»)
 
-**Beobachtung:** Die lokale Datenbank liegt in einem anonymen Volume. `docker compose down` oder ein Zurücksetzen von Docker Desktop legt beim nächsten `make db` eine leere Datenbank an; die Handy-Verknüpfungen aus `make dev-handy` sind dann abgemeldet, Brief-Codes weg.
+**Beobachtung:** Der Pre-Push-Hook lässt `make check` aus, wenn derselbe Stand schon grün geprüft wurde und seither nur Doku und die Versionsnummer dazukamen. Die Begründung (Wartezeit gegen lokale Schranke, die CI prüft jeden Push auf `dev`) steht nur in der Release-Doku und im Commit, nicht als ADR. Die Versionsregel bekam für eine Abwägung von ähnlichem Gewicht nachträglich ADR-007.
 
-**Ursprung:** Frage des Projektleiters, ob die Verknüpfungen später wieder gehen, Session vom 05.11.2026.
+**Ursprung:** Review (`cas-reviewer`) des Branches `feat/schnellere-merges`.
 
-**Einschätzung:** Für erfundene Daten verkraftbar (`make seed` gibt neue Codes). Ein benanntes Volume würde es robuster machen, kostet beim Umstellen einmal die vorhandenen Daten.
+**Einschätzung:** Ein kurzes ADR wäre konsistent mit ADR-007; nötig wird es spätestens, wenn jemand die Schranke wieder verschärfen oder weiter lockern will.
 
-### 2026-11-05 — CI: Browser-Installation scheitert an gesperrtem apt
+### 2026-11-06 — npm-Skript e2e:browser wird nirgends mehr aufgerufen
 
 **Thema:** Betrieb
 
-**Fundort:** `.github/workflows/check.yml`, Job «E2E (Playwright)», Schritt Browser-Installation (`--with-deps`)
+**Fundort:** `package.json` (`e2e:browser`)
 
-**Beobachtung:** Lauf 41999966173 auf `dev` (Merge `fix/anleitung-hinweis`) brach ab mit «Could not get lock /var/lib/dpkg/lock-frontend. It is held by process … (apt-get)», Code 100. Der nächste Lauf auf demselben Code lief durch.
+**Beobachtung:** Die CI installiert Systempakete und Browser jetzt pro Gerät direkt über `playwright install-deps`/`install`. `e2e:browser` (beide Browser mit `--with-deps`) ruft weder die CI noch das Makefile noch die Doku auf.
 
-**Ursprung:** Wrap-up der Session vom 05.11.2026.
+**Ursprung:** Review (`cas-reviewer`) des Branches `feat/schnellere-merges`.
 
-**Einschätzung:** Störung des GitHub-Runners (apt läuft im Hintergrund), nicht des Codes. Häuft es sich: vor der Installation auf die apt-Sperre warten oder den Job neu starten lassen.
+**Einschätzung:** Entweder als lokaler Einrichtungsbefehl in README/Makefile nennen oder entfernen; eine Änderung an `package.json` zählt als Code und bringt eine Versionsnummer, daher mit dem nächsten Code-Merge erledigen.
 
-### 2026-11-05 — Leitbild sagt «Verwaltung über Profil», die App zeigt sie auf der Startseite
-
-**Thema:** Verwaltung
-
-**Fundort:** `docs/ui-leitbild.md` (Layout und Navigation, «Verwaltung … erreichbar über einen Eintrag unter *Profil*»), `src/routes/+page.svelte:39`
-
-**Beobachtung:** Das Leitbild nennt einen Eintrag unter Profil als Weg in die Verwaltung. Im Code steht die Kachel «Verwaltung» auf der Startseite; im Profil gibt es keinen solchen Eintrag.
-
-**Ursprung:** #54 (Ruhiges App-Gefühl), beim Nachführen des Leitbilds.
-
-**Einschätzung:** Doku-Drift, keine Funktionsstörung. Entscheiden, wo der Eintrag hingehört, dann Leitbild oder Code angleichen.
-
-### 2026-11-05 — Mockup «Hilfe beim Start» zeigt die Fusszeile ohne «Datenschutz»
-
-**Thema:** App
-
-**Fundort:** `docs/ui-mockups/hilfe.html` (Fusszeilen der Bildschirme Einstiegsseite und Login)
-
-**Beobachtung:** Die Mockups zeigen «Hilfe · Version», die App seit DS-09 «Hilfe · Datenschutz · Version». Die Abweichung ist älter als #54.
-
-**Ursprung:** Review (cas-reviewer) zu #54.
-
-**Einschätzung:** Kosmetik in der Doku. Beim nächsten Umbau der Mockups (Design-Ablauf mit Artifacts) mitnehmen.
-
-### 2026-11-05 — Reiter: aria-current wechselt, bevor die neue Seite da ist
-
-**Thema:** App
-
-**Fundort:** `src/lib/ui/Reiter.svelte` (`aktiv` folgt `navigating.to`)
-
-**Beobachtung:** Damit der Reiter sofort reagiert, folgt auch `aria-current` dem Ziel der Navigation. Ein Screenreader kann «Profil, aktuelle Seite» ansagen, während noch Start zu sehen ist; leitet das Laden um, springt es zurück. Sauberer wäre: `aria-current` an `page.route.id`, nur Farbe und Balken (`data-aktiv`) folgen dem Ziel.
-
-**Ursprung:** Code-Review zu #54.
-
-**Einschätzung:** Kurze Zeitspanne (Ladezeit), kein Fehler im Ablauf. Bei der nächsten Arbeit an den Reitern trennen; braucht eine eigene Markierung fürs Aussehen.
-
-### 2026-11-05 — Rückfrage: Ausblenden ohne `overlay` an falscher Stelle
-
-**Thema:** Verwaltung
-
-**Fundort:** `dialog.karte` in `src/lib/design/basis.css`
-
-**Beobachtung:** Browser ohne die CSS-Eigenschaft `overlay` (Firefox, wohl auch Safari) nehmen die Rückfrage beim Schliessen sofort aus der obersten Ebene; die 150 ms Ausblenden laufen dann an ihrer Stelle im Seitenfluss. Ein zweiter Tipp ist abgefangen (`pointer-events: none`).
-
-**Ursprung:** Code-Review zu #54.
-
-**Einschätzung:** Kurz und nur in der Verwaltung. Am Mac in Safari ansehen; stört es, das Ausblenden nur dort zeigen, wo `overlay` unterstützt ist (`@supports`).
-
-### 2026-11-05 — «Für Fairgate» zeigt auch ausgetretene und gelöschte Mitglieder
-
-**Thema:** Verwaltung
-
-**Fundort:** `listeFuerFairgate` in `src/lib/server/admin/fairgate.ts`
-
-**Beobachtung:** Die Liste filtert nicht nach Status. Tritt ein Mitglied aus, nachdem es Angaben selbst geändert hat, bleibt es mit «für Fairgate offen» in der Liste, bis der Admin abhakt.
-
-**Ursprung:** Gesamtreview zu #50.
-
-**Einschätzung:** Hängt am Austritt und Löschen (FR-04, Etappe 3 von #43). Dort entscheiden, ob der Austritt die Markierung löscht oder die Liste nur aktive Mitglieder zeigt.
-
-### 2026-11-05 — «Für Fairgate»: Feinschliff aus den Reviews
-
-**Thema:** Verwaltung
-
-**Fundort:** `src/routes/verwaltung/+layout.ts`, `src/routes/verwaltung/fairgate/+page.svelte`, `src/lib/server/admin/fairgate.ts`
-
-**Beobachtung:** Der Zähler in der Seitenleiste lädt die ganze Liste, nur um sie zu zählen. Hat ein anderer Admin schon abgehakt, verschwindet die Zeile ohne Rückmeldung. Liegt die letzte Selbständerung länger als die Aufbewahrung des Verlaufs zurück, bleiben «Geändert» und «Neue Angaben» leer. Namen erscheinen als «Nachname, Vorname», der Entwurf zeigte «Vorname Nachname».
-
-**Ursprung:** Task- und Gesamtreview zu #50.
-
-**Einschätzung:** Bei der Vereinsgrösse ohne Folgen. Bei der nächsten Arbeit an der Verwaltung mitnehmen.
-
-### 2026-11-05 — Passkey zeigt nach dem E-Mail-Wechsel weiter die alte Adresse
-
-**Thema:** App
-
-**Fundort:** Schlüsselbund des Geräts (Name des Passkeys), `src/lib/server/profil/email-wechsel.ts`
-
-**Beobachtung:** Der Passkey trägt im Schlüsselbund die Adresse, die beim Einrichten galt. Nach einem E-Mail-Wechsel steht dort weiter die alte. Das Anmelden klappt, weil der Passkey an seiner Kennung hängt.
-
-**Ursprung:** Gesamtreview zu #50.
-
-**Einschätzung:** Nur kosmetisch. Prüfen, ob WebAuthn den Namen nachführen kann (Signal-API), sonst in der Hilfe erwähnen.
-
-### 2026-11-05 — Profil: abgelaufene Sitzung beim Speichern zeigt «Störung» statt Login
-
-**Thema:** App
-
-**Fundort:** `src/routes/profil/+page.svelte`, `src/lib/profil/angaben.ts`
-
-**Beobachtung:** Läuft die Sitzung während des Bearbeitens ab, meldet die Seite eine Störung und leitet nicht zur Anmeldung. Die Seite ist zudem auf rund 430 Zeilen gewachsen; ein eigener Baustein «Meine Angaben» wäre leichter zu lesen.
-
-**Ursprung:** Task-Review zu #50 (Verhalten bestand schon vorher bei Passkey und Abmelden).
-
-**Einschätzung:** Selten, die Sitzung hält ein Jahr. Beim nächsten Umbau der Profilseite beides angehen.
-
-### 2026-11-05 — Wartende Login-Mailanfrage bleibt nach dem Abmelden im Gerätespeicher
-
-**Thema:** App
-
-**Fundort:** `abmelden()` in `src/routes/profil/+page.svelte`, `src/lib/login/mailanfrage.ts`
-
-**Beobachtung:** Der E-Mail-Wechsel räumt seinen Eintrag beim Abmelden jetzt ab, die wartende Login-Mailanfrage nicht. Sie verfällt nach 15 Minuten und wird beim nächsten Start der App gelöscht.
-
-**Ursprung:** Gesamtreview zu #50.
-
-**Einschätzung:** Altbestand, kurze Frist. Der Konsequenz halber beim Abmelden ebenfalls löschen; eine Zeile.
-
-### 2026-11-05 — Leitbild hat keinen Baustein für zwei Felder nebeneinander
-
-**Thema:** App
-
-**Fundort:** `docs/ui-leitbild.md`, Adresse im Profil (`src/routes/profil/+page.svelte`)
-
-**Beobachtung:** PLZ und Ort stehen im Profil untereinander, der Entwurf zeigte sie nebeneinander. Ohne Inline-Stile fehlt dafür ein Baustein im Leitbild.
-
-**Ursprung:** Bildvergleich zu #50.
-
-**Einschätzung:** Kein Fehler. Kommt ein zweiter Fall dazu (z. B. Formulare der CM-Anmeldung), einen Baustein «Feldzeile» ins Leitbild aufnehmen.
-
-### 2026-11-05 — E2E: gemeinsame IP-Grenze und geteilte Testdatenbank
+### 2026-11-06 — Live-Schlüssel könnte jetzt in einer Deployment-Umgebung nur für main liegen
 
 **Thema:** Betrieb
 
-**Fundort:** `tests/e2e/profil.test.ts`, `tests/e2e/verwaltung.test.ts`, `docs/testkonzept.md`
+**Fundort:** `.github/workflows/check.yml` (Job `ausliefern`, `SSH_SCHLUESSEL_LIVE`), `docs/ci-cd-und-release.md` («Schutz des Auslieferungswegs»), `docs/sicherheitskonzept.md` («Neu zu bestätigen»)
 
-**Beobachtung:** Alle E2E-Läufe teilen sich die Grenze von 10 Code-Anfragen pro IP und Stunde. Darum prüft nur das iPhone-Projekt den Login mit der neuen Adresse. Die geteilte Testdatenbank füllt zudem die Liste «Für Fairgate» mit Einträgen aus anderen Tests, was den Screenshot unruhig macht.
+**Beobachtung:** Seit das Repo öffentlich ist, gibt es Deployment-Umgebungen mit Schutzregeln ohne GitHub Pro. Die SSH-Schlüssel liegen aber noch als gewöhnliche Repo-Secrets: Ein Workflow, der auf `dev` gepusht wird, kann den Live-Schlüssel lesen. Eine Umgebung `live` mit «nur `main` darf ausliefern» würde genau das Restrisiko schliessen, das im Sicherheitskonzept noch zu bestätigen ist. Zudem prüft jetzt auch GitHub selbst auf Secrets (mit Sperre beim Push); der Kommentar in `secret-scan.yml` («für private Repos kostenpflichtig») stimmt nicht mehr ganz, gitleaks bleibt trotzdem nützlich. Ebenso veraltet: der Kommentar in `check.yml` (Zeilen 5–6, Minuten über alle privaten Repos geteilt). Und `docs/betrieb-und-uebergabe.md` («Restrisiko plötzlicher Ausfall») hält die Nachfolger-Einstellung von GitHub-Privatkonten für ungeprüft «für private Repos»; für das jetzt öffentliche Repo neu prüfen.
 
-**Ursprung:** Task 8 zu #50.
+**Ursprung:** Session «Actions-Minuten», Wechsel des Repos auf öffentlich.
 
-**Einschätzung:** Hält, solange die Zahl der Mail-Tests klein bleibt. Kommen weitere dazu, eine Testeinstellung für die Grenzen oder eine IP je Projekt vorsehen.
+**Einschätzung:** Lohnt sich vor der ersten Live-Auslieferung (`AUSLIEFERUNG_LIVE`); Änderung am Workflow zählt als Code und braucht einen Probelauf auf `dev` und `main`. Der Kern (Umgebungen für die Schlüssel) ist mit Zustimmung des Projektleiters jetzt Issue [#61](https://github.com/konstantinniedermann/tco-app/issues/61), wartet auf das Hosting (#39); offen hier bleiben nur die veralteten Kommentare und die Nachfolger-Einstellung.
 
-### 2026-11-05 — Anlass: Kachel und Seite nennen den Anmeldeschluss zu ungenau
-
-**Thema:** App
-
-**Fundort:** `src/lib/anlass/stand.ts`, `src/routes/anlass/[id]/+page.svelte`
-
-**Beobachtung:** Die Kachel sagt nur den Tag («Bitte bis Di, 16. März …»); setzt der Admin den Schluss auf 12.00 Uhr, schliesst die Anmeldung schon mittags. Auf der Anlass-Seite steht nirgends, bis wann sich die Antwort ändern lässt.
-
-**Ursprung:** Code-Review und cas-reviewer zu #52.
-
-**Einschätzung:** Klein. Uhrzeit nennen, wenn sie nicht 23.59 ist; auf der Seite «Antwort änderbar bis …» ergänzen. Mit der Überarbeitung des Vorschlags nach K-50 erledigen.
-
-### 2026-11-05 — Anlass: Kalenderdatei ohne SEQUENCE, Steuerzeichen nicht entfernt, 404 als rohes JSON
-
-**Thema:** App
-
-**Fundort:** `src/lib/server/anlass/kalender.ts`, `src/lib/server/anlass/schnittstellen.ts` (`getKalender`)
-
-**Beobachtung:** Nach einer Terminänderung (FR-32) ersetzen manche Kalender den alten Eintrag beim erneuten Import nicht, weil `SEQUENCE`/`LAST-MODIFIED` fehlen. Steuerzeichen ausser Zeilenumbrüchen werden nicht entfernt (RFC 5545). Für einen gelöschten Anlass zeigt der Browser `{"fehler":"nicht-gefunden"}`, weil der Link ausserhalb der App öffnet.
-
-**Ursprung:** Code-Review und cas-reviewer zu #52.
-
-**Einschätzung:** Klein. `LAST-MODIFIED` aus *Termin geändert am*, Steuerzeichen in `maskiere` entfernen, für 404 kurzen Text liefern. Bei der Handprüfung auf echten Geräten (Release-Checkliste) mit ansehen.
-
-### 2026-11-05 — Verwaltung Anlässe: Meldung bei Zeitumstellung, «Gespeichert» und Zählung ausgetretener Mitglieder
-
-**Thema:** Verwaltung
-
-**Fundort:** `src/lib/server/anlass/angaben.ts`, `src/routes/verwaltung/anlaesse/[id]/+page.svelte`, `ladeAnlassAdmin`
-
-**Beobachtung:** Eine Zeit in der Lücke der Umstellung meldet «Bitte Datum und Zeit angeben.», obwohl beides angegeben ist. Scheitert nach dem Speichern das Neuladen, fehlt «Gespeichert». *kommen* und *kommen nicht* zählen auch Antworten von Mitgliedern, die inzwischen ausgetreten sind; *noch keine Antwort* zählt nur aktive.
-
-**Ursprung:** Code-Review und cas-reviewer zu #52.
-
-**Einschätzung:** Klein. Eigene Meldung für die Umstellung; bei Neuladefehler trotzdem rückmelden; Zählung auf aktive Mitglieder beschränken, sobald der Austritt gebaut ist (Etappe 3 von #43).
-
-### 2026-11-05 — Löschfrist für Anmeldungen zu Anlässen ist versprochen, aber nicht gebaut
+### 2026-11-06 — Repo öffentlich: Entscheid ohne ADR, Vereinsunterlagen jetzt einsehbar
 
 **Thema:** Betrieb
 
-**Fundort:** `docs/datenschutz.md` (*Löschen*), `docs/datenschutzerklaerung.md`, DS-06
+**Fundort:** `docs/ci-cd-und-release.md` («Öffentliches Repo, `main` auf GitHub geschützt»), `docs/anforderungen/` (Anforderungs-PDF, Autorfeld in den Metadaten), `CLAUDE.md` (Ausnahme für das Anforderungsdokument)
 
-**Beobachtung:** Datenschutzkonzept und -erklärung nennen «ein Jahr nach dem Anlass» (Vorschlag K-50). Gebaut ist nur das Löschen von Hand mit dem Anlass; das ist im Design so entschieden.
+**Beobachtung:** Der Wechsel auf öffentlich kehrt den früheren Entscheid «privat, kein GitHub Pro» um und lässt sich nicht ganz zurücknehmen. Begründung und Alternativen (Budget erhöhen, GitHub Pro, CI-Minuten senken) stehen nur in einem Nebensatz der CI/CD-Doku, nicht als ADR. Öffentlich sind jetzt auch Anforderungs-PDF, Abklärungen, Recherchen, Issues und CI-Logs. Im Autorfeld des PDFs steht der volle Name der verfassenden Person aus dem Vorstand; der Projektleiter hat entschieden, es so zu lassen und den Vorstand nicht zu informieren. Die Ausnahme in `CLAUDE.md` für das Anforderungsdokument stammt aus der Zeit, als das Repo privat war.
 
-**Ursprung:** Code-Review und cas-reviewer zu #52.
+**Ursprung:** Review (`cas-reviewer`) des Branches `docs/repo-oeffentlich`.
 
-**Einschätzung:** Mit den übrigen Löschfristen bauen (Austritt, K-38). Bis dahin löscht der Admin vergangene Anlässe. Vor dem Live-Gang mit Mitgliederdaten prüfen, ob DS-06 dafür erfüllt sein muss.
+**Einschätzung:** Ein kurzes ADR würde den Entscheid und die Alternativen festhalten (ähnlich ADR-007). Neue Vereinsdokumente vor dem Einchecken auf Metadaten prüfen.
 
-### 2026-11-05 — Beispiel-GV in make seed läuft im März 2027 ab
+### 2026-11-06 — Turnierjahr ändern prüft bestehende Kategorien nicht gegen das neue Jahr
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/turnier/turniere.ts`, `aendereTurnier`
+
+**Beobachtung:** Wird das Turnierjahr geändert, werden bestehende Kategorien nicht gegen das neue Jahr geprüft. Ein Jahrgang bis kann dadurch grösser als das Turnierjahr werden.
+
+**Ursprung:** Review #57.
+
+**Einschätzung:** Niedrig; in der Praxis bleibt das Jahr eines Turniers fest.
+
+### 2026-11-06 — Letzte Kategorie absagen kann ein offenes Turnier ohne aktive Kategorie hinterlassen
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/turnier/turniere.ts`, `sageKategorieAb`
+
+**Beobachtung:** `sageKategorieAb` sperrt die Turnierzeile nicht. Zusammen mit dem Absagen der letzten Kategorie kann ein offenes Turnier ohne aktive Kategorie entstehen.
+
+**Ursprung:** Review #57.
+
+**Einschätzung:** Mit #58 (Absage-Sperre) mitlösen.
+
+### 2026-11-06 — Kategorientabelle am Handy: Klassierung nur durch seitliches Schieben erreichbar
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/routes/verwaltung/turniere/[id]/+page.svelte`, Tabelle *Kategorien*
+
+**Beobachtung:** Am Handy ist die Spalte Klassierung nur durch seitliches Schieben erreichbar; «Einzel» und «Doppel» werden getrennt umbrochen (Ein-zel, Dop-pel).
+
+**Ursprung:** Review #57.
+
+**Einschätzung:** Mit der Spalte Anmeldungen in #58 neu ansehen.
+
+### 2026-11-06 — Kleinbefunde aus den Reviews von #57 (Politur, Testlücken)
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/turnier/`, `src/lib/verwaltung/`, `src/routes/verwaltung/turniere/`, `scripts/beispiel-turnier.ts`
+
+**Beobachtung:** Aus den Task-Reviews, im Gesamt-Review als «nicht vor dem Merge» eingestuft:
+- Hilfetext Mindestsumme sagt «ohne Lizenz», das Fachmodell «keine Lizenz» (`Kategorieformular.svelte`).
+- Keine Unit-Tests für `startziel`/`offenFuerCm` (`src/lib/verwaltung/umleiten.ts`); nur E2E.
+- Hinweis «Mixed gibt es nur im Doppel.» nicht per `aria-describedby` an die Gruppe gebunden.
+- Grenzen der Turniernummern im Browser kopiert (`Turnierformular.svelte`), nicht aus einem gemeinsamen Modul.
+- RR-08-Bedingung (nicht gesperrt, Mitglied aktiv) steht zweimal in `src/lib/server/admin/rollen.ts`.
+- Seed prüft im Test nur die Kategorienamen, nicht ihre Werte; Zweig «nach dem Anmeldeschluss → in Vorbereitung» ungetestet; Ergebnisse von `legeKategorieAn`/`setzeStatus` werden verworfen.
+- Die E2E-Turniere 2097–2099 bleiben nach dem Lauf in der E2E-Datenbank stehen.
+- Am Handy hatte der Entwurf zwei Tasten in voller Breite (`taste-breit`), die App nicht.
+
+**Ursprung:** Task- und Gesamt-Review #57.
+
+**Einschätzung:** Alles klein. «keine Lizenz» und die Anzeige am Handy mit Teil 2 (#58) angleichen; RR-08 doppelt fällt beim Rollen-Umbau (Entwurf «Rollen schärfen») ohnehin an.
+
+### 2026-11-06 — Abgewiesener Push nach dev: «nächste freie Nummer» scheitert am eigenen Pre-Push-Hook, wenn dev zwei Schritte weiter ist
 
 **Thema:** Betrieb
 
-**Fundort:** `scripts/beispiel-anlass.ts`
+**Fundort:** `.claude/skills/tco-branching/SKILL.md` (Schritt 4, «Wird der Push abgewiesen …»), `docs/adr/adr-007-version-pro-merge.md`, `scripts/pruefungen/version-merge.ts` (Vergleich mit dem ersten Elternteil)
 
-**Beobachtung:** Die Daten sind fest (Beginn 19.03.2027). Nach dem Anmeldeschluss legt das Skript keine Antworten mehr an, nach dem Beginn erscheint die GV nicht mehr auf der Startseite.
+**Beobachtung:** Der Hook vergleicht jeden Commit mit seinem ersten Elternteil. Nach `pull --no-commit origin dev` ist das der eigene, noch nicht gepushte Merge-Commit. Hat `dev` inzwischen zwei Code-Merges oder eine Nebenversion bekommen, ist die nächste freie Nummer kein einzelner Schritt mehr, und der Push wird dauerhaft abgewiesen; zurücksetzen verbietet der Ablauf. In einem Wegwerf-Repo nachgestellt: `version-merge: …: 0.6.1 → 0.6.3 ist kein einzelner Schritt`, Exit 1. Kein Test deckt den Fall ab.
 
-**Ursprung:** Code-Review und cas-reviewer zu #52.
+**Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
 
-**Einschätzung:** Klein, nur lokal. Daten relativ zu `jetzt` berechnen, wenn der Vorschlag nach dem März 2027 noch vorgezeigt wird.
+**Einschätzung:** Randfall, blockiert nur den Merge nach `dev`. Lösungsweg: bei einem Merge-Commit gegen die höchste Version aller Elternteile prüfen, mit eigenem Test.
 
-### 2026-11-05 — E2E «Menü auf der Einstiegsseite bleibt beim weichen Aufklappen richtig gebunden» schlägt auf Android gelegentlich fehl
+### 2026-11-06 — Turnierseite verspricht eine Anmeldung der Mitglieder, die es noch nicht gibt
 
-**Thema:** App
+**Thema:** Turnier-Verwaltung
 
-**Fundort:** `tests/e2e/bewegung.test.ts:283` (Projekt `android`)
+**Fundort:** `src/routes/verwaltung/turniere/[id]/+page.svelte` (Texte bei *Anmeldung offen* «Mitglieder melden sich bis … an» und bei *geschlossen* «Mitglieder sehen ihre Anmeldungen …»)
 
-**Beobachtung:** Lokal in `make check` einmal, bei `--repeat-each 3` einmal von drei Läufen: Die Taste «MyTCO installieren» erscheint nicht innerhalb von 30 s nach `bietetInstallationAn(page, 'dismissed')`. Die übrigen Läufe und die CI auf `dev` sind grün.
+**Beobachtung:** Für Mitglieder gibt es weder Seite noch Schnittstelle zum Turnier; die kommt mit Teil 2 (#58). Der CM-Verantwortliche liest aber, Mitglieder könnten sich jetzt anmelden. In `docs/versionen.md` (0.6.0) ist der Stand jetzt nachgetragen.
 
-**Ursprung:** Abschluss-Prüfung zu #52 (der Branch ändert Einstiegsseite und Test nicht).
+**Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
 
-**Einschätzung:** Vermutlich Wettlauf zwischen dem nachgestellten Install-Angebot und dem Laden der Seite. Bei der nächsten Arbeit an #54 oder der Einstiegsseite ansehen.
+**Einschätzung:** Heute ohne Wirkung, weil weder Test noch Live ausgeliefert werden. Text anpassen oder bis #58 so lassen; spätestens bevor ein CM-Verantwortlicher die Verwaltung auf Test oder Live sieht.
 
-**Nachtrag 2026-11-05:** In der CI auf `dev` (Lauf 42041712102) scheiterte im Projekt `iphone` einmal auch `bewegung.test.ts:210` «Zwei schnelle Reiter-Klicks hintereinander» (`toHaveURL` nach 5 s); der erneute Lauf war grün. Die Tests zu den weichen Seitenwechseln wirken unter WebKit in der CI zeitempfindlich.
+### 2026-11-06 — Kleinbefunde aus dem Doku-Abgleich vor dem Release (Code-Kommentare, Tests)
 
-**Nachtrag 2026-11-05 (Nacharbeit #54):** Lokal nicht nachgestellt: zwei volle E2E-Läufe und `bewegung.test.ts` mit `--repeat-each 4` auf `iphone` und `android` waren grün, auch beide Tests oben. Seit der Nacharbeit scrollt nur noch der Rollbereich; ob das die Zeitempfindlichkeit in der CI ändert, zeigen erst die nächsten CI-Läufe.
+**Thema:** Turnier-Verwaltung
 
-### 2026-11-05 — Mockups zeigen den Rollbereich noch nicht
+**Fundort:** `src/lib/verwaltung/Kategorieformular.svelte`, `src/lib/turnier/klassierung.ts`, `src/lib/server/turnier/schnittstellen.db.test.ts`, `vitest.config.ts`, `.githooks/pre-push`, `Makefile` (Ziel `hooks`), `docs/fachmodell.md`
 
-**Thema:** App
+**Beobachtung:**
+- Annahmen nicht dort markiert, wo sie wirken: Vorbelegung der Mindestsumme 9 (K-51) im Kategorieformular, Skala N1–N4/R1–R9 (K-25.1) in `klassierung.ts`; `make annahmen` findet sie nicht.
+- Rechte-Test der Turnier-Schnittstellen spielt die Rolle `lizenz` nicht durch (Testkonzept: «jede Rolle»); `lizenz` ist anderswo als Nicht-Verwaltungsrolle getestet.
+- `src/lib/turnier/` (Status FR-33, Klassierungsreihenfolge FR-34) liegt ausserhalb der Abdeckungsmessung (`src/lib/server/**`), wie schon `src/lib/anlass/`.
+- `.githooks/pre-push` begründet den lokalen Schutz noch mit «Branch-Schutz für private Repos nur mit Pro»; `make help` beim Ziel `hooks` nennt die Versionsprüfung beim Push auf `dev` nicht.
+- Fachmodell-Diagramm nennt `AnmeldungAnlass`, der Code `anlassAnmeldung` / `anlass_anmeldung`, obwohl die Namen im Code dem Diagramm folgen sollen.
 
-**Fundort:** `docs/ui-mockups/*.html` (Handy-Rahmen `.handy` in `mockup.css`)
+**Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
 
-**Beobachtung:** Seit der Nacharbeit zu #54 scrollt in der App nur der Rollbereich (`.app.schale` mit `.rollbereich`), Kopfleiste und Reiter stehen fest. Die Mockups bauen die Seite noch ohne `.schale` und `.rollbereich`; im Handy-Rahmen scrollt der ganze Rahmen samt Kopfleiste und Reiter.
-
-**Ursprung:** Nacharbeit #54 (Test am iPhone), beim Abschluss.
-
-**Einschätzung:** Nur Darstellung der Mockups, die App ist richtig. Beim nächsten Mockup-Umbau `.schale` und `.rollbereich` übernehmen und den Rahmen auf `height: 100 %` der Schale stellen.
-
-### 2026-11-05 — E2E A-LOGIN-09 «nach Neuladen weiterhin angemeldet» scheiterte einmal auf dem iPhone
-
-**Thema:** App
-
-**Fundort:** `tests/e2e/login.test.ts` (A-LOGIN-09, Projekt `iphone`)
-
-**Beobachtung:** Im vollen E2E-Lauf des Pre-Push-Hooks einmal rot; einzeln mit `--repeat-each 5` fünfmal grün, in drei vollen Läufen davor ebenfalls grün.
-
-**Ursprung:** Fix-Branch zu #54 (Beschriftung der Eingabetaste), beim Pushen.
-
-**Einschätzung:** Zeitempfindlich unter Last wie die schon erfassten Ausreisser der Seitenwechsel-Tests; zusammen mit diesen ansehen.
-
-### 2026-11-05 — Datenschutzerklärung verspricht Löschung des Änderungsverlaufs nach 12 Monaten, nicht gebaut
-
-**Thema:** Betrieb
-
-**Fundort:** `docs/datenschutzerklaerung.md` (Änderungsverlauf «12 Monate»), FR-26 (geplant), DS-06
-
-**Beobachtung:** Die Erklärung in der App nennt 12 Monate für den Änderungsverlauf; gelöscht wird nichts. Ebenso sind die Fristen bei Austritt und Löschen (FR-04) nicht gebaut. Nur die Zeile zu den Anlässen trägt in `docs/datenschutz.md` den Vermerk «bis die Löschfristen gebaut sind».
-
-**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereiche App sowie Daten/Tests).
-
-**Einschätzung:** Heute ohne Folge (nicht ausgeliefert, Erklärung als Entwurf markiert). Die Release-Checkliste in `docs/testkonzept.md` verlangt jetzt vor dem ersten Live-Release mit Mitgliedern, dass Hinweis an die alte Adresse, Verlauf-Löschung und Anlass-Löschung gebaut sind oder die Erklärung angepasst ist. Mit dem Eintrag zur Löschfrist der Anlass-Anmeldungen zusammen bauen.
-
-### 2026-11-05 — «erstellt von» am Anlass ist ein Personenbezug ohne aufgeführten Zweck
-
-**Thema:** Verwaltung
-
-**Fundort:** `src/lib/server/db/schema.ts` (`anlass.erstellt_von`), `docs/fachmodell.md` (Objekt Anlass, Personendaten «—»), `docs/datenschutz.md` (*Welche Daten*)
-
-**Beobachtung:** Die Spalte verweist auf den Admin, der den Anlass anlegt; sie wird geschrieben, aber nirgends gelesen oder angezeigt. Fachmodell und Datenschutzkonzept führen sie nicht als Personendatum (DS-04: nur aufgeführte Felder).
-
-**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereiche App sowie Daten/Tests).
-
-**Einschätzung:** Entweder streichen (neue Migration) oder mit Zweck ins Konzept und Fachmodell. Entscheid bei der nächsten Arbeit an den Anlässen.
-
-### 2026-11-05 — Test-IDs und Testdaten-Regel weichen vom Testkonzept ab
-
-**Thema:** App
-
-**Fundort:** `src/lib/login/passkey.test.ts` (Tests mit A-LOGIN-10 und A-LOGIN-11), `scripts/pruefungen/test-ids.ts`, `scripts/pruefungen/testdaten.ts`, `scripts/beispiel-anlass.ts`, `docs/testkonzept.md`
-
-**Beobachtung:** Zwei Passkey-Tests nennen A-LOGIN-10 bzw. A-LOGIN-11 (SMS/App, «später»), prüfen aber Passkey-Funktionen (A-LOGIN-07). Die Prüfung `test-ids` lässt die ID irgendwo in der Datei genügen, auch im Kommentar, strenger klingt das Testkonzept («jeder Test nennt im Namen die ID»). `scripts/beispiel-anlass.ts` legt fünf weitere erfundene Mitglieder an; das Testkonzept nennt nur `scripts/erfundene-mitglieder.ts`, und `testdaten` prüft die Datei nicht (nur Dateinamen `seed*`, `erfundene-*`). Die Daten selbst sind erfunden (`@example.org`).
-
-**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereich Daten/Tests).
-
-**Einschätzung:** Kleinere Prüf-Lücken ohne Folge für Mitglieder. IDs umbenennen (prüfen, ob A-LOGIN-10 dann noch einen Test hat), Prüfung `testdaten` um die Datei erweitern, Satz im Testkonzept angleichen.
-
-### 2026-11-05 — Fachmodell und Anforderungen bei den Anlässen nicht ganz nachgeführt
-
-**Thema:** App
-
-**Fundort:** `docs/fachmodell.md` (Überblick-Diagramm), `docs/anforderungen/anforderungen.md` (A-STARTSEITE-04), FR-27, `src/lib/server/anlass/` (`ladeAnlassFuerMitglied`)
-
-**Beobachtung:** Im Überblick-Diagramm fehlen `Anlass` und die Anmeldung (Code-Name `anlassAnmeldung`). A-STARTSEITE-04 steht auf «geplant», die Startseite zeigt aber schon kommende Anlässe mit dem eigenen Stand. FR-27 sagt «sichtbar, solange der Beginn nicht vorbei ist»; die Detailseite liefert auch vergangene Anlässe aus (nur mit der eigenen Antwort).
-
-**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereich Daten/Tests).
-
-**Einschätzung:** Nur Doku-Stand, ohne Datenschutzfolge. Bei der nächsten Arbeit an den Anlässen nachziehen; FR-27 klären (Detailseite nach dem Anlass sperren oder Satz anpassen).
-
-### 2026-11-05 — Datenschutzerklärung siezt, die App duzt
-
-**Thema:** App
-
-**Fundort:** `docs/datenschutzerklaerung.md` gegen `docs/ui-leitbild.md` (Sprache: Du-Form)
-
-**Beobachtung:** Die Erklärung (in der App unter «Datenschutz») spricht die Mitglieder mit «Sie» an, Leitbild, Hilfe und App duzen.
-
-**Ursprung:** Doku-Abgleich vor 0.5.0 (Bereich App).
-
-**Einschätzung:** Entscheid des Projektleiters bzw. Vorstands zusammen mit der Freigabe der Erklärung (K-06.2).
+**Einschätzung:** Alles klein, Code-Änderungen mit `make check` und Korrekturnummer; nicht im reinen Doku-Release mitgemacht. Abdeckung: entweder `src/lib/turnier/**` mitmessen oder die Ausnahme im Testkonzept festhalten.

@@ -36,7 +36,8 @@ sie, Geheimnisse stehen darin keine).
   und meldet ohne Ziel `fehler`. `RESTIC_REPOSITORY` in `sicherung.env` ohne Anführungszeichen,
   als absoluter Pfad oder mit Schema (`s3:…`, `sftp:…`, `rest:…` usw.). Anlegen als `mytco`:
   `( . /opt/mytco/bin/lib.sh && restic_docker init </dev/null )`
-- systemd-Units `systemd/mytco-sicherung.{service,timer}` nach `/etc/systemd/system/`. Den Timer
+- systemd-Units `systemd/mytco-sicherung.{service,timer}` nach `/etc/systemd/system/`. Der Timer
+  startet jede Nacht um 02:30 (Serverzeit; verpasste Läufe holt er nach). Den Timer
   erst einschalten, wenn Live eingeschaltet und einmal ausgeliefert ist (vorher meldet er jede
   Nacht `fehler`): `systemctl enable --now mytco-sicherung.timer`.
 
@@ -46,6 +47,9 @@ Vorausgesetzt wird `PermitUserEnvironment no` (Standard) und das übliche `Accep
 Der Passwort-Hash für Test kommt aus `caddy hash-password` und steht in `proxy.env` in
 einfachen Anführungszeichen: `MYTCO_TEST_PASSWORT_HASH='$2a$14$…'`. Ohne sie frisst Compose die
 `$`-Zeichen.
+
+`MYTCO_HTTP_PORT` und `MYTCO_HTTPS_PORT` (Vorgabe 80 und 443) stehen nicht in der Vorlage;
+sie braucht nur der lokale Nachweis (`nachweis/nachweis.sh`), auf dem Server bleiben sie leer.
 
 **Änderungen an `proxy.env`** wirken mit der nächsten Auslieferung oder sofort mit
 `docker compose -p mytco-proxy -f /opt/mytco/proxy/compose.proxy.yml --env-file /opt/mytco/proxy/proxy.env up -d`.
@@ -69,6 +73,11 @@ trotzdem zu Ende.
 | Sichern (mit `ohne-aufraeumen` ohne `forget --prune`) | `/opt/mytco/gemeinsam/bin/sichern <umgebung> [ohne-aufraeumen]` |
 | Wiederherstellen (neuester oder bestimmter Lauf; sichert vorher) | `/opt/mytco/gemeinsam/bin/wiederherstellen <umgebung> [lauf-…] [ohne-sicherung]` |
 | Probe in einer Wegwerf-Datenbank | `/opt/mytco/gemeinsam/bin/probe <umgebung> [lauf-…]` |
+
+`sichern` zählt die Datensätze vor und nach dem Dump. Weichen die Zahlen ab, weil jemand
+währenddessen etwas geändert hat, verwirft es den Lauf und versucht es erneut, höchstens
+dreimal. Nach jeder gelungenen Auslieferung löscht `ausliefern` die Images des Repos, ausser
+dem aktuellen und dem vorherigen von Test und Live; ein Fehler dabei steht nur im Protokoll.
 
 Ist in `live/geheim.env` `MAIL_NUR_AN` gesetzt (Leerzeichen und Anführungszeichen zählen
 nicht; erkannt wird jede Zeilenform, die Compose liest, auch `export MAIL_NUR_AN=…` und
@@ -118,9 +127,10 @@ Die Angaben landen im Shell-Verlauf: Befehl mit führendem Leerzeichen eingeben 
 sich der Admin über «Code per E-Mail» an. Auf Test ist Erika Beispiel (erfunden) automatisch
 Admin.
 
-## Auslieferung ohne CI (keine Actions-Minuten)
+## Auslieferung ohne CI
 
-Ohne Minuten baut die CI auch kein Image. Dann von Hand:
+Fällt die CI aus (GitHub-Ausfall, oder das Repo wird wieder privat und die Actions-Minuten
+sind aufgebraucht), baut sie auch kein Image. Dann von Hand:
 
 1. Persönliches Token (classic) bei GitHub anlegen, nur mit `write:packages`, kurze Laufzeit.
 2. Lokal bauen und in die Ablage schieben:

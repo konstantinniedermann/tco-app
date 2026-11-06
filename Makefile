@@ -4,7 +4,10 @@
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
 
-check: docs voraussetzungen voraussetzungen-docker ## Alle Prüfungen wie in der CI, ausser Secret-Scan (Hook), OSV-Malware-Prüfung und Rauchtest (nur CI)
+# Grün gemerkt wird nur ein sauberer, während der Prüfung unveränderter Stand (scripts/pruefungen/gruener-stand.ts);
+# der Pre-Push-Hook lässt make check für ihn aus.
+check: docs voraussetzungen voraussetzungen-docker ## Alle Prüfungen wie in der CI, ausser Secret-Scan (Hook), OSV-Malware-Prüfung und Rauchtest (nur CI); merkt sich den Stand, wenn grün
+	@node scripts/pruefungen/gruener-stand.ts beginn
 	npm run lint
 	npm run check:svelte
 	npm run pruefungen
@@ -13,6 +16,7 @@ check: docs voraussetzungen voraussetzungen-docker ## Alle Prüfungen wie in der
 	npm run build:spa
 	$(MAKE) e2e
 	$(MAKE) image
+	@node scripts/pruefungen/gruener-stand.ts merken
 
 check-schnell: docs voraussetzungen ## Schnellprüfung ohne Datenbank (Doku, Lint, Svelte-Check, Prüfskripte, Einheitstests) — pre-commit bei Code
 	npm run lint
@@ -54,7 +58,7 @@ dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einste
 dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs iPhone im selben WLAN mit festen Namen für Erika und Kurt (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
 	./scripts/dev-handy.sh
 
-seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 3 erfundene Mitglieder und eine Beispiel-GV anlegen, Brief-Codes für Erika (Admin) und Kurt (Mitglied) ausgeben (Einstellungen aus .env)
+seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 3 erfundene Mitglieder, eine Beispiel-GV und ein Beispielturnier 2027 anlegen, Brief-Codes für Erika (Admin), Kurt (Mitglied) und Hanna Muster (CM) ausgeben (Einstellungen aus .env)
 	node --env-file=.env scripts/migrate.ts
 	node --env-file=.env scripts/seed-lokal.ts
 

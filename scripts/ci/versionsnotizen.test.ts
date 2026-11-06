@@ -28,8 +28,8 @@ const VERSIONEN = `# Versionen
 
 let ordner: string;
 
-function notizen(version: string): { status: number | null; ausgabe: string } {
-	const lauf = spawnSync('bash', [SKRIPT, version], { cwd: ordner, encoding: 'utf-8' });
+function notizen(...argumente: string[]): { status: number | null; ausgabe: string } {
+	const lauf = spawnSync('bash', [SKRIPT, ...argumente], { cwd: ordner, encoding: 'utf-8' });
 	return { status: lauf.status, ausgabe: lauf.stdout };
 }
 
@@ -60,6 +60,21 @@ describe('versionsnotizen.sh', () => {
 		const lauf = notizen('9.9.9');
 		expect(lauf.status).toBe(0);
 		expect(lauf.ausgabe.trim()).toBe('');
+	});
+	it('fasst mit Vorversion alle Abschnitte danach bis zur Version zusammen, neueste zuerst', () => {
+		expect(notizen('1.2.30', '1.2.3').ausgabe).toBe(
+			'### 1.2.30 — später\n\n- dreissig\n\n### 1.2.4\n\n- vier\n\n'
+		);
+	});
+	it('nimmt mit Vorversion weder Neueres noch «Unveröffentlicht» mit', () => {
+		const ausgabe = notizen('1.2.4', '1.2.0').ausgabe;
+		expect(ausgabe).toContain('### 1.2.4');
+		expect(ausgabe).toContain('### 1.2.3 — Datum');
+		expect(ausgabe).not.toContain('dreissig');
+		expect(ausgabe).not.toContain('offen');
+	});
+	it('gibt mit Vorversion nichts aus, wenn kein Abschnitt dazwischen liegt', () => {
+		expect(notizen('1.2.3', '1.2.3').ausgabe.trim()).toBe('');
 	});
 	it('bricht ohne Versionsargument ab', () => {
 		const lauf = spawnSync('bash', [SKRIPT], { cwd: ordner, encoding: 'utf-8' });

@@ -12,20 +12,22 @@ import {
 } from '../login/codes.ts';
 import type { Mailer } from '../login/dienst.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
-import { istAdmin } from './rollen.ts';
+import { verwaltungsrollen, type VerwaltungsRolle } from './rollen.ts';
 
 // SI-08: Die Bestätigung gilt 24 Stunden für diese Sitzung.
 export const ADMIN_BESTAETIGUNG_MS = 24 * 60 * 60 * 1000;
 
+// RR-07: `rollen` ist nie leer; ohne Verwaltungsrolle heisst die Stufe `keine-rolle`.
+// Die Rollen werden bei jeder Prüfung neu gelesen: Entzug oder Sperre wirkt sofort.
 export type Zugang =
-	| { stufe: 'bestaetigt'; kontoId: number; mitgliedId: number }
-	| { stufe: 'unbestaetigt' }
-	| { stufe: 'kein-admin' }
+	| { stufe: 'bestaetigt'; kontoId: number; mitgliedId: number; rollen: VerwaltungsRolle[] }
+	| { stufe: 'unbestaetigt'; rollen: VerwaltungsRolle[] }
+	| { stufe: 'keine-rolle' }
 	| { stufe: 'abgemeldet' };
 
 export type ZugangDienst = {
 	pruefe(konto: AngemeldetesKonto | undefined): Promise<Zugang>;
-	// `arbeit` läuft ohne Warten des Aufrufers und lehnt nie ab. Kein Admin: keine Mail.
+	// `arbeit` läuft ohne Warten des Aufrufers und lehnt nie ab. Keine Verwaltungsrolle: keine Mail.
 	fordereCodeAn(
 		konto: AngemeldetesKonto
 	): Promise<{ annahme: 'ok' | 'zu-viele'; arbeit: Promise<void> }>;
@@ -61,17 +63,21 @@ export function erstelleZugangDienst(abh: ZugangAbh): ZugangDienst {
 	const { db, schluessel, kontakt, bremsen } = abh;
 	const jetzt = abh.jetzt ?? (() => new Date());
 
+	const hatVerwaltungsrolle = async (kontoId: number) =>
+		(await verwaltungsrollen(db, kontoId)).length > 0;
+
 	async function pruefe(k: AngemeldetesKonto | undefined): Promise<Zugang> {
 		if (!k) return { stufe: 'abgemeldet' };
-		if (!(await istAdmin(db, k.kontoId))) return { stufe: 'kein-admin' };
+		const rollen = await verwaltungsrollen(db, k.kontoId);
+		if (rollen.length === 0) return { stufe: 'keine-rolle' };
 		const [zeile] = await db
 			.select({ am: sitzung.adminBestaetigtAm })
 			.from(sitzung)
 			.where(eq(sitzung.kennungHash, k.sitzungHash));
 		if (!zeile?.am || jetzt().getTime() - zeile.am.getTime() >= ADMIN_BESTAETIGUNG_MS) {
-			return { stufe: 'unbestaetigt' };
+			return { stufe: 'unbestaetigt', rollen };
 		}
-		return { stufe: 'bestaetigt', kontoId: k.kontoId, mitgliedId: k.mitgliedId };
+		return { stufe: 'bestaetigt', kontoId: k.kontoId, mitgliedId: k.mitgliedId, rollen };
 	}
 
 	async function speichereUndSende(k: AngemeldetesKonto, an: string): Promise<void> {
@@ -94,12 +100,13 @@ export function erstelleZugangDienst(abh: ZugangAbh): ZugangDienst {
 		}
 	}
 
-	// Die Grenze darf hier sichtbar werden: Der Aufrufer ist angemeldeter Admin, die Adresse seine eigene.
+	// Die Grenze darf hier sichtbar werden: Der Aufrufer ist angemeldet und hat eine Verwaltungsrolle,
+	// die Adresse ist seine eigene.
 	async function fordereCodeAn(
 		k: AngemeldetesKonto
 	): Promise<{ annahme: 'ok' | 'zu-viele'; arbeit: Promise<void> }> {
 		const keineMail = { annahme: 'ok' as const, arbeit: Promise.resolve() };
-		if (!(await istAdmin(db, k.kontoId))) return keineMail;
+		if (!(await hatVerwaltungsrolle(k.kontoId))) return keineMail;
 		const [m] = await db
 			.select({ email: mitglied.email })
 			.from(konto)
@@ -120,7 +127,7 @@ export function erstelleZugangDienst(abh: ZugangAbh): ZugangDienst {
 
 	async function bestaetige(k: AngemeldetesKonto, eingabe: unknown): Promise<'ok' | 'falsch'> {
 		const code = typeof eingabe === 'string' ? normalisiereMailCode(eingabe) : null;
-		if (code === null || !(await istAdmin(db, k.kontoId))) return 'falsch';
+		if (code === null || !(await hatVerwaltungsrolle(k.kontoId))) return 'falsch';
 		const t = jetzt();
 		// Der Versuch wird atomar reserviert; mehr als 5 sind auch parallel nicht möglich.
 		const [reserviert] = await db
