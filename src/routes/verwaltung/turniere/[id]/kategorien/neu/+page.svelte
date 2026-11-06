@@ -26,7 +26,9 @@
 		laeuft = false;
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok') {
-			await goto(resolve('/verwaltung/turniere/[id]', { id: String(data.turnier.id) }));
+			await goto(resolve('/verwaltung/turniere/[id]', { id: String(data.turnier.id) }), {
+				refreshAll: true
+			});
 		} else if (a.art === 'eingabe') {
 			fehler = a.felder;
 		} else if (a.art === 'vergeben') {
