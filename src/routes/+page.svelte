@@ -5,6 +5,7 @@
 	import { standText as cmStandText } from '../lib/cm/anzeige.ts';
 	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { hinweisErledigt, kannPasskey, richtePasskeyEin } from '../lib/login/passkey.ts';
+	import PushHinweis from '../lib/push/PushHinweis.svelte';
 	import { datumLang } from '../lib/verwaltung/turnier-anzeige.ts';
 	import type { PageProps } from './$types';
 
@@ -69,6 +70,9 @@
 		{/if}
 	</div>
 {/if}
+
+<!-- Ein Angebot nach dem anderen: Push erst, wenn der Passkey-Hinweis weg ist (UI-04). -->
+<PushHinweis aktiv={!sichtbar && data.ansicht === null} />
 
 {#if data.turniere.length > 0 || data.anlaesse.length > 0}
 	<h2>Jetzt aktuell</h2>

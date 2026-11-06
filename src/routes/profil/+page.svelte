@@ -22,6 +22,7 @@
 		type EigenesFeld
 	} from '../../lib/profil/angaben.ts';
 	import { vergissWechsel } from '../../lib/profil/wechselanfrage.ts';
+	import Benachrichtigungen from '../../lib/push/Benachrichtigungen.svelte';
 	import {
 		KLASSIERUNGEN,
 		klassierungName,
@@ -538,6 +539,8 @@
 		</p>
 	</div>
 </details>
+
+<Benachrichtigungen {nurAnsehen} />
 
 <div class="karte">
 	<button

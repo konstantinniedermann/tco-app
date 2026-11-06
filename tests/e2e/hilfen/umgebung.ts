@@ -12,7 +12,12 @@ const STANDARD = {
 	MYTCO_CODE_SCHLUESSEL: 'nur-lokal-nicht-fuer-produktion-0123456789abcdef',
 	MYTCO_SMTP_URL: 'smtp://localhost:51025',
 	MYTCO_MAIL_ABSENDER: 'MyTCO <mytco@example.org>',
-	MYTCO_KONTAKT: 'das Sekretariat (erfunden), sekretariat@example.org'
+	MYTCO_KONTAKT: 'das Sekretariat (erfunden), sekretariat@example.org',
+	// Das Beispiel-Paar aus .env.example (SI-22): Mit Schlüssel zeigt die App Push an. Echt
+	// abonniert wird im E2E nicht, der Push-Dienst ist in der CI nicht erreichbar.
+	MYTCO_VAPID_OEFFENTLICH:
+		'BCUfPbrWschrERMITs9b_aJhHWZSvc7oWyUHpVd_omS5ejcBc5z7q2beiy7XknqCc5dnOM7olJiRPqYTc66ltm4', // gitleaks:allow
+	MYTCO_VAPID_PRIVAT: 'AlluMnyXOTzUIJlj8DqJ8fyieKtuVOMsa0u-fKAuKxI' // gitleaks:allow
 };
 
 export type E2eEinstellungen = typeof STANDARD & { MYTCO_ADRESSE: string };
@@ -25,6 +30,8 @@ export function e2eEinstellungen(adresse: string): E2eEinstellungen {
 		MYTCO_SMTP_URL: env.MYTCO_SMTP_URL || STANDARD.MYTCO_SMTP_URL,
 		MYTCO_MAIL_ABSENDER: env.MYTCO_MAIL_ABSENDER || STANDARD.MYTCO_MAIL_ABSENDER,
 		MYTCO_KONTAKT: env.MYTCO_KONTAKT || STANDARD.MYTCO_KONTAKT,
+		MYTCO_VAPID_OEFFENTLICH: env.MYTCO_VAPID_OEFFENTLICH || STANDARD.MYTCO_VAPID_OEFFENTLICH,
+		MYTCO_VAPID_PRIVAT: env.MYTCO_VAPID_PRIVAT || STANDARD.MYTCO_VAPID_PRIVAT,
 		MYTCO_ADRESSE: env.MYTCO_ADRESSE || adresse
 	};
 }

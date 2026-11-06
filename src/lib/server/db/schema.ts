@@ -66,8 +66,17 @@ export const konto = pgTable('konto', {
 	mailCodeAblauf: timestamp('mail_code_ablauf', { withTimezone: true }),
 	mailCodeFehlversuche: integer('mail_code_fehlversuche').notNull().default(0),
 	// Zufällige Konto-Kennung für WebAuthn (base64url aus 32 Zufallsbytes), gesetzt beim ersten Versuch, einen Passkey einzurichten.
-	passkeyKennung: text('passkey_kennung').unique('konto_passkey_kennung_unique')
+	passkeyKennung: text('passkey_kennung').unique('konto_passkey_kennung_unique'),
+	// Themen, zu denen das Mitglied Mitteilungen erhält (FR-41); neue Konten haben alle an.
+	themaAnlaesse: boolean('thema_anlaesse').notNull().default(true),
+	themaCm: boolean('thema_cm').notNull().default(true),
+	themaVerein: boolean('thema_verein').notNull().default(true)
 });
+
+export type Thema = 'anlaesse' | 'cm' | 'verein';
+export type Weg = 'push' | 'push-sonst-mail' | 'push-und-mail';
+// 'cm' kommt mit dem CM-Plan.
+export type Bezug = 'anlass' | 'verein';
 
 export const sitzung = pgTable(
 	'sitzung',
@@ -273,6 +282,55 @@ export const kategorie = pgTable(
 		uniqueIndex('kategorie_name_aktiv_unique')
 			.on(t.turnierId, sql`lower(${t.name})`)
 			.where(sql`${t.status} = 'aktiv'`)
+	]
+);
+
+// Push-Abo eines Geräts (FR-40); hängt an der Sitzung und verschwindet mit ihr.
+export const pushAbo = pgTable(
+	'push_abo',
+	{
+		endpunkt: text('endpunkt').primaryKey(),
+		sitzungHash: text('sitzung_hash')
+			.notNull()
+			.references(() => sitzung.kennungHash, { onDelete: 'cascade' }),
+		kontoId: integer('konto_id')
+			.notNull()
+			.references(() => konto.id, { onDelete: 'cascade' }),
+		p256dh: text('p256dh').notNull(),
+		auth: text('auth').notNull(),
+		eingerichtetAm: timestamp('eingerichtet_am', { withTimezone: true }).notNull()
+	},
+	(t) => [
+		index('push_abo_konto_id_idx').on(t.kontoId),
+		// FR-40: ein Abo je Sitzung, also je Gerät.
+		uniqueIndex('push_abo_sitzung_hash_unique').on(t.sitzungHash)
+	]
+);
+
+// Gesendete Mitteilung mit Zählern der Zustellung (FR-45).
+export const mitteilung = pgTable(
+	'mitteilung',
+	{
+		id: serial('id').primaryKey(),
+		bezug: text('bezug').$type<Bezug>().notNull(),
+		anlassId: integer('anlass_id').references(() => anlass.id, { onDelete: 'cascade' }),
+		absenderId: integer('absender_id').references(() => mitglied.id, { onDelete: 'set null' }),
+		gesendetAm: timestamp('gesendet_am', { withTimezone: true }).notNull(),
+		titel: text('titel').notNull(),
+		text: text('text').notNull(),
+		auswahl: text('auswahl').notNull(),
+		weg: text('weg').$type<Weg>().notNull(),
+		push: integer('push').notNull().default(0),
+		mails: integer('mails').notNull().default(0),
+		ersatzMails: integer('ersatz_mails').notNull().default(0),
+		nichtErreichbar: integer('nicht_erreichbar').notNull().default(0)
+	},
+	(t) => [
+		check('mitteilung_bezug_check', sql`${t.bezug} in ('anlass', 'verein')`),
+		check('mitteilung_anlass_check', sql`(${t.bezug} = 'anlass') = (${t.anlassId} is not null)`),
+		check('mitteilung_weg_check', sql`${t.weg} in ('push', 'push-sonst-mail', 'push-und-mail')`),
+		index('mitteilung_anlass_id_gesendet_am_idx').on(t.anlassId, t.gesendetAm),
+		index('mitteilung_gesendet_am_idx').on(t.gesendetAm)
 	]
 );
 

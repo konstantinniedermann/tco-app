@@ -7,10 +7,23 @@ import {
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import type { Db } from '../db/index.ts';
-import { aenderung, anlass, kategorie, mitglied, sitzung, turnier } from '../db/schema.ts';
+import {
+	aenderung,
+	anlass,
+	kategorie,
+	mitglied,
+	mitteilung,
+	sitzung,
+	turnier
+} from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
+import {
+	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
+	type MitteilungAdminDienste
+} from '../mitteilung/schnittstellen.ts';
 import { TURNIER_SCHNITTSTELLEN, postKategorien, postTurniere } from '../turnier/schnittstellen.ts';
+import { legeAnlassAn } from '../anlass/anlaesse.ts';
 import { ROLLEN } from './rollen.ts';
 import {
 	ADMIN_SCHNITTSTELLEN,
@@ -74,11 +87,15 @@ function baue() {
 		bremsen: erstelleBremsen(),
 		jetzt: () => start
 	});
-	const d: AdminDienste = {
+	// Mit Push und Mailer der Mitteilungen; beide dürfen hier nie aufgerufen werden.
+	const d: MitteilungAdminDienste = {
 		db: db(),
 		zugang,
 		hinweis: vi.fn<AdminDienste['hinweis']>(async () => {}),
-		jetzt: () => start
+		jetzt: () => start,
+		push: vi.fn<NonNullable<MitteilungAdminDienste['push']>>(async () => 'ok'),
+		mailer: vi.fn<MitteilungAdminDienste['mailer']>(async () => {}),
+		adresse: 'https://mytco.example.org'
 	};
 	return { d, post };
 }
@@ -102,8 +119,9 @@ const hole = (konto: AngemeldetesKonto, extra: { params?: Record<string, string>
 	ereignis({ method: 'GET', konto, ...extra });
 
 async function zeilen() {
-	const n = async (t: typeof mitglied | typeof anlass | typeof turnier | typeof kategorie) =>
-		(await db().select({ n: count() }).from(t))[0].n;
+	const n = async (
+		t: typeof mitglied | typeof anlass | typeof turnier | typeof kategorie | typeof mitteilung
+	) => (await db().select({ n: count() }).from(t))[0].n;
 	const [aenderungen] = await db().select({ n: count() }).from(aenderung);
 	const [sitzungen] = await db().select({ n: count() }).from(sitzung);
 	const kategorien = await db()
@@ -113,6 +131,7 @@ async function zeilen() {
 		mitglied: await n(mitglied),
 		anlass: await n(anlass),
 		turnier: await n(turnier),
+		mitteilung: await n(mitteilung),
 		kategorie: kategorien,
 		aenderung: aenderungen.n,
 		sitzung: sitzungen.n
@@ -170,10 +189,11 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		const mytco = await bestaetigt(s, ['mytco']);
 		const schreibende = Object.entries({
 			...ADMIN_SCHNITTSTELLEN,
-			...TURNIER_SCHNITTSTELLEN
+			...TURNIER_SCHNITTSTELLEN,
+			...MITTEILUNG_ADMIN_SCHNITTSTELLEN
 			// Schreibend ist alles, was nicht liest: Auch ein künftiges delete… oder put… fällt hier auf.
 		}).filter(([name]) => !name.startsWith('get') && !ERLAUBT_FUER_MYTCO.includes(name));
-		expect(schreibende.length).toBeGreaterThanOrEqual(13);
+		expect(schreibende.length).toBeGreaterThanOrEqual(17);
 		const vorher = await zeilen();
 		for (const [name, fn] of schreibende) {
 			const r = await fn(s.d, ereignis({ konto: mytco.konto, body: {}, params: { id } }));
@@ -181,6 +201,8 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		}
 		expect(await zeilen()).toEqual(vorher);
 		expect(s.d.hinweis).not.toHaveBeenCalled();
+		expect(s.d.push).not.toHaveBeenCalled();
+		expect(s.d.mailer).not.toHaveBeenCalled();
 	});
 
 	test('MyTCO-Admin: postRollen bleibt erlaubt', async () => {
@@ -222,10 +244,19 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		expect([r.status, await r.json()]).toEqual([403, { fehler: 'kein-admin' }]);
 	});
 
-	test('MyTCO-Admin liest Mitglieder, Turniere, Verlauf → 200', async () => {
+	test('MyTCO-Admin liest Mitglieder, Turniere, Verlauf, Mitteilungen → 200', async () => {
 		const s = baue();
 		const mytco = await bestaetigt(s, ['mytco']);
 		const ziel = await legeMitgliedAn(db(), { nachname: 'Lesbar' });
+		const anlassId = String(
+			await legeAnlassAn(db(), ziel.mitgliedId, {
+				titel: 'GV Erfunden',
+				beginn: new Date('2027-03-19T18:30:00Z'),
+				ort: 'Clubhaus',
+				einladung: '',
+				anmeldeschluss: new Date('2027-03-16T22:59:00Z')
+			})
+		);
 		const antworten = [
 			await getMitglieder(s.d, hole(mytco.konto)),
 			await getMitglied(s.d, hole(mytco.konto, { params: { id: String(ziel.mitgliedId) } })),
@@ -233,9 +264,14 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			await getVerlauf(s.d, hole(mytco.konto)),
 			await ADMIN_SCHNITTSTELLEN.getFairgate(s.d, hole(mytco.konto)),
 			await ADMIN_SCHNITTSTELLEN.getAdminAnlaesse(s.d, hole(mytco.konto)),
-			await getRollen(s.d, hole(mytco.konto))
+			await getRollen(s.d, hole(mytco.konto)),
+			await MITTEILUNG_ADMIN_SCHNITTSTELLEN.getVereinMitteilungen(s.d, hole(mytco.konto)),
+			await MITTEILUNG_ADMIN_SCHNITTSTELLEN.getAnlassMitteilungen(
+				s.d,
+				hole(mytco.konto, { params: { id: anlassId } })
+			)
 		];
-		expect(antworten.map((r) => r.status)).toEqual([200, 200, 200, 200, 200, 200, 200]);
+		expect(antworten.map((r) => r.status)).toEqual([200, 200, 200, 200, 200, 200, 200, 200, 200]);
 		const liste = (await antworten[0].json()) as { id: number }[];
 		expect(liste.map((z) => z.id)).toContain(ziel.mitgliedId);
 	});
@@ -248,9 +284,17 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			['postMitglieder', mytco, 403, 'unbestaetigt'],
 			['getRollen', mytco, 403, 'unbestaetigt'],
 			['postMitglieder', cm, 403, 'kein-admin'],
-			['getRollen', cm, 403, 'kein-admin']
+			['getRollen', cm, 403, 'kein-admin'],
+			['postVereinSenden', mytco, 403, 'unbestaetigt'],
+			['getVereinMitteilungen', mytco, 403, 'unbestaetigt'],
+			['postVereinSenden', cm, 403, 'kein-admin'],
+			['getVereinMitteilungen', cm, 403, 'kein-admin']
 		];
-		const alle = { ...ADMIN_SCHNITTSTELLEN, ...TURNIER_SCHNITTSTELLEN };
+		const alle = {
+			...ADMIN_SCHNITTSTELLEN,
+			...TURNIER_SCHNITTSTELLEN,
+			...MITTEILUNG_ADMIN_SCHNITTSTELLEN
+		};
 		for (const [name, konto, status, fehler] of faelle) {
 			const fn = alle[name as keyof typeof alle];
 			const r = await fn(

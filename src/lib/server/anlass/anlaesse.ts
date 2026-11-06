@@ -101,19 +101,28 @@ function fuerMitglied(db: Db, mitgliedId: number) {
 
 type Zeile = Awaited<ReturnType<typeof fuerMitglied>>[number];
 
+/**
+ * FR-32: Eine Antwort ist zu prüfen, wenn sie älter ist als die letzte Änderung von Beginn oder
+ * Ort. Ohne Antwort oder ohne Änderung nicht. Nach dem Anmeldeschluss lässt sich nichts mehr
+ * ändern, also auch nichts mehr prüfen. Einzige Stelle dieser Regel (Anlass-Seite, Mitteilungen).
+ */
+export function zuPruefen(
+	offen: boolean,
+	antwortGeaendertAm: Date | null,
+	terminGeaendertAm: Date | null
+): boolean {
+	return (
+		offen &&
+		antwortGeaendertAm !== null &&
+		terminGeaendertAm !== null &&
+		antwortGeaendertAm.getTime() < terminGeaendertAm.getTime()
+	);
+}
+
 function alsAnsicht(z: Zeile, jetzt: Date): AnlassMitglied {
 	const { terminGeaendertAm, geaendertAm, ...rest } = z;
 	const offen = istOffen(z.anmeldeschluss, jetzt);
-	return {
-		...rest,
-		offen,
-		// Nach dem Anmeldeschluss lässt sich nichts mehr ändern, also auch nichts mehr prüfen.
-		zuPruefen:
-			offen &&
-			geaendertAm !== null &&
-			terminGeaendertAm !== null &&
-			geaendertAm.getTime() < terminGeaendertAm.getTime()
-	};
+	return { ...rest, offen, zuPruefen: zuPruefen(offen, geaendertAm, terminGeaendertAm) };
 }
 
 /** FR-27: alle Anlässe, deren Beginn noch kommt, der nächste zuerst. */

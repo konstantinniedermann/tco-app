@@ -6,7 +6,7 @@ import { erstelleBremsen } from '../../../src/lib/server/login/bremse.ts';
 import { erstelleLoginDienst, type LoginDienst } from '../../../src/lib/server/login/dienst.ts';
 import { eq } from 'drizzle-orm';
 import { machAdmin } from '../../../src/lib/server/admin/erster-admin.ts';
-import { legeAnlassAn } from '../../../src/lib/server/anlass/anlaesse.ts';
+import { legeAnlassAn, melde } from '../../../src/lib/server/anlass/anlaesse.ts';
 import { setzeRollen, type Rolle } from '../../../src/lib/server/admin/rollen.ts';
 import { meldeAn as meldeZurCmAnInDb } from '../../../src/lib/server/cm/anmeldungen.ts';
 import { mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
@@ -146,6 +146,16 @@ export async function legeOffenenAnlassAn(erstelltVon: number, titel: string): P
 		einladung: '',
 		anmeldeschluss: new Date('2099-05-17T21:59:00Z')
 	});
+}
+
+/** Das Mitglied antwortet auf den Anlass, ohne Bemerkung. */
+export async function meldeZumAnlass(
+	anlassId: number,
+	mitgliedId: number,
+	antwort: 'kommt' | 'kommt-nicht'
+): Promise<void> {
+	const r = await melde(hole().db, anlassId, mitgliedId, { antwort, bemerkung: null }, new Date());
+	if (r !== 'ok') throw new Error(`Antwort auf Anlass ${anlassId}: ${r}`);
 }
 
 /** Stellt für ein bestehendes Konto einen weiteren Brief-Code aus (ohne Bindestrich). */

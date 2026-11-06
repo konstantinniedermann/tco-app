@@ -17,6 +17,7 @@ Liste «Für Fairgate», Rollen mit *Ansicht als …* für MyTCO-Admins, eigene 
 Anmeldung zu Anlässen wie der Generalversammlung (Vorschlag für den Vorstand, K-50),
 Turnier der Clubmeisterschaft mit Kategorien anlegen für die CM-Admins (noch ohne
 Anmeldung der Mitglieder),
+Mitteilungen per Push und E-Mail zu Anlässen und an den Verein für Mitglieder-Admins,
 Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene Testdaten) sind
 gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
 den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* aus

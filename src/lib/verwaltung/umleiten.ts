@@ -30,6 +30,7 @@ const SEITEN: Record<string, Bereich> = {
 	anlaesse: 'mitglieder',
 	fairgate: 'mitglieder',
 	verlauf: 'mitglieder',
+	mitteilungen: 'mitglieder',
 	turniere: 'cm',
 	rollen: 'rollen'
 };

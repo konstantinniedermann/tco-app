@@ -50,6 +50,10 @@ classDiagram
     Anlass "1" *-- "*" AnmeldungAnlass
     AnmeldungAnlass "*" --> "1" Mitglied
     Anlass "*" --> "0..1" Mitglied : erstellt von
+    Konto "1" *-- "*" PushAbo
+    PushAbo "*" --> "1" Sitzung
+    Anlass "0..1" o-- "*" Mitteilung
+    Mitteilung "*" --> "0..1" Mitglied : von
 ```
 
 `AnmeldungAnlass` ist im Diagramm die *Anmeldung (Anlass)*, zur Unterscheidung von der
@@ -62,7 +66,7 @@ Anmeldung zu einem Turnier.
 | Objekt | Attribute | P |
 |--------|-----------|---|
 | **Mitglied** | Mitgliedernummer (aus Fairgate; Pflicht beim Einlesen und beim Befehl *Admin festlegen*, sonst freiwillig, A-MITGLIED-07; eindeutig ohne Rücksicht auf Gross-/Kleinschreibung, gespeichert wie eingegeben), Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25; fehlt bei Junioren, die ein Elternteil führt), Telefon, Geschlecht, Jahrgang (K-40.2; für Lizenzanträge hängt an K-40.1), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28; Werte N1–N4, R1–R9 oder *keine Lizenz*, Skala als Annahme bis K-25.1; fehlt sie, ist sie *nicht angegeben*), Status *aktiv / ausgetreten / Löschung vorgemerkt / gelöscht*, Austrittsdatum, *verwaltet von* (Mitglied, nur bei Junioren ohne eigenes Login, Vorschlag K-08), *für Fairgate offen seit* (Zeitpunkt, gesetzt, wenn das Mitglied Adresse, E-Mail oder Telefon selbst ändert; gelöscht, wenn der Mitglieder-Admin die Angaben nach Fairgate übertragen hat — Annahme K-19.2, A-KONTO-02) | alle ausser Status |
-| **Konto** | Brief-Code und Mail-Code getrennt, je nur als Hash mit Ablauf; beim Brief-Code dazu *benutzt am*, beim Mail-Code die Zahl der Fehlversuche (FR-24). Sitzungsversion, Sitzungen (eine je Gerät, mit *angemeldet am* und *zuletzt genutzt*), Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Benachrichtigung per E-Mail / Push ja/nein, Passkeys (je Gerät öffentlicher Schlüssel, Kennung, Zähler, Übertragungswege, Domain, Gerätename, eingerichtet am, zuletzt benutzt; freiwillig, A-LOGIN-07) und die zufällige Passkey-Kennung des Kontos (gesetzt beim ersten Versuch, einen Passkey einzurichten). Je Sitzung die Bestätigung der Verwaltung mit Zeitpunkt, Admin-Code als Hash mit Ablauf und Fehlversuchen (SI-08), dazu die Rolle einer laufenden *Ansicht als …* (nur beim MyTCO-Admin, A-ROLLE-09) | alle |
+| **Konto** | Brief-Code und Mail-Code getrennt, je nur als Hash mit Ablauf; beim Brief-Code dazu *benutzt am*, beim Mail-Code die Zahl der Fehlversuche (FR-24). Sitzungsversion, Sitzungen (eine je Gerät, mit *angemeldet am* und *zuletzt genutzt*), Daten beim ersten Login ergänzt ja/nein, gesperrt ja/nein, Themen *Anlässe* / *Clubmeisterschaft* / *Verein* ja/nein (für neue Konten an, FR-41), Passkeys (je Gerät öffentlicher Schlüssel, Kennung, Zähler, Übertragungswege, Domain, Gerätename, eingerichtet am, zuletzt benutzt; freiwillig, A-LOGIN-07) und die zufällige Passkey-Kennung des Kontos (gesetzt beim ersten Versuch, einen Passkey einzurichten). Je Sitzung die Bestätigung der Verwaltung mit Zeitpunkt, Admin-Code als Hash mit Ablauf und Fehlversuchen (SI-08), dazu die Rolle einer laufenden *Ansicht als …* (nur beim MyTCO-Admin, A-ROLLE-09) | alle |
 | **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](rollen-und-rechte.md) fest | — |
 | **Aenderung** | Eintrag im Änderungsverlauf: Mitglied, von (Mitglied, das die Änderung ausgelöst hat; leer bei automatisch, dann *MyTCO*; ist das auslösende Konto gelöscht, *gelöschtes Konto*), Feld oder Aktion, Zeitpunkt; ohne alte und neue Werte (FR-26) | Mitglied, von |
 
@@ -72,6 +76,13 @@ Anmeldung zu einem Turnier.
 |--------|-----------|---|
 | **Anlass** | Titel, Beginn, Ort, Einladung (Text), Anmeldeschluss, Kalender-Kennung (zufällig, für den Link ohne Login), Termin geändert am, erstellt von (Mitglieder-Admin), erstellt am. Gilt für alle aktiven Mitglieder (**Annahme K-50**) | erstellt von |
 | **Anmeldung (Anlass)** | Anlass, Mitglied, Antwort *kommt* / *kommt nicht*, Bemerkung (optional, nur bei *kommt nicht*), geändert am. Auch die Abmeldung heisst *Anmeldung* (Glossar) | Antwort, Bemerkung |
+
+### Mitteilungen
+
+| Objekt | Attribute | P |
+|--------|-----------|---|
+| **Push-Abo** | Konto, Sitzung, Adresse beim Push-Dienst, zwei Schlüssel, eingerichtet am. Gehört zur Sitzung und endet mit ihr (FR-40) | Konto |
+| **Mitteilung** | Bezug (Anlass oder Verein; die Clubmeisterschaft folgt später), Anlass (bei Bezug Anlass), Absender (Mitglied), Zeit, Titel, Text, Auswahl der Empfänger, Weg, Zahlen (Push zugestellt, E-Mails verschickt, ersatzweise per E-Mail, nicht erreichbar). Keine Empfängernamen (FR-45) | Absender |
 
 ### Clubmeisterschaft
 
@@ -137,6 +148,12 @@ Anmeldung zu einem Turnier.
 | FR-35 | Eine Kategorie sagt der CM-Admin ab (Rückfrage vorher); der Status *abgesagt* hat keinen Rückweg. Die Turnierseite zeigt sie mit Plakette *abgesagt* ohne Link. Absagen geht nur ohne aktive Anmeldungen (*bestätigt* oder *beantragt*) | A-TURNIER-03 | umgesetzt |
 | FR-36 | Ändert der CM-Admin eine Kategorie so, dass aktive Anmeldungen nicht mehr passen, warnt MyTCO mit der Zahl; gespeichert wird erst nach Bestätigung | A-TURNIER-03 | umgesetzt |
 | FR-37 | Vor der ersten CM-Anmeldung muss das Mitglied Klassierung, Geschlecht und Jahrgang angegeben haben; Geschlecht und Jahrgang trägt es einmal selbst ein, wenn sie leer sind, die Klassierung jederzeit | A-ANMELDUNG-03 | umgesetzt |
+| FR-40 | Push gilt je Gerät und nur nach Einschalten durch das Mitglied; das Abo gehört zur Sitzung und endet mit ihr | N-APP-02 | umgesetzt |
+| FR-41 | Themen *Anlässe*, *Clubmeisterschaft*, *Verein*, für neue Konten an; sie gelten für Push und E-Mail einer Mitteilung, nicht für Bestätigungen und Codes | N-APP-02 | umgesetzt |
+| FR-42 | Eine Mitteilung verschickt nur der Mitglieder-Admin (Anlass, Verein), von Hand, nach Vorschau und Rückfrage; Titel 1–50, Text 1–200 Zeichen | N-APP-02 | umgesetzt |
+| FR-43 | Empfänger sind aktive Mitglieder; beim Anlass genau eine Auswahl *alle*, *noch keine Antwort*, *kommt*, *kommt nicht*, *zu prüfen* (wie FR-32); wer das Thema abgeschaltet hat, fällt weg | N-APP-02 | umgesetzt |
+| FR-44 | Weg *nur Push*, *Push, sonst E-Mail*, *Push und E-Mail*; bei *Push, sonst E-Mail* bekommt eine E-Mail, wer kein Abo hat oder bei wem jeder Push scheiterte | N-APP-02 | umgesetzt |
+| FR-45 | Der Verlauf nennt Zeit, Absender, Titel, Text, Auswahl, Weg und Zahlen, keine Empfängernamen; Einträge älter als 365 Tage löscht der nächste Versand | N-APP-02 | umgesetzt |
 
 ## Lebenszyklen
 

@@ -15,6 +15,7 @@ describe('RR-07: Bereiche der Verwaltung je Rolle', () => {
 		expect(bereichVon('/verwaltung/anlaesse/neu')).toBe('mitglieder');
 		expect(bereichVon('/verwaltung/fairgate')).toBe('mitglieder');
 		expect(bereichVon('/verwaltung/verlauf')).toBe('mitglieder');
+		expect(bereichVon('/verwaltung/mitteilungen')).toBe('mitglieder');
 		expect(bereichVon('/verwaltung/turniere/3/kategorien/7')).toBe('cm');
 		expect(bereichVon('/verwaltung/rollen')).toBe('rollen');
 		expect(bereichVon('/verwaltung/bestaetigen')).toBeNull();
@@ -28,6 +29,7 @@ describe('RR-07: Bereiche der Verwaltung je Rolle', () => {
 		expect(umleitung('/verwaltung/rollen', ['cm'], false)).toBe('/verwaltung/turniere');
 		expect(umleitung('/verwaltung/mitglieder', ['cm'], false)).toBe('/verwaltung/turniere');
 		expect(umleitung('/verwaltung/anlaesse', ['cm'], false)).toBe('/verwaltung/turniere');
+		expect(umleitung('/verwaltung/mitteilungen', ['cm'], false)).toBe('/verwaltung/turniere');
 		expect(umleitung('/verwaltung/turniere', ['mitglieder'], false)).toBe('/verwaltung/mitglieder');
 	});
 

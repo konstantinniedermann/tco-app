@@ -33,7 +33,9 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Geschlecht, Jahrgang | Zulassung zu Kategorien; für die CM reicht der Jahrgang (K-40.2); volles Geburtsdatum nur, falls Swiss Tennis es für Lizenzanträge verlangt (hängt an K-40.1) | für die CM ja, beim Anlegen freiwillig; leer trägt das Mitglied sie einmal selbst ein (FR-37) |
 | Mitgliedernummer aus Fairgate | Wiedererkennen beim Einlesen (A-MITGLIED-07) | Pflicht beim Einlesen und beim Befehl *Admin festlegen*, sonst freiwillig |
 | Lizenznummer, Klassierung | Anmeldung (die Klassierung fragt die CM-Seite vor der ersten Anmeldung ab, FR-37), Lizenzanträge, Export an Swiss Tennis | nein; Klassierung für die CM ja |
-| Konto, Rollen, Benachrichtigungs-Einstellungen | Login, Berechtigungen, Push | ja |
+| Konto, Rollen, Benachrichtigungs-Einstellungen: Themen *Anlässe*, *Clubmeisterschaft*, *Verein* (für neue Konten an) | Login, Berechtigungen, Mitteilungen abstellen | ja |
+| Push-Abo je Gerät (nur nach Einschalten durch das Mitglied): Adresse beim Push-Dienst, zwei Schlüssel, eingerichtet am, zugehörige Sitzung | Push zustellen (FR-40) | nein |
+| Verlauf der Mitteilungen: Absender, Zeit, Titel, Text, Auswahl in Worten, Weg, Zahlen; keine Empfängernamen (FR-45) | Doppelte Mitteilungen vermeiden, nachvollziehen | — |
 | Sitzungen: je angemeldetes Gerät *angemeldet am* und *zuletzt genutzt*, ohne IP-Adresse und Gerätenamen; beim MyTCO-Admin die Rolle einer laufenden *Ansicht als …* | Login merken und nach einem Jahr ohne Nutzung beenden (*zuletzt genutzt*); *angemeldet am*, um Missbrauch nachzuvollziehen, etwa wenn ein Mitglied ein fremdes Gerät vermutet; die Ansicht, damit sie nur lesend bleibt | — |
 | Passkey (A-LOGIN-07): je Passkey Kennung, öffentlicher Schlüssel, Zähler, Übertragungswege, Adresse der App (Relying-Party-ID), grobe Gerätebezeichnung (nur das Etikett aus dem Browser, z. B. *iPhone*), eingerichtet am, zuletzt benutzt; je Konto eine zufällige Passkey-Kennung (keine Personendaten); je Sitzung ein Merker, ob der Passkey-Hinweis noch erscheint. Name und E-Mail-Adresse liegen nur im Schlüsselbund des Mitglieds (sein Gerät zeigt sie an), MyTCO speichert sie dafür nicht zusätzlich | Login ohne Code | nein |
 | IP-Adresse bei Login-Versuchen und E-Mail-Wechseln; eingetippte E-Mail-Adresse einer Code-Anfrage, Empfänger-Adressen eines E-Mail-Wechsels und des Hinweises an die alte Adresse | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
@@ -86,6 +88,9 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Anmeldungen zu Anlässen:** ein Jahr nach dem Anlass (**Vorschlag K-50**). Bis die Löschfristen
   gebaut sind, löscht der Mitglieder-Admin den Anlass; mit ihm sind alle Anmeldungen dazu gelöscht.
+- **Push-Abo:** mit der Sitzung (Abmelden, Sitzung beendet, nach einem Jahr ohne Nutzung), beim Abschalten, wenn der Push-Dienst es als ungültig meldet, und mit dem Konto.
+- **Verlauf der Mitteilungen:** 365 Tage nach dem Versand, ohne Hintergrund-Job: Jeder neue Versand löscht ältere Einträge mit; mit dem Anlass, wenn er gelöscht wird.
+- **Merker «Push-Hinweis abgelehnt»:** nur im Gerätespeicher.
 - **Eingelesene Mitgliederliste** (A-MITGLIED-07): wird nach dem Einlesen nicht aufbewahrt;
   übernommen werden nur Felder aus [Welche Daten](#welche-daten).
 - **Logs und Backups:** höchstens 30 Tage.
@@ -176,7 +181,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | DS-02 | Hoster und E-Mail-Dienst mit Auftragsbearbeitungsvertrag oder passenden AGB (Infomaniak: [ADR-003](adr/adr-003-hosting-infomaniak-vps.md); Metanet-Postfach: K-09; Scaleway: DPA vorhanden, [Kosten](kosten.md)) |
 | DS-03 | Kein Tracking, keine Werbung, keine Inhalte von fremden Servern (CDN, Google Fonts); nur technisch nötige Cookies, deshalb kein Cookie-Banner |
 | DS-04 | Nur Felder aus [Welche Daten](#welche-daten); Exporte nur mit den Feldern, die Swiss Tennis braucht |
-| DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“; Empfänger in BCC) |
+| DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“); E-Mails gehen je Empfänger einzeln, nie mehrere Adressen in einem Empfängerfeld. Bei Mitteilungen (FR-42) weist das Formular darauf hin; die Vorschau zeigt dem Mitglieder-Admin nur Namen, die er schon sehen darf |
 | DS-06 | Löschfristen aus [Löschen](#löschen) sind umgesetzt; Logs ohne Inhalte (keine Einmal-Codes, Kontaktdaten, Resultate); IP-Adressen höchstens 24 Stunden, auch in Logs |
 | DS-07 | Der Mitglieder-Admin kann die Daten eines Mitglieds exportieren und löschen (Stand 0.5.0: noch nicht gebaut, kommt mit Etappe 3 von #43; bis dahin Auskunft und Löschung von Hand) |
 | DS-08 | Entwicklung und Tests nur mit erfundenen Daten |

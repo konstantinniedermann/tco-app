@@ -426,3 +426,93 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #43, Screenshots der Seite *Rollen*.
 
 **Einschätzung:** Zusammen mit dem Eintrag oben lösen: Eine eigene Datenbank pro Worktree oder pro Lauf hält die Listen klein; sonst Screenshots auf einer frisch mit `make seed` aufgesetzten Datenbank machen.
+
+### 2026-11-06 — Doppel-Kategorien erlauben Jahrgang von/bis, obwohl es im Doppel keine Alterskategorien gibt
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/verwaltung/Kategorieformular.svelte` (Felder Jahrgang auch bei *Doppel*), FR-34 in `docs/fachmodell.md`
+
+**Beobachtung:** Laut Projektleiter gibt es im Doppel nur Herren, Damen und Mixed, keine Alterskategorien. Formular und FR-34 lassen Jahrgang von/bis aber auch bei Doppel zu. Der Entwurf zu Mitteilungen (#63) prüft die Spielberechtigung im Doppel deshalb nur nach Geschlecht.
+
+**Ursprung:** Brainstorming #63 (Mitteilungen per Push und E-Mail).
+
+**Einschätzung:** Niedrig. Bei Doppel die Jahrgang-Felder ausblenden und FR-34 anpassen, am besten zusammen mit der Spielberechtigung aus #58.
+
+### 2026-11-06 — Service Worker ist von der Typprüfung ausgenommen, auch in der CI
+
+**Thema:** Betrieb
+
+**Fundort:** `tsconfig.json` (`"exclude": ["src/service-worker"]`), `src/service-worker/tsconfig.json`, `npm run check:svelte`
+
+**Beobachtung:** Der Service Worker hat eine eigene `tsconfig.json` mit den Typen von `$app/tsconfig/service-worker`; die Wurzel schliesst ihn aus. `svelte-check` in `make check-schnell`, `make check` und der CI läuft nur über die Wurzel, eine Prüfung mit der eigenen Konfiguration ruft niemand auf. Typfehler im Service Worker fielen erst im Build oder auf dem Gerät auf. Die Logik liegt zwar in `src/lib/push/nutzlast.ts` (geprüft und getestet), der Rahmen mit `push` und `notificationclick` aber nicht.
+
+**Ursprung:** #63, Mitteilungen per Push und E-Mail.
+
+**Einschätzung:** Niedrig, die Datei ist klein. Ein zusätzlicher Aufruf `tsc -p src/service-worker --noEmit` (nach `svelte-kit sync`) in `check:svelte` würde reichen.
+
+### 2026-11-06 — Verlauf der Mitteilungen am Handy: Tabelle schiebt seitlich und bricht stark um
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/verwaltung/Mitteilungsverlauf.svelte` (Verwaltung, Anlass-Seite und *Mitteilungen*)
+
+**Beobachtung:** Bei Handybreite (420 px) passen von sechs Spalten nur vier; *Weg* und *Erreicht* sind nur durch seitliches Schieben erreichbar, Titel und Text brechen nach zwei, drei Wörtern um. Gleiches Muster wie bei der Kategorientabelle (Eintrag oben).
+
+**Ursprung:** #63, Nachweis mit echtem Push (Screenshot des Verlaufs).
+
+**Einschätzung:** Eine Kartenliste statt Tabelle wäre am Handy besser lesbar, braucht aber einen neuen Baustein im UI-Leitbild. Zusammen mit der Kategorientabelle lösen. Die Verwaltung wird vor allem am PC genutzt, darum niedrig.
+
+### 2026-11-06 — Mitteilungen zur Clubmeisterschaft fehlen noch, die Spielberechtigung aus #58 liegt jetzt auf dev
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** #63 (Teil Clubmeisterschaft), `docs/fachmodell.md` (*Mitteilung*: «die Clubmeisterschaft folgt später»), N-APP-02 in `docs/anforderungen/anforderungen.md`
+
+**Beobachtung:** #63 liefert Push und Mitteilungen zu Anlässen und an den Verein. Mitteilungen zur Clubmeisterschaft (z. B. an alle Spielberechtigten einer Kategorie) brauchen die Spielberechtigung und die Anmeldungen aus #58; beides liegt inzwischen auf `dev`. Das Thema *Clubmeisterschaft* ist im Profil schon wählbar, es gibt aber noch keinen Versand dazu.
+
+**Ursprung:** #63, Abschluss.
+
+**Einschätzung:** Der CM-Teil lässt sich jetzt als eigener, kurzer Plan angehen (eine Empfänger-Funktion, Vorlagen, zwei Schnittstellen; siehe Plan zu #63, Abschnitt «Nicht in diesem Plan»).
+
+### 2026-11-06 — RR-03 auf dem iPhone vereinzelt rot: Rückfrage erscheint nicht nach «Rollen speichern»
+
+**Thema:** Betrieb
+
+**Fundort:** Profil `iphone` (WebKit), `tests/e2e/verwaltung.test.ts:204` (RR-03, letzter MyTCO-Admin)
+
+**Beobachtung:** Im vollen `make check` rot, einzeln mit `--project=iphone --repeat-each=5` 1 von 5 rot. Im Fehlerbild ist *MyTCO-Admin* abgehakt, die Rückfrage «Rolle MyTCO-Admin entziehen?» aber nicht offen; kein Seitenfehler. Der Test öffnet die Mitgliedseite mit `page.goto` und klickt gleich danach. Der Branch (#63) ändert weder den Test noch die Mitgliedseite.
+
+**Ursprung:** #63, Nachweislauf von `make check`.
+
+**Einschätzung:** Vermutlich Klick vor der Hydration (Häkchen geht im HTML auch ohne Svelte, die Taste nicht). Im Test vor dem Klick auf ein Zeichen der fertigen Seite warten.
+
+### 2026-11-06 — Kleinbefunde aus den Reviews von #63 (Mitteilungen per Push und E-Mail)
+
+**Thema:** Betrieb
+
+**Fundort:** `src/lib/server/mitteilung/`, `src/lib/push/`, `src/service-worker/`, `src/lib/verwaltung/` (Mitteilungsformular), `tests/e2e/mitteilungen.test.ts`, `package.json`
+
+**Beobachtung:** Aus den Task-, Schluss- und cas-Reviews, als «nicht vor dem Merge» eingestuft:
+- Service Worker beachtet `pushsubscriptionchange` nicht; Firefox kann das Abo still erneuern, dann geht Push ins Leere, bis das Mitglied neu einschaltet.
+- Link im Push und in der Mail entsteht aus `MYTCO_ADRESSE`; weicht sie von der ausgelieferten Adresse ab, zeigt er auf den falschen Ursprung (erwägen: nur den Pfad schicken).
+- Empfänger können sich zwischen Vorschau und Senden ändern (Antwort, Themen, Abo).
+- Kein Hinweis im Formular, wenn Push auf dem Server aus ist (kein VAPID-Paar).
+- `@types/web-push@3.6.4` passt nicht zur Hauptversion von `web-push@4.0.0`.
+- Anlass zwischen Prüfung und Eintrag in den Verlauf gelöscht → 500, obwohl schon gesendet.
+- Abgebrochener langer Versand hinterlässt keinen Verlaufseintrag (`gesendetAm` erst nach dem Versand).
+- `schema.db.test.ts`: `.rejects.toThrow()` ohne Namen des Constraints.
+- `migration-0009.db.test.ts`: ungenutzter Parameter `_db`.
+- Grenztests für Schlüssellängen und genau 1000 Zeichen beim Abo fehlen.
+- E2E-Abwesenheitsprüfungen schwach (`toHaveCount(0)` ohne Warten); kein E2E für blockierte Mitteilungen.
+- Push-Schalter behandelt 401 als allgemeine Störung statt Umleitung zum Login.
+- Fokus springt weg, während die Themen-Schalter beim Speichern gesperrt sind.
+- Abos abgelaufener Sitzungen bekommen Pushes bis zum Aufräumen.
+- `Grundzeile.email` als `string` typisiert, `Empfaenger.email` als `string | null`.
+- Wache «Nicht gespeichert» übersieht ein laufendes Senden sowie Auswahl und Weg.
+- Race-E2E prüft die Abwesenheit nach nur einem Animation-Frame.
+- Eingabe-Fehler einer veralteten Vorschau bleibt sichtbar.
+
+**Ursprung:** Task-Reviews, Schluss-Review und cas-reviewer zu #63.
+
+**Einschätzung:** Alles klein. `pushsubscriptionchange` und der Link aus `MYTCO_ADRESSE` zuerst ansehen, sobald Push auf Test läuft (#39); die Testlücken bei Gelegenheit mit dem CM-Teil der Mitteilungen.

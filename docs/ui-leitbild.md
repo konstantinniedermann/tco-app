@@ -173,8 +173,8 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Nebentaste | `.taste-neben` | weiss mit grünem Rand; gedrückt `--farbe-marke-zart` |
 | Link | `a` | grün, unterstrichen |
 | Zurück | `.zurueck` | „‹ Zurück" oben links auf Unterseiten |
-| Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
-| Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>` |
+| Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); bei einer festen Höchstlänge zählt der Hilfetext mit („12 von 50 Zeichen", `.feld-hilfe`); Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
+| Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>`. Als Schalter (Ein/Aus, gilt sofort, ohne Speichern-Taste) dieselbe Fläche mit Häkchen statt Kreis (`type="checkbox"`), angehakt heisst ein: *Benachrichtigungen* im Profil |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
 | Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
 | Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; klappt weich auf und zu (`--dauer-mittel`) |
@@ -234,7 +234,8 @@ Kopfleiste.
 - **Startseite:** „Hoi <Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
   „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
   stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
-  (A-ANLASS-01).
+  (A-ANLASS-01). Angebote stehen vor „Jetzt aktuell", jedes als eigener Hinweis
+  und immer nur eines zugleich (UI-04): zuerst *Passkey einrichten*, danach *Mitteilungen aufs Handy?*.
 - **Unterseiten:** „‹ Zurück" oben links, keine Reiter (bei der CM-Anmeldung neu prüfen).
 - **Einstiegsseite** (nur im Handy-Browser, nicht vom Symbol aus): „Willkommen bei MyTCO", eine Karte „Zuerst auf den Startbildschirm" mit der Anleitung bzw. auf Android der Haupttaste „MyTCO installieren", darunter der Link „Ohne Startbildschirm weiter" zum Login.
 - **Hilfe:** ohne Login, über die Fusszeile; jedes Thema ein Aufklappbereich, der Kontakt eine Karte.
@@ -251,7 +252,7 @@ Kopfleiste.
 Startseite, direkt unter der Begrüssung, nur für Konten mit einer Rolle über *Mitglied* hinaus
 (RR-07). Dunkelgrüne Seitenleiste mit
 „MyTCO Verwaltung", den Bereichen, die eine der eigenen Rollen lesen darf, und „‹ Zur App":
-*Mitgliederverwaltung* (Mitglieder, Anlässe, Für Fairgate mit Zahl der offenen,
+*Mitgliederverwaltung* (Mitglieder, Anlässe, Mitteilungen, Für Fairgate mit Zahl der offenen,
 Änderungsverlauf) für Mitglieder- und MyTCO-Admin, *Clubmeisterschaft* (Turniere) für CM- und
 MyTCO-Admin, *MyTCO* (Rollen) nur für den MyTCO-Admin. Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
@@ -265,6 +266,12 @@ Seite zum Anlegen ohne Schreibrecht zur Liste ihres Bereichs.
   Mitglieder-Admin, CM-Admin, Lizenz-Admin) und die Haupttaste «Ansehen». Danach geht es zur
   ersten Seite dieser Rolle; bei Mitglied und Lizenz-Admin, die keine Verwaltung haben, zur
   Startseite der App.
+- **Mitteilungen** (Seite des Anlasses und Bereich *Mitteilungen*): Taste «Neue Mitteilung», beim
+  Anlass dann eine Vorlage oder «Leer anfangen». Titel, Text, Empfänger und Weg stehen in einer
+  Karte; «Vorschau» zeigt die Zahlen und aufklappbar die Namen. «Senden» geht erst mit einer
+  Vorschau zu den aktuellen Eingaben, fragt zurück (`<dialog class="karte">`) und ist während des
+  Sendens gesperrt («Wird gesendet …»). Darunter der Verlauf als Tabelle, ohne Empfängernamen. Das
+  Formular sieht nur, wer schreiben darf.
 Namen von Mitgliedern stehen in allen Tabellen und Listen der Verwaltung als „Nachname,
 Vorname", damit sie sich gleich lesen und sortieren.
 
@@ -292,8 +299,9 @@ auch, während der Inhalt noch nachläuft. Jeder Reiter beginnt oben; wer den ak
 nochmals antippt, kommt ebenfalls nach oben. Nur «‹ Zurück» und die Zurück-Taste oder -Geste
 des Browsers bringen eine Seite dorthin zurück, wo man sie verlassen hat.
 
-**Aufklappbereiche im Profil** sind anfangs zu und merken sich, ob sie offen sind, solange die
-App offen ist; nach dem Abmelden sind sie wieder zu.
+**Aufklappbereiche im Profil** (*Meine Angaben*, *Anmelden mit Passkey*, *Benachrichtigungen*)
+sind anfangs zu und merken sich, ob sie offen sind, solange die App offen ist; nach dem
+Abmelden sind sie wieder zu.
 
 **Antippen:** kein grauer Blitz des Browsers, dafür ein Gedrückt-Zustand (`--dauer-kurz`):
 Reiter in `--farbe-marke` mit etwas kleinerem Symbol; Kachel als Link in `--farbe-marke-zart`, leicht
@@ -341,7 +349,7 @@ verlassen?»** mit *Abbrechen* (Nebentaste: bleibt auf der Seite, die Eingaben b
   etwas tippt und es wieder zurücksetzt, wird nicht gefragt; nach dem Speichern auch nicht.
 - **Welche Formulare:** alle, die Angaben speichern: *Meine Angaben* im Profil, die Antwort auf
   einen Anlass, in der Verwaltung Mitglied (Angaben und Rollen), Anlass, Turnier und
-  Kategorie, jeweils beim Anlegen und Bearbeiten. Login, Codes und E-Mail-Wechsel nicht: Sie haben keinen
+  Kategorie, jeweils beim Anlegen und Bearbeiten, und die Mitteilung, bis sie gesendet ist (geladener Stand: leer oder die gewählte Vorlage). Login, Codes und E-Mail-Wechsel nicht: Sie haben keinen
   gespeicherten Stand, nur einen Ablauf. Im Code trägt das Formular `data-ungespeichert`,
   solange es abweicht.
 - **Nur lesen:** Auf Seiten nur zum Lesen und in der Ansicht sind die Formulare gesperrt
