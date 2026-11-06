@@ -15,6 +15,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   Reevaluations-Triggern (#16).
 - Warum jeder Merge nach `dev` mit Code eine eigene Versionsnummer bekommt, steht jetzt als
   [ADR-007](adr/adr-007-version-pro-merge.md).
+- Entwurf für die Anmeldung zur Clubmeisterschaft, geschnitten in vier Teile: Turnier anlegen,
+  Einzel-Anmeldung, Doppel, Anmeldungen verwalten (#51; Teil-Issues #57 bis #60). Neue Frage
+  K-51 an den Verein: Doppel nach Summe der Klassierungen.
 
 ## 0.5.1 — Versionsnummer bei jedem Merge
 
