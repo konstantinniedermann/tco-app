@@ -30,7 +30,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Postadresse | Login-Briefe | ja |
 | E-Mail-Adresse | Bestätigungen, Benachrichtigungen, neuer Einmal-Code (A-LOGIN-10); je Mitglied eine eigene (FR-25) | ja, ausser bei Junioren, die ein Elternteil führt (Vorschlag K-08) |
 | Telefonnummer | Absprache der Gruppenspiele | für die CM ja |
-| Geschlecht, Jahrgang | Zulassung zu Kategorien; für die CM reicht der Jahrgang (K-40.2); volles Geburtsdatum nur, falls Swiss Tennis es für Lizenzanträge verlangt (hängt an K-40.1) | für die CM ja, beim Anlegen freiwillig |
+| Geschlecht, Jahrgang | Zulassung zu Kategorien; für die CM reicht der Jahrgang (K-40.2); volles Geburtsdatum nur, falls Swiss Tennis es für Lizenzanträge verlangt (hängt an K-40.1) | für die CM ja, beim Anlegen freiwillig; leer trägt das Mitglied sie einmal selbst ein (FR-37) |
 | Mitgliedernummer aus Fairgate | Wiedererkennen beim Einlesen (A-MITGLIED-07) | Pflicht beim Einlesen und beim Befehl *Admin festlegen*, sonst freiwillig |
 | Lizenznummer, Klassierung | Anmeldung (die Klassierung fragt die CM-Seite vor der ersten Anmeldung ab, FR-37), Lizenzanträge, Export an Swiss Tennis | nein; Klassierung für die CM ja |
 | Konto, Rollen, Benachrichtigungs-Einstellungen | Login, Berechtigungen, Push | ja |
@@ -46,7 +46,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | *Verwaltet von*: Elternteil, der das Konto eines Juniors führt (Vorschlag K-08) | Kind ohne eigenes Login | — |
 | Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (A-MITGLIED-07) | — |
 
-E-Mail, Telefon und Lizenznummer (Annahme K-19.1, FR-02) sowie die Adresse (Annahme K-19.2) ändert das Mitglied selbst im Profil; die E-Mail erst nach je einem Code an die alte und die neue Adresse (SI-09). Name, Geschlecht, Jahrgang und Mitgliedernummer ändert weiterhin der Mitglieder-Admin. Ändert er die E-Mail-Adresse, erhält die alte einen Hinweis ohne Adressen (SI-09). Neue Datenarten entstehen dadurch nicht.
+E-Mail, Telefon und Lizenznummer (Annahme K-19.1, FR-02) sowie die Adresse (Annahme K-19.2) ändert das Mitglied selbst im Profil; die E-Mail erst nach je einem Code an die alte und die neue Adresse (SI-09). Geschlecht und Jahrgang trägt das Mitglied einmal selbst ein, wenn sie leer sind (FR-37), danach ändert sie der Mitglieder-Admin; Name und Mitgliedernummer ändert weiterhin nur er. Ändert er die E-Mail-Adresse, erhält die alte einen Hinweis ohne Adressen (SI-09). Neue Datenarten entstehen dadurch nicht.
 
 Der Befehl *Admin festlegen* legt nur den ersten Admin selbst an (MyTCO- und Mitglieder-Admin, Annahme K-18.4); alle anderen Mitglieder kommen über das Einlesen oder die Verwaltung.
 
