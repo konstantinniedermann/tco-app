@@ -162,6 +162,15 @@ describe('Prüfung Kategorie', () => {
 		expect(pruefeKategorie({ ...doppel, mindestsumme: '20' }, 2027).ok).toBe(true);
 	});
 
+	it('FR-34: negative Mindestsumme ist ein Fehler', () => {
+		const r = pruefeKategorie({ ...doppel, mindestsumme: -5 }, 2027);
+		expect(r).toMatchObject({
+			ok: false,
+			felder: { mindestsumme: 'Bitte eine Zahl von 0 bis 20 angeben.' }
+		});
+		expect(pruefeKategorie({ ...doppel, jahr: -1, jahrgangVon: -1 }, 2027).ok).toBe(false);
+	});
+
 	it('FR-34: Wechsel auf Einzel verwirft die Mindestsumme, auf Doppel die Klassierung', () => {
 		const e = pruefeKategorie({ ...einzel, mindestsumme: 9 }, 2027);
 		expect(e).toMatchObject({ ok: true, werte: { mindestsumme: null } });

@@ -173,7 +173,8 @@ export function pruefeKategorie(
 			felder.klassierungBis = MELDUNG.klassierungEnde;
 	} else if (art === 'doppel') {
 		const z = zahl(roh.mindestsumme);
-		if (z === null || z === 'ungueltig' || z > SUMME_MAX) felder.mindestsumme = MELDUNG.summe;
+		if (z === null || z === 'ungueltig' || z < 0 || z > SUMME_MAX)
+			felder.mindestsumme = MELDUNG.summe;
 		else mindestsumme = z;
 	}
 
