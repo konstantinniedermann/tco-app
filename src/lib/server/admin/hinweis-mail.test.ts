@@ -46,9 +46,11 @@ describe('erstelleHinweis', () => {
 		expect(fehler.mock.calls).toEqual([['Hinweis-Mail nicht versandt']]);
 	});
 
-	test('SI-04, SI-09: ist die Grenze der Adresse erreicht, geht still keine Mail hinaus', async () => {
+	test('SI-04, SI-09: Grenze pro Stunde ausgeschöpft → Hinweis geht trotzdem', async () => {
 		const post: unknown[] = [];
 		const bremsen = erstelleBremsen();
+		for (let i = 0; i < 3; i++) bremsen.mailsProAdresseStunde.zaehle('alt@example.org');
+		expect(bremsen.mailsProAdresseStunde.erlaubt('alt@example.org')).toBe(false);
 		const hinweis = erstelleHinweis({
 			mailer: async (n) => {
 				post.push(n);
@@ -56,9 +58,39 @@ describe('erstelleHinweis', () => {
 			kontakt: 'kontakt@example.org',
 			bremsen
 		});
-		for (let i = 0; i < 3; i++) await hinweis('Alt@Example.org ');
-		await hinweis('alt@example.org');
-		expect(post).toHaveLength(3);
+		await hinweis('Alt@Example.org ');
+		expect(post).toHaveLength(1);
 		expect(fehler).not.toHaveBeenCalled();
+	});
+
+	test('SI-04, SI-09: Grenze pro Tag ausgeschöpft → Hinweis geht trotzdem', async () => {
+		const post: unknown[] = [];
+		const bremsen = erstelleBremsen();
+		for (let i = 0; i < 10; i++) bremsen.mailsProAdresseTag.zaehle('alt@example.org');
+		expect(bremsen.mailsProAdresseTag.erlaubt('alt@example.org')).toBe(false);
+		expect(bremsen.mailsProAdresseStunde.erlaubt('alt@example.org')).toBe(true);
+		const hinweis = erstelleHinweis({
+			mailer: async (n) => {
+				post.push(n);
+			},
+			kontakt: 'kontakt@example.org',
+			bremsen
+		});
+		await hinweis('Alt@Example.org ');
+		expect(post).toHaveLength(1);
+		expect(fehler).not.toHaveBeenCalled();
+	});
+
+	test('SI-04, SI-09: der Hinweis zählt gegen beide Grenzen der Adresse', async () => {
+		const bremsen = erstelleBremsen();
+		const hinweis = erstelleHinweis({
+			mailer: async () => {},
+			kontakt: 'kontakt@example.org',
+			bremsen
+		});
+		for (let i = 0; i < 3; i++) await hinweis('Alt@Example.org ');
+		expect(bremsen.mailsProAdresseStunde.erlaubt('alt@example.org')).toBe(false);
+		for (let i = 0; i < 7; i++) await hinweis('alt@example.org');
+		expect(bremsen.mailsProAdresseTag.erlaubt('alt@example.org')).toBe(false);
 	});
 });

@@ -15,19 +15,15 @@ export function baueEmailHinweisMail(kontakt: string): { betreff: string; text: 
 
 export type HinweisAbh = { mailer: Mailer; kontakt: string; bremsen: Bremsen };
 
-// Wirft nie. Die Mail zählt gegen die Grenzen der Empfänger-Adresse (SI-04); ist sie erreicht,
-// geht still keine Mail hinaus.
+// Wirft nie. Die Mail zählt gegen die Grenzen der Empfänger-Adresse (SI-04), wird von ihnen aber
+// nie blockiert: Sonst merkte die Person eine Übernahme nicht, wenn Login-Codes die Grenze
+// ausgeschöpft haben (SI-09). Eine Flut bleibt begrenzt, weil nur eine bestätigte
+// Adress-Änderung durch einen Mitglieder-Admin den Hinweis auslöst.
 export function erstelleHinweis(abh: HinweisAbh): (an: string) => Promise<void> {
 	const { mailer, kontakt, bremsen } = abh;
 	return async (an) => {
 		try {
 			const adresse = an.trim().toLowerCase();
-			if (
-				!bremsen.mailsProAdresseStunde.erlaubt(adresse) ||
-				!bremsen.mailsProAdresseTag.erlaubt(adresse)
-			) {
-				return;
-			}
 			bremsen.mailsProAdresseStunde.zaehle(adresse);
 			bremsen.mailsProAdresseTag.zaehle(adresse);
 			await mailer({ an, ...baueEmailHinweisMail(kontakt) });
