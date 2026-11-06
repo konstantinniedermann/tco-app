@@ -1,7 +1,7 @@
 # Design: Rollen schärfen — vier Admin-Rollen statt eines «Admin» (#43)
 
 **Datum:** 2026-11-06 · **Issue:** [#43](https://github.com/konstantinniedermann/tco-app/issues/43)
-· **Status:** Entwurf, Konzept vom Projektleiter im Gespräch festgelegt; Frage an den Vorstand
+· **Status:** freigegeben (Projektleiter, 06.11.2026); Frage an den Vorstand
 K-18.4
 
 ## Absicht
@@ -23,7 +23,7 @@ lässt sich einzeln geben und wieder entziehen (Entscheid Projektleiter, 06.11.2
 | Rolle | Beispiel im Verein (Vorschlag K-18.4) | Darf in MyTCO | Ausserhalb von MyTCO |
 |-------|---------------------------------------|---------------|----------------------|
 | **MyTCO-Admin** | Projektleiter, Hauptansprechperson | **Sieht alles, ändert nichts** ausser Rollen. Vergibt und entzieht Rollen. *Ansicht als …* | GitHub, Hosting, Server, Code, Datensicherung, Zugangsdaten |
-| **Mitglieder-Admin** | Mitgliederverwaltung, evtl. Aktuarin | Mitglieder anlegen, bearbeiten, Austritt, Export und Löschen (DS-07), Brief-Codes und Briefe drucken, Sitzungen beenden, Liste *Für Fairgate*, Anlässe (GV-Anmeldung) | — |
+| **Mitglieder-Admin** | Mitgliederverwaltung, evtl. Aktuarin | Mitglieder anlegen, bearbeiten, Austritt, Export und Löschen (DS-07), Briefe auslösen (Serie für nicht aktivierte Konten), Sitzungen beenden, Liste *Für Fairgate*, Anlässe (GV-Anmeldung) | — |
 | **CM-Admin** | CM-Leitung, Projektleiter | wie heute *CM-Verantwortlicher* (A-ROLLE-07) | — |
 | **Lizenz-Admin** | Lizenzverantwortlicher | wie heute *Lizenzverantwortlicher* (A-ROLLE-08) | — |
 | **Mitglied** | alle | wie heute | — |
@@ -56,12 +56,13 @@ Nummern beim Nachführen dort vergeben.
 7. **Verwaltung zeigt nur die eigenen Bereiche** (wie RR-07): Mitglieder-Admin nur Mitglieder,
    Fairgate, Anlässe, Verlauf; CM-Admin nur Clubmeisterschaft; Lizenz-Admin nur Lizenzen;
    MyTCO-Admin alle, nur lesend, dazu *Rollen*.
-8. **Briefe:** Der Mitglieder-Admin erzeugt die Briefe. Wie in Etappe 2 der
-   [Mitgliederverwaltung](2026-11-04-admin-mitgliederverwaltung-design.md) druckt sie der
-   Browser, kein PDF vom Server; «Als PDF sichern» im Druckdialog genügt, um die Datei
-   weiterzugeben. Wer druckt und verschickt, braucht keine Rolle (Vorschlag K-16.1). Hinweis in
-   der Druckansicht: Die Briefe enthalten die Codes aller Empfänger, eine gesicherte Datei nach
-   dem Druck löschen.
+8. **Briefe:** Der Mitglieder-Admin löst die Briefe aus, auch als Serie in einem Schritt: Die
+   Liste lässt sich auf **Konto noch nicht aktiviert** filtern (noch nie eingeloggt, mit oder
+   ohne schon ausgestellten Brief-Code), alle oder einzelne auswählen, Briefe erzeugen. Ein
+   neuer Code ersetzt den alten (FR-24), so dient dieselbe Liste auch für einen zweiten Brief an
+   Nachzügler. **Vertagt** (Entscheid Projektleiter, 06.11.2026): wie gedruckt und verschickt
+   wird und wer das übernimmt (K-16.1). Bis dahin gilt die Druckansicht im Browser aus der
+   [Mitgliederverwaltung](2026-11-04-admin-mitgliederverwaltung-design.md#briefe).
 9. **Konten mit Admin-Rolle sind nicht besonders geschützt** (Entscheid Projektleiter,
    06.11.2026): Der Mitglieder-Admin darf auch bei ihnen E-Mail ändern, Brief-Code ausstellen,
    Sitzungen beenden, Austritt erfassen und löschen. Damit könnte er sich in das Konto eines
@@ -96,7 +97,7 @@ Die Spalte *Admin* in [Rollen und Rechte](../../rollen-und-rechte.md#matrix) tei
 | Daten / Funktion | Mitglieder-Admin | MyTCO-Admin |
 |------------------|:----------------:|:-----------:|
 | Mitglieder anlegen, bearbeiten, löschen, exportieren | S | L |
-| Neuer Brief-Code, Briefe drucken, Sitzungen beenden | S | – |
+| Neuer Brief-Code, Briefe auslösen, Sitzungen beenden | S | – |
 | Rollen vergeben | – | S |
 | Änderungsverlauf | L | L |
 | Liste *Für Fairgate* | S | L |
@@ -117,7 +118,6 @@ CM-Admin und Lizenz-Admin übernehmen die Spalten der heutigen Verantwortlichen 
   Verein; die App erzwingt sie nicht (Entscheid des Bauenden). In die Datenschutzerklärung: wer
   die Rollen hat, was sie sehen und wozu.
 - Die Mitglieder-Admins sehen, was heute der Admin sieht, ausser der Rollenvergabe.
-- Briefe: Hinweis zum Löschen einer gesicherten Datei nach dem Druck (Regel 8).
 - Sicherheitskonzept: Restrisiko aus Regel 9 aufnehmen.
 
 ## Übergang im Code
@@ -145,7 +145,7 @@ Oberfläche: Band *Ansicht als* erst ins [UI-Leitbild](../../ui-leitbild.md).
 
 ## Nicht-Ziele
 
-- Keine Rolle *Briefversand*: Das PDF reicht (K-16.1).
+- Keine Rolle *Briefversand*; Druck und Versand sind vertagt (K-16.1).
 - Keine Rolle *Anlässe*, *Junioren-Leiter*, *Gast*: kommen später (A-ROLLE-04 bis -06).
 - In *Ansicht als* nichts absenden, auch nicht auf Test.
 - Keine Rechte pro Person ausserhalb der Rollen.
@@ -161,4 +161,4 @@ Ansicht. Screenshot, axe ohne Verstösse.
 
 K-18.4 (wer übernimmt welche der neuen Rollen; ersetzt den ersten Vorschlag in K-18.2 und
 ändert die Antwort auf K-18.1, weil die Stellvertretung durch den Admin entfällt),
-K-16.1 (Briefversand ohne Rolle, Vorschlag).
+K-16.1 (wer druckt und verschickt die Briefe; vertagt).

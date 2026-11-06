@@ -11,8 +11,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 - Entwurf «Rollen schärfen»: Statt eines «Admin» vier Admin-Rollen (MyTCO-, Mitglieder-, CM-,
   Lizenz-Admin), einzeln vergeben; der MyTCO-Admin sieht alles, ändert nichts und kann MyTCO
   «als» eine Rolle ansehen (#43). Neue Fragen an den Verein: K-18.4 (Besetzung der Rollen),
-  K-50.1 bis K-50.4 (GV-Anmeldung, frühestens zur GV 2028, #52); K-13.2 und K-16.1 als
-  Vorschläge nach dem gebauten Stand; K-06.3 selbst beantwortet.
+  K-50.1 bis K-50.4 (GV-Anmeldung, frühestens zur GV 2028, #52); K-13.2 als
+  Vorschlag nach dem gebauten Stand; Briefe löst der Mitglieder-Admin als Serie für nicht
+  aktivierte Konten aus, Druck und Versand vertagt (K-16.1); K-06.3 selbst beantwortet.
 
 ## 0.5.3 — Schnellere Merges
 
