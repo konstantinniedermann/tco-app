@@ -59,13 +59,20 @@ Voraussetzung für den Umbau (Spec, Regel 9). Die Selbständerung (#50) bleibt u
 - Produces: `baueEmailHinweisMail(kontakt: string): { betreff: string; text: string }`; `AdminDienste` erhält `hinweis: (an: string) => Promise<void>` (wirft nie, Fehler → `console.error('Hinweis-Mail nicht versandt')`); `aendereAngaben` liefert bei `ok` zusätzlich `alteEmail: string | null` (gesetzt nur, wenn `email` unter `geaendert` ist).
 
 - [ ] **Schritt 1: Failing Tests.**
-  - `hinweis-mail.test.ts` › `«Hinweis nennt keine Adressen und den Kontakt»`: Betreff `'Deine E-Mail-Adresse in MyTCO wurde geändert'`; `text` enthält `'Falls du das nicht warst, melde dich bei <kontakt>.'` und weder die alte noch die neue Adresse.
+  - `hinweis-mail.test.ts` › `«Hinweis nennt keine Adressen und den Kontakt»`: Betreff und Text genau so (vom Projektleiter am 06.11.2026 festgelegt), ohne alte oder neue Adresse:
+    ```text
+    Betreff: Deine E-Mail-Adresse in MyTCO wurde geändert
+
+    Die Verwaltung von MyTCO hat die E-Mail-Adresse deines Kontos geändert. Mails von MyTCO gehen ab jetzt an die neue Adresse, auch der Code zum Anmelden.
+
+    Hast du diese Änderung nicht verlangt? Dann melde dich bitte bei <kontakt>.
+    ```
   - `mitglieder.db.test.ts` › `«aendereAngaben meldet die alte Adresse nur bei geänderter E-Mail»`: E-Mail geändert → `alteEmail` = alte Adresse; nur Telefon geändert → `alteEmail === null`.
   - `schnittstellen.db.test.ts` › `«postMitglied schickt den Hinweis an die alte Adresse»`: `hinweis` als Spion, E-Mail ändern → genau ein Aufruf mit der alten Adresse; Änderung ohne E-Mail → kein Aufruf. Dazu `«scheitert der Hinweis, bleibt die Änderung gespeichert»`: Spion wirft nicht (Vertrag), aber ein Mailer, der wirft, führt im echten `hinweis` zu genau einer Logzeile `'Hinweis-Mail nicht versandt'` (für diesen Test den Log-Spion der Datei gezielt erwarten und zurücksetzen).
 - [ ] **Schritt 2:** `npx vitest run src/lib/server/admin/hinweis-mail.test.ts` und `make test` → FAIL.
 - [ ] **Schritt 3: Umsetzen.** `hinweis` wird erst nach dem Commit der Transaktion aufgerufen und nicht abgewartet (`void d.hinweis(alt)`), damit die Antwortzeit nichts verrät und kein Mailfehler die Antwort ändert. In `index.ts` derselbe umgeleitete Mailer wie für den Zugang (`leiteUm(...)`). Die Mail zählt gegen die Grenze der Empfänger-Adresse (SI-04: `bremsen.mailsProAdresseStunde/Tag`). Ist die Grenze erreicht, geht still keine Mail hinaus.
 - [ ] **Schritt 4:** Tests → PASS.
-- [ ] **Schritt 5:** In `docs/sicherheitskonzept.md` bei SI-09 den Satz «der Hinweis bei einer Änderung durch den Admin fehlt noch …» durch den gebauten Stand ersetzen. Commit `feat: Hinweis an die alte Adresse, wenn die Verwaltung die E-Mail ändert (SI-09)`.
+- [ ] **Schritt 5:** In `docs/sicherheitskonzept.md` bei SI-09 den zitierten Hinweistext («Falls du das nicht warst …») durch den neuen Wortlaut ersetzen. Den Satz «der Hinweis bei einer Änderung durch den Admin fehlt noch …» ersetzen durch den gebauten Stand. Commit `feat: Hinweis an die alte Adresse, wenn die Verwaltung die E-Mail ändert (SI-09)`.
 
 ### Task 2: Rollen im Datenmodell, Übergang und RR-03 für den MyTCO-Admin
 
