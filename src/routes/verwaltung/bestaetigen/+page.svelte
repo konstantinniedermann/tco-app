@@ -39,7 +39,7 @@
 		const a = await bestaetige(code);
 		if (a.art === 'ok') {
 			// Eine vorgeladene Seite (Tippen auf einen Link) kennt die Bestätigung noch nicht.
-			await goto(resolve(startziel(data.rollen)), { invalidateAll: true });
+			await goto(resolve(startziel(data.rollen)), { refreshAll: true });
 			return;
 		}
 		laeuft = false;

@@ -122,6 +122,9 @@ test('RR-07, A-ROLLE-07, A-TURNIER-01, A-TURNIER-02, A-TURNIER-03, A-ANMELDUNG-0
 	// A-TURNIER-03, FR-35: Kategorie über die Rückfrage absagen; danach ohne Link mit Plakette.
 	await page.getByRole('link', { name: 'Herren R1–R6' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Herren R1–R6' })).toBeVisible();
+	// Die Maus ruht auf dem Rücklink zum Turnier, bevor abgesagt wird: Ein Vorladen schon beim Überfahren holte
+	// die Turnierseite vor dem Speichern, der Rücksprung zeigte dann den alten Stand.
+	await page.getByRole('link', { name: `‹ ${name}` }).hover();
 	await page.getByRole('button', { name: 'Kategorie absagen' }).click();
 	const rueckfrage = page.getByRole('dialog', { name: 'Kategorie absagen?' });
 	await expect(rueckfrage.getByText('Das lässt sich nicht rückgängig machen.')).toBeVisible();

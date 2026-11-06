@@ -5,8 +5,8 @@
 export const DATENBANK_URL =
 	process.env.DATABASE_URL ?? 'postgres://mytco:mytco_lokal@localhost:55432/mytco';
 
-/** HTTP-API von Mailpit (docker-compose.yml, Service `mail`). */
-export const MAILPIT_URL = 'http://localhost:58025';
+/** HTTP-API von Mailpit (docker-compose.yml, Service `mail`); in der CI über den Service-Namen. */
+export const MAILPIT_URL = process.env.MAILPIT_URL || 'http://localhost:58025';
 
 const STANDARD = {
 	MYTCO_CODE_SCHLUESSEL: 'nur-lokal-nicht-fuer-produktion-0123456789abcdef',

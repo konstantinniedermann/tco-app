@@ -182,6 +182,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Nachtrag (06.11.2026, nachmittags):** Nach dem Entscheid noch dreimal am selben Tag, jedes Mal mit demselben Abbruch nach 8 Minuten und nach einem Neustart des Jobs grün: Release-PR #62 (desktop), Merge 0.6.1 auf `dev` (android), Merge 0.7.0 auf `dev`, Lauf 42223464675 (iphone).
 
+**Umgesetzt (06.11.2026):** Entscheid revidiert, die E2E-Jobs laufen im Playwright-Image (Branch `fix/ci-playwright-container`); kein apt mehr. Der Umbau deckte einen App-Fehler auf (veraltete Seite nach dem Speichern durch Vorladen beim Überfahren), behoben in `fix/vorladen-veraltet`. Bei der nächsten Auswertung ins Archiv.
+
 ### 2026-11-06 — make check baut die App doppelt: einmal selbst, einmal im Webserver der E2E-Tests
 
 **Thema:** Betrieb
@@ -229,6 +231,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) des Branches `feat/schnellere-merges`.
 
 **Einschätzung:** Entweder als lokaler Einrichtungsbefehl in README/Makefile nennen oder entfernen; eine Änderung an `package.json` zählt als Code und bringt eine Versionsnummer, daher mit dem nächsten Code-Merge erledigen.
+
+**Nachtrag (06.11.2026):** Die CI installiert gar nichts mehr, die E2E-Jobs laufen im Playwright-Image (`fix/ci-playwright-container`). `e2e:browser` bleibt damit erst recht ungenutzt; lokal installiert die README die Browser mit `playwright install chromium webkit`.
 
 ### 2026-11-06 — Live-Schlüssel könnte jetzt in einer Deployment-Umgebung nur für main liegen
 
