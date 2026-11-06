@@ -322,3 +322,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) des Branches `feat/wappen-start`.
 
 **Einschätzung:** Nur bei Störungen oder gleichzeitiger Bearbeitung; die Rückfrage schadet dann nicht (Verlassen geht). Beheben, wenn diese Seiten ohnehin angefasst werden: das Formular nach jedem Nachladen neu aufbauen wie bei den Angaben eines Mitglieds (`nachSpeichern`).
+
+### 2026-11-06 — Auswahlfeld «Geschlecht» ist im iPhone-Profil der Verwaltung nur halb so hoch wie die Textfelder
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/design/basis.css` (`.feld-zeile select`), sichtbar in `src/lib/verwaltung/Angabenformular.svelte` auf iPhone (WebKit)
+
+**Beobachtung:** Im E2E-Screenshot (iPhone-Profil) zeigt WebKit das `<select>` mit eigenem Aussehen (`menulist`): schmal, ohne den dicken Rand und ohne `--tippflaeche` als Mindesthöhe. Das gilt gesperrt (Baustein *Nur lesen*) wie bearbeitbar; das Kategorieformular hat dieselben Felder. Im selben Bild läuft auch die lange E-Mail-Adresse im Feld abgeschnitten.
+
+**Ursprung:** Screenshots zu #43 (Task 5, Rollen-Umbau der Oberfläche).
+
+**Einschätzung:** Vermutlich verletzt es UI-03 (48 px) am iPhone; die Abhilfe wäre wahrscheinlich `appearance: none` mit einem eigenen Pfeil. Das trifft alle Auswahlfelder, darum erst ins Leitbild und dann am Gerät prüfen.
