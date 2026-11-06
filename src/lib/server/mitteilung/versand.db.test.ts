@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { eq, inArray } from 'drizzle-orm';
+import { inArray } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
@@ -169,19 +169,22 @@ describe('Versand einer Mitteilung', () => {
 
 	test('FR-44: ungueltig löscht das Abo', async () => {
 		const m = await legeMitgliedAn(db);
-		const sitzungHash = randomUUID();
-		await db.insert(sitzung).values({
-			kennungHash: sitzungHash,
-			kontoId: m.kontoId,
-			sitzungsversion: 1,
-			erstelltAm: SITZUNG_ZEIT,
-			zuletztGenutzt: SITZUNG_ZEIT
-		});
+		// Zwei Geräte, je mit eigener Sitzung (ein Abo je Sitzung).
+		const sitzungen = [randomUUID(), randomUUID()];
+		await db.insert(sitzung).values(
+			sitzungen.map((kennungHash) => ({
+				kennungHash,
+				kontoId: m.kontoId,
+				sitzungsversion: 1,
+				erstelltAm: SITZUNG_ZEIT,
+				zuletztGenutzt: SITZUNG_ZEIT
+			}))
+		);
 		const [weg, bleibt] = [neuesAbo(), neuesAbo()];
 		await db.insert(pushAbo).values(
-			[weg, bleibt].map((a) => ({
+			[weg, bleibt].map((a, i) => ({
 				...a,
-				sitzungHash,
+				sitzungHash: sitzungen[i],
 				kontoId: m.kontoId,
 				eingerichtetAm: SITZUNG_ZEIT
 			}))
@@ -208,7 +211,7 @@ describe('Versand einer Mitteilung', () => {
 			.where(inArray(pushAbo.endpunkt, [weg.endpunkt, bleibt.endpunkt]));
 		expect(rest).toEqual([{ endpunkt: bleibt.endpunkt }]);
 		expect(z).toEqual({ push: 0, mails: 0, ersatzMails: 1, nichtErreichbar: 0 });
-		await db.delete(sitzung).where(eq(sitzung.kennungHash, sitzungHash));
+		await db.delete(sitzung).where(inArray(sitzung.kennungHash, sitzungen));
 	});
 
 	test('FR-44: Mailfehler bei einem hält die anderen nicht auf', async () => {

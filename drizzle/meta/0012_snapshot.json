@@ -1,5 +1,5 @@
 {
-  "id": "29b8d73d-4708-4c25-afff-f0d0574f99aa",
+  "id": "01f92217-5a93-4cea-aa95-a354ee282265",
   "prevId": "cc81a6f7-667c-4baf-b2ef-8c82d6353b4d",
   "version": "7",
   "dialect": "postgresql",
@@ -1280,6 +1280,21 @@
             }
           ],
           "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "push_abo_sitzung_hash_unique": {
+          "name": "push_abo_sitzung_hash_unique",
+          "columns": [
+            {
+              "expression": "sitzung_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
           "concurrently": false,
           "method": "btree",
           "with": {}

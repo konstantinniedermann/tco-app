@@ -435,6 +435,33 @@ describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 		]);
 	});
 
+	test('FR-45: Verlauf zeigt nur das letzte Jahr, auch ohne Senden', async () => {
+		const s = baue();
+		const admin = await bestaetigt(s, ['mitglieder']);
+		const { id } = await neuerAnlass(admin.mitgliedId);
+		const spaeter = new Date(JETZT.getTime() + 400 * TAG);
+		const eintrag = (titel: string, alter: number) => ({
+			bezug: 'anlass' as const,
+			anlassId: id,
+			absenderId: admin.mitgliedId,
+			gesendetAm: new Date(spaeter.getTime() - alter),
+			titel,
+			text: 'Alt',
+			auswahl: 'alle',
+			weg: 'push' as const
+		});
+		await db()
+			.insert(mitteilung)
+			.values([
+				eintrag('zu alt', 365 * TAG + 1000),
+				eintrag('genau ein Jahr', 365 * TAG),
+				eintrag('jung', TAG)
+			]);
+		const d = { ...s.d, jetzt: () => spaeter };
+		const v = await (await getAnlassMitteilungen(d, hole(admin.konto, { id: String(id) }))).json();
+		expect(v.verlauf.map((e: { titel: string }) => e.titel)).toEqual(['jung', 'genau ein Jahr']);
+	});
+
 	test('FR-43: Vorschau liefert Namen nach Nachname', async () => {
 		const s = baue();
 		const admin = await bestaetigt(s, ['mitglieder']);

@@ -1,6 +1,6 @@
 // Push-Abo prüfen, speichern und löschen (FR-40). Der Endpunkt ist eine URL, die der Server später
 // aufruft; darum nur Push-Dienste der Browser-Hersteller (SI-21), sonst wäre es eine Anfragefälschung.
-import { eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { pushAbo } from '../db/schema.ts';
 
@@ -18,21 +18,23 @@ function hostErlaubt(host: string): boolean {
 	return GENAU.includes(host) || ENDUNG.some((e) => host.endsWith(e) && host.length > e.length);
 }
 
-function endpunktGueltig(roh: string): boolean {
-	if (roh.length > MAX_ENDPUNKT) return false;
+/** Der Endpunkt in der Schreibweise von `URL`, damit dasselbe Gerät nur einmal gespeichert wird; `null`, wenn ungültig. */
+function gueltigerEndpunkt(roh: string): string | null {
+	if (roh.length > MAX_ENDPUNKT) return null;
 	let u: URL;
 	try {
 		u = new URL(roh);
 	} catch {
-		return false;
+		return null;
 	}
-	return (
+	const gueltig =
 		u.protocol === 'https:' &&
 		u.username === '' &&
 		u.password === '' &&
 		u.port === '' &&
-		hostErlaubt(u.hostname)
-	);
+		hostErlaubt(u.hostname) &&
+		u.href.length <= MAX_ENDPUNKT;
+	return gueltig ? u.href : null;
 }
 
 const schluessel = (w: unknown, max: number): w is string =>
@@ -42,14 +44,18 @@ const schluessel = (w: unknown, max: number): w is string =>
 export function pruefeAbo(roh: unknown): { ok: true; abo: Abo } | { ok: false } {
 	if (typeof roh !== 'object' || roh === null) return { ok: false };
 	const { endpoint, keys } = roh as { endpoint?: unknown; keys?: unknown };
-	if (typeof endpoint !== 'string' || !endpunktGueltig(endpoint)) return { ok: false };
+	const endpunkt = typeof endpoint === 'string' ? gueltigerEndpunkt(endpoint) : null;
+	if (endpunkt === null) return { ok: false };
 	if (typeof keys !== 'object' || keys === null) return { ok: false };
 	const { p256dh, auth } = keys as { p256dh?: unknown; auth?: unknown };
 	if (!schluessel(p256dh, MAX_P256DH) || !schluessel(auth, MAX_AUTH)) return { ok: false };
-	return { ok: true, abo: { endpunkt: endpoint, p256dh, auth } };
+	return { ok: true, abo: { endpunkt, p256dh, auth } };
 }
 
-/** Upsert auf den Endpunkt: dasselbe Gerät bei einem anderen Konto wechselt zum neuen Konto. */
+/**
+ * Ein Abo je Sitzung (FR-40): Andere Abos derselben Sitzung fallen weg. Upsert auf den Endpunkt:
+ * dasselbe Gerät bei einem anderen Konto wechselt zum neuen Konto.
+ */
 export async function speichereAbo(
 	db: Db,
 	kontoId: number,
@@ -64,10 +70,15 @@ export async function speichereAbo(
 		auth: abo.auth,
 		eingerichtetAm: jetzt
 	};
-	await db
-		.insert(pushAbo)
-		.values({ endpunkt: abo.endpunkt, ...werte })
-		.onConflictDoUpdate({ target: pushAbo.endpunkt, set: werte });
+	await db.transaction(async (tx) => {
+		await tx
+			.delete(pushAbo)
+			.where(and(eq(pushAbo.sitzungHash, sitzungHash), ne(pushAbo.endpunkt, abo.endpunkt)));
+		await tx
+			.insert(pushAbo)
+			.values({ endpunkt: abo.endpunkt, ...werte })
+			.onConflictDoUpdate({ target: pushAbo.endpunkt, set: werte });
+	});
 }
 
 export async function loescheAbo(db: Db, sitzungHash: string): Promise<void> {

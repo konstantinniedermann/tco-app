@@ -35,4 +35,5 @@ ALTER TABLE "push_abo" ADD CONSTRAINT "push_abo_sitzung_hash_sitzung_kennung_has
 ALTER TABLE "push_abo" ADD CONSTRAINT "push_abo_konto_id_konto_id_fk" FOREIGN KEY ("konto_id") REFERENCES "public"."konto"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "mitteilung_anlass_id_gesendet_am_idx" ON "mitteilung" USING btree ("anlass_id","gesendet_am");--> statement-breakpoint
 CREATE INDEX "mitteilung_gesendet_am_idx" ON "mitteilung" USING btree ("gesendet_am");--> statement-breakpoint
-CREATE INDEX "push_abo_konto_id_idx" ON "push_abo" USING btree ("konto_id");
+CREATE INDEX "push_abo_konto_id_idx" ON "push_abo" USING btree ("konto_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "push_abo_sitzung_hash_unique" ON "push_abo" USING btree ("sitzung_hash");

@@ -5,6 +5,9 @@ import type { PushSender } from './versand.ts';
 
 // Ein Push, der einen Tag nicht zugestellt werden konnte, ist veraltet.
 const TTL_SEKUNDEN = 24 * 60 * 60;
+// Ein hängender Push-Dienst hält den Versand nicht auf: Nach 10 s ohne Antwort gilt der Push als
+// gescheitert (`web-push` bricht die Anfrage mit «Socket timeout» ab).
+const TIMEOUT_MS = 10_000;
 
 /**
  * Kontakt für den Push-Dienst (VAPID `subject`): die Adresse von MyTCO, wenn sie `https:` ist,
@@ -24,6 +27,7 @@ export function erstelleWebPush(
 ): PushSender {
 	const optionen = {
 		TTL: TTL_SEKUNDEN,
+		timeout: TIMEOUT_MS,
 		vapidDetails: { subject, publicKey: vapid.oeffentlich, privateKey: vapid.privat }
 	};
 	return async (abo, nutzlast) => {

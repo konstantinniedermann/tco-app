@@ -16,6 +16,14 @@ describe('Push-Abo prüfen', () => {
 		});
 	});
 
+	test('FR-40: Endpunkt wird in der Schreibweise von URL gespeichert', () => {
+		const r = pruefeAbo(abo('https://FCM.GoogleAPIs.com/fcm/send/abc'));
+		expect(r).toEqual({
+			ok: true,
+			abo: { endpunkt: 'https://fcm.googleapis.com/fcm/send/abc', ...KEYS }
+		});
+	});
+
 	test('SI-21: Endpunkt von web.push.apple.com ist gültig', () => {
 		expect(pruefeAbo(abo('https://web.push.apple.com/QAbc')).ok).toBe(true);
 	});

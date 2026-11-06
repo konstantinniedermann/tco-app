@@ -125,7 +125,7 @@ function verlauf(art: Ziel['art']): AdminHandler {
 			mitZiel(d, e, art, async (z) =>
 				antwort(200, {
 					vorlagen: z.art === 'anlass' ? vorlagenAnlass(z.anlass) : [],
-					verlauf: await ladeVerlauf(d.db, bezug(z))
+					verlauf: await ladeVerlauf(d.db, bezug(z), jetztAdmin(d))
 				})
 			)
 		);

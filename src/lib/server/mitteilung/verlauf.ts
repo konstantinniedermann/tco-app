@@ -1,5 +1,5 @@
 // Verlauf der gesendeten Mitteilungen (FR-42, FR-45): nur Zahlen, nie die Namen der Empfänger.
-import { and, desc, eq, lt, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, lt, sql } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { anlass, mitglied, mitteilung, type Weg } from '../db/schema.ts';
 import type { Zahlen } from './versand.ts';
@@ -42,8 +42,10 @@ export async function ladeAnlassKopf(
 	return a ?? null;
 }
 
-/** Neueste zuerst. */
-export async function ladeVerlauf(db: Db, b: Bezug): Promise<VerlaufEintrag[]> {
+const grenze = (jetzt: Date) => new Date(jetzt.getTime() - AUFBEWAHRUNG_MS);
+
+/** Neueste zuerst; nur das letzte Jahr, auch wenn seither nichts gesendet und aufgeräumt wurde (FR-45). */
+export async function ladeVerlauf(db: Db, b: Bezug, jetzt: Date): Promise<VerlaufEintrag[]> {
 	return db
 		.select({
 			gesendetAm: mitteilung.gesendetAm,
@@ -59,7 +61,7 @@ export async function ladeVerlauf(db: Db, b: Bezug): Promise<VerlaufEintrag[]> {
 		})
 		.from(mitteilung)
 		.leftJoin(mitglied, eq(mitglied.id, mitteilung.absenderId))
-		.where(nachBezug(b))
+		.where(and(nachBezug(b), gte(mitteilung.gesendetAm, grenze(jetzt))))
 		.orderBy(desc(mitteilung.gesendetAm), desc(mitteilung.id));
 }
 
@@ -74,9 +76,7 @@ export async function speichereMitteilung(
 	jetzt: Date
 ): Promise<void> {
 	await db.transaction(async (tx) => {
-		await tx
-			.delete(mitteilung)
-			.where(lt(mitteilung.gesendetAm, new Date(jetzt.getTime() - AUFBEWAHRUNG_MS)));
+		await tx.delete(mitteilung).where(lt(mitteilung.gesendetAm, grenze(jetzt)));
 		await tx.insert(mitteilung).values({
 			bezug: b.art,
 			anlassId: b.art === 'anlass' ? b.anlassId : null,

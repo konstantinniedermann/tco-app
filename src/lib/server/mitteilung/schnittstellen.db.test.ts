@@ -95,6 +95,46 @@ describe('Schnittstellen für Mitteilungen (Mitglied)', () => {
 		expect(vom1).toHaveLength(0);
 	});
 
+	test('FR-40: ein zweites Abo derselben Sitzung ersetzt das erste', async () => {
+		const konto = await einloggen();
+		const erstes = neuesAbo();
+		const zweites = neuesAbo();
+		await postAbo(d, ereignis({ body: erstes, konto }));
+		const r = await postAbo(d, ereignis({ body: zweites, konto }));
+		expect(r.status).toBe(200);
+		const zeilen = await db
+			.select()
+			.from(pushAbo)
+			.where(eq(pushAbo.sitzungHash, konto.sitzungHash));
+		expect(zeilen.map((z) => z.endpunkt)).toEqual([zweites.endpoint]);
+	});
+
+	test('FR-40: Endpunkt wird normalisiert gespeichert', async () => {
+		const konto = await einloggen();
+		const abo = neuesAbo();
+		const gross = abo.endpoint.replace('fcm.googleapis.com', 'FCM.GOOGLEAPIS.COM');
+		await postAbo(d, ereignis({ body: { ...abo, endpoint: gross }, konto }));
+		const zeilen = await db
+			.select()
+			.from(pushAbo)
+			.where(eq(pushAbo.sitzungHash, konto.sitzungHash));
+		expect(zeilen.map((z) => z.endpunkt)).toEqual([abo.endpoint]);
+	});
+
+	test('FR-40: Abo löschen trifft nur die eigene Sitzung', async () => {
+		const a = await einloggen();
+		const b = await einloggen();
+		const aboB = neuesAbo();
+		await postAbo(d, ereignis({ body: neuesAbo(), konto: a }));
+		await postAbo(d, ereignis({ body: aboB, konto: b }));
+		const r = await postAboLoeschen(d, ereignis({ body: {}, konto: a }));
+		expect(r.status).toBe(200);
+		const vonA = await db.select().from(pushAbo).where(eq(pushAbo.sitzungHash, a.sitzungHash));
+		expect(vonA).toHaveLength(0);
+		const vonB = await db.select().from(pushAbo).where(eq(pushAbo.sitzungHash, b.sitzungHash));
+		expect(vonB.map((z) => z.endpunkt)).toEqual([aboB.endpoint]);
+	});
+
 	test('FR-40: Abo löschen', async () => {
 		const konto = await einloggen();
 		await postAbo(d, ereignis({ body: neuesAbo(), konto }));

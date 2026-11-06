@@ -300,7 +300,11 @@ export const pushAbo = pgTable(
 		auth: text('auth').notNull(),
 		eingerichtetAm: timestamp('eingerichtet_am', { withTimezone: true }).notNull()
 	},
-	(t) => [index('push_abo_konto_id_idx').on(t.kontoId)]
+	(t) => [
+		index('push_abo_konto_id_idx').on(t.kontoId),
+		// FR-40: ein Abo je Sitzung, also je Gerät.
+		uniqueIndex('push_abo_sitzung_hash_unique').on(t.sitzungHash)
+	]
 );
 
 // Gesendete Mitteilung mit Zählern der Zustellung (FR-45).

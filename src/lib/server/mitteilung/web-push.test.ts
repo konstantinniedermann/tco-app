@@ -15,7 +15,7 @@ beforeEach(() => {
 });
 
 describe('Web-Push-Adapter', () => {
-	test('FR-44: Erfolg gibt ok, mit TTL 86400 und den VAPID-Angaben', async () => {
+	test('FR-44: Erfolg gibt ok, mit TTL 86400, Timeout 10 s und den VAPID-Angaben', async () => {
 		sendNotification.mockResolvedValue({ statusCode: 201 });
 		const sende = erstelleWebPush(VAPID, 'https://my.tcolten.ch');
 		expect(await sende(ABO, '{"titel":"T"}')).toBe('ok');
@@ -24,6 +24,7 @@ describe('Web-Push-Adapter', () => {
 			'{"titel":"T"}',
 			{
 				TTL: 86400,
+				timeout: 10000,
 				vapidDetails: {
 					subject: 'https://my.tcolten.ch',
 					publicKey: VAPID.oeffentlich,
@@ -46,6 +47,9 @@ describe('Web-Push-Adapter', () => {
 		sendNotification.mockRejectedValueOnce(fehlerMitStatus(429));
 		expect(await sende(ABO, 'x')).toBe('fehler');
 		sendNotification.mockRejectedValueOnce(new Error('Netz weg'));
+		expect(await sende(ABO, 'x')).toBe('fehler');
+		// So bricht web-push nach dem Timeout ab.
+		sendNotification.mockRejectedValueOnce(new Error('Socket timeout'));
 		expect(await sende(ABO, 'x')).toBe('fehler');
 		sendNotification.mockRejectedValueOnce(null);
 		expect(await sende(ABO, 'x')).toBe('fehler');
