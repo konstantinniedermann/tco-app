@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Repo öffentlich gemacht (Actions-Minuten gratis); `main` auf GitHub geschützt: nur über
+  PR mit Merge-Commit, Prüfungen grün, kein Force-Push. Workflows aus Forks laufen erst nach
+  Freigabe; Secret-Scanning von GitHub mit Sperre beim Push an. Doku zu CI/CD, Sicherheit
+  und Kosten nachgeführt.
 - Entwurf «Rollen schärfen»: Statt eines «Admin» vier Admin-Rollen (MyTCO-, Mitglieder-, CM-,
   Lizenz-Admin), einzeln vergeben; der MyTCO-Admin sieht alles, ändert nichts und kann MyTCO
   «als» eine Rolle ansehen (#43). Neue Fragen an den Verein: K-18.4 (Besetzung der Rollen),

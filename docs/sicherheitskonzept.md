@@ -133,8 +133,9 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
 Beim Gesamt-Review von #32 richtiggestellt; die frühere Annahme deckt die neue Reichweite nicht.
 Bis der Projektleiter bestätigt, gelten diese beiden Punkte als nicht angenommen.
 
-- **Schreibrecht auf GitHub reicht bis root auf dem Server.** Ohne GitHub Pro kann jedes Konto
-  mit Schreibrecht direkt auf `main` pushen oder einen Workflow mit dem Live-Schlüssel schreiben
+- **Schreibrecht auf GitHub reicht bis root auf dem Server.** Direkt auf `main` pushen kann
+  seit 06.11.2026 niemand mehr (Repo öffentlich, Regel «main schützen» auf GitHub), aber jedes
+  Konto mit Schreibrecht kann auf `dev` einen Workflow mit dem Live-Schlüssel schreiben
   ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Weil die Einrichtung des Servers im
   Image mitreist, läuft das `ausliefern` eines Images auf dem Server selbst, als Benutzer
   `mytco` mit Zugang zu Docker. Das reicht so weit wie root: an die Geheimnisse beider

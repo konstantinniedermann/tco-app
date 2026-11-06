@@ -177,3 +177,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) des Branches `feat/schnellere-merges`.
 
 **Einschätzung:** Entweder als lokaler Einrichtungsbefehl in README/Makefile nennen oder entfernen; eine Änderung an `package.json` zählt als Code und bringt eine Versionsnummer, daher mit dem nächsten Code-Merge erledigen.
+
+### 2026-11-06 — Live-Schlüssel könnte jetzt in einer Deployment-Umgebung nur für main liegen
+
+**Thema:** Betrieb
+
+**Fundort:** `.github/workflows/check.yml` (Job `ausliefern`, `SSH_SCHLUESSEL_LIVE`), `docs/ci-cd-und-release.md` («Schutz des Auslieferungswegs»), `docs/sicherheitskonzept.md` («Neu zu bestätigen»)
+
+**Beobachtung:** Seit das Repo öffentlich ist, gibt es Deployment-Umgebungen mit Schutzregeln ohne GitHub Pro. Die SSH-Schlüssel liegen aber noch als gewöhnliche Repo-Secrets: Ein Workflow, der auf `dev` gepusht wird, kann den Live-Schlüssel lesen. Eine Umgebung `live` mit «nur `main` darf ausliefern» würde genau das Restrisiko schliessen, das im Sicherheitskonzept noch zu bestätigen ist. Zudem prüft jetzt auch GitHub selbst auf Secrets (mit Sperre beim Push); der Kommentar in `secret-scan.yml` («für private Repos kostenpflichtig») stimmt nicht mehr ganz, gitleaks bleibt trotzdem nützlich.
+
+**Ursprung:** Session «Actions-Minuten», Wechsel des Repos auf öffentlich.
+
+**Einschätzung:** Lohnt sich vor der ersten Live-Auslieferung (`AUSLIEFERUNG_LIVE`); Änderung am Workflow zählt als Code und braucht einen Probelauf auf `dev` und `main`.
