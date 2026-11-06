@@ -72,7 +72,7 @@ flowchart TD
   S["Seiten: src/routes, +page.svelte, oft mit +page.ts"] -->|fetch, JSON| API["Schnittstellen: src/routes/api, nur +server.ts"]
   S --> UI["Oberfläche: src/lib, ohne server"]
   H["hooks.server.ts: Sitzung, Sicherheits-Header"] --> API
-  API --> F["Fachmodule: src/lib/server/login, admin, profil, anlass, brief"]
+  API --> F["Fachmodule: src/lib/server/login, admin, profil, anlass, turnier, brief"]
   F --> DB["Datenbank: src/lib/server/db, Drizzle, Migrationen in drizzle/"]
   DB --> PG[(PostgreSQL)]
 ```
@@ -80,10 +80,10 @@ flowchart TD
 | Baustein | Aufgabe | Regel |
 |----------|---------|-------|
 | **Seiten** (`src/routes/**/+page.*`) | Bildschirme für Mitglieder und `verwaltung/` für Admins; laden Daten im Browser | keine Server-Dateien ausser `+server.ts`, keine Form Actions, keine Remote Functions ([ADR-002](adr/adr-002-sveltekit-postgresql.md), Prüfung `bauregel`) |
-| **Schnittstellen** (`src/routes/api/**/+server.ts`) | JSON für die Seiten; `api/admin/` nur für Admins | Admin-Routen nutzen nur die Einträge aus `ADMIN_SCHNITTSTELLEN` (`src/lib/server/admin/schnittstellen.ts`), die Sitzung und Rolle prüfen, für den Admin-Bereich zusätzlich den frischen Mail-Code (SI-08) |
+| **Schnittstellen** (`src/routes/api/**/+server.ts`) | JSON für die Seiten; `api/admin/` nur für Verwaltungsrollen (Turniere und Kategorien: `admin` und `cm`, alles andere nur `admin`) | Admin-Routen nutzen nur die Einträge aus `ADMIN_SCHNITTSTELLEN` (`src/lib/server/admin/schnittstellen.ts`) oder `TURNIER_SCHNITTSTELLEN` (`src/lib/server/turnier/schnittstellen.ts`), die Sitzung und Rolle prüfen, für den Admin-Bereich zusätzlich den frischen Mail-Code (SI-08) |
 | **Fachmodule** (`src/lib/server/<thema>/`) | Fachregeln aus dem [Fachmodell](fachmodell.md) (`FR-NN`) und Rechte aus [Rollen und Rechte](rollen-und-rechte.md) (`RR-NN`) | Rechte prüft immer der Server |
 | **Datenbank** (`src/lib/server/db/`, `drizzle/`) | Schema und Migrationen | Migrationen fügen nur hinzu, damit der Rückfall auf das vorherige Image geht ([CI/CD und Release](ci-cd-und-release.md#auslieferung)) |
-| **Oberfläche** (`src/lib/` ohne `server/`) | Bausteine und Tokens (`ui/`, `design/`), Teile je Thema (`verwaltung/`, `login/`, `profil/`, `anlass/`, `hilfe/`, `datenschutz/`) | nur aus dem [UI-Leitbild](ui-leitbild.md) |
+| **Oberfläche** (`src/lib/` ohne `server/`) | Bausteine und Tokens (`ui/`, `design/`), Teile je Thema (`verwaltung/`, `login/`, `profil/`, `anlass/`, `turnier/`, `hilfe/`, `datenschutz/`) | nur aus dem [UI-Leitbild](ui-leitbild.md) |
 | **Skripte** (`scripts/`) | Admin festlegen, Seed, Testdaten, Musterbrief, Prüfungen für Hook und CI | Befehle über `make help` |
 | **Betrieb** (`betrieb/`) | Einrichtung, Auslieferung und Sicherung auf dem Server | siehe Kapitel 7 |
 
