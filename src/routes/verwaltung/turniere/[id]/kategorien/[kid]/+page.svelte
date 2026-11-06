@@ -24,6 +24,7 @@
 	let schluessel = $state(0);
 	let fehler = $state<Partial<Record<KategorieFeld, string>>>({});
 	let allgemein = $state<string | null>(null);
+	let absageFehler = $state<string | null>(null);
 	let rueckmeldung = $state<string | null>(null);
 	let laeuft = $state(false);
 	let rueckfrage = $state<HTMLDialogElement>();
@@ -64,6 +65,7 @@
 	async function absagen() {
 		if (laeuft) return;
 		laeuft = true;
+		absageFehler = null;
 		const a = await sageKategorieAb(kategorie.id);
 		rueckfrage?.close();
 		laeuft = false;
@@ -71,7 +73,7 @@
 		if (a.art === 'ok' || a.art === 'nicht-gefunden') {
 			await goto(resolve('/verwaltung/turniere/[id]', { id: String(kategorie.turnierId) }));
 		} else {
-			allgemein = MELDUNG.stoerung;
+			absageFehler = MELDUNG.stoerung;
 		}
 	}
 </script>
@@ -110,6 +112,9 @@
 	<h2>Kategorie absagen</h2>
 	<div class="karte">
 		<p>Mitglieder sehen eine abgesagte Kategorie nicht mehr.</p>
+		{#if absageFehler}
+			<p class="fehler" role="alert">{absageFehler}</p>
+		{/if}
 		<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}
 			>Kategorie absagen</button
 		>
