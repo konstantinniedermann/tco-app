@@ -137,6 +137,7 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] Admin-Seite am PC: die Selbständerung erscheint unter *Für Fairgate* und verschwindet nach dem Abhaken (A-KONTO-02)
 - [ ] iPhone (App vom Startbildschirm) und Android: Reiterwechsel blendet über, Hilfe schiebt sich herein und mit «‹ Zurück» hinaus, Aufklappbereich öffnet weich; kein grauer Tipp-Blitz, kein Link-Menü beim langen Drücken auf Reiter und Tasten; mit «Bewegung reduzieren» alles ohne Bewegung (UI-09, #54)
 - [ ] iPhone und Android: Kopfleiste und Reiter bleiben beim Scrollen stehen; Tipp auf einen Reiter wirkt auch, während der Inhalt nachläuft; mit offener Tastatur (z. B. Adresse im Profil) sind die Reiter weg, die Kopfleiste bleibt oben, nichts springt, «Weiter» führt ins nächste Feld (Leitbild «Eingabe mit Tastatur», #54)
+- [ ] iPhone (App vom Startbildschirm) und Android: Tipp aufs Wappen führt zur Startseite; mit offener Tastatur schliesst er nur die Tastatur; nach einer ungespeicherten Änderung (z. B. Telefon im Profil) kommt «Nicht gespeichert – trotzdem verlassen?», *Abbrechen* bleibt, *Verlassen* geht weiter (Leitbild «Ungespeicherte Änderungen»)
 - [ ] Steht ein Einrichtungsabend an: mobile Daten statt Club-WLAN, oder die Grenzen pro IP vorher prüfen ([ADR-004](adr/adr-004-login-einmal-code.md), Restrisiken)
 - [ ] Push einschalten und erhalten (ab Etappe *CM-Betrieb*)
 - [ ] Erika Beispiel öffnet auf Test die Verwaltung mit Code per Mail (SI-08, A-ROLLE-02)

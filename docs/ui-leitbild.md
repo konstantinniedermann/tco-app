@@ -326,14 +326,14 @@ verlassen?»** mit *Abbrechen* (Nebentaste: bleibt auf der Seite, die Eingaben b
 - **Ungespeichert** ist ein Formular nur, solange ein Feld vom geladenen Stand abweicht. Wer
   etwas tippt und es wieder zurücksetzt, wird nicht gefragt; nach dem Speichern auch nicht.
 - **Welche Formulare:** alle, die Angaben speichern: *Meine Angaben* im Profil, die Antwort auf
-  einen Anlass, in der Verwaltung Angaben und Rollen eines Mitglieds, Anlass, Turnier und
-  Kategorie (anlegen und bearbeiten). Login, Codes und E-Mail-Wechsel nicht: Sie haben keinen
+  einen Anlass, in der Verwaltung Mitglied (Angaben und Rollen), Anlass, Turnier und
+  Kategorie, jeweils beim Anlegen und Bearbeiten. Login, Codes und E-Mail-Wechsel nicht: Sie haben keinen
   gespeicherten Stand, nur einen Ablauf. Im Code trägt das Formular `data-ungespeichert`,
   solange es abweicht.
 - **Ohne Rückfrage:** Wechsel, die die App selbst auslöst (nach dem Speichern zur neuen Seite,
   abgelaufene Sitzung, Abmelden), Links aus der App hinaus (Kalender), die Zurück-Taste oder
-  -Geste des Handys und das Schliessen der App. Bei der Geste zeigt der Browser die vorige
-  Seite schon an, bevor die App davon erfährt; beim Schliessen gibt es nur den Dialog des
+  -Geste des Browsers oder Handys (auch am PC) und das Schliessen der App. Bei der Geste
+  zeigt der Browser die vorige Seite schon an, bevor die App davon erfährt; beim Schliessen gibt es nur den Dialog des
   Browsers, nicht diese Rückfrage.
 
 ## Brief (Druck)

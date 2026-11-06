@@ -12,7 +12,7 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   Verwaltung zu deren erster Seite; bei offener Tastatur schliesst er nur die Tastatur. Wer
   ein Formular geändert und nicht gespeichert hat, wird vor dem Verlassen über einen Link der
   App gefragt: «Nicht gespeichert – trotzdem verlassen?» (Abbrechen · Verlassen). Die
-  Zurück-Geste des Handys und das Schliessen der App fragen nicht. UI-Leitbild nachgeführt.
+  Zurück-Taste oder -Geste und das Schliessen der App fragen nicht. UI-Leitbild nachgeführt.
 
 ## 0.6.0 — Clubmeisterschaft: Turnier anlegen
 
