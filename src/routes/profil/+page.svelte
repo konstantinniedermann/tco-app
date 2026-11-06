@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { MELDUNG, meldung, sende } from '../../lib/login/anmelden.ts';
+	import { speichereKlassierung } from '../../lib/cm/api.ts';
 	import { holeSpeicher } from '../../lib/login/mailanfrage.ts';
 	import {
 		entfernePasskey,
@@ -21,6 +22,11 @@
 		type EigenesFeld
 	} from '../../lib/profil/angaben.ts';
 	import { vergissWechsel } from '../../lib/profil/wechselanfrage.ts';
+	import {
+		KLASSIERUNGEN,
+		klassierungName,
+		type Klassierung
+	} from '../../lib/turnier/klassierung.ts';
 	import { feldMeldung } from '../../lib/verwaltung/anzeige.ts';
 	import { istKlappeOffen, merkeKlappe } from '../../lib/ui/klappe.ts';
 	import type { FullAutoFill } from 'svelte/elements';
@@ -34,6 +40,8 @@
 	// die Felder dieser einen Angabe an Ort und Stelle, nie zwei zugleich (UI-04).
 	// Annahme K-19.1: Telefon und Lizenznummer, Annahme K-19.2: Adresse ändert das Mitglied selbst.
 	type Angabe = 'telefon' | 'adresse' | 'lizenznummer';
+	// FR-37: Die Klassierung hat eine eigene Schnittstelle und eine Auswahl statt eines Textfelds.
+	type Offen = Angabe | 'klassierung';
 	const FELDER: Record<Angabe, EigenesFeld[]> = {
 		telefon: ['telefon'],
 		adresse: ['strasse', 'plz', 'ort'],
@@ -66,7 +74,9 @@
 	// Stand aus `load`; nach Speichern oder «veraltet» mit dem neu geladenen überschrieben. Lädt
 	// `load` neu (neues `data`), gilt wieder dessen Stand.
 	let angaben = $derived<EigeneAngaben | null>(data.angaben);
-	let offen = $state<Angabe | null>(null);
+	let klassierung = $derived<Klassierung | null>(data.klassierung);
+	let offen = $state<Offen | null>(null);
+	let klassierungWahl = $state<Klassierung | ''>('');
 	let werte = $state<Record<EigenesFeld, string>>({
 		telefon: '',
 		strasse: '',
@@ -75,6 +85,7 @@
 		lizenznummer: ''
 	});
 	let feldFehler = $state<Partial<Record<EigenesFeld, string>>>({});
+	let klassierungFehler = $state<string | null>(null);
 	// Betrifft die ganze Angabe (Störung, Altdaten): unter dem Formular.
 	let formularFehler = $state<string | null>(null);
 	// «veraltet»: steht nach dem Neuladen unter der Angabe, deren «Ändern» den Fokus bekommt.
@@ -83,11 +94,13 @@
 	let formular = $state<HTMLFormElement>();
 	// Ungespeichert (UI-Leitbild): ein Feld der offenen Angabe weicht vom geladenen Stand ab.
 	const geaendert = $derived(
-		offen !== null &&
-			angaben !== null &&
-			FELDER[offen].some((f) => werte[f] !== (angaben?.[f] ?? ''))
+		offen === 'klassierung'
+			? klassierungWahl !== (klassierung ?? '')
+			: offen !== null &&
+					angaben !== null &&
+					FELDER[offen].some((f) => werte[f] !== (angaben?.[f] ?? ''))
 	);
-	const aendernKnoepfe: Partial<Record<Angabe, HTMLButtonElement>> = {};
+	const aendernKnoepfe: Partial<Record<Offen, HTMLButtonElement>> = {};
 
 	// Hinweis nach dem E-Mail-Wechsel, bis «Schliessen».
 	let emailHinweis = $state(true);
@@ -118,19 +131,50 @@
 		formular?.querySelector('input')?.focus();
 	}
 
+	async function oeffneKlassierung() {
+		offen = 'klassierung';
+		klassierungWahl = klassierung ?? '';
+		klassierungFehler = null;
+		feldFehler = {};
+		formularFehler = null;
+		veraltetBei = null;
+		await tick();
+		formular?.querySelector('select')?.focus();
+	}
+
 	async function schliesse() {
 		const a = offen;
 		offen = null;
 		feldFehler = {};
+		klassierungFehler = null;
 		formularFehler = null;
 		await tick();
 		if (a) aendernKnoepfe[a]?.focus();
 	}
 
+	async function klassierungSpeichern(event: SubmitEvent) {
+		event.preventDefault();
+		if (speichert) return;
+		speichert = true;
+		klassierungFehler = null;
+		formularFehler = null;
+		const wahl = klassierungWahl;
+		const r = await speichereKlassierung(wahl);
+		if (r.art === 'ok' && wahl !== '') {
+			klassierung = wahl;
+			await schliesse();
+		} else if (r.art === 'eingabe') {
+			klassierungFehler = r.felder.klassierung ?? 'Bitte deine Klassierung wählen.';
+			await tick();
+			formular?.querySelector('select')?.focus();
+		} else formularFehler = MELDUNG.stoerung;
+		speichert = false;
+	}
+
 	async function speichern(event: SubmitEvent) {
 		event.preventDefault();
 		const a = offen;
-		if (!a || !angaben || speichert) return;
+		if (!a || a === 'klassierung' || !angaben || speichert) return;
 		speichert = true;
 		feldFehler = {};
 		formularFehler = null;
@@ -303,6 +347,49 @@
 				false
 			)}
 			{@render angabe('lizenznummer', 'Lizenznummer', angaben.lizenznummer, true)}
+			{#if offen === 'klassierung'}
+				<form
+					bind:this={formular}
+					onsubmit={klassierungSpeichern}
+					novalidate
+					data-ungespeichert={geaendert ? '' : undefined}
+				>
+					<div class="feld">
+						<label for="angabe-klassierung">Klassierung</label>
+						<select
+							id="angabe-klassierung"
+							bind:value={klassierungWahl}
+							aria-invalid={klassierungFehler ? 'true' : undefined}
+							aria-describedby={klassierungFehler ? 'angabe-fehler-klassierung' : undefined}
+						>
+							<option value="">–</option>
+							{#each KLASSIERUNGEN as k (k)}
+								<option value={k}>{klassierungName(k)}</option>
+							{/each}
+						</select>
+						{#if klassierungFehler}
+							<p class="fehler" id="angabe-fehler-klassierung">{klassierungFehler}</p>
+						{/if}
+					</div>
+					<p class="leise">Gilt für neue Anmeldungen zur Clubmeisterschaft.</p>
+					<div class="leiste">
+						<button type="submit" class="taste-haupt">Klassierung speichern</button>
+						<button type="button" class="taste-neben" onclick={schliesse}>Abbrechen</button>
+					</div>
+					{#if formularFehler}
+						<p class="fehler" role="alert">{formularFehler}</p>
+					{/if}
+				</form>
+			{:else}
+				{@render anzeige(
+					'klassierung',
+					'Klassierung',
+					klassierung ? klassierungName(klassierung) : null,
+					false,
+					'nicht angegeben',
+					oeffneKlassierung
+				)}
+			{/if}
 			<p class="leise">
 				{personText}<br />Name, Jahrgang und Nummer ändert die Mitgliederverwaltung. Stimmt etwas
 				nicht?
@@ -350,25 +437,36 @@
 			{/if}
 		</form>
 	{:else}
-		<div class="kachel">
-			<span>
-				<strong>{titelText}</strong>
-				{#if freiwillig}<span class="leise">(freiwillig)</span>{/if}<br />
-				{#if wert}{wert}{:else}<span class="leise">nicht erfasst</span>{/if}
-			</span>
-			{#if !nurAnsehen}
-				<button
-					type="button"
-					class="taste-neben"
-					bind:this={aendernKnoepfe[a]}
-					onclick={() => oeffne(a)}
-					aria-describedby={veraltetBei === a ? 'angaben-veraltet' : undefined}>Ändern</button
-				>
-			{/if}
-		</div>
-		{#if veraltetBei === a}
-			<p class="fehler" id="angaben-veraltet" role="alert">{MELDUNG_PROFIL.veraltet}</p>
+		{@render anzeige(a, titelText, wert, freiwillig, 'nicht erfasst', () => oeffne(a))}
+	{/if}
+{/snippet}
+
+{#snippet anzeige(
+	a: Offen,
+	titelText: string,
+	wert: string | null,
+	freiwillig: boolean,
+	leer: string,
+	aendern: () => void
+)}
+	<div class="kachel">
+		<span>
+			<strong>{titelText}</strong>
+			{#if freiwillig}<span class="leise">(freiwillig)</span>{/if}<br />
+			{#if wert}{wert}{:else}<span class="leise">{leer}</span>{/if}
+		</span>
+		{#if !nurAnsehen}
+			<button
+				type="button"
+				class="taste-neben"
+				bind:this={aendernKnoepfe[a]}
+				onclick={aendern}
+				aria-describedby={veraltetBei === a ? 'angaben-veraltet' : undefined}>Ändern</button
+			>
 		{/if}
+	</div>
+	{#if veraltetBei === a}
+		<p class="fehler" id="angaben-veraltet" role="alert">{MELDUNG_PROFIL.veraltet}</p>
 	{/if}
 {/snippet}
 
