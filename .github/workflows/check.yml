@@ -131,7 +131,9 @@ jobs:
     needs: aenderung
     if: needs.aenderung.outputs.code == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Normal rund 11 Minuten. Das Limit lässt Platz für den schlimmsten Fall der Installation
+    # (Systempakete 8 Minuten, dazu 3 Download-Versuche à 5 Minuten); es kostet nur, wenn etwas hängt.
+    timeout-minutes: 35
     permissions:
       contents: read
     services:
