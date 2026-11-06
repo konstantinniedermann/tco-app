@@ -4,7 +4,10 @@
 import { erstelleDb, type Db } from '../../../src/lib/server/db/index.ts';
 import { erstelleBremsen } from '../../../src/lib/server/login/bremse.ts';
 import { erstelleLoginDienst, type LoginDienst } from '../../../src/lib/server/login/dienst.ts';
+import { eq } from 'drizzle-orm';
 import { machAdmin } from '../../../src/lib/server/admin/erster-admin.ts';
+import { setzeRollen } from '../../../src/lib/server/admin/rollen.ts';
+import { turnier } from '../../../src/lib/server/db/schema.ts';
 import { legeMitgliedAn } from '../../hilfen/mitglieder.ts';
 import { DATENBANK_URL, MAILPIT_URL, e2eEinstellungen } from './umgebung.ts';
 
@@ -45,6 +48,21 @@ export async function legeAdminMitBriefCodeAn(vorname: string) {
 	const konto = await legeKontoMitBriefCodeAn(vorname);
 	await machAdmin(hole().db, konto.kontoId, new Date());
 	return konto;
+}
+
+/** Wie `legeKontoMitBriefCodeAn`, das Konto hat nur die Rolle CM (Code-Bestätigung fehlt noch). */
+export async function legeCmMitBriefCodeAn(vorname: string) {
+	const konto = await legeKontoMitBriefCodeAn(vorname);
+	await setzeRollen(hole().db, { art: 'automatisch' }, konto.kontoId, ['cm'], new Date());
+	return konto;
+}
+
+/**
+ * Löscht das Turnier dieses Jahres samt Kategorien und Turniernummern (Fremdschlüssel mit
+ * Cascade). Die E2E-Datenbank überdauert die Läufe, und pro Jahr gibt es nur ein Turnier.
+ */
+export async function loescheTurnier(jahr: number): Promise<void> {
+	await hole().db.delete(turnier).where(eq(turnier.jahr, jahr));
 }
 
 /** Stellt für ein bestehendes Konto einen weiteren Brief-Code aus (ohne Bindestrich). */
