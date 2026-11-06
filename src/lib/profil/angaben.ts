@@ -6,6 +6,7 @@
 import { jsonPost } from '../json-post.ts';
 import type { Holen } from '../login/anmelden.ts';
 import type { EigeneAngaben, EigenesFeld } from '../server/profil/angaben.ts';
+import { istKlassierung, type Klassierung } from '../turnier/klassierung.ts';
 
 export type { EigeneAngaben, EigenesFeld };
 
@@ -107,16 +108,30 @@ async function schicke(
 	}
 }
 
-/** Angaben des angemeldeten Mitglieds; `null` bei Störung oder ohne Sitzung. */
-export async function ladeAngaben(holen: Holen = fetch): Promise<EigeneAngaben | null> {
+/**
+ * Angaben des angemeldeten Mitglieds und seine Klassierung (FR-37: gehört nicht zu den Angaben
+ * der Verwaltung, kommt darum extra); `null` bei Störung oder ohne Sitzung.
+ */
+export async function ladeProfil(
+	holen: Holen = fetch
+): Promise<{ angaben: EigeneAngaben; klassierung: Klassierung | null } | null> {
 	try {
 		const antwort = await holen('/api/profil', { method: 'GET' });
 		if (!antwort.ok) return null;
-		const { angaben } = await leseJson(antwort);
-		return istObjekt(angaben) ? (angaben as EigeneAngaben) : null;
+		const { angaben, klassierung } = await leseJson(antwort);
+		if (!istObjekt(angaben)) return null;
+		return {
+			angaben: angaben as EigeneAngaben,
+			klassierung: istKlassierung(klassierung) ? klassierung : null
+		};
 	} catch {
 		return null;
 	}
+}
+
+/** Angaben des angemeldeten Mitglieds; `null` bei Störung oder ohne Sitzung. */
+export async function ladeAngaben(holen: Holen = fetch): Promise<EigeneAngaben | null> {
+	return (await ladeProfil(holen))?.angaben ?? null;
 }
 
 /** Kontakt des Vereins für Fragen (Annahme K-21); `null`, wenn er sich nicht laden lässt. */

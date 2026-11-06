@@ -8,6 +8,17 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.8.0 — Clubmeisterschaft: Einzel-Anmeldung der Mitglieder
+
+- Clubmeisterschaft: Mitglieder melden sich selbst an (#58). Sie tragen fehlende Klassierung,
+  Geschlecht und Jahrgang einmal nach, sehen nur passende Einzel-Kategorien, haben höchstens
+  3 Anmeldungen, melden sich bis zum Anmeldeschluss selbst ab und bekommen jedes Mal eine
+  Bestätigung per Mail. Kachel auf der Startseite, Klassierung im Profil.
+- Verwaltung: Warnung, wenn eine geänderte Kategorie Anmeldungen unpassend macht; eine
+  Kategorie mit aktiven Anmeldungen lässt sich nicht absagen; Spalte *Anmeldungen*.
+- Korrektur: Nach dem Speichern einer Kategorie zeigte die Turnierseite manchmal noch den alten
+  Stand, wenn ihr Link vorher schon berührt worden war.
+
 ## 0.7.2 — E2E-Tests im Playwright-Container
 
 - CI: Die E2E-Jobs laufen im offiziellen Playwright-Image, Browser und Systempakete sind

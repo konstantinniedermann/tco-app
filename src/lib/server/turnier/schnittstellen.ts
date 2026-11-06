@@ -96,7 +96,8 @@ export function postKategorie(d: AdminDienste, e: AdminEreignis): Promise<Respon
 		if (id === null || !k) return nichtGefunden();
 		const p = pruefeKategorie(koerper, k.turnierjahr);
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.felder });
-		const r = await aendereKategorie(d.db, id, p.werte);
+		const r = await aendereKategorie(d.db, id, p.werte, koerper.trotzdem === true);
+		if (typeof r === 'object') return antwort(409, { fehler: 'unpassend', anzahl: r.unpassend });
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r === 'abgesagt') return antwort(409, { fehler: 'abgesagt' });
 		if (r === 'vergeben') return antwort(409, { fehler: 'vergeben', feld: 'name' });
@@ -108,7 +109,9 @@ export function postKategorieAbsagen(d: AdminDienste, e: AdminEreignis): Promise
 	return schreibt(d, e, 'cm', async () => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
-		return (await sageKategorieAb(d.db, id)) === 'ok' ? antwort(200, {}) : nichtGefunden();
+		const r = await sageKategorieAb(d.db, id);
+		if (typeof r === 'object') return antwort(409, { fehler: 'hat-anmeldungen', anzahl: r.aktiv });
+		return r === 'ok' ? antwort(200, {}) : nichtGefunden();
 	});
 }
 

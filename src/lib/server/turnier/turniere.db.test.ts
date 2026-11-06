@@ -1,5 +1,9 @@
+import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
+import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { meldeAb, meldeAn } from '../cm/anmeldungen.ts';
 import { erstelleDb } from '../db/index.ts';
+import { anmeldung, anmeldungSpieler, mitglied } from '../db/schema.ts';
 import type { KategorieWerte, TurnierWerte } from './angaben.ts';
 import {
 	aendereKategorie,
@@ -43,11 +47,13 @@ const einzel = (name: string, teil: Partial<KategorieWerte> = {}): KategorieWert
 	...teil
 });
 
-async function neuesTurnier(teil: Partial<TurnierWerte> = {}) {
-	const w = werte(teil);
-	const r = await legeTurnierAn(db, w);
-	if (r.ergebnis !== 'ok') throw new Error('Jahr schon vergeben');
-	return { id: r.id, w };
+/** Turnier in einem freien Zufallsjahr: Ein schon vergebenes Jahr (anderer Test) wird neu gezogen. */
+async function neuesTurnier(teil: Omit<Partial<TurnierWerte>, 'jahr'> = {}) {
+	for (;;) {
+		const w = werte(teil);
+		const r = await legeTurnierAn(db, w);
+		if (r.ergebnis === 'ok') return { id: r.id, w };
+	}
 }
 const jetztVor = (w: TurnierWerte) => new Date(`${w.jahr}-05-01T10:00:00Z`);
 const jetztNach = (w: TurnierWerte) => new Date(`${w.jahr}-06-15T10:00:00Z`);
@@ -142,7 +148,7 @@ describe('Kategorien', () => {
 		expect(await legeKategorieAn(db, -1, einzel('X'))).toEqual({ ergebnis: 'nicht-gefunden' });
 		const b = await legeKategorieAn(db, id, einzel('Herren B'));
 		if (b.ergebnis !== 'ok') throw new Error('anlegen');
-		expect(await aendereKategorie(db, b.id, einzel('herren a'))).toBe('vergeben');
+		expect(await aendereKategorie(db, b.id, einzel('herren a'), false)).toBe('vergeben');
 		const doppel = einzel('Herren A', {
 			art: 'doppel',
 			klassierungVon: null,
@@ -150,14 +156,14 @@ describe('Kategorien', () => {
 			mindestsumme: 9,
 			jahrgangVon: 1990
 		});
-		expect(await aendereKategorie(db, a.id, doppel)).toBe('ok');
+		expect(await aendereKategorie(db, a.id, doppel, false)).toBe('ok');
 		expect(await ladeKategorie(db, a.id)).toMatchObject({
 			...doppel,
 			id: a.id,
 			status: 'aktiv',
 			turnierId: id
 		});
-		expect(await aendereKategorie(db, -1, doppel)).toBe('nicht-gefunden');
+		expect(await aendereKategorie(db, -1, doppel, false)).toBe('nicht-gefunden');
 		expect(await ladeKategorie(db, -1)).toBeNull();
 		expect(await sageKategorieAb(db, a.id)).toBe('ok');
 		expect(await legeKategorieAn(db, id, einzel('Herren A'))).toMatchObject({ ergebnis: 'ok' });
@@ -175,11 +181,81 @@ describe('Kategorien', () => {
 			status: 'abgesagt',
 			turnierjahr: w.jahr
 		});
-		expect(await aendereKategorie(db, k.id, einzel('Damen A'))).toBe('abgesagt');
+		expect(await aendereKategorie(db, k.id, einzel('Damen A'), false)).toBe('abgesagt');
 		expect((await listeTurniere(db, jetztVor(w))).find((z) => z.id === id)?.kategorien).toBe(0);
 		expect(await setzeStatus(db, id, 'offen', jetztVor(w))).toBe('keine-kategorie');
 		const d = await ladeTurnier(db, id, jetztVor(w));
 		expect(d?.kategorien).toHaveLength(1);
 		expect(d?.kategorien[0]).toMatchObject({ id: k.id, status: 'abgesagt' });
+	});
+
+	/** Offenes Turnier mit einer Herren-Kategorie R1–R5 und ein Herr mit Klassierung `klassierung`, angemeldet. */
+	async function mitAnmeldung(klassierung = 'R3') {
+		const { id, w } = await neuesTurnier();
+		const k = await legeKategorieAn(db, id, einzel('Herren A'));
+		if (k.ergebnis !== 'ok') throw new Error('anlegen');
+		expect(await setzeStatus(db, id, 'offen', jetztVor(w))).toBe('ok');
+		const m = await legeMitgliedAn(db, {});
+		await db
+			.update(mitglied)
+			.set({ geschlecht: 'm', jahrgang: 1990, klassierung })
+			.where(eq(mitglied.id, m.mitgliedId));
+		expect(await meldeAn(db, k.id, m.mitgliedId, jetztVor(w))).toBe('ok');
+		return { id, w, kid: k.id, mitgliedId: m.mitgliedId };
+	}
+
+	test('FR-36: Ändern mit unpassenden Anmeldungen ergibt unpassend mit Anzahl, mit trotzdem gespeichert, Anmeldungen bleiben', async () => {
+		const t = await mitAnmeldung('R3');
+		const enger = einzel('Herren A', { klassierungBis: 'R2' });
+		expect(await aendereKategorie(db, t.kid, enger, false)).toEqual({ unpassend: 1 });
+		expect((await ladeKategorie(db, t.kid))?.klassierungBis).toBe('R5');
+		// Passt weiterhin: ohne Rückfrage gespeichert.
+		const weiter = einzel('Herren A', { klassierungBis: 'R4' });
+		expect(await aendereKategorie(db, t.kid, weiter, false)).toBe('ok');
+		expect(await aendereKategorie(db, t.kid, enger, true)).toBe('ok');
+		expect((await ladeKategorie(db, t.kid))?.klassierungBis).toBe('R2');
+		const d = await ladeTurnier(db, t.id, jetztVor(t.w));
+		expect(d?.kategorien[0].anmeldungen).toBe(1);
+		// Wechsel auf Doppel: kein Einzel-Spieler passt mehr, die aktive Einzel-Anmeldung zählt.
+		const doppel = einzel('Herren A', {
+			art: 'doppel',
+			klassierungVon: null,
+			klassierungBis: null,
+			mindestsumme: 9
+		});
+		expect(await aendereKategorie(db, t.kid, doppel, false)).toEqual({ unpassend: 1 });
+		// Ohne Anmeldungen ist alles ok.
+		const leer = await legeKategorieAn(db, t.id, einzel('Herren B'));
+		if (leer.ergebnis !== 'ok') throw new Error('anlegen');
+		expect(
+			await aendereKategorie(db, leer.id, einzel('Herren B', { klassierungBis: 'R1' }), false)
+		).toBe('ok');
+	});
+
+	test('FR-35: Absagen mit aktiver Anmeldung ergibt hat-anmeldungen, nach Abmeldung geht es', async () => {
+		const t = await mitAnmeldung();
+		expect(await sageKategorieAb(db, t.kid)).toEqual({ aktiv: 1 });
+		expect((await ladeKategorie(db, t.kid))?.status).toBe('aktiv');
+		const [a] = await db
+			.select({ id: anmeldung.id })
+			.from(anmeldung)
+			.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
+			.where(eq(anmeldungSpieler.mitgliedId, t.mitgliedId));
+		expect(await meldeAb(db, a.id, t.mitgliedId, jetztVor(t.w))).toBe('ok');
+		expect(await sageKategorieAb(db, t.kid)).toBe('ok');
+		expect((await ladeKategorie(db, t.kid))?.status).toBe('abgesagt');
+		expect(await sageKategorieAb(db, -1)).toBe('nicht-gefunden');
+	});
+
+	test('FR-36: Turnierseite zählt aktive Anmeldungen je Kategorie', async () => {
+		const t = await mitAnmeldung();
+		const leer = await legeKategorieAn(db, t.id, einzel('Herren B'));
+		if (leer.ergebnis !== 'ok') throw new Error('anlegen');
+		const d = await ladeTurnier(db, t.id, jetztVor(t.w));
+		expect(d?.kategorien.map((k) => [k.name, k.anmeldungen])).toEqual([
+			['Herren A', 1],
+			['Herren B', 0]
+		]);
+		expect((await ladeKategorie(db, t.kid))?.anmeldungen).toBe(1);
 	});
 });

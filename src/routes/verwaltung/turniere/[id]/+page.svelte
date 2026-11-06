@@ -192,7 +192,9 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Kategorie</th><th>Art</th><th>Geschlecht</th><th>Jahrgang</th><th>Klassierung</th>
+					<th>Kategorie</th><th>Art</th><th>Geschlecht</th><th>Jahrgang</th><th>Klassierung</th><th
+						>Anmeldungen</th
+					>
 				</tr>
 			</thead>
 			<tbody>
@@ -214,6 +216,7 @@
 						<td>{geschlechtText(k.geschlecht)}</td>
 						<td>{jahrgangText(k.jahrgangVon, k.jahrgangBis)}</td>
 						<td>{klassierungText(k)}</td>
+						<td>{k.status === 'abgesagt' ? '' : k.anmeldungen}</td>
 					</tr>
 				{/each}
 			</tbody>

@@ -23,6 +23,8 @@ describe('Übergänge beim Seitenwechsel (UI-09)', () => {
 		expect(uebergang('/profil', '/profil/email', 'link')).toBe('tiefer');
 		expect(uebergang('/', '/anlass/[id]', 'link')).toBe('tiefer');
 		expect(uebergang('/anlass/[id]', '/', 'link')).toBe('zurueck');
+		expect(uebergang('/', '/clubmeisterschaft/[id]', 'link')).toBe('tiefer');
+		expect(uebergang('/clubmeisterschaft/[id]', '/', 'link')).toBe('zurueck');
 	});
 
 	it('schiebt zurück nach rechts weg', () => {

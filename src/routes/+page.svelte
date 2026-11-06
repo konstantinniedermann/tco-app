@@ -2,8 +2,10 @@
 	import { resolve } from '$app/paths';
 	import { standText } from '../lib/anlass/stand.ts';
 	import { formatiereBeginn } from '../lib/anlass/zeit.ts';
+	import { standText as cmStandText } from '../lib/cm/anzeige.ts';
 	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { hinweisErledigt, kannPasskey, richtePasskeyEin } from '../lib/login/passkey.ts';
+	import { datumLang } from '../lib/verwaltung/turnier-anzeige.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -68,8 +70,21 @@
 	</div>
 {/if}
 
-{#if data.anlaesse.length > 0}
+{#if data.turniere.length > 0 || data.anlaesse.length > 0}
 	<h2>Jetzt aktuell</h2>
+	{#each data.turniere as t (t.id)}
+		<a class="karte kachel hervor" href={resolve('/clubmeisterschaft/[id]', { id: String(t.id) })}>
+			<span>
+				<strong>{t.name}</strong><br />
+				<span class="leise"
+					>{t.status === 'offen'
+						? `Anmeldung bis ${datumLang(t.anmeldeschluss)}`
+						: 'Anmeldung geschlossen'}<br />{cmStandText(t.anzahl)}</span
+				>
+			</span>
+			<span class="kachel-pfeil" aria-hidden="true">›</span>
+		</a>
+	{/each}
 	{#each data.anlaesse as a (a.id)}
 		<a class="karte kachel hervor" href={resolve('/anlass/[id]', { id: String(a.id) })}>
 			<span>

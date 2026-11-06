@@ -24,6 +24,38 @@ export async function klappeAuf(page: Page, titel: string): Promise<void> {
 	await expect(klappe).toHaveAttribute('open', '');
 }
 
+/**
+ * Wartet, bis die Reiter den Code ihrer Seiten fertig vorgeladen haben. Sie laden ihn gleich beim
+ * Anzeigen (`data-sveltekit-preload-code="eager"`); ein `page.goto` mitten hinein bricht das
+ * Laden ab, und WebKit meldet das als Konsolenfehler («Importing a module script failed»).
+ * Lädt dieselben Seitenmodule über das App-Modul von SvelteKit: Ein Import derselben Adresse
+ * teilt sich das Laden mit dem Vorladen, das Warten endet also genau, wenn alles da ist.
+ */
+export async function wartetAufVorladen(page: Page): Promise<void> {
+	await page.evaluate(async () => {
+		const pfade = [...document.querySelectorAll<HTMLAnchorElement>('nav.reiter a[href]')].map(
+			(a) => new URL(a.href).pathname
+		);
+		if (pfade.length === 0) return;
+		const eintrag = performance
+			.getEntriesByType('resource')
+			.find((e) => /\/_app\/immutable\/entry\/app\.[^/]+\.js$/.test(new URL(e.name).pathname));
+		if (!eintrag) throw new Error('App-Modul von SvelteKit nicht gefunden');
+		// dictionary: Route → [Seite, Layouts]; negative Nummern stehen für Seiten mit Server-Load (~n).
+		const app = (await import(eintrag.name)) as {
+			nodes: (() => Promise<unknown>)[];
+			dictionary: Record<string, [number, (number | undefined)[]?]>;
+		};
+		const nummern = pfade.flatMap((pfad) => {
+			const route = app.dictionary[pfad];
+			if (!route) throw new Error(`Route ${pfad} nicht im App-Modul`);
+			const [seite, layouts = []] = route;
+			return [seite, ...layouts].filter((n) => n !== undefined).map((n) => (n < 0 ? ~n : n));
+		});
+		await Promise.all(nummern.map((n) => app.nodes[n]()));
+	});
+}
+
 // WebKit: Für den Screenshot legt Playwright ein eigenes Stylesheet an (Quelle
 // web-inspector://), das an der CSP der App scheitert. Nur während des Screenshots ignoriert.
 const SCREENSHOT_STIL = /^Refused to apply a stylesheet because its hash/;

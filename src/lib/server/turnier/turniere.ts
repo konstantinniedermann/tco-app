@@ -1,5 +1,6 @@
 // Turniere und Kategorien speichern, Anmeldung öffnen und schliessen (FR-33 bis FR-35).
 import { and, asc, desc, eq, sql } from 'drizzle-orm';
+import { zaehleAktive, zaehleUnpassende } from '../cm/anmeldungen.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
 	kategorie,
@@ -21,7 +22,12 @@ export type TurnierZeile = {
 	kategorien: number;
 };
 
-export type KategorieZeile = KategorieWerte & { id: number; status: KategorieStatus };
+export type KategorieZeile = KategorieWerte & {
+	id: number;
+	status: KategorieStatus;
+	/** Aktive Anmeldungen (FR-35, FR-36). */
+	anmeldungen: number;
+};
 
 export type TurnierDetail = TurnierWerte & {
 	id: number;
@@ -47,11 +53,12 @@ function pruefeVergeben(fehler: unknown, name: string): void {
 	if (uniqueVerletzung(fehler) !== name) throw fehler;
 }
 
-function kategorieZeile(z: typeof kategorie.$inferSelect): KategorieZeile {
+function kategorieZeile(z: typeof kategorie.$inferSelect, anmeldungen: number): KategorieZeile {
 	const stufe = (s: string | null) => (s !== null && istStufe(s) ? s : null);
 	return {
 		id: z.id,
 		status: z.status,
+		anmeldungen,
 		name: z.name,
 		geschlecht: z.geschlecht,
 		art: z.art,
@@ -148,7 +155,9 @@ export async function ladeTurnier(db: Db, id: number, jetzt: Date): Promise<Turn
 		nummern: nummern.map((n) => ({ bezeichnung: n.bezeichnung, nummer: n.nummer })),
 		status: wirksamerStatus(t.status, t.anmeldeschluss, jetzt),
 		gespeicherterStatus: t.status,
-		kategorien: kategorien.map(kategorieZeile)
+		kategorien: await Promise.all(
+			kategorien.map(async (k) => kategorieZeile(k, await zaehleAktive(db, k.id)))
+		)
 	};
 }
 
@@ -242,23 +251,33 @@ export async function ladeKategorie(
 		.where(eq(kategorie.id, id));
 	if (!z) return null;
 	return {
-		...kategorieZeile(z.k),
+		...kategorieZeile(z.k, await zaehleAktive(db, id)),
 		turnierId: z.k.turnierId,
 		turnierjahr: z.jahr,
 		turniername: z.turniername
 	};
 }
 
+/**
+ * FR-36: Passen aktive Anmeldungen nach den neuen Werten nicht mehr, speichert nur `trotzdem`.
+ * Gesperrt wird allein die Kategorie, nie eine Mitgliedszeile: So bleibt die Reihenfolge von
+ * `meldeAn` (Mitglied, dann Kategorie) ohne Zyklus.
+ */
 export async function aendereKategorie(
 	db: Db,
 	id: number,
-	w: KategorieWerte
-): Promise<'ok' | 'vergeben' | 'abgesagt' | 'nicht-gefunden'> {
+	w: KategorieWerte,
+	trotzdem: boolean
+): Promise<'ok' | 'vergeben' | 'abgesagt' | 'nicht-gefunden' | { unpassend: number }> {
 	try {
 		return await db.transaction(async (tx) => {
 			const [k] = await tx.select().from(kategorie).where(eq(kategorie.id, id)).for('update');
 			if (!k) return 'nicht-gefunden' as const;
 			if (k.status === 'abgesagt') return 'abgesagt' as const;
+			if (!trotzdem) {
+				const unpassend = await zaehleUnpassende(tx, id, w);
+				if (unpassend > 0) return { unpassend };
+			}
 			await tx.update(kategorie).set(kategorieSpalten(w)).where(eq(kategorie.id, id));
 			return 'ok' as const;
 		});
@@ -268,11 +287,21 @@ export async function aendereKategorie(
 	}
 }
 
-export async function sageKategorieAb(db: Db, id: number): Promise<'ok' | 'nicht-gefunden'> {
-	const zeilen = await db
-		.update(kategorie)
-		.set({ status: 'abgesagt' })
-		.where(eq(kategorie.id, id))
-		.returning({ id: kategorie.id });
-	return zeilen.length === 0 ? 'nicht-gefunden' : 'ok';
+/** FR-35: Absagen geht nur ohne aktive Anmeldungen; Sperre wie bei `aendereKategorie`. */
+export async function sageKategorieAb(
+	db: Db,
+	id: number
+): Promise<'ok' | 'nicht-gefunden' | { aktiv: number }> {
+	return db.transaction(async (tx) => {
+		const [k] = await tx
+			.select({ id: kategorie.id })
+			.from(kategorie)
+			.where(eq(kategorie.id, id))
+			.for('update');
+		if (!k) return 'nicht-gefunden' as const;
+		const aktiv = await zaehleAktive(tx, id);
+		if (aktiv > 0) return { aktiv };
+		await tx.update(kategorie).set({ status: 'abgesagt' }).where(eq(kategorie.id, id));
+		return 'ok' as const;
+	});
 }
