@@ -260,7 +260,8 @@ export async function ladeKategorie(
 
 /**
  * FR-36: Passen aktive Anmeldungen nach den neuen Werten nicht mehr, speichert nur `trotzdem`.
- * Gesperrt wird allein die Kategorie (Reihenfolge wie `meldeAn`: Mitglied, dann Kategorie).
+ * Gesperrt wird allein die Kategorie, nie eine Mitgliedszeile: So bleibt die Reihenfolge von
+ * `meldeAn` (Mitglied, dann Kategorie) ohne Zyklus.
  */
 export async function aendereKategorie(
 	db: Db,
