@@ -128,6 +128,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Ein Neustart des Jobs hilft meist. Dauerhaft wohl nur ohne apt: den E2E-Job im offiziellen Playwright-Container laufen lassen (Image mit Browsern und Systempaketen) — eine neue Abhängigkeit, braucht Freigabe. Alternativ apt mit eigenem Zeitlimit je Verbindung und einem zweiten Versuch, der den ersten sicher beendet (`sudo timeout …`).
 
+**Entscheid Nutzer (06.11.2026):** vorerst nichts ändern, Container allenfalls später. Abwägung: deutlich stabiler (kein Ubuntu-Download mehr), kaum schneller (der Pull des Images frisst den Gewinn grösstenteils), Image-Version muss mit Playwright mitgezogen werden.
+
 ### 2026-11-06 — make check baut die App doppelt: einmal selbst, einmal im Webserver der E2E-Tests
 
 **Thema:** Betrieb
