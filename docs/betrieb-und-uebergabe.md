@@ -116,8 +116,8 @@ Nachfolge (K-05).
    - Ob Geheimnisse, Variablen und Container-Images beim Transfer mitkommen, beim Transfer
      prüfen und sonst neu eintragen (Vermutung: Images bleiben im alten Konto).
    - Mitarbeitende im Repo prüfen: Die Hauptansprechperson bleibt, der Projektleiter geht.
-   - Sichtbarkeit und Regel «main schützen» prüfen: Wird das Repo privat oder liegt es auf
-     einem Konto ohne GitHub Pro, fallen der Schutz von `main` und die Gratisminuten weg
+   - Sichtbarkeit und Regel «main schützen» prüfen: Wird das Repo privat (auf einem Konto ohne
+     GitHub Pro), fallen der Schutz von `main` und die Gratisminuten weg
      ([CI/CD und Release](ci-cd-und-release.md#actions-minuten)).
 6. **Geheimnisse wechseln, die nur der Projektleiter kannte:** neues Passwort für die
    Sicherung (restic kann einen Schlüssel hinzufügen und den alten entfernen), neues

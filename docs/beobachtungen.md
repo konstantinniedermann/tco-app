@@ -257,3 +257,44 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Task- und Gesamt-Review #57.
 
 **Einschätzung:** Alles klein. «keine Lizenz» und die Anzeige am Handy mit Teil 2 (#58) angleichen; RR-08 doppelt fällt beim Rollen-Umbau (Entwurf «Rollen schärfen») ohnehin an.
+
+### 2026-11-06 — Abgewiesener Push nach dev: «nächste freie Nummer» scheitert am eigenen Pre-Push-Hook, wenn dev zwei Schritte weiter ist
+
+**Thema:** Betrieb
+
+**Fundort:** `.claude/skills/tco-branching/SKILL.md` (Schritt 4, «Wird der Push abgewiesen …»), `docs/adr/adr-007-version-pro-merge.md`, `scripts/pruefungen/version-merge.ts` (Vergleich mit dem ersten Elternteil)
+
+**Beobachtung:** Der Hook vergleicht jeden Commit mit seinem ersten Elternteil. Nach `pull --no-commit origin dev` ist das der eigene, noch nicht gepushte Merge-Commit. Hat `dev` inzwischen zwei Code-Merges oder eine Nebenversion bekommen, ist die nächste freie Nummer kein einzelner Schritt mehr, und der Push wird dauerhaft abgewiesen; zurücksetzen verbietet der Ablauf. In einem Wegwerf-Repo nachgestellt: `version-merge: …: 0.6.1 → 0.6.3 ist kein einzelner Schritt`, Exit 1. Kein Test deckt den Fall ab.
+
+**Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
+
+**Einschätzung:** Randfall, blockiert nur den Merge nach `dev`. Lösungsweg: bei einem Merge-Commit gegen die höchste Version aller Elternteile prüfen, mit eigenem Test.
+
+### 2026-11-06 — Turnierseite verspricht eine Anmeldung der Mitglieder, die es noch nicht gibt
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/routes/verwaltung/turniere/[id]/+page.svelte` (Texte bei *Anmeldung offen* «Mitglieder melden sich bis … an» und bei *geschlossen* «Mitglieder sehen ihre Anmeldungen …»)
+
+**Beobachtung:** Für Mitglieder gibt es weder Seite noch Schnittstelle zum Turnier; die kommt mit Teil 2 (#58). Der CM-Verantwortliche liest aber, Mitglieder könnten sich jetzt anmelden. In `docs/versionen.md` (0.6.0) ist der Stand jetzt nachgetragen.
+
+**Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
+
+**Einschätzung:** Heute ohne Wirkung, weil weder Test noch Live ausgeliefert werden. Text anpassen oder bis #58 so lassen; spätestens bevor ein CM-Verantwortlicher die Verwaltung auf Test oder Live sieht.
+
+### 2026-11-06 — Kleinbefunde aus dem Doku-Abgleich vor dem Release (Code-Kommentare, Tests)
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/verwaltung/Kategorieformular.svelte`, `src/lib/turnier/klassierung.ts`, `src/lib/server/turnier/schnittstellen.db.test.ts`, `vitest.config.ts`, `.githooks/pre-push`, `Makefile` (Ziel `hooks`), `docs/fachmodell.md`
+
+**Beobachtung:**
+- Annahmen nicht dort markiert, wo sie wirken: Vorbelegung der Mindestsumme 9 (K-51) im Kategorieformular, Skala N1–N4/R1–R9 (K-25.1) in `klassierung.ts`; `make annahmen` findet sie nicht.
+- Rechte-Test der Turnier-Schnittstellen spielt die Rolle `lizenz` nicht durch (Testkonzept: «jede Rolle»); `lizenz` ist anderswo als Nicht-Verwaltungsrolle getestet.
+- `src/lib/turnier/` (Status FR-33, Klassierungsreihenfolge FR-34) liegt ausserhalb der Abdeckungsmessung (`src/lib/server/**`), wie schon `src/lib/anlass/`.
+- `.githooks/pre-push` begründet den lokalen Schutz noch mit «Branch-Schutz für private Repos nur mit Pro»; `make help` beim Ziel `hooks` nennt die Versionsprüfung beim Push auf `dev` nicht.
+- Fachmodell-Diagramm nennt `AnmeldungAnlass`, der Code `anlassAnmeldung` / `anlass_anmeldung`, obwohl die Namen im Code dem Diagramm folgen sollen.
+
+**Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
+
+**Einschätzung:** Alles klein, Code-Änderungen mit `make check` und Korrekturnummer; nicht im reinen Doku-Release mitgemacht. Abdeckung: entweder `src/lib/turnier/**` mitmessen oder die Ausnahme im Testkonzept festhalten.

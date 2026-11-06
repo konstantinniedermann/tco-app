@@ -219,7 +219,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
 |----|-------------|--------|--------|--------|
 | N-APP-01 | MyTCO ist eine einfache Mobile-App für Android und iOS; das PDF nennt noch eine Web-App mit möglicher App später. Zuerst als installierbare Web-App, die Store-App ist N-APP-04 | Ziel, PDF 1 | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
 | N-APP-02 | Benachrichtigungen per Push und E-Mail | Ziel, PDF 5b | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | geplant |
-| N-APP-03 | Admin und Verantwortliche arbeiten in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Funktionen zeigt | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | umgesetzt\* (Verwaltung nur für Admins; CM und Lizenz mit ihren Etappen) |
+| N-APP-03 | Admin und Verantwortliche arbeiten in einer eigenen Admin-Oberfläche, als Bereich in MyTCO, der nur mit einer dieser Rollen sichtbar ist und nur deren Funktionen zeigt | PL | Fundament ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | umgesetzt\* (Admin; `cm` mit nur dem Bereich *Clubmeisterschaft*, #57; Lizenz mit ihrer Etappe) |
 | N-APP-04 | MyTCO ist als App im App Store und bei Google Play erhältlich | Ziel | später ([ADR-001](../adr/adr-001-web-app-zuerst.md)) | später |
 | N-DESIGN-01 | Das Design lehnt sich an die Website tcolten.ch an, mit abgeändertem Farbkonzept zur Abgrenzung | PDF 3a | Fundament (UI-Leitbild, #13) | geplant |
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |
