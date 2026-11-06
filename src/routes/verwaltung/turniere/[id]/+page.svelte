@@ -44,7 +44,7 @@
 	const STATUS_MELDUNG = {
 		'keine-kategorie': 'Lege zuerst mindestens eine Kategorie an.',
 		'schluss-vorbei':
-			'Der Anmeldeschluss ist vorbei. Verschiebe ihn unten bei den Angaben, dann öffne die Anmeldung wieder.',
+			'Der Anmeldeschluss ist vorbei. Verschiebe ihn unten bei den Angaben; ist die Anmeldung danach noch geschlossen, öffne sie wieder.',
 		unzulaessig: 'Die Anmeldung hat sich inzwischen geändert. Hier steht jetzt der neue Stand.',
 		'nicht-gefunden': 'Dieses Turnier gibt es nicht mehr.'
 	} as const;
