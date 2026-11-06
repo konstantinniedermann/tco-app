@@ -237,3 +237,23 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review #57.
 
 **Einschätzung:** Mit der Spalte Anmeldungen in #58 neu ansehen.
+
+### 2026-11-06 — Kleinbefunde aus den Reviews von #57 (Politur, Testlücken)
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/turnier/`, `src/lib/verwaltung/`, `src/routes/verwaltung/turniere/`, `scripts/beispiel-turnier.ts`
+
+**Beobachtung:** Aus den Task-Reviews, im Gesamt-Review als «nicht vor dem Merge» eingestuft:
+- Hilfetext Mindestsumme sagt «ohne Lizenz», das Fachmodell «keine Lizenz» (`Kategorieformular.svelte`).
+- Keine Unit-Tests für `startziel`/`offenFuerCm` (`src/lib/verwaltung/umleiten.ts`); nur E2E.
+- Hinweis «Mixed gibt es nur im Doppel.» nicht per `aria-describedby` an die Gruppe gebunden.
+- Grenzen der Turniernummern im Browser kopiert (`Turnierformular.svelte`), nicht aus einem gemeinsamen Modul.
+- RR-08-Bedingung (nicht gesperrt, Mitglied aktiv) steht zweimal in `src/lib/server/admin/rollen.ts`.
+- Seed prüft im Test nur die Kategorienamen, nicht ihre Werte; Zweig «nach dem Anmeldeschluss → in Vorbereitung» ungetestet; Ergebnisse von `legeKategorieAn`/`setzeStatus` werden verworfen.
+- Die E2E-Turniere 2097–2099 bleiben nach dem Lauf in der E2E-Datenbank stehen.
+- Am Handy hatte der Entwurf zwei Tasten in voller Breite (`taste-breit`), die App nicht.
+
+**Ursprung:** Task- und Gesamt-Review #57.
+
+**Einschätzung:** Alles klein. «keine Lizenz» und die Anzeige am Handy mit Teil 2 (#58) angleichen; RR-08 doppelt fällt beim Rollen-Umbau (Entwurf «Rollen schärfen») ohnehin an.
