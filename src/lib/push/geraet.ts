@@ -84,7 +84,9 @@ function browser(): PushGeraet {
 
 /**
  * Nur aus einem Tipp aufrufen: Das iPhone fragt sonst nicht um Erlaubnis. Ein Abo mit einem
- * anderen Schlüssel (Schlüssel gewechselt) wird ersetzt, eines mit demselben übernommen.
+ * anderen Schlüssel (Schlüssel gewechselt) wird ersetzt, eines mit demselben übernommen. Nimmt
+ * der Server ein hier neu angelegtes Abo nicht an, wird es im Browser wieder abgemeldet: Browser
+ * und Server sollen nicht auseinanderlaufen.
  */
 export async function schalteEin(
 	schluessel: string,
@@ -100,21 +102,29 @@ export async function schalteEin(
 			await abo.unsubscribe();
 			abo = null;
 		}
+		const neu = abo === null;
 		abo ??= await pm.subscribe({ userVisibleOnly: true, applicationServerKey: bytes });
 		const r = await sendeAbo(abo.toJSON(), g.holen);
-		return r.art === 'ok' ? 'ein' : 'stoerung';
+		if (r.art === 'ok') return 'ein';
+		if (neu) await abo.unsubscribe().catch(() => false);
+		return 'stoerung';
 	} catch {
 		return 'stoerung';
 	}
 }
 
-/** Meldet das Abo im Browser ab und löscht es auf dem Server, auch wenn der Browser scheitert. */
-export async function schalteAus(g: PushGeraet = browser()): Promise<void> {
+/**
+ * Löscht das Abo zuerst auf dem Server; erst wenn das geklappt hat, auch im Browser. Scheitert
+ * der Server, bleibt Push an (`'stoerung'`), statt im Browser aus und auf dem Server an zu sein.
+ */
+export async function schalteAus(g: PushGeraet = browser()): Promise<'aus' | 'stoerung'> {
+	const r = await loescheAbo(g.holen);
+	if (r.art !== 'ok') return 'stoerung';
 	try {
 		const abo = await (await g.pushManager())?.getSubscription();
 		await abo?.unsubscribe();
 	} catch {
-		// Kein Service Worker oder Abo schon weg: Der Server löscht trotzdem.
+		// Kein Service Worker oder Abo schon weg: Auf dem Server ist es gelöscht, es kommt nichts mehr.
 	}
-	await loescheAbo(g.holen);
+	return 'aus';
 }

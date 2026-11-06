@@ -28,3 +28,38 @@ export function sicheresZiel(link: unknown, ursprung: string): string {
 		return start;
 	}
 }
+
+/** Was der Service Worker von einem offenen Fenster braucht (`WindowClient`). */
+export type Fenster = {
+	url: string;
+	focus(): Promise<unknown>;
+	navigate(url: string): Promise<Fenster | null>;
+};
+
+/** Was der Service Worker von `self.clients` braucht (`Clients`). */
+export type Fensterliste = {
+	matchAll(o: { type: 'window'; includeUncontrolled: boolean }): Promise<readonly Fenster[]>;
+	openWindow(url: string): Promise<unknown>;
+};
+
+/**
+ * Ein offenes Fenster von MyTCO navigiert zum Ziel und bekommt danach den Fokus. Lässt es sich
+ * nicht navigieren (nicht vom Service Worker gesteuert), öffnet ein neues Fenster. Nie beides.
+ */
+export async function oeffneZiel(c: Fensterliste, ziel: string, ursprung: string): Promise<void> {
+	const fenster = await c.matchAll({ type: 'window', includeUncontrolled: true });
+	const offen = fenster.find((f) => new URL(f.url).origin === new URL(ursprung).origin);
+	if (offen) {
+		let geladen: Fenster | null;
+		try {
+			geladen = await offen.navigate(ziel);
+		} catch {
+			await c.openWindow(ziel);
+			return;
+		}
+		// `null`: Die Seite ist geladen, gibt aber keinen Client zurück; kein zweites Fenster.
+		await geladen?.focus().catch(() => undefined);
+		return;
+	}
+	await c.openWindow(ziel);
+}

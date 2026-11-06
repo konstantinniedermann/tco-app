@@ -100,7 +100,7 @@ describe('Push einschalten und ausschalten (FR-40)', () => {
 		erlaubnis?: NotificationPermission;
 		vorhanden?: { schluessel: Uint8Array } | null;
 		ohneWorker?: boolean;
-		antwort?: Response;
+		antwort?: Response | Error;
 	}) {
 		const protokoll: string[] = [];
 		const anfragen: { pfad: string; init: RequestInit }[] = [];
@@ -129,6 +129,8 @@ describe('Push einschalten und ausschalten (FR-40)', () => {
 						} as unknown as PushManager),
 			holen: async (pfad, init) => {
 				anfragen.push({ pfad, init });
+				if (pfad.endsWith('/loeschen')) protokoll.push('server');
+				if (o.antwort instanceof Error) throw o.antwort;
 				return o.antwort ?? Response.json({ pushHier: true });
 			}
 		};
@@ -165,21 +167,53 @@ describe('Push einschalten und ausschalten (FR-40)', () => {
 		expect(gleich.protokoll).toEqual(['erlaubnis']);
 	});
 
-	test('FR-40: Störung ohne Service Worker oder wenn der Server ablehnt', async () => {
+	test('FR-40: Störung ohne Service Worker', async () => {
 		expect(await schalteEin(SCHLUESSEL, geraet({ ohneWorker: true }).g)).toBe('stoerung');
-		const aus = geraet({ antwort: Response.json({ fehler: 'push-aus' }, { status: 409 }) });
-		expect(await schalteEin(SCHLUESSEL, aus.g)).toBe('stoerung');
 	});
 
-	test('FR-40: Ausschalten meldet das Abo im Browser ab und löscht es auf dem Server', async () => {
-		const h = geraet({ vorhanden: { schluessel: schluesselBytes(SCHLUESSEL) } });
-		await schalteAus(h.g);
-		expect(h.protokoll).toEqual(['abgemeldet']);
+	test('FR-40: lehnt der Server ab (409 push-aus, 401, 500, Netz weg), wird das neue Abo im Browser wieder abgemeldet', async () => {
+		const antworten = [
+			Response.json({ fehler: 'push-aus' }, { status: 409 }),
+			Response.json({ fehler: 'abgemeldet' }, { status: 401 }),
+			Response.json({}, { status: 500 }),
+			new Error('Netz weg')
+		];
+		for (const antwort of antworten) {
+			const h = geraet({ antwort });
+			expect(await schalteEin(SCHLUESSEL, h.g)).toBe('stoerung');
+			expect(h.protokoll).toEqual(['erlaubnis', 'abonniert:true', 'abgemeldet']);
+		}
+	});
+
+	test('FR-40: 401 beim Einschalten ergibt Störung, ein schon vorhandenes Abo bleibt', async () => {
+		const h = geraet({
+			vorhanden: { schluessel: schluesselBytes(SCHLUESSEL) },
+			antwort: Response.json({ fehler: 'abgemeldet' }, { status: 401 })
+		});
+		expect(await schalteEin(SCHLUESSEL, h.g)).toBe('stoerung');
+		expect(h.protokoll).toEqual(['erlaubnis']);
+	});
+
+	test('FR-40: Ausschalten löscht zuerst auf dem Server, dann im Browser', async () => {
+		const h = geraet({
+			vorhanden: { schluessel: schluesselBytes(SCHLUESSEL) },
+			antwort: Response.json({ pushHier: false })
+		});
+		expect(await schalteAus(h.g)).toBe('aus');
+		expect(h.protokoll).toEqual(['server', 'abgemeldet']);
 		expect(h.anfragen[0].pfad).toBe('/api/benachrichtigungen/abo/loeschen');
 		expect(JSON.parse(String(h.anfragen[0].init.body))).toEqual({});
-		// Ohne Service Worker löscht es trotzdem auf dem Server.
-		const ohne = geraet({ ohneWorker: true });
-		await schalteAus(ohne.g);
+		// Ohne Service Worker ist es auf dem Server trotzdem gelöscht.
+		const ohne = geraet({ ohneWorker: true, antwort: Response.json({ pushHier: false }) });
+		expect(await schalteAus(ohne.g)).toBe('aus');
 		expect(ohne.anfragen).toHaveLength(1);
+	});
+
+	test('FR-40: scheitert das Löschen auf dem Server, bleibt das Abo im Browser', async () => {
+		for (const antwort of [Response.json({}, { status: 500 }), new Error('Netz weg')]) {
+			const h = geraet({ vorhanden: { schluessel: schluesselBytes(SCHLUESSEL) }, antwort });
+			expect(await schalteAus(h.g)).toBe('stoerung');
+			expect(h.protokoll).toEqual(['server']);
+		}
 	});
 });

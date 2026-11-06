@@ -3,6 +3,7 @@
 	// drei Themen. Die Schalter gelten sofort, ohne Speichern-Taste (UI-Leitbild, Auswahlfläche
 	// als Schalter).
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../login/anmelden.ts';
 	import { istKlappeOffen, merkeKlappe } from '../ui/klappe.ts';
@@ -30,6 +31,7 @@
 	let pushLaeuft = $state(false);
 	let pushFehler = $state<string | null>(null);
 	let themenFehler = $state<string | null>(null);
+	let themenLaeuft = $state(false);
 
 	onMount(async () => {
 		const r = await holeBenachrichtigungen();
@@ -49,10 +51,8 @@
 				pushFehler = r === 'abgelehnt' ? ABGELEHNT : MELDUNG.stoerung;
 			}
 		} else {
-			await schalteAus();
-			// Ob der Server das Abo gelöscht hat, sagt erst der neue Stand.
-			const r = await holeBenachrichtigungen();
-			if (r.art !== 'ok' || r.daten.pushHier) {
+			// Scheitert das Löschen auf dem Server, bleibt Push an, auch im Browser.
+			if ((await schalteAus()) !== 'aus') {
 				stand.pushHier = true;
 				pushFehler = MELDUNG.stoerung;
 			}
@@ -60,15 +60,27 @@
 		pushLaeuft = false;
 	}
 
+	// Eine Anfrage nach der anderen: Solange eine läuft, sind die Schalter gesperrt. Scheitert sie,
+	// zeigen die Schalter den Stand des Servers. Ohne Sitzung geht es zum Login wie auf der
+	// Anlass-Seite.
 	async function schalteThema(thema: Thema, an: boolean) {
-		if (!stand) return;
+		if (!stand || themenLaeuft) return;
+		themenLaeuft = true;
 		themenFehler = null;
 		stand.themen[thema] = an;
-		const r = await speichereThemen({ ...stand.themen });
-		if (r.art !== 'ok') {
-			stand.themen[thema] = !an;
+		let r = await speichereThemen({ ...stand.themen });
+		if (r.art !== 'ok' && r.art !== 'abgemeldet') {
 			themenFehler = MELDUNG.stoerung;
+			r = await holeBenachrichtigungen();
+			// Lässt sich auch der Stand nicht laden, gilt der letzte bekannte des Servers.
+			if (r.art !== 'ok' && r.art !== 'abgemeldet') stand.themen[thema] = !an;
 		}
+		if (r.art === 'abgemeldet') {
+			await goto(resolve('/login'));
+			return;
+		}
+		if (r.art === 'ok') stand.themen = r.daten.themen;
+		themenLaeuft = false;
 	}
 </script>
 
@@ -108,7 +120,7 @@
 					<p class="fehler" id="push-fehler" role="alert">{pushFehler}</p>
 				{/if}
 			{/if}
-			<fieldset class="auswahl-gruppe" disabled={nurAnsehen}>
+			<fieldset class="auswahl-gruppe" disabled={nurAnsehen || themenLaeuft}>
 				<legend>Mitteilungen zu</legend>
 				{#each THEMEN as t (t.thema)}
 					<label class="auswahl">
