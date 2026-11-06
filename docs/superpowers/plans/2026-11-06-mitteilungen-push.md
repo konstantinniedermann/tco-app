@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Kein Code vor Task 1 (Datenschutzkonzept und -erklärung zuerst, CLAUDE.md).
-- `web-push` erst installieren, wenn der Projektleiter die Abhängigkeit freigegeben hat. Blockt `dep-guard`, Namen melden und warten.
+- `web-push` erst installieren, wenn der Projektleiter die Abhängigkeit freigegeben hat. Blockt `dep-guard`, Namen melden und warten. `web-push` und `@types/web-push`: freigegeben vom Projektleiter am 06.11.2026.
 - Svelte-/SvelteKit-Code nur nach Doku über den Svelte-MCP-Server; Komponenten durch `svelte-autofixer`.
 - Unter `src/routes` nur `+server.ts` als Server-Datei (ADR-002).
 - Oberfläche nur aus Bausteinen von `docs/ui-leitbild.md`; fehlt einer, zuerst ins Leitbild.

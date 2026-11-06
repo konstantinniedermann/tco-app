@@ -10,18 +10,18 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 - Mitteilungen per Push und E-Mail (#63): Im Profil unter *Benachrichtigungen* schaltet ein
   Mitglied Push für sein Gerät ein (auf dem iPhone nur vom Startbildschirm) und wählt die
-  Themen *Anlässe*, *Clubmeisterschaft* und *Verein*; sie gelten für Push und E-Mail. Auf dem
-  Android-Handy fragt die Startseite einmal «Mitteilungen aufs Handy?» (Einschalten · Nein,
-  danke). Ein Tipp auf die Mitteilung öffnet den Anlass. Der Mitglieder-Admin schickt
-  Mitteilungen von der Seite eines Anlasses (Vorlagen *Erinnerung*, *Änderung*, *Neuer
-  Anlass*; an alle oder nur an die, die noch nicht geantwortet haben, kommen, nicht kommen
-  oder deren Antwort nach einer Terminänderung zu prüfen ist) oder unter *Mitteilungen* an
-  den ganzen Verein. Er
-  wählt den Weg (nur Push, Push sonst E-Mail, Push und E-Mail), sieht vorher, wie viele
-  Mitglieder sie wie erreicht, und bestätigt das Senden. Der Verlauf zeigt jede Mitteilung
-  mit Zahlen, ohne Namen der Empfänger, ein Jahr lang. Neu die Einstellungen
-  `MYTCO_VAPID_OEFFENTLICH` und `MYTCO_VAPID_PRIVAT` je Umgebung; ohne sie ist Push aus und
-  Mitteilungen gehen per E-Mail. Mitteilungen zur Clubmeisterschaft folgen.
+  Themen *Anlässe*, *Clubmeisterschaft* und *Verein*; sie gelten für Push und E-Mail. Auf
+  Handys, die Push können (Android, iPhone vom Startbildschirm), fragt die Startseite einmal
+  «Mitteilungen aufs Handy?» (Einschalten · Nein, danke). Ein Tipp auf die Mitteilung öffnet
+  den Anlass. Der Mitglieder-Admin schickt Mitteilungen von der Seite eines Anlasses (Vorlagen
+  *Erinnerung*, *Änderung*, *Neuer Anlass*; an alle oder nur an die, die noch nicht
+  geantwortet haben, kommen, nicht kommen oder deren Antwort nach einer Terminänderung zu
+  prüfen ist) oder unter *Mitteilungen* an den ganzen Verein. Er wählt den Weg (nur Push, Push
+  sonst E-Mail, Push und E-Mail), sieht vorher, wie viele Mitglieder sie wie erreicht, und
+  bestätigt das Senden. Der Verlauf zeigt jede Mitteilung mit Zahlen, ohne Namen der
+  Empfänger, ein Jahr lang. Neues Paket `web-push` verschickt die Pushes. Neu die
+  Einstellungen `MYTCO_VAPID_OEFFENTLICH` und `MYTCO_VAPID_PRIVAT` je Umgebung; ohne sie ist
+  Push aus und Mitteilungen gehen per E-Mail. Mitteilungen zur Clubmeisterschaft folgen.
 
 ## 0.8.0 — Clubmeisterschaft: Einzel-Anmeldung der Mitglieder
 

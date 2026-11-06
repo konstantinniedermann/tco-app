@@ -184,7 +184,8 @@ Erst Konzept und Datenschutzerklärung, dann Code (CLAUDE.md).
   brauchen voraussichtlich keine neuen Bausteine; was fehlt, kommt zuerst ins Leitbild.
 - Service Worker: SvelteKit-eigener (`src/service-worker.ts`), nur für den Empfang von Push und
   den Tipp darauf, **kein Offline-Cache** *(mein Vorschlag: Caching ist ein eigenes Thema)*.
-- Neue Abhängigkeit: voraussichtlich `web-push` (Versand mit VAPID). Freigabe im Plan.
+- Neue Abhängigkeit: `web-push` (Versand mit VAPID), dazu `@types/web-push`; freigegeben vom
+  Projektleiter am 06.11.2026.
 - VAPID-Schlüssel als Server-Geheimnis je Umgebung (lokal, Test, Live), wie die übrigen
   Geheimnisse ([Sicherheitskonzept](../../sicherheitskonzept.md)).
 - Kosten: Web Push CHF 0. Mails: eine Mitteilung an alle sind 300–500 Mails; Scaleway

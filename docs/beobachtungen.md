@@ -463,17 +463,17 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Eine Kartenliste statt Tabelle wäre am Handy besser lesbar, braucht aber einen neuen Baustein im UI-Leitbild. Zusammen mit der Kategorientabelle lösen. Die Verwaltung wird vor allem am PC genutzt, darum niedrig.
 
-### 2026-11-06 — Mitteilungen zur Clubmeisterschaft warten auf die Spielberechtigung aus #58
+### 2026-11-06 — Mitteilungen zur Clubmeisterschaft fehlen noch, die Spielberechtigung aus #58 liegt jetzt auf dev
 
 **Thema:** Turnier-Verwaltung
 
 **Fundort:** #63 (Teil Clubmeisterschaft), `docs/fachmodell.md` (*Mitteilung*: «die Clubmeisterschaft folgt später»), N-APP-02 in `docs/anforderungen/anforderungen.md`
 
-**Beobachtung:** #63 liefert Push und Mitteilungen zu Anlässen und an den Verein. Mitteilungen zur Clubmeisterschaft (z. B. an alle Spielberechtigten einer Kategorie) brauchen die Spielberechtigung, die erst mit #58 kommt. Das Thema *Clubmeisterschaft* ist im Profil schon wählbar, es gibt aber noch keinen Versand dazu.
+**Beobachtung:** #63 liefert Push und Mitteilungen zu Anlässen und an den Verein. Mitteilungen zur Clubmeisterschaft (z. B. an alle Spielberechtigten einer Kategorie) brauchen die Spielberechtigung und die Anmeldungen aus #58; beides liegt inzwischen auf `dev`. Das Thema *Clubmeisterschaft* ist im Profil schon wählbar, es gibt aber noch keinen Versand dazu.
 
 **Ursprung:** #63, Abschluss.
 
-**Einschätzung:** Kein eigener Vorgang nötig, solange #63 den CM-Teil offen führt; nach #58 dort weiterbauen.
+**Einschätzung:** Der CM-Teil lässt sich jetzt als eigener, kurzer Plan angehen (eine Empfänger-Funktion, Vorlagen, zwei Schnittstellen; siehe Plan zu #63, Abschnitt «Nicht in diesem Plan»).
 
 ### 2026-11-06 — RR-03 auf dem iPhone vereinzelt rot: Rückfrage erscheint nicht nach «Rollen speichern»
 
@@ -486,3 +486,33 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #63, Nachweislauf von `make check`.
 
 **Einschätzung:** Vermutlich Klick vor der Hydration (Häkchen geht im HTML auch ohne Svelte, die Taste nicht). Im Test vor dem Klick auf ein Zeichen der fertigen Seite warten.
+
+### 2026-11-06 — Kleinbefunde aus den Reviews von #63 (Mitteilungen per Push und E-Mail)
+
+**Thema:** Betrieb
+
+**Fundort:** `src/lib/server/mitteilung/`, `src/lib/push/`, `src/service-worker/`, `src/lib/verwaltung/` (Mitteilungsformular), `tests/e2e/mitteilungen.test.ts`, `package.json`
+
+**Beobachtung:** Aus den Task-, Schluss- und cas-Reviews, als «nicht vor dem Merge» eingestuft:
+- Service Worker beachtet `pushsubscriptionchange` nicht; Firefox kann das Abo still erneuern, dann geht Push ins Leere, bis das Mitglied neu einschaltet.
+- Link im Push und in der Mail entsteht aus `MYTCO_ADRESSE`; weicht sie von der ausgelieferten Adresse ab, zeigt er auf den falschen Ursprung (erwägen: nur den Pfad schicken).
+- Empfänger können sich zwischen Vorschau und Senden ändern (Antwort, Themen, Abo).
+- Kein Hinweis im Formular, wenn Push auf dem Server aus ist (kein VAPID-Paar).
+- `@types/web-push@3.6.4` passt nicht zur Hauptversion von `web-push@4.0.0`.
+- Anlass zwischen Prüfung und Eintrag in den Verlauf gelöscht → 500, obwohl schon gesendet.
+- Abgebrochener langer Versand hinterlässt keinen Verlaufseintrag (`gesendetAm` erst nach dem Versand).
+- `schema.db.test.ts`: `.rejects.toThrow()` ohne Namen des Constraints.
+- `migration-0009.db.test.ts`: ungenutzter Parameter `_db`.
+- Grenztests für Schlüssellängen und genau 1000 Zeichen beim Abo fehlen.
+- E2E-Abwesenheitsprüfungen schwach (`toHaveCount(0)` ohne Warten); kein E2E für blockierte Mitteilungen.
+- Push-Schalter behandelt 401 als allgemeine Störung statt Umleitung zum Login.
+- Fokus springt weg, während die Themen-Schalter beim Speichern gesperrt sind.
+- Abos abgelaufener Sitzungen bekommen Pushes bis zum Aufräumen.
+- `Grundzeile.email` als `string` typisiert, `Empfaenger.email` als `string | null`.
+- Wache «Nicht gespeichert» übersieht ein laufendes Senden sowie Auswahl und Weg.
+- Race-E2E prüft die Abwesenheit nach nur einem Animation-Frame.
+- Eingabe-Fehler einer veralteten Vorschau bleibt sichtbar.
+
+**Ursprung:** Task-Reviews, Schluss-Review und cas-reviewer zu #63.
+
+**Einschätzung:** Alles klein. `pushsubscriptionchange` und der Link aus `MYTCO_ADRESSE` zuerst ansehen, sobald Push auf Test läuft (#39); die Testlücken bei Gelegenheit mit dem CM-Teil der Mitteilungen.

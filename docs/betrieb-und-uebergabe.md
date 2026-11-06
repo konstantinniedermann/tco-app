@@ -52,7 +52,7 @@ ersetzen lassen:
 | Wiederherstellungscodes der Konten | Konto bei Verlust des zweiten Faktors gesperrt | **ja, zwingend** |
 | Zugangsdaten der Konten | Wiederherstellung über die Vereinsadresse | ja |
 | Schlüssel für die Codes (`MYTCO_CODE_SCHLUESSEL`) | neu setzen; alle offenen Codes werden ungültig, auch die in verschickten Briefen | ja |
-| VAPID-Schlüsselpaar für Push (`MYTCO_VAPID_OEFFENTLICH`, `MYTCO_VAPID_PRIVAT`) | neu erzeugen und eintragen; alle Push-Anmeldungen werden ungültig, Geräte melden sich neu an | nein |
+| VAPID-Schlüsselpaar für Push (`MYTCO_VAPID_OEFFENTLICH`, `MYTCO_VAPID_PRIVAT`) | neu erzeugen und eintragen, danach auf dieser Umgebung `DELETE FROM push_abo;`; alle Push-Anmeldungen werden ungültig, die Mitglieder schalten Push neu ein (der Hinweis auf der Startseite erscheint wieder) | nein |
 | Datenbank-Passwort, Test-Passwort, SSH-Schlüssel der CI und des Projektleiters | neu erzeugen und eintragen | nein |
 
 **Wo:** hängt an K-49. Annahme K-49: bis zur Antwort im Passwortmanager des Projektleiters.

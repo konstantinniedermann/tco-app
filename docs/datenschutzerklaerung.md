@@ -85,8 +85,9 @@ einen Passkey einrichten willst (auch wenn du abbrichst), und bleibt, bis dein K
 Schlüsselbund an, MyTCO speichert sie dafür nicht zusätzlich. Ob der Hinweis auf den Passkey
 noch erscheint, merkt sich MyTCO an deiner Sitzung.
 
-**Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login und den Wechsel der E-Mail-Adresse nötig ist. Keine Werbung,
-keine Analyse-Dienste.
+**Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login und den Wechsel der E-Mail-Adresse nötig ist, und ob du den
+Hinweis auf Push mit «Nein, danke» weggeklickt hast. Schaltest du Push ein, legt dein Browser dafür eine Anmeldung beim
+Push-Dienst an. Keine Werbung, keine Analyse-Dienste.
 
 **Deine Rechte:** Du kannst jederzeit erfahren, welche Daten MyTCO über dich hat, und sie
 berichtigen oder löschen lassen. E-Mail, Telefon, Adresse und Lizenznummer änderst du selbst in
