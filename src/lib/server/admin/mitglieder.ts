@@ -270,7 +270,7 @@ export async function aendereAngaben(
 	vorher: Angaben,
 	jetzt: Date
 ): Promise<
-	| { ergebnis: 'ok'; geaendert: Feld[] }
+	| { ergebnis: 'ok'; geaendert: Feld[]; alteEmail: string | null }
 	| Vergeben
 	| { ergebnis: 'nicht-gefunden' }
 	| { ergebnis: 'veraltet' }
@@ -283,7 +283,7 @@ export async function aendereAngaben(
 			if (geaenderteFelder(gespeichert, vorher).length > 0)
 				return { ergebnis: 'veraltet' as const };
 			const geaendert = geaenderteFelder(gespeichert, angaben);
-			if (geaendert.length === 0) return { ergebnis: 'ok' as const, geaendert };
+			if (geaendert.length === 0) return { ergebnis: 'ok' as const, geaendert, alteEmail: null };
 			await tx.update(mitglied).set(angaben).where(eq(mitglied.id, id));
 			await schreibeVerlauf(
 				tx,
@@ -292,7 +292,9 @@ export async function aendereAngaben(
 				geaendert.map((feld) => ({ aktion: 'feld-geaendert' as const, detail: feld })),
 				jetzt
 			);
-			return { ergebnis: 'ok' as const, geaendert };
+			// SI-09: Nur eine geänderte E-Mail braucht den Hinweis an die alte Adresse.
+			const alteEmail = geaendert.includes('email') ? alt.email : null;
+			return { ergebnis: 'ok' as const, geaendert, alteEmail };
 		});
 	} catch (fehler) {
 		const feld = vergebenesFeld(fehler);

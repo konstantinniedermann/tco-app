@@ -33,7 +33,13 @@ import type { ZugangDienst } from './zugang.ts';
 
 export type AdminEreignis = Ereignis & Pick<RequestEvent, 'params'>;
 
-export type AdminDienste = { db: Db; zugang: ZugangDienst; jetzt?: () => Date };
+export type AdminDienste = {
+	db: Db;
+	zugang: ZugangDienst;
+	// SI-09: Hinweis an die alte Adresse; wirft nie.
+	hinweis: (an: string) => Promise<void>;
+	jetzt?: () => Date;
+};
 
 type AdminUrheber = Extract<Urheber, { art: 'admin' | 'mitglied' }> & { art: 'admin' };
 
@@ -192,6 +198,8 @@ export function postMitglied(d: AdminDienste, e: AdminEreignis): Promise<Respons
 		const r = await aendereAngaben(d.db, urheber, id, p.angaben, vorher, t);
 		switch (r.ergebnis) {
 			case 'ok':
+				// Nach dem Commit und ohne Warten: Die Antwortzeit verrät nichts, ein Mailfehler ändert sie nicht.
+				if (r.alteEmail !== null) void d.hinweis(r.alteEmail);
 				return antwort(200, { geaendert: r.geaendert });
 			case 'vergeben':
 				return antwort(409, { fehler: 'vergeben', feld: r.feld });

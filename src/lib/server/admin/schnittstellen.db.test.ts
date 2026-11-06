@@ -32,6 +32,8 @@ import {
 } from './schnittstellen.ts';
 import { getAnlaesse } from '../anlass/schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
+import { erstelleHinweis } from './hinweis-mail.ts';
+import { ladeMitglied } from './mitglieder.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {
@@ -66,8 +68,9 @@ function baue() {
 		bremsen: erstelleBremsen(),
 		jetzt: () => start
 	});
-	const d: AdminDienste = { db, zugang, jetzt: () => start };
-	return { d, post };
+	const hinweis = vi.fn<AdminDienste['hinweis']>(async () => {});
+	const d: AdminDienste = { db, zugang, hinweis, jetzt: () => start };
+	return { d, post, hinweis };
 }
 
 async function einloggen(kontoId: number): Promise<AngemeldetesKonto> {
@@ -306,6 +309,73 @@ describe('Admin-Schnittstellen', () => {
 		const koerper = (await r.json()) as { fehler: string; felder: Record<string, string> };
 		expect(koerper.fehler).toBe('eingabe');
 		expect(koerper.felder).toHaveProperty('plz');
+	});
+
+	async function angelegt(s: ReturnType<typeof baue>, konto: AngemeldetesKonto) {
+		const angaben = eindeutig();
+		const neu = await postMitglieder(s.d, ereignis({ body: angaben, konto }));
+		const { id } = (await neu.json()) as { id: number };
+		const vorher = (await ladeMitglied(db, id, start))!.angaben;
+		return { angaben, id, vorher };
+	}
+
+	test('SI-09: postMitglied schickt den Hinweis an die alte Adresse', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const { angaben, id, vorher } = await angelegt(s, admin.konto);
+		const ohneEmail = await postMitglied(
+			s.d,
+			ereignis({
+				body: { ...angaben, ort: 'Aarau', vorher },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect(ohneEmail.status).toBe(200);
+		expect(s.hinweis).not.toHaveBeenCalled();
+
+		const neueEmail = `neu-${id}@example.org`;
+		const mitEmail = await postMitglied(
+			s.d,
+			ereignis({
+				body: { ...angaben, ort: 'Aarau', email: neueEmail, vorher: { ...vorher, ort: 'Aarau' } },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect(mitEmail.status).toBe(200);
+		expect(s.hinweis).toHaveBeenCalledTimes(1);
+		expect(s.hinweis).toHaveBeenCalledWith(angaben.email);
+	});
+
+	test('SI-09: scheitert der Hinweis, bleibt die Änderung gespeichert', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const { angaben, id, vorher } = await angelegt(s, admin.konto);
+		const hinweis = erstelleHinweis({
+			mailer: async () => {
+				throw new Error('SMTP-Fehler');
+			},
+			kontakt: 'kontakt@example.org',
+			bremsen: erstelleBremsen()
+		});
+		const neueEmail = `neu-${id}@example.org`;
+		const r = await postMitglied(
+			{ ...s.d, hinweis },
+			ereignis({
+				body: { ...angaben, email: neueEmail, vorher },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect(r.status).toBe(200);
+		const [gespeichert] = await db.select().from(mitglied).where(eq(mitglied.id, id));
+		expect(gespeichert.email).toBe(neueEmail);
+		// Der Hinweis läuft ohne Warten; die eine feste Logzeile erwarten und zurücksetzen.
+		const fehlerLog = logs[0];
+		await vi.waitFor(() => expect(fehlerLog).toHaveBeenCalledTimes(1));
+		expect(fehlerLog.mock.calls).toEqual([['Hinweis-Mail nicht versandt']]);
+		fehlerLog.mockClear();
 	});
 
 	test('FR-01, FR-26: Mitglied anlegen, lesen, ändern, doppelte E-Mail → 409, Verlauf', async () => {

@@ -54,7 +54,7 @@ function baue(jetzt: Date = start) {
 		bremsen: erstelleBremsen(),
 		jetzt: () => start
 	});
-	const d: AdminDienste = { db, zugang, jetzt: () => jetzt };
+	const d: AdminDienste = { db, zugang, hinweis: async () => {}, jetzt: () => jetzt };
 	return { d, post };
 }
 

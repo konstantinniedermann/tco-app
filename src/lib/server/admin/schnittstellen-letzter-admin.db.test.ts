@@ -37,7 +37,7 @@ describe('Admin-Schnittstelle Rollen, eigene Datenbank', () => {
 			bremsen: erstelleBremsen(),
 			jetzt: () => start
 		});
-		const d: AdminDienste = { db, zugang, jetzt: () => start };
+		const d: AdminDienste = { db, zugang, hinweis: async () => {}, jetzt: () => start };
 		const admin = await legeMitgliedAn(db, { rollen: ['admin'] });
 		const kennung = await erstelleSitzung(db, admin.kontoId, start);
 		const konto = (await pruefeSitzung(db, kennung, start))!.konto;
