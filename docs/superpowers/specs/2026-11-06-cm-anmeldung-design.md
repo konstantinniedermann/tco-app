@@ -1,7 +1,7 @@
 # Design: Anmeldung zur Clubmeisterschaft (#51)
 
 **Datum:** 2026-11-06 · **Issue:** [#51](https://github.com/konstantinniedermann/tco-app/issues/51)
-· **Status:** Entwurf
+· **Status:** freigegeben (Projektleiter, 06.11.2026)
 
 ## Absicht
 
@@ -55,7 +55,10 @@ die niemand bearbeiten kann.
    Turniernummern mit Bezeichnung (z. B. *Gruppenphase*, *Finalwochenende*; ob es zwei sind,
    hängt an K-25.4, das Modell erlaubt beides). Ein Turnier pro Jahr; ältere bleiben lesbar.
 3. **Kategorien:** Name, Geschlecht (*Herren*, *Damen*, *Mixed*, *offen*), Jahrgang von–bis
-   (optional, beide Enden einzeln optional), Klassierung von–bis, *Einzel* oder *Doppel*.
+   (optional, beide Enden einzeln optional), *Einzel* oder *Doppel*. Im **Einzel** gilt ein
+   Klassierungsbereich von–bis. Im **Doppel** gilt stattdessen eine Mindestsumme der
+   Klassierungen beider Spieler, vorbelegt mit 9 (R4+R5 oder R1+R8 gehen, R3+R5 nicht; Angabe
+   Projektleiter, Annahme K-51); der CM-Verantwortliche kann sie je Kategorie ändern.
    *Mixed* gibt es nur im Doppel. Erfasst wird von Hand; «vom Vorjahr übernehmen» gibt es erst,
    wenn es ein Vorjahr gibt (Nicht-Ziel).
 4. **Status:** Ein neues Turnier ist *in Vorbereitung* und für Mitglieder unsichtbar. Der
@@ -73,7 +76,7 @@ die niemand bearbeiten kann.
    ab (Entscheid Projektleiter). Eine abgesagte Kategorie verschwindet für Mitglieder.
 7. **Seed:** `make seed` legt ein erfundenes Turnier 2027 mit offener Anmeldung an: Herren,
    Damen, Mixed, Junioren (mit Jahrgang), Senioren, Einzel und Doppel, verschiedene
-   Klassierungsbereiche (z. B. R1–R6, R7–R9). Die Teile 2 bis 4 ergänzen erfundene Anmeldungen.
+   Klassierungsbereiche (z. B. R1–R6, R7–R9) und Doppel mit Mindestsumme 9. Die Teile 2 bis 4 ergänzen erfundene Anmeldungen.
 
 ### Teil 2 — Einzel-Anmeldung
 
@@ -106,13 +109,16 @@ die niemand bearbeiten kann.
 ### Teil 3 — Doppel
 
 1. **Partner wählen:** In einer Doppelkategorie wählt der Spieler den Partner über ein Suchfeld.
-   Zur Wahl stehen aktive Mitglieder, die nach Geschlecht, Jahrgang und Klassierung in die
-   Kategorie passen und dort noch in keiner Anmeldung stehen (FR-07, FR-09). Im *Mixed* eine
-   Frau und ein Mann. Hat ein Mitglied keine Klassierung eingetragen, ist es wählbar und trägt
-   den Vermerk *Klassierung fehlt*; der CM-Verantwortliche prüft.
-   Passt einer der beiden **nur** wegen der Klassierung nicht (und nur nach oben, siehe Teil 4,
-   Ziel 6), wird die Anmeldung ein Wildcard-Antrag für das Paar (*beantragt*); das kommt mit
-   Teil 4, bis dahin ist ein solcher Partner nicht wählbar.
+   Zur Wahl stehen aktive Mitglieder, die nach Geschlecht und Jahrgang in die Kategorie passen,
+   dort noch in keiner Anmeldung stehen (FR-07, FR-09) und mit dem Spieler zusammen die
+   **Mindestsumme der Klassierungen** erreichen (Teil 1, Ziel 3). Gezählt wird R1 = 1 bis
+   R9 = 9; *keine Lizenz* zählt 10, N1–N4 zählen 0 (Annahme K-51). Im *Mixed* eine Frau und ein
+   Mann. Hat ein Mitglied keine Klassierung eingetragen, ist es wählbar und trägt den Vermerk
+   *Klassierung fehlt*; der CM-Verantwortliche prüft. Wer *sucht Partner*, wird allein nicht
+   an der Summe gemessen.
+   Ein Paar, das zu stark ist (Summe zu klein), kann keinen Wildcard-Antrag stellen
+   (Wildcard nur nach oben, Teil 4, Ziel 6); es kommt nur über den CM-Verantwortlichen hinein.
+   Doppel kennen damit keinen Wildcard-Antrag.
 2. **Keine Zustimmung nötig:** Der Partner wird per Mail benachrichtigt (Annahme K-27). Die
    Mail enthält den Hinweis, dass Gegner und Partner E-Mail und Telefon sehen, und wie man sich
    abmeldet, wenn man das nicht will (Entscheid Projektleiter). Die
@@ -162,14 +168,17 @@ und [Anforderungen](../../anforderungen/anforderungen.md), bevor der jeweilige T
 - **Klassierung:** Reihenfolge von stark nach schwach N1–N4, R1–R9, *keine Lizenz*. *Keine
   Lizenz* passt in jeden Bereich, dessen schwaches Ende R9 ist. Die Skala ist eine Annahme
   (Glossar: *Vermutung*), bis K-25.1 beantwortet ist.
+- **Doppel nach Summe:** Eine Doppelkategorie hat statt eines Klassierungsbereichs eine
+  Mindestsumme (vorbelegt 9); R1 = 1 … R9 = 9, *keine Lizenz* = 10, N1–N4 = 0 (Annahme K-51).
+  FR-07 und das Fachmodell (Kategorie) entsprechend ändern.
 - **Kategorie:** neuer Status *abgesagt*; nur ohne aktive Anmeldungen (Teil 1, Ziel 6).
-- **Anmeldung:** Doppel mit 1 Spieler ist erlaubt (*sucht Partner*). Status bleibt
-  *bestätigt* / *beantragt* / *abgelehnt* / *zurückgezogen*; *Wildcard* und *sucht Partner*
-  sind eigene Merkmale, weil eine Anmeldung beides zugleich sein kann (Doppel-Wildcard ohne
-  Partner). *sucht Partner* ergibt sich aus der Zahl der Spieler. Das Schema dafür legt
-  Teil 2 so an, dass Teil 3 und 4 parallel darauf bauen können.
-- **Wildcard nur nach oben:** Ein Antrag geht nur für Kategorien, deren Klassierungsbereich
-  stärker ist als der Spieler (FR-08 präzisieren).
+- **Anmeldung:** Doppel mit 1 Spieler ist erlaubt (*sucht Partner*; ergibt sich aus der Zahl
+  der Spieler). Status *bestätigt* / *beantragt* / *abgelehnt* / *zurückgezogen*; *beantragt*
+  kommt nur im Einzel vor (Wildcard). Das Schema dafür legt Teil 2 so an, dass Teil 3 und 4
+  parallel darauf bauen können.
+- **Wildcard nur nach oben und nur im Einzel:** Ein Antrag geht nur für Kategorien, deren
+  Klassierungsbereich stärker ist als der Spieler (FR-08 präzisieren). Im Doppel gibt es keinen
+  Wildcard-Antrag, weil die Mindestsumme nur zu starke Paare ausschliesst.
 - **Geschlecht und Jahrgang:** Das Mitglied darf beides einmal selbst eintragen, wenn es fehlt
   (RR-Matrix: Ausnahme zu «L eigene»).
 - **Änderungsverlauf:** Korrekturen der Klassierung durch den CM-Verantwortlichen erscheinen mit
@@ -223,7 +232,7 @@ Fläche; der Wildcard-Bereich ist eingeklappt. Fehlt ein Baustein, kommt er erst
 
 Die Regeln oben beruhen bis zur Antwort auf Annahmen: K-24.1/.2 (Kalender, Anmeldeschluss),
 K-25.1 (Kategorien), K-25.4/.5 (Turniernummern), K-27.1–.3 (Doppel), K-28 (Klassierung),
-K-29 (Abmelden). Keine davon blockiert den Bau; die Antworten ändern Seed-Daten oder einzelne
+K-29 (Abmelden), K-51 (Doppel nach Summe der Klassierungen). Keine davon blockiert den Bau; die Antworten ändern Seed-Daten oder einzelne
 Regeln.
 
 ## Entscheide von Claude (zum Gegenlesen)
@@ -236,7 +245,9 @@ Regeln.
 - Wildcard-Mail an den CM-Verantwortlichen je Antrag.
 - Klassierung nur am Mitglied, nicht an der Anmeldung; spätere Änderungen wirken nur auf neue
   Anmeldungen.
-- Doppel, in dem einer nur wegen der Klassierung nicht passt → Wildcard-Antrag für das Paar.
+- Doppel-Summe: *keine Lizenz* zählt 10, N1–N4 zählen 0; Mindestsumme je Kategorie änderbar
+  (Annahme K-51, beim Verein nachgefragt).
+- Wer *sucht Partner*, wird allein nicht an der Summe gemessen.
 
 ## Dem Bauenden überlassen
 
