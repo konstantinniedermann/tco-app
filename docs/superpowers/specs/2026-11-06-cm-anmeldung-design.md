@@ -110,7 +110,7 @@ die niemand bearbeiten kann.
 
 1. **Partner wählen:** In einer Doppelkategorie wählt der Spieler den Partner über ein Suchfeld.
    Zur Wahl stehen aktive Mitglieder, die nach Geschlecht und Jahrgang in die Kategorie passen,
-   dort noch in keiner Anmeldung stehen (FR-07, FR-09) und mit dem Spieler zusammen die
+   dort noch in keiner Anmeldung stehen, ausser allein als *sucht Partner* (FR-07, FR-09), und mit dem Spieler zusammen die
    **Mindestsumme der Klassierungen** erreichen (Teil 1, Ziel 3). Gezählt wird R1 = 1 bis
    R9 = 9; *keine Lizenz* zählt 10, N1–N4 zählen 0 (Annahme K-51). Im *Mixed* eine Frau und ein
    Mann. Hat ein Mitglied keine Klassierung eingetragen, ist es wählbar und trägt den Vermerk
@@ -135,8 +135,8 @@ die niemand bearbeiten kann.
 
 ### Teil 4 — Anmeldungen verwalten
 
-1. **Liste je Kategorie** mit Status (*bestätigt*, *Wildcard beantragt*, *sucht Partner*) und
-   Anzahl, dazu Klassierung der Spieler und der Vermerk *Klassierung fehlt*.
+1. **Liste je Kategorie** mit Status (*bestätigt*, *beantragt* = Wildcard-Antrag) und Vermerk *sucht Partner*, dazu die
+   Anzahl, die Klassierung der Spieler und der Vermerk *Klassierung fehlt*.
 2. **Von Hand anmelden:** jedes aktive Mitglied in jede Kategorie, auch Junioren ohne eigenes
    Login und auch nach dem Anmeldeschluss. Passt die Kategorie nicht, ist die Grenze von 3
    überschritten oder die Anmeldung geschlossen, zeigt MyTCO eine Warnung; nach Bestätigung
@@ -144,7 +144,7 @@ die niemand bearbeiten kann.
 3. **Ändern:** in eine andere Kategorie verschieben, Doppelpartner ändern, zwei *sucht Partner*
    zu einem Paar zusammenlegen, Klassierung eines Spielers korrigieren. Für die Regeln gilt
    dasselbe wie beim Anmelden von Hand: warnen, nicht sperren.
-4. **Löschen:** Die Anmeldung wird *zurückgezogen* und zählt nicht mehr (meine Entscheidung: kein
+4. **Löschen:** Die Anmeldung wird *zurückgezogen* und zählt nicht mehr (Entscheid Claude: kein
    echtes Löschen, damit Mail und Zählung nachvollziehbar bleiben).
 5. **Mails:** Jede Änderung durch den CM-Verantwortlichen (anmelden, verschieben, Partner,
    löschen, Entscheid) geht per Mail an die betroffenen Spieler. Wer von ihm angemeldet wird,
@@ -181,6 +181,9 @@ und [Anforderungen](../../anforderungen/anforderungen.md), bevor der jeweilige T
   Wildcard-Antrag, weil die Mindestsumme nur zu starke Paare ausschliesst.
 - **Geschlecht und Jahrgang:** Das Mitglied darf beides einmal selbst eintragen, wenn es fehlt
   (RR-Matrix: Ausnahme zu «L eigene»).
+- **FR-02 (Pflichtangaben beim ersten Login):** Die Klassierung fragt nicht der erste Login ab,
+  sondern die CM-Seite (Teil 2, Ziel 1). FR-02 entsprechend anpassen, damit sie nicht doppelt
+  oder schon beim Login erzwungen wird.
 - **Änderungsverlauf:** Korrekturen der Klassierung durch den CM-Verantwortlichen erscheinen mit
   eigenem Urheber `cm` (FR-26; Schema-Änderung beim Urheber).
 - **Turnier:** Übergang *Anmeldung geschlossen* → *Anmeldung offen* (wieder öffnen) ist erlaubt;
