@@ -63,6 +63,7 @@ flowchart LR
 | Login | Einmal-Code per Brief oder Mail, kein Passwort, lange Sitzung | [ADR-004](adr/adr-004-login-einmal-code.md) |
 | Passkey | Freiwillig, als Komfort, mit SimpleWebAuthn | [ADR-005](adr/adr-005-passkey-simplewebauthn.md) |
 | Eigenständig | Eigene Mitgliederliste, keine Anbindung an Fairgate | [ADR-006](adr/adr-006-eigenstaendig-ohne-fairgate.md) |
+| Versionen | Jeder Merge nach `dev` mit Code bekommt seine eigene Versionsnummer | [ADR-007](adr/adr-007-version-pro-merge.md) |
 
 ## 5 Bausteinsicht
 

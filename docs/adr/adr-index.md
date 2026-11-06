@@ -6,6 +6,8 @@ Architecture Decision Records halten Entscheidungen mit Tragweite fest — *waru
 so gebaut wird, nicht nur *wie*. Jede ADR nennt die geprüften Optionen, die Entscheidung,
 die Konsequenzen und einen **Reevaluations-Trigger**: wann die Entscheidung neu zu
 bewerten ist. Vorlage: [`vorlage.md`](vorlage.md). Dateiname: `adr-NNN-kurztitel.md`.
+Eine neue ADR kommt in diese Tabelle und mit einer Zeile in die
+[Lösungsstrategie von arc42](../arc42.md#4-lösungsstrategie).
 
 | ADR | Titel | Status | Datum |
 |-----|-------|--------|-------|
