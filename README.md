@@ -6,7 +6,8 @@ Resultate. Admins pflegen die Mitglieder und bereiten die Daten für Swiss Tenni
 
 Geplant als Mobile-App für Android und iOS (mit Push-Benachrichtigungen) und einer
 Admin-Oberfläche. MyTCO wird vorerst **eigenständig** aufgebaut, ohne Anbindung an die
-Mitgliederverwaltung Fairgate oder die Website tcolten.ch.
+Mitgliederverwaltung Fairgate ([ADR-006](docs/adr/adr-006-eigenstaendig-ohne-fairgate.md))
+oder die Website tcolten.ch.
 
 ## Stand
 

@@ -9,8 +9,8 @@ einzelnen Aufgaben stehen als Issues darin.
 ([`anforderungen/`](anforderungen/README.md)).
 
 **Grundsatz:** MyTCO wird vorerst eigenständig aufgebaut — ohne Anbindung an Fairgate
-und ohne Einbindung in tcolten.ch. Mitglieder pflegt der Admin von Hand, solange Fairgate
-nicht angebunden ist.
+und ohne Einbindung in tcolten.ch. Mitglieder pflegt der Admin in MyTCO, von Hand oder per
+Datei aus Fairgate (A-MITGLIED-07); warum: [ADR-006](adr/adr-006-eigenstaendig-ohne-fairgate.md).
 
 ## Etappen
 
