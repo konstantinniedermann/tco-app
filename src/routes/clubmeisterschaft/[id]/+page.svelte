@@ -35,6 +35,7 @@
 	let jahrgang = $state('');
 	let feldFehler = $state<Partial<Record<CmAngabe, string>>>({});
 	let angabenForm = $state<HTMLFormElement>();
+	let zaehlerBereich = $state<HTMLDivElement>();
 	// Ungespeichert (UI-Leitbild): eine Angabe weicht vom geladenen Stand ab.
 	const geaendert = $derived(
 		klassierung !== (cm.spieler.klassierung ?? '') || geschlecht !== null || jahrgang !== ''
@@ -53,11 +54,16 @@
 		'passt-nicht': 'Diese Kategorie passt nicht zu deinen Angaben.'
 	} as const;
 
-	async function neuLaden() {
+	/** Gibt zurück, ob die neue Ansicht geladen ist; Weiterleitungen erledigt sie selbst. */
+	async function neuLaden(): Promise<boolean> {
 		const r = await holeCmAnsicht(cm.turnier.id);
-		if (r.art === 'ok') cm = r.daten;
-		else if (r.art === 'nicht-gefunden') await goto(resolve('/'));
+		if (r.art === 'ok') {
+			cm = r.daten;
+			return true;
+		}
+		if (r.art === 'nicht-gefunden') await goto(resolve('/'));
 		else if (r.art === 'abgemeldet') await goto(resolve('/login'));
+		return false;
 	}
 
 	async function angabenSenden(event: SubmitEvent) {
@@ -71,8 +77,14 @@
 			...(cm.fehlt.includes('geschlecht') ? { geschlecht: geschlecht ?? '' } : {}),
 			...(cm.fehlt.includes('jahrgang') ? { jahrgang } : {})
 		});
-		if (r.art === 'ok') await neuLaden();
-		else if (r.art === 'eingabe') {
+		if (r.art === 'ok') {
+			const geladen = await neuLaden();
+			if (geladen) {
+				// Das Formular ist weg: Fokus zum Zähler, nicht in den leeren Körper der Seite.
+				await tick();
+				zaehlerBereich?.focus();
+			} else fehler = MELDUNG.stoerung;
+		} else if (r.art === 'eingabe') {
 			feldFehler = r.felder;
 			await tick();
 			const erstes = (['klassierung', 'geschlecht', 'jahrgang'] as const).find((f) => r.felder[f]);
@@ -200,7 +212,7 @@
 		{/if}
 	</section>
 {:else}
-	<div class="zaehler">
+	<div class="zaehler" bind:this={zaehlerBereich} tabindex="-1">
 		<div class="zaehler-balken" aria-hidden="true">
 			{#each { length: cm.grenze }, i (i)}
 				<span class={{ 'zaehler-voll': i < anzahl }}></span>
