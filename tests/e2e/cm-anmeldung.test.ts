@@ -179,6 +179,7 @@ test('FR-36, FR-35: CM-Admin wird gewarnt und kann eine Kategorie mit Anmeldunge
 	const jahr = testjahr(JAHR_VERWALTUNG, info);
 	const name = `Clubmeisterschaft ${jahr}`;
 	const {
+		turnierId,
 		kategorieIds: [kategorieId]
 	} = await legeOffenesTurnierAn(jahr, [einzel('Herren R1–R9', 'herren', 'R1')]);
 	const spieler = await legeKontoAn('Bruno', `Probe${randomUUID().slice(0, 6)}`);
@@ -218,6 +219,14 @@ test('FR-36, FR-35: CM-Admin wird gewarnt und kann eine Kategorie mit Anmeldunge
 	).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Kategorie absagen' })).toHaveCount(0);
 
+	// Eine Berührung des Rücklinks ohne Seitenwechsel (Scrollen am Handy) lädt die Turnierseite
+	// vor dem Speichern vor; der Rücksprung danach muss trotzdem den neuen Stand zeigen.
+	const vorgeladen = page.waitForResponse((r) =>
+		new URL(r.url()).pathname.endsWith(`/turniere/${turnierId}`)
+	);
+	await page.getByRole('link', { name: `‹ ${name}` }).dispatchEvent('touchstart');
+	await vorgeladen;
+
 	// FR-36: R7–R9 schliesst den R3-Spieler aus; Rückfrage, dann trotzdem speichern.
 	await page.getByLabel('von (stärkste)').selectOption('R7');
 	await page.getByRole('button', { name: 'Kategorie speichern' }).click();
@@ -231,5 +240,8 @@ test('FR-36, FR-35: CM-Admin wird gewarnt und kann eine Kategorie mit Anmeldunge
 	await expect(warnung).toBeHidden();
 	await expect(page.getByLabel('von (stärkste)')).toHaveValue('R7');
 	await expect(page.getByRole('button', { name: 'Kategorie absagen' })).toHaveCount(0);
+	await page.getByRole('link', { name: `‹ ${name}` }).click();
+	await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
+	await expect(page.getByRole('row', { name: /Herren R1–R9/ })).toContainText('R7–R9');
 	expect(fehler).toEqual([]);
 });

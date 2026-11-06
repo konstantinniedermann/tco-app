@@ -9,6 +9,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 ## Unveröffentlicht
 
 - Clubmeisterschaft: Mitglieder melden sich selbst an (#58)
+- Korrektur: Nach dem Speichern einer Kategorie zeigte die Turnierseite manchmal noch den alten
+  Stand, wenn ihr Link vorher schon berührt worden war.
 
 ## 0.7.2 — E2E-Tests im Playwright-Container
 

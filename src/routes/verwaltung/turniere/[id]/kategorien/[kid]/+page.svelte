@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, refreshAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import Kategorieformular, {
 		anfrage,
@@ -60,7 +60,10 @@
 			unpassend = a.anzahl;
 			warnung?.showModal();
 		} else if (a.art === 'ok') {
-			if (await neuLaden()) schluessel++;
+			// refreshAll lädt den neuen Stand und verwirft Vorgeladenes: Eine Berührung des Rücklinks
+			// ohne Seitenwechsel hätte die Turnierseite sonst mit dem Stand vor dem Speichern behalten.
+			await refreshAll();
+			schluessel++;
 			rueckmeldung = 'Gespeichert';
 		} else if (a.art === 'eingabe') {
 			fehler = a.felder;
