@@ -31,7 +31,7 @@
 		vorlagen={[]}
 		haupt
 		stufe={2}
-		ongesendet={neuLaden}
+		onverlauf={neuLaden}
 	/>
 {/if}
 

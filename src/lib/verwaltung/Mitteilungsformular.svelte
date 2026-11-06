@@ -6,6 +6,7 @@
 	import { fehlerText } from './anzeige.ts';
 	import {
 		AUSWAHL_NAMEN,
+		gleicheWerte,
 		VORLAGE_NAMEN,
 		WEG_NAMEN,
 		WEGE,
@@ -19,8 +20,7 @@
 		type MitteilungWerte,
 		type Vorlage,
 		type Vorschau,
-		type Weg,
-		type Zahlen
+		type Weg
 	} from './mitteilung-api.ts';
 	import { leiteUm } from './umleiten.ts';
 
@@ -32,10 +32,10 @@
 		haupt?: boolean;
 		/** Stufe der Überschrift «Neue Mitteilung»: 3 unter einem Abschnitt, 2 direkt unter dem Seitentitel. */
 		stufe?: 2 | 3;
-		/** Nach dem Senden, damit die Seite den Verlauf neu lädt. */
-		ongesendet: (zahlen: Zahlen) => void;
+		/** Nach dem Senden, auch nach einer Störung (dann kann sie schon draussen sein): Die Seite lädt den Verlauf neu. */
+		onverlauf: () => void;
 	};
-	let { bezug, vorlagen, haupt = false, stufe = 3, ongesendet }: Props = $props();
+	let { bezug, vorlagen, haupt = false, stufe = 3, onverlauf }: Props = $props();
 
 	const REIHE: MitteilungFeld[] = ['titel', 'text', 'auswahl', 'weg'];
 
@@ -45,8 +45,9 @@
 	let text = $state('');
 	let auswahl = $state('alle');
 	let weg = $state<Weg>('push-sonst-mail');
-	// Gilt nur für die Werte, mit denen sie geholt wurde; jede Eingabe danach verwirft sie.
-	let vorschau = $state<Vorschau | null>(null);
+	// FR-43: Die Vorschau gilt nur für die Werte, mit denen sie geholt wurde (`werte`); jede Eingabe
+	// danach verwirft sie, und gesendet werden genau diese Werte.
+	let vorschau = $state<{ werte: MitteilungWerte; daten: Vorschau } | null>(null);
 	let fehler = $state<Partial<Record<MitteilungFeld, string>>>({});
 	let allgemein = $state<string | null>(null);
 	let ergebnis = $state<string | null>(null);
@@ -57,7 +58,12 @@
 	const ungespeichert = $derived(
 		schritt === 'formular' && (titel !== start.titel || text !== start.text)
 	);
-	const senden = $derived(vorschau !== null && vorschau.anzahl > 0 && laeuft === null);
+	const gueltig = $derived(
+		vorschau !== null && gleicheWerte(vorschau.werte, { titel, text, auswahl, weg })
+			? vorschau.daten
+			: null
+	);
+	const senden = $derived(gueltig !== null && gueltig.anzahl > 0 && laeuft === null);
 	const knopfHaupt = $derived(haupt ? 'taste-haupt' : 'taste-neben');
 
 	async function oeffne(v: Vorlage | null) {
@@ -89,6 +95,9 @@
 
 	const werte = (): MitteilungWerte => ({ titel, text, auswahl, weg });
 
+	const NACH_STOERUNG =
+		'Das hat nicht geklappt. Die Mitteilung kann trotzdem schon verschickt sein: Prüfe den Verlauf, bevor du es erneut versuchst.';
+
 	/** Antworten, die beide Anfragen gleich behandeln; `true`, wenn die Antwort erledigt ist. */
 	async function behandle(a: Antwort<unknown>): Promise<boolean> {
 		if (await leiteUm(a)) return true;
@@ -114,23 +123,34 @@
 		laeuft = 'vorschau';
 		fehler = {};
 		allgemein = null;
-		const a = await zeigeVorschau(bezug, werte());
+		const geschickt = werte();
+		const a = await zeigeVorschau(bezug, geschickt);
 		laeuft = null;
-		if (!(await behandle(a)) && a.art === 'ok') vorschau = a.daten;
+		if (await behandle(a)) return;
+		// Wer während der Anfrage weitergetippt hat, braucht eine neue Vorschau.
+		if (a.art === 'ok' && gleicheWerte(werte(), geschickt)) {
+			vorschau = { werte: geschickt, daten: a.daten };
+		}
 	}
 
 	async function sende() {
 		rueckfrage?.close();
-		if (laeuft || !vorschau) return;
+		if (laeuft || !vorschau || !gueltig) return;
 		laeuft = 'senden';
 		allgemein = null;
-		const a = await sendeMitteilung(bezug, werte());
+		const a = await sendeMitteilung(bezug, vorschau.werte);
 		laeuft = null;
+		if (a.art === 'stoerung') {
+			// Die Antwort fehlt, der Versand kann trotzdem gelaufen sein.
+			allgemein = NACH_STOERUNG;
+			onverlauf();
+			return;
+		}
 		if (await behandle(a)) return;
 		if (a.art !== 'ok') return;
 		ergebnis = `Gesendet: ${zahlenText(a.daten)}.`;
 		schliesse();
-		ongesendet(a.daten);
+		onverlauf();
 	}
 
 	const beschreibung = (...ids: (string | false | undefined)[]) =>
@@ -261,21 +281,21 @@
 		</form>
 
 		<div role="status">
-			{#if vorschau}
-				{#each vorschauZeilen(vorschau, weg) as zeile, i (i)}
+			{#if gueltig}
+				{#each vorschauZeilen(gueltig, weg) as zeile, i (i)}
 					<p>
 						{#if i === 0}<strong>{zeile}</strong>{:else}{zeile}{/if}
 					</p>
 				{/each}
 			{/if}
 		</div>
-		{#if vorschau && vorschau.namen.length > 0}
+		{#if gueltig && gueltig.namen.length > 0}
 			<details class="karte klappe">
 				<summary class="klappe-titel"
-					>Namen <span class="leise">{vorschau.namen.length}</span></summary
+					>Namen <span class="leise">{gueltig.namen.length}</span></summary
 				>
 				<ul>
-					{#each vorschau.namen as name, i (i)}
+					{#each gueltig.namen as name, i (i)}
 						<li>{name}</li>
 					{/each}
 				</ul>
@@ -293,8 +313,8 @@
 		<span class="feld-hilfe" id="mitteilung-senden-hilfe"
 			>{laeuft === 'senden'
 				? 'Das kann bis zu einer Minute dauern. Bitte die Seite offen lassen.'
-				: vorschau
-					? vorschau.anzahl === 0
+				: gueltig
+					? gueltig.anzahl === 0
 						? 'Niemand bekommt diese Mitteilung.'
 						: ''
 					: 'Senden geht nach der Vorschau.'}</span
@@ -308,7 +328,7 @@
 <p class="leise" role="status">{ergebnis ?? ''}</p>
 
 <dialog class="karte" bind:this={rueckfrage} aria-labelledby="mitteilung-rueckfrage-titel">
-	<h2 id="mitteilung-rueckfrage-titel">{rueckfrageText(vorschau?.anzahl ?? 0)}</h2>
+	<h2 id="mitteilung-rueckfrage-titel">{rueckfrageText(gueltig?.anzahl ?? 0)}</h2>
 	<p>«{titel}» geht gleich hinaus. Zurückholen lässt sie sich nicht.</p>
 	<div class="leiste">
 		<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}>Abbrechen</button>

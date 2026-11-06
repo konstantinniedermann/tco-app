@@ -4,6 +4,7 @@ import {
 	WEG_NAMEN,
 	WEGE,
 	auswahlText,
+	gleicheWerte,
 	ladeMitteilungen,
 	rueckfrageText,
 	sendeMitteilung,
@@ -145,5 +146,16 @@ describe('Mitteilungen in der Verwaltung: Texte', () => {
 		expect(zahlenText({ push: 12, mails: 25, ersatzMails: 1, nichtErreichbar: 2 })).toBe(
 			'12 per Push, 25 per E-Mail, 1 ersatzweise per E-Mail, nicht erreichbar: 2'
 		);
+	});
+});
+
+describe('Mitteilungen in der Verwaltung: Vorschau gilt nur für ihre Werte', () => {
+	it('FR-43: jede Abweichung in Titel, Text, Auswahl oder Weg macht die Vorschau ungültig', () => {
+		expect(gleicheWerte(WERTE, { ...WERTE })).toBe(true);
+		expect(gleicheWerte(WERTE, { ...WERTE, titel: 'Erinnerung: GV!' })).toBe(false);
+		expect(gleicheWerte(WERTE, { ...WERTE, text: 'Bitte melde dich an' })).toBe(false);
+		expect(gleicheWerte(WERTE, { ...WERTE, auswahl: 'kommt' })).toBe(false);
+		expect(gleicheWerte(WERTE, { ...WERTE, weg: 'push' })).toBe(false);
+		expect(gleicheWerte(null, WERTE)).toBe(false);
 	});
 });

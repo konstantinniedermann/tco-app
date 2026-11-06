@@ -42,16 +42,38 @@ async function bestaetige(page: Page, konto: Konto, ziel: RegExp, titel: string)
 	await expect(page.getByRole('heading', { level: 1, name: titel })).toBeVisible();
 }
 
-async function oeffneVerwaltung(page: Page, konto: Konto) {
+/**
+ * Über die Kachel statt `page.goto`: Die Reiter der Startseite laden den Code ihrer Seiten gleich
+ * vor; ein `page.goto` mitten hinein bricht das ab, und WebKit meldet «Importing a module script
+ * failed» in der Konsole. Ein Klick wechselt in der App, ohne das Laden abzubrechen.
+ */
+async function oeffneVerwaltung(
+	page: Page,
+	konto: Konto,
+	erste = { url: /\/verwaltung\/mitglieder$/, titel: 'Mitglieder' }
+) {
 	await meldeAn(page, konto);
-	await page.goto('/verwaltung');
-	await bestaetige(page, konto, /\/verwaltung\/mitglieder$/, 'Mitglieder');
+	await page.getByRole('link', { name: 'Verwaltung' }).click();
+	await bestaetige(page, konto, erste.url, erste.titel);
 }
 
 const seitenleiste = (page: Page) => page.getByRole('navigation', { name: 'Verwaltung' });
 // Auf der Seite des Anlasses heissen auch dessen Felder «Titel»; darum alles in der Karte.
 const neu = (page: Page) => page.getByRole('region', { name: 'Neue Mitteilung' });
 const sendenTaste = (page: Page) => neu(page).getByRole('button', { name: 'Senden', exact: true });
+
+/** Zum Anlass über die Links der Verwaltung, wie ein Admin dorthin kommt. */
+async function oeffneAnlass(page: Page, titel: string) {
+	await seitenleiste(page).getByRole('link', { name: 'Anlässe' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Anlässe' })).toBeVisible();
+	await page.getByRole('link', { name: titel, exact: true }).click();
+	await expect(page.getByRole('heading', { level: 1, name: titel })).toBeVisible();
+}
+
+async function oeffneMitteilungen(page: Page) {
+	await seitenleiste(page).getByRole('link', { name: 'Mitteilungen' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Mitteilungen' })).toBeVisible();
+}
 
 /** Wartet auf die Mail an `adresse` und gibt ihren Betreff zurück. */
 async function holeBetreff(adresse: string, wartezeitMs = 15_000): Promise<string> {
@@ -85,11 +107,10 @@ test('FR-42: Mitglieder-Admin wählt Erinnerung, sieht Vorschau mit Zahl und Nam
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
 	const admin = await legeRollenkontoMitBriefCodeAn('Mona', ['mitglieder']);
-	const { titel, anlassId, gast, name } = await anlassMitEinemGast(admin);
+	const { titel, gast, name } = await anlassMitEinemGast(admin);
 
 	await oeffneVerwaltung(page, admin);
-	await page.goto(`/verwaltung/anlaesse/${anlassId}`);
-	await expect(page.getByRole('heading', { level: 1, name: titel })).toBeVisible();
+	await oeffneAnlass(page, titel);
 	await expect(page.getByText('Noch keine Mitteilungen verschickt.')).toBeVisible();
 	await page.getByRole('button', { name: 'Neue Mitteilung' }).click();
 	await neu(page).getByRole('button', { name: 'Erinnerung', exact: true }).click();
@@ -158,10 +179,10 @@ test('FR-42: Senden-Taste ist während des Sendens gesperrt', async ({ page }) =
 	test.setTimeout(60_000);
 	const fehler = sammleKonsolenfehler(page);
 	const admin = await legeRollenkontoMitBriefCodeAn('Mona', ['mitglieder']);
-	const { anlassId, gast } = await anlassMitEinemGast(admin);
+	const { titel, gast } = await anlassMitEinemGast(admin);
 
 	await oeffneVerwaltung(page, admin);
-	await page.goto(`/verwaltung/anlaesse/${anlassId}`);
+	await oeffneAnlass(page, titel);
 	await page.getByRole('button', { name: 'Neue Mitteilung' }).click();
 	await neu(page).getByRole('button', { name: 'Leer anfangen' }).click();
 	await expect(neu(page).getByLabel('Titel')).toHaveValue('');
@@ -204,8 +225,7 @@ test('FR-42: allgemeine Mitteilung an den Verein', async ({ page }, info) => {
 	const fehler = sammleKonsolenfehler(page);
 	const admin = await legeRollenkontoMitBriefCodeAn('Mona', ['mitglieder']);
 	await oeffneVerwaltung(page, admin);
-	await seitenleiste(page).getByRole('link', { name: 'Mitteilungen' }).click();
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitteilungen' })).toBeVisible();
+	await oeffneMitteilungen(page);
 
 	// Ohne Vorlage gleich das leere Formular; Empfänger ohne Wahl.
 	await page.getByRole('button', { name: 'Neue Mitteilung' }).click();
@@ -224,14 +244,26 @@ test('FR-42: allgemeine Mitteilung an den Verein', async ({ page }, info) => {
 
 	// Der Versand an alle aktiven Mitglieder ist in admin-schnittstellen.db.test.ts belegt; hier
 	// antwortet ein Ersatz, damit keine Mail an Konten paralleler Tests geht.
+	// Der erste Versuch scheitert unterwegs: Die Mitteilung kann trotzdem schon draussen sein.
 	let anfrage: unknown = null;
+	let versuche = 0;
 	await page.route('**/api/admin/mitteilungen/senden', async (route) => {
+		versuche++;
 		anfrage = route.request().postDataJSON();
+		if (versuche === 1) {
+			await route.fulfill({ status: 502, body: 'Bad Gateway' });
+			return;
+		}
 		await route.fulfill({
 			status: 201,
 			json: { push: 0, mails: 3, ersatzMails: 0, nichtErreichbar: 1 }
 		});
 	});
+	await sendenTaste(page).click();
+	await page.getByRole('dialog').getByRole('button', { name: 'Senden' }).click();
+	await expect(neu(page).getByRole('alert')).toContainText(
+		'Prüfe den Verlauf, bevor du es erneut versuchst.'
+	);
 	await sendenTaste(page).click();
 	await page.getByRole('dialog').getByRole('button', { name: 'Senden' }).click();
 	await expect(
@@ -243,22 +275,74 @@ test('FR-42: allgemeine Mitteilung an den Verein', async ({ page }, info) => {
 		auswahl: 'alle',
 		weg: 'push-und-mail'
 	});
+	// Nur die vorgetäuschte 502 steht in der Konsole.
+	expect(fehler.filter((f) => !/status of 502\b/.test(f))).toEqual([]);
+});
+
+test('FR-43: Eingabe während der Vorschau verwirft die späte Antwort, Senden bleibt gesperrt', async ({
+	page
+}) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeRollenkontoMitBriefCodeAn('Mona', ['mitglieder']);
+	await oeffneVerwaltung(page, admin);
+	await oeffneMitteilungen(page);
+	await page.getByRole('button', { name: 'Neue Mitteilung' }).click();
+	await neu(page).getByLabel('Titel').fill('Clubhaus offen');
+	await neu(page).getByLabel('Text').fill('Ab Samstag offen.');
+
+	// Die Antwort der Vorschau kommt erst, nachdem der Text schon geändert ist.
+	let freigeben = () => {};
+	const freigegeben = new Promise<void>((r) => (freigeben = r));
+	let angekommen = () => {};
+	const unterwegs = new Promise<void>((r) => (angekommen = r));
+	await page.route('**/api/admin/mitteilungen/vorschau', async (route) => {
+		angekommen();
+		await freigegeben;
+		await route.continue();
+	});
+	const antwort = page.waitForResponse('**/api/admin/mitteilungen/vorschau');
+	await neu(page).getByRole('button', { name: 'Vorschau' }).click();
+	await unterwegs;
+	await neu(page).getByLabel('Text').fill('Ab Sonntag offen.');
+	freigeben();
+	await antwort;
+	await page.evaluate(() => new Promise((r) => requestAnimationFrame(r)));
+
+	await expect(neu(page).getByText(/^\d+ Mitglieder?:/)).toHaveCount(0);
+	await expect(sendenTaste(page)).toBeDisabled();
+	await expect(page.getByText('Senden geht nach der Vorschau.')).toBeVisible();
+
+	// Eine neue Vorschau gilt; gesendet wird genau, was sie zeigte.
+	await page.unroute('**/api/admin/mitteilungen/vorschau');
+	await neu(page).getByRole('button', { name: 'Vorschau' }).click();
+	await expect(neu(page).getByText(/^\d+ Mitglieder?:/)).toBeVisible();
+	let anfrage: unknown = null;
+	await page.route('**/api/admin/mitteilungen/senden', async (route) => {
+		anfrage = route.request().postDataJSON();
+		await route.fulfill({
+			status: 201,
+			json: { push: 0, mails: 1, ersatzMails: 0, nichtErreichbar: 0 }
+		});
+	});
+	await sendenTaste(page).click();
+	await page.getByRole('dialog').getByRole('button', { name: 'Senden' }).click();
+	await expect(page.getByText('Gesendet: 0 per Push, 1 per E-Mail.')).toBeVisible();
+	expect(anfrage).toMatchObject({ titel: 'Clubhaus offen', text: 'Ab Sonntag offen.' });
 	expect(fehler).toEqual([]);
 });
 
 test('FR-42: MyTCO-Admin sieht nur den Verlauf, ohne «Neue Mitteilung»', async ({ page }, info) => {
 	const fehler = sammleKonsolenfehler(page);
 	const mytco = await legeRollenkontoMitBriefCodeAn('Theo', ['mytco']);
-	const { anlassId } = await anlassMitEinemGast(mytco);
+	const { titel } = await anlassMitEinemGast(mytco);
 	await oeffneVerwaltung(page, mytco);
-	await seitenleiste(page).getByRole('link', { name: 'Mitteilungen' }).click();
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitteilungen' })).toBeVisible();
+	await oeffneMitteilungen(page);
 	await expect(page.getByText('Nur ansehen.')).toBeVisible();
 	await expect(page.getByRole('heading', { level: 2, name: 'Verschickt' })).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Neue Mitteilung' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'mitteilung-verein-nur-ansehen');
 
-	await page.goto(`/verwaltung/anlaesse/${anlassId}`);
+	await oeffneAnlass(page, titel);
 	await expect(page.getByRole('heading', { level: 2, name: 'Mitteilungen' })).toBeVisible();
 	await expect(page.getByText('Noch keine Mitteilungen verschickt.')).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Neue Mitteilung' })).toHaveCount(0);
@@ -268,10 +352,7 @@ test('FR-42: MyTCO-Admin sieht nur den Verlauf, ohne «Neue Mitteilung»', async
 test('FR-42: CM-Admin sieht keinen Bereich Mitteilungen', async ({ page }, info) => {
 	const fehler = sammleKonsolenfehler(page);
 	const cm = await legeCmMitBriefCodeAn('Dario');
-	await meldeAn(page, cm);
-	await page.goto('/verwaltung/mitteilungen');
-	await expect(page).toHaveURL(/\/verwaltung\/bestaetigen$/);
-	await bestaetige(page, cm, /\/verwaltung\/turniere$/, 'Clubmeisterschaft');
+	await oeffneVerwaltung(page, cm, { url: /\/verwaltung\/turniere$/, titel: 'Clubmeisterschaft' });
 
 	// RR-07: die Seite führt zu den Turnieren, die Seitenleiste nennt sie nicht.
 	await page.goto('/verwaltung/mitteilungen');

@@ -33,6 +33,14 @@ function mitMeldungen<T>(a: Antwort<T>): Antwort<T> {
 	return { art: 'eingabe', felder: Object.fromEntries(felder.map((f) => [f, FELD_MELDUNG[f]])) };
 }
 
+/** FR-43: Eine Vorschau gilt nur für genau die Werte, mit denen sie geholt wurde. */
+export const gleicheWerte = (a: MitteilungWerte | null, b: MitteilungWerte) =>
+	a !== null &&
+	a.titel === b.titel &&
+	a.text === b.text &&
+	a.auswahl === b.auswahl &&
+	a.weg === b.weg;
+
 export const ladeMitteilungen = (b: Bezug, holen: Holen = fetch) =>
 	lese<Mitteilungen>(pfad(b), holen);
 

@@ -164,7 +164,7 @@
 		<Mitteilungsformular
 			bezug={{ art: 'anlass', anlassId: detail.id }}
 			vorlagen={mitteilungen.vorlagen}
-			ongesendet={verlaufNeuLaden}
+			onverlauf={verlaufNeuLaden}
 		/>
 	{/if}
 	<Mitteilungsverlauf eintraege={mitteilungen.verlauf} />
