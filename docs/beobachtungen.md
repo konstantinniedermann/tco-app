@@ -116,6 +116,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-06 — Kleinbefunde aus den Reviews von #58 (CM Teil 2 Einzel-Anmeldung)
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/cm/`, `src/lib/server/turnier/`, `src/lib/cm/`, `src/routes/clubmeisterschaft/`, `scripts/`, `tests/e2e/cm-anmeldung.test.ts`
+
+**Beobachtung:** Aus den Task- und Schluss-Reviews, als «nicht vor dem Merge» eingestuft:
+- Bestätigungsmail wird mit `await` abgewartet (`src/lib/server/cm/schnittstellen.ts` ~:95): hängt SMTP, wartet die Antwort bis zum Timeout; die Hinweis-Mail der Verwaltung nutzt `void`.
+- Test-Turniere (2090–2099) aus E2E erscheinen auf der Startseite von `make dev`, weil E2E und dev die DB `mytco` teilen (wie Test-Anlässe).
+- Kein UI-Test für «Ansicht als Mitglied» auf der CM-Seite (Server-Riegel ist getestet); `verwaltung.test.ts` könnte es günstig mitprüfen.
+- Anmeldungen können unsichtbar werden: Kategorie Einzel→Doppel mit «Trotzdem speichern» oder gelöschtes Geschlecht/Jahrgang → aktive Anmeldung zählt zur Grenze, erscheint aber nicht mehr auf der Mitgliederseite; Teil 3/4 müssen das auffangen.
+- Turnier-Zeile in `meldeAn` ohne Sperre (kleines Rennen mit frühem Schliessen).
+- Tests: null-Klassierung gültig nicht getestet; Löschen eines Mitglieds mit Anmeldung (FK) nicht getestet; schwache `not.toBe('ok')`-Assertions und Doppel-Zweig in `meldeAn` ungetestet; `bisWartend` zählt Sperren DB-weit; Endpunkt-Test `passt-nicht` fehlt, `angaben-fehlen` ohne Mail-Check, fremd-Test ohne echtes fremdes Mitglied; Seed prüft `meldeAn`-Ergebnis und Anzahl je Kategorie nicht; E2E-Namen ohne FR-05/06/07/10; Selektor «letzte Zelle».
+- Code-Pflege: `jahrInZuerich`/1900-Regel doppelt; Fallback-404 nach Schreiben ohne Kommentar, Fehlerliste nicht aus Union typisiert; profil hängt von `cm/` ab; `ausstehend` bleibt nach Abbrechen; eine Zählabfrage je Kategorie in `ladeTurnier`; «3» fest in Texten; Geschlecht-Radios ohne `aria-invalid`; `rufe()` fast Kopie von `src/lib/anlass/api.ts`; `jahrgang()` doppelt; Non-null-Assertions in `passung.ts`.
+- Oberfläche: Leerraum über dem h2 in der Karte «Deine Angaben für die Clubmeisterschaft»; Klassierung speichern bei abgelaufener Sitzung zeigt generische Meldung (wie die übrigen Profilangaben).
+- E2E-Hilfe `wartetAufVorladen` ohne eigenes Timeout und abhängig von SvelteKit-Interna (`dictionary`/`nodes`) — scheitert laut, nicht still.
+
+**Ursprung:** Schluss-Review #58 (CM Teil 2)
+
+**Einschätzung:** Alles klein, nichts blockiert Teil 3/4; Punkt «unsichtbare Anmeldungen» bei Teil 4 aufnehmen.
+
 ### 2026-11-06 — Kleinbefunde aus den Reviews von #43 (Rollen schärfen)
 
 **Thema:** Rollen und Rechte
