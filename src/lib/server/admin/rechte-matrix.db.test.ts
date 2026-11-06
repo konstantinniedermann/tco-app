@@ -52,9 +52,15 @@ afterEach(() => {
 
 const start = new Date('2026-11-02T12:00:00Z');
 
-// Schreibende Schnittstellen, die der MyTCO-Admin benutzen darf: Rollen vergeben und die eigene
-// Bestätigung der Verwaltung (SI-08). Task 4 ergänzt hier die Schnittstellen der «Ansicht als …».
-const ERLAUBT_FUER_MYTCO: readonly string[] = ['postRollen', 'postZugang', 'postZugangCode'];
+// Schreibende Schnittstellen, die der MyTCO-Admin benutzen darf: Rollen vergeben, die eigene
+// Bestätigung der Verwaltung (SI-08) und die «Ansicht als …» seiner Sitzung.
+const ERLAUBT_FUER_MYTCO: readonly string[] = [
+	'postRollen',
+	'postZugang',
+	'postZugangCode',
+	'postAnsicht',
+	'postAnsichtBeenden'
+];
 
 function baue() {
 	const post: { text: string }[] = [];
@@ -165,7 +171,8 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		const schreibende = Object.entries({
 			...ADMIN_SCHNITTSTELLEN,
 			...TURNIER_SCHNITTSTELLEN
-		}).filter(([name]) => name.startsWith('post') && !ERLAUBT_FUER_MYTCO.includes(name));
+			// Schreibend ist alles, was nicht liest: Auch ein künftiges delete… oder put… fällt hier auf.
+		}).filter(([name]) => !name.startsWith('get') && !ERLAUBT_FUER_MYTCO.includes(name));
 		expect(schreibende.length).toBeGreaterThanOrEqual(13);
 		const vorher = await zeilen();
 		for (const [name, fn] of schreibende) {

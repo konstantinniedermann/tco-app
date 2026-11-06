@@ -66,6 +66,25 @@ export async function verwaltungsrollen(
 	return VERWALTUNGSROLLEN.filter((r) => vorhanden.has(r));
 }
 
+// «Ansicht als …»: Der MyTCO-Admin sieht MyTCO wie jemand mit genau dieser Rolle (oder ohne
+// Admin-Rolle, `mitglied`). Liste wie die Prüfung `sitzung_ansicht_rolle_check`.
+export const ANSICHT_ROLLEN = ['mitglied', 'mitglieder', 'cm', 'lizenz'] as const;
+export type AnsichtRolle = (typeof ANSICHT_ROLLEN)[number];
+
+export const istAnsichtRolle = (r: unknown): r is AnsichtRolle =>
+	(ANSICHT_ROLLEN as readonly unknown[]).includes(r);
+
+/** Die Rollen, mit denen eine Sitzung rechnet: in der Ansicht nur deren Verwaltungsrolle. */
+export function effektiveRollen(
+	echte: VerwaltungsRolle[],
+	ansicht: AnsichtRolle | null
+): VerwaltungsRolle[] {
+	if (ansicht === null) return echte;
+	// `lizenz` öffnet die Verwaltung noch nicht; `mitglied` hat keine Verwaltungsrolle.
+	if (ansicht === 'mitglied' || ansicht === 'lizenz') return [];
+	return [ansicht];
+}
+
 export type RollenListe = { rolle: Rolle; mitglieder: { id: number; name: string }[] }[];
 
 // Regel 2: Wer welche Rolle hat, für die Rollenvergabe. RR-08: nur Konten, die nicht gesperrt sind

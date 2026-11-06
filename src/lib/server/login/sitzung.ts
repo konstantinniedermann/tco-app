@@ -1,7 +1,8 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { eq, lt, sql } from 'drizzle-orm';
+import type { AnsichtRolle } from '../admin/rollen.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
-import { konto, mitglied, sitzung } from '../db/schema.ts';
+import { konto, kontoRolle, mitglied, sitzung } from '../db/schema.ts';
 
 export const SITZUNG_COOKIE = 'mytco_sitzung';
 export const SITZUNG_GUELTIG_MS = 365 * 24 * 60 * 60 * 1000;
@@ -14,6 +15,8 @@ export type AngemeldetesKonto = {
 	passkeyHinweis: boolean;
 	// Hash der Sitzungskennung; ordnet Zugangs-Daten (SI-08) dieser Sitzung zu.
 	sitzungHash: string;
+	// «Ansicht als …»; nur gesetzt, solange das Konto die Rolle `mytco` hat.
+	ansicht: AnsichtRolle | null;
 };
 
 export function sitzungAbgelaufen(zuletztGenutzt: Date, jetzt: Date): boolean {
@@ -78,7 +81,9 @@ export async function pruefeSitzung(
 			sitzungsversion: sitzung.sitzungsversion,
 			kontoVersion: konto.sitzungsversion,
 			gesperrt: konto.gesperrt,
-			status: mitglied.status
+			status: mitglied.status,
+			// Ohne Rolle `mytco` gilt eine gespeicherte Ansicht nicht mehr: Der Entzug wirkt sofort.
+			ansicht: sql<AnsichtRolle | null>`case when exists (select 1 from ${kontoRolle} where ${kontoRolle.kontoId} = ${konto.id} and ${kontoRolle.rolle} = 'mytco') then ${sitzung.ansichtRolle} end`
 		})
 		.from(sitzung)
 		.innerJoin(konto, eq(konto.id, sitzung.kontoId))
@@ -106,7 +111,8 @@ export async function pruefeSitzung(
 			mitgliedId: zeile.mitgliedId,
 			vorname: zeile.vorname,
 			passkeyHinweis: zeile.passkeyHinweis,
-			sitzungHash: kennungHash
+			sitzungHash: kennungHash,
+			ansicht: zeile.ansicht
 		},
 		verlaengert
 	};

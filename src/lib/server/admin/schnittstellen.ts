@@ -27,7 +27,8 @@ import {
 	listeMitglieder,
 	type MitgliedStatus
 } from './mitglieder.ts';
-import { ROLLEN, listeRollen, setzeRollen, type Rolle } from './rollen.ts';
+import { setzeAnsicht } from './ansicht.ts';
+import { ROLLEN, istAnsichtRolle, listeRollen, setzeRollen, type Rolle } from './rollen.ts';
 import { ladeVerlauf, type Urheber } from './verlauf.ts';
 import type { ZugangDienst } from './zugang.ts';
 import { darf, type Art, type Bereich } from '../../verwaltung/bereiche.ts';
@@ -144,6 +145,33 @@ export async function postZugang(d: AdminDienste, e: AdminEreignis): Promise<Res
 		const r = await d.zugang.bestaetige(konto, code);
 		return r === 'ok' ? antwort(200, {}) : antwort(400, { fehler: 'falsch' });
 	});
+}
+
+// «Ansicht als …»: nur der MyTCO-Admin mit bestätigter Sitzung, geprüft mit den echten Rollen,
+// nicht mit denen einer laufenden Ansicht. Kein Verlaufseintrag: Es ändert sich nur diese Sitzung.
+export async function postAnsicht(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	if (!istJson(e)) return formatFehler();
+	const konto = e.locals.konto;
+	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
+	const z = await d.zugang.pruefe({ ...konto, ansicht: null });
+	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
+	if (z.stufe === 'keine-rolle' || !z.rollen.includes('mytco')) {
+		return antwort(403, { fehler: 'kein-admin' });
+	}
+	if (z.stufe === 'unbestaetigt') return antwort(403, { fehler: 'unbestaetigt' });
+	const { rolle } = await leseKoerper(e);
+	if (!istAnsichtRolle(rolle)) return eingabeFehler();
+	await setzeAnsicht(d.db, konto.sitzungHash, rolle);
+	return antwort(200, {});
+}
+
+// Beenden geht immer, auch ohne Rolle und ohne laufende Ansicht: Es kann nur zurück zu den echten Rollen.
+export async function postAnsichtBeenden(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	if (!istJson(e)) return formatFehler();
+	const konto = e.locals.konto;
+	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
+	await setzeAnsicht(d.db, konto.sitzungHash, null);
+	return antwort(200, {});
 }
 
 export function getMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Response> {
@@ -331,6 +359,8 @@ export const ADMIN_SCHNITTSTELLEN = {
 	getZugang,
 	postZugangCode,
 	postZugang,
+	postAnsicht,
+	postAnsichtBeenden,
 	getMitglieder,
 	postMitglieder,
 	getMitglied,

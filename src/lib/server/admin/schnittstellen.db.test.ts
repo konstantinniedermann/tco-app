@@ -120,9 +120,10 @@ describe('Admin-Schnittstellen', () => {
 			(await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] })).kontoId
 		);
 		const geschuetzt = Object.entries(ADMIN_SCHNITTSTELLEN).filter(
-			([name]) => !['getZugang', 'postZugang', 'postZugangCode'].includes(name)
+			([name]) =>
+				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(15);
+		expect(geschuetzt).toHaveLength(16);
 		for (const [name, fn] of geschuetzt) {
 			const mach = (konto?: AngemeldetesKonto) =>
 				ereignis({
@@ -154,9 +155,10 @@ describe('Admin-Schnittstellen', () => {
 			.delete(kontoRolle)
 			.where(and(eq(kontoRolle.kontoId, ehemals.kontoId), eq(kontoRolle.rolle, 'mitglieder')));
 		const geschuetzt = Object.entries(ADMIN_SCHNITTSTELLEN).filter(
-			([name]) => !['getZugang', 'postZugang', 'postZugangCode'].includes(name)
+			([name]) =>
+				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(15);
+		expect(geschuetzt).toHaveLength(16);
 		for (const [name, fn] of geschuetzt) {
 			for (const konto of [cm.konto, ehemals.konto]) {
 				const r = await fn(
@@ -595,7 +597,12 @@ describe('Admin-Schnittstellen', () => {
 		const normal = await legeMitgliedAn(db);
 		const ra = await getSitzung(ereignis({ konto: await einloggen(admin.kontoId) }), db);
 		const rn = await getSitzung(ereignis({ konto: await einloggen(normal.kontoId) }), db);
-		expect(await ra.json()).toEqual({ vorname: 'Test', passkeyHinweis: false, verwaltung: true });
+		expect(await ra.json()).toEqual({
+			vorname: 'Test',
+			passkeyHinweis: false,
+			verwaltung: true,
+			ansicht: null
+		});
 		expect(await rn.json()).toMatchObject({ verwaltung: false });
 		expect((await getSitzung(ereignis(), db)).status).toBe(401);
 	});

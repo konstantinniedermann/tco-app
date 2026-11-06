@@ -12,13 +12,14 @@ import {
 } from '../login/codes.ts';
 import type { Mailer } from '../login/dienst.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
-import { verwaltungsrollen, type VerwaltungsRolle } from './rollen.ts';
+import { effektiveRollen, verwaltungsrollen, type VerwaltungsRolle } from './rollen.ts';
 
 // SI-08: Die Bestätigung gilt 24 Stunden für diese Sitzung.
 export const ADMIN_BESTAETIGUNG_MS = 24 * 60 * 60 * 1000;
 
 // RR-07: `rollen` ist nie leer; ohne Verwaltungsrolle heisst die Stufe `keine-rolle`.
-// Die Rollen werden bei jeder Prüfung neu gelesen: Entzug oder Sperre wirkt sofort.
+// Die Rollen werden bei jeder Prüfung neu gelesen: Entzug oder Sperre wirkt sofort. In der
+// «Ansicht als …» sind es die Rollen der Ansicht (effektiveRollen).
 export type Zugang =
 	| { stufe: 'bestaetigt'; kontoId: number; mitgliedId: number; rollen: VerwaltungsRolle[] }
 	| { stufe: 'unbestaetigt'; rollen: VerwaltungsRolle[] }
@@ -63,12 +64,13 @@ export function erstelleZugangDienst(abh: ZugangAbh): ZugangDienst {
 	const { db, schluessel, kontakt, bremsen } = abh;
 	const jetzt = abh.jetzt ?? (() => new Date());
 
+	// Die echten Rollen, nicht die der Ansicht: Die Bestätigung per Mail-Code geht auch in der Ansicht.
 	const hatVerwaltungsrolle = async (kontoId: number) =>
 		(await verwaltungsrollen(db, kontoId)).length > 0;
 
 	async function pruefe(k: AngemeldetesKonto | undefined): Promise<Zugang> {
 		if (!k) return { stufe: 'abgemeldet' };
-		const rollen = await verwaltungsrollen(db, k.kontoId);
+		const rollen = effektiveRollen(await verwaltungsrollen(db, k.kontoId), k.ansicht);
 		if (rollen.length === 0) return { stufe: 'keine-rolle' };
 		const [zeile] = await db
 			.select({ am: sitzung.adminBestaetigtAm })
