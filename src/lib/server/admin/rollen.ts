@@ -40,6 +40,32 @@ export async function istAdmin(db: DbOderTx, kontoId: number): Promise<boolean> 
 	return zeile.n > 0;
 }
 
+export const VERWALTUNGSROLLEN = ['admin', 'cm'] as const satisfies readonly Rolle[];
+export type VerwaltungsRolle = (typeof VERWALTUNGSROLLEN)[number];
+
+// RR-07, RR-08: Rollen, die die Verwaltung öffnen, für ein Konto, das nicht gesperrt ist und
+// dessen Mitglied aktiv ist; sonst leer. Reihenfolge wie VERWALTUNGSROLLEN.
+export async function verwaltungsrollen(
+	db: DbOderTx,
+	kontoId: number
+): Promise<VerwaltungsRolle[]> {
+	const zeilen = await db
+		.select({ rolle: kontoRolle.rolle })
+		.from(kontoRolle)
+		.innerJoin(konto, eq(konto.id, kontoRolle.kontoId))
+		.innerJoin(mitglied, eq(mitglied.id, konto.mitgliedId))
+		.where(
+			and(
+				eq(kontoRolle.kontoId, kontoId),
+				inArray(kontoRolle.rolle, [...VERWALTUNGSROLLEN]),
+				eq(konto.gesperrt, false),
+				eq(mitglied.status, 'aktiv')
+			)
+		);
+	const vorhanden = new Set(zeilen.map((z) => z.rolle));
+	return VERWALTUNGSROLLEN.filter((r) => vorhanden.has(r));
+}
+
 export async function setzeRollen(
 	db: Db,
 	urheber: Urheber,

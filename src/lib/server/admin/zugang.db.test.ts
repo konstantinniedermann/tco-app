@@ -1,8 +1,8 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { kontoRolle, sitzung } from '../db/schema.ts';
+import { konto as kontoTabelle, kontoRolle, mitglied, sitzung } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleLoginDienst } from '../login/dienst.ts';
 import { beendeAlleSitzungen, erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
@@ -77,7 +77,8 @@ describe('Zugang zur Verwaltung', () => {
 		expect(await z.dienst.pruefe(konto)).toEqual<Zugang>({
 			stufe: 'bestaetigt',
 			kontoId: admin.kontoId,
-			mitgliedId: admin.mitgliedId
+			mitgliedId: admin.mitgliedId,
+			rollen: ['admin']
 		});
 		z.zeit.t = new Date(start.getTime() + ADMIN_BESTAETIGUNG_MS - MINUTE);
 		expect((await z.dienst.pruefe(konto)).stufe).toBe('bestaetigt');
@@ -192,16 +193,57 @@ describe('Zugang zur Verwaltung', () => {
 		expect(r.ergebnis).toBe('falsch');
 	});
 
-	test('RR-07: Konto ohne Rolle admin → kein-admin, Code-Anfrage schickt keine Mail', async () => {
+	test('RR-07: Konto ohne Verwaltungsrolle → keine-rolle, Code-Anfrage schickt keine Mail', async () => {
 		const z = baue();
-		const m = await legeMitgliedAn(db, { rollen: ['cm'] });
-		const konto = await einloggen(m.kontoId);
-		expect(await z.dienst.pruefe(konto)).toEqual({ stufe: 'kein-admin' });
-		const r = await z.dienst.fordereCodeAn(konto);
-		expect(r.annahme).toBe('ok');
-		await r.arbeit;
-		expect(z.post).toHaveLength(0);
-		expect(await z.dienst.bestaetige(konto, '123456')).toBe('falsch');
+		for (const rollen of [[], ['lizenz']]) {
+			const m = await legeMitgliedAn(db, { rollen });
+			const konto = await einloggen(m.kontoId);
+			expect(await z.dienst.pruefe(konto)).toEqual({ stufe: 'keine-rolle' });
+			const r = await z.dienst.fordereCodeAn(konto);
+			expect(r.annahme).toBe('ok');
+			await r.arbeit;
+			expect(z.post).toHaveLength(0);
+			expect(await z.dienst.bestaetige(konto, '123456')).toBe('falsch');
+		}
+	});
+
+	test('RR-07: cm ohne Admin bekommt Zugang mit Rollen [cm], Lizenz allein nicht', async () => {
+		const z = baue();
+		const cm = await legeMitgliedAn(db, { rollen: ['cm', 'lizenz'] });
+		const konto = await einloggen(cm.kontoId);
+		expect(await z.dienst.pruefe(konto)).toEqual<Zugang>({ stufe: 'unbestaetigt', rollen: ['cm'] });
+		expect(await bestaetigt(z, konto)).toBe('ok');
+		expect(z.post.at(-1)!.an).toBe(cm.email);
+		expect(await z.dienst.pruefe(konto)).toEqual<Zugang>({
+			stufe: 'bestaetigt',
+			kontoId: cm.kontoId,
+			mitgliedId: cm.mitgliedId,
+			rollen: ['cm']
+		});
+
+		const lizenz = await einloggen((await legeMitgliedAn(db, { rollen: ['lizenz'] })).kontoId);
+		expect(await z.dienst.pruefe(lizenz)).toEqual({ stufe: 'keine-rolle' });
+	});
+
+	test('RR-07, RR-08: Sperre oder Austritt eines bestätigten cm-Kontos → keine-rolle bei der nächsten Prüfung', async () => {
+		// Die Sitzungsprüfung lässt solche Konten gar nicht erst ein; der Zugang prüft trotzdem selbst.
+		const z = baue();
+		const gesperrt = await legeMitgliedAn(db, { rollen: ['cm'] });
+		const ausgetreten = await legeMitgliedAn(db, { rollen: ['cm'] });
+		const kg = await einloggen(gesperrt.kontoId);
+		const ka = await einloggen(ausgetreten.kontoId);
+		expect(await bestaetigt(z, kg)).toBe('ok');
+		expect(await bestaetigt(z, ka)).toBe('ok');
+		await db
+			.update(kontoTabelle)
+			.set({ gesperrt: true })
+			.where(eq(kontoTabelle.id, gesperrt.kontoId));
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten' })
+			.where(eq(mitglied.id, ausgetreten.mitgliedId));
+		expect(await z.dienst.pruefe(kg)).toEqual({ stufe: 'keine-rolle' });
+		expect(await z.dienst.pruefe(ka)).toEqual({ stufe: 'keine-rolle' });
 	});
 
 	test('RR-07: entzogene Rolle hebt eine bestehende Bestätigung auf', async () => {
@@ -210,7 +252,24 @@ describe('Zugang zur Verwaltung', () => {
 		const konto = await einloggen(admin.kontoId);
 		expect(await bestaetigt(z, konto)).toBe('ok');
 		await db.delete(kontoRolle).where(eq(kontoRolle.kontoId, admin.kontoId));
-		expect(await z.dienst.pruefe(konto)).toEqual({ stufe: 'kein-admin' });
+		expect(await z.dienst.pruefe(konto)).toEqual({ stufe: 'keine-rolle' });
+	});
+
+	test('RR-07: entzogenes admin bei verbleibendem cm wirkt sofort, Bestätigung bleibt für cm', async () => {
+		const z = baue();
+		const m = await legeMitgliedAn(db, { rollen: ['admin', 'cm'] });
+		const konto = await einloggen(m.kontoId);
+		expect(await bestaetigt(z, konto)).toBe('ok');
+		expect(await z.dienst.pruefe(konto)).toMatchObject({ rollen: ['admin', 'cm'] });
+		await db
+			.delete(kontoRolle)
+			.where(and(eq(kontoRolle.kontoId, m.kontoId), eq(kontoRolle.rolle, 'admin')));
+		expect(await z.dienst.pruefe(konto)).toEqual<Zugang>({
+			stufe: 'bestaetigt',
+			kontoId: m.kontoId,
+			mitgliedId: m.mitgliedId,
+			rollen: ['cm']
+		});
 	});
 
 	test('SI-08: vierte Code-Anfrage in einer Stunde → zu-viele, keine Mail', async () => {
