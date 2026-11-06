@@ -17,7 +17,8 @@ const EBENE: Record<string, number> = {
 	'/datenschutz': 1,
 	'/login/mail': 1,
 	'/profil/email': 1,
-	'/anlass/[id]': 1
+	'/anlass/[id]': 1,
+	'/clubmeisterschaft/[id]': 1
 };
 
 const FUSSZEILE = new Set(['/', '/login', '/login/mail', '/willkommen']);
