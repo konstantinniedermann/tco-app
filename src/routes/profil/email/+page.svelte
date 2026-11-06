@@ -174,7 +174,8 @@
 		</form>
 	</div>
 	<p class="leise">
-		Kommst du nicht mehr an die bisherige Adresse? Dann ändert der Admin sie für dich.
+		Kommst du nicht mehr an die bisherige Adresse? Dann ändert die Mitgliederverwaltung sie für
+		dich.
 		{#if data.kontakt}Schreib an {data.kontakt}.{:else}Den Kontakt findest du in deinem Brief.{/if}
 	</p>
 {:else}

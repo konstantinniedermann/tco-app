@@ -96,6 +96,16 @@ test('A-HILFE-01: Link mit Anker öffnet das Thema', async ({ page }) => {
 	await expect(page.locator('details#passkey')).not.toHaveAttribute('open', '');
 });
 
+test('A-HILFE-01: eigene Angaben nennen die Mitgliederverwaltung, nicht «den Admin»', async ({
+	page
+}) => {
+	await page.goto('/hilfe#eigene-angaben');
+	const thema = page.locator('details#eigene-angaben');
+	await expect(thema).toHaveAttribute('open', '');
+	await expect(thema).toContainText('ändert die Mitgliederverwaltung es für dich');
+	await expect(thema).not.toContainText('Admin');
+});
+
 test.describe('Einstiegsseite', () => {
 	test.afterAll(async () => {
 		await schliesseLoginHilfen();

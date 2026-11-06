@@ -17,7 +17,7 @@ export type Speichern =
 	| {
 			ergebnis: 'eingabe';
 			felder: Partial<Record<EigenesFeld, string>>;
-			/** Die Prüfung scheitert an einem Feld, das nur der Admin ändert (Altdaten). */
+			/** Die Prüfung scheitert an einem Feld, das nur der Mitglieder-Admin ändert (Altdaten). */
 			fremd: boolean;
 	  };
 
@@ -44,7 +44,7 @@ export function codeEingabeFehler(codeAlt: string, codeNeu: string): string | nu
 	return codeAlt.trim() === '' || codeNeu.trim() === '' ? MELDUNG_PROFIL.codesFehlen : null;
 }
 
-/** Meldung, wenn Altdaten in einem Feld des Admins das Speichern verhindern. */
+/** Meldung, wenn Altdaten in einem Feld des Mitglieder-Admins das Speichern verhindern. */
 export function fremdMeldung(kontakt: string | null): string {
 	const satz = 'Deine Angaben lassen sich gerade nicht speichern.';
 	return kontakt
@@ -131,7 +131,7 @@ export async function ladeKontakt(holen: Holen = fetch): Promise<string | null> 
 	}
 }
 
-/** `vorher`: die Angaben, wie die Seite sie geladen hat; sonst `veraltet` (zweiter Tab, Admin). */
+/** `vorher`: die Angaben, wie die Seite sie geladen hat; sonst `veraltet` (zweiter Tab, Mitglieder-Admin). */
 export async function speichereAngaben(
 	neu: Partial<Record<EigenesFeld, string>>,
 	vorher: EigeneAngaben,

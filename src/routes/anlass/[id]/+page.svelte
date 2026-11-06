@@ -148,8 +148,8 @@
 				<div class="feld">
 					<label for="bemerkung">Bemerkung (freiwillig)</label>
 					<span class="feld-hilfe" id="bemerkung-hilfe"
-						>Ein Grund ist nicht nötig, bitte keine Angaben zur Gesundheit. Die Bemerkung lesen nur
-						die Admins.</span
+						>Ein Grund ist nicht nötig, bitte keine Angaben zur Gesundheit. Die Bemerkung sehen nur
+						du, die Mitgliederverwaltung und wer MyTCO technisch betreut.</span
 					>
 					<textarea
 						id="bemerkung"

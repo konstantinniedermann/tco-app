@@ -304,7 +304,8 @@
 			)}
 			{@render angabe('lizenznummer', 'Lizenznummer', angaben.lizenznummer, true)}
 			<p class="leise">
-				{personText}<br />Name, Jahrgang und Nummer ändert der Admin. Stimmt etwas nicht?
+				{personText}<br />Name, Jahrgang und Nummer ändert die Mitgliederverwaltung. Stimmt etwas
+				nicht?
 				{#if data.kontakt}Schreib an {data.kontakt}.{:else}Den Kontakt findest du in deinem Brief.{/if}
 			</p>
 		{/if}
