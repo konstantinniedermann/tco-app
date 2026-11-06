@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
+	absageSperreText,
+	anmeldungenText,
 	datumKurz,
 	datumLang,
 	geschlechtText,
 	jahrgangText,
 	klassierungText,
-	statusText
+	statusText,
+	unpassendText
 } from './turnier-anzeige.ts';
 
 describe('Anzeigehilfen für Turniere', () => {
@@ -55,5 +58,25 @@ describe('Anzeigehilfen für Turniere', () => {
 		expect(geschlechtText('damen')).toBe('Damen');
 		expect(geschlechtText('mixed')).toBe('Mixed');
 		expect(geschlechtText('offen')).toBe('offen');
+	});
+
+	it('FR-35, FR-36: Texte zu Anmeldungen mit richtiger Einzahl und Mehrzahl', () => {
+		expect([anmeldungenText(0), anmeldungenText(1), anmeldungenText(2)]).toEqual([
+			'0 Anmeldungen',
+			'1 Anmeldung',
+			'2 Anmeldungen'
+		]);
+		expect(unpassendText(1)).toBe(
+			'1 Anmeldung passt nach der Änderung nicht mehr zu dieser Kategorie. Sie bleibt trotzdem stehen.'
+		);
+		expect(unpassendText(3)).toBe(
+			'3 Anmeldungen passen nach der Änderung nicht mehr zu dieser Kategorie. Sie bleiben trotzdem stehen.'
+		);
+		expect(absageSperreText(1)).toBe(
+			'Diese Kategorie hat 1 aktive Anmeldung. Absagen geht erst, wenn keine mehr da ist.'
+		);
+		expect(absageSperreText(2)).toBe(
+			'Diese Kategorie hat 2 aktive Anmeldungen. Absagen geht erst, wenn keine mehr da sind.'
+		);
 	});
 });

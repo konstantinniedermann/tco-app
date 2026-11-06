@@ -192,7 +192,9 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Kategorie</th><th>Art</th><th>Geschlecht</th><th>Jahrgang</th><th>Klassierung</th>
+					<th>Kategorie</th><th>Art</th><th>Geschlecht</th><th>Jahrgang</th><th>Klassierung</th><th
+						>Anmeldungen</th
+					>
 				</tr>
 			</thead>
 			<tbody>

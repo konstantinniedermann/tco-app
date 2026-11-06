@@ -3,7 +3,8 @@ import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { turnier } from '../db/schema.ts';
+import { turnier, mitglied } from '../db/schema.ts';
+import { meldeAn } from '../cm/anmeldungen.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
 import type { AdminDienste } from '../admin/schnittstellen.ts';
@@ -261,6 +262,43 @@ describe('Turnier-Schnittstellen', () => {
 		expect((await postKategorien(s.d, post(cm, EINZEL, { id: String(id) }))).status).toBe(201);
 		expect((await postKategorieAbsagen(s.d, post(cm, {}, { id: '999999999' }))).status).toBe(404);
 		expect((await postKategorieAbsagen(s.d, post(cm, {}, { id: 'x' }))).status).toBe(404);
+	});
+
+	test('FR-36, FR-35: 409 unpassend und hat-anmeldungen mit anzahl', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm']);
+		const jahr = await freiesJahr(2067);
+		const { id } = await (await postTurniere(s.d, post(cm, turnierAngaben(jahr)))).json();
+		const { id: kid } = await (
+			await postKategorien(s.d, post(cm, EINZEL, { id: String(id) }))
+		).json();
+		const k = { id: String(kid) };
+		const vorSchluss = new Date(`${jahr}-05-01T10:00:00Z`);
+		expect(
+			(
+				await postTurnierStatus(
+					baue(vorSchluss).d,
+					post(cm, { status: 'offen' }, { id: String(id) })
+				)
+			).status
+		).toBe(200);
+		const m = await legeMitgliedAn(db, {});
+		await db
+			.update(mitglied)
+			.set({ geschlecht: 'm', jahrgang: 1990, klassierung: 'R5' })
+			.where(eq(mitglied.id, m.mitgliedId));
+		expect(await meldeAn(db, kid, m.mitgliedId, vorSchluss)).toBe('ok');
+
+		const enger = { ...EINZEL, klassierungVon: 'R1', klassierungBis: 'R2' };
+		for (const trotzdem of [undefined, false, 'true', 1]) {
+			const r = await postKategorie(s.d, post(cm, { ...enger, trotzdem }, k));
+			expect([r.status, await r.json()]).toEqual([409, { fehler: 'unpassend', anzahl: 1 }]);
+		}
+		const ok = await postKategorie(s.d, post(cm, { ...enger, trotzdem: true }, k));
+		expect([ok.status, await ok.json()]).toEqual([200, {}]);
+		const a = await postKategorieAbsagen(s.d, post(cm, {}, k));
+		expect([a.status, await a.json()]).toEqual([409, { fehler: 'hat-anmeldungen', anzahl: 1 }]);
+		expect((await (await getKategorie(s.d, hole(cm, k))).json()).anmeldungen).toBe(1);
 	});
 
 	test('RR-07: ohne Rolle 403, unbestätigt 403 unbestaetigt, MyTCO-Admin nur lesend, ändernd ohne JSON 415', async () => {
