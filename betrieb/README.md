@@ -127,9 +127,10 @@ Die Angaben landen im Shell-Verlauf: Befehl mit führendem Leerzeichen eingeben 
 sich der Admin über «Code per E-Mail» an. Auf Test ist Erika Beispiel (erfunden) automatisch
 Admin.
 
-## Auslieferung ohne CI (keine Actions-Minuten)
+## Auslieferung ohne CI
 
-Ohne Minuten baut die CI auch kein Image. Dann von Hand:
+Fällt die CI aus (GitHub-Ausfall, oder das Repo wird wieder privat und die Actions-Minuten
+sind aufgebraucht), baut sie auch kein Image. Dann von Hand:
 
 1. Persönliches Token (classic) bei GitHub anlegen, nur mit `write:packages`, kurze Laufzeit.
 2. Lokal bauen und in die Ablage schieben:

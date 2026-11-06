@@ -205,26 +205,40 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   Geheimnis nur an Schritte, die es anfordern; ein Schadpaket in den Tests kommt so nicht
   an den Schlüssel. Welche Rechte die einzelnen Jobs haben, legt der Punkt zu
   `workflow-rechte.ts` oben fest.
-- **Kein GitHub Pro:** Schutz von `main` auf GitHub, Geheimnisse nur für eine Umgebung und
-  „nur `main` darf ausliefern“ gibt es für private Repos erst ab Pro (B:
+- **Öffentliches Repo, `main` auf GitHub geschützt:** Das Repo ist öffentlich (seit
+  06.11.2026, Entscheid des Projektleiters wegen der Actions-Minuten). Damit gibt es den
+  Schutz von `main` ohne GitHub Pro (B:
+  [GitHub Docs](https://docs.github.com/en/get-started/learning-about-github/githubs-plans)).
+  Die Regel «main schützen» lässt Änderungen an `main` nur über einen PR mit Merge-Commit
+  zu, verlangt grüne Prüfungen (`Prüfen (Lint, Tests, Build)`, `Doku (make docs)`,
+  `gitleaks (ganze Historie)`) und verbietet Force-Push und Löschen; Ausnahmen hat niemand.
+  Freigaben verlangt sie keine (0): Jedes Konto mit Schreibrecht kann selbst einen PR nach
+  `main` öffnen und mergen, auch von einem anderen Branch als `dev`; die Regel erzwingt nur
+  PR, Merge-Commit und grüne Prüfungen. Die Ende-zu-Ende-Tests sind bewusst keine verlangte
+  Prüfung: Läuft der Job nicht (nur Doku), meldet er sich unter einem anderen Namen, und eine
+  verlangte Prüfung, die nie kommt, sperrt den PR. Dass sie vor dem Release grün sind, sichert
+  der Ablauf «warten bis grün» (Skill `tco-branching`). Workflows aus Forks laufen erst nach
+  Freigabe durch den Projektleiter. Geheimnisse nur für eine Umgebung und „nur `main` darf
+  ausliefern“ (Deployment-Umgebungen) gibt es für öffentliche Repos ebenfalls gratis (B:
   [GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments),
-  Antwort der API). Der Projektleiter verzichtet darauf, um laufende Kosten auf seinem
-  Privatkonto zu vermeiden; das Restrisiko ist im Sicherheitskonzept bewertet. Die Auslieferung bleibt
-  automatisch.
+  ebenso der Link oben); sie sind noch nicht eingerichtet ([Beobachtungen](beobachtungen.md)).
+  Die Auslieferung bleibt automatisch.
 - **Restrisiko** (bewertet im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
   Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
   Hauptansprechperson nutzt ihren Zugang nur zum Lesen; neu bewerten bei einer Übergabe, wenn das
   Repo das Konto wechselt, [Betrieb und Übergabe](betrieb-und-uebergabe.md#übergabe-checkliste)). Die
   Reichweite ist dort am 02.11.2026 richtiggestellt worden und **vom Projektleiter neu zu
   bestätigen**:
-  - Wer ins Repo pushen kann, kann direkt auf `main` pushen (davor schützt nur der lokale
-    Hook des Projektleiters) oder einen Workflow schreiben, der den Live-Schlüssel nutzt
-    (davor schützt nichts). Weil das `ausliefern` aus dem Image auf dem Server läuft, reicht
+  - Wer ins Repo pushen kann, kann zwar nicht mehr direkt auf `main` pushen (Regel «main
+    schützen» auf GitHub, zusätzlich der lokale Hook), aber selbst einen PR nach `main`
+    mergen, sobald die verlangten Prüfungen grün sind, und auf `dev` einen Workflow
+    schreiben, der den Live-Schlüssel nutzt (davor schützt nichts, solange die Schlüssel
+    nicht in Deployment-Umgebungen liegen). Weil das `ausliefern` aus dem Image auf dem Server läuft, reicht
     das bis zu root auf dem Server: Geheimnisse beider Umgebungen, Sicherungszugang,
     Türsteher und Schlüssel. Getrennte Schlüssel für Test und Live helfen nur gegen einen
     gestohlenen Schlüssel allein; ein schädliches Image, das nur auf Test kommt, erreicht über
     denselben Server trotzdem Live. Pushen können der Projektleiter und die Hauptansprechperson
-    im Vorstand: Mitarbeitende eines privaten Repos auf einem Privatkonto haben immer
+    im Vorstand: Mitarbeitende eines Repos auf einem Privatkonto haben immer
     Schreibrecht (B: [GitHub Docs](https://docs.github.com/en/account-and-profile/reference/permission-levels-for-a-personal-account-repository)).
     Eine reine Leserolle gibt es erst in einer Organisation; das Repo bleibt bis zu einer
     Übergabe auf dem Privatkonto ([Betrieb und Übergabe](betrieb-und-uebergabe.md#konten)).
@@ -393,10 +407,12 @@ alten Version arbeitet:
 
 ## Actions-Minuten
 
-Der Gratisplan des GitHub-Kontos hat 2000 Minuten pro Monat, **geteilt mit den anderen
-privaten Repos** (B: Messung in Munica, Stand 10/2026). Munica allein braucht fest über
-1200 Minuten; im September 2026 war das Kontingent aufgebraucht (B, ebenda). Ist auch das
-Budget erschöpft, startet GitHub keine Jobs mehr, also auch keine Auslieferung.
+Das Repo ist öffentlich; für öffentliche Repos sind die Standard-Runner von GitHub gratis
+und ohne Kontingent (B: Abrechnung des Kontos, öffentliche Repos mit 0 verrechnet). Bis
+06.11.2026 war es privat und teilte die 2000 Gratisminuten pro Monat mit den anderen
+privaten Repos des Kontos; MyTCO allein brauchte im November in sechs Tagen über 1100
+Minuten (B: Abrechnung des Kontos). Das war der Grund für den Wechsel. Die Regeln unten
+bleiben, weil sie auch die Wartezeit kurz halten.
 
 - CI nur bei PRs und auf `dev`/`main`; Issue-Branches prüfen lokal.
 - Nur PR-Läufe brechen den vorherigen ab. Jeder Push auf `dev`/`main` läuft für sich, auch
@@ -408,9 +424,10 @@ Budget erschöpft, startet GitHub keine Jobs mehr, also auch keine Auslieferung.
 - **Gemessen** (erster Lauf auf `dev`, 01.11.2026, B): ein Merge mit Code dauert rund
   3 Minuten und kostet 11 abgerechnete Minuten. GitHub rundet jeden Job auf ganze Minuten
   auf, gezählt werden 7 Jobs inklusive Secret-Scan. Ein reiner Doku-Merge kostet 3 Minuten.
-  Bei rund 30 Code-Merges im Monat sind das etwa 330 Minuten (S). Reicht das Kontingent
-  nicht, laufen die Ende-zu-Ende-Tests nur beim PR nach `main`.
-- **Notfall ohne Minuten:** Ohne Minuten baut die CI auch kein Image. Der Projektleiter baut
+  Seit den Ende-zu-Ende-Tests auf drei Geräten kostet ein voller Lauf rund 20 abgerechnete
+  Minuten (B: Jobdauern auf `dev`, 06.11.2026).
+- **Notfall ohne CI** (GitHub-Ausfall oder das Repo wird wieder privat und die Minuten sind
+  aufgebraucht): Ohne CI gibt es auch kein Image. Der Projektleiter baut
   es dann lokal für den Server (`--platform linux/amd64`, sein Mac baut sonst für arm64),
   schiebt es mit einem eigenen, kurzlebigen Token (nur `packages: write`) in
   die Container-Ablage und startet die Auslieferung mit dem Digest von Hand auf dem Server

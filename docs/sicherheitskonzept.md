@@ -128,14 +128,16 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
   Ein Adresswechsel (Übergangsadresse zu `my.tcolten.ch`, K-10) macht alle Passkeys ungültig:
   Mitglieder melden sich mit dem Code an und sehen den Hinweis wieder.
 
-### Neu zu bestätigen (Stand 2026-11-02)
+### Neu zu bestätigen (Stand 2026-11-02, Schutz von `main` nachgeführt 2026-11-06)
 
 Beim Gesamt-Review von #32 richtiggestellt; die frühere Annahme deckt die neue Reichweite nicht.
 Bis der Projektleiter bestätigt, gelten diese beiden Punkte als nicht angenommen.
 
-- **Schreibrecht auf GitHub reicht bis root auf dem Server.** Ohne GitHub Pro kann jedes Konto
-  mit Schreibrecht direkt auf `main` pushen oder einen Workflow mit dem Live-Schlüssel schreiben
-  ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Weil die Einrichtung des Servers im
+- **Schreibrecht auf GitHub reicht bis root auf dem Server.** Direkt auf `main` pushen kann
+  seit 06.11.2026 niemand mehr (Repo öffentlich, Regel «main schützen» auf GitHub). Jedes
+  Konto mit Schreibrecht kann aber selbst einen PR nach `main` mergen, sobald die verlangten
+  Prüfungen grün sind (die Regel verlangt keine Freigabe), und auf `dev` einen Workflow mit
+  dem Live-Schlüssel schreiben ([CI/CD](ci-cd-und-release.md#schutz-des-auslieferungswegs)). Weil die Einrichtung des Servers im
   Image mitreist, läuft das `ausliefern` eines Images auf dem Server selbst, als Benutzer
   `mytco` mit Zugang zu Docker. Das reicht so weit wie root: an die Geheimnisse beider
   Umgebungen und an den Sicherungszugang, aber auch an den Türsteher, die Schlüssel in
