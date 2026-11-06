@@ -27,9 +27,11 @@ Daten übergeben. So sind sie ohne Aufbau testbar; hier entstehen die meisten Te
 Fachlogik und wird über die Ende-zu-Ende-Tests und das Review geprüft.
 
 **Rechte:** Die Berechtigung prüft immer der Server (ADR-001), also wird sie dort getestet.
-Pro Schnittstelle gibt es einen Test, der jede Rolle durchspielt, auch ohne Login, mit
-gesperrtem Konto (RR-08) und mit dem Konto eines anderen Mitglieds (RR-06: *eigene* und
-*beteiligt*): erlaubte Rollen erhalten die Daten, alle anderen nicht.
+Pro Schnittstelle gibt es einen Test, der jede Rolle durchspielt, auch ohne Login und mit
+dem Konto eines anderen Mitglieds (RR-06: *eigene* und *beteiligt*): erlaubte Rollen erhalten
+die Daten, alle anderen nicht. Das gesperrte Konto (RR-08) wird nicht pro Schnittstelle
+geprüft, sondern einmal zentral: Die Sitzungsprüfung behandelt es wie «nicht angemeldet»
+(Tests in `sitzung.db.test.ts`), und jede Schnittstelle geht über sie.
 
 **Ende-zu-Ende** in drei Umgebungen:
 
@@ -45,8 +47,8 @@ den Passkey-Ablauf also nicht. Wie sich ein echter Authenticator auf iPhone und 
 verhält, zeigt allein die [Checkliste](#checkliste-vor-dem-release).
 
 Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelheit; zuerst
-Login per Einmal-Code, Daten ergänzen und eingeloggt bleiben (die geplanten
-A-LOGIN-Anforderungen der Etappe *Mitglieder-Login*).
+Login per Einmal-Code und eingeloggt bleiben, später *Daten ergänzen* beim ersten Login
+(FR-02, noch geplant).
 
 **Grenzen pro IP:** Alle Browser eines Laufs kommen von 127.0.0.1 an denselben Server; die
 Grenze von 10 Code-Anfragen pro IP und Stunde (SI-04) gilt für den ganzen Lauf, Login-Codes

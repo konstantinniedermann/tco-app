@@ -389,7 +389,9 @@ Budget erschöpft, startet GitHub keine Jobs mehr, also auch keine Auslieferung.
 - CI nur bei PRs und auf `dev`/`main`; Issue-Branches prüfen lokal.
 - Nur PR-Läufe brechen den vorherigen ab. Jeder Push auf `dev`/`main` läuft für sich, auch
   wenn weitere folgen; sonst könnte ein späterer Push den wartenden Lauf eines Code-Pushs
-  verdrängen und ihn ungetestet lassen.
+  verdrängen und ihn ungetestet lassen. Ausnahme ist der Secret-Scan (`secret-scan.yml`): Er
+  bricht auch auf `dev`/`main` den vorherigen Lauf ab. Dabei geht nichts verloren, weil jeder
+  Lauf die ganze Historie prüft.
 - Änderungen nur an der Doku lösen weder Ende-zu-Ende-Tests noch eine Auslieferung aus.
 - **Gemessen** (erster Lauf auf `dev`, 01.11.2026, B): ein Merge mit Code dauert rund
   3 Minuten und kostet 11 abgerechnete Minuten. GitHub rundet jeden Job auf ganze Minuten
