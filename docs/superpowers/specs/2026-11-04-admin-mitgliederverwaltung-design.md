@@ -187,8 +187,10 @@ Die Etappe 1 kommt zuerst, weil alle anderen Rechte, Verlauf und Verwaltungsrahm
 
 ## Briefe
 
-- **Seite *Briefe*:** Liste der aktiven Mitglieder ohne gültigen Brief-Code und ohne
-  eingelöstes Login, mit Auswahl (alle oder einzelne). «Briefe erzeugen» stellt für die
+- **Seite *Briefe*:** Liste der aktiven Mitglieder, deren Konto noch nicht aktiviert ist (noch
+  nie eingeloggt), mit Angabe, ob schon ein Brief-Code ausgestellt ist, und Auswahl (alle oder
+  einzelne). So erhalten auch Nachzügler einen zweiten Brief; der neue Code ersetzt den alten
+  (Entscheid Projektleiter, 06.11.2026). «Briefe erzeugen» stellt für die
   Auswahl je einen Brief-Code aus (bestehende Funktion `stelleBriefCodeAus`, FR-24) und
   öffnet eine Druckansicht mit einer Seite je Brief aus `baueBriefHtml`.
 - **Einzelner Brief:** «Neuen Brief-Code ausstellen» auf der Seite eines Mitglieds öffnet
