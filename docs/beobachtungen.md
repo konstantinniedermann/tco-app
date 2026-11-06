@@ -161,6 +161,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Nachtrag (06.11.2026, nachmittags):** Nach dem Entscheid noch dreimal am selben Tag, jedes Mal mit demselben Abbruch nach 8 Minuten und nach einem Neustart des Jobs grün: Release-PR #62 (desktop), Merge 0.6.1 auf `dev` (android), Merge 0.7.0 auf `dev`, Lauf 42223464675 (iphone).
 
+**Umgesetzt (06.11.2026):** Entscheid revidiert, die E2E-Jobs laufen im Playwright-Image (Branch `fix/ci-playwright-container`); kein apt mehr. Der Umbau deckte einen App-Fehler auf (veraltete Seite nach dem Speichern durch Vorladen beim Überfahren), behoben in `fix/vorladen-veraltet`. Bei der nächsten Auswertung ins Archiv.
+
 ### 2026-11-06 — make check baut die App doppelt: einmal selbst, einmal im Webserver der E2E-Tests
 
 **Thema:** Betrieb
