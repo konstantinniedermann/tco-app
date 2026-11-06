@@ -1,6 +1,6 @@
 import { and, asc, count, eq, inArray, ne, sql } from 'drizzle-orm';
 import type { Db, DbOderTx } from '../db/index.ts';
-import { konto, kontoRolle, mitglied } from '../db/schema.ts';
+import { konto, kontoRolle, mitglied, sitzung } from '../db/schema.ts';
 import { schreibeVerlauf, type Eintrag, type Urheber } from './verlauf.ts';
 
 export const ROLLEN = ['mytco', 'mitglieder', 'cm', 'lizenz'] as const;
@@ -151,6 +151,10 @@ export async function setzeRollen(
 			await tx
 				.delete(kontoRolle)
 				.where(and(eq(kontoRolle.kontoId, kontoId), inArray(kontoRolle.rolle, entzogen)));
+		}
+		// Ohne `mytco` endet jede «Ansicht als …» des Kontos; bei neuer Vergabe lebt sie nicht wieder auf.
+		if (entzogen.includes('mytco')) {
+			await tx.update(sitzung).set({ ansichtRolle: null }).where(eq(sitzung.kontoId, kontoId));
 		}
 		if (vergeben.length > 0) {
 			await tx.insert(kontoRolle).values(vergeben.map((rolle) => ({ kontoId, rolle })));

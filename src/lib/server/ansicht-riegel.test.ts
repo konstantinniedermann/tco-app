@@ -19,6 +19,11 @@ describe('Ansicht als …: Riegel für speichernde Anfragen', () => {
 		for (const pfad of ERLAUBT_IN_ANSICHT) expect(riegel('POST', pfad, 'mitglied')).toBeNull();
 	});
 
+	test('die Ausnahmen gelten nur für den genauen Pfad, nicht mit Schrägstrich am Ende', () => {
+		expect(riegel('POST', '/api/logout/', 'cm')?.status).toBe(403);
+		expect(riegel('POST', '/api/admin/ansicht/beenden/', 'cm')?.status).toBe(403);
+	});
+
 	test('Lesen bleibt offen, ohne Ansicht greift der Riegel nicht', () => {
 		expect(riegel('GET', '/api/admin/mitglieder', 'cm')).toBeNull();
 		expect(riegel('HEAD', '/api/sitzung', 'cm')).toBeNull();

@@ -64,7 +64,8 @@ export function erstelleZugangDienst(abh: ZugangAbh): ZugangDienst {
 	const { db, schluessel, kontakt, bremsen } = abh;
 	const jetzt = abh.jetzt ?? (() => new Date());
 
-	// Die echten Rollen, nicht die der Ansicht: Die Bestätigung per Mail-Code geht auch in der Ansicht.
+	// Die echten Rollen, nicht die der Ansicht: Die Bestätigung per Mail-Code geht auch in den Ansichten
+	// `cm` und `mitglieder` (in `mitglied` und `lizenz` gibt es keine Verwaltung).
 	const hatVerwaltungsrolle = async (kontoId: number) =>
 		(await verwaltungsrollen(db, kontoId)).length > 0;
 

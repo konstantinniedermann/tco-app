@@ -5,13 +5,28 @@ import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { legeAnlassAn } from '../anlass/anlaesse.ts';
 import { postAnmeldung } from '../anlass/schnittstellen.ts';
 import { erstelleDb } from '../db/index.ts';
-import { aenderung, anlassAnmeldung, kontoRolle, sitzung } from '../db/schema.ts';
+import {
+	aenderung,
+	anlassAnmeldung,
+	kontoRolle,
+	mitglied,
+	sitzung,
+	turnier
+} from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleLoginDienst } from '../login/dienst.ts';
 import { getSitzung, postLogout } from '../login/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
+import { postTurniere } from '../turnier/schnittstellen.ts';
 import { riegel } from './ansicht.ts';
-import { getZugang, postAnsicht, postAnsichtBeenden, type AdminDienste } from './schnittstellen.ts';
+import { setzeRollen } from './rollen.ts';
+import {
+	getZugang,
+	postAnsicht,
+	postAnsichtBeenden,
+	postMitglieder,
+	type AdminDienste
+} from './schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
@@ -248,6 +263,65 @@ describe('Ansicht als … (Server)', () => {
 			ereignis({ contentType: 'text/plain', konto: a.konto })
 		);
 		expect(textEnde.status).toBe(415);
+	});
+
+	// Zweite Schicht: Auch ohne den Riegel im Hook schreibt keine Schnittstelle in der Ansicht.
+	test('in der Ansicht cm scheitert postTurniere direkt mit 403 nur-ansehen, die DB bleibt gleich', async () => {
+		const a = await angemeldet(['mytco'], true);
+		expect((await schalteEin(a.s.d, a.konto, { rolle: 'cm' })).status).toBe(200);
+		const konto = (await lade(a.kennung))!;
+		const name = `Clubmeisterschaft ${crypto.randomUUID()}`;
+		const r = await postTurniere(
+			a.s.d,
+			ereignis({
+				konto,
+				body: { jahr: 2093, name, anmeldeschluss: '2093-05-31', nummern: [] }
+			})
+		);
+		expect([r.status, await r.json()]).toEqual([403, { fehler: 'nur-ansehen' }]);
+		expect(await db.select().from(turnier).where(eq(turnier.name, name))).toEqual([]);
+	});
+
+	test('in der Ansicht mitglieder scheitert postMitglieder direkt mit 403 nur-ansehen, die DB bleibt gleich', async () => {
+		const a = await angemeldet(['mytco'], true);
+		expect((await schalteEin(a.s.d, a.konto, { rolle: 'mitglieder' })).status).toBe(200);
+		const konto = (await lade(a.kennung))!;
+		const email = `neu-${crypto.randomUUID()}@example.org`;
+		const r = await postMitglieder(
+			a.s.d,
+			ereignis({
+				konto,
+				body: {
+					vorname: 'Erika',
+					nachname: 'Beispiel',
+					strasse: 'Erfundenweg 1',
+					plz: '4600',
+					ort: 'Olten',
+					email
+				}
+			})
+		);
+		expect([r.status, await r.json()]).toEqual([403, { fehler: 'nur-ansehen' }]);
+		expect(await db.select().from(mitglied).where(eq(mitglied.email, email))).toEqual([]);
+		expect(await verlaufVon(a.mitgliedId)).toEqual([]);
+	});
+
+	test('mytco entzogen und wieder vergeben: die alte Ansicht lebt nicht wieder auf', async () => {
+		// Ein zweiter MyTCO-Admin, damit der Entzug nicht an der Untergrenze scheitert.
+		const anderer = await legeMitgliedAn(db, { rollen: ['mytco'] });
+		const a = await angemeldet(['mytco', 'mitglieder'], true);
+		const zweite = await erstelleSitzung(db, a.kontoId, start);
+		expect((await schalteEin(a.s.d, a.konto, { rolle: 'cm' })).status).toBe(200);
+		await db.update(sitzung).set({ ansichtRolle: 'lizenz' }).where(eq(sitzung.kontoId, a.kontoId));
+		const urheber = { art: 'admin' as const, mitgliedId: anderer.mitgliedId };
+		expect(
+			await setzeRollen(db, urheber, a.kontoId, ['mitglieder'], ['mytco', 'mitglieder'], start)
+		).toBe('ok');
+		expect(
+			await setzeRollen(db, urheber, a.kontoId, ['mytco', 'mitglieder'], ['mitglieder'], start)
+		).toBe('ok');
+		expect((await lade(a.kennung))!.ansicht).toBeNull();
+		expect((await lade(zweite))!.ansicht).toBeNull();
 	});
 
 	test('Beenden ohne Rolle und ohne Ansicht ist harmlos, ohne Sitzung 401', async () => {

@@ -74,6 +74,7 @@ async function mitKonto(
 // Wer den Bereich nicht einmal lesen darf, bekommt `kein-admin` (der Code für «dieser Bereich ist
 // dir nicht offen»), nicht die Aufforderung zum Bestätigen. Wer ihn nur lesen darf und schreiben
 // will, bekommt nach der Bestätigung `kein-recht` (Regel 3: der MyTCO-Admin liest).
+// In der «Ansicht als …» schreibt keine Schnittstelle, auch ohne den Riegel im Hook (zweite Schicht).
 async function mitRolle(
 	d: AdminDienste,
 	e: AdminEreignis,
@@ -83,6 +84,9 @@ async function mitRolle(
 ): Promise<Response> {
 	const z = await d.zugang.pruefe(e.locals.konto);
 	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
+	if (art === 'schreiben' && e.locals.konto?.ansicht != null) {
+		return antwort(403, { fehler: 'nur-ansehen' });
+	}
 	if (z.stufe === 'keine-rolle' || !darf(z.rollen, bereich, 'lesen')) {
 		return antwort(403, { fehler: 'kein-admin' });
 	}
