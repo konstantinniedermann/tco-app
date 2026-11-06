@@ -20,6 +20,10 @@ export const STANDARD_ADRESSE = 'https://my.tcolten.ch';
 /** Schlüssel aus `.env.example`; öffentlich im Repo, darum in Produktion verboten. */
 export const BEISPIEL_SCHLUESSEL = 'nur-lokal-nicht-fuer-produktion-0123456789abcdef';
 
+/** Öffentlicher VAPID-Schlüssel aus `.env.example`; im Repo bekannt, darum in Produktion verboten. */
+export const BEISPIEL_VAPID_OEFFENTLICH =
+	'BCUfPbrWschrERMITs9b_aJhHWZSvc7oWyUHpVd_omS5ejcBc5z7q2beiy7XknqCc5dnOM7olJiRPqYTc66ltm4'; // gitleaks:allow
+
 /**
  * process.env statt `$app/env/private`, Begründung wie bei `holeDb` in `db/index.ts`.
  * Fehlertexte nennen nur den Namen der Variablen, nie ihren Wert (SI-05).
@@ -43,7 +47,7 @@ export function leseEinstellungen(
 	if (mailNurAn !== undefined && !/^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]+$/.test(mailNurAn)) {
 		throw new Error('MAIL_NUR_AN ist keine Mail-Adresse');
 	}
-	const vapid = leseVapid(env);
+	const vapid = leseVapid(env, env.NODE_ENV === 'production');
 	return {
 		codeSchluessel,
 		smtpUrl,
@@ -56,18 +60,26 @@ export function leseEinstellungen(
 }
 
 /** Beide leer: Push aus. Beide gesetzt: je base64url. Fehlertexte nennen nie den Wert (SI-05). */
-function leseVapid(env: Record<string, string | undefined>): Einstellungen['vapid'] {
+function leseVapid(
+	env: Record<string, string | undefined>,
+	produktion: boolean
+): Einstellungen['vapid'] {
 	const oeffentlich = env.MYTCO_VAPID_OEFFENTLICH?.trim() || undefined;
 	const privat = env.MYTCO_VAPID_PRIVAT?.trim() || undefined;
 	if (oeffentlich === undefined && privat === undefined) return undefined;
 	if (oeffentlich === undefined || privat === undefined) {
 		throw new Error('MYTCO_VAPID_OEFFENTLICH und MYTCO_VAPID_PRIVAT nur zusammen');
 	}
-	for (const [name, wert] of [
-		['MYTCO_VAPID_OEFFENTLICH', oeffentlich],
-		['MYTCO_VAPID_PRIVAT', privat]
-	]) {
+	// P-256: öffentlicher Schlüssel 65 Byte (87 Zeichen), privater 32 Byte (43 Zeichen).
+	for (const [name, wert, laenge] of [
+		['MYTCO_VAPID_OEFFENTLICH', oeffentlich, 87],
+		['MYTCO_VAPID_PRIVAT', privat, 43]
+	] as const) {
 		if (!/^[A-Za-z0-9_-]+$/.test(wert)) throw new Error(`${name} ist nicht base64url`);
+		if (wert.length !== laenge) throw new Error(`${name} hat nicht ${laenge} Zeichen`);
+	}
+	if (produktion && oeffentlich === BEISPIEL_VAPID_OEFFENTLICH) {
+		throw new Error('MYTCO_VAPID_OEFFENTLICH ist der Beispielwert aus .env.example');
 	}
 	return { oeffentlich, privat };
 }
