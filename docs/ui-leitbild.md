@@ -227,8 +227,8 @@ Kopfleiste.
   *CM-Anmeldung*); *Lizenz* kommt mit der Etappe *Lizenzanträge*. Höchstens
   4 Reiter, kein verstecktes Menü (☰). „CM" ist die Kurzform, weil „Clubmeisterschaft" bei
   grosser Schrift nicht in den Reiter passt; Seitentitel schreiben es aus.
-- **Startseite:** „Hoi <Vorname>", darunter „Jetzt aktuell" (Kacheln, die wichtigste
-  hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
+- **Startseite:** „Hoi <Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
+  „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
   stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
   (A-ANLASS-01).
 - **Unterseiten:** „‹ Zurück" oben links, keine Reiter (bei der CM-Anmeldung neu prüfen).

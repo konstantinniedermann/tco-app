@@ -89,13 +89,15 @@ Für eine geplante Übergabe vom Projektleiter an eine Nachfolge. Der Vorstand b
 Nachfolge (K-05).
 
 1. **Arbeitsumgebung:** Die Nachfolge installiert Claude Code, klont das Repo und startet mit
-   `make help`, [`README.md`](../README.md) und dieser Datei. Im Repo liegen nur die
-   Projekt-`CLAUDE.md` und der Skill `tco-branching`. Nur auf dem Rechner des Projektleiters
-   (unter `~/.claude/` bzw. eine Ebene über dem Repo) liegen und gehen sonst verloren: die
-   übergeordnete `CLAUDE.md` (Workflow, Dependencies, Commit-Konvention, Umgang mit Befunden),
-   die Skills `session-start`, `session-wrap-up`, `beobachtungen-auswerten` und `doku-audit`,
-   der Agent `cas-reviewer`, der Hook `dep-guard`, das Plugin *superpowers* und die Memories mit
-   den bekannten Fallen. Vor der Übergabe entscheiden, was davon ins Repo kommt.
+   `make help`, [`README.md`](../README.md) und dieser Datei. Im Repo liegen die
+   Projekt-`CLAUDE.md`, der Skill `tco-branching`, die Hooks der Versionsverwaltung
+   (`.githooks/`) und der Eintrag für den Svelte-MCP-Server (`.mcp.json`). Nur auf dem Rechner
+   des Projektleiters (unter `~/.claude/` bzw. eine Ebene über dem Repo) liegen und gehen sonst
+   verloren: die übergeordnete `CLAUDE.md` (Workflow, Dependencies, Commit-Konvention, Umgang
+   mit Befunden), die Skills `session-start`, `session-wrap-up`, `beobachtungen-auswerten` und
+   `doku-audit`, der Agent `cas-reviewer`, die Hooks `dep-guard` (blockt unbekannte Pakete) und
+   `ps_hooks` (Lagebild und Schutz der Worktrees bei parallelen Sessions), das Plugin
+   *superpowers* und die Memories mit den bekannten Fallen. Vor der Übergabe entscheiden, was davon ins Repo kommt.
 2. **Tresor:** Die Nachfolge erhält Zugang zu den Geheimnissen (K-49).
 3. **Infomaniak und Mailversand:** Die Nachfolge wird Benutzer in den Konten; der
    Projektleiter wird entfernt. Die Vereinsadresse bleibt Inhaberin.
