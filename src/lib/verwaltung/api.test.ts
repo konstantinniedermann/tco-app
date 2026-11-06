@@ -12,7 +12,13 @@ import {
 	ladeZugang,
 	legeMitgliedAn,
 	speichereAngaben,
-	speichereRollen
+	speichereRollen,
+	ladeTurniere,
+	legeTurnierAn,
+	setzeTurnierStatus,
+	legeKategorieAn,
+	sageKategorieAb,
+	aendereKategorie
 } from './api.ts';
 
 type Aufruf = { pfad: string; init: RequestInit };
@@ -151,5 +157,61 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			pfad: '/api/admin/anlaesse/3/loeschen',
 			init: { method: 'POST' }
 		});
+	});
+
+	it('FR-33: 409 schluss-vorbei und keine-kategorie werden eigene Ergebnisse', async () => {
+		const a = await setzeTurnierStatus(
+			1,
+			'offen',
+			holer(json(409, { fehler: 'schluss-vorbei' })).holen
+		);
+		const b = await setzeTurnierStatus(
+			1,
+			'offen',
+			holer(json(409, { fehler: 'keine-kategorie' })).holen
+		);
+		const c = await setzeTurnierStatus(
+			1,
+			'geschlossen',
+			holer(json(409, { fehler: 'unzulaessig' })).holen
+		);
+		const d = await aendereKategorie(2, {}, holer(json(409, { fehler: 'abgesagt' })).holen);
+		expect([a, b, c, d]).toEqual([
+			{ art: 'schluss-vorbei' },
+			{ art: 'keine-kategorie' },
+			{ art: 'unzulaessig' },
+			{ art: 'abgesagt' }
+		]);
+	});
+
+	it('FR-33: 409 vergeben nennt Jahr oder Name', async () => {
+		const r = await legeTurnierAn({}, holer(json(409, { fehler: 'vergeben', feld: 'jahr' })).holen);
+		expect(r).toEqual({ art: 'vergeben', feld: 'jahr' });
+	});
+
+	it('FR-33: Turnier-Endpunkte werden mit Pfad und Körper aufgerufen', async () => {
+		const h = holer(json(200, {}));
+		await ladeTurniere(h.holen);
+		await setzeTurnierStatus(7, 'offen', h.holen);
+		await legeKategorieAn(7, { name: 'x' }, h.holen);
+		await sageKategorieAb(9, h.holen);
+		expect(h.aufrufe.map((a) => [a.init.method, a.pfad])).toEqual([
+			['GET', '/api/admin/turniere'],
+			['POST', '/api/admin/turniere/7/status'],
+			['POST', '/api/admin/turniere/7/kategorien'],
+			['POST', '/api/admin/kategorien/9/absagen']
+		]);
+		expect(JSON.parse(String(h.aufrufe[1].init.body))).toEqual({ status: 'offen' });
+	});
+
+	it('RR-07: ladeZugang liefert die Rollen', async () => {
+		const r = await ladeZugang(
+			holer(json(200, { bestaetigt: true, mitgliedId: 3, rollen: ['cm'] })).holen
+		);
+		expect(r).toEqual({
+			art: 'ok',
+			daten: { bestaetigt: true, mitgliedId: 3, rollen: ['cm'] }
+		});
+		if (r.art === 'ok') expect(r.daten.rollen).toEqual(['cm']);
 	});
 });
