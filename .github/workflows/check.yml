@@ -126,12 +126,25 @@ jobs:
       - run: npm run build
       - run: npm run build:spa
 
+  # Ein Job pro Gerät (Playwright-Projekt): Der Runner hat 2 Kerne, Playwright nutzt davon einen
+  # Worker; nacheinander dauerten die drei Geräte gut 8 Minuten. Fällt ein Gerät durch, laufen
+  # die anderen zu Ende. Die Auslieferung wartet auf alle drei.
   e2e:
-    name: E2E (Playwright)
+    name: E2E (${{ matrix.geraet }})
     needs: aenderung
     if: needs.aenderung.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - geraet: iphone
+            browser: webkit
+          - geraet: android
+            browser: chromium
+          - geraet: desktop
+            browser: chromium
     permissions:
       contents: read
     services:
@@ -179,19 +192,25 @@ jobs:
       - run: npm exec --no -- svelte-kit sync
       # Der Download von Browsern und Systempaketen hängt selten fest (sonst unter 3 Minuten).
       # Statt bis zum Job-Limit zu warten: je Versuch höchstens 5 Minuten, bis zu 3 Versuche.
+      # Nur der Browser dieses Geräts.
       - name: Browser installieren (bis 3 Versuche)
+        env:
+          BROWSER: ${{ matrix.browser }}
         run: |
           for versuch in 1 2 3; do
-            if timeout --kill-after=10s 5m npm run e2e:browser; then exit 0; fi
+            if timeout --kill-after=10s 5m npm exec --no -- playwright install --with-deps "$BROWSER"; then exit 0; fi
             echo "::warning::Browser-Download, Versuch $versuch abgebrochen oder fehlgeschlagen"
           done
           exit 1
-      - run: npm run e2e
+      - name: E2E-Tests
+        env:
+          GERAET: ${{ matrix.geraet }}
+        run: npm run e2e -- --project="$GERAET"
       - name: Ergebnisse und Screenshots sichern
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: test-results
+          name: test-results-${{ matrix.geraet }}
           path: test-results/
           retention-days: 30
           if-no-files-found: warn
