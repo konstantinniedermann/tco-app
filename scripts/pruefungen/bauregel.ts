@@ -17,13 +17,15 @@ function exportiertActions(inhalt: string): boolean {
 }
 
 // Admin-Routen sind dünn: Sie importieren nur den Dienst-Einstieg und die Schnittstellen, und
-// von den Schnittstellen nur Einträge aus ADMIN_SCHNITTSTELLEN. Nur diese deckt der Rechte-Test
-// («ohne Sitzung 401, ohne Rolle 403») ab.
+// von den Schnittstellen nur Einträge aus ADMIN_SCHNITTSTELLEN oder TURNIER_SCHNITTSTELLEN (Bereich
+// Clubmeisterschaft, offen auch für `cm`). Nur diese decken die Rechte-Tests ab.
 const ADMIN_ROUTE = /^src\/routes\/api\/admin\/(?:.*\/)?\+server\.(ts|js)$/;
-const ERLAUBTER_IMPORT = /(?:^|\/)lib\/server\/admin\/(?:index|schnittstellen)\.ts$|^\.\/\$types$/;
+const ERLAUBTER_IMPORT =
+	/(?:^|\/)lib\/server\/(?:admin\/(?:index|schnittstellen)|turnier\/schnittstellen)\.ts$|^\.\/\$types$/;
 const ADMIN_MODUL = /(?:^|\/|^\$)lib\/server\/admin(?:\/|$)/;
 const SCHNITTSTELLEN_DATEI = 'src/lib/server/admin/schnittstellen.ts';
-const SCHNITTSTELLEN_IMPORT = /(?:^|\/)lib\/server\/admin\/schnittstellen\.ts$/;
+const TURNIER_DATEI = 'src/lib/server/turnier/schnittstellen.ts';
+const SCHNITTSTELLEN_IMPORT = /(?:^|\/)lib\/server\/(?:admin|turnier)\/schnittstellen\.ts$/;
 const INDEX_IMPORT = /(?:^|\/)lib\/server\/admin\/index\.ts$/;
 const AUS_INDEX = new Set(['holeAdminDienste']);
 
@@ -74,10 +76,8 @@ function benannteNamen(klausel: string): [string, string][] | null {
 		});
 }
 
-function adminSchnittstellen(dateien: Map<string, string>): Set<string> | null {
-	const block = /\bexport\s+const\s+ADMIN_SCHNITTSTELLEN\s*=\s*\{([^}]*)\}/.exec(
-		dateien.get(SCHNITTSTELLEN_DATEI) ?? ''
-	);
+function schnittstellenListe(inhalt: string, konstante: string): Set<string> | null {
+	const block = new RegExp(`\\bexport\\s+const\\s+${konstante}\\s*=\\s*\\{([^}]*)\\}`).exec(inhalt);
 	if (!block) return null;
 	return new Set(
 		block[1]
@@ -85,6 +85,16 @@ function adminSchnittstellen(dateien: Map<string, string>): Set<string> | null {
 			.map((e) => e.split(':')[0].trim())
 			.filter((n) => n !== '')
 	);
+}
+
+function adminSchnittstellen(dateien: Map<string, string>): Set<string> | null {
+	const admin = schnittstellenListe(
+		dateien.get(SCHNITTSTELLEN_DATEI) ?? '',
+		'ADMIN_SCHNITTSTELLEN'
+	);
+	if (admin === null) return null;
+	const turnier = schnittstellenListe(dateien.get(TURNIER_DATEI) ?? '', 'TURNIER_SCHNITTSTELLEN');
+	return new Set([...admin, ...(turnier ?? [])]);
 }
 
 function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): string[] {
@@ -183,6 +193,7 @@ export function betrifftBauregel(pfad: string): boolean {
 	return (
 		pfad.startsWith('src/routes/') ||
 		pfad === SCHNITTSTELLEN_DATEI ||
+		pfad === TURNIER_DATEI ||
 		/^(vite|svelte)\.config\.[cm]?[tj]s$/.test(pfad) ||
 		/\.remote\.(ts|js)$/.test(pfad)
 	);

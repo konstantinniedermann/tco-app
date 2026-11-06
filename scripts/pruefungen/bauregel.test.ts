@@ -97,6 +97,25 @@ describe('Admin-Routen', () => {
 		expect(pruefe(`${gut}\n${dynamisch}`)).toHaveLength(1);
 	});
 
+	it('RR-07: Einträge aus TURNIER_SCHNITTSTELLEN sind erlaubt, andere aus turnier/schnittstellen.ts nicht', () => {
+		const turnierRoute = 'src/routes/api/admin/turniere/+server.ts';
+		const turnierListe: [string, string] = [
+			'src/lib/server/turnier/schnittstellen.ts',
+			'export const TURNIER_SCHNITTSTELLEN = {\n\tgetTurniere\n} satisfies Record<string, unknown>;'
+		];
+		const rumpf = (namen: string) =>
+			[
+				"import { holeAdminDienste } from '../../../../lib/server/admin/index.ts';",
+				`import { ${namen} } from '../../../../lib/server/turnier/schnittstellen.ts';`,
+				'export const GET = (e) => getTurniere(holeAdminDienste(), e);'
+			].join('\n');
+		const mit = (inhalt: string) =>
+			pruefeBauregel(new Map([liste, turnierListe, [turnierRoute, inhalt]]));
+		expect(mit(rumpf('getTurniere'))).toEqual([]);
+		expect(mit(rumpf('getTurniere, hilfe'))).toEqual([
+			`${turnierRoute}: Admin-Route nutzt 'hilfe'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
+		]);
+	});
 	it('RR-07: nur Funktionen aus ADMIN_SCHNITTSTELLEN (die der Rechte-Test abdeckt)', () => {
 		const fremd = gut.replace('{ getMitglied }', '{ getMitglied, mitAdmin }');
 		expect(pruefe(fremd)).toEqual([
