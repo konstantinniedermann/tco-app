@@ -405,3 +405,51 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Brainstorming #63 (Mitteilungen per Push und E-Mail).
 
 **Einschätzung:** Niedrig. Bei Doppel die Jahrgang-Felder ausblenden und FR-34 anpassen, am besten zusammen mit der Spielberechtigung aus #58.
+
+### 2026-11-06 — Service Worker ist von der Typprüfung ausgenommen, auch in der CI
+
+**Thema:** Betrieb
+
+**Fundort:** `tsconfig.json` (`"exclude": ["src/service-worker"]`), `src/service-worker/tsconfig.json`, `npm run check:svelte`
+
+**Beobachtung:** Der Service Worker hat eine eigene `tsconfig.json` mit den Typen von `$app/tsconfig/service-worker`; die Wurzel schliesst ihn aus. `svelte-check` in `make check-schnell`, `make check` und der CI läuft nur über die Wurzel, eine Prüfung mit der eigenen Konfiguration ruft niemand auf. Typfehler im Service Worker fielen erst im Build oder auf dem Gerät auf. Die Logik liegt zwar in `src/lib/push/nutzlast.ts` (geprüft und getestet), der Rahmen mit `push` und `notificationclick` aber nicht.
+
+**Ursprung:** #63, Mitteilungen per Push und E-Mail.
+
+**Einschätzung:** Niedrig, die Datei ist klein. Ein zusätzlicher Aufruf `tsc -p src/service-worker --noEmit` (nach `svelte-kit sync`) in `check:svelte` würde reichen.
+
+### 2026-11-06 — Verlauf der Mitteilungen am Handy: Tabelle schiebt seitlich und bricht stark um
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/verwaltung/Mitteilungsverlauf.svelte` (Verwaltung, Anlass-Seite und *Mitteilungen*)
+
+**Beobachtung:** Bei Handybreite (420 px) passen von sechs Spalten nur vier; *Weg* und *Erreicht* sind nur durch seitliches Schieben erreichbar, Titel und Text brechen nach zwei, drei Wörtern um. Gleiches Muster wie bei der Kategorientabelle (Eintrag oben).
+
+**Ursprung:** #63, Nachweis mit echtem Push (Screenshot des Verlaufs).
+
+**Einschätzung:** Eine Kartenliste statt Tabelle wäre am Handy besser lesbar, braucht aber einen neuen Baustein im UI-Leitbild. Zusammen mit der Kategorientabelle lösen. Die Verwaltung wird vor allem am PC genutzt, darum niedrig.
+
+### 2026-11-06 — Mitteilungen zur Clubmeisterschaft warten auf die Spielberechtigung aus #58
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** #63 (Teil Clubmeisterschaft), `docs/fachmodell.md` (*Mitteilung*: «die Clubmeisterschaft folgt später»), N-APP-02 in `docs/anforderungen/anforderungen.md`
+
+**Beobachtung:** #63 liefert Push und Mitteilungen zu Anlässen und an den Verein. Mitteilungen zur Clubmeisterschaft (z. B. an alle Spielberechtigten einer Kategorie) brauchen die Spielberechtigung, die erst mit #58 kommt. Das Thema *Clubmeisterschaft* ist im Profil schon wählbar, es gibt aber noch keinen Versand dazu.
+
+**Ursprung:** #63, Abschluss.
+
+**Einschätzung:** Kein eigener Vorgang nötig, solange #63 den CM-Teil offen führt; nach #58 dort weiterbauen.
+
+### 2026-11-06 — RR-03 auf dem iPhone vereinzelt rot: Rückfrage erscheint nicht nach «Rollen speichern»
+
+**Thema:** Betrieb
+
+**Fundort:** Profil `iphone` (WebKit), `tests/e2e/verwaltung.test.ts:204` (RR-03, letzter MyTCO-Admin)
+
+**Beobachtung:** Im vollen `make check` rot, einzeln mit `--project=iphone --repeat-each=5` 1 von 5 rot. Im Fehlerbild ist *MyTCO-Admin* abgehakt, die Rückfrage «Rolle MyTCO-Admin entziehen?» aber nicht offen; kein Seitenfehler. Der Test öffnet die Mitgliedseite mit `page.goto` und klickt gleich danach. Der Branch (#63) ändert weder den Test noch die Mitgliedseite.
+
+**Ursprung:** #63, Nachweislauf von `make check`.
+
+**Einschätzung:** Vermutlich Klick vor der Hydration (Häkchen geht im HTML auch ohne Svelte, die Taste nicht). Im Test vor dem Klick auf ein Zeichen der fertigen Seite warten.
