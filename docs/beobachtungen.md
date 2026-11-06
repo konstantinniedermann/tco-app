@@ -151,3 +151,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Branch `feat/schnellere-merges`, Nachweisläufe von `make check`.
 
 **Einschätzung:** Vermutlich derselbe Wettlauf wie im archivierten Thema, unter lokaler Last mit mehr Workern häufiger. Der Trigger im Archiv zählt nur CI; lokal wäre eine eigene Regel zu überlegen (z. B. den Seitenfehler gezielt ignorieren, wenn die Seite danach korrekt geladen ist).
+
+### 2026-11-06 — Grüner Stand: Abwägung «lokal weniger prüfen, CI fängt auf» ohne ADR
+
+**Thema:** Betrieb
+
+**Fundort:** `scripts/pruefungen/gruener-stand.ts`, `.githooks/pre-push`, `docs/ci-cd-und-release.md` («Grüner Stand»)
+
+**Beobachtung:** Der Pre-Push-Hook lässt `make check` aus, wenn derselbe Stand schon grün geprüft wurde und seither nur Doku und die Versionsnummer dazukamen. Die Begründung (Wartezeit gegen lokale Schranke, die CI prüft jeden Push auf `dev`) steht nur in der Release-Doku und im Commit, nicht als ADR. Die Versionsregel bekam für eine Abwägung von ähnlichem Gewicht nachträglich ADR-007.
+
+**Ursprung:** Review (`cas-reviewer`) des Branches `feat/schnellere-merges`.
+
+**Einschätzung:** Ein kurzes ADR wäre konsistent mit ADR-007; nötig wird es spätestens, wenn jemand die Schranke wieder verschärfen oder weiter lockern will.
+
+### 2026-11-06 — npm-Skript e2e:browser wird nirgends mehr aufgerufen
+
+**Thema:** Betrieb
+
+**Fundort:** `package.json` (`e2e:browser`)
+
+**Beobachtung:** Die CI installiert Systempakete und Browser jetzt pro Gerät direkt über `playwright install-deps`/`install`. `e2e:browser` (beide Browser mit `--with-deps`) ruft weder die CI noch das Makefile noch die Doku auf.
+
+**Ursprung:** Review (`cas-reviewer`) des Branches `feat/schnellere-merges`.
+
+**Einschätzung:** Entweder als lokaler Einrichtungsbefehl in README/Makefile nennen oder entfernen; eine Änderung an `package.json` zählt als Code und bringt eine Versionsnummer, daher mit dem nächsten Code-Merge erledigen.
