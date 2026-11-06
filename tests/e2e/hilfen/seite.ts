@@ -25,23 +25,34 @@ export async function klappeAuf(page: Page, titel: string): Promise<void> {
 }
 
 /**
- * Wartet, bis der Browser eine Weile nichts mehr lädt. Die Reiter laden den Code der anderen
- * Seiten gleich beim Anzeigen vor (`data-sveltekit-preload-code="eager"`); ein `page.goto`
- * mitten hinein bricht das Laden ab, und WebKit meldet das als Konsolenfehler («Importing a
- * module script failed»).
+ * Wartet, bis die Reiter den Code ihrer Seiten fertig vorgeladen haben. Sie laden ihn gleich beim
+ * Anzeigen (`data-sveltekit-preload-code="eager"`); ein `page.goto` mitten hinein bricht das
+ * Laden ab, und WebKit meldet das als Konsolenfehler («Importing a module script failed»).
+ * Lädt dieselben Seitenmodule über das App-Modul von SvelteKit: Ein Import derselben Adresse
+ * teilt sich das Laden mit dem Vorladen, das Warten endet also genau, wenn alles da ist.
  */
-export async function wartetAufRuhigesNetz(page: Page, ruheMs = 300): Promise<void> {
-	await new Promise<void>((fertig) => {
-		const ende = () => {
-			page.off('request', neu).off('requestfinished', neu).off('requestfailed', neu);
-			fertig();
+export async function wartetAufVorladen(page: Page): Promise<void> {
+	await page.evaluate(async () => {
+		const pfade = [...document.querySelectorAll<HTMLAnchorElement>('nav.reiter a[href]')].map(
+			(a) => new URL(a.href).pathname
+		);
+		if (pfade.length === 0) return;
+		const eintrag = performance
+			.getEntriesByType('resource')
+			.find((e) => /\/_app\/immutable\/entry\/app\.[^/]+\.js$/.test(new URL(e.name).pathname));
+		if (!eintrag) throw new Error('App-Modul von SvelteKit nicht gefunden');
+		// dictionary: Route → [Seite, Layouts]; negative Nummern stehen für Seiten mit Server-Load (~n).
+		const app = (await import(eintrag.name)) as {
+			nodes: (() => Promise<unknown>)[];
+			dictionary: Record<string, [number, (number | undefined)[]?]>;
 		};
-		let uhr = setTimeout(ende, ruheMs);
-		function neu() {
-			clearTimeout(uhr);
-			uhr = setTimeout(ende, ruheMs);
-		}
-		page.on('request', neu).on('requestfinished', neu).on('requestfailed', neu);
+		const nummern = pfade.flatMap((pfad) => {
+			const route = app.dictionary[pfad];
+			if (!route) throw new Error(`Route ${pfad} nicht im App-Modul`);
+			const [seite, layouts = []] = route;
+			return [seite, ...layouts].filter((n) => n !== undefined).map((n) => (n < 0 ? ~n : n));
+		});
+		await Promise.all(nummern.map((n) => app.nodes[n]()));
 	});
 }
 

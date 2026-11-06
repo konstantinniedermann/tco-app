@@ -6,7 +6,7 @@ import {
 	loescheTurnier,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
-import { pruefeBildschirm, sammleKonsolenfehler, wartetAufRuhigesNetz } from './hilfen/seite.ts';
+import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
 // Alle Browser kommen von 127.0.0.1 an denselben Server (Grenzen pro IP). Jeder Test braucht
 // darum nur die nötigen Anfragen: ein Brief-Login, ein Code für die Verwaltung.
@@ -32,8 +32,8 @@ async function meldeAn(page: Page, konto: Konto) {
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${konto.vorname}` })).toBeVisible();
-	// Die Startseite lädt den Code des Profils vor (Reiter); ein folgendes page.goto bräche das ab.
-	await wartetAufRuhigesNetz(page);
+	// Die Reiter laden den Code ihrer Seiten vor; ein folgendes page.goto bräche das ab.
+	await wartetAufVorladen(page);
 }
 
 /** Wie `bestaetige` in verwaltung.test.ts; ein Konto nur mit CM landet bei den Turnieren. */

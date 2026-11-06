@@ -13,7 +13,7 @@ import {
 	schliesseLoginHilfen,
 	setzeSpielerangaben
 } from './hilfen/login.ts';
-import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
 // CM Teil 2: Mitglieder melden sich am Handy zu Einzel-Kategorien an (A-ANMELDUNG-01 bis -03,
 // FR-37); die CM-Verwaltung wird gewarnt und kann nicht absagen (FR-35, FR-36).
@@ -68,6 +68,8 @@ async function meldeAn(page: Page, konto: Konto) {
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${konto.vorname}` })).toBeVisible();
+	// Die Reiter laden den Code ihrer Seiten vor; ein folgendes page.goto bräche das ab.
+	await wartetAufVorladen(page);
 }
 
 /** Karte einer Kategorie auf der CM-Seite, gefunden über ihren Namen. */
@@ -117,7 +119,7 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	await page.getByLabel('Mann').check();
 	await page.getByRole('button', { name: 'Weiter zu den Kategorien' }).click();
 
-	// FR-07: nur passende Einzel-Kategorien; die Damen-Kategorie und das Doppel fehlen.
+	// A-ANMELDUNG-03, FR-07: nur passende Einzel-Kategorien; die Damen-Kategorie und das Doppel fehlen.
 	await expect(page.getByText('0 von 3 Anmeldungen', { exact: true })).toBeVisible();
 	await expect(karte(page, 'Herren R1–R9')).toBeVisible();
 	await expect(karte(page, 'Herren R4–R9')).toBeVisible();
@@ -139,7 +141,7 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	await expect(karte(page, 'Herren R1–R9')).toContainText('Du bist angemeldet.');
 	await pruefeBildschirm(page, info, 'cm-angemeldet');
 
-	// A-ANMELDUNG-03: höchstens drei; danach sind die übrigen Tasten gesperrt.
+	// A-ANMELDUNG-02, FR-06: höchstens drei; danach sind die übrigen Tasten gesperrt.
 	await karte(page, 'Herren R4–R9').getByRole('button', { name: 'Anmelden' }).click();
 	await expect(page.getByRole('status')).toHaveText(
 		'Angemeldet für Herren R4–R9. Die Bestätigung kommt per Mail.'
