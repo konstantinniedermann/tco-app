@@ -610,3 +610,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Prüfung der Issue-Labels.
 
 **Einschätzung:** Beim nächsten Arbeiten an #29 die vier Punkte am Code prüfen und entweder in die DoD übernehmen (erledigt bzw. offen) oder bewusst verwerfen.
+
+### 2026-11-06 — make check baut die App doppelt: einmal selbst, einmal im Webserver der E2E-Tests
+
+**Thema:** Betrieb
+
+**Fundort:** `Makefile` (`check`: `npm run build`, dann `make e2e`), `playwright.config.ts` (`webServer.command`: `npm run build && …`)
+
+**Beobachtung:** `make check` baut die App mit `npm run build` und startet danach die E2E-Tests, deren Webserver noch einmal `npm run build` ausführt. In der CI baut jeder der drei E2E-Jobs ebenfalls selbst. Kostet lokal geschätzt 20–30 s pro voller Prüfung.
+
+**Ursprung:** Analyse, warum Merges lange dauern (Branch `feat/schnellere-merges`).
+
+**Einschätzung:** Kleine Ersparnis; ein Umbau müsste sicherstellen, dass die E2E-Tests nie gegen einen veralteten Build laufen. Erst angehen, wenn die Prüfdauer wieder stört.

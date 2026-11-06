@@ -15,6 +15,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   Reevaluations-Triggern (#16).
 - Warum jeder Merge nach `dev` mit Code eine eigene Versionsnummer bekommt, steht jetzt als
   [ADR-007](adr/adr-007-version-pro-merge.md).
+- Schnellere Merges: Die E2E-Tests laufen in der CI als drei parallele Jobs (iPhone, Android,
+  Desktop) statt nacheinander. Lokal merkt sich ein grünes `make check` den geprüften Stand;
+  der Pre-Push-Hook prüft ihn nicht noch einmal voll, wenn seither nur Doku und die
+  Versionsnummer dazukamen (`gruener-stand.ts`).
 
 ## 0.5.1 — Versionsnummer bei jedem Merge
 
