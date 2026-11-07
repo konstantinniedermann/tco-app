@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Lokaler pre-push-Hook (aktivieren: make hooks).
-# Branch-Schutz für private Repos gibt es auf GitHub nur mit Pro — daher lokal:
+# Zusätzlich zur Regel «main schützen» auf GitHub auch lokal:
 # Der Weg auf main ist immer ein PR aus dev, nie ein direkter Push.
 # Enthält ein gepushter Bereich Code, läuft vor dem Push make check (wie die CI) — ausser sein
 # Stand ist schon grün geprüft und seither kamen nur Doku und Versionsnummer dazu (gruener-stand.ts).

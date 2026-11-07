@@ -53,9 +53,13 @@ Protocol) und laufen darum nur in Chrome. WebKit bietet das nicht, die Safari-En
 den Passkey-Ablauf also nicht. Wie sich ein echter Authenticator auf iPhone und Android
 verhält, zeigt allein die [Checkliste](#checkliste-vor-dem-release).
 
-Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelheit; zuerst
-Login per Einmal-Code und eingeloggt bleiben, später *Daten ergänzen* beim ersten Login
-(FR-02, noch geplant).
+Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelheit. Heute
+(`tests/e2e/`): Login per Einmal-Code und eingeloggt bleiben, Passkey, Startseite, Hilfe und
+Datenschutzerklärung ohne Login, Profil mit E-Mail-Wechsel, Benachrichtigungen, Anlässe,
+Mitteilungen, Verwaltung mit Rollen, Austritt, Löschen und Auskunft, Turnier und Kategorien,
+CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, dazu Bedienung (Wappen,
+Statusleiste, Fusszeile, Fokusrahmen). Später *Daten ergänzen* beim ersten Login (FR-02, noch
+geplant).
 
 **Grenzen pro IP:** Alle Browser eines Laufs kommen von 127.0.0.1 an denselben Server; die
 Grenze von 10 Code-Anfragen pro IP und Stunde (SI-04) gilt für den ganzen Lauf, Login-Codes
@@ -100,9 +104,10 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
 
 - Wenige erfundene Personen, von Hand geschrieben und fest im Repo, ohne Generator für Namen
   oder Adressen. Seed-Daten und Testdaten der Test-Umgebung
-  (beide aus `scripts/erfundene-mitglieder.ts`); der Musterbrief nimmt dieselbe erste Person, aber mit eigener Adresse.
+  (beide aus `scripts/erfundene-mitglieder.ts`; Mona und Theo nur lokal aus `scripts/seed-lokal.ts`); der Musterbrief nimmt dieselbe erste Person, aber mit eigener Adresse.
   Die Beispiel-GV (`scripts/beispiel-anlass.ts`) legt für `make seed` fünf weitere erfundene
-  Mitglieder an.
+  Mitglieder an, das Beispielturnier (`scripts/beispiel-turnier.ts`) fünf weitere erfundene
+  Spieler mit Anmeldungen und einem Wildcard-Antrag.
 - Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
   (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
 - E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern im Format

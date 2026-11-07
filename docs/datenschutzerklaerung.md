@@ -50,7 +50,7 @@ du selbst einschaltest. Für nichts anderes.
   Doppelpartner sucht, sieht die Namen der Mitglieder, die für die Kategorie in Frage kommen.
 - Deine Gegner und dein Doppelpartner sehen während der Clubmeisterschaft deine E-Mail und
   Telefonnummer, damit ihr die Spiele absprechen könnt.
-- Den Spielplan des Finalwochenendes sehen alle, auch ohne Login.
+- Den Spielplan des Finalwochenendes sehen alle, auch ohne Login [**Vorschlag K-39**].
 - Die Kalenderdatei eines Anlasses (Titel, Zeit, Ort, Einladung) ist über ihren Link auch ohne
   Login abrufbar; sie enthält keine Angaben zu Personen.
 - Swiss Tennis erhält Anmeldungen, Resultate und Lizenzanträge.
@@ -68,6 +68,8 @@ Name in vergangenen Resultaten und bei deinen Anmeldungen zur Clubmeisterschaft;
 nach Beginn des Anlasses [**Vorschlag K-50**].
 
 Auf Wunsch erhältst du eine Auskunft über alle Daten, die wir von dir gespeichert haben.
+Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge und
+zurückgezogene Anmeldungen geben dir die CM-Admins Auskunft.
 
 **Login:** Du loggst dich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 dein Gerät das Login mit einem Cookie, bis du MyTCO ein Jahr nicht genutzt hast oder dich

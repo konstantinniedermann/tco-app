@@ -61,7 +61,7 @@ Bankdaten.
 |-----|-------|
 | Mitglied | alle eigenen Daten, auch die eigenen Anmeldungen zu Anlässen; den Änderungsverlauf zum eigenen Konto auf Anfrage bei der Ansprechperson |
 | Elternteil, der ein Kind führt | alle Daten des Kindes, ändert sie und meldet es an (Vorschlag K-08) |
-| Mitglieder-Admin | alle Daten der Mitglieder und den Änderungsverlauf; in der Liste *Für Fairgate* die selbst geänderten Kontaktangaben, bis er sie abhakt; alle Anmeldungen zu Anlässen mit Bemerkung (**Annahme K-50:** nur Mitglieder- und MyTCO-Admins, nicht der ganze Vorstand); Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
+| Mitglieder-Admin | alle Daten der Mitglieder (von der CM nur bestätigte Anmeldungen, ohne Wildcard-Anträge und Kommentare) und den Änderungsverlauf; in der Liste *Für Fairgate* die selbst geänderten Kontaktangaben, bis er sie abhakt; alle Anmeldungen zu Anlässen mit Bemerkung (**Annahme K-50:** nur Mitglieder- und MyTCO-Admins, nicht der ganze Vorstand); Einmal-Codes sind nach der Ausgabe für niemanden abrufbar |
 | MyTCO-Admin | alles, was eine der anderen Rollen sieht, auch Bemerkungen zu Anlässen und Wildcard-Kommentare, und den Änderungsverlauf; nur lesend. **Zweck:** die anderen Rollen unterstützen, Fehler suchen, die Rollenvergabe prüfen. *Ansicht als …* zeigt ihm nichts darüber hinaus. **Annahme K-18.4:** Die Rolle erhalten nur Personen, die MyTCO technisch betreuen (Projektleiter und seine Stellvertretung, vgl. SI-16), nicht weitere Vorstandsmitglieder; eine Abmachung des Vereins, die App erzwingt sie nicht |
 | CM-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung, Geschlecht und Jahrgang der Spieler (zum Zuordnen in Kategorien). Die Klassierung korrigiert auch der CM-Admin (A-ANMELDUNG-06, Matrix in `rollen-und-rechte.md`); Geschlecht und Jahrgang ändert nur der Mitglieder-Admin |
 | Lizenz-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
@@ -95,7 +95,9 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Auskunft** (Mitglieder-Admin, DS-07): druckbare Seite mit allen gespeicherten Daten des Mitglieds
   ausser Geheimnissen; Verlauf-Einträge, in denen die Person nur Urheber bei anderen ist, fehlen (sie
   nennen Dritte). Schritte der Verwaltung zeigt die Auskunft als «Mitgliederverwaltung», nicht mit dem
-  Namen des Admins. Das Erstellen steht im Änderungsverlauf.
+  Namen des Admins. Von der CM enthält sie nur bestätigte Anmeldungen, ohne Wildcard-Kommentar, weil
+  der Mitglieder-Admin Wildcard-Anträge nicht sieht; die übrigen Anmeldungen, Wildcard-Anträge und Kommentare
+  gibt auf Wunsch der CM-Admin bekannt. Das Erstellen steht im Änderungsverlauf.
 - **Mitglied löschen** (Mitglieder-Admin, DS-07): Bedenkzeit von 7 Tagen (Anzeige «wird gelöscht»); wie beim Austritt werden offene Anmeldungen zurückgezogen und Antworten zu kommenden Anlässen gelöscht. Die Markierung *für Fairgate offen* entfernt nur der Austritt; die Löschung räumt sie ohnehin ab. In dieser Zeit steht das Mitglied
   im Zustand *Löschung vorgemerkt*, das Login ist gesperrt, und der Mitglieder-Admin kann die Löschung
   rückgängig machen; dann gilt wieder der Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum). Nach der Woche wird gelöscht wie nach der Frist beim Austritt.

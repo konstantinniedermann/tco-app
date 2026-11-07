@@ -23,12 +23,6 @@
 		geloescht: 'gelöscht'
 	} as const;
 	const ANTWORT = { kommt: 'kommt', 'kommt-nicht': 'kommt nicht' } as const;
-	const CM_STATUS = {
-		bestaetigt: 'bestätigt',
-		beantragt: 'beantragt',
-		abgelehnt: 'abgelehnt',
-		zurueckgezogen: 'zurückgezogen'
-	} as const;
 
 	const THEMA = { anlaesse: 'Anlässe', cm: 'Clubmeisterschaft', verein: 'Verein' } as const;
 	const themen = $derived(
@@ -202,24 +196,21 @@
 
 	<h2>Clubmeisterschaft</h2>
 	{#if a.cm.length === 0}
-		<p>Keine Anmeldungen.</p>
+		<p>Keine bestätigten Anmeldungen.</p>
 	{:else}
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<div class="tabelle" role="region" aria-label="Clubmeisterschaft" tabindex="0">
 			<table>
 				<thead
 					><tr
-						><th scope="col">Turnier</th><th scope="col">Kategorie</th><th scope="col">Status</th
-						><th scope="col">Angemeldet am</th><th scope="col">Kommentar</th></tr
+						><th scope="col">Turnier</th><th scope="col">Kategorie</th><th scope="col"
+							>Angemeldet am</th
+						></tr
 					></thead
 				>
 				<tbody>
 					{#each a.cm as z, i (i)}
-						<tr
-							><td>{z.turnier}</td><td>{z.kategorie}</td><td>{CM_STATUS[z.status]}</td><td
-								>{datumText(z.angemeldetAm)}</td
-							><td>{z.kommentar ?? '–'}</td></tr
-						>
+						<tr><td>{z.turnier}</td><td>{z.kategorie}</td><td>{datumText(z.angemeldetAm)}</td></tr>
 					{/each}
 				</tbody>
 			</table>

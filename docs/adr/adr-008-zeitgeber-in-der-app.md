@@ -35,7 +35,9 @@ wurde, holt der Lauf nach dem Start nach.
 - Läuft die App nicht, wird nichts gelöscht; der nächste Start holt es nach.
 - Die Release-Checkliste prüft auf Test, dass der Zeitgeber läuft
   ([Testkonzept](../testkonzept.md)).
-- `ZEITGEBER=aus` schaltet ihn ab; die E2E-Tests tun das, damit kein Lauf ihre Daten löscht.
+- `ZEITGEBER=aus` schaltet ihn ab; die E2E-Tests tun das, damit kein Lauf ihre Daten löscht. Das
+  wirkt nur lokal und im E2E: `betrieb/compose.umgebung.yml` reicht die Variable nicht durch, auf
+  Test und Live läuft der Zeitgeber immer.
 
 ## Reevaluations-Trigger
 

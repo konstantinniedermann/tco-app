@@ -83,6 +83,10 @@ Grundsätze; das Werkzeug wird mit [#39](https://github.com/konstantinniedermann
    auf, die gar nicht erst startet.
 3. **An die Vereinsadresse:** Meldungen gehen an die Vereinsadresse, damit sie bei einer
    Übergabe mitwandern.
+4. **Löschlauf:** Der Zeitgeber der App löscht täglich nach den Fristen
+   ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)). Ein Fehlschlag steht nur als «Löschlauf
+   fehlgeschlagen» im Log des App-Containers (`src/lib/server/zeitgeber.ts`); die Überwachung
+   meldet ihn noch nicht.
 
 ## Übergabe-Checkliste
 
