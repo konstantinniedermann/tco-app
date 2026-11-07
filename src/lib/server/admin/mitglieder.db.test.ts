@@ -279,13 +279,19 @@ describe('listeMitglieder', () => {
 		expect(await listeMitglieder(db, { suche: u, status: 'aktiv' }, jetzt)).toEqual([]);
 	});
 
-	test('Liste ohne Statusfilter blendet gelöschte aus, mit Filter zeigt sie', async () => {
+	test('Gelöschte erscheinen in keiner Liste, auch nicht mit Filter «geloescht» (Konto fehlt)', async () => {
 		const u = randomUUID().slice(0, 8);
 		const id = await anlegen({ nachname: `Weg${u}` });
-		await db.update(mitglied).set({ status: 'geloescht' }).where(eq(mitglied.id, id));
+		// Wie der Löschlauf: nur der Name bleibt, das Konto ist weg.
+		await db
+			.update(mitglied)
+			.set({ status: 'geloescht', email: null, strasse: null, plz: null, ort: null })
+			.where(eq(mitglied.id, id));
+		await db.delete(konto).where(eq(konto.mitgliedId, id));
 		expect(await listeMitglieder(db, { suche: u }, jetzt)).toEqual([]);
-		const z = await listeMitglieder(db, { suche: u, status: 'geloescht' }, jetzt);
-		expect(z.map((x) => x.id)).toEqual([id]);
+		// Die Liste verbindet Mitglied und Konto: ohne Konto keine Zeile. Die Oberfläche hat
+		// keinen Filter «gelöscht».
+		expect(await listeMitglieder(db, { suche: u, status: 'geloescht' }, jetzt)).toEqual([]);
 	});
 
 	test('Liste zeigt Login-Stand: ohne-brief, brief-offen, eingeloggt, gesperrt', async () => {
