@@ -44,7 +44,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Anmeldungen zur CM (Kategorie, Status, bei Wildcard mit Kommentar), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
 | Anmeldungen zu Anlässen: Antwort *kommt* / *kommt nicht*, freiwillige Bemerkung (ohne Angaben zur Gesundheit) | Planung des Anlasses, z. B. der Generalversammlung (A-ANLASS-01) | nein |
 | *Erstellt von* am Anlass: der Mitglieder-Admin, der ihn angelegt hat | Rückfragen zum Anlass: nachvollziehen, wer ihn angelegt hat | — |
-| Austrittsdatum | Löschfrist nach Austritt | — |
+| Austrittsdatum; Zeitpunkt der Löschvormerkung und Zustand davor | Löschfrist, Bedenkzeit, Rückgängig | — |
 | *Verwaltet von*: Elternteil, der das Konto eines Juniors führt (Vorschlag K-08) | Kind ohne eigenes Login | — |
 | Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (A-MITGLIED-07) | — |
 
@@ -83,7 +83,8 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
   Antworten zu kommenden Anlässen gelöscht, die Markierung *für Fairgate offen* entfernt. Die Daten
   bleiben eine Frist lang, falls das Mitglied zurückkommt, dann werden sie gelöscht; der Name bleibt in
   vergangenen Resultaten (**Vorschlag K-38:** Austritt plus 1 Jahr; die Frist legt der Verein fest).
-  Vom Austritt erfährt MyTCO über die eingelesene Mitgliederliste (A-MITGLIED-07, K-17.1).
+  Heute erfasst der Mitglieder-Admin den Austritt von Hand; später übernimmt das das Einlesen der
+  Mitgliederliste (A-MITGLIED-07, K-17.1, [#46](https://github.com/konstantinniedermann/tco-app/issues/46)).
 - **Zeitgeber:** Ein täglicher Zeitgeber der App (auch kurz nach jedem Start; `ZEITGEBER=aus` schaltet
   ihn ab, ein Datenbank-Sperrschloss verhindert parallele Läufe) löscht, was fällig ist. Die Frist nach
   dem Austritt und die Bedenkzeit rechnen nach Schweizer Kalenderzeit; gelöscht wird nie vor dem
@@ -93,7 +94,8 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
   von*, Urheber oder Absender werden leer und erscheinen als *gelöschtes Konto*.
 - **Auskunft** (Mitglieder-Admin, DS-07): druckbare Seite mit allen gespeicherten Daten des Mitglieds
   ausser Geheimnissen; Verlauf-Einträge, in denen die Person nur Urheber bei anderen ist, fehlen (sie
-  nennen Dritte). Das Erstellen steht im Änderungsverlauf.
+  nennen Dritte). Schritte der Verwaltung zeigt die Auskunft als «Mitgliederverwaltung», nicht mit dem
+  Namen des Admins. Das Erstellen steht im Änderungsverlauf.
 - **Mitglied löschen** (Mitglieder-Admin, DS-07): Bedenkzeit von 7 Tagen (Anzeige «wird gelöscht»); wie beim Austritt werden offene Anmeldungen zurückgezogen und Antworten zu kommenden Anlässen gelöscht. Die Markierung *für Fairgate offen* entfernt nur der Austritt; die Löschung räumt sie ohnehin ab. In dieser Zeit steht das Mitglied
   im Zustand *Löschung vorgemerkt*, das Login ist gesperrt, und der Mitglieder-Admin kann die Löschung
   rückgängig machen; dann gilt wieder der Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum). Nach der Woche wird gelöscht wie nach der Frist beim Austritt.
@@ -102,7 +104,7 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Anmeldungen zu Anlässen:** ein Jahr nach Beginn des Anlasses (**Vorschlag K-50**), vom Zeitgeber gelöscht;
   mit dem Anlass sind alle Anmeldungen dazu ohnehin gelöscht.
-- **Push-Abo:** mit der Sitzung (Abmelden, Sitzung beendet, nach einem Jahr ohne Nutzung), beim Abschalten, wenn der Push-Dienst es als ungültig meldet, und mit dem Konto.
+- **Push-Abo:** mit der Sitzung (Abmelden, Sitzung beendet, nach einem Jahr ohne Nutzung), beim Abschalten, wenn der Push-Dienst es als ungültig meldet, beim Austritt und bei der Löschvormerkung sowie mit dem Konto.
 - **Verlauf der Mitteilungen:** 365 Tage nach dem Versand, ohne Hintergrund-Job: Jeder neue Versand löscht ältere Einträge mit; mit dem Anlass, wenn er gelöscht wird.
 - **Merker «Push-Hinweis abgelehnt»:** nur im Gerätespeicher.
 - **Eingelesene Mitgliederliste** (A-MITGLIED-07): wird nach dem Einlesen nicht aufbewahrt;
