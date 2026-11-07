@@ -34,6 +34,10 @@
 	const status = $derived(statusText(cm.turnier.status));
 	const anzahl = $derived(cm.eigene.length);
 	const voll = $derived(anzahl >= cm.grenze);
+	// FR-08: Nach dem Anmeldeschluss bleiben nur die laufenden Anträge zu sehen (ohne Tasten).
+	const wildcardSichtbar = $derived(
+		offen ? cm.wildcard : cm.wildcard.filter((k) => k.anmeldungId !== null)
+	);
 	const fragtAngaben = $derived(cm.fehlt.length > 0 && offen);
 
 	// FR-37: fehlende Angaben. Die Klassierung lässt sich hier zugleich setzen.
@@ -58,6 +62,7 @@
 	let wildcardZiel = $state<CmKategorie | null>(null);
 	let kommentar = $state('');
 	let kommentarFehler = $state<string | null>(null);
+	let kommentarFeld = $state<HTMLTextAreaElement>();
 	const knoepfe: Record<number, HTMLButtonElement | undefined> = {};
 
 	const FEHLER = {
@@ -143,6 +148,8 @@
 		if (laeuft || !k) return;
 		if (kommentar.trim() === '') {
 			kommentarFehler = 'Bitte schreib kurz, warum du hier spielen möchtest.';
+			await tick();
+			kommentarFeld?.focus();
 			return;
 		}
 		laeuft = true;
@@ -160,6 +167,8 @@
 				return;
 			case 'eingabe':
 				kommentarFehler = r.felder.kommentar ?? MELDUNG.stoerung;
+				await tick();
+				kommentarFeld?.focus();
 				return;
 			case 'abgemeldet':
 				await goto(resolve('/login'));
@@ -167,6 +176,7 @@
 			case 'voll':
 			case 'geschlossen':
 			case 'keine-wildcard':
+			case 'passt-nicht':
 				wildcardDialog?.close();
 				fehler = FEHLER[r.art];
 				await neuLaden();
@@ -338,20 +348,20 @@
 			{/if}
 		</div>
 	{:else}
-		{#if cm.fehlt.length === 0 && cm.wildcard.length === 0}
+		{#if cm.fehlt.length === 0 && wildcardSichtbar.length === 0}
 			<p>Für deine Angaben gibt es keine passende Kategorie.</p>
 		{/if}
 	{/each}
 
-	{#if offen && cm.wildcard.length > 0}
+	{#if wildcardSichtbar.length > 0}
 		<details
 			class="karte klappe"
-			open={istKlappeOffen('cm-wildcard')}
+			open={!offen || istKlappeOffen('cm-wildcard')}
 			ontoggle={(e) => merkeKlappe('cm-wildcard', e.currentTarget.open)}
 		>
 			<summary class="klappe-titel">Weitere Kategorien mit Wildcard-Antrag</summary>
 			<div>
-				{#each cm.wildcard as k (k.id)}
+				{#each wildcardSichtbar as k (k.id)}
 					<div class="karte kachel">
 						<span>
 							<strong>{k.name}</strong><br />
@@ -360,7 +370,7 @@
 							{#if k.anmeldungId !== null}<br /><span class="plakette">Wildcard beantragt</span
 								>{/if}
 						</span>
-						{#if !nurAnsehen}
+						{#if offen && !nurAnsehen}
 							{#if k.anmeldungId !== null}
 								<button
 									type="button"
@@ -381,7 +391,7 @@
 						{/if}
 					</div>
 				{/each}
-				{#if voll && !nurAnsehen}
+				{#if offen && voll && !nurAnsehen}
 					<p class="leise">Mehr als 3 Anmeldungen gehen nicht. Melde dich zuerst irgendwo ab.</p>
 				{/if}
 			</div>
@@ -424,6 +434,7 @@
 			<textarea
 				id="cm-kommentar"
 				rows="4"
+				bind:this={kommentarFeld}
 				maxlength={KOMMENTAR_MAX}
 				bind:value={kommentar}
 				required
