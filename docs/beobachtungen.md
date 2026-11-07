@@ -604,3 +604,39 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Schluss-Review von #60 (CM Teil 4).
 
 **Einschätzung:** Harmlos (die Oberfläche bietet nur Spieler aktiver Anmeldungen an), aber uneinheitlich. Bei der nächsten Arbeit an der Klassierung `status = 'aktiv'` mitprüfen. Nachtrag (Merge mit #43): Gelöschte weist `schreibeKlassierung` ab, weil ihre Anmeldung nach dem Anmeldeschluss aktiv in der Liste stehen kann; offen bleibt nur *ausgetreten*.
+
+### 2026-11-07 — Wiedereintritt und «Löschung rückgängig» ohne Rückfrage
+
+**Thema:** Rollen und Rechte
+
+**Fundort:** `src/lib/verwaltung/Mitgliedschaft.svelte` (Tasten «Wiedereintritt erfassen», «Löschung rückgängig machen»)
+
+**Beobachtung:** Beide Aktionen laufen ohne Rückfrage. Ein Fehltipp gibt einem ehemaligen Mitglied sofort das Login zurück, samt gespeicherter Admin-Rollen (die nach Entscheid wieder wirken).
+
+**Ursprung:** Schluss-Review #43 Etappe 3 («Declined to judge»); Entwurf und Plan sehen keine Rückfrage vor.
+
+**Einschätzung:** Umkehrbar (erneut Austritt erfassen), aber bei Admin-Rollen heikel. Kleine Ergänzung, falls gewünscht.
+
+### 2026-11-07 — Admin kann den eigenen Austritt erfassen
+
+**Thema:** Rollen und Rechte
+
+**Fundort:** `src/lib/server/admin/mitgliedschaft.ts` (`erfasseAustritt`, `merkeZumLoeschenVor`)
+
+**Beobachtung:** Ein Mitglieder-Admin kann sich selbst austragen oder zum Löschen vormerken und sperrt sich damit sofort aus. Nur der letzte MyTCO-Admin ist geschützt (RR-03).
+
+**Ursprung:** Schluss-Review #43 Etappe 3 («Declined to judge»).
+
+**Einschätzung:** Spec schweigt dazu; Regel für die Rollen-Doku, kein Fehler im Code.
+
+### 2026-11-07 — Wartezeit im Löschlauf-Test könnte auf der CI knapp sein
+
+**Thema:** Betrieb
+
+**Fundort:** `src/lib/server/admin/loeschung.db.test.ts` (Hilfe `wartetAuf`, etwa 2 s)
+
+**Beobachtung:** Der Test wartet höchstens rund 2 s, bis ein Lauf an einer Zeilensperre hängt. Auf einer ausgelasteten CI-Maschine kann das zu kurz sein; der Test würde dann laut scheitern, nicht falsch grün.
+
+**Ursprung:** Re-Review Task 4, #43 Etappe 3.
+
+**Einschätzung:** Nur beobachten; bei einem roten CI-Lauf die Grenze erhöhen.
