@@ -640,3 +640,75 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Re-Review Task 4, #43 Etappe 3.
 
 **Einschätzung:** Nur beobachten; bei einem roten CI-Lauf die Grenze erhöhen.
+
+### 2026-11-07 — Mitteilungsverlauf wird nur beim nächsten Versand gelöscht, nicht im täglichen Löschlauf
+
+**Thema:** Betrieb
+
+**Fundort:** `src/lib/server/mitteilung/verlauf.ts` (Löschen nach 365 Tagen), `src/lib/server/admin/loeschung.ts` (`raeumeAuf`), `docs/datenschutzerklaerung.md` («ein Jahr lang»)
+
+**Beobachtung:** Einträge im Mitteilungsverlauf, die älter als ein Jahr sind, löscht nur der nächste Versand einer Mitteilung. Wird keine verschickt, bleiben sie, und die Auskunft zeigt sie ohne Altersgrenze. `datenschutz.md` beschreibt das ehrlich, die Datenschutzerklärung sagt «ein Jahr lang».
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Das Löschen gehört in den täglichen Löschlauf (ADR-008); kleiner Code-Schritt mit DB-Test.
+
+### 2026-11-07 — Push geht an Geräte mit abgelaufener Sitzung, bis sich jemand anmeldet
+
+**Thema:** Betrieb
+
+**Fundort:** `src/lib/server/mitteilung/empfaenger.ts` (Empfänger-Abfrage), `src/lib/server/login/sitzung.ts` (Aufräumen nur beim Login), `src/lib/server/admin/auskunft.ts` (Push-Abos)
+
+**Beobachtung:** Die Empfänger-Abfrage prüft nicht, ob die Sitzung des Push-Abos noch gilt. Abgelaufene Sitzungen räumt erst der nächste Login irgendeines Mitglieds weg; bis dahin bekommt das Gerät weiter Push, und die Auskunft zeigt das Abo, aber nicht die Sitzung. `datenschutz.md` sagt: nach einem Jahr ohne Nutzung kein Abo mehr.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Abgelaufene Sitzungen im täglichen Löschlauf mitnehmen oder in der Abfrage ausfiltern.
+
+### 2026-11-07 — Themen-Schalter «Clubmeisterschaft» im Profil wirkt noch auf keinen Versand
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/push/Benachrichtigungen.svelte` (Schalter), `src/lib/server/mitteilung/empfaenger.ts` (liest `themaCm` nicht)
+
+**Beobachtung:** Mitglieder können «Clubmeisterschaft» abschalten, aber kein Versand liest den Schalter: Mitteilungen an den Verein gibt es nur zu Anlässen und Verein, CM-Meldungen an Einzelne ignorieren Themen absichtlich (FR-47). Wer abschaltet, glaubt, keine CM-Meldungen mehr zu bekommen.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Bis es CM-Mitteilungen an alle gibt, den Schalter ausblenden oder einen Hinweis darunter setzen.
+
+### 2026-11-07 — Austritt zieht CM-Anmeldungen nicht zurück, wenn die Anmeldung vor dem Schluss geschlossen wurde
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/cm/austritt.ts`, FR-04 in `docs/fachmodell.md` («bis zum Anmeldeschluss»)
+
+**Beobachtung:** Der Code zieht beim Austritt nur zurück, solange das Turnier *offen* ist. Hat der CM-Admin die Anmeldung vor dem Anmeldeschluss geschlossen, bleibt die Anmeldung eines Ausgetretenen stehen. Die Doku beschreibt das Soll «bis zum Anmeldeschluss».
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Code-Frage: Datum statt Status prüfen? Mit dem CM-Admin klären, ob ein Ausgetretener nach dem Schliessen von Hand entfernt werden soll.
+
+### 2026-11-07 — Datenschutzerklärung nennt Resultate, Lizenzanträge und Export an Swiss Tennis, die noch nicht gebaut sind
+
+**Thema:** Rollen und Rechte
+
+**Fundort:** `docs/datenschutzerklaerung.md` (Abschnitte «Welche Daten» und «Weitergabe»)
+
+**Beobachtung:** Die Erklärung nennt Resultate und Lizenzanträge als gespeichert und Swiss Tennis als Empfänger. Im Schema gibt es dafür noch keine Tabelle und keinen Export.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Vertretbar, weil die Erklärung den Ausbau vorwegnimmt; vor der Freigabe durch den Vorstand bewusst entscheiden, ob sie den Stand oder das Ziel beschreibt.
+
+### 2026-11-07 — Glossar kennt die Begriffe aus Etappe 3 und den Mitteilungen nicht
+
+**Thema:** Rollen und Rechte
+
+**Fundort:** `docs/glossar.md`
+
+**Beobachtung:** Es fehlen *Austritt*, *Wiedereintritt*, *Löschung vorgemerkt* («wird gelöscht»), «gelöschtes Konto», *Auskunft*, *Mitteilung*, *Thema*, *Weg* sowie eigene Einträge für *CM-Admin* und *Lizenz-Admin*.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Beim nächsten Doku-Durchgang nachtragen; die Begriffe stehen im Fachmodell.
