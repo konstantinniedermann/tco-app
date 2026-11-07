@@ -46,21 +46,21 @@ export type CmAnsicht = {
 };
 
 /** FR-06: höchstens drei aktive Anmeldungen je Turnier. */
-const GRENZE = 3;
+export const GRENZE = 3;
 
 /** Aktiv sind bestätigte und (ab Teil 4) beantragte Anmeldungen. */
 const AKTIV: AnmeldungStatus[] = ['bestaetigt', 'beantragt'];
-const istAktiv = inArray(anmeldung.status, AKTIV);
+export const istAktiv = inArray(anmeldung.status, AKTIV);
 
 const namenOrdnung = new Intl.Collator('de-CH');
 
-const spielerSpalten = {
+export const spielerSpalten = {
 	geschlecht: mitglied.geschlecht,
 	jahrgang: mitglied.jahrgang,
 	klassierung: mitglied.klassierung
 };
 
-const regelAus = (k: typeof kategorie.$inferSelect): KategorieRegel => ({
+export const regelAus = (k: typeof kategorie.$inferSelect): KategorieRegel => ({
 	art: k.art,
 	geschlecht: k.geschlecht,
 	jahrgangVon: k.jahrgangVon,
@@ -70,7 +70,7 @@ const regelAus = (k: typeof kategorie.$inferSelect): KategorieRegel => ({
 });
 
 /** Aktive Anmeldungen des Mitglieds in einem Turnier, nach Kategoriename. */
-async function eigeneAnmeldungen(db: DbOderTx, turnierId: number, mitgliedId: number) {
+export async function eigeneAnmeldungen(db: DbOderTx, turnierId: number, mitgliedId: number) {
 	return db
 		.select({ anmeldungId: anmeldung.id, kategorieId: kategorie.id, kategorie: kategorie.name })
 		.from(anmeldung)

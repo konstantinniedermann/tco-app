@@ -68,7 +68,8 @@ function vergebenesFeld(fehler: unknown): Vergeben['feld'] | null {
 	return null;
 }
 
-function maskiere(text: string): string {
+/** Platzhalter für `ilike` als gewöhnliche Zeichen. */
+export function maskiere(text: string): string {
 	return text.replace(/[\\%_]/g, (z) => `\\${z}`);
 }
 
