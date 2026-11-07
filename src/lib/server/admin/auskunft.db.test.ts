@@ -17,6 +17,7 @@ import {
 	kategorie,
 	konto,
 	mitglied,
+	mitteilung,
 	passkey,
 	pushAbo,
 	turnier
@@ -48,13 +49,20 @@ async function vollesMitglied() {
 	const m = await legeMitgliedAn(db, { vorname: 'Erika', nachname: 'Beispiel', rollen: ['cm'] });
 	await db
 		.update(mitglied)
-		.set({ telefon: '079 000 00 00', jahrgang: 1990, lizenznummer: 'L-123' })
+		.set({
+			telefon: '079 000 00 00',
+			jahrgang: 1990,
+			lizenznummer: 'L-123',
+			klassierung: 'R4',
+			fairgateOffenSeit: new Date('2026-10-01T08:00:00Z')
+		})
 		.where(eq(mitglied.id, m.mitgliedId));
 	await db
 		.update(konto)
 		.set({
 			briefCodeHash: `GEHEIM-BRIEFCODE-${randomUUID()}`,
-			briefCodeAblauf: new Date('2030-01-01T00:00:00Z')
+			briefCodeAblauf: new Date('2030-01-01T00:00:00Z'),
+			themaCm: false
 		})
 		.where(eq(konto.id, m.kontoId));
 	const kennung = await erstelleSitzung(db, m.kontoId, jetzt);
@@ -72,7 +80,8 @@ async function vollesMitglied() {
 		oeffentlicherSchluessel: 'GEHEIM-SCHLUESSEL',
 		rpId: 'mytco.example.org',
 		geraet: 'iPhone',
-		eingerichtetAm: new Date('2026-05-01T10:00:00Z')
+		eingerichtetAm: new Date('2026-05-01T10:00:00Z'),
+		zuletztBenutzt: new Date('2026-10-02T09:00:00Z')
 	});
 	const [a] = await db
 		.insert(anlass)
@@ -81,9 +90,19 @@ async function vollesMitglied() {
 			beginn: new Date('2027-03-19T18:30:00Z'),
 			ort: 'Clubhaus',
 			anmeldeschluss: new Date('2027-03-16T22:59:00Z'),
-			kalenderKennung: randomUUID()
+			kalenderKennung: randomUUID(),
+			erstelltVon: m.mitgliedId
 		})
 		.returning({ id: anlass.id });
+	await db.insert(mitteilung).values({
+		bezug: 'verein',
+		absenderId: m.mitgliedId,
+		gesendetAm: new Date('2026-09-01T10:00:00Z'),
+		titel: 'Platzsperre Erfunden',
+		text: 'GEHEIM-TEXT-NICHT-IN-AUSKUNFT',
+		auswahl: 'alle',
+		weg: 'push'
+	});
 	await db.insert(anlassAnmeldung).values({
 		anlassId: a.id,
 		mitgliedId: m.mitgliedId,
@@ -108,7 +127,13 @@ async function vollesMitglied() {
 		.returning({ id: kategorie.id });
 	const [an] = await db
 		.insert(anmeldung)
-		.values({ kategorieId: k.id, status: 'bestaetigt', angemeldetAm: jetzt, geaendertAm: jetzt })
+		.values({
+			kategorieId: k.id,
+			status: 'bestaetigt',
+			kommentar: 'Wildcard Erfunden',
+			angemeldetAm: new Date('2026-10-05T07:00:00Z'),
+			geaendertAm: jetzt
+		})
 		.returning({ id: anmeldung.id });
 	await db.insert(anmeldungSpieler).values({ anmeldungId: an.id, mitgliedId: m.mitgliedId });
 	// 60 Einträge: mehr als die 50 der Mitgliederseite.
@@ -139,21 +164,44 @@ describe('ladeAuskunft (DS-07)', () => {
 			lizenznummer: 'L-123'
 		});
 		expect(a!.rollen).toEqual(['cm']);
+		expect(a!.klassierung).toBe('R4');
+		expect(a!.fairgateOffenSeit).toEqual(new Date('2026-10-01T08:00:00Z'));
+		expect(a!.themen).toEqual(['anlaesse', 'verein']);
 		expect(a!.login).toEqual({
-			geraete: 1,
-			zuletztGenutzt: jetzt,
-			passkeys: [{ eingerichtetAm: new Date('2026-05-01T10:00:00Z') }],
-			pushGeraete: 1
+			geraete: [{ erstelltAm: jetzt, zuletztGenutzt: jetzt }],
+			passkeys: [
+				{
+					geraet: 'iPhone',
+					eingerichtetAm: new Date('2026-05-01T10:00:00Z'),
+					zuletztBenutzt: new Date('2026-10-02T09:00:00Z')
+				}
+			],
+			push: [{ eingerichtetAm: jetzt }]
 		});
+		expect(a!.anlaesseErstellt).toEqual([
+			{ titel: 'Saisonstart Erfunden', beginn: new Date('2027-03-19T18:30:00Z') }
+		]);
+		expect(a!.mitteilungen).toEqual([
+			{ titel: 'Platzsperre Erfunden', gesendetAm: new Date('2026-09-01T10:00:00Z') }
+		]);
 		expect(a!.anlaesse).toEqual([
 			{
 				titel: 'Saisonstart Erfunden',
 				beginn: new Date('2027-03-19T18:30:00Z'),
 				antwort: 'kommt-nicht',
-				bemerkung: 'Ferien'
+				bemerkung: 'Ferien',
+				geaendertAm: jetzt
 			}
 		]);
-		expect(a!.cm).toEqual([{ turnier: 'CM 2088', kategorie: 'Herren A', status: 'bestaetigt' }]);
+		expect(a!.cm).toEqual([
+			{
+				turnier: 'CM 2088',
+				kategorie: 'Herren A',
+				status: 'bestaetigt',
+				angemeldetAm: new Date('2026-10-05T07:00:00Z'),
+				kommentar: 'Wildcard Erfunden'
+			}
+		]);
 		expect(a!.verlauf).toHaveLength(60);
 		expect(a!.mitgliedschaft).toEqual({ austrittAm: null, vorgemerktAm: null, loeschtAm: null });
 	});

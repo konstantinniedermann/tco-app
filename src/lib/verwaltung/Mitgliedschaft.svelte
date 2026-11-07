@@ -29,6 +29,8 @@
 	let loeschDatum = $state('');
 	let fehler = $state<string | null>(null);
 	let veraltet = $state(false);
+	let titel = $state<HTMLHeadingElement>();
+	let erledigt = $state(false);
 
 	function frageAustritt() {
 		frist = wiedereintrittBis(new Date());
@@ -47,12 +49,17 @@
 		try {
 			fehler = null;
 			veraltet = false;
+			erledigt = false;
 			const a = await aktion(detail.id);
 			austrittFrage?.close();
 			loeschenFrage?.close();
 			if (await leiteUm(a)) return;
-			if (a.art === 'ok') await invalidateAll();
-			else if (a.art === 'veraltet') veraltet = true;
+			if (a.art === 'ok') {
+				erledigt = true;
+				await invalidateAll();
+				// Die Rückfrage ist zu und die Taste vielleicht weg: der Fokus geht zur Karte.
+				titel?.focus();
+			} else if (a.art === 'veraltet') veraltet = true;
 			else if (a.art === 'letzter-mytco')
 				fehler = 'Das ist der letzte MyTCO-Admin. Gib die Rolle zuerst jemand anderem.';
 			else if (a.art === 'frist-abgelaufen')
@@ -70,7 +77,7 @@
 </script>
 
 <section class="karte" aria-labelledby="mitgliedschaft-titel">
-	<h2 id="mitgliedschaft-titel">
+	<h2 id="mitgliedschaft-titel" tabindex="-1" bind:this={titel}>
 		Mitgliedschaft
 		{#if status === 'ausgetreten'}
 			<span class="plakette">ausgetreten</span>
@@ -114,6 +121,7 @@
 		{#if status === 'vorgemerkt'}
 			<p class="leise">Danach ist das Mitglied wieder {davor}, wie vorher.</p>
 		{/if}
+		<p class="leise" role="status">{erledigt ? 'Gespeichert.' : ''}</p>
 		{#if veraltet}
 			<p class="fehler" role="alert">{VERALTET}</p>
 			<div class="leiste">

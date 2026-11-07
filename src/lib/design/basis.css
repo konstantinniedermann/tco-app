@@ -1702,11 +1702,15 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	font-size: var(--groesse-gross);
 }
 
+.druckseite .tabelle {
+	box-shadow: none;
+	margin-bottom: var(--abstand-5);
+}
+
 .druckseite table {
 	width: 100%;
 	border-collapse: collapse;
 	font-size: var(--groesse-klein);
-	margin-bottom: var(--abstand-5);
 }
 
 .druckseite th,
@@ -1735,5 +1739,10 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	.druckseite {
 		padding: 0;
 		box-shadow: none;
+	}
+
+	/* Auf Papier scrollt nichts: Tabellen laufen ganz aus */
+	.druckseite .tabelle {
+		overflow: visible;
 	}
 }

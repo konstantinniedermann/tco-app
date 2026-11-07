@@ -29,21 +29,9 @@
 		zurueckgezogen: 'zurückgezogen'
 	} as const;
 
-	const anzahl = (n: number, eins: string, viele: string) => `${n} ${n === 1 ? eins : viele}`;
-	const geraete = $derived(
-		a.login.geraete === 0
-			? 'keines'
-			: `${a.login.geraete}${a.login.zuletztGenutzt ? `, zuletzt genutzt am ${datumText(a.login.zuletztGenutzt)}` : ''}`
-	);
-	const passkeys = $derived(
-		a.login.passkeys.length === 0
-			? 'keine'
-			: `${a.login.passkeys.length}, eingerichtet am ${a.login.passkeys.map((p) => datumText(p.eingerichtetAm)).join(', ')}`
-	);
-	const push = $derived(
-		a.login.pushGeraete === 0
-			? 'nicht eingeschaltet'
-			: `auf ${anzahl(a.login.pushGeraete, 'Gerät', 'Geräten')} eingeschaltet`
+	const THEMA = { anlaesse: 'Anlässe', cm: 'Clubmeisterschaft', verein: 'Verein' } as const;
+	const themen = $derived(
+		a.themen.length === 0 ? 'keine' : a.themen.map((t) => THEMA[t]).join(', ')
 	);
 	const mitgliedschaft = $derived.by(() => {
 		const m = a.mitgliedschaft;
@@ -83,100 +71,192 @@
 	</p>
 
 	<h2>Angaben</h2>
-	<table>
-		<tbody>
-			<tr><th scope="row">Name</th><td>{ang.vorname} {ang.nachname}</td></tr>
-			<tr><th scope="row">Adresse</th><td>{ang.strasse}, {ang.plz} {ang.ort}</td></tr>
-			<tr><th scope="row">E-Mail</th><td>{ang.email}</td></tr>
-			<tr><th scope="row">Telefon</th><td>{ang.telefon ?? '–'}</td></tr>
-			<tr><th scope="row">Mitgliedernummer</th><td>{ang.mitgliedernummer ?? '–'}</td></tr>
-			<tr
-				><th scope="row">Geschlecht, Jahrgang</th><td
-					>{ang.geschlecht ?? '–'}, {ang.jahrgang ?? '–'}</td
-				></tr
-			>
-			<tr><th scope="row">Lizenznummer</th><td>{ang.lizenznummer ?? '–'}</td></tr>
-		</tbody>
-	</table>
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<div class="tabelle" role="region" aria-label="Angaben" tabindex="0">
+		<table>
+			<tbody>
+				<tr><th scope="row">Name</th><td>{ang.vorname} {ang.nachname}</td></tr>
+				<tr><th scope="row">Adresse</th><td>{ang.strasse}, {ang.plz} {ang.ort}</td></tr>
+				<tr><th scope="row">E-Mail</th><td>{ang.email}</td></tr>
+				<tr><th scope="row">Telefon</th><td>{ang.telefon ?? '–'}</td></tr>
+				<tr><th scope="row">Mitgliedernummer</th><td>{ang.mitgliedernummer ?? '–'}</td></tr>
+				<tr
+					><th scope="row">Geschlecht, Jahrgang</th><td
+						>{ang.geschlecht ?? '–'}, {ang.jahrgang ?? '–'}</td
+					></tr
+				>
+				<tr
+					><th scope="row">Klassierung, Lizenznummer</th><td
+						>{a.klassierung ?? '–'}, {ang.lizenznummer ?? '–'}</td
+					></tr
+				>
+				{#if a.fairgateOffenSeit}
+					<tr
+						><th scope="row">Für Fairgate offen</th><td>seit {datumText(a.fairgateOffenSeit)}</td
+						></tr
+					>
+				{/if}
+			</tbody>
+		</table>
+	</div>
 
 	<h2>Mitgliedschaft und Rollen</h2>
-	<table>
-		<tbody>
-			<tr
-				><th scope="row">Status</th><td
-					>{STATUS[a.status]}{mitgliedschaft ? `, ${mitgliedschaft}` : ''}</td
-				></tr
-			>
-			<tr
-				><th scope="row">Rollen</th><td
-					>{['Mitglied', ...a.rollen.map((r) => ROLLEN_NAME[r])].join(', ')}</td
-				></tr
-			>
-		</tbody>
-	</table>
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<div class="tabelle" role="region" aria-label="Mitgliedschaft und Rollen" tabindex="0">
+		<table>
+			<tbody>
+				<tr
+					><th scope="row">Status</th><td
+						>{STATUS[a.status]}{mitgliedschaft ? `, ${mitgliedschaft}` : ''}</td
+					></tr
+				>
+				<tr
+					><th scope="row">Rollen</th><td
+						>{['Mitglied', ...a.rollen.map((r) => ROLLEN_NAME[r])].join(', ')}</td
+					></tr
+				>
+				<tr><th scope="row">Mitteilungen</th><td>{themen}</td></tr>
+			</tbody>
+		</table>
+	</div>
 
 	<h2>Login und Geräte</h2>
-	<table>
-		<tbody>
-			<tr><th scope="row">Eingeloggte Geräte</th><td>{geraete}</td></tr>
-			<tr><th scope="row">Passkeys</th><td>{passkeys}</td></tr>
-			<tr><th scope="row">Push-Mitteilungen</th><td>{push}</td></tr>
-		</tbody>
-	</table>
+	{#if a.login.geraete.length === 0 && a.login.passkeys.length === 0 && a.login.push.length === 0}
+		<p>Keine Geräte, keine Passkeys, keine Push-Mitteilungen.</p>
+	{:else}
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<div class="tabelle" role="region" aria-label="Login und Geräte" tabindex="0">
+			<table>
+				<thead
+					><tr
+						><th scope="col">Art</th><th scope="col">Eingerichtet am</th><th scope="col"
+							>Zuletzt genutzt</th
+						></tr
+					></thead
+				>
+				<tbody>
+					{#each a.login.geraete as z, i (i)}
+						<tr
+							><td>Eingeloggtes Gerät</td><td>{datumText(z.erstelltAm)}</td><td
+								>{datumText(z.zuletztGenutzt)}</td
+							></tr
+						>
+					{/each}
+					{#each a.login.passkeys as z, i (i)}
+						<tr
+							><td>Passkey ({z.geraet})</td><td>{datumText(z.eingerichtetAm)}</td><td
+								>{z.zuletztBenutzt ? datumText(z.zuletztBenutzt) : '–'}</td
+							></tr
+						>
+					{/each}
+					{#each a.login.push as z, i (i)}
+						<tr><td>Push-Mitteilungen</td><td>{datumText(z.eingerichtetAm)}</td><td>–</td></tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	{/if}
 
 	<h2>Anlässe</h2>
 	{#if a.anlaesse.length === 0}
 		<p>Keine Antworten.</p>
 	{:else}
-		<table>
-			<thead
-				><tr><th scope="col">Anlass</th><th scope="col">Datum</th><th scope="col">Antwort</th></tr
-				></thead
-			>
-			<tbody>
-				{#each a.anlaesse as z, i (i)}
-					<tr
-						><td>{z.titel}</td><td>{datumText(z.beginn)}</td><td
-							>{ANTWORT[z.antwort]}{z.bemerkung ? `, «${z.bemerkung}»` : ''}</td
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<div class="tabelle" role="region" aria-label="Anlässe" tabindex="0">
+			<table>
+				<thead
+					><tr
+						><th scope="col">Anlass</th><th scope="col">Datum</th><th scope="col">Antwort</th><th
+							scope="col">Geändert am</th
 						></tr
-					>
-				{/each}
-			</tbody>
-		</table>
+					></thead
+				>
+				<tbody>
+					{#each a.anlaesse as z, i (i)}
+						<tr
+							><td>{z.titel}</td><td>{datumText(z.beginn)}</td><td
+								>{ANTWORT[z.antwort]}{z.bemerkung ? `, «${z.bemerkung}»` : ''}</td
+							><td>{datumText(z.geaendertAm)}</td></tr
+						>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	{/if}
+
+	{#if a.anlaesseErstellt.length > 0}
+		<h2>Von dir angelegte Anlässe</h2>
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<div class="tabelle" role="region" aria-label="Angelegte Anlässe" tabindex="0">
+			<table>
+				<thead><tr><th scope="col">Anlass</th><th scope="col">Datum</th></tr></thead>
+				<tbody>
+					{#each a.anlaesseErstellt as z, i (i)}
+						<tr><td>{z.titel}</td><td>{datumText(z.beginn)}</td></tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	{/if}
 
 	<h2>Clubmeisterschaft</h2>
 	{#if a.cm.length === 0}
 		<p>Keine Anmeldungen.</p>
 	{:else}
-		<table>
-			<thead
-				><tr
-					><th scope="col">Turnier</th><th scope="col">Kategorie</th><th scope="col">Status</th></tr
-				></thead
-			>
-			<tbody>
-				{#each a.cm as z, i (i)}
-					<tr><td>{z.turnier}</td><td>{z.kategorie}</td><td>{CM_STATUS[z.status]}</td></tr>
-				{/each}
-			</tbody>
-		</table>
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<div class="tabelle" role="region" aria-label="Clubmeisterschaft" tabindex="0">
+			<table>
+				<thead
+					><tr
+						><th scope="col">Turnier</th><th scope="col">Kategorie</th><th scope="col">Status</th
+						><th scope="col">Angemeldet am</th><th scope="col">Kommentar</th></tr
+					></thead
+				>
+				<tbody>
+					{#each a.cm as z, i (i)}
+						<tr
+							><td>{z.turnier}</td><td>{z.kategorie}</td><td>{CM_STATUS[z.status]}</td><td
+								>{datumText(z.angemeldetAm)}</td
+							><td>{z.kommentar ?? '–'}</td></tr
+						>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	{/if}
+
+	{#if a.mitteilungen.length > 0}
+		<h2>Von dir gesendete Mitteilungen</h2>
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<div class="tabelle" role="region" aria-label="Gesendete Mitteilungen" tabindex="0">
+			<table>
+				<thead><tr><th scope="col">Titel</th><th scope="col">Gesendet am</th></tr></thead>
+				<tbody>
+					{#each a.mitteilungen as z, i (i)}
+						<tr><td>{z.titel}</td><td>{datumText(z.gesendetAm)}</td></tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	{/if}
 
 	<h2>Änderungsverlauf (letzte 12 Monate)</h2>
 	{#if a.verlauf.length === 0}
 		<p>Keine Einträge.</p>
 	{:else}
-		<table>
-			<thead
-				><tr><th scope="col">Wann</th><th scope="col">Wer</th><th scope="col">Was</th></tr></thead
-			>
-			<tbody>
-				{#each a.verlauf as z, i (i)}
-					<tr><td>{datumText(z.zeitpunkt)}</td><td>{z.urheber}</td><td>{aktionText(z)}</td></tr>
-				{/each}
-			</tbody>
-		</table>
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<div class="tabelle" role="region" aria-label="Änderungsverlauf" tabindex="0">
+			<table>
+				<thead
+					><tr><th scope="col">Wann</th><th scope="col">Wer</th><th scope="col">Was</th></tr></thead
+				>
+				<tbody>
+					{#each a.verlauf as z, i (i)}
+						<tr><td>{datumText(z.zeitpunkt)}</td><td>{z.urheber}</td><td>{aktionText(z)}</td></tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	{/if}
 	<p class="leise">
 		Ohne alte und neue Werte. Wer was sieht und wie lange MyTCO Daten aufbewahrt, steht in der

@@ -396,7 +396,7 @@ Seite *Auskunft*.
   dem Bildschirm mit Innenabstand, auf Papier ohne.
 - **Kopfzeile:** Wappen auf `--farbe-marke` in einem Quadrat mit `--radius`, daneben «MyTCO · TC Olten»,
   darunter Titel und Untertitel.
-- **Tabellen:** Abschnitt als `<h2>` mit Tabelle darunter; 1 px Linien in `--farbe-rand`, Bezeichnung
+- **Tabellen:** Abschnitt als `<h2>` mit Tabelle darunter in `.tabelle` (benannte Region mit `tabindex="0"`, auf dem Handy waagrecht scrollbar, auf Papier nicht beschnitten); 1 px Linien in `--farbe-rand`, Bezeichnung
   links fett, Tabellenkopf in `--farbe-marke-zart`.
 - **Tasten:** «‹ Zurück» und «Drucken oder als PDF speichern» tragen `.nicht-drucken`.
 - **Druck:** Unter `@media print` verschwinden `.nicht-drucken`, `.seitenleiste` und `.kopf`; der
