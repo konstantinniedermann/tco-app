@@ -49,6 +49,7 @@ jobs:
       contents: read
     outputs:
       code: ${{ steps.erkennen.outputs.code }}
+      playwright: ${{ steps.playwright.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -84,6 +85,18 @@ jobs:
           fi
           echo "Basis: ${basis:-keine} -> code=${code}"
           echo "code=${code}" >> "$GITHUB_OUTPUT"
+      # Version für das Image der E2E-Jobs, aus dem geprüften Stand: So zieht das Image mit, wenn
+      # Dependabot Playwright aktualisiert. Nur eine reine Versionsnummer wird weitergegeben
+      # (Prüfung über den ganzen Wert: grep liesse eine zweite Zeile durch).
+      - name: Playwright-Version lesen
+        id: playwright
+        run: |
+          version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Playwright-Version nicht lesbar: $version"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
   pruefen:
     name: Prüfen (Lint, Tests, Build)
@@ -129,24 +142,23 @@ jobs:
   # Ein Job pro Gerät (Playwright-Projekt): Der Runner hat 2 Kerne, Playwright nutzt davon einen
   # Worker; nacheinander dauerten die drei Geräte gut 8 Minuten. Fällt ein Gerät durch, laufen
   # die anderen zu Ende. Die Auslieferung wartet auf alle drei.
+  # Die Jobs laufen im offiziellen Playwright-Image (Browser und Systempakete schon drin): Die
+  # Installation über apt hing am langsamen Ubuntu-Spiegel. Im Container erreichen die Tests
+  # Datenbank und Mailpit über die Service-Namen, nicht über localhost.
   e2e:
     name: E2E (${{ matrix.geraet }})
     needs: aenderung
     if: needs.aenderung.outputs.code == 'true'
     runs-on: ubuntu-latest
-    # Das Limit lässt Platz für den schlimmsten Fall der Installation (Systempakete 8 Minuten,
-    # dazu 3 Download-Versuche à 5 Minuten); es kostet nur, wenn etwas hängt.
-    timeout-minutes: 35
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.aenderung.outputs.playwright }}-noble
+      # Benutzer des Runners (Eigentümer des Arbeitsordners); --ipc=host empfiehlt Playwright für Chromium.
+      options: --user 1001 --ipc=host --init
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - geraet: iphone
-            browser: webkit
-          - geraet: android
-            browser: chromium
-          - geraet: desktop
-            browser: chromium
+        geraet: [iphone, android, desktop]
     permissions:
       contents: read
     services:
@@ -156,29 +168,27 @@ jobs:
           POSTGRES_USER: mytco
           POSTGRES_PASSWORD: mytco_lokal
           POSTGRES_DB: mytco
-        ports:
-          - 55432:5432
         options: >-
           --health-cmd "pg_isready -U mytco -d mytco"
           --health-interval 2s
           --health-timeout 3s
           --health-retries 20
-      # Fängt die Code-Mails; die Login-Tests lesen sie über die API (Port 58025).
+      # Fängt die Code-Mails; die Login-Tests lesen sie über die API (Port 8025).
       mail:
         image: axllent/mailpit:v1.33
-        ports:
-          - 51025:1025
-          - 58025:8025
         options: >-
           --health-cmd "/mailpit readyz"
           --health-interval 2s
           --health-timeout 3s
           --health-retries 20
-    # Wie .env.example; MYTCO_ADRESSE ist die baseURL von Playwright (Port 4173 ohne E2E_PORT).
+    # Wie .env.example, aber mit den Service-Namen und Container-Ports; MYTCO_ADRESSE ist die
+    # baseURL von Playwright (Port 4173 ohne E2E_PORT). Der Mail-Host `mail` gilt nur ohne
+    # NODE_ENV=production als erlaubt (einstellungen.ts); die E2E-Tests setzen es nicht.
     env:
-      DATABASE_URL: postgres://mytco:mytco_lokal@localhost:55432/mytco
+      DATABASE_URL: postgres://mytco:mytco_lokal@postgres:5432/mytco
       MYTCO_CODE_SCHLUESSEL: nur-lokal-nicht-fuer-produktion-0123456789abcdef
-      MYTCO_SMTP_URL: smtp://localhost:51025
+      MYTCO_SMTP_URL: smtp://mail:1025
+      MAILPIT_URL: http://mail:8025
       MYTCO_MAIL_ABSENDER: 'MyTCO <mytco@example.org>'
       MYTCO_KONTAKT: 'das Sekretariat (erfunden), sekretariat@example.org'
       MYTCO_ADRESSE: http://localhost:4173
@@ -192,25 +202,6 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm exec --no -- svelte-kit sync
-      # Systempakete einmal, ohne Wiederholung: Bricht ein Versuch ab, läuft sein apt-get weiter
-      # und hält die dpkg-Sperre, ein zweiter Versuch scheitert dann sicher. Ein langsamer
-      # Spiegelserver bekommt darum Zeit, statt abgebrochen zu werden. Nur für den Browser dieses Geräts.
-      - name: Systempakete für den Browser
-        timeout-minutes: 8
-        env:
-          BROWSER: ${{ matrix.browser }}
-        run: npm exec --no -- playwright install-deps "$BROWSER"
-      # Der Download des Browsers hängt selten fest (sonst unter 2 Minuten). Statt bis zum
-      # Job-Limit zu warten: je Versuch höchstens 5 Minuten, bis zu 3 Versuche.
-      - name: Browser herunterladen (bis 3 Versuche)
-        env:
-          BROWSER: ${{ matrix.browser }}
-        run: |
-          for versuch in 1 2 3; do
-            if timeout --kill-after=10s 5m npm exec --no -- playwright install "$BROWSER"; then exit 0; fi
-            echo "::warning::Browser-Download, Versuch $versuch abgebrochen oder fehlgeschlagen"
-          done
-          exit 1
       - name: E2E-Tests
         env:
           GERAET: ${{ matrix.geraet }}

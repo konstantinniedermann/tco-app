@@ -94,6 +94,19 @@ describe('Mitgliedernummer', () => {
 });
 
 describe('aendereAngaben', () => {
+	test('gelöschtes Mitglied: nicht-gefunden, Felder bleiben leer', async () => {
+		const m = await erfinde(db, { status: 'geloescht' });
+		await db
+			.update(mitglied)
+			.set({ email: null, strasse: null, plz: null, ort: null })
+			.where(eq(mitglied.id, m.mitgliedId));
+		const vorher = angaben({ email: '', strasse: '', plz: '', ort: '' });
+		const r = await aendereAngaben(db, urheber, m.mitgliedId, angaben(), vorher, jetzt);
+		expect(r.ergebnis).toBe('nicht-gefunden');
+		const [z] = await db.select().from(mitglied).where(eq(mitglied.id, m.mitgliedId));
+		expect(z.email).toBeNull();
+	});
+
 	test('A-MITGLIED-02, FR-26: Bearbeiten schreibt je geändertem Feld einen Eintrag', async () => {
 		const id = await anlegen();
 		const d = await ladeMitglied(db, id, jetzt);
@@ -105,18 +118,44 @@ describe('aendereAngaben', () => {
 			d!.angaben,
 			jetzt
 		);
-		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['ort', 'telefon'] });
+		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['ort', 'telefon'], alteEmail: null });
 		const verlauf = await ladeVerlauf(db, { mitgliedId: id, grenze: 10 });
 		const felder = verlauf.filter((v) => v.aktion === 'feld-geaendert').map((v) => v.detail);
 		expect(felder.sort()).toEqual(['ort', 'telefon']);
 		expect(JSON.stringify(verlauf)).not.toContain('Aarau');
 	});
 
+	test('SI-09: aendereAngaben meldet die alte Adresse nur bei geänderter E-Mail', async () => {
+		const id = await anlegen();
+		const d = (await ladeMitglied(db, id, jetzt))!;
+		const neueEmail = `neu-${randomUUID().slice(0, 8)}@example.org`;
+		const mitEmail = await aendereAngaben(
+			db,
+			urheber,
+			id,
+			{ ...d.angaben, email: neueEmail },
+			d.angaben,
+			jetzt
+		);
+		expect(mitEmail).toEqual({ ergebnis: 'ok', geaendert: ['email'], alteEmail: d.angaben.email });
+
+		const d2 = (await ladeMitglied(db, id, jetzt))!;
+		const nurTelefon = await aendereAngaben(
+			db,
+			urheber,
+			id,
+			{ ...d2.angaben, telefon: '+41 00 000 00 02' },
+			d2.angaben,
+			jetzt
+		);
+		expect(nurTelefon).toEqual({ ergebnis: 'ok', geaendert: ['telefon'], alteEmail: null });
+	});
+
 	test('FR-26: Speichern ohne echte Änderung schreibt nichts', async () => {
 		const id = await anlegen();
 		const d = await ladeMitglied(db, id, jetzt);
 		const r = await aendereAngaben(db, urheber, id, { ...d!.angaben }, d!.angaben, jetzt);
-		expect(r).toEqual({ ergebnis: 'ok', geaendert: [] });
+		expect(r).toEqual({ ergebnis: 'ok', geaendert: [], alteEmail: null });
 		const verlauf = await ladeVerlauf(db, { mitgliedId: id, grenze: 10 });
 		expect(verlauf.map((v) => v.aktion)).toEqual(['angelegt']);
 	});
@@ -142,7 +181,7 @@ describe('aendereAngaben', () => {
 		const geladen = (await ladeMitglied(db, id, jetzt))!.angaben;
 		// Admin A speichert eine neue Adresse …
 		const a = await aendereAngaben(db, urheber, id, { ...geladen, ort: 'Aarau' }, geladen, jetzt);
-		expect(a).toEqual({ ergebnis: 'ok', geaendert: ['ort'] });
+		expect(a).toEqual({ ergebnis: 'ok', geaendert: ['ort'], alteEmail: null });
 		// … Admin B hat noch den alten Stand und ändert das Telefon.
 		const b = await aendereAngaben(
 			db,
@@ -171,7 +210,7 @@ describe('aendereAngaben', () => {
 			neu,
 			jetzt
 		);
-		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['telefon'] });
+		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['telefon'], alteEmail: null });
 	});
 
 	test('A-MITGLIED-07: Mitgliedernummer eines anderen in anderer Schreibweise → vergeben', async () => {
@@ -227,13 +266,32 @@ describe('listeMitglieder', () => {
 		expect(await ids(`Beispiel${u}, Kurt`)).toEqual([]);
 	});
 
-	test('Liste ohne Statusfilter blendet gelöschte aus, mit Filter zeigt sie', async () => {
+	test('Filter «vorgemerkt» findet das vorgemerkte Mitglied; ohne Filter erscheint es', async () => {
+		const u = randomUUID().slice(0, 8);
+		const id = await anlegen({ nachname: `Vorg${u}` });
+		await db
+			.update(mitglied)
+			.set({ status: 'vorgemerkt', vorgemerktAm: jetzt, statusVorher: 'aktiv' })
+			.where(eq(mitglied.id, id));
+		const mit = await listeMitglieder(db, { suche: u, status: 'vorgemerkt' }, jetzt);
+		expect(mit.map((x) => [x.id, x.status])).toEqual([[id, 'vorgemerkt']]);
+		expect((await listeMitglieder(db, { suche: u }, jetzt)).map((x) => x.id)).toEqual([id]);
+		expect(await listeMitglieder(db, { suche: u, status: 'aktiv' }, jetzt)).toEqual([]);
+	});
+
+	test('Gelöschte erscheinen in keiner Liste, auch nicht mit Filter «geloescht» (Konto fehlt)', async () => {
 		const u = randomUUID().slice(0, 8);
 		const id = await anlegen({ nachname: `Weg${u}` });
-		await db.update(mitglied).set({ status: 'geloescht' }).where(eq(mitglied.id, id));
+		// Wie der Löschlauf: nur der Name bleibt, das Konto ist weg.
+		await db
+			.update(mitglied)
+			.set({ status: 'geloescht', email: null, strasse: null, plz: null, ort: null })
+			.where(eq(mitglied.id, id));
+		await db.delete(konto).where(eq(konto.mitgliedId, id));
 		expect(await listeMitglieder(db, { suche: u }, jetzt)).toEqual([]);
-		const z = await listeMitglieder(db, { suche: u, status: 'geloescht' }, jetzt);
-		expect(z.map((x) => x.id)).toEqual([id]);
+		// Die Liste verbindet Mitglied und Konto: ohne Konto keine Zeile. Die Oberfläche hat
+		// keinen Filter «gelöscht».
+		expect(await listeMitglieder(db, { suche: u, status: 'geloescht' }, jetzt)).toEqual([]);
 	});
 
 	test('Liste zeigt Login-Stand: ohne-brief, brief-offen, eingeloggt, gesperrt', async () => {
@@ -293,6 +351,12 @@ describe('Verlauf im Detail', () => {
 });
 
 describe('beendeSitzungenVon', () => {
+	test('gelöschtes Mitglied: nicht-gefunden, nichts wird geschrieben', async () => {
+		const m = await erfinde(db, { status: 'geloescht' });
+		expect(await beendeSitzungenVon(db, urheber, m.mitgliedId, jetzt)).toBe('nicht-gefunden');
+		expect(await ladeVerlauf(db, { mitgliedId: m.mitgliedId, grenze: 5 })).toEqual([]);
+	});
+
 	test('SI-07, FR-24: Sitzungen beenden erhöht die Sitzungsversion, Verlauf «sitzungen-beendet»', async () => {
 		const m = await erfinde(db);
 		await erstelleSitzung(db, m.kontoId, jetzt);

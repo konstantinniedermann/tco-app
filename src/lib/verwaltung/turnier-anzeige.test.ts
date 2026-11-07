@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import {
+	absageSperreText,
+	anmeldungenText,
+	anmeldungStatus,
 	datumKurz,
 	datumLang,
 	geschlechtText,
 	jahrgangText,
+	mitgliedVermerk,
 	klassierungText,
-	statusText
+	spielerGeschlechtText,
+	statusText,
+	trefferText,
+	unpassendText,
+	warnungText
 } from './turnier-anzeige.ts';
 
 describe('Anzeigehilfen für Turniere', () => {
@@ -55,5 +63,82 @@ describe('Anzeigehilfen für Turniere', () => {
 		expect(geschlechtText('damen')).toBe('Damen');
 		expect(geschlechtText('mixed')).toBe('Mixed');
 		expect(geschlechtText('offen')).toBe('offen');
+	});
+
+	it('FR-35, FR-36: Texte zu Anmeldungen mit richtiger Einzahl und Mehrzahl', () => {
+		expect(unpassendText(1)).toBe(
+			'1 Anmeldung passt nach der Änderung nicht mehr zu dieser Kategorie. Sie bleibt trotzdem stehen.'
+		);
+		expect(unpassendText(3)).toBe(
+			'3 Anmeldungen passen nach der Änderung nicht mehr zu dieser Kategorie. Sie bleiben trotzdem stehen.'
+		);
+		expect(absageSperreText(1)).toBe(
+			'Diese Kategorie hat 1 aktive Anmeldung. Absagen geht erst, wenn keine mehr da ist.'
+		);
+		expect(absageSperreText(2)).toBe(
+			'Diese Kategorie hat 2 aktive Anmeldungen. Absagen geht erst, wenn keine mehr da sind.'
+		);
+	});
+
+	it('FR-46: Warnungen beim Anmelden von Hand als kurze Sätze, in fester Reihenfolge', () => {
+		expect(warnungText(['passt-nicht', 'voll'])).toBe(
+			'Passt nicht zur Kategorie. Hat schon 3 Anmeldungen.'
+		);
+		expect(warnungText(['angaben-fehlen', 'passt-nicht', 'voll', 'geschlossen'])).toBe(
+			'Angaben fehlen. Passt nicht zur Kategorie. Hat schon 3 Anmeldungen. Anmeldung ist geschlossen.'
+		);
+		expect(warnungText([])).toBe('');
+	});
+
+	it('A-ANMELDUNG-06: Zähler der Anmeldungen nennt die Wildcard-Anträge', () => {
+		const z = (status: 'bestaetigt' | 'beantragt') => ({ status });
+		expect(anmeldungenText([])).toBe('Noch keine Anmeldungen.');
+		expect(anmeldungenText([z('bestaetigt')])).toBe('1 Anmeldung');
+		expect(anmeldungenText([z('beantragt')])).toBe('1 Anmeldung, 1 Wildcard-Antrag');
+		expect(
+			anmeldungenText([
+				z('bestaetigt'),
+				z('bestaetigt'),
+				z('bestaetigt'),
+				z('bestaetigt'),
+				z('beantragt')
+			])
+		).toBe('5 Anmeldungen, 1 Wildcard-Antrag');
+		expect(anmeldungenText([z('beantragt'), z('beantragt')])).toBe(
+			'2 Anmeldungen, 2 Wildcard-Anträge'
+		);
+	});
+
+	it('A-ANMELDUNG-06, FR-08: Status der Anmeldung als Plakette mit Text', () => {
+		expect(anmeldungStatus('bestaetigt')).toEqual({ text: 'bestätigt', klasse: 'plakette-ok' });
+		expect(anmeldungStatus('beantragt')).toEqual({
+			text: 'Wildcard beantragt',
+			klasse: 'plakette-offen'
+		});
+	});
+
+	it('FR-04: Vermerk am Namen nur bei Austritt, Löschvormerkung und Löschung', () => {
+		expect(mitgliedVermerk('aktiv')).toBeNull();
+		expect(mitgliedVermerk('ausgetreten')).toEqual({ text: 'ausgetreten', klasse: 'plakette' });
+		expect(mitgliedVermerk('vorgemerkt')).toEqual({
+			text: 'wird gelöscht',
+			klasse: 'plakette plakette-gesperrt'
+		});
+		expect(mitgliedVermerk('geloescht')).toEqual({ text: 'gelöscht', klasse: 'plakette' });
+	});
+
+	it('A-ANMELDUNG-06: Geschlecht und Angaben eines Spielers, Fehlendes als Strich', () => {
+		expect(spielerGeschlechtText('w')).toBe('weiblich');
+		expect(spielerGeschlechtText('m')).toBe('männlich');
+		expect(spielerGeschlechtText(null)).toBe('–');
+		expect(trefferText({ klassierung: 'R7', geschlecht: 'w', jahrgang: 1990 })).toBe(
+			'R7 · weiblich · 1990'
+		);
+		expect(trefferText({ klassierung: 'keine', geschlecht: 'm', jahrgang: null })).toBe(
+			'keine Lizenz · männlich · Jahrgang fehlt'
+		);
+		expect(trefferText({ klassierung: null, geschlecht: null, jahrgang: 2001 })).toBe(
+			'Klassierung fehlt · Geschlecht fehlt · 2001'
+		);
 	});
 });

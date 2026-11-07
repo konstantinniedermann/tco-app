@@ -116,6 +116,80 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-07 — Android-Test «Menü auf der Einstiegsseite» wartet unter Last vergeblich auf «MyTCO installieren»
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/bewegung.test.ts:375`, Profil `android`; wartet nach `bietetInstallationAn(page, 'dismissed')` auf die Taste «MyTCO installieren»
+
+**Beobachtung:** Lokal am 07.11. in 2 von 4 vollen Läufen rot (Timeout 30 s beim Klick), dazwischen grün, auch einzeln im vollen E2E-Lauf grün. Die Einstiegsseite war in den Branches des Tages nicht geändert. Jeder Fehlversuch kostet am Pre-Push-Hook ein ganzes `make check`.
+
+**Ursprung:** #60, Nachweisläufe und Push des Merges nach dev.
+
+**Einschätzung:** Vermutlich ein Wettlauf zwischen dem simulierten Install-Angebot und dem Rendern der Taste unter Last (parallele Worker, zusätzlicher Mailversand). Prüfen, ob die Hilfe auf ein Zeichen der Seite warten sollte, bevor sie das Angebot auslöst.
+
+### 2026-11-06 — Speichern ohne Seitenwechsel lässt Vorgeladenes stehen (Anlass- und CM-Seite)
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/routes/clubmeisterschaft/[id]/+page.svelte` (Angaben, An-/Abmelden), `src/routes/anlass/[id]/+page.svelte` (Anmeldung), Ziel jeweils die Startseite mit Zähler bzw. Stand
+
+**Beobachtung:** Seiten werden beim Antippen vorgeladen. Berührt man am Handy den Rücklink, ohne ihn zu öffnen (Scrollen), und meldet sich danach auf der Seite an oder ab, behält SvelteKit die vorgeladene Startseite; ein Tippen auf denselben Link zeigt den alten Stand. Auf der Kategorieseite der Verwaltung belegt (E2E rot) und dort mit `refreshAll()` nach dem Speichern behoben; die beiden Mitgliederseiten übernehmen den neuen Stand selbst (aus der Antwort oder per Nachladen) und verwerfen das Vorgeladene nicht.
+
+**Ursprung:** Merge von dev (Vorladen beim Antippen, `refreshAll`) in #58
+
+**Einschätzung:** Gleiches Muster wie auf der Kategorieseite, aber `refreshAll()` zeigt bei einem gescheiterten Nachladen die Fehlerseite statt der heutigen Meldung (`MELDUNG.stoerung`); das ist eine Abwägung für beide Seiten zusammen, kein Mitnehmen im Merge.
+
+### 2026-11-06 — Kleinbefunde aus den Reviews von #58 (CM Teil 2 Einzel-Anmeldung)
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/cm/`, `src/lib/server/turnier/`, `src/lib/cm/`, `src/routes/clubmeisterschaft/`, `scripts/`, `tests/e2e/cm-anmeldung.test.ts`
+
+**Beobachtung:** Aus den Task- und Schluss-Reviews, als «nicht vor dem Merge» eingestuft:
+- Bestätigungsmail wird mit `await` abgewartet (`src/lib/server/cm/schnittstellen.ts` ~:95): hängt SMTP, wartet die Antwort bis zum Timeout; die Hinweis-Mail der Verwaltung nutzt `void`.
+- Test-Turniere (2090–2099) aus E2E erscheinen auf der Startseite von `make dev`, weil E2E und dev die DB `mytco` teilen (wie Test-Anlässe).
+- Kein UI-Test für «Ansicht als Mitglied» auf der CM-Seite (Server-Riegel ist getestet); `verwaltung.test.ts` könnte es günstig mitprüfen.
+- Anmeldungen können unsichtbar werden: Kategorie Einzel→Doppel mit «Trotzdem speichern» oder gelöschtes Geschlecht/Jahrgang → aktive Anmeldung zählt zur Grenze, erscheint aber nicht mehr auf der Mitgliederseite; Teil 3/4 müssen das auffangen.
+- Turnier-Zeile in `meldeAn` ohne Sperre (kleines Rennen mit frühem Schliessen).
+- Tests: null-Klassierung gültig nicht getestet; Löschen eines Mitglieds mit Anmeldung (FK) nicht getestet; schwache `not.toBe('ok')`-Assertions und Doppel-Zweig in `meldeAn` ungetestet; `bisWartend` zählt Sperren DB-weit; Endpunkt-Test `passt-nicht` fehlt, `angaben-fehlen` ohne Mail-Check, fremd-Test ohne echtes fremdes Mitglied; Seed prüft `meldeAn`-Ergebnis und Anzahl je Kategorie nicht; E2E-Namen ohne FR-05/06/07/10; Selektor «letzte Zelle».
+- Code-Pflege: `jahrInZuerich`/1900-Regel doppelt; Fallback-404 nach Schreiben ohne Kommentar, Fehlerliste nicht aus Union typisiert; profil hängt von `cm/` ab; `ausstehend` bleibt nach Abbrechen; eine Zählabfrage je Kategorie in `ladeTurnier`; «3» fest in Texten; Geschlecht-Radios ohne `aria-invalid`; `rufe()` fast Kopie von `src/lib/anlass/api.ts`; `jahrgang()` doppelt; Non-null-Assertions in `passung.ts`.
+- Oberfläche: Leerraum über dem h2 in der Karte «Deine Angaben für die Clubmeisterschaft»; Klassierung speichern bei abgelaufener Sitzung zeigt generische Meldung (wie die übrigen Profilangaben).
+- E2E-Hilfe `wartetAufVorladen` ohne eigenes Timeout und abhängig von SvelteKit-Interna (`dictionary`/`nodes`) — scheitert laut, nicht still.
+
+**Ursprung:** Schluss-Review #58 (CM Teil 2)
+
+**Einschätzung:** Alles klein, nichts blockiert Teil 3/4; Punkt «unsichtbare Anmeldungen» bei Teil 4 aufnehmen.
+
+### 2026-11-06 — Kleinbefunde aus den Reviews von #43 (Rollen schärfen)
+
+**Thema:** Rollen und Rechte
+
+**Fundort:** `src/lib/server/admin/`, `src/lib/verwaltung/`, `src/routes/`, `scripts/`, `tests/e2e/`, `drizzle/0009_rollen_schaerfen.sql`
+
+**Beobachtung:** Aus den Task- und Schluss-Reviews, als «nicht vor dem Merge» eingestuft:
+- `postMitglied` (`src/lib/server/admin/schnittstellen.ts`): Dass der Hinweis an die alte Adresse bei `vergeben`/`veraltet` ausbleibt, ist ungetestet.
+- `src/lib/server/admin`: einmaliger, nicht reproduzierter Flake in den DB-Tests (vermutlich die geteilte DB).
+- `machAdmin` (`src/lib/server/admin/erster-admin.ts`) wertet das Ergebnis `veraltet` von `setzeRollen` nicht aus.
+- `src/lib/server/admin/schnittstellen-letzter-admin.db.test.ts` hängt von der Reihenfolge ab.
+- Migrationstest 0009 schreibt die Ausgangsdaten mit dem aktuellen TS-Schema; er altert mit jedem Schema-Wechsel.
+- `scripts/seed-lokal.ts` koppelt Rollen und Personas über Indizes.
+- Rechte-Matrix-Test (`src/lib/server/admin/rechte-matrix.db.test.ts`): Der Spread zweier Listen kann eine Namenskollision verdecken; Aufbau mit gleichen IDs; Testnamen ohne RR-/SI-Kennung.
+- `ANSICHT_ROLLEN` steht doppelt (Schema-Literal in `src/lib/server/db/schema.ts` und `src/lib/server/admin/rollen.ts`).
+- `ansicht_rolle` wird nur in `setzeRollen` gelöscht (`src/lib/server/admin/rollen.ts`); vor Etappe 3 beachten.
+- Ansicht als …: Eine Störung von `/api/sitzung` lässt die Tasten wieder erscheinen (der Server weist ab); zwei Quellen für denselben Zustand.
+- `src/routes/anlass/[id]/+page.svelte`: Hinweis «Datum oder Ort geändert» steht in der Ansicht ohne Aktion.
+- `nur-ansehen` ausserhalb der Verwaltung (zweiter Tab) ohne eigene Meldung.
+- Root-Load (`src/routes/+layout.ts`) fragt `/api/sitzung` auch auf öffentlichen Seiten ab; doppelte Anfrage in `src/routes/+page.ts` und `src/routes/profil/+page.ts`.
+- `fieldset.nur-lesen` ohne Erklärung für Screenreader; Band-Name «Ansicht» knapp.
+- Sperrmuster in 4 Formularen kopiert; Name `nurAnsehen` doppeldeutig; Export `NUR_ANSEHEN` (`src/lib/verwaltung/anzeige.ts`) ausserhalb der Datei unbenutzt.
+- E2E (`tests/e2e/verwaltung.test.ts`): axe nicht ganz am Testende; kein E2E für «keine Rückfrage in der Ansicht».
+- Befehlsname «Admin festlegen» (`make admin`, `scripts/admin-festlegen.ts`) passt nicht mehr zum Wortgebrauch der vier Rollen.
+
+**Ursprung:** #43 Reviews Rollen-Umbau.
+
+**Einschätzung:** Alles klein. `ansicht_rolle` und die doppelte Quelle für die Ansicht vor Etappe 3 ansehen; der Befehlsname lässt sich mit der nächsten Arbeit an den Skripten angleichen.
+
 ### 2026-11-06 — CI: langsamer Ubuntu-Spiegel macht den E2E-Lauf rot, auch nach dem Fix der apt-Sperre
 
 **Thema:** Betrieb
@@ -129,6 +203,10 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Einschätzung:** Ein Neustart des Jobs hilft meist. Dauerhaft wohl nur ohne apt: den E2E-Job im offiziellen Playwright-Container laufen lassen (Image mit Browsern und Systempaketen) — eine neue Abhängigkeit, braucht Freigabe. Alternativ apt mit eigenem Zeitlimit je Verbindung und einem zweiten Versuch, der den ersten sicher beendet (`sudo timeout …`).
 
 **Entscheid Nutzer (06.11.2026):** vorerst nichts ändern, Container allenfalls später. Abwägung: deutlich stabiler (kein Ubuntu-Download mehr), kaum schneller (der Pull des Images frisst den Gewinn grösstenteils), Image-Version muss mit Playwright mitgezogen werden.
+
+**Nachtrag (06.11.2026, nachmittags):** Nach dem Entscheid noch dreimal am selben Tag, jedes Mal mit demselben Abbruch nach 8 Minuten und nach einem Neustart des Jobs grün: Release-PR #62 (desktop), Merge 0.6.1 auf `dev` (android), Merge 0.7.0 auf `dev`, Lauf 42223464675 (iphone).
+
+**Umgesetzt (06.11.2026):** Entscheid revidiert, die E2E-Jobs laufen im Playwright-Image (Branch `fix/ci-playwright-container`); kein apt mehr. Der Umbau deckte einen App-Fehler auf (veraltete Seite nach dem Speichern durch Vorladen beim Überfahren), behoben in `fix/vorladen-veraltet`. Bei der nächsten Auswertung ins Archiv.
 
 ### 2026-11-06 — make check baut die App doppelt: einmal selbst, einmal im Webserver der E2E-Tests
 
@@ -177,6 +255,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) des Branches `feat/schnellere-merges`.
 
 **Einschätzung:** Entweder als lokaler Einrichtungsbefehl in README/Makefile nennen oder entfernen; eine Änderung an `package.json` zählt als Code und bringt eine Versionsnummer, daher mit dem nächsten Code-Merge erledigen.
+
+**Nachtrag (06.11.2026):** Die CI installiert gar nichts mehr, die E2E-Jobs laufen im Playwright-Image (`fix/ci-playwright-container`). `e2e:browser` bleibt damit erst recht ungenutzt; lokal installiert die README die Browser mit `playwright install chromium webkit`.
 
 ### 2026-11-06 — Live-Schlüssel könnte jetzt in einer Deployment-Umgebung nur für main liegen
 
@@ -298,3 +378,337 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Doku-Abgleich vor dem Release vom 06.11.2026.
 
 **Einschätzung:** Alles klein, Code-Änderungen mit `make check` und Korrekturnummer; nicht im reinen Doku-Release mitgemacht. Abdeckung: entweder `src/lib/turnier/**` mitmessen oder die Ausnahme im Testkonzept festhalten.
+
+### 2026-11-06 — «Importing a module script failed» auch einzeln reproduzierbar (SI-07, iPhone)
+
+**Thema:** Betrieb
+
+**Fundort:** Profil `iphone` (WebKit), `tests/e2e/verwaltung.test.ts:134` (SI-07), Seitenfehler-Sammlung `fehler` der Admin-Seite
+
+**Beobachtung:** Nachtrag zum Eintrag «lokal in make check: zwei rote von drei vollen Läufen»: SI-07 ist nicht nur unter Last rot. Einzeln mit `--project=iphone --repeat-each=10` auf dem Code von `origin/dev` 2 von 10 rot, nur durch «TypeError: Importing a module script failed.»; im vollen `make check` einmal rot, einmal grün. Der Test öffnet einen zweiten Browser-Kontext neben der Admin-Seite.
+
+**Ursprung:** Branch `feat/wappen-start`, Nachweisläufe von `make check`.
+
+**Einschätzung:** Gut reproduzierbar, damit untersuchbar: Mit `--repeat-each` lässt sich eine Ursache (z. B. ein Modul, das während eines Seitenwechsels nachgeladen und abgebrochen wird) eingrenzen. Bis dahin kostet er Wiederholungen von `make check`.
+
+### 2026-11-06 — Rückfrage «Nicht gespeichert» nach Speichern, wenn das Nachladen scheitert
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/routes/verwaltung/turniere/[id]/+page.svelte` (Speichern; Status setzen, Fall «unzulässig»), `src/routes/verwaltung/turniere/[id]/kategorien/[kid]/+page.svelte`, `src/routes/verwaltung/anlaesse/[id]/+page.svelte`; Marker `data-ungespeichert`
+
+**Beobachtung:** Scheitert nach erfolgreichem Speichern das Nachladen des Stands, wird das Formular nicht neu aufgebaut; es gilt weiter als geändert, und beim Verlassen kommt die Rückfrage, obwohl gespeichert ist. Wird beim Turnier ein Status-Wechsel als «unzulässig» abgewiesen, lädt die Seite den neuen Stand, baut das Formular aber nicht neu auf: Hat inzwischen ein anderer Admin etwas geändert, gilt das unberührte Formular als geändert. Die graue Speichern-Taste verhält sich schon bisher genauso.
+
+**Ursprung:** Review (`cas-reviewer`) des Branches `feat/wappen-start`.
+
+**Einschätzung:** Nur bei Störungen oder gleichzeitiger Bearbeitung; die Rückfrage schadet dann nicht (Verlassen geht). Beheben, wenn diese Seiten ohnehin angefasst werden: das Formular nach jedem Nachladen neu aufbauen wie bei den Angaben eines Mitglieds (`nachSpeichern`).
+
+### 2026-11-06 — Auswahlfeld «Geschlecht» ist im iPhone-Profil der Verwaltung nur halb so hoch wie die Textfelder
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/design/basis.css` (`.feld-zeile select`), sichtbar in `src/lib/verwaltung/Angabenformular.svelte` auf iPhone (WebKit)
+
+**Beobachtung:** Im E2E-Screenshot (iPhone-Profil) zeigt WebKit das `<select>` mit eigenem Aussehen (`menulist`): schmal, ohne den dicken Rand und ohne `--tippflaeche` als Mindesthöhe. Das gilt gesperrt (Baustein *Nur lesen*) wie bearbeitbar; das Kategorieformular hat dieselben Felder. Im selben Bild läuft auch die lange E-Mail-Adresse im Feld abgeschnitten.
+
+**Ursprung:** Screenshots zu #43 (Task 5, Rollen-Umbau der Oberfläche).
+
+**Einschätzung:** Vermutlich verletzt es UI-03 (48 px) am iPhone; die Abhilfe wäre wahrscheinlich `appearance: none` mit einem eigenen Pfeil. Das trifft alle Auswahlfelder, darum erst ins Leitbild und dann am Gerät prüfen.
+
+### 2026-11-06 — Migration, die alte Werte verbietet, legt Seed und E2E paralleler Worktrees lahm
+
+**Thema:** Betrieb
+
+**Fundort:** gemeinsame lokale Datenbank `mytco` aller Worktrees; `drizzle/0009_rollen_schaerfen.sql` (`konto_rolle_rolle_check` ohne `admin`)
+
+**Beobachtung:** Eine Migration, die alte Werte verbietet (hier die Rolle `admin`), lässt Seed und E2E paralleler Worktrees mit älterem Code scheitern, sobald ein Worktree sie in die gemeinsame Datenbank eingespielt hat. Zurück geht es nur mit einer neu aufgesetzten Datenbank. Die Wappen-Session musste auf eine eigene Datenbank `mytco_wappen` ausweichen.
+
+**Ursprung:** #43, Rollen-Umbau.
+
+**Einschätzung:** Eigene Datenbank pro Worktree für E2E erwägen, z. B. `DATABASE_URL` aus dem Namen des Worktrees ableiten, oder den Ausweg im Skill `tco-branching` beschreiben.
+
+### 2026-11-06 — Testkonten aus E2E-Läufen sammeln sich in der gemeinsamen Datenbank an
+
+**Thema:** Betrieb
+
+**Fundort:** gemeinsame lokale Datenbank `mytco`; Seite `/verwaltung/rollen`
+
+**Beobachtung:** Jeder E2E-Lauf legt neue erfundene Konten mit Rollen an, aufgeräumt wird nicht. Auf der Seite *Rollen* stehen z. B. 474 MyTCO-Admins. Das stört Screenshots als Nachweis, weil Listen und Zahlen nicht nach dem Verein aussehen.
+
+**Ursprung:** #43, Screenshots der Seite *Rollen*.
+
+**Einschätzung:** Zusammen mit dem Eintrag oben lösen: Eine eigene Datenbank pro Worktree oder pro Lauf hält die Listen klein; sonst Screenshots auf einer frisch mit `make seed` aufgesetzten Datenbank machen.
+
+**Ergänzung 2026-11-07 (#60):** Ein Wildcard-Antrag meldet alle CM-Admins (FR-47), bevor die Antwort kommt; lokal sind das 735 Testkonten, also rund 735 Mails pro Antrag. Mailpit behält nur die neuesten 500, Code-Mails paralleler Tests können dabei wegfallen, und die Antwort dauert länger. `holeMailCode` liest seither nur Mails mit dem Betreff «Dein Code für …», sonst griff ein CM-Konto die Wildcard-Meldung statt seines Codes. In der CI (frische Datenbank) unkritisch. Seit die Antwort nicht mehr auf die Meldungen wartet, verschickt der Dev-Server nach einem E2E-Lauf noch minutenlang diese Mails; das kann lokal zu wackligen Tests führen.
+
+### 2026-11-06 — Doppel-Kategorien erlauben Jahrgang von/bis, obwohl es im Doppel keine Alterskategorien gibt
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/verwaltung/Kategorieformular.svelte` (Felder Jahrgang auch bei *Doppel*), FR-34 in `docs/fachmodell.md`
+
+**Beobachtung:** Laut Projektleiter gibt es im Doppel nur Herren, Damen und Mixed, keine Alterskategorien. Formular und FR-34 lassen Jahrgang von/bis aber auch bei Doppel zu. Der Entwurf zu Mitteilungen (#63) prüft die Spielberechtigung im Doppel deshalb nur nach Geschlecht.
+
+**Ursprung:** Brainstorming #63 (Mitteilungen per Push und E-Mail).
+
+**Einschätzung:** Niedrig. Bei Doppel die Jahrgang-Felder ausblenden und FR-34 anpassen, am besten zusammen mit der Spielberechtigung aus #58.
+
+### 2026-11-06 — Service Worker ist von der Typprüfung ausgenommen, auch in der CI
+
+**Thema:** Betrieb
+
+**Fundort:** `tsconfig.json` (`"exclude": ["src/service-worker"]`), `src/service-worker/tsconfig.json`, `npm run check:svelte`
+
+**Beobachtung:** Der Service Worker hat eine eigene `tsconfig.json` mit den Typen von `$app/tsconfig/service-worker`; die Wurzel schliesst ihn aus. `svelte-check` in `make check-schnell`, `make check` und der CI läuft nur über die Wurzel, eine Prüfung mit der eigenen Konfiguration ruft niemand auf. Typfehler im Service Worker fielen erst im Build oder auf dem Gerät auf. Die Logik liegt zwar in `src/lib/push/nutzlast.ts` (geprüft und getestet), der Rahmen mit `push` und `notificationclick` aber nicht.
+
+**Ursprung:** #63, Mitteilungen per Push und E-Mail.
+
+**Einschätzung:** Niedrig, die Datei ist klein. Ein zusätzlicher Aufruf `tsc -p src/service-worker --noEmit` (nach `svelte-kit sync`) in `check:svelte` würde reichen.
+
+### 2026-11-06 — Verlauf der Mitteilungen am Handy: Tabelle schiebt seitlich und bricht stark um
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/verwaltung/Mitteilungsverlauf.svelte` (Verwaltung, Anlass-Seite und *Mitteilungen*)
+
+**Beobachtung:** Bei Handybreite (420 px) passen von sechs Spalten nur vier; *Weg* und *Erreicht* sind nur durch seitliches Schieben erreichbar, Titel und Text brechen nach zwei, drei Wörtern um. Gleiches Muster wie bei der Kategorientabelle (Eintrag oben).
+
+**Ursprung:** #63, Nachweis mit echtem Push (Screenshot des Verlaufs).
+
+**Einschätzung:** Eine Kartenliste statt Tabelle wäre am Handy besser lesbar, braucht aber einen neuen Baustein im UI-Leitbild. Zusammen mit der Kategorientabelle lösen. Die Verwaltung wird vor allem am PC genutzt, darum niedrig.
+
+**Ergänzung 2026-11-07 (#60):** Die Anmeldungsliste einer Kategorie (`src/lib/verwaltung/Anmeldungsliste.svelte`) zeigt dasselbe Muster: Am Handy liegen *Jahrgang*, *Status* und *Aktionen* rechts ausserhalb, die gestapelten Tasten machen jede Zeile sehr hoch, der Name bricht mitten im Wort (Screenshot `cm-anmeldungen-liste.png` aus `tests/e2e/cm-verwaltung.test.ts`).
+
+### 2026-11-06 — Mitteilungen zur Clubmeisterschaft fehlen noch, die Spielberechtigung aus #58 liegt jetzt auf dev
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** #63 (Teil Clubmeisterschaft), `docs/fachmodell.md` (*Mitteilung*: «die Clubmeisterschaft folgt später»), N-APP-02 in `docs/anforderungen/anforderungen.md`
+
+**Beobachtung:** #63 liefert Push und Mitteilungen zu Anlässen und an den Verein. Mitteilungen zur Clubmeisterschaft (z. B. an alle Spielberechtigten einer Kategorie) brauchen die Spielberechtigung und die Anmeldungen aus #58; beides liegt inzwischen auf `dev`. Das Thema *Clubmeisterschaft* ist im Profil schon wählbar, es gibt aber noch keinen Versand dazu.
+
+**Ursprung:** #63, Abschluss.
+
+**Einschätzung:** Der CM-Teil lässt sich jetzt als eigener, kurzer Plan angehen (eine Empfänger-Funktion, Vorlagen, zwei Schnittstellen; siehe Plan zu #63, Abschnitt «Nicht in diesem Plan»).
+
+### 2026-11-06 — RR-03 auf dem iPhone vereinzelt rot: Rückfrage erscheint nicht nach «Rollen speichern»
+
+**Thema:** Betrieb
+
+**Fundort:** Profil `iphone` (WebKit), `tests/e2e/verwaltung.test.ts:204` (RR-03, letzter MyTCO-Admin)
+
+**Beobachtung:** Im vollen `make check` rot, einzeln mit `--project=iphone --repeat-each=5` 1 von 5 rot. Im Fehlerbild ist *MyTCO-Admin* abgehakt, die Rückfrage «Rolle MyTCO-Admin entziehen?» aber nicht offen; kein Seitenfehler. Der Test öffnet die Mitgliedseite mit `page.goto` und klickt gleich danach. Der Branch (#63) ändert weder den Test noch die Mitgliedseite.
+
+**Ursprung:** #63, Nachweislauf von `make check`.
+
+**Einschätzung:** Vermutlich Klick vor der Hydration (Häkchen geht im HTML auch ohne Svelte, die Taste nicht). Im Test vor dem Klick auf ein Zeichen der fertigen Seite warten.
+
+### 2026-11-06 — Kleinbefunde aus den Reviews von #63 (Mitteilungen per Push und E-Mail)
+
+**Thema:** Betrieb
+
+**Fundort:** `src/lib/server/mitteilung/`, `src/lib/push/`, `src/service-worker/`, `src/lib/verwaltung/` (Mitteilungsformular), `tests/e2e/mitteilungen.test.ts`, `package.json`
+
+**Beobachtung:** Aus den Task-, Schluss- und cas-Reviews, als «nicht vor dem Merge» eingestuft:
+- Service Worker beachtet `pushsubscriptionchange` nicht; Firefox kann das Abo still erneuern, dann geht Push ins Leere, bis das Mitglied neu einschaltet.
+- Link im Push und in der Mail entsteht aus `MYTCO_ADRESSE`; weicht sie von der ausgelieferten Adresse ab, zeigt er auf den falschen Ursprung (erwägen: nur den Pfad schicken).
+- Empfänger können sich zwischen Vorschau und Senden ändern (Antwort, Themen, Abo).
+- Kein Hinweis im Formular, wenn Push auf dem Server aus ist (kein VAPID-Paar).
+- `@types/web-push@3.6.4` passt nicht zur Hauptversion von `web-push@4.0.0`.
+- Anlass zwischen Prüfung und Eintrag in den Verlauf gelöscht → 500, obwohl schon gesendet.
+- Abgebrochener langer Versand hinterlässt keinen Verlaufseintrag (`gesendetAm` erst nach dem Versand).
+- `schema.db.test.ts`: `.rejects.toThrow()` ohne Namen des Constraints.
+- `migration-0009.db.test.ts`: ungenutzter Parameter `_db`.
+- Grenztests für Schlüssellängen und genau 1000 Zeichen beim Abo fehlen.
+- E2E-Abwesenheitsprüfungen schwach (`toHaveCount(0)` ohne Warten); kein E2E für blockierte Mitteilungen.
+- Push-Schalter behandelt 401 als allgemeine Störung statt Umleitung zum Login.
+- Fokus springt weg, während die Themen-Schalter beim Speichern gesperrt sind.
+- Abos abgelaufener Sitzungen bekommen Pushes bis zum Aufräumen.
+- `Grundzeile.email` als `string` typisiert, `Empfaenger.email` als `string | null`.
+- Wache «Nicht gespeichert» übersieht ein laufendes Senden sowie Auswahl und Weg.
+- Race-E2E prüft die Abwesenheit nach nur einem Animation-Frame.
+- Eingabe-Fehler einer veralteten Vorschau bleibt sichtbar.
+
+**Ursprung:** Task-Reviews, Schluss-Review und cas-reviewer zu #63.
+
+**Einschätzung:** Alles klein. `pushsubscriptionchange` und der Link aus `MYTCO_ADRESSE` zuerst ansehen, sobald Push auf Test läuft (#39); die Testlücken bei Gelegenheit mit dem CM-Teil der Mitteilungen.
+
+### 2026-11-07 — Auskunft zeigt `sitzung.ansichtRolle` nicht
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/server/admin/auskunft.ts`
+
+**Beobachtung:** Die Auskunft (DS-07) nennt das flüchtige Feld `sitzung.ansichtRolle` nicht; es gibt es nur für MyTCO-Admins in der Ansicht als Rolle und verschwindet mit der Sitzung.
+
+**Ursprung:** Review von Task 8 in #43 (Etappe 3).
+
+**Einschätzung:** Vermutlich ohne Folgen, weil es kein Mitgliederdatum im engeren Sinn ist; bei Gelegenheit in `datenschutz.md` ausdrücklich erwähnen oder aufnehmen.
+
+### 2026-11-07 — Verlauf-Einträge als Urheber bei anderen fehlen in der Auskunft
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/server/admin/auskunft.ts`, `src/lib/server/admin/verlauf.ts`
+
+**Beobachtung:** Einträge, in denen die Person nur Urheber bei anderen Mitgliedern ist, stehen nicht in der Auskunft, weil sie Dritte nennen.
+
+**Ursprung:** Review von Task 8 in #43 (Etappe 3).
+
+**Einschätzung:** Gewollt; offen ist nur, ob eine Anzahl («hat 12 Änderungen bei anderen ausgelöst») gewünscht ist.
+
+### 2026-11-07 — E2E `bewegung.test.ts:399` im Profil iphone einmal flackernd
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/bewegung.test.ts:399`
+
+**Beobachtung:** Einmal «Importing a module script failed» im Profil iphone; danach nicht mehr aufgetreten.
+
+**Ursprung:** E2E-Lauf in #43, Task 9; unabhängig von #43.
+
+**Einschätzung:** Wahrscheinlich Netz-/Dev-Server-Flackern. Kommt es wieder, Trace holen.
+
+### 2026-11-07 — IP-Grenze der Code-Anfragen im E2E fast ausgeschöpft
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/`, Grenze von 10 Code-Anfragen je Stunde und IP
+
+**Beobachtung:** Die Suite nutzt die Grenze fast ganz aus. Der neue Test für den Ausgetretenen fordert einen Code deshalb nur im Profil android an.
+
+**Ursprung:** Task 9 in #43.
+
+**Einschätzung:** Ein weiterer Test mit Code-Anfrage braucht eine andere Lösung (Grenze im E2E anheben oder getrennte IPs).
+
+### 2026-11-07 — Abgelehnter Wildcard-Antrag fehlt auf der CM-Seite; wiederholtes Beantragen meldet jedes Mal allen CM-Admins
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/cm/anmeldungen.ts` → `ladeCmAnsicht`, `src/lib/server/cm/schnittstellen.ts` → `postCmWildcard`, `src/routes/clubmeisterschaft/[id]/+page.svelte`
+
+**Beobachtung:** Nach einer Ablehnung zeigt die CM-Seite des Mitglieds die Kategorie wieder mit «Wildcard beantragen», ohne Hinweis auf die Ablehnung; den Entscheid kennt es nur aus der Meldung. Beantragt und zieht ein Mitglied mehrmals zurück, geht jeder neue Antrag als Meldung an alle CM-Admins, ohne Bremse.
+
+**Ursprung:** Schluss-Review von #60 (CM Teil 4).
+
+**Einschätzung:** Klein, unter Freunden kaum ein Problem. Ein Vermerk «abgelehnt» bei der Kategorie wäre einfach; eine Bremse erst, wenn es tatsächlich vorkommt.
+
+### 2026-11-07 — Klassierung korrigieren prüft nicht, ob das Mitglied noch aktiv ist
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/cm/verwaltung.ts` → `korrigiereKlassierung`, `src/lib/server/cm/angaben.ts` → `schreibeKlassierung`
+
+**Beobachtung:** Der CM-Admin kann die Klassierung eines ausgetretenen oder gelöschten Mitglieds ändern; `schreibeKlassierung` prüft nur, ob es das Mitglied gibt. Von Hand anmelden und die Spielersuche verlangen dagegen *aktiv*.
+
+**Ursprung:** Schluss-Review von #60 (CM Teil 4).
+
+**Einschätzung:** Harmlos (die Oberfläche bietet nur Spieler aktiver Anmeldungen an), aber uneinheitlich. Bei der nächsten Arbeit an der Klassierung `status = 'aktiv'` mitprüfen. Nachtrag (Merge mit #43): Gelöschte weist `schreibeKlassierung` ab, weil ihre Anmeldung nach dem Anmeldeschluss aktiv in der Liste stehen kann; offen bleibt nur *ausgetreten*.
+
+### 2026-11-07 — Wiedereintritt und «Löschung rückgängig» ohne Rückfrage
+
+**Thema:** Rollen und Rechte
+
+**Fundort:** `src/lib/verwaltung/Mitgliedschaft.svelte` (Tasten «Wiedereintritt erfassen», «Löschung rückgängig machen»)
+
+**Beobachtung:** Beide Aktionen laufen ohne Rückfrage. Ein Fehltipp gibt einem ehemaligen Mitglied sofort das Login zurück, samt gespeicherter Admin-Rollen (die nach Entscheid wieder wirken).
+
+**Ursprung:** Schluss-Review #43 Etappe 3 («Declined to judge»); Entwurf und Plan sehen keine Rückfrage vor.
+
+**Einschätzung:** Umkehrbar (erneut Austritt erfassen), aber bei Admin-Rollen heikel. Kleine Ergänzung, falls gewünscht.
+
+### 2026-11-07 — Admin kann den eigenen Austritt erfassen
+
+**Thema:** Rollen und Rechte
+
+**Fundort:** `src/lib/server/admin/mitgliedschaft.ts` (`erfasseAustritt`, `merkeZumLoeschenVor`)
+
+**Beobachtung:** Ein Mitglieder-Admin kann sich selbst austragen oder zum Löschen vormerken und sperrt sich damit sofort aus. Nur der letzte MyTCO-Admin ist geschützt (RR-03).
+
+**Ursprung:** Schluss-Review #43 Etappe 3 («Declined to judge»).
+
+**Einschätzung:** Spec schweigt dazu; Regel für die Rollen-Doku, kein Fehler im Code.
+
+### 2026-11-07 — Wartezeit im Löschlauf-Test könnte auf der CI knapp sein
+
+**Thema:** Betrieb
+
+**Fundort:** `src/lib/server/admin/loeschung.db.test.ts` (Hilfe `wartetAuf`, etwa 2 s)
+
+**Beobachtung:** Der Test wartet höchstens rund 2 s, bis ein Lauf an einer Zeilensperre hängt. Auf einer ausgelasteten CI-Maschine kann das zu kurz sein; der Test würde dann laut scheitern, nicht falsch grün.
+
+**Ursprung:** Re-Review Task 4, #43 Etappe 3.
+
+**Einschätzung:** Nur beobachten; bei einem roten CI-Lauf die Grenze erhöhen.
+
+### 2026-11-07 — Mitteilungsverlauf wird nur beim nächsten Versand gelöscht, nicht im täglichen Löschlauf
+
+**Thema:** Betrieb
+
+**Fundort:** `src/lib/server/mitteilung/verlauf.ts` (Löschen nach 365 Tagen), `src/lib/server/admin/loeschung.ts` (`raeumeAuf`), `docs/datenschutzerklaerung.md` («ein Jahr lang»)
+
+**Beobachtung:** Einträge im Mitteilungsverlauf, die älter als ein Jahr sind, löscht nur der nächste Versand einer Mitteilung. Wird keine verschickt, bleiben sie, und die Auskunft zeigt sie ohne Altersgrenze. `datenschutz.md` beschreibt das ehrlich, die Datenschutzerklärung sagt «ein Jahr lang».
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Das Löschen gehört in den täglichen Löschlauf (ADR-008); kleiner Code-Schritt mit DB-Test.
+
+### 2026-11-07 — Push geht an Geräte mit abgelaufener Sitzung, bis sich jemand anmeldet
+
+**Thema:** Betrieb
+
+**Fundort:** `src/lib/server/mitteilung/empfaenger.ts` (Empfänger-Abfrage), `src/lib/server/login/sitzung.ts` (Aufräumen nur beim Login), `src/lib/server/admin/auskunft.ts` (Push-Abos)
+
+**Beobachtung:** Die Empfänger-Abfrage prüft nicht, ob die Sitzung des Push-Abos noch gilt. Abgelaufene Sitzungen räumt erst der nächste Login irgendeines Mitglieds weg; bis dahin bekommt das Gerät weiter Push, und die Auskunft zeigt das Abo, aber nicht die Sitzung. `datenschutz.md` sagt: nach einem Jahr ohne Nutzung kein Abo mehr.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Abgelaufene Sitzungen im täglichen Löschlauf mitnehmen oder in der Abfrage ausfiltern.
+
+### 2026-11-07 — Themen-Schalter «Clubmeisterschaft» im Profil wirkt noch auf keinen Versand
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/push/Benachrichtigungen.svelte` (Schalter), `src/lib/server/mitteilung/empfaenger.ts` (liest `themaCm` nicht)
+
+**Beobachtung:** Mitglieder können «Clubmeisterschaft» abschalten, aber kein Versand liest den Schalter: Mitteilungen an den Verein gibt es nur zu Anlässen und Verein, CM-Meldungen an Einzelne ignorieren Themen absichtlich (FR-47). Wer abschaltet, glaubt, keine CM-Meldungen mehr zu bekommen.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Bis es CM-Mitteilungen an alle gibt, den Schalter ausblenden oder einen Hinweis darunter setzen.
+
+### 2026-11-07 — Austritt zieht CM-Anmeldungen nicht zurück, wenn die Anmeldung vor dem Schluss geschlossen wurde
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/cm/austritt.ts`, FR-04 in `docs/fachmodell.md` («bis zum Anmeldeschluss»)
+
+**Beobachtung:** Der Code zieht beim Austritt nur zurück, solange das Turnier *offen* ist. Hat der CM-Admin die Anmeldung vor dem Anmeldeschluss geschlossen, bleibt die Anmeldung eines Ausgetretenen stehen. Die Doku beschreibt das Soll «bis zum Anmeldeschluss».
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Code-Frage: Datum statt Status prüfen? Mit dem CM-Admin klären, ob ein Ausgetretener nach dem Schliessen von Hand entfernt werden soll.
+
+### 2026-11-07 — Datenschutzerklärung nennt Resultate, Lizenzanträge und Export an Swiss Tennis, die noch nicht gebaut sind
+
+**Thema:** Rollen und Rechte
+
+**Fundort:** `docs/datenschutzerklaerung.md` (Abschnitte «Welche Daten» und «Weitergabe»)
+
+**Beobachtung:** Die Erklärung nennt Resultate und Lizenzanträge als gespeichert und Swiss Tennis als Empfänger. Im Schema gibt es dafür noch keine Tabelle und keinen Export.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Vertretbar, weil die Erklärung den Ausbau vorwegnimmt; vor der Freigabe durch den Vorstand bewusst entscheiden, ob sie den Stand oder das Ziel beschreibt.
+
+### 2026-11-07 — Glossar kennt die Begriffe aus Etappe 3 und den Mitteilungen nicht
+
+**Thema:** Rollen und Rechte
+
+**Fundort:** `docs/glossar.md`
+
+**Beobachtung:** Es fehlen *Austritt*, *Wiedereintritt*, *Löschung vorgemerkt* («wird gelöscht»), «gelöschtes Konto», *Auskunft*, *Mitteilung*, *Thema*, *Weg* sowie eigene Einträge für *CM-Admin* und *Lizenz-Admin*.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
+
+**Einschätzung:** Beim nächsten Doku-Durchgang nachtragen; die Begriffe stehen im Fachmodell.

@@ -6,9 +6,9 @@
 ## Absicht
 
 Der Projektleiter will dem Vorstand **in der laufenden App** zeigen, wie eine Anmeldung zur
-Generalversammlung (GV) in MyTCO aussehen könnte. Der Admin erstellt einen Anlass, z. B. die GV.
+Generalversammlung (GV) in MyTCO aussehen könnte. Der Mitglieder-Admin erstellt einen Anlass, z. B. die GV.
 Er erscheint bei allen Mitgliedern auf der Startseite. Das Mitglied meldet sich mit wenigen Tipps
-an oder ab und speichert den Termin in seinem Kalender. Die Admins sehen jederzeit, wer kommt.
+an oder ab und speichert den Termin in seinem Kalender. Die Mitglieder-Admins sehen jederzeit, wer kommt.
 
 Gezeigt wird lokal beim Projektleiter (`make dev`, `make dev-handy`), mit erfundenen Daten. Test
 und Live sind noch nicht in Betrieb. Gebaut wird trotzdem normal, ohne Schalter: Was hier
@@ -27,7 +27,7 @@ Die GV ist der erste Anlass neben der Clubmeisterschaft. Gebaut wird allgemein *
 
 ## Ziele
 
-1. **Admin erstellt einen Anlass** in der Verwaltung: Titel, Beginn (Datum und Zeit), Ort,
+1. **Mitglieder-Admin erstellt einen Anlass** in der Verwaltung: Titel, Beginn (Datum und Zeit), Ort,
    Einladung (Freitext, z. B. Traktanden), Anmeldeschluss. Er kann ihn ändern und löschen.
 2. **Startseite:** Jeder kommende Anlass erscheint bei **allen Mitgliedern** als hervorgehobene
    Kachel unter «Jetzt aktuell» mit Datum und dem eigenen Stand («Bitte bis … an- oder
@@ -45,7 +45,7 @@ Die GV ist der erste Anlass neben der Clubmeisterschaft. Gebaut wird allgemein *
 5. **Verwaltung, Anlass ansehen:** Kennzahlen *kommen*, *kommen nicht*, *noch keine Antwort*
    (alle aktiven Mitglieder ohne Antwort, auch solche ohne Login); Tabelle nur mit den Antworten:
    Name, Antwort, Bemerkung, geändert am.
-6. **Termin geändert:** Ändert der Admin Beginn oder Ort, bleiben die Antworten. Wer schon
+6. **Termin geändert:** Ändert der Mitglieder-Admin Beginn oder Ort, bleiben die Antworten. Wer schon
    geantwortet hat, sieht auf Startseite und Anlass-Seite «Datum oder Ort geändert, bitte prüfe
    deine Antwort», bis er erneut antwortet.
 7. **Erfundene Beispieldaten:** `make seed` legt eine GV 2027 mit einigen Antworten erfundener
@@ -69,8 +69,8 @@ Die GV ist der erste Anlass neben der Clubmeisterschaft. Gebaut wird allgemein *
 | FR-28 | An- und abmelden geht bis zum Anmeldeschluss (einschliesslich der Minute); der Anmeldeschluss liegt nicht nach dem Beginn |
 | FR-29 | Je Mitglied und Anlass gibt es höchstens eine Antwort, *kommt* oder *kommt nicht*; eine neue Antwort ersetzt die alte |
 | FR-30 | Eine Bemerkung gibt es nur bei *kommt nicht*, höchstens 500 Zeichen; wechselt die Antwort auf *kommt*, wird sie gelöscht |
-| FR-31 | Löscht der Admin einen Anlass, sind alle Antworten dazu mit gelöscht |
-| FR-32 | Ändert der Admin Beginn oder Ort, bleiben die Antworten; eine Antwort, die älter ist als die Änderung, gilt als *zu prüfen*, bis das Mitglied erneut antwortet |
+| FR-31 | Löscht der Mitglieder-Admin einen Anlass, sind alle Antworten dazu mit gelöscht |
+| FR-32 | Ändert der Mitglieder-Admin Beginn oder Ort, bleiben die Antworten; eine Antwort, die älter ist als die Änderung, gilt als *zu prüfen*, bis das Mitglied erneut antwortet |
 
 Die Nummern FR-27 bis FR-32 folgen auf die letzte im Fachmodell; vor dem Bau dort prüfen.
 
@@ -86,26 +86,26 @@ Abmeldung. Im Code `anlass` und `anlass_anmeldung`, getrennt von der künftigen 
 
 ## Rechte
 
-| Daten / Funktion | Mitglied | Admin |
-|------------------|----------|-------|
-| Kommende Anlässe | L | S (erstellen, ändern, löschen) |
-| Eigene Anmeldung zum Anlass, bis Anmeldeschluss | S eigene | S eigene |
-| Anmeldungen aller (Name, Antwort, Bemerkung) | – | L |
-| Kalenderdatei eines Anlasses (ohne Personendaten) | wer den Link hat, auch ohne Login | wer den Link hat |
+| Daten / Funktion | Mitglied | Mitglieder-Admin | MyTCO-Admin |
+|------------------|----------|------------------|-------------|
+| Kommende Anlässe | L | S (erstellen, ändern, löschen) | L |
+| Eigene Anmeldung zum Anlass, bis Anmeldeschluss | S eigene | S eigene | S eigene |
+| Anmeldungen aller (Name, Antwort, Bemerkung) | – | L | L |
+| Kalenderdatei eines Anlasses (ohne Personendaten) | wer den Link hat, auch ohne Login | wer den Link hat | wer den Link hat |
 
 Die Verwaltung der Anlässe verlangt wie die Mitgliederverwaltung die Bestätigung per Mail-Code
-(RR-09). CM- und Lizenzverantwortliche sehen nichts Zusätzliches.
+(RR-09). CM- und Lizenz-Admin sehen nichts Zusätzliches. Nachgeführt mit den Rollen aus [#43](2026-11-06-rollen-schaerfen-design.md): Was hier zuerst «Admin» hiess, ist der Mitglieder-Admin; der MyTCO-Admin liest nur.
 
 ## Datenschutz (vor dem Bau nachführen)
 
 - *Welche Daten:* neue Zeile «Anmeldungen zu Anlässen (Antwort, freiwillige Bemerkung)».
 - Die Bemerkung sagt im Hilfetext: «Ein Grund ist nicht nötig, bitte keine Angaben zur
-  Gesundheit. Die Bemerkung lesen nur die Admins.» (keine Gesundheitsdaten, auch nicht als Grund
+  Gesundheit. Die Bemerkung lesen nur die Admins.» (mit #43: Mitglieder- und MyTCO-Admins) (keine Gesundheitsdaten, auch nicht als Grund
   für eine Abmeldung).
-- *Wer sieht was:* Mitglied die eigene; Admin alle.
+- *Wer sieht was:* Mitglied die eigene; Mitglieder-Admin und, nur lesend, MyTCO-Admin alle.
 - *Löschen:* Anmeldungen ein Jahr nach dem Anlass löschen (Vorschlag K-50). Gebaut wird die
   automatische Löschung mit den übrigen Löschfristen, nicht in diesem Issue; bis dahin löscht der
-  Admin den Anlass.
+  Mitglieder-Admin den Anlass.
 - Die Kalenderdatei ist ohne Login abrufbar, enthält aber keine Personendaten (nur Anlassdaten).
 - Datenschutzerklärung entsprechend ergänzen.
 
@@ -141,23 +141,23 @@ den Bereich *Anlässe*.
 
 ## Nachweis
 
-Einheiten- und Datenbanktests für Regeln und Schnittstellen (TDD), E2E für Admin erstellt →
-Mitglied sieht Kachel → meldet sich an → Admin sieht Antwort, mit Screenshot auf iPhone, Android
+Einheiten- und Datenbanktests für Regeln und Schnittstellen (TDD), E2E für Mitglieder-Admin erstellt →
+Mitglied sieht Kachel → meldet sich an → Mitglieder-Admin sieht Antwort, mit Screenshot auf iPhone, Android
 und PC und axe ohne Verstösse. Den Kalendereintrag prüft der Projektleiter von Hand auf einem
 echten iPhone und Android-Gerät (`make dev-handy`); der E2E-Test prüft nur die Datei.
 
 ## Entscheide des Bauenden
 
 - Die Einladung ist reiner Text, kein PDF (keine Datei-Ablage).
-- Admins sehen auch vergangene Anlässe in der Verwaltung; Mitglieder nicht.
+- Mitglieder- und MyTCO-Admins sehen auch vergangene Anlässe in der Verwaltung; Mitglieder nicht.
 - Kacheln auf der Startseite nach Beginn sortiert, der nächste zuerst.
 - Nach dem Senden zeigt die Anlass-Seite die Antwort mit Plakette und «Antwort ändern» (Entwurf,
   Bildschirm 4).
 
 ## Annahmen bis zur Antwort auf K-50
 
-- Annahme K-50: Anmeldeschluss setzt der Admin frei (Vorschlag in der Maske: 3 Tage vor Beginn).
-- Annahme K-50: Liste und Bemerkungen sehen nur die Admins von MyTCO, nicht der ganze Vorstand.
+- Annahme K-50: Anmeldeschluss setzt der Mitglieder-Admin frei (Vorschlag in der Maske: 3 Tage vor Beginn).
+- Annahme K-50: Liste und Bemerkungen sehen nur die Mitglieder- und MyTCO-Admins, nicht der ganze Vorstand.
 - Annahme K-50: Jeder Anlass gilt für alle aktiven Mitglieder.
 
 `make annahmen` prüft diese Notiz nicht (Historie); die lebenden Markierungen stehen in

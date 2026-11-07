@@ -41,6 +41,8 @@
 		/** Die Taste ist grau, solange nichts geändert ist (Bearbeiten). */
 		nurBeiAenderung?: boolean;
 		rueckmeldung?: string | null;
+		/** Die Rolle darf nur lesen: Felder gesperrt, ohne Tasten (UI-Leitbild, Baustein Nur lesen). */
+		nurLesen?: boolean;
 		onspeichern: (werte: TurnierWerte) => void;
 	};
 	let {
@@ -51,6 +53,7 @@
 		nameFolgtJahr = false,
 		nurBeiAenderung = false,
 		rueckmeldung = null,
+		nurLesen = false,
 		onspeichern
 	}: Props = $props();
 
@@ -140,7 +143,24 @@
 		ids.filter(Boolean).join(' ') || undefined;
 </script>
 
-<form bind:this={formular} onsubmit={abschicken} novalidate>
+<form
+	bind:this={formular}
+	onsubmit={abschicken}
+	novalidate
+	data-ungespeichert={geaendert ? '' : undefined}
+>
+	{#if nurLesen}
+		<fieldset class="nur-lesen" disabled>{@render felder()}</fieldset>
+	{:else}
+		{@render felder()}
+		<button type="submit" class={knopfArt} disabled={nurBeiAenderung && !geaendert}>{knopf}</button>
+		<span class="leise" role="status"
+			>{#if rueckmeldung && !geaendert}{rueckmeldung}{/if}</span
+		>
+	{/if}
+</form>
+
+{#snippet felder()}
 	<div class="feld-zeile">
 		<label for="turnier-jahr">Jahr</label>
 		<input
@@ -221,23 +241,25 @@
 						aria-describedby={fehlerId}
 					/>
 				</div>
-				<button
-					type="button"
-					class="taste-neben"
-					aria-label="Entfernen: Turniernummer {i + 1}"
-					onclick={() => entferne(n.schluessel)}>Entfernen</button
-				>
+				{#if !nurLesen}
+					<button
+						type="button"
+						class="taste-neben"
+						aria-label="Entfernen: Turniernummer {i + 1}"
+						onclick={() => entferne(n.schluessel)}>Entfernen</button
+					>
+				{/if}
 			</div>
 		{/each}
 		{#if fehler.nummern}
 			<p class="fehler" id="fehler-turnier-nummern">{fehler.nummern}</p>
 		{/if}
-		<button type="button" class="taste-neben" bind:this={weitere} onclick={weitereNummer}
-			>Weitere Turniernummer</button
-		>
+		{#if !nurLesen}
+			<button type="button" class="taste-neben" bind:this={weitere} onclick={weitereNummer}
+				>Weitere Turniernummer</button
+			>
+		{:else if nummern.length === 0}
+			<p class="leise">Keine Turniernummern.</p>
+		{/if}
 	</fieldset>
-	<button type="submit" class={knopfArt} disabled={nurBeiAenderung && !geaendert}>{knopf}</button>
-	<span class="leise" role="status"
-		>{#if rueckmeldung && !geaendert}{rueckmeldung}{/if}</span
-	>
-</form>
+{/snippet}

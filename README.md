@@ -2,21 +2,23 @@
 
 Mitglieder-App des **Tennis-Club Olten (TCO)**. Mitglieder melden sich an, verwalten
 ihre Lizenzanträge und nehmen an der Clubmeisterschaft teil — Anmeldung, Spielplan,
-Resultate. Admins pflegen die Mitglieder und bereiten die Daten für Swiss Tennis auf.
+Resultate. Die Admin-Rollen pflegen die Mitglieder und bereiten die Daten für Swiss Tennis auf.
 
 Geplant als Mobile-App für Android und iOS (mit Push-Benachrichtigungen) und einer
-Admin-Oberfläche. MyTCO wird vorerst **eigenständig** aufgebaut, ohne Anbindung an die
+Verwaltung. MyTCO wird vorerst **eigenständig** aufgebaut, ohne Anbindung an die
 Mitgliederverwaltung Fairgate ([ADR-006](docs/adr/adr-006-eigenstaendig-ohne-fairgate.md))
 oder die Website tcolten.ch.
 
 ## Stand
 
 Phase **Fundament**, noch nicht ausgeliefert (aktuelle Nummer: [Versionen](docs/versionen.md)): Login per Einmal-Code mit
-Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung für Admins mit
-Liste «Für Fairgate», eigene Angaben im Profil ändern, Datenschutzerklärung in der App,
+Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung für Mitglieder-Admins mit
+Liste «Für Fairgate», Austritt, Löschen mit Bedenkzeit, Auskunft und automatischen Löschfristen, Rollen mit *Ansicht als …* für MyTCO-Admins, eigene Angaben im Profil ändern, Datenschutzerklärung in der App,
 Anmeldung zu Anlässen wie der Generalversammlung (Vorschlag für den Vorstand, K-50),
-Turnier der Clubmeisterschaft mit Kategorien anlegen für die CM-Verantwortlichen (noch ohne
-Anmeldung der Mitglieder),
+Turnier der Clubmeisterschaft mit Kategorien anlegen und Anmeldungen verwalten (Wildcard-Anträge
+entscheiden, von Hand anmelden) für die CM-Admins, Einzel-Anmeldung der Mitglieder zur
+Clubmeisterschaft mit Wildcard-Antrag,
+Mitteilungen per Push und E-Mail zu Anlässen und an den Verein für Mitglieder-Admins,
 Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene Testdaten) sind
 gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
 den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* aus
@@ -45,7 +47,7 @@ npm exec --no -- playwright install chromium webkit
 make hooks   # einmalig: Git-Hooks aktivieren
 cp .env.example .env   # je Ordner bzw. Worktree: lokale Einstellungen (nur erfundene Werte)
 make db      # lokale PostgreSQL und Mail-Fänger Mailpit starten
-make seed    # erfundene Mitglieder, eine Beispiel-GV und ein Beispielturnier 2027 anlegen, gibt Brief-Codes für Erika (Admin), Kurt (Mitglied) und Hanna Muster (CM) aus
+make seed    # erfundene Mitglieder, eine Beispiel-GV und ein Beispielturnier 2027 anlegen, gibt Brief-Codes für die Personas aus (make help)
 make dev     # Entwicklungsserver
 make check   # alle Prüfungen (braucht Docker)
 ```
@@ -56,7 +58,9 @@ beim Ausliefern von selbst.
 
 Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make dev-handy` startet den
 Entwicklungsserver stattdessen fürs iPhone im selben WLAN (macOS, nur im eigenen WLAN), mit
-festen Namen `mytco-admin.local` (Erika) und `mytco-mitglied.local` (Kurt): je Name eine
+einem festen Namen je Rolle: `mytco-mitglied.local` (Kurt, Mitglied), `mytco-mytcoadmin.local` (Theo,
+MyTCO-Admin), `mytco-mitgliederadmin.local` (Mona, Mitglieder-Admin) und `mytco-cmadmin.local`
+(Hanna, CM-Admin): je Name eine
 Verknüpfung auf dem Startbildschirm mit eigenem Login. Login per Code klappt dort, Passkey nicht
 (braucht HTTPS); vorher einmal `make seed`, am Laptop dann über die WLAN-Adresse statt
 localhost. `make musterbrief` erzeugt

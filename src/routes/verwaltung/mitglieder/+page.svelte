@@ -2,9 +2,11 @@
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { ladeMitglieder, type MitgliedZeile } from '../../../lib/verwaltung/api.ts';
-	import { ROLLEN_NAMEN, plakette } from '../../../lib/verwaltung/anzeige.ts';
+	import { plakette } from '../../../lib/verwaltung/anzeige.ts';
+	import { ROLLEN_NAME } from '../../../lib/verwaltung/rollen-namen.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 
+	let { data } = $props();
 	let suche = $state('');
 	let status = $state('');
 	let zeilen = $state<MitgliedZeile[]>([]);
@@ -35,7 +37,7 @@
 	});
 
 	const rollenText = (rollen: MitgliedZeile['rollen']) =>
-		['Mitglied', ...rollen.map((r) => ROLLEN_NAMEN[r])].join(', ');
+		['Mitglied', ...rollen.map((r) => ROLLEN_NAME[r])].join(', ');
 </script>
 
 <svelte:head>
@@ -58,10 +60,12 @@
 			<option value="">Alle</option>
 			<option value="aktiv">aktiv</option>
 			<option value="ausgetreten">ausgetreten</option>
-			<option value="geloescht">gelöscht</option>
+			<option value="vorgemerkt">wird gelöscht</option>
 		</select>
 	</div>
-	<a class="taste-haupt" href={resolve('/verwaltung/mitglieder/neu')}>Mitglied anlegen</a>
+	{#if data.darfSchreiben.mitglieder}
+		<a class="taste-haupt" href={resolve('/verwaltung/mitglieder/neu')}>Mitglied anlegen</a>
+	{/if}
 </div>
 
 {#if fehler}

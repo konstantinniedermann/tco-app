@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { formatiereBeginn, formatiereZeitpunkt } from '../../../../lib/anlass/zeit.ts';
-	import { MELDUNG } from '../../../../lib/login/anmelden.ts';
 	import Anlassformular, {
 		type AnlassWerte
 	} from '../../../../lib/verwaltung/Anlassformular.svelte';
@@ -13,10 +12,16 @@
 		type AnlassDetail,
 		type AnlassFeld
 	} from '../../../../lib/verwaltung/api.ts';
+	import { fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
+	import { ladeMitteilungen } from '../../../../lib/verwaltung/mitteilung-api.ts';
+	import Mitteilungsformular from '../../../../lib/verwaltung/Mitteilungsformular.svelte';
+	import Mitteilungsverlauf from '../../../../lib/verwaltung/Mitteilungsverlauf.svelte';
+	import { MELDUNG } from '../../../../lib/login/anmelden.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	const nurLesen = $derived(!data.darfSchreiben.mitglieder);
 
 	// Nach dem Speichern lädt die Seite den neuen Stand, ohne neu zu navigieren.
 	let detail = $derived<AnlassDetail>(data.detail);
@@ -26,6 +31,13 @@
 	let rueckmeldung = $state<string | null>(null);
 	let laeuft = $state(false);
 	let rueckfrage = $state<HTMLDialogElement>();
+	// Mitteilungen (FR-42): nach dem Senden lädt die Seite den Verlauf neu.
+	let mitteilungen = $derived(data.mitteilungen);
+
+	async function verlaufNeuLaden() {
+		const m = await ladeMitteilungen({ art: 'anlass', anlassId: detail.id });
+		if (m.art === 'ok') mitteilungen = m.daten;
+	}
 
 	const start = $derived<AnlassWerte>({
 		titel: detail.titel,
@@ -55,7 +67,7 @@
 		} else if (a.art === 'nicht-gefunden') {
 			allgemein = 'Diesen Anlass gibt es nicht mehr.';
 		} else {
-			allgemein = MELDUNG.stoerung;
+			allgemein = fehlerText(a);
 		}
 		laeuft = false;
 	}
@@ -68,9 +80,9 @@
 		laeuft = false;
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok' || a.art === 'nicht-gefunden') {
-			await goto(resolve('/verwaltung/anlaesse'));
+			await goto(resolve('/verwaltung/anlaesse'), { refreshAll: true });
 		} else {
-			allgemein = MELDUNG.stoerung;
+			allgemein = fehlerText(a);
 		}
 	}
 </script>
@@ -135,6 +147,7 @@
 			knopf="Angaben speichern"
 			nurBeiAenderung
 			{rueckmeldung}
+			{nurLesen}
 			onspeichern={speichern}
 		/>
 	{/key}
@@ -143,9 +156,25 @@
 	{/if}
 </div>
 
-<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}
-	>Anlass löschen</button
->
+<h2>Mitteilungen</h2>
+{#if mitteilungen === null}
+	<p class="fehler" role="alert">{MELDUNG.stoerung}</p>
+{:else}
+	{#if !nurLesen}
+		<Mitteilungsformular
+			bezug={{ art: 'anlass', anlassId: detail.id }}
+			vorlagen={mitteilungen.vorlagen}
+			onverlauf={verlaufNeuLaden}
+		/>
+	{/if}
+	<Mitteilungsverlauf eintraege={mitteilungen.verlauf} />
+{/if}
+
+{#if !nurLesen}
+	<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}
+		>Anlass löschen</button
+	>
+{/if}
 
 <dialog class="karte" bind:this={rueckfrage} aria-labelledby="loeschen-titel">
 	<h2 id="loeschen-titel">Anlass löschen?</h2>

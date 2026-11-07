@@ -268,8 +268,63 @@ html {
 	width: auto;
 }
 
+/* Das Wappen als Link zur Startseite: sieht aus wie das Wappen allein; die Tippfläche reicht
+   unsichtbar auf --tippflaeche (UI-03), ohne die Kopfleiste zu vergrössern. Mit `.kopf`
+   davor, damit die Links der Seitenleiste (Verwaltung) ihm kein Polster geben. */
+.kopf .kopf-start {
+	position: relative;
+	display: flex;
+	min-height: 0;
+	padding: 0;
+}
+
+.kopf .kopf-start::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: max(100%, var(--tippflaeche));
+	height: max(100%, var(--tippflaeche));
+	translate: -50% -50%;
+}
+
 .kopf a {
 	color: var(--farbe-flaeche);
+}
+
+/*
+ * Band «Ansicht als …» (UI-Leitbild): über der Kopfleiste, solange der MyTCO-Admin MyTCO mit einer
+ * anderen Rolle ansieht. Reicht wie die Kopfleiste unter die Statusleiste (in der iPhone-App vom
+ * Startbildschirm deckt das Statusleisten-Band genau diesen Abstand); die Kopfleiste darunter
+ * beginnt dann ohne ihn.
+ */
+.ansicht-band {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--abstand-2) var(--abstand-3);
+	padding: var(--abstand-3) var(--abstand-4);
+	padding-top: calc(var(--abstand-3) + env(safe-area-inset-top));
+	padding-inline: max(var(--abstand-4), env(safe-area-inset-left))
+		max(var(--abstand-4), env(safe-area-inset-right));
+	background: var(--farbe-hinweis-flaeche);
+	border-bottom: var(--rand-akzent) solid var(--farbe-hinweis);
+	color: var(--farbe-hinweis);
+	font-weight: 700;
+}
+
+.ansicht-band p {
+	margin: 0;
+}
+
+.ansicht-band .fehler {
+	flex-basis: 100%;
+}
+
+.ansicht-band ~ .kopf,
+.ansicht-band ~ .verwaltung .kopf {
+	padding-top: var(--abstand-3);
 }
 
 /* Reiter (unten auf dem Handy, ab 60em als Textlinks in der Kopfleiste) */
@@ -556,6 +611,24 @@ fieldset.auswahl-gruppe {
 	margin: 0 0 var(--abstand-3);
 	padding: 0;
 	border: 0;
+}
+
+/* Nur lesen (UI-Leitbild): gesperrte Felder ohne Rand des Fieldsets, Text gut lesbar */
+fieldset.nur-lesen {
+	min-inline-size: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.nur-lesen input:disabled,
+.nur-lesen select:disabled,
+.nur-lesen textarea:disabled {
+	border-color: var(--farbe-linie);
+	background: var(--farbe-hintergrund);
+	color: var(--farbe-text);
+	-webkit-text-fill-color: var(--farbe-text);
+	opacity: 1;
 }
 
 fieldset.auswahl-gruppe legend {
@@ -1402,7 +1475,7 @@ a.kachel:active {
 
 /*
  * Seitenwechsel (UI-09, Leitbild «Bewegung und Bedienung»): View Transitions, gesteuert über
- * html[data-uebergang] aus +layout.svelte. Kopfleiste und Statusleisten-Band stehen still.
+ * html[data-uebergang] aus +layout.svelte. Kopfleiste, Statusleisten-Band und Band «Ansicht als …» stehen still.
  * Reiter stehen beim Überblenden still; beim Schieben gehören sie zur Seite und gleiten mit.
  */
 .kopf {
@@ -1411,6 +1484,10 @@ a.kachel:active {
 
 .statusleiste {
 	view-transition-name: statusleiste;
+}
+
+.ansicht-band {
+	view-transition-name: ansicht-band;
 }
 
 .reiter {
@@ -1424,13 +1501,16 @@ html[data-uebergang='zurueck'] .reiter {
 
 ::view-transition-group(kopf),
 ::view-transition-group(statusleiste),
+::view-transition-group(ansicht-band),
 ::view-transition-new(kopf),
-::view-transition-new(statusleiste) {
+::view-transition-new(statusleiste),
+::view-transition-new(ansicht-band) {
 	animation: none;
 }
 
 ::view-transition-old(kopf),
-::view-transition-old(statusleiste) {
+::view-transition-old(statusleiste),
+::view-transition-old(ansicht-band) {
 	display: none;
 }
 
@@ -1521,6 +1601,10 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		padding: var(--abstand-6);
 	}
 
+	.ansicht-band {
+		order: -3;
+	}
+
 	.kopf {
 		order: -2;
 	}
@@ -1587,5 +1671,109 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	.verwaltung .inhalt {
 		max-width: none;
 		margin: 0;
+	}
+}
+
+/* Druckseite (Auskunft): weisser Grund, Tabellen mit Linien in --farbe-rand */
+.druckseite {
+	background: var(--farbe-flaeche);
+	color: var(--farbe-text);
+	padding: var(--abstand-5);
+	border-radius: var(--radius);
+	box-shadow: var(--schatten-karte);
+}
+
+.druckseite-kopf {
+	display: flex;
+	align-items: center;
+	gap: var(--abstand-3);
+	margin-bottom: var(--abstand-4);
+}
+
+.druckseite-wappen {
+	display: inline-flex;
+	background: var(--farbe-marke);
+	border-radius: var(--radius);
+	padding: var(--abstand-2);
+}
+
+.druckseite h2 {
+	margin: var(--abstand-5) 0 var(--abstand-2);
+	font-size: var(--groesse-gross);
+}
+
+.druckseite .tabelle {
+	box-shadow: none;
+	margin-bottom: var(--abstand-5);
+}
+
+.druckseite table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: var(--groesse-klein);
+}
+
+.druckseite th,
+.druckseite td {
+	text-align: left;
+	vertical-align: top;
+	padding: var(--abstand-2);
+	border-bottom: var(--rand-duenn) solid var(--farbe-rand);
+}
+
+.druckseite tbody th {
+	width: 34%;
+}
+
+.druckseite thead th {
+	background: var(--farbe-marke-zart);
+}
+
+@media print {
+	.nicht-drucken,
+	.seitenleiste,
+	.kopf,
+	.hinweis,
+	.ansicht-band {
+		display: none;
+	}
+
+	.druckseite {
+		padding: 0;
+		box-shadow: none;
+	}
+
+	/* Auf Papier scrollt nichts: Tabellen laufen ganz aus */
+	.druckseite .tabelle {
+		overflow: visible;
+	}
+
+	/* Ein Block über die ganze Papierbreite: kein Raster der Verwaltung, keine feste Höhe, weisser Grund */
+	html,
+	body,
+	.app,
+	.verwaltung,
+	.inhalt {
+		background: var(--farbe-flaeche);
+	}
+
+	.schale,
+	.rollbereich {
+		height: auto;
+		overflow: visible;
+	}
+
+	.app,
+	.verwaltung {
+		display: block;
+		min-height: 0;
+	}
+
+	.verwaltung .inhalt,
+	.inhalt {
+		width: 100%;
+		max-width: none;
+		margin: 0;
+		padding-inline: 0;
 	}
 }

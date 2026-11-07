@@ -113,25 +113,55 @@ describe('Admin-Routen', () => {
 			pruefeBauregel(new Map([liste, turnierListe, [turnierRoute, inhalt]]));
 		expect(mit(rumpf('getTurniere'))).toEqual([]);
 		expect(mit(rumpf('getTurniere, hilfe'))).toEqual([
-			`${turnierRoute}: Admin-Route nutzt 'hilfe'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
+			`${turnierRoute}: Admin-Route nutzt 'hilfe'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN und MITTEILUNG_ADMIN_SCHNITTSTELLEN`
+		]);
+	});
+	it('RR-07: Mitteilungen der Verwaltung nur aus MITTEILUNG_ADMIN_SCHNITTSTELLEN mit ihren Diensten', () => {
+		const mRoute = 'src/routes/api/admin/mitteilungen/+server.ts';
+		const mListe: [string, string] = [
+			'src/lib/server/mitteilung/schnittstellen.ts',
+			'export const MITTEILUNG_ADMIN_SCHNITTSTELLEN = {\n\tgetVereinMitteilungen\n} satisfies Record<string, unknown>;'
+		];
+		const rumpf = (namen: string, dienst = 'holeMitteilungAdminDienste', zeile = '') =>
+			[
+				`import { ${dienst} } from '../../../../lib/server/mitteilung/index.ts';`,
+				`import { ${namen} } from '../../../../lib/server/mitteilung/schnittstellen.ts';`,
+				`export const GET = (e) => getVereinMitteilungen(${dienst}(), e);`,
+				zeile
+			].join('\n');
+		const mit = (inhalt: string) => pruefeBauregel(new Map([liste, mListe, [mRoute, inhalt]]));
+		expect(mit(rumpf('getVereinMitteilungen'))).toEqual([]);
+		// Die Schnittstellen der Mitglieder prüfen keine Verwaltungsrolle.
+		expect(mit(rumpf('getVereinMitteilungen, postThemen'))).toEqual([
+			`${mRoute}: Admin-Route nutzt 'postThemen'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN und MITTEILUNG_ADMIN_SCHNITTSTELLEN`
+		]);
+		expect(mit(rumpf('getVereinMitteilungen', 'holeMitteilungDienste'))).toEqual([
+			`${mRoute}: Admin-Route importiert 'holeMitteilungDienste' aus ../../../../lib/server/mitteilung/index.ts; erlaubt ist nur holeMitteilungAdminDienste`
+		]);
+		expect(
+			mit(rumpf('getVereinMitteilungen', undefined, 'const db = holeMitteilungAdminDienste().db;'))
+		).toEqual([
+			`${mRoute}: holeMitteilungAdminDienste() nur direkt als erstes Argument einer Schnittstelle übergeben`
+		]);
+		// Aus admin/index.ts bleibt nur holeAdminDienste erlaubt.
+		const quer = rumpf('getVereinMitteilungen').replace('mitteilung/index.ts', 'admin/index.ts');
+		expect(mit(quer)).toEqual([
+			`${mRoute}: Admin-Route importiert 'holeMitteilungAdminDienste' aus ../../../../lib/server/admin/index.ts; erlaubt ist nur holeAdminDienste`
 		]);
 	});
 	it('RR-07: nur Funktionen aus ADMIN_SCHNITTSTELLEN (die der Rechte-Test abdeckt)', () => {
-		const fremd = gut.replace('{ getMitglied }', '{ getMitglied, mitAdmin }');
+		const fremd = gut.replace('{ getMitglied }', '{ getMitglied, liest }');
 		expect(pruefe(fremd)).toEqual([
-			`${route}: Admin-Route nutzt 'mitAdmin'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
+			`${route}: Admin-Route nutzt 'liest'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN und MITTEILUNG_ADMIN_SCHNITTSTELLEN`
 		]);
 		const umbenannt = gut
 			.replace('{ getMitglied }', '{ getMitglied as get, postMitglied }')
 			.replace('getMitglied(holeAdminDienste()', 'get(holeAdminDienste()');
 		expect(pruefe(umbenannt)).toEqual([]);
 		// Ein Kommentar mit Apostroph im Import verschluckt den Import nicht.
-		const mitKommentar = gut.replace(
-			'{ getMitglied }',
-			"{\n\tgetMitglied, // geht's\n\tmitAdmin\n}"
-		);
+		const mitKommentar = gut.replace('{ getMitglied }', "{\n\tgetMitglied, // geht's\n\tliest\n}");
 		expect(pruefe(mitKommentar)).toEqual([
-			`${route}: Admin-Route nutzt 'mitAdmin'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN`
+			`${route}: Admin-Route nutzt 'liest'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN und MITTEILUNG_ADMIN_SCHNITTSTELLEN`
 		]);
 		for (const schlecht of [
 			"import * as s from '../../../../../lib/server/admin/schnittstellen.ts';",
@@ -213,6 +243,46 @@ describe('Admin-Routen', () => {
 				])
 			)
 		).toEqual([]);
+	});
+});
+
+describe('Mitteilungen ausserhalb von api/admin', () => {
+	const mListe: [string, string] = [
+		'src/lib/server/mitteilung/schnittstellen.ts',
+		'export const MITTEILUNG_ADMIN_SCHNITTSTELLEN = {\n\tgetVereinMitteilungen,\n\tpostVereinSenden\n} satisfies Record<string, AdminHandler>;'
+	];
+	const pfad = 'src/routes/api/benachrichtigungen/+server.ts';
+	const pruefe = (inhalt: string) => pruefeBauregel(new Map([mListe, [pfad, inhalt]]));
+	const gut = [
+		"import { holeMitteilungDienste } from '../../../lib/server/mitteilung/index.ts';",
+		"import { getBenachrichtigungen } from '../../../lib/server/mitteilung/schnittstellen.ts';",
+		'export const GET = (e) => getBenachrichtigungen(holeMitteilungDienste(), e);'
+	].join('\n');
+	it('RR-07: Mitglieder-Routen nutzen die Dienste und Schnittstellen der Mitglieder', () => {
+		expect(pruefe(gut)).toEqual([]);
+	});
+	it('RR-07: keine Dienste und Schnittstellen der Verwaltung ausserhalb von api/admin', () => {
+		expect(
+			pruefe(gut.replace('{ holeMitteilungDienste }', '{ holeMitteilungAdminDienste as h }'))
+		).toEqual([
+			`${pfad}: nur Routen unter src/routes/api/admin/ dürfen 'holeMitteilungAdminDienste' nutzen`
+		]);
+		expect(
+			pruefe(
+				gut.replace('{ getBenachrichtigungen }', '{ getBenachrichtigungen, postVereinSenden }')
+			)
+		).toEqual([`${pfad}: nur Routen unter src/routes/api/admin/ dürfen 'postVereinSenden' nutzen`]);
+		expect(pruefe("import { holeMitteilungAdminDienste } from '$lib/server/mitteilung';")).toEqual([
+			`${pfad}: nur Routen unter src/routes/api/admin/ dürfen 'holeMitteilungAdminDienste' nutzen`
+		]);
+		// Ohne Namen liesse sich nicht prüfen, was die Route nutzt.
+		for (const quelle of [
+			"import * as m from '../../../lib/server/mitteilung/index.ts';",
+			"const m = await import('../../../lib/server/mitteilung/schnittstellen.ts');",
+			"export * from '../../../lib/server/mitteilung/schnittstellen.ts';"
+		]) {
+			expect(pruefe(quelle)).toHaveLength(1);
+		}
 	});
 });
 

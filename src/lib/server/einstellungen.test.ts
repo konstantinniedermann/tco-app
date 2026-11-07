@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, test } from 'vitest';
-import { BEISPIEL_SCHLUESSEL, leseEinstellungen } from './einstellungen.ts';
+import {
+	BEISPIEL_SCHLUESSEL,
+	BEISPIEL_VAPID_OEFFENTLICH,
+	leseEinstellungen
+} from './einstellungen.ts';
 
 const schluessel = 'k'.repeat(32);
 const vollstaendig = {
@@ -149,6 +153,93 @@ describe('leseEinstellungen', () => {
 		test('ausserhalb von Produktion ist smtp:// ohne TLS erlaubt', () => {
 			const env = { ...vollstaendig, MYTCO_SMTP_URL: 'smtp://mail.example.org:25' };
 			expect(leseEinstellungen(env).smtpUrl).toBe('smtp://mail.example.org:25');
+		});
+	});
+
+	describe('VAPID-Schlüssel', () => {
+		const oeffentlich = 'B' + 'a1_-'.repeat(21) + 'a1';
+		const privat = 'A' + 'z9_-'.repeat(10) + 'z9';
+
+		test('SI-22: ohne VAPID-Schlüssel ist vapid undefined', () => {
+			expect(leseEinstellungen(vollstaendig).vapid).toBeUndefined();
+			const leer = { ...vollstaendig, MYTCO_VAPID_OEFFENTLICH: '', MYTCO_VAPID_PRIVAT: ' ' };
+			expect(leseEinstellungen(leer).vapid).toBeUndefined();
+		});
+
+		test('SI-22: nur ein VAPID-Schlüssel wirft', () => {
+			const nurOeffentlich = { ...vollstaendig, MYTCO_VAPID_OEFFENTLICH: oeffentlich };
+			const nurPrivat = { ...vollstaendig, MYTCO_VAPID_PRIVAT: privat };
+			for (const env of [nurOeffentlich, nurPrivat]) {
+				expect(() => leseEinstellungen(env)).toThrow(
+					'MYTCO_VAPID_OEFFENTLICH und MYTCO_VAPID_PRIVAT nur zusammen'
+				);
+			}
+		});
+
+		test('SI-22: beide gesetzt ergibt vapid', () => {
+			const env = {
+				...vollstaendig,
+				MYTCO_VAPID_OEFFENTLICH: oeffentlich,
+				MYTCO_VAPID_PRIVAT: privat
+			};
+			expect(leseEinstellungen(env).vapid).toEqual({ oeffentlich, privat });
+		});
+
+		test('SI-22: falsche Länge wirft', () => {
+			const kurz = {
+				...vollstaendig,
+				MYTCO_VAPID_OEFFENTLICH: oeffentlich.slice(1),
+				MYTCO_VAPID_PRIVAT: privat
+			};
+			expect(() => leseEinstellungen(kurz)).toThrow(
+				new Error('MYTCO_VAPID_OEFFENTLICH hat nicht 87 Zeichen')
+			);
+			const lang = {
+				...vollstaendig,
+				MYTCO_VAPID_OEFFENTLICH: oeffentlich,
+				MYTCO_VAPID_PRIVAT: privat + 'a'
+			};
+			expect(() => leseEinstellungen(lang)).toThrow(
+				new Error('MYTCO_VAPID_PRIVAT hat nicht 43 Zeichen')
+			);
+		});
+
+		test('SI-22: Beispiel-Paar in Produktion wirft', () => {
+			const env = {
+				...vollstaendig,
+				MYTCO_SMTP_URL: 'smtps://mail.example.org:465',
+				MYTCO_VAPID_OEFFENTLICH: BEISPIEL_VAPID_OEFFENTLICH,
+				MYTCO_VAPID_PRIVAT: privat,
+				NODE_ENV: 'production'
+			};
+			expect(() => leseEinstellungen(env)).toThrow(
+				new Error('MYTCO_VAPID_OEFFENTLICH ist der Beispielwert aus .env.example')
+			);
+			expect(leseEinstellungen({ ...env, NODE_ENV: 'development' }).vapid?.oeffentlich).toBe(
+				BEISPIEL_VAPID_OEFFENTLICH
+			);
+		});
+
+		test('SI-22: Beispiel-Schlüssel steht so in .env.example', () => {
+			expect(readFileSync('.env.example', 'utf-8')).toContain(
+				`MYTCO_VAPID_OEFFENTLICH=${BEISPIEL_VAPID_OEFFENTLICH}`
+			);
+		});
+
+		test('SI-22: Fehlertext nennt keinen Wert', () => {
+			const geheim = 'kein base64url!/geheim';
+			const env = {
+				...vollstaendig,
+				MYTCO_VAPID_OEFFENTLICH: oeffentlich,
+				MYTCO_VAPID_PRIVAT: geheim
+			};
+			expect(() => leseEinstellungen(env)).toThrow(
+				new Error('MYTCO_VAPID_PRIVAT ist nicht base64url')
+			);
+			const andersrum = { ...env, MYTCO_VAPID_OEFFENTLICH: geheim, MYTCO_VAPID_PRIVAT: privat };
+			expect(() => leseEinstellungen(andersrum)).toThrow(
+				new Error('MYTCO_VAPID_OEFFENTLICH ist nicht base64url')
+			);
 		});
 	});
 });

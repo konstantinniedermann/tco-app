@@ -5,6 +5,7 @@
 	import { datumKurz, statusText } from '../../../lib/verwaltung/turnier-anzeige.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 
+	let { data } = $props();
 	let zeilen = $state<TurnierListe>([]);
 	let fehler = $state<string | null>(null);
 	let geladen = $state(false);
@@ -31,9 +32,11 @@
 	{#if geladen}{zeilen.length} {zeilen.length === 1 ? 'Turnier' : 'Turniere'}{/if}
 </p>
 
-<div class="leiste">
-	<a class="taste-haupt" href={resolve('/verwaltung/turniere/neu')}>Neues Turnier</a>
-</div>
+{#if data.darfSchreiben.cm}
+	<div class="leiste">
+		<a class="taste-haupt" href={resolve('/verwaltung/turniere/neu')}>Neues Turnier</a>
+	</div>
+{/if}
 
 {#if fehler}
 	<p class="fehler" role="alert">{fehler}</p>

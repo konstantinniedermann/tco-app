@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { MELDUNG } from '../../../../lib/login/anmelden.ts';
 	import Turnierformular, {
 		neuesTurnier,
 		type TurnierWerte
 	} from '../../../../lib/verwaltung/Turnierformular.svelte';
 	import { legeTurnierAn, type TurnierFeld } from '../../../../lib/verwaltung/api.ts';
+	import { fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 
 	const start = neuesTurnier(new Date());
@@ -29,7 +29,7 @@
 		} else if (a.art === 'vergeben') {
 			fehler = { jahr: 'Für dieses Jahr gibt es schon ein Turnier.' };
 		} else {
-			allgemein = MELDUNG.stoerung;
+			allgemein = fehlerText(a);
 		}
 	}
 </script>

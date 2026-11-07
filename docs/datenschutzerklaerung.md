@@ -20,9 +20,9 @@ MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Fragen zum Datenschutz
 [Ansprechperson], [E-Mail-Adresse des Vereins].
 
 **Welche Daten:** Name, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Mitgliedernummer,
-Lizenznummer und Klassierung, deine Anmeldungen, Resultate und Lizenzanträge, deine An- oder
+Lizenznummer und Klassierung, deine Anmeldungen zur Clubmeisterschaft, Resultate und Lizenzanträge, deine An- oder
 Abmeldung zu Anlässen wie der Generalversammlung mit einer freiwilligen Bemerkung. Deine Grunddaten übernimmt
-der Verein aus seiner Mitgliederliste. Legt ein Admin einen Anlass an, speichert MyTCO, wer ihn
+der Verein aus seiner Mitgliederliste. Legt die Verwaltung einen Anlass an, speichert MyTCO, wer ihn
 angelegt hat, damit sich Rückfragen klären lassen.
 
 **Wozu:** für dein Konto, die Clubmeisterschaft, Anlässe, Lizenzanträge und Benachrichtigungen, die
@@ -30,30 +30,46 @@ du selbst einschaltest. Für nichts anderes.
 
 **Wer sieht was:**
 
-- Der Admin sieht alle deine Daten und, ohne Inhalt, wer wann welche Angabe geändert oder
-  welche Aktion ausgelöst hat (12 Monate). Deinen Einmal-Code kann nach dem Versand niemand mehr abrufen. Die Verantwortlichen von
-  Clubmeisterschaft und Lizenzen sehen deinen Namen, deine E-Mail und Telefonnummer und was
-  sie für ihre Aufgabe brauchen. Deine An- oder Abmeldung zu einem Anlass und deine Bemerkung sehen
-  nur du und der Admin. Schreib in die Bemerkung bitte keine Angaben zur Gesundheit.
-- Alle Mitglieder sehen Name, Kategorien und Resultate der Clubmeisterschaft. Wer einen
+- Die **Mitglieder-Admins** führen die Mitgliederliste. Sie sehen alle deine Daten und, ohne
+  Inhalt, wer wann welche Angabe geändert oder welche Aktion ausgelöst hat (12 Monate).
+- Die **MyTCO-Admins** betreuen MyTCO technisch und vergeben die Rollen
+  [Personen, **Vorschlag K-18.4:** Projektleiter und Stellvertretung]. Sie sehen dieselben
+  Daten wie alle anderen Rollen, ändern sie aber nicht. Das brauchen sie, um den anderen zu
+  helfen, Fehler zu finden und die Vergabe der Rollen zu prüfen.
+- Die **CM-Admins** und **Lizenz-Admins** sehen deinen Namen, deine E-Mail und Telefonnummer
+  und was sie für die Clubmeisterschaft bzw. die Lizenzen brauchen. Die CM-Admins sehen dazu
+  dein Geschlecht und deinen Jahrgang, um dich in die passenden Kategorien einzuordnen; ändern
+  können sie beides nicht.
+- Deinen Einmal-Code kann nach dem Versand niemand mehr abrufen.
+- Deine An- oder Abmeldung zu einem Anlass und deine Bemerkung sehen nur du, die
+  Mitglieder-Admins und die MyTCO-Admins. Schreib in die Bemerkung bitte keine Angaben zur
+  Gesundheit.
+- Deinen Wildcard-Antrag und seinen Kommentar sehen nur du, die CM-Admins und die MyTCO-Admins.
+  Schreib in den Kommentar bitte keine Angaben zur Gesundheit.
+- Alle Mitglieder sehen Name, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft. Wer einen
   Doppelpartner sucht, sieht die Namen der Mitglieder, die für die Kategorie in Frage kommen.
 - Deine Gegner und dein Doppelpartner sehen während der Clubmeisterschaft deine E-Mail und
   Telefonnummer, damit ihr die Spiele absprechen könnt.
-- Den Spielplan des Finalwochenendes sehen alle, auch ohne Login.
+- Den Spielplan des Finalwochenendes sehen alle, auch ohne Login [**Vorschlag K-39**].
 - Die Kalenderdatei eines Anlasses (Titel, Zeit, Ort, Einladung) ist über ihren Link auch ohne
   Login abrufbar; sie enthält keine Angaben zu Personen.
 - Swiss Tennis erhält Anmeldungen, Resultate und Lizenzanträge.
 
 **Wo:** Die Daten liegen bei Infomaniak in der Schweiz; E-Mails versendet [E-Mail-Dienst].
-Push-Nachrichten stellt der Hersteller deines Browsers oder Handys zu (z. B. Google, Apple);
-sie enthalten keine Daten anderer Mitglieder.
+Push-Nachrichten enthalten keine Daten anderer Mitglieder (zum Zustellen siehe «Mitteilungen»).
+
+**Mitteilungen:** Der Mitglieder-Admin kann dir Mitteilungen zu Anlässen und zum Verein schicken, als Push und als E-Mail. Push gibt es nur, wenn du ihn auf einem Gerät selbst einschaltest. Die Nachricht leitet Apple, Google, Mozilla oder Microsoft (je nach deinem Gerät) verschlüsselt weiter; sie sehen, dass eine Nachricht für dein Gerät eintrifft, aber nicht ihren Inhalt. MyTCO speichert dafür je Gerät die Adresse beim Push-Dienst und zwei Schlüssel. Das Abo endet mit dem Abmelden, wenn du Push abschaltest, mit deinem Austritt oder wenn dein Konto zum Löschen vorgemerkt wird, und mit deinem Konto. Im Profil stellst du Mitteilungen je Thema (Anlässe, Clubmeisterschaft, Verein) ab. Bestätigungen, Codes und persönliche Meldungen zu deinen CM-Anmeldungen bleiben davon unberührt. Wer wann welche Mitteilung geschickt hat, sehen der Mitglieder-Admin und, nur lesend, der MyTCO-Admin ein Jahr lang, ohne Namen der Empfänger.
 
 **Wie lange:** Solange du Mitglied bist. Nach einem Austritt wird dein Konto gesperrt; deine
 Daten bleiben noch eine Frist lang, falls du zurückkommst [Frist, **Vorschlag K-38:** 1 Jahr], und werden
 dann gelöscht. Löscht der Verein dein Mitglied, zum Beispiel auf deinen Wunsch, ist dein Konto
 sofort gesperrt, und deine Daten werden nach einer Woche gelöscht. In beiden Fällen bleibt dein
-Name in vergangenen Resultaten. Deine An- oder Abmeldung zu einem Anlass löschen wir ein Jahr
-nach dem Anlass [**Vorschlag K-50**].
+Name in vergangenen Resultaten und bei deinen Anmeldungen zur Clubmeisterschaft; die Turniergeschichte ist bei Swiss Tennis ohnehin öffentlich. Deine An- oder Abmeldung zu einem Anlass löschen wir ein Jahr
+nach Beginn des Anlasses [**Vorschlag K-50**].
+
+Auf Wunsch erhältst du eine Auskunft über alle Daten, die wir von dir gespeichert haben.
+Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge und
+zurückgezogene Anmeldungen geben dir die CM-Admins Auskunft.
 
 **Login:** Du loggst dich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 dein Gerät das Login mit einem Cookie, bis du MyTCO ein Jahr nicht genutzt hast oder dich
@@ -68,7 +84,7 @@ E-Mail-Adresse, bestätigst du die Änderung mit je einem Code an die alte und d
 Adresse. Bis du beide Codes eingetippt hast, merkt sich dein Gerät die neue Adresse; ist die
 Änderung bestätigt, mit «‹ Zurück» abgebrochen oder du meldest dich ab, löscht MyTCO sie sofort; sonst nach 15 Minuten spätestens beim nächsten Start der App. Auf
 dem Server liegt die neue Adresse bis dahin nur im Arbeitsspeicher und verfällt nach 15 Minuten;
-für die Grenze der Code-Mails merkt sich MyTCO sie dort höchstens 24 Stunden. Ändert der Admin deine Adresse, erhält die alte einen Hinweis. Richtest du freiwillig einen
+für die Grenze der Code-Mails merkt sich MyTCO sie dort höchstens 24 Stunden. Ändert ein Mitglieder-Admin deine Adresse, erhält die alte einen Hinweis. Richtest du freiwillig einen
 Passkey ein, speichert MyTCO je Passkey nur dessen öffentlichen Schlüssel, eine Kennung, einen
 Zähler, die Adresse der App, eine grobe Gerätebezeichnung (z. B. «iPhone») sowie wann du ihn
 eingerichtet und zuletzt benutzt hast. Diese Angaben löschen wir, sobald du den Passkey
@@ -77,10 +93,14 @@ einen Passkey einrichten willst (auch wenn du abbrichst), und bleibt, bis dein K
 Schlüsselbund an, MyTCO speichert sie dafür nicht zusätzlich. Ob der Hinweis auf den Passkey
 noch erscheint, merkt sich MyTCO an deiner Sitzung.
 
-**Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login und den Wechsel der E-Mail-Adresse nötig ist. Keine Werbung,
-keine Analyse-Dienste.
+**Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login und den Wechsel der E-Mail-Adresse nötig ist, und ob du den
+Hinweis auf Push mit «Nein, danke» weggeklickt hast. Schaltest du Push ein, legt dein Browser dafür eine Anmeldung beim
+Push-Dienst an. Keine Werbung, keine Analyse-Dienste.
 
 **Deine Rechte:** Du kannst jederzeit erfahren, welche Daten MyTCO über dich hat, und sie
 berichtigen oder löschen lassen. E-Mail, Telefon, Adresse und Lizenznummer änderst du selbst in
 der App; geänderte Kontaktangaben überträgt der Verein von Hand in seine Mitgliederliste
-(Fairgate).
+(Fairgate). Deine Klassierung änderst du jederzeit im Profil; stimmt sie nicht, korrigieren sie
+auch die CM-Admins.
+Geschlecht und Jahrgang trägst du einmal auf der Seite der Clubmeisterschaft ein, falls sie
+fehlen; danach ändert sie nur die Mitgliederverwaltung.

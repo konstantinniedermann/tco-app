@@ -7,10 +7,18 @@ import {
 	legeAdminMitBriefCodeAn,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
+	legeOffenenAnlassAn,
+	legeRollenkontoMitBriefCodeAn,
+	legeTurnierAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import { klappeAuf, pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import {
+	klappeAuf,
+	pruefeBildschirm,
+	sammleKonsolenfehler,
+	wartetAufVorladen
+} from './hilfen/seite.ts';
 
 // Alle Browser kommen von 127.0.0.1 an denselben Server (Grenzen pro IP). Jeder Test braucht
 // darum nur die nötigen Anfragen: ein Brief-Login, ein Admin-Code.
@@ -26,6 +34,8 @@ async function meldeAn(page: Page, konto: Konto) {
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${konto.vorname}` })).toBeVisible();
+	// Die Reiter laden den Code ihrer Seiten vor; ein folgendes page.goto bräche das ab.
+	await wartetAufVorladen(page);
 }
 
 /** Schickt den Admin-Code, liest ihn aus Mailpit und bestätigt (SI-08). */
@@ -103,7 +113,7 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 
 	// A-ROLLE-01: Rolle vergeben. Die Klappe «Rollen» ist zu wie in Mockup 6.
 	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('CM-Verantwortliche').check();
+	await page.getByLabel('CM-Admin').check();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
 	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
 
@@ -111,7 +121,7 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 	const verlauf = page.getByRole('table', { name: 'Verlauf' });
 	await expect(verlauf).toContainText('angelegt');
 	await expect(verlauf).toContainText('Telefon geändert');
-	await expect(verlauf).toContainText('Rolle CM-Verantwortliche vergeben');
+	await expect(verlauf).toContainText('Rolle CM-Admin vergeben');
 	await expect(verlauf).not.toContainText('+41 00 000 00 00');
 	await pruefeBildschirm(page, info, 'verwaltung-mitglied');
 
@@ -181,29 +191,30 @@ test('RR-07: Mitglied ohne Rolle sieht keine Kachel und landet bei /verwaltung a
 	expect(fehler).toEqual([]);
 });
 
-test('RR-03: der letzte Admin sieht die Meldung beim Entzug seiner Rolle', async ({
+test('RR-03: der letzte MyTCO-Admin sieht die Meldung beim Entzug seiner Rolle', async ({
 	page
 }, info) => {
-	// In der gemeinsamen Testdatenbank gibt es weitere Admins; die Antwort des Servers ist hier
+	// In der gemeinsamen Testdatenbank gibt es weitere MyTCO-Admins; die Antwort des Servers ist hier
 	// gestellt. Die Regel selbst prüfen die Datenbanktests (schnittstellen-letzter-admin).
 	const fehler = sammleKonsolenfehler(page);
 	const admin = await legeAdminMitBriefCodeAn('Emil');
 	await oeffneVerwaltung(page, admin);
 	await page.goto(`/verwaltung/mitglieder/${admin.mitgliedId}`);
 	await page.route('**/api/admin/mitglieder/*/rollen', (route) =>
-		route.fulfill({ status: 409, json: { fehler: 'letzter-admin' } })
+		route.fulfill({ status: 409, json: { fehler: 'letzter-mytco' } })
 	);
 	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('Admin', { exact: true }).uncheck();
+	await page.getByLabel('MyTCO-Admin', { exact: true }).uncheck();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
 	// Wer sich selbst die Rolle entzieht, wird vorher gefragt; «Abbrechen» schickt nichts.
-	const rueckfrage = page.getByRole('dialog', { name: 'Rolle Admin entziehen?' });
-	await expect(rueckfrage.getByText('Du verlierst den Zugang zur Verwaltung.')).toBeVisible();
+	const rueckfrage = page.getByRole('dialog', { name: 'Rolle MyTCO-Admin entziehen?' });
+	await expect(rueckfrage.getByText('Du kannst danach keine Rollen mehr vergeben.')).toBeVisible();
 	await rueckfrage.getByRole('button', { name: 'Abbrechen' }).click();
 	await expect(rueckfrage).toBeHidden();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
 	await rueckfrage.getByRole('button', { name: 'Rolle entziehen' }).click();
-	const meldung = 'Du bist der letzte Admin. Gib zuerst jemand anderem die Rolle Admin.';
+	const meldung =
+		'Du bist der letzte MyTCO-Admin. Gib zuerst jemand anderem die Rolle MyTCO-Admin.';
 	await expect(page.getByText(meldung)).toBeVisible();
 	await pruefeBildschirm(page, info, 'verwaltung-letzter-admin');
 	expect(fehler).toEqual([]);
@@ -285,7 +296,7 @@ test('A-MITGLIED-02: zwei Admins am selben Mitglied – die zweite Änderung üb
 	await page.getByRole('button', { name: 'Angaben speichern' }).click();
 	await expect(meldung).toBeVisible();
 	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('CM-Verantwortliche').check();
+	await page.getByLabel('CM-Admin').check();
 	await page.getByRole('button', { name: 'Rollen speichern' }).click();
 	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
 	await expect(page.getByLabel('Ort', { exact: true })).toHaveValue('Baden');
@@ -384,4 +395,228 @@ test('UI-06: Verwaltung nicht erreichbar – Fehlerseite mit Rahmen, Meldung in 
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${admin.vorname}` })).toBeVisible();
 	// In der Konsole stehen nur die vorgetäuschte 503 und die 404 der Seite, die es nicht gibt.
 	expect(fehler.filter((f) => !/status of (503|404)\b/.test(f))).toEqual([]);
+});
+
+// «Ansicht als …» und die Bereiche je Rolle (Design Rollen schärfen, Regeln 3 und 7).
+// Pro Jahr gibt es ein Turnier; jedes Projekt hat sein Jahr, getrennt von turnier.test.ts.
+const ANSICHT_JAHR: Record<string, number> = { iphone: 2096, android: 2095, desktop: 2094 };
+
+const band = (page: Page) => page.getByRole('complementary', { name: 'Ansicht' });
+
+/** Wählt auf der Seite Rollen eine Ansicht und schaltet sie ein. */
+async function schaueAls(page: Page, rolle: string) {
+	await seitenleiste(page).getByRole('link', { name: 'Rollen' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Rollen' })).toBeVisible();
+	await page.getByRole('radio', { name: rolle, exact: true }).check();
+	await page.getByRole('button', { name: 'Ansehen' }).click();
+	await expect(band(page)).toContainText(`Ansicht als ${rolle} — nur ansehen`);
+}
+
+/** Speichert aus der Seite heraus, wie es ein Skript könnte: der Server antwortet mit dem Status. */
+function postAusDerSeite(page: Page, pfad: string, inhalt: object): Promise<number> {
+	return page.evaluate(
+		async ({ pfad, inhalt }) =>
+			(
+				await fetch(pfad, {
+					method: 'POST',
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify(inhalt)
+				})
+			).status,
+		{ pfad, inhalt }
+	);
+}
+
+test('A-ROLLE-01, RR-07: MyTCO-Admin vergibt eine Rolle, schaut als CM-Admin, kann nicht absenden, beendet die Ansicht', async ({
+	page
+}, info) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const jahr = ANSICHT_JAHR[info.project.name];
+	const turnierId = await legeTurnierAn(jahr);
+	const mytco = await legeRollenkontoMitBriefCodeAn('Theo', ['mytco']);
+	const nachname = `Probe${randomUUID().slice(0, 8)}`;
+	const mitglied = await legeKontoAn('Selma', nachname);
+	await oeffneVerwaltung(page, mytco);
+
+	// Regel 7: Der MyTCO-Admin sieht alle Bereiche und dazu die Rollen.
+	await expect(seitenleiste(page).getByRole('link', { name: 'Turniere' })).toBeVisible();
+	await expect(seitenleiste(page).getByRole('link', { name: 'Rollen' })).toBeVisible();
+
+	// Regel 2: Rolle CM-Admin an ein erfundenes Mitglied vergeben.
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	await page.locator('summary', { hasText: 'Rollen' }).click();
+	await page.getByLabel('CM-Admin').check();
+	await page.getByRole('button', { name: 'Rollen speichern' }).click();
+	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
+
+	// Die Übersicht nennt es unter «CM-Admin», als Link zu seiner Seite.
+	await seitenleiste(page).getByRole('link', { name: 'Rollen' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Rollen' })).toBeVisible();
+	await pruefeBildschirm(page, info, 'rollen-seite');
+	const cmAdmins = page.locator('details.klappe', {
+		has: page.locator('summary', { hasText: 'CM-Admin' })
+	});
+	await cmAdmins.locator('summary').click();
+	await expect(cmAdmins.getByRole('link', { name: `${nachname}, Selma` })).toBeVisible();
+
+	// Ansicht als CM-Admin: zuerst zu den Turnieren, nur die Clubmeisterschaft, Band oben.
+	await schaueAls(page, 'CM-Admin');
+	await expect(page).toHaveURL(/\/verwaltung\/turniere$/);
+	await expect(page.getByRole('heading', { level: 1, name: 'Clubmeisterschaft' })).toBeVisible();
+	await expect(seitenleiste(page).getByRole('link', { name: 'Turniere' })).toBeVisible();
+	await expect(seitenleiste(page).getByRole('link', { name: 'Mitglieder' })).toHaveCount(0);
+	await expect(seitenleiste(page).getByRole('link', { name: 'Rollen' })).toHaveCount(0);
+	await expect(page.getByRole('link', { name: 'Neues Turnier' })).toHaveCount(0);
+
+	// Turnierseite: gesperrt, ohne Taste zum Speichern; der Server weist auch direkt ab.
+	await page.getByRole('link', { name: `Clubmeisterschaft ${jahr}` }).click();
+	await expect(
+		page.getByRole('heading', { level: 1, name: `Clubmeisterschaft ${jahr}` })
+	).toBeVisible();
+	await expect(page.getByLabel('Name', { exact: true })).toBeDisabled();
+	await expect(page.getByRole('button', { name: 'Angaben speichern' })).toHaveCount(0);
+	await expect(page.getByRole('button', { name: 'Anmeldung öffnen' })).toHaveCount(0);
+	await expect(page.getByRole('link', { name: 'Neue Kategorie' })).toHaveCount(0);
+	await pruefeBildschirm(page, info, 'ansicht-cm-turnier');
+	const status = await postAusDerSeite(page, `/api/admin/turniere/${turnierId}/status`, {
+		status: 'offen'
+	});
+	expect(status).toBe(403);
+
+	// Beenden: das Band ist weg, die eigenen Rollen gelten wieder (alle Bereiche, nur lesend).
+	await band(page).getByRole('button', { name: 'Beenden' }).click();
+	await expect(band(page)).toHaveCount(0);
+	await expect(seitenleiste(page).getByRole('link', { name: 'Rollen' })).toBeVisible();
+	await expect(page.getByText('Nur ansehen.')).toBeVisible();
+	await pruefeBildschirm(page, info, 'ansicht-beendet');
+	expect(fehler).toEqual([]);
+});
+
+test('RR-07: Ansicht als Mitglied – auch in der App fehlt jede Taste zum Speichern', async ({
+	page
+}, info) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const mytco = await legeRollenkontoMitBriefCodeAn('Tamara', ['mytco']);
+	const titel = `Probeanlass ${randomUUID().slice(0, 8)}`;
+	const anlassId = await legeOffenenAnlassAn(mytco.mitgliedId, titel);
+	await oeffneVerwaltung(page, mytco);
+
+	// «Mitglied» hat keine Verwaltung: es geht zur Startseite der App, ohne Kachel Verwaltung.
+	await schaueAls(page, 'Mitglied');
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Tamara' })).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Verwaltung' })).toHaveCount(0);
+
+	// Antwort auf einen Anlass: kein Formular, keine Taste.
+	await page.getByRole('link', { name: new RegExp(titel) }).click();
+	await expect(page.getByRole('heading', { level: 1, name: titel })).toBeVisible();
+	await expect(band(page)).toBeVisible();
+	await expect(page.getByRole('radio')).toHaveCount(0);
+	await expect(page.getByRole('button', { name: 'Antwort senden' })).toHaveCount(0);
+	await expect(page.getByText('Noch keine Antwort.')).toBeVisible();
+	await pruefeBildschirm(page, info, 'ansicht-mitglied-anlass');
+	const antwort = await postAusDerSeite(page, `/api/anlaesse/${anlassId}/anmeldung`, {
+		antwort: 'kommt',
+		bemerkung: null
+	});
+	expect(antwort).toBe(403);
+
+	// Profil: die Angaben ohne «Ändern», kein Passkey; Abmelden bleibt.
+	await page.goto('/profil');
+	await klappeAuf(page, 'Meine Angaben');
+	await expect(page.getByText(mytco.email)).toBeVisible();
+	await expect(page.getByRole('button', { name: 'Ändern' })).toHaveCount(0);
+	await expect(page.getByRole('link', { name: 'Ändern' })).toHaveCount(0);
+	await expect(page.getByRole('button', { name: 'Abmelden' })).toBeVisible();
+	await pruefeBildschirm(page, info, 'ansicht-mitglied-profil');
+
+	// Beenden: die Seite bleibt, «Ändern» ist wieder da.
+	await band(page).getByRole('button', { name: 'Beenden' }).click();
+	await expect(band(page)).toHaveCount(0);
+	await expect(page.getByRole('button', { name: 'Ändern' }).first()).toBeVisible();
+	expect(fehler).toEqual([]);
+});
+
+test('RR-07, Regel 3: MyTCO-Admin sieht Mitglied nur lesend (fieldset disabled, Hinweis Nur ansehen)', async ({
+	page
+}, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const mytco = await legeRollenkontoMitBriefCodeAn('Tobias', ['mytco']);
+	const mitglied = await legeKontoAn('Rahel');
+	await oeffneVerwaltung(page, mytco);
+
+	// Liste: ohne «Mitglied anlegen»; die Seite zum Anlegen führt zur Liste zurück.
+	const hinweis = page.getByText('Nur ansehen.');
+	await expect(hinweis).toBeVisible();
+	await expect(page.getByText('Ändern kann hier nur der Mitglieder-Admin.')).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Mitglied anlegen' })).toHaveCount(0);
+	await page.goto('/verwaltung/mitglieder/neu');
+	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
+	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+
+	// Mitglied: Angaben gesperrt, ohne Speichern und ohne Sitzungen beenden; Rollen bleiben offen.
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	await expect(page.getByRole('heading', { level: 1, name: /Rahel/ })).toBeVisible();
+	await expect(hinweis).toBeVisible();
+	await expect(page.locator('fieldset.nur-lesen')).toHaveAttribute('disabled', '');
+	await expect(page.getByLabel('Vorname', { exact: true })).toBeDisabled();
+	await expect(page.getByLabel('Vorname', { exact: true })).toHaveValue('Rahel');
+	await expect(page.getByRole('button', { name: 'Angaben speichern' })).toHaveCount(0);
+	await expect(page.getByRole('button', { name: 'Alle Sitzungen beenden' })).toHaveCount(0);
+	await page.locator('summary', { hasText: 'Rollen' }).click();
+	await expect(page.getByLabel('CM-Admin')).toBeEnabled();
+	await pruefeBildschirm(page, info, 'mytco-mitglied-nur-lesen');
+
+	// Gesperrt heisst nicht ungespeichert: Das Wappen fragt nicht nach.
+	await page.getByRole('link', { name: 'Zur Startseite', exact: true }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	expect(fehler).toEqual([]);
+});
+
+test('A-MITGLIED-02: Rollen speichern, inzwischen geändert – Meldung mit «Neuen Stand laden»', async ({
+	page
+}, info) => {
+	// Den Konflikt stellt der Test nach; die Regel selbst prüfen die Datenbanktests (veraltet).
+	const fehler = sammleKonsolenfehler(page);
+	const mytco = await legeRollenkontoMitBriefCodeAn('Timon', ['mytco']);
+	const mitglied = await legeKontoAn('Regula');
+	await oeffneVerwaltung(page, mytco);
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	await page.route('**/api/admin/mitglieder/*/rollen', (route) =>
+		route.fulfill({ status: 409, json: { fehler: 'veraltet' } })
+	);
+	await page.locator('summary', { hasText: 'Rollen' }).click();
+	await page.getByLabel('Lizenz-Admin').check();
+	await page.getByRole('button', { name: 'Rollen speichern' }).click();
+	await expect(
+		page.getByText('Inzwischen hat jemand anderes dieses Mitglied geändert.')
+	).toBeVisible();
+	await expect(page.getByRole('button', { name: 'Neuen Stand laden' })).toBeVisible();
+	await pruefeBildschirm(page, info, 'rollen-veraltet');
+	expect(fehler).toEqual([]);
+});
+
+test('RR-07, Regel 2: Mitglieder-Admin sieht keine Rollenvergabe', async ({ page }, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeRollenkontoMitBriefCodeAn('Mona', ['mitglieder']);
+	const mitglied = await legeKontoAn('Ruth');
+	await oeffneVerwaltung(page, admin);
+	await expect(seitenleiste(page).getByRole('link', { name: 'Mitglieder' })).toBeVisible();
+	await expect(seitenleiste(page).getByRole('link', { name: 'Rollen' })).toHaveCount(0);
+	await expect(seitenleiste(page).getByRole('link', { name: 'Turniere' })).toHaveCount(0);
+	await expect(page.getByText('Nur ansehen.')).toHaveCount(0);
+
+	// Die Seite Rollen führt zur ersten Seite der Verwaltung.
+	await page.goto('/verwaltung/rollen');
+	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
+	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+
+	// Beim Mitglied: Angaben bearbeitbar, keine Klappe «Rollen».
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	await expect(page.getByRole('heading', { level: 1, name: /Ruth/ })).toBeVisible();
+	await expect(page.getByLabel('Vorname', { exact: true })).toBeEnabled();
+	await expect(page.locator('summary', { hasText: 'Rollen' })).toHaveCount(0);
+	await pruefeBildschirm(page, info, 'mitglieder-admin-ohne-rollen');
+	expect(fehler).toEqual([]);
 });

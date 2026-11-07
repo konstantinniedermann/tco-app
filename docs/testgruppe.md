@@ -30,7 +30,7 @@ Lauf.
 
 ## Ablauf Lauf 1
 
-1. Der Admin legt die Testpersonen in MyTCO an, mit ihren echten Daten.
+1. Der Mitglieder-Admin legt die Testpersonen in MyTCO an, mit ihren echten Daten.
 2. Der Projektleiter schickt jeder Person die [Mail](#mail-an-die-testpersonen) mit ihrem
    Brief als PDF und stellt sie in den Chat ([Begrüssung](#chat-nachrichten)).
 3. Die Testpersonen arbeiten die [Aufträge](#aufträge-lauf-1) ab, zuerst alleine.
@@ -57,8 +57,8 @@ die Konten bleiben danach bestehen ([Datenschutz](datenschutz.md#testgruppe)).
 | 7 | Freiwillig: MyTCO am Laptop öffnen und mit dem Passkey vom Handy anmelden | A-LOGIN-07 |
 
 Bei jedem Auftrag dürfen die Testpersonen die Hilfe in MyTCO (A-HILFE-01) benutzen. Aufträge
-nach Rolle (z. B. Admin legt ein Mitglied an) gibt es in Lauf 1 nicht: Auf Live entstünde
-ein echtes Konto, und die Admin-Seite prüft die Checkliste vor dem Release.
+nach Rolle (z. B. Mitglieder-Admin legt ein Mitglied an) gibt es in Lauf 1 nicht: Auf Live entstünde
+ein echtes Konto, und die Verwaltung prüft die Checkliste vor dem Release.
 
 ## Regeln
 

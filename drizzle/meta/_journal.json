@@ -64,6 +64,41 @@
       "when": 1793956716963,
       "tag": "0008_turnier",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793963077306,
+      "tag": "0009_rollen_schaerfen",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793964801387,
+      "tag": "0010_ansicht",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793980155450,
+      "tag": "0011_cm_anmeldung",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793990516838,
+      "tag": "0012_mitteilungen",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794035725380,
+      "tag": "0013_mitgliedschaft",
+      "breakpoints": true
     }
   ]
 }

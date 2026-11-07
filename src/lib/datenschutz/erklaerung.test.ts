@@ -64,6 +64,22 @@ describe('Datenschutzerklärung aus der Doku (DS-09)', () => {
 		expect(text).not.toMatch(/\*\*|"#|\\n/);
 	});
 
+	it('DS-09: Erklärung nennt CM-Anmeldungen und ihre Aufbewahrung', () => {
+		const text = JSON.stringify(leseErklaerung(roh));
+		expect(text).toContain('Anmeldungen zur Clubmeisterschaft');
+		expect(text).toContain('Namen der bestätigten Anmeldungen');
+		expect(text).toContain('bei deinen Anmeldungen zur Clubmeisterschaft');
+	});
+
+	it('DS-09: Erklärung sagt, wer Klassierung, Geschlecht und Jahrgang ändert (FR-37)', () => {
+		const text = JSON.stringify(leseErklaerung(roh));
+		expect(text).toContain('Klassierung änderst du jederzeit im Profil');
+		expect(text).toContain('stimmt sie nicht, korrigieren sie auch die CM-Admins');
+		expect(text).toContain(
+			'Geschlecht und Jahrgang trägst du einmal auf der Seite der Clubmeisterschaft ein'
+		);
+	});
+
 	it('meldet einen fehlenden Titel als Fehler statt eine leere Seite zu zeigen', () => {
 		expect(() => leseErklaerung('ohne Trennlinie')).toThrow();
 	});

@@ -18,7 +18,22 @@ import {
 	setzeTurnierStatus,
 	legeKategorieAn,
 	sageKategorieAb,
-	aendereKategorie
+	aendereKategorie,
+	beendeAnsicht,
+	ladeRollenListe,
+	schaueAls,
+	erfasseAustritt,
+	erfasseWiedereintritt,
+	loescheMitglied,
+	nimmLoeschungZurueck,
+	ladeAuskunft,
+	ladeAnmeldungen,
+	meldeVonHandAn,
+	verschiebeAnmeldung,
+	loescheAnmeldung,
+	entscheideAntrag,
+	sucheSpieler,
+	korrigiereKlassierung
 } from './api.ts';
 
 type Aufruf = { pfad: string; init: RequestInit };
@@ -36,6 +51,48 @@ function holer(antwort: Response | Error) {
 const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
 
 describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
+	it('Regel 3: 403 kein-recht und nur-ansehen kommen als eigene Antwort an', async () => {
+		const a = await speichereRollen(
+			1,
+			['cm'],
+			[],
+			holer(json(403, { fehler: 'kein-recht' })).holen
+		);
+		const b = await legeTurnierAn({}, holer(json(403, { fehler: 'nur-ansehen' })).holen);
+		expect([a, b]).toEqual([{ art: 'kein-recht' }, { art: 'nur-ansehen' }]);
+	});
+
+	it('Regel 2: Rollen-Übersicht liest /api/admin/rollen', async () => {
+		const liste = [{ rolle: 'cm', mitglieder: [{ id: 3, name: 'Muster, Hanna' }] }];
+		const h = holer(json(200, liste));
+		expect(await ladeRollenListe(h.holen)).toEqual({ art: 'ok', daten: liste });
+		expect(h.aufrufe[0].pfad).toBe('/api/admin/rollen');
+	});
+
+	it('Ansicht als …: einschalten schickt die Rolle; läuft schon eine, wird sie zuerst beendet', async () => {
+		const ohne = holer(json(200, {}));
+		expect(await schaueAls('cm', null, ohne.holen)).toEqual({ art: 'ok', daten: {} });
+		expect(ohne.aufrufe.map((a) => [a.pfad, a.init.body])).toEqual([
+			['/api/admin/ansicht', JSON.stringify({ rolle: 'cm' })]
+		]);
+
+		const mit = holer(json(200, {}));
+		await schaueAls('mitglied', 'cm', mit.holen);
+		expect(mit.aufrufe.map((a) => a.pfad)).toEqual([
+			'/api/admin/ansicht/beenden',
+			'/api/admin/ansicht'
+		]);
+
+		// Lässt sich die laufende Ansicht nicht beenden, schaltet die Seite keine neue ein.
+		const kaputt = holer(new Error('Netz weg'));
+		expect(await schaueAls('mitglied', 'cm', kaputt.holen)).toEqual({ art: 'stoerung' });
+		expect(kaputt.aufrufe).toHaveLength(1);
+
+		const ende = holer(json(200, {}));
+		expect(await beendeAnsicht(ende.holen)).toEqual({ art: 'ok', daten: {} });
+		expect(ende.aufrufe[0].init.method).toBe('POST');
+	});
+
 	it('RR-07: 401 wird abgemeldet, 403 kein-admin und unbestaetigt bleiben getrennt', async () => {
 		const a = await ladeZugang(holer(json(401, { fehler: 'abgemeldet' })).holen);
 		const b = await ladeZugang(holer(json(403, { fehler: 'kein-admin' })).holen);
@@ -109,10 +166,19 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 		});
 	});
 
-	it('RR-03: 409 letzter-admin, 404 nicht-gefunden', async () => {
+	it('RR-03: Rollen schicken den geladenen Stand mit; 409 letzter-mytco und veraltet, 404 nicht-gefunden', async () => {
+		const { aufrufe, holen } = holer(json(409, { fehler: 'letzter-mytco' }));
+		expect(await speichereRollen(7, ['cm'], ['mytco', 'cm'], holen)).toEqual({
+			art: 'letzter-mytco'
+		});
+		expect(aufrufe[0].pfad).toBe('/api/admin/mitglieder/7/rollen');
+		expect(JSON.parse(String(aufrufe[0].init.body))).toEqual({
+			rollen: ['cm'],
+			vorher: ['mytco', 'cm']
+		});
 		expect(
-			await speichereRollen(7, [], holer(json(409, { fehler: 'letzter-admin' })).holen)
-		).toEqual({ art: 'letzter-admin' });
+			await speichereRollen(7, [], [], holer(json(409, { fehler: 'veraltet' })).holen)
+		).toEqual({ art: 'veraltet' });
 		expect(await ladeMitglied(9, holer(json(404, { fehler: 'nicht-gefunden' })).holen)).toEqual({
 			art: 'nicht-gefunden'
 		});
@@ -175,13 +241,25 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			'geschlossen',
 			holer(json(409, { fehler: 'unzulaessig' })).holen
 		);
-		const d = await aendereKategorie(2, {}, holer(json(409, { fehler: 'abgesagt' })).holen);
+		const d = await aendereKategorie(2, {}, false, holer(json(409, { fehler: 'abgesagt' })).holen);
 		expect([a, b, c, d]).toEqual([
 			{ art: 'schluss-vorbei' },
 			{ art: 'keine-kategorie' },
 			{ art: 'unzulaessig' },
 			{ art: 'abgesagt' }
 		]);
+	});
+
+	it('FR-36: 409 unpassend wird eigenes Ergebnis mit anzahl', async () => {
+		const u = holer(json(409, { fehler: 'unpassend', anzahl: 3 }));
+		expect(await aendereKategorie(2, {}, false, u.holen)).toEqual({ art: 'unpassend', anzahl: 3 });
+		const h = holer(json(409, { fehler: 'hat-anmeldungen', anzahl: 2 }));
+		expect(await sageKategorieAb(2, h.holen)).toEqual({ art: 'hat-anmeldungen', anzahl: 2 });
+		const t = holer(json(200, {}));
+		await aendereKategorie(2, { name: 'x' }, true, t.holen);
+		expect(JSON.parse(String(t.aufrufe[0].init.body))).toEqual({ name: 'x', trotzdem: true });
+		await aendereKategorie(2, { name: 'x' }, false, t.holen);
+		expect(JSON.parse(String(t.aufrufe[1].init.body))).toEqual({ name: 'x' });
 	});
 
 	it('FR-33: 409 vergeben nennt Jahr oder Name', async () => {
@@ -213,5 +291,149 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			daten: { bestaetigt: true, mitgliedId: 3, rollen: ['cm'] }
 		});
 		if (r.art === 'ok') expect(r.daten.rollen).toEqual(['cm']);
+	});
+
+	it('A-ANMELDUNG-06, FR-46, FR-08: Anmeldungen verwalten mit Pfad, Methode und Körper', async () => {
+		const h = holer(json(200, {}));
+		await ladeAnmeldungen(4, h.holen);
+		await meldeVonHandAn(4, 12, false, h.holen);
+		await meldeVonHandAn(4, 12, true, h.holen);
+		await verschiebeAnmeldung(30, 5, false, h.holen);
+		await verschiebeAnmeldung(30, 5, true, h.holen);
+		await loescheAnmeldung(30, h.holen);
+		await korrigiereKlassierung(12, 'R6', h.holen);
+		expect(h.aufrufe.map((a) => [a.init.method, a.pfad])).toEqual([
+			['GET', '/api/admin/kategorien/4/anmeldungen'],
+			['POST', '/api/admin/kategorien/4/anmeldungen'],
+			['POST', '/api/admin/kategorien/4/anmeldungen'],
+			['POST', '/api/admin/anmeldungen/30'],
+			['POST', '/api/admin/anmeldungen/30'],
+			['POST', '/api/admin/anmeldungen/30/loeschen'],
+			['POST', '/api/admin/spieler/12/klassierung']
+		]);
+		const koerper = h.aufrufe.slice(1).map((a) => JSON.parse(String(a.init.body)));
+		expect(koerper).toEqual([
+			{ mitgliedId: 12 },
+			{ mitgliedId: 12, trotzdem: true },
+			{ kategorieId: 5 },
+			{ kategorieId: 5, trotzdem: true },
+			{},
+			{ klassierung: 'R6' }
+		]);
+	});
+
+	it('FR-08: Entscheid schickt den Grund nur bei einer Ablehnung, ohne Leerzeichen am Rand', async () => {
+		const h = holer(json(200, {}));
+		await entscheideAntrag(30, true, 'wird ignoriert', h.holen);
+		await entscheideAntrag(30, false, '  Zu viele Anträge.  ', h.holen);
+		await entscheideAntrag(30, false, '   ', h.holen);
+		expect(h.aufrufe.map((a) => [a.init.method, a.pfad])).toEqual([
+			['POST', '/api/admin/anmeldungen/30/entscheid'],
+			['POST', '/api/admin/anmeldungen/30/entscheid'],
+			['POST', '/api/admin/anmeldungen/30/entscheid']
+		]);
+		expect(h.aufrufe.map((a) => JSON.parse(String(a.init.body)))).toEqual([
+			{ bestaetigt: true },
+			{ bestaetigt: false, grund: 'Zu viele Anträge.' },
+			{ bestaetigt: false }
+		]);
+	});
+
+	it('A-ANMELDUNG-06: Spielersuche schickt den Suchtext kodiert und liefert die Treffer', async () => {
+		const treffer = [
+			{
+				mitgliedId: 12,
+				name: 'Muster, Hanna',
+				geschlecht: 'w',
+				jahrgang: 1990,
+				klassierung: 'R7'
+			}
+		];
+		const h = holer(json(200, treffer));
+		expect(await sucheSpieler('Muster, H&a', h.holen)).toEqual({ art: 'ok', daten: treffer });
+		expect(h.aufrufe[0]).toMatchObject({ init: { method: 'GET' } });
+		expect(h.aufrufe[0].pfad).toBe('/api/admin/spieler?suche=Muster%2C+H%26a');
+	});
+
+	it('FR-46: 409 warnung kommt mit den Warnungen an', async () => {
+		const w = holer(json(409, { fehler: 'warnung', warnungen: ['passt-nicht', 'voll'] }));
+		expect(await meldeVonHandAn(4, 12, false, w.holen)).toEqual({
+			art: 'warnung',
+			warnungen: ['passt-nicht', 'voll']
+		});
+		const v = holer(json(409, { fehler: 'warnung', warnungen: ['geschlossen'] }));
+		expect(await verschiebeAnmeldung(30, 5, false, v.holen)).toEqual({
+			art: 'warnung',
+			warnungen: ['geschlossen']
+		});
+		// Ohne Liste der Warnungen ist die Antwort nicht lesbar.
+		const kaputt = holer(json(409, { fehler: 'warnung' }));
+		expect(await meldeVonHandAn(4, 12, false, kaputt.holen)).toEqual({ art: 'stoerung' });
+	});
+
+	it('FR-46, FR-08: 409 schon-angemeldet, vorbereitung und nicht-beantragt werden eigene Ergebnisse', async () => {
+		const a = await meldeVonHandAn(
+			4,
+			12,
+			false,
+			holer(json(409, { fehler: 'schon-angemeldet' })).holen
+		);
+		const b = await verschiebeAnmeldung(
+			30,
+			5,
+			false,
+			holer(json(409, { fehler: 'vorbereitung' })).holen
+		);
+		const c = await entscheideAntrag(
+			30,
+			true,
+			'',
+			holer(json(409, { fehler: 'nicht-beantragt' })).holen
+		);
+		const d = await loescheAnmeldung(30, holer(json(404, { fehler: 'nicht-gefunden' })).holen);
+		expect([a, b, c, d]).toEqual([
+			{ art: 'schon-angemeldet' },
+			{ art: 'vorbereitung' },
+			{ art: 'nicht-beantragt' },
+			{ art: 'nicht-gefunden' }
+		]);
+	});
+});
+
+describe('Mitgliedschaft: Austritt, Löschung, Auskunft', () => {
+	const aktionen = [
+		[erfasseAustritt, 'austritt'],
+		[erfasseWiedereintritt, 'wiedereintritt'],
+		[loescheMitglied, 'loeschen'],
+		[nimmLoeschungZurueck, 'loeschen-rueckgaengig']
+	] as const;
+
+	it.each(aktionen)('schickt ein leeres JSON an den richtigen Pfad (%#)', async (aktion, pfad) => {
+		const h = holer(json(200, {}));
+		expect(await aktion(5, h.holen)).toEqual({ art: 'ok', daten: {} });
+		expect(h.aufrufe[0].pfad).toBe(`/api/admin/mitglieder/5/${pfad}`);
+		expect(h.aufrufe[0].init.method).toBe('POST');
+		expect(h.aufrufe[0].init.body).toBe('{}');
+	});
+
+	it.each(aktionen)('409 und weitere Antworten werden eigene Ergebnisse (%#)', async (aktion) => {
+		const mit = (s: number, i: unknown) => aktion(1, holer(json(s, i)).holen);
+		expect(await mit(409, { fehler: 'veraltet' })).toEqual({ art: 'veraltet' });
+		expect(await mit(409, { fehler: 'letzter-mytco' })).toEqual({ art: 'letzter-mytco' });
+		expect(await mit(409, { fehler: 'frist-abgelaufen' })).toEqual({ art: 'frist-abgelaufen' });
+		expect(await mit(403, { fehler: 'nur-ansehen' })).toEqual({ art: 'nur-ansehen' });
+		expect(await mit(404, {})).toEqual({ art: 'nicht-gefunden' });
+		expect(await mit(500, {})).toEqual({ art: 'stoerung' });
+		expect(await aktion(1, holer(new Error('weg')).holen)).toEqual({ art: 'stoerung' });
+	});
+
+	it('Auskunft liest /api/admin/mitglieder/[id]/auskunft', async () => {
+		const h = holer(json(200, { name: 'Beispiel, Lea' }));
+		expect(await ladeAuskunft(5, h.holen)).toEqual({
+			art: 'ok',
+			daten: { name: 'Beispiel, Lea' }
+		});
+		expect(h.aufrufe[0].pfad).toBe('/api/admin/mitglieder/5/auskunft');
+		expect(h.aufrufe[0].init.method).toBe('GET');
 	});
 });

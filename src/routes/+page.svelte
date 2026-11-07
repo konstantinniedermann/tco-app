@@ -2,13 +2,19 @@
 	import { resolve } from '$app/paths';
 	import { standText } from '../lib/anlass/stand.ts';
 	import { formatiereBeginn } from '../lib/anlass/zeit.ts';
+	import { standText as cmStandText } from '../lib/cm/anzeige.ts';
 	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { hinweisErledigt, kannPasskey, richtePasskeyEin } from '../lib/login/passkey.ts';
+	import PushHinweis from '../lib/push/PushHinweis.svelte';
+	import { datumLang } from '../lib/verwaltung/turnier-anzeige.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	let erledigt = $state(false);
-	const sichtbar = $derived(data.passkeyHinweis && kannPasskey() && !erledigt);
+	// In der «Ansicht als …» kein Angebot: Einrichten und «Nein, danke» speichern etwas.
+	const sichtbar = $derived(
+		data.passkeyHinweis && kannPasskey() && !erledigt && data.ansicht === null
+	);
 	let laeuft = $state(false);
 	let fehler = $state<string | null>(null);
 
@@ -65,8 +71,24 @@
 	</div>
 {/if}
 
-{#if data.anlaesse.length > 0}
+<!-- Ein Angebot nach dem anderen: Push erst, wenn der Passkey-Hinweis weg ist (UI-04). -->
+<PushHinweis aktiv={!sichtbar && data.ansicht === null} />
+
+{#if data.turniere.length > 0 || data.anlaesse.length > 0}
 	<h2>Jetzt aktuell</h2>
+	{#each data.turniere as t (t.id)}
+		<a class="karte kachel hervor" href={resolve('/clubmeisterschaft/[id]', { id: String(t.id) })}>
+			<span>
+				<strong>{t.name}</strong><br />
+				<span class="leise"
+					>{t.status === 'offen'
+						? `Anmeldung bis ${datumLang(t.anmeldeschluss)}`
+						: 'Anmeldung geschlossen'}<br />{cmStandText(t.anzahl)}</span
+				>
+			</span>
+			<span class="kachel-pfeil" aria-hidden="true">›</span>
+		</a>
+	{/each}
 	{#each data.anlaesse as a (a.id)}
 		<a class="karte kachel hervor" href={resolve('/anlass/[id]', { id: String(a.id) })}>
 			<span>

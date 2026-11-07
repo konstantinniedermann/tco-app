@@ -8,6 +8,102 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.11.1 — Auskunft ohne Wildcard-Anträge, Doku-Abgleich
+
+- Auskunft: Von der Clubmeisterschaft zeigt sie nur noch bestätigte Anmeldungen, ohne Status und
+  Wildcard-Kommentar, weil der Mitglieder-Admin Wildcard-Anträge nicht sieht; die übrigen gibt auf
+  Wunsch der CM-Admin bekannt. Doku-Abgleich vor dem Release: Datenschutz, README, arc42,
+  Fachmodell, Glossar, Testkonzept, Betrieb (Löschlauf, `ZEITGEBER` nur lokal und im E2E).
+
+## 0.11.0 — Austritt, Löschen und Auskunft
+
+- Austritt, Löschen, Auskunft und Löschfristen (#43, Etappe 3): Der Mitglieder-Admin erfasst Austritt
+  und Wiedereintritt, merkt ein Mitglied zum Löschen vor (7 Tage Bedenkzeit, Anzeige «wird gelöscht»,
+  rückgängig machbar) und druckt die Auskunft mit allen gespeicherten Daten (steht im Änderungsverlauf).
+  Austritt und Vormerken sperren das Login und ziehen offene Anmeldungen zurück. Ein täglicher
+  Zeitgeber der App löscht ausgetretene Mitglieder nach einem Jahr (nur der Name bleibt), den
+  Änderungsverlauf nach 12 Monaten und Antworten zu Anlässen ein Jahr nach Beginn des Anlasses; Verweise auf
+  Gelöschte erscheinen als «gelöschtes Konto». Der letzte MyTCO-Admin kann weder austreten noch
+  vorgemerkt werden (RR-03). Die Anmeldeliste der Clubmeisterschaft zeigt ausgetretene und
+  vorgemerkte Mitglieder; Aktionen der CM-Verantwortlichen schreiben bei Gelöschten keinen Verlauf mehr.
+
+## 0.10.0 — Anmeldungen verwalten und Wildcard-Anträge
+
+- Clubmeisterschaft: Anmeldungen verwalten und Wildcard-Anträge (#60, nur Einzel). Der
+  CM-Admin sieht auf der Seite einer Kategorie alle Anmeldungen, meldet Mitglieder von Hand an,
+  verschiebt sie in eine andere Kategorie, löscht Anmeldungen und korrigiert die Klassierung;
+  passt etwas nicht zu den Regeln, warnt MyTCO, und er bestätigt mit «Trotzdem …». Mitglieder
+  beantragen für eine stärkere Kategorie eine Wildcard mit Kommentar; der CM-Admin bestätigt
+  oder lehnt ab, wahlweise mit Grund. Spieler und CM-Admins bekommen eine Meldung (Push, sonst
+  E-Mail). Der MyTCO-Admin sieht die Liste nur lesend.
+
+## 0.9.1 — Testserver mit festem Namen je Rolle
+
+- Testserver im WLAN: `make dev-handy` meldet je Rolle einen festen Namen an —
+  `mytco-mitglied.local` (Kurt), `mytco-mytcoadmin.local` (Theo), `mytco-mitgliederadmin.local`
+  (Mona) und neu `mytco-cmadmin.local` (Hanna, CM-Admin) — und gibt je Persona einen Link auf ihre
+  Mails in Mailpit aus. `mytco-admin.local` (Erika) entfällt; Erika bleibt nur im Seed.
+
+## 0.9.0 — Mitteilungen per Push und E-Mail
+
+- Mitteilungen per Push und E-Mail (#63): Im Profil unter *Benachrichtigungen* schaltet ein
+  Mitglied Push für sein Gerät ein (auf dem iPhone nur vom Startbildschirm) und wählt die
+  Themen *Anlässe*, *Clubmeisterschaft* und *Verein*; sie gelten für Push und E-Mail. Auf
+  Handys, die Push können (Android, iPhone vom Startbildschirm), fragt die Startseite einmal
+  «Mitteilungen aufs Handy?» (Einschalten · Nein, danke). Ein Tipp auf die Mitteilung öffnet
+  den Anlass. Der Mitglieder-Admin schickt Mitteilungen von der Seite eines Anlasses (Vorlagen
+  *Erinnerung*, *Änderung*, *Neuer Anlass*; an alle oder nur an die, die noch nicht
+  geantwortet haben, kommen, nicht kommen oder deren Antwort nach einer Terminänderung zu
+  prüfen ist) oder unter *Mitteilungen* an den ganzen Verein. Er wählt den Weg (nur Push, Push
+  sonst E-Mail, Push und E-Mail), sieht vorher, wie viele Mitglieder sie wie erreicht, und
+  bestätigt das Senden. Der Verlauf zeigt jede Mitteilung mit Zahlen, ohne Namen der
+  Empfänger, ein Jahr lang. Neues Paket `web-push` verschickt die Pushes. Neu die
+  Einstellungen `MYTCO_VAPID_OEFFENTLICH` und `MYTCO_VAPID_PRIVAT` je Umgebung; ohne sie ist
+  Push aus und Mitteilungen gehen per E-Mail. Mitteilungen zur Clubmeisterschaft folgen.
+
+## 0.8.0 — Clubmeisterschaft: Einzel-Anmeldung der Mitglieder
+
+- Clubmeisterschaft: Mitglieder melden sich selbst an (#58). Sie tragen fehlende Klassierung,
+  Geschlecht und Jahrgang einmal nach, sehen nur passende Einzel-Kategorien, haben höchstens
+  3 Anmeldungen, melden sich bis zum Anmeldeschluss selbst ab und bekommen jedes Mal eine
+  Bestätigung per Mail. Kachel auf der Startseite, Klassierung im Profil.
+- Verwaltung: Warnung, wenn eine geänderte Kategorie Anmeldungen unpassend macht; eine
+  Kategorie mit aktiven Anmeldungen lässt sich nicht absagen; Spalte *Anmeldungen*.
+- Korrektur: Nach dem Speichern einer Kategorie zeigte die Turnierseite manchmal noch den alten
+  Stand, wenn ihr Link vorher schon berührt worden war.
+
+## 0.7.2 — E2E-Tests im Playwright-Container
+
+- CI: Die E2E-Jobs laufen im offiziellen Playwright-Image, Browser und Systempakete sind
+  schon drin. Die Installation über apt fällt weg; sie hing immer wieder am langsamen
+  Ubuntu-Spiegel. Die Image-Version folgt Playwright aus `package-lock.json`.
+
+## 0.7.1 — Kein alter Stand nach dem Speichern
+
+- Korrektur: Nach dem Speichern zeigte die nächste Seite manchmal noch den alten Stand, etwa
+  eine eben abgesagte Kategorie als offen. Die App lud Seiten schon beim Überfahren eines
+  Links mit der Maus vor; jetzt erst beim Antippen bzw. Klicken, und die Rücksprünge nach dem
+  Speichern laden immer frisch.
+
+## 0.7.0 — Rollen schärfen
+
+- Rollen geschärft (#43): Statt «Admin» gibt es vier Admin-Rollen, einzeln vergeben:
+  MyTCO-Admin (vergibt Rollen, sieht alle Bereiche, ändert nichts), Mitglieder-Admin,
+  CM-Admin und Lizenz-Admin. Übergang: Bisherige Admins sind MyTCO- und Mitglieder-Admin.
+  Neu die Seite *Rollen* und *Ansicht als …*: Der MyTCO-Admin sieht MyTCO wie eine gewählte
+  Rolle, nur lesend, auf dem Server durchgesetzt. Ändert die Verwaltung eine E-Mail-Adresse,
+  erhält die alte einen Hinweis. «Rollen speichern» meldet, wenn jemand die Rollen inzwischen
+  geändert hat, statt sie zu überschreiben. Rollen und Rechte, Anforderungen, Datenschutz und
+  Sicherheitskonzept nachgeführt.
+
+## 0.6.1 — Wappen führt zum Start
+
+- Wappen führt zum Start: Ein Tipp aufs Wappen in der Kopfleiste führt zur Startseite, in der
+  Verwaltung zu deren erster Seite; bei offener Tastatur schliesst er nur die Tastatur. Wer
+  ein Formular geändert und nicht gespeichert hat, wird vor dem Verlassen über einen Link der
+  App gefragt: «Nicht gespeichert – trotzdem verlassen?» (Abbrechen · Verlassen). Die
+  Zurück-Taste oder -Geste und das Schliessen der App fragen nicht. UI-Leitbild nachgeführt.
+
 ## 0.6.0 — Clubmeisterschaft: Turnier anlegen
 
 - Clubmeisterschaft: Der CM-Verantwortliche (Rolle `cm`) öffnet die Verwaltung und sieht dort

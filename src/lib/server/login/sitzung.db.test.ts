@@ -6,6 +6,7 @@ import {
 	type EigeneDatenbank
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { erfasseAustritt, merkeZumLoeschenVor } from '../admin/mitgliedschaft.ts';
 import { erstelleDb } from '../db/index.ts';
 import { konto, mitglied, sitzung } from '../db/schema.ts';
 import {
@@ -54,7 +55,14 @@ describe('Sitzungen', () => {
 		const { kontoId, mitgliedId, vorname } = await legeMitgliedAn(db, { vorname: 'Erfunden' });
 		const kennung = await erstelleSitzung(db, kontoId, jetzt);
 		expect(await pruefeSitzung(db, kennung, jetzt)).toEqual({
-			konto: { kontoId, mitgliedId, vorname, passkeyHinweis: false, sitzungHash: hash(kennung) },
+			konto: {
+				kontoId,
+				mitgliedId,
+				vorname,
+				passkeyHinweis: false,
+				sitzungHash: hash(kennung),
+				ansicht: null
+			},
 			verlaengert: false
 		});
 		expect(await pruefeSitzung(db, 'unbekannt', jetzt)).toBeNull();
@@ -119,7 +127,36 @@ describe('Sitzungen', () => {
 	test('nicht aktives Mitglied → null', async () => {
 		const { kontoId, mitgliedId } = await legeMitgliedAn(db);
 		const kennung = await erstelleSitzung(db, kontoId, jetzt);
-		await db.update(mitglied).set({ status: 'ausgetreten' }).where(eq(mitglied.id, mitgliedId));
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten', austrittAm: new Date() })
+			.where(eq(mitglied.id, mitgliedId));
+		expect(await pruefeSitzung(db, kennung, jetzt)).toBeNull();
+	});
+
+	test('Review-Fokus 5: offene Sitzung nach Austritt oder Vormerken → null', async () => {
+		const admin = await legeMitgliedAn(db);
+		const urheber = { art: 'admin', mitgliedId: admin.mitgliedId } as const;
+		const a = await legeMitgliedAn(db);
+		const v = await legeMitgliedAn(db);
+		const kennungA = await erstelleSitzung(db, a.kontoId, jetzt);
+		const kennungV = await erstelleSitzung(db, v.kontoId, jetzt);
+		expect(await pruefeSitzung(db, kennungA, jetzt)).not.toBeNull();
+
+		expect(await erfasseAustritt(db, urheber, a.mitgliedId, jetzt)).toBe('ok');
+		expect(await merkeZumLoeschenVor(db, urheber, v.mitgliedId, jetzt)).toBe('ok');
+
+		expect(await pruefeSitzung(db, kennungA, jetzt)).toBeNull();
+		expect(await pruefeSitzung(db, kennungV, jetzt)).toBeNull();
+	});
+
+	test('vorgemerktes Mitglied → null, auch mit erhaltener Sitzungszeile', async () => {
+		const { kontoId, mitgliedId } = await legeMitgliedAn(db);
+		const kennung = await erstelleSitzung(db, kontoId, jetzt);
+		await db
+			.update(mitglied)
+			.set({ status: 'vorgemerkt', vorgemerktAm: jetzt, statusVorher: 'aktiv' })
+			.where(eq(mitglied.id, mitgliedId));
 		expect(await pruefeSitzung(db, kennung, jetzt)).toBeNull();
 	});
 

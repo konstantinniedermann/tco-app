@@ -6,14 +6,21 @@ import { FELDER, type Angaben, type Feld } from './angaben.ts';
 
 export type Urheber = { art: 'admin' | 'mitglied'; mitgliedId: number } | { art: 'automatisch' };
 
-// Etappen 2 und 3 ergänzen weitere Aktionen.
 export type Aktion =
 	| 'angelegt'
 	| 'feld-geaendert'
 	| 'rolle-vergeben'
 	| 'rolle-entzogen'
 	| 'sitzungen-beendet'
-	| 'fairgate-uebertragen';
+	| 'fairgate-uebertragen'
+	| 'ausgetreten'
+	| 'wiedereingetreten'
+	| 'loeschung-vorgemerkt'
+	| 'loeschung-zurueckgenommen'
+	| 'auskunft-erstellt'
+	// FR-46, FR-08: jede Änderung des CM-Admins an einer Anmeldung, neutral: ohne Kategorie,
+	// Wildcard oder Entscheid, weil auch der Mitglieder-Admin den Verlauf sieht.
+	| 'cm-anmeldung-geaendert';
 
 // FR-26: `detail` enthält nur einen Feld- oder Rollennamen, nie einen Wert.
 export type Eintrag = { aktion: Aktion; detail?: string };
@@ -52,10 +59,11 @@ export type VerlaufZeile = {
 
 export async function ladeVerlauf(
 	db: DbOderTx,
-	filter: { mitgliedId?: number; grenze: number }
+	// Ohne `grenze` kommen alle Einträge.
+	filter: { mitgliedId?: number; grenze?: number }
 ): Promise<VerlaufZeile[]> {
 	const urheber = alias(mitglied, 'urheber');
-	const zeilen = await db
+	const abfrage = db
 		.select({
 			id: aenderung.id,
 			zeitpunkt: aenderung.zeitpunkt,
@@ -75,8 +83,8 @@ export async function ladeVerlauf(
 		.where(
 			filter.mitgliedId === undefined ? undefined : eq(aenderung.mitgliedId, filter.mitgliedId)
 		)
-		.orderBy(desc(aenderung.zeitpunkt), desc(aenderung.id))
-		.limit(filter.grenze);
+		.orderBy(desc(aenderung.zeitpunkt), desc(aenderung.id));
+	const zeilen = await (filter.grenze === undefined ? abfrage : abfrage.limit(filter.grenze));
 	return zeilen.map((z) => ({
 		zeitpunkt: z.zeitpunkt,
 		urheber:

@@ -36,7 +36,7 @@
 </script>
 
 <script lang="ts">
-	import { FELD_NAMEN, feldMeldung } from './anzeige.ts';
+	import { FELD_NAMEN, GESCHLECHT_NAME, feldMeldung } from './anzeige.ts';
 
 	type Props = {
 		start: Werte;
@@ -45,6 +45,8 @@
 		/** Die Taste ist grau, solange nichts geändert ist (Bearbeiten). */
 		nurBeiAenderung?: boolean;
 		rueckmeldung?: string | null;
+		/** Die Rolle darf nur lesen: Felder gesperrt, ohne Tasten (UI-Leitbild, Baustein Nur lesen). */
+		nurLesen?: boolean;
 		onspeichern: (werte: Werte) => void;
 	};
 	let {
@@ -53,6 +55,7 @@
 		knopf,
 		nurBeiAenderung = false,
 		rueckmeldung = null,
+		nurLesen = false,
 		onspeichern
 	}: Props = $props();
 
@@ -104,7 +107,26 @@
 	}
 </script>
 
-<form bind:this={formular} onsubmit={abschicken} novalidate>
+<form
+	bind:this={formular}
+	onsubmit={abschicken}
+	novalidate
+	data-ungespeichert={geaendert ? '' : undefined}
+>
+	{#if nurLesen}
+		<fieldset class="nur-lesen" disabled>{@render felder()}</fieldset>
+	{:else}
+		{@render felder()}
+		<button type="submit" class="taste-haupt" disabled={nurBeiAenderung && !geaendert}
+			>{knopf}</button
+		>
+		<span class="leise" role="status"
+			>{#if rueckmeldung && !geaendert}{rueckmeldung}{/if}</span
+		>
+	{/if}
+</form>
+
+{#snippet felder()}
 	{#each REIHE as f (f)}
 		<div class="feld-zeile">
 			<label for="feld-{f}">{bezeichnung(f)}</label>
@@ -116,8 +138,8 @@
 					aria-describedby={fehler[f] ? `fehler-${f}` : undefined}
 				>
 					<option value="">–</option>
-					<option value="w">weiblich</option>
-					<option value="m">männlich</option>
+					<option value="w">{GESCHLECHT_NAME.w}</option>
+					<option value="m">{GESCHLECHT_NAME.m}</option>
 				</select>
 			{:else}
 				<input
@@ -135,9 +157,4 @@
 			{/if}
 		</div>
 	{/each}
-	<button type="submit" class="taste-haupt" disabled={nurBeiAenderung && !geaendert}>{knopf}</button
-	>
-	<span class="leise" role="status"
-		>{#if rueckmeldung && !geaendert}{rueckmeldung}{/if}</span
-	>
-</form>
+{/snippet}

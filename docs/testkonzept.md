@@ -33,22 +33,33 @@ die Daten, alle anderen nicht. Das gesperrte Konto (RR-08) wird nicht pro Schnit
 geprüft, sondern einmal zentral: Die Sitzungsprüfung behandelt es wie «nicht angemeldet»
 (Tests in `sitzung.db.test.ts`), und jede Schnittstelle geht über sie.
 
+**Rechte-Matrix der Admin-Rollen:** `src/lib/server/admin/rechte-matrix.db.test.ts` ruft jede
+schreibende Schnittstelle der Verwaltung als MyTCO-Admin auf und erwartet überall ausser bei
+den Rollen eine Absage, ohne dass sich in der Datenbank etwas ändert; dazu Lesen je Bereich und
+die fremden Bereiche der anderen Rollen. Eine neue schreibende Schnittstelle fällt dort
+automatisch hinein. Den Riegel von *Ansicht als …* (SI-20) prüfen
+`src/lib/server/ansicht-riegel.test.ts` und `src/lib/server/admin/ansicht.db.test.ts`.
+
 **Ende-zu-Ende** in drei Umgebungen:
 
 | Umgebung | Steht für |
 |----------|-----------|
 | Safari-Engine (WebKit), Handygrösse | iPhone, gut die Hälfte der Mitglieder (ADR-001) |
 | Chrome, Handygrösse | Android |
-| Chrome, Desktop | Admin am PC |
+| Chrome, Desktop | Verwaltung am PC |
 
 **Passkey:** Die Ende-zu-Ende-Tests nutzen einen virtuellen Authenticator (Chrome DevTools
 Protocol) und laufen darum nur in Chrome. WebKit bietet das nicht, die Safari-Engine prüft
 den Passkey-Ablauf also nicht. Wie sich ein echter Authenticator auf iPhone und Android
 verhält, zeigt allein die [Checkliste](#checkliste-vor-dem-release).
 
-Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelheit; zuerst
-Login per Einmal-Code und eingeloggt bleiben, später *Daten ergänzen* beim ersten Login
-(FR-02, noch geplant).
+Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelheit. Heute
+(`tests/e2e/`): Login per Einmal-Code und eingeloggt bleiben, Passkey, Startseite, Hilfe und
+Datenschutzerklärung ohne Login, Profil mit E-Mail-Wechsel, Benachrichtigungen, Anlässe,
+Mitteilungen, Verwaltung mit Rollen, Austritt, Löschen und Auskunft, Turnier und Kategorien,
+CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, dazu Bedienung (Wappen,
+Statusleiste, Fusszeile, Fokusrahmen). Später *Daten ergänzen* beim ersten Login (FR-02, noch
+geplant).
 
 **Grenzen pro IP:** Alle Browser eines Laufs kommen von 127.0.0.1 an denselben Server; die
 Grenze von 10 Code-Anfragen pro IP und Stunde (SI-04) gilt für den ganzen Lauf, Login-Codes
@@ -64,7 +75,7 @@ zählen die Ende-zu-Ende-Tests und das Review.
 ## Anforderung → Testfall
 
 Jeder Test nennt im Namen die ID, die er prüft, z. B.
-`FR-24: Einmal-Code gilt nur einmal` oder `RR-04: Admin kann keinen Code abrufen`.
+`FR-24: Einmal-Code gilt nur einmal` oder `RR-04: Datenbank enthält den Brief-Code nicht im Klartext`.
 Ein Test darf mehrere IDs nennen.
 
 Die CI prüft, dass jede dieser IDs mindestens einen Test hat (sie sucht die ID irgendwo in
@@ -93,9 +104,10 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
 
 - Wenige erfundene Personen, von Hand geschrieben und fest im Repo, ohne Generator für Namen
   oder Adressen. Seed-Daten und Testdaten der Test-Umgebung
-  (beide aus `scripts/erfundene-mitglieder.ts`); der Musterbrief nimmt dieselbe erste Person, aber mit eigener Adresse.
+  (beide aus `scripts/erfundene-mitglieder.ts`; Mona und Theo nur lokal aus `scripts/seed-lokal.ts`); der Musterbrief nimmt dieselbe erste Person, aber mit eigener Adresse.
   Die Beispiel-GV (`scripts/beispiel-anlass.ts`) legt für `make seed` fünf weitere erfundene
-  Mitglieder an.
+  Mitglieder an, das Beispielturnier (`scripts/beispiel-turnier.ts`) fünf weitere erfundene
+  Spieler mit Anmeldungen und einem Wildcard-Antrag.
 - Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
   (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
 - E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern im Format
@@ -134,14 +146,16 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] Seite Hilfe ohne Login über die Fusszeile erreichbar, der Kontakt stimmt (A-HILFE-01)
 - [ ] Anlass: «In den Kalender» auf einem echten iPhone **in der App vom Startbildschirm** und auf einem Android-Handy; der Termin landet mit Datum, Zeit und Ort im Kalender des Geräts (A-ANLASS-01, SI-19); vorher als Erika in der Verwaltung einen Anlass anlegen (Test ist nach jeder Auslieferung ohne Anlass)
 - [ ] iPhone, App vom Startbildschirm: Telefon und Adresse im Profil ändern; E-Mail ändern, in die Mail-App wechseln und zurück → Schritt 2 mit den zwei Code-Feldern steht da, beide Mails kommen an (über die Umleitung), danach Login mit der neuen Adresse (A-KONTO-01, A-KONTO-02, SI-09)
-- [ ] Admin-Seite am PC: die Selbständerung erscheint unter *Für Fairgate* und verschwindet nach dem Abhaken (A-KONTO-02)
+- [ ] Verwaltung am PC: die Selbständerung erscheint unter *Für Fairgate* und verschwindet nach dem Abhaken (A-KONTO-02)
 - [ ] iPhone (App vom Startbildschirm) und Android: Reiterwechsel blendet über, Hilfe schiebt sich herein und mit «‹ Zurück» hinaus, Aufklappbereich öffnet weich; kein grauer Tipp-Blitz, kein Link-Menü beim langen Drücken auf Reiter und Tasten; mit «Bewegung reduzieren» alles ohne Bewegung (UI-09, #54)
 - [ ] iPhone und Android: Kopfleiste und Reiter bleiben beim Scrollen stehen; Tipp auf einen Reiter wirkt auch, während der Inhalt nachläuft; mit offener Tastatur (z. B. Adresse im Profil) sind die Reiter weg, die Kopfleiste bleibt oben, nichts springt, «Weiter» führt ins nächste Feld (Leitbild «Eingabe mit Tastatur», #54)
+- [ ] iPhone (App vom Startbildschirm) und Android: Tipp aufs Wappen führt zur Startseite; mit offener Tastatur schliesst er nur die Tastatur; nach einer ungespeicherten Änderung (z. B. Telefon im Profil) kommt «Nicht gespeichert – trotzdem verlassen?», *Abbrechen* bleibt, *Verlassen* geht weiter (Leitbild «Ungespeicherte Änderungen»)
 - [ ] Steht ein Einrichtungsabend an: mobile Daten statt Club-WLAN, oder die Grenzen pro IP vorher prüfen ([ADR-004](adr/adr-004-login-einmal-code.md), Restrisiken)
-- [ ] Push einschalten und erhalten (ab Etappe *CM-Betrieb*)
-- [ ] Erika Beispiel öffnet auf Test die Verwaltung mit Code per Mail (SI-08, A-ROLLE-02)
-- [ ] Admin-Seite am PC: die geänderten Funktionen einmal durchgehen
-- [ ] Vor dem ersten Live-Release mit Mitgliedern: Hinweis an die alte E-Mail-Adresse (FR-25, SI-09), Löschung des Änderungsverlaufs nach 12 Monaten (FR-26) und der Anlass-Antworten ein Jahr nach dem Anlass (K-50) sind gebaut, sonst Datenschutzerklärung anpassen
+- [ ] Push auf einem echten iPhone **in der App vom Startbildschirm** und auf einem Android-Handy: Push einschalten, als Mitglieder-Admin eine Mitteilung zu einem Anlass schicken → sie kommt an, ein Tipp darauf öffnet den Anlass; nach dem Abmelden kommt keine mehr an (FR-40, FR-44). Offen, bis #39 steht
+- [ ] Erika Beispiel (MyTCO- und Mitglieder-Admin) öffnet auf Test die Verwaltung mit Code per Mail (SI-08, A-ROLLE-02)
+- [ ] Rollen: `rechte-matrix.db.test.ts` ist im Lauf von `make check` grün; auf Test gibt Erika Hanna Muster die Rolle CM-Admin, schaltet *Ansicht als CM-Admin* ein: Band oben, Turniere ohne Speicher-Tasten, eine Mitgliedseite, die schon vorher in einem zweiten Tab offen war, meldet beim Speichern «In der Ansicht kannst du nichts speichern.» (Riegel, SI-20); *Beenden* bringt die Tasten zurück; danach die Rolle wieder entziehen (A-ROLLE-01, A-ROLLE-09)
+- [ ] Verwaltung am PC: die geänderten Funktionen einmal durchgehen
+- [x] Löschfristen gebaut (Etappe 3 von #43): Änderungsverlauf nach 12 Monaten (FR-26), Anlass-Antworten ein Jahr nach Beginn des Anlasses (K-50), Austritt plus 1 Jahr (K-38); auf Test prüfen, dass der Zeitgeber läuft (`ZEITGEBER` nicht auf `aus`)
 - [ ] `admin-festlegen` einmal auf Test über `docker compose exec` ausgeführt
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.

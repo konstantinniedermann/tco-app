@@ -10,8 +10,10 @@ was dort steht, gilt. Kapitel ohne eigene Aussage fehlen (Laufzeitsicht: Login-A
 ## 1 Ziele und Randbedingungen
 
 MyTCO ist die Mitglieder-App des Tennis-Club Olten: Login ohne Passwort, eigene Angaben,
-Anlässe, später Anmeldung und Resultate der Clubmeisterschaft und Lizenzanträge. Admins
-pflegen darin die Mitglieder. Umfang und Termine: [Roadmap](roadmap.md),
+Anlässe, Mitteilungen per Push und E-Mail, Anmeldung zur Clubmeisterschaft, später deren
+Resultate und Lizenzanträge.
+Mitglieder-Admins pflegen darin die Mitglieder, CM- und Lizenz-Admins ihre Bereiche, der
+MyTCO-Admin vergibt die Rollen. Umfang und Termine: [Roadmap](roadmap.md),
 [Anforderungen](anforderungen/anforderungen.md).
 
 | Qualitätsziel | Bedeutet | Anforderung |
@@ -31,14 +33,14 @@ entsteht mit Claude Code, die Regeln dafür erzwingen Prüfungen in Hook und CI.
 ```mermaid
 flowchart LR
   M([Mitglieder, Handy oder PC]) -->|Browser, App auf dem Startbildschirm| APP[MyTCO]
-  A([Admins und Verantwortliche]) -->|Verwaltung im selben Browser| APP
+  A([Admin-Rollen]) -->|Verwaltung im selben Browser| APP
   APP -->|Einmal-Codes, Bestätigungen| MAIL[Mail-Versand]
   MAIL --> M
   BRIEF[Login-Brief auf Papier] -->|Brief-Code, QR-Code| M
   APP -->|Druckansicht| BRIEF
   DNS[DNS von tcolten.ch bei Metanet] -.->|my.tcolten.ch zeigt auf den Server| APP
   FG[Fairgate] -.->|Mitgliederliste als Datei, geplant| APP
-  APP -.->|Liste Für Fairgate, Admin überträgt von Hand| FG
+  APP -.->|Liste Für Fairgate, Mitglieder-Admin überträgt von Hand| FG
   APP -.->|Lizenznummern, später| ST[Swiss Tennis Advantage]
   ST -.->|Gruppen und Tableaus als Excel, später| APP
   GH[GitHub: Code, CI, Container-Ablage] -->|Auslieferung| APP
@@ -64,6 +66,7 @@ flowchart LR
 | Passkey | Freiwillig, als Komfort, mit SimpleWebAuthn | [ADR-005](adr/adr-005-passkey-simplewebauthn.md) |
 | Eigenständig | Eigene Mitgliederliste, keine Anbindung an Fairgate | [ADR-006](adr/adr-006-eigenstaendig-ohne-fairgate.md) |
 | Versionen | Jeder Merge nach `dev` mit Code bekommt seine eigene Versionsnummer | [ADR-007](adr/adr-007-version-pro-merge.md) |
+| Löschfristen | Ein täglicher Zeitgeber in der App ruft den Löschlauf auf, kein Cron, kein Datenbank-Job | [ADR-008](adr/adr-008-zeitgeber-in-der-app.md) |
 
 ## 5 Bausteinsicht
 
@@ -72,19 +75,20 @@ flowchart TD
   S["Seiten: src/routes, +page.svelte, oft mit +page.ts"] -->|fetch, JSON| API["Schnittstellen: src/routes/api, nur +server.ts"]
   S --> UI["Oberfläche: src/lib, ohne server"]
   H["hooks.server.ts: Sitzung, Sicherheits-Header"] --> API
-  API --> F["Fachmodule: src/lib/server/login, admin, profil, anlass, turnier, brief"]
+  API --> F["Fachmodule: src/lib/server/login, admin, profil, anlass, turnier, cm, mitteilung, brief"]
   F --> DB["Datenbank: src/lib/server/db, Drizzle, Migrationen in drizzle/"]
   DB --> PG[(PostgreSQL)]
 ```
 
 | Baustein | Aufgabe | Regel |
 |----------|---------|-------|
-| **Seiten** (`src/routes/**/+page.*`) | Bildschirme für Mitglieder und `verwaltung/` für Admins; laden Daten im Browser | keine Server-Dateien ausser `+server.ts`, keine Form Actions, keine Remote Functions ([ADR-002](adr/adr-002-sveltekit-postgresql.md), Prüfung `bauregel`) |
-| **Schnittstellen** (`src/routes/api/**/+server.ts`) | JSON für die Seiten; `api/admin/` nur für Verwaltungsrollen (Turniere und Kategorien: `admin` und `cm`, alles andere nur `admin`) | Admin-Routen nutzen nur die Einträge aus `ADMIN_SCHNITTSTELLEN` (`src/lib/server/admin/schnittstellen.ts`) oder `TURNIER_SCHNITTSTELLEN` (`src/lib/server/turnier/schnittstellen.ts`), die Sitzung und Rolle prüfen, für den Admin-Bereich zusätzlich den frischen Mail-Code (SI-08) |
+| **Seiten** (`src/routes/**/+page.*`) | Bildschirme für Mitglieder und `verwaltung/` für die Admin-Rollen; laden Daten im Browser | keine Server-Dateien ausser `+server.ts`, keine Form Actions, keine Remote Functions ([ADR-002](adr/adr-002-sveltekit-postgresql.md), Prüfung `bauregel`) |
+| **Schnittstellen** (`src/routes/api/**/+server.ts`) | JSON für die Seiten; `api/admin/` nur für Verwaltungsrollen, je Bereich Lesen und Schreiben getrennt (`src/lib/verwaltung/bereiche.ts`: Mitglieder schreibt `mitglieder`, Clubmeisterschaft `cm`, Rollen `mytco`; `mytco` liest alle Bereiche) | Admin-Routen nutzen nur die Einträge aus `ADMIN_SCHNITTSTELLEN` (`src/lib/server/admin/schnittstellen.ts`), `TURNIER_SCHNITTSTELLEN` (`src/lib/server/turnier/schnittstellen.ts`) oder `MITTEILUNG_ADMIN_SCHNITTSTELLEN` (`src/lib/server/mitteilung/schnittstellen.ts`), die Sitzung, Bereich und Art prüfen, dazu den frischen Mail-Code (SI-08); während *Ansicht als …* weist der Hook jedes Speichern ab (SI-20) |
 | **Fachmodule** (`src/lib/server/<thema>/`) | Fachregeln aus dem [Fachmodell](fachmodell.md) (`FR-NN`) und Rechte aus [Rollen und Rechte](rollen-und-rechte.md) (`RR-NN`) | Rechte prüft immer der Server |
 | **Datenbank** (`src/lib/server/db/`, `drizzle/`) | Schema und Migrationen | Migrationen fügen nur hinzu, damit der Rückfall auf das vorherige Image geht ([CI/CD und Release](ci-cd-und-release.md#auslieferung)) |
-| **Oberfläche** (`src/lib/` ohne `server/`) | Bausteine und Tokens (`ui/`, `design/`), Teile je Thema (`verwaltung/`, `login/`, `profil/`, `anlass/`, `turnier/`, `hilfe/`, `datenschutz/`) | nur aus dem [UI-Leitbild](ui-leitbild.md) |
-| **Skripte** (`scripts/`) | Admin festlegen, Seed, Testdaten, Musterbrief, Prüfungen für Hook und CI | Befehle über `make help` |
+| **Oberfläche** (`src/lib/` ohne `server/`) | Bausteine und Tokens (`ui/`, `design/`), Teile je Thema (`verwaltung/`, `login/`, `profil/`, `anlass/`, `turnier/`, `cm/`, `mitteilung/`, `push/`, `hilfe/`, `datenschutz/`) | nur aus dem [UI-Leitbild](ui-leitbild.md) |
+| **Zeitgeber** (`src/lib/server/zeitgeber.ts`, gestartet in `hooks.server.ts`) | Täglicher Takt in der App (erster Lauf kurz nach dem Start), ruft den Löschlauf `raeumeAuf` (`src/lib/server/admin/loeschung.ts`) | `ZEITGEBER=aus` schaltet ihn ab (E2E); ein Datenbank-Sperrschloss verhindert parallele Läufe ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)) |
+| **Skripte** (`scripts/`) | Ersten Admin festlegen, Seed, Testdaten, Musterbrief, Prüfungen für Hook und CI | Befehle über `make help` |
 | **Betrieb** (`betrieb/`) | Einrichtung, Auslieferung und Sicherung auf dem Server | siehe Kapitel 7 |
 
 Welche Pfade zu welcher Aufgabe gehören: [Context-Scopes](context-scopes.md).
@@ -126,8 +130,9 @@ flowchart LR
 
 | Thema | Wo |
 |-------|-----|
-| Login, Sitzung, Admin-Zugang | [Sicherheitskonzept](sicherheitskonzept.md#login), [ADR-004](adr/adr-004-login-einmal-code.md) |
+| Login, Sitzung, Zugang zur Verwaltung | [Sicherheitskonzept](sicherheitskonzept.md#login), [ADR-004](adr/adr-004-login-einmal-code.md) |
 | Rollen und Rechte | [Rollen und Rechte](rollen-und-rechte.md) |
+| Löschfristen zur Laufzeit | Der Zeitgeber der App löscht täglich, was fällig ist: ausgetretene Mitglieder nach 1 Jahr, vorgemerkte nach 7 Tagen, Verlauf nach 12 Monaten, Antworten zu Anlässen ein Jahr nach Beginn des Anlasses ([Datenschutzkonzept](datenschutz.md#löschen)) |
 | Personendaten, Löschen, Logs | [Datenschutzkonzept](datenschutz.md) (`DS-NN`), [Datenschutzerklärung](datenschutzerklaerung.md) |
 | Sicherheit | [Sicherheitskonzept](sicherheitskonzept.md) (`SI-NN`) |
 | Oberfläche, Sprache, Barrierefreiheit | [UI-Leitbild](ui-leitbild.md) (`UI-NN`) |

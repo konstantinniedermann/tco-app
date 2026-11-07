@@ -8,6 +8,7 @@ import {
 	mitAenderung,
 	ladeAngaben,
 	ladeKontakt,
+	ladeProfil,
 	speichereAngaben,
 	starteWechsel,
 	type EigeneAngaben
@@ -59,6 +60,17 @@ describe('A-KONTO-01: eigene Angaben laden', () => {
 	it('Kontakt aus /api/kontakt, bei Störung null', async () => {
 		expect(await ladeKontakt(holer(json(200, { kontakt: 'K' })).holen)).toBe('K');
 		expect(await ladeKontakt(holer(json(500, {})).holen)).toBeNull();
+	});
+
+	it('FR-37: Klassierung kommt mit den Angaben, unbekannte Werte gelten als nicht angegeben', async () => {
+		const { aufrufe, holen } = holer(json(200, { angaben: LEA, klassierung: 'R5' }));
+		expect(await ladeProfil(holen)).toEqual({ angaben: LEA, klassierung: 'R5' });
+		expect(aufrufe).toEqual([{ pfad: '/api/profil', init: { method: 'GET' } }]);
+		expect(await ladeProfil(holer(json(200, { angaben: LEA, klassierung: 'R10' })).holen)).toEqual({
+			angaben: LEA,
+			klassierung: null
+		});
+		expect(await ladeProfil(holer(json(500, {})).holen)).toBeNull();
 	});
 });
 

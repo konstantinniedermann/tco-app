@@ -20,10 +20,10 @@ export const mitglied = pgTable(
 		id: serial('id').primaryKey(),
 		vorname: text('vorname').notNull(),
 		nachname: text('nachname').notNull(),
-		strasse: text('strasse').notNull(),
-		plz: text('plz').notNull(),
-		ort: text('ort').notNull(),
-		email: text('email').notNull().unique('mitglied_email_unique'),
+		strasse: text('strasse'),
+		plz: text('plz'),
+		ort: text('ort'),
+		email: text('email').unique('mitglied_email_unique'),
 		status: text('status').notNull().default('aktiv'),
 		// Leer erlaubt (mehrere Mitglieder ohne Nummer); gesetzt ist sie eindeutig, ohne Rücksicht auf
 		// Gross-/Kleinschreibung («A12» = «a12»), gespeichert wie eingegeben.
@@ -31,14 +31,46 @@ export const mitglied = pgTable(
 		telefon: text('telefon'),
 		geschlecht: text('geschlecht'),
 		jahrgang: integer('jahrgang'),
+		// Swiss-Tennis-Klassierung (FR-37): N1..N4, R1..R9 oder «keine»; leer = nicht erfasst.
+		klassierung: text('klassierung'),
 		lizenznummer: text('lizenznummer'),
 		// Annahme K-19.2: Gesetzt, sobald das Mitglied eine Angabe selbst geändert hat, die der Verein noch in Fairgate
 		// nachführen muss; leer = nichts offen.
-		fairgateOffenSeit: timestamp('fairgate_offen_seit', { withTimezone: true })
+		fairgateOffenSeit: timestamp('fairgate_offen_seit', { withTimezone: true }),
+		// Zeitpunkt, an dem der Austritt erfasst wurde; die Aufbewahrungsfrist läuft ab hier. Leer = nie ausgetreten.
+		austrittAm: timestamp('austritt_am', { withTimezone: true }),
+		// Zeitpunkt, an dem das Mitglied zum Löschen vorgemerkt wurde; die Bedenkzeit läuft ab hier.
+		vorgemerktAm: timestamp('vorgemerkt_am', { withTimezone: true }),
+		// Status vor dem Vormerken (zur Rücknahme); nur bei `vorgemerkt` gesetzt.
+		statusVorher: text('status_vorher')
 	},
 	(t) => [
-		check('mitglied_status_check', sql`${t.status} in ('aktiv', 'ausgetreten', 'geloescht')`),
+		check(
+			'mitglied_status_check',
+			sql`${t.status} in ('aktiv', 'ausgetreten', 'vorgemerkt', 'geloescht')`
+		),
+		// Adresse und E-Mail dürfen nur bei gelöschten Mitgliedern fehlen.
+		check(
+			'mitglied_geloescht_check',
+			sql`${t.status} = 'geloescht' or (${t.email} is not null and ${t.strasse} is not null and ${t.plz} is not null and ${t.ort} is not null)`
+		),
+		check(
+			'mitglied_status_vorher_check',
+			sql`${t.statusVorher} is null or ${t.statusVorher} in ('aktiv', 'ausgetreten')`
+		),
+		check(
+			'mitglied_vorgemerkt_check',
+			sql`${t.status} <> 'vorgemerkt' or (${t.vorgemerktAm} is not null and ${t.statusVorher} is not null)`
+		),
+		check(
+			'mitglied_ausgetreten_check',
+			sql`${t.status} <> 'ausgetreten' or ${t.austrittAm} is not null`
+		),
 		check('mitglied_geschlecht_check', sql`${t.geschlecht} in ('w', 'm')`),
+		check(
+			'mitglied_klassierung_check',
+			sql`${t.klassierung} is null or ${t.klassierung} in ('N1', 'N2', 'N3', 'N4', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'keine')`
+		),
 		uniqueIndex('mitglied_mitgliedernummer_klein_unique').on(sql`lower(${t.mitgliedernummer})`),
 		// Der Login sucht die Adresse ohne Rücksicht auf Gross-/Kleinschreibung: sie muss auch so eindeutig sein.
 		uniqueIndex('mitglied_email_klein_unique').on(sql`lower(${t.email})`)
@@ -60,8 +92,17 @@ export const konto = pgTable('konto', {
 	mailCodeAblauf: timestamp('mail_code_ablauf', { withTimezone: true }),
 	mailCodeFehlversuche: integer('mail_code_fehlversuche').notNull().default(0),
 	// Zufällige Konto-Kennung für WebAuthn (base64url aus 32 Zufallsbytes), gesetzt beim ersten Versuch, einen Passkey einzurichten.
-	passkeyKennung: text('passkey_kennung').unique('konto_passkey_kennung_unique')
+	passkeyKennung: text('passkey_kennung').unique('konto_passkey_kennung_unique'),
+	// Themen, zu denen das Mitglied Mitteilungen erhält (FR-41); neue Konten haben alle an.
+	themaAnlaesse: boolean('thema_anlaesse').notNull().default(true),
+	themaCm: boolean('thema_cm').notNull().default(true),
+	themaVerein: boolean('thema_verein').notNull().default(true)
 });
+
+export type Thema = 'anlaesse' | 'cm' | 'verein';
+export type Weg = 'push' | 'push-sonst-mail' | 'push-und-mail';
+// 'cm' kommt mit dem CM-Plan.
+export type Bezug = 'anlass' | 'verein';
 
 export const sitzung = pgTable(
 	'sitzung',
@@ -77,9 +118,17 @@ export const sitzung = pgTable(
 		adminBestaetigtAm: timestamp('admin_bestaetigt_am', { withTimezone: true }),
 		adminCodeHash: text('admin_code_hash'),
 		adminCodeAblauf: timestamp('admin_code_ablauf', { withTimezone: true }),
-		adminCodeFehlversuche: integer('admin_code_fehlversuche').notNull().default(0)
+		adminCodeFehlversuche: integer('admin_code_fehlversuche').notNull().default(0),
+		// «Ansicht als …» des MyTCO-Admins, nur für diese Sitzung; null heisst keine Ansicht.
+		ansichtRolle: text('ansicht_rolle')
 	},
-	(t) => [index('sitzung_konto_id_idx').on(t.kontoId)]
+	(t) => [
+		index('sitzung_konto_id_idx').on(t.kontoId),
+		check(
+			'sitzung_ansicht_rolle_check',
+			sql`${t.ansichtRolle} is null or ${t.ansichtRolle} in ('mitglied', 'mitglieder', 'cm', 'lizenz')`
+		)
+	]
 );
 
 export const passkey = pgTable(
@@ -115,7 +164,7 @@ export const kontoRolle = pgTable(
 	},
 	(t) => [
 		primaryKey({ columns: [t.kontoId, t.rolle] }),
-		check('konto_rolle_rolle_check', sql`${t.rolle} in ('admin', 'cm', 'lizenz')`)
+		check('konto_rolle_rolle_check', sql`${t.rolle} in ('mytco', 'mitglieder', 'cm', 'lizenz')`)
 	]
 );
 
@@ -259,5 +308,96 @@ export const kategorie = pgTable(
 		uniqueIndex('kategorie_name_aktiv_unique')
 			.on(t.turnierId, sql`lower(${t.name})`)
 			.where(sql`${t.status} = 'aktiv'`)
+	]
+);
+
+// Push-Abo eines Geräts (FR-40); hängt an der Sitzung und verschwindet mit ihr.
+export const pushAbo = pgTable(
+	'push_abo',
+	{
+		endpunkt: text('endpunkt').primaryKey(),
+		sitzungHash: text('sitzung_hash')
+			.notNull()
+			.references(() => sitzung.kennungHash, { onDelete: 'cascade' }),
+		kontoId: integer('konto_id')
+			.notNull()
+			.references(() => konto.id, { onDelete: 'cascade' }),
+		p256dh: text('p256dh').notNull(),
+		auth: text('auth').notNull(),
+		eingerichtetAm: timestamp('eingerichtet_am', { withTimezone: true }).notNull()
+	},
+	(t) => [
+		index('push_abo_konto_id_idx').on(t.kontoId),
+		// FR-40: ein Abo je Sitzung, also je Gerät.
+		uniqueIndex('push_abo_sitzung_hash_unique').on(t.sitzungHash)
+	]
+);
+
+// Gesendete Mitteilung mit Zählern der Zustellung (FR-45).
+export const mitteilung = pgTable(
+	'mitteilung',
+	{
+		id: serial('id').primaryKey(),
+		bezug: text('bezug').$type<Bezug>().notNull(),
+		anlassId: integer('anlass_id').references(() => anlass.id, { onDelete: 'cascade' }),
+		absenderId: integer('absender_id').references(() => mitglied.id, { onDelete: 'set null' }),
+		gesendetAm: timestamp('gesendet_am', { withTimezone: true }).notNull(),
+		titel: text('titel').notNull(),
+		text: text('text').notNull(),
+		auswahl: text('auswahl').notNull(),
+		weg: text('weg').$type<Weg>().notNull(),
+		push: integer('push').notNull().default(0),
+		mails: integer('mails').notNull().default(0),
+		ersatzMails: integer('ersatz_mails').notNull().default(0),
+		nichtErreichbar: integer('nicht_erreichbar').notNull().default(0)
+	},
+	(t) => [
+		check('mitteilung_bezug_check', sql`${t.bezug} in ('anlass', 'verein')`),
+		check('mitteilung_anlass_check', sql`(${t.bezug} = 'anlass') = (${t.anlassId} is not null)`),
+		check('mitteilung_weg_check', sql`${t.weg} in ('push', 'push-sonst-mail', 'push-und-mail')`),
+		index('mitteilung_anlass_id_gesendet_am_idx').on(t.anlassId, t.gesendetAm),
+		index('mitteilung_gesendet_am_idx').on(t.gesendetAm)
+	]
+);
+
+export type AnmeldungStatus = 'bestaetigt' | 'beantragt' | 'abgelehnt' | 'zurueckgezogen';
+
+// Anmeldung zu einer Kategorie (FR-04, FR-06); Einzel mit einem, Doppel mit zwei Spielern.
+export const anmeldung = pgTable(
+	'anmeldung',
+	{
+		id: serial('id').primaryKey(),
+		kategorieId: integer('kategorie_id')
+			.notNull()
+			.references(() => kategorie.id, { onDelete: 'cascade' }),
+		status: text('status').$type<AnmeldungStatus>().notNull().default('bestaetigt'),
+		// Wildcard-Begründung (Teil 4).
+		kommentar: text('kommentar'),
+		angemeldetAm: timestamp('angemeldet_am', { withTimezone: true }).notNull(),
+		geaendertAm: timestamp('geaendert_am', { withTimezone: true }).notNull()
+	},
+	(t) => [
+		check(
+			'anmeldung_status_check',
+			sql`${t.status} in ('bestaetigt', 'beantragt', 'abgelehnt', 'zurueckgezogen')`
+		),
+		index('anmeldung_kategorie_idx').on(t.kategorieId)
+	]
+);
+
+// Spieler einer Anmeldung. Das Mitglied wird nicht mitgelöscht: die Anmeldung bleibt bestehen.
+export const anmeldungSpieler = pgTable(
+	'anmeldung_spieler',
+	{
+		anmeldungId: integer('anmeldung_id')
+			.notNull()
+			.references(() => anmeldung.id, { onDelete: 'cascade' }),
+		mitgliedId: integer('mitglied_id')
+			.notNull()
+			.references(() => mitglied.id)
+	},
+	(t) => [
+		primaryKey({ columns: [t.anmeldungId, t.mitgliedId] }),
+		index('anmeldung_spieler_mitglied_idx').on(t.mitgliedId)
 	]
 );

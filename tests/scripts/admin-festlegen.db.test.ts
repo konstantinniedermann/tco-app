@@ -112,22 +112,24 @@ describe('Befehl admin-festlegen', () => {
 	test('A-ROLLE-02: Erfolg → Ergebnis ausgegeben, Exit-Code unverändert, keine Werte', async () => {
 		await festlegen(args({ ...WERTE, nachname: 'Nachnamex' }), db);
 		expect(process.exitCode).toBeUndefined();
-		expect(ausgabe).toEqual(['admin: Mitglied angelegt, Rolle admin vergeben']);
+		expect(ausgabe).toEqual([
+			'admin: Mitglied angelegt, Rollen MyTCO-Admin und Mitglieder-Admin vergeben'
+		]);
 		keineWerteInAusgabe(['7391847', 'Zirkonia', 'Nachnamex', 'zirkonia.q']);
 
 		await festlegen(args({ ...WERTE, nachname: 'Nachnamex' }), db);
-		expect(ausgabe.at(-1)).toBe('admin: Mitglied war schon Admin, nichts geändert');
+		expect(ausgabe.at(-1)).toBe('admin: Mitglied war schon MyTCO-Admin, nichts geändert');
 		expect(process.exitCode).toBeUndefined();
 	});
 });
 
 describe('Testdaten', () => {
-	test('testdaten: Erika Beispiel ist auf Test Admin', async () => {
+	test('testdaten: Erika Beispiel ist auf Test MyTCO-Admin und Mitglieder-Admin', async () => {
 		// Wie ladeTestdaten in scripts/testdaten.ts: anlegen, dann das erste Mitglied zum Admin machen.
 		const kontoIds = await legeErfundeneMitgliederAn(db);
 		await machAdmin(db, kontoIds[0], new Date());
 		expect(ERFUNDENE_MITGLIEDER[0]).toMatchObject({ vorname: 'Erika', nachname: 'Beispiel' });
-		expect(await ladeRollen(db, kontoIds[0])).toEqual(['admin']);
+		expect((await ladeRollen(db, kontoIds[0])).sort()).toEqual(['mitglieder', 'mytco']);
 		expect(await ladeRollen(db, kontoIds[1])).toEqual([]);
 	});
 });

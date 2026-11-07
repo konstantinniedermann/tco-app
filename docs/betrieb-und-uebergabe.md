@@ -52,6 +52,7 @@ ersetzen lassen:
 | Wiederherstellungscodes der Konten | Konto bei Verlust des zweiten Faktors gesperrt | **ja, zwingend** |
 | Zugangsdaten der Konten | Wiederherstellung über die Vereinsadresse | ja |
 | Schlüssel für die Codes (`MYTCO_CODE_SCHLUESSEL`) | neu setzen; alle offenen Codes werden ungültig, auch die in verschickten Briefen | ja |
+| VAPID-Schlüsselpaar für Push (`MYTCO_VAPID_OEFFENTLICH`, `MYTCO_VAPID_PRIVAT`) | neu erzeugen und eintragen, danach auf dieser Umgebung `DELETE FROM push_abo;`; alle Push-Anmeldungen werden ungültig, die Mitglieder schalten Push neu ein (der Hinweis auf der Startseite erscheint wieder) | nein |
 | Datenbank-Passwort, Test-Passwort, SSH-Schlüssel der CI und des Projektleiters | neu erzeugen und eintragen | nein |
 
 **Wo:** hängt an K-49. Annahme K-49: bis zur Antwort im Passwortmanager des Projektleiters.
@@ -82,6 +83,10 @@ Grundsätze; das Werkzeug wird mit [#39](https://github.com/konstantinniedermann
    auf, die gar nicht erst startet.
 3. **An die Vereinsadresse:** Meldungen gehen an die Vereinsadresse, damit sie bei einer
    Übergabe mitwandern.
+4. **Löschlauf:** Der Zeitgeber der App löscht täglich nach den Fristen
+   ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)). Ein Fehlschlag steht nur als «Löschlauf
+   fehlgeschlagen» im Log des App-Containers (`src/lib/server/zeitgeber.ts`); die Überwachung
+   meldet ihn noch nicht.
 
 ## Übergabe-Checkliste
 
@@ -125,7 +130,7 @@ Nachfolge (K-05).
    Codes unterwegs sind.
 7. **Adressen umstellen:** Mail-Empfänger auf Test (`MAIL_NUR_AN`), Kontakt in der App
    (`MYTCO_KONTAKT`), falls er auf den Projektleiter lautet.
-8. **Rollen in MyTCO:** Die Nachfolge erhält Admin; die Rollen des Projektleiters vergibt der
+8. **Rollen in MyTCO:** Die Nachfolge erhält MyTCO-Admin; die übrigen Rollen des Projektleiters vergibt der
    Vorstand neu ([Rollen und Rechte](rollen-und-rechte.md)).
 9. **Fragen-Tabelle:** Besitz im Google Drive an die Nachfolge übertragen.
 10. **Abschluss:** Die Nachfolge liefert einmal selbst auf Test und Live aus, und die Probe der

@@ -1,8 +1,10 @@
 import { randomUUID } from 'node:crypto';
+import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeEigeneDatenbankAn } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
+import { anlassAnmeldung, mitglied } from '../db/schema.ts';
 import type { AnlassWerte } from './angaben.ts';
 import {
 	aendereAnlass,
@@ -106,6 +108,19 @@ describe('Anlässe', () => {
 		expect(a).toMatchObject({ antwort: 'kommt', bemerkung: null });
 	});
 
+	test('Austritt: ausgetretene oder vorgemerkte Mitglieder können nicht antworten', async () => {
+		const { id } = await neu();
+		const weg = await legeMitgliedAn(db, { status: 'ausgetreten' });
+		const vorgemerkt = await legeMitgliedAn(db, { status: 'vorgemerkt' });
+		for (const m of [weg, vorgemerkt]) {
+			expect(await melde(db, id, m.mitgliedId, { antwort: 'kommt', bemerkung: null }, JETZT)).toBe(
+				'nicht-gefunden'
+			);
+		}
+		const zeilen = await db.select().from(anlassAnmeldung).where(eq(anlassAnmeldung.anlassId, id));
+		expect(zeilen).toHaveLength(0);
+	});
+
 	test('FR-31: loescheAnlass entfernt Anlass und Antworten', async () => {
 		const { id } = await neu();
 		const m = await legeMitgliedAn(db);
@@ -179,6 +194,41 @@ describe('Anlässe', () => {
 			]);
 			expect(await listeAnlaesse(edb)).toEqual([
 				expect.objectContaining({ id, kommen: 1, kommenNicht: 1 })
+			]);
+		} finally {
+			await eigene.abbauen();
+		}
+	});
+
+	test('Zahlen und Anmeldungen zählen nur aktive Mitglieder, nicht ausgetretene oder vorgemerkte', async () => {
+		const eigene = await legeEigeneDatenbankAn('anlass');
+		try {
+			const edb = eigene.db;
+			const admin = await legeMitgliedAn(edb, { nachname: 'Zzz' });
+			const id = await legeAnlassAn(edb, admin.mitgliedId, werte());
+			const aktiv = await legeMitgliedAn(edb, { nachname: 'Aaa' });
+			const weg = await legeMitgliedAn(edb, { nachname: 'Bbb' });
+			const vorgemerkt = await legeMitgliedAn(edb, { nachname: 'Ccc' });
+			for (const [m, antwort] of [
+				[aktiv, 'kommt'],
+				[weg, 'kommt'],
+				[vorgemerkt, 'kommt-nicht']
+			] as const) {
+				await melde(edb, id, m.mitgliedId, { antwort, bemerkung: null }, JETZT);
+			}
+			await edb
+				.update(mitglied)
+				.set({ status: 'ausgetreten', austrittAm: JETZT })
+				.where(eq(mitglied.id, weg.mitgliedId));
+			await edb
+				.update(mitglied)
+				.set({ status: 'vorgemerkt', vorgemerktAm: JETZT, statusVorher: 'aktiv' })
+				.where(eq(mitglied.id, vorgemerkt.mitgliedId));
+			const a = await ladeAnlassAdmin(edb, id);
+			expect(a?.zahlen).toEqual({ kommen: 1, kommenNicht: 0, keineAntwort: 1 });
+			expect(a?.anmeldungen.map((z) => z.name)).toEqual(['Aaa, Test']);
+			expect(await listeAnlaesse(edb)).toEqual([
+				expect.objectContaining({ id, kommen: 1, kommenNicht: 0 })
 			]);
 		} finally {
 			await eigene.abbauen();

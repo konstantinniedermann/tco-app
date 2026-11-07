@@ -7,6 +7,8 @@ import {
 	aenderung,
 	anlass,
 	anlassAnmeldung,
+	anmeldung,
+	anmeldungSpieler,
 	kategorie,
 	konto,
 	kontoRolle,
@@ -305,5 +307,136 @@ describe('Schema Turnier und Kategorie', () => {
 		await db.delete(turnier).where(eq(turnier.id, t.id));
 		const rest = await db.select().from(kategorie).where(eq(kategorie.turnierId, t.id));
 		expect(rest).toHaveLength(0);
+	});
+
+	test('FR-37: Klassierung nur aus der Skala', async () => {
+		const { mitgliedId } = await legeMitgliedAn(db);
+		const f = await fang(
+			db.update(mitglied).set({ klassierung: 'R10' }).where(eq(mitglied.id, mitgliedId))
+		);
+		expect(constraint(f)).toBe('mitglied_klassierung_check');
+		await db.update(mitglied).set({ klassierung: 'keine' }).where(eq(mitglied.id, mitgliedId));
+		await db.update(mitglied).set({ klassierung: 'R9' }).where(eq(mitglied.id, mitgliedId));
+	});
+
+	test('FR-06: Anmeldestatus nur aus der Liste', async () => {
+		const t = await neuesTurnier();
+		const [k] = await db
+			.insert(kategorie)
+			.values({ ...einzel, turnierId: t.id })
+			.returning();
+		const jetzt = new Date();
+		const f = await fang(
+			db.insert(anmeldung).values({
+				kategorieId: k.id,
+				status: 'offen' as 'bestaetigt',
+				angemeldetAm: jetzt,
+				geaendertAm: jetzt
+			})
+		);
+		expect(constraint(f)).toBe('anmeldung_status_check');
+	});
+
+	test('FR-04: Turnier löschen räumt Anmeldungen mit, Mitglied bleibt', async () => {
+		const { mitgliedId } = await legeMitgliedAn(db);
+		const t = await neuesTurnier();
+		const [k] = await db
+			.insert(kategorie)
+			.values({ ...einzel, turnierId: t.id })
+			.returning();
+		const jetzt = new Date();
+		const [a] = await db
+			.insert(anmeldung)
+			.values({ kategorieId: k.id, angemeldetAm: jetzt, geaendertAm: jetzt })
+			.returning();
+		expect(a.status).toBe('bestaetigt');
+		await db.insert(anmeldungSpieler).values({ anmeldungId: a.id, mitgliedId });
+		await db.delete(turnier).where(eq(turnier.id, t.id));
+		expect(await db.select().from(anmeldung).where(eq(anmeldung.id, a.id))).toHaveLength(0);
+		expect(
+			await db.select().from(anmeldungSpieler).where(eq(anmeldungSpieler.anmeldungId, a.id))
+		).toHaveLength(0);
+		expect(await db.select().from(mitglied).where(eq(mitglied.id, mitgliedId))).toHaveLength(1);
+	});
+});
+
+describe('Austritt und Löschen (#43)', () => {
+	const basis = () => ({
+		vorname: 'Test',
+		nachname: 'Muster',
+		strasse: 'Erfundenweg 1',
+		plz: '4600',
+		ort: 'Olten',
+		email: `test-${randomUUID()}@example.org`
+	});
+	const constraint = async (p: Promise<unknown>) => {
+		const f = await p.then(
+			() => null,
+			(e: unknown) => e
+		);
+		expect(f).toBeInstanceOf(Error);
+		return (f as Error & { cause?: { constraint?: string } }).cause?.constraint;
+	};
+	const jetzt = new Date();
+
+	test('vorgemerkt wird mit vorgemerkt_am und status_vorher angenommen', async () => {
+		const [m] = await db
+			.insert(mitglied)
+			.values({ ...basis(), status: 'vorgemerkt', vorgemerktAm: jetzt, statusVorher: 'aktiv' })
+			.returning();
+		expect(m.status).toBe('vorgemerkt');
+		expect(m.austrittAm).toBeNull();
+	});
+
+	test('mitglied_geloescht_check: aktives Mitglied ohne E-Mail wird abgelehnt', async () => {
+		expect(await constraint(db.insert(mitglied).values({ ...basis(), email: null }))).toBe(
+			'mitglied_geloescht_check'
+		);
+	});
+
+	test('mitglied_geloescht_check: gelöschtes Mitglied nur mit Vor- und Nachname wird angenommen', async () => {
+		const [m] = await db
+			.insert(mitglied)
+			.values({
+				vorname: 'Test',
+				nachname: 'Muster',
+				status: 'geloescht',
+				strasse: null,
+				plz: null,
+				ort: null,
+				email: null
+			})
+			.returning();
+		expect(m.email).toBeNull();
+	});
+
+	test('mitglied_status_vorher_check: nur aktiv oder ausgetreten', async () => {
+		expect(await constraint(db.insert(mitglied).values({ ...basis(), statusVorher: 'xx' }))).toBe(
+			'mitglied_status_vorher_check'
+		);
+	});
+
+	test('mitglied_vorgemerkt_check: verlangt vorgemerkt_am und status_vorher', async () => {
+		expect(
+			await constraint(
+				db.insert(mitglied).values({ ...basis(), status: 'vorgemerkt', statusVorher: 'aktiv' })
+			)
+		).toBe('mitglied_vorgemerkt_check');
+		expect(
+			await constraint(
+				db.insert(mitglied).values({ ...basis(), status: 'vorgemerkt', vorgemerktAm: jetzt })
+			)
+		).toBe('mitglied_vorgemerkt_check');
+	});
+
+	test('mitglied_ausgetreten_check: verlangt austritt_am', async () => {
+		expect(
+			await constraint(db.insert(mitglied).values({ ...basis(), status: 'ausgetreten' }))
+		).toBe('mitglied_ausgetreten_check');
+		const [m] = await db
+			.insert(mitglied)
+			.values({ ...basis(), status: 'ausgetreten', austrittAm: jetzt })
+			.returning();
+		expect(m.austrittAm).toEqual(jetzt);
 	});
 });

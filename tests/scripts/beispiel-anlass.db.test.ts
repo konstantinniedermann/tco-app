@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { legeBeispielAnlassAn } from '../../scripts/beispiel-anlass.ts';
-import { anlass, anlassAnmeldung } from '../../src/lib/server/db/schema.ts';
+import { anlass, anlassAnmeldung, mitteilung } from '../../src/lib/server/db/schema.ts';
 import { legeEigeneDatenbankAn, type EigeneDatenbank } from '../hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../hilfen/mitglieder.ts';
 
@@ -35,5 +35,19 @@ describe('Beispiel-GV für make seed', () => {
 		expect(antworten.find((a) => a.antwort === 'kommt-nicht')?.bemerkung).toBe(
 			'Bin leider in den Ferien.'
 		);
+		// FR-42: genau ein erfundener Eintrag im Verlauf der Mitteilungen, auch nach zwei Läufen.
+		const verlauf = await eigene.db.select().from(mitteilung);
+		expect(verlauf).toHaveLength(1);
+		expect(verlauf[0]).toMatchObject({
+			bezug: 'anlass',
+			anlassId: anlaesse[0].id,
+			absenderId: mitgliedId,
+			gesendetAm: jetzt,
+			titel: 'Erinnerung: Generalversammlung 2027',
+			auswahl: 'keine-antwort',
+			weg: 'push-sonst-mail',
+			push: 1,
+			mails: 1
+		});
 	});
 });

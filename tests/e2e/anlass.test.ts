@@ -8,7 +8,7 @@ import {
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
 test.afterAll(async () => {
 	await schliesseLoginHilfen();
@@ -21,6 +21,8 @@ async function meldeAn(page: Page, konto: Konto) {
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${konto.vorname}` })).toBeVisible();
+	// Die Reiter laden den Code ihrer Seiten vor; ein folgendes page.goto bräche das ab.
+	await wartetAufVorladen(page);
 }
 
 /** Admin öffnet die Verwaltung mit dem Code aus der Mail (SI-08). */
@@ -92,6 +94,10 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	await expect(seite.getByRole('heading', { level: 1, name: titel })).toBeVisible();
 	await expect(seite.getByText('2. Wahlen', { exact: false })).toBeVisible();
 	await seite.getByLabel('Ich komme nicht').check();
+	// Wie in der Datenschutzerklärung: wer die Bemerkung sieht, in Worten für Mitglieder.
+	await expect(
+		seite.getByText('Die Bemerkung sehen nur du, die Mitgliederverwaltung und wer MyTCO')
+	).toBeVisible();
 	await seite.getByLabel('Bemerkung (freiwillig)').fill('Bin in den Ferien.');
 	await pruefeBildschirm(seite, info, 'anlass-abmelden');
 	await seite.getByRole('button', { name: 'Antwort senden' }).click();

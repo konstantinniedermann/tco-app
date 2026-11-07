@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { MELDUNG } from '../../../../lib/login/anmelden.ts';
 	import Turnierformular, {
 		werteAusTurnier,
 		type TurnierWerte
@@ -19,10 +18,13 @@
 		klassierungText,
 		statusText
 	} from '../../../../lib/verwaltung/turnier-anzeige.ts';
+	import { fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	// Regel 3: Der MyTCO-Admin liest die Clubmeisterschaft, ändern kann sie nur der CM-Admin.
+	const nurLesen = $derived(!data.darfSchreiben.cm);
 
 	// Nach dem Speichern und nach jedem Statuswechsel lädt die Seite den neuen Stand, ohne neu zu navigieren.
 	let detail = $derived<TurnierAnsicht>(data.detail);
@@ -72,7 +74,7 @@
 			statusMeldung = STATUS_MELDUNG[a.art];
 			if (a.art === 'unzulaessig') await neuLaden();
 		} else {
-			statusMeldung = MELDUNG.stoerung;
+			statusMeldung = fehlerText(a);
 		}
 		laeuft = false;
 	}
@@ -96,7 +98,7 @@
 		} else if (a.art === 'nicht-gefunden') {
 			allgemein = 'Dieses Turnier gibt es nicht mehr.';
 		} else {
-			allgemein = MELDUNG.stoerung;
+			allgemein = fehlerText(a);
 		}
 		laeuft = false;
 	}
@@ -116,7 +118,13 @@
 <h2>Anmeldung</h2>
 <div class="karte">
 	<p><span class="plakette {status.klasse}">{status.text}</span></p>
-	{#if detail.status === 'vorbereitung'}
+	{#if nurLesen}
+		<p>
+			{#if detail.status === 'vorbereitung'}Mitglieder sehen das Turnier noch nicht.
+			{:else if detail.status === 'offen'}Mitglieder melden sich bis {schluss} an.
+			{:else}Mitglieder sehen ihre Anmeldungen, können aber nichts mehr ändern.{/if}
+		</p>
+	{:else if detail.status === 'vorbereitung'}
 		<p>
 			Mitglieder sehen das Turnier noch nicht. Prüfe Angaben und Kategorien, dann öffne die
 			Anmeldung.
@@ -162,13 +170,15 @@
 </div>
 
 <h2>Kategorien</h2>
-<div class="leiste">
-	<a
-		class="taste-neben"
-		href={resolve('/verwaltung/turniere/[id]/kategorien/neu', { id: String(detail.id) })}
-		>Neue Kategorie</a
-	>
-</div>
+{#if !nurLesen}
+	<div class="leiste">
+		<a
+			class="taste-neben"
+			href={resolve('/verwaltung/turniere/[id]/kategorien/neu', { id: String(detail.id) })}
+			>Neue Kategorie</a
+		>
+	</div>
+{/if}
 {#if detail.kategorien.length === 0}
 	<p>Noch keine Kategorien.</p>
 {:else}
@@ -182,7 +192,9 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Kategorie</th><th>Art</th><th>Geschlecht</th><th>Jahrgang</th><th>Klassierung</th>
+					<th>Kategorie</th><th>Art</th><th>Geschlecht</th><th>Jahrgang</th><th>Klassierung</th><th
+						>Anmeldungen</th
+					>
 				</tr>
 			</thead>
 			<tbody>
@@ -204,6 +216,7 @@
 						<td>{geschlechtText(k.geschlecht)}</td>
 						<td>{jahrgangText(k.jahrgangVon, k.jahrgangBis)}</td>
 						<td>{klassierungText(k)}</td>
+						<td>{k.status === 'abgesagt' ? '' : k.anmeldungen}</td>
 					</tr>
 				{/each}
 			</tbody>
@@ -221,6 +234,7 @@
 			knopfArt="taste-neben"
 			nurBeiAenderung
 			{rueckmeldung}
+			{nurLesen}
 			onspeichern={speichern}
 		/>
 	{/key}

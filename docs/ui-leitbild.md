@@ -22,7 +22,9 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Welcher Übergang, welcher Reiter aktiv, wo die Fusszeile steht | `src/lib/ui/navigation.ts` |
 | Reiter (sofort aktiv, gleitende Markierung, nochmals antippen → nach oben) | `src/lib/ui/Reiter.svelte` |
 | Weiches Auf- und Zuklappen, gemerkte Aufklappbereiche | `src/lib/ui/klappe.ts` |
-| Eingabe mit Tastatur (Reiter weg, Feld ins Blickfeld, «Weiter») | `src/lib/ui/tastatur.ts` |
+| Eingabe mit Tastatur (Reiter weg, Feld ins Blickfeld, «Weiter», Wappen schliesst die Tastatur) | `src/lib/ui/tastatur.ts` |
+| Rückfrage bei ungespeicherten Änderungen (wann sie kommt), Wappen als Weg zur Startseite | `src/lib/ui/ungespeichert.ts`, `src/routes/+layout.svelte`, `src/routes/verwaltung/+layout.svelte` |
+| Band *Ansicht als …*, Hinweis *Nur ansehen*, Bereiche der Verwaltung je Rolle und Umleitung | `src/routes/+layout.svelte`, `src/routes/verwaltung/+layout.svelte`, `src/lib/verwaltung/umleiten.ts`, `src/lib/verwaltung/AnsichtWahl.svelte` |
 | Baustein Anleitung (Zeichnung, Ablauf) | `src/lib/ui/Anleitung.svelte`, `src/lib/ui/ZeichnungIphone.svelte`, `src/lib/ui/ZeichnungAndroid.svelte` |
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
 
@@ -160,7 +162,8 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 
 | Baustein | Klasse | Regel |
 |----------|--------|-------|
-| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und steht fest oben (nur der Rollbereich darunter scrollt, in der Verwaltung `sticky`), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch) |
+| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und steht fest oben (nur der Rollbereich darunter scrollt, in der Verwaltung `sticky`), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch). Das Wappen ist ein Link zur Startseite (`.kopf-start`, zugänglicher Name «Zur Startseite»): in der App zu Start, in der Verwaltung zu deren erster Seite. Die Kopfleiste sieht aus wie ohne Link; die Tippfläche reicht unsichtbar über das Wappen hinaus auf `--tippflaeche` (UI-03). Bei offener Tastatur schliesst der Tipp nur die Tastatur ([Eingabe mit Tastatur](#eingabe-mit-tastatur)), bei ungespeicherten Änderungen kommt zuerst die Rückfrage ([Ungespeicherte Änderungen](#ungespeicherte-änderungen)) |
+| Band *Ansicht als …* | `.ansicht-band` | nur solange der MyTCO-Admin *Ansicht als …* nutzt, auf jeder Seite von App und Verwaltung; liegt über der Kopfleiste. Fläche `--farbe-hinweis-flaeche`, Text `--farbe-hinweis`, unten ein Balken `--rand-akzent` in `--farbe-hinweis`; Text «Ansicht als <Rolle> — nur ansehen» und die Nebentaste *Beenden* (zurück zu den eigenen Rollen, die Seite lädt neu, sie bleibt dieselbe). Reicht wie die Kopfleiste unter die Statusleiste; die Kopfleiste darunter beginnt dann ohne diesen Abstand. Steht beim Seitenwechsel still wie die Kopfleiste; in der Verwaltung scrollt es mit der Seite weg wie deren Kopfleiste |
 | Statusleisten-Band | `.statusleiste` | ausserhalb von `.app`, fest oben, deckend in `--farbe-marke` wie die Kopfleiste darunter (auch in der Verwaltung). Im Browser so hoch wie `env(safe-area-inset-top)` (am PC 0); in der iPhone-App vom Startbildschirm (`display-mode: standalone`, nur iOS) zusätzlich `--abstand-3` hoch, also über dem oberen Rand der Kopfleiste und über 10 px; nicht in der Verwaltung (`.statusleiste-verwaltung`), weil deren Kopfleiste mit der Seitenleiste wegscrollt. iOS legt sonst über Web-Apps vom Startbildschirm einen hellen Schleier über die Statusleiste; iOS lässt ihn nur weg, wenn oben in der Mitte ein fester oder mitlaufender, deckender, fast bildschirmbreiter Streifen liegt |
 | Rollbereich | `.rollbereich` | Mitglieder-App: der einzige Bereich, der scrollt, zwischen Kopfleiste und Reitern; enthält Inhalt und Fusszeile. Beim Überziehen federt nur er, Kopfleiste und Reiter bleiben stehen |
 | Seitenhintergrund (iPhone-App vom Startbildschirm) | `html`, `body` in `display-mode: standalone`, nur iOS | `--farbe-marke`; `.app` trägt dann `--farbe-hintergrund`. Was an Schleier bleibt, ist so grün statt hell |
@@ -170,16 +173,18 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Nebentaste | `.taste-neben` | weiss mit grünem Rand; gedrückt `--farbe-marke-zart` |
 | Link | `a` | grün, unterstrichen |
 | Zurück | `.zurueck` | „‹ Zurück" oben links auf Unterseiten |
-| Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
-| Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>` |
+| Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); bei einer festen Höchstlänge zählt der Hilfetext mit („12 von 50 Zeichen", `.feld-hilfe`); Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
+| Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>`. Als Schalter (Ein/Aus, gilt sofort, ohne Speichern-Taste) dieselbe Fläche mit Häkchen statt Kreis (`type="checkbox"`), angehakt heisst ein: *Benachrichtigungen* im Profil |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
 | Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
 | Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; klappt weich auf und zu (`--dauer-mittel`) |
 | Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste; ist der ganze Eintrag ein Link, gedrückt `--farbe-marke-zart` und leicht verkleinert und nicht markierbar; eine Kachel mit eigener Aktion bleibt ruhig und markierbar |
 | Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt" oder „1 von 3 Anmeldungen" |
-| Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05) |
+| Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05). Zustände der Mitgliedschaft: *ausgetreten* = `.plakette`, *wird gelöscht* = `.plakette-gesperrt` |
+| Druckseite | `.druckseite` | nur Verwaltung: Auskunft über die Daten eines Mitglieds, siehe [Druckseite](#druckseite-auskunft); Klasse `.nicht-drucken` blendet unter `@media print` aus |
 | Anleitung | `.anleitung` | gezeichnetes Handy (`.anleitung-film`, ein `.anleitung-bild` pro Schritt), darunter die Taste (`.anleitung-taste`) und die nummerierten Schritte (`.anleitung-schritte`), am Schluss ein Eintrag „Fertig!" (`.anleitung-fertig`, mit ✓ statt Nummer); die Zeichnung ist für Screenreader verborgen, die Schritte tragen die Bedeutung; ein Schritt gehört zu genau einem Bild; in der Zeichnung nur Beschriftungen, die in der Hilfe von Apple bzw. Google belegt sind, sonst graue Balken (`.anleitung-eintrag.leer`); der Tipp-Kreis (`.anleitung-tipp`) zeigt, wo man tippt; Bewegung nach UI-09 |
-| Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen") |
+| Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen"). Einzige Ausnahme ist *Nur ansehen*: oben auf Verwaltungsseiten, auf denen die eigene Rolle etwas nur lesen darf, «**Nur ansehen.** Ändern kann hier nur der <Rolle>.», ohne Aktion; er bleibt, solange die Rolle nur liest. In der Ansicht steht er nicht, dort sagt es das Band |
+| Nur lesen | `fieldset.nur-lesen` | Formular, das die eigene Rolle oder die Ansicht nur lesen lässt: die Felder stehen in `<fieldset disabled class="nur-lesen">` (ohne Rand und Abstand, Text in `--farbe-text`, damit er gut lesbar bleibt); Absende- und Aktions-Tasten fehlen, auch «Weitere …», «Entfernen», «… löschen» und Tasten zum Anlegen. In der Ansicht fehlen in der ganzen App alle Tasten, die etwas speichern (Profil, Antwort auf einen Anlass, Passkey); *Abmelden* bleibt |
 | Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06); betrifft sie das ganze Formular (z. B. *Inzwischen hat jemand anderes dieses Mitglied geändert*), unter dem Formular, mit dem Lösungsweg als Nebentaste daneben (*Neuen Stand laden*) |
 | Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm waagrecht scrollbar; enthält sie keine Links oder Tasten, ist der Bereich eine benannte Region mit `tabindex="0"`, damit er per Tastatur scrollt |
 | Symbol | `.symbol` | eigene SVG-Symbole, 24er-Raster, Strich 2, immer mit Text |
@@ -210,7 +215,7 @@ unterscheidet.
 | Aufklappbereich | ein festes Thema auf einer langen Seite (Profil) | bleibt immer |
 | Kachel | führt weiter oder löst eine Aktion für einen Eintrag aus (*Clubmeisterschaft 2027 ›*, *iPhone · Entfernen*) | so lange, wie es den Eintrag gibt |
 | Kachel hervorgehoben (roter Balken) | das Wichtigste, was gerade läuft; man kann sie nicht wegklicken | solange es aktuell ist |
-| Hinweis (ocker Balken) | eine Mitteilung oder ein Angebot an das Mitglied (*Passkey einrichten*, *Brief-Code läuft bald ab*) | vorübergehend: verschwindet, wenn erledigt oder weggeklickt |
+| Hinweis (ocker Balken) | eine Mitteilung oder ein Angebot an das Mitglied (*Passkey einrichten*, *Brief-Code läuft bald ab*) | vorübergehend: verschwindet, wenn erledigt oder weggeklickt; *Nur ansehen* bleibt, solange die Rolle nur liest |
 
 Teile eines Bausteins heissen `<baustein>-<teil>`, z. B. `.kopf-wappen`, `.feld-hilfe`,
 `.zaehler-balken`, `.zaehler-voll`, `.zaehler-text`, `.kachel-pfeil`, `.seitenleiste-bereich`,
@@ -230,7 +235,8 @@ Kopfleiste.
 - **Startseite:** „Hoi <Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
   „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
   stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
-  (A-ANLASS-01).
+  (A-ANLASS-01). Angebote stehen vor „Jetzt aktuell", jedes als eigener Hinweis
+  und immer nur eines zugleich (UI-04): zuerst *Passkey einrichten*, danach *Mitteilungen aufs Handy?*.
 - **Unterseiten:** „‹ Zurück" oben links, keine Reiter (bei der CM-Anmeldung neu prüfen).
 - **Einstiegsseite** (nur im Handy-Browser, nicht vom Symbol aus): „Willkommen bei MyTCO", eine Karte „Zuerst auf den Startbildschirm" mit der Anleitung bzw. auf Android der Haupttaste „MyTCO installieren", darunter der Link „Ohne Startbildschirm weiter" zum Login.
 - **Hilfe:** ohne Login, über die Fusszeile; jedes Thema ein Aufklappbereich, der Kontakt eine Karte.
@@ -246,10 +252,27 @@ Kopfleiste.
 **Verwaltung (vor allem am PC):** erreichbar über die Kachel „Verwaltung ›" auf der
 Startseite, direkt unter der Begrüssung, nur für Konten mit einer Rolle über *Mitglied* hinaus
 (RR-07). Dunkelgrüne Seitenleiste mit
-„MyTCO Verwaltung", den Bereichen der eigenen Rollen (Admin: Mitglieder, Anlässe,
-Für Fairgate mit Zahl der offenen, Änderungsverlauf; Clubmeisterschaft: Turniere, für CM und
-Admin) und „‹ Zur App". Inhalt: Titel,
+„MyTCO Verwaltung", den Bereichen, die eine der eigenen Rollen lesen darf, und „‹ Zur App":
+*Mitgliederverwaltung* (Mitglieder, Anlässe, Mitteilungen, Für Fairgate mit Zahl der offenen,
+Änderungsverlauf) für Mitglieder- und MyTCO-Admin, *Clubmeisterschaft* (Turniere) für CM- und
+MyTCO-Admin, *MyTCO* (Rollen) nur für den MyTCO-Admin. Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
+Darf die Rolle einen Bereich nur lesen, gilt der Baustein *Nur lesen* mit dem Hinweis *Nur
+ansehen*. Eine Seite ausserhalb der eigenen Bereiche führt zur ersten Seite der Verwaltung, eine
+Seite zum Anlegen ohne Schreibrecht zur Liste ihres Bereichs.
+
+- **Rollen** (nur MyTCO-Admin): je Rolle ein Aufklappbereich mit der Zahl in der Titelzeile und
+  den Mitgliedern als Links zu ihrer Seite (vergeben und entzogen wird dort, in der Klappe
+  *Rollen*). Darunter die Karte *Ansicht als …*: vier Auswahlflächen (Mitglied,
+  Mitglieder-Admin, CM-Admin, Lizenz-Admin) und die Haupttaste «Ansehen». Danach geht es zur
+  ersten Seite dieser Rolle; bei Mitglied und Lizenz-Admin, die keine Verwaltung haben, zur
+  Startseite der App.
+- **Mitteilungen** (Seite des Anlasses und Bereich *Mitteilungen*): Taste «Neue Mitteilung», beim
+  Anlass dann eine Vorlage oder «Leer anfangen». Titel, Text, Empfänger und Weg stehen in einer
+  Karte; «Vorschau» zeigt die Zahlen und aufklappbar die Namen. «Senden» geht erst mit einer
+  Vorschau zu den aktuellen Eingaben, fragt zurück (`<dialog class="karte">`) und ist während des
+  Sendens gesperrt («Wird gesendet …»). Darunter der Verlauf als Tabelle, ohne Empfängernamen. Das
+  Formular sieht nur, wer schreiben darf.
 Namen von Mitgliedern stehen in allen Tabellen und Listen der Verwaltung als „Nachname,
 Vorname", damit sie sich gleich lesen und sortieren.
 
@@ -277,8 +300,9 @@ auch, während der Inhalt noch nachläuft. Jeder Reiter beginnt oben; wer den ak
 nochmals antippt, kommt ebenfalls nach oben. Nur «‹ Zurück» und die Zurück-Taste oder -Geste
 des Browsers bringen eine Seite dorthin zurück, wo man sie verlassen hat.
 
-**Aufklappbereiche im Profil** sind anfangs zu und merken sich, ob sie offen sind, solange die
-App offen ist; nach dem Abmelden sind sie wieder zu.
+**Aufklappbereiche im Profil** (*Meine Angaben*, *Anmelden mit Passkey*, *Benachrichtigungen*)
+sind anfangs zu und merken sich, ob sie offen sind, solange die App offen ist; nach dem
+Abmelden sind sie wieder zu.
 
 **Antippen:** kein grauer Blitz des Browsers, dafür ein Gedrückt-Zustand (`--dauer-kurz`):
 Reiter in `--farbe-marke` mit etwas kleinerem Symbol; Kachel als Link in `--farbe-marke-zart`, leicht
@@ -307,10 +331,35 @@ schiebt sich über die Reiter, das Feld steht ruhig darüber.
 - **Eingabetaste:** «Weiter» springt ins nächste Feld desselben Formulars, im letzten Feld
   sendet «Fertig» das Formular ab (Bedienung per Finger). Am PC, auch in der Verwaltung,
   sendet die Eingabetaste wie gewohnt sofort ab.
+- **Wappen:** Ein Tipp aufs Wappen schliesst bei offener Tastatur nur die Tastatur, wie ein
+  Tipp auf den Hintergrund; er führt nicht zur Startseite. Erst der nächste Tipp führt weiter.
 - **Nach dem Absenden** geht die Tastatur zu, der Fokus geht zum Ergebnis (z. B. zu
   «Ändern» der gespeicherten Angabe).
 - **Jedes Feld** hat die passende Tastatur (`type`, `inputmode`) und `autocomplete`.
   Schrift in Feldern nie unter 16 px (`--groesse-text`), sonst zoomt das iPhone hinein.
+
+### Ungespeicherte Änderungen
+
+Wer in einem Formular etwas geändert und nicht gespeichert hat und die Seite in der App
+verlässt (Wappen, Reiter, «‹ Zurück», Seitenleiste und andere Links der Verwaltung), bekommt
+zuerst die Rückfrage als `<dialog class="karte">`: **«Nicht gespeichert – trotzdem
+verlassen?»** mit *Abbrechen* (Nebentaste: bleibt auf der Seite, die Eingaben bleiben) ·
+*Verlassen* (Haupttaste: die Eingaben verfallen, die App geht zum Ziel).
+
+- **Ungespeichert** ist ein Formular nur, solange ein Feld vom geladenen Stand abweicht. Wer
+  etwas tippt und es wieder zurücksetzt, wird nicht gefragt; nach dem Speichern auch nicht.
+- **Welche Formulare:** alle, die Angaben speichern: *Meine Angaben* im Profil, die Antwort auf
+  einen Anlass, in der Verwaltung Mitglied (Angaben und Rollen), Anlass, Turnier und
+  Kategorie, jeweils beim Anlegen und Bearbeiten, und die Mitteilung, bis sie gesendet ist (geladener Stand: leer oder die gewählte Vorlage). Login, Codes und E-Mail-Wechsel nicht: Sie haben keinen
+  gespeicherten Stand, nur einen Ablauf. Im Code trägt das Formular `data-ungespeichert`,
+  solange es abweicht.
+- **Nur lesen:** Auf Seiten nur zum Lesen und in der Ansicht sind die Formulare gesperrt
+  ([Baustein *Nur lesen*](#bausteine)); dort kommt keine Rückfrage.
+- **Ohne Rückfrage:** Wechsel, die die App selbst auslöst (nach dem Speichern zur neuen Seite,
+  abgelaufene Sitzung, Abmelden), Links aus der App hinaus (Kalender), die Zurück-Taste oder
+  -Geste des Browsers oder Handys (auch am PC) und das Schliessen der App. Bei der Geste
+  zeigt der Browser die vorige Seite schon an, bevor die App davon erfährt; beim Schliessen gibt es nur den Dialog des
+  Browsers, nicht diese Rückfrage.
 
 ## Brief (Druck)
 
@@ -336,6 +385,23 @@ passt.
 | `--brief-fenster-breite` | `80mm` | Breite des Adressfelds |
 | `--brief-qr` | `35mm` | Kantenlänge des QR-Codes |
 | `--brief-schrift` | `12pt` | Grundschrift des Briefs (1 rem auf Papier) |
+
+## Druckseite (Auskunft)
+
+Die Auskunft über die Daten eines Mitglieds (DS-07) ist eine Seite der Verwaltung, die für den
+Druck oder als PDF gedacht ist. Quelle des Entwurfs: Design «Austritt und Löschen», Variante A,
+Seite *Auskunft*.
+
+- **Fläche:** `.druckseite` hat weissen Grund (`--farbe-flaeche`) und Text in `--farbe-text`; auf
+  dem Bildschirm mit Innenabstand, auf Papier ohne.
+- **Kopfzeile:** Wappen auf `--farbe-marke` in einem Quadrat mit `--radius`, daneben «MyTCO · TC Olten»,
+  darunter Titel und Untertitel.
+- **Tabellen:** Abschnitt als `<h2>` mit Tabelle darunter in `.tabelle` (benannte Region mit `tabindex="0"`, auf dem Handy waagrecht scrollbar, auf Papier nicht beschnitten); 1 px Linien in `--farbe-rand`, Bezeichnung
+  links fett, Tabellenkopf in `--farbe-marke-zart`.
+- **Tasten:** «‹ Zurück» und «Drucken oder als PDF speichern» tragen `.nicht-drucken`.
+- **Druck:** Unter `@media print` verschwinden `.nicht-drucken`, `.seitenleiste` und `.kopf`,
+  dazu der Hinweis «Nur ansehen» (`.hinweis`) und das Band der Ansicht (`.ansicht-band`); der
+  Inhalt nutzt die ganze Breite: Rahmen und Raster der Verwaltung werden zu einem Block auf weissem Grund, ohne feste Höhe.
 
 ## Sprache
 

@@ -165,7 +165,7 @@ export function erstelleEmailWechselDienst(abh: EmailWechselAbh): EmailWechselDi
 			.from(mitglied)
 			.where(eq(mitglied.id, k.mitgliedId));
 		if (!m) return { annahme: 'ungueltig', arbeit: ohneArbeit };
-		const bisherige = m.email.trim().toLowerCase();
+		const bisherige = (m.email ?? '').trim().toLowerCase();
 		if (neue === bisherige) return { annahme: 'gleich', arbeit: ohneArbeit };
 
 		// Ab hier ohne await: Prüfen und Zählen sind atomar, parallele Anfragen umgehen keine Grenze.
@@ -206,7 +206,7 @@ export function erstelleEmailWechselDienst(abh: EmailWechselAbh): EmailWechselDi
 		speicher.lege(k.kontoId, wechsel);
 		return {
 			annahme: 'ok',
-			arbeit: versende(k, wechsel, { alt: m.email, neu: anNeu }, codes)
+			arbeit: versende(k, wechsel, { alt: m.email ?? '', neu: anNeu }, codes)
 		};
 	}
 
@@ -246,7 +246,8 @@ export function erstelleEmailWechselDienst(abh: EmailWechselAbh): EmailWechselDi
 					.where(eq(mitglied.id, k.mitgliedId))
 					.for('update');
 				// Hat der Admin die Adresse inzwischen geändert, gilt seine Änderung.
-				if (!m || m.email.trim().toLowerCase() !== wechsel.bisherige) return 'falsch' as const;
+				if (!m || (m.email ?? '').trim().toLowerCase() !== wechsel.bisherige)
+					return 'falsch' as const;
 				await tx
 					.update(mitglied)
 					.set(
