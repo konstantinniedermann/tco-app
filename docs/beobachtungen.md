@@ -520,3 +520,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Task-Reviews, Schluss-Review und cas-reviewer zu #63.
 
 **Einschätzung:** Alles klein. `pushsubscriptionchange` und der Link aus `MYTCO_ADRESSE` zuerst ansehen, sobald Push auf Test läuft (#39); die Testlücken bei Gelegenheit mit dem CM-Teil der Mitteilungen.
+
+### 2026-11-07 — Abgelehnter Wildcard-Antrag fehlt auf der CM-Seite; wiederholtes Beantragen meldet jedes Mal allen CM-Admins
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/cm/anmeldungen.ts` → `ladeCmAnsicht`, `src/lib/server/cm/schnittstellen.ts` → `postCmWildcard`, `src/routes/clubmeisterschaft/[id]/+page.svelte`
+
+**Beobachtung:** Nach einer Ablehnung zeigt die CM-Seite des Mitglieds die Kategorie wieder mit «Wildcard beantragen», ohne Hinweis auf die Ablehnung; den Entscheid kennt es nur aus der Meldung. Beantragt und zieht ein Mitglied mehrmals zurück, geht jeder neue Antrag als Meldung an alle CM-Admins, ohne Bremse.
+
+**Ursprung:** Schluss-Review von #60 (CM Teil 4).
+
+**Einschätzung:** Klein, unter Freunden kaum ein Problem. Ein Vermerk «abgelehnt» bei der Kategorie wäre einfach; eine Bremse erst, wenn es tatsächlich vorkommt.
+
+### 2026-11-07 — Klassierung korrigieren prüft nicht, ob das Mitglied noch aktiv ist
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/cm/verwaltung.ts` → `korrigiereKlassierung`, `src/lib/server/cm/angaben.ts` → `schreibeKlassierung`
+
+**Beobachtung:** Der CM-Admin kann die Klassierung eines ausgetretenen oder gelöschten Mitglieds ändern; `schreibeKlassierung` prüft nur, ob es das Mitglied gibt. Von Hand anmelden und die Spielersuche verlangen dagegen *aktiv*.
+
+**Ursprung:** Schluss-Review von #60 (CM Teil 4).
+
+**Einschätzung:** Harmlos (die Oberfläche bietet nur Spieler aktiver Anmeldungen an), aber uneinheitlich. Bei der nächsten Arbeit an der Klassierung `status = 'aktiv'` mitprüfen.
