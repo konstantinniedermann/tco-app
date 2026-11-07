@@ -427,6 +427,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Zusammen mit dem Eintrag oben lösen: Eine eigene Datenbank pro Worktree oder pro Lauf hält die Listen klein; sonst Screenshots auf einer frisch mit `make seed` aufgesetzten Datenbank machen.
 
+**Ergänzung 2026-11-07 (#60):** Ein Wildcard-Antrag meldet alle CM-Admins (FR-47), bevor die Antwort kommt; lokal sind das 735 Testkonten, also rund 735 Mails pro Antrag. Mailpit behält nur die neuesten 500, Code-Mails paralleler Tests können dabei wegfallen, und die Antwort dauert länger. `holeMailCode` liest seither nur Mails mit dem Betreff «Dein Code für …», sonst griff ein CM-Konto die Wildcard-Meldung statt seines Codes. In der CI (frische Datenbank) unkritisch.
+
 ### 2026-11-06 — Doppel-Kategorien erlauben Jahrgang von/bis, obwohl es im Doppel keine Alterskategorien gibt
 
 **Thema:** Turnier-Verwaltung
@@ -462,6 +464,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #63, Nachweis mit echtem Push (Screenshot des Verlaufs).
 
 **Einschätzung:** Eine Kartenliste statt Tabelle wäre am Handy besser lesbar, braucht aber einen neuen Baustein im UI-Leitbild. Zusammen mit der Kategorientabelle lösen. Die Verwaltung wird vor allem am PC genutzt, darum niedrig.
+
+**Ergänzung 2026-11-07 (#60):** Die Anmeldungsliste einer Kategorie (`src/lib/verwaltung/Anmeldungsliste.svelte`) zeigt dasselbe Muster: Am Handy liegen *Jahrgang*, *Status* und *Aktionen* rechts ausserhalb, die gestapelten Tasten machen jede Zeile sehr hoch, der Name bricht mitten im Wort (Screenshot `cm-anmeldungen-liste.png` aus `tests/e2e/cm-verwaltung.test.ts`).
 
 ### 2026-11-06 — Mitteilungen zur Clubmeisterschaft fehlen noch, die Spielberechtigung aus #58 liegt jetzt auf dev
 

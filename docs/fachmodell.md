@@ -116,11 +116,11 @@ Anmeldung zu einem Turnier.
 | FR-03 | Ein Konto hat mindestens die Rolle *Mitglied*; der MyTCO-Admin vergibt weitere | A-ROLLE-01 | umgesetzt |
 | FR-04 | Austritt: Konto sofort gesperrt, Status *ausgetreten* (inaktiv). Tritt das Mitglied innert der Frist wieder ein, wird es wieder *aktiv*. Nach der Frist wird das Konto gelöscht und das Mitglied auf Vor- und Nachname reduziert (Status *gelöscht*), damit vergangene Resultate lesbar bleiben (Vorschlag K-38: Frist 1 Jahr). Löschen: Login sofort gesperrt, eine Woche rückgängig machbar (zurück in den Zustand davor), danach wie nach der Frist | [Datenschutz](datenschutz.md#löschen) | geplant |
 | FR-05 | Anmelden geht nur, solange das Turnier den Status *Anmeldung offen* hat (bis Anmeldeschluss) | A-ANMELDUNG-07 | umgesetzt (Einzel; Doppel mit #59) |
-| FR-06 | Ein Spieler hat je Turnier höchstens 3 Anmeldungen, die nicht *abgelehnt* oder *zurückgezogen* sind. Wildcard-Anträge zählen mit; ein Doppel zählt für beide Partner (Annahme K-27) | A-ANMELDUNG-02 | umgesetzt (Einzel; Doppel mit #59, Wildcard-Anträge mit #60) |
+| FR-06 | Ein Spieler hat je Turnier höchstens 3 Anmeldungen, die nicht *abgelehnt* oder *zurückgezogen* sind. Wildcard-Anträge zählen mit; ein Doppel zählt für beide Partner (Annahme K-27) | A-ANMELDUNG-02 | umgesetzt (Einzel; Doppel mit #59) |
 | FR-07 | MyTCO schlägt nur Kategorien vor, die nach Geschlecht, Jahrgang und Klassierung passen; im Doppel muss auch der Partner passen (Annahme K-27) | A-ANMELDUNG-03 | umgesetzt (Einzel; Doppel mit #59) |
-| FR-08 | Nur im Einzel, nur für eine stärkere Kategorie, die allein wegen der Klassierung nicht passt, meldet man sich mit Wildcard-Antrag und Pflichtkommentar an. Die Anmeldung bleibt *beantragt*, bis der CM-Admin sie bestätigt oder ablehnt. Kommentar und Wildcard sehen nur der Spieler, der CM-Admin und, nur lesend, der MyTCO-Admin. Nach einer Ablehnung ist ein neuer Antrag möglich | A-ANMELDUNG-10 | geplant |
+| FR-08 | Nur im Einzel, nur für eine stärkere Kategorie, die allein wegen der Klassierung nicht passt, meldet man sich mit Wildcard-Antrag und Pflichtkommentar an. Die Anmeldung bleibt *beantragt*, bis der CM-Admin sie bestätigt oder ablehnt. Kommentar und Wildcard sehen nur der Spieler, der CM-Admin und, nur lesend, der MyTCO-Admin. Nach einer Ablehnung ist ein neuer Antrag möglich | A-ANMELDUNG-10 | umgesetzt |
 | FR-09 | Ein Doppelpartner muss die Anmeldung nicht bestätigen; er wird benachrichtigt (Annahme K-27). Jedes Mitglied steht je Kategorie in höchstens einer Anmeldung | A-ANMELDUNG-04 | umgesetzt (Einzel: je Kategorie höchstens eine Anmeldung; Doppelpartner mit #59) |
-| FR-10 | Bis zum Anmeldeschluss kann ein Spieler seine Anmeldung selbst zurückziehen (Annahme K-29); danach nur der CM-Admin | A-ANMELDUNG-06 | umgesetzt (Rückzug durch das Mitglied; durch den CM-Admin mit #60) |
+| FR-10 | Bis zum Anmeldeschluss kann ein Spieler seine Anmeldung selbst zurückziehen (Annahme K-29); danach nur der CM-Admin | A-ANMELDUNG-06 | umgesetzt (Einzel; Doppel mit #59) |
 | FR-11 | Der Kommentar enthält keine Gesundheitsangaben; die Eingabemaske weist darauf hin | [Datenschutz](datenschutz.md#welche-daten) | geplant |
 | FR-12 | Gruppen und KO-Tableaus entstehen in Advantage und werden übernommen; MyTCO lost nicht selbst aus | A-ADVANTAGE-02, A-ADVANTAGE-03 | geplant |
 | FR-13 | Eine Kategorie spielt Gruppen, KO oder zuerst Gruppen und dann KO. Ein Spiel gehört entweder zu einer Gruppe oder zu einem KoTableau | A-ADVANTAGE-03 | geplant |
@@ -154,8 +154,8 @@ Anmeldung zu einem Turnier.
 | FR-43 | Empfänger sind aktive Mitglieder; beim Anlass genau eine Auswahl *alle*, *noch keine Antwort*, *kommt*, *kommt nicht*, *zu prüfen* (wie FR-32); wer das Thema abgeschaltet hat, fällt weg | N-APP-02 | umgesetzt |
 | FR-44 | Weg *nur Push*, *Push, sonst E-Mail*, *Push und E-Mail*; bei *Push, sonst E-Mail* bekommt eine E-Mail, wer kein Abo hat oder bei wem jeder Push scheiterte | N-APP-02 | umgesetzt |
 | FR-45 | Der Verlauf nennt Zeit, Absender, Titel, Text, Auswahl, Weg und Zahlen, keine Empfängernamen; Einträge älter als 365 Tage löscht der nächste Versand | N-APP-02 | umgesetzt |
-| FR-46 | Der CM-Admin meldet von Hand an und verschiebt auch gegen FR-06, FR-07 und den Anmeldeschluss: MyTCO warnt, nach Bestätigung gilt es; nicht während *in Vorbereitung* | A-ANMELDUNG-06 | geplant |
-| FR-47 | Meldungen der CM an Einzelne (Wildcard-Antrag an die CM-Admins, Entscheid, Änderung durch den CM-Admin) gehen *Push, sonst E-Mail*; die Themen (FR-41) gelten nicht | A-ANMELDUNG-06, A-ANMELDUNG-10 | geplant |
+| FR-46 | Der CM-Admin meldet von Hand an und verschiebt auch gegen FR-06, FR-07 und den Anmeldeschluss: MyTCO warnt, nach Bestätigung gilt es; nicht während *in Vorbereitung* | A-ANMELDUNG-06 | umgesetzt (Einzel; Doppel mit #59) |
+| FR-47 | Meldungen der CM an Einzelne (Wildcard-Antrag an die CM-Admins, Entscheid, Änderung durch den CM-Admin) gehen *Push, sonst E-Mail*; die Themen (FR-41) gelten nicht | A-ANMELDUNG-06, A-ANMELDUNG-10 | umgesetzt |
 
 ## Lebenszyklen
 
@@ -163,7 +163,7 @@ Anmeldung zu einem Turnier.
 |--------|----------|
 | Turnier | *in Vorbereitung* → *Anmeldung offen* ⇄ *Anmeldung geschlossen* (wieder öffnen nur vor dem Anmeldeschluss, FR-33; von selbst geschlossen nach dem Anmeldeschluss) → *läuft* → *abgeschlossen* |
 | Kategorie | *aktiv* → *abgesagt* (FR-35) |
-| Anmeldung | *bestätigt* (ohne Wildcard sofort) · *beantragt* → *bestätigt* / *abgelehnt* (mit Wildcard) · jederzeit → *zurückgezogen* (FR-10) |
+| Anmeldung | *bestätigt* (ohne Wildcard sofort) · *beantragt* → *bestätigt* / *abgelehnt* (mit Wildcard) · → *zurückgezogen*: durch das Mitglied bis zum Anmeldeschluss (FR-10), durch den CM-Admin jederzeit (FR-46) |
 | Resultat | *gemeldet* → *bestätigt* / *bestritten* → *bestätigt* (Entscheid des CM-Admins) |
 | Lizenzantrag | *beantragt* → *exportiert* → *erledigt* · *beantragt* → *zurückgezogen* |
 | Mitglied | *aktiv* → *ausgetreten* (inaktiv) → *gelöscht* nach der Frist, nur noch der Name · *ausgetreten* → *aktiv* bei Wiedereintritt · *aktiv* oder *ausgetreten* → *Löschung vorgemerkt* → *gelöscht* nach einer Woche; dazwischen rückgängig machbar, zurück in den Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum) (FR-04) |
