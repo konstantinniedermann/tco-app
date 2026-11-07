@@ -13,6 +13,7 @@
 		type Rolle
 	} from '../../../../lib/verwaltung/api.ts';
 	import {
+		VERALTET,
 		VERGEBEN,
 		aktionText,
 		plakette,
@@ -20,6 +21,7 @@
 		zeitText,
 		fehlerText
 	} from '../../../../lib/verwaltung/anzeige.ts';
+	import Mitgliedschaft from '../../../../lib/verwaltung/Mitgliedschaft.svelte';
 	import { ROLLEN_NAME } from '../../../../lib/verwaltung/rollen-namen.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';
@@ -43,8 +45,6 @@
 	// «Rollen speichern»), verschwindet sie.
 	let veraltetBei = $state<string | null>(null);
 	const angabenVeraltet = $derived(veraltetBei === JSON.stringify(angaben));
-	const VERALTET =
-		'Inzwischen hat jemand anderes dieses Mitglied geändert. Nichts gespeichert: Lade den neuen Stand und gib deine Änderung nochmals ein.';
 
 	const speichereWerte = (werte: Werte) => einzeln(() => schickeAngaben(werte));
 	async function schickeAngaben(werte: Werte) {
@@ -251,6 +251,8 @@
 	</div>
 
 	<div>
+		<Mitgliedschaft {detail} {nurLesen} />
+
 		<details class="karte klappe" open>
 			<summary class="klappe-titel"
 				>Login <span class="leise"

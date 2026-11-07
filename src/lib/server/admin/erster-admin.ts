@@ -21,7 +21,7 @@ export async function machAdmin(db: Db, kontoId: number, jetzt: Date): Promise<v
 	await setzeRollen(db, { art: 'automatisch' }, kontoId, [...rollen, ...fehlend], rollen, jetzt);
 }
 
-type Treffer = { id: number; email: string; mitgliedernummer: string | null };
+type Treffer = { id: number; email: string | null; mitgliedernummer: string | null };
 
 // Liest nur: Mitglied mit dieser Mitgliedernummer bzw. dieser E-Mail (beide ohne Gross-/Kleinschreibung).
 async function findeMitglied(db: Db, bedingung: SQL): Promise<Treffer | null> {
@@ -49,7 +49,9 @@ async function findeBestehendes(
 	if (ueberNummer && ueberEmail)
 		return ueberNummer.id === ueberEmail.id ? ueberNummer.id : 'widerspruch';
 	if (ueberNummer) {
-		return ueberNummer.email.toLowerCase() === email.toLowerCase() ? ueberNummer.id : 'widerspruch';
+		return ueberNummer.email?.toLowerCase() === email.toLowerCase()
+			? ueberNummer.id
+			: 'widerspruch';
 	}
 	if (ueberEmail) {
 		const dbNummer = ueberEmail.mitgliedernummer;

@@ -59,7 +59,7 @@ describe('Beispielturnier für make seed', () => {
 				.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId));
 		const erste = await lesen();
 		expect(new Set(erste.map((a) => a.email)).size).toBeGreaterThanOrEqual(4);
-		expect(erste.every((a) => a.email.endsWith('@example.org'))).toBe(true);
+		expect(erste.every((a) => a.email!.endsWith('@example.org'))).toBe(true);
 		for (const name of ['Herren R1–R6', 'Herren R7–R9', 'Damen R4–R9']) {
 			expect(erste.some((a) => a.kategorie === name)).toBe(true);
 		}

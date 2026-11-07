@@ -446,6 +446,24 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		expect(await korrigiereKlassierung(db, urheber, -1, 'R5', jetzt)).toBe('nicht-gefunden');
 	});
 
+	test('FR-04: die Klassierung eines gelöschten Mitglieds bleibt leer, ohne Verlaufseintrag', async () => {
+		const cm = await spieler();
+		const weg = await spieler();
+		await db
+			.update(mitglied)
+			.set({ klassierung: null, status: 'geloescht' })
+			.where(eq(mitglied.id, weg));
+		const urheber = { art: 'admin' as const, mitgliedId: cm };
+		const jetzt = new Date('2026-11-07T10:00:00Z');
+		expect(await korrigiereKlassierung(db, urheber, weg, 'R5', jetzt)).toBe('nicht-gefunden');
+		const [m] = await db
+			.select({ klassierung: mitglied.klassierung })
+			.from(mitglied)
+			.where(eq(mitglied.id, weg));
+		expect(m.klassierung).toBeNull();
+		expect(await db.select().from(aenderung).where(eq(aenderung.mitgliedId, weg))).toEqual([]);
+	});
+
 	test('FR-26, FR-46, FR-08: jede Änderung des CM-Admins steht im Verlauf des Spielers, ohne Werte', async () => {
 		const t = await turnier(['Herren A', 'Herren B']);
 		const [a, b] = t.kategorien;
@@ -522,6 +540,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				status: 'bestaetigt',
 				kommentar: null,
 				mitgliedId: alphaA,
+				mitgliedStatus: 'aktiv',
 				name: 'Alpha, Adam',
 				geschlecht: 'm',
 				jahrgang: 1990,
@@ -532,6 +551,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				status: 'beantragt',
 				kommentar: 'Bin besser',
 				mitgliedId: alphaB,
+				mitgliedStatus: 'aktiv',
 				name: 'Alpha, Bert',
 				geschlecht: null,
 				jahrgang: null,
@@ -542,6 +562,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				status: 'bestaetigt',
 				kommentar: null,
 				mitgliedId: zeta,
+				mitgliedStatus: 'aktiv',
 				name: 'Zeta, Anna',
 				geschlecht: 'm',
 				jahrgang: 1990,
@@ -560,6 +581,65 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		});
 		await anmeldungMit(doppel, zeta, 'bestaetigt', t.jetzt);
 		expect(await ladeAnmeldungen(db, doppel)).toEqual([]);
+	});
+
+	test('FR-04: ladeAnmeldungen nennt den Status des Mitglieds, auch Ausgetretene und Gelöschte', async () => {
+		const t = await turnier(['Herren A']);
+		const [a] = t.kategorien;
+		const aktiv = await spieler({ nachname: 'Aktiv' });
+		const aus = await spieler({ nachname: 'Aus' });
+		const vorgemerkt = await spieler({ nachname: 'Vor' });
+		const weg = await spieler({ nachname: 'Weg' });
+		for (const id of [aktiv, aus, vorgemerkt, weg])
+			await anmeldungMit(a, id, 'bestaetigt', t.jetzt);
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten', austrittAm: t.jetzt })
+			.where(eq(mitglied.id, aus));
+		await db
+			.update(mitglied)
+			.set({ status: 'vorgemerkt', statusVorher: 'aktiv', vorgemerktAm: t.jetzt })
+			.where(eq(mitglied.id, vorgemerkt));
+		await db.update(mitglied).set({ status: 'geloescht' }).where(eq(mitglied.id, weg));
+
+		const status = Object.fromEntries(
+			(await ladeAnmeldungen(db, a)).map((z) => [z.mitgliedId, z.mitgliedStatus])
+		);
+		expect(status).toEqual({
+			[aktiv]: 'aktiv',
+			[aus]: 'ausgetreten',
+			[vorgemerkt]: 'vorgemerkt',
+			[weg]: 'geloescht'
+		});
+	});
+
+	test('FR-04: CM-Aktionen an einer Anmeldung eines gelöschten Mitglieds schreiben keinen Verlauf', async () => {
+		const t = await turnier(['Herren A', 'Herren B']);
+		const [a, b] = t.kategorien;
+		const verlaufsZahl = async (id: number) =>
+			(await db.select().from(aenderung).where(eq(aenderung.mitgliedId, id))).length;
+		const loesche = (id: number) =>
+			db.update(mitglied).set({ status: 'geloescht' }).where(eq(mitglied.id, id));
+
+		const v = await spieler();
+		const idV = await anmeldungMit(a, v, 'bestaetigt', t.jetzt);
+		await loesche(v);
+		expect(await verschiebe(db, admin, idV, b, t.jetzt, true)).toMatchObject({ ergebnis: 'ok' });
+		expect(await loescheAnmeldung(db, admin, idV, t.jetzt)).toMatchObject({ mitgliedId: v });
+
+		const e = await spieler();
+		const idE = await anmeldungMit(a, e, 'beantragt', t.jetzt, 'Bitte');
+		await loesche(e);
+		expect(await entscheide(db, admin, idE, true, t.jetzt)).toMatchObject({ mitgliedId: e });
+
+		expect(await verlaufsZahl(v)).toBe(0);
+		expect(await verlaufsZahl(e)).toBe(0);
+
+		// Gegenprobe: ein aktives Mitglied bekommt weiter seinen Eintrag.
+		const ok = await spieler();
+		const idOk = await anmeldungMit(a, ok, 'bestaetigt', t.jetzt);
+		expect(await loescheAnmeldung(db, admin, idOk, t.jetzt)).toMatchObject({ mitgliedId: ok });
+		expect(await verlaufsZahl(ok)).toBe(1);
 	});
 
 	test('A-ANMELDUNG-06: sucheSpieler findet aktive nach Vor-, Nach- oder ganzem Namen, höchstens 20', async () => {

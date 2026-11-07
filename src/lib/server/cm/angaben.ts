@@ -128,11 +128,12 @@ export async function schreibeKlassierung(
 ): Promise<'ok' | 'nicht-gefunden'> {
 	return db.transaction(async (tx) => {
 		const [z] = await tx
-			.select({ klassierung: mitglied.klassierung })
+			.select({ klassierung: mitglied.klassierung, status: mitglied.status })
 			.from(mitglied)
 			.where(eq(mitglied.id, mitgliedId))
 			.for('update');
-		if (!z) return 'nicht-gefunden';
+		// Von einem gelöschten Mitglied bleibt nur der Name (FR-04).
+		if (!z || z.status === 'geloescht') return 'nicht-gefunden';
 		if (z.klassierung === wert) return 'ok';
 		await tx.update(mitglied).set({ klassierung: wert }).where(eq(mitglied.id, mitgliedId));
 		await schreibeVerlauf(

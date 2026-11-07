@@ -8,6 +8,18 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.11.0 — Austritt, Löschen und Auskunft
+
+- Austritt, Löschen, Auskunft und Löschfristen (#43, Etappe 3): Der Mitglieder-Admin erfasst Austritt
+  und Wiedereintritt, merkt ein Mitglied zum Löschen vor (7 Tage Bedenkzeit, Anzeige «wird gelöscht»,
+  rückgängig machbar) und druckt die Auskunft mit allen gespeicherten Daten (steht im Änderungsverlauf).
+  Austritt und Vormerken sperren das Login und ziehen offene Anmeldungen zurück. Ein täglicher
+  Zeitgeber der App löscht ausgetretene Mitglieder nach einem Jahr (nur der Name bleibt), den
+  Änderungsverlauf nach 12 Monaten und Antworten zu Anlässen ein Jahr nach Beginn des Anlasses; Verweise auf
+  Gelöschte erscheinen als «gelöschtes Konto». Der letzte MyTCO-Admin kann weder austreten noch
+  vorgemerkt werden (RR-03). Die Anmeldeliste der Clubmeisterschaft zeigt ausgetretene und
+  vorgemerkte Mitglieder; Aktionen der CM-Verantwortlichen schreiben bei Gelöschten keinen Verlauf mehr.
+
 ## 0.10.0 — Anmeldungen verwalten und Wildcard-Anträge
 
 - Clubmeisterschaft: Anmeldungen verwalten und Wildcard-Anträge (#60, nur Einzel). Der

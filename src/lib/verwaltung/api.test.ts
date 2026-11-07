@@ -22,6 +22,11 @@ import {
 	beendeAnsicht,
 	ladeRollenListe,
 	schaueAls,
+	erfasseAustritt,
+	erfasseWiedereintritt,
+	loescheMitglied,
+	nimmLoeschungZurueck,
+	ladeAuskunft,
 	ladeAnmeldungen,
 	meldeVonHandAn,
 	verschiebeAnmeldung,
@@ -392,5 +397,43 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			{ art: 'nicht-beantragt' },
 			{ art: 'nicht-gefunden' }
 		]);
+	});
+});
+
+describe('Mitgliedschaft: Austritt, Löschung, Auskunft', () => {
+	const aktionen = [
+		[erfasseAustritt, 'austritt'],
+		[erfasseWiedereintritt, 'wiedereintritt'],
+		[loescheMitglied, 'loeschen'],
+		[nimmLoeschungZurueck, 'loeschen-rueckgaengig']
+	] as const;
+
+	it.each(aktionen)('schickt ein leeres JSON an den richtigen Pfad (%#)', async (aktion, pfad) => {
+		const h = holer(json(200, {}));
+		expect(await aktion(5, h.holen)).toEqual({ art: 'ok', daten: {} });
+		expect(h.aufrufe[0].pfad).toBe(`/api/admin/mitglieder/5/${pfad}`);
+		expect(h.aufrufe[0].init.method).toBe('POST');
+		expect(h.aufrufe[0].init.body).toBe('{}');
+	});
+
+	it.each(aktionen)('409 und weitere Antworten werden eigene Ergebnisse (%#)', async (aktion) => {
+		const mit = (s: number, i: unknown) => aktion(1, holer(json(s, i)).holen);
+		expect(await mit(409, { fehler: 'veraltet' })).toEqual({ art: 'veraltet' });
+		expect(await mit(409, { fehler: 'letzter-mytco' })).toEqual({ art: 'letzter-mytco' });
+		expect(await mit(409, { fehler: 'frist-abgelaufen' })).toEqual({ art: 'frist-abgelaufen' });
+		expect(await mit(403, { fehler: 'nur-ansehen' })).toEqual({ art: 'nur-ansehen' });
+		expect(await mit(404, {})).toEqual({ art: 'nicht-gefunden' });
+		expect(await mit(500, {})).toEqual({ art: 'stoerung' });
+		expect(await aktion(1, holer(new Error('weg')).holen)).toEqual({ art: 'stoerung' });
+	});
+
+	it('Auskunft liest /api/admin/mitglieder/[id]/auskunft', async () => {
+		const h = holer(json(200, { name: 'Beispiel, Lea' }));
+		expect(await ladeAuskunft(5, h.holen)).toEqual({
+			art: 'ok',
+			daten: { name: 'Beispiel, Lea' }
+		});
+		expect(h.aufrufe[0].pfad).toBe('/api/admin/mitglieder/5/auskunft');
+		expect(h.aufrufe[0].init.method).toBe('GET');
 	});
 });

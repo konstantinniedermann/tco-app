@@ -1673,3 +1673,107 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		margin: 0;
 	}
 }
+
+/* Druckseite (Auskunft): weisser Grund, Tabellen mit Linien in --farbe-rand */
+.druckseite {
+	background: var(--farbe-flaeche);
+	color: var(--farbe-text);
+	padding: var(--abstand-5);
+	border-radius: var(--radius);
+	box-shadow: var(--schatten-karte);
+}
+
+.druckseite-kopf {
+	display: flex;
+	align-items: center;
+	gap: var(--abstand-3);
+	margin-bottom: var(--abstand-4);
+}
+
+.druckseite-wappen {
+	display: inline-flex;
+	background: var(--farbe-marke);
+	border-radius: var(--radius);
+	padding: var(--abstand-2);
+}
+
+.druckseite h2 {
+	margin: var(--abstand-5) 0 var(--abstand-2);
+	font-size: var(--groesse-gross);
+}
+
+.druckseite .tabelle {
+	box-shadow: none;
+	margin-bottom: var(--abstand-5);
+}
+
+.druckseite table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: var(--groesse-klein);
+}
+
+.druckseite th,
+.druckseite td {
+	text-align: left;
+	vertical-align: top;
+	padding: var(--abstand-2);
+	border-bottom: var(--rand-duenn) solid var(--farbe-rand);
+}
+
+.druckseite tbody th {
+	width: 34%;
+}
+
+.druckseite thead th {
+	background: var(--farbe-marke-zart);
+}
+
+@media print {
+	.nicht-drucken,
+	.seitenleiste,
+	.kopf,
+	.hinweis,
+	.ansicht-band {
+		display: none;
+	}
+
+	.druckseite {
+		padding: 0;
+		box-shadow: none;
+	}
+
+	/* Auf Papier scrollt nichts: Tabellen laufen ganz aus */
+	.druckseite .tabelle {
+		overflow: visible;
+	}
+
+	/* Ein Block über die ganze Papierbreite: kein Raster der Verwaltung, keine feste Höhe, weisser Grund */
+	html,
+	body,
+	.app,
+	.verwaltung,
+	.inhalt {
+		background: var(--farbe-flaeche);
+	}
+
+	.schale,
+	.rollbereich {
+		height: auto;
+		overflow: visible;
+	}
+
+	.app,
+	.verwaltung {
+		display: block;
+		min-height: 0;
+	}
+
+	.verwaltung .inhalt,
+	.inhalt {
+		width: 100%;
+		max-width: none;
+		margin: 0;
+		padding-inline: 0;
+	}
+}

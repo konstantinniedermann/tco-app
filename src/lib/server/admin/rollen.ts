@@ -40,6 +40,21 @@ export async function istMytcoAdmin(db: DbOderTx, kontoId: number): Promise<bool
 	return zeile.n > 0;
 }
 
+/**
+ * RR-03: Ordnet alle Schritte, die die Zahl der MyTCO-Admins senken können, hintereinander.
+ * Immer als erste Sperre der Transaktion nehmen, vor jeder Zeilensperre (keine Verklemmung).
+ */
+export async function sperreRollen(tx: DbOderTx): Promise<void> {
+	await tx.execute(sql`select pg_advisory_xact_lock(${SPERRE_ROLLEN})`);
+}
+
+/** RR-03: Das Konto ist ein zählender MyTCO-Admin, und es gibt keinen anderen. Unter `sperreRollen`. */
+export async function waereLetzterMytco(tx: DbOderTx, kontoId: number): Promise<boolean> {
+	if (!(await istMytcoAdmin(tx, kontoId))) return false;
+	const [andere] = await zaehlendeMytcoAdmins(tx, kontoId);
+	return andere.n === 0;
+}
+
 export const VERWALTUNGSROLLEN = ['mytco', 'mitglieder', 'cm'] as const satisfies readonly Rolle[];
 export type VerwaltungsRolle = (typeof VERWALTUNGSROLLEN)[number];
 
@@ -127,7 +142,7 @@ export async function setzeRollen(
 ): Promise<'ok' | 'letzter-mytco' | 'veraltet' | 'nicht-gefunden'> {
 	return db.transaction(async (tx) => {
 		// RR-03: Vergleichen, Zählen und Schreiben müssen gegenüber anderen Änderungen atomar sein.
-		await tx.execute(sql`select pg_advisory_xact_lock(${SPERRE_ROLLEN})`);
+		await sperreRollen(tx);
 
 		const [ziel] = await tx
 			.select({ mitgliedId: konto.mitgliedId })
@@ -142,9 +157,8 @@ export async function setzeRollen(
 		const entzogen = alt.filter((r) => !neu.includes(r));
 
 		// RR-03: Mindestens ein MyTCO-Admin bleibt; für die übrigen Rollen gilt keine Untergrenze.
-		if (entzogen.includes('mytco') && (await istMytcoAdmin(tx, kontoId))) {
-			const [andere] = await zaehlendeMytcoAdmins(tx, kontoId);
-			if (andere.n === 0) return 'letzter-mytco';
+		if (entzogen.includes('mytco') && (await waereLetzterMytco(tx, kontoId))) {
+			return 'letzter-mytco';
 		}
 
 		if (entzogen.length > 0) {

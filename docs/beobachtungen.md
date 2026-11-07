@@ -533,6 +533,54 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Alles klein. `pushsubscriptionchange` und der Link aus `MYTCO_ADRESSE` zuerst ansehen, sobald Push auf Test läuft (#39); die Testlücken bei Gelegenheit mit dem CM-Teil der Mitteilungen.
 
+### 2026-11-07 — Auskunft zeigt `sitzung.ansichtRolle` nicht
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/server/admin/auskunft.ts`
+
+**Beobachtung:** Die Auskunft (DS-07) nennt das flüchtige Feld `sitzung.ansichtRolle` nicht; es gibt es nur für MyTCO-Admins in der Ansicht als Rolle und verschwindet mit der Sitzung.
+
+**Ursprung:** Review von Task 8 in #43 (Etappe 3).
+
+**Einschätzung:** Vermutlich ohne Folgen, weil es kein Mitgliederdatum im engeren Sinn ist; bei Gelegenheit in `datenschutz.md` ausdrücklich erwähnen oder aufnehmen.
+
+### 2026-11-07 — Verlauf-Einträge als Urheber bei anderen fehlen in der Auskunft
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/server/admin/auskunft.ts`, `src/lib/server/admin/verlauf.ts`
+
+**Beobachtung:** Einträge, in denen die Person nur Urheber bei anderen Mitgliedern ist, stehen nicht in der Auskunft, weil sie Dritte nennen.
+
+**Ursprung:** Review von Task 8 in #43 (Etappe 3).
+
+**Einschätzung:** Gewollt; offen ist nur, ob eine Anzahl («hat 12 Änderungen bei anderen ausgelöst») gewünscht ist.
+
+### 2026-11-07 — E2E `bewegung.test.ts:399` im Profil iphone einmal flackernd
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/bewegung.test.ts:399`
+
+**Beobachtung:** Einmal «Importing a module script failed» im Profil iphone; danach nicht mehr aufgetreten.
+
+**Ursprung:** E2E-Lauf in #43, Task 9; unabhängig von #43.
+
+**Einschätzung:** Wahrscheinlich Netz-/Dev-Server-Flackern. Kommt es wieder, Trace holen.
+
+### 2026-11-07 — IP-Grenze der Code-Anfragen im E2E fast ausgeschöpft
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/`, Grenze von 10 Code-Anfragen je Stunde und IP
+
+**Beobachtung:** Die Suite nutzt die Grenze fast ganz aus. Der neue Test für den Ausgetretenen fordert einen Code deshalb nur im Profil android an.
+
+**Ursprung:** Task 9 in #43.
+
+**Einschätzung:** Ein weiterer Test mit Code-Anfrage braucht eine andere Lösung (Grenze im E2E anheben oder getrennte IPs).
+
 ### 2026-11-07 — Abgelehnter Wildcard-Antrag fehlt auf der CM-Seite; wiederholtes Beantragen meldet jedes Mal allen CM-Admins
 
 **Thema:** Turnier-Verwaltung
@@ -555,4 +603,4 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Ursprung:** Schluss-Review von #60 (CM Teil 4).
 
-**Einschätzung:** Harmlos (die Oberfläche bietet nur Spieler aktiver Anmeldungen an), aber uneinheitlich. Bei der nächsten Arbeit an der Klassierung `status = 'aktiv'` mitprüfen.
+**Einschätzung:** Harmlos (die Oberfläche bietet nur Spieler aktiver Anmeldungen an), aber uneinheitlich. Bei der nächsten Arbeit an der Klassierung `status = 'aktiv'` mitprüfen. Nachtrag (Merge mit #43): Gelöschte weist `schreibeKlassierung` ab, weil ihre Anmeldung nach dem Anmeldeschluss aktiv in der Liste stehen kann; offen bleibt nur *ausgetreten*.

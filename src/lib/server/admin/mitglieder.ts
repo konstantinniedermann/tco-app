@@ -3,6 +3,7 @@ import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, kontoRolle, mitglied, sitzung } from '../db/schema.ts';
 import { beendeAlleSitzungen, sitzungAbgelaufen } from '../login/sitzung.ts';
 import type { Angaben, Feld } from './angaben.ts';
+import { loeschtAm } from './mitgliedschaft.ts';
 import { ladeRollen, type Rolle } from './rollen.ts';
 import {
 	geaenderteFelder,
@@ -12,7 +13,7 @@ import {
 	type VerlaufZeile
 } from './verlauf.ts';
 
-export type MitgliedStatus = 'aktiv' | 'ausgetreten' | 'geloescht';
+export type MitgliedStatus = 'aktiv' | 'ausgetreten' | 'vorgemerkt' | 'geloescht';
 export type LoginStand = 'ohne-brief' | 'brief-offen' | 'eingeloggt' | 'gesperrt';
 
 export type Listenzeile = {
@@ -38,6 +39,8 @@ export type Detail = {
 		geraete: number;
 		zuletztGenutzt: Date | null;
 	};
+	/** Daten zu Austritt und Löschung; `loeschtAm` nur bei `ausgetreten` und `vorgemerkt`. */
+	mitgliedschaft: { austrittAm: Date | null; vorgemerktAm: Date | null; loeschtAm: Date | null };
 	verlauf: VerlaufZeile[];
 	/** Es gibt mehr Einträge als `verlauf` zeigt (nur die letzten `VERLAUF_GRENZE`). */
 	verlaufGekuerzt: boolean;
@@ -181,7 +184,7 @@ export async function listeMitglieder(
 		id: z.id,
 		mitgliedernummer: z.mitgliedernummer,
 		name: `${z.nachname}, ${z.vorname}`,
-		email: z.email,
+		email: z.email ?? '',
 		jahrgang: z.jahrgang,
 		rollen: rollen.get(z.kontoId) ?? [],
 		status: z.status as MitgliedStatus,
@@ -194,10 +197,10 @@ export function angabenAusZeile(z: typeof mitglied.$inferSelect): Angaben {
 		mitgliedernummer: z.mitgliedernummer,
 		vorname: z.vorname,
 		nachname: z.nachname,
-		strasse: z.strasse,
-		plz: z.plz,
-		ort: z.ort,
-		email: z.email,
+		strasse: z.strasse ?? '',
+		plz: z.plz ?? '',
+		ort: z.ort ?? '',
+		email: z.email ?? '',
 		telefon: z.telefon,
 		geschlecht: z.geschlecht as Angaben['geschlecht'],
 		jahrgang: z.jahrgang,
@@ -220,10 +223,12 @@ export async function ladeMitglied(db: Db, id: number, jetzt: Date): Promise<Det
 	]);
 	const zeiten = sitzungen.get(zeile.k.id) ?? [];
 	const zuletzt = zeiten.reduce<Date | null>((a, b) => (a === null || b > a ? b : a), null);
+	const status = zeile.m.status as MitgliedStatus;
+	const { austrittAm, vorgemerktAm } = zeile.m;
 	return {
 		id: zeile.m.id,
 		kontoId: zeile.k.id,
-		status: zeile.m.status as MitgliedStatus,
+		status,
 		angaben: angabenAusZeile(zeile.m),
 		rollen,
 		login: {
@@ -231,6 +236,11 @@ export async function ladeMitglied(db: Db, id: number, jetzt: Date): Promise<Det
 			briefGueltigBis: briefOffen(zeile.k, jetzt) ? zeile.k.briefCodeAblauf : null,
 			geraete: zeiten.length,
 			zuletztGenutzt: zuletzt
+		},
+		mitgliedschaft: {
+			austrittAm,
+			vorgemerktAm,
+			loeschtAm: loeschtAm({ status, austrittAm, vorgemerktAm })
 		},
 		verlauf: verlauf.slice(0, VERLAUF_GRENZE),
 		verlaufGekuerzt: verlauf.length > VERLAUF_GRENZE
@@ -279,7 +289,8 @@ export async function aendereAngaben(
 	try {
 		return await db.transaction(async (tx) => {
 			const [alt] = await tx.select().from(mitglied).where(eq(mitglied.id, id)).for('update');
-			if (!alt) return { ergebnis: 'nicht-gefunden' as const };
+			// Gelöschte behalten nur den Namen; nichts darf zurückgeschrieben werden.
+			if (!alt || alt.status === 'geloescht') return { ergebnis: 'nicht-gefunden' as const };
 			const gespeichert = angabenAusZeile(alt);
 			if (geaenderteFelder(gespeichert, vorher).length > 0)
 				return { ergebnis: 'veraltet' as const };
@@ -312,7 +323,11 @@ export async function beendeSitzungenVon(
 	jetzt: Date
 ): Promise<'ok' | 'nicht-gefunden'> {
 	return db.transaction(async (tx) => {
-		const [k] = await tx.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, id));
+		const [k] = await tx
+			.select({ id: konto.id })
+			.from(konto)
+			.innerJoin(mitglied, eq(mitglied.id, konto.mitgliedId))
+			.where(and(eq(konto.mitgliedId, id), ne(mitglied.status, 'geloescht')));
 		if (!k) return 'nicht-gefunden' as const;
 		await beendeAlleSitzungen(tx, k.id);
 		await schreibeVerlauf(tx, id, urheber, [{ aktion: 'sitzungen-beendet' }], jetzt);

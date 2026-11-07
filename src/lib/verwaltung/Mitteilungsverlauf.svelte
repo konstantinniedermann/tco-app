@@ -26,7 +26,7 @@
 				{#each eintraege as e, i (i)}
 					<tr>
 						<td>{zeitText(e.gesendetAm)}</td>
-						<td>{e.absender ?? 'gelöschtes Mitglied'}</td>
+						<td>{e.absender ?? 'gelöschtes Konto'}</td>
 						<td><strong>{e.titel}</strong><br />{e.text}</td>
 						<td>{auswahlText(e.auswahl)}</td>
 						<td>{WEG_NAMEN[e.weg]}</td>

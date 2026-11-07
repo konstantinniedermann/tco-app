@@ -240,7 +240,7 @@ describe('Zugang zur Verwaltung', () => {
 			.where(eq(kontoTabelle.id, gesperrt.kontoId));
 		await db
 			.update(mitglied)
-			.set({ status: 'ausgetreten' })
+			.set({ status: 'ausgetreten', austrittAm: new Date() })
 			.where(eq(mitglied.id, ausgetreten.mitgliedId));
 		expect(await z.dienst.pruefe(kg)).toEqual({ stufe: 'keine-rolle' });
 		expect(await z.dienst.pruefe(ka)).toEqual({ stufe: 'keine-rolle' });

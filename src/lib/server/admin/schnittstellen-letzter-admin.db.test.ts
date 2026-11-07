@@ -1,3 +1,4 @@
+import { and, eq, ne } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import {
@@ -5,9 +6,10 @@ import {
 	type EigeneDatenbank
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { kontoRolle } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
-import { postRollen, type AdminDienste } from './schnittstellen.ts';
+import { postAustritt, postLoeschen, postRollen, type AdminDienste } from './schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 // «Letzter Admin» ist global; darum eine eigene Datenbank statt der gemeinsamen.
@@ -117,5 +119,21 @@ describe('Admin-Schnittstelle Rollen, eigene Datenbank', () => {
 		);
 		expect(r.status).toBe(403);
 		expect(await r.json()).toEqual({ fehler: 'kein-admin' });
+	});
+
+	test('RR-03: Austritt und Vormerken des letzten MyTCO-Admins → 409 letzter-mytco', async () => {
+		const { d, admin, konto } = await bestaetigterMytcoAdmin();
+		// Die Tests davor haben weitere MyTCO-Admins angelegt; dieser soll der einzige sein.
+		await eigene!.db
+			.delete(kontoRolle)
+			.where(and(eq(kontoRolle.rolle, 'mytco'), ne(kontoRolle.kontoId, admin.kontoId)));
+		for (const fn of [postAustritt, postLoeschen]) {
+			const r = await fn(
+				d,
+				ereignis({ body: {}, params: { id: String(admin.mitgliedId) }, konto })
+			);
+			expect(r.status).toBe(409);
+			expect(await r.json()).toEqual({ fehler: 'letzter-mytco' });
+		}
 	});
 });

@@ -23,7 +23,9 @@ export async function legeMitgliedAn(db: Db, teil: Teil = {}) {
 			plz: '4600',
 			ort: 'Olten',
 			email,
-			...(teil.status === undefined ? {} : { status: teil.status })
+			...(teil.status === undefined ? {} : { status: teil.status }),
+			...(teil.status === 'ausgetreten' ? { austrittAm: new Date() } : {}),
+			...(teil.status === 'vorgemerkt' ? { vorgemerktAm: new Date(), statusVorher: 'aktiv' } : {})
 		})
 		.returning({ id: mitglied.id });
 	const [k] = await db

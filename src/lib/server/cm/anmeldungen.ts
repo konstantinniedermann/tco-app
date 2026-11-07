@@ -249,11 +249,12 @@ async function trageEin<F extends string>(
 ): Promise<'ok' | F | Gemeinsam> {
 	return db.transaction(async (tx) => {
 		const [m] = await tx
-			.select(spielerSpalten)
+			.select({ ...spielerSpalten, status: mitglied.status })
 			.from(mitglied)
 			.where(eq(mitglied.id, mitgliedId))
 			.for('update');
-		if (!m) return 'nicht-gefunden';
+		// Gesperrt wird vor dem Prüfen: eine Anmeldung kann nicht nach einem Austritt landen.
+		if (!m || m.status !== 'aktiv') return 'nicht-gefunden';
 		const [z] = await tx
 			.select({ k: kategorie, t: turnier })
 			.from(kategorie)

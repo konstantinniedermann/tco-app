@@ -5,6 +5,7 @@ import type { Angaben, Feld } from '../server/admin/angaben.ts';
 import type { AnlassFeld } from '../server/anlass/angaben.ts';
 import type { AnlassAdmin, AnlassListe } from '../server/anlass/anlaesse.ts';
 import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairgate.ts';
+import type { Auskunft } from '../server/admin/auskunft.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
 import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
@@ -30,6 +31,7 @@ export type Json<T> = T extends Date
 			: T;
 
 export type MitgliedDetail = Json<Detail>;
+export type AuskunftAnsicht = Json<Auskunft>;
 export type MitgliedZeile = Json<Listenzeile>;
 export type VerlaufEintrag = Json<VerlaufZeile>;
 export type AnlassZeile = Json<AnlassListe>;
@@ -58,6 +60,7 @@ export type Antwort<T> =
 	| { art: 'vergeben'; feld: Feld | 'jahr' | 'name' }
 	| { art: 'letzter-mytco' }
 	| { art: 'veraltet' }
+	| { art: 'frist-abgelaufen' }
 	| { art: 'schluss-vorbei' }
 	| { art: 'keine-kategorie' }
 	| { art: 'unzulaessig' }
@@ -100,6 +103,7 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 	if (status === 409) {
 		if (k.fehler === 'letzter-mytco') return { art: 'letzter-mytco' };
 		if (k.fehler === 'veraltet') return { art: 'veraltet' };
+		if (k.fehler === 'frist-abgelaufen') return { art: 'frist-abgelaufen' };
 		if (k.fehler === 'schluss-vorbei') return { art: 'schluss-vorbei' };
 		if (k.fehler === 'keine-kategorie') return { art: 'keine-kategorie' };
 		if (k.fehler === 'unzulaessig') return { art: 'unzulaessig' };
@@ -207,6 +211,21 @@ export const speichereRollen = (
 
 export const beendeSitzungen = (id: number, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/mitglieder/${id}/sitzungen`, {}, holen);
+
+/** Austritt, Wiedereintritt, Löschen und Zurücknehmen: ändern den Stand der Mitgliedschaft (FR-04). */
+const mitgliedschaft =
+	(aktion: string) =>
+	(id: number, holen: Holen = fetch) =>
+		schicke<Record<string, never>>(`${ADMIN}/mitglieder/${id}/${aktion}`, {}, holen);
+
+export const erfasseAustritt = mitgliedschaft('austritt');
+export const erfasseWiedereintritt = mitgliedschaft('wiedereintritt');
+export const loescheMitglied = mitgliedschaft('loeschen');
+export const nimmLoeschungZurueck = mitgliedschaft('loeschen-rueckgaengig');
+
+/** DS-07: alles, was MyTCO zu dem Mitglied speichert. */
+export const ladeAuskunft = (id: number, holen: Holen = fetch) =>
+	lese<AuskunftAnsicht>(`${ADMIN}/mitglieder/${id}/auskunft`, holen);
 
 export function ladeVerlauf(
 	filter: { mitglied?: number },

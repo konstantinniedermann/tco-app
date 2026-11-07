@@ -58,14 +58,16 @@ du selbst einschaltest. Für nichts anderes.
 **Wo:** Die Daten liegen bei Infomaniak in der Schweiz; E-Mails versendet [E-Mail-Dienst].
 Push-Nachrichten enthalten keine Daten anderer Mitglieder (zum Zustellen siehe «Mitteilungen»).
 
-**Mitteilungen:** Der Mitglieder-Admin kann dir Mitteilungen zu Anlässen und zum Verein schicken, als Push und als E-Mail. Push gibt es nur, wenn du ihn auf einem Gerät selbst einschaltest. Die Nachricht leitet Apple, Google, Mozilla oder Microsoft (je nach deinem Gerät) verschlüsselt weiter; sie sehen, dass eine Nachricht für dein Gerät eintrifft, aber nicht ihren Inhalt. MyTCO speichert dafür je Gerät die Adresse beim Push-Dienst und zwei Schlüssel. Das Abo endet mit dem Abmelden, wenn du Push abschaltest, und mit deinem Konto. Im Profil stellst du Mitteilungen je Thema (Anlässe, Clubmeisterschaft, Verein) ab. Bestätigungen, Codes und persönliche Meldungen zu deinen CM-Anmeldungen bleiben davon unberührt. Wer wann welche Mitteilung geschickt hat, sehen der Mitglieder-Admin und, nur lesend, der MyTCO-Admin ein Jahr lang, ohne Namen der Empfänger.
+**Mitteilungen:** Der Mitglieder-Admin kann dir Mitteilungen zu Anlässen und zum Verein schicken, als Push und als E-Mail. Push gibt es nur, wenn du ihn auf einem Gerät selbst einschaltest. Die Nachricht leitet Apple, Google, Mozilla oder Microsoft (je nach deinem Gerät) verschlüsselt weiter; sie sehen, dass eine Nachricht für dein Gerät eintrifft, aber nicht ihren Inhalt. MyTCO speichert dafür je Gerät die Adresse beim Push-Dienst und zwei Schlüssel. Das Abo endet mit dem Abmelden, wenn du Push abschaltest, mit deinem Austritt oder wenn dein Konto zum Löschen vorgemerkt wird, und mit deinem Konto. Im Profil stellst du Mitteilungen je Thema (Anlässe, Clubmeisterschaft, Verein) ab. Bestätigungen, Codes und persönliche Meldungen zu deinen CM-Anmeldungen bleiben davon unberührt. Wer wann welche Mitteilung geschickt hat, sehen der Mitglieder-Admin und, nur lesend, der MyTCO-Admin ein Jahr lang, ohne Namen der Empfänger.
 
 **Wie lange:** Solange du Mitglied bist. Nach einem Austritt wird dein Konto gesperrt; deine
 Daten bleiben noch eine Frist lang, falls du zurückkommst [Frist, **Vorschlag K-38:** 1 Jahr], und werden
 dann gelöscht. Löscht der Verein dein Mitglied, zum Beispiel auf deinen Wunsch, ist dein Konto
 sofort gesperrt, und deine Daten werden nach einer Woche gelöscht. In beiden Fällen bleibt dein
 Name in vergangenen Resultaten und bei deinen Anmeldungen zur Clubmeisterschaft; die Turniergeschichte ist bei Swiss Tennis ohnehin öffentlich. Deine An- oder Abmeldung zu einem Anlass löschen wir ein Jahr
-nach dem Anlass [**Vorschlag K-50**].
+nach Beginn des Anlasses [**Vorschlag K-50**].
+
+Auf Wunsch erhältst du eine Auskunft über alle Daten, die wir von dir gespeichert haben.
 
 **Login:** Du loggst dich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 dein Gerät das Login mit einem Cookie, bis du MyTCO ein Jahr nicht genutzt hast oder dich

@@ -13,6 +13,10 @@ import {
 	postMitglieder,
 	postRollen,
 	postSitzungen,
+	postAustritt,
+	postWiedereintritt,
+	postLoeschen,
+	postLoeschenRueckgaengig,
 	getMitglied,
 	getMitglieder,
 	getVerlauf,
@@ -34,6 +38,7 @@ import { getAnlaesse } from '../anlass/schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 import { erstelleHinweis } from './hinweis-mail.ts';
 import { ladeMitglied } from './mitglieder.ts';
+import { setzeAnsicht } from './ansicht.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {
@@ -123,7 +128,7 @@ describe('Admin-Schnittstellen', () => {
 			([name]) =>
 				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(16);
+		expect(geschuetzt).toHaveLength(21);
 		for (const [name, fn] of geschuetzt) {
 			const mach = (konto?: AngemeldetesKonto) =>
 				ereignis({
@@ -158,7 +163,7 @@ describe('Admin-Schnittstellen', () => {
 			([name]) =>
 				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(16);
+		expect(geschuetzt).toHaveLength(21);
 		for (const [name, fn] of geschuetzt) {
 			for (const konto of [cm.konto, ehemals.konto]) {
 				const r = await fn(
@@ -256,6 +261,10 @@ describe('Admin-Schnittstellen', () => {
 			postMitglied,
 			postRollen,
 			postSitzungen,
+			postAustritt,
+			postWiedereintritt,
+			postLoeschen,
+			postLoeschenRueckgaengig,
 			postFairgate,
 			postAdminAnlaesse,
 			postAdminAnlass,
@@ -711,5 +720,93 @@ describe('Admin-Schnittstellen', () => {
 			ereignis({ body: {}, params: { id: String(id) }, konto: admin.konto })
 		);
 		expect([nochmal.status, await nochmal.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
+	});
+});
+
+describe('Mitgliedschaft: Austritt, Wiedereintritt, Löschung', () => {
+	const post = (
+		fn: typeof postAustritt,
+		s: ReturnType<typeof baue>,
+		konto: AngemeldetesKonto,
+		id: string
+	) => fn(s.d, ereignis({ body: {}, params: { id }, konto }));
+
+	test('Austritt: 200, zweiter Aufruf 409 veraltet; unbekannte ID und ungültige ID 404', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const ziel = await legeMitgliedAn(db);
+		const id = String(ziel.mitgliedId);
+		const ok = await post(postAustritt, s, admin.konto, id);
+		expect([ok.status, await ok.json()]).toEqual([200, {}]);
+		expect((await ladeMitglied(db, ziel.mitgliedId, start))!.status).toBe('ausgetreten');
+		const nochmal = await post(postAustritt, s, admin.konto, id);
+		expect([nochmal.status, await nochmal.json()]).toEqual([409, { fehler: 'veraltet' }]);
+		for (const falsch of ['999999999', 'abc']) {
+			const r = await post(postAustritt, s, admin.konto, falsch);
+			expect([falsch, r.status, await r.json()]).toEqual([
+				falsch,
+				404,
+				{ fehler: 'nicht-gefunden' }
+			]);
+		}
+	});
+
+	test('Ablauf: Wiedereintritt, Löschung vormerken und zurücknehmen; falscher Zustand 409', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const ziel = await legeMitgliedAn(db);
+		const id = String(ziel.mitgliedId);
+		const status = async () => (await ladeMitglied(db, ziel.mitgliedId, start))!.status;
+		const veraltet = [409, { fehler: 'veraltet' }];
+		for (const fn of [postWiedereintritt, postLoeschenRueckgaengig]) {
+			const r = await post(fn, s, admin.konto, id);
+			expect([r.status, await r.json()]).toEqual(veraltet);
+		}
+		expect((await post(postAustritt, s, admin.konto, id)).status).toBe(200);
+		expect((await post(postWiedereintritt, s, admin.konto, id)).status).toBe(200);
+		expect(await status()).toBe('aktiv');
+		expect((await post(postLoeschen, s, admin.konto, id)).status).toBe(200);
+		expect(await status()).toBe('vorgemerkt');
+		const doppelt = await post(postLoeschen, s, admin.konto, id);
+		expect([doppelt.status, await doppelt.json()]).toEqual(veraltet);
+		expect((await post(postLoeschenRueckgaengig, s, admin.konto, id)).status).toBe(200);
+		expect(await status()).toBe('aktiv');
+		for (const fn of [postWiedereintritt, postLoeschen, postLoeschenRueckgaengig]) {
+			const r = await post(fn, s, admin.konto, '999999999');
+			expect([r.status, await r.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
+		}
+	});
+
+	test('Wiedereintritt nach der Frist → 409 frist-abgelaufen', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const ziel = await legeMitgliedAn(db, { status: 'ausgetreten' });
+		await db
+			.update(mitglied)
+			.set({ austrittAm: new Date('2025-01-01T00:00:00Z') })
+			.where(eq(mitglied.id, ziel.mitgliedId));
+		const r = await post(postWiedereintritt, s, admin.konto, String(ziel.mitgliedId));
+		expect([r.status, await r.json()]).toEqual([409, { fehler: 'frist-abgelaufen' }]);
+	});
+
+	test('ohne JSON → Formatfehler; in der Ansicht als … → 403 nur-ansehen', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mytco', 'mitglieder']);
+		const ziel = await legeMitgliedAn(db);
+		const id = String(ziel.mitgliedId);
+		for (const fn of [postAustritt, postWiedereintritt, postLoeschen, postLoeschenRueckgaengig]) {
+			const r = await fn(
+				s.d,
+				ereignis({ contentType: 'text/plain', body: '{}', params: { id }, konto: admin.konto })
+			);
+			expect([r.status, await r.json()]).toEqual([415, { fehler: 'format' }]);
+		}
+		await setzeAnsicht(db, admin.konto.sitzungHash, 'mitglieder');
+		const inAnsicht: AngemeldetesKonto = { ...admin.konto, ansicht: 'mitglieder' };
+		for (const fn of [postAustritt, postWiedereintritt, postLoeschen, postLoeschenRueckgaengig]) {
+			const r = await post(fn, s, inAnsicht, id);
+			expect([r.status, await r.json()]).toEqual([403, { fehler: 'nur-ansehen' }]);
+		}
+		expect((await ladeMitglied(db, ziel.mitgliedId, start))!.status).toBe('aktiv');
 	});
 });

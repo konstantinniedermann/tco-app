@@ -134,7 +134,7 @@ describe('Erster Admin', () => {
 			.select({ e: mitglied.email })
 			.from(mitglied)
 			.where(eq(mitglied.id, b.mitgliedId));
-		const roh = angaben({ mitgliedernummer: ma.n!, email: mb.e });
+		const roh = angaben({ mitgliedernummer: ma.n!, email: mb.e! });
 		expect(await legeAdminFest(db, roh, jetzt)).toEqual(WIDERSPRUCH);
 		expect(await ladeRollen(db, a.kontoId)).toEqual([]);
 		expect(await ladeRollen(db, b.kontoId)).toEqual([]);

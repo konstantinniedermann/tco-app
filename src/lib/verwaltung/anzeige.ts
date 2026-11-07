@@ -16,6 +16,10 @@ export function fehlerText(a: Antwort<unknown>): string {
 	return MELDUNG.stoerung;
 }
 
+/** Meldung, wenn zwischen Laden und Speichern ein anderer das Mitglied geändert hat (409). */
+export const VERALTET =
+	'Inzwischen hat jemand anderes dieses Mitglied geändert. Nichts gespeichert: Lade den neuen Stand und gib deine Änderung nochmals ein.';
+
 export const FELD_NAMEN: Record<Feld | 'klassierung', string> = {
 	mitgliedernummer: 'Mitgliedernummer',
 	vorname: 'Vorname',
@@ -30,6 +34,9 @@ export const FELD_NAMEN: Record<Feld | 'klassierung', string> = {
 	klassierung: 'Klassierung',
 	lizenznummer: 'Lizenznummer'
 };
+
+/** Geschlecht als Wort, wie im Angabenformular. */
+export const GESCHLECHT_NAME = { w: 'weiblich', m: 'männlich' } as const;
 
 // Verlaufseinträge von vor dem Umbau der Rollen nennen noch die alte Rolle admin.
 const VERLAUF_ROLLEN: Record<string, string> = { ...ROLLEN_NAME, admin: 'Admin' };
@@ -63,6 +70,16 @@ export function aktionText(z: Pick<VerlaufEintrag, 'aktion' | 'detail'>): string
 			return 'alle Sitzungen beendet';
 		case 'fairgate-uebertragen':
 			return 'In Fairgate übertragen';
+		case 'ausgetreten':
+			return 'Austritt erfasst';
+		case 'wiedereingetreten':
+			return 'Wiedereintritt erfasst';
+		case 'loeschung-vorgemerkt':
+			return 'zum Löschen vorgemerkt';
+		case 'loeschung-zurueckgenommen':
+			return 'Löschung rückgängig gemacht';
+		case 'auskunft-erstellt':
+			return 'Auskunft erstellt';
 		case 'cm-anmeldung-geaendert':
 			return 'CM-Anmeldung geändert (CM)';
 		default:
@@ -97,6 +114,8 @@ export function plakette(z: Pick<MitgliedZeile, 'login' | 'status'>): {
 	klasse: string;
 } {
 	if (z.status === 'ausgetreten') return { text: 'ausgetreten', klasse: 'plakette' };
+	if (z.status === 'vorgemerkt')
+		return { text: 'wird gelöscht', klasse: 'plakette plakette-gesperrt' };
 	if (z.status === 'geloescht') return { text: 'gelöscht', klasse: 'plakette' };
 	switch (z.login) {
 		case 'eingeloggt':
@@ -115,3 +134,48 @@ const TAG = new Intl.DateTimeFormat('de-CH', { dateStyle: 'medium' });
 
 export const zeitText = (iso: string) => ZEIT.format(new Date(iso));
 export const tagText = (iso: string) => TAG.format(new Date(iso));
+
+const ZONE = 'Europe/Zurich';
+const DATUM = new Intl.DateTimeFormat('de-CH', {
+	timeZone: ZONE,
+	day: 'numeric',
+	month: 'numeric',
+	year: 'numeric'
+});
+const DATUM_ZEIT = new Intl.DateTimeFormat('de-CH', {
+	timeZone: ZONE,
+	day: 'numeric',
+	month: 'numeric',
+	year: 'numeric',
+	hour: '2-digit',
+	minute: '2-digit',
+	hourCycle: 'h23'
+});
+
+/** «7.11.2026» nach dem Kalender in Zürich. */
+export const datumText = (iso: string) => DATUM.format(new Date(iso)).replaceAll(' ', '');
+
+/** «7.11.2026, 09:12» in Zürcher Zeit. */
+export function datumZeitText(iso: string): string {
+	const t = Object.fromEntries(
+		DATUM_ZEIT.formatToParts(new Date(iso)).map((p) => [p.type, p.value])
+	);
+	return `${t.day}.${t.month}.${t.year}, ${t.hour}:${t.minute}`;
+}
+
+// Zürcher Kalendertag von `jetzt`, um Jahre und Tage verschoben (Überlauf: 29.2. wird 1.3.).
+function verschoben(jetzt: Date, jahre: number, tage: number): string {
+	const t = Object.fromEntries(DATUM.formatToParts(jetzt).map((p) => [p.type, p.value]));
+	const d = new Date(Date.UTC(Number(t.year) + jahre, Number(t.month) - 1, Number(t.day) + tage));
+	return `${d.getUTCDate()}.${d.getUTCMonth() + 1}.${d.getUTCFullYear()}`;
+}
+
+/** Nur zur Anzeige in der Rückfrage: bis wann der Wiedereintritt ginge (Annahme K-38: ein Kalenderjahr). */
+export const wiedereintrittBis = (jetzt: Date) => verschoben(jetzt, 1, 0);
+
+/** Nur zur Anzeige in der Rückfrage: wann die Löschung fällig wird (Bedenkzeit sieben Tage). */
+export const loeschungAm = (jetzt: Date) => verschoben(jetzt, 0, 7);
+
+/** «Vorname Nachname» für Titel (die Auskunft liefert «Nachname, Vorname»). */
+export const auskunftTitel = (a: { vorname: string; nachname: string }) =>
+	`${a.vorname} ${a.nachname}`;

@@ -96,6 +96,23 @@ describe('Liste Für Fairgate', () => {
 		expect(await zeileVon(mitgliedId)).toBeUndefined();
 	});
 
+	test('nicht aktives Mitglied mit gesetzter Markierung erscheint nicht', async () => {
+		for (const status of ['ausgetreten', 'vorgemerkt', 'geloescht']) {
+			const { mitgliedId } = await legeMitgliedAn(db, { status });
+			await db.update(mitglied).set({ fairgateOffenSeit: t1 }).where(eq(mitglied.id, mitgliedId));
+			expect(await zeileVon(mitgliedId), status).toBeUndefined();
+		}
+	});
+
+	test('gelöschter Verlauf zu offener Markierung: felder leer, verlaufGeloescht', async () => {
+		const { mitgliedId } = await neuesMitglied();
+		await selbst(mitgliedId, { telefon: '079 123 45 67' }, t1);
+		expect((await zeileVon(mitgliedId))!.verlaufGeloescht).toBe(false);
+		await db.delete(aenderung).where(eq(aenderung.mitgliedId, mitgliedId));
+		const z = await zeileVon(mitgliedId);
+		expect(z).toMatchObject({ felder: [], verlaufGeloescht: true });
+	});
+
 	test('A-KONTO-02: Lizenznummer allein erzeugt keinen Eintrag', async () => {
 		const { mitgliedId } = await neuesMitglied();
 		await selbst(mitgliedId, { lizenznummer: '12345678' }, t1);

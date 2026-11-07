@@ -1,7 +1,7 @@
 // Anlässe anlegen, ändern, löschen und An- oder Abmelden (A-ANLASS-01, FR-27 bis FR-32).
 import { randomBytes } from 'node:crypto';
-import { and, asc, desc, eq, gt, sql } from 'drizzle-orm';
-import type { Db } from '../db/index.ts';
+import { and, asc, desc, eq, gt, inArray, sql } from 'drizzle-orm';
+import type { Db, DbOderTx } from '../db/index.ts';
 import { anlass, anlassAnmeldung, mitglied, type Antwort } from '../db/schema.ts';
 import type { AnlassWerte } from './angaben.ts';
 import type { KalenderAnlass } from './kalender.ts';
@@ -75,6 +75,27 @@ export async function aendereAnlass(
 export async function loescheAnlass(db: Db, id: number): Promise<'ok' | 'nicht-gefunden'> {
 	const weg = await db.delete(anlass).where(eq(anlass.id, id)).returning({ id: anlass.id });
 	return weg.length > 0 ? 'ok' : 'nicht-gefunden';
+}
+
+/** Austritt und Vormerken: Antworten zu Anlässen, deren Beginn noch kommt, sind weg; Vergangenes bleibt. */
+export async function loescheKommendeAntworten(
+	tx: DbOderTx,
+	mitgliedId: number,
+	jetzt: Date
+): Promise<number> {
+	const weg = await tx
+		.delete(anlassAnmeldung)
+		.where(
+			and(
+				eq(anlassAnmeldung.mitgliedId, mitgliedId),
+				inArray(
+					anlassAnmeldung.anlassId,
+					tx.select({ id: anlass.id }).from(anlass).where(gt(anlass.beginn, jetzt))
+				)
+			)
+		)
+		.returning({ anlassId: anlassAnmeldung.anlassId });
+	return weg.length;
 }
 
 function fuerMitglied(db: Db, mitgliedId: number) {
@@ -156,6 +177,13 @@ export async function melde(
 	jetzt: Date
 ): Promise<'ok' | 'geschlossen' | 'nicht-gefunden'> {
 	return db.transaction(async (tx) => {
+		// Zuerst das Mitglied, dann der Anlass: eine Antwort kann nicht nach einem Austritt landen.
+		const [m] = await tx
+			.select({ status: mitglied.status })
+			.from(mitglied)
+			.where(eq(mitglied.id, mitgliedId))
+			.for('share');
+		if (m?.status !== 'aktiv') return 'nicht-gefunden';
 		const [z] = await tx
 			.select({ anmeldeschluss: anlass.anmeldeschluss })
 			.from(anlass)
@@ -180,7 +208,7 @@ export async function melde(
 }
 
 const zaehle = (antwort: Antwort) =>
-	sql<number>`count(${anlassAnmeldung.mitgliedId}) filter (where ${anlassAnmeldung.antwort} = ${antwort})`.mapWith(
+	sql<number>`count(${anlassAnmeldung.mitgliedId}) filter (where ${anlassAnmeldung.antwort} = ${antwort} and ${mitglied.status} = 'aktiv')`.mapWith(
 		Number
 	);
 
@@ -196,6 +224,7 @@ export async function listeAnlaesse(db: Db): Promise<AnlassListe[]> {
 		})
 		.from(anlass)
 		.leftJoin(anlassAnmeldung, eq(anlassAnmeldung.anlassId, anlass.id))
+		.leftJoin(mitglied, eq(mitglied.id, anlassAnmeldung.mitgliedId))
 		.groupBy(anlass.id)
 		.orderBy(desc(anlass.beginn), desc(anlass.id));
 }
@@ -222,7 +251,7 @@ export async function ladeAnlassAdmin(db: Db, id: number): Promise<AnlassAdmin |
 		})
 		.from(anlassAnmeldung)
 		.innerJoin(mitglied, eq(mitglied.id, anlassAnmeldung.mitgliedId))
-		.where(eq(anlassAnmeldung.anlassId, id))
+		.where(and(eq(anlassAnmeldung.anlassId, id), eq(mitglied.status, 'aktiv')))
 		.orderBy(asc(mitglied.nachname), asc(mitglied.vorname), asc(mitglied.id));
 	// Noch keine Antwort: aktive Mitglieder ohne Anmeldung, auch solche ohne Login.
 	const [{ keineAntwort }] = await db

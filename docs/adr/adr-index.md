@@ -18,3 +18,4 @@ Eine neue ADR kommt in diese Tabelle und mit einer Zeile in die
 | [ADR-005](adr-005-passkey-simplewebauthn.md) | Der freiwillige Passkey wird mit SimpleWebAuthn gebaut | Entschieden | 2026-11-04 |
 | [ADR-006](adr-006-eigenstaendig-ohne-fairgate.md) | MyTCO führt seine eigene Mitgliederliste, ohne Anbindung an Fairgate | Entschieden | 2026-10-29 |
 | [ADR-007](adr-007-version-pro-merge.md) | Jeder Merge nach dev mit Code bekommt seine eigene Versionsnummer | Entschieden | 2026-11-05 |
+| [ADR-008](adr-008-zeitgeber-in-der-app.md) | Die Löschfristen setzt ein täglicher Zeitgeber in der App durch | Entschieden | 2026-11-07 |

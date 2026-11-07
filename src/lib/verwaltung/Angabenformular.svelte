@@ -36,7 +36,7 @@
 </script>
 
 <script lang="ts">
-	import { FELD_NAMEN, feldMeldung } from './anzeige.ts';
+	import { FELD_NAMEN, GESCHLECHT_NAME, feldMeldung } from './anzeige.ts';
 
 	type Props = {
 		start: Werte;
@@ -138,8 +138,8 @@
 					aria-describedby={fehler[f] ? `fehler-${f}` : undefined}
 				>
 					<option value="">–</option>
-					<option value="w">weiblich</option>
-					<option value="m">männlich</option>
+					<option value="w">{GESCHLECHT_NAME.w}</option>
+					<option value="m">{GESCHLECHT_NAME.m}</option>
 				</select>
 			{:else}
 				<input

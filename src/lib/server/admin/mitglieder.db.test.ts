@@ -94,6 +94,19 @@ describe('Mitgliedernummer', () => {
 });
 
 describe('aendereAngaben', () => {
+	test('gelöschtes Mitglied: nicht-gefunden, Felder bleiben leer', async () => {
+		const m = await erfinde(db, { status: 'geloescht' });
+		await db
+			.update(mitglied)
+			.set({ email: null, strasse: null, plz: null, ort: null })
+			.where(eq(mitglied.id, m.mitgliedId));
+		const vorher = angaben({ email: '', strasse: '', plz: '', ort: '' });
+		const r = await aendereAngaben(db, urheber, m.mitgliedId, angaben(), vorher, jetzt);
+		expect(r.ergebnis).toBe('nicht-gefunden');
+		const [z] = await db.select().from(mitglied).where(eq(mitglied.id, m.mitgliedId));
+		expect(z.email).toBeNull();
+	});
+
 	test('A-MITGLIED-02, FR-26: Bearbeiten schreibt je geändertem Feld einen Eintrag', async () => {
 		const id = await anlegen();
 		const d = await ladeMitglied(db, id, jetzt);
@@ -253,13 +266,32 @@ describe('listeMitglieder', () => {
 		expect(await ids(`Beispiel${u}, Kurt`)).toEqual([]);
 	});
 
-	test('Liste ohne Statusfilter blendet gelöschte aus, mit Filter zeigt sie', async () => {
+	test('Filter «vorgemerkt» findet das vorgemerkte Mitglied; ohne Filter erscheint es', async () => {
+		const u = randomUUID().slice(0, 8);
+		const id = await anlegen({ nachname: `Vorg${u}` });
+		await db
+			.update(mitglied)
+			.set({ status: 'vorgemerkt', vorgemerktAm: jetzt, statusVorher: 'aktiv' })
+			.where(eq(mitglied.id, id));
+		const mit = await listeMitglieder(db, { suche: u, status: 'vorgemerkt' }, jetzt);
+		expect(mit.map((x) => [x.id, x.status])).toEqual([[id, 'vorgemerkt']]);
+		expect((await listeMitglieder(db, { suche: u }, jetzt)).map((x) => x.id)).toEqual([id]);
+		expect(await listeMitglieder(db, { suche: u, status: 'aktiv' }, jetzt)).toEqual([]);
+	});
+
+	test('Gelöschte erscheinen in keiner Liste, auch nicht mit Filter «geloescht» (Konto fehlt)', async () => {
 		const u = randomUUID().slice(0, 8);
 		const id = await anlegen({ nachname: `Weg${u}` });
-		await db.update(mitglied).set({ status: 'geloescht' }).where(eq(mitglied.id, id));
+		// Wie der Löschlauf: nur der Name bleibt, das Konto ist weg.
+		await db
+			.update(mitglied)
+			.set({ status: 'geloescht', email: null, strasse: null, plz: null, ort: null })
+			.where(eq(mitglied.id, id));
+		await db.delete(konto).where(eq(konto.mitgliedId, id));
 		expect(await listeMitglieder(db, { suche: u }, jetzt)).toEqual([]);
-		const z = await listeMitglieder(db, { suche: u, status: 'geloescht' }, jetzt);
-		expect(z.map((x) => x.id)).toEqual([id]);
+		// Die Liste verbindet Mitglied und Konto: ohne Konto keine Zeile. Die Oberfläche hat
+		// keinen Filter «gelöscht».
+		expect(await listeMitglieder(db, { suche: u, status: 'geloescht' }, jetzt)).toEqual([]);
 	});
 
 	test('Liste zeigt Login-Stand: ohne-brief, brief-offen, eingeloggt, gesperrt', async () => {
@@ -319,6 +351,12 @@ describe('Verlauf im Detail', () => {
 });
 
 describe('beendeSitzungenVon', () => {
+	test('gelöschtes Mitglied: nicht-gefunden, nichts wird geschrieben', async () => {
+		const m = await erfinde(db, { status: 'geloescht' });
+		expect(await beendeSitzungenVon(db, urheber, m.mitgliedId, jetzt)).toBe('nicht-gefunden');
+		expect(await ladeVerlauf(db, { mitgliedId: m.mitgliedId, grenze: 5 })).toEqual([]);
+	});
+
 	test('SI-07, FR-24: Sitzungen beenden erhöht die Sitzungsversion, Verlauf «sitzungen-beendet»', async () => {
 		const m = await erfinde(db);
 		await erstelleSitzung(db, m.kontoId, jetzt);

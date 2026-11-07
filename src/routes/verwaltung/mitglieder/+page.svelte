@@ -60,7 +60,7 @@
 			<option value="">Alle</option>
 			<option value="aktiv">aktiv</option>
 			<option value="ausgetreten">ausgetreten</option>
-			<option value="geloescht">gelöscht</option>
+			<option value="vorgemerkt">wird gelöscht</option>
 		</select>
 	</div>
 	{#if data.darfSchreiben.mitglieder}
