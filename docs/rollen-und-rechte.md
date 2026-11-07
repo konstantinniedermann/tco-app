@@ -86,6 +86,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Turnier, Turniernummern, Kategorien | – | L | S | L | L | L |
 | Eigene Anmeldung, bis Anmeldeschluss (FR-10) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Anmeldungen aller (Name, Kategorie) | – | L bestätigte | S | L bestätigte | L bestätigte | L |
+| Geschlecht und Jahrgang der Spieler (zum Zuordnen) | – | – | L | – | S | L |
 | Klassierung der Spieler korrigieren (A-ANMELDUNG-06, K-28) | – | – | S | – | – | L |
 | Wildcard-Antrag und Kommentar (FR-08) | – | S eigene | S, entscheidet | S eigene | S eigene | L |
 | **CM-Betrieb** | | | | | | |
@@ -108,6 +109,8 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 
 Beim MyTCO-Admin heisst **L**: in der Verwaltung lesen, nicht absenden; als Mitglied hat er
 daneben die Rechte der Spalte *Mitglied*.
+
+Der CM-Admin darf sich selbst von Hand anmelden und über den eigenen Wildcard-Antrag entscheiden.
 
 ## Später
 

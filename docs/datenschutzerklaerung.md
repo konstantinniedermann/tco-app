@@ -37,7 +37,9 @@ du selbst einschaltest. Für nichts anderes.
   Daten wie alle anderen Rollen, ändern sie aber nicht. Das brauchen sie, um den anderen zu
   helfen, Fehler zu finden und die Vergabe der Rollen zu prüfen.
 - Die **CM-Admins** und **Lizenz-Admins** sehen deinen Namen, deine E-Mail und Telefonnummer
-  und was sie für die Clubmeisterschaft bzw. die Lizenzen brauchen.
+  und was sie für die Clubmeisterschaft bzw. die Lizenzen brauchen. Die CM-Admins sehen dazu
+  dein Geschlecht und deinen Jahrgang, um dich in die passenden Kategorien einzuordnen; ändern
+  können sie beides nicht.
 - Deinen Einmal-Code kann nach dem Versand niemand mehr abrufen.
 - Deine An- oder Abmeldung zu einem Anlass und deine Bemerkung sehen nur du, die
   Mitglieder-Admins und die MyTCO-Admins. Schreib in die Bemerkung bitte keine Angaben zur
