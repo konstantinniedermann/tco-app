@@ -263,6 +263,29 @@ describe('Schnittstellen der CM (Mitglied)', () => {
 		logs[0].mockClear();
 	});
 
+	test('FR-47, SI-05: Meldung an die CM-Admins gestört, Antrag gilt trotzdem und nichts wird geloggt', async () => {
+		const t = await turnier(['Herren A']);
+		const { d } = baue(t.jetzt);
+		let versucht = false;
+		d.melde = async () => {
+			versucht = true;
+			throw new Error('push://geheim nicht erreichbar');
+		};
+		const m = await mitgliedMit({ geschlecht: 'm', jahrgang: 1990, klassierung: 'R8' });
+		const r = await postCmWildcard(
+			d,
+			ereignis({
+				params: { id: String(t.kategorien[0]) },
+				body: { kommentar: 'Bitte' },
+				konto: m.konto as never
+			})
+		);
+		expect(r.status).toBe(200);
+		await vi.waitFor(() => expect(versucht).toBe(true));
+		// Ohne Abfangen wäre das eine unbehandelte Ablehnung, an der Vitest den Lauf scheitern lässt.
+		await new Promise((fertig) => setTimeout(fertig, 0));
+	});
+
 	test('A-ANMELDUNG-10, FR-08, FR-47: Wildcard beantragen schickt die Bestätigung und meldet den CM-Admins ohne Namen', async () => {
 		const t = await turnier(['Herren A']);
 		const [k] = t.kategorien;

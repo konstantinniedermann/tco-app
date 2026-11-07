@@ -14,12 +14,9 @@ export type Aktion =
 	| 'rolle-entzogen'
 	| 'sitzungen-beendet'
 	| 'fairgate-uebertragen'
-	// FR-46, FR-08: Änderungen des CM-Admins an Anmeldungen, ohne Kategorie oder Grund.
-	| 'cm-angemeldet'
-	| 'cm-verschoben'
-	| 'cm-geloescht'
-	| 'wildcard-bestaetigt'
-	| 'wildcard-abgelehnt';
+	// FR-46, FR-08: jede Änderung des CM-Admins an einer Anmeldung, neutral: ohne Kategorie,
+	// Wildcard oder Entscheid, weil auch der Mitglieder-Admin den Verlauf sieht.
+	| 'cm-anmeldung-geaendert';
 
 // FR-26: `detail` enthält nur einen Feld- oder Rollennamen, nie einen Wert.
 export type Eintrag = { aktion: Aktion; detail?: string };

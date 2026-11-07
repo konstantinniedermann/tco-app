@@ -4,7 +4,7 @@ import type { Klassierung } from '../../turnier/klassierung.ts';
 import { warnungenEinzel, type Spieler } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
 import { maskiere } from '../admin/mitglieder.ts';
-import { schreibeVerlauf } from '../admin/verlauf.ts';
+import { schreibeVerlauf, type Eintrag } from '../admin/verlauf.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { anmeldung, anmeldungSpieler, kategorie, mitglied, turnier } from '../db/schema.ts';
 import { schreibeKlassierung, spielerAus } from './angaben.ts';
@@ -36,6 +36,12 @@ type Betroffen = { mitgliedId: number; kategorie: string; turnierId: number };
 
 /** Der handelnde CM-Admin; der Änderungsverlauf des Spielers nennt ihn (FR-26). */
 export type CmUrheber = { art: 'admin'; mitgliedId: number };
+
+/**
+ * Verlaufseintrag jeder Änderung des CM-Admins an einer Anmeldung: neutral, ohne Kategorie,
+ * Wildcard oder Entscheid, weil auch der Mitglieder-Admin den Verlauf sieht (Datenschutz).
+ */
+const GEAENDERT: Eintrag[] = [{ aktion: 'cm-anmeldung-geaendert' }];
 
 /** Höchstens so viele Treffer zeigt die Suche. */
 const TREFFER = 20;
@@ -221,7 +227,7 @@ export async function meldeVonHandAn(
 			.values({ kategorieId, status: 'bestaetigt', angemeldetAm: jetzt, geaendertAm: jetzt })
 			.returning({ id: anmeldung.id });
 		await tx.insert(anmeldungSpieler).values({ anmeldungId: neu.id, mitgliedId });
-		await schreibeVerlauf(tx, mitgliedId, urheber, [{ aktion: 'cm-angemeldet' }], jetzt);
+		await schreibeVerlauf(tx, mitgliedId, urheber, GEAENDERT, jetzt);
 		return 'ok';
 	});
 }
@@ -264,7 +270,7 @@ export async function verschiebe(
 			.update(anmeldung)
 			.set({ kategorieId: zielKategorieId, status: 'bestaetigt', geaendertAm: jetzt })
 			.where(eq(anmeldung.id, anmeldungId));
-		await schreibeVerlauf(tx, m.id, urheber, [{ aktion: 'cm-verschoben' }], jetzt);
+		await schreibeVerlauf(tx, m.id, urheber, GEAENDERT, jetzt);
 		return {
 			ergebnis: 'ok' as const,
 			mitgliedId: m.id,
@@ -293,7 +299,7 @@ export async function loescheAnmeldung(
 			.update(anmeldung)
 			.set({ status: 'zurueckgezogen', geaendertAm: jetzt })
 			.where(eq(anmeldung.id, anmeldungId));
-		await schreibeVerlauf(tx, m.id, urheber, [{ aktion: 'cm-geloescht' }], jetzt);
+		await schreibeVerlauf(tx, m.id, urheber, GEAENDERT, jetzt);
 		return { mitgliedId: m.id, kategorie: a.kategorie, turnierId: a.turnierId };
 	});
 }
@@ -316,8 +322,7 @@ export async function entscheide(
 			.update(anmeldung)
 			.set({ status: bestaetigt ? 'bestaetigt' : 'abgelehnt', geaendertAm: jetzt })
 			.where(eq(anmeldung.id, anmeldungId));
-		const aktion = bestaetigt ? 'wildcard-bestaetigt' : 'wildcard-abgelehnt';
-		await schreibeVerlauf(tx, m.id, urheber, [{ aktion }], jetzt);
+		await schreibeVerlauf(tx, m.id, urheber, GEAENDERT, jetzt);
 		return { mitgliedId: m.id, kategorie: a.kategorie, turnierId: a.turnierId };
 	});
 }

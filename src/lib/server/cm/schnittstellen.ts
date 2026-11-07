@@ -155,13 +155,14 @@ async function meldeCmAdmins(
 	ohne: number,
 	m: Parameters<CmDienste['melde']>[1]
 ): Promise<void> {
-	let ids: number[];
 	try {
-		ids = (await cmAdmins(d.db)).filter((id) => id !== ohne);
+		await d.melde(
+			(await cmAdmins(d.db)).filter((id) => id !== ohne),
+			m
+		);
 	} catch {
-		return;
+		// Bewusst leer: kein Log, kein Fehler an den Antragsteller.
 	}
-	await d.melde(ids, m);
 }
 
 /**

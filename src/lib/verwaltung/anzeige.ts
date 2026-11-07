@@ -63,16 +63,8 @@ export function aktionText(z: Pick<VerlaufEintrag, 'aktion' | 'detail'>): string
 			return 'alle Sitzungen beendet';
 		case 'fairgate-uebertragen':
 			return 'In Fairgate übertragen';
-		case 'cm-angemeldet':
-			return 'von Hand angemeldet (CM)';
-		case 'cm-verschoben':
-			return 'verschoben (CM)';
-		case 'cm-geloescht':
-			return 'gelöscht (CM)';
-		case 'wildcard-bestaetigt':
-			return 'Wildcard bestätigt';
-		case 'wildcard-abgelehnt':
-			return 'Wildcard abgelehnt';
+		case 'cm-anmeldung-geaendert':
+			return 'CM-Anmeldung geändert (CM)';
 		default:
 			return z.aktion;
 	}

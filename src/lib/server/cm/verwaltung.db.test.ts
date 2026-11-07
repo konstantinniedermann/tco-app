@@ -481,9 +481,9 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		expect(await loescheAnmeldung(db, admin, id, t.jetzt)).toMatchObject({ mitgliedId: ich });
 		expect(await loescheAnmeldung(db, admin, id, t.jetzt)).toBe('nicht-gefunden');
 		expect(await verlaufVon(ich)).toEqual([
-			eintrag('cm-angemeldet'),
-			eintrag('cm-verschoben'),
-			eintrag('cm-geloescht')
+			eintrag('cm-anmeldung-geaendert'),
+			eintrag('cm-anmeldung-geaendert'),
+			eintrag('cm-anmeldung-geaendert')
 		]);
 
 		const ja = await spieler({ klassierung: 'R8' });
@@ -493,8 +493,8 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		expect(await entscheide(db, admin, idJa, true, t.jetzt)).toMatchObject({ mitgliedId: ja });
 		expect(await entscheide(db, admin, idNein, false, t.jetzt)).toMatchObject({ mitgliedId: nein });
 		expect(await entscheide(db, admin, idJa, false, t.jetzt)).toBe('nicht-beantragt');
-		expect(await verlaufVon(ja)).toEqual([eintrag('wildcard-bestaetigt')]);
-		expect(await verlaufVon(nein)).toEqual([eintrag('wildcard-abgelehnt')]);
+		expect(await verlaufVon(ja)).toEqual([eintrag('cm-anmeldung-geaendert')]);
+		expect(await verlaufVon(nein)).toEqual([eintrag('cm-anmeldung-geaendert')]);
 	});
 
 	test('A-ANMELDUNG-06: ladeAnmeldungen zeigt nur aktive Einzel, nach Nachname und Vorname', async () => {

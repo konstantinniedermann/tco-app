@@ -157,7 +157,7 @@ const warnung = (w: { warnungen: Warnung[] }) =>
 /**
  * FR-47: persönliche Meldung an den Spieler, erst nach dem Speichern. DS-05: ohne Namen anderer
  * Mitglieder, auch nicht des CM-Admins. Betrifft es den CM-Admin selbst, entfällt sie. Die Antwort
- * wartet nicht auf Push und Mail; `meldeMitgliedern` wirft nie.
+ * wartet nicht auf Push und Mail; wirft `meldeMitgliedern` doch, bleibt das still (SI-05).
  */
 function melde(
 	d: MitteilungAdminDienste,
@@ -171,7 +171,7 @@ function melde(
 		{ db: d.db, push: d.push, mailer: d.mailer, adresse: d.adresse },
 		[mitgliedId],
 		{ titel: 'Clubmeisterschaft', text, pfad: `/clubmeisterschaft/${turnierId}` }
-	);
+	).catch(() => {});
 }
 
 /** A-ANMELDUNG-06: aktive Einzel-Anmeldungen der Kategorie. */

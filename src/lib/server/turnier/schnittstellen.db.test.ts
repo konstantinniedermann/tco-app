@@ -767,10 +767,10 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 			detail: null
 		});
 		expect(verlauf).toEqual([
-			eintrag('cm-angemeldet'),
-			eintrag('cm-verschoben'),
-			eintrag('cm-geloescht'),
-			eintrag('wildcard-bestaetigt')
+			eintrag('cm-anmeldung-geaendert'),
+			eintrag('cm-anmeldung-geaendert'),
+			eintrag('cm-anmeldung-geaendert'),
+			eintrag('cm-anmeldung-geaendert')
 		]);
 	});
 
