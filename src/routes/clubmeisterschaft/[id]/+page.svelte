@@ -3,17 +3,24 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import {
+		beantrageWildcard,
 		holeCmAnsicht,
 		meldeAb,
 		meldeAn,
 		sendeCmAngaben,
 		type CmAnsicht,
+		type CmFelder,
 		type CmKategorie
 	} from '../../../lib/cm/api.ts';
-	import { kategorieText, namenText } from '../../../lib/cm/anzeige.ts';
+	import {
+		KOMMENTAR_MAX,
+		kategorieText,
+		kommentarZaehlerText,
+		namenText
+	} from '../../../lib/cm/anzeige.ts';
+	import { istKlappeOffen, merkeKlappe } from '../../../lib/ui/klappe.ts';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { KLASSIERUNGEN, klassierungName } from '../../../lib/turnier/klassierung.ts';
-	import type { CmAngabe } from '../../../lib/turnier/passung.ts';
 	import { datumLang, statusText } from '../../../lib/verwaltung/turnier-anzeige.ts';
 	import type { PageProps } from './$types';
 
@@ -33,7 +40,7 @@
 	let klassierung = $derived<string>(cm.spieler.klassierung ?? '');
 	let geschlecht = $state<'w' | 'm' | null>(null);
 	let jahrgang = $state('');
-	let feldFehler = $state<Partial<Record<CmAngabe, string>>>({});
+	let feldFehler = $state<CmFelder>({});
 	let angabenForm = $state<HTMLFormElement>();
 	let zaehlerBereich = $state<HTMLDivElement>();
 	// Ungespeichert (UI-Leitbild): eine Angabe weicht vom geladenen Stand ab.
@@ -45,11 +52,17 @@
 	let meldung = $state<string | null>(null);
 	let fehler = $state<string | null>(null);
 	let kontaktHinweis = $state<HTMLDialogElement>();
-	let ausstehend = $state<CmKategorie | null>(null);
+	let ausstehend = $state<{ k: CmKategorie; wildcard: boolean } | null>(null);
+	// FR-08: Dialog für den Wildcard-Antrag.
+	let wildcardDialog = $state<HTMLDialogElement>();
+	let wildcardZiel = $state<CmKategorie | null>(null);
+	let kommentar = $state('');
+	let kommentarFehler = $state<string | null>(null);
 	const knoepfe: Record<number, HTMLButtonElement | undefined> = {};
 
 	const FEHLER = {
 		voll: 'Du hast schon 3 Anmeldungen.',
+		'keine-wildcard': 'Für diese Kategorie geht kein Wildcard-Antrag.',
 		geschlossen: 'Die Anmeldung ist inzwischen geschlossen.',
 		'passt-nicht': 'Diese Kategorie passt nicht zu deinen Angaben.'
 	} as const;
@@ -97,15 +110,76 @@
 	// Vor der ersten Anmeldung im Turnier: Hinweis zu den Kontaktdaten (Datenschutz).
 	function anmeldenTippen(k: CmKategorie) {
 		if (cm.eigene.length === 0) {
-			ausstehend = k;
+			ausstehend = { k, wildcard: false };
 			kontaktHinweis?.showModal();
 		} else void anmelden(k);
 	}
 
+	function wildcardTippen(k: CmKategorie) {
+		if (cm.eigene.length === 0) {
+			ausstehend = { k, wildcard: true };
+			kontaktHinweis?.showModal();
+		} else wildcardOeffnen(k);
+	}
+
 	function hinweisBestaetigen() {
-		const k = ausstehend;
+		const a = ausstehend;
 		kontaktHinweis?.close();
-		if (k) void anmelden(k);
+		if (!a) return;
+		if (a.wildcard) wildcardOeffnen(a.k);
+		else void anmelden(a.k);
+	}
+
+	function wildcardOeffnen(k: CmKategorie) {
+		wildcardZiel = k;
+		kommentar = '';
+		kommentarFehler = null;
+		wildcardDialog?.showModal();
+	}
+
+	async function wildcardSenden(event: SubmitEvent) {
+		event.preventDefault();
+		const k = wildcardZiel;
+		if (laeuft || !k) return;
+		if (kommentar.trim() === '') {
+			kommentarFehler = 'Bitte schreib kurz, warum du hier spielen möchtest.';
+			return;
+		}
+		laeuft = true;
+		meldung = null;
+		fehler = null;
+		kommentarFehler = null;
+		const r = await beantrageWildcard(k.id, kommentar);
+		laeuft = false;
+		switch (r.art) {
+			case 'ok':
+				cm = r.daten;
+				wildcardDialog?.close();
+				meldung = 'Wildcard beantragt. Du bekommst Bescheid.';
+				await fokusBei(k.id);
+				return;
+			case 'eingabe':
+				kommentarFehler = r.felder.kommentar ?? MELDUNG.stoerung;
+				return;
+			case 'abgemeldet':
+				await goto(resolve('/login'));
+				return;
+			case 'voll':
+			case 'geschlossen':
+			case 'keine-wildcard':
+				wildcardDialog?.close();
+				fehler = FEHLER[r.art];
+				await neuLaden();
+				return;
+			case 'schon-angemeldet':
+			case 'angaben-fehlen':
+			case 'nicht-gefunden':
+				wildcardDialog?.close();
+				await neuLaden();
+				return;
+			default:
+				kommentarFehler = MELDUNG.stoerung;
+		}
 	}
 
 	// Nach dem Wechsel der Taste (Anmelden ↔ Abmelden) bleibt der Fokus bei der Kategorie.
@@ -146,7 +220,7 @@
 		}
 	}
 
-	async function abmelden(k: CmKategorie) {
+	async function abmelden(k: CmKategorie, wildcard = false) {
 		if (laeuft || k.anmeldungId === null) return;
 		laeuft = true;
 		meldung = null;
@@ -156,7 +230,7 @@
 		switch (r.art) {
 			case 'ok':
 				cm = r.daten;
-				meldung = `Abgemeldet von ${k.name}.`;
+				meldung = wildcard ? `Antrag für ${k.name} zurückgezogen.` : `Abgemeldet von ${k.name}.`;
 				await fokusBei(k.id);
 				return;
 			case 'abgemeldet':
@@ -264,10 +338,56 @@
 			{/if}
 		</div>
 	{:else}
-		{#if cm.fehlt.length === 0}
+		{#if cm.fehlt.length === 0 && cm.wildcard.length === 0}
 			<p>Für deine Angaben gibt es keine passende Kategorie.</p>
 		{/if}
 	{/each}
+
+	{#if offen && cm.wildcard.length > 0}
+		<details
+			class="karte klappe"
+			open={istKlappeOffen('cm-wildcard')}
+			ontoggle={(e) => merkeKlappe('cm-wildcard', e.currentTarget.open)}
+		>
+			<summary class="klappe-titel">Weitere Kategorien mit Wildcard-Antrag</summary>
+			<div>
+				<p class="leise">Für diese Kategorien entscheidet die Turnierleitung über deinen Antrag.</p>
+				{#each cm.wildcard as k (k.id)}
+					<div class="karte kachel">
+						<span>
+							<strong>{k.name}</strong><br />
+							<span class="leise">{kategorieText(k)}</span><br />
+							<span class="leise">{namenText(k.namen)}</span>
+							{#if k.anmeldungId !== null}<br /><span class="plakette">Wildcard beantragt</span
+								>{/if}
+						</span>
+						{#if !nurAnsehen}
+							{#if k.anmeldungId !== null}
+								<button
+									type="button"
+									class="taste-neben"
+									bind:this={knoepfe[k.id]}
+									disabled={laeuft}
+									onclick={() => abmelden(k, true)}>Zurückziehen</button
+								>
+							{:else}
+								<button
+									type="button"
+									class="taste-neben"
+									bind:this={knoepfe[k.id]}
+									disabled={laeuft || voll}
+									onclick={() => wildcardTippen(k)}>Wildcard beantragen</button
+								>
+							{/if}
+						{/if}
+					</div>
+				{/each}
+				{#if voll && !nurAnsehen}
+					<p class="leise">Mehr als 3 Anmeldungen gehen nicht. Melde dich zuerst irgendwo ab.</p>
+				{/if}
+			</div>
+		</details>
+	{/if}
 {/if}
 
 <dialog
@@ -285,8 +405,47 @@
 		<button type="button" class="taste-neben" onclick={() => kontaktHinweis?.close()}
 			>Abbrechen</button
 		>
-		<button type="button" class="taste-haupt" onclick={hinweisBestaetigen}>Anmelden</button>
+		<button type="button" class="taste-haupt" onclick={hinweisBestaetigen}
+			>{ausstehend?.wildcard ? 'Weiter' : 'Anmelden'}</button
+		>
 	</div>
+</dialog>
+
+<dialog
+	class="karte"
+	bind:this={wildcardDialog}
+	aria-labelledby="wildcard-titel"
+	onclose={() => (wildcardZiel = null)}
+>
+	<h2 id="wildcard-titel">Wildcard beantragen</h2>
+	{#if wildcardZiel}<p class="leise">{wildcardZiel.name}</p>{/if}
+	<form onsubmit={wildcardSenden} novalidate>
+		<div class="feld">
+			<label for="cm-kommentar">Warum möchtest du hier spielen?</label>
+			<textarea
+				id="cm-kommentar"
+				rows="4"
+				maxlength={KOMMENTAR_MAX}
+				bind:value={kommentar}
+				required
+				aria-invalid={kommentarFehler ? 'true' : undefined}
+				aria-describedby={kommentarFehler
+					? 'cm-kommentar-hilfe cm-fehler-kommentar'
+					: 'cm-kommentar-hilfe'}></textarea>
+			<span class="feld-hilfe" id="cm-kommentar-hilfe"
+				>{kommentarZaehlerText(kommentar.length)}</span
+			>
+			{#if kommentarFehler}
+				<p class="fehler" id="cm-fehler-kommentar" role="alert">{kommentarFehler}</p>
+			{/if}
+		</div>
+		<div class="leiste">
+			<button type="button" class="taste-neben" onclick={() => wildcardDialog?.close()}
+				>Abbrechen</button
+			>
+			<button type="submit" class="taste-haupt" disabled={laeuft}>Beantragen</button>
+		</div>
+	</form>
 </dialog>
 
 {#snippet angabenFelder()}

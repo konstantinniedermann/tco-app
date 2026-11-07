@@ -3,6 +3,7 @@ import {
 	holeCmAnsicht,
 	holeCmTurniere,
 	meldeAb,
+	beantrageWildcard,
 	meldeAn,
 	sendeCmAngaben,
 	speichereKlassierung
@@ -88,5 +89,20 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 		expect(await ergebnis(404, { fehler: 'nicht-gefunden' })).toEqual({ art: 'nicht-gefunden' });
 		expect(await ergebnis(500, {})).toEqual({ art: 'stoerung' });
 		expect(await meldeAn(1, holer(new Error('weg')).holen)).toEqual({ art: 'stoerung' });
+	});
+
+	test('FR-08: Wildcard-Antrag mit Kommentar auf eigenem Pfad, eigene Ablehnungen', async () => {
+		const h = holer(json(200, { grenze: 3 }));
+		expect((await beantrageWildcard(4, 'Ich spiele gern.', h.holen)).art).toBe('ok');
+		expect(h.aufrufe[0].pfad).toBe('/api/cm/kategorien/4/wildcard');
+		expect(istJsonPost(h.aufrufe[0])).toBe(true);
+		expect(JSON.parse(String(h.aufrufe[0].init.body))).toEqual({ kommentar: 'Ich spiele gern.' });
+
+		const ergebnis = async (status: number, inhalt: unknown) =>
+			beantrageWildcard(1, 'x', holer(json(status, inhalt)).holen);
+		expect(await ergebnis(409, { fehler: 'keine-wildcard' })).toEqual({ art: 'keine-wildcard' });
+		expect(await ergebnis(409, { fehler: 'voll' })).toEqual({ art: 'voll' });
+		const felder = { kommentar: 'Bitte einen Kommentar angeben.' };
+		expect(await ergebnis(400, { fehler: 'eingabe', felder })).toEqual({ art: 'eingabe', felder });
 	});
 });
