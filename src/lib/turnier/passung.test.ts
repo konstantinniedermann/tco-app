@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { fehlendeAngaben, passtEinzel, type KategorieRegel, type Spieler } from './passung.ts';
+import {
+	fehlendeAngaben,
+	passtEinzel,
+	warnungenEinzel,
+	wildcardEinzel,
+	type KategorieRegel,
+	type Spieler
+} from './passung.ts';
 
 const regel = (r: Partial<KategorieRegel>): KategorieRegel => ({
 	art: 'einzel',
@@ -61,5 +68,35 @@ describe('Passung Einzel', () => {
 		expect(passtEinzel(regel({}), s)).toBe(false);
 		expect(fehlendeAngaben(spieler({ jahrgang: null }))).toEqual(['jahrgang']);
 		expect(fehlendeAngaben(spieler({}))).toEqual([]);
+	});
+});
+
+describe('Wildcard Einzel', () => {
+	const h46 = regel({ geschlecht: 'herren', klassierungVon: 'R4', klassierungBis: 'R6' });
+	const h16 = regel({ geschlecht: 'herren', klassierungVon: 'R1', klassierungBis: 'R6' });
+
+	it('FR-08: Wildcard nur nach oben und nur wegen der Klassierung', () => {
+		expect(wildcardEinzel(h46, spieler({ klassierung: 'R8' }))).toBe(true);
+		expect(wildcardEinzel(h16, spieler({ klassierung: 'keine' }))).toBe(true);
+		expect(wildcardEinzel(h46, spieler({ klassierung: 'R2' }))).toBe(false);
+		expect(wildcardEinzel(h46, spieler({ klassierung: 'R5' }))).toBe(false);
+		expect(wildcardEinzel(h46, spieler({ klassierung: 'R8', geschlecht: 'w' }))).toBe(false);
+		const junioren = regel({
+			geschlecht: 'herren',
+			jahrgangVon: 2009,
+			klassierungVon: 'R4',
+			klassierungBis: 'R6'
+		});
+		expect(wildcardEinzel(junioren, spieler({ klassierung: 'R8', jahrgang: 1990 }))).toBe(false);
+		expect(wildcardEinzel(h46, spieler({ klassierung: null }))).toBe(false);
+		expect(wildcardEinzel({ ...h46, art: 'doppel' }, spieler({ klassierung: 'R8' }))).toBe(false);
+		expect(wildcardEinzel(regel({}), spieler({ klassierung: 'R8' }))).toBe(false);
+	});
+
+	it('FR-08: Warnungen beim Anmelden von Hand', () => {
+		const r79 = regel({ geschlecht: 'herren', klassierungVon: 'R7', klassierungBis: 'R9' });
+		expect(warnungenEinzel(h46, spieler({ klassierung: null }))).toEqual(['angaben-fehlen']);
+		expect(warnungenEinzel(r79, spieler({ klassierung: 'R2' }))).toEqual(['passt-nicht']);
+		expect(warnungenEinzel(h46, spieler({ klassierung: 'R5' }))).toEqual([]);
 	});
 });

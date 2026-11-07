@@ -7,6 +7,7 @@ import type { KategorieWerte } from '../turnier/angaben.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../turnier/turniere.ts';
 import { setzeKlassierung } from './angaben.ts';
 import {
+	beantrageWildcard,
 	eigeneKategorien,
 	ladeCmAnsicht,
 	laufendeTurniere,
@@ -15,6 +16,7 @@ import {
 	zaehleAktive,
 	zaehleUnpassende
 } from './anmeldungen.ts';
+import { entscheide } from './verwaltung.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 
@@ -63,6 +65,18 @@ async function offenesTurnier(namen: string[] = ['Herren A']) {
 		for (const n of namen) kategorien.push(await kategorieIn(id, n));
 		expect(await setzeStatus(db, id, 'offen', jetztIn(jahr))).toBe('ok');
 		return { id, jahr, jetzt: jetztIn(jahr), kategorien };
+	}
+}
+
+/** Offenes Turnier in einem freien Jahr; `lege` legt die Kategorien vor dem Öffnen an. */
+async function offenesTurnierMit<T>(lege: (turnierId: number) => Promise<T>) {
+	for (;;) {
+		const jahr = zufallsJahr();
+		const id = await turnierIm(jahr);
+		if (id === null) continue;
+		const k = await lege(id);
+		expect(await setzeStatus(db, id, 'offen', jetztIn(jahr))).toBe('ok');
+		return { id, jahr, jetzt: jetztIn(jahr), k };
 	}
 }
 
@@ -203,6 +217,7 @@ describe('CM-Anmeldung', () => {
 					namen: []
 				}
 			],
+			wildcard: [],
 			eigene: [],
 			grenze: 3
 		});
@@ -250,8 +265,8 @@ describe('CM-Anmeldung', () => {
 		const idB = zeilen.find((z) => z.kategorieId === b)!.id;
 		const idA = zeilen.find((z) => z.kategorieId === a)!.id;
 		expect(ansicht?.eigene).toEqual([
-			{ anmeldungId: idA, kategorie: 'Herren A' },
-			{ anmeldungId: idB, kategorie: 'Herren B' }
+			{ anmeldungId: idA, kategorie: 'Herren A', status: 'bestaetigt' },
+			{ anmeldungId: idB, kategorie: 'Herren B', status: 'bestaetigt' }
 		]);
 		expect(ansicht?.kategorien.find((k) => k.id === b)).toMatchObject({
 			passt: true,
@@ -454,5 +469,170 @@ describe('CM-Anmeldung', () => {
 		expect(await zaehleUnpassende(db, k, { ...regel, geschlecht: 'damen' })).toBe(2);
 		expect(await zaehleUnpassende(db, k, { ...regel, jahrgangVon: 1991 })).toBe(2);
 		expect(await zaehleUnpassende(db, -1, regel)).toBe(0);
+	});
+
+	test('A-ANMELDUNG-10, FR-08: Wildcard-Antrag R8 in R4–R6 ist beantragt, zählt bei der Grenze, Namen zeigen ihn nicht', async () => {
+		const t = await offenesTurnierMit(async (id) => {
+			const stark = await kategorieIn(id, 'Herren R4–R6', {
+				klassierungVon: 'R4',
+				klassierungBis: 'R6'
+			});
+			const passend = [];
+			for (const n of ['Herren R7–R9 A', 'Herren R7–R9 B', 'Herren R7–R9 C']) {
+				passend.push(await kategorieIn(id, n, { klassierungVon: 'R7', klassierungBis: 'R9' }));
+			}
+			await kategorieIn(id, 'Damen R4–R6', {
+				geschlecht: 'damen',
+				klassierungVon: 'R4',
+				klassierungBis: 'R6'
+			});
+			return { stark, passend };
+		});
+		const { stark, passend } = t.k;
+		const ich = await spieler({ vorname: 'Wim', nachname: 'Wildcard', klassierung: 'R8' });
+		const r5 = await spieler({ vorname: 'Fünf', nachname: 'Passend', klassierung: 'R5' });
+		expect(await meldeAn(db, stark, r5, t.jetzt)).toBe('ok');
+
+		const vorher = await ladeCmAnsicht(db, t.id, ich, t.jetzt);
+		expect(vorher?.wildcard).toEqual([
+			expect.objectContaining({
+				id: stark,
+				name: 'Herren R4–R6',
+				passt: false,
+				anmeldungId: null,
+				namen: ['Fünf Passend']
+			})
+		]);
+		expect(vorher?.kategorien.map((k) => k.id)).toEqual(passend);
+		// Wildcard nur über den Antrag, nicht über das normale Anmelden.
+		expect(await meldeAn(db, stark, ich, t.jetzt)).toBe('passt-nicht');
+
+		expect(
+			await beantrageWildcard(db, stark, ich, 'Ich spiele seit Jahren R5-Gegner.', t.jetzt)
+		).toBe('ok');
+		const [zeile] = await db
+			.select()
+			.from(anmeldung)
+			.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
+			.where(and(eq(anmeldung.kategorieId, stark), eq(anmeldungSpieler.mitgliedId, ich)));
+		expect(zeile.anmeldung).toMatchObject({
+			status: 'beantragt',
+			kommentar: 'Ich spiele seit Jahren R5-Gegner.',
+			angemeldetAm: t.jetzt,
+			geaendertAm: t.jetzt
+		});
+		const id = zeile.anmeldung.id;
+
+		const nachher = await ladeCmAnsicht(db, t.id, ich, t.jetzt);
+		expect(nachher?.turnier.anzahl).toBe(1);
+		expect(nachher?.eigene).toEqual([
+			{ anmeldungId: id, kategorie: 'Herren R4–R6', status: 'beantragt' }
+		]);
+		// Der Antrag steht im Wildcard-Bereich, nicht doppelt unter den Kategorien.
+		expect(nachher?.wildcard).toEqual([
+			expect.objectContaining({ id: stark, anmeldungId: id, namen: ['Fünf Passend'] })
+		]);
+		expect(nachher?.kategorien.map((k) => k.id)).toEqual(passend);
+		// Andere sehen den Antrag nicht unter den Namen (nur bestätigte).
+		const fremd = await ladeCmAnsicht(db, t.id, r5, t.jetzt);
+		expect(fremd?.kategorien.find((k) => k.id === stark)?.namen).toEqual(['Fünf Passend']);
+
+		expect(await beantrageWildcard(db, stark, ich, 'Nochmals.', t.jetzt)).toBe('schon-angemeldet');
+		expect(await meldeAn(db, passend[0], ich, t.jetzt)).toBe('ok');
+		expect(await meldeAn(db, passend[1], ich, t.jetzt)).toBe('ok');
+		// FR-06: der Antrag zählt bei der Grenze von 3 mit.
+		expect(await meldeAn(db, passend[2], ich, t.jetzt)).toBe('voll');
+		expect(await eigeneKategorien(db, t.id, ich)).toEqual([
+			'Herren R4–R6 (beantragt)',
+			'Herren R7–R9 A',
+			'Herren R7–R9 B'
+		]);
+
+		// Zurückziehen wie eine Abmeldung (FR-10).
+		expect(await meldeAb(db, id, ich, t.jetzt)).toBe('ok');
+		expect((await ladeCmAnsicht(db, t.id, ich, t.jetzt))?.wildcard).toEqual([
+			expect.objectContaining({ id: stark, anmeldungId: null })
+		]);
+	});
+
+	test('A-ANMELDUNG-10, FR-08: ein laufender Antrag bleibt nach Klassierungsänderung unter wildcard', async () => {
+		const t = await offenesTurnierMit(async (id) =>
+			kategorieIn(id, 'Herren R4–R6', { klassierungVon: 'R4', klassierungBis: 'R6' })
+		);
+		const ich = await spieler({ klassierung: 'R8' });
+		expect(await beantrageWildcard(db, t.k, ich, 'Bitte.', t.jetzt)).toBe('ok');
+		const [{ id }] = await aktiveVon(ich, [t.k]);
+		// R5 passt jetzt normal, R3 ist zu stark: der Antrag bleibt ein Antrag.
+		for (const klassierung of ['R5', 'R3']) {
+			expect(await setzeKlassierung(db, ich, klassierung, t.jetzt)).toBe('ok');
+			const a = await ladeCmAnsicht(db, t.id, ich, t.jetzt);
+			expect(a?.wildcard).toEqual([expect.objectContaining({ id: t.k, anmeldungId: id })]);
+			expect(a?.kategorien).toEqual([]);
+		}
+		// Eine bestätigte Wildcard steht unter den Kategorien.
+		expect(
+			await entscheide(db, { art: 'admin', mitgliedId: ich }, id, true, t.jetzt)
+		).toMatchObject({ mitgliedId: ich });
+		const a = await ladeCmAnsicht(db, t.id, ich, t.jetzt);
+		expect(a?.wildcard).toEqual([]);
+		expect(a?.kategorien).toEqual([expect.objectContaining({ id: t.k, anmeldungId: id })]);
+	});
+
+	test('A-ANMELDUNG-10, FR-08: keine Wildcard nach unten, für andere Geschlechter oder passend; nach Ablehnung erneut', async () => {
+		const t = await offenesTurnierMit(async (id) => ({
+			schwach: await kategorieIn(id, 'Herren R7–R9', {
+				klassierungVon: 'R7',
+				klassierungBis: 'R9'
+			}),
+			stark: await kategorieIn(id, 'Herren R1–R3', {
+				klassierungVon: 'R1',
+				klassierungBis: 'R3'
+			}),
+			damen: await kategorieIn(id, 'Damen R1–R3', {
+				geschlecht: 'damen',
+				klassierungVon: 'R1',
+				klassierungBis: 'R3'
+			}),
+			doppel: await kategorieIn(id, 'Doppel', {
+				geschlecht: 'offen',
+				art: 'doppel',
+				klassierungVon: null,
+				klassierungBis: null,
+				mindestsumme: 10
+			})
+		}));
+		const { schwach, stark, damen, doppel } = t.k;
+		const r2 = await spieler({ klassierung: 'R2' });
+		const ansicht = await ladeCmAnsicht(db, t.id, r2, t.jetzt);
+		expect(ansicht?.wildcard).toEqual([]);
+		for (const k of [schwach, stark, damen]) {
+			expect(await beantrageWildcard(db, k, r2, 'Bitte.', t.jetzt)).toBe('keine-wildcard');
+		}
+		// Doppel bleiben für Mitglieder ausgeblendet, wie beim Anmelden.
+		expect(await beantrageWildcard(db, doppel, r2, 'Bitte.', t.jetzt)).toBe('nicht-gefunden');
+		const ohne = await spieler({ klassierung: 'R8', jahrgang: null });
+		expect(await beantrageWildcard(db, stark, ohne, 'Bitte.', t.jetzt)).toBe('angaben-fehlen');
+		expect((await ladeCmAnsicht(db, t.id, ohne, t.jetzt))?.wildcard).toEqual([]);
+		expect(await beantrageWildcard(db, -1, r2, 'Bitte.', t.jetzt)).toBe('nicht-gefunden');
+		expect(await beantrageWildcard(db, stark, -1, 'Bitte.', t.jetzt)).toBe('nicht-gefunden');
+
+		const r8 = await spieler({ klassierung: 'R8' });
+		const spaet = new Date(`${t.jahr}-06-01T10:00:00Z`);
+		expect(await beantrageWildcard(db, stark, r8, 'Bitte.', spaet)).toBe('geschlossen');
+
+		// Nach einer Ablehnung darf er erneut beantragen; die abgelehnte zählt nicht (FR-06).
+		expect(await beantrageWildcard(db, stark, r8, 'Erster Versuch.', t.jetzt)).toBe('ok');
+		const [erster] = await aktiveVon(r8, [stark]);
+		expect(
+			await entscheide(db, { art: 'admin', mitgliedId: r8 }, erster.id, false, t.jetzt)
+		).toMatchObject({ mitgliedId: r8 });
+		expect((await ladeCmAnsicht(db, t.id, r8, t.jetzt))?.turnier.anzahl).toBe(0);
+		expect(await beantrageWildcard(db, stark, r8, 'Zweiter Versuch.', t.jetzt)).toBe('ok');
+		const alle = await db
+			.select({ id: anmeldung.id, status: anmeldung.status })
+			.from(anmeldung)
+			.where(eq(anmeldung.kategorieId, stark));
+		expect(alle.map((z) => z.status).sort()).toEqual(['abgelehnt', 'beantragt']);
+		expect(alle.find((z) => z.status === 'abgelehnt')?.id).toBe(erster.id);
 	});
 });

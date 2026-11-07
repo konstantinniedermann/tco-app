@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import type { KategorieRegel } from '../turnier/passung.ts';
-import { kategorieText, namenText, standText } from './anzeige.ts';
+import { kategorieText, kommentarZaehlerText, namenText, standText } from './anzeige.ts';
 
 const regel = (k: Partial<KategorieRegel> = {}): KategorieRegel => ({
 	art: 'einzel',
@@ -49,5 +49,10 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 		expect(namenText(['Anna Beispiel', 'Bea Muster'])).toBe(
 			'Angemeldet (2): Anna Beispiel, Bea Muster'
 		);
+	});
+
+	test('FR-08: Zähler des Wildcard-Kommentars', () => {
+		expect(kommentarZaehlerText(0)).toBe('0 von 300 Zeichen');
+		expect(kommentarZaehlerText(12)).toBe('12 von 300 Zeichen');
 	});
 });

@@ -8,6 +8,16 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.10.0 — Anmeldungen verwalten und Wildcard-Anträge
+
+- Clubmeisterschaft: Anmeldungen verwalten und Wildcard-Anträge (#60, nur Einzel). Der
+  CM-Admin sieht auf der Seite einer Kategorie alle Anmeldungen, meldet Mitglieder von Hand an,
+  verschiebt sie in eine andere Kategorie, löscht Anmeldungen und korrigiert die Klassierung;
+  passt etwas nicht zu den Regeln, warnt MyTCO, und er bestätigt mit «Trotzdem …». Mitglieder
+  beantragen für eine stärkere Kategorie eine Wildcard mit Kommentar; der CM-Admin bestätigt
+  oder lehnt ab, wahlweise mit Grund. Spieler und CM-Admins bekommen eine Meldung (Push, sonst
+  E-Mail). Der MyTCO-Admin sieht die Liste nur lesend.
+
 ## 0.9.1 — Testserver mit festem Namen je Rolle
 
 - Testserver im WLAN: `make dev-handy` meldet je Rolle einen festen Namen an —

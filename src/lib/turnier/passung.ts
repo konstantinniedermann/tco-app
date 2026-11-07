@@ -1,6 +1,6 @@
 // Passung von Spieler und Einzel-Kategorie (FR-07). Läuft im Browser und auf dem Server.
 import type { Art, Geschlecht } from '../server/db/schema.ts';
-import { BEREICH, istStufe, type Klassierung } from './klassierung.ts';
+import { BEREICH, istStufe, type Klassierung, type Stufe } from './klassierung.ts';
 
 export type Spieler = {
 	geschlecht: 'w' | 'm' | null;
@@ -44,4 +44,27 @@ export function passtEinzel(k: KategorieRegel, s: Spieler): boolean {
 	if (s.klassierung === 'keine') return k.klassierungBis === 'R9';
 	const i = BEREICH.indexOf(s.klassierung as (typeof BEREICH)[number]);
 	return i >= BEREICH.indexOf(k.klassierungVon) && i <= BEREICH.indexOf(k.klassierungBis);
+}
+
+/**
+ * FR-08: Wildcard nur nach oben: Geschlecht und Jahrgang passen, nur die Klassierung ist
+ * schwächer als `klassierungBis` (`keine` gilt als schwächer als R9).
+ */
+export function wildcardEinzel(k: KategorieRegel, s: Spieler): boolean {
+	if (k.art !== 'einzel' || fehlendeAngaben(s).length > 0 || passtEinzel(k, s)) return false;
+	if (!istStufe(k.klassierungBis) || !istStufe(k.klassierungVon)) return false;
+	// Ohne Klassierungsbereich gäbe es nichts zu lockern; Geschlecht und Jahrgang prüft die Passung
+	// derselben Kategorie ohne Klassierungsbereich.
+	if (!passtEinzel({ ...k, klassierungVon: null, klassierungBis: null }, s)) return false;
+	if (s.klassierung === 'keine') return true;
+	return BEREICH.indexOf(s.klassierung as Stufe) > BEREICH.indexOf(k.klassierungBis);
+}
+
+/** FR-08: Warnungen beim Anmelden von Hand (der Verwalter darf trotzdem anmelden). */
+export function warnungenEinzel(
+	k: KategorieRegel,
+	s: Spieler
+): ('angaben-fehlen' | 'passt-nicht')[] {
+	if (fehlendeAngaben(s).length > 0) return ['angaben-fehlen'];
+	return passtEinzel(k, s) ? [] : ['passt-nicht'];
 }

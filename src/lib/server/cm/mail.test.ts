@@ -56,6 +56,21 @@ describe('baueBestaetigungsMail', () => {
 		expect(text).toContain('Du hast dich von «Herren R1–R6» abgemeldet.');
 		expect(text).toContain('Deine Anmeldungen für die Clubmeisterschaft 2027:\n- Senioren 45+\n');
 	});
+
+	test('A-ANMELDUNG-10, FR-08: Mail nach Wildcard-Antrag nennt ihn und zeigt ihn in der Liste als beantragt', () => {
+		const { betreff, text } = baueBestaetigungsMail(
+			{ ...inhalt, aktion: 'antrag', eigene: ['Herren R1–R6 (beantragt)', 'Senioren 45+'] },
+			'kontakt@example.org'
+		);
+		expect(betreff).toBe('Clubmeisterschaft 2027: deine Anmeldungen');
+		expect(text.split('\n').slice(0, 5)).toEqual([
+			'Du hast eine Wildcard für «Herren R1–R6» beantragt.',
+			'',
+			'Deine Anmeldungen für die Clubmeisterschaft 2027:',
+			'- Herren R1–R6 (beantragt)',
+			'- Senioren 45+'
+		]);
+	});
 });
 
 describe('erstelleBestaetigung', () => {

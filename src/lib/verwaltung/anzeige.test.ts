@@ -34,6 +34,12 @@ describe('Texte der Verwaltung', () => {
 		);
 	});
 
+	it('FR-26, FR-46: Änderungen des CM-Admins an Anmeldungen stehen neutral im Verlauf', () => {
+		expect(aktionText({ aktion: 'cm-anmeldung-geaendert', detail: null })).toBe(
+			'CM-Anmeldung geändert (CM)'
+		);
+	});
+
 	it('UI-06: Fehlertext des Servers wird ein Satz', () => {
 		expect(feldMeldung('fehlt')).toBe('Fehlt.');
 		expect(feldMeldung('4 Ziffern')).toBe('4 Ziffern.');

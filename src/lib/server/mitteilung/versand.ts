@@ -66,7 +66,12 @@ async function nebeneinander<T>(
 }
 
 /** Gelungen ja/nein; ein ungültiges Abo wird gelöscht. Wirft nie. */
-async function sendePush(db: Db, push: PushSender, abo: Abo, nutzlast: string): Promise<boolean> {
+export async function sendePush(
+	db: Db,
+	push: PushSender,
+	abo: Abo,
+	nutzlast: string
+): Promise<boolean> {
 	try {
 		const r = await push(abo, nutzlast);
 		if (r === 'ungueltig') await db.delete(pushAbo).where(eq(pushAbo.endpunkt, abo.endpunkt));
@@ -77,7 +82,7 @@ async function sendePush(db: Db, push: PushSender, abo: Abo, nutzlast: string): 
 }
 
 /** DS-05: je Empfänger eine eigene Mail an genau seine Adresse. Gelungen ja/nein, wirft nie. */
-async function sendeMail(mailer: Mailer, an: string, betreff: string, text: string) {
+export async function sendeMail(mailer: Mailer, an: string, betreff: string, text: string) {
 	try {
 		await mailer({ an, betreff, text });
 		return true;

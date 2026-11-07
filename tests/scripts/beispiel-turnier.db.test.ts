@@ -66,4 +66,24 @@ describe('Beispielturnier für make seed', () => {
 		await legeBeispielTurnierAn(eigene.db, jetzt);
 		expect(await lesen()).toHaveLength(erste.length);
 	});
+
+	test('FR-08: Beispielturnier hat einen Wildcard-Antrag mit Kommentar, zweiter Lauf legt ihn nicht doppelt an', async () => {
+		const jetzt = new Date('2026-11-06T10:00:00Z');
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		const antraege = await eigene.db
+			.select({ kategorie: kategorie.name, email: mitglied.email, kommentar: anmeldung.kommentar })
+			.from(anmeldung)
+			.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
+			.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
+			.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId))
+			.where(eq(anmeldung.status, 'beantragt'));
+		expect(antraege).toEqual([
+			{
+				kategorie: 'Herren R1–R6',
+				email: 'urs.probe@example.org',
+				kommentar: 'Möchte mich mit Stärkeren messen.'
+			}
+		]);
+	});
 });

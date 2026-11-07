@@ -33,3 +33,10 @@ export const namenText = (namen: string[]): string =>
 	namen.length === 0
 		? 'Noch niemand angemeldet.'
 		: `Angemeldet (${namen.length}): ${namen.join(', ')}`;
+
+/** FR-08: Längengrenze des Wildcard-Kommentars. */
+export const KOMMENTAR_MAX = 300;
+
+/** FR-08: Zähler unter dem Kommentarfeld, «12 von 300 Zeichen». */
+export const kommentarZaehlerText = (laenge: number): string =>
+	`${laenge} von ${KOMMENTAR_MAX} Zeichen`;

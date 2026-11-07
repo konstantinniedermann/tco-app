@@ -181,6 +181,62 @@ die niemand bearbeiten kann.
    lehnt ab; der Spieler bekommt den Entscheid per Mail.
 8. **Kategorie absagen** nach Verschieben oder Löschen der Anmeldungen (Teil 1, Ziel 6).
 
+**Präzisierungen vor dem Bau (07.11.2026):**
+
+- **Nur Einzel:** Teil 4 baut alles für Einzel. *Doppelpartner ändern* und *zwei «sucht
+  Partner» zusammenlegen* baut Teil 3 (#59) mit, sobald es Doppel gibt (Entscheid
+  Projektleiter).
+- **Oberfläche direkt nach dem [UI-Leitbild](../../ui-leitbild.md)**, ohne vorherigen Entwurf;
+  Screenshots am Schluss (Entscheid Projektleiter). Die Liste je Kategorie steht als Tabelle
+  der Verwaltung (Leitbild: auf schmalem Bildschirm waagrecht scrollbar) auf der bestehenden
+  Kategorieseite (Entscheid Claude).
+- **Ablehnung mit freiwilligem Grund:** Lehnt der CM-Admin einen Wildcard-Antrag ab, kann er
+  einen kurzen Grund schreiben; er steht nur in der Meldung an den Spieler und wird nicht
+  gespeichert (Entscheid Projektleiter; Speichern: Entscheid Claude, Datensparsamkeit).
+- **Push statt Mail:** Alle Meldungen aus Teil 4 laufen über den Weg *Push, sonst E-Mail*
+  (FR-44): ein Push an jedes Gerät mit Abo, eine E-Mail nur, wer keines hat oder bei wem jeder
+  Push scheiterte. Das betrifft den neuen Wildcard-Antrag (an alle Konten mit der Rolle
+  CM-Admin), den Entscheid und jede Änderung durch den CM-Admin (an die betroffenen Spieler).
+  Die Bestätigung nach der eigenen An- oder Abmeldung aus Teil 2 bleibt eine Mail mit allen
+  eigenen Anmeldungen, auch nach einem eigenen Wildcard-Antrag (Entscheid Projektleiter). Die
+  Themen-Schalter (FR-41) gelten nicht: Es sind persönliche Meldungen wie Bestätigungen
+  (Entscheid Claude). Ziel 5 und 7 oben sind damit überholt, wo sie «Mail» sagen.
+- **Nach einer Ablehnung** darf der Spieler erneut beantragen; die abgelehnte Anmeldung bleibt
+  als *abgelehnt* stehen und zählt nicht (FR-06) (Entscheid Claude).
+- **Zurückziehen eines Antrags** durch den Spieler wie eine Abmeldung: bis zum Anmeldeschluss
+  (FR-10).
+- **Klassierung korrigieren** ändert das eine Feld beim Mitglied (Teil 2, Ziel 1). Der
+  Änderungsverlauf zeigt den CM-Admin als Urheber, mit Namen wie bei den übrigen Admins
+  (Entscheid Claude).
+- **Von Hand anmelden** sucht unter den aktiven Mitgliedern nach Namen. Fehlen beim Mitglied
+  Klassierung, Geschlecht oder Jahrgang, ist das ein Grund für die Warnung, keine Sperre. Hat
+  das Mitglied weder Push-Abo noch E-Mail-Adresse, entfällt die Meldung (Entscheid Claude).
+- **Geschlecht und Jahrgang:** Der CM-Admin sieht sie bei den Spielern und in der Suche, weil
+  er sonst nicht zuordnen kann; ändern darf sie weiter nur der Mitglieder-Admin. Fehlt eine
+  Angabe, warnt MyTCO nur. Datenschutzkonzept, Datenschutzerklärung und RR-Matrix werden vor dem
+  Bau nachgeführt (Entscheid Projektleiter).
+- **CM-Admin als Spieler:** Er darf sich selbst von Hand anmelden und über den eigenen
+  Wildcard-Antrag entscheiden; der Änderungsverlauf zeigt, wer es war (Entscheid
+  Projektleiter, ein Satz in Rollen und Rechte).
+- **Änderungsverlauf neutral:** Von Hand anmelden, verschieben, löschen und entscheiden erzeugen
+  denselben Eintrag «CM-Anmeldung geändert», ohne Kategorie, Wildcard oder Entscheid. Den
+  Verlauf sieht auch der Mitglieder-Admin; von einem Wildcard-Antrag erfahren nur Spieler,
+  CM-Admins und MyTCO-Admins (Entscheid Projektleiter).
+- **Erst ab offener Anmeldung:** Von Hand anmelden, verschieben und entscheiden gehen erst,
+  wenn das Turnier nicht mehr *in Vorbereitung* ist, damit keine Meldung zu einem Turnier geht,
+  das die Mitglieder noch nicht sehen (Entscheid Claude).
+- **Texte kurz und knapp:** Push, Ersatz-Mail und Oberfläche mit einem, höchstens zwei Sätzen,
+  z. B. «Der CM-Admin hat dich in Herren R7–R9 angemeldet.». Push und Ersatz-Mail nennen keine
+  anderen Mitglieder, auch nicht den CM-Admin oder beim Wildcard-Antrag den Spieler (DS-05;
+  Entscheid Claude). Wer es war, zeigt der Änderungsverlauf. Wer vom CM-Admin angemeldet
+  wird, bekommt den Hinweis zu den Kontaktdaten als einen kurzen Satz. Claude schreibt die
+  Texte, der Projektleiter sieht sie am Schluss mit den Screenshots (Entscheid Projektleiter).
+- **Wildcard-Kommentar** bleibt nach dem Entscheid gespeichert und fällt unter die Löschfrist
+  der CM-Anmeldungen, die vor dem Live-Gang festgelegt wird (Entscheid Claude).
+- **Wer was darf:** Nur der CM-Admin ändert; der MyTCO-Admin sieht dieselbe Liste nur lesend
+  (RR-07).
+- **Seed:** `make seed` ergänzt erfundene Anmeldungen, darunter einen offenen Wildcard-Antrag.
+
 ## Regeln, die sich ändern oder neu sind
 
 Nachzuführen in [Fachmodell](../../fachmodell.md), [Rollen und Rechte](../../rollen-und-rechte.md)
@@ -206,7 +262,8 @@ und [Anforderungen](../../anforderungen/anforderungen.md), bevor der jeweilige T
   sondern die CM-Seite (Teil 2, Ziel 1). FR-02 entsprechend anpassen, damit sie nicht doppelt
   oder schon beim Login erzwungen wird.
 - **Änderungsverlauf:** Korrekturen der Klassierung durch den CM-Verantwortlichen erscheinen mit
-  eigenem Urheber `cm` (FR-26; Schema-Änderung beim Urheber).
+  Urheber *admin* und seinem Namen, wie bei den übrigen Admins (FR-26; überholt durch die
+  Präzisierung zu Teil 4 vom 07.11.2026: kein eigener Urheber `cm`, keine Schema-Änderung).
 - **Turnier:** Übergang *Anmeldung geschlossen* → *Anmeldung offen* (wieder öffnen) ist erlaubt;
   *Anmeldung offen* gilt nur bis zum Anmeldeschluss (FR-05).
 - **Rechte:** Rolle `cm` öffnet die Verwaltung, nur den Bereich *Clubmeisterschaft* (RR-07
@@ -266,8 +323,9 @@ trotzdem zuerst ins Leitbild.
 - Export und Import mit Advantage und Swiss Tennis: offen, bis K-47 und der Datenaustausch
   geklärt sind; beide Richtungen sollen so einfach wie möglich gehen (Entscheid Projektleiter).
 - Kategorien vom Vorjahr übernehmen.
-- Benachrichtigung per Push, SMS oder WhatsApp (A-ANMELDUNG-08, -09); Teil 2 bis 4 schreiben
-  nur Mails.
+- Benachrichtigung per Push, SMS oder WhatsApp im CM-Betrieb (A-ANMELDUNG-08, -09). Teil 2
+  und 3 schreiben nur Mails; Teil 4 schickt seine Meldungen *Push, sonst E-Mail* (Präzisierung
+  vom 07.11.2026).
 - Anmeldung für ein Kind durch die Eltern (#45, Junioren); bis dahin meldet der
   CM-Verantwortliche Junioren von Hand an.
 

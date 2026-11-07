@@ -73,7 +73,7 @@ Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 | A-ROLLE-04 | Rolle *Anlässe-Veranstalter*; bis dahin gehören die Anlässe zum Mitglieder-Admin (A-ROLLE-02), die CM leitet der CM-Admin (A-ROLLE-07) | PDF 4a | später\* | später |
 | A-ROLLE-05 | Rolle *Junioren-Leiter* | PDF 4a | später\* | später |
 | A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später\* | später |
-| A-ROLLE-07 | Rolle *CM-Admin* (vorher *CM-Verantwortlicher*): Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | umgesetzt\* (Turnier und Kategorien, #57; Anmeldungen, Gruppen und Resultate folgen mit ihren Etappen) |
+| A-ROLLE-07 | Rolle *CM-Admin* (vorher *CM-Verantwortlicher*): Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | umgesetzt\* (Turnier und Kategorien, #57; Einzel-Anmeldungen, #60; Doppel, Gruppen und Resultate folgen mit ihren Etappen) |
 | A-ROLLE-08 | Rolle *Lizenz-Admin* (vorher *Lizenzverantwortlicher*): Lizenzrunde und Lizenzanträge | PL | Lizenzanträge | geplant |
 | A-ROLLE-09 | *Ansicht als …*: Der MyTCO-Admin sieht App und Verwaltung so, wie sie eine gewählte Rolle sieht, nur lesend; der Server weist jedes Speichern ab ([Rollen und Rechte](../rollen-und-rechte.md#ansicht-als-), SI-20) | PL | Mitglieder-Login | umgesetzt |
 
@@ -165,11 +165,11 @@ Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vo
 | A-ANMELDUNG-03 | MyTCO zeigt nur die Kategorien an, die für den Spieler möglich sind (Klassierung evtl. ausgenommen, weil die Klassierung nicht automatisch von Swiss Tennis kommt) | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
 | A-ANMELDUNG-04 | Bei einer Doppelkategorie zeigt MyTCO sofort alle verfügbaren Spieler des Clubs zur Wahl des Doppelpartners | PDF 5b | CM-Anmeldung | geplant |
 | A-ANMELDUNG-05 | Nach der Anmeldung erhält der Spieler eine automatische Bestätigung mit seinen Kategorien | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
-| A-ANMELDUNG-06 | Der CM-Admin fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | geplant |
+| A-ANMELDUNG-06 | Der CM-Admin fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
 | A-ANMELDUNG-07 | Die Anmeldung schliesst zu einem Anmeldeschluss | PDF 5c (abgeleitet) | CM-Anmeldung\* | umgesetzt |
 | A-ANMELDUNG-08 | Der Spieler wählt, ob er bei Neuigkeiten, die ihn betreffen (neue Spiele, geänderter Spielplan), benachrichtigt wird | PDF 5b | CM-Betrieb\* | geplant |
 | A-ANMELDUNG-09 | Benachrichtigung per SMS oder WhatsApp (zuerst E-Mail und Push, siehe N-APP-02) | PDF 5b | später\* | später |
-| A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der CM-Admin entscheidet | PL | CM-Anmeldung | geplant |
+| A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der CM-Admin entscheidet | PL | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
 
 ### ADVANTAGE — Datenaustausch mit Swiss Tennis
 

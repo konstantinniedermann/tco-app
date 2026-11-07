@@ -10,6 +10,8 @@ import type { Db } from '../db/index.ts';
 import {
 	aenderung,
 	anlass,
+	anmeldung,
+	anmeldungSpieler,
 	kategorie,
 	mitglied,
 	mitteilung,
@@ -24,6 +26,7 @@ import {
 } from '../mitteilung/schnittstellen.ts';
 import { TURNIER_SCHNITTSTELLEN, postKategorien, postTurniere } from '../turnier/schnittstellen.ts';
 import { legeAnlassAn } from '../anlass/anlaesse.ts';
+import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';
 import { ROLLEN } from './rollen.ts';
 import {
 	ADMIN_SCHNITTSTELLEN,
@@ -124,6 +127,10 @@ async function zeilen() {
 	) => (await db().select({ n: count() }).from(t))[0].n;
 	const [aenderungen] = await db().select({ n: count() }).from(aenderung);
 	const [sitzungen] = await db().select({ n: count() }).from(sitzung);
+	const [anmeldungen] = await db().select({ n: count() }).from(anmeldung);
+	const klassierungen = await db()
+		.select({ id: mitglied.id, klassierung: mitglied.klassierung })
+		.from(mitglied);
 	const kategorien = await db()
 		.select({ id: kategorie.id, status: kategorie.status })
 		.from(kategorie);
@@ -134,7 +141,9 @@ async function zeilen() {
 		mitteilung: await n(mitteilung),
 		kategorie: kategorien,
 		aenderung: aenderungen.n,
-		sitzung: sitzungen.n
+		sitzung: sitzungen.n,
+		anmeldung: anmeldungen.n,
+		klassierung: klassierungen
 	};
 }
 
@@ -193,7 +202,7 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			...MITTEILUNG_ADMIN_SCHNITTSTELLEN
 			// Schreibend ist alles, was nicht liest: Auch ein künftiges delete… oder put… fällt hier auf.
 		}).filter(([name]) => !name.startsWith('get') && !ERLAUBT_FUER_MYTCO.includes(name));
-		expect(schreibende.length).toBeGreaterThanOrEqual(17);
+		expect(schreibende.length).toBeGreaterThanOrEqual(22);
 		const vorher = await zeilen();
 		for (const [name, fn] of schreibende) {
 			const r = await fn(s.d, ereignis({ konto: mytco.konto, body: {}, params: { id } }));
@@ -244,7 +253,7 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		expect([r.status, await r.json()]).toEqual([403, { fehler: 'kein-admin' }]);
 	});
 
-	test('MyTCO-Admin liest Mitglieder, Turniere, Verlauf, Mitteilungen → 200', async () => {
+	test('MyTCO-Admin liest Mitglieder, Turniere, Anmeldungen, Verlauf, Mitteilungen → 200', async () => {
 		const s = baue();
 		const mytco = await bestaetigt(s, ['mytco']);
 		const ziel = await legeMitgliedAn(db(), { nachname: 'Lesbar' });
@@ -257,10 +266,53 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 				anmeldeschluss: new Date('2027-03-16T22:59:00Z')
 			})
 		);
+		// RR-07: Wildcard-Antrag mit Kommentar; der MyTCO-Admin sieht ihn nur lesend.
+		const t = await legeTurnierAn(db(), {
+			jahr: 2072,
+			name: 'Clubmeisterschaft 2072',
+			anmeldeschluss: '2072-05-31',
+			nummern: []
+		});
+		if (t.ergebnis !== 'ok') throw new Error(t.ergebnis);
+		const k = await legeKategorieAn(db(), t.id, {
+			name: 'Herren R1-R5',
+			geschlecht: 'herren',
+			art: 'einzel',
+			jahrgangVon: null,
+			jahrgangBis: null,
+			klassierungVon: 'R1',
+			klassierungBis: 'R5',
+			mindestsumme: null
+		});
+		if (k.ergebnis !== 'ok') throw new Error(k.ergebnis);
+		const kategorieId = k.id;
+		const [a] = await db()
+			.insert(anmeldung)
+			.values({
+				kategorieId,
+				status: 'beantragt',
+				kommentar: 'Möchte mich messen.',
+				angemeldetAm: start,
+				geaendertAm: start
+			})
+			.returning({ id: anmeldung.id });
+		await db().insert(anmeldungSpieler).values({ anmeldungId: a.id, mitgliedId: ziel.mitgliedId });
 		const antworten = [
 			await getMitglieder(s.d, hole(mytco.konto)),
 			await getMitglied(s.d, hole(mytco.konto, { params: { id: String(ziel.mitgliedId) } })),
 			await TURNIER_SCHNITTSTELLEN.getTurniere(s.d, hole(mytco.konto)),
+			await TURNIER_SCHNITTSTELLEN.getAnmeldungen(
+				s.d,
+				hole(mytco.konto, { params: { id: String(kategorieId) } })
+			),
+			await TURNIER_SCHNITTSTELLEN.getSpieler(
+				s.d,
+				ereignis({
+					method: 'GET',
+					konto: mytco.konto,
+					url: 'http://localhost/api/admin/spieler?suche=Lesbar'
+				})
+			),
 			await getVerlauf(s.d, hole(mytco.konto)),
 			await ADMIN_SCHNITTSTELLEN.getFairgate(s.d, hole(mytco.konto)),
 			await ADMIN_SCHNITTSTELLEN.getAdminAnlaesse(s.d, hole(mytco.konto)),
@@ -271,9 +323,19 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 				hole(mytco.konto, { params: { id: anlassId } })
 			)
 		];
-		expect(antworten.map((r) => r.status)).toEqual([200, 200, 200, 200, 200, 200, 200, 200, 200]);
+		expect(antworten.map((r) => r.status)).toEqual(Array(antworten.length).fill(200));
+		expect(antworten).toHaveLength(11);
 		const liste = (await antworten[0].json()) as { id: number }[];
 		expect(liste.map((z) => z.id)).toContain(ziel.mitgliedId);
+		expect(await antworten[3].json()).toEqual([
+			expect.objectContaining({
+				mitgliedId: ziel.mitgliedId,
+				status: 'beantragt',
+				kommentar: 'Möchte mich messen.'
+			})
+		]);
+		const treffer = (await antworten[4].json()) as { mitgliedId: number }[];
+		expect(treffer.map((z) => z.mitgliedId)).toContain(ziel.mitgliedId);
 	});
 
 	test('Unbestätigt: lesbarer Bereich → unbestaetigt vor kein-recht; fremder Bereich → kein-admin', async () => {
