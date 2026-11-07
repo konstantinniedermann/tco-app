@@ -201,8 +201,8 @@ test('A-ANMELDUNG-10, FR-08: Mitglied beantragt eine Wildcard, CM-Admin lehnt mi
 	page
 }, info) => {
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder beantragen am Handy; der Nachweis mit Screenshots läuft auf iPhone und Android
-	// Die Meldung an die CM-Admins (FR-47) geht an alle der gemeinsamen Testdatenbank, bevor die
-	// Antwort kommt; lokal sind das Hunderte aus früheren Läufen.
+	// Die Meldung an die CM-Admins (FR-47) geht an alle der gemeinsamen Testdatenbank, nach der
+	// Antwort und der Reihe nach; lokal sind das Hunderte aus früheren Läufen, der neue zuletzt.
 	test.setTimeout(180_000);
 	const fehler = sammleKonsolenfehler(page);
 	const jahr = testjahr(JAHR_WILDCARD, info);
@@ -237,14 +237,17 @@ test('A-ANMELDUNG-10, FR-08: Mitglied beantragt eine Wildcard, CM-Admin lehnt mi
 	await antrag.getByLabel('Warum möchtest du hier spielen?').fill(kommentar);
 	await pruefeBildschirm(page, info, 'cm-wildcard-antrag');
 	await antrag.getByRole('button', { name: 'Beantragen' }).click();
-	await expect(page.getByRole('status')).toHaveText('Wildcard beantragt. Du bekommst Bescheid.', {
-		timeout: 120_000
-	});
+	await expect(page.getByRole('status')).toHaveText('Wildcard beantragt. Du bekommst Bescheid.');
 	await expect(karte(page, 'Herren R1–R6').getByText('Wildcard beantragt')).toBeVisible();
 	await expect(page.getByText('1 von 3 Anmeldungen', { exact: true })).toBeVisible();
 
 	// FR-47, DS-05: Die CM-Admins erfahren vom Antrag, ohne den Namen des Mitglieds.
-	const meldung = await warteAufMail(cm.email, 'Wildcard-Antrag', `/kategorien/${kategorieId}`);
+	const meldung = await warteAufMail(
+		cm.email,
+		'Wildcard-Antrag',
+		`/kategorien/${kategorieId}`,
+		120_000
+	);
 	expect(meldung).toContain('Neuer Wildcard-Antrag für «Herren R1–R6».');
 	expect(meldung).not.toContain(nachname);
 
@@ -303,6 +306,8 @@ test('RR-07, FR-08: MyTCO-Admin sieht die Anmeldungen mit Kommentar, ohne Tasten
 	await meldeAn(page, mytco);
 	await page.goto('/verwaltung');
 	await bestaetige(page, mytco, 'Mitglieder');
+	// Die Mitgliederliste lädt erst nach der Überschrift; page.goto bräche sie sonst ab (WebKit).
+	await expect(page.getByRole('status')).toHaveText(/^\d+ Mitglied(er)?$/);
 	await page.goto(`/verwaltung/turniere/${turnierId}/kategorien/${kategorieId}`);
 	await expect(page.getByRole('heading', { level: 1, name: 'Herren R1–R6' })).toBeVisible();
 	await expect(page.getByText('1 Anmeldung, 1 Wildcard-Antrag', { exact: true })).toBeVisible();
