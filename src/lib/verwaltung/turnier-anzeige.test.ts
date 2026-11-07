@@ -7,6 +7,7 @@ import {
 	datumLang,
 	geschlechtText,
 	jahrgangText,
+	mitgliedVermerk,
 	klassierungText,
 	spielerGeschlechtText,
 	statusText,
@@ -114,6 +115,16 @@ describe('Anzeigehilfen für Turniere', () => {
 			text: 'Wildcard beantragt',
 			klasse: 'plakette-offen'
 		});
+	});
+
+	it('FR-04: Vermerk am Namen nur bei Austritt, Löschvormerkung und Löschung', () => {
+		expect(mitgliedVermerk('aktiv')).toBeNull();
+		expect(mitgliedVermerk('ausgetreten')).toEqual({ text: 'ausgetreten', klasse: 'plakette' });
+		expect(mitgliedVermerk('vorgemerkt')).toEqual({
+			text: 'wird gelöscht',
+			klasse: 'plakette plakette-gesperrt'
+		});
+		expect(mitgliedVermerk('geloescht')).toEqual({ text: 'gelöscht', klasse: 'plakette' });
 	});
 
 	it('A-ANMELDUNG-06: Geschlecht und Angaben eines Spielers, Fehlendes als Strich', () => {

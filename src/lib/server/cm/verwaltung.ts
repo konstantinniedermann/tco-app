@@ -3,7 +3,7 @@ import { and, asc, eq, or, sql } from 'drizzle-orm';
 import type { Klassierung } from '../../turnier/klassierung.ts';
 import { warnungenEinzel, type Spieler } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
-import { maskiere } from '../admin/mitglieder.ts';
+import { maskiere, type MitgliedStatus } from '../admin/mitglieder.ts';
 import { schreibeVerlauf, type Eintrag } from '../admin/verlauf.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { anmeldung, anmeldungSpieler, kategorie, mitglied, turnier } from '../db/schema.ts';
@@ -18,6 +18,8 @@ export type AnmeldungZeile = {
 	status: 'bestaetigt' | 'beantragt';
 	kommentar: string | null;
 	mitgliedId: number;
+	/** Status des Mitglieds: Austritt und Löschung zeigt die Liste als Plakette (FR-04). */
+	mitgliedStatus: MitgliedStatus;
 	name: string;
 	geschlecht: 'w' | 'm' | null;
 	jahrgang: number | null;
@@ -65,6 +67,7 @@ export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<Anme
 			status: anmeldung.status,
 			kommentar: anmeldung.kommentar,
 			mitgliedId: mitglied.id,
+			mitgliedStatus: mitglied.status,
 			vorname: mitglied.vorname,
 			nachname: mitglied.nachname,
 			...spielerSpalten
@@ -80,6 +83,7 @@ export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<Anme
 		status: z.status as AnmeldungZeile['status'],
 		kommentar: z.kommentar,
 		mitgliedId: z.mitgliedId,
+		mitgliedStatus: z.mitgliedStatus as MitgliedStatus,
 		...nameUndAngaben(z)
 	}));
 }

@@ -581,18 +581,6 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Ein weiterer Test mit Code-Anfrage braucht eine andere Lösung (Grenze im E2E anheben oder getrennte IPs).
 
-### 2026-11-07 — Vermerk «ausgetreten» in der CM-Anmeldeliste (Nacharbeit zu #43)
-
-**Thema:** Turnier-Verwaltung
-
-**Fundort:** CM-Anmeldeliste der Verwaltung (hängt an #60)
-
-**Beobachtung:** Task 10 von #43 wurde ausgelassen, weil #60 nicht auf `dev` war. Ausgetretene oder vorgemerkte Mitglieder tragen in der Liste noch keinen Vermerk.
-
-**Ursprung:** Etappe 3 von #43, Task 10.
-
-**Einschätzung:** Nacharbeit, sobald #60 auf `dev` ist: Vermerk «ausgetreten» in der Liste ergänzen.
-
 ### 2026-11-07 — Abgelehnter Wildcard-Antrag fehlt auf der CM-Seite; wiederholtes Beantragen meldet jedes Mal allen CM-Admins
 
 **Thema:** Turnier-Verwaltung

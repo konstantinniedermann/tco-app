@@ -540,6 +540,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				status: 'bestaetigt',
 				kommentar: null,
 				mitgliedId: alphaA,
+				mitgliedStatus: 'aktiv',
 				name: 'Alpha, Adam',
 				geschlecht: 'm',
 				jahrgang: 1990,
@@ -550,6 +551,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				status: 'beantragt',
 				kommentar: 'Bin besser',
 				mitgliedId: alphaB,
+				mitgliedStatus: 'aktiv',
 				name: 'Alpha, Bert',
 				geschlecht: null,
 				jahrgang: null,
@@ -560,6 +562,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				status: 'bestaetigt',
 				kommentar: null,
 				mitgliedId: zeta,
+				mitgliedStatus: 'aktiv',
 				name: 'Zeta, Anna',
 				geschlecht: 'm',
 				jahrgang: 1990,
@@ -578,6 +581,36 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		});
 		await anmeldungMit(doppel, zeta, 'bestaetigt', t.jetzt);
 		expect(await ladeAnmeldungen(db, doppel)).toEqual([]);
+	});
+
+	test('FR-04: ladeAnmeldungen nennt den Status des Mitglieds, auch Ausgetretene und Gelöschte', async () => {
+		const t = await turnier(['Herren A']);
+		const [a] = t.kategorien;
+		const aktiv = await spieler({ nachname: 'Aktiv' });
+		const aus = await spieler({ nachname: 'Aus' });
+		const vorgemerkt = await spieler({ nachname: 'Vor' });
+		const weg = await spieler({ nachname: 'Weg' });
+		for (const id of [aktiv, aus, vorgemerkt, weg])
+			await anmeldungMit(a, id, 'bestaetigt', t.jetzt);
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten', austrittAm: t.jetzt })
+			.where(eq(mitglied.id, aus));
+		await db
+			.update(mitglied)
+			.set({ status: 'vorgemerkt', statusVorher: 'aktiv', vorgemerktAm: t.jetzt })
+			.where(eq(mitglied.id, vorgemerkt));
+		await db.update(mitglied).set({ status: 'geloescht' }).where(eq(mitglied.id, weg));
+
+		const status = Object.fromEntries(
+			(await ladeAnmeldungen(db, a)).map((z) => [z.mitgliedId, z.mitgliedStatus])
+		);
+		expect(status).toEqual({
+			[aktiv]: 'aktiv',
+			[aus]: 'ausgetreten',
+			[vorgemerkt]: 'vorgemerkt',
+			[weg]: 'geloescht'
+		});
 	});
 
 	test('A-ANMELDUNG-06: sucheSpieler findet aktive nach Vor-, Nach- oder ganzem Namen, höchstens 20', async () => {

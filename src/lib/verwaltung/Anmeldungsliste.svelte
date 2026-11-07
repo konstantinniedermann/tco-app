@@ -24,6 +24,7 @@
 	import {
 		anmeldungStatus,
 		anmeldungenText,
+		mitgliedVermerk,
 		spielerGeschlechtText,
 		trefferText,
 		warnungText
@@ -287,9 +288,11 @@
 					<tbody>
 						{#each zeilen as z (z.anmeldungId)}
 							{@const status = anmeldungStatus(z.status)}
+							{@const vermerk = mitgliedVermerk(z.mitgliedStatus)}
 							<tr>
 								<td>
 									<span id="anmeldung-{z.anmeldungId}">{z.name}</span>
+									{#if vermerk}<span class={vermerk.klasse}>{vermerk.text}</span>{/if}
 									{#if z.kommentar}
 										<div class="leise mehrzeilig">{z.kommentar}</div>
 									{/if}

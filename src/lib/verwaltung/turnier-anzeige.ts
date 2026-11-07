@@ -3,6 +3,7 @@ import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwa
 import type { KategorieWerte } from '../server/turnier/angaben.ts';
 import type { Geschlecht, TurnierStatus } from '../server/db/schema.ts';
 import { klassierungName } from '../turnier/klassierung.ts';
+import { plakette } from './anzeige.ts';
 
 const STATUS: Record<
 	TurnierStatus,
@@ -106,6 +107,11 @@ const ANMELDUNG_STATUS: Record<
 };
 
 export const anmeldungStatus = (s: AnmeldungZeile['status']) => ANMELDUNG_STATUS[s];
+
+/** FR-04: Plakette neben dem Namen für Austritt, Löschvormerkung und Löschung; sonst keine. */
+export function mitgliedVermerk(status: AnmeldungZeile['mitgliedStatus']) {
+	return status === 'aktiv' ? null : plakette({ login: 'ohne-brief', status });
+}
 
 /** Geschlecht eines Spielers wie in den Angaben der Mitglieder-Verwaltung. */
 export const spielerGeschlechtText = (g: 'w' | 'm' | null) =>
