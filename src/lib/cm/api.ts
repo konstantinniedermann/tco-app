@@ -19,16 +19,20 @@ const ABGELEHNT = [
 	'voll',
 	'passt-nicht',
 	'schon-angemeldet',
-	'angaben-fehlen'
+	'angaben-fehlen',
+	'keine-wildcard'
 ] as const;
 type Abgelehnt = (typeof ABGELEHNT)[number];
+
+/** Felder, die der Server bei 400 melden kann. */
+export type CmFelder = Partial<Record<CmAngabe | 'kommentar', string>>;
 
 export type Ergebnis<T> =
 	| { art: 'ok'; daten: T }
 	| { art: 'abgemeldet' }
 	| { art: 'nicht-gefunden' }
 	| { art: Abgelehnt }
-	| { art: 'eingabe'; felder: Partial<Record<CmAngabe, string>> }
+	| { art: 'eingabe'; felder: CmFelder }
 	| { art: 'stoerung' };
 
 const istAbgelehnt = (x: unknown): x is Abgelehnt =>
@@ -46,7 +50,7 @@ async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<E
 		if (r.status === 404) return { art: 'nicht-gefunden' };
 		if (r.status === 409 && istAbgelehnt(k.fehler)) return { art: k.fehler };
 		if (r.status === 400 && k.fehler === 'eingabe' && istObjekt(k.felder))
-			return { art: 'eingabe', felder: k.felder as Partial<Record<CmAngabe, string>> };
+			return { art: 'eingabe', felder: k.felder as CmFelder };
 		return { art: 'stoerung' };
 	} catch {
 		return { art: 'stoerung' };
@@ -68,6 +72,10 @@ export const sendeCmAngaben = (
 
 export const meldeAn = (kategorieId: number, holen: Holen = fetch) =>
 	rufe<CmAnsicht>(`/api/cm/kategorien/${kategorieId}/anmeldung`, jsonPost({}), holen);
+
+/** FR-08: Wildcard für eine stärkere Kategorie beantragen; der Kommentar ist Pflicht. */
+export const beantrageWildcard = (kategorieId: number, kommentar: string, holen: Holen = fetch) =>
+	rufe<CmAnsicht>(`/api/cm/kategorien/${kategorieId}/wildcard`, jsonPost({ kommentar }), holen);
 
 export const meldeAb = (anmeldungId: number, holen: Holen = fetch) =>
 	rufe<CmAnsicht>(`/api/cm/anmeldungen/${anmeldungId}/abmelden`, jsonPost({}), holen);

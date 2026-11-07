@@ -26,7 +26,14 @@ import {
 	erfasseWiedereintritt,
 	loescheMitglied,
 	nimmLoeschungZurueck,
-	ladeAuskunft
+	ladeAuskunft,
+	ladeAnmeldungen,
+	meldeVonHandAn,
+	verschiebeAnmeldung,
+	loescheAnmeldung,
+	entscheideAntrag,
+	sucheSpieler,
+	korrigiereKlassierung
 } from './api.ts';
 
 type Aufruf = { pfad: string; init: RequestInit };
@@ -284,6 +291,112 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			daten: { bestaetigt: true, mitgliedId: 3, rollen: ['cm'] }
 		});
 		if (r.art === 'ok') expect(r.daten.rollen).toEqual(['cm']);
+	});
+
+	it('A-ANMELDUNG-06, FR-46, FR-08: Anmeldungen verwalten mit Pfad, Methode und Körper', async () => {
+		const h = holer(json(200, {}));
+		await ladeAnmeldungen(4, h.holen);
+		await meldeVonHandAn(4, 12, false, h.holen);
+		await meldeVonHandAn(4, 12, true, h.holen);
+		await verschiebeAnmeldung(30, 5, false, h.holen);
+		await verschiebeAnmeldung(30, 5, true, h.holen);
+		await loescheAnmeldung(30, h.holen);
+		await korrigiereKlassierung(12, 'R6', h.holen);
+		expect(h.aufrufe.map((a) => [a.init.method, a.pfad])).toEqual([
+			['GET', '/api/admin/kategorien/4/anmeldungen'],
+			['POST', '/api/admin/kategorien/4/anmeldungen'],
+			['POST', '/api/admin/kategorien/4/anmeldungen'],
+			['POST', '/api/admin/anmeldungen/30'],
+			['POST', '/api/admin/anmeldungen/30'],
+			['POST', '/api/admin/anmeldungen/30/loeschen'],
+			['POST', '/api/admin/spieler/12/klassierung']
+		]);
+		const koerper = h.aufrufe.slice(1).map((a) => JSON.parse(String(a.init.body)));
+		expect(koerper).toEqual([
+			{ mitgliedId: 12 },
+			{ mitgliedId: 12, trotzdem: true },
+			{ kategorieId: 5 },
+			{ kategorieId: 5, trotzdem: true },
+			{},
+			{ klassierung: 'R6' }
+		]);
+	});
+
+	it('FR-08: Entscheid schickt den Grund nur bei einer Ablehnung, ohne Leerzeichen am Rand', async () => {
+		const h = holer(json(200, {}));
+		await entscheideAntrag(30, true, 'wird ignoriert', h.holen);
+		await entscheideAntrag(30, false, '  Zu viele Anträge.  ', h.holen);
+		await entscheideAntrag(30, false, '   ', h.holen);
+		expect(h.aufrufe.map((a) => [a.init.method, a.pfad])).toEqual([
+			['POST', '/api/admin/anmeldungen/30/entscheid'],
+			['POST', '/api/admin/anmeldungen/30/entscheid'],
+			['POST', '/api/admin/anmeldungen/30/entscheid']
+		]);
+		expect(h.aufrufe.map((a) => JSON.parse(String(a.init.body)))).toEqual([
+			{ bestaetigt: true },
+			{ bestaetigt: false, grund: 'Zu viele Anträge.' },
+			{ bestaetigt: false }
+		]);
+	});
+
+	it('A-ANMELDUNG-06: Spielersuche schickt den Suchtext kodiert und liefert die Treffer', async () => {
+		const treffer = [
+			{
+				mitgliedId: 12,
+				name: 'Muster, Hanna',
+				geschlecht: 'w',
+				jahrgang: 1990,
+				klassierung: 'R7'
+			}
+		];
+		const h = holer(json(200, treffer));
+		expect(await sucheSpieler('Muster, H&a', h.holen)).toEqual({ art: 'ok', daten: treffer });
+		expect(h.aufrufe[0]).toMatchObject({ init: { method: 'GET' } });
+		expect(h.aufrufe[0].pfad).toBe('/api/admin/spieler?suche=Muster%2C+H%26a');
+	});
+
+	it('FR-46: 409 warnung kommt mit den Warnungen an', async () => {
+		const w = holer(json(409, { fehler: 'warnung', warnungen: ['passt-nicht', 'voll'] }));
+		expect(await meldeVonHandAn(4, 12, false, w.holen)).toEqual({
+			art: 'warnung',
+			warnungen: ['passt-nicht', 'voll']
+		});
+		const v = holer(json(409, { fehler: 'warnung', warnungen: ['geschlossen'] }));
+		expect(await verschiebeAnmeldung(30, 5, false, v.holen)).toEqual({
+			art: 'warnung',
+			warnungen: ['geschlossen']
+		});
+		// Ohne Liste der Warnungen ist die Antwort nicht lesbar.
+		const kaputt = holer(json(409, { fehler: 'warnung' }));
+		expect(await meldeVonHandAn(4, 12, false, kaputt.holen)).toEqual({ art: 'stoerung' });
+	});
+
+	it('FR-46, FR-08: 409 schon-angemeldet, vorbereitung und nicht-beantragt werden eigene Ergebnisse', async () => {
+		const a = await meldeVonHandAn(
+			4,
+			12,
+			false,
+			holer(json(409, { fehler: 'schon-angemeldet' })).holen
+		);
+		const b = await verschiebeAnmeldung(
+			30,
+			5,
+			false,
+			holer(json(409, { fehler: 'vorbereitung' })).holen
+		);
+		const c = await entscheideAntrag(
+			30,
+			true,
+			'',
+			holer(json(409, { fehler: 'nicht-beantragt' })).holen
+		);
+		const d = await loescheAnmeldung(30, holer(json(404, { fehler: 'nicht-gefunden' })).holen);
+		expect([a, b, c, d]).toEqual([
+			{ art: 'schon-angemeldet' },
+			{ art: 'vorbereitung' },
+			{ art: 'nicht-beantragt' },
+			{ art: 'nicht-gefunden' }
+		]);
 	});
 });
 

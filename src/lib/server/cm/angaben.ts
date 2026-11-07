@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
 import { istKlassierung, type Klassierung } from '../../turnier/klassierung.ts';
 import { fehlendeAngaben, type CmAngabe, type Spieler } from '../../turnier/passung.ts';
-import { schreibeVerlauf } from '../admin/verlauf.ts';
+import { schreibeVerlauf, type Urheber } from '../admin/verlauf.ts';
 import type { Db } from '../db/index.ts';
 import { mitglied } from '../db/schema.ts';
 
@@ -112,19 +112,34 @@ export async function setzeKlassierung(
 	jetzt: Date
 ): Promise<'ok' | 'eingabe' | 'nicht-gefunden'> {
 	if (!istKlassierung(wert)) return 'eingabe';
+	return schreibeKlassierung(db, mitgliedId, wert, { art: 'mitglied', mitgliedId }, jetzt);
+}
+
+/**
+ * Klassierung setzen und im Verlauf mit `urheber` festhalten (FR-26); der gleiche Wert ist `ok`
+ * ohne Verlauf. Das Mitglied selbst und der CM-Admin ändern dasselbe Feld (Teil 2, Ziel 1).
+ */
+export async function schreibeKlassierung(
+	db: Db,
+	mitgliedId: number,
+	wert: Klassierung,
+	urheber: Urheber,
+	jetzt: Date
+): Promise<'ok' | 'nicht-gefunden'> {
 	return db.transaction(async (tx) => {
 		const [z] = await tx
-			.select({ klassierung: mitglied.klassierung })
+			.select({ klassierung: mitglied.klassierung, status: mitglied.status })
 			.from(mitglied)
 			.where(eq(mitglied.id, mitgliedId))
 			.for('update');
-		if (!z) return 'nicht-gefunden';
+		// Von einem gelöschten Mitglied bleibt nur der Name (FR-04).
+		if (!z || z.status === 'geloescht') return 'nicht-gefunden';
 		if (z.klassierung === wert) return 'ok';
 		await tx.update(mitglied).set({ klassierung: wert }).where(eq(mitglied.id, mitgliedId));
 		await schreibeVerlauf(
 			tx,
 			mitgliedId,
-			{ art: 'mitglied', mitgliedId },
+			urheber,
 			[{ aktion: 'feld-geaendert', detail: 'klassierung' }],
 			jetzt
 		);

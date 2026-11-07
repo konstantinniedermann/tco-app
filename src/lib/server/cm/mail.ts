@@ -3,7 +3,8 @@ import { datumLang } from '../../verwaltung/turnier-anzeige.ts';
 
 export type BestaetigungInhalt = {
 	turniername: string;
-	aktion: 'an' | 'ab';
+	/** `antrag`: Wildcard-Antrag (FR-08). */
+	aktion: 'an' | 'ab' | 'antrag';
 	kategorie: string;
 	eigene: string[];
 	anmeldeschluss: string;
@@ -14,10 +15,11 @@ export function baueBestaetigungsMail(
 	i: BestaetigungInhalt,
 	kontakt: string
 ): { betreff: string; text: string } {
-	const erste =
-		i.aktion === 'an'
-			? `Du hast dich für «${i.kategorie}» angemeldet.`
-			: `Du hast dich von «${i.kategorie}» abgemeldet.`;
+	const erste = {
+		an: `Du hast dich für «${i.kategorie}» angemeldet.`,
+		ab: `Du hast dich von «${i.kategorie}» abgemeldet.`,
+		antrag: `Du hast eine Wildcard für «${i.kategorie}» beantragt.`
+	}[i.aktion];
 	const liste =
 		i.eigene.length > 0
 			? [`Deine Anmeldungen für die ${i.turniername}:`, ...i.eigene.map((k) => `- ${k}`)]

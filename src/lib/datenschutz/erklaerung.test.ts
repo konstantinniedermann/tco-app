@@ -74,6 +74,7 @@ describe('Datenschutzerklärung aus der Doku (DS-09)', () => {
 	it('DS-09: Erklärung sagt, wer Klassierung, Geschlecht und Jahrgang ändert (FR-37)', () => {
 		const text = JSON.stringify(leseErklaerung(roh));
 		expect(text).toContain('Klassierung änderst du jederzeit im Profil');
+		expect(text).toContain('stimmt sie nicht, korrigieren sie auch die CM-Admins');
 		expect(text).toContain(
 			'Geschlecht und Jahrgang trägst du einmal auf der Seite der Clubmeisterschaft ein'
 		);

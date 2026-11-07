@@ -80,6 +80,8 @@ export function aktionText(z: Pick<VerlaufEintrag, 'aktion' | 'detail'>): string
 			return 'Löschung rückgängig gemacht';
 		case 'auskunft-erstellt':
 			return 'Auskunft erstellt';
+		case 'cm-anmeldung-geaendert':
+			return 'CM-Anmeldung geändert (CM)';
 		default:
 			return z.aktion;
 	}

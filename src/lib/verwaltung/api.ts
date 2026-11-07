@@ -8,6 +8,7 @@ import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairg
 import type { Auskunft } from '../server/admin/auskunft.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
+import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
 import type { TurnierStatus } from '../server/db/schema.ts';
 import type { MitteilungFeld } from '../server/mitteilung/angaben.ts';
 import type { KategorieFeld, TurnierFeld } from '../server/turnier/angaben.ts';
@@ -18,6 +19,7 @@ import type {
 	ladeKategorie as ServerLadeKategorie
 } from '../server/turnier/turniere.ts';
 import type { VerlaufZeile } from '../server/admin/verlauf.ts';
+import type { Klassierung } from '../turnier/klassierung.ts';
 
 // Was nach JSON im Browser ankommt: Zeitpunkte sind Zeichenketten.
 export type Json<T> = T extends Date
@@ -39,6 +41,7 @@ export type TurnierListe = Json<TurnierZeile>[];
 export type TurnierAnsicht = Json<TurnierDetail>;
 export type KategorieAnsicht = Json<NonNullable<Awaited<ReturnType<typeof ServerLadeKategorie>>>>;
 export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus, VerwaltungsRolle };
+export type { AnmeldungZeile, SpielerTreffer, Warnung };
 type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld | MitteilungFeld;
 export type FairgateZeile = Json<ServerFairgateZeile>;
 export type { Angaben, AnsichtRolle, Feld, MitgliedStatus, Rolle, RollenListe };
@@ -64,6 +67,10 @@ export type Antwort<T> =
 	| { art: 'abgesagt' }
 	| { art: 'unpassend'; anzahl: number }
 	| { art: 'hat-anmeldungen'; anzahl: number }
+	| { art: 'warnung'; warnungen: Warnung[] }
+	| { art: 'schon-angemeldet' }
+	| { art: 'vorbereitung' }
+	| { art: 'nicht-beantragt' }
 	| { art: 'stoerung' };
 
 export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
@@ -76,6 +83,7 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 		felder?: unknown;
 		feld?: unknown;
 		anzahl?: unknown;
+		warnungen?: unknown;
 	};
 	if (status >= 200 && status < 300) return { art: 'ok', daten: koerper as T };
 	if (status === 401) return { art: 'abgemeldet' };
@@ -106,6 +114,11 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 			return { art: 'hat-anmeldungen', anzahl: k.anzahl };
 		if (k.fehler === 'vergeben' && typeof k.feld === 'string')
 			return { art: 'vergeben', feld: k.feld as Feld | 'jahr' | 'name' };
+		if (k.fehler === 'warnung' && Array.isArray(k.warnungen))
+			return { art: 'warnung', warnungen: k.warnungen as Warnung[] };
+		if (k.fehler === 'schon-angemeldet') return { art: 'schon-angemeldet' };
+		if (k.fehler === 'vorbereitung') return { art: 'vorbereitung' };
+		if (k.fehler === 'nicht-beantragt') return { art: 'nicht-beantragt' };
 	}
 	return STOERUNG;
 }
@@ -285,3 +298,69 @@ export const aendereKategorie = (
 
 export const sageKategorieAb = (id: number, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/kategorien/${id}/absagen`, {}, holen);
+
+/** A-ANMELDUNG-06: aktive Einzel-Anmeldungen der Kategorie, sortiert nach Nachname, Vorname. */
+export const ladeAnmeldungen = (kategorieId: number, holen: Holen = fetch) =>
+	lese<AnmeldungZeile[]>(`${ADMIN}/kategorien/${kategorieId}/anmeldungen`, holen);
+
+/** FR-46: von Hand anmelden; `trotzdem` nach der Rückfrage zu den Warnungen. */
+export const meldeVonHandAn = (
+	kategorieId: number,
+	mitgliedId: number,
+	trotzdem = false,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/kategorien/${kategorieId}/anmeldungen`,
+		trotzdem ? { mitgliedId, trotzdem: true } : { mitgliedId },
+		holen
+	);
+
+/** FR-46: in eine andere Einzel-Kategorie desselben Turniers verschieben. */
+export const verschiebeAnmeldung = (
+	anmeldungId: number,
+	kategorieId: number,
+	trotzdem = false,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/anmeldungen/${anmeldungId}`,
+		trotzdem ? { kategorieId, trotzdem: true } : { kategorieId },
+		holen
+	);
+
+/** FR-46: Löschen zieht die Anmeldung zurück. */
+export const loescheAnmeldung = (anmeldungId: number, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/anmeldungen/${anmeldungId}/loeschen`, {}, holen);
+
+/** FR-08: über einen Wildcard-Antrag entscheiden; der freiwillige Grund gilt nur bei Ablehnung. */
+export function entscheideAntrag(
+	anmeldungId: number,
+	bestaetigt: boolean,
+	grund: string,
+	holen: Holen = fetch
+) {
+	const text = grund.trim();
+	const inhalt = !bestaetigt && text ? { bestaetigt, grund: text } : { bestaetigt };
+	return schicke<Record<string, never>>(
+		`${ADMIN}/anmeldungen/${anmeldungId}/entscheid`,
+		inhalt,
+		holen
+	);
+}
+
+/** A-ANMELDUNG-06: aktive Mitglieder nach Namen, für das Anmelden von Hand. */
+export const sucheSpieler = (suche: string, holen: Holen = fetch) =>
+	lese<SpielerTreffer[]>(`${ADMIN}/spieler?${new URLSearchParams({ suche })}`, holen);
+
+/** Klassierung eines Spielers korrigieren (Teil 4, Ziel 3). */
+export const korrigiereKlassierung = (
+	mitgliedId: number,
+	klassierung: Klassierung,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/spieler/${mitgliedId}/klassierung`,
+		{ klassierung },
+		holen
+	);

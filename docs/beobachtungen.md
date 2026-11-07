@@ -116,6 +116,18 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-07 — Android-Test «Menü auf der Einstiegsseite» wartet unter Last vergeblich auf «MyTCO installieren»
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/bewegung.test.ts:375`, Profil `android`; wartet nach `bietetInstallationAn(page, 'dismissed')` auf die Taste «MyTCO installieren»
+
+**Beobachtung:** Lokal am 07.11. in 2 von 4 vollen Läufen rot (Timeout 30 s beim Klick), dazwischen grün, auch einzeln im vollen E2E-Lauf grün. Die Einstiegsseite war in den Branches des Tages nicht geändert. Jeder Fehlversuch kostet am Pre-Push-Hook ein ganzes `make check`.
+
+**Ursprung:** #60, Nachweisläufe und Push des Merges nach dev.
+
+**Einschätzung:** Vermutlich ein Wettlauf zwischen dem simulierten Install-Angebot und dem Rendern der Taste unter Last (parallele Worker, zusätzlicher Mailversand). Prüfen, ob die Hilfe auf ein Zeichen der Seite warten sollte, bevor sie das Angebot auslöst.
+
 ### 2026-11-06 — Speichern ohne Seitenwechsel lässt Vorgeladenes stehen (Anlass- und CM-Seite)
 
 **Thema:** App-Oberfläche
@@ -427,6 +439,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Zusammen mit dem Eintrag oben lösen: Eine eigene Datenbank pro Worktree oder pro Lauf hält die Listen klein; sonst Screenshots auf einer frisch mit `make seed` aufgesetzten Datenbank machen.
 
+**Ergänzung 2026-11-07 (#60):** Ein Wildcard-Antrag meldet alle CM-Admins (FR-47), bevor die Antwort kommt; lokal sind das 735 Testkonten, also rund 735 Mails pro Antrag. Mailpit behält nur die neuesten 500, Code-Mails paralleler Tests können dabei wegfallen, und die Antwort dauert länger. `holeMailCode` liest seither nur Mails mit dem Betreff «Dein Code für …», sonst griff ein CM-Konto die Wildcard-Meldung statt seines Codes. In der CI (frische Datenbank) unkritisch. Seit die Antwort nicht mehr auf die Meldungen wartet, verschickt der Dev-Server nach einem E2E-Lauf noch minutenlang diese Mails; das kann lokal zu wackligen Tests führen.
+
 ### 2026-11-06 — Doppel-Kategorien erlauben Jahrgang von/bis, obwohl es im Doppel keine Alterskategorien gibt
 
 **Thema:** Turnier-Verwaltung
@@ -462,6 +476,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #63, Nachweis mit echtem Push (Screenshot des Verlaufs).
 
 **Einschätzung:** Eine Kartenliste statt Tabelle wäre am Handy besser lesbar, braucht aber einen neuen Baustein im UI-Leitbild. Zusammen mit der Kategorientabelle lösen. Die Verwaltung wird vor allem am PC genutzt, darum niedrig.
+
+**Ergänzung 2026-11-07 (#60):** Die Anmeldungsliste einer Kategorie (`src/lib/verwaltung/Anmeldungsliste.svelte`) zeigt dasselbe Muster: Am Handy liegen *Jahrgang*, *Status* und *Aktionen* rechts ausserhalb, die gestapelten Tasten machen jede Zeile sehr hoch, der Name bricht mitten im Wort (Screenshot `cm-anmeldungen-liste.png` aus `tests/e2e/cm-verwaltung.test.ts`).
 
 ### 2026-11-06 — Mitteilungen zur Clubmeisterschaft fehlen noch, die Spielberechtigung aus #58 liegt jetzt auf dev
 
@@ -576,3 +592,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Etappe 3 von #43, Task 10.
 
 **Einschätzung:** Nacharbeit, sobald #60 auf `dev` ist: Vermerk «ausgetreten» in der Liste ergänzen.
+
+### 2026-11-07 — Abgelehnter Wildcard-Antrag fehlt auf der CM-Seite; wiederholtes Beantragen meldet jedes Mal allen CM-Admins
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/cm/anmeldungen.ts` → `ladeCmAnsicht`, `src/lib/server/cm/schnittstellen.ts` → `postCmWildcard`, `src/routes/clubmeisterschaft/[id]/+page.svelte`
+
+**Beobachtung:** Nach einer Ablehnung zeigt die CM-Seite des Mitglieds die Kategorie wieder mit «Wildcard beantragen», ohne Hinweis auf die Ablehnung; den Entscheid kennt es nur aus der Meldung. Beantragt und zieht ein Mitglied mehrmals zurück, geht jeder neue Antrag als Meldung an alle CM-Admins, ohne Bremse.
+
+**Ursprung:** Schluss-Review von #60 (CM Teil 4).
+
+**Einschätzung:** Klein, unter Freunden kaum ein Problem. Ein Vermerk «abgelehnt» bei der Kategorie wäre einfach; eine Bremse erst, wenn es tatsächlich vorkommt.
+
+### 2026-11-07 — Klassierung korrigieren prüft nicht, ob das Mitglied noch aktiv ist
+
+**Thema:** Turnier-Verwaltung
+
+**Fundort:** `src/lib/server/cm/verwaltung.ts` → `korrigiereKlassierung`, `src/lib/server/cm/angaben.ts` → `schreibeKlassierung`
+
+**Beobachtung:** Der CM-Admin kann die Klassierung eines ausgetretenen oder gelöschten Mitglieds ändern; `schreibeKlassierung` prüft nur, ob es das Mitglied gibt. Von Hand anmelden und die Spielersuche verlangen dagegen *aktiv*.
+
+**Ursprung:** Schluss-Review von #60 (CM Teil 4).
+
+**Einschätzung:** Harmlos (die Oberfläche bietet nur Spieler aktiver Anmeldungen an), aber uneinheitlich. Bei der nächsten Arbeit an der Klassierung `status = 'aktiv'` mitprüfen. Nachtrag (Merge mit #43): Gelöschte weist `schreibeKlassierung` ab, weil ihre Anmeldung nach dem Anmeldeschluss aktiv in der Liste stehen kann; offen bleibt nur *ausgetreten*.
