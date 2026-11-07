@@ -116,6 +116,18 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-07 — Android-Test «Menü auf der Einstiegsseite» wartet unter Last vergeblich auf «MyTCO installieren»
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/bewegung.test.ts:375`, Profil `android`; wartet nach `bietetInstallationAn(page, 'dismissed')` auf die Taste «MyTCO installieren»
+
+**Beobachtung:** Lokal am 07.11. in 2 von 4 vollen Läufen rot (Timeout 30 s beim Klick), dazwischen grün, auch einzeln im vollen E2E-Lauf grün. Die Einstiegsseite war in den Branches des Tages nicht geändert. Jeder Fehlversuch kostet am Pre-Push-Hook ein ganzes `make check`.
+
+**Ursprung:** #60, Nachweisläufe und Push des Merges nach dev.
+
+**Einschätzung:** Vermutlich ein Wettlauf zwischen dem simulierten Install-Angebot und dem Rendern der Taste unter Last (parallele Worker, zusätzlicher Mailversand). Prüfen, ob die Hilfe auf ein Zeichen der Seite warten sollte, bevor sie das Angebot auslöst.
+
 ### 2026-11-06 — Speichern ohne Seitenwechsel lässt Vorgeladenes stehen (Anlass- und CM-Seite)
 
 **Thema:** App-Oberfläche
