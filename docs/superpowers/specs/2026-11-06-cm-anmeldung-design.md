@@ -181,6 +181,50 @@ die niemand bearbeiten kann.
    lehnt ab; der Spieler bekommt den Entscheid per Mail.
 8. **Kategorie absagen** nach Verschieben oder Löschen der Anmeldungen (Teil 1, Ziel 6).
 
+**Präzisierungen vor dem Bau (07.11.2026):**
+
+- **Nur Einzel:** Teil 4 baut alles für Einzel. *Doppelpartner ändern* und *zwei «sucht
+  Partner» zusammenlegen* baut Teil 3 (#59) mit, sobald es Doppel gibt (Entscheid
+  Projektleiter).
+- **Oberfläche direkt nach dem [UI-Leitbild](../../ui-leitbild.md)**, ohne vorherigen Entwurf;
+  Screenshots am Schluss (Entscheid Projektleiter). Die Liste je Kategorie steht als Tabelle
+  der Verwaltung (Leitbild: auf schmalem Bildschirm waagrecht scrollbar) auf der bestehenden
+  Kategorieseite (Entscheid Claude).
+- **Ablehnung mit freiwilligem Grund:** Lehnt der CM-Admin einen Wildcard-Antrag ab, kann er
+  einen kurzen Grund schreiben; er steht nur in der Mail an den Spieler und wird nicht
+  gespeichert (Entscheid Projektleiter; Speichern: Entscheid Claude, Datensparsamkeit).
+- **Wildcard-Mail an alle CM-Admins:** Jeder neue Antrag geht per Mail an alle Konten mit der
+  Rolle CM-Admin; der Spieler bekommt die übliche Bestätigung mit seinen Anmeldungen, der
+  Antrag darin als *beantragt* (Entscheid Claude).
+- **Nach einer Ablehnung** darf der Spieler erneut beantragen; die abgelehnte Anmeldung bleibt
+  als *abgelehnt* stehen und zählt nicht (FR-06) (Entscheid Claude).
+- **Zurückziehen eines Antrags** durch den Spieler wie eine Abmeldung: bis zum Anmeldeschluss
+  (FR-10).
+- **Klassierung korrigieren** ändert das eine Feld beim Mitglied (Teil 2, Ziel 1). Der
+  Änderungsverlauf zeigt den CM-Admin als Urheber, mit Namen wie bei den übrigen Admins
+  (Entscheid Claude).
+- **Von Hand anmelden** sucht unter den aktiven Mitgliedern nach Namen. Fehlen beim Mitglied
+  Klassierung, Geschlecht oder Jahrgang, ist das ein Grund für die Warnung, keine Sperre. Hat
+  das Mitglied keine E-Mail-Adresse, entfällt die Mail (Entscheid Claude).
+- **Geschlecht und Jahrgang:** Der CM-Admin sieht sie bei den Spielern und in der Suche, weil
+  er sonst nicht zuordnen kann; ändern darf sie weiter nur der Mitglieder-Admin. Fehlt eine
+  Angabe, warnt MyTCO nur. Datenschutzkonzept, Datenschutzerklärung und RR-Matrix werden vor dem
+  Bau nachgeführt (Entscheid Projektleiter).
+- **CM-Admin als Spieler:** Er darf sich selbst von Hand anmelden und über den eigenen
+  Wildcard-Antrag entscheiden; Änderungsverlauf und Mails zeigen, wer es war (Entscheid
+  Projektleiter, ein Satz in Rollen und Rechte).
+- **Erst ab offener Anmeldung:** Von Hand anmelden, verschieben und entscheiden gehen erst,
+  wenn das Turnier nicht mehr *in Vorbereitung* ist, damit keine Mail zu einem Turnier geht,
+  das die Mitglieder noch nicht sehen (Entscheid Claude).
+- **Mailtexte** schreibt Claude im Stil der bestehenden Bestätigung; der Projektleiter sieht
+  sie am Schluss mit den Screenshots. Nach dem Anmeldeschluss fehlt in der Bestätigung der
+  Satz zum selbst An- und Abmelden (Entscheid Projektleiter).
+- **Wildcard-Kommentar** bleibt nach dem Entscheid gespeichert und fällt unter die Löschfrist
+  der CM-Anmeldungen, die vor dem Live-Gang festgelegt wird (Entscheid Claude).
+- **Wer was darf:** Nur der CM-Admin ändert; der MyTCO-Admin sieht dieselbe Liste nur lesend
+  (RR-07).
+- **Seed:** `make seed` ergänzt erfundene Anmeldungen, darunter einen offenen Wildcard-Antrag.
+
 ## Regeln, die sich ändern oder neu sind
 
 Nachzuführen in [Fachmodell](../../fachmodell.md), [Rollen und Rechte](../../rollen-und-rechte.md)
