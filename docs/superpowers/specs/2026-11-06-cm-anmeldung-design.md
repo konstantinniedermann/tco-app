@@ -216,7 +216,7 @@ die niemand bearbeiten kann.
   Angabe, warnt MyTCO nur. Datenschutzkonzept, Datenschutzerklärung und RR-Matrix werden vor dem
   Bau nachgeführt (Entscheid Projektleiter).
 - **CM-Admin als Spieler:** Er darf sich selbst von Hand anmelden und über den eigenen
-  Wildcard-Antrag entscheiden; die Verwaltung zeigt, wer es war (Entscheid
+  Wildcard-Antrag entscheiden; der Änderungsverlauf zeigt, wer es war (Entscheid
   Projektleiter, ein Satz in Rollen und Rechte).
 - **Erst ab offener Anmeldung:** Von Hand anmelden, verschieben und entscheiden gehen erst,
   wenn das Turnier nicht mehr *in Vorbereitung* ist, damit keine Meldung zu einem Turnier geht,
@@ -224,7 +224,7 @@ die niemand bearbeiten kann.
 - **Texte kurz und knapp:** Push, Ersatz-Mail und Oberfläche mit einem, höchstens zwei Sätzen,
   z. B. «Der CM-Admin hat dich in Herren R7–R9 angemeldet.». Push und Ersatz-Mail nennen keine
   anderen Mitglieder, auch nicht den CM-Admin oder beim Wildcard-Antrag den Spieler (DS-05;
-  Entscheid Claude). Wer es war, zeigt die Verwaltung. Wer vom CM-Admin angemeldet
+  Entscheid Claude). Wer es war, zeigt der Änderungsverlauf. Wer vom CM-Admin angemeldet
   wird, bekommt den Hinweis zu den Kontaktdaten als einen kurzen Satz. Claude schreibt die
   Texte, der Projektleiter sieht sie am Schluss mit den Screenshots (Entscheid Projektleiter).
 - **Wildcard-Kommentar** bleibt nach dem Entscheid gespeichert und fällt unter die Löschfrist
@@ -258,7 +258,8 @@ und [Anforderungen](../../anforderungen/anforderungen.md), bevor der jeweilige T
   sondern die CM-Seite (Teil 2, Ziel 1). FR-02 entsprechend anpassen, damit sie nicht doppelt
   oder schon beim Login erzwungen wird.
 - **Änderungsverlauf:** Korrekturen der Klassierung durch den CM-Verantwortlichen erscheinen mit
-  eigenem Urheber `cm` (FR-26; Schema-Änderung beim Urheber).
+  Urheber *admin* und seinem Namen, wie bei den übrigen Admins (FR-26; überholt durch die
+  Präzisierung zu Teil 4 vom 07.11.2026: kein eigener Urheber `cm`, keine Schema-Änderung).
 - **Turnier:** Übergang *Anmeldung geschlossen* → *Anmeldung offen* (wieder öffnen) ist erlaubt;
   *Anmeldung offen* gilt nur bis zum Anmeldeschluss (FR-05).
 - **Rechte:** Rolle `cm` öffnet die Verwaltung, nur den Bereich *Clubmeisterschaft* (RR-07
@@ -318,8 +319,9 @@ trotzdem zuerst ins Leitbild.
 - Export und Import mit Advantage und Swiss Tennis: offen, bis K-47 und der Datenaustausch
   geklärt sind; beide Richtungen sollen so einfach wie möglich gehen (Entscheid Projektleiter).
 - Kategorien vom Vorjahr übernehmen.
-- Benachrichtigung per Push, SMS oder WhatsApp (A-ANMELDUNG-08, -09); Teil 2 bis 4 schreiben
-  nur Mails.
+- Benachrichtigung per Push, SMS oder WhatsApp im CM-Betrieb (A-ANMELDUNG-08, -09). Teil 2
+  und 3 schreiben nur Mails; Teil 4 schickt seine Meldungen *Push, sonst E-Mail* (Präzisierung
+  vom 07.11.2026).
 - Anmeldung für ein Kind durch die Eltern (#45, Junioren); bis dahin meldet der
   CM-Verantwortliche Junioren von Hand an.
 

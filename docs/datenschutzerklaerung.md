@@ -44,6 +44,8 @@ du selbst einschaltest. Für nichts anderes.
 - Deine An- oder Abmeldung zu einem Anlass und deine Bemerkung sehen nur du, die
   Mitglieder-Admins und die MyTCO-Admins. Schreib in die Bemerkung bitte keine Angaben zur
   Gesundheit.
+- Deinen Wildcard-Antrag und seinen Kommentar sehen nur du, die CM-Admins und die MyTCO-Admins.
+  Schreib in den Kommentar bitte keine Angaben zur Gesundheit.
 - Alle Mitglieder sehen Name, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft. Wer einen
   Doppelpartner sucht, sieht die Namen der Mitglieder, die für die Kategorie in Frage kommen.
 - Deine Gegner und dein Doppelpartner sehen während der Clubmeisterschaft deine E-Mail und
@@ -56,7 +58,7 @@ du selbst einschaltest. Für nichts anderes.
 **Wo:** Die Daten liegen bei Infomaniak in der Schweiz; E-Mails versendet [E-Mail-Dienst].
 Push-Nachrichten enthalten keine Daten anderer Mitglieder (zum Zustellen siehe «Mitteilungen»).
 
-**Mitteilungen:** Der Mitglieder-Admin kann dir Mitteilungen zu Anlässen und zum Verein schicken, als Push und als E-Mail. Push gibt es nur, wenn du ihn auf einem Gerät selbst einschaltest. Die Nachricht leitet Apple, Google, Mozilla oder Microsoft (je nach deinem Gerät) verschlüsselt weiter; sie sehen, dass eine Nachricht für dein Gerät eintrifft, aber nicht ihren Inhalt. MyTCO speichert dafür je Gerät die Adresse beim Push-Dienst und zwei Schlüssel. Das Abo endet mit dem Abmelden, wenn du Push abschaltest, und mit deinem Konto. Im Profil stellst du Mitteilungen je Thema (Anlässe, Clubmeisterschaft, Verein) ab. Bestätigungen und Codes bleiben davon unberührt. Wer wann welche Mitteilung geschickt hat, sehen der Mitglieder-Admin und, nur lesend, der MyTCO-Admin ein Jahr lang, ohne Namen der Empfänger.
+**Mitteilungen:** Der Mitglieder-Admin kann dir Mitteilungen zu Anlässen und zum Verein schicken, als Push und als E-Mail. Push gibt es nur, wenn du ihn auf einem Gerät selbst einschaltest. Die Nachricht leitet Apple, Google, Mozilla oder Microsoft (je nach deinem Gerät) verschlüsselt weiter; sie sehen, dass eine Nachricht für dein Gerät eintrifft, aber nicht ihren Inhalt. MyTCO speichert dafür je Gerät die Adresse beim Push-Dienst und zwei Schlüssel. Das Abo endet mit dem Abmelden, wenn du Push abschaltest, und mit deinem Konto. Im Profil stellst du Mitteilungen je Thema (Anlässe, Clubmeisterschaft, Verein) ab. Bestätigungen, Codes und persönliche Meldungen zu deinen CM-Anmeldungen bleiben davon unberührt. Wer wann welche Mitteilung geschickt hat, sehen der Mitglieder-Admin und, nur lesend, der MyTCO-Admin ein Jahr lang, ohne Namen der Empfänger.
 
 **Wie lange:** Solange du Mitglied bist. Nach einem Austritt wird dein Konto gesperrt; deine
 Daten bleiben noch eine Frist lang, falls du zurückkommst [Frist, **Vorschlag K-38:** 1 Jahr], und werden
