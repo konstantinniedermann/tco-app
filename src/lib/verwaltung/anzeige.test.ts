@@ -6,7 +6,12 @@ import {
 	feldMeldung,
 	geaendertText,
 	neueAngaben,
-	plakette
+	plakette,
+	datumText,
+	datumZeitText,
+	wiedereintrittBis,
+	loeschungAm,
+	auskunftTitel
 } from './anzeige.ts';
 
 describe('Texte der Verwaltung', () => {
@@ -79,5 +84,32 @@ describe('Texte der Verwaltung', () => {
 			'lea@example.org'
 		]);
 		expect(neueAngaben({ felder: ['telefon'], angaben })).toEqual(['(leer)']);
+	});
+});
+
+describe('Datumstexte der Mitgliedschaft (Schweizer Zeit)', () => {
+	it('Datum als «7.11.2026», nach Zürcher Kalender', () => {
+		expect(datumText('2026-11-07T10:00:00Z')).toBe('7.11.2026');
+		expect(datumText('2026-11-07T23:30:00Z')).toBe('8.11.2026');
+		expect(datumText('2026-07-31T22:30:00Z')).toBe('1.8.2026');
+	});
+
+	it('Datum mit Zeit als «7.11.2026, 09:12»', () => {
+		expect(datumZeitText('2026-11-07T08:12:00Z')).toBe('7.11.2026, 09:12');
+	});
+
+	it('Frist des Wiedereintritts: ein Kalenderjahr, 29. Februar wird 1. März', () => {
+		expect(wiedereintrittBis(new Date('2026-11-07T10:00:00Z'))).toBe('7.11.2027');
+		expect(wiedereintrittBis(new Date('2026-11-07T23:30:00Z'))).toBe('8.11.2027');
+		expect(wiedereintrittBis(new Date('2028-02-29T10:00:00Z'))).toBe('1.3.2029');
+	});
+
+	it('Löschung nach der Bedenkzeit: sieben Tage', () => {
+		expect(loeschungAm(new Date('2026-11-07T10:00:00Z'))).toBe('14.11.2026');
+		expect(loeschungAm(new Date('2026-10-25T10:00:00Z'))).toBe('1.11.2026');
+	});
+
+	it('Titel der Auskunft: Vorname Nachname', () => {
+		expect(auskunftTitel({ vorname: 'Lea', nachname: 'Beispiel' })).toBe('Lea Beispiel');
 	});
 });
