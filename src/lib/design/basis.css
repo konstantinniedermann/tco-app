@@ -1745,4 +1745,33 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	.druckseite .tabelle {
 		overflow: visible;
 	}
+
+	/* Ein Block über die ganze Papierbreite: kein Raster der Verwaltung, keine feste Höhe, weisser Grund */
+	html,
+	body,
+	.app,
+	.verwaltung,
+	.inhalt {
+		background: var(--farbe-flaeche);
+	}
+
+	.schale,
+	.rollbereich {
+		height: auto;
+		overflow: visible;
+	}
+
+	.app,
+	.verwaltung {
+		display: block;
+		min-height: 0;
+	}
+
+	.verwaltung .inhalt,
+	.inhalt {
+		width: 100%;
+		max-width: none;
+		margin: 0;
+		padding-inline: 0;
+	}
 }

@@ -140,6 +140,10 @@ test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in d
 	await expect(page.locator('.ansicht-band')).not.toBeVisible();
 	await expect(page.locator('.seitenleiste')).not.toBeVisible();
 	await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+	// Der Inhalt füllt die Seite (kein schmaler Streifen im Raster der Verwaltung).
+	const breite = page.viewportSize()!.width;
+	const druck = await page.locator('.druckseite').boundingBox();
+	expect(druck!.width).toBeGreaterThanOrEqual(breite * 0.8);
 	await bild(page, projekt, 'auskunft-druck', true);
 	// WebKit meldet beim Screenshot sein eigenes Stylesheet als CSP-Verstoss (siehe hilfen/seite.ts).
 	expect(

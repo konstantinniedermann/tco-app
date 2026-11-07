@@ -400,7 +400,7 @@ Seite *Auskunft*.
   links fett, Tabellenkopf in `--farbe-marke-zart`.
 - **Tasten:** «‹ Zurück» und «Drucken oder als PDF speichern» tragen `.nicht-drucken`.
 - **Druck:** Unter `@media print` verschwinden `.nicht-drucken`, `.seitenleiste` und `.kopf`; der
-  Inhalt nutzt die ganze Breite.
+  Inhalt nutzt die ganze Breite: Rahmen und Raster der Verwaltung werden zu einem Block auf weissem Grund, ohne feste Höhe.
 
 ## Sprache
 
