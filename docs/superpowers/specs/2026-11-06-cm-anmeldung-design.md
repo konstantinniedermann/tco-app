@@ -191,11 +191,16 @@ die niemand bearbeiten kann.
   der Verwaltung (Leitbild: auf schmalem Bildschirm waagrecht scrollbar) auf der bestehenden
   Kategorieseite (Entscheid Claude).
 - **Ablehnung mit freiwilligem Grund:** Lehnt der CM-Admin einen Wildcard-Antrag ab, kann er
-  einen kurzen Grund schreiben; er steht nur in der Mail an den Spieler und wird nicht
+  einen kurzen Grund schreiben; er steht nur in der Meldung an den Spieler und wird nicht
   gespeichert (Entscheid Projektleiter; Speichern: Entscheid Claude, Datensparsamkeit).
-- **Wildcard-Mail an alle CM-Admins:** Jeder neue Antrag geht per Mail an alle Konten mit der
-  Rolle CM-Admin; der Spieler bekommt die übliche Bestätigung mit seinen Anmeldungen, der
-  Antrag darin als *beantragt* (Entscheid Claude).
+- **Push statt Mail:** Alle Meldungen aus Teil 4 laufen über den Weg *Push, sonst E-Mail*
+  (FR-44): ein Push an jedes Gerät mit Abo, eine E-Mail nur, wer keines hat oder bei wem jeder
+  Push scheiterte. Das betrifft den neuen Wildcard-Antrag (an alle Konten mit der Rolle
+  CM-Admin), den Entscheid und jede Änderung durch den CM-Admin (an die betroffenen Spieler).
+  Die Bestätigung nach der eigenen An- oder Abmeldung aus Teil 2 bleibt eine Mail mit allen
+  eigenen Anmeldungen, auch nach einem eigenen Wildcard-Antrag (Entscheid Projektleiter). Die
+  Themen-Schalter (FR-41) gelten nicht: Es sind persönliche Meldungen wie Bestätigungen
+  (Entscheid Claude). Ziel 5 und 7 oben sind damit überholt, wo sie «Mail» sagen.
 - **Nach einer Ablehnung** darf der Spieler erneut beantragen; die abgelehnte Anmeldung bleibt
   als *abgelehnt* stehen und zählt nicht (FR-06) (Entscheid Claude).
 - **Zurückziehen eines Antrags** durch den Spieler wie eine Abmeldung: bis zum Anmeldeschluss
@@ -205,20 +210,21 @@ die niemand bearbeiten kann.
   (Entscheid Claude).
 - **Von Hand anmelden** sucht unter den aktiven Mitgliedern nach Namen. Fehlen beim Mitglied
   Klassierung, Geschlecht oder Jahrgang, ist das ein Grund für die Warnung, keine Sperre. Hat
-  das Mitglied keine E-Mail-Adresse, entfällt die Mail (Entscheid Claude).
+  das Mitglied weder Push-Abo noch E-Mail-Adresse, entfällt die Meldung (Entscheid Claude).
 - **Geschlecht und Jahrgang:** Der CM-Admin sieht sie bei den Spielern und in der Suche, weil
   er sonst nicht zuordnen kann; ändern darf sie weiter nur der Mitglieder-Admin. Fehlt eine
   Angabe, warnt MyTCO nur. Datenschutzkonzept, Datenschutzerklärung und RR-Matrix werden vor dem
   Bau nachgeführt (Entscheid Projektleiter).
 - **CM-Admin als Spieler:** Er darf sich selbst von Hand anmelden und über den eigenen
-  Wildcard-Antrag entscheiden; Änderungsverlauf und Mails zeigen, wer es war (Entscheid
+  Wildcard-Antrag entscheiden; Änderungsverlauf und Meldungen zeigen, wer es war (Entscheid
   Projektleiter, ein Satz in Rollen und Rechte).
 - **Erst ab offener Anmeldung:** Von Hand anmelden, verschieben und entscheiden gehen erst,
-  wenn das Turnier nicht mehr *in Vorbereitung* ist, damit keine Mail zu einem Turnier geht,
+  wenn das Turnier nicht mehr *in Vorbereitung* ist, damit keine Meldung zu einem Turnier geht,
   das die Mitglieder noch nicht sehen (Entscheid Claude).
-- **Mailtexte** schreibt Claude im Stil der bestehenden Bestätigung; der Projektleiter sieht
-  sie am Schluss mit den Screenshots. Nach dem Anmeldeschluss fehlt in der Bestätigung der
-  Satz zum selbst An- und Abmelden (Entscheid Projektleiter).
+- **Texte kurz und knapp:** Push, Ersatz-Mail und Oberfläche mit einem, höchstens zwei Sätzen,
+  z. B. «Hanna Muster hat dich in Herren R7–R9 angemeldet.». Wer vom CM-Admin angemeldet
+  wird, bekommt den Hinweis zu den Kontaktdaten als einen kurzen Satz. Claude schreibt die
+  Texte, der Projektleiter sieht sie am Schluss mit den Screenshots (Entscheid Projektleiter).
 - **Wildcard-Kommentar** bleibt nach dem Entscheid gespeichert und fällt unter die Löschfrist
   der CM-Anmeldungen, die vor dem Live-Gang festgelegt wird (Entscheid Claude).
 - **Wer was darf:** Nur der CM-Admin ändert; der MyTCO-Admin sieht dieselbe Liste nur lesend
