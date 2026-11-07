@@ -180,7 +180,8 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; klappt weich auf und zu (`--dauer-mittel`) |
 | Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste; ist der ganze Eintrag ein Link, gedrückt `--farbe-marke-zart` und leicht verkleinert und nicht markierbar; eine Kachel mit eigener Aktion bleibt ruhig und markierbar |
 | Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt" oder „1 von 3 Anmeldungen" |
-| Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05) |
+| Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05). Zustände der Mitgliedschaft: *ausgetreten* = `.plakette`, *wird gelöscht* = `.plakette-gesperrt` |
+| Druckseite | `.druckseite` | nur Verwaltung: Auskunft über die Daten eines Mitglieds, siehe [Druckseite](#druckseite-auskunft); Klasse `.nicht-drucken` blendet unter `@media print` aus |
 | Anleitung | `.anleitung` | gezeichnetes Handy (`.anleitung-film`, ein `.anleitung-bild` pro Schritt), darunter die Taste (`.anleitung-taste`) und die nummerierten Schritte (`.anleitung-schritte`), am Schluss ein Eintrag „Fertig!" (`.anleitung-fertig`, mit ✓ statt Nummer); die Zeichnung ist für Screenreader verborgen, die Schritte tragen die Bedeutung; ein Schritt gehört zu genau einem Bild; in der Zeichnung nur Beschriftungen, die in der Hilfe von Apple bzw. Google belegt sind, sonst graue Balken (`.anleitung-eintrag.leer`); der Tipp-Kreis (`.anleitung-tipp`) zeigt, wo man tippt; Bewegung nach UI-09 |
 | Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen"). Einzige Ausnahme ist *Nur ansehen*: oben auf Verwaltungsseiten, auf denen die eigene Rolle etwas nur lesen darf, «**Nur ansehen.** Ändern kann hier nur der <Rolle>.», ohne Aktion; er bleibt, solange die Rolle nur liest. In der Ansicht steht er nicht, dort sagt es das Band |
 | Nur lesen | `fieldset.nur-lesen` | Formular, das die eigene Rolle oder die Ansicht nur lesen lässt: die Felder stehen in `<fieldset disabled class="nur-lesen">` (ohne Rand und Abstand, Text in `--farbe-text`, damit er gut lesbar bleibt); Absende- und Aktions-Tasten fehlen, auch «Weitere …», «Entfernen», «… löschen» und Tasten zum Anlegen. In der Ansicht fehlen in der ganzen App alle Tasten, die etwas speichern (Profil, Antwort auf einen Anlass, Passkey); *Abmelden* bleibt |
@@ -384,6 +385,22 @@ passt.
 | `--brief-fenster-breite` | `80mm` | Breite des Adressfelds |
 | `--brief-qr` | `35mm` | Kantenlänge des QR-Codes |
 | `--brief-schrift` | `12pt` | Grundschrift des Briefs (1 rem auf Papier) |
+
+## Druckseite (Auskunft)
+
+Die Auskunft über die Daten eines Mitglieds (DS-07) ist eine Seite der Verwaltung, die für den
+Druck oder als PDF gedacht ist. Quelle des Entwurfs: Design «Austritt und Löschen», Variante A,
+Seite *Auskunft*.
+
+- **Fläche:** `.druckseite` hat weissen Grund (`--farbe-flaeche`) und Text in `--farbe-text`; auf
+  dem Bildschirm mit Innenabstand, auf Papier ohne.
+- **Kopfzeile:** Wappen auf `--farbe-marke` in einem Quadrat mit `--radius`, daneben «MyTCO · TC Olten»,
+  darunter Titel und Untertitel.
+- **Tabellen:** Abschnitt als `<h2>` mit Tabelle darunter; 1 px Linien in `--farbe-rand`, Bezeichnung
+  links fett, Tabellenkopf in `--farbe-marke-zart`.
+- **Tasten:** «‹ Zurück» und «Drucken oder als PDF speichern» tragen `.nicht-drucken`.
+- **Druck:** Unter `@media print` verschwinden `.nicht-drucken`, `.seitenleiste` und `.kopf`; der
+  Inhalt nutzt die ganze Breite.
 
 ## Sprache
 

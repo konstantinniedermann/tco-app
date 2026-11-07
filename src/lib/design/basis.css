@@ -1673,3 +1673,67 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		margin: 0;
 	}
 }
+
+/* Druckseite (Auskunft): weisser Grund, Tabellen mit Linien in --farbe-rand */
+.druckseite {
+	background: var(--farbe-flaeche);
+	color: var(--farbe-text);
+	padding: var(--abstand-5);
+	border-radius: var(--radius);
+	box-shadow: var(--schatten-karte);
+}
+
+.druckseite-kopf {
+	display: flex;
+	align-items: center;
+	gap: var(--abstand-3);
+	margin-bottom: var(--abstand-4);
+}
+
+.druckseite-wappen {
+	display: inline-flex;
+	background: var(--farbe-marke);
+	border-radius: var(--radius);
+	padding: var(--abstand-2);
+}
+
+.druckseite h2 {
+	margin: var(--abstand-5) 0 var(--abstand-2);
+	font-size: var(--groesse-gross);
+}
+
+.druckseite table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: var(--groesse-klein);
+	margin-bottom: var(--abstand-5);
+}
+
+.druckseite th,
+.druckseite td {
+	text-align: left;
+	vertical-align: top;
+	padding: var(--abstand-2);
+	border-bottom: var(--rand-duenn) solid var(--farbe-rand);
+}
+
+.druckseite tbody th {
+	width: 34%;
+}
+
+.druckseite thead th {
+	background: var(--farbe-marke-zart);
+}
+
+@media print {
+	.nicht-drucken,
+	.seitenleiste,
+	.kopf {
+		display: none;
+	}
+
+	.druckseite {
+		padding: 0;
+		box-shadow: none;
+	}
+}
