@@ -68,7 +68,8 @@ Name in vergangenen Resultaten und bei deinen Anmeldungen zur Clubmeisterschaft;
 nach Beginn des Anlasses [**Vorschlag K-50**].
 
 Auf Wunsch erhältst du eine Auskunft über alle Daten, die wir von dir gespeichert haben.
-Wildcard-Anträge und ihre Kommentare stehen nicht darin; darüber geben dir die CM-Admins Auskunft.
+Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge und
+zurückgezogene Anmeldungen geben dir die CM-Admins Auskunft.
 
 **Login:** Du loggst dich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 dein Gerät das Login mit einem Cookie, bis du MyTCO ein Jahr nicht genutzt hast oder dich

@@ -8,6 +8,11 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Auskunft: Von der Clubmeisterschaft zeigt sie nur noch bestätigte Anmeldungen, ohne Status und
+  Wildcard-Kommentar, weil der Mitglieder-Admin Wildcard-Anträge nicht sieht; die übrigen gibt auf
+  Wunsch der CM-Admin bekannt. Doku-Abgleich vor dem Release: Datenschutz, README, arc42,
+  Fachmodell, Glossar, Testkonzept, Betrieb (Löschlauf, `ZEITGEBER` nur lokal und im E2E).
+
 ## 0.11.0 — Austritt, Löschen und Auskunft
 
 - Austritt, Löschen, Auskunft und Löschfristen (#43, Etappe 3): Der Mitglieder-Admin erfasst Austritt
