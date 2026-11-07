@@ -427,7 +427,7 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Zusammen mit dem Eintrag oben lösen: Eine eigene Datenbank pro Worktree oder pro Lauf hält die Listen klein; sonst Screenshots auf einer frisch mit `make seed` aufgesetzten Datenbank machen.
 
-**Ergänzung 2026-11-07 (#60):** Ein Wildcard-Antrag meldet alle CM-Admins (FR-47), bevor die Antwort kommt; lokal sind das 735 Testkonten, also rund 735 Mails pro Antrag. Mailpit behält nur die neuesten 500, Code-Mails paralleler Tests können dabei wegfallen, und die Antwort dauert länger. `holeMailCode` liest seither nur Mails mit dem Betreff «Dein Code für …», sonst griff ein CM-Konto die Wildcard-Meldung statt seines Codes. In der CI (frische Datenbank) unkritisch.
+**Ergänzung 2026-11-07 (#60):** Ein Wildcard-Antrag meldet alle CM-Admins (FR-47), bevor die Antwort kommt; lokal sind das 735 Testkonten, also rund 735 Mails pro Antrag. Mailpit behält nur die neuesten 500, Code-Mails paralleler Tests können dabei wegfallen, und die Antwort dauert länger. `holeMailCode` liest seither nur Mails mit dem Betreff «Dein Code für …», sonst griff ein CM-Konto die Wildcard-Meldung statt seines Codes. In der CI (frische Datenbank) unkritisch. Seit die Antwort nicht mehr auf die Meldungen wartet, verschickt der Dev-Server nach einem E2E-Lauf noch minutenlang diese Mails; das kann lokal zu wackligen Tests führen.
 
 ### 2026-11-06 — Doppel-Kategorien erlauben Jahrgang von/bis, obwohl es im Doppel keine Alterskategorien gibt
 

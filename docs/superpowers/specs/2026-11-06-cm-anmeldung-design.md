@@ -218,6 +218,10 @@ die niemand bearbeiten kann.
 - **CM-Admin als Spieler:** Er darf sich selbst von Hand anmelden und über den eigenen
   Wildcard-Antrag entscheiden; der Änderungsverlauf zeigt, wer es war (Entscheid
   Projektleiter, ein Satz in Rollen und Rechte).
+- **Änderungsverlauf neutral:** Von Hand anmelden, verschieben, löschen und entscheiden erzeugen
+  denselben Eintrag «CM-Anmeldung geändert», ohne Kategorie, Wildcard oder Entscheid. Den
+  Verlauf sieht auch der Mitglieder-Admin; von einem Wildcard-Antrag erfahren nur Spieler,
+  CM-Admins und MyTCO-Admins (Entscheid Projektleiter).
 - **Erst ab offener Anmeldung:** Von Hand anmelden, verschieben und entscheiden gehen erst,
   wenn das Turnier nicht mehr *in Vorbereitung* ist, damit keine Meldung zu einem Turnier geht,
   das die Mitglieder noch nicht sehen (Entscheid Claude).

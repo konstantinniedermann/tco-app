@@ -111,7 +111,7 @@ Beim MyTCO-Admin heisst **L**: in der Verwaltung lesen, nicht absenden; als Mitg
 daneben die Rechte der Spalte *Mitglied*.
 
 Der CM-Admin darf sich selbst von Hand anmelden und über den eigenen Wildcard-Antrag entscheiden;
-sein Name steht im Änderungsverlauf.
+sein Name steht im Änderungsverlauf, neutral als «CM-Anmeldung geändert».
 
 ## Später
 
