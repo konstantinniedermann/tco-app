@@ -1,4 +1,5 @@
-// Schnittstellen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01…05). Alles nur mit Sitzung.
+// Schnittstellen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01…05, A-ANMELDUNG-10). Alles
+// nur mit Sitzung.
 import type { RequestEvent } from '@sveltejs/kit';
 import { parseId } from '../parse-id.ts';
 import type { Db } from '../db/index.ts';
@@ -10,8 +11,10 @@ import {
 	type Ereignis
 } from '../login/schnittstellen.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
+import { cmAdmins } from '../mitteilung/meldung.ts';
 import { trageCmAngabenNach } from './angaben.ts';
 import {
+	beantrageWildcard,
 	eigeneKategorien,
 	ladeCmAnsicht,
 	laufendeTurniere,
@@ -24,6 +27,8 @@ import type { BestaetigungInhalt } from './mail.ts';
 export type CmDienste = {
 	db: Db;
 	bestaetigung: (an: string, i: BestaetigungInhalt) => Promise<void>;
+	/** FR-47: persönliche Meldung, Push, sonst E-Mail; wirft nie. */
+	melde: (mitgliedIds: number[], m: { titel: string; text: string; pfad: string }) => Promise<void>;
 	jetzt?: () => Date;
 };
 export type CmEreignis = Ereignis & Pick<RequestEvent, 'params'>;
@@ -78,14 +83,24 @@ export function postCmAngaben(d: CmDienste, e: CmEreignis): Promise<Response> {
 	});
 }
 
-const FEHLER = ['geschlossen', 'voll', 'passt-nicht', 'schon-angemeldet', 'angaben-fehlen'];
+const FEHLER = [
+	'geschlossen',
+	'voll',
+	'passt-nicht',
+	'keine-wildcard',
+	'schon-angemeldet',
+	'angaben-fehlen'
+];
+
+/** FR-08: Höchstlänge des Wildcard-Kommentars (nach `trim`). */
+const KOMMENTAR_MAX = 300;
 
 // Nach dem Speichern: neue Ansicht und, erst danach, die Bestätigung (wirft nie).
 async function antwortMitMail(
 	d: CmDienste,
 	konto: AngemeldetesKonto,
 	bezug: Bezug,
-	aktion: 'an' | 'ab',
+	aktion: BestaetigungInhalt['aktion'],
 	t: Date
 ): Promise<Response> {
 	const ansicht = await ladeCmAnsicht(d.db, bezug.turnierId, konto.mitgliedId, t);
@@ -128,5 +143,42 @@ export function postCmAbmeldung(d: CmDienste, e: CmEreignis): Promise<Response> 
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r === 'geschlossen') return antwort(409, { fehler: 'geschlossen' });
 		return antwortMitMail(d, konto, bezug, 'ab', t);
+	});
+}
+
+/**
+ * A-ANMELDUNG-10, FR-08: Wildcard-Antrag mit Pflichtkommentar. Danach die Bestätigung an den
+ * Spieler und eine Meldung an die CM-Admins (FR-47), DS-05: ohne Namen des Spielers.
+ */
+export function postCmWildcard(d: CmDienste, e: CmEreignis): Promise<Response> {
+	return aendernd(e, async (konto) => {
+		const id = parseId(e.params.id);
+		if (id === null) return nichtGefunden();
+		const roh = (await leseKoerper(e)).kommentar;
+		const kommentar = typeof roh === 'string' ? roh.trim() : '';
+		if (kommentar.length === 0 || kommentar.length > KOMMENTAR_MAX) {
+			return antwort(400, {
+				fehler: 'eingabe',
+				felder: {
+					kommentar:
+						kommentar.length === 0
+							? 'Bitte schreib kurz, warum du hier spielen möchtest.'
+							: `Höchstens ${KOMMENTAR_MAX} Zeichen.`
+				}
+			});
+		}
+		const bezug = await bezugDerKategorie(d.db, id);
+		if (!bezug) return nichtGefunden();
+		const t = jetzt(d);
+		const r = await beantrageWildcard(d.db, id, konto.mitgliedId, kommentar, t);
+		if (r === 'nicht-gefunden') return nichtGefunden();
+		if (r !== 'ok') return antwort(409, { fehler: FEHLER.includes(r) ? r : 'geschlossen' });
+		const a = await antwortMitMail(d, konto, bezug, 'antrag', t);
+		await d.melde(await cmAdmins(d.db), {
+			titel: 'Wildcard-Antrag',
+			text: `Neuer Wildcard-Antrag für «${bezug.kategorie}».`,
+			pfad: `/verwaltung/turniere/${bezug.turnierId}/kategorien/${id}`
+		});
+		return a;
 	});
 }

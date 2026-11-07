@@ -1,9 +1,9 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { mitglied } from '../db/schema.ts';
+import { anmeldung, anmeldungSpieler, mitglied } from '../db/schema.ts';
 import { erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../turnier/turniere.ts';
 import type { BestaetigungInhalt } from './mail.ts';
@@ -14,6 +14,7 @@ import {
 	postCmAbmeldung,
 	postCmAngaben,
 	postCmAnmeldung,
+	postCmWildcard,
 	type CmDienste
 } from './schnittstellen.ts';
 
@@ -38,16 +39,22 @@ afterEach(() => {
 
 const SITZUNG_ZEIT = new Date('2026-11-02T12:00:00Z');
 
+type Meldung = { titel: string; text: string; pfad: string };
+
 function baue(jetzt: Date) {
 	const mails: { an: string; i: BestaetigungInhalt }[] = [];
+	const meldungen: { ids: number[]; m: Meldung }[] = [];
 	const d: CmDienste = {
 		db,
 		bestaetigung: async (an, i) => {
 			mails.push({ an, i });
 		},
+		melde: async (ids, m) => {
+			meldungen.push({ ids, m });
+		},
 		jetzt: () => jetzt
 	};
-	return { d, mails };
+	return { d, mails, meldungen };
 }
 
 /** Offenes Turnier in freiem Jahr mit Herren-Kategorien R1–R5; `jetzt` liegt vor dem Anmeldeschluss. */
@@ -104,7 +111,8 @@ describe('Schnittstellen der CM (Mitglied)', () => {
 			['GET', getCmAnsicht],
 			['POST', postCmAngaben],
 			['POST', postCmAnmeldung],
-			['POST', postCmAbmeldung]
+			['POST', postCmAbmeldung],
+			['POST', postCmWildcard]
 		] as const;
 		for (const [method, fn] of alle) {
 			const r = await fn(d, ereignis({ method, body: {}, params: { id: '1' } }));
@@ -139,7 +147,9 @@ describe('Schnittstellen der CM (Mitglied)', () => {
 		expect(r.status).toBe(200);
 		const ansicht = await r.json();
 		expect(ansicht.turnier.anzahl).toBe(1);
-		expect(ansicht.eigene).toEqual([{ anmeldungId: expect.any(Number), kategorie: 'Herren A' }]);
+		expect(ansicht.eigene).toEqual([
+			{ anmeldungId: expect.any(Number), kategorie: 'Herren A', status: 'bestaetigt' }
+		]);
 		expect(mails).toEqual([
 			{
 				an: m.email,
@@ -235,6 +245,7 @@ describe('Schnittstellen der CM (Mitglied)', () => {
 		const d: CmDienste = {
 			db,
 			jetzt: () => t.jetzt,
+			melde: async () => {},
 			bestaetigung: erstelleBestaetigung({
 				kontakt: 'kontakt@example.org',
 				mailer: async () => {
@@ -249,5 +260,101 @@ describe('Schnittstellen der CM (Mitglied)', () => {
 		// SI-05: nur die feste Zeile, nichts vom Fehler.
 		expect(logs[0].mock.calls).toEqual([['Bestätigungs-Mail nicht versandt']]);
 		logs[0].mockClear();
+	});
+
+	test('A-ANMELDUNG-10, FR-08, FR-47: Wildcard beantragen schickt die Bestätigung und meldet den CM-Admins ohne Namen', async () => {
+		const t = await turnier(['Herren A']);
+		const [k] = t.kategorien;
+		const { d, mails, meldungen } = baue(t.jetzt);
+		const hanna = await legeMitgliedAn(db, { vorname: 'Hanna', rollen: ['cm'] });
+		const m = await mitgliedMit({ geschlecht: 'm', jahrgang: 1990, klassierung: 'R8' });
+		const beantrage = (body: unknown, kategorie = k, konto: object = m.konto) =>
+			postCmWildcard(
+				d,
+				ereignis({ params: { id: String(kategorie) }, body, konto: konto as never })
+			);
+
+		const vorher = await (
+			await getCmAnsicht(
+				d,
+				ereignis({ method: 'GET', params: { id: String(t.id) }, konto: m.konto })
+			)
+		).json();
+		expect(vorher.wildcard).toEqual([
+			expect.objectContaining({ id: k, name: 'Herren A', anmeldungId: null })
+		]);
+
+		// Kommentar Pflicht, 1–300 Zeichen nach trim.
+		for (const body of [
+			{},
+			{ kommentar: '   ' },
+			{ kommentar: 7 },
+			{ kommentar: 'x'.repeat(301) }
+		]) {
+			const r = await beantrage(body);
+			expect([r.status, await r.json()]).toEqual([
+				400,
+				{ fehler: 'eingabe', felder: { kommentar: expect.any(String) } }
+			]);
+		}
+		expect([mails, meldungen]).toEqual([[], []]);
+
+		const r = await beantrage({ kommentar: '  Ich möchte mich mit Stärkeren messen.  ' });
+		expect(r.status).toBe(200);
+		const ansicht = await r.json();
+		expect(ansicht.eigene).toEqual([
+			{ anmeldungId: expect.any(Number), kategorie: 'Herren A', status: 'beantragt' }
+		]);
+		expect(ansicht.wildcard).toEqual([
+			expect.objectContaining({ id: k, anmeldungId: ansicht.eigene[0].anmeldungId })
+		]);
+		const [zeile] = await db
+			.select({ kommentar: anmeldung.kommentar, status: anmeldung.status })
+			.from(anmeldung)
+			.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
+			.where(and(eq(anmeldung.kategorieId, k), eq(anmeldungSpieler.mitgliedId, m.mitgliedId)));
+		expect(zeile).toEqual({
+			kommentar: 'Ich möchte mich mit Stärkeren messen.',
+			status: 'beantragt'
+		});
+		expect(mails).toEqual([
+			{
+				an: m.email,
+				i: {
+					turniername: `Clubmeisterschaft ${t.jahr}`,
+					aktion: 'antrag',
+					kategorie: 'Herren A',
+					eigene: ['Herren A (beantragt)'],
+					anmeldeschluss: `${t.jahr}-05-31`
+				}
+			}
+		]);
+		expect(meldungen).toHaveLength(1);
+		expect(meldungen[0].ids).toContain(hanna.mitgliedId);
+		expect(meldungen[0].ids).not.toContain(m.mitgliedId);
+		// DS-05: ohne Namen des Spielers.
+		expect(meldungen[0].m).toEqual({
+			titel: 'Wildcard-Antrag',
+			text: 'Neuer Wildcard-Antrag für «Herren A».',
+			pfad: `/verwaltung/turniere/${t.id}/kategorien/${k}`
+		});
+
+		const nochmals = await beantrage({ kommentar: 'Nochmals.' });
+		expect([nochmals.status, await nochmals.json()]).toEqual([409, { fehler: 'schon-angemeldet' }]);
+		const r3 = await mitgliedMit();
+		const passt = await beantrage({ kommentar: 'Bitte.' }, k, r3.konto);
+		expect([passt.status, await passt.json()]).toEqual([409, { fehler: 'keine-wildcard' }]);
+		const weg = await beantrage({ kommentar: 'Bitte.' }, 2_000_000_000);
+		expect(weg.status).toBe(404);
+		expect([mails.length, meldungen.length]).toEqual([1, 1]);
+
+		// Zurückziehen = abmelden, mit der gewohnten Bestätigung.
+		const ab = await postCmAbmeldung(
+			d,
+			ereignis({ params: { id: String(ansicht.eigene[0].anmeldungId) }, konto: m.konto })
+		);
+		expect(ab.status).toBe(200);
+		expect(mails[1].i).toMatchObject({ aktion: 'ab', kategorie: 'Herren A', eigene: [] });
+		expect(meldungen).toHaveLength(1);
 	});
 });
