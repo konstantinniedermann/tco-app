@@ -8,6 +8,15 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Austritt, Löschen, Auskunft und Löschfristen (#43, Etappe 3): Der Mitglieder-Admin erfasst Austritt
+  und Wiedereintritt, merkt ein Mitglied zum Löschen vor (7 Tage Bedenkzeit, Anzeige «wird gelöscht»,
+  rückgängig machbar) und druckt die Auskunft mit allen gespeicherten Daten (steht im Änderungsverlauf).
+  Austritt und Vormerken sperren das Login und ziehen offene Anmeldungen zurück. Ein täglicher
+  Zeitgeber der App löscht ausgetretene Mitglieder nach einem Jahr (nur der Name bleibt), den
+  Änderungsverlauf nach 12 Monaten und Antworten zu Anlässen ein Jahr nach dem Anlass; Verweise auf
+  Gelöschte erscheinen als «gelöschtes Konto». Der letzte MyTCO-Admin kann weder austreten noch
+  vorgemerkt werden (RR-03).
+
 ## 0.9.1 — Testserver mit festem Namen je Rolle
 
 - Testserver im WLAN: `make dev-handy` meldet je Rolle einen festen Namen an —

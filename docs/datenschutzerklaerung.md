@@ -59,7 +59,7 @@ Push-Nachrichten enthalten keine Daten anderer Mitglieder (zum Zustellen siehe �
 **Wie lange:** Solange du Mitglied bist. Nach einem Austritt wird dein Konto gesperrt; deine
 Daten bleiben noch eine Frist lang, falls du zurückkommst [Frist, **Vorschlag K-38:** 1 Jahr], und werden
 dann gelöscht. Löscht der Verein dein Mitglied, zum Beispiel auf deinen Wunsch, ist dein Konto
-sofort gesperrt, und deine Daten werden nach einer Woche gelöscht. In beiden Fällen bleibt dein
+sofort gesperrt, und deine Daten werden nach einer Woche gelöscht. Auf Wunsch erhältst du eine Auskunft über deine gespeicherten Daten. In beiden Fällen bleibt dein
 Name in vergangenen Resultaten und bei deinen Anmeldungen zur Clubmeisterschaft; die Turniergeschichte ist bei Swiss Tennis ohnehin öffentlich. Deine An- oder Abmeldung zu einem Anlass löschen wir ein Jahr
 nach dem Anlass [**Vorschlag K-50**].
 
