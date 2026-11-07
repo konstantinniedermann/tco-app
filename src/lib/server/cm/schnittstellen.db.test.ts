@@ -330,7 +330,8 @@ describe('Schnittstellen der CM (Mitglied)', () => {
 				}
 			}
 		]);
-		expect(meldungen).toHaveLength(1);
+		// Die Antwort wartet nicht auf die Meldung an die CM-Admins.
+		await vi.waitFor(() => expect(meldungen).toHaveLength(1));
 		expect(meldungen[0].ids).toContain(hanna.mitgliedId);
 		expect(meldungen[0].ids).not.toContain(m.mitgliedId);
 		// DS-05: ohne Namen des Spielers.
@@ -373,7 +374,7 @@ describe('Schnittstellen der CM (Mitglied)', () => {
 			})
 		);
 		expect(r.status).toBe(200);
-		expect(meldungen).toHaveLength(1);
+		await vi.waitFor(() => expect(meldungen).toHaveLength(1));
 		expect(meldungen[0].ids).toContain(anderer.mitgliedId);
 		expect(meldungen[0].ids).not.toContain(ich.mitgliedId);
 	});

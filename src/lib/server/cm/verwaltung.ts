@@ -4,6 +4,7 @@ import type { Klassierung } from '../../turnier/klassierung.ts';
 import { warnungenEinzel, type Spieler } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
 import { maskiere } from '../admin/mitglieder.ts';
+import { schreibeVerlauf } from '../admin/verlauf.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { anmeldung, anmeldungSpieler, kategorie, mitglied, turnier } from '../db/schema.ts';
 import { schreibeKlassierung, spielerAus } from './angaben.ts';
@@ -32,6 +33,9 @@ export type SpielerTreffer = {
 };
 
 type Betroffen = { mitgliedId: number; kategorie: string; turnierId: number };
+
+/** Der handelnde CM-Admin; der Änderungsverlauf des Spielers nennt ihn (FR-26). */
+export type CmUrheber = { art: 'admin'; mitgliedId: number };
 
 /** Höchstens so viele Treffer zeigt die Suche. */
 const TREFFER = 20;
@@ -188,6 +192,7 @@ function warnungen(
  */
 export async function meldeVonHandAn(
 	db: Db,
+	urheber: CmUrheber,
 	kategorieId: number,
 	mitgliedId: number,
 	jetzt: Date,
@@ -216,6 +221,7 @@ export async function meldeVonHandAn(
 			.values({ kategorieId, status: 'bestaetigt', angemeldetAm: jetzt, geaendertAm: jetzt })
 			.returning({ id: anmeldung.id });
 		await tx.insert(anmeldungSpieler).values({ anmeldungId: neu.id, mitgliedId });
+		await schreibeVerlauf(tx, mitgliedId, urheber, [{ aktion: 'cm-angemeldet' }], jetzt);
 		return 'ok';
 	});
 }
@@ -227,6 +233,7 @@ export async function meldeVonHandAn(
  */
 export async function verschiebe(
 	db: Db,
+	urheber: CmUrheber,
 	anmeldungId: number,
 	zielKategorieId: number,
 	jetzt: Date,
@@ -257,6 +264,7 @@ export async function verschiebe(
 			.update(anmeldung)
 			.set({ kategorieId: zielKategorieId, status: 'bestaetigt', geaendertAm: jetzt })
 			.where(eq(anmeldung.id, anmeldungId));
+		await schreibeVerlauf(tx, m.id, urheber, [{ aktion: 'cm-verschoben' }], jetzt);
 		return {
 			ergebnis: 'ok' as const,
 			mitgliedId: m.id,
@@ -270,6 +278,7 @@ export async function verschiebe(
 /** FR-46: Löschen zieht die Anmeldung zurück, auch nach dem Anmeldeschluss (Teil 4, Ziel 4). */
 export async function loescheAnmeldung(
 	db: Db,
+	urheber: CmUrheber,
 	anmeldungId: number,
 	jetzt: Date
 ): Promise<Betroffen | 'nicht-gefunden'> {
@@ -284,6 +293,7 @@ export async function loescheAnmeldung(
 			.update(anmeldung)
 			.set({ status: 'zurueckgezogen', geaendertAm: jetzt })
 			.where(eq(anmeldung.id, anmeldungId));
+		await schreibeVerlauf(tx, m.id, urheber, [{ aktion: 'cm-geloescht' }], jetzt);
 		return { mitgliedId: m.id, kategorie: a.kategorie, turnierId: a.turnierId };
 	});
 }
@@ -291,6 +301,7 @@ export async function loescheAnmeldung(
 /** FR-08: über einen Wildcard-Antrag entscheiden; nur solange er *beantragt* ist. */
 export async function entscheide(
 	db: Db,
+	urheber: CmUrheber,
 	anmeldungId: number,
 	bestaetigt: boolean,
 	jetzt: Date
@@ -305,6 +316,8 @@ export async function entscheide(
 			.update(anmeldung)
 			.set({ status: bestaetigt ? 'bestaetigt' : 'abgelehnt', geaendertAm: jetzt })
 			.where(eq(anmeldung.id, anmeldungId));
+		const aktion = bestaetigt ? 'wildcard-bestaetigt' : 'wildcard-abgelehnt';
+		await schreibeVerlauf(tx, m.id, urheber, [{ aktion }], jetzt);
 		return { mitgliedId: m.id, kategorie: a.kategorie, turnierId: a.turnierId };
 	});
 }
@@ -312,7 +325,7 @@ export async function entscheide(
 /** Teil 4, Ziel 3: der CM-Admin korrigiert die Klassierung; der Verlauf nennt ihn (FR-26). */
 export async function korrigiereKlassierung(
 	db: Db,
-	urheber: { art: 'admin'; mitgliedId: number },
+	urheber: CmUrheber,
 	mitgliedId: number,
 	klassierung: Klassierung,
 	jetzt: Date

@@ -2,7 +2,13 @@
 // (A-ANMELDUNG-06, FR-08, FR-46, FR-47), Bereich `cm`: Der CM-Admin liest und schreibt, der
 // MyTCO-Admin liest nur (Regel 3).
 import { istKlassierung } from '../../turnier/klassierung.ts';
-import { liest, schreibt, type AdminDienste, type AdminEreignis } from '../admin/schnittstellen.ts';
+import {
+	liest,
+	schreibt,
+	type AdminDienste,
+	type AdminEreignis,
+	type AdminUrheber
+} from '../admin/schnittstellen.ts';
 import {
 	entscheide,
 	korrigiereKlassierung,
@@ -150,14 +156,23 @@ const warnung = (w: { warnungen: Warnung[] }) =>
 
 /**
  * FR-47: persönliche Meldung an den Spieler, erst nach dem Speichern. DS-05: ohne Namen anderer
- * Mitglieder, auch nicht des CM-Admins. Wirft nie.
+ * Mitglieder, auch nicht des CM-Admins. Betrifft es den CM-Admin selbst, entfällt sie. Die Antwort
+ * wartet nicht auf Push und Mail; `meldeMitgliedern` wirft nie.
  */
-const melde = (d: MitteilungAdminDienste, mitgliedId: number, turnierId: number, text: string) =>
-	meldeMitgliedern({ db: d.db, push: d.push, mailer: d.mailer, adresse: d.adresse }, [mitgliedId], {
-		titel: 'Clubmeisterschaft',
-		text,
-		pfad: `/clubmeisterschaft/${turnierId}`
-	});
+function melde(
+	d: MitteilungAdminDienste,
+	urheber: AdminUrheber,
+	mitgliedId: number,
+	turnierId: number,
+	text: string
+): void {
+	if (mitgliedId === urheber.mitgliedId) return;
+	void meldeMitgliedern(
+		{ db: d.db, push: d.push, mailer: d.mailer, adresse: d.adresse },
+		[mitgliedId],
+		{ titel: 'Clubmeisterschaft', text, pfad: `/clubmeisterschaft/${turnierId}` }
+	);
+}
 
 /** A-ANMELDUNG-06: aktive Einzel-Anmeldungen der Kategorie. */
 export function getAnmeldungen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
@@ -174,20 +189,21 @@ export function postAnmeldungVonHand(
 	d: MitteilungAdminDienste,
 	e: AdminEreignis
 ): Promise<Response> {
-	return schreibt(d, e, 'cm', async (_urheber, koerper) => {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
 		const kategorieId = parseId(e.params.id);
 		if (kategorieId === null) return nichtGefunden();
 		const mitgliedId = idAus(koerper.mitgliedId);
 		const trotzdem = trotzdemAus(koerper);
 		if (mitgliedId === null || trotzdem === null) return eingabeFehler();
-		const r = await meldeVonHandAn(d.db, kategorieId, mitgliedId, jetzt(d), trotzdem);
+		const r = await meldeVonHandAn(d.db, urheber, kategorieId, mitgliedId, jetzt(d), trotzdem);
 		if (typeof r === 'object') return warnung(r);
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r !== 'ok') return antwort(409, { fehler: r });
 		const k = await ladeKategorie(d.db, kategorieId);
 		if (k) {
-			await melde(
+			melde(
 				d,
+				urheber,
 				mitgliedId,
 				k.turnierId,
 				`Der CM-Admin hat dich in «${k.name}» angemeldet. Gegner sehen deine E-Mail und Telefonnummer.`
@@ -199,18 +215,19 @@ export function postAnmeldungVonHand(
 
 /** FR-46: eine Anmeldung in eine andere Einzel-Kategorie desselben Turniers verschieben. */
 export function postVerschieben(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
-	return schreibt(d, e, 'cm', async (_urheber, koerper) => {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
 		const anmeldungId = parseId(e.params.id);
 		if (anmeldungId === null) return nichtGefunden();
 		const kategorieId = idAus(koerper.kategorieId);
 		const trotzdem = trotzdemAus(koerper);
 		if (kategorieId === null || trotzdem === null) return eingabeFehler();
-		const r = await verschiebe(d.db, anmeldungId, kategorieId, jetzt(d), trotzdem);
+		const r = await verschiebe(d.db, urheber, anmeldungId, kategorieId, jetzt(d), trotzdem);
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (typeof r === 'string') return antwort(409, { fehler: r });
 		if ('warnungen' in r) return warnung(r);
-		await melde(
+		melde(
 			d,
+			urheber,
 			r.mitgliedId,
 			r.turnierId,
 			`Der CM-Admin hat dich von «${r.von}» nach «${r.nach}» verschoben.`
@@ -224,12 +241,14 @@ export function postAnmeldungLoeschen(
 	d: MitteilungAdminDienste,
 	e: AdminEreignis
 ): Promise<Response> {
-	return schreibt(d, e, 'cm', async () => {
+	return schreibt(d, e, 'cm', async (urheber) => {
 		const anmeldungId = parseId(e.params.id);
-		const r = anmeldungId === null ? null : await loescheAnmeldung(d.db, anmeldungId, jetzt(d));
+		const r =
+			anmeldungId === null ? null : await loescheAnmeldung(d.db, urheber, anmeldungId, jetzt(d));
 		if (r === null || r === 'nicht-gefunden') return nichtGefunden();
-		await melde(
+		melde(
 			d,
+			urheber,
 			r.mitgliedId,
 			r.turnierId,
 			`Der CM-Admin hat deine Anmeldung für «${r.kategorie}» gelöscht.`
@@ -243,7 +262,7 @@ export function postAnmeldungLoeschen(
  * in der Meldung und wird nicht gespeichert (Teil 4, Präzisierung).
  */
 export function postEntscheid(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
-	return schreibt(d, e, 'cm', async (_urheber, koerper) => {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
 		const anmeldungId = parseId(e.params.id);
 		if (anmeldungId === null) return nichtGefunden();
 		const { bestaetigt, grund: roh } = koerper;
@@ -251,13 +270,13 @@ export function postEntscheid(d: MitteilungAdminDienste, e: AdminEreignis): Prom
 		if (roh !== undefined && typeof roh !== 'string') return eingabeFehler();
 		const grund = (roh ?? '').trim();
 		if (grund.length > GRUND_MAX) return eingabeFehler();
-		const r = await entscheide(d.db, anmeldungId, bestaetigt, jetzt(d));
+		const r = await entscheide(d.db, urheber, anmeldungId, bestaetigt, jetzt(d));
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r === 'nicht-beantragt') return antwort(409, { fehler: r });
 		const text = bestaetigt
 			? `Deine Wildcard für «${r.kategorie}» ist bestätigt.`
 			: `Deine Wildcard für «${r.kategorie}» ist abgelehnt.${grund ? ` Grund: ${grund}` : ''}`;
-		await melde(d, r.mitgliedId, r.turnierId, text);
+		melde(d, urheber, r.mitgliedId, r.turnierId, text);
 		return antwort(200, {});
 	});
 }

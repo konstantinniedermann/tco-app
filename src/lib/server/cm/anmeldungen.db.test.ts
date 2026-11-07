@@ -570,7 +570,9 @@ describe('CM-Anmeldung', () => {
 			expect(a?.kategorien).toEqual([]);
 		}
 		// Eine bestätigte Wildcard steht unter den Kategorien.
-		expect(await entscheide(db, id, true, t.jetzt)).toMatchObject({ mitgliedId: ich });
+		expect(
+			await entscheide(db, { art: 'admin', mitgliedId: ich }, id, true, t.jetzt)
+		).toMatchObject({ mitgliedId: ich });
 		const a = await ladeCmAnsicht(db, t.id, ich, t.jetzt);
 		expect(a?.wildcard).toEqual([]);
 		expect(a?.kategorien).toEqual([expect.objectContaining({ id: t.k, anmeldungId: id })]);
@@ -621,7 +623,9 @@ describe('CM-Anmeldung', () => {
 		// Nach einer Ablehnung darf er erneut beantragen; die abgelehnte zählt nicht (FR-06).
 		expect(await beantrageWildcard(db, stark, r8, 'Erster Versuch.', t.jetzt)).toBe('ok');
 		const [erster] = await aktiveVon(r8, [stark]);
-		expect(await entscheide(db, erster.id, false, t.jetzt)).toMatchObject({ mitgliedId: r8 });
+		expect(
+			await entscheide(db, { art: 'admin', mitgliedId: r8 }, erster.id, false, t.jetzt)
+		).toMatchObject({ mitgliedId: r8 });
 		expect((await ladeCmAnsicht(db, t.id, r8, t.jetzt))?.turnier.anzahl).toBe(0);
 		expect(await beantrageWildcard(db, stark, r8, 'Zweiter Versuch.', t.jetzt)).toBe('ok');
 		const alle = await db

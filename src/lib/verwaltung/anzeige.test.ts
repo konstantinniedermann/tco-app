@@ -34,6 +34,26 @@ describe('Texte der Verwaltung', () => {
 		);
 	});
 
+	it('FR-26, FR-46: Verlaufstexte für Änderungen des CM-Admins an Anmeldungen', () => {
+		expect(
+			(
+				[
+					'cm-angemeldet',
+					'cm-verschoben',
+					'cm-geloescht',
+					'wildcard-bestaetigt',
+					'wildcard-abgelehnt'
+				] as const
+			).map((aktion) => aktionText({ aktion, detail: null }))
+		).toEqual([
+			'von Hand angemeldet (CM)',
+			'verschoben (CM)',
+			'gelöscht (CM)',
+			'Wildcard bestätigt',
+			'Wildcard abgelehnt'
+		]);
+	});
+
 	it('UI-06: Fehlertext des Servers wird ein Satz', () => {
 		expect(feldMeldung('fehlt')).toBe('Fehlt.');
 		expect(feldMeldung('4 Ziffern')).toBe('4 Ziffern.');

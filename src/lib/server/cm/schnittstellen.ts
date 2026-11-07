@@ -192,7 +192,8 @@ export function postCmWildcard(d: CmDienste, e: CmEreignis): Promise<Response> {
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r !== 'ok') return antwort(409, { fehler: FEHLER.includes(r) ? r : 'geschlossen' });
 		const a = await antwortMitMail(d, konto, bezug, 'antrag', t);
-		await meldeCmAdmins(d, konto.mitgliedId, {
+		// Die Antwort wartet nicht auf Push und Mail an die CM-Admins; `meldeCmAdmins` wirft nie.
+		void meldeCmAdmins(d, konto.mitgliedId, {
 			titel: 'Wildcard-Antrag',
 			text: `Neuer Wildcard-Antrag für «${bezug.kategorie}».`,
 			pfad: `/verwaltung/turniere/${bezug.turnierId}/kategorien/${id}`

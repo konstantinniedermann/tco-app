@@ -13,7 +13,13 @@ export type Aktion =
 	| 'rolle-vergeben'
 	| 'rolle-entzogen'
 	| 'sitzungen-beendet'
-	| 'fairgate-uebertragen';
+	| 'fairgate-uebertragen'
+	// FR-46, FR-08: Änderungen des CM-Admins an Anmeldungen, ohne Kategorie oder Grund.
+	| 'cm-angemeldet'
+	| 'cm-verschoben'
+	| 'cm-geloescht'
+	| 'wildcard-bestaetigt'
+	| 'wildcard-abgelehnt';
 
 // FR-26: `detail` enthält nur einen Feld- oder Rollennamen, nie einen Wert.
 export type Eintrag = { aktion: Aktion; detail?: string };

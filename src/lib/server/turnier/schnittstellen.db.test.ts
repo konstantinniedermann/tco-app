@@ -503,13 +503,16 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 			post(cm, { mitgliedId: r8.mitgliedId, trotzdem: true }, k)
 		);
 		expect(await antwortVon(ok)).toEqual([200, {}]);
-		expect(s.mails).toEqual([
-			meldung(
-				r8.email,
-				'Der CM-Admin hat dich in «Herren A» angemeldet. Gegner sehen deine E-Mail und Telefonnummer.',
-				t.id
-			)
-		]);
+		// M-1: Die Antwort wartet nicht auf die Meldung; der Test wartet auf den Versand.
+		await vi.waitFor(() =>
+			expect(s.mails).toEqual([
+				meldung(
+					r8.email,
+					'Der CM-Admin hat dich in «Herren A» angemeldet. Gegner sehen deine E-Mail und Telefonnummer.',
+					t.id
+				)
+			])
+		);
 		const doppelt = await postAnmeldungVonHand(
 			s.d,
 			post(cm, { mitgliedId: r8.mitgliedId, trotzdem: true }, k)
@@ -592,9 +595,11 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 		const ok = await postVerschieben(s.d, post(cm, { kategorieId: b, trotzdem: true }, id));
 		expect(await antwortVon(ok)).toEqual([200, {}]);
 		expect(await statusVon(Number(id.id))).toEqual({ status: 'bestaetigt', kategorieId: b });
-		expect(s.mails).toEqual([
-			meldung(r3.email, 'Der CM-Admin hat dich von «Herren A» nach «Herren B» verschoben.', t.id)
-		]);
+		await vi.waitFor(() =>
+			expect(s.mails).toEqual([
+				meldung(r3.email, 'Der CM-Admin hat dich von «Herren A» nach «Herren B» verschoben.', t.id)
+			])
+		);
 
 		for (const body of [{}, { kategorieId: String(a) }, { kategorieId: a, trotzdem: 'ja' }]) {
 			const r = await postVerschieben(s.d, post(cm, body, id));
@@ -616,9 +621,11 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 
 		expect(await antwortVon(await postAnmeldungLoeschen(s.d, post(cm, {}, id)))).toEqual([200, {}]);
 		expect((await statusVon(anmeldungId)).status).toBe('zurueckgezogen');
-		expect(s.mails).toEqual([
-			meldung(r3.email, 'Der CM-Admin hat deine Anmeldung für «Herren A» gelöscht.', t.id)
-		]);
+		await vi.waitFor(() =>
+			expect(s.mails).toEqual([
+				meldung(r3.email, 'Der CM-Admin hat deine Anmeldung für «Herren A» gelöscht.', t.id)
+			])
+		);
 		expect((await postAnmeldungLoeschen(s.d, post(cm, {}, id))).status).toBe(404);
 		expect((await postAnmeldungLoeschen(s.d, post(cm, {}, { id: 'x' }))).status).toBe(404);
 		expect(s.mails).toHaveLength(1);
@@ -658,19 +665,19 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 		expect((await statusVon(Number(antraege.lang))).status).toBe('beantragt');
 		expect(s.mails).toEqual([]);
 
-		expect(await antwortVon(await entscheid(antraege.ja, { bestaetigt: true }))).toEqual([200, {}]);
-		expect(
-			await antwortVon(
-				await entscheid(antraege.nein, { bestaetigt: false, grund: '  Zu stark.  ' })
-			)
-		).toEqual([200, {}]);
-		expect(
-			await antwortVon(await entscheid(antraege.ohne, { bestaetigt: false, grund: '   ' }))
-		).toEqual([200, {}]);
+		// Die Antwort wartet nicht auf die Meldung: nach jedem Entscheid auf die Mail warten, damit
+		// die Reihenfolge feststeht.
 		const zweihundert = 'y'.repeat(200);
-		expect(
-			await antwortVon(await entscheid(antraege.lang, { bestaetigt: false, grund: zweihundert }))
-		).toEqual([200, {}]);
+		const entscheide: [string, object][] = [
+			[antraege.ja, { bestaetigt: true }],
+			[antraege.nein, { bestaetigt: false, grund: '  Zu stark.  ' }],
+			[antraege.ohne, { bestaetigt: false, grund: '   ' }],
+			[antraege.lang, { bestaetigt: false, grund: zweihundert }]
+		];
+		for (const [i, [anmeldungId, body]] of entscheide.entries()) {
+			expect(await antwortVon(await entscheid(anmeldungId, body))).toEqual([200, {}]);
+			await vi.waitFor(() => expect(s.mails).toHaveLength(i + 1));
+		}
 		expect((await statusVon(Number(antraege.ja))).status).toBe('bestaetigt');
 		expect((await statusVon(Number(antraege.nein))).status).toBe('abgelehnt');
 		expect(s.mails).toEqual([
@@ -688,6 +695,83 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 		expect(await antwortVon(nochmals)).toEqual([409, { fehler: 'nicht-beantragt' }]);
 		expect((await entscheid('999999999', { bestaetigt: true })).status).toBe(404);
 		expect(s.mails).toHaveLength(4);
+	});
+
+	test('FR-47: Die Antwort wartet nicht auf die Meldung an den Spieler', async () => {
+		const t = await cmTurnier([['Herren A']]);
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const r3 = await spieler('R3');
+		expect(await meldeAn(db, t.kategorien[0], r3.mitgliedId, t.jetzt)).toBe('ok');
+		const id = { id: String(await anmeldungIn(t.kategorien[0], r3.mitgliedId)) };
+		// Der Versand hängt, bis der Test ihn freigibt.
+		let freigeben = () => {};
+		const haengt = new Promise<void>((r) => (freigeben = r));
+		const versandt: string[] = [];
+		const d = {
+			...s.d,
+			mailer: async (n: { an: string }) => {
+				await haengt;
+				versandt.push(n.an);
+			}
+		};
+		expect(await antwortVon(await postAnmeldungLoeschen(d, post(cm, {}, id)))).toEqual([200, {}]);
+		expect(versandt).toEqual([]);
+		freigeben();
+		await vi.waitFor(() => expect(versandt).toEqual([r3.email]));
+	});
+
+	test('FR-47, FR-26: Handelt der CM-Admin bei sich selbst, gibt es keine Meldung; der Verlauf nennt ihn', async () => {
+		const t = await cmTurnier([['Herren A'], ['Herren B'], ['Herren C']]);
+		const [a, b, c] = t.kategorien;
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+
+		const an = await postAnmeldungVonHand(
+			s.d,
+			post(cm, { mitgliedId: cm.mitgliedId, trotzdem: true }, { id: String(a) })
+		);
+		expect(await antwortVon(an)).toEqual([200, {}]);
+		const id = { id: String(await anmeldungIn(a, cm.mitgliedId)) };
+		const weiter = await postVerschieben(s.d, post(cm, { kategorieId: b, trotzdem: true }, id));
+		expect(await antwortVon(weiter)).toEqual([200, {}]);
+		expect(await antwortVon(await postAnmeldungLoeschen(s.d, post(cm, {}, id)))).toEqual([200, {}]);
+		const eigenerAntrag = { id: String(await antrag(c, cm.mitgliedId, t.jetzt)) };
+		const ja = await postEntscheid(s.d, post(cm, { bestaetigt: true }, eigenerAntrag));
+		expect(await antwortVon(ja)).toEqual([200, {}]);
+
+		// Danach eine Meldung an einen anderen Spieler: Sie ist die einzige.
+		const r3 = await spieler('R3');
+		const fremd = await postAnmeldungVonHand(
+			s.d,
+			post(cm, { mitgliedId: r3.mitgliedId }, { id: String(a) })
+		);
+		expect(await antwortVon(fremd)).toEqual([200, {}]);
+		await vi.waitFor(() => expect(s.mails).toHaveLength(1));
+		expect(s.mails[0].an).toBe(r3.email);
+
+		const verlauf = await db
+			.select({
+				urheberArt: aenderung.urheberArt,
+				von: aenderung.urheberMitgliedId,
+				aktion: aenderung.aktion,
+				detail: aenderung.detail
+			})
+			.from(aenderung)
+			.where(eq(aenderung.mitgliedId, cm.mitgliedId))
+			.orderBy(aenderung.id);
+		const eintrag = (aktion: string) => ({
+			urheberArt: 'admin',
+			von: cm.mitgliedId,
+			aktion,
+			detail: null
+		});
+		expect(verlauf).toEqual([
+			eintrag('cm-angemeldet'),
+			eintrag('cm-verschoben'),
+			eintrag('cm-geloescht'),
+			eintrag('wildcard-bestaetigt')
+		]);
 	});
 
 	test('A-ANMELDUNG-06: Spielersuche nach Namen, Suchtext höchstens 100 Zeichen', async () => {

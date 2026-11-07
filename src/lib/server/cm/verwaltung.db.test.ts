@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { and, eq, inArray, sql } from 'drizzle-orm';
-import { afterAll, describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { aenderung, anmeldung, anmeldungSpieler, mitglied } from '../db/schema.ts';
@@ -19,10 +19,17 @@ import {
 	loescheAnmeldung,
 	meldeVonHandAn,
 	sucheSpieler,
-	verschiebe
+	verschiebe,
+	type CmUrheber
 } from './verwaltung.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
+
+// Der handelnde CM-Admin, ein erfundenes Mitglied; der Verlauf des Spielers nennt ihn (FR-26).
+let admin: CmUrheber;
+beforeAll(async () => {
+	admin = { art: 'admin', mitgliedId: (await legeMitgliedAn(db)).mitgliedId };
+});
 
 afterAll(async () => {
 	await db.$client.end();
@@ -165,17 +172,17 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			klassierungBis: 'R9'
 		});
 		const ich = await spieler();
-		expect(await meldeVonHandAn(db, a, ich, t.jetzt, false)).toBe('ok');
+		expect(await meldeVonHandAn(db, admin, a, ich, t.jetzt, false)).toBe('ok');
 		expect(await anmeldungenVon(ich, [a])).toEqual([
 			expect.objectContaining({ status: 'bestaetigt', kategorieId: a })
 		]);
 
 		const r2 = await spieler({ klassierung: 'R2' });
-		expect(await meldeVonHandAn(db, schwach, r2, t.jetzt, false)).toEqual({
+		expect(await meldeVonHandAn(db, admin, schwach, r2, t.jetzt, false)).toEqual({
 			warnungen: ['passt-nicht']
 		});
 		expect(await anmeldungenVon(r2, [schwach])).toEqual([]);
-		expect(await meldeVonHandAn(db, schwach, r2, t.jetzt, true)).toBe('ok');
+		expect(await meldeVonHandAn(db, admin, schwach, r2, t.jetzt, true)).toBe('ok');
 		expect(await anmeldungenVon(r2, [schwach])).toEqual([
 			expect.objectContaining({ status: 'bestaetigt' })
 		]);
@@ -186,28 +193,30 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		const [k1, k2, k3, k4] = t.kategorien;
 		const ich = await spieler();
 		const nachSchluss = spaeterIn(t.jahr);
-		expect(await meldeVonHandAn(db, k1, ich, nachSchluss, false)).toEqual({
+		expect(await meldeVonHandAn(db, admin, k1, ich, nachSchluss, false)).toEqual({
 			warnungen: ['geschlossen']
 		});
-		expect(await meldeVonHandAn(db, k1, ich, nachSchluss, true)).toBe('ok');
+		expect(await meldeVonHandAn(db, admin, k1, ich, nachSchluss, true)).toBe('ok');
 
 		for (const k of [k2, k3]) expect(await meldeAn(db, k, ich, t.jetzt)).toBe('ok');
-		expect(await meldeVonHandAn(db, k4, ich, t.jetzt, false)).toEqual({ warnungen: ['voll'] });
-		expect(await meldeVonHandAn(db, k4, ich, t.jetzt, true)).toBe('ok');
+		expect(await meldeVonHandAn(db, admin, k4, ich, t.jetzt, false)).toEqual({
+			warnungen: ['voll']
+		});
+		expect(await meldeVonHandAn(db, admin, k4, ich, t.jetzt, true)).toBe('ok');
 		expect(await zaehleAktive(db, k4)).toBe(1);
 
 		const ohne = await spieler({ klassierung: null });
-		expect(await meldeVonHandAn(db, k1, ohne, nachSchluss, false)).toEqual({
+		expect(await meldeVonHandAn(db, admin, k1, ohne, nachSchluss, false)).toEqual({
 			warnungen: ['angaben-fehlen', 'geschlossen']
 		});
-		expect(await meldeVonHandAn(db, k1, ohne, t.jetzt, true)).toBe('ok');
+		expect(await meldeVonHandAn(db, admin, k1, ohne, t.jetzt, true)).toBe('ok');
 	});
 
 	test('FR-46, FR-09: Vorbereitung, abgesagt, Doppel, Unbekannte und schon angemeldet', async () => {
 		const vorbereitung = await turnier(['Herren A'], false);
 		const ich = await spieler();
 		expect(
-			await meldeVonHandAn(db, vorbereitung.kategorien[0], ich, vorbereitung.jetzt, true)
+			await meldeVonHandAn(db, admin, vorbereitung.kategorien[0], ich, vorbereitung.jetzt, true)
 		).toBe('vorbereitung');
 
 		const t = await turnier(['Herren A', 'Abgesagt']);
@@ -221,17 +230,17 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			mindestsumme: 9
 		});
 		for (const k of [abgesagt, doppel, -1]) {
-			expect(await meldeVonHandAn(db, k, ich, t.jetzt, true)).toBe('nicht-gefunden');
+			expect(await meldeVonHandAn(db, admin, k, ich, t.jetzt, true)).toBe('nicht-gefunden');
 		}
-		expect(await meldeVonHandAn(db, a, -1, t.jetzt, true)).toBe('nicht-gefunden');
+		expect(await meldeVonHandAn(db, admin, a, -1, t.jetzt, true)).toBe('nicht-gefunden');
 		const ausgetreten = await spieler({ status: 'ausgetreten' });
-		expect(await meldeVonHandAn(db, a, ausgetreten, t.jetzt, true)).toBe('nicht-gefunden');
+		expect(await meldeVonHandAn(db, admin, a, ausgetreten, t.jetzt, true)).toBe('nicht-gefunden');
 
-		expect(await meldeVonHandAn(db, a, ich, t.jetzt, false)).toBe('ok');
-		expect(await meldeVonHandAn(db, a, ich, t.jetzt, true)).toBe('schon-angemeldet');
+		expect(await meldeVonHandAn(db, admin, a, ich, t.jetzt, false)).toBe('ok');
+		expect(await meldeVonHandAn(db, admin, a, ich, t.jetzt, true)).toBe('schon-angemeldet');
 		const antrag = await spieler();
 		await anmeldungMit(a, antrag, 'beantragt', t.jetzt, 'Bitte');
-		expect(await meldeVonHandAn(db, a, antrag, t.jetzt, true)).toBe('schon-angemeldet');
+		expect(await meldeVonHandAn(db, admin, a, antrag, t.jetzt, true)).toBe('schon-angemeldet');
 		expect(await zaehleAktive(db, a)).toBe(2);
 	});
 
@@ -243,7 +252,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		const [inA] = (await anmeldungenVon(ich, [a])).map((z) => z.id);
 
 		// Drei aktive: die verschobene zählt nicht, also keine Warnung «voll».
-		expect(await verschiebe(db, inA, d, t.jetzt, false)).toEqual({
+		expect(await verschiebe(db, admin, inA, d, t.jetzt, false)).toEqual({
 			ergebnis: 'ok',
 			mitgliedId: ich,
 			von: 'Herren A',
@@ -259,11 +268,11 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			klassierungVon: 'R6',
 			klassierungBis: 'R9'
 		});
-		expect(await verschiebe(db, id, schwach, spaeterIn(t.jahr), false)).toEqual({
+		expect(await verschiebe(db, admin, id, schwach, spaeterIn(t.jahr), false)).toEqual({
 			warnungen: ['geschlossen']
 		});
 		expect(await statusVon(id)).toEqual({ status: 'beantragt', kategorieId: a });
-		expect(await verschiebe(db, id, schwach, spaeterIn(t.jahr), true)).toMatchObject({
+		expect(await verschiebe(db, admin, id, schwach, spaeterIn(t.jahr), true)).toMatchObject({
 			ergebnis: 'ok',
 			von: 'Herren A',
 			nach: 'Herren R6–R9'
@@ -283,14 +292,16 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		const damen = await kategorieIn(t.id, 'Damen', { geschlecht: 'damen' });
 		const ich = await spieler();
 		for (const k of [k1, k2, k3]) expect(await meldeAn(db, k, ich, t.jetzt)).toBe('ok');
-		expect(await meldeVonHandAn(db, k4, ich, t.jetzt, true)).toBe('ok');
+		expect(await meldeVonHandAn(db, admin, k4, ich, t.jetzt, true)).toBe('ok');
 		const [inK1] = (await anmeldungenVon(ich, [k1])).map((z) => z.id);
-		expect(await verschiebe(db, inK1, damen, t.jetzt, false)).toEqual({
+		expect(await verschiebe(db, admin, inK1, damen, t.jetzt, false)).toEqual({
 			warnungen: ['passt-nicht', 'voll']
 		});
-		expect(await verschiebe(db, inK1, k5, t.jetzt, false)).toEqual({ warnungen: ['voll'] });
+		expect(await verschiebe(db, admin, inK1, k5, t.jetzt, false)).toEqual({ warnungen: ['voll'] });
 		expect(await statusVon(inK1)).toEqual({ status: 'bestaetigt', kategorieId: k1 });
-		expect(await verschiebe(db, inK1, damen, t.jetzt, true)).toMatchObject({ ergebnis: 'ok' });
+		expect(await verschiebe(db, admin, inK1, damen, t.jetzt, true)).toMatchObject({
+			ergebnis: 'ok'
+		});
 	});
 
 	test('FR-09, FR-46: verschieben in die eigene oder eine belegte Kategorie, in ein anderes Turnier oder abgewiesene', async () => {
@@ -299,12 +310,14 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		const ich = await spieler();
 		for (const k of [a, b]) expect(await meldeAn(db, k, ich, t.jetzt)).toBe('ok');
 		const [inA] = (await anmeldungenVon(ich, [a])).map((z) => z.id);
-		expect(await verschiebe(db, inA, a, t.jetzt, true)).toBe('schon-angemeldet');
-		expect(await verschiebe(db, inA, b, t.jetzt, true)).toBe('schon-angemeldet');
+		expect(await verschiebe(db, admin, inA, a, t.jetzt, true)).toBe('schon-angemeldet');
+		expect(await verschiebe(db, admin, inA, b, t.jetzt, true)).toBe('schon-angemeldet');
 		expect(await statusVon(inA)).toEqual({ status: 'bestaetigt', kategorieId: a });
 
 		const anderes = await turnier(['Herren A']);
-		expect(await verschiebe(db, inA, anderes.kategorien[0], t.jetzt, true)).toBe('nicht-gefunden');
+		expect(await verschiebe(db, admin, inA, anderes.kategorien[0], t.jetzt, true)).toBe(
+			'nicht-gefunden'
+		);
 		const abgesagt = await kategorieIn(t.id, 'Abgesagt');
 		expect(await sageKategorieAb(db, abgesagt)).toBe('ok');
 		const doppel = await kategorieIn(t.id, 'Doppel', {
@@ -315,11 +328,11 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			mindestsumme: 9
 		});
 		for (const k of [abgesagt, doppel, -1]) {
-			expect(await verschiebe(db, inA, k, t.jetzt, true)).toBe('nicht-gefunden');
+			expect(await verschiebe(db, admin, inA, k, t.jetzt, true)).toBe('nicht-gefunden');
 		}
-		expect(await verschiebe(db, -1, b, t.jetzt, true)).toBe('nicht-gefunden');
+		expect(await verschiebe(db, admin, -1, b, t.jetzt, true)).toBe('nicht-gefunden');
 		const weg = await anmeldungMit(a, await spieler(), 'zurueckgezogen', t.jetzt);
-		expect(await verschiebe(db, weg, b, t.jetzt, true)).toBe('nicht-gefunden');
+		expect(await verschiebe(db, admin, weg, b, t.jetzt, true)).toBe('nicht-gefunden');
 		expect(await statusVon(inA)).toEqual({ status: 'bestaetigt', kategorieId: a });
 	});
 
@@ -328,9 +341,9 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		const [a, b] = t.kategorien;
 		const ich = await spieler();
 		const id = await anmeldungMit(a, ich, 'beantragt', t.jetzt, 'Bitte');
-		expect(await verschiebe(db, id, b, t.jetzt, true)).toBe('vorbereitung');
-		expect(await loescheAnmeldung(db, id, t.jetzt)).toBe('nicht-gefunden');
-		expect(await entscheide(db, id, true, t.jetzt)).toBe('nicht-gefunden');
+		expect(await verschiebe(db, admin, id, b, t.jetzt, true)).toBe('vorbereitung');
+		expect(await loescheAnmeldung(db, admin, id, t.jetzt)).toBe('nicht-gefunden');
+		expect(await entscheide(db, admin, id, true, t.jetzt)).toBe('nicht-gefunden');
 		expect(await statusVon(id)).toEqual({ status: 'beantragt', kategorieId: a });
 	});
 
@@ -344,7 +357,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 
 		// Auch nach dem Anmeldeschluss.
 		const spaeter = spaeterIn(t.jahr);
-		expect(await loescheAnmeldung(db, id, spaeter)).toEqual({
+		expect(await loescheAnmeldung(db, admin, id, spaeter)).toEqual({
 			mitgliedId: ich,
 			kategorie: 'Herren A',
 			turnierId: t.id
@@ -352,8 +365,8 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		const [z] = await db.select().from(anmeldung).where(eq(anmeldung.id, id));
 		expect(z).toMatchObject({ status: 'zurueckgezogen', geaendertAm: spaeter });
 		expect(await zaehleAktive(db, a)).toBe(0);
-		expect(await loescheAnmeldung(db, id, spaeter)).toBe('nicht-gefunden');
-		expect(await loescheAnmeldung(db, -1, spaeter)).toBe('nicht-gefunden');
+		expect(await loescheAnmeldung(db, admin, id, spaeter)).toBe('nicht-gefunden');
+		expect(await loescheAnmeldung(db, admin, -1, spaeter)).toBe('nicht-gefunden');
 		expect(await sageKategorieAb(db, a)).toBe('ok');
 	});
 
@@ -368,12 +381,12 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		const idWeg = await anmeldungMit(a, weg, 'beantragt', t.jetzt, 'Bitte');
 		const spaeter = spaeterIn(t.jahr);
 
-		expect(await entscheide(db, idJa, true, spaeter)).toEqual({
+		expect(await entscheide(db, admin, idJa, true, spaeter)).toEqual({
 			mitgliedId: ja,
 			kategorie: 'Herren A',
 			turnierId: t.id
 		});
-		expect(await entscheide(db, idNein, false, spaeter)).toEqual({
+		expect(await entscheide(db, admin, idNein, false, spaeter)).toEqual({
 			mitgliedId: nein,
 			kategorie: 'Herren A',
 			turnierId: t.id
@@ -393,11 +406,11 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		});
 		expect(await zaehleAktive(db, a)).toBe(2);
 
-		expect(await entscheide(db, idJa, false, spaeter)).toBe('nicht-beantragt');
-		expect(await entscheide(db, idNein, true, spaeter)).toBe('nicht-beantragt');
+		expect(await entscheide(db, admin, idJa, false, spaeter)).toBe('nicht-beantragt');
+		expect(await entscheide(db, admin, idNein, true, spaeter)).toBe('nicht-beantragt');
 		expect(await meldeAb(db, idWeg, weg, t.jetzt)).toBe('ok');
-		expect(await entscheide(db, idWeg, true, t.jetzt)).toBe('nicht-beantragt');
-		expect(await entscheide(db, -1, true, t.jetzt)).toBe('nicht-gefunden');
+		expect(await entscheide(db, admin, idWeg, true, t.jetzt)).toBe('nicht-beantragt');
+		expect(await entscheide(db, admin, -1, true, t.jetzt)).toBe('nicht-gefunden');
 		expect(await statusVon(idJa)).toEqual({ status: 'bestaetigt', kategorieId: a });
 	});
 
@@ -431,6 +444,57 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			}
 		]);
 		expect(await korrigiereKlassierung(db, urheber, -1, 'R5', jetzt)).toBe('nicht-gefunden');
+	});
+
+	test('FR-26, FR-46, FR-08: jede Änderung des CM-Admins steht im Verlauf des Spielers, ohne Werte', async () => {
+		const t = await turnier(['Herren A', 'Herren B']);
+		const [a, b] = t.kategorien;
+		const verlaufVon = (mitgliedId: number) =>
+			db
+				.select({
+					zeitpunkt: aenderung.zeitpunkt,
+					urheberArt: aenderung.urheberArt,
+					urheberMitgliedId: aenderung.urheberMitgliedId,
+					aktion: aenderung.aktion,
+					detail: aenderung.detail
+				})
+				.from(aenderung)
+				.where(eq(aenderung.mitgliedId, mitgliedId))
+				.orderBy(aenderung.id);
+		const eintrag = (aktion: string) => ({
+			zeitpunkt: t.jetzt,
+			urheberArt: 'admin',
+			urheberMitgliedId: admin.mitgliedId,
+			aktion,
+			detail: null
+		});
+
+		// Abgewiesenes (Warnung ohne trotzdem) schreibt nichts.
+		const ich = await spieler({ klassierung: 'R8' });
+		expect(await meldeVonHandAn(db, admin, a, ich, t.jetzt, false)).toEqual({
+			warnungen: ['passt-nicht']
+		});
+		expect(await verlaufVon(ich)).toEqual([]);
+		expect(await meldeVonHandAn(db, admin, a, ich, t.jetzt, true)).toBe('ok');
+		const [id] = (await anmeldungenVon(ich, [a])).map((z) => z.id);
+		expect(await verschiebe(db, admin, id, b, t.jetzt, true)).toMatchObject({ ergebnis: 'ok' });
+		expect(await loescheAnmeldung(db, admin, id, t.jetzt)).toMatchObject({ mitgliedId: ich });
+		expect(await loescheAnmeldung(db, admin, id, t.jetzt)).toBe('nicht-gefunden');
+		expect(await verlaufVon(ich)).toEqual([
+			eintrag('cm-angemeldet'),
+			eintrag('cm-verschoben'),
+			eintrag('cm-geloescht')
+		]);
+
+		const ja = await spieler({ klassierung: 'R8' });
+		const nein = await spieler({ klassierung: 'R8' });
+		const idJa = await anmeldungMit(a, ja, 'beantragt', t.jetzt, 'Bitte');
+		const idNein = await anmeldungMit(a, nein, 'beantragt', t.jetzt, 'Bitte');
+		expect(await entscheide(db, admin, idJa, true, t.jetzt)).toMatchObject({ mitgliedId: ja });
+		expect(await entscheide(db, admin, idNein, false, t.jetzt)).toMatchObject({ mitgliedId: nein });
+		expect(await entscheide(db, admin, idJa, false, t.jetzt)).toBe('nicht-beantragt');
+		expect(await verlaufVon(ja)).toEqual([eintrag('wildcard-bestaetigt')]);
+		expect(await verlaufVon(nein)).toEqual([eintrag('wildcard-abgelehnt')]);
 	});
 
 	test('A-ANMELDUNG-06: ladeAnmeldungen zeigt nur aktive Einzel, nach Nachname und Vorname', async () => {
@@ -538,7 +602,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 
 		const [ab, verschoben] = await gleichzeitig(ich, () => [
 			meldeAb(db, id, ich, t.jetzt),
-			verschiebe(db, id, b, t.jetzt, false)
+			verschiebe(db, admin, id, b, t.jetzt, false)
 		]);
 		expect(ab).toBe('ok');
 		// Entweder zuerst verschoben und dann in B zurückgezogen, oder zuerst zurückgezogen in A.
@@ -560,7 +624,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 
 		const [ab, entscheid] = await gleichzeitig(ich, () => [
 			meldeAb(db, id, ich, t.jetzt),
-			entscheide(db, id, true, t.jetzt)
+			entscheide(db, admin, id, true, t.jetzt)
 		]);
 		expect(ab).toBe('ok');
 		if (entscheid !== 'nicht-beantragt') {
