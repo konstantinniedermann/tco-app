@@ -351,7 +351,6 @@
 		>
 			<summary class="klappe-titel">Weitere Kategorien mit Wildcard-Antrag</summary>
 			<div>
-				<p class="leise">Für diese Kategorien entscheidet die Turnierleitung über deinen Antrag.</p>
 				{#each cm.wildcard as k (k.id)}
 					<div class="karte kachel">
 						<span>
