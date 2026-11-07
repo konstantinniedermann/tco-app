@@ -55,7 +55,7 @@ db: voraussetzungen-docker ## Lokale Datenbank und Mail-Fänger Mailpit starten 
 dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einstellungen aus .env)
 	node --env-file=.env node_modules/vite/bin/vite.js dev
 
-dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs iPhone im selben WLAN mit festen Namen für Erika und Kurt (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
+dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs iPhone im selben WLAN mit einem festen Namen je Rolle (Kurt, Theo, Mona, Hanna) (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
 	./scripts/dev-handy.sh
 
 seed: voraussetzungen-env db ## Lokale Datenbank migrieren, 5 erfundene Mitglieder, eine Beispiel-GV und ein Beispielturnier 2027 anlegen, Brief-Codes ausgeben für Erika (MyTCO-Admin und Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin) (Einstellungen aus .env)

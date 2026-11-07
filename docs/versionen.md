@@ -8,6 +8,11 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Testserver im WLAN: `make dev-handy` meldet je Rolle einen festen Namen an —
+  `mytco-mitglied.local` (Kurt), `mytco-mytcoadmin.local` (Theo), `mytco-mitgliederadmin.local`
+  (Mona) und neu `mytco-cmadmin.local` (Hanna, CM-Admin) — und gibt je Persona einen Link auf ihre
+  Mails in Mailpit aus. `mytco-admin.local` (Erika) entfällt; Erika bleibt nur im Seed.
+
 ## 0.9.0 — Mitteilungen per Push und E-Mail
 
 - Mitteilungen per Push und E-Mail (#63): Im Profil unter *Benachrichtigungen* schaltet ein
