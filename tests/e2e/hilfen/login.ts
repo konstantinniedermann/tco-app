@@ -8,7 +8,10 @@ import { eq } from 'drizzle-orm';
 import { machAdmin } from '../../../src/lib/server/admin/erster-admin.ts';
 import { legeAnlassAn, melde } from '../../../src/lib/server/anlass/anlaesse.ts';
 import { setzeRollen, type Rolle } from '../../../src/lib/server/admin/rollen.ts';
-import { meldeAn as meldeZurCmAnInDb } from '../../../src/lib/server/cm/anmeldungen.ts';
+import {
+	beantrageWildcard,
+	meldeAn as meldeZurCmAnInDb
+} from '../../../src/lib/server/cm/anmeldungen.ts';
 import { mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../../../src/lib/server/turnier/angaben.ts';
 import {
@@ -137,6 +140,16 @@ export async function meldeZurCmAn(kategorieId: number, mitgliedId: number): Pro
 	if (r !== 'ok') throw new Error(`Anmeldung zur Kategorie ${kategorieId}: ${r}`);
 }
 
+/** Wildcard-Antrag über die Fachlogik (FR-08), ohne Mail an Spieler und CM-Admins. */
+export async function beantrageWildcardDirekt(
+	kategorieId: number,
+	mitgliedId: number,
+	kommentar: string
+): Promise<void> {
+	const r = await beantrageWildcard(hole().db, kategorieId, mitgliedId, kommentar, new Date());
+	if (r !== 'ok') throw new Error(`Wildcard-Antrag für Kategorie ${kategorieId}: ${r}`);
+}
+
 /** Erfundener Anlass weit in der Zukunft mit offener Anmeldung; gibt seine Nummer zurück. */
 export async function legeOffenenAnlassAn(erstelltVon: number, titel: string): Promise<number> {
 	return legeAnlassAn(hole().db, erstelltVon, {
@@ -169,26 +182,61 @@ export async function beendeAlleSitzungen(kontoId: number): Promise<void> {
 
 type Treffer = { messages: { ID: string }[] };
 
-/** Wartet auf die Mail an `adresse` (der Versand läuft nach der Antwort) und liest den Code. */
-export async function holeMailCode(adresse: string, wartezeitMs = 15_000): Promise<string> {
+/** Mails an `adresse` (neueste zuerst), wahlweise nur mit diesem Betreff. */
+async function sucheMails(adresse: string, betreff?: string): Promise<{ ID: string }[]> {
 	const suche = new URL('/api/v1/search', MAILPIT_URL);
-	suche.searchParams.set('query', `to:"${adresse}"`);
+	suche.searchParams.set('query', `to:"${adresse}"${betreff ? ` subject:"${betreff}"` : ''}`);
+	const antwort = await fetch(suche);
+	return antwort.ok ? ((await antwort.json()) as Treffer).messages : [];
+}
+
+async function mailText(id: string): Promise<string> {
+	const mail = await fetch(new URL(`/api/v1/message/${id}`, MAILPIT_URL));
+	return ((await mail.json()) as { Text: string }).Text;
+}
+
+// Alle Code-Mails (Login, Verwaltung, neue E-Mail-Adresse) beginnen den Betreff so.
+const CODE_BETREFF = 'Dein Code für';
+const warte = () => new Promise((r) => setTimeout(r, 250));
+
+/**
+ * Wartet auf die Code-Mail an `adresse` (der Versand läuft nach der Antwort) und liest den Code.
+ * Nur Mails mit dem Betreff der Code-Mail: CM-Admins bekommen auch Meldungen paralleler Tests
+ * (FR-47), etwa zu einem neuen Wildcard-Antrag.
+ */
+export async function holeMailCode(adresse: string, wartezeitMs = 15_000): Promise<string> {
 	const ende = Date.now() + wartezeitMs;
 	while (Date.now() < ende) {
-		const antwort = await fetch(suche);
-		if (antwort.ok) {
-			const [neueste] = ((await antwort.json()) as Treffer).messages;
-			if (neueste) {
-				const mail = await fetch(new URL(`/api/v1/message/${neueste.ID}`, MAILPIT_URL));
-				const { Text } = (await mail.json()) as { Text: string };
-				const code = /\b(\d{6})\b/.exec(Text)?.[1];
-				if (code) return code;
-				throw new Error('Mail ohne sechsstelligen Code');
-			}
+		const [neueste] = await sucheMails(adresse, CODE_BETREFF);
+		if (neueste) {
+			const code = /\b(\d{6})\b/.exec(await mailText(neueste.ID))?.[1];
+			if (code) return code;
+			throw new Error('Mail ohne sechsstelligen Code');
 		}
-		await new Promise((r) => setTimeout(r, 250));
+		await warte();
 	}
 	throw new Error('Keine Mail in Mailpit angekommen');
+}
+
+/**
+ * Wartet auf eine Mail an `adresse` mit diesem Betreff, deren Text `inhalt` enthält, und gibt den
+ * Text zurück (Meldungen ohne Push-Abo kommen als Mail, FR-47).
+ */
+export async function warteAufMail(
+	adresse: string,
+	betreff: string,
+	inhalt: string,
+	wartezeitMs = 15_000
+): Promise<string> {
+	const ende = Date.now() + wartezeitMs;
+	while (Date.now() < ende) {
+		for (const { ID } of await sucheMails(adresse, betreff)) {
+			const text = await mailText(ID);
+			if (text.includes(inhalt)) return text;
+		}
+		await warte();
+	}
+	throw new Error(`Keine Mail «${betreff}» mit «${inhalt}» in Mailpit angekommen`);
 }
 
 export async function schliesseLoginHilfen(): Promise<void> {

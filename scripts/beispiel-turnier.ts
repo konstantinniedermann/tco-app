@@ -1,7 +1,7 @@
 // Nur lokal (make seed): eine erfundene Clubmeisterschaft 2027 mit Kategorien, damit die
 // Verwaltung beim Vorzeigen nicht leer ist (DS-08).
 import { and, eq } from 'drizzle-orm';
-import { meldeAn } from '../src/lib/server/cm/anmeldungen.ts';
+import { beantrageWildcard, meldeAn } from '../src/lib/server/cm/anmeldungen.ts';
 import type { Db } from '../src/lib/server/db/index.ts';
 import { kategorie, mitglied, turnier } from '../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../src/lib/server/turnier/angaben.ts';
@@ -76,11 +76,17 @@ const ANMELDUNGEN: [string, string[]][] = [
 	['Herren R7–R9', ['Urs']],
 	['Damen R4–R9', ['Lena', 'Sara']]
 ];
+// FR-08: ein offener Wildcard-Antrag, damit die Verwaltung beim Vorzeigen einen zeigt.
+const ANTRAG = {
+	kategorie: 'Herren R1–R6',
+	vorname: 'Urs',
+	kommentar: 'Möchte mich mit Stärkeren messen.'
+};
 
 const mailVon = (s: (typeof SPIELER)[number]) =>
 	`${s.vorname}.${s.nachname}@example.org`.toLowerCase();
 
-/** Legt erfundene Anmeldungen an; wiederholbar, ein zweiter Lauf ändert nichts. */
+/** Legt erfundene Anmeldungen und einen Antrag an; wiederholbar, ein zweiter Lauf ändert nichts. */
 async function legeBeispielAnmeldungenAn(db: Db, turnierId: number, jetzt: Date): Promise<void> {
 	const ids = new Map<string, number>();
 	for (const s of SPIELER) {
@@ -112,6 +118,13 @@ async function legeBeispielAnmeldungenAn(db: Db, turnierId: number, jetzt: Date)
 		// 'schon-angemeldet' beim zweiten Lauf ist gewollt.
 		for (const v of vornamen) await meldeAn(db, k.id, ids.get(v) as number, jetzt);
 	}
+	const [k] = await db
+		.select({ id: kategorie.id })
+		.from(kategorie)
+		.where(and(eq(kategorie.turnierId, turnierId), eq(kategorie.name, ANTRAG.kategorie)));
+	// Auch hier: 'schon-angemeldet' beim zweiten Lauf ist gewollt.
+	if (k)
+		await beantrageWildcard(db, k.id, ids.get(ANTRAG.vorname) as number, ANTRAG.kommentar, jetzt);
 }
 
 /** Legt die Beispiel-Clubmeisterschaft samt Anmeldungen an; vorhandene Daten bleiben unverändert. */
