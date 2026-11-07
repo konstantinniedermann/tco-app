@@ -233,6 +233,7 @@ test('A-ANMELDUNG-10, FR-08: Mitglied beantragt eine Wildcard, CM-Admin lehnt mi
 	await expect(hinweis).toContainText('E-Mail-Adresse und Telefonnummer');
 	await hinweis.getByRole('button', { name: 'Weiter' }).click();
 	const antrag = page.getByRole('dialog', { name: 'Wildcard beantragen' });
+	await expect(antrag).toContainText('Bitte keine Angaben zur Gesundheit.');
 	await antrag.getByLabel('Warum möchtest du hier spielen?').fill(kommentar);
 	await pruefeBildschirm(page, info, 'cm-wildcard-antrag');
 	await antrag.getByRole('button', { name: 'Beantragen' }).click();
@@ -253,9 +254,16 @@ test('A-ANMELDUNG-10, FR-08: Mitglied beantragt eine Wildcard, CM-Admin lehnt mi
 	await expect(page.getByText('1 Anmeldung, 1 Wildcard-Antrag', { exact: true })).toBeVisible();
 	await expect(zeile(page, nachname)).toContainText(kommentar);
 	await expect(zeile(page, nachname)).toContainText('Wildcard beantragt');
+	// Verschieben bestätigt einen Antrag; der Dialog sagt es, hier nur angesehen.
+	await zeile(page, nachname).getByRole('button', { name: 'Verschieben' }).click();
+	const verschieben = page.getByRole('dialog', { name: 'Verschieben' });
+	await expect(verschieben).toContainText('Der Antrag gilt danach als bestätigt.');
+	await verschieben.getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(verschieben).toBeHidden();
 	await zeile(page, nachname).getByRole('button', { name: 'Entscheiden' }).click();
 	const entscheid = page.getByRole('dialog', { name: 'Wildcard-Antrag' });
 	await expect(entscheid).toContainText(kommentar);
+	await expect(entscheid).toContainText('bitte keine Angaben zur Gesundheit');
 	await entscheid.getByLabel('Grund (freiwillig)').fill('Das Feld ist schon voll.');
 	await pruefeBildschirm(page, info, 'cm-wildcard-entscheid');
 	await entscheid.getByRole('button', { name: 'Ablehnen' }).click();

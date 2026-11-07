@@ -414,6 +414,9 @@
 		{#if gewaehlt}
 			{@const z = gewaehlt}
 			<p>{z.name}</p>
+			{#if z.status === 'beantragt'}
+				<p>Der Antrag gilt danach als bestätigt.</p>
+			{/if}
 			{#if andere.length === 0}
 				<p>Es gibt keine andere aktive Einzel-Kategorie.</p>
 			{:else}
@@ -527,7 +530,10 @@
 					aria-describedby="entscheiden-grund-hilfe entscheiden-grund-zaehler"
 					bind:value={grund}
 				/>
-				<span class="feld-hilfe" id="entscheiden-grund-hilfe">Nur bei Ablehnung.</span>
+				<span class="feld-hilfe" id="entscheiden-grund-hilfe"
+					>Nur bei Ablehnung. Steht in der Meldung an den Spieler; bitte keine Angaben zur
+					Gesundheit.</span
+				>
 				<span class="feld-hilfe" id="entscheiden-grund-zaehler"
 					>{grund.length} von {GRUND_MAX} Zeichen</span
 				>

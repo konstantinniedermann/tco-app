@@ -367,7 +367,8 @@
 							<strong>{k.name}</strong><br />
 							<span class="leise">{kategorieText(k)}</span><br />
 							<span class="leise">{namenText(k.namen)}</span>
-							{#if k.anmeldungId !== null}<br /><span class="plakette">Wildcard beantragt</span
+							{#if k.anmeldungId !== null}<br /><span class="plakette plakette-offen"
+									>Wildcard beantragt</span
 								>{/if}
 						</span>
 						{#if offen && !nurAnsehen}
@@ -431,6 +432,10 @@
 	<form onsubmit={wildcardSenden} novalidate>
 		<div class="feld">
 			<label for="cm-kommentar">Warum möchtest du hier spielen?</label>
+			<span class="feld-hilfe" id="cm-kommentar-hinweis"
+				>Bitte keine Angaben zur Gesundheit. Den Kommentar sehen nur du, die CM-Admins und wer MyTCO
+				technisch betreut.</span
+			>
 			<textarea
 				id="cm-kommentar"
 				rows="4"
@@ -440,8 +445,8 @@
 				required
 				aria-invalid={kommentarFehler ? 'true' : undefined}
 				aria-describedby={kommentarFehler
-					? 'cm-kommentar-hilfe cm-fehler-kommentar'
-					: 'cm-kommentar-hilfe'}></textarea>
+					? 'cm-kommentar-hinweis cm-kommentar-hilfe cm-fehler-kommentar'
+					: 'cm-kommentar-hinweis cm-kommentar-hilfe'}></textarea>
 			<span class="feld-hilfe" id="cm-kommentar-hilfe"
 				>{kommentarZaehlerText(kommentar.length)}</span
 			>
