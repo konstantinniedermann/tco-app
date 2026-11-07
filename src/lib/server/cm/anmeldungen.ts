@@ -50,7 +50,7 @@ const GRENZE = 3;
 
 /** Aktiv sind bestätigte und (ab Teil 4) beantragte Anmeldungen. */
 const AKTIV: AnmeldungStatus[] = ['bestaetigt', 'beantragt'];
-const istAktiv = inArray(anmeldung.status, AKTIV);
+export const istAktiv = inArray(anmeldung.status, AKTIV);
 
 const namenOrdnung = new Intl.Collator('de-CH');
 

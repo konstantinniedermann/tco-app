@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { testPruefer, type Antwort } from '../../../../tests/hilfen/passkey-pruefer.ts';
+import { erfasseAustritt, merkeZumLoeschenVor } from '../admin/mitgliedschaft.ts';
 import { erstelleDb } from '../db/index.ts';
 import { konto, mitglied, passkey, sitzung } from '../db/schema.ts';
 import { erstelleBremsen } from './bremse.ts';
@@ -284,6 +285,31 @@ describe('Mit Passkey anmelden', () => {
 		expect(d.aufrufe.pruefeAnmelden).toBe(vorher);
 		expect(await sitzungenVon(gesperrt.kontoId)).toHaveLength(1); // nur die Code-Sitzung
 		expect(await sitzungenVon(ausgetreten.kontoId)).toHaveLength(1);
+	});
+
+	test('Review-Fokus 5: nach Austritt oder Vormerken wie ein unbekannter Passkey', async () => {
+		const d = baue();
+		const admin = await legeMitgliedAn(db);
+		const urheber = { art: 'admin', mitgliedId: admin.mitgliedId } as const;
+		const ausgetreten = await legeMitgliedAn(db);
+		const vorgemerkt = await legeMitgliedAn(db);
+		const a = await richteEin(d, ausgetreten.kontoId);
+		const v = await richteEin(d, vorgemerkt.kontoId);
+		expect(await erfasseAustritt(db, urheber, ausgetreten.mitgliedId, start)).toBe('ok');
+		expect(await merkeZumLoeschenVor(db, urheber, vorgemerkt.mitgliedId, start)).toBe('ok');
+		const vorher = d.aufrufe.pruefeAnmelden;
+
+		const unbekannt = await meldeAn(d, neueKennung());
+		expect(unbekannt).toEqual({ ergebnis: 'falsch' });
+		expect(await meldeAn(d, a.kennung)).toEqual(unbekannt);
+		expect(await meldeAn(d, v.kennung)).toEqual(unbekannt);
+
+		expect(d.aufrufe.pruefeAnmelden).toBe(vorher);
+		expect(await sitzungenVon(ausgetreten.kontoId)).toHaveLength(0);
+		expect(await sitzungenVon(vorgemerkt.kontoId)).toHaveLength(0);
+		// Passkeys bleiben bis zur Löschung.
+		expect(await passkeysVon(ausgetreten.kontoId)).toHaveLength(1);
+		expect(await passkeysVon(vorgemerkt.kontoId)).toHaveLength(1);
 	});
 
 	test('SI-18: Passkey einer anderen rpId wird nicht angenommen', async () => {

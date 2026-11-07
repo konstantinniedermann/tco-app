@@ -1,10 +1,11 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { erfasseAustritt, merkeZumLoeschenVor } from '../admin/mitgliedschaft.ts';
 import { erstelleDb } from '../db/index.ts';
 import { konto, mitglied, sitzung } from '../db/schema.ts';
 import { erstelleBremsen } from './bremse.ts';
-import { MAIL_CODE_GUELTIG_MS } from './codes.ts';
+import { MAIL_CODE_GUELTIG_MS, erzeugeBriefCode } from './codes.ts';
 import { erstelleLoginDienst, type Mailer } from './dienst.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
@@ -375,5 +376,45 @@ describe('Mail-Code', () => {
 		expect(await d.dienst.loginMitMailCode(email, falsch, 'ip-w')).toEqual({
 			ergebnis: 'zu-viele'
 		});
+	});
+
+	test('Review-Fokus 5: ausgetreten und vorgemerkt wie unbekannte Adresse, keine Mail', async () => {
+		const d = baue();
+		const admin = await legeMitgliedAn(db);
+		const urheber = { art: 'admin', mitgliedId: admin.mitgliedId } as const;
+		const ausgetreten = await legeMitgliedAn(db);
+		const vorgemerkt = await legeMitgliedAn(db);
+		// Codes vor dem Übergang ausgestellt: auch sie führen danach nicht hinein.
+		const { code: brief } = await d.dienst.stelleBriefCodeAus(ausgetreten.kontoId);
+		await fordereAn(d, vorgemerkt.email, 'ip-r5-1');
+		const mailCode = codeAus(d.post[0]);
+		expect(await erfasseAustritt(db, urheber, ausgetreten.mitgliedId, start)).toBe('ok');
+		expect(await merkeZumLoeschenVor(db, urheber, vorgemerkt.mitgliedId, start)).toBe('ok');
+		d.post.length = 0;
+
+		const unbekannt = d.dienst.fordereMailCodeAn('niemand-r5@example.org', 'ip-r5-2');
+		const a = d.dienst.fordereMailCodeAn(ausgetreten.email, 'ip-r5-2');
+		const v = d.dienst.fordereMailCodeAn(vorgemerkt.email, 'ip-r5-2');
+		await Promise.all([unbekannt.arbeit, a.arbeit, v.arbeit]);
+		expect([a.annahme, v.annahme]).toEqual([unbekannt.annahme, unbekannt.annahme]);
+		expect(d.post).toHaveLength(0);
+
+		const falschUnbekannt = await d.dienst.loginMitMailCode(
+			'niemand-r5@example.org',
+			mailCode,
+			'ip-r5-3'
+		);
+		expect(await d.dienst.loginMitMailCode(vorgemerkt.email, mailCode, 'ip-r5-3')).toEqual(
+			falschUnbekannt
+		);
+		expect(await d.dienst.loginMitBriefCode(brief, 'ip-r5-4')).toEqual(
+			await d.dienst.loginMitBriefCode(erzeugeBriefCode(), 'ip-r5-4')
+		);
+		expect(
+			await db.select().from(sitzung).where(eq(sitzung.kontoId, ausgetreten.kontoId))
+		).toHaveLength(0);
+		expect(
+			await db.select().from(sitzung).where(eq(sitzung.kontoId, vorgemerkt.kontoId))
+		).toHaveLength(0);
 	});
 });
