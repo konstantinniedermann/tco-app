@@ -85,21 +85,22 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
   vergangenen Resultaten (**Vorschlag K-38:** Austritt plus 1 Jahr; die Frist legt der Verein fest).
   Vom Austritt erfährt MyTCO über die eingelesene Mitgliederliste (A-MITGLIED-07, K-17.1).
 - **Zeitgeber:** Ein täglicher Zeitgeber der App (auch kurz nach jedem Start; `ZEITGEBER=aus` schaltet
-  ihn ab, ein Datenbank-Sperrschloss verhindert parallele Läufe) löscht, was fällig ist. Fristen rechnen
-  nach Schweizer Kalenderzeit; gelöscht wird nie vor dem angezeigten Datum.
+  ihn ab, ein Datenbank-Sperrschloss verhindert parallele Läufe) löscht, was fällig ist. Die Frist nach
+  dem Austritt und die Bedenkzeit rechnen nach Schweizer Kalenderzeit; gelöscht wird nie vor dem
+  angezeigten Datum. Verlauf und Antworten zu Anlässen löscht der Lauf nach einer Grenze von 12 Monaten (UTC).
 - **Was bei der Löschung bleibt:** nur Vor- und Nachname. Konto mit Sitzungen, Passkeys, Rollen und
   Push-Abos, die eigenen Verlauf-Einträge und die Antworten zu Anlässen entfallen. Verweise als *erstellt
   von*, Urheber oder Absender werden leer und erscheinen als *gelöschtes Konto*.
 - **Auskunft** (Mitglieder-Admin, DS-07): druckbare Seite mit allen gespeicherten Daten des Mitglieds
   ausser Geheimnissen; Verlauf-Einträge, in denen die Person nur Urheber bei anderen ist, fehlen (sie
   nennen Dritte). Das Erstellen steht im Änderungsverlauf.
-- **Mitglied löschen** (Mitglieder-Admin, DS-07): Bedenkzeit von 7 Tagen (Anzeige «wird gelöscht»); gleicher Rückzug wie beim Austritt. In dieser Zeit steht das Mitglied
+- **Mitglied löschen** (Mitglieder-Admin, DS-07): Bedenkzeit von 7 Tagen (Anzeige «wird gelöscht»); wie beim Austritt werden offene Anmeldungen zurückgezogen und Antworten zu kommenden Anlässen gelöscht. Die Markierung *für Fairgate offen* entfernt nur der Austritt; die Löschung räumt sie ohnehin ab. In dieser Zeit steht das Mitglied
   im Zustand *Löschung vorgemerkt*, das Login ist gesperrt, und der Mitglieder-Admin kann die Löschung
   rückgängig machen; dann gilt wieder der Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum). Nach der Woche wird gelöscht wie nach der Frist beim Austritt.
 - **CM-Anmeldungen:** bleiben beim vergangenen Turnier, wie Resultate. Wird ein Mitglied gelöscht, bleibt in seinen Anmeldungen nur der Name (der Wildcard-Kommentar einer Einzel-Anmeldung wird geleert, Doppel regelt [#59](https://github.com/konstantinniedermann/tco-app/issues/59)); Grund: Die Turniergeschichte mit Namen und Resultaten ist bei Swiss Tennis ohnehin öffentlich einsehbar.
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
-- **Anmeldungen zu Anlässen:** ein Jahr nach dem Anlass (**Vorschlag K-50**), vom Zeitgeber gelöscht;
+- **Anmeldungen zu Anlässen:** ein Jahr nach Beginn des Anlasses (**Vorschlag K-50**), vom Zeitgeber gelöscht;
   mit dem Anlass sind alle Anmeldungen dazu ohnehin gelöscht.
 - **Push-Abo:** mit der Sitzung (Abmelden, Sitzung beendet, nach einem Jahr ohne Nutzung), beim Abschalten, wenn der Push-Dienst es als ungültig meldet, und mit dem Konto.
 - **Verlauf der Mitteilungen:** 365 Tage nach dem Versand, ohne Hintergrund-Job: Jeder neue Versand löscht ältere Einträge mit; mit dem Anlass, wenn er gelöscht wird.

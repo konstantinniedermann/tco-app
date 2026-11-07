@@ -13,7 +13,7 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   rückgängig machbar) und druckt die Auskunft mit allen gespeicherten Daten (steht im Änderungsverlauf).
   Austritt und Vormerken sperren das Login und ziehen offene Anmeldungen zurück. Ein täglicher
   Zeitgeber der App löscht ausgetretene Mitglieder nach einem Jahr (nur der Name bleibt), den
-  Änderungsverlauf nach 12 Monaten und Antworten zu Anlässen ein Jahr nach dem Anlass; Verweise auf
+  Änderungsverlauf nach 12 Monaten und Antworten zu Anlässen ein Jahr nach Beginn des Anlasses; Verweise auf
   Gelöschte erscheinen als «gelöschtes Konto». Der letzte MyTCO-Admin kann weder austreten noch
   vorgemerkt werden (RR-03).
 
