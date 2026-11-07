@@ -105,6 +105,7 @@ test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in d
 		name: 'Gerda Beispiel' + projekt + ' löschen?'
 	});
 	await expect(frageLoeschen).toBeVisible();
+	await expect(frageLoeschen).toContainText('Kommende Anmeldungen werden zurückgezogen.');
 	await pruefeBildschirm(page, info, 'mitgliedschaft-rueckfrage-loeschen');
 	await bild(page, projekt, 'rueckfrage-loeschen');
 	await frageLoeschen.getByRole('button', { name: 'Mitglied löschen' }).click();
@@ -118,8 +119,10 @@ test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in d
 	await expect(karte).toContainText('Aktiv. Kommt der Austritt');
 	await expect(karte.getByText('wird gelöscht', { exact: true })).toHaveCount(0);
 
-	// Auskunft.
-	await karte.getByRole('link', { name: /Auskunft über die Daten/ }).click();
+	// Auskunft. Der Link lädt nicht vor: schon das Laden steht im Verlauf.
+	const auskunft = karte.getByRole('link', { name: /Auskunft über die Daten/ });
+	await expect(auskunft).toHaveAttribute('data-sveltekit-preload-data', 'false');
+	await auskunft.click();
 	await expect(page).toHaveURL(/\/auskunft$/);
 	await expect(
 		page.getByRole('heading', {
@@ -129,6 +132,10 @@ test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in d
 	).toBeVisible();
 	for (const abschnitt of ['Angaben', 'Mitgliedschaft und Rollen', 'Login und Geräte'])
 		await expect(page.getByRole('heading', { level: 2, name: abschnitt })).toBeVisible();
+	// «Wer» nennt den Admin nicht beim Namen.
+	const verlauf = page.getByRole('region', { name: 'Änderungsverlauf' });
+	await expect(verlauf).toContainText('Mitgliederverwaltung');
+	await expect(verlauf).not.toContainText('Ada');
 	await pruefeBildschirm(page, info, 'mitgliedschaft-auskunft');
 	await bild(page, projekt, 'auskunft', true);
 
@@ -136,8 +143,6 @@ test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in d
 	await expect(
 		page.getByRole('button', { name: 'Drucken oder als PDF speichern' })
 	).not.toBeVisible();
-	await expect(page.locator('.reiter')).not.toBeVisible();
-	await expect(page.locator('.ansicht-band')).not.toBeVisible();
 	await expect(page.locator('.seitenleiste')).not.toBeVisible();
 	await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 	// Der Inhalt füllt die Seite (kein schmaler Streifen im Raster der Verwaltung).

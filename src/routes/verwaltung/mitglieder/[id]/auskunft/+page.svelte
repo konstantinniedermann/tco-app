@@ -2,6 +2,7 @@
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import {
+		GESCHLECHT_NAME,
 		aktionText,
 		auskunftTitel,
 		datumText,
@@ -82,7 +83,7 @@
 				<tr><th scope="row">Mitgliedernummer</th><td>{ang.mitgliedernummer ?? '–'}</td></tr>
 				<tr
 					><th scope="row">Geschlecht, Jahrgang</th><td
-						>{ang.geschlecht ?? '–'}, {ang.jahrgang ?? '–'}</td
+						>{ang.geschlecht ? GESCHLECHT_NAME[ang.geschlecht] : '–'}, {ang.jahrgang ?? '–'}</td
 					></tr
 				>
 				<tr

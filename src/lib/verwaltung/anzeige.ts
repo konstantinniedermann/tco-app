@@ -35,6 +35,9 @@ export const FELD_NAMEN: Record<Feld | 'klassierung', string> = {
 	lizenznummer: 'Lizenznummer'
 };
 
+/** Geschlecht als Wort, wie im Angabenformular. */
+export const GESCHLECHT_NAME = { w: 'weiblich', m: 'männlich' } as const;
+
 // Verlaufseinträge von vor dem Umbau der Rollen nennen noch die alte Rolle admin.
 const VERLAUF_ROLLEN: Record<string, string> = { ...ROLLEN_NAME, admin: 'Admin' };
 

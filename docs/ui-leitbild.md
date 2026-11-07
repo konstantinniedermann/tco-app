@@ -399,7 +399,8 @@ Seite *Auskunft*.
 - **Tabellen:** Abschnitt als `<h2>` mit Tabelle darunter in `.tabelle` (benannte Region mit `tabindex="0"`, auf dem Handy waagrecht scrollbar, auf Papier nicht beschnitten); 1 px Linien in `--farbe-rand`, Bezeichnung
   links fett, Tabellenkopf in `--farbe-marke-zart`.
 - **Tasten:** «‹ Zurück» und «Drucken oder als PDF speichern» tragen `.nicht-drucken`.
-- **Druck:** Unter `@media print` verschwinden `.nicht-drucken`, `.seitenleiste` und `.kopf`; der
+- **Druck:** Unter `@media print` verschwinden `.nicht-drucken`, `.seitenleiste` und `.kopf`,
+  dazu der Hinweis «Nur ansehen» (`.hinweis`) und das Band der Ansicht (`.ansicht-band`); der
   Inhalt nutzt die ganze Breite: Rahmen und Raster der Verwaltung werden zu einem Block auf weissem Grund, ohne feste Höhe.
 
 ## Sprache

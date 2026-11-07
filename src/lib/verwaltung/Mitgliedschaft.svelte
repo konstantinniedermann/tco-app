@@ -135,8 +135,10 @@
 	{/if}
 
 	<p class="leise">
-		<a href={resolve('/verwaltung/mitglieder/[id]/auskunft', { id: String(detail.id) })}
-			>Auskunft über die Daten ›</a
+		<!-- Kein Vorladen: schon das Laden schreibt «Auskunft erstellt» in den Verlauf (DS-07). -->
+		<a
+			href={resolve('/verwaltung/mitglieder/[id]/auskunft', { id: String(detail.id) })}
+			data-sveltekit-preload-data="false">Auskunft über die Daten ›</a
 		>
 	</p>
 </section>
@@ -158,7 +160,8 @@
 <dialog class="karte" bind:this={loeschenFrage} aria-labelledby="loeschen-titel">
 	<h2 id="loeschen-titel">{name} löschen?</h2>
 	<p>
-		Das Login ist ab sofort gesperrt. Am {loeschDatum} löscht MyTCO die Daten; dann bleibt nur der Name.
+		Das Login ist ab sofort gesperrt. Kommende Anmeldungen werden zurückgezogen. Am {loeschDatum}
+		löscht MyTCO die Daten; dann bleibt nur der Name.
 	</p>
 	<p class="leise">Bis dahin kannst du das rückgängig machen.</p>
 	<div class="leiste">

@@ -1732,7 +1732,9 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 @media print {
 	.nicht-drucken,
 	.seitenleiste,
-	.kopf {
+	.kopf,
+	.hinweis,
+	.ansicht-band {
 		display: none;
 	}
 
