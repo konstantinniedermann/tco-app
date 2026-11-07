@@ -1,5 +1,5 @@
 // Löschfristen (FR-04, docs/datenschutz.md «Löschen»): Konten nach Frist oder Bedenkzeit,
-// Änderungsverlauf nach 12 Monaten, Antworten zu Anlässen ein Jahr nach dem Anlass.
+// Änderungsverlauf nach 12 Monaten, Antworten zu Anlässen ein Jahr nach Beginn des Anlasses.
 import { and, eq, getTableColumns, inArray, lt, sql } from 'drizzle-orm';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
@@ -15,13 +15,14 @@ import {
 } from '../db/schema.ts';
 import type { MitgliedStatus } from './mitglieder.ts';
 import { loeschtAm } from './mitgliedschaft.ts';
+import { sperreRollen } from './rollen.ts';
 
 // Ein Lauf zur Zeit (Neustart, zwei Prozesse); 4301 ist die Rollen-Sperre.
 const SPERRE_LOESCHLAUF = 4302;
 
 // Änderungsverlauf: 12 Monate (docs/datenschutz.md).
 const VERLAUF_MONATE = 12;
-// Vorschlag K-50: Antworten zu Anlässen bleiben ein Jahr nach dem Anlass.
+// Vorschlag K-50: Antworten zu Anlässen bleiben ein Jahr nach Beginn des Anlasses.
 const ANTWORTEN_MONATE = 12;
 
 // Von einem gelöschten Mitglied bleiben nur diese Spalten; jede andere wird leer, auch künftige.
@@ -146,6 +147,8 @@ export async function raeumeAuf(db: Db, jetzt: Date): Promise<Loeschlauf> {
 			sql`select pg_try_advisory_xact_lock(${SPERRE_LOESCHLAUF}) as frei`
 		);
 		if (!sperre.rows[0]?.frei) return { lief: false, konten: [], verlauf: 0, antworten: 0 };
+		// Wie Übergänge und Rollenänderungen: Rollen-Sperre vor jeder Zeilensperre.
+		await sperreRollen(tx);
 
 		const konten = await loescheKonten(tx, jetzt);
 		const verlauf = await tx
