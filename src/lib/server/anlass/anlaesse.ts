@@ -201,7 +201,7 @@ export async function melde(
 }
 
 const zaehle = (antwort: Antwort) =>
-	sql<number>`count(${anlassAnmeldung.mitgliedId}) filter (where ${anlassAnmeldung.antwort} = ${antwort})`.mapWith(
+	sql<number>`count(${anlassAnmeldung.mitgliedId}) filter (where ${anlassAnmeldung.antwort} = ${antwort} and ${mitglied.status} = 'aktiv')`.mapWith(
 		Number
 	);
 
@@ -217,6 +217,7 @@ export async function listeAnlaesse(db: Db): Promise<AnlassListe[]> {
 		})
 		.from(anlass)
 		.leftJoin(anlassAnmeldung, eq(anlassAnmeldung.anlassId, anlass.id))
+		.leftJoin(mitglied, eq(mitglied.id, anlassAnmeldung.mitgliedId))
 		.groupBy(anlass.id)
 		.orderBy(desc(anlass.beginn), desc(anlass.id));
 }
@@ -243,7 +244,7 @@ export async function ladeAnlassAdmin(db: Db, id: number): Promise<AnlassAdmin |
 		})
 		.from(anlassAnmeldung)
 		.innerJoin(mitglied, eq(mitglied.id, anlassAnmeldung.mitgliedId))
-		.where(eq(anlassAnmeldung.anlassId, id))
+		.where(and(eq(anlassAnmeldung.anlassId, id), eq(mitglied.status, 'aktiv')))
 		.orderBy(asc(mitglied.nachname), asc(mitglied.vorname), asc(mitglied.id));
 	// Noch keine Antwort: aktive Mitglieder ohne Anmeldung, auch solche ohne Login.
 	const [{ keineAntwort }] = await db

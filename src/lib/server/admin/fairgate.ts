@@ -14,6 +14,8 @@ export type FairgateZeile = {
 	mitgliedernummer: string | null;
 	seit: Date;
 	felder: Feld[];
+	/** Offene Markierung, aber kein Verlaufseintrag des Mitglieds mehr dazu (Verlauf nach 12 Monaten gelöscht). */
+	verlaufGeloescht: boolean;
 	angaben: Pick<Angaben, 'email' | 'telefon' | 'strasse' | 'plz' | 'ort'>;
 };
 
@@ -21,7 +23,7 @@ export async function listeFuerFairgate(db: DbOderTx): Promise<FairgateZeile[]> 
 	const offene = await db
 		.select()
 		.from(mitglied)
-		.where(isNotNull(mitglied.fairgateOffenSeit))
+		.where(and(isNotNull(mitglied.fairgateOffenSeit), eq(mitglied.status, 'aktiv')))
 		.orderBy(asc(mitglied.fairgateOffenSeit), asc(mitglied.id));
 	if (offene.length === 0) return [];
 	const eintraege = await db
@@ -58,6 +60,7 @@ export async function listeFuerFairgate(db: DbOderTx): Promise<FairgateZeile[]> 
 			mitgliedernummer: m.mitgliedernummer,
 			seit: m.fairgateOffenSeit!,
 			felder,
+			verlaufGeloescht: felder.length === 0,
 			angaben: {
 				email: m.email ?? '',
 				telefon: m.telefon,

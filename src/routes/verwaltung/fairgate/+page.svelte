@@ -67,7 +67,13 @@
 					<tr>
 						<td>{z.name}</td>
 						<td>{z.mitgliedernummer ?? ''}</td>
-						<td>{geaendertText(z.felder)}</td>
+						<td>
+							{#if z.verlaufGeloescht}
+								Änderung älter als 12 Monate, Angaben in Fairgate prüfen.
+							{:else}
+								{geaendertText(z.felder)}
+							{/if}
+						</td>
 						<td>
 							{#each neueAngaben(z) as zeile, i (i)}
 								{#if i > 0}<br />{/if}{zeile}

@@ -288,7 +288,8 @@ export async function aendereAngaben(
 	try {
 		return await db.transaction(async (tx) => {
 			const [alt] = await tx.select().from(mitglied).where(eq(mitglied.id, id)).for('update');
-			if (!alt) return { ergebnis: 'nicht-gefunden' as const };
+			// Gelöschte behalten nur den Namen; nichts darf zurückgeschrieben werden.
+			if (!alt || alt.status === 'geloescht') return { ergebnis: 'nicht-gefunden' as const };
 			const gespeichert = angabenAusZeile(alt);
 			if (geaenderteFelder(gespeichert, vorher).length > 0)
 				return { ergebnis: 'veraltet' as const };
@@ -321,7 +322,11 @@ export async function beendeSitzungenVon(
 	jetzt: Date
 ): Promise<'ok' | 'nicht-gefunden'> {
 	return db.transaction(async (tx) => {
-		const [k] = await tx.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, id));
+		const [k] = await tx
+			.select({ id: konto.id })
+			.from(konto)
+			.innerJoin(mitglied, eq(mitglied.id, konto.mitgliedId))
+			.where(and(eq(konto.mitgliedId, id), ne(mitglied.status, 'geloescht')));
 		if (!k) return 'nicht-gefunden' as const;
 		await beendeAlleSitzungen(tx, k.id);
 		await schreibeVerlauf(tx, id, urheber, [{ aktion: 'sitzungen-beendet' }], jetzt);
