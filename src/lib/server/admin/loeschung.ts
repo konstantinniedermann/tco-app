@@ -1,8 +1,18 @@
 // Löschfristen (FR-04, docs/datenschutz.md «Löschen»): Konten nach Frist oder Bedenkzeit,
 // Änderungsverlauf nach 12 Monaten, Antworten zu Anlässen ein Jahr nach dem Anlass.
-import { and, getTableColumns, inArray, lt, sql } from 'drizzle-orm';
+import { and, eq, getTableColumns, inArray, lt, sql } from 'drizzle-orm';
 import type { Db, DbOderTx } from '../db/index.ts';
-import { aenderung, anlass, anlassAnmeldung, konto, mitglied, mitteilung } from '../db/schema.ts';
+import {
+	aenderung,
+	anlass,
+	anlassAnmeldung,
+	anmeldung,
+	anmeldungSpieler,
+	kategorie,
+	konto,
+	mitglied,
+	mitteilung
+} from '../db/schema.ts';
 import type { MitgliedStatus } from './mitglieder.ts';
 import { loeschtAm } from './mitgliedschaft.ts';
 
@@ -33,11 +43,13 @@ export type Loeschlauf = {
 	antworten: number;
 };
 
-// Gleiche Uhrzeit (UTC), `monate` Kalendermonate früher. Gibt es den Tag nicht (29. Februar),
-// rückt die Grenze auf den Folgetag: nie zu früh gelöscht.
+// Gleiche Uhrzeit (UTC), `monate` Kalendermonate früher. Gibt es den Tag dort nicht (29.2.2028
+// → Februar 2027), gilt der letzte Tag des Monats: die Grenze liegt früher, gelöscht wird nie
+// vor dem Jahrestag.
 function vorMonaten(jetzt: Date, monate: number): Date {
 	const r = new Date(jetzt);
 	r.setUTCMonth(r.getUTCMonth() - monate);
+	if (r.getUTCDate() !== jetzt.getUTCDate()) r.setUTCDate(0);
 	return r;
 }
 
@@ -85,12 +97,31 @@ async function loescheKonten(tx: DbOderTx, jetzt: Date) {
 		.where(inArray(aenderung.urheberMitgliedId, ids));
 	await tx.update(anlass).set({ erstelltVon: null }).where(inArray(anlass.erstelltVon, ids));
 	await tx.update(mitteilung).set({ absenderId: null }).where(inArray(mitteilung.absenderId, ids));
-	// 2. Konto (mit Sitzungen, Passkeys, Rollen, Push-Abos), Antworten und eigener Verlauf.
+	// 2. Konto (mit Sitzungen, Passkeys, Rollen, Push-Abos), Antworten und eigener Verlauf. Vom
+	// Einzel bleibt nur der Name, ohne Wildcard-Begründung; das Doppel regelt #59.
 	await tx.delete(konto).where(inArray(konto.mitgliedId, ids));
+	await tx
+		.update(anmeldung)
+		.set({ kommentar: null })
+		.where(
+			and(
+				inArray(
+					anmeldung.id,
+					tx
+						.select({ id: anmeldungSpieler.anmeldungId })
+						.from(anmeldungSpieler)
+						.where(inArray(anmeldungSpieler.mitgliedId, ids))
+				),
+				inArray(
+					anmeldung.kategorieId,
+					tx.select({ id: kategorie.id }).from(kategorie).where(eq(kategorie.art, 'einzel'))
+				)
+			)
+		);
 	const antworten = await tx
 		.delete(anlassAnmeldung)
 		.where(inArray(anlassAnmeldung.mitgliedId, ids))
-		.returning({ id: anlassAnmeldung.anlassId });
+		.returning({ anlassId: anlassAnmeldung.anlassId });
 	const verlauf = await tx
 		.delete(aenderung)
 		.where(inArray(aenderung.mitgliedId, ids))
@@ -132,7 +163,7 @@ export async function raeumeAuf(db: Db, jetzt: Date): Promise<Loeschlauf> {
 						.where(lt(anlass.beginn, vorMonaten(jetzt, ANTWORTEN_MONATE)))
 				)
 			)
-			.returning({ id: anlassAnmeldung.anlassId });
+			.returning({ anlassId: anlassAnmeldung.anlassId });
 		return {
 			lief: true,
 			konten: konten.ids,

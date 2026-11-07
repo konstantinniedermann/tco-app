@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { eq, sql } from 'drizzle-orm';
+import type { PoolClient } from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
 	legeEigeneDatenbankAn,
@@ -26,7 +27,8 @@ import {
 } from '../db/schema.ts';
 import { erstelleSitzung } from '../login/sitzung.ts';
 import { ladeVerlauf as ladeMitteilungsverlauf } from '../mitteilung/verlauf.ts';
-import { raeumeAuf } from './loeschung.ts';
+import { raeumeAuf, type Loeschlauf } from './loeschung.ts';
+import { utcZuZuerich } from '../../anlass/zeit.ts';
 import type { MitgliedStatus } from './mitglieder.ts';
 import { loeschtAm } from './mitgliedschaft.ts';
 import { ladeVerlauf, schreibeVerlauf } from './verlauf.ts';
@@ -58,6 +60,7 @@ afterEach(() => {
 const TAG = 24 * 60 * 60 * 1000;
 const hash = (kennung: string) => createHash('sha256').update(kennung).digest('hex');
 const NACHNAME = 'Loeschkandidat';
+const UEBERSPRUNGEN = { lief: false, konten: [], verlauf: 0, antworten: 0 };
 
 /** Ausgetretenes Mitglied mit allen Angaben, Login, Rollen, Passkey und Push-Abo. */
 async function ausgetreten(austrittAm: Date) {
@@ -163,7 +166,7 @@ describe('Konto löschen', () => {
 		);
 		const vergangen = await anlassAm(new Date(austritt.getTime() - 10 * TAG));
 		await antworte(vergangen, m.mitgliedId, austritt);
-		// CM-Anmeldungen: Einzel und Doppel mit Partner.
+		// CM-Anmeldungen mit Wildcard-Begründung: Einzel allein, Doppel mit Partner.
 		const [t] = await db
 			.insert(turnier)
 			.values({
@@ -184,12 +187,34 @@ describe('Konto löschen', () => {
 				klassierungBis: 'R9'
 			})
 			.returning({ id: kategorie.id });
-		const [a] = await db
-			.insert(anmeldung)
-			.values({ kategorieId: einzel.id, angemeldetAm: austritt, geaendertAm: austritt })
-			.returning({ id: anmeldung.id });
-		await db.insert(anmeldungSpieler).values({ anmeldungId: a.id, mitgliedId: m.mitgliedId });
-		await db.insert(anmeldungSpieler).values({ anmeldungId: a.id, mitgliedId: partner.mitgliedId });
+		const [doppel] = await db
+			.insert(kategorie)
+			.values({
+				turnierId: t.id,
+				name: 'Mixed',
+				geschlecht: 'mixed',
+				art: 'doppel',
+				mindestsumme: 10
+			})
+			.returning({ id: kategorie.id });
+		const melde = async (kategorieId: number, spieler: number[]) => {
+			const [x] = await db
+				.insert(anmeldung)
+				.values({
+					kategorieId,
+					status: 'beantragt',
+					kommentar: 'Wildcard wegen Verletzung',
+					angemeldetAm: austritt,
+					geaendertAm: austritt
+				})
+				.returning({ id: anmeldung.id });
+			await db
+				.insert(anmeldungSpieler)
+				.values(spieler.map((mitgliedId) => ({ anmeldungId: x.id, mitgliedId })));
+			return x.id;
+		};
+		const a = await melde(einzel.id, [m.mitgliedId]);
+		const d = await melde(doppel.id, [m.mitgliedId, partner.mitgliedId]);
 		const jetzt = await frist(m.mitgliedId);
 
 		const ergebnis = await raeumeAuf(db, jetzt);
@@ -211,9 +236,16 @@ describe('Konto löschen', () => {
 			await db.select().from(aenderung).where(eq(aenderung.mitgliedId, m.mitgliedId))
 		).toHaveLength(0);
 		expect(await db.select().from(anlass).where(eq(anlass.id, vergangen))).toHaveLength(1);
-		expect(await db.select().from(anmeldung).where(eq(anmeldung.id, a.id))).toHaveLength(1);
+		// Vom Einzel bleibt nur der Name: die Begründung ist weg. Das Doppel regelt #59.
+		const [einzelBleibt] = await db.select().from(anmeldung).where(eq(anmeldung.id, a));
+		expect(einzelBleibt).toMatchObject({ status: 'beantragt', kommentar: null });
+		const [doppelBleibt] = await db.select().from(anmeldung).where(eq(anmeldung.id, d));
+		expect(doppelBleibt.kommentar).toBe('Wildcard wegen Verletzung');
 		expect(
-			await db.select().from(anmeldungSpieler).where(eq(anmeldungSpieler.anmeldungId, a.id))
+			await db.select().from(anmeldungSpieler).where(eq(anmeldungSpieler.anmeldungId, a))
+		).toHaveLength(1);
+		expect(
+			await db.select().from(anmeldungSpieler).where(eq(anmeldungSpieler.anmeldungId, d))
 		).toHaveLength(2);
 		// Der Partner bleibt unberührt.
 		expect((await zeile(partner.mitgliedId)).status).toBe('aktiv');
@@ -312,14 +344,22 @@ describe('Review-Fokus 3: Grenze der Frist', () => {
 		expect(ende).toEqual(new Date('2027-11-07T08:00:00Z'));
 	});
 
-	test('Austritt über die Sommerzeit (Schweiz 29.3. 00:30, nach der Umstellung)', async () => {
+	test('Austritt 29.3.2026 00:30 (Winterzeit): Jahrestag 29.3.2027 00:30 Sommerzeit', async () => {
 		const ende = await grenze(await ausgetreten(new Date('2026-03-28T23:30:00Z')));
-		expect(ende).toEqual(new Date('2027-03-28T23:30:00Z'));
+		expect(ende).toEqual(new Date('2027-03-28T22:30:00Z'));
+		expect(utcZuZuerich(ende)).toBe('2027-03-29T00:30');
+	});
+
+	test('Austritt 31.10.2027 00:30 (Sommerzeit): Jahrestag 31.10.2028 00:30 Winterzeit', async () => {
+		const ende = await grenze(await ausgetreten(new Date('2027-10-30T22:30:00Z')));
+		expect(ende).toEqual(new Date('2028-10-30T23:30:00Z'));
+		expect(utcZuZuerich(ende)).toBe('2028-10-31T00:30');
 	});
 
 	test('Bedenkzeit: loeschtAm − 1 ms nichts, loeschtAm gelöscht, auch über die Sommerzeit', async () => {
 		const ende = await grenze(await vorgemerkt(new Date('2026-03-25T23:30:00Z')));
-		expect(ende).toEqual(new Date('2026-04-01T23:30:00Z'));
+		expect(ende).toEqual(new Date('2026-04-01T22:30:00Z'));
+		expect(utcZuZuerich(ende)).toBe('2026-04-02T00:30');
 	});
 
 	test('vorgemerkt: nach 6 Tagen nicht, nach 7 Tagen gelöscht', async () => {
@@ -369,6 +409,30 @@ describe('Fristen für Verlauf und Anlass-Antworten', () => {
 		expect(bleibt).toEqual([{ detail: 'grenze' }, { detail: 'gestern' }]);
 	});
 
+	test('Verlauf am 29.2.2028: Grenze 28.2.2027, nie vor dem Jahrestag gelöscht', async () => {
+		const m = await legeMitgliedAn(db);
+		const eintrag = (zeitpunkt: string, detail: string) =>
+			schreibeVerlauf(
+				db,
+				m.mitgliedId,
+				{ art: 'automatisch' },
+				[{ aktion: 'feld-geaendert', detail }],
+				new Date(zeitpunkt)
+			);
+		await eintrag('2027-02-28T07:59:59.999Z', 'alt');
+		await eintrag('2027-02-28T08:00:00Z', 'grenze');
+		// Jahrestag erst am 1.3.2028: bleibt.
+		await eintrag('2027-03-01T07:00:00Z', 'maerz');
+
+		expect((await raeumeAuf(db, new Date('2028-02-29T08:00:00Z'))).verlauf).toBe(1);
+
+		const bleibt = await db
+			.select({ detail: aenderung.detail })
+			.from(aenderung)
+			.orderBy(aenderung.zeitpunkt);
+		expect(bleibt).toEqual([{ detail: 'grenze' }, { detail: 'maerz' }]);
+	});
+
 	test('Antworten: Anlass vor mehr als einem Jahr → Antworten weg, Anlass bleibt; jünger bleibt', async () => {
 		const m = await legeMitgliedAn(db);
 		const alt = await anlassAm(new Date(vorEinemJahr.getTime() - 1));
@@ -392,50 +456,72 @@ describe('Fristen für Verlauf und Anlass-Antworten', () => {
 	});
 });
 
+type Halter = PoolClient;
+
+/** Eigene Verbindung mit offener Transaktion; am Ende zurückgerollt und verworfen (keine Sperre bleibt). */
+async function mitHalter(fn: (h: Halter) => Promise<void>): Promise<void> {
+	const h = await db.$client.connect();
+	try {
+		await h.query('begin');
+		await fn(h);
+	} finally {
+		await h.query('rollback').catch(() => {});
+		h.release(true);
+	}
+}
+
+/** Wartet, bis eine andere Verbindung auf eine Sperre des Halters wartet. */
+async function wartetAuf(h: Halter): Promise<void> {
+	const [{ pid }] = (await h.query<{ pid: number }>('select pg_backend_pid() as pid')).rows;
+	for (let i = 0; ; i++) {
+		const r = await db.execute<{ n: number }>(
+			sql`select count(*)::int as n from pg_stat_activity where datname = current_database() and pid <> pg_backend_pid() and ${pid}::int = any(pg_blocking_pids(pid))`
+		);
+		if (r.rows[0].n > 0) return;
+		if (i > 200) throw new Error('niemand wartet auf die Sperre');
+		await new Promise((weiter) => setTimeout(weiter, 10));
+	}
+}
+
 describe('Review-Fokus 2: zwei Läufe', () => {
 	test('hält ein anderer Lauf die Sperre: lief false, nichts geändert, kein Log', async () => {
 		const m = await ausgetreten(new Date('2026-11-07T08:00:00Z'));
 		const jetzt = await frist(m.mitgliedId);
 		const vorher = await zeile(m.mitgliedId);
-		const halter = await db.$client.connect();
-		try {
-			await halter.query('begin');
-			await halter.query('select pg_advisory_xact_lock(4302)');
+		await mitHalter(async (h) => {
+			await h.query('select pg_advisory_xact_lock(4302)');
 
-			expect(await raeumeAuf(db, jetzt)).toEqual({
-				lief: false,
-				konten: [],
-				verlauf: 0,
-				antworten: 0
-			});
-		} finally {
-			await halter.query('rollback');
-			halter.release();
-		}
+			expect(await raeumeAuf(db, jetzt)).toEqual(UEBERSPRUNGEN);
+		});
 		expect(await zeile(m.mitgliedId)).toEqual(vorher);
 		expect(console.info).not.toHaveBeenCalled();
 	});
 
-	test('gleichzeitig: Ergebnis wie ein Lauf; ein Lauf danach findet nichts', async () => {
+	test('gleichzeitig: genau einer mit lief true, der zweite überspringt; danach findet ein Lauf nichts', async () => {
 		const a = await ausgetreten(new Date('2026-11-07T08:00:00Z'));
 		const b = await vorgemerkt(new Date('2027-10-01T08:00:00Z'));
 		const jetzt = new Date('2027-11-07T08:00:00Z');
+		let erster: Promise<Loeschlauf> | undefined;
 
-		const laeufe = await Promise.all([raeumeAuf(db, jetzt), raeumeAuf(db, jetzt)]);
+		// Lauf 1 hält die Sperre 4302 und hängt an der Zeile von a; Lauf 2 kommt in dieser Zeit.
+		await mitHalter(async (h) => {
+			await h.query('select id from mitglied where id = $1 for update', [a.mitgliedId]);
+			erster = raeumeAuf(db, jetzt);
+			await wartetAuf(h);
 
-		const gelaufen = laeufe.filter((l) => l.lief);
-		expect(gelaufen.length).toBeGreaterThanOrEqual(1);
-		// Lief der zweite erst nach dem ersten, findet er nichts mehr: jedes Konto genau einmal.
-		expect(laeufe.flatMap((l) => l.konten).sort((x, y) => x - y)).toEqual([
-			a.mitgliedId,
-			b.mitgliedId
-		]);
-		expect(laeufe.filter((l) => l.konten.length > 0)).toHaveLength(1);
+			expect(await raeumeAuf(db, jetzt)).toEqual(UEBERSPRUNGEN);
+		});
+
+		expect(await erster).toEqual({
+			lief: true,
+			konten: [a.mitgliedId, b.mitgliedId],
+			verlauf: 0,
+			antworten: 0
+		});
 		for (const m of [a, b]) {
 			const z = await zeile(m.mitgliedId);
 			expect(z).toEqual(nurName(z, m.mitgliedId));
 		}
-
 		expect(await raeumeAuf(db, jetzt)).toEqual({
 			lief: true,
 			konten: [],
@@ -449,30 +535,18 @@ describe('Review-Fokus 2: zwei Läufe', () => {
 		const vorgemerktAm = new Date('2027-11-01T08:00:00Z');
 		const m = await vorgemerkt(vorgemerktAm);
 		const jetzt = await frist(m.mitgliedId);
-		const halter = await db.$client.connect();
-		try {
-			await halter.query('begin');
-			await halter.query('select id from mitglied where id = $1 for update', [m.mitgliedId]);
+		await mitHalter(async (h) => {
+			await h.query('select id from mitglied where id = $1 for update', [m.mitgliedId]);
 			const lauf = raeumeAuf(db, jetzt);
-			// Warten, bis der Lauf an der Zeilensperre hängt.
-			for (let i = 0; ; i++) {
-				const warten = await db.execute<{ n: number }>(
-					sql`select count(*)::int as n from pg_locks where not granted`
-				);
-				if (warten.rows[0].n > 0) break;
-				if (i > 200) throw new Error('Lauf wartet nicht auf die Sperre');
-				await new Promise((r) => setTimeout(r, 10));
-			}
-			await halter.query(
+			await wartetAuf(h);
+			await h.query(
 				`update mitglied set status = 'ausgetreten', vorgemerkt_am = null, status_vorher = null where id = $1`,
 				[m.mitgliedId]
 			);
-			await halter.query('commit');
+			await h.query('commit');
 
 			expect(await lauf).toEqual({ lief: true, konten: [], verlauf: 0, antworten: 0 });
-		} finally {
-			halter.release();
-		}
+		});
 		const z = await zeile(m.mitgliedId);
 		expect(z.status).toBe('ausgetreten');
 		expect(await kontoDa(m.kontoId)).toBe(true);

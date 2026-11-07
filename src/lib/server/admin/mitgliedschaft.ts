@@ -1,5 +1,6 @@
 // Übergänge der Mitgliedschaft: Austritt, Wiedereintritt, Löschung vormerken und rückgängig (FR-04).
 import { eq } from 'drizzle-orm';
+import { utcZuZuerich } from '../../anlass/zeit.ts';
 import { loescheKommendeAntworten } from '../anlass/anlaesse.ts';
 import { zieheOffeneEinzelZurueck } from '../cm/austritt.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
@@ -14,26 +15,47 @@ export const FRIST_AUSTRITT = { jahre: 1 } as const;
 // Bedenkzeit nach «Mitglied löschen»: so lange lässt sich die Löschung rückgängig machen.
 export const BEDENKZEIT = { tage: 7 } as const;
 
-const TAG_MS = 24 * 60 * 60 * 1000;
+const MINUTE_MS = 60 * 1000;
+const STUNDE_MS = 60 * MINUTE_MS;
 
-// Gleicher Tag und gleiche Uhrzeit (UTC) im Folgejahr; ein 29. Februar wird zum 1. März, nie früher.
-function plusJahre(d: Date, jahre: number): Date {
-	const r = new Date(d);
-	r.setUTCFullYear(r.getUTCFullYear() + jahre);
-	return r;
+// Wanduhr in Zürich als «UTC»-Millisekunden, mit Sekunden und Millisekunden. Der Versatz zu
+// UTC ist immer eine ganze Stunde; `utcZuZuerich` liefert die Wanduhr auf die Minute.
+function zuerichMs(d: Date): number {
+	const [datum, zeit] = utcZuZuerich(d).split('T');
+	const [j, mo, t] = datum.split('-').map(Number);
+	const [h, mi] = zeit.split(':').map(Number);
+	const rest = ((d.getTime() % MINUTE_MS) + MINUTE_MS) % MINUTE_MS;
+	return Date.UTC(j, mo - 1, t, h, mi) + rest;
 }
 
-/** Zeitpunkt, ab dem der Zeitgeber das Mitglied löscht (fällig bei `jetzt >= loeschtAm`). */
+/**
+ * Gleiche Uhrzeit in Zürich, `jahre` Kalenderjahre und `tage` Kalendertage später, als Zeitpunkt.
+ * Ein 29. Februar wird zum 1. März. Gibt es die Uhrzeit nicht (Umstellung auf Sommerzeit) oder
+ * zweimal (auf Winterzeit), gilt der spätere Zeitpunkt: nie früher.
+ */
+function spaeterInZuerich(d: Date, um: { jahre?: number; tage?: number }): Date {
+	const ziel = new Date(zuerichMs(d));
+	ziel.setUTCFullYear(ziel.getUTCFullYear() + (um.jahre ?? 0));
+	ziel.setUTCDate(ziel.getUTCDate() + (um.tage ?? 0));
+	// Zürich ist UTC+1 (Winter) oder UTC+2 (Sommer); der spätere Kandidat ist UTC+1.
+	const kandidaten = [1, 2].map((h) => new Date(ziel.getTime() - h * STUNDE_MS));
+	return kandidaten.find((k) => zuerichMs(k) === ziel.getTime()) ?? kandidaten[0];
+}
+
+/**
+ * Zeitpunkt, ab dem der Zeitgeber das Mitglied löscht (fällig bei `jetzt >= loeschtAm`): nach dem
+ * Schweizer Kalender, damit das angezeigte Datum stimmt.
+ */
 export function loeschtAm(m: {
 	status: MitgliedStatus;
 	austrittAm: Date | null;
 	vorgemerktAm: Date | null;
 }): Date | null {
 	if (m.status === 'ausgetreten' && m.austrittAm !== null) {
-		return plusJahre(m.austrittAm, FRIST_AUSTRITT.jahre);
+		return spaeterInZuerich(m.austrittAm, { jahre: FRIST_AUSTRITT.jahre });
 	}
 	if (m.status === 'vorgemerkt' && m.vorgemerktAm !== null) {
-		return new Date(m.vorgemerktAm.getTime() + BEDENKZEIT.tage * TAG_MS);
+		return spaeterInZuerich(m.vorgemerktAm, { tage: BEDENKZEIT.tage });
 	}
 	return null;
 }

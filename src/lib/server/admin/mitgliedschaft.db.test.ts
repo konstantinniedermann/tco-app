@@ -31,6 +31,7 @@ import {
 	nimmLoeschungZurueck
 } from './mitgliedschaft.ts';
 import { istMytcoAdmin, ladeRollen } from './rollen.ts';
+import { utcZuZuerich } from '../../anlass/zeit.ts';
 
 // «Letzter MyTCO-Admin» ist global; darum eine eigene Datenbank statt der gemeinsamen.
 let eigene: EigeneDatenbank | undefined;
@@ -364,6 +365,42 @@ describe('loeschtAm', () => {
 
 		expect(loeschtAm({ status: 'aktiv', austrittAm: null, vorgemerktAm: null })).toBeNull();
 		expect(loeschtAm({ status: 'geloescht', austrittAm: jetzt, vorgemerktAm: null })).toBeNull();
+	});
+
+	// Schweizer Kalender: gleiche Uhrzeit in Zürich ein Jahr bzw. 7 Tage später.
+	const austritt = (iso: string) =>
+		loeschtAm({ status: 'ausgetreten', austrittAm: new Date(iso), vorgemerktAm: null });
+	const vormerken = (iso: string) =>
+		loeschtAm({ status: 'vorgemerkt', austrittAm: null, vorgemerktAm: new Date(iso) });
+
+	test('Austritt über die Winterzeit: 31.10.2027 00:30 (Sommerzeit) → 31.10.2028 00:30 (Winterzeit)', () => {
+		const ende = austritt('2027-10-30T22:30:00Z');
+		expect(ende).toEqual(new Date('2028-10-30T23:30:00Z'));
+		expect(utcZuZuerich(ende!)).toBe('2028-10-31T00:30');
+		// Der alte UTC-Jahrestag läge in der Schweiz noch am 30.10.: dort nicht fällig.
+		expect(utcZuZuerich(new Date(ende!.getTime() - 1))).toBe('2028-10-31T00:29');
+	});
+
+	test('Austritt über die Sommerzeit: 29.3.2026 00:30 (Winterzeit) → 29.3.2027 00:30 (Sommerzeit)', () => {
+		const ende = austritt('2026-03-28T23:30:00Z');
+		expect(ende).toEqual(new Date('2027-03-28T22:30:00Z'));
+		expect(utcZuZuerich(ende!)).toBe('2027-03-29T00:30');
+	});
+
+	test('Austritt am 29. Februar → 1. März, nie früher; Sekunden bleiben', () => {
+		expect(austritt('2028-02-29T07:15:42.123Z')).toEqual(new Date('2029-03-01T07:15:42.123Z'));
+	});
+
+	test('Bedenkzeit: 7 Kalendertage in Schweizer Zeit, über die Umstellung', () => {
+		expect(vormerken('2026-03-25T23:30:00Z')).toEqual(new Date('2026-04-01T22:30:00Z'));
+		expect(vormerken('2026-10-21T22:30:00Z')).toEqual(new Date('2026-10-28T23:30:00Z'));
+	});
+
+	test('Uhrzeit fehlt (Sommerzeit) oder doppelt (Winterzeit): der spätere Zeitpunkt', () => {
+		// 22.3.2026 02:30 → 29.3.2026 02:30 gibt es nicht: 03:30 Sommerzeit.
+		expect(vormerken('2026-03-22T01:30:00Z')).toEqual(new Date('2026-03-29T01:30:00Z'));
+		// 18.10.2026 02:30 → 25.10.2026 02:30 gibt es zweimal: die zweite (Winterzeit).
+		expect(vormerken('2026-10-18T00:30:00Z')).toEqual(new Date('2026-10-25T01:30:00Z'));
 	});
 
 	test('ladeMitglied liefert die Daten der Mitgliedschaft', async () => {
