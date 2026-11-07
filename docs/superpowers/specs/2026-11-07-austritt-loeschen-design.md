@@ -133,9 +133,15 @@ Release-Checkliste (`docs/testkonzept.md`) verlangt sie vor dem ersten Live-Rele
   Zustand und Daten (*ausgetreten am …*, *wird gelöscht am …*) und den passenden Tasten.
   Die Plakette im Titel zeigt den Zustand.
 - Druckbare Seite **Auskunft**.
-- Ablauf: nach Freigabe dieses Entwurfs ein Design-Artifact auf dem Design System MyTCO
-  (Handy-Artboards, Varianten); Abnahme per Screenshot neben dem Entwurf und axe. Fehlende
-  Bausteine erst ins `docs/ui-leitbild.md`.
+- Design-Entwurf: [MyTCO Mitgliedschaft und Auskunft](https://claude.ai/artifact/5UiDtGffbPejwFudsGNunU).
+  Gewählt (Projektleiter): **Variante A** — Karte *Mitgliedschaft* rechts oben über Login und
+  Rollen, mit Zustand, Löschdatum und Tasten (aktiv: *Austritt erfassen*, *Mitglied löschen*;
+  ausgetreten: *Wiedereintritt erfassen*, *Mitglied löschen*; vorgemerkt: *Löschung rückgängig
+  machen*), Link *Auskunft über die Daten ›*. Plakette *wird gelöscht* mit `plakette-gesperrt`.
+  Rückfragen nennen, was sofort passiert und bis wann es rückgängig geht. Auskunft wie im
+  Entwurf (A4, Tabellen, Taste *Drucken oder als PDF speichern*, nicht auf dem Ausdruck).
+- Abnahme per Screenshot neben dem Entwurf und axe. Das Drucklayout der Auskunft kommt erst ins
+  `docs/ui-leitbild.md`, dann in den Code.
 
 ## Rahmen
 
