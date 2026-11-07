@@ -177,6 +177,13 @@ export async function melde(
 	jetzt: Date
 ): Promise<'ok' | 'geschlossen' | 'nicht-gefunden'> {
 	return db.transaction(async (tx) => {
+		// Zuerst das Mitglied, dann der Anlass: eine Antwort kann nicht nach einem Austritt landen.
+		const [m] = await tx
+			.select({ status: mitglied.status })
+			.from(mitglied)
+			.where(eq(mitglied.id, mitgliedId))
+			.for('share');
+		if (m?.status !== 'aktiv') return 'nicht-gefunden';
 		const [z] = await tx
 			.select({ anmeldeschluss: anlass.anmeldeschluss })
 			.from(anlass)

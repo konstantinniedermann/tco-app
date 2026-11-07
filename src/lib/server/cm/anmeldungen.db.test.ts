@@ -384,6 +384,25 @@ describe('CM-Anmeldung', () => {
 		expect(await meldeAn(db, k, -1, t.jetzt)).toBe('nicht-gefunden');
 	});
 
+	test('Austritt: ausgetretene oder vorgemerkte Mitglieder können sich nicht anmelden', async () => {
+		const t = await offenesTurnier();
+		const [k] = t.kategorien;
+		const weg = await spieler();
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten', austrittAm: t.jetzt })
+			.where(eq(mitglied.id, weg));
+		const vorgemerkt = await spieler();
+		await db
+			.update(mitglied)
+			.set({ status: 'vorgemerkt', vorgemerktAm: t.jetzt, statusVorher: 'aktiv' })
+			.where(eq(mitglied.id, vorgemerkt));
+		expect(await meldeAn(db, k, weg, t.jetzt)).toBe('nicht-gefunden');
+		expect(await meldeAn(db, k, vorgemerkt, t.jetzt)).toBe('nicht-gefunden');
+		const zeilen = await db.select().from(anmeldung).where(eq(anmeldung.kategorieId, k));
+		expect(zeilen).toHaveLength(0);
+	});
+
 	test('FR-33: Turnier in Vorbereitung ist für Mitglieder nicht sichtbar, laufende Turniere ab diesem Jahr', async () => {
 		// Vier freie Jahre hintereinander: letztes Jahr, dieses (Vorbereitung), nächstes, übernächstes.
 		let ids: (number | null)[];

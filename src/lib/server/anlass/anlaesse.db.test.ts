@@ -4,7 +4,7 @@ import { afterAll, describe, expect, test } from 'vitest';
 import { legeEigeneDatenbankAn } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { mitglied } from '../db/schema.ts';
+import { anlassAnmeldung, mitglied } from '../db/schema.ts';
 import type { AnlassWerte } from './angaben.ts';
 import {
 	aendereAnlass,
@@ -106,6 +106,19 @@ describe('Anlässe', () => {
 		await melde(db, id, m.mitgliedId, { antwort: 'kommt', bemerkung: 'bleibt nicht' }, JETZT);
 		const a = await ladeAnlassFuerMitglied(db, id, m.mitgliedId, JETZT);
 		expect(a).toMatchObject({ antwort: 'kommt', bemerkung: null });
+	});
+
+	test('Austritt: ausgetretene oder vorgemerkte Mitglieder können nicht antworten', async () => {
+		const { id } = await neu();
+		const weg = await legeMitgliedAn(db, { status: 'ausgetreten' });
+		const vorgemerkt = await legeMitgliedAn(db, { status: 'vorgemerkt' });
+		for (const m of [weg, vorgemerkt]) {
+			expect(await melde(db, id, m.mitgliedId, { antwort: 'kommt', bemerkung: null }, JETZT)).toBe(
+				'nicht-gefunden'
+			);
+		}
+		const zeilen = await db.select().from(anlassAnmeldung).where(eq(anlassAnmeldung.anlassId, id));
+		expect(zeilen).toHaveLength(0);
 	});
 
 	test('FR-31: loescheAnlass entfernt Anlass und Antworten', async () => {
