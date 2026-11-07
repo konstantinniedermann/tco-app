@@ -56,10 +56,11 @@ export type VerlaufZeile = {
 
 export async function ladeVerlauf(
 	db: DbOderTx,
-	filter: { mitgliedId?: number; grenze: number }
+	// Ohne `grenze` kommen alle Einträge (Auskunft).
+	filter: { mitgliedId?: number; grenze?: number }
 ): Promise<VerlaufZeile[]> {
 	const urheber = alias(mitglied, 'urheber');
-	const zeilen = await db
+	const abfrage = db
 		.select({
 			id: aenderung.id,
 			zeitpunkt: aenderung.zeitpunkt,
@@ -79,8 +80,8 @@ export async function ladeVerlauf(
 		.where(
 			filter.mitgliedId === undefined ? undefined : eq(aenderung.mitgliedId, filter.mitgliedId)
 		)
-		.orderBy(desc(aenderung.zeitpunkt), desc(aenderung.id))
-		.limit(filter.grenze);
+		.orderBy(desc(aenderung.zeitpunkt), desc(aenderung.id));
+	const zeilen = await (filter.grenze === undefined ? abfrage : abfrage.limit(filter.grenze));
 	return zeilen.map((z) => ({
 		zeitpunkt: z.zeitpunkt,
 		urheber:

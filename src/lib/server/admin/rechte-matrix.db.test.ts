@@ -28,6 +28,7 @@ import { ROLLEN } from './rollen.ts';
 import {
 	ADMIN_SCHNITTSTELLEN,
 	getMitglied,
+	getAuskunft,
 	getMitglieder,
 	getRollen,
 	getVerlauf,
@@ -193,7 +194,16 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			...MITTEILUNG_ADMIN_SCHNITTSTELLEN
 			// Schreibend ist alles, was nicht liest: Auch ein künftiges delete… oder put… fällt hier auf.
 		}).filter(([name]) => !name.startsWith('get') && !ERLAUBT_FUER_MYTCO.includes(name));
-		expect(schreibende.length).toBeGreaterThanOrEqual(17);
+		const namen = schreibende.map(([name]) => name);
+		for (const n of [
+			'postAustritt',
+			'postWiedereintritt',
+			'postLoeschen',
+			'postLoeschenRueckgaengig'
+		]) {
+			expect(namen).toContain(n);
+		}
+		expect(schreibende.length).toBeGreaterThanOrEqual(21);
 		const vorher = await zeilen();
 		for (const [name, fn] of schreibende) {
 			const r = await fn(s.d, ereignis({ konto: mytco.konto, body: {}, params: { id } }));
@@ -242,6 +252,36 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		const cm = await bestaetigt(s, ['cm']);
 		const r = await getMitglieder(s.d, hole(cm.konto));
 		expect([r.status, await r.json()]).toEqual([403, { fehler: 'kein-admin' }]);
+	});
+
+	test('CM-Admin: Austritt, Löschung und Auskunft → 403 kein-admin', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm']);
+		const ziel = await legeMitgliedAn(db());
+		const params = { id: String(ziel.mitgliedId) };
+		for (const fn of [
+			ADMIN_SCHNITTSTELLEN.postAustritt,
+			ADMIN_SCHNITTSTELLEN.postWiedereintritt,
+			ADMIN_SCHNITTSTELLEN.postLoeschen,
+			ADMIN_SCHNITTSTELLEN.postLoeschenRueckgaengig
+		]) {
+			const r = await fn(s.d, ereignis({ konto: cm.konto, body: {}, params }));
+			expect([r.status, await r.json()]).toEqual([403, { fehler: 'kein-admin' }]);
+		}
+		const a = await getAuskunft(s.d, hole(cm.konto, { params }));
+		expect([a.status, await a.json()]).toEqual([403, { fehler: 'kein-admin' }]);
+	});
+
+	test('MyTCO-Admin liest die Auskunft → 200', async () => {
+		const s = baue();
+		const mytco = await bestaetigt(s, ['mytco']);
+		const ziel = await legeMitgliedAn(db());
+		const r = await getAuskunft(
+			s.d,
+			hole(mytco.konto, { params: { id: String(ziel.mitgliedId) } })
+		);
+		expect(r.status).toBe(200);
+		expect(((await r.json()) as { status: string }).status).toBe('aktiv');
 	});
 
 	test('MyTCO-Admin liest Mitglieder, Turniere, Verlauf, Mitteilungen → 200', async () => {

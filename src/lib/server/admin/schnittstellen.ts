@@ -27,9 +27,16 @@ import {
 	listeMitglieder,
 	type MitgliedStatus
 } from './mitglieder.ts';
+import { ladeAuskunft } from './auskunft.ts';
 import { setzeAnsicht } from './ansicht.ts';
+import {
+	erfasseAustritt,
+	erfasseWiedereintritt,
+	merkeZumLoeschenVor,
+	nimmLoeschungZurueck
+} from './mitgliedschaft.ts';
 import { ROLLEN, istAnsichtRolle, listeRollen, setzeRollen, type Rolle } from './rollen.ts';
-import { ladeVerlauf, type Urheber } from './verlauf.ts';
+import { ladeVerlauf, schreibeVerlauf, type Urheber } from './verlauf.ts';
 import type { ZugangDienst } from './zugang.ts';
 import { darf, type Art, type Bereich } from '../../verwaltung/bereiche.ts';
 
@@ -287,6 +294,52 @@ export function postSitzungen(d: AdminDienste, e: AdminEreignis): Promise<Respon
 	});
 }
 
+// Die vier Übergänge der Mitgliedschaft: leerer JSON-Körper, die Funktion prüft den Ausgangszustand.
+function uebergang<E extends string>(
+	d: AdminDienste,
+	e: AdminEreignis,
+	fn: (
+		db: Db,
+		urheber: AdminUrheber,
+		id: number,
+		jetzt: Date
+	) => Promise<'ok' | 'nicht-gefunden' | E>
+): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (urheber) => {
+		const id = parseId(e.params.id);
+		if (id === null) return nichtGefunden();
+		const r = await fn(d.db, urheber, id, jetzt(d));
+		if (r === 'ok') return antwort(200, {});
+		return r === 'nicht-gefunden' ? nichtGefunden() : antwort(409, { fehler: r });
+	});
+}
+
+export const postAustritt = (d: AdminDienste, e: AdminEreignis) => uebergang(d, e, erfasseAustritt);
+export const postWiedereintritt = (d: AdminDienste, e: AdminEreignis) =>
+	uebergang(d, e, erfasseWiedereintritt);
+export const postLoeschen = (d: AdminDienste, e: AdminEreignis) =>
+	uebergang(d, e, merkeZumLoeschenVor);
+export const postLoeschenRueckgaengig = (d: AdminDienste, e: AdminEreignis) =>
+	uebergang(d, e, nimmLoeschungZurueck);
+
+// DS-07: alles, was MyTCO zur Person speichert. Der Aufruf steht im Änderungsverlauf.
+export function getAuskunft(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return liest(d, e, 'mitglieder', async (leseId) => {
+		const id = parseId(e.params.id);
+		const t = jetzt(d);
+		const auskunft = id === null ? null : await ladeAuskunft(d.db, id, t);
+		if (id === null || !auskunft) return nichtGefunden();
+		await schreibeVerlauf(
+			d.db,
+			id,
+			{ art: 'admin', mitgliedId: leseId },
+			[{ aktion: 'auskunft-erstellt' }],
+			t
+		);
+		return antwort(200, auskunft);
+	});
+}
+
 export function getVerlauf(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	return liest(d, e, 'mitglieder', async () => {
 		const q = e.url.searchParams;
@@ -377,6 +430,11 @@ export const ADMIN_SCHNITTSTELLEN = {
 	postRollen,
 	getRollen,
 	postSitzungen,
+	postAustritt,
+	postWiedereintritt,
+	postLoeschen,
+	postLoeschenRueckgaengig,
+	getAuskunft,
 	getVerlauf,
 	getFairgate,
 	postFairgate,
