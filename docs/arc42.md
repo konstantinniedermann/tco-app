@@ -10,7 +10,8 @@ was dort steht, gilt. Kapitel ohne eigene Aussage fehlen (Laufzeitsicht: Login-A
 ## 1 Ziele und Randbedingungen
 
 MyTCO ist die Mitglieder-App des Tennis-Club Olten: Login ohne Passwort, eigene Angaben,
-Anlässe, später Anmeldung und Resultate der Clubmeisterschaft und Lizenzanträge.
+Anlässe, Mitteilungen per Push und E-Mail, Anmeldung zur Clubmeisterschaft, später deren
+Resultate und Lizenzanträge.
 Mitglieder-Admins pflegen darin die Mitglieder, CM- und Lizenz-Admins ihre Bereiche, der
 MyTCO-Admin vergibt die Rollen. Umfang und Termine: [Roadmap](roadmap.md),
 [Anforderungen](anforderungen/anforderungen.md).
@@ -74,7 +75,7 @@ flowchart TD
   S["Seiten: src/routes, +page.svelte, oft mit +page.ts"] -->|fetch, JSON| API["Schnittstellen: src/routes/api, nur +server.ts"]
   S --> UI["Oberfläche: src/lib, ohne server"]
   H["hooks.server.ts: Sitzung, Sicherheits-Header"] --> API
-  API --> F["Fachmodule: src/lib/server/login, admin, profil, anlass, turnier, brief"]
+  API --> F["Fachmodule: src/lib/server/login, admin, profil, anlass, turnier, cm, mitteilung, brief"]
   F --> DB["Datenbank: src/lib/server/db, Drizzle, Migrationen in drizzle/"]
   DB --> PG[(PostgreSQL)]
 ```
@@ -85,7 +86,7 @@ flowchart TD
 | **Schnittstellen** (`src/routes/api/**/+server.ts`) | JSON für die Seiten; `api/admin/` nur für Verwaltungsrollen, je Bereich Lesen und Schreiben getrennt (`src/lib/verwaltung/bereiche.ts`: Mitglieder schreibt `mitglieder`, Clubmeisterschaft `cm`, Rollen `mytco`; `mytco` liest alle Bereiche) | Admin-Routen nutzen nur die Einträge aus `ADMIN_SCHNITTSTELLEN` (`src/lib/server/admin/schnittstellen.ts`), `TURNIER_SCHNITTSTELLEN` (`src/lib/server/turnier/schnittstellen.ts`) oder `MITTEILUNG_ADMIN_SCHNITTSTELLEN` (`src/lib/server/mitteilung/schnittstellen.ts`), die Sitzung, Bereich und Art prüfen, dazu den frischen Mail-Code (SI-08); während *Ansicht als …* weist der Hook jedes Speichern ab (SI-20) |
 | **Fachmodule** (`src/lib/server/<thema>/`) | Fachregeln aus dem [Fachmodell](fachmodell.md) (`FR-NN`) und Rechte aus [Rollen und Rechte](rollen-und-rechte.md) (`RR-NN`) | Rechte prüft immer der Server |
 | **Datenbank** (`src/lib/server/db/`, `drizzle/`) | Schema und Migrationen | Migrationen fügen nur hinzu, damit der Rückfall auf das vorherige Image geht ([CI/CD und Release](ci-cd-und-release.md#auslieferung)) |
-| **Oberfläche** (`src/lib/` ohne `server/`) | Bausteine und Tokens (`ui/`, `design/`), Teile je Thema (`verwaltung/`, `login/`, `profil/`, `anlass/`, `turnier/`, `hilfe/`, `datenschutz/`) | nur aus dem [UI-Leitbild](ui-leitbild.md) |
+| **Oberfläche** (`src/lib/` ohne `server/`) | Bausteine und Tokens (`ui/`, `design/`), Teile je Thema (`verwaltung/`, `login/`, `profil/`, `anlass/`, `turnier/`, `cm/`, `mitteilung/`, `push/`, `hilfe/`, `datenschutz/`) | nur aus dem [UI-Leitbild](ui-leitbild.md) |
 | **Zeitgeber** (`src/lib/server/zeitgeber.ts`, gestartet in `hooks.server.ts`) | Täglicher Takt in der App (erster Lauf kurz nach dem Start), ruft den Löschlauf `raeumeAuf` (`src/lib/server/admin/loeschung.ts`) | `ZEITGEBER=aus` schaltet ihn ab (E2E); ein Datenbank-Sperrschloss verhindert parallele Läufe ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)) |
 | **Skripte** (`scripts/`) | Ersten Admin festlegen, Seed, Testdaten, Musterbrief, Prüfungen für Hook und CI | Befehle über `make help` |
 | **Betrieb** (`betrieb/`) | Einrichtung, Auslieferung und Sicherung auf dem Server | siehe Kapitel 7 |

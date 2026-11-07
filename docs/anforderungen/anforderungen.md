@@ -201,7 +201,7 @@ Resultate importieren ([Recherche Systemlandschaft](../recherche/README.md)).
 
 Advantage kann Plätze benennen, ein Spielzeitraster erzeugen und auf Doppelbelegung
 prüfen. Ob ein eigener Planer nötig ist, hängt davon ab, ob der Spielplan in Advantage in
-der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-30062027)).
+der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-01062027)).
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|

@@ -49,7 +49,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Gruppe, Gruppenspiele | Form „Round Robin“: Jeder spielt gegen jeden in seiner Gruppe. Der Organisator legt die Anzahl Gruppen fest und teilt die Spieler zu | Gruppe, Gruppenspiele | ADV 10, 39–41; PDF 5c |
 | KO-System | Wer verliert, scheidet aus. In Advantage heisst die Form *Draw*. *Vermutung:* „Draw“ ist das KO-System; das Handbuch erklärt den Begriff nicht | KO-System | PDF 5c; ADV 10 |
 | Tableau | Spielfeld einer Konkurrenz mit Positionen; die Grösse ergibt sich aus der Zahl der bestätigten Spieler | Tableau | ADV 10–11, 29–30 |
-| Finaltableau | Tableau, das in Advantage auf die Gruppenspiele folgt. Laut PDF eröffnet der TCO dafür neue KO-Turniere (siehe [K-25](abklaerungen.md#vor-cm-anmeldung-15052027)) | Finaltableau | ADV 42; PDF 5e-i |
+| Finaltableau | Tableau, das in Advantage auf die Gruppenspiele folgt. Laut PDF eröffnet der TCO dafür neue KO-Turniere (siehe [K-25](abklaerungen.md#vor-cm-anmeldung-15042027)) | Finaltableau | ADV 42; PDF 5e-i |
 | Setzung | Die Gesetzten werden aus der Klassierung bestimmt und nach Turnierreglement platziert | Setzung | ADV 29 |
 | Auslosung | Teilt nach der Setzung die übrigen Spieler auf die Positionen im Tableau zu | Auslosung | ADV 7, 10, 28–29 |
 | Runde | Stufe im Tableau; Spielplan und Resultate werden je Runde erfasst | Runde | ADV 30, 32, 37 |
@@ -57,7 +57,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Anmeldung | Teilnahme eines Spielers (Einzel) oder eines Doppelteams an einer Kategorie. In Advantage meldet man sich online über myTennis an und landet in der Anmeldeliste; ins Tableau kommt man erst, wenn die Anmeldung *bestätigt* ist. In MyTCO höchstens 3 gleichzeitig | Anmeldung | PDF 5b; ADV 18, 20–23, 28–29 |
 | Anmeldeschluss | Datum, nach dem keine Anmeldungen mehr möglich sind; in Advantage je Turnier oder Konkurrenz. Beim TCO bisher Anfang Juni, 2027 vor der Auslosung Anfang Juni (hängt an K-24.2) | Anmeldeschluss | ADV 7, 10, 13, 28; Recherche |
 | Nenngeld | Startgebühr in Advantage, je Spieler mit Vermerk „bezahlt“. Die CM hat kein Nenngeld (K-25.2) | Nenngeld | ADV 7, 28 |
-| Wildcard-Antrag | Anmeldung für eine Kategorie ausserhalb des eigenen Klassierungsbereichs, mit Kommentar; der CM-Admin entscheidet | Wildcard-Antrag | [A-ANMELDUNG-10](anforderungen/anforderungen.md#anmeldung--anmeldung-zur-clubmeisterschaft) |
+| Wildcard-Antrag | Anmeldung für eine stärkere Kategorie, die allein wegen der Klassierung nicht passt (nur Einzel), mit Kommentar; der CM-Admin entscheidet | Wildcard-Antrag | [A-ANMELDUNG-10](anforderungen/anforderungen.md#anmeldung--anmeldung-zur-clubmeisterschaft) |
 | Mindestsumme | Bei einer Doppelkategorie die kleinste Summe der Klassierungen beider Spieler (R1 = 1 … R9 = 9, *keine Lizenz* = 10, N1–N4 = 0), vorbelegt 9. *Annahme K-51* | Mindestsumme | [FR-34](fachmodell.md#fachregeln) |
 | abgesagt | Status einer Kategorie, die nicht stattfindet; ohne Rückweg; Mitglieder sehen sie nicht mehr, die Verwaltung zeigt sie mit Plakette *abgesagt* | abgesagt | [FR-35](fachmodell.md#fachregeln) |
 | Folgespiel | Spiel der nächsten KO-Runde, in das der Sieger eines Spiels nachrückt | Folgespiel | [Fachmodell](fachmodell.md) |
@@ -77,7 +77,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Lizenz | Spielberechtigung von Swiss Tennis, Pflicht für offizielle Turniere. Beim TCO macht der Club das Inkasso, die Lizenz verlängert sich automatisch | Lizenz | ADV 15, 20, 22, 25; Recherche |
 | Lizenznummer | Nummer, unter der Swiss Tennis einen lizenzierten Spieler führt. Advantage nimmt eine ganze Spalte Lizenznummern per Copy-Paste an. Das Mitglied ergänzt sie beim ersten Login | Lizenznummer | ADV 17–18; PDF 3b-i |
 | Lizenzantrag | Antrag eines Mitglieds in MyTCO, eine Lizenz zu bestellen bzw. zu aktualisieren oder zu stornieren | Lizenzantrag | Ziel; PDF 3e |
-| Storno | Antrag, die Lizenz abzubestellen. *Annahme K-34:* entspricht der Sistierung bei Swiss Tennis (siehe [Abklärungen](abklaerungen.md#vor-lizenzanträgen-01102027)) | Storno | Ziel; PDF 3e |
+| Storno | Antrag, die Lizenz abzubestellen. *Annahme K-34:* entspricht der Sistierung bei Swiss Tennis (siehe [Abklärungen](abklaerungen.md#vor-lizenzanträgen-01042028)) | Storno | Ziel; PDF 3e |
 | Sistierung | Beim TCO bis Ende Februar möglich. *Annahme K-34.1:* die Lizenz ruht für die folgende Saison. Im Advantage-Handbuch nicht erwähnt | Sistierung | Recherche |
 | Stichtag | Datum, zu dem der Lizenz-Admin die Liste der Lizenzanträge sieht und exportiert. *Annahme K-34.2:* liegt vor der Sistierungsfrist Ende Februar | Stichtag | Ziel |
 | Lizenzrunde | Alle Lizenzanträge eines Jahres bis zu einem Stichtag; der Lizenz-Admin exportiert sie gesammelt | Lizenzrunde | [Fachmodell](fachmodell.md) |
@@ -106,7 +106,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Gast | Rolle nur für die Registrierung, ohne Zugriff auf weitere Seiten | Gast | PDF 4a |
 | Admin | Im PDF die Rolle mit Zugang zur Mitgliederverwaltung und zu den Admin-Masken. In MyTCO kein Begriff ohne Zusatz, weil er Betrieb und Mitgliederdaten vermischt | MyTCO-Admin, Mitglieder-Admin, CM-Admin, Lizenz-Admin | PDF 4a; Ziel |
 | MyTCO-Admin | Rolle für die technische Betreuung: vergibt und entzieht Rollen, sieht alle Bereiche der Verwaltung, ändert dort nichts; *Ansicht als …* | MyTCO-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
-| Mitglieder-Admin | Rolle für die Mitgliederdaten: Mitglieder, Briefe, Sitzungen, Liste *Für Fairgate*, Anlässe | Mitglieder-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
+| Mitglieder-Admin | Rolle für die Mitgliederdaten: Mitglieder, Briefe, Sitzungen, Liste *Für Fairgate*, Anlässe, Mitteilungen, Austritt und Löschen | Mitglieder-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
 | Ansicht als … | Der MyTCO-Admin sieht App und Verwaltung wie eine gewählte Rolle, nur lesend; ein Band zeigt das an | Ansicht als … | [A-ROLLE-09](anforderungen/anforderungen.md#rolle--benutzerrollen) |
 | Junioren-Leiter | Rolle für die Betreuung der Junioren | Junioren-Leiter | PDF 4a |
 | Anlässe-Veranstalter | Rolle für die Organisation von Anlässen | Anlässe-Veranstalter, später; bis dahin Mitglieder-Admin, die CM leitet der CM-Admin | PDF 4a |

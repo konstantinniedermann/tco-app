@@ -18,7 +18,7 @@ heissen die Admin-Rollen `mytco`, `mitglieder`, `cm` und `lizenz`.
 |-------|-----------|---------|-------------|
 | **Mitglied** | Mitglieder-Login | Eigene Daten pflegen, sich zur CM anmelden, Resultate melden, Lizenz beantragen | A-ROLLE-03 |
 | **MyTCO-Admin** | Mitglieder-Login | Betreut MyTCO technisch. Vergibt und entzieht Rollen, sieht alle Bereiche der Verwaltung, ändert dort nichts; *Ansicht als …* | A-ROLLE-01, A-ROLLE-09 |
-| **Mitglieder-Admin** | Mitglieder-Login | Mitglieder anlegen, bearbeiten, Austritt, Export und Löschen (DS-07); Brief-Codes, Sitzungen beenden, Liste *Für Fairgate*; Anlässe | A-ROLLE-02 |
+| **Mitglieder-Admin** | Mitglieder-Login | Mitglieder anlegen, bearbeiten, Austritt, Auskunft drucken und Löschen (DS-07); Brief-Codes, Sitzungen beenden, Liste *Für Fairgate*; Anlässe | A-ROLLE-02 |
 | **CM-Admin** | CM-Anmeldung | Turnier und Kategorien anlegen, Wildcard-Anträge entscheiden, Anmeldungen von Hand, Gruppen und Tableaus aus Advantage übernehmen, Resultate erfassen und Streitfälle entscheiden | A-ROLLE-07 |
 | **Lizenz-Admin** | Lizenzanträge | Stichtag der Lizenzrunde setzen, Anträge ansehen, exportieren und abhaken | A-ROLLE-08 |
 
@@ -41,7 +41,7 @@ verteilt der MyTCO-Admin die Rollen von Hand. Einzelheiten im
 | RR-04 | Einmal-Codes (Brief- und Mail-Code) sind nur als Hash gespeichert und nach der Ausgabe für niemanden abrufbar, auch nicht für die Verwaltung. Der Mitglieder-Admin kann einen neuen Brief-Code ausstellen, der nur den alten Brief-Code ersetzt, und alle Sitzungen eines Kontos beenden; einen Code per E-Mail holt sich das Mitglied selbst (A-LOGIN-10, [#29](https://github.com/konstantinniedermann/tco-app/issues/29)) | umgesetzt\* (Sitzungen beenden in der Verwaltung; neuer Brief-Code mit Etappe 2 von #43) |
 | RR-05 | Für die Rolle *Mitglied* gibt es kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM und bei der Wahl des Doppelpartners (nur Mitglieder, die für die Kategorie passen und noch frei sind) | geplant |
 | RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist | geplant |
-| RR-07 | Die Verwaltung sieht nur, wer eine Admin-Rolle hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03): Mitglieder-Admin *Mitgliederverwaltung* (Mitglieder, Anlässe, Für Fairgate, Verlauf), CM-Admin *Clubmeisterschaft*, Lizenz-Admin *Lizenzen*, MyTCO-Admin alle Bereiche nur lesend und dazu *Rollen*. Was eine Rolle nur lesen darf, weist der Server beim Speichern ab; ein ausgeblendeter Knopf reicht nicht | umgesetzt\* (Lizenzen mit ihrer Etappe) |
+| RR-07 | Die Verwaltung sieht nur, wer eine Admin-Rolle hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03): Mitglieder-Admin *Mitgliederverwaltung* (Mitglieder, Anlässe, Mitteilungen, Für Fairgate, Verlauf), CM-Admin *Clubmeisterschaft*, Lizenz-Admin *Lizenzen*, MyTCO-Admin alle Bereiche nur lesend und dazu *Rollen*. Was eine Rolle nur lesen darf, weist der Server beim Speichern ab; ein ausgeblendeter Knopf reicht nicht | umgesetzt\* (Lizenzen mit ihrer Etappe) |
 | RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | umgesetzt (Austritt und Vormerken sperren das Login; Rollen bleiben gespeichert und wirken nach Wiedereintritt oder Rückgängig wieder) |
 | RR-09 | Wer die Verwaltung öffnet, bestätigt sie höchstens einmal pro 24 Stunden mit einem frischen Code per E-Mail, mit jeder Admin-Rolle ([SI-08](sicherheitskonzept.md#vorgaben), K-12.1) | umgesetzt |
 
@@ -75,7 +75,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Benachrichtigungen (FR-02; E-Mail, Telefon und Lizenznummer: Annahme K-19.1, die E-Mail erst nach zwei Codes, SI-09) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Eigene Adresse (Annahme K-19.2) | – | S eigene | S eigene | S eigene | S | S eigene |
 | Eigener Name, Geschlecht, Jahrgang, Mitgliedernummer (Geschlecht und Jahrgang einmal selbst, wenn leer, FR-37) | – | L eigene | L eigene | L eigene | S | L |
-| Mitglieder anlegen, bearbeiten, löschen, exportieren (DS-07) | – | – | – | – | S | L |
+| Mitglieder anlegen, bearbeiten, löschen, Auskunft drucken (DS-07) | – | – | – | – | S | L |
 | Neuer Code für einen Brief, Briefe auslösen, Sitzungen beenden | – | – | – | – | S | – |
 | Rollen vergeben | – | – | – | – | – | S |
 | Änderungsverlauf (FR-26) | – | – | – | – | L | L |
