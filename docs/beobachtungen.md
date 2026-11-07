@@ -391,6 +391,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Gut reproduzierbar, damit untersuchbar: Mit `--repeat-each` lässt sich eine Ursache (z. B. ein Modul, das während eines Seitenwechsels nachgeladen und abgebrochen wird) eingrenzen. Bis dahin kostet er Wiederholungen von `make check`.
 
+**Nachtrag 2026-11-07:** Trifft nicht nur SI-07: Im `make check` des Release-Branches 0.11.1 einmal rot in `tests/e2e/bewegung.test.ts:399` («Unbekannte Adresse aus einem Reiter: Fehlerseite ohne Fusszeile», `iphone`), wieder nur durch diesen Seitenfehler; der zweite volle Lauf grün.
+
 ### 2026-11-06 — Rückfrage «Nicht gespeichert» nach Speichern, wenn das Nachladen scheitert
 
 **Thema:** App-Oberfläche
