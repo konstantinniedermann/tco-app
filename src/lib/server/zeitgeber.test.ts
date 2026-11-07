@@ -61,4 +61,29 @@ describe('starteZeitgeber', () => {
 		await vi.advanceTimersByTimeAsync(1000);
 		expect(lauf).toHaveBeenCalledTimes(1);
 	});
+
+	it('ein sofort werfender Lauf wird gefangen und der Takt läuft weiter', async () => {
+		const fehler = vi.spyOn(console, 'error').mockImplementation(() => {});
+		const lauf = vi.fn(() => {
+			throw new Error('geheim');
+		});
+		starte(lauf, { start: 10, abstand: 100 });
+		await vi.advanceTimersByTimeAsync(10);
+		await vi.advanceTimersByTimeAsync(100);
+		expect(lauf).toHaveBeenCalledTimes(2);
+		expect(fehler).toHaveBeenCalledWith('Löschlauf fehlgeschlagen');
+		expect(JSON.stringify(fehler.mock.calls)).not.toContain('geheim');
+	});
+
+	it('ein alter Stopp beendet einen neuen Takt nicht', async () => {
+		const alt = vi.fn(async () => {});
+		const neu = vi.fn(async () => {});
+		const stopp1 = starte(alt, { start: 10, abstand: 100 });
+		stopp1();
+		starte(neu, { start: 10, abstand: 100 });
+		stopp1();
+		await vi.advanceTimersByTimeAsync(110);
+		expect(alt).not.toHaveBeenCalled();
+		expect(neu).toHaveBeenCalledTimes(2);
+	});
 });

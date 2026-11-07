@@ -13,22 +13,27 @@ export function starteZeitgeber(
 	const global = globalThis as Record<symbol, unknown>;
 	if (global[MERKER]) return () => {};
 
+	// Der Merker gehört genau diesem Start; ein alter Stopp darf einen neuen Takt nicht beenden.
+	const eigener: { handle?: NodeJS.Timeout } = {};
 	const einmal = () => {
-		// Nur die Tatsache, nie der Meldungstext (kann Personendaten enthalten).
-		lauf().catch(() => console.error('Löschlauf fehlgeschlagen'));
+		// Auch ein sofortiger Fehler (vor dem ersten Promise) wird gefangen. Geloggt wird nur die
+		// Tatsache, nie der Meldungstext (kann Personendaten enthalten).
+		Promise.resolve()
+			.then(lauf)
+			.catch(() => console.error('Löschlauf fehlgeschlagen'));
 	};
-	const erster = setTimeout(() => {
+	eigener.handle = setTimeout(() => {
 		einmal();
-		const wiederholung = setInterval(einmal, takt.abstand);
-		wiederholung.unref();
-		global[MERKER] = wiederholung;
+		eigener.handle = setInterval(einmal, takt.abstand);
+		eigener.handle.unref();
 	}, takt.start);
-	erster.unref();
-	global[MERKER] = erster;
+	eigener.handle.unref();
+	global[MERKER] = eigener;
 
 	return () => {
-		clearTimeout(erster);
-		clearInterval(global[MERKER] as NodeJS.Timeout);
+		if (global[MERKER] !== eigener) return;
+		clearTimeout(eigener.handle);
+		clearInterval(eigener.handle);
 		delete global[MERKER];
 	};
 }
