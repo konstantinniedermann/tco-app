@@ -274,7 +274,7 @@ describe('Mit Passkey anmelden', () => {
 		await db.update(konto).set({ gesperrt: true }).where(eq(konto.id, gesperrt.kontoId));
 		await db
 			.update(mitglied)
-			.set({ status: 'ausgetreten' })
+			.set({ status: 'ausgetreten', austrittAm: new Date() })
 			.where(eq(mitglied.id, ausgetreten.mitgliedId));
 		const vorher = d.aufrufe.pruefeAnmelden;
 

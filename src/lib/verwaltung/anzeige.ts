@@ -63,6 +63,16 @@ export function aktionText(z: Pick<VerlaufEintrag, 'aktion' | 'detail'>): string
 			return 'alle Sitzungen beendet';
 		case 'fairgate-uebertragen':
 			return 'In Fairgate übertragen';
+		case 'ausgetreten':
+			return 'Austritt erfasst';
+		case 'wiedereingetreten':
+			return 'Wiedereintritt erfasst';
+		case 'loeschung-vorgemerkt':
+			return 'zum Löschen vorgemerkt';
+		case 'loeschung-zurueckgenommen':
+			return 'Löschung rückgängig gemacht';
+		case 'auskunft-erstellt':
+			return 'Auskunft erstellt';
 		default:
 			return z.aktion;
 	}
@@ -95,6 +105,8 @@ export function plakette(z: Pick<MitgliedZeile, 'login' | 'status'>): {
 	klasse: string;
 } {
 	if (z.status === 'ausgetreten') return { text: 'ausgetreten', klasse: 'plakette' };
+	if (z.status === 'vorgemerkt')
+		return { text: 'wird gelöscht', klasse: 'plakette plakette-gesperrt' };
 	if (z.status === 'geloescht') return { text: 'gelöscht', klasse: 'plakette' };
 	switch (z.login) {
 		case 'eingeloggt':

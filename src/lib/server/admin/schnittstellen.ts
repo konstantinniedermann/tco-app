@@ -46,7 +46,12 @@ export type AdminDienste = {
 export type AdminUrheber = Extract<Urheber, { art: 'admin' | 'mitglied' }> & { art: 'admin' };
 
 // Record statt Liste: Kommt ein Status dazu, meldet der Compiler die Lücke hier.
-const STATUS: Record<MitgliedStatus, true> = { aktiv: true, ausgetreten: true, geloescht: true };
+const STATUS: Record<MitgliedStatus, true> = {
+	aktiv: true,
+	ausgetreten: true,
+	vorgemerkt: true,
+	geloescht: true
+};
 const istStatus = (s: string): s is MitgliedStatus => Object.hasOwn(STATUS, s);
 const VERLAUF_STANDARD = 100;
 const VERLAUF_MAX = 500;

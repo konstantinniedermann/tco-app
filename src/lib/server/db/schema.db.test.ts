@@ -358,4 +358,85 @@ describe('Schema Turnier und Kategorie', () => {
 		).toHaveLength(0);
 		expect(await db.select().from(mitglied).where(eq(mitglied.id, mitgliedId))).toHaveLength(1);
 	});
+
+	describe('Austritt und Löschen (#43)', () => {
+		const basis = () => ({
+			vorname: 'Test',
+			nachname: 'Muster',
+			strasse: 'Erfundenweg 1',
+			plz: '4600',
+			ort: 'Olten',
+			email: `test-${randomUUID()}@example.org`
+		});
+		const constraint = async (p: Promise<unknown>) => {
+			const f = await p.then(
+				() => null,
+				(e: unknown) => e
+			);
+			expect(f).toBeInstanceOf(Error);
+			return (f as Error & { cause?: { constraint?: string } }).cause?.constraint;
+		};
+		const jetzt = new Date();
+
+		test('vorgemerkt wird mit vorgemerkt_am und status_vorher angenommen', async () => {
+			const [m] = await db
+				.insert(mitglied)
+				.values({ ...basis(), status: 'vorgemerkt', vorgemerktAm: jetzt, statusVorher: 'aktiv' })
+				.returning();
+			expect(m.status).toBe('vorgemerkt');
+			expect(m.austrittAm).toBeNull();
+		});
+
+		test('mitglied_geloescht_check: aktives Mitglied ohne E-Mail wird abgelehnt', async () => {
+			expect(await constraint(db.insert(mitglied).values({ ...basis(), email: null }))).toBe(
+				'mitglied_geloescht_check'
+			);
+		});
+
+		test('mitglied_geloescht_check: gelöschtes Mitglied nur mit Vor- und Nachname wird angenommen', async () => {
+			const [m] = await db
+				.insert(mitglied)
+				.values({
+					vorname: 'Test',
+					nachname: 'Muster',
+					status: 'geloescht',
+					strasse: null,
+					plz: null,
+					ort: null,
+					email: null
+				})
+				.returning();
+			expect(m.email).toBeNull();
+		});
+
+		test('mitglied_status_vorher_check: nur aktiv oder ausgetreten', async () => {
+			expect(await constraint(db.insert(mitglied).values({ ...basis(), statusVorher: 'xx' }))).toBe(
+				'mitglied_status_vorher_check'
+			);
+		});
+
+		test('mitglied_vorgemerkt_check: verlangt vorgemerkt_am und status_vorher', async () => {
+			expect(
+				await constraint(
+					db.insert(mitglied).values({ ...basis(), status: 'vorgemerkt', statusVorher: 'aktiv' })
+				)
+			).toBe('mitglied_vorgemerkt_check');
+			expect(
+				await constraint(
+					db.insert(mitglied).values({ ...basis(), status: 'vorgemerkt', vorgemerktAm: jetzt })
+				)
+			).toBe('mitglied_vorgemerkt_check');
+		});
+
+		test('mitglied_ausgetreten_check: verlangt austritt_am', async () => {
+			expect(
+				await constraint(db.insert(mitglied).values({ ...basis(), status: 'ausgetreten' }))
+			).toBe('mitglied_ausgetreten_check');
+			const [m] = await db
+				.insert(mitglied)
+				.values({ ...basis(), status: 'ausgetreten', austrittAm: jetzt })
+				.returning();
+			expect(m.austrittAm).toEqual(jetzt);
+		});
+	});
 });

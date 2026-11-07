@@ -92,6 +92,13 @@
       "when": 1793990516838,
       "tag": "0012_mitteilungen",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794035725380,
+      "tag": "0013_mitgliedschaft",
+      "breakpoints": true
     }
   ]
 }

@@ -29,7 +29,12 @@ const grundmenge = (themaAn: SQL) =>
 // Wie die Liste der Anmeldungen in der Verwaltung.
 const REIHENFOLGE = [asc(mitglied.nachname), asc(mitglied.vorname), asc(mitglied.id)];
 
-type Grundzeile = { mitgliedId: number; name: string; email: string; kontoId: number | null };
+type Grundzeile = {
+	mitgliedId: number;
+	name: string;
+	email: string | null;
+	kontoId: number | null;
+};
 
 async function mitAbos(db: Db, zeilen: Grundzeile[]): Promise<Empfaenger[]> {
 	const kontoIds = zeilen.flatMap((z) => (z.kontoId === null ? [] : [z.kontoId]));

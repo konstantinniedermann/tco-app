@@ -34,6 +34,20 @@ describe('Texte der Verwaltung', () => {
 		);
 	});
 
+	it('Verlaufstexte für Austritt, Löschen und Auskunft', () => {
+		const text = (aktion: Parameters<typeof aktionText>[0]['aktion']) =>
+			aktionText({ aktion, detail: null });
+		expect(text('ausgetreten')).toBe('Austritt erfasst');
+		expect(text('wiedereingetreten')).toBe('Wiedereintritt erfasst');
+		expect(text('loeschung-vorgemerkt')).toBe('zum Löschen vorgemerkt');
+		expect(text('loeschung-zurueckgenommen')).toBe('Löschung rückgängig gemacht');
+		expect(text('auskunft-erstellt')).toBe('Auskunft erstellt');
+		expect(plakette({ login: 'eingeloggt', status: 'vorgemerkt' })).toEqual({
+			text: 'wird gelöscht',
+			klasse: 'plakette plakette-gesperrt'
+		});
+	});
+
 	it('UI-06: Fehlertext des Servers wird ein Satz', () => {
 		expect(feldMeldung('fehlt')).toBe('Fehlt.');
 		expect(feldMeldung('4 Ziffern')).toBe('4 Ziffern.');

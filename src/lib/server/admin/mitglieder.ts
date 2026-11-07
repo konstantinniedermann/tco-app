@@ -12,7 +12,7 @@ import {
 	type VerlaufZeile
 } from './verlauf.ts';
 
-export type MitgliedStatus = 'aktiv' | 'ausgetreten' | 'geloescht';
+export type MitgliedStatus = 'aktiv' | 'ausgetreten' | 'vorgemerkt' | 'geloescht';
 export type LoginStand = 'ohne-brief' | 'brief-offen' | 'eingeloggt' | 'gesperrt';
 
 export type Listenzeile = {
@@ -180,7 +180,7 @@ export async function listeMitglieder(
 		id: z.id,
 		mitgliedernummer: z.mitgliedernummer,
 		name: `${z.nachname}, ${z.vorname}`,
-		email: z.email,
+		email: z.email ?? '',
 		jahrgang: z.jahrgang,
 		rollen: rollen.get(z.kontoId) ?? [],
 		status: z.status as MitgliedStatus,
@@ -193,10 +193,10 @@ export function angabenAusZeile(z: typeof mitglied.$inferSelect): Angaben {
 		mitgliedernummer: z.mitgliedernummer,
 		vorname: z.vorname,
 		nachname: z.nachname,
-		strasse: z.strasse,
-		plz: z.plz,
-		ort: z.ort,
-		email: z.email,
+		strasse: z.strasse ?? '',
+		plz: z.plz ?? '',
+		ort: z.ort ?? '',
+		email: z.email ?? '',
 		telefon: z.telefon,
 		geschlecht: z.geschlecht as Angaben['geschlecht'],
 		jahrgang: z.jahrgang,

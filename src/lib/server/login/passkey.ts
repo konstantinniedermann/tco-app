@@ -94,7 +94,7 @@ export function erstellePasskeyDienst(abh: PasskeyAbh): PasskeyDienst {
 		const { optionen, challenge } = await pruefer.optionenEinrichten({
 			ort,
 			kontoKennung,
-			name: k.email,
+			name: k.email ?? '',
 			anzeigename: `${k.vorname} ${k.nachname}`,
 			vorhandene
 		});

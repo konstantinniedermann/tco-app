@@ -341,7 +341,10 @@ describe('Mail-Code', () => {
 		await fordereAn(d, a.email, 'ip-u-1');
 		await fordereAn(d, b.email, 'ip-u-2');
 		await db.update(konto).set({ gesperrt: true }).where(eq(konto.id, a.kontoId));
-		await db.update(mitglied).set({ status: 'ausgetreten' }).where(eq(mitglied.id, b.mitgliedId));
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten', austrittAm: new Date() })
+			.where(eq(mitglied.id, b.mitgliedId));
 		expect(await d.dienst.loginMitMailCode(a.email, codeAus(d.post[0]), 'ip-u-3')).toEqual({
 			ergebnis: 'falsch'
 		});

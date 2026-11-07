@@ -59,11 +59,11 @@ export async function listeFuerFairgate(db: DbOderTx): Promise<FairgateZeile[]> 
 			seit: m.fairgateOffenSeit!,
 			felder,
 			angaben: {
-				email: m.email,
+				email: m.email ?? '',
 				telefon: m.telefon,
-				strasse: m.strasse,
-				plz: m.plz,
-				ort: m.ort
+				strasse: m.strasse ?? '',
+				plz: m.plz ?? '',
+				ort: m.ort ?? ''
 			}
 		};
 	});

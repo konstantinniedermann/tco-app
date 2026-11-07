@@ -20,10 +20,10 @@ export const mitglied = pgTable(
 		id: serial('id').primaryKey(),
 		vorname: text('vorname').notNull(),
 		nachname: text('nachname').notNull(),
-		strasse: text('strasse').notNull(),
-		plz: text('plz').notNull(),
-		ort: text('ort').notNull(),
-		email: text('email').notNull().unique('mitglied_email_unique'),
+		strasse: text('strasse'),
+		plz: text('plz'),
+		ort: text('ort'),
+		email: text('email').unique('mitglied_email_unique'),
 		status: text('status').notNull().default('aktiv'),
 		// Leer erlaubt (mehrere Mitglieder ohne Nummer); gesetzt ist sie eindeutig, ohne Rücksicht auf
 		// Gross-/Kleinschreibung («A12» = «a12»), gespeichert wie eingegeben.
@@ -36,10 +36,36 @@ export const mitglied = pgTable(
 		lizenznummer: text('lizenznummer'),
 		// Annahme K-19.2: Gesetzt, sobald das Mitglied eine Angabe selbst geändert hat, die der Verein noch in Fairgate
 		// nachführen muss; leer = nichts offen.
-		fairgateOffenSeit: timestamp('fairgate_offen_seit', { withTimezone: true })
+		fairgateOffenSeit: timestamp('fairgate_offen_seit', { withTimezone: true }),
+		// Zeitpunkt, an dem der Austritt erfasst wurde; die Aufbewahrungsfrist läuft ab hier. Leer = nie ausgetreten.
+		austrittAm: timestamp('austritt_am', { withTimezone: true }),
+		// Zeitpunkt, an dem das Mitglied zum Löschen vorgemerkt wurde; die Bedenkzeit läuft ab hier.
+		vorgemerktAm: timestamp('vorgemerkt_am', { withTimezone: true }),
+		// Status vor dem Vormerken (zur Rücknahme); nur bei `vorgemerkt` gesetzt.
+		statusVorher: text('status_vorher')
 	},
 	(t) => [
-		check('mitglied_status_check', sql`${t.status} in ('aktiv', 'ausgetreten', 'geloescht')`),
+		check(
+			'mitglied_status_check',
+			sql`${t.status} in ('aktiv', 'ausgetreten', 'vorgemerkt', 'geloescht')`
+		),
+		// Adresse und E-Mail dürfen nur bei gelöschten Mitgliedern fehlen.
+		check(
+			'mitglied_geloescht_check',
+			sql`${t.status} = 'geloescht' or (${t.email} is not null and ${t.strasse} is not null and ${t.plz} is not null and ${t.ort} is not null)`
+		),
+		check(
+			'mitglied_status_vorher_check',
+			sql`${t.statusVorher} is null or ${t.statusVorher} in ('aktiv', 'ausgetreten')`
+		),
+		check(
+			'mitglied_vorgemerkt_check',
+			sql`${t.status} <> 'vorgemerkt' or (${t.vorgemerktAm} is not null and ${t.statusVorher} is not null)`
+		),
+		check(
+			'mitglied_ausgetreten_check',
+			sql`${t.status} <> 'ausgetreten' or ${t.austrittAm} is not null`
+		),
 		check('mitglied_geschlecht_check', sql`${t.geschlecht} in ('w', 'm')`),
 		check(
 			'mitglied_klassierung_check',

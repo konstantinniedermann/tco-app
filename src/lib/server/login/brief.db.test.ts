@@ -161,7 +161,10 @@ describe('Brief-Code', () => {
 		const { dienst } = baueDienst();
 		const { kontoId, mitgliedId } = await legeMitgliedAn(db);
 		const { code } = await dienst.stelleBriefCodeAus(kontoId);
-		await db.update(mitglied).set({ status: 'ausgetreten' }).where(eq(mitglied.id, mitgliedId));
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten', austrittAm: new Date() })
+			.where(eq(mitglied.id, mitgliedId));
 		expect(await dienst.loginMitBriefCode(code, 'ip-9')).toEqual({ ergebnis: 'falsch' });
 		expect((await holeKonto(kontoId)).briefCodeBenutztAm).toBeNull();
 	});

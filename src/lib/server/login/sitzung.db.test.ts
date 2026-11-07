@@ -126,7 +126,10 @@ describe('Sitzungen', () => {
 	test('nicht aktives Mitglied → null', async () => {
 		const { kontoId, mitgliedId } = await legeMitgliedAn(db);
 		const kennung = await erstelleSitzung(db, kontoId, jetzt);
-		await db.update(mitglied).set({ status: 'ausgetreten' }).where(eq(mitglied.id, mitgliedId));
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten', austrittAm: new Date() })
+			.where(eq(mitglied.id, mitgliedId));
 		expect(await pruefeSitzung(db, kennung, jetzt)).toBeNull();
 	});
 

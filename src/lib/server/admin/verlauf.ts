@@ -6,14 +6,18 @@ import { FELDER, type Angaben, type Feld } from './angaben.ts';
 
 export type Urheber = { art: 'admin' | 'mitglied'; mitgliedId: number } | { art: 'automatisch' };
 
-// Etappen 2 und 3 ergänzen weitere Aktionen.
 export type Aktion =
 	| 'angelegt'
 	| 'feld-geaendert'
 	| 'rolle-vergeben'
 	| 'rolle-entzogen'
 	| 'sitzungen-beendet'
-	| 'fairgate-uebertragen';
+	| 'fairgate-uebertragen'
+	| 'ausgetreten'
+	| 'wiedereingetreten'
+	| 'loeschung-vorgemerkt'
+	| 'loeschung-zurueckgenommen'
+	| 'auskunft-erstellt';
 
 // FR-26: `detail` enthält nur einen Feld- oder Rollennamen, nie einen Wert.
 export type Eintrag = { aktion: Aktion; detail?: string };
