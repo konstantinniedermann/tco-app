@@ -433,7 +433,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		expect(await korrigiereKlassierung(db, urheber, -1, 'R5', jetzt)).toBe('nicht-gefunden');
 	});
 
-	test('A-ANMELDUNG-06: ladeAnmeldungen zeigt nur aktive, nach Nachname und Vorname', async () => {
+	test('A-ANMELDUNG-06: ladeAnmeldungen zeigt nur aktive Einzel, nach Nachname und Vorname', async () => {
 		const t = await turnier(['Herren A', 'Herren B']);
 		const [a, b] = t.kategorien;
 		const zeta = await spieler({ vorname: 'Anna', nachname: 'Zeta' });
@@ -485,9 +485,20 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			}
 		]);
 		expect(await ladeAnmeldungen(db, -1)).toEqual([]);
+
+		// Doppel kommt mit #59: die Liste zeigt nur Einzel.
+		const doppel = await kategorieIn(t.id, 'Doppel', {
+			geschlecht: 'offen',
+			art: 'doppel',
+			klassierungVon: null,
+			klassierungBis: null,
+			mindestsumme: 9
+		});
+		await anmeldungMit(doppel, zeta, 'bestaetigt', t.jetzt);
+		expect(await ladeAnmeldungen(db, doppel)).toEqual([]);
 	});
 
-	test('A-ANMELDUNG-06: sucheSpieler findet aktive nach Vor- oder Nachname, höchstens 20', async () => {
+	test('A-ANMELDUNG-06: sucheSpieler findet aktive nach Vor-, Nach- oder ganzem Namen, höchstens 20', async () => {
 		const zeichen = randomUUID().slice(0, 8);
 		const probe = await spieler({
 			vorname: `Paul${zeichen}`,
@@ -505,6 +516,10 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		});
 		expect(treffer.some((z) => z.name.includes(`Paula${zeichen}`))).toBe(false);
 		expect((await sucheSpieler(db, `PAUL${zeichen}`)).map((z) => z.mitgliedId)).toEqual([probe]);
+		// Der ganze Name zusammen, in beiden Reihenfolgen.
+		for (const name of [`Paul${zeichen} Probe`, `probe, paul${zeichen}`, `Probe Paul${zeichen}`]) {
+			expect((await sucheSpieler(db, name)).map((z) => z.mitgliedId)).toEqual([probe]);
+		}
 
 		const viele = `Viele${zeichen}`;
 		for (let i = 0; i < 21; i++) await spieler({ vorname: `V${i}`, nachname: viele });

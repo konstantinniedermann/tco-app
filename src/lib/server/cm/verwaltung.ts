@@ -1,5 +1,5 @@
 // Anmeldungen verwalten durch den CM-Admin, nur Einzel (A-ANMELDUNG-06, FR-08, FR-46).
-import { and, asc, eq, ilike, or } from 'drizzle-orm';
+import { and, asc, eq, or, sql } from 'drizzle-orm';
 import type { Klassierung } from '../../turnier/klassierung.ts';
 import { warnungenEinzel, type Spieler } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
@@ -47,7 +47,7 @@ const nameUndAngaben = (z: {
 	klassierung: string | null;
 }) => ({ name: `${z.nachname}, ${z.vorname}`, ...spielerAus(z) });
 
-/** A-ANMELDUNG-06: aktive Anmeldungen einer Kategorie (bestätigt und beantragt). */
+/** A-ANMELDUNG-06: aktive Anmeldungen einer Einzel-Kategorie (bestätigt und beantragt). */
 export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<AnmeldungZeile[]> {
 	const zeilen = await db
 		.select({
@@ -62,7 +62,8 @@ export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<Anme
 		.from(anmeldung)
 		.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
 		.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId))
-		.where(and(eq(anmeldung.kategorieId, kategorieId), istAktiv))
+		.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
+		.where(and(eq(anmeldung.kategorieId, kategorieId), eq(kategorie.art, 'einzel'), istAktiv))
 		.orderBy(...namensfolge);
 	return zeilen.map((z) => ({
 		anmeldungId: z.anmeldungId,
@@ -73,7 +74,10 @@ export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<Anme
 	}));
 }
 
-/** Aktive Mitglieder, deren Vor- oder Nachname `suche` enthält (ab zwei Zeichen). */
+/**
+ * Aktive Mitglieder, deren Name `suche` enthält (ab zwei Zeichen): Vor- oder Nachname allein,
+ * «Vorname Nachname» oder «Nachname, Vorname», wie die Suche der Mitglieder-Verwaltung.
+ */
 export async function sucheSpieler(db: Db, suche: string): Promise<SpielerTreffer[]> {
 	const text = suche.trim();
 	if (text.length < 2) return [];
@@ -89,7 +93,11 @@ export async function sucheSpieler(db: Db, suche: string): Promise<SpielerTreffe
 		.where(
 			and(
 				eq(mitglied.status, 'aktiv'),
-				or(ilike(mitglied.vorname, muster), ilike(mitglied.nachname, muster))
+				or(
+					sql`${mitglied.vorname} || ' ' || ${mitglied.nachname} ilike ${muster}`,
+					sql`${mitglied.nachname} || ' ' || ${mitglied.vorname} ilike ${muster}`,
+					sql`${mitglied.nachname} || ', ' || ${mitglied.vorname} ilike ${muster}`
+				)
 			)
 		)
 		.orderBy(...namensfolge)
