@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto, refreshAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import Anmeldungsliste from '../../../../../../lib/verwaltung/Anmeldungsliste.svelte';
 	import Kategorieformular, {
 		anfrage,
 		werteAusKategorie,
@@ -131,6 +132,21 @@
 			<p class="fehler" role="alert">{allgemein}</p>
 		{/if}
 	</div>
+
+	{#if kategorie.art === 'einzel'}
+		<Anmeldungsliste
+			kategorieId={kategorie.id}
+			zeilen={data.anmeldungen}
+			andere={data.andere}
+			vorbereitung={data.vorbereitung}
+			{nurLesen}
+		/>
+	{:else}
+		<h2>Anmeldungen</h2>
+		<div class="karte">
+			<p>Doppel verwalten kommt später.</p>
+		</div>
+	{/if}
 
 	{#if !nurLesen}
 		<h2>Kategorie absagen</h2>
