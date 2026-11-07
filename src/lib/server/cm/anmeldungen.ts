@@ -128,8 +128,8 @@ export async function laufendeTurniere(
  * Die CM-Seite eines Mitglieds; `null`, wenn das Turnier unbekannt oder in Vorbereitung ist.
  * Doppel bleiben ausgeblendet. Kategorien gibt es erst, wenn keine Angabe mehr fehlt (FR-37);
  * dann die passenden (FR-07) und die, in denen das Mitglied schon aktiv angemeldet ist. Unter
- * `wildcard` stehen die, für die ein Antrag geht (FR-08), ohne Anmeldung oder mit laufendem
- * Antrag; jede Kategorie steht nur in einer der beiden Listen.
+ * `wildcard` stehen die laufenden Anträge und die, für die ein Antrag geht (FR-08); jede
+ * Kategorie steht nur in einer der beiden Listen.
  */
 export async function ladeCmAnsicht(
 	db: Db,
@@ -171,8 +171,10 @@ export async function ladeCmAnsicht(
 				anmeldungId: eigen?.anmeldungId ?? null,
 				namen: []
 			};
-			if (wildcardEinzel(regel, spieler) && eigen?.status !== 'bestaetigt') wildcard.push(eintrag);
-			else if (eintrag.passt || eigen) kategorien.push(eintrag);
+			// Ein laufender Antrag bleibt ein Antrag, auch wenn sich die Klassierung geändert hat.
+			if (eigen?.status === 'beantragt' || (!eigen && wildcardEinzel(regel, spieler))) {
+				wildcard.push(eintrag);
+			} else if (eintrag.passt || eigen) kategorien.push(eintrag);
 		}
 		await fuelleNamen(db, [...kategorien, ...wildcard]);
 	}

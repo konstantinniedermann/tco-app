@@ -90,9 +90,10 @@ async function turnier(namen: string[]) {
 }
 
 async function mitgliedMit(
-	angaben: object = { geschlecht: 'm', jahrgang: 1990, klassierung: 'R3' }
+	angaben: object = { geschlecht: 'm', jahrgang: 1990, klassierung: 'R3' },
+	rollen: string[] = []
 ) {
-	const m = await legeMitgliedAn(db, { vorname: 'Vreni' });
+	const m = await legeMitgliedAn(db, { vorname: 'Vreni', rollen });
 	await db.update(mitglied).set(angaben).where(eq(mitglied.id, m.mitgliedId));
 	const kennung = await erstelleSitzung(db, m.kontoId, SITZUNG_ZEIT);
 	const konto = (await pruefeSitzung(db, kennung, SITZUNG_ZEIT))!.konto;
@@ -356,5 +357,24 @@ describe('Schnittstellen der CM (Mitglied)', () => {
 		expect(ab.status).toBe(200);
 		expect(mails[1].i).toMatchObject({ aktion: 'ab', kategorie: 'Herren A', eigene: [] });
 		expect(meldungen).toHaveLength(1);
+	});
+
+	test('A-ANMELDUNG-10, FR-47: beantragt ein CM-Admin selbst, geht die Meldung nicht an ihn', async () => {
+		const t = await turnier(['Herren A']);
+		const { d, meldungen } = baue(t.jetzt);
+		const anderer = await legeMitgliedAn(db, { vorname: 'Hanna', rollen: ['cm'] });
+		const ich = await mitgliedMit({ geschlecht: 'm', jahrgang: 1990, klassierung: 'R8' }, ['cm']);
+		const r = await postCmWildcard(
+			d,
+			ereignis({
+				params: { id: String(t.kategorien[0]) },
+				body: { kommentar: 'Bitte.' },
+				konto: ich.konto
+			})
+		);
+		expect(r.status).toBe(200);
+		expect(meldungen).toHaveLength(1);
+		expect(meldungen[0].ids).toContain(anderer.mitgliedId);
+		expect(meldungen[0].ids).not.toContain(ich.mitgliedId);
 	});
 });

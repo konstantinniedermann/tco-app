@@ -147,6 +147,24 @@ export function postCmAbmeldung(d: CmDienste, e: CmEreignis): Promise<Response> 
 }
 
 /**
+ * FR-47: Meldung an die CM-Admins ausser dem Antragsteller selbst. Wirft nie und loggt nichts
+ * (SI-05): Der Antrag ist schon gespeichert.
+ */
+async function meldeCmAdmins(
+	d: CmDienste,
+	ohne: number,
+	m: Parameters<CmDienste['melde']>[1]
+): Promise<void> {
+	let ids: number[];
+	try {
+		ids = (await cmAdmins(d.db)).filter((id) => id !== ohne);
+	} catch {
+		return;
+	}
+	await d.melde(ids, m);
+}
+
+/**
  * A-ANMELDUNG-10, FR-08: Wildcard-Antrag mit Pflichtkommentar. Danach die Bestätigung an den
  * Spieler und eine Meldung an die CM-Admins (FR-47), DS-05: ohne Namen des Spielers.
  */
@@ -174,7 +192,7 @@ export function postCmWildcard(d: CmDienste, e: CmEreignis): Promise<Response> {
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r !== 'ok') return antwort(409, { fehler: FEHLER.includes(r) ? r : 'geschlossen' });
 		const a = await antwortMitMail(d, konto, bezug, 'antrag', t);
-		await d.melde(await cmAdmins(d.db), {
+		await meldeCmAdmins(d, konto.mitgliedId, {
 			titel: 'Wildcard-Antrag',
 			text: `Neuer Wildcard-Antrag für «${bezug.kategorie}».`,
 			pfad: `/verwaltung/turniere/${bezug.turnierId}/kategorien/${id}`

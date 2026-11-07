@@ -555,6 +555,27 @@ describe('CM-Anmeldung', () => {
 		]);
 	});
 
+	test('A-ANMELDUNG-10, FR-08: ein laufender Antrag bleibt nach Klassierungsänderung unter wildcard', async () => {
+		const t = await offenesTurnierMit(async (id) =>
+			kategorieIn(id, 'Herren R4–R6', { klassierungVon: 'R4', klassierungBis: 'R6' })
+		);
+		const ich = await spieler({ klassierung: 'R8' });
+		expect(await beantrageWildcard(db, t.k, ich, 'Bitte.', t.jetzt)).toBe('ok');
+		const [{ id }] = await aktiveVon(ich, [t.k]);
+		// R5 passt jetzt normal, R3 ist zu stark: der Antrag bleibt ein Antrag.
+		for (const klassierung of ['R5', 'R3']) {
+			expect(await setzeKlassierung(db, ich, klassierung, t.jetzt)).toBe('ok');
+			const a = await ladeCmAnsicht(db, t.id, ich, t.jetzt);
+			expect(a?.wildcard).toEqual([expect.objectContaining({ id: t.k, anmeldungId: id })]);
+			expect(a?.kategorien).toEqual([]);
+		}
+		// Eine bestätigte Wildcard steht unter den Kategorien.
+		expect(await entscheide(db, id, true, t.jetzt)).toMatchObject({ mitgliedId: ich });
+		const a = await ladeCmAnsicht(db, t.id, ich, t.jetzt);
+		expect(a?.wildcard).toEqual([]);
+		expect(a?.kategorien).toEqual([expect.objectContaining({ id: t.k, anmeldungId: id })]);
+	});
+
 	test('A-ANMELDUNG-10, FR-08: keine Wildcard nach unten, für andere Geschlechter oder passend; nach Ablehnung erneut', async () => {
 		const t = await offenesTurnierMit(async (id) => ({
 			schwach: await kategorieIn(id, 'Herren R7–R9', {
