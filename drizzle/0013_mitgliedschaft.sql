@@ -4,6 +4,8 @@ ALTER TABLE "mitglied" ALTER COLUMN "plz" DROP NOT NULL;--> statement-breakpoint
 ALTER TABLE "mitglied" ALTER COLUMN "ort" DROP NOT NULL;--> statement-breakpoint
 ALTER TABLE "mitglied" ALTER COLUMN "email" DROP NOT NULL;--> statement-breakpoint
 ALTER TABLE "mitglied" ADD COLUMN "austritt_am" timestamp with time zone;--> statement-breakpoint
+-- Bestand: Bisher setzte kein Code den Austritt; Frist läuft ab dem Einspielen.
+UPDATE "mitglied" SET "austritt_am" = now() WHERE "status" = 'ausgetreten';--> statement-breakpoint
 ALTER TABLE "mitglied" ADD COLUMN "vorgemerkt_am" timestamp with time zone;--> statement-breakpoint
 ALTER TABLE "mitglied" ADD COLUMN "status_vorher" text;--> statement-breakpoint
 ALTER TABLE "mitglied" ADD CONSTRAINT "mitglied_geloescht_check" CHECK ("mitglied"."status" = 'geloescht' or ("mitglied"."email" is not null and "mitglied"."strasse" is not null and "mitglied"."plz" is not null and "mitglied"."ort" is not null));--> statement-breakpoint
