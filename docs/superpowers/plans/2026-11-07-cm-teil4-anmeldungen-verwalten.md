@@ -204,10 +204,10 @@ Sperrreihenfolge wie `meldeAn`.
   `409 { fehler: 'schon-angemeldet' | 'vorbereitung' | 'nicht-beantragt' }`; Eingabefehler `400 { fehler: 'eingabe' }`
   (Körper: `{ mitgliedId: number, trotzdem?: boolean }`, `{ kategorieId: number, trotzdem?: boolean }`,
   `{ bestaetigt: boolean, grund?: string }`, `{ klassierung: Klassierung }`).
-- Meldungen nach dem Speichern (Name des Urhebers als «Vorname Nachname», Pfad `/clubmeisterschaft/<turnierId>`):
-  - von Hand: Titel `Clubmeisterschaft`, Text `<Urheber> hat dich in «<Kategorie>» angemeldet. Gegner sehen deine E-Mail und Telefonnummer.`
-  - verschieben: `<Urheber> hat dich von «<von>» nach «<nach>» verschoben.`
-  - löschen: `<Urheber> hat deine Anmeldung für «<Kategorie>» gelöscht.`
+- Meldungen nach dem Speichern (DS-05: keine Namen anderer Mitglieder, auch nicht des Urhebers; Pfad `/clubmeisterschaft/<turnierId>`):
+  - von Hand: Titel `Clubmeisterschaft`, Text `Der CM-Admin hat dich in «<Kategorie>» angemeldet. Gegner sehen deine E-Mail und Telefonnummer.`
+  - verschieben: `Der CM-Admin hat dich von «<von>» nach «<nach>» verschoben.`
+  - löschen: `Der CM-Admin hat deine Anmeldung für «<Kategorie>» gelöscht.`
   - Entscheid: `Deine Wildcard für «<Kategorie>» ist bestätigt.` bzw. `Deine Wildcard für «<Kategorie>» ist abgelehnt.` + bei Grund ` Grund: <Grund>`
   - Klassierung: keine Meldung.
 
@@ -232,7 +232,7 @@ Sperrreihenfolge wie `meldeAn`.
   - `beantrageWildcard(db: Db, kategorieId: number, mitgliedId: number, kommentar: string, jetzt: Date): Promise<'ok' | 'geschlossen' | 'voll' | 'keine-wildcard' | 'schon-angemeldet' | 'angaben-fehlen' | 'nicht-gefunden'>` — Status *beantragt*, zählt für FR-06
   - `CmDienste.melde: (mitgliedIds: number[], m: { titel: string; text: string; pfad: string }) => Promise<void>` (in `index.ts` aus `meldeMitgliedern` gebaut)
   - `BestaetigungInhalt.aktion: 'an' | 'ab' | 'antrag'`; `eigene` als Text inkl. `« (beantragt)»`
-- Schnittstelle `postCmWildcard`: Körper `{ kommentar: string }` (1–300 nach `trim`, sonst `400 { fehler: 'eingabe', felder: { kommentar } }`). Bei `ok`: Bestätigungsmail an den Spieler (erste Zeile `Du hast eine Wildcard für «<Kategorie>» beantragt.`) und Meldung an `cmAdmins` — Titel `Wildcard-Antrag`, Text `<Vorname Nachname> möchte in «<Kategorie>» spielen.`, Pfad `/verwaltung/turniere/<turnierId>/kategorien/<kategorieId>`.
+- Schnittstelle `postCmWildcard`: Körper `{ kommentar: string }` (1–300 nach `trim`, sonst `400 { fehler: 'eingabe', felder: { kommentar } }`). Bei `ok`: Bestätigungsmail an den Spieler (erste Zeile `Du hast eine Wildcard für «<Kategorie>» beantragt.`) und Meldung an `cmAdmins` — Titel `Wildcard-Antrag`, Text `Neuer Wildcard-Antrag für «<Kategorie>».` (DS-05: ohne Namen des Spielers), Pfad `/verwaltung/turniere/<turnierId>/kategorien/<kategorieId>`.
 - Zurückziehen eines Antrags = bestehendes `meldeAb` (unverändert).
 
 - [ ] **Step 1: Failing Tests**, Namen mit `A-ANMELDUNG-10, FR-08`: Antrag R8 in R4–R6 → *beantragt*, zählt bei der Grenze, Namen der Kategorie zeigen ihn nicht (`fuelleNamen` nur bestätigt); R2 in R7–R9 → `keine-wildcard`; leerer Kommentar → 400; nach Ablehnung erneuter Antrag → `ok`; Ansicht listet die Kategorie unter `wildcard`; Meldung an Hanna (CM-Admin) mit obigem Text, Bestätigungsmail an den Spieler.
@@ -288,7 +288,7 @@ Aufbau (nur Einzel, nicht bei *abgesagt*; bei Doppel ein Satz «Doppel verwalten
 
 - [ ] **Step 1: E2E** (Testjahre wie `turnier.test.ts`, eigenes Turnier je Projekt, Mails aus Mailpit):
   - `A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschiebt, korrigiert die Klassierung und löscht` — Warnung «Passt nicht zur Kategorie.» → «Trotzdem anmelden»; Mail an den Spieler mit `hat dich in «…» angemeldet`; nach Löschen lässt sich die Kategorie absagen; `pruefeBildschirm` für Liste und Warnungsdialog
-  - `A-ANMELDUNG-10, FR-08: Mitglied beantragt eine Wildcard, CM-Admin lehnt mit Grund ab` — Mitglied öffnet die Klappe, beantragt mit Kommentar, sieht «Wildcard beantragt»; Mail an den CM-Admin `möchte in «…» spielen`; CM-Admin lehnt mit Grund ab; Mail an den Spieler enthält `Grund:`; `pruefeBildschirm` für Klappe (iPhone/Android) und Entscheid-Dialog
+  - `A-ANMELDUNG-10, FR-08: Mitglied beantragt eine Wildcard, CM-Admin lehnt mit Grund ab` — Mitglied öffnet die Klappe, beantragt mit Kommentar, sieht «Wildcard beantragt»; Mail an den CM-Admin `Neuer Wildcard-Antrag für «…»`; CM-Admin lehnt mit Grund ab; Mail an den Spieler enthält `Grund:`; `pruefeBildschirm` für Klappe (iPhone/Android) und Entscheid-Dialog
   - MyTCO-Admin sieht die Liste mit Kommentar, ohne Tasten (`RR-07`)
 - [ ] **Step 2:** `make seed` → läuft zweimal hintereinander ohne Fehler; Verwaltung zeigt bei «Herren R1–R6» einen Antrag.
 - [ ] **Step 3:** Doku-Status nachführen, Eintrag unter *Unveröffentlicht* (kurz: was der CM-Admin jetzt kann, Wildcard, Push, sonst E-Mail).

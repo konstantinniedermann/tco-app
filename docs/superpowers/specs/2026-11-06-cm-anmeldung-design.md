@@ -216,13 +216,15 @@ die niemand bearbeiten kann.
   Angabe, warnt MyTCO nur. Datenschutzkonzept, Datenschutzerklärung und RR-Matrix werden vor dem
   Bau nachgeführt (Entscheid Projektleiter).
 - **CM-Admin als Spieler:** Er darf sich selbst von Hand anmelden und über den eigenen
-  Wildcard-Antrag entscheiden; Änderungsverlauf und Meldungen zeigen, wer es war (Entscheid
+  Wildcard-Antrag entscheiden; die Verwaltung zeigt, wer es war (Entscheid
   Projektleiter, ein Satz in Rollen und Rechte).
 - **Erst ab offener Anmeldung:** Von Hand anmelden, verschieben und entscheiden gehen erst,
   wenn das Turnier nicht mehr *in Vorbereitung* ist, damit keine Meldung zu einem Turnier geht,
   das die Mitglieder noch nicht sehen (Entscheid Claude).
 - **Texte kurz und knapp:** Push, Ersatz-Mail und Oberfläche mit einem, höchstens zwei Sätzen,
-  z. B. «Hanna Muster hat dich in Herren R7–R9 angemeldet.». Wer vom CM-Admin angemeldet
+  z. B. «Der CM-Admin hat dich in Herren R7–R9 angemeldet.». Push und Ersatz-Mail nennen keine
+  anderen Mitglieder, auch nicht den CM-Admin oder beim Wildcard-Antrag den Spieler (DS-05;
+  Entscheid Claude). Wer es war, zeigt die Verwaltung. Wer vom CM-Admin angemeldet
   wird, bekommt den Hinweis zu den Kontaktdaten als einen kurzen Satz. Claude schreibt die
   Texte, der Projektleiter sieht sie am Schluss mit den Screenshots (Entscheid Projektleiter).
 - **Wildcard-Kommentar** bleibt nach dem Entscheid gespeichert und fällt unter die Löschfrist
