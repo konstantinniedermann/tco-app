@@ -57,7 +57,9 @@ beim Ausliefern von selbst.
 
 Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make dev-handy` startet den
 Entwicklungsserver stattdessen fürs iPhone im selben WLAN (macOS, nur im eigenen WLAN), mit
-festen Namen `mytco-admin.local` (Erika, MyTCO- und Mitglieder-Admin) und `mytco-mitglied.local` (Kurt): je Name eine
+einem festen Namen je Rolle: `mytco-mitglied.local` (Kurt, Mitglied), `mytco-mytcoadmin.local` (Theo,
+MyTCO-Admin), `mytco-mitgliederadmin.local` (Mona, Mitglieder-Admin) und `mytco-cmadmin.local`
+(Hanna, CM-Admin): je Name eine
 Verknüpfung auf dem Startbildschirm mit eigenem Login. Login per Code klappt dort, Passkey nicht
 (braucht HTTPS); vorher einmal `make seed`, am Laptop dann über die WLAN-Adresse statt
 localhost. `make musterbrief` erzeugt
