@@ -13,7 +13,7 @@ oder die Website tcolten.ch.
 
 Phase **Fundament**, noch nicht ausgeliefert (aktuelle Nummer: [Versionen](docs/versionen.md)): Login per Einmal-Code mit
 Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung für Mitglieder-Admins mit
-Liste «Für Fairgate», Rollen mit *Ansicht als …* für MyTCO-Admins, eigene Angaben im Profil ändern, Datenschutzerklärung in der App,
+Liste «Für Fairgate», Austritt, Löschen mit Bedenkzeit, Auskunft und automatischen Löschfristen, Rollen mit *Ansicht als …* für MyTCO-Admins, eigene Angaben im Profil ändern, Datenschutzerklärung in der App,
 Anmeldung zu Anlässen wie der Generalversammlung (Vorschlag für den Vorstand, K-50),
 Turnier der Clubmeisterschaft mit Kategorien anlegen für die CM-Admins (noch ohne
 Anmeldung der Mitglieder),
