@@ -34,14 +34,20 @@
 		kategorieId: number;
 		/** `null`: Die Liste liess sich nicht laden. */
 		zeilen: AnmeldungZeile[] | null;
-		/** Übrige aktive Einzel-Kategorien desselben Turniers, Ziel fürs Verschieben. */
-		andere: { id: number; name: string }[];
-		/** Das Turnier ist noch in Vorbereitung: Von Hand anmelden geht noch nicht. */
-		vorbereitung: boolean;
+		/**
+		 * Aus dem Turnier: die übrigen aktiven Einzel-Kategorien (Ziel fürs Verschieben) und ob es
+		 * noch in Vorbereitung ist. `null`: Das Turnier liess sich nicht laden; dann fehlen
+		 * Von Hand anmelden und Verschieben, statt einen falschen Stand zu zeigen.
+		 */
+		turnier: { andere: { id: number; name: string }[]; vorbereitung: boolean } | null;
 		nurLesen: boolean;
 	};
 
-	let { kategorieId, zeilen, andere, vorbereitung, nurLesen }: Props = $props();
+	let { kategorieId, zeilen, turnier, nurLesen }: Props = $props();
+
+	const andere = $derived(turnier?.andere ?? []);
+	// Von Hand anmelden und verschieben gehen erst, wenn das Turnier nicht mehr in Vorbereitung ist.
+	const offen = $derived(turnier !== null && !turnier.vorbereitung);
 
 	const GRUND_MAX = 200;
 	const WEG = 'Diese Anmeldung gibt es nicht mehr.';
@@ -125,6 +131,7 @@
 			anmelden?.close();
 			return;
 		}
+		if (!anmelden?.open) return;
 		if (a.art === 'ok') {
 			treffer = a.daten;
 		} else {
@@ -152,18 +159,28 @@
 			dialog?.close();
 			return;
 		}
+		const satz = a.art === 'ok' ? erfolg : a.art === 'warnung' ? undefined : folgen[a.art];
+		// Wurde der Dialog inzwischen geschlossen, gehören Warnungen und Fehler zu keinem Dialog mehr
+		// (`warnungen` und `fehler` teilen sich alle Dialoge). Ein geänderter Stand lädt trotzdem neu.
+		if (!dialog?.open) {
+			if (satz !== undefined) {
+				await refreshAll();
+				rueckmeldung = satz;
+			}
+			laeuft = false;
+			return;
+		}
 		if (a.art === 'warnung') {
 			warnungen = a.warnungen;
 			laeuft = false;
 			return;
 		}
-		const satz = a.art === 'ok' ? erfolg : folgen[a.art];
 		if (satz === undefined) {
 			fehler = fehlerText(a);
 			laeuft = false;
 			return;
 		}
-		dialog?.close();
+		dialog.close();
 		await refreshAll();
 		laeuft = false;
 		rueckmeldung = satz;
@@ -229,8 +246,18 @@
 	{:else}
 		<p>{anmeldungenText(zeilen)}</p>
 		{#if !nurLesen}
-			{#if vorbereitung}
-				<p class="leise">Von Hand anmelden geht, sobald die Anmeldung offen ist.</p>
+			{#if turnier === null}
+				<p class="fehler" role="alert">
+					Das Turnier lässt sich gerade nicht laden. Von Hand anmelden und verschieben gehen erst
+					danach.
+				</p>
+				<div class="leiste">
+					<button type="button" class="taste-neben" onclick={() => refreshAll()}>Neu laden</button>
+				</div>
+			{:else if turnier.vorbereitung}
+				<p class="leise">
+					Von Hand anmelden und verschieben gehen, sobald die Anmeldung offen ist.
+				</p>
 			{:else}
 				<div class="leiste">
 					<button type="button" class="taste-neben" onclick={oeffneAnmelden}
@@ -288,12 +315,14 @@
 													onclick={() => oeffneEntscheid(z)}>Entscheiden</button
 												>
 											{/if}
-											<button
-												type="button"
-												class="taste-neben"
-												aria-describedby="anmeldung-{z.anmeldungId}"
-												onclick={() => oeffneVerschieben(z)}>Verschieben</button
-											>
+											{#if offen}
+												<button
+													type="button"
+													class="taste-neben"
+													aria-describedby="anmeldung-{z.anmeldungId}"
+													onclick={() => oeffneVerschieben(z)}>Verschieben</button
+												>
+											{/if}
 											<button
 												type="button"
 												class="taste-neben"
@@ -495,9 +524,10 @@
 					type="text"
 					maxlength={GRUND_MAX}
 					autocomplete="off"
-					aria-describedby="entscheiden-grund-zaehler"
+					aria-describedby="entscheiden-grund-hilfe entscheiden-grund-zaehler"
 					bind:value={grund}
 				/>
+				<span class="feld-hilfe" id="entscheiden-grund-hilfe">Nur bei Ablehnung.</span>
 				<span class="feld-hilfe" id="entscheiden-grund-zaehler"
 					>{grund.length} von {GRUND_MAX} Zeichen</span
 				>

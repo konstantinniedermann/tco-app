@@ -137,8 +137,7 @@
 		<Anmeldungsliste
 			kategorieId={kategorie.id}
 			zeilen={data.anmeldungen}
-			andere={data.andere}
-			vorbereitung={data.vorbereitung}
+			turnier={data.turnier}
 			{nurLesen}
 		/>
 	{:else}

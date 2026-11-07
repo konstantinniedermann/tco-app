@@ -17,17 +17,23 @@ export const load: PageLoad = async ({ fetch, params }) => {
 		ladeTurnier(Number(params.id), fetch)
 	]);
 	if (a.art === 'ok' && a.daten.turnierId === Number(params.id)) {
-		const turnier = t.art === 'ok' ? t.daten : null;
 		return {
 			kategorie: a.daten,
 			// `null`: Die Liste liess sich nicht laden; die Seite sagt es in der Karte.
 			anmeldungen: liste.art === 'ok' ? liste.daten : (null as AnmeldungZeile[] | null),
-			// FR-46: verschoben wird nur in eine andere aktive Einzel-Kategorie desselben Turniers.
-			andere: (turnier?.kategorien ?? [])
-				.filter((k) => k.art === 'einzel' && k.status === 'aktiv' && k.id !== kid)
-				.map((k) => ({ id: k.id, name: k.name })),
-			// Von Hand anmelden geht erst, wenn das Turnier nicht mehr in Vorbereitung ist.
-			vorbereitung: turnier?.status === 'vorbereitung'
+			// `null`: Das Turnier liess sich nicht laden; die Karte sagt es, statt falsch zu wirken.
+			turnier:
+				t.art === 'ok'
+					? {
+							// FR-46: verschoben wird nur in eine andere aktive Einzel-Kategorie desselben Turniers.
+							andere: t.daten.kategorien
+								.filter((k) => k.art === 'einzel' && k.status === 'aktiv' && k.id !== kid)
+								.map((k) => ({ id: k.id, name: k.name })),
+							// Von Hand anmelden und verschieben gehen erst, wenn das Turnier nicht mehr in
+							// Vorbereitung ist.
+							vorbereitung: t.daten.status === 'vorbereitung'
+						}
+					: null
 		};
 	}
 	if (a.art === 'abgemeldet') redirect(307, '/login');
