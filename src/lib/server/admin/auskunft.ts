@@ -15,8 +15,7 @@ import {
 	sitzung,
 	turnier,
 	type Thema,
-	type Antwort,
-	type AnmeldungStatus
+	type Antwort
 } from '../db/schema.ts';
 import type { Angaben } from './angaben.ts';
 import { ladeMitglied, type Detail, type MitgliedStatus } from './mitglieder.ts';
@@ -56,13 +55,8 @@ export type Auskunft = {
 	}[];
 	/** Anlässe, die das Mitglied angelegt hat. */
 	anlaesseErstellt: { titel: string; beginn: Date }[];
-	cm: {
-		turnier: string;
-		kategorie: string;
-		status: AnmeldungStatus;
-		angemeldetAm: Date;
-		kommentar: string | null;
-	}[];
+	/** Nur bestätigte Anmeldungen, ohne Kommentar: Wildcard-Anträge sieht der Mitglieder-Admin nicht (FR-08). */
+	cm: { turnier: string; kategorie: string; angemeldetAm: Date }[];
 	/** Mitteilungen, die das Mitglied gesendet hat; ohne Empfänger (FR-45). */
 	mitteilungen: { titel: string; gesendetAm: Date }[];
 	verlauf: AuskunftVerlauf[];
@@ -160,15 +154,13 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 			.select({
 				turnier: turnier.name,
 				kategorie: kategorie.name,
-				status: anmeldung.status,
-				angemeldetAm: anmeldung.angemeldetAm,
-				kommentar: anmeldung.kommentar
+				angemeldetAm: anmeldung.angemeldetAm
 			})
 			.from(anmeldungSpieler)
 			.innerJoin(anmeldung, eq(anmeldung.id, anmeldungSpieler.anmeldungId))
 			.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
 			.innerJoin(turnier, eq(turnier.id, kategorie.turnierId))
-			.where(eq(anmeldungSpieler.mitgliedId, id))
+			.where(and(eq(anmeldungSpieler.mitgliedId, id), eq(anmeldung.status, 'bestaetigt')))
 			.orderBy(desc(turnier.jahr), asc(kategorie.name), asc(anmeldung.id)),
 		// Nur Titel und Zeit; Text, Auswahl und Zahlen sind keine Daten dieser Person.
 		db

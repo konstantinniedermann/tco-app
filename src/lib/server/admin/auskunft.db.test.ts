@@ -136,6 +136,29 @@ async function vollesMitglied() {
 		})
 		.returning({ id: anmeldung.id });
 	await db.insert(anmeldungSpieler).values({ anmeldungId: an.id, mitgliedId: m.mitgliedId });
+	// Offener Wildcard-Antrag: sieht der Mitglieder-Admin nicht (Rechte-Matrix, FR-08).
+	const [k2] = await db
+		.insert(kategorie)
+		.values({
+			turnierId: t.id,
+			name: 'Herren Open',
+			geschlecht: 'herren',
+			art: 'einzel',
+			klassierungVon: 'N1',
+			klassierungBis: 'R3'
+		})
+		.returning({ id: kategorie.id });
+	const [wc] = await db
+		.insert(anmeldung)
+		.values({
+			kategorieId: k2.id,
+			status: 'beantragt',
+			kommentar: 'WILDCARD-KOMMENTAR-NICHT-IN-AUSKUNFT',
+			angemeldetAm: new Date('2026-10-06T07:00:00Z'),
+			geaendertAm: jetzt
+		})
+		.returning({ id: anmeldung.id });
+	await db.insert(anmeldungSpieler).values({ anmeldungId: wc.id, mitgliedId: m.mitgliedId });
 	// 60 Einträge: mehr als die 50 der Mitgliederseite.
 	await db.insert(aenderung).values(
 		Array.from({ length: 60 }, (_, i) => ({
@@ -149,7 +172,7 @@ async function vollesMitglied() {
 }
 
 describe('ladeAuskunft (DS-07)', () => {
-	test('enthält Angaben, Rollen, Login, Anlass, CM-Anmeldung und den ganzen Verlauf', async () => {
+	test('enthält Angaben, Rollen, Login, Anlass, bestätigte CM-Anmeldung ohne Wildcard und den ganzen Verlauf', async () => {
 		const m = await vollesMitglied();
 		const a = await ladeAuskunft(db, m.mitgliedId, jetzt);
 		expect(a).not.toBeNull();
@@ -197,11 +220,11 @@ describe('ladeAuskunft (DS-07)', () => {
 			{
 				turnier: 'CM 2088',
 				kategorie: 'Herren A',
-				status: 'bestaetigt',
-				angemeldetAm: new Date('2026-10-05T07:00:00Z'),
-				kommentar: 'Wildcard Erfunden'
+				angemeldetAm: new Date('2026-10-05T07:00:00Z')
 			}
 		]);
+		expect(JSON.stringify(a)).not.toContain('Wildcard Erfunden');
+		expect(JSON.stringify(a)).not.toContain('WILDCARD-KOMMENTAR');
 		expect(a!.verlauf).toHaveLength(60);
 		expect(a!.mitgliedschaft).toEqual({ austrittAm: null, vorgemerktAm: null, loeschtAm: null });
 	});
