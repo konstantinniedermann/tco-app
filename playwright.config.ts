@@ -42,6 +42,8 @@ export default defineConfig({
 			PORT: String(port),
 			PROTOCOL_HEADER: 'x-forwarded-proto',
 			DATABASE_URL: DATENBANK_URL,
+			// Kein Löschlauf im Hintergrund: die Tests lösen Löschungen selbst aus.
+			ZEITGEBER: 'aus',
 			...e2eEinstellungen(baseURL)
 		},
 		reuseExistingServer: false,
