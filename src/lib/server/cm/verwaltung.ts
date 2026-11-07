@@ -45,6 +45,20 @@ export type CmUrheber = { art: 'admin'; mitgliedId: number };
  */
 const GEAENDERT: Eintrag[] = [{ aktion: 'cm-anmeldung-geaendert' }];
 
+/**
+ * Hält die CM-Änderung im Verlauf des Spielers fest, außer er ist gelöscht: Von ihm bleibt nur der
+ * Name, sein Verlauf ist weg und wächst nicht wieder (FR-04).
+ */
+async function schreibeGeaendert(
+	tx: DbOderTx,
+	spieler: { id: number; status: string },
+	urheber: CmUrheber,
+	jetzt: Date
+) {
+	if (spieler.status === 'geloescht') return;
+	await schreibeVerlauf(tx, spieler.id, urheber, GEAENDERT, jetzt);
+}
+
 /** Höchstens so viele Treffer zeigt die Suche. */
 const TREFFER = 20;
 
@@ -146,7 +160,7 @@ async function sperreSpielerDer(tx: DbOderTx, anmeldungId: number) {
 		.where(and(eq(anmeldungSpieler.anmeldungId, anmeldungId), eq(kategorie.art, 'einzel')));
 	if (!s) return null;
 	const [m] = await tx
-		.select({ id: mitglied.id, ...spielerSpalten })
+		.select({ id: mitglied.id, status: mitglied.status, ...spielerSpalten })
 		.from(mitglied)
 		.where(eq(mitglied.id, s.mitgliedId))
 		.for('update');
@@ -274,7 +288,7 @@ export async function verschiebe(
 			.update(anmeldung)
 			.set({ kategorieId: zielKategorieId, status: 'bestaetigt', geaendertAm: jetzt })
 			.where(eq(anmeldung.id, anmeldungId));
-		await schreibeVerlauf(tx, m.id, urheber, GEAENDERT, jetzt);
+		await schreibeGeaendert(tx, m, urheber, jetzt);
 		return {
 			ergebnis: 'ok' as const,
 			mitgliedId: m.id,
@@ -303,7 +317,7 @@ export async function loescheAnmeldung(
 			.update(anmeldung)
 			.set({ status: 'zurueckgezogen', geaendertAm: jetzt })
 			.where(eq(anmeldung.id, anmeldungId));
-		await schreibeVerlauf(tx, m.id, urheber, GEAENDERT, jetzt);
+		await schreibeGeaendert(tx, m, urheber, jetzt);
 		return { mitgliedId: m.id, kategorie: a.kategorie, turnierId: a.turnierId };
 	});
 }
@@ -326,7 +340,7 @@ export async function entscheide(
 			.update(anmeldung)
 			.set({ status: bestaetigt ? 'bestaetigt' : 'abgelehnt', geaendertAm: jetzt })
 			.where(eq(anmeldung.id, anmeldungId));
-		await schreibeVerlauf(tx, m.id, urheber, GEAENDERT, jetzt);
+		await schreibeGeaendert(tx, m, urheber, jetzt);
 		return { mitgliedId: m.id, kategorie: a.kategorie, turnierId: a.turnierId };
 	});
 }

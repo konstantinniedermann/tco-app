@@ -613,6 +613,35 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		});
 	});
 
+	test('FR-04: CM-Aktionen an einer Anmeldung eines gelöschten Mitglieds schreiben keinen Verlauf', async () => {
+		const t = await turnier(['Herren A', 'Herren B']);
+		const [a, b] = t.kategorien;
+		const verlaufsZahl = async (id: number) =>
+			(await db.select().from(aenderung).where(eq(aenderung.mitgliedId, id))).length;
+		const loesche = (id: number) =>
+			db.update(mitglied).set({ status: 'geloescht' }).where(eq(mitglied.id, id));
+
+		const v = await spieler();
+		const idV = await anmeldungMit(a, v, 'bestaetigt', t.jetzt);
+		await loesche(v);
+		expect(await verschiebe(db, admin, idV, b, t.jetzt, true)).toMatchObject({ ergebnis: 'ok' });
+		expect(await loescheAnmeldung(db, admin, idV, t.jetzt)).toMatchObject({ mitgliedId: v });
+
+		const e = await spieler();
+		const idE = await anmeldungMit(a, e, 'beantragt', t.jetzt, 'Bitte');
+		await loesche(e);
+		expect(await entscheide(db, admin, idE, true, t.jetzt)).toMatchObject({ mitgliedId: e });
+
+		expect(await verlaufsZahl(v)).toBe(0);
+		expect(await verlaufsZahl(e)).toBe(0);
+
+		// Gegenprobe: ein aktives Mitglied bekommt weiter seinen Eintrag.
+		const ok = await spieler();
+		const idOk = await anmeldungMit(a, ok, 'bestaetigt', t.jetzt);
+		expect(await loescheAnmeldung(db, admin, idOk, t.jetzt)).toMatchObject({ mitgliedId: ok });
+		expect(await verlaufsZahl(ok)).toBe(1);
+	});
+
 	test('A-ANMELDUNG-06: sucheSpieler findet aktive nach Vor-, Nach- oder ganzem Namen, höchstens 20', async () => {
 		const zeichen = randomUUID().slice(0, 8);
 		const probe = await spieler({
