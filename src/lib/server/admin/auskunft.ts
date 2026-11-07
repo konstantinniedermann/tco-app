@@ -1,6 +1,7 @@
 import { and, asc, desc, eq } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import {
+	aenderung,
 	anlass,
 	anlassAnmeldung,
 	anmeldung,
@@ -21,7 +22,7 @@ import type { Angaben } from './angaben.ts';
 import { ladeMitglied, type Detail, type MitgliedStatus } from './mitglieder.ts';
 import type { Rolle } from './rollen.ts';
 import { sitzungAbgelaufen } from '../login/sitzung.ts';
-import { ladeVerlauf, type VerlaufZeile } from './verlauf.ts';
+import type { Aktion } from './verlauf.ts';
 
 /**
  * DS-07: alles, was MyTCO zu einer Person speichert, nach «Welche Daten» in `docs/datenschutz.md`.
@@ -64,8 +65,30 @@ export type Auskunft = {
 	}[];
 	/** Mitteilungen, die das Mitglied gesendet hat; ohne Empfänger (FR-45). */
 	mitteilungen: { titel: string; gesendetAm: Date }[];
-	verlauf: VerlaufZeile[];
+	verlauf: AuskunftVerlauf[];
 };
+
+/**
+ * Eine Zeile des Änderungsverlaufs in der Auskunft. «Wer» nennt keine Dritten: Admins erscheinen
+ * als «Mitgliederverwaltung», Automatisches als «MyTCO», eigene Schritte mit dem eigenen Namen.
+ */
+export type AuskunftVerlauf = {
+	zeitpunkt: Date;
+	urheber: string;
+	aktion: Aktion;
+	detail: string | null;
+};
+
+function wer(
+	z: { urheberArt: string; urheberMitgliedId: number | null },
+	id: number,
+	name: string
+): string {
+	if (z.urheberArt === 'automatisch') return 'MyTCO';
+	if (z.urheberMitgliedId === null) return 'gelöschtes Konto';
+	if (z.urheberArt === 'mitglied' && z.urheberMitgliedId === id) return name;
+	return 'Mitgliederverwaltung';
+}
 
 /** `null` für Unbekannte und Gelöschte: Von ihnen speichert MyTCO nur noch den Namen. */
 export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Auskunft | null> {
@@ -154,15 +177,26 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 			.where(eq(mitteilung.absenderId, id))
 			.orderBy(desc(mitteilung.gesendetAm), asc(mitteilung.id)),
 		// Alles, was gespeichert ist (der Zeitgeber löscht nach 12 Monaten), ohne Grenze.
-		ladeVerlauf(db, { mitgliedId: id })
+		db
+			.select({
+				zeitpunkt: aenderung.zeitpunkt,
+				urheberArt: aenderung.urheberArt,
+				urheberMitgliedId: aenderung.urheberMitgliedId,
+				aktion: aenderung.aktion,
+				detail: aenderung.detail
+			})
+			.from(aenderung)
+			.where(eq(aenderung.mitgliedId, id))
+			.orderBy(desc(aenderung.zeitpunkt), desc(aenderung.id))
 	]);
+	const name = `${m.angaben.nachname}, ${m.angaben.vorname}`;
 	const themen: Thema[] = [];
 	if (zusatz.themaAnlaesse) themen.push('anlaesse');
 	if (zusatz.themaCm) themen.push('cm');
 	if (zusatz.themaVerein) themen.push('verein');
 	return {
 		erstelltAm: jetzt,
-		name: `${m.angaben.nachname}, ${m.angaben.vorname}`,
+		name,
 		angaben: m.angaben,
 		klassierung: zusatz.klassierung,
 		fairgateOffenSeit: zusatz.fairgateOffenSeit,
@@ -179,6 +213,11 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 		anlaesseErstellt,
 		cm,
 		mitteilungen,
-		verlauf
+		verlauf: verlauf.map((z) => ({
+			zeitpunkt: z.zeitpunkt,
+			urheber: wer(z, id, name),
+			aktion: z.aktion as Aktion,
+			detail: z.detail
+		}))
 	};
 }

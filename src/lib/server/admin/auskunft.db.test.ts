@@ -222,6 +222,51 @@ describe('ladeAuskunft (DS-07)', () => {
 		expect(JSON.stringify(a)).not.toContain('GEHEIM');
 	});
 
+	test('«Wer» im Verlauf: Mitgliederverwaltung, MyTCO, eigener Name, gelöschtes Konto; kein Admin-Name', async () => {
+		const m = await legeMitgliedAn(db, { vorname: 'Erika', nachname: 'Beispiel' });
+		const admin = await legeMitgliedAn(db, { vorname: 'Adam', nachname: 'Verwalterich' });
+		const zeit = (min: number) => new Date(jetzt.getTime() - min * 60_000);
+		await db.insert(aenderung).values([
+			{
+				mitgliedId: m.mitgliedId,
+				zeitpunkt: zeit(1),
+				urheberArt: 'admin',
+				urheberMitgliedId: admin.mitgliedId,
+				aktion: 'ausgetreten'
+			},
+			{
+				mitgliedId: m.mitgliedId,
+				zeitpunkt: zeit(2),
+				urheberArt: 'automatisch',
+				aktion: 'sitzungen-beendet'
+			},
+			{
+				mitgliedId: m.mitgliedId,
+				zeitpunkt: zeit(3),
+				urheberArt: 'mitglied',
+				urheberMitgliedId: m.mitgliedId,
+				aktion: 'feld-geaendert',
+				detail: 'telefon'
+			},
+			{
+				mitgliedId: m.mitgliedId,
+				zeitpunkt: zeit(4),
+				urheberArt: 'admin',
+				urheberMitgliedId: null,
+				aktion: 'wiedereingetreten'
+			}
+		]);
+		const a = await ladeAuskunft(db, m.mitgliedId, jetzt);
+		expect(a!.verlauf.map((z) => [z.urheber, z.aktion])).toEqual([
+			['Mitgliederverwaltung', 'ausgetreten'],
+			['MyTCO', 'sitzungen-beendet'],
+			['Beispiel, Erika', 'feld-geaendert'],
+			['gelöschtes Konto', 'wiedereingetreten']
+		]);
+		expect(JSON.stringify(a)).not.toContain('Verwalterich');
+		expect(JSON.stringify(a)).not.toContain('(selbst)');
+	});
+
 	test('gelöschtes oder unbekanntes Mitglied → null', async () => {
 		const weg = await legeMitgliedAn(db);
 		await db.delete(konto).where(eq(konto.id, weg.kontoId));
@@ -244,7 +289,11 @@ describe('getAuskunft', () => {
 			jetzt: () => jetzt
 		});
 		const d: AdminDienste = { db, zugang, hinweis: async () => {}, jetzt: () => jetzt };
-		const leser = await legeMitgliedAn(db, { rollen: ['mytco'] });
+		const leser = await legeMitgliedAn(db, {
+			vorname: 'Lea',
+			nachname: 'Leserich',
+			rollen: ['mytco']
+		});
 		const kennung = await erstelleSitzung(db, leser.kontoId, jetzt);
 		const k = (await pruefeSitzung(db, kennung, jetzt))!.konto;
 		await (
@@ -271,6 +320,16 @@ describe('getAuskunft', () => {
 			detail: null
 		});
 
+		// Zweiter Abruf: der erste steht im Verlauf, ohne Namen des Admins.
+		const zweite = await (
+			await getAuskunft(d, ereignis({ method: 'GET', params, konto: k }))
+		).json();
+		expect(zweite.verlauf[0]).toMatchObject({
+			urheber: 'Mitgliederverwaltung',
+			aktion: 'auskunft-erstellt'
+		});
+		expect(JSON.stringify(zweite)).not.toContain('Leserich');
+
 		// Gelöscht und unbekannt: 404, kein weiterer Eintrag.
 		const weg = await legeMitgliedAn(db, { status: 'geloescht' });
 		await db.delete(konto).where(eq(konto.id, weg.kontoId));
@@ -280,6 +339,6 @@ describe('getAuskunft', () => {
 		}
 		expect(
 			await db.select().from(aenderung).where(eq(aenderung.aktion, 'auskunft-erstellt'))
-		).toHaveLength(1);
+		).toHaveLength(2);
 	});
 });

@@ -56,7 +56,7 @@ export type VerlaufZeile = {
 
 export async function ladeVerlauf(
 	db: DbOderTx,
-	// Ohne `grenze` kommen alle Einträge (Auskunft).
+	// Ohne `grenze` kommen alle Einträge.
 	filter: { mitgliedId?: number; grenze?: number }
 ): Promise<VerlaufZeile[]> {
 	const urheber = alias(mitglied, 'urheber');
