@@ -36,6 +36,15 @@ export function istVeralteteE2eDatenbank(name: string, jetzt: Date): boolean {
 	return jetzt.getTime() - angelegt > EIN_TAG_MS;
 }
 
+/** Zeigt die URL auf eine Datenbank dieses Skripts? playwright.config.ts bricht sonst ab. */
+export function istE2eDatenbank(url: string): boolean {
+	try {
+		return new URL(url).pathname.startsWith(`/${PRAEFIX}`);
+	} catch {
+		return false;
+	}
+}
+
 export function urlMitDatenbank(basis: string, name: string): string {
 	const url = new URL(basis);
 	url.pathname = `/${name}`;
@@ -60,7 +69,7 @@ async function raeumeAlteAuf(basis: string, jetzt: Date): Promise<void> {
 		);
 		for (const { datname } of rows) {
 			if (!istVeralteteE2eDatenbank(datname, jetzt)) continue;
-			await c.query(`DROP DATABASE IF EXISTS ${datname} WITH (FORCE)`);
+			await c.query(`DROP DATABASE IF EXISTS ${c.escapeIdentifier(datname)} WITH (FORCE)`);
 			console.log(`Alte E2E-Datenbank gelöscht: ${datname}`);
 		}
 	});
@@ -71,11 +80,11 @@ function playwright(args: string[], datenbankUrl: string): Promise<number> {
 		stdio: 'inherit',
 		env: { ...process.env, DATABASE_URL: datenbankUrl }
 	});
-	// Ctrl-C erreicht Playwright ohnehin (gleiche Prozessgruppe); hier nur nicht vorzeitig enden,
-	// damit die Datenbank danach noch gelöscht wird.
-	const warte = () => {};
-	process.on('SIGINT', warte);
-	process.on('SIGTERM', warte);
+	// Signale an Playwright weiterreichen und selbst nicht vorzeitig enden, damit die Datenbank
+	// danach noch gelöscht wird (Ctrl-C trifft ohnehin die ganze Prozessgruppe).
+	for (const signal of ['SIGINT', 'SIGTERM'] as const) {
+		process.on(signal, () => kind.kill(signal));
+	}
 	return new Promise((fertig) => {
 		kind.on('exit', (code, signal) => fertig(code ?? (signal ? 1 : 0)));
 		kind.on('error', (fehler) => {
@@ -90,13 +99,15 @@ async function main(): Promise<void> {
 	const jetzt = new Date();
 	await raeumeAlteAuf(basis, jetzt);
 	const name = e2eDatenbankName(jetzt, randomBytes(4).toString('hex'));
-	await mitVerbindung(basis, (c) => c.query(`CREATE DATABASE ${name}`).then(() => {}));
+	await mitVerbindung(basis, (c) =>
+		c.query(`CREATE DATABASE ${c.escapeIdentifier(name)}`).then(() => {})
+	);
 	console.log(`E2E auf eigener Datenbank ${name}`);
 	try {
 		process.exitCode = await playwright(process.argv.slice(2), urlMitDatenbank(basis, name));
 	} finally {
 		await mitVerbindung(basis, (c) =>
-			c.query(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`).then(() => {})
+			c.query(`DROP DATABASE IF EXISTS ${c.escapeIdentifier(name)} WITH (FORCE)`).then(() => {})
 		);
 	}
 }
