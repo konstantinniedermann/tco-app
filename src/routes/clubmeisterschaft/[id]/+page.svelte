@@ -64,6 +64,9 @@
 	let feldFehler = $state<CmFelder>({});
 	let angabenForm = $state<HTMLFormElement>();
 	let zaehlerBereich = $state<HTMLDivElement>();
+	let angabenTitel = $state<HTMLHeadingElement>();
+	// Titel der Anfrage-Karten, Ziel des Fokus, wenn eine davon verschwindet.
+	const anfrageTitel: (HTMLHeadingElement | null | undefined)[] = [];
 	// Ungespeichert (UI-Leitbild): eine Angabe weicht vom geladenen Stand ab.
 	const geaendert = $derived(
 		klassierung !== (cm.spieler.klassierung ?? '') || geschlecht !== null || jahrgang !== ''
@@ -305,11 +308,21 @@
 		}
 	}
 
-	// Nach Annehmen oder Ablehnen ist die Karte der Anfrage weg: Fokus zur Kategorie oder zum
-	// Zähler, nicht ins Leere.
+	/**
+	 * Nach Annehmen oder Ablehnen ist die Karte der Anfrage weg (WCAG 2.4.3): Fokus zur Kategorie,
+	 * sonst zur nächsten Anfrage-Karte, zum Zähler oder zum Titel der Karte *Deine Angaben*.
+	 */
 	async function fokusNachAnfrage(kategorieId?: number) {
 		await tick();
-		((kategorieId !== undefined && knoepfe[kategorieId]) || zaehlerBereich)?.focus();
+		// Steht die Taste noch (die Anfrage ist geblieben), bleibt der Fokus dort.
+		const aktiv = document.activeElement;
+		if (aktiv instanceof HTMLElement && aktiv !== document.body && aktiv.isConnected) return;
+		const ziel =
+			(kategorieId !== undefined ? knoepfe[kategorieId] : undefined) ??
+			anfrageTitel.find((t) => t?.isConnected) ??
+			zaehlerBereich ??
+			angabenTitel;
+		ziel?.focus();
 	}
 
 	/** FR-48: eine Anfrage an einen selbst annehmen. */
@@ -335,10 +348,12 @@
 			case 'schon-angemeldet':
 				fehler = ANNEHMEN_FEHLER[r.art];
 				await neuLaden();
+				await fokusNachAnfrage();
 				return;
 			case 'angaben-fehlen':
 			case 'nicht-gefunden':
 				await neuLaden();
+				await fokusNachAnfrage();
 				return;
 			default:
 				fehler = MELDUNG.stoerung;
@@ -364,6 +379,7 @@
 				return;
 			case 'nicht-gefunden':
 				await neuLaden();
+				await fokusNachAnfrage();
 				return;
 			default:
 				fehler = MELDUNG.stoerung;
@@ -455,8 +471,8 @@
 </p>
 
 <!-- FR-48: Anfragen an einen selbst stehen oben, auch über der Karte «Deine Angaben». -->
-{#each cm.anfragen as a (a.anfrageId)}
-	{@render anfrageKarte(a)}
+{#each cm.anfragen as a, i (a.anfrageId)}
+	{@render anfrageKarte(a, i)}
 {/each}
 
 {#if fragtAngaben}
@@ -464,7 +480,9 @@
 		{#if meldung}<p>{meldung}</p>{/if}
 	</div>
 	<section class="karte" aria-labelledby="angaben-titel">
-		<h2 id="angaben-titel">Deine Angaben für die Clubmeisterschaft</h2>
+		<h2 id="angaben-titel" tabindex="-1" bind:this={angabenTitel}>
+			Deine Angaben für die Clubmeisterschaft
+		</h2>
 		<p>Damit MyTCO dir die passenden Kategorien zeigt, braucht es noch:</p>
 		{#if nurAnsehen}
 			<fieldset disabled class="nur-lesen">
@@ -709,9 +727,11 @@
 </dialog>
 
 <!-- FR-48, FR-19: Anfrage an einen selbst, mit dem Kontakt des Anfragenden. -->
-{#snippet anfrageKarte(a: CmAnfrage)}
+{#snippet anfrageKarte(a: CmAnfrage, i: number)}
 	<section class="karte" aria-labelledby="anfrage-{a.anfrageId}">
-		<h2 id="anfrage-{a.anfrageId}">Anfrage für «{a.kategorie}»</h2>
+		<h2 id="anfrage-{a.anfrageId}" tabindex="-1" bind:this={anfrageTitel[i]}>
+			Anfrage für «{a.kategorie}»
+		</h2>
 		<p>
 			<strong>{a.von}</strong>{#if a.klassierung}&nbsp;· {klassierungName(a.klassierung)}{/if} möchte
 			mit dir spielen.
@@ -785,19 +805,21 @@
 
 {#snippet suchende(k: CmKategorie)}
 	{#if k.suchende.length > 0}
-		<p><span class="plakette plakette-offen">sucht Partner</span></p>
-		{#each k.suchende as s, i (i)}
-			<p>
-				<strong>{s.name}</strong>{#if s.kommentar}<br /><span class="leise">«{s.kommentar}»</span
-					>{/if}
-			</p>
-		{/each}
+		<div class="karte-teil">
+			<p><span class="plakette plakette-offen">sucht Partner</span></p>
+			{#each k.suchende as s, i (i)}
+				<p>
+					<strong>{s.name}</strong>{#if s.kommentar}<br /><span class="leise">«{s.kommentar}»</span
+						>{/if}
+				</p>
+			{/each}
+		</div>
 	{/if}
 {/snippet}
 
 {#snippet meineAnfragen(k: CmKategorie)}
 	{#each k.meineAnfragen as a (a.anfrageId)}
-		<div class="kachel">
+		<div class="kachel karte-teil">
 			<span>
 				Deine Anfrage an <strong>{a.an}</strong><br />
 				<span class="plakette plakette-offen">offen</span>
@@ -835,18 +857,20 @@
 			<p class="leise">Weitere Paare: {weitere.join(', ')}</p>
 		{/if}
 		{#if offen && !nurAnsehen}
-			<p>
-				<button
-					type="button"
-					class="taste-neben"
-					bind:this={knoepfe[k.id]}
-					disabled={laeuft}
-					onclick={() => abmelden(k)}>Abmelden</button
-				>
-			</p>
-			<p class="leise">
-				Dann ist auch {vornameVon(partner.name)} abgemeldet und bekommt eine Meldung.
-			</p>
+			<div class="karte-teil">
+				<p>
+					<button
+						type="button"
+						class="taste-neben"
+						bind:this={knoepfe[k.id]}
+						disabled={laeuft}
+						onclick={() => abmelden(k)}>Abmelden</button
+					>
+				</p>
+				<p class="leise">
+					Dann ist auch {vornameVon(partner.name)} abgemeldet und bekommt eine Meldung.
+				</p>
+			</div>
 		{/if}
 	</section>
 {/snippet}
