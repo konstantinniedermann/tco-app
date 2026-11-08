@@ -11,6 +11,7 @@ import {
 	legeOffenesTurnierAn,
 	meldeZurCmAn,
 	schliesseLoginHilfen,
+	setzeRufname,
 	setzeSpielerangaben
 } from './hilfen/login.ts';
 import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
@@ -27,6 +28,7 @@ test.afterAll(async () => {
 // die Läufe: `legeOffenesTurnierAn` löscht das Turnier des Jahres vorher.
 const JAHR_MITGLIED: Record<string, number> = { iphone: 2093, android: 2092 };
 const JAHR_VERWALTUNG: Record<string, number> = { iphone: 2091, android: 2090 };
+const JAHR_RUFNAME: Record<string, number> = { iphone: 2082, android: 2081 };
 
 function testjahr(jahre: Record<string, number>, info: TestInfo): number {
 	const jahr = jahre[info.project.name];
@@ -61,6 +63,8 @@ const MIXED: KategorieWerte = {
 	mindestsumme: 9
 };
 
+const DAMEN_DOPPEL: KategorieWerte = { ...MIXED, name: 'Damen Doppel', geschlecht: 'damen' };
+
 type Konto = Awaited<ReturnType<typeof legeKontoMitBriefCodeAn>>;
 
 async function meldeAn(page: Page, konto: Konto) {
@@ -90,7 +94,8 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 		einzel('Offen R1–R9', 'offen', 'R1'),
 		einzel('Herren Jahrgang bis 1991', 'herren', 'R1', 1991),
 		einzel('Damen R1–R9', 'damen', 'R1'),
-		MIXED
+		MIXED,
+		DAMEN_DOPPEL
 	]);
 	// Ohne Klassierung und Geschlecht; der Jahrgang steht schon (wie aus Fairgate).
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
@@ -112,21 +117,23 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 		page.getByRole('heading', { level: 2, name: 'Deine Angaben für die Clubmeisterschaft' })
 	).toBeVisible();
 	await expect(page.getByLabel('Klassierung')).toBeVisible();
-	await expect(page.getByRole('group', { name: 'Geschlecht' })).toBeVisible();
+	await expect(page.getByRole('radiogroup', { name: 'Geschlecht' })).toBeVisible();
 	await expect(page.getByLabel('Jahrgang')).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'cm-angaben');
 	await page.getByLabel('Klassierung').selectOption('R6');
 	await page.getByLabel('Mann').check();
 	await page.getByRole('button', { name: 'Weiter zu den Kategorien' }).click();
 
-	// A-ANMELDUNG-03, FR-07: nur passende Einzel-Kategorien; die Damen-Kategorie und das Doppel fehlen.
+	// A-ANMELDUNG-03, FR-07: nur passende Kategorien; die Damen-Kategorien fehlen, das Mixed passt
+	// (Doppel ohne Jahrgang, die Mindestsumme prüft erst die Partnerwahl).
 	await expect(page.getByText('0 von 3 Anmeldungen', { exact: true })).toBeVisible();
 	await expect(karte(page, 'Herren R1–R9')).toBeVisible();
 	await expect(karte(page, 'Herren R4–R9')).toBeVisible();
 	await expect(karte(page, 'Offen R1–R9')).toBeVisible();
 	await expect(karte(page, 'Herren Jahrgang bis 1991')).toBeVisible();
 	await expect(page.getByText('Damen R1–R9')).toHaveCount(0);
-	await expect(page.getByText('Mixed Doppel')).toHaveCount(0);
+	await expect(page.getByText('Mixed Doppel', { exact: true })).toBeVisible();
+	await expect(page.getByText('Damen Doppel')).toHaveCount(0);
 
 	// A-ANMELDUNG-01: erste Anmeldung mit Rückfrage zu den Kontaktdaten.
 	await karte(page, 'Herren R1–R9').getByRole('button', { name: 'Anmelden' }).click();
@@ -164,8 +171,11 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	await expect(vierte).toBeEnabled();
 	await expect(karte(page, 'Offen R1–R9')).toContainText('Noch niemand angemeldet.');
 
-	// Die Kachel nennt den neuen Stand.
-	await page.getByRole('link', { name: '‹ Zurück' }).click();
+	// Die Kachel auf der Startseite nennt den neuen Stand.
+	await page
+		.getByRole('navigation', { name: 'Hauptnavigation' })
+		.getByRole('link', { name: 'Start', exact: true })
+		.click();
 	await expect(kachel).toContainText('2 Anmeldungen');
 	expect(fehler).toEqual([]);
 });
@@ -182,12 +192,14 @@ test('FR-36, FR-35: CM-Admin wird gewarnt und kann eine Kategorie mit Anmeldunge
 		turnierId,
 		kategorieIds: [kategorieId]
 	} = await legeOffenesTurnierAn(jahr, [einzel('Herren R1–R9', 'herren', 'R1')]);
-	const spieler = await legeKontoAn('Bruno', `Probe${randomUUID().slice(0, 6)}`);
+	const nachname = `Probe${randomUUID().slice(0, 6)}`;
+	const spieler = await legeKontoAn('Johannes', nachname);
 	await setzeSpielerangaben(spieler.mitgliedId, {
 		geschlecht: 'm',
 		jahrgang: 1985,
 		klassierung: 'R3'
 	});
+	await setzeRufname(spieler.mitgliedId, 'Hannes');
 	await meldeZurCmAn(kategorieId, spieler.mitgliedId);
 
 	const cm = await legeCmMitBriefCodeAn('Carla');
@@ -210,6 +222,12 @@ test('FR-36, FR-35: CM-Admin wird gewarnt und kann eine Kategorie mit Anmeldunge
 	).toHaveText('1');
 	await page.getByRole('link', { name: 'Herren R1–R9' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Herren R1–R9' })).toBeVisible();
+
+	// Die Anmeldezeile zeigt den Rufnamen, dahinter leise den amtlichen Namen (Nachname zuerst).
+	const anmeldezeile = page.getByRole('row', { name: new RegExp(nachname) });
+	await expect(anmeldezeile).toContainText('Hannes');
+	await expect(anmeldezeile.locator('.leise').first()).toHaveText(`${nachname}, Johannes`);
+	await pruefeBildschirm(page, info, 'cm-turnierleitung-rufname');
 
 	// FR-35: statt der Taste der Satz, warum Absagen nicht geht.
 	await expect(
@@ -243,5 +261,40 @@ test('FR-36, FR-35: CM-Admin wird gewarnt und kann eine Kategorie mit Anmeldunge
 	await page.getByRole('link', { name: `‹ ${name}` }).click();
 	await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
 	await expect(page.getByRole('row', { name: /Herren R1–R9/ })).toContainText('R7–R9');
+	expect(fehler).toEqual([]);
+});
+
+test('Rufname: Teilnehmerliste zeigt Rufname mit amtlichem Namen', async ({ page }, info) => {
+	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder sehen die Liste am Handy; die Darstellung selbst prüfen die Einheitstests
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const jahr = testjahr(JAHR_RUFNAME, info);
+	const {
+		kategorieIds: [kategorieId]
+	} = await legeOffenesTurnierAn(jahr, [einzel('Herren R1–R9', 'herren', 'R1')]);
+	const nachname = `Probe${randomUUID().slice(0, 6)}`;
+	const spieler = await legeKontoAn('Johannes', nachname);
+	await setzeSpielerangaben(spieler.mitgliedId, {
+		geschlecht: 'm',
+		jahrgang: 1985,
+		klassierung: 'R3'
+	});
+	await setzeRufname(spieler.mitgliedId, 'Hannes');
+	await meldeZurCmAn(kategorieId, spieler.mitgliedId);
+
+	// Ein anderes Mitglied sieht die Liste.
+	const betrachter = await legeKontoMitBriefCodeAn('Moritz', `Probe${randomUUID().slice(0, 6)}`);
+	await setzeSpielerangaben(betrachter.mitgliedId, {
+		geschlecht: 'm',
+		jahrgang: 1990,
+		klassierung: 'R6'
+	});
+	await startetVomSymbol(page);
+	await meldeAn(page, betrachter);
+	await page.getByRole('link', { name: new RegExp(`Clubmeisterschaft ${jahr}`) }).click();
+	await expect(karte(page, 'Herren R1–R9')).toContainText(
+		`Angemeldet (1): Hannes (Johannes ${nachname})`
+	);
+	await pruefeBildschirm(page, info, 'cm-rufname');
 	expect(fehler).toEqual([]);
 });

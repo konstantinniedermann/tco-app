@@ -6,9 +6,12 @@ import type { AnlassFeld } from '../server/anlass/angaben.ts';
 import type { AnlassAdmin, AnlassListe } from '../server/anlass/anlaesse.ts';
 import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairgate.ts';
 import type { Auskunft } from '../server/admin/auskunft.ts';
+import type { AusgestellterBrief, BriefZeile } from '../server/admin/briefe.ts';
+import type { DateiFehler, Vorschau } from '../server/admin/einlesen.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
 import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
+import type { DoppelVerwaltung as ServerDoppelVerwaltung } from '../server/cm/verwaltung-doppel.ts';
 import type { TurnierStatus } from '../server/db/schema.ts';
 import type { MitteilungFeld } from '../server/mitteilung/angaben.ts';
 import type { KategorieFeld, TurnierFeld } from '../server/turnier/angaben.ts';
@@ -42,8 +45,12 @@ export type TurnierAnsicht = Json<TurnierDetail>;
 export type KategorieAnsicht = Json<NonNullable<Awaited<ReturnType<typeof ServerLadeKategorie>>>>;
 export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus, VerwaltungsRolle };
 export type { AnmeldungZeile, SpielerTreffer, Warnung };
+export type DoppelVerwaltung = Json<ServerDoppelVerwaltung>;
 type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld | MitteilungFeld;
 export type FairgateZeile = Json<ServerFairgateZeile>;
+export type BriefListe = Json<BriefZeile>[];
+export type { AusgestellterBrief };
+export type { DateiFehler, Vorschau };
 export type { Angaben, AnsichtRolle, Feld, MitgliedStatus, Rolle, RollenListe };
 
 export type Antwort<T> =
@@ -59,14 +66,18 @@ export type Antwort<T> =
 	| { art: 'eingabe'; felder: Partial<Record<AlleFelder, string>> }
 	| { art: 'vergeben'; feld: Feld | 'jahr' | 'name' }
 	| { art: 'letzter-mytco' }
+	| { art: 'eigenes-konto' }
 	| { art: 'veraltet' }
 	| { art: 'frist-abgelaufen' }
 	| { art: 'schluss-vorbei' }
 	| { art: 'keine-kategorie' }
 	| { art: 'unzulaessig' }
 	| { art: 'abgesagt' }
+	| { art: 'art-gesperrt' }
 	| { art: 'unpassend'; anzahl: number }
 	| { art: 'hat-anmeldungen'; anzahl: number }
+	| { art: 'nicht-moeglich'; anzahl: number }
+	| { art: 'datei'; datei: DateiFehler }
 	| { art: 'warnung'; warnungen: Warnung[] }
 	| { art: 'schon-angemeldet' }
 	| { art: 'vorbereitung' }
@@ -84,6 +95,7 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 		feld?: unknown;
 		anzahl?: unknown;
 		warnungen?: unknown;
+		datei?: unknown;
 	};
 	if (status >= 200 && status < 300) return { art: 'ok', daten: koerper as T };
 	if (status === 401) return { art: 'abgemeldet' };
@@ -97,21 +109,27 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 	if (status === 429) return { art: 'zu-viele' };
 	if (status === 400) {
 		if (k.fehler === 'falsch') return { art: 'falsch' };
+		if (k.fehler === 'datei' && k.datei && typeof k.datei === 'object')
+			return { art: 'datei', datei: k.datei as DateiFehler };
 		if (k.fehler === 'eingabe' && k.felder && typeof k.felder === 'object')
 			return { art: 'eingabe', felder: k.felder as Partial<Record<AlleFelder, string>> };
 	}
 	if (status === 409) {
 		if (k.fehler === 'letzter-mytco') return { art: 'letzter-mytco' };
+		if (k.fehler === 'eigenes-konto') return { art: 'eigenes-konto' };
 		if (k.fehler === 'veraltet') return { art: 'veraltet' };
 		if (k.fehler === 'frist-abgelaufen') return { art: 'frist-abgelaufen' };
 		if (k.fehler === 'schluss-vorbei') return { art: 'schluss-vorbei' };
 		if (k.fehler === 'keine-kategorie') return { art: 'keine-kategorie' };
 		if (k.fehler === 'unzulaessig') return { art: 'unzulaessig' };
 		if (k.fehler === 'abgesagt') return { art: 'abgesagt' };
+		if (k.fehler === 'art-gesperrt') return { art: 'art-gesperrt' };
 		if (k.fehler === 'unpassend' && typeof k.anzahl === 'number')
 			return { art: 'unpassend', anzahl: k.anzahl };
 		if (k.fehler === 'hat-anmeldungen' && typeof k.anzahl === 'number')
 			return { art: 'hat-anmeldungen', anzahl: k.anzahl };
+		if (k.fehler === 'nicht-moeglich' && typeof k.anzahl === 'number')
+			return { art: 'nicht-moeglich', anzahl: k.anzahl };
 		if (k.fehler === 'vergeben' && typeof k.feld === 'string')
 			return { art: 'vergeben', feld: k.feld as Feld | 'jahr' | 'name' };
 		if (k.fehler === 'warnung' && Array.isArray(k.warnungen))
@@ -186,6 +204,28 @@ export function ladeMitglieder(
 	const abfrage = q.size > 0 ? `?${q}` : '';
 	return lese(`${ADMIN}/mitglieder${abfrage}`, holen);
 }
+
+/** A-LOGIN-01: aktive Mitglieder, die MyTCO noch nie geöffnet haben. */
+export const ladeBriefe = (holen: Holen = fetch) => lese<BriefListe>(`${ADMIN}/briefe`, holen);
+
+/**
+ * A-LOGIN-01: stellt für jedes Mitglied einen neuen Brief-Code aus (alles oder nichts). Die Antwort
+ * enthält die Codes im Klartext (RR-04: nur für die Druckansicht, nie speichern).
+ */
+export const erzeugeBriefe = (ids: number[], holen: Holen = fetch) =>
+	schicke<{ briefe: AusgestellterBrief[] }>(`${ADMIN}/briefe`, { ids }, holen);
+
+/** Wie `erzeugeBriefe`, für ein einzelnes Mitglied. */
+export const erzeugeBrief = (id: number, holen: Holen = fetch) =>
+	schicke<{ briefe: AusgestellterBrief[] }>(`${ADMIN}/mitglieder/${id}/brief`, {}, holen);
+
+/** A-MITGLIED-07: Vorschau einer Datei; nichts wird gespeichert. */
+export const zeigeEinleseVorschau = (text: string, holen: Holen = fetch) =>
+	schicke<Vorschau>(`${ADMIN}/einlesen/vorschau`, { text }, holen);
+
+/** A-MITGLIED-07: legt die neuen Zeilen an, wenn es noch `erwartet` sind (sonst `veraltet`). */
+export const liesMitgliederEin = (text: string, erwartet: number, holen: Holen = fetch) =>
+	schicke<{ angelegt: number }>(`${ADMIN}/einlesen`, { text, erwartet }, holen);
 
 export const legeMitgliedAn = (angaben: object, holen: Holen = fetch) =>
 	schicke<{ id: number }>(`${ADMIN}/mitglieder`, angaben, holen);
@@ -283,7 +323,10 @@ export const legeKategorieAn = (turnierId: number, angaben: object, holen: Holen
 export const ladeKategorie = (id: number, holen: Holen = fetch) =>
 	lese<KategorieAnsicht>(`${ADMIN}/kategorien/${id}`, holen);
 
-/** `trotzdem`: speichert auch, wenn aktive Anmeldungen nach der Änderung nicht mehr passen (FR-36). */
+/**
+ * `trotzdem`: speichert auch, wenn aktive Anmeldungen nach der Änderung nicht mehr passen (FR-36);
+ * Einzel oder Doppel wechseln geht mit aktiven Anmeldungen nie (`art-gesperrt`).
+ */
 export const aendereKategorie = (
 	id: number,
 	angaben: object,
@@ -364,3 +407,62 @@ export const korrigiereKlassierung = (
 		{ klassierung },
 		holen
 	);
+
+/** A-ANMELDUNG-06: Paare, Suchende und offene Anfragen einer Doppel-Kategorie. */
+export const ladeDoppel = (kategorieId: number, holen: Holen = fetch) =>
+	lese<DoppelVerwaltung>(`${ADMIN}/kategorien/${kategorieId}/doppel`, holen);
+
+const mitTrotzdem = (inhalt: object, trotzdem: boolean) =>
+	trotzdem ? { ...inhalt, trotzdem: true } : inhalt;
+
+/** FR-46: ein Paar (zwei Mitglieder) oder einen Suchenden (eines) von Hand anmelden. */
+export const meldeDoppelAn = (
+	kategorieId: number,
+	mitgliedIds: [number] | [number, number],
+	trotzdem = false,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/kategorien/${kategorieId}/doppel`,
+		mitTrotzdem({ mitgliedIds }, trotzdem),
+		holen
+	);
+
+/** FR-46: zwei Suchende zu einem Paar zusammenlegen. */
+export const legeZusammen = (
+	anmeldungId: number,
+	mitAnmeldungId: number,
+	trotzdem = false,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/anmeldungen/${anmeldungId}/zusammenlegen`,
+		mitTrotzdem({ mitAnmeldungId }, trotzdem),
+		holen
+	);
+
+/** FR-46: Partner eines Paars ändern; `neuId` `null`: Der Bleibende sucht danach selbst. */
+export const aenderePartner = (
+	anmeldungId: number,
+	bleibtId: number,
+	neuId: number | null,
+	trotzdem = false,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/anmeldungen/${anmeldungId}/partner`,
+		mitTrotzdem({ bleibtId, neuId }, trotzdem),
+		holen
+	);
+
+/** FR-46, FR-48: eine offene Partner-Anfrage als Paar anmelden. */
+export const meldeAnfrageAlsPaarAn = (anfrageId: number, trotzdem = false, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/anfragen/${anfrageId}/paar`,
+		mitTrotzdem({}, trotzdem),
+		holen
+	);
+
+/** FR-46, FR-48: eine offene Partner-Anfrage löschen; der Anfragende erfährt es. */
+export const loescheAnfrage = (anfrageId: number, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/anfragen/${anfrageId}/loeschen`, {}, holen);

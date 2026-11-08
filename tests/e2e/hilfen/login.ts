@@ -12,7 +12,9 @@ import {
 	beantrageWildcard,
 	meldeAn as meldeZurCmAnInDb
 } from '../../../src/lib/server/cm/anmeldungen.ts';
-import { mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
+import { stelleAnfrage } from '../../../src/lib/server/cm/doppel.ts';
+import { meldeDoppelVonHandAn } from '../../../src/lib/server/cm/verwaltung-doppel.ts';
+import { konto, mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../../../src/lib/server/turnier/angaben.ts';
 import {
 	legeKategorieAn,
@@ -105,6 +107,11 @@ export async function loescheTurnier(jahr: number): Promise<void> {
 	await hole().db.delete(turnier).where(eq(turnier.jahr, jahr));
 }
 
+/** Gibt dem Turnier einen anderen (erfundenen) Namen, z. B. einen sehr langen. */
+export async function benenneTurnier(turnierId: number, name: string): Promise<void> {
+	await hole().db.update(turnier).set({ name }).where(eq(turnier.id, turnierId));
+}
+
 /**
  * Wie `legeTurnierAn`, dazu diese Kategorien und offene Anmeldung (Anmeldeschluss 31. Mai des
  * Jahres). Gibt die Nummern von Turnier und Kategorien zurück, in der Reihenfolge der Werte.
@@ -134,10 +141,91 @@ export async function setzeSpielerangaben(
 	await hole().db.update(mitglied).set(angaben).where(eq(mitglied.id, mitgliedId));
 }
 
-/** Meldet ein Mitglied über die Fachlogik zu einer Einzel-Kategorie an (ohne Mail). */
-export async function meldeZurCmAn(kategorieId: number, mitgliedId: number): Promise<void> {
-	const r = await meldeZurCmAnInDb(hole().db, kategorieId, mitgliedId, new Date());
+/** Leert die Strasse eines erfundenen Mitglieds: Die Adresse ist dann unvollständig (A-LOGIN-01). */
+export async function leereStrasse(mitgliedId: number): Promise<void> {
+	await hole().db.update(mitglied).set({ strasse: '' }).where(eq(mitglied.id, mitgliedId));
+}
+
+/** Setzt den Rufnamen eines erfundenen Mitglieds (nur das Mitglied selbst tut das im Profil). */
+export async function setzeRufname(mitgliedId: number, rufname: string | null): Promise<void> {
+	await hole().db.update(mitglied).set({ rufname }).where(eq(mitglied.id, mitgliedId));
+}
+
+/** Setzt die Telefonnummer eines erfundenen Mitglieds (FR-19: Doppelpartner sehen sie). */
+export async function setzeTelefon(mitgliedId: number, telefon: string): Promise<void> {
+	await hole().db.update(mitglied).set({ telefon }).where(eq(mitglied.id, mitgliedId));
+}
+
+/**
+ * Partner-Anfrage im Doppel über die Fachlogik (FR-48), ohne Meldung an den Angefragten. Er
+ * braucht ein Login (Brief-Code eingelöst).
+ */
+export async function stelleAnfrageDirekt(
+	kategorieId: number,
+	vonId: number,
+	anId: number
+): Promise<void> {
+	const r = await stelleAnfrage(hole().db, kategorieId, vonId, anId, new Date());
+	if (r !== 'ok') throw new Error(`Anfrage für Kategorie ${kategorieId}: ${r}`);
+}
+
+/**
+ * Meldet ein Mitglied über die Fachlogik zu einer Kategorie an (ohne Mail); im Doppel allein
+ * (*sucht Partner*), wahlweise mit Kommentar (FR-49).
+ */
+export async function meldeZurCmAn(
+	kategorieId: number,
+	mitgliedId: number,
+	suchtext: string | null = null
+): Promise<void> {
+	const r = await meldeZurCmAnInDb(hole().db, kategorieId, mitgliedId, new Date(), suchtext);
 	if (r !== 'ok') throw new Error(`Anmeldung zur Kategorie ${kategorieId}: ${r}`);
+}
+
+/**
+ * Meldet ein Paar über die Fachlogik der Verwaltung an (FR-46), als CM-Admin `cmMitgliedId`, ohne
+ * Meldung an die Spieler; Warnungen übergeht es.
+ */
+export async function meldePaarDirektAn(
+	kategorieId: number,
+	paar: [number, number],
+	cmMitgliedId: number
+): Promise<void> {
+	const r = await meldeDoppelVonHandAn(
+		hole().db,
+		{ art: 'admin', mitgliedId: cmMitgliedId },
+		kategorieId,
+		paar,
+		new Date(),
+		true
+	);
+	if (typeof r !== 'object' || !('ergebnis' in r)) {
+		throw new Error(`Paar für Kategorie ${kategorieId}: ${JSON.stringify(r)}`);
+	}
+}
+
+/**
+ * Das erfundene Mitglied ist ausgetreten, ohne die Folgen eines Austritts (seine Anmeldungen
+ * bleiben stehen), wie nach dem Anmeldeschluss.
+ */
+export async function setzeAusgetreten(mitgliedId: number): Promise<void> {
+	await hole()
+		.db.update(mitglied)
+		.set({ status: 'ausgetreten', austrittAm: new Date() })
+		.where(eq(mitglied.id, mitgliedId));
+}
+
+/** Setzt den Anmeldeschluss eines Turniers (`YYYY-MM-DD`), etwa auf ein vergangenes Datum. */
+export async function setzeAnmeldeschluss(turnierId: number, datum: string): Promise<void> {
+	await hole().db.update(turnier).set({ anmeldeschluss: datum }).where(eq(turnier.id, turnierId));
+}
+
+/** Das Konto hat ein Login, als hätte es den Brief-Code eingelöst, ohne Browser. */
+export async function gibLogin(kontoId: number): Promise<void> {
+	await hole()
+		.db.update(konto)
+		.set({ briefCodeBenutztAm: new Date() })
+		.where(eq(konto.id, kontoId));
 }
 
 /** Wildcard-Antrag über die Fachlogik (FR-08), ohne Mail an Spieler und CM-Admins. */
@@ -174,6 +262,33 @@ export async function meldeZumAnlass(
 /** Stellt für ein bestehendes Konto einen weiteren Brief-Code aus (ohne Bindestrich). */
 export async function stelleBriefCodeAus(kontoId: number): Promise<string> {
 	return (await hole().dienst.stelleBriefCodeAus(kontoId)).code;
+}
+
+/** Lässt den Brief-Code eines Kontos ablaufen (gestern), ohne ihn zu benutzen. */
+export async function laesstBriefCodeAblaufen(kontoId: number): Promise<void> {
+	const gestern = new Date(Date.now() - 24 * 60 * 60 * 1000);
+	await hole().db.update(konto).set({ briefCodeAblauf: gestern }).where(eq(konto.id, kontoId));
+}
+
+/**
+ * Erfundenes Mitglied, ausgetreten oder zum Löschen vorgemerkt, mit gespeicherten Rollen.
+ * `davor`: der Zustand vor dem Vormerken (nur bei `vorgemerkt`).
+ */
+export async function legeEhemaligesAn(
+	vorname: string,
+	nachname: string,
+	status: 'ausgetreten' | 'vorgemerkt',
+	rollen: Rolle[],
+	davor: 'aktiv' | 'ausgetreten' = 'aktiv'
+) {
+	const m = await legeMitgliedAn(hole().db, { vorname, nachname, status, rollen });
+	if (status === 'vorgemerkt' && davor === 'ausgetreten') {
+		await hole()
+			.db.update(mitglied)
+			.set({ statusVorher: 'ausgetreten', austrittAm: new Date() })
+			.where(eq(mitglied.id, m.mitgliedId));
+	}
+	return m;
 }
 
 export async function beendeAlleSitzungen(kontoId: number): Promise<void> {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import Zurueck from '../../lib/ui/Zurueck.svelte';
 	import type { Teil } from '../../lib/datenschutz/erklaerung.ts';
 	import type { PageProps } from './$types';
 
@@ -16,7 +16,7 @@
 	{/each}
 {/snippet}
 
-<a class="zurueck" href={resolve('/')}>‹ Zurück</a>
+<Zurueck />
 <h1>{data.titel}</h1>
 <p class="leise">Entwurf: Der Vorstand gibt diesen Text noch frei.</p>
 

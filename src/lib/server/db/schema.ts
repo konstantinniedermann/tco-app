@@ -11,6 +11,7 @@ import {
 	serial,
 	text,
 	timestamp,
+	unique,
 	uniqueIndex
 } from 'drizzle-orm/pg-core';
 
@@ -20,6 +21,8 @@ export const mitglied = pgTable(
 		id: serial('id').primaryKey(),
 		vorname: text('vorname').notNull(),
 		nachname: text('nachname').notNull(),
+		// Freiwillig; pflegt nur das Mitglied selbst im Profil.
+		rufname: text('rufname'),
 		strasse: text('strasse'),
 		plz: text('plz'),
 		ort: text('ort'),
@@ -373,6 +376,8 @@ export const anmeldung = pgTable(
 		status: text('status').$type<AnmeldungStatus>().notNull().default('bestaetigt'),
 		// Wildcard-Begründung (Teil 4).
 		kommentar: text('kommentar'),
+		// «Sucht Partner» (FR-49): freier Hinweis der Anmeldung, höchstens 120 Zeichen.
+		suchtext: text('suchtext'),
 		angemeldetAm: timestamp('angemeldet_am', { withTimezone: true }).notNull(),
 		geaendertAm: timestamp('geaendert_am', { withTimezone: true }).notNull()
 	},
@@ -381,6 +386,7 @@ export const anmeldung = pgTable(
 			'anmeldung_status_check',
 			sql`${t.status} in ('bestaetigt', 'beantragt', 'abgelehnt', 'zurueckgezogen')`
 		),
+		check('anmeldung_suchtext_check', sql`char_length(${t.suchtext}) <= 120`),
 		index('anmeldung_kategorie_idx').on(t.kategorieId)
 	]
 );
@@ -399,5 +405,30 @@ export const anmeldungSpieler = pgTable(
 	(t) => [
 		primaryKey({ columns: [t.anmeldungId, t.mitgliedId] }),
 		index('anmeldung_spieler_mitglied_idx').on(t.mitgliedId)
+	]
+);
+
+// Offene Partner-Anfrage (FR-48). Nur offene Anfragen werden gespeichert; erledigte werden gelöscht.
+// Die Mitglieder werden nicht mitgelöscht: eine Anfrage hängt nur an der Kategorie.
+export const partnerAnfrage = pgTable(
+	'partner_anfrage',
+	{
+		id: serial('id').primaryKey(),
+		kategorieId: integer('kategorie_id')
+			.notNull()
+			.references(() => kategorie.id, { onDelete: 'cascade' }),
+		vonId: integer('von_id')
+			.notNull()
+			.references(() => mitglied.id),
+		anId: integer('an_id')
+			.notNull()
+			.references(() => mitglied.id),
+		gestelltAm: timestamp('gestellt_am', { withTimezone: true }).notNull()
+	},
+	(t) => [
+		// Höchstens eine eigene offene Anfrage je Person und Kategorie.
+		unique('partner_anfrage_von_unique').on(t.kategorieId, t.vonId),
+		check('partner_anfrage_selbst_check', sql`${t.vonId} <> ${t.anId}`),
+		index('partner_anfrage_an_idx').on(t.anId)
 	]
 );

@@ -500,10 +500,40 @@ html {
 	cursor: not-allowed;
 }
 
+/* Pfad der Verwaltung (UI-Leitbild, Baustein Pfad): auf schmalem Bildschirm nur «‹ <Eltern>» */
+.pfad {
+	display: none;
+	margin-bottom: var(--abstand-3);
+}
+
+.pfad ol {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pfad li {
+	display: inline;
+}
+
+.pfad li + li::before {
+	content: ' › ';
+	color: var(--farbe-text-leise);
+}
+
 .zurueck {
 	display: inline-block;
+	max-width: 100%;
 	margin-bottom: var(--abstand-3);
 	border-radius: var(--radius);
+	/* Immer einzeilig; ein zu langer Name endet mit «…» (UI-Leitbild, Baustein Zurück). */
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: top;
 }
 
 /* Eingabefelder */
@@ -545,6 +575,36 @@ html {
 	background: var(--farbe-flaeche);
 	color: var(--farbe-text);
 	font: inherit;
+}
+
+/* Auswahlfelder im eigenen Aussehen: Mit dem des Browsers (menulist) ignoriert WebKit Höhe,
+   Innenabstand und Rand, das Feld würde auf dem iPhone halb so hoch (UI-03). Pfeil aus zwei
+   Verläufen; gesperrt (.nur-lesen) setzt `background` neu und blendet ihn aus. */
+.feld select,
+.feld-zeile select {
+	appearance: none;
+	padding-right: calc(var(--abstand-3) + 1.5em);
+	background-image:
+		linear-gradient(45deg, transparent 50%, var(--farbe-text) 50%),
+		linear-gradient(135deg, var(--farbe-text) 50%, transparent 50%);
+	background-position:
+		right calc(var(--abstand-3) + 0.4em) center,
+		right var(--abstand-3) center;
+	background-size: 0.4em 0.4em;
+	background-repeat: no-repeat;
+}
+
+/* Dateiwahl (nur Verwaltung, Einlesen): die Wahltaste des Browsers wie eine Nebentaste */
+.feld input[type='file']::file-selector-button {
+	margin-right: var(--abstand-3);
+	padding: var(--abstand-2) var(--abstand-4);
+	border: var(--rand-dick) solid var(--farbe-marke);
+	border-radius: var(--radius);
+	background: var(--farbe-flaeche);
+	color: var(--farbe-marke);
+	font: inherit;
+	font-weight: 700;
+	cursor: pointer;
 }
 
 .feld-code input {
@@ -811,6 +871,27 @@ a.kachel:active {
 
 .kachel.hervor {
 	border-left: var(--rand-akzent) solid var(--farbe-aktion);
+}
+
+/* Trefferliste: Ergebnisse einer Suche, je Treffer eine Kachel */
+.trefferliste {
+	display: flex;
+	flex-direction: column;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.trefferliste > li {
+	padding: var(--abstand-3) 0;
+	border-top: var(--rand-duenn) solid var(--farbe-linie);
+}
+
+/* Kartenteil: Abschnitt mit eigenem Thema innerhalb einer Karte, mit Trennlinie oben */
+.karte-teil {
+	border-top: var(--rand-duenn) solid var(--farbe-linie);
+	padding-top: var(--abstand-3);
+	margin-top: var(--abstand-3);
 }
 
 /* Zähler: Schritte eines Formulars oder ein Kontingent */
@@ -1476,7 +1557,8 @@ a.kachel:active {
 /*
  * Seitenwechsel (UI-09, Leitbild «Bewegung und Bedienung»): View Transitions, gesteuert über
  * html[data-uebergang] aus +layout.svelte. Kopfleiste, Statusleisten-Band und Band «Ansicht als …» stehen still.
- * Reiter stehen beim Überblenden still; beim Schieben gehören sie zur Seite und gleiten mit.
+ * Reiter stehen beim Überblenden still, beim Schieben auch, wenn beide Seiten sie zeigen
+ * (data-reiter-bleibt); sonst gehören sie zur Seite und gleiten mit.
  */
 .kopf {
 	view-transition-name: kopf;
@@ -1494,8 +1576,8 @@ a.kachel:active {
 	view-transition-name: reiter;
 }
 
-html[data-uebergang='tiefer'] .reiter,
-html[data-uebergang='zurueck'] .reiter {
+html[data-uebergang='tiefer']:not([data-reiter-bleibt]) .reiter,
+html[data-uebergang='zurueck']:not([data-reiter-bleibt]) .reiter {
 	view-transition-name: none;
 }
 
@@ -1522,11 +1604,14 @@ html[data-uebergang='blende']::view-transition-new(root) {
 
 /* Der Balken gleitet live im neuen Bild; das alte Bild der Reiter würde ihn doppelt zeigen */
 html[data-uebergang='blende']::view-transition-group(reiter),
-html[data-uebergang='blende']::view-transition-new(reiter) {
+html[data-uebergang='blende']::view-transition-new(reiter),
+html[data-reiter-bleibt]::view-transition-group(reiter),
+html[data-reiter-bleibt]::view-transition-new(reiter) {
 	animation: none;
 }
 
-html[data-uebergang='blende']::view-transition-old(reiter) {
+html[data-uebergang='blende']::view-transition-old(reiter),
+html[data-reiter-bleibt]::view-transition-old(reiter) {
 	display: none;
 }
 
@@ -1597,6 +1682,14 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 
 /* PC-Layout ab 60em Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
 @container app (min-width: 60rem) {
+	.pfad {
+		display: block;
+	}
+
+	.pfad-kurz {
+		display: none;
+	}
+
 	.inhalt {
 		padding: var(--abstand-6);
 	}
@@ -1729,6 +1822,23 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	background: var(--farbe-marke-zart);
 }
 
+/* Briefdruck: die Briefe untereinander, jedes Blatt A4-breit und weiss; auf schmalem Bildschirm
+   scrollt der Rahmen waagrecht. Nur eine Vorschau, massgebend ist der Ausdruck. */
+.briefdruck {
+	display: grid;
+	gap: var(--abstand-4);
+	justify-content: start;
+	overflow-x: auto;
+	padding: var(--abstand-1);
+}
+
+@media screen {
+	.briefdruck .brief {
+		width: var(--brief-breite);
+		box-shadow: var(--schatten-karte);
+	}
+}
+
 @media print {
 	.nicht-drucken,
 	.seitenleiste,
@@ -1775,5 +1885,16 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		max-width: none;
 		margin: 0;
 		padding-inline: 0;
+	}
+
+	/* Briefe: das Blatt beginnt oben links auf dem Papier (Adressfeld im Fenster des Kuverts) */
+	.inhalt:has(.brief) {
+		padding: 0;
+	}
+
+	.briefdruck {
+		display: block;
+		overflow: visible;
+		padding: 0;
 	}
 }

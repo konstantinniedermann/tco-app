@@ -51,7 +51,7 @@ test('A-KONTO-01, A-KONTO-02: Mitglied ändert Telefon und Adresse im Profil', a
 	const fehler = sammleKonsolenfehler(page);
 	await meldeAn(page, 'Lina');
 	await oeffneProfil(page);
-	await expect(kachel(page, 'Telefon')).toContainText('nicht erfasst');
+	await expect(kachel(page, 'Telefon')).toContainText('nicht angegeben');
 
 	// Annahme K-19.1: Telefon ändert das Mitglied selbst.
 	await kachel(page, 'Telefon').getByRole('button', { name: 'Ändern' }).click();
@@ -90,6 +90,7 @@ test('SI-09, A-KONTO-01: Mitglied wechselt die E-Mail mit zwei Codes', async ({ 
 	await kachel(page, 'E-Mail').getByRole('link', { name: 'Ändern' }).click();
 	await expect(page).toHaveURL(/\/profil\/email$/);
 	await expect(page.getByText('Schritt 1 von 2 · Neue Adresse')).toBeVisible();
+	await expect(page.getByRole('link', { name: '‹ Profil' })).toBeVisible();
 	await expect(page.getByText('Dann ändert die Mitgliederverwaltung sie für dich.')).toBeVisible();
 
 	const neu = `neu-${randomUUID()}@example.org`;
@@ -99,6 +100,8 @@ test('SI-09, A-KONTO-01: Mitglied wechselt die E-Mail mit zwei Codes', async ({ 
 	await expect(codeAlt).toBeFocused();
 	await expect(page.getByText('Schritt 2 von 2 · Bestätigen')).toBeVisible();
 	await expect(page.getByText(neu, { exact: true })).toBeVisible();
+	// Formularschritt: Der Link nennt den Schritt (UI-Leitbild, Unterseiten).
+	await expect(page.getByRole('link', { name: '‹ Andere Adresse' })).toBeVisible();
 	await pruefeBildschirm(page, info, 'profil-email-codes');
 
 	// Je ein Code an die bisherige und an die neue Adresse; erst beide zusammen ändern die E-Mail.
@@ -138,5 +141,51 @@ test('SI-09, A-KONTO-01: Mitglied wechselt die E-Mail mit zwei Codes', async ({ 
 	await feld.fill(loginCode);
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Noah' })).toBeVisible();
+	expect(fehler).toEqual([]);
+});
+
+test('Rufname setzen und löschen', async ({ page }, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	await meldeAn(page, 'Johanna');
+	await oeffneProfil(page);
+	await expect(kachel(page, 'Rufname')).toContainText('nicht angegeben');
+
+	await kachel(page, 'Rufname').getByRole('button', { name: 'Ändern' }).click();
+	await expect(
+		page.getByText('Freiwillig. Unter diesem Namen sehen dich die anderen im Club.')
+	).toBeVisible();
+	const feld = page.getByLabel('Rufname (freiwillig)');
+	await feld.fill('Hannes');
+	await page.getByRole('button', { name: 'Rufname speichern' }).click();
+	await expect(kachel(page, 'Rufname')).toContainText('Hannes');
+
+	// Die Namenszeile zeigt den Rufnamen, leise dahinter den amtlichen Namen.
+	const namenszeile = page.locator('p').filter({ hasText: /^Hannes Johanna/ });
+	await expect(namenszeile).toBeVisible();
+	await expect(namenszeile.locator('.leise').first()).toContainText('Johanna');
+
+	// Zu lang: Meldung, nichts wird gespeichert.
+	await kachel(page, 'Rufname').getByRole('button', { name: 'Ändern' }).click();
+	await feld.fill('Elfzeichen!');
+	await page.getByRole('button', { name: 'Rufname speichern' }).click();
+	await expect(page.getByText('Höchstens 10 Zeichen.')).toBeVisible();
+	await pruefeBildschirm(page, info, 'profil-rufname');
+	await feld.fill('Hannes');
+	await page.getByRole('button', { name: 'Rufname speichern' }).click();
+	await expect(kachel(page, 'Rufname')).toContainText('Hannes');
+
+	// Die Startseite grüsst mit dem Rufnamen.
+	await page.getByRole('navigation', { name: 'Hauptnavigation' }).getByRole('link').first().click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Hannes' })).toBeVisible();
+
+	// Löschen: leer speichern, dann grüsst die Startseite wieder mit dem Vornamen.
+	await oeffneProfil(page);
+	await kachel(page, 'Rufname').getByRole('button', { name: 'Ändern' }).click();
+	await feld.fill('');
+	await page.getByRole('button', { name: 'Rufname speichern' }).click();
+	await expect(kachel(page, 'Rufname')).toContainText('nicht angegeben');
+	await page.getByRole('navigation', { name: 'Hauptnavigation' }).getByRole('link').first().click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Johanna' })).toBeVisible();
+	await pruefeBildschirm(page, info, 'start-ohne-rufname');
 	expect(fehler).toEqual([]);
 });

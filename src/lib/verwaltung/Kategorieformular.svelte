@@ -16,6 +16,7 @@
 	/** Vorbelegung: Einzel über den ganzen Bereich; beim Doppel die Mindestsumme 9. */
 	const VON = 'N1';
 	const BIS = 'R9';
+	// Annahme K-51: Mindestsumme 9 für alle Doppelkategorien.
 	const SUMME = '9';
 
 	export const NEUE_KATEGORIE: KategorieWerte = {
@@ -43,7 +44,10 @@
 		};
 	}
 
-	/** Anfrage an den Server: leere Felder als `null`, das Feld der anderen Art ebenfalls. */
+	/**
+	 * Anfrage an den Server: leere Felder als `null`, die Felder der anderen Art ebenfalls. Im
+	 * Doppel gibt es keinen Jahrgang (FR-34).
+	 */
 	export function anfrage(w: KategorieWerte) {
 		const zahl = (v: string) => (v.trim() === '' ? null : v.trim());
 		const einzel = w.art === 'einzel';
@@ -51,8 +55,8 @@
 			name: w.name,
 			geschlecht: w.geschlecht,
 			art: w.art,
-			jahrgangVon: zahl(w.jahrgangVon),
-			jahrgangBis: zahl(w.jahrgangBis),
+			jahrgangVon: einzel ? zahl(w.jahrgangVon) : null,
+			jahrgangBis: einzel ? zahl(w.jahrgangBis) : null,
 			klassierungVon: einzel ? w.klassierungVon || null : null,
 			klassierungBis: einzel ? w.klassierungBis || null : null,
 			mindestsumme: einzel ? null : zahl(w.mindestsumme)
@@ -195,7 +199,12 @@
 		{/if}
 	</fieldset>
 
-	<fieldset class="auswahl-gruppe" aria-describedby={fehlerId('geschlecht')}>
+	<fieldset
+		class="auswahl-gruppe"
+		aria-describedby={[einzel && 'kategorie-mixed-hinweis', fehlerId('geschlecht')]
+			.filter(Boolean)
+			.join(' ') || undefined}
+	>
 		<legend>Geschlecht</legend>
 		<label class="auswahl"
 			><input
@@ -233,56 +242,57 @@
 			/>offen (alle)</label
 		>
 		{#if einzel}
-			<p class="leise">Mixed gibt es nur im Doppel.</p>
+			<p class="leise" id="kategorie-mixed-hinweis">Mixed gibt es nur im Doppel.</p>
 		{/if}
 		{#if fehler.geschlecht}
 			<p class="fehler" id="fehler-kategorie-geschlecht">{fehler.geschlecht}</p>
 		{/if}
 	</fieldset>
 
-	<fieldset class="auswahl-gruppe">
-		<legend>Jahrgang (freiwillig)</legend>
-		<div class="leiste">
-			<div class="feld">
-				<label for="kategorie-jahrgangVon">von</label>
-				<input
-					id="kategorie-jahrgangVon"
-					type="text"
-					inputmode="numeric"
-					maxlength="4"
-					autocomplete="off"
-					bind:value={werte.jahrgangVon}
-					aria-invalid={ungueltig('jahrgangVon')}
-					aria-describedby={fehlerId('jahrgangVon')}
-				/>
-				{#if fehler.jahrgangVon}
-					<p class="fehler" id="fehler-kategorie-jahrgangVon">{fehler.jahrgangVon}</p>
-				{/if}
-			</div>
-			<div class="feld">
-				<label for="kategorie-jahrgangBis">bis</label>
-				<input
-					id="kategorie-jahrgangBis"
-					type="text"
-					inputmode="numeric"
-					maxlength="4"
-					autocomplete="off"
-					bind:value={werte.jahrgangBis}
-					aria-invalid={ungueltig('jahrgangBis')}
-					aria-describedby={fehlerId('jahrgangBis')}
-				/>
-				{#if fehler.jahrgangBis}
-					<p class="fehler" id="fehler-kategorie-jahrgangBis">{fehler.jahrgangBis}</p>
-				{/if}
-			</div>
-		</div>
-		<p class="leise">
-			Leer lassen, wenn es keine Grenze gibt. Beispiel Junioren U18 im Jahr 2027: von 2009, bis
-			leer.
-		</p>
-	</fieldset>
-
+	<!-- FR-34: Jahrgang und Klassierungsbereich nur im Einzel, die Mindestsumme nur im Doppel. -->
 	{#if einzel}
+		<fieldset class="auswahl-gruppe">
+			<legend>Jahrgang (freiwillig)</legend>
+			<div class="leiste">
+				<div class="feld">
+					<label for="kategorie-jahrgangVon">von</label>
+					<input
+						id="kategorie-jahrgangVon"
+						type="text"
+						inputmode="numeric"
+						maxlength="4"
+						autocomplete="off"
+						bind:value={werte.jahrgangVon}
+						aria-invalid={ungueltig('jahrgangVon')}
+						aria-describedby={fehlerId('jahrgangVon')}
+					/>
+					{#if fehler.jahrgangVon}
+						<p class="fehler" id="fehler-kategorie-jahrgangVon">{fehler.jahrgangVon}</p>
+					{/if}
+				</div>
+				<div class="feld">
+					<label for="kategorie-jahrgangBis">bis</label>
+					<input
+						id="kategorie-jahrgangBis"
+						type="text"
+						inputmode="numeric"
+						maxlength="4"
+						autocomplete="off"
+						bind:value={werte.jahrgangBis}
+						aria-invalid={ungueltig('jahrgangBis')}
+						aria-describedby={fehlerId('jahrgangBis')}
+					/>
+					{#if fehler.jahrgangBis}
+						<p class="fehler" id="fehler-kategorie-jahrgangBis">{fehler.jahrgangBis}</p>
+					{/if}
+				</div>
+			</div>
+			<p class="leise">
+				Leer lassen, wenn es keine Grenze gibt. Beispiel Junioren U18 im Jahr 2027: von 2009, bis
+				leer.
+			</p>
+		</fieldset>
+
 		<fieldset class="auswahl-gruppe">
 			<legend>Klassierung</legend>
 			<div class="leiste">
@@ -340,7 +350,7 @@
 					.join(' ')}
 			/>
 			<span class="feld-hilfe" id="kategorie-mindestsumme-hilfe"
-				>Die Klassierungen beider Spieler zusammengezählt: R1 = 1 bis R9 = 9, ohne Lizenz = 10, N =
+				>Die Klassierungen beider Spieler zusammengezählt: R1 = 1 bis R9 = 9, keine Lizenz = 10, N =
 				0. Bei 9 geht R4 + R5, R3 + R5 nicht.</span
 			>
 			{#if fehler.mindestsumme}

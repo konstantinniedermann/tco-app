@@ -13,11 +13,11 @@ oder die Website tcolten.ch.
 
 Phase **Fundament**, noch nicht ausgeliefert (aktuelle Nummer: [Versionen](docs/versionen.md)): Login per Einmal-Code mit
 Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung für Mitglieder-Admins mit
-Liste «Für Fairgate», Austritt, Löschen mit Bedenkzeit, Auskunft und automatischen Löschfristen, Rollen mit *Ansicht als …* für MyTCO-Admins, eigene Angaben im Profil ändern, Datenschutzerklärung in der App,
+Liste «Für Fairgate», Einlesen einer Mitgliederliste als CSV-Datei, Login-Briefen einzeln und als Serie aus einer Druckansicht, Austritt, Löschen mit Bedenkzeit, Auskunft und automatischen Löschfristen, Rollen mit *Ansicht als …* für MyTCO-Admins, eigene Angaben im Profil ändern (mit freiwilligem Rufnamen, der überall vor dem amtlichen Namen steht), Datenschutzerklärung in der App,
 Anmeldung zu Anlässen wie der Generalversammlung (Vorschlag für den Vorstand, K-50),
 Turnier der Clubmeisterschaft mit Kategorien anlegen und Anmeldungen verwalten (Wildcard-Anträge
-entscheiden, von Hand anmelden) für die CM-Admins, Einzel-Anmeldung der Mitglieder zur
-Clubmeisterschaft mit Wildcard-Antrag,
+entscheiden, von Hand anmelden) für die CM-Admins, Einzel- und Doppel-Anmeldung der Mitglieder
+zur Clubmeisterschaft (Wildcard-Antrag im Einzel, Doppel mit Partner-Anfrage),
 Mitteilungen per Push und E-Mail zu Anlässen und an den Verein für Mitglieder-Admins,
 Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene Testdaten) sind
 gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
@@ -47,7 +47,7 @@ npm exec --no -- playwright install chromium webkit
 make hooks   # einmalig: Git-Hooks aktivieren
 cp .env.example .env   # je Ordner bzw. Worktree: lokale Einstellungen (nur erfundene Werte)
 make db      # lokale PostgreSQL und Mail-Fänger Mailpit starten
-make seed    # erfundene Mitglieder, eine Beispiel-GV und ein Beispielturnier 2027 anlegen, gibt Brief-Codes für die Personas aus (make help)
+make seed    # Testbestand anlegen (rund 200 erfundene Mitglieder, zwei Anlässe, ein Beispielturnier 2027), gibt Brief-Codes für die Personas aus (make help)
 make dev     # Entwicklungsserver
 make check   # alle Prüfungen (braucht Docker)
 ```

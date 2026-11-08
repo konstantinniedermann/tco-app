@@ -12,6 +12,7 @@ export type AngemeldetesKonto = {
 	kontoId: number;
 	mitgliedId: number;
 	vorname: string;
+	rufname: string | null;
 	passkeyHinweis: boolean;
 	// Hash der Sitzungskennung; ordnet Zugangs-Daten (SI-08) dieser Sitzung zu.
 	sitzungHash: string;
@@ -76,6 +77,7 @@ export async function pruefeSitzung(
 			kontoId: konto.id,
 			mitgliedId: mitglied.id,
 			vorname: mitglied.vorname,
+			rufname: mitglied.rufname,
 			zuletztGenutzt: sitzung.zuletztGenutzt,
 			passkeyHinweis: sitzung.passkeyHinweis,
 			sitzungsversion: sitzung.sitzungsversion,
@@ -110,6 +112,7 @@ export async function pruefeSitzung(
 			kontoId: zeile.kontoId,
 			mitgliedId: zeile.mitgliedId,
 			vorname: zeile.vorname,
+			rufname: zeile.rufname,
 			passkeyHinweis: zeile.passkeyHinweis,
 			sitzungHash: kennungHash,
 			ansicht: zeile.ansicht

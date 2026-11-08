@@ -2,8 +2,8 @@ name: Check
 
 # Dieselben Prüfungen wie lokal `make check`, aber ohne docker compose (die DB kommt
 # als Service-Container) und mit der OSV-Malware-Prüfung zusätzlich. Nur PRs und die
-# beiden dauerhaften Branches — Feature-Branches deckt der lokale Hook ab (Actions-
-# Minuten werden über alle privaten Repos geteilt). Reine Doku-Änderungen laufen nur
+# beiden dauerhaften Branches — Feature-Branches deckt der lokale Hook ab (hält die
+# Wartezeit kurz; Minuten sind für das öffentliche Repo gratis). Reine Doku-Änderungen laufen nur
 # durch den Job `doku`; die Code-Jobs hängen an `aenderung`.
 on:
   pull_request:
@@ -232,7 +232,8 @@ jobs:
       # gleiche Version wie Munica.
       - name: osv-scanner installieren
         run: |
-          curl -sSfL -o /tmp/osv-scanner \
+          # Wiederholt kurze Störungen von GitHub (z. B. 504); die Prüfsumme danach bleibt gleich streng.
+          curl -sSfL --retry 5 --retry-delay 15 --retry-connrefused -o /tmp/osv-scanner \
             https://github.com/google/osv-scanner/releases/download/v2.4.0/osv-scanner_linux_amd64
           chmod +x /tmp/osv-scanner
           echo "15314940c10d26af9c6649f150b8a47c1262e8fc7e17b1d1029b0e479e8ed8a0  /tmp/osv-scanner" | sha256sum -c -

@@ -1,5 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
+import { mitglied } from '../db/schema.ts';
 import {
 	antwort,
 	formatFehler,
@@ -8,7 +10,8 @@ import {
 	type Ereignis
 } from '../login/schnittstellen.ts';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
-import { parseId } from '../parse-id.ts';
+import { jahrInZuerich } from '../datum.ts';
+import { INTEGER_MAX, parseId } from '../parse-id.ts';
 import { pruefeAnlass } from '../anlass/angaben.ts';
 import {
 	aendereAnlass,
@@ -27,18 +30,29 @@ import {
 	listeMitglieder,
 	type MitgliedStatus
 } from './mitglieder.ts';
+import { listeBriefEmpfaenger, MAX_BRIEFE, stelleBriefeAus, type BriefAbh } from './briefe.ts';
+import { liesEin, nurFehler, zeigeVorschau } from './einlesen.ts';
 import { ladeAuskunft } from './auskunft.ts';
 import { setzeAnsicht } from './ansicht.ts';
 import {
 	erfasseAustritt,
 	erfasseWiedereintritt,
 	merkeZumLoeschenVor,
-	nimmLoeschungZurueck
+	nimmLoeschungZurueck,
+	type MitRueckzug
 } from './mitgliedschaft.ts';
 import { ROLLEN, istAnsichtRolle, listeRollen, setzeRollen, type Rolle } from './rollen.ts';
 import { ladeVerlauf, schreibeVerlauf, type Urheber } from './verlauf.ts';
 import type { ZugangDienst } from './zugang.ts';
 import { darf, type Art, type Bereich } from '../../verwaltung/bereiche.ts';
+import type { Rueckzug } from '../cm/austritt.ts';
+import {
+	austrittAnfrageMeldung,
+	austrittMeldung,
+	type DoppelMeldung
+} from '../cm/doppel-meldung.ts';
+import { meldeMitgliedern } from '../mitteilung/meldung.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
 
 export type AdminEreignis = Ereignis & Pick<RequestEvent, 'params'>;
 
@@ -47,6 +61,8 @@ export type AdminDienste = {
 	zugang: ZugangDienst;
 	// SI-09: Hinweis an die alte Adresse; wirft nie.
 	hinweis: (an: string) => Promise<void>;
+	// Schlüssel, Adresse und Kontakt für die Briefe (Brief-Code, Text).
+	brief: BriefAbh;
 	jetzt?: () => Date;
 };
 
@@ -204,7 +220,7 @@ export function getMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Respon
 export function postMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
 		const t = jetzt(d);
-		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: t.getFullYear() });
+		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: jahrInZuerich(t) });
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.fehler });
 		const r = await legeMitgliedAn(d.db, urheber, p.angaben, t);
 		return r.ergebnis === 'ok'
@@ -226,7 +242,7 @@ export function postMitglied(d: AdminDienste, e: AdminEreignis): Promise<Respons
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const t = jetzt(d);
-		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: t.getFullYear() });
+		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: jahrInZuerich(t) });
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.fehler });
 		// Der Stand, den die Seite geladen hat: schützt vor dem Überschreiben fremder Änderungen.
 		const vorher = leseStand(koerper.vorher);
@@ -294,6 +310,49 @@ export function postSitzungen(d: AdminDienste, e: AdminEreignis): Promise<Respon
 	});
 }
 
+// A-LOGIN-01: Empfänger der Brief-Serie. Die Antworten der Brief-Schnittstellen enthalten Codes im
+// Klartext und werden nirgends geloggt (SI-05).
+export function getBriefe(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return liest(d, e, 'mitglieder', async () =>
+		antwort(200, await listeBriefEmpfaenger(d.db, jetzt(d)))
+	);
+}
+
+// 1 bis MAX_BRIEFE verschiedene ganze Zahlen von 1 bis INTEGER_MAX.
+function leseIds(roh: unknown): number[] | null {
+	if (!Array.isArray(roh) || roh.length < 1 || roh.length > MAX_BRIEFE) return null;
+	if (!roh.every((x) => typeof x === 'number' && Number.isInteger(x) && x > 0 && x <= INTEGER_MAX))
+		return null;
+	return new Set(roh).size === roh.length ? (roh as number[]) : null;
+}
+
+export function postBriefe(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
+		const ids = leseIds(koerper.ids);
+		if (ids === null) return eingabeFehler();
+		const r = await stelleBriefeAus(d.db, d.brief, urheber, ids, jetzt(d));
+		return r.ergebnis === 'ok'
+			? antwort(200, { briefe: r.briefe })
+			: antwort(409, { fehler: 'nicht-moeglich', anzahl: r.anzahl });
+	});
+}
+
+export function postBrief(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (urheber) => {
+		const id = parseId(e.params.id);
+		if (id === null) return nichtGefunden();
+		const [m] = await d.db
+			.select({ status: mitglied.status })
+			.from(mitglied)
+			.where(eq(mitglied.id, id));
+		if (!m || m.status === 'geloescht') return nichtGefunden();
+		const r = await stelleBriefeAus(d.db, d.brief, urheber, [id], jetzt(d));
+		return r.ergebnis === 'ok'
+			? antwort(200, { briefe: r.briefe })
+			: antwort(409, { fehler: 'nicht-moeglich', anzahl: r.anzahl });
+	});
+}
+
 // Die vier Übergänge der Mitgliedschaft: leerer JSON-Körper, die Funktion prüft den Ausgangszustand.
 function uebergang<E extends string>(
 	d: AdminDienste,
@@ -314,11 +373,52 @@ function uebergang<E extends string>(
 	});
 }
 
-export const postAustritt = (d: AdminDienste, e: AdminEreignis) => uebergang(d, e, erfasseAustritt);
+/**
+ * FR-04, FR-47: Meldungen nach Austritt oder Vormerken, erst nach dem Commit: an den Partner
+ * eines zurückgezogenen Paars und an den anderen jeder gelöschten Anfrage. Ohne Grund und ohne
+ * Namen des Ausgetretenen; betrifft es den Admin selbst, entfällt sie. Gleiche Meldungen an
+ * denselben Empfänger gehen nur einmal (Anfragen in beide Richtungen). Die Antwort wartet nicht
+ * auf Push und Mail; wirft `meldeMitgliedern` doch, bleibt das still (SI-05).
+ */
+function meldeRueckzug(d: MitteilungAdminDienste, urheber: AdminUrheber, cm: Rueckzug): void {
+	const melder = { db: d.db, push: d.push, mailer: d.mailer, adresse: d.adresse };
+	const gesendet = new Set<string>();
+	const sende = (an: number, m: DoppelMeldung) => {
+		if (an === urheber.mitgliedId) return;
+		const schluessel = JSON.stringify([an, m.titel, m.text, m.pfad]);
+		if (gesendet.has(schluessel)) return;
+		gesendet.add(schluessel);
+		void meldeMitgliedern(melder, [an], m).catch(() => {});
+	};
+	for (const p of cm.partner) sende(p.mitgliedId, austrittMeldung(p.kategorie, p.turnierId));
+	for (const h of cm.hinfaellig) sende(h.anderer, austrittAnfrageMeldung(h.kategorie, h.turnierId));
+}
+
+// Austritt und Vormerken: wie `uebergang`, nach dem Erfolg die Meldungen zum Doppel.
+function mitRueckzug<E extends string>(
+	d: MitteilungAdminDienste,
+	e: AdminEreignis,
+	fn: (
+		db: Db,
+		urheber: AdminUrheber,
+		id: number,
+		jetzt: Date
+	) => Promise<MitRueckzug | 'nicht-gefunden' | E>
+): Promise<Response> {
+	return uebergang(d, e, async (db, urheber, id, t) => {
+		const r = await fn(db, urheber, id, t);
+		if (typeof r === 'string') return r;
+		meldeRueckzug(d, urheber, r.cm);
+		return 'ok';
+	});
+}
+
+export const postAustritt = (d: MitteilungAdminDienste, e: AdminEreignis) =>
+	mitRueckzug(d, e, erfasseAustritt);
 export const postWiedereintritt = (d: AdminDienste, e: AdminEreignis) =>
 	uebergang(d, e, erfasseWiedereintritt);
-export const postLoeschen = (d: AdminDienste, e: AdminEreignis) =>
-	uebergang(d, e, merkeZumLoeschenVor);
+export const postLoeschen = (d: MitteilungAdminDienste, e: AdminEreignis) =>
+	mitRueckzug(d, e, merkeZumLoeschenVor);
 export const postLoeschenRueckgaengig = (d: AdminDienste, e: AdminEreignis) =>
 	uebergang(d, e, nimmLoeschungZurueck);
 
@@ -358,6 +458,29 @@ export function getVerlauf(d: AdminDienste, e: AdminEreignis): Promise<Response>
 
 export function getFairgate(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	return liest(d, e, 'mitglieder', async () => antwort(200, await listeFuerFairgate(d.db)));
+}
+
+// A-MITGLIED-07: Der Text der Datei kommt im JSON-Körper und wird weder gespeichert noch geloggt
+// (SI-05). Schon die Vorschau ist schreibend: Nur der Mitglieder-Admin lädt Mitgliederdaten hoch.
+export function postEinlesenVorschau(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (_urheber, koerper) => {
+		if (typeof koerper.text !== 'string') return eingabeFehler();
+		const v = await zeigeVorschau(d.db, koerper.text, jetzt(d));
+		if (!v.ok) return antwort(400, { fehler: 'datei', datei: nurFehler(v) });
+		return antwort(200, { neu: v.neu, fehlerhaft: v.fehlerhaft, vorhanden: v.vorhanden });
+	});
+}
+
+export function postEinlesen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
+		const { text, erwartet } = koerper;
+		if (typeof text !== 'string' || typeof erwartet !== 'number' || !Number.isSafeInteger(erwartet))
+			return eingabeFehler();
+		const r = await liesEin(d.db, urheber, text, erwartet, jetzt(d));
+		if (r.ergebnis === 'ok') return antwort(200, { angelegt: r.angelegt });
+		if (r.ergebnis === 'veraltet') return antwort(409, { fehler: 'veraltet' });
+		return antwort(400, { fehler: 'datei', datei: nurFehler(r) });
+	});
 }
 
 export function postFairgate(d: AdminDienste, e: AdminEreignis): Promise<Response> {
@@ -417,6 +540,7 @@ export function postAdminAnlassLoeschen(d: AdminDienste, e: AdminEreignis): Prom
 	});
 }
 
+// Mit den Diensten der Mitteilungen: Austritt und Löschung melden den Doppelpartnern.
 export const ADMIN_SCHNITTSTELLEN = {
 	getZugang,
 	postZugangCode,
@@ -430,6 +554,11 @@ export const ADMIN_SCHNITTSTELLEN = {
 	postRollen,
 	getRollen,
 	postSitzungen,
+	getBriefe,
+	postBriefe,
+	postBrief,
+	postEinlesenVorschau,
+	postEinlesen,
 	postAustritt,
 	postWiedereintritt,
 	postLoeschen,
@@ -443,4 +572,4 @@ export const ADMIN_SCHNITTSTELLEN = {
 	getAdminAnlass,
 	postAdminAnlass,
 	postAdminAnlassLoeschen
-} satisfies Record<string, (d: AdminDienste, e: AdminEreignis) => Promise<Response>>;
+} satisfies Record<string, (d: MitteilungAdminDienste, e: AdminEreignis) => Promise<Response>>;

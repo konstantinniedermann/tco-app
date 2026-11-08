@@ -7,6 +7,7 @@ import { FELDER, type Angaben, type Feld } from './angaben.ts';
 export type Urheber = { art: 'admin' | 'mitglied'; mitgliedId: number } | { art: 'automatisch' };
 
 export type Aktion =
+	// `detail: 'einlesen'`, wenn das Mitglied aus einer Datei kam (Weg, kein Wert).
 	| 'angelegt'
 	| 'feld-geaendert'
 	| 'rolle-vergeben'
@@ -18,6 +19,8 @@ export type Aktion =
 	| 'loeschung-vorgemerkt'
 	| 'loeschung-zurueckgenommen'
 	| 'auskunft-erstellt'
+	// RR-04: ohne `detail`; der Code selbst steht nie im Verlauf.
+	| 'brief-code-ausgestellt'
 	// FR-46, FR-08: jede Änderung des CM-Admins an einer Anmeldung, neutral: ohne Kategorie,
 	// Wildcard oder Entscheid, weil auch der Mitglieder-Admin den Verlauf sieht.
 	| 'cm-anmeldung-geaendert';
@@ -29,6 +32,17 @@ export function geaenderteFelder(alt: Angaben, neu: Angaben): Feld[] {
 	return FELDER.filter((feld) => alt[feld] !== neu[feld]);
 }
 
+function zeileVon(mitgliedId: number, urheber: Urheber, e: Eintrag, jetzt: Date) {
+	return {
+		mitgliedId,
+		zeitpunkt: jetzt,
+		urheberArt: urheber.art,
+		urheberMitgliedId: urheber.art === 'automatisch' ? null : urheber.mitgliedId,
+		aktion: e.aktion,
+		detail: e.detail ?? null
+	};
+}
+
 export async function schreibeVerlauf(
 	tx: DbOderTx,
 	mitgliedId: number,
@@ -37,16 +51,19 @@ export async function schreibeVerlauf(
 	jetzt: Date
 ): Promise<void> {
 	if (eintraege.length === 0) return;
-	await tx.insert(aenderung).values(
-		eintraege.map((e) => ({
-			mitgliedId,
-			zeitpunkt: jetzt,
-			urheberArt: urheber.art,
-			urheberMitgliedId: urheber.art === 'automatisch' ? null : urheber.mitgliedId,
-			aktion: e.aktion,
-			detail: e.detail ?? null
-		}))
-	);
+	await tx.insert(aenderung).values(eintraege.map((e) => zeileVon(mitgliedId, urheber, e, jetzt)));
+}
+
+/** Derselbe Eintrag für viele Mitglieder in einer Anfrage (Einlesen). */
+export async function schreibeVerlaufFuer(
+	tx: DbOderTx,
+	mitgliedIds: readonly number[],
+	urheber: Urheber,
+	eintrag: Eintrag,
+	jetzt: Date
+): Promise<void> {
+	if (mitgliedIds.length === 0) return;
+	await tx.insert(aenderung).values(mitgliedIds.map((id) => zeileVon(id, urheber, eintrag, jetzt)));
 }
 
 export type VerlaufZeile = {

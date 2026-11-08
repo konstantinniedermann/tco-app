@@ -58,7 +58,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-MITGLIED-04 | Selbstregistrierung über die Website tcolten.ch, damit der Briefversand entfallen kann (mit der zuständigen Person) | PDF 4a | später\* | später |
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
 | A-MITGLIED-06 | Mitglieder- und MyTCO-Admin sehen im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Verwaltung, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | umgesetzt (Verlauf der Änderungen; Löschung nach 12 Monaten durch den Zeitgeber) |
-| A-MITGLIED-07 | Der Mitglieder-Admin liest die Mitgliederliste aus Fairgate ein (Excel oder CSV) und führt so Ein- und Austritte nach; zum Start erfasst der Projektleiter die Mitglieder ([#46](https://github.com/konstantinniedermann/tco-app/issues/46)) | K-17.1 | CM-Anmeldung\* | offen (hängt an K-45) |
+| A-MITGLIED-07 | Der Mitglieder-Admin liest die Mitgliederliste aus Fairgate ein (Excel oder CSV) und führt so Ein- und Austritte nach; zum Start erfasst der Projektleiter die Mitglieder ([#46](https://github.com/konstantinniedermann/tco-app/issues/46)) | K-17.1 | CM-Anmeldung\* | teilweise: Einlesen einer Datei im MyTCO-Schema umgesetzt ([#43](https://github.com/konstantinniedermann/tco-app/issues/43), Seite *Einlesen*); Umwandlung der Fairgate-Liste und Abgleich von Ein- und Austritten offen (#46, hängt an K-45) |
 | A-MITGLIED-08 | Ein Mitglied erfasst sein Kind und erledigt für es das Administrative (Daten, CM-Anmeldung), bis das Kind ab der Altersgrenze des Vereins ein eigenes Login hat (Vorschlag K-08) ([#45](https://github.com/konstantinniedermann/tco-app/issues/45)) | K-46, PL | CM-Anmeldung\* | offen (hängt an K-08) |
 
 ### ROLLE — Benutzerrollen
@@ -73,7 +73,7 @@ Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 | A-ROLLE-04 | Rolle *Anlässe-Veranstalter*; bis dahin gehören die Anlässe zum Mitglieder-Admin (A-ROLLE-02), die CM leitet der CM-Admin (A-ROLLE-07) | PDF 4a | später\* | später |
 | A-ROLLE-05 | Rolle *Junioren-Leiter* | PDF 4a | später\* | später |
 | A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später\* | später |
-| A-ROLLE-07 | Rolle *CM-Admin* (vorher *CM-Verantwortlicher*): Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | umgesetzt\* (Turnier und Kategorien, #57; Einzel-Anmeldungen, #60; Doppel, Gruppen und Resultate folgen mit ihren Etappen) |
+| A-ROLLE-07 | Rolle *CM-Admin* (vorher *CM-Verantwortlicher*): Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | umgesetzt\* (Turnier und Kategorien, #57; Einzel-Anmeldungen, #60; Doppel, #59; Gruppen und Resultate folgen mit ihren Etappen) |
 | A-ROLLE-08 | Rolle *Lizenz-Admin* (vorher *Lizenzverantwortlicher*): Lizenzrunde und Lizenzanträge | PL | Lizenzanträge | geplant |
 | A-ROLLE-09 | *Ansicht als …*: Der MyTCO-Admin sieht App und Verwaltung so, wie sie eine gewählte Rolle sieht, nur lesend; der Server weist jedes Speichern ab ([Rollen und Rechte](../rollen-und-rechte.md#ansicht-als-), SI-20) | PL | Mitglieder-Login | umgesetzt |
 
@@ -95,10 +95,10 @@ auf dem Handy aussieht, klärt das UI-Leitbild (Issue #13).
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-STARTSEITE-01 | Die Startseite zeigt das eingeloggte Konto und einen Logout-Knopf | PDF 3c | Mitglieder-Login\* | geplant |
-| A-STARTSEITE-02 | Die Startseite bietet Shortcuts zu den wichtigsten Funktionen | PDF 3c | CM-Anmeldung\* | geplant |
-| A-STARTSEITE-03 | Die Shortcuts lassen sich später einfach ändern (z. B. für die Anmeldung zu einem bestimmten Anlass) | PDF 3c | CM-Anmeldung\* | geplant |
-| A-STARTSEITE-04 | Die Startseite zeigt die Anlässe, für die das Mitglied angemeldet ist | PDF 3c | CM-Anmeldung\* | geplant |
+| A-STARTSEITE-01 | Die Startseite zeigt das eingeloggte Konto und einen Logout-Knopf | PDF 3c | Mitglieder-Login\* | teilweise (Konto mit Begrüssung auf der Startseite; Logout im Profil) |
+| A-STARTSEITE-02 | Die Startseite bietet Shortcuts zu den wichtigsten Funktionen | PDF 3c | CM-Anmeldung\* | teilweise (Kacheln unter «Jetzt aktuell» und Verwaltung) |
+| A-STARTSEITE-03 | Die Shortcuts lassen sich später einfach ändern (z. B. für die Anmeldung zu einem bestimmten Anlass) | PDF 3c | CM-Anmeldung\* | teilweise (Kacheln unter «Jetzt aktuell») |
+| A-STARTSEITE-04 | Die Startseite zeigt die Anlässe, für die das Mitglied angemeldet ist | PDF 3c | CM-Anmeldung\* | teilweise (Anlässe mit eigenem Stand als Kacheln) |
 
 ### HILFE — Hilfe beim Start
 
@@ -160,16 +160,16 @@ Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vo
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-ANMELDUNG-01 | Alle Mitglieder können sich zur Clubmeisterschaft anmelden | PDF 5b, Ziel | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
-| A-ANMELDUNG-02 | Ein Spieler hat höchstens 3 Anmeldungen gleichzeitig | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
-| A-ANMELDUNG-03 | MyTCO zeigt nur die Kategorien an, die für den Spieler möglich sind (Klassierung evtl. ausgenommen, weil die Klassierung nicht automatisch von Swiss Tennis kommt) | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
-| A-ANMELDUNG-04 | Bei einer Doppelkategorie zeigt MyTCO sofort alle verfügbaren Spieler des Clubs zur Wahl des Doppelpartners | PDF 5b | CM-Anmeldung | geplant |
-| A-ANMELDUNG-05 | Nach der Anmeldung erhält der Spieler eine automatische Bestätigung mit seinen Kategorien | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
-| A-ANMELDUNG-06 | Der CM-Admin fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
+| A-ANMELDUNG-01 | Alle Mitglieder können sich zur Clubmeisterschaft anmelden | PDF 5b, Ziel | CM-Anmeldung | umgesetzt |
+| A-ANMELDUNG-02 | Ein Spieler hat höchstens 3 Anmeldungen gleichzeitig | PDF 5b | CM-Anmeldung | umgesetzt |
+| A-ANMELDUNG-03 | MyTCO zeigt nur die Kategorien an, die für den Spieler möglich sind (Klassierung evtl. ausgenommen, weil die Klassierung nicht automatisch von Swiss Tennis kommt) | PDF 5b | CM-Anmeldung | umgesetzt |
+| A-ANMELDUNG-04 | Bei einer Doppelkategorie zeigt MyTCO sofort alle verfügbaren Spieler des Clubs zur Wahl des Doppelpartners | PDF 5b | CM-Anmeldung | umgesetzt als Suche nach Namen, ab zwei Buchstaben |
+| A-ANMELDUNG-05 | Nach der Anmeldung erhält der Spieler eine automatische Bestätigung mit seinen Kategorien | PDF 5b | CM-Anmeldung | umgesetzt |
+| A-ANMELDUNG-06 | Der CM-Admin fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | umgesetzt |
 | A-ANMELDUNG-07 | Die Anmeldung schliesst zu einem Anmeldeschluss | PDF 5c (abgeleitet) | CM-Anmeldung\* | umgesetzt |
 | A-ANMELDUNG-08 | Der Spieler wählt, ob er bei Neuigkeiten, die ihn betreffen (neue Spiele, geänderter Spielplan), benachrichtigt wird | PDF 5b | CM-Betrieb\* | geplant |
 | A-ANMELDUNG-09 | Benachrichtigung per SMS oder WhatsApp (zuerst E-Mail und Push, siehe N-APP-02) | PDF 5b | später\* | später |
-| A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der CM-Admin entscheidet | PL | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
+| A-ANMELDUNG-10 | Für eine Kategorie ausserhalb des eigenen Klassierungsbereichs meldet sich der Spieler mit Wildcard-Antrag und Kommentar an; der CM-Admin entscheidet | PL | CM-Anmeldung | umgesetzt (nur Einzel; im Doppel keine Wildcard) |
 
 ### ADVANTAGE — Datenaustausch mit Swiss Tennis
 

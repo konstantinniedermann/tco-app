@@ -15,6 +15,25 @@ function istErwarteteApiAntwort(text: string, url: string): boolean {
 	);
 }
 
+/**
+ * Pfad über dem Titel einer Unterseite der Verwaltung (UI-Leitbild, Baustein Pfad): am breiten
+ * Bildschirm die Stufen als Links und die aktuelle Seite ohne Link, auf dem Handy nur
+ * «‹ <Elternseite>».
+ */
+export async function pruefePfad(page: Page, stufen: string[], aktuell: string): Promise<void> {
+	const pfad = page.getByRole('navigation', { name: 'Pfad' });
+	// Unter 60rem Breite (wie das PC-Layout, UI-Leitbild) steht nur der kurze Link.
+	if ((page.viewportSize()?.width ?? 1280) < 960) {
+		await expect(pfad).toBeHidden();
+		await expect(
+			page.getByRole('main').getByRole('link', { name: `‹ ${stufen.at(-1)}`, exact: true })
+		).toBeVisible();
+		return;
+	}
+	await expect(pfad.getByRole('link')).toHaveText(stufen);
+	await expect(pfad.locator('[aria-current="page"]')).toHaveText(aktuell);
+}
+
 /** Klappt den Aufklappbereich mit dem Titel `titel` auf, falls er zu ist (im Profil anfangs zu). */
 export async function klappeAuf(page: Page, titel: string): Promise<void> {
 	const klappe = page.locator('details.klappe', {

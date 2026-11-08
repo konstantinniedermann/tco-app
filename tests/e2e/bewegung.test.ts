@@ -3,7 +3,7 @@ import pkg from '../../package.json' with { type: 'json' };
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import { bietetInstallationAn, startetVomSymbol } from './hilfen/geraet.ts';
 import { legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
-import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
 // Ruhiges App-Gefühl (#54): Fusszeile, Reiter, Seitenwechsel, Bedienung, Aufklappen.
 // Regeln: docs/ui-leitbild.md, Abschnitt «Bewegung und Bedienung», UI-09.
@@ -23,6 +23,7 @@ async function meldeAn(page: Page, vorname: string): Promise<void> {
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${vorname}` })).toBeVisible();
+	await wartetAufVorladen(page);
 }
 
 function reiter(page: Page, name: 'Start' | 'Profil') {
@@ -135,7 +136,7 @@ test('Jeder Reiter beginnt oben; aktiver Reiter führt nach oben', async ({ page
 	await expect.poll(() => gerollt(page)).toBe(0);
 });
 
-test('«‹ Zurück» und Zurück des Browsers bringen die Seite an die alte Stelle', async ({
+test('Zurück-Link und Zurück des Browsers bringen die Seite an die alte Stelle', async ({
 	page
 }) => {
 	await meldeAn(page, 'Jana');
@@ -145,7 +146,7 @@ test('«‹ Zurück» und Zurück des Browsers bringen die Seite an die alte Ste
 	await hilfe.evaluate((a: HTMLElement) => a.click());
 	await expect(page).toHaveURL(/\/hilfe$/);
 	await expect.poll(() => gerollt(page)).toBe(0);
-	await page.getByRole('link', { name: '‹ Zurück' }).click();
+	await page.getByRole('link', { name: '‹ Start' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Jana' })).toBeVisible();
 	await machLang(page);
 	await expect.poll(() => gerollt(page)).toBe(300);
@@ -191,7 +192,7 @@ test('Tastatur: Reiter weg, solange ein Feld den Fokus hat (Handy)', async ({ pa
 	await profilKlappe(page, 'Meine Angaben').locator('summary').click();
 	await page.getByRole('button', { name: 'Ändern' }).first().click();
 	const navigation = page.getByRole('navigation', { name: 'Hauptnavigation' });
-	await page.getByLabel('Telefon (freiwillig)').focus();
+	await page.getByLabel('Rufname (freiwillig)').focus();
 	if (info.project.name === 'desktop') {
 		// Am PC (Maus) bleiben die Reiter.
 		await expect(navigation).toBeVisible();
@@ -265,7 +266,7 @@ test('Übergänge: Reiter blenden über, Unterseiten schieben (UI-09)', async ({
 	await expect(page).toHaveURL(/\/$/);
 	await page.getByRole('contentinfo').getByRole('link', { name: 'Hilfe' }).click();
 	await expect(page).toHaveURL(/\/hilfe$/);
-	await page.getByRole('link', { name: '‹ Zurück' }).click();
+	await page.getByRole('link', { name: '‹ Start' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Mara' })).toBeVisible();
 	const erwartet = (await kenntUebergaenge(page)) ? ['blende', 'blende', 'tiefer', 'zurueck'] : [];
 	expect((await uebergaenge(page)).slice(vorher)).toEqual(erwartet);

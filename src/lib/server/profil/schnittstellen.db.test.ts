@@ -13,6 +13,7 @@ import {
 	postEmailBestaetigen,
 	postKlassierung,
 	postProfil,
+	postRufname,
 	type ProfilDienste
 } from './schnittstellen.ts';
 
@@ -65,7 +66,8 @@ const schnittstellen = [
 	['postProfil', postProfil, 'POST'],
 	['postEmail', postEmail, 'POST'],
 	['postEmailBestaetigen', postEmailBestaetigen, 'POST'],
-	['postKlassierung', postKlassierung, 'POST']
+	['postKlassierung', postKlassierung, 'POST'],
+	['postRufname', postRufname, 'POST']
 ] as const;
 
 describe('Profil-Schnittstellen', () => {
@@ -238,6 +240,28 @@ describe('Profil-Schnittstellen', () => {
 		expect(await schlecht.json()).toEqual({
 			fehler: 'eingabe',
 			felder: { klassierung: 'Bitte deine Klassierung wählen.' }
+		});
+	});
+
+	test('Rufname im Profil speichern, GET liefert ihn, zu lang ergibt Feldfehler', async () => {
+		const { d } = baue();
+		const l = await lea();
+		const vorher = await (await getProfil(d, ereignis({ method: 'GET', konto: l.konto }))).json();
+		expect(vorher.rufname).toBeNull();
+		const ok = await postRufname(d, ereignis({ body: { rufname: 'Hannes' }, konto: l.konto }));
+		expect([ok.status, await ok.json()]).toEqual([200, { rufname: 'Hannes' }]);
+		const profil = await (await getProfil(d, ereignis({ method: 'GET', konto: l.konto }))).json();
+		expect(profil.rufname).toBe('Hannes');
+		const leer = await postRufname(d, ereignis({ body: { rufname: '' }, konto: l.konto }));
+		expect([leer.status, await leer.json()]).toEqual([200, { rufname: null }]);
+		const schlecht = await postRufname(
+			d,
+			ereignis({ body: { rufname: 'ABCDEFGHIJK' }, konto: l.konto })
+		);
+		expect(schlecht.status).toBe(400);
+		expect(await schlecht.json()).toEqual({
+			fehler: 'eingabe',
+			felder: { rufname: 'Höchstens 10 Zeichen.' }
 		});
 	});
 });

@@ -2,6 +2,7 @@
 import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
 import type { KategorieWerte } from '../server/turnier/angaben.ts';
 import type { Geschlecht, TurnierStatus } from '../server/db/schema.ts';
+import { nameText, type Namensteile } from '../name.ts';
 import { klassierungName } from '../turnier/klassierung.ts';
 import { plakette } from './anzeige.ts';
 
@@ -72,6 +73,10 @@ export const unpassendText = (n: number) =>
 		? '1 Anmeldung passt nach der Änderung nicht mehr zu dieser Kategorie. Sie bleibt trotzdem stehen.'
 		: `${n} Anmeldungen passen nach der Änderung nicht mehr zu dieser Kategorie. Sie bleiben trotzdem stehen.`;
 
+/** FR-36: Einzel oder Doppel wechseln geht nur ohne aktive Anmeldungen (409 `art-gesperrt`). */
+export const ART_GESPERRT =
+	'Einzel oder Doppel lässt sich nur ändern, solange niemand angemeldet ist.';
+
 /** FR-35: Absagen geht erst ohne aktive Anmeldungen. */
 export const absageSperreText = (n: number) =>
 	n === 1
@@ -87,6 +92,25 @@ const WARNUNG: Record<Warnung, string> = {
 
 /** FR-46: Warnungen vor dem Anmelden oder Verschieben von Hand, in der Reihenfolge des Servers. */
 export const warnungText = (w: readonly Warnung[]) => w.map((x) => WARNUNG[x]).join(' ');
+
+/**
+ * FR-46: Warnungen im Doppel als Liste, Sätze wie im Einzel. Der Server sagt bei `voll` nicht, wer
+ * die Grenze erreicht hat; der Satz nennt darum die Spieler, für die es gelten kann.
+ */
+export const doppelWarnungen = (w: readonly Warnung[], namen: readonly string[]): string[] =>
+	w.map((x) =>
+		x === 'voll' && namen.length > 0
+			? `${namen.join(' oder ')} hat schon 3 Anmeldungen.`
+			: WARNUNG[x]
+	);
+
+/** A-ANMELDUNG-06: «Lena Muster / Max Beispiel», mit Rufname wie in der kurzen Textform. */
+export const paarText = (p: { spieler: readonly { name: Namensteile }[] }) =>
+	p.spieler.map((s) => nameText(s.name, 'vorname-zuerst')).join(' / ');
+
+/** A-ANMELDUNG-06: Summe der Klassierungen eines Paars; `null`, wenn eine fehlt. */
+export const summeText = (summe: number | null) =>
+	summe === null ? 'Summe offen' : `Summe ${summe}`;
 
 /** A-ANMELDUNG-06: «5 Anmeldungen, 1 Wildcard-Antrag»; Anträge zählen bei den Anmeldungen mit. */
 export function anmeldungenText(zeilen: readonly Pick<AnmeldungZeile, 'status'>[]): string {
@@ -111,6 +135,26 @@ export const anmeldungStatus = (s: AnmeldungZeile['status']) => ANMELDUNG_STATUS
 /** FR-04: Plakette neben dem Namen für Austritt, Löschvormerkung und Löschung; sonst keine. */
 export function mitgliedVermerk(status: AnmeldungZeile['mitgliedStatus']) {
 	return status === 'aktiv' ? null : plakette({ login: 'ohne-brief', status });
+}
+
+/**
+ * FR-46: Wer nicht *aktiv* ist (ausgetreten, zum Löschen vorgemerkt), bleibt beim Partner
+ * ändern nicht im Paar; der Grund steht bei der gesperrten Wahl. Sonst `null`.
+ */
+export const nichtAktivGrund = (status: AnmeldungZeile['mitgliedStatus']) =>
+	status === 'aktiv' ? null : 'nicht mehr aktiv';
+
+/**
+ * FR-46: Verschieben geht nur, wenn alle Spieler der Anmeldung *aktiv* sind (der Server lehnt
+ * es sonst ab). Der Satz sagt vor dem Senden, warum und was stattdessen geht; sonst `null`.
+ */
+export function verschiebenGesperrt(
+	spieler: readonly Pick<AnmeldungZeile, 'mitgliedStatus'>[]
+): string | null {
+	if (spieler.every((s) => s.mitgliedStatus === 'aktiv')) return null;
+	return spieler.length > 1
+		? 'Ein Spieler ist nicht mehr aktiv. Verschieben geht nicht; ändere zuerst den Partner oder lösche die Anmeldung.'
+		: 'Der Spieler ist nicht mehr aktiv. Verschieben geht nicht; lösche die Anmeldung.';
 }
 
 /** Geschlecht eines Spielers wie in den Angaben der Mitglieder-Verwaltung. */

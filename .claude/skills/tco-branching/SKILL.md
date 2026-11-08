@@ -45,9 +45,18 @@ Git-Konfiguration (`core.hooksPath`) gilt für alle Worktrees.
 Wer Code ändert: im neuen Worktree `npm ci --ignore-scripts` (Hooks brauchen `node_modules`;
 `make check` zusätzlich Docker Desktop). Für `make dev` und `make seed` braucht der Worktree eine
 eigene `.env` (`cp .env.example .env`); sie ist gitignoriert und fehlt in jedem neuen Worktree.
-Alle Worktrees teilen die lokale Datenbank `mytco`; `make seed` und `make e2e` spielen dort die
-Migrationen des eigenen Branches ein (`make dev` nicht: vorher einmal `make seed`). Eine Migration, die schon eingespielt
-wurde, wird darum nie neu erzeugt — eine Änderung kommt als neue Migration dazu.
+Alle Worktrees teilen die lokale Datenbank `mytco` für `make dev`, `make dev-handy` und
+`make seed`; `make seed` spielt dort die Migrationen des eigenen Branches ein (`make dev` nicht:
+vorher einmal `make seed`). Eine Migration, die schon eingespielt wurde, wird darum nie neu
+erzeugt — eine Änderung kommt als neue Migration dazu.
+
+**E2E und `make check` nehmen `mytco` nicht:** `npm run e2e` (`scripts/e2e.ts`) legt für jeden
+Lauf eine eigene, frisch migrierte Datenbank an und löscht sie danach. Parallele Läufe stören
+sich darum nicht über die Datenbank, und Screenshots entstehen immer auf frischem Stand. Den
+Mail-Fänger Mailpit und den Ordner `test-results` teilen sie weiter: Im selben Worktree nicht
+gleichzeitig `make check` und einen Push mit voller Prüfung laufen lassen. Verbietet eine
+Migration alte Werte (z. B. eine Rolle aus einem Check entfernt), scheitert nur noch `make seed`
+paralleler Branches an `mytco`; wer sie baut, warnt die parallelen Sessions.
 
 **2 — Arbeiten:** TDD bzw. Doku, Dateien einzeln stagen, committen, Branch pushen
 (`git push -u origin <typ>/issue-NNN` — löst kein Deploy aus). Spec- und Plan-Dateien

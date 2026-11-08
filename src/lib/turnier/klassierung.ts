@@ -1,4 +1,5 @@
 // Klassierungen im Tennis (Swiss Tennis), stark → schwach. Läuft im Browser und auf dem Server.
+// Skala N1–N4, R1–R9: Annahme K-25.1.
 export const BEREICH = [
 	'N1',
 	'N2',
@@ -32,3 +33,7 @@ export const istKlassierung = (v: unknown): v is Klassierung =>
 	typeof v === 'string' && (KLASSIERUNGEN as readonly string[]).includes(v);
 
 export const klassierungName = (k: Klassierung): string => (k === 'keine' ? 'keine Lizenz' : k);
+
+/** FR-07: Punkte für die Mindestsumme im Doppel: N1–N4 → 0, R*n* → *n*, `keine` → 10. */
+export const punkte = (k: Klassierung): number =>
+	k === 'keine' ? 10 : k.startsWith('R') ? Number(k.slice(1)) : 0;

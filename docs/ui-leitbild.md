@@ -27,6 +27,8 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Band *Ansicht als …*, Hinweis *Nur ansehen*, Bereiche der Verwaltung je Rolle und Umleitung | `src/routes/+layout.svelte`, `src/routes/verwaltung/+layout.svelte`, `src/lib/verwaltung/umleiten.ts`, `src/lib/verwaltung/AnsichtWahl.svelte` |
 | Baustein Anleitung (Zeichnung, Ablauf) | `src/lib/ui/Anleitung.svelte`, `src/lib/ui/ZeichnungIphone.svelte`, `src/lib/ui/ZeichnungAndroid.svelte` |
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
+| Druckansicht der Briefe (Seite *Briefe*, Seite eines Mitglieds) | `src/lib/verwaltung/Briefdruck.svelte` |
+| Zurück-Link, Pfad, Name mit Rufname, Trefferliste der Verwaltung, Rückfrage-Dialog | `src/lib/ui/Zurueck.svelte`, `src/lib/verwaltung/Pfad.svelte`, `src/lib/ui/Name.svelte`, `src/lib/verwaltung/Spielersuche.svelte`, `src/lib/verwaltung/Aktionsdialog.svelte` |
 
 Zwei Prüfungen halten Leitbild und Code beisammen:
 
@@ -172,15 +174,19 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Haupttaste | `.taste-haupt` | Sandplatz-Rot, höchstens eine pro Bildschirm (UI-04) |
 | Nebentaste | `.taste-neben` | weiss mit grünem Rand; gedrückt `--farbe-marke-zart` |
 | Link | `a` | grün, unterstrichen |
-| Zurück | `.zurueck` | „‹ Zurück" oben links auf Unterseiten |
-| Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); bei einer festen Höchstlänge zählt der Hilfetext mit („12 von 50 Zeichen", `.feld-hilfe`); Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
+| Zurück | `.zurueck` | „‹ <Titel der Elternseite>" oben links auf Unterseiten, z. B. „‹ Profil", „‹ Clubmeisterschaft 2027"; führt eine Stufe höher in der [festen Ordnung](#feste-ordnung), egal woher man kam; immer einzeilig, ein zu langer Name endet mit „…" |
+| Pfad | `nav.pfad` | nur Verwaltung: über dem Titel jeder Unterseite die Stufen von der Seitenleiste bis hier, getrennt durch „›", z. B. „Turniere › Clubmeisterschaft 2027 › Herren R5/R9"; jede Stufe ein Link, die aktuelle Seite fett und ohne Link (`aria-current="page"`); unter `60rem` Breite des App-Rahmens steht statt seiner nur „‹ <Elternseite>" als `.zurueck`, darüber endet ein zu langer Pfad mit „…"; nie umbrechend, nicht im Druck |
+| Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); ein Auswahlfeld (`select`) sieht aus wie ein Textfeld (gleiche Höhe, gleicher Rand) mit einem Pfeil rechts in `--farbe-text`, auf allen Geräten gleich statt im Aussehen des Browsers (UI-03); gesperrt ohne Pfeil; bei einer festen Höchstlänge zählt der Hilfetext mit („12 von 50 Zeichen", `.feld-hilfe`); als Dateiwahl (`input type="file"`, nur Verwaltung: *Einlesen*) mit dem Rand des Felds und der Wahltaste des Browsers im Aussehen der Nebentaste; Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
 | Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>`. Als Schalter (Ein/Aus, gilt sofort, ohne Speichern-Taste) dieselbe Fläche mit Häkchen statt Kreis (`type="checkbox"`), angehakt heisst ein: *Benachrichtigungen* im Profil |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
 | Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
 | Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; klappt weich auf und zu (`--dauer-mittel`) |
 | Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste; ist der ganze Eintrag ein Link, gedrückt `--farbe-marke-zart` und leicht verkleinert und nicht markierbar; eine Kachel mit eigener Aktion bleibt ruhig und markierbar |
+| Trefferliste | `ul.trefferliste` | Ergebnisse einer Suche unter dem Suchfeld: je Treffer eine Kachel mit Trennlinie oben, Name links, genau eine Nebentaste rechts; Vermerke als Plakette unter dem Namen; erscheint ab zwei Buchstaben |
+| Kartenteil | `.karte-teil` | Abschnitt innerhalb einer Karte mit eigenem Thema (z. B. «sucht Partner», eigene Anfragen, Abmelden): Trennlinie oben, Abstand `--abstand-3` darüber und im Inneren |
 | Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt" oder „1 von 3 Anmeldungen" |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05). Zustände der Mitgliedschaft: *ausgetreten* = `.plakette`, *wird gelöscht* = `.plakette-gesperrt` |
+| Briefdruck | `.briefdruck` | nur Verwaltung: Druckansicht frisch erzeugter Briefe, siehe [Briefdruck](#briefdruck) |
 | Druckseite | `.druckseite` | nur Verwaltung: Auskunft über die Daten eines Mitglieds, siehe [Druckseite](#druckseite-auskunft); Klasse `.nicht-drucken` blendet unter `@media print` aus |
 | Anleitung | `.anleitung` | gezeichnetes Handy (`.anleitung-film`, ein `.anleitung-bild` pro Schritt), darunter die Taste (`.anleitung-taste`) und die nummerierten Schritte (`.anleitung-schritte`), am Schluss ein Eintrag „Fertig!" (`.anleitung-fertig`, mit ✓ statt Nummer); die Zeichnung ist für Screenreader verborgen, die Schritte tragen die Bedeutung; ein Schritt gehört zu genau einem Bild; in der Zeichnung nur Beschriftungen, die in der Hilfe von Apple bzw. Google belegt sind, sonst graue Balken (`.anleitung-eintrag.leer`); der Tipp-Kreis (`.anleitung-tipp`) zeigt, wo man tippt; Bewegung nach UI-09 |
 | Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen"). Einzige Ausnahme ist *Nur ansehen*: oben auf Verwaltungsseiten, auf denen die eigene Rolle etwas nur lesen darf, «**Nur ansehen.** Ändern kann hier nur der <Rolle>.», ohne Aktion; er bleibt, solange die Rolle nur liest. In der Ansicht steht er nicht, dort sagt es das Band |
@@ -194,6 +200,8 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Verwaltungsrahmen | `.verwaltung` | Seitenleiste links, Inhalt rechts; auf schmalem Bildschirm untereinander |
 | Fusszeile | `footer.inhalt.leise` | nur vor dem Login (Einstiegsseite, Login, Login mit Mail-Code) und auf der Startseite: Links „Hilfe" · „Datenschutz" · Version; nicht auf Profil, Hilfe, Datenschutz, Fehlerseite und in der Verwaltung; als letztes Element (ohne Reiter) mit Abstand über dem Home-Balken |
 | Nebentext | `.leise` | kleiner und leiser, für Hilfen und Nebeninfos |
+| Name mit Rufname | Svelte-Komponente, Nebentext `.leise` | Rufname in `--farbe-text` und Grundgrösse, dahinter mit einem Leerzeichen der amtliche Name als `.leise` («Hannes Johannes Muster»); bricht die Zeile um, darf der amtliche Name in die nächste rutschen. Ohne Rufname nur der amtliche Name in normaler Schrift. Der amtliche Name heisst «Vorname Nachname», in den Verwaltungsbereichen für Turniere, Anlässe und Mitteilungen «Nachname, Vorname». Screenreader lesen alles, nichts wird versteckt |
+| Name mit Rufname, kurze Textform | reine Textfunktion | dieselbe Regel für Fliesstext und reinen Text: «Rufname (Vorname Nachname)», ohne Rufname «Vorname Nachname»; die Begrüssung nimmt nur den Rufnamen. Nur eingeloggt; Seiten ohne Login und die Mitgliederverwaltung zeigen den amtlichen Namen |
 | Breite Taste | `.taste-breit` | Zusatz zu einer Taste: volle Breite (Formulare auf dem Handy) |
 | Feld-Zeile | `.feld-zeile` | nur Verwaltung: Bezeichnung links, Eingabe rechts, gleiche Schriftgrösse; unter `60rem` steht die Bezeichnung über dem Feld |
 | Inaktive Taste | `.taste-haupt:disabled`, `.taste-neben:disabled` | nur Verwaltung: grau, solange es nichts zu speichern gibt; die Taste nennt, was sie speichert («Angaben speichern», «Rollen speichern»); Haupt- und Nebentaste sehen inaktiv gleich aus |
@@ -228,16 +236,28 @@ und der aktive Eintrag der Seitenleiste tragen `aria-current="page"`, keine eige
 `--breite-inhalt`), Reiter unten. Ab `60rem` Breite wandern die Reiter als Textlinks in die
 Kopfleiste.
 
-- **Reiter:** Start · CM · Profil (heute Start · Profil, *CM* kommt mit der Etappe
-  *CM-Anmeldung*); *Lizenz* kommt mit der Etappe *Lizenzanträge*. Höchstens
+- **Reiter:** Start · CM · Profil; *Lizenz* kommt mit der Etappe *Lizenzanträge*. Höchstens
   4 Reiter, kein verstecktes Menü (☰). „CM" ist die Kurzform, weil „Clubmeisterschaft" bei
-  grosser Schrift nicht in den Reiter passt; Seitentitel schreiben es aus.
-- **Startseite:** „Hoi <Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
-  „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
+  grosser Schrift nicht in den Reiter passt; Seitentitel schreiben es aus. Die Reiter stehen
+  nach dem Login auf jeder Seite der App; jede Seite markiert den Reiter ihres Bereichs
+  ([feste Ordnung](#feste-ordnung)). Vor dem Login (Einstiegsseite, Login, Login mit Mail-Code,
+  Hilfe und Datenschutz ohne Sitzung) und in der Verwaltung gibt es keine Reiter.
+- **Reiter CM:** oberste Seite `/clubmeisterschaft`. Läuft keine Clubmeisterschaft (freigegeben,
+  aus dem laufenden Jahr), steht dort der Titel „Clubmeisterschaft" und der Text „Zurzeit läuft
+  keine Clubmeisterschaft. Sobald die Anmeldung offen ist, steht sie hier."; läuft genau eine,
+  zeigt der Reiter direkt deren Seite (ohne Zurück-Link); laufen mehrere, je eine Kachel wie auf
+  der Startseite. Die Kachel der CM auf der Startseite bleibt und führt in den Bereich CM.
+- **Startseite:** „Hoi <Rufname, sonst Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
+  „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben); Anlässe stehen als Kacheln unter „Jetzt aktuell" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
   stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
   (A-ANLASS-01). Angebote stehen vor „Jetzt aktuell", jedes als eigener Hinweis
   und immer nur eines zugleich (UI-04): zuerst *Passkey einrichten*, danach *Mitteilungen aufs Handy?*.
-- **Unterseiten:** „‹ Zurück" oben links, keine Reiter (bei der CM-Anmeldung neu prüfen).
+- **Unterseiten:** Zurück-Link mit Ziel oben links (Baustein *Zurück*), die Reiter bleiben.
+  Formularschritte dürfen den Schritt nennen statt der Elternseite: *E-Mail ändern* Schritt 2
+  „‹ Andere Adresse" (zurück zu Schritt 1).
+- **Höchstens zwei Stufen unter dem Reiter**, z. B. CM › Herren R5/R9 › Spiel gegen X. Was
+  tiefer wäre, wird ein *Umschalter* auf derselben Seite oder ein *Blatt von unten*
+  ([Vorgaben für Künftiges](#vorgaben-für-künftiges)).
 - **Einstiegsseite** (nur im Handy-Browser, nicht vom Symbol aus): „Willkommen bei MyTCO", eine Karte „Zuerst auf den Startbildschirm" mit der Anleitung bzw. auf Android der Haupttaste „MyTCO installieren", darunter der Link „Ohne Startbildschirm weiter" zum Login.
 - **Hilfe:** ohne Login, über die Fusszeile; jedes Thema ein Aufklappbereich, der Kontakt eine Karte.
 - **Datenschutz:** ohne Login, über die Fusszeile (DS-09); Text der Datenschutzerklärung in einer Karte, solange er nicht freigegeben ist mit dem leisen Vermerk «Entwurf».
@@ -245,7 +265,7 @@ Kopfleiste.
   wie in der Mitglieder-App, auch unter der Verwaltung; oben links „‹ Zur Startseite" bzw.
   „‹ Zur Verwaltung", darunter eine Karte mit Titel und Meldung in Worten (UI-06).
 - **Formulare:** mehr als etwa 4 Felder werden in Schritte geteilt, mit Schritt-Zähler. Das
-  erste Login hat 3 Schritte: 1 Angaben prüfen (vom Verein erfasst, nur lesen) · 2 Kontakt ·
+  erste Login hat (geplant, FR-02) 3 Schritte: 1 Angaben prüfen (vom Verein erfasst, nur lesen) · 2 Kontakt ·
   3 Tennis (Lizenznummer, Klassierung).
 - **Kontingente** zeigt der Mengen-Zähler, z. B. „1 von 3 Anmeldungen" (FR-06).
 
@@ -253,7 +273,7 @@ Kopfleiste.
 Startseite, direkt unter der Begrüssung, nur für Konten mit einer Rolle über *Mitglied* hinaus
 (RR-07). Dunkelgrüne Seitenleiste mit
 „MyTCO Verwaltung", den Bereichen, die eine der eigenen Rollen lesen darf, und „‹ Zur App":
-*Mitgliederverwaltung* (Mitglieder, Anlässe, Mitteilungen, Für Fairgate mit Zahl der offenen,
+*Mitgliederverwaltung* (Mitglieder, Einlesen, Briefe, Anlässe, Mitteilungen, Für Fairgate mit Zahl der offenen,
 Änderungsverlauf) für Mitglieder- und MyTCO-Admin, *Clubmeisterschaft* (Turniere) für CM- und
 MyTCO-Admin, *MyTCO* (Rollen) nur für den MyTCO-Admin. Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
@@ -276,6 +296,50 @@ Seite zum Anlegen ohne Schreibrecht zur Liste ihres Bereichs.
 Namen von Mitgliedern stehen in allen Tabellen und Listen der Verwaltung als „Nachname,
 Vorname", damit sie sich gleich lesen und sortieren.
 
+Unterseiten der Verwaltung tragen über dem Titel den Baustein *Pfad*; die erste Stufe ist der
+Eintrag der Seitenleiste. Die obersten Seiten (Einträge der Seitenleiste) haben keinen Pfad.
+Druckansichten haben keinen Pfad: Die Auskunft behält ihre Leiste, die Taste heisst
+„‹ <Nachname, Vorname>"; der Briefdruck behält „‹ Zurück", weil er nur die Ansicht schliesst.
+
+### Feste Ordnung
+
+Jede Seite gehört zu genau einem Bereich (Reiter) und hat höchstens eine Elternseite. Der
+Zurück-Link führt immer dorthin; die Zurück-Taste oder -Geste des Geräts geht weiter den
+Verlauf zurück. Gebaut in `src/lib/ui/navigation.ts`.
+
+| Seite | Reiter | Zurück-Link |
+|-------|--------|-------------|
+| Start | Start | — |
+| Anlass | Start | „‹ Start" |
+| Hilfe, Datenschutz mit Sitzung | Start | „‹ Start" |
+| Hilfe, Datenschutz ohne Sitzung, Login mit Mail-Code | — | „‹ Anmelden" |
+| Clubmeisterschaft (Übersicht) | CM | — |
+| Seite einer CM | CM | — wenn sie die einzige laufende ist, sonst „‹ Clubmeisterschaft" |
+| Doppel einer CM (Partnerwahl) | CM | „‹ <Name der CM>" |
+| Profil | Profil | — |
+| E-Mail ändern | Profil | „‹ Profil" |
+
+| Seite der Verwaltung | Pfad |
+|----------------------|------|
+| Mitglied | Mitglieder › <Nachname, Vorname> |
+| Änderungsverlauf eines Mitglieds | Mitglieder › <Nachname, Vorname> › Änderungsverlauf |
+| Mitglied anlegen | Mitglieder › Mitglied anlegen |
+| Anlass, Neuer Anlass | Anlässe › <Titel> bzw. Neuer Anlass |
+| Turnier, Neues Turnier | Turniere › <Name> bzw. Neues Turnier |
+| Kategorie, Neue Kategorie | Turniere › <Turnier> › <Kategorie> bzw. Neue Kategorie |
+
+### Vorgaben für Künftiges
+
+Noch nicht gebaut; gilt für den CM-Betrieb und alles, was tiefer als zwei Stufen würde.
+Entwurf: Design-Artifact «MyTCO Navigation und Tiefe» (#69).
+
+- **Umschalter** (Unterreiter mit Balken): Einträge wie *Spiele · Rangliste · Teilnehmer* oben
+  auf einer Seite, der aktive in `--farbe-marke` mit Balken `--rand-akzent` unten, die anderen
+  leise; wechselt den Inhalt auf derselben Seite, ohne neue Stufe. Segmente (Knopfgruppe) sind
+  verworfen.
+- **Blatt von unten** für das letzte Stück eines Ablaufs (z. B. *Resultat melden*): ein
+  `<dialog>`, das von unten hereinkommt; „Abbrechen" schliesst es, die Seite darunter bleibt.
+
 ### Bewegung und Bedienung
 
 MyTCO soll sich anfühlen wie eine App auf dem iPhone: Was man antippt, reagiert sofort, und
@@ -286,9 +350,9 @@ die Bewegung zeigt, wohin man gegangen ist. Dauern und Kurven stehen unter
 
 | Wechsel | Beispiele | Bewegung |
 |---------|-----------|----------|
-| gleiche Ebene | Start ↔ Profil, Einstiegsseite → Login, Login → Start | Inhalt blendet über (`--dauer-kurz`, linear) |
-| eine Ebene tiefer | Start → Hilfe, Login → Datenschutz, Login → Login mit Mail-Code, Profil → E-Mail ändern, Start → Anlass | neue Seite schiebt sich von rechts herein, alte Seite und Reiter weichen um 28 % nach links (`--dauer-schieben`, `--kurve-schieben`) |
-| zurück | „‹ Zurück" | umgekehrt: Seite schiebt sich nach rechts weg |
+| gleiche Ebene oder anderer Bereich | Start ↔ Profil, Start → CM, Kachel der CM auf Start, Profil → Hilfe, Einstiegsseite → Login, Login → Start | Inhalt blendet über (`--dauer-kurz`, linear) |
+| eine Ebene tiefer im selben Bereich | Start → Hilfe, Login → Datenschutz, Login → Login mit Mail-Code, Profil → E-Mail ändern, Start → Anlass, CM → Doppel | neue Seite schiebt sich von rechts herein, alte Seite weicht um 28 % nach links (`--dauer-schieben`, `--kurve-schieben`) |
+| zurück | Zurück-Link, Reiter auf einer Unterseite | umgekehrt: Seite schiebt sich nach rechts weg |
 | Zurück-Taste oder -Geste des Browsers, Verwaltung, unbekannte Adresse | | keine; die Geste animiert der Browser selbst, eine unbekannte Adresse lädt die Seite neu. Lässt sich eine bekannte Seite nicht laden, bewegt sich die Fehlerseite wie die Seite, die sie ersetzt |
 
 Kopfleiste und Statusleisten-Band stehen beim Wechsel still, die Reiter auch, solange sie
@@ -296,8 +360,10 @@ auf beiden Seiten stehen.
 
 **Reiter:** Der angetippte Reiter wird sofort aktiv, auch wenn die Seite noch lädt; der
 Balken gleitet hinüber (`--dauer-mittel`). Weil nur der Rollbereich scrollt, wirkt der Tipp
-auch, während der Inhalt noch nachläuft. Jeder Reiter beginnt oben; wer den aktiven Reiter
-nochmals antippt, kommt ebenfalls nach oben. Nur «‹ Zurück» und die Zurück-Taste oder -Geste
+auch, während der Inhalt noch nachläuft. Jeder Reiter beginnt oben. Wer den aktiven Reiter
+nochmals antippt, kommt auf einer Unterseite zur obersten Seite des Bereichs (wie beim
+iPhone), auf der obersten Seite nach oben. Nur der Zurück-Link, der aktive Reiter auf einer
+Unterseite (er führt wie der Zurück-Link eine Stufe höher) und die Zurück-Taste oder -Geste
 des Browsers bringen eine Seite dorthin zurück, wo man sie verlassen hat.
 
 **Aufklappbereiche im Profil** (*Meine Angaben*, *Anmelden mit Passkey*, *Benachrichtigungen*)
@@ -306,10 +372,10 @@ Abmelden sind sie wieder zu.
 
 **Antippen:** kein grauer Blitz des Browsers, dafür ein Gedrückt-Zustand (`--dauer-kurz`):
 Reiter in `--farbe-marke` mit etwas kleinerem Symbol; Kachel als Link in `--farbe-marke-zart`, leicht
-verkleinert; Nebentaste, „‹ Zurück", Titelzeile des Aufklappbereichs und Textlinks in
+verkleinert; Nebentaste, Zurück-Link, Titelzeile des Aufklappbereichs und Textlinks in
 `--farbe-marke-zart`; Haupttaste in `--farbe-aktion-dunkel`.
 
-**Markieren:** Kopfleiste, Reiter, Tasten, „‹ Zurück", Kacheln als Link und Titelzeilen der
+**Markieren:** Kopfleiste, Reiter, Tasten, Zurück-Link, Kacheln als Link und Titelzeilen der
 Aufklappbereiche lassen sich nicht markieren und öffnen beim langen Drücken kein Link-Menü.
 Fliesstext, Codes, Angaben und Tabellen bleiben markier- und kopierbar.
 
@@ -341,7 +407,7 @@ schiebt sich über die Reiter, das Feld steht ruhig darüber.
 ### Ungespeicherte Änderungen
 
 Wer in einem Formular etwas geändert und nicht gespeichert hat und die Seite in der App
-verlässt (Wappen, Reiter, «‹ Zurück», Seitenleiste und andere Links der Verwaltung), bekommt
+verlässt (Wappen, Reiter, Zurück-Link, Pfad, Seitenleiste und andere Links der Verwaltung), bekommt
 zuerst die Rückfrage als `<dialog class="karte">`: **«Nicht gespeichert – trotzdem
 verlassen?»** mit *Abbrechen* (Nebentaste: bleibt auf der Seite, die Eingaben bleiben) ·
 *Verlassen* (Haupttaste: die Eingaben verfallen, die App geht zum Ziel).
@@ -363,9 +429,13 @@ verlassen?»** mit *Abbrechen* (Nebentaste: bleibt auf der Seite, die Eingaben b
 
 ## Brief (Druck)
 
-Der Brief mit dem Einmal-Code (A-LOGIN-01) ist eine A4-Seite ohne Seitenrand des Druckers
-(`@page { size: A4; margin: 0 }`). Er nutzt dieselben Farb-, Schrift- und Abstands-Tokens wie
-die App; nur Werte auf dem Papier stehen in absoluten Einheiten (Masse in `mm`, die
+Der Brief mit dem Einmal-Code (A-LOGIN-01) ist eine A4-Seite ohne Seitenrand des Druckers.
+Sein Stil steht in `src/lib/design/brief.css` (die CSP erlaubt kein `<style>` und kein `style=`)
+und gilt in der App global. Deshalb liegt jede Regel unter `.brief`, und die Seite ist eine
+benannte (`@page brief { size: A4; margin: 0 }`, `.brief { page: brief }`); andere Druckseiten
+wie die Auskunft behalten ihren Druckrand. Mehrere Briefe folgen mit je einer Seite
+(`.brief + .brief { break-before: page }`). Der Brief nutzt dieselben Farb-, Schrift- und
+Abstands-Tokens wie die App; nur Werte auf dem Papier stehen in absoluten Einheiten (Masse in `mm`, die
 Grundschrift in `pt`), deshalb in eigenen Tokens. Die Symbole der
 Anleitung (Teilen, Drei-Punkte-Menü) folgen dem Baustein *Symbol*: 24er-Raster, Strich 2,
 Farbe `currentColor`, immer mit Text.
@@ -373,7 +443,8 @@ Farbe `currentColor`, immer mit Text.
 **Annahme K-16.1:** Fensterkuvert C5/6 mit Fenster rechts. Die Lage des Adressfelds ist eine
 Konstante; ändert sich das Kuvert, ändern sich nur diese Tokens.
 
-Der Brief setzt seine Grundschrift `--brief-schrift` auf `html`; alle Schrift- und
+Der Brief setzt seine Grundschrift `--brief-schrift` beim Druck auf `html` (nur wo ein `.brief`
+steht, `html:has(.brief)`); alle Schrift- und
 Abstands-Tokens in `rem` werden damit auf Briefgrösse verkleinert, damit alles auf eine Seite
 passt.
 
@@ -385,6 +456,24 @@ passt.
 | `--brief-fenster-breite` | `80mm` | Breite des Adressfelds |
 | `--brief-qr` | `35mm` | Kantenlänge des QR-Codes |
 | `--brief-schrift` | `12pt` | Grundschrift des Briefs (1 rem auf Papier) |
+| `--brief-breite` | `210mm` | Breite des Blatts (A4) in der Vorschau auf dem Bildschirm |
+
+## Briefdruck
+
+Die Druckansicht (`src/lib/verwaltung/Briefdruck.svelte`) zeigt frisch erzeugte Briefe, eine Seite
+je Brief. Die Codes stehen nur hier (RR-04): nicht in der Adresse, nicht im Speicher des Browsers;
+«‹ Zurück» verwirft sie.
+
+- **Tasten:** Leiste mit «‹ Zurück» und «Drucken oder als PDF speichern» (beide Nebentasten),
+  darunter in `.leise` «Die Codes stehen nur hier. Drucke jetzt oder speichere als PDF. Ein gespeichertes PDF löschst du nach dem Druck.»; alles
+  mit `.nicht-drucken`.
+- **Vorschau:** Die Briefe stehen untereinander in einem Rahmen `.briefdruck` (benannte Region
+  mit `tabindex="0"`, waagrecht scrollbar wie eine Tabelle); jedes Blatt ist `--brief-breite`
+  breit, weiss, mit Schatten `--schatten-karte`. Auf dem Bildschirm hat der Brief die
+  Schriftgrösse der App: Die Vorschau zeigt nur, was gedruckt wird; massgebend ist der Ausdruck.
+- **Druck:** Rahmen ohne Schatten und ohne Scrollen, die Verwaltung (`.inhalt` mit einem
+  `.brief`) ohne Innenabstand: Das Blatt beginnt oben links auf dem Papier, das Adressfeld liegt
+  wie im Musterbrief im Fenster des Kuverts.
 
 ## Druckseite (Auskunft)
 
@@ -398,7 +487,7 @@ Seite *Auskunft*.
   darunter Titel und Untertitel.
 - **Tabellen:** Abschnitt als `<h2>` mit Tabelle darunter in `.tabelle` (benannte Region mit `tabindex="0"`, auf dem Handy waagrecht scrollbar, auf Papier nicht beschnitten); 1 px Linien in `--farbe-rand`, Bezeichnung
   links fett, Tabellenkopf in `--farbe-marke-zart`.
-- **Tasten:** «‹ Zurück» und «Drucken oder als PDF speichern» tragen `.nicht-drucken`.
+- **Tasten:** «‹ <Nachname, Vorname>» und «Drucken oder als PDF speichern» tragen `.nicht-drucken`.
 - **Druck:** Unter `@media print` verschwinden `.nicht-drucken`, `.seitenleiste` und `.kopf`,
   dazu der Hinweis «Nur ansehen» (`.hinweis`) und das Band der Ansicht (`.ansicht-band`); der
   Inhalt nutzt die ganze Breite: Rahmen und Raster der Verwaltung werden zu einem Block auf weissem Grund, ohne feste Höhe.

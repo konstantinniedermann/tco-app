@@ -35,6 +35,11 @@
 			<a href={resolve('/verwaltung/mitglieder')} aria-current={aktuell('/verwaltung/mitglieder')}
 				>Mitglieder</a
 			>
+			<a href={resolve('/verwaltung/einlesen')} aria-current={aktuell('/verwaltung/einlesen')}
+				>Einlesen</a
+			>
+			<a href={resolve('/verwaltung/briefe')} aria-current={aktuell('/verwaltung/briefe')}>Briefe</a
+			>
 			<a href={resolve('/verwaltung/anlaesse')} aria-current={aktuell('/verwaltung/anlaesse')}
 				>Anlässe</a
 			>

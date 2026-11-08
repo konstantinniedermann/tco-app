@@ -7,17 +7,17 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { refreshAll } from '$app/navigation';
+	import Name from '../ui/Name.svelte';
+	import Spielersuche from './Spielersuche.svelte';
 	import { KLASSIERUNGEN, klassierungName, type Klassierung } from '../turnier/klassierung.ts';
 	import {
 		entscheideAntrag,
 		korrigiereKlassierung,
 		loescheAnmeldung,
 		meldeVonHandAn,
-		sucheSpieler,
 		verschiebeAnmeldung,
 		type Antwort,
 		type AnmeldungZeile,
-		type SpielerTreffer,
 		type Warnung
 	} from './api.ts';
 	import { fehlerText } from './anzeige.ts';
@@ -26,7 +26,6 @@
 		anmeldungenText,
 		mitgliedVermerk,
 		spielerGeschlechtText,
-		trefferText,
 		warnungText
 	} from './turnier-anzeige.ts';
 	import { leiteUm } from './umleiten.ts';
@@ -68,16 +67,12 @@
 	let loeschen = $state<HTMLDialogElement>();
 	let entscheiden = $state<HTMLDialogElement>();
 
-	let suche = $state('');
-	let treffer = $state<SpielerTreffer[] | null>(null);
+	// Jedes Öffnen von «Von Hand anmelden» beginnt mit einer leeren Suche.
+	let suchlauf = $state(0);
 	let mitgliedId = $state<number | null>(null);
 	let zielId = $state<number | null>(null);
 	let klassierung = $state<Klassierung | ''>('');
 	let grund = $state('');
-
-	// Nur die neueste Suche zählt, wenn mehrere unterwegs sind.
-	let abfrage = 0;
-	let warten: ReturnType<typeof setTimeout> | undefined;
 
 	function oeffne(dialog: HTMLDialogElement | undefined, z: AnmeldungZeile | null) {
 		gewaehlt = z;
@@ -88,10 +83,8 @@
 	}
 
 	function oeffneAnmelden() {
-		suche = '';
-		treffer = null;
+		suchlauf++;
 		mitgliedId = null;
-		abfrage++;
 		oeffne(anmelden, null);
 	}
 
@@ -108,37 +101,6 @@
 	function oeffneEntscheid(z: AnmeldungZeile) {
 		grund = '';
 		oeffne(entscheiden, z);
-	}
-
-	function setzeSuche(wert: string) {
-		suche = wert;
-		mitgliedId = null;
-		warnungen = [];
-		fehler = null;
-		clearTimeout(warten);
-		const nr = ++abfrage;
-		const text = wert.trim();
-		if (text.length < 2) {
-			treffer = null;
-			return;
-		}
-		warten = setTimeout(() => suchen(text, nr), 200);
-	}
-
-	async function suchen(text: string, nr: number) {
-		const a = await sucheSpieler(text);
-		if (nr !== abfrage) return;
-		if (await leiteUm(a)) {
-			anmelden?.close();
-			return;
-		}
-		if (!anmelden?.open) return;
-		if (a.art === 'ok') {
-			treffer = a.daten;
-		} else {
-			treffer = null;
-			fehler = fehlerText(a);
-		}
 	}
 
 	/**
@@ -291,7 +253,9 @@
 							{@const vermerk = mitgliedVermerk(z.mitgliedStatus)}
 							<tr>
 								<td>
-									<span id="anmeldung-{z.anmeldungId}">{z.name}</span>
+									<span id="anmeldung-{z.anmeldungId}"
+										><Name name={z.name} form="nachname-zuerst" /></span
+									>
 									{#if vermerk}<span class={vermerk.klasse}>{vermerk.text}</span>{/if}
 									{#if z.kommentar}
 										<div class="leise mehrzeilig">{z.kommentar}</div>
@@ -353,48 +317,19 @@
 {#if !nurLesen}
 	<dialog class="karte" bind:this={anmelden} aria-labelledby="anmelden-titel">
 		<h2 id="anmelden-titel">Von Hand anmelden</h2>
-		<div class="feld">
-			<label for="anmelden-suche">Mitglied suchen</label>
-			<input
-				id="anmelden-suche"
-				type="search"
-				maxlength="100"
-				autocomplete="off"
-				aria-describedby="anmelden-suche-hilfe"
-				bind:value={() => suche, setzeSuche}
+		{#key suchlauf}
+			<Spielersuche
+				id="anmelden"
+				label="Mitglied suchen"
+				gewaehlt={mitgliedId}
+				gesperrt={(id) => (istAngemeldet(id) ? 'schon angemeldet' : null)}
+				onwahl={(t) => {
+					mitgliedId = t?.mitgliedId ?? null;
+					warnungen = [];
+					fehler = null;
+				}}
 			/>
-			<span class="feld-hilfe" id="anmelden-suche-hilfe">Ab 2 Buchstaben.</span>
-		</div>
-		{#if treffer !== null}
-			{#if treffer.length === 0}
-				<p>Keine Treffer.</p>
-			{:else}
-				<fieldset class="auswahl-gruppe">
-					<legend>Treffer</legend>
-					{#each treffer as t (t.mitgliedId)}
-						{@const schon = istAngemeldet(t.mitgliedId)}
-						<label class="auswahl">
-							<input
-								type="radio"
-								name="anmelden-spieler"
-								value={t.mitgliedId}
-								checked={mitgliedId === t.mitgliedId}
-								disabled={schon}
-								onchange={() => {
-									mitgliedId = t.mitgliedId;
-									warnungen = [];
-								}}
-							/>
-							<span
-								>{t.name}<br /><span class="leise"
-									>{schon ? 'schon angemeldet' : trefferText(t)}</span
-								></span
-							>
-						</label>
-					{/each}
-				</fieldset>
-			{/if}
-		{/if}
+		{/key}
 		{#if warnungen.length > 0}
 			<p role="alert">{warnungText(warnungen)}</p>
 		{/if}
@@ -416,7 +351,7 @@
 		<h2 id="verschieben-titel">Verschieben</h2>
 		{#if gewaehlt}
 			{@const z = gewaehlt}
-			<p>{z.name}</p>
+			<p><Name name={z.name} form="nachname-zuerst" /></p>
 			{#if z.status === 'beantragt'}
 				<p>Der Antrag gilt danach als bestätigt.</p>
 			{/if}
@@ -468,7 +403,7 @@
 		<h2 id="klassierung-titel">Klassierung korrigieren</h2>
 		{#if gewaehlt}
 			{@const z = gewaehlt}
-			<p>{z.name}</p>
+			<p><Name name={z.name} form="nachname-zuerst" /></p>
 			<div class="feld">
 				<label for="klassierung-wahl">Klassierung</label>
 				<select id="klassierung-wahl" bind:value={klassierung}>
@@ -500,7 +435,7 @@
 		<h2 id="loeschen-titel">Anmeldung löschen?</h2>
 		{#if gewaehlt}
 			{@const z = gewaehlt}
-			<p>{z.name}</p>
+			<p><Name name={z.name} form="nachname-zuerst" /></p>
 			{#if fehler}
 				<p class="fehler" role="alert">{fehler}</p>
 			{/if}
@@ -519,7 +454,7 @@
 		<h2 id="entscheiden-titel">Wildcard-Antrag</h2>
 		{#if gewaehlt}
 			{@const z = gewaehlt}
-			<p>{z.name}</p>
+			<p><Name name={z.name} form="nachname-zuerst" /></p>
 			{#if z.kommentar}
 				<p class="mehrzeilig">{z.kommentar}</p>
 			{/if}

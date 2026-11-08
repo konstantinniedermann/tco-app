@@ -1,3 +1,8 @@
+import { utcZuZuerich } from '../anlass/zeit.ts';
+
+/** Kalenderjahr in Schweizer Zeit (am 1. Januar um 0:30 schon das neue, auch auf einem Server in UTC). */
+export const jahrInZuerich = (jetzt: Date): number => Number(utcZuZuerich(jetzt).slice(0, 4));
+
 const DATUM = new Intl.DateTimeFormat('de-CH', {
 	day: '2-digit',
 	month: '2-digit',

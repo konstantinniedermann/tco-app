@@ -4,7 +4,14 @@ import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { aenderung, anmeldung, anmeldungSpieler, turnier, mitglied } from '../db/schema.ts';
+import {
+	aenderung,
+	anmeldung,
+	anmeldungSpieler,
+	mitglied,
+	partnerAnfrage,
+	turnier
+} from '../db/schema.ts';
 import { meldeAn } from '../cm/anmeldungen.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
@@ -20,16 +27,22 @@ import {
 	getTurnier,
 	getTurniere,
 	postAnmeldungLoeschen,
+	postAnfrageAlsPaar,
+	postAnfrageLoeschen,
 	postAnmeldungVonHand,
+	postDoppelVonHand,
 	postEntscheid,
 	postKategorie,
 	postKategorieAbsagen,
 	postKategorien,
 	postKlassierung,
+	postPartnerAendern,
 	postTurnier,
 	postTurnierStatus,
 	postTurniere,
-	postVerschieben
+	postVerschieben,
+	postZusammenlegen,
+	getDoppel
 } from './schnittstellen.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
@@ -73,6 +86,11 @@ function baue(jetzt: Date = start) {
 		db,
 		zugang,
 		hinweis: async () => {},
+		brief: {
+			schluessel: 'y'.repeat(40),
+			adresse: 'https://mytco.example.org',
+			kontakt: 'kontakt@example.org'
+		},
 		jetzt: () => jetzt,
 		push: null,
 		mailer: async (n) => {
@@ -320,18 +338,23 @@ describe('Turnier-Schnittstellen', () => {
 		}
 		const ok = await postKategorie(s.d, post(cm, { ...enger, trotzdem: true }, k));
 		expect([ok.status, await ok.json()]).toEqual([200, {}]);
+		// FR-36: Einzel oder Doppel wechseln geht mit Anmeldung nicht, auch nicht mit trotzdem.
+		const gesperrt = await postKategorie(s.d, post(cm, { ...DOPPEL, trotzdem: true }, k));
+		expect([gesperrt.status, await gesperrt.json()]).toEqual([409, { fehler: 'art-gesperrt' }]);
 		const a = await postKategorieAbsagen(s.d, post(cm, {}, k));
 		expect([a.status, await a.json()]).toEqual([409, { fehler: 'hat-anmeldungen', anzahl: 1 }]);
 		expect((await (await getKategorie(s.d, hole(cm, k))).json()).anmeldungen).toBe(1);
 	});
 
-	test('RR-07: ohne Rolle 403, unbestätigt 403 unbestaetigt, MyTCO-Admin nur lesend, ändernd ohne JSON 415', async () => {
+	test('RR-07: ohne Rolle 403, unbestätigt 403 unbestaetigt, MyTCO-Admin nur lesend, Mitglieder- und Lizenz-Admin 403, ändernd ohne JSON 415', async () => {
 		const s = baue();
 		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
 		const unbestaetigt = await einloggen((await legeMitgliedAn(db, { rollen: ['cm'] })).kontoId);
 		const cm = await bestaetigt(s, ['cm']);
 		const mytco = await bestaetigt(s, ['mytco']);
 		const mitglieder = await bestaetigt(s, ['mitglieder']);
+		// `lizenz` öffnet die Verwaltung noch nicht und kann sie darum auch nicht bestätigen.
+		const lizenz = await einloggen((await legeMitgliedAn(db, { rollen: ['lizenz'] })).kontoId);
 		const mach = (name: string, konto?: AngemeldetesKonto) =>
 			ereignis({
 				method: name.startsWith('get') ? 'GET' : 'POST',
@@ -339,7 +362,7 @@ describe('Turnier-Schnittstellen', () => {
 				params: { id: '999999999' },
 				konto
 			});
-		expect(Object.keys(TURNIER_SCHNITTSTELLEN)).toHaveLength(16);
+		expect(Object.keys(TURNIER_SCHNITTSTELLEN)).toHaveLength(22);
 		for (const [name, fn] of Object.entries(TURNIER_SCHNITTSTELLEN)) {
 			const ohne = await fn(s.d, mach(name));
 			expect([name, ohne.status, await ohne.json()]).toEqual([name, 401, { fehler: 'abgemeldet' }]);
@@ -363,6 +386,8 @@ describe('Turnier-Schnittstellen', () => {
 			}
 			const v = await fn(s.d, mach(name, mitglieder));
 			expect([name, v.status, await v.json()]).toEqual([name, 403, { fehler: 'kein-admin' }]);
+			const l = await fn(s.d, mach(name, lizenz));
+			expect([name, l.status, await l.json()]).toEqual([name, 403, { fehler: 'kein-admin' }]);
 			if (name.startsWith('post')) {
 				const roh = ereignis({
 					konto: cm,
@@ -793,7 +818,7 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 		expect(await treffer.json()).toEqual([
 			{
 				mitgliedId: r5.mitgliedId,
-				name: `${name}, Test`,
+				name: { vorname: 'Test', rufname: null, nachname: name },
 				geschlecht: 'm',
 				jahrgang: 1990,
 				klassierung: 'R5'
@@ -831,6 +856,298 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 			post(cm, { klassierung: 'R5' }, { id: '999999999' })
 		);
 		expect(niemand.status).toBe(404);
+		expect(s.mails).toEqual([]);
+	});
+});
+
+// Doppel verwalten (#59 Etappe 2): Texte aus `cm/doppel-meldung.ts`, hier nur die Zustellung.
+const DOPPEL_K = {
+	art: 'doppel' as const,
+	geschlecht: 'offen' as const,
+	klassierungVon: null,
+	klassierungBis: null,
+	mindestsumme: 9
+};
+
+/** Erfundener Spieler mit festem Namen; `name` ist die Form in den Meldungen. */
+async function doppelSpieler(vorname: string, klassierung: string | null = 'R5') {
+	const nachname = `Doppeltest${Math.floor(Math.random() * 1e9)}`;
+	const m = await legeMitgliedAn(db, { vorname, nachname });
+	await db
+		.update(mitglied)
+		.set({ geschlecht: 'm', jahrgang: 1990, klassierung })
+		.where(eq(mitglied.id, m.mitgliedId));
+	return { ...m, name: `${vorname} ${nachname}` };
+}
+
+const mailsAn = (s: ReturnType<typeof baue>) =>
+	s.mails.map((m) => [m.an, m.text.split('\n\n')[0]]).sort();
+
+describe('Doppel verwalten (#59 Etappe 2)', () => {
+	test('A-ANMELDUNG-06, FR-46, FR-47: Paar von Hand anmelden warnt, Meldung an beide, Liste lesbar', async () => {
+		const t = await cmTurnier([['Doppel A', DOPPEL_K]]);
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const k = { id: String(t.kategorien[0]) };
+		const a = await doppelSpieler('Anna', 'R3');
+		const b = await doppelSpieler('Berta', 'R3');
+
+		const ids = [a.mitgliedId, b.mitgliedId];
+		const warn = await postDoppelVonHand(s.d, post(cm, { mitgliedIds: ids }, k));
+		expect(await antwortVon(warn)).toEqual([
+			409,
+			{ fehler: 'warnung', warnungen: ['passt-nicht'] }
+		]);
+		expect(s.mails).toEqual([]);
+		const ok = await postDoppelVonHand(s.d, post(cm, { mitgliedIds: ids, trotzdem: true }, k));
+		expect(await antwortVon(ok)).toEqual([200, {}]);
+		await vi.waitFor(() => expect(s.mails).toHaveLength(2));
+		const text = (partner: string) =>
+			`Der CM-Admin hat dich mit ${partner} für «Doppel A» angemeldet. Partner und Gegner sehen deine E-Mail und Telefonnummer.`;
+		expect(mailsAn(s)).toEqual(
+			[
+				[a.email, text(b.name)],
+				[b.email, text(a.name)]
+			].sort()
+		);
+		const liste = await getDoppel(s.d, hole(cm, k));
+		expect(liste.status).toBe(200);
+		expect((await liste.json()).paare).toHaveLength(1);
+		const doppelt = await postDoppelVonHand(s.d, post(cm, { mitgliedIds: ids, trotzdem: true }, k));
+		expect(await antwortVon(doppelt)).toEqual([409, { fehler: 'schon-angemeldet' }]);
+		expect((await getDoppel(s.d, hole(cm, { id: '999999999' }))).status).toBe(404);
+		const einzel = String(await kategorieIn(t.id, 'Einzel'));
+		expect((await getDoppel(s.d, hole(cm, { id: einzel }))).status).toBe(404);
+	});
+
+	test('A-ANMELDUNG-06, FR-46: Paar von Hand prüft den Körper und die Rolle', async () => {
+		const t = await cmTurnier([['Doppel A', DOPPEL_K]], false);
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const mytco = await bestaetigt(s, ['mytco']);
+		const k = { id: String(t.kategorien[0]) };
+		const a = await doppelSpieler('Anna');
+		for (const body of [
+			{},
+			{ mitgliedIds: [] },
+			{ mitgliedIds: [1, 1] },
+			{ mitgliedIds: [1, 2, 3] },
+			{ mitgliedIds: ['1'] },
+			{ mitgliedIds: [1.5] },
+			{ mitgliedIds: 1 },
+			{ mitgliedIds: [a.mitgliedId], trotzdem: 'ja' }
+		]) {
+			const r = await postDoppelVonHand(s.d, post(cm, body, k));
+			expect([body, ...(await antwortVon(r))]).toEqual([body, 400, { fehler: 'eingabe' }]);
+		}
+		const vor = await postDoppelVonHand(s.d, post(cm, { mitgliedIds: [a.mitgliedId] }, k));
+		expect(await antwortVon(vor)).toEqual([409, { fehler: 'vorbereitung' }]);
+		expect((await getDoppel(s.d, hole(mytco, k))).status).toBe(200);
+		for (const fn of [
+			postDoppelVonHand,
+			postZusammenlegen,
+			postPartnerAendern,
+			postAnfrageAlsPaar,
+			postAnfrageLoeschen
+		]) {
+			const r = await fn(s.d, post(mytco, { mitgliedIds: [a.mitgliedId] }, k));
+			expect([r.status, await r.json()]).toEqual([403, { fehler: 'kein-recht' }]);
+		}
+		expect(s.mails).toEqual([]);
+	});
+
+	test('FR-46, FR-47: zusammenlegen und Partner ändern melden den Betroffenen', async () => {
+		const t = await cmTurnier([['Doppel A', DOPPEL_K]]);
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const kid = t.kategorien[0];
+		const a = await doppelSpieler('Anna');
+		const b = await doppelSpieler('Berta');
+		const c = await doppelSpieler('Clara');
+		for (const x of [a, b, c]) {
+			const r = await postDoppelVonHand(
+				s.d,
+				post(cm, { mitgliedIds: [x.mitgliedId] }, { id: String(kid) })
+			);
+			expect(r.status).toBe(200);
+		}
+		await vi.waitFor(() => expect(s.mails).toHaveLength(3));
+		s.mails.length = 0;
+		const idA = await anmeldungIn(kid, a.mitgliedId);
+		const idB = await anmeldungIn(kid, b.mitgliedId);
+		const p = { id: String(idA) };
+
+		for (const body of [{}, { mitAnmeldungId: '1' }, { mitAnmeldungId: idB, trotzdem: 1 }]) {
+			const r = await postZusammenlegen(s.d, post(cm, body, p));
+			expect([body, ...(await antwortVon(r))]).toEqual([body, 400, { fehler: 'eingabe' }]);
+		}
+		const zusammen = await postZusammenlegen(s.d, post(cm, { mitAnmeldungId: idB }, p));
+		expect(await antwortVon(zusammen)).toEqual([200, {}]);
+		await vi.waitFor(() => expect(s.mails.length).toBeGreaterThanOrEqual(2));
+		expect(s.mails.map((m) => m.an).sort()).toEqual([a.email, b.email].sort());
+		s.mails.length = 0;
+		expect((await postZusammenlegen(s.d, post(cm, { mitAnmeldungId: idB }, p))).status).toBe(404);
+
+		for (const body of [
+			{},
+			{ bleibtId: a.mitgliedId },
+			{ bleibtId: a.mitgliedId, neuId: '3' },
+			{ bleibtId: a.mitgliedId, neuId: c.mitgliedId, trotzdem: 'x' }
+		]) {
+			const r = await postPartnerAendern(s.d, post(cm, body, p));
+			expect([body, ...(await antwortVon(r))]).toEqual([body, 400, { fehler: 'eingabe' }]);
+		}
+		// `bleibtId` gehört nicht zum Paar: Fehler der Eingabe.
+		const fremd = await postPartnerAendern(
+			s.d,
+			post(cm, { bleibtId: c.mitgliedId, neuId: null }, p)
+		);
+		expect(await antwortVon(fremd)).toEqual([400, { fehler: 'eingabe' }]);
+		const neu = await postPartnerAendern(
+			s.d,
+			post(cm, { bleibtId: a.mitgliedId, neuId: c.mitgliedId }, p)
+		);
+		expect(await antwortVon(neu)).toEqual([200, {}]);
+		await vi.waitFor(() => expect(s.mails).toHaveLength(3));
+		expect(s.mails.map((m) => m.an).sort()).toEqual([a.email, b.email, c.email].sort());
+		s.mails.length = 0;
+		const [aktiv] = await db
+			.select({ id: anmeldung.id })
+			.from(anmeldung)
+			.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
+			.where(
+				and(
+					eq(anmeldung.kategorieId, kid),
+					eq(anmeldung.status, 'bestaetigt'),
+					eq(anmeldungSpieler.mitgliedId, c.mitgliedId)
+				)
+			);
+		const idNeu = { id: String(aktiv.id) };
+		const ohne = await postPartnerAendern(
+			s.d,
+			post(cm, { bleibtId: a.mitgliedId, neuId: null }, idNeu)
+		);
+		expect(await antwortVon(ohne)).toEqual([200, {}]);
+		await vi.waitFor(() => expect(s.mails).toHaveLength(2));
+	});
+
+	test('FR-46, FR-47: Anfrage als Paar anmelden oder löschen, Meldung an den Anfragenden', async () => {
+		const t = await cmTurnier([['Doppel A', DOPPEL_K]]);
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const kid = t.kategorien[0];
+		const a = await doppelSpieler('Anna');
+		const b = await doppelSpieler('Berta');
+		const c = await doppelSpieler('Clara');
+		const [x] = await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: kid, vonId: a.mitgliedId, anId: b.mitgliedId, gestelltAm: t.jetzt })
+			.returning({ id: partnerAnfrage.id });
+		const [y] = await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: kid, vonId: c.mitgliedId, anId: b.mitgliedId, gestelltAm: t.jetzt })
+			.returning({ id: partnerAnfrage.id });
+
+		const weg = await postAnfrageLoeschen(s.d, post(cm, {}, { id: String(y.id) }));
+		expect(await antwortVon(weg)).toEqual([200, {}]);
+		await vi.waitFor(() => expect(s.mails).toHaveLength(1));
+		expect(mailsAn(s)).toEqual([
+			[c.email, `Deine Anfrage an ${b.name} für «Doppel A» ist hinfällig.`]
+		]);
+		expect((await postAnfrageLoeschen(s.d, post(cm, {}, { id: String(y.id) }))).status).toBe(404);
+		expect((await postAnfrageLoeschen(s.d, post(cm, {}, { id: 'x' }))).status).toBe(404);
+		s.mails.length = 0;
+
+		const bad = await postAnfrageAlsPaar(s.d, post(cm, { trotzdem: 'ja' }, { id: String(x.id) }));
+		expect(await antwortVon(bad)).toEqual([400, { fehler: 'eingabe' }]);
+		const paar = await postAnfrageAlsPaar(s.d, post(cm, {}, { id: String(x.id) }));
+		expect(await antwortVon(paar)).toEqual([200, {}]);
+		await vi.waitFor(() => expect(s.mails.length).toBeGreaterThanOrEqual(2));
+		expect(s.mails.map((m) => m.an).sort()).toEqual([a.email, b.email].sort());
+		expect((await postAnfrageAlsPaar(s.d, post(cm, {}, { id: String(x.id) }))).status).toBe(404);
+	});
+
+	test('FR-46, FR-47: verschieben und löschen gehen bei Doppel über die Doppel-Logik', async () => {
+		const t = await cmTurnier([
+			['Doppel A', DOPPEL_K],
+			['Doppel B', DOPPEL_K]
+		]);
+		const [ka, kb] = t.kategorien;
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const a = await doppelSpieler('Anna');
+		const b = await doppelSpieler('Berta');
+		const ok = await postDoppelVonHand(
+			s.d,
+			post(cm, { mitgliedIds: [a.mitgliedId, b.mitgliedId] }, { id: String(ka) })
+		);
+		expect(ok.status).toBe(200);
+		await vi.waitFor(() => expect(s.mails).toHaveLength(2));
+		s.mails.length = 0;
+		const id = { id: String(await anmeldungIn(ka, a.mitgliedId)) };
+
+		const weiter = await postVerschieben(s.d, post(cm, { kategorieId: kb }, id));
+		expect(await antwortVon(weiter)).toEqual([200, {}]);
+		expect((await statusVon(Number(id.id))).kategorieId).toBe(kb);
+		await vi.waitFor(() => expect(s.mails).toHaveLength(2));
+		expect(s.mails.map((m) => m.an).sort()).toEqual([a.email, b.email].sort());
+		s.mails.length = 0;
+
+		const loeschen = await postAnmeldungLoeschen(s.d, post(cm, {}, id));
+		expect(await antwortVon(loeschen)).toEqual([200, {}]);
+		expect((await statusVon(Number(id.id))).status).toBe('zurueckgezogen');
+		await vi.waitFor(() => expect(s.mails).toHaveLength(2));
+		expect(mailsAn(s)[0][1]).toBe('Der CM-Admin hat eure Anmeldung für «Doppel B» gelöscht.');
+		expect((await postAnmeldungLoeschen(s.d, post(cm, {}, id))).status).toBe(404);
+		const fremd = await postVerschieben(s.d, post(cm, { kategorieId: ka }, { id: '999999999' }));
+		expect(fremd.status).toBe(404);
+	});
+
+	test('FR-35, FR-36: offene Anfragen mit Meldung gelöscht, beim Absagen und beim Wechsel der Art', async () => {
+		const t = await cmTurnier([
+			['Doppel A', DOPPEL_K],
+			['Doppel B', DOPPEL_K]
+		]);
+		const [ka, kb] = t.kategorien;
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const a = await doppelSpieler('Anna');
+		const b = await doppelSpieler('Berta');
+		for (const k of [ka, kb]) {
+			await db
+				.insert(partnerAnfrage)
+				.values({ kategorieId: k, vonId: a.mitgliedId, anId: b.mitgliedId, gestelltAm: t.jetzt });
+		}
+
+		const absage = await postKategorieAbsagen(s.d, post(cm, {}, { id: String(ka) }));
+		expect(await antwortVon(absage)).toEqual([200, {}]);
+		await vi.waitFor(() => expect(s.mails).toHaveLength(1));
+		expect(mailsAn(s)).toEqual([
+			[a.email, `Deine Anfrage an ${b.name} für «Doppel A» ist hinfällig.`]
+		]);
+		s.mails.length = 0;
+
+		const wechsel = await postKategorie(
+			s.d,
+			post(cm, { ...EINZEL, name: 'Einzel neu' }, { id: String(kb) })
+		);
+		expect(await antwortVon(wechsel)).toEqual([200, {}]);
+		await vi.waitFor(() => expect(s.mails).toHaveLength(1));
+		expect(mailsAn(s)).toEqual([
+			[a.email, `Deine Anfrage an ${b.name} für «Doppel B» ist hinfällig.`]
+		]);
+		const rest = await db
+			.select()
+			.from(partnerAnfrage)
+			.where(eq(partnerAnfrage.vonId, a.mitgliedId));
+		expect(rest).toEqual([]);
+		// Ohne offene Anfragen kommt keine Meldung.
+		s.mails.length = 0;
+		const nochmal = await postKategorie(
+			s.d,
+			post(cm, { ...EINZEL, name: 'Einzel neu 2' }, { id: String(kb) })
+		);
+		expect(nochmal.status).toBe(200);
 		expect(s.mails).toEqual([]);
 	});
 });

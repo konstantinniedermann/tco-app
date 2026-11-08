@@ -18,9 +18,11 @@
 		ladeAngaben,
 		mitAenderung,
 		speichereAngaben,
+		speichereRufname,
 		type EigeneAngaben,
 		type EigenesFeld
 	} from '../../lib/profil/angaben.ts';
+	import { pruefeRufname } from '../../lib/name.ts';
 	import { vergissWechsel } from '../../lib/profil/wechselanfrage.ts';
 	import Benachrichtigungen from '../../lib/push/Benachrichtigungen.svelte';
 	import {
@@ -29,6 +31,7 @@
 		type Klassierung
 	} from '../../lib/turnier/klassierung.ts';
 	import { feldMeldung } from '../../lib/verwaltung/anzeige.ts';
+	import Name from '../../lib/ui/Name.svelte';
 	import { istKlappeOffen, merkeKlappe } from '../../lib/ui/klappe.ts';
 	import type { FullAutoFill } from 'svelte/elements';
 	import type { PageProps } from './$types';
@@ -42,7 +45,8 @@
 	// Annahme K-19.1: Telefon und Lizenznummer, Annahme K-19.2: Adresse ändert das Mitglied selbst.
 	type Angabe = 'telefon' | 'adresse' | 'lizenznummer';
 	// FR-37: Die Klassierung hat eine eigene Schnittstelle und eine Auswahl statt eines Textfelds.
-	type Offen = Angabe | 'klassierung';
+	// Der Rufname hat ebenfalls eine eigene Schnittstelle (Issue #67).
+	type Offen = Angabe | 'klassierung' | 'rufname';
 	const FELDER: Record<Angabe, EigenesFeld[]> = {
 		telefon: ['telefon'],
 		adresse: ['strasse', 'plz', 'ort'],
@@ -76,8 +80,10 @@
 	// `load` neu (neues `data`), gilt wieder dessen Stand.
 	let angaben = $derived<EigeneAngaben | null>(data.angaben);
 	let klassierung = $derived<Klassierung | null>(data.klassierung);
+	let rufname = $derived<string | null>(data.rufname);
 	let offen = $state<Offen | null>(null);
 	let klassierungWahl = $state<Klassierung | ''>('');
+	let rufnameWert = $state('');
 	let werte = $state<Record<EigenesFeld, string>>({
 		telefon: '',
 		strasse: '',
@@ -87,6 +93,7 @@
 	});
 	let feldFehler = $state<Partial<Record<EigenesFeld, string>>>({});
 	let klassierungFehler = $state<string | null>(null);
+	let rufnameFehler = $state<string | null>(null);
 	// Betrifft die ganze Angabe (Störung, Altdaten): unter dem Formular.
 	let formularFehler = $state<string | null>(null);
 	// «veraltet»: steht nach dem Neuladen unter der Angabe, deren «Ändern» den Fokus bekommt.
@@ -97,7 +104,9 @@
 	const geaendert = $derived(
 		offen === 'klassierung'
 			? klassierungWahl !== (klassierung ?? '')
-			: offen !== null &&
+			: offen === 'rufname'
+				? rufnameWert.trim() !== (rufname ?? '')
+				: offen !== null &&
 					angaben !== null &&
 					FELDER[offen].some((f) => werte[f] !== (angaben?.[f] ?? ''))
 	);
@@ -107,12 +116,13 @@
 	let emailHinweis = $state(true);
 	let angabenTitel: HTMLElement | undefined;
 
-	const personText = $derived.by(() => {
+	// Hinter dem Namen (Baustein Name) stehen Jahrgang und Mitgliedernummer als Text.
+	const personRest = $derived.by(() => {
 		if (!angaben) return '';
-		const teile = [`${angaben.vorname} ${angaben.nachname}`];
+		const teile: string[] = [];
 		if (angaben.jahrgang !== null) teile.push(`Jahrgang ${angaben.jahrgang}`);
 		if (angaben.mitgliedernummer) teile.push(`Mitgliedernummer ${angaben.mitgliedernummer}`);
-		return teile.join(' · ');
+		return teile.map((t) => ` · ${t}`).join('');
 	});
 
 	async function oeffne(a: Angabe) {
@@ -143,11 +153,23 @@
 		formular?.querySelector('select')?.focus();
 	}
 
+	async function oeffneRufname() {
+		offen = 'rufname';
+		rufnameWert = rufname ?? '';
+		rufnameFehler = null;
+		feldFehler = {};
+		formularFehler = null;
+		veraltetBei = null;
+		await tick();
+		formular?.querySelector('input')?.focus();
+	}
+
 	async function schliesse() {
 		const a = offen;
 		offen = null;
 		feldFehler = {};
 		klassierungFehler = null;
+		rufnameFehler = null;
 		formularFehler = null;
 		await tick();
 		if (a) aendernKnoepfe[a]?.focus();
@@ -172,10 +194,36 @@
 		speichert = false;
 	}
 
+	async function rufnameSpeichern(event: SubmitEvent) {
+		event.preventDefault();
+		if (speichert) return;
+		rufnameFehler = null;
+		formularFehler = null;
+		// Zuerst im Browser prüfen (Grapheme statt `maxlength`); die Meldung kommt aus derselben Prüfung.
+		const pruefung = pruefeRufname(rufnameWert);
+		if (!pruefung.ok) {
+			rufnameFehler = pruefung.fehler;
+			await tick();
+			formular?.querySelector('input')?.focus();
+			return;
+		}
+		speichert = true;
+		const r = await speichereRufname(rufnameWert);
+		if (r.ergebnis === 'ok') {
+			rufname = r.rufname;
+			await schliesse();
+		} else if (r.ergebnis === 'eingabe') {
+			rufnameFehler = r.fehler;
+			await tick();
+			formular?.querySelector('input')?.focus();
+		} else formularFehler = MELDUNG.stoerung;
+		speichert = false;
+	}
+
 	async function speichern(event: SubmitEvent) {
 		event.preventDefault();
 		const a = offen;
-		if (!a || a === 'klassierung' || !angaben || speichert) return;
+		if (!a || a === 'klassierung' || a === 'rufname' || !angaben || speichert) return;
 		speichert = true;
 		feldFehler = {};
 		formularFehler = null;
@@ -340,6 +388,43 @@
 					<a class="taste-neben" href={resolve('/profil/email')}>Ändern</a>
 				{/if}
 			</div>
+			{#if offen === 'rufname'}
+				<form
+					bind:this={formular}
+					onsubmit={rufnameSpeichern}
+					novalidate
+					data-ungespeichert={geaendert ? '' : undefined}
+				>
+					<div class="feld">
+						<label for="angabe-rufname">Rufname (freiwillig)</label>
+						<input
+							id="angabe-rufname"
+							bind:value={rufnameWert}
+							type="text"
+							autocomplete="off"
+							aria-invalid={rufnameFehler ? 'true' : undefined}
+							aria-describedby={rufnameFehler
+								? 'angabe-hilfe-rufname angabe-fehler-rufname'
+								: 'angabe-hilfe-rufname'}
+						/>
+						{#if rufnameFehler}
+							<p class="fehler" id="angabe-fehler-rufname">{rufnameFehler}</p>
+						{/if}
+					</div>
+					<p class="leise" id="angabe-hilfe-rufname">
+						Freiwillig. Unter diesem Namen sehen dich die anderen im Club.
+					</p>
+					<div class="leiste">
+						<button type="submit" class="taste-haupt">Rufname speichern</button>
+						<button type="button" class="taste-neben" onclick={schliesse}>Abbrechen</button>
+					</div>
+					{#if formularFehler}
+						<p class="fehler" role="alert">{formularFehler}</p>
+					{/if}
+				</form>
+			{:else}
+				{@render anzeige('rufname', 'Rufname', rufname, true, 'nicht angegeben', oeffneRufname)}
+			{/if}
 			{@render angabe('telefon', 'Telefon', angaben.telefon, false)}
 			{@render angabe(
 				'adresse',
@@ -391,9 +476,13 @@
 					oeffneKlassierung
 				)}
 			{/if}
+			<p>
+				<Name name={{ rufname, vorname: angaben.vorname, nachname: angaben.nachname }} /><span
+					class="leise">{personRest}</span
+				>
+			</p>
 			<p class="leise">
-				{personText}<br />Name, Jahrgang und Nummer ändert die Mitgliederverwaltung. Stimmt etwas
-				nicht?
+				Name, Jahrgang und Nummer ändert die Mitgliederverwaltung. Stimmt etwas nicht?
 				{#if data.kontakt}Schreib an {data.kontakt}.{:else}Den Kontakt findest du in deinem Brief.{/if}
 			</p>
 		{/if}
@@ -438,7 +527,7 @@
 			{/if}
 		</form>
 	{:else}
-		{@render anzeige(a, titelText, wert, freiwillig, 'nicht erfasst', () => oeffne(a))}
+		{@render anzeige(a, titelText, wert, freiwillig, 'nicht angegeben', () => oeffne(a))}
 	{/if}
 {/snippet}
 

@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { goto, refreshAll } from '$app/navigation';
+	import Pfad from '../../../../../../lib/verwaltung/Pfad.svelte';
 	import { resolve } from '$app/paths';
 	import Anmeldungsliste from '../../../../../../lib/verwaltung/Anmeldungsliste.svelte';
+	import DoppelListe from '../../../../../../lib/verwaltung/DoppelListe.svelte';
 	import Kategorieformular, {
 		anfrage,
 		werteAusKategorie,
@@ -17,6 +19,7 @@
 	import { fehlerText } from '../../../../../../lib/verwaltung/anzeige.ts';
 	import {
 		absageSperreText,
+		ART_GESPERRT,
 		unpassendText
 	} from '../../../../../../lib/verwaltung/turnier-anzeige.ts';
 	import { leiteUm } from '../../../../../../lib/verwaltung/umleiten.ts';
@@ -70,6 +73,8 @@
 			fehler = a.felder;
 		} else if (a.art === 'vergeben') {
 			fehler = { name: 'Eine Kategorie mit diesem Namen gibt es in diesem Turnier schon.' };
+		} else if (a.art === 'art-gesperrt') {
+			fehler = { art: ART_GESPERRT };
 		} else if (a.art === 'abgesagt') {
 			await neuLaden();
 		} else if (a.art === 'nicht-gefunden') {
@@ -105,9 +110,16 @@
 	<title>{kategorie.name} – MyTCO</title>
 </svelte:head>
 
-<a class="zurueck" href={resolve('/verwaltung/turniere/[id]', { id: String(kategorie.turnierId) })}
-	>‹ {kategorie.turniername}</a
->
+<Pfad
+	stufen={[
+		{ text: 'Turniere', href: resolve('/verwaltung/turniere') },
+		{
+			text: kategorie.turniername,
+			href: resolve('/verwaltung/turniere/[id]', { id: String(kategorie.turnierId) })
+		}
+	]}
+	aktuell={kategorie.name}
+/>
 <h1>{kategorie.name}</h1>
 
 {#if kategorie.status === 'abgesagt'}
@@ -141,10 +153,7 @@
 			{nurLesen}
 		/>
 	{:else}
-		<h2>Anmeldungen</h2>
-		<div class="karte">
-			<p>Doppel verwalten kommt später.</p>
-		</div>
+		<DoppelListe kategorieId={kategorie.id} liste={data.doppel} turnier={data.turnier} {nurLesen} />
 	{/if}
 
 	{#if !nurLesen}
@@ -174,7 +183,13 @@
 			</div>
 		</dialog>
 
-		<dialog class="karte" bind:this={warnung} aria-labelledby="warnung-titel">
+		<!-- Abbrechen (oder Esc) verwirft die zurückgehaltenen Werte, wie auf der CM-Seite. -->
+		<dialog
+			class="karte"
+			bind:this={warnung}
+			aria-labelledby="warnung-titel"
+			onclose={() => (ausstehend = null)}
+		>
 			<h2 id="warnung-titel">Anmeldungen passen nicht mehr</h2>
 			<p>{unpassendText(unpassend)}</p>
 			<div class="leiste">

@@ -112,6 +112,15 @@ Jede Etappe endet grün (`make check`), mit Nachweis und einem Merge nach `dev`.
 
 Die Etappe 1 kommt zuerst, weil alle anderen Rechte, Verlauf und Verwaltungsrahmen brauchen.
 
+**Etappe 2 geteilt (Projektleiter, 08.11.2026):** zuerst **2a Briefe** (einzelner Brief auf der
+Seite eines Mitglieds, Seite *Briefe* mit Serie, Druckansicht), weil der Pilot sie braucht; der
+«neue Brief-Code» aus Etappe 1 kommt mit 2a. Danach **2b Einlesen**, nötig erst für die
+300–500 Mitglieder zu 1.0. Nachweis 2a: DB-Test Ausstellen und Verlauf, E2E Serie → Druckansicht,
+Screenshot der Druckansicht; 2b wie oben. Mit den [geschärften Rollen](2026-11-06-rollen-schaerfen-design.md)
+gilt: Briefe und Einlesen schreibt der Mitglieder-Admin (Bereich `mitglieder`), der
+MyTCO-Admin sieht die Seiten nur lesend und stellt keine Codes aus. **Stand:** Etappen 2a und 2b
+sind umgesetzt (Plan 2b: `docs/superpowers/plans/2026-11-08-admin-etappe-2b-einlesen.md`).
+
 ## Rollen und Admin-Zugang
 
 - **Rollen** als eigene Tabelle (Konto ↔ Rolle, mehrere je Konto, RR-01). Bekannte Rollen
@@ -155,7 +164,11 @@ Die Etappe 1 kommt zuerst, weil alle anderen Rechte, Verlauf und Verwaltungsrahm
   Kopfzeile erkannt), Felder mit Anführungszeichen nach RFC 4180. Erste Zeile sind die
   Spaltennamen, die Reihenfolge ist frei. Unbekannte Spalten sind ein Fehler der ganzen Datei,
   damit nichts Ungeplantes übernommen wird (*Welche Daten*).
-- **Grenzen:** höchstens 1 MB und 2000 Zeilen.
+- **Grenzen:** höchstens 400 KB und 2000 Zeilen (Projektleiter, 08.11.2026: unter der Grenze
+  des Servers von 512 KB je Anfrage, die damit für alle Schnittstellen bleibt; 500 Mitglieder
+  ergeben etwa 75 KB).
+- **Vorlage:** Die Seite *Einlesen* bietet eine Vorlage zum Herunterladen an (CSV nur mit der
+  Kopfzeile, ohne Daten) und zeigt die Spalten mit ihren Regeln (Projektleiter, 08.11.2026).
 - **Spalten:**
 
 | Spalte | Pflicht | Form |
@@ -181,9 +194,14 @@ Die Etappe 1 kommt zuerst, weil alle anderen Rechte, Verlauf und Verwaltungsrahm
 - **Keine Aufbewahrung:** Die Datei wird nur im Arbeitsspeicher gelesen, nie gespeichert und
   nie geloggt.
 - **Übertragung:** Der Browser liest die Datei und schickt ihren Text im JSON-Körper, weil
-  ändernde Anfragen nur JSON annehmen (SI-10). Die Grösse der Anfrage muss dafür über die
-  heutige Grenze des Servers (512 KB) auf gut 1 MB steigen, nur für diese Schnittstelle oder
-  mit kleinster nötiger Erhöhung.
+  ändernde Anfragen nur JSON annehmen (SI-10). Mit der Grenze von 400 KB passt die Datei samt
+  JSON-Hülle unter die Grenze des Servers; die Oberfläche prüft die Grösse schon vor dem
+  Schicken, der Server prüft sie erneut.
+- **Rechte:** Hochladen, Vorschau und Übernahme nur für den Mitglieder-Admin (Bereich
+  `mitglieder`, schreiben). Der MyTCO-Admin sieht die Seite mit Beschreibung und Vorlage, aber
+  ohne Hochladen ([Rollen schärfen](2026-11-06-rollen-schaerfen-design.md)).
+- **Nach der Übernahme:** ein Link auf die Seite *Briefe*, wo die Neuen schon in der Liste
+  stehen.
 
 ## Briefe
 
@@ -191,8 +209,9 @@ Die Etappe 1 kommt zuerst, weil alle anderen Rechte, Verlauf und Verwaltungsrahm
   nie eingeloggt), mit Angabe, ob schon ein Brief-Code ausgestellt ist, und Auswahl (alle oder
   einzelne). So erhalten auch Nachzügler einen zweiten Brief; der neue Code ersetzt den alten
   (Entscheid Projektleiter, 06.11.2026). «Briefe erzeugen» stellt für die
-  Auswahl je einen Brief-Code aus (bestehende Funktion `stelleBriefCodeAus`, FR-24) und
-  öffnet eine Druckansicht mit einer Seite je Brief aus `baueBriefHtml`.
+  Auswahl je einen Brief-Code aus (`stelleBriefCodeAusIn` in `stelleBriefeAus`, eine
+  Transaktion für alle, FR-24) und öffnet eine Druckansicht mit einer Seite je Brief aus
+  `baueBriefInhalt`.
 - **Einzelner Brief:** «Neuen Brief-Code ausstellen» auf der Seite eines Mitglieds öffnet
   dieselbe Druckansicht für ein Mitglied.
 - **Code nur einmal sichtbar:** Die Druckansicht entsteht aus der Antwort des Servers und
@@ -201,8 +220,9 @@ Die Etappe 1 kommt zuerst, weil alle anderen Rechte, Verlauf und Verwaltungsrahm
 - **Verlauf:** je Mitglied «Brief-Code ausgestellt».
 - **Sicherheitsregeln des Browsers:** `baueBriefHtml` liefert heute ein eigenes Dokument mit
   eingebettetem `<style>`, das die Content-Security-Policy der App blockt. Der Brief wird für
-  die Druckansicht umgebaut (Stil aus einer Datei bzw. aus `basis.css`), ohne Ausnahme in der
-  Policy. Der Musterbrief (`make musterbrief`) muss weiter gleich aussehen.
+  die Druckansicht umgebaut: `baueBriefInhalt` liefert nur den Inhalt, den Stil bringt
+  `brief.css`, ohne Ausnahme in der Policy. `baueBriefHtml` bleibt für den Musterbrief
+  (`make musterbrief`), der weiter gleich aussieht.
 
 ## Austritt und Löschen
 

@@ -2,22 +2,24 @@
 // Konto bekommt nichts. Mitglieder ohne Konto (noch nie angemeldet) bekommen sie nur per Mail;
 // für sie gelten die Themen wie für neue Konten als an (FR-41). Wer das Thema abgeschaltet hat,
 // fällt weg, für Push und Mail.
-import { and, asc, eq, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNull, or, type SQL } from 'drizzle-orm';
+import type { Namensteile } from '../../name.ts';
 import type { AnlassAuswahl } from '../../mitteilung/auswahl.ts';
 import { istOffen, zuPruefen } from '../anlass/anlaesse.ts';
 import type { Db } from '../db/index.ts';
+import { namensSpalten } from '../namen.ts';
 import { anlass, anlassAnmeldung, konto, mitglied, pushAbo } from '../db/schema.ts';
 
 export type Empfaenger = {
 	mitgliedId: number;
-	name: string;
+	name: Namensteile;
 	email: string | null;
 	abos: { endpunkt: string; p256dh: string; auth: string }[];
 };
 
 const GRUNDFELDER = {
 	mitgliedId: mitglied.id,
-	name: sql<string>`${mitglied.nachname} || ', ' || ${mitglied.vorname}`,
+	name: namensSpalten,
 	email: mitglied.email,
 	kontoId: konto.id
 };
@@ -31,7 +33,7 @@ const REIHENFOLGE = [asc(mitglied.nachname), asc(mitglied.vorname), asc(mitglied
 
 type Grundzeile = {
 	mitgliedId: number;
-	name: string;
+	name: Namensteile;
 	email: string | null;
 	kontoId: number | null;
 };

@@ -92,6 +92,11 @@ function baue(teil: { push?: PushSender | null; mailer?: Mailer } = {}) {
 		db: db(),
 		zugang,
 		hinweis: async () => {},
+		brief: {
+			schluessel: 'y'.repeat(40),
+			adresse: 'https://mytco.example.org',
+			kontakt: 'kontakt@example.org'
+		},
 		jetzt: () => JETZT,
 		push:
 			teil.push === undefined
@@ -118,7 +123,7 @@ async function einloggen(kontoId: number): Promise<AngemeldetesKonto & { kennung
 async function bestaetigt(
 	s: ReturnType<typeof baue>,
 	rollen: string[],
-	name: { vorname?: string; nachname?: string } = {}
+	name: { vorname?: string; rufname?: string; nachname?: string } = {}
 ) {
 	const m = await legeMitgliedAn(db(), { ...name, rollen });
 	const konto = await einloggen(m.kontoId);
@@ -158,7 +163,7 @@ async function neuerAnlass(von: number) {
 async function mitAntwort(
 	anlassId: number,
 	antwort: 'kommt' | 'kommt-nicht',
-	name: { vorname?: string; nachname?: string } = {}
+	name: { vorname?: string; rufname?: string; nachname?: string } = {}
 ) {
 	const m = await legeMitgliedAn(db(), name);
 	expect(await melde(db(), anlassId, m.mitgliedId, { antwort, bemerkung: null }, JETZT)).toBe('ok');
@@ -175,7 +180,11 @@ const anzahlEintraege = async () => (await db().select({ n: count() }).from(mitt
 describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 	test('FR-42: Mitglieder-Admin sendet, Verlauf zeigt den Eintrag ohne Namen', async () => {
 		const s = baue();
-		const admin = await bestaetigt(s, ['mitglieder'], { vorname: 'Ada', nachname: 'Absender' });
+		const admin = await bestaetigt(s, ['mitglieder'], {
+			vorname: 'Adelheid',
+			rufname: 'Ada',
+			nachname: 'Absender'
+		});
 		const { id, w } = await neuerAnlass(admin.mitgliedId);
 		const mitPush = await mitAntwort(id, 'kommt', { nachname: 'Pushwerth' });
 		const ohnePush = await mitAntwort(id, 'kommt', { nachname: 'Mailinger' });
@@ -210,7 +219,7 @@ describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 			verlauf: [
 				{
 					gesendetAm: JETZT.toISOString(),
-					absender: 'Absender, Ada',
+					absender: { rufname: 'Ada', vorname: 'Adelheid', nachname: 'Absender' },
 					titel: NACHRICHT.titel,
 					text: NACHRICHT.text,
 					auswahl: 'kommt',
@@ -250,7 +259,11 @@ describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 		const v = await (await getVereinMitteilungen(s.d, hole(admin.konto))).json();
 		expect(v.vorlagen).toEqual([]);
 		expect(v.verlauf).toHaveLength(1);
-		expect(v.verlauf[0]).toMatchObject({ absender: 'Vorstand, Vera', auswahl: 'alle', ...z });
+		expect(v.verlauf[0]).toMatchObject({
+			absender: { rufname: null, vorname: 'Vera', nachname: 'Vorstand' },
+			auswahl: 'alle',
+			...z
+		});
 		// Beim Verein gibt es nur «alle».
 		const falsch = await postVereinSenden(
 			s.d,
@@ -467,7 +480,7 @@ describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 		const admin = await bestaetigt(s, ['mitglieder']);
 		const { id } = await neuerAnlass(admin.mitgliedId);
 		const zwahlen = await mitAntwort(id, 'kommt', { vorname: 'Anna', nachname: 'Zwahlen' });
-		await mitAntwort(id, 'kommt', { vorname: 'Beat', nachname: 'Abt' });
+		await mitAntwort(id, 'kommt', { vorname: 'Bernhard', rufname: 'Beat', nachname: 'Abt' });
 		await mitAntwort(id, 'kommt', { vorname: 'Cleo', nachname: 'Meier' });
 		await mitAntwort(id, 'kommt-nicht', { vorname: 'Dora', nachname: 'Bern' });
 		await abo(zwahlen.kontoId);
@@ -482,7 +495,11 @@ describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 				push: 1,
 				mails: 2,
 				nichtErreichbar: 0,
-				namen: ['Abt, Beat', 'Meier, Cleo', 'Zwahlen, Anna']
+				namen: [
+					{ rufname: 'Beat', vorname: 'Bernhard', nachname: 'Abt' },
+					{ rufname: null, vorname: 'Cleo', nachname: 'Meier' },
+					{ rufname: null, vorname: 'Anna', nachname: 'Zwahlen' }
+				]
 			}
 		]);
 		// Ohne VAPID zählt jeder als ohne Push.

@@ -388,8 +388,12 @@ describe('Mail-Code', () => {
 		const { code: brief } = await d.dienst.stelleBriefCodeAus(ausgetreten.kontoId);
 		await fordereAn(d, vorgemerkt.email, 'ip-r5-1');
 		const mailCode = codeAus(d.post[0]);
-		expect(await erfasseAustritt(db, urheber, ausgetreten.mitgliedId, start)).toBe('ok');
-		expect(await merkeZumLoeschenVor(db, urheber, vorgemerkt.mitgliedId, start)).toBe('ok');
+		expect(await erfasseAustritt(db, urheber, ausgetreten.mitgliedId, start)).toMatchObject({
+			ergebnis: 'ok'
+		});
+		expect(await merkeZumLoeschenVor(db, urheber, vorgemerkt.mitgliedId, start)).toMatchObject({
+			ergebnis: 'ok'
+		});
 		d.post.length = 0;
 
 		const unbekannt = d.dienst.fordereMailCodeAn('niemand-r5@example.org', 'ip-r5-2');

@@ -1,6 +1,7 @@
 import { eq, sql, type SQL } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { konto, mitglied } from '../db/schema.ts';
+import { jahrInZuerich } from '../datum.ts';
 import { pruefeAngaben, type Feld } from './angaben.ts';
 import { legeMitgliedAn } from './mitglieder.ts';
 import { ladeRollen, setzeRollen, type Rolle } from './rollen.ts';
@@ -18,7 +19,23 @@ export async function machAdmin(db: Db, kontoId: number, jetzt: Date): Promise<v
 	const rollen = await ladeRollen(db, kontoId);
 	const fehlend = ERSTER_ADMIN.filter((r) => !rollen.includes(r));
 	if (fehlend.length === 0) return;
-	await setzeRollen(db, { art: 'automatisch' }, kontoId, [...rollen, ...fehlend], rollen, jetzt);
+	const r = await setzeRollen(
+		db,
+		{ art: 'automatisch' },
+		kontoId,
+		[...rollen, ...fehlend],
+		rollen,
+		jetzt
+	);
+	// Das Skript bricht ab statt still weiterzulaufen. `letzter-mytco` kann nicht kommen: nichts wird entzogen.
+	if (r === 'nicht-gefunden') {
+		throw new Error(`machAdmin: Konto ${kontoId} nicht gefunden, keine Rolle vergeben`);
+	}
+	if (r !== 'ok') {
+		throw new Error(
+			`machAdmin: Rollen von Konto ${kontoId} inzwischen geändert, keine Rolle vergeben`
+		);
+	}
 }
 
 type Treffer = { id: number; email: string | null; mitgliedernummer: string | null };
@@ -79,7 +96,7 @@ export async function legeAdminFest(
 	roh: Record<string, string | undefined>,
 	jetzt: Date
 ): Promise<AdminFestgelegt> {
-	const pruefung = pruefeAngaben(roh, { nummerPflicht: true, jahr: jetzt.getFullYear() });
+	const pruefung = pruefeAngaben(roh, { nummerPflicht: true, jahr: jahrInZuerich(jetzt) });
 	if (!pruefung.ok) return { ergebnis: 'fehler', fehler: pruefung.fehler };
 	const { angaben } = pruefung;
 

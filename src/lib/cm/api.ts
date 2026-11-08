@@ -5,6 +5,7 @@ import type {
 	CmAnsicht as ServerCmAnsicht,
 	CmStand as ServerCmStand
 } from '../server/cm/anmeldungen.ts';
+import type { PartnerTreffer as ServerPartnerTreffer } from '../server/cm/doppel.ts';
 import type { Klassierung } from '../turnier/klassierung.ts';
 import type { CmAngabe } from '../turnier/passung.ts';
 import type { Holen, Json } from '../verwaltung/api.ts';
@@ -12,20 +13,35 @@ import type { Holen, Json } from '../verwaltung/api.ts';
 export type CmStand = Json<ServerCmStand>;
 export type CmAnsicht = Json<ServerCmAnsicht>;
 export type CmKategorie = CmAnsicht['kategorien'][number];
+export type CmAnfrage = CmAnsicht['anfragen'][number];
+export type PartnerTreffer = Json<ServerPartnerTreffer>;
 
-/** Gründe, aus denen der Server eine Anmeldung ablehnt (409). */
+/**
+ * A-ANMELDUNG-04: die Doppel-Kategorie, für die die Anmelde-Seite gilt: Anmeldung offen, alle
+ * Angaben da und noch ohne Partner (allein suchen darf man schon). Sonst `null`.
+ */
+export function doppelZurWahl(cm: CmAnsicht, kategorieId: number): CmKategorie | null {
+	if (cm.turnier.status !== 'offen' || cm.fehlt.length > 0) return null;
+	const k = cm.kategorien.find((x) => x.id === kategorieId && x.art === 'doppel');
+	return k && k.eigen?.art !== 'paar' ? k : null;
+}
+
+/** Gründe, aus denen der Server eine Anmeldung oder Anfrage ablehnt (409). */
 const ABGELEHNT = [
 	'geschlossen',
 	'voll',
 	'passt-nicht',
 	'schon-angemeldet',
+	'schon-angefragt',
+	'anfrage-offen',
+	'hinfaellig',
 	'angaben-fehlen',
 	'keine-wildcard'
 ] as const;
 type Abgelehnt = (typeof ABGELEHNT)[number];
 
 /** Felder, die der Server bei 400 melden kann. */
-export type CmFelder = Partial<Record<CmAngabe | 'kommentar', string>>;
+export type CmFelder = Partial<Record<CmAngabe | 'kommentar' | 'suchtext', string>>;
 
 export type Ergebnis<T> =
 	| { art: 'ok'; daten: T }
@@ -70,8 +86,17 @@ export const sendeCmAngaben = (
 	holen: Holen = fetch
 ) => rufe<Record<string, never>>('/api/cm/angaben', jsonPost(angaben), holen);
 
-export const meldeAn = (kategorieId: number, holen: Holen = fetch) =>
-	rufe<CmAnsicht>(`/api/cm/kategorien/${kategorieId}/anmeldung`, jsonPost({}), holen);
+/** Anmelden; im Doppel allein, dann mit dem freiwilligen Kommentar *sucht Partner* (FR-49). */
+export const meldeAn = (
+	kategorieId: number,
+	suchtext: string | null = null,
+	holen: Holen = fetch
+) =>
+	rufe<CmAnsicht>(
+		`/api/cm/kategorien/${kategorieId}/anmeldung`,
+		jsonPost(suchtext === null ? {} : { suchtext }),
+		holen
+	);
 
 /** FR-08: Wildcard für eine stärkere Kategorie beantragen; der Kommentar ist Pflicht. */
 export const beantrageWildcard = (kategorieId: number, kommentar: string, holen: Holen = fetch) =>
@@ -83,3 +108,36 @@ export const meldeAb = (anmeldungId: number, holen: Holen = fetch) =>
 /** FR-37: Klassierung im Profil ändern. */
 export const speichereKlassierung = (klassierung: Klassierung | '', holen: Holen = fetch) =>
 	rufe<Record<string, never>>('/api/profil/klassierung', jsonPost({ klassierung }), holen);
+
+/** FR-48: Partner für ein Doppel suchen; `signal` bricht eine veraltete Suche ab. */
+export const sucheDoppelPartner = (
+	kategorieId: number,
+	suche: string,
+	holen: Holen = fetch,
+	signal?: AbortSignal
+) =>
+	rufe<PartnerTreffer[]>(
+		`/api/cm/kategorien/${kategorieId}/partner?suche=${encodeURIComponent(suche)}`,
+		{ method: 'GET', signal },
+		holen
+	);
+
+/** FR-48: einen Partner anfragen. */
+export const stelleAnfrage = (kategorieId: number, anId: number, holen: Holen = fetch) =>
+	rufe<CmAnsicht>(`/api/cm/kategorien/${kategorieId}/anfragen`, jsonPost({ anId }), holen);
+
+/** FR-48: eine Anfrage an einen selbst annehmen. */
+export const nimmAnfrageAn = (anfrageId: number, holen: Holen = fetch) =>
+	rufe<CmAnsicht>(`/api/cm/anfragen/${anfrageId}/annehmen`, jsonPost({}), holen);
+
+/** FR-48: eine Anfrage an einen selbst ablehnen. */
+export const lehneAnfrageAb = (anfrageId: number, holen: Holen = fetch) =>
+	rufe<CmAnsicht>(`/api/cm/anfragen/${anfrageId}/ablehnen`, jsonPost({}), holen);
+
+/** FR-48: eine eigene Anfrage zurückziehen. */
+export const zieheAnfrageZurueck = (anfrageId: number, holen: Holen = fetch) =>
+	rufe<CmAnsicht>(`/api/cm/anfragen/${anfrageId}/zurueckziehen`, jsonPost({}), holen);
+
+/** FR-49: Kommentar *sucht Partner* der eigenen Anmeldung ändern; leer löscht ihn. */
+export const setzeSuchtext = (anmeldungId: number, suchtext: string, holen: Holen = fetch) =>
+	rufe<CmAnsicht>(`/api/cm/anmeldungen/${anmeldungId}/suchtext`, jsonPost({ suchtext }), holen);

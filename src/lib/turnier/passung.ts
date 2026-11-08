@@ -1,6 +1,6 @@
-// Passung von Spieler und Einzel-Kategorie (FR-07). Läuft im Browser und auf dem Server.
+// Passung von Spieler und Kategorie, Einzel und Doppel (FR-07). Läuft in Browser und Server.
 import type { Art, Geschlecht } from '../server/db/schema.ts';
-import { BEREICH, istStufe, type Klassierung, type Stufe } from './klassierung.ts';
+import { BEREICH, istStufe, punkte, type Klassierung, type Stufe } from './klassierung.ts';
 
 export type Spieler = {
 	geschlecht: 'w' | 'm' | null;
@@ -15,6 +15,8 @@ export type KategorieRegel = {
 	jahrgangBis: number | null;
 	klassierungVon: string | null;
 	klassierungBis: string | null;
+	/** Nur Doppel: Summe der Punkte (`punkte`) beider Spieler muss mindestens so hoch sein. */
+	mindestsumme: number | null;
 };
 
 export type CmAngabe = 'klassierung' | 'geschlecht' | 'jahrgang';
@@ -67,4 +69,72 @@ export function warnungenEinzel(
 ): ('angaben-fehlen' | 'passt-nicht')[] {
 	if (fehlendeAngaben(s).length > 0) return ['angaben-fehlen'];
 	return passtEinzel(k, s) ? [] : ['passt-nicht'];
+}
+
+/** Doppel: was einem Spieler noch fehlt, damit ein Paar geprüft werden kann. */
+export type Vermerk = 'angaben-fehlen' | 'klassierung-fehlt';
+
+export function vermerk(s: Spieler): Vermerk | null {
+	if (s.geschlecht === null) return 'angaben-fehlen';
+	return s.klassierung === null ? 'klassierung-fehlt' : null;
+}
+
+/** Geschlechter des Paars passen zur Kategorie; `null` (nur bei der Suche) passt immer. */
+function geschlechtPaarPasst(k: KategorieRegel, a: 'w' | 'm', b: 'w' | 'm' | null): boolean {
+	switch (k.geschlecht) {
+		case 'herren':
+			return a === 'm' && (b === null || b === 'm');
+		case 'damen':
+			return a === 'w' && (b === null || b === 'w');
+		case 'mixed':
+			return b === null || a !== b;
+		default:
+			return true;
+	}
+}
+
+/** Im Doppel zählen nur Geschlecht und Klassierung, nie der Jahrgang. */
+function hatGeschlechtUndKlassierung(
+	s: Spieler
+): s is Spieler & { geschlecht: 'w' | 'm'; klassierung: Klassierung } {
+	return s.geschlecht !== null && s.klassierung !== null;
+}
+
+/** FR-07: passt der Spieler allein in diese Doppel-Kategorie? Der Jahrgang zählt im Doppel nicht. */
+export function passtDoppelAllein(k: KategorieRegel, s: Spieler): boolean {
+	if (k.art !== 'doppel' || !hatGeschlechtUndKlassierung(s)) return false;
+	return k.geschlecht === 'herren'
+		? s.geschlecht === 'm'
+		: k.geschlecht !== 'damen' || s.geschlecht === 'w';
+}
+
+/**
+ * FR-07: passt das Paar in diese Doppel-Kategorie? `streng = false` (Suche): `a` braucht
+ * Geschlecht und Klassierung, fehlende Angaben von `b` gelten als passend (ohne Klassierung entfällt die Summenprüfung).
+ * `streng = true` (Annehmen): beide brauchen Geschlecht und Klassierung. Kein Jahrgang.
+ */
+export function passtAlsPaar(k: KategorieRegel, a: Spieler, b: Spieler, streng: boolean): boolean {
+	if (k.art !== 'doppel' || k.mindestsumme === null || !hatGeschlechtUndKlassierung(a))
+		return false;
+	if (streng && !hatGeschlechtUndKlassierung(b)) return false;
+	if (!geschlechtPaarPasst(k, a.geschlecht, b.geschlecht)) return false;
+	if (b.klassierung === null) return true;
+	return punkte(a.klassierung) + punkte(b.klassierung) >= k.mindestsumme;
+}
+
+/**
+ * FR-46: Warnungen beim Anmelden eines Doppels von Hand (der CM-Admin darf trotzdem anmelden).
+ * `b === null`: allein, *sucht Partner*. Fehlen Geschlecht oder Klassierung, ist das die einzige
+ * Warnung; Grenze und Anmeldeschluss prüft der Server.
+ */
+export function warnungenDoppel(
+	k: KategorieRegel,
+	a: Spieler,
+	b: Spieler | null
+): ('angaben-fehlen' | 'passt-nicht')[] {
+	if (!hatGeschlechtUndKlassierung(a) || (b !== null && !hatGeschlechtUndKlassierung(b))) {
+		return ['angaben-fehlen'];
+	}
+	const passt = b === null ? passtDoppelAllein(k, a) : passtAlsPaar(k, a, b, true);
+	return passt ? [] : ['passt-nicht'];
 }

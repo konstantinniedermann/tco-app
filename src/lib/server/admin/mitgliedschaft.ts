@@ -2,7 +2,8 @@
 import { eq } from 'drizzle-orm';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
 import { loescheKommendeAntworten } from '../anlass/anlaesse.ts';
-import { zieheOffeneEinzelZurueck } from '../cm/austritt.ts';
+import { sperreMitglieder } from '../cm/anmeldungen.ts';
+import { doppelPartner, zieheOffeneZurueck, type Rueckzug } from '../cm/austritt.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, mitglied, pushAbo } from '../db/schema.ts';
 import { beendeAlleSitzungen } from '../login/sitzung.ts';
@@ -62,27 +63,42 @@ export function loeschtAm(m: {
 
 type Zeile = typeof mitglied.$inferSelect & { status: MitgliedStatus };
 
+const NOCHMALS = Symbol('nochmals');
+
 /**
  * Ein Übergang in einer Transaktion: erst die Rollen-Sperre (gleiche Reihenfolge wie
  * `setzeRollen`, keine Verklemmung), dann die Mitglied-Zeile `for update`. Passt ihr Status
  * nicht zu `von`, hat inzwischen ein anderer geändert: `veraltet`, nichts geändert.
+ *
+ * `mitsperren` nennt weitere Mitglieder (die Doppelpartner beim Austritt). Sie werden mit dem
+ * Mitglied aufsteigend nach ID gesperrt (`sperreMitglieder`), wie es jeder Weg der CM tut, der
+ * zwei Mitglieder braucht: So verklemmt sich der Übergang nicht mit einem Abmelden oder Annehmen.
+ * Gelesen werden sie vor dem Sperren; kam inzwischen einer dazu, beginnt die Transaktion neu.
  */
-async function uebergang<E extends string>(
+async function uebergang<R>(
 	db: Db,
 	id: number,
 	von: readonly MitgliedStatus[],
-	schritt: (tx: DbOderTx, m: Zeile, kontoId: number) => Promise<'ok' | E>
-): Promise<'ok' | 'nicht-gefunden' | 'veraltet' | E> {
-	return db.transaction(async (tx) => {
-		await sperreRollen(tx);
-		const [m] = await tx.select().from(mitglied).where(eq(mitglied.id, id)).for('update');
-		if (!m) return 'nicht-gefunden' as const;
-		const zeile = m as Zeile;
-		if (!von.includes(zeile.status)) return 'veraltet' as const;
-		const [k] = await tx.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, id));
-		if (!k) return 'nicht-gefunden' as const;
-		return schritt(tx, zeile, k.id);
-	});
+	schritt: (tx: DbOderTx, m: Zeile, kontoId: number) => Promise<R>,
+	mitsperren: (tx: DbOderTx, id: number) => Promise<number[]> = async () => []
+): Promise<R | 'nicht-gefunden' | 'veraltet'> {
+	for (;;) {
+		const r = await db.transaction(async (tx) => {
+			await sperreRollen(tx);
+			const vorher = await mitsperren(tx, id);
+			await sperreMitglieder(tx, [id, ...vorher]);
+			if ((await mitsperren(tx, id)).join() !== vorher.join()) return NOCHMALS;
+			// Die Zeile ist schon gesperrt; hier mit allen Spalten.
+			const [m] = await tx.select().from(mitglied).where(eq(mitglied.id, id));
+			if (!m) return 'nicht-gefunden' as const;
+			const zeile = m as Zeile;
+			if (!von.includes(zeile.status)) return 'veraltet' as const;
+			const [k] = await tx.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, id));
+			if (!k) return 'nicht-gefunden' as const;
+			return schritt(tx, zeile, k.id);
+		});
+		if (r !== NOCHMALS) return r;
+	}
 }
 
 // Login sofort weg: Push-Abos und Sitzungen. Passkeys bleiben bis zur Löschung.
@@ -91,34 +107,53 @@ async function sperreLogin(tx: DbOderTx, kontoId: number): Promise<void> {
 	await beendeAlleSitzungen(tx, kontoId);
 }
 
-// Kommende Anmeldungen zurückziehen; Vergangenes bleibt. Keine Mitteilung.
+// Kommende Anmeldungen zurückziehen und offene Anfragen löschen; Vergangenes bleibt. Die
+// Meldungen dazu schicken erst die Schnittstellen, nach dem Commit.
 async function zieheKommendesZurueck(tx: DbOderTx, mitgliedId: number, jetzt: Date) {
-	await zieheOffeneEinzelZurueck(tx, mitgliedId, jetzt);
+	const cm = await zieheOffeneZurueck(tx, mitgliedId, jetzt);
 	await loescheKommendeAntworten(tx, mitgliedId, jetzt);
+	return cm;
 }
+
+/** Erfolg von Austritt und Vormerken: was die CM dabei zurückgezogen hat (für die Meldungen). */
+export type MitRueckzug = { ergebnis: 'ok'; cm: Rueckzug };
 
 const vermerke = (tx: DbOderTx, id: number, urheber: Urheber, aktion: Aktion, jetzt: Date) =>
 	schreibeVerlauf(tx, id, urheber, [{ aktion }], jetzt);
 
-/** FR-04: Austritt ab sofort, nur aus `aktiv`. RR-03: nicht für den letzten MyTCO-Admin. */
+// RR-10: Den eigenen Austritt erfasst, sich selbst merkt ein anderer Mitglieder-Admin vor.
+const istEigenes = (urheber: Urheber, id: number) =>
+	urheber.art !== 'automatisch' && urheber.mitgliedId === id;
+
+/**
+ * FR-04: Austritt ab sofort, nur aus `aktiv`. RR-10: nicht der eigene. RR-03: nicht für den
+ * letzten MyTCO-Admin.
+ */
 export function erfasseAustritt(
 	db: Db,
 	urheber: Urheber,
 	id: number,
 	jetzt: Date
-): Promise<'ok' | 'nicht-gefunden' | 'veraltet' | 'letzter-mytco'> {
-	return uebergang(db, id, ['aktiv'], async (tx, _m, kontoId) => {
-		if (await waereLetzterMytco(tx, kontoId)) return 'letzter-mytco' as const;
-		await tx
-			.update(mitglied)
-			// «Für Fairgate» zeigt nur aktive Mitglieder: die Markierung ist mit dem Austritt erledigt.
-			.set({ status: 'ausgetreten', austrittAm: jetzt, fairgateOffenSeit: null })
-			.where(eq(mitglied.id, id));
-		await sperreLogin(tx, kontoId);
-		await zieheKommendesZurueck(tx, id, jetzt);
-		await vermerke(tx, id, urheber, 'ausgetreten', jetzt);
-		return 'ok' as const;
-	});
+): Promise<MitRueckzug | 'nicht-gefunden' | 'veraltet' | 'eigenes-konto' | 'letzter-mytco'> {
+	return uebergang(
+		db,
+		id,
+		['aktiv'],
+		async (tx, _m, kontoId) => {
+			if (istEigenes(urheber, id)) return 'eigenes-konto' as const;
+			if (await waereLetzterMytco(tx, kontoId)) return 'letzter-mytco' as const;
+			await tx
+				.update(mitglied)
+				// «Für Fairgate» zeigt nur aktive Mitglieder: die Markierung ist mit dem Austritt erledigt.
+				.set({ status: 'ausgetreten', austrittAm: jetzt, fairgateOffenSeit: null })
+				.where(eq(mitglied.id, id));
+			await sperreLogin(tx, kontoId);
+			const cm = await zieheKommendesZurueck(tx, id, jetzt);
+			await vermerke(tx, id, urheber, 'ausgetreten', jetzt);
+			return { ergebnis: 'ok' as const, cm };
+		},
+		doppelPartner
+	);
 }
 
 /** FR-04: Wiedereintritt innert Frist, nur aus `ausgetreten`; Rollen wirken sofort wieder. */
@@ -140,25 +175,35 @@ export function erfasseWiedereintritt(
 	});
 }
 
-/** «Mitglied löschen»: aus `aktiv` oder `ausgetreten` zum Löschen vormerken (Bedenkzeit). */
+/**
+ * «Mitglied löschen»: aus `aktiv` oder `ausgetreten` zum Löschen vormerken (Bedenkzeit).
+ * RR-10: nicht sich selbst. RR-03: nicht den letzten MyTCO-Admin.
+ */
 export function merkeZumLoeschenVor(
 	db: Db,
 	urheber: Urheber,
 	id: number,
 	jetzt: Date
-): Promise<'ok' | 'nicht-gefunden' | 'veraltet' | 'letzter-mytco'> {
-	return uebergang(db, id, ['aktiv', 'ausgetreten'], async (tx, m, kontoId) => {
-		if (await waereLetzterMytco(tx, kontoId)) return 'letzter-mytco' as const;
-		// `austrittAm` bleibt: Rückgängig stellt «ausgetreten» mit dem alten Datum wieder her.
-		await tx
-			.update(mitglied)
-			.set({ status: 'vorgemerkt', vorgemerktAm: jetzt, statusVorher: m.status })
-			.where(eq(mitglied.id, id));
-		await sperreLogin(tx, kontoId);
-		await zieheKommendesZurueck(tx, id, jetzt);
-		await vermerke(tx, id, urheber, 'loeschung-vorgemerkt', jetzt);
-		return 'ok' as const;
-	});
+): Promise<MitRueckzug | 'nicht-gefunden' | 'veraltet' | 'eigenes-konto' | 'letzter-mytco'> {
+	return uebergang(
+		db,
+		id,
+		['aktiv', 'ausgetreten'],
+		async (tx, m, kontoId) => {
+			if (istEigenes(urheber, id)) return 'eigenes-konto' as const;
+			if (await waereLetzterMytco(tx, kontoId)) return 'letzter-mytco' as const;
+			// `austrittAm` bleibt: Rückgängig stellt «ausgetreten» mit dem alten Datum wieder her.
+			await tx
+				.update(mitglied)
+				.set({ status: 'vorgemerkt', vorgemerktAm: jetzt, statusVorher: m.status })
+				.where(eq(mitglied.id, id));
+			await sperreLogin(tx, kontoId);
+			const cm = await zieheKommendesZurueck(tx, id, jetzt);
+			await vermerke(tx, id, urheber, 'loeschung-vorgemerkt', jetzt);
+			return { ergebnis: 'ok' as const, cm };
+		},
+		doppelPartner
+	);
 }
 
 /** Löschung rückgängig: zurück in den Zustand davor, `austrittAm` unverändert. */

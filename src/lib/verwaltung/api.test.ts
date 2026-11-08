@@ -27,13 +27,22 @@ import {
 	loescheMitglied,
 	nimmLoeschungZurueck,
 	ladeAuskunft,
+	ladeBriefe,
+	erzeugeBriefe,
+	erzeugeBrief,
 	ladeAnmeldungen,
 	meldeVonHandAn,
 	verschiebeAnmeldung,
 	loescheAnmeldung,
 	entscheideAntrag,
 	sucheSpieler,
-	korrigiereKlassierung
+	korrigiereKlassierung,
+	ladeDoppel,
+	meldeDoppelAn,
+	legeZusammen,
+	aenderePartner,
+	meldeAnfrageAlsPaarAn,
+	loescheAnfrage
 } from './api.ts';
 
 type Aufruf = { pfad: string; init: RequestInit };
@@ -250,6 +259,11 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 		]);
 	});
 
+	it('FR-36: 409 art-gesperrt wird eigenes Ergebnis', async () => {
+		const g = holer(json(409, { fehler: 'art-gesperrt' }));
+		expect(await aendereKategorie(2, {}, true, g.holen)).toEqual({ art: 'art-gesperrt' });
+	});
+
 	it('FR-36: 409 unpassend wird eigenes Ergebnis mit anzahl', async () => {
 		const u = holer(json(409, { fehler: 'unpassend', anzahl: 3 }));
 		expect(await aendereKategorie(2, {}, false, u.holen)).toEqual({ art: 'unpassend', anzahl: 3 });
@@ -322,6 +336,77 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 		]);
 	});
 
+	it('A-ANMELDUNG-06, FR-46, FR-48: Doppel verwalten mit Pfad, Methode und Körper', async () => {
+		const h = holer(json(200, {}));
+		await ladeDoppel(7, h.holen);
+		await meldeDoppelAn(7, [12], false, h.holen);
+		await meldeDoppelAn(7, [12, 13], true, h.holen);
+		await legeZusammen(40, 41, false, h.holen);
+		await legeZusammen(40, 41, true, h.holen);
+		await aenderePartner(40, 12, 14, false, h.holen);
+		await aenderePartner(40, 12, null, true, h.holen);
+		await meldeAnfrageAlsPaarAn(9, false, h.holen);
+		await meldeAnfrageAlsPaarAn(9, true, h.holen);
+		await loescheAnfrage(9, h.holen);
+		expect(h.aufrufe.map((a) => [a.init.method, a.pfad])).toEqual([
+			['GET', '/api/admin/kategorien/7/doppel'],
+			['POST', '/api/admin/kategorien/7/doppel'],
+			['POST', '/api/admin/kategorien/7/doppel'],
+			['POST', '/api/admin/anmeldungen/40/zusammenlegen'],
+			['POST', '/api/admin/anmeldungen/40/zusammenlegen'],
+			['POST', '/api/admin/anmeldungen/40/partner'],
+			['POST', '/api/admin/anmeldungen/40/partner'],
+			['POST', '/api/admin/anfragen/9/paar'],
+			['POST', '/api/admin/anfragen/9/paar'],
+			['POST', '/api/admin/anfragen/9/loeschen']
+		]);
+		const koerper = h.aufrufe.slice(1).map((a) => JSON.parse(String(a.init.body)));
+		expect(koerper).toEqual([
+			{ mitgliedIds: [12] },
+			{ mitgliedIds: [12, 13], trotzdem: true },
+			{ mitAnmeldungId: 41 },
+			{ mitAnmeldungId: 41, trotzdem: true },
+			{ bleibtId: 12, neuId: 14 },
+			{ bleibtId: 12, neuId: null, trotzdem: true },
+			{},
+			{ trotzdem: true },
+			{}
+		]);
+	});
+
+	it('A-ANMELDUNG-06: Doppel-Liste kommt mit Paaren, Suchenden und Anfragen an', async () => {
+		const s = (mitgliedId: number, vorname: string) => ({
+			mitgliedId,
+			name: { rufname: null, vorname, nachname: 'Beispiel' },
+			mitgliedStatus: 'aktiv',
+			geschlecht: 'm',
+			klassierung: 'R5'
+		});
+		const liste = {
+			paare: [{ anmeldungId: 40, spieler: [s(12, 'Max'), s(13, 'Tim')], summe: 10 }],
+			suchende: [{ anmeldungId: 41, spieler: s(14, 'Ben'), kommentar: 'Gern am Abend.' }],
+			anfragen: [
+				{
+					anfrageId: 9,
+					von: s(15, 'Leo'),
+					an: s(16, 'Noah'),
+					gestelltAm: '2027-04-02T08:00:00.000Z'
+				}
+			]
+		};
+		expect(await ladeDoppel(7, holer(json(200, liste)).holen)).toEqual({ art: 'ok', daten: liste });
+		expect(await ladeDoppel(7, holer(json(404, { fehler: 'nicht-gefunden' })).holen)).toEqual({
+			art: 'nicht-gefunden'
+		});
+		const w = holer(json(409, { fehler: 'warnung', warnungen: ['passt-nicht', 'voll'] }));
+		expect(await meldeDoppelAn(7, [12, 13], false, w.holen)).toEqual({
+			art: 'warnung',
+			warnungen: ['passt-nicht', 'voll']
+		});
+		const v = holer(json(409, { fehler: 'vorbereitung' }));
+		expect(await legeZusammen(40, 41, false, v.holen)).toEqual({ art: 'vorbereitung' });
+	});
+
 	it('FR-08: Entscheid schickt den Grund nur bei einer Ablehnung, ohne Leerzeichen am Rand', async () => {
 		const h = holer(json(200, {}));
 		await entscheideAntrag(30, true, 'wird ignoriert', h.holen);
@@ -343,7 +428,7 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 		const treffer = [
 			{
 				mitgliedId: 12,
-				name: 'Muster, Hanna',
+				name: { rufname: null, vorname: 'Hanna', nachname: 'Muster' },
 				geschlecht: 'w',
 				jahrgang: 1990,
 				klassierung: 'R7'
@@ -421,6 +506,7 @@ describe('Mitgliedschaft: Austritt, Löschung, Auskunft', () => {
 		expect(await mit(409, { fehler: 'veraltet' })).toEqual({ art: 'veraltet' });
 		expect(await mit(409, { fehler: 'letzter-mytco' })).toEqual({ art: 'letzter-mytco' });
 		expect(await mit(409, { fehler: 'frist-abgelaufen' })).toEqual({ art: 'frist-abgelaufen' });
+		expect(await mit(409, { fehler: 'eigenes-konto' })).toEqual({ art: 'eigenes-konto' });
 		expect(await mit(403, { fehler: 'nur-ansehen' })).toEqual({ art: 'nur-ansehen' });
 		expect(await mit(404, {})).toEqual({ art: 'nicht-gefunden' });
 		expect(await mit(500, {})).toEqual({ art: 'stoerung' });
@@ -435,5 +521,23 @@ describe('Mitgliedschaft: Austritt, Löschung, Auskunft', () => {
 		});
 		expect(h.aufrufe[0].pfad).toBe('/api/admin/mitglieder/5/auskunft');
 		expect(h.aufrufe[0].init.method).toBe('GET');
+	});
+	it('A-LOGIN-01: Briefe lesen, als Serie und einzeln erzeugen; 409 nicht-moeglich mit anzahl', async () => {
+		const l = holer(json(200, []));
+		expect(await ladeBriefe(l.holen)).toEqual({ art: 'ok', daten: [] });
+		expect(l.aufrufe[0].pfad).toBe('/api/admin/briefe');
+		expect(l.aufrufe[0].init.method).toBe('GET');
+		const s = holer(json(200, { briefe: [] }));
+		expect(await erzeugeBriefe([3, 4], s.holen)).toEqual({ art: 'ok', daten: { briefe: [] } });
+		expect(s.aufrufe[0].pfad).toBe('/api/admin/briefe');
+		expect(JSON.parse(String(s.aufrufe[0].init.body))).toEqual({ ids: [3, 4] });
+		const e = holer(json(200, { briefe: [] }));
+		await erzeugeBrief(7, e.holen);
+		expect(e.aufrufe[0].pfad).toBe('/api/admin/mitglieder/7/brief');
+		expect(JSON.parse(String(e.aufrufe[0].init.body))).toEqual({});
+		const n = holer(json(409, { fehler: 'nicht-moeglich', anzahl: 2 }));
+		expect(await erzeugeBriefe([1, 2], n.holen)).toEqual({ art: 'nicht-moeglich', anzahl: 2 });
+		const k = holer(json(403, { fehler: 'kein-recht' }));
+		expect(await erzeugeBrief(1, k.holen)).toEqual({ art: 'kein-recht' });
 	});
 });

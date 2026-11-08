@@ -4,6 +4,7 @@ import { konto, kontoRolle, mitglied } from '../../src/lib/server/db/schema.ts';
 
 type Teil = Partial<{
 	vorname: string;
+	rufname: string | null;
 	nachname: string;
 	status: string;
 	gesperrt: boolean;
@@ -18,6 +19,7 @@ export async function legeMitgliedAn(db: Db, teil: Teil = {}) {
 		.insert(mitglied)
 		.values({
 			vorname,
+			rufname: teil.rufname ?? null,
 			nachname: teil.nachname ?? 'Muster',
 			strasse: 'Erfundenweg 1',
 			plz: '4600',

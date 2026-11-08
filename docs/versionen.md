@@ -8,6 +8,91 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.17.0 — Doppel in der Verwaltung
+
+- Doppel in der Verwaltung (#59, Etappe 2): Der CM-Admin sieht Paare, Suchende und offene
+  Anfragen einer Doppel-Kategorie. Er meldet von Hand an, ändert Partner, legt Suchende zusammen,
+  meldet offene Anfragen als Paar an oder löscht sie, verschiebt, löscht und korrigiert
+  Klassierungen; die Spieler bekommen eine Meldung.
+- Doppel: Jedes Mitglied hat höchstens eine offene Anfrage je Kategorie.
+- Doppel: Ist der Partner ausgetreten oder zum Löschen vorgemerkt, sind seine Kontaktdaten
+  ausgeblendet.
+- Doppel: Anfragen von Mitgliedern ohne Login (gesperrt oder Brief-Code nie eingelöst) erscheinen
+  nicht mehr.
+- Doppel: Nach dem Anmeldeschluss lassen sich Anfragen nicht mehr ablehnen oder zurückziehen.
+- Doppel: Sagt der CM-Admin eine Doppel-Kategorie ab oder macht er sie zum Einzel, erfährt der
+  Anfragende, dass seine offene Anfrage hinfällig ist.
+
+## 0.16.0 — Übersichtliche Navigation mit Reiter CM
+
+- Übersichtliche Navigation (#69): Die Reiter Start · CM · Profil stehen nach dem Login auf jeder
+  Seite, der neue Reiter CM führt zur laufenden Clubmeisterschaft. Zurück-Links nennen ihr Ziel
+  («‹ Profil», «‹ Clubmeisterschaft 2027»), die Verwaltung zeigt über dem Titel den Pfad.
+
+## 0.15.1 — E2E auf eigener Datenbank, Testbestand für make seed
+
+- E2E auf eigener Datenbank: Jeder E2E-Lauf (`make e2e`, `make check`, Pre-Push-Hook, CI) legt
+  über `scripts/e2e.ts` eine frische Datenbank an und löscht sie danach. Die lokale Datenbank
+  `mytco` wuchs vorher mit jedem Lauf (zuletzt über 11'000 Test-Mitglieder), Listen über alle
+  Mitglieder liefen in Timeouts und der Pre-Push-Hook wurde rot ohne Fehler im Code.
+- `make seed` legt einen Testbestand an: rund 200 erfundene Mitglieder mit gemischten Angaben,
+  dazu ein zweiter Anlass (Clubabend) und gemischte Antworten auf beide Anlässe.
+- Profil: Ein leeres Feld heisst überall «nicht angegeben» (vorher bei Telefon und Lizenznummer
+  «nicht erfasst»).
+- CI: Der Download von gitleaks und osv-scanner wiederholt sich bei kurzen Störungen von GitHub.
+
+## 0.15.0 — Doppel mit Partner-Anfrage
+
+- Doppel zur Clubmeisterschaft (#59, Etappe 1): Mitglieder suchen in einer Doppel-Kategorie einen
+  Partner und fragen ihn an; er nimmt an oder lehnt ab, erst dann sind beide angemeldet und sehen
+  gegenseitig E-Mail und Telefon. Wer noch keinen Partner hat, meldet sich allein an und steht mit
+  freiwilligem Kommentar unter «sucht Partner». Meldet sich einer ab, ist das Paar zurückgezogen,
+  der andere bekommt eine Meldung. Doppel in der Verwaltung folgt mit Etappe 2.
+- Doppel-Kategorien haben keinen Jahrgang mehr. Ob eine Kategorie Einzel oder Doppel ist, lässt
+  sich nur ändern, solange niemand angemeldet ist.
+- Austritt und Löschen: Anmeldungen zur CM, auch im Einzel, werden bis und mit dem Tag des
+  Anmeldeschlusses zurückgezogen, auch wenn die Anmeldung vorher von Hand geschlossen wurde; im
+  Doppel bekommt der Partner eine Meldung.
+- UI-Leitbild: neue Bausteine «Trefferliste» (Ergebnisse einer Suche) und «Kartenteil» (Abschnitt
+  innerhalb einer Karte).
+
+## 0.14.0 — Mitgliederliste einlesen
+
+- Einlesen (#43, Etappe 2b): Der Mitglieder-Admin liest eine CSV-Datei im MyTCO-Schema ein
+  (Vorlage auf der Seite). Die Vorschau zeigt neue, fehlerhafte und schon vorhandene Zeilen; nach
+  der Rückfrage legt MyTCO alle neuen Mitglieder auf einmal an, ohne Brief-Code. Die Datei wird
+  nicht aufbewahrt; Verlaufseintrag «angelegt (Einlesen)».
+
+## 0.13.0 — Login-Briefe aus der Verwaltung
+
+- Briefe (#43, Etappe 2a): Der Mitglieder-Admin stellt einen neuen Brief-Code einzeln aus oder
+  erzeugt Briefe für alle, die MyTCO noch nie geöffnet haben, und druckt sie aus einer Druckansicht
+  des Browsers. Der Code erscheint nur dort; Verlaufseintrag «Brief-Code ausgestellt».
+- Mitgliedschaft (#43): Den eigenen Austritt und das eigene Löschen erfasst ein anderer
+  Mitglieder-Admin (RR-10). Kommen beim Wiedereintritt oder «Löschung rückgängig» gespeicherte
+  Admin-Rollen zurück, fragt die Verwaltung vorher nach. Jahr und Zeitpunkte der Verwaltung in
+  Schweizer Zeit, auch auf einem Server in UTC.
+
+## 0.12.0 — Rufname
+
+- Rufname (#67): Wer will, trägt im Profil unter «Meine Angaben» einen Rufnamen ein (höchstens 10 Zeichen).
+  Die Startseite grüsst damit («Hoi Hannes»), und die anderen im Club sehen ihn mit dem amtlichen Namen
+  dahinter; Mitgliederverwaltung, Auskunft und Brief bleiben beim amtlichen Namen. Datenschutz, Fachmodell
+  und UI-Leitbild beschreiben ihn.
+
+## 0.11.2 — Auswahlfelder am iPhone, Auskunft vollständiger, Beobachtungs-Auswertung
+
+- Auswahlfelder (z. B. Geschlecht, Klassierung) sind auf allen Geräten so hoch wie die Textfelder;
+  auf dem iPhone waren sie halb so hoch (UI-03).
+- Auskunft: nennt je Gerät, wann ein Admin die Verwaltung bestätigt hat, und eine laufende
+  «Ansicht als …»; die Datenschutzerklärung nennt diese Daten und dass Änderungen bei anderen
+  Mitgliedern nicht in der Auskunft stehen.
+- Prüfungen: Service Worker wird typgeprüft; Abdeckung misst auch die Fachlogik in
+  `src/lib/turnier` und `src/lib/anlass`; zwei wacklige E2E-Tests (Install-Angebot, Vorladen)
+  warten jetzt auf die App.
+- Doku aus der Beobachtungs-Auswertung: ADR-009 (Grüner Stand), ADR-010 (öffentliches Repo),
+  Glossar, eigene Datenbank für E2E bei parallelen Sessions.
+
 ## 0.11.1 — Auskunft ohne Wildcard-Anträge, Doku-Abgleich
 
 - Auskunft: Von der Clubmeisterschaft zeigt sie nur noch bestätigte Anmeldungen, ohne Status und

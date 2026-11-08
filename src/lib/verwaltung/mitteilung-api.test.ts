@@ -54,11 +54,23 @@ describe('Mitteilungen in der Verwaltung: Anfragen', () => {
 
 	it('FR-43: Vorschau und Senden schicken die Werte als JSON an den Bezug', async () => {
 		const vorschau = holer(
-			json(200, { anzahl: 1, push: 0, mails: 1, nichtErreichbar: 0, namen: ['Muster, Hanna'] })
+			json(200, {
+				anzahl: 1,
+				push: 0,
+				mails: 1,
+				nichtErreichbar: 0,
+				namen: [{ rufname: null, vorname: 'Hanna', nachname: 'Muster' }]
+			})
 		);
 		expect(await zeigeVorschau({ art: 'anlass', anlassId: 7 }, WERTE, vorschau.holen)).toEqual({
 			art: 'ok',
-			daten: { anzahl: 1, push: 0, mails: 1, nichtErreichbar: 0, namen: ['Muster, Hanna'] }
+			daten: {
+				anzahl: 1,
+				push: 0,
+				mails: 1,
+				nichtErreichbar: 0,
+				namen: [{ rufname: null, vorname: 'Hanna', nachname: 'Muster' }]
+			}
 		});
 		const senden = holer(json(201, { push: 0, mails: 1, ersatzMails: 0, nichtErreichbar: 0 }));
 		expect((await sendeMitteilung({ art: 'verein' }, WERTE, senden.holen)).art).toBe('ok');

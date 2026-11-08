@@ -7,6 +7,192 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Auswertung vom 08.11.2026 (Abend) — 14 Einträge, gegen `dev` (49a426f) verifiziert
+
+Bilanz je Eintrag: 0 ganz verworfen · 7 abgehakt (1 davon überholt) · 4 mitgemacht (dazu 1 Nebenbefund) · 1 Regel ·
+1 an ein Issue (#69) · 1 auf mehrere Ausgänge verteilt (Kleinbefunde #43 Briefe). Bei 7 trug die
+Begründung ganz oder teilweise nicht (Tabelle unten). Abschnitt «Offen» danach leer.
+
+**Verworfen** (Teile)
+
+- 2026-11-08 — Kleinbefunde #43 Briefe, Teil «Rückfrage mit mehreren Rollen ohne E2E» → gibt es:
+  `tests/e2e/mitgliedschaft.test.ts` prüft «Vera bekommt die Rollen Mitglieder-Admin, CM-Admin
+  zurück.» (93e1c6c, vor dem Eintrag)
+- ebenda, Teil «`INTEGER_MAX` schützt nur `leseIds`» → `parseId` (`src/lib/server/parse-id.ts`)
+  begrenzt alle vier ID-Felder im JSON-Körper (`ids`, `mitgliedId`, `kategorieId`, `anId`)
+
+**An Issues angehängt**
+
+- 2026-11-08 — Design System «MyTCO» hinkt dem UI-Leitbild hinterher, mit dem Teil «Trefferliste
+  und Kartenteil fehlen» aus den Kleinbefunden #59 → [Kommentar in #69](https://github.com/konstantinniedermann/tco-app/issues/69#issuecomment-6724275890):
+  ganzes Design System gegen `dev` nachführen, nicht nur die neuen Bausteine
+
+**Mitgemacht**
+
+- 2026-11-08 — Lokale DB `mytco` über 11'000 Mitglieder, Pre-Push-Hook rot, mit 2026-11-08
+  «Briefe-Liste über tausend Zeilen» → a4d8b77, c410b11 (`scripts/e2e.ts`: jeder E2E-Lauf auf eigener,
+  danach gelöschter Datenbank); Nachweis: voller E2E-Lauf 328 grün, `mytco` vorher und nachher
+  11'332 Mitglieder. `mytco` von Hand auf die 15 Seed-Mitglieder verkleinert (Logins blieben),
+  dann c3f4394, a56a070 (`make seed` mit Testbestand: 201 Mitglieder, 2 Anlässe, 146 Antworten)
+- 2026-11-08 — Secret-Scan / OSV scheitern am Download → d305307 (`--retry 5 --retry-delay 15
+  --retry-connrefused`, keine Änderung an der Prüfsumme). Wirkt erst ab dem nächsten CI-Lauf
+- 2026-11-08 — Profil: leere Kachel sagt je Feld etwas anderes → 70e136d (überall «nicht angegeben»)
+- Nebenbefund — `mitgliedIdAus` in `src/lib/server/cm/schnittstellen.ts` mit fester Zahl statt
+  `INTEGER_MAX` → 314ea36
+
+**Regel**
+
+- 2026-11-08 — Pre-Push-Hook und `make check` gleichzeitig: E2E rot → Skill `tco-branching`
+  (1b26fe4): nicht gleichzeitig im selben Worktree; die Datenbank ist als Ursache mit
+  `scripts/e2e.ts` ausgeschlossen, offen bleiben `test-results` und Mailpit
+
+**Abgehakt** — mit Begründung; wo der Punkt zurückkommen kann, mit Trigger
+
+- 2026-11-08 — Übergabe an #59: Namenssuche und Namensanzeige → überholt: `sucheDoppelPartner`
+  nutzt `nameEnthaelt`, die Doppel-Seiten `<Name>` (#59 Etappe 1, 7feb527)
+- 2026-11-08 — Automatische Pushes zu CM-Resultaten und Restzeit ohne Anforderung → die Spec zu
+  #66 hält die Lücke fest («brauchen eine eigene Anforderung»). Trigger: Issue «CM-Betrieb»
+- 2026-11-08 — Kleinbefunde #59 Etappe 1 → die vier Fragen an den Projektleiter (Login beider,
+  Kontakt nach Austritt, Sperre nach Schluss, Grenze für Anfragen) entscheidet die Spec von
+  Etappe 2 (Branch `feat/issue-059-etappe2`); E2E-Hänger einmalig, Trigger: erneuter Hänger,
+  dann zuerst den Trace holen; Code-Hygiene der CM-Seite (993 Zeilen, 8 gleiche Handler,
+  `bisWartend` dreifach u. a.), Trigger: nächster Umbau der CM-Seite
+- 2026-11-08 — Kleinbefunde #43 Briefe, übrige Teile → Code-Teile (doppelte IDs, leere Liste,
+  409 statt 404) über die Schnittstelle nicht erreichbar oder nur im Wettlauf; Testlücken und
+  Grenze 1000, Trigger: Seite *Briefe* oder Mitgliedsseite wird angefasst bzw. die Liste wächst
+  über 1000. Eigener Brief-Code bleibt erlaubt (Entscheid Projektleiter, 044ff52 in
+  `rollen-und-rechte.md`); zwei Admins gleichzeitig folgt aus FR-24
+- 2026-11-08 — Nach 409 bei den Briefen fällt der Fokus auf `body` → Trigger wie oben; beim Fix
+  je eine `toBeFocused`-Prüfung in den zwei 409-Tests
+- 2026-11-08 — Auskunft: Angaben je Gerät nur im DB-Test → Trigger: Auskunft-Seite oder ihr E2E
+  wird angefasst (braucht ein Testmitglied mit Sitzung)
+- 2026-11-08 — Einlesen: 2000 Zeilen nur berechnet → Verein hat 300–500 Mitglieder. Trigger: eine
+  Datei mit über 1000 Zeilen soll eingelesen werden
+- Nebenbefund (Review) — übrig gebliebene Datenbanken `mytco_test_*` abgebrochener
+  Vitest-Läufe und von Hand angelegte `mytco_<name>` räumt `scripts/e2e.ts` nicht weg (nur
+  `mytco_e2e_*`) → je wenige MB, harmlos. Trigger: der lokale Datenbank-Server wird spürbar voll
+- 2026-11-08 — Turnierleitung am Handy: Namensspalte bricht um → `.tabelle td` erbt
+  `hyphens: auto` (`src/lib/design/basis.css`), nicht gemessen. Trigger: ein CM-Admin nutzt die
+  Liste am Handy, oder die Verwaltungstabellen werden umgebaut
+
+**Falsche Prämissen**
+
+| Eintrag | Behauptet | Gemessen |
+|---|---|---|
+| Einlesen 2000 Zeilen | Ein DB-Test liesse die gemeinsame Test-DB jedes Mal wachsen | Die DB-Tests legen je Lauf eine eigene Datenbank an und löschen sie (`tests/setup/datenbank-global.ts`) |
+| Secret-Scan / OSV | `--retry 3 --retry-all-errors` fängt kurze Störungen ab | Die Ausfälle dauerten 5–6 Minuten, `--retry 3` wartet 7 s; `--retry-all-errors` ist nicht nötig (504 zählt als vorübergehend) |
+| Design System | 23 Commits Rückstand; README hinkt mit «‹ Zurück» hinterher | 36 Commits; das Leitbild selbst sagt noch «‹ Zurück» (wartet auf #69) |
+| Kleinbefunde #43 Briefe | Mehrrollen-Rückfrage ohne E2E; `INTEGER_MAX` nur in `leseIds` | Beides widerlegt (siehe Verworfen) |
+| Fokus nach 409 | Die Taste verschwindet | Auf der Seite *Briefe* wird sie gesperrt; Fokus auf `body` nicht gemessen |
+| Profil | betrifft «freiwillige Felder» | Telefon und Klassierung sind in der Kachel nicht als freiwillig markiert |
+| Kleinbefunde #59 | Fragen offen für den Projektleiter | In der Spec von Etappe 2 schon entschieden |
+
+### Auswertung vom 08.11.2026 — 44 Einträge, gegen `dev` (ec9b0c5) verifiziert
+
+Bilanz je Eintrag: 1 verworfen · 16 abgehakt (3 davon überholt) · 9 mitgemacht · 4 Doku ·
+8 an Issues (#40, #43, #59, #63) · 6 auf mehrere Ausgänge verteilt (die Sammel-Einträge aus den Reviews
+von #43, #57, #58, #63, Doku-Abgleich, Vorgeladenes). Bei 24 trug die Begründung ganz oder teilweise nicht
+(Tabelle unten). Zwei Trigger aus früheren Auswertungen waren eingetreten (Android-Einstiegsseite, IP-Grenze).
+Gleich lautende Einträge stehen bei ihrem Hauptausgang. Abschnitt «Offen» danach leer.
+
+**Verworfen**
+
+- 2026-11-06 — npm-Skript `e2e:browser` wird nirgends aufgerufen → das Skript war schon vor dem Eintrag
+  entfernt: af3848a (06.11. 08:59, «altes Browser-Skript entfernt»), Eintrag 0c26c93 (10:01);
+  `package.json` kennt nur noch `"e2e": "playwright test"`
+
+**An Issues angehängt**
+
+- 2026-11-06 — Doppel-Kategorien erlauben Jahrgang → [Kommentar in #59](https://github.com/konstantinniedermann/tco-app/issues/59#issuecomment-6718915658), Entscheid des Projektleiters: im Doppel kein Jahrgang; von #59 übernommen
+- 2026-11-07 — Austritt zieht CM-Anmeldung nach frühem Schliessen nicht zurück → ebenda, Entscheid: bis zum Datum des Anmeldeschlusses; von #59 übernommen
+- 2026-11-06 — Kleinbefunde #58, Teile Einzel→Doppel unsichtbar, Turnier-Sperre in `trageEin`, Doppel-Test `meldeAn` → ebenda; Politur in Kategorieformular und CM-Dateien an die Session von #59 übergeben (sie baut die Dateien um). Übrige Teile siehe Abgehakt
+- 2026-11-06 — Speichern ohne Seitenwechsel, Teil CM-Seite → ebenda (Neuladen der Startseite in Teil 3)
+- 2026-11-07 — Wiedereintritt und «Löschung rückgängig» ohne Rückfrage → [Kommentar in #43](https://github.com/konstantinniedermann/tco-app/issues/43#issuecomment-6718915861), Entscheid: Rückfrage, wenn Admin-Rollen wieder wirken
+- 2026-11-07 — Admin kann den eigenen Austritt erfassen → ebenda, Entscheid: beim eigenen Konto sperren
+- 2026-11-06 — Kleinbefunde #43, Teile `postMitglied`-Test, `machAdmin`, `NUR_ANSEHEN` → ebenda, dazu Nebenbefund Jahr in Server-Zeit; übrige Teile siehe Abgehakt
+- 2026-11-07 — Mitteilungsverlauf nur beim nächsten Versand gelöscht, mit 2026-11-07 «Push an Geräte mit abgelaufener Sitzung» und Kleinbefunde #63 Teil 14 → [Kommentar in #63](https://github.com/konstantinniedermann/tco-app/issues/63#issuecomment-6718916015), Entscheid: dort statt neuem Issue
+- 2026-11-07 — Themen-Schalter «Clubmeisterschaft» wirkt auf keinen Versand → ebenda (CM-Teil)
+- 2026-11-07 — Datenschutzerklärung nennt Ungebautes → [Kommentar in #40](https://github.com/konstantinniedermann/tco-app/issues/40#issuecomment-6718916177): vor DS-09 Stand oder Ziel entscheiden
+
+**Mitgemacht**
+
+- 2026-11-07 — Android-Test Einstiegsseite → 6f90692 (Hilfe `bietetInstallationAn` wartet auf die App; gleicher Wettlauf in `hilfe.test.ts` mit erledigt); Nachweis: `hilfe` und `bewegung` je 3-mal auf iPhone und Android, 177 grün
+- 2026-11-06 — «Importing a module script failed» einzeln (SI-07, `bewegung.test.ts`), mit 2026-11-07 «`bewegung.test.ts:399` flackernd» → SI-07 überholt (37e38eb); `bewegung.test.ts` wartet jetzt auch aufs Vorladen (6f90692)
+- 2026-11-06 — Service Worker ohne Typprüfung → 741a890 (`tsc -p src/service-worker` in `check:svelte`; Gegenprobe mit Typfehler: Exit 2)
+- 2026-11-06 — Live-Schlüssel, Teil veraltete Texte → 7c0d9cb (Kommentare in `check.yml` und `secret-scan.yml`), 9c237b5 (Nachfolger-Einstellung, Link auf #61 statt Beobachtungen). Kern bleibt #61
+- 2026-11-06 — Kleinbefunde Doku-Abgleich → 8b357b5 und 0a135e7 (Annahme K-25.1 auffindbar, auch im Fachmodell), fce0eeb (Rechte-Test mit Lizenz-Admin, mutiert), df86e3b (Abdeckung misst `src/lib/turnier` und `src/lib/anlass`, 98 %), b26fea4 (`make help`), 0a135e7 (Diagramm `AnlassAnmeldung`). K-51 im Kategorieformular an #59 übergeben; Teil Pre-Push-Kommentar überholt (3f7ca3e)
+- 2026-11-07 — Auskunft zeigt `sitzung.ansichtRolle` nicht, mit 2026-11-07 «Verlauf als Urheber fehlt in der Auskunft» → d458244 (Auskunft nennt Bestätigung der Verwaltung und *Ansicht als …* je Gerät, mutiert; die Erklärung nennt die Ausnahme Dritter); Konzept um die Admin-Bestätigung ergänzt (0a135e7). Eine Anzahl «hat N Änderungen ausgelöst» verworfen
+- 2026-11-07 — Glossar ohne Begriffe aus Etappe 3 und Mitteilungen → c5cd234 (11 Begriffe, *Mitgliedschaft* nachgeführt)
+- 2026-11-06 — Auswahlfeld «Geschlecht» am iPhone halb so hoch → 5c13117 (Leitbild *Eingabefeld*, `appearance: none` mit Pfeil aus Tokens, E2E prüft die Höhe; ohne Fix auf dem iPhone rot). Betraf alle Auswahlfelder, auch Profil und CM-Seite. Teil «lange E-Mail-Adresse im Feld abgeschnitten» nicht untersucht (im Screenshot weiter sichtbar). Trigger: am Gerät oder in der Testgruppe gemeldet
+- Nebenbefund — Testkommentar «Admin-Bestätigung zählt zur IP-Grenze» → 6f90692 (`zugang.ts` bremst nur je Adresse)
+- 2026-11-06 — Kleinbefunde #63, Teil `rejects.toThrow()` ohne Constraint → fce0eeb (prüft `mitteilung_anlass_check`, mutiert)
+
+**Doku**
+
+- 2026-11-06 — Grüner Stand ohne ADR → ADR-009 (d09d67f)
+- 2026-11-06 — Repo öffentlich ohne ADR → ADR-010 (d09d67f); Ausnahme für das Anforderungsdokument in `CLAUDE.md` bleibt (Entscheid des Projektleiters)
+- 2026-11-06 — Migration verbietet alte Werte, mit 2026-11-06 «Testkonten sammeln sich an» → 6b31c68 (Skill `tco-branching`: eigene Datenbank, beim Lauf dieser Auswertung selbst benutzt); Teil «Wildcard meldet vor der Antwort» überholt (2d81360)
+
+**Abgehakt** — mit Begründung; wo der Punkt zurückkommen kann, mit Trigger
+
+- 2026-11-06 — CI: langsamer Ubuntu-Spiegel → überholt: E2E im Playwright-Image (807f9d3), kein apt mehr
+- 2026-11-06 — «Importing a module script failed» lokal (2 von 3) → überholt (37e38eb, `wartetAufVorladen`); Archiv-Trigger «3. ungeklärter roter CI-Lauf» nicht eingetreten (iPhone in 8 CI-Läufen seit 37e38eb grün)
+- 2026-11-06 — Turnierseite verspricht Anmeldung → überholt: Mitgliederseite mit #58 (59ca595)
+- 2026-11-06 — CM-Mitteilungen fehlen noch → führt #63 schon als offenen DoD-Punkt
+- 2026-11-06 — `make check` baut doppelt → sogar dreifach (auch `Dockerfile` über `make image`). Trigger: die Prüfdauer stört
+- 2026-11-06 — Turnierjahr ändern prüft Kategorien nicht → betrifft auch «Jahrgang von». Trigger: das Jahr eines Turniers mit Kategorien wird geändert
+- 2026-11-06 — Letzte Kategorie absagen → harmlos (offenes Turnier ohne Kategorie). Trigger: ein Mitglied sieht ein offenes Turnier ohne Kategorie
+- 2026-11-06 — Kategorientabelle am Handy, mit 2026-11-06 «Verlauf der Mitteilungen am Handy» → das Leitbild erlaubt waagrechtes Schieben in der Verwaltung (Baustein *Tabelle*). Trigger: Klage aus der Testgruppe oder eines Admins; dann auch `hyphens: auto` der Tabellenzellen (`basis.css`), das «Ein-zel» trennt
+- 2026-11-06 — Kleinbefunde #57 → Teil Unit-Tests `startziel` überholt (07b1586), E2E-Turniere bleiben bewusst stehen (Test löscht vor dem Lauf); «keine Lizenz» und `aria-describedby` an #59 übergeben; Rest (kopierte Grenzen, RR-08 jetzt dreifach, Seed-Tests, `taste-breit`) Trigger: nächste Arbeit an der Datei
+- 2026-11-06 — Abgewiesener Push, nächste freie Nummer → aus dem Code bestätigt, kein Test. Trigger: der erste so abgewiesene Push
+- 2026-11-06 — Rückfrage «Nicht gespeichert» bei Nachlade-Fehler, mit Speichern ohne Seitenwechsel (Anlass-Seite) → Kategorieseite überholt (cb159bb). Trigger: nächste Arbeit an Turnier- oder Anlass-Seite
+- 2026-11-06 — RR-03 iPhone vereinzelt rot → Ursache widerlegt (`ssr = false`, keine Hydration), drei andere Wege offen. Trigger: zweites Auftreten, dann Trace
+- 2026-11-06 — Kleinbefunde #63 → Teile `_db` und `Grundzeile.email` überholt (8e75b17, 61c71ce); Push-Link geht nie auf fremden Ursprung (`sicheresZiel`), nur Mail-Links. Trigger: Push läuft auf Test (#39) oder CM-Teil von #63
+- 2026-11-07 — IP-Grenze der Code-Anfragen → ganz ausgeschöpft (10 von 10), der Archiv-Trigger ist mit de102d7 eingetreten und wurde mit «nur Android» umgangen. Trigger: der nächste Test mit Code-Anfrage hebt die Grenze im E2E an
+- 2026-11-07 — Abgelehnter Wildcard-Antrag, wiederholtes Beantragen → unter Freunden kaum ein Problem. Trigger: es kommt vor
+- 2026-11-07 — Klassierung korrigieren prüft *aktiv* nicht → betrifft auch *vorgemerkt*; harmlos. Trigger: nächste Arbeit an der Klassierung
+- 2026-11-07 — Wartezeit im Löschlauf-Test → mindestens 2 s (Zählgrenze), 0 von 4 CI-Läufen rot. Trigger: erster roter CI-Lauf
+- 2026-11-06 — Kleinbefunde #58, übrige Teile → Teile FK-Löschen und null-Klassierung überholt bzw. abgedeckt. Trigger: nächste Arbeit an der Datei
+- 2026-11-06 — Kleinbefunde #43, übrige Teile → Migrationstest 0009 überholt (416ded6), `ansicht_rolle` räumen Austritt und Löschen jetzt mit; Flake in 60 CI-Läufen nicht wieder. Befehlsname `make admin`, Trigger: Skripte werden angefasst; Rest Trigger: nächste Arbeit an der Datei
+
+**Falsche Prämissen**
+
+| Eintrag | Behauptet | Gemessen |
+|---|---|---|
+| `e2e:browser` ungenutzt | Skript steht in `package.json` | vor dem Eintrag entfernt (af3848a) |
+| Android-Test Einstiegsseite | nur lokal rot | auch in der CI (Lauf 42347979329); das Archiv sagte «in der CI nie rot» |
+| RR-03 iPhone | Klick vor der Hydration | `ssr = false`: kein Server-HTML, keine Hydration |
+| `bewegung.test.ts:399` | Dev-Server-Flackern | E2E laufen gegen `node build`; Mechanismus in `seite.ts` beschrieben |
+| Testkonten | Wildcard meldet vor der Antwort; Dev-Server sendet minutenlang nach | `void` seit 2d81360; Playwright beendet den Server |
+| IP-Grenze | fast ausgeschöpft | 10 von 10 |
+| Löschlauf-Test | höchstens rund 2 s | mindestens rund 2 s (200 × 10 ms) |
+| `make check` | baut doppelt | dreifach |
+| Repo öffentlich | Begründung nur im Nebensatz | eigener Absatz; es fehlten die Alternativen |
+| Letzte Kategorie | mit #58 (Absage-Sperre) mitlösen | #58 sperrt nur Kategorien mit Anmeldungen; auch ohne Gleichzeitigkeit erreichbar |
+| Kategorientabelle, #57 | mit #58 neu ansehen bzw. angleichen; RR-08 fällt beim Rollen-Umbau an | nicht geschehen; RR-08 steht jetzt dreifach |
+| Turnierjahr | betrifft «Jahrgang bis» | auch «Jahrgang von» |
+| Doku-Abgleich Turnier | `make annahmen` findet K-25.1 im Fachmodell | «Annahme bis K-25.1» passte nicht aufs Muster |
+| Kleinbefunde #58 | Mail bei ~:95; `jahrInZuerich` doppelt; `rufe()` zweimal; mehrere schwache Assertions; Teil 3/4 fangen unsichtbare Anmeldungen auf | :110; doppelt ist die Jahresrechnung; viermal; eine; #60 lädt auch nur Einzel |
+| Doppel-Jahrgang | mit der Spielberechtigung aus #58 | entsteht in #59; die Aussage stand nur im Mitteilungs-Entwurf |
+| Klassierung korrigieren | offen bleibt nur *ausgetreten*; nur theoretisch | auch *vorgemerkt*; seit f1fa4d1 über die Oberfläche erreichbar |
+| Austritt CM | Soll steht in FR-04; nur Austritt | steht in den Lebenszyklen, FR-04 ist mehrdeutig; Löschvormerkung gleich |
+| Kleinbefunde #63 | 19 Punkte; Push-Link auf fremden Ursprung; `toHaveCount(0)` wartet nicht | 18; nur Mail-Links; wartet, ist aber sofort grün |
+| Auskunft `ansichtRolle` | flüchtiges Feld, Konzept nennt es nicht | DB-Spalte; Konzept nannte es schon (d290a78) |
+| Mitteilungsverlauf | Erklärung sagt «ein Jahr lang» (Speicherdauer) | meint die Sichtbarkeit; die Abweichung liegt im Konzept und der Auskunft |
+| Push abgelaufene Sitzung | Konzept sagt «nach einem Jahr kein Abo» | Konzept sagt «dann beim nächsten Login»; zweiter Sendeweg `meldung.ts` fehlte |
+| Erklärung Ungebautes | Resultate, Lizenzanträge, Export | dazu Gegner-Kontakt, Resultate für alle, Doppelpartner, Spielplan |
+| Kleinbefunde #43 | zwei Listen gespreadet; Sperrmuster 4-mal; `ansicht_rolle` nur in `setzeRollen` gelöscht | drei; 5-mal; auch `setzeAnsicht(null)` |
+
+**Gekippte Empfehlungen:**
+
+- Kleinigkeiten in Kategorieformular und CM-Dateien sollten mitgemacht werden. Im Vollzug meldete die
+  Session von #59, dass sie genau diese Dateien umbaut; übergeben statt geändert, damit kein Konflikt entsteht.
+- Rechte-Test mit `lizenz`: zuerst wie die anderen Rollen mit bestätigter Verwaltung gebaut und rot —
+  `lizenz` öffnet die Verwaltung noch nicht und kann sie nicht bestätigen. Der Test meldet das Konto jetzt
+  nur an.
+- Beim Zurücknehmen einer Mutation hat `git checkout --` die noch nicht committeten Änderungen an zwei
+  Testdateien mit verworfen; aus den gespeicherten Ersetzungen wiederhergestellt und erneut geprüft.
+
 ### Auswertung vom 06.11.2026 — 41 Einträge, gegen `dev` (3bb0636) verifiziert
 
 Bilanz je Eintrag: 0 ganz verworfen (2 Teilaussagen widerlegt) · 16 abgehakt (2 überholt) ·

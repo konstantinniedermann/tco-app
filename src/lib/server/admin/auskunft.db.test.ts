@@ -20,6 +20,7 @@ import {
 	mitteilung,
 	passkey,
 	pushAbo,
+	sitzung,
 	turnier
 } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
@@ -66,6 +67,10 @@ async function vollesMitglied() {
 		})
 		.where(eq(konto.id, m.kontoId));
 	const kennung = await erstelleSitzung(db, m.kontoId, jetzt);
+	await db
+		.update(sitzung)
+		.set({ adminBestaetigtAm: jetzt, ansichtRolle: 'cm' })
+		.where(eq(sitzung.kennungHash, hash(kennung)));
 	await db.insert(pushAbo).values({
 		endpunkt: `https://push.example.org/GEHEIM-ENDPUNKT-${randomUUID()}`,
 		sitzungHash: hash(kennung),
@@ -172,6 +177,19 @@ async function vollesMitglied() {
 }
 
 describe('ladeAuskunft (DS-07)', () => {
+	test('nennt den Rufname neben dem amtlichen Namen', async () => {
+		const m = await legeMitgliedAn(db, {
+			vorname: 'Johannes',
+			rufname: 'Hannes',
+			nachname: 'Muster'
+		});
+		const a = await ladeAuskunft(db, m.mitgliedId, jetzt);
+		expect(a!.rufname).toBe('Hannes');
+		expect(a!.name).toBe('Muster, Johannes');
+		const o = await legeMitgliedAn(db, {});
+		expect((await ladeAuskunft(db, o.mitgliedId, jetzt))!.rufname).toBeNull();
+	});
+
 	test('enthält Angaben, Rollen, Login, Anlass, bestätigte CM-Anmeldung ohne Wildcard und den ganzen Verlauf', async () => {
 		const m = await vollesMitglied();
 		const a = await ladeAuskunft(db, m.mitgliedId, jetzt);
@@ -191,7 +209,9 @@ describe('ladeAuskunft (DS-07)', () => {
 		expect(a!.fairgateOffenSeit).toEqual(new Date('2026-10-01T08:00:00Z'));
 		expect(a!.themen).toEqual(['anlaesse', 'verein']);
 		expect(a!.login).toEqual({
-			geraete: [{ erstelltAm: jetzt, zuletztGenutzt: jetzt }],
+			geraete: [
+				{ erstelltAm: jetzt, zuletztGenutzt: jetzt, verwaltungBestaetigtAm: jetzt, ansicht: 'cm' }
+			],
 			passkeys: [
 				{
 					geraet: 'iPhone',
@@ -311,7 +331,17 @@ describe('getAuskunft', () => {
 			bremsen: erstelleBremsen(),
 			jetzt: () => jetzt
 		});
-		const d: AdminDienste = { db, zugang, hinweis: async () => {}, jetzt: () => jetzt };
+		const d: AdminDienste = {
+			db,
+			zugang,
+			hinweis: async () => {},
+			brief: {
+				schluessel: 'y'.repeat(40),
+				adresse: 'https://mytco.example.org',
+				kontakt: 'kontakt@example.org'
+			},
+			jetzt: () => jetzt
+		};
 		const leser = await legeMitgliedAn(db, {
 			vorname: 'Lea',
 			nachname: 'Leserich',

@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, count, eq, isNotNull, isNull } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { legeBeispielTurnierAn } from '../../scripts/beispiel-turnier.ts';
 import {
@@ -6,6 +6,7 @@ import {
 	anmeldungSpieler,
 	kategorie,
 	mitglied,
+	partnerAnfrage,
 	turnier,
 	turniernummer
 } from '../../src/lib/server/db/schema.ts';
@@ -85,5 +86,74 @@ describe('Beispielturnier für make seed', () => {
 				kommentar: 'Möchte mich mit Stärkeren messen.'
 			}
 		]);
+	});
+
+	test('Rufname: zwei erfundene Spieler haben einen, einer davon gleich dem Vornamen in anderer Schreibweise', async () => {
+		await legeBeispielTurnierAn(eigene.db, new Date('2026-11-06T10:00:00Z'));
+		const mitRufname = await eigene.db
+			.select({ vorname: mitglied.vorname, rufname: mitglied.rufname })
+			.from(mitglied)
+			.where(isNotNull(mitglied.rufname));
+		expect(mitRufname.sort((a, b) => a.vorname.localeCompare(b.vorname))).toEqual([
+			{ vorname: 'Lena', rufname: 'lena' },
+			{ vorname: 'Max', rufname: 'Maxi' }
+		]);
+	});
+
+	test('A-ANMELDUNG-04, FR-48, FR-49: Beispielturnier hat ein Paar, zwei Suchende, eine offene Anfrage und einen Spieler ohne Klassierung, zweiter Lauf ändert nichts', async () => {
+		const jetzt = new Date('2026-11-06T10:00:00Z');
+		const zeilen = async () => ({
+			mitglied: (await eigene.db.select({ n: count() }).from(mitglied))[0].n,
+			anmeldung: (await eigene.db.select({ n: count() }).from(anmeldung))[0].n,
+			spieler: (await eigene.db.select({ n: count() }).from(anmeldungSpieler))[0].n,
+			anfragen: (await eigene.db.select({ n: count() }).from(partnerAnfrage))[0].n
+		});
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		const erste = await zeilen();
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		expect(await zeilen()).toEqual(erste);
+
+		const doppel = await eigene.db
+			.select({
+				kategorie: kategorie.name,
+				anmeldungId: anmeldung.id,
+				suchtext: anmeldung.suchtext,
+				vorname: mitglied.vorname
+			})
+			.from(anmeldung)
+			.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
+			.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
+			.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId))
+			.where(and(eq(kategorie.art, 'doppel'), eq(anmeldung.status, 'bestaetigt')));
+		const je = (name: string) => doppel.filter((d) => d.kategorie === name);
+		const mixed = je('Mixed Doppel');
+		expect(mixed.map((d) => d.vorname).sort()).toEqual(['Lena', 'Max']);
+		expect(new Set(mixed.map((d) => d.anmeldungId)).size).toBe(1);
+		expect(mixed[0].suchtext).toBeNull();
+		expect(je('Damen Doppel').map(({ vorname, suchtext }) => ({ vorname, suchtext }))).toEqual([
+			{ vorname: 'Sara', suchtext: 'Suche jemanden auf R5–R7-Niveau, eher abends.' }
+		]);
+		expect(je('Herren Doppel').map(({ vorname, suchtext }) => ({ vorname, suchtext }))).toEqual([
+			{ vorname: 'Paul', suchtext: null }
+		]);
+
+		const anfragen = await eigene.db
+			.select({ kategorie: kategorie.name, vonId: partnerAnfrage.vonId, anId: partnerAnfrage.anId })
+			.from(partnerAnfrage)
+			.innerJoin(kategorie, eq(kategorie.id, partnerAnfrage.kategorieId));
+		const vorname = async (id: number) =>
+			(await eigene.db.select().from(mitglied).where(eq(mitglied.id, id)))[0].vorname;
+		expect(anfragen).toHaveLength(1);
+		expect(anfragen[0].kategorie).toBe('Herren Doppel');
+		expect([await vorname(anfragen[0].vonId), await vorname(anfragen[0].anId)]).toEqual([
+			'Urs',
+			'Paul'
+		]);
+
+		const ohneKlassierung = await eigene.db
+			.select({ email: mitglied.email })
+			.from(mitglied)
+			.where(isNull(mitglied.klassierung));
+		expect(ohneKlassierung).toEqual([{ email: 'nico.musterli@example.org' }]);
 	});
 });

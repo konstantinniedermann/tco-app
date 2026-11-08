@@ -9,7 +9,10 @@ declare global {
 			konto?: import('./lib/server/login/sitzung.ts').AngemeldetesKonto;
 		}
 		// interface PageData {}
-		// interface PageState {}
+		interface PageState {
+			/** Rückmeldung, die die CM-Seite nach dem Wechsel von der Doppel-Anmelde-Seite zeigt. */
+			cmMeldung?: string;
+		}
 		// interface Platform {}
 	}
 }

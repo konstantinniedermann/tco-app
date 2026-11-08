@@ -168,7 +168,8 @@ describe('Prüfung Kategorie', () => {
 			ok: false,
 			felder: { mindestsumme: 'Bitte eine Zahl von 0 bis 20 angeben.' }
 		});
-		expect(pruefeKategorie({ ...doppel, jahr: -1, jahrgangVon: -1 }, 2027).ok).toBe(false);
+		// Ein negativer Jahrgang zählt nur im Einzel; im Doppel wird er geleert (FR-34).
+		expect(pruefeKategorie({ ...einzel, jahrgangVon: -1 }, 2027).ok).toBe(false);
 	});
 
 	it('FR-34: Wechsel auf Einzel verwirft die Mindestsumme, auf Doppel die Klassierung', () => {
@@ -195,6 +196,13 @@ describe('Prüfung Kategorie', () => {
 		expect(r).toMatchObject({ ok: true, werte: { jahrgangVon: 1990, jahrgangBis: 2027 } });
 		const leer = pruefeKategorie({ ...einzel, jahrgangVon: '', jahrgangBis: null }, 2027);
 		expect(leer).toMatchObject({ ok: true, werte: { jahrgangVon: null, jahrgangBis: null } });
+	});
+
+	it('FR-34: Doppel ohne Jahrgang: der Server leert ihn und prüft ihn nicht', () => {
+		const r = pruefeKategorie({ ...doppel, jahrgangVon: '2009', jahrgangBis: 2010 }, 2027);
+		expect(r).toMatchObject({ ok: true, werte: { jahrgangVon: null, jahrgangBis: null } });
+		const unsinn = pruefeKategorie({ ...doppel, jahrgangVon: 'abc', jahrgangBis: 1800 }, 2027);
+		expect(unsinn).toMatchObject({ ok: true, werte: { jahrgangVon: null, jahrgangBis: null } });
 	});
 
 	it('FR-34: Name 1 bis 60 Zeichen, getrimmt', () => {

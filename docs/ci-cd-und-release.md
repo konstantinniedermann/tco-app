@@ -31,7 +31,7 @@ Testgruppe. Auf der Test-Umgebung läuft die
 dort nie hin (DS-08).
 
 **Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut.
-[#32](https://github.com/konstantinniedermann/tco-app/issues/32) baut den lokal belegbaren Teil:
+[#32](https://github.com/konstantinniedermann/tco-app/issues/32) baute den lokal belegbaren Teil:
 Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
 (43 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
@@ -221,7 +221,7 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   Freigabe durch den Projektleiter. Geheimnisse nur für eine Umgebung und „nur `main` darf
   ausliefern“ (Deployment-Umgebungen) gibt es für öffentliche Repos ebenfalls gratis (B:
   [GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments),
-  ebenso der Link oben); sie sind noch nicht eingerichtet ([Beobachtungen](beobachtungen.md)).
+  ebenso der Link oben); sie sind noch nicht eingerichtet ([#61](https://github.com/konstantinniedermann/tco-app/issues/61)).
   Die Auslieferung bleibt automatisch.
 - **Restrisiko** (bewertet im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
   Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
@@ -281,9 +281,9 @@ werden sie nicht geprüft.
 | `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
 | `ZEITGEBER` | Nur lokal und im E2E: `aus` schaltet den täglichen Löschlauf ab ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)); auf Test und Live nicht durchgereicht (`betrieb/compose.umgebung.yml`), dort läuft er immer | nein |
 
-**Schnittstelle zu [#32](https://github.com/konstantinniedermann/tco-app/issues/32):**
-Hinter dem Reverse Proxy muss `adapter-node` die Client-IP aus einer Kopfzeile lesen, die nur
-der Proxy setzt (`ADDRESS_HEADER`, bei `X-Forwarded-For` dazu `XFF_DEPTH`). Sonst teilen alle
+Hinter dem Reverse Proxy liest `adapter-node` die Client-IP aus einer Kopfzeile, die nur der
+Proxy setzt (`ADDRESS_HEADER`, bei `X-Forwarded-For` dazu `XFF_DEPTH`; gesetzt in
+`betrieb/compose.umgebung.yml`). Sonst teilen alle
 Mitglieder die IP des Proxys, und die Bremsen pro IP sperren alle zusammen. `PROTOCOL_HEADER`
 nur setzen, wenn der Proxy die Kopfzeile zuverlässig setzt. Die E2E-Tests setzen sie nur,
 damit WebKit das Cookie auf `http://localhost` annimmt. IPv6-Clients fasst die App vor dem
@@ -313,13 +313,13 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Secret-Scan über die ganze Historie (gitleaks) | — | Hook und CI |
 | Secret-Scanning von GitHub mit Sperre beim Push (Einstellung im Repo, gratis für öffentliche Repos) | — | GitHub |
 | ESLint mit Svelte-Regeln, Prettier | ADR-002, Arbeitsregeln | vorhanden |
-| `svelte-check`, Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
+| `svelte-check`, Typprüfung des Service Workers (`tsc`), Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
 | Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN`, `TURNIER_SCHNITTSTELLEN` (Clubmeisterschaft, auch für `cm`) bzw. `MITTEILUNG_ADMIN_SCHNITTSTELLEN` (Mitteilungen der Verwaltung; alle drei deckt der Rechte-Test ab) und reichen `holeAdminDienste()` bzw. `holeMitteilungAdminDienste()` nur weiter; andere Routen nutzen `lib/server/admin` nicht | ADR-002, RR-07 | vorhanden |
 | Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
-| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI als ein Job pro Umgebung parallel (je nur mit ihrem Browser); Screenshots als Artefakt pro Umgebung, 30 Tage; im offiziellen Playwright-Image (Browser und Systempakete schon drin, Version aus `package-lock.json`), Datenbank und Mailpit über die Service-Namen | Testkonzept | vorhanden |
+| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI als ein Job pro Umgebung parallel (je nur mit ihrem Browser); Screenshots als Artefakt pro Umgebung, 30 Tage; im offiziellen Playwright-Image (Browser und Systempakete schon drin, Version aus `package-lock.json`), Datenbank und Mailpit über die Service-Namen; jeder Lauf läuft über `scripts/e2e.ts` auf einer eigenen, danach gelöschten Datenbank (`mytco_e2e_…`) im Postgres-Service | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
 | Docker-Image baut | ADR-003 | vorhanden |
 | Rauchtest des Images (Start, Migration, `/api/status`) | ADR-003 | vorhanden |
@@ -330,6 +330,8 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Node-Hauptversion wie in `.nvmrc`, sonst enden Prüfskripte still (`pruefe-node.sh`) | — | vorhanden |
 | Jeder Merge nach `dev` mit Code erhöht die Version um einen Schritt, mit Abschnitt in den Versionen (`version-merge.ts`) | dieses Konzept | nur Hook (Push auf `dev`) |
 
+gitleaks und osv-scanner werden als Binary geladen (bei Störungen von GitHub bis zu 5 Wiederholungen im Abstand von 15 s) und danach per SHA-256 geprüft.
+
 **Grüner Stand** (`gruener-stand.ts`): Ein grünes `make check` merkt sich den geprüften Stand,
 aber nur, wenn vor und nach der Prüfung nichts Uncommittetes herumlag und kein Commit dazukam.
 Der Pre-Push-Hook lässt `make check` aus, wenn der gepushte Stand schon grün geprüft ist und
@@ -339,7 +341,7 @@ weil ein E2E-Test sie liest. Das ist der Normalfall beim Push des Feature-Branch
 Push des Merge-Commits auf `dev`. Kam fremder Code von `dev` dazu, prüft der Hook voll, und
 ebenso im Zweifel (keine Liste, unlesbare Datei). Die Liste liegt unversioniert im
 gemeinsamen Git-Ordner, gilt also für alle Worktrees. Die CI prüft jeden Push auf `dev`
-unabhängig davon.
+unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
 
 ## Abhängigkeiten
 
@@ -419,7 +421,8 @@ Das Repo ist öffentlich; für öffentliche Repos sind die Standard-Runner von G
 und ohne Kontingent (B: Abrechnung des Kontos, öffentliche Repos mit 0 verrechnet). Bis
 06.11.2026 war es privat und teilte die 2000 Gratisminuten pro Monat mit den anderen
 privaten Repos des Kontos; MyTCO allein brauchte im November in sechs Tagen über 1100
-Minuten (B: Abrechnung des Kontos). Das war der Grund für den Wechsel. Die Regeln unten
+Minuten (B: Abrechnung des Kontos). Das war der Grund für den Wechsel
+([ADR-010](adr/adr-010-repo-oeffentlich.md)). Die Regeln unten
 bleiben, weil sie auch die Wartezeit kurz halten.
 
 - CI nur bei PRs und auf `dev`/`main`; Issue-Branches prüfen lokal.
