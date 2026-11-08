@@ -1,7 +1,13 @@
 // A-MITGLIED-07, Etappe 2b: Mitglieder aus einer CSV-Datei im MyTCO-Schema einlesen. Die Datei
 // lebt nur im Arbeitsspeicher; sie wird weder gespeichert noch geloggt (SI-05, DS-06).
+import { inArray, sql } from 'drizzle-orm';
+import { jahrInZuerich } from '../datum.ts';
+import type { Db, DbOderTx } from '../db/index.ts';
+import { konto, mitglied } from '../db/schema.ts';
 import { FELDER, pruefeAngaben, type Angaben, type Feld } from './angaben.ts';
 import { leseCsv } from './csv.ts';
+import { vergebenesFeld } from './mitglieder.ts';
+import { schreibeVerlaufFuer, type Urheber } from './verlauf.ts';
 
 // Unter der Grenze des Servers für eine Anfrage (512 KB), samt JSON-Hülle (Projektleiter, 08.11.2026).
 export const MAX_BYTES = 400 * 1024;
@@ -112,4 +118,116 @@ export function pruefeDatei(text: string, jahr: number): Dateipruefung {
 	}
 	fehlerhaft.sort((a, b) => a.zeile - b.zeile);
 	return { ok: true, gueltig: eindeutig, fehlerhaft };
+}
+
+export type Vorschau = {
+	neu: { zeile: number; name: string }[];
+	fehlerhaft: FehlerZeile[];
+	vorhanden: { zeile: number; name: string; grund: 'nummer' | 'email' | 'beides' }[];
+};
+
+type Aufteilung = Vorschau & { anzulegen: Angaben[] };
+
+/** Der Fehler der Datei ohne `ok`. */
+function nurFehler(f: { ok: false } & DateiFehler): DateiFehler {
+	return f.grund === 'spalten'
+		? { grund: 'spalten', unbekannt: f.unbekannt, fehlend: f.fehlend, doppelt: f.doppelt }
+		: { grund: f.grund };
+}
+
+// Bekannte Nummern und Adressen (klein) unter allen Mitgliedern, jeder Status: Wer schon da ist,
+// wird nicht geändert (Abgleich erst in #46).
+async function bekannte(db: DbOderTx, gueltig: GueltigeZeile[]) {
+	const nummern = gueltig.flatMap((z) =>
+		z.angaben.mitgliedernummer ? [z.angaben.mitgliedernummer.toLowerCase()] : []
+	);
+	const emails = gueltig.map((z) => z.angaben.email);
+	const kleinNummer = sql<string>`lower(${mitglied.mitgliedernummer})`;
+	const kleinEmail = sql<string>`lower(${mitglied.email})`;
+	const [n, e] = await Promise.all([
+		nummern.length
+			? db.select({ wert: kleinNummer }).from(mitglied).where(inArray(kleinNummer, nummern))
+			: [],
+		db.select({ wert: kleinEmail }).from(mitglied).where(inArray(kleinEmail, emails))
+	]);
+	return { nummern: new Set(n.map((x) => x.wert)), emails: new Set(e.map((x) => x.wert)) };
+}
+
+async function teileAuf(
+	db: DbOderTx,
+	text: string,
+	jetzt: Date
+): Promise<({ ok: true } & Aufteilung) | ({ ok: false } & DateiFehler)> {
+	const p = pruefeDatei(text, jahrInZuerich(jetzt));
+	if (!p.ok) return p;
+	const schon = await bekannte(db, p.gueltig);
+	const neu: Vorschau['neu'] = [];
+	const vorhanden: Vorschau['vorhanden'] = [];
+	const anzulegen: Angaben[] = [];
+	for (const { zeile, angaben } of p.gueltig) {
+		const name = `${angaben.vorname} ${angaben.nachname}`.slice(0, MAX_NAME);
+		const nummer = schon.nummern.has(angaben.mitgliedernummer?.toLowerCase() ?? '');
+		const email = schon.emails.has(angaben.email);
+		if (nummer || email) {
+			vorhanden.push({
+				zeile,
+				name,
+				grund: nummer && email ? 'beides' : nummer ? 'nummer' : 'email'
+			});
+		} else {
+			neu.push({ zeile, name });
+			anzulegen.push(angaben);
+		}
+	}
+	return { ok: true, neu, fehlerhaft: p.fehlerhaft, vorhanden, anzulegen };
+}
+
+/** Vorschau in drei Gruppen; liest nur. */
+export async function zeigeVorschau(
+	db: DbOderTx,
+	text: string,
+	jetzt: Date
+): Promise<({ ok: true } & Vorschau) | ({ ok: false } & DateiFehler)> {
+	const a = await teileAuf(db, text, jetzt);
+	if (!a.ok) return a;
+	return { ok: true, neu: a.neu, fehlerhaft: a.fehlerhaft, vorhanden: a.vorhanden };
+}
+
+/**
+ * FR-01: legt alle neuen Zeilen in einer Transaktion an (Mitglied und Konto ohne Brief-Code).
+ * Die Datei wird dafür erneut geprüft; stimmt die Zahl der neuen Zeilen nicht mehr mit der
+ * Vorschau überein (`erwartet`) oder kommt ein anderer zuvor, entsteht nichts (`veraltet`).
+ */
+export async function liesEin(
+	db: Db,
+	urheber: Urheber,
+	text: string,
+	erwartet: number,
+	jetzt: Date
+): Promise<
+	| { ergebnis: 'ok'; angelegt: number }
+	| { ergebnis: 'veraltet' }
+	| ({ ergebnis: 'datei' } & DateiFehler)
+> {
+	const VERALTET = { ergebnis: 'veraltet' } as const;
+	try {
+		return await db.transaction(async (tx) => {
+			const a = await teileAuf(tx, text, jetzt);
+			if (!a.ok) return { ergebnis: 'datei' as const, ...nurFehler(a) };
+			if (erwartet < 1 || a.anzulegen.length !== erwartet) return VERALTET;
+			const ids = await tx.insert(mitglied).values(a.anzulegen).returning({ id: mitglied.id });
+			await tx.insert(konto).values(ids.map(({ id }) => ({ mitgliedId: id })));
+			await schreibeVerlaufFuer(
+				tx,
+				ids.map(({ id }) => id),
+				urheber,
+				{ aktion: 'angelegt', detail: 'einlesen' },
+				jetzt
+			);
+			return { ergebnis: 'ok' as const, angelegt: ids.length };
+		});
+	} catch (fehler) {
+		if (vergebenesFeld(fehler) !== null) return VERALTET;
+		throw fehler;
+	}
 }

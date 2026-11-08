@@ -62,7 +62,7 @@ const INDEX_FELD: Record<string, Vergeben['feld']> = {
 
 // Gibt das betroffene Feld zurück, wenn `fehler` (auch in `cause` verpackt) eine bekannte
 // Eindeutigkeitsverletzung ist, sonst `null`.
-function vergebenesFeld(fehler: unknown): Vergeben['feld'] | null {
+export function vergebenesFeld(fehler: unknown): Vergeben['feld'] | null {
 	let aktuell: unknown = fehler;
 	for (let i = 0; i < 3 && aktuell instanceof Error; i++) {
 		const e = aktuell as { code?: unknown; constraint?: unknown };
