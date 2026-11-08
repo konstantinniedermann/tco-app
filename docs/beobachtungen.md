@@ -127,3 +127,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) der Beobachtungs-Auswertung vom 08.11.2026.
 
 **Einschätzung:** Niedrig: Typen sind geprüft, `ansicht` ist per DB-Regel auf vier Werte begrenzt. Ein Schritt im bestehenden Auskunft-E2E würde reichen, wenn die Seite ohnehin angefasst wird.
+
+### 2026-11-08 — Design System «MyTCO» hinkt dem UI-Leitbild hinterher
+
+**Thema:** App-Oberfläche
+
+**Fundort:** Design-System-Artifact «MyTCO» (`project/tokens.json`, `meta.ref` = `dev@36306dc`, synced 2026-11-05), `docs/ui-leitbild.md`, `src/lib/design/tokens.css`
+
+**Beobachtung:** Seit dem Stand des Design Systems haben 23 Commits auf `dev` das UI-Leitbild oder `tokens.css` geändert (u. a. Bewegung und Bedienung, #54). Die README des Design Systems beschreibt z. B. noch Unterseiten nur mit «‹ Zurück». Entwürfe, die nur die Tokens des Design Systems nehmen, könnten veraltete Werte zeigen; die Entwürfe zu #69 binden darum die echten `tokens.css`/`basis.css` aus dem Repo ein.
+
+**Ursprung:** Entwurf zu #69 (Navigation und Tiefe).
+
+**Einschätzung:** Mittel bis niedrig: Entwürfe mit den echten CSS-Dateien sind nicht betroffen. Nachführen spätestens mit den neuen Bausteinen aus #69 (Umschalter, Blatt von unten), wie es dessen DoD ohnehin verlangt.
