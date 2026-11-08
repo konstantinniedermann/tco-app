@@ -154,7 +154,7 @@ die niemand bearbeiten kann.
    Doppel-Anmeldung *zurückgezogen*, und der andere bekommt eine Mail (Entscheid Projektleiter).
 5. **Kontaktdaten:** Partner sehen gegenseitig E-Mail und Telefon bis zum Ende der CM (FR-19).
 
-**Präzisierungen vor dem Bau (08.11.2026):**
+**Präzisierungen vor dem Bau (08.11.2026, freigegeben Projektleiter mit dem Design-Entwurf):**
 
 - **Zwei Etappen in einem Issue** (#59; Entscheid Projektleiter): *Etappe 1* baut die
   Mitgliederseite (Partnerwahl, «Partner gesucht» mit Kommentar, Abmelden, Austritt, Meldungen,
