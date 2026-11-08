@@ -217,12 +217,17 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			'postAnmeldungVonHand',
 			'postVerschieben',
 			'postAnmeldungLoeschen',
+			'postDoppelVonHand',
+			'postZusammenlegen',
+			'postPartnerAendern',
+			'postAnfrageAlsPaar',
+			'postAnfrageLoeschen',
 			'postEntscheid',
 			'postKlassierung'
 		]) {
 			expect(namen).toContain(n);
 		}
-		expect(schreibende.length).toBeGreaterThanOrEqual(26);
+		expect(schreibende.length).toBeGreaterThanOrEqual(31);
 		const vorher = await zeilen();
 		for (const [name, fn] of schreibende) {
 			const r = await fn(s.d, ereignis({ konto: mytco.konto, body: {}, params: { id } }));
@@ -336,6 +341,17 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		});
 		if (k.ergebnis !== 'ok') throw new Error(k.ergebnis);
 		const kategorieId = k.id;
+		const dk = await legeKategorieAn(db(), t.id, {
+			name: 'Doppel offen',
+			geschlecht: 'offen',
+			art: 'doppel',
+			jahrgangVon: null,
+			jahrgangBis: null,
+			klassierungVon: null,
+			klassierungBis: null,
+			mindestsumme: 9
+		});
+		if (dk.ergebnis !== 'ok') throw new Error(dk.ergebnis);
 		const [a] = await db()
 			.insert(anmeldung)
 			.values({
@@ -371,10 +387,14 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			await MITTEILUNG_ADMIN_SCHNITTSTELLEN.getAnlassMitteilungen(
 				s.d,
 				hole(mytco.konto, { params: { id: anlassId } })
+			),
+			await TURNIER_SCHNITTSTELLEN.getDoppel(
+				s.d,
+				hole(mytco.konto, { params: { id: String(dk.id) } })
 			)
 		];
 		expect(antworten.map((r) => r.status)).toEqual(Array(antworten.length).fill(200));
-		expect(antworten).toHaveLength(11);
+		expect(antworten).toHaveLength(12);
 		const liste = (await antworten[0].json()) as { id: number }[];
 		expect(liste.map((z) => z.id)).toContain(ziel.mitgliedId);
 		expect(await antworten[3].json()).toEqual([
