@@ -360,7 +360,7 @@
 
 <dialog class="karte" bind:this={rueckfrage} aria-labelledby="rueckfrage-titel">
 	<h2 id="rueckfrage-titel">
-		{#if ziel}<Name name={ziel.name} />{/if} anfragen?
+		{#if ziel}{nameText(ziel.name, 'vorname-zuerst')}{/if} anfragen?
 	</h2>
 	{#if ziel}
 		<p>{rueckfrageText(anredeName(ziel.name))}</p>

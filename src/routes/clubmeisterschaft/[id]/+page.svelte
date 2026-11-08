@@ -736,8 +736,9 @@
 			Anfrage für «{a.kategorie}»
 		</h2>
 		<p>
-			<Name name={a.von} />{#if a.klassierung}&nbsp;· {klassierungName(a.klassierung)}{/if} möchte mit
-			dir spielen.
+			<strong>{nameText(a.von, 'vorname-zuerst')}</strong>{#if a.klassierung}&nbsp;· {klassierungName(
+					a.klassierung
+				)}{/if} möchte mit dir spielen.
 		</p>
 		{#if a.kontakt}
 			<p>
@@ -824,7 +825,7 @@
 	{#each k.meineAnfragen as a (a.anfrageId)}
 		<div class="kachel karte-teil">
 			<span>
-				Deine Anfrage an <Name name={a.an} /><br />
+				Deine Anfrage an <strong>{nameText(a.an, 'vorname-zuerst')}</strong><br />
 				<span class="plakette plakette-offen">offen</span>
 			</span>
 			{#if offen && !nurAnsehen}
@@ -848,7 +849,7 @@
 	<section class="karte" aria-labelledby="doppel-{k.id}">
 		<h2 id="doppel-{k.id}">{k.name}</h2>
 		<p class="leise">{doppelText(k)}</p>
-		<p>Du spielst mit <Name name={partner.name} />.</p>
+		<p>Du spielst mit <strong>{nameText(partner.name, 'vorname-zuerst')}</strong>.</p>
 		{#if partner.telefon || partner.email}
 			<p>
 				{#if partner.telefon}<a href="tel:{waehlbar(partner.telefon)}">{partner.telefon}</a>{/if}
