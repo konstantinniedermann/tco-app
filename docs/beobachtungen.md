@@ -714,3 +714,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Doku-Abgleich vor dem Release 0.11.1.
 
 **Einschätzung:** Beim nächsten Doku-Durchgang nachtragen; die Begriffe stehen im Fachmodell.
+
+### 2026-11-08 — Briefe-Liste im lokalen E2E über tausend Zeilen, Tests darum langsam
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/briefe.test.ts`, gemeinsame lokale Datenbank `mytco`
+
+**Beobachtung:** Die Seite *Briefe* zeigt alle aktiven Mitglieder, die MyTCO nie geöffnet haben. Jeder E2E-Lauf legt solche Test-Mitglieder an und räumt sie nicht weg; lokal stehen schon rund 1300 in der Liste. axe und das ganzseitige Bildschirmfoto (über 60 000 px hoch) brauchen dafür so lange, dass die Datei ein Zeitlimit von 90 s braucht. In der CI (frische Datenbank) ist die Liste klein. Dasselbe trifft schon andere Dateien: `mitteilungen.test.ts` «FR-42: allgemeine Mitteilung an den Verein» läuft auf dem iPhone ins 30-s-Limit, weil die Vorschau lokal 10 630 aktive Mitglieder zählt (auch beim Wiederholen rot).
+
+**Ursprung:** #43 Etappe 2a, Aufgabe 4.
+
+**Einschätzung:** Solange die Läufe grün bleiben, abhaken; wächst die Laufzeit weiter, Test-Mitglieder beim Lauf aufräumen oder die lokale Datenbank zurücksetzen.
+
+### 2026-11-08 — «gültig bis» rechnet in der Verwaltung mit der Zeitzone des Browsers, im Brief mit Zürich
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/verwaltung/anzeige.ts` (`tagText`, ohne `timeZone`), genutzt auf der Seite eines Mitglieds und der Seite *Briefe*; der Brief nutzt `formatiereDatum` (Europe/Zurich)
+
+**Beobachtung:** Läuft ein Code kurz vor Mitternacht ab und steht der Browser nicht in der Schweizer Zeitzone, kann die Verwaltung einen anderen Tag zeigen als der Brief.
+
+**Ursprung:** #43 Etappe 2a, Aufgabe 4.
+
+**Einschätzung:** Kleiner Fix (`timeZone: ZONE` in `TAG`), betrifft auch *Für Fairgate*; im Verein laufen die Browser in der Schweiz, darum kaum spürbar.
