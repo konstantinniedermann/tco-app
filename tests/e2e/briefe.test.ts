@@ -10,6 +10,7 @@ import {
 	holeMailCode,
 	legeAdminMitBriefCodeAn,
 	legeKontoAn,
+	legeKontoMitBriefCodeAn,
 	legeRollenkontoMitBriefCodeAn,
 	leereStrasse,
 	schliesseLoginHilfen
@@ -296,5 +297,113 @@ test('A-LOGIN-01, RR-07: MyTCO-Admin sieht die Liste ohne Auswahl und ohne Taste
 	await expect(page.getByRole('button', { name: /Briefe erzeugen/ })).toHaveCount(0);
 	await expect(page.locator('dialog', { hasText: 'Briefe erzeugen' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'briefe-nur-ansehen');
+	expect(ohneScreenshotStil(fehler)).toEqual([]);
+});
+
+// Einzelner Brief auf der Seite eines Mitglieds (Karte «Login»).
+
+async function oeffneMitglied(page: Page, mitgliedId: number, name: string) {
+	await page.goto(`/verwaltung/mitglieder/${mitgliedId}`);
+	await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
+}
+
+const login = (page: Page) =>
+	page.locator('details.klappe', { has: page.locator('summary', { hasText: 'Login' }) });
+
+test('A-LOGIN-01, RR-04: einzelner Brief auf der Mitgliedsseite ersetzt den alten Code', async ({
+	page
+}, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const projekt = info.project.name;
+	const nachname = eindeutig('Einzel', info);
+	const ziel = await legeKontoMitBriefCodeAn('Hanna', nachname);
+	await meldeAdminAn(page);
+	await oeffneMitglied(page, ziel.mitgliedId, `${nachname}, Hanna`);
+
+	await login(page).getByRole('button', { name: 'Neuen Brief-Code ausstellen' }).click();
+	const frage = page.getByRole('dialog', { name: 'Neuen Brief-Code ausstellen?' });
+	await expect(frage).toBeVisible();
+	await expect(frage).toContainText(
+		'Der alte Brief-Code gilt dann nicht mehr. Eingeloggte Geräte bleiben eingeloggt.'
+	);
+	await pruefeBildschirm(page, info, 'brief-einzeln-rueckfrage');
+	await bild(page, projekt, 'brief-einzeln-rueckfrage');
+	await frage.getByRole('button', { name: 'Ausstellen', exact: true }).click();
+
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Hanna' })).toBeVisible();
+	await expect(page.locator('.brief')).toHaveCount(1);
+	const zurueck = page.getByRole('button', { name: '‹ Zurück' });
+	await expect(zurueck).toBeFocused();
+	const code = (await page.locator('.brief-code').textContent())!.trim();
+	expect(code).not.toBe(formatiereBriefCode(ziel.code));
+	await pruefeBildschirm(page, info, 'brief-einzeln-druckansicht');
+	await bild(page, projekt, 'brief-einzeln-druckansicht', true);
+
+	// Zurück zum Mitglied: Der Code ist weg, die Karte zeigt den neuen Stand.
+	await zurueck.click();
+	const titel = page.getByRole('heading', { level: 1, name: `${nachname}, Hanna` });
+	await expect(titel).toBeVisible();
+	await expect(titel).toBeFocused();
+	await expect(page.locator('.brief-code')).toHaveCount(0);
+	await expect(login(page)).toContainText(/Brief-Code gültig bis \d{2}\.\d{2}\.\d{4}/);
+	await expect(page.getByRole('table', { name: 'Verlauf' })).toContainText(
+		'Brief-Code ausgestellt'
+	);
+
+	// Der alte Code meldet nicht mehr an, der neue schon.
+	const andere = await page.context().browser()!.newContext(info.project.use);
+	const seite2 = await andere.newPage();
+	await seite2.goto('/login');
+	await seite2.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(ziel.code));
+	await seite2.getByRole('button', { name: 'Anmelden', exact: true }).click();
+	await expect(
+		seite2.getByText(
+			'Dieser Code stimmt nicht. Prüf ihn oder lass dir einen neuen per E-Mail schicken.'
+		)
+	).toBeVisible();
+	await seite2.getByLabel('Code aus dem Brief').fill(code);
+	await seite2.getByRole('button', { name: 'Anmelden', exact: true }).click();
+	await expect(seite2.getByRole('heading', { level: 1, name: 'Hoi Hanna' })).toBeVisible();
+	await andere.close();
+	expect(ohneScreenshotStil(fehler)).toEqual([]);
+});
+
+test('A-LOGIN-01: Mitgliedsseite – Adresse fehlt, kein Brief möglich', async ({ page }, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const nachname = eindeutig('Ohnebrief', info);
+	const ziel = await legeKontoAn('Ines', nachname);
+	await meldeAdminAn(page);
+	await oeffneMitglied(page, ziel.mitgliedId, `${nachname}, Ines`);
+
+	// Fehlt die Adresse erst nach dem Laden, stellt der Server keinen Code aus (409).
+	await leereStrasse(ziel.mitgliedId);
+	await login(page).getByRole('button', { name: 'Neuen Brief-Code ausstellen' }).click();
+	await page
+		.getByRole('dialog', { name: 'Neuen Brief-Code ausstellen?' })
+		.getByRole('button', { name: 'Ausstellen', exact: true })
+		.click();
+	await expect(login(page).getByRole('alert')).toHaveText(
+		'Für dieses Mitglied lässt sich kein Brief erstellen.'
+	);
+	await expect(page.locator('.brief')).toHaveCount(0);
+	// Nach dem Neuladen steht statt der Taste der Hinweis.
+	await expect(login(page).getByText('Für einen Brief fehlt die Adresse.')).toBeVisible();
+	await expect(page.getByRole('button', { name: 'Neuen Brief-Code ausstellen' })).toHaveCount(0);
+	await pruefeBildschirm(page, info, 'brief-einzeln-adresse-fehlt');
+	expect(ohneScreenshotStil(fehler)).toEqual([]);
+});
+
+test('RR-07: MyTCO-Admin sieht keine Taste «Neuen Brief-Code ausstellen»', async ({
+	page
+}, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const nachname = eindeutig('Nurlesen', info);
+	const ziel = await legeKontoAn('Jana', nachname);
+	await meldeAdminAn(page, true);
+	await oeffneMitglied(page, ziel.mitgliedId, `${nachname}, Jana`);
+
+	await expect(login(page)).toContainText('Für dieses Mitglied gibt es noch keinen Brief-Code.');
+	await expect(page.getByRole('button', { name: 'Neuen Brief-Code ausstellen' })).toHaveCount(0);
+	await expect(page.locator('dialog', { hasText: 'Neuen Brief-Code ausstellen?' })).toHaveCount(0);
 	expect(ohneScreenshotStil(fehler)).toEqual([]);
 });
