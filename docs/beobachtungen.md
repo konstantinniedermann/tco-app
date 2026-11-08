@@ -139,3 +139,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Entwurf zu #69 (Navigation und Tiefe).
 
 **Einschätzung:** Mittel bis niedrig: Entwürfe mit den echten CSS-Dateien sind nicht betroffen. Nachführen spätestens mit den neuen Bausteinen aus #69 (Umschalter, Blatt von unten), wie es dessen DoD ohnehin verlangt.
+
+### 2026-11-08 — Secret-Scan scheitert, wenn GitHub den gitleaks-Download kurz verweigert
+
+**Thema:** CI
+
+**Fundort:** `.github/workflows/secret-scan.yml`, Schritt *gitleaks installieren* (`curl -sSfL` ohne `--retry`)
+
+**Beobachtung:** Der Scan des Merge-Commits von #66 auf `dev` scheiterte zweimal hintereinander mit `curl: (22) … 504` beim Herunterladen von gitleaks aus den GitHub-Releases, nicht an einem Fund. Der Lauf ist rot, obwohl nichts geprüft wurde.
+
+**Ursprung:** Merge von #66 nach `dev` (Konzept Gruppenphase).
+
+**Einschätzung:** Niedrig: Wiederholen hilft, sobald GitHub wieder antwortet. `curl --retry 3 --retry-all-errors` würde kurze Störungen abfangen; zu prüfen, ob das den Prüfsummen-Schritt berührt.
