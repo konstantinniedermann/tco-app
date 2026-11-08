@@ -48,7 +48,7 @@ du selbst einschaltest. Für nichts anderes.
   Schreib in den Kommentar bitte keine Angaben zur Gesundheit.
 - Alle Mitglieder sehen Name, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft. Wer einen
   Doppelpartner sucht, sieht Name und Klassierung der Mitglieder, die für die Kategorie in Frage kommen. Fehlt
-  eine Angabe, steht dort *Klassierung fehlt* oder *Angaben fehlen*.
+  eine Angabe, steht dort *Klassierung fehlt* oder *Angaben fehlen* (Geschlecht).
 - Meldest du dich im Doppel allein an, steht dort *sucht Partner*, für alle Mitglieder sichtbar. Du kannst einen
   kurzen Kommentar dazuschreiben (höchstens 120 Zeichen, freiwillig, bitte keine Angaben zur Gesundheit). Er
   wird gelöscht, sobald du einen Partner hast oder dich abmeldest.
