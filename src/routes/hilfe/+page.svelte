@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import Zurueck from '../../lib/ui/Zurueck.svelte';
 	import { erkenneGeraet } from '../../lib/hilfe/geraet.ts';
 	import Anleitung from '../../lib/ui/Anleitung.svelte';
 	import type { PageProps } from './$types';
@@ -42,7 +42,7 @@
 	</details>
 {/snippet}
 
-<a class="zurueck" href={resolve('/')}>‹ Zurück</a>
+<Zurueck />
 <h1>Hilfe</h1>
 
 {#if androidZuerst}

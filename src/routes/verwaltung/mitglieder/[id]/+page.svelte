@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import Pfad from '../../../../lib/verwaltung/Pfad.svelte';
 	import { resolve } from '$app/paths';
 	import { tick } from 'svelte';
 	import Briefdruck from '../../../../lib/verwaltung/Briefdruck.svelte';
@@ -240,7 +241,10 @@
 {#if briefe}
 	<Briefdruck {briefe} zurueck={zurueckZumMitglied} />
 {:else}
-	<a class="zurueck" href={resolve('/verwaltung/mitglieder')}>‹ Zurück</a>
+	<Pfad
+		stufen={[{ text: 'Mitglieder', href: resolve('/verwaltung/mitglieder') }]}
+		aktuell={`${angaben.nachname}, ${angaben.vorname}`}
+	/>
 	<h1 tabindex="-1" bind:this={titel}>
 		{angaben.nachname}, {angaben.vorname} <span class={stand.klasse}>{stand.text}</span>
 	</h1>

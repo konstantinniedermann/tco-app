@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
+	import Zurueck from '../../../lib/ui/Zurueck.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
@@ -76,7 +77,7 @@
 		}
 	}
 
-	// «‹ Zurück» in Schritt 2 führt zu Schritt 1 (andere Adresse eingeben).
+	// «‹ Andere Adresse» in Schritt 2 führt zu Schritt 1.
 	async function zuSchritt1(event: MouseEvent) {
 		event.preventDefault();
 		vergissWechsel(speicher);
@@ -132,9 +133,9 @@
 </svelte:head>
 
 {#if schritt === 'adresse'}
-	<a class="zurueck" href={resolve('/profil')}>‹ Zurück</a>
+	<Zurueck />
 {:else}
-	<a class="zurueck" href={resolve('/profil/email')} onclick={zuSchritt1}>‹ Zurück</a>
+	<Zurueck text="Andere Adresse" href={resolve('/profil/email')} onclick={zuSchritt1} />
 {/if}
 <div class="zaehler">
 	<div class="zaehler-balken" aria-hidden="true">

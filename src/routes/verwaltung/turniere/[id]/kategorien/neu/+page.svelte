@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Pfad from '../../../../../../lib/verwaltung/Pfad.svelte';
 	import { resolve } from '$app/paths';
 	import Kategorieformular, {
 		NEUE_KATEGORIE,
@@ -45,9 +46,16 @@
 	<title>Neue Kategorie – MyTCO</title>
 </svelte:head>
 
-<a class="zurueck" href={resolve('/verwaltung/turniere/[id]', { id: String(data.turnier.id) })}
-	>‹ {data.turnier.name}</a
->
+<Pfad
+	stufen={[
+		{ text: 'Turniere', href: resolve('/verwaltung/turniere') },
+		{
+			text: data.turnier.name,
+			href: resolve('/verwaltung/turniere/[id]', { id: String(data.turnier.id) })
+		}
+	]}
+	aktuell="Neue Kategorie"
+/>
 <h1>Neue Kategorie</h1>
 
 <div class="karte">

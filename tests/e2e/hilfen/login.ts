@@ -106,6 +106,11 @@ export async function loescheTurnier(jahr: number): Promise<void> {
 	await hole().db.delete(turnier).where(eq(turnier.jahr, jahr));
 }
 
+/** Gibt dem Turnier einen anderen (erfundenen) Namen, z. B. einen sehr langen. */
+export async function benenneTurnier(turnierId: number, name: string): Promise<void> {
+	await hole().db.update(turnier).set({ name }).where(eq(turnier.id, turnierId));
+}
+
 /**
  * Wie `legeTurnierAn`, dazu diese Kategorien und offene Anmeldung (Anmeldeschluss 31. Mai des
  * Jahres). Gibt die Nummern von Turnier und Kategorien zurück, in der Reihenfolge der Werte.

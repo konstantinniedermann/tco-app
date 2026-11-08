@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import Pfad from '../../../../lib/verwaltung/Pfad.svelte';
 	import Turnierformular, {
 		werteAusTurnier,
 		type TurnierWerte
@@ -108,7 +109,10 @@
 	<title>{detail.name} – MyTCO</title>
 </svelte:head>
 
-<a class="zurueck" href={resolve('/verwaltung/turniere')}>‹ Zurück</a>
+<Pfad
+	stufen={[{ text: 'Turniere', href: resolve('/verwaltung/turniere') }]}
+	aktuell={detail.name}
+/>
 <h1>{detail.name}</h1>
 <p class="leise">
 	Anmeldeschluss {schluss} · {aktive}

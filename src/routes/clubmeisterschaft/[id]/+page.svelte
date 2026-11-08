@@ -35,6 +35,7 @@
 	} from '../../../lib/cm/anzeige.ts';
 	import { anredeName, nameText, type Namensteile } from '../../../lib/name.ts';
 	import Name from '../../../lib/ui/Name.svelte';
+	import Zurueck from '../../../lib/ui/Zurueck.svelte';
 	import { istKlappeOffen, merkeKlappe } from '../../../lib/ui/klappe.ts';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { KLASSIERUNGEN, klassierungName } from '../../../lib/turnier/klassierung.ts';
@@ -117,9 +118,9 @@
 	} as const;
 
 	/**
-	 * Übernimmt die neue Ansicht nach dem Speichern. Vorgeladene Seiten (die Startseite beim
-	 * Antippen von «‹ Zurück») verfallen, damit ihr Zähler stimmt. `/api/cm` lädt nur die
-	 * Startseite; diese Seite lädt dabei nicht neu und kann so auch keine Fehlerseite zeigen.
+	 * Übernimmt die neue Ansicht nach dem Speichern. Vorgeladene Seiten (Startseite, Reiter CM)
+	 * verfallen, damit ihr Zähler stimmt. Diese Seite holt `/api/cm` ungebunden (`+page.ts`),
+	 * lädt dabei nicht neu und kann so auch keine Fehlerseite zeigen.
 	 */
 	async function uebernimm(neu: CmAnsicht) {
 		cm = neu;
@@ -481,7 +482,7 @@
 	<title>{cm.turnier.name} – MyTCO</title>
 </svelte:head>
 
-<a class="zurueck" href={resolve('/')}>‹ Zurück</a>
+<Zurueck />
 <h1>{cm.turnier.name}</h1>
 <p>
 	<span class="plakette {status.klasse}">{status.text}</span><br />

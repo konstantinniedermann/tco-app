@@ -14,6 +14,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   Klassierungen; die Spieler bekommen eine Meldung.
 - Doppel: Jedes Mitglied hat höchstens eine offene Anfrage je Kategorie.
 
+## 0.16.0 — Übersichtliche Navigation mit Reiter CM
+
+- Übersichtliche Navigation (#69): Die Reiter Start · CM · Profil stehen nach dem Login auf jeder
+  Seite, der neue Reiter CM führt zur laufenden Clubmeisterschaft. Zurück-Links nennen ihr Ziel
+  («‹ Profil», «‹ Clubmeisterschaft 2027»), die Verwaltung zeigt über dem Titel den Pfad.
+
 ## 0.15.1 — E2E auf eigener Datenbank, Testbestand für make seed
 
 - E2E auf eigener Datenbank: Jeder E2E-Lauf (`make e2e`, `make check`, Pre-Push-Hook, CI) legt
