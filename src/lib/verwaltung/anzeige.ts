@@ -3,7 +3,7 @@ import { MELDUNG } from '../login/anmelden.ts';
 import type { Antwort, FairgateZeile, Feld, MitgliedZeile, Rolle, VerlaufEintrag } from './api.ts';
 import { ROLLEN_NAME } from './rollen-namen.ts';
 
-export const NUR_ANSEHEN = 'In der Ansicht kannst du nichts speichern.';
+const NUR_ANSEHEN = 'In der Ansicht kannst du nichts speichern.';
 const KEIN_RECHT = 'Das darfst du hier nur ansehen, nicht ändern.';
 
 /**
@@ -141,10 +141,15 @@ export function plakette(z: Pick<MitgliedZeile, 'login' | 'status'>): {
 
 const ZONE = 'Europe/Zurich';
 
-const ZEIT = new Intl.DateTimeFormat('de-CH', { dateStyle: 'short', timeStyle: 'short' });
+const ZEIT = new Intl.DateTimeFormat('de-CH', {
+	dateStyle: 'short',
+	timeStyle: 'short',
+	timeZone: ZONE
+});
 // Wie der Brief (formatiereDatum): der Zürcher Kalendertag, nicht der des Browsers.
 const TAG = new Intl.DateTimeFormat('de-CH', { dateStyle: 'medium', timeZone: ZONE });
 
+/** «01.02.27, 00:30» in Zürcher Zeit, nicht in der des Browsers. */
 export const zeitText = (iso: string) => ZEIT.format(new Date(iso));
 /** «01.02.2027» nach dem Kalender in Zürich. */
 export const tagText = (iso: string) => TAG.format(new Date(iso));

@@ -383,6 +383,37 @@ describe('Admin-Schnittstellen', () => {
 		expect(s.hinweis).toHaveBeenCalledWith(angaben.email);
 	});
 
+	test('SI-09: kein Hinweis an die alte Adresse bei vergeben/veraltet', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const { angaben, id, vorher } = await angelegt(s, admin.konto);
+		const andere = await angelegt(s, admin.konto);
+		const vergeben = await postMitglied(
+			s.d,
+			ereignis({
+				body: { ...angaben, email: andere.angaben.email, vorher },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect([vergeben.status, await vergeben.json()]).toEqual([
+			409,
+			{ fehler: 'vergeben', feld: 'email' }
+		]);
+		const veraltet = await postMitglied(
+			s.d,
+			ereignis({
+				body: { ...angaben, email: `neu-${id}@example.org`, vorher: { ...vorher, ort: 'Aarau' } },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect([veraltet.status, await veraltet.json()]).toEqual([409, { fehler: 'veraltet' }]);
+		expect(s.hinweis).not.toHaveBeenCalled();
+		const [gespeichert] = await db.select().from(mitglied).where(eq(mitglied.id, id));
+		expect(gespeichert.email).toBe(angaben.email);
+	});
+
 	test('SI-09: scheitert der Hinweis, bleibt die Änderung gespeichert', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);

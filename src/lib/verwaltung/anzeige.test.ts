@@ -11,6 +11,7 @@ import {
 	datumText,
 	datumZeitText,
 	tagText,
+	zeitText,
 	wiedereintrittBis,
 	loeschungAm,
 	auskunftTitel
@@ -119,6 +120,10 @@ describe('Datumstexte der Mitgliedschaft (Schweizer Zeit)', () => {
 	it('«gültig bis» als «01.02.2027», nach Zürcher Kalender wie im Brief', () => {
 		expect(tagText('2027-01-31T10:00:00Z')).toBe('31.01.2027');
 		expect(tagText('2027-01-31T23:30:00Z')).toBe('01.02.2027');
+	});
+
+	it('Zeitpunkt im Verlauf in Zürcher Zeit, nicht in der des Browsers', () => {
+		expect(zeitText('2027-01-31T23:30:00Z')).toBe('01.02.27, 00:30');
 	});
 
 	it('Datum mit Zeit als «7.11.2026, 09:12»', () => {

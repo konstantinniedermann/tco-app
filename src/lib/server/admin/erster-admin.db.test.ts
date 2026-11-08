@@ -1,6 +1,6 @@
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import {
 	legeEigeneDatenbankAn,
 	type EigeneDatenbank
@@ -8,7 +8,7 @@ import {
 import type { Db } from '../db/index.ts';
 import { aenderung, konto, kontoRolle, mitglied } from '../db/schema.ts';
 import { legeAdminFest, machAdmin } from './erster-admin.ts';
-import { ladeRollen } from './rollen.ts';
+import { ladeRollen, sperreRollen } from './rollen.ts';
 
 // «Es gibt noch keinen Admin» ist global; darum eine eigene Datenbank.
 let eigene: EigeneDatenbank | undefined;
@@ -212,5 +212,35 @@ describe('Erster Admin', () => {
 		expect((await ladeRollen(db, kontoId)).sort()).toEqual(MYTCO_UND_MITGLIEDER);
 		const verlauf = await db.select().from(aenderung).where(eq(aenderung.mitgliedId, mitgliedId));
 		expect(verlauf).toHaveLength(2);
+	});
+
+	test('machAdmin: veraltet oder nicht-gefunden → Fehler mit klarer Meldung, das Skript bricht ab', async () => {
+		await expect(machAdmin(db, -1, jetzt)).rejects.toThrow(
+			'machAdmin: Konto -1 nicht gefunden, keine Rolle vergeben'
+		);
+
+		// Zwischen Lesen und Schreiben ändert ein anderer die Rollen: Die Transaktion hält die
+		// Rollen-Sperre, bis machAdmin gelesen hat und auf die Sperre wartet.
+		const { kontoId } = await legeBestehendesAn(angaben());
+		let lauf: Promise<void> | undefined;
+		await db.transaction(async (tx) => {
+			await sperreRollen(tx);
+			await tx.insert(kontoRolle).values({ kontoId, rolle: 'cm' });
+			lauf = machAdmin(db, kontoId, jetzt);
+			lauf.catch(() => {});
+			await vi.waitFor(
+				async () => {
+					const r = await db.execute<{ n: number }>(
+						sql`select count(*)::int as n from pg_locks where locktype = 'advisory' and not granted and database = (select oid from pg_database where datname = current_database())`
+					);
+					expect(r.rows[0].n).toBe(1);
+				},
+				{ timeout: 4000 }
+			);
+		});
+		await expect(lauf).rejects.toThrow(
+			`machAdmin: Rollen von Konto ${kontoId} inzwischen geändert, keine Rolle vergeben`
+		);
+		expect(await ladeRollen(db, kontoId)).toEqual(['cm']);
 	});
 });

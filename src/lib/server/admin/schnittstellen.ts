@@ -10,6 +10,7 @@ import {
 	type Ereignis
 } from '../login/schnittstellen.ts';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
+import { jahrInZuerich } from '../datum.ts';
 import { parseId } from '../parse-id.ts';
 import { pruefeAnlass } from '../anlass/angaben.ts';
 import {
@@ -209,7 +210,7 @@ export function getMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Respon
 export function postMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
 		const t = jetzt(d);
-		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: t.getFullYear() });
+		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: jahrInZuerich(t) });
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.fehler });
 		const r = await legeMitgliedAn(d.db, urheber, p.angaben, t);
 		return r.ergebnis === 'ok'
@@ -231,7 +232,7 @@ export function postMitglied(d: AdminDienste, e: AdminEreignis): Promise<Respons
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const t = jetzt(d);
-		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: t.getFullYear() });
+		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: jahrInZuerich(t) });
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.fehler });
 		// Der Stand, den die Seite geladen hat: schützt vor dem Überschreiben fremder Änderungen.
 		const vorher = leseStand(koerper.vorher);

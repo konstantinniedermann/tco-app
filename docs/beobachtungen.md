@@ -116,6 +116,18 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-08 — Nach einem 409 bei den Briefen fällt der Fokus auf `body`
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/routes/verwaltung/briefe/+page.svelte` («Briefe erzeugen»), `src/routes/verwaltung/mitglieder/[id]/+page.svelte` («Neuen Brief-Code ausstellen»)
+
+**Beobachtung:** Antwortet der Server mit 409, lädt die Seite den neuen Stand; die Taste, die die Rückfrage geöffnet hat, verschwindet dabei, und der Fokus fällt auf `body`. Die Meldung selbst kommt über `role="alert"` an.
+
+**Ursprung:** Review Task 5, #43 Etappe 2a.
+
+**Einschätzung:** Klein, Feinschliff für die Barrierefreiheit: den Fokus nach dem Neuladen auf die Meldung oder den Titel der Karte setzen.
+
 ### 2026-11-07 — Android-Test «Menü auf der Einstiegsseite» wartet unter Last vergeblich auf «MyTCO installieren»
 
 **Thema:** Betrieb

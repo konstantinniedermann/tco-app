@@ -4,6 +4,7 @@ import { angabenAusZeile } from '../admin/mitglieder.ts';
 import { geaenderteFelder, schreibeVerlauf } from '../admin/verlauf.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { mitglied } from '../db/schema.ts';
+import { jahrInZuerich } from '../datum.ts';
 
 // Annahme K-19.1: Telefon und Lizenznummer pflegt das Mitglied selbst.
 // Annahme K-19.2: Die Adresse (Strasse, PLZ, Ort) pflegt das Mitglied selbst.
@@ -54,7 +55,7 @@ export async function aendereEigeneAngaben(
 		}
 		const pruefung = pruefeAngaben(
 			{ ...gespeichert, ...eigene },
-			{ nummerPflicht: false, jahr: jetzt.getFullYear() }
+			{ nummerPflicht: false, jahr: jahrInZuerich(jetzt) }
 		);
 		if (!pruefung.ok) return { ergebnis: 'eingabe' as const, fehler: pruefung.fehler };
 
