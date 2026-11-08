@@ -8,7 +8,7 @@
 		datumText,
 		datumZeitText
 	} from '../../../../../lib/verwaltung/anzeige.ts';
-	import { ROLLEN_NAME } from '../../../../../lib/verwaltung/rollen-namen.ts';
+	import { ANSICHT_NAME, ROLLEN_NAME } from '../../../../../lib/verwaltung/rollen-namen.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -132,9 +132,11 @@
 				<tbody>
 					{#each a.login.geraete as z, i (i)}
 						<tr
-							><td>Eingeloggtes Gerät</td><td>{datumText(z.erstelltAm)}</td><td
-								>{datumText(z.zuletztGenutzt)}</td
-							></tr
+							><td
+								>Eingeloggtes Gerät{#if z.verwaltungBestaetigtAm}, Verwaltung bestätigt am {datumZeitText(
+										z.verwaltungBestaetigtAm
+									)}{/if}{#if z.ansicht}, Ansicht als {ANSICHT_NAME[z.ansicht]}{/if}</td
+							><td>{datumText(z.erstelltAm)}</td><td>{datumText(z.zuletztGenutzt)}</td></tr
 						>
 					{/each}
 					{#each a.login.passkeys as z, i (i)}

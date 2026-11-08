@@ -19,7 +19,7 @@ import {
 } from '../db/schema.ts';
 import type { Angaben } from './angaben.ts';
 import { ladeMitglied, type Detail, type MitgliedStatus } from './mitglieder.ts';
-import type { Rolle } from './rollen.ts';
+import type { AnsichtRolle, Rolle } from './rollen.ts';
 import { sitzungAbgelaufen } from '../login/sitzung.ts';
 import type { Aktion } from './verlauf.ts';
 
@@ -41,8 +41,16 @@ export type Auskunft = {
 	/** Themen, zu denen das Mitglied Mitteilungen erhält (FR-41). */
 	themen: Thema[];
 	login: {
-		/** Gültige Sitzungen, je angemeldetes Gerät. */
-		geraete: { erstelltAm: Date; zuletztGenutzt: Date }[];
+		/**
+		 * Gültige Sitzungen, je angemeldetes Gerät; bei Admins, wann die Verwaltung bestätigt wurde,
+		 * beim MyTCO-Admin eine laufende «Ansicht als …».
+		 */
+		geraete: {
+			erstelltAm: Date;
+			zuletztGenutzt: Date;
+			verwaltungBestaetigtAm: Date | null;
+			ansicht: AnsichtRolle | null;
+		}[];
 		passkeys: { geraet: string; eingerichtetAm: Date; zuletztBenutzt: Date | null }[];
 		push: { eingerichtetAm: Date }[];
 	};
@@ -111,7 +119,12 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 			.innerJoin(konto, eq(konto.mitgliedId, mitglied.id))
 			.where(eq(mitglied.id, id)),
 		db
-			.select({ erstelltAm: sitzung.erstelltAm, zuletztGenutzt: sitzung.zuletztGenutzt })
+			.select({
+				erstelltAm: sitzung.erstelltAm,
+				zuletztGenutzt: sitzung.zuletztGenutzt,
+				verwaltungBestaetigtAm: sitzung.adminBestaetigtAm,
+				ansicht: sitzung.ansichtRolle
+			})
 			.from(sitzung)
 			.innerJoin(
 				konto,
@@ -197,7 +210,9 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 		rollen: m.rollen,
 		themen,
 		login: {
-			geraete: sitzungen.filter((z) => !sitzungAbgelaufen(z.zuletztGenutzt, jetzt)),
+			geraete: sitzungen
+				.filter((z) => !sitzungAbgelaufen(z.zuletztGenutzt, jetzt))
+				.map((z) => ({ ...z, ansicht: z.ansicht as AnsichtRolle | null })),
 			passkeys,
 			push
 		},

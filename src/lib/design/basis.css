@@ -547,6 +547,23 @@ html {
 	font: inherit;
 }
 
+/* Auswahlfelder im eigenen Aussehen: Mit dem des Browsers (menulist) ignoriert WebKit Höhe,
+   Innenabstand und Rand, das Feld würde auf dem iPhone halb so hoch (UI-03). Pfeil aus zwei
+   Verläufen; gesperrt (.nur-lesen) setzt `background` neu und blendet ihn aus. */
+.feld select,
+.feld-zeile select {
+	appearance: none;
+	padding-right: calc(var(--abstand-3) + 1.5em);
+	background-image:
+		linear-gradient(45deg, transparent 50%, var(--farbe-text) 50%),
+		linear-gradient(135deg, var(--farbe-text) 50%, transparent 50%);
+	background-position:
+		right calc(var(--abstand-3) + 0.4em) center,
+		right var(--abstand-3) center;
+	background-size: 0.4em 0.4em;
+	background-repeat: no-repeat;
+}
+
 .feld-code input {
 	font-family: var(--schrift-code);
 	font-size: var(--groesse-gross);

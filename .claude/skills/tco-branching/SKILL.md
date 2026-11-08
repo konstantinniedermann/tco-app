@@ -49,6 +49,22 @@ Alle Worktrees teilen die lokale Datenbank `mytco`; `make seed` und `make e2e` s
 Migrationen des eigenen Branches ein (`make dev` nicht: vorher einmal `make seed`). Eine Migration, die schon eingespielt
 wurde, wird darum nie neu erzeugt — eine Änderung kommt als neue Migration dazu.
 
+**Eigene Datenbank, sobald eine andere Session gleichzeitig E2E laufen lässt oder eine Migration
+alte Werte verbietet** (z. B. eine Rolle aus einem Check entfernt): Dann scheitern Seed und E2E
+der anderen Branches an `mytco`, und zwei E2E-Läufe stören sich ohnehin (gleiche Testjahre,
+IP-Grenze, Testkonten). Ausweg, ein Aufruf:
+
+```bash
+D=mytco_<kurzname>; U=postgres://mytco:mytco_lokal@localhost:55432/$D
+docker compose -p mytco exec -T db createdb -U mytco $D
+export DATABASE_URL=$U && npm run db:migrate && make e2e      # bzw. make check
+```
+
+E2E liest die `.env` nicht, nur die exportierte Variable (`tests/e2e/hilfen/umgebung.ts`). Wer die
+Migration baut, warnt die parallelen Sessions. Danach die DB löschen
+(`docker compose -p mytco exec -T db dropdb -U mytco $D`). Screenshots als Nachweis auf einer
+solchen frischen DB machen: In `mytco` sammeln sich Testkonten aus jedem E2E-Lauf an.
+
 **2 — Arbeiten:** TDD bzw. Doku, Dateien einzeln stagen, committen, Branch pushen
 (`git push -u origin <typ>/issue-NNN` — löst kein Deploy aus). Spec- und Plan-Dateien
 gehören in den Feature-Branch. Zieht `dev` weiter: `git merge origin/dev` im Worktree.

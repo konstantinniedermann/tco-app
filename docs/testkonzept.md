@@ -70,7 +70,8 @@ der neuen Adresse nach einem E-Mail-Wechsel prüft nur das iPhone.
 ## Abdeckung
 
 Die CI misst, welcher Code durch Tests läuft. **Mindestens 90 %** gilt für Fachlogik und
-Rechte-Prüfung; darunter schlägt die CI an. Für die Oberfläche gibt es keine Zahl; dort
+Rechte-Prüfung (`src/lib/server/`, dazu die Fachlogik, die auch im Browser läuft: `src/lib/turnier/`,
+`src/lib/anlass/stand.ts` und `zeit.ts`); darunter schlägt die CI an. Für die Oberfläche gibt es keine Zahl; dort
 zählen die Ende-zu-Ende-Tests und das Review.
 
 ## Anforderung → Testfall

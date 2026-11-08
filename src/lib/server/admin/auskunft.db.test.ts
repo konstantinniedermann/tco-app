@@ -20,6 +20,7 @@ import {
 	mitteilung,
 	passkey,
 	pushAbo,
+	sitzung,
 	turnier
 } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
@@ -66,6 +67,10 @@ async function vollesMitglied() {
 		})
 		.where(eq(konto.id, m.kontoId));
 	const kennung = await erstelleSitzung(db, m.kontoId, jetzt);
+	await db
+		.update(sitzung)
+		.set({ adminBestaetigtAm: jetzt, ansichtRolle: 'cm' })
+		.where(eq(sitzung.kennungHash, hash(kennung)));
 	await db.insert(pushAbo).values({
 		endpunkt: `https://push.example.org/GEHEIM-ENDPUNKT-${randomUUID()}`,
 		sitzungHash: hash(kennung),
@@ -191,7 +196,9 @@ describe('ladeAuskunft (DS-07)', () => {
 		expect(a!.fairgateOffenSeit).toEqual(new Date('2026-10-01T08:00:00Z'));
 		expect(a!.themen).toEqual(['anlaesse', 'verein']);
 		expect(a!.login).toEqual({
-			geraete: [{ erstelltAm: jetzt, zuletztGenutzt: jetzt }],
+			geraete: [
+				{ erstelltAm: jetzt, zuletztGenutzt: jetzt, verwaltungBestaetigtAm: jetzt, ansicht: 'cm' }
+			],
 			passkeys: [
 				{
 					geraet: 'iPhone',
