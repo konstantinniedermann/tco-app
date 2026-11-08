@@ -200,8 +200,9 @@ umgesetzt; offen ist 2b Einlesen.
   nie eingeloggt), mit Angabe, ob schon ein Brief-Code ausgestellt ist, und Auswahl (alle oder
   einzelne). So erhalten auch Nachzügler einen zweiten Brief; der neue Code ersetzt den alten
   (Entscheid Projektleiter, 06.11.2026). «Briefe erzeugen» stellt für die
-  Auswahl je einen Brief-Code aus (bestehende Funktion `stelleBriefCodeAus`, FR-24) und
-  öffnet eine Druckansicht mit einer Seite je Brief aus `baueBriefHtml`.
+  Auswahl je einen Brief-Code aus (`stelleBriefCodeAusIn` in `stelleBriefeAus`, eine
+  Transaktion für alle, FR-24) und öffnet eine Druckansicht mit einer Seite je Brief aus
+  `baueBriefInhalt`.
 - **Einzelner Brief:** «Neuen Brief-Code ausstellen» auf der Seite eines Mitglieds öffnet
   dieselbe Druckansicht für ein Mitglied.
 - **Code nur einmal sichtbar:** Die Druckansicht entsteht aus der Antwort des Servers und
@@ -210,8 +211,9 @@ umgesetzt; offen ist 2b Einlesen.
 - **Verlauf:** je Mitglied «Brief-Code ausgestellt».
 - **Sicherheitsregeln des Browsers:** `baueBriefHtml` liefert heute ein eigenes Dokument mit
   eingebettetem `<style>`, das die Content-Security-Policy der App blockt. Der Brief wird für
-  die Druckansicht umgebaut (Stil aus einer Datei bzw. aus `basis.css`), ohne Ausnahme in der
-  Policy. Der Musterbrief (`make musterbrief`) muss weiter gleich aussehen.
+  die Druckansicht umgebaut: `baueBriefInhalt` liefert nur den Inhalt, den Stil bringt
+  `brief.css`, ohne Ausnahme in der Policy. `baueBriefHtml` bleibt für den Musterbrief
+  (`make musterbrief`), der weiter gleich aussieht.
 
 ## Austritt und Löschen
 
