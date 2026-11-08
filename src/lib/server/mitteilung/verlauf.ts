@@ -1,6 +1,8 @@
 // Verlauf der gesendeten Mitteilungen (FR-42, FR-45): nur Zahlen, nie die Namen der Empfänger.
-import { and, desc, eq, gte, lt, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, lt } from 'drizzle-orm';
+import type { Namensteile } from '../../name.ts';
 import type { Db } from '../db/index.ts';
+import { namensSpalten } from '../namen.ts';
 import { anlass, mitglied, mitteilung, type Weg } from '../db/schema.ts';
 import type { Zahlen } from './versand.ts';
 
@@ -9,8 +11,8 @@ export type Bezug = { art: 'anlass'; anlassId: number } | { art: 'verein' };
 
 export type VerlaufEintrag = Zahlen & {
 	gesendetAm: Date;
-	/** `Nachname, Vorname` des Absenders; `null`, wenn es das Mitglied nicht mehr gibt. */
-	absender: string | null;
+	/** Name des Absenders; `null`, wenn es das Mitglied nicht mehr gibt. */
+	absender: Namensteile | null;
 	titel: string;
 	text: string;
 	auswahl: string;
@@ -46,10 +48,11 @@ const grenze = (jetzt: Date) => new Date(jetzt.getTime() - AUFBEWAHRUNG_MS);
 
 /** Neueste zuerst; nur das letzte Jahr, auch wenn seither nichts gesendet und aufgeräumt wurde (FR-45). */
 export async function ladeVerlauf(db: Db, b: Bezug, jetzt: Date): Promise<VerlaufEintrag[]> {
-	return db
+	const zeilen = await db
 		.select({
 			gesendetAm: mitteilung.gesendetAm,
-			absender: sql<string | null>`${mitglied.nachname} || ', ' || ${mitglied.vorname}`,
+			// Links verknüpft: ohne Mitglied sind die Namensspalten `null`.
+			...namensSpalten,
 			titel: mitteilung.titel,
 			text: mitteilung.text,
 			auswahl: mitteilung.auswahl,
@@ -63,6 +66,11 @@ export async function ladeVerlauf(db: Db, b: Bezug, jetzt: Date): Promise<Verlau
 		.leftJoin(mitglied, eq(mitglied.id, mitteilung.absenderId))
 		.where(and(nachBezug(b), gte(mitteilung.gesendetAm, grenze(jetzt))))
 		.orderBy(desc(mitteilung.gesendetAm), desc(mitteilung.id));
+	return zeilen.map(({ rufname, vorname, nachname, ...rest }) => ({
+		...rest,
+		// Die Namensspalten sind nie leer: `null` heisst, das Mitglied ist gelöscht.
+		absender: vorname === null || nachname === null ? null : { rufname, vorname, nachname }
+	}));
 }
 
 /**

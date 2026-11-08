@@ -1,8 +1,10 @@
 // Anlässe anlegen, ändern, löschen und An- oder Abmelden (A-ANLASS-01, FR-27 bis FR-32).
 import { randomBytes } from 'node:crypto';
 import { and, asc, desc, eq, gt, inArray, sql } from 'drizzle-orm';
+import type { Namensteile } from '../../name.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { anlass, anlassAnmeldung, mitglied, type Antwort } from '../db/schema.ts';
+import { namensSpalten } from '../namen.ts';
 import type { AnlassWerte } from './angaben.ts';
 import type { KalenderAnlass } from './kalender.ts';
 
@@ -32,7 +34,12 @@ export type AnlassListe = {
 export type AnlassAdmin = AnlassWerte & {
 	id: number;
 	zahlen: { kommen: number; kommenNicht: number; keineAntwort: number };
-	anmeldungen: { name: string; antwort: Antwort; bemerkung: string | null; geaendertAm: Date }[];
+	anmeldungen: {
+		name: Namensteile;
+		antwort: Antwort;
+		bemerkung: string | null;
+		geaendertAm: Date;
+	}[];
 };
 
 const neueKennung = () => randomBytes(32).toString('base64url');
@@ -244,7 +251,7 @@ export async function ladeAnlassAdmin(db: Db, id: number): Promise<AnlassAdmin |
 	if (!a) return null;
 	const anmeldungen = await db
 		.select({
-			name: sql<string>`${mitglied.nachname} || ', ' || ${mitglied.vorname}`,
+			name: namensSpalten,
 			antwort: anlassAnmeldung.antwort,
 			bemerkung: anlassAnmeldung.bemerkung,
 			geaendertAm: anlassAnmeldung.geaendertAm

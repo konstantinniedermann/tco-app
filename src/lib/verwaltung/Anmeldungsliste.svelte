@@ -7,6 +7,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { refreshAll } from '$app/navigation';
+	import Name from '../ui/Name.svelte';
 	import { KLASSIERUNGEN, klassierungName, type Klassierung } from '../turnier/klassierung.ts';
 	import {
 		entscheideAntrag,
@@ -291,7 +292,9 @@
 							{@const vermerk = mitgliedVermerk(z.mitgliedStatus)}
 							<tr>
 								<td>
-									<span id="anmeldung-{z.anmeldungId}">{z.name}</span>
+									<span id="anmeldung-{z.anmeldungId}"
+										><Name name={z.name} form="nachname-zuerst" /></span
+									>
 									{#if vermerk}<span class={vermerk.klasse}>{vermerk.text}</span>{/if}
 									{#if z.kommentar}
 										<div class="leise mehrzeilig">{z.kommentar}</div>
@@ -386,7 +389,7 @@
 								}}
 							/>
 							<span
-								>{t.name}<br /><span class="leise"
+								><Name name={t.name} form="nachname-zuerst" /><br /><span class="leise"
 									>{schon ? 'schon angemeldet' : trefferText(t)}</span
 								></span
 							>
@@ -416,7 +419,7 @@
 		<h2 id="verschieben-titel">Verschieben</h2>
 		{#if gewaehlt}
 			{@const z = gewaehlt}
-			<p>{z.name}</p>
+			<p><Name name={z.name} form="nachname-zuerst" /></p>
 			{#if z.status === 'beantragt'}
 				<p>Der Antrag gilt danach als bestätigt.</p>
 			{/if}
@@ -468,7 +471,7 @@
 		<h2 id="klassierung-titel">Klassierung korrigieren</h2>
 		{#if gewaehlt}
 			{@const z = gewaehlt}
-			<p>{z.name}</p>
+			<p><Name name={z.name} form="nachname-zuerst" /></p>
 			<div class="feld">
 				<label for="klassierung-wahl">Klassierung</label>
 				<select id="klassierung-wahl" bind:value={klassierung}>
@@ -500,7 +503,7 @@
 		<h2 id="loeschen-titel">Anmeldung löschen?</h2>
 		{#if gewaehlt}
 			{@const z = gewaehlt}
-			<p>{z.name}</p>
+			<p><Name name={z.name} form="nachname-zuerst" /></p>
 			{#if fehler}
 				<p class="fehler" role="alert">{fehler}</p>
 			{/if}
@@ -519,7 +522,7 @@
 		<h2 id="entscheiden-titel">Wildcard-Antrag</h2>
 		{#if gewaehlt}
 			{@const z = gewaehlt}
-			<p>{z.name}</p>
+			<p><Name name={z.name} form="nachname-zuerst" /></p>
 			{#if z.kommentar}
 				<p class="mehrzeilig">{z.kommentar}</p>
 			{/if}

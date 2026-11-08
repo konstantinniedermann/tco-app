@@ -64,11 +64,27 @@ const KATEGORIEN: KategorieWerte[] = [
 ];
 
 // Erfundene Spielerinnen und Spieler mit Klassierung (DS-08); je Kategorie 1–2 Anmeldungen.
+// Max hat den Rufnamen «Maxi», Lena «lena» (gleich dem Vornamen in anderer Schreibweise: wird
+// angezeigt wie ohne Rufname); die anderen haben keinen.
 const SPIELER = [
-	{ vorname: 'Max', nachname: 'Vorbild', geschlecht: 'm', jahrgang: 1990, klassierung: 'R4' },
+	{
+		vorname: 'Max',
+		rufname: 'Maxi',
+		nachname: 'Vorbild',
+		geschlecht: 'm',
+		jahrgang: 1990,
+		klassierung: 'R4'
+	},
 	{ vorname: 'Paul', nachname: 'Beispielmann', geschlecht: 'm', jahrgang: 1978, klassierung: 'R6' },
 	{ vorname: 'Urs', nachname: 'Probe', geschlecht: 'm', jahrgang: 1985, klassierung: 'R8' },
-	{ vorname: 'Lena', nachname: 'Vorzeige', geschlecht: 'w', jahrgang: 1995, klassierung: 'R5' },
+	{
+		vorname: 'Lena',
+		rufname: 'lena',
+		nachname: 'Vorzeige',
+		geschlecht: 'w',
+		jahrgang: 1995,
+		klassierung: 'R5'
+	},
 	{ vorname: 'Sara', nachname: 'Erdacht', geschlecht: 'w', jahrgang: 1988, klassierung: 'R9' }
 ] as const;
 const ANMELDUNGEN: [string, string[]][] = [
@@ -83,8 +99,8 @@ const ANTRAG = {
 	kommentar: 'Möchte mich mit Stärkeren messen.'
 };
 
-const mailVon = (s: (typeof SPIELER)[number]) =>
-	`${s.vorname}.${s.nachname}@example.org`.toLowerCase();
+type Spieler = { vorname: string; nachname: string; rufname?: string };
+const mailVon = (s: Spieler) => `${s.vorname}.${s.nachname}@example.org`.toLowerCase();
 
 /** Legt erfundene Anmeldungen und einen Antrag an; wiederholbar, ein zweiter Lauf ändert nichts. */
 async function legeBeispielAnmeldungenAn(db: Db, turnierId: number, jetzt: Date): Promise<void> {
@@ -95,6 +111,7 @@ async function legeBeispielAnmeldungenAn(db: Db, turnierId: number, jetzt: Date)
 			.insert(mitglied)
 			.values({
 				vorname: s.vorname,
+				rufname: 'rufname' in s ? s.rufname : null,
 				nachname: s.nachname,
 				email: mailVon(s),
 				strasse: 'Erfundenweg 1',

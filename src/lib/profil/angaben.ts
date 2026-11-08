@@ -109,20 +109,23 @@ async function schicke(
 }
 
 /**
- * Angaben des angemeldeten Mitglieds und seine Klassierung (FR-37: gehört nicht zu den Angaben
- * der Verwaltung, kommt darum extra); `null` bei Störung oder ohne Sitzung.
+ * Angaben des angemeldeten Mitglieds, seine Klassierung (FR-37) und sein Rufname: beide gehören
+ * nicht zu den Angaben der Verwaltung und kommen darum extra; `null` bei Störung oder ohne Sitzung.
  */
-export async function ladeProfil(
-	holen: Holen = fetch
-): Promise<{ angaben: EigeneAngaben; klassierung: Klassierung | null } | null> {
+export async function ladeProfil(holen: Holen = fetch): Promise<{
+	angaben: EigeneAngaben;
+	klassierung: Klassierung | null;
+	rufname: string | null;
+} | null> {
 	try {
 		const antwort = await holen('/api/profil', { method: 'GET' });
 		if (!antwort.ok) return null;
-		const { angaben, klassierung } = await leseJson(antwort);
+		const { angaben, klassierung, rufname } = await leseJson(antwort);
 		if (!istObjekt(angaben)) return null;
 		return {
 			angaben: angaben as EigeneAngaben,
-			klassierung: istKlassierung(klassierung) ? klassierung : null
+			klassierung: istKlassierung(klassierung) ? klassierung : null,
+			rufname: typeof rufname === 'string' ? rufname : null
 		};
 	} catch {
 		return null;
@@ -174,4 +177,27 @@ export async function bestaetigeWechsel(
 	holen: Holen = fetch
 ): Promise<Ergebnis> {
 	return (await schicke('/api/profil/email/bestaetigen', { codeAlt, codeNeu }, holen)).ergebnis;
+}
+
+/** Rufname im Profil setzen; leer löscht ihn. Bei `eingabe` steht die Meldung des Servers bereit. */
+export async function speichereRufname(
+	rufname: string,
+	holen: Holen = fetch
+): Promise<
+	| { ergebnis: 'ok'; rufname: string | null }
+	| { ergebnis: 'eingabe'; fehler: string }
+	| { ergebnis: 'stoerung' }
+> {
+	const { ergebnis, koerper } = await schicke('/api/profil/rufname', { rufname }, holen);
+	if (ergebnis === 'ok') {
+		return { ergebnis, rufname: typeof koerper.rufname === 'string' ? koerper.rufname : null };
+	}
+	if (ergebnis === 'eingabe') {
+		const felder = istObjekt(koerper.felder) ? koerper.felder : {};
+		return {
+			ergebnis,
+			fehler: typeof felder.rufname === 'string' ? felder.rufname : 'Ungültig.'
+		};
+	}
+	return { ergebnis: 'stoerung' };
 }

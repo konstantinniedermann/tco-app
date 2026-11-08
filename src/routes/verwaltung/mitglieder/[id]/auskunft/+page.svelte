@@ -71,6 +71,9 @@
 		<table>
 			<tbody>
 				<tr><th scope="row">Name</th><td>{ang.vorname} {ang.nachname}</td></tr>
+				{#if a.rufname}
+					<tr><th scope="row">Rufname</th><td>{a.rufname}</td></tr>
+				{/if}
 				<tr><th scope="row">Adresse</th><td>{ang.strasse}, {ang.plz} {ang.ort}</td></tr>
 				<tr><th scope="row">E-Mail</th><td>{ang.email}</td></tr>
 				<tr><th scope="row">Telefon</th><td>{ang.telefon ?? '–'}</td></tr>

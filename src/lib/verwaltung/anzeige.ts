@@ -20,7 +20,7 @@ export function fehlerText(a: Antwort<unknown>): string {
 export const VERALTET =
 	'Inzwischen hat jemand anderes dieses Mitglied geändert. Nichts gespeichert: Lade den neuen Stand und gib deine Änderung nochmals ein.';
 
-export const FELD_NAMEN: Record<Feld | 'klassierung', string> = {
+export const FELD_NAMEN: Record<Feld | 'klassierung' | 'rufname', string> = {
 	mitgliedernummer: 'Mitgliedernummer',
 	vorname: 'Vorname',
 	nachname: 'Nachname',
@@ -32,6 +32,7 @@ export const FELD_NAMEN: Record<Feld | 'klassierung', string> = {
 	geschlecht: 'Geschlecht',
 	jahrgang: 'Jahrgang',
 	klassierung: 'Klassierung',
+	rufname: 'Rufname',
 	lizenznummer: 'Lizenznummer'
 };
 

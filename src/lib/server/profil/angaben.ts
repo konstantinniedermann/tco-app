@@ -4,6 +4,7 @@ import { angabenAusZeile } from '../admin/mitglieder.ts';
 import { geaenderteFelder, schreibeVerlauf } from '../admin/verlauf.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { mitglied } from '../db/schema.ts';
+import { pruefeRufname } from '../../name.ts';
 
 // Annahme K-19.1: Telefon und Lizenznummer pflegt das Mitglied selbst.
 // Annahme K-19.2: Die Adresse (Strasse, PLZ, Ort) pflegt das Mitglied selbst.
@@ -78,5 +79,41 @@ export async function aendereEigeneAngaben(
 			jetzt
 		);
 		return { ergebnis: 'ok' as const, geaendert };
+	});
+}
+
+/**
+ * Rufname setzen, ändern oder löschen (leer ist `null`); nur das Mitglied selbst, über das Profil.
+ * Der gleiche Wert ist `ok` ohne Verlauf. Der Rufname gehört nicht zu den Fairgate-Feldern.
+ */
+export async function setzeRufname(
+	db: Db,
+	mitgliedId: number,
+	roh: unknown,
+	jetzt: Date
+): Promise<
+	{ ergebnis: 'ok' } | { ergebnis: 'eingabe'; fehler: string } | { ergebnis: 'nicht-gefunden' }
+> {
+	const pruefung = pruefeRufname(roh);
+	if (!pruefung.ok) return { ergebnis: 'eingabe', fehler: pruefung.fehler };
+	const rufname = pruefung.rufname;
+	return db.transaction(async (tx) => {
+		const [z] = await tx
+			.select({ rufname: mitglied.rufname, status: mitglied.status })
+			.from(mitglied)
+			.where(eq(mitglied.id, mitgliedId))
+			.for('update');
+		// Von einem gelöschten Mitglied bleibt nur der Name (FR-04).
+		if (!z || z.status === 'geloescht') return { ergebnis: 'nicht-gefunden' as const };
+		if (z.rufname === rufname) return { ergebnis: 'ok' as const };
+		await tx.update(mitglied).set({ rufname }).where(eq(mitglied.id, mitgliedId));
+		await schreibeVerlauf(
+			tx,
+			mitgliedId,
+			{ art: 'mitglied', mitgliedId },
+			[{ aktion: 'feld-geaendert', detail: 'rufname' }],
+			jetzt
+		);
+		return { ergebnis: 'ok' as const };
 	});
 }

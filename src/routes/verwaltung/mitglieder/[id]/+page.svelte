@@ -196,6 +196,9 @@
 
 <a class="zurueck" href={resolve('/verwaltung/mitglieder')}>‹ Zurück</a>
 <h1>{angaben.nachname}, {angaben.vorname} <span class={stand.klasse}>{stand.text}</span></h1>
+{#if detail.rufname}
+	<p class="leise">Rufname {detail.rufname}</p>
+{/if}
 {#if angaben.mitgliedernummer}
 	<p class="leise">Mitgliedernummer {angaben.mitgliedernummer}</p>
 {/if}
