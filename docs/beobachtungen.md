@@ -151,3 +151,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Merge von #66 nach `dev` (Konzept Gruppenphase).
 
 **Einschätzung:** Niedrig: Wiederholen hilft, sobald GitHub wieder antwortet. `curl --retry 3 --retry-all-errors` würde kurze Störungen abfangen; zu prüfen, ob das den Prüfsummen-Schritt berührt.
+
+### 2026-11-08 — Automatische Pushes zu CM-Resultaten und Restzeit haben keine Anforderung
+
+**Thema:** Benachrichtigungen
+
+**Fundort:** `docs/superpowers/specs/2026-11-08-cm-gruppenphase-design.md` (*Rund um die Kategorieseite*, *Grenzen und Sonderfälle*), `docs/superpowers/specs/2026-11-06-mitteilungen-design.md` («Kein automatischer Push»), A-ANMELDUNG-08
+
+**Beobachtung:** Das Konzept zu #66 enthält Push-Texte («Neues Resultat in deiner Gruppe …», «Noch 7 Tage Gruppenphase …»). #63 verschickt nur per Knopf, A-ANMELDUNG-08 deckt nur neue Spiele und einen geänderten Spielplan. Für automatische Pushes zu Resultaten und Restzeit gibt es keine Anforderung und kein Issue.
+
+**Ursprung:** Review (`cas-reviewer`) des Konzepts zu #66.
+
+**Einschätzung:** Mittel bis niedrig: fällt erst mit CM-Betrieb ins Gewicht. Braucht dann eine eigene Anforderung (Auslöser, Zeitgeber, Einstellung des Spielers); Push hat beim Projektleiter Vorrang vor Mail.
