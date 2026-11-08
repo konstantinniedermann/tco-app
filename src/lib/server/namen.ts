@@ -11,13 +11,14 @@ export const namensSpalten = {
 
 /**
  * Trifft, wenn der Name das Muster enthält: Rufname, Vor- oder Nachname allein, «Vorname Nachname»
- * oder «Nachname, Vorname». `muster` ist ein fertiges LIKE-Muster mit maskierten Platzhaltern.
+ * oder «Nachname, Vorname», auch «Rufname Nachname». `muster` ist ein fertiges LIKE-Muster mit maskierten Platzhaltern.
  */
 export function nameEnthaelt(muster: string): SQL {
 	return or(
 		sql`${mitglied.vorname} || ' ' || ${mitglied.nachname} ilike ${muster}`,
 		sql`${mitglied.nachname} || ' ' || ${mitglied.vorname} ilike ${muster}`,
 		sql`${mitglied.nachname} || ', ' || ${mitglied.vorname} ilike ${muster}`,
-		sql`${mitglied.rufname} ilike ${muster}`
+		sql`${mitglied.rufname} ilike ${muster}`,
+		sql`${mitglied.rufname} || ' ' || ${mitglied.nachname} ilike ${muster}`
 	)!;
 }

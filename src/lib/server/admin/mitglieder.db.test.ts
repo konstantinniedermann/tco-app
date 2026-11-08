@@ -244,6 +244,8 @@ describe('listeMitglieder', () => {
 		const zeilen = await listeMitglieder(db, { suche: `hannes${u}` }, jetzt);
 		expect(zeilen.map((z) => z.id)).toEqual([m.mitgliedId]);
 		expect(zeilen[0].name).toBe('Muster, Johannes');
+		const mitNachname = await listeMitglieder(db, { suche: `hannes${u} mus` }, jetzt);
+		expect(mitNachname.map((z) => z.id)).toEqual([m.mitgliedId]);
 	});
 
 	test('Detail liefert den Rufname ausserhalb der Angaben', async () => {

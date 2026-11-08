@@ -681,6 +681,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			})
 		);
 		expect((await sucheSpieler(db, `Hann`)).map((z) => z.mitgliedId)).toContain(hannes);
+		expect((await sucheSpieler(db, 'Hannes Rufer')).map((z) => z.mitgliedId)).toEqual([hannes]);
 
 		const viele = `Viele${zeichen}`;
 		for (let i = 0; i < 21; i++) await spieler({ vorname: `V${i}`, nachname: viele });
