@@ -10,7 +10,7 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"build:spa": "MYTCO_SPA=1 vite build",
-		"check:svelte": "svelte-kit sync && svelte-check --fail-on-warnings",
+		"check:svelte": "svelte-kit sync && svelte-check --fail-on-warnings && tsc -p src/service-worker --noEmit",
 		"test:einheit": "vitest run --project einheit",
 		"test:db": "vitest run --project datenbank",
 		"db:migrate": "node scripts/migrate.ts",
