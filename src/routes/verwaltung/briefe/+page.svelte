@@ -31,7 +31,8 @@
 
 	function briefText(z: BriefListe[number]): string {
 		if (z.adresseFehlt) return 'Adresse fehlt';
-		return z.briefGueltigBis ? `Code gültig bis ${tagText(z.briefGueltigBis)}` : 'noch kein Brief';
+		if (z.briefGueltigBis) return `Code gültig bis ${tagText(z.briefGueltigBis)}`;
+		return z.briefAbgelaufen ? 'Code abgelaufen' : 'noch kein Brief';
 	}
 
 	// RR-04: Die Codes leben nur in diesem Zustand, nie in der Adresse oder im Speicher.

@@ -12,7 +12,7 @@ import {
 	beantrageWildcard,
 	meldeAn as meldeZurCmAnInDb
 } from '../../../src/lib/server/cm/anmeldungen.ts';
-import { mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
+import { konto, mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../../../src/lib/server/turnier/angaben.ts';
 import {
 	legeKategorieAn,
@@ -179,6 +179,12 @@ export async function meldeZumAnlass(
 /** Stellt für ein bestehendes Konto einen weiteren Brief-Code aus (ohne Bindestrich). */
 export async function stelleBriefCodeAus(kontoId: number): Promise<string> {
 	return (await hole().dienst.stelleBriefCodeAus(kontoId)).code;
+}
+
+/** Lässt den Brief-Code eines Kontos ablaufen (gestern), ohne ihn zu benutzen. */
+export async function laesstBriefCodeAblaufen(kontoId: number): Promise<void> {
+	const gestern = new Date(Date.now() - 24 * 60 * 60 * 1000);
+	await hole().db.update(konto).set({ briefCodeAblauf: gestern }).where(eq(konto.id, kontoId));
 }
 
 /**

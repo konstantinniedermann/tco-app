@@ -16,7 +16,10 @@
 		>Drucken oder als PDF speichern</button
 	>
 </div>
-<p class="leise nicht-drucken">Die Codes stehen nur hier. Drucke jetzt oder speichere als PDF.</p>
+<p class="leise nicht-drucken">
+	Die Codes stehen nur hier. Drucke jetzt oder speichere als PDF. Ein gespeichertes PDF löschst du
+	nach dem Druck.
+</p>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div class="briefdruck" role="region" aria-label="Briefe zum Drucken" tabindex="0">

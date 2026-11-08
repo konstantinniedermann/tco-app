@@ -8,6 +8,7 @@ import {
 } from '../../src/lib/server/login/codes.ts';
 import {
 	holeMailCode,
+	laesstBriefCodeAblaufen,
 	legeAdminMitBriefCodeAn,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
@@ -122,7 +123,9 @@ test('A-LOGIN-01: Serie – Auswahl, Rückfrage, Druckansicht, Code meldet an', 
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Berta' })).toBeVisible();
 	await expect(page.locator('.brief')).toHaveCount(1);
 	await expect(
-		page.getByText('Die Codes stehen nur hier. Drucke jetzt oder speichere als PDF.')
+		page.getByText(
+			'Die Codes stehen nur hier. Drucke jetzt oder speichere als PDF. Ein gespeichertes PDF löschst du nach dem Druck.'
+		)
 	).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Drucken oder als PDF speichern' })).toBeVisible();
 	const code = (await page.locator('.brief-code').textContent())!.trim();
@@ -288,11 +291,14 @@ test('A-LOGIN-01, RR-07: MyTCO-Admin sieht die Liste ohne Auswahl und ohne Taste
 	const fehler = sammleKonsolenfehler(page);
 	const nachname = eindeutig('Ansehen', info);
 	await legeKontoAn('Gina', nachname);
+	const abgelaufen = await legeKontoMitBriefCodeAn('Gabi', nachname);
+	await laesstBriefCodeAblaufen(abgelaufen.kontoId);
 	await meldeAdminAn(page, true);
 	await oeffneBriefe(page);
 
 	await expect(page.getByText('Nur ansehen.')).toBeVisible();
 	await expect(zeile(page, `${nachname}, Gina`)).toContainText('noch kein Brief');
+	await expect(zeile(page, `${nachname}, Gabi`)).toContainText('Code abgelaufen');
 	await expect(page.getByRole('checkbox')).toHaveCount(0);
 	await expect(page.getByRole('button', { name: /Briefe erzeugen/ })).toHaveCount(0);
 	await expect(page.locator('dialog', { hasText: 'Briefe erzeugen' })).toHaveCount(0);

@@ -85,11 +85,13 @@ describe('listeBriefEmpfaenger', () => {
 			name: 'Briefa, Ohne',
 			mitgliedernummer: null,
 			briefGueltigBis: null,
+			briefAbgelaufen: false,
 			adresseFehlt: false
 		});
 		expect(zeile(offen.mitgliedId)?.briefGueltigBis).toEqual(
 			new Date(jetzt.getTime() + BRIEF_CODE_GUELTIG_MS)
 		);
+		expect(zeile(offen.mitgliedId)?.briefAbgelaufen).toBe(false);
 		expect(zeile(benutzt.mitgliedId)).toBeUndefined();
 		expect(zeile(eingeloggt.mitgliedId)).toBeUndefined();
 		expect(zeile(ausgetreten.mitgliedId)).toBeUndefined();
@@ -111,6 +113,8 @@ describe('listeBriefEmpfaenger', () => {
 		const ids = liste.map((z) => z.id).filter((id) => [a, b, c].some((m) => m.mitgliedId === id));
 		expect(ids).toEqual([c.mitgliedId, a.mitgliedId, b.mitgliedId]);
 		expect(liste.find((z) => z.id === a.mitgliedId)?.briefGueltigBis).toBeNull();
+		expect(liste.find((z) => z.id === a.mitgliedId)?.briefAbgelaufen).toBe(true);
+		expect(liste.find((z) => z.id === b.mitgliedId)?.briefAbgelaufen).toBe(false);
 	});
 });
 

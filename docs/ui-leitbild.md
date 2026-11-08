@@ -401,7 +401,7 @@ je Brief. Die Codes stehen nur hier (RR-04): nicht in der Adresse, nicht im Spei
 «‹ Zurück» verwirft sie.
 
 - **Tasten:** Leiste mit «‹ Zurück» und «Drucken oder als PDF speichern» (beide Nebentasten),
-  darunter in `.leise` «Die Codes stehen nur hier. Drucke jetzt oder speichere als PDF.»; alles
+  darunter in `.leise` «Die Codes stehen nur hier. Drucke jetzt oder speichere als PDF. Ein gespeichertes PDF löschst du nach dem Druck.»; alles
   mit `.nicht-drucken`.
 - **Vorschau:** Die Briefe stehen untereinander in einem Rahmen `.briefdruck` (benannte Region
   mit `tabindex="0"`, waagrecht scrollbar wie eine Tabelle); jedes Blatt ist `--brief-breite`

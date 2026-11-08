@@ -15,6 +15,8 @@ export type BriefZeile = {
 	name: string;
 	mitgliedernummer: string | null;
 	briefGueltigBis: Date | null;
+	/** Ein Code ist ausgestellt, nie benutzt und abgelaufen (Spalte Brief: «Code abgelaufen»). */
+	briefAbgelaufen: boolean;
 	adresseFehlt: boolean;
 };
 
@@ -67,6 +69,8 @@ export async function listeBriefEmpfaenger(db: Db, jetzt: Date): Promise<BriefZe
 			name: `${z.nachname}, ${z.vorname}`,
 			mitgliedernummer: z.mitgliedernummer,
 			briefGueltigBis: briefOffen(z, jetzt) ? z.briefCodeAblauf : null,
+			briefAbgelaufen:
+				z.briefCodeHash !== null && z.briefCodeAblauf !== null && z.briefCodeAblauf <= jetzt,
 			adresseFehlt: adresseFehlt(z)
 		}));
 }
