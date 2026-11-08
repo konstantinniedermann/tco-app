@@ -105,18 +105,10 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 		).toEqual(['Jonas Keller / Nina Brunner']);
 	});
 
-	test('FR-48: Rückfrage vor der Anfrage spricht den Partner richtig an', () => {
-		expect(rueckfrageText('Marco', 'mixed', 'w')).toBe(
-			'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit er dich ' +
-				'anrufen kann. Nimmt er an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.'
-		);
-		expect(rueckfrageText('Lea', 'damen', 'w')).toContain(
-			'damit sie dich anrufen kann. Nimmt sie an'
-		);
-		expect(rueckfrageText('Lea', 'mixed', 'm')).toContain('damit sie dich');
-		expect(rueckfrageText('Urs', 'herren', 'm')).toContain('damit er dich');
-		expect(rueckfrageText('Kim', 'offen', 'w')).toContain(
-			'damit Kim dich anrufen kann. Nimmt Kim an'
+	test('FR-48: Rückfrage vor der Anfrage nennt den Angefragten beim Vornamen', () => {
+		expect(rueckfrageText('Marco')).toBe(
+			'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit Marco dich ' +
+				'anrufen kann. Nimmt Marco an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.'
 		);
 	});
 });

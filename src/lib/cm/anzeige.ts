@@ -1,5 +1,4 @@
 // Anzeigehilfen der Clubmeisterschaft für Mitglieder: reine Funktionen, Browser und Server.
-import type { Geschlecht } from '../server/db/schema.ts';
 import type { KategorieRegel, Vermerk } from '../turnier/passung.ts';
 import { geschlechtText } from '../verwaltung/turnier-anzeige.ts';
 
@@ -95,19 +94,10 @@ export const vornameVon = (name: string): string => name.trim().split(/\s+/)[0];
 export const weiterePaare = (paare: string[], partner: string): string[] =>
 	paare.filter((p) => !p.split(' / ').includes(partner));
 
-/** Wie die Rückfrage den Angefragten nennt: aus der Kategorie, sonst beim Vornamen. */
-function pronomen(geschlecht: Geschlecht, ich: 'w' | 'm' | null): 'er' | 'sie' | null {
-	if (geschlecht === 'herren') return 'er';
-	if (geschlecht === 'damen') return 'sie';
-	if (geschlecht === 'mixed' && ich !== null) return ich === 'w' ? 'er' : 'sie';
-	return null;
-}
-
-/** FR-48, FR-19: Text der Rückfrage vor dem Senden einer Anfrage. */
-export function rueckfrageText(vorname: string, geschlecht: Geschlecht, ich: 'w' | 'm' | null) {
-	const wer = pronomen(geschlecht, ich) ?? vorname;
+/** FR-48, FR-19: Text der Rückfrage vor dem Senden einer Anfrage; nennt den Angefragten beim Vornamen. */
+export function rueckfrageText(vorname: string): string {
 	return (
-		`${vorname} sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit ${wer} ` +
-		`dich anrufen kann. Nimmt ${wer} an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.`
+		`${vorname} sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit ${vorname} ` +
+		`dich anrufen kann. Nimmt ${vorname} an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.`
 	);
 }

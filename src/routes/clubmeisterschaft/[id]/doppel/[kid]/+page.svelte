@@ -361,7 +361,7 @@
 <dialog class="karte" bind:this={rueckfrage} aria-labelledby="rueckfrage-titel">
 	<h2 id="rueckfrage-titel">{ziel?.name} anfragen?</h2>
 	{#if ziel}
-		<p>{rueckfrageText(vornameVon(ziel.name), k.geschlecht, cm.spieler.geschlecht)}</p>
+		<p>{rueckfrageText(vornameVon(ziel.name))}</p>
 	{/if}
 	<p class="leise">
 		Meldet sich später einer von euch ab, ist die ganze Doppel-Anmeldung zurückgezogen.
