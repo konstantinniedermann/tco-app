@@ -128,8 +128,8 @@ export type Vorschau = {
 
 type Aufteilung = Vorschau & { anzulegen: Angaben[] };
 
-/** Der Fehler der Datei ohne `ok`. */
-function nurFehler(f: { ok: false } & DateiFehler): DateiFehler {
+/** Nur der Fehler der Datei, ohne `ok` oder `ergebnis` (für Antworten). */
+export function nurFehler(f: DateiFehler): DateiFehler {
 	return f.grund === 'spalten'
 		? { grund: 'spalten', unbekannt: f.unbekannt, fehlend: f.fehlend, doppelt: f.doppelt }
 		: { grund: f.grund };
