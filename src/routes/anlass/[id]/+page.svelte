@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Zurueck from '../../../lib/ui/Zurueck.svelte';
 	import { resolve } from '$app/paths';
 	import { sendeAntwort, type AnlassAnsicht, type AntwortArt } from '../../../lib/anlass/api.ts';
 	import { formatiereBeginn } from '../../../lib/anlass/zeit.ts';
@@ -94,13 +95,13 @@
 </svelte:head>
 
 {#if !anlass}
-	<a class="zurueck" href={resolve('/')}>‹ Zur Startseite</a>
+	<Zurueck />
 	<div class="karte">
 		<h1>Anlass nicht gefunden</h1>
 		<p>Diesen Anlass gibt es nicht mehr.</p>
 	</div>
 {:else}
-	<a class="zurueck" href={resolve('/')}>‹ Zurück</a>
+	<Zurueck />
 	<h1>{anlass.titel}</h1>
 
 	<section class="karte" aria-labelledby="einladung">

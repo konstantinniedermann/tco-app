@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy, tick } from 'svelte';
+	import Zurueck from '../../../../../lib/ui/Zurueck.svelte';
 	import { goto, invalidate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import {
@@ -251,9 +252,7 @@
 	<title>{k.name} – MyTCO</title>
 </svelte:head>
 
-<a class="zurueck" href={resolve('/clubmeisterschaft/[id]', { id: String(cm.turnier.id) })}
-	>‹ Zurück</a
->
+<Zurueck text={cm.turnier.name} />
 <h1>{k.name}</h1>
 <p class="leise">{doppelText(k)} · Anmeldeschluss {datumLang(cm.turnier.anmeldeschluss)}</p>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
+	import Zurueck from '../../../lib/ui/Zurueck.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { MELDUNG, meldung, sende } from '../../../lib/login/anmelden.ts';
@@ -75,7 +76,7 @@
 	<title>Code per E-Mail – MyTCO</title>
 </svelte:head>
 
-<a class="zurueck" href={resolve('/login')}>‹ Zurück</a>
+<Zurueck />
 <h1>Code per E-Mail</h1>
 
 {#if schritt === 'adresse'}

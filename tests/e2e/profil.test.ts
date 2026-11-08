@@ -90,6 +90,7 @@ test('SI-09, A-KONTO-01: Mitglied wechselt die E-Mail mit zwei Codes', async ({ 
 	await kachel(page, 'E-Mail').getByRole('link', { name: 'Ändern' }).click();
 	await expect(page).toHaveURL(/\/profil\/email$/);
 	await expect(page.getByText('Schritt 1 von 2 · Neue Adresse')).toBeVisible();
+	await expect(page.getByRole('link', { name: '‹ Profil' })).toBeVisible();
 	await expect(page.getByText('Dann ändert die Mitgliederverwaltung sie für dich.')).toBeVisible();
 
 	const neu = `neu-${randomUUID()}@example.org`;
@@ -99,6 +100,8 @@ test('SI-09, A-KONTO-01: Mitglied wechselt die E-Mail mit zwei Codes', async ({ 
 	await expect(codeAlt).toBeFocused();
 	await expect(page.getByText('Schritt 2 von 2 · Bestätigen')).toBeVisible();
 	await expect(page.getByText(neu, { exact: true })).toBeVisible();
+	// Formularschritt: Der Link nennt den Schritt (UI-Leitbild, Unterseiten).
+	await expect(page.getByRole('link', { name: '‹ Andere Adresse' })).toBeVisible();
 	await pruefeBildschirm(page, info, 'profil-email-codes');
 
 	// Je ein Code an die bisherige und an die neue Adresse; erst beide zusammen ändern die E-Mail.
