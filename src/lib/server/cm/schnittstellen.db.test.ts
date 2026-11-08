@@ -7,7 +7,7 @@ import { anmeldung, anmeldungSpieler, konto, mitglied, partnerAnfrage } from '..
 import { erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../turnier/turniere.ts';
 import type { BestaetigungInhalt } from './mail.ts';
-import { erstelleBestaetigung } from './mail.ts';
+import { baueBestaetigungsMail, erstelleBestaetigung } from './mail.ts';
 import {
 	getCmAnsicht,
 	getCmPartner,
@@ -514,6 +514,39 @@ describe('Schnittstellen der CM zum Doppel (Mitglied)', () => {
 				(await ok.json()).kategorien.find((k: { id: number }) => k.id === t.doppel).eigen
 			).toEqual({ art: 'sucht', kommentar: null });
 		}
+	});
+
+	test('A-ANMELDUNG-05: Bestätigungsmail nach Doppel-Anmeldung, allein mit «sucht Partner», nach dem Annehmen mit dem Partner', async () => {
+		const t = await doppelTurnier();
+		const { d, mails } = baue(t.jetzt);
+		const lea = await spielerMitLogin('Lea', 'Marbach');
+		const marco = await spielerMitLogin('Marco', 'Beispiel');
+		const inhalt = (eigene: string[]) => ({
+			turniername: `Clubmeisterschaft ${t.jahr}`,
+			aktion: 'an',
+			kategorie: 'Offenes Doppel',
+			eigene,
+			anmeldeschluss: `${t.jahr}-05-31`
+		});
+
+		expect((await postCmAnmeldung(d, mit(lea, { id: String(t.doppel) }))).status).toBe(200);
+		expect(mails).toEqual([{ an: lea.email, i: inhalt(['Offenes Doppel (sucht Partner)']) }]);
+		expect(baueBestaetigungsMail(mails[0].i, 'cm@example.org').text).toContain(
+			'Deine Anmeldungen für die Clubmeisterschaft'
+		);
+		expect(baueBestaetigungsMail(mails[0].i, 'cm@example.org').text).toContain(
+			'- Offenes Doppel (sucht Partner)'
+		);
+
+		// Marco fragt an, Lea nimmt an: Die Bestätigung geht an Lea, die gehandelt hat.
+		mails.length = 0;
+		expect((await anfragen(d, marco, t.doppel, { anId: lea.mitgliedId })).status).toBe(200);
+		const id = await anfrageId(marco.mitgliedId, lea.mitgliedId);
+		expect((await postCmAnfrageAnnehmen(d, mit(lea, { id: String(id) }))).status).toBe(200);
+		expect(mails).toEqual([{ an: lea.email, i: inhalt(['Offenes Doppel (mit Marco Beispiel)']) }]);
+		expect(baueBestaetigungsMail(mails[0].i, 'cm@example.org').text).toContain(
+			'- Offenes Doppel (mit Marco Beispiel)'
+		);
 	});
 
 	test('FR-49: Suchtext mit 121 Zeichen wird abgewiesen, mit 120 genommen; nichts gespeichert, keine Mail', async () => {

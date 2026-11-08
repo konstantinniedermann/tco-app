@@ -328,6 +328,37 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		]);
 	});
 
+	test('A-ANMELDUNG-02: vierte Anmeldung im Doppel → voll, allein und beim Annehmen; das Doppel zählt für beide', async () => {
+		const ich = await lea();
+		const marcoId = await marco();
+
+		// Allein anmelden: Marco hat schon drei Einzel.
+		const t = await offenesDoppel();
+		for (const k of t.herrenEinzel) await anmeldungMit(k, [marcoId], t.jetzt);
+		expect(await meldeAn(db, t.mixed, marcoId, t.jetzt)).toBe('voll');
+		expect(await aktiveIn(t.mixed)).toEqual([]);
+
+		// Annehmen: Lea hat drei Anmeldungen, bevor sie Marcos Anfrage annimmt.
+		const u = await offenesDoppel();
+		const id = await anfrage(u.mixed, marcoId, ich, u.jetzt);
+		for (const k of u.damenEinzel) expect(await meldeAn(db, k, ich, u.jetzt)).toBe('ok');
+		expect(await nimmAnfrageAn(db, id, ich, u.jetzt)).toBe('voll');
+		expect(await aktiveIn(u.mixed)).toEqual([]);
+
+		// Das Paar zählt für beide: Danach geht je nur noch ein Einzel.
+		const v = await offenesDoppel();
+		const paar = await anfrage(v.mixed, marcoId, ich, v.jetzt);
+		expect(await nimmAnfrageAn(db, paar, ich, v.jetzt)).toMatchObject({ ergebnis: 'ok' });
+		for (const [spieler, kategorien] of [
+			[ich, v.damenEinzel],
+			[marcoId, v.herrenEinzel]
+		] as const) {
+			expect(await meldeAn(db, kategorien[0], spieler, v.jetzt)).toBe('ok');
+			expect(await meldeAn(db, kategorien[1], spieler, v.jetzt)).toBe('ok');
+			expect(await meldeAn(db, kategorien[2], spieler, v.jetzt)).toBe('voll');
+		}
+	});
+
 	test('FR-49: Suchtext ändern nur bei der eigenen Anmeldung allein, solange offen', async () => {
 		const t = await offenesDoppel();
 		const ich = await lea();
