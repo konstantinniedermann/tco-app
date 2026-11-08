@@ -113,7 +113,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | MyTCO-Admin | Rolle für die technische Betreuung: vergibt und entzieht Rollen, sieht alle Bereiche der Verwaltung, ändert dort nichts; *Ansicht als …* | MyTCO-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
 | Mitglieder-Admin | Rolle für die Mitgliederdaten: Mitglieder, Briefe, Sitzungen, Liste *Für Fairgate*, Anlässe, Mitteilungen, Austritt und Löschen | Mitglieder-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
 | CM-Admin | Rolle für die Clubmeisterschaft: Turnier und Kategorien, Wildcard-Anträge, Anmeldungen von Hand, später Gruppen, Tableaus und Resultate | CM-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
-| Lizenz-Admin | Rolle für die Lizenzanträge: Stichtag der Lizenzrunde setzen, Anträge ansehen, exportieren und abhaken | Lizenz-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
+| Lizenz-Admin | Rolle für die Lizenzanträge, später: Stichtag der Lizenzrunde setzen, Anträge ansehen, exportieren und abhaken; öffnet die Verwaltung noch nicht | Lizenz-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
 | Ansicht als … | Der MyTCO-Admin sieht App und Verwaltung wie eine gewählte Rolle, nur lesend; ein Band zeigt das an | Ansicht als … | [A-ROLLE-09](anforderungen/anforderungen.md#rolle--benutzerrollen) |
 | Junioren-Leiter | Rolle für die Betreuung der Junioren | Junioren-Leiter | PDF 4a |
 | Anlässe-Veranstalter | Rolle für die Organisation von Anlässen | Anlässe-Veranstalter, später; bis dahin Mitglieder-Admin, die CM leitet der CM-Admin | PDF 4a |
