@@ -18,6 +18,45 @@ import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hil
 
 // Pro Jahr gibt es ein Turnier; diese Jahre gehören nur dieser Datei (übrige E2E: 2075–2099).
 const JAHR_DOPPEL: Record<string, number> = { iphone: 2074, android: 2073 };
+const JAHR_CM: Record<string, number> = { iphone: 2072, android: 2071 };
+
+const EINZEL: KategorieWerte = {
+	name: 'Herren R1–R9',
+	geschlecht: 'herren',
+	art: 'einzel',
+	jahrgangVon: null,
+	jahrgangBis: null,
+	klassierungVon: 'R1',
+	klassierungBis: 'R9',
+	mindestsumme: null
+};
+
+type Stand = {
+	id: number;
+	name: string;
+	anmeldeschluss: string;
+	status: 'offen';
+	anzahl: 0;
+	anfragen: 0;
+};
+const stand = (id: number, name: string): Stand => ({
+	id,
+	name,
+	anmeldeschluss: '2099-05-31',
+	status: 'offen',
+	anzahl: 0,
+	anfragen: 0
+});
+
+/**
+ * Ersetzt die Liste der laufenden CMs: In der E2E-Datenbank laufen viele Testturniere zugleich
+ * (alle Jahre ab heute), «keine» und «eine» liessen sich sonst nicht prüfen.
+ */
+async function laufendeCms(page: Page, liste: Stand[]) {
+	await page.route('**/api/cm', (route) =>
+		route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(liste) })
+	);
+}
 
 const MIXED: KategorieWerte = {
 	name: 'Mixed Doppel',
@@ -149,5 +188,76 @@ test.describe('Mitglieder-App', () => {
 		await zurueck.click();
 		await expect(page.getByRole('heading', { level: 1, name: lang })).toBeVisible();
 		expect(fehler).toEqual([]);
+	});
+
+	test('#69: Reiter CM ohne laufende CM zeigt den Hinweis', async ({ page }, info) => {
+		await meldeAn(page, 'Ursi');
+		await laufendeCms(page, []);
+		await reiter(page, 'CM').click();
+		await expect(page).toHaveURL(/\/clubmeisterschaft$/);
+		await expect(page.getByRole('heading', { level: 1, name: 'Clubmeisterschaft' })).toBeVisible();
+		await expect(
+			page.getByText(
+				'Zurzeit läuft keine Clubmeisterschaft. Sobald die Anmeldung offen ist, steht sie hier.',
+				{ exact: true }
+			)
+		).toBeVisible();
+		await expect(reiter(page, 'CM')).toHaveAttribute('aria-current', 'page');
+		await pruefeBildschirm(page, info, 'navigation-cm-keine');
+	});
+
+	test('#69: Reiter CM mit einer CM zeigt sie direkt', async ({ page }, info) => {
+		const fehler = sammleKonsolenfehler(page);
+		const jahr = JAHR_CM[info.project.name];
+		const { turnierId } = await legeOffenesTurnierAn(jahr, [EINZEL]);
+		await meldeAn(page, 'Vera');
+		await laufendeCms(page, [stand(turnierId, `Clubmeisterschaft ${jahr}`)]);
+		await reiter(page, 'CM').click();
+		await expect(page).toHaveURL(new RegExp(`/clubmeisterschaft/${turnierId}$`));
+		await expect(
+			page.getByRole('heading', { level: 1, name: `Clubmeisterschaft ${jahr}` })
+		).toBeVisible();
+		await expect(page.locator('a.zurueck')).toHaveCount(0);
+		await expect(reiter(page, 'CM')).toHaveAttribute('aria-current', 'page');
+
+		// Nochmals antippen bleibt auf der Seite; die Zurück-Taste führt zur Seite vor dem Tipp.
+		await reiter(page, 'CM').click();
+		await expect(page).toHaveURL(new RegExp(`/clubmeisterschaft/${turnierId}$`));
+		await page.goBack();
+		await expect(page).toHaveURL(/\/$/);
+		await expect(page.getByRole('heading', { level: 1, name: 'Hoi Vera' })).toBeVisible();
+		expect(fehler).toEqual([]);
+	});
+
+	test('#69: Reiter CM mit mehreren CMs zeigt Kacheln', async ({ page }, info) => {
+		const jahr = JAHR_CM[info.project.name];
+		const { turnierId } = await legeOffenesTurnierAn(jahr, [EINZEL]);
+		await meldeAn(page, 'Wanda');
+		await laufendeCms(page, [
+			stand(turnierId, `Clubmeisterschaft ${jahr}`),
+			stand(turnierId + 100000, 'Clubmeisterschaft Erfunden')
+		]);
+		await reiter(page, 'CM').click();
+		await expect(page).toHaveURL(/\/clubmeisterschaft$/);
+		await expect(page.locator('main a.kachel')).toHaveCount(2);
+		await pruefeBildschirm(page, info, 'navigation-cm-mehrere');
+		await page.getByRole('link', { name: new RegExp(`Clubmeisterschaft ${jahr}`) }).click();
+		await expect(
+			page.getByRole('heading', { level: 1, name: `Clubmeisterschaft ${jahr}` })
+		).toBeVisible();
+		await page.getByRole('link', { name: '‹ Clubmeisterschaft', exact: true }).click();
+		await expect(page).toHaveURL(/\/clubmeisterschaft$/);
+	});
+
+	test('#69: Kachel auf Start führt in den Reiter CM', async ({ page }, info) => {
+		const jahr = JAHR_CM[info.project.name];
+		const { turnierId } = await legeOffenesTurnierAn(jahr, [EINZEL]);
+		await laufendeCms(page, [stand(turnierId, `Clubmeisterschaft ${jahr}`)]);
+		await meldeAn(page, 'Xenia');
+		await page.getByRole('link', { name: new RegExp(`Clubmeisterschaft ${jahr}`) }).click();
+		await expect(
+			page.getByRole('heading', { level: 1, name: `Clubmeisterschaft ${jahr}` })
+		).toBeVisible();
+		await expect(reiter(page, 'CM')).toHaveAttribute('aria-current', 'page');
 	});
 });
