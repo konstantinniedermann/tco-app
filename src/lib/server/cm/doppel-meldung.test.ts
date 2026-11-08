@@ -7,7 +7,12 @@ import {
 	anfrageMeldung,
 	austrittAnfrageMeldung,
 	austrittMeldung,
+	geloeschtDoppelText,
+	herausgenommenText,
 	hinfaelligMeldung,
+	neuerPartnerText,
+	ohneErsatzText,
+	verschobenDoppelText,
 	vonHandAlleinText,
 	vonHandPaarText
 } from './doppel-meldung.ts';
@@ -65,6 +70,24 @@ describe('Meldungen zum Doppel', () => {
 		);
 		expect(anfrageGeloeschtText('Marco Beispiel', 'Mixed Doppel')).toBe(
 			'Deine Anfrage an Marco Beispiel für «Mixed Doppel» ist hinfällig.'
+		);
+	});
+
+	test('FR-46, FR-47: Partner ändern, verschieben und löschen nennen den anderen, nie den CM-Admin beim Namen', () => {
+		expect(herausgenommenText('Lena Aebi', 'Mixed Doppel')).toBe(
+			'Der CM-Admin hat dich aus dem Doppel mit Lena Aebi für «Mixed Doppel» genommen.'
+		);
+		expect(neuerPartnerText('Marco Beispiel', 'Mixed Doppel')).toBe(
+			'Der CM-Admin hat Marco Beispiel als deinen Partner für «Mixed Doppel» eingetragen.'
+		);
+		expect(ohneErsatzText('Mixed Doppel')).toBe(
+			'Der CM-Admin hat deinen Partner aus «Mixed Doppel» genommen. Du suchst jetzt einen Partner.'
+		);
+		expect(verschobenDoppelText('Offenes Doppel', 'Herren Doppel')).toBe(
+			'Der CM-Admin hat eure Anmeldung von «Offenes Doppel» nach «Herren Doppel» verschoben.'
+		);
+		expect(geloeschtDoppelText('Mixed Doppel')).toBe(
+			'Der CM-Admin hat eure Anmeldung für «Mixed Doppel» gelöscht.'
 		);
 	});
 });

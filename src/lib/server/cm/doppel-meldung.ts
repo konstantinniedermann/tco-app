@@ -61,3 +61,23 @@ export const vonHandAlleinText = (kategorie: string) =>
 /** FR-46: an den Anfragenden, wenn der CM-Admin seine Anfrage löscht, ohne Grund. */
 export const anfrageGeloeschtText = (an: string, kategorie: string) =>
 	`Deine Anfrage an ${an} für «${kategorie}» ist hinfällig.`;
+
+/** FR-46: an den, der beim Partner ändern herausfällt; `bleibt` ist der andere. */
+export const herausgenommenText = (bleibt: string, kategorie: string) =>
+	`Der CM-Admin hat dich aus dem Doppel mit ${bleibt} für «${kategorie}» genommen.`;
+
+/** FR-46: an den, der bleibt, wenn der CM-Admin einen neuen Partner einträgt. */
+export const neuerPartnerText = (neu: string, kategorie: string) =>
+	`Der CM-Admin hat ${neu} als deinen Partner für «${kategorie}» eingetragen.`;
+
+/** FR-46: an den, der bleibt, wenn der CM-Admin den Partner ohne Ersatz herausnimmt. */
+export const ohneErsatzText = (kategorie: string) =>
+	`Der CM-Admin hat deinen Partner aus «${kategorie}» genommen. Du suchst jetzt einen Partner.`;
+
+/** FR-46: an jeden Spieler einer verschobenen Doppel-Anmeldung. */
+export const verschobenDoppelText = (von: string, nach: string) =>
+	`Der CM-Admin hat eure Anmeldung von «${von}» nach «${nach}» verschoben.`;
+
+/** FR-46: an jeden Spieler einer gelöschten Doppel-Anmeldung. */
+export const geloeschtDoppelText = (kategorie: string) =>
+	`Der CM-Admin hat eure Anmeldung für «${kategorie}» gelöscht.`;

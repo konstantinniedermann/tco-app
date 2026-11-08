@@ -1,7 +1,8 @@
 // Doppel verwalten durch den CM-Admin (A-ANMELDUNG-06, FR-46): Liste, von Hand anmelden,
-// zusammenlegen, offene Anfragen als Paar anmelden oder löschen. Wie im Einzel (`verwaltung.ts`)
-// warnt MyTCO, statt zu sperren; nie geht ein Spieler doppelt in dieselbe Kategorie, ein Paar mit
-// mehr als zwei Spielern, ein Turnier *in Vorbereitung* oder ein Mitglied, das nicht *aktiv* ist.
+// zusammenlegen, offene Anfragen als Paar anmelden oder löschen, Partner ändern, verschieben und
+// löschen. Wie im Einzel (`verwaltung.ts`) warnt MyTCO, statt zu sperren; nie geht ein Spieler
+// doppelt in dieselbe Kategorie, ein Paar mit mehr als zwei Spielern, ein Turnier *in
+// Vorbereitung* oder ein Mitglied, das nicht *aktiv* ist.
 // Ein Login ist für den CM-Admin nicht nötig. Gesperrt wird wie in Etappe 1: Mitglieder nach
 // aufsteigender ID (`sperreMitglieder`), dann Kategorie und Turnier, dann Anmeldung oder Anfrage.
 import { and, asc, eq, inArray } from 'drizzle-orm';
@@ -35,7 +36,12 @@ import {
 } from './doppel.ts';
 import {
 	anfrageGeloeschtText,
+	geloeschtDoppelText,
+	herausgenommenText,
 	hinfaelligMeldung,
+	neuerPartnerText,
+	ohneErsatzText,
+	verschobenDoppelText,
 	vonHandAlleinText,
 	vonHandPaarText
 } from './doppel-meldung.ts';
@@ -229,6 +235,19 @@ const hinfaelligFuer = (hinfaellig: Hinfaellig[], kategorie: string, turnierId: 
 	);
 
 /**
+ * Löscht die offenen Anfragen von und an die `spieler` in der Kategorie; die Dritten erfahren,
+ * dass sie hinfällig sind. Regel für alle Paarbildungen, auch beim Verschieben aus der alten.
+ */
+async function anfragenVerfallen(
+	tx: DbOderTx,
+	k: { id: number; name: string },
+	turnierId: number,
+	spieler: Gesperrt[]
+): Promise<Benachrichtigung[]> {
+	return hinfaelligFuer(await loescheAnfragenDerBeiden(tx, k.id, spieler), k.name, turnierId);
+}
+
+/**
  * Nach einer Paarbildung des CM-Admins (`bildePaar`): Regel für alle Paarbildungen, die Anfragen
  * beider in der Kategorie verfallen; dazu Verlauf bei beiden, Meldung an beide mit dem Namen des
  * anderen und an die Dritten, deren Anfragen verfallen sind.
@@ -240,7 +259,7 @@ async function nachPaar(
 	[a, b]: [Gesperrt, Gesperrt],
 	jetzt: Date
 ): Promise<DoppelErgebnis> {
-	const hinfaellig = await loescheAnfragenDerBeiden(tx, ziel.k.id, [a, b]);
+	const verfallen = await anfragenVerfallen(tx, ziel.k, ziel.t.id, [a, b]);
 	await schreibeGeaendert(tx, a, urheber, jetzt);
 	await schreibeGeaendert(tx, b, urheber, jetzt);
 	return {
@@ -249,7 +268,7 @@ async function nachPaar(
 		meldungen: geordnet([
 			{ mitgliedId: a.id, text: vonHandPaarText(nameFuerText(b), ziel.k.name) },
 			{ mitgliedId: b.id, text: vonHandPaarText(nameFuerText(a), ziel.k.name) },
-			...hinfaelligFuer(hinfaellig, ziel.k.name, ziel.t.id)
+			...verfallen
 		])
 	};
 }
@@ -464,4 +483,231 @@ export async function loescheAnfrage(
 			]
 		};
 	});
+}
+
+/**
+ * Sperrt die Spieler der Anmeldung und die `weiteren` Mitglieder nach aufsteigender ID. Jede
+ * Änderung an den Spielern einer Anmeldung sperrt sie zuerst: Kam vor der Sperre einer dazu oder
+ * weg, ist die Liste veraltet (`null`), ebenso ohne Spieler (unbekannte Anmeldung).
+ */
+async function sperreSpielerDerAnmeldung(tx: DbOderTx, anmeldungId: number, weitere: number[]) {
+	const vorher = await spielerDer(tx, anmeldungId);
+	if (vorher.length === 0) return null;
+	const gesperrt = await sperreMitglieder(tx, [...vorher, ...weitere]);
+	if ((await spielerDer(tx, anmeldungId)).join() !== vorher.join()) return null;
+	const [{ kategorieId }] = await tx
+		.select({ kategorieId: anmeldung.kategorieId })
+		.from(anmeldung)
+		.where(eq(anmeldung.id, anmeldungId));
+	// Mitglieder mit Anmeldungen bleiben in der Datenbank (Fremdschlüssel), auch gelöschte.
+	return { spieler: vorher.map((id) => gesperrt.get(id)!), gesperrt, kategorieId };
+}
+
+/** Sperrt die Anmeldung `for update`, wenn sie noch aktiv ist. */
+async function sperreAktive(tx: DbOderTx, anmeldungId: number): Promise<boolean> {
+	const [a] = await tx
+		.select({ id: anmeldung.id })
+		.from(anmeldung)
+		.where(and(eq(anmeldung.id, anmeldungId), istAktiv))
+		.for('update');
+	return a !== undefined;
+}
+
+const zurueckgezogen = (tx: DbOderTx, anmeldungId: number, jetzt: Date) =>
+	tx
+		.update(anmeldung)
+		.set({ status: 'zurueckgezogen', suchtext: null, geaendertAm: jetzt })
+		.where(eq(anmeldung.id, anmeldungId));
+
+/**
+ * FR-46: Partner ändern, mit Ersatz (`neuId`) oder ohne (`null`). Nur in einer aktiven Paar-
+ * Anmeldung; `bleibtId` muss einer der beiden sein, `neuId` keiner der beiden (sonst `eingabe`).
+ * Die alte Anmeldung ist *zurückgezogen*, eine neue, bestätigte hat den Bleibenden und den Neuen
+ * bzw. ihn allein (*sucht Partner*): So bleibt nachvollziehbar, wer wann dabei war. Sucht der
+ * Neue hier allein, ist seine Anmeldung *zurückgezogen*; steht er hier zu zweit:
+ * `schon-angemeldet`. Danach die Regel für alle Paarbildungen. Warnungen wie beim Anmelden,
+ * `voll` nur für den Neuen (der Bleibende zählt hier schon). Meldung an den Herausgefallenen,
+ * den Bleibenden und den Neuen. Sperren: alle drei Mitglieder, Kategorie und Turnier, Anmeldung.
+ */
+export async function aenderePartner(
+	db: Db,
+	urheber: CmUrheber,
+	anmeldungId: number,
+	bleibtId: number,
+	neuId: number | null,
+	jetzt: Date,
+	trotzdem: boolean
+): Promise<DoppelErgebnis | DoppelAbgelehnt | 'eingabe'> {
+	return db.transaction(async (tx) => {
+		const g = await sperreSpielerDerAnmeldung(tx, anmeldungId, neuId === null ? [] : [neuId]);
+		if (!g || g.spieler.length !== 2) return 'nicht-gefunden';
+		const ids = g.spieler.map((m) => m.id);
+		if (!ids.includes(bleibtId) || (neuId !== null && ids.includes(neuId))) return 'eingabe';
+		const bleibt = g.gesperrt.get(bleibtId)!;
+		const raus = g.spieler.find((m) => m.id !== bleibtId)!;
+		let neu: Gesperrt | null = null;
+		if (neuId !== null) {
+			const m = g.gesperrt.get(neuId);
+			if (m?.status !== 'aktiv') return 'nicht-gefunden';
+			neu = m;
+		}
+		if (bleibt.status !== 'aktiv') return 'nicht-gefunden';
+		const ziel = await sperreDoppel(tx, g.kategorieId);
+		if (!ziel || !(await sperreAktive(tx, anmeldungId))) return 'nicht-gefunden';
+		if (ziel.t.status === 'vorbereitung') return 'vorbereitung';
+		const standNeu = neu && (await standIm(tx, ziel.t.id, ziel.k.id, neu.id));
+		if (standNeu && zuZweit(standNeu)) return 'schon-angemeldet';
+		if (!trotzdem) {
+			const b = neu && spielerAus(neu);
+			const w = warnungen(ziel, spielerAus(bleibt), b, standNeu ? [standNeu] : [], jetzt);
+			if (w.length > 0) return { warnungen: w };
+		}
+
+		await zurueckgezogen(tx, anmeldungId, jetzt);
+		if (standNeu?.hier) await zurueckgezogen(tx, standNeu.hier.anmeldungId, jetzt);
+		const neuesPaar = neu ? [bleibt, neu] : [bleibt];
+		const [zeile] = await tx
+			.insert(anmeldung)
+			.values({
+				kategorieId: ziel.k.id,
+				status: 'bestaetigt',
+				angemeldetAm: jetzt,
+				geaendertAm: jetzt
+			})
+			.returning({ id: anmeldung.id });
+		await tx
+			.insert(anmeldungSpieler)
+			.values(neuesPaar.map((m) => ({ anmeldungId: zeile.id, mitgliedId: m.id })));
+		for (const m of [raus, ...neuesPaar]) await schreibeGeaendert(tx, m, urheber, jetzt);
+
+		const k = ziel.k.name;
+		const meldungen: Benachrichtigung[] = [
+			{ mitgliedId: raus.id, text: herausgenommenText(nameFuerText(bleibt), k) }
+		];
+		if (neu) {
+			meldungen.push(
+				{ mitgliedId: bleibt.id, text: neuerPartnerText(nameFuerText(neu), k) },
+				{ mitgliedId: neu.id, text: vonHandPaarText(nameFuerText(bleibt), k) },
+				...(await anfragenVerfallen(tx, ziel.k, ziel.t.id, [bleibt, neu]))
+			);
+		} else {
+			meldungen.push({ mitgliedId: bleibt.id, text: ohneErsatzText(k) });
+		}
+		return { ergebnis: 'ok' as const, turnierId: ziel.t.id, meldungen: geordnet(meldungen) };
+	});
+}
+
+/**
+ * FR-46: ein Paar oder einen Suchenden zusammen in eine andere aktive Doppel-Kategorie desselben
+ * Turniers verschieben (sonst `nicht-gefunden`; nie zwischen Einzel und Doppel); jeder Spieler
+ * muss aktiv sein. Steht einer dort schon: `schon-angemeldet`. Warnungen für das Paar bzw. den
+ * Suchenden; bei `voll` zählt die verschobene nicht mit. Die Anfragen der Verschobenen in der
+ * alten Kategorie verfallen mit Meldung an die anderen; kommt ein Paar an, gilt im Ziel die Regel
+ * für alle Paarbildungen, ein Suchender behält dort seine Anfragen und seinen Kommentar.
+ * Sperren: die Spieler, dann beide Kategorien nach aufsteigender ID (je mit dem Turnier), dann
+ * die Anmeldung.
+ */
+export async function verschiebeDoppel(
+	db: Db,
+	urheber: CmUrheber,
+	anmeldungId: number,
+	zielKategorieId: number,
+	jetzt: Date,
+	trotzdem: boolean
+): Promise<(DoppelErgebnis & { von: string; nach: string }) | DoppelAbgelehnt> {
+	return db.transaction(async (tx) => {
+		const g = await sperreSpielerDerAnmeldung(tx, anmeldungId, []);
+		if (!g || g.spieler.some((m) => m.status !== 'aktiv')) return 'nicht-gefunden';
+		const gesperrt = new Map<number, Ziel | null>();
+		for (const id of [...new Set([g.kategorieId, zielKategorieId])].sort((a, b) => a - b)) {
+			gesperrt.set(id, await sperreKategorieUndTurnier(tx, id));
+		}
+		const quelle = gesperrt.get(g.kategorieId)!;
+		const ziel = gesperrt.get(zielKategorieId);
+		if (
+			!(await sperreAktive(tx, anmeldungId)) ||
+			quelle.k.art !== 'doppel' ||
+			!ziel ||
+			ziel.k.art !== 'doppel' ||
+			ziel.k.status !== 'aktiv' ||
+			ziel.t.id !== quelle.t.id
+		) {
+			return 'nicht-gefunden';
+		}
+		if (ziel.t.status === 'vorbereitung') return 'vorbereitung';
+		const staende: Stand[] = [];
+		for (const m of g.spieler) staende.push(await standIm(tx, ziel.t.id, ziel.k.id, m.id));
+		if (staende.some((s) => s.hier !== null)) return 'schon-angemeldet';
+		if (!trotzdem) {
+			const [a, b] = g.spieler;
+			// Die verschobene zählt bei der Grenze nicht mit.
+			const ohneDiese = staende.map((s) => ({ ...s, anzahl: s.anzahl - 1 }));
+			const w = warnungen(ziel, spielerAus(a), b ? spielerAus(b) : null, ohneDiese, jetzt);
+			if (w.length > 0) return { warnungen: w };
+		}
+
+		await tx
+			.update(anmeldung)
+			.set({ kategorieId: ziel.k.id, geaendertAm: jetzt })
+			.where(eq(anmeldung.id, anmeldungId));
+		const meldungen: Benachrichtigung[] = g.spieler.map((m) => ({
+			mitgliedId: m.id,
+			text: verschobenDoppelText(quelle.k.name, ziel.k.name)
+		}));
+		meldungen.push(...(await anfragenVerfallen(tx, quelle.k, quelle.t.id, g.spieler)));
+		if (g.spieler.length === 2) {
+			meldungen.push(...(await anfragenVerfallen(tx, ziel.k, ziel.t.id, g.spieler)));
+		}
+		for (const m of g.spieler) await schreibeGeaendert(tx, m, urheber, jetzt);
+		return {
+			ergebnis: 'ok' as const,
+			turnierId: ziel.t.id,
+			von: quelle.k.name,
+			nach: ziel.k.name,
+			meldungen: geordnet(meldungen)
+		};
+	});
+}
+
+/**
+ * FR-46: eine aktive Doppel-Anmeldung löschen: Sie ist *zurückgezogen*, der Kommentar weg, auch
+ * nach dem Anmeldeschluss; Meldung an jeden Spieler. Die Anfragen bleiben. Abgemeldet, Einzel,
+ * unbekannt oder in Vorbereitung: `nicht-gefunden`. Sperren: die Spieler, Kategorie und Turnier,
+ * dann die Anmeldung.
+ */
+export async function loescheDoppel(
+	db: Db,
+	urheber: CmUrheber,
+	anmeldungId: number,
+	jetzt: Date
+): Promise<DoppelErgebnis | 'nicht-gefunden'> {
+	return db.transaction(async (tx) => {
+		const g = await sperreSpielerDerAnmeldung(tx, anmeldungId, []);
+		if (!g) return 'nicht-gefunden';
+		const z = (await sperreKategorieUndTurnier(tx, g.kategorieId))!;
+		if (!(await sperreAktive(tx, anmeldungId)) || z.k.art !== 'doppel') return 'nicht-gefunden';
+		if (z.t.status === 'vorbereitung') return 'nicht-gefunden';
+		await zurueckgezogen(tx, anmeldungId, jetzt);
+		for (const m of g.spieler) await schreibeGeaendert(tx, m, urheber, jetzt);
+		return {
+			ergebnis: 'ok' as const,
+			turnierId: z.t.id,
+			meldungen: geordnet(
+				g.spieler.map((m) => ({ mitgliedId: m.id, text: geloeschtDoppelText(z.k.name) }))
+			)
+		};
+	});
+}
+
+/** Einzel oder Doppel einer Anmeldung, für die Weiche der Schnittstelle; `null`, wenn unbekannt. */
+export async function artDerAnmeldung(
+	db: Db,
+	anmeldungId: number
+): Promise<'einzel' | 'doppel' | null> {
+	const [z] = await db
+		.select({ art: kategorie.art })
+		.from(anmeldung)
+		.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
+		.where(eq(anmeldung.id, anmeldungId));
+	return z?.art ?? null;
 }
