@@ -1,6 +1,19 @@
 import { describe, expect, test } from 'vitest';
 import type { KategorieRegel } from '../turnier/passung.ts';
-import { kategorieText, kommentarZaehlerText, namenText, standText } from './anzeige.ts';
+import {
+	doppelText,
+	kategorieText,
+	kommentarZaehlerText,
+	namenText,
+	rueckfrageText,
+	standText,
+	SUCHTEXT_MAX,
+	suchtextZaehlerText,
+	waehlbar,
+	vermerkText,
+	vornameVon,
+	weiterePaare
+} from './anzeige.ts';
 
 const regel = (k: Partial<KategorieRegel> = {}): KategorieRegel => ({
 	art: 'einzel',
@@ -55,5 +68,55 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 	test('FR-08: Zähler des Wildcard-Kommentars', () => {
 		expect(kommentarZaehlerText(0)).toBe('0 von 300 Zeichen');
 		expect(kommentarZaehlerText(12)).toBe('12 von 300 Zeichen');
+	});
+
+	test('A-ANMELDUNG-02: Stand nennt offene Anfragen an einen', () => {
+		expect(standText(2, 1)).toBe('2 Anmeldungen · 1 Anfrage');
+		expect(standText(0, 2)).toBe('Noch keine Anmeldung · 2 Anfragen');
+		expect(standText(1, 0)).toBe('1 Anmeldung');
+	});
+
+	test('A-ANMELDUNG-04: Doppel als Kurztext, ohne leere Teile', () => {
+		expect(doppelText(regel({ art: 'doppel', geschlecht: 'mixed', mindestsumme: 9 }))).toBe(
+			'Doppel · Mixed · zusammen mind. 9'
+		);
+		expect(doppelText(regel({ art: 'doppel', geschlecht: 'damen' }))).toBe('Doppel · Damen');
+		expect(doppelText(regel({ art: 'doppel', geschlecht: 'offen', mindestsumme: 0 }))).toBe(
+			'Doppel · zusammen mind. 0'
+		);
+	});
+
+	test('FR-48: Vermerk in der Partnersuche als Text', () => {
+		expect(vermerkText('klassierung-fehlt')).toBe('Klassierung fehlt');
+		expect(vermerkText('angaben-fehlen')).toBe('Angaben fehlen');
+	});
+
+	test('FR-49: Zähler des Kommentars «sucht Partner»', () => {
+		expect(SUCHTEXT_MAX).toBe(120);
+		expect(suchtextZaehlerText(45)).toBe('45 von 120 Zeichen');
+	});
+
+	test('FR-19: Kontakt des Partners als Link, weitere Paare ohne das eigene', () => {
+		expect(waehlbar('079 000 00 01')).toBe('0790000001');
+		expect(waehlbar('+41 (79) 000-00-01')).toBe('+41790000001');
+		expect(vornameVon('Marco Muster')).toBe('Marco');
+		expect(
+			weiterePaare(['Lea Beispiel / Marco Muster', 'Jonas Keller / Nina Brunner'], 'Marco Muster')
+		).toEqual(['Jonas Keller / Nina Brunner']);
+	});
+
+	test('FR-48: Rückfrage vor der Anfrage spricht den Partner richtig an', () => {
+		expect(rueckfrageText('Marco', 'mixed', 'w')).toBe(
+			'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit er dich ' +
+				'anrufen kann. Nimmt er an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.'
+		);
+		expect(rueckfrageText('Lea', 'damen', 'w')).toContain(
+			'damit sie dich anrufen kann. Nimmt sie an'
+		);
+		expect(rueckfrageText('Lea', 'mixed', 'm')).toContain('damit sie dich');
+		expect(rueckfrageText('Urs', 'herren', 'm')).toContain('damit er dich');
+		expect(rueckfrageText('Kim', 'offen', 'w')).toContain(
+			'damit Kim dich anrufen kann. Nimmt Kim an'
+		);
 	});
 });

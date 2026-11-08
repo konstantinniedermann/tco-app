@@ -7,7 +7,7 @@ export type Uebergang = 'blende' | 'tiefer' | 'zurueck';
 const REITER_SEITEN = new Set(['/', '/profil']);
 
 // Ebene jeder Seite der Mitglieder-App: 0 = Reiter- und Login-Seiten, 1 = Unterseiten mit
-// «‹ Zurück». Seiten ohne Eintrag (Verwaltung, unbekannt) wechseln ohne Bewegung.
+// «‹ Zurück», 2 = Unterseiten davon. Seiten ohne Eintrag (Verwaltung, unbekannt) wechseln ohne Bewegung.
 const EBENE: Record<string, number> = {
 	'/': 0,
 	'/profil': 0,
@@ -18,7 +18,8 @@ const EBENE: Record<string, number> = {
 	'/login/mail': 1,
 	'/profil/email': 1,
 	'/anlass/[id]': 1,
-	'/clubmeisterschaft/[id]': 1
+	'/clubmeisterschaft/[id]': 1,
+	'/clubmeisterschaft/[id]/doppel/[kid]': 2
 };
 
 const FUSSZEILE = new Set(['/', '/login', '/login/mail', '/willkommen']);

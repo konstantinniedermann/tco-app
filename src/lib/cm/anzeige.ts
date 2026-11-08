@@ -1,10 +1,21 @@
 // Anzeigehilfen der Clubmeisterschaft für Mitglieder: reine Funktionen, Browser und Server.
-import type { KategorieRegel } from '../turnier/passung.ts';
+import type { Geschlecht } from '../server/db/schema.ts';
+import type { KategorieRegel, Vermerk } from '../turnier/passung.ts';
 import { geschlechtText } from '../verwaltung/turnier-anzeige.ts';
 
-/** A-ANMELDUNG-02: eigener Stand auf der Startseiten-Kachel. */
-export const standText = (anzahl: number): string =>
-	anzahl === 0 ? 'Noch keine Anmeldung' : `${anzahl} ${anzahl === 1 ? 'Anmeldung' : 'Anmeldungen'}`;
+/**
+ * A-ANMELDUNG-02: eigener Stand auf der Startseiten-Kachel, mit den offenen Anfragen an einen
+ * («2 Anmeldungen · 1 Anfrage»).
+ */
+export function standText(anzahl: number, anfragen = 0): string {
+	const stand =
+		anzahl === 0
+			? 'Noch keine Anmeldung'
+			: `${anzahl} ${anzahl === 1 ? 'Anmeldung' : 'Anmeldungen'}`;
+	return anfragen === 0
+		? stand
+		: `${stand} · ${anfragen} ${anfragen === 1 ? 'Anfrage' : 'Anfragen'}`;
+}
 
 function jahrgang(von: number | null, bis: number | null): string {
 	if (von !== null && bis !== null) return `Jahrgang ${von}–${bis}`;
@@ -40,3 +51,63 @@ export const KOMMENTAR_MAX = 300;
 /** FR-08: Zähler unter dem Kommentarfeld, «12 von 300 Zeichen». */
 export const kommentarZaehlerText = (laenge: number): string =>
 	`${laenge} von ${KOMMENTAR_MAX} Zeichen`;
+
+/** A-ANMELDUNG-04: «Doppel · Mixed · zusammen mind. 9»; was die Kategorie nicht einschränkt, fehlt. */
+export function doppelText(k: KategorieRegel): string {
+	return [
+		'Doppel',
+		k.geschlecht === 'offen' ? '' : geschlechtText(k.geschlecht),
+		k.mindestsumme === null ? '' : `zusammen mind. ${k.mindestsumme}`
+	]
+		.filter((teil) => teil !== '')
+		.join(' · ');
+}
+
+const VERMERK: Record<Vermerk, string> = {
+	'klassierung-fehlt': 'Klassierung fehlt',
+	'angaben-fehlen': 'Angaben fehlen'
+};
+
+/** FR-48: Vermerk eines möglichen Partners in der Suche. */
+export const vermerkText = (v: Vermerk): string => VERMERK[v];
+
+/** FR-49: Längengrenze des Kommentars *sucht Partner*. */
+export const SUCHTEXT_MAX = 120;
+
+/** FR-49: Zähler unter dem Kommentarfeld, «45 von 120 Zeichen». */
+export const suchtextZaehlerText = (laenge: number): string =>
+	`${laenge} von ${SUCHTEXT_MAX} Zeichen`;
+
+/** Hinweis vor der ersten Anmeldung im Turnier (Datenschutz, Kontaktdaten). */
+export const KONTAKT_HINWEIS =
+	'Deine Gegner und dein Doppelpartner sehen während der Clubmeisterschaft deine ' +
+	'E-Mail-Adresse und Telefonnummer, damit ihr die Spiele selbst abmachen könnt. ' +
+	'Verbergen geht nicht.';
+
+/** FR-19: Telefonnummer für einen `tel:`-Link, nur Ziffern und ein führendes «+». */
+export const waehlbar = (nummer: string): string =>
+	`${nummer.trim().startsWith('+') ? '+' : ''}${nummer.replace(/\D/g, '')}`;
+
+/** Vorname aus «Vorname Nachname». */
+export const vornameVon = (name: string): string => name.trim().split(/\s+/)[0];
+
+/** FR-19: die bestätigten Paare der Kategorie ohne das eigene (das mit dem Partner). */
+export const weiterePaare = (paare: string[], partner: string): string[] =>
+	paare.filter((p) => !p.split(' / ').includes(partner));
+
+/** Wie die Rückfrage den Angefragten nennt: aus der Kategorie, sonst beim Vornamen. */
+function pronomen(geschlecht: Geschlecht, ich: 'w' | 'm' | null): 'er' | 'sie' | null {
+	if (geschlecht === 'herren') return 'er';
+	if (geschlecht === 'damen') return 'sie';
+	if (geschlecht === 'mixed' && ich !== null) return ich === 'w' ? 'er' : 'sie';
+	return null;
+}
+
+/** FR-48, FR-19: Text der Rückfrage vor dem Senden einer Anfrage. */
+export function rueckfrageText(vorname: string, geschlecht: Geschlecht, ich: 'w' | 'm' | null) {
+	const wer = pronomen(geschlecht, ich) ?? vorname;
+	return (
+		`${vorname} sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit ${wer} ` +
+		`dich anrufen kann. Nimmt ${wer} an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.`
+	);
+}

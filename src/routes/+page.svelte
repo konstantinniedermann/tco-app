@@ -83,7 +83,7 @@
 				<span class="leise"
 					>{t.status === 'offen'
 						? `Anmeldung bis ${datumLang(t.anmeldeschluss)}`
-						: 'Anmeldung geschlossen'}<br />{cmStandText(t.anzahl)}</span
+						: 'Anmeldung geschlossen'}<br />{cmStandText(t.anzahl, t.anfragen)}</span
 				>
 			</span>
 			<span class="kachel-pfeil" aria-hidden="true">›</span>
