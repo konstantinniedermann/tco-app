@@ -109,8 +109,8 @@ den Rufnamen, alles unter Mitgliederverwaltung bleibt amtlich, Seiten ohne Login
 - In der App heisst der amtliche Name «Vorname Nachname». In den Verwaltungsbereichen aus
   Entscheidung 6 behält er die dort übliche Form «Nachname, Vorname» *(mein Vorschlag: so bleiben
   Liste und Sortierung lesbar, auch wenn nur ein Teil der Mitglieder einen Rufnamen hat)*.
-- Für Screenreader wird der Name als ein Text vorgelesen («Hannes, Johannes Muster»). Der graue
-  Teil wird nicht versteckt.
+- Screenreader lesen den Namen so, wie er dasteht («Hannes Johannes Muster»). Der graue Teil
+  wird nicht versteckt.
 - Alle Stellen nutzen eine gemeinsame Svelte-Komponente und eine gemeinsame Funktion für reinen
   Text, etwa für die Begrüssung. Der Server liefert dafür statt eines fertigen Strings die Teile
   (`rufname`, `vorname`, `nachname`).
