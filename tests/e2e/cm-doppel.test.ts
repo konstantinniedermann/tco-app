@@ -4,6 +4,7 @@ import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
+	gibLogin,
 	legeKontoMitBriefCodeAn,
 	legeOffenesTurnierAn,
 	schliesseLoginHilfen,
@@ -359,9 +360,11 @@ test('FR-48: Ablehnen', async ({ page }, info) => {
 	const leaName = `Lea ${lea.nachname}`;
 	const marcoName = `Marco ${marco.nachname}`;
 
-	// Marco hat ein Login; Leas Anfrage an ihn läuft über die Fachlogik.
+	// Marco hat ein Login; Leas Anfrage an ihn läuft über die Fachlogik. Auch Lea braucht ein
+	// Login, sonst erscheint ihre Anfrage nicht (FR-48: die Antwort muss sie erreichen).
 	await startetVomSymbol(page);
 	await meldeAn(page, marco);
+	await gibLogin(lea.kontoId);
 	await stelleAnfrageDirekt(kategorieId, lea.mitgliedId, marco.mitgliedId);
 	await oeffneCm(page, turnierId, jahr);
 	await expect(anfrageKarte(page)).toContainText(`${leaName} · R4 möchte mit dir spielen.`);
