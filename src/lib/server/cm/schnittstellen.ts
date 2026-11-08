@@ -21,6 +21,7 @@ import {
 	meldeAb,
 	meldeAn
 } from './anmeldungen.ts';
+import { nimmAnfrageAn, stelleAnfrage } from './doppel.ts';
 import { bezugDerAnmeldung, bezugDerKategorie, mitgliedEmail, type Bezug } from './bezug.ts';
 import type { BestaetigungInhalt } from './mail.ts';
 
@@ -83,14 +84,28 @@ export function postCmAngaben(d: CmDienste, e: CmEreignis): Promise<Response> {
 	});
 }
 
+/** Alles, was eine Schreibfunktion statt `ok` ablehnen kann (ohne `nicht-gefunden`, das ist 404). */
+type Ablehnung = Exclude<
+	| Awaited<ReturnType<typeof meldeAn>>
+	| Awaited<ReturnType<typeof beantrageWildcard>>
+	| Awaited<ReturnType<typeof stelleAnfrage>>
+	| Exclude<Awaited<ReturnType<typeof nimmAnfrageAn>>, { ergebnis: 'ok' }>,
+	'ok' | 'nicht-gefunden'
+>;
+
 const FEHLER = [
 	'geschlossen',
 	'voll',
 	'passt-nicht',
 	'keine-wildcard',
 	'schon-angemeldet',
+	'schon-angefragt',
 	'angaben-fehlen'
-];
+] satisfies readonly Ablehnung[];
+
+/** 409 mit dem Grund; was die Liste nicht kennt, gilt als `geschlossen`. */
+const ablehnung = (r: string) =>
+	antwort(409, { fehler: (FEHLER as readonly string[]).includes(r) ? r : 'geschlossen' });
 
 /** FR-08: Höchstlänge des Wildcard-Kommentars (nach `trim`). */
 const KOMMENTAR_MAX = 300;
@@ -104,6 +119,7 @@ async function antwortMitMail(
 	t: Date
 ): Promise<Response> {
 	const ansicht = await ladeCmAnsicht(d.db, bezug.turnierId, konto.mitgliedId, t);
+	// Das Turnier kann zwischen Speichern und Lesen verschwunden sein; die Änderung gilt trotzdem.
 	if (!ansicht) return nichtGefunden();
 	const an = await mitgliedEmail(d.db, konto.mitgliedId);
 	if (an) {
@@ -127,7 +143,7 @@ export function postCmAnmeldung(d: CmDienste, e: CmEreignis): Promise<Response> 
 		const t = jetzt(d);
 		const r = await meldeAn(d.db, id, konto.mitgliedId, t);
 		if (r === 'nicht-gefunden') return nichtGefunden();
-		if (r !== 'ok') return antwort(409, { fehler: FEHLER.includes(r) ? r : 'geschlossen' });
+		if (r !== 'ok') return ablehnung(r);
 		return antwortMitMail(d, konto, bezug, 'an', t);
 	});
 }
@@ -191,7 +207,7 @@ export function postCmWildcard(d: CmDienste, e: CmEreignis): Promise<Response> {
 		const t = jetzt(d);
 		const r = await beantrageWildcard(d.db, id, konto.mitgliedId, kommentar, t);
 		if (r === 'nicht-gefunden') return nichtGefunden();
-		if (r !== 'ok') return antwort(409, { fehler: FEHLER.includes(r) ? r : 'geschlossen' });
+		if (r !== 'ok') return ablehnung(r);
 		const a = await antwortMitMail(d, konto, bezug, 'antrag', t);
 		// Die Antwort wartet nicht auf Push und Mail an die CM-Admins; `meldeCmAdmins` wirft nie.
 		void meldeCmAdmins(d, konto.mitgliedId, {
