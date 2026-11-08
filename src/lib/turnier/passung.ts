@@ -1,4 +1,4 @@
-// Passung von Spieler und Einzel-Kategorie (FR-07). Läuft im Browser und auf dem Server.
+// Passung von Spieler und Kategorie, Einzel und Doppel (FR-07). Läuft in Browser und Server.
 import type { Art, Geschlecht } from '../server/db/schema.ts';
 import { BEREICH, istStufe, punkte, type Klassierung, type Stufe } from './klassierung.ts';
 

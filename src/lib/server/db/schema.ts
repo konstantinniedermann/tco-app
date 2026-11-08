@@ -376,7 +376,7 @@ export const anmeldung = pgTable(
 		status: text('status').$type<AnmeldungStatus>().notNull().default('bestaetigt'),
 		// Wildcard-Begründung (Teil 4).
 		kommentar: text('kommentar'),
-		// «Sucht Partner» (FR-48): freier Hinweis der Anmeldung, höchstens 120 Zeichen.
+		// «Sucht Partner» (FR-49): freier Hinweis der Anmeldung, höchstens 120 Zeichen.
 		suchtext: text('suchtext'),
 		angemeldetAm: timestamp('angemeldet_am', { withTimezone: true }).notNull(),
 		geaendertAm: timestamp('geaendert_am', { withTimezone: true }).notNull()
