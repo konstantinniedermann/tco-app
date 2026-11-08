@@ -295,4 +295,50 @@ test.describe('Mitglieder-App', () => {
 		await rueckfrage.getByRole('button', { name: 'Verlassen' }).click();
 		await expect(page.getByRole('heading', { level: 1, name: 'Hoi Yara' })).toBeVisible();
 	});
+
+	test('#69: Anmelden auf der CM-Seite lädt die Seite nicht neu', async ({ page }, info) => {
+		const jahr = JAHR_CM[info.project.name];
+		const { turnierId } = await legeOffenesTurnierAn(jahr, [EINZEL]);
+		const konto = await meldeAn(page, 'Zora');
+		await setzeSpielerangaben(konto.mitgliedId, {
+			geschlecht: 'm',
+			jahrgang: 1990,
+			klassierung: 'R5'
+		});
+		await page.goto(`/clubmeisterschaft/${turnierId}`);
+		await expect(
+			page.getByRole('heading', { level: 1, name: `Clubmeisterschaft ${jahr}` })
+		).toBeVisible();
+
+		// Nach dem Speichern verfällt nur die vorgeladene Startseite; diese Seite holt weder die
+		// Liste der CMs noch ihre Ansicht neu (sonst zeigte eine Störung danach die Fehlerseite).
+		const neuGeladen: string[] = [];
+		page.on('request', (r) => {
+			const pfad = new URL(r.url()).pathname;
+			if (pfad === '/api/cm' || pfad === `/api/cm/${turnierId}`) neuGeladen.push(pfad);
+		});
+		await page
+			.locator('.karte.kachel')
+			.filter({ has: page.getByText(EINZEL.name, { exact: true }) })
+			.getByRole('button', { name: 'Anmelden' })
+			.click();
+		await page.getByRole('dialog').getByRole('button', { name: 'Anmelden' }).click();
+		await expect(page.getByRole('status')).toHaveText(
+			`Angemeldet für ${EINZEL.name}. Die Bestätigung kommt per Mail.`
+		);
+		expect(neuGeladen).toEqual([]);
+	});
+});
+
+test.describe('am PC', () => {
+	test.skip(({ isMobile }) => isMobile, 'nur PC'); // skip: Die Reiter unten am Handy prüft «Mitglieder-App» oben
+	test('#69: Reiter in der Kopfleiste auch auf Unterseiten, mit CM', async ({ page }) => {
+		await meldeAn(page, 'Ada');
+		await page.goto('/profil/email');
+		await expect(reiterleiste(page).getByRole('link')).toHaveText(['Start', 'CM', 'Profil']);
+		await expect(reiter(page, 'Profil')).toHaveAttribute('aria-current', 'page');
+		await reiter(page, 'CM').click();
+		await expect(page).toHaveURL(/\/clubmeisterschaft(\/\d+)?$/);
+		await expect(reiter(page, 'CM')).toHaveAttribute('aria-current', 'page');
+	});
 });

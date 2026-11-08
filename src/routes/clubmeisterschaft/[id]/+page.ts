@@ -10,7 +10,9 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ fetch, params }) => {
 	const id = Number(params.id);
 	if (!Number.isSafeInteger(id) || id <= 0) redirect(307, '/');
-	const [r, laufend] = await Promise.all([holeCmAnsicht(id, fetch), holeCmTurniere(fetch)]);
+	// Die Liste der laufenden CMs über das globale `fetch`: Das `fetch` von `load` würde sie zur
+	// Abhängigkeit machen, und `invalidate('/api/cm')` nach dem Speichern lüde die ganze Seite neu.
+	const [r, laufend] = await Promise.all([holeCmAnsicht(id, fetch), holeCmTurniere()]);
 	if (r.art === 'abgemeldet') {
 		const wartend = leseMailanfrage(holeSpeicher(), Date.now());
 		redirect(307, wartend ? '/login/mail' : '/login');
