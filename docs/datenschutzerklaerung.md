@@ -68,7 +68,8 @@ Name in vergangenen Resultaten und bei deinen Anmeldungen zur Clubmeisterschaft;
 nach Beginn des Anlasses [**Vorschlag K-50**].
 
 Auf Wunsch erhältst du eine Auskunft über alle Daten, die wir von dir gespeichert haben.
-Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge und
+Änderungen, die du bei anderen Mitgliedern ausgelöst hast, stehen nicht darin, weil sie andere
+betreffen. Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge und
 zurückgezogene Anmeldungen geben dir die CM-Admins Auskunft.
 
 **Login:** Du loggst dich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
