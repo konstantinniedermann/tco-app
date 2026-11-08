@@ -601,7 +601,7 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		expect(await anfragenIn(t.herren)).toEqual([]);
 	});
 
-	test('FR-48: mehrere Anfragen gleichzeitig zählen nicht bei der Grenze', async () => {
+	test('FR-48: offene Anfragen zählen nicht bei der Grenze', async () => {
 		const t = await offenesDoppel();
 		const ich = await lea();
 		await anmeldungMit(t.damenEinzel[0], [ich], t.jetzt);

@@ -11,9 +11,11 @@ import {
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
 	legeOffenesTurnierAn,
+	meldePaarDirektAn,
 	meldeZurCmAn,
 	schliesseLoginHilfen,
 	setzeAnmeldeschluss,
+	setzeAusgetreten,
 	setzeSpielerangaben,
 	stelleAnfrageDirekt,
 	warteAufMail
@@ -35,6 +37,7 @@ const JAHR_VON_HAND: Record<string, number> = { iphone: 2074, android: 2073, des
 const JAHR_ZUSAMMEN: Record<string, number> = { iphone: 2071, android: 2070, desktop: 2069 };
 const JAHR_ANFRAGEN: Record<string, number> = { iphone: 2068, android: 2067, desktop: 2066 };
 const JAHR_EINE_ANFRAGE: Record<string, number> = { iphone: 2065, android: 2064 };
+const JAHR_VERSCHIEBEN: Record<string, number> = { iphone: 2063, android: 2062, desktop: 2061 };
 
 function testjahr(jahre: Record<string, number>, info: TestInfo): number {
 	const jahr = jahre[info.project.name];
@@ -53,6 +56,9 @@ const HERREN: KategorieWerte = {
 	klassierungBis: null,
 	mindestsumme: 9
 };
+
+/** Zweite Doppel-Kategorie mit denselben Werten: Ziel fürs Verschieben. */
+const HERREN_B: KategorieWerte = { ...HERREN, name: 'Herren Doppel B' };
 
 type Konto = Awaited<ReturnType<typeof legeKontoMitBriefCodeAn>>;
 type Spieler = {
@@ -95,7 +101,7 @@ async function oeffneKategorieAlsCm(page: Page, cm: Konto, jahr: number) {
 	await expect(page.getByRole('heading', { level: 1, name: 'Clubmeisterschaft' })).toBeVisible();
 	await page.getByRole('link', { name: turnier }).click();
 	await expect(page.getByRole('heading', { level: 1, name: turnier })).toBeVisible();
-	await page.getByRole('link', { name: HERREN.name }).click();
+	await page.getByRole('link', { name: HERREN.name, exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: HERREN.name })).toBeVisible();
 }
 
@@ -212,6 +218,7 @@ test('FR-46, FR-49: zwei Suchende zusammenlegen', async ({ page }, info) => {
 	await zeile(page, carl.nachname).getByRole('button', { name: 'Zusammenlegen' }).click();
 	const zusammen = page.getByRole('dialog', { name: 'Zusammenlegen' });
 	await zusammen.getByRole('radio', { name: new RegExp(`${dario.nachname}, Dario`) }).check();
+	await pruefeBildschirm(page, info, 'cm-doppel-zusammenlegen');
 	await zusammen.getByRole('button', { name: 'Zusammenlegen', exact: true }).click();
 	await expect(zusammen).toBeHidden();
 	await meldetErfolg(page, 'Zusammengelegt.');
@@ -259,6 +266,7 @@ test('FR-48: offene Anfrage als Paar anmelden und löschen', async ({ page }, in
 	await expect(alsPaar).toContainText(`${gian.name} / ${hugo.name}`);
 	await alsPaar.getByRole('button', { name: 'Als Paar anmelden', exact: true }).click();
 	await expect(alsPaar.getByRole('alert')).toHaveText('Anmeldung ist geschlossen.');
+	await pruefeBildschirm(page, info, 'cm-doppel-als-paar');
 	await alsPaar.getByRole('button', { name: 'Trotzdem anmelden' }).click();
 	await expect(alsPaar).toBeHidden();
 	await meldetErfolg(page, 'Als Paar angemeldet.');
@@ -342,5 +350,99 @@ test('FR-48: nur eine offene Anfrage je Kategorie (Mitglied)', async ({ page }, 
 	).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Anfragen', exact: true })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'cm-doppel-eine-anfrage');
+	expect(fehler).toEqual([]);
+});
+
+test('FR-46: CM-Admin verschiebt, korrigiert die Klassierung und löscht; nicht aktive Spieler', async ({
+	page
+}, info) => {
+	test.setTimeout(150_000);
+	const fehler = sammleKonsolenfehler(page);
+	const jahr = testjahr(JAHR_VERSCHIEBEN, info);
+	const {
+		kategorieIds: [kategorieId]
+	} = await legeOffenesTurnierAn(jahr, [HERREN, HERREN_B]);
+	// Summe 4 + 5 = 9 und 6 + 7 = 13: Beide Paare passen in beide Kategorien.
+	const ole = await legeHerrnAn('Ole', 'R4');
+	const pius = await legeHerrnAn('Pius', 'R5');
+	const quirin = await legeHerrnAn('Quirin', 'R6');
+	const rolf = await legeHerrnAn('Rolf', 'R7');
+	const cm = await legeCmMitBriefCodeAn('Clara');
+	await meldePaarDirektAn(kategorieId, [ole.mitgliedId, pius.mitgliedId], cm.mitgliedId);
+	await meldePaarDirektAn(kategorieId, [quirin.mitgliedId, rolf.mitgliedId], cm.mitgliedId);
+	// Rolf tritt nach dem Anmeldeschluss aus: Die Anmeldung bleibt, er ist nicht mehr aktiv.
+	await setzeAusgetreten(rolf.mitgliedId);
+	await oeffneKategorieAlsCm(page, cm, jahr);
+	await expect(zeile(teil(page, 'Paare'), rolf.nachname)).toContainText('ausgetreten');
+
+	// Partner ändern: Wer nicht mehr aktiv ist, kann nicht bleiben.
+	await zeile(page, rolf.nachname).getByRole('button', { name: 'Partner ändern' }).click();
+	const partner = page.getByRole('dialog', { name: 'Partner ändern' });
+	await expect(
+		partner.getByRole('radio', { name: new RegExp(`${rolf.nachname}, Rolf`) })
+	).toBeDisabled();
+	await expect(partner.getByText('nicht mehr aktiv', { exact: true })).toBeVisible();
+	await expect(
+		partner.getByRole('radio', { name: new RegExp(`${quirin.nachname}, Quirin`) })
+	).toBeEnabled();
+	await partner.getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(partner).toBeHidden();
+
+	// Verschieben: Der Dialog sagt vor dem Senden, warum es nicht geht; die Taste bleibt gesperrt.
+	await zeile(page, rolf.nachname).getByRole('button', { name: 'Verschieben' }).click();
+	const verschieben = page.getByRole('dialog', { name: 'Verschieben' });
+	await expect(verschieben).toContainText(
+		'Ein Spieler ist nicht mehr aktiv. Verschieben geht nicht; ändere zuerst den Partner oder lösche die Anmeldung.'
+	);
+	await expect(verschieben.getByRole('radio')).toHaveCount(0);
+	await expect(
+		verschieben.getByRole('button', { name: 'Verschieben', exact: true })
+	).toBeDisabled();
+	await pruefeBildschirm(page, info, 'cm-doppel-verschieben-gesperrt');
+	await verschieben.getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(verschieben).toBeHidden();
+
+	// Verschieben: Ole und Pius gehen in die zweite Kategorie.
+	await zeile(page, ole.nachname).getByRole('button', { name: 'Verschieben' }).click();
+	await expect(verschieben).toContainText('· Summe 9');
+	await verschieben.getByRole('radio', { name: HERREN_B.name }).check();
+	await pruefeBildschirm(page, info, 'cm-doppel-verschieben');
+	await verschieben.getByRole('button', { name: 'Verschieben', exact: true }).click();
+	await expect(verschieben).toBeHidden();
+	await meldetErfolg(page, 'Verschoben.');
+	await expect(teil(page, 'Paare')).not.toContainText(ole.nachname);
+	await expect(teil(page, 'Paare')).toContainText(quirin.nachname);
+	for (const s of [ole, pius]) {
+		await meldungAn(
+			s,
+			`Der CM-Admin hat eure Anmeldung von «${HERREN.name}» nach «${HERREN_B.name}» verschoben.`
+		);
+	}
+
+	// Klassierung korrigieren: im Paar zuerst den Spieler wählen.
+	await zeile(page, quirin.nachname).getByRole('button', { name: 'Klassierung' }).click();
+	const klassierung = page.getByRole('dialog', { name: 'Klassierung korrigieren' });
+	const speichern = klassierung.getByRole('button', { name: 'Klassierung speichern' });
+	await expect(speichern).toBeDisabled();
+	await klassierung.getByRole('radio', { name: new RegExp(`${quirin.nachname}, Quirin`) }).check();
+	await klassierung.getByLabel('Klassierung', { exact: true }).selectOption('R8');
+	await pruefeBildschirm(page, info, 'cm-doppel-klassierung');
+	await speichern.click();
+	await expect(klassierung).toBeHidden();
+	await meldetErfolg(page, 'Klassierung gespeichert.');
+	// Summe 8 + 7 = 15.
+	await expect(zeile(teil(page, 'Paare'), quirin.nachname)).toContainText('15');
+
+	// Anmeldung löschen: Quirin erfährt es; Rolf ist ausgetreten.
+	await zeile(page, quirin.nachname).getByRole('button', { name: 'Löschen' }).click();
+	const loeschen = page.getByRole('dialog', { name: 'Anmeldung löschen?' });
+	await expect(loeschen).toContainText(quirin.name);
+	await expect(loeschen).toContainText(rolf.name);
+	await pruefeBildschirm(page, info, 'cm-doppel-loeschen');
+	await loeschen.getByRole('button', { name: 'Löschen', exact: true }).click();
+	await expect(loeschen).toBeHidden();
+	await meldetErfolg(page, 'Gelöscht.');
+	await expect(teil(page, 'Paare')).toContainText('Keine.');
+	await meldungAn(quirin, `Der CM-Admin hat eure Anmeldung für «${HERREN.name}» gelöscht.`);
 	expect(fehler).toEqual([]);
 });

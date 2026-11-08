@@ -13,6 +13,7 @@ import {
 	meldeAn as meldeZurCmAnInDb
 } from '../../../src/lib/server/cm/anmeldungen.ts';
 import { stelleAnfrage } from '../../../src/lib/server/cm/doppel.ts';
+import { meldeDoppelVonHandAn } from '../../../src/lib/server/cm/verwaltung-doppel.ts';
 import { konto, mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../../../src/lib/server/turnier/angaben.ts';
 import {
@@ -179,6 +180,39 @@ export async function meldeZurCmAn(
 ): Promise<void> {
 	const r = await meldeZurCmAnInDb(hole().db, kategorieId, mitgliedId, new Date(), suchtext);
 	if (r !== 'ok') throw new Error(`Anmeldung zur Kategorie ${kategorieId}: ${r}`);
+}
+
+/**
+ * Meldet ein Paar über die Fachlogik der Verwaltung an (FR-46), als CM-Admin `cmMitgliedId`, ohne
+ * Meldung an die Spieler; Warnungen übergeht es.
+ */
+export async function meldePaarDirektAn(
+	kategorieId: number,
+	paar: [number, number],
+	cmMitgliedId: number
+): Promise<void> {
+	const r = await meldeDoppelVonHandAn(
+		hole().db,
+		{ art: 'admin', mitgliedId: cmMitgliedId },
+		kategorieId,
+		paar,
+		new Date(),
+		true
+	);
+	if (typeof r !== 'object' || !('ergebnis' in r)) {
+		throw new Error(`Paar für Kategorie ${kategorieId}: ${JSON.stringify(r)}`);
+	}
+}
+
+/**
+ * Das erfundene Mitglied ist ausgetreten, ohne die Folgen eines Austritts (seine Anmeldungen
+ * bleiben stehen), wie nach dem Anmeldeschluss.
+ */
+export async function setzeAusgetreten(mitgliedId: number): Promise<void> {
+	await hole()
+		.db.update(mitglied)
+		.set({ status: 'ausgetreten', austrittAm: new Date() })
+		.where(eq(mitglied.id, mitgliedId));
 }
 
 /** Setzt den Anmeldeschluss eines Turniers (`YYYY-MM-DD`), etwa auf ein vergangenes Datum. */
