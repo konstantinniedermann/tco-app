@@ -2,8 +2,8 @@ name: Check
 
 # Dieselben Prüfungen wie lokal `make check`, aber ohne docker compose (die DB kommt
 # als Service-Container) und mit der OSV-Malware-Prüfung zusätzlich. Nur PRs und die
-# beiden dauerhaften Branches — Feature-Branches deckt der lokale Hook ab (Actions-
-# Minuten werden über alle privaten Repos geteilt). Reine Doku-Änderungen laufen nur
+# beiden dauerhaften Branches — Feature-Branches deckt der lokale Hook ab (hält die
+# Wartezeit kurz; Minuten sind für das öffentliche Repo gratis). Reine Doku-Änderungen laufen nur
 # durch den Job `doku`; die Code-Jobs hängen an `aenderung`.
 on:
   pull_request:

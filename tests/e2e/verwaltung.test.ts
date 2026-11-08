@@ -123,6 +123,10 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 	await expect(verlauf).toContainText('Telefon geändert');
 	await expect(verlauf).toContainText('Rolle CM-Admin vergeben');
 	await expect(verlauf).not.toContainText('+41 00 000 00 00');
+	// UI-03: Das Auswahlfeld ist so hoch wie die Textfelder, auch in WebKit (iPhone).
+	const hoehe = async (id: string) => (await page.locator(`#${id}`).boundingBox())!.height;
+	expect(await hoehe('feld-geschlecht')).toBeGreaterThanOrEqual(48);
+	expect(await hoehe('feld-geschlecht')).toBeCloseTo(await hoehe('feld-telefon'), 0);
 	await pruefeBildschirm(page, info, 'verwaltung-mitglied');
 
 	await page.getByRole('link', { name: 'Ganzer Verlauf' }).click();

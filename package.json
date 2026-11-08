@@ -1,6 +1,6 @@
 {
 	"name": "mytco",
-	"version": "0.11.1",
+	"version": "0.11.2",
 	"private": true,
 	"type": "module",
 	"engines": {
@@ -10,7 +10,7 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"build:spa": "MYTCO_SPA=1 vite build",
-		"check:svelte": "svelte-kit sync && svelte-check --fail-on-warnings",
+		"check:svelte": "svelte-kit sync && svelte-check --fail-on-warnings && tsc -p src/service-worker --noEmit",
 		"test:einheit": "vitest run --project einheit",
 		"test:db": "vitest run --project datenbank",
 		"db:migrate": "node scripts/migrate.ts",

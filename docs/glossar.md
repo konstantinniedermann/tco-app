@@ -101,12 +101,19 @@ Was nicht belegt ist, steht als *Vermutung* da.
 |---------|-----------|----------|--------|
 | Rolle | Bündel von Berechtigungen, das der MyTCO-Admin einem Konto gibt. Das PDF nennt Gast, Mitglied, Junioren-Leiter, Anlässe-Veranstalter und Admin; MyTCO teilt «Admin» in MyTCO-, Mitglieder-, CM- und Lizenz-Admin. Was jede Rolle darf, steht in [Rollen und Rechte](rollen-und-rechte.md) | Rolle | PDF 4a |
 | Mitglied | Person, die Mitglied im TCO ist; zugleich die Grundrolle in MyTCO | Mitglied | PDF 1, 4a |
-| Mitgliedschaft | Zugehörigkeit eines Mitglieds zum TCO. Was ein Mitglied daran selbst ändern kann, ist offen | Mitgliedschaft | PDF 1 |
+| Mitgliedschaft | Zugehörigkeit eines Mitglieds zum TCO, in MyTCO als Status *aktiv*, *ausgetreten*, *Löschung vorgemerkt* oder *gelöscht*. Ändern kann sie nur der Mitglieder-Admin (Karte *Mitgliedschaft*) | Mitgliedschaft | PDF 1; [FR-04](fachmodell.md#fachregeln) |
+| Austritt | Der Mitglieder-Admin erfasst, dass ein Mitglied den Verein verlässt: Status *ausgetreten*, Login sofort gesperrt, kommende Anmeldungen zurückgezogen; nach der Frist löscht der Zeitgeber das Mitglied | Austritt | [FR-04](fachmodell.md#fachregeln) |
+| Wiedereintritt | Ein ausgetretenes Mitglied wird innert der Frist wieder *aktiv*; Passkeys und Rollen wirken wieder | Wiedereintritt | [FR-04](fachmodell.md#fachregeln) |
+| Löschung vorgemerkt | Status nach *Mitglied löschen*, angezeigt als «wird gelöscht»: Login gesperrt, eine Woche rückgängig machbar, danach gelöscht | Löschung vorgemerkt | [FR-04](fachmodell.md#fachregeln) |
+| gelöscht, gelöschtes Konto | Status eines gelöschten Mitglieds: Es bleiben nur Vor- und Nachname, damit vergangene Resultate lesbar bleiben. Verweise auf sein Konto (*erstellt von*, Urheber, Absender) erscheinen als *gelöschtes Konto* | gelöscht | [FR-04](fachmodell.md#fachregeln) |
+| Auskunft | Druckbare Seite mit allen gespeicherten Daten eines Mitglieds, die der Mitglieder-Admin auf Verlangen ausgibt | Auskunft | [DS-07](datenschutz.md#vorgaben-für-technik-und-hosting); [Rollen und Rechte](rollen-und-rechte.md) |
 | Spieler | Mitglied, das an der Clubmeisterschaft teilnimmt | Spieler | PDF 5b, 5d |
 | Gast | Rolle nur für die Registrierung, ohne Zugriff auf weitere Seiten | Gast | PDF 4a |
 | Admin | Im PDF die Rolle mit Zugang zur Mitgliederverwaltung und zu den Admin-Masken. In MyTCO kein Begriff ohne Zusatz, weil er Betrieb und Mitgliederdaten vermischt | MyTCO-Admin, Mitglieder-Admin, CM-Admin, Lizenz-Admin | PDF 4a; Ziel |
 | MyTCO-Admin | Rolle für die technische Betreuung: vergibt und entzieht Rollen, sieht alle Bereiche der Verwaltung, ändert dort nichts; *Ansicht als …* | MyTCO-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
 | Mitglieder-Admin | Rolle für die Mitgliederdaten: Mitglieder, Briefe, Sitzungen, Liste *Für Fairgate*, Anlässe, Mitteilungen, Austritt und Löschen | Mitglieder-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
+| CM-Admin | Rolle für die Clubmeisterschaft: Turnier und Kategorien, Wildcard-Anträge, Anmeldungen von Hand, später Gruppen, Tableaus und Resultate | CM-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
+| Lizenz-Admin | Rolle für die Lizenzanträge, später: Stichtag der Lizenzrunde setzen, Anträge ansehen, exportieren und abhaken; öffnet die Verwaltung noch nicht | Lizenz-Admin | [Rollen und Rechte](rollen-und-rechte.md) |
 | Ansicht als … | Der MyTCO-Admin sieht App und Verwaltung wie eine gewählte Rolle, nur lesend; ein Band zeigt das an | Ansicht als … | [A-ROLLE-09](anforderungen/anforderungen.md#rolle--benutzerrollen) |
 | Junioren-Leiter | Rolle für die Betreuung der Junioren | Junioren-Leiter | PDF 4a |
 | Anlässe-Veranstalter | Rolle für die Organisation von Anlässen | Anlässe-Veranstalter, später; bis dahin Mitglieder-Admin, die CM leitet der CM-Admin | PDF 4a |
@@ -124,3 +131,12 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Startseite | Erste Seite nach dem Login mit Shortcuts, Konto und Logout | Startseite | PDF 3c |
 | Newsfeed | Bereich für Neuigkeiten des Vereins auf der Startseite | Newsfeed | PDF 3c |
 | Anlass | Veranstaltung, für die sich Mitglieder anmelden, z. B. Clubmeisterschaft, Junioren-Training, Junioren-Turnier | Anlass | PDF 3d |
+
+## Mitteilungen
+
+| Begriff | Bedeutung | In MyTCO | Quelle |
+|---------|-----------|----------|--------|
+| Mitteilung | Nachricht des Mitglieder-Admins an Mitglieder, zu einem Anlass oder an den Verein, per Push und/oder E-Mail; nach Vorschau und Rückfrage verschickt und im Verlauf festgehalten (ohne Empfängernamen) | Mitteilung | [FR-41–45](fachmodell.md#fachregeln) |
+| Push | Benachrichtigung aufs Handy oder in den Browser, ohne dass die App offen ist; das Mitglied schaltet sie je Gerät im Profil ein | Push | [ADR-001](adr/adr-001-web-app-zuerst.md) |
+| Thema | Schalter im Profil (*Anlässe*, *Clubmeisterschaft*, *Verein*), mit dem ein Mitglied Mitteilungen eines Themas abbestellt; gilt für Push und E-Mail, nicht für Bestätigungen und Codes | Thema | [FR-41](fachmodell.md#fachregeln) |
+| Weg | Wie eine Mitteilung zugestellt wird: *nur Push*, *Push, sonst E-Mail* oder *Push und E-Mail* | Weg | [FR-44](fachmodell.md#fachregeln) |

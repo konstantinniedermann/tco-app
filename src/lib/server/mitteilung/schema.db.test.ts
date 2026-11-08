@@ -70,8 +70,9 @@ describe('Mitteilungen: Datenmodell', () => {
 	});
 
 	test('FR-45: Mitteilung zum Anlass ohne anlassId wird abgewiesen', async () => {
-		await expect(
-			db.insert(mitteilung).values({
+		const fehler = await db
+			.insert(mitteilung)
+			.values({
 				bezug: 'anlass',
 				anlassId: null,
 				gesendetAm: SITZUNG_ZEIT,
@@ -80,6 +81,12 @@ describe('Mitteilungen: Datenmodell', () => {
 				auswahl: 'alle',
 				weg: 'push'
 			})
-		).rejects.toThrow();
+			.then(
+				() => null,
+				(f: unknown) => f
+			);
+		const c = (fehler as { cause?: { constraint_name?: string; constraint?: string } } | null)
+			?.cause;
+		expect(c?.constraint_name ?? c?.constraint).toBe('mitteilung_anlass_check');
 	});
 });
