@@ -42,7 +42,9 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Konkurrenz | Advantage-Begriff für einen Wettbewerb im Turnier, festgelegt durch Begegnungsart, Alterskategorie, Klassierungsbereich und Form. Anmeldung, Tableau, Spielplan und Status laufen je Konkurrenz. „Kategorie“ ist in Advantage nur ein Merkmal (Alterskategorie, Turnierkategorie) | Kategorie (siehe Sprachregeln) | ADV 7, 9–10, 15, 27–28, 39, 43 |
 | Alterskategorie | Altersmerkmal einer Konkurrenz, z. B. „10&U“, „12&U“. Welche Alterskategorien die CM anbietet, ist nicht belegt | Alterskategorie | ADV 9–10; PDF 5a |
 | Begegnungsart | Merkmal einer Konkurrenz. *Vermutung:* Einzel oder Doppel (steht im Handbuch nur in einem Bildschirmfoto) | Einzel / Doppel | ADV 10; PDF 5a |
-| Doppelpartner | Mitspieler in einer Doppelkategorie, bei der Anmeldung aus den Spielern des Clubs gewählt. Advantage erfasst ein Doppelteam als zwei Lizenznummern, verbunden mit „/“ | Doppelpartner | PDF 5b; ADV 18 |
+| Doppelpartner | Mitspieler in einer Doppelkategorie, bei der Anmeldung aus den Spielern des Clubs gewählt. Advantage erfasst ein Doppelteam als zwei Lizenznummern, verbunden mit „/“. In MyTCO wird er angefragt (Partner-Anfrage) oder vom CM-Admin zugeordnet | Doppelpartner | PDF 5b; ADV 18 |
+| Partner-Anfrage | Anfrage eines Mitglieds an ein anderes, gemeinsam in einer Doppelkategorie anzutreten; angenommen wird sie zur Anmeldung, abgelehnt, zurückgezogen oder verfallen wird sie gelöscht (FR-48) | Partner-Anfrage | [Fachmodell](fachmodell.md) |
+| Sucht Partner | Doppel-Anmeldung mit erst einem Spieler, mit freiwilligem Kommentar (FR-49) | sucht Partner | [Fachmodell](fachmodell.md) |
 | Klassierung | Spielstärke eines Spielers bei Swiss Tennis, z. B. R8. Grundlage für die Zulassung zu einer Konkurrenz (von–bis, z. B. R7–R9) und für die Setzung. *Vermutung:* Skala R1–R9 und N1–N4; im Handbuch steht nur das Beispiel R7–R9 | Klassierung (Wert des Spielers), Klassierungsbereich (zugelassen in einer Kategorie) | ADV 9–11, 29 |
 | Stärkekategorie | Wort des PDFs für Klassierung bzw. Klassierungsbereich. Lässt sich nicht automatisch von Swiss Tennis übernehmen | nicht verwendet → Klassierung | PDF 5a, 5b |
 | Form | Wie eine Konkurrenz gespielt wird: *Round Robin* (Gruppenspiele), *Draw* oder *Abbruchtableau* | — | ADV 10 |
@@ -121,8 +123,11 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Registrierung | Ein neues Konto selbst anlegen statt per Brief zu erhalten; vorgesehen über tcolten.ch, später | Registrierung | PDF 4a |
 | Admin-Oberfläche | Teil von MyTCO für die Admin-Rollen, nach Bereichen gegliedert. Das PDF nennt die einzelnen Eingabeseiten darin *Admin-Masken* | Verwaltung | PDF 5b, 5d; Ziel |
 | Mitgliederverwaltung | Bereich der Verwaltung, in dem der Mitglieder-Admin Mitglieder von Hand anlegt, bearbeitet und löscht | Mitgliederverwaltung | Ziel; PDF 4a |
+| Einlesen | Übernahme einer Mitgliederliste als CSV-Datei durch den Mitglieder-Admin (A-MITGLIED-07) | Einlesen | [Anforderungen](anforderungen/anforderungen.md) |
+| Rufname | Freiwilliger Name, den nur das Mitglied selbst im Profil setzt (höchstens 10 Zeichen); erscheint neben dem Namen, wenn er vom Vornamen abweicht | Rufname | [Fachmodell](fachmodell.md) |
 | Konto | Zugang eines Mitglieds zu MyTCO mit seinen Daten | Konto | PDF 3e, 4a |
 | Login | Einloggen in MyTCO | Login | PDF 2, 3b |
+| Mitglied mit Login | Mitglied, das MyTCO mindestens einmal geöffnet hat (Brief-Code eingelöst) und nicht gesperrt ist; nur diese erscheinen in der Partnerwahl | Mitglied mit Login | FR-48 |
 | Einmal-Code | Code zum Eintippen, gilt für ein einziges Login. Kommt per Brief (lange gültig) oder auf Anfrage per E-Mail (kurz gültig). Ersetzt das *Einmalpasswort* aus dem PDF; ein Passwort gibt es in MyTCO nicht | Einmal-Code | PDF 2; [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
 | Sitzung | Zeitraum, in dem ein Gerät nach dem Login eingeloggt bleibt. Endet nach einem Jahr ohne Nutzung, beim Logout oder wenn der Mitglieder-Admin sie beendet | Sitzung | [#29](https://github.com/konstantinniedermann/tco-app/issues/29) |
 | Änderungsverlauf | Liste für Mitglieder- und MyTCO-Admin, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat, ohne alte und neue Werte. Nicht zu verwechseln mit dem *Änderungsprotokoll* der Anforderungen | Änderungsverlauf | [SI-12](sicherheitskonzept.md#vorgaben) |

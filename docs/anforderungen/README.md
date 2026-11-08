@@ -57,6 +57,8 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 | 06.11.2026 | CM Teil 2, Einzel-Anmeldung ([#58](https://github.com/konstantinniedermann/tco-app/issues/58), [Design](../superpowers/specs/2026-11-06-cm-anmeldung-design.md)): Die Klassierung fragt die CM-Seite ab statt der erste Login (A-LOGIN-03, FR-02, FR-37); Geschlecht und Jahrgang trägt das Mitglied einmal selbst ein; Warnung beim Ändern einer Kategorie (FR-36); Doppel-Kategorien sind für Mitglieder bis Teil 3 ausgeblendet | Projektleiter |
 | 06.11.2026 | CM Teil 2 umgesetzt ([#58](https://github.com/konstantinniedermann/tco-app/issues/58)): A-ANMELDUNG-01, -02, -03 und -05 auf *umgesetzt* für Einzel-Kategorien; Doppel folgen mit [#59](https://github.com/konstantinniedermann/tco-app/issues/59) | Projektleiter |
 | 07.11.2026 | CM Teil 4 umgesetzt ([#60](https://github.com/konstantinniedermann/tco-app/issues/60)): A-ANMELDUNG-06 und -10 auf *umgesetzt* für Einzel-Kategorien (Anmeldungen von Hand, verschieben, löschen, Klassierung korrigieren, Wildcard-Antrag und Entscheid); Doppel folgen mit [#59](https://github.com/konstantinniedermann/tco-app/issues/59) | Projektleiter |
+| 08.11.2026 | Doppel umgesetzt ([#59](https://github.com/konstantinniedermann/tco-app/issues/59)): A-ANMELDUNG-01 bis -06 und -10 auch für Doppel-Kategorien auf *umgesetzt* (Partner-Anfragen, Suche nach Partner, Doppel-Verwaltung durch den CM-Admin) | Projektleiter |
+| 08.11.2026 | Einlesen ([#43](https://github.com/konstantinniedermann/tco-app/issues/43)): A-MITGLIED-07 teilweise (Einlesen einer Datei) | Projektleiter |
 
 ## Offene Fragen an den Verein
 
