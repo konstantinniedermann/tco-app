@@ -476,11 +476,13 @@
 					oeffneKlassierung
 				)}
 			{/if}
+			<p>
+				<Name name={{ rufname, vorname: angaben.vorname, nachname: angaben.nachname }} /><span
+					class="leise">{personRest}</span
+				>
+			</p>
 			<p class="leise">
-				<Name
-					name={{ rufname, vorname: angaben.vorname, nachname: angaben.nachname }}
-				/>{personRest}<br />Name, Jahrgang und Nummer ändert die Mitgliederverwaltung. Stimmt etwas
-				nicht?
+				Name, Jahrgang und Nummer ändert die Mitgliederverwaltung. Stimmt etwas nicht?
 				{#if data.kontakt}Schreib an {data.kontakt}.{:else}Den Kontakt findest du in deinem Brief.{/if}
 			</p>
 		{/if}
