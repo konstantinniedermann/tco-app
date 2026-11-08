@@ -737,12 +737,14 @@ describe('CM-Anmeldung', () => {
 			klassierung: 'R4'
 		});
 		const sepp = await spieler({
+			rufname: 'Joe',
 			vorname: 'Sepp',
 			nachname: 'Aebi',
 			geschlecht: 'm',
 			klassierung: 'R3'
 		});
 		const lea = await spieler({
+			rufname: 'Lele',
 			vorname: 'Lea',
 			nachname: 'Marbach',
 			geschlecht: 'w',
@@ -760,6 +762,11 @@ describe('CM-Anmeldung', () => {
 			geschlecht: 'w',
 			klassierung: 'R7'
 		});
+		// Namen kommen als Teile mit Rufname, wie die Namen der Einzel-Kategorien.
+		const ritaName = { rufname: null, vorname: 'Rita', nachname: 'Zumbach' };
+		const seppName = { rufname: 'Joe', vorname: 'Sepp', nachname: 'Aebi' };
+		const leaName = { rufname: 'Lele', vorname: 'Lea', nachname: 'Marbach' };
+		const marcoName = { rufname: null, vorname: 'Marco', nachname: 'Beispiel' };
 		await setze(sepp, kontakt('079 111 22 33', 'sepp@example.org'));
 		await setze(rita, kontakt(null, 'rita@example.org'));
 		await setze(lea, kontakt('079 444 55 66', 'lea@example.org'));
@@ -790,8 +797,8 @@ describe('CM-Anmeldung', () => {
 			passt: true,
 			anmeldungId: marcoId,
 			namen: [],
-			paare: ['Sepp Aebi / Rita Zumbach'],
-			suchende: [{ name: 'Lea Marbach', kommentar: 'Abends frei' }],
+			paare: [[seppName, ritaName]],
+			suchende: [{ name: leaName, kommentar: 'Abends frei' }],
 			eigen: { art: 'sucht', kommentar: null },
 			meineAnfragen: []
 		});
@@ -807,7 +814,7 @@ describe('CM-Anmeldung', () => {
 				anfrageId,
 				kategorieId: mixed,
 				kategorie: 'Mixed Doppel',
-				von: 'Lea Marbach',
+				von: leaName,
 				klassierung: 'R6',
 				kontakt: { art: 'telefon', wert: '079 444 55 66' }
 			}
@@ -827,9 +834,9 @@ describe('CM-Anmeldung', () => {
 		expect(l?.kategorien.map((k) => k.name)).toEqual(['Mixed Doppel']);
 		expect(kat(l, mixed)).toMatchObject({
 			anmeldungId: leaId,
-			suchende: [{ name: 'Marco Beispiel', kommentar: null }],
+			suchende: [{ name: marcoName, kommentar: null }],
 			eigen: { art: 'sucht', kommentar: 'Abends frei' },
-			meineAnfragen: [{ anfrageId, an: 'Marco Beispiel' }]
+			meineAnfragen: [{ anfrageId, an: marcoName }]
 		});
 		expect(l?.anfragen).toEqual([]);
 
@@ -837,16 +844,16 @@ describe('CM-Anmeldung', () => {
 		const r = await ladeCmAnsicht(db, t.id, rita, t.jetzt);
 		expect(kat(r, mixed)).toMatchObject({
 			anmeldungId: paarId,
-			paare: ['Sepp Aebi / Rita Zumbach'],
+			paare: [[seppName, ritaName]],
 			eigen: {
 				art: 'paar',
-				partner: { name: 'Sepp Aebi', telefon: '079 111 22 33', email: 'sepp@example.org' }
+				partner: { name: seppName, telefon: '079 111 22 33', email: 'sepp@example.org' }
 			}
 		});
 		const s = await ladeCmAnsicht(db, t.id, sepp, t.jetzt);
 		expect(kat(s, mixed)?.eigen).toEqual({
 			art: 'paar',
-			partner: { name: 'Rita Zumbach', telefon: null, email: 'rita@example.org' }
+			partner: { name: ritaName, telefon: null, email: 'rita@example.org' }
 		});
 
 		// Laufende Turniere zählen die offenen Anfragen an einen selbst.
@@ -893,6 +900,7 @@ describe('CM-Anmeldung', () => {
 			klassierung: 'R5'
 		});
 		const paula = await spieler({
+			rufname: 'Pola',
 			vorname: 'Paula',
 			nachname: 'Paar',
 			geschlecht: 'w',
@@ -941,10 +949,18 @@ describe('CM-Anmeldung', () => {
 
 		const ansicht = await ladeCmAnsicht(db, t.id, nina, t.jetzt);
 		expect(ansicht?.kategorien[0]).toMatchObject({
-			paare: ['Paul Paar / Paula Paar'],
+			paare: [
+				[
+					{ rufname: null, vorname: 'Paul', nachname: 'Paar' },
+					{ rufname: 'Pola', vorname: 'Paula', nachname: 'Paar' }
+				]
+			],
 			suchende: [
-				{ name: 'Marco Beispiel', kommentar: 'Gern am Abend' },
-				{ name: 'Lea Marbach', kommentar: 'Gern am Abend' }
+				{
+					name: { rufname: null, vorname: 'Marco', nachname: 'Beispiel' },
+					kommentar: 'Gern am Abend'
+				},
+				{ name: { rufname: null, vorname: 'Lea', nachname: 'Marbach' }, kommentar: 'Gern am Abend' }
 			]
 		});
 		const json = JSON.stringify(ansicht);

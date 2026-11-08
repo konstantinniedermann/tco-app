@@ -579,8 +579,10 @@ describe('Schnittstellen der CM zum Doppel (Mitglied)', () => {
 		const { d, mails, meldungen } = baue(t.jetzt);
 		// Die gemeinsame Test-Datenbank kennt weitere «Marbach»: ein eigener Nachname hält die Suche eindeutig.
 		const nachname = `Marbach${Math.random().toString(36).slice(2, 8)}`;
-		const lea = await spielerMitLogin('Lea', nachname);
-		const marco = await spielerMitLogin('Marco', 'Beispiel');
+		// Mit Rufnamen: Treffer, Ansicht und Meldungen nennen ihn wie die übrige CM-Seite.
+		const lea = await spielerMitLogin('Lea', nachname, { rufname: 'Lele' });
+		const marco = await spielerMitLogin('Marco', 'Beispiel', { rufname: 'Mäc' });
+		const leaName = { rufname: 'Lele', vorname: 'Lea', nachname };
 		const dora = await spielerMitLogin('Dora', 'Dritte');
 		await postCmAnmeldung(d, mit(lea, { id: String(t.doppel) }));
 		mails.length = 0;
@@ -590,15 +592,16 @@ describe('Schnittstellen der CM zum Doppel (Mitglied)', () => {
 		const treffer = (await s.json()).filter(
 			(x: { mitgliedId: number }) => x.mitgliedId === lea.mitgliedId
 		);
-		expect(treffer).toEqual([
-			expect.objectContaining({ name: `Lea ${nachname}`, anfrageId: null })
-		]);
+		expect(treffer).toEqual([expect.objectContaining({ name: leaName, anfrageId: null })]);
+		// Die Suche findet auch den Rufnamen.
+		const perRufname = await (await suche(d, marco, t.doppel, `Lele ${nachname}`)).json();
+		expect(perRufname.map((x: { mitgliedId: number }) => x.mitgliedId)).toEqual([lea.mitgliedId]);
 
 		const a = await anfragen(d, marco, t.doppel, { anId: lea.mitgliedId });
 		expect(a.status).toBe(200);
 		expect(
 			(await a.json()).kategorien.find((k: { id: number }) => k.id === t.doppel)
-		).toMatchObject({ meineAnfragen: [{ an: `Lea ${nachname}` }] });
+		).toMatchObject({ meineAnfragen: [{ an: leaName }] });
 		const andere = await anfragen(d, dora, t.doppel, { anId: lea.mitgliedId });
 		expect(andere.status).toBe(200);
 		expect(meldungen).toEqual([
@@ -606,7 +609,7 @@ describe('Schnittstellen der CM zum Doppel (Mitglied)', () => {
 				ids: [lea.mitgliedId],
 				m: {
 					titel: 'Clubmeisterschaft',
-					text: 'Marco Beispiel möchte mit dir «Offenes Doppel» spielen. Annehmen oder ablehnen kannst du in MyTCO.',
+					text: 'Mäc (Marco Beispiel) möchte mit dir «Offenes Doppel» spielen. Annehmen oder ablehnen kannst du in MyTCO.',
 					pfad: `/clubmeisterschaft/${t.id}`
 				}
 			},
@@ -624,18 +627,18 @@ describe('Schnittstellen der CM zum Doppel (Mitglied)', () => {
 		const ansicht = await ok.json();
 		expect(ansicht.kategorien.find((k: { id: number }) => k.id === t.doppel).eigen).toMatchObject({
 			art: 'paar',
-			partner: { name: 'Marco Beispiel' }
+			partner: { name: { rufname: 'Mäc', vorname: 'Marco', nachname: 'Beispiel' } }
 		});
 		// Bestätigung nur an Lea (sie hat angenommen), nicht an Marco oder Dora.
 		expect(mails.map((m) => [m.an, m.i.aktion])).toEqual([[lea.email, 'an']]);
 		expect(meldungen.map((x) => [x.ids, x.m.text])).toEqual([
 			[
 				[marco.mitgliedId],
-				`Lea ${nachname} hat angenommen. Ihr seid für «Offenes Doppel» angemeldet.`
+				`Lele (Lea ${nachname}) hat angenommen. Ihr seid für «Offenes Doppel» angemeldet.`
 			],
 			[
 				[dora.mitgliedId],
-				`Lea ${nachname} hat inzwischen einen Partner für «Offenes Doppel». Die Anfrage ist hinfällig.`
+				`Lele (Lea ${nachname}) hat inzwischen einen Partner für «Offenes Doppel». Die Anfrage ist hinfällig.`
 			]
 		]);
 		for (const x of meldungen) expect(x.m.pfad).toBe(`/clubmeisterschaft/${t.id}`);
@@ -683,7 +686,7 @@ describe('Schnittstellen der CM zum Doppel (Mitglied)', () => {
 		const t = await doppelTurnier();
 		const { d, mails, meldungen } = baue(t.jetzt);
 		const lea = await spielerMitLogin('Lea', 'Marbach');
-		const marco = await spielerMitLogin('Marco', 'Beispiel');
+		const marco = await spielerMitLogin('Marco', 'Beispiel', { rufname: 'Mäc' });
 		await postCmAnmeldung(d, mit(lea, { id: String(t.doppel) }));
 		await anfragen(d, marco, t.doppel, { anId: lea.mitgliedId });
 		const ok = await postCmAnfrageAnnehmen(
@@ -700,7 +703,7 @@ describe('Schnittstellen der CM zum Doppel (Mitglied)', () => {
 		expect(meldungen.map((x) => [x.ids, x.m.text])).toEqual([
 			[
 				[lea.mitgliedId],
-				'Marco Beispiel hat sich von «Offenes Doppel» abgemeldet. Eure Anmeldung ist zurückgezogen.'
+				'Mäc (Marco Beispiel) hat sich von «Offenes Doppel» abgemeldet. Eure Anmeldung ist zurückgezogen.'
 			]
 		]);
 	});

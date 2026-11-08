@@ -26,12 +26,14 @@
 		kategorieText,
 		kommentarZaehlerText,
 		namenText,
+		paarText,
 		paareText,
 		suchtextZaehlerText,
 		waehlbar,
-		vornameVon,
 		weiterePaare
 	} from '../../../lib/cm/anzeige.ts';
+	import { anredeName, nameText, type Namensteile } from '../../../lib/name.ts';
+	import Name from '../../../lib/ui/Name.svelte';
 	import { istKlappeOffen, merkeKlappe } from '../../../lib/ui/klappe.ts';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { KLASSIERUNGEN, klassierungName } from '../../../lib/turnier/klassierung.ts';
@@ -337,7 +339,7 @@
 		switch (r.art) {
 			case 'ok':
 				await uebernimm(r.daten);
-				meldung = `Angemeldet mit ${a.von} für ${a.kategorie}. Die Bestätigung kommt per Mail.`;
+				meldung = `Angemeldet mit ${nameText(a.von, 'vorname-zuerst')} für ${a.kategorie}. Die Bestätigung kommt per Mail.`;
 				await fokusNachAnfrage(a.kategorieId);
 				return;
 			case 'abgemeldet':
@@ -372,7 +374,7 @@
 		switch (r.art) {
 			case 'ok':
 				await uebernimm(r.daten);
-				meldung = `Anfrage von ${a.von} abgelehnt.`;
+				meldung = `Anfrage von ${nameText(a.von, 'vorname-zuerst')} abgelehnt.`;
 				await fokusNachAnfrage();
 				return;
 			case 'abgemeldet':
@@ -398,7 +400,7 @@
 		switch (r.art) {
 			case 'ok':
 				await uebernimm(r.daten);
-				meldung = `Anfrage an ${a.an} zurückgezogen.`;
+				meldung = `Anfrage an ${nameText(a.an, 'vorname-zuerst')} zurückgezogen.`;
 				await fokusBei(k.id);
 				return;
 			case 'abgemeldet':
@@ -734,8 +736,8 @@
 			Anfrage für «{a.kategorie}»
 		</h2>
 		<p>
-			<strong>{a.von}</strong>{#if a.klassierung}&nbsp;· {klassierungName(a.klassierung)}{/if} möchte
-			mit dir spielen.
+			<Name name={a.von} />{#if a.klassierung}&nbsp;· {klassierungName(a.klassierung)}{/if} möchte mit
+			dir spielen.
 		</p>
 		{#if a.kontakt}
 			<p>
@@ -810,7 +812,7 @@
 			<p><span class="plakette plakette-offen">sucht Partner</span></p>
 			{#each k.suchende as s, i (i)}
 				<p>
-					<strong>{s.name}</strong>{#if s.kommentar}<br /><span class="leise">«{s.kommentar}»</span
+					<Name name={s.name} />{#if s.kommentar}<br /><span class="leise">«{s.kommentar}»</span
 						>{/if}
 				</p>
 			{/each}
@@ -822,7 +824,7 @@
 	{#each k.meineAnfragen as a (a.anfrageId)}
 		<div class="kachel karte-teil">
 			<span>
-				Deine Anfrage an <strong>{a.an}</strong><br />
+				Deine Anfrage an <Name name={a.an} /><br />
 				<span class="plakette plakette-offen">offen</span>
 			</span>
 			{#if offen && !nurAnsehen}
@@ -840,13 +842,13 @@
 <!-- FR-19: eigenes Paar mit dem Kontakt des Partners. -->
 {#snippet eigenesPaar(
 	k: CmKategorie,
-	partner: { name: string; telefon: string | null; email: string | null }
+	partner: { name: Namensteile; telefon: string | null; email: string | null }
 )}
 	{@const weitere = weiterePaare(k.paare, partner.name)}
 	<section class="karte" aria-labelledby="doppel-{k.id}">
 		<h2 id="doppel-{k.id}">{k.name}</h2>
 		<p class="leise">{doppelText(k)}</p>
-		<p>Du spielst mit <strong>{partner.name}</strong>.</p>
+		<p>Du spielst mit <Name name={partner.name} />.</p>
 		{#if partner.telefon || partner.email}
 			<p>
 				{#if partner.telefon}<a href="tel:{waehlbar(partner.telefon)}">{partner.telefon}</a>{/if}
@@ -855,7 +857,7 @@
 			</p>
 		{/if}
 		{#if weitere.length > 0}
-			<p class="leise">Weitere Paare: {weitere.join(', ')}</p>
+			<p class="leise">Weitere Paare: {weitere.map(paarText).join(', ')}</p>
 		{/if}
 		{#if offen && !nurAnsehen}
 			<div class="karte-teil">
@@ -869,7 +871,7 @@
 					>
 				</p>
 				<p class="leise">
-					Dann ist auch {vornameVon(partner.name)} abgemeldet und bekommt eine Meldung.
+					Dann ist auch {anredeName(partner.name)} abgemeldet und bekommt eine Meldung.
 				</p>
 			</div>
 		{/if}

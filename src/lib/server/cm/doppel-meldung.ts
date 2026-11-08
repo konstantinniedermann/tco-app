@@ -1,5 +1,6 @@
 // Meldungen zum Doppel (FR-47): Push, sonst E-Mail, verschickt über `meldeMitgliedern`. Sie nennen
-// keinen CM-Admin und keinen Grund wie einen Austritt.
+// keinen CM-Admin und keinen Grund wie einen Austritt. Namen kommen in der kurzen Textform
+// «Hannes (Johannes Muster)» (`nameFuerText`).
 
 export type DoppelMeldung = { titel: 'Clubmeisterschaft'; text: string; pfad: string };
 
@@ -17,7 +18,7 @@ export const austrittMeldung = (kategorie: string, turnierId: number) =>
 export const austrittAnfrageMeldung = (kategorie: string, turnierId: number) =>
 	meldung(`Die Anfrage für «${kategorie}» ist hinfällig.`, turnierId);
 
-/** FR-48: an den Angefragten. `von` ist «Vorname Nachname», nie eine Telefonnummer. */
+/** FR-48: an den Angefragten. `von` ist die kurze Textform des Namens, nie eine Telefonnummer. */
 export const anfrageMeldung = (von: string, kategorie: string, turnierId: number) =>
 	meldung(
 		`${von} möchte mit dir «${kategorie}» spielen. Annehmen oder ablehnen kannst du in MyTCO.`,

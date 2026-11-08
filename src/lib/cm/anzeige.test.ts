@@ -5,13 +5,13 @@ import {
 	kategorieText,
 	kommentarZaehlerText,
 	namenText,
+	paareText,
 	rueckfrageText,
 	standText,
 	SUCHTEXT_MAX,
 	suchtextZaehlerText,
 	waehlbar,
 	vermerkText,
-	vornameVon,
 	weiterePaare
 } from './anzeige.ts';
 
@@ -107,13 +107,38 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 	test('FR-19: Kontakt des Partners als Link, weitere Paare ohne das eigene', () => {
 		expect(waehlbar('079 000 00 01')).toBe('0790000001');
 		expect(waehlbar('+41 (79) 000-00-01')).toBe('+41790000001');
-		expect(vornameVon('Marco Muster')).toBe('Marco');
+		const lea = { rufname: null, vorname: 'Lea', nachname: 'Beispiel' };
+		const marco = { rufname: 'Max', vorname: 'Marco', nachname: 'Muster' };
+		const jonas = { rufname: null, vorname: 'Jonas', nachname: 'Keller' };
+		const nina = { rufname: null, vorname: 'Nina', nachname: 'Brunner' };
 		expect(
-			weiterePaare(['Lea Beispiel / Marco Muster', 'Jonas Keller / Nina Brunner'], 'Marco Muster')
-		).toEqual(['Jonas Keller / Nina Brunner']);
+			weiterePaare(
+				[
+					[lea, marco],
+					[jonas, nina]
+				],
+				marco
+			)
+		).toEqual([[jonas, nina]]);
 	});
 
-	test('FR-48: Rückfrage vor der Anfrage nennt den Angefragten beim Vornamen', () => {
+	test('A-ANMELDUNG-04: Paare in der kurzen Textform mit Rufname', () => {
+		expect(paareText([])).toBe('Noch niemand angemeldet.');
+		expect(
+			paareText([
+				[
+					{ rufname: null, vorname: 'Lea', nachname: 'Beispiel' },
+					{ rufname: 'Hannes', vorname: 'Johannes', nachname: 'Muster' }
+				],
+				[
+					{ rufname: 'Nina', vorname: 'Nina', nachname: 'Brunner' },
+					{ rufname: null, vorname: 'Jonas', nachname: 'Keller' }
+				]
+			])
+		).toBe('Angemeldet (2): Lea Beispiel / Hannes (Johannes Muster), Nina Brunner / Jonas Keller');
+	});
+
+	test('FR-48: Rückfrage vor der Anfrage nennt den Angefragten mit der Anrede', () => {
 		expect(rueckfrageText('Marco')).toBe(
 			'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit Marco dich ' +
 				'anrufen kann. Nimmt Marco an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.'

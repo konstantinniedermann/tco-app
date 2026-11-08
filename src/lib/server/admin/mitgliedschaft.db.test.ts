@@ -316,15 +316,15 @@ describe('Austritt', () => {
 			const a = (await ladeCmAnsicht(db, offen.turnierId, dritter.mitgliedId, jetzt))!;
 			const d = a.kategorien.find((k) => k.id === offen.doppel)!;
 			return {
-				suchende: d.suchende.map((s) => s.name),
-				meineAnfragen: d.meineAnfragen.map((x) => x.an),
-				anfragen: a.anfragen.map((x) => x.von)
+				suchende: d.suchende.map((s) => s.name.nachname),
+				meineAnfragen: d.meineAnfragen.map((x) => x.an.nachname),
+				anfragen: a.anfragen.map((x) => x.von.nachname)
 			};
 		};
 		expect(await sicht()).toEqual({
-			suchende: ['Theo Austritt'],
-			meineAnfragen: ['Theo Austritt'],
-			anfragen: ['Theo Austritt']
+			suchende: ['Austritt'],
+			meineAnfragen: ['Austritt'],
+			anfragen: ['Austritt']
 		});
 
 		await erfasseAustritt(db, urheber, m.mitgliedId, jetzt);

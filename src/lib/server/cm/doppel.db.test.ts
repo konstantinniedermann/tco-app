@@ -155,6 +155,7 @@ async function offenesDoppel() {
 }
 
 type Angaben = Partial<{
+	rufname: string | null;
 	geschlecht: 'w' | 'm' | null;
 	jahrgang: number | null;
 	klassierung: string | null;
@@ -398,6 +399,8 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		await anmeldungMit(t.mixed, [max], t.jetzt, 'Eher abends');
 		await anmeldungMit(t.herrenEinzel[0], [max], t.jetzt);
 		await anmeldungMit(t.herrenEinzel[1], [max], t.jetzt);
+		// Nur der Rufname enthält «ma»: die Suche findet ihn trotzdem.
+		const reto = await spieler('Reto', 'Huber', { rufname: 'Mattu' });
 		const meine = [
 			ich,
 			marcoId,
@@ -410,26 +413,33 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 			voll,
 			manuel,
 			mario,
-			max
+			max,
+			reto
 		];
 
 		const treffer = (await sucheDoppelPartner(db, t.mixed, ich, ' ma ')).filter((z) =>
 			meine.includes(z.mitgliedId)
 		);
 		const leer = { vermerk: null, suchtPartner: false, kommentar: null, anfrageId: null };
+		const name = (vorname: string, nachname: string, rufname: string | null = null) => ({
+			rufname,
+			vorname,
+			nachname
+		});
+		const marcoName = name('Marco', 'Beispiel');
 		expect(treffer).toEqual([
 			{
 				...leer,
 				mitgliedId: manuel,
-				name: 'Manuel Arnold',
+				name: name('Manuel', 'Arnold'),
 				klassierung: null,
 				vermerk: 'klassierung-fehlt'
 			},
-			{ ...leer, mitgliedId: marcoId, name: 'Marco Beispiel', klassierung: 'R5' },
+			{ ...leer, mitgliedId: marcoId, name: marcoName, klassierung: 'R5' },
 			{
 				...leer,
 				mitgliedId: max,
-				name: 'Max Cadonau',
+				name: name('Max', 'Cadonau'),
 				klassierung: 'R7',
 				suchtPartner: true,
 				kommentar: 'Eher abends'
@@ -437,11 +447,16 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 			{
 				...leer,
 				mitgliedId: mario,
-				name: 'Mario Dörig',
+				name: name('Mario', 'Dörig'),
 				klassierung: 'R5',
 				vermerk: 'angaben-fehlen'
-			}
+			},
+			// Sortiert wie alle nach Nachname; der Rufname ändert die Reihenfolge nicht.
+			{ ...leer, mitgliedId: reto, name: name('Reto', 'Huber', 'Mattu'), klassierung: 'R5' }
 		]);
+		// «Rufname Nachname» findet ihn auch.
+		const rufer = await sucheDoppelPartner(db, t.mixed, ich, 'mattu huber');
+		expect(rufer.map((z) => z.mitgliedId)).toContain(reto);
 		expect(await sucheDoppelPartner(db, t.mixed, ich, ' m ')).toEqual([]);
 		// Eine Einzel-Kategorie und eine unbekannte haben keine Partner.
 		expect(await sucheDoppelPartner(db, t.damenEinzel[0], ich, 'Marco')).toEqual([]);
@@ -454,7 +469,7 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		// Andere Tests legen auch einen Marco Beispiel an.
 		const nachher = await sucheDoppelPartner(db, t.mixed, ich, 'Marco Beispiel');
 		expect(nachher.filter((z) => z.mitgliedId === marcoId)).toEqual([
-			{ ...leer, mitgliedId: marcoId, name: 'Marco Beispiel', klassierung: 'R5', anfrageId: id }
+			{ ...leer, mitgliedId: marcoId, name: marcoName, klassierung: 'R5', anfrageId: id }
 		]);
 	});
 
@@ -467,7 +482,7 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 			await spieler('Partner', `Q${marke}${String(i).padStart(2, '0')}`);
 		}
 		const treffer = await sucheDoppelPartner(db, t.mixed, ich, marke);
-		expect(treffer.map((z) => z.name)).toEqual(
+		expect(treffer.map((z) => `${z.name.vorname} ${z.name.nachname}`)).toEqual(
 			Array.from({ length: 20 }, (_, i) => `Partner Q${marke}${String(i).padStart(2, '0')}`)
 		);
 	});
@@ -550,7 +565,7 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 	test('FR-48, FR-49: Annehmen ohne Anmeldungen ergibt eine neue Anmeldung mit beiden', async () => {
 		const t = await offenesDoppel();
 		const ich = await lea();
-		const marcoId = await marco();
+		const marcoId = await marco({ rufname: 'Mäc' });
 		const id = await anfrage(t.mixed, ich, marcoId, t.jetzt);
 		expect(await nimmAnfrageAn(db, id, marcoId, t.jetzt)).toEqual({
 			ergebnis: 'ok',
@@ -563,7 +578,10 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 			{ id: expect.any(Number), status: 'bestaetigt', suchtext: null, spieler: [ich, marcoId] }
 		]);
 		expect(await anfragenIn(t.mixed)).toEqual([]);
-		expect(await eigeneKategorien(db, t.id, ich)).toEqual(['Mixed Doppel (mit Marco Beispiel)']);
+		// Die Bestätigungsmail nennt den Partner in der kurzen Textform mit Rufname.
+		expect(await eigeneKategorien(db, t.id, ich)).toEqual([
+			'Mixed Doppel (mit Mäc (Marco Beispiel))'
+		]);
 		expect(await eigeneKategorien(db, t.id, marcoId)).toEqual(['Mixed Doppel (mit Lea Marbach)']);
 	});
 
@@ -627,7 +645,7 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 
 	test('FR-48: Annehmen lässt die übrigen Anfragen beider in der Kategorie verfallen', async () => {
 		const t = await offenesDoppel();
-		const ich = await lea();
+		const ich = await lea({ rufname: 'Lele' });
 		const marcoId = await marco();
 		const max = await spieler('Max', 'Cadonau');
 		const paul = await spieler('Paul', 'Sommer');
@@ -648,7 +666,8 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 			kategorie: 'Mixed Doppel',
 			turnierId: t.id,
 			hinfaellig: [
-				{ anIds: [max, paul], mitName: 'Lea Marbach' },
+				// Die Meldung nennt den Namen in der kurzen Textform mit Rufname.
+				{ anIds: [max, paul], mitName: 'Lele (Lea Marbach)' },
 				{ anIds: [nina], mitName: 'Marco Beispiel' }
 			]
 		});

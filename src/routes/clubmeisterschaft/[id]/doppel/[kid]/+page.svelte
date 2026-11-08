@@ -19,9 +19,10 @@
 		doppelText,
 		rueckfrageText,
 		suchtextZaehlerText,
-		vermerkText,
-		vornameVon
+		vermerkText
 	} from '../../../../../lib/cm/anzeige.ts';
+	import { anredeName, nameText } from '../../../../../lib/name.ts';
+	import Name from '../../../../../lib/ui/Name.svelte';
 	import { MELDUNG } from '../../../../../lib/login/anmelden.ts';
 	import { klassierungName } from '../../../../../lib/turnier/klassierung.ts';
 	import { datumLang } from '../../../../../lib/verwaltung/turnier-anzeige.ts';
@@ -139,18 +140,18 @@
 		rueckfrage?.close();
 		switch (r.art) {
 			case 'ok':
-				await zurCmSeite(`Anfrage an ${t.name} gesendet.`);
+				await zurCmSeite(`Anfrage an ${nameText(t.name, 'vorname-zuerst')} gesendet.`);
 				return;
 			case 'abgemeldet':
 				await goto(resolve('/login'));
 				return;
 			case 'schon-angefragt':
-				fehler = `Du hast ${t.name} schon angefragt.`;
+				fehler = `Du hast ${nameText(t.name, 'vorname-zuerst')} schon angefragt.`;
 				suchen(true);
 				return;
 			case 'passt-nicht':
 			case 'nicht-gefunden':
-				fehler = `${t.name} lässt sich hier nicht mehr anfragen.`;
+				fehler = `${nameText(t.name, 'vorname-zuerst')} lässt sich hier nicht mehr anfragen.`;
 				suchen(true);
 				return;
 			case 'voll':
@@ -182,7 +183,7 @@
 				treffer =
 					treffer?.map((x) => (x.mitgliedId === t.mitgliedId ? { ...x, anfrageId: null } : x)) ??
 					null;
-				meldung = `Anfrage an ${t.name} zurückgezogen.`;
+				meldung = `Anfrage an ${nameText(t.name, 'vorname-zuerst')} zurückgezogen.`;
 				await tick();
 				knoepfe[t.mitgliedId]?.focus();
 				return;
@@ -285,9 +286,8 @@
 			{#each treffer as t (t.mitgliedId)}
 				<li class="kachel">
 					<span>
-						<strong id="treffer-{t.mitgliedId}">{t.name}</strong>{#if t.klassierung}&nbsp;· {klassierungName(
-								t.klassierung
-							)}{/if}
+						<span id="treffer-{t.mitgliedId}"><Name name={t.name} /></span
+						>{#if t.klassierung}&nbsp;· {klassierungName(t.klassierung)}{/if}
 						{#if t.vermerk || t.suchtPartner || t.anfrageId !== null}
 							<br />
 							{#if t.vermerk}<span class="plakette">{vermerkText(t.vermerk)}</span>{/if}
@@ -359,9 +359,11 @@
 {/if}
 
 <dialog class="karte" bind:this={rueckfrage} aria-labelledby="rueckfrage-titel">
-	<h2 id="rueckfrage-titel">{ziel?.name} anfragen?</h2>
+	<h2 id="rueckfrage-titel">
+		{#if ziel}<Name name={ziel.name} />{/if} anfragen?
+	</h2>
 	{#if ziel}
-		<p>{rueckfrageText(vornameVon(ziel.name))}</p>
+		<p>{rueckfrageText(anredeName(ziel.name))}</p>
 	{/if}
 	<p class="leise">
 		Meldet sich später einer von euch ab, ist die ganze Doppel-Anmeldung zurückgezogen.

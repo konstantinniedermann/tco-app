@@ -45,11 +45,15 @@ export const namenText = (namen: Namensteile[]): string =>
 		? 'Noch niemand angemeldet.'
 		: `Angemeldet (${namen.length}): ${namen.map((n) => nameText(n, 'vorname-zuerst')).join(', ')}`;
 
-/** A-ANMELDUNG-04: die bestätigten Paare einer Doppel-Kategorie. */
-export const paareText = (paare: string[]): string =>
+/** A-ANMELDUNG-04: ein Paar in der kurzen Textform, «Lea Beispiel / Hannes (Johannes Muster)». */
+export const paarText = (paar: Namensteile[]): string =>
+	paar.map((n) => nameText(n, 'vorname-zuerst')).join(' / ');
+
+/** A-ANMELDUNG-04: die bestätigten Paare einer Doppel-Kategorie, wie `namenText` im Einzel. */
+export const paareText = (paare: Namensteile[][]): string =>
 	paare.length === 0
 		? 'Noch niemand angemeldet.'
-		: `Angemeldet (${paare.length}): ${paare.join(', ')}`;
+		: `Angemeldet (${paare.length}): ${paare.map(paarText).join(', ')}`;
 
 /** FR-08: Längengrenze des Wildcard-Kommentars. */
 export const KOMMENTAR_MAX = 300;
@@ -94,17 +98,20 @@ export const KONTAKT_HINWEIS =
 export const waehlbar = (nummer: string): string =>
 	`${nummer.trim().startsWith('+') ? '+' : ''}${nummer.replace(/\D/g, '')}`;
 
-/** Vorname aus «Vorname Nachname». */
-export const vornameVon = (name: string): string => name.trim().split(/\s+/)[0];
+const gleicherName = (a: Namensteile, b: Namensteile) =>
+	a.rufname === b.rufname && a.vorname === b.vorname && a.nachname === b.nachname;
 
 /** FR-19: die bestätigten Paare der Kategorie ohne das eigene (das mit dem Partner). */
-export const weiterePaare = (paare: string[], partner: string): string[] =>
-	paare.filter((p) => !p.split(' / ').includes(partner));
+export const weiterePaare = (paare: Namensteile[][], partner: Namensteile): Namensteile[][] =>
+	paare.filter((p) => !p.some((n) => gleicherName(n, partner)));
 
-/** FR-48, FR-19: Text der Rückfrage vor dem Senden einer Anfrage; nennt den Angefragten beim Vornamen. */
-export function rueckfrageText(vorname: string): string {
+/**
+ * FR-48, FR-19: Text der Rückfrage vor dem Senden einer Anfrage; `anrede` ist der Rufname des
+ * Angefragten, sonst sein Vorname (`anredeName`).
+ */
+export function rueckfrageText(anrede: string): string {
 	return (
-		`${vorname} sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit ${vorname} ` +
-		`dich anrufen kann. Nimmt ${vorname} an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.`
+		`${anrede} sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit ${anrede} ` +
+		`dich anrufen kann. Nimmt ${anrede} an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.`
 	);
 }

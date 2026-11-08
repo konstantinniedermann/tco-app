@@ -2,7 +2,7 @@
 // A-ANMELDUNG-10, FR-05 bis FR-10, FR-37); Anfragen und Suche im Doppel in `doppel.ts`.
 import { and, asc, count, eq, gte, inArray, ne, sql } from 'drizzle-orm';
 import type { Klassierung } from '../../turnier/klassierung.ts';
-import type { Namensteile } from '../../name.ts';
+import { nameText, type Namensteile } from '../../name.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
 	anmeldung,
@@ -27,6 +27,7 @@ import {
 } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
 import { jahrInZuerich } from '../datum.ts';
+import { namensSpalten } from '../namen.ts';
 import { spielerAus } from './angaben.ts';
 
 export type CmStand = {
@@ -40,7 +41,7 @@ export type CmStand = {
 };
 
 /** Der Partner eines bestätigten Paars, mit Kontakt (FR-19). */
-export type CmPartner = { name: string; telefon: string | null; email: string | null };
+export type CmPartner = { name: Namensteile; telefon: string | null; email: string | null };
 
 export type CmKategorie = KategorieRegel & {
 	id: number;
@@ -50,14 +51,14 @@ export type CmKategorie = KategorieRegel & {
 	anmeldungId: number | null;
 	/** Einzel: Namen der Bestätigten; im Doppel leer, dort stehen `paare` und `suchende`. */
 	namen: Namensteile[];
-	/** Doppel: «Vorname Nachname / Vorname Nachname» der bestätigten Paare. */
-	paare: string[];
+	/** Doppel: die beiden Spieler jedes bestätigten Paars, je nach Nachname, dann Vorname. */
+	paare: Namensteile[][];
 	/** Doppel: wer allein angemeldet ist und einen Partner sucht, ohne einen selbst. */
-	suchende: { name: string; kommentar: string | null }[];
+	suchende: { name: Namensteile; kommentar: string | null }[];
 	/** Doppel: der eigene Stand in dieser Kategorie. */
 	eigen: { art: 'paar'; partner: CmPartner } | { art: 'sucht'; kommentar: string | null } | null;
 	/** Doppel: die eigenen offenen Anfragen in dieser Kategorie. */
-	meineAnfragen: { anfrageId: number; an: string }[];
+	meineAnfragen: { anfrageId: number; an: Namensteile }[];
 };
 
 /** Offene Anfrage an einen selbst; Kontakt und Klassierung sieht nur der Angefragte (FR-19). */
@@ -65,7 +66,7 @@ export type CmAnfrage = {
 	anfrageId: number;
 	kategorieId: number;
 	kategorie: string;
-	von: string;
+	von: Namensteile;
 	klassierung: Klassierung | null;
 	kontakt: { art: 'telefon' | 'email'; wert: string } | null;
 };
@@ -115,7 +116,15 @@ export function suchtextAus(roh: string | null | undefined): string | null {
 	return text.length > 0 ? text : null;
 }
 
-export const nameVon = (m: { vorname: string; nachname: string }) => `${m.vorname} ${m.nachname}`;
+/** Die Namensteile aus einer Zeile mit `namensSpalten`, ohne die übrigen Spalten. */
+export const namensteile = (m: Namensteile): Namensteile => ({
+	rufname: m.rufname,
+	vorname: m.vorname,
+	nachname: m.nachname
+});
+
+/** Kurze Textform für Meldungen und Mails an Mitglieder: «Hannes (Johannes Muster)». */
+export const nameFuerText = (m: Namensteile): string => nameText(m, 'vorname-zuerst');
 
 /** Aktive Anmeldungen des Mitglieds in einem Turnier, nach Kategoriename. */
 export async function eigeneAnmeldungen(db: DbOderTx, turnierId: number, mitgliedId: number) {
@@ -288,8 +297,7 @@ async function offeneAnfragenAn(db: Db, turnierId: number, mitgliedId: number) {
 			anfrageId: partnerAnfrage.id,
 			kategorieId: kategorie.id,
 			kategorie: kategorie.name,
-			vorname: mitglied.vorname,
-			nachname: mitglied.nachname,
+			...namensSpalten,
 			telefon: mitglied.telefon,
 			email: mitglied.email,
 			klassierung: mitglied.klassierung
@@ -305,7 +313,7 @@ async function offeneAnfragenAn(db: Db, turnierId: number, mitgliedId: number) {
 		anfrageId: z.anfrageId,
 		kategorieId: z.kategorieId,
 		kategorie: z.kategorie,
-		von: nameVon(z),
+		von: namensteile(z),
 		klassierung: spielerAus({ geschlecht: null, jahrgang: null, klassierung: z.klassierung })
 			.klassierung,
 		kontakt: kontaktVon(z)
@@ -327,8 +335,7 @@ async function fuelleDoppel(db: Db, doppel: CmKategorie[], mitgliedId: number): 
 			status: anmeldung.status,
 			suchtext: anmeldung.suchtext,
 			mitgliedId: mitglied.id,
-			vorname: mitglied.vorname,
-			nachname: mitglied.nachname,
+			...namensSpalten,
 			telefon: mitglied.telefon,
 			email: mitglied.email
 		})
@@ -363,18 +370,18 @@ async function fuelleDoppel(db: Db, doppel: CmKategorie[], mitgliedId: number): 
 		const k = nachId.get(a.kategorieId)!;
 		const ich = a.spieler.find((s) => s.mitgliedId === mitgliedId);
 		if (a.spieler.length >= 2) {
-			if (a.status === 'bestaetigt') k.paare.push(a.spieler.map(nameVon).join(' / '));
+			if (a.status === 'bestaetigt') k.paare.push(a.spieler.map(namensteile));
 			const partner = a.spieler.find((s) => s.mitgliedId !== mitgliedId);
 			if (ich && partner) {
 				k.eigen = {
 					art: 'paar',
-					partner: { name: nameVon(partner), telefon: partner.telefon, email: partner.email }
+					partner: { name: namensteile(partner), telefon: partner.telefon, email: partner.email }
 				};
 			}
 		} else if (ich) {
 			k.eigen = { art: 'sucht', kommentar: a.suchtext };
 		} else {
-			k.suchende.push({ name: nameVon(a.spieler[0]), kommentar: a.suchtext });
+			k.suchende.push({ name: namensteile(a.spieler[0]), kommentar: a.suchtext });
 		}
 	}
 
@@ -382,15 +389,14 @@ async function fuelleDoppel(db: Db, doppel: CmKategorie[], mitgliedId: number): 
 		.select({
 			anfrageId: partnerAnfrage.id,
 			kategorieId: partnerAnfrage.kategorieId,
-			vorname: mitglied.vorname,
-			nachname: mitglied.nachname
+			...namensSpalten
 		})
 		.from(partnerAnfrage)
 		.innerJoin(mitglied, eq(mitglied.id, partnerAnfrage.anId))
 		.where(and(eq(partnerAnfrage.vonId, mitgliedId), inArray(partnerAnfrage.kategorieId, ids)))
 		.orderBy(asc(partnerAnfrage.gestelltAm), asc(partnerAnfrage.id));
 	for (const e of eigene) {
-		nachId.get(e.kategorieId)?.meineAnfragen.push({ anfrageId: e.anfrageId, an: nameVon(e) });
+		nachId.get(e.kategorieId)?.meineAnfragen.push({ anfrageId: e.anfrageId, an: namensteile(e) });
 	}
 }
 
@@ -441,8 +447,7 @@ export async function sperreMitglieder(tx: DbOderTx, ids: number[]) {
 		const [m] = await tx
 			.select({
 				id: mitglied.id,
-				vorname: mitglied.vorname,
-				nachname: mitglied.nachname,
+				...namensSpalten,
 				status: mitglied.status,
 				...spielerSpalten
 			})
@@ -640,8 +645,7 @@ export async function eigeneKategorien(
 		const zeilen = await db
 			.select({
 				anmeldungId: anmeldungSpieler.anmeldungId,
-				vorname: mitglied.vorname,
-				nachname: mitglied.nachname
+				...namensSpalten
 			})
 			.from(anmeldungSpieler)
 			.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId))
@@ -651,7 +655,7 @@ export async function eigeneKategorien(
 					ne(anmeldungSpieler.mitgliedId, mitgliedId)
 				)
 			);
-		for (const z of zeilen) partner.set(z.anmeldungId, nameVon(z));
+		for (const z of zeilen) partner.set(z.anmeldungId, nameFuerText(z));
 	}
 	return eigene.map((e) => {
 		if (e.art === 'doppel') {

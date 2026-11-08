@@ -321,7 +321,9 @@ describe('Konto löschen', () => {
 		expect(a.anfragen).toEqual([]);
 		expect(d.meineAnfragen).toEqual([]);
 		// Der Name bleibt wie bei jeder Anmeldung eines vergangenen Turniers, ohne Kommentar.
-		expect(d.suchende).toEqual([{ name: `Erika ${NACHNAME}`, kommentar: null }]);
+		expect(d.suchende).toEqual([
+			{ name: { rufname: null, vorname: 'Erika', nachname: NACHNAME }, kommentar: null }
+		]);
 	});
 
 	test('Review-Fokus 4: Urheber, Ersteller und Absender geleert, Ladeseiten laden weiter', async () => {

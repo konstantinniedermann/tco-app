@@ -1,6 +1,8 @@
 import { and, eq, inArray, or } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { anmeldung, anmeldungSpieler, kategorie, mitglied, partnerAnfrage } from '../db/schema.ts';
+import { namensSpalten } from '../namen.ts';
+import { nameFuerText } from './anmeldungen.ts';
 
 export type Bezug = { turnierId: number; kategorie: string };
 
@@ -42,13 +44,10 @@ export async function mitgliedEmail(db: Db, mitgliedId: number): Promise<string 
 	return z?.email ?? null;
 }
 
-/** «Vorname Nachname» für die Meldungen an den jeweils anderen; nie Kontaktdaten. */
+/** Kurze Textform «Hannes (Johannes Muster)» für die Meldungen an den jeweils anderen; nie Kontaktdaten. */
 export async function mitgliedName(db: Db, mitgliedId: number): Promise<string | null> {
-	const [z] = await db
-		.select({ vorname: mitglied.vorname, nachname: mitglied.nachname })
-		.from(mitglied)
-		.where(eq(mitglied.id, mitgliedId));
-	return z ? `${z.vorname} ${z.nachname}` : null;
+	const [z] = await db.select(namensSpalten).from(mitglied).where(eq(mitglied.id, mitgliedId));
+	return z ? nameFuerText(z) : null;
 }
 
 /** Wie `bezugDerKategorie`, über eine Anfrage, an der man als Anfragender oder Angefragter beteiligt ist. */

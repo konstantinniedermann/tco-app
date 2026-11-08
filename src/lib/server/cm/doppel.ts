@@ -1,6 +1,7 @@
 // Doppel der Mitglieder zur Clubmeisterschaft: Partnersuche, Anfragen und Suchtext
 // (A-ANMELDUNG-04, FR-48, FR-49). Allein anmelden und abmelden laufen über `anmeldungen.ts`.
-import { and, asc, count, eq, inArray, isNotNull, ne, or, sql } from 'drizzle-orm';
+import { and, asc, count, eq, inArray, isNotNull, ne, or } from 'drizzle-orm';
+import type { Namensteile } from '../../name.ts';
 import type { Klassierung } from '../../turnier/klassierung.ts';
 import { fehlendeAngaben, passtAlsPaar, vermerk, type Vermerk } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
@@ -15,12 +16,14 @@ import {
 	partnerAnfrage,
 	turnier
 } from '../db/schema.ts';
+import { namensSpalten, nameEnthaelt } from '../namen.ts';
 import { spielerAus } from './angaben.ts';
 import {
 	eigeneAnmeldungen,
 	GRENZE,
 	istAktiv,
-	nameVon,
+	nameFuerText,
+	namensteile,
 	regelAus,
 	sperreKategorieUndTurnier,
 	sperreMitglieder,
@@ -29,12 +32,15 @@ import {
 	suchtextAus
 } from './anmeldungen.ts';
 
-/** Verfallene Anfragen eines Spielers: an wen die Meldung «… hat inzwischen einen Partner» geht. */
+/**
+ * Verfallene Anfragen eines Spielers: an wen die Meldung «… hat inzwischen einen Partner» geht;
+ * `mitName` in der kurzen Textform.
+ */
 export type Hinfaellig = { anIds: number[]; mitName: string };
 
 export type PartnerTreffer = {
 	mitgliedId: number;
-	name: string;
+	name: Namensteile;
 	klassierung: Klassierung | null;
 	vermerk: Vermerk | null;
 	suchtPartner: boolean;
@@ -84,8 +90,9 @@ const zuZweit = (s: Stand) => s.hier !== null && !s.hier.allein;
 const hatPlatz = (s: Stand) => s.hier !== null || s.anzahl < GRENZE;
 
 /**
- * FR-48: Partner für ein Doppel suchen, ab zwei Zeichen, höchstens 20, nach Nachname. Treffer sind
- * aktive Mitglieder mit Login ausser einem selbst, die mit einem selbst passen (`passtAlsPaar`,
+ * FR-48: Partner für ein Doppel suchen, ab zwei Zeichen, höchstens 20, nach Nachname; die Suche
+ * findet auch den Rufnamen (`nameEnthaelt`). Treffer sind aktive Mitglieder mit Login ausser
+ * einem selbst, die mit einem selbst passen (`passtAlsPaar`,
  * fehlende Angaben des anderen mit Vermerk), dort nicht schon zu zweit sind und die Grenze nicht
  * erreicht haben; wer hier allein sucht, zählt schon mit.
  */
@@ -112,8 +119,7 @@ export async function sucheDoppelPartner(
 		await db
 			.select({
 				mitgliedId: mitglied.id,
-				vorname: mitglied.vorname,
-				nachname: mitglied.nachname,
+				...namensSpalten,
 				...spielerSpalten
 			})
 			.from(mitglied)
@@ -123,11 +129,7 @@ export async function sucheDoppelPartner(
 					eq(mitglied.status, 'aktiv'),
 					ne(mitglied.id, mitgliedId),
 					hatLogin,
-					or(
-						sql`${mitglied.vorname} || ' ' || ${mitglied.nachname} ilike ${muster}`,
-						sql`${mitglied.nachname} || ' ' || ${mitglied.vorname} ilike ${muster}`,
-						sql`${mitglied.nachname} || ', ' || ${mitglied.vorname} ilike ${muster}`
-					)
+					nameEnthaelt(muster)
 				)
 			)
 			.orderBy(asc(mitglied.nachname), asc(mitglied.vorname), asc(mitglied.id))
@@ -183,7 +185,7 @@ export async function sucheDoppelPartner(
 		const s = spielerAus(k);
 		treffer.push({
 			mitgliedId: k.mitgliedId,
-			name: nameVon(k),
+			name: namensteile(k),
 			klassierung: s.klassierung,
 			vermerk: vermerk(s),
 			suchtPartner: sucht !== undefined,
@@ -283,7 +285,7 @@ export async function lehneAnfrageAb(
 async function loescheAnfragenDerBeiden(
 	tx: DbOderTx,
 	kategorieId: number,
-	beide: { id: number; vorname: string; nachname: string }[]
+	beide: (Namensteile & { id: number })[]
 ): Promise<Hinfaellig[]> {
 	const ids = beide.map((b) => b.id);
 	const weg = await tx
@@ -303,7 +305,7 @@ async function loescheAnfragenDerBeiden(
 			if (gegenueber !== null && !ids.includes(gegenueber)) andere.add(gegenueber);
 		}
 		if (andere.size > 0) {
-			hinfaellig.push({ anIds: [...andere].sort((x, y) => x - y), mitName: nameVon(b) });
+			hinfaellig.push({ anIds: [...andere].sort((x, y) => x - y), mitName: nameFuerText(b) });
 		}
 	}
 	return hinfaellig;
