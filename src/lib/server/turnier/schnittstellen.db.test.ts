@@ -73,6 +73,11 @@ function baue(jetzt: Date = start) {
 		db,
 		zugang,
 		hinweis: async () => {},
+		brief: {
+			schluessel: 'y'.repeat(40),
+			adresse: 'https://mytco.example.org',
+			kontakt: 'kontakt@example.org'
+		},
 		jetzt: () => jetzt,
 		push: null,
 		mailer: async (n) => {

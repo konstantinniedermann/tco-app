@@ -1,5 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
+import { mitglied } from '../db/schema.ts';
 import {
 	antwort,
 	formatFehler,
@@ -27,6 +29,7 @@ import {
 	listeMitglieder,
 	type MitgliedStatus
 } from './mitglieder.ts';
+import { listeBriefEmpfaenger, MAX_BRIEFE, stelleBriefeAus, type BriefAbh } from './briefe.ts';
 import { ladeAuskunft } from './auskunft.ts';
 import { setzeAnsicht } from './ansicht.ts';
 import {
@@ -47,6 +50,8 @@ export type AdminDienste = {
 	zugang: ZugangDienst;
 	// SI-09: Hinweis an die alte Adresse; wirft nie.
 	hinweis: (an: string) => Promise<void>;
+	// Schlüssel, Adresse und Kontakt für die Briefe (Brief-Code, Text).
+	brief: BriefAbh;
 	jetzt?: () => Date;
 };
 
@@ -294,6 +299,48 @@ export function postSitzungen(d: AdminDienste, e: AdminEreignis): Promise<Respon
 	});
 }
 
+// A-LOGIN-01: Empfänger der Brief-Serie. Die Antworten der Brief-Schnittstellen enthalten Codes im
+// Klartext und werden nirgends geloggt (SI-05).
+export function getBriefe(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return liest(d, e, 'mitglieder', async () =>
+		antwort(200, await listeBriefEmpfaenger(d.db, jetzt(d)))
+	);
+}
+
+// 1 bis MAX_BRIEFE verschiedene ganze Zahlen > 0.
+function leseIds(roh: unknown): number[] | null {
+	if (!Array.isArray(roh) || roh.length < 1 || roh.length > MAX_BRIEFE) return null;
+	if (!roh.every((x) => typeof x === 'number' && Number.isInteger(x) && x > 0)) return null;
+	return new Set(roh).size === roh.length ? (roh as number[]) : null;
+}
+
+export function postBriefe(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
+		const ids = leseIds(koerper.ids);
+		if (ids === null) return eingabeFehler();
+		const r = await stelleBriefeAus(d.db, d.brief, urheber, ids, jetzt(d));
+		return r.ergebnis === 'ok'
+			? antwort(200, { briefe: r.briefe })
+			: antwort(409, { fehler: 'nicht-moeglich', anzahl: r.anzahl });
+	});
+}
+
+export function postBrief(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (urheber) => {
+		const id = parseId(e.params.id);
+		if (id === null) return nichtGefunden();
+		const [m] = await d.db
+			.select({ status: mitglied.status })
+			.from(mitglied)
+			.where(eq(mitglied.id, id));
+		if (!m || m.status === 'geloescht') return nichtGefunden();
+		const r = await stelleBriefeAus(d.db, d.brief, urheber, [id], jetzt(d));
+		return r.ergebnis === 'ok'
+			? antwort(200, { briefe: r.briefe })
+			: antwort(409, { fehler: 'nicht-moeglich', anzahl: r.anzahl });
+	});
+}
+
 // Die vier Übergänge der Mitgliedschaft: leerer JSON-Körper, die Funktion prüft den Ausgangszustand.
 function uebergang<E extends string>(
 	d: AdminDienste,
@@ -430,6 +477,9 @@ export const ADMIN_SCHNITTSTELLEN = {
 	postRollen,
 	getRollen,
 	postSitzungen,
+	getBriefe,
+	postBriefe,
+	postBrief,
 	postAustritt,
 	postWiedereintritt,
 	postLoeschen,

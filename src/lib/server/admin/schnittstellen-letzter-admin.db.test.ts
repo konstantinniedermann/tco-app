@@ -38,7 +38,17 @@ async function bestaetigterMytcoAdmin() {
 		bremsen: erstelleBremsen(),
 		jetzt: () => start
 	});
-	const d: AdminDienste = { db, zugang, hinweis: async () => {}, jetzt: () => start };
+	const d: AdminDienste = {
+		db,
+		zugang,
+		hinweis: async () => {},
+		brief: {
+			schluessel: 'y'.repeat(40),
+			adresse: 'https://mytco.example.org',
+			kontakt: 'kontakt@example.org'
+		},
+		jetzt: () => start
+	};
 	const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 	const kennung = await erstelleSitzung(db, admin.kontoId, start);
 	const konto = (await pruefeSitzung(db, kennung, start))!.konto;
