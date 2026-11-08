@@ -49,7 +49,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | *Verwaltet von*: Elternteil, der das Konto eines Juniors führt (Vorschlag K-08) | Kind ohne eigenes Login | — |
 | Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (A-MITGLIED-07) | — |
 
-E-Mail, Telefon und Lizenznummer (Annahme K-19.1, FR-02) sowie die Adresse (Annahme K-19.2) ändert das Mitglied selbst im Profil; die E-Mail erst nach je einem Code an die alte und die neue Adresse (SI-09). Geschlecht und Jahrgang trägt das Mitglied einmal selbst ein, wenn sie leer sind (FR-37), danach ändert sie der Mitglieder-Admin; Den Rufnamen setzt, ändert und löscht nur das Mitglied selbst im Profil; Name und Mitgliedernummer ändert weiterhin nur der Mitglieder-Admin. Ändert er die E-Mail-Adresse, erhält die alte einen Hinweis ohne Adressen (SI-09). Neue Datenarten entstehen dadurch nicht.
+E-Mail, Telefon und Lizenznummer (Annahme K-19.1, FR-02) sowie die Adresse (Annahme K-19.2) ändert das Mitglied selbst im Profil; die E-Mail erst nach je einem Code an die alte und die neue Adresse (SI-09). Geschlecht und Jahrgang trägt das Mitglied einmal selbst ein, wenn sie leer sind (FR-37), danach ändert sie der Mitglieder-Admin; den Rufnamen setzt, ändert und löscht nur das Mitglied selbst im Profil; Name und Mitgliedernummer ändert weiterhin nur der Mitglieder-Admin. Ändert er die E-Mail-Adresse, erhält die alte einen Hinweis ohne Adressen (SI-09). Ausser dem Rufnamen (eigene Datenart, siehe Tabelle der Datenarten) entstehen dadurch keine neuen Datenarten.
 
 Der Befehl *Admin festlegen* legt nur den ersten Admin selbst an (MyTCO- und Mitglieder-Admin, Annahme K-18.4); alle anderen Mitglieder kommen über das Einlesen oder die Verwaltung.
 
@@ -68,7 +68,7 @@ Bankdaten.
 | Lizenz-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
 | Alle Mitglieder | Name und Rufname, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft; bei der Wahl des Doppelpartners die Namen der Mitglieder, die für die Kategorie passen |
 | Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31) |
-| Alle, ohne Login | Kalenderdatei eines Anlasses über einen nicht erratbaren Link: Titel, Beginn, Ort, Einladung, keine Personendaten (ohne Rufname) |
+| Alle, ohne Login | Kalenderdatei eines Anlasses über einen nicht erratbaren Link: Titel, Beginn, Ort, Einladung, keine Personendaten |
 | Alle, ohne Login | Spielplan des Finalwochenendes mit Name (ohne Rufname), Kategorie, Platz, Zeit, Resultat (**Vorschlag K-39**, spätere Etappe) |
 | Swiss Tennis | Anmeldungen, Resultate und Lizenzanträge, als Export von Hand |
 

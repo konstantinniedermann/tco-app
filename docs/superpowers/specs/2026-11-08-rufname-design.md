@@ -118,7 +118,9 @@ den Rufnamen, alles unter Mitgliederverwaltung bleibt amtlich, Seiten ohne Login
 ## Profil
 
 - Neues Feld *Rufname* in der Karte *Meine Angaben*, bearbeitbar wie Telefon und Adresse über
-  denselben Ablauf (Ändern → Speichern, Schutz gegen veraltete Stände).
+  denselben Ablauf (Ändern → Speichern). Speichern wie bei der Klassierung: der zuletzt gespeicherte
+  Stand gilt. Nur das Mitglied selbst schreibt den Rufnamen; ein Konflikt entsteht höchstens
+  zwischen zwei eigenen Geräten.
 - Hilfetext: «Freiwillig. Unter diesem Namen sehen dich die anderen im Club.»
 - Ist kein Rufname gesetzt, zeigt die Kachel «nicht angegeben» wie bei anderen freiwilligen
   Feldern.
