@@ -1,6 +1,8 @@
-// Nur lokal: legt erfundene Mitglieder an und gibt Brief-Codes für die Personas aus: Erika
-// (MyTCO-Admin und Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage
-// (nur Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin).
+// Nur lokal: legt einen Testbestand an (rund 200 erfundene Mitglieder, zwei Anlässe, ein
+// Beispielturnier) und gibt Brief-Codes für die Personas aus: Erika (MyTCO-Admin und
+// Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur
+// Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin). Mehrfach ausführbar: Vorhandenes
+// bleibt, Logins bleiben gültig, nur die Brief-Codes der Personas sind neu.
 // Aufruf über `make seed` (lädt .env). Bricht ab, wenn die Datenbank nicht lokal ist.
 import { eq } from 'drizzle-orm';
 import { machAdmin } from '../src/lib/server/admin/erster-admin.ts';
@@ -11,7 +13,12 @@ import { leseEinstellungen } from '../src/lib/server/einstellungen.ts';
 import { erstelleBremsen } from '../src/lib/server/login/bremse.ts';
 import { formatiereBriefCode } from '../src/lib/server/login/codes.ts';
 import { erstelleLoginDienst } from '../src/lib/server/login/dienst.ts';
-import { legeBeispielAnlassAn } from './beispiel-anlass.ts';
+import {
+	legeBeispielAnlassAn,
+	legeBeispielClubabendAn,
+	meldeBeispielAntworten
+} from './beispiel-anlass.ts';
+import { legeBeispielMitgliederAn } from './beispiel-mitglieder.ts';
 import { legeBeispielTurnierAn } from './beispiel-turnier.ts';
 import { ERFUNDENE_MITGLIEDER, legeErfundeneMitgliederAn } from './erfundene-mitglieder.ts';
 
@@ -49,9 +56,15 @@ async function seed(): Promise<void> {
 			.select({ id: konto.mitgliedId })
 			.from(konto)
 			.where(eq(konto.id, kontoIds[0]));
-		await legeBeispielAnlassAn(db, erika.id, new Date());
+		const jetzt = new Date();
+		const gv = await legeBeispielAnlassAn(db, erika.id, jetzt);
 		// Eine Beispiel-Clubmeisterschaft und Hanna als CM-Admin.
-		await legeBeispielTurnierAn(db, new Date());
+		await legeBeispielTurnierAn(db, jetzt);
+		// Testbestand: rund 200 Mitglieder, ein zweiter Anlass, gemischte Antworten auf beide.
+		const bestand = await legeBeispielMitgliederAn(db, jetzt);
+		const clubabend = await legeBeispielClubabendAn(db, erika.id, jetzt);
+		await meldeBeispielAntworten(db, gv, bestand, jetzt, 0);
+		await meldeBeispielAntworten(db, clubabend, bestand, jetzt, 1);
 		// Je eine Persona mit nur einer Admin-Rolle, damit sich die Bereiche einzeln ausprobieren lassen.
 		const einzelrollen: [number, Rolle][] = [
 			[2, 'cm'],
