@@ -140,6 +140,18 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Hinweis zur Übergabe, kein Fehler; erledigt sich mit dem Merge von #59.
 
+### 2026-11-08 — Turnierleitung am Handy: Namensspalte bricht silbenweise um
+
+**Thema:** Verwaltung, Oberfläche
+
+**Fundort:** `src/lib/verwaltung/Anmeldungsliste.svelte` (Tabelle der Anmeldungen einer Kategorie), Breite 390 px
+
+**Beobachtung:** Die Namensspalte ist so schmal, dass ein Name mit Rufname («Hannes» plus «Nachname, Johannes») in Silben umbricht; die übrigen Spalten nehmen den Platz, die Tabelle scrollt waagrecht.
+
+**Ursprung:** Screenshot im Schlussnachweis Rufname (#67).
+
+**Einschätzung:** Niedrig, die Verwaltung wird meist am Computer genutzt. Bei Gelegenheit der Namensspalte eine Mindestbreite geben oder die Tabelle am Handy als Karten zeigen.
+
 ### 2026-11-08 — Auskunft: neue Angaben je Gerät nur im DB-Test belegt, nicht auf der Seite
 
 **Thema:** App-Oberfläche
