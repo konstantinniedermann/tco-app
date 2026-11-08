@@ -11,7 +11,7 @@ import {
 } from '../login/schnittstellen.ts';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
 import { jahrInZuerich } from '../datum.ts';
-import { parseId } from '../parse-id.ts';
+import { INTEGER_MAX, parseId } from '../parse-id.ts';
 import { pruefeAnlass } from '../anlass/angaben.ts';
 import {
 	aendereAnlass,
@@ -308,10 +308,11 @@ export function getBriefe(d: AdminDienste, e: AdminEreignis): Promise<Response> 
 	);
 }
 
-// 1 bis MAX_BRIEFE verschiedene ganze Zahlen > 0.
+// 1 bis MAX_BRIEFE verschiedene ganze Zahlen von 1 bis INTEGER_MAX.
 function leseIds(roh: unknown): number[] | null {
 	if (!Array.isArray(roh) || roh.length < 1 || roh.length > MAX_BRIEFE) return null;
-	if (!roh.every((x) => typeof x === 'number' && Number.isInteger(x) && x > 0)) return null;
+	if (!roh.every((x) => typeof x === 'number' && Number.isInteger(x) && x > 0 && x <= INTEGER_MAX))
+		return null;
 	return new Set(roh).size === roh.length ? (roh as number[]) : null;
 }
 

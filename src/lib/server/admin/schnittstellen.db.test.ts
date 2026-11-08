@@ -580,7 +580,7 @@ describe('Admin-Schnittstellen', () => {
 		expect(Array.isArray(await r.json())).toBe(true);
 	});
 
-	test('RR-04: Eingabe ohne Liste, leer, doppelt oder über MAX_BRIEFE → 400', async () => {
+	test('SI-10: Eingabe ohne Liste, leer, doppelt, zu gross oder über MAX_BRIEFE → 400', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s, ['mitglieder']);
 		const m = await legeMitgliedAn(db);
@@ -594,6 +594,7 @@ describe('Admin-Schnittstellen', () => {
 			{ ids: [-1] },
 			{ ids: [1.5] },
 			{ ids: ['1'] },
+			{ ids: [2 ** 31] },
 			{ ids: zuviele }
 		];
 		for (const body of schlecht) {
