@@ -114,21 +114,22 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 		page.getByRole('heading', { level: 2, name: 'Deine Angaben für die Clubmeisterschaft' })
 	).toBeVisible();
 	await expect(page.getByLabel('Klassierung')).toBeVisible();
-	await expect(page.getByRole('group', { name: 'Geschlecht' })).toBeVisible();
+	await expect(page.getByRole('radiogroup', { name: 'Geschlecht' })).toBeVisible();
 	await expect(page.getByLabel('Jahrgang')).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'cm-angaben');
 	await page.getByLabel('Klassierung').selectOption('R6');
 	await page.getByLabel('Mann').check();
 	await page.getByRole('button', { name: 'Weiter zu den Kategorien' }).click();
 
-	// A-ANMELDUNG-03, FR-07: nur passende Einzel-Kategorien; die Damen-Kategorie und das Doppel fehlen.
+	// A-ANMELDUNG-03, FR-07: nur passende Kategorien; die Damen-Kategorie fehlt, das Mixed passt
+	// (Doppel ohne Jahrgang, die Mindestsumme prüft erst die Partnerwahl).
 	await expect(page.getByText('0 von 3 Anmeldungen', { exact: true })).toBeVisible();
 	await expect(karte(page, 'Herren R1–R9')).toBeVisible();
 	await expect(karte(page, 'Herren R4–R9')).toBeVisible();
 	await expect(karte(page, 'Offen R1–R9')).toBeVisible();
 	await expect(karte(page, 'Herren Jahrgang bis 1991')).toBeVisible();
 	await expect(page.getByText('Damen R1–R9')).toHaveCount(0);
-	await expect(page.getByText('Mixed Doppel')).toHaveCount(0);
+	await expect(page.getByText('Mixed Doppel', { exact: true })).toBeVisible();
 
 	// A-ANMELDUNG-01: erste Anmeldung mit Rückfrage zu den Kontaktdaten.
 	await karte(page, 'Herren R1–R9').getByRole('button', { name: 'Anmelden' }).click();
