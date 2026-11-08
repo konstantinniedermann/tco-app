@@ -16,6 +16,8 @@ import {
 	getBriefe,
 	postBriefe,
 	postBrief,
+	postEinlesen,
+	postEinlesenVorschau,
 	postAustritt,
 	postWiedereintritt,
 	postLoeschen,
@@ -137,7 +139,7 @@ describe('Admin-Schnittstellen', () => {
 			([name]) =>
 				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(24);
+		expect(geschuetzt).toHaveLength(26);
 		for (const [name, fn] of geschuetzt) {
 			const mach = (konto?: AngemeldetesKonto) =>
 				ereignis({
@@ -172,7 +174,7 @@ describe('Admin-Schnittstellen', () => {
 			([name]) =>
 				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(24);
+		expect(geschuetzt).toHaveLength(26);
 		for (const [name, fn] of geschuetzt) {
 			for (const konto of [cm.konto, ehemals.konto]) {
 				const r = await fn(
@@ -957,5 +959,72 @@ describe('Mitgliedschaft: Austritt, Wiedereintritt, Löschung', () => {
 			expect([r.status, await r.json()]).toEqual([403, { fehler: 'nur-ansehen' }]);
 		}
 		expect((await ladeMitglied(db, ziel.mitgliedId, start))!.status).toBe('aktiv');
+	});
+});
+
+describe('Einlesen', () => {
+	const KOPF = 'mitgliedernummer;vorname;nachname;strasse;plz;ort;email';
+	const zeile = () => {
+		const id = crypto.randomUUID().replaceAll('-', '').slice(0, 12);
+		return `S${id};Sina;Schnittstelle;Erfundenweg 1;4600;Olten;schnitt-${id}@example.org`;
+	};
+
+	test('A-MITGLIED-07: Vorschau und Übernahme durch den Mitglieder-Admin', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const text = `${KOPF}\n${zeile()}\n${zeile()}\n`;
+		const v = await postEinlesenVorschau(s.d, ereignis({ body: { text }, konto: admin.konto }));
+		expect(v.status).toBe(200);
+		const vorschau = (await v.json()) as {
+			neu: unknown[];
+			fehlerhaft: unknown[];
+			vorhanden: unknown[];
+		};
+		expect([vorschau.neu.length, vorschau.fehlerhaft.length, vorschau.vorhanden.length]).toEqual([
+			2, 0, 0
+		]);
+		const r = await postEinlesen(
+			s.d,
+			ereignis({ body: { text, erwartet: 2 }, konto: admin.konto })
+		);
+		expect([r.status, await r.json()]).toEqual([200, { angelegt: 2 }]);
+		const nochmal = await postEinlesen(
+			s.d,
+			ereignis({ body: { text, erwartet: 2 }, konto: admin.konto })
+		);
+		expect([nochmal.status, await nochmal.json()]).toEqual([409, { fehler: 'veraltet' }]);
+	});
+
+	test('A-MITGLIED-07: Fehler der Datei → 400 mit Grund, ohne Inhalt der Datei', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const text = 'vorname;iban\nSina;CH00\n';
+		for (const fn of [postEinlesenVorschau, postEinlesen]) {
+			const r = await fn(s.d, ereignis({ body: { text, erwartet: 1 }, konto: admin.konto }));
+			const antwort = await r.json();
+			expect(r.status).toBe(400);
+			expect(antwort).toMatchObject({
+				fehler: 'datei',
+				datei: { grund: 'spalten', unbekannt: ['iban'] }
+			});
+			expect(JSON.stringify(antwort)).not.toContain('CH00');
+		}
+	});
+
+	test('SI-10: Text fehlt oder ist keine Zeichenkette, erwartet keine ganze Zahl → 400', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		for (const body of [{}, { text: 5 }, { text: ['a'] }]) {
+			const r = await postEinlesenVorschau(s.d, ereignis({ body, konto: admin.konto }));
+			expect([r.status, await r.json()]).toEqual([400, { fehler: 'eingabe' }]);
+		}
+		for (const body of [
+			{ text: 'x' },
+			{ text: 'x', erwartet: '2' },
+			{ text: 'x', erwartet: 1.5 }
+		]) {
+			const r = await postEinlesen(s.d, ereignis({ body, konto: admin.konto }));
+			expect([r.status, await r.json()]).toEqual([400, { fehler: 'eingabe' }]);
+		}
 	});
 });

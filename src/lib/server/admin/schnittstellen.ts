@@ -31,6 +31,7 @@ import {
 	type MitgliedStatus
 } from './mitglieder.ts';
 import { listeBriefEmpfaenger, MAX_BRIEFE, stelleBriefeAus, type BriefAbh } from './briefe.ts';
+import { liesEin, nurFehler, zeigeVorschau } from './einlesen.ts';
 import { ladeAuskunft } from './auskunft.ts';
 import { setzeAnsicht } from './ansicht.ts';
 import {
@@ -409,6 +410,29 @@ export function getFairgate(d: AdminDienste, e: AdminEreignis): Promise<Response
 	return liest(d, e, 'mitglieder', async () => antwort(200, await listeFuerFairgate(d.db)));
 }
 
+// A-MITGLIED-07: Der Text der Datei kommt im JSON-Körper und wird weder gespeichert noch geloggt
+// (SI-05). Schon die Vorschau ist schreibend: Nur der Mitglieder-Admin lädt Mitgliederdaten hoch.
+export function postEinlesenVorschau(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (_urheber, koerper) => {
+		if (typeof koerper.text !== 'string') return eingabeFehler();
+		const v = await zeigeVorschau(d.db, koerper.text, jetzt(d));
+		if (!v.ok) return antwort(400, { fehler: 'datei', datei: nurFehler(v) });
+		return antwort(200, { neu: v.neu, fehlerhaft: v.fehlerhaft, vorhanden: v.vorhanden });
+	});
+}
+
+export function postEinlesen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
+		const { text, erwartet } = koerper;
+		if (typeof text !== 'string' || typeof erwartet !== 'number' || !Number.isSafeInteger(erwartet))
+			return eingabeFehler();
+		const r = await liesEin(d.db, urheber, text, erwartet, jetzt(d));
+		if (r.ergebnis === 'ok') return antwort(200, { angelegt: r.angelegt });
+		if (r.ergebnis === 'veraltet') return antwort(409, { fehler: 'veraltet' });
+		return antwort(400, { fehler: 'datei', datei: nurFehler(r) });
+	});
+}
+
 export function postFairgate(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
 		const id = parseId(e.params.id);
@@ -482,6 +506,8 @@ export const ADMIN_SCHNITTSTELLEN = {
 	getBriefe,
 	postBriefe,
 	postBrief,
+	postEinlesenVorschau,
+	postEinlesen,
 	postAustritt,
 	postWiedereintritt,
 	postLoeschen,

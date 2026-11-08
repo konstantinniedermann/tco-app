@@ -68,7 +68,7 @@ const nameVon = <T extends string>(namen: Record<T, string>, roh: string | null)
 export function aktionText(z: Pick<VerlaufEintrag, 'aktion' | 'detail'>): string {
 	switch (z.aktion) {
 		case 'angelegt':
-			return 'angelegt';
+			return z.detail === 'einlesen' ? 'angelegt (Einlesen)' : 'angelegt';
 		case 'feld-geaendert':
 			return `${nameVon(FELD_NAMEN, z.detail)} geändert`;
 		case 'rolle-vergeben':

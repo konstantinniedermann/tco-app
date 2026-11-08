@@ -8,6 +8,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.14.0 — Mitgliederliste einlesen
+
+- Einlesen (#43, Etappe 2b): Der Mitglieder-Admin liest eine CSV-Datei im MyTCO-Schema ein
+  (Vorlage auf der Seite). Die Vorschau zeigt neue, fehlerhafte und schon vorhandene Zeilen; nach
+  der Rückfrage legt MyTCO alle neuen Mitglieder auf einmal an, ohne Brief-Code. Die Datei wird
+  nicht aufbewahrt; Verlaufseintrag «angelegt (Einlesen)».
+
 ## 0.13.0 — Login-Briefe aus der Verwaltung
 
 - Briefe (#43, Etappe 2a): Der Mitglieder-Admin stellt einen neuen Brief-Code einzeln aus oder

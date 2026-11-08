@@ -37,6 +37,7 @@ describe('Texte der Verwaltung', () => {
 		// Einträge von vor dem Umbau der Rollen nennen die alte Rolle.
 		expect(aktionText({ aktion: 'rolle-entzogen', detail: 'admin' })).toBe('Rolle Admin entzogen');
 		expect(aktionText({ aktion: 'angelegt', detail: null })).toBe('angelegt');
+		expect(aktionText({ aktion: 'angelegt', detail: 'einlesen' })).toBe('angelegt (Einlesen)');
 		expect(aktionText({ aktion: 'fairgate-uebertragen', detail: null })).toBe(
 			'In Fairgate übertragen'
 		);
