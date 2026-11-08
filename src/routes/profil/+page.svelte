@@ -527,7 +527,7 @@
 			{/if}
 		</form>
 	{:else}
-		{@render anzeige(a, titelText, wert, freiwillig, 'nicht erfasst', () => oeffne(a))}
+		{@render anzeige(a, titelText, wert, freiwillig, 'nicht angegeben', () => oeffne(a))}
 	{/if}
 {/snippet}
 
