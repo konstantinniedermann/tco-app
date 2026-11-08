@@ -7,6 +7,86 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Auswertung vom 08.11.2026 (Abend) — 14 Einträge, gegen `dev` (49a426f) verifiziert
+
+Bilanz je Eintrag: 0 ganz verworfen · 7 abgehakt (1 davon überholt) · 4 mitgemacht (dazu 1 Nebenbefund) · 1 Regel ·
+1 an ein Issue (#69) · 1 auf mehrere Ausgänge verteilt (Kleinbefunde #43 Briefe). Bei 7 trug die
+Begründung ganz oder teilweise nicht (Tabelle unten). Abschnitt «Offen» danach leer.
+
+**Verworfen** (Teile)
+
+- 2026-11-08 — Kleinbefunde #43 Briefe, Teil «Rückfrage mit mehreren Rollen ohne E2E» → gibt es:
+  `tests/e2e/mitgliedschaft.test.ts` prüft «Vera bekommt die Rollen Mitglieder-Admin, CM-Admin
+  zurück.» (93e1c6c, vor dem Eintrag)
+- ebenda, Teil «`INTEGER_MAX` schützt nur `leseIds`» → `parseId` (`src/lib/server/parse-id.ts`)
+  begrenzt alle vier ID-Felder im JSON-Körper (`ids`, `mitgliedId`, `kategorieId`, `anId`)
+
+**An Issues angehängt**
+
+- 2026-11-08 — Design System «MyTCO» hinkt dem UI-Leitbild hinterher, mit dem Teil «Trefferliste
+  und Kartenteil fehlen» aus den Kleinbefunden #59 → [Kommentar in #69](https://github.com/konstantinniedermann/tco-app/issues/69#issuecomment-6724275890):
+  ganzes Design System gegen `dev` nachführen, nicht nur die neuen Bausteine
+
+**Mitgemacht**
+
+- 2026-11-08 — Lokale DB `mytco` über 11'000 Mitglieder, Pre-Push-Hook rot, mit 2026-11-08
+  «Briefe-Liste über tausend Zeilen» → a4d8b77, c410b11 (`scripts/e2e.ts`: jeder E2E-Lauf auf eigener,
+  danach gelöschter Datenbank); Nachweis: voller E2E-Lauf 328 grün, `mytco` vorher und nachher
+  11'332 Mitglieder. `mytco` von Hand auf die 15 Seed-Mitglieder verkleinert (Logins blieben),
+  dann c3f4394, a56a070 (`make seed` mit Testbestand: 201 Mitglieder, 2 Anlässe, 146 Antworten)
+- 2026-11-08 — Secret-Scan / OSV scheitern am Download → d305307 (`--retry 5 --retry-delay 15
+  --retry-connrefused`, keine Änderung an der Prüfsumme). Wirkt erst ab dem nächsten CI-Lauf
+- 2026-11-08 — Profil: leere Kachel sagt je Feld etwas anderes → 70e136d (überall «nicht angegeben»)
+- Nebenbefund — `mitgliedIdAus` in `src/lib/server/cm/schnittstellen.ts` mit fester Zahl statt
+  `INTEGER_MAX` → 314ea36
+
+**Regel**
+
+- 2026-11-08 — Pre-Push-Hook und `make check` gleichzeitig: E2E rot → Skill `tco-branching`
+  (1b26fe4): nicht gleichzeitig im selben Worktree; die Datenbank ist als Ursache mit
+  `scripts/e2e.ts` ausgeschlossen, offen bleiben `test-results` und Mailpit
+
+**Abgehakt** — mit Begründung; wo der Punkt zurückkommen kann, mit Trigger
+
+- 2026-11-08 — Übergabe an #59: Namenssuche und Namensanzeige → überholt: `sucheDoppelPartner`
+  nutzt `nameEnthaelt`, die Doppel-Seiten `<Name>` (#59 Etappe 1, 7feb527)
+- 2026-11-08 — Automatische Pushes zu CM-Resultaten und Restzeit ohne Anforderung → die Spec zu
+  #66 hält die Lücke fest («brauchen eine eigene Anforderung»). Trigger: Issue «CM-Betrieb»
+- 2026-11-08 — Kleinbefunde #59 Etappe 1 → die vier Fragen an den Projektleiter (Login beider,
+  Kontakt nach Austritt, Sperre nach Schluss, Grenze für Anfragen) entscheidet die Spec von
+  Etappe 2 (Branch `feat/issue-059-etappe2`); E2E-Hänger einmalig, Trigger: erneuter Hänger,
+  dann zuerst den Trace holen; Code-Hygiene der CM-Seite (993 Zeilen, 8 gleiche Handler,
+  `bisWartend` dreifach u. a.), Trigger: nächster Umbau der CM-Seite
+- 2026-11-08 — Kleinbefunde #43 Briefe, übrige Teile → Code-Teile (doppelte IDs, leere Liste,
+  409 statt 404) über die Schnittstelle nicht erreichbar oder nur im Wettlauf; Testlücken und
+  Grenze 1000, Trigger: Seite *Briefe* oder Mitgliedsseite wird angefasst bzw. die Liste wächst
+  über 1000. Eigener Brief-Code bleibt erlaubt (Entscheid Projektleiter, 044ff52 in
+  `rollen-und-rechte.md`); zwei Admins gleichzeitig folgt aus FR-24
+- 2026-11-08 — Nach 409 bei den Briefen fällt der Fokus auf `body` → Trigger wie oben; beim Fix
+  je eine `toBeFocused`-Prüfung in den zwei 409-Tests
+- 2026-11-08 — Auskunft: Angaben je Gerät nur im DB-Test → Trigger: Auskunft-Seite oder ihr E2E
+  wird angefasst (braucht ein Testmitglied mit Sitzung)
+- 2026-11-08 — Einlesen: 2000 Zeilen nur berechnet → Verein hat 300–500 Mitglieder. Trigger: eine
+  Datei mit über 1000 Zeilen soll eingelesen werden
+- Nebenbefund (Review) — übrig gebliebene Datenbanken `mytco_test_*` abgebrochener
+  Vitest-Läufe und von Hand angelegte `mytco_<name>` räumt `scripts/e2e.ts` nicht weg (nur
+  `mytco_e2e_*`) → je wenige MB, harmlos. Trigger: der lokale Datenbank-Server wird spürbar voll
+- 2026-11-08 — Turnierleitung am Handy: Namensspalte bricht um → `.tabelle td` erbt
+  `hyphens: auto` (`src/lib/design/basis.css`), nicht gemessen. Trigger: ein CM-Admin nutzt die
+  Liste am Handy, oder die Verwaltungstabellen werden umgebaut
+
+**Falsche Prämissen**
+
+| Eintrag | Behauptet | Gemessen |
+|---|---|---|
+| Einlesen 2000 Zeilen | Ein DB-Test liesse die gemeinsame Test-DB jedes Mal wachsen | Die DB-Tests legen je Lauf eine eigene Datenbank an und löschen sie (`tests/setup/datenbank-global.ts`) |
+| Secret-Scan / OSV | `--retry 3 --retry-all-errors` fängt kurze Störungen ab | Die Ausfälle dauerten 5–6 Minuten, `--retry 3` wartet 7 s; `--retry-all-errors` ist nicht nötig (504 zählt als vorübergehend) |
+| Design System | 23 Commits Rückstand; README hinkt mit «‹ Zurück» hinterher | 36 Commits; das Leitbild selbst sagt noch «‹ Zurück» (wartet auf #69) |
+| Kleinbefunde #43 Briefe | Mehrrollen-Rückfrage ohne E2E; `INTEGER_MAX` nur in `leseIds` | Beides widerlegt (siehe Verworfen) |
+| Fokus nach 409 | Die Taste verschwindet | Auf der Seite *Briefe* wird sie gesperrt; Fokus auf `body` nicht gemessen |
+| Profil | betrifft «freiwillige Felder» | Telefon und Klassierung sind in der Kachel nicht als freiwillig markiert |
+| Kleinbefunde #59 | Fragen offen für den Projektleiter | In der Spec von Etappe 2 schon entschieden |
+
 ### Auswertung vom 08.11.2026 — 44 Einträge, gegen `dev` (ec9b0c5) verifiziert
 
 Bilanz je Eintrag: 1 verworfen · 16 abgehakt (3 davon überholt) · 9 mitgemacht · 4 Doku ·
