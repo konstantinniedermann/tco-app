@@ -112,6 +112,15 @@ Jede Etappe endet grün (`make check`), mit Nachweis und einem Merge nach `dev`.
 
 Die Etappe 1 kommt zuerst, weil alle anderen Rechte, Verlauf und Verwaltungsrahmen brauchen.
 
+**Etappe 2 geteilt (Projektleiter, 08.11.2026):** zuerst **2a Briefe** (einzelner Brief auf der
+Seite eines Mitglieds, Seite *Briefe* mit Serie, Druckansicht), weil der Pilot sie braucht; der
+«neue Brief-Code» aus Etappe 1 kommt mit 2a. Danach **2b Einlesen**, nötig erst für die
+300–500 Mitglieder zu 1.0. Nachweis 2a: DB-Test Ausstellen und Verlauf, E2E Serie → Druckansicht,
+Screenshot der Druckansicht; 2b wie oben. Mit den [geschärften Rollen](2026-11-06-rollen-schaerfen-design.md)
+gilt: Briefe und Einlesen schreibt der Mitglieder-Admin (Bereich `mitglieder`), der
+MyTCO-Admin sieht die Seiten nur lesend und stellt keine Codes aus. **Stand:** Etappe 2a ist
+umgesetzt; offen ist 2b Einlesen.
+
 ## Rollen und Admin-Zugang
 
 - **Rollen** als eigene Tabelle (Konto ↔ Rolle, mehrere je Konto, RR-01). Bekannte Rollen
@@ -191,8 +200,9 @@ Die Etappe 1 kommt zuerst, weil alle anderen Rechte, Verlauf und Verwaltungsrahm
   nie eingeloggt), mit Angabe, ob schon ein Brief-Code ausgestellt ist, und Auswahl (alle oder
   einzelne). So erhalten auch Nachzügler einen zweiten Brief; der neue Code ersetzt den alten
   (Entscheid Projektleiter, 06.11.2026). «Briefe erzeugen» stellt für die
-  Auswahl je einen Brief-Code aus (bestehende Funktion `stelleBriefCodeAus`, FR-24) und
-  öffnet eine Druckansicht mit einer Seite je Brief aus `baueBriefHtml`.
+  Auswahl je einen Brief-Code aus (`stelleBriefCodeAusIn` in `stelleBriefeAus`, eine
+  Transaktion für alle, FR-24) und öffnet eine Druckansicht mit einer Seite je Brief aus
+  `baueBriefInhalt`.
 - **Einzelner Brief:** «Neuen Brief-Code ausstellen» auf der Seite eines Mitglieds öffnet
   dieselbe Druckansicht für ein Mitglied.
 - **Code nur einmal sichtbar:** Die Druckansicht entsteht aus der Antwort des Servers und
@@ -201,8 +211,9 @@ Die Etappe 1 kommt zuerst, weil alle anderen Rechte, Verlauf und Verwaltungsrahm
 - **Verlauf:** je Mitglied «Brief-Code ausgestellt».
 - **Sicherheitsregeln des Browsers:** `baueBriefHtml` liefert heute ein eigenes Dokument mit
   eingebettetem `<style>`, das die Content-Security-Policy der App blockt. Der Brief wird für
-  die Druckansicht umgebaut (Stil aus einer Datei bzw. aus `basis.css`), ohne Ausnahme in der
-  Policy. Der Musterbrief (`make musterbrief`) muss weiter gleich aussehen.
+  die Druckansicht umgebaut: `baueBriefInhalt` liefert nur den Inhalt, den Stil bringt
+  `brief.css`, ohne Ausnahme in der Policy. `baueBriefHtml` bleibt für den Musterbrief
+  (`make musterbrief`), der weiter gleich aussieht.
 
 ## Austritt und Löschen
 

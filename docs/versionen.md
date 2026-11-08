@@ -8,6 +8,16 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.13.0 — Login-Briefe aus der Verwaltung
+
+- Briefe (#43, Etappe 2a): Der Mitglieder-Admin stellt einen neuen Brief-Code einzeln aus oder
+  erzeugt Briefe für alle, die MyTCO noch nie geöffnet haben, und druckt sie aus einer Druckansicht
+  des Browsers. Der Code erscheint nur dort; Verlaufseintrag «Brief-Code ausgestellt».
+- Mitgliedschaft (#43): Den eigenen Austritt und das eigene Löschen erfasst ein anderer
+  Mitglieder-Admin (RR-10). Kommen beim Wiedereintritt oder «Löschung rückgängig» gespeicherte
+  Admin-Rollen zurück, fragt die Verwaltung vorher nach. Jahr und Zeitpunkte der Verwaltung in
+  Schweizer Zeit, auch auf einem Server in UTC.
+
 ## 0.12.0 — Rufname
 
 - Rufname (#67): Wer will, trägt im Profil unter «Meine Angaben» einen Rufnamen ein (höchstens 10 Zeichen).

@@ -27,6 +27,9 @@ import {
 	loescheMitglied,
 	nimmLoeschungZurueck,
 	ladeAuskunft,
+	ladeBriefe,
+	erzeugeBriefe,
+	erzeugeBrief,
 	ladeAnmeldungen,
 	meldeVonHandAn,
 	verschiebeAnmeldung,
@@ -421,6 +424,7 @@ describe('Mitgliedschaft: Austritt, Löschung, Auskunft', () => {
 		expect(await mit(409, { fehler: 'veraltet' })).toEqual({ art: 'veraltet' });
 		expect(await mit(409, { fehler: 'letzter-mytco' })).toEqual({ art: 'letzter-mytco' });
 		expect(await mit(409, { fehler: 'frist-abgelaufen' })).toEqual({ art: 'frist-abgelaufen' });
+		expect(await mit(409, { fehler: 'eigenes-konto' })).toEqual({ art: 'eigenes-konto' });
 		expect(await mit(403, { fehler: 'nur-ansehen' })).toEqual({ art: 'nur-ansehen' });
 		expect(await mit(404, {})).toEqual({ art: 'nicht-gefunden' });
 		expect(await mit(500, {})).toEqual({ art: 'stoerung' });
@@ -435,5 +439,23 @@ describe('Mitgliedschaft: Austritt, Löschung, Auskunft', () => {
 		});
 		expect(h.aufrufe[0].pfad).toBe('/api/admin/mitglieder/5/auskunft');
 		expect(h.aufrufe[0].init.method).toBe('GET');
+	});
+	it('A-LOGIN-01: Briefe lesen, als Serie und einzeln erzeugen; 409 nicht-moeglich mit anzahl', async () => {
+		const l = holer(json(200, []));
+		expect(await ladeBriefe(l.holen)).toEqual({ art: 'ok', daten: [] });
+		expect(l.aufrufe[0].pfad).toBe('/api/admin/briefe');
+		expect(l.aufrufe[0].init.method).toBe('GET');
+		const s = holer(json(200, { briefe: [] }));
+		expect(await erzeugeBriefe([3, 4], s.holen)).toEqual({ art: 'ok', daten: { briefe: [] } });
+		expect(s.aufrufe[0].pfad).toBe('/api/admin/briefe');
+		expect(JSON.parse(String(s.aufrufe[0].init.body))).toEqual({ ids: [3, 4] });
+		const e = holer(json(200, { briefe: [] }));
+		await erzeugeBrief(7, e.holen);
+		expect(e.aufrufe[0].pfad).toBe('/api/admin/mitglieder/7/brief');
+		expect(JSON.parse(String(e.aufrufe[0].init.body))).toEqual({});
+		const n = holer(json(409, { fehler: 'nicht-moeglich', anzahl: 2 }));
+		expect(await erzeugeBriefe([1, 2], n.holen)).toEqual({ art: 'nicht-moeglich', anzahl: 2 });
+		const k = holer(json(403, { fehler: 'kein-recht' }));
+		expect(await erzeugeBrief(1, k.holen)).toEqual({ art: 'kein-recht' });
 	});
 });

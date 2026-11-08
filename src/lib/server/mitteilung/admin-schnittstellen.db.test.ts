@@ -92,6 +92,11 @@ function baue(teil: { push?: PushSender | null; mailer?: Mailer } = {}) {
 		db: db(),
 		zugang,
 		hinweis: async () => {},
+		brief: {
+			schluessel: 'y'.repeat(40),
+			adresse: 'https://mytco.example.org',
+			kontakt: 'kontakt@example.org'
+		},
 		jetzt: () => JETZT,
 		push:
 			teil.push === undefined

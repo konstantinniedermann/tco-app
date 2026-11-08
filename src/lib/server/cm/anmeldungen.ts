@@ -21,7 +21,8 @@ import {
 	type Spieler
 } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
-import { jahrInZuerich, spielerAus } from './angaben.ts';
+import { jahrInZuerich } from '../datum.ts';
+import { spielerAus } from './angaben.ts';
 
 export type CmStand = {
 	id: number;

@@ -18,6 +18,8 @@ export type Aktion =
 	| 'loeschung-vorgemerkt'
 	| 'loeschung-zurueckgenommen'
 	| 'auskunft-erstellt'
+	// RR-04: ohne `detail`; der Code selbst steht nie im Verlauf.
+	| 'brief-code-ausgestellt'
 	// FR-46, FR-08: jede Änderung des CM-Admins an einer Anmeldung, neutral: ohne Kategorie,
 	// Wildcard oder Entscheid, weil auch der Mitglieder-Admin den Verlauf sieht.
 	| 'cm-anmeldung-geaendert';

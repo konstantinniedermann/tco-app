@@ -116,6 +116,30 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-08 — Nach einem 409 bei den Briefen fällt der Fokus auf `body`
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/routes/verwaltung/briefe/+page.svelte` («Briefe erzeugen»), `src/routes/verwaltung/mitglieder/[id]/+page.svelte` («Neuen Brief-Code ausstellen»)
+
+**Beobachtung:** Antwortet der Server mit 409, lädt die Seite den neuen Stand; die Taste, die die Rückfrage geöffnet hat, verschwindet dabei, und der Fokus fällt auf `body`. Die Meldung selbst kommt über `role="alert"` an.
+
+**Ursprung:** Review Task 5, #43 Etappe 2a.
+
+**Einschätzung:** Klein, Feinschliff für die Barrierefreiheit: den Fokus nach dem Neuladen auf die Meldung oder den Titel der Karte setzen.
+
+### 2026-11-08 — Briefe-Liste im lokalen E2E über tausend Zeilen, Tests darum langsam
+
+**Thema:** Betrieb
+
+**Fundort:** `tests/e2e/briefe.test.ts`, gemeinsame lokale Datenbank `mytco`
+
+**Beobachtung:** Die Seite *Briefe* zeigt alle aktiven Mitglieder, die MyTCO nie geöffnet haben. Jeder E2E-Lauf legt solche Test-Mitglieder an und räumt sie nicht weg; lokal stehen schon rund 1300 in der Liste. axe und das ganzseitige Bildschirmfoto (über 60 000 px hoch) brauchen dafür so lange, dass die Datei ein Zeitlimit von 90 s braucht. In der CI (frische Datenbank) ist die Liste klein. Dasselbe trifft schon andere Dateien: `mitteilungen.test.ts` «FR-42: allgemeine Mitteilung an den Verein» läuft auf dem iPhone ins 30-s-Limit, weil die Vorschau lokal 10 630 aktive Mitglieder zählt (auch beim Wiederholen rot).
+
+**Ursprung:** #43 Etappe 2a, Aufgabe 4.
+
+**Einschätzung:** Solange die Läufe grün bleiben, abhaken; wächst die Laufzeit weiter, Test-Mitglieder beim Lauf aufräumen oder die lokale Datenbank zurücksetzen.
+
 ### 2026-11-08 — Profil: leere Kachel sagt je Feld etwas anderes
 
 **Thema:** App-Oberfläche

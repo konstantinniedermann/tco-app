@@ -12,7 +12,7 @@ import {
 	beantrageWildcard,
 	meldeAn as meldeZurCmAnInDb
 } from '../../../src/lib/server/cm/anmeldungen.ts';
-import { mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
+import { konto, mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../../../src/lib/server/turnier/angaben.ts';
 import {
 	legeKategorieAn,
@@ -134,6 +134,11 @@ export async function setzeSpielerangaben(
 	await hole().db.update(mitglied).set(angaben).where(eq(mitglied.id, mitgliedId));
 }
 
+/** Leert die Strasse eines erfundenen Mitglieds: Die Adresse ist dann unvollständig (A-LOGIN-01). */
+export async function leereStrasse(mitgliedId: number): Promise<void> {
+	await hole().db.update(mitglied).set({ strasse: '' }).where(eq(mitglied.id, mitgliedId));
+}
+
 /** Setzt den Rufnamen eines erfundenen Mitglieds (nur das Mitglied selbst tut das im Profil). */
 export async function setzeRufname(mitgliedId: number, rufname: string | null): Promise<void> {
 	await hole().db.update(mitglied).set({ rufname }).where(eq(mitglied.id, mitgliedId));
@@ -179,6 +184,33 @@ export async function meldeZumAnlass(
 /** Stellt für ein bestehendes Konto einen weiteren Brief-Code aus (ohne Bindestrich). */
 export async function stelleBriefCodeAus(kontoId: number): Promise<string> {
 	return (await hole().dienst.stelleBriefCodeAus(kontoId)).code;
+}
+
+/** Lässt den Brief-Code eines Kontos ablaufen (gestern), ohne ihn zu benutzen. */
+export async function laesstBriefCodeAblaufen(kontoId: number): Promise<void> {
+	const gestern = new Date(Date.now() - 24 * 60 * 60 * 1000);
+	await hole().db.update(konto).set({ briefCodeAblauf: gestern }).where(eq(konto.id, kontoId));
+}
+
+/**
+ * Erfundenes Mitglied, ausgetreten oder zum Löschen vorgemerkt, mit gespeicherten Rollen.
+ * `davor`: der Zustand vor dem Vormerken (nur bei `vorgemerkt`).
+ */
+export async function legeEhemaligesAn(
+	vorname: string,
+	nachname: string,
+	status: 'ausgetreten' | 'vorgemerkt',
+	rollen: Rolle[],
+	davor: 'aktiv' | 'ausgetreten' = 'aktiv'
+) {
+	const m = await legeMitgliedAn(hole().db, { vorname, nachname, status, rollen });
+	if (status === 'vorgemerkt' && davor === 'ausgetreten') {
+		await hole()
+			.db.update(mitglied)
+			.set({ statusVorher: 'ausgetreten', austrittAm: new Date() })
+			.where(eq(mitglied.id, m.mitgliedId));
+	}
+	return m;
 }
 
 export async function beendeAlleSitzungen(kontoId: number): Promise<void> {
