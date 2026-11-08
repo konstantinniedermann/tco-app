@@ -209,7 +209,7 @@ test('Kaltstart mit offener Mail-Anfrage zeigt das Feld «Code aus der Mail»; L
 	await expect(page).toHaveURL(/\/login\/mail$/);
 	await expect(page.getByLabel('Code aus der Mail')).toBeVisible();
 
-	// «‹ Zurück» führt zur Brief-Seite und springt nicht wieder zurück.
+	// «‹ Anmelden» führt zur Brief-Seite und springt nicht wieder zurück.
 	await page.getByRole('link', { name: '‹ Anmelden' }).click();
 	await expect(page).toHaveURL(/\/login$/);
 	await expect(page.getByLabel('Code aus dem Brief')).toBeVisible();

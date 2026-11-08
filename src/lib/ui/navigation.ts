@@ -116,7 +116,8 @@ export function zeigtFusszeile(routeId: string | null, fehler: boolean): boolean
 }
 
 /**
- * Jede Seite beginnt oben (auch jeder Reiter). Nur «‹ Zurück» und die Zurück-Taste oder -Geste
+ * Jede Seite beginnt oben (auch jeder Reiter). Nur der Zurück-Link (auch ein Reiter auf einer
+ * Unterseite, der eine Stufe höher führt) und die Zurück-Taste oder -Geste
  * des Browsers bringen eine Seite dorthin zurück, wo man sie verlassen hat.
  */
 export function stelltStandWiederHer(

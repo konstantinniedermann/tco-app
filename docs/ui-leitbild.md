@@ -174,7 +174,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Nebentaste | `.taste-neben` | weiss mit grünem Rand; gedrückt `--farbe-marke-zart` |
 | Link | `a` | grün, unterstrichen |
 | Zurück | `.zurueck` | „‹ <Titel der Elternseite>" oben links auf Unterseiten, z. B. „‹ Profil", „‹ Clubmeisterschaft 2027"; führt eine Stufe höher in der [festen Ordnung](#feste-ordnung), egal woher man kam; immer einzeilig, ein zu langer Name endet mit „…" |
-| Pfad | `nav.pfad` | nur Verwaltung: über dem Titel jeder Unterseite die Stufen von der Seitenleiste bis hier, getrennt durch „›", z. B. „Turniere › Clubmeisterschaft 2027 › Herren R5/R9"; jede Stufe ein Link, die aktuelle Seite fett und ohne Link (`aria-current="page"`); passt er nicht in eine Zeile (schmaler Bildschirm), steht statt seiner nur „‹ <Elternseite>" als `.zurueck`; nie umbrechend, nicht im Druck |
+| Pfad | `nav.pfad` | nur Verwaltung: über dem Titel jeder Unterseite die Stufen von der Seitenleiste bis hier, getrennt durch „›", z. B. „Turniere › Clubmeisterschaft 2027 › Herren R5/R9"; jede Stufe ein Link, die aktuelle Seite fett und ohne Link (`aria-current="page"`); unter `60rem` Breite des App-Rahmens steht statt seiner nur „‹ <Elternseite>" als `.zurueck`, darüber endet ein zu langer Pfad mit „…"; nie umbrechend, nicht im Druck |
 | Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); ein Auswahlfeld (`select`) sieht aus wie ein Textfeld (gleiche Höhe, gleicher Rand) mit einem Pfeil rechts in `--farbe-text`, auf allen Geräten gleich statt im Aussehen des Browsers (UI-03); gesperrt ohne Pfeil; bei einer festen Höchstlänge zählt der Hilfetext mit („12 von 50 Zeichen", `.feld-hilfe`); als Dateiwahl (`input type="file"`, nur Verwaltung: *Einlesen*) mit dem Rand des Felds und der Wahltaste des Browsers im Aussehen der Nebentaste; Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
 | Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>`. Als Schalter (Ein/Aus, gilt sofort, ohne Speichern-Taste) dieselbe Fläche mit Häkchen statt Kreis (`type="checkbox"`), angehakt heisst ein: *Benachrichtigungen* im Profil |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
@@ -361,8 +361,9 @@ auf beiden Seiten stehen.
 Balken gleitet hinüber (`--dauer-mittel`). Weil nur der Rollbereich scrollt, wirkt der Tipp
 auch, während der Inhalt noch nachläuft. Jeder Reiter beginnt oben. Wer den aktiven Reiter
 nochmals antippt, kommt auf einer Unterseite zur obersten Seite des Bereichs (wie beim
-iPhone), auf der obersten Seite nach oben. Nur der Zurück-Link und die Zurück-Taste oder
--Geste des Browsers bringen eine Seite dorthin zurück, wo man sie verlassen hat.
+iPhone), auf der obersten Seite nach oben. Nur der Zurück-Link, der aktive Reiter auf einer
+Unterseite (er führt wie der Zurück-Link eine Stufe höher) und die Zurück-Taste oder -Geste
+des Browsers bringen eine Seite dorthin zurück, wo man sie verlassen hat.
 
 **Aufklappbereiche im Profil** (*Meine Angaben*, *Anmelden mit Passkey*, *Benachrichtigungen*)
 sind anfangs zu und merken sich, ob sie offen sind, solange die App offen ist; nach dem

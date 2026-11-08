@@ -166,7 +166,8 @@ CM mit «Deine Kategorien» und «Alle Kategorien» (Entwurf 1). Das baut der CM
 
 Keine neuen Personendaten. Der Reiter CM zeigt dasselbe wie die heutige CM-Seite. Der Pfad in der
 Verwaltung zeigt den Namen eines Mitglieds nur auf dessen eigenen Seiten (Mitglied, Auskunft,
-Verlauf), wo er schon im Titel steht, und nur den Admins, die diese Seiten heute schon sehen.
+Verlauf; auf dem Verlauf steht er schon in jeder Zeile der Tabelle) und nur den Admins, die diese
+Seiten heute schon sehen.
 
 ## Nachweis (Definition of Done aus #69)
 

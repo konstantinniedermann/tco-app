@@ -118,9 +118,9 @@
 	} as const;
 
 	/**
-	 * Übernimmt die neue Ansicht nach dem Speichern. Vorgeladene Seiten (die Startseite beim
-	 * Antippen von «‹ Zurück») verfallen, damit ihr Zähler stimmt. `/api/cm` lädt nur die
-	 * Startseite; diese Seite lädt dabei nicht neu und kann so auch keine Fehlerseite zeigen.
+	 * Übernimmt die neue Ansicht nach dem Speichern. Vorgeladene Seiten (Startseite, Reiter CM)
+	 * verfallen, damit ihr Zähler stimmt. Diese Seite holt `/api/cm` ungebunden (`+page.ts`),
+	 * lädt dabei nicht neu und kann so auch keine Fehlerseite zeigen.
 	 */
 	async function uebernimm(neu: CmAnsicht) {
 		cm = neu;

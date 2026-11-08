@@ -36,7 +36,7 @@
 	);
 
 	// Nur der Rollbereich scrollt (UI-Leitbild, Baustein Rollbereich), darum führt die App die
-	// Position selbst: Jede Seite beginnt oben, «‹ Zurück» und die Zurück-Taste des Browsers
+	// Position selbst: Jede Seite beginnt oben, der Zurück-Link und die Zurück-Taste des Browsers
 	// bringen sie an die alte Stelle. SvelteKit scrollt nur das Dokument, das hier nie scrollt.
 	// Nur ein Speicher, nicht reaktiv: Nichts in der Anzeige hängt davon ab.
 	let rollbereich = $state<HTMLElement>();

@@ -77,7 +77,7 @@
 		}
 	}
 
-	// «‹ Zurück» in Schritt 2 führt zu Schritt 1 (andere Adresse eingeben).
+	// «‹ Andere Adresse» in Schritt 2 führt zu Schritt 1.
 	async function zuSchritt1(event: MouseEvent) {
 		event.preventDefault();
 		vergissWechsel(speicher);

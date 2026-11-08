@@ -136,7 +136,7 @@ test('Jeder Reiter beginnt oben; aktiver Reiter führt nach oben', async ({ page
 	await expect.poll(() => gerollt(page)).toBe(0);
 });
 
-test('«‹ Zurück» und Zurück des Browsers bringen die Seite an die alte Stelle', async ({
+test('Zurück-Link und Zurück des Browsers bringen die Seite an die alte Stelle', async ({
 	page
 }) => {
 	await meldeAn(page, 'Jana');

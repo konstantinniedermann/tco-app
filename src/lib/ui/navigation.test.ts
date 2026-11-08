@@ -89,7 +89,7 @@ describe('Reiter', () => {
 		expect(aktiverReiter('/profil/email', null)).toBe('/profil');
 	});
 
-	it('beginnt oben, ausser bei «‹ Zurück» und der Zurück-Taste des Browsers', () => {
+	it('beginnt oben, ausser beim Zurück-Link und der Zurück-Taste des Browsers', () => {
 		expect(stelltStandWiederHer('/profil', '/', 'link')).toBe(false);
 		expect(stelltStandWiederHer('/', '/', 'link')).toBe(false);
 		expect(stelltStandWiederHer('/', '/hilfe', 'link')).toBe(false);
