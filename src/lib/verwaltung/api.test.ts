@@ -343,7 +343,7 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 		const treffer = [
 			{
 				mitgliedId: 12,
-				name: 'Muster, Hanna',
+				name: { rufname: null, vorname: 'Hanna', nachname: 'Muster' },
 				geschlecht: 'w',
 				jahrgang: 1990,
 				klassierung: 'R7'
