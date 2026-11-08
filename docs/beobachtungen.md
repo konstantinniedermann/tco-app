@@ -242,3 +242,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) des Konzepts zu #66.
 
 **Einschätzung:** Mittel bis niedrig: fällt erst mit CM-Betrieb ins Gewicht. Braucht dann eine eigene Anforderung (Auslöser, Zeitgeber, Einstellung des Spielers); Push hat beim Projektleiter Vorrang vor Mail.
+
+### 2026-11-08 — Pre-Push-Hook und `make check` gleichzeitig im selben Worktree: E2E rot
+
+**Thema:** CI
+
+**Fundort:** `.githooks/pre-push` (volle Prüfung samt E2E), `make check`
+
+**Beobachtung:** Ein `git push` lief, während im selben Worktree `make check` auf einer eigenen Datenbank lief. Beide E2E-Läufe gleichzeitig: 19 Tests rot (Verwaltung, Bewegung, Mitgliedschaft, auf allen Geräten), dieselben Tests einzeln danach grün. Ursache nicht geklärt (gemeinsamer Ordner `test-results`, Mailpit oder die gemeinsame DB `mytco` des Hooks).
+
+**Ursprung:** #43 Etappe 2b, Session vom 08.11.2026.
+
+**Einschätzung:** Niedrig: Pushen erst nach grünem `make check` (dann prüft der Hook nicht noch einmal voll). Vielleicht ein Satz im Skill `tco-branching`.
+
+### 2026-11-08 — Einlesen: Übernahme von 2000 Zeilen nur berechnet, nicht mit der DB belegt
+
+**Thema:** Verwaltung, Oberfläche
+
+**Fundort:** `src/lib/server/admin/einlesen.ts` (`liesEin`, je ein Insert für Mitglieder, Konten, Verlauf)
+
+**Beobachtung:** Die Grenze von 2000 Zeilen ist nur beim Lesen der Datei getestet. 2000 × 11 Felder ergeben etwa 22'000 Parameter, PostgreSQL erlaubt 65'535; kein Test legt wirklich 2000 an. Zudem vergleicht die Übernahme nur die Anzahl der neuen Zeilen mit der Vorschau, nicht welche es sind (doppelte Mitglieder verhindert die Datenbank trotzdem).
+
+**Ursprung:** Review (`cas-reviewer`) von #43 Etappe 2b.
+
+**Einschätzung:** Niedrig: Der Verein hat 300–500 Mitglieder. Ein DB-Test mit 2000 Zeilen würde die gemeinsame Test-DB jedes Mal um 2000 Mitglieder wachsen lassen; nur mit eigener DB sinnvoll.
