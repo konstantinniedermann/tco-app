@@ -112,6 +112,14 @@ Jede Etappe endet grün (`make check`), mit Nachweis und einem Merge nach `dev`.
 
 Die Etappe 1 kommt zuerst, weil alle anderen Rechte, Verlauf und Verwaltungsrahmen brauchen.
 
+**Etappe 2 geteilt (Projektleiter, 08.11.2026):** zuerst **2a Briefe** (einzelner Brief auf der
+Seite eines Mitglieds, Seite *Briefe* mit Serie, Druckansicht), weil der Pilot sie braucht; der
+«neue Brief-Code» aus Etappe 1 kommt mit 2a. Danach **2b Einlesen**, nötig erst für die
+300–500 Mitglieder zu 1.0. Nachweis 2a: DB-Test Ausstellen und Verlauf, E2E Serie → Druckansicht,
+Screenshot der Druckansicht; 2b wie oben. Mit den [geschärften Rollen](2026-11-06-rollen-schaerfen-design.md)
+gilt: Briefe und Einlesen schreibt der Mitglieder-Admin (Bereich `mitglieder`), der
+MyTCO-Admin sieht die Seiten nur lesend und stellt keine Codes aus.
+
 ## Rollen und Admin-Zugang
 
 - **Rollen** als eigene Tabelle (Konto ↔ Rolle, mehrere je Konto, RR-01). Bekannte Rollen
