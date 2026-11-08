@@ -8,6 +8,11 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.17.1 — Abhängigkeiten aktualisiert
+
+- Abhängigkeiten aktualisiert (Dependabot #68, nur Entwicklungswerkzeuge): vitest und
+  @vitest/coverage-v8 5.1.0, vite 8.3.6, svelte-check 4.7.8, eslint-plugin-svelte 3.24.0.
+
 ## 0.17.0 — Doppel in der Verwaltung
 
 - Doppel in der Verwaltung (#59, Etappe 2): Der CM-Admin sieht Paare, Suchende und offene
