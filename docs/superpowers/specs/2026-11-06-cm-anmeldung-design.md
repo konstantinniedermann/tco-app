@@ -154,6 +154,105 @@ die niemand bearbeiten kann.
    Doppel-Anmeldung *zurückgezogen*, und der andere bekommt eine Mail (Entscheid Projektleiter).
 5. **Kontaktdaten:** Partner sehen gegenseitig E-Mail und Telefon bis zum Ende der CM (FR-19).
 
+**Präzisierungen vor dem Bau (08.11.2026):**
+
+- **Zwei Etappen in einem Issue** (#59; Entscheid Projektleiter): *Etappe 1* baut die
+  Mitgliederseite (Partnerwahl, «Partner gesucht» mit Kommentar, Abmelden, Austritt, Meldungen,
+  Kontaktdaten). *Etappe 2* baut die Doppel in der Verwaltung (Präzisierung zu Teil 4 vom
+  07.11.2026: Liste, von Hand anmelden, verschieben, löschen, Partner ändern, zwei *sucht
+  Partner* zusammenlegen). Jede Etappe geht einzeln nach `dev`.
+- **Partnerwahl ist eine Anfrage** (Entscheid Projektleiter; ersetzt Ziel 2 *Keine Zustimmung
+  nötig* und die Annahme K-27 dazu): Wählt Lea einen Partner, bekommt er eine **Anfrage** und
+  nimmt sie an oder lehnt sie ab. Das gilt, ob er *sucht Partner* oder noch gar nicht
+  angemeldet ist. Erst mit dem Annehmen entsteht das Paar.
+  - Mit der Anfrage sieht der Angefragte Leas Namen, Klassierung und Telefonnummer, damit er
+    sie anrufen kann (Entscheid Projektleiter); ohne Telefon die E-Mail (Entscheid Claude).
+    Die Rückfrage vor dem Senden sagt Lea das. Seine Kontaktdaten sieht Lea erst nach dem
+    Annehmen.
+  - **Mehrere Anfragen gleichzeitig** gehen, auch in derselben Kategorie; sie zählen nicht bei
+    der Grenze von 3 (Entscheid Projektleiter). Senden geht nur, solange man selbst die Grenze
+    nicht erreicht hat oder in der Kategorie schon allein sucht.
+  - **Annehmen** prüft die Regeln neu: Geschlecht, Jahrgang, Mindestsumme und die Grenze von 3
+    für beide. Fehlen dem Angefragten Angaben, fragt die CM-Seite sie vorher ab (Teil 2). Mit
+    dem Annehmen verfallen alle übrigen offenen Anfragen der beiden in dieser Kategorie, und
+    wer sie gestellt hat, bekommt eine Meldung (Entscheid Claude).
+  - **Wo das Paar landet:** Sucht der Angefragte schon, kommt Lea in seine Anmeldung; sucht nur
+    Lea, kommt er in ihre; sonst entsteht eine neue. Suchen beide, wird Leas eigene
+    *zurückgezogen* (Entscheid Claude).
+  - **Ablehnen** ohne Grund; Lea bekommt eine Meldung. **Zurückziehen** geht, solange die
+    Anfrage offen ist.
+  - **Beim Anmeldeschluss offene Anfragen** bleiben stehen; der CM-Admin sieht sie in der Liste
+    und legt die beiden zusammen oder nicht (Entscheid Projektleiter, Etappe 2). Danach
+    nehmen Mitglieder nicht mehr an.
+  - **Nicht gespeichert, was erledigt ist:** Eine Anfrage, die abgelehnt, zurückgezogen oder
+    verfallen ist, wird gelöscht, sobald die Meldung verschickt ist; angenommen wird sie zur
+    Anmeldung (Entscheid Claude, Datensparsamkeit). Erneut anfragen geht.
+  - Der CM-Admin meldet Paare in Etappe 2 weiter ohne Anfrage an (Teil 4, Ziel 2).
+- **Push, sonst E-Mail** für alle Meldungen zum Doppel (Entscheid Projektleiter): neue Anfrage,
+  angenommen, abgelehnt, verfallen, Partner hat abgemeldet, Paar wegen Austritt
+  zurückgezogen. Weg und Regeln wie in Teil 4 (FR-44; Themen-Schalter gelten nicht). Wer
+  selbst eine Anmeldung ändert (allein anmelden, annehmen, abmelden), bekommt wie im Einzel die
+  Mail mit allen eigenen Anmeldungen (Teil 2, Ziel 7); der andere nur die Meldung (Entscheid
+  Claude). Ziel 2 bis 4 oben sind damit überholt, wo sie «Mail» sagen.
+- **Die Meldungen nennen den anderen Spieler**, weil sie sonst nichts aussagen (Datenschutz
+  unten: Einzelmeldung an Beteiligte); das gilt auch für Meldungen aus der Verwaltung in
+  Etappe 2. Sie nennen keinen CM-Admin und keinen Grund wie einen Austritt, und keine
+  Telefonnummer: Die steht nur in MyTCO, nicht auf dem Sperrbildschirm (Entscheid Claude).
+  Texte mit einem, höchstens zwei Sätzen, z. B. «Lea Beispiel möchte mit dir Mixed Doppel
+  spielen. Annehmen oder ablehnen kannst du in MyTCO.» Claude schreibt die Texte, der
+  Projektleiter sieht sie am Schluss mit den Screenshots.
+- **Nur mit eigenem Login wählbar** (Entscheid Projektleiter): Wer kein Login hat, kann keine
+  Anfrage annehmen; ihn meldet der CM-Admin an (Teil 4, Ziel 2).
+- **Fehlen einem möglichen Partner Geschlecht oder Jahrgang**, ist er wählbar und trägt den
+  Vermerk *Angaben fehlen*, wie bei fehlender Klassierung (*Klassierung fehlt*) (Entscheid
+  Projektleiter). In der Suche steht nur einer der beiden Vermerke: *Angaben fehlen*, sobald
+  Geschlecht oder Jahrgang fehlt, sonst *Klassierung fehlt* (Entscheid Claude). Ein Partner
+  mit fehlender Klassierung wird in der Suche nicht an der Summe gemessen; das Annehmen prüft
+  sie.
+- **Wer in der Suche steht:** aktive Mitglieder mit Login ausser einem selbst, die nach
+  Geschlecht und Jahrgang passen (oder *Angaben fehlen*), in der Kategorie nicht schon zu zweit
+  angemeldet sind, die Grenze von 3 nicht erreicht haben (eine eigene *sucht-Partner*-Anmeldung
+  in dieser Kategorie zählt schon mit) und mit dem Spieler die Mindestsumme erreichen (Entscheid
+  Projektleiter: nur passende). Im *Mixed* nur das andere Geschlecht. Die Liste erscheint erst
+  nach zwei getippten Buchstaben. Sie zeigt **Name und Klassierung** (Entscheid Projektleiter),
+  sonst den Vermerk, dazu *sucht Partner* mit Kommentar und ob man ihn schon angefragt hat.
+- **Kommentar bei «Partner gesucht»** (Wunsch Projektleiter): Wer sich allein anmeldet, kann
+  einen kurzen Kommentar schreiben, z. B. «Suche jemanden auf R5–R7-Niveau, eher abends».
+  Freiwillig, höchstens 120 Zeichen, änderbar, solange er sucht. Ihn sehen alle Mitglieder,
+  bei der Kategorie und in der Partnersuche; ein Hinweis beim Feld sagt das und bittet um keine
+  Angaben zur Gesundheit (Entscheid Projektleiter). Findet sich ein Partner oder meldet er ab,
+  wird der Kommentar gelöscht, nicht nur ausgeblendet (Entscheid Projektleiter). Er ist nicht
+  der Wildcard-Kommentar (anderer Kreis, der ihn sieht); wie das Schema beide trennt, ist dem
+  Bauenden überlassen.
+- **Austritt und Löschvormerkung** eines Spielers, solange die Anmeldung offen ist: Die ganze
+  Doppel-Anmeldung ist *zurückgezogen*, wie beim Abmelden, und der Partner bekommt eine
+  Meldung ohne Grund (Entscheid Projektleiter; Hinweis aus #43). Seine offenen Anfragen
+  verfallen. Nach dem Anmeldeschluss bleibt die Anmeldung stehen, wie im Einzel. Bei der
+  Löschung bleibt nur der Name (Datenschutz, *Löschfrist*); Kommentar und Anfragen werden
+  mitgelöscht.
+- **Auf der CM-Seite** (Variante A des Entwurfs, Entscheid Projektleiter): Jede Doppelkategorie
+  ist eine Karte mit den bestätigten Paaren («Anna Probst / Sara Keller») und darunter, wer
+  *sucht Partner*, mit Kommentar. **Anfragen an einen selbst** stehen oben in einer eigenen
+  Karte mit *Annehmen* und *Ablehnen*; die eigenen offenen Anfragen bei ihrer Kategorie, mit
+  *Zurückziehen*. Die Startseiten-Kachel nennt offene Anfragen an einen (Entscheid Claude).
+- **Kontaktdaten des Partners** stehen auf der CM-Seite bei der eigenen Doppel-Anmeldung, als
+  Links zum Anrufen und Schreiben, solange das Turnier läuft (Entscheid Claude; das *Ende der
+  CM* kommt mit *CM-Betrieb*). Der Hinweis vor der ersten Anmeldung nennt neu auch den
+  Doppelpartner; vor dem Annehmen sagt die Rückfrage dasselbe.
+- **Partner ändern in der Verwaltung** (Etappe 2, Entscheid Projektleiter): Wer herausfällt,
+  ist nicht mehr angemeldet und bekommt eine Meldung. Die alte Anmeldung bleibt als
+  *zurückgezogen* stehen, das neue Paar ist eine neue Anmeldung, damit nachvollziehbar bleibt,
+  wer wann dabei war.
+- **Einzel oder Doppel wechseln** geht nur, solange die Kategorie keine aktiven Anmeldungen hat
+  (Entscheid Projektleiter; ändert Teil 1, Ziel 5 für diesen Fall). Sonst würde aus einer
+  Einzel-Anmeldung ungefragt ein *sucht Partner*.
+- **Kategorie ändern im Doppel** (FR-36): Die Warnung zählt Paare, die nach den neuen Werten
+  nicht mehr passen (Geschlecht, Jahrgang, Mindestsumme), und Spieler, die allein suchen und
+  nach Geschlecht oder Jahrgang nicht mehr passen (Entscheid Claude).
+- **Seed:** `make seed` ergänzt erfundene Doppel-Anmeldungen: Paare, zwei *sucht Partner*
+  (einer mit Kommentar), eine offene Anfrage und einen Spieler mit fehlender Klassierung.
+- **Oberfläche:** zuerst ein Design-Entwurf (Entscheid Projektleiter), siehe *Oberfläche*.
+
 ### Teil 4 — Anmeldungen verwalten
 
 1. **Liste je Kategorie** mit Status (*bestätigt*, *beantragt* = Wildcard-Antrag) und Vermerk *sucht Partner*, dazu die
@@ -277,11 +376,20 @@ Partnerwahl die Namen passender Mitglieder sind dort schon vorgesehen, ebenso di
 und der Hinweis zu den Kontaktdaten. Neu und nachzuführen (Konzept und Datenschutzerklärung):
 
 - Der Vermerk *sucht Partner* ist für alle Mitglieder sichtbar.
-- Der Vermerk *Klassierung fehlt* ist bei der Partnerwahl sichtbar.
+- Der Vermerk *Klassierung fehlt* ist bei der Partnerwahl sichtbar, ebenso *Angaben fehlen*
+  (Geschlecht oder Jahrgang fehlt; Präzisierung zu Teil 3).
+- Der freiwillige Kommentar bei *sucht Partner* ist für alle Mitglieder sichtbar und wird
+  gelöscht, sobald ein Partner gefunden ist oder der Spieler abmeldet (Präzisierung zu Teil 3).
+- Bei der Partnerwahl sehen Mitglieder die **Klassierung** der passenden Mitglieder
+  (Präzisierung zu Teil 3).
+- Wer eine Partner-Anfrage stellt, gibt dem Angefragten Name, Klassierung und Telefonnummer
+  (sonst E-Mail) frei; die Kontaktdaten des Angefragten sieht er erst nach dem Annehmen. Erledigte
+  Anfragen werden gelöscht (Präzisierung zu Teil 3).
 - Die Mails an Doppelpartner nennen den Namen des anderen Spielers (Einzelmail an Beteiligte,
   keine Sammelmail; DS-05 bleibt erfüllt).
-- Wer von einem Partner oder vom CM-Verantwortlichen angemeldet wird, bekommt den Hinweis zu
-  den Kontaktdaten in der Mail statt vorher; die Kontaktdaten sind sofort sichtbar, abmelden
+- Wer vom CM-Verantwortlichen angemeldet wird, bekommt den Hinweis zu
+  den Kontaktdaten in der Mail statt vorher (ein Doppelpartner seit der Präzisierung zu Teil 3
+  vor dem Annehmen der Anfrage); die Kontaktdaten sind sofort sichtbar, abmelden
   geht bis zum Anmeldeschluss (Entscheid Projektleiter). Ergänzt *Kontaktdaten* im Konzept.
 - Mitglieder tragen fehlendes Geschlecht und fehlenden Jahrgang einmal selbst ein (beides steht
   schon unter *Welche Daten*).
@@ -317,6 +425,17 @@ Warnung im Kategorie-Formular entstehen direkt aus den Bausteinen des UI-Leitbil
 per Playwright-Screenshot auf iPhone und Android und mit axe. Fehlt ein Baustein, kommt er
 trotzdem zuerst ins Leitbild.
 
+**Teil 3 (Entscheid Projektleiter, 08.11.2026):** zuerst ein Design-Entwurf für die
+Mitgliederseite (Etappe 1): Design-Artifact
+[MyTCO CM Doppel](https://claude.ai/artifact/5N9wh3oa2D9ULWvvZEya7q), Variante A. Doppelkategorie
+als Karte mit Paaren und *sucht Partner*; Seite *Anmelden* mit den Karten *Partner anfragen*
+(Suche, Treffer mit Klassierung oder Vermerk) und *Noch keinen Partner?* (Kommentar); Rückfrage
+vor dem Senden; Karte *Anfrage für …* mit *Annehmen* (Haupttaste) und *Ablehnen*; eigene
+Doppel-Anmeldung mit den Kontaktdaten des Partners. Neu ist die **Trefferliste** (Liste von
+Kacheln mit Trennlinie, je eine Aktion); sie kommt vor dem Bau ins UI-Leitbild.
+Die Verwaltung (Etappe 2) folgt dem UI-Leitbild ohne Entwurf, wie Teil 4 (Entscheid Claude).
+Abnahme per Bildvergleich und axe.
+
 ## Nicht-Ziele
 
 - Gruppen, KO-Tableaus, Spielplan, Resultate (*CM-Betrieb*).
@@ -324,8 +443,8 @@ trotzdem zuerst ins Leitbild.
   geklärt sind; beide Richtungen sollen so einfach wie möglich gehen (Entscheid Projektleiter).
 - Kategorien vom Vorjahr übernehmen.
 - Benachrichtigung per Push, SMS oder WhatsApp im CM-Betrieb (A-ANMELDUNG-08, -09). Teil 2
-  und 3 schreiben nur Mails; Teil 4 schickt seine Meldungen *Push, sonst E-Mail* (Präzisierung
-  vom 07.11.2026).
+  schreibt nur Mails; Teil 3 und 4 schicken ihre Meldungen *Push, sonst E-Mail*
+  (Präzisierungen vom 07. und 08.11.2026).
 - Anmeldung für ein Kind durch die Eltern (#45, Junioren); bis dahin meldet der
   CM-Verantwortliche Junioren von Hand an.
 
