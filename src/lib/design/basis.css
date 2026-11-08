@@ -500,6 +500,30 @@ html {
 	cursor: not-allowed;
 }
 
+/* Pfad der Verwaltung (UI-Leitbild, Baustein Pfad): auf schmalem Bildschirm nur «‹ <Eltern>» */
+.pfad {
+	display: none;
+	margin-bottom: var(--abstand-3);
+}
+
+.pfad ol {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pfad li {
+	display: inline;
+}
+
+.pfad li + li::before {
+	content: ' › ';
+	color: var(--farbe-text-leise);
+}
+
 .zurueck {
 	display: inline-block;
 	max-width: 100%;
@@ -1658,6 +1682,14 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 
 /* PC-Layout ab 60em Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
 @container app (min-width: 60rem) {
+	.pfad {
+		display: block;
+	}
+
+	.pfad-kurz {
+		display: none;
+	}
+
 	.inhalt {
 		padding: var(--abstand-6);
 	}

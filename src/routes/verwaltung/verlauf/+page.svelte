@@ -2,7 +2,8 @@
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
-	import { ladeVerlauf, type VerlaufEintrag } from '../../../lib/verwaltung/api.ts';
+	import { ladeMitglied, ladeVerlauf, type VerlaufEintrag } from '../../../lib/verwaltung/api.ts';
+	import Pfad from '../../../lib/verwaltung/Pfad.svelte';
 	import { aktionText, zeitText } from '../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 
@@ -12,6 +13,21 @@
 		return roh !== null && /^\d+$/.test(roh) ? Number(roh) : undefined;
 	});
 	let zeilen = $state<VerlaufEintrag[]>([]);
+	// Name des Mitglieds für den Pfad («Mitglieder › Nachname, Vorname › Änderungsverlauf»).
+	let name = $state<string | null>(null);
+	$effect(() => {
+		const id = mitglied;
+		name = null;
+		if (id === undefined) return;
+		let aktuell = true;
+		ladeMitglied(id).then((a) => {
+			if (aktuell && a.art === 'ok')
+				name = `${a.daten.angaben.nachname}, ${a.daten.angaben.vorname}`;
+		});
+		return () => {
+			aktuell = false;
+		};
+	});
 	let fehler = $state<string | null>(null);
 	let geladen = $state(false);
 
@@ -38,10 +54,17 @@
 	<title>Änderungsverlauf – MyTCO</title>
 </svelte:head>
 
-{#if mitglied !== undefined}
-	<a class="zurueck" href={resolve('/verwaltung/mitglieder/[id]', { id: String(mitglied) })}
-		>‹ Zurück</a
-	>
+{#if mitglied !== undefined && name !== null}
+	<Pfad
+		stufen={[
+			{ text: 'Mitglieder', href: resolve('/verwaltung/mitglieder') },
+			{
+				text: name,
+				href: resolve('/verwaltung/mitglieder/[id]', { id: String(mitglied) })
+			}
+		]}
+		aktuell="Änderungsverlauf"
+	/>
 {/if}
 <h1>Änderungsverlauf</h1>
 <p class="leise">

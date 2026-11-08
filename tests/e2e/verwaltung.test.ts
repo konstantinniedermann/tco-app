@@ -17,6 +17,7 @@ import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,
+	pruefePfad,
 	sammleKonsolenfehler,
 	wartetAufVorladen
 } from './hilfen/seite.ts';
@@ -134,6 +135,7 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 	await expect(page).toHaveURL(/\/verwaltung\/verlauf\?mitglied=\d+$/);
 	await expect(page.getByRole('heading', { level: 1, name: 'Änderungsverlauf' })).toBeVisible();
 	await expect(page.getByRole('cell', { name: 'Telefon geändert' })).toBeVisible();
+	await pruefePfad(page, ['Mitglieder', `${nachname}, Erika`], 'Änderungsverlauf');
 	await pruefeBildschirm(page, info, 'verwaltung-verlauf');
 
 	// A-MITGLIED-06: Suche in der Liste.

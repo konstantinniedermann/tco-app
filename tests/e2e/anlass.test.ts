@@ -8,7 +8,12 @@ import {
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
+import {
+	pruefeBildschirm,
+	pruefePfad,
+	sammleKonsolenfehler,
+	wartetAufVorladen
+} from './hilfen/seite.ts';
 
 test.afterAll(async () => {
 	await schliesseLoginHilfen();
@@ -158,7 +163,11 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	await expect(tabelle).toContainText('kommt');
 	await expect(tabelle).not.toContainText('Bin in den Ferien.');
 	await pruefeBildschirm(page, info, 'anlass-verwaltung');
-	await page.getByRole('link', { name: '‹ Zurück' }).click();
+	await pruefePfad(page, ['Anlässe'], titel);
+	await page
+		.getByRole('main')
+		.getByRole('link', { name: /^(‹ )?Anlässe$/ })
+		.click();
 	await expect(page.getByRole('link', { name: titel })).toBeVisible();
 	await pruefeBildschirm(page, info, 'anlass-liste');
 	expect(fehler).toEqual([]);
