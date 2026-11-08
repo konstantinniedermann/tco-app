@@ -847,6 +847,12 @@ describe('CM-Anmeldung', () => {
 		await anfrage(nina, marco);
 		expect(await stand(marco)).toMatchObject({ anfragen: 2 });
 
+		// Eine abgesagte Kategorie: Zählung und Liste lassen die Anfragen dort weg.
+		await db.update(kategorie).set({ status: 'abgesagt' }).where(eq(kategorie.id, mixed));
+		expect(await stand(marco)).toMatchObject({ anfragen: 0 });
+		expect((await ladeCmAnsicht(db, t.id, marco, t.jetzt))?.anfragen).toEqual([]);
+		await db.update(kategorie).set({ status: 'aktiv' }).where(eq(kategorie.id, mixed));
+
 		// Wer die Anmeldung zurückzieht, verschwindet aus den Listen.
 		await db.update(anmeldung).set({ status: 'zurueckgezogen' }).where(eq(anmeldung.id, leaId));
 		expect(kat(await ladeCmAnsicht(db, t.id, marco, t.jetzt), mixed)?.suchende).toEqual([]);

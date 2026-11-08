@@ -165,7 +165,7 @@ export async function laufendeTurniere(
 		.select({ turnierId: kategorie.turnierId, n: count() })
 		.from(partnerAnfrage)
 		.innerJoin(kategorie, eq(kategorie.id, partnerAnfrage.kategorieId))
-		.where(eq(partnerAnfrage.anId, mitgliedId))
+		.where(and(eq(partnerAnfrage.anId, mitgliedId), anfrageZaehlt))
 		.groupBy(kategorie.turnierId);
 	const anfragen = new Map(offene.map((o) => [o.turnierId, o.n]));
 	return zeilen.map((z) => ({
@@ -267,6 +267,9 @@ export async function ladeCmAnsicht(
 	};
 }
 
+/** Eine Anfrage zählt nur, solange ihre Kategorie nicht abgesagt ist; Zählung und Liste teilen sich das. */
+const anfrageZaehlt = eq(kategorie.status, 'aktiv');
+
 /** Telefon, sonst E-Mail, sonst nichts. */
 const kontaktVon = (m: { telefon: string | null; email: string | null }): CmAnfrage['kontakt'] => {
 	const telefon = m.telefon?.trim();
@@ -292,11 +295,7 @@ async function offeneAnfragenAn(db: Db, turnierId: number, mitgliedId: number) {
 		.innerJoin(kategorie, eq(kategorie.id, partnerAnfrage.kategorieId))
 		.innerJoin(mitglied, eq(mitglied.id, partnerAnfrage.vonId))
 		.where(
-			and(
-				eq(partnerAnfrage.anId, mitgliedId),
-				eq(kategorie.turnierId, turnierId),
-				eq(kategorie.status, 'aktiv')
-			)
+			and(eq(partnerAnfrage.anId, mitgliedId), eq(kategorie.turnierId, turnierId), anfrageZaehlt)
 		)
 		.orderBy(asc(partnerAnfrage.gestelltAm), asc(partnerAnfrage.id));
 	return zeilen.map((z): CmAnfrage => ({
