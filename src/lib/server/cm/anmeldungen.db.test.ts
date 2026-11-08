@@ -2,7 +2,7 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { anmeldung, anmeldungSpieler, kategorie, mitglied } from '../db/schema.ts';
+import { anmeldung, anmeldungSpieler, kategorie, mitglied, partnerAnfrage } from '../db/schema.ts';
 import type { KategorieWerte } from '../turnier/angaben.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../turnier/turniere.ts';
 import { setzeKlassierung } from './angaben.ts';
@@ -126,6 +126,9 @@ async function bisWartend(n: number) {
 	throw new Error(`nach 3 s warten nicht ${n} Anfragen auf eine Sperre`);
 }
 
+/** Einzel-Kategorien kennen weder Paare noch Suchende noch Anfragen. */
+const ohneDoppel = { paare: [], suchende: [], eigen: null, meineAnfragen: [] };
+
 async function anmeldungId(kategorieId: number, mitgliedId: number, jetzt: Date) {
 	expect(await meldeAn(db, kategorieId, mitgliedId, jetzt)).toBe('ok');
 	const [a] = await aktiveVon(mitgliedId, [kategorieId]);
@@ -133,7 +136,7 @@ async function anmeldungId(kategorieId: number, mitgliedId: number, jetzt: Date)
 }
 
 describe('CM-Anmeldung', () => {
-	test('A-ANMELDUNG-03, FR-07: Ansicht zeigt nur passende Einzel-Kategorien mit Namen der bestätigten, Doppel nie', async () => {
+	test('A-ANMELDUNG-03, FR-07: Ansicht zeigt nur passende Kategorien, im Einzel mit Namen der bestätigten', async () => {
 		const t = await offenesTurnier();
 		const [herren] = t.kategorien;
 		const damen = await kategorieIn(t.id, 'Damen', { geschlecht: 'damen' });
@@ -147,7 +150,7 @@ describe('CM-Anmeldung', () => {
 			klassierungVon: 'N1',
 			klassierungBis: 'R9'
 		});
-		await kategorieIn(t.id, 'Doppel', {
+		const doppel = await kategorieIn(t.id, 'Doppel', {
 			geschlecht: 'offen',
 			art: 'doppel',
 			klassierungVon: null,
@@ -188,7 +191,8 @@ describe('CM-Anmeldung', () => {
 				name: `Clubmeisterschaft ${t.jahr}`,
 				anmeldeschluss: `${t.jahr}-05-31`,
 				status: 'offen',
-				anzahl: 0
+				anzahl: 0,
+				anfragen: 0
 			},
 			fehlt: [],
 			spieler: { geschlecht: 'm', jahrgang: 1990, klassierung: 'R3' },
@@ -205,7 +209,8 @@ describe('CM-Anmeldung', () => {
 					mindestsumme: null,
 					passt: true,
 					anmeldungId: null,
-					namen: ['Adam Alpha', 'Bert Alpha', 'Anna Zeta']
+					namen: ['Adam Alpha', 'Bert Alpha', 'Anna Zeta'],
+					...ohneDoppel
 				},
 				{
 					id: offen,
@@ -219,11 +224,28 @@ describe('CM-Anmeldung', () => {
 					mindestsumme: null,
 					passt: true,
 					anmeldungId: null,
-					namen: []
+					namen: [],
+					...ohneDoppel
+				},
+				{
+					id: doppel,
+					name: 'Doppel',
+					art: 'doppel',
+					geschlecht: 'offen',
+					jahrgangVon: null,
+					jahrgangBis: null,
+					klassierungVon: null,
+					klassierungBis: null,
+					mindestsumme: 10,
+					passt: true,
+					anmeldungId: null,
+					namen: [],
+					...ohneDoppel
 				}
 			],
 			wildcard: [],
 			eigene: [],
+			anfragen: [],
 			grenze: 3
 		});
 		for (const k of [damen, schwach, senioren, abgesagt]) {
@@ -284,7 +306,8 @@ describe('CM-Anmeldung', () => {
 			name: `Clubmeisterschaft ${t.jahr}`,
 			anmeldeschluss: `${t.jahr}-05-31`,
 			status: 'offen',
-			anzahl: 2
+			anzahl: 2,
+			anfragen: 0
 		});
 		expect(await eigeneKategorien(db, t.id, ich)).toEqual(['Herren A', 'Herren B']);
 		expect(await zaehleAktive(db, b)).toBe(1);
@@ -457,14 +480,16 @@ describe('CM-Anmeldung', () => {
 				name: `Clubmeisterschaft ${jahr + 1}`,
 				anmeldeschluss: `${jahr + 1}-05-31`,
 				status: 'offen',
-				anzahl: 0
+				anzahl: 0,
+				anfragen: 0
 			},
 			{
 				id: uebernaechstes,
 				name: `Clubmeisterschaft ${jahr + 2}`,
 				anmeldeschluss: `${jahr + 2}-05-31`,
 				status: 'geschlossen',
-				anzahl: 0
+				anzahl: 0,
+				anfragen: 0
 			}
 		]);
 		expect(await ladeCmAnsicht(db, vorbereitung, ich, jetzt)).toBeNull();
@@ -665,5 +690,250 @@ describe('CM-Anmeldung', () => {
 			.where(eq(anmeldung.kategorieId, stark));
 		expect(alle.map((z) => z.status).sort()).toEqual(['abgelehnt', 'beantragt']);
 		expect(alle.find((z) => z.status === 'abgelehnt')?.id).toBe(erster.id);
+	});
+
+	test('A-ANMELDUNG-04, FR-19: Doppel auf der CM-Seite mit Paaren, Suchenden, Partner-Kontakt und Anfragen', async () => {
+		const t = await offenesTurnierMit(async (id) => {
+			const doppel = { art: 'doppel', klassierungVon: null, klassierungBis: null, mindestsumme: 9 };
+			return {
+				mixed: await kategorieIn(id, 'Mixed Doppel', { ...doppel, geschlecht: 'mixed' } as never),
+				herren: await kategorieIn(id, 'Herren Doppel', {
+					...doppel,
+					geschlecht: 'herren'
+				} as never),
+				einzel: await kategorieIn(id, 'Herren A')
+			};
+		});
+		const { mixed, herren, einzel } = t.k;
+		const kontakt = (telefon: string | null, email: string | null) => ({ telefon, email });
+		const setze = (id: number, k: { telefon: string | null; email: string | null }) =>
+			db.update(mitglied).set(k).where(eq(mitglied.id, id));
+		const doppelAnmeldung = async (kategorieId: number, ids: number[], suchtext: string | null) => {
+			const [a] = await db
+				.insert(anmeldung)
+				.values({ kategorieId, suchtext, angemeldetAm: t.jetzt, geaendertAm: t.jetzt })
+				.returning({ id: anmeldung.id });
+			await db
+				.insert(anmeldungSpieler)
+				.values(ids.map((mitgliedId) => ({ anmeldungId: a.id, mitgliedId })));
+			return a.id;
+		};
+
+		const rita = await spieler({
+			vorname: 'Rita',
+			nachname: 'Zumbach',
+			geschlecht: 'w',
+			klassierung: 'R4'
+		});
+		const sepp = await spieler({
+			vorname: 'Sepp',
+			nachname: 'Aebi',
+			geschlecht: 'm',
+			klassierung: 'R3'
+		});
+		const lea = await spieler({
+			vorname: 'Lea',
+			nachname: 'Marbach',
+			geschlecht: 'w',
+			klassierung: 'R6'
+		});
+		const marco = await spieler({
+			vorname: 'Marco',
+			nachname: 'Beispiel',
+			geschlecht: 'm',
+			klassierung: 'R5'
+		});
+		const nina = await spieler({
+			vorname: 'Nina',
+			nachname: 'Neutral',
+			geschlecht: 'w',
+			klassierung: 'R7'
+		});
+		await setze(sepp, kontakt('079 111 22 33', 'sepp@example.org'));
+		await setze(rita, kontakt(null, 'rita@example.org'));
+		await setze(lea, kontakt('079 444 55 66', 'lea@example.org'));
+		await setze(marco, kontakt('079 777 88 99', 'marco@example.org'));
+		await setze(nina, kontakt('079 000 00 00', 'nina@example.org'));
+
+		const paarId = await doppelAnmeldung(mixed, [rita, sepp], null);
+		const leaId = await doppelAnmeldung(mixed, [lea], 'Abends frei');
+		const marcoId = await doppelAnmeldung(mixed, [marco], null);
+		const anfrage = async (von: number, an: number) => {
+			const [a] = await db
+				.insert(partnerAnfrage)
+				.values({ kategorieId: mixed, vonId: von, anId: an, gestelltAm: t.jetzt })
+				.returning({ id: partnerAnfrage.id });
+			return a.id;
+		};
+		const anfrageId = await anfrage(lea, marco);
+
+		const kat = (a: Awaited<ReturnType<typeof ladeCmAnsicht>>, id: number) =>
+			a?.kategorien.find((k) => k.id === id);
+
+		// Marco: Herren Doppel und Mixed, Paar und Suchende ohne ihn, Anfrage von Lea mit Telefon.
+		const m = await ladeCmAnsicht(db, t.id, marco, t.jetzt);
+		expect(m?.kategorien.map((k) => k.name)).toEqual(['Mixed Doppel', 'Herren Doppel', 'Herren A']);
+		expect(kat(m, mixed)).toMatchObject({
+			art: 'doppel',
+			mindestsumme: 9,
+			passt: true,
+			anmeldungId: marcoId,
+			namen: [],
+			paare: ['Sepp Aebi / Rita Zumbach'],
+			suchende: [{ name: 'Lea Marbach', kommentar: 'Abends frei' }],
+			eigen: { art: 'sucht', kommentar: null },
+			meineAnfragen: []
+		});
+		expect(kat(m, herren)).toMatchObject({
+			anmeldungId: null,
+			eigen: null,
+			paare: [],
+			suchende: []
+		});
+		expect(kat(m, einzel)).toMatchObject({ art: 'einzel', paare: [], suchende: [], eigen: null });
+		expect(m?.anfragen).toEqual([
+			{
+				anfrageId,
+				kategorieId: mixed,
+				kategorie: 'Mixed Doppel',
+				von: 'Lea Marbach',
+				klassierung: 'R6',
+				kontakt: { art: 'telefon', wert: '079 444 55 66' }
+			}
+		]);
+		expect(m?.turnier.anzahl).toBe(1);
+
+		// Ohne Telefon: die E-Mail-Adresse.
+		await setze(lea, kontakt(null, 'lea@example.org'));
+		expect((await ladeCmAnsicht(db, t.id, marco, t.jetzt))?.anfragen[0].kontakt).toEqual({
+			art: 'email',
+			wert: 'lea@example.org'
+		});
+		await setze(lea, kontakt('079 444 55 66', 'lea@example.org'));
+
+		// Lea: Herren Doppel nicht für sie, die eigene Anfrage an Marco, ihr Suchtext.
+		const l = await ladeCmAnsicht(db, t.id, lea, t.jetzt);
+		expect(l?.kategorien.map((k) => k.name)).toEqual(['Mixed Doppel']);
+		expect(kat(l, mixed)).toMatchObject({
+			anmeldungId: leaId,
+			suchende: [{ name: 'Marco Beispiel', kommentar: null }],
+			eigen: { art: 'sucht', kommentar: 'Abends frei' },
+			meineAnfragen: [{ anfrageId, an: 'Marco Beispiel' }]
+		});
+		expect(l?.anfragen).toEqual([]);
+
+		// Rita im Paar: Telefon und E-Mail des Partners (beides darf fehlen).
+		const r = await ladeCmAnsicht(db, t.id, rita, t.jetzt);
+		expect(kat(r, mixed)).toMatchObject({
+			anmeldungId: paarId,
+			paare: ['Sepp Aebi / Rita Zumbach'],
+			eigen: {
+				art: 'paar',
+				partner: { name: 'Sepp Aebi', telefon: '079 111 22 33', email: 'sepp@example.org' }
+			}
+		});
+		const s = await ladeCmAnsicht(db, t.id, sepp, t.jetzt);
+		expect(kat(s, mixed)?.eigen).toEqual({
+			art: 'paar',
+			partner: { name: 'Rita Zumbach', telefon: null, email: 'rita@example.org' }
+		});
+
+		// Laufende Turniere zählen die offenen Anfragen an einen selbst.
+		const stand = async (id: number) =>
+			(await laufendeTurniere(db, id, t.jetzt)).find((x) => x.id === t.id);
+		expect(await stand(marco)).toMatchObject({ anzahl: 1, anfragen: 1 });
+		expect(await stand(lea)).toMatchObject({ anzahl: 1, anfragen: 0 });
+		expect(await stand(nina)).toMatchObject({ anzahl: 0, anfragen: 0 });
+		await anfrage(nina, marco);
+		expect(await stand(marco)).toMatchObject({ anfragen: 2 });
+
+		// Wer die Anmeldung zurückzieht, verschwindet aus den Listen.
+		await db.update(anmeldung).set({ status: 'zurueckgezogen' }).where(eq(anmeldung.id, leaId));
+		expect(kat(await ladeCmAnsicht(db, t.id, marco, t.jetzt), mixed)?.suchende).toEqual([]);
+		await db.update(anmeldung).set({ status: 'bestaetigt' }).where(eq(anmeldung.id, leaId));
+	});
+
+	test('A-ANMELDUNG-04, DS-08: die Ansicht eines Dritten enthält weder Kontakt noch Klassierung anderer', async () => {
+		const t = await offenesTurnierMit((id) =>
+			kategorieIn(id, 'Mixed Doppel', {
+				art: 'doppel',
+				geschlecht: 'mixed',
+				klassierungVon: null,
+				klassierungBis: null,
+				mindestsumme: 9
+			})
+		);
+		const lea = await spieler({
+			vorname: 'Lea',
+			nachname: 'Marbach',
+			geschlecht: 'w',
+			klassierung: 'R6'
+		});
+		const marco = await spieler({
+			vorname: 'Marco',
+			nachname: 'Beispiel',
+			geschlecht: 'm',
+			klassierung: 'R5'
+		});
+		const paula = await spieler({
+			vorname: 'Paula',
+			nachname: 'Paar',
+			geschlecht: 'w',
+			klassierung: 'R2'
+		});
+		const paul = await spieler({
+			vorname: 'Paul',
+			nachname: 'Paar',
+			geschlecht: 'm',
+			klassierung: 'N4'
+		});
+		const nina = await spieler({
+			vorname: 'Nina',
+			nachname: 'Neutral',
+			geschlecht: 'w',
+			klassierung: 'R7'
+		});
+		for (const [id, tel] of [
+			[lea, '079 444 55 66'],
+			[marco, '079 777 88 99'],
+			[paula, '079 123 45 67'],
+			[paul, '079 765 43 21']
+		] as const) {
+			await db
+				.update(mitglied)
+				.set({ telefon: tel, email: `m${id}@example.org` })
+				.where(eq(mitglied.id, id));
+		}
+		for (const ids of [[lea], [marco], [paula, paul]]) {
+			const [a] = await db
+				.insert(anmeldung)
+				.values({
+					kategorieId: t.k,
+					suchtext: 'Gern am Abend',
+					angemeldetAm: t.jetzt,
+					geaendertAm: t.jetzt
+				})
+				.returning({ id: anmeldung.id });
+			await db
+				.insert(anmeldungSpieler)
+				.values(ids.map((mitgliedId) => ({ anmeldungId: a.id, mitgliedId })));
+		}
+		await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: t.k, vonId: lea, anId: marco, gestelltAm: t.jetzt });
+
+		const ansicht = await ladeCmAnsicht(db, t.id, nina, t.jetzt);
+		expect(ansicht?.kategorien[0]).toMatchObject({
+			paare: ['Paul Paar / Paula Paar'],
+			suchende: [
+				{ name: 'Marco Beispiel', kommentar: 'Gern am Abend' },
+				{ name: 'Lea Marbach', kommentar: 'Gern am Abend' }
+			]
+		});
+		const json = JSON.stringify(ansicht);
+		for (const verboten of ['079', '@example.org', 'telefon', 'email', 'R6', 'R5', 'R2', 'N4']) {
+			expect(json).not.toContain(verboten);
+		}
+		expect(ansicht?.anfragen).toEqual([]);
 	});
 });

@@ -1,12 +1,14 @@
 // Anmeldungen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01, A-ANMELDUNG-04,
 // A-ANMELDUNG-10, FR-05 bis FR-10, FR-37); Anfragen und Suche im Doppel in `doppel.ts`.
 import { and, asc, count, eq, gte, inArray, ne, sql } from 'drizzle-orm';
+import type { Klassierung } from '../../turnier/klassierung.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
 	anmeldung,
 	anmeldungSpieler,
 	kategorie,
 	mitglied,
+	partnerAnfrage,
 	turnier,
 	type AnmeldungStatus,
 	type Art,
@@ -30,14 +32,39 @@ export type CmStand = {
 	anmeldeschluss: string;
 	status: TurnierStatus;
 	anzahl: number;
+	/** Offene Partner-Anfragen an einen selbst in diesem Turnier. */
+	anfragen: number;
 };
+
+/** Der Partner eines bestätigten Paars, mit Kontakt (FR-19). */
+export type CmPartner = { name: string; telefon: string | null; email: string | null };
 
 export type CmKategorie = KategorieRegel & {
 	id: number;
 	name: string;
 	passt: boolean;
+	/** Die eigene aktive Anmeldung in dieser Kategorie, auch im Doppel. */
 	anmeldungId: number | null;
+	/** Einzel: Namen der Bestätigten; im Doppel leer, dort stehen `paare` und `suchende`. */
 	namen: string[];
+	/** Doppel: «Vorname Nachname / Vorname Nachname» der bestätigten Paare. */
+	paare: string[];
+	/** Doppel: wer allein angemeldet ist und einen Partner sucht, ohne einen selbst. */
+	suchende: { name: string; kommentar: string | null }[];
+	/** Doppel: der eigene Stand in dieser Kategorie. */
+	eigen: { art: 'paar'; partner: CmPartner } | { art: 'sucht'; kommentar: string | null } | null;
+	/** Doppel: die eigenen offenen Anfragen in dieser Kategorie. */
+	meineAnfragen: { anfrageId: number; an: string }[];
+};
+
+/** Offene Anfrage an einen selbst; Kontakt und Klassierung sieht nur der Angefragte (FR-19). */
+export type CmAnfrage = {
+	anfrageId: number;
+	kategorieId: number;
+	kategorie: string;
+	von: string;
+	klassierung: Klassierung | null;
+	kontakt: { art: 'telefon' | 'email'; wert: string } | null;
 };
 
 /** Aktiv sind bestätigte und (ab Teil 4) beantragte Anmeldungen. */
@@ -51,6 +78,7 @@ export type CmAnsicht = {
 	/** FR-08: Kategorien, für die ein Wildcard-Antrag geht oder schon läuft. */
 	wildcard: CmKategorie[];
 	eigene: { anmeldungId: number; kategorie: string; status: AktiverStatus }[];
+	anfragen: CmAnfrage[];
 	grenze: 3;
 };
 
@@ -133,15 +161,29 @@ export async function laufendeTurniere(
 		.where(and(ne(turnier.status, 'vorbereitung'), gte(turnier.jahr, jahrInZuerich(jetzt))))
 		.groupBy(turnier.id)
 		.orderBy(asc(turnier.jahr));
-	return zeilen.map((z) => ({ ...z, status: wirksamerStatus(z.status, z.anmeldeschluss, jetzt) }));
+	const offene = await db
+		.select({ turnierId: kategorie.turnierId, n: count() })
+		.from(partnerAnfrage)
+		.innerJoin(kategorie, eq(kategorie.id, partnerAnfrage.kategorieId))
+		.where(eq(partnerAnfrage.anId, mitgliedId))
+		.groupBy(kategorie.turnierId);
+	const anfragen = new Map(offene.map((o) => [o.turnierId, o.n]));
+	return zeilen.map((z) => ({
+		...z,
+		status: wirksamerStatus(z.status, z.anmeldeschluss, jetzt),
+		anfragen: anfragen.get(z.id) ?? 0
+	}));
 }
 
 /**
  * Die CM-Seite eines Mitglieds; `null`, wenn das Turnier unbekannt oder in Vorbereitung ist.
- * Doppel bleiben ausgeblendet. Kategorien gibt es erst, wenn keine Angabe mehr fehlt (FR-37);
+ * Kategorien gibt es erst, wenn keine Angabe mehr fehlt (FR-37);
  * dann die passenden (FR-07) und die, in denen das Mitglied schon aktiv angemeldet ist. Unter
  * `wildcard` stehen die laufenden Anträge und die, für die ein Antrag geht (FR-08); jede
- * Kategorie steht nur in einer der beiden Listen.
+ * Kategorie steht nur in einer der beiden Listen. Doppel stehen in `kategorien`, wenn man allein
+ * passt (`passtDoppelAllein`) oder dort angemeldet ist; ein Wildcard gibt es nur im Einzel.
+ * Kontakt und Klassierung eines anderen Mitglieds stehen nur beim eigenen Partner und beim
+ * Anfragenden (FR-19).
  */
 export async function ladeCmAnsicht(
 	db: Db,
@@ -156,6 +198,7 @@ export async function ladeCmAnsicht(
 	const spieler = spielerAus(m);
 	const fehlt = fehlendeAngaben(spieler);
 	const eigene = await eigeneAnmeldungen(db, turnierId, mitgliedId);
+	const anfragen = await offeneAnfragenAn(db, turnierId, mitgliedId);
 
 	const kategorien: CmKategorie[] = [];
 	const wildcard: CmKategorie[] = [];
@@ -163,13 +206,7 @@ export async function ladeCmAnsicht(
 		const zeilen = await db
 			.select()
 			.from(kategorie)
-			.where(
-				and(
-					eq(kategorie.turnierId, turnierId),
-					eq(kategorie.art, 'einzel'),
-					eq(kategorie.status, 'aktiv')
-				)
-			)
+			.where(and(eq(kategorie.turnierId, turnierId), eq(kategorie.status, 'aktiv')))
 			.orderBy(asc(kategorie.id));
 		const angemeldet = new Map(eigene.map((e) => [e.kategorieId, e]));
 		for (const k of zeilen) {
@@ -179,16 +216,31 @@ export async function ladeCmAnsicht(
 				...regel,
 				id: k.id,
 				name: k.name,
-				passt: passtEinzel(regel, spieler),
+				passt: k.art === 'doppel' ? passtDoppelAllein(regel, spieler) : passtEinzel(regel, spieler),
 				anmeldungId: eigen?.anmeldungId ?? null,
-				namen: []
+				namen: [],
+				paare: [],
+				suchende: [],
+				eigen: null,
+				meineAnfragen: []
 			};
 			// Ein laufender Antrag bleibt ein Antrag, auch wenn sich die Klassierung geändert hat.
-			if (eigen?.status === 'beantragt' || (!eigen && wildcardEinzel(regel, spieler))) {
+			if (
+				k.art === 'einzel' &&
+				(eigen?.status === 'beantragt' || (!eigen && wildcardEinzel(regel, spieler)))
+			) {
 				wildcard.push(eintrag);
 			} else if (eintrag.passt || eigen) kategorien.push(eintrag);
 		}
-		await fuelleNamen(db, [...kategorien, ...wildcard]);
+		await fuelleNamen(
+			db,
+			[...kategorien, ...wildcard].filter((k) => k.art === 'einzel')
+		);
+		await fuelleDoppel(
+			db,
+			kategorien.filter((k) => k.art === 'doppel'),
+			mitgliedId
+		);
 	}
 
 	return {
@@ -198,7 +250,8 @@ export async function ladeCmAnsicht(
 			name: t.name,
 			anmeldeschluss: t.anmeldeschluss,
 			status: wirksamerStatus(t.status, t.anmeldeschluss, jetzt),
-			anzahl: eigene.length
+			anzahl: eigene.length,
+			anfragen: anfragen.length
 		},
 		fehlt,
 		spieler,
@@ -209,8 +262,134 @@ export async function ladeCmAnsicht(
 			kategorie: e.kategorie,
 			status: e.status
 		})),
+		anfragen,
 		grenze: GRENZE
 	};
+}
+
+/** Telefon, sonst E-Mail, sonst nichts. */
+const kontaktVon = (m: { telefon: string | null; email: string | null }): CmAnfrage['kontakt'] => {
+	const telefon = m.telefon?.trim();
+	if (telefon) return { art: 'telefon', wert: telefon };
+	const email = m.email?.trim();
+	return email ? { art: 'email', wert: email } : null;
+};
+
+/** Offene Anfragen an das Mitglied in diesem Turnier, älteste zuerst. */
+async function offeneAnfragenAn(db: Db, turnierId: number, mitgliedId: number) {
+	const zeilen = await db
+		.select({
+			anfrageId: partnerAnfrage.id,
+			kategorieId: kategorie.id,
+			kategorie: kategorie.name,
+			vorname: mitglied.vorname,
+			nachname: mitglied.nachname,
+			telefon: mitglied.telefon,
+			email: mitglied.email,
+			klassierung: mitglied.klassierung
+		})
+		.from(partnerAnfrage)
+		.innerJoin(kategorie, eq(kategorie.id, partnerAnfrage.kategorieId))
+		.innerJoin(mitglied, eq(mitglied.id, partnerAnfrage.vonId))
+		.where(
+			and(
+				eq(partnerAnfrage.anId, mitgliedId),
+				eq(kategorie.turnierId, turnierId),
+				eq(kategorie.status, 'aktiv')
+			)
+		)
+		.orderBy(asc(partnerAnfrage.gestelltAm), asc(partnerAnfrage.id));
+	return zeilen.map((z): CmAnfrage => ({
+		anfrageId: z.anfrageId,
+		kategorieId: z.kategorieId,
+		kategorie: z.kategorie,
+		von: nameVon(z),
+		klassierung: spielerAus({ geschlecht: null, jahrgang: null, klassierung: z.klassierung })
+			.klassierung,
+		kontakt: kontaktVon(z)
+	}));
+}
+
+/**
+ * Paare, Suchende, den eigenen Stand und die eigenen Anfragen der Doppel-Kategorien. Paare sind
+ * bestätigte Anmeldungen mit zwei Spielern, Suchende aktive mit einem; beide nach Nachname des
+ * ersten Spielers (die Spieler eines Paars stehen selbst nach Nachname, dann Vorname).
+ */
+async function fuelleDoppel(db: Db, doppel: CmKategorie[], mitgliedId: number): Promise<void> {
+	if (doppel.length === 0) return;
+	const ids = doppel.map((k) => k.id);
+	const zeilen = await db
+		.select({
+			anmeldungId: anmeldung.id,
+			kategorieId: anmeldung.kategorieId,
+			status: anmeldung.status,
+			suchtext: anmeldung.suchtext,
+			mitgliedId: mitglied.id,
+			vorname: mitglied.vorname,
+			nachname: mitglied.nachname,
+			telefon: mitglied.telefon,
+			email: mitglied.email
+		})
+		.from(anmeldung)
+		.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
+		.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId))
+		.where(and(inArray(anmeldung.kategorieId, ids), istAktiv));
+	const nachName = (a: { nachname: string; vorname: string }, b: typeof a) =>
+		namenOrdnung.compare(a.nachname, b.nachname) || namenOrdnung.compare(a.vorname, b.vorname);
+	const anmeldungen = new Map<
+		number,
+		{ kategorieId: number; status: string; suchtext: string | null; spieler: typeof zeilen }
+	>();
+	for (const z of zeilen) {
+		const a = anmeldungen.get(z.anmeldungId);
+		if (a) a.spieler.push(z);
+		else {
+			anmeldungen.set(z.anmeldungId, {
+				kategorieId: z.kategorieId,
+				status: z.status,
+				suchtext: z.suchtext,
+				spieler: [z]
+			});
+		}
+	}
+	const sortiert = [...anmeldungen.values()];
+	for (const a of sortiert) a.spieler.sort(nachName);
+	sortiert.sort((a, b) => nachName(a.spieler[0], b.spieler[0]));
+
+	const nachId = new Map(doppel.map((k) => [k.id, k]));
+	for (const a of sortiert) {
+		const k = nachId.get(a.kategorieId)!;
+		const ich = a.spieler.find((s) => s.mitgliedId === mitgliedId);
+		if (a.spieler.length >= 2) {
+			if (a.status === 'bestaetigt') k.paare.push(a.spieler.map(nameVon).join(' / '));
+			const partner = a.spieler.find((s) => s.mitgliedId !== mitgliedId);
+			if (ich && partner) {
+				k.eigen = {
+					art: 'paar',
+					partner: { name: nameVon(partner), telefon: partner.telefon, email: partner.email }
+				};
+			}
+		} else if (ich) {
+			k.eigen = { art: 'sucht', kommentar: a.suchtext };
+		} else {
+			k.suchende.push({ name: nameVon(a.spieler[0]), kommentar: a.suchtext });
+		}
+	}
+
+	const eigene = await db
+		.select({
+			anfrageId: partnerAnfrage.id,
+			kategorieId: partnerAnfrage.kategorieId,
+			vorname: mitglied.vorname,
+			nachname: mitglied.nachname
+		})
+		.from(partnerAnfrage)
+		.innerJoin(mitglied, eq(mitglied.id, partnerAnfrage.anId))
+		.where(and(eq(partnerAnfrage.vonId, mitgliedId), inArray(partnerAnfrage.kategorieId, ids)))
+		.orderBy(asc(partnerAnfrage.gestelltAm), asc(partnerAnfrage.id));
+	for (const e of eigene) {
+		nachId.get(e.kategorieId)?.meineAnfragen.push({ anfrageId: e.anfrageId, an: nameVon(e) });
+	}
 }
 
 /** «Vorname Nachname» der bestätigten Anmeldungen, nach Nachname, dann Vorname. */
