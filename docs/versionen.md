@@ -13,6 +13,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   meldet offene Anfragen als Paar an oder löscht sie, verschiebt, löscht und korrigiert
   Klassierungen; die Spieler bekommen eine Meldung.
 - Doppel: Jedes Mitglied hat höchstens eine offene Anfrage je Kategorie.
+- Doppel: Ist der Partner ausgetreten oder zum Löschen vorgemerkt, sind seine Kontaktdaten
+  ausgeblendet.
+- Doppel: Anfragen von Mitgliedern ohne Login (gesperrt oder Brief-Code nie eingelöst) erscheinen
+  nicht mehr.
+- Doppel: Nach dem Anmeldeschluss lassen sich Anfragen nicht mehr ablehnen oder zurückziehen.
+- Doppel: Sagt der CM-Admin eine Doppel-Kategorie ab oder macht er sie zum Einzel, erfährt der
+  Anfragende, dass seine offene Anfrage hinfällig ist.
 
 ## 0.16.0 — Übersichtliche Navigation mit Reiter CM
 

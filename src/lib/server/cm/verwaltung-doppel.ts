@@ -197,7 +197,11 @@ export async function ladeDoppel(db: Db, kategorieId: number): Promise<DoppelVer
 	return liste;
 }
 
-/** Aktive Doppel-Kategorie mit Turnier, gesperrt `for share`; sonst `null`. */
+/**
+ * Aktive Doppel-Kategorie mit Turnier, gesperrt `for share`; sonst `null`. Anders als
+ * `sperreDoppel` in `doppel.ts` lässt sie auch ein Turnier *in Vorbereitung* durch; die
+ * Aufrufer melden dann `vorbereitung`.
+ */
 async function sperreDoppel(tx: DbOderTx, kategorieId: number) {
 	const z = await sperreKategorieUndTurnier(tx, kategorieId);
 	return z && z.k.art === 'doppel' && z.k.status === 'aktiv' ? z : null;
