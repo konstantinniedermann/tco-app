@@ -8,7 +8,7 @@
 	import Reiter from '../lib/ui/Reiter.svelte';
 	import { klappeWeich, vergissKlappen } from '../lib/ui/klappe.ts';
 	import {
-		istReiterSeite,
+		REITER,
 		stelltStandWiederHer,
 		uebergang,
 		vergisstStand,
@@ -24,7 +24,7 @@
 	import { ANSICHT_NAME } from '../lib/verwaltung/rollen-namen.ts';
 
 	let { children, data } = $props();
-	const mitReiter = $derived(istReiterSeite(page.route.id));
+	const mitReiter = $derived(REITER.some((r) => r === page.route.id));
 	// Fusszeile nur vor dem Login und auf der Startseite (UI-Leitbild, Baustein Fusszeile).
 	const mitFusszeile = $derived(zeigtFusszeile(page.route.id, page.error !== null));
 	// Die Verwaltung bringt Seitenleiste und Inhalt selbst mit (eigenes Layout). Die Fehlerseite
