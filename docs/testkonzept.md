@@ -56,7 +56,8 @@ verhält, zeigt allein die [Checkliste](#checkliste-vor-dem-release).
 Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelheit. Heute
 (`tests/e2e/`): Login per Einmal-Code und eingeloggt bleiben, Passkey, Startseite, Hilfe und
 Datenschutzerklärung ohne Login, Profil mit E-Mail-Wechsel, Benachrichtigungen, Anlässe,
-Mitteilungen, Verwaltung mit Rollen, Austritt, Löschen und Auskunft, Turnier und Kategorien,
+Mitteilungen, Verwaltung mit Rollen, Briefe einzeln und als Serie mit Druckansicht, Austritt,
+Löschen und Auskunft, Turnier und Kategorien,
 CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, dazu Bedienung (Wappen,
 Statusleiste, Fusszeile, Fokusrahmen). Später *Daten ergänzen* beim ersten Login (FR-02, noch
 geplant).

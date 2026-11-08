@@ -118,7 +118,8 @@ Seite eines Mitglieds, Seite *Briefe* mit Serie, Druckansicht), weil der Pilot s
 300–500 Mitglieder zu 1.0. Nachweis 2a: DB-Test Ausstellen und Verlauf, E2E Serie → Druckansicht,
 Screenshot der Druckansicht; 2b wie oben. Mit den [geschärften Rollen](2026-11-06-rollen-schaerfen-design.md)
 gilt: Briefe und Einlesen schreibt der Mitglieder-Admin (Bereich `mitglieder`), der
-MyTCO-Admin sieht die Seiten nur lesend und stellt keine Codes aus.
+MyTCO-Admin sieht die Seiten nur lesend und stellt keine Codes aus. **Stand:** Etappe 2a ist
+umgesetzt; offen ist 2b Einlesen.
 
 ## Rollen und Admin-Zugang
 

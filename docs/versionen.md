@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Briefe (#43, Etappe 2a): Der Mitglieder-Admin stellt einen neuen Brief-Code einzeln aus oder
+  erzeugt Briefe für alle, die MyTCO noch nie geöffnet haben, und druckt sie aus einer Druckansicht
+  des Browsers. Der Code erscheint nur dort; Verlaufseintrag «Brief-Code ausgestellt».
+
 ## 0.11.1 — Auskunft ohne Wildcard-Anträge, Doku-Abgleich
 
 - Auskunft: Von der Clubmeisterschaft zeigt sie nur noch bestätigte Anmeldungen, ohne Status und
