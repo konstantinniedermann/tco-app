@@ -177,7 +177,13 @@
 			</div>
 		</dialog>
 
-		<dialog class="karte" bind:this={warnung} aria-labelledby="warnung-titel">
+		<!-- Abbrechen (oder Esc) verwirft die zurückgehaltenen Werte, wie auf der CM-Seite. -->
+		<dialog
+			class="karte"
+			bind:this={warnung}
+			aria-labelledby="warnung-titel"
+			onclose={() => (ausstehend = null)}
+		>
 			<h2 id="warnung-titel">Anmeldungen passen nicht mehr</h2>
 			<p>{unpassendText(unpassend)}</p>
 			<div class="leiste">
