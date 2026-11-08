@@ -73,8 +73,8 @@ Bei mehreren Spielen trägt jedes eine Nebentaste, weil ein Bildschirm höchsten
 ### 2 — Rangliste (Gruppenspiele)
 
 Spalten: Platz, Name, Siege, Sätze, offen. Die Reihenfolge folgt den Regeln von Swiss Tennis
-(A-RESULTAT-06). Die eigene Zeile ist hinterlegt und trägt «(du)». Eine gestrichelte Linie
-«Bis hier: weiter ins Finalwochenende» steht unter dem letzten Platz, der weiterkommt.
+(A-RESULTAT-06). Die eigene Zeile ist hinterlegt und trägt «(du)». Die Rangliste sagt nicht, wer
+weiterkommt (siehe *Grenzen und Sonderfälle*).
 
 ### 2 — Dein Weg (KO-System)
 
@@ -101,8 +101,7 @@ aus, endet der Weg mit der verlorenen Runde, Plakette «ausgeschieden».
   noch 12 Tage» und den Platz in der Gruppe) und führt auf die Kategorieseite. Kein Fortschrittsbalken.
 - **Nach dem Melden eines Resultats:** Bestätigung mit dem Resultat, Hinweis «… bekommt das Resultat
   zum Bestätigen» und dem neuen Stand in einem Satz («Du bist auf Platz 2. Deine 4 Gruppenspiele sind
-  alle gespielt.»). Wäre der Spieler mit diesem Resultat sicher weiter, sagt eine Karte «Bestätigt …
-das Resultat, bist du weiter.» Nach der Bestätigung steht auf der Kategorieseite «Du bist weiter».
+  alle gespielt.»). Keine Aussage, ob der Spieler weiterkommt.
 - **Push** (nur wer es eingestellt hat, A-ANMELDUNG-08), ohne Namen anderer:
   «Neues Resultat in deiner Gruppe. Du bist jetzt auf Platz 2.» ·
   «Noch 7 Tage Gruppenphase. Du hast 1 Spiel offen.»
@@ -124,15 +123,14 @@ Push-Texte bleiben ohne Namen anderer (DS-05).
 
 Vor dem Code kommen ins Leitbild (`docs/ui-leitbild.md`) und danach ins Design System:
 
-- **Rangliste:** Raster mit fünf Spalten, eigene Zeile hinterlegt (`farbe-marke-zart`), Trennlinie
-  «Bis hier: weiter» (gestrichelt, `farbe-marke`). In der App gibt es sonst keine Tabellen.
+- **Rangliste:** Raster mit fünf Spalten, eigene Zeile hinterlegt (`farbe-marke-zart`). In der App
+  gibt es sonst keine Tabellen.
 - **Weg-Liste:** Runden untereinander mit Balken (`rand-akzent`) in Grün, Rot oder Grau und dem
   Zustand als Plakette.
 
 ## Annahmen und offene Fragen
 
-- **Wer weiterkommt** (Anzahl je Gruppe) und die **Ranglistenregeln** im Einzelnen: aus den
-  Kategorien in Advantage (A-ADVANTAGE-02, -03). Der Entwurf nimmt die ersten zwei je Gruppe an.
+- **Ranglistenregeln** im Einzelnen: aus den Kategorien in Advantage (A-ADVANTAGE-02, -03).
 - **Restzeit:** gerechnet bis zum Ende der Gruppenphase bzw. der Runde. Woher das Datum kommt, legt
   CM-Betrieb fest.
 - **Offene Spiele für alle:** Ob die CM-Verantwortlichen das so wollen, ist nicht gefragt. Eine
@@ -145,7 +143,10 @@ Entscheid des Projektleiters:
 - **Gemeldet, noch nicht bestätigt:** Das Resultat zählt sofort in Rangliste, «offen» und
   «Gemeldete Resultate». Bis zur Bestätigung (A-RESULTAT-04) trägt das Spiel die Plakette
   «unbestätigt». Bestreitet der Gegner, entscheidet der CM-Admin; der Stand kann dann zurückspringen.
-  «Du bist weiter» rechnet nur mit bestätigten Resultaten.
+- **Wer weiterkommt (Gruppenspiele):** MyTCO behauptet es nicht: keine Linie in der Rangliste, keine
+  Karte «Du bist weiter», kein Hinweis nach dem Melden. Die Kategorien regeln das unterschiedlich
+  (z. B. kommt teils der beste Gruppenzweite weiter). Im KO-System zeigt «Dein Weg» die nächste
+  Runde, weil sie dort feststeht.
 
 Entscheide von Claude, vom Projektleiter beim Lesen zu prüfen:
 
@@ -165,8 +166,6 @@ Entscheide von Claude, vom Projektleiter beim Lesen zu prüfen:
   A-ANMELDUNG-08. Die Texte oben sind die Vorlage dafür.
 - **Junioren ohne eigenes Login:** Es gilt, was #45 festlegt. Bis dahin zeigt die Seite nur Spiele
   des eigenen Kontos.
-- **«Du bist weiter»:** erscheint nur, wenn niemand den Spieler nach Siegen noch einholen kann. In
-  jedem Zweifelsfall fehlt die Karte. Eine falsche Meldung wäre schlimmer als keine.
 
 ## Was der Umsetzung überlassen bleibt
 
