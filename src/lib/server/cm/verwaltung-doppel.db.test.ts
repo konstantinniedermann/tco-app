@@ -204,13 +204,21 @@ const paarIds = (a: number, b: number) => [a, b].sort((x, y) => x - y);
 const sortiert = (m: { mitgliedId: number; text: string }[]) =>
 	[...m].sort((a, b) => a.mitgliedId - b.mitgliedId || a.text.localeCompare(b.text));
 
-/** Wartet (höchstens 3 s), bis `n` Verbindungen dieser Datenbank auf eine Sperre warten. */
-async function bisWartend(n: number) {
+/**
+ * Wartet (höchstens 3 s), bis `n` Verbindungen auf die Sperre von `halter` warten, direkt oder
+ * hinter einer anderen Wartenden (Zeilensperren reihen sich ein). Parallele DB-Tests zählen nicht.
+ */
+async function bisWartend(halter: number, n: number) {
 	const ende = Date.now() + 3000;
 	while (Date.now() < ende) {
 		const { rows } = await db.execute<{ n: number }>(
-			sql`select count(*)::int as n from pg_stat_activity
-				where datname = current_database() and wait_event_type = 'Lock'`
+			sql`with recursive kette(pid) as (
+					select ${halter}::int
+					union
+					select a.pid from pg_stat_activity a
+					join kette k on k.pid = any(pg_blocking_pids(a.pid))
+				)
+				select (count(*) - 1)::int as n from kette`
 		);
 		if (rows[0].n >= n) return;
 		await new Promise((r) => setTimeout(r, 20));
@@ -229,8 +237,9 @@ async function gleichzeitig<A, B>(mitgliedId: number, beide: () => [Promise<A>, 
 			.from(mitglied)
 			.where(eq(mitglied.id, mitgliedId))
 			.for('update');
+		const { rows } = await tx.execute<{ pid: number }>(sql`select pg_backend_pid() as pid`);
 		const alle = Promise.all(beide());
-		await bisWartend(2);
+		await bisWartend(rows[0].pid, 2);
 		return { alle };
 	});
 	return laufend.alle;
@@ -457,6 +466,21 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 		expect(
 			await meldeDoppelVonHandAn(db, admin, t.mixed, [lena, ohneKlassierung], t.jetzt, false)
 		).toEqual({ warnungen: ['angaben-fehlen'] });
+	});
+
+	test('FR-46, FR-06: Suchender mit drei Anmeldungen (eine davon hier) bekommt von Hand einen Partner ohne Warnung voll', async () => {
+		const t = await turnier();
+		const paul = await spieler('Paul', 'Brunner');
+		const urs = await spieler('Urs', 'Christen');
+		await anmeldungMit(t.einzel[0], [paul], t.jetzt);
+		await anmeldungMit(t.einzel[1], [paul], t.jetzt);
+		const sucht = await anmeldungMit(t.doppel, [paul], t.jetzt);
+		expect(await meldeDoppelVonHandAn(db, admin, t.doppel, [paul, urs], t.jetzt, false)).toEqual(
+			expect.objectContaining({ ergebnis: 'ok' })
+		);
+		expect(await aktiveIn(t.doppel)).toEqual([
+			{ id: sucht, status: 'bestaetigt', suchtext: null, spieler: paarIds(paul, urs) }
+		]);
 	});
 
 	test('FR-46: von Hand nie in Vorbereitung, nie zu einem Paar, nie zwei Suchende, nie nicht aktive Mitglieder', async () => {
