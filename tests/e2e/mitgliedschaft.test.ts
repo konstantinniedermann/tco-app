@@ -50,6 +50,7 @@ async function oeffneVerwaltung(page: Page) {
 	await page.getByLabel('Code aus der Mail').fill(await holeMailCode(admin.email));
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	return admin;
 }
 
 test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in der Verwaltung', async ({
@@ -208,7 +209,7 @@ test('RR-08: Wiedereintritt eines Mitglieds mit Admin-Rolle fragt nach, ohne Rol
 	const frageZurueck = page.getByRole('dialog', {
 		name: `Löschung von Lena ${name} rückgängig machen?`
 	});
-	await expect(frageZurueck).toContainText('Lena bekommt die Rollen CM-Admin zurück.');
+	await expect(frageZurueck).toContainText('Lena bekommt die Rolle CM-Admin zurück.');
 	await frageZurueck.getByRole('button', { name: 'Weiter' }).click();
 	await expect(karte).toContainText(aktiv);
 
@@ -216,5 +217,22 @@ test('RR-08: Wiedereintritt eines Mitglieds mit Admin-Rolle fragt nach, ohne Rol
 	await karte.getByRole('button', { name: 'Löschung rückgängig machen' }).click();
 	await expect(karte.getByText('ausgetreten', { exact: true })).toBeVisible();
 	await expect(page.getByRole('dialog')).toHaveCount(0);
+	expect(fehler).toEqual([]);
+});
+
+test('RR-10: auf der eigenen Seite weder Austritt noch Löschen, dafür ein Hinweis', async ({
+	page
+}, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await oeffneVerwaltung(page);
+	await page.goto(`/verwaltung/mitglieder/${admin.mitgliedId}`);
+	const karte = page.getByRole('region', { name: /^Mitgliedschaft/ });
+	await expect(karte).toContainText('Aktiv. Kommt der Austritt');
+	await expect(karte).toContainText(
+		'Deinen Austritt und dein Löschen erfasst ein anderer Mitglieder-Admin.'
+	);
+	await expect(karte.getByRole('button', { name: 'Austritt erfassen' })).toHaveCount(0);
+	await expect(karte.getByRole('button', { name: 'Mitglied löschen' })).toHaveCount(0);
+	await pruefeBildschirm(page, info, 'mitgliedschaft-eigene-seite');
 	expect(fehler).toEqual([]);
 });

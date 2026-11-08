@@ -49,6 +49,9 @@
 	// «Rollen speichern»), verschwindet sie.
 	let veraltetBei = $state<string | null>(null);
 	const angabenVeraltet = $derived(veraltetBei === JSON.stringify(angaben));
+	// Solange die Angaben abweichen, ginge ein Brief an die alte Adresse: erst speichern.
+	let angabenFormular = $state<ReturnType<typeof Angabenformular>>();
+	const angabenUngespeichert = $derived(angabenFormular?.ungespeichert() ?? false);
 
 	const speichereWerte = (werte: Werte) => einzeln(() => schickeAngaben(werte));
 	async function schickeAngaben(werte: Werte) {
@@ -251,6 +254,7 @@
 				<summary class="klappe-titel">Angaben</summary>
 				{#key angabenSchluessel}
 					<Angabenformular
+						bind:this={angabenFormular}
 						start={werteAus(angaben)}
 						fehler={angabenFehler}
 						knopf="Angaben speichern"
@@ -297,7 +301,7 @@
 		</div>
 
 		<div>
-			<Mitgliedschaft {detail} {nurLesen} />
+			<Mitgliedschaft {detail} {nurLesen} eigene={data.eigeneMitgliedId === detail.id} />
 
 			<details class="karte klappe" open>
 				<summary class="klappe-titel"
@@ -326,9 +330,14 @@
 								<button
 									type="button"
 									class="taste-neben"
+									disabled={angabenUngespeichert}
+									aria-describedby={angabenUngespeichert ? 'brief-erst-speichern' : undefined}
 									onclick={() => briefRueckfrage?.showModal()}>Neuen Brief-Code ausstellen</button
 								>
 							</div>
+							{#if angabenUngespeichert}
+								<p class="leise" id="brief-erst-speichern">Speichere zuerst die Angaben.</p>
+							{/if}
 						{/if}
 					{/if}
 					{#if briefFehler}

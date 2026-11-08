@@ -21,19 +21,24 @@
 
 	// Karte «Mitgliedschaft»: Austritt, Wiedereintritt, Löschen und Zurücknehmen (FR-04).
 	// `nurLesen`: Ansicht als … oder MyTCO-Admin; dann keine Tasten, der Link zur Auskunft bleibt.
-	let { detail, nurLesen }: { detail: MitgliedDetail; nurLesen: boolean } = $props();
+	// `eigene`: die eigene Seite des Admins; Austritt und Löschen erfasst ein anderer (RR-10).
+	let { detail, nurLesen, eigene }: { detail: MitgliedDetail; nurLesen: boolean; eigene: boolean } =
+		$props();
 
 	const mg = $derived(detail.mitgliedschaft);
 	const status = $derived(detail.status);
-	// Die Löschung geht zurück in den Zustand davor; `austrittAm` bleibt bei der Vormerkung stehen.
+	// Die Löschung geht zurück in den Zustand davor. Invariante: Der Wiedereintritt leert
+	// `austrittAm`, das Vormerken lässt es stehen. Darum heisst `austrittAm` bei «vorgemerkt»:
+	// vorher ausgetreten.
 	const davor = $derived(mg.austrittAm === null ? 'aktiv' : 'ausgetreten');
 	const name = $derived(`${detail.angaben.vorname} ${detail.angaben.nachname}`);
 	const rollen = $derived(rollenText(detail.rollen));
+	const rollenWort = $derived(detail.rollen.length === 1 ? 'Rolle' : 'Rollen');
 
 	let austrittFrage = $state<HTMLDialogElement>();
 	let loeschenFrage = $state<HTMLDialogElement>();
 	let zurueckFrage = $state<HTMLDialogElement>();
-	// Welchen Schritt die Rückfrage «… bekommt die Rollen zurück» bestätigt.
+	// Welchen Schritt die Rückfrage «… bekommt die Rolle(n) … zurück» bestätigt.
 	let zurueck = $state<'wiedereintritt' | 'rueckgaengig'>('wiedereintritt');
 	// Daten der Rückfragen: nur zur Anzeige, der Server rechnet selbst.
 	let frist = $state('');
@@ -134,21 +139,29 @@
 	{/if}
 
 	{#if !nurLesen}
-		<div class="leiste">
-			{#if status === 'aktiv'}
-				<button type="button" class="taste-neben" onclick={frageAustritt}>Austritt erfassen</button>
-				<button type="button" class="taste-neben" onclick={frageLoeschen}>Mitglied löschen</button>
-			{:else if status === 'ausgetreten'}
-				<button type="button" class="taste-neben" onclick={() => frageZurueck('wiedereintritt')}
-					>Wiedereintritt erfassen</button
-				>
-				<button type="button" class="taste-neben" onclick={frageLoeschen}>Mitglied löschen</button>
-			{:else if status === 'vorgemerkt'}
-				<button type="button" class="taste-neben" onclick={() => frageZurueck('rueckgaengig')}
-					>Löschung rückgängig machen</button
-				>
-			{/if}
-		</div>
+		{#if eigene && status !== 'vorgemerkt'}
+			<p class="leise">Deinen Austritt und dein Löschen erfasst ein anderer Mitglieder-Admin.</p>
+		{:else}
+			<div class="leiste">
+				{#if status === 'aktiv'}
+					<button type="button" class="taste-neben" onclick={frageAustritt}
+						>Austritt erfassen</button
+					>
+					<button type="button" class="taste-neben" onclick={frageLoeschen}>Mitglied löschen</button
+					>
+				{:else if status === 'ausgetreten'}
+					<button type="button" class="taste-neben" onclick={() => frageZurueck('wiedereintritt')}
+						>Wiedereintritt erfassen</button
+					>
+					<button type="button" class="taste-neben" onclick={frageLoeschen}>Mitglied löschen</button
+					>
+				{:else if status === 'vorgemerkt'}
+					<button type="button" class="taste-neben" onclick={() => frageZurueck('rueckgaengig')}
+						>Löschung rückgängig machen</button
+					>
+				{/if}
+			</div>
+		{/if}
 		{#if status === 'vorgemerkt'}
 			<p class="leise">Danach ist das Mitglied wieder {davor}, wie vorher.</p>
 		{/if}
@@ -211,7 +224,7 @@
 			? `Wiedereintritt von ${name} erfassen?`
 			: `Löschung von ${name} rückgängig machen?`}
 	</h2>
-	<p>{detail.angaben.vorname} bekommt die Rollen {rollen} zurück.</p>
+	<p>{detail.angaben.vorname} bekommt die {rollenWort} {rollen} zurück.</p>
 	<div class="leiste">
 		<button type="button" class="taste-neben" onclick={() => zurueckFrage?.close()}
 			>Abbrechen</button

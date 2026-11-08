@@ -320,7 +320,18 @@ test('A-LOGIN-01, RR-04: einzelner Brief auf der Mitgliedsseite ersetzt den alte
 	await meldeAdminAn(page);
 	await oeffneMitglied(page, ziel.mitgliedId, `${nachname}, Hanna`);
 
-	await login(page).getByRole('button', { name: 'Neuen Brief-Code ausstellen' }).click();
+	// Ungespeicherte Angaben: erst speichern, sonst ginge der Brief an die alte Adresse.
+	const ausstellen = login(page).getByRole('button', { name: 'Neuen Brief-Code ausstellen' });
+	const strasse = page.getByLabel('Strasse', { exact: true });
+	const alteStrasse = await strasse.inputValue();
+	await strasse.fill(`${alteStrasse} 2`);
+	await expect(ausstellen).toBeDisabled();
+	await expect(login(page).getByText('Speichere zuerst die Angaben.')).toBeVisible();
+	await strasse.fill(alteStrasse);
+	await expect(ausstellen).toBeEnabled();
+	await expect(login(page).getByText('Speichere zuerst die Angaben.')).toHaveCount(0);
+
+	await ausstellen.click();
 	const frage = page.getByRole('dialog', { name: 'Neuen Brief-Code ausstellen?' });
 	await expect(frage).toBeVisible();
 	await expect(frage).toContainText(
