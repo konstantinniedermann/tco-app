@@ -35,6 +35,16 @@ describe('Testbestand für make seed', () => {
 		expect(await eigene.db.$count(mitglied, eq(mitglied.status, 'ausgetreten'))).toBe(8);
 	});
 
+	test('erkennt ein Mitglied mit lokal geänderter E-Mail an der Mitgliedernummer', async () => {
+		const ids = await legeBeispielMitgliederAn(eigene.db, jetzt);
+		await eigene.db
+			.update(mitglied)
+			.set({ email: 'neu.adresse@example.org' })
+			.where(eq(mitglied.id, ids[0]));
+		expect(await legeBeispielMitgliederAn(eigene.db, jetzt)).toEqual(ids);
+		expect(await eigene.db.$count(mitglied)).toBe(ANZAHL_BEISPIEL_MITGLIEDER);
+	});
+
 	test('Angaben sind gemischt und nur unter example.org (DS-08)', () => {
 		const werte = beispielMitglieder(jetzt);
 		expect(werte.every((w) => w.email?.endsWith('@example.org'))).toBe(true);

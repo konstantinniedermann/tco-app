@@ -92,14 +92,20 @@ export function beispielMitglieder(jetzt: Date): Werte[] {
 /** Legt den Testbestand samt Konto an und gibt die Mitglied-IDs in derselben Reihenfolge. */
 export async function legeBeispielMitgliederAn(db: Db, jetzt: Date): Promise<number[]> {
 	const werte = beispielMitglieder(jetzt);
-	await db.insert(mitglied).values(werte).onConflictDoNothing({ target: mitglied.email });
-	const emails = werte.map((w) => w.email as string);
+	// Wiedererkannt an der Mitgliedernummer: Sie bleibt, auch wenn jemand lokal die E-Mail ändert.
+	// Ohne Ziel deckt das Auslassen beide eindeutigen Spalten ab (Nummer und E-Mail).
+	await db.insert(mitglied).values(werte).onConflictDoNothing();
+	const nummern = werte.map((w) => w.mitgliedernummer as string);
 	const vorhanden = await db
-		.select({ id: mitglied.id, email: mitglied.email })
+		.select({ id: mitglied.id, nummer: mitglied.mitgliedernummer })
 		.from(mitglied)
-		.where(inArray(mitglied.email, emails));
-	const idVon = new Map(vorhanden.map((m) => [m.email, m.id]));
-	const ids = emails.map((e) => idVon.get(e) as number);
+		.where(inArray(mitglied.mitgliedernummer, nummern));
+	const idVon = new Map(vorhanden.map((m) => [m.nummer, m.id]));
+	const ids = nummern.map((n) => {
+		const id = idVon.get(n);
+		if (id === undefined) throw new Error(`Testbestand: Mitgliedernummer ${n} ist schon vergeben`);
+		return id;
+	});
 	await db
 		.insert(konto)
 		.values(ids.map((mitgliedId) => ({ mitgliedId })))
