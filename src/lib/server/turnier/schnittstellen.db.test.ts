@@ -325,13 +325,15 @@ describe('Turnier-Schnittstellen', () => {
 		expect((await (await getKategorie(s.d, hole(cm, k))).json()).anmeldungen).toBe(1);
 	});
 
-	test('RR-07: ohne Rolle 403, unbestätigt 403 unbestaetigt, MyTCO-Admin nur lesend, ändernd ohne JSON 415', async () => {
+	test('RR-07: ohne Rolle 403, unbestätigt 403 unbestaetigt, MyTCO-Admin nur lesend, Mitglieder- und Lizenz-Admin 403, ändernd ohne JSON 415', async () => {
 		const s = baue();
 		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
 		const unbestaetigt = await einloggen((await legeMitgliedAn(db, { rollen: ['cm'] })).kontoId);
 		const cm = await bestaetigt(s, ['cm']);
 		const mytco = await bestaetigt(s, ['mytco']);
 		const mitglieder = await bestaetigt(s, ['mitglieder']);
+		// `lizenz` öffnet die Verwaltung noch nicht und kann sie darum auch nicht bestätigen.
+		const lizenz = await einloggen((await legeMitgliedAn(db, { rollen: ['lizenz'] })).kontoId);
 		const mach = (name: string, konto?: AngemeldetesKonto) =>
 			ereignis({
 				method: name.startsWith('get') ? 'GET' : 'POST',
@@ -363,6 +365,8 @@ describe('Turnier-Schnittstellen', () => {
 			}
 			const v = await fn(s.d, mach(name, mitglieder));
 			expect([name, v.status, await v.json()]).toEqual([name, 403, { fehler: 'kein-admin' }]);
+			const l = await fn(s.d, mach(name, lizenz));
+			expect([name, l.status, await l.json()]).toEqual([name, 403, { fehler: 'kein-admin' }]);
 			if (name.startsWith('post')) {
 				const roh = ereignis({
 					konto: cm,
