@@ -77,8 +77,8 @@ test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in d
 	await bild(karte, projekt, 'karte-ausgetreten');
 
 	// Das Mitglied fordert einen Code an: dieselbe Rückmeldung wie bei einer unbekannten Adresse.
-	// Die Grenze für Code-Anfragen gilt pro IP für den ganzen Lauf über alle drei Projekte (und
-	// die Admin-Bestätigung zählt mit): darum fragt nur ein Projekt an.
+	// Die Grenze für Code-Anfragen gilt pro IP für den ganzen Lauf über alle drei Projekte (die
+	// Admin-Bestätigung zählt nicht mit): darum fragt nur ein Projekt an.
 	if (projekt === 'android') {
 		const andere = await page.context().browser()!.newContext(info.project.use);
 		const seite2 = await andere.newPage();

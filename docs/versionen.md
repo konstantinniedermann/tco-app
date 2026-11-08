@@ -8,6 +8,19 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.11.2 — Auswahlfelder am iPhone, Auskunft vollständiger, Beobachtungs-Auswertung
+
+- Auswahlfelder (z. B. Geschlecht, Klassierung) sind auf allen Geräten so hoch wie die Textfelder;
+  auf dem iPhone waren sie halb so hoch (UI-03).
+- Auskunft: nennt je Gerät, wann ein Admin die Verwaltung bestätigt hat, und eine laufende
+  «Ansicht als …»; die Datenschutzerklärung nennt diese Daten und dass Änderungen bei anderen
+  Mitgliedern nicht in der Auskunft stehen.
+- Prüfungen: Service Worker wird typgeprüft; Abdeckung misst auch die Fachlogik in
+  `src/lib/turnier` und `src/lib/anlass`; zwei wacklige E2E-Tests (Install-Angebot, Vorladen)
+  warten jetzt auf die App.
+- Doku aus der Beobachtungs-Auswertung: ADR-009 (Grüner Stand), ADR-010 (öffentliches Repo),
+  Glossar, eigene Datenbank für E2E bei parallelen Sessions.
+
 ## 0.11.1 — Auskunft ohne Wildcard-Anträge, Doku-Abgleich
 
 - Auskunft: Von der Clubmeisterschaft zeigt sie nur noch bestätigte Anmeldungen, ohne Status und
