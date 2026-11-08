@@ -74,8 +74,9 @@ den Rufnamen, alles unter Mitgliederverwaltung bleibt amtlich, Seiten ohne Login
 
 ## Regeln für das Feld
 
-- **Länge** *(mein Vorschlag)*: höchstens 30 Zeichen nach dem Kürzen der Leerzeichen am Anfang
-  und am Ende. Leer gilt als «kein Rufname» und wird als leer gespeichert, nicht als
+- **Länge** (Entscheidung des Projektleiters: Rufnamen sind kurze Spitznamen): höchstens 10
+  Zeichen nach dem Kürzen der Leerzeichen am Anfang und am Ende. Ist er länger, zeigt das Profil
+  die Meldung «Höchstens 10 Zeichen.» Leer gilt als «kein Rufname» und wird als leer gespeichert, nicht als
   Leerstring.
 - **Gleich wie der Vorname** *(mein Vorschlag)*: Stimmt der Rufname ohne Rücksicht auf Gross- und
   Kleinschreibung mit dem Vornamen überein, behandelt die Anzeige ihn wie «kein Rufname». So
