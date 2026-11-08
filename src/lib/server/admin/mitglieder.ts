@@ -3,7 +3,7 @@ import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, kontoRolle, mitglied, sitzung } from '../db/schema.ts';
 import { nameEnthaelt } from '../namen.ts';
 import { beendeAlleSitzungen, sitzungAbgelaufen } from '../login/sitzung.ts';
-import type { Angaben, Feld } from './angaben.ts';
+import { FELDER, type Angaben, type Feld } from './angaben.ts';
 import { loeschtAm } from './mitgliedschaft.ts';
 import { ladeRollen, type Rolle } from './rollen.ts';
 import {
@@ -298,7 +298,9 @@ export async function aendereAngaben(
 				return { ergebnis: 'veraltet' as const };
 			const geaendert = geaenderteFelder(gespeichert, angaben);
 			if (geaendert.length === 0) return { ergebnis: 'ok' as const, geaendert, alteEmail: null };
-			await tx.update(mitglied).set(angaben).where(eq(mitglied.id, id));
+			// Nur die Angaben-Felder schreiben: weitere Schlüssel (z. B. rufname) bleiben unberührt.
+			const werte = Object.fromEntries(FELDER.map((f) => [f, angaben[f]]));
+			await tx.update(mitglied).set(werte).where(eq(mitglied.id, id));
 			await schreibeVerlauf(
 				tx,
 				id,

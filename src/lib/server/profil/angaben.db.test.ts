@@ -213,7 +213,7 @@ describe('setzeRufname', () => {
 			db,
 			{ art: 'admin', mitgliedId },
 			mitgliedId,
-			{ ...vorher, telefon: '079 111 22 33' },
+			{ ...vorher, telefon: '079 111 22 33', rufname: 'Fremd' } as typeof vorher,
 			vorher,
 			jetzt
 		);
