@@ -199,6 +199,7 @@ describe('CM-Anmeldung', () => {
 					jahrgangBis: null,
 					klassierungVon: 'R1',
 					klassierungBis: 'R5',
+					mindestsumme: null,
 					passt: true,
 					anmeldungId: null,
 					namen: ['Adam Alpha', 'Bert Alpha', 'Anna Zeta']
@@ -212,6 +213,7 @@ describe('CM-Anmeldung', () => {
 					jahrgangBis: null,
 					klassierungVon: 'N1',
 					klassierungBis: 'R9',
+					mindestsumme: null,
 					passt: true,
 					anmeldungId: null,
 					namen: []
