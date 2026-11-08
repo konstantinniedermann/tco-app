@@ -116,6 +116,30 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-08 — Profil: leere Kachel sagt je Feld etwas anderes
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/routes/profil/` (Karte *Meine Angaben*), Kacheln Rufname, Klassierung, Telefon, Lizenznummer
+
+**Beobachtung:** Ist ein freiwilliges Feld leer, sagt die Kachel bei Rufname und Klassierung «nicht angegeben», bei Telefon und Lizenznummer «nicht erfasst». Uneinheitlich im Profil.
+
+**Ursprung:** Schlussreview Rufname (#67).
+
+**Einschätzung:** Niedrig, nur Wortwahl. Bei Gelegenheit auf eine Formulierung vereinheitlichen (inkl. Tests und Hilfe).
+
+### 2026-11-08 — Übergabe an #59: Namenssuche und Namensanzeige wiederverwenden
+
+**Thema:** Rufname
+
+**Fundort:** `src/lib/server/namen.ts` (`nameEnthaelt`), `src/lib/ui/Name.svelte`, Spec `docs/superpowers/specs/2026-11-08-rufname-design.md` (Tabelle «Wo der Name erscheint»)
+
+**Beobachtung:** Wer #59 (Partnerwahl im Doppel) nach #67 merged, nutzt für die Partnersuche `nameEnthaelt` und für die Anzeige `<Name>`, nicht eigene Namensbausteine.
+
+**Ursprung:** Schlussreview Rufname (#67).
+
+**Einschätzung:** Hinweis zur Übergabe, kein Fehler; erledigt sich mit dem Merge von #59.
+
 ### 2026-11-08 — Auskunft: neue Angaben je Gerät nur im DB-Test belegt, nicht auf der Seite
 
 **Thema:** App-Oberfläche

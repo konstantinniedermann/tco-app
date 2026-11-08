@@ -184,12 +184,14 @@ test('FR-36, FR-35: CM-Admin wird gewarnt und kann eine Kategorie mit Anmeldunge
 		turnierId,
 		kategorieIds: [kategorieId]
 	} = await legeOffenesTurnierAn(jahr, [einzel('Herren R1–R9', 'herren', 'R1')]);
-	const spieler = await legeKontoAn('Bruno', `Probe${randomUUID().slice(0, 6)}`);
+	const nachname = `Probe${randomUUID().slice(0, 6)}`;
+	const spieler = await legeKontoAn('Johannes', nachname);
 	await setzeSpielerangaben(spieler.mitgliedId, {
 		geschlecht: 'm',
 		jahrgang: 1985,
 		klassierung: 'R3'
 	});
+	await setzeRufname(spieler.mitgliedId, 'Hannes');
 	await meldeZurCmAn(kategorieId, spieler.mitgliedId);
 
 	const cm = await legeCmMitBriefCodeAn('Carla');
@@ -212,6 +214,12 @@ test('FR-36, FR-35: CM-Admin wird gewarnt und kann eine Kategorie mit Anmeldunge
 	).toHaveText('1');
 	await page.getByRole('link', { name: 'Herren R1–R9' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Herren R1–R9' })).toBeVisible();
+
+	// Die Anmeldezeile zeigt den Rufnamen, dahinter leise den amtlichen Namen (Nachname zuerst).
+	const anmeldezeile = page.getByRole('row', { name: new RegExp(nachname) });
+	await expect(anmeldezeile).toContainText('Hannes');
+	await expect(anmeldezeile.locator('.leise').first()).toHaveText(`${nachname}, Johannes`);
+	await pruefeBildschirm(page, info, 'cm-turnierleitung-rufname');
 
 	// FR-35: statt der Taste der Satz, warum Absagen nicht geht.
 	await expect(

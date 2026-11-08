@@ -156,6 +156,11 @@ test('Rufname setzen und löschen', async ({ page }, info) => {
 	await page.getByRole('button', { name: 'Rufname speichern' }).click();
 	await expect(kachel(page, 'Rufname')).toContainText('Hannes');
 
+	// Die Namenszeile zeigt den Rufnamen, leise dahinter den amtlichen Namen.
+	const namenszeile = page.locator('p').filter({ hasText: /^Hannes Johanna/ });
+	await expect(namenszeile).toBeVisible();
+	await expect(namenszeile.locator('.leise').first()).toContainText('Johanna');
+
 	// Zu lang: Meldung, nichts wird gespeichert.
 	await kachel(page, 'Rufname').getByRole('button', { name: 'Ändern' }).click();
 	await feld.fill('Elfzeichen!');
@@ -164,6 +169,7 @@ test('Rufname setzen und löschen', async ({ page }, info) => {
 	await pruefeBildschirm(page, info, 'profil-rufname');
 	await feld.fill('Hannes');
 	await page.getByRole('button', { name: 'Rufname speichern' }).click();
+	await expect(kachel(page, 'Rufname')).toContainText('Hannes');
 
 	// Die Startseite grüsst mit dem Rufnamen.
 	await page.getByRole('navigation', { name: 'Hauptnavigation' }).getByRole('link').first().click();
