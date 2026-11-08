@@ -813,6 +813,20 @@ a.kachel:active {
 	border-left: var(--rand-akzent) solid var(--farbe-aktion);
 }
 
+/* Trefferliste: Ergebnisse einer Suche, je Treffer eine Kachel */
+.trefferliste {
+	display: flex;
+	flex-direction: column;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.trefferliste > li {
+	padding: var(--abstand-3) 0;
+	border-top: var(--rand-duenn) solid var(--farbe-linie);
+}
+
 /* Zähler: Schritte eines Formulars oder ein Kontingent */
 .zaehler {
 	margin-bottom: var(--abstand-4);

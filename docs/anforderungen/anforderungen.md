@@ -163,7 +163,7 @@ Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vo
 | A-ANMELDUNG-01 | Alle Mitglieder können sich zur Clubmeisterschaft anmelden | PDF 5b, Ziel | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
 | A-ANMELDUNG-02 | Ein Spieler hat höchstens 3 Anmeldungen gleichzeitig | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
 | A-ANMELDUNG-03 | MyTCO zeigt nur die Kategorien an, die für den Spieler möglich sind (Klassierung evtl. ausgenommen, weil die Klassierung nicht automatisch von Swiss Tennis kommt) | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
-| A-ANMELDUNG-04 | Bei einer Doppelkategorie zeigt MyTCO sofort alle verfügbaren Spieler des Clubs zur Wahl des Doppelpartners | PDF 5b | CM-Anmeldung | geplant |
+| A-ANMELDUNG-04 | Bei einer Doppelkategorie zeigt MyTCO sofort alle verfügbaren Spieler des Clubs zur Wahl des Doppelpartners | PDF 5b | CM-Anmeldung | geplant (Mitgliederseite mit #59 Etappe 1, Verwaltung Etappe 2) |
 | A-ANMELDUNG-05 | Nach der Anmeldung erhält der Spieler eine automatische Bestätigung mit seinen Kategorien | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
 | A-ANMELDUNG-06 | Der CM-Admin fügt Anmeldungen von Hand hinzu oder ändert sie (z. B. die Klassierung) | PDF 5b | CM-Anmeldung | umgesetzt (Einzel; Doppel mit #59) |
 | A-ANMELDUNG-07 | Die Anmeldung schliesst zu einem Anmeldeschluss | PDF 5c (abgeleitet) | CM-Anmeldung\* | umgesetzt |
