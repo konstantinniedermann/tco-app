@@ -7,6 +7,7 @@ import {
 	geaendertText,
 	neueAngaben,
 	plakette,
+	rollenText,
 	datumText,
 	datumZeitText,
 	tagText,
@@ -97,6 +98,14 @@ describe('Texte der Verwaltung', () => {
 			'lea@example.org'
 		]);
 		expect(neueAngaben({ felder: ['telefon'], angaben })).toEqual(['(leer)']);
+	});
+});
+
+describe('Rollen als Text', () => {
+	it('RR-08: Namen in fester Reihenfolge, durch Komma', () => {
+		expect(rollenText(['cm', 'mitglieder'])).toBe('Mitglieder-Admin, CM-Admin');
+		expect(rollenText(['lizenz'])).toBe('Lizenz-Admin');
+		expect(rollenText([])).toBe('');
 	});
 });
 

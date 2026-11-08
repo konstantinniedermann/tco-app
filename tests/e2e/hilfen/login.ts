@@ -181,6 +181,27 @@ export async function stelleBriefCodeAus(kontoId: number): Promise<string> {
 	return (await hole().dienst.stelleBriefCodeAus(kontoId)).code;
 }
 
+/**
+ * Erfundenes Mitglied, ausgetreten oder zum Löschen vorgemerkt, mit gespeicherten Rollen.
+ * `davor`: der Zustand vor dem Vormerken (nur bei `vorgemerkt`).
+ */
+export async function legeEhemaligesAn(
+	vorname: string,
+	nachname: string,
+	status: 'ausgetreten' | 'vorgemerkt',
+	rollen: Rolle[],
+	davor: 'aktiv' | 'ausgetreten' = 'aktiv'
+) {
+	const m = await legeMitgliedAn(hole().db, { vorname, nachname, status, rollen });
+	if (status === 'vorgemerkt' && davor === 'ausgetreten') {
+		await hole()
+			.db.update(mitglied)
+			.set({ statusVorher: 'ausgetreten', austrittAm: new Date() })
+			.where(eq(mitglied.id, m.mitgliedId));
+	}
+	return m;
+}
+
 export async function beendeAlleSitzungen(kontoId: number): Promise<void> {
 	await hole().dienst.beendeAlleSitzungen(kontoId);
 }

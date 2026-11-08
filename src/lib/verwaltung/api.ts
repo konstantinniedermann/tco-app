@@ -62,6 +62,7 @@ export type Antwort<T> =
 	| { art: 'eingabe'; felder: Partial<Record<AlleFelder, string>> }
 	| { art: 'vergeben'; feld: Feld | 'jahr' | 'name' }
 	| { art: 'letzter-mytco' }
+	| { art: 'eigenes-konto' }
 	| { art: 'veraltet' }
 	| { art: 'frist-abgelaufen' }
 	| { art: 'schluss-vorbei' }
@@ -106,6 +107,7 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 	}
 	if (status === 409) {
 		if (k.fehler === 'letzter-mytco') return { art: 'letzter-mytco' };
+		if (k.fehler === 'eigenes-konto') return { art: 'eigenes-konto' };
 		if (k.fehler === 'veraltet') return { art: 'veraltet' };
 		if (k.fehler === 'frist-abgelaufen') return { art: 'frist-abgelaufen' };
 		if (k.fehler === 'schluss-vorbei') return { art: 'schluss-vorbei' };

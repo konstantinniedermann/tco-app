@@ -42,11 +42,13 @@ verteilt der MyTCO-Admin die Rollen von Hand. Einzelheiten im
 | RR-05 | Für die Rolle *Mitglied* gibt es kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM und bei der Wahl des Doppelpartners (nur Mitglieder, die für die Kategorie passen und noch frei sind) | geplant |
 | RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist | geplant |
 | RR-07 | Die Verwaltung sieht nur, wer eine Admin-Rolle hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03): Mitglieder-Admin *Mitgliederverwaltung* (Mitglieder, Anlässe, Mitteilungen, Für Fairgate, Verlauf), CM-Admin *Clubmeisterschaft*, Lizenz-Admin *Lizenzen*, MyTCO-Admin alle Bereiche nur lesend und dazu *Rollen*. Was eine Rolle nur lesen darf, weist der Server beim Speichern ab; ein ausgeblendeter Knopf reicht nicht | umgesetzt\* (Lizenzen mit ihrer Etappe) |
-| RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | umgesetzt (Austritt und Vormerken sperren das Login; Rollen bleiben gespeichert und wirken nach Wiedereintritt oder Rückgängig wieder) |
+| RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | umgesetzt (Austritt und Vormerken sperren das Login; Rollen bleiben gespeichert und wirken nach Wiedereintritt oder Rückgängig wieder; kommen dabei Admin-Rollen zurück, fragt die Verwaltung vorher nach) |
 | RR-09 | Wer die Verwaltung öffnet, bestätigt sie höchstens einmal pro 24 Stunden mit einem frischen Code per E-Mail, mit jeder Admin-Rolle ([SI-08](sicherheitskonzept.md#vorgaben), K-12.1) | umgesetzt |
+| RR-10 | Ein Mitglieder-Admin erfasst weder den eigenen Austritt noch merkt er sich selbst zum Löschen vor; das macht ein anderer Mitglieder-Admin | umgesetzt |
 
 **Konten mit Admin-Rolle sind nicht besonders geschützt** (Entscheid Projektleiter): Der
-Mitglieder-Admin ändert auch bei ihnen E-Mail, Brief-Code, Sitzungen und Austritt. Ändert er
+Mitglieder-Admin ändert auch bei ihnen E-Mail, Brief-Code, Sitzungen und Austritt; nur den
+eigenen Austritt und das eigene Löschen nicht (RR-10). Ändert er
 eine E-Mail, erhält die alte Adresse einen Hinweis (SI-09); das Restrisiko steht im
 [Sicherheitskonzept](sicherheitskonzept.md#restrisiken).
 
@@ -75,7 +77,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Eigene E-Mail, Telefon, Lizenznummer, Klassierung, Benachrichtigungen (FR-02; E-Mail, Telefon und Lizenznummer: Annahme K-19.1, die E-Mail erst nach zwei Codes, SI-09) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Eigene Adresse (Annahme K-19.2) | – | S eigene | S eigene | S eigene | S | S eigene |
 | Eigener Name, Geschlecht, Jahrgang, Mitgliedernummer (Geschlecht und Jahrgang einmal selbst, wenn leer, FR-37) | – | L eigene | L eigene | L eigene | S | L |
-| Mitglieder anlegen, bearbeiten, löschen, Auskunft drucken (DS-07) | – | – | – | – | S | L |
+| Mitglieder anlegen, bearbeiten, löschen, Auskunft drucken (DS-07; den eigenen Austritt und sich selbst löschen nicht, RR-10) | – | – | – | – | S | L |
 | Neuer Code für einen Brief, Briefe auslösen, Sitzungen beenden | – | – | – | – | S | – |
 | Rollen vergeben | – | – | – | – | – | S |
 | Änderungsverlauf (FR-26) | – | – | – | – | L | L |

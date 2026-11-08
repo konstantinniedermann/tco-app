@@ -1,6 +1,6 @@
 // Texte der Verwaltung: Namen von Feldern, Rollen und Verlaufseinträgen, Zeitangaben.
 import { MELDUNG } from '../login/anmelden.ts';
-import type { Antwort, FairgateZeile, Feld, MitgliedZeile, VerlaufEintrag } from './api.ts';
+import type { Antwort, FairgateZeile, Feld, MitgliedZeile, Rolle, VerlaufEintrag } from './api.ts';
 import { ROLLEN_NAME } from './rollen-namen.ts';
 
 export const NUR_ANSEHEN = 'In der Ansicht kannst du nichts speichern.';
@@ -14,6 +14,14 @@ export function fehlerText(a: Antwort<unknown>): string {
 	if (a.art === 'nur-ansehen') return NUR_ANSEHEN;
 	if (a.art === 'kein-recht') return KEIN_RECHT;
 	return MELDUNG.stoerung;
+}
+
+/** Rollen als Namen in der Reihenfolge der Rollen-Seite: «Mitglieder-Admin, CM-Admin». */
+export function rollenText(rollen: readonly Rolle[]): string {
+	return (Object.keys(ROLLEN_NAME) as Rolle[])
+		.filter((r) => rollen.includes(r))
+		.map((r) => ROLLEN_NAME[r])
+		.join(', ');
 }
 
 /** Meldung, wenn zwischen Laden und Speichern ein anderer das Mitglied geändert hat (409). */

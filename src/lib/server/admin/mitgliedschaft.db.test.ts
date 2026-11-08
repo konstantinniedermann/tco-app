@@ -60,6 +60,12 @@ beforeEach(async () => {
 	urheber = { art: 'admin', mitgliedId: admin.mitgliedId };
 });
 
+// RR-10: Den eigenen Austritt erfasst ein anderer; dieser zählt nicht als MyTCO-Admin (RR-03).
+async function andererMitgliederAdmin() {
+	const m = await legeMitgliedAn(db, { rollen: ['mitglieder'] });
+	return { art: 'admin' as const, mitgliedId: m.mitgliedId };
+}
+
 const zeile = async (id: number) => {
 	const [z] = await db.select().from(mitglied).where(eq(mitglied.id, id));
 	return { ...z, status: z.status as MitgliedStatus };
@@ -222,16 +228,34 @@ describe('Austritt', () => {
 
 	test('RR-03: der letzte MyTCO-Admin kann nicht austreten, nichts geändert', async () => {
 		const kennung = await erstelleSitzung(db, admin.kontoId, jetzt);
-		expect(await erfasseAustritt(db, urheber, admin.mitgliedId, jetzt)).toBe('letzter-mytco');
+		const anderer = await andererMitgliederAdmin();
+		expect(await erfasseAustritt(db, anderer, admin.mitgliedId, jetzt)).toBe('letzter-mytco');
 		expect((await zeile(admin.mitgliedId)).status).toBe('aktiv');
 		expect(await pruefeSitzung(db, kennung, jetzt)).not.toBeNull();
 		expect(await aktionen(admin.mitgliedId)).toEqual([]);
 	});
 
 	test('RR-03: mit einem zweiten MyTCO-Admin geht der Austritt', async () => {
-		await legeMitgliedAn(db, { rollen: ['mytco'] });
-		expect(await erfasseAustritt(db, urheber, admin.mitgliedId, jetzt)).toBe('ok');
+		const zweiter = await legeMitgliedAn(db, { rollen: ['mytco'] });
+		const durchZweiten = { art: 'admin' as const, mitgliedId: zweiter.mitgliedId };
+		expect(await erfasseAustritt(db, durchZweiten, admin.mitgliedId, jetzt)).toBe('ok');
 		expect(await istMytcoAdmin(db, admin.kontoId)).toBe(false);
+	});
+
+	test('RR-10: Mitglieder-Admin kann den eigenen Austritt nicht erfassen', async () => {
+		// Auch ohne MyTCO-Admin-Rolle (RR-03 greift dann nicht) und beim MyTCO-Admin vor RR-03.
+		const selbst = await legeMitgliedAn(db, { rollen: ['mitglieder'] });
+		const kennung = await mitLogin(selbst.kontoId);
+		const ich = { art: 'admin' as const, mitgliedId: selbst.mitgliedId };
+		const vorher = await zeile(selbst.mitgliedId);
+		expect(await erfasseAustritt(db, ich, selbst.mitgliedId, jetzt)).toBe('eigenes-konto');
+		expect(await zeile(selbst.mitgliedId)).toEqual(vorher);
+		expect(await pruefeSitzung(db, kennung, jetzt)).not.toBeNull();
+		expect(await aktionen(selbst.mitgliedId)).toEqual([]);
+
+		expect(await erfasseAustritt(db, urheber, admin.mitgliedId, jetzt)).toBe('eigenes-konto');
+		expect((await zeile(admin.mitgliedId)).status).toBe('aktiv');
+		expect(await aktionen(admin.mitgliedId)).toEqual([]);
 	});
 });
 
@@ -342,7 +366,8 @@ describe('Löschung vormerken und rückgängig', () => {
 	});
 
 	test('RR-03: den letzten MyTCO-Admin nicht vormerken; vorgemerkt → veraltet; rückgängig nur aus vorgemerkt', async () => {
-		expect(await merkeZumLoeschenVor(db, urheber, admin.mitgliedId, jetzt)).toBe('letzter-mytco');
+		const anderer = await andererMitgliederAdmin();
+		expect(await merkeZumLoeschenVor(db, anderer, admin.mitgliedId, jetzt)).toBe('letzter-mytco');
 		expect((await zeile(admin.mitgliedId)).status).toBe('aktiv');
 
 		const m = await legeMitgliedAn(db, { status: 'vorgemerkt' });
@@ -351,6 +376,19 @@ describe('Löschung vormerken und rückgängig', () => {
 		expect(await nimmLoeschungZurueck(db, urheber, aktiv.mitgliedId, jetzt)).toBe('veraltet');
 		expect(await merkeZumLoeschenVor(db, urheber, -1, jetzt)).toBe('nicht-gefunden');
 		expect(await nimmLoeschungZurueck(db, urheber, -1, jetzt)).toBe('nicht-gefunden');
+	});
+
+	test('RR-10: Mitglieder-Admin kann sich nicht selbst zum Löschen vormerken', async () => {
+		for (const status of ['aktiv', 'ausgetreten'] as const) {
+			const selbst = await legeMitgliedAn(db, { rollen: ['mitglieder'], status });
+			const ich = { art: 'admin' as const, mitgliedId: selbst.mitgliedId };
+			const vorher = await zeile(selbst.mitgliedId);
+			expect(await merkeZumLoeschenVor(db, ich, selbst.mitgliedId, jetzt)).toBe('eigenes-konto');
+			expect(await zeile(selbst.mitgliedId)).toEqual(vorher);
+			expect(await aktionen(selbst.mitgliedId)).toEqual([]);
+		}
+		expect(await merkeZumLoeschenVor(db, urheber, admin.mitgliedId, jetzt)).toBe('eigenes-konto');
+		expect((await zeile(admin.mitgliedId)).status).toBe('aktiv');
 	});
 });
 
@@ -482,9 +520,10 @@ describe('Gleichzeitig (Review-Fokus 1)', () => {
 
 	test('RR-03 parallel: zwei MyTCO-Admins treten gleichzeitig aus, einer bleibt', async () => {
 		const zweiter = await legeMitgliedAn(db, { rollen: ['mytco'] });
+		const anderer = await andererMitgliederAdmin();
 		const ergebnisse = await Promise.all([
-			erfasseAustritt(db, urheber, admin.mitgliedId, jetzt),
-			merkeZumLoeschenVor(db, urheber, zweiter.mitgliedId, jetzt)
+			erfasseAustritt(db, anderer, admin.mitgliedId, jetzt),
+			merkeZumLoeschenVor(db, anderer, zweiter.mitgliedId, jetzt)
 		]);
 		expect([...ergebnisse].sort()).toEqual(['letzter-mytco', 'ok']);
 		const zaehlend = [

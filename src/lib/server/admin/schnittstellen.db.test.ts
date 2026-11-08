@@ -3,7 +3,7 @@ import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { kontoRolle, mitglied } from '../db/schema.ts';
+import { kontoRolle, mitglied, sitzung } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { antwort, getSitzung } from '../login/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
@@ -876,6 +876,21 @@ describe('Mitgliedschaft: Austritt, Wiedereintritt, Löschung', () => {
 			const r = await post(fn, s, admin.konto, '999999999');
 			expect([r.status, await r.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
 		}
+	});
+
+	test('RR-10: eigener Austritt und eigenes Vormerken → 409 eigenes-konto, nichts geändert', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const id = String(admin.mitgliedId);
+		for (const fn of [postAustritt, postLoeschen]) {
+			const r = await post(fn, s, admin.konto, id);
+			expect([r.status, await r.json()]).toEqual([409, { fehler: 'eigenes-konto' }]);
+		}
+		expect((await ladeMitglied(db, admin.mitgliedId, start))!.status).toBe('aktiv');
+		// Das Login bleibt: keine Sitzung beendet.
+		expect(await db.select().from(sitzung).where(eq(sitzung.kontoId, admin.kontoId))).toHaveLength(
+			1
+		);
 	});
 
 	test('Wiedereintritt nach der Frist → 409 frist-abgelaufen', async () => {

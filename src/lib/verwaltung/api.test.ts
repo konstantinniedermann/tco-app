@@ -424,6 +424,7 @@ describe('Mitgliedschaft: Austritt, Löschung, Auskunft', () => {
 		expect(await mit(409, { fehler: 'veraltet' })).toEqual({ art: 'veraltet' });
 		expect(await mit(409, { fehler: 'letzter-mytco' })).toEqual({ art: 'letzter-mytco' });
 		expect(await mit(409, { fehler: 'frist-abgelaufen' })).toEqual({ art: 'frist-abgelaufen' });
+		expect(await mit(409, { fehler: 'eigenes-konto' })).toEqual({ art: 'eigenes-konto' });
 		expect(await mit(403, { fehler: 'nur-ansehen' })).toEqual({ art: 'nur-ansehen' });
 		expect(await mit(404, {})).toEqual({ art: 'nicht-gefunden' });
 		expect(await mit(500, {})).toEqual({ art: 'stoerung' });
