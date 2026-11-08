@@ -99,6 +99,13 @@
       "when": 1794035725380,
       "tag": "0013_mitgliedschaft",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794126264183,
+      "tag": "0014_true_prodigy",
+      "breakpoints": true
     }
   ]
 }

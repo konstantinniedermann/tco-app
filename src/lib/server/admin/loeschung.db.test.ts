@@ -71,6 +71,7 @@ async function ausgetreten(austrittAm: Date) {
 			status: 'ausgetreten',
 			austrittAm,
 			mitgliedernummer: `T-${m.mitgliedId}`,
+			rufname: 'Hannes',
 			telefon: '079 000 00 00',
 			geschlecht: 'w',
 			jahrgang: 1980,
