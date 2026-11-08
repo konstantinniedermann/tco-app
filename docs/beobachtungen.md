@@ -116,6 +116,23 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-08 — Kleinbefunde aus den Reviews von #43 (Etappe 2a Briefe)
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/lib/server/admin/briefe.ts`, `src/lib/server/admin/schnittstellen.ts` (`postBriefe`, `postBrief`), `src/routes/verwaltung/briefe/+page.svelte`, `tests/e2e/briefe.test.ts`, `tests/e2e/mitgliedschaft.test.ts`
+
+**Beobachtung:** Aus den Task- und Schluss-Reviews, als «nicht vor dem Merge» eingestuft:
+- Tests: kein DB-Test, dass ein Mitglied mit abgelaufener oder veralteter Sitzung in der Liste *Briefe* bleibt; der Doppelklick-Riegel und die Speicherprüfung (RR-04) sind nur auf der Seite *Briefe* per E2E belegt, nicht auf der Mitgliedsseite; der 409-E2E prüft nicht, dass serverseitig kein Code entstand (der DB-Test deckt es); die Rückfrage mit mehreren zurückkehrenden Rollen («die Rollen X, Y») hat keinen E2E; `readFileSync` mit relativem Pfad in `briefe.test.ts`.
+- Code: `stelleBriefeAus` zählt `anzahl` bei doppelten IDs falsch (die Schnittstelle weist Doppel mit 400 ab) und öffnet bei leerer Liste eine Transaktion; die Abbildung ok → 200 / sonst 409 steht in `postBriefe` und `postBrief` doppelt; wird ein Mitglied zwischen Lesen und Ausstellen gelöscht, antwortet `postBrief` 409 statt 404.
+- Oberfläche: mehr als 1000 gewählte Zeilen ergeben eine allgemeine Störungsmeldung statt eines klaren Hinweises (`MAX_BRIEFE`); eine Antwort mit 1000 Briefen wäre mehrere MB gross.
+- Nicht entschieden: Ein Mitglieder-Admin kann für sein eigenes Konto einen Brief-Code ausstellen (RR-10 deckt nur Austritt und Löschen); zwei Admins, die gleichzeitig Serien für dieselben Mitglieder erzeugen, machen den ersten Ausdruck ungültig (folgt aus FR-24).
+- `INTEGER_MAX` schützt nur `leseIds`; andere Schnittstellen mit IDs im JSON-Körper wurden nicht darauf geprüft.
+
+**Ursprung:** #43 Etappe 2a, Task-Reviews 2–6 und Schluss-Review.
+
+**Einschätzung:** Alles niedrig, für einen Verein mit 300–500 Mitgliedern unkritisch. Die Testlücken bei Gelegenheit schliessen, die zwei offenen Fragen bei Bedarf dem Projektleiter vorlegen.
+
 ### 2026-11-08 — Nach einem 409 bei den Briefen fällt der Fokus auf `body`
 
 **Thema:** App-Oberfläche
@@ -211,6 +228,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Merge von #66 nach `dev` (Konzept Gruppenphase).
 
 **Einschätzung:** Niedrig: Wiederholen hilft, sobald GitHub wieder antwortet. `curl --retry 3 --retry-all-errors` würde kurze Störungen abfangen; zu prüfen, ob das den Prüfsummen-Schritt berührt.
+
+**Nachtrag (08.11.2026, Merge von #43 Etappe 2a):** Dieselbe Ursache trifft die Malware-Prüfung: Job *Malware-Prüfung (OSV)* in `check.yml`, Schritt *osv-scanner installieren*, zweimal `curl: (22) … 504` (Lauf 42468002707), auch ein Abruf von Hand bekam 504. Alle übrigen Jobs grün. Der Fix mit `--retry` gehört in beide Workflows.
 
 ### 2026-11-08 — Automatische Pushes zu CM-Resultaten und Restzeit haben keine Anforderung
 
