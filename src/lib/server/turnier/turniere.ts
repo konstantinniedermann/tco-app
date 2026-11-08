@@ -4,6 +4,7 @@ import { zaehleAktive, zaehleUnpassende } from '../cm/anmeldungen.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
 	kategorie,
+	partnerAnfrage,
 	turnier,
 	turniernummer,
 	type KategorieStatus,
@@ -260,6 +261,8 @@ export async function ladeKategorie(
 
 /**
  * FR-36: Passen aktive Anmeldungen nach den neuen Werten nicht mehr, speichert nur `trotzdem`.
+ * Einzel oder Doppel wechseln geht nur ohne aktive Anmeldungen, auch mit `trotzdem` nicht
+ * (`art-gesperrt`): Sonst würde aus einer Einzel-Anmeldung ungefragt ein *sucht Partner*.
  * Gesperrt wird allein die Kategorie, nie eine Mitgliedszeile: So bleibt die Reihenfolge von
  * `meldeAn` (Mitglied, dann Kategorie) ohne Zyklus.
  */
@@ -268,12 +271,15 @@ export async function aendereKategorie(
 	id: number,
 	w: KategorieWerte,
 	trotzdem: boolean
-): Promise<'ok' | 'vergeben' | 'abgesagt' | 'nicht-gefunden' | { unpassend: number }> {
+): Promise<
+	'ok' | 'vergeben' | 'abgesagt' | 'art-gesperrt' | 'nicht-gefunden' | { unpassend: number }
+> {
 	try {
 		return await db.transaction(async (tx) => {
 			const [k] = await tx.select().from(kategorie).where(eq(kategorie.id, id)).for('update');
 			if (!k) return 'nicht-gefunden' as const;
 			if (k.status === 'abgesagt') return 'abgesagt' as const;
+			if (w.art !== k.art && (await zaehleAktive(tx, id)) > 0) return 'art-gesperrt' as const;
 			if (!trotzdem) {
 				const unpassend = await zaehleUnpassende(tx, id, w);
 				if (unpassend > 0) return { unpassend };
@@ -287,7 +293,10 @@ export async function aendereKategorie(
 	}
 }
 
-/** FR-35: Absagen geht nur ohne aktive Anmeldungen; Sperre wie bei `aendereKategorie`. */
+/**
+ * FR-35: Absagen geht nur ohne aktive Anmeldungen; Sperre wie bei `aendereKategorie`. Offene
+ * Partner-Anfragen der Kategorie sind danach gelöscht (FR-48, Datensparsamkeit).
+ */
 export async function sageKategorieAb(
 	db: Db,
 	id: number
@@ -302,6 +311,7 @@ export async function sageKategorieAb(
 		const aktiv = await zaehleAktive(tx, id);
 		if (aktiv > 0) return { aktiv };
 		await tx.update(kategorie).set({ status: 'abgesagt' }).where(eq(kategorie.id, id));
+		await tx.delete(partnerAnfrage).where(eq(partnerAnfrage.kategorieId, id));
 		return 'ok' as const;
 	});
 }

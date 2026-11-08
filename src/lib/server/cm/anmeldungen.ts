@@ -16,6 +16,7 @@ import {
 } from '../db/schema.ts';
 import {
 	fehlendeAngaben,
+	passtAlsPaar,
 	passtDoppelAllein,
 	passtEinzel,
 	wildcardEinzel,
@@ -665,7 +666,9 @@ export async function zaehleAktive(db: DbOderTx, kategorieId: number): Promise<n
 
 /**
  * FR-36: aktive Anmeldungen, deren Spieler nach den Werten `neu` nicht mehr passen, gemessen
- * an den heutigen Angaben der Spieler. Eine Anmeldung zählt einmal, auch mit zwei Spielern.
+ * an den heutigen Angaben der Spieler. Im Doppel zählt ein Paar, das nicht mehr passt
+ * (`passtAlsPaar`, streng: Geschlecht und Mindestsumme), und wer allein sucht und nach Geschlecht
+ * nicht mehr passt (`passtDoppelAllein`). Eine Anmeldung zählt einmal.
  */
 export async function zaehleUnpassende(
 	db: DbOderTx,
@@ -677,9 +680,18 @@ export async function zaehleUnpassende(
 		.from(anmeldung)
 		.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
 		.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId))
-		.where(and(eq(anmeldung.kategorieId, kategorieId), istAktiv));
-	const unpassend = new Set(
-		zeilen.filter((z) => !passtEinzel(neu, spielerAus(z))).map((z) => z.anmeldungId)
-	);
-	return unpassend.size;
+		.where(and(eq(anmeldung.kategorieId, kategorieId), istAktiv))
+		.orderBy(asc(anmeldung.id), asc(anmeldungSpieler.mitgliedId));
+	const spieler = new Map<number, Spieler[]>();
+	for (const z of zeilen) {
+		const liste = spieler.get(z.anmeldungId) ?? [];
+		liste.push(spielerAus(z));
+		spieler.set(z.anmeldungId, liste);
+	}
+	const passt = ([a, b]: Spieler[]): boolean => {
+		if (neu.art === 'einzel')
+			return passtEinzel(neu, a) && (b === undefined || passtEinzel(neu, b));
+		return b === undefined ? passtDoppelAllein(neu, a) : passtAlsPaar(neu, a, b, true);
+	};
+	return [...spieler.values()].filter((s) => !passt(s)).length;
 }

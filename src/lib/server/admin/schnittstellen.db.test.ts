@@ -3,7 +3,9 @@ import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { kontoRolle, mitglied } from '../db/schema.ts';
+import { anmeldung, anmeldungSpieler, kontoRolle, mitglied, partnerAnfrage } from '../db/schema.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { antwort, getSitzung } from '../login/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
@@ -60,6 +62,7 @@ afterEach(() => {
 });
 
 const start = new Date('2026-11-02T12:00:00Z');
+const ADRESSE = 'https://mytco.example.org';
 
 function baue() {
 	const post: { an: string; text: string }[] = [];
@@ -74,8 +77,20 @@ function baue() {
 		jetzt: () => start
 	});
 	const hinweis = vi.fn<AdminDienste['hinweis']>(async () => {});
-	const d: AdminDienste = { db, zugang, hinweis, jetzt: () => start };
-	return { d, post, hinweis };
+	// Meldungen zum Doppel (FR-47): ohne VAPID gehen sie per E-Mail.
+	const mails: { an: string; betreff: string; text: string }[] = [];
+	const d: MitteilungAdminDienste = {
+		db,
+		zugang,
+		hinweis,
+		jetzt: () => start,
+		push: null,
+		mailer: async (n) => {
+			mails.push(n);
+		},
+		adresse: ADRESSE
+	};
+	return { d, post, hinweis, mails };
 }
 
 async function einloggen(kontoId: number): Promise<AngemeldetesKonto> {
@@ -750,6 +765,84 @@ describe('Mitgliedschaft: Austritt, Wiedereintritt, Löschung', () => {
 			]);
 		}
 	});
+
+	/** Offenes Doppel in einem freien Jahr mit Anmeldeschluss nach `start`. */
+	async function offenesDoppel() {
+		for (;;) {
+			const jahr = 3000 + Math.floor(Math.random() * 6000);
+			const t = await legeTurnierAn(db, {
+				jahr,
+				name: `Clubmeisterschaft ${jahr}`,
+				anmeldeschluss: `${jahr}-05-31`,
+				nummern: []
+			});
+			if (t.ergebnis !== 'ok') continue;
+			const k = await legeKategorieAn(db, t.id, {
+				name: 'Herren Doppel',
+				geschlecht: 'herren',
+				art: 'doppel',
+				jahrgangVon: null,
+				jahrgangBis: null,
+				klassierungVon: null,
+				klassierungBis: null,
+				mindestsumme: 9
+			});
+			if (k.ergebnis !== 'ok') throw new Error(`Kategorie: ${k.ergebnis}`);
+			return { turnierId: t.id, kategorieId: k.id };
+		}
+	}
+
+	const meldung = (an: string, text: string, turnierId: number) => ({
+		an,
+		betreff: 'Clubmeisterschaft',
+		text: `${text}\n\n${ADRESSE}/clubmeisterschaft/${turnierId}`
+	});
+
+	for (const [name, fn] of [
+		['Austritt', postAustritt],
+		['Löschung vormerken', postLoeschen]
+	] as const) {
+		test(`FR-04, FR-47: ${name} meldet dem Partner den Rückzug und dem Dritten die hinfällige Anfrage`, async () => {
+			const s = baue();
+			const admin = await bestaetigterAdmin(s, ['mitglieder']);
+			const ziel = await legeMitgliedAn(db);
+			const partner = await legeMitgliedAn(db);
+			const dritter = await legeMitgliedAn(db);
+			const { turnierId, kategorieId } = await offenesDoppel();
+			const [a] = await db
+				.insert(anmeldung)
+				.values({ kategorieId, status: 'bestaetigt', angemeldetAm: start, geaendertAm: start })
+				.returning({ id: anmeldung.id });
+			await db.insert(anmeldungSpieler).values([
+				{ anmeldungId: a.id, mitgliedId: ziel.mitgliedId },
+				{ anmeldungId: a.id, mitgliedId: partner.mitgliedId }
+			]);
+			await db.insert(partnerAnfrage).values({
+				kategorieId,
+				vonId: dritter.mitgliedId,
+				anId: ziel.mitgliedId,
+				gestelltAm: start
+			});
+
+			const r = await post(fn, s, admin.konto, String(ziel.mitgliedId));
+
+			expect([r.status, await r.json()]).toEqual([200, {}]);
+			// Die Antwort wartet nicht auf die Meldungen; der Test wartet auf den Versand.
+			await vi.waitFor(() => expect(s.mails).toHaveLength(2));
+			expect(s.mails).toEqual(
+				expect.arrayContaining([
+					meldung(
+						partner.email,
+						'Eure Anmeldung für «Herren Doppel» ist zurückgezogen.',
+						turnierId
+					),
+					meldung(dritter.email, 'Die Anfrage für «Herren Doppel» ist hinfällig.', turnierId)
+				])
+			);
+			const [z] = await db.select().from(anmeldung).where(eq(anmeldung.id, a.id));
+			expect(z.status).toBe('zurueckgezogen');
+		});
+	}
 
 	test('Ablauf: Wiedereintritt, Löschung vormerken und zurücknehmen; falscher Zustand 409', async () => {
 		const s = baue();

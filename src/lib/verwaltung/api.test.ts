@@ -250,6 +250,11 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 		]);
 	});
 
+	it('FR-36: 409 art-gesperrt wird eigenes Ergebnis', async () => {
+		const g = holer(json(409, { fehler: 'art-gesperrt' }));
+		expect(await aendereKategorie(2, {}, true, g.holen)).toEqual({ art: 'art-gesperrt' });
+	});
+
 	it('FR-36: 409 unpassend wird eigenes Ergebnis mit anzahl', async () => {
 		const u = holer(json(409, { fehler: 'unpassend', anzahl: 3 }));
 		expect(await aendereKategorie(2, {}, false, u.holen)).toEqual({ art: 'unpassend', anzahl: 3 });

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	absageSperreText,
 	anmeldungenText,
+	ART_GESPERRT,
 	anmeldungStatus,
 	datumKurz,
 	datumLang,
@@ -77,6 +78,9 @@ describe('Anzeigehilfen für Turniere', () => {
 		);
 		expect(absageSperreText(2)).toBe(
 			'Diese Kategorie hat 2 aktive Anmeldungen. Absagen geht erst, wenn keine mehr da sind.'
+		);
+		expect(ART_GESPERRT).toBe(
+			'Einzel oder Doppel lässt sich nur ändern, solange niemand angemeldet ist.'
 		);
 	});
 

@@ -295,8 +295,12 @@ describe('Mit Passkey anmelden', () => {
 		const vorgemerkt = await legeMitgliedAn(db);
 		const a = await richteEin(d, ausgetreten.kontoId);
 		const v = await richteEin(d, vorgemerkt.kontoId);
-		expect(await erfasseAustritt(db, urheber, ausgetreten.mitgliedId, start)).toBe('ok');
-		expect(await merkeZumLoeschenVor(db, urheber, vorgemerkt.mitgliedId, start)).toBe('ok');
+		expect(await erfasseAustritt(db, urheber, ausgetreten.mitgliedId, start)).toMatchObject({
+			ergebnis: 'ok'
+		});
+		expect(await merkeZumLoeschenVor(db, urheber, vorgemerkt.mitgliedId, start)).toMatchObject({
+			ergebnis: 'ok'
+		});
 		const vorher = d.aufrufe.pruefeAnmelden;
 
 		const unbekannt = await meldeAn(d, neueKennung());

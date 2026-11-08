@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'vitest';
 import {
 	legeEigeneDatenbankAn,
@@ -16,11 +16,13 @@ import {
 	kategorie,
 	kontoRolle,
 	mitglied,
+	partnerAnfrage,
 	passkey,
 	pushAbo,
 	sitzung,
 	turnier
 } from '../db/schema.ts';
+import { ladeCmAnsicht } from '../cm/anmeldungen.ts';
 import { erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
 import { ladeMitglied, type MitgliedStatus } from './mitglieder.ts';
 import {
@@ -98,10 +100,10 @@ async function mitLogin(kontoId: number) {
 let naechstesJahr = 2030;
 
 /** Turnier mit einer Einzel- und einer Doppel-Kategorie. */
-async function turnierMit(anmeldeschluss: string) {
+async function turnierMit(anmeldeschluss: string, status: 'offen' | 'geschlossen' = 'offen') {
 	const [t] = await db
 		.insert(turnier)
-		.values({ jahr: naechstesJahr++, name: 'Clubmeisterschaft', anmeldeschluss, status: 'offen' })
+		.values({ jahr: naechstesJahr++, name: 'Clubmeisterschaft', anmeldeschluss, status })
 		.returning({ id: turnier.id });
 	const [einzel] = await db
 		.insert(kategorie)
@@ -124,19 +126,28 @@ async function turnierMit(anmeldeschluss: string) {
 			mindestsumme: 10
 		})
 		.returning({ id: kategorie.id });
-	return { einzel: einzel.id, doppel: doppel.id };
+	return { turnierId: t.id, einzel: einzel.id, doppel: doppel.id };
 }
 
-async function meldeAn(kategorieId: number, mitgliedIds: number[]) {
+async function meldeAn(kategorieId: number, mitgliedIds: number[], suchtext: string | null = null) {
 	const [a] = await db
 		.insert(anmeldung)
-		.values({ kategorieId, status: 'bestaetigt', angemeldetAm: jetzt, geaendertAm: jetzt })
+		.values({
+			kategorieId,
+			status: 'bestaetigt',
+			suchtext,
+			angemeldetAm: jetzt,
+			geaendertAm: jetzt
+		})
 		.returning({ id: anmeldung.id });
 	await db
 		.insert(anmeldungSpieler)
 		.values(mitgliedIds.map((mitgliedId) => ({ anmeldungId: a.id, mitgliedId })));
 	return a.id;
 }
+
+/** Ergebnis eines Übergangs ohne die CM-Angaben: `'ok'` oder der Fehler. */
+const kurz = (r: string | { ergebnis: 'ok' }) => (typeof r === 'string' ? r : r.ergebnis);
 
 const statusVon = async (anmeldungId: number) =>
 	(await db.select().from(anmeldung).where(eq(anmeldung.id, anmeldungId)))[0];
@@ -165,7 +176,7 @@ describe('Austritt', () => {
 			.where(eq(mitglied.id, m.mitgliedId));
 		const kennung = await mitLogin(m.kontoId);
 
-		expect(await erfasseAustritt(db, urheber, m.mitgliedId, jetzt)).toBe('ok');
+		expect(kurz(await erfasseAustritt(db, urheber, m.mitgliedId, jetzt))).toBe('ok');
 
 		const z = await zeile(m.mitgliedId);
 		expect(z.status).toBe('ausgetreten');
@@ -179,7 +190,7 @@ describe('Austritt', () => {
 		expect(await aktionen(m.mitgliedId)).toEqual([['ausgetreten', admin.mitgliedId]]);
 	});
 
-	test('zieht offene Einzel-Anmeldungen zurück, löscht kommende Antworten, Vergangenes bleibt', async () => {
+	test('zieht offene Anmeldungen zurück, löscht kommende Antworten, Vergangenes bleibt', async () => {
 		const m = await legeMitgliedAn(db);
 		const partner = await legeMitgliedAn(db);
 		const offen = await turnierMit('2026-12-31');
@@ -196,19 +207,123 @@ describe('Austritt', () => {
 		}
 		const spaeter = new Date(jetzt.getTime() + 60_000);
 
-		expect(await erfasseAustritt(db, urheber, m.mitgliedId, spaeter)).toBe('ok');
+		expect(await erfasseAustritt(db, urheber, m.mitgliedId, spaeter)).toMatchObject({
+			ergebnis: 'ok'
+		});
 
 		expect(await statusVon(einzelOffen)).toMatchObject({
 			status: 'zurueckgezogen',
 			geaendertAm: spaeter
 		});
 		expect(await statusVon(einzelZu)).toMatchObject({ status: 'bestaetigt', geaendertAm: jetzt });
-		expect((await statusVon(doppel)).status).toBe('bestaetigt');
+		expect((await statusVon(doppel)).status).toBe('zurueckgezogen');
 		const antworten = await db
 			.select({ anlassId: anlassAnmeldung.anlassId })
 			.from(anlassAnmeldung)
 			.where(eq(anlassAnmeldung.mitgliedId, m.mitgliedId));
 		expect(antworten).toEqual([{ anlassId: vergangen }]);
+	});
+
+	test('FR-04: Austritt zieht offene Doppel zurück, meldet Partner und Anfragen, nach Anmeldeschluss bleibt das Paar', async () => {
+		const m = await legeMitgliedAn(db);
+		const partner = await legeMitgliedAn(db);
+		const dritter = await legeMitgliedAn(db);
+		const vierter = await legeMitgliedAn(db);
+		const offen = await turnierMit('2026-12-31');
+		const zu = await turnierMit('2026-11-01');
+		const paarOffen = await meldeAn(offen.doppel, [m.mitgliedId, partner.mitgliedId]);
+		const paarZu = await meldeAn(zu.doppel, [m.mitgliedId, partner.mitgliedId]);
+		const frage = (kategorieId: number, vonId: number, anId: number) =>
+			db
+				.insert(partnerAnfrage)
+				.values({ kategorieId, vonId, anId, gestelltAm: jetzt })
+				.returning({ id: partnerAnfrage.id });
+		await frage(offen.doppel, dritter.mitgliedId, m.mitgliedId);
+		await frage(offen.doppel, m.mitgliedId, vierter.mitgliedId);
+		// Auch nach dem Anmeldeschluss: Eine offene Anfrage eines Ausgetretenen hat keinen Zweck mehr.
+		await frage(zu.doppel, m.mitgliedId, vierter.mitgliedId);
+		const [fremd] = await frage(offen.doppel, dritter.mitgliedId, vierter.mitgliedId);
+		const spaeter = new Date(jetzt.getTime() + 60_000);
+
+		expect(await erfasseAustritt(db, urheber, m.mitgliedId, spaeter)).toEqual({
+			ergebnis: 'ok',
+			cm: {
+				partner: [
+					{ mitgliedId: partner.mitgliedId, kategorie: 'Doppel', turnierId: offen.turnierId }
+				],
+				hinfaellig: [
+					{ anderer: dritter.mitgliedId, kategorie: 'Doppel', turnierId: offen.turnierId },
+					{ anderer: vierter.mitgliedId, kategorie: 'Doppel', turnierId: offen.turnierId },
+					{ anderer: vierter.mitgliedId, kategorie: 'Doppel', turnierId: zu.turnierId }
+				]
+			}
+		});
+
+		expect(await statusVon(paarOffen)).toMatchObject({
+			status: 'zurueckgezogen',
+			geaendertAm: spaeter
+		});
+		expect(await statusVon(paarZu)).toMatchObject({ status: 'bestaetigt', geaendertAm: jetzt });
+		const anfragen = await db.select({ id: partnerAnfrage.id }).from(partnerAnfrage);
+		expect(anfragen).toEqual([{ id: fremd.id }]);
+	});
+
+	test('FR-04: Austritt zieht auch zurück, wenn der CM-Admin früh geschlossen hat', async () => {
+		const m = await legeMitgliedAn(db);
+		const frueh = await turnierMit('2026-12-31', 'geschlossen');
+		const einzel = await meldeAn(frueh.einzel, [m.mitgliedId]);
+		const sucht = await meldeAn(frueh.doppel, [m.mitgliedId], 'Suche jemanden für abends');
+
+		expect(await erfasseAustritt(db, urheber, m.mitgliedId, jetzt)).toEqual({
+			ergebnis: 'ok',
+			cm: { partner: [], hinfaellig: [] }
+		});
+
+		expect(await statusVon(einzel)).toMatchObject({ status: 'zurueckgezogen' });
+		expect(await statusVon(sucht)).toMatchObject({ status: 'zurueckgezogen', suchtext: null });
+	});
+
+	test('FR-04: nach dem Austritt zeigt die CM-Seite den Ausgetretenen weder als Suchenden noch in Anfragen', async () => {
+		const m = await legeMitgliedAn(db, { vorname: 'Theo', nachname: 'Austritt' });
+		const dritter = await legeMitgliedAn(db);
+		await db
+			.update(mitglied)
+			.set({ geschlecht: 'm', jahrgang: 1990, klassierung: 'R5' })
+			.where(inArray(mitglied.id, [m.mitgliedId, dritter.mitgliedId]));
+		const offen = await turnierMit('2026-12-31');
+		await meldeAn(offen.doppel, [m.mitgliedId], 'Suche jemanden für abends');
+		await db.insert(partnerAnfrage).values([
+			{
+				kategorieId: offen.doppel,
+				vonId: m.mitgliedId,
+				anId: dritter.mitgliedId,
+				gestelltAm: jetzt
+			},
+			{
+				kategorieId: offen.doppel,
+				vonId: dritter.mitgliedId,
+				anId: m.mitgliedId,
+				gestelltAm: jetzt
+			}
+		]);
+		const sicht = async () => {
+			const a = (await ladeCmAnsicht(db, offen.turnierId, dritter.mitgliedId, jetzt))!;
+			const d = a.kategorien.find((k) => k.id === offen.doppel)!;
+			return {
+				suchende: d.suchende.map((s) => s.name),
+				meineAnfragen: d.meineAnfragen.map((x) => x.an),
+				anfragen: a.anfragen.map((x) => x.von)
+			};
+		};
+		expect(await sicht()).toEqual({
+			suchende: ['Theo Austritt'],
+			meineAnfragen: ['Theo Austritt'],
+			anfragen: ['Theo Austritt']
+		});
+
+		await erfasseAustritt(db, urheber, m.mitgliedId, jetzt);
+
+		expect(await sicht()).toEqual({ suchende: [], meineAnfragen: [], anfragen: [] });
 	});
 
 	test('nicht aus ausgetreten (veraltet), unbekannt → nicht-gefunden', async () => {
@@ -230,7 +345,7 @@ describe('Austritt', () => {
 
 	test('RR-03: mit einem zweiten MyTCO-Admin geht der Austritt', async () => {
 		await legeMitgliedAn(db, { rollen: ['mytco'] });
-		expect(await erfasseAustritt(db, urheber, admin.mitgliedId, jetzt)).toBe('ok');
+		expect(kurz(await erfasseAustritt(db, urheber, admin.mitgliedId, jetzt))).toBe('ok');
 		expect(await istMytcoAdmin(db, admin.kontoId)).toBe(false);
 	});
 });
@@ -240,7 +355,7 @@ describe('Wiedereintritt', () => {
 		const m = await legeMitgliedAn(db, { rollen: ['mytco'] });
 		const offen = await turnierMit('2026-12-31');
 		const einzel = await meldeAn(offen.einzel, [m.mitgliedId]);
-		expect(await erfasseAustritt(db, urheber, m.mitgliedId, jetzt)).toBe('ok');
+		expect(kurz(await erfasseAustritt(db, urheber, m.mitgliedId, jetzt))).toBe('ok');
 		expect(await istMytcoAdmin(db, m.kontoId)).toBe(false);
 
 		const spaeter = new Date(jetzt.getTime() + 30 * TAG);
@@ -291,7 +406,7 @@ describe('Löschung vormerken und rückgängig', () => {
 		await erfasseAustritt(db, urheber, m.mitgliedId, jetzt);
 		const spaeter = new Date(jetzt.getTime() + 3 * TAG);
 
-		expect(await merkeZumLoeschenVor(db, urheber, m.mitgliedId, spaeter)).toBe('ok');
+		expect(kurz(await merkeZumLoeschenVor(db, urheber, m.mitgliedId, spaeter))).toBe('ok');
 		expect(await zeile(m.mitgliedId)).toMatchObject({
 			status: 'vorgemerkt',
 			vorgemerktAm: spaeter,
@@ -319,7 +434,7 @@ describe('Löschung vormerken und rückgängig', () => {
 		const offen = await turnierMit('2026-12-31');
 		const einzel = await meldeAn(offen.einzel, [m.mitgliedId]);
 
-		expect(await merkeZumLoeschenVor(db, urheber, m.mitgliedId, jetzt)).toBe('ok');
+		expect(kurz(await merkeZumLoeschenVor(db, urheber, m.mitgliedId, jetzt))).toBe('ok');
 		expect(await zeile(m.mitgliedId)).toMatchObject({
 			status: 'vorgemerkt',
 			statusVorher: 'aktiv',
@@ -422,16 +537,20 @@ describe('loeschtAm', () => {
 describe('Gleichzeitig (Review-Fokus 1)', () => {
 	test('zweimal derselbe Übergang: genau ein ok, das andere veraltet, ein Verlaufseintrag', async () => {
 		const m = await legeMitgliedAn(db);
-		const austritte = await Promise.all([
-			erfasseAustritt(db, urheber, m.mitgliedId, jetzt),
-			erfasseAustritt(db, urheber, m.mitgliedId, jetzt)
-		]);
+		const austritte = (
+			await Promise.all([
+				erfasseAustritt(db, urheber, m.mitgliedId, jetzt),
+				erfasseAustritt(db, urheber, m.mitgliedId, jetzt)
+			])
+		).map(kurz);
 		expect(austritte.sort()).toEqual(['ok', 'veraltet']);
 
-		const vormerken = await Promise.all([
-			merkeZumLoeschenVor(db, urheber, m.mitgliedId, jetzt),
-			merkeZumLoeschenVor(db, urheber, m.mitgliedId, jetzt)
-		]);
+		const vormerken = (
+			await Promise.all([
+				merkeZumLoeschenVor(db, urheber, m.mitgliedId, jetzt),
+				merkeZumLoeschenVor(db, urheber, m.mitgliedId, jetzt)
+			])
+		).map(kurz);
 		expect(vormerken.sort()).toEqual(['ok', 'veraltet']);
 
 		const zurueck = await Promise.all([
@@ -449,7 +568,7 @@ describe('Gleichzeitig (Review-Fokus 1)', () => {
 
 	test('Vormerken vor dem Austritt: der Austritt ist veraltet', async () => {
 		const m = await legeMitgliedAn(db);
-		expect(await merkeZumLoeschenVor(db, urheber, m.mitgliedId, jetzt)).toBe('ok');
+		expect(kurz(await merkeZumLoeschenVor(db, urheber, m.mitgliedId, jetzt))).toBe('ok');
 		expect(await erfasseAustritt(db, urheber, m.mitgliedId, jetzt)).toBe('veraltet');
 		expect(await zeile(m.mitgliedId)).toMatchObject({
 			status: 'vorgemerkt',
@@ -460,10 +579,12 @@ describe('Gleichzeitig (Review-Fokus 1)', () => {
 	test('Austritt und Vormerken parallel: nie ein vermischter Zustand', async () => {
 		for (let i = 0; i < 5; i++) {
 			const m = await legeMitgliedAn(db);
-			const [austritt, vormerken] = await Promise.all([
-				erfasseAustritt(db, urheber, m.mitgliedId, jetzt),
-				merkeZumLoeschenVor(db, urheber, m.mitgliedId, jetzt)
-			]);
+			const [austritt, vormerken] = (
+				await Promise.all([
+					erfasseAustritt(db, urheber, m.mitgliedId, jetzt),
+					merkeZumLoeschenVor(db, urheber, m.mitgliedId, jetzt)
+				])
+			).map(kurz);
 			const z = await zeile(m.mitgliedId);
 			const verlauf = (await aktionen(m.mitgliedId)).map(([a]) => a);
 			expect(vormerken).toBe('ok');
@@ -482,10 +603,12 @@ describe('Gleichzeitig (Review-Fokus 1)', () => {
 
 	test('RR-03 parallel: zwei MyTCO-Admins treten gleichzeitig aus, einer bleibt', async () => {
 		const zweiter = await legeMitgliedAn(db, { rollen: ['mytco'] });
-		const ergebnisse = await Promise.all([
-			erfasseAustritt(db, urheber, admin.mitgliedId, jetzt),
-			merkeZumLoeschenVor(db, urheber, zweiter.mitgliedId, jetzt)
-		]);
+		const ergebnisse = (
+			await Promise.all([
+				erfasseAustritt(db, urheber, admin.mitgliedId, jetzt),
+				merkeZumLoeschenVor(db, urheber, zweiter.mitgliedId, jetzt)
+			])
+		).map(kurz);
 		expect([...ergebnisse].sort()).toEqual(['letzter-mytco', 'ok']);
 		const zaehlend = [
 			await istMytcoAdmin(db, admin.kontoId),
