@@ -11,6 +11,7 @@ import {
 	legeOffenesTurnierAn,
 	meldeZurCmAn,
 	schliesseLoginHilfen,
+	setzeRufname,
 	setzeSpielerangaben
 } from './hilfen/login.ts';
 import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
@@ -27,6 +28,7 @@ test.afterAll(async () => {
 // die Läufe: `legeOffenesTurnierAn` löscht das Turnier des Jahres vorher.
 const JAHR_MITGLIED: Record<string, number> = { iphone: 2093, android: 2092 };
 const JAHR_VERWALTUNG: Record<string, number> = { iphone: 2091, android: 2090 };
+const JAHR_RUFNAME: Record<string, number> = { iphone: 2082, android: 2081 };
 
 function testjahr(jahre: Record<string, number>, info: TestInfo): number {
 	const jahr = jahre[info.project.name];
@@ -243,5 +245,40 @@ test('FR-36, FR-35: CM-Admin wird gewarnt und kann eine Kategorie mit Anmeldunge
 	await page.getByRole('link', { name: `‹ ${name}` }).click();
 	await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
 	await expect(page.getByRole('row', { name: /Herren R1–R9/ })).toContainText('R7–R9');
+	expect(fehler).toEqual([]);
+});
+
+test('Rufname: Teilnehmerliste zeigt Rufname mit amtlichem Namen', async ({ page }, info) => {
+	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder sehen die Liste am Handy; die Darstellung selbst prüfen die Einheitstests
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const jahr = testjahr(JAHR_RUFNAME, info);
+	const {
+		kategorieIds: [kategorieId]
+	} = await legeOffenesTurnierAn(jahr, [einzel('Herren R1–R9', 'herren', 'R1')]);
+	const nachname = `Probe${randomUUID().slice(0, 6)}`;
+	const spieler = await legeKontoAn('Johannes', nachname);
+	await setzeSpielerangaben(spieler.mitgliedId, {
+		geschlecht: 'm',
+		jahrgang: 1985,
+		klassierung: 'R3'
+	});
+	await setzeRufname(spieler.mitgliedId, 'Hannes');
+	await meldeZurCmAn(kategorieId, spieler.mitgliedId);
+
+	// Ein anderes Mitglied sieht die Liste.
+	const betrachter = await legeKontoMitBriefCodeAn('Moritz', `Probe${randomUUID().slice(0, 6)}`);
+	await setzeSpielerangaben(betrachter.mitgliedId, {
+		geschlecht: 'm',
+		jahrgang: 1990,
+		klassierung: 'R6'
+	});
+	await startetVomSymbol(page);
+	await meldeAn(page, betrachter);
+	await page.getByRole('link', { name: new RegExp(`Clubmeisterschaft ${jahr}`) }).click();
+	await expect(karte(page, 'Herren R1–R9')).toContainText(
+		`Angemeldet (1): Hannes (Johannes ${nachname})`
+	);
+	await pruefeBildschirm(page, info, 'cm-rufname');
 	expect(fehler).toEqual([]);
 });

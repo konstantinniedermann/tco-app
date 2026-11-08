@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, isNotNull } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { legeBeispielTurnierAn } from '../../scripts/beispiel-turnier.ts';
 import {
@@ -84,6 +84,18 @@ describe('Beispielturnier für make seed', () => {
 				email: 'urs.probe@example.org',
 				kommentar: 'Möchte mich mit Stärkeren messen.'
 			}
+		]);
+	});
+
+	test('Rufname: zwei erfundene Spieler haben einen, einer davon gleich dem Vornamen in anderer Schreibweise', async () => {
+		await legeBeispielTurnierAn(eigene.db, new Date('2026-11-06T10:00:00Z'));
+		const mitRufname = await eigene.db
+			.select({ vorname: mitglied.vorname, rufname: mitglied.rufname })
+			.from(mitglied)
+			.where(isNotNull(mitglied.rufname));
+		expect(mitRufname.sort((a, b) => a.vorname.localeCompare(b.vorname))).toEqual([
+			{ vorname: 'Lena', rufname: 'lena' },
+			{ vorname: 'Max', rufname: 'Maxi' }
 		]);
 	});
 });

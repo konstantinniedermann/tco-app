@@ -134,6 +134,11 @@ export async function setzeSpielerangaben(
 	await hole().db.update(mitglied).set(angaben).where(eq(mitglied.id, mitgliedId));
 }
 
+/** Setzt den Rufnamen eines erfundenen Mitglieds (nur das Mitglied selbst tut das im Profil). */
+export async function setzeRufname(mitgliedId: number, rufname: string | null): Promise<void> {
+	await hole().db.update(mitglied).set({ rufname }).where(eq(mitglied.id, mitgliedId));
+}
+
 /** Meldet ein Mitglied über die Fachlogik zu einer Einzel-Kategorie an (ohne Mail). */
 export async function meldeZurCmAn(kategorieId: number, mitgliedId: number): Promise<void> {
 	const r = await meldeZurCmAnInDb(hole().db, kategorieId, mitgliedId, new Date());

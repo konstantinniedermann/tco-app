@@ -8,7 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
-- Rufname (#67), Doku zuerst: Datenschutz, Fachmodell und UI-Leitbild beschreiben den freiwilligen Rufnamen, den nur das Mitglied im Profil pflegt.
+- Rufname (#67): Wer will, trägt im Profil unter «Meine Angaben» einen Rufnamen ein (höchstens 10 Zeichen).
+  Die Startseite grüsst damit («Hoi Hannes»), und die anderen im Club sehen ihn mit dem amtlichen Namen
+  dahinter; Mitgliederverwaltung, Auskunft und Brief bleiben beim amtlichen Namen. Datenschutz, Fachmodell
+  und UI-Leitbild beschreiben ihn.
 
 ## 0.11.2 — Auswahlfelder am iPhone, Auskunft vollständiger, Beobachtungs-Auswertung
 

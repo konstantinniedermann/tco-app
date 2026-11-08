@@ -140,3 +140,43 @@ test('SI-09, A-KONTO-01: Mitglied wechselt die E-Mail mit zwei Codes', async ({ 
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Noah' })).toBeVisible();
 	expect(fehler).toEqual([]);
 });
+
+test('Rufname setzen und löschen', async ({ page }, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	await meldeAn(page, 'Johanna');
+	await oeffneProfil(page);
+	await expect(kachel(page, 'Rufname')).toContainText('nicht angegeben');
+
+	await kachel(page, 'Rufname').getByRole('button', { name: 'Ändern' }).click();
+	await expect(
+		page.getByText('Freiwillig. Unter diesem Namen sehen dich die anderen im Club.')
+	).toBeVisible();
+	const feld = page.getByLabel('Rufname (freiwillig)');
+	await feld.fill('Hannes');
+	await page.getByRole('button', { name: 'Rufname speichern' }).click();
+	await expect(kachel(page, 'Rufname')).toContainText('Hannes');
+
+	// Zu lang: Meldung, nichts wird gespeichert.
+	await kachel(page, 'Rufname').getByRole('button', { name: 'Ändern' }).click();
+	await feld.fill('Elfzeichen!');
+	await page.getByRole('button', { name: 'Rufname speichern' }).click();
+	await expect(page.getByText('Höchstens 10 Zeichen.')).toBeVisible();
+	await pruefeBildschirm(page, info, 'profil-rufname');
+	await feld.fill('Hannes');
+	await page.getByRole('button', { name: 'Rufname speichern' }).click();
+
+	// Die Startseite grüsst mit dem Rufnamen.
+	await page.getByRole('navigation', { name: 'Hauptnavigation' }).getByRole('link').first().click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Hannes' })).toBeVisible();
+
+	// Löschen: leer speichern, dann grüsst die Startseite wieder mit dem Vornamen.
+	await oeffneProfil(page);
+	await kachel(page, 'Rufname').getByRole('button', { name: 'Ändern' }).click();
+	await feld.fill('');
+	await page.getByRole('button', { name: 'Rufname speichern' }).click();
+	await expect(kachel(page, 'Rufname')).toContainText('nicht angegeben');
+	await page.getByRole('navigation', { name: 'Hauptnavigation' }).getByRole('link').first().click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Johanna' })).toBeVisible();
+	await pruefeBildschirm(page, info, 'start-ohne-rufname');
+	expect(fehler).toEqual([]);
+});
