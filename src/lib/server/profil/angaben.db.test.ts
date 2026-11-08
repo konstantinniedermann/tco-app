@@ -3,7 +3,8 @@ import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { aenderung, mitglied } from '../db/schema.ts';
-import { aendereEigeneAngaben, ladeEigeneAngaben } from './angaben.ts';
+import { aendereAngaben } from '../admin/mitglieder.ts';
+import { aendereEigeneAngaben, ladeEigeneAngaben, setzeRufname } from './angaben.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 
@@ -137,5 +138,88 @@ describe('aendereEigeneAngaben', () => {
 		const { vorher } = await lea();
 		const r = await aendereEigeneAngaben(db, 2147483000, { telefon: '' }, vorher, jetzt);
 		expect(r).toEqual({ ergebnis: 'nicht-gefunden' });
+	});
+});
+
+describe('setzeRufname', () => {
+	test('setzt, ändert und löscht den Rufnamen', async () => {
+		const { mitgliedId } = await lea();
+		expect(await setzeRufname(db, mitgliedId, 'Hannes', jetzt)).toEqual({ ergebnis: 'ok' });
+		expect((await zeile(mitgliedId)).rufname).toBe('Hannes');
+		expect(await setzeRufname(db, mitgliedId, 'Hans', jetzt)).toEqual({ ergebnis: 'ok' });
+		expect((await zeile(mitgliedId)).rufname).toBe('Hans');
+		expect(await setzeRufname(db, mitgliedId, '', jetzt)).toEqual({ ergebnis: 'ok' });
+		expect((await zeile(mitgliedId)).rufname).toBeNull();
+		const v = await db.select().from(aenderung).where(eq(aenderung.mitgliedId, mitgliedId));
+		expect(v).toHaveLength(3);
+		for (const e of v) {
+			expect(e).toMatchObject({
+				urheberArt: 'mitglied',
+				urheberMitgliedId: mitgliedId,
+				aktion: 'feld-geaendert',
+				detail: 'rufname'
+			});
+		}
+	});
+
+	test('leer und Leerzeichen werden null', async () => {
+		const { mitgliedId } = await lea();
+		await setzeRufname(db, mitgliedId, 'Hannes', jetzt);
+		expect(await setzeRufname(db, mitgliedId, '   ', jetzt)).toEqual({ ergebnis: 'ok' });
+		expect((await zeile(mitgliedId)).rufname).toBeNull();
+	});
+
+	test('gleicher Wert schreibt keinen Verlauf', async () => {
+		const { mitgliedId } = await lea();
+		await setzeRufname(db, mitgliedId, 'Hannes', jetzt);
+		expect(await setzeRufname(db, mitgliedId, ' Hannes ', jetzt)).toEqual({ ergebnis: 'ok' });
+		await setzeRufname(db, mitgliedId, '', jetzt);
+		expect(await setzeRufname(db, mitgliedId, '', jetzt)).toEqual({ ergebnis: 'ok' });
+		const v = await db.select().from(aenderung).where(eq(aenderung.mitgliedId, mitgliedId));
+		expect(v).toHaveLength(2);
+	});
+
+	test('zu lang ist eingabe', async () => {
+		const { mitgliedId } = await lea();
+		await setzeRufname(db, mitgliedId, 'Hannes', jetzt);
+		expect(await setzeRufname(db, mitgliedId, 'ABCDEFGHIJK', jetzt)).toEqual({
+			ergebnis: 'eingabe',
+			fehler: 'Höchstens 10 Zeichen.'
+		});
+		expect((await zeile(mitgliedId)).rufname).toBe('Hannes');
+	});
+
+	test('setzt für Fairgate offen nicht', async () => {
+		const { mitgliedId } = await lea();
+		await setzeRufname(db, mitgliedId, 'Hannes', jetzt);
+		expect((await zeile(mitgliedId)).fairgateOffenSeit).toBeNull();
+	});
+
+	test('gelöschtes oder unbekanntes Mitglied ist nicht-gefunden', async () => {
+		expect(await setzeRufname(db, 2147483000, 'Hannes', jetzt)).toEqual({
+			ergebnis: 'nicht-gefunden'
+		});
+		const { mitgliedId } = await lea();
+		await db.update(mitglied).set({ status: 'geloescht' }).where(eq(mitglied.id, mitgliedId));
+		expect(await setzeRufname(db, mitgliedId, 'Hannes', jetzt)).toEqual({
+			ergebnis: 'nicht-gefunden'
+		});
+	});
+
+	test('Admin-Angaben lassen Rufname stehen', async () => {
+		const { mitgliedId, vorher } = await lea();
+		await setzeRufname(db, mitgliedId, 'Hannes', jetzt);
+		const r = await aendereAngaben(
+			db,
+			{ art: 'admin', mitgliedId },
+			mitgliedId,
+			{ ...vorher, telefon: '079 111 22 33' },
+			vorher,
+			jetzt
+		);
+		expect(r.ergebnis).toBe('ok');
+		const z = await zeile(mitgliedId);
+		expect(z.telefon).toBe('079 111 22 33');
+		expect(z.rufname).toBe('Hannes');
 	});
 });
