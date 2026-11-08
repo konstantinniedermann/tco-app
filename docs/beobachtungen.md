@@ -179,3 +179,63 @@ Einzel-Liste.
 **Ursprung:** Review #69 (Code-Review, cas-reviewer)
 
 **Einschätzung:** Kosmetisch; erst angehen, wenn es bei echten Namen stört (z. B. Mittelstufen statt Ende kürzen).
+
+### 2026-11-08 — Auskunft schreibt beim Öffnen einen Verlaufseintrag, auch lesend und in «Ansicht als …»
+
+**Thema:** Rechte
+
+**Fundort:** `src/lib/server/admin/schnittstellen.ts` (`getAuskunft`); `docs/rollen-und-rechte.md` (MyTCO-Admin «L», Ansicht «kein Eintrag»).
+
+**Beobachtung:** `getAuskunft` schreibt beim Öffnen einen Verlaufseintrag «Auskunft erstellt», auch für den nur lesenden MyTCO-Admin und in «Ansicht als …». Die Rechte-Matrix verspricht dort «L» bzw. «kein Eintrag».
+
+**Ursprung:** Doku-Abgleich vor Release 0.17.0
+
+**Einschätzung:** Mittel. Entscheid Projektleiter: Ist der Eintrag gewollt, kommt eine Ausnahme in die Matrix; sonst ohne Eintrag in Ansicht und beim nur lesenden Zugriff.
+
+### 2026-11-08 — Status «geplant» bei gebauten Anforderungen ohne Test-ID
+
+**Thema:** Doku
+
+**Fundort:** `docs/anforderungen/anforderungen.md` (A-LOGIN-01, A-MITGLIED-03), `docs/rollen-und-rechte.md` (RR-05, RR-06), `docs/fachmodell.md` (FR-11).
+
+**Beobachtung:** Diese fünf IDs sind gebaut, stehen aber auf «geplant». Zum Umstellen braucht je ein Test die ID im Namen (Prüfung `test-ids`).
+
+**Ursprung:** Doku-Abgleich vor Release 0.17.0
+
+**Einschätzung:** Niedrig. Beim nächsten Anfassen der Tests die ID in den Testnamen nehmen und den Status umstellen.
+
+### 2026-11-08 — Kontaktdaten für CM- und Lizenz-Admin: Zusage strenger als Doku
+
+**Thema:** Datenschutz
+
+**Fundort:** `docs/rollen-und-rechte.md` (Matrix), `docs/datenschutz.md` (K-42); Verwaltungslisten der CM und Lizenzen.
+
+**Beobachtung:** Matrix und Datenschutz versprechen CM- und Lizenz-Admin E-Mail und Telefon aller Mitglieder (K-42). Die Verwaltungslisten liefern sie bewusst nicht; der Ist-Stand ist strenger als zugesagt.
+
+**Ursprung:** Doku-Abgleich vor Release 0.17.0
+
+**Einschätzung:** Niedrig. Soll stehen lassen (Code folgt bei Bedarf) oder das Ist zeigen; passt zur Regel, dass der Code nicht mehr zeigt als zugesagt.
+
+### 2026-11-08 — Kopfkommentar in doppel-meldung.ts widerspricht DS-05 (präzisiert)
+
+**Thema:** Doku
+
+**Fundort:** `src/lib/server/cm/doppel-meldung.ts` (Kopfkommentar).
+
+**Beobachtung:** Der Kommentar sagt «keinen CM-Admin». Die Texte nennen die Rolle «Der CM-Admin», was gewollt ist: DS-05 erlaubt die Rolle, nicht den Namen.
+
+**Ursprung:** Doku-Abgleich vor Release 0.17.0
+
+**Einschätzung:** Niedrig. Den Kommentar beim nächsten Code-Commit an DS-05 angleichen (nur Doku-Änderungen vor dem Release, darum jetzt nicht).
+
+### 2026-11-08 — testgruppe.md: Brief-Code und Brief als PDF noch offener Prüfpunkt
+
+**Thema:** Doku
+
+**Fundort:** `docs/testgruppe.md` (Zeile 24).
+
+**Beobachtung:** Der Punkt «Brief-Code und Brief als PDF in der Mitgliederverwaltung» (#43, Etappe 2) steht als offen. Ob das zum Stand passt, ist nicht geprüft.
+
+**Ursprung:** Doku-Abgleich vor Release 0.17.0
+
+**Einschätzung:** Niedrig. Mit dem Stand von #43 abgleichen und den Punkt abhaken oder belassen.
