@@ -827,6 +827,13 @@ a.kachel:active {
 	border-top: var(--rand-duenn) solid var(--farbe-linie);
 }
 
+/* Kartenteil: Abschnitt mit eigenem Thema innerhalb einer Karte, mit Trennlinie oben */
+.karte-teil {
+	border-top: var(--rand-duenn) solid var(--farbe-linie);
+	padding-top: var(--abstand-3);
+	margin-top: var(--abstand-3);
+}
+
 /* Zähler: Schritte eines Formulars oder ein Kontingent */
 .zaehler {
 	margin-bottom: var(--abstand-4);
