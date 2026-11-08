@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Doppel zur Clubmeisterschaft (#59, Etappe 1): Mitglieder suchen in einer Doppel-Kategorie einen
+  Partner und fragen ihn an; er nimmt an oder lehnt ab, erst dann sind beide angemeldet und sehen
+  gegenseitig E-Mail und Telefon. Wer noch keinen Partner hat, meldet sich allein an und steht mit
+  freiwilligem Kommentar unter «sucht Partner». Meldet sich einer ab, ist das Paar zurückgezogen,
+  der andere bekommt eine Meldung. Doppel in der Verwaltung folgt mit Etappe 2.
+
 ## 0.13.0 — Login-Briefe aus der Verwaltung
 
 - Briefe (#43, Etappe 2a): Der Mitglieder-Admin stellt einen neuen Brief-Code einzeln aus oder
