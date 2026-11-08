@@ -260,4 +260,39 @@ test.describe('Mitglieder-App', () => {
 		).toBeVisible();
 		await expect(reiter(page, 'CM')).toHaveAttribute('aria-current', 'page');
 	});
+
+	test('#69: Reiter antippen mit ungespeicherten Änderungen fragt zurück', async ({
+		page
+	}, info) => {
+		const jahr = JAHR_DOPPEL[info.project.name];
+		const {
+			turnierId,
+			kategorieIds: [kategorieId]
+		} = await legeOffenesTurnierAn(jahr, [MIXED]);
+		const konto = await meldeAn(page, 'Yara');
+		await setzeSpielerangaben(konto.mitgliedId, {
+			geschlecht: 'w',
+			jahrgang: 1990,
+			klassierung: 'R4'
+		});
+		await setzeTelefon(konto.mitgliedId, '079 000 00 70');
+		await page.goto(`/clubmeisterschaft/${turnierId}/doppel/${kategorieId}`);
+		await page.getByLabel('Kommentar (freiwillig)').fill('Eher am Wochenende.');
+		// Bei offener Tastatur sind die Reiter weg (UI-Leitbild); zuerst die Tastatur schliessen.
+		await page.getByLabel('Kommentar (freiwillig)').blur();
+
+		await reiter(page, 'CM').click();
+		const rueckfrage = page.getByRole('dialog', {
+			name: 'Nicht gespeichert – trotzdem verlassen?'
+		});
+		await expect(rueckfrage).toBeVisible();
+		await rueckfrage.getByRole('button', { name: 'Abbrechen' }).click();
+		await expect(page).toHaveURL(new RegExp(`/doppel/${kategorieId}$`));
+		await expect(page.getByLabel('Kommentar (freiwillig)')).toHaveValue('Eher am Wochenende.');
+
+		await reiter(page, 'Start').click();
+		await expect(rueckfrage).toBeVisible();
+		await rueckfrage.getByRole('button', { name: 'Verlassen' }).click();
+		await expect(page.getByRole('heading', { level: 1, name: 'Hoi Yara' })).toBeVisible();
+	});
 });
