@@ -117,6 +117,14 @@ describe('baueBriefHtml', () => {
 		expect(ohneQr).not.toMatch(/#[0-9a-f]{3,8}\b|(?<![\w-])(?:black|white)(?![\w-])/i);
 	});
 
+	test('A-LOGIN-01: jeder Brief druckt auf eine eigene A4-Seite ohne Rand (@page brief)', () => {
+		const css = BRIEF_CSS.replace(/\/\*[\s\S]*?\*\//g, '');
+		expect(css).toMatch(/@page brief\s*\{[^}]*size:\s*A4;/);
+		const regel = /(?:^|\})\s*\.brief\s*\{([^}]*)\}/.exec(css);
+		expect(regel).not.toBeNull();
+		expect((regel as RegExpExecArray)[1]).toMatch(/(?:^|;|\s)page:\s*brief;/);
+	});
+
 	test('brief.css wirkt nur unter .brief (läuft in der App global)', () => {
 		const css = BRIEF_CSS.replace(/\/\*[\s\S]*?\*\//g, '');
 		const selektoren = [...css.matchAll(/(?:^|[}{])\s*([^{}@]+)\{/g)].map((t) => t[1].trim());

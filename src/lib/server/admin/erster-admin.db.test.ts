@@ -214,7 +214,7 @@ describe('Erster Admin', () => {
 		expect(verlauf).toHaveLength(2);
 	});
 
-	test('machAdmin: veraltet oder nicht-gefunden → Fehler mit klarer Meldung, das Skript bricht ab', async () => {
+	test('K-18.4: machAdmin: veraltet oder nicht-gefunden → Fehler mit klarer Meldung, das Skript bricht ab', async () => {
 		await expect(machAdmin(db, -1, jetzt)).rejects.toThrow(
 			'machAdmin: Konto -1 nicht gefunden, keine Rolle vergeben'
 		);

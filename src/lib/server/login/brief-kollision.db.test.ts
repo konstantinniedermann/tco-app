@@ -47,7 +47,7 @@ describe('Brief-Code: Hash-Kollision', () => {
 		expect(k.briefCodeHash).not.toBeNull();
 	});
 
-	test('Kollision in einer äusseren Transaktion bricht diese nicht ab', async () => {
+	test('FR-24: Kollision in einer äusseren Transaktion bricht diese nicht ab', async () => {
 		const a = await legeMitgliedAn(db);
 		const b = await legeMitgliedAn(db);
 		const belegt = erzeugeBriefCode();
