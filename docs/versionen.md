@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Doppel in der Verwaltung (#59, Etappe 2): Der CM-Admin sieht Paare, Suchende und offene
+  Anfragen einer Doppel-Kategorie. Er meldet von Hand an, ändert Partner, legt Suchende zusammen,
+  meldet offene Anfragen als Paar an oder löscht sie, verschiebt, löscht und korrigiert
+  Klassierungen; die Spieler bekommen eine Meldung.
+- Doppel: Jedes Mitglied hat höchstens eine offene Anfrage je Kategorie.
+
 ## 0.15.1 — E2E auf eigener Datenbank, Testbestand für make seed
 
 - E2E auf eigener Datenbank: Jeder E2E-Lauf (`make e2e`, `make check`, Pre-Push-Hook, CI) legt

@@ -115,3 +115,19 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 ---
 
 ## Offen
+
+### 2026-11-08 — Einzel-Liste auf Aktionsdialog umstellen
+
+**Thema:** Verwaltung UI
+
+**Fundort:** `src/lib/verwaltung/Anmeldungsliste.svelte` (`fuehreAus`) und
+`src/lib/verwaltung/Aktionsdialog.svelte`.
+
+**Beobachtung:** Die Ablauflogik Warnung → *Trotzdem …* → Umleitung bei geändertem Stand gibt es
+jetzt doppelt: in der Einzel-Liste von Hand und in `Aktionsdialog` für die Doppel-Liste. Die
+Einzel-Liste könnte `Aktionsdialog` übernehmen (dort fehlt etwa das Verwerfen veralteter Antworten).
+
+**Ursprung:** Review Task 7, #59 Etappe 2.
+
+**Einschätzung:** niedrig; Umbau ohne neues Verhalten, lohnt sich beim nächsten Eingriff in die
+Einzel-Liste.

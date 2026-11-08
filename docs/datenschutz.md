@@ -80,7 +80,9 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 Ein Doppelpartner wird vor dem Annehmen einer Anfrage nochmals darauf hingewiesen. Wer
 eine Partner-Anfrage stellt, gibt dem Angefragten Name, Klassierung und Telefonnummer (sonst
 E-Mail) frei; die Kontaktdaten des Angefragten sieht er erst nach dem Annehmen. Der Kommentar
-bei *sucht Partner* soll keine Angaben zur Gesundheit enthalten.
+bei *sucht Partner* soll keine Angaben zur Gesundheit enthalten. Meldungen der Verwaltung zum
+Doppel nennen den anderen Spieler (Partner oder Angefragten); sie gehen einzeln an die
+Beteiligten, DS-05 bleibt erfüllt.
 
 ## Löschen
 
@@ -229,4 +231,4 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
 
-- 08.11.2026: CM-Admin sieht offene Partner-Anfragen; Doppelpartner sieht Kontaktdaten nicht mehr, wenn der Partner ausgetreten oder zum Löschen vorgemerkt ist (#59 Etappe 2).
+- 08.11.2026: CM-Admin sieht offene Partner-Anfragen; Doppelpartner sieht Kontaktdaten nicht mehr, wenn der Partner ausgetreten oder zum Löschen vorgemerkt ist; Meldungen der Verwaltung zum Doppel nennen den anderen Spieler (#59 Etappe 2).
