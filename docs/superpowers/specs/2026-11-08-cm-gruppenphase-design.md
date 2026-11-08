@@ -72,8 +72,8 @@ Bei mehreren Spielen trägt jedes eine Nebentaste, weil ein Bildschirm höchsten
 
 ### 2 — Rangliste (Gruppenspiele)
 
-Spalten: Platz, Name, Siege, Sätze, offen. Die Reihenfolge folgt den Regeln von Swiss Tennis
-(A-RESULTAT-06). Die eigene Zeile ist hinterlegt und trägt «(du)». Die Rangliste sagt nicht, wer
+Spalten: Platz, Name, Siege, Sätze, offen. Die Reihenfolge folgt FR-15 (Siege, dann
+Direktbegegnung, Satz- und Gamedifferenz, danach Korrektur durch den CM-Admin). Die eigene Zeile ist hinterlegt und trägt «(du)». Die Rangliste sagt nicht, wer
 weiterkommt (siehe *Grenzen und Sonderfälle*).
 
 ### 2 — Dein Weg (KO-System)
@@ -102,22 +102,23 @@ aus, endet der Weg mit der verlorenen Runde, Plakette «ausgeschieden».
 - **Nach dem Melden eines Resultats:** Bestätigung mit dem Resultat, Hinweis «… bekommt das Resultat
   zum Bestätigen» und dem neuen Stand in einem Satz («Du bist auf Platz 2. Deine 4 Gruppenspiele sind
   alle gespielt.»). Keine Aussage, ob der Spieler weiterkommt.
-- **Push** (nur wer es eingestellt hat, A-ANMELDUNG-08), ohne Namen anderer:
+- **Push** (Vorlage, siehe *Grenzen und Sonderfälle*), ohne Namen anderer:
   «Neues Resultat in deiner Gruppe. Du bist jetzt auf Platz 2.» ·
   «Noch 7 Tage Gruppenphase. Du hast 1 Spiel offen.»
 
 ## Datenschutz
 
 Laut `docs/datenschutz.md` sehen alle Mitglieder schon Name, Kategorien und Resultate der CM. Neu
-für alle sichtbar werden die **offenen Spiele** (wer gegen wen noch nicht gespielt hat). Vor der
-Umsetzung kommen deshalb dazu:
+für alle sichtbar werden die **offenen Spiele** (wer gegen wen noch nicht gespielt hat) und
+**gemeldete, noch nicht bestätigte oder bestrittene Resultate**. Vor der Umsetzung kommen deshalb dazu:
 
 - `docs/datenschutz.md`, *Wer sieht was*, Zeile *Alle Mitglieder*: «… und Resultate der
-  Clubmeisterschaft» wird zu «…, Spiele (offen und gespielt) und Resultate der Clubmeisterschaft».
+  Clubmeisterschaft» wird zu «…, Spiele (offen und gespielt) und Resultate der Clubmeisterschaft,
+  auch gemeldete, noch nicht bestätigte».
 - `docs/datenschutzerklaerung.md`: derselbe Zusatz im Satz «Alle Mitglieder sehen …».
 
-Kontaktdaten zeigt die Seite nur den Gegnern, bis zum Ende der CM (N-DATENSCHUTZ-02, K-31). Die
-Push-Texte bleiben ohne Namen anderer (DS-05).
+Kontaktdaten zeigt die Seite nur Gegnern und Doppelpartnern, bis zum Ende der CM (FR-19,
+N-DATENSCHUTZ-02, K-31). Die Push-Texte bleiben ohne Namen anderer (DS-05).
 
 ## Fürs UI-Leitbild
 
@@ -126,11 +127,12 @@ Vor dem Code kommen ins Leitbild (`docs/ui-leitbild.md`) und danach ins Design S
 - **Rangliste:** Raster mit fünf Spalten, eigene Zeile hinterlegt (`farbe-marke-zart`). In der App
   gibt es sonst keine Tabellen.
 - **Weg-Liste:** Runden untereinander mit Balken (`rand-akzent`) in Grün, Rot oder Grau und dem
-  Zustand als Plakette.
+  Zustand als Plakette. Der rote Balken der offenen Runde ist eine neue Verwendung von
+  `farbe-aktion`; die Leitbild-Zeile dazu wird erweitert.
+- **Plakette «unbestätigt»:** für gemeldete, noch nicht bestätigte Resultate.
 
 ## Annahmen und offene Fragen
 
-- **Ranglistenregeln** im Einzelnen: aus den Kategorien in Advantage (A-ADVANTAGE-02, -03).
 - **Restzeit:** gerechnet bis zum Ende der Gruppenphase bzw. der Runde. Woher das Datum kommt, legt
   CM-Betrieb fest.
 - **Offene Spiele für alle:** Ob die CM-Verantwortlichen das so wollen, ist nicht gefragt. Eine
@@ -140,9 +142,12 @@ Vor dem Code kommen ins Leitbild (`docs/ui-leitbild.md`) und danach ins Design S
 
 Entscheid des Projektleiters:
 
-- **Gemeldet, noch nicht bestätigt:** Das Resultat zählt sofort in Rangliste, «offen» und
-  «Gemeldete Resultate». Bis zur Bestätigung (A-RESULTAT-04) trägt das Spiel die Plakette
-  «unbestätigt». Bestreitet der Gegner, entscheidet der CM-Admin; der Stand kann dann zurückspringen.
+- **Gemeldet, noch nicht bestätigt:** In einer Gruppe zählt das Resultat sofort in Rangliste,
+  «offen» und «Gemeldete Resultate». Bis zur Bestätigung (FR-16: durch den Gegner oder nach 3 Tagen)
+  trägt das Spiel die Plakette «unbestätigt». Bestreitet der Gegner, entscheidet der CM-Admin; der
+  Stand kann dann zurückspringen. Im KO rückt der Sieger erst nach der Bestätigung ins Folgespiel
+  (FR-14); bis dahin steht das Resultat mit «unbestätigt» im Weg und in den Resultaten. FR-18 im
+  Fachmodell ist entsprechend angepasst.
 - **Wer weiterkommt (Gruppenspiele):** MyTCO behauptet es nicht: keine Linie in der Rangliste, keine
   Karte «Du bist weiter», kein Hinweis nach dem Melden. Die Kategorien regeln das unterschiedlich
   (z. B. kommt teils der beste Gruppenzweite weiter). Im KO-System zeigt «Dein Weg» die nächste
@@ -162,8 +167,9 @@ Entscheide von Claude, vom Projektleiter beim Lesen zu prüfen:
 - **Mehrere Kategorien:** Die Startseite hat eine einzige hervorgehobene Kachel. Sie fasst zusammen
   («2 Spiele offen in 2 Kategorien») und führt bei einer Kategorie direkt auf deren Seite, sonst auf
   die Turnierseite. «Deine offenen Spiele» gilt je Kategorie.
-- **Push:** nicht Teil von #66. Auslöser, Zeitgeber und Einstellung gehören zu #63 bzw.
-  A-ANMELDUNG-08. Die Texte oben sind die Vorlage dafür.
+- **Push:** nicht Teil von #66, und noch ohne Platz: #63 verschickt nur per Knopf, nie automatisch,
+  und A-ANMELDUNG-08 deckt nur neue Spiele und einen geänderten Spielplan. Automatische Pushes zu
+  Resultaten und Restzeit brauchen eine eigene Anforderung; die Texte oben sind die Vorlage dafür.
 - **Junioren ohne eigenes Login:** Es gilt, was #45 festlegt. Bis dahin zeigt die Seite nur Spiele
   des eigenen Kontos.
 

@@ -128,7 +128,7 @@ Anmeldung zu einem Turnier.
 | FR-15 | Rangliste je Gruppe nach gewonnenen Spielen; bei Gleichstand 1. Direktbegegnung, 2. Satzdifferenz, 3. Gamedifferenz; danach Korrektur durch den CM-Admin | A-RESULTAT-06, [Glossar](glossar.md#clubmeisterschaft-und-turnier) | geplant |
 | FR-16 | Ein Spieler des Spiels meldet das Resultat, der Gegner bestätigt oder bestreitet es. Ohne Reaktion gilt es nach 3 Tagen als bestätigt; bei Streit entscheidet der CM-Admin (Annahme K-32) | A-RESULTAT-03, A-RESULTAT-04 | geplant |
 | FR-17 | Erfasst der CM-Admin ein Resultat, ist es sofort bestätigt | A-RESULTAT-07 | geplant |
-| FR-18 | Rangliste und Folgespiele rechnen nur mit bestätigten Resultaten | A-RESULTAT-06 | geplant |
+| FR-18 | Die Rangliste einer Gruppe rechnet schon mit gemeldeten Resultaten; bis zur Bestätigung tragen sie die Plakette «unbestätigt». Folgespiele im KO entstehen nur aus bestätigten Resultaten (#66) | A-RESULTAT-06 | geplant |
 | FR-19 | Gegner und Doppelpartner sehen E-Mail und Telefon, bis das Turnier *abgeschlossen* ist | N-DATENSCHUTZ-02, K-31 | geplant |
 | FR-20 | Ein Mitglied hat je Lizenzrunde höchstens einen offenen Lizenzantrag. Zurückziehen geht, solange er *beantragt* ist | A-LIZENZ-01, A-LIZENZ-02 | geplant |
 | FR-21 | Ein Antrag gehört zur nächsten Lizenzrunde, deren Stichtag noch nicht vorbei ist. Storno entspricht der Sistierung bei Swiss Tennis (Annahme K-34) | A-LIZENZ-03 | geplant |
