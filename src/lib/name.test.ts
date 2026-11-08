@@ -53,8 +53,15 @@ describe('pruefeRufname', () => {
 		expect(pruefeRufname('👍🏽'.repeat(11)).ok).toBe(false);
 	});
 
+	test('harte Obergrenze für die Textlänge', () => {
+		expect(pruefeRufname('a' + '\u0301'.repeat(100))).toEqual({
+			ok: false,
+			fehler: 'Höchstens 10 Zeichen.'
+		});
+	});
+
 	test('lehnt Steuerzeichen und Nicht-Text ab', () => {
-		expect(pruefeRufname('Han​nes')).toEqual({
+		expect(pruefeRufname('Han\u200Bnes')).toEqual({
 			ok: false,
 			fehler: 'Unsichtbares Sonderzeichen, bitte neu eintippen.'
 		});

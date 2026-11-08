@@ -1,6 +1,8 @@
 // Wie Namen angezeigt werden. Läuft auch im Browser: keine Importe aus src/lib/server.
 
 export const RUFNAME_MAX = 10;
+// Harte Grenze für die Textlänge: ein Graphem kann beliebig viele kombinierende Zeichen tragen.
+export const RUFNAME_MAX_TEXT = 40;
 
 export type Namensteile = { rufname: string | null; vorname: string; nachname: string };
 export type Namensform = 'vorname-zuerst' | 'nachname-zuerst';
@@ -45,7 +47,7 @@ export function pruefeRufname(
 	if (STEUERZEICHEN.test(rufname)) {
 		return { ok: false, fehler: 'Unsichtbares Sonderzeichen, bitte neu eintippen.' };
 	}
-	if ([...grapheme.segment(rufname)].length > RUFNAME_MAX) {
+	if (rufname.length > RUFNAME_MAX_TEXT || [...grapheme.segment(rufname)].length > RUFNAME_MAX) {
 		return { ok: false, fehler: `Höchstens ${RUFNAME_MAX} Zeichen.` };
 	}
 	return { ok: true, rufname };
