@@ -34,7 +34,11 @@ Playwright (iPhone/Android/Desktop, axe).
 - Oberfläche nur aus Bausteinen von `docs/ui-leitbild.md`; neu ist nur die **Trefferliste**
   (Task 1). Höchstens eine Haupttaste je Bildschirm (Dialog = eigener Bildschirm).
 - Klassierung zählt R1 = 1 … R9 = 9, `keine` = 10, N1–N4 = 0; ein Paar passt, wenn die Summe
-  **≥ Mindestsumme** ist. Im *Mixed* eine Frau und ein Mann.
+  **≥ Mindestsumme** ist. Im *Mixed* eine Frau und ein Mann. **Im Doppel gibt es keinen
+  Jahrgang** (Entscheid Projektleiter, 08.11.2026): Doppel-Passung, Suche und Warnungen prüfen
+  nur Geschlecht und Mindestsumme.
+- Austritt und Löschvormerkung ziehen bis zum **Datum** des Anmeldeschlusses zurück, auch wenn
+  von Hand früher geschlossen (Entscheid Projektleiter, 08.11.2026; auch Einzel).
 - Kommentar *sucht Partner*: freiwillig, 0–120 Zeichen nach `trim` (leer = `null`).
 - Wählbar und anfragbar ist nur, wer ein Login hat: Konto nicht gesperrt und
   `konto.briefCodeBenutztAm` gesetzt; Mitglied *aktiv*.
@@ -75,7 +79,7 @@ Playwright (iPhone/Android/Desktop, axe).
   `docs/ui-leitbild.md`, `src/lib/design/basis.css`
 
 - [ ] **Step 1: Fachmodell.** FR-06: «ein Doppel zählt für beide Partner; offene Anfragen
-  zählen nicht». FR-07: Doppel nach Geschlecht und Jahrgang beider Spieler und Mindestsumme
+  zählen nicht». FR-07: Doppel nur nach Geschlecht beider Spieler und Mindestsumme, ohne Jahrgang
   (Skala wie oben, Annahme K-51). FR-09 neu: «Ein Doppelpartner wird angefragt und nimmt an
   oder lehnt ab (Entscheid Projektleiter); jedes Mitglied steht je Kategorie in höchstens einer
   aktiven Anmeldung». Neu, Status *geplant*:
@@ -122,22 +126,22 @@ Playwright (iPhone/Android/Desktop, axe).
 - Produces: `punkte(k: Klassierung): number` (klassierung.ts) — N1–N4 → 0, R*n* → *n*, `keine` → 10.
 - Produces: `KategorieRegel.mindestsumme: number | null` (neu im Typ; `regelAus` füllt es).
 - Produces: `passtDoppelAllein(k: KategorieRegel, s: Spieler): boolean` — `art` doppel, keine
-  Angabe fehlt, Geschlecht (`herren` m, `damen` w, `mixed` und `offen` beide), Jahrgang im Bereich.
+  Angabe fehlt, Geschlecht (`herren` m, `damen` w, `mixed` und `offen` beide); der Jahrgang zählt im Doppel nicht.
 - Produces: `type Vermerk = 'angaben-fehlen' | 'klassierung-fehlt'`;
-  `vermerk(s: Spieler): Vermerk | null` — `angaben-fehlen`, sobald Geschlecht oder Jahrgang fehlt, sonst `klassierung-fehlt`, sonst `null`.
+  `vermerk(s: Spieler): Vermerk | null` — `angaben-fehlen`, sobald das Geschlecht fehlt, sonst `klassierung-fehlt`, sonst `null`.
 - Produces: `passtAlsPaar(k: KategorieRegel, a: Spieler, b: Spieler, streng: boolean): boolean`
   — `streng = false` (Suche): fehlende Angaben von `b` gelten als passend, fehlende Klassierung
   wird nicht summiert; `a` muss vollständig sein. `streng = true` (Annehmen): beide vollständig.
-  Geschlecht (Mixed: genau eine `w`, ein `m`), Jahrgang beider, `punkte(a) + punkte(b) >= mindestsumme`.
+  Geschlecht (Mixed: genau eine `w`, ein `m`), `punkte(a) + punkte(b) >= mindestsumme`; kein Jahrgang.
 
-- [ ] **Step 1: Failing tests**, Name `FR-07: Doppel nach Geschlecht, Jahrgang und Mindestsumme`:
+- [ ] **Step 1: Failing tests**, Name `FR-07: Doppel nach Geschlecht und Mindestsumme, ohne Jahrgang`:
   - `punkte`: N2 → 0, R4 → 4, `keine` → 10
   - R4+R5 in Herren Doppel (9) → `true`; R3+R5 → `false`; R1+R8 → `true`; N1+R9 → `false`
   - Mixed: w+m → `true`; w+w → `false`; Damen: w+m → `false`
-  - Jahrgang: einer ausserhalb → `false`
+  - Jahrgang spielt keine Rolle: Kategorie mit `jahrgangVon` 2000, Spieler 1970 → trotzdem `true`
   - Suche (`streng=false`): `b` ohne Klassierung → `true`; `b` ohne Geschlecht in Mixed → `true`; Annehmen (`streng=true`): dieselben → `false`
   - `passtDoppelAllein`: m in Mixed → `true`; w in Herren Doppel → `false`; Einzel-Kategorie → `false`
-  - `vermerk`: ohne Jahrgang → `angaben-fehlen`; nur ohne Klassierung → `klassierung-fehlt`; vollständig → `null`
+  - `vermerk`: ohne Geschlecht → `angaben-fehlen`; nur ohne Jahrgang → `null`; nur ohne Klassierung → `klassierung-fehlt`; vollständig → `null`
   - Einzel unverändert: bestehende Tests grün; `passtEinzel` für Doppel bleibt `false`
 - [ ] **Step 2:** `npx vitest run src/lib/turnier` → FAIL
 - [ ] **Step 3:** Implementieren; Typ-Fehler aus `mindestsumme` in bestehenden Aufrufern mit `regelAus` bzw. `mindestsumme: null` beheben (`npm run check:svelte`).
@@ -190,9 +194,13 @@ Playwright (iPhone/Android/Desktop, axe).
     der beiden in der Kategorie (als `hinfaellig` zurückgegeben); `schon-angemeldet` löscht die Anfrage.
   - `meldeAb(...)` gibt neu `{ ergebnis: 'ok'; partnerId: number | null } | 'geschlossen' | 'nicht-gefunden'` zurück; Doppel: ganze Anmeldung *zurückgezogen*, `suchtext` → `null`.
   - `eigeneKategorien`: Doppel als `«<Kategorie> (mit <Vorname Nachname>)»` bzw. `«<Kategorie> (sucht Partner)»`.
+  - `trageEin` (und `stelleAnfrage`, `nimmAnfrageAn`) lesen die Turnier-Zeile mit `for share`
+    nach der Kategorie, damit ein gleichzeitiges Schliessen (`setzeStatus` sperrt das Turnier)
+    nicht zwischen Prüfung und Eintrag fällt.
 
 - [ ] **Step 1: Failing DB-Tests**, `describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel')`:
-  - allein anmelden mit Suchtext → aktive Anmeldung mit einem Spieler, Suchtext gespeichert; 121 Zeichen abgewiesen (Schnittstelle, Task 7); w in Herren Doppel → `passt-nicht`
+  - allein anmelden (`meldeAn` mit Doppel-Kategorie) mit Suchtext → aktive Anmeldung mit einem Spieler, Suchtext gespeichert; w in Herren Doppel → `passt-nicht`; zweites Mal → `schon-angemeldet`; mit 3 aktiven → `voll`; nach Anmeldeschluss → `geschlossen`
+  - Turnier-Sperre: `meldeAn` und `setzeStatus(…, 'geschlossen')` gleichzeitig (`Promise.all`) → entweder Anmeldung vor dem Schliessen oder `geschlossen`, nie eine Anmeldung in einem danach geschlossenen Turnier mit späterem Zeitstempel
   - Suche `'ma'` findet Marco (R5) für Lea (R6, Mixed, 9), nicht Mia (w), nicht Moritz (R2: 8 < 9), nicht Mitglied ohne Login, nicht wer schon gepaart ist, nicht wer 3 hat; Manuel ohne Klassierung mit `klassierung-fehlt`; Suchender mit `suchtPartner` und Kommentar; `'m'` → leer
   - Anfrage stellen → `ok`; zweite an denselben → `schon-angefragt`; an sich selbst / ohne Login / unpassend / Einzel-Kategorie → `passt-nicht` bzw. `nicht-gefunden`; mehrere Anfragen gleichzeitig ok, zählen nicht bei der Grenze (Lea mit 2 Anmeldungen + 3 Anfragen → `eigeneAnmeldungen` = 2)
   - Annehmen ohne Anmeldungen → neue Anmeldung mit beiden; Marco sucht schon → Lea in seiner, Suchtext weg; beide suchen → Leas eigene *zurückgezogen*; übrige Anfragen beider in der Kategorie gelöscht und in `hinfaellig`
@@ -235,12 +243,14 @@ Playwright (iPhone/Android/Desktop, axe).
 - Test: `src/lib/server/admin/mitgliedschaft.db.test.ts`, `src/lib/server/admin/loeschung.db.test.ts`, `src/lib/server/turnier/turniere.db.test.ts`, betroffene Schnittstellen-Tests
 
 **Interfaces:**
-- Produces: `zieheOffeneZurueck(tx: DbOderTx, mitgliedId: number, jetzt: Date): Promise<{ partner: { mitgliedId: number; kategorie: string; turnierId: number }[]; hinfaellig: { anderer: number; kategorie: string; turnierId: number }[] }>` (ersetzt `zieheOffeneEinzelZurueck`) — Einzel und Doppel, solange offen; löscht alle offenen Anfragen von und an das Mitglied.
+- Produces: `zieheOffeneZurueck(tx: DbOderTx, mitgliedId: number, jetzt: Date): Promise<{ partner: { mitgliedId: number; kategorie: string; turnierId: number }[]; hinfaellig: { anderer: number; kategorie: string; turnierId: number }[] }>` (ersetzt `zieheOffeneEinzelZurueck`) — Einzel und Doppel, solange `jetzt` vor dem Ende des Anmeldeschluss-Tages (24 Uhr Zürich) liegt, **unabhängig vom gespeicherten oder von Hand gesetzten Status** (Entscheid Projektleiter); löscht alle offenen Anfragen von und an das Mitglied.
 - `erfasseAustritt` und `merkeZumLoeschenVor` geben bei Erfolg `{ ergebnis: 'ok'; cm: Awaited<ReturnType<typeof zieheOffeneZurueck>> }` statt `'ok'`; die Schnittstellen melden danach: Partner `Eure Anmeldung für «<Kategorie>» ist zurückgezogen.`, Anfragen `Die Anfrage für «<Kategorie>» ist hinfällig.`
 - Löschung: Suchtext und Anfragen der Gelöschten weg (wie heute `kommentar`), Kommentar «das Doppel regelt #59» entfernen.
 - `aendereKategorie`: `art` anders als gespeichert und `zaehleAktive > 0` → `'art-gesperrt'` (auch mit `trotzdem`). `zaehleUnpassende` misst Doppel mit `passtAlsPaar(…, true)` bzw. `passtDoppelAllein` für Suchende.
 
-- [ ] **Step 1: Failing Tests**: `FR-04: Austritt zieht offene Doppel zurück` (Paar → *zurückgezogen*, Meldung an Partner per Spion mit obigem Text, offene Anfragen weg; nach Anmeldeschluss bleibt das Paar); Löschung leert Suchtext und Anfragen; `FR-36: Einzel/Doppel wechseln nur ohne Anmeldungen` (mit aktiver → `art-gesperrt`, ohne → `ok`); Warnung zählt ein Paar, das nach höherer Mindestsumme nicht mehr passt.
+- Doppel ohne Jahrgang: `pruefeKategorie` (`src/lib/server/turnier/angaben.ts`) setzt bei `art = 'doppel'` `jahrgangVon`/`jahrgangBis` auf `null`; `src/lib/verwaltung/Kategorieformular.svelte` zeigt das Fieldset *Jahrgang* nur bei *Einzel* (Svelte-Doku und Autofixer wie in Task 8).
+
+- [ ] **Step 1: Failing Tests**: `FR-04: Austritt zieht offene Doppel zurück` (Paar → *zurückgezogen*, Meldung an Partner per Spion mit obigem Text, offene Anfragen weg; nach Anmeldeschluss bleibt das Paar); `FR-04: Austritt zieht auch zurück, wenn der CM-Admin früh geschlossen hat` (Status *geschlossen* von Hand, Datum noch nicht erreicht → Einzel und Doppel *zurückgezogen*); `FR-34: Doppel ohne Jahrgang` (`pruefeKategorie` mit Doppel und Jahrgang → Werte ohne Jahrgang); Löschung leert Suchtext und Anfragen; `FR-36: Einzel/Doppel wechseln nur ohne Anmeldungen` (mit aktiver → `art-gesperrt`, ohne → `ok`); Warnung zählt ein Paar, das nach höherer Mindestsumme nicht mehr passt.
 - [ ] **Step 2:** Tests → FAIL
 - [ ] **Step 3:** Implementieren; Rechte-Tests (`rechte-matrix.db.test.ts`) mit den neuen Diensten nachziehen.
 - [ ] **Step 4:** `npx vitest run src/lib/server` → PASS
@@ -294,6 +304,7 @@ Aufbau genau nach dem Design-Entwurf, Variante A (Texte von dort):
   annehmen.»; *Ablehnen* geht.
 - Nach dem Anmeldeschluss: keine Tasten, Anfragen an einen ohne *Annehmen* mit Satz «Über offene Anfragen entscheidet jetzt die Turnierleitung.»; in *Ansicht als …* keine speichernden Tasten.
 - Fehler `voll`, `geschlossen`, `passt-nicht`, `schon-angemeldet`, `angaben-fehlen` mit kurzem Satz und neu laden, wie heute.
+- Nach jedem Speichern auf CM- und Anmelde-Seite die vorgeladene Startseite ungültig machen (`invalidateAll` bzw. wie die Kategorieseite der Verwaltung mit `refreshAll()`), damit der Zähler stimmt; scheitert das Nachladen, bleibt `MELDUNG.stoerung` statt einer Fehlerseite.
 
 - [ ] **Step 1:** Svelte-Doku über MCP holen (`$state`, `$derived`, `$effect` für die verzögerte Suche, `<dialog>`).
 - [ ] **Step 2: Failing Tests** für Client-Funktionen (Pfade, Methoden, Antwort-Arten) und `doppelText`, `vermerkText`, `standText`.

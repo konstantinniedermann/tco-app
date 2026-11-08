@@ -172,7 +172,7 @@ die niemand bearbeiten kann.
   - **Mehrere Anfragen gleichzeitig** gehen, auch in derselben Kategorie; sie zählen nicht bei
     der Grenze von 3 (Entscheid Projektleiter). Senden geht nur, solange man selbst die Grenze
     nicht erreicht hat oder in der Kategorie schon allein sucht.
-  - **Annehmen** prüft die Regeln neu: Geschlecht, Jahrgang, Mindestsumme und die Grenze von 3
+  - **Annehmen** prüft die Regeln neu: Geschlecht, Mindestsumme und die Grenze von 3
     für beide. Fehlen dem Angefragten Angaben, fragt die CM-Seite sie vorher ab (Teil 2). Mit
     dem Annehmen verfallen alle übrigen offenen Anfragen der beiden in dieser Kategorie, und
     wer sie gestellt hat, bekommt eine Meldung (Entscheid Claude).
@@ -203,14 +203,18 @@ die niemand bearbeiten kann.
   Projektleiter sieht sie am Schluss mit den Screenshots.
 - **Nur mit eigenem Login wählbar** (Entscheid Projektleiter): Wer kein Login hat, kann keine
   Anfrage annehmen; ihn meldet der CM-Admin an (Teil 4, Ziel 2).
-- **Fehlen einem möglichen Partner Geschlecht oder Jahrgang**, ist er wählbar und trägt den
-  Vermerk *Angaben fehlen*, wie bei fehlender Klassierung (*Klassierung fehlt*) (Entscheid
+- **Im Doppel gibt es keinen Jahrgang** (Entscheid Projektleiter, 08.11.2026, Kommentar in
+  #59): Doppelkategorien sind nur *Herren*, *Damen*, *Mixed* (und *offen*), ohne
+  Alterskategorien. Passung und Suche im Doppel prüfen nur Geschlecht und Mindestsumme. Das
+  Kategorie-Formular blendet den Jahrgang bei *Doppel* aus, der Server leert ihn dort; FR-34
+  wird angepasst. Ziel 1 oben ist damit überholt, wo es «und Jahrgang» sagt.
+- **Fehlt einem möglichen Partner das Geschlecht**, ist er wählbar und trägt den Vermerk
+  *Angaben fehlen*, wie bei fehlender Klassierung (*Klassierung fehlt*) (Entscheid
   Projektleiter). In der Suche steht nur einer der beiden Vermerke: *Angaben fehlen*, sobald
-  Geschlecht oder Jahrgang fehlt, sonst *Klassierung fehlt* (Entscheid Claude). Ein Partner
-  mit fehlender Klassierung wird in der Suche nicht an der Summe gemessen; das Annehmen prüft
-  sie.
+  das Geschlecht fehlt, sonst *Klassierung fehlt* (Entscheid Claude). Ein Partner mit fehlender
+  Klassierung wird in der Suche nicht an der Summe gemessen; das Annehmen prüft sie.
 - **Wer in der Suche steht:** aktive Mitglieder mit Login ausser einem selbst, die nach
-  Geschlecht und Jahrgang passen (oder *Angaben fehlen*), in der Kategorie nicht schon zu zweit
+  Geschlecht passen (oder *Angaben fehlen*), in der Kategorie nicht schon zu zweit
   angemeldet sind, die Grenze von 3 nicht erreicht haben (eine eigene *sucht-Partner*-Anmeldung
   in dieser Kategorie zählt schon mit) und mit dem Spieler die Mindestsumme erreichen (Entscheid
   Projektleiter: nur passende). Im *Mixed* nur das andere Geschlecht. Die Liste erscheint erst
@@ -224,10 +228,12 @@ die niemand bearbeiten kann.
   wird der Kommentar gelöscht, nicht nur ausgeblendet (Entscheid Projektleiter). Er ist nicht
   der Wildcard-Kommentar (anderer Kreis, der ihn sieht); wie das Schema beide trennt, ist dem
   Bauenden überlassen.
-- **Austritt und Löschvormerkung** eines Spielers, solange die Anmeldung offen ist: Die ganze
-  Doppel-Anmeldung ist *zurückgezogen*, wie beim Abmelden, und der Partner bekommt eine
-  Meldung ohne Grund (Entscheid Projektleiter; Hinweis aus #43). Seine offenen Anfragen
-  verfallen. Nach dem Anmeldeschluss bleibt die Anmeldung stehen, wie im Einzel. Bei der
+- **Austritt und Löschvormerkung** eines Spielers bis zum **Datum des Anmeldeschlusses**, auch
+  wenn der CM-Admin die Anmeldung vorher von Hand geschlossen hat (Entscheid Projektleiter,
+  08.11.2026; gilt auch fürs Einzel): Die ganze Doppel-Anmeldung ist *zurückgezogen*, wie beim
+  Abmelden, und der Partner bekommt eine Meldung ohne Grund (Entscheid Projektleiter; Hinweis
+  aus #43). Seine offenen Anfragen verfallen. Nach dem Anmeldeschluss bleibt die Anmeldung
+  stehen, der CM-Admin entscheidet. Bei der
   Löschung bleibt nur der Name (Datenschutz, *Löschfrist*); Kommentar und Anfragen werden
   mitgelöscht.
 - **Auf der CM-Seite** (Variante A des Entwurfs, Entscheid Projektleiter): Jede Doppelkategorie
@@ -245,10 +251,16 @@ die niemand bearbeiten kann.
   wer wann dabei war.
 - **Einzel oder Doppel wechseln** geht nur, solange die Kategorie keine aktiven Anmeldungen hat
   (Entscheid Projektleiter; ändert Teil 1, Ziel 5 für diesen Fall). Sonst würde aus einer
-  Einzel-Anmeldung ungefragt ein *sucht Partner*.
+  Einzel-Anmeldung ungefragt ein *sucht Partner*. Altlasten aus dem früheren Weg («Trotzdem
+  speichern») gibt es nicht, solange MyTCO nicht live ist; darum keine Bereinigung (Entscheid
+  Claude).
 - **Kategorie ändern im Doppel** (FR-36): Die Warnung zählt Paare, die nach den neuen Werten
-  nicht mehr passen (Geschlecht, Jahrgang, Mindestsumme), und Spieler, die allein suchen und
-  nach Geschlecht oder Jahrgang nicht mehr passen (Entscheid Claude).
+  nicht mehr passen (Geschlecht, Mindestsumme), und Spieler, die allein suchen und nach
+  Geschlecht nicht mehr passen (Entscheid Claude).
+- **Anmelden sperrt das Turnier mit** (Befund aus der Beobachtungs-Auswertung, Kommentar in
+  #59): Der gemeinsame Weg der Anmeldung liest das Turnier mit Sperre, damit ein gleichzeitiges
+  Schliessen nicht zwischen Prüfung und Eintrag fällt; das gilt auch für Anfrage und Annehmen
+  (Entscheid Claude).
 - **Seed:** `make seed` ergänzt erfundene Doppel-Anmeldungen: Paare, zwei *sucht Partner*
   (einer mit Kommentar), eine offene Anfrage und einen Spieler mit fehlender Klassierung.
 - **Oberfläche:** zuerst ein Design-Entwurf (Entscheid Projektleiter), siehe *Oberfläche*.
@@ -377,7 +389,7 @@ und der Hinweis zu den Kontaktdaten. Neu und nachzuführen (Konzept und Datensch
 
 - Der Vermerk *sucht Partner* ist für alle Mitglieder sichtbar.
 - Der Vermerk *Klassierung fehlt* ist bei der Partnerwahl sichtbar, ebenso *Angaben fehlen*
-  (Geschlecht oder Jahrgang fehlt; Präzisierung zu Teil 3).
+  (das Geschlecht fehlt; Präzisierung zu Teil 3).
 - Der freiwillige Kommentar bei *sucht Partner* ist für alle Mitglieder sichtbar und wird
   gelöscht, sobald ein Partner gefunden ist oder der Spieler abmeldet (Präzisierung zu Teil 3).
 - Bei der Partnerwahl sehen Mitglieder die **Klassierung** der passenden Mitglieder
