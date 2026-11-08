@@ -14,6 +14,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   Mitglieder liefen in Timeouts und der Pre-Push-Hook wurde rot ohne Fehler im Code.
 - `make seed` legt einen Testbestand an: rund 200 erfundene Mitglieder mit gemischten Angaben,
   dazu ein zweiter Anlass (Clubabend) und gemischte Antworten auf beide Anlässe.
+- Profil: Ein leeres Feld heisst überall «nicht angegeben» (vorher bei Telefon und Lizenznummer
+  «nicht erfasst»).
+- CI: Der Download von gitleaks und osv-scanner wiederholt sich bei kurzen Störungen von GitHub.
 
 ## 0.15.0 — Doppel mit Partner-Anfrage
 
