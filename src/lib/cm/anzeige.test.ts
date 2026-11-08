@@ -45,10 +45,18 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 
 	test('A-ANMELDUNG-01: Namen der Angemeldeten', () => {
 		expect(namenText([])).toBe('Noch niemand angemeldet.');
-		expect(namenText(['Anna Beispiel'])).toBe('Angemeldet (1): Anna Beispiel');
-		expect(namenText(['Anna Beispiel', 'Bea Muster'])).toBe(
-			'Angemeldet (2): Anna Beispiel, Bea Muster'
+		expect(namenText([{ rufname: null, vorname: 'Anna', nachname: 'Beispiel' }])).toBe(
+			'Angemeldet (1): Anna Beispiel'
 		);
+	});
+
+	test('namenText mit Rufname', () => {
+		expect(
+			namenText([
+				{ rufname: null, vorname: 'Anna', nachname: 'Muster' },
+				{ rufname: 'Hannes', vorname: 'Johannes', nachname: 'Beispiel' }
+			])
+		).toBe('Angemeldet (2): Anna Muster, Hannes (Johannes Beispiel)');
 	});
 
 	test('FR-08: Zähler des Wildcard-Kommentars', () => {

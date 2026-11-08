@@ -1,5 +1,6 @@
 // Anzeigehilfen der Clubmeisterschaft für Mitglieder: reine Funktionen, Browser und Server.
 import type { KategorieRegel } from '../turnier/passung.ts';
+import { nameText, type Namensteile } from '../name.ts';
 import { geschlechtText } from '../verwaltung/turnier-anzeige.ts';
 
 /** A-ANMELDUNG-02: eigener Stand auf der Startseiten-Kachel. */
@@ -29,10 +30,10 @@ export function kategorieText(k: KategorieRegel): string {
 }
 
 /** A-ANMELDUNG-01: Namen der bestätigten Anmeldungen einer Kategorie. */
-export const namenText = (namen: string[]): string =>
+export const namenText = (namen: Namensteile[]): string =>
 	namen.length === 0
 		? 'Noch niemand angemeldet.'
-		: `Angemeldet (${namen.length}): ${namen.join(', ')}`;
+		: `Angemeldet (${namen.length}): ${namen.map((n) => nameText(n, 'vorname-zuerst')).join(', ')}`;
 
 /** FR-08: Längengrenze des Wildcard-Kommentars. */
 export const KOMMENTAR_MAX = 300;
