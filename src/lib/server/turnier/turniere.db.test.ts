@@ -241,7 +241,10 @@ describe('Kategorien', () => {
 			.from(anmeldung)
 			.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
 			.where(eq(anmeldungSpieler.mitgliedId, t.mitgliedId));
-		expect(await meldeAb(db, a.id, t.mitgliedId, jetztVor(t.w))).toBe('ok');
+		expect(await meldeAb(db, a.id, t.mitgliedId, jetztVor(t.w))).toEqual({
+			ergebnis: 'ok',
+			partnerId: null
+		});
 		expect(await sageKategorieAb(db, t.kid)).toBe('ok');
 		expect((await ladeKategorie(db, t.kid))?.status).toBe('abgesagt');
 		expect(await sageKategorieAb(db, -1)).toBe('nicht-gefunden');

@@ -1,5 +1,5 @@
-// Einzel-Anmeldungen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01, A-ANMELDUNG-10,
-// FR-05 bis FR-10, FR-37).
+// Anmeldungen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01, A-ANMELDUNG-04,
+// A-ANMELDUNG-10, FR-05 bis FR-10, FR-37); Anfragen und Suche im Doppel in `doppel.ts`.
 import { and, asc, count, eq, gte, inArray, ne, sql } from 'drizzle-orm';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
@@ -9,10 +9,12 @@ import {
 	mitglied,
 	turnier,
 	type AnmeldungStatus,
+	type Art,
 	type TurnierStatus
 } from '../db/schema.ts';
 import {
 	fehlendeAngaben,
+	passtDoppelAllein,
 	passtEinzel,
 	wildcardEinzel,
 	type CmAngabe,
@@ -76,6 +78,14 @@ export const regelAus = (k: typeof kategorie.$inferSelect): KategorieRegel => ({
 	mindestsumme: k.mindestsumme
 });
 
+/** Kommentar *sucht Partner* (FR-49): ohne Leerraum am Rand, leer wird `null`. */
+export function suchtextAus(roh: string | null | undefined): string | null {
+	const text = roh?.trim() ?? '';
+	return text.length > 0 ? text : null;
+}
+
+export const nameVon = (m: { vorname: string; nachname: string }) => `${m.vorname} ${m.nachname}`;
+
 /** Aktive Anmeldungen des Mitglieds in einem Turnier, nach Kategoriename. */
 export async function eigeneAnmeldungen(db: DbOderTx, turnierId: number, mitgliedId: number) {
 	return db
@@ -83,6 +93,7 @@ export async function eigeneAnmeldungen(db: DbOderTx, turnierId: number, mitglie
 			anmeldungId: anmeldung.id,
 			kategorieId: kategorie.id,
 			kategorie: kategorie.name,
+			art: kategorie.art,
 			// `istAktiv` lässt nur diese beiden Status durch.
 			status: sql<AktiverStatus>`${anmeldung.status}`
 		})
@@ -234,35 +245,73 @@ async function fuelleNamen(db: Db, kategorien: CmKategorie[]): Promise<void> {
 type Gemeinsam = 'geschlossen' | 'voll' | 'schon-angemeldet' | 'angaben-fehlen' | 'nicht-gefunden';
 
 /**
- * Gemeinsamer Weg von Anmeldung (FR-07) und Wildcard-Antrag (FR-08). Die Zeile des Mitglieds wird
- * zuerst gesperrt (`for update`), dann die Kategorie (`for share`): parallele Anmeldungen
- * desselben Mitglieds laufen nacheinander, so zählen Grenze und Doppelanmeldung richtig, und
- * die Verwaltung kann die Kategorie nicht gleichzeitig ändern oder absagen. `regel` prüft die
- * Passung und gibt sonst ihren eigenen Fehler zurück.
+ * Sperrt die Mitglieder `for update` nach aufsteigender ID, je mit eigener Anfrage: Wer zwei
+ * Mitglieder braucht (Paar, Anfrage), sperrt sie immer in derselben Reihenfolge, so verklemmen
+ * sich zwei Transaktionen nie. Fehlt ein Mitglied, fehlt es in der Antwort.
+ */
+export async function sperreMitglieder(tx: DbOderTx, ids: number[]) {
+	const gesperrt = [];
+	for (const id of [...new Set(ids)].sort((a, b) => a - b)) {
+		const [m] = await tx
+			.select({
+				id: mitglied.id,
+				vorname: mitglied.vorname,
+				nachname: mitglied.nachname,
+				status: mitglied.status,
+				...spielerSpalten
+			})
+			.from(mitglied)
+			.where(eq(mitglied.id, id))
+			.for('update');
+		if (m) gesperrt.push(m);
+	}
+	return new Map(gesperrt.map((m) => [m.id, m]));
+}
+
+/**
+ * Sperrt nach den Mitgliedern die Kategorie und danach ihr Turnier `for share`: Die Verwaltung
+ * kann die Kategorie nicht gleichzeitig ändern oder absagen, und ein gleichzeitiges Schliessen
+ * (`setzeStatus` sperrt das Turnier) fällt nicht zwischen Prüfung und Eintrag.
+ */
+export async function sperreKategorieUndTurnier(tx: DbOderTx, kategorieId: number) {
+	const [k] = await tx.select().from(kategorie).where(eq(kategorie.id, kategorieId)).for('share');
+	if (!k) return null;
+	const [t] = await tx.select().from(turnier).where(eq(turnier.id, k.turnierId)).for('share');
+	return { k, t };
+}
+
+/** Spieler einer Anmeldung (gleich welcher Status), aufsteigend. */
+export async function spielerDer(tx: DbOderTx, anmeldungId: number): Promise<number[]> {
+	const zeilen = await tx
+		.select({ id: anmeldungSpieler.mitgliedId })
+		.from(anmeldungSpieler)
+		.where(eq(anmeldungSpieler.anmeldungId, anmeldungId))
+		.orderBy(asc(anmeldungSpieler.mitgliedId));
+	return zeilen.map((z) => z.id);
+}
+
+/**
+ * Gemeinsamer Weg von Anmeldung (FR-07, im Doppel allein) und Wildcard-Antrag (FR-08). Gesperrt
+ * wird das Mitglied (`for update`), dann Kategorie und Turnier (`sperreKategorieUndTurnier`):
+ * parallele Anmeldungen desselben Mitglieds laufen nacheinander, so zählen Grenze und
+ * Doppelanmeldung richtig. `regel` prüft die Passung und gibt sonst ihren eigenen Fehler zurück;
+ * `arten` sind die Kategorien, die der Weg kennt.
  */
 async function trageEin<F extends string>(
 	db: Db,
 	kategorieId: number,
 	mitgliedId: number,
 	jetzt: Date,
+	arten: readonly Art[],
 	regel: (k: KategorieRegel, s: Spieler) => F | null,
-	neu: { status: AktiverStatus; kommentar: string | null }
+	neu: { status: AktiverStatus; kommentar: string | null; suchtext: string | null }
 ): Promise<'ok' | F | Gemeinsam> {
 	return db.transaction(async (tx) => {
-		const [m] = await tx
-			.select({ ...spielerSpalten, status: mitglied.status })
-			.from(mitglied)
-			.where(eq(mitglied.id, mitgliedId))
-			.for('update');
+		const m = (await sperreMitglieder(tx, [mitgliedId])).get(mitgliedId);
 		// Gesperrt wird vor dem Prüfen: eine Anmeldung kann nicht nach einem Austritt landen.
 		if (!m || m.status !== 'aktiv') return 'nicht-gefunden';
-		const [z] = await tx
-			.select({ k: kategorie, t: turnier })
-			.from(kategorie)
-			.innerJoin(turnier, eq(turnier.id, kategorie.turnierId))
-			.where(eq(kategorie.id, kategorieId))
-			.for('share', { of: kategorie });
-		if (!z || z.k.art !== 'einzel' || z.k.status !== 'aktiv' || z.t.status === 'vorbereitung') {
+		const z = await sperreKategorieUndTurnier(tx, kategorieId);
+		if (!z || !arten.includes(z.k.art) || z.k.status !== 'aktiv' || z.t.status === 'vorbereitung') {
 			return 'nicht-gefunden';
 		}
 		if (wirksamerStatus(z.t.status, z.t.anmeldeschluss, jetzt) !== 'offen') return 'geschlossen';
@@ -276,27 +325,40 @@ async function trageEin<F extends string>(
 
 		const [zeile] = await tx
 			.insert(anmeldung)
-			.values({ kategorieId, ...neu, angemeldetAm: jetzt, geaendertAm: jetzt })
+			.values({
+				kategorieId,
+				...neu,
+				suchtext: z.k.art === 'doppel' ? suchtextAus(neu.suchtext) : null,
+				angemeldetAm: jetzt,
+				geaendertAm: jetzt
+			})
 			.returning({ id: anmeldung.id });
 		await tx.insert(anmeldungSpieler).values({ anmeldungId: zeile.id, mitgliedId });
 		return 'ok';
 	});
 }
 
-/** A-ANMELDUNG-01, FR-05 bis FR-09: anmelden, sofort bestätigt. */
+/**
+ * A-ANMELDUNG-01, FR-05 bis FR-09: anmelden, sofort bestätigt. Im Doppel allein: der Spieler
+ * *sucht Partner*, mit freiwilligem `suchtext` (A-ANMELDUNG-04, FR-49; die Länge prüft die
+ * Schnittstelle). Im Einzel gibt es keinen Suchtext.
+ */
 export function meldeAn(
 	db: Db,
 	kategorieId: number,
 	mitgliedId: number,
-	jetzt: Date
+	jetzt: Date,
+	suchtext: string | null = null
 ): Promise<'ok' | 'passt-nicht' | Gemeinsam> {
 	return trageEin(
 		db,
 		kategorieId,
 		mitgliedId,
 		jetzt,
-		(k, s) => (passtEinzel(k, s) ? null : 'passt-nicht'),
-		{ status: 'bestaetigt', kommentar: null }
+		['einzel', 'doppel'],
+		(k, s) =>
+			(k.art === 'doppel' ? passtDoppelAllein(k, s) : passtEinzel(k, s)) ? null : 'passt-nicht',
+		{ status: 'bestaetigt', kommentar: null, suchtext }
 	);
 }
 
@@ -317,62 +379,101 @@ export function beantrageWildcard(
 		kategorieId,
 		mitgliedId,
 		jetzt,
+		['einzel'],
 		(k, s) => (wildcardEinzel(k, s) ? null : 'keine-wildcard'),
-		{ status: 'beantragt', kommentar }
+		{ status: 'beantragt', kommentar, suchtext: null }
 	);
 }
 
-/** FR-10: eine eigene aktive Anmeldung zurückziehen, nur solange das Turnier offen ist. */
+/** Ergebnis einer Abmeldung; `partnerId` ist der andere Spieler eines Paars. */
+export type Abgemeldet = { ergebnis: 'ok'; partnerId: number | null };
+
+const NOCHMALS = Symbol('nochmals');
+
+/**
+ * FR-10: eine eigene aktive Anmeldung zurückziehen, nur solange das Turnier offen ist. Im Doppel
+ * ist die ganze Anmeldung *zurückgezogen*, auch für den Partner, und der Suchtext ist weg (FR-49).
+ * Gesperrt werden zuerst alle Spieler der Anmeldung (`sperreMitglieder`), dann Kategorie,
+ * Turnier und Anmeldung.
+ */
 export async function meldeAb(
 	db: Db,
 	anmeldungId: number,
 	mitgliedId: number,
 	jetzt: Date
-): Promise<'ok' | 'geschlossen' | 'nicht-gefunden'> {
-	return db.transaction(async (tx) => {
-		// Gleiche Reihenfolge wie meldeAn: zuerst das Mitglied, dann die Anmeldung.
-		const [m] = await tx
-			.select({ id: mitglied.id })
-			.from(mitglied)
-			.where(eq(mitglied.id, mitgliedId))
-			.for('update');
-		if (!m) return 'nicht-gefunden';
-		const [z] = await tx
-			.select({ status: turnier.status, anmeldeschluss: turnier.anmeldeschluss })
-			.from(anmeldung)
-			.innerJoin(
-				anmeldungSpieler,
-				and(
-					eq(anmeldungSpieler.anmeldungId, anmeldung.id),
-					eq(anmeldungSpieler.mitgliedId, mitgliedId)
-				)
-			)
-			.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
-			.innerJoin(turnier, eq(turnier.id, kategorie.turnierId))
-			.where(and(eq(anmeldung.id, anmeldungId), istAktiv))
-			.for('update', { of: anmeldung });
-		if (!z) return 'nicht-gefunden';
-		if (wirksamerStatus(z.status, z.anmeldeschluss, jetzt) !== 'offen') return 'geschlossen';
-		await tx
-			.update(anmeldung)
-			.set({ status: 'zurueckgezogen', geaendertAm: jetzt })
-			.where(eq(anmeldung.id, anmeldungId));
-		return 'ok';
-	});
+): Promise<Abgemeldet | 'geschlossen' | 'nicht-gefunden'> {
+	for (;;) {
+		const r = await db.transaction(async (tx) => {
+			const vorher = await spielerDer(tx, anmeldungId);
+			if (!vorher.includes(mitgliedId)) return 'nicht-gefunden' as const;
+			if (!(await sperreMitglieder(tx, vorher)).has(mitgliedId)) return 'nicht-gefunden' as const;
+			const spieler = await spielerDer(tx, anmeldungId);
+			// Kam vor dem Sperren ein Partner dazu, ist er nicht gesperrt: von vorn, in Reihenfolge.
+			if (spieler.join() !== vorher.join()) return NOCHMALS;
+			const [{ kategorieId }] = await tx
+				.select({ kategorieId: anmeldung.kategorieId })
+				.from(anmeldung)
+				.where(eq(anmeldung.id, anmeldungId));
+			const z = await sperreKategorieUndTurnier(tx, kategorieId);
+			const [aktiv] = await tx
+				.select({ id: anmeldung.id })
+				.from(anmeldung)
+				.where(and(eq(anmeldung.id, anmeldungId), istAktiv))
+				.for('update');
+			if (!z || !aktiv) return 'nicht-gefunden' as const;
+			if (wirksamerStatus(z.t.status, z.t.anmeldeschluss, jetzt) !== 'offen') {
+				return 'geschlossen' as const;
+			}
+			await tx
+				.update(anmeldung)
+				.set({ status: 'zurueckgezogen', suchtext: null, geaendertAm: jetzt })
+				.where(eq(anmeldung.id, anmeldungId));
+			return {
+				ergebnis: 'ok' as const,
+				partnerId: spieler.find((id) => id !== mitgliedId) ?? null
+			};
+		});
+		if (r !== NOCHMALS) return r;
+	}
 }
 
 /**
  * Namen der Kategorien, in denen das Mitglied aktiv angemeldet ist (für die Mail), nach Name;
- * ein laufender Wildcard-Antrag mit « (beantragt)».
+ * ein laufender Wildcard-Antrag mit « (beantragt)», ein Doppel mit « (mit <Partner>)» oder
+ * « (sucht Partner)».
  */
 export async function eigeneKategorien(
 	db: DbOderTx,
 	turnierId: number,
 	mitgliedId: number
 ): Promise<string[]> {
-	return (await eigeneAnmeldungen(db, turnierId, mitgliedId)).map((e) =>
-		e.status === 'beantragt' ? `${e.kategorie} (beantragt)` : e.kategorie
-	);
+	const eigene = await eigeneAnmeldungen(db, turnierId, mitgliedId);
+	const doppel = eigene.filter((e) => e.art === 'doppel').map((e) => e.anmeldungId);
+	const partner = new Map<number, string>();
+	if (doppel.length > 0) {
+		const zeilen = await db
+			.select({
+				anmeldungId: anmeldungSpieler.anmeldungId,
+				vorname: mitglied.vorname,
+				nachname: mitglied.nachname
+			})
+			.from(anmeldungSpieler)
+			.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId))
+			.where(
+				and(
+					inArray(anmeldungSpieler.anmeldungId, doppel),
+					ne(anmeldungSpieler.mitgliedId, mitgliedId)
+				)
+			);
+		for (const z of zeilen) partner.set(z.anmeldungId, nameVon(z));
+	}
+	return eigene.map((e) => {
+		if (e.art === 'doppel') {
+			const p = partner.get(e.anmeldungId);
+			return p ? `${e.kategorie} (mit ${p})` : `${e.kategorie} (sucht Partner)`;
+		}
+		return e.status === 'beantragt' ? `${e.kategorie} (beantragt)` : e.kategorie;
+	});
 }
 
 /** Aktive Anmeldungen einer Kategorie (FR-35). */

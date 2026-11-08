@@ -164,7 +164,10 @@ describe('CM-Anmeldung', () => {
 		const beantragt = await spieler({ vorname: 'Be', nachname: 'Antragt' });
 		for (const s of [zeta, alphaB, alphaA])
 			expect(await meldeAn(db, herren, s, t.jetzt)).toBe('ok');
-		expect(await meldeAb(db, await anmeldungId(herren, weg, t.jetzt), weg, t.jetzt)).toBe('ok');
+		expect(await meldeAb(db, await anmeldungId(herren, weg, t.jetzt), weg, t.jetzt)).toEqual({
+			ergebnis: 'ok',
+			partnerId: null
+		});
 		const [b] = await db
 			.insert(anmeldung)
 			.values({
@@ -295,7 +298,7 @@ describe('CM-Anmeldung', () => {
 		expect(await meldeAn(db, k2, ich, t.jetzt)).toBe('ok');
 		expect(await meldeAn(db, k3, ich, t.jetzt)).toBe('ok');
 		expect(await meldeAn(db, k4, ich, t.jetzt)).toBe('voll');
-		expect(await meldeAb(db, erste, ich, t.jetzt)).toBe('ok');
+		expect(await meldeAb(db, erste, ich, t.jetzt)).toEqual({ ergebnis: 'ok', partnerId: null });
 		expect(await meldeAn(db, k4, ich, t.jetzt)).toBe('ok');
 		expect(await aktiveVon(ich, t.kategorien)).toHaveLength(3);
 
@@ -333,7 +336,7 @@ describe('CM-Anmeldung', () => {
 		const ich = await spieler();
 		const erste = await anmeldungId(k, ich, t.jetzt);
 		expect(await meldeAn(db, k, ich, t.jetzt)).toBe('schon-angemeldet');
-		expect(await meldeAb(db, erste, ich, t.jetzt)).toBe('ok');
+		expect(await meldeAb(db, erste, ich, t.jetzt)).toEqual({ ergebnis: 'ok', partnerId: null });
 		expect(await meldeAn(db, k, ich, t.jetzt)).toBe('ok');
 		// Neu anmelden ist eine neue Zeile; die alte bleibt zurückgezogen.
 		const alle = await db
@@ -359,7 +362,7 @@ describe('CM-Anmeldung', () => {
 			expect.objectContaining({ id: herren, passt: false, anmeldungId: id })
 		]);
 		expect(await meldeAn(db, herren, ich, t.jetzt)).toBe('passt-nicht');
-		expect(await meldeAb(db, id, ich, t.jetzt)).toBe('ok');
+		expect(await meldeAb(db, id, ich, t.jetzt)).toEqual({ ergebnis: 'ok', partnerId: null });
 		expect((await ladeCmAnsicht(db, t.id, ich, t.jetzt))?.kategorien).toEqual([]);
 	});
 
@@ -372,7 +375,10 @@ describe('CM-Anmeldung', () => {
 		const letzteMinute = new Date(`${t.jahr}-05-31T21:59:00Z`);
 		const mitternacht = new Date(`${t.jahr}-05-31T22:00:00Z`);
 		const zweite = await anmeldungId(k2, ich, letzteMinute);
-		expect(await meldeAb(db, erste, ich, letzteMinute)).toBe('ok');
+		expect(await meldeAb(db, erste, ich, letzteMinute)).toEqual({
+			ergebnis: 'ok',
+			partnerId: null
+		});
 		expect(await meldeAn(db, k1, ich, mitternacht)).toBe('geschlossen');
 		expect(await meldeAb(db, zweite, ich, mitternacht)).toBe('geschlossen');
 		expect((await ladeCmAnsicht(db, t.id, ich, mitternacht))?.turnier.status).toBe('geschlossen');
@@ -394,7 +400,7 @@ describe('CM-Anmeldung', () => {
 		expect(await meldeAb(db, id, fremd, t.jetzt)).toBe('nicht-gefunden');
 		expect(await meldeAb(db, -1, ich, t.jetzt)).toBe('nicht-gefunden');
 		expect(await meldeAb(db, id, -1, t.jetzt)).toBe('nicht-gefunden');
-		expect(await meldeAb(db, id, ich, t.jetzt)).toBe('ok');
+		expect(await meldeAb(db, id, ich, t.jetzt)).toEqual({ ergebnis: 'ok', partnerId: null });
 		// Schon zurückgezogen: nichts mehr abzumelden.
 		expect(await meldeAb(db, id, ich, t.jetzt)).toBe('nicht-gefunden');
 		expect(await meldeAn(db, -1, ich, t.jetzt)).toBe('nicht-gefunden');
@@ -474,7 +480,10 @@ describe('CM-Anmeldung', () => {
 		const r5 = await spieler({ klassierung: 'R5' });
 		expect(await meldeAn(db, k, r2, t.jetzt)).toBe('ok');
 		expect(await meldeAn(db, k, r4, t.jetzt)).toBe('ok');
-		expect(await meldeAb(db, await anmeldungId(k, r5, t.jetzt), r5, t.jetzt)).toBe('ok');
+		expect(await meldeAb(db, await anmeldungId(k, r5, t.jetzt), r5, t.jetzt)).toEqual({
+			ergebnis: 'ok',
+			partnerId: null
+		});
 
 		const regel = {
 			art: 'einzel' as const,
@@ -571,7 +580,7 @@ describe('CM-Anmeldung', () => {
 		]);
 
 		// Zurückziehen wie eine Abmeldung (FR-10).
-		expect(await meldeAb(db, id, ich, t.jetzt)).toBe('ok');
+		expect(await meldeAb(db, id, ich, t.jetzt)).toEqual({ ergebnis: 'ok', partnerId: null });
 		expect((await ladeCmAnsicht(db, t.id, ich, t.jetzt))?.wildcard).toEqual([
 			expect.objectContaining({ id: stark, anmeldungId: null })
 		]);

@@ -408,7 +408,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 
 		expect(await entscheide(db, admin, idJa, false, spaeter)).toBe('nicht-beantragt');
 		expect(await entscheide(db, admin, idNein, true, spaeter)).toBe('nicht-beantragt');
-		expect(await meldeAb(db, idWeg, weg, t.jetzt)).toBe('ok');
+		expect(await meldeAb(db, idWeg, weg, t.jetzt)).toEqual({ ergebnis: 'ok', partnerId: null });
 		expect(await entscheide(db, admin, idWeg, true, t.jetzt)).toBe('nicht-beantragt');
 		expect(await entscheide(db, admin, -1, true, t.jetzt)).toBe('nicht-gefunden');
 		expect(await statusVon(idJa)).toEqual({ status: 'bestaetigt', kategorieId: a });
@@ -684,7 +684,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			meldeAb(db, id, ich, t.jetzt),
 			verschiebe(db, admin, id, b, t.jetzt, false)
 		]);
-		expect(ab).toBe('ok');
+		expect(ab).toEqual({ ergebnis: 'ok', partnerId: null });
 		// Entweder zuerst verschoben und dann in B zurückgezogen, oder zuerst zurückgezogen in A.
 		const zeilen = await anmeldungenVon(ich, [a, b]);
 		if (verschoben === 'nicht-gefunden') {
@@ -706,7 +706,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			meldeAb(db, id, ich, t.jetzt),
 			entscheide(db, admin, id, true, t.jetzt)
 		]);
-		expect(ab).toBe('ok');
+		expect(ab).toEqual({ ergebnis: 'ok', partnerId: null });
 		if (entscheid !== 'nicht-beantragt') {
 			expect(entscheid).toEqual({ mitgliedId: ich, kategorie: 'Herren A', turnierId: t.id });
 		}
