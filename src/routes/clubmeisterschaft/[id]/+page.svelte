@@ -488,8 +488,11 @@
 		{/if}
 	</div>
 	{#if cm.fehlt.includes('geschlecht')}
+		<!-- `aria-invalid` gilt für die Gruppe, nicht für einzelne Radios (ARIA). -->
 		<fieldset
 			class="auswahl-gruppe"
+			role="radiogroup"
+			aria-invalid={feldFehler.geschlecht ? 'true' : undefined}
 			aria-describedby={feldFehler.geschlecht ? 'cm-fehler-geschlecht' : undefined}
 		>
 			<legend>Geschlecht</legend>
