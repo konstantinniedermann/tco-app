@@ -1,4 +1,6 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { SPALTEN } from '../../verwaltung/einlesen.ts';
 import { FELDER } from './angaben.ts';
 import { MAX_BYTES, MAX_ZEILEN, PFLICHT_SPALTEN, pruefeDatei } from './einlesen.ts';
 
@@ -74,7 +76,7 @@ describe('pruefeDatei', () => {
 	});
 
 	it('A-MITGLIED-07: Windows-1252 statt UTF-8 (Ersatzzeichen) ist ein Fehler der Datei', () => {
-		const text = `${KOPF}\nA1;Erika;M�ller;Weg 1;4600;Olten;e@example.org\n`;
+		const text = `${KOPF}\nA1;Erika;M\uFFFDller;Weg 1;4600;Olten;e@example.org\n`;
 		expect(pruefeDatei(text, 2026)).toEqual({ ok: false, grund: 'kodierung' });
 	});
 
@@ -163,5 +165,16 @@ describe('pruefeDatei', () => {
 		const r = ok(`${KOPF}\nA1; ${lang} ;Beispiel;Weg 1;4600;Olten;e@example.org\n`);
 		expect(r.fehlerhaft[0].name).toHaveLength(100);
 		expect(r.fehlerhaft[0].name.startsWith('x')).toBe(true);
+	});
+});
+
+describe('Vorlage', () => {
+	it('A-MITGLIED-07: Vorlage und Spaltenliste der Seite nennen genau die Felder, in ihrer Reihenfolge', () => {
+		const vorlage = readFileSync('static/mytco-einlesen-vorlage.csv', 'utf8');
+		expect(vorlage.startsWith('\uFEFF')).toBe(true);
+		expect(vorlage.slice(1).trim().split(';')).toEqual([...FELDER]);
+		expect(SPALTEN.map((s) => s.spalte)).toEqual([...FELDER]);
+		const r = pruefeDatei(vorlage, 2026);
+		expect(r).toEqual({ ok: false, grund: 'keine-zeilen' });
 	});
 });

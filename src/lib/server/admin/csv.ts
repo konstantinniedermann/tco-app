@@ -23,7 +23,7 @@ function trennzeichen(text: string): ';' | ',' {
 }
 
 export function leseCsv(text: string): CsvErgebnis {
-	const inhalt = text.startsWith('﻿') ? text.slice(1) : text;
+	const inhalt = text.startsWith('\uFEFF') ? text.slice(1) : text;
 	if (inhalt.trim() === '') return { ok: false, grund: 'leer' };
 	const trenn = trennzeichen(inhalt);
 

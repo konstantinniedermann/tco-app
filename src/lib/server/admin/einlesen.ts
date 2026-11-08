@@ -8,20 +8,9 @@ import { FELDER, pruefeAngaben, type Angaben, type Feld } from './angaben.ts';
 import { leseCsv } from './csv.ts';
 import { vergebenesFeld } from './mitglieder.ts';
 import { schreibeVerlaufFuer, type Urheber } from './verlauf.ts';
+import { MAX_BYTES, MAX_ZEILEN, PFLICHT_SPALTEN } from '../../verwaltung/einlesen.ts';
 
-// Unter der Grenze des Servers für eine Anfrage (512 KB), samt JSON-Hülle (Projektleiter, 08.11.2026).
-export const MAX_BYTES = 400 * 1024;
-export const MAX_ZEILEN = 2000;
-
-export const PFLICHT_SPALTEN: readonly Feld[] = [
-	'mitgliedernummer',
-	'vorname',
-	'nachname',
-	'strasse',
-	'plz',
-	'ort',
-	'email'
-];
+export { MAX_BYTES, MAX_ZEILEN, PFLICHT_SPALTEN };
 
 export type DateiFehler =
 	| {
@@ -73,7 +62,7 @@ function mehrfache(zeilen: GueltigeZeile[], wert: (a: Angaben) => string | null)
 export function pruefeDatei(text: string, jahr: number): Dateipruefung {
 	if (new TextEncoder().encode(text).length > MAX_BYTES) return { ok: false, grund: 'zu-gross' };
 	// Excel speichert «CSV» ohne «UTF-8» in Windows-1252; der Browser macht aus Umlauten U+FFFD.
-	if (text.includes('�')) return { ok: false, grund: 'kodierung' };
+	if (text.includes('\uFFFD')) return { ok: false, grund: 'kodierung' };
 	const csv = leseCsv(text);
 	if (!csv.ok) return { ok: false, grund: csv.grund };
 

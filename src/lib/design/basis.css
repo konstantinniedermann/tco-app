@@ -564,6 +564,19 @@ html {
 	background-repeat: no-repeat;
 }
 
+/* Dateiwahl (nur Verwaltung, Einlesen): die Wahltaste des Browsers wie eine Nebentaste */
+.feld input[type='file']::file-selector-button {
+	margin-right: var(--abstand-3);
+	padding: var(--abstand-2) var(--abstand-4);
+	border: var(--rand-dick) solid var(--farbe-marke);
+	border-radius: var(--radius);
+	background: var(--farbe-flaeche);
+	color: var(--farbe-marke);
+	font: inherit;
+	font-weight: 700;
+	cursor: pointer;
+}
+
 .feld-code input {
 	font-family: var(--schrift-code);
 	font-size: var(--groesse-gross);

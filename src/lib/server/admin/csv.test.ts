@@ -21,7 +21,7 @@ describe('leseCsv', () => {
 	});
 
 	it('A-MITGLIED-07: BOM am Anfang und CRLF', () => {
-		const r = ok('﻿vorname;nachname\r\nErika;Beispiel\r\nMax;Muster\r\n');
+		const r = ok('\uFEFFvorname;nachname\r\nErika;Beispiel\r\nMax;Muster\r\n');
 		expect(r.kopf).toEqual(['vorname', 'nachname']);
 		expect(r.zeilen.map((z) => z.nummer)).toEqual([2, 3]);
 	});
@@ -60,7 +60,7 @@ describe('leseCsv', () => {
 
 	it('A-MITGLIED-07: leere Datei oder nur Leerraum', () => {
 		expect(leseCsv('')).toEqual({ ok: false, grund: 'leer' });
-		expect(leseCsv('﻿ \r\n\n')).toEqual({ ok: false, grund: 'leer' });
+		expect(leseCsv('\uFEFF \r\n\n')).toEqual({ ok: false, grund: 'leer' });
 	});
 
 	it('A-MITGLIED-07: Kopf ohne Daten ergibt keine Zeilen', () => {

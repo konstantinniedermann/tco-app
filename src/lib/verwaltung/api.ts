@@ -7,6 +7,7 @@ import type { AnlassAdmin, AnlassListe } from '../server/anlass/anlaesse.ts';
 import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairgate.ts';
 import type { Auskunft } from '../server/admin/auskunft.ts';
 import type { AusgestellterBrief, BriefZeile } from '../server/admin/briefe.ts';
+import type { DateiFehler, Vorschau } from '../server/admin/einlesen.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
 import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
@@ -47,6 +48,7 @@ type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld | MitteilungFe
 export type FairgateZeile = Json<ServerFairgateZeile>;
 export type BriefListe = Json<BriefZeile>[];
 export type { AusgestellterBrief };
+export type { DateiFehler, Vorschau };
 export type { Angaben, AnsichtRolle, Feld, MitgliedStatus, Rolle, RollenListe };
 
 export type Antwort<T> =
@@ -72,6 +74,7 @@ export type Antwort<T> =
 	| { art: 'unpassend'; anzahl: number }
 	| { art: 'hat-anmeldungen'; anzahl: number }
 	| { art: 'nicht-moeglich'; anzahl: number }
+	| { art: 'datei'; datei: DateiFehler }
 	| { art: 'warnung'; warnungen: Warnung[] }
 	| { art: 'schon-angemeldet' }
 	| { art: 'vorbereitung' }
@@ -89,6 +92,7 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 		feld?: unknown;
 		anzahl?: unknown;
 		warnungen?: unknown;
+		datei?: unknown;
 	};
 	if (status >= 200 && status < 300) return { art: 'ok', daten: koerper as T };
 	if (status === 401) return { art: 'abgemeldet' };
@@ -102,6 +106,8 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 	if (status === 429) return { art: 'zu-viele' };
 	if (status === 400) {
 		if (k.fehler === 'falsch') return { art: 'falsch' };
+		if (k.fehler === 'datei' && k.datei && typeof k.datei === 'object')
+			return { art: 'datei', datei: k.datei as DateiFehler };
 		if (k.fehler === 'eingabe' && k.felder && typeof k.felder === 'object')
 			return { art: 'eingabe', felder: k.felder as Partial<Record<AlleFelder, string>> };
 	}
@@ -208,6 +214,14 @@ export const erzeugeBriefe = (ids: number[], holen: Holen = fetch) =>
 /** Wie `erzeugeBriefe`, für ein einzelnes Mitglied. */
 export const erzeugeBrief = (id: number, holen: Holen = fetch) =>
 	schicke<{ briefe: AusgestellterBrief[] }>(`${ADMIN}/mitglieder/${id}/brief`, {}, holen);
+
+/** A-MITGLIED-07: Vorschau einer Datei; nichts wird gespeichert. */
+export const zeigeEinleseVorschau = (text: string, holen: Holen = fetch) =>
+	schicke<Vorschau>(`${ADMIN}/einlesen/vorschau`, { text }, holen);
+
+/** A-MITGLIED-07: legt die neuen Zeilen an, wenn es noch `erwartet` sind (sonst `veraltet`). */
+export const liesMitgliederEin = (text: string, erwartet: number, holen: Holen = fetch) =>
+	schicke<{ angelegt: number }>(`${ADMIN}/einlesen`, { text, erwartet }, holen);
 
 export const legeMitgliedAn = (angaben: object, holen: Holen = fetch) =>
 	schicke<{ id: number }>(`${ADMIN}/mitglieder`, angaben, holen);
