@@ -63,6 +63,8 @@ const MIXED: KategorieWerte = {
 	mindestsumme: 9
 };
 
+const DAMEN_DOPPEL: KategorieWerte = { ...MIXED, name: 'Damen Doppel', geschlecht: 'damen' };
+
 type Konto = Awaited<ReturnType<typeof legeKontoMitBriefCodeAn>>;
 
 async function meldeAn(page: Page, konto: Konto) {
@@ -92,7 +94,8 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 		einzel('Offen R1–R9', 'offen', 'R1'),
 		einzel('Herren Jahrgang bis 1991', 'herren', 'R1', 1991),
 		einzel('Damen R1–R9', 'damen', 'R1'),
-		MIXED
+		MIXED,
+		DAMEN_DOPPEL
 	]);
 	// Ohne Klassierung und Geschlecht; der Jahrgang steht schon (wie aus Fairgate).
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
@@ -121,7 +124,7 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	await page.getByLabel('Mann').check();
 	await page.getByRole('button', { name: 'Weiter zu den Kategorien' }).click();
 
-	// A-ANMELDUNG-03, FR-07: nur passende Kategorien; die Damen-Kategorie fehlt, das Mixed passt
+	// A-ANMELDUNG-03, FR-07: nur passende Kategorien; die Damen-Kategorien fehlen, das Mixed passt
 	// (Doppel ohne Jahrgang, die Mindestsumme prüft erst die Partnerwahl).
 	await expect(page.getByText('0 von 3 Anmeldungen', { exact: true })).toBeVisible();
 	await expect(karte(page, 'Herren R1–R9')).toBeVisible();
@@ -130,6 +133,7 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	await expect(karte(page, 'Herren Jahrgang bis 1991')).toBeVisible();
 	await expect(page.getByText('Damen R1–R9')).toHaveCount(0);
 	await expect(page.getByText('Mixed Doppel', { exact: true })).toBeVisible();
+	await expect(page.getByText('Damen Doppel')).toHaveCount(0);
 
 	// A-ANMELDUNG-01: erste Anmeldung mit Rückfrage zu den Kontaktdaten.
 	await karte(page, 'Herren R1–R9').getByRole('button', { name: 'Anmelden' }).click();
