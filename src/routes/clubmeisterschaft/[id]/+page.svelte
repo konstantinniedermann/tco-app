@@ -354,6 +354,11 @@
 				await neuLaden();
 				await fokusNachAnfrage();
 				return;
+			case 'hinfaellig':
+				fehler = 'Diese Anfrage gilt nicht mehr.';
+				await neuLaden();
+				await fokusNachAnfrage();
+				return;
 			case 'angaben-fehlen':
 			case 'nicht-gefunden':
 				await neuLaden();
@@ -381,6 +386,11 @@
 			case 'abgemeldet':
 				await goto(resolve('/login'));
 				return;
+			case 'geschlossen':
+				fehler = FEHLER.geschlossen;
+				await neuLaden();
+				await fokusNachAnfrage();
+				return;
 			case 'nicht-gefunden':
 				await neuLaden();
 				await fokusNachAnfrage();
@@ -406,6 +416,10 @@
 				return;
 			case 'abgemeldet':
 				await goto(resolve('/login'));
+				return;
+			case 'geschlossen':
+				fehler = FEHLER.geschlossen;
+				await neuLaden();
 				return;
 			case 'nicht-gefunden':
 				await neuLaden();

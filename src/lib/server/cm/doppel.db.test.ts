@@ -12,7 +12,14 @@ import {
 } from '../db/schema.ts';
 import type { KategorieWerte } from '../turnier/angaben.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../turnier/turniere.ts';
-import { eigeneAnmeldungen, eigeneKategorien, meldeAb, meldeAn } from './anmeldungen.ts';
+import {
+	eigeneAnmeldungen,
+	eigeneKategorien,
+	ladeCmAnsicht,
+	laufendeTurniere,
+	meldeAb,
+	meldeAn
+} from './anmeldungen.ts';
 import {
 	lehneAnfrageAb,
 	nimmAnfrageAn,
@@ -599,19 +606,20 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		const ich = await lea();
 		await anmeldungMit(t.damenEinzel[0], [ich], t.jetzt);
 		await anmeldungMit(t.damenEinzel[1], [ich], t.jetzt);
-		for (const [v, n] of [
-			['Marco', 'Beispiel'],
-			['Max', 'Cadonau'],
-			['Paul', 'Sommer']
-		]) {
-			expect(await stelleAnfrage(db, t.mixed, ich, await spieler(v, n), t.jetzt)).toBe('ok');
-		}
+		// Je Kategorie eine Anfrage (nur eine je Person); sie zählen nicht bei der Grenze.
+		const marcoId = await marco();
+		const nina = await spieler('Nina', 'Graf', { geschlecht: 'w' });
+		expect(await stelleAnfrage(db, t.mixed, ich, marcoId, t.jetzt)).toBe('ok');
+		expect(await stelleAnfrage(db, t.damen, ich, nina, t.jetzt)).toBe('ok');
+		// Auch fremde Anfragen an dieselbe Person zählen nicht.
+		const paul = await spieler('Paul', 'Sommer');
+		expect(await stelleAnfrage(db, t.mixed, paul, ich, t.jetzt)).toBe('ok');
 		expect(await eigeneAnmeldungen(db, t.id, ich)).toHaveLength(2);
-		expect(await anfragenIn(t.mixed)).toHaveLength(3);
+		expect(await anfragenIn(t.mixed)).toHaveLength(2);
+		expect(await anfragenIn(t.damen)).toHaveLength(1);
 
 		// Mit drei Anmeldungen geht keine Anfrage mehr, ausser man sucht dort schon allein.
 		await anmeldungMit(t.damenEinzel[2], [ich], t.jetzt);
-		const nina = await spieler('Nina', 'Graf', { geschlecht: 'w' });
 		expect(await stelleAnfrage(db, t.damen, ich, nina, t.jetzt)).toBe('voll');
 		const sara = await spieler('Sara', 'Keller', { geschlecht: 'w' });
 		const kurt = await spieler('Kurt', 'Weber');
@@ -706,18 +714,19 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		const t = await offenesDoppel();
 		const ich = await lea({ rufname: 'Lele' });
 		const marcoId = await marco();
-		const max = await spieler('Max', 'Cadonau');
-		const paul = await spieler('Paul', 'Sommer');
 		const nina = await spieler('Nina', 'Graf', { geschlecht: 'w' });
+		const sara = await spieler('Sara', 'Keller', { geschlecht: 'w' });
+		const paul = await spieler('Paul', 'Sommer');
+		const otto = await spieler('Otto', 'Frei');
 		const id = await anfrage(t.mixed, ich, marcoId, t.jetzt);
-		await anfrage(t.mixed, ich, max, t.jetzt);
+		// Dritte fragen Lea oder Marco an (je Person nur eine Anfrage je Kategorie).
 		await anfrage(t.mixed, paul, ich, t.jetzt);
-		await anfrage(t.mixed, marcoId, nina, t.jetzt);
+		await anfrage(t.mixed, nina, marcoId, t.jetzt);
 		// Die gekreuzte Anfrage fällt ohne Meldung weg: beide sind jetzt ein Paar.
 		await anfrage(t.mixed, marcoId, ich, t.jetzt);
 		// Andere Kategorie und Dritte untereinander bleiben.
 		const damen = await anfrage(t.damen, ich, nina, t.jetzt);
-		const dritte = await anfrage(t.mixed, paul, nina, t.jetzt);
+		const dritte = await anfrage(t.mixed, otto, sara, t.jetzt);
 
 		expect(await nimmAnfrageAn(db, id, marcoId, t.jetzt)).toEqual({
 			ergebnis: 'ok',
@@ -726,11 +735,11 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 			turnierId: t.id,
 			hinfaellig: [
 				// Die Meldung nennt den Namen in der kurzen Textform mit Rufname.
-				{ anIds: [max, paul], mitName: 'Lele (Lea Marbach)' },
+				{ anIds: [paul], mitName: 'Lele (Lea Marbach)' },
 				{ anIds: [nina], mitName: 'Marco Beispiel' }
 			]
 		});
-		expect(await anfragenIn(t.mixed)).toEqual([{ id: dritte, vonId: paul, anId: nina }]);
+		expect(await anfragenIn(t.mixed)).toEqual([{ id: dritte, vonId: otto, anId: sara }]);
 		expect(await anfragenIn(t.damen)).toEqual([{ id: damen, vonId: ich, anId: nina }]);
 	});
 
@@ -793,21 +802,21 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		const ich = await lea();
 		const marcoId = await marco();
 		const id = await anfrage(t.mixed, ich, marcoId, t.jetzt);
-		expect(await lehneAnfrageAb(db, id, ich)).toBe('nicht-gefunden');
-		expect(await lehneAnfrageAb(db, id, marcoId)).toEqual({
+		expect(await lehneAnfrageAb(db, id, ich, t.jetzt)).toBe('nicht-gefunden');
+		expect(await lehneAnfrageAb(db, id, marcoId, t.jetzt)).toEqual({
 			vonId: ich,
 			kategorie: 'Mixed Doppel',
 			turnierId: t.id
 		});
 		expect(await anfragenIn(t.mixed)).toEqual([]);
-		expect(await lehneAnfrageAb(db, id, marcoId)).toBe('nicht-gefunden');
+		expect(await lehneAnfrageAb(db, id, marcoId, t.jetzt)).toBe('nicht-gefunden');
 
 		// Erneut anfragen geht; zurückziehen kann nur, wer gefragt hat.
 		const neu = await anfrage(t.mixed, ich, marcoId, t.jetzt);
-		expect(await zieheAnfrageZurueck(db, neu, marcoId)).toBe('nicht-gefunden');
-		expect(await zieheAnfrageZurueck(db, neu, ich)).toBe('ok');
+		expect(await zieheAnfrageZurueck(db, neu, marcoId, t.jetzt)).toBe('nicht-gefunden');
+		expect(await zieheAnfrageZurueck(db, neu, ich, t.jetzt)).toBe('ok');
 		expect(await anfragenIn(t.mixed)).toEqual([]);
-		expect(await zieheAnfrageZurueck(db, neu, ich)).toBe('nicht-gefunden');
+		expect(await zieheAnfrageZurueck(db, neu, ich, t.jetzt)).toBe('nicht-gefunden');
 	});
 
 	test('FR-10: Abmelden aus dem Paar zieht die ganze Anmeldung zurück und nennt den Partner; als Suchender ist der Suchtext weg', async () => {
@@ -910,5 +919,122 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 				spieler: [ich, marcoId].sort((a, b) => a - b)
 			}
 		]);
+	});
+});
+
+describe('FR-48, FR-19: Nachträge Etappe 2', () => {
+	const sperreKonto = (mitgliedId: number, gesperrt: boolean) =>
+		db.update(konto).set({ gesperrt }).where(eq(konto.mitgliedId, mitgliedId));
+
+	test('FR-48: eine offene Anfrage je Kategorie; an denselben schon-angefragt, nach dem Zurückziehen geht ein anderer', async () => {
+		const t = await offenesDoppel();
+		const ich = await lea();
+		const marcoId = await marco();
+		const max = await spieler('Max', 'Cadonau');
+		expect(await stelleAnfrage(db, t.mixed, ich, marcoId, t.jetzt)).toBe('ok');
+		expect(await stelleAnfrage(db, t.mixed, ich, marcoId, t.jetzt)).toBe('schon-angefragt');
+		expect(await stelleAnfrage(db, t.mixed, ich, max, t.jetzt)).toBe('anfrage-offen');
+		// Eine andere Kategorie ist unabhängig: Lea (w) und Nina (w) im Damen Doppel.
+		const nina = await spieler('Nina', 'Graf', { geschlecht: 'w' });
+		expect(await stelleAnfrage(db, t.damen, ich, nina, t.jetzt)).toBe('ok');
+		expect(await anfragenIn(t.mixed)).toEqual([
+			{ id: expect.any(Number), vonId: ich, anId: marcoId }
+		]);
+
+		const [offen] = await anfragenIn(t.mixed);
+		expect(await zieheAnfrageZurueck(db, offen.id, ich, t.jetzt)).toBe('ok');
+		expect(await stelleAnfrage(db, t.mixed, ich, max, t.jetzt)).toBe('ok');
+	});
+
+	test('FR-48: an einen selbst sind beliebig viele Anfragen möglich', async () => {
+		const t = await offenesDoppel();
+		const marcoId = await marco();
+		const nina = await spieler('Nina', 'Graf', { geschlecht: 'w' });
+		const paula = await spieler('Paula', 'Sommer', { geschlecht: 'w' });
+		expect(await stelleAnfrage(db, t.mixed, nina, marcoId, t.jetzt)).toBe('ok');
+		expect(await stelleAnfrage(db, t.mixed, paula, marcoId, t.jetzt)).toBe('ok');
+		expect(await anfragenIn(t.mixed)).toHaveLength(2);
+	});
+
+	test('FR-48: Wettlauf – zwei Anfragen derselben Person an verschiedene: genau eine gilt', async () => {
+		const t = await offenesDoppel();
+		const ich = await lea();
+		const marcoId = await marco();
+		const max = await spieler('Max', 'Cadonau');
+		const ergebnisse = await Promise.all([
+			stelleAnfrage(db, t.mixed, ich, marcoId, t.jetzt),
+			stelleAnfrage(db, t.mixed, ich, max, t.jetzt)
+		]);
+		expect([...ergebnisse].sort()).toEqual(['anfrage-offen', 'ok']);
+		expect(await anfragenIn(t.mixed)).toHaveLength(1);
+	});
+
+	test('FR-48: Anfragen von Mitgliedern ohne Login fehlen in der Liste und im Zähler; Annehmen ergibt hinfaellig', async () => {
+		const t = await offenesDoppel();
+		const ich = await lea();
+		const marcoId = await marco();
+		const id = await anfrage(t.mixed, ich, marcoId, t.jetzt);
+		const anzahl = async () => {
+			const stand = (await laufendeTurniere(db, marcoId, t.jetzt)).find((x) => x.id === t.id);
+			return [stand?.anfragen, (await ladeCmAnsicht(db, t.id, marcoId, t.jetzt))?.anfragen.length];
+		};
+		expect(await anzahl()).toEqual([1, 1]);
+
+		await sperreKonto(ich, true);
+		expect(await anzahl()).toEqual([0, 0]);
+		await sperreKonto(ich, false);
+		expect(await anzahl()).toEqual([1, 1]);
+
+		await sperreKonto(ich, true);
+		expect(await nimmAnfrageAn(db, id, marcoId, t.jetzt)).toBe('hinfaellig');
+		expect(await anfragenIn(t.mixed)).toEqual([]);
+		expect(await aktiveIn(t.mixed)).toEqual([]);
+	});
+
+	test('FR-48: nach dem Anmeldeschluss sind Ablehnen und Zurückziehen geschlossen, die Anfrage bleibt', async () => {
+		const t = await offenesDoppel();
+		const ich = await lea();
+		const marcoId = await marco();
+		const id = await anfrage(t.mixed, ich, marcoId, t.jetzt);
+		expect(await lehneAnfrageAb(db, id, marcoId, t.spaet)).toBe('geschlossen');
+		expect(await zieheAnfrageZurueck(db, id, ich, t.spaet)).toBe('geschlossen');
+		expect(await anfragenIn(t.mixed)).toHaveLength(1);
+		// Fremde bleiben nicht-gefunden, auch nach dem Schluss.
+		expect(await lehneAnfrageAb(db, id, ich, t.spaet)).toBe('nicht-gefunden');
+		expect(await zieheAnfrageZurueck(db, id, marcoId, t.spaet)).toBe('nicht-gefunden');
+	});
+
+	test('FR-19: tritt der Partner nach dem Anmeldeschluss aus, bleibt sein Name, aber kein Kontakt', async () => {
+		const t = await offenesDoppel();
+		const ich = await lea();
+		const marcoId = await marco();
+		const marcoMail = `marco${marcoId}@example.org`;
+		await db
+			.update(mitglied)
+			.set({ telefon: '079 555 01 99', email: marcoMail })
+			.where(eq(mitglied.id, marcoId));
+		await anmeldungMit(t.mixed, [ich, marcoId], t.jetzt);
+		const eigen = async () =>
+			(await ladeCmAnsicht(db, t.id, ich, t.spaet))?.kategorien.find((k) => k.id === t.mixed)
+				?.eigen;
+		expect(await eigen()).toMatchObject({
+			art: 'paar',
+			partner: { telefon: '079 555 01 99', email: marcoMail }
+		});
+
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten', austrittAm: new Date('2026-06-15T10:00:00Z') })
+			.where(eq(mitglied.id, marcoId));
+		const ansicht = await ladeCmAnsicht(db, t.id, ich, t.spaet);
+		const nachher = ansicht?.kategorien.find((k) => k.id === t.mixed)?.eigen;
+		expect(nachher).toMatchObject({
+			art: 'paar',
+			partner: { name: { vorname: 'Marco', nachname: 'Beispiel' }, telefon: null, email: null }
+		});
+		// Review Focus 5: Marcos Kontakt steht nirgends im JSON der Ansicht.
+		const json = JSON.stringify(ansicht);
+		expect(json).not.toContain('079 555 01 99');
+		expect(json).not.toContain(marcoMail);
 	});
 });

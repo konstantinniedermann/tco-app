@@ -36,6 +36,13 @@
 	let cm = $derived<CmAnsicht>(data.cm);
 	let k = $derived<CmKategorie>(data.kategorie);
 	const sucht = $derived(k.eigen?.art === 'sucht');
+	// Je Kategorie eine offene Anfrage: Solange sie steht, ist keine weitere möglich.
+	const offeneAnfrage = $derived(k.meineAnfragen[0] ?? null);
+	const offeneAnfrageText = $derived(
+		offeneAnfrage
+			? `Du hast ${nameText(offeneAnfrage.an, 'vorname-zuerst')} angefragt. Zieh die Anfrage zurück, um jemand anderen anzufragen.`
+			: null
+	);
 
 	let laeuft = $state(false);
 	let meldung = $state<string | null>(null);
@@ -149,6 +156,10 @@
 				fehler = `Du hast ${nameText(t.name, 'vorname-zuerst')} schon angefragt.`;
 				suchen(true);
 				return;
+			case 'anfrage-offen':
+				await neuLaden();
+				fehler = offeneAnfrageText;
+				return;
 			case 'passt-nicht':
 			case 'nicht-gefunden':
 				fehler = `${nameText(t.name, 'vorname-zuerst')} lässt sich hier nicht mehr anfragen.`;
@@ -189,6 +200,10 @@
 				return;
 			case 'abgemeldet':
 				await goto(resolve('/login'));
+				return;
+			case 'geschlossen':
+				fehler = FEHLER.geschlossen;
+				await neuLaden();
 				return;
 			case 'nicht-gefunden':
 				suchen(true);
@@ -281,6 +296,9 @@
 			aria-describedby="p-suche-hilfe"
 		/>
 	</div>
+	{#if offeneAnfrageText}
+		<p>{offeneAnfrageText}</p>
+	{/if}
 	{#if !zuKurz && treffer && treffer.length > 0}
 		<ul class="trefferliste" aria-label="Treffer">
 			{#each treffer as t (t.mitgliedId)}
@@ -306,7 +324,7 @@
 								disabled={laeuft}
 								onclick={() => zurueckziehen(t)}>Zurückziehen</button
 							>
-						{:else}
+						{:else if !offeneAnfrage}
 							<button
 								type="button"
 								class="taste-neben"
@@ -328,10 +346,7 @@
 			<p>Niemand gefunden, der mit dir passt.</p>
 		{/if}
 	</div>
-	<p class="leise">
-		Wer angefragt wird, nimmt an oder lehnt ab. Erst dann seid ihr angemeldet. Du kannst mehrere
-		fragen.
-	</p>
+	<p class="leise">Wer angefragt wird, nimmt an oder lehnt ab. Erst dann seid ihr angemeldet.</p>
 </section>
 
 {#if !sucht}

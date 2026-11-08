@@ -110,6 +110,8 @@ type Ablehnung = Exclude<
 	| Awaited<ReturnType<typeof meldeAn>>
 	| Awaited<ReturnType<typeof beantrageWildcard>>
 	| Awaited<ReturnType<typeof stelleAnfrage>>
+	| Exclude<Awaited<ReturnType<typeof lehneAnfrageAb>>, { vonId: number }>
+	| Exclude<Awaited<ReturnType<typeof zieheAnfrageZurueck>>, 'ok'>
 	| Exclude<Awaited<ReturnType<typeof nimmAnfrageAn>>, { ergebnis: 'ok' }>,
 	'ok' | 'nicht-gefunden'
 >;
@@ -121,6 +123,8 @@ const FEHLER = [
 	'keine-wildcard',
 	'schon-angemeldet',
 	'schon-angefragt',
+	'anfrage-offen',
+	'hinfaellig',
 	'angaben-fehlen'
 ] satisfies readonly Ablehnung[];
 
@@ -361,15 +365,17 @@ export function postCmAnfrageAblehnen(d: CmDienste, e: CmEreignis): Promise<Resp
 	return aendernd(e, async (konto) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
-		const r = await lehneAnfrageAb(d.db, id, konto.mitgliedId);
+		const t = jetzt(d);
+		const r = await lehneAnfrageAb(d.db, id, konto.mitgliedId, t);
 		if (r === 'nicht-gefunden') return nichtGefunden();
+		if (typeof r === 'string') return ablehnung(r);
 		const an = await mitgliedName(d.db, konto.mitgliedId);
 		void meldeMitgliedern(
 			d,
 			[r.vonId],
 			abgelehntMeldung(an ?? 'Dein Partner', r.kategorie, r.turnierId)
 		);
-		return antwortMitMail(d, konto, r, null, jetzt(d));
+		return antwortMitMail(d, konto, r, null, t);
 	});
 }
 
@@ -381,10 +387,11 @@ export function postCmAnfrageZurueck(d: CmDienste, e: CmEreignis): Promise<Respo
 		// Vor dem Löschen lesen, sonst ist die Kategorie für die Ansicht nicht mehr zu finden.
 		const bezug = await bezugDerAnfrage(d.db, id, konto.mitgliedId);
 		if (!bezug) return nichtGefunden();
-		if ((await zieheAnfrageZurueck(d.db, id, konto.mitgliedId)) === 'nicht-gefunden') {
-			return nichtGefunden();
-		}
-		return antwortMitMail(d, konto, bezug, null, jetzt(d));
+		const t = jetzt(d);
+		const r = await zieheAnfrageZurueck(d.db, id, konto.mitgliedId, t);
+		if (r === 'nicht-gefunden') return nichtGefunden();
+		if (r !== 'ok') return ablehnung(r);
+		return antwortMitMail(d, konto, bezug, null, t);
 	});
 }
 

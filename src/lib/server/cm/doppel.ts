@@ -1,6 +1,6 @@
 // Doppel der Mitglieder zur Clubmeisterschaft: Partnersuche, Anfragen und Suchtext
 // (A-ANMELDUNG-04, FR-48, FR-49). Allein anmelden und abmelden laufen über `anmeldungen.ts`.
-import { and, asc, count, eq, inArray, isNotNull, ne, or } from 'drizzle-orm';
+import { and, asc, count, eq, inArray, ne, or } from 'drizzle-orm';
 import type { Namensteile } from '../../name.ts';
 import type { Klassierung } from '../../turnier/klassierung.ts';
 import { fehlendeAngaben, passtAlsPaar, vermerk, type Vermerk } from '../../turnier/passung.ts';
@@ -21,6 +21,7 @@ import { spielerAus } from './angaben.ts';
 import {
 	eigeneAnmeldungen,
 	GRENZE,
+	hatLogin,
 	istAktiv,
 	nameFuerText,
 	namensteile,
@@ -51,9 +52,6 @@ export type PartnerTreffer = {
 
 /** Höchstens so viele Treffer zeigt die Partnersuche. */
 const TREFFER = 20;
-
-/** Ein Login hat, wessen Konto nicht gesperrt ist und wer den Brief-Code eingelöst hat. */
-const hatLogin = and(eq(konto.gesperrt, false), isNotNull(konto.briefCodeBenutztAm));
 
 async function hatKontoMitLogin(tx: DbOderTx, mitgliedId: number): Promise<boolean> {
 	const [k] = await tx
@@ -218,6 +216,7 @@ export async function stelleAnfrage(
 	| 'passt-nicht'
 	| 'schon-angemeldet'
 	| 'schon-angefragt'
+	| 'anfrage-offen'
 	| 'angaben-fehlen'
 	| 'nicht-gefunden'
 > {
@@ -239,35 +238,79 @@ export async function stelleAnfrage(
 		const standVon = await standIm(tx, z.t.id, kategorieId, vonId);
 		if (zuZweit(standVon)) return 'schon-angemeldet';
 		if (!hatPlatz(standVon)) return 'voll';
+		// Je Kategorie eine offene Anfrage: an denselben `schon-angefragt`, an einen anderen `anfrage-offen`.
+		const [offen] = await tx
+			.select({ anId: partnerAnfrage.anId })
+			.from(partnerAnfrage)
+			.where(and(eq(partnerAnfrage.kategorieId, kategorieId), eq(partnerAnfrage.vonId, vonId)));
+		if (offen) return offen.anId === anId ? 'schon-angefragt' : 'anfrage-offen';
+		// Ein Wettlauf derselben Person (zwei Fenster) trifft den Unique; die Anfrage der anderen gilt.
 		const neu = await tx
 			.insert(partnerAnfrage)
 			.values({ kategorieId, vonId, anId, gestelltAm: jetzt })
-			.onConflictDoNothing()
+			.onConflictDoNothing({ target: [partnerAnfrage.kategorieId, partnerAnfrage.vonId] })
 			.returning({ id: partnerAnfrage.id });
-		return neu.length === 0 ? 'schon-angefragt' : 'ok';
+		return neu.length === 0 ? 'anfrage-offen' : 'ok';
 	});
 }
 
-/** FR-48: eine eigene offene Anfrage zurückziehen (löscht sie). */
+/**
+ * Anmeldeschluss der Anfrage: `true`, wenn die Wahl der Partner dort nicht mehr offen ist.
+ * Liest ohne Sperre; wer nach dem Schluss noch zieht, ändert nichts mehr am Stand.
+ */
+async function istGeschlossen(tx: DbOderTx, kategorieId: number, jetzt: Date): Promise<boolean> {
+	const [z] = await tx
+		.select({ status: turnier.status, anmeldeschluss: turnier.anmeldeschluss })
+		.from(kategorie)
+		.innerJoin(turnier, eq(turnier.id, kategorie.turnierId))
+		.where(eq(kategorie.id, kategorieId));
+	return !z || wirksamerStatus(z.status, z.anmeldeschluss, jetzt) !== 'offen';
+}
+
+/**
+ * FR-48: eine eigene offene Anfrage zurückziehen (löscht sie); nach dem Anmeldeschluss bleibt sie
+ * stehen (`geschlossen`).
+ */
 export async function zieheAnfrageZurueck(
 	db: Db,
 	anfrageId: number,
-	vonId: number
-): Promise<'ok' | 'nicht-gefunden'> {
-	const weg = await db
-		.delete(partnerAnfrage)
-		.where(and(eq(partnerAnfrage.id, anfrageId), eq(partnerAnfrage.vonId, vonId)))
-		.returning({ id: partnerAnfrage.id });
-	return weg.length === 0 ? 'nicht-gefunden' : 'ok';
+	vonId: number,
+	jetzt: Date
+): Promise<'ok' | 'geschlossen' | 'nicht-gefunden'> {
+	return db.transaction(async (tx) => {
+		const [a] = await tx
+			.select({ kategorieId: partnerAnfrage.kategorieId })
+			.from(partnerAnfrage)
+			.where(and(eq(partnerAnfrage.id, anfrageId), eq(partnerAnfrage.vonId, vonId)));
+		if (!a) return 'nicht-gefunden';
+		if (await istGeschlossen(tx, a.kategorieId, jetzt)) return 'geschlossen';
+		const weg = await tx
+			.delete(partnerAnfrage)
+			.where(and(eq(partnerAnfrage.id, anfrageId), eq(partnerAnfrage.vonId, vonId)))
+			.returning({ id: partnerAnfrage.id });
+		return weg.length === 0 ? 'nicht-gefunden' : 'ok';
+	});
 }
 
-/** FR-48: eine Anfrage an einen selbst ablehnen, ohne Grund (löscht sie). */
+/**
+ * FR-48: eine Anfrage an einen selbst ablehnen, ohne Grund (löscht sie); nach dem Anmeldeschluss
+ * bleibt sie stehen (`geschlossen`).
+ */
 export async function lehneAnfrageAb(
 	db: Db,
 	anfrageId: number,
-	anId: number
-): Promise<{ vonId: number; kategorie: string; turnierId: number } | 'nicht-gefunden'> {
+	anId: number,
+	jetzt: Date
+): Promise<
+	{ vonId: number; kategorie: string; turnierId: number } | 'geschlossen' | 'nicht-gefunden'
+> {
 	return db.transaction(async (tx) => {
+		const [vorab] = await tx
+			.select({ kategorieId: partnerAnfrage.kategorieId })
+			.from(partnerAnfrage)
+			.where(and(eq(partnerAnfrage.id, anfrageId), eq(partnerAnfrage.anId, anId)));
+		if (!vorab) return 'nicht-gefunden';
+		if (await istGeschlossen(tx, vorab.kategorieId, jetzt)) return 'geschlossen';
 		const [a] = await tx
 			.delete(partnerAnfrage)
 			.where(and(eq(partnerAnfrage.id, anfrageId), eq(partnerAnfrage.anId, anId)))
@@ -317,7 +360,8 @@ async function loescheAnfragenDerBeiden(
 /**
  * FR-48: eine Anfrage an einen selbst annehmen. Geprüft wird neu: Login, Anmeldeschluss, die
  * eigenen Angaben (FR-37), die Passung beider (`passtAlsPaar`, streng) und die Grenze für beide.
- * Ist einer der beiden dort inzwischen zu zweit, ist die Anfrage weg (`schon-angemeldet`); sonst
+ * Hat der Anfragende kein Login mehr, ist die Anfrage weg (`hinfaellig`, keine Meldung). Ist einer
+ * der beiden dort inzwischen zu zweit, ist die Anfrage weg (`schon-angemeldet`); sonst
  * bleibt sie bei einer Ablehnung stehen. Das Paar landet in der Anmeldung dessen, der schon
  * sucht (zuerst der Angefragte; suchen beide, ist die der Anfragenden *zurückgezogen*), sonst in
  * einer neuen; der Suchtext ist weg (FR-49). Alle übrigen Anfragen beider in der Kategorie
@@ -341,6 +385,7 @@ export async function nimmAnfrageAn(
 	| 'passt-nicht'
 	| 'schon-angemeldet'
 	| 'angaben-fehlen'
+	| 'hinfaellig'
 	| 'nicht-gefunden'
 > {
 	return db.transaction(async (tx) => {
@@ -362,6 +407,11 @@ export async function nimmAnfrageAn(
 		if (!offen || !z || von?.status !== 'aktiv' || an?.status !== 'aktiv') return 'nicht-gefunden';
 		if (!(await hatKontoMitLogin(tx, anId))) return 'nicht-gefunden';
 		if (wirksamerStatus(z.t.status, z.t.anmeldeschluss, jetzt) !== 'offen') return 'geschlossen';
+		// Ohne Login des Anfragenden (gesperrt oder Brief nicht eingelöst) erreicht ihn keine Antwort.
+		if (!(await hatKontoMitLogin(tx, von.id))) {
+			await tx.delete(partnerAnfrage).where(eq(partnerAnfrage.id, anfrageId));
+			return 'hinfaellig';
+		}
 		const ich = spielerAus(an);
 		if (fehlendeAngaben(ich).length > 0) return 'angaben-fehlen';
 		if (!passtAlsPaar(regelAus(z.k), ich, spielerAus(von), true)) return 'passt-nicht';

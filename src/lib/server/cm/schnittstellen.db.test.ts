@@ -831,3 +831,60 @@ describe('Schnittstellen der CM zum Doppel (Mitglied)', () => {
 		await new Promise((fertig) => setTimeout(fertig, 0));
 	});
 });
+
+describe('FR-48: Nachträge Etappe 2 an der Schnittstelle', () => {
+	const ausgabe = async (r: Response) => [r.status, await r.json()];
+
+	test('409 anfrage-offen bei einer zweiten Anfrage in derselben Kategorie, ohne Meldung', async () => {
+		const t = await doppelTurnier();
+		const { d, meldungen } = baue(t.jetzt);
+		const lea = await spielerMitLogin('Lea', 'Marbach');
+		const marco = await spielerMitLogin('Marco', 'Beispiel');
+		const max = await spielerMitLogin('Max', 'Cadonau');
+		expect((await anfragen(d, lea, t.doppel, { anId: marco.mitgliedId })).status).toBe(200);
+		meldungen.length = 0;
+		expect(await ausgabe(await anfragen(d, lea, t.doppel, { anId: max.mitgliedId }))).toEqual([
+			409,
+			{ fehler: 'anfrage-offen' }
+		]);
+		expect(meldungen).toEqual([]);
+	});
+
+	test('409 hinfaellig beim Annehmen, wenn der Anfragende kein Login mehr hat; Anfrage weg, keine Meldung', async () => {
+		const t = await doppelTurnier();
+		const { d, mails, meldungen } = baue(t.jetzt);
+		const lea = await spielerMitLogin('Lea', 'Marbach');
+		const marco = await spielerMitLogin('Marco', 'Beispiel');
+		await anfragen(d, lea, t.doppel, { anId: marco.mitgliedId });
+		const id = await anfrageId(lea.mitgliedId, marco.mitgliedId);
+		await db.update(konto).set({ gesperrt: true }).where(eq(konto.id, lea.kontoId));
+		meldungen.length = 0;
+		expect(await ausgabe(await postCmAnfrageAnnehmen(d, mit(marco, { id: String(id) })))).toEqual([
+			409,
+			{ fehler: 'hinfaellig' }
+		]);
+		expect(await anfrageId(lea.mitgliedId, marco.mitgliedId)).toBeUndefined();
+		expect(meldungen).toEqual([]);
+		expect(mails).toEqual([]);
+	});
+
+	test('409 geschlossen beim Ablehnen und Zurückziehen nach dem Anmeldeschluss, die Anfrage bleibt', async () => {
+		const t = await doppelTurnier();
+		const { d } = baue(t.jetzt);
+		const lea = await spielerMitLogin('Lea', 'Marbach');
+		const marco = await spielerMitLogin('Marco', 'Beispiel');
+		await anfragen(d, lea, t.doppel, { anId: marco.mitgliedId });
+		const id = String(await anfrageId(lea.mitgliedId, marco.mitgliedId));
+		const spaet = baue(new Date(`${t.jahr}-06-01T10:00:00Z`));
+		expect(await ausgabe(await postCmAnfrageAblehnen(spaet.d, mit(marco, { id })))).toEqual([
+			409,
+			{ fehler: 'geschlossen' }
+		]);
+		expect(await ausgabe(await postCmAnfrageZurueck(spaet.d, mit(lea, { id })))).toEqual([
+			409,
+			{ fehler: 'geschlossen' }
+		]);
+		expect(spaet.meldungen).toEqual([]);
+		expect(await anfrageId(lea.mitgliedId, marco.mitgliedId)).toBe(Number(id));
+	});
+});
