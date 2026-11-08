@@ -73,7 +73,12 @@ async function sperreDoppel(tx: DbOderTx, kategorieId: number) {
 }
 
 /** Stand eines Spielers im Turnier: Zahl der aktiven Anmeldungen und die in dieser Kategorie. */
-async function standIm(tx: DbOderTx, turnierId: number, kategorieId: number, mitgliedId: number) {
+export async function standIm(
+	tx: DbOderTx,
+	turnierId: number,
+	kategorieId: number,
+	mitgliedId: number
+) {
 	const eigene = await eigeneAnmeldungen(tx, turnierId, mitgliedId);
 	const e = eigene.find((x) => x.kategorieId === kategorieId);
 	const hier = e
@@ -81,11 +86,11 @@ async function standIm(tx: DbOderTx, turnierId: number, kategorieId: number, mit
 		: null;
 	return { anzahl: eigene.length, hier };
 }
-type Stand = Awaited<ReturnType<typeof standIm>>;
+export type Stand = Awaited<ReturnType<typeof standIm>>;
 
-const zuZweit = (s: Stand) => s.hier !== null && !s.hier.allein;
+export const zuZweit = (s: Stand) => s.hier !== null && !s.hier.allein;
 /** FR-06: Platz für ein Paar: unter der Grenze, oder er sucht hier schon allein (zählt schon mit). */
-const hatPlatz = (s: Stand) => s.hier !== null || s.anzahl < GRENZE;
+export const hatPlatz = (s: Stand) => s.hier !== null || s.anzahl < GRENZE;
 
 /**
  * FR-48: Partner für ein Doppel suchen, ab zwei Zeichen, höchstens 20, nach Nachname; die Suche
@@ -340,7 +345,7 @@ export async function lehneAnfrageAb(
  * Löscht alle offenen Anfragen der beiden in der Kategorie. Dritte, die eine davon gestellt oder
  * bekommen haben, stehen in `hinfaellig` beim Namen des Spielers, der nun einen Partner hat.
  */
-async function loescheAnfragenDerBeiden(
+export async function loescheAnfragenDerBeiden(
 	tx: DbOderTx,
 	kategorieId: number,
 	beide: (Namensteile & { id: number })[]
@@ -367,6 +372,50 @@ async function loescheAnfragenDerBeiden(
 		}
 	}
 	return hinfaellig;
+}
+
+type Paarspieler = [Namensteile & { id: number }, Stand];
+
+/**
+ * Bildet das Paar aus `erster` und `zweiter` in der Kategorie, unter den Sperren beider und ohne
+ * weitere Prüfung: Wer schon allein sucht, nimmt den anderen in seine Anmeldung (zuerst
+ * `erster`; suchen beide, ist die von `zweiter` *zurückgezogen*), sonst entsteht eine neue,
+ * bestätigte. Die Suchtexte sind weg (FR-49). Keiner darf dort schon zu zweit stehen; die
+ * Anfragen beider löscht danach `loescheAnfragenDerBeiden`.
+ */
+export async function bildePaar(
+	tx: DbOderTx,
+	kategorieId: number,
+	[erster, standErster]: Paarspieler,
+	[zweiter, standZweiter]: Paarspieler,
+	jetzt: Date
+): Promise<void> {
+	const sucht = standErster.hier ?? standZweiter.hier;
+	if (sucht) {
+		const dazu = standErster.hier ? zweiter : erster;
+		await tx
+			.insert(anmeldungSpieler)
+			.values({ anmeldungId: sucht.anmeldungId, mitgliedId: dazu.id });
+		await tx
+			.update(anmeldung)
+			.set({ suchtext: null, geaendertAm: jetzt })
+			.where(eq(anmeldung.id, sucht.anmeldungId));
+		if (standErster.hier && standZweiter.hier) {
+			await tx
+				.update(anmeldung)
+				.set({ status: 'zurueckgezogen', suchtext: null, geaendertAm: jetzt })
+				.where(eq(anmeldung.id, standZweiter.hier.anmeldungId));
+		}
+	} else {
+		const [neu] = await tx
+			.insert(anmeldung)
+			.values({ kategorieId, status: 'bestaetigt', angemeldetAm: jetzt, geaendertAm: jetzt })
+			.returning({ id: anmeldung.id });
+		await tx.insert(anmeldungSpieler).values([
+			{ anmeldungId: neu.id, mitgliedId: erster.id },
+			{ anmeldungId: neu.id, mitgliedId: zweiter.id }
+		]);
+	}
 }
 
 /**
@@ -435,38 +484,7 @@ export async function nimmAnfrageAn(
 		}
 		if (!hatPlatz(standVon) || !hatPlatz(standAn)) return 'voll';
 
-		if (standAn.hier) {
-			await tx
-				.insert(anmeldungSpieler)
-				.values({ anmeldungId: standAn.hier.anmeldungId, mitgliedId: von.id });
-			await tx
-				.update(anmeldung)
-				.set({ suchtext: null, geaendertAm: jetzt })
-				.where(eq(anmeldung.id, standAn.hier.anmeldungId));
-			if (standVon.hier) {
-				await tx
-					.update(anmeldung)
-					.set({ status: 'zurueckgezogen', suchtext: null, geaendertAm: jetzt })
-					.where(eq(anmeldung.id, standVon.hier.anmeldungId));
-			}
-		} else if (standVon.hier) {
-			await tx
-				.insert(anmeldungSpieler)
-				.values({ anmeldungId: standVon.hier.anmeldungId, mitgliedId: an.id });
-			await tx
-				.update(anmeldung)
-				.set({ suchtext: null, geaendertAm: jetzt })
-				.where(eq(anmeldung.id, standVon.hier.anmeldungId));
-		} else {
-			const [neu] = await tx
-				.insert(anmeldung)
-				.values({ kategorieId: z.k.id, angemeldetAm: jetzt, geaendertAm: jetzt })
-				.returning({ id: anmeldung.id });
-			await tx.insert(anmeldungSpieler).values([
-				{ anmeldungId: neu.id, mitgliedId: von.id },
-				{ anmeldungId: neu.id, mitgliedId: an.id }
-			]);
-		}
+		await bildePaar(tx, z.k.id, [an, standAn], [von, standVon], jetzt);
 		const hinfaellig = await loescheAnfragenDerBeiden(tx, z.k.id, [von, an]);
 		return {
 			ergebnis: 'ok' as const,

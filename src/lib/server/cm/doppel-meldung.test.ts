@@ -2,11 +2,14 @@ import { describe, expect, test } from 'vitest';
 import {
 	abgelehntMeldung,
 	abgemeldetMeldung,
+	anfrageGeloeschtText,
 	angenommenMeldung,
 	anfrageMeldung,
 	austrittAnfrageMeldung,
 	austrittMeldung,
-	hinfaelligMeldung
+	hinfaelligMeldung,
+	vonHandAlleinText,
+	vonHandPaarText
 } from './doppel-meldung.ts';
 
 describe('Meldungen zum Doppel', () => {
@@ -50,6 +53,18 @@ describe('Meldungen zum Doppel', () => {
 		);
 		expect(abgemeldetMeldung('Lea Marbach', 'Mixed Doppel', 7)).toEqual(
 			m('Lea Marbach hat sich von «Mixed Doppel» abgemeldet. Eure Anmeldung ist zurückgezogen.')
+		);
+	});
+
+	test('FR-46, FR-47: Texte des CM-Admins nennen den anderen Spieler, nie den CM-Admin beim Namen', () => {
+		expect(vonHandPaarText('Marco Beispiel', 'Mixed Doppel')).toBe(
+			'Der CM-Admin hat dich mit Marco Beispiel für «Mixed Doppel» angemeldet. Partner und Gegner sehen deine E-Mail und Telefonnummer.'
+		);
+		expect(vonHandAlleinText('Mixed Doppel')).toBe(
+			'Der CM-Admin hat dich für «Mixed Doppel» angemeldet; du suchst noch einen Partner. Partner und Gegner sehen deine E-Mail und Telefonnummer.'
+		);
+		expect(anfrageGeloeschtText('Marco Beispiel', 'Mixed Doppel')).toBe(
+			'Deine Anfrage an Marco Beispiel für «Mixed Doppel» ist hinfällig.'
 		);
 	});
 });

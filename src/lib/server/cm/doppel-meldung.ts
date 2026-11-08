@@ -46,3 +46,18 @@ export const abgemeldetMeldung = (wer: string, kategorie: string, turnierId: num
 		`${wer} hat sich von «${kategorie}» abgemeldet. Eure Anmeldung ist zurückgezogen.`,
 		turnierId
 	);
+
+// Texte zu Änderungen des CM-Admins (FR-46); Titel und Pfad setzt die Schnittstelle. Sie nennen
+// den CM-Admin als Rolle, nie beim Namen.
+
+/** FR-46: an jeden der beiden, wenn der CM-Admin ein Paar anmeldet oder zusammenlegt. */
+export const vonHandPaarText = (partner: string, kategorie: string) =>
+	`Der CM-Admin hat dich mit ${partner} für «${kategorie}» angemeldet. Partner und Gegner sehen deine E-Mail und Telefonnummer.`;
+
+/** FR-46: an den Spieler, wenn der CM-Admin ihn allein (*sucht Partner*) anmeldet. */
+export const vonHandAlleinText = (kategorie: string) =>
+	`Der CM-Admin hat dich für «${kategorie}» angemeldet; du suchst noch einen Partner. Partner und Gegner sehen deine E-Mail und Telefonnummer.`;
+
+/** FR-46: an den Anfragenden, wenn der CM-Admin seine Anfrage löscht, ohne Grund. */
+export const anfrageGeloeschtText = (an: string, kategorie: string) =>
+	`Deine Anfrage an ${an} für «${kategorie}» ist hinfällig.`;
