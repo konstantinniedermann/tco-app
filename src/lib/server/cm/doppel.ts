@@ -255,16 +255,54 @@ export async function stelleAnfrage(
 }
 
 /**
- * Anmeldeschluss der Anfrage: `true`, wenn die Wahl der Partner dort nicht mehr offen ist.
- * Liest ohne Sperre; wer nach dem Schluss noch zieht, ändert nichts mehr am Stand.
+ * Löscht eine offene Anfrage, wenn `seite` (`von` oder `an`) das Mitglied ist, und gibt sie zurück.
+ * Gesperrt wird wie bei den anderen Wegen: beide Mitglieder (aufsteigende ID), Kategorie und
+ * Turnier, dann die Anfrage; erst danach gilt der Anmeldeschluss. So löscht kein gleichzeitiges
+ * Verlängern oder Annehmen eine Anfrage nach dem Schluss.
  */
-async function istGeschlossen(tx: DbOderTx, kategorieId: number, jetzt: Date): Promise<boolean> {
-	const [z] = await tx
-		.select({ status: turnier.status, anmeldeschluss: turnier.anmeldeschluss })
-		.from(kategorie)
-		.innerJoin(turnier, eq(turnier.id, kategorie.turnierId))
-		.where(eq(kategorie.id, kategorieId));
-	return !z || wirksamerStatus(z.status, z.anmeldeschluss, jetzt) !== 'offen';
+async function loescheEigeneAnfrage(
+	db: Db,
+	anfrageId: number,
+	seite: 'von' | 'an',
+	mitgliedId: number,
+	jetzt: Date
+): Promise<
+	| { vonId: number; kategorieId: number; kategorie: string; turnierId: number }
+	| 'geschlossen'
+	| 'nicht-gefunden'
+> {
+	const gehoert = and(
+		eq(partnerAnfrage.id, anfrageId),
+		eq(seite === 'von' ? partnerAnfrage.vonId : partnerAnfrage.anId, mitgliedId)
+	);
+	return db.transaction(async (tx) => {
+		const [vorab] = await tx
+			.select({
+				vonId: partnerAnfrage.vonId,
+				anId: partnerAnfrage.anId,
+				kategorieId: partnerAnfrage.kategorieId
+			})
+			.from(partnerAnfrage)
+			.where(gehoert);
+		if (!vorab) return 'nicht-gefunden';
+		await sperreMitglieder(tx, [vorab.vonId, vorab.anId]);
+		const z = await sperreKategorieUndTurnier(tx, vorab.kategorieId);
+		// Eine gleichzeitige Annahme oder Ablehnung kann sie inzwischen gelöscht haben.
+		const [offen] = await tx
+			.select({ id: partnerAnfrage.id })
+			.from(partnerAnfrage)
+			.where(gehoert)
+			.for('update');
+		if (!z || !offen) return 'nicht-gefunden';
+		if (wirksamerStatus(z.t.status, z.t.anmeldeschluss, jetzt) !== 'offen') return 'geschlossen';
+		await tx.delete(partnerAnfrage).where(eq(partnerAnfrage.id, anfrageId));
+		return {
+			vonId: vorab.vonId,
+			kategorieId: z.k.id,
+			kategorie: z.k.name,
+			turnierId: z.t.id
+		};
+	});
 }
 
 /**
@@ -277,19 +315,8 @@ export async function zieheAnfrageZurueck(
 	vonId: number,
 	jetzt: Date
 ): Promise<'ok' | 'geschlossen' | 'nicht-gefunden'> {
-	return db.transaction(async (tx) => {
-		const [a] = await tx
-			.select({ kategorieId: partnerAnfrage.kategorieId })
-			.from(partnerAnfrage)
-			.where(and(eq(partnerAnfrage.id, anfrageId), eq(partnerAnfrage.vonId, vonId)));
-		if (!a) return 'nicht-gefunden';
-		if (await istGeschlossen(tx, a.kategorieId, jetzt)) return 'geschlossen';
-		const weg = await tx
-			.delete(partnerAnfrage)
-			.where(and(eq(partnerAnfrage.id, anfrageId), eq(partnerAnfrage.vonId, vonId)))
-			.returning({ id: partnerAnfrage.id });
-		return weg.length === 0 ? 'nicht-gefunden' : 'ok';
-	});
+	const r = await loescheEigeneAnfrage(db, anfrageId, 'von', vonId, jetzt);
+	return typeof r === 'string' ? r : 'ok';
 }
 
 /**
@@ -304,24 +331,9 @@ export async function lehneAnfrageAb(
 ): Promise<
 	{ vonId: number; kategorie: string; turnierId: number } | 'geschlossen' | 'nicht-gefunden'
 > {
-	return db.transaction(async (tx) => {
-		const [vorab] = await tx
-			.select({ kategorieId: partnerAnfrage.kategorieId })
-			.from(partnerAnfrage)
-			.where(and(eq(partnerAnfrage.id, anfrageId), eq(partnerAnfrage.anId, anId)));
-		if (!vorab) return 'nicht-gefunden';
-		if (await istGeschlossen(tx, vorab.kategorieId, jetzt)) return 'geschlossen';
-		const [a] = await tx
-			.delete(partnerAnfrage)
-			.where(and(eq(partnerAnfrage.id, anfrageId), eq(partnerAnfrage.anId, anId)))
-			.returning({ vonId: partnerAnfrage.vonId, kategorieId: partnerAnfrage.kategorieId });
-		if (!a) return 'nicht-gefunden';
-		const [k] = await tx
-			.select({ name: kategorie.name, turnierId: kategorie.turnierId })
-			.from(kategorie)
-			.where(eq(kategorie.id, a.kategorieId));
-		return { vonId: a.vonId, kategorie: k.name, turnierId: k.turnierId };
-	});
+	const r = await loescheEigeneAnfrage(db, anfrageId, 'an', anId, jetzt);
+	if (typeof r === 'string') return r;
+	return { vonId: r.vonId, kategorie: r.kategorie, turnierId: r.turnierId };
 }
 
 /**

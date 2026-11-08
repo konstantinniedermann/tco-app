@@ -157,8 +157,8 @@
 				suchen(true);
 				return;
 			case 'anfrage-offen':
+				// Nach dem Neuladen steht der Hinweis über der Trefferliste.
 				await neuLaden();
-				fehler = offeneAnfrageText;
 				return;
 			case 'passt-nicht':
 			case 'nicht-gefunden':
