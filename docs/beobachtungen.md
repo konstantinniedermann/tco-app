@@ -116,6 +116,24 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-08 — Restbefunde aus den Reviews von #59 Etappe 2 (Doppel in der Verwaltung)
+
+**Thema:** Verwaltung UI
+
+**Fundort:** `src/lib/server/cm/verwaltung-doppel.ts`, `src/lib/server/cm/doppel.ts`, `src/lib/verwaltung/DoppelListe.svelte`, `src/lib/verwaltung/Aktionsdialog.svelte`, `src/lib/server/cm/verwaltung-doppel.db.test.ts`, `src/lib/server/turnier/schnittstellen.db.test.ts`
+
+**Beobachtung:**
+- Für den Projektleiter: Löscht der CM-Admin die Anmeldung eines Suchenden, bleiben dessen eigene offene Anfragen stehen (wie beim Selbst-Abmelden); nimmt der Angefragte später an, entsteht das Paar trotzdem. Mitlöschen oder so lassen?
+- *Partner ändern* legt für den Bleibenden eine neue Anmeldung an (`angemeldetAm` = jetzt); falls später etwas nach Anmeldedatum sortiert (Warteliste), beachten.
+- Die Warnung «3 Anmeldungen» nennt bei zwei Spielern «A oder B», weil der Server nicht meldet, wer es ist.
+- Testlücken: keine Tests mit echter Überschneidung für *Partner ändern* und *Verschieben* (gleiche Sperrfolge wie die getesteten Wege); kein Test, dass die Meldung entfällt, wenn der Anfragende selbst CM-Admin ist; kein Test für das Verwerfen veralteter Antworten im Aktionsdialog und das Aufräumen des Suchtimers; eine Anfrage eines gesperrten Kontos hält dessen Platz (`anfrage-offen`) — gewollt, ungetestet.
+- Eine veraltete Umleitung oder `ok` im Aktionsdialog läuft noch vor dem Stand-Vergleich (harmlos).
+- `DoppelListe.svelte` hat rund 650 Zeilen; die drei Tabellenteile liessen sich als Komponenten herauslösen.
+
+**Ursprung:** #59 Etappe 2, Task-Reviews und Schluss-Review (SDD-Ledger), nicht im Branch erledigt.
+
+**Einschätzung:** Niedrig für den Verein. Die Frage zum Löschen eines Suchenden mit dem CM-Betrieb klären; Testlücken und Aufteilung beim nächsten Umbau der Verwaltung.
+
 ### 2026-11-08 — Einzel-Liste auf Aktionsdialog umstellen
 
 **Thema:** Verwaltung UI
