@@ -1,0 +1,2 @@
+ALTER TABLE "partner_anfrage" DROP CONSTRAINT "partner_anfrage_paar_unique";--> statement-breakpoint
+ALTER TABLE "partner_anfrage" ADD CONSTRAINT "partner_anfrage_von_unique" UNIQUE("kategorie_id","von_id");

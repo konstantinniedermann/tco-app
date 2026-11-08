@@ -57,15 +57,30 @@ async function doppelKategorie() {
 }
 
 describe('Schema Partner-Anfrage und Suchtext', () => {
-	test('FR-48: offene Anfrage je Paar nur einmal', async () => {
+	test('FR-48: höchstens eine eigene offene Anfrage je Kategorie', async () => {
 		const kategorieId = await doppelKategorie();
+		const andereKategorieId = await doppelKategorie();
 		const von = (await legeMitgliedAn(db)).mitgliedId;
 		const an = (await legeMitgliedAn(db)).mitgliedId;
+		const drittes = (await legeMitgliedAn(db)).mitgliedId;
 		const zeile = { kategorieId, vonId: von, anId: an, gestelltAm: new Date() };
 
 		await db.insert(partnerAnfrage).values(zeile);
-		await expect(db.insert(partnerAnfrage).values(zeile)).rejects.toThrow();
-		// Die Gegenrichtung ist ein anderes Paar.
+		// Gleiche Person, anderer Empfänger, gleiche Kategorie: abgewiesen.
+		const fehler = await db
+			.insert(partnerAnfrage)
+			.values({ ...zeile, anId: drittes })
+			.then(
+				() => null,
+				(e: unknown) => e as { message: string; cause?: { constraint?: string; message?: string } }
+			);
+		expect(fehler).not.toBeNull();
+		expect(fehler!.cause?.constraint ?? fehler!.cause?.message ?? fehler!.message).toContain(
+			'partner_anfrage_von_unique'
+		);
+		// Dieselbe Person in einer anderen Kategorie darf anfragen.
+		await db.insert(partnerAnfrage).values({ ...zeile, kategorieId: andereKategorieId });
+		// Die Gegenrichtung ist eine andere Person und damit erlaubt.
 		await db.insert(partnerAnfrage).values({ ...zeile, vonId: an, anId: von });
 	});
 
