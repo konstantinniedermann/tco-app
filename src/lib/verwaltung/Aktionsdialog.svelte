@@ -72,30 +72,32 @@
 		if (laeuft || !bereit) return;
 		laeuft = true;
 		fehler = null;
-		const nr = stand;
-		const a = await aktion(warnungen !== undefined);
-		if (await leiteUm(a)) {
+		// Wirft etwas (z. B. das Neuladen in `onfertig`), bleibt die Haupttaste nicht gesperrt.
+		try {
+			const nr = stand;
+			const a = await aktion(warnungen !== undefined);
+			if (await leiteUm(a)) {
+				dialog?.close();
+				return;
+			}
+			const satz = a.art === 'ok' ? erfolg : a.art === 'warnung' ? undefined : folgen[a.art];
+			// Wurde der Dialog inzwischen geschlossen, neu geöffnet oder etwas anderes gewählt, gehören
+			// Warnungen und Fehler zu keinem Dialog mehr. Ein geänderter Stand lädt trotzdem neu.
+			if (nr !== stand || !dialog?.open) {
+				if (satz !== undefined) await onfertig(satz);
+				return;
+			}
+			if (a.art === 'warnung') {
+				warnungen = a;
+			} else if (satz === undefined) {
+				fehler = fehlerText(a);
+			} else {
+				dialog.close();
+				await onfertig(satz);
+			}
+		} finally {
 			laeuft = false;
-			dialog?.close();
-			return;
 		}
-		const satz = a.art === 'ok' ? erfolg : a.art === 'warnung' ? undefined : folgen[a.art];
-		// Wurde der Dialog inzwischen geschlossen, neu geöffnet oder etwas anderes gewählt, gehören
-		// Warnungen und Fehler zu keinem Dialog mehr. Ein geänderter Stand lädt trotzdem neu.
-		if (nr !== stand || !dialog?.open) {
-			if (satz !== undefined) await onfertig(satz);
-			laeuft = false;
-			return;
-		}
-		if (a.art === 'warnung') {
-			warnungen = a;
-		} else if (satz === undefined) {
-			fehler = fehlerText(a);
-		} else {
-			dialog.close();
-			await onfertig(satz);
-		}
-		laeuft = false;
 	}
 </script>
 

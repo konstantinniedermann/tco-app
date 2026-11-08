@@ -137,6 +137,26 @@ export function mitgliedVermerk(status: AnmeldungZeile['mitgliedStatus']) {
 	return status === 'aktiv' ? null : plakette({ login: 'ohne-brief', status });
 }
 
+/**
+ * FR-46: Wer nicht *aktiv* ist (ausgetreten, zum Löschen vorgemerkt), bleibt beim Partner
+ * ändern nicht im Paar; der Grund steht bei der gesperrten Wahl. Sonst `null`.
+ */
+export const nichtAktivGrund = (status: AnmeldungZeile['mitgliedStatus']) =>
+	status === 'aktiv' ? null : 'nicht mehr aktiv';
+
+/**
+ * FR-46: Verschieben geht nur, wenn alle Spieler der Anmeldung *aktiv* sind (der Server lehnt
+ * es sonst ab). Der Satz sagt vor dem Senden, warum und was stattdessen geht; sonst `null`.
+ */
+export function verschiebenGesperrt(
+	spieler: readonly Pick<AnmeldungZeile, 'mitgliedStatus'>[]
+): string | null {
+	if (spieler.every((s) => s.mitgliedStatus === 'aktiv')) return null;
+	return spieler.length > 1
+		? 'Ein Spieler ist nicht mehr aktiv. Verschieben geht nicht; ändere zuerst den Partner oder lösche die Anmeldung.'
+		: 'Der Spieler ist nicht mehr aktiv. Verschieben geht nicht; lösche die Anmeldung.';
+}
+
 /** Geschlecht eines Spielers wie in den Angaben der Mitglieder-Verwaltung. */
 export const spielerGeschlechtText = (g: 'w' | 'm' | null) =>
 	g === 'w' ? 'weiblich' : g === 'm' ? 'männlich' : '–';

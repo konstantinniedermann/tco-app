@@ -10,6 +10,8 @@ import {
 	geschlechtText,
 	jahrgangText,
 	mitgliedVermerk,
+	nichtAktivGrund,
+	verschiebenGesperrt,
 	klassierungText,
 	paarText,
 	spielerGeschlechtText,
@@ -178,5 +180,25 @@ describe('Anzeigehilfen für Turniere', () => {
 		]);
 		expect(doppelWarnungen(['angaben-fehlen'], [])).toEqual(['Angaben fehlen.']);
 		expect(doppelWarnungen([], ['Max Beispiel'])).toEqual([]);
+	});
+
+	it('FR-46: wer nicht aktiv ist, bleibt nicht im Paar und wird nicht verschoben', () => {
+		expect(nichtAktivGrund('aktiv')).toBeNull();
+		expect(nichtAktivGrund('ausgetreten')).toBe('nicht mehr aktiv');
+		expect(nichtAktivGrund('vorgemerkt')).toBe('nicht mehr aktiv');
+		expect(nichtAktivGrund('geloescht')).toBe('nicht mehr aktiv');
+
+		const s = (mitgliedStatus: 'aktiv' | 'ausgetreten' | 'vorgemerkt') => ({ mitgliedStatus });
+		expect(verschiebenGesperrt([s('aktiv'), s('aktiv')])).toBeNull();
+		expect(verschiebenGesperrt([s('aktiv')])).toBeNull();
+		expect(verschiebenGesperrt([s('aktiv'), s('ausgetreten')])).toBe(
+			'Ein Spieler ist nicht mehr aktiv. Verschieben geht nicht; ändere zuerst den Partner oder lösche die Anmeldung.'
+		);
+		expect(verschiebenGesperrt([s('vorgemerkt'), s('ausgetreten')])).toBe(
+			'Ein Spieler ist nicht mehr aktiv. Verschieben geht nicht; ändere zuerst den Partner oder lösche die Anmeldung.'
+		);
+		expect(verschiebenGesperrt([s('vorgemerkt')])).toBe(
+			'Der Spieler ist nicht mehr aktiv. Verschieben geht nicht; lösche die Anmeldung.'
+		);
 	});
 });

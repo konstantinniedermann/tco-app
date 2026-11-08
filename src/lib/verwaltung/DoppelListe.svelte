@@ -26,7 +26,13 @@
 		type SpielerTreffer
 	} from './api.ts';
 	import { datumText } from './anzeige.ts';
-	import { mitgliedVermerk, paarText, summeText } from './turnier-anzeige.ts';
+	import {
+		mitgliedVermerk,
+		nichtAktivGrund,
+		paarText,
+		summeText,
+		verschiebenGesperrt
+	} from './turnier-anzeige.ts';
 
 	type Spieler = DoppelVerwaltung['suchende'][number]['spieler'];
 	/** Paar oder Suchender; `summe` nur beim Paar. */
@@ -95,6 +101,8 @@
 	const klassierungSpieler = $derived(
 		gewaehlt?.spieler.find((s) => s.mitgliedId === spielerId) ?? null
 	);
+	// Ist ein Spieler nicht mehr aktiv, lehnt der Server das Verschieben ab; der Dialog sagt es vorher.
+	const verschiebenSperre = $derived(gewaehlt ? verschiebenGesperrt(gewaehlt.spieler) : null);
 
 	function oeffne(dialog: Dialog | undefined, a: Anmeldung | null) {
 		gewaehlt = a;
@@ -153,7 +161,18 @@
 
 	async function fertig(satz: string) {
 		zumErgebnis = true;
-		await refreshAll();
+		let geladen = false;
+		try {
+			await refreshAll();
+			geladen = true;
+		} finally {
+			// Wirft das Neuladen, gibt es kein Ergebnis: Der Fokus geht wie beim Schliessen zur
+			// Überschrift, und das nächste Schliessen eines Dialogs ebenso.
+			if (!geladen) {
+				zumErgebnis = false;
+				titel?.focus();
+			}
+		}
 		rueckmeldung = satz;
 		await tick();
 		rueckmeldungFeld?.focus();
@@ -418,17 +437,23 @@
 			<fieldset class="auswahl-gruppe">
 				<legend>Wer bleibt?</legend>
 				{#each a.spieler as s (s.mitgliedId)}
+					{@const grund = nichtAktivGrund(s.mitgliedStatus)}
 					<label class="auswahl">
 						<input
 							type="radio"
 							name="partner-bleibt"
 							value={s.mitgliedId}
 							checked={bleibtId === s.mitgliedId}
+							disabled={grund !== null}
 							onchange={() => {
 								bleibtId = s.mitgliedId;
 								partner?.verwerfe();
 							}}
-						/><Name name={s.name} form="nachname-zuerst" />
+						/><span
+							><Name name={s.name} form="nachname-zuerst" />{#if grund}<br /><span class="leise"
+									>{grund}</span
+								>{/if}</span
+						>
 					</label>
 				{/each}
 			</fieldset>
@@ -502,7 +527,7 @@
 		titel="Verschieben"
 		taste="Verschieben"
 		trotzdemTaste="Trotzdem verschieben"
-		bereit={zielId !== null}
+		bereit={zielId !== null && verschiebenSperre === null}
 		namen={namenVon(gewaehlt?.spieler ?? [])}
 		aktion={(trotzdem) => verschiebeAnmeldung(gewaehlt!.anmeldungId, zielId!, trotzdem)}
 		erfolg="Verschoben."
@@ -516,7 +541,9 @@
 	>
 		{#if gewaehlt}
 			{@render paarZeile(gewaehlt)}
-			{#if andere.length === 0}
+			{#if verschiebenSperre}
+				<p>{verschiebenSperre}</p>
+			{:else if andere.length === 0}
 				<p>Es gibt keine andere aktive Doppel-Kategorie.</p>
 			{:else}
 				<fieldset class="auswahl-gruppe">
