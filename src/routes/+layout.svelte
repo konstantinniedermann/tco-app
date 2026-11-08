@@ -8,7 +8,7 @@
 	import Reiter from '../lib/ui/Reiter.svelte';
 	import { klappeWeich, vergissKlappen } from '../lib/ui/klappe.ts';
 	import {
-		istReiterSeite,
+		zeigtReiter,
 		stelltStandWiederHer,
 		uebergang,
 		vergisstStand,
@@ -24,7 +24,9 @@
 	import { ANSICHT_NAME } from '../lib/verwaltung/rollen-namen.ts';
 
 	let { children, data } = $props();
-	const mitReiter = $derived(istReiterSeite(page.route.id));
+	// Reiter nach dem Login auf jeder Seite der App; Hilfe und Datenschutz melden, ob eine Sitzung
+	// besteht (UI-Leitbild, feste Ordnung).
+	const mitReiter = $derived(zeigtReiter(page.route.id, page.data.angemeldet !== false));
 	// Fusszeile nur vor dem Login und auf der Startseite (UI-Leitbild, Baustein Fusszeile).
 	const mitFusszeile = $derived(zeigtFusszeile(page.route.id, page.error !== null));
 	// Die Verwaltung bringt Seitenleiste und Inhalt selbst mit (eigenes Layout). Die Fehlerseite
@@ -34,7 +36,7 @@
 	);
 
 	// Nur der Rollbereich scrollt (UI-Leitbild, Baustein Rollbereich), darum führt die App die
-	// Position selbst: Jede Seite beginnt oben, «‹ Zurück» und die Zurück-Taste des Browsers
+	// Position selbst: Jede Seite beginnt oben, der Zurück-Link und die Zurück-Taste des Browsers
 	// bringen sie an die alte Stelle. SvelteKit scrollt nur das Dokument, das hier nie scrollt.
 	// Nur ein Speicher, nicht reaktiv: Nichts in der Anzeige hängt davon ab.
 	let rollbereich = $state<HTMLElement>();
@@ -88,6 +90,11 @@
 		laufend?.skipTransition();
 		const wurzel = document.documentElement;
 		wurzel.dataset.uebergang = art;
+		// Stehen auf beiden Seiten Reiter, bleiben sie beim Schieben stehen (UI-Leitbild).
+		const vonId = navigation.from?.route.id ?? null;
+		const nachId = navigation.to?.route.id ?? null;
+		if (zeigtReiter(vonId, true) && zeigtReiter(nachId, true)) wurzel.dataset.reiterBleibt = '';
+		else delete wurzel.dataset.reiterBleibt;
 		return new Promise<void>((bereit) => {
 			const uebergangJetzt = document.startViewTransition(async () => {
 				bereit();
@@ -101,6 +108,7 @@
 					if (laufend !== uebergangJetzt) return;
 					laufend = null;
 					delete wurzel.dataset.uebergang;
+					delete wurzel.dataset.reiterBleibt;
 				});
 		});
 	});

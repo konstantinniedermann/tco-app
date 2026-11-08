@@ -136,7 +136,7 @@ test('Jeder Reiter beginnt oben; aktiver Reiter führt nach oben', async ({ page
 	await expect.poll(() => gerollt(page)).toBe(0);
 });
 
-test('«‹ Zurück» und Zurück des Browsers bringen die Seite an die alte Stelle', async ({
+test('Zurück-Link und Zurück des Browsers bringen die Seite an die alte Stelle', async ({
 	page
 }) => {
 	await meldeAn(page, 'Jana');
@@ -146,7 +146,7 @@ test('«‹ Zurück» und Zurück des Browsers bringen die Seite an die alte Ste
 	await hilfe.evaluate((a: HTMLElement) => a.click());
 	await expect(page).toHaveURL(/\/hilfe$/);
 	await expect.poll(() => gerollt(page)).toBe(0);
-	await page.getByRole('link', { name: '‹ Zurück' }).click();
+	await page.getByRole('link', { name: '‹ Start' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Jana' })).toBeVisible();
 	await machLang(page);
 	await expect.poll(() => gerollt(page)).toBe(300);
@@ -266,7 +266,7 @@ test('Übergänge: Reiter blenden über, Unterseiten schieben (UI-09)', async ({
 	await expect(page).toHaveURL(/\/$/);
 	await page.getByRole('contentinfo').getByRole('link', { name: 'Hilfe' }).click();
 	await expect(page).toHaveURL(/\/hilfe$/);
-	await page.getByRole('link', { name: '‹ Zurück' }).click();
+	await page.getByRole('link', { name: '‹ Start' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Mara' })).toBeVisible();
 	const erwartet = (await kenntUebergaenge(page)) ? ['blende', 'blende', 'tiefer', 'zurueck'] : [];
 	expect((await uebergaenge(page)).slice(vorher)).toEqual(erwartet);

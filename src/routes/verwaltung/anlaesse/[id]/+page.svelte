@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Pfad from '../../../../lib/verwaltung/Pfad.svelte';
 	import { resolve } from '$app/paths';
 	import Name from '../../../../lib/ui/Name.svelte';
 	import { formatiereBeginn, formatiereZeitpunkt } from '../../../../lib/anlass/zeit.ts';
@@ -92,7 +93,10 @@
 	<title>{detail.titel} – MyTCO</title>
 </svelte:head>
 
-<a class="zurueck" href={resolve('/verwaltung/anlaesse')}>‹ Zurück</a>
+<Pfad
+	stufen={[{ text: 'Anlässe', href: resolve('/verwaltung/anlaesse') }]}
+	aktuell={detail.titel}
+/>
 <h1>{detail.titel}</h1>
 <p class="leise">{formatiereBeginn(detail.beginn)} · {detail.ort}</p>
 

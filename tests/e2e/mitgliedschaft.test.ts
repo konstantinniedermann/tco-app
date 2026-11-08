@@ -9,7 +9,12 @@ import {
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { MAILPIT_URL } from './hilfen/umgebung.ts';
-import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
+import {
+	pruefeBildschirm,
+	pruefePfad,
+	sammleKonsolenfehler,
+	wartetAufVorladen
+} from './hilfen/seite.ts';
 
 // Alle Browser kommen von 127.0.0.1 an denselben Server (Grenzen pro IP): pro Test ein
 // Brief-Login und ein Admin-Code, im ersten dazu eine Code-Anfrage des ausgetretenen Mitglieds.
@@ -63,6 +68,8 @@ test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in d
 
 	await page.goto(`/verwaltung/mitglieder/${ziel.mitgliedId}`);
 	const karte = page.getByRole('region', { name: /^Mitgliedschaft/ });
+	await expect(karte).toBeVisible();
+	await pruefePfad(page, ['Mitglieder'], `Beispiel${projekt}, Gerda`);
 	await expect(karte).toContainText('Aktiv. Kommt der Austritt aus Fairgate');
 	await pruefeBildschirm(page, info, 'mitgliedschaft-aktiv');
 	await bild(karte, projekt, 'karte-aktiv');
@@ -135,6 +142,11 @@ test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in d
 			level: 1,
 			name: `Auskunft über die Daten von Gerda Beispiel${projekt}`
 		})
+	).toBeVisible();
+	// Druckseite ohne Pfad; die Taste nennt das Mitglied (UI-Leitbild, Druckseite).
+	await expect(page.getByRole('navigation', { name: 'Pfad' })).toHaveCount(0);
+	await expect(
+		page.getByRole('link', { name: `‹ Beispiel${projekt}, Gerda`, exact: true })
 	).toBeVisible();
 	for (const abschnitt of ['Angaben', 'Mitgliedschaft und Rollen', 'Login und Geräte'])
 		await expect(page.getByRole('heading', { level: 2, name: abschnitt })).toBeVisible();

@@ -44,7 +44,7 @@
 
 <div class="leiste nicht-drucken">
 	<a class="taste-neben" href={resolve('/verwaltung/mitglieder/[id]', { id: page.params.id ?? '' })}
-		>‹ Zurück</a
+		>‹ {ang.nachname}, {ang.vorname}</a
 	>
 	<button type="button" class="taste-neben" onclick={() => window.print()}
 		>Drucken oder als PDF speichern</button

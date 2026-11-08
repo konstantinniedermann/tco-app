@@ -171,8 +171,11 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	await expect(vierte).toBeEnabled();
 	await expect(karte(page, 'Offen R1–R9')).toContainText('Noch niemand angemeldet.');
 
-	// Die Kachel nennt den neuen Stand.
-	await page.getByRole('link', { name: '‹ Zurück' }).click();
+	// Die Kachel auf der Startseite nennt den neuen Stand.
+	await page
+		.getByRole('navigation', { name: 'Hauptnavigation' })
+		.getByRole('link', { name: 'Start', exact: true })
+		.click();
 	await expect(kachel).toContainText('2 Anmeldungen');
 	expect(fehler).toEqual([]);
 });
