@@ -185,8 +185,9 @@ die niemand bearbeiten kann.
     und legt die beiden zusammen oder nicht (Entscheid Projektleiter, Etappe 2). Danach
     nehmen Mitglieder nicht mehr an.
   - **Nicht gespeichert, was erledigt ist:** Eine Anfrage, die abgelehnt, zurückgezogen oder
-    verfallen ist, wird gelöscht, sobald die Meldung verschickt ist; angenommen wird sie zur
-    Anmeldung (Entscheid Claude, Datensparsamkeit). Erneut anfragen geht.
+    verfallen ist, wird sofort gelöscht (im selben Schritt, die Meldung geht danach);
+    angenommen wird sie zur Anmeldung (Entscheid Claude, Datensparsamkeit). Erneut anfragen
+    geht.
   - Der CM-Admin meldet Paare in Etappe 2 weiter ohne Anfrage an (Teil 4, Ziel 2).
 - **Push, sonst E-Mail** für alle Meldungen zum Doppel (Entscheid Projektleiter): neue Anfrage,
   angenommen, abgelehnt, verfallen, Partner hat abgemeldet, Paar wegen Austritt

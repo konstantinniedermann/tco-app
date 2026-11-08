@@ -86,8 +86,8 @@ bei *sucht Partner* soll keine Angaben zur Gesundheit enthalten.
 
 - **Austritt:** Der Mitglieder-Admin erfasst ihn. Konto sofort inaktiv (Login gesperrt, Sitzungen und
   Push-Abos weg; Passkeys und Rollen bleiben, damit sie nach einem Wiedereintritt wieder wirken).
-  Einzel- und Doppel-Anmeldungen zur CM (auch Wildcard-Anträge) werden bis zum Datum des Anmeldeschlusses zurückgezogen, auch wenn der CM-Admin die Anmeldung vorher von Hand geschlossen hat; danach bleiben sie stehen (im Doppel bekommt der Partner eine Meldung ohne Grund), offene Partner-Anfragen verfallen,
-  Antworten zu kommenden Anlässen gelöscht, die Markierung *für Fairgate offen* entfernt. Die Daten
+  Einzel- und Doppel-Anmeldungen zur CM (auch Wildcard-Anträge) werden bis zum Datum des Anmeldeschlusses zurückgezogen (im Doppel bekommt der Partner eine Meldung ohne Grund), auch wenn der CM-Admin die Anmeldung vorher von Hand geschlossen hat; danach bleiben sie stehen. Offene Partner-Anfragen verfallen,
+  Antworten zu kommenden Anlässen werden gelöscht, die Markierung *für Fairgate offen* entfernt. Die Daten
   bleiben eine Frist lang, falls das Mitglied zurückkommt, dann werden sie gelöscht; der Name bleibt in
   vergangenen Resultaten (**Vorschlag K-38:** Austritt plus 1 Jahr; die Frist legt der Verein fest).
   Heute erfasst der Mitglieder-Admin den Austritt von Hand; später übernimmt das das Einlesen der
@@ -109,7 +109,7 @@ bei *sucht Partner* soll keine Angaben zur Gesundheit enthalten.
   im Zustand *Löschung vorgemerkt*, das Login ist gesperrt, und der Mitglieder-Admin kann die Löschung
   rückgängig machen; dann gilt wieder der Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum). Nach der Woche wird gelöscht wie nach der Frist beim Austritt.
 - **CM-Anmeldungen:** bleiben beim vergangenen Turnier, wie Resultate. Wird ein Mitglied gelöscht, bleibt in seinen Anmeldungen nur der Name (der Wildcard-Kommentar einer Einzel-Anmeldung und der Kommentar *sucht Partner* werden geleert, Partner-Anfragen gelöscht); Grund: Die Turniergeschichte mit Namen und Resultaten ist bei Swiss Tennis ohnehin öffentlich einsehbar.
-- **Partner-Anfragen:** Abgelehnte, zurückgezogene und verfallene Anfragen werden gelöscht, sobald die Meldung verschickt ist; angenommene werden zur Anmeldung. Der Kommentar *sucht Partner* wird gelöscht, sobald ein Partner gefunden ist oder der Spieler abmeldet.
+- **Partner-Anfragen:** Erledigte Anfragen werden sofort gelöscht (abgelehnte, zurückgezogene, verfallene); angenommene werden zur Anmeldung. Der Kommentar *sucht Partner* wird gelöscht, sobald ein Partner gefunden ist oder der Spieler abmeldet.
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Anmeldungen zu Anlässen:** ein Jahr nach Beginn des Anlasses (**Vorschlag K-50**), vom Zeitgeber gelöscht;

@@ -16,8 +16,8 @@ Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung fü
 Liste «Für Fairgate», Login-Briefen einzeln und als Serie aus einer Druckansicht, Austritt, Löschen mit Bedenkzeit, Auskunft und automatischen Löschfristen, Rollen mit *Ansicht als …* für MyTCO-Admins, eigene Angaben im Profil ändern (mit freiwilligem Rufnamen, der überall vor dem amtlichen Namen steht), Datenschutzerklärung in der App,
 Anmeldung zu Anlässen wie der Generalversammlung (Vorschlag für den Vorstand, K-50),
 Turnier der Clubmeisterschaft mit Kategorien anlegen und Anmeldungen verwalten (Wildcard-Anträge
-entscheiden, von Hand anmelden) für die CM-Admins, Einzel-Anmeldung der Mitglieder zur
-Clubmeisterschaft mit Wildcard-Antrag,
+entscheiden, von Hand anmelden) für die CM-Admins, Einzel- und Doppel-Anmeldung der Mitglieder
+zur Clubmeisterschaft (Wildcard-Antrag im Einzel, Doppel mit Partner-Anfrage),
 Mitteilungen per Push und E-Mail zu Anlässen und an den Verein für Mitglieder-Admins,
 Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene Testdaten) sind
 gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
