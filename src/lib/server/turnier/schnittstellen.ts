@@ -178,8 +178,8 @@ const warnung = (w: { warnungen: Warnung[] }) =>
 	antwort(409, { fehler: 'warnung', warnungen: w.warnungen });
 
 /**
- * FR-47: persönliche Meldung an den Spieler, erst nach dem Speichern. DS-05: ohne Namen anderer
- * Mitglieder, auch nicht des CM-Admins. Betrifft es den CM-Admin selbst, entfällt sie. Die Antwort
+ * FR-47: persönliche Meldung an den Spieler, erst nach dem Speichern. Ohne Namen anderer
+ * Mitglieder, ausser im Doppel der andere Spieler (DS-05); nie der CM-Admin. Betrifft es den CM-Admin selbst, entfällt sie. Die Antwort
  * wartet nicht auf Push und Mail; wirft `meldeMitgliedern` doch, bleibt das still (SI-05).
  */
 function melde(

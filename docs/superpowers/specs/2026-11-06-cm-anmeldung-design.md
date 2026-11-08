@@ -501,7 +501,7 @@ und der Hinweis zu den Kontaktdaten. Neu und nachzuführen (Konzept und Datensch
   Datenschutzerklärung): Der CM-Admin sieht die offenen Partner-Anfragen (von, an, seit) jederzeit,
   der MyTCO-Admin lesend. Die Kontaktdaten eines ausgetretenen oder zum Löschen vorgemerkten
   Doppelpartners sieht der andere nicht mehr. Meldungen aus der Verwaltung zum Doppel nennen den
-  anderen Spieler (Einzelmeldung an Beteiligte, DS-05 bleibt erfüllt).
+  anderen Spieler (Einzelmeldung an Beteiligte); DS-05 präzisiert (Entscheid Projektleiter, 08.11.2026).
 
 Alle Testdaten sind erfunden (DS-08).
 

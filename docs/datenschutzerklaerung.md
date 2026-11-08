@@ -65,7 +65,9 @@ du selbst einschaltest. Für nichts anderes.
 - Swiss Tennis erhält Anmeldungen, Resultate und Lizenzanträge.
 
 **Wo:** Die Daten liegen bei Infomaniak in der Schweiz; E-Mails versendet [E-Mail-Dienst].
-Push-Nachrichten enthalten keine Daten anderer Mitglieder (zum Zustellen siehe «Mitteilungen»).
+Push-Nachrichten enthalten keine Daten anderer Mitglieder. Ausnahme: Persönliche Meldungen zum
+Doppel nennen deinen Partner bzw. wer dich angefragt hat, nie eine Telefonnummer (zum Zustellen
+siehe «Mitteilungen»).
 
 **Mitteilungen:** Der Mitglieder-Admin kann dir Mitteilungen zu Anlässen und zum Verein schicken, als Push und als E-Mail. Push gibt es nur, wenn du ihn auf einem Gerät selbst einschaltest. Die Nachricht leitet Apple, Google, Mozilla oder Microsoft (je nach deinem Gerät) verschlüsselt weiter; sie sehen, dass eine Nachricht für dein Gerät eintrifft, aber nicht ihren Inhalt. MyTCO speichert dafür je Gerät die Adresse beim Push-Dienst und zwei Schlüssel. Das Abo endet mit dem Abmelden, wenn du Push abschaltest, mit deinem Austritt oder wenn dein Konto zum Löschen vorgemerkt wird, und mit deinem Konto. Im Profil stellst du Mitteilungen je Thema (Anlässe, Clubmeisterschaft, Verein) ab. Bestätigungen, Codes und persönliche Meldungen zu deinen CM-Anmeldungen bleiben davon unberührt. Wer wann welche Mitteilung geschickt hat, sehen der Mitglieder-Admin und, nur lesend, der MyTCO-Admin ein Jahr lang, ohne Namen der Empfänger.
 
