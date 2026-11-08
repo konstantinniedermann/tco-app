@@ -98,7 +98,12 @@
 
 	function oeffne(dialog: Dialog | undefined, a: Anmeldung | null) {
 		gewaehlt = a;
+		oeffneDialog(dialog);
+	}
+
+	function oeffneDialog(dialog: Dialog | undefined) {
 		rueckmeldung = null;
+		zumErgebnis = false;
 		dialog?.oeffne();
 	}
 
@@ -138,20 +143,25 @@
 
 	function oeffneAnfrage(dialog: Dialog | undefined, x: Anfrage) {
 		anfrage = x;
-		rueckmeldung = null;
-		dialog?.oeffne();
+		oeffneDialog(dialog);
 	}
 
-	// Der Fokus geht zum Ergebnis. Das `close` des Dialogs (Fokus zur Überschrift) kommt vorher,
-	// weil es vor der Antwort des Neuladens eintrifft.
+	// Nach einer Aktion geht der Fokus zum Ergebnis, sonst beim Schliessen eines Dialogs zur
+	// Überschrift. Das `close` des Dialogs kommt nicht sicher vor dem Ende des Neuladens; bis zum
+	// nächsten Öffnen lässt es darum den Fokus beim Ergebnis.
+	let zumErgebnis = false;
+
 	async function fertig(satz: string) {
+		zumErgebnis = true;
 		await refreshAll();
 		rueckmeldung = satz;
 		await tick();
 		rueckmeldungFeld?.focus();
 	}
 
-	const zurUeberschrift = () => titel?.focus();
+	const zurUeberschrift = () => {
+		if (!zumErgebnis) titel?.focus();
+	};
 
 	const suchender = (s: DoppelVerwaltung['suchende'][number]): Anmeldung => ({
 		anmeldungId: s.anmeldungId,
