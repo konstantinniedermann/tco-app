@@ -3,7 +3,7 @@ import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { ladeCmAnsicht, laufendeTurniere, meldeAb, meldeAn } from '../cm/anmeldungen.ts';
 import { erstelleDb } from '../db/index.ts';
-import { anmeldung, anmeldungSpieler, mitglied, partnerAnfrage } from '../db/schema.ts';
+import { anmeldung, anmeldungSpieler, konto, mitglied, partnerAnfrage } from '../db/schema.ts';
 import type { KategorieWerte, TurnierWerte } from './angaben.ts';
 import {
 	aendereKategorie,
@@ -258,12 +258,19 @@ describe('Kategorien', () => {
 			.values(spieler.map((mitgliedId) => ({ anmeldungId: a.id, mitgliedId })));
 	}
 
-	async function herr(klassierung: string) {
+	async function herr(klassierung: string, mitLogin = false) {
 		const m = await legeMitgliedAn(db, {});
 		await db
 			.update(mitglied)
 			.set({ geschlecht: 'm', jahrgang: 1990, klassierung })
 			.where(eq(mitglied.id, m.mitgliedId));
+		// Anfragen zählen nur von Mitgliedern mit Login.
+		if (mitLogin) {
+			await db
+				.update(konto)
+				.set({ briefCodeBenutztAm: new Date('2026-01-05T10:00:00Z') })
+				.where(eq(konto.mitgliedId, m.mitgliedId));
+		}
 		return m.mitgliedId;
 	}
 
@@ -310,9 +317,9 @@ describe('Kategorien', () => {
 		const andere = await legeKategorieAn(db, id, alsDoppel('Offenes Doppel'));
 		if (k.ergebnis !== 'ok' || andere.ergebnis !== 'ok') throw new Error('anlegen');
 		expect(await setzeStatus(db, id, 'offen', jetztVor(w))).toBe('ok');
-		const a = await herr('R4');
+		const a = await herr('R4', true);
 		const b = await herr('R5');
-		const c = await herr('R6');
+		const c = await herr('R6', true);
 		await db
 			.insert(partnerAnfrage)
 			.values({ kategorieId: k.id, vonId: a, anId: b, gestelltAm: jetztVor(w) });
