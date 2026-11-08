@@ -140,8 +140,9 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 
 	test('FR-48: Rückfrage vor der Anfrage nennt den Angefragten mit der Anrede', () => {
 		expect(rueckfrageText('Marco')).toBe(
-			'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit Marco dich ' +
-				'anrufen kann. Nimmt Marco an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.'
+			'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer (ohne Telefon deine ' +
+				'E-Mail), damit Marco dich erreichen kann. Nimmt Marco an, seid ihr angemeldet und seht ' +
+				'gegenseitig E-Mail und Telefon.'
 		);
 	});
 });

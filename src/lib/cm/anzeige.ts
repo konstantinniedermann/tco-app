@@ -111,7 +111,8 @@ export const weiterePaare = (paare: Namensteile[][], partner: Namensteile): Name
  */
 export function rueckfrageText(anrede: string): string {
 	return (
-		`${anrede} sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit ${anrede} ` +
-		`dich anrufen kann. Nimmt ${anrede} an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.`
+		`${anrede} sieht deinen Namen, deine Klassierung und deine Telefonnummer (ohne Telefon deine ` +
+		`E-Mail), damit ${anrede} dich erreichen kann. Nimmt ${anrede} an, seid ihr angemeldet und ` +
+		`seht gegenseitig E-Mail und Telefon.`
 	);
 }

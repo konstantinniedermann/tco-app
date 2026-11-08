@@ -160,7 +160,8 @@ test('A-ANMELDUNG-04, FR-48, FR-19: Lea fragt Marco an, Marco nimmt an, beide se
 	await treffer.getByRole('button', { name: 'Anfragen' }).click();
 	const rueckfrage = page.getByRole('dialog', { name: `${marcoName} anfragen?` });
 	await expect(rueckfrage).toContainText(
-		'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer, damit Marco dich anrufen kann.'
+		'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer (ohne Telefon deine ' +
+			'E-Mail), damit Marco dich erreichen kann.'
 	);
 	await expect(rueckfrage).toContainText(
 		'Meldet sich später einer von euch ab, ist die ganze Doppel-Anmeldung zurückgezogen.'
