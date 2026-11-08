@@ -110,6 +110,16 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
   Die Beispiel-GV (`scripts/beispiel-anlass.ts`) legt für `make seed` fünf weitere erfundene
   Mitglieder an, das Beispielturnier (`scripts/beispiel-turnier.ts`) fünf weitere erfundene
   Spieler mit Anmeldungen und einem Wildcard-Antrag.
+- Ausnahme für die lokale Datenbank: Der Testbestand von `make seed`
+  (`scripts/beispiel-mitglieder.ts`) kombiniert feste Vornamen mit erkennbar erfundenen
+  Nachnamen zu 185 Mitgliedern (zusammen mit den Personas rund 200), ohne Zufall und ohne
+  Bibliothek; dazu ein zweiter Anlass mit gemischten Antworten. Er ist bei jedem Lauf gleich und
+  legt nichts doppelt an.
+- Jeder E2E-Lauf (`npm run e2e`, also auch `make e2e`, `make check`, der Pre-Push-Hook und die
+  CI) läuft über `scripts/e2e.ts` auf einer eigenen, frisch angelegten Datenbank
+  (`mytco_e2e_<Zeit>_<Zufall>`) und löscht sie danach; Reste abgebrochener Läufe, die älter als
+  ein Tag sind, räumt der nächste Lauf weg. Die lokale Datenbank `mytco` gehört so nur
+  `make seed`, `make dev` und `make dev-handy` und wächst nicht mit den Testkonten der Läufe.
 - Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
   (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
 - E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern im Format

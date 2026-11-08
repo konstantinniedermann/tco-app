@@ -51,7 +51,7 @@ test('A-KONTO-01, A-KONTO-02: Mitglied ändert Telefon und Adresse im Profil', a
 	const fehler = sammleKonsolenfehler(page);
 	await meldeAn(page, 'Lina');
 	await oeffneProfil(page);
-	await expect(kachel(page, 'Telefon')).toContainText('nicht erfasst');
+	await expect(kachel(page, 'Telefon')).toContainText('nicht angegeben');
 
 	// Annahme K-19.1: Telefon ändert das Mitglied selbst.
 	await kachel(page, 'Telefon').getByRole('button', { name: 'Ändern' }).click();
