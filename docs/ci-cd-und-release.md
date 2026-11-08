@@ -221,7 +221,7 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   Freigabe durch den Projektleiter. Geheimnisse nur für eine Umgebung und „nur `main` darf
   ausliefern“ (Deployment-Umgebungen) gibt es für öffentliche Repos ebenfalls gratis (B:
   [GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments),
-  ebenso der Link oben); sie sind noch nicht eingerichtet ([Beobachtungen](beobachtungen.md)).
+  ebenso der Link oben); sie sind noch nicht eingerichtet ([#61](https://github.com/konstantinniedermann/tco-app/issues/61)).
   Die Auslieferung bleibt automatisch.
 - **Restrisiko** (bewertet im [Sicherheitskonzept](sicherheitskonzept.md#restrisiken), unter
   Bedingungen: Zwei-Faktor-Login auf allen Konten mit Schreibrecht (SI-15), die
@@ -339,7 +339,7 @@ weil ein E2E-Test sie liest. Das ist der Normalfall beim Push des Feature-Branch
 Push des Merge-Commits auf `dev`. Kam fremder Code von `dev` dazu, prüft der Hook voll, und
 ebenso im Zweifel (keine Liste, unlesbare Datei). Die Liste liegt unversioniert im
 gemeinsamen Git-Ordner, gilt also für alle Worktrees. Die CI prüft jeden Push auf `dev`
-unabhängig davon.
+unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
 
 ## Abhängigkeiten
 
@@ -419,7 +419,8 @@ Das Repo ist öffentlich; für öffentliche Repos sind die Standard-Runner von G
 und ohne Kontingent (B: Abrechnung des Kontos, öffentliche Repos mit 0 verrechnet). Bis
 06.11.2026 war es privat und teilte die 2000 Gratisminuten pro Monat mit den anderen
 privaten Repos des Kontos; MyTCO allein brauchte im November in sechs Tagen über 1100
-Minuten (B: Abrechnung des Kontos). Das war der Grund für den Wechsel. Die Regeln unten
+Minuten (B: Abrechnung des Kontos). Das war der Grund für den Wechsel
+([ADR-010](adr/adr-010-repo-oeffentlich.md)). Die Regeln unten
 bleiben, weil sie auch die Wartezeit kurz halten.
 
 - CI nur bei PRs und auf `dev`/`main`; Issue-Branches prüfen lokal.

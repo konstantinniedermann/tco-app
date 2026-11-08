@@ -37,8 +37,10 @@ Store-App ([ADR-001](adr/adr-001-web-app-zuerst.md), K-22).
 Vereinsadresse laufen, hängt alles am Projektleiter. Fällt er plötzlich aus, läuft MyTCO
 weiter, aber niemand kann das Repo übertragen, die Geheimnisse der Auslieferung ändern oder
 den Server verwalten; die Hauptansprechperson kann nur ins Repo schreiben. Im Notfall
-übernimmt sie übergangsweise (K-05). Zu prüfen: Die Nachfolger-Einstellung von
-GitHub-Privatkonten könnte das Repo abdecken (ungeprüft, ob sie für private Repos gilt).
+übernimmt sie übergangsweise (K-05). Seit das Repo öffentlich ist, deckt es die
+Nachfolger-Einstellung des GitHub-Kontos ab (B: [GitHub Deceased User Policy](https://docs.github.com/en/site-policy/other-site-policies/github-deceased-user-policy),
+Beispiel «transfer public repositories»); ob ein Nachfolger eingetragen ist, prüft der
+Projektleiter. Geheimnisse und Server deckt sie nicht ab.
 
 ## Geheimnisse
 
