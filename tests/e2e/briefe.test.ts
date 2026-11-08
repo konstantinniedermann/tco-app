@@ -126,6 +126,8 @@ test('A-LOGIN-01: Serie – Auswahl, Rückfrage, Druckansicht, Code meldet an', 
 	await expect(page.getByRole('button', { name: 'Drucken oder als PDF speichern' })).toBeVisible();
 	const code = (await page.locator('.brief-code').textContent())!.trim();
 	expect(code).toMatch(/^[A-Z0-9]{5}-[A-Z0-9]+$/);
+	// Der Fokus springt zur Druckansicht, nicht ins Leere.
+	await expect(page.getByRole('button', { name: '‹ Zurück' })).toBeFocused();
 	await pruefeBildschirm(page, info, 'briefe-druckansicht');
 	await bild(page, projekt, 'briefe-druckansicht', true);
 
@@ -141,6 +143,7 @@ test('A-LOGIN-01: Serie – Auswahl, Rückfrage, Druckansicht, Code meldet an', 
 	// Zurück zur Liste: Wer MyTCO geöffnet hat, steht nicht mehr darin.
 	await page.getByRole('button', { name: '‹ Zurück' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Briefe' })).toBeVisible();
+	await expect(page.getByRole('heading', { level: 1, name: 'Briefe' })).toBeFocused();
 	await expect(zeile(page, name)).toHaveCount(0);
 
 	await page.goto(`/verwaltung/mitglieder/${ziel.mitgliedId}`);
@@ -291,6 +294,7 @@ test('A-LOGIN-01, RR-07: MyTCO-Admin sieht die Liste ohne Auswahl und ohne Taste
 	await expect(zeile(page, `${nachname}, Gina`)).toContainText('noch kein Brief');
 	await expect(page.getByRole('checkbox')).toHaveCount(0);
 	await expect(page.getByRole('button', { name: /Briefe erzeugen/ })).toHaveCount(0);
+	await expect(page.locator('dialog', { hasText: 'Briefe erzeugen' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'briefe-nur-ansehen');
 	expect(ohneScreenshotStil(fehler)).toEqual([]);
 });

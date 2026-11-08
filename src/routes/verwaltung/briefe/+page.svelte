@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import { tick } from 'svelte';
 	import Briefdruck from '../../../lib/verwaltung/Briefdruck.svelte';
 	import {
 		erzeugeBriefe,
@@ -38,8 +39,11 @@
 	let fehler = $state<string | null>(null);
 	let rueckfrage = $state<HTMLDialogElement>();
 
-	// Eine Anfrage nach der anderen: ein Doppelklick stellt nicht zwei Mal Codes aus.
-	let laeuft = false;
+	let titel = $state<HTMLHeadingElement>();
+
+	// Eine Anfrage nach der anderen: ein Doppelklick stellt nicht zwei Mal Codes aus. Solange sie
+	// läuft, ist «Briefe erzeugen» in der Rückfrage gesperrt.
+	let laeuft = $state(false);
 	async function einzeln(aktion: () => Promise<void>) {
 		if (laeuft) return;
 		laeuft = true;
@@ -68,10 +72,12 @@
 		}
 	}
 
-	// Verwirft die Briefe samt Codes und lädt die Liste neu.
-	function zurueck() {
+	// Verwirft die Briefe samt Codes und lädt die Liste neu; der Fokus geht zum Titel.
+	async function zurueck() {
 		briefe = null;
-		void invalidateAll();
+		await tick();
+		titel?.focus();
+		await invalidateAll();
 	}
 </script>
 
@@ -82,7 +88,7 @@
 {#if briefe}
 	<Briefdruck {briefe} {zurueck} />
 {:else}
-	<h1>Briefe</h1>
+	<h1 tabindex="-1" bind:this={titel}>Briefe</h1>
 	<p class="leise">
 		Mitglieder, die MyTCO noch nie geöffnet haben. Ein neuer Code ersetzt den alten.
 	</p>
@@ -163,16 +169,26 @@
 	{/if}
 {/if}
 
-<dialog class="karte" bind:this={rueckfrage} aria-labelledby="briefe-titel">
-	<h2 id="briefe-titel">
-		{auswahl.length === 1 ? '1 Brief erzeugen?' : `${auswahl.length} Briefe erzeugen?`}
-	</h2>
-	<p>
-		Die Codes erscheinen nur in der Druckansicht. Schliesst du sie ohne zu drucken, erzeugst du neue
-		Briefe.
-	</p>
-	<div class="leiste">
-		<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}>Abbrechen</button>
-		<button type="button" class="taste-haupt" onclick={erzeuge}>Briefe erzeugen</button>
-	</div>
-</dialog>
+{#if darfErzeugen}
+	<dialog class="karte" bind:this={rueckfrage} aria-labelledby="briefe-titel">
+		<h2 id="briefe-titel">
+			{auswahl.length === 1 ? '1 Brief erzeugen?' : `${auswahl.length} Briefe erzeugen?`}
+		</h2>
+		<p>
+			Die Codes erscheinen nur in der Druckansicht. Schliesst du sie ohne zu drucken, erzeugst du
+			neue Briefe.
+		</p>
+		<div class="leiste">
+			<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}
+				>Abbrechen</button
+			>
+			<button
+				type="button"
+				class="taste-haupt"
+				disabled={laeuft}
+				aria-busy={laeuft}
+				onclick={erzeuge}>Briefe erzeugen</button
+			>
+		</div>
+	</dialog>
+{/if}

@@ -726,15 +726,3 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #43 Etappe 2a, Aufgabe 4.
 
 **Einschätzung:** Solange die Läufe grün bleiben, abhaken; wächst die Laufzeit weiter, Test-Mitglieder beim Lauf aufräumen oder die lokale Datenbank zurücksetzen.
-
-### 2026-11-08 — «gültig bis» rechnet in der Verwaltung mit der Zeitzone des Browsers, im Brief mit Zürich
-
-**Thema:** App-Oberfläche
-
-**Fundort:** `src/lib/verwaltung/anzeige.ts` (`tagText`, ohne `timeZone`), genutzt auf der Seite eines Mitglieds und der Seite *Briefe*; der Brief nutzt `formatiereDatum` (Europe/Zurich)
-
-**Beobachtung:** Läuft ein Code kurz vor Mitternacht ab und steht der Browser nicht in der Schweizer Zeitzone, kann die Verwaltung einen anderen Tag zeigen als der Brief.
-
-**Ursprung:** #43 Etappe 2a, Aufgabe 4.
-
-**Einschätzung:** Kleiner Fix (`timeZone: ZONE` in `TAG`), betrifft auch *Für Fairgate*; im Verein laufen die Browser in der Schweiz, darum kaum spürbar.

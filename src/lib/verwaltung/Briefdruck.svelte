@@ -8,7 +8,10 @@
 </script>
 
 <div class="leiste nicht-drucken">
-	<button type="button" class="taste-neben" onclick={zurueck}>‹ Zurück</button>
+	<!-- Beim Erscheinen bekommt «‹ Zurück» den Fokus: Die Taste, die die Ansicht geöffnet hat, ist weg. -->
+	<button type="button" class="taste-neben" onclick={zurueck} {@attach (t) => t.focus()}
+		>‹ Zurück</button
+	>
 	<button type="button" class="taste-neben" onclick={() => window.print()}
 		>Drucken oder als PDF speichern</button
 	>

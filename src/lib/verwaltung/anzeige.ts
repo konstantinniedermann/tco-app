@@ -131,13 +131,15 @@ export function plakette(z: Pick<MitgliedZeile, 'login' | 'status'>): {
 	}
 }
 
+const ZONE = 'Europe/Zurich';
+
 const ZEIT = new Intl.DateTimeFormat('de-CH', { dateStyle: 'short', timeStyle: 'short' });
-const TAG = new Intl.DateTimeFormat('de-CH', { dateStyle: 'medium' });
+// Wie der Brief (formatiereDatum): der Zürcher Kalendertag, nicht der des Browsers.
+const TAG = new Intl.DateTimeFormat('de-CH', { dateStyle: 'medium', timeZone: ZONE });
 
 export const zeitText = (iso: string) => ZEIT.format(new Date(iso));
+/** «01.02.2027» nach dem Kalender in Zürich. */
 export const tagText = (iso: string) => TAG.format(new Date(iso));
-
-const ZONE = 'Europe/Zurich';
 const DATUM = new Intl.DateTimeFormat('de-CH', {
 	timeZone: ZONE,
 	day: 'numeric',
