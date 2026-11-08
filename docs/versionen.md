@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Übersichtliche Navigation (#69): Die Reiter Start · CM · Profil stehen nach dem Login auf jeder
+  Seite, der neue Reiter CM führt zur laufenden Clubmeisterschaft. Zurück-Links nennen ihr Ziel
+  («‹ Profil», «‹ Clubmeisterschaft 2027»), die Verwaltung zeigt über dem Titel den Pfad.
+
 ## 0.15.0 — Doppel mit Partner-Anfrage
 
 - Doppel zur Clubmeisterschaft (#59, Etappe 1): Mitglieder suchen in einer Doppel-Kategorie einen
