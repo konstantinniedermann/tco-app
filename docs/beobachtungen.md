@@ -242,3 +242,19 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) des Konzepts zu #66.
 
 **Einschätzung:** Mittel bis niedrig: fällt erst mit CM-Betrieb ins Gewicht. Braucht dann eine eigene Anforderung (Auslöser, Zeitgeber, Einstellung des Spielers); Push hat beim Projektleiter Vorrang vor Mail.
+
+### 2026-11-08 — Kleinbefunde und offene Fragen aus #59 (Etappe 1 Doppel)
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/routes/clubmeisterschaft/[id]/+page.svelte`, `src/routes/clubmeisterschaft/[id]/doppel/[kid]/+page.svelte`, `src/lib/server/cm/doppel.ts`, `src/lib/server/cm/anmeldungen.ts`, `src/lib/cm/anzeige.ts`, `src/lib/server/db/schema.ts`, `tests/e2e/cm-doppel.test.ts`, Design-System-Artifact «MyTCO»
+
+**Beobachtung:**
+- E2E-Hänger, einmal: «Allein anmelden» blieb gesperrt, die Mails kamen nicht innert 15 s; auf gleichem Stand danach grün. Nicht nachgestellt (Umgebung oder Race).
+- Design System «MyTCO»: Es fehlen die Bausteine Trefferliste und Kartenteil aus dem UI-Leitbild (Nachtrag zur Beobachtung «Design System «MyTCO» hinkt dem UI-Leitbild hinterher»).
+- Für Etappe 2 bzw. den Projektleiter: Das Login wird nur beim Annehmenden geprüft, nicht beim Anfragenden; die Kontaktdaten eines nach dem Anmeldeschluss Ausgetretenen bleiben für den Partner sichtbar; Ablehnen und Zurückziehen einer Anfrage sind nach dem Schluss serverseitig nicht gesperrt; es gibt keine Obergrenze für Anfragen.
+- Aufgeschoben aus den Reviews (Code-Hygiene): CM-Seite gross (rund 1000 Zeilen; Handler-Skelett mehrfach, Kommentarfeld und `FEHLER` doppelt); Fokus-Kleinigkeiten (nach einem Fehler der Suche, nach «Kommentar gespeichert», nach `art-gesperrt`); Fehler fern der Karte (UI-06); wiederholte Sperr- und Prüfblöcke in `doppel.ts` und `anmeldungen.ts`; `bisWartend` dreifach kopiert; `meldeAb` ohne Obergrenze der Neustarts; Schema-Tests ohne Constraint-Namen; `weiterePaare` vergleicht Namen statt IDs; Suche ohne Längenobergrenze.
+
+**Ursprung:** #59 Etappe 1, Task-Reviews, Task-9-Review und Schluss-Review.
+
+**Einschätzung:** Niedrig für den Verein; nichts davon hält den Merge auf. Die Fragen an den Projektleiter mit Etappe 2 (Doppel in der Verwaltung) klären; die Code-Hygiene beim nächsten Umbau der CM-Seite, etwa beim Aufteilen in Komponenten.
