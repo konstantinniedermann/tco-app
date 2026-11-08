@@ -282,3 +282,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** #59 Etappe 1, Task-Reviews, Task-9-Review und Schluss-Review.
 
 **Einschätzung:** Niedrig für den Verein; nichts davon hält den Merge auf. Die Fragen an den Projektleiter mit Etappe 2 (Doppel in der Verwaltung) klären; die Code-Hygiene beim nächsten Umbau der CM-Seite, etwa beim Aufteilen in Komponenten.
+
+### 2026-11-08 — Lokale DB `mytco` wächst durch E2E auf über 11'000 Mitglieder, Pre-Push-Hook wird rot
+
+**Thema:** CI
+
+**Fundort:** `.githooks/pre-push` (volle Prüfung auf der gemeinsamen DB `mytco`), `tests/e2e/mitteilungen.test.ts` («FR-42: allgemeine Mitteilung an den Verein», `pruefeBildschirm`)
+
+**Beobachtung:** Beim Push des Merges von #59 nach `dev` war im Hook ein E2E rot: axe brauchte auf der Vorschau der Mitteilung länger als 30 s (Timeout), auch einzeln wiederholt. Die lokale DB `mytco` hatte 11'332 Mitglieder aus früheren Testläufen. Auf einer frischen DB lief derselbe Stand mit `make check` vollständig grün (328 E2E), die CI ebenso.
+
+**Ursprung:** #59 Etappe 1, Merge nach `dev` am 08.11.2026.
+
+**Einschätzung:** Mittel für die Arbeitsweise: Jede Session kann daran scheitern, ohne Fehler im Code. Denkbar: `make check`/Hook auf einer frisch angelegten DB, oder die Test-Mitglieder in `mytco` regelmässig aufräumen (Verwandt: Beobachtung «Pre-Push-Hook und `make check` gleichzeitig im selben Worktree»).
