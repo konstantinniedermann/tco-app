@@ -115,3 +115,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 ---
 
 ## Offen
+
+### 2026-11-08 — Auskunft: neue Angaben je Gerät nur im DB-Test belegt, nicht auf der Seite
+
+**Thema:** App-Oberfläche
+
+**Fundort:** `src/routes/verwaltung/mitglieder/[id]/auskunft/+page.svelte` (Tabelle *Login und Geräte*), `tests/e2e/mitgliedschaft.test.ts`
+
+**Beobachtung:** Seit 0.11.2 nennt die Auskunft je Gerät «Verwaltung bestätigt am …» und «Ansicht als …». Der DB-Test von `ladeAuskunft` belegt die Daten (mit Mutationsprobe); dass die Seite sie zeigt, prüft weder ein E2E-Test noch ein Screenshot.
+
+**Ursprung:** Review (`cas-reviewer`) der Beobachtungs-Auswertung vom 08.11.2026.
+
+**Einschätzung:** Niedrig: Typen sind geprüft, `ansicht` ist per DB-Regel auf vier Werte begrenzt. Ein Schritt im bestehenden Auskunft-E2E würde reichen, wenn die Seite ohnehin angefasst wird.
