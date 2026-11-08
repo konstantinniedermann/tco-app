@@ -6,6 +6,7 @@ import type { AnlassFeld } from '../server/anlass/angaben.ts';
 import type { AnlassAdmin, AnlassListe } from '../server/anlass/anlaesse.ts';
 import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairgate.ts';
 import type { Auskunft } from '../server/admin/auskunft.ts';
+import type { AusgestellterBrief, BriefZeile } from '../server/admin/briefe.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
 import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
@@ -44,6 +45,8 @@ export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus, Verwalt
 export type { AnmeldungZeile, SpielerTreffer, Warnung };
 type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld | MitteilungFeld;
 export type FairgateZeile = Json<ServerFairgateZeile>;
+export type BriefListe = Json<BriefZeile>[];
+export type { AusgestellterBrief };
 export type { Angaben, AnsichtRolle, Feld, MitgliedStatus, Rolle, RollenListe };
 
 export type Antwort<T> =
@@ -67,6 +70,7 @@ export type Antwort<T> =
 	| { art: 'abgesagt' }
 	| { art: 'unpassend'; anzahl: number }
 	| { art: 'hat-anmeldungen'; anzahl: number }
+	| { art: 'nicht-moeglich'; anzahl: number }
 	| { art: 'warnung'; warnungen: Warnung[] }
 	| { art: 'schon-angemeldet' }
 	| { art: 'vorbereitung' }
@@ -112,6 +116,8 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 			return { art: 'unpassend', anzahl: k.anzahl };
 		if (k.fehler === 'hat-anmeldungen' && typeof k.anzahl === 'number')
 			return { art: 'hat-anmeldungen', anzahl: k.anzahl };
+		if (k.fehler === 'nicht-moeglich' && typeof k.anzahl === 'number')
+			return { art: 'nicht-moeglich', anzahl: k.anzahl };
 		if (k.fehler === 'vergeben' && typeof k.feld === 'string')
 			return { art: 'vergeben', feld: k.feld as Feld | 'jahr' | 'name' };
 		if (k.fehler === 'warnung' && Array.isArray(k.warnungen))
@@ -186,6 +192,20 @@ export function ladeMitglieder(
 	const abfrage = q.size > 0 ? `?${q}` : '';
 	return lese(`${ADMIN}/mitglieder${abfrage}`, holen);
 }
+
+/** A-LOGIN-01: aktive Mitglieder, die MyTCO noch nie geöffnet haben. */
+export const ladeBriefe = (holen: Holen = fetch) => lese<BriefListe>(`${ADMIN}/briefe`, holen);
+
+/**
+ * A-LOGIN-01: stellt für jedes Mitglied einen neuen Brief-Code aus (alles oder nichts). Die Antwort
+ * enthält die Codes im Klartext (RR-04: nur für die Druckansicht, nie speichern).
+ */
+export const erzeugeBriefe = (ids: number[], holen: Holen = fetch) =>
+	schicke<{ briefe: AusgestellterBrief[] }>(`${ADMIN}/briefe`, { ids }, holen);
+
+/** Wie `erzeugeBriefe`, für ein einzelnes Mitglied. */
+export const erzeugeBrief = (id: number, holen: Holen = fetch) =>
+	schicke<{ briefe: AusgestellterBrief[] }>(`${ADMIN}/mitglieder/${id}/brief`, {}, holen);
 
 export const legeMitgliedAn = (angaben: object, holen: Holen = fetch) =>
 	schicke<{ id: number }>(`${ADMIN}/mitglieder`, angaben, holen);

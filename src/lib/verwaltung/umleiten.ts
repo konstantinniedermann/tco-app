@@ -27,6 +27,7 @@ const BEREICHE_IN_REIHE: readonly Bereich[] = ['mitglieder', 'cm', 'rollen'];
 // Seiten unter /verwaltung je Bereich (erster Pfadteil nach /verwaltung).
 const SEITEN: Record<string, Bereich> = {
 	mitglieder: 'mitglieder',
+	briefe: 'mitglieder',
 	anlaesse: 'mitglieder',
 	fairgate: 'mitglieder',
 	verlauf: 'mitglieder',

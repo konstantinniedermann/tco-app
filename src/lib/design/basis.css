@@ -1729,6 +1729,23 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	background: var(--farbe-marke-zart);
 }
 
+/* Briefdruck: die Briefe untereinander, jedes Blatt A4-breit und weiss; auf schmalem Bildschirm
+   scrollt der Rahmen waagrecht. Nur eine Vorschau, massgebend ist der Ausdruck. */
+.briefdruck {
+	display: grid;
+	gap: var(--abstand-4);
+	justify-content: start;
+	overflow-x: auto;
+	padding: var(--abstand-1);
+}
+
+@media screen {
+	.briefdruck .brief {
+		width: var(--brief-breite);
+		box-shadow: var(--schatten-karte);
+	}
+}
+
 @media print {
 	.nicht-drucken,
 	.seitenleiste,
@@ -1775,5 +1792,16 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		max-width: none;
 		margin: 0;
 		padding-inline: 0;
+	}
+
+	/* Briefe: das Blatt beginnt oben links auf dem Papier (Adressfeld im Fenster des Kuverts) */
+	.inhalt:has(.brief) {
+		padding: 0;
+	}
+
+	.briefdruck {
+		display: block;
+		overflow: visible;
+		padding: 0;
 	}
 }

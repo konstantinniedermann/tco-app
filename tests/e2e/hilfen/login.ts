@@ -134,6 +134,11 @@ export async function setzeSpielerangaben(
 	await hole().db.update(mitglied).set(angaben).where(eq(mitglied.id, mitgliedId));
 }
 
+/** Leert die Strasse eines erfundenen Mitglieds: Die Adresse ist dann unvollständig (A-LOGIN-01). */
+export async function leereStrasse(mitgliedId: number): Promise<void> {
+	await hole().db.update(mitglied).set({ strasse: '' }).where(eq(mitglied.id, mitgliedId));
+}
+
 /** Meldet ein Mitglied über die Fachlogik zu einer Einzel-Kategorie an (ohne Mail). */
 export async function meldeZurCmAn(kategorieId: number, mitgliedId: number): Promise<void> {
 	const r = await meldeZurCmAnInDb(hole().db, kategorieId, mitgliedId, new Date());
