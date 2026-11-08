@@ -2,6 +2,7 @@
 import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
 import type { KategorieWerte } from '../server/turnier/angaben.ts';
 import type { Geschlecht, TurnierStatus } from '../server/db/schema.ts';
+import { nameText, type Namensteile } from '../name.ts';
 import { klassierungName } from '../turnier/klassierung.ts';
 import { plakette } from './anzeige.ts';
 
@@ -91,6 +92,25 @@ const WARNUNG: Record<Warnung, string> = {
 
 /** FR-46: Warnungen vor dem Anmelden oder Verschieben von Hand, in der Reihenfolge des Servers. */
 export const warnungText = (w: readonly Warnung[]) => w.map((x) => WARNUNG[x]).join(' ');
+
+/**
+ * FR-46: Warnungen im Doppel als Liste, Sätze wie im Einzel. Der Server sagt bei `voll` nicht, wer
+ * die Grenze erreicht hat; der Satz nennt darum die Spieler, für die es gelten kann.
+ */
+export const doppelWarnungen = (w: readonly Warnung[], namen: readonly string[]): string[] =>
+	w.map((x) =>
+		x === 'voll' && namen.length > 0
+			? `${namen.join(' oder ')} hat schon 3 Anmeldungen.`
+			: WARNUNG[x]
+	);
+
+/** A-ANMELDUNG-06: «Lena Muster / Max Beispiel», mit Rufname wie in der kurzen Textform. */
+export const paarText = (p: { spieler: readonly { name: Namensteile }[] }) =>
+	p.spieler.map((s) => nameText(s.name, 'vorname-zuerst')).join(' / ');
+
+/** A-ANMELDUNG-06: Summe der Klassierungen eines Paars; `null`, wenn eine fehlt. */
+export const summeText = (summe: number | null) =>
+	summe === null ? 'Summe offen' : `Summe ${summe}`;
 
 /** A-ANMELDUNG-06: «5 Anmeldungen, 1 Wildcard-Antrag»; Anträge zählen bei den Anmeldungen mit. */
 export function anmeldungenText(zeilen: readonly Pick<AnmeldungZeile, 'status'>[]): string {

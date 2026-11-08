@@ -6,12 +6,15 @@ import {
 	anmeldungStatus,
 	datumKurz,
 	datumLang,
+	doppelWarnungen,
 	geschlechtText,
 	jahrgangText,
 	mitgliedVermerk,
 	klassierungText,
+	paarText,
 	spielerGeschlechtText,
 	statusText,
+	summeText,
 	trefferText,
 	unpassendText,
 	warnungText
@@ -144,5 +147,36 @@ describe('Anzeigehilfen für Turniere', () => {
 		expect(trefferText({ klassierung: null, geschlecht: null, jahrgang: 2001 })).toBe(
 			'Klassierung fehlt · Geschlecht fehlt · 2001'
 		);
+	});
+
+	it('A-ANMELDUNG-06: Paar als Text, Vorname zuerst, Rufname wie in der kurzen Textform', () => {
+		const n = (rufname: string | null, vorname: string, nachname: string) => ({
+			name: { rufname, vorname, nachname }
+		});
+		expect(paarText({ spieler: [n(null, 'Lena', 'Muster'), n(null, 'Max', 'Beispiel')] })).toBe(
+			'Lena Muster / Max Beispiel'
+		);
+		expect(paarText({ spieler: [n('Leni', 'Lena', 'Muster'), n('Max', 'Max', 'Beispiel')] })).toBe(
+			'Leni (Lena Muster) / Max Beispiel'
+		);
+	});
+
+	it('A-ANMELDUNG-06: Summe des Paars, offen ohne beide Klassierungen', () => {
+		expect(summeText(9)).toBe('Summe 9');
+		expect(summeText(0)).toBe('Summe 0');
+		expect(summeText(null)).toBe('Summe offen');
+	});
+
+	it('FR-46: Warnungen im Doppel als Liste wie im Einzel, «voll» nennt die Spieler', () => {
+		expect(doppelWarnungen(['passt-nicht', 'voll', 'geschlossen'], ['Max Beispiel'])).toEqual([
+			'Passt nicht zur Kategorie.',
+			'Max Beispiel hat schon 3 Anmeldungen.',
+			'Anmeldung ist geschlossen.'
+		]);
+		expect(doppelWarnungen(['voll'], ['Lena Muster', 'Max Beispiel'])).toEqual([
+			'Lena Muster oder Max Beispiel hat schon 3 Anmeldungen.'
+		]);
+		expect(doppelWarnungen(['angaben-fehlen'], [])).toEqual(['Angaben fehlen.']);
+		expect(doppelWarnungen([], ['Max Beispiel'])).toEqual([]);
 	});
 });
