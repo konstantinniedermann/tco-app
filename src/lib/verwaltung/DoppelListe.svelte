@@ -6,7 +6,7 @@
 	lädt die Seite neu.
 -->
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { tick, type Snippet } from 'svelte';
 	import { refreshAll } from '$app/navigation';
 	import { nameText } from '../name.ts';
 	import Name from '../ui/Name.svelte';
@@ -59,6 +59,7 @@
 
 	let titel = $state<HTMLHeadingElement>();
 	let rueckmeldung = $state<string | null>(null);
+	let rueckmeldungFeld = $state<HTMLParagraphElement>();
 
 	let anmelden = $state<Dialog>();
 	let partner = $state<Dialog>();
@@ -141,9 +142,13 @@
 		dialog?.oeffne();
 	}
 
+	// Der Fokus geht zum Ergebnis. Das `close` des Dialogs (Fokus zur Überschrift) kommt vorher,
+	// weil es vor der Antwort des Neuladens eintrifft.
 	async function fertig(satz: string) {
 		await refreshAll();
 		rueckmeldung = satz;
+		await tick();
+		rueckmeldungFeld?.focus();
 	}
 
 	const zurUeberschrift = () => titel?.focus();
@@ -312,7 +317,7 @@
 				{/if}
 			</div>
 		{/if}
-		<p class="leise" role="status">
+		<p class="leise" role="status" tabindex="-1" bind:this={rueckmeldungFeld}>
 			{#if rueckmeldung}{rueckmeldung}{/if}
 		</p>
 		{@render teil('Paare', liste.paare.length, ['Paar', 'Klassierungen', 'Summe'], paarZeilen)}

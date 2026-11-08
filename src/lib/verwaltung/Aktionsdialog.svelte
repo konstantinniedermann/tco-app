@@ -51,6 +51,9 @@
 	let laeuft = $state(false);
 	let fehler = $state<string | null>(null);
 	let warnungen = $state<Antwort<unknown> & { art: 'warnung' }>();
+	// Zählt jedes Öffnen und jede neue Wahl: Eine Antwort auf einen älteren Stand zeigt keine
+	// Warnungen und Fehler mehr an und schliesst den Dialog nicht.
+	let stand = 0;
 
 	/** Öffnet den Dialog ohne Warnungen und Fehler vom letzten Mal. */
 	export function oeffne() {
@@ -60,6 +63,7 @@
 
 	/** Nach einer neuen Wahl gelten die Warnungen nicht mehr. */
 	export function verwerfe() {
+		stand++;
 		warnungen = undefined;
 		fehler = null;
 	}
@@ -68,6 +72,7 @@
 		if (laeuft || !bereit) return;
 		laeuft = true;
 		fehler = null;
+		const nr = stand;
 		const a = await aktion(warnungen !== undefined);
 		if (await leiteUm(a)) {
 			laeuft = false;
@@ -75,9 +80,9 @@
 			return;
 		}
 		const satz = a.art === 'ok' ? erfolg : a.art === 'warnung' ? undefined : folgen[a.art];
-		// Wurde der Dialog inzwischen geschlossen, gehören Warnungen und Fehler zu keinem Dialog mehr.
-		// Ein geänderter Stand lädt trotzdem neu.
-		if (!dialog?.open) {
+		// Wurde der Dialog inzwischen geschlossen, neu geöffnet oder etwas anderes gewählt, gehören
+		// Warnungen und Fehler zu keinem Dialog mehr. Ein geänderter Stand lädt trotzdem neu.
+		if (nr !== stand || !dialog?.open) {
 			if (satz !== undefined) await onfertig(satz);
 			laeuft = false;
 			return;

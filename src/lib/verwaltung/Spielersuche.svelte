@@ -45,6 +45,8 @@
 	// Nur die neueste Suche zählt, wenn mehrere unterwegs sind.
 	let abfrage = 0;
 	let warten: ReturnType<typeof setTimeout> | undefined;
+	// Verschwindet die Suche (z. B. neu aufgesetzt mit `{#key}`), sucht sie nicht mehr.
+	$effect(() => () => clearTimeout(warten));
 
 	function setzeSuche(wert: string) {
 		suche = wert;
