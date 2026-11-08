@@ -96,6 +96,7 @@ export async function getSitzung(e: Ereignis, db: Db): Promise<Response> {
 	if (!konto) return antwort(401, {});
 	return antwort(200, {
 		vorname: konto.vorname,
+		rufname: konto.rufname,
 		passkeyHinweis: konto.passkeyHinweis,
 		verwaltung:
 			effektiveRollen(await verwaltungsrollen(db, konto.kontoId), konto.ansicht).length > 0,

@@ -24,6 +24,7 @@ export const load: PageLoad = async ({ fetch, url }) => {
 		passkeys,
 		angaben: profil?.angaben ?? null,
 		klassierung: profil?.klassierung ?? null,
+		rufname: profil?.rufname ?? null,
 		kontakt,
 		emailGeaendert
 	};

@@ -236,6 +236,7 @@ describe('Schnittstellen', () => {
 			expect(r1.status).toBe(200);
 			expect(await r1.json()).toEqual({
 				vorname: 'Erika',
+				rufname: null,
 				passkeyHinweis: true,
 				verwaltung: false,
 				ansicht: null

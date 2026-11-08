@@ -608,6 +608,7 @@ describe('Admin-Schnittstellen', () => {
 		const rn = await getSitzung(ereignis({ konto: await einloggen(normal.kontoId) }), db);
 		expect(await ra.json()).toEqual({
 			vorname: 'Test',
+			rufname: null,
 			passkeyHinweis: false,
 			verwaltung: true,
 			ansicht: null

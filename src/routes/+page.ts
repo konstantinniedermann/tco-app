@@ -18,8 +18,9 @@ export const load: PageLoad = async ({ fetch }) => {
 		redirect(307, einstieg ? '/willkommen' : '/login');
 	}
 	if (!antwort.ok) error(503, 'Die Anmeldung lässt sich gerade nicht prüfen.');
-	const { vorname, passkeyHinweis, verwaltung } = (await antwort.json()) as {
+	const { vorname, rufname, passkeyHinweis, verwaltung } = (await antwort.json()) as {
 		vorname: string;
+		rufname: string | null;
 		passkeyHinweis: boolean;
 		verwaltung: boolean;
 	};
@@ -27,6 +28,7 @@ export const load: PageLoad = async ({ fetch }) => {
 	const [anlaesse, turniere] = await Promise.all([holeAnlaesse(fetch), holeCmTurniere(fetch)]);
 	return {
 		vorname,
+		rufname,
 		passkeyHinweis,
 		verwaltung,
 		anlaesse: anlaesse.art === 'ok' ? anlaesse.daten : [],
