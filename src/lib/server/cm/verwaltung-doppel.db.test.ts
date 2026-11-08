@@ -13,9 +13,11 @@ import {
 } from '../db/schema.ts';
 import type { KategorieWerte } from '../turnier/angaben.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../turnier/turniere.ts';
+import { meldeAb } from './anmeldungen.ts';
 import { nimmAnfrageAn } from './doppel.ts';
 import {
 	anfrageGeloeschtText,
+	anfrageHinfaelligText,
 	geloeschtDoppelText,
 	herausgenommenText,
 	hinfaelligMeldung,
@@ -800,6 +802,22 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 		]);
 	});
 
+	test('FR-46, Review Focus 4: Partner ändern auf einer Anmeldung, die das Mitglied inzwischen abgemeldet hat, ergibt nicht-gefunden ohne Änderung', async () => {
+		const t = await turnier();
+		const lena = await spieler('Lena', 'Aebi', { geschlecht: 'w', klassierung: 'R4' });
+		const max = await spieler('Max', 'Zaugg');
+		const nico = await spieler('Nico', 'Neuhaus');
+		const paar = await anmeldungMit(t.mixed, [lena, max], t.jetzt);
+		// Die Liste des CM-Admins zeigt noch das Paar; Max meldet es vorher ab.
+		expect(await meldeAb(db, paar, max, t.jetzt)).toEqual({ ergebnis: 'ok', partnerId: lena });
+		const vorher = await anmeldungenIn(t.mixed);
+
+		expect(await aenderePartner(db, admin, paar, lena, nico, t.jetzt, true)).toBe('nicht-gefunden');
+		expect(await aenderePartner(db, admin, paar, lena, null, t.jetzt, true)).toBe('nicht-gefunden');
+		expect(await anmeldungenIn(t.mixed)).toEqual(vorher);
+		for (const id of [lena, max, nico]) expect(await verlaufVon(id)).toEqual([]);
+	});
+
 	test('FR-46, Review Focus 2: Partner ändern auf einen, der schon zu zweit ist, auf einen der beiden oder mit fremdem Bleibenden ändert nichts', async () => {
 		const t = await turnier();
 		const a = await spieler('Andreas', 'Ammann');
@@ -850,6 +868,8 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 		await anmeldungMit(t.einzel[1], [paul], t.jetzt);
 		const paar = await anmeldungMit(t.doppel, [paul, urs], t.jetzt);
 		await anfrageMit(t.herren, urs, dritter, t.jetzt);
+		// In der alten Kategorie verfällt sie ohne «hat inzwischen einen Partner».
+		await anfrageMit(t.doppel, dritter, paul, t.jetzt);
 
 		expect(await verschiebeDoppel(db, admin, paar, t.herren, t.jetzt, false)).toEqual({
 			ergebnis: 'ok',
@@ -857,18 +877,26 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 			von: 'Offenes Doppel',
 			nach: 'Herren Doppel',
 			meldungen: sortiert([
-				{ mitgliedId: paul, text: verschobenDoppelText('Offenes Doppel', 'Herren Doppel') },
-				{ mitgliedId: urs, text: verschobenDoppelText('Offenes Doppel', 'Herren Doppel') },
+				{
+					mitgliedId: paul,
+					text: verschobenDoppelText('Offenes Doppel', 'Herren Doppel', false)
+				},
+				{
+					mitgliedId: urs,
+					text: verschobenDoppelText('Offenes Doppel', 'Herren Doppel', false)
+				},
 				{
 					mitgliedId: dritter,
 					text: hinfaelligMeldung('Urs Christen', 'Herren Doppel', t.id).text
-				}
+				},
+				{ mitgliedId: dritter, text: anfrageHinfaelligText('Paul Brunner', 'Offenes Doppel') }
 			])
 		});
 		expect(await anmeldungenIn(t.doppel)).toEqual([]);
 		expect(await anmeldungenIn(t.herren)).toEqual([
 			{ id: paar, status: 'bestaetigt', suchtext: null, spieler: paarIds(paul, urs) }
 		]);
+		expect(await anfragenIn(t.doppel)).toEqual([]);
 		expect(await anfragenIn(t.herren)).toEqual([]);
 		expect(await verlaufVon(paul)).toHaveLength(1);
 		expect(await verlaufVon(urs)).toHaveLength(1);
@@ -890,6 +918,15 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 			expect.objectContaining({ ergebnis: 'ok', von: 'Offenes Doppel', nach: 'Mixed Doppel' })
 		);
 		expect(await aktiveIn(t.mixed)).toEqual([expect.objectContaining({ id: paar })]);
+
+		// Drei andere aktive und diese: voll, auch wenn die verschobene nicht mitzählt.
+		const voll = await spieler('Vinzenz', 'Voll');
+		for (const k of t.einzel) await anmeldungMit(k, [voll], t.jetzt);
+		const sucht = await anmeldungMit(t.doppel, [voll], t.jetzt);
+		expect(await verschiebeDoppel(db, admin, sucht, t.herren, t.jetzt, false)).toEqual({
+			warnungen: ['voll']
+		});
+		expect(await aktiveIn(t.doppel)).toEqual([expect.objectContaining({ id: sucht })]);
 	});
 
 	test('FR-46, Review Focus 3: verschieben, wo einer schon steht, ergibt schon-angemeldet; Einzel, abgesagt oder anderes Turnier nicht-gefunden', async () => {
@@ -958,14 +995,17 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 			von: 'Offenes Doppel',
 			nach: 'Herren Doppel',
 			meldungen: sortiert([
-				{ mitgliedId: urs, text: verschobenDoppelText('Offenes Doppel', 'Herren Doppel') },
+				{
+					mitgliedId: urs,
+					text: 'Der CM-Admin hat deine Anmeldung von «Offenes Doppel» nach «Herren Doppel» verschoben.'
+				},
 				{
 					mitgliedId: dritter,
-					text: hinfaelligMeldung('Urs Christen', 'Offenes Doppel', t.id).text
+					text: 'Die Anfrage mit Urs Christen für «Offenes Doppel» ist hinfällig.'
 				},
 				{
 					mitgliedId: vierter,
-					text: hinfaelligMeldung('Urs Christen', 'Offenes Doppel', t.id).text
+					text: 'Die Anfrage mit Urs Christen für «Offenes Doppel» ist hinfällig.'
 				}
 			])
 		});
@@ -988,14 +1028,16 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 			ergebnis: 'ok',
 			turnierId: t.id,
 			meldungen: sortiert([
-				{ mitgliedId: lena, text: geloeschtDoppelText('Mixed Doppel') },
-				{ mitgliedId: max, text: geloeschtDoppelText('Mixed Doppel') }
+				{ mitgliedId: lena, text: geloeschtDoppelText('Mixed Doppel', false) },
+				{ mitgliedId: max, text: geloeschtDoppelText('Mixed Doppel', false) }
 			])
 		});
 		expect(await loescheDoppel(db, admin, sucht, t.jetzt)).toEqual({
 			ergebnis: 'ok',
 			turnierId: t.id,
-			meldungen: [{ mitgliedId: urs, text: geloeschtDoppelText('Herren Doppel') }]
+			meldungen: [
+				{ mitgliedId: urs, text: 'Der CM-Admin hat deine Anmeldung für «Herren Doppel» gelöscht.' }
+			]
 		});
 		expect(await anmeldungenIn(t.mixed)).toEqual([
 			{ id: paar, status: 'zurueckgezogen', suchtext: null, spieler: paarIds(lena, max) }

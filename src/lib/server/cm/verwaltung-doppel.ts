@@ -36,6 +36,7 @@ import {
 } from './doppel.ts';
 import {
 	anfrageGeloeschtText,
+	anfrageHinfaelligText,
 	geloeschtDoppelText,
 	herausgenommenText,
 	hinfaelligMeldung,
@@ -225,26 +226,42 @@ function warnungen(
 const geordnet = (m: Benachrichtigung[]) =>
 	m.sort((a, b) => a.mitgliedId - b.mitgliedId || a.text.localeCompare(b.text));
 
-/** Wer Anfragen an oder von einem der beiden hatte, erfährt, dass sie hinfällig sind (FR-48). */
-const hinfaelligFuer = (hinfaellig: Hinfaellig[], kategorie: string, turnierId: number) =>
+/** Text an Dritte, deren Anfrage an oder von `mitName` verfällt. */
+type HinfaelligText = (mitName: string, kategorie: string, turnierId: number) => string;
+
+/** Regel für alle Paarbildungen: `mitName` hat nun einen Partner (FR-48). */
+const hatPartner: HinfaelligText = (mitName, kategorie, turnierId) =>
+	hinfaelligMeldung(mitName, kategorie, turnierId).text;
+
+/** Verschoben aus der alten Kategorie: ohne Grund, auch ein Suchender hat keinen Partner. */
+const verschoben: HinfaelligText = (mitName, kategorie) =>
+	anfrageHinfaelligText(mitName, kategorie);
+
+/** Wer Anfragen an oder von einem der beiden hatte, erfährt, dass sie hinfällig sind. */
+const hinfaelligFuer = (
+	hinfaellig: Hinfaellig[],
+	kategorie: string,
+	turnierId: number,
+	text: HinfaelligText
+) =>
 	hinfaellig.flatMap((h) =>
-		h.anIds.map((mitgliedId) => ({
-			mitgliedId,
-			text: hinfaelligMeldung(h.mitName, kategorie, turnierId).text
-		}))
+		h.anIds.map((mitgliedId) => ({ mitgliedId, text: text(h.mitName, kategorie, turnierId) }))
 	);
 
 /**
- * Löscht die offenen Anfragen von und an die `spieler` in der Kategorie; die Dritten erfahren,
- * dass sie hinfällig sind. Regel für alle Paarbildungen, auch beim Verschieben aus der alten.
+ * Löscht die offenen Anfragen von und an die `spieler` in der Kategorie; die Dritten erfahren mit
+ * `text`, dass sie hinfällig sind. Regel für alle Paarbildungen (`hatPartner`), dazu beim
+ * Verschieben aus der alten Kategorie (`verschoben`).
  */
 async function anfragenVerfallen(
 	tx: DbOderTx,
 	k: { id: number; name: string },
 	turnierId: number,
-	spieler: Gesperrt[]
+	spieler: Gesperrt[],
+	text: HinfaelligText = hatPartner
 ): Promise<Benachrichtigung[]> {
-	return hinfaelligFuer(await loescheAnfragenDerBeiden(tx, k.id, spieler), k.name, turnierId);
+	const hinfaellig = await loescheAnfragenDerBeiden(tx, k.id, spieler);
+	return hinfaelligFuer(hinfaellig, k.name, turnierId, text);
 }
 
 /**
@@ -650,12 +667,13 @@ export async function verschiebeDoppel(
 			.update(anmeldung)
 			.set({ kategorieId: ziel.k.id, geaendertAm: jetzt })
 			.where(eq(anmeldung.id, anmeldungId));
+		const allein = g.spieler.length === 1;
 		const meldungen: Benachrichtigung[] = g.spieler.map((m) => ({
 			mitgliedId: m.id,
-			text: verschobenDoppelText(quelle.k.name, ziel.k.name)
+			text: verschobenDoppelText(quelle.k.name, ziel.k.name, allein)
 		}));
-		meldungen.push(...(await anfragenVerfallen(tx, quelle.k, quelle.t.id, g.spieler)));
-		if (g.spieler.length === 2) {
+		meldungen.push(...(await anfragenVerfallen(tx, quelle.k, quelle.t.id, g.spieler, verschoben)));
+		if (!allein) {
 			meldungen.push(...(await anfragenVerfallen(tx, ziel.k, ziel.t.id, g.spieler)));
 		}
 		for (const m of g.spieler) await schreibeGeaendert(tx, m, urheber, jetzt);
@@ -693,7 +711,10 @@ export async function loescheDoppel(
 			ergebnis: 'ok' as const,
 			turnierId: z.t.id,
 			meldungen: geordnet(
-				g.spieler.map((m) => ({ mitgliedId: m.id, text: geloeschtDoppelText(z.k.name) }))
+				g.spieler.map((m) => ({
+					mitgliedId: m.id,
+					text: geloeschtDoppelText(z.k.name, g.spieler.length === 1)
+				}))
 			)
 		};
 	});

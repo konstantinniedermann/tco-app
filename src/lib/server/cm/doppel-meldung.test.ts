@@ -3,6 +3,7 @@ import {
 	abgelehntMeldung,
 	abgemeldetMeldung,
 	anfrageGeloeschtText,
+	anfrageHinfaelligText,
 	angenommenMeldung,
 	anfrageMeldung,
 	austrittAnfrageMeldung,
@@ -83,11 +84,21 @@ describe('Meldungen zum Doppel', () => {
 		expect(ohneErsatzText('Mixed Doppel')).toBe(
 			'Der CM-Admin hat deinen Partner aus «Mixed Doppel» genommen. Du suchst jetzt einen Partner.'
 		);
-		expect(verschobenDoppelText('Offenes Doppel', 'Herren Doppel')).toBe(
+		expect(verschobenDoppelText('Offenes Doppel', 'Herren Doppel', false)).toBe(
 			'Der CM-Admin hat eure Anmeldung von «Offenes Doppel» nach «Herren Doppel» verschoben.'
 		);
-		expect(geloeschtDoppelText('Mixed Doppel')).toBe(
+		expect(verschobenDoppelText('Offenes Doppel', 'Herren Doppel', true)).toBe(
+			'Der CM-Admin hat deine Anmeldung von «Offenes Doppel» nach «Herren Doppel» verschoben.'
+		);
+		expect(geloeschtDoppelText('Mixed Doppel', false)).toBe(
 			'Der CM-Admin hat eure Anmeldung für «Mixed Doppel» gelöscht.'
+		);
+		expect(geloeschtDoppelText('Mixed Doppel', true)).toBe(
+			'Der CM-Admin hat deine Anmeldung für «Mixed Doppel» gelöscht.'
+		);
+		// Beim Verschieben verfällt eine Anfrage, ohne dass der andere einen Partner hätte.
+		expect(anfrageHinfaelligText('Urs Christen', 'Offenes Doppel')).toBe(
+			'Die Anfrage mit Urs Christen für «Offenes Doppel» ist hinfällig.'
 		);
 	});
 });

@@ -74,10 +74,17 @@ export const neuerPartnerText = (neu: string, kategorie: string) =>
 export const ohneErsatzText = (kategorie: string) =>
 	`Der CM-Admin hat deinen Partner aus «${kategorie}» genommen. Du suchst jetzt einen Partner.`;
 
-/** FR-46: an jeden Spieler einer verschobenen Doppel-Anmeldung. */
-export const verschobenDoppelText = (von: string, nach: string) =>
-	`Der CM-Admin hat eure Anmeldung von «${von}» nach «${nach}» verschoben.`;
+/** FR-46: an jeden Spieler einer verschobenen Doppel-Anmeldung; `allein` für einen Suchenden. */
+export const verschobenDoppelText = (von: string, nach: string, allein: boolean) =>
+	`Der CM-Admin hat ${allein ? 'deine' : 'eure'} Anmeldung von «${von}» nach «${nach}» verschoben.`;
 
-/** FR-46: an jeden Spieler einer gelöschten Doppel-Anmeldung. */
-export const geloeschtDoppelText = (kategorie: string) =>
-	`Der CM-Admin hat eure Anmeldung für «${kategorie}» gelöscht.`;
+/** FR-46: an jeden Spieler einer gelöschten Doppel-Anmeldung; `allein` für einen Suchenden. */
+export const geloeschtDoppelText = (kategorie: string, allein: boolean) =>
+	`Der CM-Admin hat ${allein ? 'deine' : 'eure'} Anmeldung für «${kategorie}» gelöscht.`;
+
+/**
+ * FR-46: an den anderen einer Anfrage, die beim Verschieben in der alten Kategorie verfällt;
+ * `mit` ist der Verschobene. Er hat nicht unbedingt einen Partner, darum ohne Grund.
+ */
+export const anfrageHinfaelligText = (mit: string, kategorie: string) =>
+	`Die Anfrage mit ${mit} für «${kategorie}» ist hinfällig.`;
