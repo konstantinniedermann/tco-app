@@ -48,7 +48,9 @@ verteilt der MyTCO-Admin die Rollen von Hand. Einzelheiten im
 
 **Konten mit Admin-Rolle sind nicht besonders geschützt** (Entscheid Projektleiter): Der
 Mitglieder-Admin ändert auch bei ihnen E-Mail, Brief-Code, Sitzungen und Austritt; nur den
-eigenen Austritt und das eigene Löschen nicht (RR-10). Ändert er
+eigenen Austritt und das eigene Löschen nicht (RR-10). Einen neuen Brief-Code für das eigene
+Konto darf er ausstellen: Er ist dann schon eingeloggt, und der neue Code wirft keine Geräte
+hinaus (Entscheid Projektleiter). Ändert er
 eine E-Mail, erhält die alte Adresse einen Hinweis (SI-09); das Restrisiko steht im
 [Sicherheitskonzept](sicherheitskonzept.md#restrisiken).
 

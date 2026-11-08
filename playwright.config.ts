@@ -1,5 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
+import { istE2eDatenbank } from './scripts/e2e.ts';
 import { DATENBANK_URL, e2eEinstellungen } from './tests/e2e/hilfen/umgebung.ts';
+
+// Nur über `npm run e2e` (scripts/e2e.ts) mit eigener Datenbank; ein direkter Aufruf von
+// Playwright füllte sonst die gemeinsame lokale Datenbank `mytco` mit Testkonten.
+if (!istE2eDatenbank(DATENBANK_URL)) {
+	throw new Error(
+		'E2E nur über «npm run e2e -- <datei>» starten (eigene Datenbank, scripts/e2e.ts).'
+	);
+}
 
 // `make e2e` wählt einen freien Port; leer oder ungültig gilt als nicht gesetzt.
 const e2ePort = process.env.E2E_PORT ?? '';
