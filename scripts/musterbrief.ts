@@ -25,7 +25,7 @@ const html = baueBriefHtml(
 		// Annahme K-10: App-Adresse nur, wenn ausdrücklich gesetzt, sonst die Live-Adresse.
 		adresse: process.env.MYTCO_ADRESSE || STANDARD_ADRESSE
 	},
-	readFileSync('src/lib/design/tokens.css', 'utf-8')
+	`${readFileSync('src/lib/design/tokens.css', 'utf-8')}\n${readFileSync('src/lib/design/brief.css', 'utf-8')}`
 );
 
 /** Seiten im PDF von Chromium (jede Seite ist ein eigenes `/Type /Page`-Objekt). */

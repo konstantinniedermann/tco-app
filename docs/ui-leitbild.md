@@ -363,8 +363,12 @@ verlassen?»** mit *Abbrechen* (Nebentaste: bleibt auf der Seite, die Eingaben b
 
 ## Brief (Druck)
 
-Der Brief mit dem Einmal-Code (A-LOGIN-01) ist eine A4-Seite ohne Seitenrand des Druckers
-(`@page { size: A4; margin: 0 }`). Er nutzt dieselben Farb-, Schrift- und Abstands-Tokens wie
+Der Brief mit dem Einmal-Code (A-LOGIN-01) ist eine A4-Seite ohne Seitenrand des Druckers.
+Sein Stil steht in `src/lib/design/brief.css` (die CSP erlaubt kein `<style>` und kein `style=`)
+und gilt in der App global. Deshalb liegt jede Regel unter `.brief`, und die Seite ist eine
+benannte (`@page brief { size: A4; margin: 0 }`, `.brief { page: brief }`); andere Druckseiten
+wie die Auskunft behalten ihren Druckrand. Mehrere Briefe folgen mit je einer Seite
+(`.brief + .brief { break-before: page }`). Er nutzt dieselben Farb-, Schrift- und Abstands-Tokens wie
 die App; nur Werte auf dem Papier stehen in absoluten Einheiten (Masse in `mm`, die
 Grundschrift in `pt`), deshalb in eigenen Tokens. Die Symbole der
 Anleitung (Teilen, Drei-Punkte-Menü) folgen dem Baustein *Symbol*: 24er-Raster, Strich 2,
@@ -373,7 +377,8 @@ Farbe `currentColor`, immer mit Text.
 **Annahme K-16.1:** Fensterkuvert C5/6 mit Fenster rechts. Die Lage des Adressfelds ist eine
 Konstante; ändert sich das Kuvert, ändern sich nur diese Tokens.
 
-Der Brief setzt seine Grundschrift `--brief-schrift` auf `html`; alle Schrift- und
+Der Brief setzt seine Grundschrift `--brief-schrift` beim Druck auf `html` (nur wo ein `.brief`
+steht, `html:has(.brief)`); alle Schrift- und
 Abstands-Tokens in `rem` werden damit auf Briefgrösse verkleinert, damit alles auf eine Seite
 passt.
 

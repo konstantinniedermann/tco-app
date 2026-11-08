@@ -1,7 +1,8 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, test } from 'vitest';
 import { pruefeDesignFestwerte } from '../../../../scripts/pruefungen/design-festwerte.ts';
 import { erzeugeBriefCode, formatiereBriefCode } from '../login/codes.ts';
-import { baueBriefHtml, type BriefDaten } from './brief.ts';
+import { baueBriefHtml, baueBriefInhalt, type BriefDaten } from './brief.ts';
 
 // Erfundenes Mitglied, erfundene Ansprechperson; der Code wird in jedem Test neu erzeugt.
 function daten(aenderungen: Partial<BriefDaten> = {}): BriefDaten {
@@ -20,6 +21,7 @@ function daten(aenderungen: Partial<BriefDaten> = {}): BriefDaten {
 }
 
 const TOKENS = ':root { --farbe-text: x; }';
+const BRIEF_CSS = readFileSync('src/lib/design/brief.css', 'utf-8');
 
 function qrSvg(html: string): string {
 	const treffer = /<div class="brief-qr">\s*(<svg[\s\S]*?<\/svg>)/.exec(html);
@@ -108,11 +110,43 @@ describe('baueBriefHtml', () => {
 
 	test('Druck-CSS nutzt nur Tokens, Symbole nur currentColor, kein style-Attribut', () => {
 		const html = baueBriefHtml(daten(), '');
-		const css = /<style>([\s\S]*?)<\/style>/.exec(html)?.[1] ?? '';
-		expect(css).toContain('@page');
-		expect(pruefeDesignFestwerte(new Map([['src/brief.css', css]]))).toEqual([]);
+		expect(BRIEF_CSS).toContain('@page brief');
+		expect(pruefeDesignFestwerte(new Map([['src/lib/design/brief.css', BRIEF_CSS]]))).toEqual([]);
 		const ohneQr = html.replace(/<div class="brief-qr">[\s\S]*?<\/svg>/, '');
 		expect(ohneQr).not.toMatch(/\sstyle=/);
 		expect(ohneQr).not.toMatch(/#[0-9a-f]{3,8}\b|(?<![\w-])(?:black|white)(?![\w-])/i);
+	});
+
+	test('brief.css wirkt nur unter .brief (läuft in der App global)', () => {
+		const css = BRIEF_CSS.replace(/\/\*[\s\S]*?\*\//g, '');
+		const selektoren = [...css.matchAll(/(?:^|[}{])\s*([^{}@]+)\{/g)].map((t) => t[1].trim());
+		expect(selektoren.length).toBeGreaterThan(5);
+		for (const liste of selektoren) {
+			for (const sel of liste.split(/,(?![^()]*\))/)) {
+				expect(sel.trim()).toMatch(/^(?:html:has\(\.brief\)|body:has\(\.brief\)|\.brief)(?![\w-])/);
+			}
+		}
+	});
+});
+
+describe('baueBriefInhalt', () => {
+	test('RR-04: Briefinhalt kommt ohne Stil aus (CSP)', () => {
+		const inhalt = baueBriefInhalt(daten());
+		expect(inhalt).not.toContain('<style');
+		expect(inhalt).not.toContain(' style=');
+		expect(inhalt.startsWith('<article class="brief">')).toBe(true);
+	});
+
+	test('A-LOGIN-01: Briefinhalt maskiert Namen mit Sonderzeichen', () => {
+		const inhalt = baueBriefInhalt(daten({ vorname: 'Ana<b>&"\'' }));
+		expect(inhalt).toContain('Ana&lt;b&gt;&amp;&quot;&#39;');
+		expect(inhalt).not.toContain('<b>');
+	});
+
+	test('A-LOGIN-01: eigenständiger Brief bettet die Stile ein', () => {
+		const d = daten({ code: 'ABCDEFGHJK' });
+		const html = baueBriefHtml(d, 'X-STIL');
+		expect(html).toMatch(/<style>[\s\S]*X-STIL[\s\S]*<\/style>/);
+		expect(html).toContain(baueBriefInhalt(d));
 	});
 });
