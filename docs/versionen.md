@@ -8,6 +8,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Rufname (#67), Doku zuerst: Datenschutz, Fachmodell und UI-Leitbild beschreiben den freiwilligen Rufnamen, den nur das Mitglied im Profil pflegt.
+
 ## 0.11.1 — Auskunft ohne Wildcard-Anträge, Doku-Abgleich
 
 - Auskunft: Von der Clubmeisterschaft zeigt sie nur noch bestätigte Anmeldungen, ohne Status und
