@@ -56,8 +56,9 @@ du selbst einschaltest. Für nichts anderes.
 - Fragst du jemanden als Doppelpartner an, sieht er deinen Namen, deine Klassierung und deine Telefonnummer
   (ohne Telefon deine E-Mail), damit er dich anrufen kann. Seine Kontaktdaten siehst du erst, wenn er annimmt.
   Anfragen, die abgelehnt, zurückgezogen oder hinfällig sind, löschen wir.
+  Deine Anfragen an Partner sieht auch die Turnierleitung (CM-Admin).
 - Deine Gegner und dein Doppelpartner sehen während der Clubmeisterschaft deine E-Mail und
-  Telefonnummer, damit ihr die Spiele absprechen könnt.
+  Telefonnummer, damit ihr die Spiele absprechen könnt. Trittst du aus, sieht dein Doppelpartner deine E-Mail und Telefonnummer nicht mehr.
 - Den Spielplan des Finalwochenendes sehen alle, auch ohne Login [**Vorschlag K-39**].
 - Die Kalenderdatei eines Anlasses (Titel, Zeit, Ort, Einladung) ist über ihren Link auch ohne
   Login abrufbar; sie enthält keine Angaben zu Personen.
