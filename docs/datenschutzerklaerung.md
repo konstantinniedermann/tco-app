@@ -19,7 +19,7 @@ Stand: [Datum]
 MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Fragen zum Datenschutz an:
 [Ansprechperson], [E-Mail-Adresse des Vereins].
 
-**Welche Daten:** Name, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Mitgliedernummer,
+**Welche Daten:** Name, freiwillig ein Rufname, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Mitgliedernummer,
 Lizenznummer und Klassierung, deine Anmeldungen zur Clubmeisterschaft (im Doppel auch Anfragen an Partner), Resultate und Lizenzanträge, deine An- oder
 Abmeldung zu Anlässen wie der Generalversammlung mit einer freiwilligen Bemerkung. Deine Grunddaten übernimmt
 der Verein aus seiner Mitgliederliste. Legt die Verwaltung einen Anlass an, speichert MyTCO, wer ihn
@@ -46,6 +46,7 @@ du selbst einschaltest. Für nichts anderes.
   Gesundheit.
 - Deinen Wildcard-Antrag und seinen Kommentar sehen nur du, die CM-Admins und die MyTCO-Admins.
   Schreib in den Kommentar bitte keine Angaben zur Gesundheit.
+- Deinen Rufnamen sehen eingeloggte Mitglieder neben deinem Namen, öffentliche Seiten zeigen ihn nicht. Du kannst ihn jederzeit im Profil ändern oder löschen.
 - Alle Mitglieder sehen Name, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft. Wer einen
   Doppelpartner sucht, sieht Name und Klassierung der Mitglieder, die für die Kategorie in Frage kommen. Fehlt
   eine Angabe, steht dort *Klassierung fehlt* oder *Angaben fehlen* (Geschlecht).
@@ -75,13 +76,15 @@ Name in vergangenen Resultaten und bei deinen Anmeldungen zur Clubmeisterschaft;
 nach Beginn des Anlasses [**Vorschlag K-50**].
 
 Auf Wunsch erhältst du eine Auskunft über alle Daten, die wir von dir gespeichert haben.
-Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge und
+Änderungen, die du bei anderen Mitgliedern ausgelöst hast, stehen nicht darin, weil sie andere
+betreffen. Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge und
 zurückgezogene Anmeldungen geben dir die CM-Admins Auskunft.
 
 **Login:** Du loggst dich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 dein Gerät das Login mit einem Cookie, bis du MyTCO ein Jahr nicht genutzt hast oder dich
 abmeldest; MyTCO speichert dazu je Gerät einen Eintrag mit dem Zeitpunkt der Anmeldung und der
-letzten Nutzung, ohne IP-Adresse und Gerätenamen. Forderst
+letzten Nutzung, ohne IP-Adresse und Gerätenamen; bei Admins dazu, wann sie die Verwaltung mit
+einem Code bestätigt haben, und beim MyTCO-Admin eine laufende «Ansicht als …». Forderst
 du einen neuen Code an, schickt MyTCO ihn an deine E-Mail-Adresse. Bis du den Code
 eingetippt hast, merkt sich dein Gerät diese Adresse; ist die Anfrage älter als 15 Minuten,
 löscht MyTCO sie spätestens beim nächsten Start. Deine IP-Adresse wird dabei höchstens

@@ -3,7 +3,7 @@ import pkg from '../../package.json' with { type: 'json' };
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import { bietetInstallationAn, startetVomSymbol } from './hilfen/geraet.ts';
 import { legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
-import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
 // Ruhiges App-Gefühl (#54): Fusszeile, Reiter, Seitenwechsel, Bedienung, Aufklappen.
 // Regeln: docs/ui-leitbild.md, Abschnitt «Bewegung und Bedienung», UI-09.
@@ -23,6 +23,7 @@ async function meldeAn(page: Page, vorname: string): Promise<void> {
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${vorname}` })).toBeVisible();
+	await wartetAufVorladen(page);
 }
 
 function reiter(page: Page, name: 'Start' | 'Profil') {
@@ -191,7 +192,7 @@ test('Tastatur: Reiter weg, solange ein Feld den Fokus hat (Handy)', async ({ pa
 	await profilKlappe(page, 'Meine Angaben').locator('summary').click();
 	await page.getByRole('button', { name: 'Ändern' }).first().click();
 	const navigation = page.getByRole('navigation', { name: 'Hauptnavigation' });
-	await page.getByLabel('Telefon (freiwillig)').focus();
+	await page.getByLabel('Rufname (freiwillig)').focus();
 	if (info.project.name === 'desktop') {
 		// Am PC (Maus) bleiben die Reiter.
 		await expect(navigation).toBeVisible();

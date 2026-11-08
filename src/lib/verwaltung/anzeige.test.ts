@@ -7,8 +7,11 @@ import {
 	geaendertText,
 	neueAngaben,
 	plakette,
+	rollenText,
 	datumText,
 	datumZeitText,
+	tagText,
+	zeitText,
 	wiedereintrittBis,
 	loeschungAm,
 	auskunftTitel
@@ -53,6 +56,12 @@ describe('Texte der Verwaltung', () => {
 		});
 	});
 
+	it('FR-26: ausgestellter Brief-Code steht ohne Wert im Verlauf', () => {
+		expect(aktionText({ aktion: 'brief-code-ausgestellt', detail: null })).toBe(
+			'Brief-Code ausgestellt'
+		);
+	});
+
 	it('FR-26, FR-46: Änderungen des CM-Admins an Anmeldungen stehen neutral im Verlauf', () => {
 		expect(aktionText({ aktion: 'cm-anmeldung-geaendert', detail: null })).toBe(
 			'CM-Anmeldung geändert (CM)'
@@ -93,11 +102,28 @@ describe('Texte der Verwaltung', () => {
 	});
 });
 
+describe('Rollen als Text', () => {
+	it('RR-08: Namen in fester Reihenfolge, durch Komma', () => {
+		expect(rollenText(['cm', 'mitglieder'])).toBe('Mitglieder-Admin, CM-Admin');
+		expect(rollenText(['lizenz'])).toBe('Lizenz-Admin');
+		expect(rollenText([])).toBe('');
+	});
+});
+
 describe('Datumstexte der Mitgliedschaft (Schweizer Zeit)', () => {
 	it('Datum als «7.11.2026», nach Zürcher Kalender', () => {
 		expect(datumText('2026-11-07T10:00:00Z')).toBe('7.11.2026');
 		expect(datumText('2026-11-07T23:30:00Z')).toBe('8.11.2026');
 		expect(datumText('2026-07-31T22:30:00Z')).toBe('1.8.2026');
+	});
+
+	it('«gültig bis» als «01.02.2027», nach Zürcher Kalender wie im Brief', () => {
+		expect(tagText('2027-01-31T10:00:00Z')).toBe('31.01.2027');
+		expect(tagText('2027-01-31T23:30:00Z')).toBe('01.02.2027');
+	});
+
+	it('Zeitpunkt im Verlauf in Zürcher Zeit, nicht in der des Browsers', () => {
+		expect(zeitText('2027-01-31T23:30:00Z')).toBe('01.02.27, 00:30');
 	});
 
 	it('Datum mit Zeit als «7.11.2026, 09:12»', () => {

@@ -1,5 +1,5 @@
 {
-  "id": "2d2ad031-a6e7-4bd3-8cec-0754137be37e",
+  "id": "fd60c3d4-f0ce-4536-bbe9-a12bd27e08ce",
   "prevId": "b7bd17b3-7657-4505-bca8-423376687584",
   "version": "7",
   "dialect": "postgresql",
@@ -347,12 +347,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "suchtext": {
-          "name": "suchtext",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "angemeldet_am": {
           "name": "angemeldet_am",
           "type": "timestamp with time zone",
@@ -405,10 +399,6 @@
         "anmeldung_status_check": {
           "name": "anmeldung_status_check",
           "value": "\"anmeldung\".\"status\" in ('bestaetigt', 'beantragt', 'abgelehnt', 'zurueckgezogen')"
-        },
-        "anmeldung_suchtext_check": {
-          "name": "anmeldung_suchtext_check",
-          "value": "char_length(\"anmeldung\".\"suchtext\") <= 120"
         }
       },
       "isRLSEnabled": false
@@ -832,6 +822,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "rufname": {
+          "name": "rufname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "strasse": {
           "name": "strasse",
           "type": "text",
@@ -1168,120 +1164,6 @@
         "mitteilung_weg_check": {
           "name": "mitteilung_weg_check",
           "value": "\"mitteilung\".\"weg\" in ('push', 'push-sonst-mail', 'push-und-mail')"
-        }
-      },
-      "isRLSEnabled": false
-    },
-    "public.partner_anfrage": {
-      "name": "partner_anfrage",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "kategorie_id": {
-          "name": "kategorie_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "von_id": {
-          "name": "von_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "an_id": {
-          "name": "an_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "gestellt_am": {
-          "name": "gestellt_am",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "partner_anfrage_an_idx": {
-          "name": "partner_anfrage_an_idx",
-          "columns": [
-            {
-              "expression": "an_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "partner_anfrage_kategorie_id_kategorie_id_fk": {
-          "name": "partner_anfrage_kategorie_id_kategorie_id_fk",
-          "tableFrom": "partner_anfrage",
-          "tableTo": "kategorie",
-          "columnsFrom": [
-            "kategorie_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "partner_anfrage_von_id_mitglied_id_fk": {
-          "name": "partner_anfrage_von_id_mitglied_id_fk",
-          "tableFrom": "partner_anfrage",
-          "tableTo": "mitglied",
-          "columnsFrom": [
-            "von_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "partner_anfrage_an_id_mitglied_id_fk": {
-          "name": "partner_anfrage_an_id_mitglied_id_fk",
-          "tableFrom": "partner_anfrage",
-          "tableTo": "mitglied",
-          "columnsFrom": [
-            "an_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "partner_anfrage_paar_unique": {
-          "name": "partner_anfrage_paar_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "kategorie_id",
-            "von_id",
-            "an_id"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {
-        "partner_anfrage_selbst_check": {
-          "name": "partner_anfrage_selbst_check",
-          "value": "\"partner_anfrage\".\"von_id\" <> \"partner_anfrage\".\"an_id\""
         }
       },
       "isRLSEnabled": false

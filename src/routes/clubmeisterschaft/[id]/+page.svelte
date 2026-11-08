@@ -26,6 +26,7 @@
 		kategorieText,
 		kommentarZaehlerText,
 		namenText,
+		paareText,
 		suchtextZaehlerText,
 		waehlbar,
 		vornameVon,
@@ -779,7 +780,7 @@
 			<span>
 				<strong>{k.name}</strong><br />
 				<span class="leise">{doppelText(k)}</span><br />
-				<span class="leise">{namenText(k.paare)}</span>
+				<span class="leise">{paareText(k.paare)}</span>
 			</span>
 			{#if offen && !nurAnsehen}
 				{#if voll}

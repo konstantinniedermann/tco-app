@@ -1,16 +1,13 @@
 // Klassierung, Geschlecht und Jahrgang für die CM-Anmeldung nachtragen (FR-37).
 import { eq } from 'drizzle-orm';
-import { utcZuZuerich } from '../../anlass/zeit.ts';
 import { istKlassierung, type Klassierung } from '../../turnier/klassierung.ts';
 import { fehlendeAngaben, type CmAngabe, type Spieler } from '../../turnier/passung.ts';
 import { schreibeVerlauf, type Urheber } from '../admin/verlauf.ts';
 import type { Db } from '../db/index.ts';
 import { mitglied } from '../db/schema.ts';
+import { jahrInZuerich } from '../datum.ts';
 
 export type CmFeld = CmAngabe;
-
-/** Kalenderjahr in Schweizer Zeit. */
-export const jahrInZuerich = (jetzt: Date): number => Number(utcZuZuerich(jetzt).slice(0, 4));
 
 /** Angaben eines Spielers aus der Mitgliederzeile; unbekannte Werte gelten als fehlend. */
 export function spielerAus(z: {

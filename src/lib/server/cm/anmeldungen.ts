@@ -2,6 +2,7 @@
 // A-ANMELDUNG-10, FR-05 bis FR-10, FR-37); Anfragen und Suche im Doppel in `doppel.ts`.
 import { and, asc, count, eq, gte, inArray, ne, sql } from 'drizzle-orm';
 import type { Klassierung } from '../../turnier/klassierung.ts';
+import type { Namensteile } from '../../name.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
 	anmeldung,
@@ -25,7 +26,8 @@ import {
 	type Spieler
 } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
-import { jahrInZuerich, spielerAus } from './angaben.ts';
+import { jahrInZuerich } from '../datum.ts';
+import { spielerAus } from './angaben.ts';
 
 export type CmStand = {
 	id: number;
@@ -47,7 +49,7 @@ export type CmKategorie = KategorieRegel & {
 	/** Die eigene aktive Anmeldung in dieser Kategorie, auch im Doppel. */
 	anmeldungId: number | null;
 	/** Einzel: Namen der Bestätigten; im Doppel leer, dort stehen `paare` und `suchende`. */
-	namen: string[];
+	namen: Namensteile[];
 	/** Doppel: «Vorname Nachname / Vorname Nachname» der bestätigten Paare. */
 	paare: string[];
 	/** Doppel: wer allein angemeldet ist und einen Partner sucht, ohne einen selbst. */
@@ -392,12 +394,13 @@ async function fuelleDoppel(db: Db, doppel: CmKategorie[], mitgliedId: number): 
 	}
 }
 
-/** «Vorname Nachname» der bestätigten Anmeldungen, nach Nachname, dann Vorname. */
+/** Namensteile der bestätigten Anmeldungen, nach Nachname, dann Vorname. */
 async function fuelleNamen(db: Db, kategorien: CmKategorie[]): Promise<void> {
 	if (kategorien.length === 0) return;
 	const zeilen = await db
 		.select({
 			kategorieId: anmeldung.kategorieId,
+			rufname: mitglied.rufname,
 			vorname: mitglied.vorname,
 			nachname: mitglied.nachname
 		})
@@ -418,7 +421,11 @@ async function fuelleNamen(db: Db, kategorien: CmKategorie[]): Promise<void> {
 			namenOrdnung.compare(a.nachname, b.nachname) || namenOrdnung.compare(a.vorname, b.vorname)
 	);
 	const nachId = new Map(kategorien.map((k) => [k.id, k]));
-	for (const z of zeilen) nachId.get(z.kategorieId)?.namen.push(`${z.vorname} ${z.nachname}`);
+	for (const z of zeilen) {
+		nachId
+			.get(z.kategorieId)
+			?.namen.push({ rufname: z.rufname, vorname: z.vorname, nachname: z.nachname });
+	}
 }
 
 type Gemeinsam = 'geschlossen' | 'voll' | 'schon-angemeldet' | 'angaben-fehlen' | 'nicht-gefunden';

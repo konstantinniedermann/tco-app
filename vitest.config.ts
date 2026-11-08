@@ -9,7 +9,13 @@ export default mergeConfig(
 			allowOnly: false,
 			coverage: {
 				provider: 'v8',
-				include: ['src/lib/server/**'],
+				// Fachlogik, die auch im Browser läuft, zählt mit (Testkonzept, Abdeckung).
+				include: [
+					'src/lib/server/**',
+					'src/lib/turnier/**',
+					'src/lib/anlass/stand.ts',
+					'src/lib/anlass/zeit.ts'
+				],
 				thresholds: { lines: 90, branches: 90, functions: 90, statements: 90 }
 			},
 			projects: [

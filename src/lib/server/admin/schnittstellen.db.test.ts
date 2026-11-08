@@ -3,7 +3,14 @@ import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { anmeldung, anmeldungSpieler, kontoRolle, mitglied, partnerAnfrage } from '../db/schema.ts';
+import {
+	anmeldung,
+	anmeldungSpieler,
+	kontoRolle,
+	mitglied,
+	partnerAnfrage,
+	sitzung
+} from '../db/schema.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
 import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
@@ -15,6 +22,9 @@ import {
 	postMitglieder,
 	postRollen,
 	postSitzungen,
+	getBriefe,
+	postBriefe,
+	postBrief,
 	postAustritt,
 	postWiedereintritt,
 	postLoeschen,
@@ -40,6 +50,7 @@ import { getAnlaesse } from '../anlass/schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 import { erstelleHinweis } from './hinweis-mail.ts';
 import { ladeMitglied } from './mitglieder.ts';
+import { MAX_BRIEFE } from './briefe.ts';
 import { setzeAnsicht } from './ansicht.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
@@ -63,6 +74,11 @@ afterEach(() => {
 
 const start = new Date('2026-11-02T12:00:00Z');
 const ADRESSE = 'https://mytco.example.org';
+const BRIEF = {
+	schluessel: 'y'.repeat(40),
+	adresse: ADRESSE,
+	kontakt: 'kontakt@example.org'
+};
 
 function baue() {
 	const post: { an: string; text: string }[] = [];
@@ -83,6 +99,7 @@ function baue() {
 		db,
 		zugang,
 		hinweis,
+		brief: BRIEF,
 		jetzt: () => start,
 		push: null,
 		mailer: async (n) => {
@@ -143,7 +160,7 @@ describe('Admin-Schnittstellen', () => {
 			([name]) =>
 				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(21);
+		expect(geschuetzt).toHaveLength(24);
 		for (const [name, fn] of geschuetzt) {
 			const mach = (konto?: AngemeldetesKonto) =>
 				ereignis({
@@ -178,7 +195,7 @@ describe('Admin-Schnittstellen', () => {
 			([name]) =>
 				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(21);
+		expect(geschuetzt).toHaveLength(24);
 		for (const [name, fn] of geschuetzt) {
 			for (const konto of [cm.konto, ehemals.konto]) {
 				const r = await fn(
@@ -276,6 +293,8 @@ describe('Admin-Schnittstellen', () => {
 			postMitglied,
 			postRollen,
 			postSitzungen,
+			postBriefe,
+			postBrief,
 			postAustritt,
 			postWiedereintritt,
 			postLoeschen,
@@ -385,6 +404,37 @@ describe('Admin-Schnittstellen', () => {
 		expect(mitEmail.status).toBe(200);
 		expect(s.hinweis).toHaveBeenCalledTimes(1);
 		expect(s.hinweis).toHaveBeenCalledWith(angaben.email);
+	});
+
+	test('SI-09: kein Hinweis an die alte Adresse bei vergeben/veraltet', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const { angaben, id, vorher } = await angelegt(s, admin.konto);
+		const andere = await angelegt(s, admin.konto);
+		const vergeben = await postMitglied(
+			s.d,
+			ereignis({
+				body: { ...angaben, email: andere.angaben.email, vorher },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect([vergeben.status, await vergeben.json()]).toEqual([
+			409,
+			{ fehler: 'vergeben', feld: 'email' }
+		]);
+		const veraltet = await postMitglied(
+			s.d,
+			ereignis({
+				body: { ...angaben, email: `neu-${id}@example.org`, vorher: { ...vorher, ort: 'Aarau' } },
+				params: { id: String(id) },
+				konto: admin.konto
+			})
+		);
+		expect([veraltet.status, await veraltet.json()]).toEqual([409, { fehler: 'veraltet' }]);
+		expect(s.hinweis).not.toHaveBeenCalled();
+		const [gespeichert] = await db.select().from(mitglied).where(eq(mitglied.id, id));
+		expect(gespeichert.email).toBe(angaben.email);
 	});
 
 	test('SI-09: scheitert der Hinweis, bleibt die Änderung gespeichert', async () => {
@@ -529,6 +579,97 @@ describe('Admin-Schnittstellen', () => {
 		expect(weg.status).toBe(404);
 	});
 
+	test('A-LOGIN-01: Mitglieder-Admin erzeugt Briefe für eine Auswahl', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const a = await legeMitgliedAn(db);
+		const b = await legeMitgliedAn(db);
+		const r = await postBriefe(
+			s.d,
+			ereignis({ body: { ids: [a.mitgliedId, b.mitgliedId] }, konto: admin.konto })
+		);
+		expect(r.status).toBe(200);
+		const { briefe } = (await r.json()) as { briefe: { mitgliedId: number; html: string }[] };
+		expect(briefe).toHaveLength(2);
+		for (const brief of briefe) expect(brief.html).toContain('class="brief"');
+		expect(briefe.map((x) => x.mitgliedId).sort()).toEqual([a.mitgliedId, b.mitgliedId].sort());
+	});
+
+	test('A-LOGIN-01: Liste der Briefe für den MyTCO-Admin lesbar', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mytco']);
+		const r = await getBriefe(s.d, ereignis({ method: 'GET', konto: admin.konto }));
+		expect(r.status).toBe(200);
+		expect(Array.isArray(await r.json())).toBe(true);
+	});
+
+	test('SI-10: Eingabe ohne Liste, leer, doppelt, zu gross oder über MAX_BRIEFE → 400', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const m = await legeMitgliedAn(db);
+		const zuviele = Array.from({ length: MAX_BRIEFE + 1 }, (_, i) => i + 1);
+		const schlecht: unknown[] = [
+			{},
+			{ ids: 'x' },
+			{ ids: [] },
+			{ ids: [m.mitgliedId, m.mitgliedId] },
+			{ ids: [0] },
+			{ ids: [-1] },
+			{ ids: [1.5] },
+			{ ids: ['1'] },
+			{ ids: [2 ** 31] },
+			{ ids: zuviele }
+		];
+		for (const body of schlecht) {
+			const r = await postBriefe(s.d, ereignis({ body, konto: admin.konto }));
+			expect([JSON.stringify(body).slice(0, 30), r.status, await r.json()]).toEqual([
+				JSON.stringify(body).slice(0, 30),
+				400,
+				{ fehler: 'eingabe' }
+			]);
+		}
+	});
+
+	test('A-LOGIN-01: nicht möglich → 409 mit Anzahl, kein Code ausgestellt', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const ok = await legeMitgliedAn(db);
+		const weg = await legeMitgliedAn(db, { status: 'ausgetreten' });
+		const r = await postBriefe(
+			s.d,
+			ereignis({ body: { ids: [ok.mitgliedId, weg.mitgliedId] }, konto: admin.konto })
+		);
+		expect([r.status, await r.json()]).toEqual([409, { fehler: 'nicht-moeglich', anzahl: 1 }]);
+	});
+
+	test('A-LOGIN-01: einzelner Brief für ein ausgetretenes Mitglied → 409 nicht-moeglich, unbekannte ID → 404', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const ok = await legeMitgliedAn(db);
+		const gut = await postBrief(
+			s.d,
+			ereignis({ body: {}, params: { id: String(ok.mitgliedId) }, konto: admin.konto })
+		);
+		expect(gut.status).toBe(200);
+		expect(((await gut.json()) as { briefe: unknown[] }).briefe).toHaveLength(1);
+		const weg = await legeMitgliedAn(db, { status: 'ausgetreten' });
+		const r = await postBrief(
+			s.d,
+			ereignis({ body: {}, params: { id: String(weg.mitgliedId) }, konto: admin.konto })
+		);
+		expect([r.status, await r.json()]).toEqual([409, { fehler: 'nicht-moeglich', anzahl: 1 }]);
+		for (const id of ['999999999', 'abc']) {
+			const n = await postBrief(s.d, ereignis({ body: {}, params: { id }, konto: admin.konto }));
+			expect([id, n.status]).toEqual([id, 404]);
+		}
+		const geloescht = await legeMitgliedAn(db, { status: 'geloescht' });
+		const g = await postBrief(
+			s.d,
+			ereignis({ body: {}, params: { id: String(geloescht.mitgliedId) }, konto: admin.konto })
+		);
+		expect(g.status).toBe(404);
+	});
+
 	test('A-MITGLIED-02: Liste mit Suche und Status; ungültiger Status → 400', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
@@ -623,6 +764,7 @@ describe('Admin-Schnittstellen', () => {
 		const rn = await getSitzung(ereignis({ konto: await einloggen(normal.kontoId) }), db);
 		expect(await ra.json()).toEqual({
 			vorname: 'Test',
+			rufname: null,
 			passkeyHinweis: false,
 			verwaltung: true,
 			ansicht: null
@@ -868,6 +1010,21 @@ describe('Mitgliedschaft: Austritt, Wiedereintritt, Löschung', () => {
 			const r = await post(fn, s, admin.konto, '999999999');
 			expect([r.status, await r.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
 		}
+	});
+
+	test('RR-10: eigener Austritt und eigenes Vormerken → 409 eigenes-konto, nichts geändert', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const id = String(admin.mitgliedId);
+		for (const fn of [postAustritt, postLoeschen]) {
+			const r = await post(fn, s, admin.konto, id);
+			expect([r.status, await r.json()]).toEqual([409, { fehler: 'eigenes-konto' }]);
+		}
+		expect((await ladeMitglied(db, admin.mitgliedId, start))!.status).toBe('aktiv');
+		// Das Login bleibt: keine Sitzung beendet.
+		expect(await db.select().from(sitzung).where(eq(sitzung.kontoId, admin.kontoId))).toHaveLength(
+			1
+		);
 	});
 
 	test('Wiedereintritt nach der Frist → 409 frist-abgelaufen', async () => {

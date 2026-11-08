@@ -27,7 +27,12 @@ export function holeAdminDienste(): AdminDienste {
 				mailer,
 				bremsen
 			}),
-			hinweis: erstelleHinweis({ mailer, kontakt: einstellungen.kontakt, bremsen })
+			hinweis: erstelleHinweis({ mailer, kontakt: einstellungen.kontakt, bremsen }),
+			brief: {
+				schluessel: einstellungen.codeSchluessel,
+				adresse: einstellungen.adresse,
+				kontakt: einstellungen.kontakt
+			}
 		};
 	}
 	return dienste;

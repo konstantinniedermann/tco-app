@@ -67,6 +67,8 @@ flowchart LR
 | Eigenständig | Eigene Mitgliederliste, keine Anbindung an Fairgate | [ADR-006](adr/adr-006-eigenstaendig-ohne-fairgate.md) |
 | Versionen | Jeder Merge nach `dev` mit Code bekommt seine eigene Versionsnummer | [ADR-007](adr/adr-007-version-pro-merge.md) |
 | Löschfristen | Ein täglicher Zeitgeber in der App ruft den Löschlauf auf, kein Cron, kein Datenbank-Job | [ADR-008](adr/adr-008-zeitgeber-in-der-app.md) |
+| Grüner Stand | Der Pre-Push-Hook prüft einen schon grün geprüften Stand nicht noch einmal voll; die CI prüft jeden Push auf `dev` | [ADR-009](adr/adr-009-gruener-stand.md) |
+| Öffentliches Repo | Repo öffentlich: CI gratis, `main` geschützt; nie echte Mitgliederdaten im Repo | [ADR-010](adr/adr-010-repo-oeffentlich.md) |
 
 ## 5 Bausteinsicht
 

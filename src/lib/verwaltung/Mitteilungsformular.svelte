@@ -2,6 +2,7 @@
 	import { tick } from 'svelte';
 	import { ANLASS_AUSWAHLEN } from '../mitteilung/auswahl.ts';
 	import { MAX_TEXT, MAX_TITEL } from '../mitteilung/vorlagen.ts';
+	import Name from '../ui/Name.svelte';
 	import type { Antwort } from './api.ts';
 	import { fehlerText } from './anzeige.ts';
 	import {
@@ -296,7 +297,7 @@
 				>
 				<ul>
 					{#each gueltig.namen as name, i (i)}
-						<li>{name}</li>
+						<li><Name {name} form="nachname-zuerst" /></li>
 					{/each}
 				</ul>
 			</details>

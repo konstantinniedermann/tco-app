@@ -1,5 +1,6 @@
 // Mitteilungen in der Verwaltung (FR-42 bis FR-45): Anfragen an `/api/admin/…/mitteilungen` und
 // die Texte, mit denen Formular, Vorschau und Verlauf Auswahl, Weg und Zahlen in Worten zeigen.
+import type { Namensteile } from '../name.ts';
 import type { AnlassAuswahl } from '../mitteilung/auswahl.ts';
 import { MAX_TEXT, MAX_TITEL, type Vorlage } from '../mitteilung/vorlagen.ts';
 import type { Weg } from '../server/db/schema.ts';
@@ -12,7 +13,7 @@ export type { Bezug, MitteilungFeld, Vorlage, Weg, Zahlen };
 export type MitteilungWerte = { titel: string; text: string; auswahl: string; weg: Weg };
 export type MitteilungVerlauf = Json<VerlaufEintrag>;
 export type Mitteilungen = { vorlagen: Vorlage[]; verlauf: MitteilungVerlauf[] };
-export type Vorschau = Omit<Zahlen, 'ersatzMails'> & { anzahl: number; namen: string[] };
+export type Vorschau = Omit<Zahlen, 'ersatzMails'> & { anzahl: number; namen: Namensteile[] };
 
 const pfad = (b: Bezug) =>
 	b.art === 'anlass' ? `/api/admin/anlaesse/${b.anlassId}/mitteilungen` : '/api/admin/mitteilungen';

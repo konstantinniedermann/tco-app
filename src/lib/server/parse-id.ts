@@ -1,5 +1,6 @@
 // Nummer aus der Adresse (`/…/[id]`) prüfen; gemeinsam für Admin- und Mitglieder-Schnittstellen.
-const INTEGER_MAX = 2_147_483_647;
+// Grösster Wert einer Postgres-integer-Spalte; auch für IDs aus JSON-Körpern.
+export const INTEGER_MAX = 2_147_483_647;
 
 export function parseId(roh: string | null | undefined): number | null {
 	if (roh === null || roh === undefined || !/^[1-9]\d{0,14}$/.test(roh)) return null;

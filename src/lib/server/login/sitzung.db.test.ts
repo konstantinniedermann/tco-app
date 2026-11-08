@@ -59,6 +59,7 @@ describe('Sitzungen', () => {
 				kontoId,
 				mitgliedId,
 				vorname,
+				rufname: null,
 				passkeyHinweis: false,
 				sitzungHash: hash(kennung),
 				ansicht: null
@@ -66,6 +67,13 @@ describe('Sitzungen', () => {
 			verlaengert: false
 		});
 		expect(await pruefeSitzung(db, 'unbekannt', jetzt)).toBeNull();
+	});
+
+	test('liefert Rufname', async () => {
+		const { kontoId, mitgliedId } = await legeMitgliedAn(db, { vorname: 'Johannes' });
+		await db.update(mitglied).set({ rufname: 'Hannes' }).where(eq(mitglied.id, mitgliedId));
+		const kennung = await erstelleSitzung(db, kontoId, jetzt);
+		expect((await pruefeSitzung(db, kennung, jetzt))?.konto.rufname).toBe('Hannes');
 	});
 
 	test('A-LOGIN-07: neue Sitzung ohne Angabe hat keinen Passkey-Hinweis', async () => {

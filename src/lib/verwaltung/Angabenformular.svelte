@@ -92,6 +92,10 @@
 	};
 
 	const geaendert = $derived(REIHE.some((f) => werte[f] !== start[f]));
+	/** Weicht ein Feld vom geladenen Stand ab? Für die Seite, die das Formular einbettet. */
+	export function ungespeichert(): boolean {
+		return geaendert;
+	}
 	const bezeichnung = (f: Feld) =>
 		FREIWILLIG.includes(f) ? `${FELD_NAMEN[f]} (freiwillig)` : FELD_NAMEN[f];
 

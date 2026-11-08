@@ -26,7 +26,7 @@ afterAll(async () => {
 
 const start = new Date('2026-11-02T12:00:00Z');
 
-async function bestaetigterMytcoAdmin() {
+async function bestaetigterMytcoAdmin(rollen: string[] = ['mytco', 'mitglieder']) {
 	const db = eigene!.db;
 	const post: { text: string }[] = [];
 	const zugang = erstelleZugangDienst({
@@ -43,12 +43,17 @@ async function bestaetigterMytcoAdmin() {
 		db,
 		zugang,
 		hinweis: async () => {},
+		brief: {
+			schluessel: 'y'.repeat(40),
+			adresse: 'https://mytco.example.org',
+			kontakt: 'kontakt@example.org'
+		},
 		jetzt: () => start,
 		push: null,
 		mailer: async () => {},
 		adresse: 'https://mytco.example.org'
 	};
-	const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
+	const admin = await legeMitgliedAn(db, { rollen });
 	const kennung = await erstelleSitzung(db, admin.kontoId, start);
 	const konto = (await pruefeSitzung(db, kennung, start))!.konto;
 	await (
@@ -131,7 +136,9 @@ describe('Admin-Schnittstelle Rollen, eigene Datenbank', () => {
 	});
 
 	test('RR-03: Austritt und Vormerken des letzten MyTCO-Admins → 409 letzter-mytco', async () => {
-		const { d, admin, konto } = await bestaetigterMytcoAdmin();
+		const { admin } = await bestaetigterMytcoAdmin();
+		// RR-10: Den Austritt erfasst ein anderer Mitglieder-Admin (zählt nicht als MyTCO-Admin).
+		const { d, konto } = await bestaetigterMytcoAdmin(['mitglieder']);
 		// Die Tests davor haben weitere MyTCO-Admins angelegt; dieser soll der einzige sein.
 		await eigene!.db
 			.delete(kontoRolle)

@@ -92,6 +92,6 @@ betrieb-nachweis: voraussetzungen-docker image ## Lokaler Gesamtnachweis auf Doc
 secrets: ## Secret-Scan über die ganze Git-Historie (gitleaks)
 	@gitleaks git --no-banner --redact --exit-code 1 .
 
-hooks: ## Versionierte Git-Hooks aktivieren (Secret-Scan, Code-Prüfung bei Commit und Push, kein Push auf main)
+hooks: ## Versionierte Git-Hooks aktivieren (Secret-Scan, Code-Prüfung bei Commit und Push, Versionsprüfung beim Push auf dev, kein Push auf main)
 	@git config core.hooksPath .githooks
 	@echo "Git-Hooks aus .githooks/ aktiv."

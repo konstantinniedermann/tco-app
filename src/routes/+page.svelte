@@ -5,6 +5,7 @@
 	import { standText as cmStandText } from '../lib/cm/anzeige.ts';
 	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { hinweisErledigt, kannPasskey, richtePasskeyEin } from '../lib/login/passkey.ts';
+	import { anredeName } from '../lib/name.ts';
 	import PushHinweis from '../lib/push/PushHinweis.svelte';
 	import { datumLang } from '../lib/verwaltung/turnier-anzeige.ts';
 	import type { PageProps } from './$types';
@@ -42,7 +43,7 @@
 	<title>MyTCO</title>
 </svelte:head>
 
-<h1>Hoi {data.vorname}</h1>
+<h1>Hoi {anredeName({ rufname: data.rufname, vorname: data.vorname })}</h1>
 
 {#if data.verwaltung}
 	<a class="karte kachel" href={resolve('/verwaltung')}>

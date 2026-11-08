@@ -15,69 +15,6 @@ export type BriefDaten = {
 	kontakt: string;
 };
 
-// Druck-Layout nur aus Tokens (UI-Leitbild, Abschnitt «Brief (Druck)»); die mm-Masse des
-// Papiers stehen in tokens.css. Annahme K-16.1: Fensterkuvert C5/6 mit Fenster rechts, die
-// Lage des Adressfelds kommt aus --brief-fenster-*.
-const DRUCK_CSS = `
-@page { size: A4; margin: 0; }
-* { box-sizing: border-box; }
-html, body { margin: 0; }
-html { font-size: var(--brief-schrift); }
-body {
-	background: var(--farbe-flaeche);
-	color: var(--farbe-text);
-	font-family: var(--schrift-text);
-	font-size: var(--groesse-klein);
-	line-height: var(--zeilenhoehe-text);
-}
-h1, h2, p, ol, address { margin: 0; }
-.brief { position: relative; padding: var(--brief-rand); }
-.brief-absender {
-	position: absolute;
-	top: var(--brief-rand);
-	left: var(--brief-rand);
-	color: var(--farbe-marke);
-	font-size: var(--groesse-gross);
-	font-weight: 700;
-	line-height: var(--zeilenhoehe-titel);
-}
-.brief-absender span { display: block; color: var(--farbe-text-leise); font-size: var(--groesse-klein); font-weight: 400; }
-.brief-fenster {
-	margin-top: calc(var(--brief-fenster-oben) - var(--brief-rand));
-	margin-left: calc(var(--brief-fenster-links) - var(--brief-rand));
-	width: var(--brief-fenster-breite);
-	font-size: var(--groesse-text);
-	font-style: normal;
-}
-.brief-inhalt { margin-top: var(--abstand-6); display: grid; gap: var(--abstand-5); }
-.brief-inhalt h1 { color: var(--farbe-marke); font-size: var(--groesse-gross); line-height: var(--zeilenhoehe-titel); }
-.brief-text { display: grid; gap: var(--abstand-2); }
-.brief-zugang {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	gap: var(--abstand-6);
-	align-items: center;
-	padding: var(--abstand-4);
-	border: var(--rand-dick) solid var(--farbe-marke);
-	border-radius: var(--radius);
-}
-.brief-qr svg { display: block; width: var(--brief-qr); height: var(--brief-qr); margin: 0 auto; }
-.brief-qr-adresse { margin-top: var(--abstand-1); font-family: var(--schrift-code); text-align: center; white-space: nowrap; }
-.brief-code-titel { color: var(--farbe-text-leise); }
-.brief-code {
-	font-family: var(--schrift-code);
-	font-size: var(--groesse-titel);
-	font-weight: 700;
-	letter-spacing: var(--abstand-1);
-	line-height: var(--zeilenhoehe-titel);
-}
-.brief-anleitung { display: grid; grid-template-columns: 1fr 1fr; gap: var(--abstand-6); }
-.brief-anleitung h2 { color: var(--farbe-marke); font-size: var(--groesse-text); margin-bottom: var(--abstand-2); }
-.brief-anleitung ol { display: grid; gap: var(--abstand-2); padding-left: var(--abstand-5); }
-.symbol { width: var(--groesse-symbol); height: var(--groesse-symbol); vertical-align: middle; color: var(--farbe-marke); }
-.brief-leise { color: var(--farbe-text-leise); }
-`;
-
 const ZEICHEN: Record<string, string> = {
 	'&': '&amp;',
 	'<': '&lt;',
@@ -90,8 +27,11 @@ function maskiere(text: string): string {
 	return text.replace(/[&<>"']/g, (zeichen) => ZEICHEN[zeichen]);
 }
 
-/** QR-Code als skalierbares SVG; Ruhezone 4 Module (cellSize 1, margin 4). */
-function qrSvg(adresse: string): string {
+/**
+ * QR-Code als skalierbares SVG; Ruhezone 4 Module (cellSize 1, margin 4). Für eine Serie einmal
+ * bauen und an `baueBriefInhalt` geben: Die Adresse ist in allen Briefen dieselbe.
+ */
+export function baueQrSvg(adresse: string): string {
 	const qr = qrcode(0, 'M');
 	qr.addData(adresse);
 	qr.make();
@@ -99,26 +39,16 @@ function qrSvg(adresse: string): string {
 }
 
 /**
- * Der Brief mit dem Einmal-Code als eigenständiges HTML (A4, Druck-Layout). `tokensCss` ist
- * der Inhalt von `src/lib/design/tokens.css`; er wird eingebettet, weil das PDF ohne Server
- * entsteht. Alle eingesetzten Werte sind HTML-maskiert.
+ * Der Inhalt des Briefs mit dem Einmal-Code als `<article class="brief">`, ohne Stil: Das
+ * Druck-Layout steht in `src/lib/design/brief.css` (die CSP erlaubt kein `<style>` und kein
+ * `style=` in der App). Alle eingesetzten Werte sind HTML-maskiert. `qr` ist der QR-Code zu
+ * `d.adresse` aus `baueQrSvg`; fehlt er, entsteht er hier.
  */
-export function baueBriefHtml(d: BriefDaten, tokensCss: string): string {
+export function baueBriefInhalt(d: BriefDaten, qr: string = baueQrSvg(d.adresse)): string {
 	const adresse = maskiere(d.adresse);
 	const datenschutz = maskiere(`${d.adresse.replace(/\/+$/, '')}/datenschutz`);
 	const code = maskiere(formatiereBriefCode(d.code));
-	return `<!doctype html>
-<html lang="de-CH">
-<head>
-<meta charset="utf-8">
-<title>MyTCO – Dein Zugang</title>
-<style>
-${tokensCss}
-${DRUCK_CSS}
-</style>
-</head>
-<body>
-<main class="brief">
+	return `<article class="brief">
 <p class="brief-absender">TC Olten<span>MyTCO, die App für Mitglieder</span></p>
 <address class="brief-fenster">${maskiere(d.vorname)} ${maskiere(d.nachname)}<br>${maskiere(d.strasse)}<br>${maskiere(d.plz)} ${maskiere(d.ort)}</address>
 <div class="brief-inhalt">
@@ -128,7 +58,7 @@ ${DRUCK_CSS}
 </div>
 <div class="brief-zugang">
 <div>
-<div class="brief-qr">${qrSvg(d.adresse)}</div>
+<div class="brief-qr">${qr}</div>
 <p class="brief-qr-adresse">${adresse}</p>
 </div>
 <div>
@@ -164,7 +94,26 @@ ${DRUCK_CSS}
 <p class="brief-leise">Wie MyTCO mit deinen Daten umgeht: ${datenschutz}</p>
 </div>
 </div>
-</main>
+</article>`;
+}
+
+/**
+ * Der Brief als eigenständiges HTML (A4, Druck-Layout). `stile` ist der Inhalt von
+ * `src/lib/design/tokens.css` und `brief.css`, aneinandergehängt; er wird eingebettet, weil das
+ * PDF ohne Server entsteht.
+ */
+export function baueBriefHtml(d: BriefDaten, stile: string): string {
+	return `<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<title>MyTCO – Dein Zugang</title>
+<style>
+${stile}
+</style>
+</head>
+<body>
+${baueBriefInhalt(d)}
 </body>
 </html>
 `;

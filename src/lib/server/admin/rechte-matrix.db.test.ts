@@ -96,6 +96,11 @@ function baue() {
 		db: db(),
 		zugang,
 		hinweis: vi.fn<AdminDienste['hinweis']>(async () => {}),
+		brief: {
+			schluessel: 'y'.repeat(40),
+			adresse: 'https://mytco.example.org',
+			kontakt: 'kontakt@example.org'
+		},
 		jetzt: () => start,
 		push: vi.fn<NonNullable<MitteilungAdminDienste['push']>>(async () => 'ok'),
 		mailer: vi.fn<MitteilungAdminDienste['mailer']>(async () => {}),

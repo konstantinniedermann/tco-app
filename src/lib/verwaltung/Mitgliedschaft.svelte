@@ -9,21 +9,37 @@
 		type Antwort,
 		type MitgliedDetail
 	} from './api.ts';
-	import { VERALTET, datumText, fehlerText, loeschungAm, wiedereintrittBis } from './anzeige.ts';
+	import {
+		VERALTET,
+		datumText,
+		fehlerText,
+		loeschungAm,
+		rollenText,
+		wiedereintrittBis
+	} from './anzeige.ts';
 	import { leiteUm } from './umleiten.ts';
 
 	// Karte «Mitgliedschaft»: Austritt, Wiedereintritt, Löschen und Zurücknehmen (FR-04).
 	// `nurLesen`: Ansicht als … oder MyTCO-Admin; dann keine Tasten, der Link zur Auskunft bleibt.
-	let { detail, nurLesen }: { detail: MitgliedDetail; nurLesen: boolean } = $props();
+	// `eigene`: die eigene Seite des Admins; Austritt und Löschen erfasst ein anderer (RR-10).
+	let { detail, nurLesen, eigene }: { detail: MitgliedDetail; nurLesen: boolean; eigene: boolean } =
+		$props();
 
 	const mg = $derived(detail.mitgliedschaft);
 	const status = $derived(detail.status);
-	// Die Löschung geht zurück in den Zustand davor; `austrittAm` bleibt bei der Vormerkung stehen.
+	// Die Löschung geht zurück in den Zustand davor. Invariante: Der Wiedereintritt leert
+	// `austrittAm`, das Vormerken lässt es stehen. Darum heisst `austrittAm` bei «vorgemerkt»:
+	// vorher ausgetreten.
 	const davor = $derived(mg.austrittAm === null ? 'aktiv' : 'ausgetreten');
 	const name = $derived(`${detail.angaben.vorname} ${detail.angaben.nachname}`);
+	const rollen = $derived(rollenText(detail.rollen));
+	const rollenWort = $derived(detail.rollen.length === 1 ? 'Rolle' : 'Rollen');
 
 	let austrittFrage = $state<HTMLDialogElement>();
 	let loeschenFrage = $state<HTMLDialogElement>();
+	let zurueckFrage = $state<HTMLDialogElement>();
+	// Welchen Schritt die Rückfrage «… bekommt die Rolle(n) … zurück» bestätigt.
+	let zurueck = $state<'wiedereintritt' | 'rueckgaengig'>('wiedereintritt');
 	// Daten der Rückfragen: nur zur Anzeige, der Server rechnet selbst.
 	let frist = $state('');
 	let loeschDatum = $state('');
@@ -41,6 +57,20 @@
 		loeschenFrage?.showModal();
 	}
 
+	const ZURUECK = { wiedereintritt: erfasseWiedereintritt, rueckgaengig: nimmLoeschungZurueck };
+
+	// RR-08: Gespeicherte Admin-Rollen wirken wieder, sobald das Login zurückkommt; dann erst
+	// nachfragen. «Löschung rückgängig» gibt das Login nur zurück, wenn das Mitglied vorher aktiv war.
+	function frageZurueck(art: 'wiedereintritt' | 'rueckgaengig') {
+		const loginKommt = art === 'wiedereintritt' || davor === 'aktiv';
+		if (detail.rollen.length === 0 || !loginKommt) {
+			fuehreAus(ZURUECK[art]);
+			return;
+		}
+		zurueck = art;
+		zurueckFrage?.showModal();
+	}
+
 	// Eine Anfrage nach der anderen: ein Doppelklick schickt nicht zwei Mal.
 	let laeuft = false;
 	async function fuehreAus(aktion: (id: number) => Promise<Antwort<unknown>>) {
@@ -53,6 +83,7 @@
 			const a = await aktion(detail.id);
 			austrittFrage?.close();
 			loeschenFrage?.close();
+			zurueckFrage?.close();
 			if (await leiteUm(a)) return;
 			if (a.art === 'ok') {
 				erledigt = true;
@@ -62,6 +93,11 @@
 			} else if (a.art === 'veraltet') veraltet = true;
 			else if (a.art === 'letzter-mytco')
 				fehler = 'Das ist der letzte MyTCO-Admin. Gib die Rolle zuerst jemand anderem.';
+			else if (a.art === 'eigenes-konto')
+				fehler =
+					aktion === erfasseAustritt
+						? 'Deinen eigenen Austritt erfasst ein anderer Mitglieder-Admin.'
+						: 'Dich selbst merkt ein anderer Mitglieder-Admin zum Löschen vor.';
 			else if (a.art === 'frist-abgelaufen')
 				fehler = 'Die Frist für den Wiedereintritt ist vorbei. Leg das Mitglied neu an.';
 			else fehler = fehlerText(a);
@@ -103,21 +139,29 @@
 	{/if}
 
 	{#if !nurLesen}
-		<div class="leiste">
-			{#if status === 'aktiv'}
-				<button type="button" class="taste-neben" onclick={frageAustritt}>Austritt erfassen</button>
-				<button type="button" class="taste-neben" onclick={frageLoeschen}>Mitglied löschen</button>
-			{:else if status === 'ausgetreten'}
-				<button type="button" class="taste-neben" onclick={() => fuehreAus(erfasseWiedereintritt)}
-					>Wiedereintritt erfassen</button
-				>
-				<button type="button" class="taste-neben" onclick={frageLoeschen}>Mitglied löschen</button>
-			{:else if status === 'vorgemerkt'}
-				<button type="button" class="taste-neben" onclick={() => fuehreAus(nimmLoeschungZurueck)}
-					>Löschung rückgängig machen</button
-				>
-			{/if}
-		</div>
+		{#if eigene && status !== 'vorgemerkt'}
+			<p class="leise">Deinen Austritt und dein Löschen erfasst ein anderer Mitglieder-Admin.</p>
+		{:else}
+			<div class="leiste">
+				{#if status === 'aktiv'}
+					<button type="button" class="taste-neben" onclick={frageAustritt}
+						>Austritt erfassen</button
+					>
+					<button type="button" class="taste-neben" onclick={frageLoeschen}>Mitglied löschen</button
+					>
+				{:else if status === 'ausgetreten'}
+					<button type="button" class="taste-neben" onclick={() => frageZurueck('wiedereintritt')}
+						>Wiedereintritt erfassen</button
+					>
+					<button type="button" class="taste-neben" onclick={frageLoeschen}>Mitglied löschen</button
+					>
+				{:else if status === 'vorgemerkt'}
+					<button type="button" class="taste-neben" onclick={() => frageZurueck('rueckgaengig')}
+						>Löschung rückgängig machen</button
+					>
+				{/if}
+			</div>
+		{/if}
 		{#if status === 'vorgemerkt'}
 			<p class="leise">Danach ist das Mitglied wieder {davor}, wie vorher.</p>
 		{/if}
@@ -170,6 +214,23 @@
 		>
 		<button type="button" class="taste-haupt" onclick={() => fuehreAus(loescheMitglied)}
 			>Mitglied löschen</button
+		>
+	</div>
+</dialog>
+
+<dialog class="karte" bind:this={zurueckFrage} aria-labelledby="zurueck-titel">
+	<h2 id="zurueck-titel">
+		{zurueck === 'wiedereintritt'
+			? `Wiedereintritt von ${name} erfassen?`
+			: `Löschung von ${name} rückgängig machen?`}
+	</h2>
+	<p>{detail.angaben.vorname} bekommt die {rollenWort} {rollen} zurück.</p>
+	<div class="leiste">
+		<button type="button" class="taste-neben" onclick={() => zurueckFrage?.close()}
+			>Abbrechen</button
+		>
+		<button type="button" class="taste-haupt" onclick={() => fuehreAus(ZURUECK[zurueck])}
+			>Weiter</button
 		>
 	</div>
 </dialog>

@@ -50,8 +50,8 @@ classDiagram
     Resultat "1" *-- "0..3" Satz
     Lizenzrunde "1" *-- "*" Lizenzantrag
     Lizenzantrag "*" --> "1" Mitglied
-    Anlass "1" *-- "*" AnmeldungAnlass
-    AnmeldungAnlass "*" --> "1" Mitglied
+    Anlass "1" *-- "*" AnlassAnmeldung
+    AnlassAnmeldung "*" --> "1" Mitglied
     Anlass "*" --> "0..1" Mitglied : erstellt von
     Konto "1" *-- "*" PushAbo
     PushAbo "*" --> "1" Sitzung
@@ -59,8 +59,8 @@ classDiagram
     Mitteilung "*" --> "0..1" Mitglied : von
 ```
 
-`AnmeldungAnlass` ist im Diagramm die *Anmeldung (Anlass)*, zur Unterscheidung von der
-Anmeldung zu einem Turnier.
+`AnlassAnmeldung` ist im Diagramm die *Anmeldung (Anlass)*, zur Unterscheidung von der
+Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 
 ## Objekte
 
@@ -68,7 +68,7 @@ Anmeldung zu einem Turnier.
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Mitglied** | Mitgliedernummer (aus Fairgate; Pflicht beim Einlesen und beim Befehl *Admin festlegen*, sonst freiwillig, A-MITGLIED-07; eindeutig ohne Rücksicht auf Gross-/Kleinschreibung, gespeichert wie eingegeben), Vorname, Nachname, Postadresse, E-Mail (eindeutig, FR-25; fehlt bei Junioren, die ein Elternteil führt), Telefon, Geschlecht, Jahrgang (K-40.2; für Lizenzanträge hängt an K-40.1), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28; Werte N1–N4, R1–R9 oder *keine Lizenz*, Skala als Annahme bis K-25.1; fehlt sie, ist sie *nicht angegeben*), Status *aktiv / ausgetreten / Löschung vorgemerkt / gelöscht*, Austrittsdatum, *vorgemerkt am* und *Status vor dem Vormerken* (für die Bedenkzeit und die Rücknahme), *verwaltet von* (Mitglied, nur bei Junioren ohne eigenes Login, Vorschlag K-08), *für Fairgate offen seit* (Zeitpunkt, gesetzt, wenn das Mitglied Adresse, E-Mail oder Telefon selbst ändert; gelöscht, wenn der Mitglieder-Admin die Angaben nach Fairgate übertragen hat — Annahme K-19.2, A-KONTO-02) | alle ausser Status |
+| **Mitglied** | Mitgliedernummer (aus Fairgate; Pflicht beim Einlesen und beim Befehl *Admin festlegen*, sonst freiwillig, A-MITGLIED-07; eindeutig ohne Rücksicht auf Gross-/Kleinschreibung, gespeichert wie eingegeben), Vorname, Nachname, Rufname (freiwillig, pflegt das Mitglied selbst; höchstens 10 Zeichen, leer = keiner, gleich wie der Vorname gilt in der Anzeige als keiner), Postadresse, E-Mail (eindeutig, FR-25; fehlt bei Junioren, die ein Elternteil führt), Telefon, Geschlecht, Jahrgang (K-40.2; für Lizenzanträge hängt an K-40.1), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28; Werte N1–N4, R1–R9 oder *keine Lizenz*, Skala: Annahme K-25.1; fehlt sie, ist sie *nicht angegeben*), Status *aktiv / ausgetreten / Löschung vorgemerkt / gelöscht*, Austrittsdatum, *vorgemerkt am* und *Status vor dem Vormerken* (für die Bedenkzeit und die Rücknahme), *verwaltet von* (Mitglied, nur bei Junioren ohne eigenes Login, Vorschlag K-08), *für Fairgate offen seit* (Zeitpunkt, gesetzt, wenn das Mitglied Adresse, E-Mail oder Telefon selbst ändert; gelöscht, wenn der Mitglieder-Admin die Angaben nach Fairgate übertragen hat — Annahme K-19.2, A-KONTO-02) | alle ausser Status |
 | **Konto** | Brief-Code und Mail-Code getrennt, je nur als Hash mit Ablauf; beim Brief-Code dazu *benutzt am*, beim Mail-Code die Zahl der Fehlversuche (FR-24). Sitzungsversion, Sitzungen (eine je Gerät, mit *angemeldet am* und *zuletzt genutzt*), Daten beim ersten Login ergänzt ja/nein (mit FR-02), gesperrt ja/nein, Themen *Anlässe* / *Clubmeisterschaft* / *Verein* ja/nein (für neue Konten an, FR-41), Passkeys (je Gerät öffentlicher Schlüssel, Kennung, Zähler, Übertragungswege, Domain, Gerätename, eingerichtet am, zuletzt benutzt; freiwillig, A-LOGIN-07) und die zufällige Passkey-Kennung des Kontos (gesetzt beim ersten Versuch, einen Passkey einzurichten). Je Sitzung ein Merker für den Passkey-Hinweis (gesetzt beim Login per Code) und die Bestätigung der Verwaltung mit Zeitpunkt, Admin-Code als Hash mit Ablauf und Fehlversuchen (SI-08), dazu die Rolle einer laufenden *Ansicht als …* (nur beim MyTCO-Admin, A-ROLLE-09) | alle |
 | **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](rollen-und-rechte.md) fest | — |
 | **Aenderung** | Eintrag im Änderungsverlauf: Mitglied, von (Mitglied, das die Änderung ausgelöst hat; leer bei automatisch, dann *MyTCO*; ist das auslösende Konto gelöscht, *gelöschtes Konto*), Feld oder Aktion, Zeitpunkt; ohne alte und neue Werte (FR-26) | Mitglied, von |
@@ -132,7 +132,7 @@ Anmeldung zu einem Turnier.
 | FR-15 | Rangliste je Gruppe nach gewonnenen Spielen; bei Gleichstand 1. Direktbegegnung, 2. Satzdifferenz, 3. Gamedifferenz; danach Korrektur durch den CM-Admin | A-RESULTAT-06, [Glossar](glossar.md#clubmeisterschaft-und-turnier) | geplant |
 | FR-16 | Ein Spieler des Spiels meldet das Resultat, der Gegner bestätigt oder bestreitet es. Ohne Reaktion gilt es nach 3 Tagen als bestätigt; bei Streit entscheidet der CM-Admin (Annahme K-32) | A-RESULTAT-03, A-RESULTAT-04 | geplant |
 | FR-17 | Erfasst der CM-Admin ein Resultat, ist es sofort bestätigt | A-RESULTAT-07 | geplant |
-| FR-18 | Rangliste und Folgespiele rechnen nur mit bestätigten Resultaten | A-RESULTAT-06 | geplant |
+| FR-18 | Die Rangliste einer Gruppe rechnet schon mit gemeldeten Resultaten; bis zur Bestätigung tragen sie die Plakette «unbestätigt». Folgespiele im KO entstehen nur aus bestätigten Resultaten (#66) | A-RESULTAT-06 | geplant |
 | FR-19 | Gegner und Doppelpartner sehen E-Mail und Telefon, bis das Turnier *abgeschlossen* ist | N-DATENSCHUTZ-02, K-31 | geplant |
 | FR-20 | Ein Mitglied hat je Lizenzrunde höchstens einen offenen Lizenzantrag. Zurückziehen geht, solange er *beantragt* ist | A-LIZENZ-01, A-LIZENZ-02 | geplant |
 | FR-21 | Ein Antrag gehört zur nächsten Lizenzrunde, deren Stichtag noch nicht vorbei ist. Storno entspricht der Sistierung bei Swiss Tennis (Annahme K-34) | A-LIZENZ-03 | geplant |

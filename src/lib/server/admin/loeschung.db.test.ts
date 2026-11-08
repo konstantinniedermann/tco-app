@@ -73,6 +73,7 @@ async function ausgetreten(austrittAm: Date) {
 			status: 'ausgetreten',
 			austrittAm,
 			mitgliedernummer: `T-${m.mitgliedId}`,
+			rufname: 'Hannes',
 			telefon: '079 000 00 00',
 			geschlecht: 'w',
 			jahrgang: 1980,
@@ -365,7 +366,9 @@ describe('Konto löschen', () => {
 
 		const anlassSeite = await ladeAnlassAdmin(db, anlassId);
 		expect(anlassSeite).not.toBeNull();
-		expect(anlassSeite?.anmeldungen.map((a) => a.name)).toEqual(['Bleibt, Beat']);
+		expect(anlassSeite?.anmeldungen.map((a) => a.name)).toEqual([
+			{ rufname: null, vorname: 'Beat', nachname: 'Bleibt' }
+		]);
 		expect(JSON.stringify(anlassSeite)).not.toContain(NACHNAME);
 		const mitteilungen = await ladeMitteilungsverlauf(db, { art: 'anlass', anlassId }, jetzt);
 		expect(mitteilungen).toHaveLength(1);

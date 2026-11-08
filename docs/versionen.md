@@ -8,6 +8,36 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.13.0 — Login-Briefe aus der Verwaltung
+
+- Briefe (#43, Etappe 2a): Der Mitglieder-Admin stellt einen neuen Brief-Code einzeln aus oder
+  erzeugt Briefe für alle, die MyTCO noch nie geöffnet haben, und druckt sie aus einer Druckansicht
+  des Browsers. Der Code erscheint nur dort; Verlaufseintrag «Brief-Code ausgestellt».
+- Mitgliedschaft (#43): Den eigenen Austritt und das eigene Löschen erfasst ein anderer
+  Mitglieder-Admin (RR-10). Kommen beim Wiedereintritt oder «Löschung rückgängig» gespeicherte
+  Admin-Rollen zurück, fragt die Verwaltung vorher nach. Jahr und Zeitpunkte der Verwaltung in
+  Schweizer Zeit, auch auf einem Server in UTC.
+
+## 0.12.0 — Rufname
+
+- Rufname (#67): Wer will, trägt im Profil unter «Meine Angaben» einen Rufnamen ein (höchstens 10 Zeichen).
+  Die Startseite grüsst damit («Hoi Hannes»), und die anderen im Club sehen ihn mit dem amtlichen Namen
+  dahinter; Mitgliederverwaltung, Auskunft und Brief bleiben beim amtlichen Namen. Datenschutz, Fachmodell
+  und UI-Leitbild beschreiben ihn.
+
+## 0.11.2 — Auswahlfelder am iPhone, Auskunft vollständiger, Beobachtungs-Auswertung
+
+- Auswahlfelder (z. B. Geschlecht, Klassierung) sind auf allen Geräten so hoch wie die Textfelder;
+  auf dem iPhone waren sie halb so hoch (UI-03).
+- Auskunft: nennt je Gerät, wann ein Admin die Verwaltung bestätigt hat, und eine laufende
+  «Ansicht als …»; die Datenschutzerklärung nennt diese Daten und dass Änderungen bei anderen
+  Mitgliedern nicht in der Auskunft stehen.
+- Prüfungen: Service Worker wird typgeprüft; Abdeckung misst auch die Fachlogik in
+  `src/lib/turnier` und `src/lib/anlass`; zwei wacklige E2E-Tests (Install-Angebot, Vorladen)
+  warten jetzt auf die App.
+- Doku aus der Beobachtungs-Auswertung: ADR-009 (Grüner Stand), ADR-010 (öffentliches Repo),
+  Glossar, eigene Datenbank für E2E bei parallelen Sessions.
+
 ## 0.11.1 — Auskunft ohne Wildcard-Anträge, Doku-Abgleich
 
 - Auskunft: Von der Clubmeisterschaft zeigt sie nur noch bestätigte Anmeldungen, ohne Status und

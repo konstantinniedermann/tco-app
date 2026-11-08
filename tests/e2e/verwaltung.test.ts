@@ -10,7 +10,8 @@ import {
 	legeOffenenAnlassAn,
 	legeRollenkontoMitBriefCodeAn,
 	legeTurnierAn,
-	schliesseLoginHilfen
+	schliesseLoginHilfen,
+	setzeRufname
 } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
@@ -123,6 +124,10 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 	await expect(verlauf).toContainText('Telefon geändert');
 	await expect(verlauf).toContainText('Rolle CM-Admin vergeben');
 	await expect(verlauf).not.toContainText('+41 00 000 00 00');
+	// UI-03: Das Auswahlfeld ist so hoch wie die Textfelder, auch in WebKit (iPhone).
+	const hoehe = async (id: string) => (await page.locator(`#${id}`).boundingBox())!.height;
+	expect(await hoehe('feld-geschlecht')).toBeGreaterThanOrEqual(48);
+	expect(await hoehe('feld-geschlecht')).toBeCloseTo(await hoehe('feld-telefon'), 0);
 	await pruefeBildschirm(page, info, 'verwaltung-mitglied');
 
 	await page.getByRole('link', { name: 'Ganzer Verlauf' }).click();
@@ -618,5 +623,22 @@ test('RR-07, Regel 2: Mitglieder-Admin sieht keine Rollenvergabe', async ({ page
 	await expect(page.getByLabel('Vorname', { exact: true })).toBeEnabled();
 	await expect(page.locator('summary', { hasText: 'Rollen' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'mitglieder-admin-ohne-rollen');
+	expect(fehler).toEqual([]);
+});
+
+test('Rufname: die Mitgliederverwaltung zeigt den amtlichen Namen und den Rufnamen in einer eigenen Zeile', async ({
+	page
+}) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeAdminMitBriefCodeAn('Rita');
+	const nachname = `Probe${randomUUID().slice(0, 8)}`;
+	const mitglied = await legeKontoAn('Johannes', nachname);
+	await setzeRufname(mitglied.mitgliedId, 'Hannes');
+	await oeffneVerwaltung(page, admin);
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	await expect(
+		page.getByRole('heading', { level: 1, name: new RegExp(`^${nachname}, Johannes`) })
+	).toBeVisible();
+	await expect(page.getByText('Rufname Hannes', { exact: true })).toBeVisible();
 	expect(fehler).toEqual([]);
 });

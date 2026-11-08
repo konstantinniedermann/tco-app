@@ -56,7 +56,8 @@ verhält, zeigt allein die [Checkliste](#checkliste-vor-dem-release).
 Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelheit. Heute
 (`tests/e2e/`): Login per Einmal-Code und eingeloggt bleiben, Passkey, Startseite, Hilfe und
 Datenschutzerklärung ohne Login, Profil mit E-Mail-Wechsel, Benachrichtigungen, Anlässe,
-Mitteilungen, Verwaltung mit Rollen, Austritt, Löschen und Auskunft, Turnier und Kategorien,
+Mitteilungen, Verwaltung mit Rollen, Briefe einzeln und als Serie mit Druckansicht, Austritt,
+Löschen und Auskunft, Turnier und Kategorien,
 CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, dazu Bedienung (Wappen,
 Statusleiste, Fusszeile, Fokusrahmen). Später *Daten ergänzen* beim ersten Login (FR-02, noch
 geplant).
@@ -69,7 +70,8 @@ der neuen Adresse nach einem E-Mail-Wechsel prüft nur das iPhone.
 ## Abdeckung
 
 Die CI misst, welcher Code durch Tests läuft. **Mindestens 90 %** gilt für Fachlogik und
-Rechte-Prüfung; darunter schlägt die CI an. Für die Oberfläche gibt es keine Zahl; dort
+Rechte-Prüfung (`src/lib/server/`, dazu die Fachlogik, die auch im Browser läuft: `src/lib/turnier/`,
+`src/lib/anlass/stand.ts` und `zeit.ts`); darunter schlägt die CI an. Für die Oberfläche gibt es keine Zahl; dort
 zählen die Ende-zu-Ende-Tests und das Review.
 
 ## Anforderung → Testfall
@@ -134,6 +136,7 @@ die Umleitung (`MAIL_NUR_AN`) an den Projektleiter; der Betreff nennt den urspr�
 Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39); bis dahin lässt sich die Checkliste nur lokal (`make betrieb-nachweis`) vorbereiten. Jeder Punkt nennt die IDs, die er prüft:
 
 - [ ] QR-Code aus einem Testbrief öffnet MyTCO; im Brief für Live steht `my.tcolten.ch` (A-LOGIN-01, A-LOGIN-04)
+- [ ] Brief aus der Druckansicht der Verwaltung in Chrome und in Safari auf Papier drucken (Massstab 100 %): Adresse liegt im Fenster des Kuverts C5/6, eine Seite je Brief (A-LOGIN-01)
 - [ ] MyTCO lässt sich auf den Startbildschirm legen und startet von dort
 - [ ] Login mit Einmal-Code klappt; nach Neustart des Handys weiterhin eingeloggt (A-LOGIN-08, A-LOGIN-09)
 - [ ] Neuer Code per E-Mail kommt an und landet nicht im Spam (A-LOGIN-10)

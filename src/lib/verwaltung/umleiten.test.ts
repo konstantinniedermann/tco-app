@@ -14,6 +14,7 @@ describe('RR-07: Bereiche der Verwaltung je Rolle', () => {
 		expect(bereichVon('/verwaltung/mitglieder/12')).toBe('mitglieder');
 		expect(bereichVon('/verwaltung/anlaesse/neu')).toBe('mitglieder');
 		expect(bereichVon('/verwaltung/fairgate')).toBe('mitglieder');
+		expect(bereichVon('/verwaltung/briefe')).toBe('mitglieder');
 		expect(bereichVon('/verwaltung/verlauf')).toBe('mitglieder');
 		expect(bereichVon('/verwaltung/mitteilungen')).toBe('mitglieder');
 		expect(bereichVon('/verwaltung/turniere/3/kategorien/7')).toBe('cm');

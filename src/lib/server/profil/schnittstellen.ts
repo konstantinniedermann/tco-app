@@ -11,7 +11,7 @@ import {
 } from '../login/schnittstellen.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
 import { setzeKlassierung } from '../cm/angaben.ts';
-import { EIGENE_FELDER, aendereEigeneAngaben, ladeEigeneAngaben } from './angaben.ts';
+import { EIGENE_FELDER, aendereEigeneAngaben, ladeEigeneAngaben, setzeRufname } from './angaben.ts';
 import type { EmailWechselDienst } from './email-wechsel.ts';
 
 export type ProfilDienste = { db: Db; wechsel: EmailWechselDienst; jetzt?: () => Date };
@@ -43,10 +43,14 @@ export function getProfil(d: ProfilDienste, e: Ereignis): Promise<Response> {
 		if (!angaben) return antwort(404, { fehler: 'nicht-gefunden' });
 		// FR-37: Die Klassierung gehört nicht zu den Angaben der Verwaltung, das Profil zeigt sie extra.
 		const [m] = await d.db
-			.select({ klassierung: mitglied.klassierung })
+			.select({ klassierung: mitglied.klassierung, rufname: mitglied.rufname })
 			.from(mitglied)
 			.where(eq(mitglied.id, konto.mitgliedId));
-		return antwort(200, { angaben, klassierung: m?.klassierung ?? null });
+		return antwort(200, {
+			angaben,
+			klassierung: m?.klassierung ?? null,
+			rufname: m?.rufname ?? null
+		});
 	});
 }
 
@@ -96,6 +100,26 @@ export function postKlassierung(d: ProfilDienste, e: Ereignis): Promise<Response
 					fehler: 'eingabe',
 					felder: { klassierung: 'Bitte deine Klassierung wählen.' }
 				});
+			case 'nicht-gefunden':
+				return antwort(404, { fehler: 'nicht-gefunden' });
+		}
+	});
+}
+
+export function postRufname(d: ProfilDienste, e: Ereignis): Promise<Response> {
+	return aendernd(e, async (konto, koerper) => {
+		const r = await setzeRufname(d.db, konto.mitgliedId, koerper.rufname, jetzt(d));
+		switch (r.ergebnis) {
+			case 'ok': {
+				// Die Antwort nennt den gespeicherten Wert, so zeigt die Seite den getrimmten Rufnamen.
+				const [m] = await d.db
+					.select({ rufname: mitglied.rufname })
+					.from(mitglied)
+					.where(eq(mitglied.id, konto.mitgliedId));
+				return antwort(200, { rufname: m?.rufname ?? null });
+			}
+			case 'eingabe':
+				return antwort(400, { fehler: 'eingabe', felder: { rufname: r.fehler } });
 			case 'nicht-gefunden':
 				return antwort(404, { fehler: 'nicht-gefunden' });
 		}

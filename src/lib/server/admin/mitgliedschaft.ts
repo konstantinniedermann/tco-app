@@ -121,18 +121,26 @@ export type MitRueckzug = { ergebnis: 'ok'; cm: Rueckzug };
 const vermerke = (tx: DbOderTx, id: number, urheber: Urheber, aktion: Aktion, jetzt: Date) =>
 	schreibeVerlauf(tx, id, urheber, [{ aktion }], jetzt);
 
-/** FR-04: Austritt ab sofort, nur aus `aktiv`. RR-03: nicht für den letzten MyTCO-Admin. */
+// RR-10: Den eigenen Austritt erfasst, sich selbst merkt ein anderer Mitglieder-Admin vor.
+const istEigenes = (urheber: Urheber, id: number) =>
+	urheber.art !== 'automatisch' && urheber.mitgliedId === id;
+
+/**
+ * FR-04: Austritt ab sofort, nur aus `aktiv`. RR-10: nicht der eigene. RR-03: nicht für den
+ * letzten MyTCO-Admin.
+ */
 export function erfasseAustritt(
 	db: Db,
 	urheber: Urheber,
 	id: number,
 	jetzt: Date
-): Promise<MitRueckzug | 'nicht-gefunden' | 'veraltet' | 'letzter-mytco'> {
+): Promise<MitRueckzug | 'nicht-gefunden' | 'veraltet' | 'eigenes-konto' | 'letzter-mytco'> {
 	return uebergang(
 		db,
 		id,
 		['aktiv'],
 		async (tx, _m, kontoId) => {
+			if (istEigenes(urheber, id)) return 'eigenes-konto' as const;
 			if (await waereLetzterMytco(tx, kontoId)) return 'letzter-mytco' as const;
 			await tx
 				.update(mitglied)
@@ -167,18 +175,22 @@ export function erfasseWiedereintritt(
 	});
 }
 
-/** «Mitglied löschen»: aus `aktiv` oder `ausgetreten` zum Löschen vormerken (Bedenkzeit). */
+/**
+ * «Mitglied löschen»: aus `aktiv` oder `ausgetreten` zum Löschen vormerken (Bedenkzeit).
+ * RR-10: nicht sich selbst. RR-03: nicht den letzten MyTCO-Admin.
+ */
 export function merkeZumLoeschenVor(
 	db: Db,
 	urheber: Urheber,
 	id: number,
 	jetzt: Date
-): Promise<MitRueckzug | 'nicht-gefunden' | 'veraltet' | 'letzter-mytco'> {
+): Promise<MitRueckzug | 'nicht-gefunden' | 'veraltet' | 'eigenes-konto' | 'letzter-mytco'> {
 	return uebergang(
 		db,
 		id,
 		['aktiv', 'ausgetreten'],
 		async (tx, m, kontoId) => {
+			if (istEigenes(urheber, id)) return 'eigenes-konto' as const;
 			if (await waereLetzterMytco(tx, kontoId)) return 'letzter-mytco' as const;
 			// `austrittAm` bleibt: Rückgängig stellt «ausgetreten» mit dem alten Datum wieder her.
 			await tx

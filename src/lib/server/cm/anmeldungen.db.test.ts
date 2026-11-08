@@ -81,6 +81,7 @@ async function offenesTurnierMit<T>(lege: (turnierId: number) => Promise<T>) {
 }
 
 type Angaben = Partial<{
+	rufname: string | null;
 	vorname: string;
 	nachname: string;
 	geschlecht: 'w' | 'm' | null;
@@ -162,7 +163,7 @@ describe('CM-Anmeldung', () => {
 
 		const zeta = await spieler({ vorname: 'Anna', nachname: 'Zeta' });
 		const alphaB = await spieler({ vorname: 'Bert', nachname: 'Alpha' });
-		const alphaA = await spieler({ vorname: 'Adam', nachname: 'Alpha' });
+		const alphaA = await spieler({ rufname: 'Addi', vorname: 'Adam', nachname: 'Alpha' });
 		const weg = await spieler({ vorname: 'Weg', nachname: 'Gezogen' });
 		const beantragt = await spieler({ vorname: 'Be', nachname: 'Antragt' });
 		for (const s of [zeta, alphaB, alphaA])
@@ -209,7 +210,11 @@ describe('CM-Anmeldung', () => {
 					mindestsumme: null,
 					passt: true,
 					anmeldungId: null,
-					namen: ['Adam Alpha', 'Bert Alpha', 'Anna Zeta'],
+					namen: [
+						{ rufname: 'Addi', vorname: 'Adam', nachname: 'Alpha' },
+						{ rufname: null, vorname: 'Bert', nachname: 'Alpha' },
+						{ rufname: null, vorname: 'Anna', nachname: 'Zeta' }
+					],
 					...ohneDoppel
 				},
 				{
@@ -298,7 +303,7 @@ describe('CM-Anmeldung', () => {
 		expect(ansicht?.kategorien.find((k) => k.id === b)).toMatchObject({
 			passt: true,
 			anmeldungId: idB,
-			namen: ['Ida Ich']
+			namen: [{ rufname: null, vorname: 'Ida', nachname: 'Ich' }]
 		});
 		const laufend = await laufendeTurniere(db, ich, t.jetzt);
 		expect(laufend.find((z) => z.id === t.id)).toEqual({
@@ -556,7 +561,7 @@ describe('CM-Anmeldung', () => {
 				name: 'Herren R4–R6',
 				passt: false,
 				anmeldungId: null,
-				namen: ['Fünf Passend']
+				namen: [{ rufname: null, vorname: 'Fünf', nachname: 'Passend' }]
 			})
 		]);
 		expect(vorher?.kategorien.map((k) => k.id)).toEqual(passend);
@@ -586,12 +591,18 @@ describe('CM-Anmeldung', () => {
 		]);
 		// Der Antrag steht im Wildcard-Bereich, nicht doppelt unter den Kategorien.
 		expect(nachher?.wildcard).toEqual([
-			expect.objectContaining({ id: stark, anmeldungId: id, namen: ['Fünf Passend'] })
+			expect.objectContaining({
+				id: stark,
+				anmeldungId: id,
+				namen: [{ rufname: null, vorname: 'Fünf', nachname: 'Passend' }]
+			})
 		]);
 		expect(nachher?.kategorien.map((k) => k.id)).toEqual(passend);
 		// Andere sehen den Antrag nicht unter den Namen (nur bestätigte).
 		const fremd = await ladeCmAnsicht(db, t.id, r5, t.jetzt);
-		expect(fremd?.kategorien.find((k) => k.id === stark)?.namen).toEqual(['Fünf Passend']);
+		expect(fremd?.kategorien.find((k) => k.id === stark)?.namen).toEqual([
+			{ rufname: null, vorname: 'Fünf', nachname: 'Passend' }
+		]);
 
 		expect(await beantrageWildcard(db, stark, ich, 'Nochmals.', t.jetzt)).toBe('schon-angemeldet');
 		expect(await meldeAn(db, passend[0], ich, t.jetzt)).toBe('ok');

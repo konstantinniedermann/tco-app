@@ -1,0 +1,129 @@
+/* Druck-Layout des Briefs nur aus Tokens (UI-Leitbild, Abschnitt «Brief (Druck)»); die mm-Masse
+   des Papiers stehen in tokens.css. Annahme K-16.1: Fensterkuvert C5/6 mit Fenster rechts, die
+   Lage des Adressfelds kommt aus --brief-fenster-*.
+   Die Datei wirkt in der App global: jede Regel steht unter .brief, damit andere Seiten
+   (z. B. die Auskunft mit ihrem Druckrand) unverändert bleiben. */
+@page brief {
+	size: A4;
+	margin: 0;
+}
+@media print {
+	html:has(.brief) {
+		margin: 0;
+		font-size: var(--brief-schrift);
+	}
+	body:has(.brief) {
+		margin: 0;
+	}
+}
+.brief,
+.brief * {
+	box-sizing: border-box;
+}
+.brief {
+	page: brief;
+	position: relative;
+	padding: var(--brief-rand);
+	background: var(--farbe-flaeche);
+	color: var(--farbe-text);
+	font-family: var(--schrift-text);
+	font-size: var(--groesse-klein);
+	line-height: var(--zeilenhoehe-text);
+}
+.brief + .brief {
+	break-before: page;
+}
+.brief :is(h1, h2, p, ol, address) {
+	margin: 0;
+}
+.brief .brief-absender {
+	position: absolute;
+	top: var(--brief-rand);
+	left: var(--brief-rand);
+	color: var(--farbe-marke);
+	font-size: var(--groesse-gross);
+	font-weight: 700;
+	line-height: var(--zeilenhoehe-titel);
+}
+.brief .brief-absender span {
+	display: block;
+	color: var(--farbe-text-leise);
+	font-size: var(--groesse-klein);
+	font-weight: 400;
+}
+.brief .brief-fenster {
+	margin-top: calc(var(--brief-fenster-oben) - var(--brief-rand));
+	margin-left: calc(var(--brief-fenster-links) - var(--brief-rand));
+	width: var(--brief-fenster-breite);
+	font-size: var(--groesse-text);
+	font-style: normal;
+}
+.brief .brief-inhalt {
+	margin-top: var(--abstand-6);
+	display: grid;
+	gap: var(--abstand-5);
+}
+.brief .brief-inhalt h1 {
+	color: var(--farbe-marke);
+	font-size: var(--groesse-gross);
+	line-height: var(--zeilenhoehe-titel);
+}
+.brief .brief-text {
+	display: grid;
+	gap: var(--abstand-2);
+}
+.brief .brief-zugang {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: var(--abstand-6);
+	align-items: center;
+	padding: var(--abstand-4);
+	border: var(--rand-dick) solid var(--farbe-marke);
+	border-radius: var(--radius);
+}
+.brief .brief-qr svg {
+	display: block;
+	width: var(--brief-qr);
+	height: var(--brief-qr);
+	margin: 0 auto;
+}
+.brief .brief-qr-adresse {
+	margin-top: var(--abstand-1);
+	font-family: var(--schrift-code);
+	text-align: center;
+	white-space: nowrap;
+}
+.brief .brief-code-titel {
+	color: var(--farbe-text-leise);
+}
+.brief .brief-code {
+	font-family: var(--schrift-code);
+	font-size: var(--groesse-titel);
+	font-weight: 700;
+	letter-spacing: var(--abstand-1);
+	line-height: var(--zeilenhoehe-titel);
+}
+.brief .brief-anleitung {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--abstand-6);
+}
+.brief .brief-anleitung h2 {
+	color: var(--farbe-marke);
+	font-size: var(--groesse-text);
+	margin-bottom: var(--abstand-2);
+}
+.brief .brief-anleitung ol {
+	display: grid;
+	gap: var(--abstand-2);
+	padding-left: var(--abstand-5);
+}
+.brief .symbol {
+	width: var(--groesse-symbol);
+	height: var(--groesse-symbol);
+	vertical-align: middle;
+	color: var(--farbe-marke);
+}
+.brief .brief-leise {
+	color: var(--farbe-text-leise);
+}

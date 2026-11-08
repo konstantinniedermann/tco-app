@@ -78,6 +78,7 @@ async function turnier(namen: string[] = ['Herren A'], offen = true) {
 
 type Angaben = Partial<{
 	vorname: string;
+	rufname: string | null;
 	nachname: string;
 	status: string;
 	geschlecht: 'w' | 'm' | null;
@@ -87,8 +88,8 @@ type Angaben = Partial<{
 
 /** Erfundener Spieler; ohne Angaben ein Herr, Jahrgang 1990, R3. */
 async function spieler(teil: Angaben = {}) {
-	const { vorname, nachname, status, ...angaben } = teil;
-	const m = await legeMitgliedAn(db, { vorname, nachname, status });
+	const { vorname, rufname, nachname, status, ...angaben } = teil;
+	const m = await legeMitgliedAn(db, { vorname, rufname, nachname, status });
 	await db
 		.update(mitglied)
 		.set({ geschlecht: 'm', jahrgang: 1990, klassierung: 'R3', ...angaben })
@@ -521,6 +522,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		const zeta = await spieler({ vorname: 'Anna', nachname: 'Zeta' });
 		const alphaB = await spieler({
 			vorname: 'Bert',
+			rufname: 'Hannes',
 			nachname: 'Alpha',
 			klassierung: null,
 			geschlecht: null,
@@ -541,7 +543,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				kommentar: null,
 				mitgliedId: alphaA,
 				mitgliedStatus: 'aktiv',
-				name: 'Alpha, Adam',
+				name: { rufname: null, vorname: 'Adam', nachname: 'Alpha' },
 				geschlecht: 'm',
 				jahrgang: 1990,
 				klassierung: 'keine'
@@ -552,7 +554,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				kommentar: 'Bin besser',
 				mitgliedId: alphaB,
 				mitgliedStatus: 'aktiv',
-				name: 'Alpha, Bert',
+				name: { rufname: 'Hannes', vorname: 'Bert', nachname: 'Alpha' },
 				geschlecht: null,
 				jahrgang: null,
 				klassierung: null
@@ -563,7 +565,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				kommentar: null,
 				mitgliedId: zeta,
 				mitgliedStatus: 'aktiv',
-				name: 'Zeta, Anna',
+				name: { rufname: null, vorname: 'Anna', nachname: 'Zeta' },
 				geschlecht: 'm',
 				jahrgang: 1990,
 				klassierung: 'R3'
@@ -653,17 +655,33 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		const treffer = await sucheSpieler(db, 'pr');
 		expect(treffer).toContainEqual({
 			mitgliedId: probe,
-			name: `Probe, Paul${zeichen}`,
+			name: { rufname: null, vorname: `Paul${zeichen}`, nachname: 'Probe' },
 			geschlecht: 'm',
 			jahrgang: 1990,
 			klassierung: null
 		});
-		expect(treffer.some((z) => z.name.includes(`Paula${zeichen}`))).toBe(false);
+		expect(treffer.some((z) => z.name.vorname.includes(`Paula${zeichen}`))).toBe(false);
 		expect((await sucheSpieler(db, `PAUL${zeichen}`)).map((z) => z.mitgliedId)).toEqual([probe]);
 		// Der ganze Name zusammen, in beiden Reihenfolgen.
 		for (const name of [`Paul${zeichen} Probe`, `probe, paul${zeichen}`, `Probe Paul${zeichen}`]) {
 			expect((await sucheSpieler(db, name)).map((z) => z.mitgliedId)).toEqual([probe]);
 		}
+
+		// Der Rufname wird mitgesucht.
+		const hannes = await spieler({
+			vorname: `Johannes${zeichen}`,
+			rufname: 'Hannes',
+			nachname: 'Rufer'
+		});
+		const gefunden = await sucheSpieler(db, `Hannes`);
+		expect(gefunden).toContainEqual(
+			expect.objectContaining({
+				mitgliedId: hannes,
+				name: { rufname: 'Hannes', vorname: `Johannes${zeichen}`, nachname: 'Rufer' }
+			})
+		);
+		expect((await sucheSpieler(db, `Hann`)).map((z) => z.mitgliedId)).toContain(hannes);
+		expect((await sucheSpieler(db, 'Hannes Rufer')).map((z) => z.mitgliedId)).toEqual([hannes]);
 
 		const viele = `Viele${zeichen}`;
 		for (let i = 0; i < 21; i++) await spieler({ vorname: `V${i}`, nachname: viele });

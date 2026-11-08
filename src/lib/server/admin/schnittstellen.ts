@@ -1,5 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
+import { mitglied } from '../db/schema.ts';
 import {
 	antwort,
 	formatFehler,
@@ -8,7 +10,8 @@ import {
 	type Ereignis
 } from '../login/schnittstellen.ts';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
-import { parseId } from '../parse-id.ts';
+import { jahrInZuerich } from '../datum.ts';
+import { INTEGER_MAX, parseId } from '../parse-id.ts';
 import { pruefeAnlass } from '../anlass/angaben.ts';
 import {
 	aendereAnlass,
@@ -27,6 +30,7 @@ import {
 	listeMitglieder,
 	type MitgliedStatus
 } from './mitglieder.ts';
+import { listeBriefEmpfaenger, MAX_BRIEFE, stelleBriefeAus, type BriefAbh } from './briefe.ts';
 import { ladeAuskunft } from './auskunft.ts';
 import { setzeAnsicht } from './ansicht.ts';
 import {
@@ -56,6 +60,8 @@ export type AdminDienste = {
 	zugang: ZugangDienst;
 	// SI-09: Hinweis an die alte Adresse; wirft nie.
 	hinweis: (an: string) => Promise<void>;
+	// Schlüssel, Adresse und Kontakt für die Briefe (Brief-Code, Text).
+	brief: BriefAbh;
 	jetzt?: () => Date;
 };
 
@@ -213,7 +219,7 @@ export function getMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Respon
 export function postMitglieder(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
 		const t = jetzt(d);
-		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: t.getFullYear() });
+		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: jahrInZuerich(t) });
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.fehler });
 		const r = await legeMitgliedAn(d.db, urheber, p.angaben, t);
 		return r.ergebnis === 'ok'
@@ -235,7 +241,7 @@ export function postMitglied(d: AdminDienste, e: AdminEreignis): Promise<Respons
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const t = jetzt(d);
-		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: t.getFullYear() });
+		const p = pruefeAngaben(koerper, { nummerPflicht: false, jahr: jahrInZuerich(t) });
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.fehler });
 		// Der Stand, den die Seite geladen hat: schützt vor dem Überschreiben fremder Änderungen.
 		const vorher = leseStand(koerper.vorher);
@@ -300,6 +306,49 @@ export function postSitzungen(d: AdminDienste, e: AdminEreignis): Promise<Respon
 		if (id === null) return nichtGefunden();
 		const r = await beendeSitzungenVon(d.db, urheber, id, jetzt(d));
 		return r === 'ok' ? antwort(200, {}) : nichtGefunden();
+	});
+}
+
+// A-LOGIN-01: Empfänger der Brief-Serie. Die Antworten der Brief-Schnittstellen enthalten Codes im
+// Klartext und werden nirgends geloggt (SI-05).
+export function getBriefe(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return liest(d, e, 'mitglieder', async () =>
+		antwort(200, await listeBriefEmpfaenger(d.db, jetzt(d)))
+	);
+}
+
+// 1 bis MAX_BRIEFE verschiedene ganze Zahlen von 1 bis INTEGER_MAX.
+function leseIds(roh: unknown): number[] | null {
+	if (!Array.isArray(roh) || roh.length < 1 || roh.length > MAX_BRIEFE) return null;
+	if (!roh.every((x) => typeof x === 'number' && Number.isInteger(x) && x > 0 && x <= INTEGER_MAX))
+		return null;
+	return new Set(roh).size === roh.length ? (roh as number[]) : null;
+}
+
+export function postBriefe(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
+		const ids = leseIds(koerper.ids);
+		if (ids === null) return eingabeFehler();
+		const r = await stelleBriefeAus(d.db, d.brief, urheber, ids, jetzt(d));
+		return r.ergebnis === 'ok'
+			? antwort(200, { briefe: r.briefe })
+			: antwort(409, { fehler: 'nicht-moeglich', anzahl: r.anzahl });
+	});
+}
+
+export function postBrief(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'mitglieder', async (urheber) => {
+		const id = parseId(e.params.id);
+		if (id === null) return nichtGefunden();
+		const [m] = await d.db
+			.select({ status: mitglied.status })
+			.from(mitglied)
+			.where(eq(mitglied.id, id));
+		if (!m || m.status === 'geloescht') return nichtGefunden();
+		const r = await stelleBriefeAus(d.db, d.brief, urheber, [id], jetzt(d));
+		return r.ergebnis === 'ok'
+			? antwort(200, { briefe: r.briefe })
+			: antwort(409, { fehler: 'nicht-moeglich', anzahl: r.anzahl });
 	});
 }
 
@@ -476,6 +525,9 @@ export const ADMIN_SCHNITTSTELLEN = {
 	postRollen,
 	getRollen,
 	postSitzungen,
+	getBriefe,
+	postBriefe,
+	postBrief,
 	postAustritt,
 	postWiedereintritt,
 	postLoeschen,

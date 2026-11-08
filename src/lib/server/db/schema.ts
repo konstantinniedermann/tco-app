@@ -21,6 +21,8 @@ export const mitglied = pgTable(
 		id: serial('id').primaryKey(),
 		vorname: text('vorname').notNull(),
 		nachname: text('nachname').notNull(),
+		// Freiwillig; pflegt nur das Mitglied selbst im Profil.
+		rufname: text('rufname'),
 		strasse: text('strasse'),
 		plz: text('plz'),
 		ort: text('ort'),

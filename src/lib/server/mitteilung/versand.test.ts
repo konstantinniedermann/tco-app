@@ -5,10 +5,30 @@ import { vorschau } from './versand.ts';
 // Erfundene Empfänger: mit Push und Mail, nur Push, nur Mail, nichts.
 const ABO = { endpunkt: 'https://fcm.googleapis.com/fcm/send/x', p256dh: 'p', auth: 'a' };
 const EMPF: Empfaenger[] = [
-	{ mitgliedId: 1, name: 'Aebi, Anna', email: 'anna@example.org', abos: [ABO, ABO] },
-	{ mitgliedId: 2, name: 'Brunner, Beat', email: null, abos: [ABO] },
-	{ mitgliedId: 3, name: 'Christen, Carla', email: 'carla@example.org', abos: [] },
-	{ mitgliedId: 4, name: 'Dubach, Dario', email: null, abos: [] }
+	{
+		mitgliedId: 1,
+		name: { rufname: 'Anni', vorname: 'Anna', nachname: 'Aebi' },
+		email: 'anna@example.org',
+		abos: [ABO, ABO]
+	},
+	{
+		mitgliedId: 2,
+		name: { rufname: null, vorname: 'Beat', nachname: 'Brunner' },
+		email: null,
+		abos: [ABO]
+	},
+	{
+		mitgliedId: 3,
+		name: { rufname: null, vorname: 'Carla', nachname: 'Christen' },
+		email: 'carla@example.org',
+		abos: []
+	},
+	{
+		mitgliedId: 4,
+		name: { rufname: null, vorname: 'Dario', nachname: 'Dubach' },
+		email: null,
+		abos: []
+	}
 ];
 const NAMEN = EMPF.map((e) => e.name);
 

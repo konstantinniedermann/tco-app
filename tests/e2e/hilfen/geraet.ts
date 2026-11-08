@@ -21,11 +21,14 @@ export async function startetVomSymbol(page: Page): Promise<void> {
 /**
  * Chrome bietet die Installation an; das Mitglied nimmt sie im Dialog an oder lehnt ab.
  * `fehler`: Der Dialog lässt sich nicht öffnen (`prompt()` wirft).
+ * Wartet zuerst, bis die App gezeichnet ist: Erst dann horcht `init` in `hooks.client.ts` auf das
+ * Ereignis. Direkt nach `goto`/`reload` ginge es sonst unter Last ins Leere.
  */
 export async function bietetInstallationAn(
 	page: Page,
 	wahl: 'accepted' | 'dismissed' | 'fehler'
 ): Promise<void> {
+	await page.locator('main.inhalt').waitFor();
 	await page.evaluate((wahl) => {
 		const ereignis = new Event('beforeinstallprompt', { cancelable: true });
 		Object.assign(ereignis, {
