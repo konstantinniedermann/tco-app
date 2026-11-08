@@ -1,7 +1,7 @@
 import { and, asc, eq, inArray, isNull } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { konto, mitglied } from '../db/schema.ts';
-import { baueBriefInhalt } from '../brief/brief.ts';
+import { baueBriefInhalt, baueQrSvg } from '../brief/brief.ts';
 import { stelleBriefCodeAusIn } from '../login/dienst.ts';
 import { briefOffen, gueltigeSitzungen } from './mitglieder.ts';
 import { schreibeVerlauf, type Urheber } from './verlauf.ts';
@@ -121,23 +121,28 @@ export async function stelleBriefeAus(
 			return { ergebnis: 'nicht-moeglich' as const, anzahl: ids.length - moeglich.length };
 		}
 		const briefe: AusgestellterBrief[] = [];
+		// Dieselbe Adresse in allen Briefen: den QR-Code nur einmal bauen.
+		const qr = baueQrSvg(abh.adresse);
 		for (const z of moeglich) {
 			const { code, gueltigBis } = await stelleBriefCodeAusIn(tx, abh.schluessel, z.kontoId, jetzt);
 			await schreibeVerlauf(tx, z.id, urheber, [{ aktion: 'brief-code-ausgestellt' }], jetzt);
 			briefe.push({
 				mitgliedId: z.id,
 				name: `${z.vorname} ${z.nachname}`,
-				html: baueBriefInhalt({
-					vorname: z.vorname,
-					nachname: z.nachname,
-					strasse: z.strasse ?? '',
-					plz: z.plz ?? '',
-					ort: z.ort ?? '',
-					code,
-					gueltigBis,
-					adresse: abh.adresse,
-					kontakt: abh.kontakt
-				})
+				html: baueBriefInhalt(
+					{
+						vorname: z.vorname,
+						nachname: z.nachname,
+						strasse: z.strasse ?? '',
+						plz: z.plz ?? '',
+						ort: z.ort ?? '',
+						code,
+						gueltigBis,
+						adresse: abh.adresse,
+						kontakt: abh.kontakt
+					},
+					qr
+				)
 			});
 		}
 		return { ergebnis: 'ok' as const, briefe };

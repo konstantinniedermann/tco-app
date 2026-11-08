@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, test } from 'vitest';
 import { pruefeDesignFestwerte } from '../../../../scripts/pruefungen/design-festwerte.ts';
 import { erzeugeBriefCode, formatiereBriefCode } from '../login/codes.ts';
-import { baueBriefHtml, baueBriefInhalt, type BriefDaten } from './brief.ts';
+import { baueBriefHtml, baueBriefInhalt, baueQrSvg, type BriefDaten } from './brief.ts';
 
 // Erfundenes Mitglied, erfundene Ansprechperson; der Code wird in jedem Test neu erzeugt.
 function daten(aenderungen: Partial<BriefDaten> = {}): BriefDaten {
@@ -149,6 +149,11 @@ describe('baueBriefInhalt', () => {
 		const inhalt = baueBriefInhalt(daten({ vorname: 'Ana<b>&"\'' }));
 		expect(inhalt).toContain('Ana&lt;b&gt;&amp;&quot;&#39;');
 		expect(inhalt).not.toContain('<b>');
+	});
+
+	test('A-LOGIN-01: vorberechneter QR-Code ergibt denselben Brief', () => {
+		const d = daten();
+		expect(baueBriefInhalt(d, baueQrSvg(d.adresse))).toBe(baueBriefInhalt(d));
 	});
 
 	test('A-LOGIN-01: eigenständiger Brief bettet die Stile ein', () => {

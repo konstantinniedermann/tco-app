@@ -27,8 +27,11 @@ function maskiere(text: string): string {
 	return text.replace(/[&<>"']/g, (zeichen) => ZEICHEN[zeichen]);
 }
 
-/** QR-Code als skalierbares SVG; Ruhezone 4 Module (cellSize 1, margin 4). */
-function qrSvg(adresse: string): string {
+/**
+ * QR-Code als skalierbares SVG; Ruhezone 4 Module (cellSize 1, margin 4). Für eine Serie einmal
+ * bauen und an `baueBriefInhalt` geben: Die Adresse ist in allen Briefen dieselbe.
+ */
+export function baueQrSvg(adresse: string): string {
 	const qr = qrcode(0, 'M');
 	qr.addData(adresse);
 	qr.make();
@@ -38,9 +41,10 @@ function qrSvg(adresse: string): string {
 /**
  * Der Inhalt des Briefs mit dem Einmal-Code als `<article class="brief">`, ohne Stil: Das
  * Druck-Layout steht in `src/lib/design/brief.css` (die CSP erlaubt kein `<style>` und kein
- * `style=` in der App). Alle eingesetzten Werte sind HTML-maskiert.
+ * `style=` in der App). Alle eingesetzten Werte sind HTML-maskiert. `qr` ist der QR-Code zu
+ * `d.adresse` aus `baueQrSvg`; fehlt er, entsteht er hier.
  */
-export function baueBriefInhalt(d: BriefDaten): string {
+export function baueBriefInhalt(d: BriefDaten, qr: string = baueQrSvg(d.adresse)): string {
 	const adresse = maskiere(d.adresse);
 	const datenschutz = maskiere(`${d.adresse.replace(/\/+$/, '')}/datenschutz`);
 	const code = maskiere(formatiereBriefCode(d.code));
@@ -54,7 +58,7 @@ export function baueBriefInhalt(d: BriefDaten): string {
 </div>
 <div class="brief-zugang">
 <div>
-<div class="brief-qr">${qrSvg(d.adresse)}</div>
+<div class="brief-qr">${qr}</div>
 <p class="brief-qr-adresse">${adresse}</p>
 </div>
 <div>
