@@ -164,7 +164,11 @@ umgesetzt; offen ist 2b Einlesen.
   Kopfzeile erkannt), Felder mit Anführungszeichen nach RFC 4180. Erste Zeile sind die
   Spaltennamen, die Reihenfolge ist frei. Unbekannte Spalten sind ein Fehler der ganzen Datei,
   damit nichts Ungeplantes übernommen wird (*Welche Daten*).
-- **Grenzen:** höchstens 1 MB und 2000 Zeilen.
+- **Grenzen:** höchstens 400 KB und 2000 Zeilen (Projektleiter, 08.11.2026: unter der Grenze
+  des Servers von 512 KB je Anfrage, die damit für alle Schnittstellen bleibt; 500 Mitglieder
+  ergeben etwa 75 KB).
+- **Vorlage:** Die Seite *Einlesen* bietet eine Vorlage zum Herunterladen an (CSV nur mit der
+  Kopfzeile, ohne Daten) und zeigt die Spalten mit ihren Regeln (Projektleiter, 08.11.2026).
 - **Spalten:**
 
 | Spalte | Pflicht | Form |
@@ -190,9 +194,14 @@ umgesetzt; offen ist 2b Einlesen.
 - **Keine Aufbewahrung:** Die Datei wird nur im Arbeitsspeicher gelesen, nie gespeichert und
   nie geloggt.
 - **Übertragung:** Der Browser liest die Datei und schickt ihren Text im JSON-Körper, weil
-  ändernde Anfragen nur JSON annehmen (SI-10). Die Grösse der Anfrage muss dafür über die
-  heutige Grenze des Servers (512 KB) auf gut 1 MB steigen, nur für diese Schnittstelle oder
-  mit kleinster nötiger Erhöhung.
+  ändernde Anfragen nur JSON annehmen (SI-10). Mit der Grenze von 400 KB passt die Datei samt
+  JSON-Hülle unter die Grenze des Servers; die Oberfläche prüft die Grösse schon vor dem
+  Schicken, der Server prüft sie erneut.
+- **Rechte:** Hochladen, Vorschau und Übernahme nur für den Mitglieder-Admin (Bereich
+  `mitglieder`, schreiben). Der MyTCO-Admin sieht die Seite mit Beschreibung und Vorlage, aber
+  ohne Hochladen ([Rollen schärfen](2026-11-06-rollen-schaerfen-design.md)).
+- **Nach der Übernahme:** ein Link auf die Seite *Briefe*, wo die Neuen schon in der Liste
+  stehen.
 
 ## Briefe
 
