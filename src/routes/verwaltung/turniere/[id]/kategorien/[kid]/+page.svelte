@@ -3,6 +3,7 @@
 	import Pfad from '../../../../../../lib/verwaltung/Pfad.svelte';
 	import { resolve } from '$app/paths';
 	import Anmeldungsliste from '../../../../../../lib/verwaltung/Anmeldungsliste.svelte';
+	import DoppelListe from '../../../../../../lib/verwaltung/DoppelListe.svelte';
 	import Kategorieformular, {
 		anfrage,
 		werteAusKategorie,
@@ -152,10 +153,7 @@
 			{nurLesen}
 		/>
 	{:else}
-		<h2>Anmeldungen</h2>
-		<div class="karte">
-			<p>Doppel verwalten kommt später.</p>
-		</div>
+		<DoppelListe kategorieId={kategorie.id} liste={data.doppel} turnier={data.turnier} {nurLesen} />
 	{/if}
 
 	{#if !nurLesen}

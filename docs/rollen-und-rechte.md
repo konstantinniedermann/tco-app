@@ -99,6 +99,8 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Kontaktdaten des Doppelpartners, erst nach dem Annehmen (FR-19) | – | L beteiligt | L alle (K-42) | L alle (K-42) | S | L |
 | Name, Klassierung und Telefon (sonst E-Mail) des Anfragenden; er gibt sie mit der Anfrage dem Angefragten frei (FR-48, FR-19) | – | L an einen selbst | L an einen selbst | L an einen selbst | L an einen selbst | L an einen selbst |
 | Partner anfragen, annehmen, ablehnen (FR-48) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
+| Offene Partner-Anfragen (von, an, seit wann) | – | – | L | – | – | L |
+| Doppel von Hand anmelden, zusammenlegen, Partner ändern, Anfrage als Paar anmelden oder löschen (FR-46, FR-48) | – | – | S | – | – | L |
 | Kommentar *sucht Partner* (FR-49) | – | L; S eigener | L; S eigener | L; S eigener | L; S eigener | L; S eigener |
 | **CM-Betrieb** | | | | | | |
 | Gruppen, KO-Tableaus, Spiele aus Advantage (FR-12) | – | L | S | L | L | L |

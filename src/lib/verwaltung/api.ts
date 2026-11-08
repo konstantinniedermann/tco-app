@@ -11,6 +11,7 @@ import type { DateiFehler, Vorschau } from '../server/admin/einlesen.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
 import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
+import type { DoppelVerwaltung as ServerDoppelVerwaltung } from '../server/cm/verwaltung-doppel.ts';
 import type { TurnierStatus } from '../server/db/schema.ts';
 import type { MitteilungFeld } from '../server/mitteilung/angaben.ts';
 import type { KategorieFeld, TurnierFeld } from '../server/turnier/angaben.ts';
@@ -44,6 +45,7 @@ export type TurnierAnsicht = Json<TurnierDetail>;
 export type KategorieAnsicht = Json<NonNullable<Awaited<ReturnType<typeof ServerLadeKategorie>>>>;
 export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus, VerwaltungsRolle };
 export type { AnmeldungZeile, SpielerTreffer, Warnung };
+export type DoppelVerwaltung = Json<ServerDoppelVerwaltung>;
 type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld | MitteilungFeld;
 export type FairgateZeile = Json<ServerFairgateZeile>;
 export type BriefListe = Json<BriefZeile>[];
@@ -405,3 +407,62 @@ export const korrigiereKlassierung = (
 		{ klassierung },
 		holen
 	);
+
+/** A-ANMELDUNG-06: Paare, Suchende und offene Anfragen einer Doppel-Kategorie. */
+export const ladeDoppel = (kategorieId: number, holen: Holen = fetch) =>
+	lese<DoppelVerwaltung>(`${ADMIN}/kategorien/${kategorieId}/doppel`, holen);
+
+const mitTrotzdem = (inhalt: object, trotzdem: boolean) =>
+	trotzdem ? { ...inhalt, trotzdem: true } : inhalt;
+
+/** FR-46: ein Paar (zwei Mitglieder) oder einen Suchenden (eines) von Hand anmelden. */
+export const meldeDoppelAn = (
+	kategorieId: number,
+	mitgliedIds: [number] | [number, number],
+	trotzdem = false,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/kategorien/${kategorieId}/doppel`,
+		mitTrotzdem({ mitgliedIds }, trotzdem),
+		holen
+	);
+
+/** FR-46: zwei Suchende zu einem Paar zusammenlegen. */
+export const legeZusammen = (
+	anmeldungId: number,
+	mitAnmeldungId: number,
+	trotzdem = false,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/anmeldungen/${anmeldungId}/zusammenlegen`,
+		mitTrotzdem({ mitAnmeldungId }, trotzdem),
+		holen
+	);
+
+/** FR-46: Partner eines Paars ändern; `neuId` `null`: Der Bleibende sucht danach selbst. */
+export const aenderePartner = (
+	anmeldungId: number,
+	bleibtId: number,
+	neuId: number | null,
+	trotzdem = false,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/anmeldungen/${anmeldungId}/partner`,
+		mitTrotzdem({ bleibtId, neuId }, trotzdem),
+		holen
+	);
+
+/** FR-46, FR-48: eine offene Partner-Anfrage als Paar anmelden. */
+export const meldeAnfrageAlsPaarAn = (anfrageId: number, trotzdem = false, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/anfragen/${anfrageId}/paar`,
+		mitTrotzdem({}, trotzdem),
+		holen
+	);
+
+/** FR-46, FR-48: eine offene Partner-Anfrage löschen; der Anfragende erfährt es. */
+export const loescheAnfrage = (anfrageId: number, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/anfragen/${anfrageId}/loeschen`, {}, holen);

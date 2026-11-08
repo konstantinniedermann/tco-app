@@ -56,15 +56,18 @@ du selbst einschaltest. Für nichts anderes.
 - Fragst du jemanden als Doppelpartner an, sieht er deinen Namen, deine Klassierung und deine Telefonnummer
   (ohne Telefon deine E-Mail), damit er dich anrufen kann. Seine Kontaktdaten siehst du erst, wenn er annimmt.
   Anfragen, die abgelehnt, zurückgezogen oder hinfällig sind, löschen wir.
+  Deine Anfragen an Partner sieht auch die Turnierleitung (CM-Admin), die MyTCO-Admins nur zum Lesen.
 - Deine Gegner und dein Doppelpartner sehen während der Clubmeisterschaft deine E-Mail und
-  Telefonnummer, damit ihr die Spiele absprechen könnt.
+  Telefonnummer, damit ihr die Spiele absprechen könnt. Trittst du aus, sieht dein Doppelpartner deine E-Mail und Telefonnummer nicht mehr.
 - Den Spielplan des Finalwochenendes sehen alle, auch ohne Login [**Vorschlag K-39**].
 - Die Kalenderdatei eines Anlasses (Titel, Zeit, Ort, Einladung) ist über ihren Link auch ohne
   Login abrufbar; sie enthält keine Angaben zu Personen.
 - Swiss Tennis erhält Anmeldungen, Resultate und Lizenzanträge.
 
 **Wo:** Die Daten liegen bei Infomaniak in der Schweiz; E-Mails versendet [E-Mail-Dienst].
-Push-Nachrichten enthalten keine Daten anderer Mitglieder (zum Zustellen siehe «Mitteilungen»).
+Push-Nachrichten enthalten keine Daten anderer Mitglieder. Ausnahme: Persönliche Meldungen zum
+Doppel nennen deinen Partner bzw. die Person, mit der du eine Anfrage hast, nie Telefonnummer
+oder E-Mail-Adresse (zum Zustellen siehe «Mitteilungen»).
 
 **Mitteilungen:** Der Mitglieder-Admin kann dir Mitteilungen zu Anlässen und zum Verein schicken, als Push und als E-Mail. Push gibt es nur, wenn du ihn auf einem Gerät selbst einschaltest. Die Nachricht leitet Apple, Google, Mozilla oder Microsoft (je nach deinem Gerät) verschlüsselt weiter; sie sehen, dass eine Nachricht für dein Gerät eintrifft, aber nicht ihren Inhalt. MyTCO speichert dafür je Gerät die Adresse beim Push-Dienst und zwei Schlüssel. Das Abo endet mit dem Abmelden, wenn du Push abschaltest, mit deinem Austritt oder wenn dein Konto zum Löschen vorgemerkt wird, und mit deinem Konto. Im Profil stellst du Mitteilungen je Thema (Anlässe, Clubmeisterschaft, Verein) ab. Bestätigungen, Codes und persönliche Meldungen zu deinen CM-Anmeldungen bleiben davon unberührt. Wer wann welche Mitteilung geschickt hat, sehen der Mitglieder-Admin und, nur lesend, der MyTCO-Admin ein Jahr lang, ohne Namen der Empfänger.
 

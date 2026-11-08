@@ -14,6 +14,7 @@ import {
 	anmeldung,
 	anmeldungSpieler,
 	kategorie,
+	konto,
 	kontoRolle,
 	mitglied,
 	partnerAnfrage,
@@ -235,6 +236,7 @@ describe('Austritt', () => {
 		const partner = await legeMitgliedAn(db);
 		const dritter = await legeMitgliedAn(db);
 		const vierter = await legeMitgliedAn(db);
+		const fuenfter = await legeMitgliedAn(db);
 		const offen = await turnierMit('2026-12-31');
 		const zu = await turnierMit('2026-11-01');
 		const paarOffen = await meldeAn(offen.doppel, [m.mitgliedId, partner.mitgliedId]);
@@ -248,7 +250,8 @@ describe('Austritt', () => {
 		await frage(offen.doppel, m.mitgliedId, vierter.mitgliedId);
 		// Auch nach dem Anmeldeschluss: Eine offene Anfrage eines Ausgetretenen hat keinen Zweck mehr.
 		await frage(zu.doppel, m.mitgliedId, vierter.mitgliedId);
-		const [fremd] = await frage(offen.doppel, dritter.mitgliedId, vierter.mitgliedId);
+		// Je Person nur eine Anfrage je Kategorie: Die fremde stammt von einem Fünften.
+		const [fremd] = await frage(offen.doppel, fuenfter.mitgliedId, vierter.mitgliedId);
 		const spaeter = new Date(jetzt.getTime() + 60_000);
 
 		expect(await erfasseAustritt(db, urheber, m.mitgliedId, spaeter)).toEqual({
@@ -296,6 +299,11 @@ describe('Austritt', () => {
 			.update(mitglied)
 			.set({ geschlecht: 'm', jahrgang: 1990, klassierung: 'R5' })
 			.where(inArray(mitglied.id, [m.mitgliedId, dritter.mitgliedId]));
+		// Anfragen erscheinen nur von Mitgliedern mit Login.
+		await db
+			.update(konto)
+			.set({ briefCodeBenutztAm: new Date('2026-01-05T10:00:00Z') })
+			.where(eq(konto.mitgliedId, m.mitgliedId));
 		const offen = await turnierMit('2026-12-31');
 		await meldeAn(offen.doppel, [m.mitgliedId], 'Suche jemanden für abends');
 		await db.insert(partnerAnfrage).values([

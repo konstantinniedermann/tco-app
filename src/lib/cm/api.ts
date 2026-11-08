@@ -33,6 +33,8 @@ const ABGELEHNT = [
 	'passt-nicht',
 	'schon-angemeldet',
 	'schon-angefragt',
+	'anfrage-offen',
+	'hinfaellig',
 	'angaben-fehlen',
 	'keine-wildcard'
 ] as const;

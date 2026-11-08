@@ -6,6 +6,7 @@ import {
 	passtDoppelAllein,
 	passtEinzel,
 	vermerk,
+	warnungenDoppel,
 	warnungenEinzel,
 	wildcardEinzel,
 	type KategorieRegel,
@@ -180,5 +181,27 @@ describe('Passung Doppel', () => {
 		expect(passtAlsPaar(doppel(), b, ohneJahrgang, true)).toBe(true);
 		expect(passtAlsPaar(doppel(), ohneJahrgang, b, false)).toBe(true);
 		expect(passtDoppelAllein(doppel(), ohneJahrgang)).toBe(true);
+	});
+
+	it('FR-46: Warnungen im Doppel', () => {
+		const frau = spieler({ geschlecht: 'w', klassierung: 'R5' });
+		const mann = spieler({ klassierung: 'R5' });
+		expect(warnungenDoppel(doppel(), frau, mann)).toEqual(['passt-nicht']);
+		expect(warnungenDoppel(doppel(), spieler({ klassierung: 'R3' }), mann)).toEqual([
+			'passt-nicht'
+		]);
+		expect(warnungenDoppel(doppel(), spieler({}), null)).toEqual([]);
+		expect(warnungenDoppel(doppel(), mann, spieler({ klassierung: null }))).toEqual([
+			'angaben-fehlen'
+		]);
+		// Weitere Fälle: allein unpassend, fehlendes Geschlecht, passendes Paar, Jahrgang zählt nicht.
+		expect(warnungenDoppel(doppel(), frau, null)).toEqual(['passt-nicht']);
+		expect(warnungenDoppel(doppel(), spieler({ geschlecht: null }), null)).toEqual([
+			'angaben-fehlen'
+		]);
+		expect(warnungenDoppel(doppel(), mann, spieler({ jahrgang: null, klassierung: 'R4' }))).toEqual(
+			[]
+		);
+		expect(warnungenDoppel(doppel({ geschlecht: 'mixed' }), frau, mann)).toEqual([]);
 	});
 });

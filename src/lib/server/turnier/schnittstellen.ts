@@ -19,6 +19,20 @@ import {
 	verschiebe,
 	type Warnung
 } from '../cm/verwaltung.ts';
+import {
+	aenderePartner,
+	artDerAnmeldung,
+	ladeDoppel,
+	legeZusammen,
+	loescheAnfrage,
+	loescheDoppel,
+	meldeAnfrageAlsPaarAn,
+	meldeDoppelVonHandAn,
+	verschiebeDoppel,
+	type Benachrichtigung,
+	type DoppelAbgelehnt
+} from '../cm/verwaltung-doppel.ts';
+import { anfrageGeloeschtText } from '../cm/doppel-meldung.ts';
 import { antwort } from '../login/schnittstellen.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
@@ -33,7 +47,8 @@ import {
 	legeTurnierAn,
 	listeTurniere,
 	sageKategorieAb,
-	setzeStatus
+	setzeStatus,
+	type HinfaelligeAnfrage
 } from './turniere.ts';
 
 const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
@@ -115,29 +130,37 @@ export function getKategorie(d: AdminDienste, e: AdminEreignis): Promise<Respons
 	});
 }
 
-export function postKategorie(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return schreibt(d, e, 'cm', async (_urheber, koerper) => {
+export function postKategorie(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
 		const id = parseId(e.params.id);
 		const k = id === null ? null : await ladeKategorie(d.db, id);
 		if (id === null || !k) return nichtGefunden();
 		const p = pruefeKategorie(koerper, k.turnierjahr);
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.felder });
 		const r = await aendereKategorie(d.db, id, p.werte, koerper.trotzdem === true);
-		if (typeof r === 'object') return antwort(409, { fehler: 'unpassend', anzahl: r.unpassend });
+		if (typeof r === 'object' && 'unpassend' in r) {
+			return antwort(409, { fehler: 'unpassend', anzahl: r.unpassend });
+		}
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r === 'abgesagt' || r === 'art-gesperrt') return antwort(409, { fehler: r });
 		if (r === 'vergeben') return antwort(409, { fehler: 'vergeben', feld: 'name' });
+		meldeHinfaellige(d, urheber, r.hinfaellig);
 		return antwort(200, {});
 	});
 }
 
-export function postKategorieAbsagen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return schreibt(d, e, 'cm', async () => {
+export function postKategorieAbsagen(
+	d: MitteilungAdminDienste,
+	e: AdminEreignis
+): Promise<Response> {
+	return schreibt(d, e, 'cm', async (urheber) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const r = await sageKategorieAb(d.db, id);
-		if (typeof r === 'object') return antwort(409, { fehler: 'hat-anmeldungen', anzahl: r.aktiv });
-		return r === 'ok' ? antwort(200, {}) : nichtGefunden();
+		if (r === 'nicht-gefunden') return nichtGefunden();
+		if ('aktiv' in r) return antwort(409, { fehler: 'hat-anmeldungen', anzahl: r.aktiv });
+		meldeHinfaellige(d, urheber, r.hinfaellig);
+		return antwort(200, {});
 	});
 }
 
@@ -155,8 +178,8 @@ const warnung = (w: { warnungen: Warnung[] }) =>
 	antwort(409, { fehler: 'warnung', warnungen: w.warnungen });
 
 /**
- * FR-47: persönliche Meldung an den Spieler, erst nach dem Speichern. DS-05: ohne Namen anderer
- * Mitglieder, auch nicht des CM-Admins. Betrifft es den CM-Admin selbst, entfällt sie. Die Antwort
+ * FR-47: persönliche Meldung an den Spieler, erst nach dem Speichern. Ohne Namen anderer
+ * Mitglieder, ausser im Doppel der andere Spieler (DS-05); nie der CM-Admin. Betrifft es den CM-Admin selbst, entfällt sie. Die Antwort
  * wartet nicht auf Push und Mail; wirft `meldeMitgliedern` doch, bleibt das still (SI-05).
  */
 function melde(
@@ -172,6 +195,34 @@ function melde(
 		[mitgliedId],
 		{ titel: 'Clubmeisterschaft', text, pfad: `/clubmeisterschaft/${turnierId}` }
 	).catch(() => {});
+}
+
+/** FR-46: Meldung an jeden, dessen offene Partner-Anfrage durch Absagen oder Art-Wechsel wegfiel. */
+function meldeHinfaellige(
+	d: MitteilungAdminDienste,
+	urheber: AdminUrheber,
+	hinfaellig: HinfaelligeAnfrage[]
+): void {
+	for (const h of hinfaellig) {
+		melde(d, urheber, h.vonId, h.turnierId, anfrageGeloeschtText(h.an, h.kategorie));
+	}
+}
+
+/** Meldungen eines Doppel-Ergebnisses, erst nach dem Speichern. */
+function meldeAlle(
+	d: MitteilungAdminDienste,
+	urheber: AdminUrheber,
+	turnierId: number,
+	meldungen: Benachrichtigung[]
+): void {
+	for (const m of meldungen) melde(d, urheber, m.mitgliedId, turnierId, m.text);
+}
+
+/** Antwort auf eine Ablehnung aus der Doppel-Verwaltung: Warnung, 404 oder 409 mit Grund. */
+function abgelehnt(r: DoppelAbgelehnt): Response {
+	if (r === 'nicht-gefunden') return nichtGefunden();
+	if (typeof r === 'string') return antwort(409, { fehler: r });
+	return warnung(r);
 }
 
 /** A-ANMELDUNG-06: aktive Einzel-Anmeldungen der Kategorie. */
@@ -221,6 +272,21 @@ export function postVerschieben(d: MitteilungAdminDienste, e: AdminEreignis): Pr
 		const kategorieId = idAus(koerper.kategorieId);
 		const trotzdem = trotzdemAus(koerper);
 		if (kategorieId === null || trotzdem === null) return eingabeFehler();
+		const art = await artDerAnmeldung(d.db, anmeldungId);
+		if (art === null) return nichtGefunden();
+		if (art === 'doppel') {
+			const dr = await verschiebeDoppel(
+				d.db,
+				urheber,
+				anmeldungId,
+				kategorieId,
+				jetzt(d),
+				trotzdem
+			);
+			if (typeof dr === 'string' || 'warnungen' in dr) return abgelehnt(dr);
+			meldeAlle(d, urheber, dr.turnierId, dr.meldungen);
+			return antwort(200, {});
+		}
 		const r = await verschiebe(d.db, urheber, anmeldungId, kategorieId, jetzt(d), trotzdem);
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (typeof r === 'string') return antwort(409, { fehler: r });
@@ -243,9 +309,15 @@ export function postAnmeldungLoeschen(
 ): Promise<Response> {
 	return schreibt(d, e, 'cm', async (urheber) => {
 		const anmeldungId = parseId(e.params.id);
-		const r =
-			anmeldungId === null ? null : await loescheAnmeldung(d.db, urheber, anmeldungId, jetzt(d));
-		if (r === null || r === 'nicht-gefunden') return nichtGefunden();
+		if (anmeldungId === null) return nichtGefunden();
+		if ((await artDerAnmeldung(d.db, anmeldungId)) === 'doppel') {
+			const dr = await loescheDoppel(d.db, urheber, anmeldungId, jetzt(d));
+			if (dr === 'nicht-gefunden') return nichtGefunden();
+			meldeAlle(d, urheber, dr.turnierId, dr.meldungen);
+			return antwort(200, {});
+		}
+		const r = await loescheAnmeldung(d.db, urheber, anmeldungId, jetzt(d));
+		if (r === 'nicht-gefunden') return nichtGefunden();
 		melde(
 			d,
 			urheber,
@@ -253,6 +325,106 @@ export function postAnmeldungLoeschen(
 			r.turnierId,
 			`Der CM-Admin hat deine Anmeldung für «${r.kategorie}» gelöscht.`
 		);
+		return antwort(200, {});
+	});
+}
+
+/** A-ANMELDUNG-06: Paare, Suchende und offene Anfragen einer Doppel-Kategorie. */
+export function getDoppel(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return liest(d, e, 'cm', async () => {
+		const id = parseId(e.params.id);
+		const r = id === null ? null : await ladeDoppel(d.db, id);
+		return r ? antwort(200, r) : nichtGefunden();
+	});
+}
+
+/** FR-46: ein Paar (zwei Mitglieder) oder einen Suchenden (eines) von Hand anmelden. */
+export function postDoppelVonHand(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
+		const kategorieId = parseId(e.params.id);
+		if (kategorieId === null) return nichtGefunden();
+		const ids = Array.isArray(koerper.mitgliedIds) ? koerper.mitgliedIds.map(idAus) : [];
+		const trotzdem = trotzdemAus(koerper);
+		if (
+			trotzdem === null ||
+			(ids.length !== 1 && ids.length !== 2) ||
+			ids.some((i) => i === null) ||
+			ids[0] === ids[1]
+		) {
+			return eingabeFehler();
+		}
+		const r = await meldeDoppelVonHandAn(
+			d.db,
+			urheber,
+			kategorieId,
+			ids as [number] | [number, number],
+			jetzt(d),
+			trotzdem
+		);
+		if (typeof r === 'string' || 'warnungen' in r) return abgelehnt(r);
+		meldeAlle(d, urheber, r.turnierId, r.meldungen);
+		return antwort(200, {});
+	});
+}
+
+/** FR-46: zwei Suchende zu einem Paar zusammenlegen. */
+export function postZusammenlegen(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
+		const anmeldungId = parseId(e.params.id);
+		if (anmeldungId === null) return nichtGefunden();
+		const mitId = idAus(koerper.mitAnmeldungId);
+		const trotzdem = trotzdemAus(koerper);
+		if (mitId === null || trotzdem === null) return eingabeFehler();
+		const r = await legeZusammen(d.db, urheber, anmeldungId, mitId, jetzt(d), trotzdem);
+		if (typeof r === 'string' || 'warnungen' in r) return abgelehnt(r);
+		meldeAlle(d, urheber, r.turnierId, r.meldungen);
+		return antwort(200, {});
+	});
+}
+
+/** FR-46: Partner eines Paars ändern, mit Ersatz (`neuId`) oder ohne (`null`). */
+export function postPartnerAendern(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
+		const anmeldungId = parseId(e.params.id);
+		if (anmeldungId === null) return nichtGefunden();
+		const bleibtId = idAus(koerper.bleibtId);
+		const neuId = koerper.neuId === null ? null : idAus(koerper.neuId);
+		const trotzdem = trotzdemAus(koerper);
+		if (bleibtId === null || (koerper.neuId !== null && neuId === null) || trotzdem === null) {
+			return eingabeFehler();
+		}
+		const r = await aenderePartner(d.db, urheber, anmeldungId, bleibtId, neuId, jetzt(d), trotzdem);
+		if (r === 'eingabe') return eingabeFehler();
+		if (typeof r === 'string' || 'warnungen' in r) return abgelehnt(r);
+		meldeAlle(d, urheber, r.turnierId, r.meldungen);
+		return antwort(200, {});
+	});
+}
+
+/** FR-46: eine offene Anfrage als Paar anmelden. */
+export function postAnfrageAlsPaar(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
+		const anfrageId = parseId(e.params.id);
+		if (anfrageId === null) return nichtGefunden();
+		const trotzdem = trotzdemAus(koerper);
+		if (trotzdem === null) return eingabeFehler();
+		const r = await meldeAnfrageAlsPaarAn(d.db, urheber, anfrageId, jetzt(d), trotzdem);
+		if (typeof r === 'string' || 'warnungen' in r) return abgelehnt(r);
+		meldeAlle(d, urheber, r.turnierId, r.meldungen);
+		return antwort(200, {});
+	});
+}
+
+/** FR-46: eine offene Anfrage löschen; der Anfragende erfährt es. */
+export function postAnfrageLoeschen(
+	d: MitteilungAdminDienste,
+	e: AdminEreignis
+): Promise<Response> {
+	return schreibt(d, e, 'cm', async (urheber) => {
+		const anfrageId = parseId(e.params.id);
+		const r = anfrageId === null ? null : await loescheAnfrage(d.db, anfrageId);
+		if (r === null || r === 'nicht-gefunden') return nichtGefunden();
+		meldeAlle(d, urheber, r.turnierId, r.meldungen);
 		return antwort(200, {});
 	});
 }
@@ -315,6 +487,12 @@ export const TURNIER_SCHNITTSTELLEN = {
 	postAnmeldungVonHand,
 	postVerschieben,
 	postAnmeldungLoeschen,
+	getDoppel,
+	postDoppelVonHand,
+	postZusammenlegen,
+	postPartnerAendern,
+	postAnfrageAlsPaar,
+	postAnfrageLoeschen,
 	postEntscheid,
 	getSpieler,
 	postKlassierung

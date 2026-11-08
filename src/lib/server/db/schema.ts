@@ -426,7 +426,8 @@ export const partnerAnfrage = pgTable(
 		gestelltAm: timestamp('gestellt_am', { withTimezone: true }).notNull()
 	},
 	(t) => [
-		unique('partner_anfrage_paar_unique').on(t.kategorieId, t.vonId, t.anId),
+		// Höchstens eine eigene offene Anfrage je Person und Kategorie.
+		unique('partner_anfrage_von_unique').on(t.kategorieId, t.vonId),
 		check('partner_anfrage_selbst_check', sql`${t.vonId} <> ${t.anId}`),
 		index('partner_anfrage_an_idx').on(t.anId)
 	]

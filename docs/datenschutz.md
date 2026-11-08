@@ -65,11 +65,11 @@ Bankdaten.
 | Elternteil, der ein Kind führt | alle Daten des Kindes, ändert sie und meldet es an (Vorschlag K-08) |
 | Mitglieder-Admin | alle Daten der Mitglieder (von der CM nur bestätigte Anmeldungen, ohne Wildcard-Anträge und Kommentare) und den Änderungsverlauf; in der Liste *Für Fairgate* die selbst geänderten Kontaktangaben, bis er sie abhakt; alle Anmeldungen zu Anlässen mit Bemerkung (**Annahme K-50:** nur Mitglieder- und MyTCO-Admins, nicht der ganze Vorstand); Einmal-Codes sind nach der Ausgabe für niemanden abrufbar. Die Druckansicht der Login-Briefe hält Name, Adresse und Code nur im Browser des Mitglieder-Admins; eine als PDF gespeicherte Datei löscht er nach dem Druck |
 | MyTCO-Admin | alles, was eine der anderen Rollen sieht, auch Bemerkungen zu Anlässen und Wildcard-Kommentare, und den Änderungsverlauf; nur lesend. **Zweck:** die anderen Rollen unterstützen, Fehler suchen, die Rollenvergabe prüfen. *Ansicht als …* zeigt ihm nichts darüber hinaus. **Annahme K-18.4:** Die Rolle erhalten nur Personen, die MyTCO technisch betreuen (Projektleiter und seine Stellvertretung, vgl. SI-16), nicht weitere Vorstandsmitglieder; eine Abmachung des Vereins, die App erzwingt sie nicht |
-| CM-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung, Geschlecht und Jahrgang der Spieler (zum Zuordnen in Kategorien). Die Klassierung korrigiert auch der CM-Admin (A-ANMELDUNG-06, Matrix in `rollen-und-rechte.md`); Geschlecht und Jahrgang ändert nur der Mitglieder-Admin |
+| CM-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung, Geschlecht und Jahrgang der Spieler (zum Zuordnen in Kategorien). Die Klassierung korrigiert auch der CM-Admin (A-ANMELDUNG-06, Matrix in `rollen-und-rechte.md`); Geschlecht und Jahrgang ändert nur der Mitglieder-Admin; offene Partner-Anfragen (von, an, seit wann) |
 | Lizenz-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
 | Alle Mitglieder | Name und Rufname, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft; wer in einer Doppelkategorie *sucht Partner* mit seinem Kommentar; bei der Wahl des Doppelpartners die Namen und die Klassierung der Mitglieder, die für die Kategorie passen, dazu den Vermerk *Klassierung fehlt* oder *Angaben fehlen* (im Doppel: Geschlecht fehlt) |
 | Angefragter Doppelpartner | mit der Anfrage Name, Klassierung und Telefonnummer (sonst E-Mail) des Anfragenden, den dieser damit freigibt; die Kontaktdaten des Angefragten sieht der Anfragende erst nach dem Annehmen |
-| Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31); beim Doppelpartner erst nach dem Annehmen der Anfrage |
+| Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31); beim Doppelpartner erst nach dem Annehmen der Anfrage und nicht mehr, wenn der Partner ausgetreten oder zum Löschen vorgemerkt ist |
 | Alle, ohne Login | Kalenderdatei eines Anlasses über einen nicht erratbaren Link: Titel, Beginn, Ort, Einladung, keine Personendaten |
 | Alle, ohne Login | Spielplan des Finalwochenendes mit Name (ohne Rufname), Kategorie, Platz, Zeit, Resultat (**Vorschlag K-39**, spätere Etappe) |
 | Swiss Tennis | Anmeldungen, Resultate und Lizenzanträge, als Export von Hand |
@@ -80,7 +80,9 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
 Ein Doppelpartner wird vor dem Annehmen einer Anfrage nochmals darauf hingewiesen. Wer
 eine Partner-Anfrage stellt, gibt dem Angefragten Name, Klassierung und Telefonnummer (sonst
 E-Mail) frei; die Kontaktdaten des Angefragten sieht er erst nach dem Annehmen. Der Kommentar
-bei *sucht Partner* soll keine Angaben zur Gesundheit enthalten.
+bei *sucht Partner* soll keine Angaben zur Gesundheit enthalten. Meldungen zum Doppel (an das
+Mitglied und aus der Verwaltung) nennen den anderen Spieler (Partner, Anfragenden oder
+Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05 erlaubt.
 
 ## Löschen
 
@@ -207,7 +209,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | DS-02 | Hoster und E-Mail-Dienst mit Auftragsbearbeitungsvertrag oder passenden AGB (Infomaniak: [ADR-003](adr/adr-003-hosting-infomaniak-vps.md); Metanet-Postfach: K-09; Scaleway: DPA vorhanden, [Kosten](kosten.md)) |
 | DS-03 | Kein Tracking, keine Werbung, keine Inhalte von fremden Servern (CDN, Google Fonts); nur technisch nötige Cookies, deshalb kein Cookie-Banner |
 | DS-04 | Nur Felder aus [Welche Daten](#welche-daten); Exporte nur mit den Feldern, die Swiss Tennis braucht |
-| DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“); E-Mails gehen je Empfänger einzeln, nie mehrere Adressen in einem Empfängerfeld. Bei Mitteilungen (FR-42) weist das Formular darauf hin; die Vorschau zeigt dem Mitglieder-Admin nur Namen, die er schon sehen darf |
+| DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“). Ausnahme: Einzelmeldungen zum Doppel an die Beteiligten nennen den anderen Spieler (Partner, Anfragender oder Angefragter), nie dessen Telefon oder E-Mail und nie den CM-Admin. E-Mails gehen je Empfänger einzeln, nie mehrere Adressen in einem Empfängerfeld. Bei Mitteilungen (FR-42) weist das Formular darauf hin; die Vorschau zeigt dem Mitglieder-Admin nur Namen, die er schon sehen darf |
 | DS-06 | Löschfristen aus [Löschen](#löschen) sind umgesetzt; Logs ohne Inhalte (keine Einmal-Codes, Kontaktdaten, Resultate); IP-Adressen höchstens 24 Stunden, auch in Logs |
 | DS-07 | Der Mitglieder-Admin kann die Daten eines Mitglieds als druckbare Auskunft ausgeben und das Mitglied löschen (umgesetzt, Etappe 3 von #43) |
 | DS-08 | Entwicklung und Tests nur mit erfundenen Daten |
@@ -228,3 +230,6 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Datenschutzerklärung](datenschutzerklaerung.md) anpassen, bei Bedarf eine Frage in den
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
+
+- 08.11.2026: CM-Admin sieht offene Partner-Anfragen; Doppelpartner sieht Kontaktdaten nicht mehr, wenn der Partner ausgetreten oder zum Löschen vorgemerkt ist; Meldungen der Verwaltung zum Doppel nennen den anderen Spieler (#59 Etappe 2).
+- 08.11.2026: DS-05 präzisiert (Entscheid Projektleiter): Einzelmeldungen zum Doppel an die Beteiligten nennen den anderen Spieler, nie dessen Telefon oder E-Mail und nie den CM-Admin; gilt auch für die Meldungen aus Etappe 1 (#59).

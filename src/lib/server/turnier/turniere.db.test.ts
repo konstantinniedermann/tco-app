@@ -3,7 +3,7 @@ import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { ladeCmAnsicht, laufendeTurniere, meldeAb, meldeAn } from '../cm/anmeldungen.ts';
 import { erstelleDb } from '../db/index.ts';
-import { anmeldung, anmeldungSpieler, mitglied, partnerAnfrage } from '../db/schema.ts';
+import { anmeldung, anmeldungSpieler, konto, mitglied, partnerAnfrage } from '../db/schema.ts';
 import type { KategorieWerte, TurnierWerte } from './angaben.ts';
 import {
 	aendereKategorie,
@@ -156,7 +156,10 @@ describe('Kategorien', () => {
 			mindestsumme: 9,
 			jahrgangVon: 1990
 		});
-		expect(await aendereKategorie(db, a.id, doppel, false)).toBe('ok');
+		expect(await aendereKategorie(db, a.id, doppel, false)).toEqual({
+			ergebnis: 'ok',
+			hinfaellig: []
+		});
 		expect(await ladeKategorie(db, a.id)).toMatchObject({
 			...doppel,
 			id: a.id,
@@ -165,7 +168,7 @@ describe('Kategorien', () => {
 		});
 		expect(await aendereKategorie(db, -1, doppel, false)).toBe('nicht-gefunden');
 		expect(await ladeKategorie(db, -1)).toBeNull();
-		expect(await sageKategorieAb(db, a.id)).toBe('ok');
+		expect(await sageKategorieAb(db, a.id)).toEqual({ ergebnis: 'ok', hinfaellig: [] });
 		expect(await legeKategorieAn(db, id, einzel('Herren A'))).toMatchObject({ ergebnis: 'ok' });
 	});
 
@@ -174,8 +177,8 @@ describe('Kategorien', () => {
 		const k = await legeKategorieAn(db, id, einzel('Damen A', { geschlecht: 'damen' }));
 		if (k.ergebnis !== 'ok') throw new Error('anlegen');
 		expect((await listeTurniere(db, jetztVor(w))).find((z) => z.id === id)?.kategorien).toBe(1);
-		expect(await sageKategorieAb(db, k.id)).toBe('ok');
-		expect(await sageKategorieAb(db, k.id)).toBe('ok');
+		expect(await sageKategorieAb(db, k.id)).toEqual({ ergebnis: 'ok', hinfaellig: [] });
+		expect(await sageKategorieAb(db, k.id)).toEqual({ ergebnis: 'ok', hinfaellig: [] });
 		expect(await sageKategorieAb(db, -1)).toBe('nicht-gefunden');
 		expect(await ladeKategorie(db, k.id)).toMatchObject({
 			status: 'abgesagt',
@@ -211,8 +214,14 @@ describe('Kategorien', () => {
 		expect((await ladeKategorie(db, t.kid))?.klassierungBis).toBe('R5');
 		// Passt weiterhin: ohne Rückfrage gespeichert.
 		const weiter = einzel('Herren A', { klassierungBis: 'R4' });
-		expect(await aendereKategorie(db, t.kid, weiter, false)).toBe('ok');
-		expect(await aendereKategorie(db, t.kid, enger, true)).toBe('ok');
+		expect(await aendereKategorie(db, t.kid, weiter, false)).toEqual({
+			ergebnis: 'ok',
+			hinfaellig: []
+		});
+		expect(await aendereKategorie(db, t.kid, enger, true)).toEqual({
+			ergebnis: 'ok',
+			hinfaellig: []
+		});
 		expect((await ladeKategorie(db, t.kid))?.klassierungBis).toBe('R2');
 		const d = await ladeTurnier(db, t.id, jetztVor(t.w));
 		expect(d?.kategorien[0].anmeldungen).toBe(1);
@@ -221,7 +230,7 @@ describe('Kategorien', () => {
 		if (leer.ergebnis !== 'ok') throw new Error('anlegen');
 		expect(
 			await aendereKategorie(db, leer.id, einzel('Herren B', { klassierungBis: 'R1' }), false)
-		).toBe('ok');
+		).toEqual({ ergebnis: 'ok', hinfaellig: [] });
 	});
 
 	const alsDoppel = (name: string, teil: Partial<KategorieWerte> = {}): KategorieWerte =>
@@ -242,9 +251,15 @@ describe('Kategorien', () => {
 		// Ohne aktive Anmeldung geht der Wechsel, hin und zurück.
 		const leer = await legeKategorieAn(db, t.id, einzel('Herren B'));
 		if (leer.ergebnis !== 'ok') throw new Error('anlegen');
-		expect(await aendereKategorie(db, leer.id, alsDoppel('Herren B'), false)).toBe('ok');
+		expect(await aendereKategorie(db, leer.id, alsDoppel('Herren B'), false)).toEqual({
+			ergebnis: 'ok',
+			hinfaellig: []
+		});
 		expect((await ladeKategorie(db, leer.id))?.art).toBe('doppel');
-		expect(await aendereKategorie(db, leer.id, einzel('Herren B'), false)).toBe('ok');
+		expect(await aendereKategorie(db, leer.id, einzel('Herren B'), false)).toEqual({
+			ergebnis: 'ok',
+			hinfaellig: []
+		});
 	});
 
 	/** Aktive Anmeldung mit diesen Spielern (ein Spieler: sucht Partner, zwei: Paar). */
@@ -258,12 +273,19 @@ describe('Kategorien', () => {
 			.values(spieler.map((mitgliedId) => ({ anmeldungId: a.id, mitgliedId })));
 	}
 
-	async function herr(klassierung: string) {
+	async function herr(klassierung: string, mitLogin = false) {
 		const m = await legeMitgliedAn(db, {});
 		await db
 			.update(mitglied)
 			.set({ geschlecht: 'm', jahrgang: 1990, klassierung })
 			.where(eq(mitglied.id, m.mitgliedId));
+		// Anfragen zählen nur von Mitgliedern mit Login.
+		if (mitLogin) {
+			await db
+				.update(konto)
+				.set({ briefCodeBenutztAm: new Date('2026-01-05T10:00:00Z') })
+				.where(eq(konto.mitgliedId, m.mitgliedId));
+		}
 		return m.mitgliedId;
 	}
 
@@ -275,7 +297,10 @@ describe('Kategorien', () => {
 		await trageEin(k.id, [await herr('R4'), await herr('R5')], jetztVor(w));
 		await trageEin(k.id, [await herr('R7'), await herr('R8')], jetztVor(w));
 		await trageEin(k.id, [await herr('R6')], jetztVor(w));
-		expect(await aendereKategorie(db, k.id, alsDoppel('Herren Doppel'), false)).toBe('ok');
+		expect(await aendereKategorie(db, k.id, alsDoppel('Herren Doppel'), false)).toEqual({
+			ergebnis: 'ok',
+			hinfaellig: []
+		});
 		const hoeher = alsDoppel('Herren Doppel', { mindestsumme: 10 });
 		expect(await aendereKategorie(db, k.id, hoeher, false)).toEqual({ unpassend: 1 });
 		expect((await ladeKategorie(db, k.id))?.mindestsumme).toBe(9);
@@ -296,7 +321,10 @@ describe('Kategorien', () => {
 				.insert(partnerAnfrage)
 				.values({ kategorieId, vonId: a, anId: b, gestelltAm: jetztVor(w) });
 		}
-		expect(await sageKategorieAb(db, k.id)).toBe('ok');
+		expect(await sageKategorieAb(db, k.id)).toEqual({
+			ergebnis: 'ok',
+			hinfaellig: [expect.objectContaining({ vonId: a, kategorie: 'Herren Doppel' })]
+		});
 		const offen = await db
 			.select({ kategorieId: partnerAnfrage.kategorieId })
 			.from(partnerAnfrage)
@@ -310,9 +338,9 @@ describe('Kategorien', () => {
 		const andere = await legeKategorieAn(db, id, alsDoppel('Offenes Doppel'));
 		if (k.ergebnis !== 'ok' || andere.ergebnis !== 'ok') throw new Error('anlegen');
 		expect(await setzeStatus(db, id, 'offen', jetztVor(w))).toBe('ok');
-		const a = await herr('R4');
+		const a = await herr('R4', true);
 		const b = await herr('R5');
-		const c = await herr('R6');
+		const c = await herr('R6', true);
 		await db
 			.insert(partnerAnfrage)
 			.values({ kategorieId: k.id, vonId: a, anId: b, gestelltAm: jetztVor(w) });
@@ -326,7 +354,10 @@ describe('Kategorien', () => {
 		});
 		expect(await anfragenAn(b)).toEqual({ zaehlung: 1, liste: 1 });
 
-		expect(await aendereKategorie(db, k.id, einzel('Herren Doppel'), false)).toBe('ok');
+		expect(await aendereKategorie(db, k.id, einzel('Herren Doppel'), false)).toEqual({
+			ergebnis: 'ok',
+			hinfaellig: [expect.objectContaining({ vonId: a, kategorie: 'Herren Doppel' })]
+		});
 		expect(await anfragenAn(b)).toEqual({ zaehlung: 0, liste: 0 });
 		const offen = await db
 			.select({ kategorieId: partnerAnfrage.kategorieId })
@@ -354,7 +385,7 @@ describe('Kategorien', () => {
 			ergebnis: 'ok',
 			partnerId: null
 		});
-		expect(await sageKategorieAb(db, t.kid)).toBe('ok');
+		expect(await sageKategorieAb(db, t.kid)).toEqual({ ergebnis: 'ok', hinfaellig: [] });
 		expect((await ladeKategorie(db, t.kid))?.status).toBe('abgesagt');
 		expect(await sageKategorieAb(db, -1)).toBe('nicht-gefunden');
 	});

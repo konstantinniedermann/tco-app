@@ -222,7 +222,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 
 		const t = await turnier(['Herren A', 'Abgesagt']);
 		const [a, abgesagt] = t.kategorien;
-		expect(await sageKategorieAb(db, abgesagt)).toBe('ok');
+		expect(await sageKategorieAb(db, abgesagt)).toEqual({ ergebnis: 'ok', hinfaellig: [] });
 		const doppel = await kategorieIn(t.id, 'Doppel', {
 			geschlecht: 'offen',
 			art: 'doppel',
@@ -320,7 +320,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			'nicht-gefunden'
 		);
 		const abgesagt = await kategorieIn(t.id, 'Abgesagt');
-		expect(await sageKategorieAb(db, abgesagt)).toBe('ok');
+		expect(await sageKategorieAb(db, abgesagt)).toEqual({ ergebnis: 'ok', hinfaellig: [] });
 		const doppel = await kategorieIn(t.id, 'Doppel', {
 			geschlecht: 'offen',
 			art: 'doppel',
@@ -368,7 +368,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		expect(await zaehleAktive(db, a)).toBe(0);
 		expect(await loescheAnmeldung(db, admin, id, spaeter)).toBe('nicht-gefunden');
 		expect(await loescheAnmeldung(db, admin, -1, spaeter)).toBe('nicht-gefunden');
-		expect(await sageKategorieAb(db, a)).toBe('ok');
+		expect(await sageKategorieAb(db, a)).toEqual({ ergebnis: 'ok', hinfaellig: [] });
 	});
 
 	test('FR-08: Wildcard-Antrag bestätigen oder ablehnen; zweiter Entscheid und Entscheid nach Rückzug ergeben nicht-beantragt', async () => {

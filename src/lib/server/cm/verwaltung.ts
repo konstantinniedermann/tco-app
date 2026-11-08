@@ -58,7 +58,7 @@ const GEAENDERT: Eintrag[] = [{ aktion: 'cm-anmeldung-geaendert' }];
  * Hält die CM-Änderung im Verlauf des Spielers fest, außer er ist gelöscht: Von ihm bleibt nur der
  * Name, sein Verlauf ist weg und wächst nicht wieder (FR-04).
  */
-async function schreibeGeaendert(
+export async function schreibeGeaendert(
 	tx: DbOderTx,
 	spieler: { id: number; status: string },
 	urheber: CmUrheber,

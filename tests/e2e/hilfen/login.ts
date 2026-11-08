@@ -13,6 +13,7 @@ import {
 	meldeAn as meldeZurCmAnInDb
 } from '../../../src/lib/server/cm/anmeldungen.ts';
 import { stelleAnfrage } from '../../../src/lib/server/cm/doppel.ts';
+import { meldeDoppelVonHandAn } from '../../../src/lib/server/cm/verwaltung-doppel.ts';
 import { konto, mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../../../src/lib/server/turnier/angaben.ts';
 import {
@@ -168,10 +169,63 @@ export async function stelleAnfrageDirekt(
 	if (r !== 'ok') throw new Error(`Anfrage für Kategorie ${kategorieId}: ${r}`);
 }
 
-/** Meldet ein Mitglied über die Fachlogik zu einer Einzel-Kategorie an (ohne Mail). */
-export async function meldeZurCmAn(kategorieId: number, mitgliedId: number): Promise<void> {
-	const r = await meldeZurCmAnInDb(hole().db, kategorieId, mitgliedId, new Date());
+/**
+ * Meldet ein Mitglied über die Fachlogik zu einer Kategorie an (ohne Mail); im Doppel allein
+ * (*sucht Partner*), wahlweise mit Kommentar (FR-49).
+ */
+export async function meldeZurCmAn(
+	kategorieId: number,
+	mitgliedId: number,
+	suchtext: string | null = null
+): Promise<void> {
+	const r = await meldeZurCmAnInDb(hole().db, kategorieId, mitgliedId, new Date(), suchtext);
 	if (r !== 'ok') throw new Error(`Anmeldung zur Kategorie ${kategorieId}: ${r}`);
+}
+
+/**
+ * Meldet ein Paar über die Fachlogik der Verwaltung an (FR-46), als CM-Admin `cmMitgliedId`, ohne
+ * Meldung an die Spieler; Warnungen übergeht es.
+ */
+export async function meldePaarDirektAn(
+	kategorieId: number,
+	paar: [number, number],
+	cmMitgliedId: number
+): Promise<void> {
+	const r = await meldeDoppelVonHandAn(
+		hole().db,
+		{ art: 'admin', mitgliedId: cmMitgliedId },
+		kategorieId,
+		paar,
+		new Date(),
+		true
+	);
+	if (typeof r !== 'object' || !('ergebnis' in r)) {
+		throw new Error(`Paar für Kategorie ${kategorieId}: ${JSON.stringify(r)}`);
+	}
+}
+
+/**
+ * Das erfundene Mitglied ist ausgetreten, ohne die Folgen eines Austritts (seine Anmeldungen
+ * bleiben stehen), wie nach dem Anmeldeschluss.
+ */
+export async function setzeAusgetreten(mitgliedId: number): Promise<void> {
+	await hole()
+		.db.update(mitglied)
+		.set({ status: 'ausgetreten', austrittAm: new Date() })
+		.where(eq(mitglied.id, mitgliedId));
+}
+
+/** Setzt den Anmeldeschluss eines Turniers (`YYYY-MM-DD`), etwa auf ein vergangenes Datum. */
+export async function setzeAnmeldeschluss(turnierId: number, datum: string): Promise<void> {
+	await hole().db.update(turnier).set({ anmeldeschluss: datum }).where(eq(turnier.id, turnierId));
+}
+
+/** Das Konto hat ein Login, als hätte es den Brief-Code eingelöst, ohne Browser. */
+export async function gibLogin(kontoId: number): Promise<void> {
+	await hole()
+		.db.update(konto)
+		.set({ briefCodeBenutztAm: new Date() })
+		.where(eq(konto.id, kontoId));
 }
 
 /** Wildcard-Antrag über die Fachlogik (FR-08), ohne Mail an Spieler und CM-Admins. */

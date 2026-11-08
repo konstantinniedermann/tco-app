@@ -152,6 +152,8 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 		const ergebnis = async (status: number, inhalt: unknown) =>
 			stelleAnfrage(1, 2, holer(json(status, inhalt)).holen);
 		expect(await ergebnis(409, { fehler: 'schon-angefragt' })).toEqual({ art: 'schon-angefragt' });
+		expect(await ergebnis(409, { fehler: 'anfrage-offen' })).toEqual({ art: 'anfrage-offen' });
+		expect(await ergebnis(409, { fehler: 'hinfaellig' })).toEqual({ art: 'hinfaellig' });
 		expect(await ergebnis(409, { fehler: 'passt-nicht' })).toEqual({ art: 'passt-nicht' });
 		expect(await ergebnis(404, { fehler: 'nicht-gefunden' })).toEqual({ art: 'nicht-gefunden' });
 		expect(await nimmAnfrageAn(1, holer(json(409, { fehler: 'voll' })).holen)).toEqual({

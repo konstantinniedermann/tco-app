@@ -1,6 +1,6 @@
 // Anmeldungen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01, A-ANMELDUNG-04,
 // A-ANMELDUNG-10, FR-05 bis FR-10, FR-37); Anfragen und Suche im Doppel in `doppel.ts`.
-import { and, asc, count, eq, gte, inArray, ne, sql } from 'drizzle-orm';
+import { and, asc, count, eq, gte, inArray, isNotNull, ne, sql } from 'drizzle-orm';
 import type { Klassierung } from '../../turnier/klassierung.ts';
 import { nameText, type Namensteile } from '../../name.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
@@ -8,6 +8,7 @@ import {
 	anmeldung,
 	anmeldungSpieler,
 	kategorie,
+	konto,
 	mitglied,
 	partnerAnfrage,
 	turnier,
@@ -177,7 +178,8 @@ export async function laufendeTurniere(
 		.select({ turnierId: kategorie.turnierId, n: count() })
 		.from(partnerAnfrage)
 		.innerJoin(kategorie, eq(kategorie.id, partnerAnfrage.kategorieId))
-		.where(and(eq(partnerAnfrage.anId, mitgliedId), anfrageZaehlt))
+		.innerJoin(konto, eq(konto.mitgliedId, partnerAnfrage.vonId))
+		.where(and(eq(partnerAnfrage.anId, mitgliedId), anfrageVonMitLogin))
 		.groupBy(kategorie.turnierId);
 	const anfragen = new Map(offene.map((o) => [o.turnierId, o.n]));
 	return zeilen.map((z) => ({
@@ -285,6 +287,12 @@ export async function ladeCmAnsicht(
  */
 const anfrageZaehlt = and(eq(kategorie.status, 'aktiv'), eq(kategorie.art, 'doppel'));
 
+/** Ein Login hat, wessen Konto nicht gesperrt ist und wer den Brief-Code eingelöst hat. */
+export const hatLogin = and(eq(konto.gesperrt, false), isNotNull(konto.briefCodeBenutztAm));
+
+/** Anfragen zählen nur, solange der Anfragende ein Login hat: Nur dann kann die Antwort ihn erreichen. */
+const anfrageVonMitLogin = and(anfrageZaehlt, hatLogin);
+
 /** Telefon, sonst E-Mail, sonst nichts. */
 const kontaktVon = (m: { telefon: string | null; email: string | null }): CmAnfrage['kontakt'] => {
 	const telefon = m.telefon?.trim();
@@ -308,8 +316,13 @@ async function offeneAnfragenAn(db: Db, turnierId: number, mitgliedId: number) {
 		.from(partnerAnfrage)
 		.innerJoin(kategorie, eq(kategorie.id, partnerAnfrage.kategorieId))
 		.innerJoin(mitglied, eq(mitglied.id, partnerAnfrage.vonId))
+		.innerJoin(konto, eq(konto.mitgliedId, partnerAnfrage.vonId))
 		.where(
-			and(eq(partnerAnfrage.anId, mitgliedId), eq(kategorie.turnierId, turnierId), anfrageZaehlt)
+			and(
+				eq(partnerAnfrage.anId, mitgliedId),
+				eq(kategorie.turnierId, turnierId),
+				anfrageVonMitLogin
+			)
 		)
 		.orderBy(asc(partnerAnfrage.gestelltAm), asc(partnerAnfrage.id));
 	return zeilen.map((z): CmAnfrage => ({
@@ -340,7 +353,8 @@ async function fuelleDoppel(db: Db, doppel: CmKategorie[], mitgliedId: number): 
 			mitgliedId: mitglied.id,
 			...namensSpalten,
 			telefon: mitglied.telefon,
-			email: mitglied.email
+			email: mitglied.email,
+			mitgliedStatus: mitglied.status
 		})
 		.from(anmeldung)
 		.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
@@ -378,7 +392,12 @@ async function fuelleDoppel(db: Db, doppel: CmKategorie[], mitgliedId: number): 
 			if (ich && partner) {
 				k.eigen = {
 					art: 'paar',
-					partner: { name: namensteile(partner), telefon: partner.telefon, email: partner.email }
+					// Wer nicht mehr aktiv ist, gibt keinen Kontakt mehr heraus; der Name bleibt.
+					partner: {
+						name: namensteile(partner),
+						telefon: partner.mitgliedStatus === 'aktiv' ? partner.telefon : null,
+						email: partner.mitgliedStatus === 'aktiv' ? partner.email : null
+					}
 				};
 			}
 		} else if (ich) {

@@ -121,3 +121,20 @@ export function passtAlsPaar(k: KategorieRegel, a: Spieler, b: Spieler, streng: 
 	if (b.klassierung === null) return true;
 	return punkte(a.klassierung) + punkte(b.klassierung) >= k.mindestsumme;
 }
+
+/**
+ * FR-46: Warnungen beim Anmelden eines Doppels von Hand (der CM-Admin darf trotzdem anmelden).
+ * `b === null`: allein, *sucht Partner*. Fehlen Geschlecht oder Klassierung, ist das die einzige
+ * Warnung; Grenze und Anmeldeschluss prüft der Server.
+ */
+export function warnungenDoppel(
+	k: KategorieRegel,
+	a: Spieler,
+	b: Spieler | null
+): ('angaben-fehlen' | 'passt-nicht')[] {
+	if (!hatGeschlechtUndKlassierung(a) || (b !== null && !hatGeschlechtUndKlassierung(b))) {
+		return ['angaben-fehlen'];
+	}
+	const passt = b === null ? passtDoppelAllein(k, a) : passtAlsPaar(k, a, b, true);
+	return passt ? [] : ['passt-nicht'];
+}

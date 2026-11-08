@@ -1,15 +1,17 @@
 // Turniere und Kategorien speichern, Anmeldung öffnen und schliessen (FR-33 bis FR-35).
-import { and, asc, desc, eq, sql } from 'drizzle-orm';
-import { zaehleAktive, zaehleUnpassende } from '../cm/anmeldungen.ts';
+import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
+import { nameFuerText, zaehleAktive, zaehleUnpassende } from '../cm/anmeldungen.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
 	kategorie,
+	mitglied,
 	partnerAnfrage,
 	turnier,
 	turniernummer,
 	type KategorieStatus,
 	type TurnierStatus
 } from '../db/schema.ts';
+import { namensSpalten } from '../namen.ts';
 import { istStufe } from '../../turnier/klassierung.ts';
 import { vorSchluss, wirksamerStatus } from '../../turnier/status.ts';
 import type { KategorieWerte, TurnierWerte } from './angaben.ts';
@@ -259,6 +261,47 @@ export async function ladeKategorie(
 	};
 }
 
+/** Eine gelöschte Partner-Anfrage: Wer sie gestellt hat, an wen, in welcher Kategorie. */
+export type HinfaelligeAnfrage = {
+	vonId: number;
+	an: string;
+	kategorie: string;
+	turnierId: number;
+};
+
+/**
+ * FR-48: löscht alle offenen Partner-Anfragen der Kategorie und gibt zurück, wer sie an wen
+ * gestellt hatte, damit die Schnittstelle die Anfragenden benachrichtigen kann (FR-46).
+ */
+async function loescheAnfragenDerKategorie(
+	tx: DbOderTx,
+	kategorieId: number,
+	kategorieName: string,
+	turnierId: number
+): Promise<HinfaelligeAnfrage[]> {
+	const zeilen = await tx
+		.delete(partnerAnfrage)
+		.where(eq(partnerAnfrage.kategorieId, kategorieId))
+		.returning({ vonId: partnerAnfrage.vonId, anId: partnerAnfrage.anId });
+	if (zeilen.length === 0) return [];
+	const namen = await tx
+		.select({ id: mitglied.id, ...namensSpalten })
+		.from(mitglied)
+		.where(
+			inArray(
+				mitglied.id,
+				zeilen.map((z) => z.anId)
+			)
+		);
+	const nameVon = new Map(namen.map((n) => [n.id, nameFuerText(n)]));
+	return zeilen.map((z) => ({
+		vonId: z.vonId,
+		an: nameVon.get(z.anId) ?? '',
+		kategorie: kategorieName,
+		turnierId
+	}));
+}
+
 /**
  * FR-36: Passen aktive Anmeldungen nach den neuen Werten nicht mehr, speichert nur `trotzdem`.
  * Einzel oder Doppel wechseln geht nur ohne aktive Anmeldungen, auch mit `trotzdem` nicht
@@ -273,7 +316,12 @@ export async function aendereKategorie(
 	w: KategorieWerte,
 	trotzdem: boolean
 ): Promise<
-	'ok' | 'vergeben' | 'abgesagt' | 'art-gesperrt' | 'nicht-gefunden' | { unpassend: number }
+	| { ergebnis: 'ok'; hinfaellig: HinfaelligeAnfrage[] }
+	| 'vergeben'
+	| 'abgesagt'
+	| 'art-gesperrt'
+	| 'nicht-gefunden'
+	| { unpassend: number }
 > {
 	try {
 		return await db.transaction(async (tx) => {
@@ -287,10 +335,10 @@ export async function aendereKategorie(
 			}
 			await tx.update(kategorie).set(kategorieSpalten(w)).where(eq(kategorie.id, id));
 			// FR-48: Wie beim Absagen: Nach dem Wechsel der Art ist keine offene Anfrage mehr gültig.
-			if (w.art !== k.art) {
-				await tx.delete(partnerAnfrage).where(eq(partnerAnfrage.kategorieId, id));
-			}
-			return 'ok' as const;
+			// Die Meldung nennt den bisherigen Namen der Kategorie.
+			const hinfaellig =
+				w.art !== k.art ? await loescheAnfragenDerKategorie(tx, id, k.name, k.turnierId) : [];
+			return { ergebnis: 'ok' as const, hinfaellig };
 		});
 	} catch (f) {
 		pruefeVergeben(f, 'kategorie_name_aktiv_unique');
@@ -305,10 +353,12 @@ export async function aendereKategorie(
 export async function sageKategorieAb(
 	db: Db,
 	id: number
-): Promise<'ok' | 'nicht-gefunden' | { aktiv: number }> {
+): Promise<
+	{ ergebnis: 'ok'; hinfaellig: HinfaelligeAnfrage[] } | 'nicht-gefunden' | { aktiv: number }
+> {
 	return db.transaction(async (tx) => {
 		const [k] = await tx
-			.select({ id: kategorie.id })
+			.select({ id: kategorie.id, name: kategorie.name, turnierId: kategorie.turnierId })
 			.from(kategorie)
 			.where(eq(kategorie.id, id))
 			.for('update');
@@ -316,7 +366,7 @@ export async function sageKategorieAb(
 		const aktiv = await zaehleAktive(tx, id);
 		if (aktiv > 0) return { aktiv };
 		await tx.update(kategorie).set({ status: 'abgesagt' }).where(eq(kategorie.id, id));
-		await tx.delete(partnerAnfrage).where(eq(partnerAnfrage.kategorieId, id));
-		return 'ok' as const;
+		const hinfaellig = await loescheAnfragenDerKategorie(tx, id, k.name, k.turnierId);
+		return { ergebnis: 'ok' as const, hinfaellig };
 	});
 }

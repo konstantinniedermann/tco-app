@@ -36,7 +36,13 @@ import {
 	loescheAnmeldung,
 	entscheideAntrag,
 	sucheSpieler,
-	korrigiereKlassierung
+	korrigiereKlassierung,
+	ladeDoppel,
+	meldeDoppelAn,
+	legeZusammen,
+	aenderePartner,
+	meldeAnfrageAlsPaarAn,
+	loescheAnfrage
 } from './api.ts';
 
 type Aufruf = { pfad: string; init: RequestInit };
@@ -328,6 +334,77 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			{},
 			{ klassierung: 'R6' }
 		]);
+	});
+
+	it('A-ANMELDUNG-06, FR-46, FR-48: Doppel verwalten mit Pfad, Methode und Körper', async () => {
+		const h = holer(json(200, {}));
+		await ladeDoppel(7, h.holen);
+		await meldeDoppelAn(7, [12], false, h.holen);
+		await meldeDoppelAn(7, [12, 13], true, h.holen);
+		await legeZusammen(40, 41, false, h.holen);
+		await legeZusammen(40, 41, true, h.holen);
+		await aenderePartner(40, 12, 14, false, h.holen);
+		await aenderePartner(40, 12, null, true, h.holen);
+		await meldeAnfrageAlsPaarAn(9, false, h.holen);
+		await meldeAnfrageAlsPaarAn(9, true, h.holen);
+		await loescheAnfrage(9, h.holen);
+		expect(h.aufrufe.map((a) => [a.init.method, a.pfad])).toEqual([
+			['GET', '/api/admin/kategorien/7/doppel'],
+			['POST', '/api/admin/kategorien/7/doppel'],
+			['POST', '/api/admin/kategorien/7/doppel'],
+			['POST', '/api/admin/anmeldungen/40/zusammenlegen'],
+			['POST', '/api/admin/anmeldungen/40/zusammenlegen'],
+			['POST', '/api/admin/anmeldungen/40/partner'],
+			['POST', '/api/admin/anmeldungen/40/partner'],
+			['POST', '/api/admin/anfragen/9/paar'],
+			['POST', '/api/admin/anfragen/9/paar'],
+			['POST', '/api/admin/anfragen/9/loeschen']
+		]);
+		const koerper = h.aufrufe.slice(1).map((a) => JSON.parse(String(a.init.body)));
+		expect(koerper).toEqual([
+			{ mitgliedIds: [12] },
+			{ mitgliedIds: [12, 13], trotzdem: true },
+			{ mitAnmeldungId: 41 },
+			{ mitAnmeldungId: 41, trotzdem: true },
+			{ bleibtId: 12, neuId: 14 },
+			{ bleibtId: 12, neuId: null, trotzdem: true },
+			{},
+			{ trotzdem: true },
+			{}
+		]);
+	});
+
+	it('A-ANMELDUNG-06: Doppel-Liste kommt mit Paaren, Suchenden und Anfragen an', async () => {
+		const s = (mitgliedId: number, vorname: string) => ({
+			mitgliedId,
+			name: { rufname: null, vorname, nachname: 'Beispiel' },
+			mitgliedStatus: 'aktiv',
+			geschlecht: 'm',
+			klassierung: 'R5'
+		});
+		const liste = {
+			paare: [{ anmeldungId: 40, spieler: [s(12, 'Max'), s(13, 'Tim')], summe: 10 }],
+			suchende: [{ anmeldungId: 41, spieler: s(14, 'Ben'), kommentar: 'Gern am Abend.' }],
+			anfragen: [
+				{
+					anfrageId: 9,
+					von: s(15, 'Leo'),
+					an: s(16, 'Noah'),
+					gestelltAm: '2027-04-02T08:00:00.000Z'
+				}
+			]
+		};
+		expect(await ladeDoppel(7, holer(json(200, liste)).holen)).toEqual({ art: 'ok', daten: liste });
+		expect(await ladeDoppel(7, holer(json(404, { fehler: 'nicht-gefunden' })).holen)).toEqual({
+			art: 'nicht-gefunden'
+		});
+		const w = holer(json(409, { fehler: 'warnung', warnungen: ['passt-nicht', 'voll'] }));
+		expect(await meldeDoppelAn(7, [12, 13], false, w.holen)).toEqual({
+			art: 'warnung',
+			warnungen: ['passt-nicht', 'voll']
+		});
+		const v = holer(json(409, { fehler: 'vorbereitung' }));
+		expect(await legeZusammen(40, 41, false, v.holen)).toEqual({ art: 'vorbereitung' });
 	});
 
 	it('FR-08: Entscheid schickt den Grund nur bei einer Ablehnung, ohne Leerzeichen am Rand', async () => {

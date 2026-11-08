@@ -2,7 +2,14 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
-import { anmeldung, anmeldungSpieler, kategorie, mitglied, partnerAnfrage } from '../db/schema.ts';
+import {
+	anmeldung,
+	anmeldungSpieler,
+	kategorie,
+	konto,
+	mitglied,
+	partnerAnfrage
+} from '../db/schema.ts';
 import type { KategorieWerte } from '../turnier/angaben.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../turnier/turniere.ts';
 import { setzeKlassierung } from './angaben.ts';
@@ -772,6 +779,11 @@ describe('CM-Anmeldung', () => {
 		await setze(lea, kontakt('079 444 55 66', 'lea@example.org'));
 		await setze(marco, kontakt('079 777 88 99', 'marco@example.org'));
 		await setze(nina, kontakt('079 000 00 00', 'nina@example.org'));
+		// Anfragen zählen nur von Mitgliedern mit Login.
+		await db
+			.update(konto)
+			.set({ briefCodeBenutztAm: new Date('2026-01-05T10:00:00Z') })
+			.where(inArray(konto.mitgliedId, [lea, nina]));
 
 		const paarId = await doppelAnmeldung(mixed, [rita, sepp], null);
 		const leaId = await doppelAnmeldung(mixed, [lea], 'Abends frei');
