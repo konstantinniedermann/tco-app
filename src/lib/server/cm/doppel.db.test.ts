@@ -417,7 +417,7 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 			reto
 		];
 
-		const treffer = (await sucheDoppelPartner(db, t.mixed, ich, ' ma ')).filter((z) =>
+		const treffer = (await sucheDoppelPartner(db, t.mixed, ich, ' ma ', t.jetzt)).filter((z) =>
 			meine.includes(z.mitgliedId)
 		);
 		const leer = { vermerk: null, suchtPartner: false, kommentar: null, anfrageId: null };
@@ -455,22 +455,35 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 			{ ...leer, mitgliedId: reto, name: name('Reto', 'Huber', 'Mattu'), klassierung: 'R5' }
 		]);
 		// «Rufname Nachname» findet ihn auch.
-		const rufer = await sucheDoppelPartner(db, t.mixed, ich, 'mattu huber');
+		const rufer = await sucheDoppelPartner(db, t.mixed, ich, 'mattu huber', t.jetzt);
 		expect(rufer.map((z) => z.mitgliedId)).toContain(reto);
-		expect(await sucheDoppelPartner(db, t.mixed, ich, ' m ')).toEqual([]);
+		expect(await sucheDoppelPartner(db, t.mixed, ich, ' m ', t.jetzt)).toEqual([]);
 		// Eine Einzel-Kategorie und eine unbekannte haben keine Partner.
-		expect(await sucheDoppelPartner(db, t.damenEinzel[0], ich, 'Marco')).toEqual([]);
-		expect(await sucheDoppelPartner(db, -1, ich, 'Marco')).toEqual([]);
+		expect(await sucheDoppelPartner(db, t.damenEinzel[0], ich, 'Marco', t.jetzt)).toEqual([]);
+		expect(await sucheDoppelPartner(db, -1, ich, 'Marco', t.jetzt)).toEqual([]);
 		// Im Herren Doppel passt Lea selbst nicht.
-		expect(await sucheDoppelPartner(db, t.herren, ich, 'Marco')).toEqual([]);
+		expect(await sucheDoppelPartner(db, t.herren, ich, 'Marco', t.jetzt)).toEqual([]);
 
 		// Eine eigene offene Anfrage steht beim Treffer.
 		const id = await anfrage(t.mixed, ich, marcoId, t.jetzt);
 		// Andere Tests legen auch einen Marco Beispiel an.
-		const nachher = await sucheDoppelPartner(db, t.mixed, ich, 'Marco Beispiel');
+		const nachher = await sucheDoppelPartner(db, t.mixed, ich, 'Marco Beispiel', t.jetzt);
 		expect(nachher.filter((z) => z.mitgliedId === marcoId)).toEqual([
 			{ ...leer, mitgliedId: marcoId, name: marcoName, klassierung: 'R5', anfrageId: id }
 		]);
+	});
+
+	test('FR-48: nach dem Anmeldeschluss findet die Suche niemanden mehr', async () => {
+		const t = await offenesDoppel();
+		const ich = await lea();
+		const marcoId = await marco();
+		const vorher = await sucheDoppelPartner(db, t.mixed, ich, 'Marco Beispiel', t.jetzt);
+		expect(vorher.map((z) => z.mitgliedId)).toContain(marcoId);
+		// Keine Wahl mehr möglich: keine Namen, Klassierungen oder Kommentare.
+		expect(await sucheDoppelPartner(db, t.mixed, ich, 'Marco Beispiel', t.spaet)).toEqual([]);
+		// Von Hand früher geschlossen wirkt gleich.
+		expect(await setzeStatus(db, t.id, 'geschlossen', t.jetzt)).toBe('ok');
+		expect(await sucheDoppelPartner(db, t.mixed, ich, 'Marco Beispiel', t.jetzt)).toEqual([]);
 	});
 
 	test('A-ANMELDUNG-04: Suche zeigt höchstens 20 Treffer', async () => {
@@ -481,7 +494,7 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		for (let i = 0; i < 21; i++) {
 			await spieler('Partner', `Q${marke}${String(i).padStart(2, '0')}`);
 		}
-		const treffer = await sucheDoppelPartner(db, t.mixed, ich, marke);
+		const treffer = await sucheDoppelPartner(db, t.mixed, ich, marke, t.jetzt);
 		expect(treffer.map((z) => `${z.name.vorname} ${z.name.nachname}`)).toEqual(
 			Array.from({ length: 20 }, (_, i) => `Partner Q${marke}${String(i).padStart(2, '0')}`)
 		);

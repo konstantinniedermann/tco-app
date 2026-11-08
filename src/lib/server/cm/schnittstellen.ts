@@ -294,7 +294,7 @@ export function getCmPartner(d: CmDienste, e: CmEreignis): Promise<Response> {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const text = e.url.searchParams.get('suche') ?? '';
-		return antwort(200, await sucheDoppelPartner(d.db, id, konto.mitgliedId, text));
+		return antwort(200, await sucheDoppelPartner(d.db, id, konto.mitgliedId, text, jetzt(d)));
 	});
 }
 

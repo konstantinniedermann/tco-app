@@ -94,13 +94,15 @@ const hatPlatz = (s: Stand) => s.hier !== null || s.anzahl < GRENZE;
  * findet auch den Rufnamen (`nameEnthaelt`). Treffer sind aktive Mitglieder mit Login ausser
  * einem selbst, die mit einem selbst passen (`passtAlsPaar`,
  * fehlende Angaben des anderen mit Vermerk), dort nicht schon zu zweit sind und die Grenze nicht
- * erreicht haben; wer hier allein sucht, zählt schon mit.
+ * erreicht haben; wer hier allein sucht, zählt schon mit. Nach dem wirksamen Anmeldeschluss ist
+ * keine Wahl mehr möglich: Die Liste ist leer.
  */
 export async function sucheDoppelPartner(
 	db: Db,
 	kategorieId: number,
 	mitgliedId: number,
-	suche: string
+	suche: string,
+	jetzt: Date
 ): Promise<PartnerTreffer[]> {
 	const text = suche.trim();
 	if (text.length < 2) return [];
@@ -111,6 +113,7 @@ export async function sucheDoppelPartner(
 		.where(eq(kategorie.id, kategorieId));
 	const [m] = await db.select(spielerSpalten).from(mitglied).where(eq(mitglied.id, mitgliedId));
 	if (!z || !m || !istDoppelOffenZurWahl(z)) return [];
+	if (wirksamerStatus(z.t.status, z.t.anmeldeschluss, jetzt) !== 'offen') return [];
 	const regel = regelAus(z.k);
 	const ich = spielerAus(m);
 
