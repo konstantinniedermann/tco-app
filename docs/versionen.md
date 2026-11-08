@@ -8,6 +8,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- E2E auf eigener Datenbank: Jeder E2E-Lauf (`make e2e`, `make check`, Pre-Push-Hook, CI) legt
+  über `scripts/e2e.ts` eine frische Datenbank an und löscht sie danach. Die lokale Datenbank
+  `mytco` wuchs vorher mit jedem Lauf (zuletzt über 11'000 Test-Mitglieder), Listen über alle
+  Mitglieder liefen in Timeouts und der Pre-Push-Hook wurde rot ohne Fehler im Code.
+- `make seed` legt einen Testbestand an: rund 200 erfundene Mitglieder mit gemischten Angaben,
+  dazu ein zweiter Anlass (Clubabend) und gemischte Antworten auf beide Anlässe.
+
 ## 0.15.0 — Doppel mit Partner-Anfrage
 
 - Doppel zur Clubmeisterschaft (#59, Etappe 1): Mitglieder suchen in einer Doppel-Kategorie einen
