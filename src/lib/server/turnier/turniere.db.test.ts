@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
-import { meldeAb, meldeAn } from '../cm/anmeldungen.ts';
+import { ladeCmAnsicht, laufendeTurniere, meldeAb, meldeAn } from '../cm/anmeldungen.ts';
 import { erstelleDb } from '../db/index.ts';
 import { anmeldung, anmeldungSpieler, mitglied, partnerAnfrage } from '../db/schema.ts';
 import type { KategorieWerte, TurnierWerte } from './angaben.ts';
@@ -302,6 +302,43 @@ describe('Kategorien', () => {
 			.from(partnerAnfrage)
 			.where(eq(partnerAnfrage.vonId, a));
 		expect(offen).toEqual([{ kategorieId: andere.id }]);
+	});
+
+	test('FR-36, FR-48: Wechsel Doppel → Einzel löscht die Anfragen; Zählung und Liste 0', async () => {
+		const { id, w } = await neuesTurnier();
+		const k = await legeKategorieAn(db, id, alsDoppel('Herren Doppel'));
+		const andere = await legeKategorieAn(db, id, alsDoppel('Offenes Doppel'));
+		if (k.ergebnis !== 'ok' || andere.ergebnis !== 'ok') throw new Error('anlegen');
+		expect(await setzeStatus(db, id, 'offen', jetztVor(w))).toBe('ok');
+		const a = await herr('R4');
+		const b = await herr('R5');
+		const c = await herr('R6');
+		await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: k.id, vonId: a, anId: b, gestelltAm: jetztVor(w) });
+		await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: andere.id, vonId: a, anId: c, gestelltAm: jetztVor(w) });
+		const anfragenAn = async (mitgliedId: number) => ({
+			zaehlung: (await laufendeTurniere(db, mitgliedId, jetztVor(w))).find((t) => t.id === id)
+				?.anfragen,
+			liste: (await ladeCmAnsicht(db, id, mitgliedId, jetztVor(w)))?.anfragen.length
+		});
+		expect(await anfragenAn(b)).toEqual({ zaehlung: 1, liste: 1 });
+
+		expect(await aendereKategorie(db, k.id, einzel('Herren Doppel'), false)).toBe('ok');
+		expect(await anfragenAn(b)).toEqual({ zaehlung: 0, liste: 0 });
+		const offen = await db
+			.select({ kategorieId: partnerAnfrage.kategorieId })
+			.from(partnerAnfrage)
+			.where(eq(partnerAnfrage.vonId, a));
+		expect(offen).toEqual([{ kategorieId: andere.id }]);
+		// Eine Anfrage in einer Einzel-Kategorie zählt nie, auch wenn sie noch dastünde.
+		await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: k.id, vonId: c, anId: b, gestelltAm: jetztVor(w) });
+		expect(await anfragenAn(b)).toEqual({ zaehlung: 0, liste: 0 });
+		expect(await anfragenAn(c)).toEqual({ zaehlung: 1, liste: 1 });
 	});
 
 	test('FR-35: Absagen mit aktiver Anmeldung ergibt hat-anmeldungen, nach Abmeldung geht es', async () => {

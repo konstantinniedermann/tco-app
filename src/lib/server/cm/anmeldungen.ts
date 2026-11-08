@@ -279,8 +279,11 @@ export async function ladeCmAnsicht(
 	};
 }
 
-/** Eine Anfrage zählt nur, solange ihre Kategorie nicht abgesagt ist; Zählung und Liste teilen sich das. */
-const anfrageZaehlt = eq(kategorie.status, 'aktiv');
+/**
+ * Eine Anfrage zählt nur, solange ihre Kategorie nicht abgesagt und ein Doppel ist; Zählung und
+ * Liste teilen sich das.
+ */
+const anfrageZaehlt = and(eq(kategorie.status, 'aktiv'), eq(kategorie.art, 'doppel'));
 
 /** Telefon, sonst E-Mail, sonst nichts. */
 const kontaktVon = (m: { telefon: string | null; email: string | null }): CmAnfrage['kontakt'] => {

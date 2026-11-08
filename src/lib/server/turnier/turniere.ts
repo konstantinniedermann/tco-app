@@ -262,7 +262,8 @@ export async function ladeKategorie(
 /**
  * FR-36: Passen aktive Anmeldungen nach den neuen Werten nicht mehr, speichert nur `trotzdem`.
  * Einzel oder Doppel wechseln geht nur ohne aktive Anmeldungen, auch mit `trotzdem` nicht
- * (`art-gesperrt`): Sonst würde aus einer Einzel-Anmeldung ungefragt ein *sucht Partner*.
+ * (`art-gesperrt`): Sonst würde aus einer Einzel-Anmeldung ungefragt ein *sucht Partner*. Nach
+ * einem Wechsel sind die offenen Partner-Anfragen der Kategorie gelöscht (FR-48).
  * Gesperrt wird allein die Kategorie, nie eine Mitgliedszeile: So bleibt die Reihenfolge von
  * `meldeAn` (Mitglied, dann Kategorie) ohne Zyklus.
  */
@@ -285,6 +286,10 @@ export async function aendereKategorie(
 				if (unpassend > 0) return { unpassend };
 			}
 			await tx.update(kategorie).set(kategorieSpalten(w)).where(eq(kategorie.id, id));
+			// FR-48: Wie beim Absagen: Nach dem Wechsel der Art ist keine offene Anfrage mehr gültig.
+			if (w.art !== k.art) {
+				await tx.delete(partnerAnfrage).where(eq(partnerAnfrage.kategorieId, id));
+			}
 			return 'ok' as const;
 		});
 	} catch (f) {
