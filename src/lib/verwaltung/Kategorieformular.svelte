@@ -16,6 +16,7 @@
 	/** Vorbelegung: Einzel über den ganzen Bereich; beim Doppel die Mindestsumme 9. */
 	const VON = 'N1';
 	const BIS = 'R9';
+	// Annahme K-51: Mindestsumme 9 für alle Doppelkategorien.
 	const SUMME = '9';
 
 	export const NEUE_KATEGORIE: KategorieWerte = {
@@ -198,7 +199,12 @@
 		{/if}
 	</fieldset>
 
-	<fieldset class="auswahl-gruppe" aria-describedby={fehlerId('geschlecht')}>
+	<fieldset
+		class="auswahl-gruppe"
+		aria-describedby={[einzel && 'kategorie-mixed-hinweis', fehlerId('geschlecht')]
+			.filter(Boolean)
+			.join(' ') || undefined}
+	>
 		<legend>Geschlecht</legend>
 		<label class="auswahl"
 			><input
@@ -236,7 +242,7 @@
 			/>offen (alle)</label
 		>
 		{#if einzel}
-			<p class="leise">Mixed gibt es nur im Doppel.</p>
+			<p class="leise" id="kategorie-mixed-hinweis">Mixed gibt es nur im Doppel.</p>
 		{/if}
 		{#if fehler.geschlecht}
 			<p class="fehler" id="fehler-kategorie-geschlecht">{fehler.geschlecht}</p>
@@ -344,7 +350,7 @@
 					.join(' ')}
 			/>
 			<span class="feld-hilfe" id="kategorie-mindestsumme-hilfe"
-				>Die Klassierungen beider Spieler zusammengezählt: R1 = 1 bis R9 = 9, ohne Lizenz = 10, N =
+				>Die Klassierungen beider Spieler zusammengezählt: R1 = 1 bis R9 = 9, keine Lizenz = 10, N =
 				0. Bei 9 geht R4 + R5, R3 + R5 nicht.</span
 			>
 			{#if fehler.mindestsumme}
