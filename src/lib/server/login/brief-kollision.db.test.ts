@@ -5,7 +5,7 @@ import { erstelleDb } from '../db/index.ts';
 import { konto } from '../db/schema.ts';
 import { erstelleBremsen } from './bremse.ts';
 import { erzeugeBriefCode } from './codes.ts';
-import { erstelleLoginDienst } from './dienst.ts';
+import { erstelleLoginDienst, stelleBriefCodeAusIn } from './dienst.ts';
 
 // Erzwingt Hash-Kollisionen: die ersten Aufrufe liefern vorgegebene Codes.
 const vorgabe: string[] = [];
@@ -42,6 +42,25 @@ describe('Brief-Code: Hash-Kollision', () => {
 		await dienst.stelleBriefCodeAus(a.kontoId);
 		vorgabe.push(belegt, belegt);
 		const { code } = await dienst.stelleBriefCodeAus(b.kontoId);
+		expect(code).not.toBe(belegt);
+		const [k] = await db.select().from(konto).where(eq(konto.id, b.kontoId));
+		expect(k.briefCodeHash).not.toBeNull();
+	});
+
+	test('Kollision in einer äusseren Transaktion bricht diese nicht ab', async () => {
+		const a = await legeMitgliedAn(db);
+		const b = await legeMitgliedAn(db);
+		const belegt = erzeugeBriefCode();
+		vorgabe.push(belegt);
+		await dienst.stelleBriefCodeAus(a.kontoId);
+		vorgabe.push(belegt);
+		const jetzt = new Date('2026-11-02T12:00:00Z');
+		const code = await db.transaction(async (tx) => {
+			const r = await stelleBriefCodeAusIn(tx, 'y'.repeat(40), b.kontoId, jetzt);
+			// Nach der Kollision ist die Transaktion weiter nutzbar.
+			await tx.select().from(konto).where(eq(konto.id, b.kontoId));
+			return r.code;
+		});
 		expect(code).not.toBe(belegt);
 		const [k] = await db.select().from(konto).where(eq(konto.id, b.kontoId));
 		expect(k.briefCodeHash).not.toBeNull();

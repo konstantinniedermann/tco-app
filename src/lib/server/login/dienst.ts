@@ -1,5 +1,5 @@
 import { and, eq, gt, inArray, isNotNull, isNull, lt, lte, sql } from 'drizzle-orm';
-import type { Db } from '../db/index.ts';
+import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, mitglied } from '../db/schema.ts';
 import type { Bremsen } from './bremse.ts';
 import {
@@ -75,21 +75,23 @@ export function istEindeutigkeitsfehler(fehler: unknown): boolean {
 	return false;
 }
 
-export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
-	const { db, schluessel, kontakt, bremsen } = abh;
-	const jetzt = abh.jetzt ?? (() => new Date());
-
-	const aktivesMitglied = inArray(
-		konto.mitgliedId,
-		db.select({ id: mitglied.id }).from(mitglied).where(eq(mitglied.status, 'aktiv'))
-	);
-
-	async function stelleBriefCodeAus(kontoId: number) {
-		const gueltigBis = new Date(jetzt().getTime() + BRIEF_CODE_GUELTIG_MS);
-		for (let versuch = 1; ; versuch++) {
-			const code = erzeugeBriefCode();
-			try {
-				const zeilen = await db
+/**
+ * RR-04, FR-24: stellt einen neuen Brief-Code aus und ersetzt den alten; gespeichert wird nur
+ * der Hash. Jeder Versuch läuft in einem Savepoint: Eine Hash-Kollision bricht so eine äussere
+ * Transaktion nicht ab, es wird mit neuem Code wiederholt.
+ */
+export async function stelleBriefCodeAusIn(
+	tx: DbOderTx,
+	schluessel: string,
+	kontoId: number,
+	jetzt: Date
+): Promise<{ code: string; gueltigBis: Date }> {
+	const gueltigBis = new Date(jetzt.getTime() + BRIEF_CODE_GUELTIG_MS);
+	for (let versuch = 1; ; versuch++) {
+		const code = erzeugeBriefCode();
+		try {
+			await tx.transaction(async (sp) => {
+				const zeilen = await sp
 					.update(konto)
 					.set({
 						briefCodeHash: hashBriefCode(schluessel, code),
@@ -99,12 +101,25 @@ export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
 					.where(eq(konto.id, kontoId))
 					.returning({ id: konto.id });
 				if (zeilen.length === 0) throw new Error('Konto nicht gefunden');
-				return { code, gueltigBis };
-			} catch (fehler) {
-				if (!istEindeutigkeitsfehler(fehler) || versuch >= MAX_VERSUCHE_AUSSTELLEN) throw fehler;
-			}
+			});
+			return { code, gueltigBis };
+		} catch (fehler) {
+			if (!istEindeutigkeitsfehler(fehler) || versuch >= MAX_VERSUCHE_AUSSTELLEN) throw fehler;
 		}
 	}
+}
+
+export function erstelleLoginDienst(abh: LoginAbh): LoginDienst {
+	const { db, schluessel, kontakt, bremsen } = abh;
+	const jetzt = abh.jetzt ?? (() => new Date());
+
+	const aktivesMitglied = inArray(
+		konto.mitgliedId,
+		db.select({ id: mitglied.id }).from(mitglied).where(eq(mitglied.status, 'aktiv'))
+	);
+
+	const stelleBriefCodeAus = (kontoId: number) =>
+		stelleBriefCodeAusIn(db, schluessel, kontoId, jetzt());
 
 	async function loginMitBriefCode(
 		eingabe: unknown,

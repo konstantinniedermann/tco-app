@@ -53,6 +53,12 @@ describe('Texte der Verwaltung', () => {
 		});
 	});
 
+	it('FR-26: ausgestellter Brief-Code steht ohne Wert im Verlauf', () => {
+		expect(aktionText({ aktion: 'brief-code-ausgestellt', detail: null })).toBe(
+			'Brief-Code ausgestellt'
+		);
+	});
+
 	it('FR-26, FR-46: Änderungen des CM-Admins an Anmeldungen stehen neutral im Verlauf', () => {
 		expect(aktionText({ aktion: 'cm-anmeldung-geaendert', detail: null })).toBe(
 			'CM-Anmeldung geändert (CM)'

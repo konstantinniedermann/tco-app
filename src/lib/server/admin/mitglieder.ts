@@ -83,7 +83,7 @@ type LoginZeile = {
 	briefCodeBenutztAm: Date | null;
 };
 
-function briefOffen(k: LoginZeile, jetzt: Date): boolean {
+export function briefOffen(k: LoginZeile, jetzt: Date): boolean {
 	return (
 		k.briefCodeHash !== null &&
 		k.briefCodeAblauf !== null &&
@@ -99,7 +99,7 @@ function loginStand(k: LoginZeile, gueltigeSitzungen: number, jetzt: Date): Logi
 }
 
 // Gültige Sitzungen je Konto: nicht abgelaufen und mit der Sitzungsversion des Kontos.
-async function gueltigeSitzungen(
+export async function gueltigeSitzungen(
 	db: DbOderTx,
 	kontoIds: number[],
 	jetzt: Date
