@@ -375,13 +375,18 @@ function uebergang<E extends string>(
 /**
  * FR-04, FR-47: Meldungen nach Austritt oder Vormerken, erst nach dem Commit: an den Partner
  * eines zurückgezogenen Paars und an den anderen jeder gelöschten Anfrage. Ohne Grund und ohne
- * Namen des Ausgetretenen; betrifft es den Admin selbst, entfällt sie. Die Antwort wartet nicht
+ * Namen des Ausgetretenen; betrifft es den Admin selbst, entfällt sie. Gleiche Meldungen an
+ * denselben Empfänger gehen nur einmal (Anfragen in beide Richtungen). Die Antwort wartet nicht
  * auf Push und Mail; wirft `meldeMitgliedern` doch, bleibt das still (SI-05).
  */
 function meldeRueckzug(d: MitteilungAdminDienste, urheber: AdminUrheber, cm: Rueckzug): void {
 	const melder = { db: d.db, push: d.push, mailer: d.mailer, adresse: d.adresse };
+	const gesendet = new Set<string>();
 	const sende = (an: number, m: DoppelMeldung) => {
 		if (an === urheber.mitgliedId) return;
+		const schluessel = JSON.stringify([an, m.titel, m.text, m.pfad]);
+		if (gesendet.has(schluessel)) return;
+		gesendet.add(schluessel);
 		void meldeMitgliedern(melder, [an], m).catch(() => {});
 	};
 	for (const p of cm.partner) sende(p.mitgliedId, austrittMeldung(p.kategorie, p.turnierId));

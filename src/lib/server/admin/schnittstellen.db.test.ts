@@ -986,6 +986,28 @@ describe('Mitgliedschaft: Austritt, Wiedereintritt, Löschung', () => {
 		});
 	}
 
+	test('FR-04, FR-47: Anfragen in beide Richtungen mit demselben Dritten ergeben eine Meldung', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s, ['mitglieder']);
+		const ziel = await legeMitgliedAn(db);
+		const dritter = await legeMitgliedAn(db);
+		const { turnierId, kategorieId } = await offenesDoppel();
+		await db.insert(partnerAnfrage).values([
+			{ kategorieId, vonId: dritter.mitgliedId, anId: ziel.mitgliedId, gestelltAm: start },
+			{ kategorieId, vonId: ziel.mitgliedId, anId: dritter.mitgliedId, gestelltAm: start }
+		]);
+
+		const r = await post(postAustritt, s, admin.konto, String(ziel.mitgliedId));
+
+		expect([r.status, await r.json()]).toEqual([200, {}]);
+		await vi.waitFor(() => expect(s.mails.length).toBeGreaterThan(0));
+		// Beide Meldungen starten vor der Antwort; eine zweite käme gleich nach der ersten.
+		await new Promise((fertig) => setTimeout(fertig, 500));
+		expect(s.mails).toEqual([
+			meldung(dritter.email, 'Die Anfrage für «Herren Doppel» ist hinfällig.', turnierId)
+		]);
+	});
+
 	test('Ablauf: Wiedereintritt, Löschung vormerken und zurücknehmen; falscher Zustand 409', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s, ['mitglieder']);
