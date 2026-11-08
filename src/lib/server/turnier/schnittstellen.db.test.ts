@@ -797,7 +797,7 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 		expect(await treffer.json()).toEqual([
 			{
 				mitgliedId: r5.mitgliedId,
-				name: `${name}, Test`,
+				name: { vorname: 'Test', rufname: null, nachname: name },
 				geschlecht: 'm',
 				jahrgang: 1990,
 				klassierung: 'R5'
