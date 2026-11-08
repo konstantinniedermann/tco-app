@@ -1,6 +1,7 @@
 import { and, asc, eq, inArray, ne, or, sql, type SQL } from 'drizzle-orm';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, kontoRolle, mitglied, sitzung } from '../db/schema.ts';
+import { nameEnthaelt } from '../namen.ts';
 import { beendeAlleSitzungen, sitzungAbgelaufen } from '../login/sitzung.ts';
 import type { Angaben, Feld } from './angaben.ts';
 import { loeschtAm } from './mitgliedschaft.ts';
@@ -31,6 +32,8 @@ export type Detail = {
 	id: number;
 	kontoId: number;
 	status: MitgliedStatus;
+	/** Nur zur Anzeige; die Angaben bleiben amtlich und das Formular kennt den Rufname nicht. */
+	rufname: string | null;
 	angaben: Angaben;
 	rollen: Rolle[];
 	login: {
@@ -148,9 +151,7 @@ export async function listeMitglieder(
 		const muster = `%${maskiere(suche)}%`;
 		bedingungen.push(
 			or(
-				sql`${mitglied.vorname} || ' ' || ${mitglied.nachname} ilike ${muster}`,
-				sql`${mitglied.nachname} || ' ' || ${mitglied.vorname} ilike ${muster}`,
-				sql`${mitglied.nachname} || ', ' || ${mitglied.vorname} ilike ${muster}`,
+				nameEnthaelt(muster),
 				sql`${mitglied.email} ilike ${muster}`,
 				sql`${mitglied.mitgliedernummer} ilike ${muster}`
 			)
@@ -229,6 +230,7 @@ export async function ladeMitglied(db: Db, id: number, jetzt: Date): Promise<Det
 		id: zeile.m.id,
 		kontoId: zeile.k.id,
 		status,
+		rufname: zeile.m.rufname,
 		angaben: angabenAusZeile(zeile.m),
 		rollen,
 		login: {
