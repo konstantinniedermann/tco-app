@@ -9,6 +9,7 @@ const regel = (k: Partial<KategorieRegel> = {}): KategorieRegel => ({
 	jahrgangBis: null,
 	klassierungVon: null,
 	klassierungBis: null,
+	mindestsumme: null,
 	...k
 });
 

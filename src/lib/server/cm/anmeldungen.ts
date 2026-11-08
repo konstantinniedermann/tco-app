@@ -72,7 +72,8 @@ export const regelAus = (k: typeof kategorie.$inferSelect): KategorieRegel => ({
 	jahrgangVon: k.jahrgangVon,
 	jahrgangBis: k.jahrgangBis,
 	klassierungVon: k.klassierungVon,
-	klassierungBis: k.klassierungBis
+	klassierungBis: k.klassierungBis,
+	mindestsumme: k.mindestsumme
 });
 
 /** Aktive Anmeldungen des Mitglieds in einem Turnier, nach Kategoriename. */

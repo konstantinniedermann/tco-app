@@ -480,7 +480,8 @@ describe('CM-Anmeldung', () => {
 			jahrgangVon: null,
 			jahrgangBis: null,
 			klassierungVon: 'R1',
-			klassierungBis: 'R5'
+			klassierungBis: 'R5',
+			mindestsumme: null
 		};
 		expect(await zaehleAktive(db, k)).toBe(2);
 		expect(await zaehleUnpassende(db, k, regel)).toBe(0);
