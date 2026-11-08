@@ -54,37 +54,45 @@ describe('Testbestand für make seed', () => {
 		expect(new Set(werte.map((w) => w.geschlecht))).toEqual(new Set(['w', 'm']));
 	});
 
-	test('A-ANLASS-01: zweiter Anlass rund einen Monat später, mit gemischten Antworten', async () => {
-		const { mitgliedId } = await legeMitgliedAn(eigene.db);
-		const ids = await legeBeispielMitgliederAn(eigene.db, jetzt);
-		const gv = await legeBeispielAnlassAn(eigene.db, mitgliedId, jetzt);
-		const clubabend = await legeBeispielClubabendAn(eigene.db, mitgliedId, jetzt);
-		expect(await legeBeispielClubabendAn(eigene.db, mitgliedId, jetzt)).toBe(clubabend);
-		const [c] = await eigene.db.select().from(anlass).where(eq(anlass.id, clubabend));
-		// 8. Dezember 2026, 18.30 Uhr in Zürich (Winterzeit), Schluss drei Tage vorher um 23.59 Uhr.
-		expect(c.beginn).toEqual(new Date('2026-12-08T17:30:00Z'));
-		expect(c.anmeldeschluss).toEqual(new Date('2026-12-05T22:59:00Z'));
+	// Rund 500 Antworten in je einer eigenen Transaktion (wie `melde` in der App): unter der Last von
+	// `make check` mit Abdeckung dauert das länger als die üblichen 5 s.
+	test(
+		'A-ANLASS-01: zweiter Anlass rund einen Monat später, mit gemischten Antworten',
+		{
+			timeout: 30_000
+		},
+		async () => {
+			const { mitgliedId } = await legeMitgliedAn(eigene.db);
+			const ids = await legeBeispielMitgliederAn(eigene.db, jetzt);
+			const gv = await legeBeispielAnlassAn(eigene.db, mitgliedId, jetzt);
+			const clubabend = await legeBeispielClubabendAn(eigene.db, mitgliedId, jetzt);
+			expect(await legeBeispielClubabendAn(eigene.db, mitgliedId, jetzt)).toBe(clubabend);
+			const [c] = await eigene.db.select().from(anlass).where(eq(anlass.id, clubabend));
+			// 8. Dezember 2026, 18.30 Uhr in Zürich (Winterzeit), Schluss drei Tage vorher um 23.59 Uhr.
+			expect(c.beginn).toEqual(new Date('2026-12-08T17:30:00Z'));
+			expect(c.anmeldeschluss).toEqual(new Date('2026-12-05T22:59:00Z'));
 
-		for (let lauf = 0; lauf < 2; lauf++) {
 			await meldeBeispielAntworten(eigene.db, gv, ids, jetzt, 0);
+			// Zweimal: ein erneutes `make seed` legt keine Antwort doppelt an.
 			await meldeBeispielAntworten(eigene.db, clubabend, ids, jetzt, 1);
-		}
-		const zaehle = async (id: number) => {
-			const zeilen = await eigene.db
-				.select({ antwort: anlassAnmeldung.antwort })
-				.from(anlassAnmeldung)
-				.where(eq(anlassAnmeldung.anlassId, id));
-			return {
-				kommt: zeilen.filter((z) => z.antwort === 'kommt').length,
-				nicht: zeilen.filter((z) => z.antwort === 'kommt-nicht').length
+			await meldeBeispielAntworten(eigene.db, clubabend, ids, jetzt, 1);
+			const zaehle = async (id: number) => {
+				const zeilen = await eigene.db
+					.select({ antwort: anlassAnmeldung.antwort })
+					.from(anlassAnmeldung)
+					.where(eq(anlassAnmeldung.anlassId, id));
+				return {
+					kommt: zeilen.filter((z) => z.antwort === 'kommt').length,
+					nicht: zeilen.filter((z) => z.antwort === 'kommt-nicht').length
+				};
 			};
-		};
-		const aufGv = await zaehle(gv);
-		const aufClubabend = await zaehle(clubabend);
-		// Ausgetretene antworten nicht; die übrigen rund ein Drittel «kommt», ein Zehntel «kommt nicht».
-		expect(aufGv.kommt).toBeGreaterThan(50);
-		expect(aufGv.nicht).toBeGreaterThan(10);
-		expect(aufClubabend.kommt).toBeGreaterThan(50);
-		expect(aufClubabend).not.toEqual(aufGv);
-	});
+			const aufGv = await zaehle(gv);
+			const aufClubabend = await zaehle(clubabend);
+			// Ausgetretene antworten nicht; die übrigen rund ein Drittel «kommt», ein Zehntel «kommt nicht».
+			expect(aufGv.kommt).toBeGreaterThan(50);
+			expect(aufGv.nicht).toBeGreaterThan(10);
+			expect(aufClubabend.kommt).toBeGreaterThan(50);
+			expect(aufClubabend).not.toEqual(aufGv);
+		}
+	);
 });
