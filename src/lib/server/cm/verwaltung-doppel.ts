@@ -411,8 +411,8 @@ async function sperreAnfrage(tx: DbOderTx, anfrageId: number) {
 /**
  * FR-46: eine offene Anfrage als Paar anmelden, wie das Annehmen (`nimmAnfrageAn`), aber ohne
  * Login-Prüfung, auch nach dem Anmeldeschluss und mit Warnungen statt Sperre. Steht einer der
- * beiden hier schon zu zweit: `schon-angemeldet`, die Anfrage bleibt (der CM-Admin kann sie
- * löschen). Sperren: beide Mitglieder, Kategorie und Turnier, dann die Anfrage.
+ * beiden hier schon zu zweit, ist die Anfrage wie beim Annehmen weg (`schon-angemeldet`).
+ * Sperren: beide Mitglieder, Kategorie und Turnier, dann die Anfrage.
  */
 export async function meldeAnfrageAlsPaarAn(
 	db: Db,
@@ -429,7 +429,10 @@ export async function meldeAnfrageAlsPaarAn(
 		if (z.t.status === 'vorbereitung') return 'vorbereitung';
 		const standAn = await standIm(tx, z.t.id, z.k.id, an.id);
 		const standVon = await standIm(tx, z.t.id, z.k.id, von.id);
-		if (zuZweit(standAn) || zuZweit(standVon)) return 'schon-angemeldet';
+		if (zuZweit(standAn) || zuZweit(standVon)) {
+			await tx.delete(partnerAnfrage).where(eq(partnerAnfrage.id, anfrageId));
+			return 'schon-angemeldet';
+		}
 		if (!trotzdem) {
 			const w = warnungen(z, spielerAus(an), spielerAus(von), [standAn, standVon], jetzt);
 			if (w.length > 0) return { warnungen: w };

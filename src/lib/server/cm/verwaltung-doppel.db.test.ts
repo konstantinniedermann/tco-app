@@ -593,7 +593,7 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 		expect(await meldeAnfrageAlsPaarAn(db, admin, id, t.jetzt, true)).toBe('nicht-gefunden');
 	});
 
-	test('FR-46: Anfrage als Paar: neue Anmeldung ohne Suchende; einer schon zu zweit ergibt schon-angemeldet', async () => {
+	test('FR-46: Anfrage als Paar: neue Anmeldung ohne Suchende; einer schon zu zweit ergibt schon-angemeldet, die Anfrage ist weg', async () => {
 		const t = await turnier();
 		const a = await spieler('Andreas', 'Ammann');
 		const b = await spieler('Bruno', 'Bauer');
@@ -609,6 +609,8 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 		const ca = await anfrageMit(t.herren, c, a, t.jetzt);
 		expect(await meldeAnfrageAlsPaarAn(db, admin, ca, t.jetzt, true)).toBe('schon-angemeldet');
 		expect(await aktiveIn(t.herren)).toHaveLength(1);
+		// Wie beim Annehmen (`nimmAnfrageAn`): die Anfrage ist weg.
+		expect(await anfragenIn(t.herren)).toEqual([]);
 		expect(await meldeAnfrageAlsPaarAn(db, admin, -1, t.jetzt, true)).toBe('nicht-gefunden');
 	});
 
