@@ -200,3 +200,27 @@ Verhalten: In der Karte *Login* Nebentaste «Neuen Brief-Code ausstellen», nur 
 - [ ] **Step 3: Implementieren** und Doku nachführen (Liste oben). Eintrag in `versionen.md`: «Briefe (#43, Etappe 2a): Der Mitglieder-Admin stellt einen neuen Brief-Code einzeln aus oder erzeugt Briefe für alle, die MyTCO noch nie geöffnet haben, und druckt sie aus einer Druckansicht des Browsers. Der Code erscheint nur dort; Verlaufseintrag «Brief-Code ausgestellt».»
 - [ ] **Step 4:** `make check` grün auf dem committeten Stand; Screenshots Liste, Dialog, Druckansicht (iPhone + PC) mit `SCREENSHOTS=<scratchpad>` erzeugen und ansehen; `make musterbrief` noch eine Seite.
 - [ ] **Step 5: Commit** `feat: neuer Brief-Code auf der Seite eines Mitglieds (#43)` und `docs: Etappe 2a Briefe nachgeführt (#43)`
+
+### Task 6: Entscheide aus der Beobachtungs-Auswertung (Kommentar in #43 vom 08.11.2026)
+
+Aufgenommen mit Zustimmung des Projektleiters (08.11.2026). Quelle: Kommentar
+https://github.com/konstantinniedermann/tco-app/issues/43#issuecomment-6718915861.
+
+**Files:**
+- Modify: `src/lib/server/admin/mitgliedschaft.ts` (`erfasseAustritt`, `merkeZumLoeschenVor`), `src/lib/server/admin/schnittstellen.ts` (409-Code durchreichen; Jahr), `src/lib/verwaltung/Mitgliedschaft.svelte`, `src/lib/verwaltung/api.ts` (`deute`), `src/lib/verwaltung/anzeige.ts` (`NUR_ANSEHEN` nicht exportieren, Fehlertext), `src/lib/server/admin/erster-admin.ts`, `src/lib/server/profil/angaben.ts`, `src/lib/server/datum.ts` (neu Heimat von `jahrInZuerich`), `src/lib/server/cm/angaben.ts` + `cm/anmeldungen.ts` (Import), `docs/rollen-und-rechte.md` (neue Regel), `docs/versionen.md`
+- Test: `src/lib/server/admin/mitgliedschaft.db.test.ts`, `src/lib/server/admin/schnittstellen.db.test.ts`, `src/lib/server/admin/erster-admin.db.test.ts`, `tests/e2e/mitgliedschaft.test.ts`
+
+**Interfaces:**
+- `erfasseAustritt` / `merkeZumLoeschenVor` liefern zusätzlich `'eigenes-konto'`, wenn `urheber.mitgliedId === id` (vor der RR-03-Prüfung); `uebergang` macht daraus 409 `{ fehler: 'eigenes-konto' }`; `deute` → `{ art: 'eigenes-konto' }`.
+- `jahrInZuerich(jetzt: Date): number` zieht nach `src/lib/server/datum.ts` um (gleiches Verhalten), `cm/*` importiert von dort.
+
+Verhalten:
+1. **Eigener Austritt / eigenes Vormerken gesperrt.** Text bei 409: «Deinen eigenen Austritt erfasst ein anderer Mitglieder-Admin.» bzw. «Dich selbst merkt ein anderer Mitglieder-Admin zum Löschen vor.» Neue Regel in `docs/rollen-und-rechte.md` als nächste freie RR-Nummer: «Ein Mitglieder-Admin erfasst weder den eigenen Austritt noch merkt er sich selbst zum Löschen vor; das macht ein anderer Mitglieder-Admin» (Status umgesetzt), in der Rechte-Tabelle bzw. Matrix nachziehen, falls sie das abbildet.
+2. **Rückfrage vor «Wiedereintritt erfassen» und «Löschung rückgängig machen», wenn gespeicherte Admin-Rollen wieder wirken würden** (`detail.rollen` nicht leer; bei «Löschung rückgängig» nur, wenn das Login zurückkommt, d. h. das Mitglied vorher aktiv war – der Detail-Stand liefert das, sonst über `statusVorher` ergänzen). `<dialog>` wie bei Austritt: Titel «Wiedereintritt von <Name> erfassen?» bzw. «Löschung von <Name> rückgängig machen?», Text «<Vorname> bekommt die Rollen <Rollennamen mit ROLLEN_NAME, durch Komma> zurück.», Tasten «Weiter» / «Abbrechen». Ohne Admin-Rollen keine Rückfrage (wie heute).
+3. **Kleinbefunde:** (a) `schnittstellen.db.test.ts`: Test, dass der Hinweis an die alte Adresse (SI-09) bei `vergeben` und bei `veraltet` ausbleibt. (b) `machAdmin` wertet das Ergebnis von `setzeRollen` aus und wirft bei `veraltet`/`nicht-gefunden` einen Fehler mit klarer Meldung (Skript bricht ab statt still weiterzulaufen), mit Test. (c) `NUR_ANSEHEN` nicht exportieren. (d) Jahr in Zürcher Zeit statt `getFullYear()` an den vier Stellen (`schnittstellen.ts` ×2, `erster-admin.ts`, `profil/angaben.ts`), Einheitstest für `jahrInZuerich` am Jahreswechsel (`2026-12-31T23:30:00Z` → 2027).
+
+- [ ] **Step 1: Failing tests**: `RR-NN: Mitglieder-Admin kann den eigenen Austritt nicht erfassen` und `… sich nicht selbst zum Löschen vormerken` (DB, je 409/`eigenes-konto`, Status unverändert, kein Verlaufseintrag); `SI-09: kein Hinweis an die alte Adresse bei vergeben/veraltet`; `machAdmin` bei `veraltet`; `jahrInZuerich` am Jahreswechsel; E2E in `mitgliedschaft.test.ts`: `RR-08: Wiedereintritt eines Mitglieds mit Admin-Rolle fragt nach, ohne Rolle nicht`.
+- [ ] **Step 2:** Tests → FAIL.
+- [ ] **Step 3: Implementieren**; Svelte-Doku per MCP, Autofixer.
+- [ ] **Step 4:** betroffene DB- und E2E-Dateien grün, `make check-schnell` grün; Eintrag in `docs/versionen.md` unter «Unveröffentlicht».
+- [ ] **Step 5: Commits** `feat: eigener Austritt gesperrt, Rückfrage bei zurückkehrenden Rollen (#43)` und `refactor: Kleinbefunde aus den Reviews Rollen schärfen (#43)`
