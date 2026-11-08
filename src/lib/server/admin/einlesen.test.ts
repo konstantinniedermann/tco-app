@@ -160,6 +160,33 @@ describe('pruefeDatei', () => {
 		]);
 	});
 
+	it('A-MITGLIED-07: Doppel mit einer fehlerhaften Zeile hält auch die gültige zurück', () => {
+		const r = ok(`${KOPF}\n${ERIKA}\nX9;Erika;Zwei;Weg 2;46;Olten; erika.beispiel@EXAMPLE.org \n`);
+		expect(r.gueltig).toEqual([]);
+		expect(r.fehlerhaft.map((f) => [f.zeile, f.fehler])).toEqual([
+			[2, { email: 'kommt in der Datei mehrfach vor' }],
+			[3, { plz: '4 Ziffern', email: 'kommt in der Datei mehrfach vor' }]
+		]);
+	});
+
+	it('A-MITGLIED-07: Kodierung vor Grösse – viele Ersatzzeichen melden «kodierung»', () => {
+		const text = `${KOPF}\n${'A1;M\uFFFD;x;y;4600;z;e@example.org\n'}`.padEnd(
+			MAX_BYTES - 10,
+			'\uFFFD'
+		);
+		expect(pruefeDatei(text, 2026)).toEqual({ ok: false, grund: 'kodierung' });
+	});
+
+	it('A-MITGLIED-07: unbekannte Spalten höchstens fünf, je höchstens 30 Zeichen', () => {
+		// Ohne Kopfzeile stünden sonst die Angaben des ersten Mitglieds in der Antwort.
+		const lang = 'Musterweg 123 im langen Quartier am Hang';
+		const r = pruefeDatei(`A1;Erika;Beispiel;${lang};4600;Olten;e@example.org\n${ERIKA}\n`, 2026);
+		if (r.ok || r.grund !== 'spalten') throw new Error('erwartet: spalten');
+		expect(r.unbekannt).toHaveLength(5);
+		expect(r.unbekannt.every((s) => s.length <= 30)).toBe(true);
+		expect(r.unbekannt.join()).not.toContain(lang.toLowerCase());
+	});
+
 	it('A-MITGLIED-07: Name höchstens 100 Zeichen, ohne Leerraum am Rand', () => {
 		const lang = 'x'.repeat(150);
 		const r = ok(`${KOPF}\nA1; ${lang} ;Beispiel;Weg 1;4600;Olten;e@example.org\n`);

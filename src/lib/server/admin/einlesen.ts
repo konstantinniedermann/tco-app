@@ -38,21 +38,39 @@ export type Dateipruefung =
 
 const MEHRFACH = 'kommt in der Datei mehrfach vor';
 const MAX_NAME = 100;
+// Unbekannte Spaltennamen gehen gekürzt zurück: Fehlt die Kopfzeile, stünden sonst die Angaben des
+// ersten Mitglieds in der Antwort.
+const MAX_UNBEKANNT = 5;
+const MAX_SPALTENNAME = 30;
 const BEKANNT = new Set<string>(FELDER);
 
 function pruefeKopf(kopf: string[]): DateiFehler | null {
-	const unbekannt = [...new Set(kopf.filter((s) => !BEKANNT.has(s)))];
-	const fehlend = PFLICHT_SPALTEN.filter((s) => !kopf.includes(s));
-	const doppelt = [...new Set(kopf.filter((s, i) => kopf.indexOf(s) !== i))];
-	if (unbekannt.length + fehlend.length + doppelt.length === 0) return null;
-	return { grund: 'spalten', unbekannt, fehlend, doppelt };
+	const gesehen = new Set<string>();
+	const doppelt = new Set<string>();
+	for (const s of kopf) (gesehen.has(s) ? doppelt : gesehen).add(s);
+	const unbekannt = [...gesehen]
+		.filter((s) => !BEKANNT.has(s))
+		.slice(0, MAX_UNBEKANNT)
+		.map((s) => (s.length > MAX_SPALTENNAME ? `${s.slice(0, MAX_SPALTENNAME - 1)}…` : s));
+	const fehlend = PFLICHT_SPALTEN.filter((s) => !gesehen.has(s));
+	const doppeltBekannt = [...doppelt].filter((s) => BEKANNT.has(s));
+	if (unbekannt.length + fehlend.length + doppeltBekannt.length === 0) return null;
+	return { grund: 'spalten', unbekannt, fehlend, doppelt: doppeltBekannt };
 }
 
-/** Zeilen mit einem Wert, der in der Datei mehrfach vorkommt (ohne Gross-/Kleinschreibung). */
-function mehrfache(zeilen: GueltigeZeile[], wert: (a: Angaben) => string | null): Set<number> {
+type Gelesen = {
+	zeile: number;
+	name: string;
+	roh: Record<string, string>;
+	angaben: Angaben | null;
+	fehler: FehlerZeile['fehler'];
+};
+
+/** Zeilen mit einem Wert, der in der Datei mehrfach vorkommt (getrimmt, ohne Gross-/Kleinschreibung). */
+function mehrfache(zeilen: Gelesen[], feld: Feld): Set<number> {
 	const nach = new Map<string, number[]>();
 	for (const z of zeilen) {
-		const w = wert(z.angaben)?.toLowerCase();
+		const w = (z.roh[feld] ?? '').trim().toLowerCase();
 		if (w) nach.set(w, [...(nach.get(w) ?? []), z.zeile]);
 	}
 	return new Set([...nach.values()].filter((l) => l.length > 1).flat());
@@ -60,9 +78,10 @@ function mehrfache(zeilen: GueltigeZeile[], wert: (a: Angaben) => string | null)
 
 /** Prüft die Datei als Ganzes und jede Zeile mit derselben Prüfung wie das Formular. */
 export function pruefeDatei(text: string, jahr: number): Dateipruefung {
-	if (new TextEncoder().encode(text).length > MAX_BYTES) return { ok: false, grund: 'zu-gross' };
 	// Excel speichert «CSV» ohne «UTF-8» in Windows-1252; der Browser macht aus Umlauten U+FFFD.
-	if (text.includes('\uFFFD')) return { ok: false, grund: 'kodierung' };
+	// Vor der Grösse prüfen: Jedes Ersatzzeichen braucht drei Bytes statt einem.
+	if (text.includes('�')) return { ok: false, grund: 'kodierung' };
+	if (new TextEncoder().encode(text).length > MAX_BYTES) return { ok: false, grund: 'zu-gross' };
 	const csv = leseCsv(text);
 	if (!csv.ok) return { ok: false, grund: csv.grund };
 
@@ -73,9 +92,7 @@ export function pruefeDatei(text: string, jahr: number): Dateipruefung {
 	if (csv.zeilen.length === 0) return { ok: false, grund: 'keine-zeilen' };
 	if (csv.zeilen.length > MAX_ZEILEN) return { ok: false, grund: 'zu-viele-zeilen' };
 
-	const gueltig: GueltigeZeile[] = [];
-	const fehlerhaft: FehlerZeile[] = [];
-	for (const { nummer, felder } of csv.zeilen) {
+	const gelesen: Gelesen[] = csv.zeilen.map(({ nummer, felder }) => {
 		const roh = Object.fromEntries(kopf.map((s, i) => [s, felder[i] ?? '']));
 		const name = `${(roh.vorname ?? '').trim()} ${(roh.nachname ?? '').trim()}`
 			.trim()
@@ -83,30 +100,29 @@ export function pruefeDatei(text: string, jahr: number): Dateipruefung {
 		const zuViel = felder.slice(kopf.length).some((f) => f.trim() !== '');
 		if (felder.length < kopf.length || zuViel) {
 			const fehler = { zeile: `${felder.length} Felder statt ${kopf.length}` };
-			fehlerhaft.push({ zeile: nummer, name, fehler });
-			continue;
+			return { zeile: nummer, name, roh, angaben: null, fehler };
 		}
 		const p = pruefeAngaben(roh, { nummerPflicht: true, jahr });
-		if (p.ok) gueltig.push({ zeile: nummer, angaben: p.angaben });
-		else fehlerhaft.push({ zeile: nummer, name, fehler: p.fehler });
-	}
+		return p.ok
+			? { zeile: nummer, name, roh, angaben: p.angaben, fehler: {} }
+			: { zeile: nummer, name, roh, angaben: null, fehler: p.fehler };
+	});
 
-	const nummern = mehrfache(gueltig, (a) => a.mitgliedernummer);
-	const emails = mehrfache(gueltig, (a) => a.email);
-	const eindeutig: GueltigeZeile[] = [];
-	for (const z of gueltig) {
-		if (!nummern.has(z.zeile) && !emails.has(z.zeile)) {
-			eindeutig.push(z);
-			continue;
-		}
-		const fehler: FehlerZeile['fehler'] = {};
-		if (nummern.has(z.zeile)) fehler.mitgliedernummer = MEHRFACH;
-		if (emails.has(z.zeile)) fehler.email = MEHRFACH;
-		const name = `${z.angaben.vorname} ${z.angaben.nachname}`.slice(0, MAX_NAME);
-		fehlerhaft.push({ zeile: z.zeile, name, fehler });
+	// Eindeutigkeit über alle Zeilen, auch fehlerhafte: Sonst käme eine Zeile durch, deren Doppel
+	// nur wegen eines anderen Fehlers zurückgehalten wird.
+	const nummern = mehrfache(gelesen, 'mitgliedernummer');
+	const emails = mehrfache(gelesen, 'email');
+	const gueltig: GueltigeZeile[] = [];
+	const fehlerhaft: FehlerZeile[] = [];
+	for (const z of gelesen) {
+		const fehler = { ...z.fehler };
+		if (nummern.has(z.zeile)) fehler.mitgliedernummer ??= MEHRFACH;
+		if (emails.has(z.zeile)) fehler.email ??= MEHRFACH;
+		if (z.angaben && Object.keys(fehler).length === 0) {
+			gueltig.push({ zeile: z.zeile, angaben: z.angaben });
+		} else fehlerhaft.push({ zeile: z.zeile, name: z.name, fehler });
 	}
-	fehlerhaft.sort((a, b) => a.zeile - b.zeile);
-	return { ok: true, gueltig: eindeutig, fehlerhaft };
+	return { ok: true, gueltig, fehlerhaft };
 }
 
 export type Vorschau = {

@@ -54,6 +54,22 @@ describe('leseCsv', () => {
 		expect(r.zeilen[0].felder).toEqual([' x ', ' y ']);
 	});
 
+	it('A-MITGLIED-07: Anführungszeichen mitten im Feld ist ein Zeichen, keine Zeile geht verloren', () => {
+		const r = ok('a;b\nHauptstr. 5";x\nc;d\ne;f\nWeg 12";y\n');
+		expect(r.zeilen).toEqual([
+			{ nummer: 2, felder: ['Hauptstr. 5"', 'x'] },
+			{ nummer: 3, felder: ['c', 'd'] },
+			{ nummer: 4, felder: ['e', 'f'] },
+			{ nummer: 5, felder: ['Weg 12"', 'y'] }
+		]);
+	});
+
+	it('A-MITGLIED-07: Leerzeilen vor der Kopfzeile stören die Erkennung des Trennzeichens nicht', () => {
+		const r = ok('\n\r\nvorname;ort\nErika;Olten, Altstadt\n');
+		expect(r.kopf).toEqual(['vorname', 'ort']);
+		expect(r.zeilen).toEqual([{ nummer: 4, felder: ['Erika', 'Olten, Altstadt'] }]);
+	});
+
 	it('A-MITGLIED-07: offenes Anführungszeichen ist ein Fehler der Datei', () => {
 		expect(leseCsv('a;b\n"x;y\n')).toEqual({ ok: false, grund: 'anfuehrungszeichen' });
 	});

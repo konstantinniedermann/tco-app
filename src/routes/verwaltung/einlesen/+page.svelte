@@ -46,6 +46,8 @@
 	// Grenze des Servers für eine Anfrage (512 KB) samt JSON-Hülle; Anführungszeichen zählen doppelt.
 	const ANFRAGE_MAX = 500 * 1024;
 
+	// Vor jeder Wahl leeren: Sonst meldet der Browser dieselbe, inzwischen korrigierte Datei nicht
+	// als Änderung, und die alte Vorschau bliebe stehen.
 	async function waehle(e: Event & { currentTarget: HTMLInputElement }) {
 		const datei = e.currentTarget.files?.[0];
 		text = null;
@@ -92,8 +94,10 @@
 		} else if (a.art === 'veraltet') {
 			vorschau = null;
 			await ladeVorschau(t);
-			fehler =
-				'Inzwischen hat sich die Mitgliederliste geändert. Die Vorschau ist neu geladen, prüfe sie und lege dann an.';
+			// Nur wenn die neue Vorschau da ist; sonst bleibt die Meldung von `ladeVorschau` stehen.
+			if (vorschau !== null)
+				fehler =
+					'Inzwischen hat sich die Mitgliederliste geändert. Die Vorschau ist neu geladen, prüfe sie und lege dann an.';
 		} else if (a.art === 'datei') fehler = dateiFehlerText(a.datei);
 		else fehler = fehlerText(a);
 	}
@@ -129,6 +133,7 @@
 			aria-describedby="einlesen-hilfe"
 			disabled={laeuft}
 			bind:this={dateiwahl}
+			onclick={(e) => (e.currentTarget.value = '')}
 			onchange={waehle}
 		/>
 	</div>

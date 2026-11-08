@@ -8,12 +8,16 @@ export type CsvErgebnis =
 	| { ok: true; kopf: string[]; zeilen: CsvZeile[] }
 	| { ok: false; grund: 'leer' | 'anfuehrungszeichen' };
 
-/** `;`, wenn die erste Zeile ausserhalb von Anführungszeichen mehr `;` als `,` hat, sonst `,`. */
+/**
+ * `;`, wenn die erste nicht leere Zeile ausserhalb von Anführungszeichen mehr `;` als `,` hat,
+ * sonst `,`.
+ */
 function trennzeichen(text: string): ';' | ',' {
+	const ab = text.replace(/^\s+/, '');
 	let semikolon = 0;
 	let komma = 0;
 	let inZitat = false;
-	for (const z of text) {
+	for (const z of ab) {
 		if (z === '"') inZitat = !inZitat;
 		else if (!inZitat && (z === '\n' || z === '\r')) break;
 		else if (!inZitat && z === ';') semikolon++;
@@ -56,7 +60,7 @@ export function leseCsv(text: string): CsvErgebnis {
 				if (z === '\n' || (z === '\r' && inhalt[i + 1] !== '\n')) zeile++;
 				feld += z;
 			}
-		} else if (z === '"') inZitat = true;
+		} else if (z === '"' && feld === '') inZitat = true;
 		else if (z === trenn) feldEnde();
 		else if (z === '\r' || z === '\n') {
 			if (z === '\r' && inhalt[i + 1] === '\n') i++;
