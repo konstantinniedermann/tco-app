@@ -140,6 +140,8 @@ test('RR-07, A-ROLLE-07, A-TURNIER-01, A-TURNIER-02, A-TURNIER-03, A-ANMELDUNG-0
 	await expect(page.getByRole('heading', { level: 1, name: 'Mixed Doppel' })).toBeVisible();
 	await expect(page.getByLabel('Doppel')).toBeChecked();
 	await expect(page.getByLabel('Mindestsumme der Klassierungen')).toHaveValue('9');
+	// FR-34: Im Doppel gibt es keinen Jahrgang.
+	await expect(page.getByRole('group', { name: 'Jahrgang (freiwillig)' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'kategorie-formular');
 	expect(fehler).toEqual([]);
 });
