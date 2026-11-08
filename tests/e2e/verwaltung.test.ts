@@ -10,7 +10,8 @@ import {
 	legeOffenenAnlassAn,
 	legeRollenkontoMitBriefCodeAn,
 	legeTurnierAn,
-	schliesseLoginHilfen
+	schliesseLoginHilfen,
+	setzeRufname
 } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
@@ -622,5 +623,22 @@ test('RR-07, Regel 2: Mitglieder-Admin sieht keine Rollenvergabe', async ({ page
 	await expect(page.getByLabel('Vorname', { exact: true })).toBeEnabled();
 	await expect(page.locator('summary', { hasText: 'Rollen' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'mitglieder-admin-ohne-rollen');
+	expect(fehler).toEqual([]);
+});
+
+test('Rufname: die Mitgliederverwaltung zeigt den amtlichen Namen und den Rufnamen in einer eigenen Zeile', async ({
+	page
+}) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeAdminMitBriefCodeAn('Rita');
+	const nachname = `Probe${randomUUID().slice(0, 8)}`;
+	const mitglied = await legeKontoAn('Johannes', nachname);
+	await setzeRufname(mitglied.mitgliedId, 'Hannes');
+	await oeffneVerwaltung(page, admin);
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	await expect(
+		page.getByRole('heading', { level: 1, name: new RegExp(`^${nachname}, Johannes`) })
+	).toBeVisible();
+	await expect(page.getByText('Rufname Hannes', { exact: true })).toBeVisible();
 	expect(fehler).toEqual([]);
 });

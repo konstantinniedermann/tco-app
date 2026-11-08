@@ -148,6 +148,7 @@ describe('Ansicht als … (Server)', () => {
 		const vorher = await getSitzung(ereignis({ method: 'GET', konto: a.konto }), db);
 		expect(await vorher.json()).toEqual({
 			vorname: 'Test',
+			rufname: null,
 			passkeyHinweis: false,
 			verwaltung: true,
 			ansicht: null
@@ -157,6 +158,7 @@ describe('Ansicht als … (Server)', () => {
 		const r = await getSitzung(ereignis({ method: 'GET', konto }), db);
 		expect(await r.json()).toEqual({
 			vorname: 'Test',
+			rufname: null,
 			passkeyHinweis: false,
 			verwaltung: false,
 			ansicht: 'mitglied'

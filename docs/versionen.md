@@ -16,6 +16,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   Admin-Rollen zurück, fragt die Verwaltung vorher nach. Jahr und Zeitpunkte der Verwaltung in
   Schweizer Zeit, auch auf einem Server in UTC.
 
+## 0.12.0 — Rufname
+
+- Rufname (#67): Wer will, trägt im Profil unter «Meine Angaben» einen Rufnamen ein (höchstens 10 Zeichen).
+  Die Startseite grüsst damit («Hoi Hannes»), und die anderen im Club sehen ihn mit dem amtlichen Namen
+  dahinter; Mitgliederverwaltung, Auskunft und Brief bleiben beim amtlichen Namen. Datenschutz, Fachmodell
+  und UI-Leitbild beschreiben ihn.
+
 ## 0.11.2 — Auswahlfelder am iPhone, Auskunft vollständiger, Beobachtungs-Auswertung
 
 - Auswahlfelder (z. B. Geschlecht, Klassierung) sind auf allen Geräten so hoch wie die Textfelder;

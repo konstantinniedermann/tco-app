@@ -51,6 +51,13 @@ describe('baueBriefHtml', () => {
 		expect(html).toContain(TOKENS);
 	});
 
+	test('Brief bleibt amtlich: Anrede und Adresse nutzen Vorname und Nachname, es gibt keinen Rufname', () => {
+		const html = baueBriefHtml(daten({ vorname: 'Johannes', nachname: 'Muster' }), TOKENS);
+		expect(html).toContain('Hoi Johannes');
+		expect(html).toContain('Johannes Muster');
+		expect('rufname' in daten()).toBe(false);
+	});
+
 	test('gültig bis in Schweizer Zeit: kurz vor Mitternacht UTC ist schon der nächste Tag', () => {
 		const html = baueBriefHtml(daten({ gueltigBis: new Date('2027-01-31T23:30:00Z') }), TOKENS);
 		expect(html).toContain('gültig bis 01.02.2027');

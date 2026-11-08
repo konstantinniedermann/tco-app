@@ -9,6 +9,7 @@ import {
 	ladeAngaben,
 	ladeKontakt,
 	ladeProfil,
+	speichereRufname,
 	speichereAngaben,
 	starteWechsel,
 	type EigeneAngaben
@@ -64,13 +65,37 @@ describe('A-KONTO-01: eigene Angaben laden', () => {
 
 	it('FR-37: Klassierung kommt mit den Angaben, unbekannte Werte gelten als nicht angegeben', async () => {
 		const { aufrufe, holen } = holer(json(200, { angaben: LEA, klassierung: 'R5' }));
-		expect(await ladeProfil(holen)).toEqual({ angaben: LEA, klassierung: 'R5' });
+		expect(await ladeProfil(holen)).toEqual({ angaben: LEA, klassierung: 'R5', rufname: null });
 		expect(aufrufe).toEqual([{ pfad: '/api/profil', init: { method: 'GET' } }]);
 		expect(await ladeProfil(holer(json(200, { angaben: LEA, klassierung: 'R10' })).holen)).toEqual({
 			angaben: LEA,
-			klassierung: null
+			klassierung: null,
+			rufname: null
 		});
 		expect(await ladeProfil(holer(json(500, {})).holen)).toBeNull();
+	});
+
+	it('Rufname kommt mit den Angaben', async () => {
+		const antwort = json(200, { angaben: LEA, klassierung: null, rufname: 'Lea' });
+		expect((await ladeProfil(holer(antwort).holen))?.rufname).toBe('Lea');
+	});
+
+	it('Rufname speichern: ok, Meldung des Servers bei Eingabefehler, sonst Störung', async () => {
+		const { aufrufe, holen } = holer(json(200, { rufname: 'Hannes' }));
+		expect(await speichereRufname('Hannes', holen)).toEqual({ ergebnis: 'ok', rufname: 'Hannes' });
+		expect(aufrufe[0].pfad).toBe('/api/profil/rufname');
+		expect(await speichereRufname('', holer(json(200, { rufname: null })).holen)).toEqual({
+			ergebnis: 'ok',
+			rufname: null
+		});
+		const zuLang = json(400, { fehler: 'eingabe', felder: { rufname: 'Höchstens 10 Zeichen.' } });
+		expect(await speichereRufname('x', holer(zuLang).holen)).toEqual({
+			ergebnis: 'eingabe',
+			fehler: 'Höchstens 10 Zeichen.'
+		});
+		expect(await speichereRufname('x', holer(json(500, {})).holen)).toEqual({
+			ergebnis: 'stoerung'
+		});
 	});
 });
 

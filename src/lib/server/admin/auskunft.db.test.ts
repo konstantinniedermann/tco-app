@@ -177,6 +177,19 @@ async function vollesMitglied() {
 }
 
 describe('ladeAuskunft (DS-07)', () => {
+	test('nennt den Rufname neben dem amtlichen Namen', async () => {
+		const m = await legeMitgliedAn(db, {
+			vorname: 'Johannes',
+			rufname: 'Hannes',
+			nachname: 'Muster'
+		});
+		const a = await ladeAuskunft(db, m.mitgliedId, jetzt);
+		expect(a!.rufname).toBe('Hannes');
+		expect(a!.name).toBe('Muster, Johannes');
+		const o = await legeMitgliedAn(db, {});
+		expect((await ladeAuskunft(db, o.mitgliedId, jetzt))!.rufname).toBeNull();
+	});
+
 	test('enthält Angaben, Rollen, Login, Anlass, bestätigte CM-Anmeldung ohne Wildcard und den ganzen Verlauf', async () => {
 		const m = await vollesMitglied();
 		const a = await ladeAuskunft(db, m.mitgliedId, jetzt);

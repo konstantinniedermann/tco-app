@@ -192,7 +192,7 @@ test('Tastatur: Reiter weg, solange ein Feld den Fokus hat (Handy)', async ({ pa
 	await profilKlappe(page, 'Meine Angaben').locator('summary').click();
 	await page.getByRole('button', { name: 'Ändern' }).first().click();
 	const navigation = page.getByRole('navigation', { name: 'Hauptnavigation' });
-	await page.getByLabel('Telefon (freiwillig)').focus();
+	await page.getByLabel('Rufname (freiwillig)').focus();
 	if (info.project.name === 'desktop') {
 		// Am PC (Maus) bleiben die Reiter.
 		await expect(navigation).toBeVisible();

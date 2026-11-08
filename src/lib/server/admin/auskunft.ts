@@ -32,6 +32,7 @@ export type Auskunft = {
 	erstelltAm: Date;
 	name: string;
 	angaben: Angaben;
+	rufname: string | null;
 	klassierung: string | null;
 	/** Markierung «für Fairgate offen seit» (Annahme K-19.2); `null`, wenn nichts offen ist. */
 	fairgateOffenSeit: Date | null;
@@ -109,6 +110,7 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 	] = await Promise.all([
 		db
 			.select({
+				rufname: mitglied.rufname,
 				klassierung: mitglied.klassierung,
 				fairgateOffenSeit: mitglied.fairgateOffenSeit,
 				themaAnlaesse: konto.themaAnlaesse,
@@ -203,6 +205,7 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 		erstelltAm: jetzt,
 		name,
 		angaben: m.angaben,
+		rufname: zusatz.rufname,
 		klassierung: zusatz.klassierung,
 		fairgateOffenSeit: zusatz.fairgateOffenSeit,
 		status: m.status,

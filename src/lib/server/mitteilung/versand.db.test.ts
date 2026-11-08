@@ -52,7 +52,7 @@ function empf(teil: { email?: string | null; abos?: Abo[] } = {}): Empfaenger {
 	const id = naechsteId++;
 	return {
 		mitgliedId: id,
-		name: `Muster, Test ${id}`,
+		name: { rufname: null, vorname: `Test ${id}`, nachname: 'Muster' },
 		email: teil.email === undefined ? `test-${randomUUID()}@example.org` : teil.email,
 		abos: teil.abos ?? []
 	};
@@ -191,7 +191,7 @@ describe('Versand einer Mitteilung', () => {
 		);
 		const e: Empfaenger = {
 			mitgliedId: m.mitgliedId,
-			name: 'Muster, Test',
+			name: { rufname: null, vorname: 'Test', nachname: 'Muster' },
 			email: m.email,
 			abos: [weg, bleibt]
 		};

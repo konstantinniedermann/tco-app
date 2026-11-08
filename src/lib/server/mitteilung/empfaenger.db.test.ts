@@ -93,7 +93,11 @@ describe('Empfänger einer Mitteilung', () => {
 	test('FR-43: alle: aktive Mitglieder mit Abos, ohne Konto nur mit Mail, nach Name sortiert', async () => {
 		const { id } = await neuerAnlass();
 		const z = `-${randomUUID()}`;
-		const berta = await legeMitgliedAn(db, { vorname: 'Berta', nachname: `Zaugg${z}` });
+		const berta = await legeMitgliedAn(db, {
+			vorname: 'Berta',
+			rufname: 'Bea',
+			nachname: `Zaugg${z}`
+		});
 		const anna = await legeMitgliedAn(db, { vorname: 'Anna', nachname: `Zaugg${z}` });
 		const olga = await ohneKonto(`Aebi${z}`);
 		const a1 = await abo(berta.kontoId);
@@ -101,11 +105,21 @@ describe('Empfänger einer Mitteilung', () => {
 		const liste = await anlassEmpfaenger(db, id, 'alle', JETZT);
 		const meine = nurMeine(liste, berta, anna, olga);
 		expect(meine).toEqual([
-			{ mitgliedId: olga.mitgliedId, name: `Aebi${z}, Olga`, email: olga.email, abos: [] },
-			{ mitgliedId: anna.mitgliedId, name: `Zaugg${z}, Anna`, email: anna.email, abos: [] },
+			{
+				mitgliedId: olga.mitgliedId,
+				name: { rufname: null, vorname: 'Olga', nachname: `Aebi${z}` },
+				email: olga.email,
+				abos: []
+			},
+			{
+				mitgliedId: anna.mitgliedId,
+				name: { rufname: null, vorname: 'Anna', nachname: `Zaugg${z}` },
+				email: anna.email,
+				abos: []
+			},
 			{
 				mitgliedId: berta.mitgliedId,
-				name: `Zaugg${z}, Berta`,
+				name: { rufname: 'Bea', vorname: 'Berta', nachname: `Zaugg${z}` },
 				email: berta.email,
 				abos: expect.arrayContaining([a1, a2])
 			}

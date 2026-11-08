@@ -1,5 +1,6 @@
 // Anmeldungen verwalten durch den CM-Admin, nur Einzel (A-ANMELDUNG-06, FR-08, FR-46).
-import { and, asc, eq, or, sql } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
+import type { Namensteile } from '../../name.ts';
 import type { Klassierung } from '../../turnier/klassierung.ts';
 import { warnungenEinzel, type Spieler } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
@@ -7,6 +8,7 @@ import { maskiere, type MitgliedStatus } from '../admin/mitglieder.ts';
 import { schreibeVerlauf, type Eintrag } from '../admin/verlauf.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { anmeldung, anmeldungSpieler, kategorie, mitglied, turnier } from '../db/schema.ts';
+import { namensSpalten, nameEnthaelt } from '../namen.ts';
 import { schreibeKlassierung, spielerAus } from './angaben.ts';
 import { eigeneAnmeldungen, GRENZE, istAktiv, regelAus, spielerSpalten } from './anmeldungen.ts';
 
@@ -20,7 +22,7 @@ export type AnmeldungZeile = {
 	mitgliedId: number;
 	/** Status des Mitglieds: Austritt und Löschung zeigt die Liste als Plakette (FR-04). */
 	mitgliedStatus: MitgliedStatus;
-	name: string;
+	name: Namensteile;
 	geschlecht: 'w' | 'm' | null;
 	jahrgang: number | null;
 	klassierung: Klassierung | null;
@@ -28,7 +30,7 @@ export type AnmeldungZeile = {
 
 export type SpielerTreffer = {
 	mitgliedId: number;
-	name: string;
+	name: Namensteile;
 	geschlecht: 'w' | 'm' | null;
 	jahrgang: number | null;
 	klassierung: Klassierung | null;
@@ -66,12 +68,16 @@ const TREFFER = 20;
 const namensfolge = [asc(mitglied.nachname), asc(mitglied.vorname), asc(mitglied.id)];
 
 const nameUndAngaben = (z: {
+	rufname: string | null;
 	vorname: string;
 	nachname: string;
 	geschlecht: string | null;
 	jahrgang: number | null;
 	klassierung: string | null;
-}) => ({ name: `${z.nachname}, ${z.vorname}`, ...spielerAus(z) });
+}) => ({
+	name: { rufname: z.rufname, vorname: z.vorname, nachname: z.nachname },
+	...spielerAus(z)
+});
 
 /** A-ANMELDUNG-06: aktive Anmeldungen einer Einzel-Kategorie (bestätigt und beantragt). */
 export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<AnmeldungZeile[]> {
@@ -82,8 +88,7 @@ export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<Anme
 			kommentar: anmeldung.kommentar,
 			mitgliedId: mitglied.id,
 			mitgliedStatus: mitglied.status,
-			vorname: mitglied.vorname,
-			nachname: mitglied.nachname,
+			...namensSpalten,
 			...spielerSpalten
 		})
 		.from(anmeldung)
@@ -103,7 +108,7 @@ export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<Anme
 }
 
 /**
- * Aktive Mitglieder, deren Name `suche` enthält (ab zwei Zeichen): Vor- oder Nachname allein,
+ * Aktive Mitglieder, deren Name `suche` enthält (ab zwei Zeichen): Rufname, Vor- oder Nachname allein,
  * «Vorname Nachname» oder «Nachname, Vorname», wie die Suche der Mitglieder-Verwaltung.
  */
 export async function sucheSpieler(db: Db, suche: string): Promise<SpielerTreffer[]> {
@@ -113,21 +118,11 @@ export async function sucheSpieler(db: Db, suche: string): Promise<SpielerTreffe
 	const zeilen = await db
 		.select({
 			mitgliedId: mitglied.id,
-			vorname: mitglied.vorname,
-			nachname: mitglied.nachname,
+			...namensSpalten,
 			...spielerSpalten
 		})
 		.from(mitglied)
-		.where(
-			and(
-				eq(mitglied.status, 'aktiv'),
-				or(
-					sql`${mitglied.vorname} || ' ' || ${mitglied.nachname} ilike ${muster}`,
-					sql`${mitglied.nachname} || ' ' || ${mitglied.vorname} ilike ${muster}`,
-					sql`${mitglied.nachname} || ', ' || ${mitglied.vorname} ilike ${muster}`
-				)
-			)
-		)
+		.where(and(eq(mitglied.status, 'aktiv'), nameEnthaelt(muster)))
 		.orderBy(...namensfolge)
 		.limit(TREFFER);
 	return zeilen.map((z) => ({ mitgliedId: z.mitgliedId, ...nameUndAngaben(z) }));

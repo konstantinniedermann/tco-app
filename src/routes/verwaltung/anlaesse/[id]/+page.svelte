@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import Name from '../../../../lib/ui/Name.svelte';
 	import { formatiereBeginn, formatiereZeitpunkt } from '../../../../lib/anlass/zeit.ts';
 	import Anlassformular, {
 		type AnlassWerte
@@ -121,7 +122,7 @@
 			<tbody>
 				{#each detail.anmeldungen as z, i (i)}
 					<tr>
-						<td>{z.name}</td>
+						<td><Name name={z.name} form="nachname-zuerst" /></td>
 						<td>
 							{#if z.antwort === 'kommt'}
 								<span class="plakette plakette-ok">kommt</span>

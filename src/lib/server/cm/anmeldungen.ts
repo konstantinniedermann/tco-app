@@ -1,6 +1,7 @@
 // Einzel-Anmeldungen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01, A-ANMELDUNG-10,
 // FR-05 bis FR-10, FR-37).
 import { and, asc, count, eq, gte, inArray, ne, sql } from 'drizzle-orm';
+import type { Namensteile } from '../../name.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
 	anmeldung,
@@ -36,7 +37,7 @@ export type CmKategorie = KategorieRegel & {
 	name: string;
 	passt: boolean;
 	anmeldungId: number | null;
-	namen: string[];
+	namen: Namensteile[];
 };
 
 /** Aktiv sind bestätigte und (ab Teil 4) beantragte Anmeldungen. */
@@ -202,12 +203,13 @@ export async function ladeCmAnsicht(
 	};
 }
 
-/** «Vorname Nachname» der bestätigten Anmeldungen, nach Nachname, dann Vorname. */
+/** Namensteile der bestätigten Anmeldungen, nach Nachname, dann Vorname. */
 async function fuelleNamen(db: Db, kategorien: CmKategorie[]): Promise<void> {
 	if (kategorien.length === 0) return;
 	const zeilen = await db
 		.select({
 			kategorieId: anmeldung.kategorieId,
+			rufname: mitglied.rufname,
 			vorname: mitglied.vorname,
 			nachname: mitglied.nachname
 		})
@@ -228,7 +230,11 @@ async function fuelleNamen(db: Db, kategorien: CmKategorie[]): Promise<void> {
 			namenOrdnung.compare(a.nachname, b.nachname) || namenOrdnung.compare(a.vorname, b.vorname)
 	);
 	const nachId = new Map(kategorien.map((k) => [k.id, k]));
-	for (const z of zeilen) nachId.get(z.kategorieId)?.namen.push(`${z.vorname} ${z.nachname}`);
+	for (const z of zeilen) {
+		nachId
+			.get(z.kategorieId)
+			?.namen.push({ rufname: z.rufname, vorname: z.vorname, nachname: z.nachname });
+	}
 }
 
 type Gemeinsam = 'geschlossen' | 'voll' | 'schon-angemeldet' | 'angaben-fehlen' | 'nicht-gefunden';

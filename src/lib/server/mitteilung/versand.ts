@@ -3,6 +3,7 @@
 // Ein Fehler bei einem Empfänger hält die anderen nicht auf; der Versand wirft nie und loggt
 // nichts (SI-05), er zählt nur.
 import { eq } from 'drizzle-orm';
+import type { Namensteile } from '../../name.ts';
 import type { Db } from '../db/index.ts';
 import { pushAbo, type Weg } from '../db/schema.ts';
 import type { Mailer } from '../login/dienst.ts';
@@ -36,7 +37,7 @@ export function vorschau(
 	empf: Empfaenger[],
 	weg: Weg,
 	mitPush: boolean
-): Zahlen & { anzahl: number; namen: string[] } {
+): Zahlen & { anzahl: number; namen: Namensteile[] } {
 	const z: Zahlen = { push: 0, mails: 0, ersatzMails: 0, nichtErreichbar: 0 };
 	for (const e of empf) {
 		const push = mitPush && e.abos.length > 0;

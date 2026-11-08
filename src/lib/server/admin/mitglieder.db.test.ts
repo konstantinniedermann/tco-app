@@ -238,6 +238,25 @@ describe('aendereAngaben', () => {
 });
 
 describe('listeMitglieder', () => {
+	test('Suche findet den Rufname; die Zeile bleibt amtlich', async () => {
+		const u = randomUUID().slice(0, 8);
+		const m = await erfinde(db, { vorname: 'Johannes', rufname: `Hannes${u}`, nachname: 'Muster' });
+		const zeilen = await listeMitglieder(db, { suche: `hannes${u}` }, jetzt);
+		expect(zeilen.map((z) => z.id)).toEqual([m.mitgliedId]);
+		expect(zeilen[0].name).toBe('Muster, Johannes');
+		const mitNachname = await listeMitglieder(db, { suche: `hannes${u} mus` }, jetzt);
+		expect(mitNachname.map((z) => z.id)).toEqual([m.mitgliedId]);
+	});
+
+	test('Detail liefert den Rufname ausserhalb der Angaben', async () => {
+		const m = await erfinde(db, { vorname: 'Johannes', rufname: 'Hannes', nachname: 'Muster' });
+		const d = (await ladeMitglied(db, m.mitgliedId, jetzt))!;
+		expect(d.rufname).toBe('Hannes');
+		expect(d.angaben).not.toHaveProperty('rufname');
+		const o = await erfinde(db, {});
+		expect((await ladeMitglied(db, o.mitgliedId, jetzt))!.rufname).toBeNull();
+	});
+
 	test('Suche findet Teil von Name, E-Mail und Nummer; «100%» sucht wörtlich', async () => {
 		const u = randomUUID().slice(0, 8);
 		const n = nummer();

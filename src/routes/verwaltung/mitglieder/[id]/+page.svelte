@@ -244,6 +244,9 @@
 	<h1 tabindex="-1" bind:this={titel}>
 		{angaben.nachname}, {angaben.vorname} <span class={stand.klasse}>{stand.text}</span>
 	</h1>
+	{#if detail.rufname}
+		<p class="leise">Rufname {detail.rufname}</p>
+	{/if}
 	{#if angaben.mitgliedernummer}
 		<p class="leise">Mitgliedernummer {angaben.mitgliedernummer}</p>
 	{/if}
