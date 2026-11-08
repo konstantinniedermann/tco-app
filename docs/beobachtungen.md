@@ -115,3 +115,51 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 ---
 
 ## Offen
+
+### 2026-11-08 — Änderungsverlauf eines Mitglieds zeigt den Pfad erst nach einem zweiten Abruf
+
+**Thema:** Navigation
+
+**Fundort:** `src/routes/verwaltung/verlauf/+page.svelte` (Pfad über `ladeMitglied`)
+
+**Beobachtung:** Der Pfad «Mitglieder › Nachname, Vorname › Änderungsverlauf» erscheint erst, wenn `ladeMitglied` den Namen geliefert hat; bis dahin rutscht der Titel nachträglich nach unten. Schlägt der Abruf fehl (Mitglied gelöscht, Netz weg), fehlt der Rückweg über dem Titel ganz, nur die Seitenleiste bleibt. Der Name stünde schon in den Zeilen des Verlaufs.
+
+**Ursprung:** Review #69 (Code-Review und cas-reviewer)
+
+**Einschätzung:** Klein. Pfad sofort mit Platzhalter zeigen oder den Namen aus den Verlaufszeilen nehmen.
+
+### 2026-11-08 — CM-Seite bei Störung von /api/cm und doppelter Abruf beim Reiter CM
+
+**Thema:** Navigation
+
+**Fundort:** `src/routes/clubmeisterschaft/[id]/+page.ts`, `src/routes/clubmeisterschaft/+page.ts`
+
+**Beobachtung:** Lässt sich die Liste der laufenden CMs nicht laden, zeigt die CM-Seite «‹ Clubmeisterschaft»; läuft nur eine CM, führt dieser Link per Umleitung auf dieselbe Seite zurück. Ausserdem holen beim Tipp auf «CM» mit einer laufenden CM beide Seiten nacheinander `/api/cm`.
+
+**Ursprung:** Review #69 (Code-Review)
+
+**Einschätzung:** Selten und harmlos; beim CM-Betrieb (Umbau der CM-Seite) mitnehmen.
+
+### 2026-11-08 — Elternseite der festen Ordnung nur als Zeichenkette typisiert
+
+**Thema:** Navigation
+
+**Fundort:** `src/lib/ui/navigation.ts` (`Eltern.route`), `src/lib/ui/Zurueck.svelte` (Cast für `resolve`)
+
+**Beobachtung:** `Eltern.route` ist ein `string`; `Zurueck.svelte` castet ihn für `resolve`. Ein Tippfehler in der festen Ordnung fiele erst zur Laufzeit auf, nicht in svelte-check. Die Einheitstests prüfen die Tabelle, nicht ob die Routen existieren.
+
+**Ursprung:** Review #69 (Code-Review)
+
+**Einschätzung:** Typ aus `$app/types` (RouteId) würde es abfangen; kein Laufzeitfehler bekannt.
+
+### 2026-11-08 — Breiter Pfad in der Verwaltung kürzt die aktuelle Stufe
+
+**Thema:** Navigation
+
+**Fundort:** `src/lib/design/basis.css` (`.pfad ol`)
+
+**Beobachtung:** Ab 60rem steht der ganze Pfad einzeilig; ist er zu lang, endet er mit «…», und das kann die fett gesetzte aktuelle Seite treffen. Der Titel darunter nennt sie ohnehin.
+
+**Ursprung:** Review #69 (Code-Review, cas-reviewer)
+
+**Einschätzung:** Kosmetisch; erst angehen, wenn es bei echten Namen stört (z. B. Mittelstufen statt Ende kürzen).
