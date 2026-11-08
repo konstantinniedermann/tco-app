@@ -2,7 +2,7 @@
 // Mitglieder und einer verschickten Erinnerung im Verlauf der Mitteilungen, damit Startseite und
 // Verwaltung beim Vorzeigen nicht leer sind (DS-08).
 import { eq } from 'drizzle-orm';
-import { zuerichZuUtc } from '../src/lib/anlass/zeit.ts';
+import { utcZuZuerich, zuerichZuUtc } from '../src/lib/anlass/zeit.ts';
 import { legeAnlassAn, melde } from '../src/lib/server/anlass/anlaesse.ts';
 import { vorlagenAnlass } from '../src/lib/mitteilung/vorlagen.ts';
 import type { Db } from '../src/lib/server/db/index.ts';
@@ -53,17 +53,72 @@ async function erfundenesMitglied(db: Db, vorname: string, nachname: string): Pr
 	return id;
 }
 
-/** Legt die Beispiel-GV an; gibt es sie schon (gleicher Titel), passiert nichts. */
+const CLUBABEND = 'Clubabend mit Grill';
+const TAG_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Ein zweiter Anlass rund einen Monat nach dem ersten `make seed`, damit die Startseite zwei
+ * Anlässe zeigt; gibt es ihn schon (gleicher Titel), passiert nichts. Gibt die ID zurück.
+ */
+export async function legeBeispielClubabendAn(
+	db: Db,
+	erstelltVon: number,
+	jetzt: Date
+): Promise<number> {
+	const [vorhanden] = await db
+		.select({ id: anlass.id })
+		.from(anlass)
+		.where(eq(anlass.titel, CLUBABEND));
+	if (vorhanden) return vorhanden.id;
+	const tag = (versatz: number) =>
+		utcZuZuerich(new Date(jetzt.getTime() + versatz * TAG_MS)).slice(0, 10);
+	return legeAnlassAn(db, erstelltVon, {
+		titel: CLUBABEND,
+		beginn: zuerichZuUtc(`${tag(30)}T18:30`)!,
+		ort: 'Clubhaus, Musterweg 1, Olten',
+		einladung: [
+			'Zum Saisonstart grillieren wir zusammen auf der Terrasse.',
+			'Fleisch und Getränke offeriert der Verein, Salate sind willkommen.'
+		].join('\n'),
+		anmeldeschluss: zuerichZuUtc(`${tag(27)}T23:59`)!
+	});
+}
+
+/**
+ * Gemischte Antworten des Testbestands auf einen Anlass: etwa jedes dritte Mitglied kommt, jedes
+ * zehnte nicht (teils mit Bemerkung), der Rest hat noch nicht geantwortet. `versatz` verschiebt
+ * das Muster, damit die zwei Anlässe nicht dieselben Antworten haben. Ausgetretene und Anlässe
+ * nach dem Anmeldeschluss lässt `melde` aus.
+ */
+export async function meldeBeispielAntworten(
+	db: Db,
+	anlassId: number,
+	mitgliedIds: number[],
+	jetzt: Date,
+	versatz: number
+): Promise<void> {
+	for (const [i, mitgliedId] of mitgliedIds.entries()) {
+		const n = i + versatz;
+		if (n % 3 === 0) {
+			await melde(db, anlassId, mitgliedId, { antwort: 'kommt', bemerkung: null }, jetzt);
+		} else if (n % 10 === 1) {
+			const bemerkung = n % 20 === 1 ? 'Bin an dem Abend leider verhindert.' : null;
+			await melde(db, anlassId, mitgliedId, { antwort: 'kommt-nicht', bemerkung }, jetzt);
+		}
+	}
+}
+
+/** Legt die Beispiel-GV an und gibt ihre ID; gibt es sie schon (gleicher Titel), passiert nichts. */
 export async function legeBeispielAnlassAn(
 	db: Db,
 	erstelltVon: number,
 	jetzt: Date
-): Promise<void> {
+): Promise<number> {
 	const [vorhanden] = await db
 		.select({ id: anlass.id })
 		.from(anlass)
 		.where(eq(anlass.titel, TITEL));
-	if (vorhanden) return;
+	if (vorhanden) return vorhanden.id;
 	const beginn = zuerichZuUtc('2027-03-19T19:30')!;
 	const anmeldeschluss = zuerichZuUtc('2027-03-16T23:59')!;
 	const id = await legeAnlassAn(db, erstelltVon, {
@@ -96,4 +151,5 @@ export async function legeBeispielAnlassAn(
 		},
 		jetzt
 	);
+	return id;
 }

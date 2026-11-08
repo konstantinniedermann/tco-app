@@ -1,7 +1,7 @@
 // Schnittstellen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01…05, A-ANMELDUNG-10). Alles
 // nur mit Sitzung.
 import type { RequestEvent } from '@sveltejs/kit';
-import { parseId } from '../parse-id.ts';
+import { INTEGER_MAX, parseId } from '../parse-id.ts';
 import type { Db } from '../db/index.ts';
 import {
 	antwort,
@@ -304,7 +304,7 @@ export function getCmPartner(d: CmDienste, e: CmEreignis): Promise<Response> {
 
 /** Nummer eines Mitglieds aus dem Körper; alles andere ist keine. */
 const mitgliedIdAus = (roh: unknown) =>
-	typeof roh === 'number' && Number.isSafeInteger(roh) && roh > 0 && roh <= 2_147_483_647
+	typeof roh === 'number' && Number.isSafeInteger(roh) && roh > 0 && roh <= INTEGER_MAX
 		? roh
 		: null;
 
