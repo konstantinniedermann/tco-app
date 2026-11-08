@@ -159,7 +159,8 @@ describe('Passung Doppel', () => {
 			true
 		);
 		expect(passtDoppelAllein(doppel(), spieler({ geschlecht: 'w' }))).toBe(false);
-		expect(passtDoppelAllein(doppel(), spieler({ jahrgang: null }))).toBe(false);
+		expect(passtDoppelAllein(doppel(), spieler({ klassierung: null }))).toBe(false);
+		expect(passtDoppelAllein(doppel(), spieler({ geschlecht: null }))).toBe(false);
 		expect(passtDoppelAllein(regel({ geschlecht: 'herren' }), spieler({}))).toBe(false);
 		expect(passtEinzel(doppel(), spieler({}))).toBe(false);
 	});
@@ -170,5 +171,14 @@ describe('Passung Doppel', () => {
 		expect(vermerk(spieler({ jahrgang: null }))).toBeNull();
 		expect(vermerk(spieler({ klassierung: null }))).toBe('klassierung-fehlt');
 		expect(vermerk(spieler({}))).toBeNull();
+	});
+
+	it('FR-07: im Doppel verlangt die Passung nie einen Jahrgang', () => {
+		const ohneJahrgang = spieler({ jahrgang: null, klassierung: 'R5' });
+		const b = spieler({ klassierung: 'R5' });
+		expect(passtAlsPaar(doppel(), ohneJahrgang, b, true)).toBe(true);
+		expect(passtAlsPaar(doppel(), b, ohneJahrgang, true)).toBe(true);
+		expect(passtAlsPaar(doppel(), ohneJahrgang, b, false)).toBe(true);
+		expect(passtDoppelAllein(doppel(), ohneJahrgang)).toBe(true);
 	});
 });

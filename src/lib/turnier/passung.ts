@@ -93,23 +93,31 @@ function geschlechtPaarPasst(k: KategorieRegel, a: 'w' | 'm', b: 'w' | 'm' | nul
 	}
 }
 
+/** Im Doppel zählen nur Geschlecht und Klassierung, nie der Jahrgang. */
+function hatGeschlechtUndKlassierung(
+	s: Spieler
+): s is Spieler & { geschlecht: 'w' | 'm'; klassierung: Klassierung } {
+	return s.geschlecht !== null && s.klassierung !== null;
+}
+
 /** FR-07: passt der Spieler allein in diese Doppel-Kategorie? Der Jahrgang zählt im Doppel nicht. */
 export function passtDoppelAllein(k: KategorieRegel, s: Spieler): boolean {
-	if (k.art !== 'doppel' || fehlendeAngaben(s).length > 0) return false;
+	if (k.art !== 'doppel' || !hatGeschlechtUndKlassierung(s)) return false;
 	return k.geschlecht === 'herren'
 		? s.geschlecht === 'm'
 		: k.geschlecht !== 'damen' || s.geschlecht === 'w';
 }
 
 /**
- * FR-07: passt das Paar in diese Doppel-Kategorie? `streng = false` (Suche): `a` muss vollständig
- * sein, fehlende Angaben von `b` gelten als passend (ohne Klassierung entfällt die Summenprüfung).
- * `streng = true` (Annehmen): beide müssen Geschlecht und Klassierung haben. Kein Jahrgang.
+ * FR-07: passt das Paar in diese Doppel-Kategorie? `streng = false` (Suche): `a` braucht
+ * Geschlecht und Klassierung, fehlende Angaben von `b` gelten als passend (ohne Klassierung entfällt die Summenprüfung).
+ * `streng = true` (Annehmen): beide brauchen Geschlecht und Klassierung. Kein Jahrgang.
  */
 export function passtAlsPaar(k: KategorieRegel, a: Spieler, b: Spieler, streng: boolean): boolean {
-	if (k.art !== 'doppel' || k.mindestsumme === null || fehlendeAngaben(a).length > 0) return false;
-	if (streng && (b.geschlecht === null || b.klassierung === null)) return false;
-	if (!geschlechtPaarPasst(k, a.geschlecht!, b.geschlecht)) return false;
+	if (k.art !== 'doppel' || k.mindestsumme === null || !hatGeschlechtUndKlassierung(a))
+		return false;
+	if (streng && !hatGeschlechtUndKlassierung(b)) return false;
+	if (!geschlechtPaarPasst(k, a.geschlecht, b.geschlecht)) return false;
 	if (b.klassierung === null) return true;
-	return punkte(a.klassierung!) + punkte(b.klassierung) >= k.mindestsumme;
+	return punkte(a.klassierung) + punkte(b.klassierung) >= k.mindestsumme;
 }
