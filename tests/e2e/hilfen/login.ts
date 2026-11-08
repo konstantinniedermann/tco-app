@@ -163,10 +163,30 @@ export async function stelleAnfrageDirekt(
 	if (r !== 'ok') throw new Error(`Anfrage für Kategorie ${kategorieId}: ${r}`);
 }
 
-/** Meldet ein Mitglied über die Fachlogik zu einer Einzel-Kategorie an (ohne Mail). */
-export async function meldeZurCmAn(kategorieId: number, mitgliedId: number): Promise<void> {
-	const r = await meldeZurCmAnInDb(hole().db, kategorieId, mitgliedId, new Date());
+/**
+ * Meldet ein Mitglied über die Fachlogik zu einer Kategorie an (ohne Mail); im Doppel allein
+ * (*sucht Partner*), wahlweise mit Kommentar (FR-49).
+ */
+export async function meldeZurCmAn(
+	kategorieId: number,
+	mitgliedId: number,
+	suchtext: string | null = null
+): Promise<void> {
+	const r = await meldeZurCmAnInDb(hole().db, kategorieId, mitgliedId, new Date(), suchtext);
 	if (r !== 'ok') throw new Error(`Anmeldung zur Kategorie ${kategorieId}: ${r}`);
+}
+
+/** Setzt den Anmeldeschluss eines Turniers (`YYYY-MM-DD`), etwa auf ein vergangenes Datum. */
+export async function setzeAnmeldeschluss(turnierId: number, datum: string): Promise<void> {
+	await hole().db.update(turnier).set({ anmeldeschluss: datum }).where(eq(turnier.id, turnierId));
+}
+
+/** Das Konto hat ein Login, als hätte es den Brief-Code eingelöst, ohne Browser. */
+export async function gibLogin(kontoId: number): Promise<void> {
+	await hole()
+		.db.update(konto)
+		.set({ briefCodeBenutztAm: new Date() })
+		.where(eq(konto.id, kontoId));
 }
 
 /** Wildcard-Antrag über die Fachlogik (FR-08), ohne Mail an Spieler und CM-Admins. */
