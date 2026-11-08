@@ -12,6 +12,7 @@ import {
 	beantrageWildcard,
 	meldeAn as meldeZurCmAnInDb
 } from '../../../src/lib/server/cm/anmeldungen.ts';
+import { stelleAnfrage } from '../../../src/lib/server/cm/doppel.ts';
 import { konto, mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../../../src/lib/server/turnier/angaben.ts';
 import {
@@ -142,6 +143,24 @@ export async function leereStrasse(mitgliedId: number): Promise<void> {
 /** Setzt den Rufnamen eines erfundenen Mitglieds (nur das Mitglied selbst tut das im Profil). */
 export async function setzeRufname(mitgliedId: number, rufname: string | null): Promise<void> {
 	await hole().db.update(mitglied).set({ rufname }).where(eq(mitglied.id, mitgliedId));
+}
+
+/** Setzt die Telefonnummer eines erfundenen Mitglieds (FR-19: Doppelpartner sehen sie). */
+export async function setzeTelefon(mitgliedId: number, telefon: string): Promise<void> {
+	await hole().db.update(mitglied).set({ telefon }).where(eq(mitglied.id, mitgliedId));
+}
+
+/**
+ * Partner-Anfrage im Doppel über die Fachlogik (FR-48), ohne Meldung an den Angefragten. Er
+ * braucht ein Login (Brief-Code eingelöst).
+ */
+export async function stelleAnfrageDirekt(
+	kategorieId: number,
+	vonId: number,
+	anId: number
+): Promise<void> {
+	const r = await stelleAnfrage(hole().db, kategorieId, vonId, anId, new Date());
+	if (r !== 'ok') throw new Error(`Anfrage für Kategorie ${kategorieId}: ${r}`);
 }
 
 /** Meldet ein Mitglied über die Fachlogik zu einer Einzel-Kategorie an (ohne Mail). */

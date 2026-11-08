@@ -1,9 +1,21 @@
 // Nur lokal (make seed): eine erfundene Clubmeisterschaft 2027 mit Kategorien, damit die
 // Verwaltung beim Vorzeigen nicht leer ist (DS-08).
 import { and, eq } from 'drizzle-orm';
-import { beantrageWildcard, meldeAn } from '../src/lib/server/cm/anmeldungen.ts';
+import {
+	beantrageWildcard,
+	istAktiv,
+	meldeAn,
+	spielerDer
+} from '../src/lib/server/cm/anmeldungen.ts';
 import type { Db } from '../src/lib/server/db/index.ts';
-import { kategorie, mitglied, turnier } from '../src/lib/server/db/schema.ts';
+import {
+	anmeldung,
+	anmeldungSpieler,
+	kategorie,
+	mitglied,
+	partnerAnfrage,
+	turnier
+} from '../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../src/lib/server/turnier/angaben.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../src/lib/server/turnier/turniere.ts';
 
@@ -63,9 +75,10 @@ const KATEGORIEN: KategorieWerte[] = [
 	{ ...OHNE, name: 'Mixed Doppel', geschlecht: 'mixed', art: 'doppel', mindestsumme: 9 }
 ];
 
-// Erfundene Spielerinnen und Spieler mit Klassierung (DS-08); je Kategorie 1–2 Anmeldungen.
-// Max hat den Rufnamen «Maxi», Lena «lena» (gleich dem Vornamen in anderer Schreibweise: wird
-// angezeigt wie ohne Rufname); die anderen haben keinen.
+// Erfundene Spielerinnen und Spieler (DS-08); je Kategorie 1–2 Anmeldungen. Max hat den Rufnamen
+// «Maxi», Lena «lena» (gleich dem Vornamen in anderer Schreibweise: wird angezeigt wie ohne
+// Rufname); die anderen haben keinen. Nico hat keine Klassierung: In der Partnersuche trägt er
+// den Vermerk *Klassierung fehlt*, anmelden kann er sich nicht (FR-37).
 const SPIELER = [
 	{
 		vorname: 'Max',
@@ -85,7 +98,8 @@ const SPIELER = [
 		jahrgang: 1995,
 		klassierung: 'R5'
 	},
-	{ vorname: 'Sara', nachname: 'Erdacht', geschlecht: 'w', jahrgang: 1988, klassierung: 'R9' }
+	{ vorname: 'Sara', nachname: 'Erdacht', geschlecht: 'w', jahrgang: 1988, klassierung: 'R9' },
+	{ vorname: 'Nico', nachname: 'Musterli', geschlecht: 'm', jahrgang: 1999, klassierung: null }
 ] as const;
 const ANMELDUNGEN: [string, string[]][] = [
 	['Herren R1–R6', ['Max', 'Paul']],
@@ -99,8 +113,79 @@ const ANTRAG = {
 	kommentar: 'Möchte mich mit Stärkeren messen.'
 };
 
+// A-ANMELDUNG-04, FR-48, FR-49: im Doppel ein Paar, zwei suchen allein (eine mit Kommentar), und
+// eine offene Anfrage. Die Anfrage steht direkt in der Datenbank: Paul hat kein Login, über die
+// Fachlogik liesse er sich nicht anfragen.
+const PAAR = { kategorie: 'Mixed Doppel', vornamen: ['Max', 'Lena'] } as const;
+const ALLEIN: [string, string, string | null][] = [
+	['Damen Doppel', 'Sara', 'Suche jemanden auf R5–R7-Niveau, eher abends.'],
+	['Herren Doppel', 'Paul', null]
+];
+const ANFRAGE = { kategorie: 'Herren Doppel', von: 'Urs', an: 'Paul' } as const;
+
 type Spieler = { vorname: string; nachname: string; rufname?: string };
 const mailVon = (s: Spieler) => `${s.vorname}.${s.nachname}@example.org`.toLowerCase();
+
+async function kategorieNamens(
+	db: Db,
+	turnierId: number,
+	name: string
+): Promise<number | undefined> {
+	const [k] = await db
+		.select({ id: kategorie.id })
+		.from(kategorie)
+		.where(and(eq(kategorie.turnierId, turnierId), eq(kategorie.name, name)));
+	return k?.id;
+}
+
+/** Die aktive Anmeldung des Mitglieds in dieser Kategorie mit der Zahl ihrer Spieler. */
+async function aktiveAnmeldung(db: Db, kategorieId: number, mitgliedId: number) {
+	const [a] = await db
+		.select({ id: anmeldung.id })
+		.from(anmeldung)
+		.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
+		.where(
+			and(
+				eq(anmeldung.kategorieId, kategorieId),
+				eq(anmeldungSpieler.mitgliedId, mitgliedId),
+				istAktiv
+			)
+		);
+	return a ? { id: a.id, spieler: (await spielerDer(db, a.id)).length } : null;
+}
+
+/** Doppel: Paar, allein Suchende und die offene Anfrage; wiederholbar wie die Anmeldungen. */
+async function legeBeispielDoppelAn(
+	db: Db,
+	turnierId: number,
+	ids: Map<string, number>,
+	jetzt: Date
+): Promise<void> {
+	const id = (vorname: string) => ids.get(vorname) as number;
+	const paar = await kategorieNamens(db, turnierId, PAAR.kategorie);
+	if (paar) {
+		const [a, b] = PAAR.vornamen.map(id);
+		// Der Erste meldet sich allein an, der Zweite kommt dazu (wie nach einer angenommenen
+		// Anfrage); 'schon-angemeldet' beim zweiten Lauf ist gewollt.
+		await meldeAn(db, paar, a, jetzt);
+		const eigene = await aktiveAnmeldung(db, paar, a);
+		if (eigene?.spieler === 1 && !(await aktiveAnmeldung(db, paar, b))) {
+			await db.insert(anmeldungSpieler).values({ anmeldungId: eigene.id, mitgliedId: b });
+		}
+	}
+	for (const [name, vorname, suchtext] of ALLEIN) {
+		const k = await kategorieNamens(db, turnierId, name);
+		if (k) await meldeAn(db, k, id(vorname), jetzt, suchtext);
+	}
+	const k = await kategorieNamens(db, turnierId, ANFRAGE.kategorie);
+	// Nur solange der Angefragte dort noch allein sucht.
+	if (k && (await aktiveAnmeldung(db, k, id(ANFRAGE.an)))?.spieler === 1) {
+		await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: k, vonId: id(ANFRAGE.von), anId: id(ANFRAGE.an), gestelltAm: jetzt })
+			.onConflictDoNothing();
+	}
+}
 
 /** Legt erfundene Anmeldungen und einen Antrag an; wiederholbar, ein zweiter Lauf ändert nichts. */
 async function legeBeispielAnmeldungenAn(db: Db, turnierId: number, jetzt: Date): Promise<void> {
@@ -127,21 +212,15 @@ async function legeBeispielAnmeldungenAn(db: Db, turnierId: number, jetzt: Date)
 		ids.set(s.vorname, m.id);
 	}
 	for (const [name, vornamen] of ANMELDUNGEN) {
-		const [k] = await db
-			.select({ id: kategorie.id })
-			.from(kategorie)
-			.where(and(eq(kategorie.turnierId, turnierId), eq(kategorie.name, name)));
+		const k = await kategorieNamens(db, turnierId, name);
 		if (!k) continue;
 		// 'schon-angemeldet' beim zweiten Lauf ist gewollt.
-		for (const v of vornamen) await meldeAn(db, k.id, ids.get(v) as number, jetzt);
+		for (const v of vornamen) await meldeAn(db, k, ids.get(v) as number, jetzt);
 	}
-	const [k] = await db
-		.select({ id: kategorie.id })
-		.from(kategorie)
-		.where(and(eq(kategorie.turnierId, turnierId), eq(kategorie.name, ANTRAG.kategorie)));
+	const k = await kategorieNamens(db, turnierId, ANTRAG.kategorie);
 	// Auch hier: 'schon-angemeldet' beim zweiten Lauf ist gewollt.
-	if (k)
-		await beantrageWildcard(db, k.id, ids.get(ANTRAG.vorname) as number, ANTRAG.kommentar, jetzt);
+	if (k) await beantrageWildcard(db, k, ids.get(ANTRAG.vorname) as number, ANTRAG.kommentar, jetzt);
+	await legeBeispielDoppelAn(db, turnierId, ids, jetzt);
 }
 
 /** Legt die Beispiel-Clubmeisterschaft samt Anmeldungen an; vorhandene Daten bleiben unverändert. */

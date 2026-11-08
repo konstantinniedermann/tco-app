@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { punkte } from './klassierung.ts';
 import {
 	fehlendeAngaben,
+	passtAlsPaar,
+	passtDoppelAllein,
 	passtEinzel,
+	vermerk,
 	warnungenEinzel,
 	wildcardEinzel,
 	type KategorieRegel,
@@ -15,6 +19,7 @@ const regel = (r: Partial<KategorieRegel>): KategorieRegel => ({
 	jahrgangBis: null,
 	klassierungVon: null,
 	klassierungBis: null,
+	mindestsumme: null,
 	...r
 });
 const spieler = (s: Partial<Spieler>): Spieler => ({
@@ -98,5 +103,82 @@ describe('Wildcard Einzel', () => {
 		expect(warnungenEinzel(h46, spieler({ klassierung: null }))).toEqual(['angaben-fehlen']);
 		expect(warnungenEinzel(r79, spieler({ klassierung: 'R2' }))).toEqual(['passt-nicht']);
 		expect(warnungenEinzel(h46, spieler({ klassierung: 'R5' }))).toEqual([]);
+	});
+});
+
+describe('Passung Doppel', () => {
+	const doppel = (r: Partial<KategorieRegel> = {}) =>
+		regel({ art: 'doppel', geschlecht: 'herren', mindestsumme: 9, ...r });
+
+	it('FR-07: Doppel nach Geschlecht und Mindestsumme, ohne Jahrgang', () => {
+		expect(punkte('N2')).toBe(0);
+		expect(punkte('R4')).toBe(4);
+		expect(punkte('keine')).toBe(10);
+
+		const k = doppel();
+		const m = (klassierung: Spieler['klassierung']) => spieler({ klassierung });
+		expect(passtAlsPaar(k, m('R4'), m('R5'), true)).toBe(true);
+		expect(passtAlsPaar(k, m('R3'), m('R5'), true)).toBe(false);
+		expect(passtAlsPaar(k, m('R1'), m('R8'), true)).toBe(true);
+		expect(passtAlsPaar(k, m('N1'), m('R8'), true)).toBe(false);
+		expect(passtAlsPaar(k, m('N1'), m('R9'), true)).toBe(true);
+		expect(passtAlsPaar(doppel({ mindestsumme: null }), m('R9'), m('R9'), true)).toBe(false);
+
+		const w = spieler({ geschlecht: 'w', klassierung: 'R5' });
+		const mann = spieler({ klassierung: 'R5' });
+		expect(passtAlsPaar(doppel({ geschlecht: 'mixed' }), w, mann, true)).toBe(true);
+		expect(passtAlsPaar(doppel({ geschlecht: 'mixed' }), w, w, true)).toBe(false);
+		expect(passtAlsPaar(doppel({ geschlecht: 'damen' }), w, mann, true)).toBe(false);
+		expect(passtAlsPaar(doppel({ geschlecht: 'damen' }), w, w, true)).toBe(true);
+
+		const alt = spieler({ jahrgang: 1970, klassierung: 'R5' });
+		expect(passtAlsPaar(doppel({ jahrgangVon: 2000 }), alt, alt, true)).toBe(true);
+		expect(passtDoppelAllein(doppel({ jahrgangVon: 2000 }), alt)).toBe(true);
+	});
+
+	it('FR-07: Suche lässt fehlende Angaben des Partners zu, Annehmen nicht', () => {
+		const a = spieler({ klassierung: 'R5' });
+		const ohneKlassierung = spieler({ klassierung: null });
+		const ohneGeschlecht = spieler({ geschlecht: null, klassierung: 'R5' });
+		const mixed = doppel({ geschlecht: 'mixed' });
+		const frau = spieler({ geschlecht: 'w', klassierung: 'R5' });
+		expect(passtAlsPaar(doppel(), a, ohneKlassierung, false)).toBe(true);
+		expect(passtAlsPaar(mixed, frau, ohneGeschlecht, false)).toBe(true);
+		expect(passtAlsPaar(doppel(), a, ohneKlassierung, true)).toBe(false);
+		expect(passtAlsPaar(mixed, frau, ohneGeschlecht, true)).toBe(false);
+		// `a` muss vollständig sein
+		expect(passtAlsPaar(doppel(), ohneKlassierung, a, false)).toBe(false);
+		// ein bekannter Partner wird weiter geprüft
+		expect(passtAlsPaar(doppel(), a, spieler({ klassierung: 'R2' }), false)).toBe(false);
+		expect(passtAlsPaar(doppel(), a, spieler({ geschlecht: 'w' }), false)).toBe(false);
+	});
+
+	it('FR-07: passtDoppelAllein prüft Art, Angaben und Geschlecht', () => {
+		expect(passtDoppelAllein(doppel({ geschlecht: 'mixed' }), spieler({}))).toBe(true);
+		expect(passtDoppelAllein(doppel({ geschlecht: 'offen' }), spieler({ geschlecht: 'w' }))).toBe(
+			true
+		);
+		expect(passtDoppelAllein(doppel(), spieler({ geschlecht: 'w' }))).toBe(false);
+		expect(passtDoppelAllein(doppel(), spieler({ klassierung: null }))).toBe(false);
+		expect(passtDoppelAllein(doppel(), spieler({ geschlecht: null }))).toBe(false);
+		expect(passtDoppelAllein(regel({ geschlecht: 'herren' }), spieler({}))).toBe(false);
+		expect(passtEinzel(doppel(), spieler({}))).toBe(false);
+	});
+
+	it('FR-07: vermerk nennt, was für das Doppel fehlt', () => {
+		expect(vermerk(spieler({ geschlecht: null }))).toBe('angaben-fehlen');
+		expect(vermerk(spieler({ geschlecht: null, klassierung: null }))).toBe('angaben-fehlen');
+		expect(vermerk(spieler({ jahrgang: null }))).toBeNull();
+		expect(vermerk(spieler({ klassierung: null }))).toBe('klassierung-fehlt');
+		expect(vermerk(spieler({}))).toBeNull();
+	});
+
+	it('FR-07: im Doppel verlangt die Passung nie einen Jahrgang', () => {
+		const ohneJahrgang = spieler({ jahrgang: null, klassierung: 'R5' });
+		const b = spieler({ klassierung: 'R5' });
+		expect(passtAlsPaar(doppel(), ohneJahrgang, b, true)).toBe(true);
+		expect(passtAlsPaar(doppel(), b, ohneJahrgang, true)).toBe(true);
+		expect(passtAlsPaar(doppel(), ohneJahrgang, b, false)).toBe(true);
+		expect(passtDoppelAllein(doppel(), ohneJahrgang)).toBe(true);
 	});
 });

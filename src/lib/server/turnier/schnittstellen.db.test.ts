@@ -325,6 +325,9 @@ describe('Turnier-Schnittstellen', () => {
 		}
 		const ok = await postKategorie(s.d, post(cm, { ...enger, trotzdem: true }, k));
 		expect([ok.status, await ok.json()]).toEqual([200, {}]);
+		// FR-36: Einzel oder Doppel wechseln geht mit Anmeldung nicht, auch nicht mit trotzdem.
+		const gesperrt = await postKategorie(s.d, post(cm, { ...DOPPEL, trotzdem: true }, k));
+		expect([gesperrt.status, await gesperrt.json()]).toEqual([409, { fehler: 'art-gesperrt' }]);
 		const a = await postKategorieAbsagen(s.d, post(cm, {}, k));
 		expect([a.status, await a.json()]).toEqual([409, { fehler: 'hat-anmeldungen', anzahl: 1 }]);
 		expect((await (await getKategorie(s.d, hole(cm, k))).json()).anmeldungen).toBe(1);

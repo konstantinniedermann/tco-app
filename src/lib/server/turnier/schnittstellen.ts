@@ -125,7 +125,7 @@ export function postKategorie(d: AdminDienste, e: AdminEreignis): Promise<Respon
 		const r = await aendereKategorie(d.db, id, p.werte, koerper.trotzdem === true);
 		if (typeof r === 'object') return antwort(409, { fehler: 'unpassend', anzahl: r.unpassend });
 		if (r === 'nicht-gefunden') return nichtGefunden();
-		if (r === 'abgesagt') return antwort(409, { fehler: 'abgesagt' });
+		if (r === 'abgesagt' || r === 'art-gesperrt') return antwort(409, { fehler: r });
 		if (r === 'vergeben') return antwort(409, { fehler: 'vergeben', feld: 'name' });
 		return antwort(200, {});
 	});

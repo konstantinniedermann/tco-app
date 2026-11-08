@@ -93,6 +93,11 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Geschlecht und Jahrgang der Spieler (zum Zuordnen) | – | – | L | – | S | L |
 | Klassierung der Spieler korrigieren (A-ANMELDUNG-06, K-28) | – | – | S | – | – | L |
 | Wildcard-Antrag und Kommentar (FR-08) | – | S eigene | S, entscheidet | S eigene | S eigene | L |
+| Klassierung passender Mitglieder (Partnerwahl) | – | L | L | L | L | L |
+| Kontaktdaten des Doppelpartners, erst nach dem Annehmen (FR-19) | – | L beteiligt | L alle (K-42) | L alle (K-42) | S | L |
+| Name, Klassierung und Telefon (sonst E-Mail) des Anfragenden; er gibt sie mit der Anfrage dem Angefragten frei (FR-48, FR-19) | – | L an einen selbst | L an einen selbst | L an einen selbst | L an einen selbst | L an einen selbst |
+| Partner anfragen, annehmen, ablehnen (FR-48) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
+| Kommentar *sucht Partner* (FR-49) | – | L; S eigener | L; S eigener | L; S eigener | L; S eigener | L; S eigener |
 | **CM-Betrieb** | | | | | | |
 | Gruppen, KO-Tableaus, Spiele aus Advantage (FR-12) | – | L | S | L | L | L |
 | Resultat melden, bestätigen, bestreiten (FR-16) | – | S beteiligt | S beteiligt | S beteiligt | S beteiligt | S beteiligt |

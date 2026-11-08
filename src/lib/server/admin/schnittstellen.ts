@@ -38,12 +38,21 @@ import {
 	erfasseAustritt,
 	erfasseWiedereintritt,
 	merkeZumLoeschenVor,
-	nimmLoeschungZurueck
+	nimmLoeschungZurueck,
+	type MitRueckzug
 } from './mitgliedschaft.ts';
 import { ROLLEN, istAnsichtRolle, listeRollen, setzeRollen, type Rolle } from './rollen.ts';
 import { ladeVerlauf, schreibeVerlauf, type Urheber } from './verlauf.ts';
 import type { ZugangDienst } from './zugang.ts';
 import { darf, type Art, type Bereich } from '../../verwaltung/bereiche.ts';
+import type { Rueckzug } from '../cm/austritt.ts';
+import {
+	austrittAnfrageMeldung,
+	austrittMeldung,
+	type DoppelMeldung
+} from '../cm/doppel-meldung.ts';
+import { meldeMitgliedern } from '../mitteilung/meldung.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
 
 export type AdminEreignis = Ereignis & Pick<RequestEvent, 'params'>;
 
@@ -364,11 +373,52 @@ function uebergang<E extends string>(
 	});
 }
 
-export const postAustritt = (d: AdminDienste, e: AdminEreignis) => uebergang(d, e, erfasseAustritt);
+/**
+ * FR-04, FR-47: Meldungen nach Austritt oder Vormerken, erst nach dem Commit: an den Partner
+ * eines zurückgezogenen Paars und an den anderen jeder gelöschten Anfrage. Ohne Grund und ohne
+ * Namen des Ausgetretenen; betrifft es den Admin selbst, entfällt sie. Gleiche Meldungen an
+ * denselben Empfänger gehen nur einmal (Anfragen in beide Richtungen). Die Antwort wartet nicht
+ * auf Push und Mail; wirft `meldeMitgliedern` doch, bleibt das still (SI-05).
+ */
+function meldeRueckzug(d: MitteilungAdminDienste, urheber: AdminUrheber, cm: Rueckzug): void {
+	const melder = { db: d.db, push: d.push, mailer: d.mailer, adresse: d.adresse };
+	const gesendet = new Set<string>();
+	const sende = (an: number, m: DoppelMeldung) => {
+		if (an === urheber.mitgliedId) return;
+		const schluessel = JSON.stringify([an, m.titel, m.text, m.pfad]);
+		if (gesendet.has(schluessel)) return;
+		gesendet.add(schluessel);
+		void meldeMitgliedern(melder, [an], m).catch(() => {});
+	};
+	for (const p of cm.partner) sende(p.mitgliedId, austrittMeldung(p.kategorie, p.turnierId));
+	for (const h of cm.hinfaellig) sende(h.anderer, austrittAnfrageMeldung(h.kategorie, h.turnierId));
+}
+
+// Austritt und Vormerken: wie `uebergang`, nach dem Erfolg die Meldungen zum Doppel.
+function mitRueckzug<E extends string>(
+	d: MitteilungAdminDienste,
+	e: AdminEreignis,
+	fn: (
+		db: Db,
+		urheber: AdminUrheber,
+		id: number,
+		jetzt: Date
+	) => Promise<MitRueckzug | 'nicht-gefunden' | E>
+): Promise<Response> {
+	return uebergang(d, e, async (db, urheber, id, t) => {
+		const r = await fn(db, urheber, id, t);
+		if (typeof r === 'string') return r;
+		meldeRueckzug(d, urheber, r.cm);
+		return 'ok';
+	});
+}
+
+export const postAustritt = (d: MitteilungAdminDienste, e: AdminEreignis) =>
+	mitRueckzug(d, e, erfasseAustritt);
 export const postWiedereintritt = (d: AdminDienste, e: AdminEreignis) =>
 	uebergang(d, e, erfasseWiedereintritt);
-export const postLoeschen = (d: AdminDienste, e: AdminEreignis) =>
-	uebergang(d, e, merkeZumLoeschenVor);
+export const postLoeschen = (d: MitteilungAdminDienste, e: AdminEreignis) =>
+	mitRueckzug(d, e, merkeZumLoeschenVor);
 export const postLoeschenRueckgaengig = (d: AdminDienste, e: AdminEreignis) =>
 	uebergang(d, e, nimmLoeschungZurueck);
 
@@ -490,6 +540,7 @@ export function postAdminAnlassLoeschen(d: AdminDienste, e: AdminEreignis): Prom
 	});
 }
 
+// Mit den Diensten der Mitteilungen: Austritt und Löschung melden den Doppelpartnern.
 export const ADMIN_SCHNITTSTELLEN = {
 	getZugang,
 	postZugangCode,
@@ -521,4 +572,4 @@ export const ADMIN_SCHNITTSTELLEN = {
 	getAdminAnlass,
 	postAdminAnlass,
 	postAdminAnlassLoeschen
-} satisfies Record<string, (d: AdminDienste, e: AdminEreignis) => Promise<Response>>;
+} satisfies Record<string, (d: MitteilungAdminDienste, e: AdminEreignis) => Promise<Response>>;

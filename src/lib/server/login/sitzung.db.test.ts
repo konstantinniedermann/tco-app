@@ -151,8 +151,12 @@ describe('Sitzungen', () => {
 		const kennungV = await erstelleSitzung(db, v.kontoId, jetzt);
 		expect(await pruefeSitzung(db, kennungA, jetzt)).not.toBeNull();
 
-		expect(await erfasseAustritt(db, urheber, a.mitgliedId, jetzt)).toBe('ok');
-		expect(await merkeZumLoeschenVor(db, urheber, v.mitgliedId, jetzt)).toBe('ok');
+		expect(await erfasseAustritt(db, urheber, a.mitgliedId, jetzt)).toMatchObject({
+			ergebnis: 'ok'
+		});
+		expect(await merkeZumLoeschenVor(db, urheber, v.mitgliedId, jetzt)).toMatchObject({
+			ergebnis: 'ok'
+		});
 
 		expect(await pruefeSitzung(db, kennungA, jetzt)).toBeNull();
 		expect(await pruefeSitzung(db, kennungV, jetzt)).toBeNull();

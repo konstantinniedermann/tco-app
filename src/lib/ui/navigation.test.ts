@@ -25,6 +25,9 @@ describe('Übergänge beim Seitenwechsel (UI-09)', () => {
 		expect(uebergang('/anlass/[id]', '/', 'link')).toBe('zurueck');
 		expect(uebergang('/', '/clubmeisterschaft/[id]', 'link')).toBe('tiefer');
 		expect(uebergang('/clubmeisterschaft/[id]', '/', 'link')).toBe('zurueck');
+		const doppel = '/clubmeisterschaft/[id]/doppel/[kid]';
+		expect(uebergang('/clubmeisterschaft/[id]', doppel, 'link')).toBe('tiefer');
+		expect(uebergang(doppel, '/clubmeisterschaft/[id]', 'goto')).toBe('zurueck');
 	});
 
 	it('schiebt zurück nach rechts weg', () => {

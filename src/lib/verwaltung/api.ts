@@ -71,6 +71,7 @@ export type Antwort<T> =
 	| { art: 'keine-kategorie' }
 	| { art: 'unzulaessig' }
 	| { art: 'abgesagt' }
+	| { art: 'art-gesperrt' }
 	| { art: 'unpassend'; anzahl: number }
 	| { art: 'hat-anmeldungen'; anzahl: number }
 	| { art: 'nicht-moeglich'; anzahl: number }
@@ -120,6 +121,7 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 		if (k.fehler === 'keine-kategorie') return { art: 'keine-kategorie' };
 		if (k.fehler === 'unzulaessig') return { art: 'unzulaessig' };
 		if (k.fehler === 'abgesagt') return { art: 'abgesagt' };
+		if (k.fehler === 'art-gesperrt') return { art: 'art-gesperrt' };
 		if (k.fehler === 'unpassend' && typeof k.anzahl === 'number')
 			return { art: 'unpassend', anzahl: k.anzahl };
 		if (k.fehler === 'hat-anmeldungen' && typeof k.anzahl === 'number')
@@ -319,7 +321,10 @@ export const legeKategorieAn = (turnierId: number, angaben: object, holen: Holen
 export const ladeKategorie = (id: number, holen: Holen = fetch) =>
 	lese<KategorieAnsicht>(`${ADMIN}/kategorien/${id}`, holen);
 
-/** `trotzdem`: speichert auch, wenn aktive Anmeldungen nach der Änderung nicht mehr passen (FR-36). */
+/**
+ * `trotzdem`: speichert auch, wenn aktive Anmeldungen nach der Änderung nicht mehr passen (FR-36);
+ * Einzel oder Doppel wechseln geht mit aktiven Anmeldungen nie (`art-gesperrt`).
+ */
 export const aendereKategorie = (
 	id: number,
 	angaben: object,

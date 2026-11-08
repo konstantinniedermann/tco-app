@@ -8,6 +8,7 @@ import {
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { ladeAnlassAdmin } from '../anlass/anlaesse.ts';
+import { ladeCmAnsicht } from '../cm/anmeldungen.ts';
 import type { Db } from '../db/index.ts';
 import {
 	aenderung,
@@ -20,6 +21,7 @@ import {
 	kontoRolle,
 	mitglied,
 	mitteilung,
+	partnerAnfrage,
 	passkey,
 	pushAbo,
 	sitzung,
@@ -237,11 +239,11 @@ describe('Konto löschen', () => {
 			await db.select().from(aenderung).where(eq(aenderung.mitgliedId, m.mitgliedId))
 		).toHaveLength(0);
 		expect(await db.select().from(anlass).where(eq(anlass.id, vergangen))).toHaveLength(1);
-		// Vom Einzel bleibt nur der Name: die Begründung ist weg. Das Doppel regelt #59.
+		// Von den Anmeldungen bleibt nur der Name: Kommentare sind weg, auch beim Paar.
 		const [einzelBleibt] = await db.select().from(anmeldung).where(eq(anmeldung.id, a));
 		expect(einzelBleibt).toMatchObject({ status: 'beantragt', kommentar: null });
 		const [doppelBleibt] = await db.select().from(anmeldung).where(eq(anmeldung.id, d));
-		expect(doppelBleibt.kommentar).toBe('Wildcard wegen Verletzung');
+		expect(doppelBleibt).toMatchObject({ status: 'beantragt', kommentar: null });
 		expect(
 			await db.select().from(anmeldungSpieler).where(eq(anmeldungSpieler.anmeldungId, a))
 		).toHaveLength(1);
@@ -251,6 +253,77 @@ describe('Konto löschen', () => {
 		// Der Partner bleibt unberührt.
 		expect((await zeile(partner.mitgliedId)).status).toBe('aktiv');
 		expect(await kontoDa(partner.kontoId)).toBe(true);
+	});
+
+	test('FR-04, FR-49: Suchtext und Anfragen der Gelöschten weg, die CM-Seite nennt sie nicht mehr', async () => {
+		const austritt = new Date('2026-11-07T08:00:00Z');
+		const m = await ausgetreten(austritt);
+		const dritter = await legeMitgliedAn(db);
+		await db
+			.update(mitglied)
+			.set({ geschlecht: 'w', jahrgang: 1985, klassierung: 'R6' })
+			.where(eq(mitglied.id, dritter.mitgliedId));
+		// Nach dem Anmeldeschluss bleibt die Anmeldung beim Austritt stehen (der CM-Admin entscheidet).
+		const [t] = await db
+			.insert(turnier)
+			.values({
+				jahr: 2026,
+				name: 'Clubmeisterschaft',
+				anmeldeschluss: '2026-06-30',
+				status: 'geschlossen'
+			})
+			.returning({ id: turnier.id });
+		const [doppel] = await db
+			.insert(kategorie)
+			.values({
+				turnierId: t.id,
+				name: 'Damen Doppel',
+				geschlecht: 'damen',
+				art: 'doppel',
+				mindestsumme: 9
+			})
+			.returning({ id: kategorie.id });
+		const [sucht] = await db
+			.insert(anmeldung)
+			.values({
+				kategorieId: doppel.id,
+				status: 'bestaetigt',
+				suchtext: 'Suche jemanden für abends',
+				angemeldetAm: austritt,
+				geaendertAm: austritt
+			})
+			.returning({ id: anmeldung.id });
+		await db.insert(anmeldungSpieler).values({ anmeldungId: sucht.id, mitgliedId: m.mitgliedId });
+		// Offene Anfragen in beide Richtungen: Sie dürfen die Löschung nicht aufhalten.
+		await db.insert(partnerAnfrage).values([
+			{
+				kategorieId: doppel.id,
+				vonId: m.mitgliedId,
+				anId: dritter.mitgliedId,
+				gestelltAm: austritt
+			},
+			{
+				kategorieId: doppel.id,
+				vonId: dritter.mitgliedId,
+				anId: m.mitgliedId,
+				gestelltAm: austritt
+			}
+		]);
+
+		const ergebnis = await raeumeAuf(db, await frist(m.mitgliedId));
+
+		expect(ergebnis.konten).toEqual([m.mitgliedId]);
+		const [bleibt] = await db.select().from(anmeldung).where(eq(anmeldung.id, sucht.id));
+		expect(bleibt).toMatchObject({ status: 'bestaetigt', suchtext: null, kommentar: null });
+		expect(await db.select().from(partnerAnfrage)).toEqual([]);
+		const a = (await ladeCmAnsicht(db, t.id, dritter.mitgliedId, austritt))!;
+		const d = a.kategorien.find((k) => k.id === doppel.id)!;
+		expect(a.anfragen).toEqual([]);
+		expect(d.meineAnfragen).toEqual([]);
+		// Der Name bleibt wie bei jeder Anmeldung eines vergangenen Turniers, ohne Kommentar.
+		expect(d.suchende).toEqual([
+			{ name: { rufname: null, vorname: 'Erika', nachname: NACHNAME }, kommentar: null }
+		]);
 	});
 
 	test('Review-Fokus 4: Urheber, Ersteller und Absender geleert, Ladeseiten laden weiter', async () => {

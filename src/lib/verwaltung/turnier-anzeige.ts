@@ -72,6 +72,10 @@ export const unpassendText = (n: number) =>
 		? '1 Anmeldung passt nach der Änderung nicht mehr zu dieser Kategorie. Sie bleibt trotzdem stehen.'
 		: `${n} Anmeldungen passen nach der Änderung nicht mehr zu dieser Kategorie. Sie bleiben trotzdem stehen.`;
 
+/** FR-36: Einzel oder Doppel wechseln geht nur ohne aktive Anmeldungen (409 `art-gesperrt`). */
+export const ART_GESPERRT =
+	'Einzel oder Doppel lässt sich nur ändern, solange niemand angemeldet ist.';
+
 /** FR-35: Absagen geht erst ohne aktive Anmeldungen. */
 export const absageSperreText = (n: number) =>
 	n === 1

@@ -1,6 +1,6 @@
 // Löschfristen (FR-04, docs/datenschutz.md «Löschen»): Konten nach Frist oder Bedenkzeit,
 // Änderungsverlauf nach 12 Monaten, Antworten zu Anlässen ein Jahr nach Beginn des Anlasses.
-import { and, eq, getTableColumns, inArray, lt, sql } from 'drizzle-orm';
+import { and, getTableColumns, inArray, lt, or, sql } from 'drizzle-orm';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
 	aenderung,
@@ -8,10 +8,10 @@ import {
 	anlassAnmeldung,
 	anmeldung,
 	anmeldungSpieler,
-	kategorie,
 	konto,
 	mitglied,
-	mitteilung
+	mitteilung,
+	partnerAnfrage
 } from '../db/schema.ts';
 import type { MitgliedStatus } from './mitglieder.ts';
 import { loeschtAm } from './mitgliedschaft.ts';
@@ -98,27 +98,25 @@ async function loescheKonten(tx: DbOderTx, jetzt: Date) {
 		.where(inArray(aenderung.urheberMitgliedId, ids));
 	await tx.update(anlass).set({ erstelltVon: null }).where(inArray(anlass.erstelltVon, ids));
 	await tx.update(mitteilung).set({ absenderId: null }).where(inArray(mitteilung.absenderId, ids));
-	// 2. Konto (mit Sitzungen, Passkeys, Rollen, Push-Abos), Antworten und eigener Verlauf. Vom
-	// Einzel bleibt nur der Name, ohne Wildcard-Begründung; das Doppel regelt #59.
+	// 2. Konto (mit Sitzungen, Passkeys, Rollen, Push-Abos), Antworten und eigener Verlauf. Von
+	// den CM-Anmeldungen bleibt nur der Name: ohne Wildcard-Begründung und ohne Kommentar *sucht
+	// Partner*; offene Partner-Anfragen von und an die Gelöschten sind weg.
 	await tx.delete(konto).where(inArray(konto.mitgliedId, ids));
 	await tx
 		.update(anmeldung)
-		.set({ kommentar: null })
+		.set({ kommentar: null, suchtext: null })
 		.where(
-			and(
-				inArray(
-					anmeldung.id,
-					tx
-						.select({ id: anmeldungSpieler.anmeldungId })
-						.from(anmeldungSpieler)
-						.where(inArray(anmeldungSpieler.mitgliedId, ids))
-				),
-				inArray(
-					anmeldung.kategorieId,
-					tx.select({ id: kategorie.id }).from(kategorie).where(eq(kategorie.art, 'einzel'))
-				)
+			inArray(
+				anmeldung.id,
+				tx
+					.select({ id: anmeldungSpieler.anmeldungId })
+					.from(anmeldungSpieler)
+					.where(inArray(anmeldungSpieler.mitgliedId, ids))
 			)
 		);
+	await tx
+		.delete(partnerAnfrage)
+		.where(or(inArray(partnerAnfrage.vonId, ids), inArray(partnerAnfrage.anId, ids)));
 	const antworten = await tx
 		.delete(anlassAnmeldung)
 		.where(inArray(anlassAnmeldung.mitgliedId, ids))

@@ -9,7 +9,8 @@ import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { kontoRolle } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
-import { postAustritt, postLoeschen, postRollen, type AdminDienste } from './schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import { postAustritt, postLoeschen, postRollen } from './schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 // «Letzter Admin» ist global; darum eine eigene Datenbank statt der gemeinsamen.
@@ -38,7 +39,7 @@ async function bestaetigterMytcoAdmin(rollen: string[] = ['mytco', 'mitglieder']
 		bremsen: erstelleBremsen(),
 		jetzt: () => start
 	});
-	const d: AdminDienste = {
+	const d: MitteilungAdminDienste = {
 		db,
 		zugang,
 		hinweis: async () => {},
@@ -47,7 +48,10 @@ async function bestaetigterMytcoAdmin(rollen: string[] = ['mytco', 'mitglieder']
 			adresse: 'https://mytco.example.org',
 			kontakt: 'kontakt@example.org'
 		},
-		jetzt: () => start
+		jetzt: () => start,
+		push: null,
+		mailer: async () => {},
+		adresse: 'https://mytco.example.org'
 	};
 	const admin = await legeMitgliedAn(db, { rollen });
 	const kennung = await erstelleSitzung(db, admin.kontoId, start);

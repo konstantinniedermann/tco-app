@@ -1,6 +1,8 @@
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, or } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
-import { anmeldung, anmeldungSpieler, kategorie, mitglied } from '../db/schema.ts';
+import { anmeldung, anmeldungSpieler, kategorie, mitglied, partnerAnfrage } from '../db/schema.ts';
+import { namensSpalten } from '../namen.ts';
+import { nameFuerText } from './anmeldungen.ts';
 
 export type Bezug = { turnierId: number; kategorie: string };
 
@@ -40,4 +42,29 @@ export async function mitgliedEmail(db: Db, mitgliedId: number): Promise<string 
 		.from(mitglied)
 		.where(eq(mitglied.id, mitgliedId));
 	return z?.email ?? null;
+}
+
+/** Kurze Textform «Hannes (Johannes Muster)» für die Meldungen an den jeweils anderen; nie Kontaktdaten. */
+export async function mitgliedName(db: Db, mitgliedId: number): Promise<string | null> {
+	const [z] = await db.select(namensSpalten).from(mitglied).where(eq(mitglied.id, mitgliedId));
+	return z ? nameFuerText(z) : null;
+}
+
+/** Wie `bezugDerKategorie`, über eine Anfrage, an der man als Anfragender oder Angefragter beteiligt ist. */
+export async function bezugDerAnfrage(
+	db: Db,
+	anfrageId: number,
+	mitgliedId: number
+): Promise<Bezug | null> {
+	const [z] = await db
+		.select({ turnierId: kategorie.turnierId, kategorie: kategorie.name })
+		.from(partnerAnfrage)
+		.innerJoin(kategorie, eq(kategorie.id, partnerAnfrage.kategorieId))
+		.where(
+			and(
+				eq(partnerAnfrage.id, anfrageId),
+				or(eq(partnerAnfrage.vonId, mitgliedId), eq(partnerAnfrage.anId, mitgliedId))
+			)
+		);
+	return z ?? null;
 }

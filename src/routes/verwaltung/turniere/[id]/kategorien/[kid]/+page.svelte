@@ -17,6 +17,7 @@
 	import { fehlerText } from '../../../../../../lib/verwaltung/anzeige.ts';
 	import {
 		absageSperreText,
+		ART_GESPERRT,
 		unpassendText
 	} from '../../../../../../lib/verwaltung/turnier-anzeige.ts';
 	import { leiteUm } from '../../../../../../lib/verwaltung/umleiten.ts';
@@ -70,6 +71,8 @@
 			fehler = a.felder;
 		} else if (a.art === 'vergeben') {
 			fehler = { name: 'Eine Kategorie mit diesem Namen gibt es in diesem Turnier schon.' };
+		} else if (a.art === 'art-gesperrt') {
+			fehler = { art: ART_GESPERRT };
 		} else if (a.art === 'abgesagt') {
 			await neuLaden();
 		} else if (a.art === 'nicht-gefunden') {
@@ -174,7 +177,13 @@
 			</div>
 		</dialog>
 
-		<dialog class="karte" bind:this={warnung} aria-labelledby="warnung-titel">
+		<!-- Abbrechen (oder Esc) verwirft die zurückgehaltenen Werte, wie auf der CM-Seite. -->
+		<dialog
+			class="karte"
+			bind:this={warnung}
+			aria-labelledby="warnung-titel"
+			onclose={() => (ausstehend = null)}
+		>
 			<h2 id="warnung-titel">Anmeldungen passen nicht mehr</h2>
 			<p>{unpassendText(unpassend)}</p>
 			<div class="leiste">

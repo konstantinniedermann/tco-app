@@ -1,23 +1,40 @@
 <script lang="ts">
-	import { tick } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { onMount, tick } from 'svelte';
+	import { goto, invalidate } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import {
 		beantrageWildcard,
 		holeCmAnsicht,
+		lehneAnfrageAb,
 		meldeAb,
 		meldeAn,
+		nimmAnfrageAn,
 		sendeCmAngaben,
+		setzeSuchtext,
+		zieheAnfrageZurueck,
+		type CmAnfrage,
 		type CmAnsicht,
 		type CmFelder,
 		type CmKategorie
 	} from '../../../lib/cm/api.ts';
 	import {
+		ANNEHMEN_HINWEIS,
 		KOMMENTAR_MAX,
+		KONTAKT_HINWEIS,
+		SUCHTEXT_MAX,
+		doppelText,
 		kategorieText,
 		kommentarZaehlerText,
-		namenText
+		namenText,
+		paarText,
+		paareText,
+		suchtextZaehlerText,
+		waehlbar,
+		weiterePaare
 	} from '../../../lib/cm/anzeige.ts';
+	import { anredeName, nameText, type Namensteile } from '../../../lib/name.ts';
+	import Name from '../../../lib/ui/Name.svelte';
 	import { istKlappeOffen, merkeKlappe } from '../../../lib/ui/klappe.ts';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { KLASSIERUNGEN, klassierungName } from '../../../lib/turnier/klassierung.ts';
@@ -39,6 +56,10 @@
 		offen ? cm.wildcard : cm.wildcard.filter((k) => k.anmeldungId !== null)
 	);
 	const fragtAngaben = $derived(cm.fehlt.length > 0 && offen);
+	const hatDoppel = $derived(cm.kategorien.some((k) => k.art === 'doppel'));
+	// FR-48: Annehmen geht nur mit allen Angaben. UI-04: Bei mehreren Anfragen ist keine Haupttaste.
+	const kannAnnehmen = $derived(cm.fehlt.length === 0);
+	const annehmenHaupt = $derived(cm.anfragen.length === 1);
 
 	// FR-37: fehlende Angaben. Die Klassierung lässt sich hier zugleich setzen.
 	let klassierung = $derived<string>(cm.spieler.klassierung ?? '');
@@ -47,6 +68,9 @@
 	let feldFehler = $state<CmFelder>({});
 	let angabenForm = $state<HTMLFormElement>();
 	let zaehlerBereich = $state<HTMLDivElement>();
+	let angabenTitel = $state<HTMLHeadingElement>();
+	// Titel der Anfrage-Karten, Ziel des Fokus, wenn eine davon verschwindet.
+	const anfrageTitel: (HTMLHeadingElement | null | undefined)[] = [];
 	// Ungespeichert (UI-Leitbild): eine Angabe weicht vom geladenen Stand ab.
 	const geaendert = $derived(
 		klassierung !== (cm.spieler.klassierung ?? '') || geschlecht !== null || jahrgang !== ''
@@ -55,6 +79,11 @@
 	let laeuft = $state(false);
 	let meldung = $state<string | null>(null);
 	let fehler = $state<string | null>(null);
+	// Rückmeldung von der Anmelde-Seite des Doppels («Anfrage an … gesendet.»); erst nach dem
+	// Einhängen, damit der Screenreader sie im Status-Bereich ansagt.
+	onMount(() => {
+		if (page.state.cmMeldung) meldung = page.state.cmMeldung;
+	});
 	let kontaktHinweis = $state<HTMLDialogElement>();
 	let ausstehend = $state<{ k: CmKategorie; wildcard: boolean } | null>(null);
 	// FR-08: Dialog für den Wildcard-Antrag.
@@ -63,7 +92,14 @@
 	let kommentar = $state('');
 	let kommentarFehler = $state<string | null>(null);
 	let kommentarFeld = $state<HTMLTextAreaElement>();
-	const knoepfe: Record<number, HTMLButtonElement | undefined> = {};
+	// FR-49: Dialog für den Kommentar *sucht Partner*.
+	let suchtextDialog = $state<HTMLDialogElement>();
+	let suchtextZiel = $state<CmKategorie | null>(null);
+	let suchtext = $state('');
+	let suchtextFehler = $state<string | null>(null);
+	let suchtextFeld = $state<HTMLTextAreaElement>();
+	// Je Kategorie die Taste oder der Link, zu dem der Fokus nach einer Änderung geht.
+	const knoepfe: Record<number, HTMLElement | undefined> = {};
 
 	const FEHLER = {
 		voll: 'Du hast schon 3 Anmeldungen.',
@@ -71,6 +107,24 @@
 		geschlossen: 'Die Anmeldung ist inzwischen geschlossen.',
 		'passt-nicht': 'Diese Kategorie passt nicht zu deinen Angaben.'
 	} as const;
+
+	// FR-48: Gründe, aus denen das Annehmen einer Anfrage scheitert.
+	const ANNEHMEN_FEHLER = {
+		voll: 'Einer von euch hat schon 3 Anmeldungen.',
+		geschlossen: FEHLER.geschlossen,
+		'passt-nicht': 'Zusammen passt ihr nicht in diese Kategorie.',
+		'schon-angemeldet': 'Einer von euch hat dort inzwischen einen Partner.'
+	} as const;
+
+	/**
+	 * Übernimmt die neue Ansicht nach dem Speichern. Vorgeladene Seiten (die Startseite beim
+	 * Antippen von «‹ Zurück») verfallen, damit ihr Zähler stimmt. `/api/cm` lädt nur die
+	 * Startseite; diese Seite lädt dabei nicht neu und kann so auch keine Fehlerseite zeigen.
+	 */
+	async function uebernimm(neu: CmAnsicht) {
+		cm = neu;
+		await invalidate((url) => url.pathname === '/api/cm');
+	}
 
 	/** Gibt zurück, ob die neue Ansicht geladen ist; Weiterleitungen erledigt sie selbst. */
 	async function neuLaden(): Promise<boolean> {
@@ -160,7 +214,7 @@
 		laeuft = false;
 		switch (r.art) {
 			case 'ok':
-				cm = r.daten;
+				await uebernimm(r.daten);
 				wildcardDialog?.close();
 				meldung = 'Wildcard beantragt. Du bekommst Bescheid.';
 				await fokusBei(k.id);
@@ -207,7 +261,7 @@
 		laeuft = false;
 		switch (r.art) {
 			case 'ok':
-				cm = r.daten;
+				await uebernimm(r.daten);
 				meldung = `Angemeldet für ${k.name}. Die Bestätigung kommt per Mail.`;
 				await fokusBei(k.id);
 				return;
@@ -239,7 +293,7 @@
 		laeuft = false;
 		switch (r.art) {
 			case 'ok':
-				cm = r.daten;
+				await uebernimm(r.daten);
 				meldung = wildcard ? `Antrag für ${k.name} zurückgezogen.` : `Abgemeldet von ${k.name}.`;
 				await fokusBei(k.id);
 				return;
@@ -257,6 +311,156 @@
 				fehler = MELDUNG.stoerung;
 		}
 	}
+
+	/**
+	 * Nach Annehmen oder Ablehnen ist die Karte der Anfrage weg (WCAG 2.4.3): Fokus zur Kategorie,
+	 * sonst zur nächsten Anfrage-Karte, zum Zähler oder zum Titel der Karte *Deine Angaben*.
+	 */
+	async function fokusNachAnfrage(kategorieId?: number) {
+		await tick();
+		// Steht die Taste noch (die Anfrage ist geblieben), bleibt der Fokus dort.
+		const aktiv = document.activeElement;
+		if (aktiv instanceof HTMLElement && aktiv !== document.body && aktiv.isConnected) return;
+		const ziel =
+			(kategorieId !== undefined ? knoepfe[kategorieId] : undefined) ??
+			anfrageTitel.find((t) => t?.isConnected) ??
+			zaehlerBereich ??
+			angabenTitel;
+		ziel?.focus();
+	}
+
+	/** FR-48: eine Anfrage an einen selbst annehmen. */
+	async function annehmen(a: CmAnfrage) {
+		if (laeuft) return;
+		laeuft = true;
+		meldung = null;
+		fehler = null;
+		const r = await nimmAnfrageAn(a.anfrageId);
+		laeuft = false;
+		switch (r.art) {
+			case 'ok':
+				await uebernimm(r.daten);
+				meldung = `Angemeldet mit ${nameText(a.von, 'vorname-zuerst')} für ${a.kategorie}. Die Bestätigung kommt per Mail.`;
+				await fokusNachAnfrage(a.kategorieId);
+				return;
+			case 'abgemeldet':
+				await goto(resolve('/login'));
+				return;
+			case 'voll':
+			case 'geschlossen':
+			case 'passt-nicht':
+			case 'schon-angemeldet':
+				fehler = ANNEHMEN_FEHLER[r.art];
+				await neuLaden();
+				await fokusNachAnfrage();
+				return;
+			case 'angaben-fehlen':
+			case 'nicht-gefunden':
+				await neuLaden();
+				await fokusNachAnfrage();
+				return;
+			default:
+				fehler = MELDUNG.stoerung;
+		}
+	}
+
+	/** FR-48: eine Anfrage an einen selbst ablehnen, ohne Grund. */
+	async function ablehnen(a: CmAnfrage) {
+		if (laeuft) return;
+		laeuft = true;
+		meldung = null;
+		fehler = null;
+		const r = await lehneAnfrageAb(a.anfrageId);
+		laeuft = false;
+		switch (r.art) {
+			case 'ok':
+				await uebernimm(r.daten);
+				meldung = `Anfrage von ${nameText(a.von, 'vorname-zuerst')} abgelehnt.`;
+				await fokusNachAnfrage();
+				return;
+			case 'abgemeldet':
+				await goto(resolve('/login'));
+				return;
+			case 'nicht-gefunden':
+				await neuLaden();
+				await fokusNachAnfrage();
+				return;
+			default:
+				fehler = MELDUNG.stoerung;
+		}
+	}
+
+	/** FR-48: eine eigene offene Anfrage zurückziehen. */
+	async function zurueckziehen(k: CmKategorie, a: CmKategorie['meineAnfragen'][number]) {
+		if (laeuft) return;
+		laeuft = true;
+		meldung = null;
+		fehler = null;
+		const r = await zieheAnfrageZurueck(a.anfrageId);
+		laeuft = false;
+		switch (r.art) {
+			case 'ok':
+				await uebernimm(r.daten);
+				meldung = `Anfrage an ${nameText(a.an, 'vorname-zuerst')} zurückgezogen.`;
+				await fokusBei(k.id);
+				return;
+			case 'abgemeldet':
+				await goto(resolve('/login'));
+				return;
+			case 'nicht-gefunden':
+				await neuLaden();
+				return;
+			default:
+				fehler = MELDUNG.stoerung;
+		}
+	}
+
+	function suchtextOeffnen(k: CmKategorie) {
+		suchtextZiel = k;
+		suchtext = k.eigen?.art === 'sucht' ? (k.eigen.kommentar ?? '') : '';
+		suchtextFehler = null;
+		suchtextDialog?.showModal();
+	}
+
+	/** FR-49: Kommentar *sucht Partner* ändern; leer löscht ihn. */
+	async function suchtextSenden(event: SubmitEvent) {
+		event.preventDefault();
+		const k = suchtextZiel;
+		if (laeuft || !k || k.anmeldungId === null) return;
+		laeuft = true;
+		meldung = null;
+		fehler = null;
+		suchtextFehler = null;
+		const r = await setzeSuchtext(k.anmeldungId, suchtext);
+		laeuft = false;
+		switch (r.art) {
+			case 'ok':
+				suchtextDialog?.close();
+				await uebernimm(r.daten);
+				meldung = 'Kommentar gespeichert.';
+				await fokusBei(k.id);
+				return;
+			case 'eingabe':
+				suchtextFehler = r.felder.suchtext ?? MELDUNG.stoerung;
+				await tick();
+				suchtextFeld?.focus();
+				return;
+			case 'abgemeldet':
+				await goto(resolve('/login'));
+				return;
+			case 'geschlossen':
+				suchtextDialog?.close();
+				fehler = FEHLER.geschlossen;
+				await neuLaden();
+				return;
+			case 'nicht-gefunden':
+				suchtextDialog?.close();
+				await neuLaden();
+				return;
+			default:
+				suchtextFehler = MELDUNG.stoerung;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -270,9 +474,19 @@
 	<span class="leise">Anmeldeschluss {datumLang(cm.turnier.anmeldeschluss)}</span>
 </p>
 
+<!-- FR-48: Anfragen an einen selbst stehen oben, auch über der Karte «Deine Angaben». -->
+{#each cm.anfragen as a, i (a.anfrageId)}
+	{@render anfrageKarte(a, i)}
+{/each}
+
 {#if fragtAngaben}
+	<div role="status">
+		{#if meldung}<p>{meldung}</p>{/if}
+	</div>
 	<section class="karte" aria-labelledby="angaben-titel">
-		<h2 id="angaben-titel">Deine Angaben für die Clubmeisterschaft</h2>
+		<h2 id="angaben-titel" tabindex="-1" bind:this={angabenTitel}>
+			Deine Angaben für die Clubmeisterschaft
+		</h2>
 		<p>Damit MyTCO dir die passenden Kategorien zeigt, braucht es noch:</p>
 		{#if nurAnsehen}
 			<fieldset disabled class="nur-lesen">
@@ -320,38 +534,55 @@
 	{/if}
 
 	{#each cm.kategorien as k (k.id)}
-		<div class="karte kachel">
-			<span>
-				<strong>{k.name}</strong><br />
-				<span class="leise">{kategorieText(k)}</span><br />
-				<span class="leise">{namenText(k.namen)}</span>
-				{#if k.anmeldungId !== null}<br /><span class="leise">Du bist angemeldet.</span>{/if}
-			</span>
-			{#if offen && !nurAnsehen}
-				{#if k.anmeldungId !== null}
-					<button
-						type="button"
-						class="taste-neben"
-						bind:this={knoepfe[k.id]}
-						disabled={laeuft}
-						onclick={() => abmelden(k)}>Abmelden</button
-					>
-				{:else}
-					<button
-						type="button"
-						class="taste-neben"
-						bind:this={knoepfe[k.id]}
-						disabled={laeuft || voll}
-						onclick={() => anmeldenTippen(k)}>Anmelden</button
-					>
-				{/if}
+		{#if k.art === 'doppel'}
+			{#if k.eigen?.art === 'paar'}
+				{@render eigenesPaar(k, k.eigen.partner)}
+			{:else if k.eigen?.art === 'sucht'}
+				{@render eigeneSuche(k, k.eigen.kommentar)}
+			{:else}
+				{@render doppelKarte(k)}
 			{/if}
-		</div>
+		{:else}
+			<div class="karte kachel">
+				<span>
+					<strong>{k.name}</strong><br />
+					<span class="leise">{kategorieText(k)}</span><br />
+					<span class="leise">{namenText(k.namen)}</span>
+					{#if k.anmeldungId !== null}<br /><span class="leise">Du bist angemeldet.</span>{/if}
+				</span>
+				{#if offen && !nurAnsehen}
+					{#if k.anmeldungId !== null}
+						<button
+							type="button"
+							class="taste-neben"
+							bind:this={knoepfe[k.id]}
+							disabled={laeuft}
+							onclick={() => abmelden(k)}>Abmelden</button
+						>
+					{:else}
+						<button
+							type="button"
+							class="taste-neben"
+							bind:this={knoepfe[k.id]}
+							disabled={laeuft || voll}
+							onclick={() => anmeldenTippen(k)}>Anmelden</button
+						>
+					{/if}
+				{/if}
+			</div>
+		{/if}
 	{:else}
 		{#if cm.fehlt.length === 0 && wildcardSichtbar.length === 0}
 			<p>Für deine Angaben gibt es keine passende Kategorie.</p>
 		{/if}
 	{/each}
+
+	{#if hatDoppel}
+		<p class="leise">
+			Im Doppel zählt die Summe der Klassierungen (R1 = 1 … R9 = 9, keine Lizenz = 10). Zu starke
+			Paare meldet die Turnierleitung an.
+		</p>
+	{/if}
 
 	{#if wildcardSichtbar.length > 0}
 		<details
@@ -407,10 +638,7 @@
 	onclose={() => (ausstehend = null)}
 >
 	<h2 id="kontakt-titel">Bevor du dich anmeldest</h2>
-	<p>
-		Deine Gegner sehen während der Clubmeisterschaft deine E-Mail-Adresse und Telefonnummer, damit
-		ihr die Spiele selbst abmachen könnt. Verbergen geht nicht.
-	</p>
+	<p>{KONTAKT_HINWEIS}</p>
 	<div class="leiste">
 		<button type="button" class="taste-neben" onclick={() => kontaktHinweis?.close()}
 			>Abbrechen</button
@@ -463,6 +691,234 @@
 	</form>
 </dialog>
 
+<dialog
+	class="karte"
+	bind:this={suchtextDialog}
+	aria-labelledby="suchtext-titel"
+	onclose={() => (suchtextZiel = null)}
+>
+	<h2 id="suchtext-titel">Kommentar ändern</h2>
+	{#if suchtextZiel}<p class="leise">{suchtextZiel.name}</p>{/if}
+	<form onsubmit={suchtextSenden} novalidate>
+		<div class="feld">
+			<label for="cm-suchtext">Kommentar <span class="leise">(freiwillig)</span></label>
+			<span class="feld-hilfe" id="cm-suchtext-hinweis"
+				>Alle Mitglieder sehen ihn. Bitte keine Angaben zur Gesundheit.</span
+			>
+			<textarea
+				id="cm-suchtext"
+				rows="3"
+				bind:this={suchtextFeld}
+				maxlength={SUCHTEXT_MAX}
+				bind:value={suchtext}
+				aria-invalid={suchtextFehler ? 'true' : undefined}
+				aria-describedby={suchtextFehler
+					? 'cm-suchtext-hinweis cm-suchtext-zaehler cm-fehler-suchtext'
+					: 'cm-suchtext-hinweis cm-suchtext-zaehler'}></textarea>
+			<span class="feld-hilfe" id="cm-suchtext-zaehler">{suchtextZaehlerText(suchtext.length)}</span
+			>
+			{#if suchtextFehler}
+				<p class="fehler" id="cm-fehler-suchtext" role="alert">{suchtextFehler}</p>
+			{/if}
+		</div>
+		<div class="leiste">
+			<button type="button" class="taste-neben" onclick={() => suchtextDialog?.close()}
+				>Abbrechen</button
+			>
+			<button type="submit" class="taste-haupt" disabled={laeuft}>Speichern</button>
+		</div>
+	</form>
+</dialog>
+
+<!-- FR-48, FR-19: Anfrage an einen selbst, mit dem Kontakt des Anfragenden. -->
+{#snippet anfrageKarte(a: CmAnfrage, i: number)}
+	<section class="karte" aria-labelledby="anfrage-{a.anfrageId}">
+		<h2 id="anfrage-{a.anfrageId}" tabindex="-1" bind:this={anfrageTitel[i]}>
+			Anfrage für «{a.kategorie}»
+		</h2>
+		<p>
+			<strong>{nameText(a.von, 'vorname-zuerst')}</strong>{#if a.klassierung}&nbsp;· {klassierungName(
+					a.klassierung
+				)}{/if} möchte mit dir spielen.
+		</p>
+		{#if a.kontakt}
+			<p>
+				{#if a.kontakt.art === 'telefon'}
+					<a href="tel:{waehlbar(a.kontakt.wert)}">{a.kontakt.wert}</a>
+				{:else}
+					<a href="mailto:{a.kontakt.wert}">{a.kontakt.wert}</a>
+				{/if}
+			</p>
+		{/if}
+		{#if !offen}
+			<p class="leise">Über offene Anfragen entscheidet jetzt die Turnierleitung.</p>
+		{:else if !kannAnnehmen}
+			<p class="leise">Trag zuerst deine Angaben ein, dann kannst du annehmen.</p>
+		{:else}
+			<p class="leise">{ANNEHMEN_HINWEIS}</p>
+		{/if}
+		{#if offen && !nurAnsehen}
+			<div class="leiste">
+				<button type="button" class="taste-neben" disabled={laeuft} onclick={() => ablehnen(a)}
+					>Ablehnen</button
+				>
+				{#if kannAnnehmen}
+					<button
+						type="button"
+						class={annehmenHaupt ? 'taste-haupt' : 'taste-neben'}
+						disabled={laeuft}
+						onclick={() => annehmen(a)}>Annehmen</button
+					>
+				{/if}
+			</div>
+		{/if}
+	</section>
+{/snippet}
+
+<!-- A-ANMELDUNG-04: Doppel-Kategorie mit Paaren und wer einen Partner sucht. -->
+{#snippet doppelKarte(k: CmKategorie)}
+	<div class="karte">
+		<div class="kachel">
+			<span>
+				<strong>{k.name}</strong><br />
+				<span class="leise">{doppelText(k)}</span><br />
+				<span class="leise">{paareText(k.paare)}</span>
+			</span>
+			{#if offen && !nurAnsehen}
+				{#if voll}
+					<button type="button" class="taste-neben" bind:this={knoepfe[k.id]} disabled
+						>Anmelden</button
+					>
+				{:else}
+					<a
+						class="taste-neben"
+						bind:this={knoepfe[k.id]}
+						href={resolve('/clubmeisterschaft/[id]/doppel/[kid]', {
+							id: String(cm.turnier.id),
+							kid: String(k.id)
+						})}>Anmelden</a
+					>
+				{/if}
+			{/if}
+		</div>
+		{@render suchende(k)}
+		{@render meineAnfragen(k)}
+	</div>
+{/snippet}
+
+{#snippet suchende(k: CmKategorie)}
+	{#if k.suchende.length > 0}
+		<div class="karte-teil">
+			<p><span class="plakette plakette-offen">sucht Partner</span></p>
+			{#each k.suchende as s, i (i)}
+				<p>
+					<Name name={s.name} />{#if s.kommentar}<br /><span class="leise">«{s.kommentar}»</span
+						>{/if}
+				</p>
+			{/each}
+		</div>
+	{/if}
+{/snippet}
+
+{#snippet meineAnfragen(k: CmKategorie)}
+	{#each k.meineAnfragen as a (a.anfrageId)}
+		<div class="kachel karte-teil">
+			<span>
+				Deine Anfrage an <strong>{nameText(a.an, 'vorname-zuerst')}</strong><br />
+				<span class="plakette plakette-offen">offen</span>
+			</span>
+			{#if offen && !nurAnsehen}
+				<button
+					type="button"
+					class="taste-neben"
+					disabled={laeuft}
+					onclick={() => zurueckziehen(k, a)}>Zurückziehen</button
+				>
+			{/if}
+		</div>
+	{/each}
+{/snippet}
+
+<!-- FR-19: eigenes Paar mit dem Kontakt des Partners. -->
+{#snippet eigenesPaar(
+	k: CmKategorie,
+	partner: { name: Namensteile; telefon: string | null; email: string | null }
+)}
+	{@const weitere = weiterePaare(k.paare, partner.name)}
+	<section class="karte" aria-labelledby="doppel-{k.id}">
+		<h2 id="doppel-{k.id}">{k.name}</h2>
+		<p class="leise">{doppelText(k)}</p>
+		<p>Du spielst mit <strong>{nameText(partner.name, 'vorname-zuerst')}</strong>.</p>
+		{#if partner.telefon || partner.email}
+			<p>
+				{#if partner.telefon}<a href="tel:{waehlbar(partner.telefon)}">{partner.telefon}</a>{/if}
+				{#if partner.telefon && partner.email}<br />{/if}
+				{#if partner.email}<a href="mailto:{partner.email}">{partner.email}</a>{/if}
+			</p>
+		{/if}
+		{#if weitere.length > 0}
+			<p class="leise">Weitere Paare: {weitere.map(paarText).join(', ')}</p>
+		{/if}
+		{#if offen && !nurAnsehen}
+			<div class="karte-teil">
+				<p>
+					<button
+						type="button"
+						class="taste-neben"
+						bind:this={knoepfe[k.id]}
+						disabled={laeuft}
+						onclick={() => abmelden(k)}>Abmelden</button
+					>
+				</p>
+				<p class="leise">
+					Dann ist auch {anredeName(partner.name)} abgemeldet und bekommt eine Meldung.
+				</p>
+			</div>
+		{/if}
+	</section>
+{/snippet}
+
+<!-- A-ANMELDUNG-04, FR-49: allein angemeldet, sucht einen Partner. -->
+{#snippet eigeneSuche(k: CmKategorie, kommentar: string | null)}
+	<section class="karte" aria-labelledby="doppel-{k.id}">
+		<h2 id="doppel-{k.id}">{k.name}</h2>
+		<p class="leise">{doppelText(k)}</p>
+		<p>
+			<span class="plakette plakette-offen">sucht Partner</span><br />
+			Du bist allein angemeldet. Wer mag, wählt dich.
+		</p>
+		{#if kommentar}
+			<p class="leise">Dein Kommentar: «{kommentar}»</p>
+		{/if}
+		{@render meineAnfragen(k)}
+		{@render suchende(k)}
+		{#if offen && !nurAnsehen}
+			<div class="leiste">
+				<a
+					class="taste-neben"
+					href={resolve('/clubmeisterschaft/[id]/doppel/[kid]', {
+						id: String(cm.turnier.id),
+						kid: String(k.id)
+					})}>Partner anfragen</a
+				>
+				<button
+					type="button"
+					class="taste-neben"
+					disabled={laeuft}
+					onclick={() => suchtextOeffnen(k)}>Kommentar ändern</button
+				>
+				<button
+					type="button"
+					class="taste-neben"
+					bind:this={knoepfe[k.id]}
+					disabled={laeuft}
+					onclick={() => abmelden(k)}>Abmelden</button
+				>
+			</div>
+		{/if}
+	</section>
+{/snippet}
+
 {#snippet angabenFelder()}
 	<div class="feld">
 		<label for="cm-klassierung">Klassierung</label>
@@ -488,8 +944,11 @@
 		{/if}
 	</div>
 	{#if cm.fehlt.includes('geschlecht')}
+		<!-- `aria-invalid` gilt für die Gruppe, nicht für einzelne Radios (ARIA). -->
 		<fieldset
 			class="auswahl-gruppe"
+			role="radiogroup"
+			aria-invalid={feldFehler.geschlecht ? 'true' : undefined}
 			aria-describedby={feldFehler.geschlecht ? 'cm-fehler-geschlecht' : undefined}
 		>
 			<legend>Geschlecht</legend>

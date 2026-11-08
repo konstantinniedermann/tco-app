@@ -10,7 +10,14 @@ import type { Db, DbOderTx } from '../db/index.ts';
 import { anmeldung, anmeldungSpieler, kategorie, mitglied, turnier } from '../db/schema.ts';
 import { namensSpalten, nameEnthaelt } from '../namen.ts';
 import { schreibeKlassierung, spielerAus } from './angaben.ts';
-import { eigeneAnmeldungen, GRENZE, istAktiv, regelAus, spielerSpalten } from './anmeldungen.ts';
+import {
+	eigeneAnmeldungen,
+	GRENZE,
+	istAktiv,
+	regelAus,
+	sperreKategorieUndTurnier,
+	spielerSpalten
+} from './anmeldungen.ts';
 
 /** Gründe, warum eine Anmeldung von Hand nur nach Bestätigung gilt (FR-46). */
 export type Warnung = 'angaben-fehlen' | 'passt-nicht' | 'voll' | 'geschlossen';
@@ -128,17 +135,15 @@ export async function sucheSpieler(db: Db, suche: string): Promise<SpielerTreffe
 	return zeilen.map((z) => ({ mitgliedId: z.mitgliedId, ...nameUndAngaben(z) }));
 }
 
-/** Aktive Einzel-Kategorie mit Turnier, gesperrt `for share` wie in `meldeAn`. */
+/**
+ * Aktive Einzel-Kategorie mit Turnier, beide gesperrt `for share` wie in `meldeAn`
+ * (`sperreKategorieUndTurnier`). Das Turnier wird erst nach der Sperre gelesen: ein gleichzeitiges
+ * Schliessen (`setzeStatus`) wartet, und der gelesene Stand ist der aktuelle.
+ */
 async function sperreKategorie(tx: DbOderTx, kategorieId: number) {
-	const [z] = await tx
-		.select({ k: kategorie, t: turnier })
-		.from(kategorie)
-		.innerJoin(turnier, eq(turnier.id, kategorie.turnierId))
-		.where(
-			and(eq(kategorie.id, kategorieId), eq(kategorie.art, 'einzel'), eq(kategorie.status, 'aktiv'))
-		)
-		.for('share', { of: kategorie });
-	return z ?? null;
+	const z = await sperreKategorieUndTurnier(tx, kategorieId);
+	if (!z || z.k.art !== 'einzel' || z.k.status !== 'aktiv') return null;
+	return z;
 }
 
 /**

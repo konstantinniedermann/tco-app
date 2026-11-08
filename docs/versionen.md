@@ -8,6 +8,21 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.15.0 — Doppel mit Partner-Anfrage
+
+- Doppel zur Clubmeisterschaft (#59, Etappe 1): Mitglieder suchen in einer Doppel-Kategorie einen
+  Partner und fragen ihn an; er nimmt an oder lehnt ab, erst dann sind beide angemeldet und sehen
+  gegenseitig E-Mail und Telefon. Wer noch keinen Partner hat, meldet sich allein an und steht mit
+  freiwilligem Kommentar unter «sucht Partner». Meldet sich einer ab, ist das Paar zurückgezogen,
+  der andere bekommt eine Meldung. Doppel in der Verwaltung folgt mit Etappe 2.
+- Doppel-Kategorien haben keinen Jahrgang mehr. Ob eine Kategorie Einzel oder Doppel ist, lässt
+  sich nur ändern, solange niemand angemeldet ist.
+- Austritt und Löschen: Anmeldungen zur CM, auch im Einzel, werden bis und mit dem Tag des
+  Anmeldeschlusses zurückgezogen, auch wenn die Anmeldung vorher von Hand geschlossen wurde; im
+  Doppel bekommt der Partner eine Meldung.
+- UI-Leitbild: neue Bausteine «Trefferliste» (Ergebnisse einer Suche) und «Kartenteil» (Abschnitt
+  innerhalb einer Karte).
+
 ## 0.14.0 — Mitgliederliste einlesen
 
 - Einlesen (#43, Etappe 2b): Der Mitglieder-Admin liest eine CSV-Datei im MyTCO-Schema ein

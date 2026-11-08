@@ -140,8 +140,10 @@ export function pruefeKategorie(
 	if (!art) felder.art = MELDUNG.art;
 	if (geschlecht === 'mixed' && art === 'einzel') felder.geschlecht = MELDUNG.mixed;
 
-	// Jahrgang von/bis: freiwillig, 1900 bis Turnierjahr, von ≤ bis.
+	// Jahrgang von/bis: freiwillig, 1900 bis Turnierjahr, von ≤ bis. Im Doppel gibt es keinen
+	// Jahrgang (FR-34): Er wird geleert, nicht geprüft.
 	const jahrgang = (feld: 'jahrgangVon' | 'jahrgangBis'): number | null => {
+		if (art === 'doppel') return null;
 		const z = zahl(roh[feld]);
 		if (z === null) return null;
 		if (z === 'ungueltig' || z < JAHRGANG_MIN || z > turnierjahr) {

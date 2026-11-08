@@ -20,7 +20,7 @@ MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Fragen zum Datenschutz
 [Ansprechperson], [E-Mail-Adresse des Vereins].
 
 **Welche Daten:** Name, freiwillig ein Rufname, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Mitgliedernummer,
-Lizenznummer und Klassierung, deine Anmeldungen zur Clubmeisterschaft, Resultate und Lizenzanträge, deine An- oder
+Lizenznummer und Klassierung, deine Anmeldungen zur Clubmeisterschaft (im Doppel auch Anfragen an Partner), Resultate und Lizenzanträge, deine An- oder
 Abmeldung zu Anlässen wie der Generalversammlung mit einer freiwilligen Bemerkung. Deine Grunddaten übernimmt
 der Verein aus seiner Mitgliederliste. Legt die Verwaltung einen Anlass an, speichert MyTCO, wer ihn
 angelegt hat, damit sich Rückfragen klären lassen.
@@ -48,7 +48,14 @@ du selbst einschaltest. Für nichts anderes.
   Schreib in den Kommentar bitte keine Angaben zur Gesundheit.
 - Deinen Rufnamen sehen eingeloggte Mitglieder neben deinem Namen, öffentliche Seiten zeigen ihn nicht. Du kannst ihn jederzeit im Profil ändern oder löschen.
 - Alle Mitglieder sehen Name, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft. Wer einen
-  Doppelpartner sucht, sieht die Namen der Mitglieder, die für die Kategorie in Frage kommen.
+  Doppelpartner sucht, sieht Name und Klassierung der Mitglieder, die für die Kategorie in Frage kommen. Fehlt
+  eine Angabe, steht dort *Klassierung fehlt* oder *Angaben fehlen* (Geschlecht).
+- Meldest du dich im Doppel allein an, steht dort *sucht Partner*, für alle Mitglieder sichtbar. Du kannst einen
+  kurzen Kommentar dazuschreiben (höchstens 120 Zeichen, freiwillig, bitte keine Angaben zur Gesundheit). Er
+  wird gelöscht, sobald du einen Partner hast oder dich abmeldest.
+- Fragst du jemanden als Doppelpartner an, sieht er deinen Namen, deine Klassierung und deine Telefonnummer
+  (ohne Telefon deine E-Mail), damit er dich anrufen kann. Seine Kontaktdaten siehst du erst, wenn er annimmt.
+  Anfragen, die abgelehnt, zurückgezogen oder hinfällig sind, löschen wir.
 - Deine Gegner und dein Doppelpartner sehen während der Clubmeisterschaft deine E-Mail und
   Telefonnummer, damit ihr die Spiele absprechen könnt.
 - Den Spielplan des Finalwochenendes sehen alle, auch ohne Login [**Vorschlag K-39**].

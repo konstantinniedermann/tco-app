@@ -42,7 +42,8 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | IP-Adresse bei Login-Versuchen und E-Mail-Wechseln; eingetippte E-Mail-Adresse einer Code-Anfrage, Empfänger-Adressen eines E-Mail-Wechsels und des Hinweises an die alte Adresse | Schutz vor Durchprobieren von Codes und E-Mail-Adressen; die Adresse nur im Arbeitsspeicher und nur für die Grenze; beides höchstens 24 Stunden | — |
 | Laufender E-Mail-Wechsel (A-KONTO-01, SI-09): neue Adresse, beide Codes nur als Hash, Ablauf, Fehlversuche; nur im Arbeitsspeicher des Servers, gültig höchstens 15 Minuten. Die neue Adresse liegt dazu im Gerätespeicher des eigenen Geräts, damit Schritt 2 ein Neuladen übersteht (wie die Code-Anfrage beim Login); gelöscht nach Bestätigung, bei «‹ Zurück», beim Abmelden, sonst nach Ablauf (15 Minuten) spätestens beim nächsten Start der App | Neue Adresse mit je einem Code an die alte und die neue bestätigen | — |
 | Markierung *für Fairgate offen seit* (Annahme K-19.2) | Der Mitglieder-Admin sieht, welche selbst geänderten Kontaktangaben (Adresse, E-Mail, Telefon) er noch von Hand nach Fairgate übertragen muss (Liste *Für Fairgate*, A-KONTO-02) | — |
-| Anmeldungen zur CM (Kategorie, Status, bei Wildcard mit Kommentar), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
+| Anmeldungen zur CM (Kategorie, Status, bei Wildcard mit Kommentar, im Doppel bei *sucht Partner* mit freiwilligem Kommentar bis 120 Zeichen), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
+| Partner-Anfragen zur CM (Kategorie, von, an, gestellt am); erledigte Anfragen werden gelöscht | Doppelpartner anfragen, annehmen oder ablehnen | — |
 | Anmeldungen zu Anlässen: Antwort *kommt* / *kommt nicht*, freiwillige Bemerkung (ohne Angaben zur Gesundheit) | Planung des Anlasses, z. B. der Generalversammlung (A-ANLASS-01) | nein |
 | *Erstellt von* am Anlass: der Mitglieder-Admin, der ihn angelegt hat | Rückfragen zum Anlass: nachvollziehen, wer ihn angelegt hat | — |
 | Austrittsdatum; Zeitpunkt der Löschvormerkung und Zustand davor | Löschfrist, Bedenkzeit, Rückgängig | — |
@@ -66,8 +67,9 @@ Bankdaten.
 | MyTCO-Admin | alles, was eine der anderen Rollen sieht, auch Bemerkungen zu Anlässen und Wildcard-Kommentare, und den Änderungsverlauf; nur lesend. **Zweck:** die anderen Rollen unterstützen, Fehler suchen, die Rollenvergabe prüfen. *Ansicht als …* zeigt ihm nichts darüber hinaus. **Annahme K-18.4:** Die Rolle erhalten nur Personen, die MyTCO technisch betreuen (Projektleiter und seine Stellvertretung, vgl. SI-16), nicht weitere Vorstandsmitglieder; eine Abmachung des Vereins, die App erzwingt sie nicht |
 | CM-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung, Geschlecht und Jahrgang der Spieler (zum Zuordnen in Kategorien). Die Klassierung korrigiert auch der CM-Admin (A-ANMELDUNG-06, Matrix in `rollen-und-rechte.md`); Geschlecht und Jahrgang ändert nur der Mitglieder-Admin |
 | Lizenz-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
-| Alle Mitglieder | Name und Rufname, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft; bei der Wahl des Doppelpartners die Namen der Mitglieder, die für die Kategorie passen |
-| Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31) |
+| Alle Mitglieder | Name und Rufname, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft; wer in einer Doppelkategorie *sucht Partner* mit seinem Kommentar; bei der Wahl des Doppelpartners die Namen und die Klassierung der Mitglieder, die für die Kategorie passen, dazu den Vermerk *Klassierung fehlt* oder *Angaben fehlen* (im Doppel: Geschlecht fehlt) |
+| Angefragter Doppelpartner | mit der Anfrage Name, Klassierung und Telefonnummer (sonst E-Mail) des Anfragenden, den dieser damit freigibt; die Kontaktdaten des Angefragten sieht der Anfragende erst nach dem Annehmen |
+| Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31); beim Doppelpartner erst nach dem Annehmen der Anfrage |
 | Alle, ohne Login | Kalenderdatei eines Anlasses über einen nicht erratbaren Link: Titel, Beginn, Ort, Einladung, keine Personendaten |
 | Alle, ohne Login | Spielplan des Finalwochenendes mit Name (ohne Rufname), Kategorie, Platz, Zeit, Resultat (**Vorschlag K-39**, spätere Etappe) |
 | Swiss Tennis | Anmeldungen, Resultate und Lizenzanträge, als Export von Hand |
@@ -75,13 +77,17 @@ Bankdaten.
 **Kontaktdaten:** Wer sich zur CM anmeldet, wird vorher darauf hingewiesen, dass Gegner
 und Doppelpartner E-Mail und Telefon sehen. Verbergen geht nicht — die Spieler sprechen
 die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
+Ein Doppelpartner wird vor dem Annehmen einer Anfrage nochmals darauf hingewiesen. Wer
+eine Partner-Anfrage stellt, gibt dem Angefragten Name, Klassierung und Telefonnummer (sonst
+E-Mail) frei; die Kontaktdaten des Angefragten sieht er erst nach dem Annehmen. Der Kommentar
+bei *sucht Partner* soll keine Angaben zur Gesundheit enthalten.
 
 ## Löschen
 
 - **Austritt:** Der Mitglieder-Admin erfasst ihn. Konto sofort inaktiv (Login gesperrt, Sitzungen und
   Push-Abos weg; Passkeys und Rollen bleiben, damit sie nach einem Wiedereintritt wieder wirken).
-  Offene Einzel-Anmeldungen zur CM und Wildcard-Anträge vor der Anmeldefrist werden zurückgezogen,
-  Antworten zu kommenden Anlässen gelöscht, die Markierung *für Fairgate offen* entfernt. Die Daten
+  Einzel- und Doppel-Anmeldungen zur CM (auch Wildcard-Anträge) werden bis zum Datum des Anmeldeschlusses zurückgezogen (im Doppel bekommt der Partner eine Meldung ohne Grund), auch wenn der CM-Admin die Anmeldung vorher von Hand geschlossen hat; danach bleiben sie stehen. Offene Partner-Anfragen verfallen,
+  Antworten zu kommenden Anlässen werden gelöscht, die Markierung *für Fairgate offen* entfernt. Die Daten
   bleiben eine Frist lang, falls das Mitglied zurückkommt, dann werden sie gelöscht; der Name bleibt in
   vergangenen Resultaten (**Vorschlag K-38:** Austritt plus 1 Jahr; die Frist legt der Verein fest).
   Heute erfasst der Mitglieder-Admin den Austritt von Hand; später übernimmt das das Einlesen der
@@ -99,10 +105,11 @@ die Gruppenspiele selbst ab. Wer das nicht will, meldet sich nicht an.
   Namen des Admins. Von der CM enthält sie nur bestätigte Anmeldungen, ohne Wildcard-Kommentar, weil
   der Mitglieder-Admin Wildcard-Anträge nicht sieht; die übrigen Anmeldungen, Wildcard-Anträge und Kommentare
   gibt auf Wunsch der CM-Admin bekannt. Das Erstellen steht im Änderungsverlauf.
-- **Mitglied löschen** (Mitglieder-Admin, DS-07): Bedenkzeit von 7 Tagen (Anzeige «wird gelöscht»); wie beim Austritt werden offene Anmeldungen zurückgezogen und Antworten zu kommenden Anlässen gelöscht. Die Markierung *für Fairgate offen* entfernt nur der Austritt; die Löschung räumt sie ohnehin ab. In dieser Zeit steht das Mitglied
+- **Mitglied löschen** (Mitglieder-Admin, DS-07): Bedenkzeit von 7 Tagen (Anzeige «wird gelöscht»); wie beim Austritt werden Einzel- und Doppel-Anmeldungen bis zum Datum des Anmeldeschlusses zurückgezogen, auch wenn von Hand früher geschlossen wurde, und Antworten zu kommenden Anlässen gelöscht. Die Markierung *für Fairgate offen* entfernt nur der Austritt; die Löschung räumt sie ohnehin ab. In dieser Zeit steht das Mitglied
   im Zustand *Löschung vorgemerkt*, das Login ist gesperrt, und der Mitglieder-Admin kann die Löschung
   rückgängig machen; dann gilt wieder der Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum). Nach der Woche wird gelöscht wie nach der Frist beim Austritt.
-- **CM-Anmeldungen:** bleiben beim vergangenen Turnier, wie Resultate. Wird ein Mitglied gelöscht, bleibt in seinen Anmeldungen nur der Name (der Wildcard-Kommentar einer Einzel-Anmeldung wird geleert, Doppel regelt [#59](https://github.com/konstantinniedermann/tco-app/issues/59)); Grund: Die Turniergeschichte mit Namen und Resultaten ist bei Swiss Tennis ohnehin öffentlich einsehbar.
+- **CM-Anmeldungen:** bleiben beim vergangenen Turnier, wie Resultate. Wird ein Mitglied gelöscht, bleibt in seinen Anmeldungen nur der Name (der Wildcard-Kommentar einer Einzel-Anmeldung und der Kommentar *sucht Partner* werden geleert, Partner-Anfragen gelöscht); Grund: Die Turniergeschichte mit Namen und Resultaten ist bei Swiss Tennis ohnehin öffentlich einsehbar.
+- **Partner-Anfragen:** Erledigte Anfragen werden sofort gelöscht (abgelehnte, zurückgezogene, verfallene); angenommene werden zur Anmeldung. Der Kommentar *sucht Partner* wird gelöscht, sobald ein Partner gefunden ist oder der Spieler abmeldet.
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Anmeldungen zu Anlässen:** ein Jahr nach Beginn des Anlasses (**Vorschlag K-50**), vom Zeitgeber gelöscht;
