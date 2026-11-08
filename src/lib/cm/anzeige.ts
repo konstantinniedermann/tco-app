@@ -105,6 +105,11 @@ const gleicherName = (a: Namensteile, b: Namensteile) =>
 export const weiterePaare = (paare: Namensteile[][], partner: Namensteile): Namensteile[][] =>
 	paare.filter((p) => !p.some((n) => gleicherName(n, partner)));
 
+/** FR-19: wie `KONTAKT_HINWEIS`, für den Weg über die Anfrage (Rückfrage, Annehmen). */
+const PAAR_KONTAKT_HINWEIS =
+	'Dann sehen deine Gegner und dein Doppelpartner während der Clubmeisterschaft deine ' +
+	'E-Mail-Adresse und Telefonnummer.';
+
 /**
  * FR-48, FR-19: Text der Rückfrage vor dem Senden einer Anfrage; `anrede` ist der Rufname des
  * Angefragten, sonst sein Vorname (`anredeName`).
@@ -112,7 +117,10 @@ export const weiterePaare = (paare: Namensteile[][], partner: Namensteile): Name
 export function rueckfrageText(anrede: string): string {
 	return (
 		`${anrede} sieht deinen Namen, deine Klassierung und deine Telefonnummer (ohne Telefon deine ` +
-		`E-Mail), damit ${anrede} dich erreichen kann. Nimmt ${anrede} an, seid ihr angemeldet und ` +
-		`seht gegenseitig E-Mail und Telefon.`
+		`E-Mail), damit ${anrede} dich erreichen kann. Nimmt ${anrede} an, seid ihr angemeldet. ` +
+		PAAR_KONTAKT_HINWEIS
 	);
 }
+
+/** FR-48, FR-19: Hinweis auf der Anfrage-Karte, bevor der Angefragte annimmt. */
+export const ANNEHMEN_HINWEIS = `Nimmst du an, seid ihr angemeldet. ${PAAR_KONTAKT_HINWEIS}`;

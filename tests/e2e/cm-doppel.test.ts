@@ -49,6 +49,9 @@ const MIXED: KategorieWerte = {
 const TELEFON_LEA = '079 000 00 01';
 const TELEFON_MARCO = '079 000 00 02';
 const KOMMENTAR = 'Suche jemanden auf R5–R7-Niveau, eher abends.';
+const GEGNER_HINWEIS =
+	'Dann sehen deine Gegner und dein Doppelpartner während der Clubmeisterschaft deine ' +
+	'E-Mail-Adresse und Telefonnummer.';
 
 type Konto = Awaited<ReturnType<typeof legeKontoMitBriefCodeAn>> & { nachname: string };
 
@@ -163,6 +166,8 @@ test('A-ANMELDUNG-04, FR-48, FR-19: Lea fragt Marco an, Marco nimmt an, beide se
 		'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer (ohne Telefon deine ' +
 			'E-Mail), damit Marco dich erreichen kann.'
 	);
+	// FR-19: Schon vor dem Senden heisst es, dass auch die Gegner E-Mail und Telefon sehen.
+	await expect(rueckfrage).toContainText(GEGNER_HINWEIS);
 	await expect(rueckfrage).toContainText(
 		'Meldet sich später einer von euch ab, ist die ganze Doppel-Anmeldung zurückgezogen.'
 	);
@@ -196,6 +201,8 @@ test('A-ANMELDUNG-04, FR-48, FR-19: Lea fragt Marco an, Marco nimmt an, beide se
 		'tel:0790000001'
 	);
 	await expect(anfrage).not.toContainText(lea.email);
+	// FR-19: Vor dem Annehmen sagt die Karte, dass auch die Gegner E-Mail und Telefon sehen.
+	await expect(anfrage).toContainText(`Nimmst du an, seid ihr angemeldet. ${GEGNER_HINWEIS}`);
 	await pruefeBildschirm(marcos.seite, info, 'cm-doppel-anfrage');
 	await anfrage.getByRole('button', { name: 'Annehmen' }).click();
 	await expect(marcos.seite.getByRole('status')).toHaveText(

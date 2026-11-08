@@ -19,6 +19,7 @@
 		type CmKategorie
 	} from '../../../lib/cm/api.ts';
 	import {
+		ANNEHMEN_HINWEIS,
 		KOMMENTAR_MAX,
 		KONTAKT_HINWEIS,
 		SUCHTEXT_MAX,
@@ -754,9 +755,7 @@
 		{:else if !kannAnnehmen}
 			<p class="leise">Trag zuerst deine Angaben ein, dann kannst du annehmen.</p>
 		{:else}
-			<p class="leise">
-				Nimmst du an, seid ihr angemeldet und seht gegenseitig E-Mail und Telefon.
-			</p>
+			<p class="leise">{ANNEHMEN_HINWEIS}</p>
 		{/if}
 		{#if offen && !nurAnsehen}
 			<div class="leiste">

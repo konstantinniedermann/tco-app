@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import type { KategorieRegel } from '../turnier/passung.ts';
 import {
+	ANNEHMEN_HINWEIS,
 	doppelText,
 	kategorieText,
 	kommentarZaehlerText,
@@ -141,8 +142,16 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 	test('FR-48: Rückfrage vor der Anfrage nennt den Angefragten mit der Anrede', () => {
 		expect(rueckfrageText('Marco')).toBe(
 			'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer (ohne Telefon deine ' +
-				'E-Mail), damit Marco dich erreichen kann. Nimmt Marco an, seid ihr angemeldet und seht ' +
-				'gegenseitig E-Mail und Telefon.'
+				'E-Mail), damit Marco dich erreichen kann. Nimmt Marco an, seid ihr angemeldet. Dann ' +
+				'sehen deine Gegner und dein Doppelpartner während der Clubmeisterschaft deine ' +
+				'E-Mail-Adresse und Telefonnummer.'
+		);
+	});
+
+	test('FR-19: Anfrage-Karte sagt vor dem Annehmen, dass auch die Gegner den Kontakt sehen', () => {
+		expect(ANNEHMEN_HINWEIS).toBe(
+			'Nimmst du an, seid ihr angemeldet. Dann sehen deine Gegner und dein Doppelpartner ' +
+				'während der Clubmeisterschaft deine E-Mail-Adresse und Telefonnummer.'
 		);
 	});
 });
