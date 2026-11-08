@@ -181,7 +181,11 @@ describe('Anlässe', () => {
 			const edb = eigene.db;
 			const admin = await legeMitgliedAn(edb, { nachname: 'Zzz' });
 			const id = await legeAnlassAn(edb, admin.mitgliedId, werte());
-			const kommt = await legeMitgliedAn(edb, { nachname: 'Aaa' });
+			const kommt = await legeMitgliedAn(edb, {
+				rufname: 'Hannes',
+				vorname: 'Johannes',
+				nachname: 'Aaa'
+			});
 			const nicht = await legeMitgliedAn(edb, { nachname: 'Bbb' });
 			await legeMitgliedAn(edb, { status: 'ausgetreten' });
 			await melde(edb, id, kommt.mitgliedId, { antwort: 'kommt', bemerkung: null }, JETZT);
@@ -189,8 +193,8 @@ describe('Anlässe', () => {
 			const a = await ladeAnlassAdmin(edb, id);
 			expect(a?.zahlen).toEqual({ kommen: 1, kommenNicht: 1, keineAntwort: 1 });
 			expect(a?.anmeldungen.map((z) => [z.name, z.antwort, z.bemerkung])).toEqual([
-				['Aaa, Test', 'kommt', null],
-				['Bbb, Test', 'kommt-nicht', 'x']
+				[{ rufname: 'Hannes', vorname: 'Johannes', nachname: 'Aaa' }, 'kommt', null],
+				[{ rufname: null, vorname: 'Test', nachname: 'Bbb' }, 'kommt-nicht', 'x']
 			]);
 			expect(await listeAnlaesse(edb)).toEqual([
 				expect.objectContaining({ id, kommen: 1, kommenNicht: 1 })
@@ -226,7 +230,9 @@ describe('Anlässe', () => {
 				.where(eq(mitglied.id, vorgemerkt.mitgliedId));
 			const a = await ladeAnlassAdmin(edb, id);
 			expect(a?.zahlen).toEqual({ kommen: 1, kommenNicht: 0, keineAntwort: 1 });
-			expect(a?.anmeldungen.map((z) => z.name)).toEqual(['Aaa, Test']);
+			expect(a?.anmeldungen.map((z) => z.name)).toEqual([
+				{ rufname: null, vorname: 'Test', nachname: 'Aaa' }
+			]);
 			expect(await listeAnlaesse(edb)).toEqual([
 				expect.objectContaining({ id, kommen: 1, kommenNicht: 0 })
 			]);

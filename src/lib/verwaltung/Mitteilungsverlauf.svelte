@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Name from '../ui/Name.svelte';
 	import { zeitText } from './anzeige.ts';
 	import { WEG_NAMEN, auswahlText, zahlenText, type MitteilungVerlauf } from './mitteilung-api.ts';
 
@@ -26,7 +27,10 @@
 				{#each eintraege as e, i (i)}
 					<tr>
 						<td>{zeitText(e.gesendetAm)}</td>
-						<td>{e.absender ?? 'gelöschtes Konto'}</td>
+						<td
+							>{#if e.absender}<Name name={e.absender} form="nachname-zuerst" />{:else}gelöschtes
+								Konto{/if}</td
+						>
 						<td><strong>{e.titel}</strong><br />{e.text}</td>
 						<td>{auswahlText(e.auswahl)}</td>
 						<td>{WEG_NAMEN[e.weg]}</td>

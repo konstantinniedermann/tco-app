@@ -295,7 +295,9 @@ describe('Konto löschen', () => {
 
 		const anlassSeite = await ladeAnlassAdmin(db, anlassId);
 		expect(anlassSeite).not.toBeNull();
-		expect(anlassSeite?.anmeldungen.map((a) => a.name)).toEqual(['Bleibt, Beat']);
+		expect(anlassSeite?.anmeldungen.map((a) => a.name)).toEqual([
+			{ rufname: null, vorname: 'Beat', nachname: 'Bleibt' }
+		]);
 		expect(JSON.stringify(anlassSeite)).not.toContain(NACHNAME);
 		const mitteilungen = await ladeMitteilungsverlauf(db, { art: 'anlass', anlassId }, jetzt);
 		expect(mitteilungen).toHaveLength(1);
