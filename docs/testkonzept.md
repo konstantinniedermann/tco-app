@@ -55,10 +55,10 @@ verhält, zeigt allein die [Checkliste](#checkliste-vor-dem-release).
 
 Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelheit. Heute
 (`tests/e2e/`): Login per Einmal-Code und eingeloggt bleiben, Passkey, Startseite, Hilfe und
-Datenschutzerklärung ohne Login, Profil mit E-Mail-Wechsel, Benachrichtigungen, Anlässe,
+Datenschutzerklärung ohne Login, Profil mit E-Mail-Wechsel und Rufname, Benachrichtigungen, Anlässe,
 Mitteilungen, Verwaltung mit Rollen, Einlesen einer Datei, Briefe einzeln und als Serie mit Druckansicht, Austritt,
 Löschen und Auskunft, Turnier und Kategorien,
-CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, dazu Bedienung (Wappen,
+CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, Doppel mit Partner-Anfragen und Doppel-Verwaltung durch den CM-Admin, Navigation und Tiefe der Seiten, dazu Bedienung (Wappen,
 Statusleiste, Fusszeile, Fokusrahmen). Später *Daten ergänzen* beim ersten Login (FR-02, noch
 geplant).
 
@@ -108,8 +108,8 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
   oder Adressen. Seed-Daten und Testdaten der Test-Umgebung
   (beide aus `scripts/erfundene-mitglieder.ts`; Mona und Theo nur lokal aus `scripts/seed-lokal.ts`); der Musterbrief nimmt dieselbe erste Person, aber mit eigener Adresse.
   Die Beispiel-GV (`scripts/beispiel-anlass.ts`) legt für `make seed` fünf weitere erfundene
-  Mitglieder an, das Beispielturnier (`scripts/beispiel-turnier.ts`) fünf weitere erfundene
-  Spieler mit Anmeldungen und einem Wildcard-Antrag.
+  Mitglieder an, das Beispielturnier (`scripts/beispiel-turnier.ts`) sechs weitere erfundene
+  Spieler mit Einzel- und Doppel-Anmeldungen, einem Wildcard-Antrag, Spielern, die einen Partner suchen, und einer offenen Partner-Anfrage.
 - Ausnahme für die lokale Datenbank: Der Testbestand von `make seed`
   (`scripts/beispiel-mitglieder.ts`) kombiniert feste Vornamen mit erkennbar erfundenen
   Nachnamen zu 185 Mitgliedern (zusammen mit den Personas rund 200), ohne Zufall und ohne

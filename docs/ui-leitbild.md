@@ -28,6 +28,7 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Baustein Anleitung (Zeichnung, Ablauf) | `src/lib/ui/Anleitung.svelte`, `src/lib/ui/ZeichnungIphone.svelte`, `src/lib/ui/ZeichnungAndroid.svelte` |
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
 | Druckansicht der Briefe (Seite *Briefe*, Seite eines Mitglieds) | `src/lib/verwaltung/Briefdruck.svelte` |
+| Zurück-Link, Pfad, Name mit Rufname, Trefferliste der Verwaltung, Rückfrage-Dialog | `src/lib/ui/Zurueck.svelte`, `src/lib/verwaltung/Pfad.svelte`, `src/lib/ui/Name.svelte`, `src/lib/verwaltung/Spielersuche.svelte`, `src/lib/verwaltung/Aktionsdialog.svelte` |
 
 Zwei Prüfungen halten Leitbild und Code beisammen:
 
@@ -246,8 +247,8 @@ Kopfleiste.
   keine Clubmeisterschaft. Sobald die Anmeldung offen ist, steht sie hier."; läuft genau eine,
   zeigt der Reiter direkt deren Seite (ohne Zurück-Link); laufen mehrere, je eine Kachel wie auf
   der Startseite. Die Kachel der CM auf der Startseite bleibt und führt in den Bereich CM.
-- **Startseite:** „Hoi <Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
-  „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben) und „Du bist angemeldet" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
+- **Startseite:** „Hoi <Rufname, sonst Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
+  „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben); Anlässe stehen als Kacheln unter „Jetzt aktuell" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
   stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
   (A-ANLASS-01). Angebote stehen vor „Jetzt aktuell", jedes als eigener Hinweis
   und immer nur eines zugleich (UI-04): zuerst *Passkey einrichten*, danach *Mitteilungen aufs Handy?*.
@@ -264,7 +265,7 @@ Kopfleiste.
   wie in der Mitglieder-App, auch unter der Verwaltung; oben links „‹ Zur Startseite" bzw.
   „‹ Zur Verwaltung", darunter eine Karte mit Titel und Meldung in Worten (UI-06).
 - **Formulare:** mehr als etwa 4 Felder werden in Schritte geteilt, mit Schritt-Zähler. Das
-  erste Login hat 3 Schritte: 1 Angaben prüfen (vom Verein erfasst, nur lesen) · 2 Kontakt ·
+  erste Login hat (geplant, FR-02) 3 Schritte: 1 Angaben prüfen (vom Verein erfasst, nur lesen) · 2 Kontakt ·
   3 Tennis (Lizenznummer, Klassierung).
 - **Kontingente** zeigt der Mengen-Zähler, z. B. „1 von 3 Anmeldungen" (FR-06).
 

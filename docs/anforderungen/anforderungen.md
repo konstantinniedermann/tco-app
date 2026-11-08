@@ -73,7 +73,7 @@ Was jede Rolle darf, legt [Rollen und Rechte](../rollen-und-rechte.md) fest.
 | A-ROLLE-04 | Rolle *Anlässe-Veranstalter*; bis dahin gehören die Anlässe zum Mitglieder-Admin (A-ROLLE-02), die CM leitet der CM-Admin (A-ROLLE-07) | PDF 4a | später\* | später |
 | A-ROLLE-05 | Rolle *Junioren-Leiter* | PDF 4a | später\* | später |
 | A-ROLLE-06 | Rolle *Gast*: nur für die Registrierung, kein Zugriff auf weitere Seiten | PDF 4a | später\* | später |
-| A-ROLLE-07 | Rolle *CM-Admin* (vorher *CM-Verantwortlicher*): Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | umgesetzt\* (Turnier und Kategorien, #57; Einzel-Anmeldungen, #60; Doppel, Gruppen und Resultate folgen mit ihren Etappen) |
+| A-ROLLE-07 | Rolle *CM-Admin* (vorher *CM-Verantwortlicher*): Turnier, Kategorien, Anmeldungen, Gruppen und Resultate der Clubmeisterschaft | PL | CM-Anmeldung | umgesetzt\* (Turnier und Kategorien, #57; Einzel-Anmeldungen, #60; Doppel, #59; Gruppen und Resultate folgen mit ihren Etappen) |
 | A-ROLLE-08 | Rolle *Lizenz-Admin* (vorher *Lizenzverantwortlicher*): Lizenzrunde und Lizenzanträge | PL | Lizenzanträge | geplant |
 | A-ROLLE-09 | *Ansicht als …*: Der MyTCO-Admin sieht App und Verwaltung so, wie sie eine gewählte Rolle sieht, nur lesend; der Server weist jedes Speichern ab ([Rollen und Rechte](../rollen-und-rechte.md#ansicht-als-), SI-20) | PL | Mitglieder-Login | umgesetzt |
 
@@ -95,10 +95,10 @@ auf dem Handy aussieht, klärt das UI-Leitbild (Issue #13).
 
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
-| A-STARTSEITE-01 | Die Startseite zeigt das eingeloggte Konto und einen Logout-Knopf | PDF 3c | Mitglieder-Login\* | geplant |
-| A-STARTSEITE-02 | Die Startseite bietet Shortcuts zu den wichtigsten Funktionen | PDF 3c | CM-Anmeldung\* | geplant |
-| A-STARTSEITE-03 | Die Shortcuts lassen sich später einfach ändern (z. B. für die Anmeldung zu einem bestimmten Anlass) | PDF 3c | CM-Anmeldung\* | geplant |
-| A-STARTSEITE-04 | Die Startseite zeigt die Anlässe, für die das Mitglied angemeldet ist | PDF 3c | CM-Anmeldung\* | geplant |
+| A-STARTSEITE-01 | Die Startseite zeigt das eingeloggte Konto und einen Logout-Knopf | PDF 3c | Mitglieder-Login\* | teilweise (Konto mit Begrüssung auf der Startseite; Logout im Profil) |
+| A-STARTSEITE-02 | Die Startseite bietet Shortcuts zu den wichtigsten Funktionen | PDF 3c | CM-Anmeldung\* | teilweise (Kacheln unter «Jetzt aktuell» und Verwaltung) |
+| A-STARTSEITE-03 | Die Shortcuts lassen sich später einfach ändern (z. B. für die Anmeldung zu einem bestimmten Anlass) | PDF 3c | CM-Anmeldung\* | teilweise (Kacheln unter «Jetzt aktuell») |
+| A-STARTSEITE-04 | Die Startseite zeigt die Anlässe, für die das Mitglied angemeldet ist | PDF 3c | CM-Anmeldung\* | teilweise (Anlässe mit eigenem Stand als Kacheln) |
 
 ### HILFE — Hilfe beim Start
 
