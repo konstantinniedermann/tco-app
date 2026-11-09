@@ -143,3 +143,29 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Einschätzung:** Mittel für die Verlässlichkeit der Tests. Möglich: eine Prüfung unter `scripts/pruefungen/`, die doppelte Jahre zwischen Dateien abweist, oder Jahre ab 2100 (vorher prüfen, ob die Turnier-Angaben das zulassen), oder Jahre pro Datei aus einem Helfer vergeben.
 
 **Verifiziert:** 09.11.2026 gegen `dev` 52cc2d2 — belegt (Kommando: alle Jahreszahlen in `tests/e2e` gesammelt, frei zwischen 2026 und 2099: keine). Offen ist die Entscheidung, welcher Weg.
+
+**Nachtrag 09.11.2026 (Session K-42):** `JAHR_MAX = 2100` in `src/lib/server/turnier/angaben.ts` prüft nur die Eingabe im Turnierformular. Die DB-Tests legen Turniere direkt mit Jahren 3000–9000 an (`zufallsJahr` in `src/lib/server/cm/*.db.test.ts`); der E2E-Helfer `legeTurnierAn` (`tests/e2e/hilfen/login.ts`) ruft ebenfalls die DB-Funktion direkt auf. Jahre über 2100 gingen also für alle E2E-Tests, die das Turnier nicht über das Formular speichern. `testjahr()` ist in mehreren Testdateien kopiert statt geteilt.
+
+### 2026-11-09 — E2E: zwei iPhone-Tests der Mitgliederverwaltung nur im Gesamtlauf rot
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/verwaltung.test.ts` — «A-MITGLIED-02: zwei Admins am selben Mitglied …» und «UI-06: Verwaltung nicht erreichbar – Fehlerseite …», Projekt iphone
+
+**Beobachtung:** Im ersten `make check` (414 E2E) scheiterten beide an `toBeVisible` nach 5 s mit «waiting for navigation to finish» (`/verwaltung/mitglieder/2147483000` bzw. `/verwaltung/mitglieder`). Einzeln (`--project iphone`, ganze Datei) und im zweiten Gesamtlauf grün.
+
+**Ursprung:** Session K-42 (Kontaktdaten CM-Admin), `make check` vor dem Merge
+
+**Einschätzung:** Niedrig bis mittel. Sieht nach dem Zeitbudget unter Last auf WebKit aus (vgl. Memory zur E2E-Zeitgrenze); beim nächsten Auftreten Trace ansehen, nicht gleich die Wartezeit erhöhen.
+
+### 2026-11-09 — Spielersuche zeigt dem CM-Admin Geschlecht und Jahrgang aller aktiven Mitglieder
+
+**Thema:** Datenschutz
+
+**Fundort:** `src/lib/server/cm/verwaltung.ts` → `sucheSpieler`; `src/lib/verwaltung/turnier-anzeige.ts` → `trefferText`; `docs/datenschutz.md` «Wer sieht was», Zeile CM-Admin; `docs/rollen-und-rechte.md` «Geschlecht und Jahrgang der Spieler (zum Zuordnen)»
+
+**Beobachtung:** Beim Anmelden von Hand findet die Suche jedes aktive Mitglied und zeigt Klassierung, Geschlecht und Jahrgang. Konzept und Matrix nennen Geschlecht und Jahrgang nur «der Spieler». Die Erklärung («um dich in die passenden Kategorien einzuordnen») deckt den Zweck ab.
+
+**Ursprung:** Session K-42, beim Eingrenzen der Kontaktdaten aufgefallen
+
+**Einschätzung:** Niedrig; vermutlich nur Wortlaut («der Spieler und der Treffer der Suche beim Anmelden von Hand»). Beide Wege offen: Zusage präzisieren oder Treffer ohne Jahrgang/Geschlecht.
