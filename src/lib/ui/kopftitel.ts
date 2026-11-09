@@ -7,6 +7,7 @@
  * (Höhe einer klebenden Kopfleiste). Meldet null, sobald es wieder sichtbar ist oder fehlt.
  * `oben` wird beim Aufbau gelesen und danach bei jedem Fenster- und `inhalt`-Grössenwechsel
  * erneut; ändert sich der Wert, wird der Beobachter mit dem neuen Rand neu aufgebaut.
+ * Beim Scrollen von `wurzel` (bzw. des Fensters) prüft er zusätzlich selbst nach.
  * Gibt eine Funktion zum Aufräumen zurück.
  */
 export function beobachteKopftitel(o: {
@@ -68,6 +69,27 @@ export function beobachteKopftitel(o: {
 	groesse.observe(o.inhalt);
 	window.addEventListener('resize', pruefeRand);
 
+	// Der IntersectionObserver meldet nur den Wechsel zwischen «im Bild» und «nicht im Bild».
+	// Springt die Seite vom <h1> unterhalb des Bildes direkt über es hinaus (Taste Ende, schnelles
+	// Wischen; in der Verwaltung auf dem Handy steht die Seitenleiste über dem Inhalt), bliebe er
+	// stumm. Darum prüft auch Scrollen nach, einmal pro Bild wie der Beobachter selbst (ein Skript,
+	// das kurz hin und zurück scrollt, lässt den Titel so in Ruhe).
+	let bild = 0;
+	function nachScrollen() {
+		if (bild) return;
+		bild = requestAnimationFrame(() => {
+			bild = 0;
+			if (!ueberschrift) return;
+			const grenze = (o.wurzel ? o.wurzel.getBoundingClientRect().top : 0) + rand;
+			const neu = ueberschrift.getBoundingClientRect().bottom <= grenze;
+			if (neu === darueber) return;
+			darueber = neu;
+			melden();
+		});
+	}
+	const scrollt = o.wurzel ?? window;
+	scrollt.addEventListener('scroll', nachScrollen, { passive: true });
+
 	const mutationen = new MutationObserver(pruefe);
 	mutationen.observe(o.inhalt, { childList: true, subtree: true, characterData: true });
 	pruefe();
@@ -76,6 +98,8 @@ export function beobachteKopftitel(o: {
 		mutationen.disconnect();
 		groesse.disconnect();
 		window.removeEventListener('resize', pruefeRand);
+		scrollt.removeEventListener('scroll', nachScrollen);
+		cancelAnimationFrame(bild);
 		beobachter?.disconnect();
 	};
 }

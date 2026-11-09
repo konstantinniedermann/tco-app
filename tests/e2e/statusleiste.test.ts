@@ -53,7 +53,9 @@ test('Statusleisten-Band: in der App vom Startbildschirm höher und grüner Seit
 		for (const blatt of Array.from(document.styleSheets)) durchsuche(blatt.cssRules, false);
 		return gefunden.join(' ');
 	});
-	expect(regeln).toMatch(/\.statusleiste:not\(\.statusleiste-verwaltung\) \{ height: calc\(/);
+	// Auch in der Verwaltung: Deren Kopfleiste bleibt ebenfalls oben stehen (Leitbild).
+	expect(regeln).toMatch(/\.statusleiste \{ height: calc\(/);
+	expect(regeln).not.toMatch(/statusleiste-verwaltung/);
 	expect(regeln).toMatch(/html, body \{ background: var\(--farbe-marke\)/);
 	expect(regeln).toMatch(/\.app \{ background: var\(--farbe-hintergrund\)/);
 	const hintergrund = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);

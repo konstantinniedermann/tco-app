@@ -166,7 +166,7 @@
 	onMount(beobachteTastatur);
 </script>
 
-<div class={['statusleiste', { 'statusleiste-verwaltung': verwaltung }]}></div>
+<div class="statusleiste"></div>
 
 <div class={['app', { schale: !verwaltung }]}>
 	{#if data.ansicht}

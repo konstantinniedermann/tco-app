@@ -221,21 +221,31 @@ html {
 	scroll-padding-top: env(safe-area-inset-top);
 }
 
+/* Verwaltung auf dem Handy: Das Dokument scrollt unter der klebenden Kopfleiste durch; ein
+   Fokussprung landet unter ihr (Abstände plus Wappen, das die Höhe der Kopfleiste bestimmt) */
+@media (width < 60rem) {
+	html:has(.verwaltung) {
+		scroll-padding-top: calc(
+			env(safe-area-inset-top) + 2 * var(--abstand-3) + 1.8 * var(--groesse-gross)
+		);
+	}
+}
+
 /*
  * Nur in der iPhone-App vom Startbildschirm (standalone; -webkit-touch-callout gibt es nur auf
  * iOS, so bleiben installierte Apps auf Android und am PC unverändert): Das Band reicht über den
  * oberen Rand der Kopfleiste (gleiches Grün, unsichtbar) und bleibt so über 10 px, auch wenn iOS
  * den Abstand als 0 meldet. Der grüne Seitenhintergrund färbt den Rest-Schleier beim Scrollen
- * grün. Am iPhone geprüft (Spike 05.11.2026). In der Verwaltung scrollt die Kopfleiste mit der
- * Seitenleiste weg, dort bleibt das Band so hoch wie die Statusleiste.
+ * grün. Am iPhone geprüft (Spike 05.11.2026). Gilt auch in der Verwaltung, deren Kopfleiste
+ * ebenfalls oben stehen bleibt.
  */
 @supports (-webkit-touch-callout: default) {
 	@media (display-mode: standalone) {
-		.statusleiste:not(.statusleiste-verwaltung) {
+		.statusleiste {
 			height: calc(env(safe-area-inset-top) + var(--abstand-3));
 		}
 
-		html:has(.statusleiste:not(.statusleiste-verwaltung)) {
+		html {
 			scroll-padding-top: calc(env(safe-area-inset-top) + var(--abstand-3));
 		}
 
@@ -378,6 +388,40 @@ html {
 .ansicht-band ~ .app-rahmen .kopf,
 .ansicht-band ~ .verwaltung .kopf {
 	padding-top: var(--abstand-3);
+}
+
+/* In der Verwaltung scrollt das Dokument: Das Band scrollt mit weg, die Kopfleiste klebt dann
+   direkt unter der Statusleiste, die den fehlenden Abstand deckt */
+.ansicht-band ~ .verwaltung .kopf {
+	top: env(safe-area-inset-top);
+}
+
+/* Verwaltung: «Verwaltung» (.kopf-zusatz) und der eingeblendete Titel teilen sich den Platz
+   hinter «MyTCO»; der Titel ersetzt das Wort, statt dahinter anzuhängen */
+.verwaltung .kopf-marke {
+	display: grid;
+	grid-template-columns: auto auto minmax(0, 1fr);
+}
+
+.verwaltung .kopf-marke > .kopf-zusatz,
+.verwaltung .kopf-marke > .kopf-titel {
+	grid-area: 1 / 3;
+}
+
+.kopf-zusatz {
+	transition: opacity var(--dauer-mittel) var(--kurve-standard);
+}
+
+@container app (width < 60rem) {
+	.kopf-marke:has(> .kopf-titel[data-sichtbar]) > .kopf-zusatz {
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.kopf-zusatz {
+		transition: none;
+	}
 }
 
 /* Reiter (unten auf dem Handy, ab 60rem mit Symbol mittig in der Kopfleiste) */
@@ -1072,6 +1116,12 @@ a.kachel:active {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
+}
+
+/* Kopfleiste und Seitenleiste. Unter 60rem ohne eigene Box: Die Kopfleiste klebt dann über die
+   ganze Seite, die Seitenleiste darunter scrollt weg. Ab 60rem eine stehende Spalte (s. u.). */
+.verwaltung-leiste {
+	display: contents;
 }
 
 /*
@@ -1841,6 +1891,39 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		grid-template-columns: 15rem 1fr;
 	}
 
+	/* Kopfleiste und Seitenleiste stehen beim Scrollen des Inhalts, volle Bildschirmhöhe; was
+	   nicht passt, scrollt für sich */
+	.verwaltung-leiste {
+		display: block;
+		position: sticky;
+		top: 0;
+		align-self: start;
+		height: 100dvh;
+		overflow-y: auto;
+		overscroll-behavior-y: contain;
+		background: var(--farbe-marke-dunkel);
+	}
+
+	/* Am PC klebt der Seitenkopf im Inhalt statt des Titels in der Kopfleiste; in der schmalen
+	   Spalte steht «Verwaltung» unter «MyTCO» */
+	.verwaltung .kopf-titel {
+		display: none;
+	}
+
+	.verwaltung .kopf-marke {
+		grid-template-columns: auto minmax(0, 1fr);
+		column-gap: var(--abstand-3);
+		row-gap: 0;
+	}
+
+	.verwaltung .kopf-marke > .kopf-start {
+		grid-row: span 2;
+	}
+
+	.verwaltung .kopf-marke > .kopf-zusatz {
+		grid-area: 2 / 2;
+	}
+
 	.verwaltung .inhalt {
 		max-width: none;
 		margin: 0;
@@ -1921,6 +2004,7 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 
 @media print {
 	.nicht-drucken,
+	.verwaltung-leiste,
 	.seitenleiste,
 	.kopf,
 	.hinweis,

@@ -644,3 +644,113 @@ test('Rufname: die Mitgliederverwaltung zeigt den amtlichen Namen und den Rufnam
 	await expect(page.getByText('Rufname Hannes', { exact: true })).toBeVisible();
 	expect(fehler).toEqual([]);
 });
+
+// Kopfleiste und Seitenleiste beim Scrollen (UI-Leitbild, Kopfleiste, Seitenleiste, Titel in der
+// Kopfleiste). In der Verwaltung scrollt das Dokument, nicht ein Rollbereich.
+const scrolleFenster = (page: Page, nach: 'unten' | 'oben') =>
+	page.evaluate((n) => {
+		window.scrollTo(0, n === 'unten' ? document.documentElement.scrollHeight : 0);
+	}, nach);
+
+test('Handy: Kopfleiste bleibt stehen, Titel ersetzt «Verwaltung»', async ({ page }, info) => {
+	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Am PC klebt statt des Titels in der Kopfleiste der Seitenkopf
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeAdminMitBriefCodeAn('Wilma');
+	await oeffneVerwaltung(page, admin);
+	await page.setViewportSize({ width: page.viewportSize()!.width, height: 500 });
+	await page.goto(`/verwaltung/mitglieder/${admin.mitgliedId}`);
+	const h1 = page.getByRole('heading', { level: 1 });
+	await expect(h1).toContainText('Wilma');
+	const kopf = page.locator('header.kopf');
+	const titel = kopf.locator('.kopf-titel');
+	const zusatz = kopf.locator('.kopf-zusatz');
+	await expect(zusatz).toHaveText('Verwaltung');
+	await expect(zusatz).toHaveCSS('opacity', '1');
+	await expect(titel).not.toHaveAttribute('data-sichtbar', '');
+
+	await scrolleFenster(page, 'unten');
+	expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(200);
+	expect((await kopf.boundingBox())!.y).toBeLessThanOrEqual(1);
+	await expect(titel).toHaveAttribute('data-sichtbar', '');
+	await expect(titel).toHaveText((await h1.textContent())!.trim());
+	await expect(titel).toHaveAttribute('aria-hidden', 'true');
+	await expect(zusatz).toHaveCSS('opacity', '0');
+	// Die Seitenleiste darunter scrollt mit der Seite weg.
+	await expect(seitenleiste(page).getByRole('link', { name: 'Mitglieder' })).not.toBeInViewport();
+
+	await scrolleFenster(page, 'oben');
+	await expect(titel).not.toHaveAttribute('data-sichtbar', '');
+	await expect(zusatz).toHaveCSS('opacity', '1');
+	expect(fehler).toEqual([]);
+});
+
+test('PC: Seitenleiste bleibt beim Scrollen stehen', async ({ page }, info) => {
+	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: Unter 60rem scrollt die Seitenleiste mit der Seite weg (Test oben)
+	const fehler = sammleKonsolenfehler(page);
+	const mytco = await legeRollenkontoMitBriefCodeAn('Walter', ['mytco']);
+	await oeffneVerwaltung(page, mytco);
+	await page.setViewportSize({ width: 1280, height: 500 });
+	await page.goto(`/verwaltung/mitglieder/${mytco.mitgliedId}`);
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('Walter');
+	const kopf = page.locator('header.kopf');
+
+	await scrolleFenster(page, 'unten');
+	expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(200);
+	// Kopfleiste und Seitenleiste stehen zusammen oben, die Seitenleiste direkt unter der Kopfleiste.
+	const k = (await kopf.boundingBox())!;
+	const s = (await seitenleiste(page).boundingBox())!;
+	expect(k.y).toBeLessThanOrEqual(1);
+	expect(Math.abs(s.y - (k.y + k.height))).toBeLessThanOrEqual(1);
+	await expect(seitenleiste(page).getByRole('link', { name: 'Mitglieder' })).toBeInViewport();
+	// Höher als das Fenster: Die Leiste scrollt für sich, die Seite bleibt, wo sie ist.
+	const seiteY = await page.evaluate(() => window.scrollY);
+	await page.locator('.verwaltung-leiste').evaluate((e) => {
+		e.scrollTop = e.scrollHeight;
+	});
+	await expect(seitenleiste(page).getByRole('link', { name: 'Turniere' })).toBeInViewport();
+	await expect(seitenleiste(page).getByRole('link', { name: '‹ Zur App' })).toBeInViewport();
+	expect(await page.evaluate(() => window.scrollY)).toBe(seiteY);
+	expect((await kopf.boundingBox())!.y).toBeLessThanOrEqual(1);
+	// Am PC bleibt «Verwaltung» stehen, der Titel kommt nicht in die Kopfleiste.
+	await expect(kopf.locator('.kopf-titel')).toBeHidden();
+	await expect(kopf.locator('.kopf-zusatz')).toHaveCSS('opacity', '1');
+	expect(fehler).toEqual([]);
+});
+
+test('Band «Ansicht als …» und feste Kopfleiste überlappen nicht', async ({ page }, info) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const mytco = await legeRollenkontoMitBriefCodeAn('Wendelin', ['mytco']);
+	await oeffneVerwaltung(page, mytco);
+	await schaueAls(page, 'Mitglieder-Admin');
+	await page.setViewportSize({ width: page.viewportSize()!.width, height: 400 });
+	const kopf = page.locator('header.kopf');
+	const ueberlappen = async () => {
+		const k = (await kopf.boundingBox())!;
+		const b = (await band(page).boundingBox())!;
+		return k.y < b.y + b.height && b.y < k.y + k.height;
+	};
+
+	// Verwaltung: Das Dokument scrollt, die Kopfleiste bleibt oben stehen.
+	await page.goto(`/verwaltung/mitglieder/${mytco.mitgliedId}`);
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('Wendelin');
+	expect(await ueberlappen()).toBe(false);
+	await scrolleFenster(page, 'unten');
+	expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(200);
+	expect(await ueberlappen()).toBe(false);
+	await expect(kopf).toBeInViewport();
+	if (info.project.name !== 'desktop') {
+		await expect(kopf.locator('.kopf-titel')).toHaveAttribute('data-sichtbar', '');
+	}
+
+	// App: nur der Rollbereich scrollt.
+	await page.goto('/profil');
+	await expect(page.getByRole('heading', { level: 1, name: 'Profil' })).toBeVisible();
+	await page.locator('.rollbereich').evaluate((e) => {
+		e.scrollTop = e.scrollHeight;
+	});
+	expect(await ueberlappen()).toBe(false);
+	await expect(kopf).toBeInViewport();
+	await expect(band(page)).toBeInViewport();
+	expect(fehler).toEqual([]);
+});
