@@ -382,6 +382,11 @@ Einzel-Liste.
 (7) DB-Tests, die ihre eigene Datenbank im Testrumpf anlegen, laufen gegen die Standard-Zeitgrenze von 5 s.
 (8) Nach erfolgreichem Senden gibt es keine Ansage für Screenreader, weder für Mitglieder noch in der Verwaltung.
 (9) Der Seed setzt «neue Antwort» nicht zurück.
+(10) Der Löschhinweis im Posteingang nutzt `karte-teil` ausserhalb einer Karte (Trennlinie als Nebenwirkung); sauberer wäre ein eigener Baustein für eine Fussnote.
+(11) Nach 409 `nur-lesen` geht der getippte Text auf der Gesprächsseite still verloren; `maxlength` ist nicht getestet.
+(12) «gelesen» nach dem Senden bzw. nach dem Neuladen hat keinen eigenen Test.
+(13) Die Zähler offen/erledigt im Posteingang rechnet die Seite aus den Zeilen, die Turnierseite nimmt die Zahlen des Servers.
+(14) Der Autofixer meldet in `src/routes/verwaltung/turniere/+page.svelte` einen `$effect`, der `lade()` aufruft (bestehender Code, nicht angefasst).
 
 **Ursprung:** Final-Review #71
 
