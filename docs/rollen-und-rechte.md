@@ -89,7 +89,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Änderungsverlauf (FR-26) | – | – | – | – | L | L |
 | Liste *Für Fairgate*: selbst geänderte Kontaktangaben sehen und abhaken (A-KONTO-02, Annahme K-19.2) | – | – | – | – | S | L |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S | L |
-| E-Mail und Telefon anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L alle (K-42) | L alle (K-42) | S | L |
+| E-Mail und Telefon anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L Spieler des Turniers (aktive Anmeldung oder offene Partner-Anfrage), bis 1.1. nach dem Turnierjahr (K-42) | L mit Lizenz oder Lizenzantrag (K-42, #53) | S | L |
 | **CM-Anmeldung** | | | | | | |
 | Turnier, Turniernummern, Kategorien | – | L | S | L | L | L |
 | Kontaktperson des Turniers (wählen, nur gültige nach FR-55; Mitglieder sehen nur den Namen) | – | L Name | S | L Name | L Name | L |
@@ -99,7 +99,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Klassierung der Spieler korrigieren (A-ANMELDUNG-06, K-28) | – | – | S | – | – | L |
 | Wildcard-Antrag und Kommentar (FR-08) | – | S eigene | S, entscheidet | S eigene | S eigene | L |
 | Klassierung passender Mitglieder (Partnerwahl) | – | L | L | L | L | L |
-| Kontaktdaten des Doppelpartners, erst nach dem Annehmen (FR-19) | – | L beteiligt | L alle (K-42) | L alle (K-42) | S | L |
+| Kontaktdaten des Doppelpartners, erst nach dem Annehmen (FR-19) | – | L beteiligt | L Spieler des Turniers (K-42) | L mit Lizenz oder Lizenzantrag (K-42) | S | L |
 | Name, Klassierung und Telefon (sonst E-Mail) des Anfragenden; er gibt sie mit der Anfrage dem Angefragten frei (FR-48, FR-19) | – | L an einen selbst | L an einen selbst | L an einen selbst | L an einen selbst | L an einen selbst |
 | Partner anfragen, annehmen, ablehnen (FR-48) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Offene Partner-Anfragen (von, an, seit wann) | – | – | L | – | – | L |
