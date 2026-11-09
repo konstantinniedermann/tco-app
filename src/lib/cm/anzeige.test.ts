@@ -5,6 +5,7 @@ import {
 	anmeldungenText,
 	doppelText,
 	blaseKopfText,
+	zeitText,
 	nachrichtenOffenText,
 	kategorieText,
 	kommentarZaehlerText,
@@ -185,6 +186,10 @@ describe('Übersicht einer CM: Plakette, Anzahl, Kontakt', () => {
 		expect(blaseKopfText('leitung', '2027-12-10T07:15:00Z')).toBe(
 			'Turnierleitung · Fr, 10. Dezember, 08:15'
 		);
+	});
+
+	test('zeitText gibt Wochentag, Datum und Zürcher Zeit ohne Absender (A-TURNIER-04)', () => {
+		expect(zeitText('2027-06-09T16:40:00Z')).toBe('Mi, 9. Juni, 18:40');
 	});
 
 	test('nachrichtenOffenText kennt Einzahl und Mehrzahl (A-TURNIER-04)', () => {

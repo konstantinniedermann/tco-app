@@ -154,13 +154,18 @@ const BLASE_ZEIT = new Intl.DateTimeFormat('de-CH', {
 	hourCycle: 'h23'
 });
 
-/** Kopf einer Sprechblase: «Du · Mo, 9. Juni, 18:40» (Zürcher Zeit). */
-export function blaseKopfText(von: 'du' | 'leitung', gesendetAm: string): string {
+/** Zeitpunkt in Zürcher Zeit: «Mo, 9. Juni, 18:40» (Sprechblase und Verwaltung). */
+export function zeitText(zeitpunkt: string): string {
 	const t = Object.fromEntries(
-		BLASE_ZEIT.formatToParts(new Date(gesendetAm)).map((p) => [p.type, p.value])
+		BLASE_ZEIT.formatToParts(new Date(zeitpunkt)).map((p) => [p.type, p.value])
 	);
 	const tag = String(t.weekday).replace(/\.$/, '');
-	return `${von === 'du' ? 'Du' : 'Turnierleitung'} · ${tag}, ${t.day}. ${t.month}, ${t.hour}:${t.minute}`;
+	return `${tag}, ${t.day}. ${t.month}, ${t.hour}:${t.minute}`;
+}
+
+/** Kopf einer Sprechblase: «Du · Mo, 9. Juni, 18:40» (Zürcher Zeit). */
+export function blaseKopfText(von: 'du' | 'leitung', gesendetAm: string): string {
+	return `${von === 'du' ? 'Du' : 'Turnierleitung'} · ${zeitText(gesendetAm)}`;
 }
 
 /** Zähler der offenen Nachrichten an die Turnierleitung (Kachel Verwaltung auf der Startseite). */

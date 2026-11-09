@@ -6,14 +6,22 @@ import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
 	antworteAlsLeitung,
 	entferneKontaktperson,
+	holeMailCode,
 	legeKontoMitBriefCodeAn,
 	legeOffenesTurnierAn,
 	legeRollenkontoMitBriefCodeAn,
 	schliesseLoginHilfen,
 	schreibeNachricht,
-	setzeKontaktperson
+	setzeKontaktperson,
+	stelleBriefCodeAus,
+	warteAufMail
 } from './hilfen/login.ts';
-import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
+import {
+	pruefeBildschirm,
+	pruefePfad,
+	sammleKonsolenfehler,
+	wartetAufVorladen
+} from './hilfen/seite.ts';
 
 // Gespräch mit der Turnierleitung in der Mitglieder-App (A-TURNIER-04, FR-50 bis FR-52).
 
@@ -56,7 +64,10 @@ async function meldeAn(page: Page, konto: Pick<Konto, 'code' | 'vorname'>) {
 	await wartetAufVorladen(page);
 }
 
-const mitglied = () => legeKontoMitBriefCodeAn('Moritz', `Probe${randomUUID().slice(0, 6)}`);
+const mitglied = async () => {
+	const nachname = `Probe${randomUUID().slice(0, 6)}`;
+	return { ...(await legeKontoMitBriefCodeAn('Moritz', nachname)), nachname };
+};
 
 const fragenKarte = (page: Page) =>
 	page.locator('section.karte', {
@@ -66,6 +77,7 @@ const fragenKarte = (page: Page) =>
 test('A-TURNIER-04, FR-50: Mitglied schreibt der Turnierleitung und sieht die eigene Blase', async ({
 	page
 }, info) => {
+	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder schreiben am Handy; die Verwaltung am PC prüfen die Tests unten
 	const konsole = sammleKonsolenfehler(page);
 	const jahr = testjahr(JAHR_SCHREIBEN, info);
 	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
@@ -120,6 +132,7 @@ test('A-TURNIER-04, FR-50: Mitglied schreibt der Turnierleitung und sieht die ei
 test('A-TURNIER-04, FR-51: ohne Kontaktperson keine Karte, die Kontaktperson selbst ohne Kachel', async ({
 	page
 }, info) => {
+	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder schreiben am Handy; die Verwaltung am PC prüfen die Tests unten
 	const jahr = testjahr(JAHR_OHNE, info);
 	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
 	const konto = await mitglied();
@@ -150,6 +163,7 @@ test('A-TURNIER-04, FR-51: ohne Kontaktperson keine Karte, die Kontaktperson sel
 test('A-TURNIER-04, FR-51: nur lesend, wenn die Kontaktperson fehlt, ohne Feld', async ({
 	page
 }, info) => {
+	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder schreiben am Handy; die Verwaltung am PC prüfen die Tests unten
 	const jahr = testjahr(JAHR_NUR_LESEN, info);
 	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
 	const cmAdmin = await legeRollenkontoMitBriefCodeAn(
@@ -180,6 +194,7 @@ test('A-TURNIER-04, FR-51: nur lesend, wenn die Kontaktperson fehlt, ohne Feld',
 test('A-TURNIER-04, FR-52: neue Antwort zeigt Plakette und Kachel, nach dem Öffnen sind sie weg', async ({
 	page
 }, info) => {
+	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder schreiben am Handy; die Verwaltung am PC prüfen die Tests unten
 	const jahr = testjahr(JAHR_ANTWORT, info);
 	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
 	const cmAdmin = await legeRollenkontoMitBriefCodeAn(
@@ -221,4 +236,221 @@ test('A-TURNIER-04, FR-52: neue Antwort zeigt Plakette und Kachel, nach dem Öff
 	await page.getByRole('link', { name: 'Start', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${konto.vorname}` })).toBeVisible();
 	await expect(page.getByRole('link', { name: /Neue Antwort der Turnierleitung/ })).toHaveCount(0);
+});
+
+// Verwaltung: Posteingang und Gespräch der Turnierleitung (A-TURNIER-04, FR-50 bis FR-54).
+// Jedes Projekt hat sein festes Jahr (2030–2038 und 2051–2053).
+const JAHR_FLUSS: Record<string, number> = { iphone: 2038, android: 2037, desktop: 2036 };
+const JAHR_ANSEHEN: Record<string, number> = { iphone: 2035, android: 2034, desktop: 2033 };
+const JAHR_FREMD: Record<string, number> = { iphone: 2051, android: 2052, desktop: 2053 };
+const JAHR_LISTE: Record<string, number> = { iphone: 2032, android: 2031, desktop: 2030 };
+
+/** Von der Startseite über die Verwaltung (Code aus der Mail, SI-08) bis zur ersten Seite. */
+async function oeffneVerwaltung(page: Page, konto: Konto, titel: string) {
+	await meldeAn(page, konto);
+	await page.getByRole('link', { name: 'Verwaltung' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Verwaltung öffnen' })).toBeVisible();
+	await page.getByRole('button', { name: 'Code schicken' }).click();
+	await page.getByLabel('Code aus der Mail').fill(await holeMailCode(konto.email));
+	await page.getByRole('button', { name: 'Bestätigen' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: titel })).toBeVisible();
+}
+
+const abmelden = async (page: Page) => {
+	await page.context().clearCookies();
+	await page.evaluate(() => window.localStorage.clear());
+};
+
+test('A-TURNIER-04, FR-50, FR-52, FR-53: die Turnierleitung beantwortet, erledigt und merkt gleichzeitige Antworten', async ({
+	page
+}, info) => {
+	test.setTimeout(150_000);
+	const konsole = sammleKonsolenfehler(page);
+	const jahr = testjahr(JAHR_FLUSS, info);
+	const turnierName = `Clubmeisterschaft ${jahr}`;
+	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
+	const hanna = await legeRollenkontoMitBriefCodeAn('Hanna', ['cm'], `Muster${info.project.name}`);
+	const leonie = await legeRollenkontoMitBriefCodeAn(
+		'Leonie',
+		['cm'],
+		`Leitung${info.project.name}`
+	);
+	await setzeKontaktperson(turnierId, hanna.mitgliedId);
+	const mitgl = await mitglied();
+	const frage = 'Kann ich meine Gruppenspiele vorziehen?';
+
+	// Das Mitglied schreibt; die Kontaktperson bekommt eine Meldung ohne Inhalt und ohne Namen.
+	await startetVomSymbol(page);
+	await meldeAn(page, mitgl);
+	await page.getByRole('link', { name: new RegExp(`Clubmeisterschaft ${jahr}`) }).click();
+	await fragenKarte(page)
+		.getByRole('link', { name: /Schreib der Turnierleitung/ })
+		.click();
+	await page.getByLabel('Deine Nachricht').fill(frage);
+	await page.getByRole('button', { name: 'Senden' }).click();
+	await expect(page.getByRole('listitem').filter({ hasText: frage })).toBeVisible();
+	const mail = await warteAufMail(
+		hanna.email,
+		'Clubmeisterschaft',
+		'Neue Nachricht an die Turnierleitung.'
+	);
+	expect(mail).not.toContain(frage);
+	expect(mail).not.toContain(mitgl.nachname);
+	await abmelden(page);
+
+	// Ein zweiter CM-Admin sieht den Posteingang.
+	await oeffneVerwaltung(page, leonie, 'Clubmeisterschaft');
+	await page.getByRole('link', { name: turnierName }).click();
+	await expect(page.getByRole('heading', { level: 1, name: turnierName })).toBeVisible();
+	const abschnitt = page.locator('div.karte', {
+		has: page.getByText('Fragen an die Turnierleitung')
+	});
+	await expect(page.getByRole('heading', { level: 2, name: 'Nachrichten' })).toBeVisible();
+	await expect(abschnitt.locator('.plakette-offen')).toHaveText('1 offen');
+	await expect(abschnitt).toContainText('Kontaktperson: Hanna');
+	await pruefeBildschirm(page, info, 'verwaltung-turnier-nachrichten');
+	await abschnitt.getByRole('link', { name: 'Posteingang · 1 offen, 0 erledigt' }).click();
+
+	await expect(
+		page.getByRole('heading', { level: 1, name: 'Nachrichten an die Turnierleitung' })
+	).toBeVisible();
+	await pruefePfad(page, ['Turniere', turnierName], 'Nachrichten');
+	await expect(page.locator('.kennzahl', { hasText: 'offen' })).toContainText('1');
+	await expect(page.getByText(`31. Dezember ${jahr}`)).toBeVisible();
+	const reihe = page.getByRole('row', { name: new RegExp(mitgl.nachname) });
+	await expect(reihe).toContainText(`${mitgl.nachname}, Moritz`);
+	await expect(reihe).toContainText(frage);
+	await expect(reihe.locator('.plakette-offen')).toHaveText('offen');
+	await pruefeBildschirm(page, info, 'verwaltung-posteingang');
+	await reihe.getByRole('link', { name: `${mitgl.nachname}, Moritz` }).click();
+
+	// Antworten: der Verlauf zeigt den antwortenden Admin; das Feld leert sich.
+	const gespraechName = `Moritz ${mitgl.nachname}`;
+	await expect(page.getByRole('heading', { level: 1, name: gespraechName })).toBeVisible();
+	await pruefePfad(page, ['Turniere', turnierName, 'Nachrichten'], `${mitgl.nachname}, Moritz`);
+	const verlauf = page.getByRole('region', { name: 'Verlauf' });
+	await expect(verlauf).toContainText(frage);
+	await expect(page.getByText('Moritz sieht als Absender nur «Turnierleitung».')).toBeVisible();
+	await pruefeBildschirm(page, info, 'verwaltung-gespraech');
+	const antwort = 'Ja, das geht. Melde die Resultate wie immer.';
+	await page.getByLabel('Antwort der Turnierleitung').fill(antwort);
+	await page.getByRole('button', { name: 'Antworten', exact: true }).click();
+	await expect(verlauf).toContainText(antwort);
+	await expect(verlauf).toContainText(`Turnierleitung (Leonie Leitung${info.project.name})`);
+	await expect(page.getByLabel('Antwort der Turnierleitung')).toHaveValue('');
+
+	// Gleichzeitig: eine andere Antwort kommt dazwischen; der Text bleibt, erst die zweite Taste sendet.
+	await antworteAlsLeitung(turnierId, mitgl.mitgliedId, hanna.mitgliedId, 'Ich war schneller.');
+	const eigene = 'Meine Antwort kommt danach.';
+	await page.getByLabel('Antwort der Turnierleitung').fill(eigene);
+	await page.getByRole('button', { name: 'Antworten', exact: true }).click();
+	await expect(
+		page.getByText(
+			'Inzwischen hat jemand geantwortet. Lies die Antwort, dann sende deine trotzdem oder ändere sie.'
+		)
+	).toBeVisible();
+	await expect(verlauf).toContainText('Ich war schneller.');
+	await expect(verlauf).not.toContainText(eigene);
+	await expect(page.getByLabel('Antwort der Turnierleitung')).toHaveValue(eigene);
+	await pruefeBildschirm(page, info, 'verwaltung-gespraech-inzwischen');
+	await page.getByRole('button', { name: 'Antworten', exact: true }).click();
+	await expect(verlauf).toContainText(eigene);
+	await expect(page.getByText('Inzwischen hat jemand geantwortet.')).toHaveCount(0);
+
+	// Erledigt: Plakette und Zähler folgen, Wieder öffnen kehrt es um.
+	await page.getByRole('button', { name: 'Als erledigt markieren' }).click();
+	await expect(page.locator('.karte-kopf .plakette')).toHaveText('erledigt');
+	await expect(page.getByRole('button', { name: 'Wieder öffnen' })).toBeVisible();
+	await page
+		.getByRole('main')
+		.getByRole('link', { name: /Nachrichten/ })
+		.first()
+		.click();
+	await expect(page.locator('.kennzahl', { hasText: 'offen' })).toContainText('0');
+	await expect(page.locator('.kennzahl', { hasText: 'erledigt' })).toContainText('1');
+	await expect(page.getByRole('row', { name: new RegExp(mitgl.nachname) })).toContainText(
+		'Turnierleitung: Meine Antwort kommt danach.'
+	);
+	await abmelden(page);
+
+	// Das Mitglied liest «Turnierleitung», nie den Namen des Admins.
+	// Der Brief-Code gilt nur einmal: das Mitglied bekommt einen neuen.
+	await meldeAn(page, { vorname: mitgl.vorname, code: await stelleBriefCodeAus(mitgl.kontoId) });
+	await page.getByRole('link', { name: new RegExp(`^Clubmeisterschaft ${jahr}`) }).click();
+	await fragenKarte(page)
+		.getByRole('link', { name: /Schreib der Turnierleitung/ })
+		.click();
+	const blase = page.getByRole('listitem').filter({ hasText: antwort });
+	await expect(blase.locator('.blase-kopf')).toContainText('Turnierleitung ·');
+	await expect(page.getByRole('main')).not.toContainText('Leonie');
+	expect(konsole).toEqual([]);
+});
+
+test('A-TURNIER-04, FR-51: MyTCO-Admin sieht Posteingang und Gespräch nur zum Ansehen, ein fremdes Gespräch führt zurück', async ({
+	page
+}, info) => {
+	test.setTimeout(120_000);
+	const konsole = sammleKonsolenfehler(page);
+	const jahr = testjahr(JAHR_ANSEHEN, info);
+	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
+	const fremd = await legeOffenesTurnierAn(testjahr(JAHR_FREMD, info), [OFFEN]);
+	const leitung = await legeRollenkontoMitBriefCodeAn(
+		'Leonie',
+		['cm'],
+		`Leitung${info.project.name}`
+	);
+	await setzeKontaktperson(turnierId, leitung.mitgliedId);
+	const mitgl = await mitglied();
+	await schreibeNachricht(turnierId, mitgl.mitgliedId, 'Wann ist die Auslosung?');
+	const mytco = await legeRollenkontoMitBriefCodeAn('Tobias', ['mytco']);
+
+	await meldeAn(page, mytco);
+	await page.goto('/verwaltung');
+	await expect(page.getByRole('heading', { level: 1, name: 'Verwaltung öffnen' })).toBeVisible();
+	await page.getByRole('button', { name: 'Code schicken' }).click();
+	await page.getByLabel('Code aus der Mail').fill(await holeMailCode(mytco.email));
+	await page.getByRole('button', { name: 'Bestätigen' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	// Die Mitgliederliste lädt erst nach der Überschrift; page.goto bräche sie sonst ab (WebKit).
+	await expect(page.getByRole('status')).toHaveText(/^\d+ Mitglied(er)?$/);
+
+	await page.goto(`/verwaltung/turniere/${turnierId}/nachrichten`);
+	await expect(page.getByText('Nur ansehen.')).toBeVisible();
+	const reihe = page.getByRole('row', { name: new RegExp(mitgl.nachname) });
+	await expect(reihe).toContainText('Wann ist die Auslosung?');
+	await reihe.getByRole('link').click();
+	await expect(page.getByRole('region', { name: 'Verlauf' })).toContainText(
+		'Wann ist die Auslosung?'
+	);
+	await expect(page.getByLabel('Antwort der Turnierleitung')).toHaveCount(0);
+	await expect(page.getByRole('button', { name: 'Antworten', exact: true })).toHaveCount(0);
+	await expect(page.getByRole('button', { name: 'Als erledigt markieren' })).toHaveCount(0);
+	await pruefeBildschirm(page, info, 'verwaltung-gespraech-nur-ansehen');
+
+	// Ein Gespräch gehört zu seinem Turnier: unter einem anderen führt es zurück zum Posteingang.
+	const gid = page.url().split('/').at(-1);
+	await page.goto(`/verwaltung/turniere/${fremd.turnierId}/nachrichten/${gid}`);
+	await expect(page).toHaveURL(new RegExp(`/verwaltung/turniere/${fremd.turnierId}/nachrichten$`));
+	await expect(
+		page.getByRole('heading', { level: 1, name: 'Nachrichten an die Turnierleitung' })
+	).toBeVisible();
+	await expect(page.getByText('Noch keine Nachrichten.')).toBeVisible();
+	expect(konsole).toEqual([]);
+});
+
+test('A-TURNIER-04: die Turnierliste zeigt die offenen Nachrichten', async ({ page }, info) => {
+	test.setTimeout(120_000);
+	const jahr = testjahr(JAHR_LISTE, info);
+	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
+	const leitung = await legeRollenkontoMitBriefCodeAn(
+		'Leonie',
+		['cm'],
+		`Zeile${info.project.name}`
+	);
+	await setzeKontaktperson(turnierId, leitung.mitgliedId);
+	await schreibeNachricht(turnierId, (await mitglied()).mitgliedId, 'Frage eins');
+	await oeffneVerwaltung(page, leitung, 'Clubmeisterschaft');
+	const reihe = page.getByRole('row', { name: new RegExp(`Clubmeisterschaft ${jahr}`) });
+	await expect(page.getByRole('columnheader', { name: 'Offen' })).toBeVisible();
+	await expect(reihe.getByRole('cell').last()).toHaveText('1');
 });
