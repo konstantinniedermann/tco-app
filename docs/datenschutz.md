@@ -46,6 +46,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Partner-Anfragen zur CM (Kategorie, von, an, gestellt am); erledigte Anfragen werden gelöscht | Doppelpartner anfragen, annehmen oder ablehnen | — |
 | Anmeldungen zu Anlässen: Antwort *kommt* / *kommt nicht*, freiwillige Bemerkung (ohne Angaben zur Gesundheit) | Planung des Anlasses, z. B. der Generalversammlung (A-ANLASS-01) | nein |
 | *Erstellt von* am Anlass: der Mitglieder-Admin, der ihn angelegt hat | Rückfragen zum Anlass: nachvollziehen, wer ihn angelegt hat | — |
+| *Kontaktperson* am Turnier: ein CM-Admin, den der CM-Admin wählt | Mitglieder wissen, an wen sie sich bei Fragen zur CM wenden | nein |
 | Austrittsdatum; Zeitpunkt der Löschvormerkung und Zustand davor | Löschfrist, Bedenkzeit, Rückgängig | — |
 | *Verwaltet von*: Elternteil, der das Konto eines Juniors führt (Vorschlag K-08) | Kind ohne eigenes Login | — |
 | Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (A-MITGLIED-07) | — |
@@ -100,7 +101,8 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
   angezeigten Datum. Verlauf und Antworten zu Anlässen löscht der Lauf nach einer Grenze von 12 Monaten (UTC).
 - **Was bei der Löschung bleibt:** nur Vor- und Nachname; der Rufname wird gelöscht. Konto mit Sitzungen, Passkeys, Rollen und
   Push-Abos, die eigenen Verlauf-Einträge und die Antworten zu Anlässen entfallen. Verweise als *erstellt
-  von*, Urheber oder Absender werden leer und erscheinen als *gelöschtes Konto*.
+  von*, Urheber oder Absender werden leer und erscheinen als *gelöschtes Konto*; die *Kontaktperson*
+  eines Turniers wird leer.
 - **Auskunft** (Mitglieder-Admin, DS-07): druckbare Seite mit allen gespeicherten Daten des Mitglieds
   ausser Geheimnissen; Verlauf-Einträge, in denen die Person nur Urheber bei anderen ist, fehlen (sie
   nennen Dritte). Schritte der Verwaltung zeigt die Auskunft als «Mitgliederverwaltung», nicht mit dem
@@ -131,6 +133,9 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
   oder mit dem Entzug der Rolle MyTCO-Admin.
 - ***Erstellt von* am Anlass:** mit dem Anlass; wird der Mitglieder-Admin als Mitglied gelöscht, bleibt der
   Anlass ohne diese Angabe.
+- ***Kontaktperson* am Turnier:** bleibt beim Turnier wie die CM-Anmeldungen, auch wenn die Person die Rolle
+  CM-Admin verliert (Mitglieder sehen sie dann nicht mehr); wird sie als Mitglied gelöscht, bleibt das Turnier
+  ohne Kontaktperson.
 - **E-Mail-Adresse im Gerätespeicher** während einer Code-Anfrage: nach dem Login, sonst beim
   nächsten Start der App, sobald die Anfrage älter als 15 Minuten ist.
 - **Laufender E-Mail-Wechsel** (neue Adresse, Code-Hashes): nur im Arbeitsspeicher; weg bei
@@ -231,6 +236,7 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
 
+- 09.11.2026: Kontaktperson im Datenkatalog nachgetragen; die Löschung eines Mitglieds leert sie am Turnier.
 - 09.11.2026: Alle Mitglieder sehen auf der Seite einer CM den Namen der Kontaktperson, die der CM-Admin unter den CM-Admins wählt (ohne E-Mail und Telefon).
 - 08.11.2026: CM-Admin sieht offene Partner-Anfragen; Doppelpartner sieht Kontaktdaten nicht mehr, wenn der Partner ausgetreten oder zum Löschen vorgemerkt ist; Meldungen der Verwaltung zum Doppel nennen den anderen Spieler (#59 Etappe 2).
 - 08.11.2026: DS-05 präzisiert (Entscheid Projektleiter): Einzelmeldungen zum Doppel an die Beteiligten nennen den anderen Spieler, nie dessen Telefon oder E-Mail und nie den CM-Admin; gilt auch für die Meldungen aus Etappe 1 (#59).

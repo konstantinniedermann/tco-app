@@ -341,3 +341,27 @@ Einzel-Liste.
 **Ursprung:** Task- und Abschluss-Reviews von feat/ui-pc-feinschliff
 
 **Einschätzung:** Niedrig, nichts davon führt in die Irre; (1) und (2) beim nächsten Gang durch die Verwaltung am Mac/Safari ansehen.
+
+### 2026-11-09 — Kontaktperson ohne Fachregel, ihre Tests ohne ID
+
+**Thema:** Tests
+
+**Fundort:** `src/lib/server/turnier/kontakt.ts`, `docs/fachmodell.md` (Turnier), Tests «Kontaktperson: …» in `turniere.db.test.ts`, `anmeldungen.db.test.ts`, `schnittstellen.db.test.ts`, `angaben.test.ts`, `auskunft.db.test.ts`, `tests/scripts/beispiel-turnier.db.test.ts`
+
+**Beobachtung:** Die Regeln zur Kontaktperson (wählbar nur, wer aktiv ist, ein ungesperrtes Konto und die Rolle CM-Admin hat; für Mitglieder sichtbar nur, solange das gilt; die Wahl bleibt gespeichert) stehen nur im Code. Das Fachmodell sagt nur «solange sie CM-Admin ist». Rund 14 Tests nennen darum keine ID. Vorschlag: eine neue Fachregel (FR-50) und die Tests danach benennen.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.19.1.
+
+**Einschätzung:** Mittel; betrifft nur die Nachvollziehbarkeit, das Verhalten ist getestet.
+
+### 2026-11-09 — Kontaktperson: Schnittstelle liefert den Rufnamen mit, die Zusage nennt Vor- und Nachname
+
+**Thema:** Datenschutz
+
+**Fundort:** `src/lib/server/cm/anmeldungen.ts` (`kontaktperson`, liest `namensSpalten`), `docs/datenschutz.md` («Wer sieht was», alle Mitglieder)
+
+**Beobachtung:** Die CM-Seite zeigt den amtlichen Namen. Die Antwort von `/api/cm` enthält aber auch den Rufnamen. Den dürfen alle Mitglieder ohnehin sehen, darum ist das kein Verstoss, nur eine Abweichung vom Wortlaut. Entweder nur Vor- und Nachname lesen (Code an die Zusage angleichen) oder die Zusage auf «Name mit Rufname» präzisieren.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.19.1.
+
+**Einschätzung:** Niedrig; Entscheid des Projektleiters, welcher Weg.

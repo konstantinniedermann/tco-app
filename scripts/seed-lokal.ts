@@ -1,5 +1,5 @@
 // Nur lokal: legt einen Testbestand an (rund 200 erfundene Mitglieder, zwei Anlässe, ein
-// Beispielturnier) und gibt Brief-Codes für die Personas aus: Erika (MyTCO-Admin und
+// Beispielturnier mit Hanna als Kontaktperson) und gibt Brief-Codes für die Personas aus: Erika (MyTCO-Admin und
 // Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur
 // Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin). Mehrfach ausführbar: Vorhandenes
 // bleibt, Logins bleiben gültig, nur die Brief-Codes der Personas sind neu.
@@ -58,7 +58,7 @@ async function seed(): Promise<void> {
 			.where(eq(konto.id, kontoIds[0]));
 		const jetzt = new Date();
 		const gv = await legeBeispielAnlassAn(db, erika.id, jetzt);
-		// Eine Beispiel-Clubmeisterschaft und Hanna als CM-Admin.
+		// Eine Beispiel-Clubmeisterschaft 2027 (Rolle und Kontaktperson folgen unten).
 		await legeBeispielTurnierAn(db, jetzt);
 		// Testbestand: rund 200 Mitglieder, ein zweiter Anlass, gemischte Antworten auf beide.
 		const bestand = await legeBeispielMitgliederAn(db, jetzt);
