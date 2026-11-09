@@ -110,11 +110,14 @@ test('Nur der Rollbereich scrollt, Kopfleiste und Reiter stehen fest', async ({ 
 	const leiste = await page.getByRole('navigation', { name: 'Hauptnavigation' }).boundingBox();
 	expect(kopf?.y).toBe(0);
 	expect(leiste).not.toBeNull();
-	// Handy: Reiter unten am Bildschirm; PC: als Textlinks direkt unter der Kopfleiste.
+	// Handy: Reiter unten am Bildschirm; PC: mit Symbol in der Kopfleiste (innerhalb ihrer Höhe).
 	if (leiste && kopf && leiste.y > kopf.height) {
 		expect(Math.round(leiste.y + leiste.height)).toBe(hoehe);
 	} else {
-		expect(Math.round(leiste?.y ?? -1)).toBe(Math.round(kopf?.height ?? 0));
+		expect(leiste?.y ?? -1).toBeGreaterThanOrEqual(kopf?.y ?? 0);
+		expect((leiste?.y ?? 0) + (leiste?.height ?? 0)).toBeLessThanOrEqual(
+			(kopf?.y ?? 0) + (kopf?.height ?? 0)
+		);
 	}
 });
 

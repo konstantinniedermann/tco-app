@@ -159,37 +159,41 @@
 	{#if verwaltung}
 		{@render children()}
 	{:else}
-		<header class="kopf">
-			<a
-				class="kopf-start"
-				href={resolve('/')}
-				aria-label="Zur Startseite"
-				onclick={schliesstNurTastatur}
-				><img class="kopf-wappen" src={asset('wappen.svg')} alt="" /></a
-			>
-			MyTCO
-		</header>
+		<div class="app-rahmen">
+			<header class="kopf">
+				<span class="kopf-marke">
+					<a
+						class="kopf-start"
+						href={resolve('/')}
+						aria-label="Zur Startseite"
+						onclick={schliesstNurTastatur}
+						><img class="kopf-wappen" src={asset('wappen.svg')} alt="" /></a
+					>
+					MyTCO
+				</span>
+			</header>
 
-		<div class="rollbereich" bind:this={rollbereich}>
-			<main class="inhalt">
-				{@render children()}
-			</main>
+			<div class="rollbereich" bind:this={rollbereich}>
+				<main class="inhalt">
+					{@render children()}
+				</main>
 
-			{#if mitFusszeile}
-				<footer class="inhalt leise">
-					<p>
-						<a href={resolve('/hilfe')}>Hilfe</a>
-						·
-						<a href={resolve('/datenschutz')}>Datenschutz</a>
-						· <span data-testid="version">Version {APP_VERSION}</span>
-					</p>
-				</footer>
+				{#if mitFusszeile}
+					<footer class="inhalt leise">
+						<p>
+							<a href={resolve('/hilfe')}>Hilfe</a>
+							·
+							<a href={resolve('/datenschutz')}>Datenschutz</a>
+							· <span data-testid="version">Version {APP_VERSION}</span>
+						</p>
+					</footer>
+				{/if}
+			</div>
+
+			{#if mitReiter}
+				<Reiter />
 			{/if}
 		</div>
-
-		{#if mitReiter}
-			<Reiter />
-		{/if}
 	{/if}
 </div>
 

@@ -341,4 +341,27 @@ test.describe('am PC', () => {
 		await expect(page).toHaveURL(/\/clubmeisterschaft(\/\d+)?$/);
 		await expect(reiter(page, 'CM')).toHaveAttribute('aria-current', 'page');
 	});
+
+	test('PC: Reiter mit Symbol mittig in der Kopfleiste, aktiver als Pille', async ({
+		page
+	}, info) => {
+		test.skip(info.project.name !== 'desktop', 'nur Desktop'); // skip: Fensterbreite und Mitte sind nur dort fest
+		await meldeAn(page, 'Mia');
+		await page.goto('/profil');
+		await expect(page.locator('nav.reiter a .symbol')).toHaveCount(3);
+		for (const symbol of await page.locator('nav.reiter a .symbol').all()) {
+			await expect(symbol).toBeVisible();
+		}
+		const leiste = (await page.locator('nav.reiter').boundingBox())!;
+		const kopf = (await page.locator('header.kopf').boundingBox())!;
+		const fenster = page.viewportSize()!;
+		expect(Math.abs(leiste.x + leiste.width / 2 - fenster.width / 2)).toBeLessThanOrEqual(2);
+		expect(leiste.y).toBeGreaterThanOrEqual(kopf.y);
+		expect(leiste.y + leiste.height).toBeLessThanOrEqual(kopf.y + kopf.height);
+		await expect(reiter(page, 'Profil')).toHaveAttribute('aria-current', 'page');
+		const hintergrund = (name: 'Start' | 'Profil') =>
+			reiter(page, name).evaluate((a) => getComputedStyle(a).backgroundColor);
+		expect(await hintergrund('Profil')).not.toBe(await hintergrund('Start'));
+		await pruefeBildschirm(page, info, 'pc-reiter-kopfleiste');
+	});
 });
