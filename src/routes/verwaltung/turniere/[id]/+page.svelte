@@ -210,7 +210,7 @@
 					<tr>
 						<td>
 							{#if k.status === 'abgesagt'}
-								<span class="zelle-kurz">{k.name}</span>
+								<span class="zelle-kurz" title={k.name}>{k.name}</span>
 								<span class="plakette plakette-gesperrt">abgesagt</span>
 							{:else}
 								<span class="zelle-kurz"
