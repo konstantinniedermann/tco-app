@@ -23,15 +23,15 @@
 		KOMMENTAR_MAX,
 		KONTAKT_HINWEIS,
 		SUCHTEXT_MAX,
+		anmeldungenText,
 		doppelText,
 		kategorieText,
 		kommentarZaehlerText,
-		namenText,
-		paarText,
-		paareText,
+		kontaktFragenText,
+		standPlakette,
+		suchendeText,
 		suchtextZaehlerText,
-		waehlbar,
-		weiterePaare
+		waehlbar
 	} from '../../../lib/cm/anzeige.ts';
 	import { anredeName, nameText, type Namensteile } from '../../../lib/name.ts';
 	import Name from '../../../lib/ui/Name.svelte';
@@ -68,7 +68,7 @@
 	let jahrgang = $state('');
 	let feldFehler = $state<CmFelder>({});
 	let angabenForm = $state<HTMLFormElement>();
-	let zaehlerBereich = $state<HTMLDivElement>();
+	let seitenTitel = $state<HTMLHeadingElement>();
 	let angabenTitel = $state<HTMLHeadingElement>();
 	// Titel der Anfrage-Karten, Ziel des Fokus, wenn eine davon verschwindet.
 	const anfrageTitel: (HTMLHeadingElement | null | undefined)[] = [];
@@ -153,9 +153,9 @@
 		if (r.art === 'ok') {
 			const geladen = await neuLaden();
 			if (geladen) {
-				// Das Formular ist weg: Fokus zum Zähler, nicht in den leeren Körper der Seite.
+				// Das Formular ist weg: Fokus zum Seitentitel, nicht in den leeren Körper der Seite.
 				await tick();
-				zaehlerBereich?.focus();
+				seitenTitel?.focus();
 			} else fehler = MELDUNG.stoerung;
 		} else if (r.art === 'eingabe') {
 			feldFehler = r.felder;
@@ -315,7 +315,7 @@
 
 	/**
 	 * Nach Annehmen oder Ablehnen ist die Karte der Anfrage weg (WCAG 2.4.3): Fokus zur Kategorie,
-	 * sonst zur nächsten Anfrage-Karte, zum Zähler oder zum Titel der Karte *Deine Angaben*.
+	 * sonst zur nächsten Anfrage-Karte, zum Titel der Karte *Deine Angaben* oder zum Seitentitel.
 	 */
 	async function fokusNachAnfrage(kategorieId?: number) {
 		await tick();
@@ -325,8 +325,8 @@
 		const ziel =
 			(kategorieId !== undefined ? knoepfe[kategorieId] : undefined) ??
 			anfrageTitel.find((t) => t?.isConnected) ??
-			zaehlerBereich ??
-			angabenTitel;
+			(fragtAngaben ? angabenTitel : undefined) ??
+			seitenTitel;
 		ziel?.focus();
 	}
 
@@ -483,7 +483,7 @@
 </svelte:head>
 
 <Zurueck />
-<h1>{cm.turnier.name}</h1>
+<h1 tabindex="-1" bind:this={seitenTitel}>{cm.turnier.name}</h1>
 <p>
 	<span class="plakette {status.klasse}">{status.text}</span><br />
 	<span class="leise">Anmeldeschluss {datumLang(cm.turnier.anmeldeschluss)}</span>
@@ -525,14 +525,6 @@
 		{/if}
 	</section>
 {:else}
-	<div class="zaehler" bind:this={zaehlerBereich} tabindex="-1">
-		<div class="zaehler-balken" aria-hidden="true">
-			{#each { length: cm.grenze }, i (i)}
-				<span class={{ 'zaehler-voll': i < anzahl }}></span>
-			{/each}
-		</div>
-		<div class="zaehler-text">{anzahl} von {cm.grenze} Anmeldungen</div>
-	</div>
 	{#if offen && voll && !nurAnsehen}
 		<p class="leise">Mehr als 3 Anmeldungen gehen nicht. Melde dich zuerst irgendwo ab.</p>
 	{/if}
@@ -558,32 +550,31 @@
 				{@render doppelKarte(k)}
 			{/if}
 		{:else}
-			<div class="karte kachel">
-				<span>
-					<strong>{k.name}</strong><br />
-					<span class="leise">{kategorieText(k)}</span><br />
-					<span class="leise">{namenText(k.namen)}</span>
-					{#if k.anmeldungId !== null}<br /><span class="leise">Du bist angemeldet.</span>{/if}
-				</span>
-				{#if offen && !nurAnsehen}
-					{#if k.anmeldungId !== null}
-						<button
-							type="button"
-							class="taste-neben"
-							bind:this={knoepfe[k.id]}
-							disabled={laeuft}
-							onclick={() => abmelden(k)}>Abmelden</button
-						>
-					{:else}
-						<button
-							type="button"
-							class="taste-neben"
-							bind:this={knoepfe[k.id]}
-							disabled={laeuft || voll}
-							onclick={() => anmeldenTippen(k)}>Anmelden</button
-						>
+			<div class="karte">
+				{@render kopf(k, false)}
+				<div class="kachel">
+					<span class="leise">{kategorieText(k)}</span>
+					{#if offen && !nurAnsehen}
+						{#if k.anmeldungId !== null}
+							<button
+								type="button"
+								class="taste-neben"
+								bind:this={knoepfe[k.id]}
+								disabled={laeuft}
+								onclick={() => abmelden(k)}>Abmelden</button
+							>
+						{:else}
+							<button
+								type="button"
+								class="taste-neben"
+								bind:this={knoepfe[k.id]}
+								disabled={laeuft || voll}
+								onclick={() => anmeldenTippen(k)}>Anmelden</button
+							>
+						{/if}
 					{/if}
-				{/if}
+				</div>
+				{@render alleAnmeldungen(k)}
 			</div>
 		{/if}
 	{:else}
@@ -594,8 +585,7 @@
 
 	{#if hatDoppel}
 		<p class="leise">
-			Im Doppel zählt die Summe der Klassierungen (R1 = 1 … R9 = 9, keine Lizenz = 10). Zu starke
-			Paare meldet die Turnierleitung an.
+			Im Doppel zählt die Summe der Klassierungen (R1 = 1 … R9 = 9, keine Lizenz = 10).
 		</p>
 	{/if}
 
@@ -608,34 +598,31 @@
 			<summary class="klappe-titel">Weitere Kategorien mit Wildcard-Antrag</summary>
 			<div>
 				{#each wildcardSichtbar as k (k.id)}
-					<div class="karte kachel">
-						<span>
-							<strong>{k.name}</strong><br />
-							<span class="leise">{kategorieText(k)}</span><br />
-							<span class="leise">{namenText(k.namen)}</span>
-							{#if k.anmeldungId !== null}<br /><span class="plakette plakette-offen"
-									>Wildcard beantragt</span
-								>{/if}
-						</span>
-						{#if offen && !nurAnsehen}
-							{#if k.anmeldungId !== null}
-								<button
-									type="button"
-									class="taste-neben"
-									bind:this={knoepfe[k.id]}
-									disabled={laeuft}
-									onclick={() => abmelden(k, true)}>Zurückziehen</button
-								>
-							{:else}
-								<button
-									type="button"
-									class="taste-neben"
-									bind:this={knoepfe[k.id]}
-									disabled={laeuft || voll}
-									onclick={() => wildcardTippen(k)}>Wildcard beantragen</button
-								>
+					<div class="karte">
+						{@render kopf(k, true)}
+						<div class="kachel">
+							<span class="leise">{kategorieText(k)}</span>
+							{#if offen && !nurAnsehen}
+								{#if k.anmeldungId !== null}
+									<button
+										type="button"
+										class="taste-neben"
+										bind:this={knoepfe[k.id]}
+										disabled={laeuft}
+										onclick={() => abmelden(k, true)}>Zurückziehen</button
+									>
+								{:else}
+									<button
+										type="button"
+										class="taste-neben"
+										bind:this={knoepfe[k.id]}
+										disabled={laeuft || voll}
+										onclick={() => wildcardTippen(k)}>Wildcard beantragen</button
+									>
+								{/if}
 							{/if}
-						{/if}
+						</div>
+						{@render alleAnmeldungen(k)}
 					</div>
 				{/each}
 				{#if offen && voll && !nurAnsehen}
@@ -644,6 +631,10 @@
 			</div>
 		</details>
 	{/if}
+{/if}
+
+{#if cm.kontakt}
+	<p class="leise">{kontaktFragenText(nameText(cm.kontakt, 'vorname-zuerst'))}</p>
 {/if}
 
 <dialog
@@ -793,12 +784,9 @@
 <!-- A-ANMELDUNG-04: Doppel-Kategorie mit Paaren und wer einen Partner sucht. -->
 {#snippet doppelKarte(k: CmKategorie)}
 	<div class="karte">
+		{@render kopf(k, false)}
 		<div class="kachel">
-			<span>
-				<strong>{k.name}</strong><br />
-				<span class="leise">{doppelText(k)}</span><br />
-				<span class="leise">{paareText(k.paare)}</span>
-			</span>
+			<span class="leise">{doppelText(k)}</span>
 			{#if offen && !nurAnsehen}
 				{#if voll}
 					<button type="button" class="taste-neben" bind:this={knoepfe[k.id]} disabled
@@ -818,20 +806,47 @@
 		</div>
 		{@render suchende(k)}
 		{@render meineAnfragen(k)}
+		{@render alleAnmeldungen(k)}
 	</div>
+{/snippet}
+
+<!-- Kartenkopf (UI-Leitbild): Name links, rechts oben die Plakette mit dem eigenen Stand. -->
+{#snippet kopf(k: CmKategorie, wildcard: boolean, ueberschrift = false)}
+	{@const p = standPlakette(k, wildcard)}
+	<div class="karte-kopf">
+		{#if ueberschrift}<h2 id="doppel-{k.id}">{k.name}</h2>{:else}<strong>{k.name}</strong>{/if}
+		{#if p}<span class="plakette plakette-{p.art}">{p.text}</span>{/if}
+	</div>
+{/snippet}
+
+<!-- Kachel auf die Seite der Kategorie mit allen Anmeldungen. -->
+{#snippet alleAnmeldungen(k: CmKategorie)}
+	<a
+		class="kachel karte-teil"
+		href={resolve('/clubmeisterschaft/[id]/kategorie/[kid]', {
+			id: String(cm.turnier.id),
+			kid: String(k.id)
+		})}><span>{anmeldungenText(k)}</span><span class="kachel-pfeil" aria-hidden="true">›</span></a
+	>
 {/snippet}
 
 {#snippet suchende(k: CmKategorie)}
 	{#if k.suchende.length > 0}
-		<div class="karte-teil">
-			<p><span class="plakette plakette-offen">sucht Partner</span></p>
-			{#each k.suchende as s, i (i)}
-				<p>
-					<Name name={s.name} />{#if s.kommentar}<br /><span class="leise">«{s.kommentar}»</span
-						>{/if}
-				</p>
-			{/each}
-		</div>
+		<details
+			class="klappe karte-teil"
+			open={istKlappeOffen(`cm-suchende-${k.id}`)}
+			ontoggle={(e) => merkeKlappe(`cm-suchende-${k.id}`, e.currentTarget.open)}
+		>
+			<summary class="klappe-titel">{suchendeText(k.suchende.length)}</summary>
+			<div>
+				{#each k.suchende as s, i (i)}
+					<p>
+						<Name name={s.name} />{#if s.kommentar}<br /><span class="leise">«{s.kommentar}»</span
+							>{/if}
+					</p>
+				{/each}
+			</div>
+		</details>
 	{/if}
 {/snippet}
 
@@ -859,9 +874,8 @@
 	k: CmKategorie,
 	partner: { name: Namensteile; telefon: string | null; email: string | null }
 )}
-	{@const weitere = weiterePaare(k.paare, partner.name)}
 	<section class="karte" aria-labelledby="doppel-{k.id}">
-		<h2 id="doppel-{k.id}">{k.name}</h2>
+		{@render kopf(k, false, true)}
 		<p class="leise">{doppelText(k)}</p>
 		<p>Du spielst mit <strong>{nameText(partner.name, 'vorname-zuerst')}</strong>.</p>
 		{#if partner.telefon || partner.email}
@@ -871,9 +885,7 @@
 				{#if partner.email}<a href="mailto:{partner.email}">{partner.email}</a>{/if}
 			</p>
 		{/if}
-		{#if weitere.length > 0}
-			<p class="leise">Weitere Paare: {weitere.map(paarText).join(', ')}</p>
-		{/if}
+		{@render alleAnmeldungen(k)}
 		{#if offen && !nurAnsehen}
 			<div class="karte-teil">
 				<p>
@@ -896,17 +908,15 @@
 <!-- A-ANMELDUNG-04, FR-49: allein angemeldet, sucht einen Partner. -->
 {#snippet eigeneSuche(k: CmKategorie, kommentar: string | null)}
 	<section class="karte" aria-labelledby="doppel-{k.id}">
-		<h2 id="doppel-{k.id}">{k.name}</h2>
+		{@render kopf(k, false, true)}
 		<p class="leise">{doppelText(k)}</p>
-		<p>
-			<span class="plakette plakette-offen">sucht Partner</span><br />
-			Du bist allein angemeldet. Wer mag, wählt dich.
-		</p>
+		<p>Du bist allein angemeldet. Wer mag, wählt dich.</p>
 		{#if kommentar}
 			<p class="leise">Dein Kommentar: «{kommentar}»</p>
 		{/if}
 		{@render meineAnfragen(k)}
 		{@render suchende(k)}
+		{@render alleAnmeldungen(k)}
 		{#if offen && !nurAnsehen}
 			<div class="leiste">
 				<a

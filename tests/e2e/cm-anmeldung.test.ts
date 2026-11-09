@@ -9,8 +9,10 @@ import {
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
 	legeOffenesTurnierAn,
+	legeRollenkontoMitBriefCodeAn,
 	meldeZurCmAn,
 	schliesseLoginHilfen,
+	setzeKontaktperson,
 	setzeRufname,
 	setzeSpielerangaben
 } from './hilfen/login.ts';
@@ -78,7 +80,11 @@ async function meldeAn(page: Page, konto: Konto) {
 
 /** Karte einer Kategorie auf der CM-Seite, gefunden über ihren Namen. */
 const karte = (page: Page, name: string) =>
-	page.locator('.karte.kachel').filter({ has: page.getByText(name, { exact: true }) });
+	page.locator('div.karte').filter({ has: page.getByText(name, { exact: true }) });
+
+/** Plakette mit dem eigenen Stand im Kopf einer Karte. */
+const plakette = (page: Page, name: string, text: string) =>
+	karte(page, name).locator('.karte-kopf .plakette', { hasText: text });
 
 test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt Angaben, meldet sich an und ab', async ({
 	page
@@ -88,7 +94,7 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	const fehler = sammleKonsolenfehler(page);
 	const jahr = testjahr(JAHR_MITGLIED, info);
 	const name = `Clubmeisterschaft ${jahr}`;
-	await legeOffenesTurnierAn(jahr, [
+	const { turnierId } = await legeOffenesTurnierAn(jahr, [
 		einzel('Herren R1–R9', 'herren', 'R1'),
 		einzel('Herren R4–R9', 'herren', 'R4'),
 		einzel('Offen R1–R9', 'offen', 'R1'),
@@ -101,6 +107,10 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
 	const mitglied = await legeKontoMitBriefCodeAn('Moritz', nachname);
 	await setzeSpielerangaben(mitglied.mitgliedId, { jahrgang: 1990 });
+	const leitung = `Leitung${info.project.name}`;
+	const cmAdmin = await legeRollenkontoMitBriefCodeAn('Leonie', ['cm'], leitung);
+	await setzeKontaktperson(turnierId, cmAdmin.mitgliedId);
+	const kontaktSatz = `Bei Fragen oder Problemen melde dich bei Leonie ${leitung} (CM-Admin).`;
 
 	await startetVomSymbol(page);
 	await meldeAn(page, mitglied);
@@ -119,6 +129,8 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	await expect(page.getByLabel('Klassierung')).toBeVisible();
 	await expect(page.getByRole('radiogroup', { name: 'Geschlecht' })).toBeVisible();
 	await expect(page.getByLabel('Jahrgang')).toHaveCount(0);
+	// Die Kontaktperson steht auch, solange noch Angaben fehlen.
+	await expect(page.getByText(kontaktSatz, { exact: true })).toBeVisible();
 	await pruefeBildschirm(page, info, 'cm-angaben');
 	await page.getByLabel('Klassierung').selectOption('R6');
 	await page.getByLabel('Mann').check();
@@ -126,8 +138,11 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 
 	// A-ANMELDUNG-03, FR-07: nur passende Kategorien; die Damen-Kategorien fehlen, das Mixed passt
 	// (Doppel ohne Jahrgang, die Mindestsumme prüft erst die Partnerwahl).
-	await expect(page.getByText('0 von 3 Anmeldungen', { exact: true })).toBeVisible();
+	// Kein Zähler: Kontingente zeigt die Seite erst, wenn die Grenze erreicht ist.
+	await expect(page.getByText(/von 3 Anmeldungen/)).toHaveCount(0);
 	await expect(karte(page, 'Herren R1–R9')).toBeVisible();
+	await expect(page.getByText(kontaktSatz, { exact: true })).toBeVisible();
+	await expect(page.getByText('Zu starke Paare', { exact: false })).toHaveCount(0);
 	await expect(karte(page, 'Herren R4–R9')).toBeVisible();
 	await expect(karte(page, 'Offen R1–R9')).toBeVisible();
 	await expect(karte(page, 'Herren Jahrgang bis 1991')).toBeVisible();
@@ -143,9 +158,13 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	await expect(page.getByRole('status')).toHaveText(
 		'Angemeldet für Herren R1–R9. Die Bestätigung kommt per Mail.'
 	);
-	await expect(page.getByText('1 von 3 Anmeldungen', { exact: true })).toBeVisible();
-	await expect(karte(page, 'Herren R1–R9')).toContainText(`Moritz ${nachname}`);
-	await expect(karte(page, 'Herren R1–R9')).toContainText('Du bist angemeldet.');
+	// Der eigene Stand steht als Plakette im Kopf der Karte; Namen stehen nicht in der Übersicht.
+	await expect(plakette(page, 'Herren R1–R9', 'angemeldet')).toBeVisible();
+	await expect(plakette(page, 'Herren R4–R9', 'angemeldet')).toHaveCount(0);
+	await expect(
+		karte(page, 'Herren R1–R9').getByRole('link', { name: '1 angemeldet' })
+	).toBeVisible();
+	await expect(karte(page, 'Herren R1–R9')).not.toContainText(`Moritz ${nachname}`);
 	await pruefeBildschirm(page, info, 'cm-angemeldet');
 
 	// A-ANMELDUNG-02, FR-06: höchstens drei; danach sind die übrigen Tasten gesperrt.
@@ -157,7 +176,6 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	await expect(page.getByRole('status')).toHaveText(
 		'Angemeldet für Offen R1–R9. Die Bestätigung kommt per Mail.'
 	);
-	await expect(page.getByText('3 von 3 Anmeldungen', { exact: true })).toBeVisible();
 	await expect(
 		page.getByText('Mehr als 3 Anmeldungen gehen nicht. Melde dich zuerst irgendwo ab.')
 	).toBeVisible();
@@ -167,9 +185,11 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	// FR-10: abmelden gibt einen Platz frei.
 	await karte(page, 'Offen R1–R9').getByRole('button', { name: 'Abmelden' }).click();
 	await expect(page.getByRole('status')).toHaveText('Abgemeldet von Offen R1–R9.');
-	await expect(page.getByText('2 von 3 Anmeldungen', { exact: true })).toBeVisible();
 	await expect(vierte).toBeEnabled();
-	await expect(karte(page, 'Offen R1–R9')).toContainText('Noch niemand angemeldet.');
+	await expect(plakette(page, 'Offen R1–R9', 'angemeldet')).toHaveCount(0);
+	await expect(
+		karte(page, 'Offen R1–R9').getByRole('link', { name: 'Noch niemand angemeldet' })
+	).toBeVisible();
 
 	// Die Kachel auf der Startseite nennt den neuen Stand.
 	await page
@@ -292,9 +312,22 @@ test('Rufname: Teilnehmerliste zeigt Rufname mit amtlichem Namen', async ({ page
 	await startetVomSymbol(page);
 	await meldeAn(page, betrachter);
 	await page.getByRole('link', { name: new RegExp(`Clubmeisterschaft ${jahr}`) }).click();
-	await expect(karte(page, 'Herren R1–R9')).toContainText(
-		`Angemeldet (1): Hannes (Johannes ${nachname})`
-	);
+	// Ohne Kontaktperson fehlt der Satz; die Namen stehen nicht in der Übersicht.
+	await expect(page.getByText('Bei Fragen oder Problemen', { exact: false })).toHaveCount(0);
+	await expect(karte(page, 'Herren R1–R9')).not.toContainText(nachname);
+	// Die Seite der Kategorie listet die Namen, mit Rufname und amtlichem Namen.
+	await karte(page, 'Herren R1–R9').getByRole('link', { name: '1 angemeldet' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Herren R1–R9' })).toBeVisible();
+	await expect(page.getByRole('link', { name: `‹ Clubmeisterschaft ${jahr}` })).toBeVisible();
+	await expect(page.getByRole('heading', { level: 2, name: 'Angemeldet (1)' })).toBeVisible();
+	// Baustein Name: Rufname, daneben leise der amtliche Name.
+	await expect(page.getByRole('listitem')).toHaveText(`Hannes Johannes ${nachname}`);
 	await pruefeBildschirm(page, info, 'cm-rufname');
+	// Eine Kategorie, die es hier nicht gibt, führt zurück zur Seite der CM.
+	const url = new URL(page.url());
+	await page.goto(url.pathname.replace(/kategorie\/\d+$/, 'kategorie/999999'));
+	await expect(
+		page.getByRole('heading', { level: 1, name: `Clubmeisterschaft ${jahr}` })
+	).toBeVisible();
 	expect(fehler).toEqual([]);
 });

@@ -124,3 +124,41 @@ export function rueckfrageText(anrede: string): string {
 
 /** FR-48, FR-19: Hinweis auf der Anfrage-Karte, bevor der Angefragte annimmt. */
 export const ANNEHMEN_HINWEIS = `Nimmst du an, seid ihr angemeldet. ${PAAR_KONTAKT_HINWEIS}`;
+
+/** Was eine Karte der Übersicht vom eigenen Stand braucht (Browser- und Server-Typ). */
+type EigenerStand = {
+	art: 'einzel' | 'doppel';
+	anmeldungId: number | null;
+	eigen: { art: 'paar' | 'sucht' } | null;
+};
+
+/** Plakette im Kartenkopf: der eigene Stand in der Kategorie, sonst `null`. */
+export function standPlakette<K extends EigenerStand>(
+	k: K,
+	wildcard: boolean
+): { text: 'angemeldet' | 'sucht Partner' | 'Wildcard beantragt'; art: 'ok' | 'offen' } | null {
+	if (k.anmeldungId === null) return null;
+	if (wildcard) return { text: 'Wildcard beantragt', art: 'offen' };
+	if (k.art === 'doppel' && k.eigen?.art === 'sucht')
+		return { text: 'sucht Partner', art: 'offen' };
+	return { text: 'angemeldet', art: 'ok' };
+}
+
+/** Text der Kachel auf die Seite der Kategorie: «12 angemeldet», im Doppel «5 Paare». */
+export function anmeldungenText(k: {
+	art: 'einzel' | 'doppel';
+	namen: unknown[];
+	paare: unknown[];
+}): string {
+	const n = k.art === 'doppel' ? k.paare.length : k.namen.length;
+	if (n === 0) return 'Noch niemand angemeldet';
+	if (k.art === 'doppel') return `${n} ${n === 1 ? 'Paar' : 'Paare'}`;
+	return `${n} angemeldet`;
+}
+
+/** Titel der zugeklappten Suchenden einer Doppel-Karte. */
+export const suchendeText = (n: number): string => `${n} ${n === 1 ? 'sucht' : 'suchen'} Partner`;
+
+/** Hinweis am Ende der Seite einer CM, mit dem Namen der Kontaktperson. */
+export const kontaktFragenText = (name: string): string =>
+	`Bei Fragen oder Problemen melde dich bei ${name} (CM-Admin).`;

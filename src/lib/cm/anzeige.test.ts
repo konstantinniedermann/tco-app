@@ -2,13 +2,17 @@ import { describe, expect, test } from 'vitest';
 import type { KategorieRegel } from '../turnier/passung.ts';
 import {
 	ANNEHMEN_HINWEIS,
+	anmeldungenText,
 	doppelText,
+	kontaktFragenText,
 	kategorieText,
 	kommentarZaehlerText,
 	namenText,
 	paareText,
 	rueckfrageText,
+	standPlakette,
 	standText,
+	suchendeText,
 	SUCHTEXT_MAX,
 	suchtextZaehlerText,
 	waehlbar,
@@ -152,6 +156,71 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 		expect(ANNEHMEN_HINWEIS).toBe(
 			'Nimmst du an, seid ihr angemeldet. Dann sehen deine Gegner und dein Doppelpartner ' +
 				'während der Clubmeisterschaft deine E-Mail-Adresse und Telefonnummer.'
+		);
+	});
+});
+
+describe('Übersicht einer CM: Plakette, Anzahl, Kontakt', () => {
+	const name = { rufname: null, vorname: 'Anna', nachname: 'Beispiel' };
+	const ohne = { anmeldungId: null, eigen: null };
+
+	test('standPlakette je eigenem Stand', () => {
+		expect(standPlakette({ art: 'einzel', anmeldungId: 4, eigen: null }, false)).toEqual({
+			text: 'angemeldet',
+			art: 'ok'
+		});
+		expect(
+			standPlakette(
+				{
+					art: 'doppel',
+					anmeldungId: 5,
+					eigen: { art: 'paar', partner: { name, telefon: null, email: null } }
+				},
+				false
+			)
+		).toEqual({ text: 'angemeldet', art: 'ok' });
+		expect(
+			standPlakette(
+				{ art: 'doppel', anmeldungId: 6, eigen: { art: 'sucht', kommentar: null } },
+				false
+			)
+		).toEqual({ text: 'sucht Partner', art: 'offen' });
+		expect(standPlakette({ art: 'einzel', anmeldungId: 7, eigen: null }, true)).toEqual({
+			text: 'Wildcard beantragt',
+			art: 'offen'
+		});
+		expect(standPlakette({ art: 'einzel', ...ohne }, false)).toBeNull();
+		expect(standPlakette({ art: 'doppel', ...ohne }, false)).toBeNull();
+		expect(standPlakette({ art: 'einzel', ...ohne }, true)).toBeNull();
+	});
+
+	test('anmeldungenText zählt Namen im Einzel und Paare im Doppel', () => {
+		const einzel = (n: number) => ({
+			art: 'einzel' as const,
+			namen: Array(n).fill(name),
+			paare: []
+		});
+		const doppel = (n: number) => ({
+			art: 'doppel' as const,
+			namen: [],
+			paare: Array(n).fill([name, name])
+		});
+		expect(anmeldungenText(einzel(0))).toBe('Noch niemand angemeldet');
+		expect(anmeldungenText(einzel(1))).toBe('1 angemeldet');
+		expect(anmeldungenText(einzel(12))).toBe('12 angemeldet');
+		expect(anmeldungenText(doppel(0))).toBe('Noch niemand angemeldet');
+		expect(anmeldungenText(doppel(1))).toBe('1 Paar');
+		expect(anmeldungenText(doppel(5))).toBe('5 Paare');
+	});
+
+	test('suchendeText in Einzahl und Mehrzahl', () => {
+		expect(suchendeText(1)).toBe('1 sucht Partner');
+		expect(suchendeText(3)).toBe('3 suchen Partner');
+	});
+
+	test('kontaktFragenText nennt die Kontaktperson mit Rolle', () => {
+		expect(kontaktFragenText('Anna Beispiel')).toBe(
+			'Bei Fragen oder Problemen melde dich bei Anna Beispiel (CM-Admin).'
 		);
 	});
 });
