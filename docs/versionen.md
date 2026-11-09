@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.1 — Zeitgrenze für einen langen E2E-Test
+
+- E2E: Der Ablauf Austritt, Wiedereintritt und Auskunft (FR-04) hat unter WebKit in der CI mehr Zeit.
+
 ## 0.20.0 — Gespräch mit der Turnierleitung
 
 - Mitglieder schreiben der Turnierleitung aus der CM-Seite; alle CM-Admins sehen die Gespräche im Posteingang (#71).
