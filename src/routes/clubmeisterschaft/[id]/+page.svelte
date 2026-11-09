@@ -886,7 +886,6 @@
 				{#if partner.email}<a href="mailto:{partner.email}">{partner.email}</a>{/if}
 			</p>
 		{/if}
-		{@render alleAnmeldungen(k)}
 		{#if offen && !nurAnsehen}
 			<div class="karte-teil">
 				<p>
@@ -903,6 +902,7 @@
 				</p>
 			</div>
 		{/if}
+		{@render alleAnmeldungen(k)}
 	</section>
 {/snippet}
 
@@ -917,7 +917,6 @@
 		{/if}
 		{@render meineAnfragen(k)}
 		{@render suchende(k)}
-		{@render alleAnmeldungen(k)}
 		{#if offen && !nurAnsehen}
 			<div class="leiste">
 				<a
@@ -942,6 +941,7 @@
 				>
 			</div>
 		{/if}
+		{@render alleAnmeldungen(k)}
 	</section>
 {/snippet}
 

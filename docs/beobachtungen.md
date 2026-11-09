@@ -281,3 +281,27 @@ Einzel-Liste.
 **Ursprung:** CAS-Review des Branches feat/cm-uebersicht
 
 **Einschätzung:** Niedrig. Prüfen, ob `cmAdmins` auf `gueltigerCmAdmin` umgestellt werden soll, damit es nur eine Regel gibt.
+
+### 2026-11-09 — E2E-Mails scheitern, wenn das Netz «localhost» nicht auflöst
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/hilfen/umgebung.ts` (`MYTCO_SMTP_URL: 'smtp://localhost:51025'`), Mailpit aus `docker-compose.yml` (lauscht nur auf `127.0.0.1`).
+
+**Beobachtung:** nodemailer löst `localhost` zuerst über den DNS-Server des Netzes auf (`resolve4`). Antwortet der mit `ESERVFAIL`, weicht nodemailer auf `::1` aus, wo Mailpit nicht lauscht: Jeder E2E-Test mit Mail scheitert («Keine Mail in Mailpit angekommen», 139 rote Tests). Mit `MYTCO_SMTP_URL=smtp://127.0.0.1:51025` läuft alles.
+
+**Ursprung:** `make check` im Branch feat/cm-uebersicht, nach einem Netzwechsel
+
+**Einschätzung:** Mittel, weil es den Nachweis lahmlegt und wie ein Code-Fehler aussieht. Vorschlag: Standard in `umgebung.ts` (und ggf. `.env.example`) auf `127.0.0.1` stellen.
+
+### 2026-11-09 — Überschrift als erste Zeile einer Karte hat Abstand oben
+
+**Thema:** Verwaltung UI
+
+**Fundort:** `src/lib/design/basis.css` (`h2 { margin-top: var(--abstand-5) }`), z. B. Karte «Deine Angaben» und Seite einer Kategorie («Angemeldet (N)»).
+
+**Beobachtung:** Steht ein `h2` zuoberst in einer `.karte`, kommt zum Innenabstand der Karte noch der Abstand über der Überschrift: sichtbarer Leerraum oben in der Karte.
+
+**Ursprung:** Screenshots der neuen Seite einer Kategorie (feat/cm-uebersicht)
+
+**Einschätzung:** Niedrig, rein optisch. Eine Regel `.karte > h2:first-child { margin-top: 0 }` im Baustein Karte würde es überall beheben; vorher alle Karten mit Überschrift ansehen.
