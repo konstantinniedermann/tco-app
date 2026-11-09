@@ -10,13 +10,19 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 - Mitglieder schreiben der Turnierleitung aus der CM-Seite; alle CM-Admins sehen die Gespräche im Posteingang (#71).
 
+## 0.19.1 — Löschung leert die Kontaktperson, Doku-Abgleich vor dem Release
+
+- Wird ein Mitglied gelöscht, ist es nicht mehr Kontaktperson eines Turniers; die Verwaltung
+  zeigt den Namen danach nicht mehr an. Doku-Abgleich vor dem Release (Datenschutz, Fachmodell,
+  Testkonzept, Leitbild, CI).
+
 ## 0.19.0 — Feinschliff am PC, Seitentitel in der Kopfleiste
 
 - Feinschliff am Computer: Die Kopfleiste zeigt beim Scrollen den Titel der Seite, am Handy wie
   am PC. Am PC stehen die Reiter mit Symbol mittig in der Kopfleiste. In der Verwaltung bleiben
   Seitenleiste, Pfad und Titel beim Scrollen stehen. Die Tabellen der Verwaltung sind einzeilig
-  und passen ohne seitliches Scrollen; lange Namen und Kommentare enden mit «…», die Aktionen
-  einer Anmeldung liegen hinter «Ändern». Die Spielersuche im Dialog «Von Hand anmelden» springt nicht mehr und nennt
+  und passen ohne seitliches Scrollen; lange Namen und Kommentare enden mit «…», ab drei Aktionen
+  liegen sie hinter «Ändern». Die Spielersuche im Dialog «Von Hand anmelden» springt nicht mehr und nennt
   den Hinweis «Ab 2 Buchstaben.».
 
 ## 0.18.0 — CM-Übersicht übersichtlicher, Kontaktperson pro Turnier

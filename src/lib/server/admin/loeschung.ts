@@ -108,6 +108,10 @@ async function loescheKonten(tx: DbOderTx, jetzt: Date) {
 		.update(nachricht)
 		.set({ adminMitgliedId: null })
 		.where(inArray(nachricht.adminMitgliedId, ids));
+	await tx
+		.update(turnier)
+		.set({ kontaktMitgliedId: null })
+		.where(inArray(turnier.kontaktMitgliedId, ids));
 	// 2. Konto (mit Sitzungen, Passkeys, Rollen, Push-Abos), Antworten und eigener Verlauf. Von
 	// den CM-Anmeldungen bleibt nur der Name: ohne Wildcard-Begründung und ohne Kommentar *sucht
 	// Partner*; offene Partner-Anfragen von und an die Gelöschten sind weg.

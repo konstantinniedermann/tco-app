@@ -24,7 +24,8 @@ Fachregeln selbst greifen nicht auf Datenbank oder Oberfläche zu, sondern erhal
 Daten übergeben. So sind sie ohne Aufbau testbar; hier entstehen die meisten Tests.
 
 **Oberfläche:** Keine eigenen Tests für einzelne Bausteine der Oberfläche; sie enthält keine
-Fachlogik und wird über die Ende-zu-Ende-Tests und das Review geprüft.
+Fachlogik und wird über die Ende-zu-Ende-Tests und das Review geprüft. Reine Logik der Oberfläche
+(z. B. `src/lib/ui/navigation.ts`, `src/lib/verwaltung/zeilenaktionen.ts`) darf Einheitstests haben.
 
 **Rechte:** Die Berechtigung prüft immer der Server (ADR-001), also wird sie dort getestet.
 Pro Schnittstelle gibt es einen Test, der jede Rolle durchspielt, auch ohne Login und mit
@@ -58,7 +59,7 @@ Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelhei
 Datenschutzerklärung ohne Login, Profil mit E-Mail-Wechsel und Rufname, Benachrichtigungen, Anlässe,
 Mitteilungen, Verwaltung mit Rollen, Einlesen einer Datei, Briefe einzeln und als Serie mit Druckansicht, Austritt,
 Löschen und Auskunft, Turnier und Kategorien,
-CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, Doppel mit Partner-Anfragen und Doppel-Verwaltung durch den CM-Admin, Navigation und Tiefe der Seiten, dazu Bedienung (Wappen,
+CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, Doppel mit Partner-Anfragen und Doppel-Verwaltung durch den CM-Admin, Seite einer Kategorie, Navigation und Tiefe der Seiten, Titel in der Kopfleiste, Verwaltung am PC (klebender Seitenkopf, einzeilige Tabellen mit «Ändern»), dazu Bedienung (Wappen,
 Statusleiste, Fusszeile, Fokusrahmen). Später *Daten ergänzen* beim ersten Login (FR-02, noch
 geplant).
 
@@ -76,7 +77,7 @@ zählen die Ende-zu-Ende-Tests und das Review.
 
 ## Anforderung → Testfall
 
-Jeder Test nennt im Namen die ID, die er prüft, z. B.
+Jeder Test, der eine Fachregel, einen Grundsatz oder eine Anforderung prüft, nennt im Namen die ID, z. B.
 `FR-24: Einmal-Code gilt nur einmal` oder `RR-04: Datenbank enthält den Brief-Code nicht im Klartext`.
 Ein Test darf mehrere IDs nennen.
 
@@ -109,7 +110,7 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
   (beide aus `scripts/erfundene-mitglieder.ts`; Mona und Theo nur lokal aus `scripts/seed-lokal.ts`); der Musterbrief nimmt dieselbe erste Person, aber mit eigener Adresse.
   Die Beispiel-GV (`scripts/beispiel-anlass.ts`) legt für `make seed` fünf weitere erfundene
   Mitglieder an, das Beispielturnier (`scripts/beispiel-turnier.ts`) sechs weitere erfundene
-  Spieler mit Einzel- und Doppel-Anmeldungen, einem Wildcard-Antrag, Spielern, die einen Partner suchen, und einer offenen Partner-Anfrage.
+  Spieler mit Login (ohne Brief-Code), mit Einzel- und Doppel-Anmeldungen, einem Wildcard-Antrag, Spielern, die einen Partner suchen, und einer offenen Partner-Anfrage; Kontaktperson ist Hanna Muster (CM-Admin).
 - Ausnahme für die lokale Datenbank: Der Testbestand von `make seed`
   (`scripts/beispiel-mitglieder.ts`) kombiniert feste Vornamen mit erkennbar erfundenen
   Nachnamen zu 185 Mitgliedern (zusammen mit den Personas rund 200), ohne Zufall und ohne
@@ -160,8 +161,8 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] Anlass: «In den Kalender» auf einem echten iPhone **in der App vom Startbildschirm** und auf einem Android-Handy; der Termin landet mit Datum, Zeit und Ort im Kalender des Geräts (A-ANLASS-01, SI-19); vorher als Erika in der Verwaltung einen Anlass anlegen (Test ist nach jeder Auslieferung ohne Anlass)
 - [ ] iPhone, App vom Startbildschirm: Telefon und Adresse im Profil ändern; E-Mail ändern, in die Mail-App wechseln und zurück → Schritt 2 mit den zwei Code-Feldern steht da, beide Mails kommen an (über die Umleitung), danach Login mit der neuen Adresse (A-KONTO-01, A-KONTO-02, SI-09)
 - [ ] Verwaltung am PC: die Selbständerung erscheint unter *Für Fairgate* und verschwindet nach dem Abhaken (A-KONTO-02)
-- [ ] iPhone (App vom Startbildschirm) und Android: Reiterwechsel blendet über, Hilfe schiebt sich herein und mit «‹ Start» hinaus, Aufklappbereich öffnet weich; kein grauer Tipp-Blitz, kein Link-Menü beim langen Drücken auf Reiter und Tasten; mit «Bewegung reduzieren» alles ohne Bewegung (UI-09, #54)
-- [ ] iPhone und Android: Kopfleiste und Reiter bleiben beim Scrollen stehen; Tipp auf einen Reiter wirkt auch, während der Inhalt nachläuft; mit offener Tastatur (z. B. Adresse im Profil) sind die Reiter weg, die Kopfleiste bleibt oben, nichts springt, «Weiter» führt ins nächste Feld (Leitbild «Eingabe mit Tastatur», #54)
+- [ ] iPhone (App vom Startbildschirm) und Android: Reiterwechsel blendet über, Hilfe schiebt sich herein und mit «‹ Start» hinaus, Aufklappbereich öffnet weich, der Seitentitel blendet beim Scrollen in die Kopfleiste über, auch in der Verwaltung; kein grauer Tipp-Blitz, kein Link-Menü beim langen Drücken auf Reiter und Tasten; mit «Bewegung reduzieren» alles ohne Bewegung (UI-09, #54)
+- [ ] iPhone und Android: Kopfleiste und Reiter bleiben beim Scrollen stehen, auch die Kopfleiste der Verwaltung, ohne hellen Schleier über Uhr und Akku (Leitbild «Statusleisten-Band»); Tipp auf einen Reiter wirkt auch, während der Inhalt nachläuft; mit offener Tastatur (z. B. Adresse im Profil) sind die Reiter weg, die Kopfleiste bleibt oben, nichts springt, «Weiter» führt ins nächste Feld (Leitbild «Eingabe mit Tastatur», #54)
 - [ ] iPhone (App vom Startbildschirm) und Android: Tipp aufs Wappen führt zur Startseite; mit offener Tastatur schliesst er nur die Tastatur; nach einer ungespeicherten Änderung (z. B. Telefon im Profil) kommt «Nicht gespeichert – trotzdem verlassen?», *Abbrechen* bleibt, *Verlassen* geht weiter (Leitbild «Ungespeicherte Änderungen»)
 - [ ] Steht ein Einrichtungsabend an: mobile Daten statt Club-WLAN, oder die Grenzen pro IP vorher prüfen ([ADR-004](adr/adr-004-login-einmal-code.md), Restrisiken)
 - [ ] Push auf einem echten iPhone **in der App vom Startbildschirm** und auf einem Android-Handy: Push einschalten, als Mitglieder-Admin eine Mitteilung zu einem Anlass schicken → sie kommt an, ein Tipp darauf öffnet den Anlass; nach dem Abmelden kommt keine mehr an (FR-40, FR-44). Offen, bis #39 steht

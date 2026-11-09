@@ -58,7 +58,7 @@ dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einste
 dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs iPhone im selben WLAN mit einem festen Namen je Rolle (Kurt, Theo, Mona, Hanna) (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
 	./scripts/dev-handy.sh
 
-seed: voraussetzungen-env db ## Lokale Datenbank migrieren und Testbestand anlegen (mehrfach ausführbar): 5 Personas mit Login, rund 200 erfundene Mitglieder, eine Beispiel-GV, ein Clubabend und ein Beispielturnier 2027, Brief-Codes ausgeben für Erika (MyTCO-Admin und Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin) (Einstellungen aus .env)
+seed: voraussetzungen-env db ## Lokale Datenbank migrieren und Testbestand anlegen (mehrfach ausführbar): 5 Personas mit Login und Brief-Code, rund 200 erfundene Mitglieder, eine Beispiel-GV, ein Clubabend und ein Beispielturnier 2027 (6 Spieler mit Login ohne Brief-Code, Hanna als Kontaktperson), Brief-Codes ausgeben für Erika (MyTCO-Admin und Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin) (Einstellungen aus .env)
 	node --env-file=.env scripts/migrate.ts
 	node --env-file=.env scripts/seed-lokal.ts
 

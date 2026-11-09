@@ -29,6 +29,8 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
 | Druckansicht der Briefe (Seite *Briefe*, Seite eines Mitglieds) | `src/lib/verwaltung/Briefdruck.svelte` |
 | Zurück-Link, Pfad, Name mit Rufname, Trefferliste der Verwaltung, Rückfrage-Dialog | `src/lib/ui/Zurueck.svelte`, `src/lib/verwaltung/Pfad.svelte`, `src/lib/ui/Name.svelte`, `src/lib/verwaltung/Spielersuche.svelte`, `src/lib/verwaltung/Aktionsdialog.svelte` |
+| Titel in der Kopfleiste (wann er einblendet) | `src/lib/ui/kopftitel.ts`, `src/routes/+layout.svelte`, `src/routes/verwaltung/+layout.svelte` |
+| Seitenkopf der Verwaltung, Tasten einer Tabellenzeile, Dialog «Ändern» (ab drei Aktionen) | `src/lib/verwaltung/Seitenkopf.svelte`, `src/lib/verwaltung/Zeilentasten.svelte`, `src/lib/verwaltung/Zeilenaktionen.svelte`, `src/lib/verwaltung/zeilenaktionen.ts` |
 
 Zwei Prüfungen halten Leitbild und Code beisammen:
 
@@ -269,7 +271,7 @@ er nie.
   «angemeldet», «sucht Partner» oder «Wildcard beantragt»), den Bedingungen und der Taste; keine
   Namenslisten, stattdessen eine Kachel «12 angemeldet ›» (im Doppel «5 Paare ›») auf die Seite der
   Kategorie; die Suchenden im Doppel zugeklappt. Am Ende der Seite, auch wenn noch Angaben fehlen,
-  die Karte «Fragen oder Probleme?» mit leise «Kontaktperson: <Name> (CM-Admin)» und der Kachel
+  die Karte «Fragen oder Probleme?» mit leise «Kontaktperson: <Vorname Nachname> (CM-Admin)» (amtlicher Name ohne Rufname, damit keine doppelten Klammern entstehen) und der Kachel
   «Schreib der Turnierleitung ›» (Kartenkopf mit Plakette «neue Antwort», `.plakette-offen`, solange eine Antwort ungelesen
   ist); ohne gültige Kontaktperson fällt die Karte weg, ausser es gibt schon ein Gespräch: dann ohne
   Zeile «Kontaktperson», mit der Kachel «Dein Gespräch mit der Turnierleitung ›». Die Kachel steht nur, wo geschrieben werden darf oder schon ein Gespräch besteht; die Kontaktperson selbst sieht die Karte mit ihrem Namen, ohne Kachel.
@@ -571,7 +573,8 @@ Sie trennen nicht, weil die Tabelle auf schmalem Bildschirm ohnehin waagrecht sc
 
 ## Mockups
 
-Vorlagen für die ersten Bildschirme (Abnahme durch den Projektleiter in #13). Sie binden `tokens.css`
+Vorlagen für die ersten Bildschirme (Abnahme durch den Projektleiter in #13). Die CM-Anmeldung
+(Zähler) und die Reiter am PC sind dort überholt; massgebend ist der Text dieses Leitbilds. Sie binden `tokens.css`
 und `basis.css` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im Browser öffnen:
 
 - [Mockups](ui-mockups/index.html): Login, erstes Login (Schritt 2 von 3), Startseite mit
