@@ -275,20 +275,30 @@ test('FR-49, FR-10: allein mit Kommentar, Kommentar sichtbar, Abmelden zieht Paa
 		'Angemeldet für Mixed Doppel. Die Bestätigung kommt per Mail.'
 	);
 	const eigene = eigeneKarte(page);
-	await expect(eigene).toContainText('sucht Partner');
+	await expect(eigene.locator('.karte-kopf .plakette', { hasText: 'sucht Partner' })).toBeVisible();
 	await expect(eigene).toContainText('Du bist allein angemeldet. Wer mag, wählt dich.');
 	await expect(eigene).toContainText(`Dein Kommentar: «${KOMMENTAR}»`);
 	await expect(eigene.getByRole('link', { name: 'Partner anfragen' })).toBeVisible();
 	await expect(eigene.getByRole('button', { name: 'Kommentar ändern' })).toBeVisible();
 	await pruefeBildschirm(page, info, 'cm-doppel-sucht');
 
-	// Ein drittes Mitglied sieht bei der Kategorie, dass Lea sucht, mit ihrem Kommentar.
+	// Ein drittes Mitglied sieht bei der Kategorie, dass Lea sucht, mit ihrem Kommentar: zugeklappt,
+	// erst ein Tipp zeigt die Namen.
 	const ottos = await zweitesGeraet(page, info);
 	await meldeAn(ottos.seite, otto);
 	await oeffneCm(ottos.seite, turnierId, jahr);
-	await expect(doppelKarte(ottos.seite)).toContainText('sucht Partner');
-	await expect(doppelKarte(ottos.seite)).toContainText(leaName);
-	await expect(doppelKarte(ottos.seite)).toContainText(`«${KOMMENTAR}»`);
+	const suchende = doppelKarte(ottos.seite).getByText('1 sucht Partner', { exact: true });
+	await expect(suchende).toBeVisible();
+	await expect(doppelKarte(ottos.seite).getByText(leaName)).toBeHidden();
+	await suchende.click();
+	await expect(doppelKarte(ottos.seite).getByText(leaName)).toBeVisible();
+	await expect(doppelKarte(ottos.seite).getByText(`«${KOMMENTAR}»`)).toBeVisible();
+	// Auf der Seite der Kategorie steht Lea unter «Sucht Partner», mit Kommentar.
+	await doppelKarte(ottos.seite).getByRole('link', { name: 'Noch kein Paar' }).click();
+	const suchendeListe = ottos.seite.getByRole('region', { name: 'Sucht Partner (1)' });
+	await expect(suchendeListe).toContainText(leaName);
+	await expect(suchendeListe).toContainText(`«${KOMMENTAR}»`);
+	await oeffneCm(ottos.seite, turnierId, jahr);
 
 	// Marco findet Lea als «sucht Partner» mit Kommentar und fragt sie an.
 	const marcos = await zweitesGeraet(page, info);
@@ -315,19 +325,28 @@ test('FR-49, FR-10: allein mit Kommentar, Kommentar sichtbar, Abmelden zieht Paa
 		`Angemeldet mit ${marcoName} für Mixed Doppel. Die Bestätigung kommt per Mail.`
 	);
 	await expect(eigeneKarte(page)).toContainText(`Du spielst mit ${marcoName}.`);
+	await expect(
+		eigeneKarte(page).locator('.karte-kopf .plakette', { hasText: 'angemeldet' })
+	).toBeVisible();
 	await expect(page.getByText(KOMMENTAR)).toHaveCount(0);
 	await ottos.seite.reload();
-	await expect(doppelKarte(ottos.seite)).toContainText('Angemeldet (1):');
-	await expect(doppelKarte(ottos.seite)).toContainText(leaName);
-	await expect(doppelKarte(ottos.seite)).toContainText(marcoName);
+	// Die Übersicht zählt die Paare; die Namen stehen auf der Seite der Kategorie.
+	await expect(doppelKarte(ottos.seite).getByRole('link', { name: '1 Paar' })).toBeVisible();
+	await expect(doppelKarte(ottos.seite)).not.toContainText(marcoName);
 	await expect(ottos.seite.getByText(KOMMENTAR)).toHaveCount(0);
 	await expect(doppelKarte(ottos.seite).getByText('sucht Partner')).toHaveCount(0);
+	await doppelKarte(ottos.seite).getByRole('link', { name: '1 Paar' }).click();
+	await expect(ottos.seite.getByRole('heading', { level: 1, name: MIXED.name })).toBeVisible();
+	await expect(ottos.seite.getByRole('listitem')).toContainText([leaName]);
+	await expect(ottos.seite.getByRole('listitem')).toContainText([marcoName]);
 
 	// FR-10: Marco meldet sich ab; die ganze Anmeldung ist zurückgezogen, Lea bekommt eine Mail.
 	await oeffneCm(marcos.seite, turnierId, jahr);
 	await eigeneKarte(marcos.seite).getByRole('button', { name: 'Abmelden' }).click();
 	await expect(marcos.seite.getByRole('status')).toHaveText('Abgemeldet von Mixed Doppel.');
-	await expect(doppelKarte(marcos.seite)).toContainText('Noch niemand angemeldet.');
+	await expect(
+		doppelKarte(marcos.seite).getByRole('link', { name: 'Noch kein Paar' })
+	).toBeVisible();
 	const abgemeldet = await warteAufMail(
 		lea.email,
 		'Clubmeisterschaft',
@@ -338,7 +357,7 @@ test('FR-49, FR-10: allein mit Kommentar, Kommentar sichtbar, Abmelden zieht Paa
 	);
 	await page.reload();
 	await expect(eigeneKarte(page)).toHaveCount(0);
-	await expect(doppelKarte(page)).toContainText('Noch niemand angemeldet.');
+	await expect(doppelKarte(page).getByRole('link', { name: 'Noch kein Paar' })).toBeVisible();
 
 	expect(fehler).toEqual([]);
 	expect(ottos.fehler).toEqual([]);

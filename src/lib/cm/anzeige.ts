@@ -39,21 +39,9 @@ export function kategorieText(k: KategorieRegel): string {
 		.join(' · ');
 }
 
-/** A-ANMELDUNG-01: Namen der bestätigten Anmeldungen einer Kategorie. */
-export const namenText = (namen: Namensteile[]): string =>
-	namen.length === 0
-		? 'Noch niemand angemeldet.'
-		: `Angemeldet (${namen.length}): ${namen.map((n) => nameText(n, 'vorname-zuerst')).join(', ')}`;
-
 /** A-ANMELDUNG-04: ein Paar in der kurzen Textform, «Lea Beispiel / Hannes (Johannes Muster)». */
 export const paarText = (paar: Namensteile[]): string =>
 	paar.map((n) => nameText(n, 'vorname-zuerst')).join(' / ');
-
-/** A-ANMELDUNG-04: die bestätigten Paare einer Doppel-Kategorie, wie `namenText` im Einzel. */
-export const paareText = (paare: Namensteile[][]): string =>
-	paare.length === 0
-		? 'Noch niemand angemeldet.'
-		: `Angemeldet (${paare.length}): ${paare.map(paarText).join(', ')}`;
 
 /** FR-08: Längengrenze des Wildcard-Kommentars. */
 export const KOMMENTAR_MAX = 300;
@@ -98,13 +86,6 @@ export const KONTAKT_HINWEIS =
 export const waehlbar = (nummer: string): string =>
 	`${nummer.trim().startsWith('+') ? '+' : ''}${nummer.replace(/\D/g, '')}`;
 
-const gleicherName = (a: Namensteile, b: Namensteile) =>
-	a.rufname === b.rufname && a.vorname === b.vorname && a.nachname === b.nachname;
-
-/** FR-19: die bestätigten Paare der Kategorie ohne das eigene (das mit dem Partner). */
-export const weiterePaare = (paare: Namensteile[][], partner: Namensteile): Namensteile[][] =>
-	paare.filter((p) => !p.some((n) => gleicherName(n, partner)));
-
 /** FR-19: wie `KONTAKT_HINWEIS`, für den Weg über die Anfrage (Rückfrage, Annehmen). */
 const PAAR_KONTAKT_HINWEIS =
 	'Dann sehen deine Gegner und dein Doppelpartner während der Clubmeisterschaft deine ' +
@@ -124,3 +105,42 @@ export function rueckfrageText(anrede: string): string {
 
 /** FR-48, FR-19: Hinweis auf der Anfrage-Karte, bevor der Angefragte annimmt. */
 export const ANNEHMEN_HINWEIS = `Nimmst du an, seid ihr angemeldet. ${PAAR_KONTAKT_HINWEIS}`;
+
+/** Was eine Karte der Übersicht vom eigenen Stand braucht (Browser- und Server-Typ). */
+type EigenerStand = {
+	art: 'einzel' | 'doppel';
+	anmeldungId: number | null;
+	eigen: { art: 'paar' | 'sucht' } | null;
+};
+
+/** Plakette im Kartenkopf: der eigene Stand in der Kategorie, sonst `null`. */
+export function standPlakette<K extends EigenerStand>(
+	k: K,
+	wildcard: boolean
+): { text: 'angemeldet' | 'sucht Partner' | 'Wildcard beantragt'; art: 'ok' | 'offen' } | null {
+	if (k.anmeldungId === null) return null;
+	if (wildcard) return { text: 'Wildcard beantragt', art: 'offen' };
+	if (k.art === 'doppel' && k.eigen?.art === 'sucht')
+		return { text: 'sucht Partner', art: 'offen' };
+	return { text: 'angemeldet', art: 'ok' };
+}
+
+/** Text der Kachel auf die Seite der Kategorie: «12 angemeldet», im Doppel «5 Paare». */
+export function anmeldungenText(k: {
+	art: 'einzel' | 'doppel';
+	namen: unknown[];
+	paare: unknown[];
+}): string {
+	const n = k.art === 'doppel' ? k.paare.length : k.namen.length;
+	// Im Doppel zählen nur Paare; wer allein sucht, steht zugeklappt darüber.
+	if (k.art === 'doppel') return n === 0 ? 'Noch kein Paar' : `${n} ${n === 1 ? 'Paar' : 'Paare'}`;
+	if (n === 0) return 'Noch niemand angemeldet';
+	return `${n} angemeldet`;
+}
+
+/** Titel der zugeklappten Suchenden einer Doppel-Karte. */
+export const suchendeText = (n: number): string => `${n} ${n === 1 ? 'sucht' : 'suchen'} Partner`;
+
+/** Hinweis am Ende der Seite einer CM, mit dem Namen der Kontaktperson. */
+export const kontaktFragenText = (name: string): string =>
+	`Bei Fragen oder Problemen melde dich bei ${name} (CM-Admin).`;

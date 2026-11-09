@@ -4,6 +4,8 @@ import { nameFuerText, zaehleAktive, zaehleUnpassende } from '../cm/anmeldungen.
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
 	kategorie,
+	konto,
+	kontoRolle,
 	mitglied,
 	partnerAnfrage,
 	turnier,
@@ -12,6 +14,8 @@ import {
 	type TurnierStatus
 } from '../db/schema.ts';
 import { namensSpalten } from '../namen.ts';
+import { gueltigerCmAdmin, kontaktGueltig } from './kontakt.ts';
+import type { Namensteile } from '../../name.ts';
 import { istStufe } from '../../turnier/klassierung.ts';
 import { vorSchluss, wirksamerStatus } from '../../turnier/status.ts';
 import type { KategorieWerte, TurnierWerte } from './angaben.ts';
@@ -32,12 +36,47 @@ export type KategorieZeile = KategorieWerte & {
 	anmeldungen: number;
 };
 
-export type TurnierDetail = TurnierWerte & {
+export type TurnierDetail = Omit<TurnierWerte, 'kontakt'> & {
 	id: number;
 	status: TurnierStatus;
 	gespeicherterStatus: TurnierStatus;
 	kategorien: KategorieZeile[];
+	/** Gewählte Kontaktperson; `gueltig: false`, wenn sie nicht mehr gültig CM-Admin ist. */
+	kontakt: { mitgliedId: number; name: Namensteile; gueltig: boolean } | null;
+	/** Wer als Kontaktperson gewählt werden kann: alle gültigen CM-Admins. */
+	kontaktWahl: { mitgliedId: number; name: Namensteile }[];
 };
+
+const namenOrdnung = new Intl.Collator('de-CH');
+
+async function kontaktWahl(db: DbOderTx): Promise<TurnierDetail['kontaktWahl']> {
+	const zeilen = await db
+		.select({ mitgliedId: mitglied.id, ...namensSpalten })
+		.from(mitglied)
+		.innerJoin(konto, eq(konto.mitgliedId, mitglied.id))
+		.innerJoin(kontoRolle, eq(kontoRolle.kontoId, konto.id))
+		.where(gueltigerCmAdmin);
+	return zeilen
+		.map((z) => ({
+			mitgliedId: z.mitgliedId,
+			name: { rufname: z.rufname, vorname: z.vorname, nachname: z.nachname }
+		}))
+		.sort(
+			(a, b) =>
+				namenOrdnung.compare(a.name.nachname, b.name.nachname) ||
+				namenOrdnung.compare(a.name.vorname, b.name.vorname)
+		);
+}
+
+async function ladeKontakt(
+	db: DbOderTx,
+	mitgliedId: number | null
+): Promise<TurnierDetail['kontakt']> {
+	if (mitgliedId === null) return null;
+	const [m] = await db.select(namensSpalten).from(mitglied).where(eq(mitglied.id, mitgliedId));
+	if (!m) return null;
+	return { mitgliedId, name: m, gueltig: await kontaktGueltig(db, mitgliedId) };
+}
 
 const UNIQUE_VERLETZT = '23505';
 
@@ -160,7 +199,9 @@ export async function ladeTurnier(db: Db, id: number, jetzt: Date): Promise<Turn
 		gespeicherterStatus: t.status,
 		kategorien: await Promise.all(
 			kategorien.map(async (k) => kategorieZeile(k, await zaehleAktive(db, k.id)))
-		)
+		),
+		kontakt: await ladeKontakt(db, t.kontaktMitgliedId),
+		kontaktWahl: await kontaktWahl(db)
 	};
 }
 
@@ -168,18 +209,27 @@ export async function aendereTurnier(
 	db: Db,
 	id: number,
 	w: TurnierWerte
-): Promise<'ok' | 'vergeben' | 'nicht-gefunden'> {
+): Promise<'ok' | 'vergeben' | 'nicht-gefunden' | 'kontakt-ungueltig'> {
 	try {
 		return await db.transaction(async (tx) => {
 			const [t] = await tx
-				.select({ id: turnier.id })
+				.select({ id: turnier.id, kontakt: turnier.kontaktMitgliedId })
 				.from(turnier)
 				.where(eq(turnier.id, id))
 				.for('update');
 			if (!t) return 'nicht-gefunden' as const;
+			// Eine neue Wahl muss jetzt CM-Admin sein; die gespeicherte bleibt stehen, auch wenn sie
+			// es nicht mehr ist, damit Name oder Anmeldeschluss änderbar bleiben (Mitglieder sehen sie nicht).
+			const neu = w.kontakt !== undefined && w.kontakt !== null && w.kontakt !== t.kontakt;
+			if (neu && !(await kontaktGueltig(tx, w.kontakt!))) return 'kontakt-ungueltig' as const;
 			await tx
 				.update(turnier)
-				.set({ jahr: w.jahr, name: w.name, anmeldeschluss: w.anmeldeschluss })
+				.set({
+					jahr: w.jahr,
+					name: w.name,
+					anmeldeschluss: w.anmeldeschluss,
+					...(w.kontakt === undefined ? {} : { kontaktMitgliedId: w.kontakt })
+				})
 				.where(eq(turnier.id, id));
 			await ersetzeNummern(tx, id, w.nummern);
 			return 'ok' as const;

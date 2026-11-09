@@ -7,7 +7,16 @@
 		name: string;
 		anmeldeschluss: string;
 		nummern: { bezeichnung: string; nummer: string }[];
+		/** Mitglied-ID der Kontaktperson als Text, `''` = keine; fehlt beim neuen Turnier. */
+		kontakt?: string;
 	};
+
+	/** Für den Server: die Kontaktperson als Zahl bzw. `null`; ohne Feld bleibt sie weg. */
+	export function angabenFuerServer(w: TurnierWerte) {
+		const { kontakt, ...rest } = w;
+		if (kontakt === undefined) return rest;
+		return { ...rest, kontakt: kontakt === '' ? null : Number(kontakt) };
+	}
 
 	export const nameFuerJahr = (jahr: string) => `Clubmeisterschaft ${jahr.trim()}`.trim();
 
@@ -22,13 +31,15 @@
 			jahr: String(t.jahr),
 			name: t.name,
 			anmeldeschluss: t.anmeldeschluss,
-			nummern: t.nummern.map((n) => ({ bezeichnung: n.bezeichnung, nummer: n.nummer }))
+			nummern: t.nummern.map((n) => ({ bezeichnung: n.bezeichnung, nummer: n.nummer })),
+			kontakt: t.kontakt ? String(t.kontakt.mitgliedId) : ''
 		};
 	}
 </script>
 
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
+	import { nameText } from '../name.ts';
 
 	type Props = {
 		start: TurnierWerte;
@@ -43,6 +54,8 @@
 		rueckmeldung?: string | null;
 		/** Die Rolle darf nur lesen: Felder gesperrt, ohne Tasten (UI-Leitbild, Baustein Nur lesen). */
 		nurLesen?: boolean;
+		/** Bestehendes Turnier: Wahl der Kontaktperson unter den CM-Admins. */
+		kontaktWahl?: Pick<TurnierAnsicht, 'kontakt' | 'kontaktWahl'>;
 		onspeichern: (werte: TurnierWerte) => void;
 	};
 	let {
@@ -54,6 +67,7 @@
 		nurBeiAenderung = false,
 		rueckmeldung = null,
 		nurLesen = false,
+		kontaktWahl,
 		onspeichern
 	}: Props = $props();
 
@@ -74,6 +88,8 @@
 	let anmeldeschluss = $state(start.anmeldeschluss);
 	// svelte-ignore state_referenced_locally
 	let nummern = $state<Zeile[]>(start.nummern.map(zeile));
+	// svelte-ignore state_referenced_locally
+	let kontakt = $state(start.kontakt);
 	let nameVonHand = false;
 	let formular = $state<HTMLFormElement>();
 	let weitere = $state<HTMLButtonElement>();
@@ -83,7 +99,12 @@
 		jahr !== start.jahr ||
 			name !== start.name ||
 			anmeldeschluss !== start.anmeldeschluss ||
-			JSON.stringify(liste) !== JSON.stringify(start.nummern)
+			JSON.stringify(liste) !== JSON.stringify(start.nummern) ||
+			kontakt !== start.kontakt
+	);
+	// Die gespeicherte Person ist nicht mehr CM-Admin: Sie bleibt wählbar, damit Speichern sie behält.
+	const ehemalig = $derived(
+		kontaktWahl?.kontakt && !kontaktWahl.kontakt.gueltig ? kontaktWahl.kontakt : null
 	);
 
 	// Welche Zeile der Server beanstandet, sagt er nicht; die Grenzen (FR-33) stehen in
@@ -91,7 +112,7 @@
 	const bezeichnungFalsch = (n: Zeile) => !n.bezeichnung.trim() || n.bezeichnung.trim().length > 60;
 	const nummerFalsch = (n: Zeile) => !/^\d{1,12}$/.test(n.nummer.trim());
 
-	const REIHE: TurnierFeld[] = ['jahr', 'name', 'anmeldeschluss', 'nummern'];
+	const REIHE: TurnierFeld[] = ['jahr', 'name', 'anmeldeschluss', 'nummern', 'kontakt'];
 
 	// UI-06: nach einer Rückmeldung des Servers steht der Fokus im ersten Feld mit Fehler.
 	// Nur `fehler` löst das aus; Tippen in den Feldern darf den Fokus nicht verschieben.
@@ -136,7 +157,13 @@
 
 	function abschicken(event: SubmitEvent) {
 		event.preventDefault();
-		onspeichern({ jahr, name, anmeldeschluss, nummern: liste });
+		onspeichern({
+			jahr,
+			name,
+			anmeldeschluss,
+			nummern: liste,
+			...(kontakt === undefined ? {} : { kontakt })
+		});
 	}
 
 	const beschreibung = (...ids: (string | false | undefined)[]) =>
@@ -262,4 +289,40 @@
 			<p class="leise">Keine Turniernummern.</p>
 		{/if}
 	</fieldset>
+	{#if kontaktWahl}
+		<div class="feld-zeile">
+			<label for="turnier-kontakt">Kontaktperson <span class="leise">(freiwillig)</span></label>
+			<select
+				id="turnier-kontakt"
+				bind:value={kontakt}
+				aria-invalid={fehler.kontakt ? 'true' : undefined}
+				aria-describedby={beschreibung(
+					'turnier-kontakt-hilfe',
+					!!fehler.kontakt && 'fehler-turnier-kontakt'
+				)}
+			>
+				<option value="">keine</option>
+				{#if ehemalig}
+					<option value={String(ehemalig.mitgliedId)}
+						>{nameText(ehemalig.name, 'vorname-zuerst')} (nicht mehr CM-Admin)</option
+					>
+				{/if}
+				{#each kontaktWahl.kontaktWahl as k (k.mitgliedId)}
+					<option value={String(k.mitgliedId)}>{nameText(k.name, 'vorname-zuerst')}</option>
+				{/each}
+			</select>
+			<span class="feld-hilfe" id="turnier-kontakt-hilfe"
+				>Den Namen der Kontaktperson sehen alle Mitglieder auf der Seite der Clubmeisterschaft, mit
+				«Bei Fragen oder Problemen melde dich bei …».</span
+			>
+			{#if fehler.kontakt}
+				<p class="fehler" id="fehler-turnier-kontakt">{fehler.kontakt}</p>
+			{/if}
+			{#if !kontaktWahl.kontakt}
+				<p class="leise">Keine Kontaktperson gewählt.</p>
+			{:else if ehemalig}
+				<p class="leise">Die Kontaktperson ist nicht mehr CM-Admin.</p>
+			{/if}
+		</div>
+	{/if}
 {/snippet}

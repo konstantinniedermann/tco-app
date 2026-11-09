@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import Seitenkopf from '../../../../lib/verwaltung/Seitenkopf.svelte';
 	import Turnierformular, {
+		angabenFuerServer,
 		werteAusTurnier,
 		type TurnierWerte
 	} from '../../../../lib/verwaltung/Turnierformular.svelte';
@@ -86,7 +87,7 @@
 		fehler = {};
 		allgemein = null;
 		rueckmeldung = null;
-		const a = await aendereTurnier(detail.id, werte);
+		const a = await aendereTurnier(detail.id, angabenFuerServer(werte));
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok') {
 			if (await neuLaden()) schluessel++;
@@ -245,6 +246,7 @@
 			nurBeiAenderung
 			{rueckmeldung}
 			{nurLesen}
+			kontaktWahl={detail}
 			onspeichern={speichern}
 		/>
 	{/key}

@@ -15,6 +15,16 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   einer Anmeldung liegen hinter «Ändern». Die Spielersuche im Dialog «Von Hand anmelden» springt nicht mehr und nennt
   den Hinweis «Ab 2 Buchstaben.».
 
+## 0.18.0 — CM-Übersicht übersichtlicher, Kontaktperson pro Turnier
+
+- Clubmeisterschaft übersichtlicher: kein Zähler «1 von 3 Anmeldungen» mehr; wo man dabei ist,
+  steht als Plakette («angemeldet», «sucht Partner», «Wildcard beantragt») neben dem
+  Kategorienamen. Die Namen der Angemeldeten stehen auf einer eigenen Seite der Kategorie
+  («12 angemeldet ›»), die Suchenden im Doppel sind zugeklappt.
+- Kontaktperson pro Turnier: Der CM-Admin wählt im Turnier eine Person mit der Rolle CM-Admin;
+  Mitglieder sehen am Ende der Seite «Bei Fragen oder Problemen melde dich bei … (CM-Admin).»
+  (Name ohne Kontaktdaten). Der Hinweis «Zu starke Paare meldet die Turnierleitung an» fällt weg.
+
 ## 0.17.2 — Testdaten: Suchende im Doppel anfragbar
 
 - Testdaten (`make seed`): Die Beispielspieler der Clubmeisterschaft haben ein Konto mit Login.

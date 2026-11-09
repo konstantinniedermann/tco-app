@@ -284,6 +284,31 @@ describe('Turnier-Schnittstellen', () => {
 		).toBe(404);
 	});
 
+	test('Kontaktperson: nur CM-Admins, sonst 400 mit Feld kontakt', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm']);
+		const jahr = await freiesJahr(2071);
+		const { id } = await (await postTurniere(s.d, post(cm, turnierAngaben(jahr)))).json();
+		const admin = await legeMitgliedAn(db, { rollen: ['cm'] });
+		const ohne = await legeMitgliedAn(db);
+		const falsch = await postTurnier(
+			s.d,
+			post(cm, turnierAngaben(jahr, { kontakt: ohne.mitgliedId }), { id: String(id) })
+		);
+		expect(falsch.status).toBe(400);
+		expect(await falsch.json()).toEqual({
+			fehler: 'eingabe',
+			felder: { kontakt: 'Diese Person ist nicht CM-Admin.' }
+		});
+		const gut = await postTurnier(
+			s.d,
+			post(cm, turnierAngaben(jahr, { kontakt: admin.mitgliedId }), { id: String(id) })
+		);
+		expect(gut.status).toBe(200);
+		const t = await (await getTurnier(s.d, hole(cm, { id: String(id) }))).json();
+		expect(t.kontakt).toMatchObject({ mitgliedId: admin.mitgliedId, gueltig: true });
+	});
+
 	test('FR-35: absagen, danach ändern ergibt 409 abgesagt', async () => {
 		const s = baue();
 		const cm = await bestaetigt(s, ['cm']);

@@ -57,6 +57,25 @@ describe('Prüfung Turnier', () => {
 		expect(lang).toMatchObject({ ok: false, felder: { name: 'Höchstens 120 Zeichen.' } });
 	});
 
+	it('Kontaktperson: fehlt = unverändert, null = keine, positive Zahl = Mitglied', () => {
+		const werteVon = (kontakt: unknown) => {
+			const r = pruefeTurnier({ ...turnier, kontakt });
+			return r.ok ? r.werte.kontakt : 'fehler';
+		};
+		const ohne = pruefeTurnier(turnier);
+		expect(ohne.ok && 'kontakt' in ohne.werte).toBe(false);
+		expect(werteVon(null)).toBeNull();
+		expect(werteVon(7)).toBe(7);
+		expect(werteVon('7')).toBe(7);
+		for (const falsch of ['x', 0, -1, 1.5, {}]) {
+			const r = pruefeTurnier({ ...turnier, kontakt: falsch });
+			expect(r).toMatchObject({
+				ok: false,
+				felder: { kontakt: 'Bitte eine Person aus der Liste wählen.' }
+			});
+		}
+	});
+
 	it('FR-33: Jahr darf als Zahl oder Zahlentext kommen, nicht als Unsinn', () => {
 		expect(pruefeTurnier({ ...turnier, jahr: '2027' }).ok).toBe(true);
 		expect(pruefeTurnier({ ...turnier, jahr: 2027.5 }).ok).toBe(false);

@@ -7,11 +7,17 @@ import {
 	anmeldungSpieler,
 	kategorie,
 	konto,
+	kontoRolle,
 	mitglied,
 	partnerAnfrage
 } from '../db/schema.ts';
 import type { KategorieWerte } from '../turnier/angaben.ts';
-import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../turnier/turniere.ts';
+import {
+	aendereTurnier,
+	legeKategorieAn,
+	legeTurnierAn,
+	setzeStatus
+} from '../turnier/turniere.ts';
 import { setzeKlassierung } from './angaben.ts';
 import {
 	beantrageWildcard,
@@ -258,7 +264,8 @@ describe('CM-Anmeldung', () => {
 			wildcard: [],
 			eigene: [],
 			anfragen: [],
-			grenze: 3
+			grenze: 3,
+			kontakt: null
 		});
 		for (const k of [damen, schwach, senioren, abgesagt]) {
 			expect(await meldeAn(db, k, ich, t.jetzt)).not.toBe('ok');
@@ -980,5 +987,78 @@ describe('CM-Anmeldung', () => {
 			expect(json).not.toContain(verboten);
 		}
 		expect(ansicht?.anfragen).toEqual([]);
+	});
+});
+
+describe('Kontaktperson der CM', () => {
+	/** Offenes Turnier mit `kontakt` als Kontaktperson (vorher gültig CM-Admin). */
+	async function mitKontakt() {
+		const admin = await legeMitgliedAn(db, {
+			vorname: 'Kontakta',
+			nachname: 'Beispiel',
+			rufname: 'Kati',
+			rollen: ['cm']
+		});
+		const t = await offenesTurnier();
+		const r = await aendereTurnier(db, t.id, {
+			jahr: t.jahr,
+			name: `Clubmeisterschaft ${t.jahr}`,
+			anmeldeschluss: `${t.jahr}-05-31`,
+			nummern: [],
+			kontakt: admin.mitgliedId
+		});
+		expect(r).toBe('ok');
+		return { t, admin };
+	}
+	const kontaktFuer = async (turnierId: number, jetzt: Date) =>
+		(await ladeCmAnsicht(db, turnierId, await spieler(), jetzt))?.kontakt;
+
+	test('zeigt den Namen der gewählten Kontaktperson', async () => {
+		const { t } = await mitKontakt();
+		expect(await kontaktFuer(t.id, t.jetzt)).toEqual({
+			rufname: 'Kati',
+			vorname: 'Kontakta',
+			nachname: 'Beispiel'
+		});
+	});
+
+	test('ohne gewählte Kontaktperson null', async () => {
+		const t = await offenesTurnier();
+		expect(await kontaktFuer(t.id, t.jetzt)).toBeNull();
+	});
+
+	test('null nach Entzug der Rolle cm', async () => {
+		const { t, admin } = await mitKontakt();
+		await db.delete(kontoRolle).where(eq(kontoRolle.kontoId, admin.kontoId));
+		expect(await kontaktFuer(t.id, t.jetzt)).toBeNull();
+	});
+
+	test('null bei gesperrtem Konto', async () => {
+		const { t, admin } = await mitKontakt();
+		await db.update(konto).set({ gesperrt: true }).where(eq(konto.id, admin.kontoId));
+		expect(await kontaktFuer(t.id, t.jetzt)).toBeNull();
+	});
+
+	test('null nach Austritt und bei Vormerkung zum Löschen', async () => {
+		const a = await mitKontakt();
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten', austrittAm: new Date() })
+			.where(eq(mitglied.id, a.admin.mitgliedId));
+		expect(await kontaktFuer(a.t.id, a.t.jetzt)).toBeNull();
+		const b = await mitKontakt();
+		await db
+			.update(mitglied)
+			.set({ status: 'vorgemerkt', vorgemerktAm: new Date(), statusVorher: 'aktiv' })
+			.where(eq(mitglied.id, b.admin.mitgliedId));
+		expect(await kontaktFuer(b.t.id, b.t.jetzt)).toBeNull();
+	});
+
+	test('auch wenn dem Spieler Angaben fehlen', async () => {
+		const { t } = await mitKontakt();
+		const ohneAngaben = await spieler({ klassierung: null, jahrgang: null });
+		const a = await ladeCmAnsicht(db, t.id, ohneAngaben, t.jetzt);
+		expect(a?.fehlt.length).toBeGreaterThan(0);
+		expect(a?.kontakt).toMatchObject({ vorname: 'Kontakta' });
 	});
 });

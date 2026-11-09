@@ -327,7 +327,7 @@ test.describe('Mitglieder-App', () => {
 			if (pfad === '/api/cm' || pfad === `/api/cm/${turnierId}`) neuGeladen.push(pfad);
 		});
 		await page
-			.locator('.karte.kachel')
+			.locator('div.karte')
 			.filter({ has: page.getByText(EINZEL.name, { exact: true }) })
 			.getByRole('button', { name: 'Anmelden' })
 			.click();

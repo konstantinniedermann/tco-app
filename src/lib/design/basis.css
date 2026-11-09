@@ -1006,7 +1006,32 @@ a.kachel:active {
 	margin-top: var(--abstand-3);
 }
 
-/* Zähler: Schritte eines Formulars oder ein Kontingent */
+/* Kartenkopf: Titel links, rechts oben die Plakette mit dem eigenen Stand; ohne Platz darunter */
+.karte-kopf {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--abstand-1) var(--abstand-3);
+	margin-bottom: var(--abstand-2);
+}
+
+.karte-kopf > :first-child {
+	flex: 1 1 8em;
+	margin: 0;
+}
+
+/* Aufklappbereich innerhalb einer Karte: ohne eigene Fläche, mit der Trennlinie des Kartenteils */
+details.klappe.karte-teil > .klappe-titel {
+	font-weight: 600;
+}
+
+/* Kachel als Kartenteil: Link auf eine Unterseite am Fuss einer Karte */
+a.kachel.karte-teil {
+	min-height: var(--tippflaeche);
+}
+
+/* Zähler: Schritte eines Formulars (nicht für Kontingente) */
 .zaehler {
 	margin-bottom: var(--abstand-4);
 }

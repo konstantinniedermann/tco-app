@@ -1,6 +1,6 @@
 import { and, count, eq, isNotNull, isNull } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { legeBeispielTurnierAn } from '../../scripts/beispiel-turnier.ts';
+import { legeBeispielTurnierAn, setzeBeispielKontakt } from '../../scripts/beispiel-turnier.ts';
 import {
 	anmeldung,
 	anmeldungSpieler,
@@ -182,5 +182,19 @@ describe('Beispielturnier für make seed', () => {
 		expect(await stelleAnfrage(eigene.db, damen.id, mitgliedId, treffer[0].mitgliedId, jetzt)).toBe(
 			'ok'
 		);
+	});
+
+	test('Kontaktperson: setzt sie nur, solange keine gewählt ist', async () => {
+		const jetzt = new Date('2026-11-06T10:00:00Z');
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		const erste = await legeMitgliedAn(eigene.db, { rollen: ['cm'] });
+		const zweite = await legeMitgliedAn(eigene.db, { rollen: ['cm'] });
+		await setzeBeispielKontakt(eigene.db, erste.mitgliedId);
+		await setzeBeispielKontakt(eigene.db, zweite.mitgliedId);
+		const [t] = await eigene.db
+			.select({ kontakt: turnier.kontaktMitgliedId })
+			.from(turnier)
+			.where(eq(turnier.jahr, 2027));
+		expect(t.kontakt).toBe(erste.mitgliedId);
 	});
 });
