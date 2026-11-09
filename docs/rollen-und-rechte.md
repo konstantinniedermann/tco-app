@@ -104,6 +104,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Offene Partner-Anfragen (von, an, seit wann) | – | – | L | – | – | L |
 | Doppel von Hand anmelden, zusammenlegen, Partner ändern, Anfrage als Paar anmelden oder löschen (FR-46, FR-48) | – | – | S | – | – | L |
 | Kommentar *sucht Partner* (FR-49) | – | L; S eigener | L; S eigener | L; S eigener | L; S eigener | L; S eigener |
+| Gespräch mit der Turnierleitung: schreiben, lesen, Zustand setzen (FR-50 bis FR-54); das Mitglied sieht nur «Turnierleitung» | – | S eigenes | S | – | – | L |
 | **CM-Betrieb** | | | | | | |
 | Gruppen, KO-Tableaus, Spiele aus Advantage (FR-12) | – | L | S | L | L | L |
 | Resultat melden, bestätigen, bestreiten (FR-16) | – | S beteiligt | S beteiligt | S beteiligt | S beteiligt | S beteiligt |

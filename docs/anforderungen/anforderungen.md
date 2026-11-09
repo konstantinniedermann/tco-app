@@ -155,6 +155,7 @@ Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vo
 | A-TURNIER-01 | Der CM-Admin legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | umgesetzt |
 | A-TURNIER-02 | Zum Turnier werden die Swiss-Tennis-Turniernummern erfasst | PDF 5a | CM-Anmeldung | umgesetzt |
 | A-TURNIER-03 | Zum Turnier werden alle Kategorien erfasst, eingeteilt nach Geschlecht, Alter, Klassierungsbereich (Einzel; im PDF: Stärkekategorie) bzw. Mindestsumme der Klassierungen (Doppel, Annahme K-51) und Einzel/Doppel | PDF 5a | CM-Anmeldung | umgesetzt |
+| A-TURNIER-04 | Ein Mitglied schreibt der Turnierleitung und liest die Antwort in MyTCO; alle CM-Admins sehen und beantworten die Gespräche | PL | CM-Anmeldung | geplant |
 
 ### ANMELDUNG — Anmeldung zur Clubmeisterschaft
 

@@ -49,6 +49,7 @@ du selbst einschaltest. Für nichts anderes.
 - Deinen Rufnamen sehen eingeloggte Mitglieder neben deinem Namen, öffentliche Seiten zeigen ihn nicht. Du kannst ihn jederzeit im Profil ändern oder löschen.
 - Bist du CM-Admin und für ein Turnier als Kontaktperson gewählt, sehen alle Mitglieder deinen Namen auf der Seite
   dieser Clubmeisterschaft, nicht aber deine E-Mail oder Telefonnummer.
+- Schreibst du der Turnierleitung, lesen alle CM-Admins und die MyTCO-Admins dein Gespräch mit; du siehst als Absender nur «Turnierleitung». Schreib bitte keine Angaben zur Gesundheit. Wir löschen alle Gespräche eines Turniers am 1. Januar nach dem Turnierjahr, dein Gespräch auch, wenn dein Mitglied gelöscht wird.
 - Alle Mitglieder sehen Name, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft. Wer einen
   Doppelpartner sucht, sieht Name und Klassierung der Mitglieder, die für die Kategorie in Frage kommen. Fehlt
   eine Angabe, steht dort *Klassierung fehlt* oder *Angaben fehlen* (Geschlecht).

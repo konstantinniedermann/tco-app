@@ -44,6 +44,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Markierung *für Fairgate offen seit* (Annahme K-19.2) | Der Mitglieder-Admin sieht, welche selbst geänderten Kontaktangaben (Adresse, E-Mail, Telefon) er noch von Hand nach Fairgate übertragen muss (Liste *Für Fairgate*, A-KONTO-02) | — |
 | Anmeldungen zur CM (Kategorie, Status, bei Wildcard mit Kommentar, im Doppel bei *sucht Partner* mit freiwilligem Kommentar bis 120 Zeichen), Spiele, Resultate, Lizenzanträge | Clubmeisterschaft, Lizenzen | — |
 | Partner-Anfragen zur CM (Kategorie, von, an, gestellt am); erledigte Anfragen werden gelöscht | Doppelpartner anfragen, annehmen oder ablehnen | — |
+| Gespräche mit der Turnierleitung (je Mitglied und Turnier: Nachrichten mit Text und Zeitpunkt, Absender Mitglied oder Turnierleitung mit dem antwortenden Admin, Zustand *offen*/*erledigt*, wann das Mitglied zuletzt geöffnet hat; keine Angaben zur Gesundheit) | Fragen zur CM beantworten | nein (freiwillig, setzt nur das Mitglied) |
 | Anmeldungen zu Anlässen: Antwort *kommt* / *kommt nicht*, freiwillige Bemerkung (ohne Angaben zur Gesundheit) | Planung des Anlasses, z. B. der Generalversammlung (A-ANLASS-01) | nein |
 | *Erstellt von* am Anlass: der Mitglieder-Admin, der ihn angelegt hat | Rückfragen zum Anlass: nachvollziehen, wer ihn angelegt hat | — |
 | Austrittsdatum; Zeitpunkt der Löschvormerkung und Zustand davor | Löschfrist, Bedenkzeit, Rückgängig | — |
@@ -61,11 +62,11 @@ Bankdaten.
 
 | Wer | Sieht |
 |-----|-------|
-| Mitglied | alle eigenen Daten, auch die eigenen Anmeldungen zu Anlässen; den Änderungsverlauf zum eigenen Konto auf Anfrage bei der Ansprechperson |
+| Mitglied | alle eigenen Daten, auch die eigenen Anmeldungen zu Anlässen und das eigene Gespräch mit der Turnierleitung (ohne den Namen der antwortenden Admins); den Änderungsverlauf zum eigenen Konto auf Anfrage bei der Ansprechperson |
 | Elternteil, der ein Kind führt | alle Daten des Kindes, ändert sie und meldet es an (Vorschlag K-08) |
 | Mitglieder-Admin | alle Daten der Mitglieder (von der CM nur bestätigte Anmeldungen, ohne Wildcard-Anträge und Kommentare) und den Änderungsverlauf; in der Liste *Für Fairgate* die selbst geänderten Kontaktangaben, bis er sie abhakt; alle Anmeldungen zu Anlässen mit Bemerkung (**Annahme K-50:** nur Mitglieder- und MyTCO-Admins, nicht der ganze Vorstand); Einmal-Codes sind nach der Ausgabe für niemanden abrufbar. Die Druckansicht der Login-Briefe hält Name, Adresse und Code nur im Browser des Mitglieder-Admins; eine als PDF gespeicherte Datei löscht er nach dem Druck |
-| MyTCO-Admin | alles, was eine der anderen Rollen sieht, auch Bemerkungen zu Anlässen und Wildcard-Kommentare, und den Änderungsverlauf; nur lesend. **Zweck:** die anderen Rollen unterstützen, Fehler suchen, die Rollenvergabe prüfen. *Ansicht als …* zeigt ihm nichts darüber hinaus. **Annahme K-18.4:** Die Rolle erhalten nur Personen, die MyTCO technisch betreuen (Projektleiter und seine Stellvertretung, vgl. SI-16), nicht weitere Vorstandsmitglieder; eine Abmachung des Vereins, die App erzwingt sie nicht |
-| CM-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung, Geschlecht und Jahrgang der Spieler (zum Zuordnen in Kategorien). Die Klassierung korrigiert auch der CM-Admin (A-ANMELDUNG-06, Matrix in `rollen-und-rechte.md`); Geschlecht und Jahrgang ändert nur der Mitglieder-Admin; offene Partner-Anfragen (von, an, seit wann) |
+| MyTCO-Admin | alles, was eine der anderen Rollen sieht, auch Bemerkungen zu Anlässen und Wildcard-Kommentare, und den Änderungsverlauf, auch die Gespräche mit der Turnierleitung; nur lesend. **Zweck:** die anderen Rollen unterstützen, Fehler suchen, die Rollenvergabe prüfen. *Ansicht als …* zeigt ihm nichts darüber hinaus. **Annahme K-18.4:** Die Rolle erhalten nur Personen, die MyTCO technisch betreuen (Projektleiter und seine Stellvertretung, vgl. SI-16), nicht weitere Vorstandsmitglieder; eine Abmachung des Vereins, die App erzwingt sie nicht |
+| CM-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung, Geschlecht und Jahrgang der Spieler (zum Zuordnen in Kategorien). Die Klassierung korrigiert auch der CM-Admin (A-ANMELDUNG-06, Matrix in `rollen-und-rechte.md`); Geschlecht und Jahrgang ändert nur der Mitglieder-Admin; offene Partner-Anfragen (von, an, seit wann); alle Gespräche mit der Turnierleitung, auch wer geantwortet hat |
 | Lizenz-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
 | Alle Mitglieder | Name und Rufname, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft; Vor- und Nachnamen der Kontaktperson, die der CM-Admin für das Turnier gewählt hat, ohne E-Mail und Telefon, solange sie CM-Admin ist; wer in einer Doppelkategorie *sucht Partner* mit seinem Kommentar; bei der Wahl des Doppelpartners die Namen und die Klassierung der Mitglieder, die für die Kategorie passen, dazu den Vermerk *Klassierung fehlt* oder *Angaben fehlen* (im Doppel: Geschlecht fehlt) |
 | Angefragter Doppelpartner | mit der Anfrage Name, Klassierung und Telefonnummer (sonst E-Mail) des Anfragenden, den dieser damit freigibt; die Kontaktdaten des Angefragten sieht der Anfragende erst nach dem Annehmen |
@@ -106,12 +107,13 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
   nennen Dritte). Schritte der Verwaltung zeigt die Auskunft als «Mitgliederverwaltung», nicht mit dem
   Namen des Admins. Von der CM enthält sie nur bestätigte Anmeldungen, ohne Wildcard-Kommentar, weil
   der Mitglieder-Admin Wildcard-Anträge nicht sieht; die übrigen Anmeldungen, Wildcard-Anträge und Kommentare
-  gibt auf Wunsch der CM-Admin bekannt. Das Erstellen steht im Änderungsverlauf.
+  gibt auf Wunsch der CM-Admin bekannt, ebenso die Gespräche mit der Turnierleitung. Das Erstellen steht im Änderungsverlauf.
 - **Mitglied löschen** (Mitglieder-Admin, DS-07): Bedenkzeit von 7 Tagen (Anzeige «wird gelöscht»); wie beim Austritt werden Einzel- und Doppel-Anmeldungen bis zum Datum des Anmeldeschlusses zurückgezogen, auch wenn von Hand früher geschlossen wurde, und Antworten zu kommenden Anlässen gelöscht. Die Markierung *für Fairgate offen* entfernt nur der Austritt; die Löschung räumt sie ohnehin ab. In dieser Zeit steht das Mitglied
   im Zustand *Löschung vorgemerkt*, das Login ist gesperrt, und der Mitglieder-Admin kann die Löschung
   rückgängig machen; dann gilt wieder der Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum). Nach der Woche wird gelöscht wie nach der Frist beim Austritt.
 - **CM-Anmeldungen:** bleiben beim vergangenen Turnier, wie Resultate. Wird ein Mitglied gelöscht, bleibt in seinen Anmeldungen nur der Name (der Wildcard-Kommentar einer Einzel-Anmeldung und der Kommentar *sucht Partner* werden geleert, Partner-Anfragen gelöscht); Grund: Die Turniergeschichte mit Namen und Resultaten ist bei Swiss Tennis ohnehin öffentlich einsehbar.
 - **Partner-Anfragen:** Erledigte Anfragen werden sofort gelöscht (abgelehnte, zurückgezogene, verfallene); angenommene werden zur Anmeldung. Der Kommentar *sucht Partner* wird gelöscht, sobald ein Partner gefunden ist oder der Spieler abmeldet.
+- **Gespräche mit der Turnierleitung:** alle Gespräche eines Turniers samt Nachrichten ab dem 1.1. nach dem Turnierjahr (Schweizer Kalenderzeit), vom Zeitgeber; das Gespräch eines Mitglieds mit seiner endgültigen Löschung (nicht schon beim Vormerken). Antwortende Admins erscheinen danach als *gelöschtes Konto*. DS-05 gilt: Meldungen ohne Inhalt und ohne Namen.
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
 - **Lizenzanträge:** Ende des Folgejahres.
 - **Anmeldungen zu Anlässen:** ein Jahr nach Beginn des Anlasses (**Vorschlag K-50**), vom Zeitgeber gelöscht;
@@ -231,6 +233,7 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
 
+- 09.11.2026: Gespräche mit der Turnierleitung: Nachrichten des Mitglieds und Antworten der CM-Admins, lesbar für alle CM-Admins und lesend für den MyTCO-Admin, nicht für den Mitglieder-Admin; gelöscht ab dem 1.1. nach dem Turnierjahr (#71).
 - 09.11.2026: Alle Mitglieder sehen auf der Seite einer CM den Namen der Kontaktperson, die der CM-Admin unter den CM-Admins wählt (ohne E-Mail und Telefon).
 - 08.11.2026: CM-Admin sieht offene Partner-Anfragen; Doppelpartner sieht Kontaktdaten nicht mehr, wenn der Partner ausgetreten oder zum Löschen vorgemerkt ist; Meldungen der Verwaltung zum Doppel nennen den anderen Spieler (#59 Etappe 2).
 - 08.11.2026: DS-05 präzisiert (Entscheid Projektleiter): Einzelmeldungen zum Doppel an die Beteiligten nennen den anderen Spieler, nie dessen Telefon oder E-Mail und nie den CM-Admin; gilt auch für die Meldungen aus Etappe 1 (#59).
