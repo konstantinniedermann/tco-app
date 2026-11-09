@@ -19,6 +19,7 @@ import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hil
 // Pro Jahr gibt es ein Turnier; diese Jahre gehören nur dieser Datei (übrige E2E: 2075–2099).
 const JAHR_DOPPEL: Record<string, number> = { iphone: 2074, android: 2073 };
 const JAHR_CM: Record<string, number> = { iphone: 2072, android: 2071 };
+const JAHR_TITEL: Record<string, number> = { iphone: 2050, android: 2049, desktop: 2048 };
 
 const EINZEL: KategorieWerte = {
 	name: 'Herren R1–R9',
@@ -30,6 +31,9 @@ const EINZEL: KategorieWerte = {
 	klassierungBis: 'R9',
 	mindestsumme: null
 };
+
+const EINZEL_2: KategorieWerte = { ...EINZEL, name: 'Herren R1–R5', klassierungBis: 'R5' };
+const EINZEL_3: KategorieWerte = { ...EINZEL, name: 'Herren R1–R4', klassierungBis: 'R4' };
 
 type Stand = {
 	id: number;
@@ -365,8 +369,116 @@ test.describe('am PC', () => {
 		// Die Gruppe «Wappen + MyTCO» schneidet nichts ab: Fokusrahmen und Tippfläche des Wappens bleiben
 		await page.getByRole('link', { name: 'Zur Startseite' }).focus();
 		expect(
-			await page.locator('.kopf-marke').evaluate((e) => getComputedStyle(e).overflow)
-		).not.toBe('hidden');
+			await page
+				.locator('.kopf-marke')
+				.evaluate((e) => [getComputedStyle(e).overflowX, getComputedStyle(e).overflowY])
+		).toEqual(['visible', 'visible']);
 		await pruefeBildschirm(page, info, 'pc-reiter-kopfleiste');
+	});
+});
+
+// Titel in der Kopfleiste (UI-Leitbild): erscheint, sobald das <h1> oben aus dem Bild scrollt.
+test.describe('Titel in der Kopfleiste', () => {
+	const titel = (page: Page) => page.locator('.kopf-titel');
+	const sichtbar = (page: Page) => expect(titel(page)).toHaveAttribute('data-sichtbar', '');
+	const unsichtbar = (page: Page) => expect(titel(page)).not.toHaveAttribute('data-sichtbar', '');
+	// Der Rollbereich scrollt, nicht das Dokument.
+	const scrolle = (page: Page, nach: 'unten' | 'oben') =>
+		page.locator('.rollbereich').evaluate((e, n) => {
+			e.scrollTop = n === 'unten' ? e.scrollHeight : 0;
+		}, nach);
+
+	test('Titel blendet beim Scrollen in die Kopfleiste über', async ({ page }) => {
+		await meldeAn(page, 'Vera');
+		await page.setViewportSize({ width: page.viewportSize()!.width, height: 300 });
+		await page.goto('/profil');
+		await expect(page.getByRole('heading', { level: 1, name: 'Profil' })).toBeVisible();
+		await unsichtbar(page);
+		await scrolle(page, 'unten');
+		await sichtbar(page);
+		await expect(titel(page)).toHaveText('Profil');
+		await expect(titel(page)).toHaveAttribute('aria-hidden', 'true');
+		await scrolle(page, 'oben');
+		await unsichtbar(page);
+	});
+
+	test('Langer Titel in der Kopfleiste bleibt einzeilig', async ({ page }) => {
+		const konto = await meldeAn(page, 'Wanda');
+		const lang = 'Grillabend mit dem ganzen Verein und allen Freunden auf der Anlage am See'.padEnd(
+			80,
+			'!'
+		);
+		expect(lang).toHaveLength(80);
+		const anlass = await legeOffenenAnlassAn(konto.mitgliedId, lang);
+		await page.setViewportSize({ width: page.viewportSize()!.width, height: 400 });
+		await page.goto(`/anlass/${anlass}`);
+		await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+		const kopf = page.locator('header.kopf');
+		const leiste = page.locator('nav.reiter');
+		const hoehe = (await kopf.boundingBox())!.height;
+		const reiterX = (await leiste.boundingBox())!.x;
+		const wappenX = (await page.locator('.kopf-wappen').boundingBox())!.x;
+		await scrolle(page, 'unten');
+		await sichtbar(page);
+		await expect(titel(page)).toHaveText(lang);
+		expect((await kopf.boundingBox())!.height).toBe(hoehe);
+		expect((await page.locator('.kopf-wappen').boundingBox())!.x).toBe(wappenX);
+		const masse = await titel(page).evaluate((e) => ({
+			gekuerzt: e.scrollWidth > e.clientWidth,
+			hoehe: e.getBoundingClientRect().height,
+			zeile: parseFloat(getComputedStyle(e).lineHeight)
+		}));
+		expect(masse.gekuerzt).toBe(true);
+		expect(masse.hoehe).toBeLessThan(masse.zeile * 1.6);
+		// Am PC stehen die Reiter oben in der Kopfleiste und bleiben, wo sie sind.
+		if (await kopf.locator('nav.reiter').count()) {
+			expect((await leiste.boundingBox())!.x).toBe(reiterX);
+		}
+		expect(
+			await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
+		).toBe(true);
+	});
+
+	test('Neuer Titel ohne Seitenwechsel', async ({ page }) => {
+		await meldeAn(page, 'Xenia');
+		await page.setViewportSize({ width: page.viewportSize()!.width, height: 400 });
+		await page.goto('/profil/email');
+		await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+		await page.getByLabel('Neue E-Mail-Adresse').fill(`neu-${Date.now()}@example.org`);
+		await page.getByRole('button', { name: 'Codes senden' }).click();
+		await expect(
+			page.getByRole('heading', { level: 1, name: 'Zwei Codes eintippen' })
+		).toBeVisible();
+		await scrolle(page, 'unten');
+		await sichtbar(page);
+		await expect(titel(page)).toHaveText('Zwei Codes eintippen');
+	});
+
+	test('Zurück an gespeicherte Stelle zeigt den Titel sofort', async ({ page }, info) => {
+		const jahr = JAHR_TITEL[info.project.name];
+		const name = `Clubmeisterschaft ${jahr}`;
+		const { turnierId } = await legeOffenesTurnierAn(jahr, [MIXED, EINZEL, EINZEL_2, EINZEL_3]);
+		const konto = await meldeAn(page, 'Yara');
+		await setzeSpielerangaben(konto.mitgliedId, {
+			geschlecht: 'w',
+			jahrgang: 1992,
+			klassierung: 'R4'
+		});
+		await setzeTelefon(konto.mitgliedId, '079 000 00 71');
+		await page.setViewportSize({ width: page.viewportSize()!.width, height: 400 });
+		await page.goto(`/clubmeisterschaft/${turnierId}`);
+		await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
+		await scrolle(page, 'unten');
+		await sichtbar(page);
+		const stelle = await page.locator('.rollbereich').evaluate((e) => e.scrollTop);
+		expect(stelle).toBeGreaterThan(0);
+		await page.getByRole('link', { name: 'Anmelden' }).click();
+		await expect(page).toHaveURL(/\/doppel\//);
+		await unsichtbar(page);
+		await page.getByRole('link', { name: `‹ ${name}` }).click();
+		await expect(page).toHaveURL(new RegExp(`/clubmeisterschaft/${turnierId}$`));
+		// ohne erneutes Scrollen
+		await sichtbar(page);
+		await expect(titel(page)).toHaveText(name);
 	});
 });

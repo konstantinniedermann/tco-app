@@ -274,8 +274,46 @@ html {
 /* Wappen und «MyTCO» in einer Gruppe, damit sie am PC zusammen in Spalte 1 stehen */
 .kopf-marke {
 	display: flex;
+	flex-wrap: nowrap;
 	align-items: center;
 	gap: var(--abstand-3);
+	/* Ein langer Titel hinter «MyTCO» kürzt sich selbst (kein overflow hier: Fokusrahmen und
+	   Tippfläche des Wappens würden abgeschnitten), die Zeile bleibt einzeilig */
+	min-width: 0;
+	white-space: nowrap;
+}
+
+.kopf-marke > * {
+	flex-shrink: 0;
+}
+
+/* Titel in der Kopfleiste (Leitbild): dünner Trenner davor, durchsichtig und leicht nach unten
+   versetzt, bis das <h1> der Seite oben aus dem Bild ist (data-sichtbar) */
+.kopf-marke > .kopf-titel {
+	flex-shrink: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: var(--groesse-text);
+	font-weight: 400;
+	padding-inline-start: var(--abstand-3);
+	border-inline-start: var(--rand-duenn) solid var(--farbe-marke-hell);
+	opacity: 0;
+	translate: 0 0.5em;
+	transition:
+		opacity var(--dauer-mittel) var(--kurve-standard),
+		translate var(--dauer-mittel) var(--kurve-standard);
+}
+
+.kopf-marke > .kopf-titel[data-sichtbar] {
+	opacity: 1;
+	translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.kopf-marke > .kopf-titel {
+		transition: none;
+	}
 }
 
 .kopf-wappen {
@@ -1732,24 +1770,6 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	.app-rahmen > .kopf > * {
 		grid-column: 1;
 		min-width: 0;
-	}
-
-	/* Ein langer Titel hinter «MyTCO» kürzt sich selbst (kein overflow hier: Fokusrahmen und Tippfläche
-	   des Wappens würden abgeschnitten), die Spalte bleibt, die Zeile einzeilig */
-	.app-rahmen > .kopf > .kopf-marke {
-		flex-wrap: nowrap;
-		white-space: nowrap;
-	}
-
-	.kopf-marke > * {
-		flex-shrink: 0;
-	}
-
-	.kopf-marke > .kopf-titel {
-		flex-shrink: 1;
-		min-width: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
 	}
 
 	/* Reiter wandern mit Symbol in die Mitte der Kopfleiste (selbe Zeile, Spalte 2) */
