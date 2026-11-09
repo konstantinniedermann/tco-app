@@ -10,7 +10,9 @@ import {
 	turnier,
 	turniernummer
 } from '../../src/lib/server/db/schema.ts';
+import { sucheDoppelPartner, stelleAnfrage } from '../../src/lib/server/cm/doppel.ts';
 import { legeEigeneDatenbankAn, type EigeneDatenbank } from '../hilfen/eigene-datenbank.ts';
+import { legeMitgliedAn } from '../hilfen/mitglieder.ts';
 
 let eigene: EigeneDatenbank;
 beforeAll(async () => {
@@ -155,5 +157,30 @@ describe('Beispielturnier für make seed', () => {
 			.from(mitglied)
 			.where(isNull(mitglied.klassierung));
 		expect(ohneKlassierung).toEqual([{ email: 'nico.musterli@example.org' }]);
+	});
+
+	test('FR-48: Wer im Beispielturnier allein sucht, lässt sich in der Partnersuche finden und anfragen', async () => {
+		const jetzt = new Date('2026-11-06T10:00:00Z');
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		// Eine Spielerin wie die Persona Hanna: alle Angaben, passt ins Damen Doppel.
+		const { mitgliedId } = await legeMitgliedAn(eigene.db, { vorname: 'Hanna' });
+		await eigene.db
+			.update(mitglied)
+			.set({ geschlecht: 'w', jahrgang: 2000, klassierung: 'R5' })
+			.where(eq(mitglied.id, mitgliedId));
+		const [damen] = await eigene.db
+			.select({ id: kategorie.id })
+			.from(kategorie)
+			.where(eq(kategorie.name, 'Damen Doppel'));
+
+		const treffer = await sucheDoppelPartner(eigene.db, damen.id, mitgliedId, 'Erdacht', jetzt);
+		expect(treffer).toHaveLength(1);
+		expect(treffer[0]).toMatchObject({
+			suchtPartner: true,
+			kommentar: 'Suche jemanden auf R5–R7-Niveau, eher abends.'
+		});
+		expect(await stelleAnfrage(eigene.db, damen.id, mitgliedId, treffer[0].mitgliedId, jetzt)).toBe(
+			'ok'
+		);
 	});
 });
