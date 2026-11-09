@@ -328,11 +328,13 @@ Seite zum Anlegen ohne Schreibrecht zur Liste ihres Bereichs.
   Startseite der App.
 - **Nachrichten** (CM-Admin lesend und schreibend, MyTCO-Admin nur lesend): Auf der Seite des Turniers steht der Abschnitt «Nachrichten» (Fragen an die Turnierleitung) zuoberst, mit Plakette «N offen», der Kontaktperson und der Kachel «Posteingang · N offen, M erledigt ›». Der **Posteingang** («Nachrichten an die Turnierleitung») ist eine Tabelle mit Kennzahlen offen/erledigt und den Spalten Mitglied · Letzte Nachricht · Zuletzt · Stand, darunter «Alle Gespräche dieses Turniers werden am 1. Januar <Jahr+1> gelöscht.». Das **Gespräch in der Verwaltung** zeigt den Verlauf als eine Karte, jede Nachricht ein Kartenteil mit «Turnierleitung (Vorname Nachname)»; darunter in eigener Karte das Feld «Antwort der Turnierleitung», die Haupttaste «Antworten» und die Nebentaste «Als erledigt markieren» bzw. «Wieder öffnen».
 - **Kontakt in den Anmeldelisten** (Kategorie einer CM in der Verwaltung, K-42): Spalte «Kontakt»
-  gleich nach dem Spieler, im Paar und bei offenen Anfragen eine Zeile je Spieler. Darin zwei kurze Links «Tel.» (`tel:`) und «E-Mail» (`mailto:`), getrennt durch « · »;
+  gleich nach dem Spieler, im Paar und bei offenen Anfragen eine Zeile je Spieler (bei Anfragen oben
+  der Anfragende, darunter der Angefragte, wie in der Spalte «Von / An»). Darin zwei kurze Links «Tel.» (`tel:`) und «E-Mail» (`mailto:`), getrennt durch « · »;
   Nummer und Adresse stehen als `title` und im zugänglichen Namen («Tel. 079 …», «E-Mail anna@…»),
   damit jede Zeile am PC einzeilig bleibt; fehlt eine
-  Angabe, steht nur die andere, fehlen beide: «–». Ab dem 1.1. nach dem Turnierjahr
-  fehlt die Spalte, weil die Liste keine Kontaktdaten mehr enthält.
+  Angabe, steht nur die andere, fehlen beide: «–». Die Spalte fehlt, wenn in der Liste
+  niemand eine Angabe hat, so auch ab dem 1.1. nach dem Turnierjahr (dann liefert der Server
+  keine Kontaktdaten mehr).
 - **Mitteilungen** (Seite des Anlasses und Bereich *Mitteilungen*): Taste «Neue Mitteilung», beim
   Anlass dann eine Vorlage oder «Leer anfangen». Titel, Text, Empfänger und Weg stehen in einer
   Karte; «Vorschau» zeigt die Zahlen und aufklappbar die Namen. «Senden» geht erst mit einer
