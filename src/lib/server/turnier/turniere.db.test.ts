@@ -18,12 +18,12 @@ import {
 	ladeKategorie,
 	ladeTurnier,
 	legeKategorieAn,
-	kontaktGueltig,
 	legeTurnierAn,
 	listeTurniere,
 	sageKategorieAb,
 	setzeStatus
 } from './turniere.ts';
+import { kontaktGueltig } from './kontakt.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 

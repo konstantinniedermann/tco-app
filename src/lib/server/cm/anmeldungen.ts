@@ -29,6 +29,7 @@ import {
 import { wirksamerStatus } from '../../turnier/status.ts';
 import { jahrInZuerich } from '../datum.ts';
 import { namensSpalten } from '../namen.ts';
+import { kontaktGueltig } from '../turnier/kontakt.ts';
 import { spielerAus } from './angaben.ts';
 
 export type CmStand = {
@@ -85,6 +86,8 @@ export type CmAnsicht = {
 	eigene: { anmeldungId: number; kategorie: string; status: AktiverStatus }[];
 	anfragen: CmAnfrage[];
 	grenze: 3;
+	/** Kontaktperson für Fragen, nur solange sie gültig CM-Admin ist; sonst `null`. */
+	kontakt: Namensteile | null;
 };
 
 /** FR-06: höchstens drei aktive Anmeldungen je Turnier. */
@@ -199,6 +202,13 @@ export async function laufendeTurniere(
  * Kontakt und Klassierung eines anderen Mitglieds stehen nur beim eigenen Partner und beim
  * Anfragenden (FR-19).
  */
+/** Name der Kontaktperson eines Turniers, wenn sie gültig CM-Admin ist (sonst `null`). */
+async function kontaktperson(db: Db, mitgliedId: number | null): Promise<Namensteile | null> {
+	if (mitgliedId === null || !(await kontaktGueltig(db, mitgliedId))) return null;
+	const [m] = await db.select(namensSpalten).from(mitglied).where(eq(mitglied.id, mitgliedId));
+	return m ?? null;
+}
+
 export async function ladeCmAnsicht(
 	db: Db,
 	turnierId: number,
@@ -257,6 +267,8 @@ export async function ladeCmAnsicht(
 		);
 	}
 
+	const kontakt = await kontaktperson(db, t.kontaktMitgliedId);
+
 	return {
 		turnier: {
 			id: t.id,
@@ -277,7 +289,8 @@ export async function ladeCmAnsicht(
 			status: e.status
 		})),
 		anfragen,
-		grenze: GRENZE
+		grenze: GRENZE,
+		kontakt
 	};
 }
 

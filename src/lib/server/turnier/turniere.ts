@@ -14,6 +14,7 @@ import {
 	type TurnierStatus
 } from '../db/schema.ts';
 import { namensSpalten } from '../namen.ts';
+import { gueltigerCmAdmin, kontaktGueltig } from './kontakt.ts';
 import type { Namensteile } from '../../name.ts';
 import { istStufe } from '../../turnier/klassierung.ts';
 import { vorSchluss, wirksamerStatus } from '../../turnier/status.ts';
@@ -45,24 +46,6 @@ export type TurnierDetail = Omit<TurnierWerte, 'kontakt'> & {
 	/** Wer als Kontaktperson gewählt werden kann: alle gültigen CM-Admins. */
 	kontaktWahl: { mitgliedId: number; name: Namensteile }[];
 };
-
-/** Gültig CM-Admin: Mitglied aktiv, Konto nicht gesperrt, Rolle `cm`. */
-const gueltigerCmAdmin = and(
-	eq(mitglied.status, 'aktiv'),
-	eq(konto.gesperrt, false),
-	eq(kontoRolle.rolle, 'cm')
-);
-
-/** Kann dieses Mitglied jetzt Kontaktperson sein (bzw. es bleiben, für die Mitglieder)? */
-export async function kontaktGueltig(db: DbOderTx, mitgliedId: number): Promise<boolean> {
-	const [z] = await db
-		.select({ id: mitglied.id })
-		.from(mitglied)
-		.innerJoin(konto, eq(konto.mitgliedId, mitglied.id))
-		.innerJoin(kontoRolle, eq(kontoRolle.kontoId, konto.id))
-		.where(and(eq(mitglied.id, mitgliedId), gueltigerCmAdmin));
-	return z !== undefined;
-}
 
 const namenOrdnung = new Intl.Collator('de-CH');
 
