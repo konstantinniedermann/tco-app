@@ -305,3 +305,15 @@ Einzel-Liste.
 **Ursprung:** Screenshots der neuen Seite einer Kategorie (feat/cm-uebersicht)
 
 **Einschätzung:** Niedrig, rein optisch. Eine Regel `.karte > h2:first-child { margin-top: 0 }` im Baustein Karte würde es überall beheben; vorher alle Karten mit Überschrift ansehen.
+
+### 2026-11-09 — Restbefunde aus den Reviews der CM-Übersicht
+
+**Thema:** Tests
+
+**Fundort:** `src/routes/clubmeisterschaft/[id]/kategorie/[kid]/+page.svelte`, `tests/e2e/cm-anmeldung.test.ts`
+
+**Beobachtung:** (1) Die Seite einer Kategorie zeigt Paare als Text (`paarText`, «Rufname (Amtlich) / …»), die Einzelliste dagegen mit dem Baustein *Name* — uneinheitlich. (2) «Kontaktperson verliert die Rolle → Satz verschwindet» ist nur im DB-Test belegt, nicht im E2E. (3) Kein Screenshot mit sehr langem Kategorienamen auf 375 px; das CSS von `.karte-kopf` bricht um, ist aber nicht bildlich nachgewiesen.
+
+**Ursprung:** Abschluss-Review und CAS-Review von feat/cm-uebersicht (0.18.0)
+
+**Einschätzung:** Niedrig, nichts davon führt Mitglieder in die Irre.
