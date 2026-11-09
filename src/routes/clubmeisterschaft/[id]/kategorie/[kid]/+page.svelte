@@ -23,16 +23,16 @@
 </svelte:head>
 
 <Zurueck text={data.cm.turnier.name} />
-<div class="karte-kopf">
-	<h1>{k.name}</h1>
-	{#if plakette}<span class="plakette plakette-{plakette.art}">{plakette.text}</span>{/if}
-</div>
-<p class="leise">{doppel ? doppelText(k) : kategorieText(k)}</p>
+<h1>{k.name}</h1>
+<p>
+	{#if plakette}<span class="plakette plakette-{plakette.art}">{plakette.text}</span><br />{/if}
+	<span class="leise">{doppel ? doppelText(k) : kategorieText(k)}</span>
+</p>
 
 <section class="karte" aria-labelledby="angemeldet-titel">
-	<h2 id="angemeldet-titel">Angemeldet ({anzahl})</h2>
+	<h2 id="angemeldet-titel">{doppel ? 'Paare' : 'Angemeldet'} ({anzahl})</h2>
 	{#if anzahl === 0}
-		<p>Noch niemand angemeldet.</p>
+		<p>{doppel ? 'Noch kein Paar.' : 'Noch niemand angemeldet.'}</p>
 	{:else if doppel}
 		<ul class="trefferliste">
 			{#each k.paare as paar, i (i)}

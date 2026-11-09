@@ -192,6 +192,13 @@ export async function laufendeTurniere(
 	}));
 }
 
+/** Name der Kontaktperson eines Turniers, wenn sie gültig CM-Admin ist (sonst `null`). */
+async function kontaktperson(db: Db, mitgliedId: number | null): Promise<Namensteile | null> {
+	if (mitgliedId === null || !(await kontaktGueltig(db, mitgliedId))) return null;
+	const [m] = await db.select(namensSpalten).from(mitglied).where(eq(mitglied.id, mitgliedId));
+	return m ?? null;
+}
+
 /**
  * Die CM-Seite eines Mitglieds; `null`, wenn das Turnier unbekannt oder in Vorbereitung ist.
  * Kategorien gibt es erst, wenn keine Angabe mehr fehlt (FR-37);
@@ -202,13 +209,6 @@ export async function laufendeTurniere(
  * Kontakt und Klassierung eines anderen Mitglieds stehen nur beim eigenen Partner und beim
  * Anfragenden (FR-19).
  */
-/** Name der Kontaktperson eines Turniers, wenn sie gültig CM-Admin ist (sonst `null`). */
-async function kontaktperson(db: Db, mitgliedId: number | null): Promise<Namensteile | null> {
-	if (mitgliedId === null || !(await kontaktGueltig(db, mitgliedId))) return null;
-	const [m] = await db.select(namensSpalten).from(mitglied).where(eq(mitglied.id, mitgliedId));
-	return m ?? null;
-}
-
 export async function ladeCmAnsicht(
 	db: Db,
 	turnierId: number,

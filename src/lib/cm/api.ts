@@ -36,7 +36,10 @@ export function kategorieZumAnsehen(
 ): { kategorie: CmKategorie; wildcard: boolean } | null {
 	const k = cm.kategorien.find((x) => x.id === kategorieId);
 	if (k) return { kategorie: k, wildcard: false };
-	const w = cm.wildcard.find((x) => x.id === kategorieId);
+	// Wie die Übersicht: nach dem Anmeldeschluss nur die eigenen Anträge.
+	const w = cm.wildcard.find(
+		(x) => x.id === kategorieId && (cm.turnier.status === 'offen' || x.anmeldungId !== null)
+	);
 	return w ? { kategorie: w, wildcard: true } : null;
 }
 

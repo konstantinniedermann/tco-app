@@ -207,9 +207,25 @@ describe('Seite einer Kategorie', () => {
 	test('findet Kategorien der Übersicht und Wildcard-Kategorien, sonst null', () => {
 		const einzel = { id: 1, art: 'einzel' } as CmKategorie;
 		const wildcard = { id: 2, art: 'einzel' } as CmKategorie;
-		const ansicht = { kategorien: [einzel], wildcard: [wildcard] } as unknown as CmAnsicht;
+		const ansicht = {
+			turnier: { status: 'offen' },
+			kategorien: [einzel],
+			wildcard: [wildcard]
+		} as unknown as CmAnsicht;
 		expect(kategorieZumAnsehen(ansicht, 1)).toEqual({ kategorie: einzel, wildcard: false });
 		expect(kategorieZumAnsehen(ansicht, 2)).toEqual({ kategorie: wildcard, wildcard: true });
 		expect(kategorieZumAnsehen(ansicht, 3)).toBeNull();
+	});
+
+	test('nach dem Anmeldeschluss nur Wildcard-Kategorien mit eigenem Antrag, wie die Übersicht', () => {
+		const ohne = { id: 2, art: 'einzel', anmeldungId: null } as CmKategorie;
+		const mit = { id: 3, art: 'einzel', anmeldungId: 9 } as CmKategorie;
+		const geschlossen = {
+			turnier: { status: 'geschlossen' },
+			kategorien: [],
+			wildcard: [ohne, mit]
+		} as unknown as CmAnsicht;
+		expect(kategorieZumAnsehen(geschlossen, 2)).toBeNull();
+		expect(kategorieZumAnsehen(geschlossen, 3)).toEqual({ kategorie: mit, wildcard: true });
 	});
 });

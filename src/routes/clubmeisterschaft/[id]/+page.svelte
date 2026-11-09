@@ -33,7 +33,7 @@
 		suchtextZaehlerText,
 		waehlbar
 	} from '../../../lib/cm/anzeige.ts';
-	import { anredeName, nameText, type Namensteile } from '../../../lib/name.ts';
+	import { amtlicherName, anredeName, nameText, type Namensteile } from '../../../lib/name.ts';
 	import Name from '../../../lib/ui/Name.svelte';
 	import Zurueck from '../../../lib/ui/Zurueck.svelte';
 	import { istKlappeOffen, merkeKlappe } from '../../../lib/ui/klappe.ts';
@@ -634,7 +634,7 @@
 {/if}
 
 {#if cm.kontakt}
-	<p class="leise">{kontaktFragenText(nameText(cm.kontakt, 'vorname-zuerst'))}</p>
+	<p class="leise">{kontaktFragenText(amtlicherName(cm.kontakt, 'vorname-zuerst'))}</p>
 {/if}
 
 <dialog
@@ -823,6 +823,7 @@
 {#snippet alleAnmeldungen(k: CmKategorie)}
 	<a
 		class="kachel karte-teil"
+		aria-label="{k.name}: {anmeldungenText(k)}"
 		href={resolve('/clubmeisterschaft/[id]/kategorie/[kid]', {
 			id: String(cm.turnier.id),
 			kid: String(k.id)

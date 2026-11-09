@@ -7,8 +7,7 @@ import {
 	kontaktFragenText,
 	kategorieText,
 	kommentarZaehlerText,
-	namenText,
-	paareText,
+	paarText,
 	rueckfrageText,
 	standPlakette,
 	standText,
@@ -16,8 +15,7 @@ import {
 	SUCHTEXT_MAX,
 	suchtextZaehlerText,
 	waehlbar,
-	vermerkText,
-	weiterePaare
+	vermerkText
 } from './anzeige.ts';
 
 const regel = (k: Partial<KategorieRegel> = {}): KategorieRegel => ({
@@ -62,22 +60,6 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 		).toBe('Herren · R7–R9 · Jahrgang 1980–1989');
 	});
 
-	test('A-ANMELDUNG-01: Namen der Angemeldeten', () => {
-		expect(namenText([])).toBe('Noch niemand angemeldet.');
-		expect(namenText([{ rufname: null, vorname: 'Anna', nachname: 'Beispiel' }])).toBe(
-			'Angemeldet (1): Anna Beispiel'
-		);
-	});
-
-	test('namenText mit Rufname', () => {
-		expect(
-			namenText([
-				{ rufname: null, vorname: 'Anna', nachname: 'Muster' },
-				{ rufname: 'Hannes', vorname: 'Johannes', nachname: 'Beispiel' }
-			])
-		).toBe('Angemeldet (2): Anna Muster, Hannes (Johannes Beispiel)');
-	});
-
 	test('FR-08: Zähler des Wildcard-Kommentars', () => {
 		expect(kommentarZaehlerText(0)).toBe('0 von 300 Zeichen');
 		expect(kommentarZaehlerText(12)).toBe('12 von 300 Zeichen');
@@ -109,40 +91,19 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 		expect(suchtextZaehlerText(45)).toBe('45 von 120 Zeichen');
 	});
 
-	test('FR-19: Kontakt des Partners als Link, weitere Paare ohne das eigene', () => {
+	test('FR-19: Kontakt des Partners als Link', () => {
 		expect(waehlbar('079 000 00 01')).toBe('0790000001');
 		expect(waehlbar('+41 (79) 000-00-01')).toBe('+41790000001');
-		const lea = { rufname: null, vorname: 'Lea', nachname: 'Beispiel' };
-		const marco = { rufname: 'Max', vorname: 'Marco', nachname: 'Muster' };
-		const jonas = { rufname: null, vorname: 'Jonas', nachname: 'Keller' };
-		const nina = { rufname: null, vorname: 'Nina', nachname: 'Brunner' };
-		expect(
-			weiterePaare(
-				[
-					[lea, marco],
-					[jonas, nina]
-				],
-				marco
-			)
-		).toEqual([[jonas, nina]]);
 	});
 
-	test('A-ANMELDUNG-04: Paare in der kurzen Textform mit Rufname', () => {
-		expect(paareText([])).toBe('Noch niemand angemeldet.');
+	test('A-ANMELDUNG-04: Paar in der kurzen Textform mit Rufname', () => {
 		expect(
-			paareText([
-				[
-					{ rufname: null, vorname: 'Lea', nachname: 'Beispiel' },
-					{ rufname: 'Hannes', vorname: 'Johannes', nachname: 'Muster' }
-				],
-				[
-					{ rufname: 'Nina', vorname: 'Nina', nachname: 'Brunner' },
-					{ rufname: null, vorname: 'Jonas', nachname: 'Keller' }
-				]
+			paarText([
+				{ rufname: null, vorname: 'Lea', nachname: 'Beispiel' },
+				{ rufname: 'Hannes', vorname: 'Johannes', nachname: 'Muster' }
 			])
-		).toBe('Angemeldet (2): Lea Beispiel / Hannes (Johannes Muster), Nina Brunner / Jonas Keller');
+		).toBe('Lea Beispiel / Hannes (Johannes Muster)');
 	});
-
 	test('FR-48: Rückfrage vor der Anfrage nennt den Angefragten mit der Anrede', () => {
 		expect(rueckfrageText('Marco')).toBe(
 			'Marco sieht deinen Namen, deine Klassierung und deine Telefonnummer (ohne Telefon deine ' +
@@ -208,7 +169,7 @@ describe('Übersicht einer CM: Plakette, Anzahl, Kontakt', () => {
 		expect(anmeldungenText(einzel(0))).toBe('Noch niemand angemeldet');
 		expect(anmeldungenText(einzel(1))).toBe('1 angemeldet');
 		expect(anmeldungenText(einzel(12))).toBe('12 angemeldet');
-		expect(anmeldungenText(doppel(0))).toBe('Noch niemand angemeldet');
+		expect(anmeldungenText(doppel(0))).toBe('Noch kein Paar');
 		expect(anmeldungenText(doppel(1))).toBe('1 Paar');
 		expect(anmeldungenText(doppel(5))).toBe('5 Paare');
 	});

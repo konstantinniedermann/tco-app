@@ -294,7 +294,7 @@ test('FR-49, FR-10: allein mit Kommentar, Kommentar sichtbar, Abmelden zieht Paa
 	await expect(doppelKarte(ottos.seite).getByText(leaName)).toBeVisible();
 	await expect(doppelKarte(ottos.seite).getByText(`«${KOMMENTAR}»`)).toBeVisible();
 	// Auf der Seite der Kategorie steht Lea unter «Sucht Partner», mit Kommentar.
-	await doppelKarte(ottos.seite).getByRole('link', { name: 'Noch niemand angemeldet' }).click();
+	await doppelKarte(ottos.seite).getByRole('link', { name: 'Noch kein Paar' }).click();
 	const suchendeListe = ottos.seite.getByRole('region', { name: 'Sucht Partner (1)' });
 	await expect(suchendeListe).toContainText(leaName);
 	await expect(suchendeListe).toContainText(`«${KOMMENTAR}»`);
@@ -345,7 +345,7 @@ test('FR-49, FR-10: allein mit Kommentar, Kommentar sichtbar, Abmelden zieht Paa
 	await eigeneKarte(marcos.seite).getByRole('button', { name: 'Abmelden' }).click();
 	await expect(marcos.seite.getByRole('status')).toHaveText('Abgemeldet von Mixed Doppel.');
 	await expect(
-		doppelKarte(marcos.seite).getByRole('link', { name: 'Noch niemand angemeldet' })
+		doppelKarte(marcos.seite).getByRole('link', { name: 'Noch kein Paar' })
 	).toBeVisible();
 	const abgemeldet = await warteAufMail(
 		lea.email,
@@ -357,9 +357,7 @@ test('FR-49, FR-10: allein mit Kommentar, Kommentar sichtbar, Abmelden zieht Paa
 	);
 	await page.reload();
 	await expect(eigeneKarte(page)).toHaveCount(0);
-	await expect(
-		doppelKarte(page).getByRole('link', { name: 'Noch niemand angemeldet' })
-	).toBeVisible();
+	await expect(doppelKarte(page).getByRole('link', { name: 'Noch kein Paar' })).toBeVisible();
 
 	expect(fehler).toEqual([]);
 	expect(ottos.fehler).toEqual([]);

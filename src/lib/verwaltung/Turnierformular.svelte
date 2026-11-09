@@ -312,8 +312,8 @@
 				{/each}
 			</select>
 			<span class="feld-hilfe" id="turnier-kontakt-hilfe"
-				>Ihren Namen sehen alle Mitglieder auf der Seite der Clubmeisterschaft, mit «Bei Fragen oder
-				Problemen melde dich bei …».</span
+				>Den Namen der Kontaktperson sehen alle Mitglieder auf der Seite der Clubmeisterschaft, mit
+				«Bei Fragen oder Problemen melde dich bei …».</span
 			>
 			{#if fehler.kontakt}
 				<p class="fehler" id="fehler-turnier-kontakt">{fehler.kontakt}</p>

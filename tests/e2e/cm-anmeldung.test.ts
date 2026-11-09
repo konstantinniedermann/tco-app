@@ -161,8 +161,12 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	// Der eigene Stand steht als Plakette im Kopf der Karte; Namen stehen nicht in der Übersicht.
 	await expect(plakette(page, 'Herren R1–R9', 'angemeldet')).toBeVisible();
 	await expect(plakette(page, 'Herren R4–R9', 'angemeldet')).toHaveCount(0);
+	// Der Linkname nennt die Kategorie, damit gleich lautende Links unterscheidbar sind.
 	await expect(
-		karte(page, 'Herren R1–R9').getByRole('link', { name: '1 angemeldet' })
+		karte(page, 'Herren R1–R9').getByRole('link', {
+			name: 'Herren R1–R9: 1 angemeldet',
+			exact: true
+		})
 	).toBeVisible();
 	await expect(karte(page, 'Herren R1–R9')).not.toContainText(`Moritz ${nachname}`);
 	await pruefeBildschirm(page, info, 'cm-angemeldet');

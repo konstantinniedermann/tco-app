@@ -269,3 +269,15 @@ Einzel-Liste.
 **Ursprung:** Session Seed-Fix (Beispielspieler mit Login), `make check`
 
 **Einschätzung:** Niedrig, vermutlich ein Wackler unter Last (Modul nach dem Neuladen noch nicht ausgeliefert). Wiederholt er sich, Trace holen.
+
+### 2026-11-09 — cmAdmins zählt ausgetretene und vorgemerkte Mitglieder mit
+
+**Thema:** Rechte
+
+**Fundort:** `src/lib/server/mitteilung/meldung.ts` (`cmAdmins`) gegenüber `src/lib/server/turnier/kontakt.ts` (`gueltigerCmAdmin`).
+
+**Beobachtung:** `cmAdmins` prüft nur Rolle `cm` und ungesperrtes Konto, nicht den Status des Mitglieds. Die neue Regel für die Kontaktperson verlangt zusätzlich Status *aktiv*. Meldungen an die CM-Admins (z. B. neuer Wildcard-Antrag) können so an ausgetretene oder zum Löschen vorgemerkte Personen gehen; `meldeMitgliedern` filtert allerdings selbst nach `aktiv`, die Mail geht also wohl nicht raus.
+
+**Ursprung:** CAS-Review des Branches feat/cm-uebersicht
+
+**Einschätzung:** Niedrig. Prüfen, ob `cmAdmins` auf `gueltigerCmAdmin` umgestellt werden soll, damit es nur eine Regel gibt.

@@ -63,8 +63,9 @@ Die eigene Partnerin bzw. der eigene Partner mit Kontakt bleibt in der eigenen D
 stehen, weil man ihn braucht.
 
 Stattdessen trägt jede Karte einen Link mit der Anzahl, z. B. «12 angemeldet ›», im Doppel
-«5 Paare ›». *(Wortlaut: Entscheid Claude.)* Bei 0 lautet er «Noch niemand angemeldet ›»
-und führt trotzdem auf die Seite.
+«5 Paare ›». *(Wortlaut: Entscheid Claude.)* Bei 0 lautet er «Noch niemand angemeldet ›»,
+im Doppel «Noch kein Paar ›» (Nachtrag Review: wer allein sucht, ist angemeldet), und führt
+trotzdem auf die Seite.
 
 Der Link führt auf die neue **Seite einer Kategorie**
 `/clubmeisterschaft/[id]/kategorie/[kid]`:
