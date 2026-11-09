@@ -32,8 +32,9 @@ const EINZEL: KategorieWerte = {
 	mindestsumme: null
 };
 
-const EINZEL_2: KategorieWerte = { ...EINZEL, name: 'Herren R1–R5', klassierungBis: 'R5' };
-const EINZEL_3: KategorieWerte = { ...EINZEL, name: 'Herren R1–R4', klassierungBis: 'R4' };
+const DAMEN: KategorieWerte = { ...EINZEL, name: 'Damen R1–R9', geschlecht: 'damen' };
+const DAMEN_2: KategorieWerte = { ...DAMEN, name: 'Damen R1–R6', klassierungBis: 'R6' };
+const DAMEN_3: KategorieWerte = { ...DAMEN, name: 'Damen R1–R4', klassierungBis: 'R4' };
 
 type Stand = {
 	id: number;
@@ -457,7 +458,8 @@ test.describe('Titel in der Kopfleiste', () => {
 	test('Zurück an gespeicherte Stelle zeigt den Titel sofort', async ({ page }, info) => {
 		const jahr = JAHR_TITEL[info.project.name];
 		const name = `Clubmeisterschaft ${jahr}`;
-		const { turnierId } = await legeOffenesTurnierAn(jahr, [MIXED, EINZEL, EINZEL_2, EINZEL_3]);
+		// Damen-Kategorien, damit für Yara (w) genug Karten stehen und die Seite hoch ist.
+		const { turnierId } = await legeOffenesTurnierAn(jahr, [MIXED, DAMEN, DAMEN_2, DAMEN_3]);
 		const konto = await meldeAn(page, 'Yara');
 		await setzeSpielerangaben(konto.mitgliedId, {
 			geschlecht: 'w',
@@ -465,13 +467,19 @@ test.describe('Titel in der Kopfleiste', () => {
 			klassierung: 'R4'
 		});
 		await setzeTelefon(konto.mitgliedId, '079 000 00 71');
-		await page.setViewportSize({ width: page.viewportSize()!.width, height: 400 });
+		await page.setViewportSize({ width: page.viewportSize()!.width, height: 250 });
 		await page.goto(`/clubmeisterschaft/${turnierId}`);
 		await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
 		await scrolle(page, 'unten');
 		await sichtbar(page);
-		const stelle = await page.locator('.rollbereich').evaluate((e) => e.scrollTop);
-		expect(stelle).toBeGreaterThan(0);
+		// Das <h1> liegt weit über der Kopfleiste (mehr als ein Zurück-Link hoch, der bei mehreren
+		// laufenden CMs erscheinen kann), die Prüfung hängt also nicht von diesem Link ab.
+		const abstand = await page.evaluate(
+			() =>
+				document.querySelector('.rollbereich')!.getBoundingClientRect().top -
+				document.querySelector('main h1')!.getBoundingClientRect().bottom
+		);
+		expect(abstand).toBeGreaterThan(100);
 		await page.getByRole('link', { name: 'Anmelden' }).click();
 		await expect(page).toHaveURL(/\/doppel\//);
 		await unsichtbar(page);

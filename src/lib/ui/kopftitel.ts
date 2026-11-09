@@ -5,6 +5,8 @@
  * Beobachtet das <h1> in `inhalt` (auch wenn es ausgetauscht wird) und meldet seinen Text,
  * solange es nicht im sichtbaren Teil von `wurzel` liegt (null = Fenster), abzüglich `oben` px
  * (Höhe einer klebenden Kopfleiste). Meldet null, sobald es wieder sichtbar ist oder fehlt.
+ * `oben` wird beim Aufbau gelesen und danach bei jedem Fenster- und `inhalt`-Grössenwechsel
+ * erneut; ändert sich der Wert, wird der Beobachter mit dem neuen Rand neu aufgebaut.
  * Gibt eine Funktion zum Aufräumen zurück.
  */
 export function beobachteKopftitel(o: {
@@ -17,6 +19,7 @@ export function beobachteKopftitel(o: {
 	// Ob das <h1> oberhalb des sichtbaren Teils liegt (unterhalb zeigt die Kopfleiste nichts).
 	let darueber = false;
 	let beobachter: IntersectionObserver | null = null;
+	let rand = Math.max(0, o.oben());
 
 	function melden() {
 		o.melde(darueber && ueberschrift ? (ueberschrift.textContent ?? '').trim() : null);
@@ -37,7 +40,7 @@ export function beobachteKopftitel(o: {
 				darueber = !e.isIntersecting && e.boundingClientRect.bottom <= grenze;
 				melden();
 			},
-			{ root: o.wurzel, rootMargin: `-${Math.max(0, o.oben())}px 0px 0px 0px`, threshold: 0 }
+			{ root: o.wurzel, rootMargin: `-${rand}px 0px 0px 0px`, threshold: 0 }
 		);
 		beobachter.observe(ueberschrift);
 	}
@@ -53,12 +56,26 @@ export function beobachteKopftitel(o: {
 		} else melden();
 	}
 
+	// Ändert sich die Höhe der klebenden Kopfleiste (Fenster gedreht, Schrift grösser), braucht der
+	// Beobachter den neuen Rand.
+	function pruefeRand() {
+		const neu = Math.max(0, o.oben());
+		if (neu === rand) return;
+		rand = neu;
+		beobachte();
+	}
+	const groesse = new ResizeObserver(pruefeRand);
+	groesse.observe(o.inhalt);
+	window.addEventListener('resize', pruefeRand);
+
 	const mutationen = new MutationObserver(pruefe);
 	mutationen.observe(o.inhalt, { childList: true, subtree: true, characterData: true });
 	pruefe();
 
 	return () => {
 		mutationen.disconnect();
+		groesse.disconnect();
+		window.removeEventListener('resize', pruefeRand);
 		beobachter?.disconnect();
 	};
 }

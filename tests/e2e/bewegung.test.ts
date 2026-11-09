@@ -285,7 +285,7 @@ test('Bewegung reduzieren: kein Übergang (UI-09)', async ({ page }) => {
 	await reiter(page, 'Start').click();
 	await expect(page).toHaveURL(/\/$/);
 	expect(await uebergaenge(page)).toEqual([]);
-	// Auch Balken, Symbol, Kachel und Pfeil des Aufklappbereichs bewegen sich nicht (im Profil;
+	// Auch Balken, Symbol, Kachel, Pfeil des Aufklappbereichs und Titel der Kopfleiste bewegen sich nicht (im Profil;
 	// eine Kachel als Link hat ein normales Mitglied nicht, darum eine zum Prüfen).
 	await reiter(page, 'Profil').click();
 	await expect(page).toHaveURL(/\/profil$/);
@@ -293,12 +293,14 @@ test('Bewegung reduzieren: kein Übergang (UI-09)', async ({ page }) => {
 		const kachel = document.createElement('a');
 		kachel.className = 'kachel';
 		document.querySelector('main')?.append(kachel);
-		return ['.reiter-balken', '.reiter a .symbol', 'a.kachel', '.klappe-titel'].map((wahl) => {
-			const el = document.querySelector(wahl);
-			if (!el) return `${wahl} fehlt`;
-			const s = getComputedStyle(el, wahl === '.klappe-titel' ? '::after' : null);
-			return `${wahl}: ${s.transitionDuration}`;
-		});
+		return ['.reiter-balken', '.reiter a .symbol', 'a.kachel', '.klappe-titel', '.kopf-titel'].map(
+			(wahl) => {
+				const el = document.querySelector(wahl);
+				if (!el) return `${wahl} fehlt`;
+				const s = getComputedStyle(el, wahl === '.klappe-titel' ? '::after' : null);
+				return `${wahl}: ${s.transitionDuration}`;
+			}
+		);
 	});
 	expect(dauern.filter((d) => !/: 0s(, 0s)*$/.test(d))).toEqual([]);
 });
