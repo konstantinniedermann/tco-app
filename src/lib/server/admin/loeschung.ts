@@ -1,5 +1,5 @@
 // Löschfristen (FR-04, docs/datenschutz.md «Löschen»): Konten nach Frist oder Bedenkzeit,
-// Änderungsverlauf nach 12 Monaten, Antworten zu Anlässen ein Jahr nach Beginn des Anlasses.
+// Änderungsverlauf nach 12 Monaten, Antworten zu Anlässen ein Jahr nach Beginn des Anlasses, Gespräche mit der Turnierleitung nach dem Turnierjahr.
 import { and, getTableColumns, inArray, lt, or, sql } from 'drizzle-orm';
 import type { Db, DbOderTx } from '../db/index.ts';
 import {
@@ -8,12 +8,16 @@ import {
 	anlassAnmeldung,
 	anmeldung,
 	anmeldungSpieler,
+	gespraech,
 	konto,
 	mitglied,
 	mitteilung,
-	partnerAnfrage
+	nachricht,
+	partnerAnfrage,
+	turnier
 } from '../db/schema.ts';
 import type { MitgliedStatus } from './mitglieder.ts';
+import { jahrInZuerich } from '../datum.ts';
 import { loeschtAm } from './mitgliedschaft.ts';
 import { sperreRollen } from './rollen.ts';
 
@@ -42,6 +46,8 @@ export type Loeschlauf = {
 	verlauf: number;
 	/** Gelöschte Antworten zu Anlässen: abgelaufene und die der gelöschten Konten. */
 	antworten: number;
+	/** Gelöschte Gespräche (mit ihren Nachrichten): abgelaufene Turnierjahre und die der gelöschten Konten. */
+	gespraeche: number;
 };
 
 // Gleiche Uhrzeit (UTC), `monate` Kalendermonate früher. Gibt es den Tag dort nicht (29.2.2028
@@ -86,10 +92,10 @@ const kandidaten = (tx: DbOderTx, nur?: number[]) =>
  */
 async function loescheKonten(tx: DbOderTx, jetzt: Date) {
 	const vorab = (await kandidaten(tx)).filter((m) => faellig(m, jetzt)).map((m) => m.id);
-	if (vorab.length === 0) return { ids: [], verlauf: 0, antworten: 0 };
+	if (vorab.length === 0) return { ids: [], verlauf: 0, antworten: 0, gespraeche: 0 };
 	const gesperrt = await kandidaten(tx, vorab).for('update');
 	const ids = gesperrt.filter((m) => faellig(m, jetzt)).map((m) => m.id);
-	if (ids.length === 0) return { ids: [], verlauf: 0, antworten: 0 };
+	if (ids.length === 0) return { ids: [], verlauf: 0, antworten: 0, gespraeche: 0 };
 
 	// 1. Verweise leeren: der Name erscheint nirgends mehr als Handelnde (→ «gelöschtes Konto»).
 	await tx
@@ -98,6 +104,10 @@ async function loescheKonten(tx: DbOderTx, jetzt: Date) {
 		.where(inArray(aenderung.urheberMitgliedId, ids));
 	await tx.update(anlass).set({ erstelltVon: null }).where(inArray(anlass.erstelltVon, ids));
 	await tx.update(mitteilung).set({ absenderId: null }).where(inArray(mitteilung.absenderId, ids));
+	await tx
+		.update(nachricht)
+		.set({ adminMitgliedId: null })
+		.where(inArray(nachricht.adminMitgliedId, ids));
 	// 2. Konto (mit Sitzungen, Passkeys, Rollen, Push-Abos), Antworten und eigener Verlauf. Von
 	// den CM-Anmeldungen bleibt nur der Name: ohne Wildcard-Begründung und ohne Kommentar *sucht
 	// Partner*; offene Partner-Anfragen von und an die Gelöschten sind weg.
@@ -117,6 +127,11 @@ async function loescheKonten(tx: DbOderTx, jetzt: Date) {
 	await tx
 		.delete(partnerAnfrage)
 		.where(or(inArray(partnerAnfrage.vonId, ids), inArray(partnerAnfrage.anId, ids)));
+	// Gespräche mit der Turnierleitung (FR-54); die Nachrichten gehen per Cascade mit.
+	const gespraeche = await tx
+		.delete(gespraech)
+		.where(inArray(gespraech.mitgliedId, ids))
+		.returning({ id: gespraech.id });
 	const antworten = await tx
 		.delete(anlassAnmeldung)
 		.where(inArray(anlassAnmeldung.mitgliedId, ids))
@@ -130,7 +145,12 @@ async function loescheKonten(tx: DbOderTx, jetzt: Date) {
 		.update(mitglied)
 		.set({ ...LEER, status: 'geloescht' })
 		.where(inArray(mitglied.id, ids));
-	return { ids, verlauf: verlauf.length, antworten: antworten.length };
+	return {
+		ids,
+		verlauf: verlauf.length,
+		antworten: antworten.length,
+		gespraeche: gespraeche.length
+	};
 }
 
 /**
@@ -144,7 +164,8 @@ export async function raeumeAuf(db: Db, jetzt: Date): Promise<Loeschlauf> {
 		const sperre = await tx.execute<{ frei: boolean }>(
 			sql`select pg_try_advisory_xact_lock(${SPERRE_LOESCHLAUF}) as frei`
 		);
-		if (!sperre.rows[0]?.frei) return { lief: false, konten: [], verlauf: 0, antworten: 0 };
+		if (!sperre.rows[0]?.frei)
+			return { lief: false, konten: [], verlauf: 0, antworten: 0, gespraeche: 0 };
 		// Wie Übergänge und Rollenänderungen: Rollen-Sperre vor jeder Zeilensperre.
 		await sperreRollen(tx);
 
@@ -165,17 +186,31 @@ export async function raeumeAuf(db: Db, jetzt: Date): Promise<Loeschlauf> {
 				)
 			)
 			.returning({ anlassId: anlassAnmeldung.anlassId });
+		// Gespräche: ab dem 1.1. nach dem Turnierjahr (Zürich), FR-54.
+		const gespraeche = await tx
+			.delete(gespraech)
+			.where(
+				inArray(
+					gespraech.turnierId,
+					tx
+						.select({ id: turnier.id })
+						.from(turnier)
+						.where(lt(turnier.jahr, jahrInZuerich(jetzt)))
+				)
+			)
+			.returning({ id: gespraech.id });
 		return {
 			lief: true,
 			konten: konten.ids,
 			verlauf: konten.verlauf + verlauf.length,
-			antworten: konten.antworten + antworten.length
+			antworten: konten.antworten + antworten.length,
+			gespraeche: konten.gespraeche + gespraeche.length
 		};
 	});
 	// Erst nach dem Commit: das Log nennt nur, was wirklich gelöscht ist.
 	if (ergebnis.lief) {
-		const { konten, verlauf, antworten } = ergebnis;
-		console.info('Löschlauf', { konten, verlauf, antworten });
+		const { konten, verlauf, antworten, gespraeche } = ergebnis;
+		console.info('Löschlauf', { konten, verlauf, antworten, gespraeche });
 	}
 	return ergebnis;
 }
