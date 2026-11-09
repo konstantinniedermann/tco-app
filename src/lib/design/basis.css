@@ -1997,6 +1997,13 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		min-width: 0;
 	}
 
+	/* Der Name (erstes Element) hat Vorrang; ein Kommentar dahinter nimmt nur den Rest (Basis 0).
+	   Mit Basis auto würde der lange Kommentar an seiner Höchstbreite eingefroren und das
+	   Kürzen träfe allein den Namen */
+	.zelle-dehnbar > .zelle-kurz:not(:first-child) {
+		flex: 1 1 0;
+	}
+
 	.spalten {
 		display: grid;
 		grid-template-columns: 1fr 1fr;

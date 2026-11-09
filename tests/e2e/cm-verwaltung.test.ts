@@ -478,6 +478,10 @@ test('PC: Anmeldungen einzeilig, Aktionen über «Ändern»', async ({ page }, i
 	await expect(zLang.getByRole('button', { name: 'Ändern', exact: true })).toBeInViewport({
 		ratio: 1
 	});
+	// Der Name hat Vorrang vor dem Kommentar: «Probe…, Rolf» steht ganz da, der Kommentar kürzt sich.
+	expect(
+		await z.locator('[id^="anmeldung-"]').evaluate((e) => e.scrollWidth <= e.clientWidth)
+	).toBe(true);
 	const name = zLang.locator('[id^="anmeldung-"]');
 	expect(await name.evaluate((e) => e.getClientRects().length)).toBe(1);
 	expect(await name.evaluate((e) => e.scrollWidth > e.clientWidth)).toBe(true);
