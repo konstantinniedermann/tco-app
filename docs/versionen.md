@@ -9,9 +9,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 ## Unveröffentlicht
 
 - Feinschliff am Computer: Die Kopfleiste zeigt beim Scrollen den Titel der Seite, am Handy wie
-  am PC. Die Reiter stehen am PC in der Seitenleiste, die samt Pfad und Titel beim Scrollen
-  stehen bleibt. Die Tabellen der Verwaltung sind einzeilig; die Aktionen einer Anmeldung liegen
-  hinter «Ändern». Die Spielersuche im Dialog «Von Hand anmelden» springt nicht mehr und nennt
+  am PC. Am PC stehen die Reiter mit Symbol mittig in der Kopfleiste. In der Verwaltung bleiben
+  Seitenleiste, Pfad und Titel beim Scrollen stehen. Die Tabellen der Verwaltung sind einzeilig
+  und passen ohne seitliches Scrollen; lange Namen und Kommentare enden mit «…», die Aktionen
+  einer Anmeldung liegen hinter «Ändern». Die Spielersuche im Dialog «Von Hand anmelden» springt nicht mehr und nennt
   den Hinweis «Ab 2 Buchstaben.».
 
 ## 0.17.2 — Testdaten: Suchende im Doppel anfragbar
