@@ -77,7 +77,7 @@ flowchart TD
   S["Seiten: src/routes, +page.svelte, oft mit +page.ts"] -->|fetch, JSON| API["Schnittstellen: src/routes/api, nur +server.ts"]
   S --> UI["Oberfläche: src/lib, ohne server"]
   H["hooks.server.ts: Sitzung, Sicherheits-Header"] --> API
-  API --> F["Fachmodule: src/lib/server/login, admin, profil, anlass, turnier, cm, mitteilung, brief"]
+  API --> F["Fachmodule: src/lib/server/login, admin, profil, anlass, turnier, cm, mitteilung, gespraech, brief"]
   F --> DB["Datenbank: src/lib/server/db, Drizzle, Migrationen in drizzle/"]
   DB --> PG[(PostgreSQL)]
 ```
@@ -87,6 +87,7 @@ flowchart TD
 | **Seiten** (`src/routes/**/+page.*`) | Bildschirme für Mitglieder und `verwaltung/` für die Admin-Rollen; laden Daten im Browser | keine Server-Dateien ausser `+server.ts`, keine Form Actions, keine Remote Functions ([ADR-002](adr/adr-002-sveltekit-postgresql.md), Prüfung `bauregel`) |
 | **Schnittstellen** (`src/routes/api/**/+server.ts`) | JSON für die Seiten; `api/admin/` nur für Verwaltungsrollen, je Bereich Lesen und Schreiben getrennt (`src/lib/verwaltung/bereiche.ts`: Mitglieder schreibt `mitglieder`, Clubmeisterschaft `cm`, Rollen `mytco`; `mytco` liest alle Bereiche) | Admin-Routen nutzen nur die Einträge aus `ADMIN_SCHNITTSTELLEN` (`src/lib/server/admin/schnittstellen.ts`), `TURNIER_SCHNITTSTELLEN` (`src/lib/server/turnier/schnittstellen.ts`) oder `MITTEILUNG_ADMIN_SCHNITTSTELLEN` (`src/lib/server/mitteilung/schnittstellen.ts`), die Sitzung, Bereich und Art prüfen, dazu den frischen Mail-Code (SI-08); während *Ansicht als …* weist der Hook jedes Speichern ab (SI-20) |
 | **Fachmodule** (`src/lib/server/<thema>/`) | Fachregeln aus dem [Fachmodell](fachmodell.md) (`FR-NN`) und Rechte aus [Rollen und Rechte](rollen-und-rechte.md) (`RR-NN`) | Rechte prüft immer der Server |
+| **Gespräch mit der Turnierleitung** (`src/lib/server/gespraech/`, Tabellen `gespraech`, `nachricht`) | Fachmodell FR-50 bis FR-54: Mitglied schreibt, CM-Admins antworten und setzen den Zustand; Schnittstellen für Mitglieder `/api/cm/[id]/gespraech`, für die Verwaltung `/api/admin/gespraeche/…` und `/api/admin/turniere/[id]/gespraeche`; Meldung an die Kontaktperson über `meldeMitgliedern` (ohne Inhalt und Namen); Löschung nach dem Turnierjahr in `raeumeAuf` | Antworten und Zustand nur bis Ende des Turnierjahres, Rechte prüft der Server |
 | **Datenbank** (`src/lib/server/db/`, `drizzle/`) | Schema und Migrationen | Migrationen fügen nur hinzu, damit der Rückfall auf das vorherige Image geht ([CI/CD und Release](ci-cd-und-release.md#auslieferung)) |
 | **Oberfläche** (`src/lib/` ohne `server/`) | Bausteine und Tokens (`ui/`, `design/`), Teile je Thema (`verwaltung/`, `login/`, `profil/`, `anlass/`, `turnier/`, `cm/`, `mitteilung/`, `push/`, `hilfe/`, `datenschutz/`) | nur aus dem [UI-Leitbild](ui-leitbild.md) |
 | **Zeitgeber** (`src/lib/server/zeitgeber.ts`, gestartet in `hooks.server.ts`) | Täglicher Takt in der App (erster Lauf kurz nach dem Start), ruft den Löschlauf `raeumeAuf` (`src/lib/server/admin/loeschung.ts`) | `ZEITGEBER=aus` schaltet ihn ab (E2E); ein Datenbank-Sperrschloss verhindert parallele Läufe ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)) |

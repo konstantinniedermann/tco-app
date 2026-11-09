@@ -365,3 +365,24 @@ Einzel-Liste.
 **Ursprung:** Doku-Abgleich vor dem Release 0.19.1.
 
 **Einschätzung:** Niedrig; Entscheid des Projektleiters, welcher Weg.
+
+### 2026-11-09 — Gespräch Turnierleitung: aufgeschobene Punkte aus dem Final-Review
+
+**Thema:** Gespräch Turnierleitung
+
+**Fundort:** `src/lib/server/gespraech/` (`gespraech.ts`, `schnittstellen.ts`), `src/lib/server/cm/anmeldungen.ts` (`laufendeTurniere`), `src/routes/clubmeisterschaft/[id]/kontakt/`, `src/routes/verwaltung/turniere/[id]/nachrichten/`, Seed, DB-Tests des Gesprächs
+
+**Beobachtung:** Aufgeschoben, nichts davon führt zu falschen Daten:
+(1) «erledigt» lässt sich setzen, obwohl inzwischen eine neuere Nachricht des Mitglieds eintraf (der Zustand hat keine `nachLetzter`-Prüfung wie die Antwort).
+(2) Der Meldungslink läuft über `/verwaltung/bestaetigen` und landet auf `startziel()`, nicht im Gespräch (RR-09).
+(3) `gespraech.letzteAm` wird geschrieben, aber nirgends gelesen.
+(4) `maxlength` im Feld zählt UTF-16, der Server zählt Codepunkte (Emoji).
+(5) Nichts verknüpft `admin_mitglied_id` mit `von`.
+(6) `gespraechStand` in `laufendeTurniere` läuft pro Turnier einzeln (N+1).
+(7) DB-Tests, die ihre eigene Datenbank im Testrumpf anlegen, laufen gegen die Standard-Zeitgrenze von 5 s.
+(8) Nach erfolgreichem Senden gibt es keine Ansage für Screenreader, weder für Mitglieder noch in der Verwaltung.
+(9) Der Seed setzt «neue Antwort» nicht zurück.
+
+**Ursprung:** Final-Review #71
+
+**Einschätzung:** Niedrig; (1) und (2) zuerst ansehen, (6) erst bei vielen Turnieren relevant.
