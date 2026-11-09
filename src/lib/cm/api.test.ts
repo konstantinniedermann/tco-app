@@ -3,6 +3,7 @@ import {
 	doppelZurWahl,
 	holeCmAnsicht,
 	holeCmTurniere,
+	kategorieZumAnsehen,
 	lehneAnfrageAb,
 	meldeAb,
 	beantrageWildcard,
@@ -199,5 +200,16 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 		expect(doppelZurWahl(ansicht({ kategorien: [sucht] }), 4)).toBe(sucht);
 		const paar = { ...doppel, eigen: { art: 'paar' } } as unknown as CmKategorie;
 		expect(doppelZurWahl(ansicht({ kategorien: [paar] }), 4)).toBeNull();
+	});
+});
+
+describe('Seite einer Kategorie', () => {
+	test('findet Kategorien der Übersicht und Wildcard-Kategorien, sonst null', () => {
+		const einzel = { id: 1, art: 'einzel' } as CmKategorie;
+		const wildcard = { id: 2, art: 'einzel' } as CmKategorie;
+		const ansicht = { kategorien: [einzel], wildcard: [wildcard] } as unknown as CmAnsicht;
+		expect(kategorieZumAnsehen(ansicht, 1)).toEqual({ kategorie: einzel, wildcard: false });
+		expect(kategorieZumAnsehen(ansicht, 2)).toEqual({ kategorie: wildcard, wildcard: true });
+		expect(kategorieZumAnsehen(ansicht, 3)).toBeNull();
 	});
 });

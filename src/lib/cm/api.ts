@@ -26,6 +26,20 @@ export function doppelZurWahl(cm: CmAnsicht, kategorieId: number): CmKategorie |
 	return k && k.eigen?.art !== 'paar' ? k : null;
 }
 
+/**
+ * Seite einer Kategorie: die Kategorie, wie die Übersicht sie zeigt (auch eine Wildcard-Kategorie),
+ * sonst `null`.
+ */
+export function kategorieZumAnsehen(
+	cm: CmAnsicht,
+	kategorieId: number
+): { kategorie: CmKategorie; wildcard: boolean } | null {
+	const k = cm.kategorien.find((x) => x.id === kategorieId);
+	if (k) return { kategorie: k, wildcard: false };
+	const w = cm.wildcard.find((x) => x.id === kategorieId);
+	return w ? { kategorie: w, wildcard: true } : null;
+}
+
 /** Gründe, aus denen der Server eine Anmeldung oder Anfrage ablehnt (409). */
 const ABGELEHNT = [
 	'geschlossen',
