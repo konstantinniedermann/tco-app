@@ -369,7 +369,7 @@ die Bewegung zeigt, wohin man gegangen ist. Dauern und Kurven stehen unter
 | Zurück-Taste oder -Geste des Browsers, Verwaltung, unbekannte Adresse | | keine; die Geste animiert der Browser selbst, eine unbekannte Adresse lädt die Seite neu. Lässt sich eine bekannte Seite nicht laden, bewegt sich die Fehlerseite wie die Seite, die sie ersetzt |
 
 Kopfleiste und Statusleisten-Band stehen beim Wechsel still, die Reiter auch, solange sie
-auf beiden Seiten stehen.
+auf beiden Seiten stehen. Der Titel in der Kopfleiste ist beim Wechsel weg (die Seite beginnt oben).
 
 **Titel in der Kopfleiste:** Gilt in der Mitglieder-App und in der Verwaltung unter `60rem`, für
 jede Seite mit `<h1>` (auch Start), nicht für Seiten ohne `<h1>`. Verschwindet das `<h1>` beim
@@ -535,7 +535,7 @@ Seite *Auskunft*.
 | UI-05 | Bedeutung nie nur über Farbe: Status als Plakette mit Text, Symbole immer mit Text. |
 | UI-06 | Fehlermeldungen stehen beim Feld, in Worten, mit Lösungsweg. |
 | UI-07 | Codes werden unabhängig von Gross-/Kleinschreibung, Leerzeichen und Bindestrich angenommen. |
-| UI-09 | Bewegung gibt es nur, wo sie Orientierung gibt: beim Seitenwechsel, an der Markierung des Reiters, beim Auf- und Zuklappen, bei der Rückfrage ([Bewegung und Bedienung](#bewegung-und-bedienung), Dauern unter [Bewegung](#bewegung)) und im Baustein Anleitung. Bei „Bewegung reduzieren" wechselt alles sofort. Die Anleitung: weiche Überblendung, 3,5 s pro Schritt, 6 s für „Fertig", höchstens 3 Durchläufe, danach steht sie bei „Fertig". Eine Taste hält an (Anhalten · Abspielen · Nochmals abspielen). Bei „Bewegung reduzieren" keine Bewegung und keine Taste; die Bilder stehen nummeriert still nebeneinander. |
+| UI-09 | Bewegung gibt es nur, wo sie Orientierung gibt: beim Seitenwechsel, an der Markierung des Reiters, beim Auf- und Zuklappen, bei der Rückfrage, beim Einblenden des Titels in der Kopfleiste ([Bewegung und Bedienung](#bewegung-und-bedienung), Dauern unter [Bewegung](#bewegung)) und im Baustein Anleitung. Bei „Bewegung reduzieren" wechselt alles sofort. Die Anleitung: weiche Überblendung, 3,5 s pro Schritt, 6 s für „Fertig", höchstens 3 Durchläufe, danach steht sie bei „Fertig". Eine Taste hält an (Anhalten · Abspielen · Nochmals abspielen). Bei „Bewegung reduzieren" keine Bewegung und keine Taste; die Bilder stehen nummeriert still nebeneinander. |
 
 Lange Wörter („Clubmeisterschaft") werden getrennt statt abgeschnitten (`hyphens: auto`
 auf `body`, Sprache `de-CH` in `src/app.html`). Ausnahme sind Tabellenköpfe (`.tabelle th`):
