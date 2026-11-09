@@ -16,6 +16,10 @@ import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hil
 // Übersichtliche Navigation (#69, UI-Leitbild «Feste Ordnung»): Reiter Start · CM · Profil auf
 // allen Seiten nach dem Login, Zurück-Link mit Ziel, Reiter CM, Pfad in der Verwaltung.
 
+// Alle Browser kommen von 127.0.0.1 an denselben Server; die Grenze von 10 Code-Anfragen pro IP
+// und Stunde gilt für den ganzen Lauf und ist durch Login, Profil und Mitgliedschaft ausgeschöpft.
+// Diese Datei fordert darum keinen Code an: Anmeldung per Brief-Code, Mail-Antworten nachgebildet.
+
 // Pro Jahr gibt es ein Turnier; diese Jahre gehören nur dieser Datei (übrige E2E: 2075–2099).
 const JAHR_DOPPEL: Record<string, number> = { iphone: 2074, android: 2073 };
 const JAHR_CM: Record<string, number> = { iphone: 2072, android: 2071 };
@@ -445,6 +449,8 @@ test.describe('Titel in der Kopfleiste', () => {
 		await page.setViewportSize({ width: page.viewportSize()!.width, height: 400 });
 		await page.goto('/profil/email');
 		await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+		// Kein echter Code: die Antwort des Servers ist nachgebildet (Grenze pro IP, s. Kopf).
+		await page.route('**/api/profil/email', (route) => route.fulfill({ status: 202, json: {} }));
 		await page.getByLabel('Neue E-Mail-Adresse').fill(`neu-${Date.now()}@example.org`);
 		await page.getByRole('button', { name: 'Codes senden' }).click();
 		await expect(
