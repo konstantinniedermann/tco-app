@@ -164,18 +164,20 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 
 | Baustein | Klasse | Regel |
 |----------|--------|-------|
-| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und steht fest oben (nur der Rollbereich darunter scrollt, in der Verwaltung `sticky`), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch). Das Wappen ist ein Link zur Startseite (`.kopf-start`, zugänglicher Name «Zur Startseite»): in der App zu Start, in der Verwaltung zu deren erster Seite. Die Kopfleiste sieht aus wie ohne Link; die Tippfläche reicht unsichtbar über das Wappen hinaus auf `--tippflaeche` (UI-03). Bei offener Tastatur schliesst der Tipp nur die Tastatur ([Eingabe mit Tastatur](#eingabe-mit-tastatur)), bei ungespeicherten Änderungen kommt zuerst die Rückfrage ([Ungespeicherte Änderungen](#ungespeicherte-änderungen)) |
-| Band *Ansicht als …* | `.ansicht-band` | nur solange der MyTCO-Admin *Ansicht als …* nutzt, auf jeder Seite von App und Verwaltung; liegt über der Kopfleiste. Fläche `--farbe-hinweis-flaeche`, Text `--farbe-hinweis`, unten ein Balken `--rand-akzent` in `--farbe-hinweis`; Text «Ansicht als <Rolle> — nur ansehen» und die Nebentaste *Beenden* (zurück zu den eigenen Rollen, die Seite lädt neu, sie bleibt dieselbe). Reicht wie die Kopfleiste unter die Statusleiste; die Kopfleiste darunter beginnt dann ohne diesen Abstand. Steht beim Seitenwechsel still wie die Kopfleiste; in der Verwaltung scrollt es mit der Seite weg wie deren Kopfleiste |
-| Statusleisten-Band | `.statusleiste` | ausserhalb von `.app`, fest oben, deckend in `--farbe-marke` wie die Kopfleiste darunter (auch in der Verwaltung). Im Browser so hoch wie `env(safe-area-inset-top)` (am PC 0); in der iPhone-App vom Startbildschirm (`display-mode: standalone`, nur iOS) zusätzlich `--abstand-3` hoch, also über dem oberen Rand der Kopfleiste und über 10 px; nicht in der Verwaltung (`.statusleiste-verwaltung`), weil deren Kopfleiste mit der Seitenleiste wegscrollt. iOS legt sonst über Web-Apps vom Startbildschirm einen hellen Schleier über die Statusleiste; iOS lässt ihn nur weg, wenn oben in der Mitte ein fester oder mitlaufender, deckender, fast bildschirmbreiter Streifen liegt |
+| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; ab `60rem` zusätzlich die Reiter in der Mitte (siehe [Layout und Navigation](#layout-und-navigation)), am PC eine einzige grüne Zeile; blendet den Seitentitel ein, sobald das `<h1>` der Seite unter der Kopfleiste verschwindet (`.kopf-titel`); reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und steht fest oben (in der App scrollt nur der Rollbereich darunter, in der Verwaltung ist sie `sticky`, auch auf dem Handy), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch). Das Wappen ist ein Link zur Startseite (`.kopf-start`, zugänglicher Name «Zur Startseite»): in der App zu Start, in der Verwaltung zu deren erster Seite. Die Kopfleiste sieht aus wie ohne Link; die Tippfläche reicht unsichtbar über das Wappen hinaus auf `--tippflaeche` (UI-03). Bei offener Tastatur schliesst der Tipp nur die Tastatur ([Eingabe mit Tastatur](#eingabe-mit-tastatur)), bei ungespeicherten Änderungen kommt zuerst die Rückfrage ([Ungespeicherte Änderungen](#ungespeicherte-änderungen)) |
+| Titel in der Kopfleiste | `.kopf-titel` | der Seitentitel in der Kopfleiste, nach Wappen, „MyTCO" und einem dünnen Trenner, in `--groesse-text`; einzeilig, zu lang endet mit „…"; sichtbar mit `data-sichtbar`, sonst durchsichtig; immer `aria-hidden="true"`, denn das `<h1>` steht auf der Seite; Bewegung unter [Bewegung und Bedienung](#bewegung-und-bedienung) |
+| Zusatz in der Kopfleiste | `.kopf-zusatz` | „Verwaltung" neben „MyTCO" in der Kopfleiste der Verwaltung; blendet aus, solange der Titel sichtbar ist (oben „MyTCO Verwaltung", gescrollt „MyTCO │ Damen R4/R9") |
+| Band *Ansicht als …* | `.ansicht-band` | nur solange der MyTCO-Admin *Ansicht als …* nutzt, auf jeder Seite von App und Verwaltung; liegt über der Kopfleiste. Fläche `--farbe-hinweis-flaeche`, Text `--farbe-hinweis`, unten ein Balken `--rand-akzent` in `--farbe-hinweis`; Text «Ansicht als <Rolle> — nur ansehen» und die Nebentaste *Beenden* (zurück zu den eigenen Rollen, die Seite lädt neu, sie bleibt dieselbe). Reicht wie die Kopfleiste unter die Statusleiste; die Kopfleiste darunter beginnt dann ohne diesen Abstand. Steht beim Seitenwechsel still wie die Kopfleiste; da die Kopfleiste der Verwaltung ebenfalls oben bleibt, liegen Band und Kopfleiste dort wie in der App übereinander, nie ineinander |
+| Statusleisten-Band | `.statusleiste` | ausserhalb von `.app`, fest oben, deckend in `--farbe-marke` wie die Kopfleiste darunter (auch in der Verwaltung). Im Browser so hoch wie `env(safe-area-inset-top)` (am PC 0); in der iPhone-App vom Startbildschirm (`display-mode: standalone`, nur iOS) zusätzlich `--abstand-3` hoch, also über dem oberen Rand der Kopfleiste und über 10 px; es gilt auch in der Verwaltung, weil deren Kopfleiste ebenfalls oben stehen bleibt. iOS legt sonst über Web-Apps vom Startbildschirm einen hellen Schleier über die Statusleiste; iOS lässt ihn nur weg, wenn oben in der Mitte ein fester oder mitlaufender, deckender, fast bildschirmbreiter Streifen liegt |
 | Rollbereich | `.rollbereich` | Mitglieder-App: der einzige Bereich, der scrollt, zwischen Kopfleiste und Reitern; enthält Inhalt und Fusszeile. Beim Überziehen federt nur er, Kopfleiste und Reiter bleiben stehen |
 | Seitenhintergrund (iPhone-App vom Startbildschirm) | `html`, `body` in `display-mode: standalone`, nur iOS | `--farbe-marke`; `.app` trägt dann `--farbe-hintergrund`. Was an Schleier bleibt, ist so grün statt hell |
-| Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben (`.reiter-balken`, gleitet zum gewählten Reiter); Abstand `env(safe-area-inset-bottom)` über dem Home-Balken; reagiert beim Antippen sofort, auch wenn der Inhalt noch nachläuft; nicht markierbar; weg, solange die Tastatur offen ist ([Eingabe mit Tastatur](#eingabe-mit-tastatur)) ([Bewegung und Bedienung](#bewegung-und-bedienung)) |
-| Seitenleiste | `.seitenleiste` | nur Verwaltung, Bereiche nach Rolle |
+| Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben (`.reiter-balken`, gleitet zum gewählten Reiter); ab `60rem` stehen sie stattdessen in der Mitte der Kopfleiste ([Layout und Navigation](#layout-und-navigation)), Symbol und Wort nebeneinander; Abstand `env(safe-area-inset-bottom)` über dem Home-Balken; reagiert beim Antippen sofort, auch wenn der Inhalt noch nachläuft; nicht markierbar; weg, solange die Tastatur offen ist ([Eingabe mit Tastatur](#eingabe-mit-tastatur)) ([Bewegung und Bedienung](#bewegung-und-bedienung)) |
+| Seitenleiste | `.seitenleiste` | nur Verwaltung, Bereiche nach Rolle; ab `60rem` bleibt sie beim Scrollen des Inhalts stehen (`sticky`, volle Bildschirmhöhe unter der Kopfleiste), ist sie höher als der Bildschirm, scrollt sie für sich; unter `60rem` steht sie unter der Kopfleiste und scrollt mit der Seite weg; nicht im Druck |
 | Haupttaste | `.taste-haupt` | Sandplatz-Rot, höchstens eine pro Bildschirm (UI-04) |
 | Nebentaste | `.taste-neben` | weiss mit grünem Rand; gedrückt `--farbe-marke-zart` |
 | Link | `a` | grün, unterstrichen |
 | Zurück | `.zurueck` | „‹ <Titel der Elternseite>" oben links auf Unterseiten, z. B. „‹ Profil", „‹ Clubmeisterschaft 2027"; führt eine Stufe höher in der [festen Ordnung](#feste-ordnung), egal woher man kam; immer einzeilig, ein zu langer Name endet mit „…" |
-| Pfad | `nav.pfad` | nur Verwaltung: über dem Titel jeder Unterseite die Stufen von der Seitenleiste bis hier, getrennt durch „›", z. B. „Turniere › Clubmeisterschaft 2027 › Herren R5/R9"; jede Stufe ein Link, die aktuelle Seite fett und ohne Link (`aria-current="page"`); unter `60rem` Breite des App-Rahmens steht statt seiner nur „‹ <Elternseite>" als `.zurueck`, darüber endet ein zu langer Pfad mit „…"; nie umbrechend, nicht im Druck |
+| Pfad | `nav.pfad` | nur Verwaltung: über dem Titel jeder Unterseite die Stufen von der Seitenleiste bis hier, getrennt durch „›", z. B. „Turniere › Clubmeisterschaft 2027 › Herren R5/R9"; jede Stufe ein Link, die aktuelle Seite fett und ohne Link (`aria-current="page"`); unter `60rem` Breite des App-Rahmens steht statt seiner nur „‹ <Elternseite>" als `.zurueck`, darüber endet ein zu langer Pfad mit „…"; nie umbrechend, nicht im Druck; am PC klebt er mit dem Titel (Baustein *Seitenkopf*) |
 | Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); ein Auswahlfeld (`select`) sieht aus wie ein Textfeld (gleiche Höhe, gleicher Rand) mit einem Pfeil rechts in `--farbe-text`, auf allen Geräten gleich statt im Aussehen des Browsers (UI-03); gesperrt ohne Pfeil; bei einer festen Höchstlänge zählt der Hilfetext mit („12 von 50 Zeichen", `.feld-hilfe`); als Dateiwahl (`input type="file"`, nur Verwaltung: *Einlesen*) mit dem Rand des Felds und der Wahltaste des Browsers im Aussehen der Nebentaste; Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
 | Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>`. Als Schalter (Ein/Aus, gilt sofort, ohne Speichern-Taste) dieselbe Fläche mit Häkchen statt Kreis (`type="checkbox"`), angehakt heisst ein: *Benachrichtigungen* im Profil |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
@@ -192,9 +194,14 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen"). Einzige Ausnahme ist *Nur ansehen*: oben auf Verwaltungsseiten, auf denen die eigene Rolle etwas nur lesen darf, «**Nur ansehen.** Ändern kann hier nur der <Rolle>.», ohne Aktion; er bleibt, solange die Rolle nur liest. In der Ansicht steht er nicht, dort sagt es das Band |
 | Nur lesen | `fieldset.nur-lesen` | Formular, das die eigene Rolle oder die Ansicht nur lesen lässt: die Felder stehen in `<fieldset disabled class="nur-lesen">` (ohne Rand und Abstand, Text in `--farbe-text`, damit er gut lesbar bleibt); Absende- und Aktions-Tasten fehlen, auch «Weitere …», «Entfernen», «… löschen» und Tasten zum Anlegen. In der Ansicht fehlen in der ganzen App alle Tasten, die etwas speichern (Profil, Antwort auf einen Anlass, Passkey); *Abmelden* bleibt |
 | Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06); betrifft sie das ganze Formular (z. B. *Inzwischen hat jemand anderes dieses Mitglied geändert*), unter dem Formular, mit dem Lösungsweg als Nebentaste daneben (*Neuen Stand laden*) |
-| Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm waagrecht scrollbar; enthält sie keine Links oder Tasten, ist der Bereich eine benannte Region mit `tabindex="0"`, damit er per Tastatur scrollt |
+| Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm (unter `60rem`) waagrecht scrollbar; ab `60rem` ist jede Zeile einzeilig: Text, der nicht passt, endet mit „…" (`.zelle-kurz`), der volle Text steht in der Detailseite, im Dialog oder, wo es keines von beiden gibt, als `title`; höchstens zwei kurze Tasten pro Zeile, ab drei Aktionen steht dort eine Taste «Ändern», die den Dialog *Ändern* öffnet; ist nur eine Aktion möglich, bleibt sie als Taste stehen; Ausnahme Paare: in Tabellen mit Doppelpaaren steht jeder Spieler in einer eigenen einzeiligen Zeile, Status und Taste stehen nur einmal pro Paar; enthält sie keine Links oder Tasten, ist der Bereich eine benannte Region mit `tabindex="0"`, damit er per Tastatur scrollt |
+| Zelle, gekürzt | `.zelle-kurz` | Zelle der Tabelle mit freiem Text (Name, Kommentar, Betreff): einzeilig, ein zu langer Text endet mit „…"; nur ab `60rem` |
+| Ändern-Dialog | `<dialog class="karte">` | öffnet die Taste «Ändern» einer Tabellenzeile: Name der Zeile, der volle Text (z. B. Kommentar) und die Aktionen, die gerade gehen, je als Taste; jede Taste schliesst den Dialog und öffnet den Dialog der Aktion; «Abbrechen» schliesst; zählt für UI-04 als eigener Bildschirm |
+| Seitenkopf | `.seitenkopf` | nur Verwaltung: Pfad und `<h1>` einer Seite zusammen; ab `60rem` klebt er oben am Inhalt, auf der Fläche in `--farbe-hintergrund` mit einer dünnen Linie in `--farbe-rand` darunter, sobald Inhalt darunter durchläuft; Seiten ohne Pfad kleben nur mit dem Titel; unter `60rem` und im Druck klebt nichts |
+| Treffer (Spielersuche) | `.treffer` | Trefferbereich der Spielersuche unter dem Suchfeld, überall wo sie steht (Von Hand anmelden, Doppelpartner ändern): immer da, mit fester Höhe für etwa 5 Treffer zu je zwei Zeilen (Name, darunter leise Angaben); Tippen und Treffer ändern die Grösse nie; vor der Suche steht darin leise «Ab 2 Buchstaben.», bei keinem Ergebnis «Keine Treffer.», bei einem Fehler dessen Text, alles im selben Bereich; bei mehr Treffern scrollt nur er, mit Tastatur und Finger; die Angabe steht nicht zusätzlich als Hilfetext unter dem Feld |
 | Symbol | `.symbol` | eigene SVG-Symbole, 24er-Raster, Strich 2, immer mit Text |
-| App-Rahmen | `.app` | umschliesst Kopfleiste, Inhalt und Reiter; misst die Breite fürs PC-Layout |
+| App-Rahmen | `.app` | umschliesst Kopfleiste, Inhalt und Reiter; misst die Breite fürs PC-Layout (Container `app`) |
+| Rahmen in der App | `.app-rahmen` | in der Mitglieder-App unter `.app`; unter `60rem` ein Block, ab `60rem` ein Raster mit drei Spalten `1fr auto 1fr`: Kopfleiste über die ganze Breite, die Reiter in der Mitte (bezogen auf die ganze Breite, nicht auf den Platz rechts vom Wappen); `.app` selbst lässt sich nicht per Container-Abfrage stylen, nur seine Nachkommen |
 | Inhaltsbereich | `.inhalt` | eine Spalte, höchstens `--breite-inhalt`, Seitenrand, im Querformat mindestens der sichere Bereich (`env(safe-area-inset-left/right)`) |
 | Leiste | `.leiste` | Suche, Filter und Tasten nebeneinander, bricht bei Platzmangel um |
 | Verwaltungsrahmen | `.verwaltung` | Seitenleiste links, Inhalt rechts; auf schmalem Bildschirm untereinander |
@@ -227,14 +234,20 @@ unterscheidet.
 
 Teile eines Bausteins heissen `<baustein>-<teil>`, z. B. `.kopf-wappen`, `.feld-hilfe`,
 `.zaehler-balken`, `.zaehler-voll`, `.zaehler-text`, `.kachel-pfeil`, `.seitenleiste-bereich`,
-`.klappe-titel`. Der aktive Reiter
+`.klappe-titel`, `.kopf-titel`, `.kopf-zusatz`. Ohne Teil-Schreibweise, weil sie eigene Bausteine
+sind: `.app-rahmen`, `.seitenkopf`, `.zelle-kurz`, `.treffer`. Der aktive Reiter
 und der aktive Eintrag der Seitenleiste tragen `aria-current="page"`, keine eigene Klasse.
 
 ## Layout und Navigation
 
 **Mitglieder-App (Handy zuerst):** Kopfleiste oben, Inhalt in einer Spalte (höchstens
-`--breite-inhalt`), Reiter unten. Ab `60rem` Breite wandern die Reiter als Textlinks in die
-Kopfleiste.
+`--breite-inhalt`), Reiter unten. Ab `60rem` Breite stehen die Reiter mit denselben Symbolen wie auf dem Handy,
+Symbol und Wort nebeneinander, in der Mitte der Kopfleiste (eine einzige grüne Zeile). Nicht
+aktiv: weisse Schrift auf Grün; aktiv: helle Pille (`--farbe-marke-zart`) mit Schrift in
+`--farbe-marke`, fett, ohne Unterstreichung; Hover hellt leicht auf; Fokus als Rahmen in
+`--farbe-marke-hell`; Tippfläche mindestens `--tippflaeche`. Der Titel der Seite steht dann
+zwischen „MyTCO" und den Reitern und wird gekürzt, wenn der Platz fehlt; die Reiter verschiebt
+er nie.
 
 - **Reiter:** Start · CM · Profil; *Lizenz* kommt mit der Etappe *Lizenzanträge*. Höchstens
   4 Reiter, kein verstecktes Menü (☰). „CM" ist die Kurzform, weil „Clubmeisterschaft" bei
@@ -275,7 +288,7 @@ Startseite, direkt unter der Begrüssung, nur für Konten mit einer Rolle über 
 „MyTCO Verwaltung", den Bereichen, die eine der eigenen Rollen lesen darf, und „‹ Zur App":
 *Mitgliederverwaltung* (Mitglieder, Einlesen, Briefe, Anlässe, Mitteilungen, Für Fairgate mit Zahl der offenen,
 Änderungsverlauf) für Mitglieder- und MyTCO-Admin, *Clubmeisterschaft* (Turniere) für CM- und
-MyTCO-Admin, *MyTCO* (Rollen) nur für den MyTCO-Admin. Inhalt: Titel,
+MyTCO-Admin, *MyTCO* (Rollen) nur für den MyTCO-Admin. Ab `60rem` bleiben Seitenleiste, Pfad und Titel beim Scrollen stehen (Bausteine *Seitenleiste* und *Seitenkopf*). Unter `60rem` bleibt die Kopfleiste oben stehen wie in der App, die Seitenleiste darunter scrollt weg; der Titel blendet dort in die Kopfleiste ein und ersetzt das Wort „Verwaltung". Tabellen sind ab `60rem` einzeilig (Baustein *Tabelle*). Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
 Darf die Rolle einen Bereich nur lesen, gilt der Baustein *Nur lesen* mit dem Hinweis *Nur
 ansehen*. Eine Seite ausserhalb der eigenen Bereiche führt zur ersten Seite der Verwaltung, eine
@@ -357,6 +370,17 @@ die Bewegung zeigt, wohin man gegangen ist. Dauern und Kurven stehen unter
 
 Kopfleiste und Statusleisten-Band stehen beim Wechsel still, die Reiter auch, solange sie
 auf beiden Seiten stehen.
+
+**Titel in der Kopfleiste:** Gilt in der Mitglieder-App und in der Verwaltung unter `60rem`, für
+jede Seite mit `<h1>` (auch Start), nicht für Seiten ohne `<h1>`. Verschwindet das `<h1>` beim
+Scrollen unter der Kopfleiste, blendet sein Text in der Kopfleiste ein (kurze Überblendung mit
+etwas Verschieben von unten, `--dauer-kurz`/`--dauer-mittel`, `--kurve-standard`); kommt es
+wieder ins Bild, blendet er aus. Bei „Bewegung reduzieren" erscheint und verschwindet er ohne
+Bewegung, der Endzustand gilt sofort. Beim Seitenwechsel beginnt die Seite oben, der Titel ist
+weg; kommt eine Seite mit gespeicherter Scrollposition zurück, steht er sofort da, falls das
+`<h1>` nicht im Bild ist. Wechselt das `<h1>` ohne Seitenwechsel (Schritte eines Ablaufs), zeigt
+die Kopfleiste den neuen Titel. Er flackert, springt und bricht nie um. Screenreader hören ihn
+nicht doppelt (`aria-hidden`). In der Verwaltung am PC klebt stattdessen der Seitenkopf.
 
 **Reiter:** Der angetippte Reiter wird sofort aktiv, auch wenn die Seite noch lädt; der
 Balken gleitet hinüber (`--dauer-mittel`). Weil nur der Rollbereich scrollt, wirkt der Tipp
