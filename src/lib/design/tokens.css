@@ -8,6 +8,7 @@
 	/* Farben */
 	/* Annahme K-13.2: Farbkonzept Variante C (eigenes Grün + Sandplatz-Rot) als Abgrenzung von tcolten.ch */
 	--farbe-marke: #0f6b4f;
+	--farbe-marke-hover: #187a5c;
 	--farbe-marke-dunkel: #0b5640;
 	--farbe-marke-zart: #e3efdc;
 	/* Annahme K-13: Lindgrün von tcolten.ch, Freigabe des Vereins steht aus */

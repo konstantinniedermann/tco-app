@@ -1734,6 +1734,24 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		min-width: 0;
 	}
 
+	/* Ein langer Titel hinter «MyTCO» wird gekürzt, die Spalte bleibt, die Zeile einzeilig */
+	.app-rahmen > .kopf > .kopf-marke {
+		flex-wrap: nowrap;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	.kopf-marke > * {
+		flex-shrink: 0;
+	}
+
+	.kopf-marke > .kopf-titel {
+		flex-shrink: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
 	/* Reiter wandern mit Symbol in die Mitte der Kopfleiste (selbe Zeile, Spalte 2) */
 	.reiter {
 		grid-row: 1;
@@ -1757,8 +1775,8 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		font-size: var(--groesse-text);
 	}
 
-	.reiter a:hover {
-		background-color: var(--farbe-marke-dunkel);
+	.reiter a:hover:not([aria-current='page']) {
+		background-color: var(--farbe-marke-hover);
 	}
 
 	.reiter a[aria-current='page'] {
