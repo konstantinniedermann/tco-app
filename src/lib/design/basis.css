@@ -2233,6 +2233,15 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	}
 }
 
+/* Verlauf-Nachricht (Verwaltung): Absenderzeile und Text eng beieinander */
+.verlauf-nachricht p {
+	margin: 0;
+}
+
+.verlauf-nachricht p + p {
+	margin-top: var(--abstand-1);
+}
+
 /* Sprechblase (Gespräch mit der Turnierleitung, nur Mitglieder-App) */
 .verlauf {
 	list-style: none;

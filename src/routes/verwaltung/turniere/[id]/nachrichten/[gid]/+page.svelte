@@ -104,7 +104,7 @@
 
 <section class="karte" aria-label="Verlauf">
 	{#each gespraech.nachrichten as n, i (n.id)}
-		<div class:karte-teil={i > 0}>
+		<div class="verlauf-nachricht" class:karte-teil={i > 0}>
 			<p class="leise">
 				{#if n.von === 'mitglied'}
 					<strong>{name}</strong>
@@ -118,6 +118,12 @@
 		</div>
 	{/each}
 </section>
+
+{#snippet zustandTaste()}
+	<button type="button" class="taste-neben" disabled={laeuft} onclick={umschalten}
+		>{gespraech.zustand === 'offen' ? 'Als erledigt markieren' : 'Wieder öffnen'}</button
+	>
+{/snippet}
 
 {#if !nurLesen}
 	<section class="karte" aria-label="Antworten">
@@ -154,17 +160,13 @@
 				</div>
 				<div class="leiste">
 					<button type="submit" class="taste-haupt" disabled={laeuft}>Antworten</button>
-					<button type="button" class="taste-neben" disabled={laeuft} onclick={umschalten}
-						>{gespraech.zustand === 'offen' ? 'Als erledigt markieren' : 'Wieder öffnen'}</button
-					>
+					{@render zustandTaste()}
 				</div>
 			</form>
 		{:else}
 			<p class="leise">Antworten geht nach dem Turnierjahr nicht mehr.</p>
 			<div class="leiste">
-				<button type="button" class="taste-neben" disabled={laeuft} onclick={umschalten}
-					>{gespraech.zustand === 'offen' ? 'Als erledigt markieren' : 'Wieder öffnen'}</button
-				>
+				{@render zustandTaste()}
 			</div>
 			{#if fehler}
 				<p class="fehler" role="alert">{fehler}</p>
