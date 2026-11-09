@@ -39,8 +39,8 @@ verteilt der MyTCO-Admin die Rollen von Hand. Einzelheiten im
 | RR-02 | Gestrichen: «Der Admin darf alles, was CM- und Lizenzverantwortlicher dürfen». Es gibt keine stille Stellvertretung: Muss jemand einspringen, gibt der MyTCO-Admin sich oder einer anderen Person die Rolle, und das steht im Änderungsverlauf (Vorschlag K-18.4, ändert die Antwort auf K-18.1) | verworfen (#43) |
 | RR-03 | Es bleibt immer mindestens ein MyTCO-Admin: Der letzte kann sich die Rolle nicht entziehen und sein Konto nicht löschen. Zwei MyTCO-Admins (K-18.3) sind eine Abmachung, keine Sperre | umgesetzt (Entzug der Rolle, Austritt und Vormerken zum Löschen) |
 | RR-04 | Einmal-Codes (Brief- und Mail-Code) sind nur als Hash gespeichert und nach der Ausgabe für niemanden abrufbar, auch nicht für die Verwaltung. Der Mitglieder-Admin kann einen neuen Brief-Code ausstellen, der nur den alten Brief-Code ersetzt, und alle Sitzungen eines Kontos beenden; einen Code per E-Mail holt sich das Mitglied selbst (A-LOGIN-10, [#29](https://github.com/konstantinniedermann/tco-app/issues/29)) | umgesetzt (Sitzungen beenden und neuer Brief-Code in der Verwaltung, einzeln und als Serie) |
-| RR-05 | Für die Rolle *Mitglied* gibt es kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM und bei der Wahl des Doppelpartners (nur Mitglieder, die für die Kategorie passen und noch frei sind) | geplant |
-| RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist | geplant |
+| RR-05 | Für die Rolle *Mitglied* gibt es kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM und bei der Wahl des Doppelpartners (nur Mitglieder, die für die Kategorie passen und noch frei sind) | umgesetzt |
+| RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist | umgesetzt (Anmeldungen; Spiele mit dem CM-Betrieb) |
 | RR-07 | Die Verwaltung sieht nur, wer eine Admin-Rolle hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03): Mitglieder-Admin *Mitgliederverwaltung* (Mitglieder, Einlesen, Briefe, Anlässe, Mitteilungen, Für Fairgate, Verlauf), CM-Admin *Clubmeisterschaft*, Lizenz-Admin *Lizenzen*, MyTCO-Admin alle Bereiche nur lesend und dazu *Rollen*. Was eine Rolle nur lesen darf, weist der Server beim Speichern ab; ein ausgeblendeter Knopf reicht nicht | umgesetzt\* (Lizenzen mit ihrer Etappe) |
 | RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | umgesetzt (Austritt und Vormerken sperren das Login; Rollen bleiben gespeichert und wirken nach Wiedereintritt oder Rückgängig wieder; kommen dabei Admin-Rollen zurück, fragt die Verwaltung vorher nach) |
 | RR-09 | Wer die Verwaltung öffnet, bestätigt sie höchstens einmal pro 24 Stunden mit einem frischen Code per E-Mail, mit jeder Admin-Rolle ([SI-08](sicherheitskonzept.md#vorgaben), K-12.1) | umgesetzt |
@@ -64,7 +64,8 @@ Mitglieder-, CM- oder Lizenz-Admin), mit seinem eigenen Konto (A-ROLLE-09).
   Bestätigung der Verwaltung per Code ([SI-20](sicherheitskonzept.md#vorgaben)).
 - Ein Band oben zeigt «Ansicht als … — nur ansehen» und *Beenden*.
 - Gilt nur für die eigene Sitzung; endet mit *Beenden*, dem Logout oder dem Entzug der Rolle
-  MyTCO-Admin. Kein Eintrag im Änderungsverlauf.
+  MyTCO-Admin. Die Ansicht selbst schreibt keinen Eintrag im Änderungsverlauf; das Öffnen einer
+  Auskunft (DS-07) steht auch hier im Verlauf.
 
 ## Matrix
 
@@ -80,7 +81,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Eigene Adresse (Annahme K-19.2) | – | S eigene | S eigene | S eigene | S | S eigene |
 | Eigener Rufname (freiwillig; das Mitglied setzt, ändert und löscht ihn selbst) | – | S eigene | S eigene | S eigene | S eigene, L alle | S eigene, L alle |
 | Eigener Name, Geschlecht, Jahrgang, Mitgliedernummer (Geschlecht und Jahrgang einmal selbst, wenn leer, FR-37) | – | L eigene | L eigene | L eigene | S | L |
-| Mitglieder anlegen, bearbeiten, löschen, Auskunft drucken (DS-07; den eigenen Austritt und sich selbst löschen nicht, RR-10) | – | – | – | – | S | L |
+| Mitglieder anlegen, bearbeiten, löschen, Auskunft drucken (DS-07, das Öffnen steht immer im Änderungsverlauf, auch nur lesend; den eigenen Austritt und sich selbst löschen nicht, RR-10) | – | – | – | – | S | L |
 | Mitgliederliste einlesen (A-MITGLIED-07) | – | – | – | – | S | L |
 | Liste *Briefe*: wer MyTCO noch nie geöffnet hat (A-LOGIN-01) | – | – | – | – | S | L |
 | Neuer Code für einen Brief, Briefe auslösen, Sitzungen beenden | – | – | – | – | S | – |
@@ -88,22 +89,23 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Änderungsverlauf (FR-26) | – | – | – | – | L | L |
 | Liste *Für Fairgate*: selbst geänderte Kontaktangaben sehen und abhaken (A-KONTO-02, Annahme K-19.2) | – | – | – | – | S | L |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S | L |
-| E-Mail und Telefon anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L alle (K-42) | L alle (K-42) | S | L |
+| E-Mail und Telefon anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L Spieler des Turniers (aktive Anmeldung oder offene Partner-Anfrage), bis 1.1. nach dem Turnierjahr (K-42) | L mit Lizenz oder Lizenzantrag (K-42, #53) | S | L |
 | **CM-Anmeldung** | | | | | | |
 | Turnier, Turniernummern, Kategorien | – | L | S | L | L | L |
-| Kontaktperson des Turniers (wählen; Mitglieder sehen nur den Namen) | – | L Name | S | L Name | L Name | L |
+| Kontaktperson des Turniers (wählen, nur gültige nach FR-55; Mitglieder sehen nur den Namen) | – | L Name | S | L Name | L Name | L |
 | Eigene Anmeldung, bis Anmeldeschluss (FR-10) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Anmeldungen aller (Name, Kategorie) | – | L bestätigte | S | L bestätigte | L bestätigte | L |
 | Geschlecht und Jahrgang der Spieler (zum Zuordnen) | – | – | L | – | S | L |
 | Klassierung der Spieler korrigieren (A-ANMELDUNG-06, K-28) | – | – | S | – | – | L |
 | Wildcard-Antrag und Kommentar (FR-08) | – | S eigene | S, entscheidet | S eigene | S eigene | L |
 | Klassierung passender Mitglieder (Partnerwahl) | – | L | L | L | L | L |
-| Kontaktdaten des Doppelpartners, erst nach dem Annehmen (FR-19) | – | L beteiligt | L alle (K-42) | L alle (K-42) | S | L |
+| Kontaktdaten des Doppelpartners, erst nach dem Annehmen (FR-19) | – | L beteiligt | L Spieler des Turniers (K-42) | L mit Lizenz oder Lizenzantrag (K-42) | S | L |
 | Name, Klassierung und Telefon (sonst E-Mail) des Anfragenden; er gibt sie mit der Anfrage dem Angefragten frei (FR-48, FR-19) | – | L an einen selbst | L an einen selbst | L an einen selbst | L an einen selbst | L an einen selbst |
 | Partner anfragen, annehmen, ablehnen (FR-48) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Offene Partner-Anfragen (von, an, seit wann) | – | – | L | – | – | L |
 | Doppel von Hand anmelden, zusammenlegen, Partner ändern, Anfrage als Paar anmelden oder löschen (FR-46, FR-48) | – | – | S | – | – | L |
 | Kommentar *sucht Partner* (FR-49) | – | L; S eigener | L; S eigener | L; S eigener | L; S eigener | L; S eigener |
+| Gespräch mit der Turnierleitung: schreiben, lesen, Zustand setzen (FR-50 bis FR-54); das Mitglied sieht nur «Turnierleitung» | – | S eigenes | S | S eigenes | S eigenes | L; S eigenes |
 | **CM-Betrieb** | | | | | | |
 | Gruppen, KO-Tableaus, Spiele aus Advantage (FR-12) | – | L | S | L | L | L |
 | Resultat melden, bestätigen, bestreiten (FR-16) | – | S beteiligt | S beteiligt | S beteiligt | S beteiligt | S beteiligt |

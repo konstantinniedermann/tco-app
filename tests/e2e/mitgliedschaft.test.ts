@@ -58,9 +58,12 @@ async function oeffneVerwaltung(page: Page) {
 	return admin;
 }
 
-test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in der Verwaltung', async ({
+test('FR-04, A-MITGLIED-03: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in der Verwaltung', async ({
 	page
 }, info) => {
+	// Langer Ablauf (vier Zustände, sechs Bildschirmprüfungen, Auskunft und Druckansicht): unter
+	// WebKit in der CI knapp an den üblichen 30 s.
+	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
 	const projekt = info.project.name;
 	const ziel = await legeKontoAn('Gerda', `Beispiel${projekt}`);

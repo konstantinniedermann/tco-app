@@ -30,6 +30,7 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Druckansicht der Briefe (Seite *Briefe*, Seite eines Mitglieds) | `src/lib/verwaltung/Briefdruck.svelte` |
 | Zurück-Link, Pfad, Name mit Rufname, Trefferliste der Verwaltung, Rückfrage-Dialog | `src/lib/ui/Zurueck.svelte`, `src/lib/verwaltung/Pfad.svelte`, `src/lib/ui/Name.svelte`, `src/lib/verwaltung/Spielersuche.svelte`, `src/lib/verwaltung/Aktionsdialog.svelte` |
 | Titel in der Kopfleiste (wann er einblendet) | `src/lib/ui/kopftitel.ts`, `src/routes/+layout.svelte`, `src/routes/verwaltung/+layout.svelte` |
+| Kontakt eines Spielers in den Anmeldelisten der Verwaltung | `src/lib/verwaltung/Kontakt.svelte` |
 | Seitenkopf der Verwaltung, Tasten einer Tabellenzeile, Dialog «Ändern» (ab drei Aktionen) | `src/lib/verwaltung/Seitenkopf.svelte`, `src/lib/verwaltung/Zeilentasten.svelte`, `src/lib/verwaltung/Zeilenaktionen.svelte`, `src/lib/verwaltung/zeilenaktionen.ts` |
 
 Zwei Prüfungen halten Leitbild und Code beisammen:
@@ -184,13 +185,15 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); ein Auswahlfeld (`select`) sieht aus wie ein Textfeld (gleiche Höhe, gleicher Rand) mit einem Pfeil rechts in `--farbe-text`, auf allen Geräten gleich statt im Aussehen des Browsers (UI-03); gesperrt ohne Pfeil; bei einer festen Höchstlänge zählt der Hilfetext mit („12 von 50 Zeichen", `.feld-hilfe`); als Dateiwahl (`input type="file"`, nur Verwaltung: *Einlesen*) mit dem Rand des Felds und der Wahltaste des Browsers im Aussehen der Nebentaste; Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
 | Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>`. Als Schalter (Ein/Aus, gilt sofort, ohne Speichern-Taste) dieselbe Fläche mit Häkchen statt Kreis (`type="checkbox"`), angehakt heisst ein: *Benachrichtigungen* im Profil |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
-| Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
+| Karte | `.karte` | weisse Fläche auf Hintergrund; steht eine Überschrift zuoberst, hat sie oben keinen eigenen Abstand (der Innenabstand `--abstand-4` genügt, sonst klafft oben ein Loch); als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
 | Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; innerhalb einer Karte als `details.klappe.karte-teil` ohne eigene Fläche, mit der Trennlinie des Kartenteils (z. B. «3 suchen Partner»); klappt weich auf und zu (`--dauer-mittel`) |
 | Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste; ist der ganze Eintrag ein Link, gedrückt `--farbe-marke-zart` und leicht verkleinert und nicht markierbar; eine Kachel mit eigener Aktion bleibt ruhig und markierbar; innerhalb einer Karte als `a.kachel.karte-teil` (z. B. «12 angemeldet ›») |
 | Trefferliste | `ul.trefferliste` | Ergebnisse einer Suche unter dem Suchfeld: je Treffer eine Kachel mit Trennlinie oben, Name links, genau eine Nebentaste rechts; Vermerke als Plakette unter dem Namen; erscheint ab zwei Buchstaben. Ohne Suche und ohne Tasten auch als reine Namensliste (Kategorie einer CM: Angemeldete, Suchende mit Kommentar) |
 | Kartenteil | `.karte-teil` | Abschnitt innerhalb einer Karte mit eigenem Thema (z. B. «sucht Partner», eigene Anfragen, Abmelden): Trennlinie oben, Abstand `--abstand-3` darüber und im Inneren |
 | Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt"; nur für Schritte eines Formulars, nicht für Kontingente (wirkt sonst wie ein unfertiges Formular) |
 | Kartenkopf | `.karte-kopf` | erste Zeile einer Karte: Titel links, rechts oben eine Plakette mit dem eigenen Stand (z. B. «angemeldet»); bei Platzmangel steht die Plakette unter dem Titel, der Titel wird nie abgeschnitten |
+| Sprechblase | `.verlauf` (Liste), `.blase`, `.blase-eigen`, `.blase-leitung`, `.blase-kopf` | nur Mitglieder-App, Verlauf eines Gesprächs: älteste Nachricht oben; `.blase-eigen` rechts auf `--farbe-marke-zart`, `.blase-leitung` links auf `--farbe-flaeche`; im Kopf `.blase-kopf` (`.leise`) Absender («Du», «Turnierleitung») mit Wochentag, Datum und Uhrzeit, eine ungelesene Antwort trägt die Plakette «neu». In der Verwaltung gibt es keine Sprechblasen, dort ist jede Nachricht ein Kartenteil |
+| Verlauf-Nachricht | `.verlauf-nachricht` | Verwaltung, eine Nachricht im Verlauf eines Gesprächs (Kartenteil): Absenderzeile (`.leise`) und Text ohne Absatzabstand, dazwischen `--abstand-1` |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05). Zustände der Mitgliedschaft: *ausgetreten* = `.plakette`, *wird gelöscht* = `.plakette-gesperrt` |
 | Briefdruck | `.briefdruck` | nur Verwaltung: Druckansicht frisch erzeugter Briefe, siehe [Briefdruck](#briefdruck) |
 | Druckseite | `.druckseite` | nur Verwaltung: Auskunft über die Daten eines Mitglieds, siehe [Druckseite](#druckseite-auskunft); Klasse `.nicht-drucken` blendet unter `@media print` aus |
@@ -198,7 +201,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen"). Einzige Ausnahme ist *Nur ansehen*: oben auf Verwaltungsseiten, auf denen die eigene Rolle etwas nur lesen darf, «**Nur ansehen.** Ändern kann hier nur der <Rolle>.», ohne Aktion; er bleibt, solange die Rolle nur liest. In der Ansicht steht er nicht, dort sagt es das Band |
 | Nur lesen | `fieldset.nur-lesen` | Formular, das die eigene Rolle oder die Ansicht nur lesen lässt: die Felder stehen in `<fieldset disabled class="nur-lesen">` (ohne Rand und Abstand, Text in `--farbe-text`, damit er gut lesbar bleibt); Absende- und Aktions-Tasten fehlen, auch «Weitere …», «Entfernen», «… löschen» und Tasten zum Anlegen. In der Ansicht fehlen in der ganzen App alle Tasten, die etwas speichern (Profil, Antwort auf einen Anlass, Passkey); *Abmelden* bleibt |
 | Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06); betrifft sie das ganze Formular (z. B. *Inzwischen hat jemand anderes dieses Mitglied geändert*), unter dem Formular, mit dem Lösungsweg als Nebentaste daneben (*Neuen Stand laden*) |
-| Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm (unter `60rem`) waagrecht scrollbar; ab `60rem` ist jede Zeile einzeilig und knapp (Zellen oben und unten mit `--abstand-2`): Tasten brechen nie um; Text, der nicht passt, endet mit „…" (`.zelle-kurz`); die Seite scrollt ab `60rem` nie zur Seite; würde eine Tabelle breiter als ihr Platz (Anmeldungen einer Kategorie), nimmt die Spalte mit Name und Kommentar die übrige Breite und kürzt sich (`.zelle-dehnbar`), sodass die Tabelle nicht zur Seite scrollt und die Tasten ganz im Bild liegen; der volle Text steht in der Detailseite, im Dialog oder, wo es keines von beiden gibt, als `title`; Ausnahme Fairgate: Neue Angaben werden nicht gekürzt (sie werden von dort in Fairgate abgetippt), die Tabelle scrollt dann in ihrer Box; Ausnahme Paare: in Tabellen mit Doppelpaaren steht jeder Spieler in einer eigenen einzeiligen Zeile, Status und Taste stehen nur einmal pro Paar. Auf jeder Breite (auch unter `60rem`): höchstens zwei kurze Tasten pro Zeile, ab drei Aktionen steht dort eine Taste «Ändern», die den Dialog *Ändern* öffnet; ist nur eine Aktion möglich, bleibt sie als Taste stehen; enthält sie keine Links oder Tasten, ist der Bereich eine benannte Region mit `tabindex="0"`, damit er per Tastatur scrollt |
+| Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm (unter `60rem`) waagrecht scrollbar; ab `60rem` ist jede Zeile einzeilig und knapp (Zellen oben und unten mit `--abstand-2`): Tasten brechen nie um; Text, der nicht passt, endet mit „…" (`.zelle-kurz`); die Seite scrollt ab `60rem` nie zur Seite; würde eine Tabelle breiter als ihr Platz (Anmeldungen einer Kategorie), nimmt die Spalte mit Name und Kommentar die übrige Breite und kürzt sich (`.zelle-dehnbar`), sodass die Tabelle nicht zur Seite scrollt und die Tasten ganz im Bild liegen; der volle Text steht in der Detailseite, im Dialog oder, wo es keines von beiden gibt, als `title`; Ausnahme Fairgate: Neue Angaben werden nicht gekürzt (sie werden von dort in Fairgate abgetippt), die Tabelle scrollt dann in ihrer Box; Ausnahme Paare: in Tabellen mit Doppelpaaren und offenen Partner-Anfragen (Spalte «Von / An») steht jeder Spieler in einer eigenen einzeiligen Zeile, Status und Taste stehen nur einmal pro Paar bzw. Anfrage. Auf jeder Breite (auch unter `60rem`): höchstens zwei kurze Tasten pro Zeile, ab drei Aktionen steht dort eine Taste «Ändern», die den Dialog *Ändern* öffnet; ist nur eine Aktion möglich, bleibt sie als Taste stehen; enthält sie keine Links oder Tasten, ist der Bereich eine benannte Region mit `tabindex="0"`, damit er per Tastatur scrollt |
 | Zelle, gekürzt | `.zelle-kurz` | freier Text in einer Tabellenzelle (Name, Kommentar, Betreff): einzeilig, ein zu langer Text endet mit „…"; nur ab `60rem`. Die Klasse steht auf dem Textelement in der Zelle (z. B. `<span class="leise zelle-kurz">`), nicht auf dem `<td>`: dort wirkt die Höchstbreite ohne festes Tabellenlayout nicht; in `.zelle-dehnbar` wird sie schmaler, wenn der Platz fehlt |
 | Zelle, dehnbar | `.zelle-dehnbar` | nur ab `60rem`: die eine Spalte einer Tabelle mit freiem Text (Name, Kommentar) nimmt die Breite, die die übrigen Spalten lassen; `<div class="zelle-dehnbar">` als einziges Kind des `<td>`, darin Name und Kommentar als `.zelle-kurz` und Plaketten nebeneinander in einer Zeile; Plaketten bleiben ganz; der Name (erstes Element) hat Vorrang und endet erst mit „…", wenn er allein nicht passt, ein Kommentar dahinter nimmt nur den Rest und endet mit „…". Unter `60rem` steht der Inhalt wie in jeder Zelle |
 | Ändern-Dialog | `<dialog class="karte">` | öffnet die Taste «Ändern» einer Tabellenzeile (auf jeder Breite): Name der Zeile, der volle Text (z. B. Kommentar) und die Aktionen, die gerade gehen, je als Taste; jede Taste schliesst den Dialog und öffnet den Dialog der Aktion; «Abbrechen» schliesst; zählt für UI-04 als eigener Bildschirm |
@@ -269,14 +272,25 @@ er nie.
   «angemeldet», «sucht Partner» oder «Wildcard beantragt»), den Bedingungen und der Taste; keine
   Namenslisten, stattdessen eine Kachel «12 angemeldet ›» (im Doppel «5 Paare ›») auf die Seite der
   Kategorie; die Suchenden im Doppel zugeklappt. Am Ende der Seite, auch wenn noch Angaben fehlen,
-  «Bei Fragen oder Problemen melde dich bei <Vorname Nachname> (CM-Admin).» (amtlicher Name ohne
-  Rufname, damit keine doppelten Klammern entstehen), sofern das Turnier eine gültige Kontaktperson hat. Die **Kategorie einer CM** listet alle bestätigten Anmeldungen (im Doppel
+  die Karte «Fragen oder Probleme?» mit leise «Kontaktperson: <Vorname Nachname> (CM-Admin)» (amtlicher Name ohne Rufname, damit keine doppelten Klammern entstehen) und der Kachel
+  «Schreib der Turnierleitung ›» (Kartenkopf mit Plakette «neue Antwort», `.plakette-offen`, solange eine Antwort ungelesen
+  ist); ohne gültige Kontaktperson fällt die Karte weg, ausser es gibt schon ein Gespräch: dann ohne
+  Zeile «Kontaktperson», mit der Kachel «Dein Gespräch mit der Turnierleitung ›». Die Kachel steht nur, wo geschrieben werden darf oder schon ein Gespräch besteht; die Kontaktperson selbst sieht die Karte mit ihrem Namen, ohne Kachel.
+  Die **Kategorie einer CM** listet alle bestätigten Anmeldungen (im Doppel
   Paare und Suchende mit Kommentar) und hat keine Tasten.
 - **Startseite:** „Hoi <Rufname, sonst Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
   „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben); Anlässe stehen als Kacheln unter „Jetzt aktuell" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
   stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
   (A-ANLASS-01). Angebote stehen vor „Jetzt aktuell", jedes als eigener Hinweis
   und immer nur eines zugleich (UI-04): zuerst *Passkey einrichten*, danach *Mitteilungen aufs Handy?*.
+  Eine ungelesene Antwort der Turnierleitung steht unter „Jetzt aktuell" als hervorgehobene Kachel
+  «Neue Antwort der Turnierleitung ›» (leise der Turniername), bis das Gespräch geöffnet wird. Die Kachel
+  „Verwaltung ›" trägt für CM-Admins leise «N Nachrichten an die Turnierleitung offen».
+- **Gespräch mit der Turnierleitung** (`/clubmeisterschaft/[id]/kontakt`): Titel «Frage an die
+  Turnierleitung», Zurück „‹ <Name der CM>", darunter der Verlauf als *Sprechblasen*, dann in einer
+  Karte das Feld «Deine Nachricht» (Hilfe: «Alle CM-Admins lesen mit. Bitte keine Angaben zur Gesundheit.»)
+  und die Haupttaste «Senden». Kann das Mitglied nicht schreiben, steht statt des Felds der Satz
+  «Schreiben geht zurzeit nicht.».
 - **Unterseiten:** Zurück-Link mit Ziel oben links (Baustein *Zurück*), die Reiter bleiben.
   Formularschritte dürfen den Schritt nennen statt der Elternseite: *E-Mail ändern* Schritt 2
   „‹ Andere Adresse" (zurück zu Schritt 1).
@@ -312,6 +326,15 @@ Seite zum Anlegen ohne Schreibrecht zur Liste ihres Bereichs.
   Mitglieder-Admin, CM-Admin, Lizenz-Admin) und die Haupttaste «Ansehen». Danach geht es zur
   ersten Seite dieser Rolle; bei Mitglied und Lizenz-Admin, die keine Verwaltung haben, zur
   Startseite der App.
+- **Nachrichten** (CM-Admin lesend und schreibend, MyTCO-Admin nur lesend): Auf der Seite des Turniers steht der Abschnitt «Nachrichten» (Fragen an die Turnierleitung) zuoberst, mit Plakette «N offen», der Kontaktperson und der Kachel «Posteingang · N offen, M erledigt ›». Der **Posteingang** («Nachrichten an die Turnierleitung») ist eine Tabelle mit Kennzahlen offen/erledigt und den Spalten Mitglied · Letzte Nachricht · Zuletzt · Stand, darunter «Alle Gespräche dieses Turniers werden am 1. Januar <Jahr+1> gelöscht.». Das **Gespräch in der Verwaltung** zeigt den Verlauf als eine Karte, jede Nachricht ein Kartenteil mit «Turnierleitung (Vorname Nachname)»; darunter in eigener Karte das Feld «Antwort der Turnierleitung», die Haupttaste «Antworten» und die Nebentaste «Als erledigt markieren» bzw. «Wieder öffnen».
+- **Kontakt in den Anmeldelisten** (Kategorie einer CM in der Verwaltung, K-42): Spalte «Kontakt»
+  gleich nach dem Spieler, im Paar und bei offenen Anfragen eine Zeile je Spieler (bei Anfragen oben
+  der Anfragende, darunter der Angefragte, wie in der Spalte «Von / An»). Darin zwei kurze Links «Tel.» (`tel:`) und «E-Mail» (`mailto:`), getrennt durch « · »;
+  Nummer und Adresse stehen als `title` und im zugänglichen Namen («Tel. 079 …», «E-Mail anna@…»),
+  damit jede Zeile am PC einzeilig bleibt; fehlt eine
+  Angabe, steht nur die andere, fehlen beide: «–». Die Spalte fehlt, wenn in der Liste
+  niemand eine Angabe hat, so auch ab dem 1.1. nach dem Turnierjahr (dann liefert der Server
+  keine Kontaktdaten mehr).
 - **Mitteilungen** (Seite des Anlasses und Bereich *Mitteilungen*): Taste «Neue Mitteilung», beim
   Anlass dann eine Vorlage oder «Leer anfangen». Titel, Text, Empfänger und Weg stehen in einer
   Karte; «Vorschau» zeigt die Zahlen und aufklappbar die Namen. «Senden» geht erst mit einer
@@ -342,6 +365,7 @@ Verlauf zurück. Gebaut in `src/lib/ui/navigation.ts`.
 | Seite einer CM | CM | — wenn sie die einzige laufende ist, sonst „‹ Clubmeisterschaft" |
 | Kategorie einer CM (alle Anmeldungen) | CM | „‹ <Name der CM>" |
 | Doppel einer CM (Partnerwahl) | CM | „‹ <Name der CM>" |
+| Gespräch mit der Turnierleitung | CM | „‹ <Name der CM>" |
 | Profil | Profil | — |
 | E-Mail ändern | Profil | „‹ Profil" |
 
@@ -353,6 +377,8 @@ Verlauf zurück. Gebaut in `src/lib/ui/navigation.ts`.
 | Anlass, Neuer Anlass | Anlässe › <Titel> bzw. Neuer Anlass |
 | Turnier, Neues Turnier | Turniere › <Name> bzw. Neues Turnier |
 | Kategorie, Neue Kategorie | Turniere › <Turnier> › <Kategorie> bzw. Neue Kategorie |
+| Nachrichten (Posteingang) | Turniere › <Turnier> › Nachrichten |
+| Gespräch mit einem Mitglied | Turniere › <Turnier> › Nachrichten › <Nachname, Vorname> |
 
 ### Vorgaben für Künftiges
 

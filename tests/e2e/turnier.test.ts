@@ -90,7 +90,11 @@ test('RR-07, A-ROLLE-07, A-TURNIER-01, A-TURNIER-02, A-TURNIER-03, A-ANMELDUNG-0
 	await expect(page.getByText('in Vorbereitung', { exact: true })).toBeVisible();
 
 	// Kontaktperson: zur Wahl stehen die CM-Admins; gespeichert bleibt sie nach dem Neuladen.
-	await expect(page.getByText('Keine Kontaktperson gewählt.', { exact: true })).toBeVisible();
+	await expect(
+		page.getByText('Keine gültige Kontaktperson. Mitglieder können nicht schreiben.', {
+			exact: true
+		})
+	).toBeVisible();
 	await page.getByLabel('Kontaktperson').selectOption({ label: `Cora ${nachname}` });
 	await page.getByRole('button', { name: 'Angaben speichern' }).click();
 	await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
@@ -98,7 +102,11 @@ test('RR-07, A-ROLLE-07, A-TURNIER-01, A-TURNIER-02, A-TURNIER-03, A-ANMELDUNG-0
 	await expect(page.getByLabel('Kontaktperson').locator('option:checked')).toHaveText(
 		`Cora ${nachname}`
 	);
-	await expect(page.getByText('Keine Kontaktperson gewählt.', { exact: true })).toHaveCount(0);
+	await expect(
+		page.getByText('Keine gültige Kontaktperson. Mitglieder können nicht schreiben.', {
+			exact: true
+		})
+	).toHaveCount(0);
 
 	// FR-33: ohne Kategorie lässt sich die Anmeldung nicht öffnen.
 	await page.getByRole('button', { name: 'Anmeldung öffnen' }).click();

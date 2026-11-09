@@ -409,9 +409,6 @@ test('UI-06: Verwaltung nicht erreichbar – Fehlerseite mit Rahmen, Meldung in 
 });
 
 // «Ansicht als …» und die Bereiche je Rolle (Design Rollen schärfen, Regeln 3 und 7).
-// Pro Jahr gibt es ein Turnier; jedes Projekt hat sein Jahr, getrennt von turnier.test.ts.
-const ANSICHT_JAHR: Record<string, number> = { iphone: 2096, android: 2095, desktop: 2094 };
-
 const band = (page: Page) => page.getByRole('complementary', { name: 'Ansicht' });
 
 /** Wählt auf der Seite Rollen eine Ansicht und schaltet sie ein. */
@@ -443,8 +440,7 @@ test('A-ROLLE-01, RR-07: MyTCO-Admin vergibt eine Rolle, schaut als CM-Admin, ka
 }, info) => {
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = ANSICHT_JAHR[info.project.name];
-	const turnierId = await legeTurnierAn(jahr);
+	const { turnierId, jahr } = await legeTurnierAn();
 	const mytco = await legeRollenkontoMitBriefCodeAn('Theo', ['mytco']);
 	const nachname = `Probe${randomUUID().slice(0, 8)}`;
 	const mitglied = await legeKontoAn('Selma', nachname);

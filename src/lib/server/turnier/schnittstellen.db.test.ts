@@ -284,7 +284,7 @@ describe('Turnier-Schnittstellen', () => {
 		).toBe(404);
 	});
 
-	test('Kontaktperson: nur CM-Admins, sonst 400 mit Feld kontakt', async () => {
+	test('FR-55: Kontaktperson: nur CM-Admins, sonst 400 mit Feld kontakt', async () => {
 		const s = baue();
 		const cm = await bestaetigt(s, ['cm']);
 		const jahr = await freiesJahr(2071);
@@ -387,7 +387,7 @@ describe('Turnier-Schnittstellen', () => {
 				params: { id: '999999999' },
 				konto
 			});
-		expect(Object.keys(TURNIER_SCHNITTSTELLEN)).toHaveLength(22);
+		expect(Object.keys(TURNIER_SCHNITTSTELLEN)).toHaveLength(26);
 		for (const [name, fn] of Object.entries(TURNIER_SCHNITTSTELLEN)) {
 			const ohne = await fn(s.d, mach(name));
 			expect([name, ohne.status, await ohne.json()]).toEqual([name, 401, { fehler: 'abgemeldet' }]);
@@ -579,7 +579,9 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 				status: 'bestaetigt',
 				klassierung: 'R8',
 				geschlecht: 'm',
-				jahrgang: 1990
+				jahrgang: 1990,
+				// K-42: im Turnierjahr mit Kontaktdaten (Zeit aus den Diensten).
+				email: r8.email
 			})
 		]);
 		expect((await getAnmeldungen(s.d, hole(cm, { id: '999999999' }))).status).toBe(404);
@@ -937,7 +939,12 @@ describe('Doppel verwalten (#59 Etappe 2)', () => {
 		);
 		const liste = await getDoppel(s.d, hole(cm, k));
 		expect(liste.status).toBe(200);
-		expect((await liste.json()).paare).toHaveLength(1);
+		const { paare } = await liste.json();
+		expect(paare).toHaveLength(1);
+		// K-42: im Turnierjahr mit Kontaktdaten (Zeit aus den Diensten).
+		expect(paare[0].spieler.map((x: { email: string }) => x.email).sort()).toEqual(
+			[a.email, b.email].sort()
+		);
 		const doppelt = await postDoppelVonHand(s.d, post(cm, { mitgliedIds: ids, trotzdem: true }, k));
 		expect(await antwortVon(doppelt)).toEqual([409, { fehler: 'schon-angemeldet' }]);
 		expect((await getDoppel(s.d, hole(cm, { id: '999999999' }))).status).toBe(404);

@@ -424,7 +424,7 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		expect(await anmeldungenIn(t.damen)).toEqual([]);
 	});
 
-	test('A-ANMELDUNG-04: Suche zeigt nur passende Partner mit Login, nach Nachname', async () => {
+	test('A-ANMELDUNG-04, RR-05: Suche zeigt nur passende Partner mit Login, nach Nachname', async () => {
 		const t = await offenesDoppel();
 		const ich = await lea();
 		const marcoId = await marco();
@@ -539,7 +539,7 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		expect(await sucheDoppelPartner(db, t.mixed, ich, 'Marco Beispiel', t.jetzt)).toEqual([]);
 	});
 
-	test('A-ANMELDUNG-04: Suche zeigt höchstens 20 Treffer', async () => {
+	test('A-ANMELDUNG-04, RR-05: Suche zeigt höchstens 20 Treffer', async () => {
 		const t = await offenesDoppel();
 		const ich = await lea();
 		const zeichen = 'abcdefghijklmnopqrstuvwxyz';
@@ -785,7 +785,7 @@ describe('A-ANMELDUNG-04, FR-48, FR-49: Doppel', () => {
 		expect(await nimmAnfrageAn(db, marcoVoll, marcoId, x.jetzt)).toBe('voll');
 	});
 
-	test('FR-48: nur der Angefragte mit Login nimmt an; fremde Anfrage ergibt nicht-gefunden', async () => {
+	test('FR-48, RR-06: nur der Angefragte mit Login nimmt an; fremde Anfrage ergibt nicht-gefunden', async () => {
 		const t = await offenesDoppel();
 		const ich = await lea();
 		const marcoId = await marco();

@@ -9,6 +9,7 @@ import {
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { ladeAnlassAdmin } from '../anlass/anlaesse.ts';
 import { ladeCmAnsicht } from '../cm/anmeldungen.ts';
+import { ladeGespraech } from '../gespraech/gespraech.ts';
 import type { Db } from '../db/index.ts';
 import {
 	aenderung,
@@ -20,7 +21,9 @@ import {
 	konto,
 	kontoRolle,
 	mitglied,
+	gespraech,
 	mitteilung,
+	nachricht,
 	partnerAnfrage,
 	passkey,
 	pushAbo,
@@ -63,7 +66,7 @@ afterEach(() => {
 const TAG = 24 * 60 * 60 * 1000;
 const hash = (kennung: string) => createHash('sha256').update(kennung).digest('hex');
 const NACHNAME = 'Loeschkandidat';
-const UEBERSPRUNGEN = { lief: false, konten: [], verlauf: 0, antworten: 0 };
+const UEBERSPRUNGEN = { lief: false, konten: [], verlauf: 0, antworten: 0, gespraeche: 0 };
 
 /** Ausgetretenes Mitglied mit allen Angaben, Login, Rollen, Passkey und Push-Abo. */
 async function ausgetreten(austrittAm: Date) {
@@ -223,7 +226,13 @@ describe('Konto löschen', () => {
 
 		const ergebnis = await raeumeAuf(db, jetzt);
 
-		expect(ergebnis).toEqual({ lief: true, konten: [m.mitgliedId], verlauf: 1, antworten: 1 });
+		expect(ergebnis).toEqual({
+			lief: true,
+			konten: [m.mitgliedId],
+			verlauf: 1,
+			antworten: 1,
+			gespraeche: 0
+		});
 		const z = await zeile(m.mitgliedId);
 		expect(z).toEqual(nurName(z, m.mitgliedId));
 		expect(await kontoDa(m.kontoId)).toBe(false);
@@ -409,7 +418,8 @@ describe('Konto löschen', () => {
 			lief: true,
 			konten: [],
 			verlauf: 0,
-			antworten: 0
+			antworten: 0,
+			gespraeche: 0
 		});
 
 		expect(await zeile(aktiv.mitgliedId)).toEqual(vorher.aktiv);
@@ -492,7 +502,8 @@ describe('Fristen für Verlauf und Anlass-Antworten', () => {
 			lief: true,
 			konten: [],
 			verlauf: 1,
-			antworten: 0
+			antworten: 0,
+			gespraeche: 0
 		});
 
 		const bleibt = await db
@@ -537,7 +548,8 @@ describe('Fristen für Verlauf und Anlass-Antworten', () => {
 			lief: true,
 			konten: [],
 			verlauf: 0,
-			antworten: 1
+			antworten: 1,
+			gespraeche: 0
 		});
 
 		const bleibt = await db
@@ -609,7 +621,8 @@ describe('Review-Fokus 2: zwei Läufe', () => {
 			lief: true,
 			konten: [a.mitgliedId, b.mitgliedId],
 			verlauf: 0,
-			antworten: 0
+			antworten: 0,
+			gespraeche: 0
 		});
 		for (const m of [a, b]) {
 			const z = await zeile(m.mitgliedId);
@@ -619,7 +632,8 @@ describe('Review-Fokus 2: zwei Läufe', () => {
 			lief: true,
 			konten: [],
 			verlauf: 0,
-			antworten: 0
+			antworten: 0,
+			gespraeche: 0
 		});
 	});
 
@@ -638,7 +652,13 @@ describe('Review-Fokus 2: zwei Läufe', () => {
 			);
 			await h.query('commit');
 
-			expect(await lauf).toEqual({ lief: true, konten: [], verlauf: 0, antworten: 0 });
+			expect(await lauf).toEqual({
+				lief: true,
+				konten: [],
+				verlauf: 0,
+				antworten: 0,
+				gespraeche: 0
+			});
 		});
 		const z = await zeile(m.mitgliedId);
 		expect(z.status).toBe('ausgetreten');
@@ -664,10 +684,87 @@ describe('Log (SI-05)', () => {
 		expect(console.info).toHaveBeenCalledWith('Löschlauf', {
 			konten: [m.mitgliedId],
 			verlauf: 1,
-			antworten: 0
+			antworten: 0,
+			gespraeche: 0
 		});
 		const text = JSON.stringify(vi.mocked(console.info).mock.calls);
 		expect(text).not.toContain(NACHNAME);
 		expect(text).not.toContain(m.email);
+	});
+});
+
+describe('Gespräche löschen (FR-54)', () => {
+	async function gespraechIn(jahr: number, mitgliedId: number, adminId: number | null = null) {
+		const [t] = await db
+			.insert(turnier)
+			.values({
+				jahr,
+				name: `Turnier ${jahr}`,
+				anmeldeschluss: `${jahr}-06-30`,
+				status: 'geschlossen'
+			})
+			.returning({ id: turnier.id });
+		const gesendetAm = new Date(`${jahr}-05-01T10:00:00Z`);
+		const [g] = await db
+			.insert(gespraech)
+			.values({ turnierId: t.id, mitgliedId, letzteAm: gesendetAm })
+			.returning({ id: gespraech.id });
+		await db.insert(nachricht).values([
+			{ gespraechId: g.id, von: 'mitglied', text: 'Frage', gesendetAm },
+			{ gespraechId: g.id, von: 'leitung', adminMitgliedId: adminId, text: 'Antwort', gesendetAm }
+		]);
+		return g.id;
+	}
+	const anzahl = async (id: number) => ({
+		g: (await db.select().from(gespraech).where(eq(gespraech.id, id))).length,
+		n: (await db.select().from(nachricht).where(eq(nachricht.gespraechId, id))).length
+	});
+
+	test('FR-54: nach dem Turnierjahr (Zürich) weg, davor nicht', async () => {
+		const m = await legeMitgliedAn(db, { nachname: 'Fragerin', vorname: 'Vera' });
+		const id = await gespraechIn(2027, m.mitgliedId);
+
+		const vorher = await raeumeAuf(db, new Date('2027-12-31T22:30:00Z'));
+		expect(vorher.gespraeche).toBe(0);
+		expect(await anzahl(id)).toEqual({ g: 1, n: 2 });
+
+		const nachher = await raeumeAuf(db, new Date('2027-12-31T23:30:00Z'));
+		expect(nachher.gespraeche).toBe(1);
+		expect(await anzahl(id)).toEqual({ g: 0, n: 0 });
+		expect(console.info).toHaveBeenLastCalledWith('Löschlauf', {
+			konten: [],
+			verlauf: 0,
+			antworten: 0,
+			gespraeche: 1
+		});
+	});
+
+	test('FR-54: endgültige Löschung entfernt das Gespräch des Mitglieds, Vormerken nicht', async () => {
+		const m = await vorgemerkt(new Date('2027-03-01T08:00:00Z'));
+		const id = await gespraechIn(2027, m.mitgliedId);
+
+		const davor = await raeumeAuf(db, new Date('2027-03-02T08:00:00Z'));
+		expect(davor.gespraeche).toBe(0);
+		expect(await anzahl(id)).toEqual({ g: 1, n: 2 });
+
+		const lauf = await raeumeAuf(db, await frist(m.mitgliedId));
+		expect(lauf.konten).toEqual([m.mitgliedId]);
+		expect(lauf.gespraeche).toBe(1);
+		expect(await anzahl(id)).toEqual({ g: 0, n: 0 });
+	});
+
+	test('FR-54: Löschung eines antwortenden Admins leert den Verweis, Antwort bleibt', async () => {
+		const admin = await ausgetreten(new Date('2027-01-01T08:00:00Z'));
+		const fragerin = await legeMitgliedAn(db, { nachname: 'Fragerin', vorname: 'Vera' });
+		const id = await gespraechIn(2040, fragerin.mitgliedId, admin.mitgliedId);
+
+		await raeumeAuf(db, await frist(admin.mitgliedId));
+
+		const antwort = (await db.select().from(nachricht).where(eq(nachricht.gespraechId, id))).find(
+			(n) => n.von === 'leitung'
+		);
+		expect(antwort?.adminMitgliedId).toBeNull();
+		const geladen = await ladeGespraech(db, id, new Date('2040-06-01T00:00:00Z'));
+		expect(geladen?.nachrichten.find((n) => n.von === 'leitung')?.admin).toBeNull();
 	});
 });

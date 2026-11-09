@@ -57,7 +57,7 @@ describe('Prüfung Turnier', () => {
 		expect(lang).toMatchObject({ ok: false, felder: { name: 'Höchstens 120 Zeichen.' } });
 	});
 
-	it('Kontaktperson: fehlt = unverändert, null = keine, positive Zahl = Mitglied', () => {
+	it('FR-55: Kontaktperson: fehlt = unverändert, null = keine, positive Zahl = Mitglied', () => {
 		const werteVon = (kontakt: unknown) => {
 			const r = pruefeTurnier({ ...turnier, kontakt });
 			return r.ok ? r.werte.kontakt : 'fehler';

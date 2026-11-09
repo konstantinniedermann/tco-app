@@ -58,7 +58,7 @@ export type CmEreignis = Ereignis & Pick<RequestEvent, 'params'>;
 const jetzt = (d: CmDienste) => (d.jetzt ?? (() => new Date()))();
 const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
 
-async function mitSitzung(
+export async function mitSitzung(
 	e: CmEreignis,
 	fn: (konto: AngemeldetesKonto) => Promise<Response>
 ): Promise<Response> {
@@ -68,7 +68,7 @@ async function mitSitzung(
 }
 
 // SI-10: ändernde Anfragen nur als JSON.
-async function aendernd(
+export async function aendernd(
 	e: CmEreignis,
 	fn: (konto: AngemeldetesKonto) => Promise<Response>
 ): Promise<Response> {

@@ -54,7 +54,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 |----|-------------|--------|--------|--------|
 | A-MITGLIED-01 | Der Mitglieder-Admin legt Mitgliederkonten nach manueller Prüfung einfach und schnell von Hand an | PDF 4a, Ziel | Mitglieder-Login | umgesetzt |
 | A-MITGLIED-02 | Der Mitglieder-Admin bearbeitet die Daten eines Mitglieds | Ziel | Mitglieder-Login | umgesetzt |
-| A-MITGLIED-03 | Der Mitglieder-Admin löscht Mitgliederkonten | PDF 4a | Mitglieder-Login\* | geplant |
+| A-MITGLIED-03 | Der Mitglieder-Admin löscht Mitgliederkonten | PDF 4a | Mitglieder-Login\* | umgesetzt |
 | A-MITGLIED-04 | Selbstregistrierung über die Website tcolten.ch, damit der Briefversand entfallen kann (mit der zuständigen Person) | PDF 4a | später\* | später |
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
 | A-MITGLIED-06 | Mitglieder- und MyTCO-Admin sehen im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Verwaltung, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | umgesetzt (Verlauf der Änderungen; Löschung nach 12 Monaten durch den Zeitgeber) |
@@ -155,6 +155,7 @@ Geräten prüft die [Checkliste vor dem Release](../testkonzept.md#checkliste-vo
 | A-TURNIER-01 | Der CM-Admin legt jedes Jahr die Clubmeisterschaft als Turnier an | PDF 5a | CM-Anmeldung | umgesetzt |
 | A-TURNIER-02 | Zum Turnier werden die Swiss-Tennis-Turniernummern erfasst | PDF 5a | CM-Anmeldung | umgesetzt |
 | A-TURNIER-03 | Zum Turnier werden alle Kategorien erfasst, eingeteilt nach Geschlecht, Alter, Klassierungsbereich (Einzel; im PDF: Stärkekategorie) bzw. Mindestsumme der Klassierungen (Doppel, Annahme K-51) und Einzel/Doppel | PDF 5a | CM-Anmeldung | umgesetzt |
+| A-TURNIER-04 | Ein Mitglied schreibt der Turnierleitung und liest die Antwort in MyTCO; alle CM-Admins sehen und beantworten die Gespräche | PL | CM-Anmeldung | umgesetzt |
 
 ### ANMELDUNG — Anmeldung zur Clubmeisterschaft
 
@@ -225,7 +226,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-01062027)).
 | N-DESIGN-01 | Das Design lehnt sich an die Website tcolten.ch an, mit abgeändertem Farbkonzept zur Abgrenzung | PDF 3a | Fundament (UI-Leitbild, #13) | geplant |
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |
 | N-DATENSCHUTZ-01 | Die Bearbeitung der Mitgliederdaten entspricht dem Schweizer Datenschutzgesetz (nDSG) | PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
-| N-DATENSCHUTZ-02 | Kontaktdaten anderer Mitglieder sind nur sichtbar, soweit der Verein es festlegt: Gegner und Doppelpartner bis zum Ende der CM (K-31), CM- und Lizenz-Admin von allen (K-42) | PDF 5d, PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
+| N-DATENSCHUTZ-02 | Kontaktdaten anderer Mitglieder sind nur sichtbar, soweit der Verein es festlegt: Gegner und Doppelpartner bis zum Ende der CM (K-31), CM-Admin von den Spielern eines Turniers bis zum 1.1. nach dem Turnierjahr, Lizenz-Admin von Mitgliedern mit Lizenz oder Lizenzantrag (K-42) | PDF 5d, PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
 | N-SICHERHEIT-01 | Weitere Sicherheitsmassnahmen werden mit den zuständigen Personen festgelegt | PDF 2 | Fundament ([Sicherheitskonzept](../sicherheitskonzept.md), #6) | geplant |
 | N-BETRIEB-01 | Verfügbarkeit: MyTCO ist besonders während Anmeldephase, Gruppenspielen und Finalwochenende erreichbar; kein fester Zielwert, ein kurzer Ausfall wird in Kauf genommen (K-15) | PL | Fundament (Betrieb, #10) | geplant |
 | N-BARRIEREFREI-01 | MyTCO ist für Mitglieder jeden Alters bedienbar; Zielniveau WCAG 2.1 AA\* | PL | durchgehend | geplant |

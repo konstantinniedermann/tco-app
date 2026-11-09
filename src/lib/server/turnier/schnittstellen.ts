@@ -33,6 +33,12 @@ import {
 	type DoppelAbgelehnt
 } from '../cm/verwaltung-doppel.ts';
 import { anfrageGeloeschtText } from '../cm/doppel-meldung.ts';
+import {
+	getAdminGespraech,
+	getGespraeche,
+	postAntwort,
+	postZustand
+} from '../gespraech/schnittstellen.ts';
 import { antwort } from '../login/schnittstellen.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
@@ -236,7 +242,7 @@ export function getAnmeldungen(d: AdminDienste, e: AdminEreignis): Promise<Respo
 		const id = parseId(e.params.id);
 		const k = id === null ? null : await ladeKategorie(d.db, id);
 		if (id === null || !k) return nichtGefunden();
-		return antwort(200, await ladeAnmeldungen(d.db, id));
+		return antwort(200, await ladeAnmeldungen(d.db, id, jetzt(d)));
 	});
 }
 
@@ -338,7 +344,7 @@ export function postAnmeldungLoeschen(
 export function getDoppel(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	return liest(d, e, 'cm', async () => {
 		const id = parseId(e.params.id);
-		const r = id === null ? null : await ladeDoppel(d.db, id);
+		const r = id === null ? null : await ladeDoppel(d.db, id, jetzt(d));
 		return r ? antwort(200, r) : nichtGefunden();
 	});
 }
@@ -478,6 +484,9 @@ export function postKlassierung(d: AdminDienste, e: AdminEreignis): Promise<Resp
 	});
 }
 
+export { getAdminGespraech, getGespraeche, postAntwort, postZustand };
+
+// Enthält auch die vier Schnittstellen des Gesprächs mit der Turnierleitung (A-TURNIER-04).
 export const TURNIER_SCHNITTSTELLEN = {
 	getTurniere,
 	postTurniere,
@@ -500,5 +509,9 @@ export const TURNIER_SCHNITTSTELLEN = {
 	postAnfrageLoeschen,
 	postEntscheid,
 	getSpieler,
-	postKlassierung
+	postKlassierung,
+	getGespraeche,
+	getAdminGespraech,
+	postAntwort,
+	postZustand
 } satisfies Record<string, (d: MitteilungAdminDienste, e: AdminEreignis) => Promise<Response>>;

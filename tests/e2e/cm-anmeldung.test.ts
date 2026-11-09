@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
@@ -24,19 +24,6 @@ import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hil
 test.afterAll(async () => {
 	await schliesseLoginHilfen();
 });
-
-// Pro Jahr gibt es ein Turnier; jedes Projekt und jeder Test hat sein festes Jahr, getrennt von
-// turnier.test.ts (2097–2099) und verwaltung.test.ts (2094–2096). Die E2E-Datenbank überdauert
-// die Läufe: `legeOffenesTurnierAn` löscht das Turnier des Jahres vorher.
-const JAHR_MITGLIED: Record<string, number> = { iphone: 2093, android: 2092 };
-const JAHR_VERWALTUNG: Record<string, number> = { iphone: 2091, android: 2090 };
-const JAHR_RUFNAME: Record<string, number> = { iphone: 2082, android: 2081 };
-
-function testjahr(jahre: Record<string, number>, info: TestInfo): number {
-	const jahr = jahre[info.project.name];
-	if (!jahr) throw new Error(`Kein Testjahr für das Projekt ${info.project.name}`);
-	return jahr;
-}
 
 const einzel = (
 	name: string,
@@ -92,9 +79,7 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder melden sich am Handy an; die Verwaltung am Computer prüft turnier.test.ts
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_MITGLIED, info);
-	const name = `Clubmeisterschaft ${jahr}`;
-	const { turnierId } = await legeOffenesTurnierAn(jahr, [
+	const { turnierId, jahr } = await legeOffenesTurnierAn([
 		einzel('Herren R1–R9', 'herren', 'R1'),
 		einzel('Herren R4–R9', 'herren', 'R4'),
 		einzel('Offen R1–R9', 'offen', 'R1'),
@@ -103,6 +88,7 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 		MIXED,
 		DAMEN_DOPPEL
 	]);
+	const name = `Clubmeisterschaft ${jahr}`;
 	// Ohne Klassierung und Geschlecht; der Jahrgang steht schon (wie aus Fairgate).
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
 	const mitglied = await legeKontoMitBriefCodeAn('Moritz', nachname);
@@ -110,7 +96,7 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	const leitung = `Leitung${info.project.name}`;
 	const cmAdmin = await legeRollenkontoMitBriefCodeAn('Leonie', ['cm'], leitung);
 	await setzeKontaktperson(turnierId, cmAdmin.mitgliedId);
-	const kontaktSatz = `Bei Fragen oder Problemen melde dich bei Leonie ${leitung} (CM-Admin).`;
+	const kontaktSatz = `Kontaktperson: Leonie ${leitung} (CM-Admin)`;
 
 	await startetVomSymbol(page);
 	await meldeAn(page, mitglied);
@@ -210,12 +196,12 @@ test('FR-36, FR-35: CM-Admin wird gewarnt und kann eine Kategorie mit Anmeldunge
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Die Verwaltung am Computer prüft turnier.test.ts; hier reicht der Nachweis auf iPhone und Android
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_VERWALTUNG, info);
-	const name = `Clubmeisterschaft ${jahr}`;
 	const {
+		jahr,
 		turnierId,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, [einzel('Herren R1–R9', 'herren', 'R1')]);
+	} = await legeOffenesTurnierAn([einzel('Herren R1–R9', 'herren', 'R1')]);
+	const name = `Clubmeisterschaft ${jahr}`;
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
 	const spieler = await legeKontoAn('Johannes', nachname);
 	await setzeSpielerangaben(spieler.mitgliedId, {
@@ -292,10 +278,10 @@ test('Rufname: Teilnehmerliste zeigt Rufname mit amtlichem Namen', async ({ page
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder sehen die Liste am Handy; die Darstellung selbst prüfen die Einheitstests
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_RUFNAME, info);
 	const {
+		jahr,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, [einzel('Herren R1–R9', 'herren', 'R1')]);
+	} = await legeOffenesTurnierAn([einzel('Herren R1–R9', 'herren', 'R1')]);
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
 	const spieler = await legeKontoAn('Johannes', nachname);
 	await setzeSpielerangaben(spieler.mitgliedId, {
@@ -317,7 +303,9 @@ test('Rufname: Teilnehmerliste zeigt Rufname mit amtlichem Namen', async ({ page
 	await meldeAn(page, betrachter);
 	await page.getByRole('link', { name: new RegExp(`Clubmeisterschaft ${jahr}`) }).click();
 	// Ohne Kontaktperson fehlt der Satz; die Namen stehen nicht in der Übersicht.
-	await expect(page.getByText('Bei Fragen oder Problemen', { exact: false })).toHaveCount(0);
+	await expect(page.getByRole('heading', { level: 2, name: 'Fragen oder Probleme?' })).toHaveCount(
+		0
+	);
 	await expect(karte(page, 'Herren R1–R9')).not.toContainText(nachname);
 	// Die Seite der Kategorie listet die Namen, mit Rufname und amtlichem Namen.
 	await karte(page, 'Herren R1–R9').getByRole('link', { name: '1 angemeldet' }).click();

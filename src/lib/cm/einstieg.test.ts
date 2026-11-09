@@ -8,7 +8,8 @@ const stand = (id: number, name: string): CmStand => ({
 	anmeldeschluss: '2027-05-31',
 	status: 'offen',
 	anzahl: 0,
-	anfragen: 0
+	anfragen: 0,
+	neueAntwort: false
 });
 
 describe('cmEinstieg: oberste Seite des Reiters CM', () => {

@@ -8,6 +8,43 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.5 — Doku-Abgleich vor dem Release
+
+- Datenschutzerklärung zum Gespräch mit der Turnierleitung präzisiert: die Nachrichten stehen unter
+  *Welche Daten*, nur CM- und MyTCO-Admins lesen sie, Auskunft dazu geben die CM-Admins.
+- Datenschutzkonzept, Rollen und Rechte, Fachmodell, Glossar, Testkonzept und `make seed` an das
+  Gespräch mit der Turnierleitung angeglichen (#71).
+
+## 0.20.4 — E2E-Tests vergeben freie Turnierjahre selbst
+
+- E2E-Tests vergeben ihre Turnierjahre nicht mehr von Hand: Die Hilfe sucht sich ein freies Jahr
+  zwischen 3000 und 9999. Parallel laufende Testdateien können sich so kein Turnier mehr
+  wegnehmen, und neue Tests brauchen kein freies Jahr (Beobachtung «kein freies Turnierjahr mehr»).
+
+## 0.20.3 — Kontaktdaten für den CM-Admin nach Aufgabe
+
+- Der CM-Admin sieht in den Anmeldelisten E-Mail und Telefon der Spieler (Anmeldungen und offene
+  Partner-Anfragen), bis zum 1.1. nach dem Turnierjahr. Datenschutz: Kontaktdaten für CM- und
+  Lizenz-Admin nach Aufgabe statt von allen (K-42 eingegrenzt).
+
+## 0.20.2 — Beobachtungs-Auswertung: Tests verlässlicher, Doku an den Code angeglichen
+
+- Meldungen an die CM-Admins gehen nur an gültige CM-Admins (aktiv, Konto nicht gesperrt).
+- Änderungsverlauf eines Mitglieds: Der Pfad steht sofort da, ohne zweiten Abruf.
+- Eine Überschrift zuoberst in einer Karte hat oben keinen zusätzlichen Abstand mehr.
+- Tests: E2E-Mails über 127.0.0.1, eigene Turnierjahre je Datei, Login-Tests warten auf das
+  Vorladen, längere Zeitgrenze für DB-Tests mit eigener Datenbank.
+- Doku: neue Fachregel FR-55 (gültige Kontaktperson); Zusagen zur Auskunft im Verlauf und zum
+  Rufnamen der Kontaktperson präzisiert; gebaute Anforderungen auf «umgesetzt».
+
+## 0.20.1 — Zeitgrenze für einen langen E2E-Test
+
+- E2E: Der Ablauf Austritt, Wiedereintritt und Auskunft (FR-04) hat unter WebKit in der CI mehr Zeit.
+
+## 0.20.0 — Gespräch mit der Turnierleitung
+
+- Mitglieder schreiben der Turnierleitung aus der CM-Seite; alle CM-Admins sehen die Gespräche im Posteingang (#71).
+
 ## 0.19.1 — Löschung leert die Kontaktperson, Doku-Abgleich vor dem Release
 
 - Wird ein Mitglied gelöscht, ist es nicht mehr Kontaktperson eines Turniers; die Verwaltung

@@ -13,7 +13,14 @@ import { warnungenDoppel, type Spieler } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
 import type { MitgliedStatus } from '../admin/mitglieder.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
-import { anmeldung, anmeldungSpieler, kategorie, mitglied, partnerAnfrage } from '../db/schema.ts';
+import {
+	anmeldung,
+	anmeldungSpieler,
+	kategorie,
+	mitglied,
+	partnerAnfrage,
+	turnier
+} from '../db/schema.ts';
 import { namensSpalten } from '../namen.ts';
 import { spielerAus } from './angaben.ts';
 import {
@@ -46,9 +53,15 @@ import {
 	vonHandAlleinText,
 	vonHandPaarText
 } from './doppel-meldung.ts';
-import { schreibeGeaendert, type CmUrheber, type Warnung } from './verwaltung.ts';
+import {
+	kontaktFuerCm,
+	kontaktSichtbar,
+	schreibeGeaendert,
+	type CmUrheber,
+	type Warnung
+} from './verwaltung.ts';
 
-/** Ein Spieler in der Doppel-Liste der Verwaltung; ohne Telefon und E-Mail (FR-19). */
+/** Ein Spieler in der Doppel-Liste der Verwaltung; Telefon und E-Mail nur bis zum 1.1. nach dem Turnierjahr (K-42). */
 export type DoppelSpieler = {
 	mitgliedId: number;
 	name: Namensteile;
@@ -56,6 +69,8 @@ export type DoppelSpieler = {
 	mitgliedStatus: MitgliedStatus;
 	geschlecht: 'w' | 'm' | null;
 	klassierung: Klassierung | null;
+	email: string | null;
+	telefon: string | null;
 };
 
 export type DoppelVerwaltung = {
@@ -84,22 +99,28 @@ const nachName = (a: DoppelSpieler, b: DoppelSpieler) =>
 	namenOrdnung.compare(a.name.vorname, b.name.vorname) ||
 	a.mitgliedId - b.mitgliedId;
 
-const doppelSpieler = (z: {
-	mitgliedId: number;
-	rufname: string | null;
-	vorname: string;
-	nachname: string;
-	status: string;
-	geschlecht: string | null;
-	klassierung: string | null;
-}): DoppelSpieler => {
+const doppelSpieler = (
+	z: {
+		mitgliedId: number;
+		rufname: string | null;
+		vorname: string;
+		nachname: string;
+		status: string;
+		geschlecht: string | null;
+		klassierung: string | null;
+		email: string | null;
+		telefon: string | null;
+	},
+	kontakt: boolean
+): DoppelSpieler => {
 	const s = spielerAus({ ...z, jahrgang: null });
 	return {
 		mitgliedId: z.mitgliedId,
 		name: namensteile(z),
 		mitgliedStatus: z.status as MitgliedStatus,
 		geschlecht: s.geschlecht,
-		klassierung: s.klassierung
+		klassierung: s.klassierung,
+		...kontaktFuerCm(z, kontakt)
 	};
 };
 
@@ -108,21 +129,30 @@ const spielerSpaltenDoppel = {
 	...namensSpalten,
 	status: mitglied.status,
 	geschlecht: mitglied.geschlecht,
-	klassierung: mitglied.klassierung
+	klassierung: mitglied.klassierung,
+	email: mitglied.email,
+	telefon: mitglied.telefon
 };
 
 /**
  * A-ANMELDUNG-06: Paare, Suchende und offene Anfragen einer Doppel-Kategorie; `null` für Einzel
  * oder eine unbekannte Kategorie. Paare und Suchende nach Nachname des ersten Spielers (die
  * Spieler eines Paars selbst nach Nachname), Anfragen älteste zuerst, auch die von Mitgliedern
- * ohne Login: Der CM-Admin kann sie trotzdem anmelden.
+ * ohne Login: Der CM-Admin kann sie trotzdem anmelden. Kontaktdaten aller Beteiligten bis zum
+ * 1.1. nach dem Turnierjahr (K-42).
  */
-export async function ladeDoppel(db: Db, kategorieId: number): Promise<DoppelVerwaltung | null> {
+export async function ladeDoppel(
+	db: Db,
+	kategorieId: number,
+	jetzt: Date
+): Promise<DoppelVerwaltung | null> {
 	const [k] = await db
-		.select({ art: kategorie.art })
+		.select({ art: kategorie.art, turnierjahr: turnier.jahr })
 		.from(kategorie)
+		.innerJoin(turnier, eq(turnier.id, kategorie.turnierId))
 		.where(eq(kategorie.id, kategorieId));
 	if (!k || k.art !== 'doppel') return null;
+	const kontakt = kontaktSichtbar(k.turnierjahr, jetzt);
 
 	const zeilen = await db
 		.select({
@@ -137,7 +167,7 @@ export async function ladeDoppel(db: Db, kategorieId: number): Promise<DoppelVer
 	const anmeldungen = new Map<number, { suchtext: string | null; spieler: DoppelSpieler[] }>();
 	for (const z of zeilen) {
 		const a = anmeldungen.get(z.anmeldungId) ?? { suchtext: z.suchtext, spieler: [] };
-		a.spieler.push(doppelSpieler(z));
+		a.spieler.push(doppelSpieler(z, kontakt));
 		anmeldungen.set(z.anmeldungId, a);
 	}
 	const sortiert = [...anmeldungen.entries()].map(([anmeldungId, a]) => ({
@@ -182,7 +212,7 @@ export async function ladeDoppel(db: Db, kategorieId: number): Promise<DoppelVer
 		const ids = [...new Set(anfragen.flatMap((a) => [a.vonId, a.anId]))];
 		const personen = new Map(
 			(await db.select(spielerSpaltenDoppel).from(mitglied).where(inArray(mitglied.id, ids))).map(
-				(z) => [z.mitgliedId, doppelSpieler(z)]
+				(z) => [z.mitgliedId, doppelSpieler(z, kontakt)]
 			)
 		);
 		for (const a of anfragen) {

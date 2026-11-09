@@ -21,7 +21,7 @@ Lauf.
 
 - [ ] Live in Betrieb ([#39](https://github.com/konstantinniedermann/tco-app/issues/39)), unter der endgültigen Adresse (K-10). Unter einer Übergangsadresse müssten die Testpersonen nach dem Umzug Startbildschirm und Passkey neu einrichten ([Sicherheitskonzept](sicherheitskonzept.md))
 - [ ] Login per Einmal-Code auf Live ([#29](https://github.com/konstantinniedermann/tco-app/issues/29))
-- [ ] Brief-Code und Brief als PDF in der Mitgliederverwaltung ([#43](https://github.com/konstantinniedermann/tco-app/issues/43), Etappe 2)
+- [ ] Brief-Code und Brief als PDF in der Mitgliederverwaltung ([#43](https://github.com/konstantinniedermann/tco-app/issues/43), Etappe 2a): gebaut (0.13.0, PDF über den Druckdialog des Browsers); offen ist der Druck aus Safari auf Papier ([Testkonzept](testkonzept.md), Checkliste vor dem Release)
 - [ ] Hilfe beim Start: Hilfe-Seite und Anleitung zum Startbildschirm (A-HILFE-01, -02, [#47](https://github.com/konstantinniedermann/tco-app/issues/47))
 - [ ] Datenschutzerklärung auf Live erreichbar (DS-09), Hinweis an die alte E-Mail-Adresse gebaut (FR-25)
 - [ ] Kontaktangabe für Fragen geklärt (K-21)

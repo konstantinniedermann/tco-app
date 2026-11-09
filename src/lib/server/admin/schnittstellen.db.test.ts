@@ -769,7 +769,8 @@ describe('Admin-Schnittstellen', () => {
 			rufname: null,
 			passkeyHinweis: false,
 			verwaltung: true,
-			ansicht: null
+			ansicht: null,
+			nachrichtenOffen: 0
 		});
 		expect(await rn.json()).toMatchObject({ verwaltung: false });
 		expect((await getSitzung(ereignis(), db)).status).toBe(401);

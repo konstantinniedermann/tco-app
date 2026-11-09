@@ -20,7 +20,7 @@ MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Fragen zum Datenschutz
 [Ansprechperson], [E-Mail-Adresse des Vereins].
 
 **Welche Daten:** Name, freiwillig ein Rufname, Postadresse, E-Mail, Telefon, Geschlecht, Jahrgang, Mitgliedernummer,
-Lizenznummer und Klassierung, deine Anmeldungen zur Clubmeisterschaft (im Doppel auch Anfragen an Partner), Resultate und Lizenzanträge, deine An- oder
+Lizenznummer und Klassierung, deine Anmeldungen zur Clubmeisterschaft (im Doppel auch Anfragen an Partner), deine Nachrichten an die Turnierleitung, Resultate und Lizenzanträge, deine An- oder
 Abmeldung zu Anlässen wie der Generalversammlung mit einer freiwilligen Bemerkung. Deine Grunddaten übernimmt
 der Verein aus seiner Mitgliederliste. Legt die Verwaltung einen Anlass an, speichert MyTCO, wer ihn
 angelegt hat, damit sich Rückfragen klären lassen.
@@ -36,8 +36,10 @@ du selbst einschaltest. Für nichts anderes.
   [Personen, **Vorschlag K-18.4:** Projektleiter und Stellvertretung]. Sie sehen dieselben
   Daten wie alle anderen Rollen, ändern sie aber nicht. Das brauchen sie, um den anderen zu
   helfen, Fehler zu finden und die Vergabe der Rollen zu prüfen.
-- Die **CM-Admins** und **Lizenz-Admins** sehen deinen Namen, deine E-Mail und Telefonnummer
-  und was sie für die Clubmeisterschaft bzw. die Lizenzen brauchen. Die CM-Admins sehen dazu
+- Die **CM-Admins** und **Lizenz-Admins** sehen nur, was sie für ihre Aufgabe brauchen. Deine
+  E-Mail und Telefonnummer sehen die CM-Admins, wenn du bei einer Clubmeisterschaft angemeldet
+  bist oder eine Partner-Anfrage offen hast (bis Ende des Turnierjahres), die Lizenz-Admins,
+  wenn du eine Lizenz hast oder beantragst. Die CM-Admins sehen dazu
   dein Geschlecht und deinen Jahrgang, um dich in die passenden Kategorien einzuordnen; ändern
   können sie beides nicht.
 - Deinen Einmal-Code kann nach dem Versand niemand mehr abrufen.
@@ -49,6 +51,7 @@ du selbst einschaltest. Für nichts anderes.
 - Deinen Rufnamen sehen eingeloggte Mitglieder neben deinem Namen, öffentliche Seiten zeigen ihn nicht. Du kannst ihn jederzeit im Profil ändern oder löschen.
 - Bist du CM-Admin und für ein Turnier als Kontaktperson gewählt, sehen alle Mitglieder deinen Namen auf der Seite
   dieser Clubmeisterschaft, nicht aber deine E-Mail oder Telefonnummer.
+- Schreibst du der Turnierleitung, lesen nur die CM-Admins und die MyTCO-Admins dein Gespräch mit; du siehst als Absender nur «Turnierleitung». Schreib bitte keine Angaben zur Gesundheit. Wir löschen alle Gespräche eines Turniers am 1. Januar nach dem Turnierjahr, dein Gespräch auch, wenn du endgültig gelöscht wirst.
 - Alle Mitglieder sehen Name, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft. Wer einen
   Doppelpartner sucht, sieht Name und Klassierung der Mitglieder, die für die Kategorie in Frage kommen. Fehlt
   eine Angabe, steht dort *Klassierung fehlt* oder *Angaben fehlen* (Geschlecht).
@@ -82,8 +85,8 @@ nach Beginn des Anlasses [**Vorschlag K-50**].
 
 Auf Wunsch erhältst du eine Auskunft über alle Daten, die wir von dir gespeichert haben.
 Änderungen, die du bei anderen Mitgliedern ausgelöst hast, stehen nicht darin, weil sie andere
-betreffen. Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge und
-zurückgezogene Anmeldungen geben dir die CM-Admins Auskunft.
+betreffen. Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge,
+zurückgezogene Anmeldungen und dein Gespräch mit der Turnierleitung geben dir die CM-Admins Auskunft.
 
 **Login:** Du loggst dich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 dein Gerät das Login mit einem Cookie, bis du MyTCO ein Jahr nicht genutzt hast oder dich

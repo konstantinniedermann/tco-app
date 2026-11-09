@@ -206,7 +206,8 @@ describe('CM-Anmeldung', () => {
 				anmeldeschluss: `${t.jahr}-05-31`,
 				status: 'offen',
 				anzahl: 0,
-				anfragen: 0
+				anfragen: 0,
+				neueAntwort: false
 			},
 			fehlt: [],
 			spieler: { geschlecht: 'm', jahrgang: 1990, klassierung: 'R3' },
@@ -265,7 +266,8 @@ describe('CM-Anmeldung', () => {
 			eigene: [],
 			anfragen: [],
 			grenze: 3,
-			kontakt: null
+			kontakt: null,
+			gespraech: { vorhanden: false, neueAntwort: false, schreiben: false }
 		});
 		for (const k of [damen, schwach, senioren, abgesagt]) {
 			expect(await meldeAn(db, k, ich, t.jetzt)).not.toBe('ok');
@@ -326,7 +328,8 @@ describe('CM-Anmeldung', () => {
 			anmeldeschluss: `${t.jahr}-05-31`,
 			status: 'offen',
 			anzahl: 2,
-			anfragen: 0
+			anfragen: 0,
+			neueAntwort: false
 		});
 		expect(await eigeneKategorien(db, t.id, ich)).toEqual(['Herren A', 'Herren B']);
 		expect(await zaehleAktive(db, b)).toBe(1);
@@ -433,7 +436,7 @@ describe('CM-Anmeldung', () => {
 		expect(await aktiveVon(ich, frueh.kategorien)).toHaveLength(1);
 	});
 
-	test('FR-10: fremde Anmeldung abmelden ergibt nicht-gefunden', async () => {
+	test('FR-10, RR-06: fremde Anmeldung abmelden ergibt nicht-gefunden', async () => {
 		const t = await offenesTurnier();
 		const [k] = t.kategorien;
 		const ich = await spieler();
@@ -500,7 +503,8 @@ describe('CM-Anmeldung', () => {
 				anmeldeschluss: `${jahr + 1}-05-31`,
 				status: 'offen',
 				anzahl: 0,
-				anfragen: 0
+				anfragen: 0,
+				neueAntwort: false
 			},
 			{
 				id: uebernaechstes,
@@ -508,7 +512,8 @@ describe('CM-Anmeldung', () => {
 				anmeldeschluss: `${jahr + 2}-05-31`,
 				status: 'geschlossen',
 				anzahl: 0,
-				anfragen: 0
+				anfragen: 0,
+				neueAntwort: false
 			}
 		]);
 		expect(await ladeCmAnsicht(db, vorbereitung, ich, jetzt)).toBeNull();
@@ -990,7 +995,7 @@ describe('CM-Anmeldung', () => {
 	});
 });
 
-describe('Kontaktperson der CM', () => {
+describe('FR-55: Kontaktperson der CM', () => {
 	/** Offenes Turnier mit `kontakt` als Kontaktperson (vorher gültig CM-Admin). */
 	async function mitKontakt() {
 		const admin = await legeMitgliedAn(db, {

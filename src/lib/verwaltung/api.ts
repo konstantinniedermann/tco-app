@@ -11,6 +11,11 @@ import type { DateiFehler, Vorschau } from '../server/admin/einlesen.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
 import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
+import type {
+	GespraechZeile as ServerGespraechZeile,
+	ladeGespraech as ServerLadeGespraech,
+	listeGespraeche as ServerListeGespraeche
+} from '../server/gespraech/gespraech.ts';
 import type { DoppelVerwaltung as ServerDoppelVerwaltung } from '../server/cm/verwaltung-doppel.ts';
 import type { TurnierStatus } from '../server/db/schema.ts';
 import type { MitteilungFeld } from '../server/mitteilung/angaben.ts';
@@ -46,7 +51,10 @@ export type KategorieAnsicht = Json<NonNullable<Awaited<ReturnType<typeof Server
 export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus, VerwaltungsRolle };
 export type { AnmeldungZeile, SpielerTreffer, Warnung };
 export type DoppelVerwaltung = Json<ServerDoppelVerwaltung>;
-type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld | MitteilungFeld;
+export type GespraechListe = Json<NonNullable<Awaited<ReturnType<typeof ServerListeGespraeche>>>>;
+export type GespraechVerlauf = Json<NonNullable<Awaited<ReturnType<typeof ServerLadeGespraech>>>>;
+export type GespraechZeile = Json<ServerGespraechZeile>;
+type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld | MitteilungFeld | 'text';
 export type FairgateZeile = Json<ServerFairgateZeile>;
 export type BriefListe = Json<BriefZeile>[];
 export type { AusgestellterBrief };
@@ -82,6 +90,8 @@ export type Antwort<T> =
 	| { art: 'schon-angemeldet' }
 	| { art: 'vorbereitung' }
 	| { art: 'nicht-beantragt' }
+	| { art: 'nur-lesen' }
+	| { art: 'inzwischen'; gespraech: GespraechVerlauf }
 	| { art: 'stoerung' };
 
 export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
@@ -96,6 +106,7 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 		anzahl?: unknown;
 		warnungen?: unknown;
 		datei?: unknown;
+		gespraech?: unknown;
 	};
 	if (status >= 200 && status < 300) return { art: 'ok', daten: koerper as T };
 	if (status === 401) return { art: 'abgemeldet' };
@@ -137,6 +148,9 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 		if (k.fehler === 'schon-angemeldet') return { art: 'schon-angemeldet' };
 		if (k.fehler === 'vorbereitung') return { art: 'vorbereitung' };
 		if (k.fehler === 'nicht-beantragt') return { art: 'nicht-beantragt' };
+		if (k.fehler === 'nur-lesen') return { art: 'nur-lesen' };
+		if (k.fehler === 'inzwischen' && k.gespraech && typeof k.gespraech === 'object')
+			return { art: 'inzwischen', gespraech: k.gespraech as GespraechVerlauf };
 	}
 	return STOERUNG;
 }
@@ -466,3 +480,22 @@ export const meldeAnfrageAlsPaarAn = (anfrageId: number, trotzdem = false, holen
 /** FR-46, FR-48: eine offene Partner-Anfrage löschen; der Anfragende erfährt es. */
 export const loescheAnfrage = (anfrageId: number, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/anfragen/${anfrageId}/loeschen`, {}, holen);
+
+/** FR-52: die Gespräche eines Turniers für den Posteingang der Turnierleitung. */
+export const holeGespraeche = (turnierId: number, holen: Holen = fetch) =>
+	lese<GespraechListe>(`${ADMIN}/turniere/${turnierId}/gespraeche`, holen);
+
+/** Ein Gespräch mit Verlauf, mit den Namen der antwortenden Admins. */
+export const holeGespraech = (id: number, holen: Holen = fetch) =>
+	lese<GespraechVerlauf>(`${ADMIN}/gespraeche/${id}`, holen);
+
+/** FR-50: Antwort der Turnierleitung; `nachLetzter`: Id der letzten Nachricht, die die Seite kennt. */
+export const sendeAntwort = (
+	id: number,
+	antwort: { text: string; nachLetzter: number; trotzdem?: boolean },
+	holen: Holen = fetch
+) => schicke<GespraechVerlauf>(`${ADMIN}/gespraeche/${id}`, antwort, holen);
+
+/** FR-52: Gespräch als erledigt markieren oder wieder öffnen. */
+export const setzeZustand = (id: number, zustand: 'offen' | 'erledigt', holen: Holen = fetch) =>
+	schicke<GespraechVerlauf>(`${ADMIN}/gespraeche/${id}/zustand`, { zustand }, holen);

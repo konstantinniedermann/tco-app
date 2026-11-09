@@ -1,6 +1,6 @@
 // Meldungen zum Doppel (FR-47): Push, sonst E-Mail, verschickt über `meldeMitgliedern`. Sie nennen
-// keinen CM-Admin und keinen Grund wie einen Austritt. Namen kommen in der kurzen Textform
-// «Hannes (Johannes Muster)» (`nameFuerText`).
+// den CM-Admin nur als Rolle, nie beim Namen (DS-05), und keinen Grund wie einen Austritt. Namen
+// anderer Spieler kommen in der kurzen Textform «Hannes (Johannes Muster)» (`nameFuerText`).
 
 export type DoppelMeldung = { titel: 'Clubmeisterschaft'; text: string; pfad: string };
 

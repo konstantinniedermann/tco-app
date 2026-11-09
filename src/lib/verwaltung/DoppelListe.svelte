@@ -12,6 +12,7 @@
 	import Name from '../ui/Name.svelte';
 	import { KLASSIERUNGEN, klassierungName, type Klassierung } from '../turnier/klassierung.ts';
 	import Aktionsdialog from './Aktionsdialog.svelte';
+	import Kontakt from './Kontakt.svelte';
 	import Spielersuche from './Spielersuche.svelte';
 	import Zeilenaktionen from './Zeilenaktionen.svelte';
 	import Zeilentasten from './Zeilentasten.svelte';
@@ -59,6 +60,14 @@
 	let { kategorieId, liste, turnier, nurLesen }: Props = $props();
 
 	const andere = $derived(turnier?.andere ?? []);
+	// K-42: Ab dem 1.1. nach dem Turnierjahr liefert der Server keine Kontaktdaten mehr.
+	const mitKontakt = $derived(
+		[
+			...(liste?.paare.flatMap((p) => p.spieler) ?? []),
+			...(liste?.suchende.map((s) => s.spieler) ?? []),
+			...(liste?.anfragen.flatMap((a) => [a.von, a.an]) ?? [])
+		].some((s) => s.email || s.telefon)
+	);
 	// Von Hand anmelden und verschieben gehen erst, wenn das Turnier nicht mehr in Vorbereitung ist.
 	const offen = $derived(turnier !== null && !turnier.vorbereitung);
 
@@ -217,6 +226,10 @@
 	</div>
 {/snippet}
 
+{#snippet kontakt(s: Spieler)}
+	<Kontakt telefon={s.telefon} email={s.email} />
+{/snippet}
+
 {#snippet paarZeile(a: Anmeldung)}
 	<p>{paarText(a)}{a.summe === undefined ? '' : ` · ${summeText(a.summe)}`}</p>
 {/snippet}
@@ -260,6 +273,11 @@
 			<td id={beschrieben}>
 				{#each p.spieler as s (s.mitgliedId)}{@render spielerName(s)}{/each}
 			</td>
+			{#if mitKontakt}
+				<td
+					>{#each p.spieler as s (s.mitgliedId)}{@render kontakt(s)}{/each}</td
+				>
+			{/if}
 			<td>
 				{#each p.spieler as s (s.mitgliedId)}<div>{@render klassierungZelle(s)}</div>{/each}
 			</td>
@@ -298,6 +316,7 @@
 		})}
 		<tr>
 			<td>{@render spielerName(s.spieler, beschrieben)}</td>
+			{#if mitKontakt}<td>{@render kontakt(s.spieler)}</td>{/if}
 			<td>{@render klassierungZelle(s.spieler)}</td>
 			<td>
 				{#if s.kommentar}<span class="leise zelle-kurz" title={s.kommentar}>{s.kommentar}</span
@@ -321,8 +340,11 @@
 		{@const beschrieben = `anfrage-von-${a.anfrageId} anfrage-an-${a.anfrageId}`}
 		{@const aktionen = anfrageAktionen(a)}
 		<tr>
-			<td>{@render spielerName(a.von, `anfrage-von-${a.anfrageId}`)}</td>
-			<td>{@render spielerName(a.an, `anfrage-an-${a.anfrageId}`)}</td>
+			<td>
+				{@render spielerName(a.von, `anfrage-von-${a.anfrageId}`)}
+				{@render spielerName(a.an, `anfrage-an-${a.anfrageId}`)}
+			</td>
+			{#if mitKontakt}<td>{@render kontakt(a.von)}{@render kontakt(a.an)}</td>{/if}
 			<td>{datumText(a.gestelltAm)}</td>
 			{#if !nurLesen}
 				<td>
@@ -378,14 +400,28 @@
 		<p class="leise" role="status" tabindex="-1" bind:this={rueckmeldungFeld}>
 			{#if rueckmeldung}{rueckmeldung}{/if}
 		</p>
-		{@render teil('Paare', liste.paare.length, ['Paar', 'Klassierungen', 'Summe'], paarZeilen)}
+		{@render teil(
+			'Paare',
+			liste.paare.length,
+			mitKontakt
+				? ['Paar', 'Kontakt', 'Klassierungen', 'Summe']
+				: ['Paar', 'Klassierungen', 'Summe'],
+			paarZeilen
+		)}
 		{@render teil(
 			'Sucht Partner',
 			liste.suchende.length,
-			['Name', 'Klassierung', 'Kommentar'],
+			mitKontakt
+				? ['Name', 'Kontakt', 'Klassierung', 'Kommentar']
+				: ['Name', 'Klassierung', 'Kommentar'],
 			suchendeZeilen
 		)}
-		{@render teil('Offene Anfragen', liste.anfragen.length, ['Von', 'An', 'Seit'], anfrageZeilen)}
+		{@render teil(
+			'Offene Anfragen',
+			liste.anfragen.length,
+			mitKontakt ? ['Von / An', 'Kontakt', 'Seit'] : ['Von / An', 'Seit'],
+			anfrageZeilen
+		)}
 	{/if}
 </div>
 

@@ -84,6 +84,7 @@ type Angaben = Partial<{
 	geschlecht: 'w' | 'm' | null;
 	jahrgang: number | null;
 	klassierung: string | null;
+	telefon: string | null;
 }>;
 
 /** Erfundener Spieler; ohne Angaben ein Herr, Jahrgang 1990, R3. */
@@ -536,7 +537,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		await anmeldungMit(a, await spieler({ nachname: 'Nein' }), 'abgelehnt', t.jetzt);
 		await anmeldungMit(b, await spieler({ nachname: 'Anders' }), 'bestaetigt', t.jetzt);
 
-		expect(await ladeAnmeldungen(db, a)).toEqual([
+		expect(await ladeAnmeldungen(db, a, t.jetzt)).toEqual([
 			{
 				anmeldungId: idAlphaA,
 				status: 'bestaetigt',
@@ -546,7 +547,9 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				name: { rufname: null, vorname: 'Adam', nachname: 'Alpha' },
 				geschlecht: 'm',
 				jahrgang: 1990,
-				klassierung: 'keine'
+				klassierung: 'keine',
+				email: expect.stringMatching(/@example\.org$/),
+				telefon: null
 			},
 			{
 				anmeldungId: idAlphaB,
@@ -557,7 +560,9 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				name: { rufname: 'Hannes', vorname: 'Bert', nachname: 'Alpha' },
 				geschlecht: null,
 				jahrgang: null,
-				klassierung: null
+				klassierung: null,
+				email: expect.stringMatching(/@example\.org$/),
+				telefon: null
 			},
 			{
 				anmeldungId: idZeta,
@@ -568,10 +573,12 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 				name: { rufname: null, vorname: 'Anna', nachname: 'Zeta' },
 				geschlecht: 'm',
 				jahrgang: 1990,
-				klassierung: 'R3'
+				klassierung: 'R3',
+				email: expect.stringMatching(/@example\.org$/),
+				telefon: null
 			}
 		]);
-		expect(await ladeAnmeldungen(db, -1)).toEqual([]);
+		expect(await ladeAnmeldungen(db, -1, t.jetzt)).toEqual([]);
 
 		// Doppel kommt mit #59: die Liste zeigt nur Einzel.
 		const doppel = await kategorieIn(t.id, 'Doppel', {
@@ -582,7 +589,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			mindestsumme: 9
 		});
 		await anmeldungMit(doppel, zeta, 'bestaetigt', t.jetzt);
-		expect(await ladeAnmeldungen(db, doppel)).toEqual([]);
+		expect(await ladeAnmeldungen(db, doppel, t.jetzt)).toEqual([]);
 	});
 
 	test('FR-04: ladeAnmeldungen nennt den Status des Mitglieds, auch Ausgetretene und Gelöschte', async () => {
@@ -605,7 +612,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		await db.update(mitglied).set({ status: 'geloescht' }).where(eq(mitglied.id, weg));
 
 		const status = Object.fromEntries(
-			(await ladeAnmeldungen(db, a)).map((z) => [z.mitgliedId, z.mitgliedStatus])
+			(await ladeAnmeldungen(db, a, t.jetzt)).map((z) => [z.mitgliedId, z.mitgliedStatus])
 		);
 		expect(status).toEqual({
 			[aktiv]: 'aktiv',
@@ -613,6 +620,49 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			[vorgemerkt]: 'vorgemerkt',
 			[weg]: 'geloescht'
 		});
+	});
+
+	test('K-42: ladeAnmeldungen zeigt E-Mail und Telefon bis zum 1.1. nach dem Turnierjahr, auch nach Austritt', async () => {
+		const t = await turnier(['Herren A']);
+		const [a] = t.kategorien;
+		const aktiv = await spieler({ nachname: 'Aktiv', telefon: '079 111 22 33' });
+		const aus = await spieler({ nachname: 'Aus', telefon: '079 444 55 66' });
+		const vor = await spieler({ nachname: 'Vor', telefon: '079 777 88 99' });
+		for (const id of [aktiv, aus, vor]) await anmeldungMit(a, id, 'bestaetigt', t.jetzt);
+		await db
+			.update(mitglied)
+			.set({ status: 'ausgetreten', austrittAm: t.jetzt })
+			.where(eq(mitglied.id, aus));
+		await db
+			.update(mitglied)
+			.set({ status: 'vorgemerkt', statusVorher: 'aktiv', vorgemerktAm: t.jetzt })
+			.where(eq(mitglied.id, vor));
+		const kontakt = async (jetzt: Date) =>
+			Object.fromEntries(
+				(await ladeAnmeldungen(db, a, jetzt)).map((z) => [
+					z.mitgliedId,
+					[z.telefon, z.email?.endsWith('@example.org') ?? null]
+				])
+			);
+
+		// 31.12. 23:59 in Zürich: noch im Turnierjahr.
+		expect(await kontakt(new Date(`${t.jahr}-12-31T22:59:00Z`))).toEqual({
+			[aktiv]: ['079 111 22 33', true],
+			[aus]: ['079 444 55 66', true],
+			[vor]: ['079 777 88 99', true]
+		});
+		// 1.1. 00:00 in Zürich: nur noch Namen.
+		const danach = await ladeAnmeldungen(db, a, new Date(`${t.jahr}-12-31T23:00:00Z`));
+		expect(danach.map((z) => [z.mitgliedId, z.email, z.telefon])).toEqual(
+			expect.arrayContaining([
+				[aktiv, null, null],
+				[aus, null, null],
+				[vor, null, null]
+			])
+		);
+		const json = JSON.stringify(danach);
+		expect(json).not.toContain('079');
+		expect(json).not.toContain('@example.org');
 	});
 
 	test('FR-04: CM-Aktionen an einer Anmeldung eines gelöschten Mitglieds schreiben keinen Verlauf', async () => {

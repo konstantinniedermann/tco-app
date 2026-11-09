@@ -10,7 +10,7 @@ import {
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
+import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 import { e2eEinstellungen } from './hilfen/umgebung.ts';
 
 // Alle Browser kommen von 127.0.0.1 an denselben Server; die Grenzen pro IP und Stunde gelten
@@ -35,13 +35,17 @@ async function oeffneProfil(page: Page) {
 	await expect(page).toHaveURL(/\/profil$/);
 }
 
-/** Brief-Code klein und mit Bindestrich eintippen (UI-07). */
+/**
+ * Brief-Code klein und mit Bindestrich eintippen (UI-07). Wartet am Schluss auf das Vorladen der
+ * Reiter: Ein `reload` mitten hinein meldet WebKit als Konsolenfehler.
+ */
 async function meldeMitBriefAn(page: Page, vorname: string) {
 	const konto = await legeKontoMitBriefCodeAn(vorname);
 	await page.goto('/login');
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code).toLowerCase());
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${vorname}` })).toBeVisible();
+	await wartetAufVorladen(page);
 	return konto;
 }
 

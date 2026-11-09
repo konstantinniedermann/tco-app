@@ -20,6 +20,7 @@
 		klassierungText,
 		statusText
 	} from '../../../../lib/verwaltung/turnier-anzeige.ts';
+	import { amtlicherName } from '../../../../lib/name.ts';
 	import { fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';
@@ -42,6 +43,8 @@
 	const status = $derived(statusText(detail.status));
 	const aktive = $derived(detail.kategorien.filter((k) => k.status === 'aktiv').length);
 	const schluss = $derived(datumLang(detail.anmeldeschluss));
+	const nachrichten = $derived(detail.nachrichten);
+	const kontakt = $derived(detail.kontakt?.gueltig ? detail.kontakt : null);
 	// Ohne Link in der Tabelle (alle Kategorien abgesagt) muss der Bereich selbst per Tastatur scrollbar sein.
 	const ohneLinks = $derived(aktive === 0);
 
@@ -122,6 +125,32 @@
 	Anmeldeschluss {schluss} · {aktive}
 	{aktive === 1 ? 'Kategorie' : 'Kategorien'}
 </p>
+
+<h2>Nachrichten</h2>
+<div class="karte">
+	<div class="karte-kopf">
+		<p><strong>Fragen an die Turnierleitung</strong></p>
+		{#if nachrichten.offen > 0}
+			<span class="plakette plakette-offen">{nachrichten.offen} offen</span>
+		{/if}
+	</div>
+	<p class="leise">
+		{#if kontakt}
+			Kontaktperson: {amtlicherName(kontakt.name, 'vorname-zuerst')}. Sie bekommt eine Meldung bei
+			jeder neuen Nachricht; alle CM-Admins sehen den Posteingang.
+		{:else}
+			Keine gültige Kontaktperson. Mitglieder können nicht schreiben.
+		{/if}
+	</p>
+	<a
+		class="kachel karte-teil"
+		href={resolve('/verwaltung/turniere/[id]/nachrichten', { id: String(detail.id) })}
+		><span>Posteingang · {nachrichten.offen} offen, {nachrichten.erledigt} erledigt</span><span
+			class="kachel-pfeil"
+			aria-hidden="true">›</span
+		></a
+	>
+</div>
 
 <h2>Anmeldung</h2>
 <div class="karte">

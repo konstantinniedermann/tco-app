@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
-	import { ladeMitglied, ladeVerlauf, type VerlaufEintrag } from '../../../lib/verwaltung/api.ts';
+	import { ladeVerlauf, type VerlaufEintrag } from '../../../lib/verwaltung/api.ts';
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { aktionText, zeitText } from '../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
@@ -13,21 +13,12 @@
 		return roh !== null && /^\d+$/.test(roh) ? Number(roh) : undefined;
 	});
 	let zeilen = $state<VerlaufEintrag[]>([]);
-	// Name des Mitglieds für den Pfad («Mitglieder › Nachname, Vorname › Änderungsverlauf»).
-	let name = $state<string | null>(null);
-	$effect(() => {
-		const id = mitglied;
-		name = null;
-		if (id === undefined) return;
-		let aktuell = true;
-		ladeMitglied(id).then((a) => {
-			if (aktuell && a.art === 'ok')
-				name = `${a.daten.angaben.nachname}, ${a.daten.angaben.vorname}`;
-		});
-		return () => {
-			aktuell = false;
-		};
-	});
+	// Pfad «Mitglieder › Nachname, Vorname › Änderungsverlauf»: Der Name steht in jeder Zeile des
+	// Verlaufs. Bis sie da sind (oder wenn es keine gibt), steht «Mitglied» – der Pfad ist sofort
+	// da, der Titel rutscht nicht nach, und der Rückweg fehlt nie.
+	const name = $derived(
+		zeilen.find((z) => z.mitglied.id === mitglied)?.mitglied.name ?? 'Mitglied'
+	);
 	let fehler = $state<string | null>(null);
 	let geladen = $state(false);
 
@@ -55,7 +46,7 @@
 </svelte:head>
 
 <Seitenkopf
-	pfad={mitglied !== undefined && name !== null
+	pfad={mitglied !== undefined
 		? {
 				stufen: [
 					{ text: 'Mitglieder', href: resolve('/verwaltung/mitglieder') },
