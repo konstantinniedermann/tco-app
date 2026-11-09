@@ -74,6 +74,6 @@
 		</table>
 	</div>
 {/if}
-<p class="leise">
-	Alle Gespräche dieses Turniers werden am 31. Dezember {liste.turnier.jahr} gelöscht.
+<p class="leise karte-teil">
+	Alle Gespräche dieses Turniers werden am 1. Januar {liste.turnier.jahr + 1} gelöscht.
 </p>

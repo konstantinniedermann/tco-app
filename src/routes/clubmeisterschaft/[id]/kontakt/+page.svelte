@@ -32,12 +32,14 @@
 	let fehler = $state<string | null>(null);
 	let feld = $state<HTMLTextAreaElement>();
 
-	onMount(() => {
-		const letzte = data.gespraech.nachrichten.at(-1);
+	/** FR-52: gelesen bis zur neuesten gezeigten Nachricht; ein Fehler hier stört das Lesen nicht. */
+	function nachladen() {
+		const letzte = gespraech.nachrichten.at(-1);
 		if (nurAnsehen || !letzte) return;
-		// FR-52: gelesen bis zur neuesten gezeigten Nachricht; ein Fehler hier stört das Lesen nicht.
 		void markiereGelesen(data.turnierId, letzte.gesendetAm);
-	});
+	}
+
+	onMount(nachladen);
 
 	async function senden(e: SubmitEvent) {
 		e.preventDefault();
@@ -49,6 +51,7 @@
 		if (r.art === 'ok') {
 			gespraech = r.daten;
 			text = '';
+			nachladen();
 		} else if (r.art === 'eingabe') {
 			fehler = r.felder.text ?? MELDUNG.stoerung;
 			await tick();
@@ -56,7 +59,10 @@
 		} else if (r.art === 'nur-lesen') {
 			gesperrt = true;
 			const neu = await holeGespraech(data.turnierId);
-			if (neu.art === 'ok') gespraech = neu.daten;
+			if (neu.art === 'ok') {
+				gespraech = neu.daten;
+				nachladen();
+			}
 		} else if (r.art === 'abgemeldet') {
 			window.location.assign('/login');
 		} else {

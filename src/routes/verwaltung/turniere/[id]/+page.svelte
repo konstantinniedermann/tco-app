@@ -139,7 +139,7 @@
 			Kontaktperson: {amtlicherName(kontakt.name, 'vorname-zuerst')}. Sie bekommt eine Meldung bei
 			jeder neuen Nachricht; alle CM-Admins sehen den Posteingang.
 		{:else}
-			Keine Kontaktperson gewählt. Mitglieder können nicht schreiben.
+			Keine gültige Kontaktperson. Mitglieder können nicht schreiben.
 		{/if}
 	</p>
 	<a

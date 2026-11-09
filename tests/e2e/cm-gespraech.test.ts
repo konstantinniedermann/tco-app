@@ -277,7 +277,7 @@ test('A-TURNIER-04, FR-50, FR-52, FR-53: die Turnierleitung beantwortet, erledig
 	);
 	await setzeKontaktperson(turnierId, hanna.mitgliedId);
 	const mitgl = await mitglied();
-	const frage = 'Kann ich meine Gruppenspiele vorziehen?';
+	const frage = 'Kann ich meine Gruppenspiele\nvorziehen?';
 
 	// Das Mitglied schreibt; die Kontaktperson bekommt eine Meldung ohne Inhalt und ohne Namen.
 	await startetVomSymbol(page);
@@ -316,7 +316,9 @@ test('A-TURNIER-04, FR-50, FR-52, FR-53: die Turnierleitung beantwortet, erledig
 	).toBeVisible();
 	await pruefePfad(page, ['Turniere', turnierName], 'Nachrichten');
 	await expect(page.locator('.kennzahl', { hasText: 'offen' })).toContainText('1');
-	await expect(page.getByText(`31. Dezember ${jahr}`)).toBeVisible();
+	await expect(
+		page.getByText(`Alle Gespräche dieses Turniers werden am 1. Januar ${jahr + 1} gelöscht.`)
+	).toBeVisible();
 	const reihe = page.getByRole('row', { name: new RegExp(mitgl.nachname) });
 	await expect(reihe).toContainText(`${mitgl.nachname}, Moritz`);
 	await expect(reihe).toContainText(frage);
@@ -330,6 +332,8 @@ test('A-TURNIER-04, FR-50, FR-52, FR-53: die Turnierleitung beantwortet, erledig
 	await pruefePfad(page, ['Turniere', turnierName, 'Nachrichten'], `${mitgl.nachname}, Moritz`);
 	const verlauf = page.getByRole('region', { name: 'Verlauf' });
 	await expect(verlauf).toContainText(frage);
+	// Zeilenumbrüche des Mitglieds bleiben im Verlauf erhalten.
+	expect(await verlauf.getByText('Gruppenspiele').innerText()).toContain('\n');
 	await expect(page.getByText('Moritz sieht als Absender nur «Turnierleitung».')).toBeVisible();
 	await pruefeBildschirm(page, info, 'verwaltung-gespraech');
 	const antwort = 'Ja, das geht. Melde die Resultate wie immer.';
