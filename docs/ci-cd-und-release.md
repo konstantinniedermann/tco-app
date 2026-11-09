@@ -25,7 +25,7 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 
 Beide Adressen richtet der Website-Betreuer ein (Annahme K-10: Test und Live unter `tcolten.ch`).
 Bis dahin gilt eine Übergangsadresse, die sich aus der IP des Servers bildet; die Adressen sind
-Einstellungen, am Code ändert sich dafür nichts. Die Demo läuft auf Test, Live bleibt leer bis zur
+Einstellungen, am Code ändert sich dafür nichts. Die Demo soll auf Test laufen, Live bleibt leer bis zur
 Testgruppe. Auf der Test-Umgebung läuft die
 [Checkliste vor dem Release](testkonzept.md#checkliste-vor-dem-release). Echte Daten kommen
 dort nie hin (DS-08).
@@ -58,7 +58,10 @@ flowchart LR
   abgehakt und das Release freigegeben hat (ohne Server: Ausnahmen unter [Versionen](#versionen)).
 - **Doku-Abgleich:** Vor jedem Release, auch einem reinen Doku-Release, wird die Doku gegen
   Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Danach
-  prüft `make release-check`, ob Version, [Versionen](versionen.md) und Tags zusammenpassen;
+  prüft `make release-check`, ob Version, [Versionen](versionen.md) und Tags zusammenpassen
+  (genau ein Abschnitt pro Version, der von `package.json` zuoberst; die Version sinkt nicht;
+  «Unveröffentlicht» ist leer, sobald sie sich ändert; kein Tag ohne Abschnitt und keiner auf
+  einer Version mit dem Marker «nicht ausgeliefert»);
   enthält das Release Code (auch Skripte oder Workflows), muss die Version seit dem letzten
   Release gestiegen sein, nur bei reiner Doku bleibt sie. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre führt,
   hält das Release auf. Ablauf im Skill `tco-branching`.
@@ -113,7 +116,7 @@ Doku-Merge ändert ihn nicht.
    oder schon Mitglieder da sind; dann scheitert die Auslieferung. Scheitert nur die Mail,
    bleiben die Testdaten, und das Protokoll hält «Mail mit Brief-Code nicht versandt» fest. Code
    und Adressen stehen nie im Protokoll.
-5. **Prüfen:** Antwortet die App nicht innert einer Minute (S) auf ihre Statusabfrage,
+5. **Prüfen:** Antwortet die App nicht innert einer Minute (`MYTCO_WARTEZEIT`, 60 s) auf ihre Statusabfrage,
    startet das Skript wieder das vorherige Image. Die CI erfährt nur `ok` oder `fehler`,
    keine Logs der App, denn CI-Logs liegen bei GitHub in den USA (DS-01, DS-06).
 6. **Freigeben (`freigeben`, nur `dev`):** Erst nach einer geglückten Auslieferung auf Test
@@ -197,8 +200,9 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
   Image läuft auf dem Server als Benutzer `mytco` mit Zugang zu Docker, und das reicht so weit
   wie root. Ein solches Image kann auch den Türsteher selbst, die Schlüssel in
   `authorized_keys` und die systemd-Einheiten umschreiben.
-- Die Rechte der Workflows prüft `workflow-rechte.ts` in der CI: Jeder Job hat eigene Rechte,
-  `packages: write` nur `bauen` und `freigeben`, `contents: write` nur `release`, die SSH-Geheimnisse
+- Die Rechte der Workflows prüft `workflow-rechte.ts` in der CI: Die Workflow-Ebene hat nur
+  `contents: read`, und kein Job hat mehr als vorgegeben: `packages: write` nur `bauen` und
+  `freigeben`, `packages: read` nur `finden` und `ausliefern`, `contents: write` nur `release`, die SSH-Geheimnisse
   nur `ausliefern`.
 - Nur der Auslieferungs-Job fordert den SSH-Schlüssel an. Er führt keine npm-Pakete, keine
   fremden Actions und nichts aus Caches oder Artefakten anderer Jobs aus. GitHub gibt ein
@@ -310,7 +314,7 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Prüfung | Quelle | Stand |
 |---------|--------|-------|
 | Doku-Check (Links, Konfliktmarker, Mermaid) | — | vorhanden |
-| Secret-Scan über die ganze Historie (gitleaks) | — | Hook und CI |
+| Secret-Scan (gitleaks): Hook über die gestagten Änderungen, CI und `make secrets` über die ganze Historie | — | Hook und CI |
 | Secret-Scanning von GitHub mit Sperre beim Push (Einstellung im Repo, gratis für öffentliche Repos) | — | GitHub |
 | ESLint mit Svelte-Regeln, Prettier | ADR-002, Arbeitsregeln | vorhanden |
 | `svelte-check`, Typprüfung des Service Workers (`tsc`), Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
@@ -371,7 +375,9 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   von Hand geprüft. Nach einem restic-Update `make betrieb-nachweis` laufen lassen: Das Lesen
   der Snapshot-Liste (`lib.sh` → `snapshot_zeilen`) hängt an der Feldreihenfolge von restic, und
   `sicherungsziel` liest wie restic die erste Zeile `RESTIC_REPOSITORY=`. Startet ein neues
-  Image restic über ein Shell-Skript statt direkt, kann restic die letzte nehmen.
+  Image restic über ein Shell-Skript statt direkt, kann restic die letzte nehmen. Ebenso die Service-Images in
+  `check.yml` (PostgreSQL, Mailpit): nach einem Dependabot-Update von `docker-compose.yml` von Hand
+  nachziehen.
 
 ## Versionen
 
@@ -386,7 +392,8 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   Sessions nie dieselbe Nummer (Begründung:
   [ADR-007](adr/adr-007-version-pro-merge.md)). Der Pre-Push-Hook weist einen Push auf `dev` ab, in dem ein
   Merge mit Code die Version nicht um genau einen Schritt erhöht, sein Abschnitt nicht zuoberst
-  steht oder reine Doku die Version erhöht (`version-merge.ts`); was schon auf `main` liegt, prüft er nicht. Weil der Hook nur lokal
+  steht oder reine Doku die Version erhöht (`version-merge.ts`); was schon auf `main` liegt, prüft er nicht.
+  Direkte Commits und Fast-Forward-Merges auf `dev` prüft er nicht; darum mergt der Skill immer mit `--no-ff`. Weil der Hook nur lokal
   läuft, werden auch die PRs von Dependabot im Hauptordner gemergt, nicht auf GitHub.
 - **Korrektur** (`x.y.Z`) ist der Normalfall bei jedem Merge mit Code. **Nebenversion**
   (`0.X.0`, Korrektur zurück auf 0) setzt Claude, wenn etwas Grösseres dazukommt: eine neue
