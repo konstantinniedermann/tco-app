@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- E2E-Tests vergeben ihre Turnierjahre nicht mehr von Hand: Die Hilfe sucht sich ein freies Jahr
+  zwischen 3000 und 9999. Parallel laufende Testdateien können sich so kein Turnier mehr
+  wegnehmen, und neue Tests brauchen kein freies Jahr (Beobachtung «kein freies Turnierjahr mehr»).
+
 ## 0.20.3 — Kontaktdaten für den CM-Admin nach Aufgabe
 
 - Der CM-Admin sieht in den Anmeldelisten E-Mail und Telefon der Spieler (Anmeldungen und offene

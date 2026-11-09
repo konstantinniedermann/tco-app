@@ -51,7 +51,8 @@ zwei Entscheide des Projektleiters mit offener Umsetzung und ein neuer Befund au
   `.karte > h2:first-child`; Bildvergleich «cm-angaben», «login»)
 - Gespräch (7), DB-Tests mit eigener Datenbank gegen 5 s → d83cb8d (`ZEIT_EIGENE_DB`, vier Tests)
 - Nebenbefund — `navigation.test.ts` und `cm-doppel-verwaltung.test.ts` teilten die Turnierjahre
-  2071–2074 → 0f9af9f
+  2071–2074 → 0f9af9f; Folgebefund «kein freies Turnierjahr mehr» am 09.11.2026 umgesetzt im Branch
+  `test/e2e-turnierjahre` (`legeTurnierAn` vergibt freie Jahre 3000–9999 selbst)
 - Nebenbefund — CSS-Kommentar «60em» über einer `60rem`-Regel → 52cc2d2
 
 **Doku**
