@@ -37,6 +37,7 @@ const JAHR_VERWALTEN: Record<string, number> = { iphone: 2089, android: 2088 };
 const JAHR_WILDCARD: Record<string, number> = { iphone: 2087, android: 2086 };
 const JAHR_NUR_LESEN: Record<string, number> = { iphone: 2085, android: 2084, desktop: 2083 };
 const JAHR_KLEBEN: Record<string, number> = { desktop: 2059 };
+const JAHR_SUCHE: Record<string, number> = { iphone: 2058, android: 2057, desktop: 2056 };
 
 function testjahr(jahre: Record<string, number>, info: TestInfo): number {
 	const jahr = jahre[info.project.name];
@@ -374,4 +375,29 @@ test('PC: Ein Fokussprung landet nicht unter dem klebenden Seitenkopf', async ({
 		.evaluate((e) => e.getBoundingClientRect().bottom);
 	const feldOben = await erstes.evaluate((e) => e.getBoundingClientRect().top);
 	expect(feldOben).toBeGreaterThanOrEqual(kopfUnten);
+});
+
+test('Spielersuche springt nicht', async ({ page }, info) => {
+	test.setTimeout(120_000);
+	const jahr = testjahr(JAHR_SUCHE, info);
+	const turnier = `Clubmeisterschaft ${jahr}`;
+	await legeOffenesTurnierAn(jahr, KATEGORIEN);
+	const nachname = `Probe${randomUUID().slice(0, 6)}`;
+	await legeKontoAn('Bruno', nachname);
+	const cm = await legeCmMitBriefCodeAn('Cyrill');
+	await oeffneKategorieAlsCm(page, cm, turnier, 'Herren R1–R6');
+	await page.getByRole('button', { name: 'Von Hand anmelden' }).click();
+	const dialog = page.getByRole('dialog', { name: 'Von Hand anmelden' });
+	await expect(dialog.getByText('Ab 2 Buchstaben.')).toHaveCount(1);
+	// offsetHeight statt boundingBox: Das Einblenden des Dialogs skaliert ihn (transform).
+	const hoehe = () => dialog.evaluate((e) => (e as HTMLElement).offsetHeight);
+	const h0 = await hoehe();
+
+	await dialog.getByLabel('Mitglied suchen').fill(nachname);
+	await expect(dialog.getByRole('radio', { name: new RegExp(`${nachname}, Bruno`) })).toBeVisible();
+	expect(Math.abs((await hoehe()) - h0)).toBeLessThanOrEqual(1);
+
+	await dialog.getByLabel('Mitglied suchen').fill('zzq');
+	await expect(dialog.getByText('Keine Treffer.')).toBeVisible();
+	expect(Math.abs((await hoehe()) - h0)).toBeLessThanOrEqual(1);
 });

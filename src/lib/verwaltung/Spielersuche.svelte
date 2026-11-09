@@ -15,7 +15,7 @@
 		/** Eindeutiger Vorsatz für die IDs der Felder, wenn ein Dialog zwei Suchen hat. */
 		id: string;
 		label: string;
-		/** Weiterer Hilfetext unter dem Feld, nach «Ab 2 Buchstaben.». */
+		/** Hilfetext unter dem Feld. */
 		hilfe?: string;
 		/** Titel der Trefferliste; zwei Suchen in einem Dialog brauchen verschiedene. */
 		legende?: string;
@@ -36,11 +36,10 @@
 		onwahl
 	}: Props = $props();
 
-	const hilfeText = $derived(hilfe ? `Ab 2 Buchstaben. ${hilfe}` : 'Ab 2 Buchstaben.');
-
 	let suche = $state('');
 	let treffer = $state<SpielerTreffer[] | null>(null);
 	let fehler = $state<string | null>(null);
+	const hatTreffer = $derived(!fehler && treffer !== null && treffer.length > 0);
 
 	// Nur die neueste Suche zählt, wenn mehrere unterwegs sind.
 	let abfrage = 0;
@@ -82,16 +81,26 @@
 		type="search"
 		maxlength="100"
 		autocomplete="off"
-		aria-describedby="{id}-suche-hilfe"
+		aria-describedby={hilfe ? `${id}-suche-hilfe` : undefined}
 		bind:value={() => suche, setzeSuche}
 	/>
-	<span class="feld-hilfe" id="{id}-suche-hilfe">{hilfeText}</span>
+	{#if hilfe}
+		<span class="feld-hilfe" id="{id}-suche-hilfe">{hilfe}</span>
+	{/if}
 </div>
-{#if fehler}
-	<p class="fehler" role="alert">{fehler}</p>
-{/if}
-{#if treffer !== null}
-	{#if treffer.length === 0}
+<!-- Der Bereich ist immer da und gleich hoch; nur mit Treffern ist er eine per Tastatur scrollbare Region. -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<div
+	class="treffer"
+	role={hatTreffer ? 'region' : undefined}
+	aria-label={hatTreffer ? legende : undefined}
+	tabindex={hatTreffer ? 0 : undefined}
+>
+	{#if fehler}
+		<p class="fehler" role="alert">{fehler}</p>
+	{:else if treffer === null}
+		<p class="leise">Ab 2 Buchstaben.</p>
+	{:else if treffer.length === 0}
 		<p>Keine Treffer.</p>
 	{:else}
 		<fieldset class="auswahl-gruppe">
@@ -116,4 +125,4 @@
 			{/each}
 		</fieldset>
 	{/if}
-{/if}
+</div>

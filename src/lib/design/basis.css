@@ -788,6 +788,16 @@ fieldset.nur-lesen {
 	opacity: 1;
 }
 
+/*
+ * Trefferbereich der Spielersuche: feste Höhe für 5 Treffer, damit nichts springt.
+ * Ein Treffer: (Zeile 1,125 × 1,5 + Zeile 1 × 1,5) + 2 × --abstand-2 + 2 × --rand-dick (0,25)
+ * + --abstand-2 Abstand unten = 4,9375rem; dazu die Legende (1,6875 + 0,5) = 2,1875rem.
+ */
+.treffer {
+	height: 26.875rem;
+	overflow-y: auto;
+}
+
 fieldset.auswahl-gruppe legend {
 	padding: 0;
 	margin-bottom: var(--abstand-2);
