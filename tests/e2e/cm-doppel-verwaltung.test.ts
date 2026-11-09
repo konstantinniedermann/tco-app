@@ -36,8 +36,9 @@ test.afterAll(async () => {
 	await schliesseLoginHilfen();
 });
 
-// Pro Jahr gibt es ein Turnier; jedes Projekt und jeder Test hat sein festes Jahr, getrennt von
-// den übrigen E2E-Tests (2075–2099). `legeOffenesTurnierAn` löscht das Turnier des Jahres vorher.
+// Pro Jahr gibt es ein Turnier; jedes Projekt und jeder Test hat sein festes Jahr, das keine andere
+// E2E-Datei benutzt (vor jeder Änderung mit grep über tests/e2e prüfen). `legeOffenesTurnierAn`
+// löscht das Turnier des Jahres vorher.
 const JAHR_VON_HAND: Record<string, number> = { iphone: 2074, android: 2073, desktop: 2072 };
 const JAHR_ZUSAMMEN: Record<string, number> = { iphone: 2071, android: 2070, desktop: 2069 };
 const JAHR_ANFRAGEN: Record<string, number> = { iphone: 2068, android: 2067, desktop: 2066 };

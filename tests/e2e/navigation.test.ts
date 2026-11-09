@@ -20,9 +20,10 @@ import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hil
 // und Stunde gilt für den ganzen Lauf und ist durch Login, Profil und Mitgliedschaft ausgeschöpft.
 // Diese Datei fordert darum keinen Code an: Anmeldung per Brief-Code, Mail-Antworten nachgebildet.
 
-// Pro Jahr gibt es ein Turnier; diese Jahre gehören nur dieser Datei (übrige E2E: 2075–2099).
-const JAHR_DOPPEL: Record<string, number> = { iphone: 2074, android: 2073 };
-const JAHR_CM: Record<string, number> = { iphone: 2072, android: 2071 };
+// Pro Jahr gibt es ein Turnier, und `legeTurnierAn` löscht das alte desselben Jahres: Diese Jahre
+// benutzt keine andere E2E-Datei (vor jeder Änderung mit grep über tests/e2e prüfen).
+const JAHR_DOPPEL: Record<string, number> = { iphone: 2054, android: 2047 };
+const JAHR_CM: Record<string, number> = { iphone: 2029, android: 2028 };
 const JAHR_TITEL: Record<string, number> = { iphone: 2050, android: 2049, desktop: 2048 };
 
 const EINZEL: KategorieWerte = {
