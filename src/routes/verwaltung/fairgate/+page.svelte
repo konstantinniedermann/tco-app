@@ -80,9 +80,7 @@
 								{geaendertText(z.felder)}
 							{/if}
 						</td>
-						<td>
-							<span class="zelle-kurz" title={angaben}>{angaben}</span>
-						</td>
+						<td>{angaben}</td>
 						<td>{tagText(z.seit)}</td>
 						{#if darfAbhaken}
 							<td>

@@ -1950,6 +1950,12 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		padding-block: var(--abstand-2);
 	}
 
+	/* Tasten in der Zeile brechen nie um (auch nicht in Zellen ausserhalb von td, z. B. Dialoge) */
+	.tabelle .taste-neben,
+	.tabelle .taste-haupt {
+		white-space: nowrap;
+	}
+
 	.zelle-kurz {
 		max-width: 16rem;
 		overflow: hidden;
