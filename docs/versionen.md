@@ -8,6 +8,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.5 — Doku-Abgleich vor dem Release
+
+- Datenschutzerklärung zum Gespräch mit der Turnierleitung präzisiert: die Nachrichten stehen unter
+  *Welche Daten*, nur CM- und MyTCO-Admins lesen sie, Auskunft dazu geben die CM-Admins.
+- Datenschutzkonzept, Rollen und Rechte, Fachmodell, Glossar, Testkonzept und `make seed` an das
+  Gespräch mit der Turnierleitung angeglichen (#71).
+
 ## 0.20.4 — E2E-Tests vergeben freie Turnierjahre selbst
 
 - E2E-Tests vergeben ihre Turnierjahre nicht mehr von Hand: Die Hilfe sucht sich ein freies Jahr

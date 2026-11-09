@@ -177,3 +177,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Branch `test/e2e-turnierjahre`, zweiter `make check` (die Datei nutzt die geänderten Hilfen nicht)
 
 **Einschätzung:** Niedrig bis mittel, wie die zwei iPhone-Tests der Mitgliederverwaltung: beim nächsten Auftreten Trace mit Netzwerk ansehen, welche Anfrage abbricht, und vor dem Neuladen auf sie warten.
+
+### 2026-11-09 — Gespräch mit der Turnierleitung: keine Grenze für Nachrichten eines Mitglieds
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/gespraech/schnittstellen.ts` (Senden des Mitglieds), `src/lib/server/gespraech/meldung.ts`
+
+**Beobachtung:** Ein Mitglied kann beliebig viele Nachrichten pro Stunde schicken, und jede löst eine Meldung (Push, sonst E-Mail) an die Kontaktperson aus. Das Sicherheitskonzept verspricht hier nichts, darum kein Doku-Befund.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.20.5
+
+**Einschätzung:** Niedrig: Absender sind eingeloggte Vereinsmitglieder. Wenn nötig, eine Grenze pro Konto oder höchstens eine Meldung pro Gespräch und Stunde.

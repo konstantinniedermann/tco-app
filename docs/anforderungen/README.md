@@ -61,6 +61,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 | 08.11.2026 | Einlesen ([#43](https://github.com/konstantinniedermann/tco-app/issues/43)): A-MITGLIED-07 teilweise (Einlesen einer Datei) | Projektleiter |
 | 09.11.2026 | N-DATENSCHUTZ-02: Kontaktdaten für CM- und Lizenz-Admin nach Aufgabe statt von allen (K-42 eingegrenzt) | Projektleiter |
 | 09.11.2026 | Gespräch mit der Turnierleitung ([#71](https://github.com/konstantinniedermann/tco-app/issues/71), [Design](../superpowers/specs/2026-11-09-gespraech-turnierleitung-design.md)): neu A-TURNIER-04 (*geplant*) | Projektleiter |
+| 09.11.2026 | Gespräch mit der Turnierleitung umgesetzt ([#71](https://github.com/konstantinniedermann/tco-app/issues/71)): A-TURNIER-04 auf *umgesetzt* (FR-50 bis FR-54); A-MITGLIED-03 auf *umgesetzt* (Löschen mit Bedenkzeit) | Projektleiter |
 
 ## Offene Fragen an den Verein
 
