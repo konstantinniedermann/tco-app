@@ -33,27 +33,32 @@ dasselbe. Eine Meldung verrät auf dem Sperrbildschirm, wer was gefragt hat.
 | Clubinterne Kommunikation (Reaktionen zu Resultaten, Chats unter Mitgliedern) | Nicht hier: Reaktionen als Idee an #66, private Chats als Frage an den Vorstand |
 | Wie merken die anderen CM-Admins, dass etwas wartet? | Zähler an der Kachel «Verwaltung ›» auf der Startseite |
 | Wo sieht das Mitglied eine neue Antwort, ohne Push? | Auf der Startseite unter «Jetzt aktuell», dazu die Plakette am Link auf der CM-Seite |
-| Oberfläche | Design-Entwurf (Design-Artifact) nach Freigabe dieses Konzepts, vor dem Plan |
+| Oberfläche | Entwurf [«MyTCO Gespräch Turnierleitung»](https://claude.ai/artifact/XoDzxKrqDgmbUPbLE6mvWZ): CM-Seite Variante B (eigene Karte «Fragen?»), Gesprächsseite Variante A (Sprechblasen) |
 
 ## Wie es abläuft
 
 ### Mitglied
 
-- Der Name im Satz am Ende der Seite einer CM wird zum Link auf das **Gespräch mit der
-  Turnierleitung** (`/clubmeisterschaft/[id]/kontakt`, eine Stufe unter CM). Ohne gültige
-  Kontaktperson fällt der Satz weg wie heute. Ein bestehendes Gespräch erreicht das Mitglied dann
-  über eine eigene Zeile «Dein Gespräch mit der Turnierleitung ›», nur lesend. *(Entscheid Claude;
-  Wortlaut und Form klärt der Entwurf.)*
-- Gibt es eine Antwort, die das Mitglied noch nicht gesehen hat, trägt der Link die Plakette
-  «neue Antwort», und auf der Startseite steht unter «Jetzt aktuell» eine hervorgehobene Kachel
+- Am Ende der Seite einer CM ersetzt eine eigene Karte den heutigen Satz: Titel «Fragen oder
+  Probleme?», darunter leise «Kontaktperson: <Name> (CM-Admin)» und eine Kachel als Kartenteil
+  «Schreib der Turnierleitung ›» auf das **Gespräch mit der Turnierleitung**
+  (`/clubmeisterschaft/[id]/kontakt`, eine Stufe unter CM). Ohne gültige Kontaktperson fällt die
+  Karte weg wie heute der Satz; gibt es dann schon ein Gespräch, bleibt die Karte ohne Zeile
+  «Kontaktperson» und mit der Kachel «Dein Gespräch mit der Turnierleitung ›», nur lesend.
+  *(Wortlaut für den Fall ohne Kontaktperson: Entscheid Claude.)*
+- Gibt es eine Antwort, die das Mitglied noch nicht gesehen hat, trägt der Kartenkopf die
+  Plakette «neue Antwort», und auf der Startseite steht unter «Jetzt aktuell» eine hervorgehobene Kachel
   «Neue Antwort der Turnierleitung ›» auf das Gespräch, bis das Mitglied es öffnet. Dafür merkt
   sich das Gespräch, wann das Mitglied es zuletzt geöffnet hat.
 - Kommen später Chats unter Mitgliedern dazu, könnte ein eigener Reiter die Gespräche bündeln
   (Wunsch Projektleiter). Nicht jetzt; Reiter sind auf 4 begrenzt, *Lizenz* ist schon vorgesehen.
-- Die Seite zeigt Zurück-Link «‹ <Name der CM>», darunter den Verlauf (älteste Nachricht oben,
-  jeweils «Du» oder «Turnierleitung» mit Datum und Uhrzeit), darunter das Textfeld mit der Taste
-  «Senden». Über dem Feld steht ein kurzer Hinweis: Keine Angaben zur Gesundheit, wie beim
-  Wildcard-Kommentar.
+- Die Seite heisst «Frage an die Turnierleitung» und zeigt Zurück-Link «‹ <Name der CM>»,
+  darunter den Verlauf als **Sprechblasen** (älteste oben; eigene rechts in
+  `farbe-marke-zart`, Turnierleitung links in `farbe-flaeche`; im Kopf jeder Blase leise «Du»
+  bzw. «Turnierleitung» mit Wochentag, Datum und Uhrzeit; ungelesene Antworten mit Plakette
+  «neu»), darunter das Feld «Deine Nachricht» mit dem Hinweis «Alle CM-Admins lesen mit. Bitte
+  keine Angaben zur Gesundheit.» und die Haupttaste «Senden». Die Sprechblase ist ein neuer
+  Baustein und kommt zuerst ins Leitbild.
 - Eine Nachricht hat 1 bis 1000 Zeichen, nur Text, keine Anhänge. Gesendete Nachrichten lassen
   sich nicht ändern oder löschen. *(Entscheid Claude.)*
 - Das Gespräch entsteht mit der ersten Nachricht, nicht beim Öffnen der Seite.
@@ -80,10 +85,16 @@ dasselbe. Eine Meldung verrät auf dem Sperrbildschirm, wer was gefragt hat.
 - Der Posteingang listet die Gespräche des Turniers, offene zuerst, darin die mit der neuesten
   Nachricht des Mitglieds oben. Jede Zeile: Name des Mitglieds, Anfang der letzten Nachricht,
   Datum, Zustand *offen* oder *erledigt*.
-- Ein Gespräch (`/verwaltung/turniere/[id]/nachrichten/[gid]`) zeigt den ganzen Verlauf. Bei
-  Antworten der Turnierleitung steht für die Admins, wer geantwortet hat («Pascal Fischer»).
-  Darunter das Antwortfeld (gleiche Grenzen wie beim Mitglied) und die Taste «Erledigt»
-  bzw. «Wieder öffnen».
+- Ein Gespräch (`/verwaltung/turniere/[id]/nachrichten/[gid]`) zeigt den ganzen Verlauf als
+  eine Karte, jede Nachricht ein Kartenteil (keine Sprechblasen, am PC mit Namen). Bei Antworten
+  steht für die Admins, wer geantwortet hat («Turnierleitung (Marco Brunner)»). Darunter in
+  eigener Karte das Feld «Antwort der Turnierleitung» mit dem Hinweis, dass das Mitglied nur
+  «Turnierleitung» sieht, die Haupttaste «Antworten» und die Nebentaste «Als erledigt
+  markieren» bzw. «Wieder öffnen». *(Entwurf.)*
+- Im Turnier steht der Abschnitt «Nachrichten» zuoberst (oben handeln): Plakette «N offen»,
+  Kontaktperson, Kachel «Posteingang · N offen, M erledigt ›». Der Posteingang ist eine Tabelle
+  mit Kennzahlen offen/erledigt (Mitglied «Nachname, Vorname», letzte Nachricht gekürzt, Zeit,
+  Stand) und darunter dem Löschdatum.
 - Jeder CM-Admin kann antworten und den Zustand setzen. Eine Antwort setzt das Gespräch
   **nicht** von selbst auf *erledigt*. *(Entscheid Claude: oft folgt eine Rückfrage.)* Schreibt das
   Mitglied, ist das Gespräch wieder *offen*.
