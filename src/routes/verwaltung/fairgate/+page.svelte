@@ -10,6 +10,8 @@
 	} from '../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 
+	const ALT_TEXT = 'Änderung älter als 12 Monate, Angaben in Fairgate prüfen.';
+
 	let { data } = $props();
 	const darfAbhaken = $derived(data.darfSchreiben.mitglieder);
 
@@ -67,20 +69,19 @@
 			</thead>
 			<tbody>
 				{#each data.zeilen as z (z.id)}
+					{@const angaben = neueAngaben(z).join(' · ')}
 					<tr>
 						<td>{z.name}</td>
 						<td>{z.mitgliedernummer ?? ''}</td>
 						<td>
 							{#if z.verlaufGeloescht}
-								Änderung älter als 12 Monate, Angaben in Fairgate prüfen.
+								<span class="zelle-kurz" title={ALT_TEXT}>{ALT_TEXT}</span>
 							{:else}
 								{geaendertText(z.felder)}
 							{/if}
 						</td>
 						<td>
-							{#each neueAngaben(z) as zeile, i (i)}
-								{#if i > 0}<br />{/if}{zeile}
-							{/each}
+							<span class="zelle-kurz" title={angaben}>{angaben}</span>
 						</td>
 						<td>{tagText(z.seit)}</td>
 						{#if darfAbhaken}

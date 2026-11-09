@@ -59,7 +59,9 @@
 				{#each zeilen as z (z.id)}
 					<tr>
 						<td
-							><a href={resolve('/verwaltung/anlaesse/[id]', { id: String(z.id) })}>{z.titel}</a
+							><span class="zelle-kurz"
+								><a href={resolve('/verwaltung/anlaesse/[id]', { id: String(z.id) })}>{z.titel}</a
+								></span
 							></td
 						>
 						<td>{formatiereZeitpunkt(z.beginn)}</td>

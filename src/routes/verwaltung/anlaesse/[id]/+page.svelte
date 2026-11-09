@@ -137,7 +137,10 @@
 								<span class="plakette plakette-offen">kommt nicht</span>
 							{/if}
 						</td>
-						<td>{z.bemerkung ?? ''}</td>
+						<td>
+							{#if z.bemerkung}<span class="zelle-kurz" title={z.bemerkung}>{z.bemerkung}</span
+								>{/if}
+						</td>
 						<td>{formatiereZeitpunkt(z.geaendertAm)}</td>
 					</tr>
 				{/each}

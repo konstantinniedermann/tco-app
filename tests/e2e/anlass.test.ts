@@ -163,6 +163,11 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	await expect(tabelle).toContainText('kommt');
 	await expect(tabelle).not.toContainText('Bin in den Ferien.');
 	await pruefeBildschirm(page, info, 'anlass-verwaltung');
+	// PC: Zeile der Antworten ohne Tasten einzeilig (≤ 48 hoch).
+	if (info.project.name === 'desktop') {
+		const zeileAntwort = page.getByRole('row', { name: new RegExp(nachname) });
+		expect((await zeileAntwort.boundingBox())?.height).toBeLessThanOrEqual(48);
+	}
 	await pruefePfad(page, ['Anlässe'], titel);
 	await page
 		.getByRole('main')

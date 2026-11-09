@@ -363,6 +363,8 @@ test('A-KONTO-02: Admin sieht die Selbständerung unter Für Fairgate und hakt a
 	await expect(zeile).toContainText('Adresse');
 	await expect(zeile).toContainText('Probeweg 3, 4614 Hägendorf');
 	await pruefeBildschirm(page, info, 'fairgate');
+	// PC: eine Zeile mit Taste, auch mit mehreren neuen Angaben (≤ 72 hoch).
+	expect((await zeile.boundingBox())?.height).toBeLessThanOrEqual(72);
 
 	// Abhaken: Die Zeile verschwindet, der Verlauf nennt, wer übertragen hat.
 	await zeile.getByRole('button', { name: 'In Fairgate übertragen' }).click();

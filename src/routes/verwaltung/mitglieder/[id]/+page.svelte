@@ -295,7 +295,9 @@
 							: `${detail.verlauf.length} ${detail.verlauf.length === 1 ? 'Eintrag' : 'Einträge'}`}</span
 					></summary
 				>
-				<div class="tabelle">
+				<!-- Ohne Links in der Tabelle: der Bereich selbst ist per Tastatur scrollbar (WCAG 2.1.1). -->
+				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+				<div class="tabelle" role="region" aria-label="Verlauf des Mitglieds" tabindex="0">
 					<table aria-label="Verlauf">
 						<tbody>
 							{#each detail.verlauf as z, i (i)}

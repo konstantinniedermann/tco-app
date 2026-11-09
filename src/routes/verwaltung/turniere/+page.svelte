@@ -61,7 +61,10 @@
 					<tr>
 						<td>{z.jahr}</td>
 						<td
-							><a href={resolve('/verwaltung/turniere/[id]', { id: String(z.id) })}>{z.name}</a></td
+							><span class="zelle-kurz"
+								><a href={resolve('/verwaltung/turniere/[id]', { id: String(z.id) })}>{z.name}</a
+								></span
+							></td
 						>
 						<td><span class="plakette {status.klasse}">{status.text}</span></td>
 						<td>{datumKurz(z.anmeldeschluss)}</td>

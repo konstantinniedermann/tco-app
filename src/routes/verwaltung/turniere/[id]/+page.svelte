@@ -209,13 +209,16 @@
 					<tr>
 						<td>
 							{#if k.status === 'abgesagt'}
-								{k.name} <span class="plakette plakette-gesperrt">abgesagt</span>
+								<span class="zelle-kurz">{k.name}</span>
+								<span class="plakette plakette-gesperrt">abgesagt</span>
 							{:else}
-								<a
-									href={resolve('/verwaltung/turniere/[id]/kategorien/[kid]', {
-										id: String(detail.id),
-										kid: String(k.id)
-									})}>{k.name}</a
+								<span class="zelle-kurz"
+									><a
+										href={resolve('/verwaltung/turniere/[id]/kategorien/[kid]', {
+											id: String(detail.id),
+											kid: String(k.id)
+										})}>{k.name}</a
+									></span
 								>
 							{/if}
 						</td>
