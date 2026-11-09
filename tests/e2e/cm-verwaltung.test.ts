@@ -202,7 +202,7 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 	expect(fehler).toEqual([]);
 });
 
-test('A-ANMELDUNG-10, FR-08: Mitglied beantragt eine Wildcard, CM-Admin lehnt mit Grund ab', async ({
+test('A-ANMELDUNG-10, FR-08, FR-11: Mitglied beantragt eine Wildcard, CM-Admin lehnt mit Grund ab', async ({
 	page
 }, info) => {
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder beantragen am Handy; der Nachweis mit Screenshots läuft auf iPhone und Android

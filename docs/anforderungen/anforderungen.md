@@ -54,7 +54,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 |----|-------------|--------|--------|--------|
 | A-MITGLIED-01 | Der Mitglieder-Admin legt Mitgliederkonten nach manueller Prüfung einfach und schnell von Hand an | PDF 4a, Ziel | Mitglieder-Login | umgesetzt |
 | A-MITGLIED-02 | Der Mitglieder-Admin bearbeitet die Daten eines Mitglieds | Ziel | Mitglieder-Login | umgesetzt |
-| A-MITGLIED-03 | Der Mitglieder-Admin löscht Mitgliederkonten | PDF 4a | Mitglieder-Login\* | geplant |
+| A-MITGLIED-03 | Der Mitglieder-Admin löscht Mitgliederkonten | PDF 4a | Mitglieder-Login\* | umgesetzt |
 | A-MITGLIED-04 | Selbstregistrierung über die Website tcolten.ch, damit der Briefversand entfallen kann (mit der zuständigen Person) | PDF 4a | später\* | später |
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
 | A-MITGLIED-06 | Mitglieder- und MyTCO-Admin sehen im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Verwaltung, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | umgesetzt (Verlauf der Änderungen; Löschung nach 12 Monaten durch den Zeitgeber) |

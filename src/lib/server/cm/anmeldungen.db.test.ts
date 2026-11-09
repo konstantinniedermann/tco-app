@@ -436,7 +436,7 @@ describe('CM-Anmeldung', () => {
 		expect(await aktiveVon(ich, frueh.kategorien)).toHaveLength(1);
 	});
 
-	test('FR-10: fremde Anmeldung abmelden ergibt nicht-gefunden', async () => {
+	test('FR-10, RR-06: fremde Anmeldung abmelden ergibt nicht-gefunden', async () => {
 		const t = await offenesTurnier();
 		const [k] = t.kategorien;
 		const ich = await spieler();
