@@ -9,8 +9,14 @@ import {
 } from '../src/lib/server/cm/anmeldungen.ts';
 import type { Db } from '../src/lib/server/db/index.ts';
 import {
+	antworte,
+	schreibeAlsMitglied,
+	setzeZustand
+} from '../src/lib/server/gespraech/gespraech.ts';
+import {
 	anmeldung,
 	anmeldungSpieler,
+	gespraech,
 	kategorie,
 	konto,
 	mitglied,
@@ -262,4 +268,56 @@ export async function setzeBeispielKontakt(db: Db, mitgliedId: number): Promise<
 		.update(turnier)
 		.set({ kontaktMitgliedId: mitgliedId })
 		.where(and(eq(turnier.jahr, JAHR), isNull(turnier.kontaktMitgliedId)));
+}
+
+// FR-50 bis FR-52: drei erfundene Gespräche mit der Turnierleitung. Max fragt und wartet auf
+// Antwort (offen), Lena ist erledigt, Kurt (Persona) hat eine ungelesene Antwort von Hanna.
+const GESPRAECHE = [
+	{
+		email: 'max.vorbild@example.org',
+		frage: 'Können wir unser Gruppenspiel in den Frühlingsferien auf die Woche danach schieben?',
+		antwort: null,
+		erledigt: false
+	},
+	{
+		email: 'lena.vorzeige@example.org',
+		frage: 'Wo finde ich meine Gruppe?',
+		antwort: 'Die Gruppen hängen ab Anfang Juni am Clubhaus und stehen hier in der App.',
+		erledigt: true
+	},
+	{
+		email: 'kurt.erfunden@example.org',
+		frage: 'Zählt im Doppel jedes Spiel für beide Partner?',
+		antwort: 'Ja, ein Doppelspiel zählt für beide. Die Rangliste führen wir aber je Person.',
+		erledigt: false
+	}
+] as const;
+
+/** Legt die erfundenen Gespräche an (Hanna antwortet); wer schon ein Gespräch hat, bleibt unverändert. */
+export async function legeBeispielGespraecheAn(
+	db: Db,
+	hannaId: number,
+	jetzt: Date
+): Promise<void> {
+	const [t] = await db.select({ id: turnier.id }).from(turnier).where(eq(turnier.jahr, JAHR));
+	if (!t) return;
+	const vor = (stunden: number) => new Date(jetzt.getTime() - stunden * 3_600_000);
+	for (const [i, g] of GESPRAECHE.entries()) {
+		const [m] = await db
+			.select({ id: mitglied.id })
+			.from(mitglied)
+			.where(eq(mitglied.email, g.email));
+		if (!m) continue;
+		const [vorhanden] = await db
+			.select({ id: gespraech.id })
+			.from(gespraech)
+			.where(and(eq(gespraech.turnierId, t.id), eq(gespraech.mitgliedId, m.id)));
+		if (vorhanden) continue;
+		const r = await schreibeAlsMitglied(db, t.id, m.id, g.frage, vor(72 - i * 24));
+		if (typeof r === 'string') continue;
+		if (g.antwort) {
+			await antworte(db, r.gespraechId, hannaId, g.antwort, 0, true, vor(20 - i * 6));
+		}
+		if (g.erledigt) await setzeZustand(db, r.gespraechId, 'erledigt', jetzt);
+	}
 }

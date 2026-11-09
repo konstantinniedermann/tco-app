@@ -2,6 +2,7 @@
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
 import { nameFuerText, zaehleAktive, zaehleUnpassende } from '../cm/anmeldungen.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
+import { offeneZahlen } from '../gespraech/gespraech.ts';
 import {
 	kategorie,
 	konto,
@@ -27,6 +28,8 @@ export type TurnierZeile = {
 	anmeldeschluss: string;
 	status: TurnierStatus;
 	kategorien: number;
+	/** Offene Gespräche mit der Turnierleitung (FR-52). */
+	offen: number;
 };
 
 export type KategorieZeile = KategorieWerte & {
@@ -45,6 +48,8 @@ export type TurnierDetail = Omit<TurnierWerte, 'kontakt'> & {
 	kontakt: { mitgliedId: number; name: Namensteile; gueltig: boolean } | null;
 	/** Wer als Kontaktperson gewählt werden kann: alle gültigen CM-Admins. */
 	kontaktWahl: { mitgliedId: number; name: Namensteile }[];
+	/** Gespräche mit der Turnierleitung nach Zustand (FR-52). */
+	nachrichten: { offen: number; erledigt: number };
 };
 
 const namenOrdnung = new Intl.Collator('de-CH');
@@ -150,9 +155,14 @@ export async function listeTurniere(db: Db, jetzt: Date): Promise<TurnierZeile[]
 		.leftJoin(kategorie, and(eq(kategorie.turnierId, turnier.id), eq(kategorie.status, 'aktiv')))
 		.groupBy(turnier.id)
 		.orderBy(desc(turnier.jahr));
+	const zahlen = await offeneZahlen(
+		db,
+		zeilen.map((z) => z.id)
+	);
 	return zeilen.map((z) => ({
 		...z,
-		status: wirksamerStatus(z.status, z.anmeldeschluss, jetzt)
+		status: wirksamerStatus(z.status, z.anmeldeschluss, jetzt),
+		offen: zahlen.get(z.id)?.offen ?? 0
 	}));
 }
 
@@ -201,7 +211,8 @@ export async function ladeTurnier(db: Db, id: number, jetzt: Date): Promise<Turn
 			kategorien.map(async (k) => kategorieZeile(k, await zaehleAktive(db, k.id)))
 		),
 		kontakt: await ladeKontakt(db, t.kontaktMitgliedId),
-		kontaktWahl: await kontaktWahl(db)
+		kontaktWahl: await kontaktWahl(db),
+		nachrichten: (await offeneZahlen(db, [id])).get(id) ?? { offen: 0, erledigt: 0 }
 	};
 }
 

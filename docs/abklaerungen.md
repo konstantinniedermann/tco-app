@@ -150,6 +150,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 |----|-------|--------|------|
 | K-36 | Was gehört zu „Mitgliedschaft ändern“: Austritt, Wechsel der Mitgliederkategorie, anderes? | Vorstand | A-KONTO-04 |
 | K-50 | Anmeldung zur Generalversammlung über MyTCO, frühestens ab der GV 2028 (die GV 2027 ist im Februar, dann sind die Mitglieder noch nicht in MyTCO; Projektleiter, 06.11.2026). In der Tabelle als Unterfragen mit Vorschlägen nach dem gebauten Stand: K-50.1 heutiger Ablauf und wer die Liste führt; K-50.2 Ablauf wie in der Demo, weitere Angaben (Begleitperson, Essen); K-50.3 Liste nur für Mitglieder- und MyTCO-Admins, Löschen ein Jahr nach dem Anlass; K-50.4 Anträge weiter schriftlich an den Präsidenten (Art. 30 der Statuten), keine Anträge oder Fragen über MyTCO. | Vorstand | A-ANLASS-01, #52, [Design GV-Anmeldung](superpowers/specs/2026-11-05-gv-anmeldung-design.md) |
+| K-52 | Sollen Mitglieder in MyTCO auch untereinander schreiben können (z. B. Chat unter Mitgliedern, Reaktionen zu Resultaten)? Zu klären: Junioren, die bestehende WhatsApp-Gruppe, wer Beiträge entfernt. | Vorstand | #71, #66 |
 | K-39 | Soll der Spielplan des Finalwochenendes öffentlich, also ohne Login, sichtbar sein? Dann stehen Namen der Spieler auf einer öffentlichen Seite. | Vorstand, Ansprechperson Datenschutz | A-SPIELPLAN-08, #5, [Datenschutz](datenschutz.md) |
 
 ## Beantwortet

@@ -97,6 +97,8 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 | **Kategorie** | Name, Geschlecht (Herren / Damen / Mixed nur im Doppel / offen), Jahrgang von–bis (Alterskategorie, nur im Einzel, je Ende optional), Einzel mit Klassierung von–bis (Klassierungsbereich) **oder** Doppel mit Mindestsumme (vorbelegt 9, Annahme K-51), Status *aktiv* / *abgesagt* | — |
 | **Anmeldung** | Kategorie, Spieler (1 im Einzel, 1–2 im Doppel), Kommentar (nur beim Wildcard-Antrag: kein eigenes Feld, sondern eine Anmeldung mit Kommentar, die als *beantragt* beginnt; höchstens 300 Zeichen), Kommentar *sucht Partner* (nur im Doppel, wenn ein Spieler allein angemeldet ist, 0–120 Zeichen), Status *bestätigt* / *beantragt* / *abgelehnt* / *zurückgezogen*, angemeldet am, Gruppe (nach Auslosung), Rang-Korrektur (optional) | Spieler, Kommentar, Kommentar *sucht Partner* |
 | **Partner-Anfrage** | Kategorie, von (Mitglied), an (Mitglied), gestellt am; höchstens eine offene Anfrage je Anfragendem und Kategorie, nicht an sich selbst. Erledigte Anfragen werden gelöscht (FR-48) | von, an |
+| **Gespräch** | Turnier, Mitglied, Zustand *offen* / *erledigt*, zuletzt geöffnet vom Mitglied, Zeit der letzten Nachricht; höchstens eines je Mitglied und Turnier (FR-50) | Turnier, Mitglied |
+| **Nachricht** | Gespräch, von (Mitglied oder Turnierleitung), bei der Turnierleitung der antwortende CM-Admin, Text (1–1000 Zeichen), gesendet am; nicht änderbar (FR-50) | antwortender Admin |
 | **Gruppe** | Kategorie, Name, Turniernummer. Die Rangliste wird aus den Resultaten berechnet, nicht gespeichert | — |
 | **KoTableau** | Kategorie, Grösse (Anzahl Positionen), Turniernummer. Kommt aus Advantage | — |
 | **Spiel** | Gruppe *oder* KoTableau mit Runde (z. B. Viertelfinal) und Position, Anmeldung A und B (im KO leer, bis bekannt), Folgespiel (nur KO) | — (über die Anmeldung) |
@@ -163,6 +165,11 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 | FR-47 | Meldungen der CM an Einzelne (Wildcard-Antrag an die CM-Admins, Entscheid, Änderung durch den CM-Admin) gehen *Push, sonst E-Mail*; die Themen (FR-41) gelten nicht | A-ANMELDUNG-06, A-ANMELDUNG-10 | umgesetzt |
 | FR-48 | Partner-Anfrage: nur an Mitglieder mit Login, die passen; höchstens eine eigene offene Anfrage je Kategorie, Anfragen an einen selbst unbegrenzt; Annehmen setzt ein Login beider voraus, prüft FR-06, FR-07 und den Anmeldeschluss neu und lässt die übrigen offenen Anfragen beider in der Kategorie verfallen; nach dem Anmeldeschluss ändern Mitglieder nichts mehr an Anfragen, der CM-Admin meldet sie als Paar an oder löscht sie (sie verfällt, der Anfragende bekommt eine Meldung); Ablehnen ohne Grund; erledigte Anfragen werden gelöscht | A-ANMELDUNG-04 | umgesetzt |
 | FR-49 | Wer allein im Doppel angemeldet ist, *sucht Partner* und kann einen Kommentar (0–120 Zeichen) setzen, den alle Mitglieder sehen; er wird gelöscht, sobald ein Partner gefunden ist oder der Spieler abmeldet | A-ANMELDUNG-04 | umgesetzt |
+| FR-50 | Ein Gespräch je Mitglied und Turnier; es entsteht mit der ersten Nachricht. Eine Nachricht hat 1–1000 Zeichen, nur Text, und lässt sich nicht ändern oder löschen | A-TURNIER-04 | umgesetzt |
+| FR-51 | Schreiben darf ein aktives Mitglied, solange das Turnier für Mitglieder sichtbar ist, eine gültige Kontaktperson hat und das Turnierjahr nicht vorbei ist; die Kontaktperson selbst schreibt nicht als Mitglied. Sonst nur lesen. Antworten und den Zustand setzen dürfen CM-Admins bis Ende des Turnierjahres | A-TURNIER-04 | umgesetzt |
+| FR-52 | Zustand *offen*/*erledigt*: Eine Nachricht des Mitglieds setzt *offen*, eine Antwort ändert ihn nicht; jeder CM-Admin setzt ihn | A-TURNIER-04 | umgesetzt |
+| FR-53 | Meldung ohne Inhalt und ohne Namen (DS-05): bei einer Nachricht des Mitglieds nur an die gültige Kontaktperson, bei einer Antwort ans Mitglied; das Mitglied sieht nie, welcher Admin antwortet | A-TURNIER-04 | umgesetzt |
+| FR-54 | Gelöscht werden die Gespräche eines Turniers ab dem 1.1. nach dem Turnierjahr (Zürich) und das Gespräch eines Mitglieds bei seiner endgültigen Löschung | A-TURNIER-04 | umgesetzt |
 
 ## Lebenszyklen
 
@@ -171,6 +178,7 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 | Turnier | *in Vorbereitung* → *Anmeldung offen* ⇄ *Anmeldung geschlossen* (wieder öffnen nur vor dem Anmeldeschluss, FR-33; von selbst geschlossen nach dem Anmeldeschluss) → *läuft* → *abgeschlossen* |
 | Kategorie | *aktiv* → *abgesagt* (FR-35) |
 | Partner-Anfrage | *offen* → *angenommen* (wird Anmeldung) / *abgelehnt* / *zurückgezogen* / *verfallen* (einer der beiden hat inzwischen einen Partner, Austritt oder Löschung, Kategorie abgesagt oder Art gewechselt, verschoben oder vom CM-Admin gelöscht; FR-04, FR-35, FR-36, FR-46, FR-48); erledigte Anfragen werden sofort gelöscht |
+| Gespräch | *offen* ⇄ *erledigt*: Nachricht des Mitglieds → *offen*, jeder CM-Admin setzt beides (FR-52); gelöscht nach FR-54 |
 | Anmeldung | *bestätigt* (ohne Wildcard sofort) · *beantragt* → *bestätigt* / *abgelehnt* (mit Wildcard) · → *zurückgezogen*: durch das Mitglied bis zum Anmeldeschluss (FR-10), bei Austritt oder Löschvormerkung bis zum Datum des Anmeldeschlusses, auch nach vorzeitigem Schliessen von Hand (FR-04), durch den CM-Admin jederzeit (FR-46) |
 | Resultat | *gemeldet* → *bestätigt* / *bestritten* → *bestätigt* (Entscheid des CM-Admins) |
 | Lizenzantrag | *beantragt* → *exportiert* → *erledigt* · *beantragt* → *zurückgezogen* |

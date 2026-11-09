@@ -59,6 +59,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 | 07.11.2026 | CM Teil 4 umgesetzt ([#60](https://github.com/konstantinniedermann/tco-app/issues/60)): A-ANMELDUNG-06 und -10 auf *umgesetzt* für Einzel-Kategorien (Anmeldungen von Hand, verschieben, löschen, Klassierung korrigieren, Wildcard-Antrag und Entscheid); Doppel folgen mit [#59](https://github.com/konstantinniedermann/tco-app/issues/59) | Projektleiter |
 | 08.11.2026 | Doppel umgesetzt ([#59](https://github.com/konstantinniedermann/tco-app/issues/59)): A-ANMELDUNG-01 bis -06 und -10 auch für Doppel-Kategorien auf *umgesetzt* (Partner-Anfragen, Suche nach Partner, Doppel-Verwaltung durch den CM-Admin) | Projektleiter |
 | 08.11.2026 | Einlesen ([#43](https://github.com/konstantinniedermann/tco-app/issues/43)): A-MITGLIED-07 teilweise (Einlesen einer Datei) | Projektleiter |
+| 09.11.2026 | Gespräch mit der Turnierleitung ([#71](https://github.com/konstantinniedermann/tco-app/issues/71), [Design](../superpowers/specs/2026-11-09-gespraech-turnierleitung-design.md)): neu A-TURNIER-04 (*geplant*) | Projektleiter |
 
 ## Offene Fragen an den Verein
 

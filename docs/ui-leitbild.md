@@ -191,6 +191,8 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Kartenteil | `.karte-teil` | Abschnitt innerhalb einer Karte mit eigenem Thema (z. B. «sucht Partner», eigene Anfragen, Abmelden): Trennlinie oben, Abstand `--abstand-3` darüber und im Inneren |
 | Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt"; nur für Schritte eines Formulars, nicht für Kontingente (wirkt sonst wie ein unfertiges Formular) |
 | Kartenkopf | `.karte-kopf` | erste Zeile einer Karte: Titel links, rechts oben eine Plakette mit dem eigenen Stand (z. B. «angemeldet»); bei Platzmangel steht die Plakette unter dem Titel, der Titel wird nie abgeschnitten |
+| Sprechblase | `.verlauf` (Liste), `.blase`, `.blase-eigen`, `.blase-leitung`, `.blase-kopf` | nur Mitglieder-App, Verlauf eines Gesprächs: älteste Nachricht oben; `.blase-eigen` rechts auf `--farbe-marke-zart`, `.blase-leitung` links auf `--farbe-flaeche`; im Kopf `.blase-kopf` (`.leise`) Absender («Du», «Turnierleitung») mit Wochentag, Datum und Uhrzeit, eine ungelesene Antwort trägt die Plakette «neu». In der Verwaltung gibt es keine Sprechblasen, dort ist jede Nachricht ein Kartenteil |
+| Verlauf-Nachricht | `.verlauf-nachricht` | Verwaltung, eine Nachricht im Verlauf eines Gesprächs (Kartenteil): Absenderzeile (`.leise`) und Text ohne Absatzabstand, dazwischen `--abstand-1` |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05). Zustände der Mitgliedschaft: *ausgetreten* = `.plakette`, *wird gelöscht* = `.plakette-gesperrt` |
 | Briefdruck | `.briefdruck` | nur Verwaltung: Druckansicht frisch erzeugter Briefe, siehe [Briefdruck](#briefdruck) |
 | Druckseite | `.druckseite` | nur Verwaltung: Auskunft über die Daten eines Mitglieds, siehe [Druckseite](#druckseite-auskunft); Klasse `.nicht-drucken` blendet unter `@media print` aus |
@@ -269,14 +271,25 @@ er nie.
   «angemeldet», «sucht Partner» oder «Wildcard beantragt»), den Bedingungen und der Taste; keine
   Namenslisten, stattdessen eine Kachel «12 angemeldet ›» (im Doppel «5 Paare ›») auf die Seite der
   Kategorie; die Suchenden im Doppel zugeklappt. Am Ende der Seite, auch wenn noch Angaben fehlen,
-  «Bei Fragen oder Problemen melde dich bei <Vorname Nachname> (CM-Admin).» (amtlicher Name ohne
-  Rufname, damit keine doppelten Klammern entstehen), sofern das Turnier eine gültige Kontaktperson hat. Die **Kategorie einer CM** listet alle bestätigten Anmeldungen (im Doppel
+  die Karte «Fragen oder Probleme?» mit leise «Kontaktperson: <Vorname Nachname> (CM-Admin)» (amtlicher Name ohne Rufname, damit keine doppelten Klammern entstehen) und der Kachel
+  «Schreib der Turnierleitung ›» (Kartenkopf mit Plakette «neue Antwort», `.plakette-offen`, solange eine Antwort ungelesen
+  ist); ohne gültige Kontaktperson fällt die Karte weg, ausser es gibt schon ein Gespräch: dann ohne
+  Zeile «Kontaktperson», mit der Kachel «Dein Gespräch mit der Turnierleitung ›». Die Kachel steht nur, wo geschrieben werden darf oder schon ein Gespräch besteht; die Kontaktperson selbst sieht die Karte mit ihrem Namen, ohne Kachel.
+  Die **Kategorie einer CM** listet alle bestätigten Anmeldungen (im Doppel
   Paare und Suchende mit Kommentar) und hat keine Tasten.
 - **Startseite:** „Hoi <Rufname, sonst Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
   „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben); Anlässe stehen als Kacheln unter „Jetzt aktuell" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
   stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
   (A-ANLASS-01). Angebote stehen vor „Jetzt aktuell", jedes als eigener Hinweis
   und immer nur eines zugleich (UI-04): zuerst *Passkey einrichten*, danach *Mitteilungen aufs Handy?*.
+  Eine ungelesene Antwort der Turnierleitung steht unter „Jetzt aktuell" als hervorgehobene Kachel
+  «Neue Antwort der Turnierleitung ›» (leise der Turniername), bis das Gespräch geöffnet wird. Die Kachel
+  „Verwaltung ›" trägt für CM-Admins leise «N Nachrichten an die Turnierleitung offen».
+- **Gespräch mit der Turnierleitung** (`/clubmeisterschaft/[id]/kontakt`): Titel «Frage an die
+  Turnierleitung», Zurück „‹ <Name der CM>", darunter der Verlauf als *Sprechblasen*, dann in einer
+  Karte das Feld «Deine Nachricht» (Hilfe: «Alle CM-Admins lesen mit. Bitte keine Angaben zur Gesundheit.»)
+  und die Haupttaste «Senden». Kann das Mitglied nicht schreiben, steht statt des Felds der Satz
+  «Schreiben geht zurzeit nicht.».
 - **Unterseiten:** Zurück-Link mit Ziel oben links (Baustein *Zurück*), die Reiter bleiben.
   Formularschritte dürfen den Schritt nennen statt der Elternseite: *E-Mail ändern* Schritt 2
   „‹ Andere Adresse" (zurück zu Schritt 1).
@@ -312,6 +325,7 @@ Seite zum Anlegen ohne Schreibrecht zur Liste ihres Bereichs.
   Mitglieder-Admin, CM-Admin, Lizenz-Admin) und die Haupttaste «Ansehen». Danach geht es zur
   ersten Seite dieser Rolle; bei Mitglied und Lizenz-Admin, die keine Verwaltung haben, zur
   Startseite der App.
+- **Nachrichten** (CM-Admin lesend und schreibend, MyTCO-Admin nur lesend): Auf der Seite des Turniers steht der Abschnitt «Nachrichten» (Fragen an die Turnierleitung) zuoberst, mit Plakette «N offen», der Kontaktperson und der Kachel «Posteingang · N offen, M erledigt ›». Der **Posteingang** («Nachrichten an die Turnierleitung») ist eine Tabelle mit Kennzahlen offen/erledigt und den Spalten Mitglied · Letzte Nachricht · Zuletzt · Stand, darunter «Alle Gespräche dieses Turniers werden am 1. Januar <Jahr+1> gelöscht.». Das **Gespräch in der Verwaltung** zeigt den Verlauf als eine Karte, jede Nachricht ein Kartenteil mit «Turnierleitung (Vorname Nachname)»; darunter in eigener Karte das Feld «Antwort der Turnierleitung», die Haupttaste «Antworten» und die Nebentaste «Als erledigt markieren» bzw. «Wieder öffnen».
 - **Mitteilungen** (Seite des Anlasses und Bereich *Mitteilungen*): Taste «Neue Mitteilung», beim
   Anlass dann eine Vorlage oder «Leer anfangen». Titel, Text, Empfänger und Weg stehen in einer
   Karte; «Vorschau» zeigt die Zahlen und aufklappbar die Namen. «Senden» geht erst mit einer
@@ -342,6 +356,7 @@ Verlauf zurück. Gebaut in `src/lib/ui/navigation.ts`.
 | Seite einer CM | CM | — wenn sie die einzige laufende ist, sonst „‹ Clubmeisterschaft" |
 | Kategorie einer CM (alle Anmeldungen) | CM | „‹ <Name der CM>" |
 | Doppel einer CM (Partnerwahl) | CM | „‹ <Name der CM>" |
+| Gespräch mit der Turnierleitung | CM | „‹ <Name der CM>" |
 | Profil | Profil | — |
 | E-Mail ändern | Profil | „‹ Profil" |
 
@@ -353,6 +368,8 @@ Verlauf zurück. Gebaut in `src/lib/ui/navigation.ts`.
 | Anlass, Neuer Anlass | Anlässe › <Titel> bzw. Neuer Anlass |
 | Turnier, Neues Turnier | Turniere › <Name> bzw. Neues Turnier |
 | Kategorie, Neue Kategorie | Turniere › <Turnier> › <Kategorie> bzw. Neue Kategorie |
+| Nachrichten (Posteingang) | Turniere › <Turnier> › Nachrichten |
+| Gespräch mit einem Mitglied | Turniere › <Turnier> › Nachrichten › <Nachname, Vorname> |
 
 ### Vorgaben für Künftiges
 

@@ -2232,3 +2232,52 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		padding: 0;
 	}
 }
+
+/* Verlauf-Nachricht (Verwaltung): Absenderzeile und Text eng beieinander */
+.verlauf-nachricht p {
+	margin: 0;
+}
+
+.verlauf-nachricht p + p {
+	margin-top: var(--abstand-1);
+}
+
+/* Sprechblase (Gespräch mit der Turnierleitung, nur Mitglieder-App) */
+.verlauf {
+	list-style: none;
+	margin: 0 0 var(--abstand-4);
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--abstand-3);
+}
+
+.blase {
+	max-width: 85%;
+	padding: var(--abstand-3);
+	border-radius: var(--radius);
+	box-shadow: var(--schatten-karte);
+}
+
+.blase p {
+	margin: 0;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.blase-kopf {
+	display: block;
+	font-size: var(--groesse-klein);
+	color: var(--farbe-text-leise);
+	margin-bottom: var(--abstand-1);
+}
+
+.blase-leitung {
+	align-self: flex-start;
+	background: var(--farbe-flaeche);
+}
+
+.blase-eigen {
+	align-self: flex-end;
+	background: var(--farbe-marke-zart);
+}

@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.0 — Gespräch mit der Turnierleitung
+
+- Mitglieder schreiben der Turnierleitung aus der CM-Seite; alle CM-Admins sehen die Gespräche im Posteingang (#71).
+
 ## 0.19.1 — Löschung leert die Kontaktperson, Doku-Abgleich vor dem Release
 
 - Wird ein Mitglied gelöscht, ist es nicht mehr Kontaktperson eines Turniers; die Verwaltung

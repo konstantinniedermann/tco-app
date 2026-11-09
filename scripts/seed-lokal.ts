@@ -19,7 +19,11 @@ import {
 	meldeBeispielAntworten
 } from './beispiel-anlass.ts';
 import { legeBeispielMitgliederAn } from './beispiel-mitglieder.ts';
-import { legeBeispielTurnierAn, setzeBeispielKontakt } from './beispiel-turnier.ts';
+import {
+	legeBeispielGespraecheAn,
+	legeBeispielTurnierAn,
+	setzeBeispielKontakt
+} from './beispiel-turnier.ts';
 import { ERFUNDENE_MITGLIEDER, legeErfundeneMitgliederAn } from './erfundene-mitglieder.ts';
 
 // Nur lokal, nicht auf Test (testdaten.ts legt nur ERFUNDENE_MITGLIEDER an).
@@ -80,6 +84,7 @@ async function seed(): Promise<void> {
 			.from(konto)
 			.where(eq(konto.id, kontoIds[2]));
 		await setzeBeispielKontakt(db, hanna.id);
+		await legeBeispielGespraecheAn(db, hanna.id, jetzt);
 		const dienst = erstelleLoginDienst({
 			db,
 			schluessel: einstellungen.codeSchluessel,

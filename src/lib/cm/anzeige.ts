@@ -141,6 +141,35 @@ export function anmeldungenText(k: {
 /** Titel der zugeklappten Suchenden einer Doppel-Karte. */
 export const suchendeText = (n: number): string => `${n} ${n === 1 ? 'sucht' : 'suchen'} Partner`;
 
-/** Hinweis am Ende der Seite einer CM, mit dem Namen der Kontaktperson. */
-export const kontaktFragenText = (name: string): string =>
-	`Bei Fragen oder Problemen melde dich bei ${name} (CM-Admin).`;
+export const NACHRICHT_MAX = 1000;
+export const NACHRICHT_NUR_LESEN = 'Schreiben geht zurzeit nicht.';
+
+const BLASE_ZEIT = new Intl.DateTimeFormat('de-CH', {
+	timeZone: 'Europe/Zurich',
+	weekday: 'short',
+	day: 'numeric',
+	month: 'long',
+	hour: '2-digit',
+	minute: '2-digit',
+	hourCycle: 'h23'
+});
+
+/** Zeitpunkt in Zürcher Zeit: «Mo, 9. Juni, 18:40» (Sprechblase und Verwaltung). */
+export function zeitText(zeitpunkt: string): string {
+	const t = Object.fromEntries(
+		BLASE_ZEIT.formatToParts(new Date(zeitpunkt)).map((p) => [p.type, p.value])
+	);
+	const tag = String(t.weekday).replace(/\.$/, '');
+	return `${tag}, ${t.day}. ${t.month}, ${t.hour}:${t.minute}`;
+}
+
+/** Kopf einer Sprechblase: «Du · Mo, 9. Juni, 18:40» (Zürcher Zeit). */
+export function blaseKopfText(von: 'du' | 'leitung', gesendetAm: string): string {
+	return `${von === 'du' ? 'Du' : 'Turnierleitung'} · ${zeitText(gesendetAm)}`;
+}
+
+/** Zähler der offenen Nachrichten an die Turnierleitung (Kachel Verwaltung auf der Startseite). */
+export const nachrichtenOffenText = (n: number): string =>
+	n === 1
+		? '1 Nachricht an die Turnierleitung offen'
+		: `${n} Nachrichten an die Turnierleitung offen`;

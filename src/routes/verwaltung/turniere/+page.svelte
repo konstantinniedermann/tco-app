@@ -52,7 +52,9 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Jahr</th><th>Turnier</th><th>Status</th><th>Anmeldeschluss</th><th>Kategorien</th>
+					<th>Jahr</th><th>Turnier</th><th>Status</th><th>Anmeldeschluss</th><th>Kategorien</th><th
+						>Offen</th
+					>
 				</tr>
 			</thead>
 			<tbody>
@@ -69,6 +71,7 @@
 						<td><span class="plakette {status.klasse}">{status.text}</span></td>
 						<td>{datumKurz(z.anmeldeschluss)}</td>
 						<td>{z.kategorien}</td>
+						<td>{z.offen > 0 ? z.offen : ''}</td>
 					</tr>
 				{/each}
 			</tbody>

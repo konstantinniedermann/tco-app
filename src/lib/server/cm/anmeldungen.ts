@@ -28,6 +28,7 @@ import {
 } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
 import { jahrInZuerich } from '../datum.ts';
+import { gespraechStand } from '../gespraech/gespraech.ts';
 import { namensSpalten } from '../namen.ts';
 import { kontaktGueltig } from '../turnier/kontakt.ts';
 import { spielerAus } from './angaben.ts';
@@ -40,6 +41,8 @@ export type CmStand = {
 	anzahl: number;
 	/** Offene Partner-Anfragen an einen selbst in diesem Turnier. */
 	anfragen: number;
+	/** FR-52: Die Turnierleitung hat geantwortet, und das Mitglied hat es noch nicht gelesen. */
+	neueAntwort: boolean;
 };
 
 /** Der Partner eines bestätigten Paars, mit Kontakt (FR-19). */
@@ -88,6 +91,8 @@ export type CmAnsicht = {
 	grenze: 3;
 	/** Kontaktperson für Fragen, nur solange sie gültig CM-Admin ist; sonst `null`. */
 	kontakt: Namensteile | null;
+	/** Gespräch mit der Turnierleitung: besteht eines, gibt es Neues, darf das Mitglied schreiben. */
+	gespraech: { vorhanden: boolean; neueAntwort: boolean; schreiben: boolean };
 };
 
 /** FR-06: höchstens drei aktive Anmeldungen je Turnier. */
@@ -185,11 +190,14 @@ export async function laufendeTurniere(
 		.where(and(eq(partnerAnfrage.anId, mitgliedId), anfrageVonMitLogin))
 		.groupBy(kategorie.turnierId);
 	const anfragen = new Map(offene.map((o) => [o.turnierId, o.n]));
-	return zeilen.map((z) => ({
-		...z,
-		status: wirksamerStatus(z.status, z.anmeldeschluss, jetzt),
-		anfragen: anfragen.get(z.id) ?? 0
-	}));
+	return Promise.all(
+		zeilen.map(async (z) => ({
+			...z,
+			status: wirksamerStatus(z.status, z.anmeldeschluss, jetzt),
+			anfragen: anfragen.get(z.id) ?? 0,
+			neueAntwort: (await gespraechStand(db, z.id, mitgliedId, jetzt)).neueAntwort
+		}))
+	);
 }
 
 /** Name der Kontaktperson eines Turniers, wenn sie gültig CM-Admin ist (sonst `null`). */
@@ -268,6 +276,7 @@ export async function ladeCmAnsicht(
 	}
 
 	const kontakt = await kontaktperson(db, t.kontaktMitgliedId);
+	const gespraech = await gespraechStand(db, turnierId, mitgliedId, jetzt);
 
 	return {
 		turnier: {
@@ -277,7 +286,8 @@ export async function ladeCmAnsicht(
 			anmeldeschluss: t.anmeldeschluss,
 			status: wirksamerStatus(t.status, t.anmeldeschluss, jetzt),
 			anzahl: eigene.length,
-			anfragen: anfragen.length
+			anfragen: anfragen.length,
+			neueAntwort: gespraech.neueAntwort
 		},
 		fehlt,
 		spieler,
@@ -290,7 +300,8 @@ export async function ladeCmAnsicht(
 		})),
 		anfragen,
 		grenze: GRENZE,
-		kontakt
+		kontakt,
+		gespraech
 	};
 }
 

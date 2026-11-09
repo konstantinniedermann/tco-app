@@ -6,6 +6,7 @@ import type {
 	CmStand as ServerCmStand
 } from '../server/cm/anmeldungen.ts';
 import type { PartnerTreffer as ServerPartnerTreffer } from '../server/cm/doppel.ts';
+import type { EigenesGespraech as ServerEigenesGespraech } from '../server/gespraech/gespraech.ts';
 import type { Klassierung } from '../turnier/klassierung.ts';
 import type { CmAngabe } from '../turnier/passung.ts';
 import type { Holen, Json } from '../verwaltung/api.ts';
@@ -15,6 +16,8 @@ export type CmAnsicht = Json<ServerCmAnsicht>;
 export type CmKategorie = CmAnsicht['kategorien'][number];
 export type CmAnfrage = CmAnsicht['anfragen'][number];
 export type PartnerTreffer = Json<ServerPartnerTreffer>;
+/** Das eigene Gespräch mit der Turnierleitung (FR-50 bis FR-52). */
+export type CmGespraech = Json<ServerEigenesGespraech>;
 
 /**
  * A-ANMELDUNG-04: die Doppel-Kategorie, für die die Anmelde-Seite gilt: Anmeldung offen, alle
@@ -53,12 +56,13 @@ const ABGELEHNT = [
 	'anfrage-offen',
 	'hinfaellig',
 	'angaben-fehlen',
-	'keine-wildcard'
+	'keine-wildcard',
+	'nur-lesen'
 ] as const;
 type Abgelehnt = (typeof ABGELEHNT)[number];
 
 /** Felder, die der Server bei 400 melden kann. */
-export type CmFelder = Partial<Record<CmAngabe | 'kommentar' | 'suchtext', string>>;
+export type CmFelder = Partial<Record<CmAngabe | 'kommentar' | 'suchtext' | 'text', string>>;
 
 export type Ergebnis<T> =
 	| { art: 'ok'; daten: T }
@@ -77,6 +81,8 @@ const istObjekt = (x: unknown): x is Record<string, unknown> =>
 async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<Ergebnis<T>> {
 	try {
 		const r = await holen(pfad, init);
+		// 204 hat keinen Körper.
+		if (r.status === 204) return { art: 'ok', daten: {} as T };
 		const k = (await r.json()) as { fehler?: unknown; felder?: unknown };
 		if (r.ok) return { art: 'ok', daten: k as T };
 		if (r.status === 401) return { art: 'abgemeldet' };
@@ -158,3 +164,15 @@ export const zieheAnfrageZurueck = (anfrageId: number, holen: Holen = fetch) =>
 /** FR-49: Kommentar *sucht Partner* der eigenen Anmeldung ändern; leer löscht ihn. */
 export const setzeSuchtext = (anmeldungId: number, suchtext: string, holen: Holen = fetch) =>
 	rufe<CmAnsicht>(`/api/cm/anmeldungen/${anmeldungId}/suchtext`, jsonPost({ suchtext }), holen);
+
+/** FR-50: das eigene Gespräch mit der Turnierleitung zu einem Turnier. */
+export const holeGespraech = (turnierId: number, holen: Holen = fetch) =>
+	rufe<CmGespraech>(`/api/cm/${turnierId}/gespraech`, GET, holen);
+
+/** FR-50: eine Nachricht an die Turnierleitung; `nur-lesen`, wenn Schreiben nicht (mehr) geht. */
+export const sendeNachricht = (turnierId: number, text: string, holen: Holen = fetch) =>
+	rufe<CmGespraech>(`/api/cm/${turnierId}/gespraech`, jsonPost({ text }), holen);
+
+/** FR-52: gelesen bis zur neuesten gezeigten Nachricht (`bis`: ISO-Zeitpunkt). */
+export const markiereGelesen = (turnierId: number, bis: string, holen: Holen = fetch) =>
+	rufe<Record<string, never>>(`/api/cm/${turnierId}/gespraech/gelesen`, jsonPost({ bis }), holen);

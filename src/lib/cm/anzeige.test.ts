@@ -4,7 +4,9 @@ import {
 	ANNEHMEN_HINWEIS,
 	anmeldungenText,
 	doppelText,
-	kontaktFragenText,
+	blaseKopfText,
+	zeitText,
+	nachrichtenOffenText,
 	kategorieText,
 	kommentarZaehlerText,
 	paarText,
@@ -179,9 +181,19 @@ describe('Übersicht einer CM: Plakette, Anzahl, Kontakt', () => {
 		expect(suchendeText(3)).toBe('3 suchen Partner');
 	});
 
-	test('kontaktFragenText nennt die Kontaktperson mit Rolle', () => {
-		expect(kontaktFragenText('Anna Beispiel')).toBe(
-			'Bei Fragen oder Problemen melde dich bei Anna Beispiel (CM-Admin).'
+	test('blaseKopfText zeigt Absender, Wochentag, Datum und Zürcher Zeit (A-TURNIER-04)', () => {
+		expect(blaseKopfText('du', '2027-06-09T16:40:00Z')).toBe('Du · Mi, 9. Juni, 18:40');
+		expect(blaseKopfText('leitung', '2027-12-10T07:15:00Z')).toBe(
+			'Turnierleitung · Fr, 10. Dezember, 08:15'
 		);
+	});
+
+	test('zeitText gibt Wochentag, Datum und Zürcher Zeit ohne Absender (A-TURNIER-04)', () => {
+		expect(zeitText('2027-06-09T16:40:00Z')).toBe('Mi, 9. Juni, 18:40');
+	});
+
+	test('nachrichtenOffenText kennt Einzahl und Mehrzahl (A-TURNIER-04)', () => {
+		expect(nachrichtenOffenText(1)).toBe('1 Nachricht an die Turnierleitung offen');
+		expect(nachrichtenOffenText(2)).toBe('2 Nachrichten an die Turnierleitung offen');
 	});
 });

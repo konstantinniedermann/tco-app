@@ -110,7 +110,7 @@ test('A-ANMELDUNG-01, A-ANMELDUNG-02, A-ANMELDUNG-03, FR-37: Mitglied ergänzt A
 	const leitung = `Leitung${info.project.name}`;
 	const cmAdmin = await legeRollenkontoMitBriefCodeAn('Leonie', ['cm'], leitung);
 	await setzeKontaktperson(turnierId, cmAdmin.mitgliedId);
-	const kontaktSatz = `Bei Fragen oder Problemen melde dich bei Leonie ${leitung} (CM-Admin).`;
+	const kontaktSatz = `Kontaktperson: Leonie ${leitung} (CM-Admin)`;
 
 	await startetVomSymbol(page);
 	await meldeAn(page, mitglied);
@@ -317,7 +317,9 @@ test('Rufname: Teilnehmerliste zeigt Rufname mit amtlichem Namen', async ({ page
 	await meldeAn(page, betrachter);
 	await page.getByRole('link', { name: new RegExp(`Clubmeisterschaft ${jahr}`) }).click();
 	// Ohne Kontaktperson fehlt der Satz; die Namen stehen nicht in der Übersicht.
-	await expect(page.getByText('Bei Fragen oder Problemen', { exact: false })).toHaveCount(0);
+	await expect(page.getByRole('heading', { level: 2, name: 'Fragen oder Probleme?' })).toHaveCount(
+		0
+	);
 	await expect(karte(page, 'Herren R1–R9')).not.toContainText(nachname);
 	// Die Seite der Kategorie listet die Namen, mit Rufname und amtlichem Namen.
 	await karte(page, 'Herren R1–R9').getByRole('link', { name: '1 angemeldet' }).click();

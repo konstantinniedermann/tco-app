@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { standText } from '../lib/anlass/stand.ts';
 	import { formatiereBeginn } from '../lib/anlass/zeit.ts';
+	import { nachrichtenOffenText } from '../lib/cm/anzeige.ts';
 	import CmKachel from '../lib/cm/CmKachel.svelte';
 	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { hinweisErledigt, kannPasskey, richtePasskeyEin } from '../lib/login/passkey.ts';
@@ -46,7 +47,11 @@
 
 {#if data.verwaltung}
 	<a class="karte kachel" href={resolve('/verwaltung')}>
-		<strong>Verwaltung</strong>
+		<span>
+			<strong>Verwaltung</strong>{#if data.nachrichtenOffen > 0}<br /><span class="leise"
+					>{nachrichtenOffenText(data.nachrichtenOffen)}</span
+				>{/if}
+		</span>
 		<span class="kachel-pfeil" aria-hidden="true">›</span>
 	</a>
 {/if}
@@ -76,6 +81,18 @@
 
 {#if data.turniere.length > 0 || data.anlaesse.length > 0}
 	<h2>Jetzt aktuell</h2>
+	{#each data.turniere.filter((t) => t.neueAntwort) as t (t.id)}
+		<a
+			class="karte kachel hervor"
+			href={resolve('/clubmeisterschaft/[id]/kontakt', { id: String(t.id) })}
+		>
+			<span>
+				<strong>Neue Antwort der Turnierleitung</strong><br />
+				<span class="leise">{t.name}</span>
+			</span>
+			<span class="kachel-pfeil" aria-hidden="true">›</span>
+		</a>
+	{/each}
 	{#each data.turniere as t (t.id)}
 		<CmKachel turnier={t} />
 	{/each}

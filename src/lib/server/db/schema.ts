@@ -436,3 +436,46 @@ export const partnerAnfrage = pgTable(
 		index('partner_anfrage_an_idx').on(t.anId)
 	]
 );
+
+// Gespräch zwischen einem Mitglied und der Turnierleitung (FR-50): höchstens eines je Turnier
+// und Mitglied. Es entsteht mit der ersten Nachricht des Mitglieds.
+export const gespraech = pgTable(
+	'gespraech',
+	{
+		id: serial('id').primaryKey(),
+		turnierId: integer('turnier_id')
+			.notNull()
+			.references(() => turnier.id, { onDelete: 'cascade' }),
+		mitgliedId: integer('mitglied_id')
+			.notNull()
+			.references(() => mitglied.id),
+		zustand: text('zustand').$type<'offen' | 'erledigt'>().notNull().default('offen'),
+		// Wann das Mitglied das Gespräch zuletzt geöffnet hat (für «neue Antwort»).
+		gelesenAm: timestamp('gelesen_am', { withTimezone: true }),
+		letzteAm: timestamp('letzte_am', { withTimezone: true }).notNull()
+	},
+	(t) => [
+		unique('gespraech_turnier_mitglied_unique').on(t.turnierId, t.mitgliedId),
+		check('gespraech_zustand_check', sql`${t.zustand} in ('offen', 'erledigt')`)
+	]
+);
+
+// Eine Nachricht im Gespräch; von der Leitung nur mit dem Admin, der sie geschrieben hat.
+export const nachricht = pgTable(
+	'nachricht',
+	{
+		id: serial('id').primaryKey(),
+		gespraechId: integer('gespraech_id')
+			.notNull()
+			.references(() => gespraech.id, { onDelete: 'cascade' }),
+		von: text('von').$type<'mitglied' | 'leitung'>().notNull(),
+		adminMitgliedId: integer('admin_mitglied_id').references(() => mitglied.id),
+		text: text('text').notNull(),
+		gesendetAm: timestamp('gesendet_am', { withTimezone: true }).notNull()
+	},
+	(t) => [
+		check('nachricht_von_check', sql`${t.von} in ('mitglied', 'leitung')`),
+		check('nachricht_text_check', sql`char_length(${t.text}) between 1 and 1000`),
+		index('nachricht_gespraech_idx').on(t.gespraechId)
+	]
+);

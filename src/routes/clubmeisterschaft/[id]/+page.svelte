@@ -27,7 +27,6 @@
 		doppelText,
 		kategorieText,
 		kommentarZaehlerText,
-		kontaktFragenText,
 		standPlakette,
 		suchendeText,
 		suchtextZaehlerText,
@@ -633,8 +632,28 @@
 	{/if}
 {/if}
 
-{#if cm.kontakt}
-	<p class="leise">{kontaktFragenText(amtlicherName(cm.kontakt, 'vorname-zuerst'))}</p>
+<!-- A-TURNIER-04: Karte zum Gespräch mit der Turnierleitung; sie ersetzt den Satz mit der Kontaktperson. -->
+{#if cm.kontakt || cm.gespraech.vorhanden}
+	<section class="karte" aria-labelledby="s-fragen">
+		<div class="karte-kopf">
+			<h2 id="s-fragen">Fragen oder Probleme?</h2>
+			{#if cm.gespraech.neueAntwort}<span class="plakette plakette-offen">neue Antwort</span>{/if}
+		</div>
+		{#if cm.kontakt}
+			<p class="leise">Kontaktperson: {amtlicherName(cm.kontakt, 'vorname-zuerst')} (CM-Admin)</p>
+		{/if}
+		{#if cm.gespraech.schreiben || cm.gespraech.vorhanden}
+			<a
+				class="kachel karte-teil"
+				href={resolve('/clubmeisterschaft/[id]/kontakt', { id: String(cm.turnier.id) })}
+				><span
+					>{cm.gespraech.schreiben
+						? 'Schreib der Turnierleitung'
+						: 'Dein Gespräch mit der Turnierleitung'}</span
+				><span class="kachel-pfeil" aria-hidden="true">›</span></a
+			>
+		{/if}
+	</section>
 {/if}
 
 <dialog

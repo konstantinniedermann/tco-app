@@ -33,6 +33,12 @@ import {
 	type DoppelAbgelehnt
 } from '../cm/verwaltung-doppel.ts';
 import { anfrageGeloeschtText } from '../cm/doppel-meldung.ts';
+import {
+	getAdminGespraech,
+	getGespraeche,
+	postAntwort,
+	postZustand
+} from '../gespraech/schnittstellen.ts';
 import { antwort } from '../login/schnittstellen.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
@@ -478,6 +484,9 @@ export function postKlassierung(d: AdminDienste, e: AdminEreignis): Promise<Resp
 	});
 }
 
+export { getAdminGespraech, getGespraeche, postAntwort, postZustand };
+
+// Enthält auch die vier Schnittstellen des Gesprächs mit der Turnierleitung (A-TURNIER-04).
 export const TURNIER_SCHNITTSTELLEN = {
 	getTurniere,
 	postTurniere,
@@ -500,5 +509,9 @@ export const TURNIER_SCHNITTSTELLEN = {
 	postAnfrageLoeschen,
 	postEntscheid,
 	getSpieler,
-	postKlassierung
+	postKlassierung,
+	getGespraeche,
+	getAdminGespraech,
+	postAntwort,
+	postZustand
 } satisfies Record<string, (d: MitteilungAdminDienste, e: AdminEreignis) => Promise<Response>>;
