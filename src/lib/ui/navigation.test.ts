@@ -32,6 +32,10 @@ describe('Übergänge beim Seitenwechsel (UI-09)', () => {
 		const kategorie = '/clubmeisterschaft/[id]/kategorie/[kid]';
 		expect(uebergang('/clubmeisterschaft/[id]', kategorie, 'link')).toBe('tiefer');
 		expect(uebergang(kategorie, '/clubmeisterschaft/[id]', 'link')).toBe('zurueck');
+		// A-TURNIER-04: das Gespräch mit der Turnierleitung liegt eine Stufe unter der CM.
+		const kontakt = '/clubmeisterschaft/[id]/kontakt';
+		expect(uebergang('/clubmeisterschaft/[id]', kontakt, 'link')).toBe('tiefer');
+		expect(uebergang(kontakt, '/clubmeisterschaft/[id]', 'link')).toBe('zurueck');
 	});
 
 	it('schiebt zurück nach rechts weg', () => {
@@ -62,6 +66,7 @@ describe('Reiter', () => {
 		['/clubmeisterschaft/[id]', '/clubmeisterschaft'],
 		['/clubmeisterschaft/[id]/doppel/[kid]', '/clubmeisterschaft'],
 		['/clubmeisterschaft/[id]/kategorie/[kid]', '/clubmeisterschaft'],
+		['/clubmeisterschaft/[id]/kontakt', '/clubmeisterschaft'],
 		['/profil', '/profil'],
 		['/profil/email', '/profil'],
 		['/login', null],
@@ -123,6 +128,7 @@ describe('Zurück-Link führt eine Stufe höher in der festen Ordnung', () => {
 			k,
 			{ route: '/clubmeisterschaft/[id]', text: null }
 		],
+		['/clubmeisterschaft/[id]/kontakt', k, { route: '/clubmeisterschaft/[id]', text: null }],
 		['/hilfe', k, { route: '/', text: 'Start' }],
 		['/datenschutz', k, { route: '/', text: 'Start' }],
 		['/hilfe', { ...k, angemeldet: false }, { route: '/login', text: 'Anmelden' }],

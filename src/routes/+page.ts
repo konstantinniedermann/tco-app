@@ -18,12 +18,14 @@ export const load: PageLoad = async ({ fetch }) => {
 		redirect(307, einstieg ? '/willkommen' : '/login');
 	}
 	if (!antwort.ok) error(503, 'Die Anmeldung lässt sich gerade nicht prüfen.');
-	const { vorname, rufname, passkeyHinweis, verwaltung } = (await antwort.json()) as {
-		vorname: string;
-		rufname: string | null;
-		passkeyHinweis: boolean;
-		verwaltung: boolean;
-	};
+	const { vorname, rufname, passkeyHinweis, verwaltung, nachrichtenOffen } =
+		(await antwort.json()) as {
+			vorname: string;
+			rufname: string | null;
+			passkeyHinweis: boolean;
+			verwaltung: boolean;
+			nachrichtenOffen: number;
+		};
 	// Lassen sich Anlässe oder Turniere nicht laden, bleibt die Startseite trotzdem nutzbar.
 	const [anlaesse, turniere] = await Promise.all([holeAnlaesse(fetch), holeCmTurniere(fetch)]);
 	return {
@@ -31,6 +33,7 @@ export const load: PageLoad = async ({ fetch }) => {
 		rufname,
 		passkeyHinweis,
 		verwaltung,
+		nachrichtenOffen,
 		anlaesse: anlaesse.art === 'ok' ? anlaesse.daten : [],
 		turniere: turniere.art === 'ok' ? turniere.daten : []
 	};

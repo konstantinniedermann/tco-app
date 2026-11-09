@@ -271,7 +271,7 @@ er nie.
   die Karte «Fragen oder Probleme?» mit leise «Kontaktperson: <Name> (CM-Admin)» und der Kachel
   «Schreib der Turnierleitung ›» (Kartenkopf mit Plakette «neue Antwort», `.plakette-offen`, solange eine Antwort ungelesen
   ist); ohne gültige Kontaktperson fällt die Karte weg, ausser es gibt schon ein Gespräch: dann ohne
-  Zeile «Kontaktperson», mit der Kachel «Dein Gespräch mit der Turnierleitung ›». Die Kontaktperson selbst sieht nur den Satz «Bei Fragen oder Problemen melde dich bei <Name> (CM-Admin).».
+  Zeile «Kontaktperson», mit der Kachel «Dein Gespräch mit der Turnierleitung ›». Die Kachel steht nur, wo geschrieben werden darf oder schon ein Gespräch besteht; die Kontaktperson selbst sieht die Karte mit ihrem Namen, ohne Kachel.
   Die **Kategorie einer CM** listet alle bestätigten Anmeldungen (im Doppel
   Paare und Suchende mit Kommentar) und hat keine Tasten.
 - **Startseite:** „Hoi <Rufname, sonst Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel

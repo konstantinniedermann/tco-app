@@ -4,7 +4,7 @@
 import { erstelleDb, type Db } from '../../../src/lib/server/db/index.ts';
 import { erstelleBremsen } from '../../../src/lib/server/login/bremse.ts';
 import { erstelleLoginDienst, type LoginDienst } from '../../../src/lib/server/login/dienst.ts';
-import { eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { machAdmin } from '../../../src/lib/server/admin/erster-admin.ts';
 import { legeAnlassAn, melde } from '../../../src/lib/server/anlass/anlaesse.ts';
 import { setzeRollen, type Rolle } from '../../../src/lib/server/admin/rollen.ts';
@@ -13,8 +13,15 @@ import {
 	meldeAn as meldeZurCmAnInDb
 } from '../../../src/lib/server/cm/anmeldungen.ts';
 import { stelleAnfrage } from '../../../src/lib/server/cm/doppel.ts';
+import { antworte, schreibeAlsMitglied } from '../../../src/lib/server/gespraech/gespraech.ts';
 import { meldeDoppelVonHandAn } from '../../../src/lib/server/cm/verwaltung-doppel.ts';
-import { konto, mitglied, turnier } from '../../../src/lib/server/db/schema.ts';
+import {
+	gespraech,
+	konto,
+	mitglied,
+	nachricht,
+	turnier
+} from '../../../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../../../src/lib/server/turnier/angaben.ts';
 import {
 	legeKategorieAn,
@@ -221,6 +228,45 @@ export async function setzeKontaktperson(turnierId: number, mitgliedId: number):
 		.db.update(turnier)
 		.set({ kontaktMitgliedId: mitgliedId })
 		.where(eq(turnier.id, turnierId));
+}
+
+/** Das Turnier hat keine Kontaktperson mehr (z. B. wegen verlorener Rolle). */
+export async function entferneKontaktperson(turnierId: number): Promise<void> {
+	await hole().db.update(turnier).set({ kontaktMitgliedId: null }).where(eq(turnier.id, turnierId));
+}
+
+/** Das Mitglied schreibt der Turnierleitung, über die Fachlogik (FR-50), ohne Meldung. */
+export async function schreibeNachricht(
+	turnierId: number,
+	mitgliedId: number,
+	text: string
+): Promise<void> {
+	const r = await schreibeAlsMitglied(hole().db, turnierId, mitgliedId, text, new Date());
+	if (typeof r === 'string') throw new Error(`Nachricht an die Turnierleitung: ${r}`);
+}
+
+/** Ein CM-Admin antwortet im Gespräch des Mitglieds (FR-52), über die Fachlogik, ohne Meldung. */
+export async function antworteAlsLeitung(
+	turnierId: number,
+	mitgliedId: number,
+	adminId: number,
+	text: string
+): Promise<void> {
+	const db = hole().db;
+	const [g] = await db
+		.select({ id: gespraech.id })
+		.from(gespraech)
+		.where(and(eq(gespraech.turnierId, turnierId), eq(gespraech.mitgliedId, mitgliedId)));
+	if (!g) throw new Error('Kein Gespräch zum Antworten');
+	const [letzte] = await db
+		.select({ id: nachricht.id })
+		.from(nachricht)
+		.where(eq(nachricht.gespraechId, g.id))
+		.orderBy(desc(nachricht.id))
+		.limit(1);
+	const r = await antworte(db, g.id, adminId, text, letzte.id, false, new Date());
+	if (typeof r === 'string' || r.ergebnis !== 'ok')
+		throw new Error('Antwort liess sich nicht senden');
 }
 
 /** Setzt den Anmeldeschluss eines Turniers (`YYYY-MM-DD`), etwa auf ein vergangenes Datum. */
