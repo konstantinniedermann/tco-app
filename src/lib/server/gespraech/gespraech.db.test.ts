@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
+import { legeEigeneDatenbankAn } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { gespraech, nachricht, turnier, type TurnierStatus } from '../db/schema.ts';
@@ -17,7 +18,8 @@ import {
 	setzeZustand
 } from './gespraech.ts';
 
-const db = erstelleDb(process.env.DATABASE_URL!);
+// `let`: Der Test der Gesamtzahl tauscht sie gegen eine eigene Datenbank (siehe dort).
+let db = erstelleDb(process.env.DATABASE_URL!);
 
 afterAll(async () => {
 	await db.$client.end();
@@ -210,31 +212,44 @@ describe('A-TURNIER-04 Gespräch mit der Turnierleitung', () => {
 	});
 
 	test('FR-52: Liste mit offenen zuerst, Zahlen und Gesamtzahl', async () => {
-		const a = await aufbau();
-		const m2 = (await legeMitgliedAn(db)).mitgliedId;
-		const m3 = (await legeMitgliedAn(db)).mitgliedId;
-		const t = (n: number) => new Date(a.jetzt.getTime() + n * 60_000);
-		await schreibeAlsMitglied(db, a.turnierId, a.mitgliedId, 'alt', t(1));
-		await schreibeAlsMitglied(db, a.turnierId, m2, 'neu', t(3));
-		await schreibeAlsMitglied(db, a.turnierId, m3, 'mittel', t(2));
-		const gs = await db.select().from(gespraech).where(eq(gespraech.turnierId, a.turnierId));
-		const vonM3 = gs.find((g) => g.mitgliedId === m3)!;
-		await setzeZustand(db, vonM3.id, 'erledigt');
-		const l = await listeGespraeche(db, a.turnierId);
-		expect(l?.kontakt?.nachname).toBe('Kontaktnamen');
-		expect(l?.zeilen.map((z) => z.letzte.text)).toEqual(['neu', 'alt', 'mittel']);
-		expect(l?.zeilen.map((z) => z.zustand)).toEqual(['offen', 'offen', 'erledigt']);
-		expect(await listeGespraeche(db, -1)).toBeNull();
-
-		const zahlen = await offeneZahlen(db, [a.turnierId, -1]);
-		expect(zahlen.get(a.turnierId)).toEqual({ offen: 2, erledigt: 1 });
-		expect(zahlen.get(-1)).toEqual({ offen: 0, erledigt: 0 });
-
-		const vorher = await offeneGespraecheGesamt(db, a.jetzt);
-		await setzeZustand(db, vonM3.id, 'offen');
-		expect(await offeneGespraecheGesamt(db, a.jetzt)).toBe(vorher + 1);
-		// Turnierjahr vorbei: zählt nicht mehr.
-		const spaeter = new Date(`${a.jahr + 1}-02-01T12:00:00+01:00`);
-		expect(await offeneGespraecheGesamt(db, spaeter)).toBe(vorher - 2);
+		// Die Gesamtzahl ist global und die gemeinsame Datenbank wird parallel beschrieben: eigene Datenbank.
+		const eigene = await legeEigeneDatenbankAn('gespraech_gesamt');
+		const gemeinsame = db;
+		db = eigene.db;
+		try {
+			await pruefeListeUndGesamtzahl();
+		} finally {
+			db = gemeinsame;
+			await eigene.abbauen();
+		}
 	});
 });
+
+async function pruefeListeUndGesamtzahl() {
+	const a = await aufbau();
+	const m2 = (await legeMitgliedAn(db)).mitgliedId;
+	const m3 = (await legeMitgliedAn(db)).mitgliedId;
+	const t = (n: number) => new Date(a.jetzt.getTime() + n * 60_000);
+	await schreibeAlsMitglied(db, a.turnierId, a.mitgliedId, 'alt', t(1));
+	await schreibeAlsMitglied(db, a.turnierId, m2, 'neu', t(3));
+	await schreibeAlsMitglied(db, a.turnierId, m3, 'mittel', t(2));
+	const gs = await db.select().from(gespraech).where(eq(gespraech.turnierId, a.turnierId));
+	const vonM3 = gs.find((g) => g.mitgliedId === m3)!;
+	await setzeZustand(db, vonM3.id, 'erledigt');
+	const l = await listeGespraeche(db, a.turnierId);
+	expect(l?.kontakt?.nachname).toBe('Kontaktnamen');
+	expect(l?.zeilen.map((z) => z.letzte.text)).toEqual(['neu', 'alt', 'mittel']);
+	expect(l?.zeilen.map((z) => z.zustand)).toEqual(['offen', 'offen', 'erledigt']);
+	expect(await listeGespraeche(db, -1)).toBeNull();
+
+	const zahlen = await offeneZahlen(db, [a.turnierId, -1]);
+	expect(zahlen.get(a.turnierId)).toEqual({ offen: 2, erledigt: 1 });
+	expect(zahlen.get(-1)).toEqual({ offen: 0, erledigt: 0 });
+
+	// In der eigenen Datenbank gibt es nur dieses Turnier: die Gesamtzahl ist exakt.
+	expect(await offeneGespraecheGesamt(db, a.jetzt)).toBe(2);
+	await setzeZustand(db, vonM3.id, 'offen');
+	expect(await offeneGespraecheGesamt(db, a.jetzt)).toBe(3);
+	// Turnierjahr vorbei: zählt nicht mehr.
+	expect(await offeneGespraecheGesamt(db, mitJahr(a.jahr + 1, '02-01'))).toBe(0);
+}

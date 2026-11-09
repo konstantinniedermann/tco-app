@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
+import { legeEigeneDatenbankAn } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { ERLAUBT_IN_ANSICHT, riegel } from '../admin/ansicht.ts';
 import { erstelleZugangDienst } from '../admin/zugang.ts';
@@ -25,7 +26,8 @@ import {
 import { ANTWORT_TEXT, NACHRICHT_TEXT, pfadMitglied, pfadVerwaltung } from './meldung.ts';
 import { ladeEigenesGespraech, ladeGespraech } from './gespraech.ts';
 
-const db = erstelleDb(process.env.DATABASE_URL!);
+// `let`: Der Sitzungs-Test tauscht sie gegen eine eigene Datenbank (siehe dort).
+let db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {
 	await db.$client.end();
 });
@@ -46,8 +48,7 @@ afterEach(() => {
 
 const start = new Date('2026-11-02T12:00:00Z');
 const ADRESSE = 'https://mytco.example.org';
-// Turnierjahre 9100 bis 9900 gehören dieser Datei: Die Gesamtzahl der offenen Gespräche zählt nur
-// Turniere ab dem Jahr von `jetzt`, fremde Tests (Jahre bis 8999) fallen so heraus.
+// Turnierjahre 9100 bis 9900; nur der Sitzungs-Test zählt global und nutzt darum eine eigene Datenbank.
 const zufallsJahr = () => 9100 + Math.floor(Math.random() * 800);
 const SITZUNGSJAHR = 9950;
 const mitJahr = (jahr: number) => new Date(`${jahr}-06-15T12:00:00+02:00`);
@@ -399,6 +400,30 @@ describe('A-TURNIER-04 Schnittstellen zum Gespräch', () => {
 		expect(await neu()).toBe(false);
 	});
 
+	test('A-TURNIER-04, FR-52: gelesen kappt einen Zeitpunkt in der Zukunft auf jetzt, spätere Antworten bleiben neu', async () => {
+		const a = await aufbau();
+		const m = await mitglied();
+		await schreibe(a, m, 'Frage');
+		const gid = await gespraechId(a.turnierId, m.mitgliedId);
+		const r = await postGelesen(
+			a.s.cm,
+			post(m.konto, { bis: '9999-01-01T00:00:00Z' }, a.turnierId)
+		);
+		expect(r.status).toBe(204);
+		const [g] = await db.select().from(gespraech).where(eq(gespraech.id, gid));
+		expect(g.gelesenAm?.getTime()).toBe(a.jetzt.getTime());
+		await db.insert(nachricht).values({
+			gespraechId: gid,
+			von: 'leitung',
+			adminMitgliedId: a.kontakt.mitgliedId,
+			text: 'Später',
+			gesendetAm: new Date(a.jetzt.getTime() + 60_000)
+		});
+		const spaeter = new Date(a.jetzt.getTime() + 120_000);
+		const eigen = await ladeEigenesGespraech(db, a.turnierId, m.mitgliedId, spaeter);
+		expect(eigen?.nachrichten.at(-1)).toMatchObject({ text: 'Später', neu: true });
+	});
+
 	test('A-TURNIER-04: Mitglied sieht ein Turnier in Vorbereitung nicht (404)', async () => {
 		const a = await aufbau();
 		await db.update(turnier).set({ status: 'vorbereitung' }).where(eq(turnier.id, a.turnierId));
@@ -433,32 +458,16 @@ describe('A-TURNIER-04 Schnittstellen zum Gespräch', () => {
 	});
 
 	test('FR-52, A-TURNIER-04: getSitzung zählt offene Gespräche nur bei wirksamer Rolle cm', async () => {
-		const a = await aufbau({ jahr: SITZUNGSJAHR });
-		const m1 = await mitglied();
-		const m2 = await mitglied();
-		const m3 = await mitglied();
-		await schreibe(a, m1, 'Eins');
-		await schreibe(a, m2, 'Zwei');
-		await schreibe(a, m3, 'Drei');
-		await postZustand(
-			a.s.admin,
-			post(
-				a.kontakt.konto,
-				{ zustand: 'erledigt' },
-				await gespraechIdVon(a.turnierId, m3.mitgliedId)
-			)
-		);
-		const sitzung = async (konto: AngemeldetesKonto) =>
-			(await (await getSitzung(ereignis({ method: 'GET', konto }), db, () => a.jetzt)).json())
-				.nachrichtenOffen;
-		expect(await sitzung(a.kontakt.konto)).toBe(2);
-		const mytco = await admin(a.s, ['mytco']);
-		expect(await sitzung(mytco.konto)).toBe(0);
-		expect(await sitzung({ ...mytco.konto, ansicht: 'cm' } as AngemeldetesKonto)).toBe(2);
-		expect(await sitzung({ ...a.kontakt.konto, ansicht: 'mitglieder' } as AngemeldetesKonto)).toBe(
-			0
-		);
-		expect(await sitzung(m1.konto)).toBe(0);
+		// Die Zahl ist global und die gemeinsame Datenbank wird parallel beschrieben: eigene Datenbank.
+		const eigene = await legeEigeneDatenbankAn('gespraech_sitzung');
+		const gemeinsame = db;
+		db = eigene.db;
+		try {
+			await pruefeSitzungsZahl();
+		} finally {
+			db = gemeinsame;
+			await eigene.abbauen();
+		}
 	});
 
 	test('FR-52, A-TURNIER-04: CM-Ansicht, Turnierliste und Verwaltung tragen die Gesprächsfelder', async () => {
@@ -497,4 +506,27 @@ describe('A-TURNIER-04 Schnittstellen zum Gespräch', () => {
 async function gespraechIdVon(turnierId: number, mitgliedId: number) {
 	const zeilen = await db.select().from(gespraech).where(eq(gespraech.turnierId, turnierId));
 	return zeilen.find((g) => g.mitgliedId === mitgliedId)!.id;
+}
+
+async function pruefeSitzungsZahl() {
+	const a = await aufbau({ jahr: SITZUNGSJAHR });
+	const m1 = await mitglied();
+	const m2 = await mitglied();
+	const m3 = await mitglied();
+	await schreibe(a, m1, 'Eins');
+	await schreibe(a, m2, 'Zwei');
+	await schreibe(a, m3, 'Drei');
+	await postZustand(
+		a.s.admin,
+		post(a.kontakt.konto, { zustand: 'erledigt' }, await gespraechIdVon(a.turnierId, m3.mitgliedId))
+	);
+	const sitzung = async (konto: AngemeldetesKonto) =>
+		(await (await getSitzung(ereignis({ method: 'GET', konto }), db, () => a.jetzt)).json())
+			.nachrichtenOffen;
+	expect(await sitzung(a.kontakt.konto)).toBe(2);
+	const mytco = await admin(a.s, ['mytco']);
+	expect(await sitzung(mytco.konto)).toBe(0);
+	expect(await sitzung({ ...mytco.konto, ansicht: 'cm' } as AngemeldetesKonto)).toBe(2);
+	expect(await sitzung({ ...a.kontakt.konto, ansicht: 'mitglieder' } as AngemeldetesKonto)).toBe(0);
+	expect(await sitzung(m1.konto)).toBe(0);
 }

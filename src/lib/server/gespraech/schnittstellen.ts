@@ -88,7 +88,9 @@ export function postGelesen(d: CmDienste, e: CmEreignis): Promise<Response> {
 		const roh = (await leseKoerper(e)).bis;
 		const bis = typeof roh === 'string' ? new Date(roh) : null;
 		if (bis === null || Number.isNaN(bis.getTime())) return antwort(400, { fehler: 'eingabe' });
-		await markiereGelesen(d.db, id, konto.mitgliedId, bis);
+		// Nie über «jetzt» hinaus: Die Marke geht nur vorwärts und würde spätere Antworten verdecken.
+		const jetzt = jetztMitglied(d);
+		await markiereGelesen(d.db, id, konto.mitgliedId, bis > jetzt ? jetzt : bis);
 		return antwort(204);
 	});
 }
