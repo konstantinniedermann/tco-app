@@ -64,7 +64,8 @@ Mitglieder-, CM- oder Lizenz-Admin), mit seinem eigenen Konto (A-ROLLE-09).
   Bestätigung der Verwaltung per Code ([SI-20](sicherheitskonzept.md#vorgaben)).
 - Ein Band oben zeigt «Ansicht als … — nur ansehen» und *Beenden*.
 - Gilt nur für die eigene Sitzung; endet mit *Beenden*, dem Logout oder dem Entzug der Rolle
-  MyTCO-Admin. Kein Eintrag im Änderungsverlauf.
+  MyTCO-Admin. Die Ansicht selbst schreibt keinen Eintrag im Änderungsverlauf; das Öffnen einer
+  Auskunft (DS-07) steht auch hier im Verlauf.
 
 ## Matrix
 
@@ -80,7 +81,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Eigene Adresse (Annahme K-19.2) | – | S eigene | S eigene | S eigene | S | S eigene |
 | Eigener Rufname (freiwillig; das Mitglied setzt, ändert und löscht ihn selbst) | – | S eigene | S eigene | S eigene | S eigene, L alle | S eigene, L alle |
 | Eigener Name, Geschlecht, Jahrgang, Mitgliedernummer (Geschlecht und Jahrgang einmal selbst, wenn leer, FR-37) | – | L eigene | L eigene | L eigene | S | L |
-| Mitglieder anlegen, bearbeiten, löschen, Auskunft drucken (DS-07; den eigenen Austritt und sich selbst löschen nicht, RR-10) | – | – | – | – | S | L |
+| Mitglieder anlegen, bearbeiten, löschen, Auskunft drucken (DS-07, das Öffnen steht immer im Änderungsverlauf, auch nur lesend; den eigenen Austritt und sich selbst löschen nicht, RR-10) | – | – | – | – | S | L |
 | Mitgliederliste einlesen (A-MITGLIED-07) | – | – | – | – | S | L |
 | Liste *Briefe*: wer MyTCO noch nie geöffnet hat (A-LOGIN-01) | – | – | – | – | S | L |
 | Neuer Code für einen Brief, Briefe auslösen, Sitzungen beenden | – | – | – | – | S | – |
@@ -91,7 +92,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | E-Mail und Telefon anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L alle (K-42) | L alle (K-42) | S | L |
 | **CM-Anmeldung** | | | | | | |
 | Turnier, Turniernummern, Kategorien | – | L | S | L | L | L |
-| Kontaktperson des Turniers (wählen; Mitglieder sehen nur den Namen) | – | L Name | S | L Name | L Name | L |
+| Kontaktperson des Turniers (wählen, nur gültige nach FR-55; Mitglieder sehen nur den Namen) | – | L Name | S | L Name | L Name | L |
 | Eigene Anmeldung, bis Anmeldeschluss (FR-10) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Anmeldungen aller (Name, Kategorie) | – | L bestätigte | S | L bestätigte | L bestätigte | L |
 | Geschlecht und Jahrgang der Spieler (zum Zuordnen) | – | – | L | – | S | L |

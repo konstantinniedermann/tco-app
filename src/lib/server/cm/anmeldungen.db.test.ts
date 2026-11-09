@@ -995,7 +995,7 @@ describe('CM-Anmeldung', () => {
 	});
 });
 
-describe('Kontaktperson der CM', () => {
+describe('FR-55: Kontaktperson der CM', () => {
 	/** Offenes Turnier mit `kontakt` als Kontaktperson (vorher gültig CM-Admin). */
 	async function mitKontakt() {
 		const admin = await legeMitgliedAn(db, {

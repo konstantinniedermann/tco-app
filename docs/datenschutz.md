@@ -69,7 +69,7 @@ Bankdaten.
 | MyTCO-Admin | alles, was eine der anderen Rollen sieht, auch Bemerkungen zu Anlässen und Wildcard-Kommentare, und den Änderungsverlauf, auch die Gespräche mit der Turnierleitung; nur lesend. **Zweck:** die anderen Rollen unterstützen, Fehler suchen, die Rollenvergabe prüfen. *Ansicht als …* zeigt ihm nichts darüber hinaus. **Annahme K-18.4:** Die Rolle erhalten nur Personen, die MyTCO technisch betreuen (Projektleiter und seine Stellvertretung, vgl. SI-16), nicht weitere Vorstandsmitglieder; eine Abmachung des Vereins, die App erzwingt sie nicht |
 | CM-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung, Geschlecht und Jahrgang der Spieler (zum Zuordnen in Kategorien). Die Klassierung korrigiert auch der CM-Admin (A-ANMELDUNG-06, Matrix in `rollen-und-rechte.md`); Geschlecht und Jahrgang ändert nur der Mitglieder-Admin; offene Partner-Anfragen (von, an, seit wann); alle Gespräche mit der Turnierleitung, auch wer geantwortet hat |
 | Lizenz-Admin | Name, E-Mail und Telefon aller Mitglieder (K-42); Lizenzanträge |
-| Alle Mitglieder | Name und Rufname, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft; Vor- und Nachnamen der Kontaktperson, die der CM-Admin für das Turnier gewählt hat, ohne E-Mail und Telefon, solange sie CM-Admin ist; wer in einer Doppelkategorie *sucht Partner* mit seinem Kommentar; bei der Wahl des Doppelpartners die Namen und die Klassierung der Mitglieder, die für die Kategorie passen, dazu den Vermerk *Klassierung fehlt* oder *Angaben fehlen* (im Doppel: Geschlecht fehlt) |
+| Alle Mitglieder | Name und Rufname, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft; Name und Rufname der Kontaktperson, die der CM-Admin für das Turnier gewählt hat (die Seite zeigt Vor- und Nachname), ohne E-Mail und Telefon, solange sie als Kontaktperson gültig ist (FR-55); wer in einer Doppelkategorie *sucht Partner* mit seinem Kommentar; bei der Wahl des Doppelpartners die Namen und die Klassierung der Mitglieder, die für die Kategorie passen, dazu den Vermerk *Klassierung fehlt* oder *Angaben fehlen* (im Doppel: Geschlecht fehlt) |
 | Angefragter Doppelpartner | mit der Anfrage Name, Klassierung und Telefonnummer (sonst E-Mail) des Anfragenden, den dieser damit freigibt; die Kontaktdaten des Angefragten sieht der Anfragende erst nach dem Annehmen |
 | Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31); beim Doppelpartner erst nach dem Annehmen der Anfrage und nicht mehr, wenn der Partner ausgetreten oder zum Löschen vorgemerkt ist |
 | Alle, ohne Login | Kalenderdatei eines Anlasses über einen nicht erratbaren Link: Titel, Beginn, Ort, Einladung, keine Personendaten |
@@ -109,7 +109,8 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
   nennen Dritte). Schritte der Verwaltung zeigt die Auskunft als «Mitgliederverwaltung», nicht mit dem
   Namen des Admins. Von der CM enthält sie nur bestätigte Anmeldungen, ohne Wildcard-Kommentar, weil
   der Mitglieder-Admin Wildcard-Anträge nicht sieht; die übrigen Anmeldungen, Wildcard-Anträge und Kommentare
-  gibt auf Wunsch der CM-Admin bekannt, ebenso die Gespräche mit der Turnierleitung. Das Erstellen steht im Änderungsverlauf.
+  gibt auf Wunsch der CM-Admin bekannt, ebenso die Gespräche mit der Turnierleitung. Das Erstellen steht im Änderungsverlauf, auch wenn der MyTCO-Admin
+  die Auskunft nur lesend oder in der «Ansicht als …» öffnet: So bleibt sichtbar, wer die Daten eingesehen hat.
 - **Mitglied löschen** (Mitglieder-Admin, DS-07): Bedenkzeit von 7 Tagen (Anzeige «wird gelöscht»); wie beim Austritt werden Einzel- und Doppel-Anmeldungen bis zum Datum des Anmeldeschlusses zurückgezogen, auch wenn von Hand früher geschlossen wurde, und Antworten zu kommenden Anlässen gelöscht. Die Markierung *für Fairgate offen* entfernt nur der Austritt; die Löschung räumt sie ohnehin ab. In dieser Zeit steht das Mitglied
   im Zustand *Löschung vorgemerkt*, das Login ist gesperrt, und der Mitglieder-Admin kann die Löschung
   rückgängig machen; dann gilt wieder der Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum). Nach der Woche wird gelöscht wie nach der Frist beim Austritt.
@@ -135,8 +136,8 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
   oder mit dem Entzug der Rolle MyTCO-Admin.
 - ***Erstellt von* am Anlass:** mit dem Anlass; wird der Mitglieder-Admin als Mitglied gelöscht, bleibt der
   Anlass ohne diese Angabe.
-- ***Kontaktperson* am Turnier:** bleibt beim Turnier wie die CM-Anmeldungen, auch wenn die Person die Rolle
-  CM-Admin verliert (Mitglieder sehen sie dann nicht mehr); wird sie als Mitglied gelöscht, bleibt das Turnier
+- ***Kontaktperson* am Turnier:** bleibt beim Turnier wie die CM-Anmeldungen, auch wenn die Person nicht mehr
+  gültig ist (FR-55: Rolle entzogen, ausgetreten, Konto gesperrt; Mitglieder sehen sie dann nicht mehr); wird sie als Mitglied gelöscht, bleibt das Turnier
   ohne Kontaktperson.
 - **E-Mail-Adresse im Gerätespeicher** während einer Code-Anfrage: nach dem Login, sonst beim
   nächsten Start der App, sobald die Anfrage älter als 15 Minuten ist.
@@ -238,6 +239,7 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
 
+- 09.11.2026: Zusagen an den Code angeglichen (Beobachtungs-Auswertung, Entscheid Projektleiter): Alle Mitglieder bekommen Name und Rufname der Kontaktperson, solange sie nach FR-55 gültig ist (aktiv, Konto nicht gesperrt, CM-Admin); das Öffnen einer Auskunft steht auch beim nur lesenden MyTCO-Admin und in der «Ansicht als …» im Änderungsverlauf.
 - 09.11.2026: Gespräche mit der Turnierleitung: Nachrichten des Mitglieds und Antworten der CM-Admins, lesbar für alle CM-Admins und lesend für den MyTCO-Admin, nicht für den Mitglieder-Admin; gelöscht ab dem 1.1. nach dem Turnierjahr (#71).
 - 09.11.2026: Kontaktperson im Datenkatalog nachgetragen; die Löschung eines Mitglieds leert sie am Turnier.
 - 09.11.2026: Alle Mitglieder sehen auf der Seite einer CM den Namen der Kontaktperson, die der CM-Admin unter den CM-Admins wählt (ohne E-Mail und Telefon).

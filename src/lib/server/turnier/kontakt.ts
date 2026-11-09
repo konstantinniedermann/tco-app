@@ -1,4 +1,4 @@
-// Kontaktperson eines Turniers: ein Mitglied, das gültig CM-Admin ist (aktiv, Konto nicht
+// Kontaktperson eines Turniers (FR-55): ein Mitglied, das gültig CM-Admin ist (aktiv, Konto nicht
 // gesperrt, Rolle `cm`). Eigene Datei, weil Verwaltung (turniere.ts) und Mitglieder-Ansicht
 // (cm/anmeldungen.ts) sie brauchen und sich sonst gegenseitig importieren würden.
 import { and, eq } from 'drizzle-orm';

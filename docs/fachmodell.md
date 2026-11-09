@@ -92,7 +92,7 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Turnier** | Jahr (eindeutig), Name, Anmeldeschluss (Datum), Status, erstellt am, Kontaktperson (freiwillig, ein Mitglied mit Rolle CM-Admin; Mitglieder sehen sie nur, solange sie CM-Admin ist; wählbar nach dem Anlegen); *Anmeldung offen* gilt nur bis zum Anmeldeschluss (FR-33, siehe [Lebenszyklen](#lebenszyklen)) | Kontaktperson |
+| **Turnier** | Jahr (eindeutig), Name, Anmeldeschluss (Datum), Status, erstellt am, Kontaktperson (freiwillig, ein gültiger CM-Admin nach FR-55; Mitglieder sehen sie nur, solange sie gültig ist; wählbar nach dem Anlegen); *Anmeldung offen* gilt nur bis zum Anmeldeschluss (FR-33, siehe [Lebenszyklen](#lebenszyklen)) | Kontaktperson |
 | **Turniernummer** | Nummer bei Swiss Tennis, Bezeichnung (z. B. Gruppenphase, Finalwochenende — Annahme K-25.4), Reihenfolge. Freiwillig, 0 bis n je Turnier: Swiss Tennis vergibt sie oft erst später | — |
 | **Kategorie** | Name, Geschlecht (Herren / Damen / Mixed nur im Doppel / offen), Jahrgang von–bis (Alterskategorie, nur im Einzel, je Ende optional), Einzel mit Klassierung von–bis (Klassierungsbereich) **oder** Doppel mit Mindestsumme (vorbelegt 9, Annahme K-51), Status *aktiv* / *abgesagt* | — |
 | **Anmeldung** | Kategorie, Spieler (1 im Einzel, 1–2 im Doppel), Kommentar (nur beim Wildcard-Antrag: kein eigenes Feld, sondern eine Anmeldung mit Kommentar, die als *beantragt* beginnt; höchstens 300 Zeichen), Kommentar *sucht Partner* (nur im Doppel, wenn ein Spieler allein angemeldet ist, 0–120 Zeichen), Status *bestätigt* / *beantragt* / *abgelehnt* / *zurückgezogen*, angemeldet am, Gruppe (nach Auslosung), Rang-Korrektur (optional) | Spieler, Kommentar, Kommentar *sucht Partner* |
@@ -170,6 +170,7 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 | FR-52 | Zustand *offen*/*erledigt*: Eine Nachricht des Mitglieds setzt *offen*, eine Antwort ändert ihn nicht; jeder CM-Admin setzt ihn | A-TURNIER-04 | umgesetzt |
 | FR-53 | Meldung ohne Inhalt und ohne Namen (DS-05): bei einer Nachricht des Mitglieds nur an die gültige Kontaktperson, bei einer Antwort ans Mitglied; das Mitglied sieht nie, welcher Admin antwortet | A-TURNIER-04 | umgesetzt |
 | FR-54 | Gelöscht werden die Gespräche eines Turniers ab dem 1.1. nach dem Turnierjahr (Zürich) und das Gespräch eines Mitglieds bei seiner endgültigen Löschung | A-TURNIER-04 | umgesetzt |
+| FR-55 | Kontaktperson eines Turniers kann nur sein, wer gültig CM-Admin ist: Mitglied *aktiv*, Konto nicht gesperrt, Rolle CM-Admin. Gewählt wird nur eine gültige; Mitglieder sehen sie nur, solange sie gültig ist. Wird sie ungültig (Rolle entzogen, Austritt, Konto gesperrt), bleibt die Wahl gespeichert und wirkt wieder, sobald sie gültig ist; endgültig gelöscht, bleibt das Turnier ohne Kontaktperson | A-TURNIER-01, A-TURNIER-04 | umgesetzt |
 
 ## Lebenszyklen
 

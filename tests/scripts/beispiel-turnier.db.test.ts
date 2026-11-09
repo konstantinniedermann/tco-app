@@ -184,7 +184,7 @@ describe('Beispielturnier für make seed', () => {
 		);
 	});
 
-	test('Kontaktperson: setzt sie nur, solange keine gewählt ist', async () => {
+	test('FR-55: Kontaktperson: setzt sie nur, solange keine gewählt ist', async () => {
 		const jetzt = new Date('2026-11-06T10:00:00Z');
 		await legeBeispielTurnierAn(eigene.db, jetzt);
 		const erste = await legeMitgliedAn(eigene.db, { rollen: ['cm'] });
