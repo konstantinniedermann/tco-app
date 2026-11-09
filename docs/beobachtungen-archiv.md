@@ -31,7 +31,7 @@ zwei Entscheide des Projektleiters mit offener Umsetzung und ein neuer Befund au
   Ansage nach dem Senden → [Kommentar in #71](https://github.com/konstantinniedermann/tco-app/issues/71#issuecomment-6746131994)
   mit DoD-Vorschlag; der Link verliert das Ziel auf fünf Wegen, auch nach dem Login der Mitglieder
 - 2026-11-08 — Kontaktdaten für CM- und Lizenz-Admin, Lizenz-Teil → [Kommentar in #53](https://github.com/konstantinniedermann/tco-app/issues/53#issuecomment-6746132609);
-  übriger Teil bleibt offen (Entscheid Projektleiter, siehe «Offen»)
+  übriger Teil (Konzept, Erklärung, CM-Admin) am 09.11.2026 umgesetzt im Branch `feat/kontaktdaten-cm-admin`
 
 **Mitgemacht**
 

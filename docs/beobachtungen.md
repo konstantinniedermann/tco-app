@@ -130,20 +130,6 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Verifiziert:** 09.11.2026 gegen `dev` e947d25 — belegt (`verwaltung-doppel.ts` → `loescheDoppel` ruft `anfragenVerfallen` nicht auf; `doppel.ts` → `nimmAnfrageAn` ohne Prüfung der Anmeldung des Anfragenden). Offen ist nur die Umsetzung.
 
-### 2026-11-08 — Kontaktdaten für Admins: Kreis nach Aufgabe statt «alle» (K-42 eingegrenzt)
-
-**Thema:** Datenschutz
-
-**Fundort:** `docs/rollen-und-rechte.md` (Zeile «E-Mail und Telefon anderer Mitglieder»), `docs/datenschutz.md` («Wer sieht was», CM- und Lizenz-Admin), `docs/datenschutzerklaerung.md`; `src/lib/server/cm/verwaltung.ts`, `src/lib/server/cm/verwaltung-doppel.ts` (Listen ohne E-Mail und Telefon)
-
-**Beobachtung:** Doku und Datenschutz versprechen CM- und Lizenz-Admin E-Mail und Telefon **aller** Mitglieder (K-42). Die App liefert dem CM-Admin keine Kontaktdaten; der Lizenz-Admin hat noch keine Verwaltungsfläche.
-
-**Ursprung:** Doku-Abgleich vor Release 0.17.0
-
-**Einschätzung:** **Entscheid Projektleiter (09.11.2026, Beobachtungs-Auswertung):** Mitglieder- und MyTCO-Admin sehen alle Mitgliederdaten (wie heute); der CM-Admin die Kontaktdaten der für die CM angemeldeten Mitglieder; der Lizenz-Admin die derer mit Lizenz oder Lizenzantrag. Der Datenschutz-Text wird pauschaler («Admins sehen die Daten, die sie für ihre Aufgabe brauchen»). Umsetzung offen: erst Konzept und Datenschutzerklärung, dann der CM-Teil in einem eigenen Branch; der Lizenz-Teil steht als DoD-Vorschlag in #53. K-42 in `docs/abklaerungen.md` mit dem Entscheid ergänzen.
-
-**Verifiziert:** 09.11.2026 gegen `dev` e947d25 — belegt (`cm/verwaltung.ts` → `ladeAnmeldungen` wählt nur `namensSpalten` und `spielerSpalten`; `src/lib/verwaltung/bereiche.ts` → `Bereich` ohne Lizenz). Offen ist nur die Umsetzung.
-
 ### 2026-11-09 — E2E: kein freies Turnierjahr mehr
 
 **Thema:** Tests

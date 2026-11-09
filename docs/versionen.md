@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Der CM-Admin sieht in den Anmeldelisten E-Mail und Telefon der Spieler (Anmeldungen und offene
+  Partner-Anfragen), bis zum 1.1. nach dem Turnierjahr. Datenschutz: Kontaktdaten für CM- und
+  Lizenz-Admin nach Aufgabe statt von allen (K-42 eingegrenzt).
+
 ## 0.20.2 — Beobachtungs-Auswertung: Tests verlässlicher, Doku an den Code angeglichen
 
 - Meldungen an die CM-Admins gehen nur an gültige CM-Admins (aktiv, Konto nicht gesperrt).
