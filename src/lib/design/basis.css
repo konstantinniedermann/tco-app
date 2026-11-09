@@ -1734,10 +1734,10 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		min-width: 0;
 	}
 
-	/* Ein langer Titel hinter «MyTCO» wird gekürzt, die Spalte bleibt, die Zeile einzeilig */
+	/* Ein langer Titel hinter «MyTCO» kürzt sich selbst (kein overflow hier: Fokusrahmen und Tippfläche
+	   des Wappens würden abgeschnitten), die Spalte bleibt, die Zeile einzeilig */
 	.app-rahmen > .kopf > .kopf-marke {
 		flex-wrap: nowrap;
-		overflow: hidden;
 		white-space: nowrap;
 	}
 

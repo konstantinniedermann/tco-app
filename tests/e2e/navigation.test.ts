@@ -362,6 +362,11 @@ test.describe('am PC', () => {
 		const hintergrund = (name: 'Start' | 'Profil') =>
 			reiter(page, name).evaluate((a) => getComputedStyle(a).backgroundColor);
 		expect(await hintergrund('Profil')).not.toBe(await hintergrund('Start'));
+		// Die Gruppe «Wappen + MyTCO» schneidet nichts ab: Fokusrahmen und Tippfläche des Wappens bleiben
+		await page.getByRole('link', { name: 'Zur Startseite' }).focus();
+		expect(
+			await page.locator('.kopf-marke').evaluate((e) => getComputedStyle(e).overflow)
+		).not.toBe('hidden');
 		await pruefeBildschirm(page, info, 'pc-reiter-kopfleiste');
 	});
 });
