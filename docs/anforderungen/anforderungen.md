@@ -226,7 +226,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-01062027)).
 | N-DESIGN-01 | Das Design lehnt sich an die Website tcolten.ch an, mit abgeändertem Farbkonzept zur Abgrenzung | PDF 3a | Fundament (UI-Leitbild, #13) | geplant |
 | N-DESIGN-02 | Mobile-first: zuerst fürs Handy gestaltet, funktioniert auch auf dem PC (responsive) | PDF 3a, PL | durchgehend | geplant |
 | N-DATENSCHUTZ-01 | Die Bearbeitung der Mitgliederdaten entspricht dem Schweizer Datenschutzgesetz (nDSG) | PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
-| N-DATENSCHUTZ-02 | Kontaktdaten anderer Mitglieder sind nur sichtbar, soweit der Verein es festlegt: Gegner und Doppelpartner bis zum Ende der CM (K-31), CM- und Lizenz-Admin von allen (K-42) | PDF 5d, PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
+| N-DATENSCHUTZ-02 | Kontaktdaten anderer Mitglieder sind nur sichtbar, soweit der Verein es festlegt: Gegner und Doppelpartner bis zum Ende der CM (K-31), CM-Admin von den Spielern eines Turniers bis zum 1.1. nach dem Turnierjahr, Lizenz-Admin von Mitgliedern mit Lizenz oder Lizenzantrag (K-42) | PDF 5d, PL | Fundament ([Datenschutzkonzept](../datenschutz.md), #5) | geplant |
 | N-SICHERHEIT-01 | Weitere Sicherheitsmassnahmen werden mit den zuständigen Personen festgelegt | PDF 2 | Fundament ([Sicherheitskonzept](../sicherheitskonzept.md), #6) | geplant |
 | N-BETRIEB-01 | Verfügbarkeit: MyTCO ist besonders während Anmeldephase, Gruppenspielen und Finalwochenende erreichbar; kein fester Zielwert, ein kurzer Ausfall wird in Kauf genommen (K-15) | PL | Fundament (Betrieb, #10) | geplant |
 | N-BARRIEREFREI-01 | MyTCO ist für Mitglieder jeden Alters bedienbar; Zielniveau WCAG 2.1 AA\* | PL | durchgehend | geplant |

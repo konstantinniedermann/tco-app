@@ -254,6 +254,7 @@ test('FR-48: offene Anfrage als Paar anmelden und löschen', async ({ page }, in
 	const ivo = await legeHerrnAn('Ivo', 'R4');
 	const jan = await legeHerrnAn('Jan', 'R7');
 	const kurt = await legeHerrnAn('Kurt', 'R8');
+	await setzeSpielerangaben(gian.mitgliedId, { telefon: '079 555 66 77' });
 	// Angefragt werden kann nur, wer ein Login hat.
 	await gibLogin(hugo.kontoId);
 	await gibLogin(jan.kontoId);
@@ -266,6 +267,20 @@ test('FR-48: offene Anfrage als Paar anmelden und löschen', async ({ page }, in
 	await oeffneKategorieAlsCm(page, cm, jahr);
 	const anfragen = teil(page, 'Offene Anfragen');
 	await expect(anfragen.getByRole('row')).toHaveCount(3);
+	// K-42: Der CM-Admin erreicht beide Seiten einer offenen Anfrage und den Suchenden.
+	await expect(
+		zeile(anfragen, gian.nachname).getByRole('link', { name: 'Tel. 079 555 66 77' })
+	).toHaveAttribute('href', 'tel:0795556677');
+	for (const [wo, wer, s] of [
+		[anfragen, gian.nachname, gian],
+		[anfragen, gian.nachname, hugo],
+		[teil(page, 'Sucht Partner'), kurt.nachname, kurt]
+	] as const) {
+		await expect(zeile(wo, wer).getByRole('link', { name: `E-Mail ${s.email}` })).toHaveAttribute(
+			'href',
+			`mailto:${s.email}`
+		);
+	}
 
 	// Als Paar anmelden: Die Anmeldung ist geschlossen, der CM-Admin meldet trotzdem an.
 	await waehleAktion(page, zeile(page, gian.nachname), 'Als Paar anmelden');
@@ -279,6 +294,9 @@ test('FR-48: offene Anfrage als Paar anmelden und löschen', async ({ page }, in
 	await meldetErfolg(page, 'Als Paar angemeldet.');
 	await expect(teil(page, 'Paare')).toContainText(gian.nachname);
 	await expect(teil(page, 'Paare')).toContainText(hugo.nachname);
+	await expect(
+		zeile(teil(page, 'Paare'), gian.nachname).getByRole('link', { name: `E-Mail ${hugo.email}` })
+	).toBeVisible();
 	await expect(teil(page, 'Sucht Partner')).toContainText(kurt.nachname);
 	await expect(anfragen.getByRole('row')).toHaveCount(2);
 	// Alle drei Tabellen auf einem Bildschirm.
@@ -470,6 +488,9 @@ test('PC: Anfrage mit zwei Tasten bleibt ohne «Ändern»', async ({ page }, inf
 	await meldePaarDirektAn(kategorieId, [sandro.mitgliedId, timo.mitgliedId], cm.mitgliedId);
 	await gibLogin(vito.kontoId);
 	await stelleAnfrageDirekt(kategorieId, urs.mitgliedId, vito.mitgliedId);
+	// K-42: mit Telefon und E-Mail aller Beteiligten, der breiteste Fall der Spalte «Kontakt».
+	for (const s of [sandro, timo, urs, vito])
+		await setzeSpielerangaben(s.mitgliedId, { telefon: '+41 79 123 45 67' });
 	await oeffneKategorieAlsCm(page, cm, jahr);
 
 	// Anfrage: zwei Aktionen, beide als Taste in einer Zeile.

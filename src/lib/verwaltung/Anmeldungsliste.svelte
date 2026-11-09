@@ -10,6 +10,7 @@
 	import Name from '../ui/Name.svelte';
 	import { amtlicherName } from '../name.ts';
 	import Spielersuche from './Spielersuche.svelte';
+	import Kontakt from './Kontakt.svelte';
 	import Zeilenaktionen from './Zeilenaktionen.svelte';
 	import Zeilentasten from './Zeilentasten.svelte';
 	import type { Zeilenaktion } from './zeilenaktionen.ts';
@@ -50,6 +51,8 @@
 	let { kategorieId, zeilen, turnier, nurLesen }: Props = $props();
 
 	const andere = $derived(turnier?.andere ?? []);
+	// K-42: Ab dem 1.1. nach dem Turnierjahr liefert der Server keine Kontaktdaten mehr.
+	const mitKontakt = $derived(zeilen?.some((z) => z.email || z.telefon) ?? false);
 	// Von Hand anmelden und verschieben gehen erst, wenn das Turnier nicht mehr in Vorbereitung ist.
 	const offen = $derived(turnier !== null && !turnier.vorbereitung);
 
@@ -258,7 +261,9 @@
 				<table>
 					<thead>
 						<tr>
-							<th>Name</th><th>Klassierung</th><th>Geschlecht</th><th>Jahrgang</th><th>Status</th>
+							<th>Name</th>{#if mitKontakt}<th>Kontakt</th>{/if}<th>Klassierung</th><th
+								>Geschlecht</th
+							><th>Jahrgang</th><th>Status</th>
 							{#if !nurLesen}<th>Aktionen</th>{/if}
 						</tr>
 					</thead>
@@ -282,6 +287,9 @@
 										{/if}
 									</div>
 								</td>
+								{#if mitKontakt}
+									<td><Kontakt telefon={z.telefon} email={z.email} /></td>
+								{/if}
 								<td>
 									{#if z.klassierung}
 										{klassierungName(z.klassierung)}

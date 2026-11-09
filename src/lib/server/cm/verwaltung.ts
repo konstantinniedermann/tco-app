@@ -6,6 +6,7 @@ import { warnungenEinzel, type Spieler } from '../../turnier/passung.ts';
 import { wirksamerStatus } from '../../turnier/status.ts';
 import { maskiere, type MitgliedStatus } from '../admin/mitglieder.ts';
 import { schreibeVerlauf, type Eintrag } from '../admin/verlauf.ts';
+import { jahrInZuerich } from '../datum.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { anmeldung, anmeldungSpieler, kategorie, mitglied, turnier } from '../db/schema.ts';
 import { namensSpalten, nameEnthaelt } from '../namen.ts';
@@ -33,7 +34,24 @@ export type AnmeldungZeile = {
 	geschlecht: 'w' | 'm' | null;
 	jahrgang: number | null;
 	klassierung: Klassierung | null;
+	/** K-42: nur bis zum 1.1. nach dem Turnierjahr (`kontaktSichtbar`), sonst `null`. */
+	email: string | null;
+	telefon: string | null;
 };
+
+/**
+ * K-42: Der CM-Admin sieht E-Mail und Telefon der Spieler eines Turniers (aktive Anmeldung oder
+ * offene Partner-Anfrage) bis zum 1.1. nach dem Turnierjahr (Schweizer Kalenderzeit), auch nach
+ * Austritt oder Löschvormerkung; die Löschung leert sie ohnehin.
+ */
+export const kontaktSichtbar = (turnierjahr: number, jetzt: Date) =>
+	turnierjahr >= jahrInZuerich(jetzt);
+
+/** Kontaktdaten für die Listen des CM-Admins, ausserhalb der Frist leer. */
+export const kontaktFuerCm = (
+	m: { email: string | null; telefon: string | null },
+	sichtbar: boolean
+) => (sichtbar ? { email: m.email, telefon: m.telefon } : { email: null, telefon: null });
 
 export type SpielerTreffer = {
 	mitgliedId: number;
@@ -86,8 +104,15 @@ const nameUndAngaben = (z: {
 	...spielerAus(z)
 });
 
-/** A-ANMELDUNG-06: aktive Anmeldungen einer Einzel-Kategorie (bestätigt und beantragt). */
-export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<AnmeldungZeile[]> {
+/**
+ * A-ANMELDUNG-06: aktive Anmeldungen einer Einzel-Kategorie (bestätigt und beantragt), mit
+ * Kontaktdaten bis zum 1.1. nach dem Turnierjahr (K-42).
+ */
+export async function ladeAnmeldungen(
+	db: Db,
+	kategorieId: number,
+	jetzt: Date
+): Promise<AnmeldungZeile[]> {
 	const zeilen = await db
 		.select({
 			anmeldungId: anmeldung.id,
@@ -95,6 +120,9 @@ export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<Anme
 			kommentar: anmeldung.kommentar,
 			mitgliedId: mitglied.id,
 			mitgliedStatus: mitglied.status,
+			email: mitglied.email,
+			telefon: mitglied.telefon,
+			turnierjahr: turnier.jahr,
 			...namensSpalten,
 			...spielerSpalten
 		})
@@ -102,6 +130,7 @@ export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<Anme
 		.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
 		.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId))
 		.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
+		.innerJoin(turnier, eq(turnier.id, kategorie.turnierId))
 		.where(and(eq(anmeldung.kategorieId, kategorieId), eq(kategorie.art, 'einzel'), istAktiv))
 		.orderBy(...namensfolge);
 	return zeilen.map((z) => ({
@@ -110,7 +139,8 @@ export async function ladeAnmeldungen(db: Db, kategorieId: number): Promise<Anme
 		kommentar: z.kommentar,
 		mitgliedId: z.mitgliedId,
 		mitgliedStatus: z.mitgliedStatus as MitgliedStatus,
-		...nameUndAngaben(z)
+		...nameUndAngaben(z),
+		...kontaktFuerCm(z, kontaktSichtbar(z.turnierjahr, jetzt))
 	}));
 }
 

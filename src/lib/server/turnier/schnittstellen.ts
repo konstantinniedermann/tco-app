@@ -242,7 +242,7 @@ export function getAnmeldungen(d: AdminDienste, e: AdminEreignis): Promise<Respo
 		const id = parseId(e.params.id);
 		const k = id === null ? null : await ladeKategorie(d.db, id);
 		if (id === null || !k) return nichtGefunden();
-		return antwort(200, await ladeAnmeldungen(d.db, id));
+		return antwort(200, await ladeAnmeldungen(d.db, id, jetzt(d)));
 	});
 }
 
@@ -344,7 +344,7 @@ export function postAnmeldungLoeschen(
 export function getDoppel(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	return liest(d, e, 'cm', async () => {
 		const id = parseId(e.params.id);
-		const r = id === null ? null : await ladeDoppel(d.db, id);
+		const r = id === null ? null : await ladeDoppel(d.db, id, jetzt(d));
 		return r ? antwort(200, r) : nichtGefunden();
 	});
 }

@@ -143,7 +143,12 @@ export async function legeOffenesTurnierAn(
 /** Setzt die CM-Angaben eines erfundenen Mitglieds (FR-37); nicht genannte bleiben, wie sie sind. */
 export async function setzeSpielerangaben(
 	mitgliedId: number,
-	angaben: Partial<{ geschlecht: 'w' | 'm'; jahrgang: number; klassierung: Klassierung }>
+	angaben: Partial<{
+		geschlecht: 'w' | 'm';
+		jahrgang: number;
+		klassierung: Klassierung;
+		telefon: string;
+	}>
 ): Promise<void> {
 	await hole().db.update(mitglied).set(angaben).where(eq(mitglied.id, mitgliedId));
 }
