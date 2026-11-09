@@ -95,9 +95,14 @@ export function sammleKonsolenfehler(page: Page): string[] {
 /**
  * Wartet, bis kurze Bewegungen (UI-09) fertig sind: CSS-Übergänge wie das Einblenden der
  * Rückfrage und Seitenwechsel. Mitten im Einblenden misst axe sonst zu wenig Kontrast.
- * Die Anleitung (CSS-Animationen, mehrere Sekunden) zählt nicht dazu.
+ * Die Anleitung (CSS-Animationen, mehrere Sekunden) zählt nicht dazu. Zuerst drei Bilder
+ * abwarten: Ein Übergang, den das letzte Scrollen erst auslöst (Titel in der Kopfleiste:
+ * Beobachter, dann Svelte, dann Stil), gibt es sonst noch nicht, wenn gesammelt wird.
  */
 async function wartetAufRuhe(page: Page): Promise<void> {
+	await page.evaluate(async () => {
+		for (let i = 0; i < 3; i++) await new Promise((weiter) => requestAnimationFrame(weiter));
+	});
 	await page.evaluate(() =>
 		Promise.all(
 			document
