@@ -65,7 +65,7 @@ Alle Paare von Text und Hintergrund erfüllen mindestens WCAG AA (gemessen).
 | `--farbe-marke-hover` | `#187a5c` | Hover eines nicht aktiven Reiters in der Kopfleiste (PC), etwas heller als `--farbe-marke` | Weiss 5.3 : 1 |
 | `--farbe-marke-dunkel` | `#0b5640` | Seitenleiste der Verwaltung | Weiss 8.7 : 1 |
 | `--farbe-marke-hell` | `#cde3b9` | Wappen auf Grün, Bereichstitel der Verwaltung | auf marke-dunkel 6.3 : 1 |
-| `--farbe-marke-zart` | `#e3efdc` | Plakette *aktiv*, Tabellenkopf | marke darauf 5.5 : 1 |
+| `--farbe-marke-zart` | `#e3efdc` | Plakette *aktiv*, Tabellenkopf, aktiver Reiter am PC | marke darauf 5.5 : 1 |
 | `--farbe-aktion` | `#a84f1f` | nur die Haupttaste (UI-04), Hervorhebung „Jetzt aktuell", Tipp-Kreis der Anleitung (sagt wie die Haupttaste „hier tippen") | Weiss 5.5 : 1 |
 | `--farbe-aktion-dunkel` | `#8c4018` | Haupttaste gedrückt | Weiss 7.3 : 1 |
 | `--farbe-flaeche` | `#ffffff` | Karten, Eingabefelder, Reiter | — |
