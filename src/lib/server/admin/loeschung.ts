@@ -11,7 +11,8 @@ import {
 	konto,
 	mitglied,
 	mitteilung,
-	partnerAnfrage
+	partnerAnfrage,
+	turnier
 } from '../db/schema.ts';
 import type { MitgliedStatus } from './mitglieder.ts';
 import { loeschtAm } from './mitgliedschaft.ts';
@@ -98,6 +99,10 @@ async function loescheKonten(tx: DbOderTx, jetzt: Date) {
 		.where(inArray(aenderung.urheberMitgliedId, ids));
 	await tx.update(anlass).set({ erstelltVon: null }).where(inArray(anlass.erstelltVon, ids));
 	await tx.update(mitteilung).set({ absenderId: null }).where(inArray(mitteilung.absenderId, ids));
+	await tx
+		.update(turnier)
+		.set({ kontaktMitgliedId: null })
+		.where(inArray(turnier.kontaktMitgliedId, ids));
 	// 2. Konto (mit Sitzungen, Passkeys, Rollen, Push-Abos), Antworten und eigener Verlauf. Von
 	// den CM-Anmeldungen bleibt nur der Name: ohne Wildcard-Begründung und ohne Kommentar *sucht
 	// Partner*; offene Partner-Anfragen von und an die Gelöschten sind weg.

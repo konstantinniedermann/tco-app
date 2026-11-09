@@ -29,6 +29,7 @@ import {
 } from '../db/schema.ts';
 import { erstelleSitzung } from '../login/sitzung.ts';
 import { ladeVerlauf as ladeMitteilungsverlauf } from '../mitteilung/verlauf.ts';
+import { ladeTurnier } from '../turnier/turniere.ts';
 import { raeumeAuf, type Loeschlauf } from './loeschung.ts';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
 import type { MitgliedStatus } from './mitglieder.ts';
@@ -326,11 +327,21 @@ describe('Konto löschen', () => {
 		]);
 	});
 
-	test('Review-Fokus 4: Urheber, Ersteller und Absender geleert, Ladeseiten laden weiter', async () => {
+	test('Review-Fokus 4: Urheber, Ersteller, Absender und Kontaktperson geleert, Ladeseiten laden weiter', async () => {
 		const austritt = new Date('2026-11-07T08:00:00Z');
 		const m = await ausgetreten(austritt);
 		const anderer = await legeMitgliedAn(db, { nachname: 'Bleibt', vorname: 'Beat' });
 		const jetzt = await frist(m.mitgliedId);
+		const [t] = await db
+			.insert(turnier)
+			.values({
+				jahr: 2027,
+				name: 'Clubmeisterschaft',
+				anmeldeschluss: '2027-06-30',
+				status: 'vorbereitung',
+				kontaktMitgliedId: m.mitgliedId
+			})
+			.returning({ id: turnier.id });
 		await schreibeVerlauf(
 			db,
 			anderer.mitgliedId,
@@ -365,6 +376,12 @@ describe('Konto löschen', () => {
 			(await db.select().from(anlass).where(eq(anlass.id, anlassId)))[0].erstelltVon
 		).toBeNull();
 		expect((await db.select().from(mitteilung))[0].absenderId).toBeNull();
+		expect(
+			(await db.select().from(turnier).where(eq(turnier.id, t.id)))[0].kontaktMitgliedId
+		).toBeNull();
+		const turnierSeite = await ladeTurnier(db, t.id, jetzt);
+		expect(turnierSeite?.kontakt).toBeNull();
+		expect(JSON.stringify(turnierSeite)).not.toContain(NACHNAME);
 
 		const anlassSeite = await ladeAnlassAdmin(db, anlassId);
 		expect(anlassSeite).not.toBeNull();
