@@ -59,7 +59,7 @@ Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelhei
 Datenschutzerklärung ohne Login, Profil mit E-Mail-Wechsel und Rufname, Benachrichtigungen, Anlässe,
 Mitteilungen, Verwaltung mit Rollen, Einlesen einer Datei, Briefe einzeln und als Serie mit Druckansicht, Austritt,
 Löschen und Auskunft, Turnier und Kategorien,
-CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, Doppel mit Partner-Anfragen und Doppel-Verwaltung durch den CM-Admin, Seite einer Kategorie, Navigation und Tiefe der Seiten, Titel in der Kopfleiste, Verwaltung am PC (klebender Seitenkopf, einzeilige Tabellen mit «Ändern»), dazu Bedienung (Wappen,
+CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, Doppel mit Partner-Anfragen und Doppel-Verwaltung durch den CM-Admin, Kontaktdaten in den Anmeldelisten, Gespräch mit der Turnierleitung, Seite einer Kategorie, Navigation und Tiefe der Seiten, Titel in der Kopfleiste, Verwaltung am PC (klebender Seitenkopf, einzeilige Tabellen mit «Ändern»), dazu Bedienung (Wappen,
 Statusleiste, Fusszeile, Fokusrahmen). Später *Daten ergänzen* beim ersten Login (FR-02, noch
 geplant).
 

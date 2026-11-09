@@ -58,6 +58,10 @@ classDiagram
     PushAbo "*" --> "1" Sitzung
     Anlass "0..1" o-- "*" Mitteilung
     Mitteilung "*" --> "0..1" Mitglied : von
+    Turnier "1" *-- "*" Gespraech
+    Gespraech "*" --> "1" Mitglied
+    Gespraech "1" *-- "1..*" Nachricht
+    Nachricht "*" --> "0..1" Mitglied : antwortender Admin
 ```
 
 `AnlassAnmeldung` ist im Diagramm die *Anmeldung (Anlass)*, zur Unterscheidung von der
@@ -98,7 +102,7 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 | **Anmeldung** | Kategorie, Spieler (1 im Einzel, 1–2 im Doppel), Kommentar (nur beim Wildcard-Antrag: kein eigenes Feld, sondern eine Anmeldung mit Kommentar, die als *beantragt* beginnt; höchstens 300 Zeichen), Kommentar *sucht Partner* (nur im Doppel, wenn ein Spieler allein angemeldet ist, 0–120 Zeichen), Status *bestätigt* / *beantragt* / *abgelehnt* / *zurückgezogen*, angemeldet am, Gruppe (nach Auslosung), Rang-Korrektur (optional) | Spieler, Kommentar, Kommentar *sucht Partner* |
 | **Partner-Anfrage** | Kategorie, von (Mitglied), an (Mitglied), gestellt am; höchstens eine offene Anfrage je Anfragendem und Kategorie, nicht an sich selbst. Erledigte Anfragen werden gelöscht (FR-48) | von, an |
 | **Gespräch** | Turnier, Mitglied, Zustand *offen* / *erledigt*, zuletzt geöffnet vom Mitglied, Zeit der letzten Nachricht; höchstens eines je Mitglied und Turnier (FR-50) | Turnier, Mitglied |
-| **Nachricht** | Gespräch, von (Mitglied oder Turnierleitung), bei der Turnierleitung der antwortende CM-Admin, Text (1–1000 Zeichen), gesendet am; nicht änderbar (FR-50) | antwortender Admin |
+| **Nachricht** | Gespräch, von (Mitglied oder Turnierleitung), bei der Turnierleitung der antwortende CM-Admin, Text (1–1000 Zeichen), gesendet am; nicht änderbar (FR-50) | Text, antwortender Admin |
 | **Gruppe** | Kategorie, Name, Turniernummer. Die Rangliste wird aus den Resultaten berechnet, nicht gespeichert | — |
 | **KoTableau** | Kategorie, Grösse (Anzahl Positionen), Turniernummer. Kommt aus Advantage | — |
 | **Spiel** | Gruppe *oder* KoTableau mit Runde (z. B. Viertelfinal) und Position, Anmeldung A und B (im KO leer, bis bekannt), Folgespiel (nur KO) | — (über die Anmeldung) |
