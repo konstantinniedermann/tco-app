@@ -11,6 +11,7 @@ import {
 	legeKontoMitBriefCodeAn,
 	legeOffenesTurnierAn,
 	legeRollenkontoMitBriefCodeAn,
+	meldeZurCmAn,
 	schliesseLoginHilfen,
 	setzeSpielerangaben,
 	warteAufMail
@@ -437,6 +438,15 @@ test('PC: Anmeldungen einzeilig, Aktionen über «Ändern»', async ({ page }, i
 		.concat('.');
 	expect(kommentar).toHaveLength(200);
 	await beantrageWildcardDirekt(kategorieId, spieler.mitgliedId, kommentar);
+	// Ein langer Name (erfunden): Er kürzt sich in der Namensspalte statt die Zeile zu verbreitern.
+	const langname = `Lang${randomUUID().slice(0, 6)}-Vonderweid-Hochstrasser-Bürgisser-Zimmerli`;
+	const lang = await legeKontoAn('Annemarie-Josefine', langname);
+	await setzeSpielerangaben(lang.mitgliedId, {
+		geschlecht: 'm',
+		jahrgang: 1975,
+		klassierung: 'R5'
+	});
+	await meldeZurCmAn(kategorieId, lang.mitgliedId);
 	const cm = await legeCmMitBriefCodeAn('Cyrill');
 	await oeffneKategorieAlsCm(page, cm, turnier, 'Herren R1–R6');
 
@@ -444,9 +454,27 @@ test('PC: Anmeldungen einzeilig, Aktionen über «Ändern»', async ({ page }, i
 	const taste = z.getByRole('button', { name: 'Ändern', exact: true });
 	await expect(z.getByRole('button')).toHaveCount(1);
 	await expect(taste).toBeVisible();
+	// Bei 1280 Breite scrollt weder die Seite noch die Tabelle zur Seite; «Ändern» liegt ganz im Bild.
+	expect(page.viewportSize()?.width).toBe(1280);
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+		true
+	);
+	const tabelle = page.locator('.tabelle').filter({ has: z });
+	expect(await tabelle.evaluate((e) => e.scrollWidth <= e.clientWidth)).toBe(true);
+	// Nur senkrecht zur Tabelle scrollen: waagrecht muss «Ändern» ohne Scrollen im Bild liegen.
+	await tabelle.evaluate((e) => window.scrollBy(0, e.getBoundingClientRect().top - 200));
+	expect(await page.evaluate(() => window.scrollX)).toBe(0);
+	await expect(taste).toBeInViewport({ ratio: 1 });
+	const zLang = zeile(page, langname);
+	await expect(zLang.getByRole('button', { name: 'Ändern', exact: true })).toBeInViewport({
+		ratio: 1
+	});
+	const name = zLang.locator('[id^="anmeldung-"]');
+	expect(await name.evaluate((e) => e.getClientRects().length)).toBe(1);
+	expect(await name.evaluate((e) => e.scrollWidth > e.clientWidth)).toBe(true);
 	expect((await z.boundingBox())?.height).toBeLessThanOrEqual(72);
 	// Der Kommentar steht gekürzt in einer Zeile.
-	const hinweis = z.locator('.zelle-kurz');
+	const hinweis = z.locator('.zelle-kurz', { hasText: 'Ich spiele seit Jahren' });
 	await expect(hinweis).toHaveCount(1);
 	expect(await hinweis.evaluate((e) => e.getClientRects().length)).toBe(1);
 	expect(await hinweis.evaluate((e) => e.scrollWidth > e.clientWidth)).toBe(true);

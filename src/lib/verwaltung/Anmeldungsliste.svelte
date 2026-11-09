@@ -8,6 +8,7 @@
 	import { tick } from 'svelte';
 	import { refreshAll } from '$app/navigation';
 	import Name from '../ui/Name.svelte';
+	import { amtlicherName } from '../name.ts';
 	import Spielersuche from './Spielersuche.svelte';
 	import Zeilenaktionen from './Zeilenaktionen.svelte';
 	import Zeilentasten from './Zeilentasten.svelte';
@@ -268,13 +269,18 @@
 							{@const aktionen = aktionenVon(z)}
 							<tr>
 								<td>
-									<span id="anmeldung-{z.anmeldungId}"
-										><Name name={z.name} form="nachname-zuerst" /></span
-									>
-									{#if vermerk}<span class={vermerk.klasse}>{vermerk.text}</span>{/if}
-									{#if z.kommentar}
-										<span class="leise zelle-kurz" title={z.kommentar}>{z.kommentar}</span>
-									{/if}
+									<div class="zelle-dehnbar">
+										<span
+											id="anmeldung-{z.anmeldungId}"
+											class="zelle-kurz"
+											title={amtlicherName(z.name, 'nachname-zuerst')}
+											><Name name={z.name} form="nachname-zuerst" /></span
+										>
+										{#if vermerk}<span class={vermerk.klasse}>{vermerk.text}</span>{/if}
+										{#if z.kommentar}
+											<span class="leise zelle-kurz" title={z.kommentar}>{z.kommentar}</span>
+										{/if}
+									</div>
 								</td>
 								<td>
 									{#if z.klassierung}

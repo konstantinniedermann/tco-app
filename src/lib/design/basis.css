@@ -1967,6 +1967,29 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		vertical-align: bottom;
 	}
 
+	/* Spalte mit Name und Kommentar: nimmt die übrige Breite (width: 100%) und zählt mit
+	   max-width: 0 nicht zur Mindestbreite der Tabelle; Name und Kommentar kürzen sich darin,
+	   Plaketten bleiben ganz */
+	.tabelle td:has(> .zelle-dehnbar) {
+		width: 100%;
+		max-width: 0;
+	}
+
+	.zelle-dehnbar {
+		display: flex;
+		align-items: baseline;
+		gap: var(--abstand-2);
+	}
+
+	.zelle-dehnbar > * {
+		flex: none;
+	}
+
+	.zelle-dehnbar > .zelle-kurz {
+		flex: 0 1 auto;
+		min-width: 0;
+	}
+
 	.spalten {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
@@ -1974,9 +1997,11 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		align-items: start;
 	}
 
+	/* minmax(0, 1fr): der Inhalt darf schmaler werden als sein Mindestinhalt (breite Tabelle),
+	   sonst scrollt die ganze Seite zur Seite */
 	.verwaltung {
 		display: grid;
-		grid-template-columns: 15rem 1fr;
+		grid-template-columns: 15rem minmax(0, 1fr);
 	}
 
 	/* Kopfleiste und Seitenleiste stehen beim Scrollen des Inhalts, volle Bildschirmhöhe. Was

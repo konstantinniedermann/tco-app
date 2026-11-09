@@ -137,11 +137,23 @@ async function wartetAufRuhe(page: Page): Promise<void> {
 	);
 }
 
-/** UI-01: jeder Bildschirm ohne axe-Verstösse; dazu ein Screenshot als Nachweis. */
+/**
+ * UI-01: jeder Bildschirm ohne axe-Verstösse; dazu ein Screenshot als Nachweis. Am PC scrollt
+ * dazu keine Seite zur Seite (UI-Leitbild, Baustein Tabelle: einzeilig, ohne Seitwärtsscrollen).
+ */
 export async function pruefeBildschirm(page: Page, info: TestInfo, name: string): Promise<void> {
 	await wartetAufRuhe(page);
 	const axe = await new AxeBuilder({ page }).analyze();
 	expect(axe.violations, name).toEqual([]);
+	if (info.project.name === 'desktop') {
+		const breite = await page.evaluate(() => ({
+			seite: document.documentElement.scrollWidth,
+			fenster: window.innerWidth
+		}));
+		expect(breite.seite, `${name}: Seite breiter als das Fenster`).toBeLessThanOrEqual(
+			breite.fenster
+		);
+	}
 	screenshotLaeuft.add(page);
 	try {
 		await rolleAus(page, true);
