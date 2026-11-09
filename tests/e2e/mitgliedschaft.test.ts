@@ -58,7 +58,7 @@ async function oeffneVerwaltung(page: Page) {
 	return admin;
 }
 
-test('FR-04: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in der Verwaltung', async ({
+test('FR-04, A-MITGLIED-03: Austritt, Wiedereintritt, Vormerken, Rückgängig und Auskunft in der Verwaltung', async ({
 	page
 }, info) => {
 	// Langer Ablauf (vier Zustände, sechs Bildschirmprüfungen, Auskunft und Druckansicht): unter

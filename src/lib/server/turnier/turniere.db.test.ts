@@ -147,7 +147,7 @@ describe('Turniere', () => {
 	});
 });
 
-describe('Kontaktperson', () => {
+describe('FR-55: Kontaktperson', () => {
 	test('speichert einen CM-Admin als Kontakt, ladeTurnier zeigt ihn gültig', async () => {
 		const admin = await legeMitgliedAn(db, {
 			vorname: 'Kontakta',

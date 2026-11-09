@@ -8,6 +8,16 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.2 — Beobachtungs-Auswertung: Tests verlässlicher, Doku an den Code angeglichen
+
+- Meldungen an die CM-Admins gehen nur an gültige CM-Admins (aktiv, Konto nicht gesperrt).
+- Änderungsverlauf eines Mitglieds: Der Pfad steht sofort da, ohne zweiten Abruf.
+- Eine Überschrift zuoberst in einer Karte hat oben keinen zusätzlichen Abstand mehr.
+- Tests: E2E-Mails über 127.0.0.1, eigene Turnierjahre je Datei, Login-Tests warten auf das
+  Vorladen, längere Zeitgrenze für DB-Tests mit eigener Datenbank.
+- Doku: neue Fachregel FR-55 (gültige Kontaktperson); Zusagen zur Auskunft im Verlauf und zum
+  Rufnamen der Kontaktperson präzisiert; gebaute Anforderungen auf «umgesetzt».
+
 ## 0.20.1 — Zeitgrenze für einen langen E2E-Test
 
 - E2E: Der Ablauf Austritt, Wiedereintritt und Auskunft (FR-04) hat unter WebKit in der CI mehr Zeit.

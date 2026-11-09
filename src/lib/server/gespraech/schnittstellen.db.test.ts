@@ -1,7 +1,10 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
-import { legeEigeneDatenbankAn } from '../../../../tests/hilfen/eigene-datenbank.ts';
+import {
+	legeEigeneDatenbankAn,
+	ZEIT_EIGENE_DB
+} from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { ERLAUBT_IN_ANSICHT, riegel } from '../admin/ansicht.ts';
 import { erstelleZugangDienst } from '../admin/zugang.ts';
@@ -468,18 +471,22 @@ describe('A-TURNIER-04 Schnittstellen zum Gespräch', () => {
 		expect([r.status, await r.json()]).toEqual([403, { fehler: 'nur-ansehen' }]);
 	});
 
-	test('FR-52, A-TURNIER-04: getSitzung zählt offene Gespräche nur bei wirksamer Rolle cm', async () => {
-		// Die Zahl ist global und die gemeinsame Datenbank wird parallel beschrieben: eigene Datenbank.
-		const eigene = await legeEigeneDatenbankAn('gespraech_sitzung');
-		const gemeinsame = db;
-		db = eigene.db;
-		try {
-			await pruefeSitzungsZahl();
-		} finally {
-			db = gemeinsame;
-			await eigene.abbauen();
+	test(
+		'FR-52, A-TURNIER-04: getSitzung zählt offene Gespräche nur bei wirksamer Rolle cm',
+		ZEIT_EIGENE_DB,
+		async () => {
+			// Die Zahl ist global und die gemeinsame Datenbank wird parallel beschrieben: eigene Datenbank.
+			const eigene = await legeEigeneDatenbankAn('gespraech_sitzung');
+			const gemeinsame = db;
+			db = eigene.db;
+			try {
+				await pruefeSitzungsZahl();
+			} finally {
+				db = gemeinsame;
+				await eigene.abbauen();
+			}
 		}
-	});
+	);
 
 	test('FR-52, A-TURNIER-04: CM-Ansicht, Turnierliste und Verwaltung tragen die Gesprächsfelder', async () => {
 		const a = await aufbau();

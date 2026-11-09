@@ -7,6 +7,127 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Auswertung vom 09.11.2026 — 21 Einträge, gegen `dev` (e947d25) verifiziert
+
+Bilanz je Eintrag: 0 ganz verworfen · 7 abgehakt (1 davon nicht mehr reproduzierbar) · 8 mitgemacht (1 davon überholt) ·
+3 Doku · 1 entschieden mit Umsetzung offen · 2 auf mehrere Ausgänge verteilt (#59-Rest, Gespräch) · kein
+neues Issue. Bei 16 trug die Begründung ganz oder teilweise nicht (Tabelle unten). Nachweis: `make check`
+grün (1814 Unit-/DB-Tests, 414 E2E), Bildvergleich vor und nach der Karten-Regel. Abschnitt «Offen» danach:
+zwei Entscheide des Projektleiters mit offener Umsetzung und ein neuer Befund aus der Verifikation.
+
+**Verworfen** (Teile)
+
+- 2026-11-08 — Status «geplant» ohne Test-ID, Teil A-LOGIN-01 → sechs Testdateien nennen die ID, z. B.
+  `src/lib/server/brief/brief.test.ts` («A-LOGIN-01: Brief enthält Code als zwei Fünfergruppen…»);
+  sie steht ausserdem in der Release-Checkliste. «geplant» bleibt, bis die Briefe verschickt sind (#48)
+- 2026-11-09 — #69-Test rot mit bewegung, vermutete Ursache «gemeinsamer Zustand» → `bewegung.test.ts`
+  legt kein Turnier an und ruft `/api/cm` nicht auf; jeder Lauf hat seine eigene Datenbank (`scripts/e2e.ts`)
+- 2026-11-09 — Kontaktperson ohne Fachregel, Vorschlag «FR-50» → FR-50 hat #71 vergeben (674fe10); die
+  Regel ist FR-55
+
+**An Issues angehängt**
+
+- 2026-11-09 — Gespräch Turnierleitung, Punkte «erledigt» ohne Prüfung, Meldungslink ohne Ziel, keine
+  Ansage nach dem Senden → [Kommentar in #71](https://github.com/konstantinniedermann/tco-app/issues/71#issuecomment-6746131994)
+  mit DoD-Vorschlag; der Link verliert das Ziel auf fünf Wegen, auch nach dem Login der Mitglieder
+- 2026-11-08 — Kontaktdaten für CM- und Lizenz-Admin, Lizenz-Teil → [Kommentar in #53](https://github.com/konstantinniedermann/tco-app/issues/53#issuecomment-6746132609);
+  übriger Teil bleibt offen (Entscheid Projektleiter, siehe «Offen»)
+
+**Mitgemacht**
+
+- 2026-11-08 — Kopfkommentar `doppel-meldung.ts` widerspricht DS-05 → b001aa9
+- 2026-11-08 — Status «geplant» bei gebauten Anforderungen → a29b1fd (A-MITGLIED-03, FR-11, RR-05
+  umgesetzt; RR-06 umgesetzt für Anmeldungen; IDs in bestehenden Testnamen; Gegenprobe ohne FR-11 rot)
+- 2026-11-08 — testgruppe.md: Brief-Code noch offen → überholt (gebaut mit 0.13.0); 78e625e präzisiert
+  den Punkt, abgehakt wird er nach dem Druck aus Safari
+- 2026-11-08 — Änderungsverlauf zeigt den Pfad erst nach zweitem Abruf → e94b689 (Name aus den
+  Verlaufszeilen, Pfad sofort mit «Mitglied»)
+- 2026-11-09 — `cmAdmins` zählt Ausgetretene mit → eb925d7 (`gueltigerCmAdmin`; Test zuerst rot)
+- 2026-11-09 — E2E-Mails scheitern bei «localhost» → 01917ed (`127.0.0.1` in `umgebung.ts` und
+  `.env.example`); Memory angepasst
+- 2026-11-09 — A-LOGIN-09 auf dem iPhone rot → 55715d0 (`wartetAufVorladen` in `meldeMitBriefAn`,
+  gilt auch für SI-07)
+- 2026-11-09 — Überschrift zuoberst in einer Karte hat Abstand oben → 52cc2d2 (erst Leitbild, dann
+  `.karte > h2:first-child`; Bildvergleich «cm-angaben», «login»)
+- Gespräch (7), DB-Tests mit eigener Datenbank gegen 5 s → d83cb8d (`ZEIT_EIGENE_DB`, vier Tests)
+- Nebenbefund — `navigation.test.ts` und `cm-doppel-verwaltung.test.ts` teilten die Turnierjahre
+  2071–2074 → 0f9af9f
+- Nebenbefund — CSS-Kommentar «60em» über einer `60rem`-Regel → 52cc2d2
+
+**Doku**
+
+- 2026-11-08 — Auskunft schreibt einen Verlaufseintrag auch lesend und in «Ansicht als …» → 1b063a4,
+  Entscheid Projektleiter: Zusage präzisiert (SI-20, Rechte-Matrix, Datenschutz, Code-Kommentar). Betrifft
+  nur die Ansicht `mitglieder`; `cm` und `lizenz` dürfen die Auskunft gar nicht lesen
+- 2026-11-09 — Kontaktperson ohne Fachregel → 1b063a4 (FR-55, Turnier-Zeile im Fachmodell, Datenschutz,
+  14 Tests tragen die ID)
+- 2026-11-09 — Kontaktperson: Schnittstelle liefert den Rufnamen → 1b063a4, Entscheid Projektleiter:
+  Zusage präzisiert («Name und Rufname»)
+
+**Abgehakt** — mit Begründung; wo der Punkt zurückkommen kann, mit Trigger
+
+- 2026-11-08 — Restbefunde #59 Etappe 2, ohne die Löschfrage → `angemeldetAm` nach *Partner ändern*
+  sortiert heute nichts (die Auskunft zeigt das Datum des Wechsels); «A oder B» bei der Warnung, Testlücken,
+  Umleitung vor dem Stand-Vergleich harmlos; `DoppelListe.svelte` hat 704 Zeilen, davon ~310 für acht
+  Aktionsdialoge. Trigger: nächster Umbau der Doppel-Verwaltung
+- 2026-11-08 — Einzel-Liste auf Aktionsdialog umstellen → Entscheid Projektleiter: abhaken. Dabei
+  gefunden: Wechselt die Wahl, während eine Anfrage läuft, kann «Trotzdem anmelden» die neue Wahl ohne
+  deren Warnung anmelden (aus dem Quelltext). Trigger: nächster Eingriff in `Anmeldungsliste.svelte`
+- 2026-11-08 — CM-Seite bei Störung von `/api/cm`, doppelter Abruf → Umleitung auf dieselbe Seite nur,
+  wenn der zweite Abruf gelingt; dazu: Der Zurück-Link einer CM aus einem Vorjahr kann zu einer anderen
+  laufenden CM führen. Trigger: Umbau der CM-Seite (CM-Betrieb)
+- 2026-11-08 — Elternseite nur als Zeichenkette typisiert → die E2E klicken alle fünf Elternziele an; ein
+  Tippfehler fiele vor dem Merge auf. Trigger: ein Elternziel ohne E2E kommt dazu
+- 2026-11-08 — Breiter Pfad kürzt die aktuelle Stufe → kosmetisch. Trigger: echte Namen nach dem
+  Fairgate-Import (#46) stören
+- Nebenbefund (CAS-Review) — Turnierformular nennt jede ungültige Kontaktperson «nicht mehr
+  CM-Admin», auch bei Austritt oder gesperrtem Konto (`src/lib/verwaltung/Turnierformular.svelte`,
+  `ehemalig`) → kein Test zeigt den Text. Trigger: das Turnierformular wird angefasst, dann «nicht mehr
+  wählbar» und ein E2E-Fall
+- Nebenbefund (CAS-Review) — SI-20 «Auskunft auch in der Ansicht im Verlauf» ohne eigenen Test (der
+  nur lesende MyTCO-Admin ist in `auskunft.db.test.ts` belegt) → folgt aus `mitRolle`. Trigger: die
+  «Ansicht als …» wird umgebaut
+- 2026-11-09 — Restbefunde CM-Übersicht → Paare als Text, E2E «Kontaktperson verliert die Rolle»
+  (die Lücke liegt seit #71 in `cm-gespraech.test.ts`), Screenshot mit langem Namen. Trigger: Umbau
+  der Seite einer Kategorie
+- 2026-11-09 — #69-Test rot, wenn navigation und bewegung zusammen laufen → nicht mehr
+  reproduzierbar: derselbe Befehl grün (69 Tests), auch im Kontrolllauf mit der alten Adresse
+  `smtp://localhost`. Ursache offen; das Netz antwortet heute auf «localhost» mit `ENOTFOUND` statt
+  `SERVFAIL`, die Mail-Hypothese ist darum weder bestätigt noch widerlegt. Trigger: wieder rot, dann
+  zuerst den Trace mit Netzwerk und die Laufzeit von `POST /api/cm/anmeldungen`
+- 2026-11-09 — Restbefunde Feinschliff PC → (1) zweizeiliger Titel passt rechnerisch noch, (2)–(6)
+  Handprüfungen, (7) Mitgliederliste ungekürzt (Abweichung vom Leitbild). Trigger: Gang durch die
+  Verwaltung am Mac/Safari bzw. echte Namen nach #46
+- Gespräch, übrige Punkte → `letzteAm` ungelesen, `maxlength` strenger als der Server, CHECK
+  `von`/`admin_mitglied_id` (nur halb erzwingbar: die Löschung leert den Admin), N+1 in `laufendeTurniere`,
+  Seed setzt «neu» nicht zurück (die Seed-Funktion hat keinen Test), (10)–(14) Fussnote mit `karte-teil`,
+  verlorener Text bei `nur-lesen`, kein Test für «gelesen nach dem Senden», zwei Zählweisen, `$effect`
+  mit `lade()`. Trigger: Gespräch oder Posteingang werden angefasst
+
+**Falsche Prämissen**
+
+| Eintrag | Behauptet | Gemessen |
+|---|---|---|
+| Status «geplant» | fünf IDs ohne Test-ID; die ID muss im Testnamen stehen | A-LOGIN-01 hat sechs Testdateien; RR-06 nur für Anmeldungen gebaut; die Prüfung sucht die ID irgendwo in der Testdatei |
+| Restbefunde #59 Etappe 2 | `DoppelListe.svelte` rund 650 Zeilen, drei Tabellenteile herauslösen | 704 Zeilen; die Tabellenteile sind schon Snippets (~88), das Gewicht liegt bei acht Dialogen |
+| ebenda | Suchtimer im Aktionsdialog; nur die eigenen Anfragen bleiben | Suchtimer in `Spielersuche.svelte`; auch Anfragen **an** den Gelöschten bleiben |
+| Einzel-Liste | Umstellung auf den Aktionsdialog ist ein reiner Umbau | Der Dialog *Entscheiden* hat zwei Tasten, der Aktionsdialog kennt eine |
+| Verlauf | Rückweg fehlt, wenn das Mitglied gelöscht ist | Der Verlauf löscht mit (`onDelete: 'cascade'`) |
+| CM-Seite bei Störung | Link führt per Umleitung auf dieselbe Seite | Nur, wenn der zweite Abruf gelingt; sonst die Fehlerseite |
+| Elternseite | Ein Tippfehler fiele erst zur Laufzeit auf | Die E2E klicken alle fünf Elternziele an |
+| Auskunft | betrifft «Ansicht als …» allgemein | nur die Ansicht `mitglieder` |
+| Kontaktdaten CM/Lizenz | Titel «Zusage strenger als Doku»; Verwaltungsliste der Lizenzen | Umgekehrt (Ist strenger als zugesagt); eine Lizenz-Verwaltung gibt es nicht |
+| `cmAdmins` | Mail geht «wohl» nicht raus | Weder Mail noch Push (`meldeMitgliedern` filtert nach `aktiv`) |
+| Kontaktperson ohne Fachregel | «die Regeln stehen nur im Code»; FR-50 frei | Dass die Wahl bleibt, steht in `datenschutz.md`; FR-50 vergeben |
+| Kontaktperson Rufname | Schnittstelle `/api/cm` | `/api/cm/[id]` (`getCmAnsicht`) |
+| A-LOGIN-09 | Wackler unter Last, Modul noch nicht ausgeliefert | Neuladen bricht das laufende Vorladen ab; SI-07 hat dasselbe Muster |
+| localhost | nodemailer fragt zuerst `resolve4`, dann `::1` | IPv4 und IPv6 parallel, Rückfall auf `dns.lookup`; der genaue Weg ist offen, die Abhilfe belegt |
+| #69-Test rot | gemeinsamer Zustand der zwei Dateien | keiner; Kollision bestand mit `cm-doppel-verwaltung.test.ts` |
+| Gespräch | (1) «wie die Antwort»; (2) RR-09 verlangt das Ziel; (7) die DB-Tests des Gesprächs | (1) die Antwort prüft nur Nachrichten der Leitung; (2) die Spec verlangt es, fünf Wege verlieren es; (7) vier Tests, zwei davon bei den Anlässen |
+
+**Im Vollzug gekippt:** Gespräch (9), Seed setzt «neu» zurück, war als Minuten-Fix vorgesehen. Die Seed-Funktion hat aber keinen Test,
+der Nachweis wäre neuer Testaufwand gewesen → abgehakt.
+
 ### Auswertung vom 08.11.2026 (Abend) — 14 Einträge, gegen `dev` (49a426f) verifiziert
 
 Bilanz je Eintrag: 0 ganz verworfen · 7 abgehakt (1 davon überholt) · 4 mitgemacht (dazu 1 Nebenbefund) · 1 Regel ·

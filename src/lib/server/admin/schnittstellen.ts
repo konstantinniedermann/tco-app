@@ -102,7 +102,8 @@ async function mitKonto(
 // Wer den Bereich nicht einmal lesen darf, bekommt `kein-admin` (der Code für «dieser Bereich ist
 // dir nicht offen»), nicht die Aufforderung zum Bestätigen. Wer ihn nur lesen darf und schreiben
 // will, bekommt nach der Bestätigung `kein-recht` (Regel 3: der MyTCO-Admin liest).
-// In der «Ansicht als …» schreibt keine Schnittstelle, auch ohne den Riegel im Hook (zweite Schicht).
+// In der «Ansicht als …» speichert keine Schnittstelle, auch ohne den Riegel im Hook (zweite Schicht);
+// lesende Aufrufe wie die Auskunft (DS-07) schreiben trotzdem ihren Verlaufseintrag.
 async function mitRolle(
 	d: AdminDienste,
 	e: AdminEreignis,

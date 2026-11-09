@@ -151,13 +151,16 @@ describe('FR-47: persönliche Meldung', () => {
 		expect(wirft.mails).toHaveLength(1);
 	});
 
-	test('FR-47: cmAdmins liefert nur nicht gesperrte Konten mit Rolle cm', async () => {
+	test('FR-47: cmAdmins liefert nur gültige CM-Admins (aktiv, Konto nicht gesperrt, Rolle cm)', async () => {
 		const admin = await legeMitgliedAn(db, { rollen: ['cm'] });
 		const gesperrt = await legeMitgliedAn(db, { rollen: ['cm'], gesperrt: true });
+		const ausgetreten = await legeMitgliedAn(db, { rollen: ['cm'], status: 'ausgetreten' });
+		const vorgemerkt = await legeMitgliedAn(db, { rollen: ['cm'], status: 'vorgemerkt' });
 		const andere = await legeMitgliedAn(db, { rollen: ['mitglieder'] });
 		const ohne = await legeMitgliedAn(db);
 		const ids = await cmAdmins(db);
 		expect(ids).toContain(admin.mitgliedId);
-		for (const x of [gesperrt, andere, ohne]) expect(ids).not.toContain(x.mitgliedId);
+		for (const x of [gesperrt, ausgetreten, vorgemerkt, andere, ohne])
+			expect(ids).not.toContain(x.mitgliedId);
 	});
 });

@@ -436,7 +436,7 @@ describe('CM-Anmeldung', () => {
 		expect(await aktiveVon(ich, frueh.kategorien)).toHaveLength(1);
 	});
 
-	test('FR-10: fremde Anmeldung abmelden ergibt nicht-gefunden', async () => {
+	test('FR-10, RR-06: fremde Anmeldung abmelden ergibt nicht-gefunden', async () => {
 		const t = await offenesTurnier();
 		const [k] = t.kategorien;
 		const ich = await spieler();
@@ -995,7 +995,7 @@ describe('CM-Anmeldung', () => {
 	});
 });
 
-describe('Kontaktperson der CM', () => {
+describe('FR-55: Kontaktperson der CM', () => {
 	/** Offenes Turnier mit `kontakt` als Kontaktperson (vorher gültig CM-Admin). */
 	async function mitKontakt() {
 		const admin = await legeMitgliedAn(db, {

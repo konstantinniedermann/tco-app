@@ -284,7 +284,7 @@ describe('Turnier-Schnittstellen', () => {
 		).toBe(404);
 	});
 
-	test('Kontaktperson: nur CM-Admins, sonst 400 mit Feld kontakt', async () => {
+	test('FR-55: Kontaktperson: nur CM-Admins, sonst 400 mit Feld kontakt', async () => {
 		const s = baue();
 		const cm = await bestaetigt(s, ['cm']);
 		const jahr = await freiesJahr(2071);

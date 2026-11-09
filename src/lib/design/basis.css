@@ -846,6 +846,10 @@ fieldset.auswahl-gruppe legend {
 	box-shadow: var(--schatten-karte);
 }
 
+.karte > h2:first-child {
+	margin-top: 0;
+}
+
 .karte.klappe {
 	padding-block: var(--abstand-2);
 }
@@ -1843,7 +1847,7 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	}
 }
 
-/* PC-Layout ab 60em Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
+/* PC-Layout ab 60rem Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
 @container app (min-width: 60rem) {
 	.pfad {
 		display: block;

@@ -5,17 +5,19 @@ import { and, asc, eq, inArray, isNull, or } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { konto, kontoRolle, mitglied, pushAbo } from '../db/schema.ts';
 import type { Mailer } from '../login/dienst.ts';
+import { gueltigerCmAdmin } from '../turnier/kontakt.ts';
 import { sendeMail, sendePush, type PushSender } from './versand.ts';
 
 export type Melder = { db: Db; push: PushSender | null; mailer: Mailer; adresse: string };
 
-/** Mitglied-IDs aller nicht gesperrten Konten mit Rolle `cm`. */
+/** Mitglied-IDs aller gültigen CM-Admins: aktiv, Konto nicht gesperrt, Rolle `cm` (wie FR-55). */
 export async function cmAdmins(db: Db): Promise<number[]> {
 	const zeilen = await db
 		.select({ mitgliedId: konto.mitgliedId })
 		.from(kontoRolle)
 		.innerJoin(konto, eq(konto.id, kontoRolle.kontoId))
-		.where(and(eq(kontoRolle.rolle, 'cm'), eq(konto.gesperrt, false)))
+		.innerJoin(mitglied, eq(mitglied.id, konto.mitgliedId))
+		.where(gueltigerCmAdmin)
 		.orderBy(asc(konto.mitgliedId));
 	return zeilen.map((z) => z.mitgliedId);
 }

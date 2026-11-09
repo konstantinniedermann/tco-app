@@ -1,6 +1,9 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
-import { legeEigeneDatenbankAn } from '../../../../tests/hilfen/eigene-datenbank.ts';
+import {
+	legeEigeneDatenbankAn,
+	ZEIT_EIGENE_DB
+} from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { gespraech, nachricht, turnier, type TurnierStatus } from '../db/schema.ts';
@@ -213,7 +216,7 @@ describe('A-TURNIER-04 Gespräch mit der Turnierleitung', () => {
 		expect(leitung?.nachrichten[0].admin).toBeNull();
 	});
 
-	test('FR-52: Liste mit offenen zuerst, Zahlen und Gesamtzahl', async () => {
+	test('FR-52: Liste mit offenen zuerst, Zahlen und Gesamtzahl', ZEIT_EIGENE_DB, async () => {
 		// Die Gesamtzahl ist global und die gemeinsame Datenbank wird parallel beschrieben: eigene Datenbank.
 		const eigene = await legeEigeneDatenbankAn('gespraech_gesamt');
 		const gemeinsame = db;

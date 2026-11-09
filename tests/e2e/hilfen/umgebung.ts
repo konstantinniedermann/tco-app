@@ -10,7 +10,9 @@ export const MAILPIT_URL = process.env.MAILPIT_URL || 'http://localhost:58025';
 
 const STANDARD = {
 	MYTCO_CODE_SCHLUESSEL: 'nur-lokal-nicht-fuer-produktion-0123456789abcdef',
-	MYTCO_SMTP_URL: 'smtp://localhost:51025',
+	// IP statt «localhost»: Mailpit lauscht nur auf 127.0.0.1, und wie nodemailer «localhost»
+	// auflöst, hängt vom DNS des Netzes ab (in manchen Netzen landet es auf ::1).
+	MYTCO_SMTP_URL: 'smtp://127.0.0.1:51025',
 	MYTCO_MAIL_ABSENDER: 'MyTCO <mytco@example.org>',
 	MYTCO_KONTAKT: 'das Sekretariat (erfunden), sekretariat@example.org',
 	// Das Beispiel-Paar aus .env.example (SI-22): Mit Schlüssel zeigt die App Push an. Echt

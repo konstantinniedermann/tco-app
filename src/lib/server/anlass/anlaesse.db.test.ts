@@ -1,7 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
-import { legeEigeneDatenbankAn } from '../../../../tests/hilfen/eigene-datenbank.ts';
+import {
+	legeEigeneDatenbankAn,
+	ZEIT_EIGENE_DB
+} from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { anlassAnmeldung, mitglied } from '../db/schema.ts';
@@ -174,72 +177,80 @@ describe('Anlässe', () => {
 		expect(await aendereAnlass(db, 2_000_000_000, w, nachher)).toBe('nicht-gefunden');
 	});
 
-	test('ladeAnlassAdmin zählt keine Antwort nur bei aktiven Mitgliedern', async () => {
-		// Eigene Datenbank: Die Zahl aller aktiven Mitglieder ist eine globale Aussage.
-		const eigene = await legeEigeneDatenbankAn('anlass');
-		try {
-			const edb = eigene.db;
-			const admin = await legeMitgliedAn(edb, { nachname: 'Zzz' });
-			const id = await legeAnlassAn(edb, admin.mitgliedId, werte());
-			const kommt = await legeMitgliedAn(edb, {
-				rufname: 'Hannes',
-				vorname: 'Johannes',
-				nachname: 'Aaa'
-			});
-			const nicht = await legeMitgliedAn(edb, { nachname: 'Bbb' });
-			await legeMitgliedAn(edb, { status: 'ausgetreten' });
-			await melde(edb, id, kommt.mitgliedId, { antwort: 'kommt', bemerkung: null }, JETZT);
-			await melde(edb, id, nicht.mitgliedId, { antwort: 'kommt-nicht', bemerkung: 'x' }, JETZT);
-			const a = await ladeAnlassAdmin(edb, id);
-			expect(a?.zahlen).toEqual({ kommen: 1, kommenNicht: 1, keineAntwort: 1 });
-			expect(a?.anmeldungen.map((z) => [z.name, z.antwort, z.bemerkung])).toEqual([
-				[{ rufname: 'Hannes', vorname: 'Johannes', nachname: 'Aaa' }, 'kommt', null],
-				[{ rufname: null, vorname: 'Test', nachname: 'Bbb' }, 'kommt-nicht', 'x']
-			]);
-			expect(await listeAnlaesse(edb)).toEqual([
-				expect.objectContaining({ id, kommen: 1, kommenNicht: 1 })
-			]);
-		} finally {
-			await eigene.abbauen();
-		}
-	});
-
-	test('Zahlen und Anmeldungen zählen nur aktive Mitglieder, nicht ausgetretene oder vorgemerkte', async () => {
-		const eigene = await legeEigeneDatenbankAn('anlass');
-		try {
-			const edb = eigene.db;
-			const admin = await legeMitgliedAn(edb, { nachname: 'Zzz' });
-			const id = await legeAnlassAn(edb, admin.mitgliedId, werte());
-			const aktiv = await legeMitgliedAn(edb, { nachname: 'Aaa' });
-			const weg = await legeMitgliedAn(edb, { nachname: 'Bbb' });
-			const vorgemerkt = await legeMitgliedAn(edb, { nachname: 'Ccc' });
-			for (const [m, antwort] of [
-				[aktiv, 'kommt'],
-				[weg, 'kommt'],
-				[vorgemerkt, 'kommt-nicht']
-			] as const) {
-				await melde(edb, id, m.mitgliedId, { antwort, bemerkung: null }, JETZT);
+	test(
+		'ladeAnlassAdmin zählt keine Antwort nur bei aktiven Mitgliedern',
+		ZEIT_EIGENE_DB,
+		async () => {
+			// Eigene Datenbank: Die Zahl aller aktiven Mitglieder ist eine globale Aussage.
+			const eigene = await legeEigeneDatenbankAn('anlass');
+			try {
+				const edb = eigene.db;
+				const admin = await legeMitgliedAn(edb, { nachname: 'Zzz' });
+				const id = await legeAnlassAn(edb, admin.mitgliedId, werte());
+				const kommt = await legeMitgliedAn(edb, {
+					rufname: 'Hannes',
+					vorname: 'Johannes',
+					nachname: 'Aaa'
+				});
+				const nicht = await legeMitgliedAn(edb, { nachname: 'Bbb' });
+				await legeMitgliedAn(edb, { status: 'ausgetreten' });
+				await melde(edb, id, kommt.mitgliedId, { antwort: 'kommt', bemerkung: null }, JETZT);
+				await melde(edb, id, nicht.mitgliedId, { antwort: 'kommt-nicht', bemerkung: 'x' }, JETZT);
+				const a = await ladeAnlassAdmin(edb, id);
+				expect(a?.zahlen).toEqual({ kommen: 1, kommenNicht: 1, keineAntwort: 1 });
+				expect(a?.anmeldungen.map((z) => [z.name, z.antwort, z.bemerkung])).toEqual([
+					[{ rufname: 'Hannes', vorname: 'Johannes', nachname: 'Aaa' }, 'kommt', null],
+					[{ rufname: null, vorname: 'Test', nachname: 'Bbb' }, 'kommt-nicht', 'x']
+				]);
+				expect(await listeAnlaesse(edb)).toEqual([
+					expect.objectContaining({ id, kommen: 1, kommenNicht: 1 })
+				]);
+			} finally {
+				await eigene.abbauen();
 			}
-			await edb
-				.update(mitglied)
-				.set({ status: 'ausgetreten', austrittAm: JETZT })
-				.where(eq(mitglied.id, weg.mitgliedId));
-			await edb
-				.update(mitglied)
-				.set({ status: 'vorgemerkt', vorgemerktAm: JETZT, statusVorher: 'aktiv' })
-				.where(eq(mitglied.id, vorgemerkt.mitgliedId));
-			const a = await ladeAnlassAdmin(edb, id);
-			expect(a?.zahlen).toEqual({ kommen: 1, kommenNicht: 0, keineAntwort: 1 });
-			expect(a?.anmeldungen.map((z) => z.name)).toEqual([
-				{ rufname: null, vorname: 'Test', nachname: 'Aaa' }
-			]);
-			expect(await listeAnlaesse(edb)).toEqual([
-				expect.objectContaining({ id, kommen: 1, kommenNicht: 0 })
-			]);
-		} finally {
-			await eigene.abbauen();
 		}
-	});
+	);
+
+	test(
+		'Zahlen und Anmeldungen zählen nur aktive Mitglieder, nicht ausgetretene oder vorgemerkte',
+		ZEIT_EIGENE_DB,
+		async () => {
+			const eigene = await legeEigeneDatenbankAn('anlass');
+			try {
+				const edb = eigene.db;
+				const admin = await legeMitgliedAn(edb, { nachname: 'Zzz' });
+				const id = await legeAnlassAn(edb, admin.mitgliedId, werte());
+				const aktiv = await legeMitgliedAn(edb, { nachname: 'Aaa' });
+				const weg = await legeMitgliedAn(edb, { nachname: 'Bbb' });
+				const vorgemerkt = await legeMitgliedAn(edb, { nachname: 'Ccc' });
+				for (const [m, antwort] of [
+					[aktiv, 'kommt'],
+					[weg, 'kommt'],
+					[vorgemerkt, 'kommt-nicht']
+				] as const) {
+					await melde(edb, id, m.mitgliedId, { antwort, bemerkung: null }, JETZT);
+				}
+				await edb
+					.update(mitglied)
+					.set({ status: 'ausgetreten', austrittAm: JETZT })
+					.where(eq(mitglied.id, weg.mitgliedId));
+				await edb
+					.update(mitglied)
+					.set({ status: 'vorgemerkt', vorgemerktAm: JETZT, statusVorher: 'aktiv' })
+					.where(eq(mitglied.id, vorgemerkt.mitgliedId));
+				const a = await ladeAnlassAdmin(edb, id);
+				expect(a?.zahlen).toEqual({ kommen: 1, kommenNicht: 0, keineAntwort: 1 });
+				expect(a?.anmeldungen.map((z) => z.name)).toEqual([
+					{ rufname: null, vorname: 'Test', nachname: 'Aaa' }
+				]);
+				expect(await listeAnlaesse(edb)).toEqual([
+					expect.objectContaining({ id, kommen: 1, kommenNicht: 0 })
+				]);
+			} finally {
+				await eigene.abbauen();
+			}
+		}
+	);
 
 	test('Kalender: richtige Kennung liefert den Anlass, unbekannte null', async () => {
 		const { id, w } = await neu();
