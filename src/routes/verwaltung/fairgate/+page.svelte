@@ -75,7 +75,7 @@
 						<td>{z.mitgliedernummer ?? ''}</td>
 						<td>
 							{#if z.verlaufGeloescht}
-								<span class="zelle-kurz" title={ALT_TEXT}>{ALT_TEXT}</span>
+								<span>{ALT_TEXT}</span>
 							{:else}
 								{geaendertText(z.felder)}
 							{/if}
