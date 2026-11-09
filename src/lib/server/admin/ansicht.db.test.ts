@@ -151,7 +151,8 @@ describe('Ansicht als … (Server)', () => {
 			rufname: null,
 			passkeyHinweis: false,
 			verwaltung: true,
-			ansicht: null
+			ansicht: null,
+			nachrichtenOffen: 0
 		});
 		expect((await schalteEin(a.s.d, a.konto, { rolle: 'mitglied' })).status).toBe(200);
 		const konto = (await lade(a.kennung))!;
@@ -161,7 +162,8 @@ describe('Ansicht als … (Server)', () => {
 			rufname: null,
 			passkeyHinweis: false,
 			verwaltung: false,
-			ansicht: 'mitglied'
+			ansicht: 'mitglied',
+			nachrichtenOffen: 0
 		});
 		const z = await getZugang(a.s.d, ereignis({ method: 'GET', konto }));
 		expect([z.status, await z.json()]).toEqual([403, { fehler: 'kein-admin' }]);

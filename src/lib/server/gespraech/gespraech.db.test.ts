@@ -203,7 +203,7 @@ describe('A-TURNIER-04 Gespräch mit der Turnierleitung', () => {
 		const json = JSON.stringify(eigen);
 		expect(json).not.toContain('Adminnachname');
 		expect(json).not.toContain('Adminvorname');
-		expect(json).not.toContain(String(admin.mitgliedId) + ',');
+		expect(json).not.toMatch(/adminId|adminMitgliedId/);
 		const leitung = await ladeGespraech(db, g.id, a.jetzt);
 		expect(leitung?.nachrichten.at(-1)?.admin?.nachname).toBe('Adminnachname');
 		expect(leitung?.nachrichten[0].admin).toBeNull();

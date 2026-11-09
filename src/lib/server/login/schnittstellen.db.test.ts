@@ -239,7 +239,8 @@ describe('Schnittstellen', () => {
 				rufname: null,
 				passkeyHinweis: true,
 				verwaltung: false,
-				ansicht: null
+				ansicht: null,
+				nachrichtenOffen: 0
 			});
 
 			await s.dienst.beendeAlleSitzungen(s.kontoId);

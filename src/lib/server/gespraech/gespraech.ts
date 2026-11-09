@@ -173,11 +173,12 @@ export async function markiereGelesen(
 	db: DbOderTx,
 	turnierId: number,
 	mitgliedId: number,
-	jetzt: Date
+	bis: Date
 ): Promise<void> {
+	// Gelesen bis zur neuesten gezeigten Nachricht; die Marke geht nur vorwärts (greatest ignoriert NULL).
 	await db
 		.update(gespraech)
-		.set({ gelesenAm: jetzt })
+		.set({ gelesenAm: sql`greatest(${gespraech.gelesenAm}, ${bis.toISOString()}::timestamptz)` })
 		.where(and(eq(gespraech.turnierId, turnierId), eq(gespraech.mitgliedId, mitgliedId)));
 }
 
