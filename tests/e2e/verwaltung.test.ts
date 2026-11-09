@@ -655,12 +655,15 @@ const scrolleFenster = (page: Page, nach: 'unten' | 'oben') =>
 test('Handy: Kopfleiste bleibt stehen, Titel ersetzt «Verwaltung»', async ({ page }, info) => {
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Am PC klebt statt des Titels in der Kopfleiste der Seitenkopf
 	const fehler = sammleKonsolenfehler(page);
-	const admin = await legeAdminMitBriefCodeAn('Wilma');
+	const nachname = `Probe${randomUUID().slice(0, 8)}`;
+	const admin = await legeRollenkontoMitBriefCodeAn('Wilma', ['mitglieder'], nachname);
 	await oeffneVerwaltung(page, admin);
 	await page.setViewportSize({ width: page.viewportSize()!.width, height: 500 });
 	await page.goto(`/verwaltung/mitglieder/${admin.mitgliedId}`);
 	const h1 = page.getByRole('heading', { level: 1 });
-	await expect(h1).toContainText('Wilma');
+	await expect(h1).toContainText(`${nachname}, Wilma`);
+	// Das <h1> trägt die Plakette «aktiv»; in die Kopfleiste kommt nur der Name.
+	await expect(h1.locator('.plakette')).toHaveText('aktiv');
 	const kopf = page.locator('header.kopf');
 	const titel = kopf.locator('.kopf-titel');
 	const zusatz = kopf.locator('.kopf-zusatz');
@@ -672,7 +675,7 @@ test('Handy: Kopfleiste bleibt stehen, Titel ersetzt «Verwaltung»', async ({ p
 	expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(200);
 	expect((await kopf.boundingBox())!.y).toBeLessThanOrEqual(1);
 	await expect(titel).toHaveAttribute('data-sichtbar', '');
-	await expect(titel).toHaveText((await h1.textContent())!.trim());
+	await expect(titel).toHaveText(new RegExp(`^${nachname}, Wilma$`));
 	await expect(titel).toHaveAttribute('aria-hidden', 'true');
 	await expect(zusatz).toHaveCSS('opacity', '0');
 	// Die Seitenleiste darunter scrollt mit der Seite weg.
@@ -702,18 +705,67 @@ test('PC: Seitenleiste bleibt beim Scrollen stehen', async ({ page }, info) => {
 	expect(k.y).toBeLessThanOrEqual(1);
 	expect(Math.abs(s.y - (k.y + k.height))).toBeLessThanOrEqual(1);
 	await expect(seitenleiste(page).getByRole('link', { name: 'Mitglieder' })).toBeInViewport();
-	// Höher als das Fenster: Die Leiste scrollt für sich, die Seite bleibt, wo sie ist.
+	// Höher als das Fenster: Nur die Seitenleiste scrollt für sich, Kopfleiste und Seite bleiben.
 	const seiteY = await page.evaluate(() => window.scrollY);
-	await page.locator('.verwaltung-leiste').evaluate((e) => {
+	await seitenleiste(page).evaluate((e) => {
 		e.scrollTop = e.scrollHeight;
 	});
+	expect(await seitenleiste(page).evaluate((e) => e.scrollTop)).toBeGreaterThan(0);
 	await expect(seitenleiste(page).getByRole('link', { name: 'Turniere' })).toBeInViewport();
 	await expect(seitenleiste(page).getByRole('link', { name: '‹ Zur App' })).toBeInViewport();
 	expect(await page.evaluate(() => window.scrollY)).toBe(seiteY);
 	expect((await kopf.boundingBox())!.y).toBeLessThanOrEqual(1);
+	// WCAG 2.4.11: Ein fokussierter Link oben in der Leiste liegt nicht unter der Kopfleiste.
+	const mitglieder = seitenleiste(page).getByRole('link', { name: 'Mitglieder' });
+	await mitglieder.focus();
+	await expect(mitglieder).toBeInViewport();
+	const unterkante = (await kopf.boundingBox())!;
+	expect((await mitglieder.boundingBox())!.y).toBeGreaterThanOrEqual(
+		unterkante.y + unterkante.height - 1
+	);
 	// Am PC bleibt «Verwaltung» stehen, der Titel kommt nicht in die Kopfleiste.
 	await expect(kopf.locator('.kopf-titel')).toBeHidden();
 	await expect(kopf.locator('.kopf-zusatz')).toHaveCSS('opacity', '1');
+	expect(fehler).toEqual([]);
+});
+
+test('Handy: Langer Titel in der Kopfleiste der Verwaltung bleibt einzeilig', async ({
+	page
+}, info) => {
+	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Am PC kommt der Titel nicht in die Kopfleiste
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeRollenkontoMitBriefCodeAn('Wiebke', ['mitglieder']);
+	const lang = 'Grillabend mit dem ganzen Verein und allen Freunden auf der Anlage am See'.padEnd(
+		80,
+		'!'
+	);
+	expect(lang).toHaveLength(80);
+	const anlass = await legeOffenenAnlassAn(admin.mitgliedId, lang);
+	await oeffneVerwaltung(page, admin);
+	await page.setViewportSize({ width: page.viewportSize()!.width, height: 400 });
+	await page.goto(`/verwaltung/anlaesse/${anlass}`);
+	await expect(page.getByRole('heading', { level: 1, name: lang })).toBeVisible();
+	const kopf = page.locator('header.kopf');
+	const titel = kopf.locator('.kopf-titel');
+	const hoehe = (await kopf.boundingBox())!.height;
+	const wappenX = (await kopf.locator('.kopf-wappen').boundingBox())!.x;
+
+	await scrolleFenster(page, 'unten');
+	await expect(titel).toHaveAttribute('data-sichtbar', '');
+	await expect(titel).toHaveText(lang);
+	await expect(kopf.locator('.kopf-zusatz')).toHaveCSS('opacity', '0');
+	expect((await kopf.boundingBox())!.height).toBe(hoehe);
+	expect((await kopf.locator('.kopf-wappen').boundingBox())!.x).toBe(wappenX);
+	const masse = await titel.evaluate((e) => ({
+		gekuerzt: e.scrollWidth > e.clientWidth,
+		hoehe: e.getBoundingClientRect().height,
+		zeile: parseFloat(getComputedStyle(e).lineHeight)
+	}));
+	expect(masse.gekuerzt).toBe(true);
+	expect(masse.hoehe).toBeLessThan(masse.zeile * 1.6);
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+		true
+	);
 	expect(fehler).toEqual([]);
 });
 

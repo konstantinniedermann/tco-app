@@ -23,7 +23,7 @@ export function beobachteKopftitel(o: {
 	let rand = Math.max(0, o.oben());
 
 	function melden() {
-		o.melde(darueber && ueberschrift ? (ueberschrift.textContent ?? '').trim() : null);
+		o.melde(darueber && ueberschrift ? titelText(ueberschrift) : null);
 	}
 
 	function beobachte() {
@@ -102,4 +102,14 @@ export function beobachteKopftitel(o: {
 		cancelAnimationFrame(bild);
 		beobachter?.disconnect();
 	};
+}
+
+/**
+ * Text des <h1> für die Kopfleiste: ohne Plaketten (`.plakette`, z. B. «aktiv» hinter dem Namen
+ * eines Mitglieds), Leerraum zusammengefasst.
+ */
+export function titelText(ueberschrift: HTMLElement): string {
+	const kopie = ueberschrift.cloneNode(true) as HTMLElement;
+	for (const plakette of kopie.querySelectorAll('.plakette')) plakette.remove();
+	return (kopie.textContent ?? '').replace(/\s+/g, ' ').trim();
 }

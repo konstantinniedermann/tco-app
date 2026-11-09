@@ -1891,17 +1891,24 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		grid-template-columns: 15rem 1fr;
 	}
 
-	/* Kopfleiste und Seitenleiste stehen beim Scrollen des Inhalts, volle Bildschirmhöhe; was
-	   nicht passt, scrollt für sich */
+	/* Kopfleiste und Seitenleiste stehen beim Scrollen des Inhalts, volle Bildschirmhöhe. Was
+	   nicht passt, scrollt für sich, und zwar nur die Seitenleiste: Ein fokussierter Link landet
+	   so nie unter der Kopfleiste (WCAG 2.4.11). */
 	.verwaltung-leiste {
-		display: block;
+		display: flex;
+		flex-direction: column;
 		position: sticky;
 		top: 0;
 		align-self: start;
 		height: 100dvh;
+		background: var(--farbe-marke-dunkel);
+	}
+
+	.verwaltung-leiste > .seitenleiste {
+		flex: 1;
+		min-height: 0;
 		overflow-y: auto;
 		overscroll-behavior-y: contain;
-		background: var(--farbe-marke-dunkel);
 	}
 
 	/* Am PC klebt der Seitenkopf im Inhalt statt des Titels in der Kopfleiste; in der schmalen
