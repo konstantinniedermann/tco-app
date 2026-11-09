@@ -156,7 +156,8 @@ async function loescheKonten(tx: DbOderTx, jetzt: Date) {
 /**
  * Ein Löschlauf in einer Transaktion: Konten, deren Frist nach Austritt oder Bedenkzeit
  * abgelaufen ist (`jetzt >= loeschtAm`), Verlauf älter als 12 Monate, Antworten zu Anlässen,
- * die mehr als ein Jahr zurückliegen. Wiederholbar; hält ein anderer Lauf die Sperre, tut er
+ * die mehr als ein Jahr zurückliegen, Gespräche mit der Turnierleitung (nach dem Turnierjahr und
+ * mit dem Mitglied). Wiederholbar; hält ein anderer Lauf die Sperre, tut er
  * nichts. Log nur mit Anzahl und Mitglied-ID (SI-05).
  */
 export async function raeumeAuf(db: Db, jetzt: Date): Promise<Loeschlauf> {

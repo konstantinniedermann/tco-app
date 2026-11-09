@@ -8,6 +8,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Mitglieder schreiben der Turnierleitung aus der CM-Seite; alle CM-Admins sehen die Gespräche im Posteingang (#71).
+
 ## 0.19.0 — Feinschliff am PC, Seitentitel in der Kopfleiste
 
 - Feinschliff am Computer: Die Kopfleiste zeigt beim Scrollen den Titel der Seite, am Handy wie
