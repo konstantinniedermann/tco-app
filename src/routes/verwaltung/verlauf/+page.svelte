@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { ladeMitglied, ladeVerlauf, type VerlaufEintrag } from '../../../lib/verwaltung/api.ts';
-	import Pfad from '../../../lib/verwaltung/Pfad.svelte';
+	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { aktionText, zeitText } from '../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 
@@ -54,19 +54,22 @@
 	<title>Änderungsverlauf – MyTCO</title>
 </svelte:head>
 
-{#if mitglied !== undefined && name !== null}
-	<Pfad
-		stufen={[
-			{ text: 'Mitglieder', href: resolve('/verwaltung/mitglieder') },
-			{
-				text: name,
-				href: resolve('/verwaltung/mitglieder/[id]', { id: String(mitglied) })
+<Seitenkopf
+	pfad={mitglied !== undefined && name !== null
+		? {
+				stufen: [
+					{ text: 'Mitglieder', href: resolve('/verwaltung/mitglieder') },
+					{
+						text: name,
+						href: resolve('/verwaltung/mitglieder/[id]', { id: String(mitglied) })
+					}
+				],
+				aktuell: 'Änderungsverlauf'
 			}
-		]}
-		aktuell="Änderungsverlauf"
-	/>
-{/if}
-<h1>Änderungsverlauf</h1>
+		: undefined}
+>
+	<h1>Änderungsverlauf</h1>
+</Seitenkopf>
 <p class="leise">
 	{mitglied === undefined
 		? 'Die letzten 100 Einträge, neueste zuerst.'

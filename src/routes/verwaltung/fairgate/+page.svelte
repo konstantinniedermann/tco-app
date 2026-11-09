@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { invalidate } from '$app/navigation';
 	import { uebertrageFairgate } from '../../../lib/verwaltung/api.ts';
 	import {
@@ -38,7 +39,9 @@
 	<title>Für Fairgate – MyTCO</title>
 </svelte:head>
 
-<h1>Für Fairgate</h1>
+<Seitenkopf>
+	<h1>Für Fairgate</h1>
+</Seitenkopf>
 <p class="leise">
 	Diese Mitglieder haben Angaben in MyTCO selbst geändert.
 	{#if darfAbhaken}Trag die neuen Werte in Fairgate nach und hake dann ab.{/if}

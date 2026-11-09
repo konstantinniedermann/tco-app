@@ -1783,6 +1783,12 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	}
 }
 
+@keyframes seitenkopf-linie {
+	to {
+		border-bottom-color: var(--farbe-linie);
+	}
+}
+
 /* PC-Layout ab 60em Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
 @container app (min-width: 60rem) {
 	.pfad {
@@ -1795,6 +1801,33 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 
 	.inhalt {
 		padding: var(--abstand-6);
+	}
+
+	/* Seitenkopf (nur Verwaltung): klebt oben am Inhalt. Der negative Rand gleicht den Abstand
+	   oben von .inhalt aus; im Ruhezustand sieht alles aus wie vorher, beim Kleben bleibt er als
+	   Luft über dem Titel. Die Linie unten ist ohne Scroll-Zeitleiste immer da, sonst wächst sie
+	   in den ersten 2rem Scrollen herein (kein JS). */
+	.seitenkopf {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		margin: calc(-1 * var(--abstand-6)) 0 var(--abstand-3);
+		padding: var(--abstand-6) 0 var(--abstand-3);
+		background: var(--farbe-hintergrund);
+		border-bottom: var(--rand-duenn) solid var(--farbe-linie);
+	}
+
+	.seitenkopf > :last-child {
+		margin-bottom: 0;
+	}
+
+	@supports (animation-timeline: scroll()) {
+		.seitenkopf {
+			border-bottom-color: transparent;
+			animation: seitenkopf-linie linear both;
+			animation-timeline: scroll(root block);
+			animation-range: 0 2rem;
+		}
 	}
 
 	.ansicht-band {
@@ -2056,6 +2089,15 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		max-width: none;
 		margin: 0;
 		padding-inline: 0;
+	}
+
+	/* Auf Papier klebt nichts */
+	.seitenkopf {
+		position: static;
+		margin: 0 0 var(--abstand-3);
+		padding: 0;
+		border: 0;
+		animation: none;
 	}
 
 	/* Briefe: das Blatt beginnt oben links auf dem Papier (Adressfeld im Fenster des Kuverts) */

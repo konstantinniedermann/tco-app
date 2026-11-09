@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import Pfad from '../../../../lib/verwaltung/Pfad.svelte';
+	import Seitenkopf from '../../../../lib/verwaltung/Seitenkopf.svelte';
 	import Turnierformular, {
 		werteAusTurnier,
 		type TurnierWerte
@@ -109,11 +109,14 @@
 	<title>{detail.name} – MyTCO</title>
 </svelte:head>
 
-<Pfad
-	stufen={[{ text: 'Turniere', href: resolve('/verwaltung/turniere') }]}
-	aktuell={detail.name}
-/>
-<h1>{detail.name}</h1>
+<Seitenkopf
+	pfad={{
+		stufen: [{ text: 'Turniere', href: resolve('/verwaltung/turniere') }],
+		aktuell: detail.name
+	}}
+>
+	<h1>{detail.name}</h1>
+</Seitenkopf>
 <p class="leise">
 	Anmeldeschluss {schluss} · {aktive}
 	{aktive === 1 ? 'Kategorie' : 'Kategorien'}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Pfad from '../../../../lib/verwaltung/Pfad.svelte';
+	import Seitenkopf from '../../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import Angabenformular, {
 		LEERE_WERTE,
@@ -38,11 +38,14 @@
 	<title>Mitglied anlegen – MyTCO</title>
 </svelte:head>
 
-<Pfad
-	stufen={[{ text: 'Mitglieder', href: resolve('/verwaltung/mitglieder') }]}
-	aktuell="Mitglied anlegen"
-/>
-<h1>Mitglied anlegen</h1>
+<Seitenkopf
+	pfad={{
+		stufen: [{ text: 'Mitglieder', href: resolve('/verwaltung/mitglieder') }],
+		aktuell: 'Mitglied anlegen'
+	}}
+>
+	<h1>Mitglied anlegen</h1>
+</Seitenkopf>
 
 <div class="karte">
 	<Angabenformular start={LEERE_WERTE} {fehler} knopf="Mitglied anlegen" onspeichern={anlegen} />

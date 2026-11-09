@@ -36,6 +36,7 @@ test.afterAll(async () => {
 const JAHR_VERWALTEN: Record<string, number> = { iphone: 2089, android: 2088 };
 const JAHR_WILDCARD: Record<string, number> = { iphone: 2087, android: 2086 };
 const JAHR_NUR_LESEN: Record<string, number> = { iphone: 2085, android: 2084, desktop: 2083 };
+const JAHR_KLEBEN: Record<string, number> = { desktop: 2059 };
 
 function testjahr(jahre: Record<string, number>, info: TestInfo): number {
 	const jahr = jahre[info.project.name];
@@ -325,4 +326,21 @@ test('RR-07, FR-08: MyTCO-Admin sieht die Anmeldungen mit Kommentar, ohne Tasten
 	}
 	await pruefeBildschirm(page, info, 'cm-anmeldungen-nur-lesen');
 	expect(fehler).toEqual([]);
+});
+
+test('PC: Pfad und Titel der Kategorie bleiben beim Scrollen sichtbar', async ({ page }, info) => {
+	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: am Handy klebt nur die Kopfleiste (Titel blendet dort ein)
+	test.setTimeout(120_000);
+	const jahr = testjahr(JAHR_KLEBEN, info);
+	const turnier = `Clubmeisterschaft ${jahr}`;
+	await legeOffenesTurnierAn(jahr, KATEGORIEN);
+	const cm = await legeCmMitBriefCodeAn('Cyrill');
+	await page.setViewportSize({ width: 1280, height: 300 });
+	await oeffneKategorieAlsCm(page, cm, turnier, 'Herren R1–R6');
+	await expect(page.getByText('Noch keine Anmeldungen.')).toBeVisible();
+
+	await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+	expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+	await expect(page.getByRole('heading', { level: 1 })).toBeInViewport();
+	await expect(page.getByRole('navigation', { name: 'Pfad' })).toBeInViewport();
 });
