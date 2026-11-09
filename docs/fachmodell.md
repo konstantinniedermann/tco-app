@@ -168,7 +168,7 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 | FR-51 | Schreiben darf ein aktives Mitglied, solange das Turnier für Mitglieder sichtbar ist, eine gültige Kontaktperson hat und das Turnierjahr nicht vorbei ist; die Kontaktperson selbst schreibt nicht als Mitglied. Sonst nur lesen. Antworten dürfen CM-Admins bis Ende des Turnierjahres | A-TURNIER-04 | umgesetzt |
 | FR-52 | Zustand *offen*/*erledigt*: Eine Nachricht des Mitglieds setzt *offen*, eine Antwort ändert ihn nicht; jeder CM-Admin setzt ihn | A-TURNIER-04 | umgesetzt |
 | FR-53 | Meldung ohne Inhalt und ohne Namen (DS-05): bei einer Nachricht des Mitglieds nur an die gültige Kontaktperson, bei einer Antwort ans Mitglied; das Mitglied sieht nie, welcher Admin antwortet | A-TURNIER-04 | umgesetzt |
-| FR-54 | Gelöscht werden die Gespräche eines Turniers ab dem 1.1. nach dem Turnierjahr (Zürich) und das Gespräch eines Mitglieds bei seiner endgültigen Löschung | A-TURNIER-04 | geplant |
+| FR-54 | Gelöscht werden die Gespräche eines Turniers ab dem 1.1. nach dem Turnierjahr (Zürich) und das Gespräch eines Mitglieds bei seiner endgültigen Löschung | A-TURNIER-04 | umgesetzt |
 
 ## Lebenszyklen
 
