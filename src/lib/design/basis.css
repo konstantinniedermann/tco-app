@@ -1096,6 +1096,11 @@ a.kachel:active {
 	border-top: var(--rand-duenn) solid var(--farbe-linie);
 }
 
+/* Tasten in der letzten Zelle: kein Abstand unter der Leiste, die Zeile bleibt so hoch wie eine Taste */
+.tabelle td .leiste {
+	margin-bottom: 0;
+}
+
 /* Symbole: eigene SVGs im 24er-Raster, immer mit Text */
 .symbol {
 	width: var(--groesse-symbol);
@@ -1936,6 +1941,26 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		grid-column: 2;
 	}
 
+	/* Tabelle: jede Zeile einzeilig und knapp (eine Zeile mit Tasten so hoch wie eine Taste plus
+	   wenig Rand); freier Text endet mit «…» (.zelle-kurz), der volle Text steht im Dialog
+	   «Ändern», in der Detailseite oder als title */
+	.tabelle th,
+	.tabelle td {
+		white-space: nowrap;
+		padding-block: var(--abstand-2);
+	}
+
+	.zelle-kurz {
+		max-width: 16rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	span.zelle-kurz {
+		display: inline-block;
+		vertical-align: bottom;
+	}
+
 	.spalten {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
@@ -2038,6 +2063,8 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	text-align: left;
 	vertical-align: top;
 	padding: var(--abstand-2);
+	/* Ausnahme zur einzeiligen Tabelle am PC: die Auskunft bricht um wie auf Papier */
+	white-space: normal;
 	border-bottom: var(--rand-duenn) solid var(--farbe-rand);
 }
 

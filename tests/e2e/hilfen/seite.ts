@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, type TestInfo } from '@playwright/test';
+import { expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 
 // Browser melden jede 4xx-Antwort in der Konsole. Bei den Schnittstellen sind 400 (Code
 // falsch), 401 (nicht angemeldet), 403 (kein Admin), 409 (vergeben, letzter Admin, veraltet)
@@ -32,6 +32,24 @@ export async function pruefePfad(page: Page, stufen: string[], aktuell: string):
 	}
 	await expect(pfad.getByRole('link')).toHaveText(stufen);
 	await expect(pfad.locator('[aria-current="page"]')).toHaveText(aktuell);
+}
+
+/**
+ * Wählt die Aktion `name` einer Tabellenzeile der Verwaltung (UI-Leitbild, Baustein Tabelle): Hat
+ * die Zeile die Taste «Ändern» (ab drei Aktionen), über den Dialog «Ändern», sonst direkt.
+ */
+export async function waehleAktion(page: Page, zeile: Locator, name: string): Promise<void> {
+	const aendern = zeile.getByRole('button', { name: 'Ändern', exact: true });
+	// Erst zählen, wenn die Zeile mit ihren Tasten steht.
+	await expect(zeile.getByRole('button').first()).toBeVisible();
+	if ((await aendern.count()) === 0) {
+		await zeile.getByRole('button', { name, exact: true }).click();
+		return;
+	}
+	await aendern.click();
+	const dialog = page.getByRole('dialog', { name: 'Ändern', exact: true });
+	await dialog.getByRole('button', { name, exact: true }).click();
+	await expect(dialog).toBeHidden();
 }
 
 /** Klappt den Aufklappbereich mit dem Titel `titel` auf, falls er zu ist (im Profil anfangs zu). */

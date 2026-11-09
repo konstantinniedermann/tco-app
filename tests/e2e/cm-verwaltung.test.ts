@@ -19,6 +19,7 @@ import {
 	klappeAuf,
 	pruefeBildschirm,
 	sammleKonsolenfehler,
+	waehleAktion,
 	wartetAufVorladen
 } from './hilfen/seite.ts';
 
@@ -38,6 +39,7 @@ const JAHR_WILDCARD: Record<string, number> = { iphone: 2087, android: 2086 };
 const JAHR_NUR_LESEN: Record<string, number> = { iphone: 2085, android: 2084, desktop: 2083 };
 const JAHR_KLEBEN: Record<string, number> = { desktop: 2059 };
 const JAHR_SUCHE: Record<string, number> = { iphone: 2058, android: 2057, desktop: 2056 };
+const JAHR_EINZEILIG: Record<string, number> = { desktop: 2055 };
 
 function testjahr(jahre: Record<string, number>, info: TestInfo): number {
 	const jahr = jahre[info.project.name];
@@ -147,7 +149,7 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 	expect(angemeldet).not.toContain('Cyrill');
 
 	// FR-46: Verschieben in die passende Kategorie, ohne Warnung.
-	await zeile(page, nachname).getByRole('button', { name: 'Verschieben' }).click();
+	await waehleAktion(page, zeile(page, nachname), 'Verschieben');
 	const verschieben = page.getByRole('dialog', { name: 'Verschieben' });
 	await verschieben.getByRole('radio', { name: 'Herren R7–R9' }).check();
 	await verschieben.getByRole('button', { name: 'Verschieben', exact: true }).click();
@@ -167,7 +169,7 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 	await expect(zeile(page, nachname)).toContainText('R8');
 
 	// Teil 4: Der CM-Admin korrigiert die Klassierung; die Liste zeigt sie gleich.
-	await zeile(page, nachname).getByRole('button', { name: 'Klassierung' }).click();
+	await waehleAktion(page, zeile(page, nachname), 'Klassierung');
 	const klassierung = page.getByRole('dialog', { name: 'Klassierung korrigieren' });
 	await klassierung.getByLabel('Klassierung').selectOption('R7');
 	await klassierung.getByRole('button', { name: 'Klassierung speichern' }).click();
@@ -176,7 +178,7 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 	await expect(zeile(page, nachname)).toContainText('R7');
 
 	// FR-46, FR-10: Löschen zieht die Anmeldung zurück, auch durch den CM-Admin.
-	await zeile(page, nachname).getByRole('button', { name: 'Löschen' }).click();
+	await waehleAktion(page, zeile(page, nachname), 'Löschen');
 	const loeschen = page.getByRole('dialog', { name: 'Anmeldung löschen?' });
 	await loeschen.getByRole('button', { name: 'Löschen', exact: true }).click();
 	await expect(loeschen).toBeHidden();
@@ -260,12 +262,12 @@ test('A-ANMELDUNG-10, FR-08: Mitglied beantragt eine Wildcard, CM-Admin lehnt mi
 	await expect(zeile(page, nachname)).toContainText(kommentar);
 	await expect(zeile(page, nachname)).toContainText('Wildcard beantragt');
 	// Verschieben bestätigt einen Antrag; der Dialog sagt es, hier nur angesehen.
-	await zeile(page, nachname).getByRole('button', { name: 'Verschieben' }).click();
+	await waehleAktion(page, zeile(page, nachname), 'Verschieben');
 	const verschieben = page.getByRole('dialog', { name: 'Verschieben' });
 	await expect(verschieben).toContainText('Der Antrag gilt danach als bestätigt.');
 	await verschieben.getByRole('button', { name: 'Abbrechen' }).click();
 	await expect(verschieben).toBeHidden();
-	await zeile(page, nachname).getByRole('button', { name: 'Entscheiden' }).click();
+	await waehleAktion(page, zeile(page, nachname), 'Entscheiden');
 	const entscheid = page.getByRole('dialog', { name: 'Wildcard-Antrag' });
 	await expect(entscheid).toContainText(kommentar);
 	await expect(entscheid).toContainText('bitte keine Angaben zur Gesundheit');
@@ -321,6 +323,7 @@ test('RR-07, FR-08: MyTCO-Admin sieht die Anmeldungen mit Kommentar, ohne Tasten
 		'Verschieben',
 		'Klassierung',
 		'Löschen',
+		'Ändern',
 		'Kategorie absagen'
 	]) {
 		await expect(page.getByRole('button', { name: taste })).toHaveCount(0);
@@ -409,4 +412,70 @@ test('Spielersuche springt nicht', async ({ page }, info) => {
 	await expect(dialog.getByText('Keine Treffer.')).toBeVisible();
 	expect(Math.abs((await hoehe()) - h0)).toBeLessThanOrEqual(1);
 	await expect(dialog.getByLabel('Mitglied suchen')).not.toHaveAttribute('aria-describedby');
+});
+
+test('PC: Anmeldungen einzeilig, Aktionen über «Ändern»', async ({ page }, info) => {
+	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: einzeilig erst ab 60rem; am Handy scrollt die Tabelle waagrecht
+	test.setTimeout(120_000);
+	const fehler = sammleKonsolenfehler(page);
+	const jahr = testjahr(JAHR_EINZEILIG, info);
+	const turnier = `Clubmeisterschaft ${jahr}`;
+	const {
+		kategorieIds: [kategorieId]
+	} = await legeOffenesTurnierAn(jahr, KATEGORIEN);
+	const nachname = `Probe${randomUUID().slice(0, 6)}`;
+	const spieler = await legeKontoAn('Rolf', nachname);
+	await setzeSpielerangaben(spieler.mitgliedId, {
+		geschlecht: 'm',
+		jahrgang: 1980,
+		klassierung: 'R8'
+	});
+	// Wildcard-Antrag mit 200 Zeichen Kommentar: Status beantragt, also vier Aktionen.
+	const kommentar = 'Ich spiele seit Jahren am Montag und möchte mich mit Stärkeren messen. '
+		.repeat(3)
+		.slice(0, 199)
+		.concat('.');
+	expect(kommentar).toHaveLength(200);
+	await beantrageWildcardDirekt(kategorieId, spieler.mitgliedId, kommentar);
+	const cm = await legeCmMitBriefCodeAn('Cyrill');
+	await oeffneKategorieAlsCm(page, cm, turnier, 'Herren R1–R6');
+
+	const z = zeile(page, nachname);
+	const taste = z.getByRole('button', { name: 'Ändern', exact: true });
+	await expect(z.getByRole('button')).toHaveCount(1);
+	await expect(taste).toBeVisible();
+	expect((await z.boundingBox())?.height).toBeLessThanOrEqual(72);
+	// Der Kommentar steht gekürzt in einer Zeile.
+	const hinweis = z.locator('.zelle-kurz');
+	await expect(hinweis).toHaveCount(1);
+	expect(await hinweis.evaluate((e) => e.getClientRects().length)).toBe(1);
+	expect(await hinweis.evaluate((e) => e.scrollWidth > e.clientWidth)).toBe(true);
+
+	// «Ändern»: Name, voller Kommentar und die Aktionen, die gerade gehen.
+	await taste.click();
+	const aendern = page.getByRole('dialog', { name: 'Ändern', exact: true });
+	await expect(aendern).toContainText(`${nachname}, Rolf`);
+	await expect(aendern).toContainText(kommentar);
+	await expect(aendern.getByRole('button')).toHaveText([
+		'Entscheiden',
+		'Verschieben',
+		'Klassierung',
+		'Löschen',
+		'Abbrechen'
+	]);
+	await pruefeBildschirm(page, info, 'cm-anmeldung-aendern');
+	await aendern.getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(aendern).toBeHidden();
+	await expect(taste).toBeFocused();
+
+	// Eine Aktion schliesst «Ändern» und öffnet ihren Dialog; Abbrechen führt zur Zeile zurück.
+	await taste.click();
+	await aendern.getByRole('button', { name: 'Klassierung', exact: true }).click();
+	const klassierung = page.getByRole('dialog', { name: 'Klassierung korrigieren' });
+	await expect(klassierung).toBeVisible();
+	await expect(aendern).toBeHidden();
+	await klassierung.getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(klassierung).toBeHidden();
+	await expect(taste).toBeFocused();
+	expect(fehler).toEqual([]);
 });
