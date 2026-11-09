@@ -389,6 +389,14 @@ test('Spielersuche springt nicht', async ({ page }, info) => {
 	await page.getByRole('button', { name: 'Von Hand anmelden' }).click();
 	const dialog = page.getByRole('dialog', { name: 'Von Hand anmelden' });
 	await expect(dialog.getByText('Ab 2 Buchstaben.')).toHaveCount(1);
+	// Screenreader hören den Hinweis beim Fokus auf das Feld
+	const beschreibung = await dialog.getByLabel('Mitglied suchen').getAttribute('aria-describedby');
+	expect(beschreibung).toBeTruthy();
+	await expect(page.locator(`#${beschreibung}`)).toContainText('Ab 2 Buchstaben.');
+	if (info.project.name !== 'desktop') {
+		// Handy: Die Tasten des Dialogs liegen ohne Scrollen im Bild
+		await expect(dialog.getByRole('button', { name: 'Abbrechen' })).toBeInViewport();
+	}
 	// offsetHeight statt boundingBox: Das Einblenden des Dialogs skaliert ihn (transform).
 	const hoehe = () => dialog.evaluate((e) => (e as HTMLElement).offsetHeight);
 	const h0 = await hoehe();
@@ -400,4 +408,5 @@ test('Spielersuche springt nicht', async ({ page }, info) => {
 	await dialog.getByLabel('Mitglied suchen').fill('zzq');
 	await expect(dialog.getByText('Keine Treffer.')).toBeVisible();
 	expect(Math.abs((await hoehe()) - h0)).toBeLessThanOrEqual(1);
+	await expect(dialog.getByLabel('Mitglied suchen')).not.toHaveAttribute('aria-describedby');
 });

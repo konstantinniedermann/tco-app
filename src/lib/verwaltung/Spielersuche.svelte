@@ -39,6 +39,12 @@
 	let suche = $state('');
 	let treffer = $state<SpielerTreffer[] | null>(null);
 	let fehler = $state<string | null>(null);
+	const hinweis = $derived(!fehler && treffer === null);
+	const beschreibung = $derived(
+		[hilfe ? `${id}-suche-hilfe` : null, hinweis ? `${id}-suche-hinweis` : null]
+			.filter(Boolean)
+			.join(' ') || undefined
+	);
 	const hatTreffer = $derived(!fehler && treffer !== null && treffer.length > 0);
 
 	// Nur die neueste Suche zählt, wenn mehrere unterwegs sind.
@@ -81,7 +87,7 @@
 		type="search"
 		maxlength="100"
 		autocomplete="off"
-		aria-describedby={hilfe ? `${id}-suche-hilfe` : undefined}
+		aria-describedby={beschreibung}
 		bind:value={() => suche, setzeSuche}
 	/>
 	{#if hilfe}
@@ -99,7 +105,7 @@
 	{#if fehler}
 		<p class="fehler" role="alert">{fehler}</p>
 	{:else if treffer === null}
-		<p class="leise">Ab 2 Buchstaben.</p>
+		<p class="leise" id="{id}-suche-hinweis">Ab 2 Buchstaben.</p>
 	{:else if treffer.length === 0}
 		<p>Keine Treffer.</p>
 	{:else}
