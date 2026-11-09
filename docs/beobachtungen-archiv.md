@@ -80,6 +80,13 @@ zwei Entscheide des Projektleiters mit offener Umsetzung und ein neuer Befund au
   Tippfehler fiele vor dem Merge auf. Trigger: ein Elternziel ohne E2E kommt dazu
 - 2026-11-08 — Breiter Pfad kürzt die aktuelle Stufe → kosmetisch. Trigger: echte Namen nach dem
   Fairgate-Import (#46) stören
+- Nebenbefund (CAS-Review) — Turnierformular nennt jede ungültige Kontaktperson «nicht mehr
+  CM-Admin», auch bei Austritt oder gesperrtem Konto (`src/lib/verwaltung/Turnierformular.svelte`,
+  `ehemalig`) → kein Test zeigt den Text. Trigger: das Turnierformular wird angefasst, dann «nicht mehr
+  wählbar» und ein E2E-Fall
+- Nebenbefund (CAS-Review) — SI-20 «Auskunft auch in der Ansicht im Verlauf» ohne eigenen Test (der
+  nur lesende MyTCO-Admin ist in `auskunft.db.test.ts` belegt) → folgt aus `mitRolle`. Trigger: die
+  «Ansicht als …» wird umgebaut
 - 2026-11-09 — Restbefunde CM-Übersicht → Paare als Text, E2E «Kontaktperson verliert die Rolle»
   (die Lücke liegt seit #71 in `cm-gespraech.test.ts`), Screenshot mit langem Namen. Trigger: Umbau
   der Seite einer Kategorie

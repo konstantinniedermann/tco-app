@@ -170,7 +170,7 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 | FR-52 | Zustand *offen*/*erledigt*: Eine Nachricht des Mitglieds setzt *offen*, eine Antwort ändert ihn nicht; jeder CM-Admin setzt ihn | A-TURNIER-04 | umgesetzt |
 | FR-53 | Meldung ohne Inhalt und ohne Namen (DS-05): bei einer Nachricht des Mitglieds nur an die gültige Kontaktperson, bei einer Antwort ans Mitglied; das Mitglied sieht nie, welcher Admin antwortet | A-TURNIER-04 | umgesetzt |
 | FR-54 | Gelöscht werden die Gespräche eines Turniers ab dem 1.1. nach dem Turnierjahr (Zürich) und das Gespräch eines Mitglieds bei seiner endgültigen Löschung | A-TURNIER-04 | umgesetzt |
-| FR-55 | Kontaktperson eines Turniers kann nur sein, wer gültig CM-Admin ist: Mitglied *aktiv*, Konto nicht gesperrt, Rolle CM-Admin. Gewählt wird nur eine gültige; Mitglieder sehen sie nur, solange sie gültig ist. Wird sie ungültig (Rolle entzogen, Austritt, Konto gesperrt), bleibt die Wahl gespeichert und wirkt wieder, sobald sie gültig ist; endgültig gelöscht, bleibt das Turnier ohne Kontaktperson | A-TURNIER-01, A-TURNIER-04 | umgesetzt |
+| FR-55 | Kontaktperson eines Turniers kann nur sein, wer gültig CM-Admin ist: Mitglied *aktiv*, Konto nicht gesperrt, Rolle CM-Admin. Gewählt wird nur eine gültige; Mitglieder sehen sie nur, solange sie gültig ist. Wird sie ungültig (Rolle entzogen, Austritt, Löschung vorgemerkt, Konto gesperrt), bleibt die Wahl gespeichert und wirkt wieder, sobald sie gültig ist; endgültig gelöscht, bleibt das Turnier ohne Kontaktperson | A-TURNIER-01, A-TURNIER-04 | umgesetzt |
 
 ## Lebenszyklen
 
