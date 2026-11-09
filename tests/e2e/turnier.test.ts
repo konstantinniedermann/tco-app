@@ -3,6 +3,7 @@ import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
 	holeMailCode,
 	legeCmMitBriefCodeAn,
+	legeRollenkontoMitBriefCodeAn,
 	loescheTurnier,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
@@ -64,7 +65,8 @@ test('RR-07, A-ROLLE-07, A-TURNIER-01, A-TURNIER-02, A-TURNIER-03, A-ANMELDUNG-0
 	const jahr = testjahr(info);
 	const name = `Clubmeisterschaft ${jahr}`;
 	await loescheTurnier(jahr);
-	const cm = await legeCmMitBriefCodeAn('Cora');
+	const nachname = `Kontakt${info.project.name}`;
+	const cm = await legeRollenkontoMitBriefCodeAn('Cora', ['cm'], nachname);
 	await meldeAn(page, cm);
 
 	// RR-07: die CM sieht die Kachel; die Bestätigung führt zu den Turnieren, nicht zu den Mitgliedern.
@@ -86,6 +88,17 @@ test('RR-07, A-ROLLE-07, A-TURNIER-01, A-TURNIER-02, A-TURNIER-03, A-ANMELDUNG-0
 	await page.getByRole('button', { name: 'Turnier anlegen' }).click();
 	await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
 	await expect(page.getByText('in Vorbereitung', { exact: true })).toBeVisible();
+
+	// Kontaktperson: zur Wahl stehen die CM-Admins; gespeichert bleibt sie nach dem Neuladen.
+	await expect(page.getByText('Keine Kontaktperson gewählt.', { exact: true })).toBeVisible();
+	await page.getByLabel('Kontaktperson').selectOption({ label: `Cora ${nachname}` });
+	await page.getByRole('button', { name: 'Angaben speichern' }).click();
+	await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
+	await page.reload();
+	await expect(page.getByLabel('Kontaktperson').locator('option:checked')).toHaveText(
+		`Cora ${nachname}`
+	);
+	await expect(page.getByText('Keine Kontaktperson gewählt.', { exact: true })).toHaveCount(0);
 
 	// FR-33: ohne Kategorie lässt sich die Anmeldung nicht öffnen.
 	await page.getByRole('button', { name: 'Anmeldung öffnen' }).click();

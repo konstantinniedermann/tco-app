@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import Mitteilungsformular from '../../../lib/verwaltung/Mitteilungsformular.svelte';
 	import Mitteilungsverlauf from '../../../lib/verwaltung/Mitteilungsverlauf.svelte';
 	import { ladeMitteilungen } from '../../../lib/verwaltung/mitteilung-api.ts';
@@ -19,7 +20,9 @@
 	<title>Mitteilungen – MyTCO</title>
 </svelte:head>
 
-<h1>Mitteilungen</h1>
+<Seitenkopf>
+	<h1>Mitteilungen</h1>
+</Seitenkopf>
 <p class="leise">
 	Allgemeine Mitteilungen an alle aktiven Mitglieder, per Push oder E-Mail. Mitteilungen zu einem
 	Anlass schickst du auf der Seite des Anlasses.

@@ -8,7 +8,11 @@
 	import { tick } from 'svelte';
 	import { refreshAll } from '$app/navigation';
 	import Name from '../ui/Name.svelte';
+	import { amtlicherName } from '../name.ts';
 	import Spielersuche from './Spielersuche.svelte';
+	import Zeilenaktionen from './Zeilenaktionen.svelte';
+	import Zeilentasten from './Zeilentasten.svelte';
+	import type { Zeilenaktion } from './zeilenaktionen.ts';
 	import { KLASSIERUNGEN, klassierungName, type Klassierung } from '../turnier/klassierung.ts';
 	import {
 		entscheideAntrag,
@@ -66,6 +70,7 @@
 	let klassierungDialog = $state<HTMLDialogElement>();
 	let loeschen = $state<HTMLDialogElement>();
 	let entscheiden = $state<HTMLDialogElement>();
+	let aendern = $state<ReturnType<typeof Zeilenaktionen>>();
 
 	// Jedes Öffnen von «Von Hand anmelden» beginnt mit einer leeren Suche.
 	let suchlauf = $state(0);
@@ -101,6 +106,16 @@
 	function oeffneEntscheid(z: AnmeldungZeile) {
 		grund = '';
 		oeffne(entscheiden, z);
+	}
+
+	/** Was in der Zeile gerade geht; ab drei Aktionen stehen sie im Dialog «Ändern». */
+	function aktionenVon(z: AnmeldungZeile): Zeilenaktion[] {
+		return [
+			...(z.status === 'beantragt' ? [{ name: 'Entscheiden', los: () => oeffneEntscheid(z) }] : []),
+			...(offen ? [{ name: 'Verschieben', los: () => oeffneVerschieben(z) }] : []),
+			{ name: 'Klassierung', los: () => oeffneKlassierung(z) },
+			{ name: 'Löschen', los: () => oeffne(loeschen, z) }
+		];
 	}
 
 	/**
@@ -251,15 +266,21 @@
 						{#each zeilen as z (z.anmeldungId)}
 							{@const status = anmeldungStatus(z.status)}
 							{@const vermerk = mitgliedVermerk(z.mitgliedStatus)}
+							{@const aktionen = aktionenVon(z)}
 							<tr>
 								<td>
-									<span id="anmeldung-{z.anmeldungId}"
-										><Name name={z.name} form="nachname-zuerst" /></span
-									>
-									{#if vermerk}<span class={vermerk.klasse}>{vermerk.text}</span>{/if}
-									{#if z.kommentar}
-										<div class="leise mehrzeilig">{z.kommentar}</div>
-									{/if}
+									<div class="zelle-dehnbar">
+										<span
+											id="anmeldung-{z.anmeldungId}"
+											class="zelle-kurz"
+											title={amtlicherName(z.name, 'nachname-zuerst')}
+											><Name name={z.name} form="nachname-zuerst" /></span
+										>
+										{#if vermerk}<span class={vermerk.klasse}>{vermerk.text}</span>{/if}
+										{#if z.kommentar}
+											<span class="leise zelle-kurz" title={z.kommentar}>{z.kommentar}</span>
+										{/if}
+									</div>
 								</td>
 								<td>
 									{#if z.klassierung}
@@ -273,36 +294,12 @@
 								<td><span class="plakette {status.klasse}">{status.text}</span></td>
 								{#if !nurLesen}
 									<td>
-										<div class="leiste">
-											{#if z.status === 'beantragt'}
-												<button
-													type="button"
-													class="taste-neben"
-													aria-describedby="anmeldung-{z.anmeldungId}"
-													onclick={() => oeffneEntscheid(z)}>Entscheiden</button
-												>
-											{/if}
-											{#if offen}
-												<button
-													type="button"
-													class="taste-neben"
-													aria-describedby="anmeldung-{z.anmeldungId}"
-													onclick={() => oeffneVerschieben(z)}>Verschieben</button
-												>
-											{/if}
-											<button
-												type="button"
-												class="taste-neben"
-												aria-describedby="anmeldung-{z.anmeldungId}"
-												onclick={() => oeffneKlassierung(z)}>Klassierung</button
-											>
-											<button
-												type="button"
-												class="taste-neben"
-												aria-describedby="anmeldung-{z.anmeldungId}"
-												onclick={() => oeffne(loeschen, z)}>Löschen</button
-											>
-										</div>
+										<Zeilentasten
+											{aktionen}
+											beschrieben="anmeldung-{z.anmeldungId}"
+											onaendern={() =>
+												aendern?.zeige({ name: z.name, text: z.kommentar, aktionen })}
+										/>
 									</td>
 								{/if}
 							</tr>
@@ -315,6 +312,8 @@
 </div>
 
 {#if !nurLesen}
+	<Zeilenaktionen bind:this={aendern} id="anmeldung-aendern" />
+
 	<dialog class="karte" bind:this={anmelden} aria-labelledby="anmelden-titel">
 		<h2 id="anmelden-titel">Von Hand anmelden</h2>
 		{#key suchlauf}

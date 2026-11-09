@@ -171,6 +171,10 @@ test('FR-42: Mitglieder-Admin wählt Erinnerung, sieht Vorschau mit Zahl und Nam
 	await expect(zeile.nth(1)).toContainText('0 per Push, 1 per E-Mail');
 	// Spec Ziel 12: keine Namen der Empfänger im Verlauf.
 	await expect(zeile.nth(1)).not.toContainText(name);
+	// PC: Titel und Text stehen in einer Zeile, die Zeile hat keine Tasten (≤ 48 hoch).
+	if (info.project.name === 'desktop') {
+		expect((await zeile.nth(1).boundingBox())?.height).toBeLessThanOrEqual(48);
+	}
 	await pruefeBildschirm(page, info, 'mitteilung-verlauf');
 
 	// DS-05: eine eigene Mail an den Gast, Betreff = Titel.

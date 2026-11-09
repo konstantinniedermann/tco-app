@@ -110,11 +110,14 @@ test('Nur der Rollbereich scrollt, Kopfleiste und Reiter stehen fest', async ({ 
 	const leiste = await page.getByRole('navigation', { name: 'Hauptnavigation' }).boundingBox();
 	expect(kopf?.y).toBe(0);
 	expect(leiste).not.toBeNull();
-	// Handy: Reiter unten am Bildschirm; PC: als Textlinks direkt unter der Kopfleiste.
+	// Handy: Reiter unten am Bildschirm; PC: mit Symbol in der Kopfleiste (innerhalb ihrer Höhe).
 	if (leiste && kopf && leiste.y > kopf.height) {
 		expect(Math.round(leiste.y + leiste.height)).toBe(hoehe);
 	} else {
-		expect(Math.round(leiste?.y ?? -1)).toBe(Math.round(kopf?.height ?? 0));
+		expect(leiste?.y ?? -1).toBeGreaterThanOrEqual(kopf?.y ?? 0);
+		expect((leiste?.y ?? 0) + (leiste?.height ?? 0)).toBeLessThanOrEqual(
+			(kopf?.y ?? 0) + (kopf?.height ?? 0)
+		);
 	}
 });
 
@@ -282,15 +285,25 @@ test('Bewegung reduzieren: kein Übergang (UI-09)', async ({ page }) => {
 	await reiter(page, 'Start').click();
 	await expect(page).toHaveURL(/\/$/);
 	expect(await uebergaenge(page)).toEqual([]);
-	// Auch Balken, Symbol, Kachel und Pfeil des Aufklappbereichs bewegen sich nicht (im Profil;
-	// eine Kachel als Link hat ein normales Mitglied nicht, darum eine zum Prüfen).
+	// Auch Balken, Symbol, Kachel, Pfeil des Aufklappbereichs, Titel und Zusatz der Kopfleiste
+	// bewegen sich nicht (im Profil; eine Kachel als Link hat ein normales Mitglied nicht, den
+	// Zusatz «Verwaltung» gibt es nur in der Verwaltung, darum je einer zum Prüfen).
 	await reiter(page, 'Profil').click();
 	await expect(page).toHaveURL(/\/profil$/);
 	const dauern = await page.evaluate(() => {
 		const kachel = document.createElement('a');
 		kachel.className = 'kachel';
-		document.querySelector('main')?.append(kachel);
-		return ['.reiter-balken', '.reiter a .symbol', 'a.kachel', '.klappe-titel'].map((wahl) => {
+		const zusatz = document.createElement('span');
+		zusatz.className = 'kopf-zusatz';
+		document.querySelector('main')?.append(kachel, zusatz);
+		return [
+			'.reiter-balken',
+			'.reiter a .symbol',
+			'a.kachel',
+			'.klappe-titel',
+			'.kopf-titel',
+			'.kopf-zusatz'
+		].map((wahl) => {
 			const el = document.querySelector(wahl);
 			if (!el) return `${wahl} fehlt`;
 			const s = getComputedStyle(el, wahl === '.klappe-titel' ? '::after' : null);

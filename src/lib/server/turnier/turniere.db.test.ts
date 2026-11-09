@@ -3,7 +3,14 @@ import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { ladeCmAnsicht, laufendeTurniere, meldeAb, meldeAn } from '../cm/anmeldungen.ts';
 import { erstelleDb } from '../db/index.ts';
-import { anmeldung, anmeldungSpieler, konto, mitglied, partnerAnfrage } from '../db/schema.ts';
+import {
+	anmeldung,
+	anmeldungSpieler,
+	konto,
+	kontoRolle,
+	mitglied,
+	partnerAnfrage
+} from '../db/schema.ts';
 import type { KategorieWerte, TurnierWerte } from './angaben.ts';
 import {
 	aendereKategorie,
@@ -16,6 +23,7 @@ import {
 	sageKategorieAb,
 	setzeStatus
 } from './turniere.ts';
+import { kontaktGueltig } from './kontakt.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 
@@ -136,6 +144,73 @@ describe('Turniere', () => {
 		// Wirksam geschlossen: Schliessen ist unzulässig, Öffnen scheitert am Schluss.
 		expect(await setzeStatus(db, id, 'geschlossen', jetztNach(w))).toBe('unzulaessig');
 		expect(await setzeStatus(db, id, 'offen', jetztNach(w))).toBe('schluss-vorbei');
+	});
+});
+
+describe('Kontaktperson', () => {
+	test('speichert einen CM-Admin als Kontakt, ladeTurnier zeigt ihn gültig', async () => {
+		const admin = await legeMitgliedAn(db, {
+			vorname: 'Kontakta',
+			nachname: 'Beispiel',
+			rollen: ['cm']
+		});
+		const { id, w } = await neuesTurnier();
+		expect(await aendereTurnier(db, id, { ...w, kontakt: admin.mitgliedId })).toBe('ok');
+		const d = await ladeTurnier(db, id, jetztVor(w));
+		expect(d?.kontakt).toEqual({
+			mitgliedId: admin.mitgliedId,
+			name: { rufname: null, vorname: 'Kontakta', nachname: 'Beispiel' },
+			gueltig: true
+		});
+		expect(d?.kontaktWahl).toContainEqual({
+			mitgliedId: admin.mitgliedId,
+			name: { rufname: null, vorname: 'Kontakta', nachname: 'Beispiel' }
+		});
+	});
+
+	test('lehnt ein Mitglied ohne Rolle cm ab', async () => {
+		const ohne = await legeMitgliedAn(db, { rollen: ['mitglieder'] });
+		const { id, w } = await neuesTurnier();
+		expect(await aendereTurnier(db, id, { ...w, kontakt: ohne.mitgliedId })).toBe(
+			'kontakt-ungueltig'
+		);
+		expect((await ladeTurnier(db, id, jetztVor(w)))?.kontakt).toBeNull();
+	});
+
+	test('behält eine ungültig gewordene Kontaktperson beim Speichern ohne Änderung', async () => {
+		const admin = await legeMitgliedAn(db, { rollen: ['cm'] });
+		const { id, w } = await neuesTurnier();
+		expect(await aendereTurnier(db, id, { ...w, kontakt: admin.mitgliedId })).toBe('ok');
+		await db.delete(kontoRolle).where(eq(kontoRolle.kontoId, admin.kontoId));
+		expect(
+			await aendereTurnier(db, id, { ...w, name: `${w.name} neu`, kontakt: admin.mitgliedId })
+		).toBe('ok');
+		const d = await ladeTurnier(db, id, jetztVor(w));
+		expect(d?.kontakt).toMatchObject({ mitgliedId: admin.mitgliedId, gueltig: false });
+		expect(d?.kontaktWahl.map((k) => k.mitgliedId)).not.toContain(admin.mitgliedId);
+	});
+
+	test('kontaktWahl enthält nur aktive, nicht gesperrte CM-Admins', async () => {
+		const gut = await legeMitgliedAn(db, { rollen: ['cm'] });
+		const gesperrt = await legeMitgliedAn(db, { rollen: ['cm'], gesperrt: true });
+		const ausgetreten = await legeMitgliedAn(db, { rollen: ['cm'], status: 'ausgetreten' });
+		const vorgemerkt = await legeMitgliedAn(db, { rollen: ['cm'], status: 'vorgemerkt' });
+		const { id, w } = await neuesTurnier();
+		const ids = (await ladeTurnier(db, id, jetztVor(w)))?.kontaktWahl.map((k) => k.mitgliedId);
+		expect(ids).toContain(gut.mitgliedId);
+		for (const m of [gesperrt, ausgetreten, vorgemerkt]) expect(ids).not.toContain(m.mitgliedId);
+		expect(await kontaktGueltig(db, gut.mitgliedId)).toBe(true);
+		expect(await kontaktGueltig(db, vorgemerkt.mitgliedId)).toBe(false);
+	});
+
+	test('Speichern ohne Schlüssel kontakt lässt ihn stehen, null entfernt ihn', async () => {
+		const admin = await legeMitgliedAn(db, { rollen: ['cm'] });
+		const { id, w } = await neuesTurnier();
+		await aendereTurnier(db, id, { ...w, kontakt: admin.mitgliedId });
+		expect(await aendereTurnier(db, id, { ...w, name: `${w.name} x` })).toBe('ok');
+		expect((await ladeTurnier(db, id, jetztVor(w)))?.kontakt?.mitgliedId).toBe(admin.mitgliedId);
+		expect(await aendereTurnier(db, id, { ...w, kontakt: null })).toBe('ok');
+		expect((await ladeTurnier(db, id, jetztVor(w)))?.kontakt).toBeNull();
 	});
 });
 

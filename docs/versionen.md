@@ -8,6 +8,42 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.19.1 — Löschung leert die Kontaktperson, Doku-Abgleich vor dem Release
+
+- Wird ein Mitglied gelöscht, ist es nicht mehr Kontaktperson eines Turniers; die Verwaltung
+  zeigt den Namen danach nicht mehr an. Doku-Abgleich vor dem Release (Datenschutz, Fachmodell,
+  Testkonzept, Leitbild, CI).
+
+## 0.19.0 — Feinschliff am PC, Seitentitel in der Kopfleiste
+
+- Feinschliff am Computer: Die Kopfleiste zeigt beim Scrollen den Titel der Seite, am Handy wie
+  am PC. Am PC stehen die Reiter mit Symbol mittig in der Kopfleiste. In der Verwaltung bleiben
+  Seitenleiste, Pfad und Titel beim Scrollen stehen. Die Tabellen der Verwaltung sind einzeilig
+  und passen ohne seitliches Scrollen; lange Namen und Kommentare enden mit «…», ab drei Aktionen
+  liegen sie hinter «Ändern». Die Spielersuche im Dialog «Von Hand anmelden» springt nicht mehr und nennt
+  den Hinweis «Ab 2 Buchstaben.».
+
+## 0.18.0 — CM-Übersicht übersichtlicher, Kontaktperson pro Turnier
+
+- Clubmeisterschaft übersichtlicher: kein Zähler «1 von 3 Anmeldungen» mehr; wo man dabei ist,
+  steht als Plakette («angemeldet», «sucht Partner», «Wildcard beantragt») neben dem
+  Kategorienamen. Die Namen der Angemeldeten stehen auf einer eigenen Seite der Kategorie
+  («12 angemeldet ›»), die Suchenden im Doppel sind zugeklappt.
+- Kontaktperson pro Turnier: Der CM-Admin wählt im Turnier eine Person mit der Rolle CM-Admin;
+  Mitglieder sehen am Ende der Seite «Bei Fragen oder Problemen melde dich bei … (CM-Admin).»
+  (Name ohne Kontaktdaten). Der Hinweis «Zu starke Paare meldet die Turnierleitung an» fällt weg.
+
+## 0.17.2 — Testdaten: Suchende im Doppel anfragbar
+
+- Testdaten (`make seed`): Die Beispielspieler der Clubmeisterschaft haben ein Konto mit Login.
+  Wer im Doppel allein sucht, lässt sich jetzt finden und anfragen; die Beispiel-Anfrage im
+  Herren Doppel wird angezeigt.
+
+## 0.17.1 — Abhängigkeiten aktualisiert
+
+- Abhängigkeiten aktualisiert (Dependabot #68, nur Entwicklungswerkzeuge): vitest und
+  @vitest/coverage-v8 5.1.0, vite 8.3.6, svelte-check 4.7.8, eslint-plugin-svelte 3.24.0.
+
 ## 0.17.0 — Doppel in der Verwaltung
 
 - Doppel in der Verwaltung (#59, Etappe 2): Der CM-Admin sieht Paare, Suchende und offene

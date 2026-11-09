@@ -116,6 +116,24 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-08 — Restbefunde aus den Reviews von #59 Etappe 2 (Doppel in der Verwaltung)
+
+**Thema:** Verwaltung UI
+
+**Fundort:** `src/lib/server/cm/verwaltung-doppel.ts`, `src/lib/server/cm/doppel.ts`, `src/lib/verwaltung/DoppelListe.svelte`, `src/lib/verwaltung/Aktionsdialog.svelte`, `src/lib/server/cm/verwaltung-doppel.db.test.ts`, `src/lib/server/turnier/schnittstellen.db.test.ts`
+
+**Beobachtung:**
+- Für den Projektleiter: Löscht der CM-Admin die Anmeldung eines Suchenden, bleiben dessen eigene offene Anfragen stehen (wie beim Selbst-Abmelden); nimmt der Angefragte später an, entsteht das Paar trotzdem. Mitlöschen oder so lassen?
+- *Partner ändern* legt für den Bleibenden eine neue Anmeldung an (`angemeldetAm` = jetzt); falls später etwas nach Anmeldedatum sortiert (Warteliste), beachten.
+- Die Warnung «3 Anmeldungen» nennt bei zwei Spielern «A oder B», weil der Server nicht meldet, wer es ist.
+- Testlücken: keine Tests mit echter Überschneidung für *Partner ändern* und *Verschieben* (gleiche Sperrfolge wie die getesteten Wege); kein Test, dass die Meldung entfällt, wenn der Anfragende selbst CM-Admin ist; kein Test für das Verwerfen veralteter Antworten im Aktionsdialog und das Aufräumen des Suchtimers; eine Anfrage eines gesperrten Kontos hält dessen Platz (`anfrage-offen`) — gewollt, ungetestet.
+- Eine veraltete Umleitung oder `ok` im Aktionsdialog läuft noch vor dem Stand-Vergleich (harmlos).
+- `DoppelListe.svelte` hat rund 650 Zeilen; die drei Tabellenteile liessen sich als Komponenten herauslösen.
+
+**Ursprung:** #59 Etappe 2, Task-Reviews und Schluss-Review (SDD-Ledger), nicht im Branch erledigt.
+
+**Einschätzung:** Niedrig für den Verein. Die Frage zum Löschen eines Suchenden mit dem CM-Betrieb klären; Testlücken und Aufteilung beim nächsten Umbau der Verwaltung.
+
 ### 2026-11-08 — Einzel-Liste auf Aktionsdialog umstellen
 
 **Thema:** Verwaltung UI
@@ -239,3 +257,111 @@ Einzel-Liste.
 **Ursprung:** Doku-Abgleich vor Release 0.17.0
 
 **Einschätzung:** Niedrig. Mit dem Stand von #43 abgleichen und den Punkt abhaken oder belassen.
+
+### 2026-11-09 — A-LOGIN-09 auf iPhone einmal rot mit «Importing a module script failed»
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/login.test.ts:66` (A-LOGIN-09, Projekt `iphone`).
+
+**Beobachtung:** Im vollen `make check` scheiterte der Test einmal: WebKit meldete nach dem Neuladen «TypeError: Importing a module script failed». Der Einzellauf danach (`--repeat-each 3`) war dreimal grün. Der Branch hatte nur das Seed geändert, das E2E nicht benutzt.
+
+**Ursprung:** Session Seed-Fix (Beispielspieler mit Login), `make check`
+
+**Einschätzung:** Niedrig, vermutlich ein Wackler unter Last (Modul nach dem Neuladen noch nicht ausgeliefert). Wiederholt er sich, Trace holen.
+
+### 2026-11-09 — cmAdmins zählt ausgetretene und vorgemerkte Mitglieder mit
+
+**Thema:** Rechte
+
+**Fundort:** `src/lib/server/mitteilung/meldung.ts` (`cmAdmins`) gegenüber `src/lib/server/turnier/kontakt.ts` (`gueltigerCmAdmin`).
+
+**Beobachtung:** `cmAdmins` prüft nur Rolle `cm` und ungesperrtes Konto, nicht den Status des Mitglieds. Die neue Regel für die Kontaktperson verlangt zusätzlich Status *aktiv*. Meldungen an die CM-Admins (z. B. neuer Wildcard-Antrag) können so an ausgetretene oder zum Löschen vorgemerkte Personen gehen; `meldeMitgliedern` filtert allerdings selbst nach `aktiv`, die Mail geht also wohl nicht raus.
+
+**Ursprung:** CAS-Review des Branches feat/cm-uebersicht
+
+**Einschätzung:** Niedrig. Prüfen, ob `cmAdmins` auf `gueltigerCmAdmin` umgestellt werden soll, damit es nur eine Regel gibt.
+
+### 2026-11-09 — E2E-Mails scheitern, wenn das Netz «localhost» nicht auflöst
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/hilfen/umgebung.ts` (`MYTCO_SMTP_URL: 'smtp://localhost:51025'`), Mailpit aus `docker-compose.yml` (lauscht nur auf `127.0.0.1`).
+
+**Beobachtung:** nodemailer löst `localhost` zuerst über den DNS-Server des Netzes auf (`resolve4`). Antwortet der mit `ESERVFAIL`, weicht nodemailer auf `::1` aus, wo Mailpit nicht lauscht: Jeder E2E-Test mit Mail scheitert («Keine Mail in Mailpit angekommen», 139 rote Tests). Mit `MYTCO_SMTP_URL=smtp://127.0.0.1:51025` läuft alles.
+
+**Ursprung:** `make check` im Branch feat/cm-uebersicht, nach einem Netzwechsel
+
+**Einschätzung:** Mittel, weil es den Nachweis lahmlegt und wie ein Code-Fehler aussieht. Vorschlag: Standard in `umgebung.ts` (und ggf. `.env.example`) auf `127.0.0.1` stellen.
+
+### 2026-11-09 — Überschrift als erste Zeile einer Karte hat Abstand oben
+
+**Thema:** Verwaltung UI
+
+**Fundort:** `src/lib/design/basis.css` (`h2 { margin-top: var(--abstand-5) }`), z. B. Karte «Deine Angaben» und Seite einer Kategorie («Angemeldet (N)»).
+
+**Beobachtung:** Steht ein `h2` zuoberst in einer `.karte`, kommt zum Innenabstand der Karte noch der Abstand über der Überschrift: sichtbarer Leerraum oben in der Karte.
+
+**Ursprung:** Screenshots der neuen Seite einer Kategorie (feat/cm-uebersicht)
+
+**Einschätzung:** Niedrig, rein optisch. Eine Regel `.karte > h2:first-child { margin-top: 0 }` im Baustein Karte würde es überall beheben; vorher alle Karten mit Überschrift ansehen.
+
+### 2026-11-09 — Restbefunde aus den Reviews der CM-Übersicht
+
+**Thema:** Tests
+
+**Fundort:** `src/routes/clubmeisterschaft/[id]/kategorie/[kid]/+page.svelte`, `tests/e2e/cm-anmeldung.test.ts`
+
+**Beobachtung:** (1) Die Seite einer Kategorie zeigt Paare als Text (`paarText`, «Rufname (Amtlich) / …»), die Einzelliste dagegen mit dem Baustein *Name* — uneinheitlich. (2) «Kontaktperson verliert die Rolle → Satz verschwindet» ist nur im DB-Test belegt, nicht im E2E. (3) Kein Screenshot mit sehr langem Kategorienamen auf 375 px; das CSS von `.karte-kopf` bricht um, ist aber nicht bildlich nachgewiesen.
+
+**Ursprung:** Abschluss-Review und CAS-Review von feat/cm-uebersicht (0.18.0)
+
+**Einschätzung:** Niedrig, nichts davon führt Mitglieder in die Irre.
+
+### 2026-11-09 — «#69: Anmelden auf der CM-Seite lädt die Seite nicht neu» rot, wenn navigation und bewegung zusammen laufen
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/navigation.test.ts` (Test «#69: Anmelden auf der CM-Seite lädt die Seite nicht neu»), zusammen mit `tests/e2e/bewegung.test.ts`
+
+**Beobachtung:** `npm run e2e -- tests/e2e/navigation.test.ts tests/e2e/bewegung.test.ts --project iphone --project android` ist auf iPhone und Android reproduzierbar rot: Nach «Anmelden» im Dialog bleibt `role=status` leer, die Kategorie zeigt «Noch niemand angemeldet». Allein läuft die Datei grün, ebenso im vollen `make check`. Auf `origin/dev` (edb8268) gleich, also nicht aus feat/ui-pc-feinschliff.
+
+**Ursprung:** Feinschliff PC (feat/ui-pc-feinschliff), Gegenprobe auf einem frischen Worktree von `origin/dev`
+
+**Einschätzung:** Mittel für die Verlässlichkeit der Tests, kein Hinweis auf einen App-Fehler. Vermutlich gemeinsamer Zustand zwischen den beiden Dateien (Turnierjahre oder laufende CMs); erst Trace mit Netzwerk ansehen.
+
+### 2026-11-09 — Restbefunde aus den Reviews von Feinschliff PC
+
+**Thema:** Verwaltung UI
+
+**Fundort:** `src/lib/design/basis.css`, `src/lib/ui/kopftitel.ts`, `src/lib/verwaltung/Spielersuche.svelte`, Tests dazu
+
+**Beobachtung:** (1) `scroll-padding-top` für den klebenden Seitenkopf am PC ist geschätzt (`--abstand-6 + 8rem`) statt aus Tokens abgeleitet; ein umbrechender langer Titel ist höher. (2) Die flexible Namens-/Kommentarspalte (`max-width: 0` in der Zelle) ist nur in Chromium geprüft, nicht in Safari/Firefox am Desktop. (3) Am PC mit Band «Ansicht als …» ragt die Seitenleiste (100dvh) bei Scrollstand 0 um die Bandhöhe unter den Rand. (4) Spielersuche im Handy-Querformat nur ~136 px hoch (35dvh). (5) Gleiche Route mit anderem Parameter: der neue Titel blitzt kurz in der Kopfleiste auf. (6) Fokus-Rückgabe des «Ändern»-Dialogs nur in Desktop-Chrome getestet. (7) Spielernamen und E-Mail in übrigen Tabellen ungekürzt — bei Extremwerten scrollt die Tabelle in ihrer Box.
+
+**Ursprung:** Task- und Abschluss-Reviews von feat/ui-pc-feinschliff
+
+**Einschätzung:** Niedrig, nichts davon führt in die Irre; (1) und (2) beim nächsten Gang durch die Verwaltung am Mac/Safari ansehen.
+
+### 2026-11-09 — Kontaktperson ohne Fachregel, ihre Tests ohne ID
+
+**Thema:** Tests
+
+**Fundort:** `src/lib/server/turnier/kontakt.ts`, `docs/fachmodell.md` (Turnier), Tests «Kontaktperson: …» in `turniere.db.test.ts`, `anmeldungen.db.test.ts`, `schnittstellen.db.test.ts`, `angaben.test.ts`, `auskunft.db.test.ts`, `tests/scripts/beispiel-turnier.db.test.ts`
+
+**Beobachtung:** Die Regeln zur Kontaktperson (wählbar nur, wer aktiv ist, ein ungesperrtes Konto und die Rolle CM-Admin hat; für Mitglieder sichtbar nur, solange das gilt; die Wahl bleibt gespeichert) stehen nur im Code. Das Fachmodell sagt nur «solange sie CM-Admin ist». Rund 14 Tests nennen darum keine ID. Vorschlag: eine neue Fachregel (FR-50) und die Tests danach benennen.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.19.1.
+
+**Einschätzung:** Mittel; betrifft nur die Nachvollziehbarkeit, das Verhalten ist getestet.
+
+### 2026-11-09 — Kontaktperson: Schnittstelle liefert den Rufnamen mit, die Zusage nennt Vor- und Nachname
+
+**Thema:** Datenschutz
+
+**Fundort:** `src/lib/server/cm/anmeldungen.ts` (`kontaktperson`, liest `namensSpalten`), `docs/datenschutz.md` («Wer sieht was», alle Mitglieder)
+
+**Beobachtung:** Die CM-Seite zeigt den amtlichen Namen. Die Antwort von `/api/cm` enthält aber auch den Rufnamen. Den dürfen alle Mitglieder ohnehin sehen, darum ist das kein Verstoss, nur eine Abweichung vom Wortlaut. Entweder nur Vor- und Nachname lesen (Code an die Zusage angleichen) oder die Zusage auf «Name mit Rufname» präzisieren.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.19.1.
+
+**Einschätzung:** Niedrig; Entscheid des Projektleiters, welcher Weg.

@@ -90,6 +90,11 @@ export function postTurnier(d: AdminDienste, e: AdminEreignis): Promise<Response
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.felder });
 		const r = await aendereTurnier(d.db, id, p.werte);
 		if (r === 'nicht-gefunden') return nichtGefunden();
+		if (r === 'kontakt-ungueltig')
+			return antwort(400, {
+				fehler: 'eingabe',
+				felder: { kontakt: 'Diese Person ist nicht CM-Admin.' }
+			});
 		if (r === 'vergeben') return antwort(409, { fehler: 'vergeben', feld: 'jahr' });
 		return antwort(200, {});
 	});

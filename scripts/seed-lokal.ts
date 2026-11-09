@@ -1,5 +1,5 @@
 // Nur lokal: legt einen Testbestand an (rund 200 erfundene Mitglieder, zwei Anlässe, ein
-// Beispielturnier) und gibt Brief-Codes für die Personas aus: Erika (MyTCO-Admin und
+// Beispielturnier mit Hanna als Kontaktperson) und gibt Brief-Codes für die Personas aus: Erika (MyTCO-Admin und
 // Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur
 // Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin). Mehrfach ausführbar: Vorhandenes
 // bleibt, Logins bleiben gültig, nur die Brief-Codes der Personas sind neu.
@@ -19,7 +19,7 @@ import {
 	meldeBeispielAntworten
 } from './beispiel-anlass.ts';
 import { legeBeispielMitgliederAn } from './beispiel-mitglieder.ts';
-import { legeBeispielTurnierAn } from './beispiel-turnier.ts';
+import { legeBeispielTurnierAn, setzeBeispielKontakt } from './beispiel-turnier.ts';
 import { ERFUNDENE_MITGLIEDER, legeErfundeneMitgliederAn } from './erfundene-mitglieder.ts';
 
 // Nur lokal, nicht auf Test (testdaten.ts legt nur ERFUNDENE_MITGLIEDER an).
@@ -58,7 +58,7 @@ async function seed(): Promise<void> {
 			.where(eq(konto.id, kontoIds[0]));
 		const jetzt = new Date();
 		const gv = await legeBeispielAnlassAn(db, erika.id, jetzt);
-		// Eine Beispiel-Clubmeisterschaft und Hanna als CM-Admin.
+		// Eine Beispiel-Clubmeisterschaft 2027 (Rolle und Kontaktperson folgen unten).
 		await legeBeispielTurnierAn(db, jetzt);
 		// Testbestand: rund 200 Mitglieder, ein zweiter Anlass, gemischte Antworten auf beide.
 		const bestand = await legeBeispielMitgliederAn(db, jetzt);
@@ -74,6 +74,12 @@ async function seed(): Promise<void> {
 		for (const [index, rolle] of einzelrollen) {
 			await db.insert(kontoRolle).values({ kontoId: kontoIds[index], rolle }).onConflictDoNothing();
 		}
+		// Hanna (CM-Admin) ist Kontaktperson der Beispiel-Clubmeisterschaft.
+		const [hanna] = await db
+			.select({ id: konto.mitgliedId })
+			.from(konto)
+			.where(eq(konto.id, kontoIds[2]));
+		await setzeBeispielKontakt(db, hanna.id);
 		const dienst = erstelleLoginDienst({
 			db,
 			schluessel: einstellungen.codeSchluessel,

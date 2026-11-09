@@ -66,6 +66,8 @@ export type Auskunft = {
 	anlaesseErstellt: { titel: string; beginn: Date }[];
 	/** Nur bestätigte Anmeldungen, ohne Kommentar: Wildcard-Anträge sieht der Mitglieder-Admin nicht (FR-08). */
 	cm: { turnier: string; kategorie: string; angemeldetAm: Date }[];
+	/** Turniere, für die das Mitglied als Kontaktperson gewählt ist (nur der Name ist sichtbar). */
+	kontaktperson: { turnier: string }[];
 	/** Mitteilungen, die das Mitglied gesendet hat; ohne Empfänger (FR-45). */
 	mitteilungen: { titel: string; gesendetAm: Date }[];
 	verlauf: AuskunftVerlauf[];
@@ -105,6 +107,7 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 		anlaesse,
 		anlaesseErstellt,
 		cm,
+		kontaktperson,
 		mitteilungen,
 		verlauf
 	] = await Promise.all([
@@ -177,6 +180,11 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 			.innerJoin(turnier, eq(turnier.id, kategorie.turnierId))
 			.where(and(eq(anmeldungSpieler.mitgliedId, id), eq(anmeldung.status, 'bestaetigt')))
 			.orderBy(desc(turnier.jahr), asc(kategorie.name), asc(anmeldung.id)),
+		db
+			.select({ turnier: turnier.name })
+			.from(turnier)
+			.where(eq(turnier.kontaktMitgliedId, id))
+			.orderBy(desc(turnier.jahr)),
 		// Nur Titel und Zeit; Text, Auswahl und Zahlen sind keine Daten dieser Person.
 		db
 			.select({ titel: mitteilung.titel, gesendetAm: mitteilung.gesendetAm })
@@ -222,6 +230,7 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 		anlaesse,
 		anlaesseErstellt,
 		cm,
+		kontaktperson,
 		mitteilungen,
 		verlauf: verlauf.map((z) => ({
 			zeitpunkt: z.zeitpunkt,

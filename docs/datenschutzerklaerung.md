@@ -47,6 +47,8 @@ du selbst einschaltest. Für nichts anderes.
 - Deinen Wildcard-Antrag und seinen Kommentar sehen nur du, die CM-Admins und die MyTCO-Admins.
   Schreib in den Kommentar bitte keine Angaben zur Gesundheit.
 - Deinen Rufnamen sehen eingeloggte Mitglieder neben deinem Namen, öffentliche Seiten zeigen ihn nicht. Du kannst ihn jederzeit im Profil ändern oder löschen.
+- Bist du CM-Admin und für ein Turnier als Kontaktperson gewählt, sehen alle Mitglieder deinen Namen auf der Seite
+  dieser Clubmeisterschaft, nicht aber deine E-Mail oder Telefonnummer.
 - Alle Mitglieder sehen Name, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft. Wer einen
   Doppelpartner sucht, sieht Name und Klassierung der Mitglieder, die für die Kategorie in Frage kommen. Fehlt
   eine Angabe, steht dort *Klassierung fehlt* oder *Angaben fehlen* (Geschlecht).

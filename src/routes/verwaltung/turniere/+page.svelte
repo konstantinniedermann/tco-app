@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { ladeTurniere, type TurnierListe } from '../../../lib/verwaltung/api.ts';
@@ -27,7 +28,9 @@
 	<title>Clubmeisterschaft – MyTCO</title>
 </svelte:head>
 
-<h1>Clubmeisterschaft</h1>
+<Seitenkopf>
+	<h1>Clubmeisterschaft</h1>
+</Seitenkopf>
 <p class="leise" role="status">
 	{#if geladen}{zeilen.length} {zeilen.length === 1 ? 'Turnier' : 'Turniere'}{/if}
 </p>
@@ -58,7 +61,10 @@
 					<tr>
 						<td>{z.jahr}</td>
 						<td
-							><a href={resolve('/verwaltung/turniere/[id]', { id: String(z.id) })}>{z.name}</a></td
+							><span class="zelle-kurz"
+								><a href={resolve('/verwaltung/turniere/[id]', { id: String(z.id) })}>{z.name}</a
+								></span
+							></td
 						>
 						<td><span class="plakette {status.klasse}">{status.text}</span></td>
 						<td>{datumKurz(z.anmeldeschluss)}</td>

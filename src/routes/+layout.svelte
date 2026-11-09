@@ -6,6 +6,7 @@
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
+	import { beobachteKopftitel } from '../lib/ui/kopftitel.ts';
 	import { klappeWeich, vergissKlappen } from '../lib/ui/klappe.ts';
 	import {
 		zeigtReiter,
@@ -41,6 +42,12 @@
 	// Nur ein Speicher, nicht reaktiv: Nichts in der Anzeige hängt davon ab.
 	let rollbereich = $state<HTMLElement>();
 	let stand: Record<string, number> = {};
+
+	// Titel in der Kopfleiste (src/lib/ui/kopftitel.ts): Der Text bleibt beim Ausblenden stehen,
+	// damit er nicht leer ausblendet.
+	let kopftitel = $state('');
+	let zeigeTitel = $state(false);
+	let inhaltsbereich = $state<HTMLElement>();
 
 	// Ungespeicherte Änderungen (UI-Leitbild): Ein Link der App weg von einem geänderten
 	// Formular wartet auf die Rückfrage. «Verlassen» geht mit `goto` zum Ziel; das fragt nicht
@@ -140,11 +147,26 @@
 		return () => document.removeEventListener('click', klappeWeich);
 	});
 
+	// Der Rollbereich beginnt unter der Kopfleiste, darum `oben` 0. In der Verwaltung gibt es die
+	// Mitglieder-App-Kopfleiste nicht, dort ist `inhaltsbereich` leer.
+	$effect(() => {
+		if (!inhaltsbereich || !rollbereich) return;
+		return beobachteKopftitel({
+			inhalt: inhaltsbereich,
+			wurzel: rollbereich,
+			oben: () => 0,
+			melde: (titel) => {
+				zeigeTitel = titel !== null;
+				if (titel !== null) kopftitel = titel;
+			}
+		});
+	});
+
 	// Eingabe mit Tastatur: Reiter weg, App über der Tastatur, «Weiter» (src/lib/ui/tastatur.ts).
 	onMount(beobachteTastatur);
 </script>
 
-<div class={['statusleiste', { 'statusleiste-verwaltung': verwaltung }]}></div>
+<div class="statusleiste"></div>
 
 <div class={['app', { schale: !verwaltung }]}>
 	{#if data.ansicht}
@@ -159,37 +181,44 @@
 	{#if verwaltung}
 		{@render children()}
 	{:else}
-		<header class="kopf">
-			<a
-				class="kopf-start"
-				href={resolve('/')}
-				aria-label="Zur Startseite"
-				onclick={schliesstNurTastatur}
-				><img class="kopf-wappen" src={asset('wappen.svg')} alt="" /></a
-			>
-			MyTCO
-		</header>
+		<div class="app-rahmen">
+			<header class="kopf">
+				<span class="kopf-marke">
+					<a
+						class="kopf-start"
+						href={resolve('/')}
+						aria-label="Zur Startseite"
+						onclick={schliesstNurTastatur}
+						><img class="kopf-wappen" src={asset('wappen.svg')} alt="" /></a
+					>
+					MyTCO
+					<span class="kopf-titel" aria-hidden="true" data-sichtbar={zeigeTitel ? '' : undefined}
+						>{kopftitel}</span
+					>
+				</span>
+			</header>
 
-		<div class="rollbereich" bind:this={rollbereich}>
-			<main class="inhalt">
-				{@render children()}
-			</main>
+			<div class="rollbereich" bind:this={rollbereich}>
+				<main class="inhalt" bind:this={inhaltsbereich}>
+					{@render children()}
+				</main>
 
-			{#if mitFusszeile}
-				<footer class="inhalt leise">
-					<p>
-						<a href={resolve('/hilfe')}>Hilfe</a>
-						·
-						<a href={resolve('/datenschutz')}>Datenschutz</a>
-						· <span data-testid="version">Version {APP_VERSION}</span>
-					</p>
-				</footer>
+				{#if mitFusszeile}
+					<footer class="inhalt leise">
+						<p>
+							<a href={resolve('/hilfe')}>Hilfe</a>
+							·
+							<a href={resolve('/datenschutz')}>Datenschutz</a>
+							· <span data-testid="version">Version {APP_VERSION}</span>
+						</p>
+					</footer>
+				{/if}
+			</div>
+
+			{#if mitReiter}
+				<Reiter />
 			{/if}
 		</div>
-
-		{#if mitReiter}
-			<Reiter />
-		{/if}
 	{/if}
 </div>
 

@@ -13,6 +13,9 @@
 	import { KLASSIERUNGEN, klassierungName, type Klassierung } from '../turnier/klassierung.ts';
 	import Aktionsdialog from './Aktionsdialog.svelte';
 	import Spielersuche from './Spielersuche.svelte';
+	import Zeilenaktionen from './Zeilenaktionen.svelte';
+	import Zeilentasten from './Zeilentasten.svelte';
+	import type { Zeilenaktion } from './zeilenaktionen.ts';
 	import {
 		aenderePartner,
 		korrigiereKlassierung,
@@ -75,6 +78,7 @@
 	let loeschen = $state<Dialog>();
 	let alsPaar = $state<Dialog>();
 	let anfrageLoeschen = $state<Dialog>();
+	let aendern = $state<ReturnType<typeof Zeilenaktionen>>();
 
 	// Gewählte Zeile und was im Dialog gewählt ist.
 	let gewaehlt = $state<Anmeldung | null>(null);
@@ -186,6 +190,23 @@
 		anmeldungId: s.anmeldungId,
 		spieler: [s.spieler]
 	});
+
+	/** Aktionen eines Paars oder Suchenden; die erste ist «Partner ändern» bzw. «Zusammenlegen». */
+	const anmeldungAktionen = (a: Anmeldung, erste: Zeilenaktion): Zeilenaktion[] => [
+		erste,
+		...(offen ? [{ name: 'Verschieben', los: () => oeffneVerschieben(a) }] : []),
+		{ name: 'Klassierung', los: () => oeffneKlassierung(a) },
+		{ name: 'Löschen', los: () => oeffne(loeschen, a) }
+	];
+
+	const anfrageAktionen = (x: Anfrage): Zeilenaktion[] => [
+		{ name: 'Als Paar anmelden', los: () => oeffneAnfrage(alsPaar, x) },
+		{ name: 'Löschen', los: () => oeffneAnfrage(anfrageLoeschen, x) }
+	];
+
+	/** Der Dialog «Ändern» nennt den ersten Spieler, ein zweiter steht im Text darunter. */
+	const zweiterName = (s: readonly Spieler[]) =>
+		s[1] ? nameText(s[1].name, 'nachname-zuerst') : null;
 </script>
 
 {#snippet spielerName(s: Spieler, id?: string)}
@@ -206,10 +227,6 @@
 	{:else}
 		<span class="plakette plakette-offen">fehlt</span>
 	{/if}
-{/snippet}
-
-{#snippet taste(name: string, beschrieben: string, onclick: () => void)}
-	<button type="button" class="taste-neben" aria-describedby={beschrieben} {onclick}>{name}</button>
 {/snippet}
 
 {#snippet tabelle(name: string, kopf: string[], zeilen: Snippet)}
@@ -235,6 +252,10 @@
 {#snippet paarZeilen()}
 	{#each liste?.paare ?? [] as p (p.anmeldungId)}
 		{@const beschrieben = `paar-${p.anmeldungId}`}
+		{@const aktionen = anmeldungAktionen(p, {
+			name: 'Partner ändern',
+			los: () => oeffnePartner(p)
+		})}
 		<tr>
 			<td id={beschrieben}>
 				{#each p.spieler as s (s.mitgliedId)}{@render spielerName(s)}{/each}
@@ -251,14 +272,16 @@
 			</td>
 			{#if !nurLesen}
 				<td>
-					<div class="leiste">
-						{@render taste('Partner ändern', beschrieben, () => oeffnePartner(p))}
-						{#if offen}
-							{@render taste('Verschieben', beschrieben, () => oeffneVerschieben(p))}
-						{/if}
-						{@render taste('Klassierung', beschrieben, () => oeffneKlassierung(p))}
-						{@render taste('Löschen', beschrieben, () => oeffne(loeschen, p))}
-					</div>
+					<Zeilentasten
+						{aktionen}
+						{beschrieben}
+						onaendern={() =>
+							aendern?.zeige({
+								name: p.spieler[0].name,
+								text: zweiterName(p.spieler),
+								aktionen
+							})}
+					/>
 				</td>
 			{/if}
 		</tr>
@@ -268,22 +291,25 @@
 {#snippet suchendeZeilen()}
 	{#each liste?.suchende ?? [] as s (s.anmeldungId)}
 		{@const beschrieben = `suchend-${s.anmeldungId}`}
+		{@const a = suchender(s)}
+		{@const aktionen = anmeldungAktionen(a, {
+			name: 'Zusammenlegen',
+			los: () => oeffneZusammen(a)
+		})}
 		<tr>
 			<td>{@render spielerName(s.spieler, beschrieben)}</td>
 			<td>{@render klassierungZelle(s.spieler)}</td>
 			<td>
-				{#if s.kommentar}<div class="leise mehrzeilig">{s.kommentar}</div>{:else}–{/if}
+				{#if s.kommentar}<span class="leise zelle-kurz" title={s.kommentar}>{s.kommentar}</span
+					>{:else}–{/if}
 			</td>
 			{#if !nurLesen}
 				<td>
-					<div class="leiste">
-						{@render taste('Zusammenlegen', beschrieben, () => oeffneZusammen(suchender(s)))}
-						{#if offen}
-							{@render taste('Verschieben', beschrieben, () => oeffneVerschieben(suchender(s)))}
-						{/if}
-						{@render taste('Klassierung', beschrieben, () => oeffneKlassierung(suchender(s)))}
-						{@render taste('Löschen', beschrieben, () => oeffne(loeschen, suchender(s)))}
-					</div>
+					<Zeilentasten
+						{aktionen}
+						{beschrieben}
+						onaendern={() => aendern?.zeige({ name: s.spieler.name, text: s.kommentar, aktionen })}
+					/>
 				</td>
 			{/if}
 		</tr>
@@ -293,16 +319,19 @@
 {#snippet anfrageZeilen()}
 	{#each liste?.anfragen ?? [] as a (a.anfrageId)}
 		{@const beschrieben = `anfrage-von-${a.anfrageId} anfrage-an-${a.anfrageId}`}
+		{@const aktionen = anfrageAktionen(a)}
 		<tr>
 			<td>{@render spielerName(a.von, `anfrage-von-${a.anfrageId}`)}</td>
 			<td>{@render spielerName(a.an, `anfrage-an-${a.anfrageId}`)}</td>
 			<td>{datumText(a.gestelltAm)}</td>
 			{#if !nurLesen}
 				<td>
-					<div class="leiste">
-						{@render taste('Als Paar anmelden', beschrieben, () => oeffneAnfrage(alsPaar, a))}
-						{@render taste('Löschen', beschrieben, () => oeffneAnfrage(anfrageLoeschen, a))}
-					</div>
+					<Zeilentasten
+						{aktionen}
+						{beschrieben}
+						onaendern={() =>
+							aendern?.zeige({ name: a.von.name, text: zweiterName([a.von, a.an]), aktionen })}
+					/>
 				</td>
 			{/if}
 		</tr>
@@ -361,6 +390,8 @@
 </div>
 
 {#if !nurLesen}
+	<Zeilenaktionen bind:this={aendern} id="doppel-aendern" />
+
 	<Aktionsdialog
 		bind:this={anmelden}
 		id="doppel-anmelden"

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Pfad from '../../../../lib/verwaltung/Pfad.svelte';
+	import Seitenkopf from '../../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import Anlassformular, {
 		LEERER_ANLASS,
@@ -36,11 +36,14 @@
 	<title>Neuer Anlass – MyTCO</title>
 </svelte:head>
 
-<Pfad
-	stufen={[{ text: 'Anlässe', href: resolve('/verwaltung/anlaesse') }]}
-	aktuell="Neuer Anlass"
-/>
-<h1>Neuer Anlass</h1>
+<Seitenkopf
+	pfad={{
+		stufen: [{ text: 'Anlässe', href: resolve('/verwaltung/anlaesse') }],
+		aktuell: 'Neuer Anlass'
+	}}
+>
+	<h1>Neuer Anlass</h1>
+</Seitenkopf>
 
 <div class="karte">
 	<Anlassformular start={LEERER_ANLASS} {fehler} knopf="Anlass erstellen" onspeichern={anlegen} />

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import { formatiereZeitpunkt } from '../../../lib/anlass/zeit.ts';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
@@ -27,7 +28,9 @@
 	<title>Anlässe – MyTCO</title>
 </svelte:head>
 
-<h1>Anlässe</h1>
+<Seitenkopf>
+	<h1>Anlässe</h1>
+</Seitenkopf>
 <p class="leise" role="status">
 	{#if geladen}{zeilen.length} {zeilen.length === 1 ? 'Anlass' : 'Anlässe'}{/if}
 </p>
@@ -56,7 +59,9 @@
 				{#each zeilen as z (z.id)}
 					<tr>
 						<td
-							><a href={resolve('/verwaltung/anlaesse/[id]', { id: String(z.id) })}>{z.titel}</a
+							><span class="zelle-kurz"
+								><a href={resolve('/verwaltung/anlaesse/[id]', { id: String(z.id) })}>{z.titel}</a
+								></span
 							></td
 						>
 						<td>{formatiereZeitpunkt(z.beginn)}</td>

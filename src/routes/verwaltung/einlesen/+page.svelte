@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { asset, resolve } from '$app/paths';
 	import {
 		liesMitgliederEin,
@@ -107,7 +108,9 @@
 	<title>Einlesen – MyTCO</title>
 </svelte:head>
 
-<h1>Einlesen</h1>
+<Seitenkopf>
+	<h1>Einlesen</h1>
+</Seitenkopf>
 <p class="leise">
 	Neue Mitglieder aus einer CSV-Datei anlegen. Wer schon in MyTCO ist, bleibt unverändert.
 </p>

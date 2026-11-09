@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import AnsichtWahl from '../../../lib/verwaltung/AnsichtWahl.svelte';
 	import { ROLLEN_NAME } from '../../../lib/verwaltung/rollen-namen.ts';
@@ -13,7 +14,9 @@
 	<title>Rollen – MyTCO</title>
 </svelte:head>
 
-<h1>Rollen</h1>
+<Seitenkopf>
+	<h1>Rollen</h1>
+</Seitenkopf>
 <p class="leise">
 	Wer welche Rolle hat. Vergeben und entziehen kannst du sie beim Mitglied, in der Klappe «Rollen».
 </p>

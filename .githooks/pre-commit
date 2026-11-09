@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Lokaler pre-commit-Hook (aktivieren: make hooks).
-# Feature-Branches laufen erst beim PR durch den CI-Secret-Scan, daher schon hier.
+# Feature-Branches prüft der CI-Secret-Scan erst nach dem Merge auf dev, daher schon hier.
 # Reine Doku-Commits: Secret-Scan + make docs (Doku-Check, Test-IDs). Sobald Code dabei ist: make check-schnell.
 set -euo pipefail
 

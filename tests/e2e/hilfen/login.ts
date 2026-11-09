@@ -215,6 +215,14 @@ export async function setzeAusgetreten(mitgliedId: number): Promise<void> {
 		.where(eq(mitglied.id, mitgliedId));
 }
 
+/** Setzt die Kontaktperson des Turniers direkt (die Verwaltung prüft die Rolle, siehe turnier.test.ts). */
+export async function setzeKontaktperson(turnierId: number, mitgliedId: number): Promise<void> {
+	await hole()
+		.db.update(turnier)
+		.set({ kontaktMitgliedId: mitgliedId })
+		.where(eq(turnier.id, turnierId));
+}
+
 /** Setzt den Anmeldeschluss eines Turniers (`YYYY-MM-DD`), etwa auf ein vergangenes Datum. */
 export async function setzeAnmeldeschluss(turnierId: number, datum: string): Promise<void> {
 	await hole().db.update(turnier).set({ anmeldeschluss: datum }).where(eq(turnier.id, turnierId));
@@ -249,13 +257,14 @@ export async function legeOffenenAnlassAn(erstelltVon: number, titel: string): P
 	});
 }
 
-/** Das Mitglied antwortet auf den Anlass, ohne Bemerkung. */
+/** Das Mitglied antwortet auf den Anlass, ohne Bemerkung (bei «kommt nicht» auf Wunsch mit). */
 export async function meldeZumAnlass(
 	anlassId: number,
 	mitgliedId: number,
-	antwort: 'kommt' | 'kommt-nicht'
+	antwort: 'kommt' | 'kommt-nicht',
+	bemerkung: string | null = null
 ): Promise<void> {
-	const r = await melde(hole().db, anlassId, mitgliedId, { antwort, bemerkung: null }, new Date());
+	const r = await melde(hole().db, anlassId, mitgliedId, { antwort, bemerkung }, new Date());
 	if (r !== 'ok') throw new Error(`Antwort auf Anlass ${anlassId}: ${r}`);
 }
 

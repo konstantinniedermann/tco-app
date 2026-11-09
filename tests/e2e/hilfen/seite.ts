@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, type TestInfo } from '@playwright/test';
+import { expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 
 // Browser melden jede 4xx-Antwort in der Konsole. Bei den Schnittstellen sind 400 (Code
 // falsch), 401 (nicht angemeldet), 403 (kein Admin), 409 (vergeben, letzter Admin, veraltet)
@@ -32,6 +32,24 @@ export async function pruefePfad(page: Page, stufen: string[], aktuell: string):
 	}
 	await expect(pfad.getByRole('link')).toHaveText(stufen);
 	await expect(pfad.locator('[aria-current="page"]')).toHaveText(aktuell);
+}
+
+/**
+ * Wählt die Aktion `name` einer Tabellenzeile der Verwaltung (UI-Leitbild, Baustein Tabelle): Hat
+ * die Zeile die Taste «Ändern» (ab drei Aktionen), über den Dialog «Ändern», sonst direkt.
+ */
+export async function waehleAktion(page: Page, zeile: Locator, name: string): Promise<void> {
+	const aendern = zeile.getByRole('button', { name: 'Ändern', exact: true });
+	// Erst zählen, wenn die Zeile mit ihren Tasten steht.
+	await expect(zeile.getByRole('button').first()).toBeVisible();
+	if ((await aendern.count()) === 0) {
+		await zeile.getByRole('button', { name, exact: true }).click();
+		return;
+	}
+	await aendern.click();
+	const dialog = page.getByRole('dialog', { name: 'Ändern', exact: true });
+	await dialog.getByRole('button', { name, exact: true }).click();
+	await expect(dialog).toBeHidden();
 }
 
 /** Klappt den Aufklappbereich mit dem Titel `titel` auf, falls er zu ist (im Profil anfangs zu). */
@@ -95,9 +113,14 @@ export function sammleKonsolenfehler(page: Page): string[] {
 /**
  * Wartet, bis kurze Bewegungen (UI-09) fertig sind: CSS-Übergänge wie das Einblenden der
  * Rückfrage und Seitenwechsel. Mitten im Einblenden misst axe sonst zu wenig Kontrast.
- * Die Anleitung (CSS-Animationen, mehrere Sekunden) zählt nicht dazu.
+ * Die Anleitung (CSS-Animationen, mehrere Sekunden) zählt nicht dazu. Zuerst drei Bilder
+ * abwarten: Ein Übergang, den das letzte Scrollen erst auslöst (Titel in der Kopfleiste:
+ * Beobachter, dann Svelte, dann Stil), gibt es sonst noch nicht, wenn gesammelt wird.
  */
 async function wartetAufRuhe(page: Page): Promise<void> {
+	await page.evaluate(async () => {
+		for (let i = 0; i < 3; i++) await new Promise((weiter) => requestAnimationFrame(weiter));
+	});
 	await page.evaluate(() =>
 		Promise.all(
 			document
@@ -114,11 +137,23 @@ async function wartetAufRuhe(page: Page): Promise<void> {
 	);
 }
 
-/** UI-01: jeder Bildschirm ohne axe-Verstösse; dazu ein Screenshot als Nachweis. */
+/**
+ * UI-01: jeder Bildschirm ohne axe-Verstösse; dazu ein Screenshot als Nachweis. Am PC scrollt
+ * dazu keine Seite zur Seite (UI-Leitbild, Baustein Tabelle: einzeilig, ohne Seitwärtsscrollen).
+ */
 export async function pruefeBildschirm(page: Page, info: TestInfo, name: string): Promise<void> {
 	await wartetAufRuhe(page);
 	const axe = await new AxeBuilder({ page }).analyze();
 	expect(axe.violations, name).toEqual([]);
+	if (info.project.name === 'desktop') {
+		const breite = await page.evaluate(() => ({
+			seite: document.documentElement.scrollWidth,
+			fenster: window.innerWidth
+		}));
+		expect(breite.seite, `${name}: Seite breiter als das Fenster`).toBeLessThanOrEqual(
+			breite.fenster
+		);
+	}
 	screenshotLaeuft.add(page);
 	try {
 		await rolleAus(page, true);

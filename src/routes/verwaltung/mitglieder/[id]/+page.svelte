@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import Pfad from '../../../../lib/verwaltung/Pfad.svelte';
+	import Seitenkopf from '../../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import { tick } from 'svelte';
 	import Briefdruck from '../../../../lib/verwaltung/Briefdruck.svelte';
@@ -241,13 +241,16 @@
 {#if briefe}
 	<Briefdruck {briefe} zurueck={zurueckZumMitglied} />
 {:else}
-	<Pfad
-		stufen={[{ text: 'Mitglieder', href: resolve('/verwaltung/mitglieder') }]}
-		aktuell={`${angaben.nachname}, ${angaben.vorname}`}
-	/>
-	<h1 tabindex="-1" bind:this={titel}>
-		{angaben.nachname}, {angaben.vorname} <span class={stand.klasse}>{stand.text}</span>
-	</h1>
+	<Seitenkopf
+		pfad={{
+			stufen: [{ text: 'Mitglieder', href: resolve('/verwaltung/mitglieder') }],
+			aktuell: `${angaben.nachname}, ${angaben.vorname}`
+		}}
+	>
+		<h1 tabindex="-1" bind:this={titel}>
+			{angaben.nachname}, {angaben.vorname} <span class={stand.klasse}>{stand.text}</span>
+		</h1>
+	</Seitenkopf>
 	{#if detail.rufname}
 		<p class="leise">Rufname {detail.rufname}</p>
 	{/if}
@@ -292,7 +295,9 @@
 							: `${detail.verlauf.length} ${detail.verlauf.length === 1 ? 'Eintrag' : 'Einträge'}`}</span
 					></summary
 				>
-				<div class="tabelle">
+				<!-- Ohne Links in der Tabelle: der Bereich selbst ist per Tastatur scrollbar (WCAG 2.1.1). -->
+				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+				<div class="tabelle" role="region" aria-label="Verlauf des Mitglieds" tabindex="0">
 					<table aria-label="Verlauf">
 						<tbody>
 							{#each detail.verlauf as z, i (i)}

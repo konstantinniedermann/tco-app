@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto, refreshAll } from '$app/navigation';
-	import Pfad from '../../../../../../lib/verwaltung/Pfad.svelte';
+	import Seitenkopf from '../../../../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import Anmeldungsliste from '../../../../../../lib/verwaltung/Anmeldungsliste.svelte';
 	import DoppelListe from '../../../../../../lib/verwaltung/DoppelListe.svelte';
@@ -110,17 +110,20 @@
 	<title>{kategorie.name} – MyTCO</title>
 </svelte:head>
 
-<Pfad
-	stufen={[
-		{ text: 'Turniere', href: resolve('/verwaltung/turniere') },
-		{
-			text: kategorie.turniername,
-			href: resolve('/verwaltung/turniere/[id]', { id: String(kategorie.turnierId) })
-		}
-	]}
-	aktuell={kategorie.name}
-/>
-<h1>{kategorie.name}</h1>
+<Seitenkopf
+	pfad={{
+		stufen: [
+			{ text: 'Turniere', href: resolve('/verwaltung/turniere') },
+			{
+				text: kategorie.turniername,
+				href: resolve('/verwaltung/turniere/[id]', { id: String(kategorie.turnierId) })
+			}
+		],
+		aktuell: kategorie.name
+	}}
+>
+	<h1>{kategorie.name}</h1>
+</Seitenkopf>
 
 {#if kategorie.status === 'abgesagt'}
 	<div class="karte">

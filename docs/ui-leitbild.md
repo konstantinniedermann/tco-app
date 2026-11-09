@@ -29,6 +29,8 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
 | Druckansicht der Briefe (Seite *Briefe*, Seite eines Mitglieds) | `src/lib/verwaltung/Briefdruck.svelte` |
 | Zurück-Link, Pfad, Name mit Rufname, Trefferliste der Verwaltung, Rückfrage-Dialog | `src/lib/ui/Zurueck.svelte`, `src/lib/verwaltung/Pfad.svelte`, `src/lib/ui/Name.svelte`, `src/lib/verwaltung/Spielersuche.svelte`, `src/lib/verwaltung/Aktionsdialog.svelte` |
+| Titel in der Kopfleiste (wann er einblendet) | `src/lib/ui/kopftitel.ts`, `src/routes/+layout.svelte`, `src/routes/verwaltung/+layout.svelte` |
+| Seitenkopf der Verwaltung, Tasten einer Tabellenzeile, Dialog «Ändern» (ab drei Aktionen) | `src/lib/verwaltung/Seitenkopf.svelte`, `src/lib/verwaltung/Zeilentasten.svelte`, `src/lib/verwaltung/Zeilenaktionen.svelte`, `src/lib/verwaltung/zeilenaktionen.ts` |
 
 Zwei Prüfungen halten Leitbild und Code beisammen:
 
@@ -62,9 +64,10 @@ Alle Paare von Text und Hintergrund erfüllen mindestens WCAG AA (gemessen).
 | Token | Wert | Verwendung | Kontrast |
 |-------|------|------------|----------|
 | `--farbe-marke` | `#0f6b4f` | Kopfleiste, Titel, Links, aktiver Reiter, Fokusrahmen | Weiss darauf 6.5 : 1 |
+| `--farbe-marke-hover` | `#187a5c` | Hover eines nicht aktiven Reiters in der Kopfleiste (PC), etwas heller als `--farbe-marke` | Weiss 5.3 : 1 |
 | `--farbe-marke-dunkel` | `#0b5640` | Seitenleiste der Verwaltung | Weiss 8.7 : 1 |
 | `--farbe-marke-hell` | `#cde3b9` | Wappen auf Grün, Bereichstitel der Verwaltung | auf marke-dunkel 6.3 : 1 |
-| `--farbe-marke-zart` | `#e3efdc` | Plakette *aktiv*, Tabellenkopf | marke darauf 5.5 : 1 |
+| `--farbe-marke-zart` | `#e3efdc` | Plakette *aktiv*, Tabellenkopf, aktiver Reiter am PC | marke darauf 5.5 : 1 |
 | `--farbe-aktion` | `#a84f1f` | nur die Haupttaste (UI-04), Hervorhebung „Jetzt aktuell", Tipp-Kreis der Anleitung (sagt wie die Haupttaste „hier tippen") | Weiss 5.5 : 1 |
 | `--farbe-aktion-dunkel` | `#8c4018` | Haupttaste gedrückt | Weiss 7.3 : 1 |
 | `--farbe-flaeche` | `#ffffff` | Karten, Eingabefelder, Reiter | — |
@@ -164,27 +167,30 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 
 | Baustein | Klasse | Regel |
 |----------|--------|-------|
-| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO"; auf dem PC zusätzlich die Reiter als Textlinks; reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und steht fest oben (nur der Rollbereich darunter scrollt, in der Verwaltung `sticky`), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch). Das Wappen ist ein Link zur Startseite (`.kopf-start`, zugänglicher Name «Zur Startseite»): in der App zu Start, in der Verwaltung zu deren erster Seite. Die Kopfleiste sieht aus wie ohne Link; die Tippfläche reicht unsichtbar über das Wappen hinaus auf `--tippflaeche` (UI-03). Bei offener Tastatur schliesst der Tipp nur die Tastatur ([Eingabe mit Tastatur](#eingabe-mit-tastatur)), bei ungespeicherten Änderungen kommt zuerst die Rückfrage ([Ungespeicherte Änderungen](#ungespeicherte-änderungen)) |
-| Band *Ansicht als …* | `.ansicht-band` | nur solange der MyTCO-Admin *Ansicht als …* nutzt, auf jeder Seite von App und Verwaltung; liegt über der Kopfleiste. Fläche `--farbe-hinweis-flaeche`, Text `--farbe-hinweis`, unten ein Balken `--rand-akzent` in `--farbe-hinweis`; Text «Ansicht als <Rolle> — nur ansehen» und die Nebentaste *Beenden* (zurück zu den eigenen Rollen, die Seite lädt neu, sie bleibt dieselbe). Reicht wie die Kopfleiste unter die Statusleiste; die Kopfleiste darunter beginnt dann ohne diesen Abstand. Steht beim Seitenwechsel still wie die Kopfleiste; in der Verwaltung scrollt es mit der Seite weg wie deren Kopfleiste |
-| Statusleisten-Band | `.statusleiste` | ausserhalb von `.app`, fest oben, deckend in `--farbe-marke` wie die Kopfleiste darunter (auch in der Verwaltung). Im Browser so hoch wie `env(safe-area-inset-top)` (am PC 0); in der iPhone-App vom Startbildschirm (`display-mode: standalone`, nur iOS) zusätzlich `--abstand-3` hoch, also über dem oberen Rand der Kopfleiste und über 10 px; nicht in der Verwaltung (`.statusleiste-verwaltung`), weil deren Kopfleiste mit der Seitenleiste wegscrollt. iOS legt sonst über Web-Apps vom Startbildschirm einen hellen Schleier über die Statusleiste; iOS lässt ihn nur weg, wenn oben in der Mitte ein fester oder mitlaufender, deckender, fast bildschirmbreiter Streifen liegt |
+| Kopfleiste | `.kopf` | grün, Wappen + „MyTCO" (zusammen in `.kopf-marke`; der eingeblendete Titel steht darin hinter „MyTCO" und wird gekürzt, nie umgebrochen); in der App ab `60rem` zusätzlich die Reiter in der Mitte (siehe [Layout und Navigation](#layout-und-navigation)), dort am PC eine einzige grüne Zeile; in der Verwaltung steht sie am PC zuoberst in der Spalte der Seitenleiste; blendet den Seitentitel ein, sobald das `<h1>` der Seite unter der Kopfleiste verschwindet (`.kopf-titel`); reicht auf dem Handy unter die Statusleiste (Abstand `env(safe-area-inset-top)`), damit Wappen und Titel unter Uhr und Akku frei bleiben, und steht fest oben (in der App scrollt nur der Rollbereich darunter, in der Verwaltung ist sie `sticky`, auch auf dem Handy), damit kein Inhalt unter Uhr und Akku durchläuft; seitlich mindestens der sichere Bereich (Querformat, Notch). Das Wappen ist ein Link zur Startseite (`.kopf-start`, zugänglicher Name «Zur Startseite»): in der App zu Start, in der Verwaltung zu deren erster Seite. Die Kopfleiste sieht aus wie ohne Link; die Tippfläche reicht unsichtbar über das Wappen hinaus auf `--tippflaeche` (UI-03). Bei offener Tastatur schliesst der Tipp nur die Tastatur ([Eingabe mit Tastatur](#eingabe-mit-tastatur)), bei ungespeicherten Änderungen kommt zuerst die Rückfrage ([Ungespeicherte Änderungen](#ungespeicherte-änderungen)) |
+| Titel in der Kopfleiste | `.kopf-titel` | der Seitentitel in der Kopfleiste (Text des `<h1>` ohne Plaketten `.plakette`), nach Wappen, „MyTCO" und einem dünnen Trenner, in `--groesse-text`; einzeilig, zu lang endet mit „…"; sichtbar mit `data-sichtbar`, sonst durchsichtig; immer `aria-hidden="true"`, denn das `<h1>` steht auf der Seite; Bewegung unter [Bewegung und Bedienung](#bewegung-und-bedienung) |
+| Zusatz in der Kopfleiste | `.kopf-zusatz` | „Verwaltung" neben „MyTCO" in der Kopfleiste der Verwaltung; unter `60rem` blendet er aus, solange der Titel sichtbar ist, und der Titel steht an seinem Platz (oben „MyTCO Verwaltung", gescrollt „MyTCO │ Damen R4/R9"); am PC bleibt er immer stehen, in der schmalen Spalte der Seitenleiste unter „MyTCO" neben dem Wappen, und der Titel kommt nicht in die Kopfleiste |
+| Band *Ansicht als …* | `.ansicht-band` | nur solange der MyTCO-Admin *Ansicht als …* nutzt, auf jeder Seite von App und Verwaltung; liegt über der Kopfleiste. Fläche `--farbe-hinweis-flaeche`, Text `--farbe-hinweis`, unten ein Balken `--rand-akzent` in `--farbe-hinweis`; Text «Ansicht als <Rolle> — nur ansehen» und die Nebentaste *Beenden* (zurück zu den eigenen Rollen, die Seite lädt neu, sie bleibt dieselbe). Reicht wie die Kopfleiste unter die Statusleiste; die Kopfleiste darunter beginnt dann ohne diesen Abstand. Steht beim Seitenwechsel still wie die Kopfleiste; da die Kopfleiste der Verwaltung ebenfalls oben bleibt, liegen Band und Kopfleiste dort wie in der App übereinander, nie ineinander. In der Verwaltung scrollt das Dokument: Das Band scrollt mit der Seite weg, die Kopfleiste klebt dann ganz oben unter der Statusleiste |
+| Statusleisten-Band | `.statusleiste` | ausserhalb von `.app`, fest oben, deckend in `--farbe-marke` wie die Kopfleiste darunter (auch in der Verwaltung). Im Browser so hoch wie `env(safe-area-inset-top)` (am PC 0); in der iPhone-App vom Startbildschirm (`display-mode: standalone`, nur iOS) zusätzlich `--abstand-3` hoch, also über dem oberen Rand der Kopfleiste und über 10 px; es gilt auch in der Verwaltung, weil deren Kopfleiste ebenfalls oben stehen bleibt. iOS legt sonst über Web-Apps vom Startbildschirm einen hellen Schleier über die Statusleiste; iOS lässt ihn nur weg, wenn oben in der Mitte ein fester oder mitlaufender, deckender, fast bildschirmbreiter Streifen liegt |
 | Rollbereich | `.rollbereich` | Mitglieder-App: der einzige Bereich, der scrollt, zwischen Kopfleiste und Reitern; enthält Inhalt und Fusszeile. Beim Überziehen federt nur er, Kopfleiste und Reiter bleiben stehen |
 | Seitenhintergrund (iPhone-App vom Startbildschirm) | `html`, `body` in `display-mode: standalone`, nur iOS | `--farbe-marke`; `.app` trägt dann `--farbe-hintergrund`. Was an Schleier bleibt, ist so grün statt hell |
-| Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben (`.reiter-balken`, gleitet zum gewählten Reiter); Abstand `env(safe-area-inset-bottom)` über dem Home-Balken; reagiert beim Antippen sofort, auch wenn der Inhalt noch nachläuft; nicht markierbar; weg, solange die Tastatur offen ist ([Eingabe mit Tastatur](#eingabe-mit-tastatur)) ([Bewegung und Bedienung](#bewegung-und-bedienung)) |
-| Seitenleiste | `.seitenleiste` | nur Verwaltung, Bereiche nach Rolle |
+| Reiter | `.reiter` | unten, 3–4 Einträge, Symbol + Text, aktiver Eintrag mit Balken oben (`.reiter-balken`, gleitet zum gewählten Reiter); ab `60rem` stehen sie stattdessen in der Mitte der Kopfleiste ([Layout und Navigation](#layout-und-navigation)), Symbol und Wort nebeneinander; Abstand `env(safe-area-inset-bottom)` über dem Home-Balken; reagiert beim Antippen sofort, auch wenn der Inhalt noch nachläuft; nicht markierbar; weg, solange die Tastatur offen ist ([Eingabe mit Tastatur](#eingabe-mit-tastatur)) ([Bewegung und Bedienung](#bewegung-und-bedienung)) |
+| Seitenleiste | `.seitenleiste` | nur Verwaltung, Bereiche nach Rolle; ab `60rem` bleibt sie beim Scrollen des Inhalts stehen, zusammen mit der Kopfleiste darüber (`.verwaltung-leiste`, `sticky`, volle Bildschirmhöhe); ist sie höher als der Bildschirm, scrollt sie für sich; unter `60rem` steht sie unter der Kopfleiste und scrollt mit der Seite weg; nicht im Druck |
 | Haupttaste | `.taste-haupt` | Sandplatz-Rot, höchstens eine pro Bildschirm (UI-04) |
 | Nebentaste | `.taste-neben` | weiss mit grünem Rand; gedrückt `--farbe-marke-zart` |
 | Link | `a` | grün, unterstrichen |
 | Zurück | `.zurueck` | „‹ <Titel der Elternseite>" oben links auf Unterseiten, z. B. „‹ Profil", „‹ Clubmeisterschaft 2027"; führt eine Stufe höher in der [festen Ordnung](#feste-ordnung), egal woher man kam; immer einzeilig, ein zu langer Name endet mit „…" |
-| Pfad | `nav.pfad` | nur Verwaltung: über dem Titel jeder Unterseite die Stufen von der Seitenleiste bis hier, getrennt durch „›", z. B. „Turniere › Clubmeisterschaft 2027 › Herren R5/R9"; jede Stufe ein Link, die aktuelle Seite fett und ohne Link (`aria-current="page"`); unter `60rem` Breite des App-Rahmens steht statt seiner nur „‹ <Elternseite>" als `.zurueck`, darüber endet ein zu langer Pfad mit „…"; nie umbrechend, nicht im Druck |
+| Pfad | `nav.pfad` | nur Verwaltung: über dem Titel jeder Unterseite die Stufen von der Seitenleiste bis hier, getrennt durch „›", z. B. „Turniere › Clubmeisterschaft 2027 › Herren R5/R9"; jede Stufe ein Link, die aktuelle Seite fett und ohne Link (`aria-current="page"`); unter `60rem` Breite des App-Rahmens steht statt seiner nur „‹ <Elternseite>" als `.zurueck`, darüber endet ein zu langer Pfad mit „…"; nie umbrechend, nicht im Druck; am PC klebt er mit dem Titel (Baustein *Seitenkopf*) |
 | Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); ein Auswahlfeld (`select`) sieht aus wie ein Textfeld (gleiche Höhe, gleicher Rand) mit einem Pfeil rechts in `--farbe-text`, auf allen Geräten gleich statt im Aussehen des Browsers (UI-03); gesperrt ohne Pfeil; bei einer festen Höchstlänge zählt der Hilfetext mit („12 von 50 Zeichen", `.feld-hilfe`); als Dateiwahl (`input type="file"`, nur Verwaltung: *Einlesen*) mit dem Rand des Felds und der Wahltaste des Browsers im Aussehen der Nebentaste; Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
 | Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>`. Als Schalter (Ein/Aus, gilt sofort, ohne Speichern-Taste) dieselbe Fläche mit Häkchen statt Kreis (`type="checkbox"`), angehakt heisst ein: *Benachrichtigungen* im Profil |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
 | Karte | `.karte` | weisse Fläche auf Hintergrund; als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
-| Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; klappt weich auf und zu (`--dauer-mittel`) |
-| Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste; ist der ganze Eintrag ein Link, gedrückt `--farbe-marke-zart` und leicht verkleinert und nicht markierbar; eine Kachel mit eigener Aktion bleibt ruhig und markierbar |
-| Trefferliste | `ul.trefferliste` | Ergebnisse einer Suche unter dem Suchfeld: je Treffer eine Kachel mit Trennlinie oben, Name links, genau eine Nebentaste rechts; Vermerke als Plakette unter dem Namen; erscheint ab zwei Buchstaben |
+| Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; innerhalb einer Karte als `details.klappe.karte-teil` ohne eigene Fläche, mit der Trennlinie des Kartenteils (z. B. «3 suchen Partner»); klappt weich auf und zu (`--dauer-mittel`) |
+| Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste; ist der ganze Eintrag ein Link, gedrückt `--farbe-marke-zart` und leicht verkleinert und nicht markierbar; eine Kachel mit eigener Aktion bleibt ruhig und markierbar; innerhalb einer Karte als `a.kachel.karte-teil` (z. B. «12 angemeldet ›») |
+| Trefferliste | `ul.trefferliste` | Ergebnisse einer Suche unter dem Suchfeld: je Treffer eine Kachel mit Trennlinie oben, Name links, genau eine Nebentaste rechts; Vermerke als Plakette unter dem Namen; erscheint ab zwei Buchstaben. Ohne Suche und ohne Tasten auch als reine Namensliste (Kategorie einer CM: Angemeldete, Suchende mit Kommentar) |
 | Kartenteil | `.karte-teil` | Abschnitt innerhalb einer Karte mit eigenem Thema (z. B. «sucht Partner», eigene Anfragen, Abmelden): Trennlinie oben, Abstand `--abstand-3` darüber und im Inneren |
-| Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt" oder „1 von 3 Anmeldungen" |
+| Zähler | `.zaehler` | Balkensegmente + Text: „Schritt 2 von 3 · Kontakt"; nur für Schritte eines Formulars, nicht für Kontingente (wirkt sonst wie ein unfertiges Formular) |
+| Kartenkopf | `.karte-kopf` | erste Zeile einer Karte: Titel links, rechts oben eine Plakette mit dem eigenen Stand (z. B. «angemeldet»); bei Platzmangel steht die Plakette unter dem Titel, der Titel wird nie abgeschnitten |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05). Zustände der Mitgliedschaft: *ausgetreten* = `.plakette`, *wird gelöscht* = `.plakette-gesperrt` |
 | Briefdruck | `.briefdruck` | nur Verwaltung: Druckansicht frisch erzeugter Briefe, siehe [Briefdruck](#briefdruck) |
 | Druckseite | `.druckseite` | nur Verwaltung: Auskunft über die Daten eines Mitglieds, siehe [Druckseite](#druckseite-auskunft); Klasse `.nicht-drucken` blendet unter `@media print` aus |
@@ -192,9 +198,15 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen"). Einzige Ausnahme ist *Nur ansehen*: oben auf Verwaltungsseiten, auf denen die eigene Rolle etwas nur lesen darf, «**Nur ansehen.** Ändern kann hier nur der <Rolle>.», ohne Aktion; er bleibt, solange die Rolle nur liest. In der Ansicht steht er nicht, dort sagt es das Band |
 | Nur lesen | `fieldset.nur-lesen` | Formular, das die eigene Rolle oder die Ansicht nur lesen lässt: die Felder stehen in `<fieldset disabled class="nur-lesen">` (ohne Rand und Abstand, Text in `--farbe-text`, damit er gut lesbar bleibt); Absende- und Aktions-Tasten fehlen, auch «Weitere …», «Entfernen», «… löschen» und Tasten zum Anlegen. In der Ansicht fehlen in der ganzen App alle Tasten, die etwas speichern (Profil, Antwort auf einen Anlass, Passkey); *Abmelden* bleibt |
 | Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06); betrifft sie das ganze Formular (z. B. *Inzwischen hat jemand anderes dieses Mitglied geändert*), unter dem Formular, mit dem Lösungsweg als Nebentaste daneben (*Neuen Stand laden*) |
-| Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm waagrecht scrollbar; enthält sie keine Links oder Tasten, ist der Bereich eine benannte Region mit `tabindex="0"`, damit er per Tastatur scrollt |
+| Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm (unter `60rem`) waagrecht scrollbar; ab `60rem` ist jede Zeile einzeilig und knapp (Zellen oben und unten mit `--abstand-2`): Tasten brechen nie um; Text, der nicht passt, endet mit „…" (`.zelle-kurz`); die Seite scrollt ab `60rem` nie zur Seite; würde eine Tabelle breiter als ihr Platz (Anmeldungen einer Kategorie), nimmt die Spalte mit Name und Kommentar die übrige Breite und kürzt sich (`.zelle-dehnbar`), sodass die Tabelle nicht zur Seite scrollt und die Tasten ganz im Bild liegen; der volle Text steht in der Detailseite, im Dialog oder, wo es keines von beiden gibt, als `title`; Ausnahme Fairgate: Neue Angaben werden nicht gekürzt (sie werden von dort in Fairgate abgetippt), die Tabelle scrollt dann in ihrer Box; Ausnahme Paare: in Tabellen mit Doppelpaaren steht jeder Spieler in einer eigenen einzeiligen Zeile, Status und Taste stehen nur einmal pro Paar. Auf jeder Breite (auch unter `60rem`): höchstens zwei kurze Tasten pro Zeile, ab drei Aktionen steht dort eine Taste «Ändern», die den Dialog *Ändern* öffnet; ist nur eine Aktion möglich, bleibt sie als Taste stehen; enthält sie keine Links oder Tasten, ist der Bereich eine benannte Region mit `tabindex="0"`, damit er per Tastatur scrollt |
+| Zelle, gekürzt | `.zelle-kurz` | freier Text in einer Tabellenzelle (Name, Kommentar, Betreff): einzeilig, ein zu langer Text endet mit „…"; nur ab `60rem`. Die Klasse steht auf dem Textelement in der Zelle (z. B. `<span class="leise zelle-kurz">`), nicht auf dem `<td>`: dort wirkt die Höchstbreite ohne festes Tabellenlayout nicht; in `.zelle-dehnbar` wird sie schmaler, wenn der Platz fehlt |
+| Zelle, dehnbar | `.zelle-dehnbar` | nur ab `60rem`: die eine Spalte einer Tabelle mit freiem Text (Name, Kommentar) nimmt die Breite, die die übrigen Spalten lassen; `<div class="zelle-dehnbar">` als einziges Kind des `<td>`, darin Name und Kommentar als `.zelle-kurz` und Plaketten nebeneinander in einer Zeile; Plaketten bleiben ganz; der Name (erstes Element) hat Vorrang und endet erst mit „…", wenn er allein nicht passt, ein Kommentar dahinter nimmt nur den Rest und endet mit „…". Unter `60rem` steht der Inhalt wie in jeder Zelle |
+| Ändern-Dialog | `<dialog class="karte">` | öffnet die Taste «Ändern» einer Tabellenzeile (auf jeder Breite): Name der Zeile, der volle Text (z. B. Kommentar) und die Aktionen, die gerade gehen, je als Taste; jede Taste schliesst den Dialog und öffnet den Dialog der Aktion; «Abbrechen» schliesst; zählt für UI-04 als eigener Bildschirm |
+| Seitenkopf | `.seitenkopf` | nur Verwaltung: Pfad und `<h1>` einer Seite zusammen; ab `60rem` klebt er oben am Inhalt, auf der Fläche in `--farbe-hintergrund` mit einer dünnen Linie in `--farbe-linie` darunter, die beim Scrollen hereinblendet (rein in CSS per `animation-timeline: scroll()`; Browser ohne diese Zeitleiste zeigen die Linie immer); Seiten ohne Pfad kleben nur mit dem Titel; steht ein Hinweis darüber (*Nur ansehen*), beginnt der Seitenkopf unter ihm und überdeckt ihn nie; unter `60rem` und im Druck klebt nichts |
+| Treffer (Spielersuche) | `.treffer` | Trefferbereich der Spielersuche unter dem Suchfeld, überall wo sie steht (Von Hand anmelden, Doppelpartner ändern): immer da, mit fester Höhe `min(26.875rem, 35dvh)`, also etwa 5 Treffer, auf niedrigen Bildschirmen höchstens 35 % der sichtbaren Höhe; `26.875rem` sind 5 Treffer zu je zwei Zeilen (Name, darunter leise Angaben): 5 × 4,9375rem je `.auswahl` (Text 1,125 × 1,5 + leise 1 × 1,5 Zeilenhöhe, 2 × `--abstand-2` Polster, 2 × `--rand-dick` Rand, `--abstand-2` Abstand unten) + 2,1875rem Legende; Tippen und Treffer ändern die Grösse nie; vor der Suche steht darin leise «Ab 2 Buchstaben.», bei keinem Ergebnis «Keine Treffer.», bei einem Fehler dessen Text, alles im selben Bereich; bei mehr Treffern scrollt nur er, mit Tastatur und Finger; die Angabe steht nicht zusätzlich als Hilfetext unter dem Feld, beschreibt das Feld aber per `aria-describedby`; kein Aussenabstand unter der Gruppe im Bereich |
 | Symbol | `.symbol` | eigene SVG-Symbole, 24er-Raster, Strich 2, immer mit Text |
-| App-Rahmen | `.app` | umschliesst Kopfleiste, Inhalt und Reiter; misst die Breite fürs PC-Layout |
+| App-Rahmen | `.app` | umschliesst Kopfleiste, Inhalt und Reiter; misst die Breite fürs PC-Layout (Container `app`) |
+| Rahmen in der App | `.app-rahmen` | in der Mitglieder-App unter `.app`; unter `60rem` ein Block, ab `60rem` ein Raster mit drei Spalten `1fr auto 1fr`: Kopfleiste über die ganze Breite, die Reiter in der Mitte (bezogen auf die ganze Breite, nicht auf den Platz rechts vom Wappen); `.app` selbst lässt sich nicht per Container-Abfrage stylen, nur seine Nachkommen |
 | Inhaltsbereich | `.inhalt` | eine Spalte, höchstens `--breite-inhalt`, Seitenrand, im Querformat mindestens der sichere Bereich (`env(safe-area-inset-left/right)`) |
 | Leiste | `.leiste` | Suche, Filter und Tasten nebeneinander, bricht bei Platzmangel um |
 | Verwaltungsrahmen | `.verwaltung` | Seitenleiste links, Inhalt rechts; auf schmalem Bildschirm untereinander |
@@ -227,14 +239,20 @@ unterscheidet.
 
 Teile eines Bausteins heissen `<baustein>-<teil>`, z. B. `.kopf-wappen`, `.feld-hilfe`,
 `.zaehler-balken`, `.zaehler-voll`, `.zaehler-text`, `.kachel-pfeil`, `.seitenleiste-bereich`,
-`.klappe-titel`. Der aktive Reiter
+`.klappe-titel`, `.kopf-titel`, `.kopf-zusatz`. Ohne Teil-Schreibweise, weil sie eigene Bausteine
+sind: `.app-rahmen`, `.seitenkopf`, `.zelle-kurz`, `.zelle-dehnbar`, `.treffer`. Der aktive Reiter
 und der aktive Eintrag der Seitenleiste tragen `aria-current="page"`, keine eigene Klasse.
 
 ## Layout und Navigation
 
 **Mitglieder-App (Handy zuerst):** Kopfleiste oben, Inhalt in einer Spalte (höchstens
-`--breite-inhalt`), Reiter unten. Ab `60rem` Breite wandern die Reiter als Textlinks in die
-Kopfleiste.
+`--breite-inhalt`), Reiter unten. Ab `60rem` Breite stehen die Reiter mit denselben Symbolen wie auf dem Handy,
+Symbol und Wort nebeneinander, in der Mitte der Kopfleiste (eine einzige grüne Zeile). Nicht
+aktiv: weisse Schrift auf Grün; aktiv: helle Pille (`--farbe-marke-zart`) mit Schrift in
+`--farbe-marke`, fett, ohne Unterstreichung; Hover hellt leicht auf; Fokus als Rahmen in
+`--farbe-marke-hell`; Tippfläche mindestens `--tippflaeche`. Der Titel der Seite steht dann
+zwischen „MyTCO" und den Reitern und wird gekürzt, wenn der Platz fehlt; die Reiter verschiebt
+er nie.
 
 - **Reiter:** Start · CM · Profil; *Lizenz* kommt mit der Etappe *Lizenzanträge*. Höchstens
   4 Reiter, kein verstecktes Menü (☰). „CM" ist die Kurzform, weil „Clubmeisterschaft" bei
@@ -247,6 +265,13 @@ Kopfleiste.
   keine Clubmeisterschaft. Sobald die Anmeldung offen ist, steht sie hier."; läuft genau eine,
   zeigt der Reiter direkt deren Seite (ohne Zurück-Link); laufen mehrere, je eine Kachel wie auf
   der Startseite. Die Kachel der CM auf der Startseite bleibt und führt in den Bereich CM.
+- **Seite einer CM:** je Kategorie eine Karte mit *Kartenkopf* (Name, rechts die Plakette
+  «angemeldet», «sucht Partner» oder «Wildcard beantragt»), den Bedingungen und der Taste; keine
+  Namenslisten, stattdessen eine Kachel «12 angemeldet ›» (im Doppel «5 Paare ›») auf die Seite der
+  Kategorie; die Suchenden im Doppel zugeklappt. Am Ende der Seite, auch wenn noch Angaben fehlen,
+  «Bei Fragen oder Problemen melde dich bei <Vorname Nachname> (CM-Admin).» (amtlicher Name ohne
+  Rufname, damit keine doppelten Klammern entstehen), sofern das Turnier eine gültige Kontaktperson hat. Die **Kategorie einer CM** listet alle bestätigten Anmeldungen (im Doppel
+  Paare und Suchende mit Kommentar) und hat keine Tasten.
 - **Startseite:** „Hoi <Rufname, sonst Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
   „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben); Anlässe stehen als Kacheln unter „Jetzt aktuell" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
   stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
@@ -267,7 +292,7 @@ Kopfleiste.
 - **Formulare:** mehr als etwa 4 Felder werden in Schritte geteilt, mit Schritt-Zähler. Das
   erste Login hat (geplant, FR-02) 3 Schritte: 1 Angaben prüfen (vom Verein erfasst, nur lesen) · 2 Kontakt ·
   3 Tennis (Lizenznummer, Klassierung).
-- **Kontingente** zeigt der Mengen-Zähler, z. B. „1 von 3 Anmeldungen" (FR-06).
+- **Kontingente** (z. B. höchstens 3 Anmeldungen, FR-06) zeigt kein Zähler; ein Satz erscheint erst, wenn die Grenze erreicht ist.
 
 **Verwaltung (vor allem am PC):** erreichbar über die Kachel „Verwaltung ›" auf der
 Startseite, direkt unter der Begrüssung, nur für Konten mit einer Rolle über *Mitglied* hinaus
@@ -275,7 +300,7 @@ Startseite, direkt unter der Begrüssung, nur für Konten mit einer Rolle über 
 „MyTCO Verwaltung", den Bereichen, die eine der eigenen Rollen lesen darf, und „‹ Zur App":
 *Mitgliederverwaltung* (Mitglieder, Einlesen, Briefe, Anlässe, Mitteilungen, Für Fairgate mit Zahl der offenen,
 Änderungsverlauf) für Mitglieder- und MyTCO-Admin, *Clubmeisterschaft* (Turniere) für CM- und
-MyTCO-Admin, *MyTCO* (Rollen) nur für den MyTCO-Admin. Inhalt: Titel,
+MyTCO-Admin, *MyTCO* (Rollen) nur für den MyTCO-Admin. Ab `60rem` bleiben Seitenleiste, Pfad und Titel beim Scrollen stehen (Bausteine *Seitenleiste* und *Seitenkopf*). Unter `60rem` bleibt die Kopfleiste oben stehen wie in der App, die Seitenleiste darunter scrollt weg; der Titel blendet dort in die Kopfleiste ein und ersetzt das Wort „Verwaltung". Tabellen sind ab `60rem` einzeilig (Baustein *Tabelle*). Inhalt: Titel,
 Kennzahlen, eine Leiste mit Suche, Filter, Nebentaste und Haupttaste, darunter die Tabelle.
 Darf die Rolle einen Bereich nur lesen, gilt der Baustein *Nur lesen* mit dem Hinweis *Nur
 ansehen*. Eine Seite ausserhalb der eigenen Bereiche führt zur ersten Seite der Verwaltung, eine
@@ -315,6 +340,7 @@ Verlauf zurück. Gebaut in `src/lib/ui/navigation.ts`.
 | Hilfe, Datenschutz ohne Sitzung, Login mit Mail-Code | — | „‹ Anmelden" |
 | Clubmeisterschaft (Übersicht) | CM | — |
 | Seite einer CM | CM | — wenn sie die einzige laufende ist, sonst „‹ Clubmeisterschaft" |
+| Kategorie einer CM (alle Anmeldungen) | CM | „‹ <Name der CM>" |
 | Doppel einer CM (Partnerwahl) | CM | „‹ <Name der CM>" |
 | Profil | Profil | — |
 | E-Mail ändern | Profil | „‹ Profil" |
@@ -356,7 +382,18 @@ die Bewegung zeigt, wohin man gegangen ist. Dauern und Kurven stehen unter
 | Zurück-Taste oder -Geste des Browsers, Verwaltung, unbekannte Adresse | | keine; die Geste animiert der Browser selbst, eine unbekannte Adresse lädt die Seite neu. Lässt sich eine bekannte Seite nicht laden, bewegt sich die Fehlerseite wie die Seite, die sie ersetzt |
 
 Kopfleiste und Statusleisten-Band stehen beim Wechsel still, die Reiter auch, solange sie
-auf beiden Seiten stehen.
+auf beiden Seiten stehen. Der Titel in der Kopfleiste ist beim Wechsel weg (die Seite beginnt oben).
+
+**Titel in der Kopfleiste:** Gilt in der Mitglieder-App und in der Verwaltung unter `60rem`, für
+jede Seite mit `<h1>` (auch Start), nicht für Seiten ohne `<h1>`. Verschwindet das `<h1>` beim
+Scrollen unter der Kopfleiste, blendet sein Text in der Kopfleiste ein (kurze Überblendung mit
+etwas Verschieben von unten, `--dauer-kurz`/`--dauer-mittel`, `--kurve-standard`); kommt es
+wieder ins Bild, blendet er aus. Bei „Bewegung reduzieren" erscheint und verschwindet er ohne
+Bewegung, der Endzustand gilt sofort. Beim Seitenwechsel beginnt die Seite oben, der Titel ist
+weg; kommt eine Seite mit gespeicherter Scrollposition zurück, steht er sofort da, falls das
+`<h1>` nicht im Bild ist. Wechselt das `<h1>` ohne Seitenwechsel (Schritte eines Ablaufs), zeigt
+die Kopfleiste den neuen Titel. Er flackert, springt und bricht nie um. Screenreader hören ihn
+nicht doppelt (`aria-hidden`). In der Verwaltung am PC klebt stattdessen der Seitenkopf.
 
 **Reiter:** Der angetippte Reiter wird sofort aktiv, auch wenn die Seite noch lädt; der
 Balken gleitet hinüber (`--dauer-mittel`). Weil nur der Rollbereich scrollt, wirkt der Tipp
@@ -511,7 +548,7 @@ Seite *Auskunft*.
 | UI-05 | Bedeutung nie nur über Farbe: Status als Plakette mit Text, Symbole immer mit Text. |
 | UI-06 | Fehlermeldungen stehen beim Feld, in Worten, mit Lösungsweg. |
 | UI-07 | Codes werden unabhängig von Gross-/Kleinschreibung, Leerzeichen und Bindestrich angenommen. |
-| UI-09 | Bewegung gibt es nur, wo sie Orientierung gibt: beim Seitenwechsel, an der Markierung des Reiters, beim Auf- und Zuklappen, bei der Rückfrage ([Bewegung und Bedienung](#bewegung-und-bedienung), Dauern unter [Bewegung](#bewegung)) und im Baustein Anleitung. Bei „Bewegung reduzieren" wechselt alles sofort. Die Anleitung: weiche Überblendung, 3,5 s pro Schritt, 6 s für „Fertig", höchstens 3 Durchläufe, danach steht sie bei „Fertig". Eine Taste hält an (Anhalten · Abspielen · Nochmals abspielen). Bei „Bewegung reduzieren" keine Bewegung und keine Taste; die Bilder stehen nummeriert still nebeneinander. |
+| UI-09 | Bewegung gibt es nur, wo sie Orientierung gibt: beim Seitenwechsel, an der Markierung des Reiters, beim Auf- und Zuklappen, bei der Rückfrage, beim Einblenden des Titels in der Kopfleiste ([Bewegung und Bedienung](#bewegung-und-bedienung), Dauern unter [Bewegung](#bewegung)) und im Baustein Anleitung. Bei „Bewegung reduzieren" wechselt alles sofort. Die Anleitung: weiche Überblendung, 3,5 s pro Schritt, 6 s für „Fertig", höchstens 3 Durchläufe, danach steht sie bei „Fertig". Eine Taste hält an (Anhalten · Abspielen · Nochmals abspielen). Bei „Bewegung reduzieren" keine Bewegung und keine Taste; die Bilder stehen nummeriert still nebeneinander. |
 
 Lange Wörter („Clubmeisterschaft") werden getrennt statt abgeschnitten (`hyphens: auto`
 auf `body`, Sprache `de-CH` in `src/app.html`). Ausnahme sind Tabellenköpfe (`.tabelle th`):
@@ -519,7 +556,8 @@ Sie trennen nicht, weil die Tabelle auf schmalem Bildschirm ohnehin waagrecht sc
 
 ## Mockups
 
-Vorlagen für die ersten Bildschirme (Abnahme durch den Projektleiter in #13). Sie binden `tokens.css`
+Vorlagen für die ersten Bildschirme (Abnahme durch den Projektleiter in #13). Die CM-Anmeldung
+(Zähler) und die Reiter am PC sind dort überholt; massgebend ist der Text dieses Leitbilds. Sie binden `tokens.css`
 und `basis.css` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im Browser öffnen:
 
 - [Mockups](ui-mockups/index.html): Login, erstes Login (Schritt 2 von 3), Startseite mit
