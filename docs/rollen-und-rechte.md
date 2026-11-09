@@ -91,6 +91,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | E-Mail und Telefon anderer Mitglieder | – | L beteiligt, bis Turnierende (FR-19) | L alle (K-42) | L alle (K-42) | S | L |
 | **CM-Anmeldung** | | | | | | |
 | Turnier, Turniernummern, Kategorien | – | L | S | L | L | L |
+| Kontaktperson des Turniers (wählen; Mitglieder sehen nur den Namen) | – | L Name | S | L Name | L Name | L |
 | Eigene Anmeldung, bis Anmeldeschluss (FR-10) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Anmeldungen aller (Name, Kategorie) | – | L bestätigte | S | L bestätigte | L bestätigte | L |
 | Geschlecht und Jahrgang der Spieler (zum Zuordnen) | – | – | L | – | S | L |

@@ -91,7 +91,7 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Turnier** | Jahr (eindeutig), Name, Anmeldeschluss (Datum), Status, erstellt am; *Anmeldung offen* gilt nur bis zum Anmeldeschluss (FR-33, siehe [Lebenszyklen](#lebenszyklen)) | — |
+| **Turnier** | Jahr (eindeutig), Name, Anmeldeschluss (Datum), Status, erstellt am, Kontaktperson (freiwillig, ein Mitglied mit Rolle CM-Admin; Mitglieder sehen sie nur, solange sie CM-Admin ist); *Anmeldung offen* gilt nur bis zum Anmeldeschluss (FR-33, siehe [Lebenszyklen](#lebenszyklen)) | — |
 | **Turniernummer** | Nummer bei Swiss Tennis, Bezeichnung (z. B. Gruppenphase, Finalwochenende — Annahme K-25.4), Reihenfolge. Freiwillig, 0 bis n je Turnier: Swiss Tennis vergibt sie oft erst später | — |
 | **Kategorie** | Name, Geschlecht (Herren / Damen / Mixed nur im Doppel / offen), Jahrgang von–bis (Alterskategorie, nur im Einzel, je Ende optional), Einzel mit Klassierung von–bis (Klassierungsbereich) **oder** Doppel mit Mindestsumme (vorbelegt 9, Annahme K-51), Status *aktiv* / *abgesagt* | — |
 | **Anmeldung** | Kategorie, Spieler (1 im Einzel, 1–2 im Doppel), Kommentar (nur beim Wildcard-Antrag: kein eigenes Feld, sondern eine Anmeldung mit Kommentar, die als *beantragt* beginnt; höchstens 300 Zeichen), Kommentar *sucht Partner* (nur im Doppel, wenn ein Spieler allein angemeldet ist, 0–120 Zeichen), Status *bestätigt* / *beantragt* / *abgelehnt* / *zurückgezogen*, angemeldet am, Gruppe (nach Auslosung), Rang-Korrektur (optional) | Spieler, Kommentar, Kommentar *sucht Partner* |
