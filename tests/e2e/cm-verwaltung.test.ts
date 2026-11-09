@@ -316,6 +316,15 @@ test('RR-07, FR-08: MyTCO-Admin sieht die Anmeldungen mit Kommentar, ohne Tasten
 	await page.goto(`/verwaltung/turniere/${turnierId}/kategorien/${kategorieId}`);
 	await expect(page.getByRole('heading', { level: 1, name: 'Herren R1–R6' })).toBeVisible();
 	await expect(page.getByText('1 Anmeldung, 1 Wildcard-Antrag', { exact: true })).toBeVisible();
+	if (info.project.name === 'desktop') {
+		// Am PC klebt der Seitenkopf; er beginnt unter dem Hinweis «Nur ansehen», statt ihn unten
+		// zu überdecken.
+		const hinweis = page.locator('main .hinweis', { hasText: 'Nur ansehen.' });
+		await expect(hinweis).toBeVisible();
+		const unten = await hinweis.evaluate((e) => e.getBoundingClientRect().bottom);
+		const oben = await page.locator('.seitenkopf').evaluate((e) => e.getBoundingClientRect().top);
+		expect(unten).toBeLessThanOrEqual(oben);
+	}
 	await expect(zeile(page, nachname)).toContainText(kommentar);
 	await expect(zeile(page, nachname)).toContainText('Wildcard beantragt');
 	for (const taste of [

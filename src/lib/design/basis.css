@@ -1846,6 +1846,12 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 		border-bottom: var(--rand-duenn) solid var(--farbe-linie);
 	}
 
+	/* Steht der Hinweis «Nur ansehen» darüber, fällt der negative Rand weg: der Seitenkopf
+	   überdeckt den Hinweis sonst unten */
+	.hinweis + .seitenkopf {
+		margin-top: 0;
+	}
+
 	.seitenkopf > :last-child {
 		margin-bottom: 0;
 	}
