@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import Pfad from '../../../../lib/verwaltung/Pfad.svelte';
+	import Seitenkopf from '../../../../lib/verwaltung/Seitenkopf.svelte';
 	import Turnierformular, {
 		angabenFuerServer,
 		werteAusTurnier,
@@ -110,11 +110,14 @@
 	<title>{detail.name} – MyTCO</title>
 </svelte:head>
 
-<Pfad
-	stufen={[{ text: 'Turniere', href: resolve('/verwaltung/turniere') }]}
-	aktuell={detail.name}
-/>
-<h1>{detail.name}</h1>
+<Seitenkopf
+	pfad={{
+		stufen: [{ text: 'Turniere', href: resolve('/verwaltung/turniere') }],
+		aktuell: detail.name
+	}}
+>
+	<h1>{detail.name}</h1>
+</Seitenkopf>
 <p class="leise">
 	Anmeldeschluss {schluss} · {aktive}
 	{aktive === 1 ? 'Kategorie' : 'Kategorien'}
@@ -207,13 +210,16 @@
 					<tr>
 						<td>
 							{#if k.status === 'abgesagt'}
-								{k.name} <span class="plakette plakette-gesperrt">abgesagt</span>
+								<span class="zelle-kurz" title={k.name}>{k.name}</span>
+								<span class="plakette plakette-gesperrt">abgesagt</span>
 							{:else}
-								<a
-									href={resolve('/verwaltung/turniere/[id]/kategorien/[kid]', {
-										id: String(detail.id),
-										kid: String(k.id)
-									})}>{k.name}</a
+								<span class="zelle-kurz"
+									><a
+										href={resolve('/verwaltung/turniere/[id]/kategorien/[kid]', {
+											id: String(detail.id),
+											kid: String(k.id)
+										})}>{k.name}</a
+									></span
 								>
 							{/if}
 						</td>

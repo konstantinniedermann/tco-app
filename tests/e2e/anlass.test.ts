@@ -4,7 +4,9 @@ import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
 	holeMailCode,
 	legeAdminMitBriefCodeAn,
+	legeKontoAn,
 	legeKontoMitBriefCodeAn,
+	meldeZumAnlass,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
@@ -163,6 +165,23 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	await expect(tabelle).toContainText('kommt');
 	await expect(tabelle).not.toContainText('Bin in den Ferien.');
 	await pruefeBildschirm(page, info, 'anlass-verwaltung');
+	// PC: Zeile der Antworten ohne Tasten einzeilig (≤ 48 hoch), auch mit langer Bemerkung; der
+	// Text endet mit «…», der volle steht im title.
+	if (info.project.name === 'desktop') {
+		const lang = 'Leider verhindert wegen eines Termins, den ich nicht verschieben kann. '.repeat(
+			3
+		);
+		const langName = `Lang${randomUUID().slice(0, 6)}`;
+		const gast = await legeKontoAn('Berta', langName);
+		const anlassId = Number(new URL(page.url()).pathname.split('/').at(-1));
+		await meldeZumAnlass(anlassId, gast.mitgliedId, 'kommt-nicht', lang.trim());
+		await page.reload();
+		const zeileAntwort = page.getByRole('row', { name: new RegExp(langName) });
+		const text = zeileAntwort.locator('.zelle-kurz');
+		await expect(text).toHaveAttribute('title', lang.trim());
+		expect((await zeileAntwort.boundingBox())?.height).toBeLessThanOrEqual(48);
+		expect(await text.evaluate((e) => e.scrollWidth > e.clientWidth)).toBe(true);
+	}
 	await pruefePfad(page, ['Anlässe'], titel);
 	await page
 		.getByRole('main')

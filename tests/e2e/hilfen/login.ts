@@ -257,13 +257,14 @@ export async function legeOffenenAnlassAn(erstelltVon: number, titel: string): P
 	});
 }
 
-/** Das Mitglied antwortet auf den Anlass, ohne Bemerkung. */
+/** Das Mitglied antwortet auf den Anlass, ohne Bemerkung (bei «kommt nicht» auf Wunsch mit). */
 export async function meldeZumAnlass(
 	anlassId: number,
 	mitgliedId: number,
-	antwort: 'kommt' | 'kommt-nicht'
+	antwort: 'kommt' | 'kommt-nicht',
+	bemerkung: string | null = null
 ): Promise<void> {
-	const r = await melde(hole().db, anlassId, mitgliedId, { antwort, bemerkung: null }, new Date());
+	const r = await melde(hole().db, anlassId, mitgliedId, { antwort, bemerkung }, new Date());
 	if (r !== 'ok') throw new Error(`Antwort auf Anlass ${anlassId}: ${r}`);
 }
 

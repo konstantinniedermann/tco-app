@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { invalidate } from '$app/navigation';
 	import { uebertrageFairgate } from '../../../lib/verwaltung/api.ts';
 	import {
@@ -8,6 +9,8 @@
 		fehlerText
 	} from '../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
+
+	const ALT_TEXT = 'Änderung älter als 12 Monate, Angaben in Fairgate prüfen.';
 
 	let { data } = $props();
 	const darfAbhaken = $derived(data.darfSchreiben.mitglieder);
@@ -38,7 +41,9 @@
 	<title>Für Fairgate – MyTCO</title>
 </svelte:head>
 
-<h1>Für Fairgate</h1>
+<Seitenkopf>
+	<h1>Für Fairgate</h1>
+</Seitenkopf>
 <p class="leise">
 	Diese Mitglieder haben Angaben in MyTCO selbst geändert.
 	{#if darfAbhaken}Trag die neuen Werte in Fairgate nach und hake dann ab.{/if}
@@ -64,21 +69,18 @@
 			</thead>
 			<tbody>
 				{#each data.zeilen as z (z.id)}
+					{@const angaben = neueAngaben(z).join(' · ')}
 					<tr>
 						<td>{z.name}</td>
 						<td>{z.mitgliedernummer ?? ''}</td>
 						<td>
 							{#if z.verlaufGeloescht}
-								Änderung älter als 12 Monate, Angaben in Fairgate prüfen.
+								<span>{ALT_TEXT}</span>
 							{:else}
 								{geaendertText(z.felder)}
 							{/if}
 						</td>
-						<td>
-							{#each neueAngaben(z) as zeile, i (i)}
-								{#if i > 0}<br />{/if}{zeile}
-							{/each}
-						</td>
+						<td>{angaben}</td>
 						<td>{tagText(z.seit)}</td>
 						{#if darfAbhaken}
 							<td>

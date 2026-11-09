@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Pfad from '../../../../lib/verwaltung/Pfad.svelte';
+	import Seitenkopf from '../../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import Name from '../../../../lib/ui/Name.svelte';
 	import { formatiereBeginn, formatiereZeitpunkt } from '../../../../lib/anlass/zeit.ts';
@@ -93,11 +93,14 @@
 	<title>{detail.titel} – MyTCO</title>
 </svelte:head>
 
-<Pfad
-	stufen={[{ text: 'Anlässe', href: resolve('/verwaltung/anlaesse') }]}
-	aktuell={detail.titel}
-/>
-<h1>{detail.titel}</h1>
+<Seitenkopf
+	pfad={{
+		stufen: [{ text: 'Anlässe', href: resolve('/verwaltung/anlaesse') }],
+		aktuell: detail.titel
+	}}
+>
+	<h1>{detail.titel}</h1>
+</Seitenkopf>
 <p class="leise">{formatiereBeginn(detail.beginn)} · {detail.ort}</p>
 
 <div class="kennzahlen">
@@ -134,7 +137,10 @@
 								<span class="plakette plakette-offen">kommt nicht</span>
 							{/if}
 						</td>
-						<td>{z.bemerkung ?? ''}</td>
+						<td>
+							{#if z.bemerkung}<span class="zelle-kurz" title={z.bemerkung}>{z.bemerkung}</span
+								>{/if}
+						</td>
 						<td>{formatiereZeitpunkt(z.geaendertAm)}</td>
 					</tr>
 				{/each}

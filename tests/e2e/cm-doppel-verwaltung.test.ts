@@ -20,7 +20,12 @@ import {
 	stelleAnfrageDirekt,
 	warteAufMail
 } from './hilfen/login.ts';
-import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
+import {
+	pruefeBildschirm,
+	sammleKonsolenfehler,
+	waehleAktion,
+	wartetAufVorladen
+} from './hilfen/seite.ts';
 
 // CM Teil 3 Etappe 2: Der CM-Admin verwaltet die Doppel einer Kategorie (A-ANMELDUNG-06, FR-46):
 // von Hand anmelden, Partner ändern, Suchende zusammenlegen, offene Anfragen als Paar anmelden
@@ -38,6 +43,7 @@ const JAHR_ZUSAMMEN: Record<string, number> = { iphone: 2071, android: 2070, des
 const JAHR_ANFRAGEN: Record<string, number> = { iphone: 2068, android: 2067, desktop: 2066 };
 const JAHR_EINE_ANFRAGE: Record<string, number> = { iphone: 2065, android: 2064 };
 const JAHR_VERSCHIEBEN: Record<string, number> = { iphone: 2063, android: 2062, desktop: 2061 };
+const JAHR_EINZEILIG: Record<string, number> = { desktop: 2060 };
 
 function testjahr(jahre: Record<string, number>, info: TestInfo): number {
 	const jahr = jahre[info.project.name];
@@ -170,7 +176,7 @@ test('A-ANMELDUNG-06, FR-46: CM-Admin meldet ein Paar von Hand an und ändert de
 	}
 
 	// Partner ändern ohne Ersatz: Anton bleibt und sucht danach selbst.
-	await zeile(page, anton.nachname).getByRole('button', { name: 'Partner ändern' }).click();
+	await waehleAktion(page, zeile(page, anton.nachname), 'Partner ändern');
 	const partner = page.getByRole('dialog', { name: 'Partner ändern' });
 	// Die Reihenfolge im Paar folgt den Nachnamen, die pro Lauf neu sind.
 	await expect(partner).toContainText(anton.name);
@@ -215,7 +221,7 @@ test('FR-46, FR-49: zwei Suchende zusammenlegen', async ({ page }, info) => {
 	await expect(zeile(page, carl.nachname)).toContainText(kommentarCarl);
 	await expect(zeile(page, dario.nachname)).toContainText(kommentarDario);
 
-	await zeile(page, carl.nachname).getByRole('button', { name: 'Zusammenlegen' }).click();
+	await waehleAktion(page, zeile(page, carl.nachname), 'Zusammenlegen');
 	const zusammen = page.getByRole('dialog', { name: 'Zusammenlegen' });
 	await zusammen.getByRole('radio', { name: new RegExp(`${dario.nachname}, Dario`) }).check();
 	await pruefeBildschirm(page, info, 'cm-doppel-zusammenlegen');
@@ -261,7 +267,7 @@ test('FR-48: offene Anfrage als Paar anmelden und löschen', async ({ page }, in
 	await expect(anfragen.getByRole('row')).toHaveCount(3);
 
 	// Als Paar anmelden: Die Anmeldung ist geschlossen, der CM-Admin meldet trotzdem an.
-	await zeile(page, gian.nachname).getByRole('button', { name: 'Als Paar anmelden' }).click();
+	await waehleAktion(page, zeile(page, gian.nachname), 'Als Paar anmelden');
 	const alsPaar = page.getByRole('dialog', { name: 'Als Paar anmelden?' });
 	await expect(alsPaar).toContainText(`${gian.name} / ${hugo.name}`);
 	await alsPaar.getByRole('button', { name: 'Als Paar anmelden', exact: true }).click();
@@ -280,7 +286,7 @@ test('FR-48: offene Anfrage als Paar anmelden und löschen', async ({ page }, in
 	await meldungAn(hugo, `Der CM-Admin hat dich mit ${gian.name} für «${HERREN.name}» angemeldet.`);
 
 	// Anfrage löschen: Ivo erfährt, dass sie hinfällig ist.
-	await zeile(page, ivo.nachname).getByRole('button', { name: 'Löschen' }).click();
+	await waehleAktion(page, zeile(page, ivo.nachname), 'Löschen');
 	const loeschen = page.getByRole('dialog', { name: 'Anfrage löschen?' });
 	await expect(loeschen).toContainText(`${ivo.name} erfährt es.`);
 	await loeschen.getByRole('button', { name: 'Löschen', exact: true }).click();
@@ -376,7 +382,7 @@ test('FR-46: CM-Admin verschiebt, korrigiert die Klassierung und löscht; nicht 
 	await expect(zeile(teil(page, 'Paare'), rolf.nachname)).toContainText('ausgetreten');
 
 	// Partner ändern: Wer nicht mehr aktiv ist, kann nicht bleiben.
-	await zeile(page, rolf.nachname).getByRole('button', { name: 'Partner ändern' }).click();
+	await waehleAktion(page, zeile(page, rolf.nachname), 'Partner ändern');
 	const partner = page.getByRole('dialog', { name: 'Partner ändern' });
 	await expect(
 		partner.getByRole('radio', { name: new RegExp(`${rolf.nachname}, Rolf`) })
@@ -389,7 +395,7 @@ test('FR-46: CM-Admin verschiebt, korrigiert die Klassierung und löscht; nicht 
 	await expect(partner).toBeHidden();
 
 	// Verschieben: Der Dialog sagt vor dem Senden, warum es nicht geht; die Taste bleibt gesperrt.
-	await zeile(page, rolf.nachname).getByRole('button', { name: 'Verschieben' }).click();
+	await waehleAktion(page, zeile(page, rolf.nachname), 'Verschieben');
 	const verschieben = page.getByRole('dialog', { name: 'Verschieben' });
 	await expect(verschieben).toContainText(
 		'Ein Spieler ist nicht mehr aktiv. Verschieben geht nicht; ändere zuerst den Partner oder lösche die Anmeldung.'
@@ -403,7 +409,7 @@ test('FR-46: CM-Admin verschiebt, korrigiert die Klassierung und löscht; nicht 
 	await expect(verschieben).toBeHidden();
 
 	// Verschieben: Ole und Pius gehen in die zweite Kategorie.
-	await zeile(page, ole.nachname).getByRole('button', { name: 'Verschieben' }).click();
+	await waehleAktion(page, zeile(page, ole.nachname), 'Verschieben');
 	await expect(verschieben).toContainText('· Summe 9');
 	await verschieben.getByRole('radio', { name: HERREN_B.name }).check();
 	await pruefeBildschirm(page, info, 'cm-doppel-verschieben');
@@ -420,7 +426,7 @@ test('FR-46: CM-Admin verschiebt, korrigiert die Klassierung und löscht; nicht 
 	}
 
 	// Klassierung korrigieren: im Paar zuerst den Spieler wählen.
-	await zeile(page, quirin.nachname).getByRole('button', { name: 'Klassierung' }).click();
+	await waehleAktion(page, zeile(page, quirin.nachname), 'Klassierung');
 	const klassierung = page.getByRole('dialog', { name: 'Klassierung korrigieren' });
 	const speichern = klassierung.getByRole('button', { name: 'Klassierung speichern' });
 	await expect(speichern).toBeDisabled();
@@ -434,7 +440,7 @@ test('FR-46: CM-Admin verschiebt, korrigiert die Klassierung und löscht; nicht 
 	await expect(zeile(teil(page, 'Paare'), quirin.nachname)).toContainText('15');
 
 	// Anmeldung löschen: Quirin erfährt es; Rolf ist ausgetreten.
-	await zeile(page, quirin.nachname).getByRole('button', { name: 'Löschen' }).click();
+	await waehleAktion(page, zeile(page, quirin.nachname), 'Löschen');
 	const loeschen = page.getByRole('dialog', { name: 'Anmeldung löschen?' });
 	await expect(loeschen).toContainText(quirin.name);
 	await expect(loeschen).toContainText(rolf.name);
@@ -444,5 +450,54 @@ test('FR-46: CM-Admin verschiebt, korrigiert die Klassierung und löscht; nicht 
 	await meldetErfolg(page, 'Gelöscht.');
 	await expect(teil(page, 'Paare')).toContainText('Keine.');
 	await meldungAn(quirin, `Der CM-Admin hat eure Anmeldung für «${HERREN.name}» gelöscht.`);
+	expect(fehler).toEqual([]);
+});
+
+test('PC: Anfrage mit zwei Tasten bleibt ohne «Ändern»', async ({ page }, info) => {
+	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: einzeilig erst ab 60rem; am Handy scrollt die Tabelle waagrecht
+	test.setTimeout(120_000);
+	const fehler = sammleKonsolenfehler(page);
+	const jahr = testjahr(JAHR_EINZEILIG, info);
+	const {
+		kategorieIds: [kategorieId]
+	} = await legeOffenesTurnierAn(jahr, [HERREN]);
+	const sandro = await legeHerrnAn('Sandro', 'R4');
+	const timo = await legeHerrnAn('Timo', 'R5');
+	const urs = await legeHerrnAn('Urs', 'R6');
+	const vito = await legeHerrnAn('Vito', 'R7');
+	const cm = await legeCmMitBriefCodeAn('Chiara');
+	await meldePaarDirektAn(kategorieId, [sandro.mitgliedId, timo.mitgliedId], cm.mitgliedId);
+	await gibLogin(vito.kontoId);
+	await stelleAnfrageDirekt(kategorieId, urs.mitgliedId, vito.mitgliedId);
+	await oeffneKategorieAlsCm(page, cm, jahr);
+
+	// Anfrage: zwei Aktionen, beide als Taste in einer Zeile.
+	const anfrage = zeile(teil(page, 'Offene Anfragen'), urs.nachname);
+	await expect(anfrage.getByRole('button')).toHaveText(['Als Paar anmelden', 'Löschen']);
+	await expect(anfrage.getByRole('button', { name: 'Ändern', exact: true })).toHaveCount(0);
+	expect((await anfrage.boundingBox())?.height).toBeLessThanOrEqual(72);
+
+	// Paar: vier Aktionen hinter «Ändern»; jeder Spieler steht einzeilig in seiner Zeile.
+	const paar = zeile(teil(page, 'Paare'), sandro.nachname);
+	await expect(paar.getByRole('button')).toHaveText(['Ändern']);
+	for (const s of [sandro, timo]) {
+		const name = paar.getByText(`${s.nachname}, ${s.name.split(' ')[0]}`, { exact: true });
+		expect(await name.evaluate((e) => e.getClientRects().length)).toBe(1);
+	}
+	await paar.getByRole('button', { name: 'Ändern', exact: true }).click();
+	const aendern = page.getByRole('dialog', { name: 'Ändern', exact: true });
+	// Der Dialog nennt beide Spieler.
+	await expect(aendern).toContainText(sandro.nachname);
+	await expect(aendern).toContainText(timo.nachname);
+	await expect(aendern.getByRole('button')).toHaveText([
+		'Partner ändern',
+		'Verschieben',
+		'Klassierung',
+		'Löschen',
+		'Abbrechen'
+	]);
+	await pruefeBildschirm(page, info, 'cm-doppel-aendern');
+	await aendern.getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(aendern).toBeHidden();
 	expect(fehler).toEqual([]);
 });

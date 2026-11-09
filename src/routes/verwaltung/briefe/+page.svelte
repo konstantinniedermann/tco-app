@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { tick } from 'svelte';
 	import Briefdruck from '../../../lib/verwaltung/Briefdruck.svelte';
@@ -89,7 +90,9 @@
 {#if briefe}
 	<Briefdruck {briefe} {zurueck} />
 {:else}
-	<h1 tabindex="-1" bind:this={titel}>Briefe</h1>
+	<Seitenkopf>
+		<h1 tabindex="-1" bind:this={titel}>Briefe</h1>
+	</Seitenkopf>
 	<p class="leise">
 		Mitglieder, die MyTCO noch nie geöffnet haben. Ein neuer Code ersetzt den alten.
 	</p>

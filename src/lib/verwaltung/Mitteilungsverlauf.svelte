@@ -31,7 +31,11 @@
 							>{#if e.absender}<Name name={e.absender} form="nachname-zuerst" />{:else}gelöschtes
 								Konto{/if}</td
 						>
-						<td><strong>{e.titel}</strong><br />{e.text}</td>
+						<td
+							><span class="zelle-kurz" title="{e.titel}: {e.text}"
+								><strong>{e.titel}</strong> {e.text}</span
+							></td
+						>
 						<td>{auswahlText(e.auswahl)}</td>
 						<td>{WEG_NAMEN[e.weg]}</td>
 						<td>{zahlenText(e)}</td>

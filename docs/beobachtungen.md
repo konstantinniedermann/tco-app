@@ -317,3 +317,27 @@ Einzel-Liste.
 **Ursprung:** Abschluss-Review und CAS-Review von feat/cm-uebersicht (0.18.0)
 
 **Einschätzung:** Niedrig, nichts davon führt Mitglieder in die Irre.
+
+### 2026-11-09 — «#69: Anmelden auf der CM-Seite lädt die Seite nicht neu» rot, wenn navigation und bewegung zusammen laufen
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/navigation.test.ts` (Test «#69: Anmelden auf der CM-Seite lädt die Seite nicht neu»), zusammen mit `tests/e2e/bewegung.test.ts`
+
+**Beobachtung:** `npm run e2e -- tests/e2e/navigation.test.ts tests/e2e/bewegung.test.ts --project iphone --project android` ist auf iPhone und Android reproduzierbar rot: Nach «Anmelden» im Dialog bleibt `role=status` leer, die Kategorie zeigt «Noch niemand angemeldet». Allein läuft die Datei grün, ebenso im vollen `make check`. Auf `origin/dev` (edb8268) gleich, also nicht aus feat/ui-pc-feinschliff.
+
+**Ursprung:** Feinschliff PC (feat/ui-pc-feinschliff), Gegenprobe auf einem frischen Worktree von `origin/dev`
+
+**Einschätzung:** Mittel für die Verlässlichkeit der Tests, kein Hinweis auf einen App-Fehler. Vermutlich gemeinsamer Zustand zwischen den beiden Dateien (Turnierjahre oder laufende CMs); erst Trace mit Netzwerk ansehen.
+
+### 2026-11-09 — Restbefunde aus den Reviews von Feinschliff PC
+
+**Thema:** Verwaltung UI
+
+**Fundort:** `src/lib/design/basis.css`, `src/lib/ui/kopftitel.ts`, `src/lib/verwaltung/Spielersuche.svelte`, Tests dazu
+
+**Beobachtung:** (1) `scroll-padding-top` für den klebenden Seitenkopf am PC ist geschätzt (`--abstand-6 + 8rem`) statt aus Tokens abgeleitet; ein umbrechender langer Titel ist höher. (2) Die flexible Namens-/Kommentarspalte (`max-width: 0` in der Zelle) ist nur in Chromium geprüft, nicht in Safari/Firefox am Desktop. (3) Am PC mit Band «Ansicht als …» ragt die Seitenleiste (100dvh) bei Scrollstand 0 um die Bandhöhe unter den Rand. (4) Spielersuche im Handy-Querformat nur ~136 px hoch (35dvh). (5) Gleiche Route mit anderem Parameter: der neue Titel blitzt kurz in der Kopfleiste auf. (6) Fokus-Rückgabe des «Ändern»-Dialogs nur in Desktop-Chrome getestet. (7) Spielernamen und E-Mail in übrigen Tabellen ungekürzt — bei Extremwerten scrollt die Tabelle in ihrer Box.
+
+**Ursprung:** Task- und Abschluss-Reviews von feat/ui-pc-feinschliff
+
+**Einschätzung:** Niedrig, nichts davon führt in die Irre; (1) und (2) beim nächsten Gang durch die Verwaltung am Mac/Safari ansehen.

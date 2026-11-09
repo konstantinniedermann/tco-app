@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { ladeMitglieder, type MitgliedZeile } from '../../../lib/verwaltung/api.ts';
@@ -44,7 +45,9 @@
 	<title>Mitglieder – MyTCO</title>
 </svelte:head>
 
-<h1>Mitglieder</h1>
+<Seitenkopf>
+	<h1>Mitglieder</h1>
+</Seitenkopf>
 <p class="leise" role="status">
 	{#if geladen}{zeilen.length} {zeilen.length === 1 ? 'Mitglied' : 'Mitglieder'}{/if}
 </p>

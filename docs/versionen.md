@@ -8,6 +8,15 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.19.0 — Feinschliff am PC, Seitentitel in der Kopfleiste
+
+- Feinschliff am Computer: Die Kopfleiste zeigt beim Scrollen den Titel der Seite, am Handy wie
+  am PC. Am PC stehen die Reiter mit Symbol mittig in der Kopfleiste. In der Verwaltung bleiben
+  Seitenleiste, Pfad und Titel beim Scrollen stehen. Die Tabellen der Verwaltung sind einzeilig
+  und passen ohne seitliches Scrollen; lange Namen und Kommentare enden mit «…», die Aktionen
+  einer Anmeldung liegen hinter «Ändern». Die Spielersuche im Dialog «Von Hand anmelden» springt nicht mehr und nennt
+  den Hinweis «Ab 2 Buchstaben.».
+
 ## 0.18.0 — CM-Übersicht übersichtlicher, Kontaktperson pro Turnier
 
 - Clubmeisterschaft übersichtlicher: kein Zähler «1 von 3 Anmeldungen» mehr; wo man dabei ist,
