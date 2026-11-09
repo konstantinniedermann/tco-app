@@ -329,6 +329,10 @@ test('RR-07, FR-08: MyTCO-Admin sieht die Anmeldungen mit Kommentar, ohne Tasten
 	}
 	await expect(zeile(page, nachname)).toContainText(kommentar);
 	await expect(zeile(page, nachname)).toContainText('Wildcard beantragt');
+	// K-42: Kontaktdaten des Spielers im Turnierjahr, als Link zum Mailen.
+	await expect(
+		zeile(page, nachname).getByRole('link', { name: `E-Mail ${spieler.email}` })
+	).toHaveAttribute('href', `mailto:${spieler.email}`);
 	for (const taste of [
 		'Von Hand anmelden',
 		'Entscheiden',
@@ -455,7 +459,9 @@ test('PC: Anmeldungen einzeilig, Aktionen über «Ändern»', async ({ page }, i
 	await setzeSpielerangaben(lang.mitgliedId, {
 		geschlecht: 'm',
 		jahrgang: 1975,
-		klassierung: 'R5'
+		klassierung: 'R5',
+		// K-42: mit Telefon und E-Mail, der breiteste Fall der Spalte «Kontakt».
+		telefon: '+41 79 123 45 67'
 	});
 	await meldeZurCmAn(kategorieId, lang.mitgliedId);
 	const cm = await legeCmMitBriefCodeAn('Cyrill');

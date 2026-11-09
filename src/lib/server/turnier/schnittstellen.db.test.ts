@@ -579,7 +579,9 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 				status: 'bestaetigt',
 				klassierung: 'R8',
 				geschlecht: 'm',
-				jahrgang: 1990
+				jahrgang: 1990,
+				// K-42: im Turnierjahr mit Kontaktdaten (Zeit aus den Diensten).
+				email: r8.email
 			})
 		]);
 		expect((await getAnmeldungen(s.d, hole(cm, { id: '999999999' }))).status).toBe(404);
@@ -937,7 +939,12 @@ describe('Doppel verwalten (#59 Etappe 2)', () => {
 		);
 		const liste = await getDoppel(s.d, hole(cm, k));
 		expect(liste.status).toBe(200);
-		expect((await liste.json()).paare).toHaveLength(1);
+		const { paare } = await liste.json();
+		expect(paare).toHaveLength(1);
+		// K-42: im Turnierjahr mit Kontaktdaten (Zeit aus den Diensten).
+		expect(paare[0].spieler.map((x: { email: string }) => x.email).sort()).toEqual(
+			[a.email, b.email].sort()
+		);
 		const doppelt = await postDoppelVonHand(s.d, post(cm, { mitgliedIds: ids, trotzdem: true }, k));
 		expect(await antwortVon(doppelt)).toEqual([409, { fehler: 'schon-angemeldet' }]);
 		expect((await getDoppel(s.d, hole(cm, { id: '999999999' }))).status).toBe(404);

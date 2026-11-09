@@ -272,7 +272,7 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 		const sucht = await anmeldungMit(t.doppel, [paul], t.jetzt, 'Eher abends');
 		const anfrage = await anfrageMit(t.doppel, urs, paul, t.jetzt);
 
-		const liste = await ladeDoppel(db, t.doppel);
+		const liste = await ladeDoppel(db, t.doppel, t.jetzt);
 		const name = (vorname: string, nachname: string) => ({ rufname: null, vorname, nachname });
 		expect(liste).toEqual({
 			paare: [
@@ -284,14 +284,18 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 							name: name('Lena', 'Aebi'),
 							mitgliedStatus: 'aktiv',
 							geschlecht: 'w',
-							klassierung: 'R4'
+							klassierung: 'R4',
+							email: expect.stringMatching(/@example\.org$/),
+							telefon: '079 111 22 33'
 						},
 						{
 							mitgliedId: max,
 							name: name('Max', 'Zaugg'),
 							mitgliedStatus: 'aktiv',
 							geschlecht: 'm',
-							klassierung: 'R5'
+							klassierung: 'R5',
+							email: expect.stringMatching(/@example\.org$/),
+							telefon: '079 444 55 66'
 						}
 					],
 					summe: 9
@@ -305,7 +309,9 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 						name: name('Paul', 'Brunner'),
 						mitgliedStatus: 'aktiv',
 						geschlecht: 'm',
-						klassierung: 'R5'
+						klassierung: 'R5',
+						email: expect.stringMatching(/@example\.org$/),
+						telefon: null
 					},
 					kommentar: 'Eher abends'
 				}
@@ -318,26 +324,35 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 						name: name('Urs', 'Christen'),
 						mitgliedStatus: 'aktiv',
 						geschlecht: 'm',
-						klassierung: null
+						klassierung: null,
+						email: expect.stringMatching(/@example\.org$/),
+						telefon: null
 					},
 					an: expect.objectContaining({ mitgliedId: paul }),
 					gestelltAm: t.jetzt
 				}
 			]
 		});
-		// Review Focus 5: weder Telefon noch E-Mail in der Liste.
-		const json = JSON.stringify(liste);
-		expect(json).not.toContain('079');
-		expect(json).not.toContain('@example.org');
+		// K-42: Ab dem 1.1. nach dem Turnierjahr (Zürich) weder Telefon noch E-Mail in der Liste.
+		const imJahr = JSON.stringify(
+			await ladeDoppel(db, t.doppel, new Date(`${t.jahr}-12-31T22:59:00Z`))
+		);
+		expect(imJahr).toContain('079 111 22 33');
+		const danach = JSON.stringify(
+			await ladeDoppel(db, t.doppel, new Date(`${t.jahr}-12-31T23:00:00Z`))
+		);
+		expect(danach).not.toContain('079');
+		expect(danach).not.toContain('@example.org');
+		expect(danach).toContain('Aebi');
 
-		expect(await ladeDoppel(db, t.einzel[0])).toBeNull();
-		expect(await ladeDoppel(db, -1)).toBeNull();
+		expect(await ladeDoppel(db, t.einzel[0], t.jetzt)).toBeNull();
+		expect(await ladeDoppel(db, -1, t.jetzt)).toBeNull();
 	});
 
 	test('A-ANMELDUNG-06: ladeDoppel: Summe null ohne Klassierung, ausgetretener Spieler mit Status, Anfragen älteste zuerst', async () => {
 		const t = await turnier();
 		const anna = await spieler('Anna', 'Graf', { geschlecht: 'w', klassierung: null });
-		const beat = await spieler('Beat', 'Huber');
+		const beat = await spieler('Beat', 'Huber', { telefon: '079 123 45 67' });
 		const cla = await spieler('Claudio', 'Iten');
 		const dora = await spieler('Dora', 'Jost', { geschlecht: 'w' });
 		await anmeldungMit(t.doppel, [anna, beat], t.jetzt);
@@ -349,13 +364,15 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 		const spaeter = await anfrageMit(t.doppel, dora, cla, new Date(t.jetzt.getTime() + 60_000));
 		const frueher = await anfrageMit(t.doppel, cla, dora, t.jetzt);
 
-		const liste = (await ladeDoppel(db, t.doppel))!;
+		const liste = (await ladeDoppel(db, t.doppel, t.jetzt))!;
 		expect(liste.paare).toHaveLength(1);
 		expect(liste.paare[0].summe).toBeNull();
 		expect(liste.paare[0].spieler.map((s) => [s.mitgliedId, s.mitgliedStatus])).toEqual([
 			[anna, 'aktiv'],
 			[beat, 'ausgetreten']
 		]);
+		// K-42: Der CM-Admin erreicht auch Ausgetretene bis zur Löschung.
+		expect(liste.paare[0].spieler[1].telefon).toBe('079 123 45 67');
 		expect(liste.anfragen.map((a) => a.anfrageId)).toEqual([frueher, spaeter]);
 	});
 
