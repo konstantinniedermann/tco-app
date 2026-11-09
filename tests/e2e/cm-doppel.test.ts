@@ -23,18 +23,6 @@ test.afterAll(async () => {
 	await schliesseLoginHilfen();
 });
 
-// Pro Jahr gibt es ein Turnier; jedes Projekt und jeder Test hat sein festes Jahr, getrennt von
-// den übrigen E2E-Tests (2081–2099). `legeOffenesTurnierAn` löscht das Turnier des Jahres vorher.
-const JAHR_ANFRAGE: Record<string, number> = { iphone: 2080, android: 2079 };
-const JAHR_ALLEIN: Record<string, number> = { iphone: 2078, android: 2077 };
-const JAHR_ABLEHNEN: Record<string, number> = { iphone: 2076, android: 2075 };
-
-function testjahr(jahre: Record<string, number>, info: TestInfo): number {
-	const jahr = jahre[info.project.name];
-	if (!jahr) throw new Error(`Kein Testjahr für das Projekt ${info.project.name}`);
-	return jahr;
-}
-
 const MIXED: KategorieWerte = {
 	name: 'Mixed Doppel',
 	geschlecht: 'mixed',
@@ -129,11 +117,11 @@ test('A-ANMELDUNG-04, FR-48, FR-19: Lea fragt Marco an, Marco nimmt an, beide se
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder melden sich am Handy an; die Verwaltung am Computer prüft turnier.test.ts
 	test.setTimeout(120_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_ANFRAGE, info);
 	const {
+		jahr,
 		turnierId,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, [MIXED]);
+	} = await legeOffenesTurnierAn([MIXED]);
 	const { lea, marco } = await legeLeaUndMarcoAn();
 	const leaName = `Lea ${lea.nachname}`;
 	const marcoName = `Marco ${marco.nachname}`;
@@ -243,11 +231,11 @@ test('FR-49, FR-10: allein mit Kommentar, Kommentar sichtbar, Abmelden zieht Paa
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder melden sich am Handy an; die Verwaltung am Computer prüft turnier.test.ts
 	test.setTimeout(150_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_ALLEIN, info);
 	const {
+		jahr,
 		turnierId,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, [MIXED]);
+	} = await legeOffenesTurnierAn([MIXED]);
 	const { lea, marco } = await legeLeaUndMarcoAn();
 	const leaName = `Lea ${lea.nachname}`;
 	const marcoName = `Marco ${marco.nachname}`;
@@ -370,11 +358,11 @@ test('FR-48: Ablehnen', async ({ page }, info) => {
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder melden sich am Handy an; die Verwaltung am Computer prüft turnier.test.ts
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_ABLEHNEN, info);
 	const {
+		jahr,
 		turnierId,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, [MIXED]);
+	} = await legeOffenesTurnierAn([MIXED]);
 	const { lea, marco } = await legeLeaUndMarcoAn();
 	const leaName = `Lea ${lea.nachname}`;
 	const marcoName = `Marco ${marco.nachname}`;

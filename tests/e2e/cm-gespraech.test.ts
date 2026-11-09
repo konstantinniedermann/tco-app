@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
@@ -28,19 +28,6 @@ import {
 test.afterAll(async () => {
 	await schliesseLoginHilfen();
 });
-
-// Pro Jahr gibt es ein Turnier; jeder Test und jedes Projekt hat sein festes Jahr (2039–2046,
-// getrennt von den anderen E2E-Dateien). Die E2E-Datenbank überdauert die Läufe.
-const JAHR_SCHREIBEN: Record<string, number> = { iphone: 2046, android: 2045 };
-const JAHR_OHNE: Record<string, number> = { iphone: 2044, android: 2043 };
-const JAHR_NUR_LESEN: Record<string, number> = { iphone: 2042, android: 2041 };
-const JAHR_ANTWORT: Record<string, number> = { iphone: 2040, android: 2039 };
-
-function testjahr(jahre: Record<string, number>, info: TestInfo): number {
-	const jahr = jahre[info.project.name];
-	if (!jahr) throw new Error(`Kein Testjahr für das Projekt ${info.project.name}`);
-	return jahr;
-}
 
 const OFFEN: KategorieWerte = {
 	name: 'Offen R1–R9',
@@ -79,8 +66,7 @@ test('A-TURNIER-04, FR-50: Mitglied schreibt der Turnierleitung und sieht die ei
 }, info) => {
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder schreiben am Handy; die Verwaltung am PC prüfen die Tests unten
 	const konsole = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_SCHREIBEN, info);
-	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
+	const { turnierId, jahr } = await legeOffenesTurnierAn([OFFEN]);
 	const leitung = `Leitung${info.project.name}`;
 	const cmAdmin = await legeRollenkontoMitBriefCodeAn('Leonie', ['cm'], leitung);
 	await setzeKontaktperson(turnierId, cmAdmin.mitgliedId);
@@ -133,8 +119,7 @@ test('A-TURNIER-04, FR-51: ohne Kontaktperson keine Karte, die Kontaktperson sel
 	page
 }, info) => {
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder schreiben am Handy; die Verwaltung am PC prüfen die Tests unten
-	const jahr = testjahr(JAHR_OHNE, info);
-	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
+	const { turnierId, jahr } = await legeOffenesTurnierAn([OFFEN]);
 	const konto = await mitglied();
 	await startetVomSymbol(page);
 	await meldeAn(page, konto);
@@ -164,8 +149,7 @@ test('A-TURNIER-04, FR-51: nur lesend, wenn die Kontaktperson fehlt, ohne Feld',
 	page
 }, info) => {
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder schreiben am Handy; die Verwaltung am PC prüfen die Tests unten
-	const jahr = testjahr(JAHR_NUR_LESEN, info);
-	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
+	const { turnierId, jahr } = await legeOffenesTurnierAn([OFFEN]);
 	const cmAdmin = await legeRollenkontoMitBriefCodeAn(
 		'Leonie',
 		['cm'],
@@ -195,8 +179,7 @@ test('A-TURNIER-04, FR-52: neue Antwort zeigt Plakette und Kachel, nach dem Öff
 	page
 }, info) => {
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder schreiben am Handy; die Verwaltung am PC prüfen die Tests unten
-	const jahr = testjahr(JAHR_ANTWORT, info);
-	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
+	const { turnierId, jahr } = await legeOffenesTurnierAn([OFFEN]);
 	const cmAdmin = await legeRollenkontoMitBriefCodeAn(
 		'Leonie',
 		['cm'],
@@ -239,11 +222,6 @@ test('A-TURNIER-04, FR-52: neue Antwort zeigt Plakette und Kachel, nach dem Öff
 });
 
 // Verwaltung: Posteingang und Gespräch der Turnierleitung (A-TURNIER-04, FR-50 bis FR-54).
-// Jedes Projekt hat sein festes Jahr (2030–2038 und 2051–2053).
-const JAHR_FLUSS: Record<string, number> = { iphone: 2038, android: 2037, desktop: 2036 };
-const JAHR_ANSEHEN: Record<string, number> = { iphone: 2035, android: 2034, desktop: 2033 };
-const JAHR_FREMD: Record<string, number> = { iphone: 2051, android: 2052, desktop: 2053 };
-const JAHR_LISTE: Record<string, number> = { iphone: 2032, android: 2031, desktop: 2030 };
 
 /** Von der Startseite über die Verwaltung (Code aus der Mail, SI-08) bis zur ersten Seite. */
 async function oeffneVerwaltung(page: Page, konto: Konto, titel: string) {
@@ -266,9 +244,8 @@ test('A-TURNIER-04, FR-50, FR-52, FR-53: die Turnierleitung beantwortet, erledig
 }, info) => {
 	test.setTimeout(150_000);
 	const konsole = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_FLUSS, info);
+	const { turnierId, jahr } = await legeOffenesTurnierAn([OFFEN]);
 	const turnierName = `Clubmeisterschaft ${jahr}`;
-	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
 	const hanna = await legeRollenkontoMitBriefCodeAn('Hanna', ['cm'], `Muster${info.project.name}`);
 	const leonie = await legeRollenkontoMitBriefCodeAn(
 		'Leonie',
@@ -395,9 +372,8 @@ test('A-TURNIER-04, FR-51: MyTCO-Admin sieht Posteingang und Gespräch nur zum A
 }, info) => {
 	test.setTimeout(120_000);
 	const konsole = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_ANSEHEN, info);
-	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
-	const fremd = await legeOffenesTurnierAn(testjahr(JAHR_FREMD, info), [OFFEN]);
+	const { turnierId } = await legeOffenesTurnierAn([OFFEN]);
+	const fremd = await legeOffenesTurnierAn([OFFEN]);
 	const leitung = await legeRollenkontoMitBriefCodeAn(
 		'Leonie',
 		['cm'],
@@ -444,8 +420,7 @@ test('A-TURNIER-04, FR-51: MyTCO-Admin sieht Posteingang und Gespräch nur zum A
 
 test('A-TURNIER-04: die Turnierliste zeigt die offenen Nachrichten', async ({ page }, info) => {
 	test.setTimeout(120_000);
-	const jahr = testjahr(JAHR_LISTE, info);
-	const { turnierId } = await legeOffenesTurnierAn(jahr, [OFFEN]);
+	const { turnierId, jahr } = await legeOffenesTurnierAn([OFFEN]);
 	const leitung = await legeRollenkontoMitBriefCodeAn(
 		'Leonie',
 		['cm'],

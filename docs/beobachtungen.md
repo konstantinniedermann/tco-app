@@ -130,22 +130,6 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Verifiziert:** 09.11.2026 gegen `dev` e947d25 — belegt (`verwaltung-doppel.ts` → `loescheDoppel` ruft `anfragenVerfallen` nicht auf; `doppel.ts` → `nimmAnfrageAn` ohne Prüfung der Anmeldung des Anfragenden). Offen ist nur die Umsetzung.
 
-### 2026-11-09 — E2E: kein freies Turnierjahr mehr
-
-**Thema:** Tests
-
-**Fundort:** `tests/e2e/*.test.ts` (Jahres-Konstanten), `tests/e2e/hilfen/login.ts` (`legeTurnierAn` löscht das Turnier desselben Jahres)
-
-**Beobachtung:** Jedes E2E-Turnier braucht ein eigenes Jahr, sonst löscht eine Datei der anderen das Turnier, wenn beide parallel laufen. Nach dem Umzug von `navigation.test.ts` auf 2028, 2029, 2047 und 2054 ist zwischen 2026 und 2099 kein Jahr mehr frei. Die nächste Testdatei mit Turnier kollidiert, und das fällt nur als zufällig roter Test auf.
-
-**Ursprung:** Beobachtungs-Auswertung 09.11.2026 (Nebenbefund zur Kollision von `navigation.test.ts` und `cm-doppel-verwaltung.test.ts`, behoben in 0f9af9f)
-
-**Einschätzung:** Mittel für die Verlässlichkeit der Tests. Möglich: eine Prüfung unter `scripts/pruefungen/`, die doppelte Jahre zwischen Dateien abweist, oder Jahre ab 2100 (vorher prüfen, ob die Turnier-Angaben das zulassen), oder Jahre pro Datei aus einem Helfer vergeben.
-
-**Verifiziert:** 09.11.2026 gegen `dev` 52cc2d2 — belegt (Kommando: alle Jahreszahlen in `tests/e2e` gesammelt, frei zwischen 2026 und 2099: keine). Offen ist die Entscheidung, welcher Weg.
-
-**Nachtrag 09.11.2026 (Session K-42):** `JAHR_MAX = 2100` in `src/lib/server/turnier/angaben.ts` prüft nur die Eingabe im Turnierformular. Die DB-Tests legen Turniere direkt mit Jahren 3000–9000 an (`zufallsJahr` in `src/lib/server/cm/*.db.test.ts`); der E2E-Helfer `legeTurnierAn` (`tests/e2e/hilfen/login.ts`) ruft ebenfalls die DB-Funktion direkt auf. Jahre über 2100 gingen also für alle E2E-Tests, die das Turnier nicht über das Formular speichern. `testjahr()` ist in mehreren Testdateien kopiert statt geteilt.
-
 ### 2026-11-09 — E2E: zwei iPhone-Tests der Mitgliederverwaltung nur im Gesamtlauf rot
 
 **Thema:** Tests
@@ -169,3 +153,27 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Session K-42, beim Eingrenzen der Kontaktdaten aufgefallen
 
 **Einschätzung:** Niedrig; vermutlich nur Wortlaut («der Spieler und der Treffer der Suche beim Anmelden von Hand»). Beide Wege offen: Zusage präzisieren oder Treffer ohne Jahrgang/Geschlecht.
+
+### 2026-11-09 — E2E-Hilfen nehmen noch ein festes Turnierjahr an
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/hilfen/login.ts` → `legeTurnierAn(festesJahr)`, `legeOffenesTurnierAn(festesJahr, kategorien)`
+
+**Beobachtung:** Seit die Hilfen freie Jahre selbst vergeben, braucht kein Test auf `dev` mehr ein festes Jahr. Der Weg mit festem Jahr (vorher löschen, dann anlegen) bleibt nur, damit Tests aus Branches, die vor der Umstellung entstanden sind, nach dem Merge weiterlaufen. Ohne ihn ist eine Kollision wie früher wieder möglich, sobald zwei Dateien dasselbe feste Jahr wählen.
+
+**Ursprung:** Review (`cas-reviewer`) des Branches `test/e2e-turnierjahre`
+
+**Einschätzung:** Niedrig. Entfernen, sobald die damals offenen Branches gemergt sind; vorher mit `grep -rn "legeTurnierAn(\|legeOffenesTurnierAn(" tests/e2e` prüfen, dass niemand mehr ein Jahr übergibt.
+
+### 2026-11-09 — E2E: FR-41 Benachrichtigungen auf dem iPhone im Gesamtlauf einmal rot
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/benachrichtigungen.test.ts` — «FR-41: Themen im Profil ab- und wieder einschalten bleibt nach Neuladen», Projekt iphone
+
+**Beobachtung:** Im `make check` scheiterte der Test an `expect(fehler).toEqual([])` mit dem WebKit-Fehler «…/api/benachrichtigungen due to access control checks.» Vermutlich bricht `page.reload()` nach `schalte(…)` eine noch laufende Anfrage an `/api/benachrichtigungen` ab (`schalte` wartet nur auf das POST). Einzeln 16 von 16 grün (`--repeat-each 8`), der Gesamtlauf davor und danach grün.
+
+**Ursprung:** Branch `test/e2e-turnierjahre`, zweiter `make check` (die Datei nutzt die geänderten Hilfen nicht)
+
+**Einschätzung:** Niedrig bis mittel, wie die zwei iPhone-Tests der Mitgliederverwaltung: beim nächsten Auftreten Trace mit Netzwerk ansehen, welche Anfrage abbricht, und vor dem Neuladen auf sie warten.
