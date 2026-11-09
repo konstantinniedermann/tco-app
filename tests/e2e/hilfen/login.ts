@@ -113,15 +113,24 @@ async function legeTurnierImJahrAn(jahr: number) {
  * zurück; der Name ist «Clubmeisterschaft <Jahr>».
  *
  * Ein festes Jahr nur für Tests aus Branches, die vor dieser Umstellung entstanden sind: Dann wird
- * ein altes Turnier desselben Jahres vorher gelöscht. Neue Tests geben kein Jahr an.
+ * ein altes Turnier desselben Jahres vorher gelöscht, und wie früher kommt nur die Nummer zurück.
+ * Neue Tests geben kein Jahr an.
  */
-export async function legeTurnierAn(jahr?: number): Promise<TestTurnier> {
-	if (jahr !== undefined) {
-		await loescheTurnier(jahr);
-		const r = await legeTurnierImJahrAn(jahr);
-		if (r.ergebnis !== 'ok') throw new Error(`Turnier ${jahr} liess sich nicht anlegen`);
-		return { turnierId: r.id, jahr };
-	}
+export async function legeTurnierAn(): Promise<TestTurnier>;
+export async function legeTurnierAn(festesJahr: number): Promise<number>;
+export async function legeTurnierAn(festesJahr?: number): Promise<TestTurnier | number> {
+	if (festesJahr !== undefined) return (await legeTurnierMitFestemJahrAn(festesJahr)).turnierId;
+	return legeTurnierInFreiemJahrAn();
+}
+
+async function legeTurnierMitFestemJahrAn(jahr: number): Promise<TestTurnier> {
+	await loescheTurnier(jahr);
+	const r = await legeTurnierImJahrAn(jahr);
+	if (r.ergebnis !== 'ok') throw new Error(`Turnier ${jahr} liess sich nicht anlegen`);
+	return { turnierId: r.id, jahr };
+}
+
+async function legeTurnierInFreiemJahrAn(): Promise<TestTurnier> {
 	for (let versuch = 0; versuch < 20; versuch++) {
 		const frei =
 			FREIE_JAHRE.von + Math.floor(Math.random() * (FREIE_JAHRE.bis - FREIE_JAHRE.von + 1));
@@ -161,7 +170,10 @@ export async function legeOffenesTurnierAn(
 	zweites?: KategorieWerte[]
 ): Promise<TestTurnier & { kategorieIds: number[] }> {
 	const kategorien = typeof erstes === 'number' ? (zweites ?? []) : erstes;
-	const { turnierId, jahr } = await legeTurnierAn(typeof erstes === 'number' ? erstes : undefined);
+	const { turnierId, jahr } =
+		typeof erstes === 'number'
+			? await legeTurnierMitFestemJahrAn(erstes)
+			: await legeTurnierInFreiemJahrAn();
 	const kategorieIds: number[] = [];
 	for (const werte of kategorien) {
 		const r = await legeKategorieAn(hole().db, turnierId, werte);

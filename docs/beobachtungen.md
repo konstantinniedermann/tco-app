@@ -153,3 +153,15 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Session K-42, beim Eingrenzen der Kontaktdaten aufgefallen
 
 **Einschätzung:** Niedrig; vermutlich nur Wortlaut («der Spieler und der Treffer der Suche beim Anmelden von Hand»). Beide Wege offen: Zusage präzisieren oder Treffer ohne Jahrgang/Geschlecht.
+
+### 2026-11-09 — E2E-Hilfen nehmen noch ein festes Turnierjahr an
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/hilfen/login.ts` → `legeTurnierAn(festesJahr)`, `legeOffenesTurnierAn(festesJahr, kategorien)`
+
+**Beobachtung:** Seit die Hilfen freie Jahre selbst vergeben, braucht kein Test auf `dev` mehr ein festes Jahr. Der Weg mit festem Jahr (vorher löschen, dann anlegen) bleibt nur, damit Tests aus Branches, die vor der Umstellung entstanden sind, nach dem Merge weiterlaufen. Ohne ihn ist eine Kollision wie früher wieder möglich, sobald zwei Dateien dasselbe feste Jahr wählen.
+
+**Ursprung:** Review (`cas-reviewer`) des Branches `test/e2e-turnierjahre`
+
+**Einschätzung:** Niedrig. Entfernen, sobald die damals offenen Branches gemergt sind; vorher mit `grep -rn "legeTurnierAn(\|legeOffenesTurnierAn(" tests/e2e` prüfen, dass niemand mehr ein Jahr übergibt.
