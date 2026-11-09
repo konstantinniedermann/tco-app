@@ -257,3 +257,15 @@ Einzel-Liste.
 **Ursprung:** Doku-Abgleich vor Release 0.17.0
 
 **Einschätzung:** Niedrig. Mit dem Stand von #43 abgleichen und den Punkt abhaken oder belassen.
+
+### 2026-11-09 — A-LOGIN-09 auf iPhone einmal rot mit «Importing a module script failed»
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/login.test.ts:66` (A-LOGIN-09, Projekt `iphone`).
+
+**Beobachtung:** Im vollen `make check` scheiterte der Test einmal: WebKit meldete nach dem Neuladen «TypeError: Importing a module script failed». Der Einzellauf danach (`--repeat-each 3`) war dreimal grün. Der Branch hatte nur das Seed geändert, das E2E nicht benutzt.
+
+**Ursprung:** Session Seed-Fix (Beispielspieler mit Login), `make check`
+
+**Einschätzung:** Niedrig, vermutlich ein Wackler unter Last (Modul nach dem Neuladen noch nicht ausgeliefert). Wiederholt er sich, Trace holen.

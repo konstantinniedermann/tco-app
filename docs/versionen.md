@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.17.2 — Testdaten: Suchende im Doppel anfragbar
+
+- Testdaten (`make seed`): Die Beispielspieler der Clubmeisterschaft haben ein Konto mit Login.
+  Wer im Doppel allein sucht, lässt sich jetzt finden und anfragen; die Beispiel-Anfrage im
+  Herren Doppel wird angezeigt.
+
 ## 0.17.1 — Abhängigkeiten aktualisiert
 
 - Abhängigkeiten aktualisiert (Dependabot #68, nur Entwicklungswerkzeuge): vitest und

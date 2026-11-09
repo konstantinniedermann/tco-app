@@ -12,6 +12,7 @@ import {
 	anmeldung,
 	anmeldungSpieler,
 	kategorie,
+	konto,
 	mitglied,
 	partnerAnfrage,
 	turnier
@@ -78,7 +79,9 @@ const KATEGORIEN: KategorieWerte[] = [
 // Erfundene Spielerinnen und Spieler (DS-08); je Kategorie 1–2 Anmeldungen. Max hat den Rufnamen
 // «Maxi», Lena «lena» (gleich dem Vornamen in anderer Schreibweise: wird angezeigt wie ohne
 // Rufname); die anderen haben keinen. Nico hat keine Klassierung: In der Partnersuche trägt er
-// den Vermerk *Klassierung fehlt*, anmelden kann er sich nicht (FR-37).
+// den Vermerk *Klassierung fehlt*, anmelden kann er sich nicht (FR-37). Alle haben ein Konto mit
+// Login: Nur solche Mitglieder findet die Partnersuche (FR-48), sonst liesse sich keiner der
+// Suchenden anfragen.
 const SPIELER = [
 	{
 		vorname: 'Max',
@@ -114,8 +117,7 @@ const ANTRAG = {
 };
 
 // A-ANMELDUNG-04, FR-48, FR-49: im Doppel ein Paar, zwei suchen allein (eine mit Kommentar), und
-// eine offene Anfrage. Die Anfrage steht direkt in der Datenbank: Paul hat kein Login, über die
-// Fachlogik liesse er sich nicht anfragen.
+// eine offene Anfrage. Die Anfrage steht direkt in der Datenbank, ohne Mitteilung an Paul.
 const PAAR = { kategorie: 'Mixed Doppel', vornamen: ['Max', 'Lena'] } as const;
 const ALLEIN: [string, string, string | null][] = [
 	['Damen Doppel', 'Sara', 'Suche jemanden auf R5–R7-Niveau, eher abends.'],
@@ -209,6 +211,11 @@ async function legeBeispielAnmeldungenAn(db: Db, turnierId: number, jetzt: Date)
 			.select({ id: mitglied.id })
 			.from(mitglied)
 			.where(eq(mitglied.email, mailVon(s)));
+		// Login wie nach eingelöstem Brief-Code; ein vorhandenes Konto bleibt, wie es ist.
+		await db
+			.insert(konto)
+			.values({ mitgliedId: m.id, briefCodeBenutztAm: jetzt })
+			.onConflictDoNothing({ target: konto.mitgliedId });
 		ids.set(s.vorname, m.id);
 	}
 	for (const [name, vornamen] of ANMELDUNGEN) {
