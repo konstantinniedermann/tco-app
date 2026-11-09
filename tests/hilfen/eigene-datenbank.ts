@@ -9,6 +9,12 @@ import { erstelleDb, type Db } from '../../src/lib/server/db/index.ts';
 
 export type EigeneDatenbank = { db: Db; abbauen: () => Promise<void> };
 
+/**
+ * Zeitgrenze für einen Test, der seine eigene Datenbank im Testrumpf anlegt: Anlegen und alle
+ * Migrationen dauern länger als die Vorgabe von Vitest (5 s). In `beforeAll` gelten 10 s.
+ */
+export const ZEIT_EIGENE_DB = { timeout: 30_000 };
+
 async function mitAdminVerbindung(fn: (c: pg.Client) => Promise<unknown>): Promise<void> {
 	const admin = new pg.Client({ connectionString: process.env.DATABASE_URL! });
 	await admin.connect();
