@@ -1783,6 +1783,15 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	}
 }
 
+/* Ein Fokussprung landet nicht unter dem klebenden Seitenkopf der Verwaltung am PC (WCAG 2.4.11):
+   Abstand oben, Pfad, Titel (eine Zeile) und Abstand unten; ein umbrechender Titel ist die
+   Ausnahme. Das <html> liegt ausserhalb des Containers, darum @media statt @container. */
+@media (width >= 60rem) {
+	html:has(.seitenkopf) {
+		scroll-padding-top: calc(var(--abstand-6) + 8rem);
+	}
+}
+
 @keyframes seitenkopf-linie {
 	to {
 		border-bottom-color: var(--farbe-linie);
@@ -1804,8 +1813,8 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	}
 
 	/* Seitenkopf (nur Verwaltung): klebt oben am Inhalt. Der negative Rand gleicht den Abstand
-	   oben von .inhalt aus; im Ruhezustand sieht alles aus wie vorher, beim Kleben bleibt er als
-	   Luft über dem Titel. Die Linie unten ist ohne Scroll-Zeitleiste immer da, sonst wächst sie
+	   oben von .inhalt aus, die Kopfzeile bleibt also an ihrer Stelle; der Abstand zum Inhalt
+	   darunter ist knapper als zuvor. Beim Kleben bleibt der Abstand als Luft über dem Titel. Die Linie unten ist ohne Scroll-Zeitleiste immer da, sonst wächst sie
 	   in den ersten 2rem Scrollen herein (kein JS). */
 	.seitenkopf {
 		position: sticky;

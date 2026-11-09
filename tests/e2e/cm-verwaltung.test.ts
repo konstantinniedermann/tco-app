@@ -344,3 +344,34 @@ test('PC: Pfad und Titel der Kategorie bleiben beim Scrollen sichtbar', async ({
 	await expect(page.getByRole('heading', { level: 1 })).toBeInViewport();
 	await expect(page.getByRole('navigation', { name: 'Pfad' })).toBeInViewport();
 });
+
+test('PC: Ein Fokussprung landet nicht unter dem klebenden Seitenkopf', async ({ page }, info) => {
+	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: am Handy klebt nur die Kopfleiste
+	test.setTimeout(120_000);
+	const jahr = testjahr(JAHR_KLEBEN, info);
+	const turnier = `Clubmeisterschaft ${jahr}`;
+	await legeOffenesTurnierAn(jahr, KATEGORIEN);
+	const cm = await legeCmMitBriefCodeAn('Cyrill');
+	await page.setViewportSize({ width: 1280, height: 260 });
+	await oeffneKategorieAlsCm(page, cm, turnier, 'Herren R1–R6');
+	await page.getByRole('navigation', { name: 'Pfad' }).getByRole('link', { name: turnier }).click();
+	await page.getByRole('link', { name: 'Neue Kategorie' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Neue Kategorie' })).toBeVisible();
+
+	await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+	// Mit Shift+Tab von unten zurück zum Namen: der Browser scrollt nur so weit wie nötig
+	const erstes = page.getByLabel('Name', { exact: true });
+	await page
+		.getByRole('button', { name: /speichern|anlegen|erstellen/i })
+		.last()
+		.focus();
+	for (let i = 0; i < 40 && !(await erstes.evaluate((e) => e === document.activeElement)); i++) {
+		await page.keyboard.press('Shift+Tab');
+	}
+	await expect(erstes).toBeFocused();
+	const kopfUnten = await page
+		.locator('.seitenkopf')
+		.evaluate((e) => e.getBoundingClientRect().bottom);
+	const feldOben = await erstes.evaluate((e) => e.getBoundingClientRect().top);
+	expect(feldOben).toBeGreaterThanOrEqual(kopfUnten);
+});
