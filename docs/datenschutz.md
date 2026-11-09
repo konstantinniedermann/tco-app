@@ -133,8 +133,9 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
   oder mit dem Entzug der Rolle MyTCO-Admin.
 - ***Erstellt von* am Anlass:** mit dem Anlass; wird der Mitglieder-Admin als Mitglied gelöscht, bleibt der
   Anlass ohne diese Angabe.
-- ***Kontaktperson* am Turnier:** mit dem Turnier; wird sie als Mitglied gelöscht, bleibt das Turnier ohne
-  Kontaktperson.
+- ***Kontaktperson* am Turnier:** bleibt beim Turnier wie die CM-Anmeldungen, auch wenn die Person die Rolle
+  CM-Admin verliert (Mitglieder sehen sie dann nicht mehr); wird sie als Mitglied gelöscht, bleibt das Turnier
+  ohne Kontaktperson.
 - **E-Mail-Adresse im Gerätespeicher** während einer Code-Anfrage: nach dem Login, sonst beim
   nächsten Start der App, sobald die Anfrage älter als 15 Minuten ist.
 - **Laufender E-Mail-Wechsel** (neue Adresse, Code-Hashes): nur im Arbeitsspeicher; weg bei

@@ -393,7 +393,8 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   [ADR-007](adr/adr-007-version-pro-merge.md)). Der Pre-Push-Hook weist einen Push auf `dev` ab, in dem ein
   Merge mit Code die Version nicht um genau einen Schritt erhöht, sein Abschnitt nicht zuoberst
   steht oder reine Doku die Version erhöht (`version-merge.ts`); was schon auf `main` liegt, prüft er nicht.
-  Direkte Commits und Fast-Forward-Merges auf `dev` prüft er nicht; darum mergt der Skill immer mit `--no-ff`. Weil der Hook nur lokal
+  Er prüft jeden Commit der Hauptlinie von `dev` einzeln: Ein direkter Commit oder ein Fast-Forward-Merge
+  mit Code scheitert, sofern nicht jeder Commit die Version erhöht; darum mergt der Skill immer mit `--no-ff`. Weil der Hook nur lokal
   läuft, werden auch die PRs von Dependabot im Hauptordner gemergt, nicht auf GitHub.
 - **Korrektur** (`x.y.Z`) ist der Normalfall bei jedem Merge mit Code. **Nebenversion**
   (`0.X.0`, Korrektur zurück auf 0) setzt Claude, wenn etwas Grösseres dazukommt: eine neue
