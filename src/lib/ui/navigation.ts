@@ -18,6 +18,7 @@ const BEREICH: Record<string, Bereich> = {
 	'/clubmeisterschaft': '/clubmeisterschaft',
 	'/clubmeisterschaft/[id]': '/clubmeisterschaft',
 	'/clubmeisterschaft/[id]/doppel/[kid]': '/clubmeisterschaft',
+	'/clubmeisterschaft/[id]/kategorie/[kid]': '/clubmeisterschaft',
 	'/profil': '/profil',
 	'/profil/email': '/profil'
 };
@@ -39,7 +40,8 @@ const EBENE: Record<string, number> = {
 	'/anlass/[id]': 1,
 	'/clubmeisterschaft': 0,
 	'/clubmeisterschaft/[id]': 1,
-	'/clubmeisterschaft/[id]/doppel/[kid]': 2
+	'/clubmeisterschaft/[id]/doppel/[kid]': 2,
+	'/clubmeisterschaft/[id]/kategorie/[kid]': 2
 };
 
 const FUSSZEILE = new Set(['/', '/login', '/login/mail', '/willkommen']);
@@ -82,6 +84,7 @@ export function elternVon(
 		case '/clubmeisterschaft/[id]':
 			return k.bereichsWurzel ? null : { route: '/clubmeisterschaft', text: 'Clubmeisterschaft' };
 		case '/clubmeisterschaft/[id]/doppel/[kid]':
+		case '/clubmeisterschaft/[id]/kategorie/[kid]':
 			return { route: '/clubmeisterschaft/[id]', text: null };
 		default:
 			return null;

@@ -19,7 +19,7 @@ import {
 	meldeBeispielAntworten
 } from './beispiel-anlass.ts';
 import { legeBeispielMitgliederAn } from './beispiel-mitglieder.ts';
-import { legeBeispielTurnierAn } from './beispiel-turnier.ts';
+import { legeBeispielTurnierAn, setzeBeispielKontakt } from './beispiel-turnier.ts';
 import { ERFUNDENE_MITGLIEDER, legeErfundeneMitgliederAn } from './erfundene-mitglieder.ts';
 
 // Nur lokal, nicht auf Test (testdaten.ts legt nur ERFUNDENE_MITGLIEDER an).
@@ -74,6 +74,12 @@ async function seed(): Promise<void> {
 		for (const [index, rolle] of einzelrollen) {
 			await db.insert(kontoRolle).values({ kontoId: kontoIds[index], rolle }).onConflictDoNothing();
 		}
+		// Hanna (CM-Admin) ist Kontaktperson der Beispiel-Clubmeisterschaft.
+		const [hanna] = await db
+			.select({ id: konto.mitgliedId })
+			.from(konto)
+			.where(eq(konto.id, kontoIds[2]));
+		await setzeBeispielKontakt(db, hanna.id);
 		const dienst = erstelleLoginDienst({
 			db,
 			schluessel: einstellungen.codeSchluessel,

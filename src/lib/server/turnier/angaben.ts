@@ -2,13 +2,15 @@
 import { istStufe, staerker, type Stufe } from '../../turnier/klassierung.ts';
 import type { Art, Geschlecht } from '../db/schema.ts';
 
-export type TurnierFeld = 'jahr' | 'name' | 'anmeldeschluss' | 'nummern';
+export type TurnierFeld = 'jahr' | 'name' | 'anmeldeschluss' | 'nummern' | 'kontakt';
 
 export type TurnierWerte = {
 	jahr: number;
 	name: string;
 	anmeldeschluss: string;
 	nummern: { bezeichnung: string; nummer: string }[];
+	/** Mitglied-ID der Kontaktperson; `null` = keine, fehlt = unverändert lassen. */
+	kontakt?: number | null;
 };
 
 export type KategorieFeld =
@@ -42,6 +44,7 @@ export const JAHRGANG_MIN = 1900;
 export const SUMME_MAX = 20;
 
 const MELDUNG = {
+	kontakt: 'Bitte eine Person aus der Liste wählen.',
 	name: 'Bitte einen Namen angeben.',
 	turniername: `Höchstens ${MAX_TURNIERNAME} Zeichen.`,
 	kategoriename: `Höchstens ${MAX_KATEGORIENAME} Zeichen.`,
@@ -101,6 +104,17 @@ function pruefeNummern(
 	return { ok: true, liste };
 }
 
+/** Kontaktperson: Schlüssel fehlt, `null` oder eine positive ganze Zahl (auch als Text). */
+function pruefeKontakt(roh: Record<string, unknown>): number | null | 'fehlt' | 'falsch' {
+	if (!('kontakt' in roh) || roh.kontakt === undefined) return 'fehlt';
+	if (roh.kontakt === null) return null;
+	const n =
+		typeof roh.kontakt === 'string' && /^\d+$/.test(roh.kontakt)
+			? Number(roh.kontakt)
+			: roh.kontakt;
+	return typeof n === 'number' && Number.isSafeInteger(n) && n > 0 ? n : 'falsch';
+}
+
 export function pruefeTurnier(
 	roh: Record<string, unknown>
 ): { ok: true; werte: TurnierWerte } | { ok: false; felder: Partial<Record<TurnierFeld, string>> } {
@@ -118,9 +132,14 @@ export function pruefeTurnier(
 	else if (jahr !== null && Number(anmeldeschluss.slice(0, 4)) !== jahr)
 		felder.anmeldeschluss = MELDUNG.schluss;
 	if (!nummern.ok) felder.nummern = nummern.meldung;
+	const kontakt = pruefeKontakt(roh);
+	if (kontakt === 'falsch') felder.kontakt = MELDUNG.kontakt;
 
-	if (Object.keys(felder).length > 0 || jahr === null || !nummern.ok) return { ok: false, felder };
-	return { ok: true, werte: { jahr, name, anmeldeschluss, nummern: nummern.liste } };
+	if (Object.keys(felder).length > 0 || jahr === null || !nummern.ok || kontakt === 'falsch')
+		return { ok: false, felder };
+	const werte: TurnierWerte = { jahr, name, anmeldeschluss, nummern: nummern.liste };
+	if (kontakt !== 'fehlt') werte.kontakt = kontakt;
+	return { ok: true, werte };
 }
 
 export function pruefeKategorie(

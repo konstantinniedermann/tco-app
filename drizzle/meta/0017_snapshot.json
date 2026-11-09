@@ -1,0 +1,1785 @@
+{
+  "id": "37da7b1b-5a97-4e21-9cef-9ed32de38d01",
+  "prevId": "3f9ce762-54de-46fb-88d3-0ac905fa48f3",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.aenderung": {
+      "name": "aenderung",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "mitglied_id": {
+          "name": "mitglied_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zeitpunkt": {
+          "name": "zeitpunkt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "urheber_art": {
+          "name": "urheber_art",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "urheber_mitglied_id": {
+          "name": "urheber_mitglied_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aktion": {
+          "name": "aktion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "detail": {
+          "name": "detail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "aenderung_mitglied_zeitpunkt_idx": {
+          "name": "aenderung_mitglied_zeitpunkt_idx",
+          "columns": [
+            {
+              "expression": "mitglied_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "zeitpunkt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "aenderung_zeitpunkt_idx": {
+          "name": "aenderung_zeitpunkt_idx",
+          "columns": [
+            {
+              "expression": "zeitpunkt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "aenderung_mitglied_id_mitglied_id_fk": {
+          "name": "aenderung_mitglied_id_mitglied_id_fk",
+          "tableFrom": "aenderung",
+          "tableTo": "mitglied",
+          "columnsFrom": [
+            "mitglied_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "aenderung_urheber_mitglied_id_mitglied_id_fk": {
+          "name": "aenderung_urheber_mitglied_id_mitglied_id_fk",
+          "tableFrom": "aenderung",
+          "tableTo": "mitglied",
+          "columnsFrom": [
+            "urheber_mitglied_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "aenderung_urheber_art_check": {
+          "name": "aenderung_urheber_art_check",
+          "value": "\"aenderung\".\"urheber_art\" in ('admin', 'mitglied', 'automatisch')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.anlass": {
+      "name": "anlass",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "titel": {
+          "name": "titel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "beginn": {
+          "name": "beginn",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ort": {
+          "name": "ort",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einladung": {
+          "name": "einladung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "anmeldeschluss": {
+          "name": "anmeldeschluss",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kalender_kennung": {
+          "name": "kalender_kennung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "termin_geaendert_am": {
+          "name": "termin_geaendert_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "erstellt_von": {
+          "name": "erstellt_von",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "erstellt_am": {
+          "name": "erstellt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "anlass_erstellt_von_mitglied_id_fk": {
+          "name": "anlass_erstellt_von_mitglied_id_fk",
+          "tableFrom": "anlass",
+          "tableTo": "mitglied",
+          "columnsFrom": [
+            "erstellt_von"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "anlass_kalender_kennung_unique": {
+          "name": "anlass_kalender_kennung_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "kalender_kennung"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "anlass_schluss_check": {
+          "name": "anlass_schluss_check",
+          "value": "\"anlass\".\"anmeldeschluss\" <= \"anlass\".\"beginn\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.anlass_anmeldung": {
+      "name": "anlass_anmeldung",
+      "schema": "",
+      "columns": {
+        "anlass_id": {
+          "name": "anlass_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mitglied_id": {
+          "name": "mitglied_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "antwort": {
+          "name": "antwort",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bemerkung": {
+          "name": "bemerkung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geaendert_am": {
+          "name": "geaendert_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "anlass_anmeldung_anlass_id_anlass_id_fk": {
+          "name": "anlass_anmeldung_anlass_id_anlass_id_fk",
+          "tableFrom": "anlass_anmeldung",
+          "tableTo": "anlass",
+          "columnsFrom": [
+            "anlass_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "anlass_anmeldung_mitglied_id_mitglied_id_fk": {
+          "name": "anlass_anmeldung_mitglied_id_mitglied_id_fk",
+          "tableFrom": "anlass_anmeldung",
+          "tableTo": "mitglied",
+          "columnsFrom": [
+            "mitglied_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "anlass_anmeldung_anlass_id_mitglied_id_pk": {
+          "name": "anlass_anmeldung_anlass_id_mitglied_id_pk",
+          "columns": [
+            "anlass_id",
+            "mitglied_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "anlass_anmeldung_antwort_check": {
+          "name": "anlass_anmeldung_antwort_check",
+          "value": "\"anlass_anmeldung\".\"antwort\" in ('kommt', 'kommt-nicht')"
+        },
+        "anlass_anmeldung_bemerkung_check": {
+          "name": "anlass_anmeldung_bemerkung_check",
+          "value": "\"anlass_anmeldung\".\"antwort\" = 'kommt-nicht' or \"anlass_anmeldung\".\"bemerkung\" is null"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.anmeldung": {
+      "name": "anmeldung",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "kategorie_id": {
+          "name": "kategorie_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'bestaetigt'"
+        },
+        "kommentar": {
+          "name": "kommentar",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "suchtext": {
+          "name": "suchtext",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "angemeldet_am": {
+          "name": "angemeldet_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geaendert_am": {
+          "name": "geaendert_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "anmeldung_kategorie_idx": {
+          "name": "anmeldung_kategorie_idx",
+          "columns": [
+            {
+              "expression": "kategorie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "anmeldung_kategorie_id_kategorie_id_fk": {
+          "name": "anmeldung_kategorie_id_kategorie_id_fk",
+          "tableFrom": "anmeldung",
+          "tableTo": "kategorie",
+          "columnsFrom": [
+            "kategorie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "anmeldung_status_check": {
+          "name": "anmeldung_status_check",
+          "value": "\"anmeldung\".\"status\" in ('bestaetigt', 'beantragt', 'abgelehnt', 'zurueckgezogen')"
+        },
+        "anmeldung_suchtext_check": {
+          "name": "anmeldung_suchtext_check",
+          "value": "char_length(\"anmeldung\".\"suchtext\") <= 120"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.anmeldung_spieler": {
+      "name": "anmeldung_spieler",
+      "schema": "",
+      "columns": {
+        "anmeldung_id": {
+          "name": "anmeldung_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mitglied_id": {
+          "name": "mitglied_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "anmeldung_spieler_mitglied_idx": {
+          "name": "anmeldung_spieler_mitglied_idx",
+          "columns": [
+            {
+              "expression": "mitglied_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "anmeldung_spieler_anmeldung_id_anmeldung_id_fk": {
+          "name": "anmeldung_spieler_anmeldung_id_anmeldung_id_fk",
+          "tableFrom": "anmeldung_spieler",
+          "tableTo": "anmeldung",
+          "columnsFrom": [
+            "anmeldung_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "anmeldung_spieler_mitglied_id_mitglied_id_fk": {
+          "name": "anmeldung_spieler_mitglied_id_mitglied_id_fk",
+          "tableFrom": "anmeldung_spieler",
+          "tableTo": "mitglied",
+          "columnsFrom": [
+            "mitglied_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "anmeldung_spieler_anmeldung_id_mitglied_id_pk": {
+          "name": "anmeldung_spieler_anmeldung_id_mitglied_id_pk",
+          "columns": [
+            "anmeldung_id",
+            "mitglied_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kategorie": {
+      "name": "kategorie",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "turnier_id": {
+          "name": "turnier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geschlecht": {
+          "name": "geschlecht",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "art": {
+          "name": "art",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jahrgang_von": {
+          "name": "jahrgang_von",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jahrgang_bis": {
+          "name": "jahrgang_bis",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "klassierung_von": {
+          "name": "klassierung_von",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "klassierung_bis": {
+          "name": "klassierung_bis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mindestsumme": {
+          "name": "mindestsumme",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'aktiv'"
+        }
+      },
+      "indexes": {
+        "kategorie_name_aktiv_unique": {
+          "name": "kategorie_name_aktiv_unique",
+          "columns": [
+            {
+              "expression": "turnier_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "lower(\"name\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"kategorie\".\"status\" = 'aktiv'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "kategorie_turnier_id_turnier_id_fk": {
+          "name": "kategorie_turnier_id_turnier_id_fk",
+          "tableFrom": "kategorie",
+          "tableTo": "turnier",
+          "columnsFrom": [
+            "turnier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "kategorie_geschlecht_check": {
+          "name": "kategorie_geschlecht_check",
+          "value": "\"kategorie\".\"geschlecht\" in ('herren', 'damen', 'mixed', 'offen')"
+        },
+        "kategorie_art_check": {
+          "name": "kategorie_art_check",
+          "value": "(\"kategorie\".\"art\" = 'einzel' and \"kategorie\".\"klassierung_von\" is not null and \"kategorie\".\"klassierung_bis\" is not null and \"kategorie\".\"mindestsumme\" is null and \"kategorie\".\"geschlecht\" <> 'mixed') or (\"kategorie\".\"art\" = 'doppel' and \"kategorie\".\"klassierung_von\" is null and \"kategorie\".\"klassierung_bis\" is null and \"kategorie\".\"mindestsumme\" is not null)"
+        },
+        "kategorie_status_check": {
+          "name": "kategorie_status_check",
+          "value": "\"kategorie\".\"status\" in ('aktiv', 'abgesagt')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.konto": {
+      "name": "konto",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "mitglied_id": {
+          "name": "mitglied_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sitzungsversion": {
+          "name": "sitzungsversion",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "gesperrt": {
+          "name": "gesperrt",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "brief_code_hash": {
+          "name": "brief_code_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "brief_code_ablauf": {
+          "name": "brief_code_ablauf",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "brief_code_benutzt_am": {
+          "name": "brief_code_benutzt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mail_code_hash": {
+          "name": "mail_code_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mail_code_ablauf": {
+          "name": "mail_code_ablauf",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mail_code_fehlversuche": {
+          "name": "mail_code_fehlversuche",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "passkey_kennung": {
+          "name": "passkey_kennung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thema_anlaesse": {
+          "name": "thema_anlaesse",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "thema_cm": {
+          "name": "thema_cm",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "thema_verein": {
+          "name": "thema_verein",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "konto_mitglied_id_mitglied_id_fk": {
+          "name": "konto_mitglied_id_mitglied_id_fk",
+          "tableFrom": "konto",
+          "tableTo": "mitglied",
+          "columnsFrom": [
+            "mitglied_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "konto_mitglied_id_unique": {
+          "name": "konto_mitglied_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mitglied_id"
+          ]
+        },
+        "konto_brief_code_hash_unique": {
+          "name": "konto_brief_code_hash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "brief_code_hash"
+          ]
+        },
+        "konto_passkey_kennung_unique": {
+          "name": "konto_passkey_kennung_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "passkey_kennung"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.konto_rolle": {
+      "name": "konto_rolle",
+      "schema": "",
+      "columns": {
+        "konto_id": {
+          "name": "konto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rolle": {
+          "name": "rolle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "konto_rolle_konto_id_konto_id_fk": {
+          "name": "konto_rolle_konto_id_konto_id_fk",
+          "tableFrom": "konto_rolle",
+          "tableTo": "konto",
+          "columnsFrom": [
+            "konto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "konto_rolle_konto_id_rolle_pk": {
+          "name": "konto_rolle_konto_id_rolle_pk",
+          "columns": [
+            "konto_id",
+            "rolle"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "konto_rolle_rolle_check": {
+          "name": "konto_rolle_rolle_check",
+          "value": "\"konto_rolle\".\"rolle\" in ('mytco', 'mitglieder', 'cm', 'lizenz')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.mitglied": {
+      "name": "mitglied",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "vorname": {
+          "name": "vorname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nachname": {
+          "name": "nachname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rufname": {
+          "name": "rufname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "strasse": {
+          "name": "strasse",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "plz": {
+          "name": "plz",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ort": {
+          "name": "ort",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'aktiv'"
+        },
+        "mitgliedernummer": {
+          "name": "mitgliedernummer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefon": {
+          "name": "telefon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geschlecht": {
+          "name": "geschlecht",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jahrgang": {
+          "name": "jahrgang",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "klassierung": {
+          "name": "klassierung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lizenznummer": {
+          "name": "lizenznummer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fairgate_offen_seit": {
+          "name": "fairgate_offen_seit",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "austritt_am": {
+          "name": "austritt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vorgemerkt_am": {
+          "name": "vorgemerkt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status_vorher": {
+          "name": "status_vorher",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "mitglied_mitgliedernummer_klein_unique": {
+          "name": "mitglied_mitgliedernummer_klein_unique",
+          "columns": [
+            {
+              "expression": "lower(\"mitgliedernummer\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "mitglied_email_klein_unique": {
+          "name": "mitglied_email_klein_unique",
+          "columns": [
+            {
+              "expression": "lower(\"email\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "mitglied_email_unique": {
+          "name": "mitglied_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "mitglied_status_check": {
+          "name": "mitglied_status_check",
+          "value": "\"mitglied\".\"status\" in ('aktiv', 'ausgetreten', 'vorgemerkt', 'geloescht')"
+        },
+        "mitglied_geloescht_check": {
+          "name": "mitglied_geloescht_check",
+          "value": "\"mitglied\".\"status\" = 'geloescht' or (\"mitglied\".\"email\" is not null and \"mitglied\".\"strasse\" is not null and \"mitglied\".\"plz\" is not null and \"mitglied\".\"ort\" is not null)"
+        },
+        "mitglied_status_vorher_check": {
+          "name": "mitglied_status_vorher_check",
+          "value": "\"mitglied\".\"status_vorher\" is null or \"mitglied\".\"status_vorher\" in ('aktiv', 'ausgetreten')"
+        },
+        "mitglied_vorgemerkt_check": {
+          "name": "mitglied_vorgemerkt_check",
+          "value": "\"mitglied\".\"status\" <> 'vorgemerkt' or (\"mitglied\".\"vorgemerkt_am\" is not null and \"mitglied\".\"status_vorher\" is not null)"
+        },
+        "mitglied_ausgetreten_check": {
+          "name": "mitglied_ausgetreten_check",
+          "value": "\"mitglied\".\"status\" <> 'ausgetreten' or \"mitglied\".\"austritt_am\" is not null"
+        },
+        "mitglied_geschlecht_check": {
+          "name": "mitglied_geschlecht_check",
+          "value": "\"mitglied\".\"geschlecht\" in ('w', 'm')"
+        },
+        "mitglied_klassierung_check": {
+          "name": "mitglied_klassierung_check",
+          "value": "\"mitglied\".\"klassierung\" is null or \"mitglied\".\"klassierung\" in ('N1', 'N2', 'N3', 'N4', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'keine')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.mitteilung": {
+      "name": "mitteilung",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "bezug": {
+          "name": "bezug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "anlass_id": {
+          "name": "anlass_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "absender_id": {
+          "name": "absender_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gesendet_am": {
+          "name": "gesendet_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "titel": {
+          "name": "titel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auswahl": {
+          "name": "auswahl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weg": {
+          "name": "weg",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "push": {
+          "name": "push",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "mails": {
+          "name": "mails",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "ersatz_mails": {
+          "name": "ersatz_mails",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "nicht_erreichbar": {
+          "name": "nicht_erreichbar",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {
+        "mitteilung_anlass_id_gesendet_am_idx": {
+          "name": "mitteilung_anlass_id_gesendet_am_idx",
+          "columns": [
+            {
+              "expression": "anlass_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "gesendet_am",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "mitteilung_gesendet_am_idx": {
+          "name": "mitteilung_gesendet_am_idx",
+          "columns": [
+            {
+              "expression": "gesendet_am",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "mitteilung_anlass_id_anlass_id_fk": {
+          "name": "mitteilung_anlass_id_anlass_id_fk",
+          "tableFrom": "mitteilung",
+          "tableTo": "anlass",
+          "columnsFrom": [
+            "anlass_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "mitteilung_absender_id_mitglied_id_fk": {
+          "name": "mitteilung_absender_id_mitglied_id_fk",
+          "tableFrom": "mitteilung",
+          "tableTo": "mitglied",
+          "columnsFrom": [
+            "absender_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "mitteilung_bezug_check": {
+          "name": "mitteilung_bezug_check",
+          "value": "\"mitteilung\".\"bezug\" in ('anlass', 'verein')"
+        },
+        "mitteilung_anlass_check": {
+          "name": "mitteilung_anlass_check",
+          "value": "(\"mitteilung\".\"bezug\" = 'anlass') = (\"mitteilung\".\"anlass_id\" is not null)"
+        },
+        "mitteilung_weg_check": {
+          "name": "mitteilung_weg_check",
+          "value": "\"mitteilung\".\"weg\" in ('push', 'push-sonst-mail', 'push-und-mail')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.partner_anfrage": {
+      "name": "partner_anfrage",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "kategorie_id": {
+          "name": "kategorie_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "von_id": {
+          "name": "von_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "an_id": {
+          "name": "an_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gestellt_am": {
+          "name": "gestellt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "partner_anfrage_an_idx": {
+          "name": "partner_anfrage_an_idx",
+          "columns": [
+            {
+              "expression": "an_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "partner_anfrage_kategorie_id_kategorie_id_fk": {
+          "name": "partner_anfrage_kategorie_id_kategorie_id_fk",
+          "tableFrom": "partner_anfrage",
+          "tableTo": "kategorie",
+          "columnsFrom": [
+            "kategorie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "partner_anfrage_von_id_mitglied_id_fk": {
+          "name": "partner_anfrage_von_id_mitglied_id_fk",
+          "tableFrom": "partner_anfrage",
+          "tableTo": "mitglied",
+          "columnsFrom": [
+            "von_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "partner_anfrage_an_id_mitglied_id_fk": {
+          "name": "partner_anfrage_an_id_mitglied_id_fk",
+          "tableFrom": "partner_anfrage",
+          "tableTo": "mitglied",
+          "columnsFrom": [
+            "an_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "partner_anfrage_von_unique": {
+          "name": "partner_anfrage_von_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "kategorie_id",
+            "von_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "partner_anfrage_selbst_check": {
+          "name": "partner_anfrage_selbst_check",
+          "value": "\"partner_anfrage\".\"von_id\" <> \"partner_anfrage\".\"an_id\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.passkey": {
+      "name": "passkey",
+      "schema": "",
+      "columns": {
+        "kennung": {
+          "name": "kennung",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "konto_id": {
+          "name": "konto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "oeffentlicher_schluessel": {
+          "name": "oeffentlicher_schluessel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zaehler": {
+          "name": "zaehler",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "transporte": {
+          "name": "transporte",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::text[]"
+        },
+        "rp_id": {
+          "name": "rp_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geraet": {
+          "name": "geraet",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eingerichtet_am": {
+          "name": "eingerichtet_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zuletzt_benutzt": {
+          "name": "zuletzt_benutzt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "passkey_konto_id_idx": {
+          "name": "passkey_konto_id_idx",
+          "columns": [
+            {
+              "expression": "konto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "passkey_konto_id_konto_id_fk": {
+          "name": "passkey_konto_id_konto_id_fk",
+          "tableFrom": "passkey",
+          "tableTo": "konto",
+          "columnsFrom": [
+            "konto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.push_abo": {
+      "name": "push_abo",
+      "schema": "",
+      "columns": {
+        "endpunkt": {
+          "name": "endpunkt",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "sitzung_hash": {
+          "name": "sitzung_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "konto_id": {
+          "name": "konto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p256dh": {
+          "name": "p256dh",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auth": {
+          "name": "auth",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eingerichtet_am": {
+          "name": "eingerichtet_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "push_abo_konto_id_idx": {
+          "name": "push_abo_konto_id_idx",
+          "columns": [
+            {
+              "expression": "konto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "push_abo_sitzung_hash_unique": {
+          "name": "push_abo_sitzung_hash_unique",
+          "columns": [
+            {
+              "expression": "sitzung_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "push_abo_sitzung_hash_sitzung_kennung_hash_fk": {
+          "name": "push_abo_sitzung_hash_sitzung_kennung_hash_fk",
+          "tableFrom": "push_abo",
+          "tableTo": "sitzung",
+          "columnsFrom": [
+            "sitzung_hash"
+          ],
+          "columnsTo": [
+            "kennung_hash"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "push_abo_konto_id_konto_id_fk": {
+          "name": "push_abo_konto_id_konto_id_fk",
+          "tableFrom": "push_abo",
+          "tableTo": "konto",
+          "columnsFrom": [
+            "konto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sitzung": {
+      "name": "sitzung",
+      "schema": "",
+      "columns": {
+        "kennung_hash": {
+          "name": "kennung_hash",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "konto_id": {
+          "name": "konto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sitzungsversion": {
+          "name": "sitzungsversion",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "erstellt_am": {
+          "name": "erstellt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zuletzt_genutzt": {
+          "name": "zuletzt_genutzt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "passkey_hinweis": {
+          "name": "passkey_hinweis",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "admin_bestaetigt_am": {
+          "name": "admin_bestaetigt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "admin_code_hash": {
+          "name": "admin_code_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "admin_code_ablauf": {
+          "name": "admin_code_ablauf",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "admin_code_fehlversuche": {
+          "name": "admin_code_fehlversuche",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "ansicht_rolle": {
+          "name": "ansicht_rolle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "sitzung_konto_id_idx": {
+          "name": "sitzung_konto_id_idx",
+          "columns": [
+            {
+              "expression": "konto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "sitzung_konto_id_konto_id_fk": {
+          "name": "sitzung_konto_id_konto_id_fk",
+          "tableFrom": "sitzung",
+          "tableTo": "konto",
+          "columnsFrom": [
+            "konto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "sitzung_ansicht_rolle_check": {
+          "name": "sitzung_ansicht_rolle_check",
+          "value": "\"sitzung\".\"ansicht_rolle\" is null or \"sitzung\".\"ansicht_rolle\" in ('mitglied', 'mitglieder', 'cm', 'lizenz')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.turnier": {
+      "name": "turnier",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "jahr": {
+          "name": "jahr",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "anmeldeschluss": {
+          "name": "anmeldeschluss",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'vorbereitung'"
+        },
+        "erstellt_am": {
+          "name": "erstellt_am",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "kontakt_mitglied_id": {
+          "name": "kontakt_mitglied_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "turnier_kontakt_mitglied_id_mitglied_id_fk": {
+          "name": "turnier_kontakt_mitglied_id_mitglied_id_fk",
+          "tableFrom": "turnier",
+          "tableTo": "mitglied",
+          "columnsFrom": [
+            "kontakt_mitglied_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "turnier_jahr_unique": {
+          "name": "turnier_jahr_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "jahr"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "turnier_status_check": {
+          "name": "turnier_status_check",
+          "value": "\"turnier\".\"status\" in ('vorbereitung', 'offen', 'geschlossen')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.turniernummer": {
+      "name": "turniernummer",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "turnier_id": {
+          "name": "turnier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bezeichnung": {
+          "name": "bezeichnung",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nummer": {
+          "name": "nummer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reihenfolge": {
+          "name": "reihenfolge",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "turniernummer_turnier_idx": {
+          "name": "turniernummer_turnier_idx",
+          "columns": [
+            {
+              "expression": "turnier_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "turniernummer_turnier_id_turnier_id_fk": {
+          "name": "turniernummer_turnier_id_turnier_id_fk",
+          "tableFrom": "turniernummer",
+          "tableTo": "turnier",
+          "columnsFrom": [
+            "turnier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

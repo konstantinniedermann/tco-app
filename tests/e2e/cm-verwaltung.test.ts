@@ -95,7 +95,7 @@ const zeile = (page: Page, nachname: string) =>
 
 /** Karte einer Kategorie auf der CM-Seite des Mitglieds, gefunden über ihren Namen. */
 const karte = (page: Page, name: string) =>
-	page.locator('.karte.kachel').filter({ has: page.getByText(name, { exact: true }) });
+	page.locator('div.karte').filter({ has: page.getByText(name, { exact: true }) });
 
 test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschiebt, korrigiert die Klassierung und löscht', async ({
 	page
@@ -239,7 +239,9 @@ test('A-ANMELDUNG-10, FR-08: Mitglied beantragt eine Wildcard, CM-Admin lehnt mi
 	await antrag.getByRole('button', { name: 'Beantragen' }).click();
 	await expect(page.getByRole('status')).toHaveText('Wildcard beantragt. Du bekommst Bescheid.');
 	await expect(karte(page, 'Herren R1–R6').getByText('Wildcard beantragt')).toBeVisible();
-	await expect(page.getByText('1 von 3 Anmeldungen', { exact: true })).toBeVisible();
+	await expect(
+		karte(page, 'Herren R1–R6').locator('.karte-kopf .plakette', { hasText: 'Wildcard beantragt' })
+	).toBeVisible();
 
 	// FR-47, DS-05: Die CM-Admins erfahren vom Antrag, ohne den Namen des Mitglieds.
 	const meldung = await warteAufMail(

@@ -215,6 +215,14 @@ export async function setzeAusgetreten(mitgliedId: number): Promise<void> {
 		.where(eq(mitglied.id, mitgliedId));
 }
 
+/** Setzt die Kontaktperson des Turniers direkt (die Verwaltung prüft die Rolle, siehe turnier.test.ts). */
+export async function setzeKontaktperson(turnierId: number, mitgliedId: number): Promise<void> {
+	await hole()
+		.db.update(turnier)
+		.set({ kontaktMitgliedId: mitgliedId })
+		.where(eq(turnier.id, turnierId));
+}
+
 /** Setzt den Anmeldeschluss eines Turniers (`YYYY-MM-DD`), etwa auf ein vergangenes Datum. */
 export async function setzeAnmeldeschluss(turnierId: number, datum: string): Promise<void> {
 	await hole().db.update(turnier).set({ anmeldeschluss: datum }).where(eq(turnier.id, turnierId));

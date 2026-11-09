@@ -1,6 +1,6 @@
 // Nur lokal (make seed): eine erfundene Clubmeisterschaft 2027 mit Kategorien, damit die
 // Verwaltung beim Vorzeigen nicht leer ist (DS-08).
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import {
 	beantrageWildcard,
 	istAktiv,
@@ -254,4 +254,12 @@ export async function legeBeispielTurnierAn(db: Db, jetzt: Date): Promise<void> 
 	// Nach dem Anmeldeschluss bleibt das Turnier in Vorbereitung ('schluss-vorbei').
 	await setzeStatus(db, t.id, 'offen', jetzt);
 	await legeBeispielAnmeldungenAn(db, t.id, jetzt);
+}
+
+/** Kontaktperson des Beispielturniers (CM-Admin der Seed-Personas), nur solange keine gewählt ist. */
+export async function setzeBeispielKontakt(db: Db, mitgliedId: number): Promise<void> {
+	await db
+		.update(turnier)
+		.set({ kontaktMitgliedId: mitgliedId })
+		.where(and(eq(turnier.jahr, JAHR), isNull(turnier.kontaktMitgliedId)));
 }

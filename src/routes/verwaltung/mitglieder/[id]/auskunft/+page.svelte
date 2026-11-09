@@ -222,6 +222,14 @@
 		</div>
 	{/if}
 
+	{#if a.kontaktperson.length > 0}
+		<p>
+			Kontaktperson für Fragen der Mitglieder (sichtbar ist nur der Name): {a.kontaktperson
+				.map((k) => k.turnier)
+				.join(', ')}
+		</p>
+	{/if}
+
 	{#if a.mitteilungen.length > 0}
 		<h2>Von dir gesendete Mitteilungen</h2>
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->

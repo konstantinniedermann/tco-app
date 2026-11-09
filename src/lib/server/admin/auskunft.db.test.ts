@@ -310,6 +310,20 @@ describe('ladeAuskunft (DS-07)', () => {
 		expect(JSON.stringify(a)).not.toContain('(selbst)');
 	});
 
+	test('nennt die Turniere, für die das Mitglied Kontaktperson ist', async () => {
+		const m = await legeMitgliedAn(db, { rollen: ['cm'] });
+		expect((await ladeAuskunft(db, m.mitgliedId, jetzt))!.kontaktperson).toEqual([]);
+		await db.insert(turnier).values({
+			jahr: jahr++,
+			name: 'CM Kontakt Erfunden',
+			anmeldeschluss: '2089-05-31',
+			kontaktMitgliedId: m.mitgliedId
+		});
+		expect((await ladeAuskunft(db, m.mitgliedId, jetzt))!.kontaktperson).toEqual([
+			{ turnier: 'CM Kontakt Erfunden' }
+		]);
+	});
+
 	test('gelöschtes oder unbekanntes Mitglied → null', async () => {
 		const weg = await legeMitgliedAn(db);
 		await db.delete(konto).where(eq(konto.id, weg.kontoId));
