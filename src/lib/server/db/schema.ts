@@ -258,7 +258,11 @@ export const turnier = pgTable(
 		name: text('name').notNull(),
 		anmeldeschluss: date('anmeldeschluss', { mode: 'string' }).notNull(),
 		status: text('status').$type<TurnierStatus>().notNull().default('vorbereitung'),
-		erstelltAm: timestamp('erstellt_am', { withTimezone: true }).notNull().defaultNow()
+		erstelltAm: timestamp('erstellt_am', { withTimezone: true }).notNull().defaultNow(),
+		// Kontaktperson für Fragen der Mitglieder, ein CM-Admin; freiwillig.
+		kontaktMitgliedId: integer('kontakt_mitglied_id').references(() => mitglied.id, {
+			onDelete: 'set null'
+		})
 	},
 	(t) => [
 		check('turnier_status_check', sql`${t.status} in ('vorbereitung', 'offen', 'geschlossen')`)

@@ -120,6 +120,13 @@
       "when": 1794156152535,
       "tag": "0016_steep_spiral",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794209888885,
+      "tag": "0017_regular_jackal",
+      "breakpoints": true
     }
   ]
 }
