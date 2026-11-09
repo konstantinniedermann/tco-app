@@ -137,14 +137,16 @@ describe('A-TURNIER-04 Gespräch mit der Turnierleitung', () => {
 		expect((await ladeGespraech(db, g.id, spaeter))?.antworten).toBe(false);
 		expect((await ladeGespraech(db, g.id, a.jetzt))?.antworten).toBe(true);
 		expect(await antworte(db, g.id, a.kontaktId, 'Zu spät', 0, false, spaeter)).toBe('nur-lesen');
+		expect(await setzeZustand(db, g.id, 'erledigt', spaeter)).toBe('nur-lesen');
+		expect((await ladeGespraech(db, g.id, a.jetzt))?.zustand).toBe('offen');
 	});
 
 	test('FR-52: Antwort lässt erledigt stehen, neue Nachricht des Mitglieds öffnet wieder', async () => {
 		const a = await aufbau();
 		await schreibeAlsMitglied(db, a.turnierId, a.mitgliedId, 'Frage', a.jetzt);
 		const [g] = await db.select().from(gespraech).where(eq(gespraech.turnierId, a.turnierId));
-		expect(await setzeZustand(db, g.id, 'erledigt')).toBe('ok');
-		expect(await setzeZustand(db, -1, 'erledigt')).toBe('nicht-gefunden');
+		expect(await setzeZustand(db, g.id, 'erledigt', a.jetzt)).toBe('ok');
+		expect(await setzeZustand(db, -1, 'erledigt', a.jetzt)).toBe('nicht-gefunden');
 		const r = await antworte(db, g.id, a.kontaktId, 'Antwort', 0, true, a.jetzt);
 		expect(r).toEqual({ ergebnis: 'ok', mitgliedId: a.mitgliedId, turnierId: a.turnierId });
 		expect((await ladeGespraech(db, g.id, a.jetzt))?.zustand).toBe('erledigt');
@@ -235,7 +237,7 @@ async function pruefeListeUndGesamtzahl() {
 	await schreibeAlsMitglied(db, a.turnierId, m3, 'mittel', t(2));
 	const gs = await db.select().from(gespraech).where(eq(gespraech.turnierId, a.turnierId));
 	const vonM3 = gs.find((g) => g.mitgliedId === m3)!;
-	await setzeZustand(db, vonM3.id, 'erledigt');
+	await setzeZustand(db, vonM3.id, 'erledigt', a.jetzt);
 	const l = await listeGespraeche(db, a.turnierId);
 	expect(l?.kontakt?.nachname).toBe('Kontaktnamen');
 	expect(l?.zeilen.map((z) => z.letzte.text)).toEqual(['neu', 'alt', 'mittel']);
@@ -248,7 +250,7 @@ async function pruefeListeUndGesamtzahl() {
 
 	// In der eigenen Datenbank gibt es nur dieses Turnier: die Gesamtzahl ist exakt.
 	expect(await offeneGespraecheGesamt(db, a.jetzt)).toBe(2);
-	await setzeZustand(db, vonM3.id, 'offen');
+	await setzeZustand(db, vonM3.id, 'offen', a.jetzt);
 	expect(await offeneGespraecheGesamt(db, a.jetzt)).toBe(3);
 	// Turnierjahr vorbei: zählt nicht mehr.
 	expect(await offeneGespraecheGesamt(db, mitJahr(a.jahr + 1, '02-01'))).toBe(0);

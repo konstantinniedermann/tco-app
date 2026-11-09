@@ -166,7 +166,10 @@ export function postZustand(d: MitteilungAdminDienste, e: AdminEreignis): Promis
 		if (id === null) return nichtGefunden();
 		const z = koerper.zustand;
 		if (z !== 'offen' && z !== 'erledigt') return antwort(400, { fehler: 'eingabe' });
-		if ((await setzeZustand(d.db, id, z)) === 'nicht-gefunden') return nichtGefunden();
-		return antwortOderWeg(await ladeGespraech(d.db, id, jetztAdmin(d)));
+		const jetzt = jetztAdmin(d);
+		const r = await setzeZustand(d.db, id, z, jetzt);
+		if (r === 'nicht-gefunden') return nichtGefunden();
+		if (r === 'nur-lesen') return nurLesen();
+		return antwortOderWeg(await ladeGespraech(d.db, id, jetzt));
 	});
 }

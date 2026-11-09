@@ -360,14 +360,19 @@ export async function antworte(
 export async function setzeZustand(
 	db: DbOderTx,
 	gespraechId: number,
-	zustand: Zustand
-): Promise<'ok' | 'nicht-gefunden'> {
-	const r = await db
-		.update(gespraech)
-		.set({ zustand })
-		.where(eq(gespraech.id, gespraechId))
-		.returning({ id: gespraech.id });
-	return r.length ? 'ok' : 'nicht-gefunden';
+	zustand: Zustand,
+	jetzt: Date
+): Promise<'ok' | 'nicht-gefunden' | 'nur-lesen'> {
+	// FR-51: Nach dem Turnierjahr nur lesen, wie bei `antworte`.
+	const [g] = await db
+		.select({ jahr: turnier.jahr })
+		.from(gespraech)
+		.innerJoin(turnier, eq(turnier.id, gespraech.turnierId))
+		.where(eq(gespraech.id, gespraechId));
+	if (!g) return 'nicht-gefunden';
+	if (g.jahr < jahrInZuerich(jetzt)) return 'nur-lesen';
+	await db.update(gespraech).set({ zustand }).where(eq(gespraech.id, gespraechId));
+	return 'ok';
 }
 
 export async function offeneZahlen(

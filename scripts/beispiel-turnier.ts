@@ -318,6 +318,6 @@ export async function legeBeispielGespraecheAn(
 		if (g.antwort) {
 			await antworte(db, r.gespraechId, hannaId, g.antwort, 0, true, vor(20 - i * 6));
 		}
-		if (g.erledigt) await setzeZustand(db, r.gespraechId, 'erledigt');
+		if (g.erledigt) await setzeZustand(db, r.gespraechId, 'erledigt', jetzt);
 	}
 }

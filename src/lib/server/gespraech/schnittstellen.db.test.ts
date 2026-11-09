@@ -355,6 +355,17 @@ describe('A-TURNIER-04 Schnittstellen zum Gespräch', () => {
 		expect((await postAntwort(a.s.admin, post(erster.konto, { text: 'x' }, gid))).status).toBe(400);
 	});
 
+	test('FR-51, A-TURNIER-04: nach dem Turnierjahr ergibt der Zustand 409 nur-lesen', async () => {
+		const a = await aufbau();
+		const m = await mitglied();
+		await schreibe(a, m, 'Frage');
+		const gid = await gespraechId(a.turnierId, m.mitgliedId);
+		const spaet = baue(new Date(`${a.jahr + 1}-01-01T00:30:00+01:00`));
+		const r = await postZustand(spaet.admin, post(a.kontakt.konto, { zustand: 'erledigt' }, gid));
+		expect([r.status, await r.json()]).toEqual([409, { fehler: 'nur-lesen' }]);
+		expect((await ladeGespraech(db, gid, a.jetzt))?.zustand).toBe('offen');
+	});
+
 	test('FR-52, A-TURNIER-04: Zustand setzen; unbekannt oder ungültig wird abgewiesen', async () => {
 		const a = await aufbau();
 		const m = await mitglied();

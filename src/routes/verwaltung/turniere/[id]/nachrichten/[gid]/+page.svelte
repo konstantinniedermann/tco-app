@@ -76,6 +76,7 @@
 		laeuft = false;
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok') gespraech = a.daten;
+		else if (a.art === 'nur-lesen') beendet = true;
 		else fehler = fehlerText(a);
 	}
 </script>
@@ -114,7 +115,7 @@
 				{/if}
 				· {zeitText(n.gesendetAm)}
 			</p>
-			<p>{n.text}</p>
+			<p class="mehrzeilig">{n.text}</p>
 		</div>
 	{/each}
 </section>
@@ -164,13 +165,7 @@
 				</div>
 			</form>
 		{:else}
-			<p class="leise">Antworten geht nach dem Turnierjahr nicht mehr.</p>
-			<div class="leiste">
-				{@render zustandTaste()}
-			</div>
-			{#if fehler}
-				<p class="fehler" role="alert">{fehler}</p>
-			{/if}
+			<p class="leise">Antworten und Ändern gehen nach dem Turnierjahr nicht mehr.</p>
 		{/if}
 	</section>
 {/if}
