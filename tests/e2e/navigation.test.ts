@@ -20,12 +20,6 @@ import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hil
 // und Stunde gilt für den ganzen Lauf und ist durch Login, Profil und Mitgliedschaft ausgeschöpft.
 // Diese Datei fordert darum keinen Code an: Anmeldung per Brief-Code, Mail-Antworten nachgebildet.
 
-// Pro Jahr gibt es ein Turnier, und `legeTurnierAn` löscht das alte desselben Jahres: Diese Jahre
-// benutzt keine andere E2E-Datei (vor jeder Änderung mit grep über tests/e2e prüfen).
-const JAHR_DOPPEL: Record<string, number> = { iphone: 2054, android: 2047 };
-const JAHR_CM: Record<string, number> = { iphone: 2029, android: 2028 };
-const JAHR_TITEL: Record<string, number> = { iphone: 2050, android: 2049, desktop: 2048 };
-
 const EINZEL: KategorieWerte = {
 	name: 'Herren R1–R9',
 	geschlecht: 'herren',
@@ -162,11 +156,11 @@ test.describe('Mitglieder-App', () => {
 
 	test('#69: Doppel nennt die CM, ein langer Name bleibt einzeilig', async ({ page }, info) => {
 		const fehler = sammleKonsolenfehler(page);
-		const jahr = JAHR_DOPPEL[info.project.name];
 		const {
+			jahr,
 			turnierId,
 			kategorieIds: [kategorieId]
-		} = await legeOffenesTurnierAn(jahr, [MIXED]);
+		} = await legeOffenesTurnierAn([MIXED]);
 		const lang = `Clubmeisterschaft ${jahr} mit einem sehr langen Namen für die Probe am Handy`;
 		await benenneTurnier(turnierId, lang);
 		const konto = await meldeAn(page, 'Tara');
@@ -216,10 +210,9 @@ test.describe('Mitglieder-App', () => {
 		await pruefeBildschirm(page, info, 'navigation-cm-keine');
 	});
 
-	test('#69: Reiter CM mit einer CM zeigt sie direkt', async ({ page }, info) => {
+	test('#69: Reiter CM mit einer CM zeigt sie direkt', async ({ page }) => {
 		const fehler = sammleKonsolenfehler(page);
-		const jahr = JAHR_CM[info.project.name];
-		const { turnierId } = await legeOffenesTurnierAn(jahr, [EINZEL]);
+		const { turnierId, jahr } = await legeOffenesTurnierAn([EINZEL]);
 		await meldeAn(page, 'Vera');
 		await laufendeCms(page, [stand(turnierId, `Clubmeisterschaft ${jahr}`)]);
 		await reiter(page, 'CM').click();
@@ -240,8 +233,7 @@ test.describe('Mitglieder-App', () => {
 	});
 
 	test('#69: Reiter CM mit mehreren CMs zeigt Kacheln', async ({ page }, info) => {
-		const jahr = JAHR_CM[info.project.name];
-		const { turnierId } = await legeOffenesTurnierAn(jahr, [EINZEL]);
+		const { turnierId, jahr } = await legeOffenesTurnierAn([EINZEL]);
 		await meldeAn(page, 'Wanda');
 		await laufendeCms(page, [
 			stand(turnierId, `Clubmeisterschaft ${jahr}`),
@@ -259,9 +251,8 @@ test.describe('Mitglieder-App', () => {
 		await expect(page).toHaveURL(/\/clubmeisterschaft$/);
 	});
 
-	test('#69: Kachel auf Start führt in den Reiter CM', async ({ page }, info) => {
-		const jahr = JAHR_CM[info.project.name];
-		const { turnierId } = await legeOffenesTurnierAn(jahr, [EINZEL]);
+	test('#69: Kachel auf Start führt in den Reiter CM', async ({ page }) => {
+		const { turnierId, jahr } = await legeOffenesTurnierAn([EINZEL]);
 		await laufendeCms(page, [stand(turnierId, `Clubmeisterschaft ${jahr}`)]);
 		await meldeAn(page, 'Xenia');
 		await page.getByRole('link', { name: new RegExp(`Clubmeisterschaft ${jahr}`) }).click();
@@ -271,14 +262,11 @@ test.describe('Mitglieder-App', () => {
 		await expect(reiter(page, 'CM')).toHaveAttribute('aria-current', 'page');
 	});
 
-	test('#69: Reiter antippen mit ungespeicherten Änderungen fragt zurück', async ({
-		page
-	}, info) => {
-		const jahr = JAHR_DOPPEL[info.project.name];
+	test('#69: Reiter antippen mit ungespeicherten Änderungen fragt zurück', async ({ page }) => {
 		const {
 			turnierId,
 			kategorieIds: [kategorieId]
-		} = await legeOffenesTurnierAn(jahr, [MIXED]);
+		} = await legeOffenesTurnierAn([MIXED]);
 		const konto = await meldeAn(page, 'Yara');
 		await setzeSpielerangaben(konto.mitgliedId, {
 			geschlecht: 'w',
@@ -306,9 +294,8 @@ test.describe('Mitglieder-App', () => {
 		await expect(page.getByRole('heading', { level: 1, name: 'Hoi Yara' })).toBeVisible();
 	});
 
-	test('#69: Anmelden auf der CM-Seite lädt die Seite nicht neu', async ({ page }, info) => {
-		const jahr = JAHR_CM[info.project.name];
-		const { turnierId } = await legeOffenesTurnierAn(jahr, [EINZEL]);
+	test('#69: Anmelden auf der CM-Seite lädt die Seite nicht neu', async ({ page }) => {
+		const { turnierId, jahr } = await legeOffenesTurnierAn([EINZEL]);
 		const konto = await meldeAn(page, 'Zora');
 		await setzeSpielerangaben(konto.mitgliedId, {
 			geschlecht: 'm',
@@ -462,11 +449,10 @@ test.describe('Titel in der Kopfleiste', () => {
 		await expect(titel(page)).toHaveText('Zwei Codes eintippen');
 	});
 
-	test('Zurück an gespeicherte Stelle zeigt den Titel sofort', async ({ page }, info) => {
-		const jahr = JAHR_TITEL[info.project.name];
-		const name = `Clubmeisterschaft ${jahr}`;
+	test('Zurück an gespeicherte Stelle zeigt den Titel sofort', async ({ page }) => {
 		// Damen-Kategorien, damit für Yara (w) genug Karten stehen und die Seite hoch ist.
-		const { turnierId } = await legeOffenesTurnierAn(jahr, [MIXED, DAMEN, DAMEN_2, DAMEN_3]);
+		const { turnierId, jahr } = await legeOffenesTurnierAn([MIXED, DAMEN, DAMEN_2, DAMEN_3]);
+		const name = `Clubmeisterschaft ${jahr}`;
 		const konto = await meldeAn(page, 'Yara');
 		await setzeSpielerangaben(konto.mitgliedId, {
 			geschlecht: 'w',

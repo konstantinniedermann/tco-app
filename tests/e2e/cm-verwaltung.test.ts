@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
@@ -31,22 +31,6 @@ import {
 test.afterAll(async () => {
 	await schliesseLoginHilfen();
 });
-
-// Pro Jahr gibt es ein Turnier; jedes Projekt und jeder Test hat sein festes Jahr, getrennt von
-// cm-anmeldung.test.ts (2090–2093), verwaltung.test.ts (2094–2096) und turnier.test.ts
-// (2097–2099). `legeOffenesTurnierAn` löscht das Turnier des Jahres vorher.
-const JAHR_VERWALTEN: Record<string, number> = { iphone: 2089, android: 2088 };
-const JAHR_WILDCARD: Record<string, number> = { iphone: 2087, android: 2086 };
-const JAHR_NUR_LESEN: Record<string, number> = { iphone: 2085, android: 2084, desktop: 2083 };
-const JAHR_KLEBEN: Record<string, number> = { desktop: 2059 };
-const JAHR_SUCHE: Record<string, number> = { iphone: 2058, android: 2057, desktop: 2056 };
-const JAHR_EINZEILIG: Record<string, number> = { desktop: 2055 };
-
-function testjahr(jahre: Record<string, number>, info: TestInfo): number {
-	const jahr = jahre[info.project.name];
-	if (!jahr) throw new Error(`Kein Testjahr für das Projekt ${info.project.name}`);
-	return jahr;
-}
 
 const einzel = (name: string, von: 'R1' | 'R7', bis: 'R6' | 'R9'): KategorieWerte => ({
 	name,
@@ -108,9 +92,8 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Nachweis mit Screenshots auf iPhone und Android; die Verwaltung am Computer prüft turnier.test.ts
 	test.setTimeout(120_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_VERWALTEN, info);
+	const { jahr } = await legeOffenesTurnierAn(KATEGORIEN);
 	const turnier = `Clubmeisterschaft ${jahr}`;
-	await legeOffenesTurnierAn(jahr, KATEGORIEN);
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
 	const spieler = await legeKontoAn('Bruno', nachname);
 	await setzeSpielerangaben(spieler.mitgliedId, {
@@ -210,11 +193,11 @@ test('A-ANMELDUNG-10, FR-08, FR-11: Mitglied beantragt eine Wildcard, CM-Admin l
 	// Antwort und der Reihe nach; lokal sind das Hunderte aus früheren Läufen, der neue zuletzt.
 	test.setTimeout(180_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_WILDCARD, info);
-	const turnier = `Clubmeisterschaft ${jahr}`;
 	const {
+		jahr,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, KATEGORIEN);
+	} = await legeOffenesTurnierAn(KATEGORIEN);
+	const turnier = `Clubmeisterschaft ${jahr}`;
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
 	const mitglied = await legeKontoMitBriefCodeAn('Moritz', nachname);
 	await setzeSpielerangaben(mitglied.mitgliedId, {
@@ -294,11 +277,10 @@ test('RR-07, FR-08: MyTCO-Admin sieht die Anmeldungen mit Kommentar, ohne Tasten
 }, info) => {
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_NUR_LESEN, info);
 	const {
 		turnierId,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, KATEGORIEN);
+	} = await legeOffenesTurnierAn(KATEGORIEN);
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
 	const spieler = await legeKontoAn('Rolf', nachname);
 	await setzeSpielerangaben(spieler.mitgliedId, {
@@ -351,9 +333,8 @@ test('RR-07, FR-08: MyTCO-Admin sieht die Anmeldungen mit Kommentar, ohne Tasten
 test('PC: Pfad und Titel der Kategorie bleiben beim Scrollen sichtbar', async ({ page }, info) => {
 	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: am Handy klebt nur die Kopfleiste (Titel blendet dort ein)
 	test.setTimeout(120_000);
-	const jahr = testjahr(JAHR_KLEBEN, info);
+	const { jahr } = await legeOffenesTurnierAn(KATEGORIEN);
 	const turnier = `Clubmeisterschaft ${jahr}`;
-	await legeOffenesTurnierAn(jahr, KATEGORIEN);
 	const cm = await legeCmMitBriefCodeAn('Cyrill');
 	await page.setViewportSize({ width: 1280, height: 300 });
 	await oeffneKategorieAlsCm(page, cm, turnier, 'Herren R1–R6');
@@ -368,9 +349,8 @@ test('PC: Pfad und Titel der Kategorie bleiben beim Scrollen sichtbar', async ({
 test('PC: Ein Fokussprung landet nicht unter dem klebenden Seitenkopf', async ({ page }, info) => {
 	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: am Handy klebt nur die Kopfleiste
 	test.setTimeout(120_000);
-	const jahr = testjahr(JAHR_KLEBEN, info);
+	const { jahr } = await legeOffenesTurnierAn(KATEGORIEN);
 	const turnier = `Clubmeisterschaft ${jahr}`;
-	await legeOffenesTurnierAn(jahr, KATEGORIEN);
 	const cm = await legeCmMitBriefCodeAn('Cyrill');
 	await page.setViewportSize({ width: 1280, height: 260 });
 	await oeffneKategorieAlsCm(page, cm, turnier, 'Herren R1–R6');
@@ -398,9 +378,8 @@ test('PC: Ein Fokussprung landet nicht unter dem klebenden Seitenkopf', async ({
 
 test('Spielersuche springt nicht', async ({ page }, info) => {
 	test.setTimeout(120_000);
-	const jahr = testjahr(JAHR_SUCHE, info);
+	const { jahr } = await legeOffenesTurnierAn(KATEGORIEN);
 	const turnier = `Clubmeisterschaft ${jahr}`;
-	await legeOffenesTurnierAn(jahr, KATEGORIEN);
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
 	await legeKontoAn('Bruno', nachname);
 	const cm = await legeCmMitBriefCodeAn('Cyrill');
@@ -434,11 +413,11 @@ test('PC: Anmeldungen einzeilig, Aktionen über «Ändern»', async ({ page }, i
 	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: einzeilig erst ab 60rem; am Handy scrollt die Tabelle waagrecht
 	test.setTimeout(120_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_EINZEILIG, info);
-	const turnier = `Clubmeisterschaft ${jahr}`;
 	const {
+		jahr,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, KATEGORIEN);
+	} = await legeOffenesTurnierAn(KATEGORIEN);
+	const turnier = `Clubmeisterschaft ${jahr}`;
 	const nachname = `Probe${randomUUID().slice(0, 6)}`;
 	const spieler = await legeKontoAn('Rolf', nachname);
 	await setzeSpielerangaben(spieler.mitgliedId, {

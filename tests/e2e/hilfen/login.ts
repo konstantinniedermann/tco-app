@@ -90,25 +90,50 @@ export async function legeCmMitBriefCodeAn(vorname: string) {
 	return legeRollenkontoMitBriefCodeAn(vorname, ['cm']);
 }
 
-/**
- * Erfundenes Turnier dieses Jahres in Vorbereitung, ohne Kategorien; ein altes desselben Jahres
- * wird vorher gelöscht (pro Jahr gibt es nur eines). Gibt seine Nummer zurück.
- */
-export async function legeTurnierAn(jahr: number): Promise<number> {
-	await loescheTurnier(jahr);
-	const r = await legeTurnierInDbAn(hole().db, {
+// Pro Jahr gibt es nur ein Turnier, und alle Testdateien eines Laufs teilen die Datenbank. Darum
+// sucht sich die Hilfe das Jahr selbst: zufällig aus diesem Bereich, bei «vergeben» ein anderes.
+// Feste Jahre von Hand stiessen parallel laufende Dateien gegenseitig ihre Turniere weg. Der
+// Bereich liegt über dem Turnierformular (bis 2100, turnier.test.ts nimmt 2097–2099) und über dem
+// Turnier aus `make seed` (2027) und bleibt vierstellig wie echte Jahre.
+const FREIE_JAHRE = { von: 3000, bis: 9999 };
+
+export type TestTurnier = { turnierId: number; jahr: number };
+
+async function legeTurnierImJahrAn(jahr: number) {
+	return legeTurnierInDbAn(hole().db, {
 		jahr,
 		name: `Clubmeisterschaft ${jahr}`,
 		anmeldeschluss: `${jahr}-05-31`,
 		nummern: []
 	});
-	if (r.ergebnis !== 'ok') throw new Error(`Turnier ${jahr} liess sich nicht anlegen`);
-	return r.id;
+}
+
+/**
+ * Erfundenes Turnier in Vorbereitung, ohne Kategorien, in einem freien Jahr. Gibt Nummer und Jahr
+ * zurück; der Name ist «Clubmeisterschaft <Jahr>».
+ *
+ * Ein festes Jahr nur für Tests aus Branches, die vor dieser Umstellung entstanden sind: Dann wird
+ * ein altes Turnier desselben Jahres vorher gelöscht. Neue Tests geben kein Jahr an.
+ */
+export async function legeTurnierAn(jahr?: number): Promise<TestTurnier> {
+	if (jahr !== undefined) {
+		await loescheTurnier(jahr);
+		const r = await legeTurnierImJahrAn(jahr);
+		if (r.ergebnis !== 'ok') throw new Error(`Turnier ${jahr} liess sich nicht anlegen`);
+		return { turnierId: r.id, jahr };
+	}
+	for (let versuch = 0; versuch < 20; versuch++) {
+		const frei =
+			FREIE_JAHRE.von + Math.floor(Math.random() * (FREIE_JAHRE.bis - FREIE_JAHRE.von + 1));
+		const r = await legeTurnierImJahrAn(frei);
+		if (r.ergebnis === 'ok') return { turnierId: r.id, jahr: frei };
+	}
+	throw new Error('Kein freies Turnierjahr gefunden');
 }
 
 /**
  * Löscht das Turnier dieses Jahres samt Kategorien und Turniernummern (Fremdschlüssel mit
- * Cascade). Die E2E-Datenbank überdauert die Läufe, und pro Jahr gibt es nur ein Turnier.
+ * Cascade). Für Tests mit festem Jahr, die ein Turnier übers Formular anlegen (turnier.test.ts).
  */
 export async function loescheTurnier(jahr: number): Promise<void> {
 	await hole().db.delete(turnier).where(eq(turnier.jahr, jahr));
@@ -121,13 +146,22 @@ export async function benenneTurnier(turnierId: number, name: string): Promise<v
 
 /**
  * Wie `legeTurnierAn`, dazu diese Kategorien und offene Anmeldung (Anmeldeschluss 31. Mai des
- * Jahres). Gibt die Nummern von Turnier und Kategorien zurück, in der Reihenfolge der Werte.
+ * Jahres). Gibt Nummer und Jahr des Turniers und die Nummern der Kategorien zurück, in der
+ * Reihenfolge der Werte. Das feste Jahr wie bei `legeTurnierAn` nur für ältere Branches.
  */
 export async function legeOffenesTurnierAn(
-	jahr: number,
 	kategorien: KategorieWerte[]
-): Promise<{ turnierId: number; kategorieIds: number[] }> {
-	const turnierId = await legeTurnierAn(jahr);
+): Promise<TestTurnier & { kategorieIds: number[] }>;
+export async function legeOffenesTurnierAn(
+	festesJahr: number,
+	kategorien: KategorieWerte[]
+): Promise<TestTurnier & { kategorieIds: number[] }>;
+export async function legeOffenesTurnierAn(
+	erstes: number | KategorieWerte[],
+	zweites?: KategorieWerte[]
+): Promise<TestTurnier & { kategorieIds: number[] }> {
+	const kategorien = typeof erstes === 'number' ? (zweites ?? []) : erstes;
+	const { turnierId, jahr } = await legeTurnierAn(typeof erstes === 'number' ? erstes : undefined);
 	const kategorieIds: number[] = [];
 	for (const werte of kategorien) {
 		const r = await legeKategorieAn(hole().db, turnierId, werte);
@@ -137,7 +171,7 @@ export async function legeOffenesTurnierAn(
 	if ((await setzeStatus(hole().db, turnierId, 'offen', new Date())) !== 'ok') {
 		throw new Error(`Anmeldung zum Turnier ${jahr} liess sich nicht öffnen`);
 	}
-	return { turnierId, kategorieIds };
+	return { turnierId, jahr, kategorieIds };
 }
 
 /** Setzt die CM-Angaben eines erfundenen Mitglieds (FR-37); nicht genannte bleiben, wie sie sind. */

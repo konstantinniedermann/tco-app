@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import type { Klassierung } from '../../src/lib/turnier/klassierung.ts';
@@ -35,22 +35,6 @@ import {
 test.afterAll(async () => {
 	await schliesseLoginHilfen();
 });
-
-// Pro Jahr gibt es ein Turnier; jedes Projekt und jeder Test hat sein festes Jahr, das keine andere
-// E2E-Datei benutzt (vor jeder Änderung mit grep über tests/e2e prüfen). `legeOffenesTurnierAn`
-// löscht das Turnier des Jahres vorher.
-const JAHR_VON_HAND: Record<string, number> = { iphone: 2074, android: 2073, desktop: 2072 };
-const JAHR_ZUSAMMEN: Record<string, number> = { iphone: 2071, android: 2070, desktop: 2069 };
-const JAHR_ANFRAGEN: Record<string, number> = { iphone: 2068, android: 2067, desktop: 2066 };
-const JAHR_EINE_ANFRAGE: Record<string, number> = { iphone: 2065, android: 2064 };
-const JAHR_VERSCHIEBEN: Record<string, number> = { iphone: 2063, android: 2062, desktop: 2061 };
-const JAHR_EINZEILIG: Record<string, number> = { desktop: 2060 };
-
-function testjahr(jahre: Record<string, number>, info: TestInfo): number {
-	const jahr = jahre[info.project.name];
-	if (!jahr) throw new Error(`Kein Testjahr für das Projekt ${info.project.name}`);
-	return jahr;
-}
 
 // Summe der Klassierungen mindestens 9 (R1 = 1 … R9 = 9).
 const HERREN: KategorieWerte = {
@@ -139,8 +123,7 @@ test('A-ANMELDUNG-06, FR-46: CM-Admin meldet ein Paar von Hand an und ändert de
 }, info) => {
 	test.setTimeout(150_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_VON_HAND, info);
-	await legeOffenesTurnierAn(jahr, [HERREN]);
+	const { jahr } = await legeOffenesTurnierAn([HERREN]);
 	// Summe 1 + 2 = 3 liegt unter der Mindestsumme 9.
 	const anton = await legeHerrnAn('Anton', 'R1');
 	const beat = await legeHerrnAn('Beat', 'R2');
@@ -207,10 +190,10 @@ test('A-ANMELDUNG-06, FR-46: CM-Admin meldet ein Paar von Hand an und ändert de
 test('FR-46, FR-49: zwei Suchende zusammenlegen', async ({ page }, info) => {
 	test.setTimeout(120_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_ZUSAMMEN, info);
 	const {
+		jahr,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, [HERREN]);
+	} = await legeOffenesTurnierAn([HERREN]);
 	const carl = await legeHerrnAn('Carl', 'R5');
 	const dario = await legeHerrnAn('Dario', 'R6');
 	const kommentarCarl = 'Spiele lieber abends.';
@@ -244,11 +227,11 @@ test('FR-46, FR-49: zwei Suchende zusammenlegen', async ({ page }, info) => {
 test('FR-48: offene Anfrage als Paar anmelden und löschen', async ({ page }, info) => {
 	test.setTimeout(150_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_ANFRAGEN, info);
 	const {
+		jahr,
 		turnierId,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, [HERREN]);
+	} = await legeOffenesTurnierAn([HERREN]);
 	const gian = await legeHerrnAn('Gian', 'R5');
 	const hugo = await legeHerrnAn('Hugo', 'R6');
 	const ivo = await legeHerrnAn('Ivo', 'R4');
@@ -320,11 +303,11 @@ test('FR-48: nur eine offene Anfrage je Kategorie (Mitglied)', async ({ page }, 
 	test.skip(info.project.name === 'desktop', 'nur Handy'); // skip: Mitglieder fragen am Handy an; die Verwaltung am Computer prüfen die Tests oben
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_EINE_ANFRAGE, info);
 	const {
+		jahr,
 		turnierId,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, [HERREN]);
+	} = await legeOffenesTurnierAn([HERREN]);
 	// Ein gemeinsamer Zusatz im Nachnamen: Die Suche danach findet Marco und Nico.
 	const zusatz = randomUUID().slice(0, 6);
 	const leo = await legeKontoMitBriefCodeAn('Leo', `Probe${zusatz}`);
@@ -383,10 +366,10 @@ test('FR-46: CM-Admin verschiebt, korrigiert die Klassierung und löscht; nicht 
 }, info) => {
 	test.setTimeout(150_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_VERSCHIEBEN, info);
 	const {
+		jahr,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, [HERREN, HERREN_B]);
+	} = await legeOffenesTurnierAn([HERREN, HERREN_B]);
 	// Summe 4 + 5 = 9 und 6 + 7 = 13: Beide Paare passen in beide Kategorien.
 	const ole = await legeHerrnAn('Ole', 'R4');
 	const pius = await legeHerrnAn('Pius', 'R5');
@@ -476,10 +459,10 @@ test('PC: Anfrage mit zwei Tasten bleibt ohne «Ändern»', async ({ page }, inf
 	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: einzeilig erst ab 60rem; am Handy scrollt die Tabelle waagrecht
 	test.setTimeout(120_000);
 	const fehler = sammleKonsolenfehler(page);
-	const jahr = testjahr(JAHR_EINZEILIG, info);
 	const {
+		jahr,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn(jahr, [HERREN]);
+	} = await legeOffenesTurnierAn([HERREN]);
 	const sandro = await legeHerrnAn('Sandro', 'R4');
 	const timo = await legeHerrnAn('Timo', 'R5');
 	const urs = await legeHerrnAn('Urs', 'R6');
