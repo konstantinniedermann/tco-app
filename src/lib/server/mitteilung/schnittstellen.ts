@@ -13,9 +13,12 @@ import {
 	antwort,
 	formatFehler,
 	istJson,
+	jetzt,
 	leseKoerper,
+	mitSitzung,
+	nichtGefunden,
 	type Ereignis
-} from '../login/schnittstellen.ts';
+} from '../http.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
 import { parseId } from '../parse-id.ts';
 import { loescheAbo, pruefeAbo, speichereAbo } from './abo.ts';
@@ -27,17 +30,6 @@ import { versende, vorschau, type PushSender } from './versand.ts';
 
 // Für die Mitglieder: ohne Push-Sender und Mailer.
 export type MitteilungDienste = { db: Db; vapidOeffentlich: string | null; jetzt?: () => Date };
-
-const jetzt = (d: MitteilungDienste) => (d.jetzt ?? (() => new Date()))();
-
-async function mitSitzung(
-	e: Ereignis,
-	fn: (konto: AngemeldetesKonto) => Promise<Response>
-): Promise<Response> {
-	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
-	return fn(konto);
-}
 
 async function stand(d: MitteilungDienste, konto: AngemeldetesKonto) {
 	return {
@@ -108,8 +100,6 @@ type Ziel =
 	| { art: 'verein' }
 	| { art: 'anlass'; anlass: NonNullable<Awaited<ReturnType<typeof ladeAnlassKopf>>> };
 
-const jetztAdmin = (d: AdminDienste) => (d.jetzt ?? (() => new Date()))();
-const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
 const bezug = (z: Ziel) =>
 	z.art === 'anlass'
 		? { art: 'anlass' as const, anlassId: z.anlass.id }
@@ -134,7 +124,7 @@ function verlauf(art: Ziel['art']): AdminHandler {
 			mitZiel(d, e, art, async (z) =>
 				antwort(200, {
 					vorlagen: z.art === 'anlass' ? vorlagenAnlass(z.anlass) : [],
-					verlauf: await ladeVerlauf(d.db, bezug(z), jetztAdmin(d))
+					verlauf: await ladeVerlauf(d.db, bezug(z), jetzt(d))
 				})
 			)
 		);
@@ -163,7 +153,7 @@ function mitEmpfaengern(art: Ziel['art'], fn: (v: Versand) => Promise<Response>)
 								ziel.anlass.id,
 								// Geprüft gegen ANLASS_AUSWAHLEN.
 								p.werte.auswahl as AnlassAuswahl,
-								jetztAdmin(d)
+								jetzt(d)
 							)
 						: await vereinEmpfaenger(d.db);
 				return fn({ d, ziel, werte: p.werte, empf, absenderId: urheber.mitgliedId });
@@ -206,7 +196,7 @@ function sendenFuer(art: Ziel['art']): AdminHandler {
 				auswahl: werte.auswahl,
 				weg: werte.weg
 			},
-			jetztAdmin(d)
+			jetzt(d)
 		);
 		return antwort(201, z);
 	});

@@ -7,10 +7,12 @@ import {
 	antwort,
 	formatFehler,
 	istJson,
+	jetzt,
 	leseKoerper,
+	mitSitzung,
+	nichtGefunden,
 	type Ereignis
-} from '../login/schnittstellen.ts';
-import type { AngemeldetesKonto } from '../login/sitzung.ts';
+} from '../http.ts';
 import { pruefeAntwort } from './angaben.ts';
 import {
 	kommendeAnlaesse,
@@ -24,21 +26,9 @@ import { baueKalender } from './kalender.ts';
 export type AnlassDienste = { db: Db; jetzt?: () => Date };
 export type AnlassEreignis = Ereignis & Pick<RequestEvent, 'params'>;
 
-const jetzt = (d: AnlassDienste) => (d.jetzt ?? (() => new Date()))();
-const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
-
 /** Für den Browser: statt der Kennung der Link zur Kalenderdatei. */
 export function fuerBrowser({ kalenderKennung, ...rest }: AnlassMitglied) {
 	return { ...rest, kalender: `/api/kalender/${kalenderKennung}` };
-}
-
-async function mitSitzung(
-	e: AnlassEreignis,
-	fn: (konto: AngemeldetesKonto) => Promise<Response>
-): Promise<Response> {
-	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
-	return fn(konto);
 }
 
 export function getAnlaesse(d: AnlassDienste, e: AnlassEreignis): Promise<Response> {

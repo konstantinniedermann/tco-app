@@ -39,27 +39,12 @@ const S06_HTTP = '06: antwort, formatFehler, istJson, leseKoerper, Ereignis wand
  */
 export const AUSNAHMEN = [
 	{
-		von: 'anlass/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
 		von: 'cm/schnittstellen.ts',
 		nach: 'login/schnittstellen.ts',
 		schritt: S06_HTTP
 	},
 	{
 		von: 'gespraech/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
-		von: 'mitteilung/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
-		von: 'profil/schnittstellen.ts',
 		nach: 'login/schnittstellen.ts',
 		schritt: S06_HTTP
 	},
