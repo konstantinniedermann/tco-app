@@ -8,6 +8,15 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.7 — Vertragstests der Schnittstellen (Refactoring Schritt 03)
+
+- Neue Tests halten das heutige Verhalten der Schnittstellen fest, bevor der Server umgebaut wird:
+  ohne Anmeldung wird abgewiesen, schreibende Anfragen ohne JSON ebenso; jede Route ruft die
+  vorgesehene Funktion mit den vorgesehenen Diensten; die Bremsen gegen Durchprobieren zählen
+  über alle Wege zusammen (#80).
+- Die Schnittstellen der Mitglieder stehen je Modul in einer Liste, wie bisher die der Verwaltung.
+  Am Verhalten der App ändert sich nichts.
+
 ## 0.20.6 — E2E-Tests verlässlicher (Refactoring Schritt 02)
 
 - Jeder E2E-Lauf baut in einen eigenen Ordner (`.e2e-build/`) und räumt ihn danach weg. Ein Build

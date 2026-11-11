@@ -173,3 +173,12 @@ export function postZustand(d: MitteilungAdminDienste, e: AdminEreignis): Promis
 		return antwortOderWeg(await ladeGespraech(d.db, id, jetzt));
 	});
 }
+
+// Die Schnittstellen der Mitglieder zum Gespräch; die Grundprüfung
+// (`src/lib/server/grundpruefung.db.test.ts`) läuft über jeden Eintrag. Die der Verwaltung stehen
+// in TURNIER_SCHNITTSTELLEN.
+export const GESPRAECH_SCHNITTSTELLEN = {
+	getGespraech,
+	postGespraech,
+	postGelesen
+} satisfies Record<string, (d: CmDienste, e: CmEreignis) => Promise<Response>>;

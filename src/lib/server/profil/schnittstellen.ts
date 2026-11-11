@@ -149,3 +149,14 @@ export function postEmailBestaetigen(d: ProfilDienste, e: Ereignis): Promise<Res
 		return r === 'ok' ? antwort(200, {}) : antwort(400, { fehler: 'falsch' });
 	});
 }
+
+// Alle Schnittstellen des eigenen Profils; die Grundprüfung
+// (`src/lib/server/grundpruefung.db.test.ts`) läuft über jeden Eintrag.
+export const PROFIL_SCHNITTSTELLEN = {
+	getProfil,
+	postProfil,
+	postKlassierung,
+	postRufname,
+	postEmail,
+	postEmailBestaetigen
+} satisfies Record<string, (d: ProfilDienste, e: Ereignis) => Promise<Response>>;

@@ -85,3 +85,12 @@ export async function getKalender(d: AnlassDienste, e: AnlassEreignis): Promise<
 		}
 	});
 }
+
+// Alle Schnittstellen der Mitglieder zu Anlässen; die Grundprüfung
+// (`src/lib/server/grundpruefung.db.test.ts`) läuft über jeden Eintrag.
+export const ANLASS_SCHNITTSTELLEN = {
+	getAnlaesse,
+	getAnlass,
+	postAnmeldung,
+	getKalender
+} satisfies Record<string, (d: AnlassDienste, e: AnlassEreignis) => Promise<Response>>;
