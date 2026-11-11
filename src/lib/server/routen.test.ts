@@ -303,6 +303,7 @@ const MITGLIEDER = new Set<unknown>(
 
 const routenModule = import.meta.glob<Record<string, unknown>>('/src/routes/api/**/+server.ts');
 const schnittstellenModule = import.meta.glob('/src/lib/server/**/*schnittstellen.ts');
+const name = (f: unknown) => (f as { name?: string }).name || '(ohne Namen)';
 const adresse = (pfad: string) => pfad.slice('/src/routes'.length, -'/+server.ts'.length);
 
 // Jede Funktion der Schnittstellen-Module zeichnet nur auf, wer sie womit aufgerufen hat, und
@@ -355,6 +356,8 @@ describe('Verdrahtung der Routen', () => {
 			const route = adresse(pfad);
 			const modul = await laden();
 			const soll = ROUTEN[route];
+			// Eine Route ohne Eintrag meldet der Test oben.
+			if (soll === undefined) continue;
 			const methoden = 'eigen' in soll ? [...soll.eigen] : Object.keys(soll);
 			expect([route, Object.keys(modul).sort()]).toEqual([route, methoden.sort()]);
 			if ('eigen' in soll) continue;
@@ -365,15 +368,15 @@ describe('Verdrahtung der Routen', () => {
 				const wer = `${methode} ${route}`;
 				expect([wer, aufrufe.length]).toEqual([wer, 1]);
 				const [aufruf] = aufrufe;
+				// Der Name macht die Meldung lesbar; entscheidend ist dieselbe Funktion.
+				expect([wer, name(aufruf.funktion)]).toEqual([wer, name(funktion)]);
 				expect([wer, aufruf.funktion === funktion]).toEqual([wer, true]);
 				// Dienste und Anfrage, in der Reihenfolge der Funktion (getSitzung: Anfrage zuerst).
-				const dienste = EINSTIEGE[einstieg]();
-				expect([wer, aufruf.args.length]).toEqual([wer, 2]);
-				expect([wer, aufruf.args.includes(dienste), aufruf.args.includes(e)]).toEqual([
-					wer,
-					true,
-					true
-				]);
+				expect([wer, aufruf.args.length, aufruf.args.includes(e)]).toEqual([wer, 2, true]);
+				const von = Object.entries(EINSTIEGE)
+					.filter(([, hole]) => aufruf.args.includes(hole()))
+					.map(([schluessel]) => schluessel);
+				expect([wer, von]).toEqual([wer, [einstieg]]);
 				expect([wer, r === aufruf.antwort]).toEqual([wer, true]);
 			}
 		}
