@@ -8,6 +8,14 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.8 — Hilfsmittel für den Umbau der Oberfläche (Refactoring Schritt 04)
+
+- Neuer Hilfsbefehl `make css-vergleich`: vergleicht die gebauten Stylesheets zweier Builds Byte für
+  Byte. Er dient als Beweis, wenn das Stylesheet später in mehrere Dateien geteilt wird. Ein
+  Werkzeug auf Abruf, ohne Wirkung auf die App (#80).
+- Prüfliste der Stellen, an denen E2E-Tests an CSS-Klassen, SvelteKit-Interna und Antworten der
+  Schnittstellen hängen (`docs/refactoring-analyse.md`).
+
 ## 0.20.7 — Vertragstests der Schnittstellen (Refactoring Schritt 03)
 
 - Neue Tests halten das heutige Verhalten der Schnittstellen fest, bevor der Server umgebaut wird:

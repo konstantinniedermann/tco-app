@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev dev-handy seed admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
+.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev dev-handy seed admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief css-vergleich
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -79,6 +79,9 @@ build: ## Produktions-Build
 
 musterbrief: voraussetzungen ## Musterbrief als PDF mit erfundenen Daten (musterbrief/musterbrief.pdf)
 	node scripts/musterbrief.ts
+
+css-vergleich: voraussetzungen ## Gebautes CSS zweier Builds vergleichen, Beweis für Schritt 18: make css-vergleich VORHER=<Ordner> NACHHER=<Ordner> (Ablauf im Kopf von scripts/css-vergleich.ts; nicht Teil von check)
+	node scripts/css-vergleich.ts '$(VORHER)' '$(NACHHER)'
 
 image: voraussetzungen-docker ## Docker-Image bauen (mytco:lokal)
 	docker build -t mytco:lokal .
