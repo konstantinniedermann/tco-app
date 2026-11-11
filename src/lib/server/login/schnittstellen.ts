@@ -5,10 +5,6 @@ import { antwort, formatFehler, istJson, leseKoerper, type Ereignis } from '../h
 import type { LoginDienst, LoginErgebnis } from './dienst.ts';
 import { SITZUNG_COOKIE, SITZUNG_GUELTIG_MS } from './sitzung.ts';
 
-// Übergang in Schritt 06: Die Themen-Module holen die Bausteine noch hier, bis jedes auf http.ts
-// umgestellt ist; die letzte Umstellung streicht diese Zeile.
-export { antwort, formatFehler, istJson, leseKoerper, type Ereignis };
-
 // Keine explizite `secure`-Option: SvelteKit setzt sie, ausser im Entwicklungsserver (darum
 // klappt der Login bei `make dev-handy` übers WLAN) oder wenn die Anfrage-URL http://localhost
 // ist. adapter-node nimmt ohne PROTOCOL_HEADER immer https an; der E2E-Test für WebKit meldet

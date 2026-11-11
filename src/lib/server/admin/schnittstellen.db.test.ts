@@ -14,7 +14,8 @@ import {
 import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
 import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
-import { antwort, getSitzung } from '../login/schnittstellen.ts';
+import { antwort } from '../http.ts';
+import { getSitzung } from '../login/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
 import {
 	ADMIN_SCHNITTSTELLEN,
