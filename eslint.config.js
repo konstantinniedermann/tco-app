@@ -29,8 +29,6 @@ const ENDUNG = '(?:\\.(?:ts|js))?';
 /** Alle Ordner unter src/lib/server/; der Test hält sie mit der Platte gleich. */
 export const MODULE = ['db', 'login', ...THEMEN];
 
-const S06_HTTP = '06: antwort, formatFehler, istJson, leseKoerper, Ereignis wandern nach http.ts';
-
 /**
  * Heutige Verletzungen: `von` und `nach` sind Dateien relativ zu src/lib/server/. `schritt` nennt den
  * Schritt aus docs/refactoring-analyse.md, der die Ausnahme abbaut, oder «bleibt: …» mit Grund.
@@ -38,11 +36,6 @@ const S06_HTTP = '06: antwort, formatFehler, istJson, leseKoerper, Ereignis wand
  * @type {{ von: string; nach: string; schritt: string }[]}
  */
 export const AUSNAHMEN = [
-	{
-		von: 'turnier/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
 	{
 		von: 'gespraech/schnittstellen.ts',
 		nach: 'cm/schnittstellen.ts',

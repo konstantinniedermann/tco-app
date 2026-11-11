@@ -39,7 +39,7 @@ import {
 	postAntwort,
 	postZustand
 } from '../gespraech/schnittstellen.ts';
-import { antwort } from '../login/schnittstellen.ts';
+import { antwort, eingabeFehler, jetzt, nichtGefunden } from '../http.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
 import { parseId } from '../parse-id.ts';
@@ -56,10 +56,6 @@ import {
 	setzeStatus,
 	type HinfaelligeAnfrage
 } from './turniere.ts';
-
-const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
-const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });
-const jetzt = (d: AdminDienste) => (d.jetzt ?? (() => new Date()))();
 
 /** Höchstlänge des Suchtexts für Spieler. */
 const SUCHE_MAX = 100;
