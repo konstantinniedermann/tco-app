@@ -130,20 +130,6 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Verifiziert:** 09.11.2026 gegen `dev` e947d25 — belegt (`verwaltung-doppel.ts` → `loescheDoppel` ruft `anfragenVerfallen` nicht auf; `doppel.ts` → `nimmAnfrageAn` ohne Prüfung der Anmeldung des Anfragenden). Offen ist nur die Umsetzung.
 
-### 2026-11-09 — E2E: zwei iPhone-Tests der Mitgliederverwaltung nur im Gesamtlauf rot
-
-**Thema:** Tests
-
-**Fundort:** `tests/e2e/verwaltung.test.ts` — «A-MITGLIED-02: zwei Admins am selben Mitglied …» und «UI-06: Verwaltung nicht erreichbar – Fehlerseite …», Projekt iphone
-
-**Beobachtung:** Im ersten `make check` (414 E2E) scheiterten beide an `toBeVisible` nach 5 s mit «waiting for navigation to finish» (`/verwaltung/mitglieder/2147483000` bzw. `/verwaltung/mitglieder`). Einzeln (`--project iphone`, ganze Datei) und im zweiten Gesamtlauf grün.
-
-**Ursprung:** Session K-42 (Kontaktdaten CM-Admin), `make check` vor dem Merge
-
-**Einschätzung:** Niedrig bis mittel. Sieht nach dem Zeitbudget unter Last auf WebKit aus (vgl. Memory zur E2E-Zeitgrenze); beim nächsten Auftreten Trace ansehen, nicht gleich die Wartezeit erhöhen.
-
-**Ursache (11.11.2026, Refactoring Schritt 02):** Kein Zeitbudget. Ein zweiter Build in `build/`, während der Lauf im selben Ordner läuft (im Lauf von K-42 ein E2E-Lauf des `cas-reviewer`), gibt dem laufenden Server eine neue `version.json`; SvelteKit lädt Seiten mit Status ab 400 dann endlos neu. Nachgestellt mit `npm run build` mitten im Lauf: genau diese zwei Tests rot. Nicht in `tests/e2e/` behebbar; offen ist der Entscheid zwischen Sperre in `scripts/e2e.ts`, eigenem Build-Ordner je Lauf oder nur einer Regel (`docs/refactoring-analyse.md`, «Erkenntnisse Schritt 02»).
-
 ### 2026-11-09 — Spielersuche zeigt dem CM-Admin Geschlecht und Jahrgang aller aktiven Mitglieder
 
 **Thema:** Datenschutz

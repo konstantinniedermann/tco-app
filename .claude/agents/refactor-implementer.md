@@ -16,6 +16,8 @@ die dir der Auftrag mit absolutem Pfad nennt. Den Hauptordner fasst du nicht an.
 - Dateien einzeln stagen, Commit-Präfixe `feat:`/`fix:`/`docs:`/`refactor:`/`test:`.
   Am Schluss der **volle** `make check` auf dem committeten Stand, auch wenn nur ein Ordner
   betroffen scheint (`make check-schnell` genügt nie); E2E im Hintergrund starten.
+- Nie zwei Builds oder Prüfläufe (`make check`, `make e2e`, `npm run build`) gleichzeitig im
+  selben Ordner starten: Sie teilen sich `test-results/` und Mailpit.
 - Verlangt der Schritt «Nachmessen vorab» und fehlt das Ergebnis im Dokument: nicht
   beginnen, sondern melden.
 - Neue Tests einmal absichtlich rot machen und das im Bericht belegen.

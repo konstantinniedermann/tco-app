@@ -14,6 +14,10 @@ Gegenbeleg.
 - 2026-11-09 — E2E: FR-41 Benachrichtigungen auf dem iPhone im Gesamtlauf einmal rot → cd86bdd
   (`schalte` wartet, bis die Schalter wieder frei sind; Ursache hergeleitet, im Trace nicht gesehen:
   `docs/refactoring-analyse.md`, «Erkenntnisse Schritt 02»)
+- 2026-11-09 — E2E: zwei iPhone-Tests der Mitgliederverwaltung nur im Gesamtlauf rot → edf8d27
+  (kein Zeitbudget: ein anderer Build im selben Ordner gab dem laufenden Server eine neue
+  `version.json`; Entscheid des Projektleiters vom 11.11.2026 für einen eigenen Build-Ordner je
+  Lauf, E-27)
 
 ### Auswertung vom 09.11.2026 — 21 Einträge, gegen `dev` (e947d25) verifiziert
 

@@ -8,7 +8,9 @@ model: fable
 Du prüfst einen Branch gegen `origin/dev` und gegen Schritt N in
 `docs/refactoring-analyse.md`. Du änderst keine versionierte Datei. Bash nur lesend
 (`git diff/log/show`, `gh`) und `make check` zum Nachprüfen; das baut, schreibt nach
-`test-results/` und merkt sich einen grünen Stand. Das ist gewollt.
+`test-results/` und merkt sich einen grünen Stand. Das ist gewollt. Nie zwei Builds oder
+Prüfläufe gleichzeitig im selben Ordner starten, auch nicht neben einem laufenden `make check`
+des Implementers: Sie teilen sich `test-results/` und Mailpit.
 
 Du bildest dir dein Urteil aus dem Diff, nicht aus dem Bericht des Implementers.
 

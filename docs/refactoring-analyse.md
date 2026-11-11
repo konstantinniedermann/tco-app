@@ -22,8 +22,8 @@ dieser Datei.
 | | |
 |---|---|
 | **Phase** | 4 Umsetzung, Etappe 0 (Stand 11.11.2026) |
-| **Erledigte Schritte** | 01 Startpaket |
-| **Nächster offener Schritt** | **02 E2E-Flakes beheben** (Subagent, Opus) |
+| **Erledigte Schritte** | 01 Startpaket, 02 E2E-Flakes |
+| **Nächster offener Schritt** | **03 Vertragstests der Schnittstellen** (Subagent, Opus) |
 | **Wartet auf Freigabe des Projektleiters** | nichts |
 | **Offene Fragen** | F-15 (muss erst vor Schritt 23 beantwortet sein) |
 | **Vorab nachzumessen** | vor Schritt 04, 07, 08, 11, 13, 19, 20, 23 (je beim Schritt beschrieben) |
@@ -405,9 +405,10 @@ Aufwand oder birgt ein benennbares Risiko; **niedrig** = Schönheitsfehler oder 
 #### B-10 — E2E-Tests auf dem iPhone-Profil unter Last wacklig · hoch · [G]
 
 - **Fundstelle:** `docs/beobachtungen.md` (drei offene Einträge zu `tests/e2e/verwaltung.test.ts`
-  und `tests/e2e/benachrichtigungen.test.ts`); 14 Stellen mit `test.setTimeout` zwischen 90 und
-  180 Sekunden; `waitForTimeout` in `tests/e2e/hilfe.test.ts` und
-  `tests/e2e/mitgliedschaft.test.ts`; acht Fallen-Notizen im Session-Gedächtnis zu E2E und CI.
+  und `tests/e2e/benachrichtigungen.test.ts`); 30 Aufrufe von `test.setTimeout` in 10 Dateien
+  (29 zwischen 90 und 180 Sekunden; berichtigt in Schritt 02, vorher «14»); `waitForTimeout` in
+  `tests/e2e/hilfe.test.ts`, `mitgliedschaft.test.ts`, `profil.test.ts` und `verwaltung.test.ts`
+  (berichtigt in Schritt 02, vorher nur die ersten zwei); acht Fallen-Notizen im Session-Gedächtnis zu E2E und CI.
 - **Auswirkung:** E2E ist das einzige Netz für die Oberfläche. Wenn es ohne Grund rot wird,
   kostet jeder Refactoring-Schritt zusätzliche Läufe, und ein echter Fehler wird leichter als
   «wieder ein Flake» abgetan. Darum Schritt 02 vor allem anderen.
@@ -1096,32 +1097,64 @@ nach und trägt das Ergebnis beim Schritt ein.
 | Nr. | Ziel | Dateien | Nutzen | Risiko | Absicherung | Voraussetzung | Modell | Weg | Nachmessen vorab | Status |
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
 | 01 | [geändert] **Startpaket.** Dieses Dokument ist in `docs/index.md` und `docs/context-scopes.md` verlinkt. Die neue Projekt-`CLAUDE.md` (Anhang A) ist nach Freigabe des Entwurfs durch den Projektleiter in Kraft. Die Sofort-Änderungen aus Anhang B an Skill und Agenten sind eingespielt (B.1, B.2). Reste sind entfernt (E-14, macht der Orchestrator) | `docs/index.md`, `docs/context-scopes.md` (eine Zeile), `CLAUDE.md`, `.claude/skills/tco-branching/SKILL.md`, `.claude/agents/refactor-*.md` | Alle Folgesessions finden Plan und Regeln; der Ablauf mit Subagenten ist beschrieben (A-01, A-02, A-04, A-11) | niedrig | `make docs`; nur Doku, darum keine Versionsnummer | Freigabe des Entwurfs der `CLAUDE.md` (Anhang A) | Fable | manuelle Session (Orchestrator, mit Projektleiter) | nein | **erledigt** 11.11.2026 (Branch `docs/refactoring-analyse`, nur Doku, keine Version) |
-| 02 | Die drei bekannten E2E-Flakes sind behoben; feste Wartezeiten ersetzt | `tests/e2e/verwaltung.test.ts`, `tests/e2e/benachrichtigungen.test.ts`, `tests/e2e/hilfe.test.ts`, `tests/e2e/mitgliedschaft.test.ts`, `tests/e2e/hilfen/` | Verlässliches Netz für alle weiteren Schritte (B-10) | niedrig | Drei volle `make e2e` hintereinander grün; Ursache je Flake mit Trace belegt, nicht nur Zeitgrenze erhöht | 01 | Opus | Subagent | nein | **teilweise** 11.11.2026 (Branch `refactor/schritt-02`, nur Tests): FR-41 und ein vierter Flake in A-MITGLIED-02 behoben, alle festen Wartezeiten ersetzt. **Die zwei Fehlerseiten-Flakes (A-MITGLIED-02, UI-06) sind nicht behoben:** Ursache liegt ausserhalb von `tests/e2e/`, Entscheid des Projektleiters (Erkenntnisse unten) |
+| 02 | Die drei bekannten E2E-Flakes sind behoben; feste Wartezeiten ersetzt | `tests/e2e/verwaltung.test.ts`, `tests/e2e/benachrichtigungen.test.ts`, `tests/e2e/hilfe.test.ts`, `tests/e2e/mitgliedschaft.test.ts`, `tests/e2e/hilfen/`; [geändert] erweitert nach Entscheid vom 11.11.2026: `scripts/e2e.ts` und `scripts/e2e.test.ts`, `vite.config.ts`, `playwright.config.ts`, `.gitignore`, `.prettierignore`, `.dockerignore`, `eslint.config.js` (eigener Build-Ordner je Lauf) | Verlässliches Netz für alle weiteren Schritte (B-10) | niedrig | Drei volle `make e2e` hintereinander grün; Ursache je Flake mit Trace belegt, nicht nur Zeitgrenze erhöht | 01 | Opus | Subagent | nein | **erledigt** 11.11.2026 (Branch `refactor/schritt-02`; Commits cd86bdd, 92c6d99 Tests, edf8d27 eigener Build-Ordner je Lauf, dazu Doku): alle drei bekannten Flakes und ein vierter behoben, feste Wartezeiten ersetzt; die Fehlerseiten-Flakes nach Entscheid (b) des Projektleiters (Erkenntnisse unten) |
 | 03 | [geändert] Der Bestand deckt für die Verwaltung 401 und 403 schon lückenlos (B-30). Es fehlen drei Dinge: (a) eine Liste je Mitglieder-Modul und eine Schleife «ohne Sitzung 401, schreibend ohne JSON 415» über alle Einträge, dazu 415 über die drei Verwaltungs-Listen; (b) ein Routen-Test: jede `+server.ts` wird geladen, und je Methode ist festgehalten, welche Schnittstellen-Funktion mit welchem Dienste-Einstieg sie aufruft (B-28); (c) ein Test, dass alle Dienste-Einstiege dieselben Bremsen teilen. 400 und 404 je Schnittstelle sind im Bestand ausreichend geprüft und bleiben, wie sie sind | neu: Listen in `cm`, `anlass`, `profil`, `gespraech`, `login/passkey-schnittstellen.ts`, `mitteilung` (Mitglieder-Teil); neuer Test neben `src/lib/server/` (Grundprüfung) und neben `src/routes/api/` (Routen); Vorbild: `admin/schnittstellen.db.test.ts`, `src/routes/api/status/status.db.test.ts` | Schliesst das Loch für die Schritte 06, 07 und 09 bis 11 | niedrig | Je Teil einmal absichtlich brechen: eine Grundprüfung entfernen, eine Route auf die falsche Funktion zeigen lassen | 01 | Opus | Subagent | nein | offen |
-| 04 | [geändert] Die vorhandenen Screenshots taugen nicht für einen Bildvergleich (B-33). Stattdessen zwei kleine Hilfsmittel: (a) Vergleich des gebauten Stylesheets vor und nach einem Schritt (muss für Schritt 18 Zeichen für Zeichen gleich sein); (b) eine Liste der CSS-Klassen und SvelteKit-Interna, an denen E2E-Tests hängen (aus B-31), als Prüfliste für die Schritte 15 bis 17. Einen Bildvergleich gibt es nicht (E-19) | neues Skript unter `scripts/` (vergleicht die CSS-Dateien aus zwei Builds), ein Abschnitt in diesem Dokument oder in `docs/testkonzept.md` | Beweis für Schritt 19 ohne Augenmass; keine Überraschungen bei den Schritten 15 bis 18 | niedrig | Eine absichtlich vertauschte Regel muss den Vergleich rot machen | 02 | Sonnet | Subagent | ja, kurz: wie Vite das Stylesheet bündelt (eine Datei oder mehrere), damit der Vergleich das Richtige vergleicht | offen |
+| 04 | [geändert] Die vorhandenen Screenshots taugen nicht für einen Bildvergleich (B-33). Stattdessen zwei kleine Hilfsmittel: (a) Vergleich des gebauten Stylesheets vor und nach einem Schritt (muss für Schritt 18 Zeichen für Zeichen gleich sein); (b) eine Liste der CSS-Klassen und SvelteKit-Interna, an denen E2E-Tests hängen (aus B-31), als Prüfliste für die Schritte 15 bis 17; [Nachtrag Schritt 02] dazu die Hilfe `wartetAufMitgliederliste` (`tests/e2e/hilfen/seite.ts`), die an `role="status"` und am Wortlaut «N Mitglied(er)» der Mitgliederliste hängt. Einen Bildvergleich gibt es nicht (E-19) | neues Skript unter `scripts/` (vergleicht die CSS-Dateien aus zwei Builds), ein Abschnitt in diesem Dokument oder in `docs/testkonzept.md` | Beweis für Schritt 19 ohne Augenmass; keine Überraschungen bei den Schritten 15 bis 18 | niedrig | Eine absichtlich vertauschte Regel muss den Vergleich rot machen | 02 | Sonnet | Subagent | ja, kurz: wie Vite das Stylesheet bündelt (eine Datei oder mehrere), damit der Vergleich das Richtige vergleicht | offen |
 | 05 | Lint-Regeln für die Richtung der Importe zwischen den Server-Modulen, zuerst nur als Bestandsaufnahme (heutige Ausnahmen aufgelistet) | `eslint.config.js` | Jeder spätere Schritt kann eine Ausnahme streichen; neue Zyklen fallen auf (B-09, B-14) | niedrig | Eine absichtlich falsche Import-Zeile muss rot werden | 01 (E-11: nur ESLint) | Sonnet | Subagent | nein | offen |
 
 **Erkenntnisse Schritt 02** (11.11.2026)
 
 - **Fehlerseiten-Flakes (A-MITGLIED-02 bei `/verwaltung/mitglieder/2147483000`, UI-06 bei
-  `/verwaltung/mitglieder`) — Ursache belegt, nicht behoben.** Wird `build/` neu gebaut, während
-  ein E2E-Lauf im selben Ordner läuft, liefert der laufende Server eine neue `version.json` zur alten
-  App. SvelteKit lädt jede Seite mit Status ab 400 dann neu (`updated.check()` in `navigate`), und
-  weil der alte Server weiter die alte App ausliefert, endlos: Playwright meldet «waiting for
-  navigation to finish». Nachgestellt: `npm run build` mitten in einem Lauf macht genau diese zwei
-  Tests rot (15 der 24 Läufe, alle nach dem Build; der Kontrolltest RR-07 blieb in 12 von 12 grün); eine untergeschobene
-  `version.json` ergibt 154 Neuladungen in 5 s. Auslöser im beobachteten Lauf (K-42, 09.11.): Der
-  Agent `cas-reviewer` startete während des `make check` im selben Worktree einen eigenen E2E-Lauf
-  (Session-Protokoll, 17:50). Kein Fehler der App (nach einer echten Auslieferung startet der Server
-  neu) und nicht mit Tests unter `tests/e2e/` behebbar. **Entscheid des Projektleiters:** (a)
-  `scripts/e2e.ts` verweigert einen zweiten Lauf im selben Ordner (Sperrdatei; klein, empfohlen),
-  (b) der Webserver baut je Lauf in einen eigenen Ordner (`playwright.config.ts`, Ausgabeordner des
-  Adapters), (c) nur die Regel «kein Build und kein E2E im selben Ordner, solange ein Lauf läuft»
-  für Sessions und Agenten (Skill bzw. Agent-Definition ausserhalb des Repos).
+  `/verwaltung/mitglieder`) — Ursache belegt, behoben nach Entscheid (b).** Wird `build/` neu
+  gebaut, während ein E2E-Lauf im selben Ordner läuft, liefert der laufende Server eine neue
+  `version.json` zur alten App. SvelteKit lädt jede Seite mit Status ab 400 dann neu
+  (`updated.check()` in `navigate`), und weil der alte Server weiter die alte App ausliefert,
+  endlos: Playwright meldet «waiting for navigation to finish». Nachgestellt: `npm run build`
+  mitten in einem Lauf macht genau diese zwei Tests rot (15 der 24 Läufe, alle nach dem Build; der
+  Kontrolltest RR-07 blieb in 12 von 12 grün); eine untergeschobene `version.json` ergibt 154
+  Neuladungen in 5 s. Auslöser im beobachteten Lauf (K-42, 09.11.): Der Agent `cas-reviewer`
+  startete während des `make check` im selben Worktree einen eigenen E2E-Lauf (Session-Protokoll,
+  17:50). Kein Fehler der App: Nach einer echten Auslieferung startet der Server neu.
+  - **Optionen:** (a) `scripts/e2e.ts` verweigert per Sperrdatei einen zweiten Lauf im selben
+    Ordner. Das deckt den Fall «zweiter `make check` oder `make build`» nicht: `check` baut vor
+    `e2e` selbst nach `build/`. (b) Jeder Lauf baut in einen eigenen Ordner. (c) Nur eine Regel für
+    Sessions und Agenten.
+  - **Entscheid des Projektleiters (11.11.2026): (b)** (E-27). Der Schritt ist dafür um Werkzeug
+    ausserhalb von `tests/e2e/` erweitert.
+  - **Umsetzung:** `scripts/e2e.ts` legt je Lauf `.e2e-build/<Name der Datenbank>/` fest und gibt
+    ihn als `MYTCO_E2E_BUILD` an Playwright. `vite.config.ts` baut dann nach
+    `<Ordner>/svelte-kit` (SvelteKits `outDir`) und `<Ordner>/build` (Ausgabe von `adapter-node`);
+    `playwright.config.ts` startet den Server von dort und bricht ohne Ordner ab. Beides braucht es:
+    Ein Build leert zu Beginn `.svelte-kit/output`, ein zweiter Build gleichzeitig mischte sonst
+    die Zwischenstände. Der fertige Server liest nur aus seinem Ordner (`adapter-node` legt `dir`
+    neben `index.js`, Hinweise auf `.svelte-kit` im Bündel sind nur Kommentare). Nach dem Lauf, auch
+    nach Ctrl-C, löscht das Skript den Ordner und stellt mit `svelte-kit sync` die Typ-Einstellungen
+    (`node_modules/$app/tsconfig.json`, die jeder Build auf seinen Ordner umschreibt) wieder auf
+    `.svelte-kit/`. Ordner abgebrochener Läufe, die älter als ein Tag sind, räumt der nächste Lauf
+    weg, wie die Datenbanken. `.e2e-build/` steht in `.gitignore`, `.prettierignore`,
+    `.dockerignore` und den ESLint-Ausnahmen. `npm run build`, `build:spa`, `make build`,
+    `make image`, Rauchtest und CI sind unverändert (ohne Variable gelten `build/` und
+    `.svelte-kit/`).
+  - **Nachstellen (vorher rot, nachher grün):** Im selben Worktree
+    `npm run e2e -- tests/e2e/verwaltung.test.ts:252 tests/e2e/verwaltung.test.ts:380
+    tests/e2e/verwaltung.test.ts:186 --project=iphone --repeat-each=12 --workers=3` starten
+    (A-MITGLIED-02, UI-06, Kontrolle RR-07). Sind etwa zwölf Tests gelaufen, `npm run build` und
+    danach einen zweiten `npm run e2e` mit einem Test starten. Vor der Umsetzung 15 Läufe rot wie
+    oben; danach 36 von 36 grün, obwohl `build/` eine neue `version.json` bekam. Zwei Läufe und
+    ein `npm run build` gleichzeitig gestartet: beide Läufe 12 von 12 grün. Die Logik des Ordners
+    (Name, Löschen, Aufräumen alter Ordner) prüft `scripts/e2e.test.ts`, zuerst rot (4 Tests,
+    Funktionen fehlten).
+  - **Bleibt als Regel:** Nie zwei Builds oder Prüfläufe gleichzeitig im selben Ordner;
+    `test-results/` und Mailpit teilen sich die Läufe weiterhin (Agent-Definitionen
+    `refactor-implementer`, `refactor-reviewer`).
 - **Vierter Flake, behoben:** Die Mitgliederliste fragt 200 ms nach dem Anzeigen an; die Hilfen
   warteten nur auf die Überschrift, ein folgendes `page.goto` brach die Anfrage ab (WebKit meldet
   das als Seitenfehler). Unter Last 5 von 30 Läufen von A-MITGLIED-02 rot, mit der neuen Hilfe
-  `wartetAufMitgliederliste` 0 von 30. Betraf jede Datei mit eigenem «Verwaltung öffnen».
+  `wartetAufMitgliederliste` 0 von 30. Umgestellt sind die Dateien, in denen nach der Liste ein
+  `page.goto` folgt: `verwaltung`, `mitgliedschaft`, `briefe`, `wappen` (zweite Stelle),
+  `cm-gespraech` und `cm-verwaltung` (die beiden letzten hatten die Prüfung schon von Hand).
+  `anlass.test.ts:43`, `einlesen.test.ts:56` und die erste Stelle in `wappen.test.ts` warten weiter
+  nur auf die Überschrift; harmlos, weil dort ein Klick folgt (Seitenwechsel ohne neues Dokument).
 - **FR-41 — Ursache hergeleitet, nicht im Trace gesehen.** In 230 Läufen unter Last nicht
   wieder aufgetreten. Belegt ist: Ein Neuladen während einer laufenden Anfrage an
   `/api/benachrichtigungen` ergibt genau die beobachtete Meldung. Die einzige Anfrage, die beim
@@ -1136,8 +1169,8 @@ nach und trägt das Ergebnis beim Schritt ein.
   bleibt bewusst eine Frist von 1,5 s: «keine Mail» hat kein Ende-Signal (SI-04), die Prüfung bricht
   aber beim ersten Treffer ab; ohne Frist belegt es `login/mailcode.db.test.ts`. Unverändert, weil
   kein Warten auf die Seite: die gestellte Verzögerung in `bewegung.test.ts` und die Abfrage-Abstände
-  in `hilfen/login.ts` und `mitteilungen.test.ts`. Die 14 Stellen mit `test.setTimeout` hat der
-  Schritt nicht angefasst.
+  in `hilfen/login.ts` und `mitteilungen.test.ts`. Die 30 Aufrufe von `test.setTimeout` in 10
+  Dateien (29 zwischen 90 und 180 s, einer mit 60 s) hat der Schritt nicht angefasst.
 - **Mail-Budget und drei Läufe:** Die Bremsen leben im Arbeitsspeicher des Servers (B-16), und jeder
   `make e2e` startet einen eigenen Server. Drei Läufe hintereinander teilen das Budget darum nicht.
 - **Nachweis:** drei volle `make e2e` hintereinander auf cd86bdd grün (je 414 bestanden, 57
@@ -1170,7 +1203,7 @@ nach und trägt das Ergebnis beim Schritt ein.
 
 | Nr. | Ziel | Dateien | Nutzen | Risiko | Absicherung | Voraussetzung | Modell | Weg | Nachmessen vorab | Status |
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
-| 19 | [geändert] Alte offene App-Versionen (E-09): Die App erkennt mit den Bordmitteln von SvelteKit, dass eine neue Version ausgeliefert ist, und lädt beim nächsten Seitenwechsel neu. Der Eigenbau (`MINDESTVERSION`, `istVersionVertraeglich`) wird entfernt, `/api/status` nennt nur noch Status und Version. Die Doku sagt danach genau das. **Deckt das Bordmittel die Anforderung nicht, nur entfernen und die Doku auf «gibt es noch nicht» korrigieren** | `vite.config.ts`, `src/routes/+layout.svelte`, `src/lib/server/version.ts`, `status.ts` und ihre Tests, `Dockerfile` (Healthcheck liest nur `status`), `docs/ci-cd-und-release.md` | Doku und Code sagen dasselbe (B-04) | mittel | Neuer Test «nach neuer Version lädt der nächste Seitenwechsel neu» (E2E oder Einheit, je nach Bordmittel); `status.db.test.ts` angepasst; Rauchtest des Images | Nachmessen erledigt | Opus | Subagent | **ja, zwingend (E-09):** über den Svelte-MCP-Server prüfen, was SvelteKit in der eingesetzten Version bietet (Versionskennung des Builds, Abfrage-Abstand, Verhalten bei `ssr = false`) und ob es die Zusage «alte App lädt neu» deckt [V] | offen |
+| 19 | [geändert] Alte offene App-Versionen (E-09): Die App erkennt mit den Bordmitteln von SvelteKit, dass eine neue Version ausgeliefert ist, und lädt beim nächsten Seitenwechsel neu. Der Eigenbau (`MINDESTVERSION`, `istVersionVertraeglich`) wird entfernt, `/api/status` nennt nur noch Status und Version. Die Doku sagt danach genau das. **Deckt das Bordmittel die Anforderung nicht, nur entfernen und die Doku auf «gibt es noch nicht» korrigieren** | `vite.config.ts`, `src/routes/+layout.svelte`, `src/lib/server/version.ts`, `status.ts` und ihre Tests, `Dockerfile` (Healthcheck liest nur `status`), `docs/ci-cd-und-release.md` | Doku und Code sagen dasselbe (B-04) | mittel | Neuer Test «nach neuer Version lädt der nächste Seitenwechsel neu» (E2E oder Einheit, je nach Bordmittel); `status.db.test.ts` angepasst; Rauchtest des Images | Nachmessen erledigt | Opus | Subagent | **ja, zwingend (E-09):** über den Svelte-MCP-Server prüfen, was SvelteKit in der eingesetzten Version bietet (Versionskennung des Builds, Abfrage-Abstand, Verhalten bei `ssr = false`) und ob es die Zusage «alte App lädt neu» deckt [V]. [Nachtrag aus dem Review von Schritt 02, als Ausgangspunkt nachzuprüfen] Das Bordmittel ist schon aktiv: Version ist der Zeitstempel des Builds, weil `kit.version` nicht gesetzt ist; abgefragt wird stündlich und wenn der Tab wieder in den Vordergrund kommt; neu geladen wird nur bei Seitenstatus ab 400 und wenn das Nachladen von Code scheitert, nicht beim normalen Seitenwechsel. `kit.version.name` ist bewusst festzulegen. Die Endlosschleife bei dauerhaft abweichender `version.json` (Erkenntnisse Schritt 02) ist ein Betriebsrisiko für den Checkpoint. Ein Test kann `version.json` per `page.route` unterschieben | offen |
 | 20 | E2E-Hilfen aufgeräumt (festes Turnierjahr weg, Datei nach Themen geteilt); ungenutzte Exporte entfernt | `tests/e2e/hilfen/login.ts`, einzelne Dateien unter `src/lib/` | Kleinere Hilfen, weniger tote Namen (B-11, B-18) | niedrig | E2E voll; `svelte-check` | 11 (E-11: reicht Handarbeit nicht, Paketvorschlag zur Freigabe) | Sonnet | Subagent | ja: Die Liste ungenutzter Exporte stammt aus einer Textsuche [E]; vorab je Name bestätigen | offen |
 
 ### 7.6 Etappe 4 — Doku und Arbeitsweise
@@ -1236,6 +1269,7 @@ sie hebt die Übergangsregeln auf.
 | **E-24** [neu] | (11.11.2026) Die Sofort-Änderungen B.1a, B.1b und B.2a bis B.2c (Skill `tco-branching`, Agenten `refactor-*`) sind freigegeben und mit Schritt 01 eingespielt. |
 | **E-25** [neu] | (11.11.2026) Die Vorschläge für Dateien ausserhalb des Repos werden nicht eingespielt, sondern als Beobachtung in der gemeinsamen `beobachtungen.md` notiert; der Projektleiter entscheidet sie bei der nächsten Auswertung. Die Vorschläge «nach dem Refactoring» (B.1c, B.1d, B.3d, B.4b, B.7) bleiben den Schritten 23 und 24 zugeordnet. |
 | **E-26** [neu] | (11.11.2026) Etappe 0 läuft nach Schritt 01 ohne Halt durch (Schritte 02 bis 05), Checkpoint am Etappenende. In den Etappen 1 und 2 Checkpoint nach jedem Schritt (7.7). |
+| **E-27** [neu] | (11.11.2026, Schritt 02) Die Fehlerseiten-Flakes werden mit einem eigenen Build-Ordner je E2E-Lauf behoben (Option b): Eine Sperre nur in `scripts/e2e.ts` deckte einen zweiten `make check` oder `make build` im selben Ordner nicht. Der normale Build, `make image`, Rauchtest und Image bleiben unverändert. |
 
 ---
 

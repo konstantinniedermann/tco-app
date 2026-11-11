@@ -121,6 +121,10 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
   (`mytco_e2e_<Zeit>_<Zufall>`) und löscht sie danach; Reste abgebrochener Läufe, die älter als
   ein Tag sind, räumt der nächste Lauf weg. Die lokale Datenbank `mytco` gehört so nur
   `make seed`, `make dev` und `make dev-handy` und wächst nicht mit den Testkonten der Läufe.
+  Ebenso baut jeder Lauf in einen eigenen Ordner (`.e2e-build/<Name der Datenbank>/`, über
+  `MYTCO_E2E_BUILD` in `vite.config.ts`) und löscht ihn danach: Ein anderer Build im selben Ordner
+  gäbe dem laufenden Server sonst eine neue `version.json`, und SvelteKit lüde Fehlerseiten endlos
+  neu.
 - Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
   (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
 - E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern im Format

@@ -68,8 +68,10 @@ vorher einmal `make seed`). Eine Migration, die schon eingespielt wurde, wird da
 erzeugt — eine Änderung kommt als neue Migration dazu.
 
 **E2E und `make check` nehmen `mytco` nicht:** `npm run e2e` (`scripts/e2e.ts`) legt für jeden
-Lauf eine eigene, frisch migrierte Datenbank an und löscht sie danach. Parallele Läufe stören
-sich darum nicht über die Datenbank, und Screenshots entstehen immer auf frischem Stand. Den
+Lauf eine eigene, frisch migrierte Datenbank an und löscht sie danach; ebenso baut jeder Lauf in
+einen eigenen Ordner unter `.e2e-build/`. Parallele Läufe stören sich darum nicht über die
+Datenbank, und ein anderer Build im selben Worktree verändert den laufenden Testserver nicht.
+Screenshots entstehen immer auf frischem Stand. Den
 Mail-Fänger Mailpit und den Ordner `test-results` teilen sie weiter: Im selben Worktree nicht
 gleichzeitig `make check` und einen Push mit voller Prüfung laufen lassen. Verbietet eine
 Migration alte Werte (z. B. eine Rolle aus einem Check entfernt), scheitert nur noch `make seed`
