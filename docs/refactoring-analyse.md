@@ -21,13 +21,15 @@ dieser Datei.
 
 | | |
 |---|---|
-| **Phase** | 4 Umsetzung, Etappe 0 abgeschlossen, Checkpoint Etappenende steht an (Stand 11.11.2026) |
+| **Phase** | 4 Umsetzung, **Etappe 0 abgeschlossen, Zwischenrevision erledigt** (11.11.2026, Abschnitt 1b) |
 | **Erledigte Schritte** | 01 Startpaket, 02 E2E-Flakes, 03 Vertragstests, 04 Hilfsmittel für Etappe 2, 05 Lint-Regeln für die Richtung der Importe |
-| **Nächster offener Schritt** | **06** (Grundbausteine der Schnittstellen an einem Ort, Zeile in 7.3; Subagent, Opus), nach dem Checkpoint Etappenende |
-| **Wartet auf Freigabe des Projektleiters** | der Checkpoint Etappenende (Ist das Netz dicht?); dazu die Antwort auf F-16 (sieben Ausnahmen ohne abbauenden Schritt, Erkenntnisse Schritt 05); die Dienst-Typen müssen vor Schritt 07 geklärt sein, `liest`/`schreibt` vor Schritt 09, nicht vor Schritt 06 |
-| **Offene Fragen** | **F-16 [OFFEN]** (Ort von `liest`/`schreibt` und der Dienst-Typen; vor Schritt 07 bzw. 09); F-15 (muss erst vor Schritt 23 beantwortet sein) |
-| **Vorab nachzumessen** | vor Schritt 07, 08, 11, 13, 19, 20, 23 (je beim Schritt beschrieben); für Schritt 04 erledigt |
-| **Nächster Checkpoint** | **Ende Etappe 0 (jetzt)**; in den Etappen 1 und 2 nach jedem Schritt (E-26) |
+| **Nächster offener Schritt** | **06** (Grundbausteine der Schnittstellen an einem Ort, Zeile in 7.3 mit den Änderungen aus 1b; Subagent, Opus), nach dem Ok des Projektleiters für Etappe 1 |
+| **Wartet auf Freigabe des Projektleiters** | **Ok für Etappe 1 (F-19) und die Antwort auf F-16** (Empfehlung A1: neuer Schritt 06a vor Schritt 07). Dazu F-17 (Muster für Verwaltungs-Schnittstellen ausserhalb von `admin/`, vor Schritt 09) und F-18 (Vorschlag zur `CLAUDE.md`). Schritt 06 braucht F-16 und F-17 noch nicht |
+| **Offene Fragen** | **F-16 [OFFEN, geändert]**, **F-17 [OFFEN]**, **F-18 [OFFEN]**, **F-19 [OFFEN]** (alle in 1b); F-15 (erst vor Schritt 23) |
+| **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
+| **Nach dem Ok (Orchestrator)** | die Änderungen aus 1b in die Zeilen von 7.3 bis 7.6 übertragen; bei F-18 = A die `CLAUDE.md` vor Schritt 06 anpassen |
+| **Vorab nachzumessen** | vor Schritt 07, 08, **09 [neu]**, **10 [neu]**, 11, 13, 19, 20, 23 (je beim Schritt und in 1b beschrieben); für Schritt 04 erledigt |
+| **Nächster Checkpoint** | nach Schritt 06; in den Etappen 1 und 2 nach jedem Schritt (E-26) |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25) |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
 
@@ -116,6 +118,344 @@ Gegenüber der ersten Fassung (Commit `7e4b68a`):
 10. **Eine neue offene Frage:** F-15 (wann steigt die Version, solange es Test nicht gibt).
 11. **Zwei Anhänge:** A mit dem Entwurf der Projekt-`CLAUDE.md`, B mit Vorschlägen für Skill,
     Agenten und die Dateien ausserhalb des Repos.
+
+---
+
+## 1b Zwischenrevision Etappe 0 (11.11.2026) [neu]
+
+Stand: `origin/dev` nach dem Merge von Schritt 05 (Commit `bad624f`, Version 0.20.9). Gelesen:
+dieses Dokument (Abschnitte 1 bis 2.3, B-12 bis B-15, 5 bis 10, Anhang B), `CLAUDE.md`, der Diff
+`3593dde..HEAD`, die neuen Tests und Werkzeuge ganz (`grundpruefung.db.test.ts`, `routen.test.ts`,
+`importrichtung.test.ts`, `eslint.config.js`, Diffs von `scripts/e2e.ts`, `vite.config.ts`,
+`playwright.config.ts`, `Makefile`), `bauregel.ts` ganz, alle sieben `index.ts`, die Köpfe und
+Hilfsfunktionen aller `schnittstellen.ts`, `hooks.server.ts`, `.githooks/pre-commit`. Nichts gebaut,
+nichts getestet. Was nicht geprüft ist, steht am Schluss.
+
+**Diese Revision ändert die Zeilen des Plans in Abschnitt 7 nicht.** Jede Änderung steht hier mit
+[geändert] oder [neu]; sie gilt erst mit dem Ok des Projektleiters und wird dann in die Zeilen
+übertragen.
+
+### Urteil
+
+1. **Das Zielbild (Abschnitt 6) trägt.** Zwei Ergänzungen in 6.1 Punkt 8: der Zusammenbau
+   (`dienste.ts`) als oberste Schicht, die kein Server-Modul importiert, und die Rechteprüfung in
+   einer Datei von `admin/`, die keine Schnittstellen-Datei ist.
+2. **Der Plan der Etappe 1 geht auf, aber nicht so, wie er dasteht.** Die zwei Fristen von F-16
+   widersprechen sich; dafür braucht es einen neuen kleinen Schritt 06a vor Schritt 07. Schritt 09
+   ist grösser als «niedrig» und braucht ein Nachmessen, Schritt 10 hat kein Ziel für `getSitzung`,
+   Schritt 11 ist beim Gespräch kleiner als geplant. Kein Schritt entfällt.
+3. **Das Netz trägt die Schritte 06, 06a, 07 und 10.** Für 08, 09 und 11 hat es je eine Stelle mit
+   falschem Grün (Fehlerwörter; eine neue Verwaltungs-Liste fällt aus den Rechte-Schleifen). Drei
+   kleine Charakterisierungstests fehlen im Plan.
+4. **Die Reihenfolge 06 → 06a → 07 → 08 → 09 → 10 → 11 → 12 stimmt.** Schritt 07 gehört vor 09 und
+   11, weil alle drei die Import-Zeilen der Routen und die Bauregel anfassen.
+5. **Checkpoint-Nachweis liegt vor:** E2E dreimal voll grün auf `bad624f` (je 414 bestanden,
+   57 übersprungen; 3,8 / 5,3 / 4,1 Minuten, gemessen vom Orchestrator [E]); CI zum Merge von
+   Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) [G].
+
+### Änderungen am Plan
+
+Belege je Zeile; Dateien unter `src/lib/server/`, wenn nichts anderes steht.
+
+| Schritt | Was | Warum (Beleg) |
+|---------|-----|---------------|
+| 06 [geändert] | **Dateien:** Die «fünf Routen», `src/hooks.server.ts` und `bauregel.ts` sind nach heutigem Stand nicht betroffen. Dazu kommen `login/passkey-schnittstellen.ts` und die Tests, die `antwort` oder `Ereignis` aus `login/schnittstellen.ts` holen | Die fünf Routen importieren nur `postBrief`, `postMailCode`, `postMail`, `postLogout`, `getSitzung`; der Hook nur `behandleFehler` und `ladeSitzungSicher`, die in `login` bleiben; `bauregel.ts` kennt keinen Pfad nach `login/schnittstellen.ts` [G] |
+| 06 [geändert] | **Kein reines Verschieben an drei Stellen:** (1) `mitKonto` in `admin` und in `profil` sind zwei verschiedene Funktionen mit gleichem Namen; nur die von `profil` ist ein `mitSitzung`. (2) `aendernd` gibt es in zwei Formen (`cm`: ohne Körper, `profil`: mit gelesenem Körper). (3) `jetzt(d)` ist je Dienst-Typ getippt und wird eine Funktion über `{ jetzt?: () => Date }`. Der Schritt legt die Form fest und begründet sie. `nichtAngemeldet` (Passkey, 401 `{}`) und das 401 `{}` von `getSitzung` bleiben bis Schritt 08 | `admin/schnittstellen.ts` → `mitKonto` ruft `zugang.pruefe` und antwortet auch 403; `profil/schnittstellen.ts` → `mitKonto` prüft nur die Sitzung; `cm/schnittstellen.ts` und `profil/schnittstellen.ts` → `aendernd` [G]. Berichtigt B-12 (Befund B-38) |
+| 06 [neu] | **Absicherung:** ein Fall «ohne Sitzung und ohne JSON antwortet 415» für eine schreibende Schnittstelle der Mitglieder, vor dem Verschieben | Die Reihenfolge «erst Format, dann Sitzung» in `aendernd` hält kein Test fest: Die Grundprüfung prüft beides mit Absicht getrennt, die Modul-Tests schicken `text/plain` immer mit Konto [E, Textsuche nach `text/plain`]. Für die Sicherheit ohne Belang, für «kein geändertes Verhalten» schon |
+| 06 | **Risiko bleibt niedrig,** Modell und Weg bleiben | Routen-Test und Grundprüfung sind vom Ort der Bausteine unabhängig; die Lint-Regel ist vorbereitet (`eslint.config.js`, Kommentar zu Ebene 1) [G] |
+| 06a [neu] | **Neuer Schritt, wenn F-16 mit A beantwortet wird: Rechteprüfung und Dienst-Typen stehen nicht mehr in Schnittstellen-Dateien.** `mitRolle`, `liest`, `schreibt`, `AdminDienste`, `AdminEreignis`, `AdminUrheber` ziehen in eine Datei in `admin/` (Arbeitstitel `admin/rechte.ts`); `MitteilungAdminDienste`, `CmDienste`, `CmEreignis` in eine Nicht-Schnittstellen-Datei ihres Moduls. **Dateien:** `admin/`, `mitteilung/`, `cm/`, `gespraech/`, `turnier/` (Importe), ihre Tests, `eslint.config.js` (sieben Ausnahmen weg). **Risiko:** niedrig (Verschieben innerhalb der Module; die Rechteprüfung bleibt an einer Stelle und unverändert). **Absicherung:** Rechte-Matrix, `admin/schnittstellen.db.test.ts`, `turnier/schnittstellen.db.test.ts`, `mitteilung/admin-schnittstellen.db.test.ts`, Grundprüfung, Routen-Test unverändert grün; der Reviewer prüft, dass `mitRolle` bis auf den Ort gleich ist. **Voraussetzung:** 06, F-16. **Modell:** Opus. **Weg:** Subagent. **Nachmessen:** nein. Branch `refactor/schritt-06a` | F-16 setzt zwei Fristen (Dienst-Typen vor 07, `liest`/`schreibt` vor 09). Das geht nicht auf: `MitteilungAdminDienste` ist `AdminDienste & { … }` (`mitteilung/schnittstellen.ts`, Typ `MitteilungAdminDienste`) [G]. Zieht der Typ in Schritt 07 in eine neue Datei und `AdminDienste` erst in Schritt 09, importiert die neue Datei bis dahin `admin/schnittstellen.ts`: eine neue Ausnahme. Beides zusammen vor 07 braucht keine |
+| 07 [geändert] | **Voraussetzung:** 06a statt «durch F-16 zu klären». **Dateien:** dazu `src/hooks.server.ts` (`holeDb`, `holeLoginDienst`) und `login/schnittstellen.db.test.ts`. **Lint:** die neue Regel gilt in beide Richtungen: `dienste.ts` darf alles importieren, und kein Modul unter `src/lib/server/` importiert `dienste.ts`. **Einstiege bleiben träge** (nichts beim Laden der Datei bauen) | Wer ausser Routen die Einstiege holt: Hook, zwei Tests, `bauregel.ts` [G, Textsuche]. `init` läuft beim Bauen mit, `leseEinstellungen` gäbe es dort nicht (`hooks.server.ts` → `init`) [G] |
+| 07 [neu] | **Absicherung, Charakterisierungstest vorab:** Mit gesetztem `MAIL_NUR_AN` geht jede Mail über jeden Einstieg nur an diese Adresse (über die echten Einstiege, Attrappe `nodemailer` wie im Bremsen-Test) | Die Umleitung (`leiteUm`) hängt heute fünfmal von Hand am Versender (`login`, `admin`, `profil`, `cm`, `mitteilung/index.ts`) [G]; geprüft ist sie nur als Einzelfunktion (`login/mail.test.ts`) [E]. Fehlt sie nach dem Zusammenlegen an einem Weg, bleibt alles grün, und Test-Mails gingen an echte Adressen |
+| 07 [geändert] | **Absicherung, Bauregel:** Der Schritt ändert in `bauregel.ts` die Muster `AUS_INDEX`, `ERLAUBTER_IMPORT`, `MITTEILUNG_INDEX` und die Prüfung «Dienste nur direkt als erstes Argument». Je geändertes Muster ein Fall in `bauregel.test.ts`, einmal rot; der Reviewer liest diesen Diff ganz | Die Muster hängen an `admin/index.ts` und `mitteilung/index.ts` [G]. Das ist mehr als eine Import-Zeile: Es ist der Schutz, den Schritt 12 «unangetastet» nennt (Befund A-18) |
+| 07 | **Risiko bleibt mittel.** Dass ein Einstieg ein Einzelstück bleibt, deckt der Routen-Test schon (er ruft den Einstieg zweimal und vergleicht das Objekt) | `routen.test.ts`, zweiter Test [G] |
+| 08 [geändert] | **Dateien:** dazu `login/passkey-schnittstellen.ts` und `login/schnittstellen.ts` (401 `{}`), ihre Gegenstücke in der Oberfläche, `grundpruefung.db.test.ts` (`OHNE_SITZUNG_ANDERS`). **Absicherung:** Server und Abruf-Module sind beide gegen die gemeinsame Liste getippt (ein fehlendes Wort macht `svelte-check` rot); Einheitstests der Abruf-Module und die `page.route`-Stellen der Prüfliste (b) nehmen ihre Wörter aus der Liste, nicht als Text | Falsches Grün nach B-29: Tests der Oberfläche und die zwölf `page.route`-Stellen tragen von Hand geschriebene Antworten. Ein auf dem Server umbenanntes Wort bleibt in allen dreien grün [G für die Stellen, V für die Folge] |
+| 09 [geändert] | **Risiko mittel statt niedrig. Nachmessen vorab: ja.** Vorab festlegen, nach welchem Muster Verwaltungs-Schnittstellen ausserhalb von `admin/` liegen (gilt auch für Schritt 11): eigene Datei je Modul mit eigener Liste, oder gemischte Datei wie `mitteilung/schnittstellen.ts` mit Namens-Wächter in der Bauregel (Frage F-17). **Voraussetzung:** 06a | (1) Die Menge der Verwaltungs-Listen führen fünf Stellen von Hand (Befund B-37). (2) `bauregel.ts` → `ERLAUBTER_IMPORT` kennt für Admin-Routen nur `admin`, `mitteilung`, `turnier`; den Wächter «Routen ausserhalb von `api/admin/` dürfen die Verwaltungs-Namen nicht importieren» gibt es nur für `mitteilung` (`pruefeMitteilungImporte`). Schritt 09 ändert also den Schutz, nicht nur «feste Pfade» [G] |
+| 09 [neu] | **Absicherung, Charakterisierungstest vorab (erster Commit):** eine Schleife «ohne Sitzung 401, ohne Rolle 403 `kein-admin`, unbestätigt 403 `unbestaetigt`» über **alle** Verwaltungs-Listen an einer Stelle (Grundprüfung, `verwaltungsDienste()`), mit den vier benannten Ausnahmen (`getZugang`, `postZugang`, `postZugangCode`, `postAnsichtBeenden`) | Diese Schleife gibt es heute nur je Liste in der Testdatei des Moduls, mit fester Zahl (26 in `admin/schnittstellen.db.test.ts`, 26 in `turnier/schnittstellen.db.test.ts`) [G]. Zieht ein Schritt fünf Einträge in eine neue Liste und senkt die Zahl, prüft sie niemand mehr auf 401 und 403, und alles bleibt grün |
+| 10 [geändert] | **Nachmessen vorab: ja (kurz). Modell Opus statt Sonnet,** solange das Ziel nicht feststeht. Der Plan nennt keinen Ort für `getSitzung`. Bedingungen: Die Datei muss auf `schnittstellen.ts` enden (Routen-Test); nicht `admin/` (die Bauregel verbietet `/api/sitzung` den Import aus `admin`); nicht direkt unter `src/lib/server/` (Schicht 2 erlaubt nur `db/`); ein neuer Ordner braucht einen Eintrag in `THEMEN`. Bleibt ein bestehendes Thema oder ein neues Modul | `bauregel.ts` → `ADMIN_MODUL`; `eslint.config.js` → `gruppe('.')`, `MODULE`; `importrichtung.test.ts` («genau die Ordner») [G] |
+| 10 [geändert] | **`AnsichtRolle` «muss mit» ist falsch herum:** `getSitzung` zieht nach oben, der Typ muss nach unten. Er ist aus der Konstante `ANSICHT_ROLLEN` in `admin/rollen.ts` abgeleitet; Konstante oder Typ ziehen nach `login/` (oder `db/`), `admin/rollen.ts` holt sie von dort. **Dateien:** dazu `login/sitzung.ts`, `admin/rollen.ts`, `scripts/importrichtung.test.ts` | `admin/rollen.ts` → `AnsichtRolle`; `login/sitzung.ts` → `AngemeldetesKonto.ansicht` [G]. Der Test «eine Ausnahme gibt nur ihre Datei und ihr Ziel frei» benutzt genau die Ausnahme `login/sitzung.ts` → `admin/rollen.ts`; fällt sie weg, wird er rot und braucht eine gestellte Ausnahme [G] |
+| 11 [geändert] | **Beim Gespräch kleiner als geplant:** Die vier Schnittstellen der Verwaltung liegen schon in `gespraech/schnittstellen.ts`; `turnier/schnittstellen.ts` reicht sie nur weiter und führt sie in `TURNIER_SCHNITTSTELLEN`. Zu tun bleibt: eigene Liste, Rechte-Schleife, Bauregel. **Bei der CM grösser:** Muster aus Schritt 09 (F-17); `cm/schnittstellen.ts` hat schon 430 Zeilen. **Voraussetzung:** dazu 06a | `turnier/schnittstellen.ts` → Import aus `gespraech/schnittstellen.ts`, `export { getAdminGespraech, … }`, `TURNIER_SCHNITTSTELLEN` [G] |
+| 12 [geändert] | **Voraussetzung:** dazu 06 und 06a. **Vorab prüfen:** ob der Fall-Test `it.each(AUSNAHMEN …)` mit leerer Liste grün bleibt («bleibt dann grün» ist nicht belegt [V]). Die Regel für `dienste.ts` (Schritt 07) gehört zu «jede Regel einmal verletzen» | `importrichtung.test.ts` → «Ausnahme … ist noch nötig» [G] |
+| 18 [geändert] | **Absicherung:** dazu den Vergleich einmal für den SPA-Build ziehen oder begründen, warum nicht | Erkenntnisse Schritt 04, «Nicht belegt»; steht nicht in der Zeile |
+| 19 [geändert] | In der Spalte «Voraussetzung» steht «Nachmessen erledigt». Gemeint ist die Bedingung, nicht der Stand: Das Nachmessen ist offen | Zeile 19, Spalten «Voraussetzung» und «Nachmessen vorab» [G] |
+| 20 [geändert] | **Aufnehmen oder ausdrücklich verwerfen:** (a) Reihenfolge im `finally` von `scripts/e2e.ts` (Review Schritt 02, dort «Kandidat für Schritt 20»); (b) «schreibend» erkennen Grundprüfung und Routen-Test am Präfix `post`, die Rechte-Matrix an «nicht `get`» | Beide Hinweise stehen nur in den Erkenntnissen, in keiner Zeile [G] |
+| 21 [geändert] | **Dateien:** dazu die Prüfung der Importrichtung und `make css-vergleich` in der Liste der Prüfungen (`docs/ci-cd-und-release.md` oder `docs/testkonzept.md`) | Der Diff der Etappe trägt dort nur den Build-Ordner nach [G] |
+| Zählung [geändert] | Mit 06a sind es 26 Schritte (Kurzfazit, 1a Punkt 2, Kopf von Abschnitt 7 nennen 25). Die Nummern 07 bis 25 bleiben, damit `CLAUDE.md` und die Lint-Liste stimmen | `eslint.config.js` → `AUSNAHMEN[].schritt` nennt Schrittnummern [G] |
+| Zielbild 6.1 Punkt 8 [geändert] | Ergänzen: «Der Zusammenbau (`dienste.ts`) ist die oberste Schicht; kein Server-Modul importiert ihn. Die Rechteprüfung der Verwaltung liegt in `admin/`, nicht in einer Schnittstellen-Datei» | Folgt aus den Zeilen 06a und 07 |
+
+**Unverändert geprüft, stimmt:** die Schritte 13 bis 17, 22 bis 25 (keine veraltete Angabe gefunden;
+nur die Zeilen gelesen, nicht die Dateien dahinter). Abschnitt 6.3 passt zu 06a («Rechteprüfung …
+höchstens der Ablageort»).
+
+**Zur Reihenfolge**
+
+- **Rechteprüfung verlegen (F-16):** gehört vor Schritt 07, nicht erst vor 09 (Zeile 06a).
+  Vor Schritt 06 ist sie nicht nötig und dort ungünstig: `liest` und `schreibt` benutzen
+  `antwort`, `istJson`, `formatFehler`, `leseKoerper`, die Schritt 06 gerade verlegt.
+- **Schritt 07 vor 08 und 09:** vor 09 und 11 ja (Import-Zeilen der Routen und die Muster der
+  Bauregel werden einmal umgestellt, 09 und 11 bauen darauf). Zu 08 gibt es keine Abhängigkeit.
+- **Schritt 08 vor 09 bis 11:** bleibt. 08 ändert Antworten, 09 bis 11 verschieben Funktionen;
+  nacheinander stören sie sich nicht.
+- **Kosten nach E-07:** Die Etappe 1 erzeugt acht weitere Versionen (06, 06a, 07 bis 12).
+
+### Trägt das Netz die Etappe 1?
+
+| Schritt | Deckt | Deckt nicht |
+|---------|-------|-------------|
+| 06 | Grundprüfung (401 über 36, 415 über 26 und 42, je mit Körper und `no-store`), Tests der Module, `ansicht.db.test.ts` für den Riegel | Reihenfolge «415 vor 401» ohne Sitzung (Zeile 06 [neu]); der Hook selbst hat keinen eigenen Test, er läuft nur in E2E mit [E] |
+| 06a | Rechte-Matrix und die Schleifen je Liste; die Lint-Probe «Ausnahme ist noch nötig» | nichts Benennbares |
+| 07 | Routen-Test (Funktion, Einstieg, Einzelstück), Bremsen-Test (Wirkung über vier Wege), E2E | Umleitung `MAIL_NUR_AN` je Weg (Zeile 07 [neu]); welcher Versender (einzeln oder Pool) einen Weg bedient; die Fehlergrenzen für Passkey, Brief und Mail-Code und die Mitteilungs-Verwaltung (schon in den Erkenntnissen Schritt 03 benannt) |
+| 08 | Grundprüfung (Körper je Antwort), Tests der Module | Wort auf dem Server geändert, in der Oberfläche nicht (B-29; Zeile 08) |
+| 09, 11 | Routen-Test: Admin-Routen rufen nur Einträge der Verwaltungs-Listen, andere Routen nie (das Gegenstück zur Bauregel als Verhalten); Rechte-Matrix für die bekannten Listen | Eine **neue** Liste steht in keiner 401/403-Schleife und nicht in der Rechte-Matrix, bis jemand sie einträgt (Zeile 09 [neu]); eine zu weit gefasste Bauregel fällt nur an `bauregel.test.ts` auf |
+| 10 | `login/schnittstellen.db.test.ts` (zieht mit), Routen-Test (`OHNE_LISTE`), E2E Startseite | `getSitzung` steht in keiner Liste; ihr 401 prüft nur ihr eigener Test |
+
+**Bleibt (gut gelöst):** Wirkung statt Identität im Bremsen-Test; die eine Tabelle `ROUTEN`;
+benannte Ausnahmen mit der heutigen Antwort statt stiller Lücken; die Probe, dass jede
+Lint-Ausnahme noch gebraucht wird; der eigene Build-Ordner je E2E-Lauf.
+
+**Zusätzliche Charakterisierungstests, die der Plan noch nicht nennt:** drei, alle klein und oben
+eingetragen (06: Reihenfolge; 07: `MAIL_NUR_AN` über alle Wege; 09: Rechte-Schleife über alle
+Verwaltungs-Listen). Der wichtigste ist der dritte.
+
+### Neue Befunde
+
+#### B-37 — Die Menge der Verwaltungs-Listen führen fünf Stellen von Hand · mittel · [G]
+
+- **Fundstelle:** `src/lib/server/admin/rechte-matrix.db.test.ts` (zweimal die drei Listen
+  zusammengefügt); `admin/schnittstellen.db.test.ts`, `turnier/schnittstellen.db.test.ts`,
+  `mitteilung/admin-schnittstellen.db.test.ts` (je eine Schleife über die eigene Liste, feste Zahl);
+  `grundpruefung.db.test.ts` → `verwaltungsDienste`; `routen.test.ts` → `VERWALTUNG`;
+  `scripts/pruefungen/bauregel.ts` → `adminSchnittstellen`.
+- **Auswirkung:** Nichts zwingt eine neue Liste in alle fünf. Der Routen-Test fängt nur, dass eine
+  Admin-Route eine ungelistete Funktion ruft, nicht, dass eine Liste ungeprüft bleibt. Die Schritte
+  09 und 11 legen neue Listen an: Zeile 09 [neu].
+
+#### B-38 — Berichtigung zu B-12: zwei der «Duplikate» sind keine · niedrig · [G]
+
+- **Fundstelle:** `admin/schnittstellen.ts` → `mitKonto` (prüft Rolle, kann 403 antworten) gegen
+  `profil/schnittstellen.ts` → `mitKonto` (nur Sitzung); `cm/schnittstellen.ts` → `aendernd` (ohne
+  Körper) gegen `profil/schnittstellen.ts` → `aendernd` (mit Körper).
+- **Auswirkung:** «`mitKonto` zweimal» in B-12 verleitet dazu, zwei verschiedene Prüfungen
+  zusammenzulegen. Schritt 06 ist an diesen Stellen ein Entwurf, kein Verschieben.
+
+#### B-39 — Die Bauregel gilt für jede Datei unter `src/routes/`, auch für Tests · niedrig · [G]
+
+- **Fundstelle:** `scripts/pruefungen/bauregel.ts` → `pruefeBauregel` (`inRoutes`, `ADMIN_MODUL`);
+  Folge: `src/lib/server/routen.test.ts` liegt nicht neben den Routen (Kopf der Datei). Unter
+  `src/routes/api/` liegen heute drei Tests (`bremsen.db.test.ts`, `kontakt/kontakt.test.ts`,
+  `status/status.db.test.ts`); keiner importiert `lib/server/admin`.
+- **Auswirkung:** Ein Test neben einer Route kann die Verwaltung nicht direkt prüfen. Das ist
+  hinnehmbar; eine Ausnahme für Tests wäre eine Änderung am Schutz. Empfehlung: so lassen.
+
+#### B-40 — Über `make` geht der Exit-Code eines Skripts verloren · niedrig · [E]
+
+- **Fundstelle:** `Makefile` → `css-vergleich`; `scripts/css-vergleich.ts` (Exit 1 für «anders»,
+  2 für falschen Aufruf); belegt von Hand in den Erkenntnissen Schritt 04, hier nicht nachgestellt.
+- **Auswirkung:** `make` meldet für jeden Fehlschlag denselben Wert. Wer «anders» von «falsch
+  aufgerufen» unterscheiden muss (Schritt 18), ruft das Skript direkt auf. Kein Umbau nötig.
+
+#### B-41 — Der Test der Importrichtung liest Quelltext der App · niedrig · [G]
+
+- **Fundstelle:** `scripts/importrichtung.test.ts` → «Ausnahme … ist noch nötig» (`lintFiles` über
+  die echten Dateien) und die zwei Ordner-Wächter (`readdirSync`); `CLAUDE.md`, «Tests»: «Kein
+  Test liest Quelltext der App».
+- **Auswirkung:** Gewollt und nützlich, aber quer zum Wortlaut der Regel. Die Regel sollte sagen,
+  dass Lint und Prüfskripte die Struktur prüfen dürfen (Vorschlag unten).
+
+**Nachtrag zu B-03 (kein neuer Befund) [G]:** Die Etappe 0 hat vier Versionen erzeugt (0.20.6 bis
+0.20.9, `docs/versionen.md`), alle für Tests und Werkzeug «ohne Wirkung auf die App».
+
+#### A-14 — Für Prüfwerkzeuge gibt es kein Commit-Präfix; die Etappe hat drei benutzt · niedrig · [G]
+
+- **Fundstelle:** `e1f23be` `feat:` (Hilfsskript, mitten im Feature-Stopp), `d536f0b` `test:`
+  (ändert `eslint.config.js`, keinen Test), `edf8d27` `fix:` (Werkzeug für E2E);
+  `.claude/agents/refactor-implementer.md` nennt fünf Präfixe ohne `chore`.
+- **Auswirkung:** Keine technische: Die Versionsregel hängt an den Dateien, nicht am Präfix [E,
+  Textsuche in `version-merge.ts` und `nur-doku.ts`]. Die Historie liest sich aber falsch (ein
+  `feat:` im Feature-Stopp). Gehört zum Vorschlag B.3a (`chore:`), nicht in die Projekt-`CLAUDE.md`.
+
+#### A-15 — «Test zuerst rot» lässt sich nicht als Commit belegen · niedrig · [G]
+
+- **Fundstelle:** `.githooks/pre-commit` → `make check-schnell` → `npm run test:einheit`: Ein Commit
+  mit rotem Einheitstest wird abgewiesen (ein roter Datenbanktest nicht, er läuft dort nicht mit).
+- **Auswirkung:** Das Rot steht nur im Bericht (so in den Schritten 03 bis 05 gemacht). Das ist
+  in Ordnung und in `refactor-implementer.md` so verlangt; die `CLAUDE.md` braucht es nicht.
+
+#### A-16 — «Nie zwei Builds oder Prüfläufe gleichzeitig» steht nur bei zwei Agenten · mittel · [G]
+
+- **Fundstelle:** `.claude/agents/refactor-implementer.md` und `refactor-reviewer.md`; Auslöser der
+  Fehlerseiten-Flakes war laut Erkenntnissen Schritt 02 ein anderer Agent (`cas-reviewer`) [E].
+- **Auswirkung:** Der eigene Build-Ordner (E-27) schützt den E2E-Lauf. Zwei `make check` oder
+  `npm run build` im selben Ordner mischen weiterhin `build/` und `.svelte-kit/`. Die Regel
+  bindet nur, wer eine der zwei Definitionen liest. Vorschlag unten.
+
+#### A-17 — Drei Stellen der `CLAUDE.md` passen nicht mehr zum Plan · niedrig · [G]
+
+- «Ab Schritt 12: Die Importrichtung … setzt ESLint durch; keine neue Ausnahme»: ESLint setzt sie
+  seit Schritt 05 durch; offen ist nur die Liste der Ausnahmen.
+- «Ab Schritt 07: … kein zweiter Mail- oder Push-Versender»: Das Zielbild (6.1 Punkt 2) sieht
+  einen zweiten Mail-Versender für den Massenversand vor.
+- «Eine neue Schnittstelle der Verwaltung kommt in ihre Liste»: Seit Schritt 03 haben auch die
+  Mitglieder Listen, und eine neue **Liste** nennt die Regel nicht (B-37).
+
+#### A-18 — Die Schritte 07, 09 und 11 ändern die Bauregel, laufen aber als gewöhnliche Schritte · niedrig · [G]
+
+- **Fundstelle:** Abschnitt 7.1 («Fable, wo eine Regel oder ein Schutz verändert wird»); Zeile 12
+  («die Sicherheitsregel bleibt unangetastet»); `bauregel.ts` → `ERLAUBTER_IMPORT`, `AUS_INDEX`,
+  `pruefeMitteilungImporte`.
+- **Auswirkung:** Der Plan behandelt die Änderungen an der Bauregel als «feste Pfade». In den
+  Schritten 09 und 11 sind es neue erlaubte Module und ein neuer Wächter. Empfehlung: Modell
+  lassen, aber den Diff an `bauregel.ts` im Review ganz lesen und je Muster einen roten Fall
+  verlangen (Zeilen 07 und 09).
+
+**Nicht aufgenommen, weil nicht belegbar:** eine «falsche Angabe im Auftrag zum Datum der
+Testdaten». Der Auftrag an den Umsetzer liegt nicht im Repo; belegt ist nur die Begründung im Test
+selbst (`grundpruefung.db.test.ts`, Kommentar über `start`). **Ohne Nummer, schon in den
+Erkenntnissen:** `svelte-check` prüft `eslint.config.js` mit (Schritt 05, hier nicht nachgeprüft);
+der Kommentar über `holeBremsen` ist unvollständig (Schritt 03; erledigt sich mit Schritt 07).
+
+### Vorschlag zur Projekt-`CLAUDE.md`
+
+Nur ein Vorschlag; geändert wurde nichts. Geprüft gegen die Aufnahmeregel (weist an, gilt immer,
+Schaden ohne die Regel). Schrittnummern und die Namen `http.ts` und `dienste.ts` stimmen mit dem
+Plan überein.
+
+```diff
+ ## Tests
+ 
+ - Jede Änderung am Verhalten beginnt mit einem Test, der vorher rot war.
+-- Tests prüfen Verhalten: Kein Test liest Quelltext der App, kein Schnappschuss-Vergleich.
++- Tests prüfen Verhalten: Kein Test liest Quelltext der App, kein Schnappschuss-Vergleich. Die
++  Struktur prüfen nur ESLint und die Prüfskripte unter `scripts/`.
+ - Fachlogik läuft im Test gegen die echte Datenbank; Attrappen nur für Mail, Push, Uhr und Abruf.
+ - E2E nur über `make e2e` bzw. `npm run e2e`. Elemente über Rolle und Beschriftung suchen, nicht
+   über CSS-Klassen; keine festen Wartezeiten.
+-- Eine neue Schnittstelle der Verwaltung kommt in ihre Liste, damit die Rechte-Tests sie prüfen.
++- Eine neue Schnittstelle kommt in die Liste ihres Moduls. Eine neue Liste der Verwaltung kommt
++  in Grundprüfung, Routen-Test, Rechte-Matrix und Bauregel.
++- Nie zwei Builds oder Prüfläufe (`make check`, `make e2e`, `npm run build`) gleichzeitig im
++  selben Ordner.
+```
+
+```diff
+ ## Übergangsregeln während des Refactorings
+ 
+ - Ab Schritt 06: Antwort, JSON-Prüfung, Körper lesen und die Standardantworten kommen nur aus
+   `src/lib/server/http.ts`; kein Themen-Modul definiert sie selbst.
+-- Ab Schritt 07: Dienste entstehen nur in `src/lib/server/dienste.ts`; kein zweiter
+-  Mail- oder Push-Versender.
++- Ab Schritt 06a: Rechteprüfung der Verwaltung und Dienst-Typen stehen in keiner
++  `schnittstellen.ts`.
++- Ab Schritt 07: Dienste, Mail- und Push-Versender entstehen nur in
++  `src/lib/server/dienste.ts`; kein Modul unter `src/lib/server/` importiert diese Datei.
+ - Ab Schritt 08: eine Fehlerform `{ fehler, felder? }`; Fehlerwörter nur aus der gemeinsamen
+   Liste, die Server und Oberfläche teilen.
+-- Ab Schritt 12: Die Importrichtung zwischen den Server-Modulen setzt ESLint durch; keine neue
+-  Ausnahme.
++- Die Importrichtung zwischen den Server-Modulen setzt ESLint durch. Keine neue Ausnahme in
++  `AUSNAHMEN` (`eslint.config.js`) ohne Entscheid des Projektleiters; ab Schritt 12 ist die
++  Liste leer.
+```
+
+- **Die Zeile «Ab Schritt 06a»** gilt nur, wenn F-16 mit A beantwortet wird.
+- **Bewusst nicht vorgeschlagen:**
+  - «Test und Korrektur dürfen im selben Commit stehen, das Rot belegt der Bericht»: steht in
+    `refactor-implementer.md`; ohne die Zeile entsteht kein Schaden (A-15).
+  - Ein Commit-Präfix für Prüfwerkzeuge: kein Schaden, und die Präfixe regelt die gemeinsame
+    `CLAUDE.md` (A-14, Vorschlag B.3a).
+- **Kleine Ungenauigkeit, ohne Vorschlag:** «Jede Schnittstelle der Verwaltung läuft über `liest`
+  oder `schreibt`» stimmt für vier nicht (`getZugang`, `postZugang`, `postZugangCode`,
+  `postAnsichtBeenden`: Sie öffnen den Zugang erst). Die Tests führen sie als benannte Ausnahmen.
+- **Nicht verglichen:** ob Anhang A noch Wort für Wort der geltenden `CLAUDE.md` entspricht.
+
+### Das Dokument als Gedächtnis
+
+Brauchbar, aber an der Grenze: 2284 Zeilen, davon rund 480 Erkenntnisse und Nachmessen in 7.2; die
+Zeilen der Tabelle 7.3 sind bis zu 1500 Zeichen lang und tragen drei Schichten Nachträge.
+**Umgesetzt ist davon nichts** (siehe «Nicht geprüft und Grenzen»). Vorschläge, in dieser
+Reihenfolge:
+
+1. **Anhang C «Protokoll Etappe 0»:** «Erkenntnisse Schritt 02 bis 05» und «Nachmessen Schritt 04»
+   wörtlich dorthin. In 7.2 bleiben je Schritt drei bis fünf Zeilen «gilt weiter» mit Verweis.
+2. **Die Prüfliste (b) bleibt vorn,** als eigener Unterabschnitt bei Etappe 2: Sie ist kein
+   Protokoll, die Schritte 08 und 13 bis 17 brauchen sie.
+3. **Tabelle 7.3 entlasten:** Die Nachträge aus den Zellen in Absätze «Hinweise zu Schritt NN»
+   unter die Tabelle; in der Zelle bleibt ein Satz. Dabei die Zeilen dieser Revision einarbeiten.
+4. **Spalte «Status» der erledigten Schritte:** nur «erledigt, Datum, Version»; Commits und
+   Einzelheiten ins Protokoll.
+5. **Abschnitt 9:** Die beantworteten Fragen F-01 bis F-14 als eine Tabelle (Frage, Antwort,
+   Entscheid); ausführlich nur die offenen. Titel und Einleitung stimmen nicht mehr («beantwortet»,
+   «eine neue, offene Frage»: Es sind zwei, mit F-17 drei).
+6. **Kopf des Dokuments** (Zeilen 5 bis 16): Version 0.20.5, Branch und «geändert wurde nichts
+   ausser dieser Datei» gelten für die Analyse, nicht mehr für den Stand. Als «Stand der Analyse»
+   kennzeichnen.
+7. **Abschnitt 1a, Tabelle 7.1 und dieser Abschnitt** nach dem Ok des Projektleiters ins
+   Protokoll; die Vermerke [neu], [geändert] und «Nachtrag» aus drei Durchgängen dann streichen
+   oder mit Datum versehen. Heute ist nicht zu erkennen, welcher Vermerk von wann ist.
+8. **Anhang A** durch einen Verweis auf die geltende `CLAUDE.md` ersetzen (zwei Fassungen laufen
+   auseinander).
+
+### Offene Fragen an den Projektleiter
+
+**F-16 [geändert] — Wohin gehören `liest`/`schreibt` und die Dienst-Typen?** Die Frage ist richtig
+gestellt, aber unvollständig: Die zwei Fristen widersprechen sich (Zeile 06a), und Option A sagt
+nicht, wo die `Admin*`-Typen liegen, während die Dienst-Typen schon umgezogen sind.
+
+- A1: Wie A, aber alles in einem eigenen Schritt 06a vor Schritt 07 (sieben Ausnahmen auf einmal
+  weg).
+- A2: Wie A im Dokument (Dienst-Typen in Schritt 07, Rechteprüfung als erster Commit von Schritt
+  09). Kostet eine neue Ausnahme zwischen 07 und 09.
+- B, C: unverändert (Abschnitt 9).
+- **Empfehlung: A1.** Frist: vor Schritt 07; Schritt 06 kann vorher starten.
+
+**F-17 [neu] — Wie liegen Verwaltungs-Schnittstellen ausserhalb von `admin/` (Schritte 09, 11)?**
+Beide Wege ändern die Bauregel, also einen Schutz; darum eine Frage und kein Detail des Schritts.
+
+- A: Eigene Datei je Modul (Arbeitstitel `verwaltung-schnittstellen.ts`) mit eigener Liste. Die
+  Bauregel bleibt eine Regel über Dateien: Admin-Routen dürfen nur diese Dateien, andere Routen
+  nie.
+- B: Gemischte Datei wie heute `mitteilung/schnittstellen.ts`; die Bauregel bekommt den
+  Namens-Wächter für jedes gemischte Modul.
+- C: Schritte 09 und 11 streichen; `admin/schnittstellen.ts` und `turnier/schnittstellen.ts`
+  bleiben, wie sie sind (dann bleibt die Ausnahme `turnier` → `gespraech`, und Schritt 12 wird
+  nicht ganz scharf).
+- **Empfehlung: A [V],** bestätigt oder verworfen durch das Nachmessen vor Schritt 09. Frist: vor
+  Schritt 09.
+
+**F-18 [neu] — Gilt der Vorschlag zur `CLAUDE.md` (oben)?**
+
+- A: Ja, ganz, einzuspielen vor Schritt 06 (die Zeile «06a» nur bei F-16 = A1).
+- B: Nur die Übergangsregeln; die drei Zeilen unter «Tests» erst mit Schritt 24.
+- C: Nein, die Datei bleibt bis Schritt 24.
+- **Empfehlung: A.** Die Regel «nie zwei Builds gleichzeitig» hat in Etappe 0 gefehlt (A-16).
+
+**F-19 [neu] — Ok für Etappe 1?**
+
+- A: Ja, mit den Änderungen dieser Revision.
+- B: Ja, aber nach dem Plan, wie er in 7.3 steht (ohne 06a, ohne die drei Tests).
+- C: Erst das Dokument aufräumen (Vorschläge 1 bis 5), dann Etappe 1.
+- **Empfehlung: A;** Aufräumen 1 bis 4 als reine Doku-Arbeit daneben.
+
+**F-15** bleibt offen und unverändert; Frist vor Schritt 23. Kein neuer Entscheid nötig: E-07 gilt,
+die Kosten sind benannt (vier Versionen in Etappe 0, acht in Etappe 1).
+
+**Kein Entscheid des Projektleiters, klärt das Nachmessen:** der Ort von `getSitzung` (Schritt 10).
+
+### Nicht geprüft und Grenzen
+
+- **Nicht ausgeführt:** kein Test, kein Build, kein Lint, kein E2E. Jede Aussage «wird rot» oder
+  «bleibt grün» ist aus dem Code gelesen.
+- **Nicht gelesen:** die Abschnitte 3.1, 3.2, 3.4 bis 3.7 und 4 dieses Dokuments, Anhang A; die
+  Fachlogik hinter den Schnittstellen; `mitteilung/`, `profil/`, `gespraech/` über die Köpfe
+  hinaus; `bremsen.db.test.ts` und `css-vergleich.ts` nur im Kopf, `css-vergleich.test.ts` und
+  `scripts/e2e.test.ts` gar nicht; die Dateien der Etappen 2 bis 4; der Agent `cas-reviewer`.
+- **Dünn belegt:** dass kein Test «ohne Sitzung und ohne JSON» schickt und dass `leiteUm` nur als
+  Einzelfunktion geprüft ist (beides Textsuche); die Empfehlung zu F-17 (kein Entwurf gebaut); ob
+  `it.each` mit leerer Liste grün bleibt; welche Dateien der Oberfläche Schritt 08 für das 401 `{}`
+  anfassen muss.
+- **Werkzeug:** Diesem Lauf fehlte ein Werkzeug zum Ändern einer Datei an einer Stelle, und Bash
+  war nur lesend erlaubt. Der Abschnitt und die Tabelle «Stand und nächster Schritt» wurden darum
+  vorbereitet und vom Orchestrator eingefügt; die redaktionellen Aufräumarbeiten sind alle nur
+  Vorschlag.
 
 ---
 
