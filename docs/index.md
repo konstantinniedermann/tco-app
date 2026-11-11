@@ -42,5 +42,6 @@ Issue im Milestone *Fundament*.
 | [Beobachtungen](beobachtungen.md) | Posteingang für Befunde ausserhalb des Scopes |
 | [Beobachtungen — Archiv](beobachtungen-archiv.md) | Ausgewertete Beobachtungen mit Ausgang |
 | [Versionen](versionen.md) | Versionshistorie |
+| [Refactoring-Analyse](refactoring-analyse.md) | Befunde, Zielbild, Plan und Stand des laufenden Refactorings |
 | [Specs und Pläne](superpowers/) | Entwürfe und Umsetzungspläne je Issue (`docs/superpowers/`) |
 | [UI-Mockups](ui-mockups/) | HTML-Mockups zum UI-Leitbild (`docs/ui-mockups/`) |

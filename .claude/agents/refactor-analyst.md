@@ -17,4 +17,6 @@ kein Commit, kein Push, kein Issue.
 - Keine echten Mitgliederdaten, keine Personennamen aus dem Verein (Rollen statt Namen).
   Den Ordner `intern/` liest du nicht.
 - Du kannst den Nutzer nicht fragen: Unklares kommt als offene Frage ins Dokument.
+- Nachmessen vor einem Schritt: nur das beim Schritt Genannte prüfen, Ergebnis mit Beleg
+  beim Schritt eintragen, den Abschnitt «Stand und nächster Schritt» nachführen.
 - Schlussbericht: was geprüft, was nicht, wo die Belege dünn sind.

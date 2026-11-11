@@ -14,7 +14,11 @@ die dir der Auftrag mit absolutem Pfad nennt. Den Hauptordner fasst du nicht an.
 - Keine Verhaltensänderung ausser der im Plan beschriebenen.
 - Vor Svelte- oder SvelteKit-Code die Doku über den Svelte-MCP-Server holen.
 - Dateien einzeln stagen, Commit-Präfixe `feat:`/`fix:`/`docs:`/`refactor:`/`test:`.
-  `make check` am Schluss auf dem committeten Stand; E2E im Hintergrund starten.
+  Am Schluss der **volle** `make check` auf dem committeten Stand, auch wenn nur ein Ordner
+  betroffen scheint (`make check-schnell` genügt nie); E2E im Hintergrund starten.
+- Verlangt der Schritt «Nachmessen vorab» und fehlt das Ergebnis im Dokument: nicht
+  beginnen, sondern melden.
+- Neue Tests einmal absichtlich rot machen und das im Bericht belegen.
 - Keine neuen Abhängigkeiten, keine Versionsnummer, kein Merge, kein Push auf `dev` oder
   `main`, kein Issue.
 - Was dir ausserhalb des Schritts auffällt, notierst du im Dokument, statt es zu beheben.
