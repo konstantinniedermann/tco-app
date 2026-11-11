@@ -16,8 +16,25 @@ bleibt auf `dev`) stehen in `CLAUDE.md` und werden hier nicht wiederholt.
 - **Jede Session** arbeitet an ihrem Issue in einem eigenen Worktree unter
   `/Users/KN/CAS/projekte/tco-app/.claude/worktrees/issue-NNN` (gitignoriert). So können
   mehrere Sessions parallel laufen, ohne sich Branch oder Dateien wegzunehmen.
-- **Merges macht Claude**, nicht der Nutzer: Feature → `dev` sobald fertig, Release
-  `dev` → `main` am Session-Ende, wenn der Stand es wert ist. Immer Merge-Commit.
+- **Merges macht Claude**, nicht der Nutzer: Feature → `dev` sobald fertig. Ein Release
+  `dev` → `main` nur mit ausdrücklicher Freigabe des Projektleiters für genau dieses
+  Release. Immer Merge-Commit.
+
+## Betrieb mit Subagenten (Orchestrator)
+
+Läuft die Arbeit über Subagenten (z. B. beim Refactoring), gilt abweichend von «Pro Issue»:
+
+- Die Orchestrator-Session bleibt im Hauptordner und wechselt nicht mit `EnterWorktree`
+  in einen Worktree: Das sperrt die Subagenten aus.
+- Sie legt den Worktree an (`git worktree add … -b <branch> origin/dev`) und nennt dem
+  Subagenten Worktree und Branch als absoluten Pfad.
+- Im Worktree laufen nur schlichte Git-Befehle: kein `git -C`, keine Schleifen oder
+  Heredocs mit `git`, keine Skripte, die Git versteckt aufrufen. Texte für Commits und
+  PRs über eine Datei (`-F`, `--body-file`).
+- Der Subagent mergt und pusht nicht. Nach dem Ok des Reviews mergt der Orchestrator im
+  Hauptordner wie in Schritt 4 und räumt Worktree und Branch sofort weg.
+- E2E und `make check` im Hintergrund starten; im Vordergrund bricht der Lauf nach
+  einigen Minuten ab.
 
 ## Pro Issue
 
