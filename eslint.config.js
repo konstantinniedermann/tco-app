@@ -58,21 +58,6 @@ export const AUSNAHMEN = [
 		schritt: '06a: der Typ MitteilungAdminDienste'
 	},
 	{
-		von: 'gespraech/schnittstellen.ts',
-		nach: 'admin/schnittstellen.ts',
-		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
-	},
-	{
-		von: 'mitteilung/schnittstellen.ts',
-		nach: 'admin/schnittstellen.ts',
-		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
-	},
-	{
-		von: 'turnier/schnittstellen.ts',
-		nach: 'admin/schnittstellen.ts',
-		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
-	},
-	{
 		von: 'turnier/schnittstellen.ts',
 		nach: 'gespraech/schnittstellen.ts',
 		schritt: '11: die Gesprächs-Schnittstellen ziehen von turnier nach gespraech'

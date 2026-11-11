@@ -44,11 +44,9 @@ import {
 	getAdminAnlass,
 	postAdminAnlaesse,
 	postAdminAnlass,
-	postAdminAnlassLoeschen,
-	liest,
-	schreibt,
-	type AdminDienste
+	postAdminAnlassLoeschen
 } from './schnittstellen.ts';
+import { liest, schreibt, type AdminDienste } from './rechte.ts';
 import { getAnlaesse } from '../anlass/schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 import { erstelleHinweis } from './hinweis-mail.ts';

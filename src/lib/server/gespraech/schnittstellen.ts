@@ -1,7 +1,7 @@
 // Schnittstellen zum Gespräch mit der Turnierleitung (A-TURNIER-04, FR-50 bis FR-53). Mitglieder
 // (nur mit Sitzung): lesen, schreiben, als gelesen markieren. Verwaltung (Bereich `cm`): Liste,
 // Verlauf, Antworten, Zustand; der MyTCO-Admin liest nur (Regel 3).
-import { liest, schreibt, type AdminEreignis, type AdminUrheber } from '../admin/schnittstellen.ts';
+import { liest, schreibt, type AdminEreignis, type AdminUrheber } from '../admin/rechte.ts';
 import type { CmDienste, CmEreignis } from '../cm/schnittstellen.ts';
 import { aendernd, antwort, jetzt, leseKoerper, mitSitzung, nichtGefunden } from '../http.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';

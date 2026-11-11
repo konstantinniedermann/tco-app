@@ -6,7 +6,7 @@ import {
 	type AnlassAuswahl
 } from '../../mitteilung/auswahl.ts';
 import { vorlagenAnlass } from '../../mitteilung/vorlagen.ts';
-import { liest, schreibt, type AdminDienste, type AdminEreignis } from '../admin/schnittstellen.ts';
+import { liest, schreibt, type AdminDienste, type AdminEreignis } from '../admin/rechte.ts';
 import type { Db } from '../db/index.ts';
 import type { Mailer } from '../login/dienst.ts';
 import {

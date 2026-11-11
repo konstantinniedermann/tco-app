@@ -36,9 +36,9 @@ import {
 	getRollen,
 	getVerlauf,
 	postAdminAnlaesse,
-	postRollen,
-	type AdminDienste
+	postRollen
 } from './schnittstellen.ts';
+import type { AdminDienste } from './rechte.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 // Die Zeilenzahlen sind global; darum eine eigene Datenbank statt der gemeinsamen.

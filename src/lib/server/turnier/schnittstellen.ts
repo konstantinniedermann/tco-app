@@ -8,7 +8,7 @@ import {
 	type AdminDienste,
 	type AdminEreignis,
 	type AdminUrheber
-} from '../admin/schnittstellen.ts';
+} from '../admin/rechte.ts';
 import {
 	entscheide,
 	korrigiereKlassierung,
