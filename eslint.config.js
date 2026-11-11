@@ -40,40 +40,37 @@ export const AUSNAHMEN = [
 		von: 'gespraech/schnittstellen.ts',
 		nach: 'cm/schnittstellen.ts',
 		schritt:
-			'ohne Schritt, offen (F-16): die Typen CmDienste und CmEreignis (aendernd und mitSitzung zieht Schritt 06 weg); Entscheid vor Schritt 07'
+			'06a: die Typen CmDienste und CmEreignis (aendernd und mitSitzung zieht Schritt 06 weg)'
 	},
 	{
 		von: 'admin/schnittstellen.ts',
 		nach: 'mitteilung/schnittstellen.ts',
-		schritt: 'ohne Schritt, offen (F-16): der Typ MitteilungAdminDienste; Entscheid vor Schritt 07'
+		schritt: '06a: der Typ MitteilungAdminDienste'
 	},
 	{
 		von: 'gespraech/schnittstellen.ts',
 		nach: 'mitteilung/schnittstellen.ts',
-		schritt: 'ohne Schritt, offen (F-16): der Typ MitteilungAdminDienste; Entscheid vor Schritt 07'
+		schritt: '06a: der Typ MitteilungAdminDienste'
 	},
 	{
 		von: 'turnier/schnittstellen.ts',
 		nach: 'mitteilung/schnittstellen.ts',
-		schritt: 'ohne Schritt, offen (F-16): der Typ MitteilungAdminDienste; Entscheid vor Schritt 07'
+		schritt: '06a: der Typ MitteilungAdminDienste'
 	},
 	{
 		von: 'gespraech/schnittstellen.ts',
 		nach: 'admin/schnittstellen.ts',
-		schritt:
-			'ohne Schritt, offen (F-16): liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber; Entscheid vor Schritt 09'
+		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
 	},
 	{
 		von: 'mitteilung/schnittstellen.ts',
 		nach: 'admin/schnittstellen.ts',
-		schritt:
-			'ohne Schritt, offen (F-16): liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber; Entscheid vor Schritt 09'
+		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
 	},
 	{
 		von: 'turnier/schnittstellen.ts',
 		nach: 'admin/schnittstellen.ts',
-		schritt:
-			'ohne Schritt, offen (F-16): liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber; Entscheid vor Schritt 09'
+		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
 	},
 	{
 		von: 'turnier/schnittstellen.ts',
