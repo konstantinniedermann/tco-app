@@ -79,6 +79,15 @@ export async function postAboLoeschen(d: MitteilungDienste, e: Ereignis): Promis
 	});
 }
 
+// Die Schnittstellen der Mitglieder zu Mitteilungen; die Grundprüfung
+// (`src/lib/server/grundpruefung.db.test.ts`) läuft über jeden Eintrag.
+export const MITTEILUNG_SCHNITTSTELLEN = {
+	getBenachrichtigungen,
+	postThemen,
+	postAbo,
+	postAboLoeschen
+} satisfies Record<string, (d: MitteilungDienste, e: Ereignis) => Promise<Response>>;
+
 // --- Verwaltung -------------------------------------------------------------------------------
 
 /**

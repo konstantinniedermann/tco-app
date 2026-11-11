@@ -411,3 +411,20 @@ export function postCmSuchtext(d: CmDienste, e: CmEreignis): Promise<Response> {
 		return antwortMitMail(d, konto, bezug, null, t);
 	});
 }
+
+// Alle Schnittstellen der Mitglieder zur Clubmeisterschaft; die Grundprüfung
+// (`src/lib/server/grundpruefung.db.test.ts`) läuft über jeden Eintrag.
+export const CM_SCHNITTSTELLEN = {
+	getCmTurniere,
+	getCmAnsicht,
+	postCmAngaben,
+	postCmAnmeldung,
+	postCmAbmeldung,
+	postCmWildcard,
+	getCmPartner,
+	postCmAnfrage,
+	postCmAnfrageAnnehmen,
+	postCmAnfrageAblehnen,
+	postCmAnfrageZurueck,
+	postCmSuchtext
+} satisfies Record<string, (d: CmDienste, e: CmEreignis) => Promise<Response>>;

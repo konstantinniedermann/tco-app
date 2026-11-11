@@ -99,3 +99,15 @@ export async function postHinweis(d: PasskeyDienst, e: Ereignis): Promise<Respon
 	await d.hinweisErledigt(s.kennung);
 	return antwort(204);
 }
+
+// Alle Schnittstellen zu Passkeys; die Grundprüfung (`src/lib/server/grundpruefung.db.test.ts`)
+// läuft über jeden Eintrag.
+export const PASSKEY_SCHNITTSTELLEN = {
+	postEinrichtenOptionen,
+	postEinrichten,
+	postAnmeldenOptionen,
+	postAnmelden,
+	getPasskeys,
+	postEntfernen,
+	postHinweis
+} satisfies Record<string, (d: PasskeyDienst, e: Ereignis) => Promise<Response>>;
