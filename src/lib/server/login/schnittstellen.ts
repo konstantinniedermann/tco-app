@@ -1,37 +1,13 @@
-import type { RequestEvent } from '@sveltejs/kit';
 import type { Db } from '../db/index.ts';
 import { offeneGespraecheGesamt } from '../gespraech/gespraech.ts';
 import { effektiveRollen, verwaltungsrollen } from '../admin/rollen.ts';
+import { antwort, formatFehler, istJson, leseKoerper, type Ereignis } from '../http.ts';
 import type { LoginDienst, LoginErgebnis } from './dienst.ts';
 import { SITZUNG_COOKIE, SITZUNG_GUELTIG_MS } from './sitzung.ts';
 
-export type Ereignis = Pick<
-	RequestEvent,
-	'request' | 'cookies' | 'getClientAddress' | 'locals' | 'url'
->;
-
-const KOPF = { 'cache-control': 'no-store' };
-
-export function antwort(status: number, inhalt?: object): Response {
-	if (inhalt === undefined) return new Response(null, { status, headers: KOPF });
-	return Response.json(inhalt, { status, headers: KOPF });
-}
-
-export function istJson(e: Ereignis): boolean {
-	return (e.request.headers.get('content-type') ?? '').toLowerCase().startsWith('application/json');
-}
-
-// Ein kaputter oder fremdartiger Körper zählt als leer; er wird nie geloggt (SI-05).
-export async function leseKoerper(e: Ereignis): Promise<Record<string, unknown>> {
-	try {
-		const roh: unknown = await e.request.json();
-		return typeof roh === 'object' && roh !== null && !Array.isArray(roh)
-			? (roh as Record<string, unknown>)
-			: {};
-	} catch {
-		return {};
-	}
-}
+// Übergang in Schritt 06: Die Themen-Module holen die Bausteine noch hier, bis jedes auf http.ts
+// umgestellt ist; die letzte Umstellung streicht diese Zeile.
+export { antwort, formatFehler, istJson, leseKoerper, type Ereignis };
 
 // Keine explizite `secure`-Option: SvelteKit setzt sie, ausser im Entwicklungsserver (darum
 // klappt der Login bei `make dev-handy` übers WLAN) oder wenn die Anfrage-URL http://localhost
@@ -60,8 +36,6 @@ export function loginAntwort(e: Ereignis, r: LoginErgebnis): Response {
 			return antwort(400, { fehler: 'falsch' });
 	}
 }
-
-export const formatFehler = () => antwort(415, { fehler: 'format' });
 
 export async function postBrief(d: LoginDienst, e: Ereignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
