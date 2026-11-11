@@ -47,8 +47,9 @@ afterEach(() => {
 	}
 });
 
-// Wie die übrigen Datenbanktests: Sitzungen mit einer Zeit um 2026-11 (siehe Session-Gedächtnis
-// «Sitzung mit Zukunftsdatum»), sonst räumt ein Login fremde Sitzungen weg.
+// Sitzungen mit derselben Zeit wie in den übrigen Datenbanktests (2026-11), nie mit einem
+// Datum weit in der Zukunft: Ein Login räumt in der gemeinsamen Test-Datenbank alle Sitzungen weg,
+// die von seiner Zeit aus ein Jahr nicht genutzt wurden, also auch die paralleler Testdateien.
 const start = new Date('2026-11-02T12:00:00Z');
 
 type Anfrage = ReturnType<typeof ereignis>;
@@ -65,6 +66,8 @@ function eintraege<D>(
 
 const mailer = vi.fn(async () => {});
 
+// Eine neue Liste der Mitglieder gehört hier hinein und in MITGLIEDER in `routen.test.ts`
+// (dort sichert der dritte Test, dass jede Route der Mitglieder eine gelistete Funktion ruft).
 function mitgliederDienste() {
 	const cm: CmDienste = {
 		db,
@@ -129,6 +132,7 @@ function verwaltungsDienste() {
 		mailer: vi.fn<MitteilungAdminDienste['mailer']>(async () => {}),
 		adresse: 'https://mytco.example.org'
 	};
+	// Eine neue Liste der Verwaltung gehört hier hinein und in VERWALTUNG in `routen.test.ts`.
 	const liste = [
 		...eintraege('admin', ADMIN_SCHNITTSTELLEN, d),
 		...eintraege('turnier', TURNIER_SCHNITTSTELLEN, d),
@@ -176,7 +180,9 @@ const OHNE_SITZUNG_ANDERS: Record<string, [number, unknown]> = {
 const OHNE_JSON_ANDERS: Record<string, [number, unknown]> = {};
 
 describe('Grundprüfung der Schnittstellen', () => {
-	test('die Listen der Mitglieder sind vollständig aufgezählt', () => {
+	// Hier nur Zählung und Ausnahmen. Dass keine Route an den Listen vorbei eine Funktion ruft,
+	// sichert der dritte Test in `routen.test.ts`.
+	test('die Listen der Mitglieder haben 36 Einträge, und jede Ausnahme gehört zu einem', () => {
 		const namen = mitgliederDienste().map(([name]) => name);
 		expect(namen).toHaveLength(36);
 		// Jede Ausnahme gehört zu einem Eintrag; eine veraltete Ausnahme fällt so auf.

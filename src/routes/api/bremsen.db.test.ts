@@ -64,6 +64,8 @@ const start = new Date('2026-11-02T12:00:00Z');
 let ipNummer = 0;
 /** Jede Anfrage aus einer eigenen IP, damit nur die Grenze der Adresse greift. */
 const neueIp = () => `198.51.100.${++ipNummer}`;
+// Die Mails gehen nach der Antwort raus; Frist grosszügig für eine langsame CI.
+const WARTEN = { timeout: 5000 };
 const mailsAn = (adresse: string) => mails.filter((m) => m.to === adresse);
 
 async function mitglied(rollen: string[] = []) {
@@ -118,7 +120,7 @@ describe('Bremsen über alle Dienste-Einstiege', () => {
 			for (let i = 0; i < 3; i++) await verbraucher[von](m);
 			expect(await pruefer[fuer](m)).toBe(429);
 			// Alle drei Mails sind wirklich gegangen; die Prüfung danach hat keine ausgelöst.
-			await vi.waitFor(() => expect(mailsAn(m.email)).toHaveLength(3));
+			await vi.waitFor(() => expect(mailsAn(m.email)).toHaveLength(3), WARTEN);
 		}
 	);
 
@@ -137,7 +139,7 @@ describe('Bremsen über alle Dienste-Einstiege', () => {
 		// Ein bestätigter Mitglieder-Admin ändert die Adresse eines Mitglieds: Hinweis an die alte.
 		const admin = await mitglied(['mitglieder']);
 		expect((await rufe(zugangCode, { body: {}, konto: admin.konto })).status).toBe(202);
-		await vi.waitFor(() => expect(mailsAn(admin.email)).toHaveLength(1));
+		await vi.waitFor(() => expect(mailsAn(admin.email)).toHaveLength(1), WARTEN);
 		const code = mailsAn(admin.email)[0].text.slice(0, 6);
 		expect((await rufe(zugangBestaetigen, { body: { code }, konto: admin.konto })).status).toBe(
 			200
@@ -149,7 +151,7 @@ describe('Bremsen über alle Dienste-Einstiege', () => {
 		const { angaben } = (await geladen.json()) as { angaben: Record<string, unknown> };
 		const body = { ...angaben, email: `weg-${crypto.randomUUID()}@example.org`, vorher: angaben };
 		expect((await rufe(mitgliedAendern, { body, params, konto: admin.konto })).status).toBe(200);
-		await vi.waitFor(() => expect(mailsAn(alt)).toHaveLength(1));
+		await vi.waitFor(() => expect(mailsAn(alt)).toHaveLength(1), WARTEN);
 		// Zwei Login-Codes dazu: Die alte Adresse hat ihre drei Mails (die Codes gehen an niemanden,
 		// weil die Adresse keinem Konto mehr gehört, zählen aber).
 		for (let i = 0; i < 2; i++) {
@@ -159,7 +161,7 @@ describe('Bremsen über alle Dienste-Einstiege', () => {
 		// der an die bisherige geht (beide Mails entstehen im selben Schritt).
 		const n = await mitglied();
 		expect((await rufe(emailAendern, { body: { email: alt }, konto: n.konto })).status).toBe(202);
-		await vi.waitFor(() => expect(mailsAn(n.email)).toHaveLength(1));
+		await vi.waitFor(() => expect(mailsAn(n.email)).toHaveLength(1), WARTEN);
 		expect(mailsAn(alt)).toHaveLength(1);
 	});
 });

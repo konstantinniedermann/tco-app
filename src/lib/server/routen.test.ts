@@ -1,5 +1,5 @@
 // Verdrahtung der Routen (Vertrag, Schritt 03 des Refactorings, B-28): Jede `+server.ts` unter
-// `src/routes/api/` wird geladen, und je Methode steht in ROUTEN, welche Schnittstellen-Funktion sie
+// `src/routes/` wird geladen, und je Methode steht in ROUTEN, welche Schnittstellen-Funktion sie
 // mit welchen Diensten aufruft. Geprüft wird das Verhalten, nicht der Quelltext: Die Funktionen der
 // Schnittstellen-Module sind durch Aufzeichner ersetzt, die Dienste kommen aus den echten Einstiegen.
 //
@@ -287,6 +287,8 @@ const OHNE_LISTE = new Set<unknown>([
 	postLogout,
 	getSitzung
 ]);
+// Eine neue Liste gehört in VERWALTUNG bzw. MITGLIEDER und in `verwaltungsDienste()` bzw.
+// `mitgliederDienste()` in `grundpruefung.db.test.ts` (dort laufen 401 und 415 über jeden Eintrag).
 const VERWALTUNG = new Set<unknown>(
 	[ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN, MITTEILUNG_ADMIN_SCHNITTSTELLEN].flatMap((l) =>
 		Object.values(l)
@@ -303,10 +305,10 @@ const MITGLIEDER = new Set<unknown>(
 	].flatMap((l) => Object.values(l))
 );
 
-const routenModule = import.meta.glob<Record<string, unknown>>('/src/routes/api/**/+server.ts');
+const routenModule = import.meta.glob<Record<string, unknown>>('/src/routes/**/+server.ts');
 const schnittstellenModule = import.meta.glob('/src/lib/server/**/*schnittstellen.ts');
 const name = (f: unknown) => (f as { name?: string }).name || '(ohne Namen)';
-const adresse = (pfad: string) => pfad.slice('/src/routes'.length, -'/+server.ts'.length);
+const adresse = (pfad: string) => pfad.slice('/src/routes'.length, -'/+server.ts'.length) || '/';
 
 // Jede Funktion der Schnittstellen-Module zeichnet nur auf, wer sie womit aufgerufen hat, und
 // antwortet mit einer eigenen Antwort. `echt` führt vom Aufzeichner zur echten Funktion (auch durch
@@ -349,7 +351,7 @@ afterAll(() => {
 });
 
 describe('Verdrahtung der Routen', () => {
-	test('jede +server.ts unter src/routes/api steht in ROUTEN, und jeder Eintrag hat eine Datei', () => {
+	test('jede +server.ts unter src/routes steht in ROUTEN, und jeder Eintrag hat eine Datei', () => {
 		expect(Object.keys(routenModule).map(adresse).sort()).toEqual(Object.keys(ROUTEN).sort());
 	});
 
