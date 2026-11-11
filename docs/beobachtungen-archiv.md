@@ -7,6 +7,14 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Erledigt im Refactoring, Schritt 02 (11.11.2026) — ausserhalb einer Auswertung
+
+**Mitgemacht**
+
+- 2026-11-09 — E2E: FR-41 Benachrichtigungen auf dem iPhone im Gesamtlauf einmal rot → cd86bdd
+  (`schalte` wartet, bis die Schalter wieder frei sind; Ursache hergeleitet, im Trace nicht gesehen:
+  `docs/refactoring-analyse.md`, «Erkenntnisse Schritt 02»)
+
 ### Auswertung vom 09.11.2026 — 21 Einträge, gegen `dev` (e947d25) verifiziert
 
 Bilanz je Eintrag: 0 ganz verworfen · 7 abgehakt (1 davon nicht mehr reproduzierbar) · 8 mitgemacht (1 davon überholt) ·

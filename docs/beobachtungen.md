@@ -142,6 +142,8 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Einschätzung:** Niedrig bis mittel. Sieht nach dem Zeitbudget unter Last auf WebKit aus (vgl. Memory zur E2E-Zeitgrenze); beim nächsten Auftreten Trace ansehen, nicht gleich die Wartezeit erhöhen.
 
+**Ursache (11.11.2026, Refactoring Schritt 02):** Kein Zeitbudget. Ein zweiter Build in `build/`, während der Lauf im selben Ordner läuft (im Lauf von K-42 ein E2E-Lauf des `cas-reviewer`), gibt dem laufenden Server eine neue `version.json`; SvelteKit lädt Seiten mit Status ab 400 dann endlos neu. Nachgestellt mit `npm run build` mitten im Lauf: genau diese zwei Tests rot. Nicht in `tests/e2e/` behebbar; offen ist der Entscheid zwischen Sperre in `scripts/e2e.ts`, eigenem Build-Ordner je Lauf oder nur einer Regel (`docs/refactoring-analyse.md`, «Erkenntnisse Schritt 02»).
+
 ### 2026-11-09 — Spielersuche zeigt dem CM-Admin Geschlecht und Jahrgang aller aktiven Mitglieder
 
 **Thema:** Datenschutz
@@ -165,18 +167,6 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) des Branches `test/e2e-turnierjahre`
 
 **Einschätzung:** Niedrig. Entfernen, sobald die damals offenen Branches gemergt sind; vorher mit `grep -rn "legeTurnierAn(\|legeOffenesTurnierAn(" tests/e2e` prüfen, dass niemand mehr ein Jahr übergibt.
-
-### 2026-11-09 — E2E: FR-41 Benachrichtigungen auf dem iPhone im Gesamtlauf einmal rot
-
-**Thema:** Tests
-
-**Fundort:** `tests/e2e/benachrichtigungen.test.ts` — «FR-41: Themen im Profil ab- und wieder einschalten bleibt nach Neuladen», Projekt iphone
-
-**Beobachtung:** Im `make check` scheiterte der Test an `expect(fehler).toEqual([])` mit dem WebKit-Fehler «…/api/benachrichtigungen due to access control checks.» Vermutlich bricht `page.reload()` nach `schalte(…)` eine noch laufende Anfrage an `/api/benachrichtigungen` ab (`schalte` wartet nur auf das POST). Einzeln 16 von 16 grün (`--repeat-each 8`), der Gesamtlauf davor und danach grün.
-
-**Ursprung:** Branch `test/e2e-turnierjahre`, zweiter `make check` (die Datei nutzt die geänderten Hilfen nicht)
-
-**Einschätzung:** Niedrig bis mittel, wie die zwei iPhone-Tests der Mitgliederverwaltung: beim nächsten Auftreten Trace mit Netzwerk ansehen, welche Anfrage abbricht, und vor dem Neuladen auf sie warten.
 
 ### 2026-11-09 — Gespräch mit der Turnierleitung: keine Grenze für Nachrichten eines Mitglieds
 
