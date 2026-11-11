@@ -23,9 +23,9 @@ import {
 	postAnlassSenden,
 	postAnlassVorschau,
 	postVereinSenden,
-	postVereinVorschau,
-	type MitteilungAdminDienste
+	postVereinVorschau
 } from './schnittstellen.ts';
+import type { MitteilungAdminDienste } from './typen.ts';
 import type { PushSender } from './versand.ts';
 
 // FR-45 löscht alte Einträge über alle Bezüge, und der Verein sind alle aktiven Mitglieder: darum

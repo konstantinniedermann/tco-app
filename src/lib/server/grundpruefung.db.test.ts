@@ -8,10 +8,12 @@ import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../tests/hilfen/mitglieder.ts';
 import { testPruefer } from '../../../tests/hilfen/passkey-pruefer.ts';
-import { ADMIN_SCHNITTSTELLEN, type AdminDienste } from './admin/schnittstellen.ts';
+import type { AdminDienste } from './admin/rechte.ts';
+import { ADMIN_SCHNITTSTELLEN } from './admin/schnittstellen.ts';
 import { erstelleZugangDienst } from './admin/zugang.ts';
 import { ANLASS_SCHNITTSTELLEN, type AnlassDienste } from './anlass/schnittstellen.ts';
-import { CM_SCHNITTSTELLEN, type CmDienste } from './cm/schnittstellen.ts';
+import { CM_SCHNITTSTELLEN } from './cm/schnittstellen.ts';
+import type { CmDienste } from './cm/typen.ts';
 import { erstelleDb } from './db/index.ts';
 import { GESPRAECH_SCHNITTSTELLEN } from './gespraech/schnittstellen.ts';
 import { erstelleBremsen } from './login/bremse.ts';
@@ -22,9 +24,9 @@ import { erstelleSitzung, pruefeSitzung } from './login/sitzung.ts';
 import {
 	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
 	MITTEILUNG_SCHNITTSTELLEN,
-	type MitteilungAdminDienste,
 	type MitteilungDienste
 } from './mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from './mitteilung/typen.ts';
 import { erstelleEmailWechselDienst } from './profil/email-wechsel.ts';
 import { PROFIL_SCHNITTSTELLEN, type ProfilDienste } from './profil/schnittstellen.ts';
 import { TURNIER_SCHNITTSTELLEN } from './turnier/schnittstellen.ts';

@@ -8,7 +8,7 @@ import {
 	type AdminDienste,
 	type AdminEreignis,
 	type AdminUrheber
-} from '../admin/schnittstellen.ts';
+} from '../admin/rechte.ts';
 import {
 	entscheide,
 	korrigiereKlassierung,
@@ -41,7 +41,7 @@ import {
 } from '../gespraech/schnittstellen.ts';
 import { antwort, eingabeFehler, jetzt, nichtGefunden } from '../http.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
-import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { parseId } from '../parse-id.ts';
 import { pruefeKategorie, pruefeTurnier } from './angaben.ts';
 import {

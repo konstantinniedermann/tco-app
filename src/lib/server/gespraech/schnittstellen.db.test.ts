@@ -9,13 +9,13 @@ import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { ERLAUBT_IN_ANSICHT, riegel } from '../admin/ansicht.ts';
 import { erstelleZugangDienst } from '../admin/zugang.ts';
 import { ladeCmAnsicht, laufendeTurniere } from '../cm/anmeldungen.ts';
-import type { CmDienste } from '../cm/schnittstellen.ts';
+import type { CmDienste } from '../cm/typen.ts';
 import { erstelleDb } from '../db/index.ts';
 import { gespraech, nachricht, turnier } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { getSitzung } from '../login/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
-import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { ladeTurnier, legeTurnierAn, listeTurniere } from '../turnier/turniere.ts';
 import {
 	getAdminGespraech,

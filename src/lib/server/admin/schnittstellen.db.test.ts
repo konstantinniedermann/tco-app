@@ -11,7 +11,7 @@ import {
 	partnerAnfrage,
 	sitzung
 } from '../db/schema.ts';
-import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { antwort } from '../http.ts';
@@ -44,11 +44,9 @@ import {
 	getAdminAnlass,
 	postAdminAnlaesse,
 	postAdminAnlass,
-	postAdminAnlassLoeschen,
-	liest,
-	schreibt,
-	type AdminDienste
+	postAdminAnlassLoeschen
 } from './schnittstellen.ts';
+import { liest, schreibt, type AdminDienste } from './rechte.ts';
 import { getAnlaesse } from '../anlass/schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 import { erstelleHinweis } from './hinweis-mail.ts';

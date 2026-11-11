@@ -20,13 +20,8 @@ import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login
 import { postTurniere } from '../turnier/schnittstellen.ts';
 import { riegel } from './ansicht.ts';
 import { setzeRollen } from './rollen.ts';
-import {
-	getZugang,
-	postAnsicht,
-	postAnsichtBeenden,
-	postMitglieder,
-	type AdminDienste
-} from './schnittstellen.ts';
+import { getZugang, postAnsicht, postAnsichtBeenden, postMitglieder } from './schnittstellen.ts';
+import type { AdminDienste } from './rechte.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);

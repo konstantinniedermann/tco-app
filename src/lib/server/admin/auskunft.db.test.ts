@@ -26,7 +26,8 @@ import {
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
 import { ladeAuskunft } from './auskunft.ts';
-import { getAuskunft, type AdminDienste } from './schnittstellen.ts';
+import type { AdminDienste } from './rechte.ts';
+import { getAuskunft } from './schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 let eigene: EigeneDatenbank | undefined;

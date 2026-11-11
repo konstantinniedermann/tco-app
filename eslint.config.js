@@ -8,7 +8,7 @@ import { defineConfig } from 'eslint/config';
 // Richtung der Importe zwischen den Server-Modulen unter src/lib/server/ (Zielbild 6.1 Punkt 8 in
 // docs/refactoring-analyse.md, Befund B-14). Ebenen von unten nach oben:
 //   1. `db/` importiert aus dem Server nichts; die Dateien direkt unter `src/lib/server/` importieren
-//      nur `db/` (dazu kommt mit Schritt 06 `http.ts`).
+//      nur `db/` (dazu gehört `http.ts`).
 //   2. `login/` importiert kein Thema.
 //   3. Die Themen importieren nicht die Schnittstellen-Dateien (`schnittstellen.ts`,
 //      `passkey-schnittstellen.ts`) eines anderen Moduls.
@@ -36,42 +36,6 @@ export const MODULE = ['db', 'login', ...THEMEN];
  * @type {{ von: string; nach: string; schritt: string }[]}
  */
 export const AUSNAHMEN = [
-	{
-		von: 'gespraech/schnittstellen.ts',
-		nach: 'cm/schnittstellen.ts',
-		schritt:
-			'06a: die Typen CmDienste und CmEreignis (aendernd und mitSitzung zieht Schritt 06 weg)'
-	},
-	{
-		von: 'admin/schnittstellen.ts',
-		nach: 'mitteilung/schnittstellen.ts',
-		schritt: '06a: der Typ MitteilungAdminDienste'
-	},
-	{
-		von: 'gespraech/schnittstellen.ts',
-		nach: 'mitteilung/schnittstellen.ts',
-		schritt: '06a: der Typ MitteilungAdminDienste'
-	},
-	{
-		von: 'turnier/schnittstellen.ts',
-		nach: 'mitteilung/schnittstellen.ts',
-		schritt: '06a: der Typ MitteilungAdminDienste'
-	},
-	{
-		von: 'gespraech/schnittstellen.ts',
-		nach: 'admin/schnittstellen.ts',
-		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
-	},
-	{
-		von: 'mitteilung/schnittstellen.ts',
-		nach: 'admin/schnittstellen.ts',
-		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
-	},
-	{
-		von: 'turnier/schnittstellen.ts',
-		nach: 'admin/schnittstellen.ts',
-		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
-	},
 	{
 		von: 'turnier/schnittstellen.ts',
 		nach: 'gespraech/schnittstellen.ts',

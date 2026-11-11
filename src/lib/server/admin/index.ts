@@ -2,7 +2,7 @@ import { leseEinstellungen } from '../einstellungen.ts';
 import { holeDb } from '../db/index.ts';
 import { holeBremsen } from '../login/index.ts';
 import { erstelleSmtpMailer, leiteUm } from '../login/mail.ts';
-import type { AdminDienste } from './schnittstellen.ts';
+import type { AdminDienste } from './rechte.ts';
 import { erstelleHinweis } from './hinweis-mail.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 

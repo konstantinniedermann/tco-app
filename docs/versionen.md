@@ -8,6 +8,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.11 — Rechteprüfung der Verwaltung in eigener Datei (Refactoring Schritt 06a)
+
+- Die Rechteprüfung der Verwaltung (`liest`, `schreibt`) steht unverändert in
+  `src/lib/server/admin/rechte.ts` statt in der Schnittstellen-Datei; Dienst-Typen, die andere
+  Module brauchen, stehen in eigenen Typ-Dateien. Reines Verschieben, am Verhalten ändert sich
+  nichts (#80).
+
 ## 0.20.10 — Grundbausteine der Schnittstellen an einem Ort (Refactoring Schritt 06)
 
 - Antwort bauen, JSON prüfen, Körper lesen, die Standardantworten, «mit Sitzung», «ändernd» und die
