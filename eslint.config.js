@@ -29,8 +29,6 @@ const ENDUNG = '(?:\\.(?:ts|js))?';
 /** Alle Ordner unter src/lib/server/; der Test hält sie mit der Platte gleich. */
 export const MODULE = ['db', 'login', ...THEMEN];
 
-const S06_HTTP = '06: antwort, formatFehler, istJson, leseKoerper, Ereignis wandern nach http.ts';
-
 /**
  * Heutige Verletzungen: `von` und `nach` sind Dateien relativ zu src/lib/server/. `schritt` nennt den
  * Schritt aus docs/refactoring-analyse.md, der die Ausnahme abbaut, oder «bleibt: …» mit Grund.
@@ -39,83 +37,40 @@ const S06_HTTP = '06: antwort, formatFehler, istJson, leseKoerper, Ereignis wand
  */
 export const AUSNAHMEN = [
 	{
-		von: 'admin/ansicht.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
-		von: 'admin/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
-		von: 'anlass/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
-		von: 'cm/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
-		von: 'gespraech/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
-		von: 'mitteilung/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
-		von: 'profil/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
-		von: 'turnier/schnittstellen.ts',
-		nach: 'login/schnittstellen.ts',
-		schritt: S06_HTTP
-	},
-	{
 		von: 'gespraech/schnittstellen.ts',
 		nach: 'cm/schnittstellen.ts',
 		schritt:
-			'ohne Schritt, offen (F-16): die Typen CmDienste und CmEreignis (aendernd und mitSitzung zieht Schritt 06 weg); Entscheid vor Schritt 07'
+			'06a: die Typen CmDienste und CmEreignis (aendernd und mitSitzung zieht Schritt 06 weg)'
 	},
 	{
 		von: 'admin/schnittstellen.ts',
 		nach: 'mitteilung/schnittstellen.ts',
-		schritt: 'ohne Schritt, offen (F-16): der Typ MitteilungAdminDienste; Entscheid vor Schritt 07'
+		schritt: '06a: der Typ MitteilungAdminDienste'
 	},
 	{
 		von: 'gespraech/schnittstellen.ts',
 		nach: 'mitteilung/schnittstellen.ts',
-		schritt: 'ohne Schritt, offen (F-16): der Typ MitteilungAdminDienste; Entscheid vor Schritt 07'
+		schritt: '06a: der Typ MitteilungAdminDienste'
 	},
 	{
 		von: 'turnier/schnittstellen.ts',
 		nach: 'mitteilung/schnittstellen.ts',
-		schritt: 'ohne Schritt, offen (F-16): der Typ MitteilungAdminDienste; Entscheid vor Schritt 07'
+		schritt: '06a: der Typ MitteilungAdminDienste'
 	},
 	{
 		von: 'gespraech/schnittstellen.ts',
 		nach: 'admin/schnittstellen.ts',
-		schritt:
-			'ohne Schritt, offen (F-16): liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber; Entscheid vor Schritt 09'
+		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
 	},
 	{
 		von: 'mitteilung/schnittstellen.ts',
 		nach: 'admin/schnittstellen.ts',
-		schritt:
-			'ohne Schritt, offen (F-16): liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber; Entscheid vor Schritt 09'
+		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
 	},
 	{
 		von: 'turnier/schnittstellen.ts',
 		nach: 'admin/schnittstellen.ts',
-		schritt:
-			'ohne Schritt, offen (F-16): liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber; Entscheid vor Schritt 09'
+		schritt: '06a: liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber'
 	},
 	{
 		von: 'turnier/schnittstellen.ts',

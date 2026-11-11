@@ -8,6 +8,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.10 — Grundbausteine der Schnittstellen an einem Ort (Refactoring Schritt 06)
+
+- Antwort bauen, JSON prüfen, Körper lesen, die Standardantworten, «mit Sitzung», «ändernd» und die
+  Uhr stehen jetzt einmal in `src/lib/server/http.ts` statt in bis zu neun Modulen. Am Verhalten
+  der Schnittstellen ändert sich nichts; ein neuer Test hält fest, dass das Format vor der
+  Anmeldung geprüft wird (#80).
+
 ## 0.20.9 — Lint-Regeln für die Importrichtung im Server (Refactoring Schritt 05)
 
 - ESLint hält die Richtung der Abhängigkeiten zwischen den Server-Modulen fest: Datenbank zuunterst,

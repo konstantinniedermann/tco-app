@@ -4,11 +4,14 @@ import type { Db } from '../db/index.ts';
 import { mitglied } from '../db/schema.ts';
 import {
 	antwort,
+	eingabeFehler,
 	formatFehler,
 	istJson,
+	jetzt,
 	leseKoerper,
+	nichtGefunden,
 	type Ereignis
-} from '../login/schnittstellen.ts';
+} from '../http.ts';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
 import { jahrInZuerich } from '../datum.ts';
 import { INTEGER_MAX, parseId } from '../parse-id.ts';
@@ -78,11 +81,6 @@ const STATUS: Record<MitgliedStatus, true> = {
 const istStatus = (s: string): s is MitgliedStatus => Object.hasOwn(STATUS, s);
 const VERLAUF_STANDARD = 100;
 const VERLAUF_MAX = 500;
-
-const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
-const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });
-
-const jetzt = (d: AdminDienste) => (d.jetzt ?? (() => new Date()))();
 
 // Sitzung und eine Verwaltungsrolle (mytco, mitglieder oder cm) genügen; die Bestätigung per Code ist hier
 // noch nicht nötig (SI-08: auch ein reiner CM muss den Code anfordern und einlösen können).

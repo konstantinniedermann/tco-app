@@ -4,12 +4,14 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { INTEGER_MAX, parseId } from '../parse-id.ts';
 import type { Db } from '../db/index.ts';
 import {
+	aendernd,
 	antwort,
-	formatFehler,
-	istJson,
+	jetzt,
 	leseKoerper,
+	mitSitzung,
+	nichtGefunden,
 	type Ereignis
-} from '../login/schnittstellen.ts';
+} from '../http.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
 import { cmAdmins } from '../mitteilung/meldung.ts';
 import { trageCmAngabenNach } from './angaben.ts';
@@ -54,27 +56,6 @@ export type CmDienste = {
 	jetzt?: () => Date;
 };
 export type CmEreignis = Ereignis & Pick<RequestEvent, 'params'>;
-
-const jetzt = (d: CmDienste) => (d.jetzt ?? (() => new Date()))();
-const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
-
-export async function mitSitzung(
-	e: CmEreignis,
-	fn: (konto: AngemeldetesKonto) => Promise<Response>
-): Promise<Response> {
-	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
-	return fn(konto);
-}
-
-// SI-10: ändernde Anfragen nur als JSON.
-export async function aendernd(
-	e: CmEreignis,
-	fn: (konto: AngemeldetesKonto) => Promise<Response>
-): Promise<Response> {
-	if (!istJson(e)) return formatFehler();
-	return mitSitzung(e, fn);
-}
 
 export function getCmTurniere(d: CmDienste, e: CmEreignis): Promise<Response> {
 	return mitSitzung(e, async (konto) =>

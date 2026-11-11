@@ -1,14 +1,8 @@
 import { geraetAusBrowser } from './geraet.ts';
 import type { Ort } from './passkey-pruefer.ts';
 import type { PasskeyDienst } from './passkey.ts';
-import {
-	antwort,
-	formatFehler,
-	istJson,
-	leseKoerper,
-	loginAntwort,
-	type Ereignis
-} from './schnittstellen.ts';
+import { antwort, formatFehler, istJson, leseKoerper, type Ereignis } from '../http.ts';
+import { loginAntwort } from './schnittstellen.ts';
 import { SITZUNG_COOKIE } from './sitzung.ts';
 
 const ort = (e: Ereignis): Ort => ({ rpId: e.url.hostname, herkunft: e.url.origin });

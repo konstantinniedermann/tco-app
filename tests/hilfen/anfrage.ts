@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import type { Ereignis } from '../../src/lib/server/login/schnittstellen.ts';
+import type { Ereignis } from '../../src/lib/server/http.ts';
 
 type Optionen = {
 	body?: unknown;
