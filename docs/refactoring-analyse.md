@@ -28,12 +28,13 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 |---|---|
 | **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b), **Etappe 1 freigegeben** (E-30) |
 | **Erledigte Schritte** | 01 Startpaket, 02 E2E-Flakes, 03 Vertragstests, 04 Hilfsmittel für Etappe 2, 05 Lint-Regeln für die Richtung der Importe (Kurzfassung in 7.2, Protokoll in Anhang C); 06 Grundbausteine in `http.ts` (Review «ok», Version 0.20.10; Ergebnis in 7.3, Protokoll in Anhang D.1) |
-| **Nächster offener Schritt** | **06a** Rechteprüfung und Dienst-Typen aus den Schnittstellen-Dateien (Zeile und «Hinweise zu Schritt 06a» in 7.3; Subagent `refactor-implementer`, Opus), **nach dem «ok» des Projektleiters zum Checkpoint von Schritt 06**. Danach 07 bis 12 in dieser Reihenfolge |
-| **Wartet auf Freigabe des Projektleiters** | «ok» zum Checkpoint nach Schritt 06 (E-30), dann startet 06a |
+| **In Arbeit** | **06a** Rechteprüfung und Dienst-Typen aus den Schnittstellen-Dateien: **umgesetzt** auf Branch `refactor/schritt-06a` (11.11.2026), **Review und Merge offen** (Ergebnis in 7.3, Protokoll in Anhang D.2). Die Übergangsregel «Ab Schritt 06a» der `CLAUDE.md` stimmt wörtlich nicht ganz (D.2) |
+| **Nächster offener Schritt** | **07** Zusammenbau der Dienste (`dienste.ts`), **braucht Nachmessen vorab** (Spalte in 7.3). Danach 08 bis 12 in dieser Reihenfolge |
+| **Wartet auf Freigabe des Projektleiters** | «ok» zum Checkpoint nach Schritt 06a (E-30); Entscheid zum Wortlaut der Übergangsregel «Ab Schritt 06a» (D.2) |
 | **Offene Fragen** | **F-17** (Ablage der Verwaltungs-Schnittstellen ausserhalb von `admin/`): stellt der Orchestrator nach dem Nachmessen vor Schritt 09. **F-15** (Version, solange es Test nicht gibt): vor Schritt 23. Beide in Abschnitt 9 |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
 | **Vorab nachzumessen** | vor Schritt 07, 08, 09, 10, 11, 13, 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). Schritte 06 und 06a brauchen keines |
-| **Nächster Checkpoint** | nach Schritt 06: Kurzbericht, weiter auf «ok» (E-30); so nach jedem Schritt der Etappen 1 und 2 |
+| **Nächster Checkpoint** | nach Schritt 06a: Kurzbericht, weiter auf «ok» (E-30); so nach jedem Schritt der Etappen 1 und 2 |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32) |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
 
@@ -1307,7 +1308,7 @@ bewusst nicht. Protokoll: Anhang C.5.
 | Nr. | Ziel | Dateien | Nutzen | Risiko | Absicherung | Voraussetzung | Modell | Weg | Nachmessen vorab | Status |
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
 | 06 | [geändert] Grundbausteine der Schnittstellen an einem Ort (`http.ts`); Duplikate entfernt (B-12, B-38). Streicht acht Ausnahmen in `AUSNAHMEN`. An drei Stellen (`mitKonto`, `aendernd`, `jetzt`) ist es kein reines Verschieben: Der Schritt legt die Form fest und begründet sie. `http.ts` importiert nur `db/`. Einzelheiten: Hinweise zu Schritt 06 | neu `src/lib/server/http.ts`; `src/lib/server/*/schnittstellen.ts`, `login/passkey-schnittstellen.ts`, `admin/ansicht.ts`; die Tests, die `antwort` oder `Ereignis` aus `login/schnittstellen.ts` holen; `eslint.config.js` (`AUSNAHMEN`). Nicht betroffen: Routen, `src/hooks.server.ts`, `bauregel.ts` | Eine Stelle statt sechs; `login` ist nicht mehr Unterbau aller Module | niedrig | Schritt 03 (Grundprüfung, Routen-Test) grün vor und nach; kein geändertes Verhalten; Lint grün ohne Regeländerung. **[neu] Charakterisierungstest vorab:** «ohne Sitzung und ohne JSON antwortet 415» für eine schreibende Schnittstelle der Mitglieder | 03, 05 (erledigt) | Opus | Subagent | nein | **erledigt** 11.11.2026 (Test-Commit `17d71cf`, sieben `refactor:`-Commits; Review «ok»; Merge `81745c1`, Version 0.20.10). Ergebnis unten, Protokoll Anhang D.1 |
-| 06a | [neu] **Rechteprüfung und Dienst-Typen stehen nicht mehr in Schnittstellen-Dateien (E-28).** `mitRolle`, `liest`, `schreibt` und die Typen `AdminDienste`, `AdminEreignis`, `AdminUrheber` ziehen nach `admin/rechte.ts` (Arbeitstitel); `MitteilungAdminDienste`, `CmDienste`, `CmEreignis` in eine Nicht-Schnittstellen-Datei ihres Moduls. Reines Verschieben: Die Rechteprüfung bleibt an einer Stelle und unverändert. Streicht die sieben Ausnahmen «ohne Schritt». Branch `refactor/schritt-06a`. Einzelheiten: Hinweise zu Schritt 06a | `src/lib/server/admin/`, `mitteilung/`, `cm/`, `gespraech/`, `turnier/` (Importe), ihre Tests, `eslint.config.js` (`AUSNAHMEN`) | Die Schritte 07, 09 und 11 brauchen keine neue Ausnahme; Schritt 12 kann die Liste leeren | niedrig (Verschieben innerhalb der Module) | Unverändert grün: Rechte-Matrix, `admin/schnittstellen.db.test.ts`, `turnier/schnittstellen.db.test.ts`, `mitteilung/admin-schnittstellen.db.test.ts`, Grundprüfung, Routen-Test; die Lint-Probe «Ausnahme ist noch nötig». Der Reviewer prüft, dass `mitRolle` bis auf den Ort gleich ist | 06 | Opus | Subagent | nein | offen |
+| 06a | [neu] **Rechteprüfung und Dienst-Typen stehen nicht mehr in Schnittstellen-Dateien (E-28).** `mitRolle`, `liest`, `schreibt` und die Typen `AdminDienste`, `AdminEreignis`, `AdminUrheber` ziehen nach `admin/rechte.ts` (Arbeitstitel); `MitteilungAdminDienste`, `CmDienste`, `CmEreignis` in eine Nicht-Schnittstellen-Datei ihres Moduls. Reines Verschieben: Die Rechteprüfung bleibt an einer Stelle und unverändert. Streicht die sieben Ausnahmen «ohne Schritt». Branch `refactor/schritt-06a`. Einzelheiten: Hinweise zu Schritt 06a | `src/lib/server/admin/`, `mitteilung/`, `cm/`, `gespraech/`, `turnier/` (Importe), ihre Tests, `eslint.config.js` (`AUSNAHMEN`) | Die Schritte 07, 09 und 11 brauchen keine neue Ausnahme; Schritt 12 kann die Liste leeren | niedrig (Verschieben innerhalb der Module) | Unverändert grün: Rechte-Matrix, `admin/schnittstellen.db.test.ts`, `turnier/schnittstellen.db.test.ts`, `mitteilung/admin-schnittstellen.db.test.ts`, Grundprüfung, Routen-Test; die Lint-Probe «Ausnahme ist noch nötig». Der Reviewer prüft, dass `mitRolle` bis auf den Ort gleich ist | 06 | Opus | Subagent | nein | **umgesetzt** 11.11.2026, Review und Merge offen (Branch `refactor/schritt-06a`, vier `refactor:`-Commits `4db07da`, `17100d6`, `fc77d1b`, `2ccbbca`, kein Test-Commit). Ergebnis unten, Protokoll Anhang D.2 |
 | 07 | [geändert] Ein Zusammenbau der Dienste (`dienste.ts`): Mail- und Push-Versender entstehen nur dort, Bremsen einmal (B-13). Die Einstiege bleiben träge. `dienste.ts` wird in der Lint-Regel die oberste Schicht, in beide Richtungen. Einzelheiten: Hinweise zu Schritt 07 | neu `src/lib/server/dienste.ts`; die sechs `index.ts`; alle `+server.ts` (Import-Zeile); `src/hooks.server.ts` (`holeDb`, `holeLoginDienst`); `login/schnittstellen.db.test.ts`, `routen.test.ts` (`EINSTIEGE`); `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`; `eslint.config.js` und `scripts/importrichtung.test.ts` | Überblick, was der Server braucht; ein SMTP-Zugang statt fünf | mittel (Lebensdauer der Einzelstücke, Bremsen müssen geteilt bleiben) | E2E Login, Profil, Mitteilungen, CM; DB-Tests der Schnittstellen; `tests/e2e/cookie.test.ts`; Routen-Test und Bremsen-Test. **[neu] Charakterisierungstest vorab:** Mit gesetztem `MAIL_NUR_AN` geht jede Mail über jeden Einstieg nur an diese Adresse. **[geändert] Bauregel:** je geändertes Muster ein Fall in `bauregel.test.ts`, einmal rot; der Reviewer liest den Diff an `bauregel.ts` ganz | 06, 06a | Opus | Subagent | ja: `mitteilung/`, `profil/`, `gespraech/` sind nur in Auszügen gelesen; vorab klären, welche Einzelstücke Zustand tragen (Bremsen, Passkey-Anfragen, E-Mail-Wechsel, SMTP-Pool) | offen |
 | 08 | [geändert] Eine Fehlerform und eine Liste der Fehlerwörter; Oberfläche im selben Schritt angepasst (B-15, B-29). Dazu gehört das 401 mit `{}` von Passkey und `getSitzung`. Einzelheiten: Hinweise zu Schritt 08 | `src/lib/server/*/schnittstellen.ts`, `login/passkey-schnittstellen.ts` und `login/schnittstellen.ts` (401 `{}`) mit ihren Gegenstücken in der Oberfläche; neue geteilte Datei für die Fehlerwörter; `src/lib/anlass/api.ts`, `src/lib/verwaltung/mitteilung-api.ts`, `src/lib/cm/api.ts`; `grundpruefung.db.test.ts` (`OHNE_SITZUNG_ANDERS`); betroffene Tests | Voraussetzung für Schritt 13; ein Übersetzer entfällt | mittel (Verhaltensänderung an internen Schnittstellen) | Schritt 03 wird bewusst an genau diesen Stellen angepasst; E2E Anlass und Mitteilungen. **[geändert]** Server und Abruf-Module sind beide gegen die gemeinsame Liste getippt (ein fehlendes Wort macht `svelte-check` rot); Einheitstests der Abruf-Module und die `page.route`-Stellen der Prüfliste (b) nehmen ihre Wörter aus der Liste, nicht als Text | 06 (E-18: Format darf sich ändern, Server und Oberfläche im selben Schritt) | Opus | Subagent | ja: vollständige Liste aller Abweichungen von der Fehlerform über alle `schnittstellen.ts` und alle Abruf-Module; die Stellen mit `page.route` aus der Prüfliste (b) in 7.4 (Pfade und Fehlerwort); welche Dateien der Oberfläche das 401 `{}` deuten | offen |
 | 09 | [geändert] Verwaltung der Anlässe liegt beim Thema Anlass (B-14), nach dem Muster aus F-17. Streicht keine Ausnahme und braucht keine neue (`liest` und `schreibt` kommen seit 06a aus `admin/rechte.ts`). Der Schritt ändert den Schutz der Bauregel, nicht nur feste Pfade. Einzelheiten: Hinweise zu Schritt 09 | `src/lib/server/admin/schnittstellen.ts`, `src/lib/server/anlass/`, Routen `src/routes/api/admin/anlaesse/`, `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`, `rechte-matrix.db.test.ts`, `grundpruefung.db.test.ts`, `routen.test.ts` | `admin/schnittstellen.ts` wird kleiner; Thema an einem Ort | **mittel** (vorher niedrig: neue Verwaltungs-Liste, Bauregel) | **[neu] Charakterisierungstest vorab (erster Commit):** eine Schleife «ohne Sitzung 401, ohne Rolle 403 `kein-admin`, unbestätigt 403 `unbestaetigt`» über **alle** Verwaltungs-Listen an einer Stelle (Grundprüfung, `verwaltungsDienste()`), mit den vier benannten Ausnahmen. Dazu Rechte-Matrix-Test, `tests/e2e/anlass.test.ts`, Routen-Test und Grundprüfung; je geändertes Muster der Bauregel ein Fall in `bauregel.test.ts`, einmal rot; der Reviewer liest den Diff an `bauregel.ts` ganz | 06a, 07; **F-17 beantwortet** | Opus | Subagent | **ja:** die zwei Muster für Verwaltungs-Schnittstellen ausserhalb von `admin/` am Code gegenüberstellen (eigene Datei je Modul mit eigener Liste, oder gemischte Datei mit Namens-Wächter) und was jedes an `bauregel.ts` ändert; Ergebnis ist die Grundlage für F-17 | offen |
@@ -1405,6 +1406,14 @@ die Folgeschritte»); das Wichtigste ist hier je Schritt wiederholt.
   (E-30).
 - **Netz:** Rechte-Matrix und die Schleifen je Liste decken die Prüfung selbst, die Lint-Probe
   «Ausnahme ist noch nötig» das Wegfallen der Ausnahmen. Kein zusätzlicher Test nötig.
+
+**Ergebnis Schritt 06a** (11.11.2026; umgesetzt, Review und Merge offen)
+
+- **Wo jetzt was liegt:** `admin/rechte.ts`: `mitRolle` (privat), `liest`, `schreibt`, `mitKonto` und die Typen `AdminDienste`, `AdminEreignis`, `AdminUrheber`. `mitteilung/typen.ts`: `MitteilungAdminDienste`. `cm/typen.ts`: `CmDienste`, `CmEreignis`. Alles Zeichen für Zeichen verschoben; `admin/schnittstellen.ts` enthält nur noch Schnittstellen, ihre Hilfen und die Liste.
+- **`mitKonto` zieht mit** und wird dafür exportiert: Es ruft `zugang.pruefe` und antwortet 401 und 403 `kein-admin`, ist also Rechteprüfung; benutzt wird es weiter nur von `postZugangCode` und `postZugang`. Selbst prüfen in `admin/schnittstellen.ts` nur noch `getZugang` und `postAnsicht` (bewusst nicht Teil des Schritts, D.2).
+- **Ausnahmen:** 11 → 4 (drei für Schritt 10, eine für Schritt 11). Lint-Regel, Bauregel und Routen-Test unverändert; Tests nur an Importpfaden geändert.
+- **Netz belegt:** Eine abgeschwächte Prüfung in `mitRolle` machte vor und nach dem Verschieben Rechte-Matrix und Schleifen rot (D.2).
+- **Folgt daraus:** 07 importiert die Dienst-Typen aus `admin/rechte.ts`, `mitteilung/typen.ts`, `cm/typen.ts` (keine Ausnahme); 09 und 11 holen `liest`/`schreibt` aus `admin/rechte.ts`; 12 hat noch die vier Ausnahmen von 10 und 11. Die Übergangsregel «Ab Schritt 06a» der `CLAUDE.md` stimmt wörtlich nicht ganz (D.2, Entscheid des Projektleiters).
 
 **Hinweise zu Schritt 07** [geändert]
 
@@ -2679,3 +2688,94 @@ Erkenntnisse, Belege und Commits je Schritt der Etappe 1. Die Kurzfassung steht 
     noch von Hand schreiben. `nichtAngemeldet` (Passkey) und das 401 `{}` von `getSitzung` bleiben bis
     dahin. Wer die Reihenfolge «Format vor Sitzung» ändern will, ändert Verhalten (Test
     `OHNE_BEIDES_ANDERS`).
+
+### D.2 Schritt 06a
+
+**Erkenntnisse Schritt 06a** (11.11.2026, Branch `refactor/schritt-06a`)
+
+- **Bestand am Code nachgelesen, Hinweise zu 06a bestätigt.** Aus `admin/schnittstellen.ts` holten
+  `gespraech` (`liest`, `schreibt`, `AdminEreignis`, `AdminUrheber`), `mitteilung` (`liest`,
+  `schreibt`, `AdminDienste`, `AdminEreignis`) und `turnier` (alle fünf). `MitteilungAdminDienste`
+  aus `mitteilung/schnittstellen.ts` holten `admin`, `gespraech`, `turnier` (dazu `mitteilung/index.ts`
+  im eigenen Modul); `CmDienste`, `CmEreignis` aus `cm/schnittstellen.ts` nur `gespraech` (dazu
+  `cm/index.ts`). Keine Route importiert einen dieser Namen. `mitRolle`, `liest`, `schreibt` und
+  `mitKonto` brauchen `antwort`, `istJson`, `formatFehler`, `leseKoerper`, `Ereignis` (`http.ts`),
+  `ZugangDienst` (`zugang.ts`), `BriefAbh` (`briefe.ts`), `Urheber` (`verlauf.ts`) und `darf`, `Art`,
+  `Bereich` (`src/lib/verwaltung/bereiche.ts`); `verlauf` und `briefe` liefern nur Typen.
+- **Ausgangslage und Netz (vor dem Umbau, nichts committet):** Rechte-Matrix, die Schnittstellen-Tests
+  von `admin`, `turnier`, `mitteilung`, `gespraech`, `cm`, `ansicht`, `auskunft`, «letzter Admin»,
+  Grundprüfung und Bremsen-Test: 16 Dateien, 200 Tests grün; Routen-Test, `importrichtung.test.ts`,
+  `bauregel.test.ts`: 71 grün; `bauregel: ok`. **Abschwächung 1:** in `mitRolle` die Zeile
+  `unbestaetigt` gestrichen → 4 rot (Rechte-Matrix «Unbestätigt: …», `admin/schnittstellen.db.test.ts`
+  zweimal, `turnier/schnittstellen.db.test.ts` «RR-07: …»). **Abschwächung 2:** die Prüfung
+  `kein-recht` gestrichen → 5 rot (Rechte-Matrix «MyTCO-Admin: jede schreibende Schnittstelle …»,
+  `admin`, `mitteilung/admin-schnittstellen.db.test.ts` «FR-42: …», `turnier` zweimal). Beide Male aus
+  einer Sicherungskopie zurückgesetzt, `git diff` leer. **Nach dem Umbau** dieselbe Abschwächung 1 in
+  `admin/rechte.ts`: dieselben 4 rot; zurückgesetzt, `git diff` leer. Das Netz hält die Prüfung auch
+  am neuen Ort.
+- **Umgebaut, ohne Verhalten zu ändern:** vier `refactor:`-Commits, jeder einzeln grün (Hook
+  `check-schnell`, dazu von Hand `svelte-check`, Routen-Test, `importrichtung.test.ts`,
+  `bauregel.test.ts`, `bauregel.ts` und die Datenbanktests der betroffenen Module): `4db07da`
+  `admin/rechte.ts` (drei Ausnahmen); `17100d6` `mitteilung/typen.ts` (drei); `fc77d1b` `cm/typen.ts`
+  (eine); `2ccbbca` der veraltete Kommentar in `eslint.config.js` («dazu kommt mit Schritt 06
+  `http.ts`»). Kein Test-Commit: Der Schritt braucht keinen neuen Test (Hinweise zu 06a, «Netz»).
+- **Inhalt unverändert:** Diff des alten Blocks in `admin/schnittstellen.ts` gegen `admin/rechte.ts`
+  ohne Importzeilen: `mitRolle`, `liest`, `schreibt` und die drei Typen Zeichen für Zeichen gleich;
+  bei `mitKonto` nur `export` und eine Kommentarzeile («Nur für `postZugangCode` und `postZugang` …»).
+  `MitteilungAdminDienste` (mit seinem Kommentar), `CmDienste` und `CmEreignis` ebenso gleich.
+- **Entscheid `mitKonto`: zieht mit nach `admin/rechte.ts`.** Massstab aus dem Auftrag: Die
+  Rechteprüfung liegt an einem Ort, `admin/schnittstellen.ts` enthält nur Schnittstellen und ihre
+  Listen. `mitKonto` ruft `zugang.pruefe` und antwortet 401 `abgemeldet` und 403 `kein-admin`; das ist
+  Rechteprüfung, nur ohne Bereich. Blieb es, stünde weiter ein Stück Rechteprüfung in einer
+  Schnittstellen-Datei. Preis: Es ist jetzt exportiert und damit für jedes Modul erreichbar. Eine
+  Verwaltungs-Schnittstelle, die es statt `liest`/`schreibt` benutzte, fiele in der Rechte-Matrix und
+  den Schleifen auf, solange sie in einer Liste steht (unbestätigt käme durch). Die vier Zugangs-Schnittstellen bleiben in
+  `admin/schnittstellen.ts`.
+- **Dateinamen:** `admin/rechte.ts` wie geplant; für die Dienst-Typen `typen.ts` in `mitteilung/` und
+  `cm/`, nicht `dienste.ts` (Verwechslung mit dem `dienste.ts` aus Schritt 07 und seiner Lint-Regel).
+  Keiner endet auf `schnittstellen.ts`: Der Routen-Test ersetzt ihre Funktionen nicht, Schicht 4 der
+  Lint-Regel greift nicht. **Routen-Test:** Bisher ersetzte er auch `liest` und `schreibt` durch
+  Aufzeichner, weil sie aus einem Modul `*schnittstellen.ts` kamen; aufgerufen wurden sie dort nie
+  (die Schnittstellen-Funktionen, die sie benutzen, sind selbst Aufzeichner). Jetzt bleiben sie echt;
+  Ergebnis und Zahl der Tests gleich.
+- **Bauregel nicht angepasst, am Code geprüft:** `bauregel.ts` hängt an den Listen
+  (`ADMIN_SCHNITTSTELLEN` …) und an den Pfaden `admin|mitteilung/(index|schnittstellen).ts`,
+  `turnier/schnittstellen.ts`, nicht an `liest`, `schreibt` oder den Typen. Eine Admin-Route, die
+  `admin/rechte.ts` importierte, meldet `ERLAUBTER_IMPORT`; eine andere Route jeden Import aus
+  `lib/server/admin` (`ADMIN_MODUL`). Die neuen `typen.ts` sieht die Bauregel nicht; sie enthalten nur
+  Typen, ein Import gäbe keiner Route Zugriff.
+- **Ausnahmen:** vorher 11, nachher 4: `turnier/schnittstellen.ts` → `gespraech/schnittstellen.ts`
+  (Schritt 11), `login/schnittstellen.ts` → `admin/rollen.ts` und → `gespraech/gespraech.ts`,
+  `login/sitzung.ts` → `admin/rollen.ts` (Schritt 10). Die Lint-Regel ist unverändert.
+- **Tests geändert:** nur Importpfade (die Typen und `liest`/`schreibt` aus `admin/rechte.ts`,
+  `mitteilung/typen.ts`, `cm/typen.ts`): `grundpruefung.db.test.ts`, `admin/rechte-matrix.db.test.ts`,
+  `admin/schnittstellen.db.test.ts`, `admin/schnittstellen-letzter-admin.db.test.ts`,
+  `admin/ansicht.db.test.ts`, `admin/auskunft.db.test.ts`, `turnier/schnittstellen.db.test.ts`,
+  `gespraech/schnittstellen.db.test.ts`, `mitteilung/admin-schnittstellen.db.test.ts`,
+  `cm/schnittstellen.db.test.ts`. Routen-Test, Bremsen-Test, `importrichtung.test.ts` und
+  `bauregel.test.ts` unverändert. Die Einheitstests sinken um sieben (die Fälle «Ausnahme ist noch
+  nötig» der gestrichenen Ausnahmen).
+- **Übergangsregel «Ab Schritt 06a» der `CLAUDE.md` stimmt wörtlich nicht ganz** (nicht geändert,
+  zur Entscheidung des Projektleiters): «Rechteprüfung der Verwaltung und Dienst-Typen stehen in keiner
+  `schnittstellen.ts`.» (1) Weiter in Schnittstellen-Dateien stehen die Dienst-Typen, die kein anderes
+  Modul braucht und die E-28 nicht nennt: `AnlassDienste`, `AnlassEreignis` (`anlass`),
+  `ProfilDienste` (`profil`), `MitteilungDienste` (`mitteilung`). (2) `getZugang` und `postAnsicht`
+  prüfen den Zugang selbst (`zugang.pruefe`), `postAnsichtBeenden` nur das Konto; das sind die
+  Schnittstellen, die den Zugang erst öffnen, und sie bleiben laut Auftrag Schnittstellen. Möglich
+  wäre, die Regel auf das Gemeinte zu präzisieren (`mitRolle`, `liest`, `schreibt`, `mitKonto` und
+  die Dienst-Typen, die andere Module importieren) oder die drei übrigen Typen in einem späteren
+  Schritt zu verschieben (07 fasst die `index.ts` ohnehin an).
+- **Ausserhalb des Schritts aufgefallen, nicht behoben:**
+  - Abschnitt 4 («Rechte an einer Stelle») nennt noch `admin/schnittstellen.ts` → `mitRolle`; das ist
+    der Stand der Analyse (0.20.5), der Ort ist jetzt `admin/rechte.ts`.
+  - `postAnsicht` wiederholt einen Teil von `mitRolle` von Hand (abgemeldet, `kein-admin`,
+    `unbestaetigt`) mit den echten Rollen statt der Ansicht; gewollt (Kommentar dort), aber eine zweite
+    Stelle, an der eine Rollenprüfung steht.
+- **Für die Folgeschritte:**
+  - **07:** `dienste.ts` holt `AdminDienste` aus `admin/rechte.ts`, `MitteilungAdminDienste` aus
+    `mitteilung/typen.ts`, `CmDienste` aus `cm/typen.ts`; die `index.ts` tun das schon. Keine
+    Ausnahme nötig.
+  - **09, 11:** `anlass/`, `cm/`, `gespraech/` holen `liest`, `schreibt` und die `Admin*`-Typen aus
+    `admin/rechte.ts` (Thema → Fachdatei eines anderen Themas, erlaubt). Ein neues
+    Schnittstellen-Modul darf `admin/rechte.ts` importieren, aber nicht `admin/schnittstellen.ts`.
+  - **12:** In `AUSNAHMEN` stehen nur noch die drei Einträge für Schritt 10 und der eine für 11.
