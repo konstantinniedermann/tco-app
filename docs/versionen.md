@@ -8,6 +8,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.9 — Lint-Regeln für die Importrichtung im Server (Refactoring Schritt 05)
+
+- ESLint hält die Richtung der Abhängigkeiten zwischen den Server-Modulen fest: Datenbank zuunterst,
+  darüber das Login, darüber die Themen; kein Thema importiert die Schnittstellen eines anderen. Die
+  19 heutigen Abweichungen stehen als benannte Ausnahmen in `eslint.config.js` und werden in den
+  folgenden Schritten abgebaut. Ein Prüfwerkzeug, ohne Wirkung auf die App (#80).
+
 ## 0.20.8 — Hilfsmittel für den Umbau der Oberfläche (Refactoring Schritt 04)
 
 - Neuer Hilfsbefehl `make css-vergleich`: vergleicht die gebauten Stylesheets zweier Builds Byte für
