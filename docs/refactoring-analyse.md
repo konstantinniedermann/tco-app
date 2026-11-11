@@ -30,7 +30,7 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 | **Erledigte Schritte** | 01 Startpaket, 02 E2E-Flakes, 03 Vertragstests, 04 Hilfsmittel für Etappe 2, 05 Lint-Regeln für die Richtung der Importe (Kurzfassung in 7.2, Protokoll in Anhang C); 06 Grundbausteine in `http.ts` (Review «ok», Version 0.20.10; Ergebnis in 7.3, Protokoll in Anhang D.1) |
 | **Zuletzt erledigt** | **06a** Rechteprüfung und Dienst-Typen aus den Schnittstellen-Dateien (Review «ok», Version 0.20.11; Ergebnis in 7.3, Protokoll in Anhang D.2) |
 | **Nächster offener Schritt** | **07** Zusammenbau der Dienste (`dienste.ts`), **braucht Nachmessen vorab** (Spalte in 7.3). Danach 08 bis 12 in dieser Reihenfolge |
-| **Wartet auf Freigabe des Projektleiters** | Checkpoint nach Schritt 06a: «ok» für das Nachmessen und den Start von Schritt 07; Entscheid zum Wortlaut der Übergangsregel «Ab Schritt 06a» in `CLAUDE.md` und zum Export von `mitKonto` (D.2) |
+| **Wartet auf Freigabe des Projektleiters** | nichts (Schritt 07 freigegeben, E-35); nächster Checkpoint nach Schritt 07 |
 | **Offene Fragen** | **F-17** (Ablage der Verwaltungs-Schnittstellen ausserhalb von `admin/`): stellt der Orchestrator nach dem Nachmessen vor Schritt 09. **F-15** (Version, solange es Test nicht gibt): vor Schritt 23. Beide in Abschnitt 9 |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
 | **Vorab nachzumessen** | vor Schritt 07, 08, 09, 10, 11, 13, 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). Schritte 06 und 06a brauchen keines |
@@ -1796,6 +1796,9 @@ sie hebt die Übergangsregeln auf.
 | **E-30** [neu] | (F-19, 11.11.2026) Ok für Etappe 1 mit den Änderungen der Zwischenrevision. Checkpoint nach jedem Schritt: Kurzbericht, weiter auf «ok». |
 | **E-31** [neu] | (11.11.2026) Dieses Dokument wird gestrafft, ohne Wissen zu verlieren: Protokoll der Etappe 0 in Anhang C, Hinweise unter den Tabellen statt in den Zellen, Abschnitt 9 als Tabelle, Anhang A als Verweis. |
 | **E-32** [neu] | (11.11.2026) Der Agent `refactor-analyst` hat das Werkzeug Edit, weiterhin nur für dieses Dokument. |
+| **E-33** [neu] | (11.11.2026, Checkpoint nach Schritt 06a) Die Übergangsregel «Ab Schritt 06a» in `CLAUDE.md` ist präzisiert: `liest` und `schreibt` kommen nur aus `admin/rechte.ts`; keine neue Schnittstelle prüft Rollen selbst; Typen, die ein anderes Modul braucht, stehen nicht in einer `schnittstellen.ts`. Die vier Dienst-Typen, die nur ihr eigenes Modul braucht (`AnlassDienste`, `AnlassEreignis`, `ProfilDienste`, `MitteilungDienste`), bleiben, wo sie sind. |
+| **E-34** [neu] | (11.11.2026) `mitKonto` der Verwaltung bleibt exportiert in `admin/rechte.ts`; benutzt wird es nur von `postZugangCode` und `postZugang`. |
+| **E-35** [neu] | (11.11.2026) Ok für Schritt 07 (Nachmessen, dann Umsetzung); danach Checkpoint. |
 
 ---
 

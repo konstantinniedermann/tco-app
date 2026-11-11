@@ -96,8 +96,9 @@ Abschluss des Plans.
 - Den Stand eines Schritts führt nur `docs/refactoring-analyse.md`.
 - Ab Schritt 06: Antwort, JSON-Prüfung, Körper lesen und die Standardantworten kommen nur aus
   `src/lib/server/http.ts`; kein Themen-Modul definiert sie selbst.
-- Ab Schritt 06a: Rechteprüfung der Verwaltung und Dienst-Typen stehen in keiner
-  `schnittstellen.ts`.
+- Ab Schritt 06a: `liest` und `schreibt` kommen nur aus `src/lib/server/admin/rechte.ts`; keine
+  neue Schnittstelle prüft Rollen selbst (`zugang.pruefe`). Typen, die ein anderes Modul braucht,
+  stehen nicht in einer `schnittstellen.ts`.
 - Ab Schritt 07: Dienste, Mail- und Push-Versender entstehen nur in
   `src/lib/server/dienste.ts`; kein Modul unter `src/lib/server/` importiert diese Datei.
 - Ab Schritt 08: eine Fehlerform `{ fehler, felder? }`; Fehlerwörter nur aus der gemeinsamen
