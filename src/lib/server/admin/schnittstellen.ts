@@ -59,7 +59,7 @@ import {
 	type DoppelMeldung
 } from '../cm/doppel-meldung.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
-import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 
 // Record statt Liste: Kommt ein Status dazu, meldet der Compiler die Lücke hier.
 const STATUS: Record<MitgliedStatus, true> = {

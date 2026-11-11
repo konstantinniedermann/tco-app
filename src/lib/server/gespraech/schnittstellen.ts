@@ -4,7 +4,7 @@
 import { liest, schreibt, type AdminEreignis, type AdminUrheber } from '../admin/rechte.ts';
 import type { CmDienste, CmEreignis } from '../cm/schnittstellen.ts';
 import { aendernd, antwort, jetzt, leseKoerper, mitSitzung, nichtGefunden } from '../http.ts';
-import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
 import { parseId } from '../parse-id.ts';
 import {

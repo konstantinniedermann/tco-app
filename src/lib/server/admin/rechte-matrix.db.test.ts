@@ -20,10 +20,8 @@ import {
 } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
-import {
-	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
-	type MitteilungAdminDienste
-} from '../mitteilung/schnittstellen.ts';
+import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { TURNIER_SCHNITTSTELLEN, postKategorien, postTurniere } from '../turnier/schnittstellen.ts';
 import { legeAnlassAn } from '../anlass/anlaesse.ts';
 import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';

@@ -6,9 +6,8 @@ import {
 	type AnlassAuswahl
 } from '../../mitteilung/auswahl.ts';
 import { vorlagenAnlass } from '../../mitteilung/vorlagen.ts';
-import { liest, schreibt, type AdminDienste, type AdminEreignis } from '../admin/rechte.ts';
+import { liest, schreibt, type AdminEreignis } from '../admin/rechte.ts';
 import type { Db } from '../db/index.ts';
-import type { Mailer } from '../login/dienst.ts';
 import {
 	antwort,
 	formatFehler,
@@ -26,7 +25,8 @@ import { pruefeMitteilung, type MitteilungWerte } from './angaben.ts';
 import { anlassEmpfaenger, vereinEmpfaenger, type Empfaenger } from './empfaenger.ts';
 import { ladeEinstellungen, pruefeThemen, setzeThemen } from './themen.ts';
 import { ladeAnlassKopf, ladeVerlauf, speichereMitteilung } from './verlauf.ts';
-import { versende, vorschau, type PushSender } from './versand.ts';
+import type { MitteilungAdminDienste } from './typen.ts';
+import { versende, vorschau } from './versand.ts';
 
 // Für die Mitglieder: ohne Push-Sender und Mailer.
 export type MitteilungDienste = { db: Db; vapidOeffentlich: string | null; jetzt?: () => Date };
@@ -81,17 +81,6 @@ export const MITTEILUNG_SCHNITTSTELLEN = {
 } satisfies Record<string, (d: MitteilungDienste, e: Ereignis) => Promise<Response>>;
 
 // --- Verwaltung -------------------------------------------------------------------------------
-
-/**
- * Die Rechte prüft die Verwaltung (`liest`/`schreibt`, Bereich `mitglieder`): Der Mitglieder-Admin
- * sendet, der MyTCO-Admin liest nur den Verlauf. `push: null` heisst: kein VAPID, Push ist aus.
- * `adresse`: Adresse von MyTCO für die Links.
- */
-export type MitteilungAdminDienste = AdminDienste & {
-	push: PushSender | null;
-	mailer: Mailer;
-	adresse: string;
-};
 
 type AdminHandler = (d: MitteilungAdminDienste, e: AdminEreignis) => Promise<Response>;
 

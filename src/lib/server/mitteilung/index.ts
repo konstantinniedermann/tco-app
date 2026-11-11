@@ -2,7 +2,8 @@ import { holeAdminDienste } from '../admin/index.ts';
 import { holeDb } from '../db/index.ts';
 import { leseEinstellungen } from '../einstellungen.ts';
 import { erstelleSmtpMailer, leiteUm } from '../login/mail.ts';
-import type { MitteilungAdminDienste, MitteilungDienste } from './schnittstellen.ts';
+import type { MitteilungDienste } from './schnittstellen.ts';
+import type { MitteilungAdminDienste } from './typen.ts';
 import { MAILS_GLEICHZEITIG } from './versand.ts';
 import { erstelleWebPush, kontaktFuerPush } from './web-push.ts';
 

@@ -15,7 +15,7 @@ import {
 import { meldeAn } from '../cm/anmeldungen.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
-import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { erstelleZugangDienst } from '../admin/zugang.ts';
 import type { KategorieWerte } from './angaben.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from './turniere.ts';

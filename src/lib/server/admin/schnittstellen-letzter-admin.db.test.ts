@@ -9,7 +9,7 @@ import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { kontoRolle } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
-import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { postAustritt, postLoeschen, postRollen } from './schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 

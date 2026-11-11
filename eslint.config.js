@@ -43,21 +43,6 @@ export const AUSNAHMEN = [
 			'06a: die Typen CmDienste und CmEreignis (aendernd und mitSitzung zieht Schritt 06 weg)'
 	},
 	{
-		von: 'admin/schnittstellen.ts',
-		nach: 'mitteilung/schnittstellen.ts',
-		schritt: '06a: der Typ MitteilungAdminDienste'
-	},
-	{
-		von: 'gespraech/schnittstellen.ts',
-		nach: 'mitteilung/schnittstellen.ts',
-		schritt: '06a: der Typ MitteilungAdminDienste'
-	},
-	{
-		von: 'turnier/schnittstellen.ts',
-		nach: 'mitteilung/schnittstellen.ts',
-		schritt: '06a: der Typ MitteilungAdminDienste'
-	},
-	{
 		von: 'turnier/schnittstellen.ts',
 		nach: 'gespraech/schnittstellen.ts',
 		schritt: '11: die Gesprächs-Schnittstellen ziehen von turnier nach gespraech'

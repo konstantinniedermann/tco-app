@@ -15,7 +15,7 @@ import { gespraech, nachricht, turnier } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { getSitzung } from '../login/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
-import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { ladeTurnier, legeTurnierAn, listeTurniere } from '../turnier/turniere.ts';
 import {
 	getAdminGespraech,

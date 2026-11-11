@@ -23,9 +23,9 @@ import { erstelleSitzung, pruefeSitzung } from './login/sitzung.ts';
 import {
 	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
 	MITTEILUNG_SCHNITTSTELLEN,
-	type MitteilungAdminDienste,
 	type MitteilungDienste
 } from './mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from './mitteilung/typen.ts';
 import { erstelleEmailWechselDienst } from './profil/email-wechsel.ts';
 import { PROFIL_SCHNITTSTELLEN, type ProfilDienste } from './profil/schnittstellen.ts';
 import { TURNIER_SCHNITTSTELLEN } from './turnier/schnittstellen.ts';

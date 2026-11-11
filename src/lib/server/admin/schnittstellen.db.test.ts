@@ -11,7 +11,7 @@ import {
 	partnerAnfrage,
 	sitzung
 } from '../db/schema.ts';
-import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { antwort } from '../http.ts';
