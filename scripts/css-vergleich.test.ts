@@ -1,6 +1,6 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { vergleicheOrdner } from './css-vergleich.ts';
 
@@ -101,5 +101,41 @@ describe('Stylesheet-Vergleich', () => {
 		const leer = ordner({});
 		mkdirSync(join(leer, 'unterordner'));
 		expect(() => vergleicheOrdner(a, leer)).toThrow(/keine CSS-Datei/);
+	});
+
+	it('vergleicht Bytes: verschiedene ungültige Bytes sind nicht gleich', () => {
+		const a = ordner({});
+		const b = ordner({});
+		writeFileSync(join(a, '0.DrKJQ_Q0.css'), Buffer.from([0x2e, 0x61, 0xff]));
+		writeFileSync(join(b, '0.DrKJQ_Q0.css'), Buffer.from([0x2e, 0x61, 0xfe]));
+		const ergebnis = vergleicheOrdner(a, b);
+		expect(ergebnis.gleich).toBe(false);
+		expect(ergebnis.meldungen.join('\n')).toContain('Inhalt anders');
+	});
+
+	it('bricht ab, wenn eine CSS-Datei in einem Unterordner liegt', () => {
+		const a = ordner({ '0.DrKJQ_Q0.css': '.a{}' });
+		const b = ordner({ '0.DrKJQ_Q0.css': '.a{}' });
+		mkdirSync(join(b, 'unter'));
+		writeFileSync(join(b, 'unter', 'x.AAAAAAAA.css'), '.x{}');
+		expect(() => vergleicheOrdner(a, b)).toThrow(/Unterordner/);
+		expect(() => vergleicheOrdner(b, a)).toThrow(/Unterordner/);
+	});
+
+	it('bricht ab, wenn beide Argumente auf denselben Ordner zeigen', () => {
+		const a = ordner({ '0.DrKJQ_Q0.css': '.a{}' });
+		expect(() => vergleicheOrdner(a, a)).toThrow(/derselbe Ordner/);
+		expect(() => vergleicheOrdner(a, join(a, '..', basename(a)))).toThrow(/derselbe Ordner/);
+	});
+
+	it('lässt mehrere Kandidaten mit gleichem Stamm als fehlt/neu stehen', () => {
+		const a = ordner({ '0.AAAAAAAA.css': '.a{}' });
+		const b = ordner({ '0.BBBBBBBB.css': '.a{}', '0.CCCCCCCC.css': '.a{}' });
+		const ergebnis = vergleicheOrdner(a, b);
+		expect(ergebnis.gleich).toBe(false);
+		const text = ergebnis.meldungen.join('\n');
+		expect(text).toContain('fehlt nachher: 0.AAAAAAAA.css');
+		expect(text).toContain('neu nachher: 0.BBBBBBBB.css');
+		expect(text).toContain('neu nachher: 0.CCCCCCCC.css');
 	});
 });
