@@ -36,11 +36,15 @@
 ## Tests
 
 - Jede Änderung am Verhalten beginnt mit einem Test, der vorher rot war.
-- Tests prüfen Verhalten: Kein Test liest Quelltext der App, kein Schnappschuss-Vergleich.
+- Tests prüfen Verhalten: Kein Test liest Quelltext der App, kein Schnappschuss-Vergleich. Die
+  Struktur prüfen nur ESLint und die Prüfskripte unter `scripts/`.
 - Fachlogik läuft im Test gegen die echte Datenbank; Attrappen nur für Mail, Push, Uhr und Abruf.
 - E2E nur über `make e2e` bzw. `npm run e2e`. Elemente über Rolle und Beschriftung suchen, nicht
   über CSS-Klassen; keine festen Wartezeiten.
-- Eine neue Schnittstelle der Verwaltung kommt in ihre Liste, damit die Rechte-Tests sie prüfen.
+- Eine neue Schnittstelle kommt in die Liste ihres Moduls. Eine neue Liste der Verwaltung kommt
+  in Grundprüfung, Routen-Test, Rechte-Matrix und Bauregel.
+- Nie zwei Builds oder Prüfläufe (`make check`, `make e2e`, `npm run build`) gleichzeitig im
+  selben Ordner.
 
 ## Mitgliederdaten — Dauerverbote
 
@@ -92,12 +96,15 @@ Abschluss des Plans.
 - Den Stand eines Schritts führt nur `docs/refactoring-analyse.md`.
 - Ab Schritt 06: Antwort, JSON-Prüfung, Körper lesen und die Standardantworten kommen nur aus
   `src/lib/server/http.ts`; kein Themen-Modul definiert sie selbst.
-- Ab Schritt 07: Dienste entstehen nur in `src/lib/server/dienste.ts`; kein zweiter
-  Mail- oder Push-Versender.
+- Ab Schritt 06a: Rechteprüfung der Verwaltung und Dienst-Typen stehen in keiner
+  `schnittstellen.ts`.
+- Ab Schritt 07: Dienste, Mail- und Push-Versender entstehen nur in
+  `src/lib/server/dienste.ts`; kein Modul unter `src/lib/server/` importiert diese Datei.
 - Ab Schritt 08: eine Fehlerform `{ fehler, felder? }`; Fehlerwörter nur aus der gemeinsamen
   Liste, die Server und Oberfläche teilen.
-- Ab Schritt 12: Die Importrichtung zwischen den Server-Modulen setzt ESLint durch; keine neue
-  Ausnahme.
+- Die Importrichtung zwischen den Server-Modulen setzt ESLint durch. Keine neue Ausnahme in
+  `AUSNAHMEN` (`eslint.config.js`) ohne Entscheid des Projektleiters; ab Schritt 12 ist die
+  Liste leer.
 - Ab Schritt 13: Abruf-Module nutzen den gemeinsamen Abruf-Baustein; keine eigene Deutung von
   Statuscodes, das Ergebnis heisst `art`.
 - Ab Schritt 15: Die Anmeldung prüft nur die gemeinsame Wächter-Funktion in der Ladefunktion;

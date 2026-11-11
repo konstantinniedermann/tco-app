@@ -1,7 +1,7 @@
 ---
 name: refactor-analyst
 description: Analyse, Nachmessen und Zwischenrevision fürs Refactoring von MyTCO. Ändert keinen Code.
-tools: Read, Grep, Glob, Bash, Write
+tools: Read, Grep, Glob, Bash, Write, Edit
 model: fable
 ---
 
