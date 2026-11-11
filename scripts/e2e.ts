@@ -4,9 +4,13 @@
 // Die Datenbank entsteht auf dem Server aus DATABASE_URL (sonst die lokale aus .env.example) und
 // wird nach dem Lauf gelöscht; der Webserver aus playwright.config.ts migriert sie. Reste
 // abgebrochener Läufe, die älter als ein Tag sind, räumt der nächste Lauf weg.
+// Ebenso baut jeder Lauf in einen eigenen Ordner unter `.e2e-build/` (vite.config.ts liest ihn aus
+// MYTCO_E2E_BUILD): Ein anderer Build im selben Ordner (`make check`, `make build`, ein zweiter
+// Lauf) verändert den laufenden Testserver sonst, und SvelteKit lädt Fehlerseiten endlos neu.
 // Nur abtrennbare TS-Syntax (läuft mit `node scripts/e2e.ts`).
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
+import { existsSync, readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import pg from 'pg';
 
@@ -45,6 +49,36 @@ export function istE2eDatenbank(url: string): boolean {
 	}
 }
 
+/** Gemeinsame Wurzel der Build-Ordner je Lauf (gitignoriert). */
+export const BUILD_WURZEL = '.e2e-build';
+
+/** Ordner, in den ein Lauf baut; trägt den Namen seiner Datenbank (mit Zeit, fürs Aufräumen). */
+export function buildOrdner(name: string): string {
+	return join(BUILD_WURZEL, name);
+}
+
+export function entferneBuildOrdner(pfad: string): void {
+	rmSync(pfad, { recursive: true, force: true });
+}
+
+/** Löscht Build-Ordner abgebrochener Läufe, die älter als ein Tag sind; gibt ihre Namen zurück. */
+export function raeumeAlteBuildsAuf(wurzel: string, jetzt: Date): string[] {
+	if (!existsSync(wurzel)) return [];
+	const alt = readdirSync(wurzel).filter((name) => istVeralteteE2eDatenbank(name, jetzt));
+	for (const name of alt) entferneBuildOrdner(join(wurzel, name));
+	return alt;
+}
+
+/**
+ * Der Build schreibt die Typ-Einstellungen von SvelteKit (`node_modules/$app/tsconfig.json`) auf
+ * seinen Ordner um; nach dem Löschen zeigten sie ins Leere. `svelte-kit sync` stellt sie wieder
+ * auf `.svelte-kit/`.
+ */
+function stelleTypenWiederHer(): void {
+	const sync = spawnSync(join('node_modules', '.bin', 'svelte-kit'), ['sync'], { stdio: 'ignore' });
+	if (sync.status !== 0) console.error('svelte-kit sync nach dem E2E-Lauf fehlgeschlagen');
+}
+
 export function urlMitDatenbank(basis: string, name: string): string {
 	const url = new URL(basis);
 	url.pathname = `/${name}`;
@@ -75,10 +109,10 @@ async function raeumeAlteAuf(basis: string, jetzt: Date): Promise<void> {
 	});
 }
 
-function playwright(args: string[], datenbankUrl: string): Promise<number> {
+function playwright(args: string[], datenbankUrl: string, ordner: string): Promise<number> {
 	const kind = spawn(join('node_modules', '.bin', 'playwright'), ['test', ...args], {
 		stdio: 'inherit',
-		env: { ...process.env, DATABASE_URL: datenbankUrl }
+		env: { ...process.env, DATABASE_URL: datenbankUrl, MYTCO_E2E_BUILD: ordner }
 	});
 	// Signale an Playwright weiterreichen und selbst nicht vorzeitig enden, damit die Datenbank
 	// danach noch gelöscht wird (Ctrl-C trifft ohnehin die ganze Prozessgruppe).
@@ -98,14 +132,24 @@ async function main(): Promise<void> {
 	const basis = process.env.DATABASE_URL || STANDARD_URL;
 	const jetzt = new Date();
 	await raeumeAlteAuf(basis, jetzt);
+	for (const alt of raeumeAlteBuildsAuf(BUILD_WURZEL, jetzt)) {
+		console.log(`Alter E2E-Build-Ordner gelöscht: ${alt}`);
+	}
 	const name = e2eDatenbankName(jetzt, randomBytes(4).toString('hex'));
+	const ordner = buildOrdner(name);
 	await mitVerbindung(basis, (c) =>
 		c.query(`CREATE DATABASE ${c.escapeIdentifier(name)}`).then(() => {})
 	);
-	console.log(`E2E auf eigener Datenbank ${name}`);
+	console.log(`E2E auf eigener Datenbank ${name}, Build in ${ordner}`);
 	try {
-		process.exitCode = await playwright(process.argv.slice(2), urlMitDatenbank(basis, name));
+		process.exitCode = await playwright(
+			process.argv.slice(2),
+			urlMitDatenbank(basis, name),
+			ordner
+		);
 	} finally {
+		entferneBuildOrdner(ordner);
+		stelleTypenWiederHer();
 		await mitVerbindung(basis, (c) =>
 			c.query(`DROP DATABASE IF EXISTS ${c.escapeIdentifier(name)} WITH (FORCE)`).then(() => {})
 		);

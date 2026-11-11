@@ -34,13 +34,21 @@ async function nochNichtGefragt(page: Page) {
 	});
 }
 
-/** Schaltet ein Thema um und wartet, bis der Server es gespeichert hat. */
+/**
+ * Schaltet ein Thema um und wartet, bis der Server es gespeichert und die Seite die Antwort
+ * verarbeitet hat: Der Test sieht die Antwort, bevor die Seite sie fertig gelesen hat. Ein
+ * `page.reload()` in diesem Moment bricht die Anfrage ab, und WebKit meldet das als Seitenfehler
+ * («… /api/benachrichtigungen due to access control checks»). Solange die Anfrage läuft, sind die
+ * Schalter gesperrt.
+ */
 async function schalte(page: Page, thema: string, an: boolean) {
+	const schalter = page.getByRole('checkbox', { name: thema });
 	const gespeichert = page.waitForResponse(
 		(r) => r.url().endsWith('/api/benachrichtigungen') && r.request().method() === 'POST' && r.ok()
 	);
-	await page.getByRole('checkbox', { name: thema }).setChecked(an);
+	await schalter.setChecked(an);
 	await gespeichert;
+	await expect(schalter).toBeEnabled();
 }
 
 test('FR-41: Themen im Profil ab- und wieder einschalten bleibt nach Neuladen', async ({

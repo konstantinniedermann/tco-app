@@ -13,6 +13,7 @@ import {
 	klappeAuf,
 	pruefeBildschirm,
 	sammleKonsolenfehler,
+	wartetAufMitgliederliste,
 	wartetAufVorladen
 } from './hilfen/seite.ts';
 
@@ -219,7 +220,7 @@ test('Verwaltung: Wappen zur ersten Seite, Rückfrage auch bei Links der Seitenl
 	await expect(page.getByRole('heading', { level: 1, name: 'Anlässe' })).toBeVisible();
 	await sitztWieVorher(page);
 	await tippeWappen(page, finger);
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await wartetAufMitgliederliste(page);
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
 
 	// Angaben geändert: der Link der Seitenleiste fragt; Abbrechen bleibt.

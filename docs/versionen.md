@@ -8,6 +8,14 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.6 — E2E-Tests verlässlicher (Refactoring Schritt 02)
+
+- Jeder E2E-Lauf baut in einen eigenen Ordner (`.e2e-build/`) und räumt ihn danach weg. Ein Build
+  oder zweiter Prüflauf im selben Ordner bringt den laufenden Testserver nicht mehr durcheinander;
+  das war die Ursache der zwei Fehlerseiten-Flakes in der Verwaltung.
+- E2E-Tests warten auf die geladene Mitgliederliste und auf das Ende des Speicherns, bevor sie die
+  Seite wechseln; vier feste Wartezeiten sind ersetzt (#80).
+
 ## 0.20.5 — Doku-Abgleich vor dem Release
 
 - Datenschutzerklärung zum Gespräch mit der Turnierleitung präzisiert: die Nachrichten stehen unter

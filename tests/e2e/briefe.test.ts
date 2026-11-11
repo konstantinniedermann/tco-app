@@ -16,7 +16,12 @@ import {
 	leereStrasse,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
-import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
+import {
+	pruefeBildschirm,
+	sammleKonsolenfehler,
+	wartetAufMitgliederliste,
+	wartetAufVorladen
+} from './hilfen/seite.ts';
 
 // Seite Briefe (A-LOGIN-01, Etappe 2a von #43). Alle Browser kommen von 127.0.0.1 an denselben
 // Server: je Test ein Admin-Login mit Brief-Code und eine Code-Bestätigung an eine neue Adresse.
@@ -65,7 +70,7 @@ async function meldeAdminAn(page: Page, nurMytco = false) {
 	await page.getByRole('button', { name: 'Code schicken' }).click();
 	await page.getByLabel('Code aus der Mail').fill(await holeMailCode(admin.email));
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await wartetAufMitgliederliste(page);
 }
 
 async function oeffneBriefe(page: Page) {

@@ -19,6 +19,7 @@ import {
 	pruefeBildschirm,
 	pruefePfad,
 	sammleKonsolenfehler,
+	wartetAufMitgliederliste,
 	wartetAufVorladen
 } from './hilfen/seite.ts';
 
@@ -48,10 +49,7 @@ async function bestaetige(page: Page, konto: Konto) {
 	await page.getByLabel('Code aus der Mail').fill(code);
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
-	// Erst weiter, wenn die Liste steht (das Layout hat die Zugangsprüfung dann abgeschlossen):
-	// Ein folgendes page.goto bricht sonst die laufende Anfrage ab, und WebKit unter Linux meldet
-	// das als Konsolenfehler.
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await wartetAufMitgliederliste(page);
 }
 
 async function oeffneVerwaltung(page: Page, konto: Konto) {
@@ -243,12 +241,8 @@ test('SI-08: falscher Code zeigt die Meldung, «Neuen Code schicken» führt wei
 
 	await page.getByRole('button', { name: 'Neuen Code schicken' }).click();
 	// Die neue Mail trifft kurz nach der Antwort ein; die neueste Mail trägt einen anderen Code.
-	let neu = erster;
-	for (let i = 0; i < 20 && neu === erster; i++) {
-		await page.waitForTimeout(250);
-		neu = await holeMailCode(admin.email);
-	}
-	expect(neu).not.toBe(erster);
+	await expect.poll(() => holeMailCode(admin.email)).not.toBe(erster);
+	const neu = await holeMailCode(admin.email);
 	await feld.fill(neu);
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
@@ -560,7 +554,7 @@ test('RR-07, Regel 3: MyTCO-Admin sieht Mitglied nur lesend (fieldset disabled, 
 	await expect(page.getByRole('link', { name: 'Mitglied anlegen' })).toHaveCount(0);
 	await page.goto('/verwaltung/mitglieder/neu');
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await wartetAufMitgliederliste(page);
 
 	// Mitglied: Angaben gesperrt, ohne Speichern und ohne Sitzungen beenden; Rollen bleiben offen.
 	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
@@ -617,7 +611,7 @@ test('RR-07, Regel 2: Mitglieder-Admin sieht keine Rollenvergabe', async ({ page
 	// Die Seite Rollen führt zur ersten Seite der Verwaltung.
 	await page.goto('/verwaltung/rollen');
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await wartetAufMitgliederliste(page);
 
 	// Beim Mitglied: Angaben bearbeitbar, keine Klappe «Rollen».
 	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);

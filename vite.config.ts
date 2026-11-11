@@ -10,6 +10,10 @@ const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 
 
 // SvelteKit 3 liest keine svelte.config.js mehr; die Konfiguration steht im Plugin.
 const spa = process.env.MYTCO_SPA === '1';
+// Nur E2E (scripts/e2e.ts): eigener Ordner je Lauf für SvelteKits Zwischenstand und den Server, damit
+// ein anderer Build im selben Ordner den laufenden Testserver nicht verändert. Sonst wie üblich
+// `.svelte-kit/` und `build/`.
+const e2eBuild = process.env.MYTCO_E2E_BUILD || undefined;
 
 export default defineConfig({
 	plugins: [
@@ -17,7 +21,10 @@ export default defineConfig({
 			compilerOptions: {
 				runes: true
 			},
-			adapter: spa ? adapterStatic({ fallback: 'index.html' }) : adapterNode(),
+			outDir: e2eBuild && `${e2eBuild}/svelte-kit`,
+			adapter: spa
+				? adapterStatic({ fallback: 'index.html' })
+				: adapterNode({ out: e2eBuild ? `${e2eBuild}/build` : 'build' }),
 			csp: {
 				mode: 'auto',
 				directives: {

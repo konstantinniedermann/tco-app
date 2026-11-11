@@ -21,6 +21,7 @@ import {
 	pruefeBildschirm,
 	sammleKonsolenfehler,
 	waehleAktion,
+	wartetAufMitgliederliste,
 	wartetAufVorladen
 } from './hilfen/seite.ts';
 
@@ -295,8 +296,7 @@ test('RR-07, FR-08: MyTCO-Admin sieht die Anmeldungen mit Kommentar, ohne Tasten
 	await meldeAn(page, mytco);
 	await page.goto('/verwaltung');
 	await bestaetige(page, mytco, 'Mitglieder');
-	// Die Mitgliederliste lädt erst nach der Überschrift; page.goto bräche sie sonst ab (WebKit).
-	await expect(page.getByRole('status')).toHaveText(/^\d+ Mitglied(er)?$/);
+	await wartetAufMitgliederliste(page);
 	await page.goto(`/verwaltung/turniere/${turnierId}/kategorien/${kategorieId}`);
 	await expect(page.getByRole('heading', { level: 1, name: 'Herren R1–R6' })).toBeVisible();
 	await expect(page.getByText('1 Anmeldung, 1 Wildcard-Antrag', { exact: true })).toBeVisible();

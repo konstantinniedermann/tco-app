@@ -10,6 +10,7 @@ export default defineConfig(
 		ignores: [
 			'.svelte-kit/',
 			'build/',
+			'.e2e-build/',
 			'coverage/',
 			'node_modules/',
 			'playwright-report/',

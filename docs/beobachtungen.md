@@ -130,18 +130,6 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 **Verifiziert:** 09.11.2026 gegen `dev` e947d25 — belegt (`verwaltung-doppel.ts` → `loescheDoppel` ruft `anfragenVerfallen` nicht auf; `doppel.ts` → `nimmAnfrageAn` ohne Prüfung der Anmeldung des Anfragenden). Offen ist nur die Umsetzung.
 
-### 2026-11-09 — E2E: zwei iPhone-Tests der Mitgliederverwaltung nur im Gesamtlauf rot
-
-**Thema:** Tests
-
-**Fundort:** `tests/e2e/verwaltung.test.ts` — «A-MITGLIED-02: zwei Admins am selben Mitglied …» und «UI-06: Verwaltung nicht erreichbar – Fehlerseite …», Projekt iphone
-
-**Beobachtung:** Im ersten `make check` (414 E2E) scheiterten beide an `toBeVisible` nach 5 s mit «waiting for navigation to finish» (`/verwaltung/mitglieder/2147483000` bzw. `/verwaltung/mitglieder`). Einzeln (`--project iphone`, ganze Datei) und im zweiten Gesamtlauf grün.
-
-**Ursprung:** Session K-42 (Kontaktdaten CM-Admin), `make check` vor dem Merge
-
-**Einschätzung:** Niedrig bis mittel. Sieht nach dem Zeitbudget unter Last auf WebKit aus (vgl. Memory zur E2E-Zeitgrenze); beim nächsten Auftreten Trace ansehen, nicht gleich die Wartezeit erhöhen.
-
 ### 2026-11-09 — Spielersuche zeigt dem CM-Admin Geschlecht und Jahrgang aller aktiven Mitglieder
 
 **Thema:** Datenschutz
@@ -165,18 +153,6 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Review (`cas-reviewer`) des Branches `test/e2e-turnierjahre`
 
 **Einschätzung:** Niedrig. Entfernen, sobald die damals offenen Branches gemergt sind; vorher mit `grep -rn "legeTurnierAn(\|legeOffenesTurnierAn(" tests/e2e` prüfen, dass niemand mehr ein Jahr übergibt.
-
-### 2026-11-09 — E2E: FR-41 Benachrichtigungen auf dem iPhone im Gesamtlauf einmal rot
-
-**Thema:** Tests
-
-**Fundort:** `tests/e2e/benachrichtigungen.test.ts` — «FR-41: Themen im Profil ab- und wieder einschalten bleibt nach Neuladen», Projekt iphone
-
-**Beobachtung:** Im `make check` scheiterte der Test an `expect(fehler).toEqual([])` mit dem WebKit-Fehler «…/api/benachrichtigungen due to access control checks.» Vermutlich bricht `page.reload()` nach `schalte(…)` eine noch laufende Anfrage an `/api/benachrichtigungen` ab (`schalte` wartet nur auf das POST). Einzeln 16 von 16 grün (`--repeat-each 8`), der Gesamtlauf davor und danach grün.
-
-**Ursprung:** Branch `test/e2e-turnierjahre`, zweiter `make check` (die Datei nutzt die geänderten Hilfen nicht)
-
-**Einschätzung:** Niedrig bis mittel, wie die zwei iPhone-Tests der Mitgliederverwaltung: beim nächsten Auftreten Trace mit Netzwerk ansehen, welche Anfrage abbricht, und vor dem Neuladen auf sie warten.
 
 ### 2026-11-09 — Gespräch mit der Turnierleitung: keine Grenze für Nachrichten eines Mitglieds
 
