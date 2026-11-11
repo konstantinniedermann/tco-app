@@ -1,4 +1,4 @@
-import { holeMitteilungDienste } from '../../../lib/server/mitteilung/index.ts';
+import { holeMitteilungDienste } from '../../../lib/server/dienste.ts';
 import {
 	getBenachrichtigungen,
 	postThemen

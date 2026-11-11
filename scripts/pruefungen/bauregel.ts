@@ -16,32 +16,33 @@ function exportiertActions(inhalt: string): boolean {
 	return false;
 }
 
-// Admin-Routen sind dünn: Sie importieren nur einen Dienst-Einstieg und die Schnittstellen, und
-// von den Schnittstellen nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN (Bereich
-// Clubmeisterschaft, offen auch für `cm`) oder MITTEILUNG_ADMIN_SCHNITTSTELLEN (Mitteilungen der
-// Verwaltung). Nur diese decken die Rechte-Tests ab.
+// Admin-Routen sind dünn: Sie importieren aus dem Zusammenbau der Dienste nur die Einstiege der
+// Verwaltung und von den Schnittstellen nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN
+// (Bereich Clubmeisterschaft, offen auch für `cm`) oder MITTEILUNG_ADMIN_SCHNITTSTELLEN (Mitteilungen
+// der Verwaltung). Nur diese decken die Rechte-Tests ab.
 const ADMIN_ROUTE = /^src\/routes\/api\/admin\/(?:.*\/)?\+server\.(ts|js)$/;
 const ERLAUBTER_IMPORT =
-	/(?:^|\/)lib\/server\/(?:(?:admin|mitteilung)\/(?:index|schnittstellen)|turnier\/schnittstellen)\.ts$|^\.\/\$types$/;
+	/(?:^|\/)lib\/server\/(?:dienste|(?:admin|mitteilung|turnier)\/schnittstellen)\.ts$|^\.\/\$types$/;
 const ADMIN_MODUL = /(?:^|\/|^\$)lib\/server\/admin(?:\/|$)/;
 const SCHNITTSTELLEN_DATEI = 'src/lib/server/admin/schnittstellen.ts';
 const TURNIER_DATEI = 'src/lib/server/turnier/schnittstellen.ts';
 const MITTEILUNG_DATEI = 'src/lib/server/mitteilung/schnittstellen.ts';
 const SCHNITTSTELLEN_IMPORT =
 	/(?:^|\/)lib\/server\/(?:admin|turnier|mitteilung)\/schnittstellen\.ts$/;
-// Je Dienst-Einstieg der eine erlaubte Name; die Mitglieder-Dienste der Mitteilungen nicht.
-const AUS_INDEX: [RegExp, string][] = [
-	[/(?:^|\/)lib\/server\/admin\/index\.ts$/, 'holeAdminDienste'],
-	[/(?:^|\/)lib\/server\/mitteilung\/index\.ts$/, 'holeMitteilungAdminDienste']
-];
-const DIENSTE = AUS_INDEX.map(([, name]) => name);
+// Die Einstiege der Verwaltung in `dienste.ts`. Eine Liste für beide Richtungen: Admin-Routen dürfen
+// aus `dienste.ts` nur diese, alle anderen Routen alles ausser diesen. Ein neuer Einstieg der
+// Verwaltung, der hier fehlt, ist für Admin-Routen gesperrt und fällt sofort auf.
+const VERWALTUNGS_EINSTIEGE = ['holeAdminDienste', 'holeMitteilungAdminDienste'];
+const AUS_DIENSTEN = /(?:^|\/)lib\/server\/dienste\.ts$/;
+const ERLAUBT_DIENSTE = VERWALTUNGS_EINSTIEGE.join(' und ');
 const ERLAUBT_IMPORT =
-	'erlaubt sind nur admin/index.ts, mitteilung/index.ts und die Schnittstellen aus admin/, turnier/ und mitteilung/';
+	'erlaubt sind nur dienste.ts und die Schnittstellen aus admin/, turnier/ und mitteilung/';
 const ERLAUBT_LISTEN =
 	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN und MITTEILUNG_ADMIN_SCHNITTSTELLEN';
-// Ausserhalb von api/admin: aus den Mitteilungen nur, was den Mitgliedern dient (Ordner-Import
-// `$lib/server/mitteilung` löst Vite auf index.ts auf).
-const MITTEILUNG_INDEX = /(?:^|\/|^\$)lib\/server\/mitteilung(?:\/index(?:\.ts)?)?$/;
+// Ausserhalb von api/admin: aus dem Zusammenbau der Dienste und aus den Mitteilungen nur, was den
+// Mitgliedern dient. `dienste.ts` mit und ohne Endung (auch `.js`, das Vite auf `.ts` auflöst), über
+// `$lib` und mit Anhang (`?…`): Der Schutz hängt hier am Namen, nicht mehr am Pfad.
+const DIENSTE_MODUL = /(?:^|\/|^\$)lib\/server\/dienste(?:\.(?:ts|js))?(?:[?#].*)?$/;
 const MITTEILUNG_SCHNITTSTELLEN = /(?:^|\/|^\$)lib\/server\/mitteilung\/schnittstellen(?:\.ts)?$/;
 
 // Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
@@ -132,28 +133,30 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 			continue;
 		}
 		const ausListe = SCHNITTSTELLEN_IMPORT.test(imp.quelle);
-		const dienst = AUS_INDEX.find(([muster]) => muster.test(imp.quelle))?.[1];
-		if (!ausListe && dienst === undefined) continue;
+		const ausDiensten = AUS_DIENSTEN.test(imp.quelle);
+		if (!ausListe && !ausDiensten) continue;
 		const namen = imp.klausel === null ? null : benannteNamen(imp.klausel);
 		if (namen === null) {
 			befunde.push(`${pfad}: Admin-Route importiert '${imp.quelle}' nicht mit Namen`);
 			continue;
 		}
 		for (const [name, lokal] of namen) {
-			if (ausListe ? erlaubt.has(name) : name === dienst) {
+			if (ausListe ? erlaubt.has(name) : VERWALTUNGS_EINSTIEGE.includes(name)) {
 				if (ausListe) schnittstellen.add(lokal);
 				continue;
 			}
 			befunde.push(
 				ausListe
 					? `${pfad}: Admin-Route nutzt '${name}'; ${ERLAUBT_LISTEN}`
-					: `${pfad}: Admin-Route importiert '${name}' aus ${imp.quelle}; erlaubt ist nur ${dienst}`
+					: `${pfad}: Admin-Route importiert '${name}' aus ${imp.quelle}; erlaubt sind nur ${ERLAUBT_DIENSTE}`
 			);
 		}
 	}
 	// Die Dienste nur einer Schnittstelle übergeben: Wer `.db` herausholt, umgeht die Rechteprüfung.
 	const code = ohneKommentare(inhalt).replace(/\bimport\b[^;]*?\bfrom\s*['"][^'"]+['"]\s*;?/g, '');
-	for (const treffer of code.matchAll(new RegExp(`\\b(?:${DIENSTE.join('|')})\\b`, 'g'))) {
+	for (const treffer of code.matchAll(
+		new RegExp(`\\b(?:${VERWALTUNGS_EINSTIEGE.join('|')})\\b`, 'g')
+	)) {
 		const davor = /([A-Za-z_$][\w$]*)\s*\(\s*$/.exec(code.slice(0, treffer.index));
 		const danach = code.slice(treffer.index + treffer[0].length);
 		if (!davor || !schnittstellen.has(davor[1]) || !/^\s*\(\s*\)\s*[,)]/.test(danach)) {
@@ -165,8 +168,8 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 	return befunde;
 }
 
-/** Ausserhalb von api/admin: keine Dienste und Schnittstellen der Verwaltung aus den Mitteilungen. */
-function pruefeMitteilungImporte(
+/** Ausserhalb von api/admin: keine Einstiege der Verwaltung und keine Schnittstellen der Mitteilungs-Verwaltung. */
+function pruefeVerwaltungImporte(
 	pfad: string,
 	imp: Import[],
 	verwaltung: Set<string> | null
@@ -174,16 +177,16 @@ function pruefeMitteilungImporte(
 	const befunde: string[] = [];
 	for (const i of imp) {
 		if (i.quelle === null) continue;
-		const ausIndex = MITTEILUNG_INDEX.test(i.quelle);
-		if (!ausIndex && !MITTEILUNG_SCHNITTSTELLEN.test(i.quelle)) continue;
+		const ausDiensten = DIENSTE_MODUL.test(i.quelle);
+		if (!ausDiensten && !MITTEILUNG_SCHNITTSTELLEN.test(i.quelle)) continue;
 		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
 		if (namen === null) {
 			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
 			continue;
 		}
 		for (const [name] of namen) {
-			const nurVerwaltung = ausIndex
-				? name === 'holeMitteilungAdminDienste'
+			const nurVerwaltung = ausDiensten
+				? VERWALTUNGS_EINSTIEGE.includes(name)
 				: (verwaltung?.has(name) ?? false);
 			if (nurVerwaltung) {
 				befunde.push(`${pfad}: nur Routen unter src/routes/api/admin/ dürfen '${name}' nutzen`);
@@ -224,7 +227,7 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
 				);
 			}
-			befunde.push(...pruefeMitteilungImporte(pfad, imp, mitteilungVerwaltung));
+			befunde.push(...pruefeVerwaltungImporte(pfad, imp, mitteilungVerwaltung));
 			if (imp.some((i) => i.quelle === null)) {
 				befunde.push(`${pfad}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`);
 			}
