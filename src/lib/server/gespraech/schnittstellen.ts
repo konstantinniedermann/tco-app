@@ -2,8 +2,8 @@
 // (nur mit Sitzung): lesen, schreiben, als gelesen markieren. Verwaltung (Bereich `cm`): Liste,
 // Verlauf, Antworten, Zustand; der MyTCO-Admin liest nur (Regel 3).
 import { liest, schreibt, type AdminEreignis, type AdminUrheber } from '../admin/schnittstellen.ts';
-import { aendernd, mitSitzung, type CmDienste, type CmEreignis } from '../cm/schnittstellen.ts';
-import { antwort, leseKoerper } from '../login/schnittstellen.ts';
+import type { CmDienste, CmEreignis } from '../cm/schnittstellen.ts';
+import { aendernd, antwort, jetzt, leseKoerper, mitSitzung, nichtGefunden } from '../http.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
 import { parseId } from '../parse-id.ts';
@@ -28,7 +28,6 @@ import {
 const TEXT_MIN = 1;
 const TEXT_MAX = 1000;
 
-const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
 /** 200 mit dem Gespräch; ist es inzwischen weg (Mitglied gelöscht), 404. */
 const antwortOderWeg = (g: object | null) => (g ? antwort(200, g) : nichtGefunden());
 const nurLesen = () => antwort(409, { fehler: 'nur-lesen' });
@@ -43,16 +42,12 @@ export function pruefeText(roh: unknown): string | null {
 	return n >= TEXT_MIN && n <= TEXT_MAX ? text : null;
 }
 
-const jetztMitglied = (d: CmDienste) => (d.jetzt ?? (() => new Date()))();
-const jetztAdmin = (d: MitteilungAdminDienste) => (d.jetzt ?? (() => new Date()))();
-
 // ---- Mitglied ----
 
 export function getGespraech(d: CmDienste, e: CmEreignis): Promise<Response> {
 	return mitSitzung(e, async (konto) => {
 		const id = parseId(e.params.id);
-		const g =
-			id === null ? null : await ladeEigenesGespraech(d.db, id, konto.mitgliedId, jetztMitglied(d));
+		const g = id === null ? null : await ladeEigenesGespraech(d.db, id, konto.mitgliedId, jetzt(d));
 		return g ? antwort(200, g) : nichtGefunden();
 	});
 }
@@ -63,8 +58,8 @@ export function postGespraech(d: CmDienste, e: CmEreignis): Promise<Response> {
 		if (id === null) return nichtGefunden();
 		const text = pruefeText((await leseKoerper(e)).text);
 		if (text === null) return textFehler();
-		const jetzt = jetztMitglied(d);
-		const r = await schreibeAlsMitglied(d.db, id, konto.mitgliedId, text, jetzt);
+		const t = jetzt(d);
+		const r = await schreibeAlsMitglied(d.db, id, konto.mitgliedId, text, t);
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r === 'nur-lesen') return nurLesen();
 		// FR-53: nur an die Kontaktperson, nach dem Speichern, ohne darauf zu warten.
@@ -77,7 +72,7 @@ export function postGespraech(d: CmDienste, e: CmEreignis): Promise<Response> {
 				})
 				.catch(() => {});
 		}
-		return antwortOderWeg(await ladeEigenesGespraech(d.db, id, konto.mitgliedId, jetzt));
+		return antwortOderWeg(await ladeEigenesGespraech(d.db, id, konto.mitgliedId, t));
 	});
 }
 
@@ -89,8 +84,8 @@ export function postGelesen(d: CmDienste, e: CmEreignis): Promise<Response> {
 		const bis = typeof roh === 'string' ? new Date(roh) : null;
 		if (bis === null || Number.isNaN(bis.getTime())) return antwort(400, { fehler: 'eingabe' });
 		// Nie über «jetzt» hinaus: Die Marke geht nur vorwärts und würde spätere Antworten verdecken.
-		const jetzt = jetztMitglied(d);
-		await markiereGelesen(d.db, id, konto.mitgliedId, bis > jetzt ? jetzt : bis);
+		const t = jetzt(d);
+		await markiereGelesen(d.db, id, konto.mitgliedId, bis > t ? t : bis);
 		return antwort(204);
 	});
 }
@@ -108,7 +103,7 @@ export function getGespraeche(d: MitteilungAdminDienste, e: AdminEreignis): Prom
 export function getAdminGespraech(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
 	return liest(d, e, 'cm', async () => {
 		const id = parseId(e.params.id);
-		const g = id === null ? null : await ladeGespraech(d.db, id, jetztAdmin(d));
+		const g = id === null ? null : await ladeGespraech(d.db, id, jetzt(d));
 		return g ? antwort(200, g) : nichtGefunden();
 	});
 }
@@ -137,7 +132,7 @@ export function postAntwort(d: MitteilungAdminDienste, e: AdminEreignis): Promis
 		const nach = koerper.nachLetzter;
 		if (typeof nach !== 'number' || !Number.isSafeInteger(nach) || nach < 0)
 			return antwort(400, { fehler: 'eingabe' });
-		const jetzt = jetztAdmin(d);
+		const t = jetzt(d);
 		const r = await antworte(
 			d.db,
 			id,
@@ -145,18 +140,18 @@ export function postAntwort(d: MitteilungAdminDienste, e: AdminEreignis): Promis
 			text,
 			nach,
 			koerper.trotzdem === true,
-			jetzt
+			t
 		);
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r === 'nur-lesen') return nurLesen();
 		if (r.ergebnis === 'inzwischen') {
 			return antwort(409, {
 				fehler: 'inzwischen',
-				gespraech: (await ladeGespraech(d.db, id, jetzt)) ?? null
+				gespraech: (await ladeGespraech(d.db, id, t)) ?? null
 			});
 		}
 		meldeAntwort(d, urheber, r.mitgliedId, r.turnierId);
-		return antwortOderWeg(await ladeGespraech(d.db, id, jetzt));
+		return antwortOderWeg(await ladeGespraech(d.db, id, t));
 	});
 }
 
@@ -166,11 +161,11 @@ export function postZustand(d: MitteilungAdminDienste, e: AdminEreignis): Promis
 		if (id === null) return nichtGefunden();
 		const z = koerper.zustand;
 		if (z !== 'offen' && z !== 'erledigt') return antwort(400, { fehler: 'eingabe' });
-		const jetzt = jetztAdmin(d);
-		const r = await setzeZustand(d.db, id, z, jetzt);
+		const t = jetzt(d);
+		const r = await setzeZustand(d.db, id, z, t);
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r === 'nur-lesen') return nurLesen();
-		return antwortOderWeg(await ladeGespraech(d.db, id, jetzt));
+		return antwortOderWeg(await ladeGespraech(d.db, id, t));
 	});
 }
 
