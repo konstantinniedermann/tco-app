@@ -21,13 +21,13 @@ dieser Datei.
 
 | | |
 |---|---|
-| **Phase** | 4 Umsetzung, Etappe 0 (Stand 11.11.2026) |
-| **Erledigte Schritte** | 01 Startpaket, 02 E2E-Flakes, 03 Vertragstests, 04 Hilfsmittel für Etappe 2 |
-| **Nächster offener Schritt** | **05** (Lint-Regeln für die Richtung der Importe, Zeile in 7.2; Subagent, Sonnet) |
-| **Wartet auf Freigabe des Projektleiters** | nichts |
+| **Phase** | 4 Umsetzung, Etappe 0 abgeschlossen, Checkpoint Etappenende steht an (Stand 11.11.2026) |
+| **Erledigte Schritte** | 01 Startpaket, 02 E2E-Flakes, 03 Vertragstests, 04 Hilfsmittel für Etappe 2, 05 Lint-Regeln für die Richtung der Importe |
+| **Nächster offener Schritt** | **06** (Grundbausteine der Schnittstellen an einem Ort, Zeile in 7.3; Subagent, Opus), nach dem Checkpoint Etappenende |
+| **Wartet auf Freigabe des Projektleiters** | der Checkpoint Etappenende (Ist das Netz dicht?); dazu ein Entscheid zu den sechs Ausnahmen ohne abbauenden Schritt (Erkenntnisse Schritt 05) |
 | **Offene Fragen** | F-15 (muss erst vor Schritt 23 beantwortet sein) |
 | **Vorab nachzumessen** | vor Schritt 07, 08, 11, 13, 19, 20, 23 (je beim Schritt beschrieben); für Schritt 04 erledigt |
-| **Nächster Checkpoint** | Ende Etappe 0 (nach Schritt 05); in den Etappen 1 und 2 nach jedem Schritt (E-26) |
+| **Nächster Checkpoint** | **Ende Etappe 0 (jetzt)**; in den Etappen 1 und 2 nach jedem Schritt (E-26) |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25) |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
 
@@ -465,6 +465,7 @@ Aufwand oder birgt ein benennbares Risiko; **niedrig** = Schönheitsfehler oder 
 - **Einordnung:** Keine der Abhängigkeiten ist ein Fehler zur Laufzeit. Der Befund betrifft
   Auffindbarkeit und Änderbarkeit. Wie weit neu geschnitten wird, ist Frage F-06.
 - **[geändert] Entschieden (E-12):** nur die klaren Fälle (Schritte 09 bis 11); `admin/` bleibt ein Modul.
+- **Nachmessen (Schritt 05, 11.11.2026):** Die Zahlen stimmen unverändert. Als Verletzung der Zielrichtung zählen davon nur Importe von Schnittstellen-Dateien und die von `login` aus (19 Stellen, alle in `AUSNAHMEN`, `eslint.config.js`); die Fachlogik-Importe zwischen Themen (z. B. `cm` → `admin/mitglieder.ts`) sind nach Zielbild erlaubt und nicht erfasst.
 
 #### B-15 — Fehlerform der Schnittstellen ist uneinheitlich · niedrig · [G]
 
@@ -1100,7 +1101,7 @@ nach und trägt das Ergebnis beim Schritt ein.
 | 02 | Die drei bekannten E2E-Flakes sind behoben; feste Wartezeiten ersetzt | `tests/e2e/verwaltung.test.ts`, `tests/e2e/benachrichtigungen.test.ts`, `tests/e2e/hilfe.test.ts`, `tests/e2e/mitgliedschaft.test.ts`, `tests/e2e/hilfen/`; [geändert] erweitert nach Entscheid vom 11.11.2026: `scripts/e2e.ts` und `scripts/e2e.test.ts`, `vite.config.ts`, `playwright.config.ts`, `.gitignore`, `.prettierignore`, `.dockerignore`, `eslint.config.js` (eigener Build-Ordner je Lauf) | Verlässliches Netz für alle weiteren Schritte (B-10) | niedrig | Drei volle `make e2e` hintereinander grün; Ursache je Flake mit Trace belegt, nicht nur Zeitgrenze erhöht | 01 | Opus | Subagent | nein | **erledigt** 11.11.2026 (Branch `refactor/schritt-02`; Commits cd86bdd, 92c6d99 Tests, edf8d27 eigener Build-Ordner je Lauf, dazu Doku): alle drei bekannten Flakes und ein vierter behoben, feste Wartezeiten ersetzt; die Fehlerseiten-Flakes nach Entscheid (b) des Projektleiters (Erkenntnisse unten) |
 | 03 | [geändert] Der Bestand deckt für die Verwaltung 401 und 403 schon lückenlos (B-30). Es fehlen drei Dinge: (a) eine Liste je Mitglieder-Modul und eine Schleife «ohne Sitzung 401, schreibend ohne JSON 415» über alle Einträge, dazu 415 über die drei Verwaltungs-Listen; (b) ein Routen-Test: jede `+server.ts` wird geladen, und je Methode ist festgehalten, welche Schnittstellen-Funktion mit welchem Dienste-Einstieg sie aufruft (B-28); (c) ein Test, dass alle Dienste-Einstiege dieselben Bremsen teilen. 400 und 404 je Schnittstelle sind im Bestand ausreichend geprüft und bleiben, wie sie sind | neu: Listen in `cm`, `anlass`, `profil`, `gespraech`, `login/passkey-schnittstellen.ts`, `mitteilung` (Mitglieder-Teil); neuer Test neben `src/lib/server/` (Grundprüfung) und neben `src/routes/api/` (Routen); Vorbild: `admin/schnittstellen.db.test.ts`, `src/routes/api/status/status.db.test.ts` | Schliesst das Loch für die Schritte 06, 07 und 09 bis 11 | niedrig | Je Teil einmal absichtlich brechen: eine Grundprüfung entfernen, eine Route auf die falsche Funktion zeigen lassen | 01 | Opus | Subagent | nein | **erledigt** 11.11.2026 (Branch `refactor/schritt-03`; Commit ecf13e2 Listen, 45e84df, 4efda00, 2f584e0, 7a9ff08 und 3757da0 Tests, 3cdb352 Hinweise des Reviews, dazu Doku): (a) `src/lib/server/grundpruefung.db.test.ts`, (b) `src/lib/server/routen.test.ts` (nicht unter `src/routes/`, wegen der Bauregel), (c) `src/routes/api/bremsen.db.test.ts`; je Teil einmal rot; eine Ausnahme vom Vertrag (Passkey: 401 ohne Fehlerwort), keine Sicherheitslücke (Erkenntnisse unten) |
 | 04 | [geändert] Die vorhandenen Screenshots taugen nicht für einen Bildvergleich (B-33). Stattdessen zwei kleine Hilfsmittel: (a) Vergleich des gebauten Stylesheets vor und nach einem Schritt (muss für Schritt 18 Zeichen für Zeichen gleich sein); (b) eine Liste der CSS-Klassen und SvelteKit-Interna, an denen E2E-Tests hängen (aus B-31), als Prüfliste für die Schritte 15 bis 17; [Nachtrag Schritt 02] dazu die Hilfe `wartetAufMitgliederliste` (`tests/e2e/hilfen/seite.ts`), die an `role="status"` und am Wortlaut «N Mitglied(er)» der Mitgliederliste hängt. Einen Bildvergleich gibt es nicht (E-19) | neues Skript unter `scripts/` (vergleicht die CSS-Dateien aus zwei Builds), ein Abschnitt in diesem Dokument oder in `docs/testkonzept.md`; [geändert, Nachmessen] `scripts/css-vergleich.ts` mit `scripts/css-vergleich.test.ts`, ein Ziel im `Makefile`; verglichen wird je Datei (Name und Inhalt) unter `.svelte-kit/output/client/_app/immutable/assets/`, nicht `build/` | Beweis für Schritt 18 ohne Augenmass; keine Überraschungen bei den Schritten 15 bis 18 | niedrig | Eine absichtlich vertauschte Regel muss den Vergleich rot machen (mit zwei echten Builds); [geändert, Nachmessen] dazu ein Einheitstest des Skripts, und zwei Builds desselben Stands müssen gleich sein (beim Nachmessen nicht gebaut) | 02 | Sonnet | Subagent | [geändert] Nachmessen erledigt, siehe unten («Nachmessen Schritt 04») | **erledigt** 11.11.2026 (Branch `refactor/schritt-04`; Commit e1f23be, dazu Doku): (a) `scripts/css-vergleich.ts` mit `scripts/css-vergleich.test.ts` und Makefile-Ziel `css-vergleich`; zwei echte Builds desselben Stands sind gleich, eine vertauschte Regel macht den Vergleich rot; (b) Prüfliste in 7.2 («Prüfliste (b)»); Erkenntnisse unten |
-| 05 | Lint-Regeln für die Richtung der Importe zwischen den Server-Modulen, zuerst nur als Bestandsaufnahme (heutige Ausnahmen aufgelistet) | `eslint.config.js` | Jeder spätere Schritt kann eine Ausnahme streichen; neue Zyklen fallen auf (B-09, B-14) | niedrig | Eine absichtlich falsche Import-Zeile muss rot werden | 01 (E-11: nur ESLint) | Sonnet | Subagent | nein | offen |
+| 05 | Lint-Regeln für die Richtung der Importe zwischen den Server-Modulen, zuerst nur als Bestandsaufnahme (heutige Ausnahmen aufgelistet) | `eslint.config.js` | Jeder spätere Schritt kann eine Ausnahme streichen; neue Zyklen fallen auf (B-09, B-14) | niedrig | Eine absichtlich falsche Import-Zeile muss rot werden | 01 (E-11: nur ESLint) | Sonnet | Subagent | nein | **erledigt** 11.11.2026 (Branch `refactor/schritt-05`; Commits d536f0b Regeln, 3800c5b Test, dazu Doku): vier Schichten-Regeln in `eslint.config.js`, 19 Ausnahmen einzeln benannt; `scripts/importrichtung.test.ts`; Erkenntnisse unten |
 
 **Erkenntnisse Schritt 02** (11.11.2026)
 
@@ -1503,17 +1504,84 @@ was nur ein zweiter Build zeigen kann, steht als [V].
   verschiedene Exit-Codes (make meldet 2 für jedes Fehlschlagen); wer den Wert braucht, ruft das Skript
   direkt auf.
 
+**Erkenntnisse Schritt 05** (11.11.2026)
+
+- **Die Regel** (`eslint.config.js`, nur Bordmittel: `no-restricted-imports` mit `regex`-Mustern, keine neue
+  Abhängigkeit, E-11 reicht). Vier Schichten für Dateien unter `src/lib/server/`, ohne `*.test.ts`:
+  (1) `db/` importiert aus dem Server nichts; (2) die Dateien direkt unter `src/lib/server/`
+  (`datum.ts`, `namen.ts`, `zeitgeber.ts` …) importieren nur `db/`; (3) `login/` importiert kein
+  Thema; (4) ein Thema (`admin`, `anlass`, `brief`, `cm`, `gespraech`, `mitteilung`, `profil`,
+  `turnier`) importiert nicht die Schnittstellen-Dateien (`schnittstellen.ts`,
+  `passkey-schnittstellen.ts`) eines anderen Moduls, `login` eingeschlossen. Die Muster hängen am
+  Importpfad (`../modul/…` oder `$lib/server/modul/…`), darum werden Pfade nach `src/lib/` ausserhalb des
+  Servers (z. B. `../anlass/zeit.ts` aus `datum.ts`) nicht mit einem Modul verwechselt. Erfasst sind
+  auch `import type` und `export … from`. `import()` im Code gibt es nicht, ESLint meldet es nicht.
+  Ein späteres `http.ts` (Schritt 06) liegt direkt unter `src/lib/server/` und fällt in Schicht (2);
+  Schritt 06 muss dort `import … from './db/…'` weiterhin erlauben und braucht keine Regeländerung.
+- **Ausnahmen: 19, alle in `AUSNAHMEN` in `eslint.config.js`** (je `von`, `nach`, `schritt`; hier nicht
+  doppelt geführt). Nach abbauendem Schritt: **06** neun (acht Mal `login/schnittstellen.ts` aus den
+  Schnittstellen-Dateien von `admin`, `anlass`, `cm`, `gespraech`, `mitteilung`, `profil`, `turnier` und
+  `admin/ansicht.ts`, dazu `gespraech` → `cm/schnittstellen.ts` für `aendernd` und `mitSitzung`);
+  **10** drei (`login/schnittstellen.ts` → `admin/rollen.ts` und `gespraech/gespraech.ts`,
+  `login/sitzung.ts` → `admin/rollen.ts`); **11** eine (`turnier/schnittstellen.ts` →
+  `gespraech/schnittstellen.ts`); **09** keine; **sechs ohne abbauenden Schritt**.
+- **Sechs Ausnahmen ohne Schritt, Entscheid des Projektleiters nötig vor Schritt 12.** (a) Drei Mal
+  `liest`, `schreibt` und die Typen `AdminDienste`, `AdminEreignis`, `AdminUrheber` aus
+  `admin/schnittstellen.ts` (aus `gespraech`, `mitteilung`, `turnier`); (b) drei Mal der Typ
+  `MitteilungAdminDienste` aus `mitteilung/schnittstellen.ts` (aus `admin`, `gespraech`, `turnier`).
+  Weder 06 (Grundbausteine ohne diese Namen) noch 09 bis 11 zieht sie weg. Schlimmer: Schritt 09 und
+  11 verschieben Schnittstellen nach `anlass`, `cm` und `gespraech`, und diese brauchen voraussichtlich `liest` und
+  `schreibt` genauso (wie `turnier` heute); es entstehen bis zu drei weitere Ausnahmen derselben Art. Zur Wahl stehen:
+  `liest`/`schreibt`/die Typen mit in `http.ts` (Schritt 06) oder in eine eigene Datei unter
+  `src/lib/server/` verschieben, oder die Regel für diese Namen aufgeben («bleibt»). Nicht
+  entschieden, kein Workaround gebaut. Eine Ausnahme mit «bleibt» gibt es heute nicht.
+- **Zwei Hinweise für Schritt 10:** `login/sitzung.ts` importiert nur den Typ `AnsichtRolle` aus
+  `admin/rollen.ts` (nicht im Plan genannt); der Typ muss mit. Und Schritt 10 betrifft drei, nicht zwei
+  Ausnahmen.
+- **Bestand nachgemessen** (Importe zwischen den Ordnern unter `src/lib/server/`, ohne Tests): die
+  Zahlen aus B-14 stimmen alle noch (`admin` ↔ `cm` 4 und 5, `admin` ↔ `mitteilung` 2 und 2,
+  `login` → `admin` 2 und → `gespraech` 1, `profil` → `admin` 6); die Listen aus Schritt 03 ändern keine Zahl. Tests sind ausgenommen (44 Paare «Modul → anderes
+  Modul» kommen nur in `*.test.ts` vor, von Berufs wegen: Rechte-Matrix, Routen-Test).
+- **Absicherung** (`scripts/importrichtung.test.ts`, 17 Fälle, läuft in `make test:einheit`): jede
+  Schicht meldet einen falschen Import in einer Datei ohne Ausnahme (auch `$lib/server/…` und
+  `export … from`); erlaubte Importe bleiben still; Tests sind ausgenommen; eine Ausnahme gibt nur
+  ihre Datei und ihr Ziel frei; **jede Ausnahme muss noch gebraucht werden**: Importiert die Datei das
+  Ziel nicht mehr, ist der Test rot («Ausnahme streichen»), damit eine stehen gebliebene Ausnahme
+  später keinen neuen Fehler durchlässt. Einmal absichtlich rot gemacht (Regel für `login` entleert,
+  veraltete Ausnahme eingetragen): drei Fälle rot, nach dem Zurücksetzen wieder 17 grün.
+  Von Hand zusätzlich: ein falscher Import je Schicht in einer Datei ohne Ausnahme macht `eslint .`
+  rot (Exit 1); die 19 Ausnahmen lassen es grün; wird die Ausnahme `login/sitzung.ts` →
+  `admin/rollen.ts` gestrichen, ist genau diese Zeile rot (Schritt 12 funktioniert so).
+  Alle Proben nicht committet, `git status` danach sauber.
+- **Lint-Dauer** (`npx eslint .`, Mac, nach `npm ci`): vorher 7,8 / 6,5 / 5,9 s, nachher 6,4 / 6,4 /
+  6,4 s; nicht spürbar langsamer.
+- **Bewusst nicht erfasst:**
+  - *B-25* (Oberfläche → Typen aus `src/lib/server/`, Server → `src/lib/verwaltung/bereiche.ts`,
+    `…/einlesen.ts`, `…/turnier-anzeige.ts`, `src/lib/name.ts`): Das Zielbild 6.1 Punkt 8 verbietet es
+    nicht, und kein Schritt baut es ab; eine Regel hätte nur Ausnahmen ohne Schritt. Wer es später
+    will, setzt es auf Schritt 12 oder nimmt eine eigene Regel.
+  - *Fachlogik-Importe zwischen Themen* (z. B. `cm` → `admin/mitglieder.ts`, `turnier` →
+    `cm/anmeldungen.ts`): Das Zielbild verbietet nur die Schnittstellen. Die gegenseitigen
+    Abhängigkeiten aus B-14 (`admin` ↔ `cm`, `cm` ↔ `gespraech`, `gespraech` ↔ `turnier`,
+    `mitteilung` ↔ `turnier`, `admin` ↔ `profil`) bleiben auch nach den Schritten 06 bis 11 zum Teil
+    bestehen. «Neue Zyklen fallen auf» gilt deshalb nur für Schnittstellen, `login` und die unterste
+    Schicht. Eine vollständige Zyklenprüfung bräuchte ein Plugin (`import/no-cycle`), also einen
+    Entscheid des Projektleiters (E-11); nicht vorgeschlagen.
+  - Die `index.ts` der Module (Zusammenbau; `mitteilung/index.ts` → `admin/index.ts`): Schritt 07.
+- **Ausserhalb des Schritts aufgefallen, nicht behoben:** `svelte-check` prüft `eslint.config.js` mit
+  (Typfehler in der Konfiguration brechen `make check-schnell`); Hilfsfunktionen dort brauchen JSDoc-Typen.
+
 ### 7.3 Etappe 1 — Server: gemeinsame Grundlage (Kern der Anwendung)
 
 | Nr. | Ziel | Dateien | Nutzen | Risiko | Absicherung | Voraussetzung | Modell | Weg | Nachmessen vorab | Status |
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
-| 06 | Grundbausteine der Schnittstellen an einem Ort; Duplikate entfernt (B-12) | neu `src/lib/server/http.ts`; `src/lib/server/*/schnittstellen.ts`, `admin/ansicht.ts`, `src/hooks.server.ts`, fünf Routen unter `src/routes/api/`, `scripts/pruefungen/bauregel.ts` (falls betroffen) | Eine Stelle statt sechs; `login` ist nicht mehr Unterbau aller Module | niedrig | Schritt 03 grün vor und nach; reines Verschieben, kein geändertes Verhalten | 03 | Opus | Subagent | nein | offen |
+| 06 | Grundbausteine der Schnittstellen an einem Ort; Duplikate entfernt (B-12) [Nachtrag Schritt 05] streicht neun Ausnahmen in `AUSNAHMEN` (`eslint.config.js`): alle `login/schnittstellen.ts`-Importe der Themen und `admin/ansicht.ts` (acht) sowie `gespraech` → `cm/schnittstellen.ts` für `aendernd` und `mitSitzung`. Bleiben dort die Typen `CmDienste`, `CmEreignis`, verschiebt der Schritt die Ausnahme auf diese Namen, streicht sie nicht. `liest`, `schreibt` und die `Admin*`-Typen gehören nicht zu den Grundbausteinen; ohne Entscheid bleiben sie Ausnahmen (Erkenntnisse Schritt 05). | neu `src/lib/server/http.ts`; `src/lib/server/*/schnittstellen.ts`, `admin/ansicht.ts`, `src/hooks.server.ts`, fünf Routen unter `src/routes/api/`, `scripts/pruefungen/bauregel.ts` (falls betroffen) | Eine Stelle statt sechs; `login` ist nicht mehr Unterbau aller Module | niedrig | Schritt 03 grün vor und nach; reines Verschieben, kein geändertes Verhalten | 03 | Opus | Subagent | nein | offen |
 | 07 | Ein Zusammenbau der Dienste: ein Mail-Versender, ein Push-Versender, Bremsen einmal (B-13) | neu `src/lib/server/dienste.ts`; die sechs `index.ts`; alle `+server.ts` (Import-Zeile); `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts` | Überblick, was der Server braucht; ein SMTP-Zugang statt fünf | mittel (Lebensdauer der Einzelstücke, Bremsen müssen geteilt bleiben) | E2E Login, Profil, Mitteilungen, CM; DB-Tests der Schnittstellen; `tests/e2e/cookie.test.ts`; [Nachtrag Schritt 03] Routen-Test und Bremsen-Test, was anzupassen ist: Erkenntnisse Schritt 03 | 06 | Opus | Subagent | ja: `mitteilung/`, `profil/`, `gespraech/` sind nur in Auszügen gelesen; vorab klären, welche Einzelstücke Zustand tragen (Bremsen, Passkey-Anfragen, E-Mail-Wechsel, SMTP-Pool) | offen |
 | 08 | Eine Fehlerform und eine Liste der Fehlerwörter; Oberfläche im selben Schritt angepasst (B-15) | `src/lib/server/*/schnittstellen.ts`, neue geteilte Datei für die Fehlerwörter, `src/lib/anlass/api.ts`, `src/lib/verwaltung/mitteilung-api.ts`, `src/lib/cm/api.ts`, betroffene Tests | Voraussetzung für Schritt 13; ein Übersetzer entfällt | mittel (Verhaltensänderung an internen Schnittstellen) | Schritt 03 wird bewusst an genau diesen Stellen angepasst; E2E Anlass und Mitteilungen | 06 (E-18: Format darf sich ändern, Server und Oberfläche im selben Schritt) | Opus | Subagent | ja: vollständige Liste aller Abweichungen von der Fehlerform über alle `schnittstellen.ts` und alle Abruf-Module; Prüfliste (b) in 7.2 (Stellen mit `page.route`, Pfade und Fehlerwort) | offen |
-| 09 | Verwaltung der Anlässe liegt beim Thema Anlass (B-14) | `src/lib/server/admin/schnittstellen.ts`, `src/lib/server/anlass/`, Routen `src/routes/api/admin/anlaesse/`, `bauregel.ts`, `rechte-matrix.db.test.ts` | `admin/schnittstellen.ts` wird kleiner; Thema an einem Ort | niedrig | Rechte-Matrix-Test, `tests/e2e/anlass.test.ts`; [Nachtrag Schritt 03] Routen-Test und Grundprüfung, was anzupassen ist: Erkenntnisse Schritt 03 | 06 | Opus | Subagent | nein | offen |
-| 10 | `login` hängt nicht mehr von `admin` und `gespraech` ab: Die Antwort von `/api/sitzung` wird ausserhalb von `login` gebaut (B-14) | `src/lib/server/login/schnittstellen.ts` → `getSitzung`, Route `src/routes/api/sitzung/+server.ts`, Tests | Ein Zyklus weniger; Login ist wieder unterste Schicht | niedrig | `login/schnittstellen.db.test.ts`, E2E Startseite und Navigation; [Nachtrag Schritt 03] Routen-Test, was anzupassen ist: Erkenntnisse Schritt 03 | 06 | Sonnet | Subagent | nein | offen |
-| 11 | [geändert] Schnitt nach E-12, nur die klaren Fälle: Die Schnittstellen der CM-Anmeldungsverwaltung ziehen von `turnier/schnittstellen.ts` zu `cm`, die des Gesprächs zu `gespraech`. `admin/` wird nicht aufgeteilt | `src/lib/server/turnier/schnittstellen.ts`, `cm/`, `gespraech/`, Routen unter `src/routes/api/admin/`, `bauregel.ts` | Ordnername sagt, wo etwas liegt | mittel (viele Routen, Prüfskript) | Rechte-Matrix-Test, alle `cm-*`-E2E, `turnier.test.ts`; [Nachtrag Schritt 03] Routen-Test und Grundprüfung, was anzupassen ist: Erkenntnisse Schritt 03 | 06, 09 (E-12) | Opus | Subagent | ja: `turnier/schnittstellen.ts` (ab Zeile 110), `gespraech/schnittstellen.ts` und `cm/verwaltung*.ts` sind nur in Auszügen gelesen; vorab die genaue Zuordnung der 26 Einträge von `TURNIER_SCHNITTSTELLEN` festhalten | offen |
-| 12 | [geändert] Importregeln für die Richtung zwischen den Modulen scharf stellen (die Ausnahmen aus Schritt 05 sind bis hier abgebaut). `bauregel.ts` **bleibt** in vollem Umfang, weil ihr Teil «Admin-Routen» das Bindeglied zu den Rechte-Tests ist (B-07); angepasst werden nur ihre festen Pfade, soweit die Schritte 07, 09 und 11 das nicht schon getan haben | `eslint.config.js`; `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts` nur wo nötig | Neue Zyklen fallen auf; die Sicherheitsregel bleibt unangetastet | niedrig | Jede Lint-Regel einmal absichtlich verletzen; `bauregel.test.ts` grün | 05, 09, 10, 11 | Sonnet | Subagent | nein | offen |
+| 09 | Verwaltung der Anlässe liegt beim Thema Anlass (B-14) [Nachtrag Schritt 05] streicht keine Ausnahme. Die verschobenen Schnittstellen in `anlass/` brauchen `liest` und `schreibt` aus `admin/schnittstellen.ts`: Ohne Entscheid (Erkenntnisse Schritt 05) entsteht eine neue Ausnahme `anlass/schnittstellen.ts` → `admin/schnittstellen.ts` und der Lint wird rot, bis sie eingetragen ist. | `src/lib/server/admin/schnittstellen.ts`, `src/lib/server/anlass/`, Routen `src/routes/api/admin/anlaesse/`, `bauregel.ts`, `rechte-matrix.db.test.ts` | `admin/schnittstellen.ts` wird kleiner; Thema an einem Ort | niedrig | Rechte-Matrix-Test, `tests/e2e/anlass.test.ts`; [Nachtrag Schritt 03] Routen-Test und Grundprüfung, was anzupassen ist: Erkenntnisse Schritt 03 | 06 | Opus | Subagent | nein | offen |
+| 10 | `login` hängt nicht mehr von `admin` und `gespraech` ab: Die Antwort von `/api/sitzung` wird ausserhalb von `login` gebaut (B-14) [Nachtrag Schritt 05] streicht drei Ausnahmen: `login/schnittstellen.ts` → `admin/rollen.ts` und → `gespraech/gespraech.ts` sowie `login/sitzung.ts` → `admin/rollen.ts` (nur der Typ `AnsichtRolle`, im Plan nicht genannt, muss mit). | `src/lib/server/login/schnittstellen.ts` → `getSitzung`, Route `src/routes/api/sitzung/+server.ts`, Tests | Ein Zyklus weniger; Login ist wieder unterste Schicht | niedrig | `login/schnittstellen.db.test.ts`, E2E Startseite und Navigation; [Nachtrag Schritt 03] Routen-Test, was anzupassen ist: Erkenntnisse Schritt 03 | 06 | Sonnet | Subagent | nein | offen |
+| 11 | [geändert] Schnitt nach E-12, nur die klaren Fälle: Die Schnittstellen der CM-Anmeldungsverwaltung ziehen von `turnier/schnittstellen.ts` zu `cm`, die des Gesprächs zu `gespraech`. `admin/` wird nicht aufgeteilt [Nachtrag Schritt 05] streicht die Ausnahme `turnier/schnittstellen.ts` → `gespraech/schnittstellen.ts`. Die verschobenen Schnittstellen in `cm/` und `gespraech/` brauchen `liest`, `schreibt` und die `Admin*`-Typen aus `admin/schnittstellen.ts`: neue Ausnahmen, wenn der Entscheid (Erkenntnisse Schritt 05) nicht vorher fällt. | `src/lib/server/turnier/schnittstellen.ts`, `cm/`, `gespraech/`, Routen unter `src/routes/api/admin/`, `bauregel.ts` | Ordnername sagt, wo etwas liegt | mittel (viele Routen, Prüfskript) | Rechte-Matrix-Test, alle `cm-*`-E2E, `turnier.test.ts`; [Nachtrag Schritt 03] Routen-Test und Grundprüfung, was anzupassen ist: Erkenntnisse Schritt 03 | 06, 09 (E-12) | Opus | Subagent | ja: `turnier/schnittstellen.ts` (ab Zeile 110), `gespraech/schnittstellen.ts` und `cm/verwaltung*.ts` sind nur in Auszügen gelesen; vorab die genaue Zuordnung der 26 Einträge von `TURNIER_SCHNITTSTELLEN` festhalten | offen |
+| 12 | [geändert] Importregeln für die Richtung zwischen den Modulen scharf stellen (die Ausnahmen aus Schritt 05 sind bis hier abgebaut). `bauregel.ts` **bleibt** in vollem Umfang, weil ihr Teil «Admin-Routen» das Bindeglied zu den Rechte-Tests ist (B-07); angepasst werden nur ihre festen Pfade, soweit die Schritte 07, 09 und 11 das nicht schon getan haben [Nachtrag Schritt 05] Scharf stellen heisst: `AUSNAHMEN` in `eslint.config.js` leeren (Liste und Erzeugung der Blöcke bleiben, kein Umbau). Die Voraussetzung «Ausnahmen bis hier abgebaut» gilt nur, wenn der Entscheid zu den sechs Ausnahmen ohne Schritt gefallen ist (Erkenntnisse Schritt 05). `scripts/importrichtung.test.ts` prüft, dass keine Ausnahme veraltet ist, und bleibt dann leer-grün. | `eslint.config.js`; `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts` nur wo nötig | Neue Zyklen fallen auf; die Sicherheitsregel bleibt unangetastet | niedrig | Jede Lint-Regel einmal absichtlich verletzen; `bauregel.test.ts` grün | 05, 09, 10, 11 | Sonnet | Subagent | nein | offen |
 
 ### 7.4 Etappe 2 — Oberfläche (Kern der Anwendung)
 
