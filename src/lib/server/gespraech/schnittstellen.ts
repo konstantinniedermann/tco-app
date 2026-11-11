@@ -2,7 +2,7 @@
 // (nur mit Sitzung): lesen, schreiben, als gelesen markieren. Verwaltung (Bereich `cm`): Liste,
 // Verlauf, Antworten, Zustand; der MyTCO-Admin liest nur (Regel 3).
 import { liest, schreibt, type AdminEreignis, type AdminUrheber } from '../admin/rechte.ts';
-import type { CmDienste, CmEreignis } from '../cm/schnittstellen.ts';
+import type { CmDienste, CmEreignis } from '../cm/typen.ts';
 import { aendernd, antwort, jetzt, leseKoerper, mitSitzung, nichtGefunden } from '../http.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';

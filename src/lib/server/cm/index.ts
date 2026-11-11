@@ -4,7 +4,7 @@ import { erstelleSmtpMailer, leiteUm } from '../login/mail.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
 import { erstelleWebPush, kontaktFuerPush } from '../mitteilung/web-push.ts';
 import { erstelleBestaetigung } from './mail.ts';
-import type { CmDienste } from './schnittstellen.ts';
+import type { CmDienste } from './typen.ts';
 
 let dienste: CmDienste | undefined;
 

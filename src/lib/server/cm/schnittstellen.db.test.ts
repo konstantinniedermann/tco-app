@@ -20,9 +20,9 @@ import {
 	postCmAnfrageZurueck,
 	postCmAnmeldung,
 	postCmSuchtext,
-	postCmWildcard,
-	type CmDienste
+	postCmWildcard
 } from './schnittstellen.ts';
+import type { CmDienste } from './typen.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {

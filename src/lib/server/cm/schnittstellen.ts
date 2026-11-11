@@ -1,17 +1,7 @@
 // Schnittstellen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01…05, A-ANMELDUNG-10). Alles
 // nur mit Sitzung.
-import type { RequestEvent } from '@sveltejs/kit';
 import { INTEGER_MAX, parseId } from '../parse-id.ts';
-import type { Db } from '../db/index.ts';
-import {
-	aendernd,
-	antwort,
-	jetzt,
-	leseKoerper,
-	mitSitzung,
-	nichtGefunden,
-	type Ereignis
-} from '../http.ts';
+import { aendernd, antwort, jetzt, leseKoerper, mitSitzung, nichtGefunden } from '../http.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
 import { cmAdmins } from '../mitteilung/meldung.ts';
 import { trageCmAngabenNach } from './angaben.ts';
@@ -47,15 +37,7 @@ import {
 	type Bezug
 } from './bezug.ts';
 import type { BestaetigungInhalt } from './mail.ts';
-
-export type CmDienste = {
-	db: Db;
-	bestaetigung: (an: string, i: BestaetigungInhalt) => Promise<void>;
-	/** FR-47: persönliche Meldung, Push, sonst E-Mail; wirft nie. */
-	melde: (mitgliedIds: number[], m: { titel: string; text: string; pfad: string }) => Promise<void>;
-	jetzt?: () => Date;
-};
-export type CmEreignis = Ereignis & Pick<RequestEvent, 'params'>;
+import type { CmDienste, CmEreignis } from './typen.ts';
 
 export function getCmTurniere(d: CmDienste, e: CmEreignis): Promise<Response> {
 	return mitSitzung(e, async (konto) =>

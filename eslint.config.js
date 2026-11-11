@@ -37,12 +37,6 @@ export const MODULE = ['db', 'login', ...THEMEN];
  */
 export const AUSNAHMEN = [
 	{
-		von: 'gespraech/schnittstellen.ts',
-		nach: 'cm/schnittstellen.ts',
-		schritt:
-			'06a: die Typen CmDienste und CmEreignis (aendernd und mitSitzung zieht Schritt 06 weg)'
-	},
-	{
 		von: 'turnier/schnittstellen.ts',
 		nach: 'gespraech/schnittstellen.ts',
 		schritt: '11: die Gesprächs-Schnittstellen ziehen von turnier nach gespraech'

@@ -9,7 +9,7 @@ import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { ERLAUBT_IN_ANSICHT, riegel } from '../admin/ansicht.ts';
 import { erstelleZugangDienst } from '../admin/zugang.ts';
 import { ladeCmAnsicht, laufendeTurniere } from '../cm/anmeldungen.ts';
-import type { CmDienste } from '../cm/schnittstellen.ts';
+import type { CmDienste } from '../cm/typen.ts';
 import { erstelleDb } from '../db/index.ts';
 import { gespraech, nachricht, turnier } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
