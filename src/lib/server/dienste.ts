@@ -171,8 +171,9 @@ export function holeProfilDienste(): ProfilDienste {
 export function holeCmDienste(): CmDienste {
 	if (!cmDienste) {
 		const e = leseEinstellungen();
-		const db = holeDb();
 		const m = holeMailer(e);
+		const db = holeDb();
+		// Reihenfolge wie bisher: Versender, Datenbank, Push.
 		const melder = { db, push: holePush(e), mailer: m, adresse: e.adresse };
 		cmDienste = {
 			db,
