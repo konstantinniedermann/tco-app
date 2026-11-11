@@ -1,6 +1,7 @@
 // Grundprüfung über alle Listen der Schnittstellen (Vertrag, Schritt 03 des Refactorings):
 // Ohne Sitzung antwortet jede Schnittstelle der Mitglieder 401, und jede schreibende Schnittstelle
-// (Mitglieder und Verwaltung) weist eine Anfrage ohne JSON mit 415 ab. Die Tests halten das heutige
+// (Mitglieder und Verwaltung) weist eine Anfrage ohne JSON mit 415 ab, auch ohne Sitzung (Format vor
+// Sitzung, festgehalten vor Schritt 06). Die Tests halten das heutige
 // Verhalten fest; Abweichungen von der Regel stehen unten als benannte Ausnahmen. 401 und 403 der
 // Verwaltung prüfen `admin/schnittstellen.db.test.ts` und `turnier/schnittstellen.db.test.ts`.
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
@@ -179,6 +180,12 @@ const OHNE_SITZUNG_ANDERS: Record<string, [number, unknown]> = {
 /** Ausnahmen von «schreibend ohne JSON 415 { fehler: 'format' }», mit der heutigen Antwort. */
 const OHNE_JSON_ANDERS: Record<string, [number, unknown]> = {};
 
+/**
+ * Ausnahmen von «schreibend ohne Sitzung und ohne JSON 415 { fehler: 'format' }», mit der heutigen
+ * Antwort. Leer: Jede schreibende Schnittstelle prüft heute zuerst das Format, dann die Sitzung.
+ */
+const OHNE_BEIDES_ANDERS: Record<string, [number, unknown]> = {};
+
 describe('Grundprüfung der Schnittstellen', () => {
 	// Hier nur Zählung und Ausnahmen. Dass keine Route an den Listen vorbei eine Funktion ruft,
 	// sichert der dritte Test in `routen.test.ts`.
@@ -230,6 +237,25 @@ describe('Grundprüfung der Schnittstellen', () => {
 				anfrage(name, { body: 'kein JSON', contentType: 'text/plain', konto, cookie: kennung })
 			);
 			const [status, koerper] = OHNE_JSON_ANDERS[name] ?? [415, { fehler: 'format' }];
+			expect(await antwortVon(name, r)).toEqual([name, status, koerper]);
+			expect([name, r.headers.get('cache-control')]).toEqual([name, 'no-store']);
+		}
+	});
+
+	// Reihenfolge der Prüfungen (Charakterisierung vor Schritt 06): Fehlen Sitzung und JSON zugleich,
+	// gewinnt heute das Format. Die beiden Tests oben prüfen die Bedingungen getrennt und hängen
+	// darum nicht an der Reihenfolge; dieser hält sie fest, damit ein Umbau sie nicht still dreht.
+	test('jede schreibende Schnittstelle antwortet ohne Sitzung und ohne JSON 415 (Format vor Sitzung)', async () => {
+		const geprueft = [...mitgliederDienste(), ...verwaltungsDienste().liste].filter(([name]) =>
+			schreibend(name)
+		);
+		expect(geprueft).toHaveLength(26 + 42);
+		for (const name of Object.keys(OHNE_BEIDES_ANDERS)) {
+			expect(geprueft.map(([n]) => n)).toContain(name);
+		}
+		for (const [name, fn] of geprueft) {
+			const r = await fn(anfrage(name, { body: 'kein JSON', contentType: 'text/plain' }));
+			const [status, koerper] = OHNE_BEIDES_ANDERS[name] ?? [415, { fehler: 'format' }];
 			expect(await antwortVon(name, r)).toEqual([name, status, koerper]);
 			expect([name, r.headers.get('cache-control')]).toEqual([name, 'no-store']);
 		}
