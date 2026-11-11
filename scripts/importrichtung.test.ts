@@ -1,7 +1,8 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync } from 'node:fs';
 import { ESLint } from 'eslint';
+import ts from 'typescript-eslint';
 import { describe, expect, it } from 'vitest';
-import { AUSNAHMEN } from '../eslint.config.js';
+import { AUSNAHMEN, MODULE, baueImportrichtung } from '../eslint.config.js';
 
 // Prüft die Lint-Regeln zur Richtung der Importe zwischen den Server-Modulen (eslint.config.js,
 // Schritt 05/12 in docs/refactoring-analyse.md): dass sie falsche Importe melden, dass eine
@@ -27,9 +28,19 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 		['login/neu.ts', "import { x } from '../admin/rollen.ts';"],
 		['datum.ts', "import { x } from './login/sitzung.ts';"],
 		['db/neu.ts', "import { x } from '../datum.ts';"],
-		['db/neu.ts', "import { x } from '../login/sitzung.ts';"]
+		['db/neu.ts', "import { x } from '../login/sitzung.ts';"],
+		// Ordner-Import ohne Datei = index.ts des Moduls
+		['login/neu.ts', "import { x } from '../admin';"],
+		['login/neu.ts', "import { x } from '$lib/server/admin';"],
+		['datum.ts', "import { x } from './admin';"],
+		['db/neu.ts', "import { x } from '../admin';"],
+		['db/neu.ts', "import { x } from '..';"],
+		// Endung .js wie .ts
+		['anlass/neu.ts', "import { x } from '../cm/schnittstellen.js';"],
+		['login/neu.ts', "import { x } from '../admin/rollen.js';"]
 	])('meldet in %s den Import %s', async (datei, code) => {
-		expect(await meldungen(datei, code)).toHaveLength(1);
+		// Mehr als eine Meldung ist möglich (`../admin` aus db: als Datei und als Modul).
+		expect((await meldungen(datei, code)).length).toBeGreaterThan(0);
 	});
 
 	it.each([
@@ -61,16 +72,48 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 		);
 	});
 
-	it('jede Ausnahme ist noch nötig (die Datei importiert das Ziel wirklich)', () => {
-		for (const a of AUSNAHMEN) {
-			const quelle = readFileSync(`${SERVER}/${a.von}`, 'utf8');
-			const ziel = a.nach.replace(/\.ts$/, '').replace(/\./g, '\\.');
-			const importiert = new RegExp(`from '(?:\\.\\./|\\$lib/server/)${ziel}(?:\\.ts)?'`).test(
-				quelle
+	it('db, login und die Themen sind genau die Ordner unter src/lib/server/', () => {
+		const ordner = readdirSync(SERVER, { withFileTypes: true })
+			.filter((e) => e.isDirectory())
+			.map((e) => e.name)
+			.sort();
+		expect(ordner).toEqual([...MODULE].sort());
+	});
+
+	// Die Muster erfassen nur Dateien direkt in einem Modulordner (`../modul/datei`). Ein Unterordner
+	// bräuchte Muster für beliebige Tiefe; das ist unverhältnismässig, solange es keinen gibt.
+	it('unter den Modulordnern gibt es keine Unterordner', () => {
+		for (const modul of MODULE) {
+			const unter = readdirSync(`${SERVER}/${modul}`, { withFileTypes: true }).filter((e) =>
+				e.isDirectory()
 			);
-			expect(importiert, `${a.von} importiert ${a.nach} nicht mehr: Ausnahme streichen`).toBe(true);
+			expect(
+				unter.map((e) => e.name),
+				`${modul}/`
+			).toEqual([]);
 		}
 	});
+
+	// Ohne die Ausnahme muss genau diese Datei wegen genau diesem Ziel gemeldet werden; ein
+	// auskommentierter oder entfernter Import zählt nicht als «gebraucht».
+	it.each(AUSNAHMEN.map((a) => [a.von, a.nach, a] as const))(
+		'Ausnahme %s → %s ist noch nötig',
+		async (von, nach, a) => {
+			const ohne = new ESLint({
+				overrideConfigFile: true,
+				overrideConfig: [
+					{ languageOptions: { parser: ts.parser } },
+					...baueImportrichtung(AUSNAHMEN.filter((x) => x !== a))
+				]
+			});
+			const [ergebnis] = await ohne.lintFiles([`${SERVER}/${von}`]);
+			const ziel = nach.replace(/\.ts$/, '');
+			const gemeldet = ergebnis.messages.some(
+				(m) => m.ruleId === 'no-restricted-imports' && m.message.includes(`${ziel}`)
+			);
+			expect(gemeldet, `${von} importiert ${nach} nicht mehr: Ausnahme streichen`).toBe(true);
+		}
+	);
 
 	it('jede Ausnahme nennt einen Schritt', () => {
 		for (const a of AUSNAHMEN) expect(a.schritt, `${a.von} → ${a.nach}`).toMatch(/\S/);

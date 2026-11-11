@@ -13,8 +13,10 @@ import { defineConfig } from 'eslint/config';
 //   3. Die Themen importieren nicht die Schnittstellen-Dateien (`schnittstellen.ts`,
 //      `passkey-schnittstellen.ts`) eines anderen Moduls.
 // Nicht erfasst: Fachlogik-Importe zwischen Themen (z. B. `cm` → `admin/mitglieder.ts`), die
-// `index.ts` der Module (Zusammenbau, Schritt 07), Importe zwischen `src/lib/server/` und dem Rest
-// von `src/lib/` (B-25) und Tests (`*.test.ts` überspannen die Module von Berufs wegen).
+// `index.ts` der Module (Zusammenbau, Schritt 07; das geplante `dienste.ts` ist die oberste Schicht
+// und bekommt dann eine eigene Regel), nicht normalisierte Pfade wie `./../cm/…`, `import()`,
+// Importe zwischen `src/lib/server/` und dem Rest von `src/lib/` (B-25) und Tests (`*.test.ts`
+// überspannen die Module von Berufs wegen). Unterordner in Modulen gibt es nicht; der Test meldet sie.
 // Jede heutige Verletzung steht einzeln in AUSNAHMEN, mit dem Schritt, der sie abbaut. Schritt 12
 // leert die Liste und stellt die Regel damit scharf. Im Code unter `src/` steht dafür kein
 // `eslint-disable`.
@@ -22,12 +24,17 @@ const SERVER = 'src/lib/server';
 const THEMEN = ['admin', 'anlass', 'brief', 'cm', 'gespraech', 'mitteilung', 'profil', 'turnier'];
 const JEDE_DATEI = '[^/]+';
 const SCHNITTSTELLEN = '(?:passkey-)?schnittstellen';
+const ENDUNG = '(?:\\.(?:ts|js))?';
+
+/** Alle Ordner unter src/lib/server/; der Test hält sie mit der Platte gleich. */
+export const MODULE = ['db', 'login', ...THEMEN];
 
 const S06_HTTP = '06: antwort, formatFehler, istJson, leseKoerper, Ereignis wandern nach http.ts';
 
 /**
  * Heutige Verletzungen: `von` und `nach` sind Dateien relativ zu src/lib/server/. `schritt` nennt den
  * Schritt aus docs/refactoring-analyse.md, der die Ausnahme abbaut, oder «bleibt: …» mit Grund.
+ * Eine Ausnahme gilt je Datei und Zieldatei, nicht je importiertem Namen.
  * @type {{ von: string; nach: string; schritt: string }[]}
  */
 export const AUSNAHMEN = [
@@ -75,43 +82,40 @@ export const AUSNAHMEN = [
 		von: 'gespraech/schnittstellen.ts',
 		nach: 'cm/schnittstellen.ts',
 		schritt:
-			'06 für aendernd und mitSitzung; die Typen CmDienste und CmEreignis bleiben offen (Entscheid vor Schritt 12)'
+			'ohne Schritt, offen (F-16): die Typen CmDienste und CmEreignis (aendernd und mitSitzung zieht Schritt 06 weg); Entscheid vor Schritt 07'
 	},
 	{
 		von: 'admin/schnittstellen.ts',
 		nach: 'mitteilung/schnittstellen.ts',
-		schritt:
-			'ohne Schritt: Entscheid des Projektleiters vor Schritt 12 offen (der Typ MitteilungAdminDienste gehört weder zu 06 noch zu 09 bis 11)'
+		schritt: 'ohne Schritt, offen (F-16): der Typ MitteilungAdminDienste; Entscheid vor Schritt 07'
 	},
 	{
 		von: 'gespraech/schnittstellen.ts',
 		nach: 'mitteilung/schnittstellen.ts',
-		schritt:
-			'ohne Schritt: Entscheid des Projektleiters vor Schritt 12 offen (der Typ MitteilungAdminDienste gehört weder zu 06 noch zu 09 bis 11)'
+		schritt: 'ohne Schritt, offen (F-16): der Typ MitteilungAdminDienste; Entscheid vor Schritt 07'
 	},
 	{
 		von: 'turnier/schnittstellen.ts',
 		nach: 'mitteilung/schnittstellen.ts',
-		schritt:
-			'ohne Schritt: Entscheid des Projektleiters vor Schritt 12 offen (der Typ MitteilungAdminDienste gehört weder zu 06 noch zu 09 bis 11)'
+		schritt: 'ohne Schritt, offen (F-16): der Typ MitteilungAdminDienste; Entscheid vor Schritt 07'
 	},
 	{
 		von: 'gespraech/schnittstellen.ts',
 		nach: 'admin/schnittstellen.ts',
 		schritt:
-			'ohne Schritt: Entscheid des Projektleiters vor Schritt 12 offen (liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber gehören weder zu 06 noch zu 09 bis 11)'
+			'ohne Schritt, offen (F-16): liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber; Entscheid vor Schritt 09'
 	},
 	{
 		von: 'mitteilung/schnittstellen.ts',
 		nach: 'admin/schnittstellen.ts',
 		schritt:
-			'ohne Schritt: Entscheid des Projektleiters vor Schritt 12 offen (liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber gehören weder zu 06 noch zu 09 bis 11)'
+			'ohne Schritt, offen (F-16): liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber; Entscheid vor Schritt 09'
 	},
 	{
 		von: 'turnier/schnittstellen.ts',
 		nach: 'admin/schnittstellen.ts',
 		schritt:
-			'ohne Schritt: Entscheid des Projektleiters vor Schritt 12 offen (liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber gehören weder zu 06 noch zu 09 bis 11)'
+			'ohne Schritt, offen (F-16): liest, schreibt und die Typen AdminDienste, AdminEreignis, AdminUrheber; Entscheid vor Schritt 09'
 	},
 	{
 		von: 'turnier/schnittstellen.ts',
@@ -136,29 +140,39 @@ export const AUSNAHMEN = [
 ];
 
 /**
- * Gruppe einer Quelldatei: wer wohin nicht importieren darf, als [Modul, Dateimuster].
+ * Gruppe einer Quelldatei: wer wohin nicht importieren darf. `ziele` sind [Modul, Dateimuster];
+ * `ordner` heisst, dass auch der Import des Moduls ohne Datei (= seine index.ts) gemeldet wird;
+ * `zusatz` sind weitere Muster für Importpfade.
  * @param {string} modul Ordner unter src/lib/server/, `.` für die Dateien direkt darunter
- * @returns {{ ebene: string; ziele: string[][] }}
+ * @returns {{ ebene: string; ziele: string[][]; ordner: boolean; zusatz: string[] }}
  */
 function gruppe(modul) {
 	if (modul === 'db')
 		return {
 			ebene: 'db importiert aus dem Server nichts',
-			ziele: [['', JEDE_DATEI], ...['login', ...THEMEN].map((m) => [m, JEDE_DATEI])]
+			ziele: [['', JEDE_DATEI], ...['login', ...THEMEN].map((m) => [m, JEDE_DATEI])],
+			ordner: true,
+			zusatz: ['^(?:\\.\\.|\\$lib/server)/?$']
 		};
 	if (modul === '.')
 		return {
 			ebene: 'Dateien direkt unter src/lib/server/ importieren nur db',
-			ziele: ['login', ...THEMEN].map((m) => [m, JEDE_DATEI])
+			ziele: ['login', ...THEMEN].map((m) => [m, JEDE_DATEI]),
+			ordner: true,
+			zusatz: []
 		};
 	if (modul === 'login')
 		return {
 			ebene: 'login importiert kein Thema',
-			ziele: THEMEN.map((m) => [m, JEDE_DATEI])
+			ziele: THEMEN.map((m) => [m, JEDE_DATEI]),
+			ordner: true,
+			zusatz: []
 		};
 	return {
 		ebene: 'ein Thema importiert nicht die Schnittstellen eines anderen Moduls',
-		ziele: ['login', ...THEMEN].filter((m) => m !== modul).map((m) => [m, SCHNITTSTELLEN])
+		ziele: ['login', ...THEMEN].filter((m) => m !== modul).map((m) => [m, SCHNITTSTELLEN]),
+		ordner: false,
+		zusatz: []
 	};
 }
 
@@ -169,27 +183,30 @@ function gruppe(modul) {
  * @returns {import('eslint').Linter.RulesRecord}
  */
 function regel(modul, frei) {
-	const { ebene, ziele } = gruppe(modul);
+	const { ebene, ziele, ordner, zusatz } = gruppe(modul);
 	const vorsatz = modul === '.' ? '\\./' : '\\.\\./';
+	const message = `Falsche Richtung: ${ebene}. Heutige Verletzungen stehen in AUSNAHMEN (eslint.config.js).`;
 	return {
 		'no-restricted-imports': [
 			'error',
 			{
-				patterns: ziele.map(([ziel, dateien]) => {
-					const erlaubt = frei
-						.filter((f) => f.startsWith(`${ziel}/`))
-						.map((f) =>
-							f
-								.slice(ziel.length + 1)
-								.replace(/\.ts$/, '')
-								.replace(/\./g, '\\.')
-						);
-					const ausser = erlaubt.length ? `(?!(?:${erlaubt.join('|')})(?:\\.ts)?$)` : '';
-					return {
-						regex: `^(?:\\$lib/server/|${vorsatz})${ziel ? `${ziel}/` : ''}${ausser}${dateien}(?:\\.ts)?$`,
-						message: `Falsche Richtung: ${ebene}. Heutige Verletzungen stehen in AUSNAHMEN (eslint.config.js).`
-					};
-				})
+				patterns: [
+					...ziele.map(([ziel, dateien]) => {
+						const erlaubt = frei
+							.filter((f) => f.startsWith(`${ziel}/`))
+							.map((f) =>
+								f
+									.slice(ziel.length + 1)
+									.replace(/\.ts$/, '')
+									.replace(/\./g, '\\.')
+							);
+						const ausser = erlaubt.length ? `(?!(?:${erlaubt.join('|')})${ENDUNG}$)` : '';
+						const datei = `${ziel ? `${ziel}/` : ''}${ausser}${dateien}${ENDUNG}`;
+						const pfad = ordner && ziel ? `${ziel}(?:/${ausser}${dateien}${ENDUNG})?/?` : datei;
+						return { regex: `^(?:\\$lib/server/|${vorsatz})${pfad}$`, message };
+					}),
+					...zusatz.map((regex) => ({ regex, message }))
+				]
 			}
 		]
 	};
@@ -197,28 +214,31 @@ function regel(modul, frei) {
 
 /** @param {string} datei */
 const modulVon = (datei) => (datei.includes('/') ? datei.split('/')[0] : '.');
-const MIT_AUSNAHME = [...new Set(AUSNAHMEN.map((a) => a.von))];
 
-/** @type {import('eslint').Linter.Config[]} */
-const importrichtung = [
-	...['db', 'login', ...THEMEN].map((modul) => ({
-		files: [`${SERVER}/${modul}/**/*.ts`],
-		ignores: ['**/*.test.ts', ...MIT_AUSNAHME.map((v) => `${SERVER}/${v}`)],
-		rules: regel(modul, [])
-	})),
-	{
-		files: [`${SERVER}/*.ts`],
-		ignores: ['**/*.test.ts', ...MIT_AUSNAHME.map((v) => `${SERVER}/${v}`)],
-		rules: regel('.', [])
-	},
-	...MIT_AUSNAHME.map((von) => ({
-		files: [`${SERVER}/${von}`],
-		rules: regel(
-			modulVon(von),
-			AUSNAHMEN.filter((a) => a.von === von).map((a) => a.nach)
-		)
-	}))
-];
+/**
+ * Die Konfigurationsblöcke der Regel für eine Liste von Ausnahmen (der Test baut sie auch ohne eine).
+ * @param {{ von: string; nach: string; schritt: string }[]} ausnahmen
+ * @returns {import('eslint').Linter.Config[]}
+ */
+export function baueImportrichtung(ausnahmen) {
+	const mitAusnahme = [...new Set(ausnahmen.map((a) => a.von))];
+	const ignores = ['**/*.test.ts', ...mitAusnahme.map((v) => `${SERVER}/${v}`)];
+	return [
+		...MODULE.map((modul) => ({
+			files: [`${SERVER}/${modul}/**/*.ts`],
+			ignores,
+			rules: regel(modul, [])
+		})),
+		{ files: [`${SERVER}/*.ts`], ignores, rules: regel('.', []) },
+		...mitAusnahme.map((von) => ({
+			files: [`${SERVER}/${von}`],
+			rules: regel(
+				modulVon(von),
+				ausnahmen.filter((a) => a.von === von).map((a) => a.nach)
+			)
+		}))
+	];
+}
 
 export default defineConfig(
 	{
@@ -256,5 +276,5 @@ export default defineConfig(
 			}
 		}
 	},
-	...importrichtung
+	...baueImportrichtung(AUSNAHMEN)
 );
