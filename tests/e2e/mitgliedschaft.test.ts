@@ -13,6 +13,7 @@ import {
 	pruefeBildschirm,
 	pruefePfad,
 	sammleKonsolenfehler,
+	wartetAufMitgliederliste,
 	wartetAufVorladen
 } from './hilfen/seite.ts';
 
@@ -54,7 +55,7 @@ async function oeffneVerwaltung(page: Page) {
 	await page.getByRole('button', { name: 'Code schicken' }).click();
 	await page.getByLabel('Code aus der Mail').fill(await holeMailCode(admin.email));
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await wartetAufMitgliederliste(page);
 	return admin;
 }
 
@@ -104,8 +105,12 @@ test('FR-04, A-MITGLIED-03: Austritt, Wiedereintritt, Vormerken, Rückgängig un
 		await expect(seite2.getByRole('status')).toHaveText(
 			'Falls ein Konto zu dieser Adresse besteht, ist eine Mail unterwegs.'
 		);
-		// Der Versand liefe nach der Antwort; kurz warten, damit eine Mail sichtbar würde.
-		await seite2.waitForTimeout(1500);
+		// Der Versand liefe erst nach der Antwort (SI-04), ein Zeichen für «fertig» gibt es darum
+		// nicht: 1,5 s lang darf keine Mail auftauchen; eine auftauchende macht den Test sofort rot.
+		// Ohne Frist belegt es login/mailcode.db.test.ts («ausgetreten und vorgemerkt …»).
+		await expect(
+			expect.poll(() => mailAnzahl(ziel.email), { timeout: 1500 }).toBeGreaterThan(0)
+		).rejects.toThrow();
 		expect(await mailAnzahl(ziel.email)).toBe(0);
 		await andere.close();
 	}

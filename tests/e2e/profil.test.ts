@@ -132,12 +132,8 @@ test('SI-09, A-KONTO-01: Mitglied wechselt die E-Mail mit zwei Codes', async ({ 
 	const feld = page.getByLabel('Code aus der Mail');
 	await expect(feld).toBeVisible();
 	// Die Login-Mail trifft kurz nach der Antwort ein; bis dahin ist die neueste Mail die des Wechsels.
-	let loginCode = neuCode;
-	for (let i = 0; i < 40 && loginCode === neuCode; i++) {
-		await page.waitForTimeout(250);
-		loginCode = await holeMailCode(neu);
-	}
-	expect(loginCode).not.toBe(neuCode);
+	await expect.poll(() => holeMailCode(neu), { timeout: 10_000 }).not.toBe(neuCode);
+	const loginCode = await holeMailCode(neu);
 	await feld.fill(loginCode);
 	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Noah' })).toBeVisible();

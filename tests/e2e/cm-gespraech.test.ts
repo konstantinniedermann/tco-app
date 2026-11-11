@@ -20,6 +20,7 @@ import {
 	pruefeBildschirm,
 	pruefePfad,
 	sammleKonsolenfehler,
+	wartetAufMitgliederliste,
 	wartetAufVorladen
 } from './hilfen/seite.ts';
 
@@ -390,9 +391,7 @@ test('A-TURNIER-04, FR-51: MyTCO-Admin sieht Posteingang und Gespräch nur zum A
 	await page.getByRole('button', { name: 'Code schicken' }).click();
 	await page.getByLabel('Code aus der Mail').fill(await holeMailCode(mytco.email));
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
-	// Die Mitgliederliste lädt erst nach der Überschrift; page.goto bräche sie sonst ab (WebKit).
-	await expect(page.getByRole('status')).toHaveText(/^\d+ Mitglied(er)?$/);
+	await wartetAufMitgliederliste(page);
 
 	await page.goto(`/verwaltung/turniere/${turnierId}/nachrichten`);
 	await expect(page.getByText('Nur ansehen.')).toBeVisible();
