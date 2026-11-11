@@ -2,9 +2,11 @@ import { defineConfig, devices } from '@playwright/test';
 import { istE2eDatenbank } from './scripts/e2e.ts';
 import { DATENBANK_URL, e2eEinstellungen } from './tests/e2e/hilfen/umgebung.ts';
 
-// Nur über `npm run e2e` (scripts/e2e.ts) mit eigener Datenbank; ein direkter Aufruf von
-// Playwright füllte sonst die gemeinsame lokale Datenbank `mytco` mit Testkonten.
-if (!istE2eDatenbank(DATENBANK_URL)) {
+// Nur über `npm run e2e` (scripts/e2e.ts) mit eigener Datenbank und eigenem Build-Ordner; ein
+// direkter Aufruf von Playwright füllte sonst die gemeinsame lokale Datenbank `mytco` mit
+// Testkonten, und ein anderer Build in `build/` veränderte den laufenden Testserver.
+const buildOrdner = process.env.MYTCO_E2E_BUILD ?? '';
+if (!istE2eDatenbank(DATENBANK_URL) || buildOrdner === '') {
 	throw new Error(
 		'E2E nur über «npm run e2e -- <datei>» starten (eigene Datenbank, scripts/e2e.ts).'
 	);
@@ -45,7 +47,8 @@ export default defineConfig({
 	],
 	webServer: {
 		// Mailpit (`make db`) fängt die Code-Mails; die Tests lesen sie über seine API.
-		command: 'npm run build && node scripts/migrate.ts && node build',
+		// Baut nach MYTCO_E2E_BUILD (vite.config.ts) und startet den Server von dort.
+		command: `npm run build && node scripts/migrate.ts && node ${buildOrdner}/build`,
 		url: baseURL,
 		env: {
 			PORT: String(port),

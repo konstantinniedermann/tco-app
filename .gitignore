@@ -25,6 +25,8 @@ betrieb/**/*.env
 node_modules/
 .svelte-kit/
 build/
+# Build je E2E-Lauf (scripts/e2e.ts)
+.e2e-build/
 coverage/
 test-results/
 playwright-report/

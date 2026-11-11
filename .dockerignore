@@ -1,6 +1,7 @@
 node_modules
 .svelte-kit
 build
+.e2e-build
 .git
 docs
 # Die Seite «Datenschutz» liest ihren Text beim Bauen von hier (DS-09).
