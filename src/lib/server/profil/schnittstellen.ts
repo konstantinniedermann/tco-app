@@ -1,13 +1,10 @@
 import { eq } from 'drizzle-orm';
-import type { Db } from '../db/index.ts';
 import { mitglied } from '../db/schema.ts';
 import { leseStand } from '../admin/angaben.ts';
 import { aenderndMitKoerper, antwort, jetzt, mitSitzung, type Ereignis } from '../http.ts';
 import { setzeKlassierung } from '../cm/angaben.ts';
 import { EIGENE_FELDER, aendereEigeneAngaben, ladeEigeneAngaben, setzeRufname } from './angaben.ts';
-import type { EmailWechselDienst } from './email-wechsel.ts';
-
-export type ProfilDienste = { db: Db; wechsel: EmailWechselDienst; jetzt?: () => Date };
+import type { ProfilDienste } from './typen.ts';
 
 // Nur die Sitzung zählt: Jedes angemeldete Mitglied bearbeitet ausschliesslich das eigene Konto
 // (mitSitzung, aenderndMitKoerper aus http.ts).

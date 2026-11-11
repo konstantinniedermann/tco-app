@@ -3,7 +3,7 @@ import { leseEinstellungen } from '../einstellungen.ts';
 import { holeBremsen } from '../login/index.ts';
 import { erstelleSmtpMailer, leiteUm } from '../login/mail.ts';
 import { erstelleEmailWechselDienst } from './email-wechsel.ts';
-import type { ProfilDienste } from './schnittstellen.ts';
+import type { ProfilDienste } from './typen.ts';
 
 let dienste: ProfilDienste | undefined;
 

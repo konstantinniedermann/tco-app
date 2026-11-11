@@ -1,5 +1,5 @@
 import { holeDb } from '../db/index.ts';
-import type { AnlassDienste } from './schnittstellen.ts';
+import type { AnlassDienste } from './typen.ts';
 
 let dienste: AnlassDienste | undefined;
 

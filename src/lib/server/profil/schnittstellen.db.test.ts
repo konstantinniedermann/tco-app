@@ -13,9 +13,9 @@ import {
 	postEmailBestaetigen,
 	postKlassierung,
 	postProfil,
-	postRufname,
-	type ProfilDienste
+	postRufname
 } from './schnittstellen.ts';
+import type { ProfilDienste } from './typen.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {

@@ -7,7 +7,6 @@ import {
 } from '../../mitteilung/auswahl.ts';
 import { vorlagenAnlass } from '../../mitteilung/vorlagen.ts';
 import { liest, schreibt, type AdminEreignis } from '../admin/rechte.ts';
-import type { Db } from '../db/index.ts';
 import {
 	antwort,
 	formatFehler,
@@ -25,11 +24,8 @@ import { pruefeMitteilung, type MitteilungWerte } from './angaben.ts';
 import { anlassEmpfaenger, vereinEmpfaenger, type Empfaenger } from './empfaenger.ts';
 import { ladeEinstellungen, pruefeThemen, setzeThemen } from './themen.ts';
 import { ladeAnlassKopf, ladeVerlauf, speichereMitteilung } from './verlauf.ts';
-import type { MitteilungAdminDienste } from './typen.ts';
+import type { MitteilungAdminDienste, MitteilungDienste } from './typen.ts';
 import { versende, vorschau } from './versand.ts';
-
-// Für die Mitglieder: ohne Push-Sender und Mailer.
-export type MitteilungDienste = { db: Db; vapidOeffentlich: string | null; jetzt?: () => Date };
 
 async function stand(d: MitteilungDienste, konto: AngemeldetesKonto) {
 	return {
