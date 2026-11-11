@@ -279,7 +279,7 @@ describe('Einstiege der Verwaltung ausserhalb von api/admin (Schritt 07)', () =>
 			for (const zeile of [
 				`import { ${einstieg} } from '../../../lib/server/dienste.ts';`,
 				`import { holeProfilDienste, ${einstieg} as h } from '../../../lib/server/dienste.ts';`,
-				`import { type X, ${einstieg} } from '../../../lib/server/dienste.ts';`,
+				`import { type holeProfilDienste, ${einstieg} } from '../../../lib/server/dienste.ts';`,
 				`import { ${einstieg} } from '../../../lib/server/dienste';`,
 				`import { ${einstieg} } from '../../../lib/server/dienste.js';`,
 				`import { ${einstieg} } from '$lib/server/dienste';`,
@@ -290,6 +290,47 @@ describe('Einstiege der Verwaltung ausserhalb von api/admin (Schritt 07)', () =>
 			}
 		}
 	);
+	// Ausserhalb von api/admin eine Erlaubt-Liste: Was nicht genau ein Einstieg der Mitglieder ist,
+	// ist ein Befund (gesperrt im Zweifel).
+	const fremd = (name: string) =>
+		`${pfad}: aus dienste.ts nur Einstiege der Mitglieder, nicht '${name}'; erlaubt sind nur holeLoginDienst, holePasskeyDienst, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste`;
+	const mit = (zeile: string) => pruefeBauregel(new Map([[pfad, `${gut}\n${zeile}`]]));
+	it('RR-07: ausserhalb von api/admin sind alle sechs Einstiege der Mitglieder erlaubt', () => {
+		expect(
+			mit(
+				"import { holeLoginDienst, holePasskeyDienst as p, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste } from '$lib/server/dienste';"
+			)
+		).toEqual([]);
+	});
+	it('RR-07: ein Kommentar statt Leerzeichen um as ist ein Befund', () => {
+		// Ohne Kommentare liest die Prüfung «holeAdminDiensteash»: kein Einstieg der Mitglieder.
+		expect(
+			mit("import { holeAdminDienste/**/as/**/h } from '../../../lib/server/dienste.ts';")
+		).toEqual([fremd('holeAdminDiensteash')]);
+		expect(
+			mit("import { holeProfilDienste/* x */as/* y */p } from '../../../lib/server/dienste.ts';")
+		).toEqual([fremd('holeProfilDiensteasp')]);
+	});
+	it('RR-07: ein Unicode-Escape im Bezeichner ist ein Befund', () => {
+		for (const name of ['holeAdminDienst\\u0065', 'holeProfilDienst\\u0065']) {
+			expect(mit(`import { ${name} } from '../../../lib/server/dienste.ts';`), name).toEqual([
+				fremd(name)
+			]);
+		}
+		// Mit geschweifter Klammer liest die Prüfung keine Namensliste: ebenfalls ein Befund.
+		expect(mit("import { holeAdminDienst\\u{65} } from '../../../lib/server/dienste.ts';")).toEqual(
+			[`${pfad}: '../../../lib/server/dienste.ts' nur statisch und mit Namen importieren`]
+		);
+	});
+	it('RR-07: ein Name, den dienste.ts heute nicht exportiert, ist ein Befund', () => {
+		for (const name of ['holeBremsen', 'holeMailer', 'holeDb']) {
+			const zeile = `import { ${name} as x } from '../../../lib/server/dienste.ts';`;
+			expect(mit(zeile), zeile).toEqual([fremd(name)]);
+		}
+		expect(mit("import { type Bremsen } from '../../../lib/server/dienste.ts';")).toEqual([
+			fremd('Bremsen')
+		]);
+	});
 	it('RR-07: dienste.ts ausserhalb von api/admin nur statisch und mit Namen', () => {
 		for (const [zeile, quelle] of [
 			["import * as d from '../../../lib/server/dienste.ts';", '../../../lib/server/dienste.ts'],

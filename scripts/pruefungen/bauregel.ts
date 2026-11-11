@@ -33,8 +33,21 @@ const SCHNITTSTELLEN_IMPORT =
 // aus `dienste.ts` nur diese, alle anderen Routen alles ausser diesen. Ein neuer Einstieg der
 // Verwaltung, der hier fehlt, ist für Admin-Routen gesperrt und fällt sofort auf.
 const VERWALTUNGS_EINSTIEGE = ['holeAdminDienste', 'holeMitteilungAdminDienste'];
+// Die Einstiege der Mitglieder: das Einzige, was eine Route ausserhalb von api/admin aus `dienste.ts`
+// holen darf. Erlaubt-Liste, keine Sperrliste: Was die Prüfung nicht genau als einen dieser Namen
+// erkennt (ein neuer Export, ein Kommentar statt Leerzeichen um `as`, ein Unicode-Escape im
+// Bezeichner), ist ein Befund.
+const MITGLIEDER_EINSTIEGE = [
+	'holeLoginDienst',
+	'holePasskeyDienst',
+	'holeProfilDienste',
+	'holeCmDienste',
+	'holeMitteilungDienste',
+	'holeAnlassDienste'
+];
 const AUS_DIENSTEN = /(?:^|\/)lib\/server\/dienste\.ts$/;
 const ERLAUBT_DIENSTE = VERWALTUNGS_EINSTIEGE.join(' und ');
+const ERLAUBT_MITGLIEDER = `erlaubt sind nur ${MITGLIEDER_EINSTIEGE.join(', ')}`;
 const ERLAUBT_IMPORT =
 	'erlaubt sind nur dienste.ts und die Schnittstellen aus admin/, turnier/ und mitteilung/';
 const ERLAUBT_LISTEN =
@@ -168,7 +181,7 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 	return befunde;
 }
 
-/** Ausserhalb von api/admin: keine Einstiege der Verwaltung und keine Schnittstellen der Mitteilungs-Verwaltung. */
+/** Ausserhalb von api/admin: aus `dienste.ts` nur Einstiege der Mitglieder, keine Schnittstellen der Mitteilungs-Verwaltung. */
 function pruefeVerwaltungImporte(
 	pfad: string,
 	imp: Import[],
@@ -185,10 +198,14 @@ function pruefeVerwaltungImporte(
 			continue;
 		}
 		for (const [name] of namen) {
-			const nurVerwaltung = ausDiensten
-				? VERWALTUNGS_EINSTIEGE.includes(name)
-				: (verwaltung?.has(name) ?? false);
-			if (nurVerwaltung) {
+			if (ausDiensten && MITGLIEDER_EINSTIEGE.includes(name)) continue;
+			if (ausDiensten && !VERWALTUNGS_EINSTIEGE.includes(name)) {
+				befunde.push(
+					`${pfad}: aus dienste.ts nur Einstiege der Mitglieder, nicht '${name}'; ${ERLAUBT_MITGLIEDER}`
+				);
+				continue;
+			}
+			if (ausDiensten || (verwaltung?.has(name) ?? false)) {
 				befunde.push(`${pfad}: nur Routen unter src/routes/api/admin/ dürfen '${name}' nutzen`);
 			}
 		}
