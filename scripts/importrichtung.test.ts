@@ -211,4 +211,11 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 	it('jede Ausnahme nennt einen Schritt', () => {
 		for (const a of AUSNAHMEN) expect(a.schritt, `${a.von} → ${a.nach}`).toMatch(/\S/);
 	});
+
+	// Seit Schritt 11 gilt die Regel ohne Ausnahme (Schritt 12 weist es nach). Eine neue Ausnahme
+	// braucht den Entscheid des Projektleiters und ändert darum auch diesen Test. Die Mechanik der
+	// Ausnahmen prüfen die gestellten Ausnahmen oben.
+	it('AUSNAHMEN ist leer', () => {
+		expect(AUSNAHMEN).toEqual([]);
+	});
 });
