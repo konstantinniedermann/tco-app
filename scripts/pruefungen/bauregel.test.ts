@@ -6,6 +6,11 @@ const LISTEN =
 	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN, CM_ADMIN_SCHNITTSTELLEN, GESPRAECH_ADMIN_SCHNITTSTELLEN, MITTEILUNG_ADMIN_SCHNITTSTELLEN und ANLASS_ADMIN_SCHNITTSTELLEN';
 const DATEIEN =
 	'erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/verwaltung-schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
+const VERWALTUNG =
+	'liest, schreibt und mitKonto nur in admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/verwaltung-schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
+/** Befund der Regel für die Rechteprüfung in einer Datei ausserhalb der Tabelle. */
+const rechteBefund = (pfad: string, name: string) =>
+	`${pfad}: '${name}' aus admin/rechte.ts; ${VERWALTUNG}`;
 
 describe('pruefeBauregel', () => {
 	it('meldet Server-Dateien neben Seiten', () => {
@@ -746,12 +751,9 @@ describe('Text in Anführungszeichen verschluckt keinen Import', () => {
 // Mitglieder liefe durch keine 403-Schleife; die Rechteprüfung `liest`/`schreibt` darf darum nur in
 // den Dateien der Tabelle VERWALTUNGS_DATEIEN stehen.
 describe('liest und schreibt nur in den Verwaltungs-Dateien', () => {
-	const VERWALTUNG =
-		'liest, schreibt und mitKonto nur in admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/verwaltung-schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
 	const mitglied = 'src/lib/server/cm/schnittstellen.ts';
 	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
-	const befund = (pfad: string, name: string) =>
-		`${pfad}: '${name}' aus admin/rechte.ts; ${VERWALTUNG}`;
+	const befund = rechteBefund;
 
 	it.each([
 		['src/lib/server/admin/schnittstellen.ts', './rechte.ts'],
@@ -869,6 +871,53 @@ describe('liest und schreibt nur in den Verwaltungs-Dateien', () => {
 		['tests/hilfen/verwaltungs-listen.ts', false]
 	])('betrifftRechteImporte(%s) ist %s', (pfad, erwartet) => {
 		expect(betrifftRechteImporte(pfad)).toBe(erwartet);
+	});
+});
+
+// Schritt 12a, Punkt 2 (N-01): Kommentare werden nur ausserhalb von Texten entfernt. Ein `//` oder
+// `/*` in einem Text lässt keinen Import verschwinden; ein Zeilenkommentar direkt hinter einem Text
+// ist ein Kommentar (D.8, D.14).
+describe('Kommentare nur ausserhalb von Texten (Schritt 12a)', () => {
+	const mitglied = 'src/lib/server/cm/schnittstellen.ts';
+	const route = 'src/routes/api/profil/+server.ts';
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
+
+	it.each([
+		['liest', "import { liest } from '$lib/server//admin/rechte.ts';"],
+		['liest', "import { liest } from '..//admin/rechte.ts';"],
+		['schreibt', 'import { schreibt } from "../admin//rechte";'],
+		['liest', "const a = '/*';\nimport { liest } from '../admin/rechte.ts';\nconst b = '*/';"],
+		['mitKonto', 'const a = `/*`;\nimport { mitKonto } from "../admin/rechte.ts";\nconst b = `*/`;']
+	])(
+		'RR-07: ein Kommentarzeichen in einem Text verschluckt den Import nicht (%s): %s',
+		(name, code) => {
+			expect(pruefe(mitglied, code)).toEqual([rechteBefund(mitglied, name)]);
+		}
+	);
+
+	it('RR-07: ein Zeilenkommentar direkt hinter einem Text verschluckt den Import nicht', () => {
+		const code = [
+			'import {',
+			"\t'holeAdminDienste'// it's",
+			'\tas h',
+			"} from '../../../lib/server/dienste.ts';"
+		].join('\n');
+		expect(pruefe(route, code)).toEqual([
+			`${route}: nur Routen unter src/routes/api/admin/ dürfen 'holeAdminDienste' nutzen`
+		]);
+	});
+
+	it('RR-07: Admin-Route: ein Kommentarzeichen in einem Text verschluckt den Import nicht', () => {
+		const admin = 'src/routes/api/admin/x/+server.ts';
+		const liste: [string, string] = [
+			'src/lib/server/admin/schnittstellen.ts',
+			'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+		];
+		const code =
+			"const a = '/*';\nimport { erstelleDb } from '../../../../lib/server/db/index.ts';\nconst b = '*/';";
+		expect(pruefeBauregel(new Map([liste, [admin, code]]))).toEqual([
+			`${admin}: Admin-Route importiert '../../../../lib/server/db/index.ts'; ${DATEIEN}`
+		]);
 	});
 });
 

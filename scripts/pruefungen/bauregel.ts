@@ -119,9 +119,28 @@ type Import =
 	| { art: 'statisch'; quelle: string; klausel: string | null }
 	| { art: 'dynamisch'; quelle: string | null };
 
-/** Entfernt Kommentare, damit z. B. ein Apostroph in einem Kommentar keinen Import verschluckt. */
+// Was kein Kommentar ist, obwohl `//` oder `/*` darin stehen kann: Texte in '…' und "…" (je auf
+// einer Zeile), Template-Literale (auch über Zeilen; `${…}` zählt mit zum Text) und Regex-Literale
+// (nach einem Zeichen oder Wort, hinter dem kein Wert endet, oder am Zeilenanfang; auf einer Zeile).
+const KEIN_KOMMENTAR = [
+	/'(?:[^'\\\n]|\\.)*'/,
+	/"(?:[^"\\\n]|\\.)*"/,
+	/`(?:[^`\\]|\\[\s\S])*`/,
+	/(?<=(?:^|[(,=:[!&|?{};+\-*%<>~^]|\b(?:return|typeof|case|do|else|in|of|new|delete|void|throw|instanceof|yield|await))\s*)\/(?![*/])(?:[^\\/\n[]|\\.|\[(?:[^\]\\\n]|\\.)*\])+\//
+];
+// Ein Zeilenkommentar beginnt nicht direkt nach `:` (eine Adresse ausserhalb eines Texts) oder `\`.
+const KOMMENTAR = [/\/\*[\s\S]*?\*\//, /(?<![:\\])\/\/[^\n]*/];
+const TEXT_ODER_KOMMENTAR = new RegExp(
+	`(${KEIN_KOMMENTAR.map((r) => r.source).join('|')})|${KOMMENTAR.map((r) => r.source).join('|')}`,
+	'gm'
+);
+
+/**
+ * Entfernt Kommentare, damit z. B. ein Apostroph in einem Kommentar keinen Import verschluckt. Texte
+ * bleiben, wie sie stehen: `//` in einem Importpfad ist kein Kommentar (Schritt 12a).
+ */
 function ohneKommentare(inhalt: string): string {
-	return inhalt.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+	return inhalt.replace(TEXT_ODER_KOMMENTAR, (_treffer, text?: string) => text ?? '');
 }
 
 // Ein Text in Anführungszeichen, je bis zum schliessenden Zeichen derselben Zeile; ein Escape (`\'`,
