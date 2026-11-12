@@ -6,6 +6,7 @@ import {
 	ZEIT_EIGENE_DB
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { ERLAUBT_IN_ANSICHT, riegel } from '../admin/ansicht.ts';
 import { erstelleZugangDienst } from '../admin/zugang.ts';
 import { ladeCmAnsicht, laufendeTurniere } from '../cm/anmeldungen.ts';
@@ -51,8 +52,9 @@ afterEach(() => {
 
 const start = new Date('2026-11-02T12:00:00Z');
 const ADRESSE = 'https://mytco.example.org';
-// Turnierjahre 9100 bis 9900; nur der Sitzungs-Test zählt global und nutzt darum eine eigene Datenbank.
-const zufallsJahr = () => 9100 + Math.floor(Math.random() * 800);
+// Turnierjahre 9100 bis 9899 (`tests/hilfen/turnierjahre.ts`); nur der Sitzungs-Test zählt global
+// und nutzt darum eine eigene Datenbank.
+const naechstesJahr = turnierjahre(import.meta.url);
 const SITZUNGSJAHR = 9950;
 const mitJahr = (jahr: number) => new Date(`${jahr}-06-15T12:00:00+02:00`);
 
@@ -119,7 +121,7 @@ async function mitglied(extra: { vorname?: string; nachname?: string } = {}) {
 
 /** Offenes Turnier mit gültiger Kontaktperson (CM-Admin); `jetzt` liegt im Turnierjahr. */
 async function aufbau(opt: { jahr?: number; ohneKontakt?: boolean } = {}) {
-	const jahr = opt.jahr ?? zufallsJahr();
+	const jahr = opt.jahr ?? naechstesJahr();
 	await db.delete(turnier).where(eq(turnier.jahr, jahr));
 	const t = await legeTurnierAn(db, {
 		jahr,

@@ -3,6 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { erstelleDb } from '../db/index.ts';
 import {
 	aenderung,
@@ -441,9 +442,10 @@ describe('Turnier-Schnittstellen', () => {
 	});
 });
 
-// Anmeldungen verwalten (Teil 4): Turniere in zufälligen Jahren wie in cm/verwaltung.db.test.ts,
-// damit sie sich nicht mit den festen Jahren oben und anderen Testdateien überschneiden.
-const zufallsJahr = () => 3000 + Math.floor(Math.random() * 6000);
+// Anmeldungen verwalten (Teil 4): Turniere in Jahren aus dem Bereich dieser Datei
+// (`tests/hilfen/turnierjahre.ts`), damit sie sich nicht mit den festen Jahren oben und anderen
+// Testdateien überschneiden.
+const naechstesJahr = turnierjahre(import.meta.url);
 
 async function kategorieIn(turnierId: number, name: string, teil: Partial<KategorieWerte> = {}) {
 	const r = await legeKategorieAn(db, turnierId, {
@@ -464,7 +466,7 @@ async function kategorieIn(turnierId: number, name: string, teil: Partial<Katego
 /** Turnier mit den Kategorien (Herren R1–R5, ausser angegeben), offen oder in Vorbereitung. */
 async function cmTurnier(kategorien: [string, Partial<KategorieWerte>?][], offen = true) {
 	for (;;) {
-		const jahr = zufallsJahr();
+		const jahr = naechstesJahr();
 		const r = await legeTurnierAn(db, {
 			jahr,
 			name: `Clubmeisterschaft ${jahr}`,

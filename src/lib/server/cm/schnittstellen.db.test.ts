@@ -2,6 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { erstelleDb } from '../db/index.ts';
 import { anmeldung, anmeldungSpieler, konto, mitglied, partnerAnfrage } from '../db/schema.ts';
 import { erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
@@ -63,10 +64,13 @@ function baue(jetzt: Date) {
 	return { d, mails, meldungen };
 }
 
+// Eigene Turnierjahre dieser Datei (`tests/hilfen/turnierjahre.ts`), gemeinsame Test-Datenbank.
+const naechstesJahr = turnierjahre(import.meta.url);
+
 /** Offenes Turnier in freiem Jahr mit Herren-Kategorien R1–R5; `jetzt` liegt vor dem Anmeldeschluss. */
 async function turnier(namen: string[]) {
 	for (;;) {
-		const jahr = 3000 + Math.floor(Math.random() * 6000);
+		const jahr = naechstesJahr();
 		const t = await legeTurnierAn(db, {
 			jahr,
 			name: `Clubmeisterschaft ${jahr}`,
@@ -418,7 +422,7 @@ describe('Schnittstellen der CM (Mitglied)', () => {
 /** Offenes Turnier mit einem offenen Doppel (Mindestsumme 9) und einem Herren-Einzel. */
 async function doppelTurnier() {
 	for (;;) {
-		const jahr = 3000 + Math.floor(Math.random() * 6000);
+		const jahr = naechstesJahr();
 		const t = await legeTurnierAn(db, {
 			jahr,
 			name: `Clubmeisterschaft ${jahr}`,

@@ -5,6 +5,7 @@ import {
 	ZEIT_EIGENE_DB
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { erstelleDb } from '../db/index.ts';
 import { gespraech, nachricht, turnier, type TurnierStatus } from '../db/schema.ts';
 import { legeTurnierAn } from '../turnier/turniere.ts';
@@ -28,8 +29,9 @@ afterAll(async () => {
 	await db.$client.end();
 });
 
-// Die gemeinsame Test-Datenbank hat Turniere anderer Tests: jedes Turnier bekommt ein eigenes Jahr.
-const zufallsJahr = () => 3000 + Math.floor(Math.random() * 6000);
+// Die gemeinsame Test-Datenbank hat Turniere anderer Tests: jedes Turnier bekommt ein eigenes Jahr
+// aus dem Bereich dieser Datei (`tests/hilfen/turnierjahre.ts`).
+const naechstesJahr = turnierjahre(import.meta.url);
 const mitJahr = (jahr: number, tag = '06-15') => new Date(`${jahr}-${tag}T12:00:00+02:00`);
 
 async function aufbau(
@@ -41,7 +43,7 @@ async function aufbau(
 		gesperrt: opt.kontakt === 'gesperrt'
 	});
 	for (;;) {
-		const jahr = zufallsJahr();
+		const jahr = naechstesJahr();
 		const t = await legeTurnierAn(db, {
 			jahr,
 			name: `Clubmeisterschaft ${jahr}`,
