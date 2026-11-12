@@ -13,8 +13,6 @@ import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../tests/hilfen/anfrage.ts';
 import { VERWALTUNGS_LISTEN } from '../../../tests/hilfen/verwaltungs-listen.ts';
 import {
-	getAdminAnlaesse,
-	getAdminAnlass,
 	getAuskunft,
 	getBriefe,
 	getFairgate,
@@ -23,9 +21,6 @@ import {
 	getRollen,
 	getVerlauf,
 	getZugang,
-	postAdminAnlaesse,
-	postAdminAnlass,
-	postAdminAnlassLoeschen,
 	postAnsicht,
 	postAnsichtBeenden,
 	postAustritt,
@@ -51,6 +46,13 @@ import {
 	getKalender,
 	postAnmeldung
 } from './anlass/schnittstellen.ts';
+import {
+	getAdminAnlaesse,
+	getAdminAnlass,
+	postAdminAnlaesse,
+	postAdminAnlass,
+	postAdminAnlassLoeschen
+} from './anlass/verwaltung-schnittstellen.ts';
 import {
 	CM_SCHNITTSTELLEN,
 	getCmAnsicht,

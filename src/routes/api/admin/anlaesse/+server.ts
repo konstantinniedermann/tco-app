@@ -2,7 +2,7 @@ import { holeAdminDienste } from '../../../../lib/server/dienste.ts';
 import {
 	getAdminAnlaesse,
 	postAdminAnlaesse
-} from '../../../../lib/server/admin/schnittstellen.ts';
+} from '../../../../lib/server/anlass/verwaltung-schnittstellen.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = (e) => getAdminAnlaesse(holeAdminDienste(), e);

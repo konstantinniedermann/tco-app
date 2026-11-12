@@ -1,5 +1,6 @@
 import type { AdminEreignis } from '../../src/lib/server/admin/rechte.ts';
 import { ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/admin/schnittstellen.ts';
+import { ANLASS_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/anlass/verwaltung-schnittstellen.ts';
 import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/mitteilung/schnittstellen.ts';
 import type { MitteilungAdminDienste } from '../../src/lib/server/mitteilung/typen.ts';
 import { TURNIER_SCHNITTSTELLEN } from '../../src/lib/server/turnier/schnittstellen.ts';
@@ -19,7 +20,8 @@ export type VerwaltungsSchnittstelle = (
 export const VERWALTUNGS_LISTEN: Record<string, Record<string, VerwaltungsSchnittstelle>> = {
 	admin: ADMIN_SCHNITTSTELLEN,
 	turnier: TURNIER_SCHNITTSTELLEN,
-	'mitteilung-admin': MITTEILUNG_ADMIN_SCHNITTSTELLEN
+	'mitteilung-admin': MITTEILUNG_ADMIN_SCHNITTSTELLEN,
+	'anlass-admin': ANLASS_ADMIN_SCHNITTSTELLEN
 };
 
 /** Alle Einträge aller Listen der Verwaltung in einem Objekt (Name → Funktion). */

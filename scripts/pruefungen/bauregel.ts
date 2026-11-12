@@ -25,16 +25,18 @@ const SERVER = 'src/lib/server/';
 
 /**
  * Was eine Route ausserhalb von api/admin aus einer Verwaltungs-Datei darf: `ordner` = nichts, der
- * ganze Ordner `lib/server/admin` ist gesperrt (ADMIN_MODUL); `namen` = keinen Namen der Liste
+ * ganze Ordner `lib/server/admin` ist gesperrt (ADMIN_MODUL); `pfad` = nichts, die Datei ist am
+ * Pfad gesperrt (reine Verwaltungs-Datei in einem Thema, E-38); `namen` = keinen Namen der Liste
  * (gemischte Datei mit Schnittstellen der Mitglieder, Sperrliste); `offen` = dafür gibt es heute
  * keine Regel (Lücke, D.7).
  */
-type Aussen = 'ordner' | 'namen' | 'offen';
+type Aussen = 'ordner' | 'pfad' | 'namen' | 'offen';
 
 // Die Schnittstellen-Dateien der Verwaltung (relativ zu src/lib/server/) mit ihrer Liste: die eine
 // Stelle für die Menge der Listen in der Bauregel. Die erste muss es geben (ADMIN_SCHNITTSTELLEN);
 // fehlt eine andere Liste, gilt sie als leer. Bereich Clubmeisterschaft: TURNIER_SCHNITTSTELLEN,
-// offen auch für `cm`; Mitteilungen der Verwaltung: MITTEILUNG_ADMIN_SCHNITTSTELLEN.
+// offen auch für `cm`; Mitteilungen der Verwaltung: MITTEILUNG_ADMIN_SCHNITTSTELLEN; Anlässe der
+// Verwaltung: ANLASS_ADMIN_SCHNITTSTELLEN.
 const VERWALTUNGS_DATEIEN: readonly { datei: string; liste: string; aussen: Aussen }[] = [
 	{ datei: 'admin/schnittstellen.ts', liste: 'ADMIN_SCHNITTSTELLEN', aussen: 'ordner' },
 	{ datei: 'turnier/schnittstellen.ts', liste: 'TURNIER_SCHNITTSTELLEN', aussen: 'offen' },
@@ -42,6 +44,11 @@ const VERWALTUNGS_DATEIEN: readonly { datei: string; liste: string; aussen: Auss
 		datei: 'mitteilung/schnittstellen.ts',
 		liste: 'MITTEILUNG_ADMIN_SCHNITTSTELLEN',
 		aussen: 'namen'
+	},
+	{
+		datei: 'anlass/verwaltung-schnittstellen.ts',
+		liste: 'ANLASS_ADMIN_SCHNITTSTELLEN',
+		aussen: 'pfad'
 	}
 ];
 
@@ -83,6 +90,14 @@ const ERLAUBT_LISTEN = `erlaubt sind nur Einträge aus ${aufzaehlung(VERWALTUNGS
 // den Mitgliedern dient. `dienste.ts` mit und ohne Endung (auch `.js`, das Vite auf `.ts` auflöst),
 // über `$lib` und mit Anhang (`?…`): Der Schutz hängt hier am Namen, nicht mehr am Pfad.
 const DIENSTE_MODUL = /(?:^|\/|^\$)lib\/server\/dienste(?:\.(?:ts|js))?(?:[?#].*)?$/;
+// Am Pfad gesperrte Dateien (`aussen: 'pfad'`): mit und ohne Endung (auch `.js`), über `$lib` und
+// mit Anhang (`?…`), wie DIENSTE_MODUL.
+const NUR_VERWALTUNG = VERWALTUNGS_DATEIEN.filter((v) => v.aussen === 'pfad').map((v) => ({
+	...v,
+	muster: new RegExp(
+		`(?:^|\\/|^\\$)lib\\/server\\/${escape(ohneEndung(v.datei))}(?:\\.(?:ts|js))?(?:[?#].*)?$`
+	)
+}));
 // Gemischte Dateien (`aussen: 'namen'`): mit und ohne `.ts`, über `$lib`.
 const GEMISCHT = VERWALTUNGS_DATEIEN.filter((v) => v.aussen === 'namen').map((v) => ({
 	...v,
@@ -290,6 +305,13 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 				befunde.push(
 					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
 				);
+			}
+			for (const v of NUR_VERWALTUNG) {
+				if (imp.some((i) => i.quelle !== null && v.muster.test(i.quelle))) {
+					befunde.push(
+						`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/${v.datei} nutzen`
+					);
+				}
 			}
 			befunde.push(...pruefeVerwaltungImporte(pfad, imp, gemischt));
 			if (imp.some((i) => i.quelle === null)) {

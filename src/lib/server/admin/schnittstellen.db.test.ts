@@ -39,15 +39,9 @@ import {
 	postFairgate,
 	getZugang,
 	postZugang,
-	postZugangCode,
-	getAdminAnlaesse,
-	getAdminAnlass,
-	postAdminAnlaesse,
-	postAdminAnlass,
-	postAdminAnlassLoeschen
+	postZugangCode
 } from './schnittstellen.ts';
 import { liest, schreibt, type AdminDienste } from './rechte.ts';
-import { getAnlaesse } from '../anlass/schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 import { erstelleHinweis } from './hinweis-mail.ts';
 import { ladeMitglied } from './mitglieder.ts';
@@ -161,7 +155,7 @@ describe('Admin-Schnittstellen', () => {
 			([name]) =>
 				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(26);
+		expect(geschuetzt).toHaveLength(21);
 		for (const [name, fn] of geschuetzt) {
 			const mach = (konto?: AngemeldetesKonto) =>
 				ereignis({
@@ -196,7 +190,7 @@ describe('Admin-Schnittstellen', () => {
 			([name]) =>
 				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(26);
+		expect(geschuetzt).toHaveLength(21);
 		for (const [name, fn] of geschuetzt) {
 			for (const konto of [cm.konto, ehemals.konto]) {
 				const r = await fn(
@@ -300,10 +294,7 @@ describe('Admin-Schnittstellen', () => {
 			postWiedereintritt,
 			postLoeschen,
 			postLoeschenRueckgaengig,
-			postFairgate,
-			postAdminAnlaesse,
-			postAdminAnlass,
-			postAdminAnlassLoeschen
+			postFairgate
 		];
 		for (const fn of aendernde) {
 			const r = await fn(
@@ -810,75 +801,6 @@ describe('Admin-Schnittstellen', () => {
 		expect(nochmal.status).toBe(404);
 		expect(await nochmal.json()).toEqual({ fehler: 'nicht-gefunden' });
 		expect((await abhaken('abc')).status).toBe(404);
-	});
-
-	test('A-ANLASS-01: Admin legt Anlass an, ändert ihn, Mitglied sieht ihn, Admin löscht ihn', async () => {
-		const s = baue();
-		const admin = await bestaetigterAdmin(s);
-		const titel = `GV ${crypto.randomUUID()}`;
-		const angaben = {
-			titel,
-			beginn: '2027-03-19T19:30',
-			ort: 'Clubhaus',
-			einladung: 'Traktanden',
-			anmeldeschluss: '2027-03-16T23:59'
-		};
-		const fehlt = await postAdminAnlaesse(
-			s.d,
-			ereignis({ body: { ...angaben, titel: ' ' }, konto: admin.konto })
-		);
-		expect([fehlt.status, await fehlt.json()]).toEqual([
-			400,
-			{ fehler: 'eingabe', felder: { titel: 'Bitte einen Titel angeben.' } }
-		]);
-		const neu = await postAdminAnlaesse(s.d, ereignis({ body: angaben, konto: admin.konto }));
-		expect(neu.status).toBe(201);
-		const { id } = await neu.json();
-
-		const mitglied = await einloggen((await legeMitgliedAn(db)).kontoId);
-		const sicht = await (
-			await getAnlaesse({ db, jetzt: () => start }, ereignis({ method: 'GET', konto: mitglied }))
-		).json();
-		expect(sicht.map((a: { titel: string }) => a.titel)).toContain(titel);
-
-		const geaendert = await postAdminAnlass(
-			s.d,
-			ereignis({
-				body: { ...angaben, ort: 'Halle' },
-				params: { id: String(id) },
-				konto: admin.konto
-			})
-		);
-		expect(geaendert.status).toBe(200);
-		const detail = await (
-			await getAdminAnlass(
-				s.d,
-				ereignis({ method: 'GET', params: { id: String(id) }, konto: admin.konto })
-			)
-		).json();
-		expect(detail).toMatchObject({
-			titel,
-			ort: 'Halle',
-			beginnLokal: '2027-03-19T19:30',
-			schlussLokal: '2027-03-16T23:59',
-			zahlen: { kommen: 0, kommenNicht: 0 },
-			anmeldungen: []
-		});
-		const liste = await (
-			await getAdminAnlaesse(s.d, ereignis({ method: 'GET', konto: admin.konto }))
-		).json();
-		expect(liste.map((a: { id: number }) => a.id)).toContain(id);
-
-		const weg = await postAdminAnlassLoeschen(
-			s.d,
-			ereignis({ body: {}, params: { id: String(id) }, konto: admin.konto })
-		);
-		expect(weg.status).toBe(200);
-		const nochmal = await postAdminAnlassLoeschen(
-			s.d,
-			ereignis({ body: {}, params: { id: String(id) }, konto: admin.konto })
-		);
-		expect([nochmal.status, await nochmal.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
 	});
 });
 

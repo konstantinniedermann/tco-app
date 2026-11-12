@@ -25,6 +25,10 @@ import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../mitteilung/schnittstellen.ts
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { TURNIER_SCHNITTSTELLEN, postKategorien, postTurniere } from '../turnier/schnittstellen.ts';
 import { legeAnlassAn } from '../anlass/anlaesse.ts';
+import {
+	ANLASS_ADMIN_SCHNITTSTELLEN,
+	postAdminAnlaesse
+} from '../anlass/verwaltung-schnittstellen.ts';
 import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';
 import { ROLLEN } from './rollen.ts';
 import {
@@ -34,7 +38,6 @@ import {
 	getMitglieder,
 	getRollen,
 	getVerlauf,
-	postAdminAnlaesse,
 	postRollen
 } from './schnittstellen.ts';
 import type { AdminDienste } from './rechte.ts';
@@ -379,7 +382,7 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			),
 			await getVerlauf(s.d, hole(mytco.konto)),
 			await ADMIN_SCHNITTSTELLEN.getFairgate(s.d, hole(mytco.konto)),
-			await ADMIN_SCHNITTSTELLEN.getAdminAnlaesse(s.d, hole(mytco.konto)),
+			await ANLASS_ADMIN_SCHNITTSTELLEN.getAdminAnlaesse(s.d, hole(mytco.konto)),
 			await getRollen(s.d, hole(mytco.konto)),
 			await MITTEILUNG_ADMIN_SCHNITTSTELLEN.getVereinMitteilungen(s.d, hole(mytco.konto)),
 			await MITTEILUNG_ADMIN_SCHNITTSTELLEN.getAnlassMitteilungen(
