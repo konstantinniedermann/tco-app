@@ -383,13 +383,32 @@ function pruefeRechteImporte(pfad: string, imp: Import[]): string[] {
 	return befunde;
 }
 
-/** Wo die Bauregel die Importe aus admin/rechte.ts prüft: `src/` ohne Routen und Tests. */
+/**
+ * Wo die Bauregel die Importe aus admin/rechte.ts prüft: `src/` ohne Routen und Tests, auch
+ * `.mts`, `.cts`, `.mjs` und `.cjs` (Vite lädt sie wie `.ts` und `.js`; Schritt 12a).
+ */
 export function betrifftRechteImporte(pfad: string): boolean {
 	return (
 		pfad.startsWith('src/') &&
 		!pfad.startsWith('src/routes/') &&
-		/\.(ts|js)$/.test(pfad) &&
+		/\.[cm]?[tj]s$/.test(pfad) &&
 		!istTestquelle(pfad)
+	);
+}
+
+// Laden, dessen Ziel die Prüfung nicht liest: `import.meta.glob` (Vite) und `require` samt
+// `createRequire` (ohne Methoden wie `x.require`). In Routen und in den Dateien der Rechte-Regel ein
+// Befund, gesperrt im Zweifel (Schritt 12a).
+const NICHT_PRUEFBAR =
+	/\bimport\s*\.\s*meta\s*\.\s*glob|(?<![\w$.])(?:require|createRequire)\s*\(/g;
+const BERECHNET = 'dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen';
+
+function pruefeNichtPruefbar(pfad: string, inhalt: string): string[] {
+	const woerter = [...ohneKommentare(inhalt).matchAll(NICHT_PRUEFBAR)].map((t) =>
+		t[0].startsWith('import') ? 'import.meta.glob' : t[0].replace(/\s*\($/, '')
+	);
+	return [...new Set(woerter)].map(
+		(wort) => `${pfad}: ${wort} lässt sich nicht prüfen; nur statische Importe`
 	);
 }
 
@@ -432,15 +451,15 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 				}
 			}
 			befunde.push(...pruefeDiensteImporte(pfad, imp));
-			if (imp.some((i) => i.quelle === null)) {
-				befunde.push(`${pfad}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`);
-			}
+			if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
 		}
-		if (
-			betrifftRechteImporte(pfad) &&
-			!VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei)
-		) {
-			befunde.push(...pruefeRechteImporte(pfad, importe(inhalt)));
+		if (inRoutes || betrifftRechteImporte(pfad)) befunde.push(...pruefeNichtPruefbar(pfad, inhalt));
+		if (betrifftRechteImporte(pfad)) {
+			const imp = importe(inhalt);
+			if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
+			if (!VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei)) {
+				befunde.push(...pruefeRechteImporte(pfad, imp));
+			}
 		}
 		if (/\.remote\.(ts|js)$/.test(name)) {
 			befunde.push(`${pfad}: Remote Functions sind nicht vorgesehen`);

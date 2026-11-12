@@ -1001,6 +1001,61 @@ describe('Importpfade auch in Routen aufgelöst (Schritt 12a)', () => {
 	});
 });
 
+// Schritt 12a, Punkt 4 (N-03): Laden, dessen Ziel die Prüfung nicht liest, ist in Routen und in den
+// Dateien der Rechte-Regel ein Befund; Dateien mit `.mts`/`.cts` gelten wie `.ts`.
+describe('Nicht prüfbares Laden (Schritt 12a)', () => {
+	const mitglied = 'src/lib/server/cm/schnittstellen.ts';
+	const route = 'src/routes/api/profil/+server.ts';
+	const admin = 'src/routes/api/admin/x/+server.ts';
+	const liste: [string, string] = [
+		'src/lib/server/admin/schnittstellen.ts',
+		'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+	];
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([liste, [pfad, code]]));
+	const nicht = (pfad: string, wort: string) =>
+		`${pfad}: ${wort} lässt sich nicht prüfen; nur statische Importe`;
+
+	it.each([
+		[route, "const m = import.meta.glob('$lib/server/admin/*.ts');", 'import.meta.glob'],
+		[route, "const m = import.meta.glob('./*.ts', { eager: true });", 'import.meta.glob'],
+		[route, "const r = require('../../../lib/server/admin/rollen.ts');", 'require'],
+		[admin, "const m = import.meta.glob('../../../../lib/server/db/*.ts');", 'import.meta.glob'],
+		[admin, "const r = require('../../../../lib/server/db/index.ts');", 'require'],
+		[
+			'src/routes/+page.svelte',
+			"<script>\n\tconst m = import.meta.glob('./*.ts');\n</script>",
+			'import.meta.glob'
+		],
+		[mitglied, "const r = require('../admin/rechte.ts');", 'require'],
+		[mitglied, "const r = createRequire(import.meta.url)('../admin/rechte.ts');", 'createRequire'],
+		[mitglied, "const m = import.meta.glob('../admin/*.ts');", 'import.meta.glob'],
+		['src/lib/server/cm/verwaltung-schnittstellen.ts', "const r = require('./x.ts');", 'require']
+	])('RR-07: %s: %s', (pfad, code, wort) => {
+		expect(pruefe(pfad, code)).toEqual([nicht(pfad, wort)]);
+	});
+
+	it.each([
+		[mitglied, 'const r = await import(pfad);'],
+		[mitglied, 'const r = await import(`../admin/${datei}.ts`);'],
+		['src/hooks.server.ts', 'const r = await import(pfad);'],
+		['src/lib/server/admin/schnittstellen.ts', 'const r = await import(pfad);']
+	])('RR-07: berechneter dynamischer Import ausserhalb der Routen in %s: %s', (pfad, code) => {
+		expect(pruefe(pfad, code)).toEqual([
+			`${pfad}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`
+		]);
+	});
+
+	it.each(['src/lib/server/cm/hilfe.mts', 'src/lib/server/cm/hilfe.cts'])(
+		'RR-07: %s gilt wie .ts',
+		(pfad) => {
+			expect(betrifftRechteImporte(pfad)).toBe(true);
+			expect(pruefe(pfad, "import { liest } from '../admin/rechte.ts';")).toEqual([
+				rechteBefund(pfad, 'liest')
+			]);
+		}
+	);
+});
+
 describe('betrifftBauregel', () => {
 	it.each([
 		'src/routes/+page.ts',
