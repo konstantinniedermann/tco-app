@@ -1,6 +1,7 @@
 import type { AdminEreignis } from '../../src/lib/server/admin/rechte.ts';
 import { ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/admin/schnittstellen.ts';
 import { ANLASS_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/anlass/verwaltung-schnittstellen.ts';
+import { CM_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/cm/verwaltung-schnittstellen.ts';
 import { GESPRAECH_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/gespraech/verwaltung-schnittstellen.ts';
 import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/mitteilung/schnittstellen.ts';
 import type { MitteilungAdminDienste } from '../../src/lib/server/mitteilung/typen.ts';
@@ -21,6 +22,7 @@ export type VerwaltungsSchnittstelle = (
 export const VERWALTUNGS_LISTEN: Record<string, Record<string, VerwaltungsSchnittstelle>> = {
 	admin: ADMIN_SCHNITTSTELLEN,
 	turnier: TURNIER_SCHNITTSTELLEN,
+	'cm-admin': CM_ADMIN_SCHNITTSTELLEN,
 	'gespraech-admin': GESPRAECH_ADMIN_SCHNITTSTELLEN,
 	'mitteilung-admin': MITTEILUNG_ADMIN_SCHNITTSTELLEN,
 	'anlass-admin': ANLASS_ADMIN_SCHNITTSTELLEN

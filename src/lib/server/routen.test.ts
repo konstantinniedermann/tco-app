@@ -69,6 +69,21 @@ import {
 	postCmSuchtext,
 	postCmWildcard
 } from './cm/schnittstellen.ts';
+import {
+	getAnmeldungen,
+	getDoppel,
+	getSpieler,
+	postAnfrageAlsPaar,
+	postAnfrageLoeschen,
+	postAnmeldungLoeschen,
+	postAnmeldungVonHand,
+	postDoppelVonHand,
+	postEntscheid,
+	postKlassierung as postKlassierungVerwaltung,
+	postPartnerAendern,
+	postVerschieben,
+	postZusammenlegen
+} from './cm/verwaltung-schnittstellen.ts';
 import { holeDb } from './db/index.ts';
 import {
 	holeAdminDienste,
@@ -132,28 +147,15 @@ import {
 	postRufname
 } from './profil/schnittstellen.ts';
 import {
-	getAnmeldungen,
-	getDoppel,
 	getKategorie,
-	getSpieler,
 	getTurnier,
 	getTurniere,
-	postAnfrageAlsPaar,
-	postAnfrageLoeschen,
-	postAnmeldungLoeschen,
-	postAnmeldungVonHand,
-	postDoppelVonHand,
-	postEntscheid,
 	postKategorie,
 	postKategorieAbsagen,
 	postKategorien,
-	postKlassierung as postKlassierungVerwaltung,
-	postPartnerAendern,
 	postTurnier,
 	postTurnierStatus,
-	postTurniere,
-	postVerschieben,
-	postZusammenlegen
+	postTurniere
 } from './turnier/schnittstellen.ts';
 
 /** Die Dienste-Einstiege; jede Route bekommt ihre Dienste von genau einem davon. */

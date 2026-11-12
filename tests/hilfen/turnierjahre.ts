@@ -14,7 +14,7 @@ export type Jahresbereich = readonly [von: number, bis: number];
  */
 export const TURNIERJAHRE: Record<string, Jahresbereich> = {
 	'src/lib/server/turnier/turniere.db.test.ts': [3000, 3599],
-	'src/lib/server/turnier/schnittstellen.db.test.ts': [3600, 4199],
+	'src/lib/server/cm/verwaltung-schnittstellen.db.test.ts': [3600, 4199],
 	'src/lib/server/gespraech/gespraech.db.test.ts': [4200, 4799],
 	'src/lib/server/cm/verwaltung-doppel.db.test.ts': [4800, 5399],
 	'src/lib/server/cm/verwaltung.db.test.ts': [5400, 5999],

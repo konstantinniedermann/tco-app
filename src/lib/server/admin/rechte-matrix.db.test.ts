@@ -25,6 +25,7 @@ import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../mitteilung/schnittstellen.ts
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { TURNIER_SCHNITTSTELLEN, postKategorien, postTurniere } from '../turnier/schnittstellen.ts';
 import { legeAnlassAn } from '../anlass/anlaesse.ts';
+import { CM_ADMIN_SCHNITTSTELLEN } from '../cm/verwaltung-schnittstellen.ts';
 import {
 	ANLASS_ADMIN_SCHNITTSTELLEN,
 	postAdminAnlaesse
@@ -368,11 +369,11 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			await getMitglieder(s.d, hole(mytco.konto)),
 			await getMitglied(s.d, hole(mytco.konto, { params: { id: String(ziel.mitgliedId) } })),
 			await TURNIER_SCHNITTSTELLEN.getTurniere(s.d, hole(mytco.konto)),
-			await TURNIER_SCHNITTSTELLEN.getAnmeldungen(
+			await CM_ADMIN_SCHNITTSTELLEN.getAnmeldungen(
 				s.d,
 				hole(mytco.konto, { params: { id: String(kategorieId) } })
 			),
-			await TURNIER_SCHNITTSTELLEN.getSpieler(
+			await CM_ADMIN_SCHNITTSTELLEN.getSpieler(
 				s.d,
 				ereignis({
 					method: 'GET',
@@ -389,7 +390,7 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 				s.d,
 				hole(mytco.konto, { params: { id: anlassId } })
 			),
-			await TURNIER_SCHNITTSTELLEN.getDoppel(
+			await CM_ADMIN_SCHNITTSTELLEN.getDoppel(
 				s.d,
 				hole(mytco.konto, { params: { id: String(dk.id) } })
 			)

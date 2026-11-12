@@ -2,7 +2,7 @@ import { holeMitteilungAdminDienste } from '../../../../../../lib/server/dienste
 import {
 	getAnmeldungen,
 	postAnmeldungVonHand
-} from '../../../../../../lib/server/turnier/schnittstellen.ts';
+} from '../../../../../../lib/server/cm/verwaltung-schnittstellen.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = (e) => getAnmeldungen(holeMitteilungAdminDienste(), e);

@@ -3,9 +3,9 @@ import { betrifftBauregel, pruefeBauregel } from './bauregel.ts';
 
 // Die Meldungstexte mit der Menge der Verwaltungs-Listen, einmal für alle Fälle.
 const LISTEN =
-	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN, GESPRAECH_ADMIN_SCHNITTSTELLEN, MITTEILUNG_ADMIN_SCHNITTSTELLEN und ANLASS_ADMIN_SCHNITTSTELLEN';
+	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN, CM_ADMIN_SCHNITTSTELLEN, GESPRAECH_ADMIN_SCHNITTSTELLEN, MITTEILUNG_ADMIN_SCHNITTSTELLEN und ANLASS_ADMIN_SCHNITTSTELLEN';
 const DATEIEN =
-	'erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
+	'erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
 
 describe('pruefeBauregel', () => {
 	it('meldet Server-Dateien neben Seiten', () => {
@@ -469,6 +469,7 @@ describe('Verwaltung der Anlässe (anlass/verwaltung-schnittstellen.ts)', () => 
 // Fall, wie bei den Anlässen. Admin-Routen nehmen nur Einträge der Liste, andere Routen nichts.
 describe.each([
 	['turnier/schnittstellen.ts', 'TURNIER_SCHNITTSTELLEN', 'getTurniere'],
+	['cm/verwaltung-schnittstellen.ts', 'CM_ADMIN_SCHNITTSTELLEN', 'getAnmeldungen'],
 	['gespraech/verwaltung-schnittstellen.ts', 'GESPRAECH_ADMIN_SCHNITTSTELLEN', 'getGespraeche']
 ])('Verwaltung am Pfad gesperrt: %s', (datei, konstante, name) => {
 	const listen: [string, string][] = [
@@ -718,6 +719,7 @@ describe('betrifftBauregel', () => {
 		'lib/b.remote.js',
 		'src/lib/server/admin/schnittstellen.ts',
 		'src/lib/server/turnier/schnittstellen.ts',
+		'src/lib/server/cm/verwaltung-schnittstellen.ts',
 		'src/lib/server/gespraech/verwaltung-schnittstellen.ts',
 		'src/lib/server/mitteilung/schnittstellen.ts',
 		'src/lib/server/anlass/verwaltung-schnittstellen.ts'
