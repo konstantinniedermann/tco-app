@@ -24,6 +24,19 @@ export const VERWALTUNGS_LISTEN: Record<string, Record<string, VerwaltungsSchnit
 	'anlass-admin': ANLASS_ADMIN_SCHNITTSTELLEN
 };
 
-/** Alle Einträge aller Listen der Verwaltung in einem Objekt (Name → Funktion). */
-export const alleVerwaltung = (): Record<string, VerwaltungsSchnittstelle> =>
-	Object.assign({}, ...Object.values(VERWALTUNGS_LISTEN));
+/**
+ * Alle Einträge aller Listen der Verwaltung in einem Objekt (Name → Funktion). Steht ein Name in
+ * zwei Listen, bricht es ab, statt den ersten still zu überschreiben.
+ */
+export function alleVerwaltung(): Record<string, VerwaltungsSchnittstelle> {
+	const alle: Record<string, VerwaltungsSchnittstelle> = {};
+	for (const [modul, liste] of Object.entries(VERWALTUNGS_LISTEN)) {
+		for (const [name, fn] of Object.entries(liste)) {
+			if (Object.hasOwn(alle, name)) {
+				throw new Error(`${name} steht in zwei Listen der Verwaltung (zuletzt ${modul})`);
+			}
+			alle[name] = fn;
+		}
+	}
+	return alle;
+}

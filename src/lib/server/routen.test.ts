@@ -6,7 +6,8 @@
 // Wer eine Route umhängt oder den Zusammenbau der Dienste ändert (Schritte 07, 09 bis 11), passt
 // nur ROUTEN und EINSTIEGE an. Zieht eine Funktion in ein anderes Modul, ändert sich nur ihr Import;
 // das Modul muss auf `schnittstellen.ts` enden (sonst `schnittstellenModule` erweitern), und eine
-// neue Liste gehört in VERWALTUNG oder MITGLIEDER.
+// neue Liste der Verwaltung gehört in `VERWALTUNGS_LISTEN` (`tests/hilfen/verwaltungs-listen.ts`),
+// eine der Mitglieder in MITGLIEDER.
 // Der Test liegt hier und nicht unter `src/routes/`: Dort gilt die Bauregel für jede Datei, und
 // nur Admin-Routen dürfen die Verwaltung importieren.
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
