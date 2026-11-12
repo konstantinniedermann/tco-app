@@ -177,3 +177,23 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Doku-Abgleich vor dem Release 0.20.5
 
 **Einschätzung:** Niedrig: Absender sind eingeloggte Vereinsmitglieder. Wenn nötig, eine Grenze pro Konto oder höchstens eine Meldung pro Gespräch und Stunde.
+
+### 2026-11-12 — Bauregel kann bei einem Kommentar hinter einer Division zu Unrecht melden
+
+**Thema:** Tests
+
+**Fundort:** `scripts/pruefungen/bauregel.ts`, `ohneKommentare` (Zeichenliste des Regex-Musters:
+`!`, `+`, `-`, `}`, `>`) und `pruefeWeiterreichen` (Muster für Typ-Argumente).
+
+**Beobachtung:** Steht hinter einer Division nach `a!`, `i++` oder `}` ein Zeilenend-Kommentar mit
+`liest`, `schreibt`, `mitKonto` oder `require(`, meldet die Bauregel in einer geprüften Datei einen
+Befund, den es nicht gibt. Ebenso gilt `liest<Map<string, number>>(a)` als Weiterreichen. Im Code
+kommt beides heute nicht vor.
+
+**Ursprung:** Refactoring Schritt 12a (#80), zweites Review; `docs/refactoring-analyse.md`, Anhang
+D.15.
+
+**Einschätzung:** Falscher roter Lauf, kein Schutzverlust. Wer darauf stösst, formuliert den
+Kommentar um oder setzt ihn auf eine eigene Zeile; eine saubere Lösung bräuchte einen Parser statt
+Mustern (neue Bauart, eigener Entscheid).
+
