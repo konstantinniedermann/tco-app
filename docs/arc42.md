@@ -77,7 +77,7 @@ flowchart TD
   S["Seiten: src/routes, +page.svelte, oft mit +page.ts"] -->|fetch, JSON| API["Schnittstellen: src/routes/api, nur +server.ts"]
   S --> UI["Oberfläche: src/lib, ohne server"]
   H["hooks.server.ts: Sitzung, Sicherheits-Header"] --> API
-  API --> F["Fachmodule: src/lib/server/login, admin, profil, anlass, turnier, cm, mitteilung, gespraech, brief"]
+  API --> F["Fachmodule: src/lib/server/login, sitzung, admin, profil, anlass, turnier, cm, mitteilung, gespraech, brief"]
   F --> DB["Datenbank: src/lib/server/db, Drizzle, Migrationen in drizzle/"]
   DB --> PG[(PostgreSQL)]
 ```
