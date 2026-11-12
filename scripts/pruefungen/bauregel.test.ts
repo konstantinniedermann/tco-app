@@ -390,9 +390,6 @@ describe('Mitteilungen ausserhalb von api/admin', () => {
 	});
 });
 
-// Namen in Anführungszeichen (ES2022, `import { 'x' as y } from …`): Die Zeile ist ein Import wie
-// jeder andere und wird nach denselben Regeln beurteilt; einen Namen mit Escape liest die Prüfung
-// nicht, er ist ein Befund (Schritt 09).
 // Reine Verwaltungs-Datei ausserhalb von lib/server/admin (Schritt 09): Admin-Routen nehmen aus ihr
 // nur Einträge der Liste, alle anderen Routen nichts; der Schutz hängt am Pfad der Datei.
 describe('Verwaltung der Anlässe (anlass/verwaltung-schnittstellen.ts)', () => {
@@ -427,6 +424,12 @@ describe('Verwaltung der Anlässe (anlass/verwaltung-schnittstellen.ts)', () => 
 			`${admin}: Admin-Route importiert '../../../../lib/server/anlass/verwaltung-schnittstellen.ts' nicht mit Namen`
 		]);
 	});
+	it('eine andere Datei, deren Name so beginnt, ist nicht gesperrt', () => {
+		const pfad = 'src/routes/api/anlaesse/+server.ts';
+		const zeile =
+			"import { x } from '../../../lib/server/anlass/verwaltung-schnittstellen-alt.ts';";
+		expect(mit(pfad, zeile)).toEqual([]);
+	});
 	it('RR-07: ausserhalb von api/admin nutzt keine Route anlass/verwaltung-schnittstellen.ts', () => {
 		const pfad = 'src/routes/api/anlaesse/+server.ts';
 		const gut = [
@@ -441,6 +444,9 @@ describe('Verwaltung der Anlässe (anlass/verwaltung-schnittstellen.ts)', () => 
 			`import { getAdminAnlaesse } from '${v}';`,
 			`import { getAdminAnlaesse } from '${v}.js';`,
 			`import { getAdminAnlaesse } from '${v}.ts?x';`,
+			`import { getAdminAnlaesse } from '${v}.mjs';`,
+			`import { getAdminAnlaesse } from '${v}.d.ts';`,
+			`import { getAdminAnlaesse } from '${v}#a';`,
 			"import { getAdminAnlaesse } from '$lib/server/anlass/verwaltung-schnittstellen';",
 			`import { getAdminAnlaesse as g } from '${v}.ts';`,
 			`import { 'getAdminAnlaesse' as g } from '${v}.ts';`,
@@ -459,6 +465,9 @@ describe('Verwaltung der Anlässe (anlass/verwaltung-schnittstellen.ts)', () => 
 	});
 });
 
+// Namen in Anführungszeichen (ES2022, `import { 'x' as y } from …`): Die Zeile ist ein Import wie
+// jeder andere und wird nach denselben Regeln beurteilt; einen Namen mit Escape (`\u…`, `\x…`,
+// `\'`, `\"`) liest die Prüfung nicht, er ist ein Befund (Schritt 09).
 describe('Namen in Anführungszeichen', () => {
 	const liste: [string, string] = [
 		'src/lib/server/admin/schnittstellen.ts',
@@ -557,6 +566,86 @@ describe('Namen in Anführungszeichen', () => {
 			"import { 'x' as y } from '../../../lib/zeit.ts';"
 		].join('\n');
 		expect(pruefe(mitglied, code)).toEqual([]);
+	});
+});
+
+// Ein Text in Anführungszeichen (auch ein einzelnes Zeichen in einem Template- oder Regex-Literal)
+// darf keinen Import dahinter verschlucken: Jedes `import` und `export` wird für sich geprüft
+// (Korrekturrunde Schritt 09).
+describe('Text in Anführungszeichen verschluckt keinen Import', () => {
+	const listen: [string, string][] = [
+		[
+			'src/lib/server/admin/schnittstellen.ts',
+			'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+		],
+		[
+			'src/lib/server/mitteilung/schnittstellen.ts',
+			'export const MITTEILUNG_ADMIN_SCHNITTSTELLEN = {\n\tpostVereinSenden\n} satisfies Record<string, unknown>;'
+		],
+		[
+			'src/lib/server/anlass/verwaltung-schnittstellen.ts',
+			'export const ANLASS_ADMIN_SCHNITTSTELLEN = {\n\tgetAdminAnlaesse\n} satisfies Record<string, unknown>;'
+		]
+	];
+	const mitglied = 'src/routes/api/profil/+server.ts';
+	const admin = 'src/routes/api/admin/mitglieder/[id]/+server.ts';
+	const pruefe = (pfad: string, inhalt: string) =>
+		pruefeBauregel(new Map([...listen, [pfad, inhalt]]));
+	// Ein Import zwischen zwei Literalen mit je einem Apostroph, danach ein weiteres `export … from`.
+	const zwischen = (literal: string, zeile: string) =>
+		`export const a = ${literal}; ${zeile} const b = ${literal}\nexport { z } from './x.ts';`;
+	const LITERALE = ["`'`", "/'/", '`"`', '/"/'];
+
+	it.each(LITERALE)('RR-07: Mitglieder-Route, Import zwischen %s', (literal) => {
+		for (const [zeile, befund] of [
+			[
+				'import { holeAdminDienste } from "$lib/server/dienste";',
+				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen 'holeAdminDienste' nutzen`
+			],
+			[
+				"import { getMitglied } from '$lib/server/admin/schnittstellen';",
+				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
+			],
+			[
+				"import { postVereinSenden } from '../../../lib/server/mitteilung/schnittstellen.ts';",
+				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen 'postVereinSenden' nutzen`
+			],
+			[
+				"import { getAdminAnlaesse } from '../../../lib/server/anlass/verwaltung-schnittstellen.ts';",
+				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen lib/server/anlass/verwaltung-schnittstellen.ts nutzen`
+			]
+		]) {
+			expect(pruefe(mitglied, zwischen(literal, zeile)), zeile).toContain(befund);
+		}
+	});
+	it.each(LITERALE)('RR-07: Admin-Route, Import zwischen %s', (literal) => {
+		const zeile = "import { erstelleDb } from '../../../../../lib/server/db/index.ts';";
+		expect(pruefe(admin, zwischen(literal, zeile))).toContain(
+			`${admin}: Admin-Route importiert '../../../../../lib/server/db/index.ts'; ${DATEIEN}`
+		);
+	});
+	it.each(["'a\\'b'", '"a\\"b"'])(
+		'RR-07: ein Name mit Escape-Anführungszeichen %s ist ein Befund und verschluckt den Import nicht',
+		(name) => {
+			const zeile = `import { ${name} as g, holeAdminDienste } from "$lib/server/dienste";`;
+			expect(pruefe(mitglied, zeile)).toEqual(
+				expect.arrayContaining([
+					`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen 'holeAdminDienste' nutzen`,
+					expect.stringContaining(name)
+				])
+			);
+		}
+	);
+	it('RR-07: export * mit Namen in Anführungszeichen ist ein Import', () => {
+		expect(pruefe(mitglied, "export * as 'ns' from '$lib/server/dienste';")).toEqual([
+			`${mitglied}: '$lib/server/dienste' nur statisch und mit Namen importieren`
+		]);
+	});
+	it('RR-07: Import ohne Namen vor einem weiteren Import ohne Semikolon', () => {
+		const code = "import '$lib/server/admin/rollen.ts'\nimport { getProfil } from '../x.ts'";
+		expect(pruefe(mitglied, code)).toEqual([
+			`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
+		]);
 	});
 });
 

@@ -90,13 +90,11 @@ const ERLAUBT_LISTEN = `erlaubt sind nur Einträge aus ${aufzaehlung(VERWALTUNGS
 // den Mitgliedern dient. `dienste.ts` mit und ohne Endung (auch `.js`, das Vite auf `.ts` auflöst),
 // über `$lib` und mit Anhang (`?…`): Der Schutz hängt hier am Namen, nicht mehr am Pfad.
 const DIENSTE_MODUL = /(?:^|\/|^\$)lib\/server\/dienste(?:\.(?:ts|js))?(?:[?#].*)?$/;
-// Am Pfad gesperrte Dateien (`aussen: 'pfad'`): mit und ohne Endung (auch `.js`), über `$lib` und
-// mit Anhang (`?…`), wie DIENSTE_MODUL.
+// Am Pfad gesperrte Dateien (`aussen: 'pfad'`): der Pfad ohne Endung, danach alles ausser einem
+// weiteren Zeichen des Dateinamens (`.ts`, `.js`, ohne, `.mjs`, `?…`, `#…`), auch über `$lib`.
 const NUR_VERWALTUNG = VERWALTUNGS_DATEIEN.filter((v) => v.aussen === 'pfad').map((v) => ({
 	...v,
-	muster: new RegExp(
-		`(?:^|\\/|^\\$)lib\\/server\\/${escape(ohneEndung(v.datei))}(?:\\.(?:ts|js))?(?:[?#].*)?$`
-	)
+	muster: new RegExp(`(?:^|\\/|^\\$)lib\\/server\\/${escape(ohneEndung(v.datei))}(?![\\w-])`)
 }));
 // Gemischte Dateien (`aussen: 'namen'`): mit und ohne `.ts`, über `$lib`.
 const GEMISCHT = VERWALTUNGS_DATEIEN.filter((v) => v.aussen === 'namen').map((v) => ({
@@ -116,22 +114,51 @@ function ohneKommentare(inhalt: string): string {
 	return inhalt.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
 }
 
-// `klausel`: was zwischen `import`/`export` und `from` steht; `null` bei `import '…'`. Sie darf
-// Namen in Anführungszeichen enthalten (`{ 'x' as y }`, ES2022), je als Ganzes bis zum schliessenden
-// Zeichen derselben Zeile; ein `from` oder `;` darin beendet sie nicht, ausserhalb beendet sie ein
-// `;`. Sie findet damit jeden Import, den sie ohne Anführungszeichen fand.
+// Ein Text in Anführungszeichen, je bis zum schliessenden Zeichen derselben Zeile; ein Escape (`\'`,
+// `\"`, `\\`) beendet ihn nicht.
+const TEXT = `'(?:[^'\\\\\\n]|\\\\.)*'|"(?:[^"\\\\\\n]|\\\\.)*"`;
+const SCHLUESSELWORT = /\b(?:import|export)\b/g;
+const OHNE_KLAUSEL = /\s*['"]([^'"]+)['"]/y;
+const BIS_FROM = `\\bfrom\\s*['"]([^'"]+)['"]`;
+// Klausel ohne Anführungszeichen und ohne `;`: die Form, die die Bauregel vor Schritt 09 allein kannte.
+const KLAUSEL = new RegExp(`([^'";]*?)${BIS_FROM}`, 'y');
+// Klausel mit Namen in Anführungszeichen (`{ 'x' as y }`, `* as 'x'`, ES2022): Texte nur in
+// geschweiften Klammern oder direkt nach `as`, sonst weder Anführungszeichen noch `;`. Ein anderer
+// Text, etwa ein einzelner Apostroph in einem Template- oder Regex-Literal, beginnt so keine Klausel.
+const KLAUSEL_MIT_TEXT = new RegExp(
+	`((?:\\bas\\s+(?:${TEXT})|[^'";{}]|\\{(?:[^'"{}]|${TEXT})*\\})*?)${BIS_FROM}`,
+	'y'
+);
+
+/** Prüft ein Muster ab einer Stelle, ohne den Text dahinter zu verbrauchen. */
+function ab(muster: RegExp, text: string, stelle: number): RegExpExecArray | null {
+	muster.lastIndex = stelle;
+	return muster.exec(text);
+}
+
+// `klausel`: was zwischen `import`/`export` und `from` steht; `null` bei `import '…'`. Jedes
+// Schlüsselwort wird für sich geprüft, nicht fortlaufend: Ein Treffer, der über einen Import
+// hinwegläuft, verbraucht ihn nicht; der hat seinen eigenen. Je Schlüsselwort gilt zuerst die Form
+// ohne Klausel (nur nach `import`), dann die Klausel ohne Anführungszeichen, erst dann die mit Namen
+// in Anführungszeichen. So gibt es jeden Treffer der Fassung vor Schritt 09 weiter, mit derselben
+// Klausel; dazu kommen Treffer, die sie verbraucht oder nicht erkannt hatte.
 // Dynamisch: `quelle` ist `null`, wenn der Pfad berechnet wird (`import(variable)`).
 function importe(inhalt: string): Import[] {
 	const text = ohneKommentare(inhalt);
-	const statisch =
-		/\b(?:import|export)\b((?:[^'";]|'[^'\n]*'|"[^"\n]*")*?)\bfrom\s*['"]([^'"]+)['"]|\bimport\s*['"]([^'"]+)['"]/g;
+	const statisch: Import[] = [];
+	for (const wort of text.matchAll(SCHLUESSELWORT)) {
+		const stelle = wort.index + wort[0].length;
+		const ohne = wort[0] === 'import' ? ab(OHNE_KLAUSEL, text, stelle) : null;
+		if (ohne) {
+			statisch.push({ art: 'statisch', quelle: ohne[1], klausel: null });
+			continue;
+		}
+		const mit = ab(KLAUSEL, text, stelle) ?? ab(KLAUSEL_MIT_TEXT, text, stelle);
+		if (mit) statisch.push({ art: 'statisch', quelle: mit[2], klausel: mit[1].trim() });
+	}
 	const dynamisch = /\bimport\s*\(\s*(?:['"`]([^'"`$]+)['"`]\s*\))?/g;
 	return [
-		...[...text.matchAll(statisch)].map((m): Import =>
-			m[2] !== undefined
-				? { art: 'statisch', quelle: m[2], klausel: m[1].trim() }
-				: { art: 'statisch', quelle: m[3], klausel: null }
-		),
+		...statisch,
 		...[...text.matchAll(dynamisch)].map((m): Import => ({
 			art: 'dynamisch',
 			quelle: m[1] ?? null
