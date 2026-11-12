@@ -64,20 +64,20 @@ describe('Admin-Routen', () => {
 		].join('\n')
 	] as const;
 	const gut = [
-		"import { holeAdminDienste } from '../../../../../lib/server/admin/index.ts';",
+		"import { holeAdminDienste } from '../../../../../lib/server/dienste.ts';",
 		"import { getMitglied } from '../../../../../lib/server/admin/schnittstellen.ts';",
 		"import type { RequestHandler } from './$types';",
 		'export const GET: RequestHandler = (e) => getMitglied(holeAdminDienste(), e);'
 	].join('\n');
 	const pruefe = (inhalt: string, weitere: [string, string][] = []) =>
 		pruefeBauregel(new Map([liste, [route, inhalt], ...weitere]));
-	it('jede +server.ts unter api/admin importiert nur aus admin/index.ts und admin/schnittstellen.ts', () => {
+	it('jede +server.ts unter api/admin importiert nur aus dienste.ts und admin/schnittstellen.ts', () => {
 		expect(pruefe(gut)).toEqual([]);
 		for (const schlecht of [
 			"import { holeDb } from '../../../lib/server/db/index.ts';",
 			"import { listeMitglieder } from '../../../lib/server/admin/mitglieder.ts';",
-			"import { x } from '../../../lib/server/admin/index.ts.evil';",
-			"export { y } from '../../../lib/server/login/index.ts';",
+			"import { x } from '../../../lib/server/dienste.ts.evil';",
+			"export { y } from '../../../lib/server/login/dienst.ts';",
 			"import '../../../lib/server/db/schema.ts';"
 		]) {
 			expect(pruefe(`${gut}\n${schlecht}`)).toHaveLength(1);
@@ -105,7 +105,7 @@ describe('Admin-Routen', () => {
 		];
 		const rumpf = (namen: string) =>
 			[
-				"import { holeAdminDienste } from '../../../../lib/server/admin/index.ts';",
+				"import { holeAdminDienste } from '../../../../lib/server/dienste.ts';",
 				`import { ${namen} } from '../../../../lib/server/turnier/schnittstellen.ts';`,
 				'export const GET = (e) => getTurniere(holeAdminDienste(), e);'
 			].join('\n');
@@ -124,30 +124,43 @@ describe('Admin-Routen', () => {
 		];
 		const rumpf = (namen: string, dienst = 'holeMitteilungAdminDienste', zeile = '') =>
 			[
-				`import { ${dienst} } from '../../../../lib/server/mitteilung/index.ts';`,
+				`import { ${dienst} } from '../../../../lib/server/dienste.ts';`,
 				`import { ${namen} } from '../../../../lib/server/mitteilung/schnittstellen.ts';`,
 				`export const GET = (e) => getVereinMitteilungen(${dienst}(), e);`,
 				zeile
 			].join('\n');
 		const mit = (inhalt: string) => pruefeBauregel(new Map([liste, mListe, [mRoute, inhalt]]));
+		/** Weitere Namen im Import aus dienste.ts, die Route nutzt weiter den Einstieg. */
+		const mitImport = (namen: string) =>
+			rumpf('getVereinMitteilungen').replace(
+				'{ holeMitteilungAdminDienste }',
+				`{ holeMitteilungAdminDienste, ${namen} }`
+			);
 		expect(mit(rumpf('getVereinMitteilungen'))).toEqual([]);
 		// Die Schnittstellen der Mitglieder prüfen keine Verwaltungsrolle.
 		expect(mit(rumpf('getVereinMitteilungen, postThemen'))).toEqual([
 			`${mRoute}: Admin-Route nutzt 'postThemen'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN und MITTEILUNG_ADMIN_SCHNITTSTELLEN`
 		]);
-		expect(mit(rumpf('getVereinMitteilungen', 'holeMitteilungDienste'))).toEqual([
-			`${mRoute}: Admin-Route importiert 'holeMitteilungDienste' aus ../../../../lib/server/mitteilung/index.ts; erlaubt ist nur holeMitteilungAdminDienste`
-		]);
+		// Aus dienste.ts nur die Einstiege der Verwaltung, keiner der Mitglieder (Schritt 07).
+		for (const fremd of ['holeMitteilungDienste', 'holeLoginDienst', 'holeCmDienste']) {
+			expect(mit(mitImport(fremd))).toEqual([
+				`${mRoute}: Admin-Route importiert '${fremd}' aus ../../../../lib/server/dienste.ts; erlaubt sind nur holeAdminDienste und holeMitteilungAdminDienste`
+			]);
+		}
 		expect(
 			mit(rumpf('getVereinMitteilungen', undefined, 'const db = holeMitteilungAdminDienste().db;'))
 		).toEqual([
 			`${mRoute}: holeMitteilungAdminDienste() nur direkt als erstes Argument einer Schnittstelle übergeben`
 		]);
-		// Aus admin/index.ts bleibt nur holeAdminDienste erlaubt.
-		const quer = rumpf('getVereinMitteilungen').replace('mitteilung/index.ts', 'admin/index.ts');
-		expect(mit(quer)).toEqual([
-			`${mRoute}: Admin-Route importiert 'holeMitteilungAdminDienste' aus ../../../../lib/server/admin/index.ts; erlaubt ist nur holeAdminDienste`
-		]);
+		// Beide Einstiege der Verwaltung kommen aus derselben Datei.
+		expect(mit(mitImport('holeAdminDienste'))).toEqual([]);
+		// Die Einstiege der Verwaltung kommen nur noch aus dienste.ts (Schritt 07).
+		for (const alt of ['admin/index.ts', 'mitteilung/index.ts']) {
+			const quer = rumpf('getVereinMitteilungen').replace('dienste.ts', alt);
+			expect(mit(quer)).toEqual([
+				`${mRoute}: Admin-Route importiert '../../../../lib/server/${alt}'; erlaubt sind nur dienste.ts und die Schnittstellen aus admin/, turnier/ und mitteilung/`
+			]);
+		}
 	});
 	it('RR-07: nur Funktionen aus ADMIN_SCHNITTSTELLEN (die der Rechte-Test abdeckt)', () => {
 		const fremd = gut.replace('{ getMitglied }', '{ getMitglied, liest }');
@@ -166,7 +179,8 @@ describe('Admin-Routen', () => {
 		for (const schlecht of [
 			"import * as s from '../../../../../lib/server/admin/schnittstellen.ts';",
 			"import s from '../../../../../lib/server/admin/schnittstellen.ts';",
-			"import { holeDb } from '../../../../../lib/server/admin/index.ts';"
+			"import { holeDb } from '../../../../../lib/server/dienste.ts';",
+			"import * as d from '../../../../../lib/server/dienste.ts';"
 		]) {
 			expect(pruefe(`${gut}\n${schlecht}`)).toHaveLength(1);
 		}
@@ -246,6 +260,94 @@ describe('Admin-Routen', () => {
 	});
 });
 
+describe('Einstiege der Verwaltung ausserhalb von api/admin (Schritt 07)', () => {
+	const pfad = 'src/routes/api/profil/+server.ts';
+	const gut = [
+		"import { holeProfilDienste } from '../../../lib/server/dienste.ts';",
+		"import { getProfil } from '../../../lib/server/profil/schnittstellen.ts';",
+		'export const GET = (e) => getProfil(holeProfilDienste(), e);'
+	].join('\n');
+	it('RR-07: Mitglieder-Routen holen ihre Einstiege aus dienste.ts', () => {
+		expect(pruefeBauregel(new Map([[pfad, gut]]))).toEqual([]);
+	});
+	// Heute schützte der Pfad lib/server/admin den Einstieg der Verwaltung; in dienste.ts schützt
+	// ihn sein Name.
+	it.each(['holeAdminDienste', 'holeMitteilungAdminDienste'])(
+		'RR-07: keine Route ausserhalb von api/admin holt %s aus dienste.ts',
+		(einstieg) => {
+			const nutzt = `${pfad}: nur Routen unter src/routes/api/admin/ dürfen '${einstieg}' nutzen`;
+			for (const zeile of [
+				`import { ${einstieg} } from '../../../lib/server/dienste.ts';`,
+				`import { holeProfilDienste, ${einstieg} as h } from '../../../lib/server/dienste.ts';`,
+				`import { type holeProfilDienste, ${einstieg} } from '../../../lib/server/dienste.ts';`,
+				`import { ${einstieg} } from '../../../lib/server/dienste';`,
+				`import { ${einstieg} } from '../../../lib/server/dienste.js';`,
+				`import { ${einstieg} } from '$lib/server/dienste';`,
+				`import { ${einstieg} } from '$lib/server/dienste.ts';`,
+				`export { ${einstieg} } from '../../../lib/server/dienste.ts';`
+			]) {
+				expect(pruefeBauregel(new Map([[pfad, `${gut}\n${zeile}`]])), zeile).toEqual([nutzt]);
+			}
+		}
+	);
+	// Ausserhalb von api/admin eine Erlaubt-Liste: Was nicht genau ein Einstieg der Mitglieder ist,
+	// ist ein Befund (gesperrt im Zweifel).
+	const fremd = (name: string) =>
+		`${pfad}: aus dienste.ts nur Einstiege der Mitglieder, nicht '${name}'; erlaubt sind nur holeLoginDienst, holePasskeyDienst, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste`;
+	const mit = (zeile: string) => pruefeBauregel(new Map([[pfad, `${gut}\n${zeile}`]]));
+	it('RR-07: ausserhalb von api/admin sind alle sechs Einstiege der Mitglieder erlaubt', () => {
+		expect(
+			mit(
+				"import { holeLoginDienst, holePasskeyDienst as p, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste } from '$lib/server/dienste';"
+			)
+		).toEqual([]);
+	});
+	it('RR-07: ein Kommentar statt Leerzeichen um as ist ein Befund', () => {
+		// Ohne Kommentare liest die Prüfung «holeAdminDiensteash»: kein Einstieg der Mitglieder.
+		expect(
+			mit("import { holeAdminDienste/**/as/**/h } from '../../../lib/server/dienste.ts';")
+		).toEqual([fremd('holeAdminDiensteash')]);
+		expect(
+			mit("import { holeProfilDienste/* x */as/* y */p } from '../../../lib/server/dienste.ts';")
+		).toEqual([fremd('holeProfilDiensteasp')]);
+	});
+	it('RR-07: ein Unicode-Escape im Bezeichner ist ein Befund', () => {
+		for (const name of ['holeAdminDienst\\u0065', 'holeProfilDienst\\u0065']) {
+			expect(mit(`import { ${name} } from '../../../lib/server/dienste.ts';`), name).toEqual([
+				fremd(name)
+			]);
+		}
+		// Mit geschweifter Klammer liest die Prüfung keine Namensliste: ebenfalls ein Befund.
+		expect(mit("import { holeAdminDienst\\u{65} } from '../../../lib/server/dienste.ts';")).toEqual(
+			[`${pfad}: '../../../lib/server/dienste.ts' nur statisch und mit Namen importieren`]
+		);
+	});
+	it('RR-07: ein Name, den dienste.ts heute nicht exportiert, ist ein Befund', () => {
+		for (const name of ['holeBremsen', 'holeMailer', 'holeDb']) {
+			const zeile = `import { ${name} as x } from '../../../lib/server/dienste.ts';`;
+			expect(mit(zeile), zeile).toEqual([fremd(name)]);
+		}
+		expect(mit("import { type Bremsen } from '../../../lib/server/dienste.ts';")).toEqual([
+			fremd('Bremsen')
+		]);
+	});
+	it('RR-07: dienste.ts ausserhalb von api/admin nur statisch und mit Namen', () => {
+		for (const [zeile, quelle] of [
+			["import * as d from '../../../lib/server/dienste.ts';", '../../../lib/server/dienste.ts'],
+			["import d from '$lib/server/dienste';", '$lib/server/dienste'],
+			["export * from '../../../lib/server/dienste.ts';", '../../../lib/server/dienste.ts'],
+			[
+				"const d = await import('../../../lib/server/dienste.ts');",
+				'../../../lib/server/dienste.ts'
+			]
+		]) {
+			expect(pruefeBauregel(new Map([[pfad, `${gut}\n${zeile}`]])), zeile).toEqual([
+				`${pfad}: '${quelle}' nur statisch und mit Namen importieren`
+			]);
+		}
+	});
+});
+
 describe('Mitteilungen ausserhalb von api/admin', () => {
 	const mListe: [string, string] = [
 		'src/lib/server/mitteilung/schnittstellen.ts',
@@ -254,7 +356,7 @@ describe('Mitteilungen ausserhalb von api/admin', () => {
 	const pfad = 'src/routes/api/benachrichtigungen/+server.ts';
 	const pruefe = (inhalt: string) => pruefeBauregel(new Map([mListe, [pfad, inhalt]]));
 	const gut = [
-		"import { holeMitteilungDienste } from '../../../lib/server/mitteilung/index.ts';",
+		"import { holeMitteilungDienste } from '../../../lib/server/dienste.ts';",
 		"import { getBenachrichtigungen } from '../../../lib/server/mitteilung/schnittstellen.ts';",
 		'export const GET = (e) => getBenachrichtigungen(holeMitteilungDienste(), e);'
 	].join('\n');
@@ -272,12 +374,12 @@ describe('Mitteilungen ausserhalb von api/admin', () => {
 				gut.replace('{ getBenachrichtigungen }', '{ getBenachrichtigungen, postVereinSenden }')
 			)
 		).toEqual([`${pfad}: nur Routen unter src/routes/api/admin/ dürfen 'postVereinSenden' nutzen`]);
-		expect(pruefe("import { holeMitteilungAdminDienste } from '$lib/server/mitteilung';")).toEqual([
+		expect(pruefe("import { holeMitteilungAdminDienste } from '$lib/server/dienste';")).toEqual([
 			`${pfad}: nur Routen unter src/routes/api/admin/ dürfen 'holeMitteilungAdminDienste' nutzen`
 		]);
 		// Ohne Namen liesse sich nicht prüfen, was die Route nutzt.
 		for (const quelle of [
-			"import * as m from '../../../lib/server/mitteilung/index.ts';",
+			"import * as m from '../../../lib/server/dienste.ts';",
 			"const m = await import('../../../lib/server/mitteilung/schnittstellen.ts');",
 			"export * from '../../../lib/server/mitteilung/schnittstellen.ts';"
 		]) {

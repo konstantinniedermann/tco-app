@@ -8,6 +8,15 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.12 — Ein Zusammenbau der Dienste (Refactoring Schritt 07)
+
+- Die Dienste des Servers entstehen an einer Stelle, `src/lib/server/dienste.ts`, statt in sechs
+  `index.ts`: zwei Mail-Versender statt fünf, ein Push-Versender statt zwei, die Bremsen wie bisher
+  einmal. Am Verhalten ändert sich nichts (#80).
+- Die Bauregel lässt Routen ausserhalb der Verwaltung aus `dienste.ts` nur die sechs Einstiege der
+  Mitglieder holen; ein neuer Test hält fest, dass mit `MAIL_NUR_AN` jede Mail über jeden Weg
+  umgeleitet wird.
+
 ## 0.20.11 — Rechteprüfung der Verwaltung in eigener Datei (Refactoring Schritt 06a)
 
 - Die Rechteprüfung der Verwaltung (`liest`, `schreibt`) steht unverändert in

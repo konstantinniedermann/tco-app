@@ -318,7 +318,7 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Secret-Scanning von GitHub mit Sperre beim Push (Einstellung im Repo, gratis für öffentliche Repos) | — | GitHub |
 | ESLint mit Svelte-Regeln, Prettier | ADR-002, Arbeitsregeln | vorhanden |
 | `svelte-check`, Typprüfung des Service Workers (`tsc`), Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
-| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN`, `TURNIER_SCHNITTSTELLEN` (Clubmeisterschaft, auch für `cm`) bzw. `MITTEILUNG_ADMIN_SCHNITTSTELLEN` (Mitteilungen der Verwaltung; alle drei deckt der Rechte-Test ab) und reichen `holeAdminDienste()` bzw. `holeMitteilungAdminDienste()` nur weiter; andere Routen nutzen `lib/server/admin` nicht | ADR-002, RR-07 | vorhanden |
+| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN`, `TURNIER_SCHNITTSTELLEN` (Clubmeisterschaft, auch für `cm`) bzw. `MITTEILUNG_ADMIN_SCHNITTSTELLEN` (Mitteilungen der Verwaltung; alle drei deckt der Rechte-Test ab) und reichen `holeAdminDienste()` bzw. `holeMitteilungAdminDienste()` aus `src/lib/server/dienste.ts` nur weiter; andere Routen nutzen `lib/server/admin` nicht und holen aus `dienste.ts` nur die sechs Einstiege der Mitglieder (Erlaubt-Liste) | ADR-002, RR-07 | vorhanden |
 | Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |

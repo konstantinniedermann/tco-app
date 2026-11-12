@@ -2,7 +2,6 @@
 // über ihre nicht erratbare Kennung (SI-19).
 import type { RequestEvent } from '@sveltejs/kit';
 import { parseId } from '../parse-id.ts';
-import type { Db } from '../db/index.ts';
 import {
 	antwort,
 	formatFehler,
@@ -22,8 +21,8 @@ import {
 	type AnlassMitglied
 } from './anlaesse.ts';
 import { baueKalender } from './kalender.ts';
+import type { AnlassDienste } from './typen.ts';
 
-export type AnlassDienste = { db: Db; jetzt?: () => Date };
 export type AnlassEreignis = Ereignis & Pick<RequestEvent, 'params'>;
 
 /** Für den Browser: statt der Kennung der Link zur Kalenderdatei. */

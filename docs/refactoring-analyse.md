@@ -28,13 +28,13 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 |---|---|
 | **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b), **Etappe 1 freigegeben** (E-30) |
 | **Erledigte Schritte** | 01 Startpaket, 02 E2E-Flakes, 03 Vertragstests, 04 Hilfsmittel für Etappe 2, 05 Lint-Regeln für die Richtung der Importe (Kurzfassung in 7.2, Protokoll in Anhang C); 06 Grundbausteine in `http.ts` (Review «ok», Version 0.20.10; Ergebnis in 7.3, Protokoll in Anhang D.1) |
-| **Zuletzt erledigt** | **06a** Rechteprüfung und Dienst-Typen aus den Schnittstellen-Dateien (Review «ok», Version 0.20.11; Ergebnis in 7.3, Protokoll in Anhang D.2) |
-| **Nächster offener Schritt** | **07** Zusammenbau der Dienste (`dienste.ts`), **braucht Nachmessen vorab** (Spalte in 7.3). Danach 08 bis 12 in dieser Reihenfolge |
-| **Wartet auf Freigabe des Projektleiters** | Checkpoint nach Schritt 06a: «ok» für das Nachmessen und den Start von Schritt 07; Entscheid zum Wortlaut der Übergangsregel «Ab Schritt 06a» in `CLAUDE.md` und zum Export von `mitKonto` (D.2) |
-| **Offene Fragen** | **F-17** (Ablage der Verwaltungs-Schnittstellen ausserhalb von `admin/`): stellt der Orchestrator nach dem Nachmessen vor Schritt 09. **F-15** (Version, solange es Test nicht gibt): vor Schritt 23. Beide in Abschnitt 9 |
+| **Zuletzt erledigt** | **07** Zusammenbau der Dienste (`dienste.ts`): Review «ok» nach einer Korrekturrunde, Version 0.20.12 (Ergebnis in 7.3, Nachmessen in Anhang D.3, Protokoll in Anhang D.4). Davor 06a (Version 0.20.11, Anhang D.2) |
+| **Nächster offener Schritt** | **08** eine Fehlerform, **braucht Nachmessen vorab** (Spalte in 7.3). Danach 09 bis 12 in dieser Reihenfolge |
+| **Wartet auf Freigabe des Projektleiters** | «ok» zum Checkpoint nach Schritt 07 (E-30); F-20 (Wortlaut «Ab Schritt 07», Abschnitt 9.1); Kenntnisnahme: der Import-Parser der Bauregel übersieht Importe mit Namen in Anführungszeichen (D.4, Korrekturrunde); Kenntnisnahme: die drei Dienst-Typen sind entgegen E-33 verschoben (D.4) |
+| **Offene Fragen** | **F-17** (Ablage der Verwaltungs-Schnittstellen ausserhalb von `admin/`): stellt der Orchestrator nach dem Nachmessen vor Schritt 09. **F-15** (Version, solange es Test nicht gibt): vor Schritt 23. **F-20** [neu] (für wen gilt die Übergangsregel «Ab Schritt 07»; Wortlaut der `CLAUDE.md`): zum Checkpoint nach Schritt 07. Alle drei in Abschnitt 9.1 |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
-| **Vorab nachzumessen** | vor Schritt 07, 08, 09, 10, 11, 13, 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). Schritte 06 und 06a brauchen keines |
-| **Nächster Checkpoint** | nach Schritt 06a: Kurzbericht, weiter auf «ok» (E-30); so nach jedem Schritt der Etappen 1 und 2 |
+| **Vorab nachzumessen** | vor Schritt 08, 09, 10, 11, 13, 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3). Schritte 06 und 06a brauchen keines |
+| **Nächster Checkpoint** | nach Schritt 07: Kurzbericht, weiter auf «ok» (E-30); so nach jedem Schritt der Etappen 1 und 2 |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32) |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
 
@@ -1309,7 +1309,7 @@ bewusst nicht. Protokoll: Anhang C.5.
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
 | 06 | [geändert] Grundbausteine der Schnittstellen an einem Ort (`http.ts`); Duplikate entfernt (B-12, B-38). Streicht acht Ausnahmen in `AUSNAHMEN`. An drei Stellen (`mitKonto`, `aendernd`, `jetzt`) ist es kein reines Verschieben: Der Schritt legt die Form fest und begründet sie. `http.ts` importiert nur `db/`. Einzelheiten: Hinweise zu Schritt 06 | neu `src/lib/server/http.ts`; `src/lib/server/*/schnittstellen.ts`, `login/passkey-schnittstellen.ts`, `admin/ansicht.ts`; die Tests, die `antwort` oder `Ereignis` aus `login/schnittstellen.ts` holen; `eslint.config.js` (`AUSNAHMEN`). Nicht betroffen: Routen, `src/hooks.server.ts`, `bauregel.ts` | Eine Stelle statt sechs; `login` ist nicht mehr Unterbau aller Module | niedrig | Schritt 03 (Grundprüfung, Routen-Test) grün vor und nach; kein geändertes Verhalten; Lint grün ohne Regeländerung. **[neu] Charakterisierungstest vorab:** «ohne Sitzung und ohne JSON antwortet 415» für eine schreibende Schnittstelle der Mitglieder | 03, 05 (erledigt) | Opus | Subagent | nein | **erledigt** 11.11.2026 (Test-Commit `17d71cf`, sieben `refactor:`-Commits; Review «ok»; Merge `81745c1`, Version 0.20.10). Ergebnis unten, Protokoll Anhang D.1 |
 | 06a | [neu] **Rechteprüfung und Dienst-Typen stehen nicht mehr in Schnittstellen-Dateien (E-28).** `mitRolle`, `liest`, `schreibt` und die Typen `AdminDienste`, `AdminEreignis`, `AdminUrheber` ziehen nach `admin/rechte.ts` (Arbeitstitel); `MitteilungAdminDienste`, `CmDienste`, `CmEreignis` in eine Nicht-Schnittstellen-Datei ihres Moduls. Reines Verschieben: Die Rechteprüfung bleibt an einer Stelle und unverändert. Streicht die sieben Ausnahmen «ohne Schritt». Branch `refactor/schritt-06a`. Einzelheiten: Hinweise zu Schritt 06a | `src/lib/server/admin/`, `mitteilung/`, `cm/`, `gespraech/`, `turnier/` (Importe), ihre Tests, `eslint.config.js` (`AUSNAHMEN`) | Die Schritte 07, 09 und 11 brauchen keine neue Ausnahme; Schritt 12 kann die Liste leeren | niedrig (Verschieben innerhalb der Module) | Unverändert grün: Rechte-Matrix, `admin/schnittstellen.db.test.ts`, `turnier/schnittstellen.db.test.ts`, `mitteilung/admin-schnittstellen.db.test.ts`, Grundprüfung, Routen-Test; die Lint-Probe «Ausnahme ist noch nötig». Der Reviewer prüft, dass `mitRolle` bis auf den Ort gleich ist | 06 | Opus | Subagent | nein | **erledigt** 11.11.2026, Review «ok», Version 0.20.11 (Branch `refactor/schritt-06a`, vier `refactor:`-Commits `4db07da`, `17100d6`, `fc77d1b`, `2ccbbca`, kein Test-Commit). Ergebnis unten, Protokoll Anhang D.2 |
-| 07 | [geändert] Ein Zusammenbau der Dienste (`dienste.ts`): Mail- und Push-Versender entstehen nur dort, Bremsen einmal (B-13). Die Einstiege bleiben träge. `dienste.ts` wird in der Lint-Regel die oberste Schicht, in beide Richtungen. Einzelheiten: Hinweise zu Schritt 07 | neu `src/lib/server/dienste.ts`; die sechs `index.ts`; alle `+server.ts` (Import-Zeile); `src/hooks.server.ts` (`holeDb`, `holeLoginDienst`); `login/schnittstellen.db.test.ts`, `routen.test.ts` (`EINSTIEGE`); `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`; `eslint.config.js` und `scripts/importrichtung.test.ts` | Überblick, was der Server braucht; ein SMTP-Zugang statt fünf | mittel (Lebensdauer der Einzelstücke, Bremsen müssen geteilt bleiben) | E2E Login, Profil, Mitteilungen, CM; DB-Tests der Schnittstellen; `tests/e2e/cookie.test.ts`; Routen-Test und Bremsen-Test. **[neu] Charakterisierungstest vorab:** Mit gesetztem `MAIL_NUR_AN` geht jede Mail über jeden Einstieg nur an diese Adresse. **[geändert] Bauregel:** je geändertes Muster ein Fall in `bauregel.test.ts`, einmal rot; der Reviewer liest den Diff an `bauregel.ts` ganz | 06, 06a | Opus | Subagent | ja: `mitteilung/`, `profil/`, `gespraech/` sind nur in Auszügen gelesen; vorab klären, welche Einzelstücke Zustand tragen (Bremsen, Passkey-Anfragen, E-Mail-Wechsel, SMTP-Pool) | offen |
+| 07 | [geändert] Ein Zusammenbau der Dienste (`dienste.ts`): Mail- und Push-Versender entstehen nur dort, Bremsen einmal (B-13). Die Einstiege bleiben träge. `dienste.ts` wird in der Lint-Regel die oberste Schicht, in beide Richtungen. Einzelheiten: Hinweise zu Schritt 07 | [geändert] neu `src/lib/server/dienste.ts`; die sechs `index.ts` (fallen weg; `db/index.ts` bleibt); 87 der 90 `+server.ts` (Import-Zeile; `/api/sitzung`, `/api/status` und `/api/kontakt` nicht); `src/hooks.server.ts` (nur `holeLoginDienst`; `holeDb` bleibt in `db/`); `login/schnittstellen.db.test.ts`, `routen.test.ts` (Import-Zeilen); neu ein Test für `MAIL_NUR_AN` neben `src/routes/api/bremsen.db.test.ts`; `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`; `eslint.config.js` und `scripts/importrichtung.test.ts`; die drei Dienst-Typen, die noch in einer `schnittstellen.ts` stehen (Anhang D.3) | Überblick, was der Server braucht; [geändert] zwei Mail-Versender (einer mit Pool) statt fünf, ein Push-Versender statt zwei | mittel (Lebensdauer der Einzelstücke, Bremsen müssen geteilt bleiben) | E2E Login, Profil, Mitteilungen, CM; DB-Tests der Schnittstellen; `tests/e2e/cookie.test.ts`; Routen-Test und Bremsen-Test. **[neu] Charakterisierungstest vorab:** Mit gesetztem `MAIL_NUR_AN` geht jede Mail über jeden Einstieg nur an diese Adresse. **[geändert] Bauregel:** je geändertes Muster ein Fall in `bauregel.test.ts`, einmal rot; der Reviewer liest den Diff an `bauregel.ts` ganz. **[geändert]** Dazu der Fall «Route ausserhalb von `api/admin/` holt `holeAdminDienste` aus `dienste.ts`»; der Reviewer prüft die Exportliste von `dienste.ts` (Anhang D.3) | 06, 06a | Opus | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.3).** War: `mitteilung/`, `profil/`, `gespraech/` sind nur in Auszügen gelesen; vorab klären, welche Einzelstücke Zustand tragen (Bremsen, Passkey-Anfragen, E-Mail-Wechsel, SMTP-Pool) | **erledigt** 12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.12 (Branch `refactor/schritt-07`: `test:` `bc111d6`, `refactor:` `bad5f36` und `a3ab6b5`; Korrekturrunde nach dem Review `1193548`, `06cf0d2`, `51fae98`). Ergebnis unten, Protokoll Anhang D.4 |
 | 08 | [geändert] Eine Fehlerform und eine Liste der Fehlerwörter; Oberfläche im selben Schritt angepasst (B-15, B-29). Dazu gehört das 401 mit `{}` von Passkey und `getSitzung`. Einzelheiten: Hinweise zu Schritt 08 | `src/lib/server/*/schnittstellen.ts`, `login/passkey-schnittstellen.ts` und `login/schnittstellen.ts` (401 `{}`) mit ihren Gegenstücken in der Oberfläche; neue geteilte Datei für die Fehlerwörter; `src/lib/anlass/api.ts`, `src/lib/verwaltung/mitteilung-api.ts`, `src/lib/cm/api.ts`; `grundpruefung.db.test.ts` (`OHNE_SITZUNG_ANDERS`); betroffene Tests | Voraussetzung für Schritt 13; ein Übersetzer entfällt | mittel (Verhaltensänderung an internen Schnittstellen) | Schritt 03 wird bewusst an genau diesen Stellen angepasst; E2E Anlass und Mitteilungen. **[geändert]** Server und Abruf-Module sind beide gegen die gemeinsame Liste getippt (ein fehlendes Wort macht `svelte-check` rot); Einheitstests der Abruf-Module und die `page.route`-Stellen der Prüfliste (b) nehmen ihre Wörter aus der Liste, nicht als Text | 06 (E-18: Format darf sich ändern, Server und Oberfläche im selben Schritt) | Opus | Subagent | ja: vollständige Liste aller Abweichungen von der Fehlerform über alle `schnittstellen.ts` und alle Abruf-Module; die Stellen mit `page.route` aus der Prüfliste (b) in 7.4 (Pfade und Fehlerwort); welche Dateien der Oberfläche das 401 `{}` deuten | offen |
 | 09 | [geändert] Verwaltung der Anlässe liegt beim Thema Anlass (B-14), nach dem Muster aus F-17. Streicht keine Ausnahme und braucht keine neue (`liest` und `schreibt` kommen seit 06a aus `admin/rechte.ts`). Der Schritt ändert den Schutz der Bauregel, nicht nur feste Pfade. Einzelheiten: Hinweise zu Schritt 09 | `src/lib/server/admin/schnittstellen.ts`, `src/lib/server/anlass/`, Routen `src/routes/api/admin/anlaesse/`, `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`, `rechte-matrix.db.test.ts`, `grundpruefung.db.test.ts`, `routen.test.ts` | `admin/schnittstellen.ts` wird kleiner; Thema an einem Ort | **mittel** (vorher niedrig: neue Verwaltungs-Liste, Bauregel) | **[neu] Charakterisierungstest vorab (erster Commit):** eine Schleife «ohne Sitzung 401, ohne Rolle 403 `kein-admin`, unbestätigt 403 `unbestaetigt`» über **alle** Verwaltungs-Listen an einer Stelle (Grundprüfung, `verwaltungsDienste()`), mit den vier benannten Ausnahmen. Dazu Rechte-Matrix-Test, `tests/e2e/anlass.test.ts`, Routen-Test und Grundprüfung; je geändertes Muster der Bauregel ein Fall in `bauregel.test.ts`, einmal rot; der Reviewer liest den Diff an `bauregel.ts` ganz | 06a, 07; **F-17 beantwortet** | Opus | Subagent | **ja:** die zwei Muster für Verwaltungs-Schnittstellen ausserhalb von `admin/` am Code gegenüberstellen (eigene Datei je Modul mit eigener Liste, oder gemischte Datei mit Namens-Wächter) und was jedes an `bauregel.ts` ändert; Ergebnis ist die Grundlage für F-17 | offen |
 | 10 | [geändert] `login` hängt nicht mehr von `admin` und `gespraech` ab: Die Antwort von `/api/sitzung` wird ausserhalb von `login` gebaut (B-14); der Typ `AnsichtRolle` zieht nach unten (`login/` oder `db/`). Streicht drei Ausnahmen. Einzelheiten: Hinweise zu Schritt 10 | `src/lib/server/login/schnittstellen.ts` → `getSitzung` (neuer Ort nach dem Nachmessen), `login/sitzung.ts`, `admin/rollen.ts`, Route `src/routes/api/sitzung/+server.ts`, `scripts/importrichtung.test.ts`, `eslint.config.js` (`AUSNAHMEN`), Tests | Ein Zyklus weniger; Login ist wieder unterste Schicht | niedrig | `login/schnittstellen.db.test.ts` (zieht mit), Routen-Test (`OHNE_LISTE`), E2E Startseite und Navigation | 06 | **Opus** (vorher Sonnet), solange das Ziel für `getSitzung` nicht feststeht | Subagent | **ja (kurz):** den Ort für `getSitzung` festlegen (Bedingungen in den Hinweisen); kein Entscheid des Projektleiters nötig | offen |
@@ -1426,6 +1426,17 @@ die Folgeschritte»); das Wichtigste ist hier je Schritt wiederholt.
 
 **Hinweise zu Schritt 07** [geändert]
 
+- **[neu] Nachmessen erledigt (12.11.2026, Anhang D.3).** Zustand tragen nur die Bremsen (eine
+  Instanz, geteilt von Login, Passkey, Verwaltung und Profil), die offenen Passkey-Anfragen und
+  die laufenden E-Mail-Wechsel; alle entstehen träge und leben bis zum Ende des Prozesses. Keine
+  Bremse zählt heute je Einstieg getrennt. Vorschlag für den Schnitt: `dienste.ts` behält die
+  acht Einstiege mit ihren Namen und baut zwei Mail-Versender (mit Pool nur als `mailer` der
+  Mitteilungs-Verwaltung, wie heute) und einen Push-Versender; die sechs `index.ts` fallen weg,
+  `holeDb` bleibt in `db/index.ts`. Kein Entscheid zum Verhalten nötig. **Wichtigste
+  Abweichung von den Hinweisen unten:** `holeAdminDienste` liegt dann in einer Datei, die jede
+  Route importiert; die Bauregel muss ihn ausserhalb von `api/admin/` am Namen sperren (heute
+  schützt ihn der Pfad `lib/server/admin`). Alle Abweichungen, der Aufbau des Tests für
+  `MAIL_NUR_AN` und die Frage F-20 zum Wortlaut der Übergangsregel stehen in D.3.
 - **Lint, bewusst geändert:** `dienste.ts` importiert `login` und alle Themen und verstösst damit
   gegen Schicht 2 (Dateien direkt unter `src/lib/server/` importieren nur `db/`). Der Schritt passt
   die Regel in `eslint.config.js` an, ohne Eintrag in `AUSNAHMEN`, und `scripts/importrichtung.test.ts`
@@ -1453,6 +1464,15 @@ die Folgeschritte»); das Wichtigste ist hier je Schritt wiederholt.
   Einstieg zweimal und vergleicht das Objekt) [G]. Der Bremsen-Test braucht keine Anpassung.
 - **Nebenbei erledigt:** Der Kommentar über `holeBremsen` in `login/index.ts` ist unvollständig
   (Anhang C.2); er fällt mit dem Zusammenbau weg oder wird richtig.
+
+**Ergebnis Schritt 07** (12.11.2026; umgesetzt, Review und Merge offen)
+
+- **Wo jetzt was liegt:** `src/lib/server/dienste.ts` exportiert genau die acht Einstiege mit ihren bisherigen Namen, jeder für sich träge, zugewiesen erst nach gelungenem Bau. Privat: die eine Instanz der Bremsen, der Mail-Versender ohne Pool, der mit Pool (nur `mailer` der Mitteilungs-Verwaltung), ein Push-Versender (`null` ohne VAPID-Paar). `leiteUm` sitzt in `baueMailer`, durch das beide Mail-Versender entstehen. Die sechs `index.ts` sind gelöscht, `db/index.ts` ist unverändert. Fabriken und Typen bleiben in den Modulen; `ProfilDienste`, `AnlassDienste` (beide in neuen `typen.ts`) und `MitteilungDienste` (`mitteilung/typen.ts`) sind Zeichen für Zeichen verschoben.
+- **Versender:** zwei Mail-Versender statt fünf, ein Push-Versender statt zwei; die Zuordnung der Wege ist unverändert und jetzt durch einen Test festgehalten.
+- **Lint:** `dienste.ts` ist oberste Schicht, in beide Richtungen (in keinem Block; Muster in `gruppe()` mit eigener Meldung). Keine neue Ausnahme, `AUSNAHMEN` unverändert (4).
+- **Bauregel:** zwei Erlaubt-Listen. Admin-Routen holen aus `dienste.ts` nur die zwei Namen aus `VERWALTUNGS_EINSTIEGE`; jede andere Route nur die sechs aus `MITGLIEDER_EINSTIEGE`, und `dienste.ts` dort nur statisch und mit Namen. Was die Prüfung nicht genau als einen dieser Namen erkennt (auch ein neuer Export), ist ein Befund. Der Schutz von `holeAdminDienste` hängt damit am Namen statt am Pfad `lib/server/admin` (`ADMIN_MODUL` bleibt). Erst Sperrliste, nach dem Review Erlaubt-Liste (D.4, Korrekturrunde).
+- **Netz belegt:** Der neue Test `src/routes/api/mail-nur-an.db.test.ts` (acht Wege, Umleitung und Pool je Weg) war auf dem alten Stand grün und je Einstieg einmal rot, nach dem Umbau an der neuen Stelle ebenso (D.4).
+- **Folgt daraus:** 09 und 11 stellen nur noch Import-Zeilen auf `dienste.ts` um, die Muster der Bauregel hängen nicht mehr an `index.ts`. 12 prüft das Muster für `dienste.ts` mit (Absicherung von 12). F-20 bleibt offen.
 
 **Hinweise zu Schritt 08** [geändert]
 
@@ -1796,12 +1816,15 @@ sie hebt die Übergangsregeln auf.
 | **E-30** [neu] | (F-19, 11.11.2026) Ok für Etappe 1 mit den Änderungen der Zwischenrevision. Checkpoint nach jedem Schritt: Kurzbericht, weiter auf «ok». |
 | **E-31** [neu] | (11.11.2026) Dieses Dokument wird gestrafft, ohne Wissen zu verlieren: Protokoll der Etappe 0 in Anhang C, Hinweise unter den Tabellen statt in den Zellen, Abschnitt 9 als Tabelle, Anhang A als Verweis. |
 | **E-32** [neu] | (11.11.2026) Der Agent `refactor-analyst` hat das Werkzeug Edit, weiterhin nur für dieses Dokument. |
+| **E-33** [neu] | (11.11.2026, Checkpoint nach Schritt 06a) Die Übergangsregel «Ab Schritt 06a» in `CLAUDE.md` ist präzisiert: `liest` und `schreibt` kommen nur aus `admin/rechte.ts`; keine neue Schnittstelle prüft Rollen selbst; Typen, die ein anderes Modul braucht, stehen nicht in einer `schnittstellen.ts`. Die vier Dienst-Typen, die nur ihr eigenes Modul braucht (`AnlassDienste`, `AnlassEreignis`, `ProfilDienste`, `MitteilungDienste`), bleiben, wo sie sind. |
+| **E-34** [neu] | (11.11.2026) `mitKonto` der Verwaltung bleibt exportiert in `admin/rechte.ts`; benutzt wird es nur von `postZugangCode` und `postZugang`. |
+| **E-35** [neu] | (11.11.2026) Ok für Schritt 07 (Nachmessen, dann Umsetzung); danach Checkpoint. |
 
 ---
 
 ## 9 Fragen [geändert]
 
-Neunzehn Fragen an den Projektleiter. **Offen sind zwei: F-15 und F-17.** Beantwortet sind F-01
+Zwanzig Fragen an den Projektleiter. **Offen sind drei: F-15, F-17 und F-20.** Beantwortet sind F-01
 bis F-14 (11.11.2026, Phase 3, jede wie empfohlen) und F-16, F-18, F-19 (11.11.2026, Checkpoint am
 Ende der Etappe 0). Der Entscheid steht je in Abschnitt 8.
 
@@ -1824,6 +1847,28 @@ kein Detail des Schritts.
   nicht ganz scharf).
 - **Empfehlung: A [V],** bestätigt oder verworfen durch das Nachmessen vor Schritt 09 (kein Entwurf
   gebaut).
+
+**F-20 [neu, OFFEN] — Für wen gilt «Dienste, Mail- und Push-Versender entstehen nur in
+`dienste.ts`»?** (Übergangsregel «Ab Schritt 07» der `CLAUDE.md`; aufgekommen beim Nachmessen,
+Anhang D.3)
+
+**Frist: Checkpoint nach Schritt 07.** Hält keinen Schritt auf.
+
+Wörtlich genommen verletzen die Regel `scripts/testdaten.ts` (eigener Versender mit `leiteUm`,
+eigener Login-Dienst, eigene Bremsen), `scripts/seed-lokal.ts`, `tests/e2e/hilfen/login.ts` und
+jeder Datenbanktest, der seine Dienste selbst baut. Das sind eigene Prozesse oder Tests, und dass
+Tests ihre Dienste selbst hineinreichen, ist gut gelöst und bleibt (B-13). Am Verhalten ändert
+keine Antwort etwas.
+
+- A: Wortlaut präzisieren: «Im Server (unter `src/`, ohne Tests) entstehen Dienste, Mail- und
+  Push-Versender nur in `src/lib/server/dienste.ts`; Skripte und Tests bauen ihre eigenen.»
+- B: Auch die Skripte holen ihre Dienste aus `dienste.ts`. Dann zieht `scripts/testdaten.ts` alle
+  Module und alle Einstellungen in das Skript, das im Laufzeit-Image läuft: eine Verhaltensänderung
+  ausserhalb des Plans.
+- C: Wortlaut lassen; die Lesart steht hier.
+- **Empfehlung: A.** Ein Satz, der sagt, was gemeint ist, erspart die Rückfrage im Review von
+  Schritt 07.
+- **Stand nach Schritt 07:** Skripte und Tests bauen ihre Dienste unverändert selbst (Lesart A).
 
 **F-15 [OFFEN] — Wann steigt die Version, solange es die Test-Umgebung noch nicht gibt?**
 (E-07; Schritt 23)
@@ -2788,3 +2833,553 @@ Erkenntnisse, Belege und Commits je Schritt der Etappe 1. Die Kurzfassung steht 
     `admin/rechte.ts` (Thema → Fachdatei eines anderen Themas, erlaubt). Ein neues
     Schnittstellen-Modul darf `admin/rechte.ts` importieren, aber nicht `admin/schnittstellen.ts`.
   - **12:** In `AUSNAHMEN` stehen nur noch die drei Einträge für Schritt 10 und der eine für 11.
+
+### D.3 Nachmessen Schritt 07
+
+**Nachmessen Schritt 07** (12.11.2026, Worktree `refactor-schritt-07`, Stand `dev` nach Schritt 06a,
+Version 0.20.11)
+
+Am Code gelesen und gezählt, **nichts ausgeführt** (kein Test, kein Build, keine Datenbank).
+Dateien unter `src/lib/server/`, wenn nichts anderes steht.
+
+- **Ganz gelesen [G]:** `src/hooks.server.ts`, die sechs `index.ts` und `db/index.ts`,
+  `login/bremse.ts`, `login/challenge.ts`, `login/mail.ts`, `profil/email-wechsel.ts`,
+  `mitteilung/web-push.ts`, `mitteilung/meldung.ts`, `mitteilung/typen.ts`,
+  `mitteilung/schnittstellen.ts`, `gespraech/schnittstellen.ts`, `gespraech/meldung.ts`,
+  `admin/hinweis-mail.ts`, `cm/mail.ts`, `cm/typen.ts`, `einstellungen.ts`, `zeitgeber.ts`,
+  `scripts/pruefungen/bauregel.ts`, `eslint.config.js`, `scripts/importrichtung.test.ts`.
+- **In Auszügen [G für die Stelle]:** `mitteilung/versand.ts` (ab Zeile 50), `profil/schnittstellen.ts`,
+  `admin/schnittstellen.ts` (`meldeRueckzug`), `admin/rechte.ts` (Typen), `routen.test.ts`
+  (`EINSTIEGE`, `ROUTEN`, der Ablauf), `src/routes/api/bremsen.db.test.ts` (Kopf),
+  `scripts/pruefungen/bauregel.test.ts` (alle Fälle mit `index.ts`), `scripts/testdaten.ts`,
+  `tests/e2e/hilfen/login.ts`.
+- **Nur per Textsuche [E]:** alle übrigen Dateien unter `src/lib/server/` ohne Tests, darunter aus
+  den drei genannten Modulen `mitteilung/{abo,angaben,empfaenger,themen,verlauf}.ts`,
+  `profil/angaben.ts` und `gespraech/gespraech.ts`. Gesucht: Variable auf Modulebene (`let`, `var`,
+  `const … = new …`, `const … = Aufruf(…)`), Klassen und Klassenfelder, `new Map/Set/WeakMap`,
+  `setInterval`/`setTimeout`, `globalThis`, `process.on`, `Symbol.for`, dazu jede Verwendung von
+  `erstelleSmtpMailer`, `leiteUm`, `erstelleWebPush`, `erstelleBremsen`, `erstelleDb`,
+  `ChallengeSpeicher`, `WechselSpeicher`, `createTransport`.
+
+#### Einzelstücke und ihr Zustand [G]
+
+Alle Einzelstücke hängen an einer Variablen auf Modulebene, entstehen **träge beim ersten Aufruf**
+ihres Einstiegs und leben **bis zum Ende des Prozesses**; keines wird je zurückgesetzt. Beim Laden
+einer Datei entsteht nichts. Die Zuweisung geschieht erst nach gelungenem Bau (`if (!dienst) { … }`
+bzw. `??=`): Wirft `leseEinstellungen`, bleibt die Variable leer, und der nächste Aufruf versucht
+es neu.
+
+| Stück | Datei → Symbol | Zustand | Benutzt von (Routen-Dateien) | Heute geteilt? | Beim Zusammenlegen |
+|-------|----------------|---------|------------------------------|----------------|--------------------|
+| Datenbank-Verbindung | `db/index.ts` → `db`, `holeDb` (`erstelleDb`: ein `pg.Pool`) | Verbindungs-Pool | jeder Einstieg; Hook (`init` → Löschlauf); `/api/sitzung`, `/api/status` direkt | ja, eine | bleibt in `db/` (unterste Schicht); `dienste.ts` holt sie nur |
+| Bremsen | `login/index.ts` → `bremsen`, `holeBremsen`; `login/bremse.ts` → `erstelleBremsen` | acht `Bremse` (je eine Map Schlüssel → Zeitstempel, Fenster 1 h oder 24 h) und ein Aufräum-Takt alle 10 Minuten (`unref`) | Login-Dienst, Passkey-Dienst, `zugang` und `hinweis` der Verwaltung, `wechsel` des Profils | ja, **genau eine Instanz** im Server (`erstelleBremsen` ruft unter `src/` nur `holeBremsen`) | **muss eine bleiben;** in `dienste.ts` privat, nicht exportiert |
+| Login-Dienst | `login/index.ts` → `dienst`, `holeLoginDienst` | keiner (Closure über Datenbank, Schlüssel, Versender, Bremsen) | Hook bei jeder Anfrage unter `/api/`; 4 (`login/brief`, `login/mail`, `login/mail-code`, `logout`) | eine | Einstieg bleibt, Name gleich |
+| Passkey-Dienst mit offenen Anfragen | `login/index.ts` → `passkeyDienst`, `holePasskeyDienst`; `login/challenge.ts` → `ChallengeSpeicher` | Map mit höchstens 1000 Anfragen, je 5 Minuten gültig, einmal einlösbar | 7 (`/api/passkey/…`); «Optionen» und «Einlösen» sind zwei Anfragen an zwei Routen | eine | **muss eine bleiben** (sonst findet das Einlösen die Anfrage nicht) |
+| Dienste der Verwaltung | `admin/index.ts` → `dienste`, `holeAdminDienste` | keiner ausser den geteilten Bremsen in `zugang` und `hinweis` | 27 | eine | Einstieg bleibt |
+| Dienste der Mitteilungs-Verwaltung | `mitteilung/index.ts` → `adminDienste`, `holeMitteilungAdminDienste` | keiner; die Felder der Verwaltung sind kopiert (`zugang`, `hinweis`, `brief`, `db` sind dieselben Objekte), dazu Pool-Versender, Push-Versender, Adresse | 24 (Mitteilungen, Turnier-Verwaltung, Gespräch der Verwaltung, Austritt) | eigenes Objekt neben `holeAdminDienste` | **muss ein eigenes Objekt bleiben** (Routen-Test: Dienste von genau einem Einstieg) |
+| Dienste des Profils mit laufenden E-Mail-Wechseln | `profil/index.ts` → `dienste`, `holeProfilDienste`; `profil/email-wechsel.ts` → `erstelleEmailWechselDienst` (darin `WechselSpeicher`) | Map mit höchstens 1000 Wechseln (einer je Konto, 15 Minuten gültig, Zähler der Fehlversuche im Eintrag) und ein Aufräum-Takt alle 10 Minuten (`unref`) | 5 (`/api/profil/…`); «Starten» und «Bestätigen» sind zwei Routen | eine | **muss eine bleiben** |
+| Dienste der CM | `cm/index.ts` → `dienste`, `holeCmDienste` | keiner | 14 (CM und Gespräch der Mitglieder) | eine | Einstieg bleibt |
+| Dienste der Mitteilungen (Mitglieder) | `mitteilung/index.ts` → `dienste`, `holeMitteilungDienste` | keiner (`db`, öffentlicher VAPID-Schlüssel) | 3 | eine | Einstieg bleibt |
+| Dienste der Anlässe | `anlass/index.ts` → `dienste`, `holeAnlassDienste` | keiner (`db`); liest wie der Passkey-Dienst keine Einstellungen | 4 | eine | Einstieg bleibt, weiter ohne Einstellungen |
+| SMTP-Versender | `login/mail.ts` → `erstelleSmtpMailer`, aufgerufen in fünf `index.ts` | je ein `nodemailer`-Transport; vier ohne Pool, einer mit (`pool: true`, 5 Verbindungen) | siehe «Mail» | **nein, fünf** | zwei: einer ohne Pool, einer mit |
+| Push-Versender | `mitteilung/web-push.ts` → `erstelleWebPush`, aufgerufen in `cm/index.ts` und `mitteilung/index.ts` | keiner (nur das Options-Objekt mit dem VAPID-Paar) | siehe «Push» | **nein, zwei** | einer |
+| Zeitgeber des Löschlaufs | `zeitgeber.ts` → Merker auf `globalThis`; gestartet in `hooks.server.ts` → `init` | ein Takt (erster Lauf nach einer Minute, dann täglich); nicht beim Bauen, nicht mit `ZEITGEBER=aus` | Hook | einer | kein Teil von `dienste.ts`, bleibt |
+
+Zahl der Routen-Dateien je Einstieg, gezählt über alle 90 `+server.ts`: 27 + 24 − 1 (eine Datei
+holt beide Verwaltungs-Einstiege) + 14 + 4 + 4 + 7 + 3 + 5 + 2 (`holeDb`) + 1 (`/api/kontakt`, kein
+Einstieg) = 90.
+
+- **Sonst kein Zustand [E]:** Was die Suche ausser dem Genannten auf Modulebene findet, sind
+  unveränderliche Konstanten (`Intl.DateTimeFormat`, `Intl.Collator`, feste `Set`, Tabellen des
+  Schemas, vorbereitete Bedingungen für Abfragen). `mitteilung/`, `profil/` und `gespraech/` tragen
+  ausser dem `WechselSpeicher` keinen Zustand; alle `Map` und `Set` dort leben nur in einem Aufruf.
+- **Einstellungen sind kein Einzelstück [G]:** `leseEinstellungen` liest bei jedem Aufruf neu aus
+  der Umgebung. Aufgerufen wird sie je einmal beim Bau von sechs Einstiegen (alle ausser Passkey und
+  Anlass), in `init` und bei jeder Anfrage an `/api/kontakt`.
+- **B-16 bestätigt und ergänzt:** Bremsen, Passkey-Anfragen und E-Mail-Wechsel sind die drei
+  Zustandsträger; dazu kommen zwei Aufräum-Takte, die B-16 nicht nennt. B-13 ist an einer Stelle
+  ungenau: «fünf offene SMTP-Zugänge» stimmt für die Zahl der Versender, aber offene Verbindungen
+  hält nur der eine mit Pool (Kommentar bei `MAILS_GLEICHZEITIG` in `mitteilung/versand.ts` [G];
+  dass ein Transport ohne Pool je Mail eine Verbindung öffnet und wieder schliesst, ist
+  Bibliothekswissen [V], `node_modules` gibt es im Worktree nicht).
+
+#### Mail [G]
+
+Fünf Versender, alle aus `MYTCO_SMTP_URL` und `MYTCO_MAIL_ABSENDER`, alle von Hand in `leiteUm(…,
+einstellungen.mailNurAn)` gewickelt. Vier bekommen die Adresse als Text, der fünfte
+`{ url, pool: true, maxConnections: MAILS_GLEICHZEITIG }` (5).
+
+| Weg | Route (Beispiel) | Einstieg | Versender heute |
+|-----|------------------|----------|-----------------|
+| Login-Code | POST `/api/login/mail-code` | `login` | ohne Pool (`login`) |
+| Code der Verwaltung | POST `/api/admin/zugang/code` | `admin` | ohne Pool (`admin`) |
+| Hinweis an die alte Adresse | POST `/api/admin/mitglieder/[id]` | `admin` | ohne Pool (`admin`) |
+| Adresswechsel, zwei Mails | POST `/api/profil/email` | `profil` | ohne Pool (`profil`) |
+| Bestätigung der CM-Anmeldung | POST `/api/cm/kategorien/[id]/anmeldung` | `cm` | ohne Pool (`cm`) |
+| Meldung an Einzelne, von Mitgliedern ausgelöst (`d.melde`) | POST `/api/cm/[id]/gespraech`, Doppel-Anfragen | `cm` | ohne Pool (`cm`), nach dem Push der CM |
+| Mitteilung an viele | POST `/api/admin/mitteilungen/senden`, `/api/admin/anlaesse/[id]/mitteilungen/senden` | `mitteilungAdmin` | **Pool** |
+| Meldung an Einzelne, von der Verwaltung ausgelöst (`meldeMitgliedern` mit `d.mailer`) | POST `/api/admin/gespraeche/[id]`, `/api/admin/mitglieder/[id]/austritt`, Turnier-Verwaltung | `mitteilungAdmin` | **Pool**, nach dem Push der Mitteilungen |
+
+- **`MAIL_NUR_AN` wirkt heute über jeden Einstieg:** Alle fünf Stellen wickeln den Versender in
+  `leiteUm`; ausserhalb der fünf `index.ts` entsteht unter `src/` kein Versender. Gelesen wird der
+  Wert beim Bau des Einstiegs, also einmal je Einstieg und Prozess. Kein Test prüft das je Weg
+  (nur `leiteUm` als Einzelfunktion in `login/mail.test.ts`, und `leseEinstellungen`); Routen-Test
+  und Bremsen-Test setzen `MAIL_NUR_AN` auf leer.
+- **Welcher Versender welchen Weg bedient,** hält kein Test fest (so schon in «Was das Netz deckt»).
+  Die zwei letzten Zeilen der Tabelle sind die Stelle, an der man es beim Zusammenlegen verwechselt:
+  Meldungen an Einzelne gehen heute je nach Auslöser über zwei verschiedene Versender.
+
+#### Push [G]
+
+Zwei Versender mit gleicher Konfiguration (`einstellungen.vapid`, `kontaktFuerPush(adresse,
+mailAbsender)`): einer in `holeCmDienste` (für `melde`), einer in `holeMitteilungAdminDienste`.
+Ohne VAPID-Paar sind beide `null`, dann gehen Meldungen per Mail. Der Versender hält keinen
+Zustand: `erstelleWebPush` baut ein Options-Objekt und reicht es je Aufruf an `sendNotification`.
+Den öffentlichen Schlüssel für die Mitglieder liest `holeMitteilungDienste` getrennt. **Für Push
+gibt es keine Umleitung wie `MAIL_NUR_AN`:** Ein Push geht immer an das gespeicherte Abo.
+
+#### Wo Zusammenlegen Verhalten ändern würde
+
+1. **Bremsen: nirgends.** Es gibt heute **keine** Bremse, die je Einstieg getrennt zählt; alle
+   fünf Nutzer bekommen dieselbe Instanz. Geändert würde das Verhalten nur, wenn beim Umbau eine
+   zweite Instanz entsteht; das fängt der Bremsen-Test (Anhang C.2: Profil, Verwaltung oder Hinweis
+   mit eigenen Bremsen machten ihn rot). Nicht gefangen: eine eigene Instanz für den Passkey-Dienst
+   (seine Bremse nutzt nur er; ohne Wirkung, C.2).
+2. **Ein einziger Mail-Versender für alles wäre eine Verhaltensänderung, in beide Richtungen.**
+   Alles über den Pool: Ein Login-Code stünde hinter einer laufenden Mitteilung an Hunderte an
+   (fünf Verbindungen) [V, Bibliothekswissen]. Alles ohne Pool: Die Mitteilung öffnete je Mail eine
+   Verbindung. Darum zwei Versender, wie es das Zielbild schon sagt, **und die Zuordnung bleibt
+   wie in der Tabelle:** Das Feld `mailer` der Mitteilungs-Verwaltung ist der Pool, alles andere
+   der Versender ohne Pool. Vier Versender ohne Pool zu einem zusammenzulegen ändert nichts [V].
+3. **Die zwei Verwaltungs-Einstiege zu einem Objekt:** Der Routen-Test würde rot (er verlangt
+   genau einen Einstieg je Aufruf), und 27 Routen bekämen Pool-Versender und Push in die Hand. Nicht
+   Teil des Schritts.
+4. **Alles auf einmal bauen statt je Einstieg:** Die zwei Aufräum-Takte starteten früher, und
+   `holeAnlassDienste` und `holePasskeyDienst` brauchten plötzlich gültige Mail-Einstellungen. In Produktion ohne Folge
+   (`init` prüft die Einstellungen beim Start), in Tests schon. Darum bleibt jeder Einstieg für
+   sich träge (so steht es im Plan).
+5. **Einstellungen einmal statt fünfmal lesen:** ohne Folge; sie sind reine Werte, und die
+   Umgebung ändert sich im laufenden Prozess nicht. Betroffen wäre nur ein Test, der die Umgebung
+   zwischen zwei ersten Aufrufen ändert; das tut keiner.
+6. **Was der Hook lädt:** `hooks.server.ts` importiert künftig `dienste.ts` und damit alle Themen
+   samt `web-push`, schon beim Start und beim Bauen (heute erst mit der ersten Route, die es
+   braucht). Gebaut wird dabei nichts; dass das Laden von `web-push` nichts auslöst, ist nicht
+   gemessen [V]. Der Build in `make check` zeigt es.
+7. **Bauregel, der einzige Punkt mit Gewicht:** siehe «Bauregel», Nr. 2.
+
+**Kein Punkt braucht einen Entscheid zum Verhalten:** Mit dem Schnitt unten bleibt alles gleich.
+
+#### Tests und Hilfen [G]
+
+- **`routen.test.ts`:** importiert die Einstiege aus den sechs `index.ts` (sechs Import-Zeilen) und
+  `holeDb`; `EINSTIEGE` hat neun Schlüssel. Bleiben die Namen der Einstiege, ändern sich nur die
+  Import-Zeilen; `EINSTIEGE` und `ROUTEN` bleiben wörtlich. Der Test ruft für jede Route **alle**
+  Einstiege auf (`hole()` im Vergleich) und braucht dafür die gestellte Umgebung, die er schon hat.
+- **`login/schnittstellen.db.test.ts`:** importiert `holeLoginDienst` aus `./index.ts` für den Test
+  «liefert dieselbe Instanz». Er bekommt den neuen Pfad; dasselbe deckt der Routen-Test für jeden
+  Einstieg ohnehin (Identität zwischen Route und Test).
+- **`src/routes/api/bremsen.db.test.ts`:** importiert nur `holeDb` (`db/index.ts`) und Routen;
+  keine Anpassung, solange `holeDb` bleibt, wo es ist.
+- **`src/routes/api/status/status.db.test.ts`:** prüft `holeDb` mit `vi.resetModules` und
+  dynamischem Import von `db/index.ts`. Ein Grund mehr, `holeDb` nicht zu verlegen.
+- **Kein Test setzt ein Einzelstück zurück** (`vi.resetModules` nur im Status-Test, dort für `db`).
+  Die Tests der Module, die Grundprüfung und die Rechte-Matrix bauen ihre Dienste selbst
+  (`erstelleBremsen`, `erstelleEmailWechselDienst` …) und kennen die `index.ts` nicht: bleibt.
+- **E2E-Hilfen:** `tests/e2e/hilfen/login.ts` baut im Test-Prozess einen eigenen Login-Dienst mit
+  eigenen Bremsen und einem Versender, der wirft; es importiert keine `index.ts` und keinen
+  Einstieg. Keine Anpassung. Dasselbe gilt für `scripts/testdaten.ts` (eigener Login-Dienst, eigene
+  Bremsen, eigener Versender mit `leiteUm`) und `scripts/seed-lokal.ts`: eigene Prozesse.
+- **Der Hook hat keinen eigenen Test;** dass er `holeLoginDienst` vom neuen Ort holt, zeigt nur
+  E2E (`tests/e2e/cookie.test.ts` und jeder Login).
+
+#### Bauregel [G]
+
+`scripts/pruefungen/bauregel.ts` nennt die `index.ts` an vier Stellen:
+
+| Muster | Heute | Nach Schritt 07 |
+|--------|-------|-----------------|
+| `ERLAUBTER_IMPORT` | Admin-Route darf `admin/index.ts`, `mitteilung/index.ts` und die drei Schnittstellen-Dateien | `dienste.ts` statt der zwei `index.ts` |
+| `AUS_INDEX` (daraus `DIENSTE`) | je Datei **ein** erlaubter Name | eine Datei, **zwei** erlaubte Namen (`holeAdminDienste`, `holeMitteilungAdminDienste`); jeder andere Name aus `dienste.ts` ist in einer Admin-Route ein Befund |
+| `MITTEILUNG_INDEX` in `pruefeMitteilungImporte` | ausserhalb von `api/admin/` ist `holeMitteilungAdminDienste` aus `mitteilung/index.ts` (auch als Ordner-Import) verboten | Muster auf `dienste.ts`; die Liste der verbotenen Namen wächst (Nr. 2) |
+| Text `ERLAUBT_IMPORT` | nennt die zwei `index.ts` | neuer Wortlaut |
+
+1. **Die Prüfung «Dienste nur direkt als erstes Argument»** hängt an den Namen in `DIENSTE`, nicht
+   am Pfad. Bleiben die Namen, bleibt sie Zeichen für Zeichen.
+2. **Im Plan nicht genannt: `ADMIN_MODUL` deckt den Verwaltungs-Einstieg nicht mehr.** Heute kann
+   keine Route ausserhalb von `api/admin/` `holeAdminDienste` holen, weil er in `admin/index.ts`
+   liegt und jeder Import aus `lib/server/admin` dort ein Befund ist. In `dienste.ts` liegt er
+   neben den Einstiegen der Mitglieder, und diese Datei importiert jede Route. Der Schutz muss vom
+   Pfad auf den Namen wechseln: ausserhalb von `api/admin/` sind aus `dienste.ts` **beide**
+   Verwaltungs-Namen verboten (heute gibt es den Namens-Wächter nur für
+   `holeMitteilungAdminDienste`). Vorschlag: **eine** Liste der Verwaltungs-Einstiege in
+   `bauregel.ts`, die beide Richtungen speist (Admin-Routen dürfen aus `dienste.ts` nur diese,
+   andere Routen alles ausser diesen). Ein neuer Verwaltungs-Einstieg, der in der Liste fehlt, ist
+   dann für Admin-Routen gesperrt und fällt sofort auf. `ADMIN_MODUL` selbst bleibt (kein Import
+   aus `lib/server/admin` ausserhalb von `api/admin/`).
+3. **Gleiche Strenge wie heute verlangt:** `dienste.ts` nur statisch und mit Namen (kein `* as`,
+   kein `export *`, kein `import()`), mit und ohne Endung, auch als `$lib/server/dienste`; `as`
+   wird durchschaut. Das sind die Fälle, die `pruefeMitteilungImporte` heute für `mitteilung/index.ts`
+   hat.
+4. **Was `dienste.ts` exportiert, ist Teil des Schutzes:** nur die acht Einstiege. Bremsen,
+   Versender und Push bleiben privat; sonst holt sie eine Mitglieder-Route, und die Bauregel sieht
+   es nicht (sie verbietet dort nur die zwei Verwaltungs-Namen). Der Reviewer prüft die Exportliste.
+5. **`bauregel.test.ts`:** Fälle mit `index.ts` eines Moduls stehen an den Zeilen 67, 79, 80, 108,
+   127, 138 bis 149, 169, 214, 225, 228, 257, 266 bis 280. Neu und je einmal rot: Admin-Route holt
+   einen Mitglieder-Einstieg aus `dienste.ts`; Admin-Route holt weiter aus `admin/index.ts`; Route
+   ausserhalb von `api/admin/` holt `holeAdminDienste` aus `dienste.ts` (mit `as`, als
+   Ordner-Import, als `* as`, dynamisch); dieselbe mit `holeMitteilungAdminDienste`;
+   `holeAdminDienste().db` in einer Admin-Route mit dem neuen Import.
+6. **`betrifftBauregel`** nennt keine `index.ts`; keine Änderung. `docs/ci-cd-und-release.md`
+   (Zeile zur Bauregel) nennt nur die Namen der Einstiege und stimmt weiter.
+7. **Als Verhalten gedeckt** ist die Gegenseite schon: Der Routen-Test verlangt je Route die
+   Dienste des Einstiegs aus `ROUTEN`. Eine Mitglieder-Route mit `holeAdminDienste()` machte ihn rot.
+
+#### Lint [G]
+
+- **Heute:** `dienste.ts` läge direkt unter `src/lib/server/` und fiele in den Block
+  `files: ['src/lib/server/*.ts']` mit `regel('.')` («importieren nur `db`»). Die sechs `index.ts`
+  sind von der Regel erfasst, verletzen sie aber nicht (sie importieren keine Schnittstellen-Datei
+  eines anderen Moduls); der Kommentar oben in `eslint.config.js` («nicht erfasst: die `index.ts`»)
+  ist in dem Punkt ungenau.
+- **Zu ändern in `eslint.config.js`:** (a) `dienste.ts` aus dem Block für `*.ts` herausnehmen
+  (`ignores`), ohne Eintrag in `AUSNAHMEN`; (b) das Verbot «niemand importiert `dienste.ts`» **in
+  `gruppe()`** als weiteres Muster für `.`, `login` und die Themen (`db` meldet `../dienste.ts`
+  schon: «db importiert aus dem Server nichts»). Ein eigener Block ginge nicht: `no-restricted-imports`
+  wird je Datei vom letzten passenden Block ersetzt, nicht ergänzt. Die Blöcke der Dateien mit
+  Ausnahme laufen ebenfalls über `regel()` und erben das Muster. (c) Kommentar oben nachführen.
+  Tests bleiben ausgenommen (`**/*.test.ts`), der Routen-Test darf `dienste.ts` also importieren.
+- **`scripts/importrichtung.test.ts`, neue Fälle:** `anlass/neu.ts`, `login/neu.ts` und `datum.ts`
+  melden den Import von `dienste.ts` (relativ, mit `$lib/server/dienste`, mit `.js`); `dienste.ts`
+  selbst darf `./login/…`, ein Thema und eine Schnittstellen-Datei importieren. Die Wächter «genau
+  die Ordner» und «keine Unterordner» sind nicht betroffen (`dienste.ts` ist eine Datei).
+- **Nicht durchgesetzt:** dass Versender, Bremsen und Dienste **nur** in `dienste.ts` entstehen. Die
+  Regel verbietet den Import von `dienste.ts`, nicht den Aufruf von `erstelleSmtpMailer` in einem
+  Modul. Das bleibt Aufgabe des Reviews (kein Vorschlag für eine weitere Regel).
+
+#### Routen [G, gezählt]
+
+90 `+server.ts`. **87 ändern ihre Import-Zeile** (88 Zeilen: `/api/admin/kategorien/[id]` holt
+beide Verwaltungs-Einstiege, künftig in einer Zeile). Unverändert bleiben drei: `/api/sitzung` und
+`/api/status` holen `holeDb` aus `db/index.ts`, `/api/kontakt` ruft `leseEinstellungen` selbst.
+Je Modul: `admin/index.ts` 27, `mitteilung/index.ts` 27 (24 Verwaltung, 3 Mitglieder), `cm` 14,
+`login` 11 (4 Login, 7 Passkey), `profil` 5, `anlass` 4.
+
+#### Abweichungen vom Plan
+
+1. **Dateiliste, «alle `+server.ts`»:** 87 von 90 (oben).
+2. **Dateiliste, Hook «(`holeDb`, `holeLoginDienst`)»:** nur der Import von `holeLoginDienst`
+   ändert sich; `holeDb` bleibt in `db/index.ts`.
+3. **Dateiliste, es fehlt:** die neue Testdatei für `MAIL_NUR_AN`; der Kommentar in
+   `eslint.config.js`. Die sechs `index.ts` werden gelöscht, nicht geändert.
+4. **Nutzen «ein SMTP-Zugang statt fünf»:** zwei Versender statt fünf (einer davon der Pool), ein
+   Push-Versender statt zwei. Zielbild 6.1 Punkt 2 sagt es schon richtig.
+5. **Hinweis «Bauregel»:** nennt drei Muster und die Argument-Prüfung. Es fehlt der Wechsel des
+   Schutzes vom Pfad auf den Namen für `holeAdminDienste` (Bauregel Nr. 2) und die Exportliste von
+   `dienste.ts` als Teil des Schutzes (Nr. 4). Die Argument-Prüfung braucht dagegen keine Änderung.
+6. **Hinweis «Routen-Test: nur `EINSTIEGE`»:** Mit gleichen Namen ändert sich nicht einmal
+   `EINSTIEGE`, nur die Import-Zeilen des Tests.
+7. **Hinweis «Wer ausser den Routen die Einstiege holt»:** stimmt (Hook, `routen.test.ts`,
+   `login/schnittstellen.db.test.ts`, `bauregel.ts` als Text). `holeDb` holen dazu zwei weitere
+   Tests (Bremsen, Status).
+8. **Dienst-Typen:** `dienste.ts` braucht `ProfilDienste`, `MitteilungDienste` und `AnlassDienste`,
+   und die stehen noch in ihrer `schnittstellen.ts` (D.2). Die Lint-Regel lässt das zu
+   (`dienste.ts` darf alles importieren), die Übergangsregel «Ab Schritt 06a» sagt aber: «Typen, die
+   ein anderes Modul braucht, stehen nicht in einer `schnittstellen.ts`». Vorschlag: Schritt 07
+   verschiebt die drei Typen im ersten Commit nach `profil/typen.ts`, `anlass/typen.ts` (beide neu)
+   und `mitteilung/typen.ts` (vorhanden), Zeichen für Zeichen wie in 06a; betroffen sind nur die
+   drei Schnittstellen-Dateien, `grundpruefung.db.test.ts` (zwei Importe) und die drei `index.ts`,
+   die ohnehin wegfallen. Kein Verhalten, kein Entscheid nötig; ohne das Verschieben liest man die
+   Regel als «Modul = Ordner», und `dienste.ts` ist keiner.
+9. **B-13:** Wortlaut «fünf offene SMTP-Zugänge» ungenau (oben). Befund und Schritt bleiben richtig.
+
+Sonst stimmen Zeile 07 und die Hinweise: Risiko, Absicherung, Voraussetzung, «Einstiege bleiben
+träge», «`init` läuft beim Bauen mit», die fünf Stellen mit `leiteUm`.
+
+#### Vorschlag für den Schnitt von `dienste.ts`
+
+- **Dort entsteht (privat, je für sich träge):** die Bremsen; der Versender ohne Pool; der
+  Versender mit Pool; der Push-Versender (`null` ohne VAPID-Paar). `leiteUm` sitzt an **einer**
+  Stelle, durch die beide Versender entstehen, damit kein Weg ohne Umleitung gebaut werden kann.
+- **Dort entsteht (exportiert, je für sich träge):** die acht Einstiege mit ihren heutigen Namen
+  (`holeLoginDienst`, `holePasskeyDienst`, `holeAdminDienste`, `holeMitteilungAdminDienste`,
+  `holeProfilDienste`, `holeCmDienste`, `holeMitteilungDienste`, `holeAnlassDienste`). Gleiche Namen
+  heisst: In den 87 Routen ändert sich nur der Pfad, `DIENSTE` in der Bauregel und `EINSTIEGE` im
+  Routen-Test bleiben. `holeMitteilungAdminDienste` bleibt ein eigenes Objekt aus den Feldern der
+  Verwaltung plus Pool, Push und Adresse; `holeAnlassDienste` und `holePasskeyDienst` lesen weiter keine Einstellungen.
+  Zugewiesen wird wie heute erst nach gelungenem Bau.
+- **Zuordnung der Versender wie heute:** ohne Pool für Login, Verwaltung (`zugang`, `hinweis`),
+  Profil und CM (`bestaetigung`, `melde`); Pool nur als `mailer` der Mitteilungs-Verwaltung. Der eine
+  Push-Versender dient `melde` der CM und der Mitteilungs-Verwaltung.
+- **In den Modulen bleibt:** jede Fabrik und jeder Typ (`erstelleLoginDienst`,
+  `erstellePasskeyDienst`, `erstelleZugangDienst`, `erstelleHinweis`, `erstelleEmailWechselDienst`
+  samt `WechselSpeicher`, `erstelleBestaetigung`, `meldeMitgliedern`, `erstelleSmtpMailer`,
+  `leiteUm`, `erstelleWebPush`, `kontaktFuerPush`, `erstelleBremsen`, `ChallengeSpeicher`,
+  `erstelleSimpleWebAuthnPruefer`). Sie bekommen weiter alles hineingereicht; Tests und Skripte
+  rufen sie wie bisher.
+- **Die sechs `index.ts` fallen weg.** Als Weiterleitung könnten sie nicht bleiben: Sie müssten
+  `dienste.ts` importieren, und das verbietet die neue Regel. `db/index.ts` bleibt unverändert
+  (`erstelleDb`, `holeDb`, die Typen); es ist das Modul der Datenbank, kein Zusammenbau, und
+  Skripte, Tests und der Status-Test hängen daran.
+- **Nicht Teil des Schritts:** `/api/kontakt` (liest die Einstellung selbst), `/api/sitzung`
+  (`holeDb`; Schritt 10 fasst die Route an), `new Date()` im Hook.
+- **Reihenfolge der Commits (Vorschlag):** (1) Test `MAIL_NUR_AN`, grün auf dem alten Stand, je Weg
+  einmal rot; (2) die drei Dienst-Typen nach `typen.ts`; (3) `dienste.ts` mit Lint-Regel und
+  `importrichtung.test.ts`, Hook, Routen, Bauregel und `bauregel.test.ts`, die zwei Tests, die sechs
+  `index.ts` gelöscht. (3) lässt sich kaum teilen: Solange eine `index.ts` und `dienste.ts`
+  nebeneinander bauen, gibt es zwei Sätze Bremsen.
+
+#### Charakterisierungstest `MAIL_NUR_AN` (Grundlage)
+
+- **Ort und Bau:** eigene Datei neben `src/routes/api/bremsen.db.test.ts`, gleicher Aufbau (echte
+  Routen, echte Einstiege, Attrappe nur `nodemailer`). Eigene Datei, weil die Einstiege
+  `MAIL_NUR_AN` beim ersten Aufruf lesen und der Bremsen-Test es leer setzt. Die Bauregel lässt
+  den Ort zu: Der Bremsen-Test importiert dort schon Admin-Routen über ihren relativen Pfad.
+- **Wege:** die acht Zeilen der Tabelle «Mail», also alle fünf heutigen Einstiege mit Versender;
+  VAPID leer, damit Meldungen per Mail gehen; je Weg ein eigenes Mitglied (Grenze drei Mails je
+  Adresse und Stunde).
+- **Geprüft je Weg:** mindestens eine Mail ist hinausgegangen (sonst ist der Test leer grün), jede
+  hat als Empfänger die Adresse aus `MAIL_NUR_AN`, und der Betreff beginnt mit «[Test für …]».
+- **Zusätzlich empfohlen:** Die Attrappe merkt sich, womit `createTransport` gerufen wurde, und der
+  Test hält je Weg fest, ob der Versender mit oder ohne Pool lief. Das schliesst die Lücke «welcher
+  Versender einen Weg bedient» aus «Was das Netz deckt» ohne Mehraufwand.
+- **Einmal rot:** `leiteUm` an einer der fünf Stellen entfernen; genau die Wege dieses Einstiegs
+  werden rot.
+
+#### Frage an den Projektleiter
+
+**F-20 [neu, OFFEN] — Für wen gilt «Dienste, Mail- und Push-Versender entstehen nur in
+`dienste.ts`»?** (Übergangsregel «Ab Schritt 07» der `CLAUDE.md`; nicht dringend, hält Schritt 07
+nicht auf)
+
+Wörtlich genommen verletzen die Regel `scripts/testdaten.ts` (eigener Versender mit `leiteUm`,
+eigener Login-Dienst, eigene Bremsen), `scripts/seed-lokal.ts`, `tests/e2e/hilfen/login.ts` und
+jeder Datenbanktest, der seine Dienste selbst baut. Das sind eigene Prozesse oder Tests, und dass
+Tests ihre Dienste selbst hineinreichen, ist gut gelöst und bleibt (B-13). Am Verhalten ändert
+keine Antwort etwas.
+
+- A: Wortlaut präzisieren: «Im Server (unter `src/`, ohne Tests) entstehen Dienste, Mail- und
+  Push-Versender nur in `src/lib/server/dienste.ts`; Skripte und Tests bauen ihre eigenen.»
+- B: Auch die Skripte holen ihre Dienste aus `dienste.ts`. Dann zieht `scripts/testdaten.ts` alle
+  Module und alle Einstellungen in das Skript, das im Laufzeit-Image läuft: eine Verhaltensänderung
+  ausserhalb des Plans.
+- C: Wortlaut lassen; die Lesart steht hier.
+- **Empfehlung: A.** Ein Satz, der sagt, was gemeint ist, erspart die Rückfrage im Review von
+  Schritt 07.
+
+#### Nicht geprüft, dünn belegt
+
+- **Nichts ausgeführt:** kein Test, kein Lint, kein Build. Dass die vorgeschlagenen Lint-Muster so
+  greifen und dass `web-push` beim Laden nichts auslöst, zeigt erst der Schritt.
+- **Bibliotheken nicht gelesen [V]:** Verhalten von `nodemailer` mit und ohne Pool (Verbindung je
+  Mail, Warteschlange im Pool) und von `web-push`; im Worktree gibt es kein `node_modules`.
+- **Nur per Textsuche [E]:** die Fachdateien ohne Treffer (Liste oben). Ein Zustand, der sich
+  hinter keinem der gesuchten Muster verbirgt (zum Beispiel ein Objekt-Literal auf Modulebene, das
+  später verändert wird), fiele nicht auf; `const … = {}` und `= []` auf Modulebene waren Teil der
+  Suche und ohne Treffer.
+- **Entwicklungs-Server [V]:** Lädt Vite ein Modul neu, entstehen dessen Einzelstücke neu. Mit
+  `dienste.ts` hängt jedes Einzelstück an jeder Fachdatei; eine Änderung irgendwo leert dann auch
+  Bremsen, Passkey-Anfragen und E-Mail-Wechsel. Nur lokal, nicht gemessen.
+- **Zeilen der Routen in `ROUTEN`:** nur für die Mail-Wege einzeln nachgelesen; die Zahl je
+  Einstieg stammt aus den Import-Zeilen der `+server.ts`.
+- **Nicht eingetragen:** F-20 steht nur hier und im Abschnitt «Stand und nächster Schritt», nicht
+  in Abschnitt 9 (der Auftrag liess sonst nichts umschreiben). Die Tabelle «Vorab nachzumessen» in
+  7.7 nennt Schritt 07 weiter; erledigt ist es laut Zeile 07 und diesem Abschnitt.
+- **Ausserhalb des Schritts aufgefallen, nicht behoben:** Meldungen an Einzelne aus der Verwaltung
+  laufen über den Pool der Mitteilungen und stehen damit hinter einer laufenden Mitteilung an [V
+  für die Warteschlange]. Der Kommentar über `holeBremsen` ist unvollständig (C.2) und fällt mit der
+  Datei weg. Die Zeile «Nächster Checkpoint» oben nennt noch Schritt 06a.
+
+### D.4 Schritt 07
+
+**Erkenntnisse Schritt 07** (12.11.2026, Branch `refactor/schritt-07`)
+
+- **Bestand am Code nachgelesen, D.3 bestätigt:** fünf `leiteUm` in den fünf `index.ts`, ein
+  Versender mit Pool (`mitteilung/index.ts`), zwei Push-Versender, Bremsen nur über `holeBremsen`.
+  87 Routen mit 88 Import-Zeilen (`/api/admin/kategorien/[id]` jetzt eine Zeile), der Hook nur mit
+  `holeLoginDienst`, dazu `routen.test.ts` und `login/schnittstellen.db.test.ts`.
+- **Commits:** `bc111d6` `test:` Charakterisierung `MAIL_NUR_AN`; `bad5f36` `refactor:` die drei
+  Dienst-Typen nach `typen.ts`; `a3ab6b5` `refactor:` `dienste.ts` mit Lint-Regel,
+  `importrichtung.test.ts`, Hook, 87 Routen, Bauregel, `bauregel.test.ts`, den zwei Tests und den
+  gelöschten `index.ts` (wie in D.3 nicht teilbar). Dazu dieser `docs:`-Commit.
+- **Charakterisierungstest `MAIL_NUR_AN`** (`src/routes/api/mail-nur-an.db.test.ts`): echte Routen,
+  echte Einstiege, Attrappe nur `nodemailer`; die Attrappe merkt sich je Transport, ob er mit
+  `pool: true` gebaut wurde. Acht Tests, einer je Weg aus D.3: Login-Code (`/api/login/mail-code`),
+  Code der Verwaltung (`/api/admin/zugang/code`), Hinweis an die alte Adresse
+  (`/api/admin/mitglieder/[id]`), zwei Codes des Adresswechsels (`/api/profil/email`),
+  Bestätigung der CM-Anmeldung (`/api/cm/kategorien/[id]/anmeldung`), Meldung an die
+  Kontaktperson (`/api/cm/[id]/gespraech`), Mitteilung an den Verein
+  (`/api/admin/mitteilungen/senden`), Meldung ans Mitglied aus der Verwaltung
+  (`/api/admin/gespraeche/[id]`). Je Weg: die Mails, die er auslöst (gezählt ab dem Auslösen),
+  sind mindestens eine je erwarteter Adresse, jede geht an die Adresse aus `MAIL_NUR_AN`, der
+  Betreff beginnt mit «[Test für …] » und nennt jede erwartete Adresse, und alle laufen über den
+  erwarteten Versender (Pool nur bei den zwei Wegen der Mitteilungs-Verwaltung). VAPID leer.
+- **Rot belegt, alter Stand** (je `mailNurAn` an einer Stelle durch `undefined` ersetzt, aus einer
+  Sicherungskopie zurückgesetzt, `git status` danach leer): `login/index.ts` → 1 rot (Login);
+  `admin/index.ts` → 2 rot (Code, Hinweis); `profil/index.ts` → 1 rot; `cm/index.ts` → 2 rot
+  (Bestätigung, Meldung); `mitteilung/index.ts` → 2 rot (Mitteilung, Meldung der Verwaltung). Je
+  genau die Wege des Einstiegs, die übrigen grün. Dazu der Pool: `mitteilung/index.ts` mit der URL
+  statt des Pool-Objekts → die zwei Wege der Mitteilungs-Verwaltung rot; `cm/index.ts` mit Pool →
+  die zwei CM-Wege rot.
+- **Rot belegt, neuer Stand** (auf `a3ab6b5`, ebenso zurückgesetzt): Umleitung in `baueMailer`
+  entfernt → alle 8 rot; Mitteilungs-Verwaltung mit `holeMailer` statt `holePoolMailer` → 2 rot;
+  Versender ohne Pool mit Pool gebaut → die 6 übrigen rot; Profil mit eigenen Bremsen
+  (`erstelleBremsen()`) → Bremsen-Test 5 von 6 rot.
+- **Dienst-Typen:** `ProfilDienste`, `AnlassDienste`, `MitteilungDienste` Zeichen für Zeichen (Diff
+  der `export type`-Zeilen gleich). `AnlassEreignis` bleibt in `anlass/schnittstellen.ts`.
+  **Zur Kenntnis des Projektleiters:** E-33 sagt, diese Typen «bleiben, wo sie sind»; der Auftrag
+  hat sie nach D.3 Nr. 8 verschoben, weil `dienste.ts` sie jetzt als anderes Modul braucht. Kein
+  Verhalten betroffen.
+- **`dienste.ts` im Einzelnen:** Jeder Einstieg liest die Einstellungen wie bisher selbst; die
+  geteilten Versender entstehen beim ersten Einstieg, der sie braucht, mit dessen Einstellungen
+  (D.3 Nr. 5: ohne Folge). `holeAnlassDienste` und `holePasskeyDienst` lesen weiter keine
+  Einstellungen. Der Kommentar über den Bremsen nennt jetzt alle fünf Nutzer (C.2 erledigt).
+  `holeMitteilungAdminDienste` bleibt ein eigenes Objekt (`...holeAdminDienste()` plus Push,
+  Pool-Versender, Adresse).
+- **Lint:** `gruppe()` liefert für `.`, `login` und die Themen das Muster «`dienste` mit
+  `\.ts`/`\.js` oder ohne, relativ oder über `$lib/server/`»; `zusatz` trägt dafür eine eigene
+  Ebene, die Meldung heisst «kein Modul unter src/lib/server/ importiert dienste.ts (oberste
+  Schicht)». `db` meldet `../dienste.ts` mit seiner eigenen Regel. `dienste.ts` steht in den
+  `ignores` aller Blöcke, ohne Eintrag in `AUSNAHMEN`. Kommentar oben nachgeführt (Ebene 4; der
+  ungenaue Satz zu den `index.ts` fällt weg). `importrichtung.test.ts`: 13 neue Fälle (8 Meldungen
+  samt `login/sitzung.ts` als Datei mit Ausnahme, `db`, 4 erlaubte Importe in `dienste.ts`), 29 →
+  42 Tests.
+- **Lint rot belegt:** `anlass/anlaesse.ts` mit `import … from '../dienste.ts'` und `datum.ts` mit
+  `export … from '$lib/server/dienste'` → je `no-restricted-imports` mit der neuen Meldung, Exit 1;
+  das Muster für die Themen gestrichen → 3 Fälle rot; `dienste.ts` aus den `ignores` genommen → 4
+  Fälle rot (und 18 Meldungen in `dienste.ts`).
+- **Bauregel:** `ERLAUBTER_IMPORT` erlaubt `dienste.ts` statt der zwei `index.ts`;
+  `AUS_INDEX`/`DIENSTE` sind `VERWALTUNGS_EINSTIEGE` (dieselben zwei Namen, darum die
+  Argument-Prüfung unverändert); `MITTEILUNG_INDEX` ist `DIENSTE_MODUL`, und
+  `pruefeMitteilungImporte` heisst `pruefeVerwaltungImporte` und sperrt ausserhalb von
+  `api/admin/` beide Namen. `ADMIN_MODUL` und `betrifftBauregel` unverändert.
+  `bauregel.test.ts`: die Fälle mit `index.ts` auf `dienste.ts` umgestellt (die Pfad-Fälle für
+  `lib/server/admin` bleiben, sie prüfen `ADMIN_MODUL`), neu: Admin-Route holt
+  `holeMitteilungDienste`, `holeLoginDienst`, `holeCmDienste`, `holeDb` oder `* as` aus
+  `dienste.ts`; Admin-Route holt weiter aus `admin/index.ts` oder `mitteilung/index.ts`; beide
+  Verwaltungs-Einstiege in einer Zeile sind erlaubt; Mitglieder-Route mit `holeAdminDienste` bzw.
+  `holeMitteilungAdminDienste` aus `dienste.ts` (direkt, mit `as`, neben `type`, ohne Endung, `.js`,
+  `$lib`, `export { … } from`); `dienste.ts` ausserhalb mit `* as`, Standard-Import, `export *`,
+  `import()`. 36 Tests.
+- **Bauregel rot belegt** (je ein Muster zurückgedreht, zurückgesetzt): `ERLAUBTER_IMPORT` mit den
+  zwei `index.ts` → 1 rot; Admin-Route darf jeden Namen aus `dienste.ts` → 2 rot; ausserhalb nur
+  `holeMitteilungAdminDienste` gesperrt (die alte Regel) → 1 rot (der Fall `holeAdminDienste`);
+  `DIENSTE_MODUL` ohne `.js` und Anhang → 2 rot; `dienste.ts` ausserhalb auch ohne Namen → 2 rot;
+  `VERWALTUNGS_EINSTIEGE` ohne `holeAdminDienste` → 8 rot. Am echten Repo: `/api/profil` mit
+  `holeAdminDienste as h` → `bauregel: … dürfen 'holeAdminDienste' nutzen`, Exit 1.
+- **Prüfläufe:** jeder Commit mit dem Hook `check-schnell`; vor dem Umbau-Commit von Hand
+  Prettier, ESLint, `svelte-check`, `bauregel: ok`, Einheitstests 342, die Datenbanktests unter
+  `src/routes/api/` samt Grundprüfung und Login 61. Voller `make check` auf `a3ab6b5`: grün (Lint; `svelte-check` 1522 Dateien ohne Fehler;
+  Prüfskripte samt `bauregel: ok`; Einheits- und Datenbanktests 149 Dateien mit 1901 Tests,
+  Abdeckung 97,07 % Anweisungen, 93,56 % Zweige; beide Builds; E2E 414 bestanden, 57
+  übersprungen, 3,6 Minuten; Image; grüner Stand `834ab0083c18` gemerkt). Auf `e9958f1` (nur
+  Doku dazu) noch einmal voll: dieselben Zahlen, E2E 3,4 Minuten.
+- **Abweichungen von D.3:**
+  1. Der Test läuft auf einer **eigenen Datenbank**, nicht auf der gemeinsamen wie der
+     Bremsen-Test: Die Mitteilung an den Verein geht an alle aktiven Mitglieder der Datenbank, und
+     `speichereMitteilung` löscht dabei Mitteilungen aller Bezüge, die älter als 365 Tage sind
+     (FR-45); auf der gemeinsamen Datenbank wirkte das auf andere Testdateien. Dafür gibt
+     `legeEigeneDatenbankAn` (`tests/hilfen/eigene-datenbank.ts`) auch die URL zurück; der Test setzt
+     `DATABASE_URL` darauf, bevor `holeDb` zum ersten Mal läuft.
+  2. **Typen:** Neben `grundpruefung.db.test.ts` (drei Importe, nicht zwei) holten auch die
+     Schnittstellen-Tests von `profil`, `mitteilung` und `anlass` die Typen aus der
+     `schnittstellen.ts`; nur Importpfade geändert.
+  3. **`DIENSTE_MODUL` strenger als «mit und ohne Endung»:** auch `.js` (Vite löst es auf `.ts`
+     auf) und ein Anhang `?…`. Der alte Pfad-Schutz `ADMIN_MODUL` fing `holeAdminDienste` mit jeder
+     Endung; ohne `.js` hätte der Namens-Schutz eine Lücke, die es vorher nicht gab.
+  4. **Ordner-Import:** `dienste.ts` ist kein Ordner; die Fälle dafür sind «ohne Endung» und
+     `$lib/server/dienste`.
+  5. **Eigene Meldung** für das Lint-Muster (D.3 sagte nur «weiteres Muster»): Sonst hiesse die
+     Meldung bei einem Thema «ein Thema importiert nicht die Schnittstellen eines anderen Moduls».
+- **Was kein Test sieht:**
+  - die **Exportliste von `dienste.ts`**: Ein weiterer Export (z. B. die Bremsen) wäre für jede
+    Mitglieder-Route erreichbar, die Bauregel verbietet dort nur die zwei Verwaltungs-Namen. Bleibt
+    Aufgabe des Reviews.
+  - dass Versender und Dienste **nur** in `dienste.ts` entstehen (D.3, keine Regel);
+  - **Push:** Kein Test baut einen Push-Versender (VAPID überall leer), also auch nicht, dass CM und
+    Mitteilungs-Verwaltung denselben bekommen; der Zweig mit VAPID-Paar in `holePush` läuft nie;
+  - eine eigene Instanz der Bremsen nur für den Passkey (ohne Wirkung, C.2) und ein zweiter
+    `ChallengeSpeicher` (nur E2E über zwei Anfragen);
+  - dass der Hook jetzt beim Start alle Module samt `web-push` lädt: nur der Build in `make check`
+    und E2E zeigen, dass dabei nichts entsteht;
+  - der Entwicklungs-Server, der beim Neuladen einer Fachdatei alle Einzelstücke neu baut (D.3, [V]).
+- **Ausserhalb des Schritts aufgefallen:**
+  - `docs/ci-cd-und-release.md` (Zeile zur Bauregel) um den Namens-Schutz ergänzt (gleiches Thema,
+    eine Zeile, in diesem `docs:`-Commit).
+  - Die Lint-Meldung endet für jedes Muster mit «Heutige Verletzungen stehen in AUSNAHMEN»; für
+    `dienste.ts` gibt es keine. Nicht geändert (Text gemeinsam für alle Muster).
+  - `bauregel.test.ts` behält Pfad-Fälle mit `lib/server/admin/index.ts`, einer Datei, die es nicht
+    mehr gibt; sie prüfen den Pfad-Schutz, der für jeden Pfad unter `lib/server/admin` gilt.
+  - Meldungen an Einzelne aus der Verwaltung laufen weiter über den Pool (D.3, unverändert, jetzt
+    vom Test festgehalten).
+- **Für die Folgeschritte:**
+  - **08:** keine Abhängigkeit.
+  - **09, 11:** Eine neue Verwaltungs-Liste ändert an der Bauregel nur noch die Listen; ein neuer
+    Einstieg der Verwaltung gehört in `VERWALTUNGS_EINSTIEGE`.
+  - **12:** das Muster für `dienste.ts` einmal mit verletzen (Absicherung von 12); `AUSNAHMEN` hat
+    weiter die vier Einträge von 10 und 11.
+
+**Korrekturrunde nach dem Review** (12.11.2026, derselbe Branch; Code sonst «ok»)
+
+- **Befunde des Reviews:** (1) In «Prüfläufe» stand ein Platzhalter statt des Ergebnisses von
+  `make check`. (2) Ausserhalb von `api/admin/` war der Schutz eine Sperrliste nach Namen. Zwei
+  Formen, die der alte Pfad-Schutz für `holeAdminDienste` fing, gingen durch:
+  `import { holeAdminDienste/**/as/**/h } …` (ohne Kommentare liest die Prüfung den Namen
+  `holeAdminDiensteash`) und ein Unicode-Escape im Bezeichner (`holeAdminDienst\u0065`).
+  (3) `holeCmDienste` baute die Datenbank vor dem Versender, `cm/index.ts` umgekehrt. (4) F-20
+  stand nicht in Abschnitt 9. Dazu der Hinweis, dass im Test `MAIL_NUR_AN` ein Nachzügler des
+  siebten Tests in das Fenster des achten fiele.
+- **Geändert:**
+  - `1193548` `refactor:` `holeCmDienste` wieder in der Reihenfolge von `cm/index.ts`:
+    Einstellungen, Versender, Datenbank, Push. Gleiches Fehlerverhalten mit einer Einschränkung,
+    die zum Teilen gehört: Ist der Versender ohne Pool schon von einem anderen Einstieg gebaut,
+    entsteht er hier nicht noch einmal (kein `createTransport`). Kein Test sieht die Reihenfolge.
+  - `06cf0d2` `refactor:` Entscheid des Orchestrators: ausserhalb von `api/admin/` eine
+    Erlaubt-Liste `MITGLIEDER_EINSTIEGE` (`holeLoginDienst`, `holePasskeyDienst`,
+    `holeProfilDienste`, `holeCmDienste`, `holeMitteilungDienste`, `holeAnlassDienste`) statt der
+    Sperrliste. Jeder andere Name aus `dienste.ts` ist ein Befund: die zwei Verwaltungs-Namen mit
+    der bisherigen Meldung, alles Übrige mit «aus dienste.ts nur Einstiege der Mitglieder, nicht
+    '…'». Ein neuer Export von `dienste.ts` ist damit ohne Eintrag auf beiden Seiten gesperrt (die
+    Liste wird geführt, nicht aus `dienste.ts` abgeleitet). Die Admin-Seite ist unverändert.
+    `bauregel.test.ts`: vier neue Fälle (alle sechs Mitglieder-Einstiege erlaubt, auch mit `as`;
+    Kommentar statt Leerzeichen um `as`; Unicode-Escape; ein Name, den `dienste.ts` heute nicht
+    exportiert: `holeBremsen`, `holeMailer`, `holeDb`, `type Bremsen`); im bestehenden Fall ist
+    `type X` durch `type holeProfilDienste` ersetzt (`X` ist jetzt selbst ein Befund). 36 → 40
+    Tests. Am echten Repo `bauregel: ok`.
+  - `51fae98` `test:` nur ein Kommentar im achten Test zum Fenster der Zählung: Ein Nachzügler der
+    Mitteilung fiele hinein und liefe ebenfalls über den Pool, also ohne aufzufallen; die Route
+    der Mitteilung wartet den Versand aber ab, bevor sie antwortet. Die ungenaue Angabe
+    «vorheriger Test» im Kommentar daneben ist berichtigt. Am Test sonst nichts.
+  - Dieser `docs:`-Commit: Platzhalter ersetzt, F-20 in 9.1 (Zählung jetzt drei offene Fragen),
+    Ergebnis in 7.3 und Stand nachgeführt.
+- **Rot belegt** (aus einer Sicherungskopie zurückgesetzt, `git status` danach ohne diese
+  Änderung): `pruefeVerwaltungImporte` wieder als Sperrliste → 3 rot (Kommentar, Unicode-Escape,
+  unbekannter Name); der Name nur am Anfang verglichen (`startsWith`) → 1 rot (Kommentar, weil
+  `holeProfilDiensteasp` mit einem erlaubten Namen beginnt). Am echten Repo: `/api/profil` mit
+  `holeAdminDienste/**/as/**/h` → `bauregel: … nicht 'holeAdminDiensteash'; erlaubt sind nur …`,
+  Exit 1; auf `dev` fing das der Pfad `lib/server/admin`.
+- **Grenze, ausserhalb des Auftrags, nicht behoben (zur Entscheidung):** Der Import-Parser der
+  Bauregel (`importe()`) erkennt einen Import mit einem Namen in Anführungszeichen nicht
+  (`import { 'erstelleDb' as e } from '…/db/index.ts'`, «arbitrary module namespace names»
+  aus ES2022): Die Klausel darf dort keine Anführungszeichen enthalten, die Zeile gilt gar nicht
+  als Import. Am Code geprüft: eine Admin-Route mit dieser Form aus `db/index.ts` und eine
+  Mitglieder-Route aus `lib/server/admin/mitglieder.ts` bzw. `admin/index.ts` melden je nichts,
+  also schon vor Schritt 07 und für jede Regel der Bauregel, nicht nur für `dienste.ts`. Ob
+  TypeScript und Vite des Projekts die Form übersetzen, ist nicht geprüft [V]. Sonst gleicher Art:
+  `\u{65}` mit geschweifter Klammer liest die Prüfung nicht als Namensliste, das ergibt aber einen
+  Befund («nur statisch und mit Namen»). Die Sperrliste der Verwaltungs-Schnittstellen aus
+  `mitteilung/schnittstellen.ts` ausserhalb von `api/admin/` hat dieselbe Schwäche wie die alte
+  Sperrliste für `dienste.ts` (Kommentar, Escape); nicht Teil dieser Runde.
+- **Prüfläufe:** jeder Commit mit dem Hook `check-schnell`; voller `make check` auf dem Endstand
+  `b342d0a`: Exit 0, 149 Dateien mit 1905 Tests, Abdeckung 97,07 % Anweisungen und 93,56 % Zweige,
+  `bauregel: ok`, E2E 414 bestanden und 57 übersprungen in 3,4 Minuten, grüner Stand `5e1f20e7adee`.
+- **Zweites Review (12.11.2026): «ok».** Der Reviewer hat die Bauregel am Repo, `bauregel.test.ts`
+  (40 von 40) und 38 Import-Formen alte gegen neue Regel laufen lassen: Keine Form ist offen, die auf
+  `origin/dev` zu war. Offen wie vorher: Namen in Anführungszeichen, nicht normalisierte Pfade,
+  `import.meta.glob`, Weiterreichen über eine Datei unter `src/lib/` ausserhalb von `server/`.
+- **Liegen geblieben (Hinweis des Reviews, kein Code geändert):** Der Kommentar über
+  `VERWALTUNGS_EINSTIEGE` in `scripts/pruefungen/bauregel.ts` sagt noch «alle anderen Routen alles
+  ausser diesen»; seit der Erlaubt-Liste stimmt das nicht mehr. Berichtigen mit dem nächsten
+  Schritt, der die Datei anfasst (09).
+- **Zum Ablauf:** Der `refactor-analyst` hatte beim Nachmessen (D.3) kein Edit-Werkzeug zur Hand,
+  obwohl es im Frontmatter steht (E-32), und hat dieses Dokument per Skript über Bash geschrieben;
+  geändert war nur diese Datei (vom Orchestrator am Diff geprüft).

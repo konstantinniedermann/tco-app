@@ -1,6 +1,7 @@
-// Dienst-Typ der Mitteilungen für die Verwaltung. Keine Schnittstellen-Datei: Die Verwaltung,
-// das Gespräch und das Turnier holen ihn von hier.
+// Dienst-Typen der Mitteilungen. Keine Schnittstellen-Datei: Die Verwaltung, das Gespräch, das
+// Turnier und der Zusammenbau der Dienste holen sie von hier.
 import type { AdminDienste } from '../admin/rechte.ts';
+import type { Db } from '../db/index.ts';
 import type { Mailer } from '../login/dienst.ts';
 import type { PushSender } from './versand.ts';
 
@@ -14,3 +15,6 @@ export type MitteilungAdminDienste = AdminDienste & {
 	mailer: Mailer;
 	adresse: string;
 };
+
+// Für die Mitglieder: ohne Push-Sender und Mailer.
+export type MitteilungDienste = { db: Db; vapidOeffentlich: string | null; jetzt?: () => Date };

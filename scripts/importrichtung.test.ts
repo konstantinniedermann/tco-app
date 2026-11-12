@@ -53,6 +53,36 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 		expect(await meldungen(datei, code)).toEqual([]);
 	});
 
+	// Oberste Schicht (Schritt 07): kein Modul unter src/lib/server/ importiert dienste.ts, auch eine
+	// Datei mit Ausnahme nicht; die Meldung nennt dienste.ts (db meldet ihn mit seiner eigenen Regel).
+	it.each([
+		['anlass/neu.ts', "import { x } from '../dienste.ts';"],
+		['anlass/neu.ts', "import { x } from '$lib/server/dienste';"],
+		['anlass/neu.ts', "export { x } from '../dienste.js';"],
+		['login/neu.ts', "import { x } from '../dienste.ts';"],
+		['login/neu.ts', "import { x } from '../dienste';"],
+		['datum.ts', "import { x } from './dienste.ts';"],
+		['datum.ts', "import { x } from '$lib/server/dienste.js';"],
+		['login/sitzung.ts', "import { x } from '../dienste.ts';"]
+	])('meldet in %s den Import von dienste.ts: %s', async (datei, code) => {
+		expect(await meldungen(datei, code)).toEqual([
+			expect.stringContaining('kein Modul unter src/lib/server/ importiert dienste.ts')
+		]);
+	});
+
+	it('meldet in db den Import von dienste.ts', async () => {
+		expect((await meldungen('db/neu.ts', "import { x } from '../dienste.ts';")).length).toBe(1);
+	});
+
+	it.each([
+		"import { x } from './login/dienst.ts';",
+		"import { x } from './admin/zugang.ts';",
+		"import { x } from './cm/schnittstellen.ts';",
+		"import { x } from './login/passkey-schnittstellen.ts';"
+	])('lässt in dienste.ts jeden Import zu: %s', async (code) => {
+		expect(await meldungen('dienste.ts', code)).toEqual([]);
+	});
+
 	it('Tests sind von der Richtungsregel ausgenommen', async () => {
 		expect(
 			await meldungen('anlass/neu.test.ts', "import { x } from '../cm/schnittstellen.ts';")

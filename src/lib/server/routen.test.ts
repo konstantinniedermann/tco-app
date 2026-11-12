@@ -11,7 +11,6 @@
 // nur Admin-Routen dürfen die Verwaltung importieren.
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../tests/hilfen/anfrage.ts';
-import { holeAdminDienste } from './admin/index.ts';
 import {
 	ADMIN_SCHNITTSTELLEN,
 	getAdminAnlaesse,
@@ -45,7 +44,6 @@ import {
 	postZugang,
 	postZugangCode
 } from './admin/schnittstellen.ts';
-import { holeAnlassDienste } from './anlass/index.ts';
 import {
 	ANLASS_SCHNITTSTELLEN,
 	getAnlaesse,
@@ -53,7 +51,6 @@ import {
 	getKalender,
 	postAnmeldung
 } from './anlass/schnittstellen.ts';
-import { holeCmDienste } from './cm/index.ts';
 import {
 	CM_SCHNITTSTELLEN,
 	getCmAnsicht,
@@ -71,6 +68,16 @@ import {
 } from './cm/schnittstellen.ts';
 import { holeDb } from './db/index.ts';
 import {
+	holeAdminDienste,
+	holeAnlassDienste,
+	holeCmDienste,
+	holeLoginDienst,
+	holeMitteilungAdminDienste,
+	holeMitteilungDienste,
+	holePasskeyDienst,
+	holeProfilDienste
+} from './dienste.ts';
+import {
 	GESPRAECH_SCHNITTSTELLEN,
 	getAdminGespraech,
 	getGespraech,
@@ -80,7 +87,6 @@ import {
 	postGespraech,
 	postZustand
 } from './gespraech/schnittstellen.ts';
-import { holeLoginDienst, holePasskeyDienst } from './login/index.ts';
 import {
 	PASSKEY_SCHNITTSTELLEN,
 	getPasskeys,
@@ -98,7 +104,6 @@ import {
 	postMail,
 	postMailCode
 } from './login/schnittstellen.ts';
-import { holeMitteilungAdminDienste, holeMitteilungDienste } from './mitteilung/index.ts';
 import {
 	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
 	MITTEILUNG_SCHNITTSTELLEN,
@@ -113,7 +118,6 @@ import {
 	postVereinSenden,
 	postVereinVorschau
 } from './mitteilung/schnittstellen.ts';
-import { holeProfilDienste } from './profil/index.ts';
 import {
 	PROFIL_SCHNITTSTELLEN,
 	getProfil,

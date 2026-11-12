@@ -1,4 +1,4 @@
-import { holeAdminDienste } from '../../../../lib/server/admin/index.ts';
+import { holeAdminDienste } from '../../../../lib/server/dienste.ts';
 import { getTurniere, postTurniere } from '../../../../lib/server/turnier/schnittstellen.ts';
 import type { RequestHandler } from './$types';
 

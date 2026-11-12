@@ -3,8 +3,8 @@ import type { Handle, HandleServerError, ServerInit } from '@sveltejs/kit/hooks'
 import { riegel } from './lib/server/admin/ansicht.ts';
 import { raeumeAuf } from './lib/server/admin/loeschung.ts';
 import { holeDb } from './lib/server/db/index.ts';
+import { holeLoginDienst } from './lib/server/dienste.ts';
 import { leseEinstellungen } from './lib/server/einstellungen.ts';
-import { holeLoginDienst } from './lib/server/login/index.ts';
 import { behandleFehler, ladeSitzungSicher } from './lib/server/login/schnittstellen.ts';
 import { starteZeitgeber } from './lib/server/zeitgeber.ts';
 

@@ -5,13 +5,8 @@ import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
 import { legeAnlassAn, loescheAnlass } from './anlaesse.ts';
-import {
-	getAnlaesse,
-	getAnlass,
-	getKalender,
-	postAnmeldung,
-	type AnlassDienste
-} from './schnittstellen.ts';
+import { getAnlaesse, getAnlass, getKalender, postAnmeldung } from './schnittstellen.ts';
+import type { AnlassDienste } from './typen.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {

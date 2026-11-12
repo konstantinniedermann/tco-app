@@ -11,7 +11,8 @@ import { testPruefer } from '../../../tests/hilfen/passkey-pruefer.ts';
 import type { AdminDienste } from './admin/rechte.ts';
 import { ADMIN_SCHNITTSTELLEN } from './admin/schnittstellen.ts';
 import { erstelleZugangDienst } from './admin/zugang.ts';
-import { ANLASS_SCHNITTSTELLEN, type AnlassDienste } from './anlass/schnittstellen.ts';
+import { ANLASS_SCHNITTSTELLEN } from './anlass/schnittstellen.ts';
+import type { AnlassDienste } from './anlass/typen.ts';
 import { CM_SCHNITTSTELLEN } from './cm/schnittstellen.ts';
 import type { CmDienste } from './cm/typen.ts';
 import { erstelleDb } from './db/index.ts';
@@ -23,12 +24,12 @@ import { erstellePasskeyDienst, type PasskeyDienst } from './login/passkey.ts';
 import { erstelleSitzung, pruefeSitzung } from './login/sitzung.ts';
 import {
 	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
-	MITTEILUNG_SCHNITTSTELLEN,
-	type MitteilungDienste
+	MITTEILUNG_SCHNITTSTELLEN
 } from './mitteilung/schnittstellen.ts';
-import type { MitteilungAdminDienste } from './mitteilung/typen.ts';
+import type { MitteilungAdminDienste, MitteilungDienste } from './mitteilung/typen.ts';
 import { erstelleEmailWechselDienst } from './profil/email-wechsel.ts';
-import { PROFIL_SCHNITTSTELLEN, type ProfilDienste } from './profil/schnittstellen.ts';
+import { PROFIL_SCHNITTSTELLEN } from './profil/schnittstellen.ts';
+import type { ProfilDienste } from './profil/typen.ts';
 import { TURNIER_SCHNITTSTELLEN } from './turnier/schnittstellen.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
