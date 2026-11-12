@@ -126,17 +126,19 @@ import {
 import { getSitzung } from './sitzung/schnittstellen.ts';
 import {
 	MITTEILUNG_SCHNITTSTELLEN,
-	getAnlassMitteilungen,
 	getBenachrichtigungen,
-	getVereinMitteilungen,
 	postAbo,
 	postAboLoeschen,
+	postThemen
+} from './mitteilung/schnittstellen.ts';
+import {
+	getAnlassMitteilungen,
+	getVereinMitteilungen,
 	postAnlassSenden,
 	postAnlassVorschau,
-	postThemen,
 	postVereinSenden,
 	postVereinVorschau
-} from './mitteilung/schnittstellen.ts';
+} from './mitteilung/verwaltung-schnittstellen.ts';
 import {
 	PROFIL_SCHNITTSTELLEN,
 	getProfil,

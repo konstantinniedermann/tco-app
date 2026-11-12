@@ -47,9 +47,9 @@ const VERWALTUNGS_DATEIEN: readonly { datei: string; liste: string; aussen: Auss
 		aussen: 'pfad'
 	},
 	{
-		datei: 'mitteilung/schnittstellen.ts',
+		datei: 'mitteilung/verwaltung-schnittstellen.ts',
 		liste: 'MITTEILUNG_ADMIN_SCHNITTSTELLEN',
-		aussen: 'namen'
+		aussen: 'pfad'
 	},
 	{
 		datei: 'anlass/verwaltung-schnittstellen.ts',

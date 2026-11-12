@@ -5,7 +5,7 @@ import { betrifftBauregel, pruefeBauregel } from './bauregel.ts';
 const LISTEN =
 	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN, CM_ADMIN_SCHNITTSTELLEN, GESPRAECH_ADMIN_SCHNITTSTELLEN, MITTEILUNG_ADMIN_SCHNITTSTELLEN und ANLASS_ADMIN_SCHNITTSTELLEN';
 const DATEIEN =
-	'erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
+	'erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/verwaltung-schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
 
 describe('pruefeBauregel', () => {
 	it('meldet Server-Dateien neben Seiten', () => {
@@ -125,13 +125,13 @@ describe('Admin-Routen', () => {
 	it('RR-07: Mitteilungen der Verwaltung nur aus MITTEILUNG_ADMIN_SCHNITTSTELLEN mit ihren Diensten', () => {
 		const mRoute = 'src/routes/api/admin/mitteilungen/+server.ts';
 		const mListe: [string, string] = [
-			'src/lib/server/mitteilung/schnittstellen.ts',
+			'src/lib/server/mitteilung/verwaltung-schnittstellen.ts',
 			'export const MITTEILUNG_ADMIN_SCHNITTSTELLEN = {\n\tgetVereinMitteilungen\n} satisfies Record<string, unknown>;'
 		];
 		const rumpf = (namen: string, dienst = 'holeMitteilungAdminDienste', zeile = '') =>
 			[
 				`import { ${dienst} } from '../../../../lib/server/dienste.ts';`,
-				`import { ${namen} } from '../../../../lib/server/mitteilung/schnittstellen.ts';`,
+				`import { ${namen} } from '../../../../lib/server/mitteilung/verwaltung-schnittstellen.ts';`,
 				`export const GET = (e) => getVereinMitteilungen(${dienst}(), e);`,
 				zeile
 			].join('\n');
@@ -146,6 +146,12 @@ describe('Admin-Routen', () => {
 		// Die Schnittstellen der Mitglieder prüfen keine Verwaltungsrolle.
 		expect(mit(rumpf('getVereinMitteilungen, postThemen'))).toEqual([
 			`${mRoute}: Admin-Route nutzt 'postThemen'; ${LISTEN}`
+		]);
+		// Die Datei der Mitglieder ist für Admin-Routen keine erlaubte Quelle (Schritt 11).
+		const mitglieder =
+			"import { postThemen } from '../../../../lib/server/mitteilung/schnittstellen.ts';";
+		expect(mit(`${rumpf('getVereinMitteilungen')}\n${mitglieder}`)).toEqual([
+			`${mRoute}: Admin-Route importiert '../../../../lib/server/mitteilung/schnittstellen.ts'; ${DATEIEN}`
 		]);
 		// Aus dienste.ts nur die Einstiege der Verwaltung, keiner der Mitglieder (Schritt 07).
 		for (const fremd of ['holeMitteilungDienste', 'holeLoginDienst', 'holeCmDienste']) {
@@ -352,7 +358,7 @@ describe('Einstiege der Verwaltung ausserhalb von api/admin (Schritt 07)', () =>
 
 describe('Mitteilungen ausserhalb von api/admin', () => {
 	const mListe: [string, string] = [
-		'src/lib/server/mitteilung/schnittstellen.ts',
+		'src/lib/server/mitteilung/verwaltung-schnittstellen.ts',
 		'export const MITTEILUNG_ADMIN_SCHNITTSTELLEN = {\n\tgetVereinMitteilungen,\n\tpostVereinSenden\n} satisfies Record<string, AdminHandler>;'
 	];
 	const pfad = 'src/routes/api/benachrichtigungen/+server.ts';
@@ -371,21 +377,38 @@ describe('Mitteilungen ausserhalb von api/admin', () => {
 		).toEqual([
 			`${pfad}: nur Routen unter src/routes/api/admin/ dürfen 'holeMitteilungAdminDienste' nutzen`
 		]);
+		// Seit Schritt 11 am Pfad der Datei der Verwaltung, nicht mehr am Namen.
 		expect(
 			pruefe(
-				gut.replace('{ getBenachrichtigungen }', '{ getBenachrichtigungen, postVereinSenden }')
+				`${gut}\nimport { postVereinSenden } from '../../../lib/server/mitteilung/verwaltung-schnittstellen.ts';`
 			)
-		).toEqual([`${pfad}: nur Routen unter src/routes/api/admin/ dürfen 'postVereinSenden' nutzen`]);
+		).toEqual([
+			`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/mitteilung/verwaltung-schnittstellen.ts nutzen`
+		]);
 		expect(pruefe("import { holeMitteilungAdminDienste } from '$lib/server/dienste';")).toEqual([
 			`${pfad}: nur Routen unter src/routes/api/admin/ dürfen 'holeMitteilungAdminDienste' nutzen`
 		]);
-		// Ohne Namen liesse sich nicht prüfen, was die Route nutzt.
+		// Ohne Namen liesse sich nicht prüfen, was die Route nutzt; die Datei der Verwaltung ist ganz
+		// gesperrt.
 		for (const quelle of [
 			"import * as m from '../../../lib/server/dienste.ts';",
-			"const m = await import('../../../lib/server/mitteilung/schnittstellen.ts');",
-			"export * from '../../../lib/server/mitteilung/schnittstellen.ts';"
+			"const m = await import('../../../lib/server/mitteilung/verwaltung-schnittstellen.ts');",
+			"export * from '../../../lib/server/mitteilung/verwaltung-schnittstellen.ts';"
 		]) {
 			expect(pruefe(quelle)).toHaveLength(1);
+		}
+	});
+	// Die eine erwartete Lockerung von Schritt 11 (D.11): Die Datei der Mitglieder enthält keine
+	// Schnittstelle der Verwaltung mehr und ist ausserhalb von api/admin frei wie jede andere.
+	it('RR-07: die Datei der Mitglieder ist ausserhalb von api/admin in jeder Form frei', () => {
+		const m = '../../../lib/server/mitteilung/schnittstellen';
+		for (const quelle of [
+			`import * as m from '${m}.ts';`,
+			`const m = await import('${m}.ts');`,
+			`export * from '${m}';`,
+			`export { postThemen } from '$lib/server/mitteilung/schnittstellen';`
+		]) {
+			expect(pruefe(`${gut}\n${quelle}`), quelle).toEqual([]);
 		}
 	});
 });
@@ -470,7 +493,12 @@ describe('Verwaltung der Anlässe (anlass/verwaltung-schnittstellen.ts)', () => 
 describe.each([
 	['turnier/schnittstellen.ts', 'TURNIER_SCHNITTSTELLEN', 'getTurniere'],
 	['cm/verwaltung-schnittstellen.ts', 'CM_ADMIN_SCHNITTSTELLEN', 'getAnmeldungen'],
-	['gespraech/verwaltung-schnittstellen.ts', 'GESPRAECH_ADMIN_SCHNITTSTELLEN', 'getGespraeche']
+	['gespraech/verwaltung-schnittstellen.ts', 'GESPRAECH_ADMIN_SCHNITTSTELLEN', 'getGespraeche'],
+	[
+		'mitteilung/verwaltung-schnittstellen.ts',
+		'MITTEILUNG_ADMIN_SCHNITTSTELLEN',
+		'getVereinMitteilungen'
+	]
 ])('Verwaltung am Pfad gesperrt: %s', (datei, konstante, name) => {
 	const listen: [string, string][] = [
 		[
@@ -513,6 +541,8 @@ describe.each([
 			`import { ${name} } from '${v}.js';`,
 			`import { ${name} } from '$lib/server/${ohneEndung}';`,
 			`import { ${name} as g } from '${v}.ts';`,
+			`import { '${name}' as g } from '${v}.ts';`,
+			`import { '${name.slice(0, -1)}\\x${name.charCodeAt(name.length - 1).toString(16)}' as g } from '${v}.ts';`,
 			`import type { ${konstante} } from '${v}.ts';`,
 			`import * as a from '${v}.ts';`,
 			`export { ${name} } from '${v}.ts';`,
@@ -536,7 +566,7 @@ describe('Namen in Anführungszeichen', () => {
 		'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
 	];
 	const mListe: [string, string] = [
-		'src/lib/server/mitteilung/schnittstellen.ts',
+		'src/lib/server/mitteilung/verwaltung-schnittstellen.ts',
 		'export const MITTEILUNG_ADMIN_SCHNITTSTELLEN = {\n\tpostVereinSenden\n} satisfies Record<string, unknown>;'
 	];
 	const admin = 'src/routes/api/admin/mitglieder/[id]/+server.ts';
@@ -595,15 +625,16 @@ describe('Namen in Anführungszeichen', () => {
 				`${mitglied}: aus dienste.ts nur Einstiege der Mitglieder, nicht 'holeBremsen'; erlaubt sind nur holeLoginDienst, holePasskeyDienst, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste`
 			],
 			[
-				"export { 'postVereinSenden' as p } from '../../../lib/server/mitteilung/schnittstellen.ts';",
-				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen 'postVereinSenden' nutzen`
+				"export { 'postVereinSenden' as p } from '../../../lib/server/mitteilung/verwaltung-schnittstellen.ts';",
+				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen lib/server/mitteilung/verwaltung-schnittstellen.ts nutzen`
 			]
 		]) {
 			expect(pruefe(mitglied, `${mitgliedGut}\n${zeile}`), zeile).toEqual([befund]);
 		}
 	});
 	it('RR-07: ein Name in Anführungszeichen mit Escape ist ein Befund', () => {
-		// Die Prüfung entschlüsselt keine Escapes: gesperrt im Zweifel, auch bei der Sperrliste.
+		// Die Prüfung entschlüsselt keine Escapes: gesperrt im Zweifel, auch bei der Erlaubt-Liste der
+		// Einstiege aus dienste.ts.
 		for (const [pfad, zeile, name] of [
 			[
 				admin,
@@ -612,8 +643,8 @@ describe('Namen in Anführungszeichen', () => {
 			],
 			[
 				mitglied,
-				"import { 'postVereinSende\\x6e' as p } from '../../../lib/server/mitteilung/schnittstellen.ts';",
-				"'postVereinSende\\x6e'"
+				"import { 'holeProfilDienst\\x65' as p } from '../../../lib/server/dienste.ts';",
+				"'holeProfilDienst\\x65'"
 			]
 		]) {
 			expect(pruefe(pfad, `${pfad === admin ? adminGut : mitgliedGut}\n${zeile}`), zeile).toEqual([
@@ -641,7 +672,7 @@ describe('Text in Anführungszeichen verschluckt keinen Import', () => {
 			'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
 		],
 		[
-			'src/lib/server/mitteilung/schnittstellen.ts',
+			'src/lib/server/mitteilung/verwaltung-schnittstellen.ts',
 			'export const MITTEILUNG_ADMIN_SCHNITTSTELLEN = {\n\tpostVereinSenden\n} satisfies Record<string, unknown>;'
 		],
 		[
@@ -669,8 +700,8 @@ describe('Text in Anführungszeichen verschluckt keinen Import', () => {
 				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
 			],
 			[
-				"import { postVereinSenden } from '../../../lib/server/mitteilung/schnittstellen.ts';",
-				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen 'postVereinSenden' nutzen`
+				"import { postVereinSenden } from '../../../lib/server/mitteilung/verwaltung-schnittstellen.ts';",
+				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen lib/server/mitteilung/verwaltung-schnittstellen.ts nutzen`
 			],
 			[
 				"import { getAdminAnlaesse } from '../../../lib/server/anlass/verwaltung-schnittstellen.ts';",
@@ -721,7 +752,7 @@ describe('betrifftBauregel', () => {
 		'src/lib/server/turnier/schnittstellen.ts',
 		'src/lib/server/cm/verwaltung-schnittstellen.ts',
 		'src/lib/server/gespraech/verwaltung-schnittstellen.ts',
-		'src/lib/server/mitteilung/schnittstellen.ts',
+		'src/lib/server/mitteilung/verwaltung-schnittstellen.ts',
 		'src/lib/server/anlass/verwaltung-schnittstellen.ts'
 	])('prüft %s', (pfad) => {
 		expect(betrifftBauregel(pfad)).toBe(true);
@@ -729,5 +760,7 @@ describe('betrifftBauregel', () => {
 	it('lässt andere Dateien aus', () => {
 		expect(betrifftBauregel('src/lib/server/status.ts')).toBe(false);
 		expect(betrifftBauregel('src/lib/server/anlass/schnittstellen.ts')).toBe(false);
+		expect(betrifftBauregel('src/lib/server/mitteilung/schnittstellen.ts')).toBe(false);
+		expect(betrifftBauregel('src/lib/server/gespraech/schnittstellen.ts')).toBe(false);
 	});
 });

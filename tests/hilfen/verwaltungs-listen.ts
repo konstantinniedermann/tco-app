@@ -3,7 +3,7 @@ import { ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/admin/schnittstellen.
 import { ANLASS_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/anlass/verwaltung-schnittstellen.ts';
 import { CM_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/cm/verwaltung-schnittstellen.ts';
 import { GESPRAECH_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/gespraech/verwaltung-schnittstellen.ts';
-import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/mitteilung/schnittstellen.ts';
+import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../../src/lib/server/mitteilung/verwaltung-schnittstellen.ts';
 import type { MitteilungAdminDienste } from '../../src/lib/server/mitteilung/typen.ts';
 import { TURNIER_SCHNITTSTELLEN } from '../../src/lib/server/turnier/schnittstellen.ts';
 
