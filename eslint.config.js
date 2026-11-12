@@ -10,8 +10,8 @@ import { defineConfig } from 'eslint/config';
 //   1. `db/` importiert aus dem Server nichts; die Dateien direkt unter `src/lib/server/` importieren
 //      nur `db/` (dazu gehört `http.ts`).
 //   2. `login/` importiert kein Thema.
-//   3. Die Themen importieren nicht die Schnittstellen-Dateien (`schnittstellen.ts`,
-//      `passkey-schnittstellen.ts`) eines anderen Moduls.
+//   3. Die Themen importieren nicht die Schnittstellen-Dateien (`schnittstellen.ts` und jede
+//      `<vorsatz>-schnittstellen.ts` wie `passkey-` oder `verwaltung-`) eines anderen Moduls.
 //   4. `dienste.ts` (Zusammenbau der Dienste) ist die oberste Schicht, in beide Richtungen: Sie darf
 //      alles importieren und steht darum in keinem Block, und kein Modul unter `src/lib/server/`
 //      importiert sie (eigenes Muster in `gruppe()`; `db` meldet sie mit seiner eigenen Regel).
@@ -25,7 +25,8 @@ import { defineConfig } from 'eslint/config';
 const SERVER = 'src/lib/server';
 const THEMEN = ['admin', 'anlass', 'brief', 'cm', 'gespraech', 'mitteilung', 'profil', 'turnier'];
 const JEDE_DATEI = '[^/]+';
-const SCHNITTSTELLEN = '(?:passkey-)?schnittstellen';
+// Vorsatz aus Kleinbuchstaben mit Bindestrich: `passkey-schnittstellen`, `verwaltung-schnittstellen`.
+const SCHNITTSTELLEN = '(?:[a-z]+-)?schnittstellen';
 const ENDUNG = '(?:\\.(?:ts|js))?';
 const DIENSTE = 'dienste';
 

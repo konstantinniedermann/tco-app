@@ -37,7 +37,11 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 		['db/neu.ts', "import { x } from '..';"],
 		// Endung .js wie .ts
 		['anlass/neu.ts', "import { x } from '../cm/schnittstellen.js';"],
-		['login/neu.ts', "import { x } from '../admin/rollen.js';"]
+		['login/neu.ts', "import { x } from '../admin/rollen.js';"],
+		// Schnittstellen-Dateien mit Vorsatz (Schritt 09): `verwaltung-schnittstellen.ts`
+		['cm/neu.ts', "import { x } from '../anlass/verwaltung-schnittstellen.ts';"],
+		['admin/neu.ts', "import { x } from '$lib/server/anlass/verwaltung-schnittstellen';"],
+		['turnier/neu.ts', "export { x } from '../anlass/verwaltung-schnittstellen.js';"]
 	])('meldet in %s den Import %s', async (datei, code) => {
 		// Mehr als eine Meldung ist möglich (`../admin` aus db: als Datei und als Modul).
 		expect((await meldungen(datei, code)).length).toBeGreaterThan(0);
@@ -46,6 +50,9 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 	it.each([
 		['anlass/neu.ts', "import { x } from '../cm/angaben.ts';"],
 		['anlass/neu.ts', "import { x } from './schnittstellen.ts';"],
+		['anlass/neu.ts', "import { x } from './verwaltung-schnittstellen.ts';"],
+		// Fachlogik mit «schnittstellen» im Namen, aber ohne Bindestrich davor, ist keine.
+		['anlass/neu.ts', "import { x } from '../cm/verwaltungschnittstellen.ts';"],
 		['anlass/neu.ts', "import { x } from '../../turnier/zeit.ts';"],
 		['login/neu.ts', "import { x } from '../db/index.ts';"],
 		['datum.ts', "import { x } from './db/index.ts';"]
