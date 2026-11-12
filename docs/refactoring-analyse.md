@@ -28,8 +28,8 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 |---|---|
 | **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b), **Etappe 1 freigegeben** (E-30) |
 | **Erledigte Schritte** | 01 Startpaket, 02 E2E-Flakes, 03 Vertragstests, 04 Hilfsmittel für Etappe 2, 05 Lint-Regeln für die Richtung der Importe (Kurzfassung in 7.2, Protokoll in Anhang C); 06 Grundbausteine in `http.ts` (Review «ok», Version 0.20.10; Ergebnis in 7.3, Protokoll in Anhang D.1) |
-| **Zuletzt erledigt** | **11, Lauf 1** umgesetzt, Review offen (Anhang D.12). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **11** CM-, Gesprächs- und Mitteilungs-Verwaltung in eigene Dateien, in zwei Läufen des Implementers mit je eigenem Review, ein Branch, ein Merge, eine Version (Orchestrator, 12.11.2026; F-22 nicht gestellt). **Lauf 1 (Turnier, CM, Gespräch) umgesetzt, Review offen** (Branch `refactor/schritt-11`, Anhang D.12): `cm/verwaltung-schnittstellen.ts` (13) und `gespraech/verwaltung-schnittstellen.ts` (4) mit eigenen Listen, `TURNIER_SCHNITTSTELLEN` 9, drei Zeilen `pfad` in der Bauregel, `AUSNAHMEN` ist leer; vorab eindeutige Turnierjahre in den Datenbanktests (Flake aus `docs/beobachtungen.md`, erledigt). **Lauf 2 offen:** Mitteilungen samt Streichen der Sperrliste nach Namen und des toten Codes der Bauregel. Danach 12 (nur noch Nachweis) |
+| **Zuletzt erledigt** | **11** umgesetzt (Lauf 1 Review «ok», Lauf 2 Review offen; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
+| **Nächster offener Schritt** | **11** umgesetzt in zwei Läufen (Branch `refactor/schritt-11`): **Review von Lauf 2 und Merge offen** (eine Version für den ganzen Schritt; Ergebnis in 7.3, Protokoll in D.12 und D.13). Lauf 1 (Turnier, CM, Gespräch) Review «ok»; Lauf 2 (Mitteilungen in `mitteilung/verwaltung-schnittstellen.ts`, Sperrliste nach Namen und toter Code der Bauregel gestrichen) umgesetzt. Danach **12**: nur noch Nachweis, `AUSNAHMEN` ist schon leer (Hinweise zu Schritt 12) |
 | **Wartet auf Freigabe des Projektleiters** | nichts. F-17, F-20 und F-21 sind beantwortet (E-36 bis E-38), die Abweichungen der Schritte 07 und 08 gebilligt (E-39); der Orchestrator arbeitet in der laufenden Session ohne Halt weiter (E-40) |
 | **Offene Fragen** | **F-22** (Schritt 11 als ein Schritt oder in zwei Teilen 11a und 11b; Empfehlung zwei Teile; ohne Antwort gilt der Plan, ein Schritt) und **F-23** (Wortlaut der Regel zu neuen Verwaltungs-Listen in der `CLAUDE.md`): beide ohne Frist, halten Schritt 11 nicht auf, Abschnitt 9.1 und Anhang D.11. **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. F-17, F-20 und F-21 stehen noch in 9.1, sind aber beantwortet (E-36 bis E-38) |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
@@ -555,6 +555,7 @@ Aufwand oder birgt ein benennbares Risiko; **niedrig** = Schönheitsfehler oder 
 - **Einordnung:** Keine der Abhängigkeiten ist ein Fehler zur Laufzeit. Der Befund betrifft
   Auffindbarkeit und Änderbarkeit. Wie weit neu geschnitten wird, ist Frage F-06.
 - **Entschieden (E-12):** nur die klaren Fälle (Schritte 09 bis 11); `admin/` bleibt ein Modul.
+- **Stand nach Schritt 11 (12.11.2026):** Die Schnittstellen der CM-Anmeldungsverwaltung stehen in `cm/verwaltung-schnittstellen.ts`, die der Verwaltung des Gesprächs in `gespraech/verwaltung-schnittstellen.ts`, die der Mitteilungs-Verwaltung in `mitteilung/verwaltung-schnittstellen.ts`; `turnier/schnittstellen.ts` hat nur noch Turnier und Kategorien. Keine Datei importiert mehr die Schnittstellen eines anderen Moduls (`AUSNAHMEN` leer). Fachlogik-Importe zwischen Themen gibt es weiter in beide Richtungen (z. B. `cm` → `turnier/turniere.ts` und `turnier` → `cm/anmeldungen.ts`, `turnier` → `cm/verwaltung-meldung.ts`); sie sind nach Zielbild erlaubt, der Schritt hat sie nicht verringert (D.11).
 - **Stand nach Schritt 10 (12.11.2026):** `login` → `admin` zählte zwei Dateien (`login/schnittstellen.ts` für `getSitzung`, `login/sitzung.ts` für den Typ `AnsichtRolle`). Beide sind weg: `getSitzung` steht im Thema `sitzung/`, der Typ in `login/sitzung.ts`; `login` importiert kein Thema mehr (D.9, D.10).
 - **Nachmessen (Schritt 05, 11.11.2026):** Die Zahlen stimmen unverändert. Als Verletzung der Zielrichtung zählen davon nur Importe von Schnittstellen-Dateien und die von `login` aus (19 Stellen, alle in `AUSNAHMEN`, `eslint.config.js`); die Fachlogik-Importe zwischen Themen (z. B. `cm` → `admin/mitglieder.ts`) sind nach Zielbild erlaubt und nicht erfasst.
 
@@ -846,6 +847,10 @@ ihm im Weg steht.
   `VERWALTUNGS_DATEIEN`. Eine Liste, die in der Datei der Tests fehlt, macht den Routen-Test rot; eine,
   die in der Tabelle fehlt, macht die Bauregel am echten Repo rot (beides belegt, D.8). Die Schleifen
   je Modul (`admin` 21, `turnier` 26, `mitteilung` 6, `anlass` 5) bleiben zusätzlich, mit fester Zahl.
+- **Stand nach Schritt 11 (D.12, D.13):** weiter zwei Stellen, jetzt mit sechs Listen; je Modul eine
+  Rechte-Schleife mit fester Zahl (`admin` 21, `turnier` 9, `cm` 13, `gespraech` 4, `mitteilung` 6,
+  `anlass` 5). Die Fundstelle `mitteilung/admin-schnittstellen.db.test.ts` heisst jetzt
+  `mitteilung/verwaltung-schnittstellen.db.test.ts`.
 
 #### B-31 — Einige E2E-Tests hängen an Einzelheiten, die Etappe 2 ändert · mittel · [G]
 
@@ -1339,7 +1344,7 @@ bewusst nicht. Protokoll: Anhang C.5.
 | 08 | [geändert] Eine Fehlerform und eine Liste der Fehlerwörter; Oberfläche im selben Schritt angepasst (B-15, B-29). Dazu gehört das 401 mit `{}` von Passkey und `getSitzung`. **[geändert]** Was neben `fehler` und `felder` im Körper stehen darf, ist F-21; die Ergebnisse der Abruf-Module bleiben in diesem Schritt gleich (Anhang D.5). Einzelheiten: Hinweise zu Schritt 08 | `src/lib/server/*/schnittstellen.ts`, `login/passkey-schnittstellen.ts` und `login/schnittstellen.ts` (401 `{}`) mit ihren Gegenstücken in der Oberfläche; neue geteilte Datei für die Fehlerwörter; `src/lib/anlass/api.ts`, `src/lib/verwaltung/mitteilung-api.ts`, `src/lib/cm/api.ts`; `grundpruefung.db.test.ts` (`OHNE_SITZUNG_ANDERS`); betroffene Tests. **[geändert]** Dazu `src/lib/server/http.ts` (dort wird die Form zum Typ), `admin/rechte.ts`, `src/lib/verwaltung/api.ts`, `push/api.ts`, `profil/angaben.ts`, `login/anmelden.ts`, die neun Einheitstests der Abruf-Module, `tests/e2e/anlass.test.ts` und `verwaltung.test.ts` (drei Stellen). Keine Seite, keine Route; für das 401 `{}` ändert sich keine Datei der Oberfläche (Anhang D.5) | Voraussetzung für Schritt 13; ein Übersetzer entfällt | mittel (Verhaltensänderung an internen Schnittstellen) | Schritt 03 wird bewusst an genau diesen Stellen angepasst; E2E Anlass und Mitteilungen. **[geändert]** Server und Abruf-Module sind beide gegen die gemeinsame Liste getippt (ein fehlendes Wort macht `svelte-check` rot); Einheitstests der Abruf-Module und die `page.route`-Stellen der Prüfliste (b) nehmen ihre Wörter aus der Liste, nicht als Text. **[geändert]** «Aus der Liste» heisst: gegen die Liste getippt (Helfer der Tests). Die genannten E2E laufen die geänderten Fehlerwege nicht ab; das Netz sind die Tests der Module beider Seiten, in denen nur die gefütterte Antwort wechselt, nicht das erwartete Ergebnis. Für `getSitzung` zuerst eine Erwartung an den Körper (Anhang D.5) | 06 (E-18: Format darf sich ändern, Server und Oberfläche im selben Schritt) | Opus | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.5).** War: vollständige Liste aller Abweichungen von der Fehlerform über alle `schnittstellen.ts` und alle Abruf-Module; die Stellen mit `page.route` aus der Prüfliste (b) in 7.4 (Pfade und Fehlerwort); welche Dateien der Oberfläche das 401 `{}` deuten | **erledigt** 12.11.2026, Review «ok», Version 0.20.13 (Branch `refactor/schritt-08`: `refactor:` `ec52ab7`, `eb054ab`, `c8ef953`, `8cf5734`, `ae408d7`, `404eaca`). Ergebnis unten, Protokoll Anhang D.6 |
 | 09 | [geändert] Verwaltung der Anlässe liegt beim Thema Anlass (B-14), nach dem Muster aus F-17. Streicht keine Ausnahme und braucht keine neue (`liest` und `schreibt` kommen seit 06a aus `admin/rechte.ts`). Der Schritt ändert den Schutz der Bauregel, nicht nur feste Pfade. **[geändert]** Umfang nach dem Nachmessen: fünf Funktionen (44 von 500 Zeilen), drei Routen; bei Variante A ändert sich dazu das Lint-Muster für Schnittstellen-Dateien, `AUSNAHMEN` bleibt unberührt (Anhang D.7). Einzelheiten: Hinweise zu Schritt 09 | `src/lib/server/admin/schnittstellen.ts`, `src/lib/server/anlass/`, Routen `src/routes/api/admin/anlaesse/`, `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`, `rechte-matrix.db.test.ts`, `grundpruefung.db.test.ts`, `routen.test.ts`. **[geändert]** Dazu `admin/schnittstellen.db.test.ts` (zwei Schleifen 26 → 21, die 415-Liste, der Test A-ANLASS-01 zieht um), eine neue Testdatei in `anlass/`, `docs/ci-cd-und-release.md` und `docs/arc42.md` (nennen die drei Listen); bei Variante A `eslint.config.js` (Muster `SCHNITTSTELLEN`) und `scripts/importrichtung.test.ts`. Von den sechs Routen unter `api/admin/anlaesse/` ändern sich drei (Anhang D.7) | `admin/schnittstellen.ts` wird kleiner; Thema an einem Ort | **mittel** (vorher niedrig: neue Verwaltungs-Liste, Bauregel) | **[neu] Charakterisierungstest vorab (erster Commit):** eine Schleife «ohne Sitzung 401, ohne Rolle 403 `kein-admin`, unbestätigt 403 `unbestaetigt`» über **alle** Verwaltungs-Listen an einer Stelle (Grundprüfung, `verwaltungsDienste()`), mit den vier benannten Ausnahmen. Dazu Rechte-Matrix-Test, `tests/e2e/anlass.test.ts`, Routen-Test und Grundprüfung; je geändertes Muster der Bauregel ein Fall in `bauregel.test.ts`, einmal rot; der Reviewer liest den Diff an `bauregel.ts` ganz. **[geändert]** Die Ausnahmen gelten je Erwartung, nicht pauschal: 401 ohne Ausnahme, `kein-admin` mit einer, `unbestaetigt` mit vier. Die Menge der Listen nehmen Schleife, Routen-Test und Rechte-Matrix aus einer gemeinsamen Stelle der Tests, sonst bleiben sie getrennt geführt. Bei Variante A ein Lint-Fall für den neuen Dateinamen, einmal rot (Anhang D.7) | 06a, 07; **F-17 beantwortet** | Opus | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.7).** War: die zwei Muster für Verwaltungs-Schnittstellen ausserhalb von `admin/` am Code gegenüberstellen (eigene Datei je Modul mit eigener Liste, oder gemischte Datei mit Namens-Wächter) und was jedes an `bauregel.ts` ändert; Ergebnis ist die Grundlage für F-17 | **umgesetzt** 12.11.2026, Review und Merge offen (Branch `refactor/schritt-09`: `test:` `c1f0022`, `refactor:` `ca51c35`, `fix:` `061093c`, `refactor:` `4caea15`, `refactor:` `3660bda`, dazu der `docs:`-Commit; Korrekturrunde nach dem Review `fix:` `7a3d1e0`, `test:` `cd1454e`). Ergebnis unten, Protokoll Anhang D.8 |
 | 10 | [geändert] `login` hängt nicht mehr von `admin` und `gespraech` ab: Die Antwort von `/api/sitzung` wird ausserhalb von `login` gebaut (B-14); der Typ `AnsichtRolle` zieht nach unten (`login/` oder `db/`). Streicht drei Ausnahmen. **[geändert]** Ort nach dem Nachmessen: neues Modul `sitzung/` mit `sitzung/schnittstellen.ts`, `getSitzung` Zeichen für Zeichen; `ANSICHT_ROLLEN` und `AnsichtRolle` nach `login/sitzung.ts` (Anhang D.9). Einzelheiten: Hinweise zu Schritt 10 | `src/lib/server/login/schnittstellen.ts` → `getSitzung` (neuer Ort nach dem Nachmessen), `login/sitzung.ts`, `admin/rollen.ts`, Route `src/routes/api/sitzung/+server.ts`, `scripts/importrichtung.test.ts`, `eslint.config.js` (`AUSNAHMEN`), Tests. **[geändert]** Dazu neu `src/lib/server/sitzung/schnittstellen.ts`; in `eslint.config.js` auch `THEMEN`; fünf Testdateien und `routen.test.ts` nur an der Import-Zeile (`login/schnittstellen.db.test.ts`, `login/passkey-schnittstellen.db.test.ts`, `admin/schnittstellen.db.test.ts`, `admin/ansicht.db.test.ts`, `gespraech/schnittstellen.db.test.ts`); `docs/context-scopes.md` und `docs/arc42.md` (nennen die Module). Die Route ändert nur ihre Import-Zeile; `bauregel.ts` ist nicht betroffen (Anhang D.9) | Ein Zyklus weniger; Login ist wieder unterste Schicht | niedrig | `login/schnittstellen.db.test.ts` (zieht mit), Routen-Test (`OHNE_LISTE`), E2E Startseite und Navigation. **[geändert]** Die Tests ziehen nicht um: `getSitzung` rufen fünf Testdateien (14 Aufrufe), es ändert sich je nur der Import. Dazu die Lint-Probe «Ausnahme ist noch nötig» (wird rot, solange einer der drei Einträge stehen bleibt) und Lint grün ohne sie; in `importrichtung.test.ts` zwei Fälle auf eine gestellte Ausnahme umstellen (Anhang D.9) | 06 | **Opus** (vorher Sonnet), solange das Ziel für `getSitzung` nicht feststeht. **[geändert]** Das Ziel steht fest (Anhang D.9); nach dem Wortlaut genügt Sonnet | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.9).** War: den Ort für `getSitzung` festlegen (Bedingungen in den Hinweisen); kein Entscheid des Projektleiters nötig | **erledigt** 12.11.2026, Review «ok», Version 0.20.16 (Branch `refactor/schritt-10`: `test:` `99d6bb2`, `refactor:` `1958575`, `2b4035f`, `docs:` `1878907`). Ergebnis unten, Protokoll Anhang D.10 |
-| 11 | [geändert] Schnitt nach E-12, nur die klaren Fälle: Die Schnittstellen der CM-Anmeldungsverwaltung ziehen von `turnier/schnittstellen.ts` zu `cm`, die des Gesprächs bekommen in `gespraech` ihre eigene Liste (sie liegen schon dort). `admin/` wird nicht aufgeteilt. Muster wie Schritt 09 (F-17). Streicht die Ausnahme `turnier/schnittstellen.ts` → `gespraech/schnittstellen.ts`. **[geändert]** Umfang nach dem Nachmessen: Zuordnung 9 Turnier (bleiben), 13 CM, 4 Gespräch bestätigt. Nach Variante A (E-38) drei neue Dateien `cm/`, `gespraech/` und `mitteilung/verwaltung-schnittstellen.ts` mit je eigener Liste; mit den Mitteilungen 23 Funktionen und 20 von 50 Admin-Routen. Die Hilfe `melde` brauchen Turnier und CM, vier Hilfen des Gesprächs beide Seiten: je eine Fachdatei. In der Bauregel fällt die Sperrliste nach Namen ganz weg (keine Zeile `namen`, keine `offen`). `AUSNAHMEN` ist damit schon nach diesem Schritt leer. Empfohlen in zwei Teilen 11a und 11b (F-22; Anhang D.11). Einzelheiten: Hinweise zu Schritt 11 | `src/lib/server/turnier/schnittstellen.ts`, `cm/`, `gespraech/`, Routen unter `src/routes/api/admin/`, `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`, `rechte-matrix.db.test.ts`, `grundpruefung.db.test.ts`, `routen.test.ts`, `eslint.config.js` (`AUSNAHMEN`). **[geändert]** Dazu `src/lib/server/mitteilung/`, `tests/hilfen/verwaltungs-listen.ts`, `turnier/schnittstellen.db.test.ts` (wird geteilt), eine neue Testdatei in `cm/`, `gespraech/schnittstellen.db.test.ts`, `mitteilung/admin-schnittstellen.db.test.ts`, `scripts/importrichtung.test.ts`, `docs/ci-cd-und-release.md`, `docs/arc42.md`, `docs/context-scopes.md`. `grundpruefung.db.test.ts` braucht keine Änderung, `routen.test.ts` nur Importe (Anhang D.11) | Ordnername sagt, wo etwas liegt | mittel (viele Routen, Prüfskript). **[geändert]** Bei den Mitteilungen liegt das Risiko im Wegfall von Schutz-Code der Bauregel, nicht im Verschieben | Rechte-Matrix-Test, alle `cm-*`-E2E, `turnier.test.ts`; Routen-Test und Grundprüfung mit der Schleife aus Schritt 09 über die neuen Listen; je geändertes Muster der Bauregel ein Fall in `bauregel.test.ts`, einmal rot. **[geändert]** Die Schleife aus Schritt 09 prüft den Bereich nicht: vorab ein Charakterisierungstest «Bereich `cm`» über die 26 Namen (Mitglieder-Admin 403 `kein-admin`, CM-Admin weder 401 noch 403), der durch den Umzug unverändert bleibt; die Schleife je Modul wird 9, 13 und 4. Vorab eine zweite gestellte Ausnahme in `importrichtung.test.ts` (Datei in einem Thema, zwei Ziele) und die Prüfung, ob `it.each` über die leere Liste grün bleibt (stand bei Schritt 12). Für die Mitteilungen dazu `tests/e2e/mitteilungen.test.ts`; rund acht Stellen in `bauregel.test.ts` werden von der Sperrliste auf den Pfad umgestellt, der Reviewer liest den Diff an `bauregel.ts` ganz und vergleicht gegen `dev` mit der einen erwarteten Abweichung (Anhang D.11) | 06a, 07, 09 (E-12; Muster nach F-17) | Opus | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.11).** War: `turnier/schnittstellen.ts` (ab Zeile 110), `gespraech/schnittstellen.ts` und `cm/verwaltung*.ts` sind nur in Auszügen gelesen; vorab die genaue Zuordnung der 26 Einträge von `TURNIER_SCHNITTSTELLEN` festhalten | **Lauf 1 umgesetzt, Review offen; Lauf 2 (Mitteilungen) offen** (12.11.2026, Branch `refactor/schritt-11`, Anhang D.12) |
+| 11 | [geändert] Schnitt nach E-12, nur die klaren Fälle: Die Schnittstellen der CM-Anmeldungsverwaltung ziehen von `turnier/schnittstellen.ts` zu `cm`, die des Gesprächs bekommen in `gespraech` ihre eigene Liste (sie liegen schon dort). `admin/` wird nicht aufgeteilt. Muster wie Schritt 09 (F-17). Streicht die Ausnahme `turnier/schnittstellen.ts` → `gespraech/schnittstellen.ts`. **[geändert]** Umfang nach dem Nachmessen: Zuordnung 9 Turnier (bleiben), 13 CM, 4 Gespräch bestätigt. Nach Variante A (E-38) drei neue Dateien `cm/`, `gespraech/` und `mitteilung/verwaltung-schnittstellen.ts` mit je eigener Liste; mit den Mitteilungen 23 Funktionen und 20 von 50 Admin-Routen. Die Hilfe `melde` brauchen Turnier und CM, vier Hilfen des Gesprächs beide Seiten: je eine Fachdatei. In der Bauregel fällt die Sperrliste nach Namen ganz weg (keine Zeile `namen`, keine `offen`). `AUSNAHMEN` ist damit schon nach diesem Schritt leer. Empfohlen in zwei Teilen 11a und 11b (F-22; Anhang D.11). Einzelheiten: Hinweise zu Schritt 11 | `src/lib/server/turnier/schnittstellen.ts`, `cm/`, `gespraech/`, Routen unter `src/routes/api/admin/`, `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`, `rechte-matrix.db.test.ts`, `grundpruefung.db.test.ts`, `routen.test.ts`, `eslint.config.js` (`AUSNAHMEN`). **[geändert]** Dazu `src/lib/server/mitteilung/`, `tests/hilfen/verwaltungs-listen.ts`, `turnier/schnittstellen.db.test.ts` (wird geteilt), eine neue Testdatei in `cm/`, `gespraech/schnittstellen.db.test.ts`, `mitteilung/admin-schnittstellen.db.test.ts`, `scripts/importrichtung.test.ts`, `docs/ci-cd-und-release.md`, `docs/arc42.md`, `docs/context-scopes.md`. `grundpruefung.db.test.ts` braucht keine Änderung, `routen.test.ts` nur Importe (Anhang D.11) | Ordnername sagt, wo etwas liegt | mittel (viele Routen, Prüfskript). **[geändert]** Bei den Mitteilungen liegt das Risiko im Wegfall von Schutz-Code der Bauregel, nicht im Verschieben | Rechte-Matrix-Test, alle `cm-*`-E2E, `turnier.test.ts`; Routen-Test und Grundprüfung mit der Schleife aus Schritt 09 über die neuen Listen; je geändertes Muster der Bauregel ein Fall in `bauregel.test.ts`, einmal rot. **[geändert]** Die Schleife aus Schritt 09 prüft den Bereich nicht: vorab ein Charakterisierungstest «Bereich `cm`» über die 26 Namen (Mitglieder-Admin 403 `kein-admin`, CM-Admin weder 401 noch 403), der durch den Umzug unverändert bleibt; die Schleife je Modul wird 9, 13 und 4. Vorab eine zweite gestellte Ausnahme in `importrichtung.test.ts` (Datei in einem Thema, zwei Ziele) und die Prüfung, ob `it.each` über die leere Liste grün bleibt (stand bei Schritt 12). Für die Mitteilungen dazu `tests/e2e/mitteilungen.test.ts`; rund acht Stellen in `bauregel.test.ts` werden von der Sperrliste auf den Pfad umgestellt, der Reviewer liest den Diff an `bauregel.ts` ganz und vergleicht gegen `dev` mit der einen erwarteten Abweichung (Anhang D.11) | 06a, 07, 09 (E-12; Muster nach F-17) | Opus | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.11).** War: `turnier/schnittstellen.ts` (ab Zeile 110), `gespraech/schnittstellen.ts` und `cm/verwaltung*.ts` sind nur in Auszügen gelesen; vorab die genaue Zuordnung der 26 Einträge von `TURNIER_SCHNITTSTELLEN` festhalten | **umgesetzt, Review von Lauf 2 und Merge offen** (12.11.2026, Branch `refactor/schritt-11`; Lauf 1 Review «ok», Anhang D.12; Lauf 2 Anhang D.13) |
 | 12 | [geändert] Importregeln für die Richtung zwischen den Modulen scharf stellen: `AUSNAHMEN` in `eslint.config.js` ist leer (Liste und Erzeugung der Blöcke bleiben, kein Umbau). `bauregel.ts` **bleibt** in vollem Umfang, weil ihr Teil «Admin-Routen» das Bindeglied zu den Rechte-Tests ist (B-07); angepasst werden nur feste Pfade, soweit die Schritte 07, 09 und 11 das nicht schon getan haben. Einzelheiten: Hinweise zu Schritt 12 | `eslint.config.js`, `scripts/importrichtung.test.ts`; `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts` nur wo nötig | Neue Zyklen über Schnittstellen, `login` und die unterste Schicht fallen auf (nicht über Fachlogik zwischen Themen, siehe Schritt 05); die Sicherheitsregel bleibt unangetastet | niedrig | Jede Lint-Regel einmal absichtlich verletzen, auch die für `dienste.ts` aus Schritt 07; `bauregel.test.ts` grün; vorab prüfen, ob der Fall-Test `it.each(AUSNAHMEN …)` mit leerer Liste grün bleibt | 05, 06, 06a, 07, 09, 10, 11 | Sonnet | Subagent | nein | offen |
 
 Belege je Hinweis; Dateien unter `src/lib/server/`, wenn nichts anderes steht. Was die Schritte an
@@ -1589,6 +1594,16 @@ Merge offen)
 - **Für die Nutzerin:** nichts. Adresse, Methode, Status, Körper und Kopfzeilen bleiben.
 - **Folgt daraus:** Schritt 11 streicht die letzte Ausnahme; Schritt 12 leert eine Liste mit einem Eintrag. Die Fälle mit Datei-Ausnahme hängen nicht mehr an `AUSNAHMEN`.
 
+**Ergebnis Schritt 11** (12.11.2026; umgesetzt in zwei Läufen nach Anhang D.11, Review von Lauf 1
+«ok», Review von Lauf 2 und Merge offen; Protokoll in D.12 und D.13)
+
+- **Wo jetzt was liegt:** Jede Verwaltungs-Liste ausserhalb von `admin/` steht in einer eigenen Datei ihres Themas (Variante A von F-17, E-38): `turnier/schnittstellen.ts` mit `TURNIER_SCHNITTSTELLEN` (9, Turnier und Kategorien), `cm/verwaltung-schnittstellen.ts` mit `CM_ADMIN_SCHNITTSTELLEN` (13, Anmeldungs-Verwaltung), `gespraech/verwaltung-schnittstellen.ts` mit `GESPRAECH_ADMIN_SCHNITTSTELLEN` (4), `mitteilung/verwaltung-schnittstellen.ts` mit `MITTEILUNG_ADMIN_SCHNITTSTELLEN` (6), `anlass/verwaltung-schnittstellen.ts` (5, seit Schritt 09); dazu `admin/schnittstellen.ts` (25). Summe 62, davon 42 schreibend, unverändert. `mitteilung/schnittstellen.ts` und `gespraech/schnittstellen.ts` enthalten nur noch Schnittstellen der Mitglieder. Zwei Fachdateien für geteilte Hilfen: `cm/verwaltung-meldung.ts` (`melde`, Turnier und CM) und `gespraech/antworten.ts` (Prüfung des Texts und drei Antworten, Mitglieder und Verwaltung). 20 Admin-Routen ändern nur ihre Import-Zeile; Rechte weiter über `liest`/`schreibt`, Bereich `cm` bzw. `mitglieder`.
+- **Bauregel:** `VERWALTUNGS_DATEIEN` hat eine Zeile `ordner` (`admin/`) und fünf `pfad`; die Arten `namen` und `offen`, die Sperrliste nach Namen (`GEMISCHT`) und ihre zwei Zweige sind gestrichen. Ausserhalb von `api/admin/` ist jede Verwaltungs-Datei am Pfad gesperrt (damit sind die Lücke «für `turnier/` keine Regel» aus D.7 und die drei Schwächen der Sperrliste zu). Die eine gewollte Lockerung: `mitteilung/schnittstellen.ts` ist ausserhalb von `api/admin/` frei wie jede Datei der Mitglieder; strenger: Admin-Routen dürfen sie nicht mehr importieren. Belegt mit einem Vergleich alter gegen neuer Fassung über gestellte Fälle (D.13).
+- **Lint:** `AUSNAHMEN` ist leer (die letzte, `turnier/schnittstellen.ts` → `gespraech/schnittstellen.ts`, fiel in Lauf 1), keine neue.
+- **Netz:** Vorab hält die Rechte-Matrix den Bereich `cm` der 26 Schnittstellen beim Namen fest; jede neue Liste hat ihre Rechte-Schleife in der Testdatei ihres Moduls; `importrichtung.test.ts` prüft die Ausnahme-Mechanik an zwei gestellten Ausnahmen (eine davon mit zwei Zielen in einem Thema). Vorab ausserhalb des Plans: eindeutige Turnierjahre in den Datenbanktests (`tests/hilfen/turnierjahre.ts`, Flake aus `docs/beobachtungen.md`).
+- **Für die Nutzerin:** nichts. Jede Route behält Adresse, Methode, Einstieg und Funktion.
+- **Folgt daraus:** Schritt 12 leert nichts mehr, er weist nur nach (Hinweise zu Schritt 12).
+
 **Hinweise zu Schritt 10** [geändert]
 
 - **Nachmessen (12.11.2026, Anhang D.9), kein Entscheid des Projektleiters nötig:** Ort ist ein
@@ -1653,12 +1668,24 @@ Merge offen)
 
 - **Voraussetzung:** Alle 19 Ausnahmen sind abgebaut: acht in 06, sieben in 06a, drei in 10, eine
   in 11 (Schritt 09 streicht keine). Schritt 07 steht in der Voraussetzung, weil seine Regel für
-  `dienste.ts` zu «jede Regel einmal verletzen» gehört.
-- **Vorab prüfen:** ob der Fall-Test `it.each(AUSNAHMEN …)` in `scripts/importrichtung.test.ts`
-  («Ausnahme … ist noch nötig») mit leerer Liste grün bleibt; «bleibt dann grün» ist nicht belegt
-  [V]. Wird er rot oder meldet «keine Tests», passt der Schritt den Test an.
-- **`scripts/importrichtung.test.ts`** prüft bis dahin, dass keine Ausnahme veraltet ist (ESLint
-  ohne die Ausnahme muss die Datei melden).
+  `dienste.ts` zu «jede Regel einmal verletzen» gehört. **[neu] Erledigt mit Schritt 11:**
+  `AUSNAHMEN` ist `[]`; der Schritt leert nichts mehr, er weist nach.
+- **Vorab prüfen — erledigt in Schritt 11 (D.12):** Vitest 5.1 nimmt `it.each` über eine leere Liste
+  hin, wenn die Datei weitere Tests hat; die Probe «Ausnahme … ist noch nötig» erzeugt dann keinen
+  Fall. Die Ausnahme-Mechanik prüfen zwei gestellte Ausnahmen (`login/gestellt.ts` mit einem Ziel,
+  `cm/gestellt.ts` mit zwei Zielen in zwei Modulen); der Hinweis des Reviews aus D.10 ist damit
+  erledigt.
+- **Zu tun (aus dem Review von Lauf 1, D.13):** (1) ein Test `expect(AUSNAHMEN).toEqual([])`, damit
+  eine neue Ausnahme ohne Entscheid auffällt; (2) die Meldung der Lint-Regel «Heutige Verletzungen
+  stehen in AUSNAHMEN (eslint.config.js)» (`eslint.config.js`, Zeile 109) ist veraltet, ebenso der
+  Kopf von `importrichtung.test.ts`; (3) jede Lint-Regel einmal absichtlich verletzen, auch die
+  für `dienste.ts`; `bauregel.test.ts` grün.
+- **Zur Kenntnis für den Projektleiter (keine Änderung im Schritt):** Der Wortlaut der
+  `CLAUDE.md` «Statuscode und Antwort baut nur die Schnittstellen-Funktion» ist bei
+  `gespraech/antworten.ts` gedehnt (Antworten in einer Hilfsdatei zweier Schnittstellen-Dateien),
+  wie schon bei `admin/rechte.ts` (`liest`/`schreibt` bauen 401 und 403).
+- **`bauregel.ts`:** Nach Schritt 11 gibt es dort keine festen Pfade ausser der Tabelle
+  `VERWALTUNGS_DATEIEN` und `ADMIN_MODUL`; nichts mehr anzupassen.
 - **Nicht Teil des Schritts:** B-25 und Fachlogik-Importe zwischen Themen (Anhang C.5, «Bewusst
   nicht erfasst»); eine Ausnahme der Bauregel für Tests unter `src/routes/` (B-39).
 
@@ -1672,7 +1699,7 @@ Ergebnis der Zwischenrevision, aus dem Code gelesen, nichts ausgeführt.
 | 06a | Rechte-Matrix und die Schleifen je Liste; die Lint-Probe «Ausnahme ist noch nötig» | nichts Benennbares |
 | 07 | Routen-Test (Funktion, Einstieg, Einzelstück), Bremsen-Test (Wirkung über vier Wege), E2E | Umleitung `MAIL_NUR_AN` je Weg (darum der Test in Schritt 07); welcher Versender (einzeln oder Pool) einen Weg bedient; die Fehlergrenzen für Passkey, Brief und Mail-Code und die Mitteilungs-Verwaltung (Anhang C.2) |
 | 08 | Grundprüfung (Körper je Antwort), Tests der Module | Wort auf dem Server geändert, in der Oberfläche nicht (B-29; Absicherung von Schritt 08). **Nachtrag Schritt 08:** für Wörter und Formen durch die gemeinsame Liste geschlossen; Feldnamen in `felder` und der innere Aufbau der Zusatzangaben bleiben offen (D.6) |
-| 09, 11 | Routen-Test: Admin-Routen rufen nur Einträge der Verwaltungs-Listen, andere Routen nie (das Gegenstück zur Bauregel als Verhalten); Rechte-Matrix für die bekannten Listen | Eine **neue** Liste steht in keiner 401/403-Schleife und nicht in der Rechte-Matrix, bis jemand sie einträgt (darum der Test in Schritt 09); eine zu weit gefasste Bauregel fällt nur an `bauregel.test.ts` auf. **Nachtrag Schritt 11, Lauf 1:** Den Bereich `cm` der 26 hält die Rechte-Matrix beim Namen fest (vorab, D.12); jede neue Liste hat ihre Rechte-Schleife in ihrer Testdatei |
+| 09, 11 | Routen-Test: Admin-Routen rufen nur Einträge der Verwaltungs-Listen, andere Routen nie (das Gegenstück zur Bauregel als Verhalten); Rechte-Matrix für die bekannten Listen | Eine **neue** Liste steht in keiner 401/403-Schleife und nicht in der Rechte-Matrix, bis jemand sie einträgt (darum der Test in Schritt 09); eine zu weit gefasste Bauregel fällt nur an `bauregel.test.ts` auf. **Nachtrag Schritt 11, Lauf 1:** Den Bereich `cm` der 26 hält die Rechte-Matrix beim Namen fest (vorab, D.12); jede neue Liste hat ihre Rechte-Schleife in ihrer Testdatei. **Nachtrag Lauf 2:** Die Sperrliste nach Namen ist weg; jede Verwaltungs-Datei ausserhalb von `admin/` ist am Pfad gesperrt, je mit einem Fall in `bauregel.test.ts` |
 | 10 | Fünf Testdateien mit 14 Aufrufen von `getSitzung` (alle sechs Felder, 401 mit Körper und `no-store`), sie ziehen nicht um, nur ihr Import ändert sich; Routen-Test (`OHNE_LISTE`, Einstieg `db`); Lint-Probe «Ausnahme ist noch nötig» und Lint ohne die drei Einträge; E2E Startseite und Navigation. **Nachtrag Schritt 10:** so umgesetzt (D.10) | `getSitzung` steht in keiner Liste (die Grundprüfung sieht sie nicht); ihr 401 prüfen zwei eigene Tests. Dass `admin/rollen.ts` Liste und Typ weiterreicht, hält nur der Typprüfer fest |
 
 **Bleibt (gut gelöst):** Wirkung statt Identität im Bremsen-Test; die eine Tabelle `ROUTEN`;
@@ -5616,3 +5643,105 @@ Grundprüfung, Rechte-Matrix, die Ablauf-Tests der Module, E2E.
   bzw. sechsten Stelle. `tests/hilfen/verwaltungs-listen.ts` hat schon die sechs Einträge des
   Zielzustands (`admin`, `turnier`, `'cm-admin'`, `'gespraech-admin'`, `'mitteilung-admin'`,
   `'anlass-admin'`); in Lauf 2 ändert sich dort nur der Pfad der Mitteilungen.
+
+### D.13 Schritt 11, Lauf 2
+
+**Erkenntnisse Schritt 11, Lauf 2** (12.11.2026, Branch `refactor/schritt-11` ab `fa763e6`, nach
+dem Review «ok» von Lauf 1; die Mitteilungen, E-38 Zusatz 1)
+
+- **Voraussetzungen geprüft:** Lauf 1 gereviewt «ok», D.11 gilt, kein Entscheid nötig (E-40);
+  keine neue Abhängigkeit, keine neue Lint-Ausnahme.
+- **Commits:** `dd80e41` `refactor:` sechs Funktionen nach `mitteilung/verwaltung-schnittstellen.ts`,
+  Zeile der Tabelle auf `pfad`, Fälle der Sperrliste auf die Pfad-Sperre umgestellt; `b519b16`
+  `refactor:` toter Code der Bauregel gestrichen; `5fc7ce5` `docs:` arc42 und CI/CD. Dazu dieser
+  `docs:`-Commit.
+- **Verschieben:** Der Teil ab «--- Verwaltung ---» (127 Zeilen: `AdminHandler`, `Ziel`, `Versand`,
+  `bezug`, `mitZiel`, `verlauf`, `mitEmpfaengern`, `vorschauFuer`, `sendenFuer`, die sechs
+  Konstanten und die Liste) steht per Skript ausgeschnitten und Zeichen für Zeichen in der neuen
+  Datei (146 Zeilen); `mitteilung/schnittstellen.ts` 208 → 65 Zeilen, nur die vier der Mitglieder.
+  Keine geteilte Hilfe (wie D.11). Einstieg `holeMitteilungAdminDienste` und der Typ in
+  `mitteilung/typen.ts` unverändert, dort nur der Kopfkommentar. Sechs Admin-Routen nur an der
+  Import-Zeile. `mitteilung/admin-schnittstellen.db.test.ts` heisst
+  `verwaltung-schnittstellen.db.test.ts` (`git mv`, nur der Import); Routen-Test (ein Import-Block
+  wird zwei), Rechte-Matrix und `tests/hilfen/verwaltungs-listen.ts` nur am Import. Ein Kommentar in
+  `tests/e2e/mitteilungen.test.ts` nennt den neuen Namen der Testdatei. Kein Kreis beim Laden:
+  Die neue Datei holt nur Fachdateien ihres Moduls, `admin/rechte.ts`, `http.ts` und
+  `src/lib/mitteilung/`.
+- **Bauregel, Umzug (`dd80e41`):** Die Zeile zeigt auf `mitteilung/verwaltung-schnittstellen.ts` mit
+  `pfad`; danach gibt es keine Zeile `namen` und keine `offen`. `bauregel.test.ts` 71 → 74:
+  - mit dem Wechsel der Zeile wurden 14 Fälle rot: acht hingen an der Sperrliste, fünf nur am
+    Meldungstext `DATEIEN`, einer an `betrifftBauregel`. Die acht prüfen jetzt die Pfad-Sperre der
+    neuen Datei, keiner ist ersatzlos gestrichen: «Mitteilungen der Verwaltung nur aus …» (Pfad der Liste), «keine
+    Dienste und Schnittstellen der Verwaltung ausserhalb» (Name `postVereinSenden` → Import der
+    neuen Datei; `import()` und `export *` der neuen Datei), «Namen in Anführungszeichen»
+    (`export { 'postVereinSenden' as p }` aus der neuen Datei; der Escape-Fall an der Sperrliste
+    wird ein Escape-Fall an der Erlaubt-Liste von `dienste.ts`, `'holeProfilDienst\x65'`), die vier
+    Literal-Fälle in «Text in Anführungszeichen verschluckt keinen Import», `betrifftBauregel`
+    und `DATEIEN`;
+  - neu: die Zeile der Mitteilungen im `describe.each` der Pfad-Sperre (zwei Fälle), dazu dort zwei
+    Formen für alle Zeilen (Name in Anführungszeichen, Name mit Escape); «die Datei der Mitglieder
+    ist ausserhalb von api/admin in jeder Form frei» (die gewollte Lockerung); «Admin-Route
+    importiert die Datei der Mitglieder» (die neue Strenge); `betrifftBauregel` lässt
+    `mitteilung/schnittstellen.ts` und `gespraech/schnittstellen.ts` aus.
+- **Bauregel, toter Code (`b519b16`):** gestrichen sind die Arten `namen` und `offen` im Typ
+  `Aussen`, `GEMISCHT`, der Parameter `gemischt`, die Zweige «Name der Liste» und «lässt sich nicht
+  lesen» samt `inAnfuehrungszeichen`. Die Funktion prüft nur noch Importe aus `dienste.ts` und
+  heisst `pruefeDiensteImporte`. `bauregel.test.ts` dabei unverändert grün (74).
+- **Vergleich alter gegen neuer Bauregel** (eigenes Skript nach der Vorlage des Reviewers aus Lauf 1,
+  im Scratchpad der Session: `l2/vergleich.ts`; fünf Arten von Routen, vier Schreibweisen des Pfads,
+  19 Quellen, sechs Endungen, 15 Namen, 27 Formen, drei Arten der Listen; die alte Fassung mit dem
+  Aufbau vor Lauf 2, die neue mit dem danach):
+  1. `bauregel.ts` aus `fa763e6` gegen `b519b16`, die sechs Admin-Routen mit ihrer neuen
+     Import-Zeile: **2 741 040 Fälle; ein Befund der alten Fassung fehlt in 11 208 Fällen, alle
+     «andere Route, Quelle `mitteilung/schnittstellen`»** — genau die eine erwartete Lockerung
+     (z. B. `import * as d from …/mitteilung/schnittstellen.ts` in `/api/profil`: alt «nur
+     statisch und mit Namen», neu frei; ein Verwaltungsname daraus, den es dort nicht mehr gibt,
+     war alt ein Befund). An Admin-Routen keine Abweichung. Strenger in 75 384 Fällen, alle
+     «andere Route, Quelle `mitteilung/verwaltung-schnittstellen`» (die neue Datei war vorher
+     ungeschützt, weil es sie nicht gab).
+  2. Ohne die Umstellung der Admin-Routen dazu strenger: Admin-Route mit Import aus
+     `mitteilung/schnittstellen` (192 Fälle; alt erlaubt, neu nicht).
+  3. `dd80e41` gegen `b519b16` (nur der tote Code): 2 770 200 Fälle in beiden Aufbauten, **0
+     Abweichungen**.
+  Am echten Repo `bauregel: ok`.
+- **Rot belegt** (je aus einer Sicherungskopie zurückgesetzt, `git diff` danach gleich): Zeile der
+  Mitteilungen mit `namen` statt `pfad` → 7 Fälle rot (Pfad-Sperre, Sperrliste-Fälle als
+  Pfad-Fälle, Literal-Fälle); Zeile gestrichen → am echten Repo die sechs Admin-Routen der
+  Mitteilungen; `/api/admin/mitteilungen` importiert `postThemen` aus
+  `mitteilung/schnittstellen.ts` → Befund «erlaubt sind nur …», Exit 1 (neu); `/api/benachrichtigungen`
+  importiert `getVereinMitteilungen` über `$lib` aus der neuen Datei → Befund, Exit 1; die neue
+  Testdatei gegen die alte `bauregel.ts` → 17 Fälle rot, darunter die Lockerung und die neue
+  Strenge; im gekürzten `pruefeDiensteImporte` die Meldung für die Einstiege der Verwaltung
+  gestrichen → 10 Fälle rot (die vereinfachte Funktion wirkt).
+- **Tests je Datei, vorher (`fa763e6`) → nachher:** `scripts/pruefungen/bauregel.test.ts` 71 → 74;
+  `mitteilung/admin-schnittstellen.db.test.ts` 10 → `mitteilung/verwaltung-schnittstellen.db.test.ts`
+  10; `mitteilung/schnittstellen.db.test.ts` 12, `admin/rechte-matrix.db.test.ts` 10,
+  `routen.test.ts` 3, `grundpruefung.db.test.ts` 7 unverändert. Kein Fall ging verloren, keine
+  Erwartung ausser den Meldungen der Bauregel änderte sich.
+- **Abweichungen von D.11:**
+  1. *Tests der Sperrliste im Umzugs-Commit, nicht im Streich-Commit:* Sobald die Zeile auf `pfad`
+     zeigt, hängen die Fälle nicht mehr an der Sperrliste und müssen im selben Commit umgestellt
+     werden; der Streich-Commit ändert keinen Test, das belegt, dass der Code tot war.
+  2. *Der Escape-Fall* der Sperrliste prüft jetzt die Erlaubt-Liste von `dienste.ts`; die
+     Pfad-Sperre meldet jeden Namen, auch mit Escape (Form im `describe.each`).
+  3. *Name der Funktion:* `pruefeVerwaltungImporte` heisst `pruefeDiensteImporte`.
+  4. *Doku-Zeilen:* `docs/context-scopes.md` nennt die Mitteilungen nur am Ordner und blieb
+     unverändert.
+- **Prüfläufe:** jeder Commit mit dem Hook `check-schnell`, grün. Voller `make check` auf dem Code-Endstand `5fc7ce5` bei sauberem Arbeitsbaum: **Exit 0** (Lint; `svelte-check` 1535 Dateien ohne Fehler und Warnung; Prüfskripte samt `bauregel: ok`; Einheits- und Datenbanktests 152 Dateien mit 1962 Tests, Abdeckung 97,07 % Anweisungen, 93,56 % Zweige; beide Builds; E2E 414 bestanden, 57 übersprungen, 3,6 Minuten; Image; grüner Stand `151c1aa09229` gemerkt). Gegen Lauf 1 (1959 Tests): +3 in `bauregel.test.ts`. Kein fremder Prüflauf auf der Maschine.
+- **Was kein Test sieht:**
+  - wie Lauf 1: Admin-Routen prüfen den Namen gegen die Vereinigung aller Listen, nicht gegen die
+    Liste ihrer Datei; die Hilfsdateien `cm/verwaltung-meldung.ts` und `gespraech/antworten.ts` kennt
+    die Bauregel nicht;
+  - dass ein Verwaltungs-Name in `mitteilung/schnittstellen.ts` wieder auftaucht: Die Datei ist nun
+    frei; dagegen steht nur der Routen-Test (eine Admin-Route darf sie nicht importieren) und die
+    Grundprüfung (eine Schnittstelle ohne Liste wird nicht geprüft);
+  - weiter offen wie nach Schritt 09: nicht normalisierte Pfade, `import.meta.glob`, Weiterreichen
+    über `src/lib/` ausserhalb von `server/`, `export { x as 'actions' }`.
+- **Für Schritt 12 notiert (aus dem Review von Lauf 1):** `expect(AUSNAHMEN).toEqual([])` als Test;
+  die veraltete Lint-Meldung «Heutige Verletzungen stehen in AUSNAHMEN» (`eslint.config.js`,
+  Zeile 109); der Wortlaut «Statuscode und Antwort baut nur die Schnittstellen-Funktion» der
+  `CLAUDE.md` ist bei `gespraech/antworten.ts` gedehnt (wie bei `admin/rechte.ts`). In die Hinweise
+  zu Schritt 12 übernommen; `CLAUDE.md` unverändert.
+- **Ausserhalb des Schritts aufgefallen, nicht behoben:** Der Plan unter
+  `docs/superpowers/plans/2026-11-06-mitteilungen-push.md` nennt noch
+  `mitteilung/admin-schnittstellen.db.test.ts`; historisch (E-15), bleibt.
