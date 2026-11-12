@@ -6,6 +6,7 @@ import {
 	type EigeneDatenbank
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { alleVerwaltung } from '../../../../tests/hilfen/verwaltungs-listen.ts';
 import type { Db } from '../db/index.ts';
 import {
 	aenderung,
@@ -200,12 +201,11 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		const id = String(ids[0]);
 
 		const mytco = await bestaetigt(s, ['mytco']);
-		const schreibende = Object.entries({
-			...ADMIN_SCHNITTSTELLEN,
-			...TURNIER_SCHNITTSTELLEN,
-			...MITTEILUNG_ADMIN_SCHNITTSTELLEN
-			// Schreibend ist alles, was nicht liest: Auch ein künftiges delete… oder put… fällt hier auf.
-		}).filter(([name]) => !name.startsWith('get') && !ERLAUBT_FUER_MYTCO.includes(name));
+		// Alle Listen der Verwaltung (`tests/hilfen/verwaltungs-listen.ts`). Schreibend ist alles, was
+		// nicht liest: Auch ein künftiges delete… oder put… fällt hier auf.
+		const schreibende = Object.entries(alleVerwaltung()).filter(
+			([name]) => !name.startsWith('get') && !ERLAUBT_FUER_MYTCO.includes(name)
+		);
 		const namen = schreibende.map(([name]) => name);
 		for (const n of [
 			'postAustritt',
@@ -420,13 +420,9 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			['postVereinSenden', cm, 403, 'kein-admin'],
 			['getVereinMitteilungen', cm, 403, 'kein-admin']
 		];
-		const alle = {
-			...ADMIN_SCHNITTSTELLEN,
-			...TURNIER_SCHNITTSTELLEN,
-			...MITTEILUNG_ADMIN_SCHNITTSTELLEN
-		};
+		const alle = alleVerwaltung();
 		for (const [name, konto, status, fehler] of faelle) {
-			const fn = alle[name as keyof typeof alle];
+			const fn = alle[name];
 			const r = await fn(
 				s.d,
 				ereignis({ method: name.startsWith('get') ? 'GET' : 'POST', body: {}, konto })

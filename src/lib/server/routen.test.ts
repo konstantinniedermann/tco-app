@@ -11,8 +11,8 @@
 // nur Admin-Routen dürfen die Verwaltung importieren.
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../tests/hilfen/anfrage.ts';
+import { VERWALTUNGS_LISTEN } from '../../../tests/hilfen/verwaltungs-listen.ts';
 import {
-	ADMIN_SCHNITTSTELLEN,
 	getAdminAnlaesse,
 	getAdminAnlass,
 	getAuskunft,
@@ -105,7 +105,6 @@ import {
 	postMailCode
 } from './login/schnittstellen.ts';
 import {
-	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
 	MITTEILUNG_SCHNITTSTELLEN,
 	getAnlassMitteilungen,
 	getBenachrichtigungen,
@@ -128,7 +127,6 @@ import {
 	postRufname
 } from './profil/schnittstellen.ts';
 import {
-	TURNIER_SCHNITTSTELLEN,
 	getAnmeldungen,
 	getDoppel,
 	getKategorie,
@@ -291,12 +289,11 @@ const OHNE_LISTE = new Set<unknown>([
 	postLogout,
 	getSitzung
 ]);
-// Eine neue Liste gehört in VERWALTUNG bzw. MITGLIEDER und in `verwaltungsDienste()` bzw.
+// Eine neue Liste der Verwaltung gehört in `VERWALTUNGS_LISTEN` (`tests/hilfen/verwaltungs-listen.ts`;
+// von dort nehmen sie auch Grundprüfung und Rechte-Matrix), eine der Mitglieder in MITGLIEDER und in
 // `mitgliederDienste()` in `grundpruefung.db.test.ts` (dort laufen 401 und 415 über jeden Eintrag).
 const VERWALTUNG = new Set<unknown>(
-	[ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN, MITTEILUNG_ADMIN_SCHNITTSTELLEN].flatMap((l) =>
-		Object.values(l)
-	)
+	Object.values(VERWALTUNGS_LISTEN).flatMap((l) => Object.values(l))
 );
 const MITGLIEDER = new Set<unknown>(
 	[

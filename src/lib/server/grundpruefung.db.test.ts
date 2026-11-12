@@ -1,15 +1,16 @@
 // Grundprüfung über alle Listen der Schnittstellen (Vertrag, Schritt 03 des Refactorings):
 // Ohne Sitzung antwortet jede Schnittstelle der Mitglieder 401, und jede schreibende Schnittstelle
 // (Mitglieder und Verwaltung) weist eine Anfrage ohne JSON mit 415 ab, auch ohne Sitzung (Format vor
-// Sitzung, festgehalten vor Schritt 06). Die Tests halten das heutige
-// Verhalten fest; Abweichungen von der Regel stehen unten als benannte Ausnahmen. 401 und 403 der
-// Verwaltung prüfen `admin/schnittstellen.db.test.ts` und `turnier/schnittstellen.db.test.ts`.
+// Sitzung, festgehalten vor Schritt 06). Jede Schnittstelle der Verwaltung antwortet ohne Sitzung
+// 401, ohne Rolle 403 `kein-admin` und unbestätigt 403 `unbestaetigt` (festgehalten vor Schritt 09,
+// über alle Listen aus `tests/hilfen/verwaltungs-listen.ts`). Die Tests halten das heutige
+// Verhalten fest; Abweichungen von der Regel stehen unten als benannte Ausnahmen, je Erwartung.
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../tests/hilfen/mitglieder.ts';
 import { testPruefer } from '../../../tests/hilfen/passkey-pruefer.ts';
+import { VERWALTUNGS_LISTEN } from '../../../tests/hilfen/verwaltungs-listen.ts';
 import type { AdminDienste } from './admin/rechte.ts';
-import { ADMIN_SCHNITTSTELLEN } from './admin/schnittstellen.ts';
 import { erstelleZugangDienst } from './admin/zugang.ts';
 import { ANLASS_SCHNITTSTELLEN } from './anlass/schnittstellen.ts';
 import type { AnlassDienste } from './anlass/typen.ts';
@@ -22,15 +23,11 @@ import { ChallengeSpeicher } from './login/challenge.ts';
 import { PASSKEY_SCHNITTSTELLEN } from './login/passkey-schnittstellen.ts';
 import { erstellePasskeyDienst, type PasskeyDienst } from './login/passkey.ts';
 import { erstelleSitzung, pruefeSitzung } from './login/sitzung.ts';
-import {
-	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
-	MITTEILUNG_SCHNITTSTELLEN
-} from './mitteilung/schnittstellen.ts';
+import { MITTEILUNG_SCHNITTSTELLEN } from './mitteilung/schnittstellen.ts';
 import type { MitteilungAdminDienste, MitteilungDienste } from './mitteilung/typen.ts';
 import { erstelleEmailWechselDienst } from './profil/email-wechsel.ts';
 import { PROFIL_SCHNITTSTELLEN } from './profil/schnittstellen.ts';
 import type { ProfilDienste } from './profil/typen.ts';
-import { TURNIER_SCHNITTSTELLEN } from './turnier/schnittstellen.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {
@@ -136,12 +133,9 @@ function verwaltungsDienste() {
 		mailer: vi.fn<MitteilungAdminDienste['mailer']>(async () => {}),
 		adresse: 'https://mytco.example.org'
 	};
-	// Eine neue Liste der Verwaltung gehört hier hinein und in VERWALTUNG in `routen.test.ts`.
-	const liste = [
-		...eintraege('admin', ADMIN_SCHNITTSTELLEN, d),
-		...eintraege('turnier', TURNIER_SCHNITTSTELLEN, d),
-		...eintraege('mitteilung-admin', MITTEILUNG_ADMIN_SCHNITTSTELLEN, d)
-	];
+	// Eine neue Liste der Verwaltung gehört in `VERWALTUNGS_LISTEN` (gilt auch für Routen-Test und
+	// Rechte-Matrix).
+	const liste = Object.entries(VERWALTUNGS_LISTEN).flatMap(([modul, l]) => eintraege(modul, l, d));
 	return { liste, zugang, post };
 }
 
@@ -173,6 +167,25 @@ const OHNE_SITZUNG_ANDERS: Record<string, [number, unknown]> = {
 	'passkey.postAnmelden': [400, { fehler: 'falsch' }]
 };
 
+/**
+ * Ausnahmen von «Verwaltung ohne Rolle 403 { fehler: 'kein-admin' }», mit der heutigen Antwort.
+ * Gewollt: Die «Ansicht als …» lässt sich immer beenden, sie führt nur zu den echten Rollen zurück.
+ */
+const OHNE_ROLLE_ANDERS: Record<string, [number, unknown]> = {
+	'admin.postAnsichtBeenden': [200, {}]
+};
+
+/**
+ * Ausnahmen von «Verwaltung unbestätigt 403 { fehler: 'unbestaetigt' }», mit der heutigen Antwort.
+ * Gewollt: Der Zugang wird erst bestätigt (SI-08), die Ansicht lässt sich immer beenden.
+ */
+const UNBESTAETIGT_ANDERS: Record<string, [number, unknown]> = {
+	'admin.getZugang': [200, { bestaetigt: false, rollen: ['mytco'] }],
+	'admin.postZugangCode': [202, {}],
+	'admin.postZugang': [400, { fehler: 'falsch' }],
+	'admin.postAnsichtBeenden': [200, {}]
+};
+
 /** Ausnahmen von «schreibend ohne JSON 415 { fehler: 'format' }», mit der heutigen Antwort. */
 const OHNE_JSON_ANDERS: Record<string, [number, unknown]> = {};
 
@@ -198,6 +211,42 @@ describe('Grundprüfung der Schnittstellen', () => {
 			const [status, koerper] = OHNE_SITZUNG_ANDERS[name] ?? [401, { fehler: 'abgemeldet' }];
 			expect(await antwortVon(name, r)).toEqual([name, status, koerper]);
 			expect([name, r.headers.get('cache-control')]).toEqual([name, 'no-store']);
+		}
+	});
+
+	test('die Listen der Verwaltung haben 62 Einträge, und jede Ausnahme gehört zu einem', () => {
+		const namen = verwaltungsDienste().liste.map(([name]) => name);
+		expect(namen).toHaveLength(62);
+		expect(new Set(namen).size).toBe(namen.length);
+		for (const name of [...Object.keys(OHNE_ROLLE_ANDERS), ...Object.keys(UNBESTAETIGT_ANDERS)]) {
+			expect(namen).toContain(name);
+		}
+	});
+
+	// RR-07, RR-09 über alle Listen der Verwaltung. Ohne Rolle: ein Mitglied ohne Verwaltungsrolle;
+	// unbestätigt: der MyTCO-Admin ohne eingelösten Code (er liest jeden Bereich, darum gilt die
+	// Erwartung für jede Liste).
+	test('jede Schnittstelle der Verwaltung antwortet ohne Sitzung 401, ohne Rolle 403, unbestätigt 403 (benannte Ausnahmen)', async () => {
+		const { liste } = verwaltungsDienste();
+		const konto = async (rollen?: string[]) => {
+			const m = await legeMitgliedAn(db, { rollen });
+			const kennung = await erstelleSitzung(db, m.kontoId, start);
+			return { konto: (await pruefeSitzung(db, kennung, start))!.konto, cookie: kennung };
+		};
+		const ohneRolle = await konto();
+		const unbestaetigt = await konto(['mytco']);
+		for (const [name, fn] of liste) {
+			const ohne = await fn(anfrage(name));
+			expect(await antwortVon(name, ohne)).toEqual([name, 401, { fehler: 'abgemeldet' }]);
+			expect([name, ohne.headers.get('cache-control')]).toEqual([name, 'no-store']);
+			const keine = await fn(anfrage(name, ohneRolle));
+			const [s1, k1] = OHNE_ROLLE_ANDERS[name] ?? [403, { fehler: 'kein-admin' }];
+			expect(await antwortVon(name, keine)).toEqual([name, s1, k1]);
+			expect([name, keine.headers.get('cache-control')]).toEqual([name, 'no-store']);
+			const unb = await fn(anfrage(name, unbestaetigt));
+			const [s2, k2] = UNBESTAETIGT_ANDERS[name] ?? [403, { fehler: 'unbestaetigt' }];
+			expect(await antwortVon(name, unb)).toEqual([name, s2, k2]);
+			expect([name, unb.headers.get('cache-control')]).toEqual([name, 'no-store']);
 		}
 	});
 
