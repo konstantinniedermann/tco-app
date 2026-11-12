@@ -1,7 +1,14 @@
 import { geraetAusBrowser } from './geraet.ts';
 import type { Ort } from './passkey-pruefer.ts';
 import type { PasskeyDienst } from './passkey.ts';
-import { antwort, formatFehler, istJson, leseKoerper, type Ereignis } from '../http.ts';
+import {
+	antwort,
+	formatFehler,
+	istJson,
+	leseKoerper,
+	nichtGefunden,
+	type Ereignis
+} from '../http.ts';
 import { loginAntwort } from './schnittstellen.ts';
 import { SITZUNG_COOKIE } from './sitzung.ts';
 
@@ -81,9 +88,7 @@ export async function postEntfernen(d: PasskeyDienst, e: Ereignis): Promise<Resp
 	if (!s) return nichtAngemeldet();
 	const { kennung } = await leseKoerper(e);
 	if (typeof kennung !== 'string') return falsch();
-	return (await d.entferne(s.kontoId, kennung)) === 'ok'
-		? antwort(204)
-		: antwort(404, { fehler: 'nicht-gefunden' });
+	return (await d.entferne(s.kontoId, kennung)) === 'ok' ? antwort(204) : nichtGefunden();
 }
 
 export async function postHinweis(d: PasskeyDienst, e: Ereignis): Promise<Response> {

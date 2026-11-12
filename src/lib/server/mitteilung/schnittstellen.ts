@@ -9,6 +9,7 @@ import { vorlagenAnlass } from '../../mitteilung/vorlagen.ts';
 import { liest, schreibt, type AdminEreignis } from '../admin/rechte.ts';
 import {
 	antwort,
+	eingabeFehler,
 	formatFehler,
 	istJson,
 	jetzt,
@@ -42,7 +43,7 @@ export async function postThemen(d: MitteilungDienste, e: Ereignis): Promise<Res
 	if (!istJson(e)) return formatFehler();
 	return mitSitzung(e, async (konto) => {
 		const themen = pruefeThemen((await leseKoerper(e)).themen);
-		if (!themen) return antwort(400, { fehler: 'eingabe' });
+		if (!themen) return eingabeFehler();
 		await setzeThemen(d.db, konto.kontoId, themen);
 		return antwort(200, await stand(d, konto));
 	});
@@ -53,7 +54,7 @@ export async function postAbo(d: MitteilungDienste, e: Ereignis): Promise<Respon
 	return mitSitzung(e, async (konto) => {
 		if (d.vapidOeffentlich === null) return antwort(409, { fehler: 'push-aus' });
 		const p = pruefeAbo(await leseKoerper(e));
-		if (!p.ok) return antwort(400, { fehler: 'eingabe' });
+		if (!p.ok) return eingabeFehler();
 		await speichereAbo(d.db, konto.kontoId, konto.sitzungHash, p.abo, jetzt(d));
 		return antwort(200, { pushHier: true });
 	});

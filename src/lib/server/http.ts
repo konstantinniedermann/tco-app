@@ -46,6 +46,7 @@ export async function leseKoerper(e: Ereignis): Promise<Record<string, unknown>>
 export const formatFehler = () => antwort(415, { fehler: 'format' });
 export const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
 export const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });
+export const abgemeldet = () => antwort(401, { fehler: 'abgemeldet' });
 
 /** Die Zeit aus den Diensten (Tests reichen sie hinein), sonst die Uhr. */
 export const jetzt = (d: { jetzt?: () => Date }): Date => (d.jetzt ?? (() => new Date()))();
@@ -56,7 +57,7 @@ export async function mitSitzung(
 	fn: (konto: Konto) => Promise<Response>
 ): Promise<Response> {
 	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
+	if (!konto) return abgemeldet();
 	return fn(konto);
 }
 

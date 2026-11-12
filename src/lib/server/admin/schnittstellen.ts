@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { mitglied } from '../db/schema.ts';
 import {
+	abgemeldet,
 	antwort,
 	eingabeFehler,
 	formatFehler,
@@ -76,7 +77,7 @@ const VERLAUF_MAX = 500;
 // RR-07: `rollen` sagt der Oberfläche, welche Bereiche sie zeigt; durchgesetzt wird an den Schnittstellen.
 export async function getZugang(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	const z = await d.zugang.pruefe(e.locals.konto);
-	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
+	if (z.stufe === 'abgemeldet') return abgemeldet();
 	if (z.stufe === 'keine-rolle') return antwort(403, { fehler: 'kein-admin' });
 	// Nur die Nummer des Angemeldeten, damit die Seite eine Rückfrage beim eigenen Konto stellen kann.
 	if (z.stufe === 'bestaetigt') {
@@ -108,9 +109,9 @@ export async function postZugang(d: AdminDienste, e: AdminEreignis): Promise<Res
 export async function postAnsicht(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
 	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
+	if (!konto) return abgemeldet();
 	const z = await d.zugang.pruefe({ ...konto, ansicht: null });
-	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
+	if (z.stufe === 'abgemeldet') return abgemeldet();
 	if (z.stufe === 'keine-rolle' || !z.rollen.includes('mytco')) {
 		return antwort(403, { fehler: 'kein-admin' });
 	}
@@ -125,7 +126,7 @@ export async function postAnsicht(d: AdminDienste, e: AdminEreignis): Promise<Re
 export async function postAnsichtBeenden(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
 	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
+	if (!konto) return abgemeldet();
 	await setzeAnsicht(d.db, konto.sitzungHash, null);
 	return antwort(200, {});
 }

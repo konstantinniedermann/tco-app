@@ -6,7 +6,7 @@
 // Schnittstellen-Datei: Andere Module holen `liest`, `schreibt` und die Typen von hier.
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Db } from '../db/index.ts';
-import { antwort, formatFehler, istJson, leseKoerper, type Ereignis } from '../http.ts';
+import { abgemeldet, antwort, formatFehler, istJson, leseKoerper, type Ereignis } from '../http.ts';
 import type { BriefAbh } from './briefe.ts';
 import type { Urheber } from './verlauf.ts';
 import type { ZugangDienst } from './zugang.ts';
@@ -36,7 +36,7 @@ export async function mitKonto(
 ): Promise<Response> {
 	const konto = e.locals.konto;
 	const z = await d.zugang.pruefe(konto);
-	if (!konto || z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
+	if (!konto || z.stufe === 'abgemeldet') return abgemeldet();
 	if (z.stufe === 'keine-rolle') return antwort(403, { fehler: 'kein-admin' });
 	return fn(konto);
 }
@@ -55,7 +55,7 @@ async function mitRolle(
 	fn: (mitgliedId: number) => Promise<Response>
 ): Promise<Response> {
 	const z = await d.zugang.pruefe(e.locals.konto);
-	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
+	if (z.stufe === 'abgemeldet') return abgemeldet();
 	if (art === 'schreiben' && e.locals.konto?.ansicht != null) {
 		return antwort(403, { fehler: 'nur-ansehen' });
 	}
