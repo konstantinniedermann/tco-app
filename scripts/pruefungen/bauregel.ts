@@ -3,16 +3,21 @@ import { istTestquelle, leseDateien, meldeErgebnis, versionierteDateien } from '
 
 const ACTIONS_DEKLARATION = /\bexport\s+(?:const|let|var|(?:async\s+)?function\s*\*?)\s*actions\b/;
 
-/** Erkennt `export { actions }` und `export { x as actions }` (auch mit mehreren Namen). */
+/**
+ * Erkennt `export { actions }`, `export { x as actions }` und `export { x as 'actions' }` (auch mit
+ * mehreren Namen). Einen Namen mit Escape liest die Prüfung nicht: gesperrt im Zweifel (Schritt 12a).
+ */
 function exportiertActions(inhalt: string): boolean {
 	for (const block of inhalt.matchAll(/\bexport\s*\{([^}]*)\}/g)) {
 		const namen = block[1].split(',').map((eintrag) =>
-			eintrag
-				.trim()
-				.split(/\s+as\s+/)
-				.pop()
+			leseName(
+				eintrag
+					.trim()
+					.split(/\s+as\s+/)
+					.pop() ?? ''
+			)
 		);
-		if (namen.includes('actions')) return true;
+		if (namen.some((name) => name === 'actions' || name.includes('\\'))) return true;
 	}
 	return false;
 }

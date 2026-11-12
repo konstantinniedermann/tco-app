@@ -38,6 +38,19 @@ describe('pruefeBauregel', () => {
 	])('meldet Form Actions als %j', (code) => {
 		expect(pruefeBauregel(new Map([['src/routes/+page.ts', code]]))).toHaveLength(1);
 	});
+	// Schritt 12a, Punkt 3 (N-05): Namen in Anführungszeichen (ES2022) und Namen mit Escape.
+	it.each([
+		"export { x as 'actions' }",
+		'export { x as "actions" }',
+		"export { a, x as 'actions', b }",
+		"export { 'actions' } from './a.ts'",
+		"export { x as 'acti\\u006fns' }",
+		'export { x as acti\\u006fns }'
+	])('meldet Form Actions mit Namen in Anführungszeichen oder Escape als %j', (code) => {
+		expect(pruefeBauregel(new Map([['src/routes/+page.ts', code]]))).toEqual([
+			'src/routes/+page.ts: Form Actions sind nicht vorgesehen'
+		]);
+	});
 	it('meldet keine ähnlichen Namen', () => {
 		expect(
 			pruefeBauregel(
