@@ -165,3 +165,22 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Doku-Abgleich vor dem Release 0.20.5
 
 **Einschätzung:** Niedrig: Absender sind eingeloggte Vereinsmitglieder. Wenn nötig, eine Grenze pro Konto oder höchstens eine Meldung pro Gespräch und Stunde.
+
+### 2026-11-12 — Datenbanktests legen Turniere mit zufälligem Jahr an und können sich treffen
+
+**Thema:** Tests
+
+**Fundort:** `src/lib/server/db/schema.db.test.ts` (Test «FR-34», Jahr 3000 bis 92999) und neun
+weitere `.db.test.ts` unter `turnier/`, `gespraech/`, `admin/` und `cm/` (Jahr 3000 bis 8999).
+
+**Beobachtung:** Die Dateien teilen sich eine Test-Datenbank. Wählen zwei dasselbe Jahr, scheitert
+einer an `turnier_jahr_unique`. So geschehen in einem vollen `make check` (Jahr 8504); der nächste
+Lauf war grün.
+
+**Ursprung:** Refactoring Schritt 09 (#80), Korrekturrunde; Protokoll in
+`docs/refactoring-analyse.md`, Anhang D.8.
+
+**Einschätzung:** Seltener Flake, kein Fehler der App. Abhilfe wäre ein eigener Jahresbereich je
+Datei oder ein Jahr aus einer Folge; klein, aber ausserhalb des Feature-Stopps erst nach dem
+Refactoring oder als Nachtrag zu Schritt 02 (E2E-Flakes).
+
