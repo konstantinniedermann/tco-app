@@ -1718,8 +1718,8 @@ Ergebnis der Zwischenrevision, aus dem Code gelesen, nichts ausgeführt.
 | 07 | Routen-Test (Funktion, Einstieg, Einzelstück), Bremsen-Test (Wirkung über vier Wege), E2E | Umleitung `MAIL_NUR_AN` je Weg (darum der Test in Schritt 07); welcher Versender (einzeln oder Pool) einen Weg bedient; die Fehlergrenzen für Passkey, Brief und Mail-Code und die Mitteilungs-Verwaltung (Anhang C.2) |
 | 08 | Grundprüfung (Körper je Antwort), Tests der Module | Wort auf dem Server geändert, in der Oberfläche nicht (B-29; Absicherung von Schritt 08). **Nachtrag Schritt 08:** für Wörter und Formen durch die gemeinsame Liste geschlossen; Feldnamen in `felder` und der innere Aufbau der Zusatzangaben bleiben offen (D.6) |
 | 09, 11 | Routen-Test: Admin-Routen rufen nur Einträge der Verwaltungs-Listen, andere Routen nie (das Gegenstück zur Bauregel als Verhalten); Rechte-Matrix für die bekannten Listen | Eine **neue** Liste steht in keiner 401/403-Schleife und nicht in der Rechte-Matrix, bis jemand sie einträgt (darum der Test in Schritt 09); eine zu weit gefasste Bauregel fällt nur an `bauregel.test.ts` auf. **Nachtrag Schritt 11, Lauf 1:** Den Bereich `cm` der 26 hält die Rechte-Matrix beim Namen fest (vorab, D.12); jede neue Liste hat ihre Rechte-Schleife in ihrer Testdatei. **Nachtrag Lauf 2:** Die Sperrliste nach Namen ist weg; jede Verwaltungs-Datei ausserhalb von `admin/` ist am Pfad gesperrt, je mit einem Fall in `bauregel.test.ts` |
-| 12 [neu] | `importrichtung.test.ts`: «`AUSNAHMEN` ist leer» und der Meldungstext; `bauregel.test.ts`: 41 Fälle für `liest`/`schreibt` (sechs Dateien frei, Mitglieder-Datei in acht Formen, unlesbare Namen, Importe ohne Namen, Dateien ausserhalb der Themen, Tests frei, Routen nicht doppelt); 22 Lint-Proben von Hand (D.14) | Weiterreichen von `liest` über eine andere Datei; `mitKonto`; berechnete dynamische Importe ausserhalb der Routen (D.14) |
 | 10 | Fünf Testdateien mit 14 Aufrufen von `getSitzung` (alle sechs Felder, 401 mit Körper und `no-store`), sie ziehen nicht um, nur ihr Import ändert sich; Routen-Test (`OHNE_LISTE`, Einstieg `db`); Lint-Probe «Ausnahme ist noch nötig» und Lint ohne die drei Einträge; E2E Startseite und Navigation. **Nachtrag Schritt 10:** so umgesetzt (D.10) | `getSitzung` steht in keiner Liste (die Grundprüfung sieht sie nicht); ihr 401 prüfen zwei eigene Tests. Dass `admin/rollen.ts` Liste und Typ weiterreicht, hält nur der Typprüfer fest |
+| 12 [neu] | `importrichtung.test.ts`: «`AUSNAHMEN` ist leer» und der Meldungstext; `bauregel.test.ts`: 41 Fälle für `liest`/`schreibt` (sechs Dateien frei, Mitglieder-Datei in acht Formen, unlesbare Namen, Importe ohne Namen, Dateien ausserhalb der Themen, Tests frei, Routen nicht doppelt); 22 Lint-Proben von Hand (D.14) | Weiterreichen von `liest` über eine andere Datei; berechnete dynamische Importe ausserhalb der Routen; `//` im Importpfad und nicht normalisierte Pfade in Routen (D.14, Nachtrag). **Nachtrag Review:** `mitKonto` ist mitgeprüft, Pfade über `$lib` und ab `/src/` sind normalisiert |
 
 **Bleibt (gut gelöst):** Wirkung statt Identität im Bremsen-Test; die eine Tabelle `ROUTEN`;
 benannte Ausnahmen mit der heutigen Antwort statt stiller Lücken; die Probe, dass jede
@@ -5860,8 +5860,8 @@ Version 0.20.17; Importregeln scharf stellen, letzter Schritt der Etappe 1)
     Liste der freien Dateien als `ignores`); darum nicht dort.
   - *Was sie meldet:* in jeder Datei unter `src/` ausser `src/routes/` und Tests (`istTestquelle`
     aus `dateien.ts`), die nicht in der Tabelle steht, jeden Import aus `src/lib/server/admin/rechte`
-    (Pfad aufgelöst: relativ, auch `./../`, über `$lib`, mit `.ts`, `.js`, ohne Endung, mit
-    Anhang), der `liest` oder `schreibt` nennt (auch umbenannt, in Anführungszeichen, als
+    (Pfad aufgelöst: relativ und normalisiert, auch `./../`; über `$lib` mit `.ts`, `.js`, ohne
+    Endung, mit Anhang, aber **nicht normalisiert**, berichtigt im Nachtrag unten), der `liest` oder `schreibt` nennt (auch umbenannt, in Anführungszeichen, als
     `export … from`), einen Namen, der kein schlichter Bezeichner ist (Escape, Kommentar statt
     Leerzeichen um `as`), oder ohne Namen auskommt (`* as`, `export *`, Standard-Import, Import ohne
     Klausel, `import()`). Routen sind ausgenommen, weil ihre eigenen Regeln strenger sind (keine
@@ -5908,11 +5908,19 @@ Version 0.20.17; Importregeln scharf stellen, letzter Schritt der Etappe 1)
     nur Importe aus `admin/rechte.ts`; heute reicht keine Datei weiter. Wie bisher «jede Datei für
     sich» (Kommentar «Grenze» in `bauregel.ts`).
   - *`mitKonto`* (die dritte Prüfung in `admin/rechte.ts`, nur für zwei Zugangs-Schnittstellen)
-    ist nicht gesperrt; heute nur in `admin/schnittstellen.ts`. Ihn in `RECHTE_PRUEFUNG`
-    aufzunehmen wäre eine Zeile, war aber nicht beauftragt.
+    war nicht gesperrt. **Erledigt im Nachtrag** (unten).
   - *Berechnete dynamische Importe* (`import(variable)`) ausserhalb von Routen meldet die Regel
     nicht; es gibt keine in `src/` ausser Tests.
   - *`.svelte`-Dateien* prüft die Regel nicht; SvelteKit verbietet ihnen `$lib/server/` im Browser.
+  - *Nachtrag Review:* `import.meta.glob(…)`, `require(…)` und Dateien mit `.mts`/`.cts` sieht die
+    Regel nicht (es gibt keine in `src/`).
+  - *Nachtrag Review, bestehender Befund, hier nicht behoben:* `ohneKommentare` (`bauregel.ts`)
+    liest `//` in einem Importpfad als Zeilenkommentar: `'$lib/server//admin/rechte.ts'` in einer
+    Mitglieder-Datei verschwindet samt Import, kein Befund. `ADMIN_MODUL` erwartet
+    `lib/server/admin` zusammenhängend: `'$lib/server/cm/../admin/rechte'` in einer Mitglieder-Route
+    bleibt ohne Befund (gestellt geprüft, Ausgabe `[]`), und die neue Regel nimmt Routen aus. Der
+    Satz oben «Routen sind ausgenommen, weil ihre eigenen Regeln strenger sind» gilt also nur für
+    normal geschriebene Pfade. Eingetragen in `docs/beobachtungen.md` (Thema Sicherheit).
   - weiter offen wie nach Schritt 11: Fachlogik-Importe zwischen Themen (C.5), nicht normalisierte
     Pfade und `import()` in der Lint-Regel; die Probe «Ausnahme … ist noch nötig» erzeugt bei leerer
     Liste keinen Fall (jetzt fängt «ist leer» einen neuen Eintrag).
@@ -5928,3 +5936,22 @@ Version 0.20.17; Importregeln scharf stellen, letzter Schritt der Etappe 1)
   - Die Zeile «Stand des Dokuments» ganz oben nennt noch den Checkpoint der Etappe 0 (11.11.2026,
     `bad624f`); die Tabelle darunter ist aktuell. Zur Zwischenrevision.
   - Der Typ `MitteilungAdminDienste` heisst weiter nach den Mitteilungen (D.12, zur Kenntnis).
+- **Nachtrag nach dem Review** (12.11.2026; Review «ok» ohne Befund vor dem Merge, zwei Hinweise im
+  selben Branch umgesetzt; Commit `2f9ad27` `fix:`, dazu dieser `docs:`-Commit):
+  1. *Nicht normalisierte Pfade:* `zielVon` normalisiert jetzt auch den Zweig über `$lib`
+     (`posix.normalize`) und kennt Pfade ab der Projektwurzel (`/src/…`, so löst Vite auf). Neu als
+     Befund in einer Mitglieder-Datei: `'$lib/server/cm/../admin/rechte'`,
+     `'$lib/server/admin/./rechte.ts'`, `'$lib/../lib/server/admin/rechte.ts'`,
+     `'/src/lib/server/admin/rechte.ts'`. Nur die neue Regel; die Routen-Regeln sind unverändert.
+  2. *`mitKonto`* steht in `RECHTE_PRUEFUNG`; die Meldung heisst «liest, schreibt und mitKonto nur
+     in …» (aus der Liste gebaut). Einziger Nutzer ist `admin/schnittstellen.ts` (in der Tabelle).
+  - *Fälle:* `bauregel.test.ts` 115 → 122 (vier Pfade, zwei Formen mit `mitKonto` in einer
+    Mitglieder-Datei, `admin/schnittstellen.ts` darf `mitKonto`). Die Erwartung der Meldung
+    (Konstante im Test) zieht mit.
+  - *Rot belegt* (je aus einer Sicherungskopie zurückgesetzt, `cmp` gleich): neue Tests gegen den
+    Stand `3b33a29` → 21 rot (die sechs neuen Formen und die Meldung); `zielVon` wie vorher → genau
+    die fünf Fälle mit diesen Pfaden rot; `mitKonto` aus der Prüfung genommen (Meldung gleich) →
+    genau die zwei `mitKonto`-Fälle rot. Am echten Repo: `cm/schnittstellen.ts` mit
+    `import { liest } from '$lib/server/cm/../admin/rechte'` und
+    `import { mitKonto } from '/src/lib/server/admin/rechte.ts'` → zwei Befunde, Exit 1;
+    zurückgesetzt `bauregel: ok`.
