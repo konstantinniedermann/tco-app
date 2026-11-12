@@ -3,16 +3,21 @@ import { istTestquelle, leseDateien, meldeErgebnis, versionierteDateien } from '
 
 const ACTIONS_DEKLARATION = /\bexport\s+(?:const|let|var|(?:async\s+)?function\s*\*?)\s*actions\b/;
 
-/** Erkennt `export { actions }` und `export { x as actions }` (auch mit mehreren Namen). */
+/**
+ * Erkennt `export { actions }`, `export { x as actions }` und `export { x as 'actions' }` (auch mit
+ * mehreren Namen). Einen Namen mit Escape liest die Prüfung nicht: gesperrt im Zweifel (Schritt 12a).
+ */
 function exportiertActions(inhalt: string): boolean {
 	for (const block of inhalt.matchAll(/\bexport\s*\{([^}]*)\}/g)) {
 		const namen = block[1].split(',').map((eintrag) =>
-			eintrag
-				.trim()
-				.split(/\s+as\s+/)
-				.pop()
+			leseName(
+				eintrag
+					.trim()
+					.split(/\s+as\s+/)
+					.pop() ?? ''
+			)
 		);
-		if (namen.includes('actions')) return true;
+		if (namen.some((name) => name === 'actions' || name.includes('\\'))) return true;
 	}
 	return false;
 }
@@ -69,6 +74,12 @@ const SCHNITTSTELLEN_IMPORT = new RegExp(
 const ERLAUBTER_IMPORT = new RegExp(
 	`${SCHNITTSTELLEN_IMPORT.source}|(?:^|\\/)lib\\/server\\/dienste\\.ts$|^\\.\\/\\$types$`
 );
+// Wohin ein erlaubter Import einer Admin-Route zeigen muss (aufgelöst, ohne Endung): Ein Pfad, der
+// nur so endet wie eine erlaubte Datei (falsche Tiefe, Paket, `/lib/…` ohne `src`), ist ein Befund.
+const ZIELE_DER_ADMIN_ROUTE = new Set([
+	`${SERVER}dienste`,
+	...VERWALTUNGS_DATEIEN.map((v) => SERVER + ohneEndung(v.datei))
+]);
 // Die Einstiege der Verwaltung in `dienste.ts`: Admin-Routen dürfen aus `dienste.ts` nur diese.
 // Ein neuer Einstieg der Verwaltung, der hier fehlt, ist für Admin-Routen gesperrt und fällt sofort
 // auf. Ausserhalb von api/admin gilt die Erlaubt-Liste MITGLIEDER_EINSTIEGE; ein Name von hier
@@ -112,21 +123,66 @@ const RECHTE_PRUEFUNG = ['liest', 'schreibt', 'mitKonto'];
 const BEZEICHNER = /^[A-Za-z_$][\w$]*$/;
 const NUR_VERWALTUNG_RECHTE = `${aufzaehlung(RECHTE_PRUEFUNG)} nur in ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.datei))}`;
 
-// Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
-// weiterreicht, fällt hier nicht auf; das bleibt Aufgabe des Reviews.
-
-type Import =
-	| { art: 'statisch'; quelle: string; klausel: string | null }
-	| { art: 'dynamisch'; quelle: string | null };
-
-/** Entfernt Kommentare, damit z. B. ein Apostroph in einem Kommentar keinen Import verschluckt. */
-function ohneKommentare(inhalt: string): string {
-	return inhalt.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
-}
-
 // Ein Text in Anführungszeichen, je bis zum schliessenden Zeichen derselben Zeile; ein Escape (`\'`,
 // `\"`, `\\`) beendet ihn nicht.
 const TEXT = `'(?:[^'\\\\\\n]|\\\\.)*'|"(?:[^"\\\\\\n]|\\\\.)*"`;
+// Die Dateien der Tabelle rufen die Rechteprüfung nur auf und reichen sie nicht weiter (Schritt 12a).
+const NUR_TEXTE = new RegExp(TEXT, 'g');
+const NUR_AUFRUFEN = `${aufzaehlung(RECHTE_PRUEFUNG)} nur aufrufen, nicht weiterreichen`;
+
+// Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
+// weiterreicht, fällt hier nicht auf; das bleibt Aufgabe des Reviews. Ausgenommen ist die
+// Rechteprüfung selbst: Sie reicht keine Datei der Tabelle weiter (`pruefeWeiterreichen`).
+
+// `wort`: `import` oder `export`; `bereich`: Anfang und Ende der Anweisung im Text ohne Kommentare.
+type Import =
+	| {
+			art: 'statisch';
+			wort: string;
+			quelle: string;
+			klausel: string | null;
+			bereich: [number, number];
+	  }
+	| { art: 'dynamisch'; quelle: string | null };
+
+// Was kein Kommentar ist, obwohl `//` oder `/*` darin stehen kann: Texte in '…' und "…" (je auf
+// einer Zeile), Template-Literale (auch über Zeilen; `${…}` zählt mit zum Text) und Regex-Literale
+// (nach einem Zeichen oder Wort, hinter dem kein Wert endet, oder am Zeilenanfang; auf einer Zeile).
+const KEIN_KOMMENTAR = [
+	/'(?:[^'\\\n]|\\.)*'/,
+	/"(?:[^"\\\n]|\\.)*"/,
+	/`(?:[^`\\]|\\[\s\S])*`/,
+	/(?<=(?:^|[(,=:[!&|?{};+\-*%<>~^]|\b(?:return|typeof|case|do|else|in|of|new|delete|void|throw|instanceof|yield|await))\s*)\/(?![*/])(?:[^\\/\n[]|\\.|\[(?:[^\]\\\n]|\\.)*\])+\//
+];
+// Ein Zeilenkommentar beginnt nicht direkt nach `:` (eine Adresse ausserhalb eines Texts) oder `\`.
+const KOMMENTAR = [/\/\*[\s\S]*?\*\//, /(?<![:\\])\/\/[^\n]*/];
+const TEXT_ODER_KOMMENTAR = new RegExp(
+	`(${KEIN_KOMMENTAR.map((r) => r.source).join('|')})|${KOMMENTAR.map((r) => r.source).join('|')}`,
+	'gm'
+);
+
+/**
+ * Entfernt Kommentare, damit z. B. ein Apostroph in einem Kommentar keinen Import verschluckt. Texte
+ * bleiben, wie sie stehen: `//` in einem Importpfad ist kein Kommentar (Schritt 12a).
+ */
+function ohneKommentare(inhalt: string): string {
+	return inhalt.replace(TEXT_ODER_KOMMENTAR, (_treffer, text?: string) => text ?? '');
+}
+
+/**
+ * Die Lesart bis Schritt 12: jedes `/*…*\/` und jedes `//…` ausser direkt nach `:`, `'`, `"`,
+ * Backtick oder `\`, ohne Rücksicht auf Texte.
+ */
+function ohneKommentareBisher(inhalt: string): string {
+	return inhalt.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+}
+
+// Zwei Lesarten ohne Kommentare: Das Muster oben kennt keine Syntax und kann einen Text zu weit oder
+// zu kurz lesen (z. B. ein Regex-Literal nach `)`, eine Division nach `a!`). Jede Regel, die von den
+// Kommentaren abhängt, prüft darum beide Lesarten; ein Befund aus einer von beiden gilt. So ist die
+// Bauregel nirgends lockerer als bis Schritt 12 (Korrekturrunde Schritt 12a).
+const LESARTEN = [ohneKommentare, ohneKommentareBisher];
+
 const SCHLUESSELWORT = /\b(?:import|export)\b/g;
 const OHNE_KLAUSEL = /\s*['"]([^'"]+)['"]/y;
 const BIS_FROM = `\\bfrom\\s*['"]([^'"]+)['"]`;
@@ -152,19 +208,28 @@ function ab(muster: RegExp, text: string, stelle: number): RegExpExecArray | nul
 // ohne Klausel (nur nach `import`), dann die Klausel ohne Anführungszeichen, erst dann die mit Namen
 // in Anführungszeichen. So gibt es jeden Treffer der Fassung vor Schritt 09 weiter, mit derselben
 // Klausel; dazu kommen Treffer, die sie verbraucht oder nicht erkannt hatte.
-// Dynamisch: `quelle` ist `null`, wenn der Pfad berechnet wird (`import(variable)`).
-function importe(inhalt: string): Import[] {
-	const text = ohneKommentare(inhalt);
+// Dynamisch: `quelle` ist `null`, wenn der Pfad berechnet wird (`import(variable)`). `text` ist eine
+// Lesart ohne Kommentare (LESARTEN).
+function importeAus(text: string): Import[] {
 	const statisch: Import[] = [];
 	for (const wort of text.matchAll(SCHLUESSELWORT)) {
 		const stelle = wort.index + wort[0].length;
 		const ohne = wort[0] === 'import' ? ab(OHNE_KLAUSEL, text, stelle) : null;
 		if (ohne) {
-			statisch.push({ art: 'statisch', quelle: ohne[1], klausel: null });
+			const bereich: [number, number] = [wort.index, stelle + ohne[0].length];
+			statisch.push({ art: 'statisch', wort: wort[0], quelle: ohne[1], klausel: null, bereich });
 			continue;
 		}
 		const mit = ab(KLAUSEL, text, stelle) ?? ab(KLAUSEL_MIT_TEXT, text, stelle);
-		if (mit) statisch.push({ art: 'statisch', quelle: mit[2], klausel: mit[1].trim() });
+		if (!mit) continue;
+		const bereich: [number, number] = [wort.index, stelle + mit[0].length];
+		statisch.push({
+			art: 'statisch',
+			wort: wort[0],
+			quelle: mit[2],
+			klausel: mit[1].trim(),
+			bereich
+		});
 	}
 	const dynamisch = /\bimport\s*\(\s*(?:['"`]([^'"`$]+)['"`]\s*\))?/g;
 	return [
@@ -223,18 +288,20 @@ function adminSchnittstellen(dateien: Map<string, string>): Set<string> | null {
 	return new Set([...admin, ...weitere.flatMap((v) => [...(listeAus(dateien, v) ?? [])])]);
 }
 
-function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): string[] {
+function pruefeAdminRoute(pfad: string, text: string, erlaubt: Set<string>): string[] {
 	const befunde: string[] = [];
 	// Lokale Namen der erlaubten Schnittstellen (auch mit `as` umbenannt).
 	const schnittstellen = new Set<string>();
-	for (const imp of importe(inhalt)) {
+	for (const imp of importeAus(text)) {
 		if (imp.art === 'dynamisch') {
 			befunde.push(
 				`${pfad}: Admin-Route lädt '${imp.quelle ?? '(berechnet)'}' dynamisch; nur statische Importe`
 			);
 			continue;
 		}
-		if (!ERLAUBTER_IMPORT.test(imp.quelle)) {
+		const amZiel =
+			imp.quelle === './$types' || ZIELE_DER_ADMIN_ROUTE.has(zielVon(pfad, imp.quelle) ?? '');
+		if (!ERLAUBTER_IMPORT.test(imp.quelle) || !amZiel) {
 			befunde.push(`${pfad}: Admin-Route importiert '${imp.quelle}'; ${ERLAUBT_IMPORT}`);
 			continue;
 		}
@@ -259,7 +326,7 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 		}
 	}
 	// Die Dienste nur einer Schnittstelle übergeben: Wer `.db` herausholt, umgeht die Rechteprüfung.
-	const code = ohneKommentare(inhalt).replace(/\bimport\b[^;]*?\bfrom\s*['"][^'"]+['"]\s*;?/g, '');
+	const code = text.replace(/\bimport\b[^;]*?\bfrom\s*['"][^'"]+['"]\s*;?/g, '');
 	for (const treffer of code.matchAll(
 		new RegExp(`\\b(?:${VERWALTUNGS_EINSTIEGE.join('|')})\\b`, 'g')
 	)) {
@@ -278,7 +345,7 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 function pruefeDiensteImporte(pfad: string, imp: Import[]): string[] {
 	const befunde: string[] = [];
 	for (const i of imp) {
-		if (i.quelle === null || !DIENSTE_MODUL.test(i.quelle)) continue;
+		if (i.quelle === null || !trifft(DIENSTE_MODUL, pfad, i.quelle)) continue;
 		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
 		if (namen === null) {
 			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
@@ -303,15 +370,30 @@ function pruefeDiensteImporte(pfad: string, imp: Import[]): string[] {
  * Paket. Über `$lib`, ab der Projektwurzel (`/src/…`, so löst Vite auf) oder relativ zur Datei.
  */
 function zielVon(pfad: string, quelle: string): string | null {
+	const voll = aufgeloest(pfad, quelle);
+	return voll === null ? null : voll.replace(/\.(?:ts|js)$/, '');
+}
+
+/** Wie `zielVon`, aber mit der Endung, wie sie steht. */
+function aufgeloest(pfad: string, quelle: string): string | null {
 	const ohneAnhang = quelle.replace(/[?#].*$/, '');
-	const voll = ohneAnhang.startsWith('$lib/')
+	return ohneAnhang.startsWith('$lib/')
 		? posix.normalize(`src/lib/${ohneAnhang.slice('$lib/'.length)}`)
 		: ohneAnhang.startsWith('/')
 			? posix.normalize(ohneAnhang.slice(1))
 			: ohneAnhang.startsWith('.')
 				? posix.join(posix.dirname(pfad), ohneAnhang)
 				: null;
-	return voll === null ? null : voll.replace(/\.(?:ts|js)$/, '');
+}
+
+/**
+ * Ob eine Sperre einen Import trifft: am Pfad, wie er steht, oder am aufgelösten Pfad (mit Endung,
+ * ohne Anhang). So bleibt jeder Befund am geschriebenen Pfad, und `..`, `./` oder `//` umgehen keine
+ * Sperre (Schritt 12a).
+ */
+function trifft(muster: RegExp, pfad: string, quelle: string): boolean {
+	const ziel = aufgeloest(pfad, quelle);
+	return muster.test(quelle) || (ziel !== null && muster.test(ziel));
 }
 
 /**
@@ -336,14 +418,111 @@ function pruefeRechteImporte(pfad: string, imp: Import[]): string[] {
 	return befunde;
 }
 
-/** Wo die Bauregel die Importe aus admin/rechte.ts prüft: `src/` ohne Routen und Tests. */
+/**
+ * In den Dateien der Tabelle: aus admin/rechte.ts nur statisch und mit Namen; `liest`, `schreibt` und
+ * `mitKonto` (auch umbenannt, auch ein Name, den die Prüfung nicht liest) stehen im Code nur direkt
+ * vor `(`. Jede andere Stelle (`export { liest }`, `export default`, `const a = liest`, `{ liest }`)
+ * reicht sie weiter, ebenso `export { liest } from` und `export * from` admin/rechte.ts (Schritt 12a).
+ */
+function pruefeWeiterreichen(pfad: string, text: string): string[] {
+	const befunde: string[] = [];
+	const lokal = new Set<string>();
+	let code = text;
+	for (const i of importeAus(text)) {
+		if (i.quelle === null || zielVon(pfad, i.quelle) !== RECHTE) continue;
+		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
+		if (i.art === 'dynamisch' || namen === null) {
+			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
+			continue;
+		}
+		// Die Anweisung selbst ist kein Weiterreichen; der Rest des Texts behält seine Stellen.
+		const [von, bis] = i.bereich;
+		code = code.slice(0, von) + ' '.repeat(bis - von) + code.slice(bis);
+		for (const [name, alias] of namen) {
+			if (BEZEICHNER.test(name) && !RECHTE_PRUEFUNG.includes(name)) continue;
+			if (i.wort === 'export' || !BEZEICHNER.test(alias.trim())) {
+				befunde.push(`${pfad}: reicht '${name}' aus admin/rechte.ts weiter; ${NUR_AUFRUFEN}`);
+			} else lokal.add(alias.trim());
+		}
+	}
+	// Texte zählen nicht: «Die Verwaltung liest …» in einer Meldung ist kein Weiterreichen. Auch hier
+	// zwei Lesarten: ohne alle Texte (auch Template- und Regex-Literale) und nur ohne '…' und "…";
+	// eine Stelle aus einer von beiden gilt.
+	for (const ohneTexte of [code.replace(TEXT_ODER_KOMMENTAR, ''), code.replace(NUR_TEXTE, "''")]) {
+		for (const name of lokal) {
+			for (const t of ohneTexte.matchAll(
+				new RegExp(`(?<![\\w$.])(?<!\\btypeof\\s+)${escape(name)}(?![\\w$])`, 'g')
+			)) {
+				// Ein Aufruf, auch mit Typ-Argument (`liest<T>(…)`), ist kein Weiterreichen.
+				if (/^\s*(?:<[^<>()]*>\s*)?\(/.test(ohneTexte.slice(t.index + name.length))) continue;
+				befunde.push(`${pfad}: reicht '${name}' aus admin/rechte.ts weiter; ${NUR_AUFRUFEN}`);
+			}
+		}
+	}
+	return [...new Set(befunde)];
+}
+
+/**
+ * Wo die Bauregel die Importe aus admin/rechte.ts prüft: `src/` ohne Routen und Tests, auch
+ * `.mts`, `.cts`, `.mjs` und `.cjs` (Vite lädt sie wie `.ts` und `.js`; Schritt 12a).
+ */
 export function betrifftRechteImporte(pfad: string): boolean {
 	return (
 		pfad.startsWith('src/') &&
 		!pfad.startsWith('src/routes/') &&
-		/\.(ts|js)$/.test(pfad) &&
+		/\.[cm]?[tj]s$/.test(pfad) &&
 		!istTestquelle(pfad)
 	);
+}
+
+// Laden, dessen Ziel die Prüfung nicht liest: `import.meta.glob` (Vite, auch `globEager`) und
+// `require` samt `createRequire` (ohne Methoden wie `x.require` und ohne `function require(`). In
+// Routen und in den Dateien der Rechte-Regel ein Befund, gesperrt im Zweifel (Schritt 12a).
+const NICHT_PRUEFBAR =
+	/\bimport\s*\.\s*meta\s*\.\s*glob|(?<![\w$.])(?<!\bfunction\s+)(?:require|createRequire)\s*\(/g;
+const BERECHNET = 'dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen';
+
+function pruefeNichtPruefbar(pfad: string, text: string): string[] {
+	const woerter = [...text.matchAll(NICHT_PRUEFBAR)].map((t) =>
+		t[0].startsWith('import') ? 'import.meta.glob' : t[0].replace(/\s*\($/, '')
+	);
+	return [...new Set(woerter)].map(
+		(wort) => `${pfad}: ${wort} lässt sich nicht prüfen; nur statische Importe`
+	);
+}
+
+/** Die Regeln, die von den Kommentaren abhängen, für eine Lesart `text` ohne Kommentare. */
+function pruefeLesart(pfad: string, text: string, liste: Set<string> | null): string[] {
+	const befunde: string[] = [];
+	const inRoutes = pfad.startsWith('src/routes/');
+	if (ADMIN_ROUTE.test(pfad)) {
+		if (liste !== null) befunde.push(...pruefeAdminRoute(pfad, text, liste));
+	} else if (inRoutes) {
+		const imp = importeAus(text);
+		if (imp.some((i) => i.quelle !== null && trifft(ADMIN_MODUL, pfad, i.quelle))) {
+			befunde.push(
+				`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
+			);
+		}
+		for (const v of NUR_VERWALTUNG) {
+			if (imp.some((i) => i.quelle !== null && trifft(v.muster, pfad, i.quelle))) {
+				befunde.push(
+					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/${v.datei} nutzen`
+				);
+			}
+		}
+		befunde.push(...pruefeDiensteImporte(pfad, imp));
+		if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
+	}
+	if (inRoutes || betrifftRechteImporte(pfad)) befunde.push(...pruefeNichtPruefbar(pfad, text));
+	if (betrifftRechteImporte(pfad)) {
+		const imp = importeAus(text);
+		if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
+		if (VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei)) {
+			befunde.push(...pruefeWeiterreichen(pfad, text));
+		} else befunde.push(...pruefeRechteImporte(pfad, imp));
+	}
+	return befunde;
 }
 
 /**
@@ -368,33 +547,9 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 		if (inRoutes && (ACTIONS_DEKLARATION.test(inhalt) || exportiertActions(inhalt))) {
 			befunde.push(`${pfad}: Form Actions sind nicht vorgesehen`);
 		}
-		if (ADMIN_ROUTE.test(pfad)) {
-			if (liste !== null) befunde.push(...pruefeAdminRoute(pfad, inhalt, liste));
-		} else if (inRoutes) {
-			const imp = importe(inhalt);
-			if (imp.some((i) => i.quelle !== null && ADMIN_MODUL.test(i.quelle))) {
-				befunde.push(
-					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
-				);
-			}
-			for (const v of NUR_VERWALTUNG) {
-				if (imp.some((i) => i.quelle !== null && v.muster.test(i.quelle))) {
-					befunde.push(
-						`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/${v.datei} nutzen`
-					);
-				}
-			}
-			befunde.push(...pruefeDiensteImporte(pfad, imp));
-			if (imp.some((i) => i.quelle === null)) {
-				befunde.push(`${pfad}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`);
-			}
-		}
-		if (
-			betrifftRechteImporte(pfad) &&
-			!VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei)
-		) {
-			befunde.push(...pruefeRechteImporte(pfad, importe(inhalt)));
-		}
+		// Jede Lesart ohne Kommentare für sich; gleiche Befunde zählen einmal.
+		const jeLesart = LESARTEN.flatMap((lesart) => pruefeLesart(pfad, lesart(inhalt), liste));
+		befunde.push(...new Set(jeLesart));
 		if (/\.remote\.(ts|js)$/.test(name)) {
 			befunde.push(`${pfad}: Remote Functions sind nicht vorgesehen`);
 		}

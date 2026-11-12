@@ -8,6 +8,14 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.19 — Reste der Bauregel geschlossen (Refactoring Schritt 12a)
+
+- Die Bauregel prüft Importpfade am aufgelösten Ziel, lässt sich von `//` in Pfaden und Texten nicht
+  mehr täuschen, erkennt `export { x as 'actions' }`, meldet nicht prüfbares Laden
+  (`import.meta.glob`, `require`, berechnetes `import()`) und verbietet das Weiterreichen der
+  Rechteprüfungen. Nur das Prüfskript ist geändert, am Verhalten ändert sich nichts (#80).
+- Projektregeln (`CLAUDE.md`) an vier Stellen im Wortlaut berichtigt.
+
 ## 0.20.18 — Importregeln ohne Ausnahme (Refactoring Schritt 12)
 
 - Die Importregel zwischen den Server-Modulen gilt ohne Ausnahme; ein Test hält fest, dass die Liste

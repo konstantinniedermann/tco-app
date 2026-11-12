@@ -19,7 +19,9 @@
   `schreibt` und steht in einer der Schnittstellen-Listen; unter `api/admin/` gibt es keine
   Schnittstelle ausserhalb der Listen.
 - Fachfunktionen kennen kein HTTP: Sie bekommen Datenbank und Zeit hineingereicht und geben ein
-  Ergebnis-Wort zurück. Statuscode und Antwort baut nur die Schnittstellen-Funktion.
+  Ergebnis-Wort zurück. Statuscode und Antwort bauen nur Schnittstellen-Dateien, ihre Antwort-Hilfen, die
+  Rechteprüfung und der Riegel der Ansicht, mit den Bausteinen aus `src/lib/server/http.ts`
+  (ausser Datei-Antworten wie die Kalender-Datei); nie eine Fachfunktion.
 - Die Zeit kommt über die Dienste (`jetzt`), nie direkt aus `new Date()`.
 - Schreibende Schnittstellen nehmen nur JSON an.
 - Logs enthalten nur feste Texte: nie Fehlermeldungen, Eingaben, Adressen oder Codes.
@@ -42,7 +44,8 @@
 - E2E nur über `make e2e` bzw. `npm run e2e`. Elemente über Rolle und Beschriftung suchen, nicht
   über CSS-Klassen; keine festen Wartezeiten.
 - Eine neue Schnittstelle kommt in die Liste ihres Moduls. Eine neue Liste der Verwaltung kommt
-  in Grundprüfung, Routen-Test, Rechte-Matrix und Bauregel.
+  in `tests/hilfen/verwaltungs-listen.ts` und in die Tabelle der Bauregel; eine neue Liste der
+  Mitglieder in Grundprüfung und Routen-Test.
 - Nie zwei Builds oder Prüfläufe (`make check`, `make e2e`, `npm run build`) gleichzeitig im
   selben Ordner.
 
@@ -104,13 +107,14 @@ Abschluss des Plans.
   Modul unter `src/lib/server/` importiert diese Datei.
 - Ab Schritt 08: eine Fehlerform `{ fehler, felder? }`; Zusatzangaben nur, wo `src/lib/fehler.ts`
   sie für ein Wort nennt. Fehlerwörter nur aus dieser Liste, die Server und Oberfläche teilen.
-- Die Importrichtung zwischen den Server-Modulen setzt ESLint durch. Keine neue Ausnahme in
-  `AUSNAHMEN` (`eslint.config.js`) ohne Entscheid des Projektleiters; ab Schritt 12 ist die
-  Liste leer.
+- Die Importrichtung zwischen den Server-Modulen setzt ESLint ohne Ausnahme durch; eine Ausnahme
+  in `AUSNAHMEN` (`eslint.config.js`) nur mit Entscheid des Projektleiters.
 - Ab Schritt 13: Abruf-Module nutzen den gemeinsamen Abruf-Baustein; keine eigene Deutung von
   Statuscodes, das Ergebnis heisst `art`.
-- Ab Schritt 15: Die Anmeldung prüft nur die gemeinsame Wächter-Funktion in der Ladefunktion;
-  Seiten laden ihre Daten in `+page.ts`, nicht im Baustein.
+- Ab Schritt 15: Fehlende Sitzung, Rolle oder Bestätigung behandelt nur die gemeinsame
+  Wächter-Funktion, in der Ladefunktion und nach einer Aktion; keine Seite schreibt die Umleitung
+  zum Login selbst, keine Ladefunktion ruft `fetch` direkt. Das erste Laden einer Seite steht in
+  `+page.ts`; im Baustein nur erneutes Laden nach Eingabe oder Aktion.
 - Ab Schritt 17: Eine Aktion mit Rückfrage nutzt `Aktionsdialog` oder die gemeinsame
   Ablauf-Funktion; keine neue Sperre und Antwort-Verzweigung von Hand.
 - Ab Schritt 18: Stile in den Dateien unter `src/lib/design/` in ihrer festen Reihenfolge;

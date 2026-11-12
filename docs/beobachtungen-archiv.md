@@ -7,6 +7,15 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Erledigt im Refactoring, Schritt 12a (12.11.2026) — ausserhalb einer Auswertung
+
+**Mitgemacht**
+
+- 2026-11-12 — Bauregel übersieht Importpfade mit `//` oder `..` vor `admin` → df46080, 4224178
+  (`ohneKommentare` entfernt Kommentare nur ausserhalb von Texten; die Routen-Regeln prüfen den
+  Pfad, wie er steht, und den aufgelösten Pfad; je Form ein Fall in `bauregel.test.ts`;
+  `docs/refactoring-analyse.md`, Anhang D.15)
+
 ### Erledigt im Refactoring, Schritt 11 (12.11.2026) — ausserhalb einer Auswertung
 
 **Mitgemacht**

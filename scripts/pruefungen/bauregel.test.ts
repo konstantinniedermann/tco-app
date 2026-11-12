@@ -6,6 +6,11 @@ const LISTEN =
 	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN, CM_ADMIN_SCHNITTSTELLEN, GESPRAECH_ADMIN_SCHNITTSTELLEN, MITTEILUNG_ADMIN_SCHNITTSTELLEN und ANLASS_ADMIN_SCHNITTSTELLEN';
 const DATEIEN =
 	'erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/verwaltung-schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
+const VERWALTUNG =
+	'liest, schreibt und mitKonto nur in admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/verwaltung-schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
+/** Befund der Regel für die Rechteprüfung in einer Datei ausserhalb der Tabelle. */
+const rechteBefund = (pfad: string, name: string) =>
+	`${pfad}: '${name}' aus admin/rechte.ts; ${VERWALTUNG}`;
 
 describe('pruefeBauregel', () => {
 	it('meldet Server-Dateien neben Seiten', () => {
@@ -32,6 +37,19 @@ describe('pruefeBauregel', () => {
 		'export {\n\ta,\n\tactions\n}'
 	])('meldet Form Actions als %j', (code) => {
 		expect(pruefeBauregel(new Map([['src/routes/+page.ts', code]]))).toHaveLength(1);
+	});
+	// Schritt 12a, Punkt 3 (N-05): Namen in Anführungszeichen (ES2022) und Namen mit Escape.
+	it.each([
+		"export { x as 'actions' }",
+		'export { x as "actions" }',
+		"export { a, x as 'actions', b }",
+		"export { 'actions' } from './a.ts'",
+		"export { x as 'acti\\u006fns' }",
+		'export { x as acti\\u006fns }'
+	])('meldet Form Actions mit Namen in Anführungszeichen oder Escape als %j', (code) => {
+		expect(pruefeBauregel(new Map([['src/routes/+page.ts', code]]))).toEqual([
+			'src/routes/+page.ts: Form Actions sind nicht vorgesehen'
+		]);
 	});
 	it('meldet keine ähnlichen Namen', () => {
 		expect(
@@ -746,12 +764,9 @@ describe('Text in Anführungszeichen verschluckt keinen Import', () => {
 // Mitglieder liefe durch keine 403-Schleife; die Rechteprüfung `liest`/`schreibt` darf darum nur in
 // den Dateien der Tabelle VERWALTUNGS_DATEIEN stehen.
 describe('liest und schreibt nur in den Verwaltungs-Dateien', () => {
-	const VERWALTUNG =
-		'liest, schreibt und mitKonto nur in admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/verwaltung-schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
 	const mitglied = 'src/lib/server/cm/schnittstellen.ts';
 	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
-	const befund = (pfad: string, name: string) =>
-		`${pfad}: '${name}' aus admin/rechte.ts; ${VERWALTUNG}`;
+	const befund = rechteBefund;
 
 	it.each([
 		['src/lib/server/admin/schnittstellen.ts', './rechte.ts'],
@@ -869,6 +884,311 @@ describe('liest und schreibt nur in den Verwaltungs-Dateien', () => {
 		['tests/hilfen/verwaltungs-listen.ts', false]
 	])('betrifftRechteImporte(%s) ist %s', (pfad, erwartet) => {
 		expect(betrifftRechteImporte(pfad)).toBe(erwartet);
+	});
+});
+
+// Schritt 12a, Punkt 2 (N-01): Kommentare werden nur ausserhalb von Texten entfernt. Ein `//` oder
+// `/*` in einem Text lässt keinen Import verschwinden; ein Zeilenkommentar direkt hinter einem Text
+// ist ein Kommentar (D.8, D.14).
+describe('Kommentare nur ausserhalb von Texten (Schritt 12a)', () => {
+	const mitglied = 'src/lib/server/cm/schnittstellen.ts';
+	const route = 'src/routes/api/profil/+server.ts';
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
+
+	it.each([
+		['liest', "import { liest } from '$lib/server//admin/rechte.ts';"],
+		['liest', "import { liest } from '..//admin/rechte.ts';"],
+		['schreibt', 'import { schreibt } from "../admin//rechte";'],
+		['liest', "const a = '/*';\nimport { liest } from '../admin/rechte.ts';\nconst b = '*/';"],
+		['mitKonto', 'const a = `/*`;\nimport { mitKonto } from "../admin/rechte.ts";\nconst b = `*/`;']
+	])(
+		'RR-07: ein Kommentarzeichen in einem Text verschluckt den Import nicht (%s): %s',
+		(name, code) => {
+			expect(pruefe(mitglied, code)).toEqual([rechteBefund(mitglied, name)]);
+		}
+	);
+
+	it('RR-07: ein Zeilenkommentar direkt hinter einem Text verschluckt den Import nicht', () => {
+		const code = [
+			'import {',
+			"\t'holeAdminDienste'// it's",
+			'\tas h',
+			"} from '../../../lib/server/dienste.ts';"
+		].join('\n');
+		expect(pruefe(route, code)).toEqual([
+			`${route}: nur Routen unter src/routes/api/admin/ dürfen 'holeAdminDienste' nutzen`
+		]);
+	});
+
+	it('RR-07: Admin-Route: ein Kommentarzeichen in einem Text verschluckt den Import nicht', () => {
+		const admin = 'src/routes/api/admin/x/+server.ts';
+		const liste: [string, string] = [
+			'src/lib/server/admin/schnittstellen.ts',
+			'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+		];
+		const code =
+			"const a = '/*';\nimport { erstelleDb } from '../../../../lib/server/db/index.ts';\nconst b = '*/';";
+		expect(pruefeBauregel(new Map([liste, [admin, code]]))).toEqual([
+			`${admin}: Admin-Route importiert '../../../../lib/server/db/index.ts'; ${DATEIEN}`
+		]);
+	});
+});
+
+// Schritt 12a, Punkt 1 (N-02): Die Routen-Regeln prüfen den Pfad, wie er steht, und die Datei, auf
+// die er zeigt; `..`, `./`, `//` und Pfade ab `/src/` umgehen keine Sperre. Eine Admin-Route nimmt
+// nur Pfade, die wirklich auf eine erlaubte Datei zeigen.
+describe('Importpfade auch in Routen aufgelöst (Schritt 12a)', () => {
+	const route = 'src/routes/api/profil/+server.ts';
+	const listen: [string, string][] = [
+		[
+			'src/lib/server/admin/schnittstellen.ts',
+			'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+		],
+		[
+			'src/lib/server/anlass/verwaltung-schnittstellen.ts',
+			'export const ANLASS_ADMIN_SCHNITTSTELLEN = {\n\tgetAdminAnlaesse\n} satisfies Record<string, unknown>;'
+		]
+	];
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([...listen, [pfad, code]]));
+	const adminModul = `${route}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`;
+
+	it.each([
+		"import { liest } from '$lib/server/cm/../admin/rechte';",
+		"import { x } from '../../../lib/server/cm/../admin/rollen.ts';",
+		"import { x } from '$lib/server/./admin/rollen.ts';",
+		"import { x } from '$lib/server//admin/rollen.ts';",
+		"import { x } from '/src/lib/server/x/../admin';",
+		"const m = await import('../../../lib/server/cm/../admin/rollen.ts');"
+	])('RR-07: Mitglieder-Route, lib/server/admin über %s', (code) => {
+		expect(pruefe(route, code)).toEqual([adminModul]);
+	});
+
+	it.each([
+		"import { getAdminAnlaesse } from '$lib/server/cm/../anlass/verwaltung-schnittstellen';",
+		"import { getAdminAnlaesse } from '../../../lib/server//anlass/verwaltung-schnittstellen.ts';",
+		"export * from '/src/lib/server/./anlass/verwaltung-schnittstellen.ts';"
+	])('RR-07: Mitglieder-Route, Pfad-Sperre über %s', (code) => {
+		expect(pruefe(route, code)).toEqual([
+			`${route}: nur Routen unter src/routes/api/admin/ dürfen lib/server/anlass/verwaltung-schnittstellen.ts nutzen`
+		]);
+	});
+
+	it.each([
+		[
+			"import { holeAdminDienste } from '$lib/server/cm/../dienste';",
+			`${route}: nur Routen unter src/routes/api/admin/ dürfen 'holeAdminDienste' nutzen`
+		],
+		[
+			"import * as d from '/src/lib/server/./dienste.ts';",
+			`${route}: '/src/lib/server/./dienste.ts' nur statisch und mit Namen importieren`
+		]
+	])('RR-07: Mitglieder-Route, dienste.ts über %s', (code, befund) => {
+		expect(pruefe(route, code)).toEqual([befund]);
+	});
+
+	// Der geschriebene Pfad endet wie eine erlaubte Datei, zeigt aber nicht auf sie.
+	it.each([
+		"import { getMitglied } from '../lib/server/admin/schnittstellen.ts';",
+		"import { getMitglied } from 'paket/lib/server/admin/schnittstellen.ts';",
+		"import { holeAdminDienste } from '/lib/server/dienste.ts';",
+		"import { holeAdminDienste } from '../../../../lib/server/dienste.ts';"
+	])('RR-07: Admin-Route, Pfad zeigt nicht auf die erlaubte Datei: %s', (zeile) => {
+		const admin = 'src/routes/api/admin/mitglieder/[id]/+server.ts';
+		const quelle = /'([^']+)'/.exec(zeile)?.[1];
+		expect(pruefe(admin, zeile)).toEqual([
+			`${admin}: Admin-Route importiert '${quelle}'; ${DATEIEN}`
+		]);
+	});
+});
+
+// Schritt 12a, Punkt 4 (N-03): Laden, dessen Ziel die Prüfung nicht liest, ist in Routen und in den
+// Dateien der Rechte-Regel ein Befund; Dateien mit `.mts`/`.cts` gelten wie `.ts`.
+describe('Nicht prüfbares Laden (Schritt 12a)', () => {
+	const mitglied = 'src/lib/server/cm/schnittstellen.ts';
+	const route = 'src/routes/api/profil/+server.ts';
+	const admin = 'src/routes/api/admin/x/+server.ts';
+	const liste: [string, string] = [
+		'src/lib/server/admin/schnittstellen.ts',
+		'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+	];
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([liste, [pfad, code]]));
+	const nicht = (pfad: string, wort: string) =>
+		`${pfad}: ${wort} lässt sich nicht prüfen; nur statische Importe`;
+
+	it.each([
+		[route, "const m = import.meta.glob('$lib/server/admin/*.ts');", 'import.meta.glob'],
+		[route, "const m = import.meta.glob('./*.ts', { eager: true });", 'import.meta.glob'],
+		[route, "const r = require('../../../lib/server/admin/rollen.ts');", 'require'],
+		[admin, "const m = import.meta.glob('../../../../lib/server/db/*.ts');", 'import.meta.glob'],
+		[admin, "const r = require('../../../../lib/server/db/index.ts');", 'require'],
+		[
+			'src/routes/+page.svelte',
+			"<script>\n\tconst m = import.meta.glob('./*.ts');\n</script>",
+			'import.meta.glob'
+		],
+		[mitglied, "const r = require('../admin/rechte.ts');", 'require'],
+		[mitglied, "const r = createRequire(import.meta.url)('../admin/rechte.ts');", 'createRequire'],
+		[mitglied, "const m = import.meta.glob('../admin/*.ts');", 'import.meta.glob'],
+		['src/lib/server/cm/verwaltung-schnittstellen.ts', "const r = require('./x.ts');", 'require']
+	])('RR-07: %s: %s', (pfad, code, wort) => {
+		expect(pruefe(pfad, code)).toEqual([nicht(pfad, wort)]);
+	});
+
+	it.each([
+		[mitglied, 'const r = await import(pfad);'],
+		[mitglied, 'const r = await import(`../admin/${datei}.ts`);'],
+		['src/hooks.server.ts', 'const r = await import(pfad);'],
+		['src/lib/server/admin/schnittstellen.ts', 'const r = await import(pfad);']
+	])('RR-07: berechneter dynamischer Import ausserhalb der Routen in %s: %s', (pfad, code) => {
+		expect(pruefe(pfad, code)).toEqual([
+			`${pfad}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`
+		]);
+	});
+
+	it.each(['src/lib/server/cm/hilfe.mts', 'src/lib/server/cm/hilfe.cts'])(
+		'RR-07: %s gilt wie .ts',
+		(pfad) => {
+			expect(betrifftRechteImporte(pfad)).toBe(true);
+			expect(pruefe(pfad, "import { liest } from '../admin/rechte.ts';")).toEqual([
+				rechteBefund(pfad, 'liest')
+			]);
+		}
+	);
+});
+
+// Schritt 12a, Punkt 5 (N-04): Die Dateien der Tabelle VERWALTUNGS_DATEIEN rufen `liest`, `schreibt`
+// und `mitKonto` nur auf; sie reichen sie nicht weiter, sonst holte eine Mitglieder-Datei sie dort.
+describe('Rechteprüfung nicht weiterreichen (Schritt 12a)', () => {
+	const datei = 'src/lib/server/cm/verwaltung-schnittstellen.ts';
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
+	const weiter = (pfad: string, name: string) =>
+		`${pfad}: reicht '${name}' aus admin/rechte.ts weiter; liest, schreibt und mitKonto nur aufrufen, nicht weiterreichen`;
+	const r = "'../admin/rechte.ts'";
+
+	it.each([
+		['liest', `import { liest } from ${r};\nexport { liest };`],
+		['l', `import { liest as l } from ${r};\nexport { l as pruefe };`],
+		['schreibt', `import { schreibt } from ${r};\nexport default schreibt;`],
+		['l', `import { liest as l } from ${r};\nexport const pruefe = l;`],
+		['liest', `import { liest } from ${r};\nconst a = liest;\nexport { a };`],
+		['liest', `import { liest } from ${r};\nexport const LISTE = { liest };`],
+		['l', `import { 'liest' as l } from ${r};\nexport { l };`],
+		['schreibt', `export { schreibt } from ${r};`],
+		['liest', `export { liest as pruefe } from ${r};`],
+		['mitKonto', `export { 'mitKonto' as m } from ${r};`]
+	])('RR-07: reicht %s weiter: %s', (name, code) => {
+		expect(pruefe(datei, code)).toEqual([weiter(datei, name)]);
+	});
+
+	it('RR-07: auch admin/schnittstellen.ts reicht mitKonto nicht weiter', () => {
+		const pfad = 'src/lib/server/admin/schnittstellen.ts';
+		expect(pruefe(pfad, "import { mitKonto } from './rechte.ts';\nexport { mitKonto };")).toEqual([
+			weiter(pfad, 'mitKonto')
+		]);
+	});
+
+	it.each([
+		`export * from ${r};`,
+		`export * as rechte from ${r};`,
+		`import * as rechte from ${r};\nexport { rechte };`,
+		`const rechte = await import(${r});`
+	])('RR-07: aus admin/rechte.ts nur statisch und mit Namen: %s', (code) => {
+		expect(pruefe(datei, code)).toEqual([
+			`${datei}: '../admin/rechte.ts' nur statisch und mit Namen importieren`
+		]);
+	});
+});
+
+// Korrekturrunde Schritt 12a (M-1, H-3): Das Muster für Texte kennt keine Syntax. Liest es einen
+// Text zu weit oder zu kurz (Regex-Literal nach `)`, Division nach `a!` oder `i++`, Backtick in einem
+// Ausdruck oder im Markup), darf kein Import und kein Weiterreichen verschwinden, das die Fassung bis
+// Schritt 12 sah: Jede Regel prüft beide Lesarten ohne Kommentare. Fälle aus dem Review.
+describe('Zwei Lesarten ohne Kommentare (Korrekturrunde Schritt 12a)', () => {
+	const mitglied = 'src/lib/server/cm/hilfe.ts';
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
+	const mehr = (quelle: string) => `import {\n\tfremd2, // geht's\n\tliest\n} from '${quelle}';`;
+	const rechte = mehr('../admin/rechte.ts');
+
+	it.each([
+		['if (x) /`/.test(a);\n' + rechte + '\nconst t = `x`;'],
+		['const d = a! / 2 + `a/b`;\n' + rechte + '\nconst t = `x`;'],
+		["const h = a! / 2; import { fremd2, /* it's */ liest } from '../admin/rechte.ts';"],
+		["let h = i++ / 2; import { fremd2, /* it's */ liest } from '../admin/rechte.ts';"],
+		['const t = `${"`"}`;\n' + rechte + '\nconst u = `x`;'],
+		['const t = `${a /* ` */}`;\n' + rechte + '\nconst u = `x`;']
+	])('RR-07: Datei der Mitglieder: %s', (code) => {
+		expect(pruefe(mitglied, code)).toEqual([rechteBefund(mitglied, 'liest')]);
+	});
+
+	it.each([
+		[
+			'src/routes/api/profil/+server.ts',
+			"if (x) /'/.test(a); const u = '//cdn/x'; const m = await import('../../../lib/server/admin/rollen.ts');"
+		],
+		[
+			'src/routes/api/profil/+server.ts',
+			'const t = `${"`"}`; const a = "//"; import { getMitglieder } from \'$lib/server/admin/schnittstellen.ts\';'
+		],
+		[
+			'src/routes/x/+page.svelte',
+			`<p>Tippe \`</p>\n<script lang="ts">\n${mehr('$lib/server/admin/rollen.ts')}\nconst t = \`x\`;\n</script>`
+		]
+	])('RR-07: Route %s: %s', (pfad, code) => {
+		expect(pruefe(pfad, code)).toContain(
+			`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
+		);
+	});
+
+	it('RR-07: Admin-Route: ein Regex-Literal mit Backtick nach ) verdeckt keinen Import', () => {
+		const admin = 'src/routes/api/admin/x/+server.ts';
+		const liste: [string, string] = [
+			'src/lib/server/admin/schnittstellen.ts',
+			'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+		];
+		const code =
+			'if (x) /`/.test(a);\n' + mehr('../../../../lib/server/db/index.ts') + '\nconst t = `x`;';
+		expect(pruefeBauregel(new Map([liste, [admin, code]]))).toContain(
+			`${admin}: Admin-Route importiert '../../../../lib/server/db/index.ts'; ${DATEIEN}`
+		);
+	});
+
+	it('RR-07: Datei der Tabelle: eine Division nach a! verdeckt kein Weiterreichen (H-3)', () => {
+		const datei = 'src/lib/server/cm/verwaltung-schnittstellen.ts';
+		const code = [
+			"import { liest } from '../admin/rechte.ts';",
+			'const r = a! / 2; export const x = liest; const s = 1 / 2;'
+		].join('\n');
+		expect(pruefe(datei, code)).toEqual([
+			`${datei}: reicht 'liest' aus admin/rechte.ts weiter; liest, schreibt und mitKonto nur aufrufen, nicht weiterreichen`
+		]);
+	});
+});
+
+// Korrekturrunde Schritt 12a (H-4, H-1, H-2): Was die neuen Regeln der Punkte 4 und 5 nicht melden.
+describe('Keine Fehlalarme der Punkte 4 und 5 (Korrekturrunde Schritt 12a)', () => {
+	const datei = 'src/lib/server/cm/verwaltung-schnittstellen.ts';
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
+	const r = "import { liest, schreibt, type AdminDienste } from '../admin/rechte.ts';";
+
+	it.each([
+		`${r}\nexport const getX = liest('cm', async (d, e) => e);`,
+		`${r}\nexport const postX = schreibt(\n\t'cm',\n\tasync (d, e) => e\n);`,
+		`${r}\nexport const getY = liest<AdminDienste>('cm', (d, e) => e);`,
+		`${r}\nconst meldung = 'Die Verwaltung liest und schreibt';\nexport const g = liest('cm', (d, e) => e);`,
+		`${r}\ntype Pruefung = typeof liest;\nexport const g = schreibt('cm', (d, e) => e);`
+	])('lässt in einer Datei der Tabelle zu: %s', (code) => {
+		expect(pruefe(datei, code)).toEqual([]);
+	});
+
+	it.each([
+		['src/lib/server/cm/schnittstellen.ts', "const r = x.require('a');"],
+		['src/lib/server/cm/schnittstellen.ts', 'declare function require(id: string): unknown;'],
+		[
+			'src/routes/api/profil/+server.ts',
+			'const m = meta.glob;\nexport const h = (a) => a.require(1);'
+		]
+	])('lässt in %s zu: %s', (pfad, code) => {
+		expect(pruefe(pfad, code)).toEqual([]);
 	});
 });
 

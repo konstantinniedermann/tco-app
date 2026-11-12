@@ -116,18 +116,6 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
-### 2026-11-12 — Bauregel übersieht Importpfade mit `//` oder `..` vor `admin`
-
-**Thema:** Sicherheit
-
-**Fundort:** `scripts/pruefungen/bauregel.ts`, `ohneKommentare` und `ADMIN_MODUL`
-
-**Beobachtung:** `ohneKommentare` liest `//` in einem Importpfad als Zeilenkommentar: `import { liest } from '$lib/server//admin/rechte.ts'` verschwindet, die Bauregel meldet nichts. `ADMIN_MODUL` erwartet `lib/server/admin` zusammenhängend: `import { liest } from '$lib/server/cm/../admin/rechte'` in einer Route ausserhalb von `api/admin/` bleibt ohne Befund (gestellt geprüft). Beide Pfade löst Vite auf. Heute schreibt kein Code so.
-
-**Ursprung:** Review von Refactoring-Schritt 12 (`docs/refactoring-analyse.md`, Anhang D.14, Nachtrag)
-
-**Einschätzung:** Klein, weil die Schreibweise ungewöhnlich ist und die Rechte-Tests über die Listen laufen. Behebung: Importpfade vor dem Prüfen normalisieren (wie `zielVon` der Regel für `liest`/`schreibt`) und Kommentare nicht innerhalb von Texten entfernen; je Form ein Fall in `bauregel.test.ts`.
-
 ### 2026-11-12 — Kostenseite hinkt der Schätzung für den Vorstand nach
 
 **Thema:** Kosten
@@ -189,3 +177,23 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 **Ursprung:** Doku-Abgleich vor dem Release 0.20.5
 
 **Einschätzung:** Niedrig: Absender sind eingeloggte Vereinsmitglieder. Wenn nötig, eine Grenze pro Konto oder höchstens eine Meldung pro Gespräch und Stunde.
+
+### 2026-11-12 — Bauregel kann bei einem Kommentar hinter einer Division zu Unrecht melden
+
+**Thema:** Tests
+
+**Fundort:** `scripts/pruefungen/bauregel.ts`, `ohneKommentare` (Zeichenliste des Regex-Musters:
+`!`, `+`, `-`, `}`, `>`) und `pruefeWeiterreichen` (Muster für Typ-Argumente).
+
+**Beobachtung:** Steht hinter einer Division nach `a!`, `i++` oder `}` ein Zeilenend-Kommentar mit
+`liest`, `schreibt`, `mitKonto` oder `require(`, meldet die Bauregel in einer geprüften Datei einen
+Befund, den es nicht gibt. Ebenso gilt `liest<Map<string, number>>(a)` als Weiterreichen. Im Code
+kommt beides heute nicht vor.
+
+**Ursprung:** Refactoring Schritt 12a (#80), zweites Review; `docs/refactoring-analyse.md`, Anhang
+D.15.
+
+**Einschätzung:** Falscher roter Lauf, kein Schutzverlust. Wer darauf stösst, formuliert den
+Kommentar um oder setzt ihn auf eine eigene Zeile; eine saubere Lösung bräuchte einen Parser statt
+Mustern (neue Bauart, eigener Entscheid).
+
