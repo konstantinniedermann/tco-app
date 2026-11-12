@@ -1,4 +1,5 @@
-import { leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
+import { posix } from 'node:path';
+import { istTestquelle, leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
 
 const ACTIONS_DEKLARATION = /\bexport\s+(?:const|let|var|(?:async\s+)?function\s*\*?)\s*actions\b/;
 
@@ -100,6 +101,16 @@ const NUR_VERWALTUNG = VERWALTUNGS_DATEIEN.filter((v) => v.aussen === 'pfad').ma
 	...v,
 	muster: new RegExp(`(?:^|\\/|^\\$)lib\\/server\\/${escape(ohneEndung(v.datei))}(?![\\w-])`)
 }));
+
+// Die Rechteprüfung der Verwaltung (`liest`, `schreibt` aus admin/rechte.ts) nutzen nur die Dateien
+// in VERWALTUNGS_DATEIEN: Eine Verwaltungs-Funktion in einer Datei der Mitglieder fiele sonst durch
+// jede 403-Schleife, ihre Rechte hingen allein an der Funktion. Geprüft wird jede Datei unter src/
+// ausser Routen (für sie gelten die Regeln oben) und Tests (sie rufen die Rechteprüfung direkt);
+// die Typen und andere Namen aus admin/rechte.ts bleiben frei.
+const RECHTE = `${SERVER}admin/rechte`;
+const RECHTE_PRUEFUNG = ['liest', 'schreibt'];
+const BEZEICHNER = /^[A-Za-z_$][\w$]*$/;
+const NUR_VERWALTUNG_RECHTE = `liest und schreibt nur in ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.datei))}`;
 
 // Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
 // weiterreicht, fällt hier nicht auf; das bleibt Aufgabe des Reviews.
@@ -287,7 +298,53 @@ function pruefeDiensteImporte(pfad: string, imp: Import[]): string[] {
 	return befunde;
 }
 
-/** Prüft die Bauregel: nur API-Routen (`+server.ts`), keine Server-Dateien neben Seiten, Form Actions oder Remote Functions. */
+/** Die Datei, auf die ein Importpfad zeigt, ohne Endung und Anhang; `null` für ein Paket. */
+function zielVon(pfad: string, quelle: string): string | null {
+	const ohneAnhang = quelle.replace(/[?#].*$/, '');
+	const voll = ohneAnhang.startsWith('$lib/')
+		? `src/lib/${ohneAnhang.slice('$lib/'.length)}`
+		: ohneAnhang.startsWith('.')
+			? posix.join(posix.dirname(pfad), ohneAnhang)
+			: null;
+	return voll === null ? null : voll.replace(/\.(?:ts|js)$/, '');
+}
+
+/**
+ * Ausserhalb der Verwaltungs-Dateien: aus admin/rechte.ts nur statisch und mit Namen, ohne `liest`
+ * und `schreibt`.
+ */
+function pruefeRechteImporte(pfad: string, imp: Import[]): string[] {
+	const befunde: string[] = [];
+	for (const i of imp) {
+		if (i.quelle === null || zielVon(pfad, i.quelle) !== RECHTE) continue;
+		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
+		if (namen === null) {
+			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
+			continue;
+		}
+		for (const [name] of namen) {
+			// Ein Name, der kein schlichter Bezeichner ist (Escape, Anführungszeichen), ist ein Befund.
+			if (BEZEICHNER.test(name) && !RECHTE_PRUEFUNG.includes(name)) continue;
+			befunde.push(`${pfad}: '${name}' aus admin/rechte.ts; ${NUR_VERWALTUNG_RECHTE}`);
+		}
+	}
+	return befunde;
+}
+
+/** Wo die Bauregel die Importe aus admin/rechte.ts prüft: `src/` ohne Routen und Tests. */
+export function betrifftRechteImporte(pfad: string): boolean {
+	return (
+		pfad.startsWith('src/') &&
+		!pfad.startsWith('src/routes/') &&
+		/\.(ts|js)$/.test(pfad) &&
+		!istTestquelle(pfad)
+	);
+}
+
+/**
+ * Prüft die Bauregel: nur API-Routen (`+server.ts`), keine Server-Dateien neben Seiten, Form Actions
+ * oder Remote Functions; dazu, wer die Rechteprüfung der Verwaltung importiert.
+ */
 export function pruefeBauregel(dateien: Map<string, string>): string[] {
 	const befunde: string[] = [];
 	const liste = adminSchnittstellen(dateien);
@@ -327,6 +384,12 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 				befunde.push(`${pfad}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`);
 			}
 		}
+		if (
+			betrifftRechteImporte(pfad) &&
+			!VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei)
+		) {
+			befunde.push(...pruefeRechteImporte(pfad, importe(inhalt)));
+		}
 		if (/\.remote\.(ts|js)$/.test(name)) {
 			befunde.push(`${pfad}: Remote Functions sind nicht vorgesehen`);
 		}
@@ -348,6 +411,8 @@ export function betrifftBauregel(pfad: string): boolean {
 }
 
 if (import.meta.main) {
-	const pfade = versionierteDateien().filter(betrifftBauregel);
+	const pfade = versionierteDateien().filter(
+		(p) => betrifftBauregel(p) || betrifftRechteImporte(p)
+	);
 	meldeErgebnis('bauregel', pruefeBauregel(leseDateien(pfade)));
 }

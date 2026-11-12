@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { betrifftBauregel, pruefeBauregel } from './bauregel.ts';
+import { betrifftBauregel, betrifftRechteImporte, pruefeBauregel } from './bauregel.ts';
 
 // Die Meldungstexte mit der Menge der Verwaltungs-Listen, einmal für alle Fälle.
 const LISTEN =
@@ -739,6 +739,120 @@ describe('Text in Anführungszeichen verschluckt keinen Import', () => {
 		expect(pruefe(mitglied, code)).toEqual([
 			`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
 		]);
+	});
+});
+
+// Schritt 12 (Restlücke aus dem Review von Schritt 11): Eine Verwaltungs-Funktion in einer Datei der
+// Mitglieder liefe durch keine 403-Schleife; die Rechteprüfung `liest`/`schreibt` darf darum nur in
+// den Dateien der Tabelle VERWALTUNGS_DATEIEN stehen.
+describe('liest und schreibt nur in den Verwaltungs-Dateien', () => {
+	const VERWALTUNG =
+		'liest und schreibt nur in admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/verwaltung-schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
+	const mitglied = 'src/lib/server/cm/schnittstellen.ts';
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
+	const befund = (pfad: string, name: string) =>
+		`${pfad}: '${name}' aus admin/rechte.ts; ${VERWALTUNG}`;
+
+	it.each([
+		['src/lib/server/admin/schnittstellen.ts', './rechte.ts'],
+		['src/lib/server/turnier/schnittstellen.ts', '../admin/rechte.ts'],
+		['src/lib/server/cm/verwaltung-schnittstellen.ts', '../admin/rechte.ts'],
+		['src/lib/server/gespraech/verwaltung-schnittstellen.ts', '../admin/rechte.ts'],
+		['src/lib/server/mitteilung/verwaltung-schnittstellen.ts', '../admin/rechte.ts'],
+		['src/lib/server/anlass/verwaltung-schnittstellen.ts', '$lib/server/admin/rechte']
+	])('RR-07: %s darf liest und schreibt importieren', (pfad, quelle) => {
+		expect(pruefe(pfad, `import { liest, schreibt, type AdminDienste } from '${quelle}';`)).toEqual(
+			[]
+		);
+	});
+
+	it.each([
+		['liest', "import { liest } from '../admin/rechte.ts';"],
+		['schreibt', "import { schreibt as s } from '../admin/rechte';"],
+		['liest', "import { type AdminDienste, liest } from '$lib/server/admin/rechte.js';"],
+		['liest', 'import { liest } from "../admin/rechte.ts";'],
+		['schreibt', "export { schreibt } from '../admin/rechte.ts';"],
+		['liest', "import { 'liest' as l } from '../admin/rechte.ts';"],
+		['liest', "import { liest } from './../admin/rechte.ts';"],
+		['liest', "import { liest } from '../admin/rechte.ts?x';"]
+	])('RR-07: eine Datei der Mitglieder importiert %s: %s', (name, code) => {
+		expect(pruefe(mitglied, code)).toEqual([befund(mitglied, name)]);
+	});
+
+	it.each([
+		["'li\\x65st'", "import { 'li\\x65st' as l } from '../admin/rechte.ts';"],
+		['li\\u0065st', "import { li\\u0065st } from '../admin/rechte.ts';"],
+		['liest/**/as', "import { liest/**/as l } from '../admin/rechte.ts';"]
+	])('RR-07: ein Name, der sich nicht lesen lässt, ist ein Befund: %s', (name, code) => {
+		const [ergebnis] = pruefe(mitglied, code);
+		expect(ergebnis).toContain(`${mitglied}: '${name.replace('/**/', '')}`);
+		expect(ergebnis).toContain(VERWALTUNG);
+	});
+
+	it.each([
+		"import * as r from '../admin/rechte.ts';",
+		"export * from '../admin/rechte.ts';",
+		"import r from '../admin/rechte.ts';",
+		"import '../admin/rechte.ts';",
+		"const r = await import('../admin/rechte.ts');"
+	])('RR-07: admin/rechte.ts nur statisch und mit Namen: %s', (code) => {
+		expect(pruefe(mitglied, code)).toEqual([
+			`${mitglied}: '../admin/rechte.ts' nur statisch und mit Namen importieren`
+		]);
+	});
+
+	it.each([
+		['src/lib/server/admin/ansicht.ts', './rechte.ts'],
+		['src/lib/server/datum.ts', './admin/rechte.ts'],
+		['src/lib/verwaltung/neu.ts', '../server/admin/rechte.ts'],
+		['src/hooks.server.ts', '$lib/server/admin/rechte']
+	])('RR-07: auch %s ausserhalb der Themen ist gemeint', (pfad, quelle) => {
+		expect(pruefe(pfad, `import { liest } from '${quelle}';`)).toEqual([befund(pfad, 'liest')]);
+	});
+
+	it.each([
+		[
+			'src/lib/server/mitteilung/typen.ts',
+			"import type { AdminDienste } from '../admin/rechte.ts';"
+		],
+		[
+			'src/lib/server/cm/verwaltung-meldung.ts',
+			"import { type AdminUrheber } from '../admin/rechte.ts';"
+		],
+		['src/lib/server/dienste.ts', "import type { AdminDienste } from './admin/rechte.ts';"],
+		[mitglied, "import { liest } from '../admin/rechte-neu.ts';"],
+		[mitglied, "// import { liest } from '../admin/rechte.ts';"]
+	])('lässt in %s %s zu', (pfad, code) => {
+		expect(pruefe(pfad, code)).toEqual([]);
+	});
+
+	it('Tests rufen die Rechteprüfung direkt', () => {
+		expect(
+			pruefe(
+				'src/lib/server/admin/schnittstellen.db.test.ts',
+				"import { liest, schreibt } from './rechte.ts';"
+			)
+		).toEqual([]);
+	});
+
+	it('Routen prüfen nur ihre eigenen Regeln, nicht doppelt', () => {
+		const route = 'src/routes/api/profil/+server.ts';
+		expect(pruefe(route, "import { liest } from '$lib/server/admin/rechte';")).toEqual([
+			`${route}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
+		]);
+	});
+
+	it.each([
+		['src/lib/server/cm/schnittstellen.ts', true],
+		['src/lib/server/admin/schnittstellen.ts', true],
+		['src/lib/verwaltung/bereiche.ts', true],
+		['src/hooks.server.ts', true],
+		['src/lib/server/admin/schnittstellen.db.test.ts', false],
+		['src/routes/api/profil/+server.ts', false],
+		['src/lib/ui/Knopf.svelte', false],
+		['tests/hilfen/verwaltungs-listen.ts', false]
+	])('betrifftRechteImporte(%s) ist %s', (pfad, erwartet) => {
+		expect(betrifftRechteImporte(pfad)).toBe(erwartet);
 	});
 });
 
