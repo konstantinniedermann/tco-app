@@ -5,8 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { AUSNAHMEN, MODULE, baueImportrichtung } from '../eslint.config.js';
 
 // Prüft die Lint-Regeln zur Richtung der Importe zwischen den Server-Modulen (eslint.config.js,
-// Schritt 05/12 in docs/refactoring-analyse.md): dass sie falsche Importe melden, dass eine
-// Ausnahme genau ihre Datei und ihr Ziel freigibt und dass keine Ausnahme veraltet ist.
+// Schritte 05 und 12 in docs/refactoring-analyse.md): dass sie falsche Importe melden, dass eine
+// Ausnahme genau ihre Datei und ihr Ziel freigibt (an gestellten Ausnahmen), dass keine Ausnahme
+// veraltet ist und dass `AUSNAHMEN` leer bleibt.
 
 const SERVER = 'src/lib/server';
 const eslint = new ESLint();
@@ -73,6 +74,15 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 	])('meldet in %s den Import %s', async (datei, code) => {
 		// Mehr als eine Meldung ist möglich (`../admin` aus db: als Datei und als Modul).
 		expect((await meldungen(datei, code)).length).toBeGreaterThan(0);
+	});
+
+	it('die Meldung nennt die Ebene und dass eine neue Ausnahme einen Entscheid braucht', async () => {
+		// ESLint stellt seinen eigenen Satz zum Muster voran.
+		expect(await meldungen('login/neu.ts', "import { x } from '../admin/rollen.ts';")).toEqual([
+			expect.stringContaining(
+				'Falsche Richtung: login importiert kein Thema. Es gibt keine Ausnahme; eine neue (AUSNAHMEN in eslint.config.js) braucht den Entscheid des Projektleiters.'
+			)
+		]);
 	});
 
 	it.each([
