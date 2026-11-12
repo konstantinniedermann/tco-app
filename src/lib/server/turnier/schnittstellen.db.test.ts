@@ -388,7 +388,7 @@ describe('Turnier-Schnittstellen', () => {
 				params: { id: '999999999' },
 				konto
 			});
-		expect(Object.keys(TURNIER_SCHNITTSTELLEN)).toHaveLength(26);
+		expect(Object.keys(TURNIER_SCHNITTSTELLEN)).toHaveLength(22);
 		for (const [name, fn] of Object.entries(TURNIER_SCHNITTSTELLEN)) {
 			const ohne = await fn(s.d, mach(name));
 			expect([name, ohne.status, await ohne.json()]).toEqual([name, 401, { fehler: 'abgemeldet' }]);

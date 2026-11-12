@@ -82,14 +82,16 @@ import {
 } from './dienste.ts';
 import {
 	GESPRAECH_SCHNITTSTELLEN,
-	getAdminGespraech,
 	getGespraech,
+	postGelesen,
+	postGespraech
+} from './gespraech/schnittstellen.ts';
+import {
+	getAdminGespraech,
 	getGespraeche,
 	postAntwort,
-	postGelesen,
-	postGespraech,
 	postZustand
-} from './gespraech/schnittstellen.ts';
+} from './gespraech/verwaltung-schnittstellen.ts';
 import {
 	PASSKEY_SCHNITTSTELLEN,
 	getPasskeys,

@@ -34,12 +34,17 @@ type Aussen = 'ordner' | 'pfad' | 'namen' | 'offen';
 
 // Die Schnittstellen-Dateien der Verwaltung (relativ zu src/lib/server/) mit ihrer Liste: die eine
 // Stelle für die Menge der Listen in der Bauregel. Die erste muss es geben (ADMIN_SCHNITTSTELLEN);
-// fehlt eine andere Liste, gilt sie als leer. Bereich Clubmeisterschaft: TURNIER_SCHNITTSTELLEN;
-// Mitteilungen der Verwaltung: MITTEILUNG_ADMIN_SCHNITTSTELLEN; Anlässe der Verwaltung:
+// fehlt eine andere Liste, gilt sie als leer. Bereich Clubmeisterschaft: TURNIER_SCHNITTSTELLEN,
+// GESPRAECH_ADMIN_SCHNITTSTELLEN; Mitteilungen der Verwaltung: MITTEILUNG_ADMIN_SCHNITTSTELLEN; Anlässe der Verwaltung:
 // ANLASS_ADMIN_SCHNITTSTELLEN.
 const VERWALTUNGS_DATEIEN: readonly { datei: string; liste: string; aussen: Aussen }[] = [
 	{ datei: 'admin/schnittstellen.ts', liste: 'ADMIN_SCHNITTSTELLEN', aussen: 'ordner' },
 	{ datei: 'turnier/schnittstellen.ts', liste: 'TURNIER_SCHNITTSTELLEN', aussen: 'pfad' },
+	{
+		datei: 'gespraech/verwaltung-schnittstellen.ts',
+		liste: 'GESPRAECH_ADMIN_SCHNITTSTELLEN',
+		aussen: 'pfad'
+	},
 	{
 		datei: 'mitteilung/schnittstellen.ts',
 		liste: 'MITTEILUNG_ADMIN_SCHNITTSTELLEN',

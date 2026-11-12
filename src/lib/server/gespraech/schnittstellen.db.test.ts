@@ -18,15 +18,14 @@ import { getSitzung } from '../sitzung/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { ladeTurnier, legeTurnierAn, listeTurniere } from '../turnier/turniere.ts';
+import { getGespraech, postGelesen, postGespraech } from './schnittstellen.ts';
 import {
+	GESPRAECH_ADMIN_SCHNITTSTELLEN,
 	getAdminGespraech,
-	getGespraech,
 	getGespraeche,
 	postAntwort,
-	postGelesen,
-	postGespraech,
 	postZustand
-} from './schnittstellen.ts';
+} from './verwaltung-schnittstellen.ts';
 import { ANTWORT_TEXT, NACHRICHT_TEXT, pfadMitglied, pfadVerwaltung } from './meldung.ts';
 import { ladeEigenesGespraech, ladeGespraech } from './gespraech.ts';
 
@@ -206,6 +205,61 @@ describe('A-TURNIER-04 Schnittstellen zum Gespräch', () => {
 			expect([r.status, await r.json()]).toEqual([403, { fehler: 'kein-recht' }]);
 		}
 		expect(await db.select().from(nachricht).where(eq(nachricht.gespraechId, gid))).toHaveLength(1);
+	});
+
+	// Die vier aus der Rechte-Schleife über TURNIER_SCHNITTSTELLEN (Schritt 11): dieselben Fälle je
+	// Eintrag der eigenen Liste.
+	test('RR-07: Verwaltungs-Liste des Gesprächs: ohne Rolle 403, unbestätigt 403 unbestaetigt, MyTCO-Admin nur lesend, Mitglieder- und Lizenz-Admin 403, ändernd ohne JSON 415', async () => {
+		const s = baue(start);
+		const normal = await einloggen((await legeMitgliedAn(db)).kontoId);
+		const unbestaetigt = await einloggen((await legeMitgliedAn(db, { rollen: ['cm'] })).kontoId);
+		const cm = (await admin(s, ['cm'])).konto;
+		const mytco = (await admin(s, ['mytco'])).konto;
+		const mitglieder = (await admin(s, ['mitglieder'])).konto;
+		const lizenz = await einloggen((await legeMitgliedAn(db, { rollen: ['lizenz'] })).kontoId);
+		const mach = (name: string, konto?: AngemeldetesKonto) =>
+			ereignis({
+				method: name.startsWith('get') ? 'GET' : 'POST',
+				body: {},
+				params: { id: '999999999' },
+				konto
+			});
+		expect(Object.keys(GESPRAECH_ADMIN_SCHNITTSTELLEN)).toHaveLength(4);
+		for (const [name, fn] of Object.entries(GESPRAECH_ADMIN_SCHNITTSTELLEN)) {
+			const ohne = await fn(s.admin, mach(name));
+			expect([name, ohne.status, await ohne.json()]).toEqual([name, 401, { fehler: 'abgemeldet' }]);
+			const keine = await fn(s.admin, mach(name, normal));
+			expect([name, keine.status, await keine.json()]).toEqual([
+				name,
+				403,
+				{ fehler: 'kein-admin' }
+			]);
+			const unb = await fn(s.admin, mach(name, unbestaetigt));
+			expect([name, unb.status, await unb.json()]).toEqual([name, 403, { fehler: 'unbestaetigt' }]);
+			const a = await fn(s.admin, mach(name, cm));
+			expect([name, a.status]).not.toContain(401);
+			expect([name, a.status]).not.toContain(403);
+			const m = await fn(s.admin, mach(name, mytco));
+			if (name.startsWith('post')) {
+				expect([name, m.status, await m.json()]).toEqual([name, 403, { fehler: 'kein-recht' }]);
+			} else {
+				expect([name, m.status]).not.toContain(403);
+			}
+			const v = await fn(s.admin, mach(name, mitglieder));
+			expect([name, v.status, await v.json()]).toEqual([name, 403, { fehler: 'kein-admin' }]);
+			const l = await fn(s.admin, mach(name, lizenz));
+			expect([name, l.status, await l.json()]).toEqual([name, 403, { fehler: 'kein-admin' }]);
+			if (name.startsWith('post')) {
+				const roh = ereignis({
+					konto: cm,
+					body: 'x',
+					contentType: 'text/plain',
+					params: { id: '1' }
+				});
+				expect([name, (await fn(s.admin, roh)).status]).toEqual([name, 415]);
+			}
+		}
+		expect(s.mails).toEqual([]);
 	});
 
 	test('A-TURNIER-04, FR-50: Nachricht nach trim 1 bis 1000 Zeichen, gezählt in Codepunkten', async () => {

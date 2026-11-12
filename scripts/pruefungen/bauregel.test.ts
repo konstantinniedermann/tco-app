@@ -3,9 +3,9 @@ import { betrifftBauregel, pruefeBauregel } from './bauregel.ts';
 
 // Die Meldungstexte mit der Menge der Verwaltungs-Listen, einmal für alle Fälle.
 const LISTEN =
-	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN, MITTEILUNG_ADMIN_SCHNITTSTELLEN und ANLASS_ADMIN_SCHNITTSTELLEN';
+	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN, GESPRAECH_ADMIN_SCHNITTSTELLEN, MITTEILUNG_ADMIN_SCHNITTSTELLEN und ANLASS_ADMIN_SCHNITTSTELLEN';
 const DATEIEN =
-	'erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts, mitteilung/schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
+	'erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
 
 describe('pruefeBauregel', () => {
 	it('meldet Server-Dateien neben Seiten', () => {
@@ -467,64 +467,64 @@ describe('Verwaltung der Anlässe (anlass/verwaltung-schnittstellen.ts)', () => 
 
 // Die übrigen reinen Verwaltungs-Dateien am Pfad (Schritt 11): je Zeile der Tabelle mit `pfad` ein
 // Fall, wie bei den Anlässen. Admin-Routen nehmen nur Einträge der Liste, andere Routen nichts.
-describe.each([['turnier/schnittstellen.ts', 'TURNIER_SCHNITTSTELLEN', 'getTurniere']])(
-	'Verwaltung am Pfad gesperrt: %s',
-	(datei, konstante, name) => {
-		const listen: [string, string][] = [
+describe.each([
+	['turnier/schnittstellen.ts', 'TURNIER_SCHNITTSTELLEN', 'getTurniere'],
+	['gespraech/verwaltung-schnittstellen.ts', 'GESPRAECH_ADMIN_SCHNITTSTELLEN', 'getGespraeche']
+])('Verwaltung am Pfad gesperrt: %s', (datei, konstante, name) => {
+	const listen: [string, string][] = [
+		[
+			'src/lib/server/admin/schnittstellen.ts',
+			'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+		],
+		[
+			`src/lib/server/${datei}`,
+			`export const ${konstante} = {\n\t${name}\n} satisfies Record<string, unknown>;`
+		]
+	];
+	const mit = (pfad: string, inhalt: string) =>
+		pruefeBauregel(new Map([...listen, [pfad, inhalt]]));
+	const ohneEndung = datei.replace(/\.ts$/, '');
+	it(`RR-07: Admin-Routen nutzen Einträge aus ${konstante}, sonst nichts daraus`, () => {
+		const admin = 'src/routes/api/admin/x/+server.ts';
+		const rumpf = (namen: string) =>
 			[
-				'src/lib/server/admin/schnittstellen.ts',
-				'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
-			],
-			[
-				`src/lib/server/${datei}`,
-				`export const ${konstante} = {\n\t${name}\n} satisfies Record<string, unknown>;`
-			]
-		];
-		const mit = (pfad: string, inhalt: string) =>
-			pruefeBauregel(new Map([...listen, [pfad, inhalt]]));
-		const ohneEndung = datei.replace(/\.ts$/, '');
-		it(`RR-07: Admin-Routen nutzen Einträge aus ${konstante}, sonst nichts daraus`, () => {
-			const admin = 'src/routes/api/admin/x/+server.ts';
-			const rumpf = (namen: string) =>
-				[
-					"import { holeMitteilungAdminDienste } from '../../../../lib/server/dienste.ts';",
-					`import { ${namen} } from '../../../../lib/server/${datei}';`,
-					`export const GET = (e) => ${name}(holeMitteilungAdminDienste(), e);`
-				].join('\n');
-			expect(mit(admin, rumpf(name))).toEqual([]);
-			expect(mit(admin, rumpf(`${name}, hilfe`))).toEqual([
-				`${admin}: Admin-Route nutzt 'hilfe'; ${LISTEN}`
-			]);
-		});
-		it(`RR-07: ausserhalb von api/admin nutzt keine Route ${datei}`, () => {
-			const pfad = 'src/routes/api/cm/+server.ts';
-			const gut = [
-				"import { holeCmDienste } from '../../../lib/server/dienste.ts';",
-				"import { getCmTurniere } from '../../../lib/server/cm/schnittstellen.ts';",
-				'export const GET = (e) => getCmTurniere(holeCmDienste(), e);'
+				"import { holeMitteilungAdminDienste } from '../../../../lib/server/dienste.ts';",
+				`import { ${namen} } from '../../../../lib/server/${datei}';`,
+				`export const GET = (e) => ${name}(holeMitteilungAdminDienste(), e);`
 			].join('\n');
-			expect(mit(pfad, gut)).toEqual([]);
-			const v = `../../../lib/server/${ohneEndung}`;
-			for (const zeile of [
-				`import { ${name} } from '${v}.ts';`,
-				`import { ${name} } from '${v}';`,
-				`import { ${name} } from '${v}.js';`,
-				`import { ${name} } from '$lib/server/${ohneEndung}';`,
-				`import { ${name} as g } from '${v}.ts';`,
-				`import type { ${konstante} } from '${v}.ts';`,
-				`import * as a from '${v}.ts';`,
-				`export { ${name} } from '${v}.ts';`,
-				`export * from '${v}.ts';`,
-				`const a = await import('${v}.ts');`,
-				`import { hilfe } from '${v}.ts';`
-			]) {
-				expect(mit(pfad, `${gut}\n${zeile}`), zeile).toEqual([
-					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/${datei} nutzen`
-				]);
-			}
-		});
-	}
-);
+		expect(mit(admin, rumpf(name))).toEqual([]);
+		expect(mit(admin, rumpf(`${name}, hilfe`))).toEqual([
+			`${admin}: Admin-Route nutzt 'hilfe'; ${LISTEN}`
+		]);
+	});
+	it(`RR-07: ausserhalb von api/admin nutzt keine Route ${datei}`, () => {
+		const pfad = 'src/routes/api/cm/+server.ts';
+		const gut = [
+			"import { holeCmDienste } from '../../../lib/server/dienste.ts';",
+			"import { getCmTurniere } from '../../../lib/server/cm/schnittstellen.ts';",
+			'export const GET = (e) => getCmTurniere(holeCmDienste(), e);'
+		].join('\n');
+		expect(mit(pfad, gut)).toEqual([]);
+		const v = `../../../lib/server/${ohneEndung}`;
+		for (const zeile of [
+			`import { ${name} } from '${v}.ts';`,
+			`import { ${name} } from '${v}';`,
+			`import { ${name} } from '${v}.js';`,
+			`import { ${name} } from '$lib/server/${ohneEndung}';`,
+			`import { ${name} as g } from '${v}.ts';`,
+			`import type { ${konstante} } from '${v}.ts';`,
+			`import * as a from '${v}.ts';`,
+			`export { ${name} } from '${v}.ts';`,
+			`export * from '${v}.ts';`,
+			`const a = await import('${v}.ts');`,
+			`import { hilfe } from '${v}.ts';`
+		]) {
+			expect(mit(pfad, `${gut}\n${zeile}`), zeile).toEqual([
+				`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/${datei} nutzen`
+			]);
+		}
+	});
+});
 
 // Namen in Anführungszeichen (ES2022, `import { 'x' as y } from …`): Die Zeile ist ein Import wie
 // jeder andere und wird nach denselben Regeln beurteilt; einen Namen mit Escape (`\u…`, `\x…`,
@@ -718,6 +718,7 @@ describe('betrifftBauregel', () => {
 		'lib/b.remote.js',
 		'src/lib/server/admin/schnittstellen.ts',
 		'src/lib/server/turnier/schnittstellen.ts',
+		'src/lib/server/gespraech/verwaltung-schnittstellen.ts',
 		'src/lib/server/mitteilung/schnittstellen.ts',
 		'src/lib/server/anlass/verwaltung-schnittstellen.ts'
 	])('prüft %s', (pfad) => {

@@ -27,7 +27,7 @@ async function meldungen(datei: string, code: string, mit = eslint): Promise<str
 }
 
 // Gestellte Ausnahme für die Fälle, die eine Datei mit Ausnahme brauchen: Sie hängen so an keinem
-// Eintrag in `AUSNAHMEN` und prüfen weiter, wenn Schritt 12 die Liste leert.
+// Eintrag in `AUSNAHMEN` und prüfen weiter, auch wenn die Liste leer ist.
 const GESTELLT = mitAusnahmen([
 	{ von: 'login/gestellt.ts', nach: 'admin/rollen.ts', schritt: 'gestellt für den Test' }
 ]);
