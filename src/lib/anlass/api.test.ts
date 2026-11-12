@@ -48,10 +48,13 @@ describe('Anfragen der Mitglieder zu Anlässen', () => {
 		expect(await ergebnis(401, { fehler: 'abgemeldet' })).toEqual({ art: 'abgemeldet' });
 		expect(await ergebnis(404, { fehler: 'nicht-gefunden' })).toEqual({ art: 'nicht-gefunden' });
 		expect(await ergebnis(409, { fehler: 'geschlossen' })).toEqual({ art: 'geschlossen' });
-		expect(await ergebnis(400, { fehler: 'eingabe', feld: 'bemerkung' })).toEqual({
-			art: 'eingabe',
-			feld: 'bemerkung'
-		});
+		expect(
+			await ergebnis(400, { fehler: 'eingabe', felder: { bemerkung: 'Höchstens 500 Zeichen.' } })
+		).toEqual({ art: 'eingabe', feld: 'bemerkung' });
+		expect(
+			await ergebnis(400, { fehler: 'eingabe', felder: { antwort: 'Bitte wählen.' } })
+		).toEqual({ art: 'eingabe', feld: 'antwort' });
+		expect(await ergebnis(400, { fehler: 'eingabe' })).toEqual({ art: 'stoerung' });
 		expect(await ergebnis(500, {})).toEqual({ art: 'stoerung' });
 		expect(
 			await sendeAntwort(1, { antwort: 'kommt', bemerkung: null }, holer(new Error('weg')).holen)

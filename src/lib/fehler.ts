@@ -106,10 +106,8 @@ export type WortOhneZusatz = {
  * nimmt der Typ sie an.
  */
 type Altform =
-	// Anlass: der Name des Felds statt `felder`.
-	| { fehler: 'eingabe'; feld: 'antwort' | 'bemerkung' }
 	// Mitteilungen: `felder` als Liste der Namen.
-	| { fehler: 'eingabe'; felder: readonly string[] };
+	{ fehler: 'eingabe'; felder: readonly string[] };
 
 /**
  * Der Körper jeder Fehlerantwort: `{ fehler, felder? }`, dazu die Zusatzangaben des Worts. Die
