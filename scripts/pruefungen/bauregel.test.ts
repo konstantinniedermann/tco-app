@@ -747,7 +747,7 @@ describe('Text in Anführungszeichen verschluckt keinen Import', () => {
 // den Dateien der Tabelle VERWALTUNGS_DATEIEN stehen.
 describe('liest und schreibt nur in den Verwaltungs-Dateien', () => {
 	const VERWALTUNG =
-		'liest und schreibt nur in admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/verwaltung-schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
+		'liest, schreibt und mitKonto nur in admin/schnittstellen.ts, turnier/schnittstellen.ts, cm/verwaltung-schnittstellen.ts, gespraech/verwaltung-schnittstellen.ts, mitteilung/verwaltung-schnittstellen.ts und anlass/verwaltung-schnittstellen.ts';
 	const mitglied = 'src/lib/server/cm/schnittstellen.ts';
 	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
 	const befund = (pfad: string, name: string) =>
@@ -774,7 +774,14 @@ describe('liest und schreibt nur in den Verwaltungs-Dateien', () => {
 		['schreibt', "export { schreibt } from '../admin/rechte.ts';"],
 		['liest', "import { 'liest' as l } from '../admin/rechte.ts';"],
 		['liest', "import { liest } from './../admin/rechte.ts';"],
-		['liest', "import { liest } from '../admin/rechte.ts?x';"]
+		['liest', "import { liest } from '../admin/rechte.ts?x';"],
+		// Nicht normalisierte Pfade und Pfade ab der Projektwurzel (Review Schritt 12)
+		['liest', "import { liest } from '$lib/server/cm/../admin/rechte';"],
+		['liest', "import { liest } from '$lib/server/admin/./rechte.ts';"],
+		['liest', "import { liest } from '$lib/../lib/server/admin/rechte.ts';"],
+		['liest', "import { liest } from '/src/lib/server/admin/rechte.ts';"],
+		['mitKonto', "import { mitKonto } from '../admin/rechte.ts';"],
+		['mitKonto', "import { type AdminDienste, mitKonto as m } from '/src/lib/server/admin/rechte';"]
 	])('RR-07: eine Datei der Mitglieder importiert %s: %s', (name, code) => {
 		expect(pruefe(mitglied, code)).toEqual([befund(mitglied, name)]);
 	});
@@ -824,6 +831,15 @@ describe('liest und schreibt nur in den Verwaltungs-Dateien', () => {
 		[mitglied, "// import { liest } from '../admin/rechte.ts';"]
 	])('lässt in %s %s zu', (pfad, code) => {
 		expect(pruefe(pfad, code)).toEqual([]);
+	});
+
+	it('RR-07: admin/schnittstellen.ts darf mitKonto importieren', () => {
+		expect(
+			pruefe(
+				'src/lib/server/admin/schnittstellen.ts',
+				"import { liest, mitKonto, schreibt } from './rechte.ts';"
+			)
+		).toEqual([]);
 	});
 
 	it('Tests rufen die Rechteprüfung direkt', () => {

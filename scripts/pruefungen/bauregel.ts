@@ -102,15 +102,15 @@ const NUR_VERWALTUNG = VERWALTUNGS_DATEIEN.filter((v) => v.aussen === 'pfad').ma
 	muster: new RegExp(`(?:^|\\/|^\\$)lib\\/server\\/${escape(ohneEndung(v.datei))}(?![\\w-])`)
 }));
 
-// Die Rechteprüfung der Verwaltung (`liest`, `schreibt` aus admin/rechte.ts) nutzen nur die Dateien
-// in VERWALTUNGS_DATEIEN: Eine Verwaltungs-Funktion in einer Datei der Mitglieder fiele sonst durch
-// jede 403-Schleife, ihre Rechte hingen allein an der Funktion. Geprüft wird jede Datei unter src/
-// ausser Routen (für sie gelten die Regeln oben) und Tests (sie rufen die Rechteprüfung direkt);
-// die Typen und andere Namen aus admin/rechte.ts bleiben frei.
+// Die Rechteprüfung der Verwaltung (`liest`, `schreibt`, `mitKonto` aus admin/rechte.ts) nutzen
+// nur die Dateien in VERWALTUNGS_DATEIEN: Eine Verwaltungs-Funktion in einer Datei der Mitglieder
+// fiele sonst durch jede 403-Schleife, ihre Rechte hingen allein an der Funktion. Geprüft wird jede
+// Datei unter src/ ausser Routen (für sie gelten die Regeln oben) und Tests (sie rufen die
+// Rechteprüfung direkt); die Typen und andere Namen aus admin/rechte.ts bleiben frei.
 const RECHTE = `${SERVER}admin/rechte`;
-const RECHTE_PRUEFUNG = ['liest', 'schreibt'];
+const RECHTE_PRUEFUNG = ['liest', 'schreibt', 'mitKonto'];
 const BEZEICHNER = /^[A-Za-z_$][\w$]*$/;
-const NUR_VERWALTUNG_RECHTE = `liest und schreibt nur in ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.datei))}`;
+const NUR_VERWALTUNG_RECHTE = `${aufzaehlung(RECHTE_PRUEFUNG)} nur in ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.datei))}`;
 
 // Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
 // weiterreicht, fällt hier nicht auf; das bleibt Aufgabe des Reviews.
@@ -298,20 +298,25 @@ function pruefeDiensteImporte(pfad: string, imp: Import[]): string[] {
 	return befunde;
 }
 
-/** Die Datei, auf die ein Importpfad zeigt, ohne Endung und Anhang; `null` für ein Paket. */
+/**
+ * Die Datei, auf die ein Importpfad zeigt, normalisiert, ohne Endung und Anhang; `null` für ein
+ * Paket. Über `$lib`, ab der Projektwurzel (`/src/…`, so löst Vite auf) oder relativ zur Datei.
+ */
 function zielVon(pfad: string, quelle: string): string | null {
 	const ohneAnhang = quelle.replace(/[?#].*$/, '');
 	const voll = ohneAnhang.startsWith('$lib/')
-		? `src/lib/${ohneAnhang.slice('$lib/'.length)}`
-		: ohneAnhang.startsWith('.')
-			? posix.join(posix.dirname(pfad), ohneAnhang)
-			: null;
+		? posix.normalize(`src/lib/${ohneAnhang.slice('$lib/'.length)}`)
+		: ohneAnhang.startsWith('/')
+			? posix.normalize(ohneAnhang.slice(1))
+			: ohneAnhang.startsWith('.')
+				? posix.join(posix.dirname(pfad), ohneAnhang)
+				: null;
 	return voll === null ? null : voll.replace(/\.(?:ts|js)$/, '');
 }
 
 /**
- * Ausserhalb der Verwaltungs-Dateien: aus admin/rechte.ts nur statisch und mit Namen, ohne `liest`
- * und `schreibt`.
+ * Ausserhalb der Verwaltungs-Dateien: aus admin/rechte.ts nur statisch und mit Namen, ohne
+ * die Namen aus RECHTE_PRUEFUNG.
  */
 function pruefeRechteImporte(pfad: string, imp: Import[]): string[] {
 	const befunde: string[] = [];
