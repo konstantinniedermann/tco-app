@@ -434,6 +434,60 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		}
 	});
 
+	// Charakterisierung zu Schritt 11 (docs/refactoring-analyse.md, Anhang D.11): Die Schnittstellen
+	// von Turnier, CM und Gespräch prüfen den Bereich `cm`, gleich, in welcher Liste sie stehen.
+	test('Bereich cm: an den 26 Schnittstellen von Turnier, CM und Gespräch bekommt der Mitglieder-Admin 403 kein-admin, der CM-Admin weder 401 noch 403', async () => {
+		const s = baue();
+		const mitglieder = await bestaetigt(s, ['mitglieder']);
+		const cm = await bestaetigt(s, ['cm']);
+		const namen = [
+			'getTurniere',
+			'postTurniere',
+			'getTurnier',
+			'postTurnier',
+			'postTurnierStatus',
+			'postKategorien',
+			'getKategorie',
+			'postKategorie',
+			'postKategorieAbsagen',
+			'getAnmeldungen',
+			'postAnmeldungVonHand',
+			'postVerschieben',
+			'postAnmeldungLoeschen',
+			'getDoppel',
+			'postDoppelVonHand',
+			'postZusammenlegen',
+			'postPartnerAendern',
+			'postAnfrageAlsPaar',
+			'postAnfrageLoeschen',
+			'postEntscheid',
+			'getSpieler',
+			'postKlassierung',
+			'getGespraeche',
+			'getAdminGespraech',
+			'postAntwort',
+			'postZustand'
+		];
+		expect(new Set(namen).size).toBe(26);
+		const alle = alleVerwaltung();
+		const mach = (name: string, konto: AngemeldetesKonto) =>
+			ereignis({
+				method: name.startsWith('get') ? 'GET' : 'POST',
+				body: {},
+				params: { id: '999999999' },
+				konto
+			});
+		for (const name of namen) {
+			const fn = alle[name];
+			expect(fn, name).toBeTypeOf('function');
+			const v = await fn(s.d, mach(name, mitglieder.konto));
+			expect([name, v.status, await v.json()]).toEqual([name, 403, { fehler: 'kein-admin' }]);
+			const a = await fn(s.d, mach(name, cm.konto));
+			expect([name, a.status]).not.toContain(401);
+			expect([name, a.status]).not.toContain(403);
+		}
+	});
+
 	test('getRollen listet nur aktive, nicht gesperrte Konten', async () => {
 		const s = baue();
 		const mytco = await bestaetigt(s, ['mytco']);
