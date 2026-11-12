@@ -123,11 +123,22 @@ const RECHTE_PRUEFUNG = ['liest', 'schreibt', 'mitKonto'];
 const BEZEICHNER = /^[A-Za-z_$][\w$]*$/;
 const NUR_VERWALTUNG_RECHTE = `${aufzaehlung(RECHTE_PRUEFUNG)} nur in ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.datei))}`;
 
-// Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
-// weiterreicht, fällt hier nicht auf; das bleibt Aufgabe des Reviews.
+// Die Dateien der Tabelle rufen die Rechteprüfung nur auf und reichen sie nicht weiter (Schritt 12a).
+const NUR_AUFRUFEN = `${aufzaehlung(RECHTE_PRUEFUNG)} nur aufrufen, nicht weiterreichen`;
 
+// Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
+// weiterreicht, fällt hier nicht auf; das bleibt Aufgabe des Reviews. Ausgenommen ist die
+// Rechteprüfung selbst: Sie reicht keine Datei der Tabelle weiter (`pruefeWeiterreichen`).
+
+// `wort`: `import` oder `export`; `bereich`: Anfang und Ende der Anweisung im Text ohne Kommentare.
 type Import =
-	| { art: 'statisch'; quelle: string; klausel: string | null }
+	| {
+			art: 'statisch';
+			wort: string;
+			quelle: string;
+			klausel: string | null;
+			bereich: [number, number];
+	  }
 	| { art: 'dynamisch'; quelle: string | null };
 
 // Was kein Kommentar ist, obwohl `//` oder `/*` darin stehen kann: Texte in '…' und "…" (je auf
@@ -184,17 +195,30 @@ function ab(muster: RegExp, text: string, stelle: number): RegExpExecArray | nul
 // Klausel; dazu kommen Treffer, die sie verbraucht oder nicht erkannt hatte.
 // Dynamisch: `quelle` ist `null`, wenn der Pfad berechnet wird (`import(variable)`).
 function importe(inhalt: string): Import[] {
-	const text = ohneKommentare(inhalt);
+	return importeAus(ohneKommentare(inhalt));
+}
+
+/** Wie `importe`, für einen Text, aus dem die Kommentare schon entfernt sind. */
+function importeAus(text: string): Import[] {
 	const statisch: Import[] = [];
 	for (const wort of text.matchAll(SCHLUESSELWORT)) {
 		const stelle = wort.index + wort[0].length;
 		const ohne = wort[0] === 'import' ? ab(OHNE_KLAUSEL, text, stelle) : null;
 		if (ohne) {
-			statisch.push({ art: 'statisch', quelle: ohne[1], klausel: null });
+			const bereich: [number, number] = [wort.index, stelle + ohne[0].length];
+			statisch.push({ art: 'statisch', wort: wort[0], quelle: ohne[1], klausel: null, bereich });
 			continue;
 		}
 		const mit = ab(KLAUSEL, text, stelle) ?? ab(KLAUSEL_MIT_TEXT, text, stelle);
-		if (mit) statisch.push({ art: 'statisch', quelle: mit[2], klausel: mit[1].trim() });
+		if (!mit) continue;
+		const bereich: [number, number] = [wort.index, stelle + mit[0].length];
+		statisch.push({
+			art: 'statisch',
+			wort: wort[0],
+			quelle: mit[2],
+			klausel: mit[1].trim(),
+			bereich
+		});
 	}
 	const dynamisch = /\bimport\s*\(\s*(?:['"`]([^'"`$]+)['"`]\s*\))?/g;
 	return [
@@ -384,6 +408,45 @@ function pruefeRechteImporte(pfad: string, imp: Import[]): string[] {
 }
 
 /**
+ * In den Dateien der Tabelle: aus admin/rechte.ts nur statisch und mit Namen; `liest`, `schreibt` und
+ * `mitKonto` (auch umbenannt, auch ein Name, den die Prüfung nicht liest) stehen im Code nur direkt
+ * vor `(`. Jede andere Stelle (`export { liest }`, `export default`, `const a = liest`, `{ liest }`)
+ * reicht sie weiter, ebenso `export { liest } from` und `export * from` admin/rechte.ts (Schritt 12a).
+ */
+function pruefeWeiterreichen(pfad: string, inhalt: string): string[] {
+	const befunde: string[] = [];
+	const text = ohneKommentare(inhalt);
+	const lokal = new Set<string>();
+	let code = text;
+	for (const i of importeAus(text)) {
+		if (i.quelle === null || zielVon(pfad, i.quelle) !== RECHTE) continue;
+		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
+		if (i.art === 'dynamisch' || namen === null) {
+			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
+			continue;
+		}
+		// Die Anweisung selbst ist kein Weiterreichen; der Rest des Texts behält seine Stellen.
+		const [von, bis] = i.bereich;
+		code = code.slice(0, von) + ' '.repeat(bis - von) + code.slice(bis);
+		for (const [name, alias] of namen) {
+			if (BEZEICHNER.test(name) && !RECHTE_PRUEFUNG.includes(name)) continue;
+			if (i.wort === 'export' || !BEZEICHNER.test(alias.trim())) {
+				befunde.push(`${pfad}: reicht '${name}' aus admin/rechte.ts weiter; ${NUR_AUFRUFEN}`);
+			} else lokal.add(alias.trim());
+		}
+	}
+	// Texte zählen nicht: «Die Verwaltung liest …» in einer Meldung ist kein Weiterreichen.
+	const ohneTexte = code.replace(TEXT_ODER_KOMMENTAR, '');
+	for (const name of lokal) {
+		for (const t of ohneTexte.matchAll(new RegExp(`(?<![\\w$.])${escape(name)}(?![\\w$])`, 'g'))) {
+			if (/^\s*\(/.test(ohneTexte.slice(t.index + name.length))) continue;
+			befunde.push(`${pfad}: reicht '${name}' aus admin/rechte.ts weiter; ${NUR_AUFRUFEN}`);
+		}
+	}
+	return befunde;
+}
+
+/**
  * Wo die Bauregel die Importe aus admin/rechte.ts prüft: `src/` ohne Routen und Tests, auch
  * `.mts`, `.cts`, `.mjs` und `.cjs` (Vite lädt sie wie `.ts` und `.js`; Schritt 12a).
  */
@@ -457,9 +520,9 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 		if (betrifftRechteImporte(pfad)) {
 			const imp = importe(inhalt);
 			if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
-			if (!VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei)) {
-				befunde.push(...pruefeRechteImporte(pfad, imp));
-			}
+			if (VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei)) {
+				befunde.push(...pruefeWeiterreichen(pfad, inhalt));
+			} else befunde.push(...pruefeRechteImporte(pfad, imp));
 		}
 		if (/\.remote\.(ts|js)$/.test(name)) {
 			befunde.push(`${pfad}: Remote Functions sind nicht vorgesehen`);

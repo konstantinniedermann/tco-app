@@ -1056,6 +1056,49 @@ describe('Nicht prüfbares Laden (Schritt 12a)', () => {
 	);
 });
 
+// Schritt 12a, Punkt 5 (N-04): Die Dateien der Tabelle VERWALTUNGS_DATEIEN rufen `liest`, `schreibt`
+// und `mitKonto` nur auf; sie reichen sie nicht weiter, sonst holte eine Mitglieder-Datei sie dort.
+describe('Rechteprüfung nicht weiterreichen (Schritt 12a)', () => {
+	const datei = 'src/lib/server/cm/verwaltung-schnittstellen.ts';
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
+	const weiter = (pfad: string, name: string) =>
+		`${pfad}: reicht '${name}' aus admin/rechte.ts weiter; liest, schreibt und mitKonto nur aufrufen, nicht weiterreichen`;
+	const r = "'../admin/rechte.ts'";
+
+	it.each([
+		['liest', `import { liest } from ${r};\nexport { liest };`],
+		['l', `import { liest as l } from ${r};\nexport { l as pruefe };`],
+		['schreibt', `import { schreibt } from ${r};\nexport default schreibt;`],
+		['l', `import { liest as l } from ${r};\nexport const pruefe = l;`],
+		['liest', `import { liest } from ${r};\nconst a = liest;\nexport { a };`],
+		['liest', `import { liest } from ${r};\nexport const LISTE = { liest };`],
+		['l', `import { 'liest' as l } from ${r};\nexport { l };`],
+		['schreibt', `export { schreibt } from ${r};`],
+		['liest', `export { liest as pruefe } from ${r};`],
+		['mitKonto', `export { 'mitKonto' as m } from ${r};`]
+	])('RR-07: reicht %s weiter: %s', (name, code) => {
+		expect(pruefe(datei, code)).toEqual([weiter(datei, name)]);
+	});
+
+	it('RR-07: auch admin/schnittstellen.ts reicht mitKonto nicht weiter', () => {
+		const pfad = 'src/lib/server/admin/schnittstellen.ts';
+		expect(pruefe(pfad, "import { mitKonto } from './rechte.ts';\nexport { mitKonto };")).toEqual([
+			weiter(pfad, 'mitKonto')
+		]);
+	});
+
+	it.each([
+		`export * from ${r};`,
+		`export * as rechte from ${r};`,
+		`import * as rechte from ${r};\nexport { rechte };`,
+		`const rechte = await import(${r});`
+	])('RR-07: aus admin/rechte.ts nur statisch und mit Namen: %s', (code) => {
+		expect(pruefe(datei, code)).toEqual([
+			`${datei}: '../admin/rechte.ts' nur statisch und mit Namen importieren`
+		]);
+	});
+});
+
 describe('betrifftBauregel', () => {
 	it.each([
 		'src/routes/+page.ts',
