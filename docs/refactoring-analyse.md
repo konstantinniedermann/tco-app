@@ -7,9 +7,10 @@ weiterarbeiten können: Es enthält den Ist-Zustand, die Befunde, das Zielbild, 
 je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 [#80](https://github.com/konstantinniedermann/tco-app/issues/80).
 
-- **Stand des Dokuments:** 12.11.2026, nach Schritt 12 (Version 0.20.18). Die Etappen 0 und 1 sind
-  umgesetzt; die Zwischenrevision am Ende der Etappe 1 (Abschnitt 1c) ist am Checkpoint entschieden
-  und eingearbeitet (E-41 bis E-44). Offen ist Schritt 12a, danach die Etappe 2.
+- **Stand des Dokuments:** 12.11.2026, nach Schritt 12a (umgesetzt, Review und Merge offen; zuletzt
+  gemergt Schritt 12, Version 0.20.18). Die Etappen 0 und 1 sind umgesetzt; die Zwischenrevision am
+  Ende der Etappe 1 (Abschnitt 1c) ist am Checkpoint entschieden und eingearbeitet (E-41 bis E-44).
+  Danach die Etappe 2.
 - **Stand der Analyse (Abschnitte 1 bis 5 und 10):** 11.11.2026, Version 0.20.5, vor Schritt 01.
   Zahlen und Fundstellen dort gelten für diesen Stand; was die Etappe 0 berichtigt hat, steht
   beim Befund. Der Vermerk «Nachtrag» ohne Schrittnummer meint den zweiten Durchgang der Analyse
@@ -20,7 +21,8 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
   Etappe 1 mit den Entscheiden vom 12.11.2026 (E-41 bis E-44) geändert hat. Die Markierungen früherer Durchgänge sind entfernt; was davor wie lautete,
   zeigt der Git-Verlauf dieser Datei.
 - **Aufbau:** Abschnitte 1 bis 5 Befunde, 6 Zielbild, 7 Plan, 8 Entscheide, 9 Fragen, 10 Grenzen;
-  Anhang A und B Anweisungsdateien, Anhang C das Protokoll der Etappe 0, Anhang D das der Etappe 1.
+  Anhang A und B Anweisungsdateien, Anhang C das Protokoll der Etappe 0, Anhang D das der Etappe 1
+  (bis D.15, Schritt 12a).
 
 ## Stand und nächster Schritt
 
@@ -28,10 +30,10 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 
 | | |
 |---|---|
-| **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Offen aus der Etappe 1: der nachgeschobene Schritt **12a** (E-42) |
+| **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt, Review und Merge offen |
 | **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D) |
-| **Zuletzt erledigt** | **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **12a** Reste der Bauregel (E-42; Zeile 12a und «Hinweise zu Schritt 12a» in 7.3; kein Nachmessen, Opus, Subagent, Branch `refactor/schritt-12a`), dann Etappe 2 ab **13** mit Nachmessen vorab, in zwei Läufen (E-41; Zeile 13 und «Hinweise zu Schritt 13» in 7.4). Der Plan hat damit 27 Schritte |
+| **Zuletzt erledigt** | **12a** Reste der Bauregel (12.11.2026, umgesetzt, **Review und Merge offen**; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`/`.cts` aufgenommen; `bauregel.test.ts` 122 → 181, je Form vorher rot; Vergleich alt gegen neu über 25 843 536 gestellte Fälle: strenger nur bei den sechs Formen, «alt Befund, neu keiner» nur in zwei erklärten Klassen (auskommentierter Import direkt hinter einem Anführungszeichen; `//` im Pfad eines dynamischen Imports, den die alte Fassung als berechnet las); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
+| **Nächster offener Schritt** | Review und Merge von **12a** (Branch `refactor/schritt-12a`; der Reviewer liest den Diff an `bauregel.ts` ganz und wiederholt den Vergleich, D.15), dann Etappe 2 ab **13** mit Nachmessen vorab, in zwei Läufen (E-41; Zeile 13 und «Hinweise zu Schritt 13» in 7.4). Der Plan hat damit 27 Schritte |
 | **Wartet auf Freigabe des Projektleiters** | nichts. Checkpoint am Ende der Etappe 1 erledigt am 12.11.2026 (E-41 bis E-44); die Berichtigungen der `CLAUDE.md` sind eingespielt (E-43) |
 | **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen Fragen sind beantwortet (F-22 durch den Ablauf erledigt, F-23 in F-26 aufgegangen) |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
@@ -298,12 +300,12 @@ angelegt (dieser Lauf durfte nur dieses Dokument ändern).
 
 | Nr. | Befund, Fundstelle | Schwere | Zuordnung (Vorschlag) | Entschieden [neu] |
 |-----|--------------------|---------|-----------------------|-------------------|
-| N-01 | `//` im Importpfad verschwindet als Kommentar (`bauregel.ts` → `ohneKommentare`; D.14, Beobachtung «Sicherheit») [G] | mittel (Schutz), heute ungenutzt | 12a | **12a**, Punkt (2) |
-| N-02 | Nicht normalisierte Pfade (`..`, `./`) in den Routen-Regeln (`ADMIN_MODUL`); die Regel für `liest`/`schreibt` normalisiert schon (D.14) [G] | mittel, heute ungenutzt | 12a | **12a**, Punkt (1) |
-| N-03 | `import.meta.glob`, `require`, berechnetes `import()` ausserhalb der Routen, `.mts`/`.cts` (D.14) | niedrig | 12a (als Befund melden) | **12a**, Punkt (4); `.mts`/`.cts` nennt die Zeile nicht: Kleinfrage in den Hinweisen zu 12a |
-| N-04 | Weiterreichen: `export { liest } from` in einer Datei der Tabelle (D.14); über eine Datei unter `src/lib/` ausserhalb von `server/` (D.4) | niedrig | 12a für `liest`/`schreibt`/`mitKonto`; der Rest bleibt als benannte Grenze («jede Datei für sich») | **12a**, Punkt (5) für `liest`/`schreibt`/`mitKonto`; der Rest **Beobachtung** (benannte Grenze) |
-| N-05 | `export { x as 'actions' }` erkennt `exportiertActions` nicht (D.8) [G] | niedrig | 12a | **12a**, Punkt (3) |
-| N-06 | Die Hilfsdateien `gespraech/antworten.ts` und `cm/verwaltung-meldung.ts` kennt die Bauregel nicht; eine Mitglieder-Route dürfte sie importieren (D.12, D.13) | niedrig | 12a, sonst Hinweis (e) zu Schritt 20 | **12a**, Punkt (6); verwirft 12a die Regel, dann **Schritt 20**, Hinweis (e) |
+| N-01 | `//` im Importpfad verschwindet als Kommentar (`bauregel.ts` → `ohneKommentare`; D.14, Beobachtung «Sicherheit») [G] | mittel (Schutz), heute ungenutzt | 12a | **12a**, Punkt (2); **erledigt** in 12a (D.15) |
+| N-02 | Nicht normalisierte Pfade (`..`, `./`) in den Routen-Regeln (`ADMIN_MODUL`); die Regel für `liest`/`schreibt` normalisiert schon (D.14) [G] | mittel, heute ungenutzt | 12a | **12a**, Punkt (1); **erledigt** in 12a (D.15) |
+| N-03 | `import.meta.glob`, `require`, berechnetes `import()` ausserhalb der Routen, `.mts`/`.cts` (D.14) | niedrig | 12a (als Befund melden) | **12a**, Punkt (4); `.mts`/`.cts` nennt die Zeile nicht: Kleinfrage in den Hinweisen zu 12a. **Erledigt** in 12a, `.mts`/`.cts` aufgenommen (D.15) |
+| N-04 | Weiterreichen: `export { liest } from` in einer Datei der Tabelle (D.14); über eine Datei unter `src/lib/` ausserhalb von `server/` (D.4) | niedrig | 12a für `liest`/`schreibt`/`mitKonto`; der Rest bleibt als benannte Grenze («jede Datei für sich») | **12a**, Punkt (5) für `liest`/`schreibt`/`mitKonto`; der Rest **Beobachtung** (benannte Grenze). Punkt (5) **erledigt** in 12a (D.15) |
+| N-05 | `export { x as 'actions' }` erkennt `exportiertActions` nicht (D.8) [G] | niedrig | 12a | **12a**, Punkt (3); **erledigt** in 12a (D.15) |
+| N-06 | Die Hilfsdateien `gespraech/antworten.ts` und `cm/verwaltung-meldung.ts` kennt die Bauregel nicht; eine Mitglieder-Route dürfte sie importieren (D.12, D.13) | niedrig | 12a, sonst Hinweis (e) zu Schritt 20 | **12a**, Punkt (6); verwirft 12a die Regel, dann **Schritt 20**, Hinweis (e). **Verworfen** in 12a (Begründung D.15), damit **Schritt 20**, Hinweis (e) |
 | N-07 | Admin-Routen prüfen den Namen gegen die Vereinigung der Listen, nicht gegen die Liste ihrer Datei (D.8, D.13) | niedrig: `alleVerwaltung()` bricht bei doppeltem Namen ab [G] | bleibt als Beobachtung | **Beobachtung** |
 | N-08 | Der Typ bindet kein Fehlerwort an seinen Status (`antwort(404, { fehler: 'veraltet' })` geht durch); Feldnamen in `felder` frei; Zusatzangaben liest die Oberfläche mit `as` (D.6) | niedrig bis mittel | Schritt 13 (P-13c); der Rest bleibt | **Schritt 13** (Nachmessen: Wort nur mit seinem Status); Feldnamen und Zusatzangaben **Beobachtung** |
 | N-09 | Die Sätze des Anlasses stehen doppelt: `ANTWORT_MELDUNG` (`anlass/angaben.ts`) sendet der Server, die Seite zeigt ihren eigenen, heute wortgleichen Satz mit fester «500» [G] | niedrig | Schritt 13: aufnehmen oder ausdrücklich verwerfen | **Schritt 13** (aufnehmen oder ausdrücklich verwerfen) |
@@ -1591,7 +1593,7 @@ bewusst nicht. Protokoll: Anhang C.5.
 | 10 | [geändert] `login` hängt nicht mehr von `admin` und `gespraech` ab: Die Antwort von `/api/sitzung` wird ausserhalb von `login` gebaut (B-14); der Typ `AnsichtRolle` zieht nach unten (`login/` oder `db/`). Streicht drei Ausnahmen. **[geändert]** Ort nach dem Nachmessen: neues Modul `sitzung/` mit `sitzung/schnittstellen.ts`, `getSitzung` Zeichen für Zeichen; `ANSICHT_ROLLEN` und `AnsichtRolle` nach `login/sitzung.ts` (Anhang D.9). Einzelheiten: Hinweise zu Schritt 10 | `src/lib/server/login/schnittstellen.ts` → `getSitzung` (neuer Ort nach dem Nachmessen), `login/sitzung.ts`, `admin/rollen.ts`, Route `src/routes/api/sitzung/+server.ts`, `scripts/importrichtung.test.ts`, `eslint.config.js` (`AUSNAHMEN`), Tests. **[geändert]** Dazu neu `src/lib/server/sitzung/schnittstellen.ts`; in `eslint.config.js` auch `THEMEN`; fünf Testdateien und `routen.test.ts` nur an der Import-Zeile (`login/schnittstellen.db.test.ts`, `login/passkey-schnittstellen.db.test.ts`, `admin/schnittstellen.db.test.ts`, `admin/ansicht.db.test.ts`, `gespraech/schnittstellen.db.test.ts`); `docs/context-scopes.md` und `docs/arc42.md` (nennen die Module). Die Route ändert nur ihre Import-Zeile; `bauregel.ts` ist nicht betroffen (Anhang D.9) | Ein Zyklus weniger; Login ist wieder unterste Schicht | niedrig | `login/schnittstellen.db.test.ts` (zieht mit), Routen-Test (`OHNE_LISTE`), E2E Startseite und Navigation. **[geändert]** Die Tests ziehen nicht um: `getSitzung` rufen fünf Testdateien (14 Aufrufe), es ändert sich je nur der Import. Dazu die Lint-Probe «Ausnahme ist noch nötig» (wird rot, solange einer der drei Einträge stehen bleibt) und Lint grün ohne sie; in `importrichtung.test.ts` zwei Fälle auf eine gestellte Ausnahme umstellen (Anhang D.9) | 06 | **Opus** (vorher Sonnet), solange das Ziel für `getSitzung` nicht feststeht. **[geändert]** Das Ziel steht fest (Anhang D.9); nach dem Wortlaut genügt Sonnet | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.9).** War: den Ort für `getSitzung` festlegen (Bedingungen in den Hinweisen); kein Entscheid des Projektleiters nötig | **erledigt** 12.11.2026, Review «ok», Version 0.20.16 (Branch `refactor/schritt-10`: `test:` `99d6bb2`, `refactor:` `1958575`, `2b4035f`, `docs:` `1878907`). Ergebnis unten, Protokoll Anhang D.10 |
 | 11 | [geändert] Schnitt nach E-12, nur die klaren Fälle: Die Schnittstellen der CM-Anmeldungsverwaltung ziehen von `turnier/schnittstellen.ts` zu `cm`, die des Gesprächs bekommen in `gespraech` ihre eigene Liste (sie liegen schon dort). `admin/` wird nicht aufgeteilt. Muster wie Schritt 09 (F-17). Streicht die Ausnahme `turnier/schnittstellen.ts` → `gespraech/schnittstellen.ts`. **[geändert]** Umfang nach dem Nachmessen: Zuordnung 9 Turnier (bleiben), 13 CM, 4 Gespräch bestätigt. Nach Variante A (E-38) drei neue Dateien `cm/`, `gespraech/` und `mitteilung/verwaltung-schnittstellen.ts` mit je eigener Liste; mit den Mitteilungen 23 Funktionen und 20 von 50 Admin-Routen. Die Hilfe `melde` brauchen Turnier und CM, vier Hilfen des Gesprächs beide Seiten: je eine Fachdatei. In der Bauregel fällt die Sperrliste nach Namen ganz weg (keine Zeile `namen`, keine `offen`). `AUSNAHMEN` ist damit schon nach diesem Schritt leer. Empfohlen in zwei Teilen 11a und 11b (F-22; Anhang D.11). Einzelheiten: Hinweise zu Schritt 11 | `src/lib/server/turnier/schnittstellen.ts`, `cm/`, `gespraech/`, Routen unter `src/routes/api/admin/`, `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`, `rechte-matrix.db.test.ts`, `grundpruefung.db.test.ts`, `routen.test.ts`, `eslint.config.js` (`AUSNAHMEN`). **[geändert]** Dazu `src/lib/server/mitteilung/`, `tests/hilfen/verwaltungs-listen.ts`, `turnier/schnittstellen.db.test.ts` (wird geteilt), eine neue Testdatei in `cm/`, `gespraech/schnittstellen.db.test.ts`, `mitteilung/admin-schnittstellen.db.test.ts`, `scripts/importrichtung.test.ts`, `docs/ci-cd-und-release.md`, `docs/arc42.md`, `docs/context-scopes.md`. `grundpruefung.db.test.ts` braucht keine Änderung, `routen.test.ts` nur Importe (Anhang D.11) | Ordnername sagt, wo etwas liegt | mittel (viele Routen, Prüfskript). **[geändert]** Bei den Mitteilungen liegt das Risiko im Wegfall von Schutz-Code der Bauregel, nicht im Verschieben | Rechte-Matrix-Test, alle `cm-*`-E2E, `turnier.test.ts`; Routen-Test und Grundprüfung mit der Schleife aus Schritt 09 über die neuen Listen; je geändertes Muster der Bauregel ein Fall in `bauregel.test.ts`, einmal rot. **[geändert]** Die Schleife aus Schritt 09 prüft den Bereich nicht: vorab ein Charakterisierungstest «Bereich `cm`» über die 26 Namen (Mitglieder-Admin 403 `kein-admin`, CM-Admin weder 401 noch 403), der durch den Umzug unverändert bleibt; die Schleife je Modul wird 9, 13 und 4. Vorab eine zweite gestellte Ausnahme in `importrichtung.test.ts` (Datei in einem Thema, zwei Ziele) und die Prüfung, ob `it.each` über die leere Liste grün bleibt (stand bei Schritt 12). Für die Mitteilungen dazu `tests/e2e/mitteilungen.test.ts`; rund acht Stellen in `bauregel.test.ts` werden von der Sperrliste auf den Pfad umgestellt, der Reviewer liest den Diff an `bauregel.ts` ganz und vergleicht gegen `dev` mit der einen erwarteten Abweichung (Anhang D.11) | 06a, 07, 09 (E-12; Muster nach F-17) | Opus | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.11).** War: `turnier/schnittstellen.ts` (ab Zeile 110), `gespraech/schnittstellen.ts` und `cm/verwaltung*.ts` sind nur in Auszügen gelesen; vorab die genaue Zuordnung der 26 Einträge von `TURNIER_SCHNITTSTELLEN` festhalten | **erledigt** 12.11.2026, Review «ok» für beide Läufe, Version 0.20.17 (Branch `refactor/schritt-11`; Lauf 1 Anhang D.12, Lauf 2 Anhang D.13) |
 | 12 | [geändert] Importregeln für die Richtung zwischen den Modulen scharf stellen: `AUSNAHMEN` in `eslint.config.js` ist leer (Liste und Erzeugung der Blöcke bleiben, kein Umbau). `bauregel.ts` **bleibt** in vollem Umfang, weil ihr Teil «Admin-Routen» das Bindeglied zu den Rechte-Tests ist (B-07); angepasst werden nur feste Pfade, soweit die Schritte 07, 09 und 11 das nicht schon getan haben. Einzelheiten: Hinweise zu Schritt 12 | `eslint.config.js`, `scripts/importrichtung.test.ts`; `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts` nur wo nötig | Neue Zyklen über Schnittstellen, `login` und die unterste Schicht fallen auf (nicht über Fachlogik zwischen Themen, siehe Schritt 05); die Sicherheitsregel bleibt unangetastet | niedrig | Jede Lint-Regel einmal absichtlich verletzen, auch die für `dienste.ts` aus Schritt 07; `bauregel.test.ts` grün; vorab prüfen, ob der Fall-Test `it.each(AUSNAHMEN …)` mit leerer Liste grün bleibt | 05, 06, 06a, 07, 09, 10, 11 | Sonnet | Subagent | nein | **erledigt** 12.11.2026, Review «ok», Version 0.20.18 (Branch `refactor/schritt-12`; `bdaa17a` `test:`, `6ea55cd` und `787764d` `refactor:`, `b02ea53` und `2f9ad27` `fix:`, `83ccfcc` `docs:`). Ergebnis unten, Protokoll Anhang D.14 |
-| 12a | [neu] **Reste der Bauregel (E-42).** (1) Importpfade werden vor jeder Regel normalisiert, auch in den Routen-Regeln (`zielVon` für alle, `ADMIN_MODUL` gegen den aufgelösten Pfad); (2) Kommentare werden nicht innerhalb von Texten entfernt (`//` im Pfad, Zeilenkommentar hinter einem Anführungszeichen); (3) `export { x as 'actions' }` gilt als Form Action; (4) `import.meta.glob`, `require` und ein berechnetes `import()` in einer geprüften Datei sind ein Befund; (5) keine Datei reicht `liest`, `schreibt` oder `mitKonto` weiter; (6) die zwei Hilfsdateien `gespraech/antworten.ts` und `cm/verwaltung-meldung.ts`: Regel aufnehmen oder im Bericht begründet verwerfen. Kein App-Code, kein Verhalten. Branch `refactor/schritt-12a`. Einzelheiten: Hinweise zu Schritt 12a | `scripts/pruefungen/bauregel.ts`, `bauregel.test.ts`, `docs/ci-cd-und-release.md` (Zeile zur Bauregel), der Eintrag «Bauregel übersieht Importpfade …» (Thema Sicherheit) in `docs/beobachtungen.md`. Kein Diff unter `src/` | Der Schutz hängt nicht mehr an der Schreibweise; die offene Beobachtung «Sicherheit» ist zu (N-01 bis N-05, N-06 entschieden) | niedrig für die App, mittel für das Werkzeug (zwei Reviews der Etappe 1 brauchten an dieser Datei eine zweite Runde) | Je Form ein Fall in `bauregel.test.ts`, vorher rot. **Vergleich alter gegen neuer Bauregel über gestellte Fälle schon durch den Umsetzer** (nicht erst im Review): nirgends lockerer als vorher, strenger nur bei den genannten Formen; am echten Repo `bauregel: ok`. Der Reviewer liest den Diff an `bauregel.ts` ganz und wiederholt den Vergleich. Voller `make check` | 12 | Opus | Subagent | nein (die Formen stehen in Anhang D.4, D.8, D.13, D.14) | offen |
+| 12a | [neu] **Reste der Bauregel (E-42).** (1) Importpfade werden vor jeder Regel normalisiert, auch in den Routen-Regeln (`zielVon` für alle, `ADMIN_MODUL` gegen den aufgelösten Pfad); (2) Kommentare werden nicht innerhalb von Texten entfernt (`//` im Pfad, Zeilenkommentar hinter einem Anführungszeichen); (3) `export { x as 'actions' }` gilt als Form Action; (4) `import.meta.glob`, `require` und ein berechnetes `import()` in einer geprüften Datei sind ein Befund; (5) keine Datei reicht `liest`, `schreibt` oder `mitKonto` weiter; (6) die zwei Hilfsdateien `gespraech/antworten.ts` und `cm/verwaltung-meldung.ts`: Regel aufnehmen oder im Bericht begründet verwerfen. Kein App-Code, kein Verhalten. Branch `refactor/schritt-12a`. Einzelheiten: Hinweise zu Schritt 12a | `scripts/pruefungen/bauregel.ts`, `bauregel.test.ts`, `docs/ci-cd-und-release.md` (Zeile zur Bauregel), der Eintrag «Bauregel übersieht Importpfade …» (Thema Sicherheit) in `docs/beobachtungen.md`. Kein Diff unter `src/` | Der Schutz hängt nicht mehr an der Schreibweise; die offene Beobachtung «Sicherheit» ist zu (N-01 bis N-05, N-06 entschieden) | niedrig für die App, mittel für das Werkzeug (zwei Reviews der Etappe 1 brauchten an dieser Datei eine zweite Runde) | Je Form ein Fall in `bauregel.test.ts`, vorher rot. **Vergleich alter gegen neuer Bauregel über gestellte Fälle schon durch den Umsetzer** (nicht erst im Review): nirgends lockerer als vorher, strenger nur bei den genannten Formen; am echten Repo `bauregel: ok`. Der Reviewer liest den Diff an `bauregel.ts` ganz und wiederholt den Vergleich. Voller `make check` | 12 | Opus | Subagent | nein (die Formen stehen in Anhang D.4, D.8, D.13, D.14) | **umgesetzt** 12.11.2026, Review und Merge offen (Branch `refactor/schritt-12a`: `fix:` `df46080` Punkt 2, `4224178` Punkt 1, `5a6bf32` Punkt 3, `ff4a265` Punkt 4, `26c46fe` Punkt 5, dazu der `docs:`-Commit; Punkt 6 verworfen). Ergebnis unten, Protokoll Anhang D.15 |
 
 Belege je Hinweis; Dateien unter `src/lib/server/`, wenn nichts anderes steht. Was die Schritte an
 Routen-Test, Grundprüfung und Bremsen-Test anpassen müssen, steht ausführlich in Anhang C.2 («Für
@@ -1859,6 +1861,13 @@ nach einer Korrekturrunde, Version 0.20.14)
 - **Für die Nutzerin:** nichts; nur Prüfwerkzeuge, ihre Tests und Doku.
 - **Folgt daraus:** Die Etappe 1 ist umgesetzt. Was die Regeln weiter nicht sehen, steht in D.14 («Was kein Test sieht»).
 
+**Ergebnis Schritt 12a** (12.11.2026; umgesetzt, Review und Merge offen; Protokoll in D.15)
+
+- **Bauregel:** Der Schutz hängt nicht mehr an der Schreibweise. (1) Die Sperren der Routen (`lib/server/admin`, die am Pfad gesperrten Verwaltungs-Dateien, `dienste.ts`) prüfen den Pfad, wie er steht, und den aufgelösten Pfad; eine Admin-Route nimmt nur Pfade, die wirklich auf eine erlaubte Datei zeigen. (2) Kommentare werden nur ausserhalb von Texten, Template- und Regex-Literalen entfernt. (3) `export { x as 'actions' }` und Namen mit Escape gelten als Form Action. (4) `import.meta.glob`, `require`, `createRequire` und ein berechnetes `import()` sind in Routen und in den geprüften Dateien unter `src/` ein Befund; `.mts`, `.cts`, `.mjs` und `.cjs` gelten wie `.ts` und `.js`. (5) Die Dateien der Tabelle `VERWALTUNGS_DATEIEN` rufen `liest`, `schreibt` und `mitKonto` nur auf und reichen sie nicht weiter. (6) Für `gespraech/antworten.ts` und `cm/verwaltung-meldung.ts` keine Regel (begründet in D.15); der Punkt geht an Schritt 20, Hinweis (e).
+- **Nachweis:** je Form ein Fall in `bauregel.test.ts` (122 → 181), jeder gegen die alte Fassung rot; Vergleich alter gegen neuer Bauregel über 25 843 536 gestellte Fälle: strenger nur bei den sechs Formen, «alt Befund, neu keiner» nur in zwei erklärten Klassen ohne Schutzverlust (auskommentierter Import direkt hinter einem Anführungszeichen; `//` im Pfad eines dynamischen Imports, den die alte Fassung als berechnet las; D.15); alle 441 versionierten Dateien unter `src/` urteilen an ihrem Pfad gleich wie vorher; am echten Repo `bauregel: ok`. Kein Diff unter `src/`.
+- **Für die Nutzerin:** nichts; nur Prüfskript, sein Test und Doku.
+- **Folgt daraus:** Die Beobachtung «Sicherheit» zur Bauregel ist erledigt (Archiv). Die Etappe 1 ist ohne offenen Eintrag zum Schutz abgeschlossen; weiter mit Schritt 13 (Nachmessen vorab).
+
 **Hinweise zu Schritt 10** [geändert]
 
 - **Nachmessen (12.11.2026, Anhang D.9), kein Entscheid des Projektleiters nötig:** Ort ist ein
@@ -1948,6 +1957,8 @@ nach einer Korrekturrunde, Version 0.20.14)
 
 **Hinweise zu Schritt 12a** [neu]
 
+- **Umgesetzt 12.11.2026 (Anhang D.15):** Punkte (1) bis (5) gebaut, (6) begründet verworfen
+  (geht an Schritt 20, Hinweis (e)); `.mts`/`.cts` aufgenommen.
 Eingefügt am Checkpoint der Etappe 1 (E-42; Herleitung in Abschnitt 1c, Befunde N-01 bis N-06).
 Die Symbole `ohneKommentare`, `zielVon`, `ADMIN_MODUL` und `exportiertActions` gibt es in
 `scripts/pruefungen/bauregel.ts` (423 Zeilen; `bauregel.test.ts` 896 Zeilen) [G: Textsuche am
@@ -2007,7 +2018,7 @@ Ergebnis der Zwischenrevision, aus dem Code gelesen, nichts ausgeführt.
 | 09, 11 | Routen-Test: Admin-Routen rufen nur Einträge der Verwaltungs-Listen, andere Routen nie (das Gegenstück zur Bauregel als Verhalten); Rechte-Matrix für die bekannten Listen | Eine **neue** Liste steht in keiner 401/403-Schleife und nicht in der Rechte-Matrix, bis jemand sie einträgt (darum der Test in Schritt 09); eine zu weit gefasste Bauregel fällt nur an `bauregel.test.ts` auf. **Nachtrag Schritt 11, Lauf 1:** Den Bereich `cm` der 26 hält die Rechte-Matrix beim Namen fest (vorab, D.12); jede neue Liste hat ihre Rechte-Schleife in ihrer Testdatei. **Nachtrag Lauf 2:** Die Sperrliste nach Namen ist weg; jede Verwaltungs-Datei ausserhalb von `admin/` ist am Pfad gesperrt, je mit einem Fall in `bauregel.test.ts` |
 | 10 | Fünf Testdateien mit 14 Aufrufen von `getSitzung` (alle sechs Felder, 401 mit Körper und `no-store`), sie ziehen nicht um, nur ihr Import ändert sich; Routen-Test (`OHNE_LISTE`, Einstieg `db`); Lint-Probe «Ausnahme ist noch nötig» und Lint ohne die drei Einträge; E2E Startseite und Navigation. **Nachtrag Schritt 10:** so umgesetzt (D.10) | `getSitzung` steht in keiner Liste (die Grundprüfung sieht sie nicht); ihr 401 prüfen zwei eigene Tests. Dass `admin/rollen.ts` Liste und Typ weiterreicht, hält nur der Typprüfer fest |
 | 12 [neu] | `importrichtung.test.ts`: «`AUSNAHMEN` ist leer» und der Meldungstext; `bauregel.test.ts`: 41 Fälle für `liest`/`schreibt` (sechs Dateien frei, Mitglieder-Datei in acht Formen, unlesbare Namen, Importe ohne Namen, Dateien ausserhalb der Themen, Tests frei, Routen nicht doppelt); 22 Lint-Proben von Hand (D.14) | Weiterreichen von `liest` über eine andere Datei; berechnete dynamische Importe ausserhalb der Routen; `//` im Importpfad und nicht normalisierte Pfade in Routen (D.14, Nachtrag). **Nachtrag Review:** `mitKonto` ist mitgeprüft, Pfade über `$lib` und ab `/src/` sind normalisiert |
-| 12a [neu] | Geplant, noch nicht gelaufen: `bauregel.test.ts` mit je einem Fall je Form, vorher rot; der Vergleich alter gegen neuer Bauregel über gestellte Fälle (Umsetzer, dann Reviewer); am echten Repo `bauregel: ok`. Die Vertragstests (Grundprüfung, Routen-Test, Rechte-Matrix) bleiben unberührt, weil kein App-Code ändert | Die Bauregel prüft Text, nicht Verhalten: Eine Schreibweise, die kein Fall stellt, bleibt unbemerkt. Weiterreichen anderer Namen als `liest`/`schreibt`/`mitKonto` und über Dateien ausserhalb von `server/` (N-04, benannte Grenze); Namen gegen die Vereinigung der Listen statt gegen die Liste der Datei (N-07). Das zweite Netz dahinter ist der Routen-Test (Verhalten) |
+| 12a [neu] | **Umgesetzt (D.15):** `bauregel.test.ts` 122 → 181, je Form ein Fall, jeder gegen die alte Fassung rot; der Vergleich alter gegen neuer Bauregel über gestellte Fälle durch den Umsetzer (Reviewer offen); die 441 echten Dateien unter `src/` urteilen gleich; am echten Repo `bauregel: ok`. Die Vertragstests (Grundprüfung, Routen-Test, Rechte-Matrix) bleiben unberührt, weil kein App-Code ändert | Die Bauregel prüft Text, nicht Verhalten: Eine Schreibweise, die kein Fall stellt, bleibt unbemerkt. Weiterreichen anderer Namen als `liest`/`schreibt`/`mitKonto` und über Dateien ausserhalb von `server/` (N-04, benannte Grenze); Namen gegen die Vereinigung der Listen statt gegen die Liste der Datei (N-07). Das zweite Netz dahinter ist der Routen-Test (Verhalten) |
 
 **Bleibt (gut gelöst):** Wirkung statt Identität im Bremsen-Test; die eine Tabelle `ROUTEN`;
 benannte Ausnahmen mit der heutigen Antwort statt stiller Lücken; die Probe, dass jede
@@ -2296,7 +2307,7 @@ jeden auf oder verwirft ihn ausdrücklich im Bericht:
   zählt die Stellen; passt es nicht, verwirft der Schritt den Punkt, und er bleibt Beobachtung.
 - **(e) [neu] Hilfsdateien ohne Regel (N-06):** nur, wenn Schritt 12a die Regel für
   `gespraech/antworten.ts` und `cm/verwaltung-meldung.ts` verworfen hat. Hat 12a sie aufgenommen,
-  entfällt der Punkt.
+  entfällt der Punkt. **Stand nach 12a:** verworfen (Begründung D.15); der Punkt gilt.
 
 ### 7.6 Etappe 4 — Doku und Arbeitsweise
 
@@ -2314,8 +2325,8 @@ jeden auf oder verwirft ihn ausdrücklich im Bericht:
 
 - **Etappe 1 [geändert]: 06 → 06a → 07 → 08 → 09 → 10 → 11 → 12 → 12a.** Stand 12.11.2026: 06
   bis 12 sind umgesetzt und gemergt, je mit Review «ok». Die Zwischenrevision am Etappenende ist
-  erledigt (Abschnitt 1c, E-41 bis E-44). Offen ist der nachgeschobene Schritt 12a (E-42), dann
-  Etappe 2.
+  erledigt (Abschnitt 1c, E-41 bis E-44). Der nachgeschobene Schritt 12a (E-42) ist umgesetzt
+  (D.15), Review und Merge offen; dann Etappe 2.
   - *12a nach 12, vor 13 [neu]:* 12a ändert nur das Prüfskript und hängt an nichts aus der
     Etappe 2. Vor 13, damit die Etappe «Server» ohne offenen Eintrag zum Schutz abschliesst
     (F-25, Antwort A).
@@ -6522,3 +6533,156 @@ Version 0.20.17; Importregeln scharf stellen, letzter Schritt der Etappe 1)
   mit 2012 Tests, E2E 414 bestanden und 57 übersprungen, grüner Stand `3b0a2cff114f`.
 - **Modell:** Der Plan nannte Sonnet; der Schritt lief mit Opus, weil die Regel für die
   Rechte-Importe dazukam (Entscheid des Orchestrators).
+
+### D.15 Schritt 12a
+
+**Erkenntnisse Schritt 12a** (12.11.2026, Branch `refactor/schritt-12a` ab `origin/dev` `f1fc3c0`
+mit den zwei Doku-Commits des Orchestrators bis `5413b6f`; Reste der Bauregel, E-42)
+
+- **Voraussetzungen geprüft:** Schritt 12 erledigt, kein Nachmessen verlangt, kein Entscheid nötig.
+  Keine neue Abhängigkeit (im Worktree nur `npm ci --ignore-scripts`), keine Lint-Ausnahme, **kein
+  Diff unter `src/`** (`git diff origin/dev -- src` leer), `CLAUDE.md` unverändert. Der Lauf wurde
+  einmal durch eine Nutzungsgrenze unterbrochen und nach `df46080` fortgesetzt; der uncommittete
+  Stand (Punkt 1) war stimmig, keine rote Probe stand im Arbeitsbaum.
+- **Commits** (je Punkt ein `fix:` mit Test und Änderung, weil der Pre-Commit-Hook `check-schnell`
+  rote Tests nicht zulässt; rot je per Probe belegt, A-15): `df46080` Punkt 2, `4224178` Punkt 1,
+  `5a6bf32` Punkt 3, `ff4a265` Punkt 4, `26c46fe` Punkt 5; dazu dieser `docs:`-Commit. Punkt 6 ohne
+  Code (verworfen, unten).
+- **Punkt 2, Kommentare nur ausserhalb von Texten (`df46080`, N-01):** `ohneKommentare` läuft über
+  ein Muster, das an jeder Stelle zuerst einen Text in '…' oder "…" (je auf einer Zeile), ein
+  Template-Literal (über Zeilen, `${…}` zählt zum Text) oder ein Regex-Literal (nach einem Zeichen
+  oder Wort, hinter dem kein Wert endet, oder am Zeilenanfang) überspringt und nur sonst einen
+  Kommentar entfernt. Die Schranke «kein Zeilenkommentar direkt nach `:` oder `\`» bleibt wie vorher;
+  die nach `'`, `"` und `` ` `` entfällt, weil Texte jetzt ganz übersprungen werden. Damit lässt `//`
+  im Pfad (`'$lib/server//admin/rechte.ts'`) und `/*` in einem Text keinen Import mehr verschwinden,
+  und ein Zeilenkommentar direkt hinter einem Text (`'holeAdminDienste'// it's`, D.8) wird entfernt.
+  Kein Parser: Ein Regex-Literal nach `)` liest das Muster als Division (unten).
+- **Punkt 1, Pfade auch in Routen aufgelöst (`4224178`, N-02):** Neue Hilfe `trifft(muster, pfad,
+  quelle)`: Eine Sperre trifft, wenn der Pfad, wie er steht, **oder** der aufgelöste Pfad passt
+  (`aufgeloest`: `$lib`, `/src/…` und relativ, normalisiert, mit Endung, ohne Anhang; `zielVon` ist
+  `aufgeloest` ohne `.ts`/`.js`). Das «oder» hält jeden alten Befund am geschriebenen Pfad. Gilt für
+  `ADMIN_MODUL`, die Pfad-Sperren der Verwaltungs-Dateien und `DIENSTE_MODUL`. Admin-Routen: Ein
+  erlaubter Import muss weiter wie bisher geschrieben sein (`ERLAUBTER_IMPORT`, mit `.ts`) **und** auf
+  die erlaubte Datei zeigen (`ZIELE_DER_ADMIN_ROUTE`); falsche Tiefe, ein Paket
+  (`paket/lib/server/…`) und `/lib/…` ohne `src` sind jetzt ein Befund. Erste Fassung im Lauf
+  berichtigt: Mit der Endung gestrichen galt `…/lib/server/admin.ts` (Datei neben dem Ordner) als
+  Ordner `admin`; der Kleinvergleich zeigte es, darum prüft `trifft` mit Endung.
+- **Punkt 3, Form Actions (`5a6bf32`, N-05):** `exportiertActions` liest die Namen mit `leseName`
+  (`'actions'` = `actions`, auch `export { 'actions' } from …`); ein Name mit Escape (`'actions'`,
+  `actions`) ist ein Befund, gesperrt im Zweifel.
+- **Punkt 4, nicht prüfbares Laden (`ff4a265`, N-03):** `import.meta.glob`, `require(` und
+  `createRequire(` (nicht `x.require`) sind in Routen und in den Dateien der Rechte-Regel (`src/` ohne
+  Routen und Tests, auch die Dateien der Tabelle) ein Befund «… lässt sich nicht prüfen; nur
+  statische Importe»; ein berechnetes `import()` dort neu ebenfalls («dynamischer Import mit
+  berechnetem Pfad …», wie in Routen). **Kleinfrage `.mts`/`.cts`: aufgenommen.**
+  `betrifftRechteImporte` nimmt `.mts`, `.cts`, `.mjs` und `.cjs` wie `.ts` und `.js`: Vite lädt sie
+  so, und eine `.mts`-Datei in einem Thema war für die Rechte-Regel unsichtbar. Routen betrifft das
+  nicht (jede Datei unter `src/routes/` wird ohnehin geprüft; SvelteKit kennt `+server.mts` nicht).
+- **Punkt 5, nicht weiterreichen (`26c46fe`, N-04):** neue `pruefeWeiterreichen` für die Dateien
+  der Tabelle `VERWALTUNGS_DATEIEN` (bisher ganz frei): Aus `admin/rechte.ts` nur statisch und mit
+  Namen (wie für alle anderen Dateien); `export { liest } from`, `export * from` admin/rechte.ts sind
+  ein Befund; ein importiertes `liest`, `schreibt` oder `mitKonto` (auch umbenannt, auch in
+  Anführungszeichen) darf im Code nur direkt vor `(` stehen. So fallen `export { liest }`, `export
+  default`, `export const x = l`, `{ liest }` und `const a = liest; export { a }` alle auf, ohne
+  Datenfluss zu verfolgen (Vorbild: die Regel «`holeAdminDienste()` nur direkt als erstes Argument»).
+  Die Import-Anweisung selbst wird dafür über ihren Bereich (`bereich`, neu im Typ `Import`, dazu
+  `wort` = `import`/`export`) ausgeblendet, Texte zählen nicht («Die Verwaltung liest …»). Am Repo
+  stehen die drei Namen in den sechs Dateien nur als Aufruf, in Kommentaren und im Import [G:
+  Textsuche vor dem Bau].
+- **Punkt 6, Hilfsdateien `gespraech/antworten.ts` und `cm/verwaltung-meldung.ts` (N-06):
+  verworfen.** Gründe: (a) Beide prüfen keine Rechte und öffnen nichts, was nicht schon offen ist:
+  `antworten.ts` baut drei Antworten und prüft die Länge eines Texts, und zwar für die Mitglieder
+  und die Verwaltung (eine Sperre am Pfad wäre falsch); `verwaltung-meldung.ts` ruft nur
+  `meldeMitgliedern` aus `mitteilung/meldung.ts`, das jeder Route frei steht wie jede Fachdatei (die
+  Bauregel erfasst Fachlogik-Importe bewusst nicht, C.5). Eine Regel nur für diese zwei Dateien
+  schützte nichts. (b) Die Form «nur von den Schnittstellen-Dateien ihres Moduls importierbar» meldete
+  am echten Repo sofort `turnier/schnittstellen.ts` → `cm/verwaltung-meldung.ts` (anderes Modul), und
+  App-Code wird nicht geändert. Der Punkt geht wie geplant an Schritt 20, Hinweis (e).
+- **Fälle, vorher rot:** `bauregel.test.ts` 122 → 181 (+59). Jede neue Datei gegen die Fassung vor
+  ihrem Punkt und gegen `origin/dev` gelaufen (alte `bauregel.ts` aus einer Sicherungskopie
+  eingesetzt, danach zurück, `cmp` gleich): Punkt 2 7 von 129 rot; Punkt 1 15 rot (gegen den Stand
+  nach Punkt 2 und gegen `origin/dev` je 15); Punkt 3 6 rot; Punkt 4 16 rot; Punkt 5 15 rot. Jeder
+  neue Fall war rot, keiner gehört zu «vorher schon grün» (Hinweise zu 12a). Im Lauf zusätzlich rot:
+  der Fall «dynamischer Import über `$lib/…/../admin`» war mit der neuen Fassung rot, weil
+  `import('$lib/…')` schon vorher als berechnet gilt (unten); der Fall nimmt jetzt einen relativen
+  Pfad.
+- **Vergleich alter (`origin/dev`) gegen neuer Bauregel** (Skript im Scratchpad der Session,
+  `s12a/vergleich.ts`, nach den Vorlagen des Reviewers `s12/diff2.ts` und `s11/c/diff.ts`): 17
+  geprüfte Dateien (sechs Routen, sieben weitere Dateien, zwei Dateien der Tabelle, `.mts` und
+  `.cts`), 18 Schreibweisen des Pfads (die zehn der Vorlage, dazu `//` an vier Stellen, falsche Tiefe,
+  Paket, `/lib/…`, `./../`), 18 Quellen (dazu die zwei Hilfsdateien), sechs Endungen, elf Namen, 83
+  Formen (36 der Vorlagen, dazu 25 für Punkt 2, je 6 für Punkt 3 und 4, 10 für Punkt 5), die sieben
+  Listen nach Schritt 11; gleiche Codes je Datei nur einmal: **25 843 536 Fälle**, 16,7 Minuten.
+  - **Strenger: 2 435 163 Fälle**, alle bei den sechs Formen (Zuordnung im Skript nach Form, Pfad,
+    Datei): Punkt 1 (Pfad) 702 874, Punkt 2 670 514, Punkt 3 644 761, Punkt 4 145 894, dazu 18 760
+    für `.mts`/`.cts` und 3 180 für berechnete Importe ausserhalb der Routen, Punkt 5 249 180;
+    **«unerwartet» 0**. (Die Zahlen je Punkt enthalten auch Fälle, in denen eine Form eines Punktes
+    durch einen anderen Punkt strenger wird, z. B. `//` im Pfad in einer Form von Punkt 3.)
+  - **Alter Befund fehlt, neu ein anderer: 108 381 Fälle.** Das Urteil bleibt «Befund»; neu ist nur
+    die Meldung. Davon 96 864 mit `//` im Pfad (die alte Fassung meldete Bruchstücke wie «importiert
+    '$lib/server\nexport { x as '»), 11 517 ohne: Admin-Routen mit falscher Tiefe, bei denen die alte
+    Fassung einen Namen bemängelte und die neue den Pfad.
+  - **Alt Befund, neu keiner: 39 824 Fälle, zwei Klassen, beide erklärt:**
+    1. 38 624 in der Form `const a = 'x'// import { … } from '…';`: ein auskommentierter Import
+       direkt hinter einem Anführungszeichen. Die alte Fassung entfernte diesen Kommentar nicht und
+       las den Import darin als Code; die neue entfernt ihn (genau die Korrektur von Punkt 2, D.8).
+       JavaScript führt ihn nicht aus; ein auskommentierter Import ist schon vorher frei (Fall
+       «lässt `// import { liest } …` zu»). Mit `;` vor dem Kommentar (`'x';// import …`) urteilen
+       beide gleich.
+    2. 1 200 dynamische Importe mit `//` im Pfad (`import('/src/lib/server//http.ts')`,
+       `import('…//dienste.mjs')`): Die alte Fassung las ab `//` alles als Kommentar, sah darum
+       einen berechneten Import und meldete das. Die neue liest den Pfad; er zeigt auf eine freie
+       Datei. Probe: Über denselben Pfad ohne `//` urteilt auch die alte Fassung «frei», in 1 200
+       von 1 200 Fällen (`s12a/fall3.ts`). Kein Schutz geht verloren.
+  - Ausser in auskommentiertem Code (Klasse 1) kein Fall einer gesperrten Quelle (`admin/`,
+    Verwaltungs-Dateien, Einstiege der Verwaltung, `liest`/`schreibt`/`mitKonto`), der alt gemeldet
+    und neu frei wäre.
+- **Keine Fehlalarme an echtem Code** (`s12a/echt.ts`): alle 441 versionierten Dateien unter `src/`
+  (auch `.svelte`, Tests, Markup) gegen beide Fassungen, je an ihrem Pfad (mit den echten Listen),
+  als Seite `src/routes/probe/+page.ts`, als Admin-Route, als Datei der Tabelle und als Fachdatei:
+  2 205 Fälle. **An ihrem Pfad 0 Abweichungen.** Abweichungen nur verschoben: 62 echte Admin-Routen
+  an einem anderen Ort (ihre relativen Pfade zeigen dann ins Leere, jetzt ein Befund, gewollt nach
+  Punkt 1) und `routen.test.ts` mit `import.meta.glob` als Seite oder Fachdatei (ein Test, an
+  seinem Pfad ausgenommen). Am echten Repo `bauregel: ok`.
+- **Was die Bauregel weiterhin nicht sieht:**
+  - Sie liest Text, keinen Syntaxbaum. Ein Regex-Literal direkt nach `)` (`if (x) /'/.test(a)`)
+    gilt als Division; ein Anführungszeichen darin kann den Rest der Zeile als Text lesen lassen.
+    Ein Template-Literal mit einem Backtick, den die Prüfung nicht als Teil eines Texts erkennt
+    (etwa in Svelte-Markup), kann die Erkennung der Kommentare bis zum nächsten Backtick
+    verschieben. In von Prettier formatiertem Code kommt beides am Repo nicht vor (0 Abweichungen
+    an 441 Dateien).
+  - Weiterreichen anderer Namen als `liest`/`schreibt`/`mitKonto` und über Dateien ausserhalb der
+    Tabelle (N-04, benannte Grenze «jede Datei für sich»); innerhalb der Tabelle `liest` in einem
+    `${…}` eines Template-Literals.
+  - `export const actions` (Escape in der Deklaration; nur der Export in Klammern ist erfasst).
+  - Laden über `eval`, `new Function` oder ein importiertes `require` unter anderem Namen;
+    `import.meta['glob']` (lädt nichts, Vite ersetzt nur die wörtliche Form).
+  - Namen gegen die Vereinigung der Listen statt gegen die Liste der Datei (N-07, Beobachtung).
+  - Die Hilfsdateien des Gesprächs und der CM (Punkt 6, Schritt 20 Hinweis (e)).
+  Das zweite Netz für Routen bleibt der Routen-Test (welche Schnittstelle eine Route mit welchen
+  Diensten aufruft), für die Rechte die Rechte-Matrix.
+- **Ausserhalb des Schritts aufgefallen, nicht behoben (beides vor dem Schritt so, nicht lockerer):**
+  - `import('$lib/…')` mit einem Pfad über `$lib` gilt als berechnet, weil das Muster für
+    dynamische Importe kein `$` im Pfad zulässt: in Routen ein Befund «berechnet» statt der
+    genaueren Meldung, ausserhalb neu ebenfalls (Punkt 4). Streng, aber ungenau gemeldet.
+  - Admin-Routen dürfen keinen Pfad über `$lib` nutzen (`ERLAUBTER_IMPORT` verlangt `lib/server/…`
+    nach `/` oder am Anfang). Unverändert gelassen, sonst wäre es eine Lockerung; alle Admin-Routen
+    schreiben relativ.
+- **Tests je Datei, vorher (`5413b6f`) → nachher:** `scripts/pruefungen/bauregel.test.ts` 122 → 181;
+  sonst keine Testdatei geändert. Eine Konstante (`VERWALTUNG`, Meldung der Rechte-Regel) zog in den
+  Kopf der Testdatei, keine Erwartung eines bestehenden Falls geändert.
+- **Doku:** `docs/ci-cd-und-release.md` (Zeile zur Bauregel); der Eintrag «Bauregel übersieht
+  Importpfade mit `//` oder `..` vor `admin`» aus `docs/beobachtungen.md` ins Archiv (erledigt im
+  Refactoring); dieses Dokument (Kopf, «Stand und nächster Schritt», 1c Tabelle N, Zeile und
+  Hinweise 12a, «Ergebnis Schritt 12a», Netz, Hinweis (e) zu Schritt 20, 7.7).
+- **Prüfläufe:** jeder Commit mit dem Hook `check-schnell`, grün. Vorher `uptime` (Last 3,9) und
+  `ps`: kein anderer Prüflauf; Docker lief. Voller `make check` auf dem Code-Endstand `26c46fe` bei sauberem Arbeitsbaum (Doku dafür
+  per `git stash` beiseite): **Exit 0** (Lint; `svelte-check` 1535 Dateien ohne Fehler und Warnung;
+  Prüfskripte samt `bauregel: ok`; Einheits- und Datenbanktests 152 Dateien mit 2071 Tests,
+  Abdeckung 97,07 % Anweisungen, 93,56 % Zweige; beide Builds; E2E 414 bestanden, 57 übersprungen,
+  3,8 Minuten; Image; grüner Stand `abb775131027` gemerkt). Gegen Schritt 12 (2012 Tests): +59, alle
+  in `bauregel.test.ts`.
+- **Für den Reviewer:** den Diff an `bauregel.ts` ganz lesen; den Vergleich mit eigenem Generator
+  wiederholen, besonders die zwei Klassen «alt Befund, neu keiner». Skripte:
+  `/private/tmp/claude-501/-Users-KN-CAS-projekte-tco-app/8815b149-c947-436e-b94c-710910cee959/scratchpad/s12a/`
+  (`vergleich.ts`, `fall3.ts`, `echt.ts`; `alt/` ist `bauregel.ts` aus `origin/dev`).
