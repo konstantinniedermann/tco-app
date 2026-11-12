@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
+import { FELD_MELDUNG } from '../mitteilung/vorlagen.ts';
 import {
 	AUSWAHL_NAMEN,
 	WEG_NAMEN,
@@ -90,7 +91,12 @@ describe('Mitteilungen in der Verwaltung: Anfragen', () => {
 	});
 
 	it('FR-42: Eingabefehler kommen je Feld als Satz an, andere Antworten unverändert', async () => {
-		const falsch = holer(json(400, { fehler: 'eingabe', felder: ['titel', 'text'] }));
+		const falsch = holer(
+			json(400, {
+				fehler: 'eingabe',
+				felder: { titel: FELD_MELDUNG.titel, text: FELD_MELDUNG.text }
+			})
+		);
 		expect(await zeigeVorschau({ art: 'verein' }, WERTE, falsch.holen)).toEqual({
 			art: 'eingabe',
 			felder: {

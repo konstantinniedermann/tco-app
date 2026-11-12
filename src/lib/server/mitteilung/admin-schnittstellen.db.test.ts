@@ -271,7 +271,7 @@ describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 		);
 		expect([falsch.status, await falsch.json()]).toEqual([
 			400,
-			{ fehler: 'eingabe', felder: ['auswahl'] }
+			{ fehler: 'eingabe', felder: { auswahl: 'Bitte die Empfänger wählen.' } }
 		]);
 	});
 
@@ -308,7 +308,14 @@ describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 		);
 		expect([r.status, await r.json()]).toEqual([
 			400,
-			{ fehler: 'eingabe', felder: ['titel', 'auswahl', 'weg'] }
+			{
+				fehler: 'eingabe',
+				felder: {
+					titel: 'Bitte einen Titel mit höchstens 50 Zeichen angeben.',
+					auswahl: 'Bitte die Empfänger wählen.',
+					weg: 'Bitte einen Weg wählen.'
+				}
+			}
 		]);
 		expect(await anzahlEintraege()).toBe(vorher);
 		expect(s.mails).toEqual([]);

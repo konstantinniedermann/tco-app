@@ -5,7 +5,7 @@ import {
 	VEREIN_AUSWAHLEN,
 	type AnlassAuswahl
 } from '../../mitteilung/auswahl.ts';
-import { vorlagenAnlass } from '../../mitteilung/vorlagen.ts';
+import { FELD_MELDUNG, vorlagenAnlass } from '../../mitteilung/vorlagen.ts';
 import { liest, schreibt, type AdminEreignis } from '../admin/rechte.ts';
 import {
 	antwort,
@@ -124,14 +124,17 @@ type Versand = {
 	absenderId: number;
 };
 
-/** Prüft die Angaben (400 mit den Feldern) und sucht die Empfänger nach der Auswahl. */
+/** Prüft die Angaben (400 mit einem Satz je Feld) und sucht die Empfänger nach der Auswahl. */
 function mitEmpfaengern(art: Ziel['art'], fn: (v: Versand) => Promise<Response>): AdminHandler {
 	return (d, e) =>
 		schreibt(d, e, 'mitglieder', (urheber, koerper) =>
 			mitZiel(d, e, art, async (ziel) => {
 				const auswahlen = ziel.art === 'anlass' ? ANLASS_AUSWAHLEN : VEREIN_AUSWAHLEN;
 				const p = pruefeMitteilung(koerper, auswahlen);
-				if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.felder });
+				if (!p.ok) {
+					const felder = Object.fromEntries(p.felder.map((f) => [f, FELD_MELDUNG[f]]));
+					return antwort(400, { fehler: 'eingabe', felder });
+				}
 				const empf =
 					ziel.art === 'anlass'
 						? await anlassEmpfaenger(

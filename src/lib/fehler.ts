@@ -102,19 +102,10 @@ export type WortOhneZusatz = {
 }[Fehlerwort];
 
 /**
- * Altformen, die Schritt 08 abbaut; jede fällt mit ihrem Commit weg. Solange eine hier steht,
- * nimmt der Typ sie an.
- */
-type Altform =
-	// Mitteilungen: `felder` als Liste der Namen.
-	{ fehler: 'eingabe'; felder: readonly string[] };
-
-/**
  * Der Körper jeder Fehlerantwort: `{ fehler, felder? }`, dazu die Zusatzangaben des Worts. Die
  * Wörter ohne Zusatz stehen in einem Glied, damit auch ein Wort aus einer Variablen passt (etwa das
  * Ergebnis einer Fachfunktion).
  */
 export type Fehlerkoerper =
 	| { fehler: WortOhneZusatz; felder?: Feldmeldungen }
-	| { [W in keyof Zusatz]: KoerperZu<W> }[keyof Zusatz]
-	| Altform;
+	| { [W in keyof Zusatz]: KoerperZu<W> }[keyof Zusatz];
