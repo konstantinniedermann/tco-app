@@ -6,15 +6,14 @@
 // Wer eine Route umhängt oder den Zusammenbau der Dienste ändert (Schritte 07, 09 bis 11), passt
 // nur ROUTEN und EINSTIEGE an. Zieht eine Funktion in ein anderes Modul, ändert sich nur ihr Import;
 // das Modul muss auf `schnittstellen.ts` enden (sonst `schnittstellenModule` erweitern), und eine
-// neue Liste gehört in VERWALTUNG oder MITGLIEDER.
+// neue Liste der Verwaltung gehört in `VERWALTUNGS_LISTEN` (`tests/hilfen/verwaltungs-listen.ts`),
+// eine der Mitglieder in MITGLIEDER.
 // Der Test liegt hier und nicht unter `src/routes/`: Dort gilt die Bauregel für jede Datei, und
 // nur Admin-Routen dürfen die Verwaltung importieren.
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../tests/hilfen/anfrage.ts';
+import { VERWALTUNGS_LISTEN } from '../../../tests/hilfen/verwaltungs-listen.ts';
 import {
-	ADMIN_SCHNITTSTELLEN,
-	getAdminAnlaesse,
-	getAdminAnlass,
 	getAuskunft,
 	getBriefe,
 	getFairgate,
@@ -23,9 +22,6 @@ import {
 	getRollen,
 	getVerlauf,
 	getZugang,
-	postAdminAnlaesse,
-	postAdminAnlass,
-	postAdminAnlassLoeschen,
 	postAnsicht,
 	postAnsichtBeenden,
 	postAustritt,
@@ -51,6 +47,13 @@ import {
 	getKalender,
 	postAnmeldung
 } from './anlass/schnittstellen.ts';
+import {
+	getAdminAnlaesse,
+	getAdminAnlass,
+	postAdminAnlaesse,
+	postAdminAnlass,
+	postAdminAnlassLoeschen
+} from './anlass/verwaltung-schnittstellen.ts';
 import {
 	CM_SCHNITTSTELLEN,
 	getCmAnsicht,
@@ -105,7 +108,6 @@ import {
 	postMailCode
 } from './login/schnittstellen.ts';
 import {
-	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
 	MITTEILUNG_SCHNITTSTELLEN,
 	getAnlassMitteilungen,
 	getBenachrichtigungen,
@@ -128,7 +130,6 @@ import {
 	postRufname
 } from './profil/schnittstellen.ts';
 import {
-	TURNIER_SCHNITTSTELLEN,
 	getAnmeldungen,
 	getDoppel,
 	getKategorie,
@@ -291,12 +292,11 @@ const OHNE_LISTE = new Set<unknown>([
 	postLogout,
 	getSitzung
 ]);
-// Eine neue Liste gehört in VERWALTUNG bzw. MITGLIEDER und in `verwaltungsDienste()` bzw.
+// Eine neue Liste der Verwaltung gehört in `VERWALTUNGS_LISTEN` (`tests/hilfen/verwaltungs-listen.ts`;
+// von dort nehmen sie auch Grundprüfung und Rechte-Matrix), eine der Mitglieder in MITGLIEDER und in
 // `mitgliederDienste()` in `grundpruefung.db.test.ts` (dort laufen 401 und 415 über jeden Eintrag).
 const VERWALTUNG = new Set<unknown>(
-	[ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN, MITTEILUNG_ADMIN_SCHNITTSTELLEN].flatMap((l) =>
-		Object.values(l)
-	)
+	Object.values(VERWALTUNGS_LISTEN).flatMap((l) => Object.values(l))
 );
 const MITGLIEDER = new Set<unknown>(
 	[

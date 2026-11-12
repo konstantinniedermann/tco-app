@@ -6,6 +6,7 @@ import {
 	type EigeneDatenbank
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { alleVerwaltung } from '../../../../tests/hilfen/verwaltungs-listen.ts';
 import type { Db } from '../db/index.ts';
 import {
 	aenderung,
@@ -24,6 +25,10 @@ import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../mitteilung/schnittstellen.ts
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { TURNIER_SCHNITTSTELLEN, postKategorien, postTurniere } from '../turnier/schnittstellen.ts';
 import { legeAnlassAn } from '../anlass/anlaesse.ts';
+import {
+	ANLASS_ADMIN_SCHNITTSTELLEN,
+	postAdminAnlaesse
+} from '../anlass/verwaltung-schnittstellen.ts';
 import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';
 import { ROLLEN } from './rollen.ts';
 import {
@@ -33,7 +38,6 @@ import {
 	getMitglieder,
 	getRollen,
 	getVerlauf,
-	postAdminAnlaesse,
 	postRollen
 } from './schnittstellen.ts';
 import type { AdminDienste } from './rechte.ts';
@@ -200,12 +204,11 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		const id = String(ids[0]);
 
 		const mytco = await bestaetigt(s, ['mytco']);
-		const schreibende = Object.entries({
-			...ADMIN_SCHNITTSTELLEN,
-			...TURNIER_SCHNITTSTELLEN,
-			...MITTEILUNG_ADMIN_SCHNITTSTELLEN
-			// Schreibend ist alles, was nicht liest: Auch ein künftiges delete… oder put… fällt hier auf.
-		}).filter(([name]) => !name.startsWith('get') && !ERLAUBT_FUER_MYTCO.includes(name));
+		// Alle Listen der Verwaltung (`tests/hilfen/verwaltungs-listen.ts`). Schreibend ist alles, was
+		// nicht liest: Auch ein künftiges delete… oder put… fällt hier auf.
+		const schreibende = Object.entries(alleVerwaltung()).filter(
+			([name]) => !name.startsWith('get') && !ERLAUBT_FUER_MYTCO.includes(name)
+		);
 		const namen = schreibende.map(([name]) => name);
 		for (const n of [
 			'postAustritt',
@@ -379,7 +382,7 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			),
 			await getVerlauf(s.d, hole(mytco.konto)),
 			await ADMIN_SCHNITTSTELLEN.getFairgate(s.d, hole(mytco.konto)),
-			await ADMIN_SCHNITTSTELLEN.getAdminAnlaesse(s.d, hole(mytco.konto)),
+			await ANLASS_ADMIN_SCHNITTSTELLEN.getAdminAnlaesse(s.d, hole(mytco.konto)),
 			await getRollen(s.d, hole(mytco.konto)),
 			await MITTEILUNG_ADMIN_SCHNITTSTELLEN.getVereinMitteilungen(s.d, hole(mytco.konto)),
 			await MITTEILUNG_ADMIN_SCHNITTSTELLEN.getAnlassMitteilungen(
@@ -420,13 +423,9 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			['postVereinSenden', cm, 403, 'kein-admin'],
 			['getVereinMitteilungen', cm, 403, 'kein-admin']
 		];
-		const alle = {
-			...ADMIN_SCHNITTSTELLEN,
-			...TURNIER_SCHNITTSTELLEN,
-			...MITTEILUNG_ADMIN_SCHNITTSTELLEN
-		};
+		const alle = alleVerwaltung();
 		for (const [name, konto, status, fehler] of faelle) {
-			const fn = alle[name as keyof typeof alle];
+			const fn = alle[name];
 			const r = await fn(
 				s.d,
 				ereignis({ method: name.startsWith('get') ? 'GET' : 'POST', body: {}, konto })

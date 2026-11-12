@@ -8,6 +8,15 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.14 — Verwaltung der Anlässe beim Thema Anlass (Refactoring Schritt 09)
+
+- Die fünf Verwaltungs-Schnittstellen der Anlässe liegen unverändert in
+  `src/lib/server/anlass/verwaltung-schnittstellen.ts` mit eigener Liste; Routen ausserhalb der
+  Verwaltung sind für die Datei gesperrt. Am Verhalten ändert sich nichts (#80).
+- Die Bauregel erkennt Importe mit Namen in Anführungszeichen und prüft jedes `import` und `export`
+  für sich; die Listen der Verwaltung stehen für die Tests an einer Stelle, und eine Schleife prüft
+  die Rechte über alle 62 Verwaltungs-Schnittstellen.
+
 ## 0.20.13 — Eine Fehlerform und eine Liste der Fehlerwörter (Refactoring Schritt 08)
 
 - Server und Oberfläche teilen eine Liste der Fehlerwörter (`src/lib/fehler.ts`); eine falsche
