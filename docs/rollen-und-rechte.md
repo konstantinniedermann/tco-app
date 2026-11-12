@@ -22,9 +22,12 @@ heissen die Admin-Rollen `mytco`, `mitglieder`, `cm` und `lizenz`.
 | **CM-Admin** | CM-Anmeldung | Turnier und Kategorien anlegen, Wildcard-Anträge entscheiden, Anmeldungen von Hand, Gruppen und Tableaus aus Advantage übernehmen, Resultate erfassen und Streitfälle entscheiden | A-ROLLE-07 |
 | **Lizenz-Admin** | Lizenzanträge | Stichtag der Lizenzrunde setzen, Anträge ansehen, exportieren und abhaken | A-ROLLE-08 |
 
-Der Vorstand hat die Rollen bestätigt und will zwei Admins (K-18.1, K-18.3). **Vorschlag
-K-18.4:** Statt «Admin» die vier Admin-Rollen oben; den MyTCO-Admin bekommen nur Personen, die
-MyTCO technisch betreuen (Projektleiter und seine Stellvertretung, vgl. SI-16). Beim Umbau
+Der Vorstand hat die Rollen bestätigt und will zwei Admins (K-18.1, K-18.3). Statt «Admin»
+gelten die vier Admin-Rollen oben (K-18.4); den MyTCO-Admin bekommen nur Personen, die
+MyTCO technisch betreuen (Projektleiter und seine Stellvertretung, vgl. SI-16). Besetzung zum
+Start: MyTCO-Admin Projektleiter und Hauptansprechperson im Vorstand, Mitglieder-Admin die
+Mitgliederverwaltung (eventuell auch die Aktuarin), CM-Admin die CM-Leitung und der
+Projektleiter, Lizenz-Admin der Lizenzverantwortliche. Beim Umbau
 wurden bisherige Admins MyTCO- und Mitglieder-Admin, damit niemand Rechte verliert; danach
 verteilt der MyTCO-Admin die Rollen von Hand. Einzelheiten im
 [Design Rollen schärfen](superpowers/specs/2026-11-06-rollen-schaerfen-design.md).
@@ -36,7 +39,7 @@ verteilt der MyTCO-Admin die Rollen von Hand. Einzelheiten im
 | ID | Regel | Status |
 |----|-------|--------|
 | RR-01 | Jedes Konto hat die Rolle *Mitglied*; die vier Admin-Rollen kommen einzeln dazu. Eine Person kann mehrere Rollen haben, ihre Rechte addieren sich (FR-03). Rollen vergibt und entzieht nur der MyTCO-Admin, auch sich selbst; jede Vergabe und jeder Entzug steht im Änderungsverlauf (FR-26). Einmalige Ausnahme: Die Migration des Rollen-Umbaus (`drizzle/0009_rollen_schaerfen.sql`) gab den bisherigen Admins MyTCO- und Mitglieder-Admin ohne Verlaufseintrag | umgesetzt |
-| RR-02 | Gestrichen: «Der Admin darf alles, was CM- und Lizenzverantwortlicher dürfen». Es gibt keine stille Stellvertretung: Muss jemand einspringen, gibt der MyTCO-Admin sich oder einer anderen Person die Rolle, und das steht im Änderungsverlauf (Vorschlag K-18.4, ändert die Antwort auf K-18.1) | verworfen (#43) |
+| RR-02 | Gestrichen: «Der Admin darf alles, was CM- und Lizenzverantwortlicher dürfen». Es gibt keine stille Stellvertretung: Muss jemand einspringen, gibt der MyTCO-Admin sich oder einer anderen Person die Rolle, und das steht im Änderungsverlauf (K-18.4, ändert die Antwort auf K-18.1) | verworfen (#43) |
 | RR-03 | Es bleibt immer mindestens ein MyTCO-Admin: Der letzte kann sich die Rolle nicht entziehen und sein Konto nicht löschen. Zwei MyTCO-Admins (K-18.3) sind eine Abmachung, keine Sperre | umgesetzt (Entzug der Rolle, Austritt und Vormerken zum Löschen) |
 | RR-04 | Einmal-Codes (Brief- und Mail-Code) sind nur als Hash gespeichert und nach der Ausgabe für niemanden abrufbar, auch nicht für die Verwaltung. Der Mitglieder-Admin kann einen neuen Brief-Code ausstellen, der nur den alten Brief-Code ersetzt, und alle Sitzungen eines Kontos beenden; einen Code per E-Mail holt sich das Mitglied selbst (A-LOGIN-10, [#29](https://github.com/konstantinniedermann/tco-app/issues/29)) | umgesetzt (Sitzungen beenden und neuer Brief-Code in der Verwaltung, einzeln und als Serie) |
 | RR-05 | Für die Rolle *Mitglied* gibt es kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM und bei der Wahl des Doppelpartners (nur Mitglieder, die für die Kategorie passen und noch frei sind) | umgesetzt |
@@ -136,7 +139,7 @@ sein Name steht im Änderungsverlauf, neutral als «CM-Anmeldung geändert».
 - **Junioren-Leiter** (A-ROLLE-05), vom Vorstand als Juniorenverantwortliche angeregt
   (K-18.1): mit den Junioren-Funktionen. Junioren gibt es schon ab der CM 2027 (K-46).
   Vorschlag K-08: Ein Mitglied handelt für sein Kind mit den Rechten von *Mitglied*, bis das
-  Kind ab der Altersgrenze des Vereins ein eigenes Login hat.
+  Kind eine eigene E-Mail-Adresse hat und sich selbst anmeldet.
 - **Anlässe-Veranstalter** (A-ROLLE-04): kommt mit allgemeinen Anlässen. Bis dahin
   gehören die Anlässe zum Mitglieder-Admin, die CM leitet der CM-Admin.
 
@@ -145,6 +148,6 @@ Neue Rollen und Rechte kommen erst in diese Matrix und, wo sie Personendaten zei
 
 ## Offene Fragen an den Verein
 
-K-08 (Konten der Junioren), K-16.1 (Briefversand), K-18.2 und K-18.4 (Admin-Rollen und wer sie übernimmt) —
+K-08 (Konten der Junioren), K-16.1 (Briefversand) —
 alle in den [Abklärungen](abklaerungen.md). Was schon entschieden ist, steht unter
 [Beantwortet](abklaerungen.md#beantwortet).

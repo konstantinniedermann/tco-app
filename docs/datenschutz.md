@@ -54,7 +54,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 
 E-Mail, Telefon und Lizenznummer (Annahme K-19.1, FR-02) sowie die Adresse (Annahme K-19.2) ändert das Mitglied selbst im Profil; die E-Mail erst nach je einem Code an die alte und die neue Adresse (SI-09). Geschlecht und Jahrgang trägt das Mitglied einmal selbst ein, wenn sie leer sind (FR-37), danach ändert sie der Mitglieder-Admin; den Rufnamen setzt, ändert und löscht nur das Mitglied selbst im Profil; Name und Mitgliedernummer ändert weiterhin nur der Mitglieder-Admin. Ändert er die E-Mail-Adresse, erhält die alte einen Hinweis ohne Adressen (SI-09). Ausser dem Rufnamen (eigene Datenart, siehe Tabelle der Datenarten) entstehen dadurch keine neuen Datenarten.
 
-Der Befehl *Admin festlegen* legt nur den ersten Admin selbst an (MyTCO- und Mitglieder-Admin, Annahme K-18.4); alle anderen Mitglieder kommen über das Einlesen oder die Verwaltung.
+Der Befehl *Admin festlegen* legt nur den ersten Admin selbst an (MyTCO- und Mitglieder-Admin, K-18.4); alle anderen Mitglieder kommen über das Einlesen oder die Verwaltung.
 
 Keine Gesundheitsdaten (auch nicht als Grund für eine Abmeldung), keine Fotos, keine
 Bankdaten.
@@ -66,7 +66,7 @@ Bankdaten.
 | Mitglied | alle eigenen Daten, auch die eigenen Anmeldungen zu Anlässen und das eigene Gespräch mit der Turnierleitung (ohne den Namen der antwortenden Admins); den Änderungsverlauf zum eigenen Konto auf Anfrage bei der Ansprechperson |
 | Elternteil, der ein Kind führt | alle Daten des Kindes, ändert sie und meldet es an (Vorschlag K-08) |
 | Mitglieder-Admin | alle Daten der Mitglieder (von der CM nur bestätigte Anmeldungen, ohne Wildcard-Anträge, Kommentare und Gespräche mit der Turnierleitung) und den Änderungsverlauf; in der Liste *Für Fairgate* die selbst geänderten Kontaktangaben, bis er sie abhakt; alle Anmeldungen zu Anlässen mit Bemerkung (**Annahme K-50:** nur Mitglieder- und MyTCO-Admins, nicht der ganze Vorstand); Einmal-Codes sind nach der Ausgabe für niemanden abrufbar. Die Druckansicht der Login-Briefe hält Name, Adresse und Code nur im Browser des Mitglieder-Admins; eine als PDF gespeicherte Datei löscht er nach dem Druck |
-| MyTCO-Admin | alles, was eine der anderen Rollen sieht, auch Bemerkungen zu Anlässen und Wildcard-Kommentare, und den Änderungsverlauf, auch die Gespräche mit der Turnierleitung; nur lesend. **Zweck:** die anderen Rollen unterstützen, Fehler suchen, die Rollenvergabe prüfen. *Ansicht als …* zeigt ihm nichts darüber hinaus. **Annahme K-18.4:** Die Rolle erhalten nur Personen, die MyTCO technisch betreuen (Projektleiter und seine Stellvertretung, vgl. SI-16), nicht weitere Vorstandsmitglieder; eine Abmachung des Vereins, die App erzwingt sie nicht |
+| MyTCO-Admin | alles, was eine der anderen Rollen sieht, auch Bemerkungen zu Anlässen und Wildcard-Kommentare, und den Änderungsverlauf, auch die Gespräche mit der Turnierleitung; nur lesend. **Zweck:** die anderen Rollen unterstützen, Fehler suchen, die Rollenvergabe prüfen. *Ansicht als …* zeigt ihm nichts darüber hinaus. Die Rolle erhalten nur Personen, die MyTCO technisch betreuen: zum Start Projektleiter und Hauptansprechperson im Vorstand als Stellvertretung (K-18.4, vgl. SI-16), nicht weitere Vorstandsmitglieder; eine Abmachung des Vereins, die App erzwingt sie nicht |
 | CM-Admin | Namen aller Mitglieder; E-Mail und Telefon nur der Spieler eines Turniers: wer eine aktive Anmeldung hat (bestätigt oder als Wildcard beantragt, auch *sucht Partner*) oder an einer offenen Partner-Anfrage beteiligt ist, auch nach Austritt oder Löschvormerkung, bis zum 1.1. nach dem Turnierjahr (K-42, eingegrenzt); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung, Geschlecht und Jahrgang der Spieler (zum Zuordnen in Kategorien). Die Klassierung korrigiert auch der CM-Admin (A-ANMELDUNG-06, Matrix in `rollen-und-rechte.md`); Geschlecht und Jahrgang ändert nur der Mitglieder-Admin; offene Partner-Anfragen (von, an, seit wann); alle Gespräche mit der Turnierleitung, auch wer geantwortet hat |
 | Lizenz-Admin | Name, E-Mail und Telefon der Mitglieder mit Lizenz oder Lizenzantrag (K-42, eingegrenzt; umgesetzt mit [#53](https://github.com/konstantinniedermann/tco-app/issues/53)); Lizenzanträge |
 | Alle Mitglieder | Name und Rufname, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft; Name und Rufname der Kontaktperson, die der CM-Admin für das Turnier gewählt hat (die Seite zeigt Vor- und Nachname), ohne E-Mail und Telefon, solange sie als Kontaktperson gültig ist (FR-55); wer in einer Doppelkategorie *sucht Partner* mit seinem Kommentar; bei der Wahl des Doppelpartners die Namen und die Klassierung der Mitglieder, die für die Kategorie passen, dazu den Vermerk *Klassierung fehlt* oder *Angaben fehlen* (im Doppel: Geschlecht fehlt) |
@@ -191,13 +191,15 @@ spätestens bis zur CM-Anmeldung.
 
 **Vorschlag K-08:**
 
-- Ein Mitglied erfasst sein Kind und erledigt für es das Administrative (Daten, CM-Anmeldung).
-  Das Kind braucht dann weder eigene E-Mail noch eigenes Login; für Gegner und Doppelpartner
-  gelten E-Mail und Telefon des Elternteils (K-31).
-- Ab einem Alter, das der Verein festlegt, erhält der Junior ein eigenes Login und braucht
-  dann eine eigene E-Mail-Adresse (FR-25).
-- Die Altersgrenze steht danach hier und in der Datenschutzerklärung. Offen ist auch, was gilt,
-  wenn die Eltern nicht Mitglied sind.
+- Jeder Junior hat ein eigenes Konto; eine Altersgrenze gibt es nicht (Vorstand, 11.11.2026).
+- Hat das Kind keine eigene E-Mail-Adresse und ist ein Elternteil Mitglied, führt der
+  Elternteil das Konto: Er wechselt in seiner eigenen App zum Kind und erledigt dort das
+  Administrative (Daten, CM-Anmeldung), ohne zweites Login. Für Gegner und Doppelpartner
+  gelten dann E-Mail und Telefon des Elternteils (K-31).
+- Sobald das Kind eine eigene Adresse hat, meldet es sich selbst an; das Führen durch den
+  Elternteil endet (FR-25: eine Adresse gehört zu höchstens einem Mitglied).
+- Sind die Eltern nicht Mitglied, meldet sich das Kind selbst an, mit der Adresse der Eltern.
+- Die Bestätigung des Vorstands zu diesem Vorschlag steht aus (Rückfrage vom 12.11.2026).
 
 ## Rechte der Mitglieder
 
@@ -228,7 +230,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 ## Offene Fragen an den Verein
 
 K-06.1 (Ansprechperson), K-08 (Konten der Junioren), K-09 (Vertrag mit Metanet
-für E-Mail), K-18.4 (wer die Admin-Rollen übernimmt), K-38 (Löschfrist), K-39 (öffentlicher Spielplan), K-40.1
+für E-Mail), K-38 (Löschfrist), K-39 (öffentlicher Spielplan), K-40.1
 (Jahrgang für Lizenzanträge) — alle in den [Abklärungen](abklaerungen.md). Was schon entschieden ist, steht unter
 [Beantwortet](abklaerungen.md#beantwortet).
 

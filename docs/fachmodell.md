@@ -18,9 +18,11 @@ Begriffe stehen im [Glossar](glossar.md), Anforderungs-IDs in den
 ändert aber nichts ausser Rollen ([RR-07](rollen-und-rechte.md#grundsätze)).
 
 **Junioren:** Junioren sind Mitglieder und spielen ab der Clubmeisterschaft 2027 mit; der
-CM-Admin kann sie auch anmelden (A-ANMELDUNG-06, K-46). Vorschlag K-08: Ein Mitglied
-führt das Konto seines Kindes (*verwaltet von*, ohne eigene E-Mail und ohne eigenes Login); ab
-einer Altersgrenze des Vereins erhält der Junior ein eigenes Login.
+CM-Admin kann sie auch anmelden (A-ANMELDUNG-06, K-46). Vorschlag K-08: Jeder Junior hat ein
+eigenes Konto. Hat er keine eigene E-Mail-Adresse, führt es ein Elternteil, der Mitglied ist
+(*verwaltet von*, ohne eigenes Login; der Elternteil wechselt in seiner App zum Kind); sobald
+der Junior eine eigene Adresse hat, meldet er sich selbst an. Sind die Eltern nicht Mitglied,
+meldet er sich mit ihrer Adresse selbst an.
 
 ## Überblick
 

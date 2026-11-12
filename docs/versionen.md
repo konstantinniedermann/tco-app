@@ -8,6 +8,14 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.15 — Antworten des Vorstands vom 11.11. übertragen
+
+- Die vier Admin-Rollen und ihre Besetzung zum Start gelten (K-18.4); Annahmen in Doku und
+  Code-Kommentaren aufgelöst, am Verhalten ändert sich nichts.
+- Junioren ohne Altersgrenze: Ein Elternteil führt das Konto des Kindes nur, solange es keine
+  eigene Adresse hat (Vorschlag K-08, Bestätigung ausstehend). Code der Website liegt auf GitLab
+  (K-44); die Fragen zu Metanet gehen an den Präsidenten.
+
 ## 0.20.14 — Verwaltung der Anlässe beim Thema Anlass (Refactoring Schritt 09)
 
 - Die fünf Verwaltungs-Schnittstellen der Anlässe liegen unverändert in
