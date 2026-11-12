@@ -91,9 +91,11 @@ const FEHLER = [
 	'angaben-fehlen'
 ] satisfies readonly Ablehnung[];
 
+const istAbgelehnt = (r: string): r is (typeof FEHLER)[number] =>
+	(FEHLER as readonly string[]).includes(r);
+
 /** 409 mit dem Grund; was die Liste nicht kennt, gilt als `geschlossen`. */
-const ablehnung = (r: string) =>
-	antwort(409, { fehler: (FEHLER as readonly string[]).includes(r) ? r : 'geschlossen' });
+const ablehnung = (r: string) => antwort(409, { fehler: istAbgelehnt(r) ? r : 'geschlossen' });
 
 /** FR-08: Höchstlänge des Wildcard-Kommentars (nach `trim`). */
 const KOMMENTAR_MAX = 300;

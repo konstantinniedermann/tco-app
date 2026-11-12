@@ -11,6 +11,7 @@ import {
 	nichtGefunden
 } from '../http.ts';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
+import type { WortOhneZusatz } from '../../fehler.ts';
 import { jahrInZuerich } from '../datum.ts';
 import { INTEGER_MAX, parseId } from '../parse-id.ts';
 import { pruefeAnlass } from '../anlass/angaben.ts';
@@ -277,7 +278,7 @@ export function postBrief(d: AdminDienste, e: AdminEreignis): Promise<Response> 
 }
 
 // Die vier Übergänge der Mitgliedschaft: leerer JSON-Körper, die Funktion prüft den Ausgangszustand.
-function uebergang<E extends string>(
+function uebergang<E extends WortOhneZusatz>(
 	d: AdminDienste,
 	e: AdminEreignis,
 	fn: (
@@ -318,7 +319,7 @@ function meldeRueckzug(d: MitteilungAdminDienste, urheber: AdminUrheber, cm: Rue
 }
 
 // Austritt und Vormerken: wie `uebergang`, nach dem Erfolg die Meldungen zum Doppel.
-function mitRueckzug<E extends string>(
+function mitRueckzug<E extends WortOhneZusatz>(
 	d: MitteilungAdminDienste,
 	e: AdminEreignis,
 	fn: (
