@@ -21,10 +21,11 @@ import {
 } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
-import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../mitteilung/schnittstellen.ts';
+import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../mitteilung/verwaltung-schnittstellen.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { TURNIER_SCHNITTSTELLEN, postKategorien, postTurniere } from '../turnier/schnittstellen.ts';
 import { legeAnlassAn } from '../anlass/anlaesse.ts';
+import { CM_ADMIN_SCHNITTSTELLEN } from '../cm/verwaltung-schnittstellen.ts';
 import {
 	ANLASS_ADMIN_SCHNITTSTELLEN,
 	postAdminAnlaesse
@@ -368,11 +369,11 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			await getMitglieder(s.d, hole(mytco.konto)),
 			await getMitglied(s.d, hole(mytco.konto, { params: { id: String(ziel.mitgliedId) } })),
 			await TURNIER_SCHNITTSTELLEN.getTurniere(s.d, hole(mytco.konto)),
-			await TURNIER_SCHNITTSTELLEN.getAnmeldungen(
+			await CM_ADMIN_SCHNITTSTELLEN.getAnmeldungen(
 				s.d,
 				hole(mytco.konto, { params: { id: String(kategorieId) } })
 			),
-			await TURNIER_SCHNITTSTELLEN.getSpieler(
+			await CM_ADMIN_SCHNITTSTELLEN.getSpieler(
 				s.d,
 				ereignis({
 					method: 'GET',
@@ -389,7 +390,7 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 				s.d,
 				hole(mytco.konto, { params: { id: anlassId } })
 			),
-			await TURNIER_SCHNITTSTELLEN.getDoppel(
+			await CM_ADMIN_SCHNITTSTELLEN.getDoppel(
 				s.d,
 				hole(mytco.konto, { params: { id: String(dk.id) } })
 			)
@@ -431,6 +432,60 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 				ereignis({ method: name.startsWith('get') ? 'GET' : 'POST', body: {}, konto })
 			);
 			expect([name, r.status, await r.json()]).toEqual([name, status, { fehler }]);
+		}
+	});
+
+	// Charakterisierung zu Schritt 11 (docs/refactoring-analyse.md, Anhang D.11): Die Schnittstellen
+	// von Turnier, CM und Gespräch prüfen den Bereich `cm`, gleich, in welcher Liste sie stehen.
+	test('Bereich cm: an den 26 Schnittstellen von Turnier, CM und Gespräch bekommt der Mitglieder-Admin 403 kein-admin, der CM-Admin weder 401 noch 403', async () => {
+		const s = baue();
+		const mitglieder = await bestaetigt(s, ['mitglieder']);
+		const cm = await bestaetigt(s, ['cm']);
+		const namen = [
+			'getTurniere',
+			'postTurniere',
+			'getTurnier',
+			'postTurnier',
+			'postTurnierStatus',
+			'postKategorien',
+			'getKategorie',
+			'postKategorie',
+			'postKategorieAbsagen',
+			'getAnmeldungen',
+			'postAnmeldungVonHand',
+			'postVerschieben',
+			'postAnmeldungLoeschen',
+			'getDoppel',
+			'postDoppelVonHand',
+			'postZusammenlegen',
+			'postPartnerAendern',
+			'postAnfrageAlsPaar',
+			'postAnfrageLoeschen',
+			'postEntscheid',
+			'getSpieler',
+			'postKlassierung',
+			'getGespraeche',
+			'getAdminGespraech',
+			'postAntwort',
+			'postZustand'
+		];
+		expect(new Set(namen).size).toBe(26);
+		const alle = alleVerwaltung();
+		const mach = (name: string, konto: AngemeldetesKonto) =>
+			ereignis({
+				method: name.startsWith('get') ? 'GET' : 'POST',
+				body: {},
+				params: { id: '999999999' },
+				konto
+			});
+		for (const name of namen) {
+			const fn = alle[name];
+			expect(fn, name).toBeTypeOf('function');
+			const v = await fn(s.d, mach(name, mitglieder.konto));
+			expect([name, v.status, await v.json()]).toEqual([name, 403, { fehler: 'kein-admin' }]);
+			const a = await fn(s.d, mach(name, cm.konto));
+			expect([name, a.status]).not.toContain(401);
+			expect([name, a.status]).not.toContain(403);
 		}
 	});
 

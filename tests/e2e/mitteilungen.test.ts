@@ -249,7 +249,7 @@ test('FR-42: allgemeine Mitteilung an den Verein', async ({ page }, info) => {
 	).toBeVisible();
 	await pruefeBildschirm(page, info, 'mitteilung-verein-vorschau');
 
-	// Der Versand an alle aktiven Mitglieder ist in admin-schnittstellen.db.test.ts belegt; hier
+	// Der Versand an alle aktiven Mitglieder ist in verwaltung-schnittstellen.db.test.ts belegt; hier
 	// antwortet ein Ersatz, damit keine Mail an Konten paralleler Tests geht.
 	// Der erste Versuch scheitert unterwegs: Die Mitteilung kann trotzdem schon draussen sein.
 	let anfrage: unknown = null;

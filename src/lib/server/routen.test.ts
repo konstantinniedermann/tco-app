@@ -69,6 +69,21 @@ import {
 	postCmSuchtext,
 	postCmWildcard
 } from './cm/schnittstellen.ts';
+import {
+	getAnmeldungen,
+	getDoppel,
+	getSpieler,
+	postAnfrageAlsPaar,
+	postAnfrageLoeschen,
+	postAnmeldungLoeschen,
+	postAnmeldungVonHand,
+	postDoppelVonHand,
+	postEntscheid,
+	postKlassierung as postKlassierungVerwaltung,
+	postPartnerAendern,
+	postVerschieben,
+	postZusammenlegen
+} from './cm/verwaltung-schnittstellen.ts';
 import { holeDb } from './db/index.ts';
 import {
 	holeAdminDienste,
@@ -82,14 +97,16 @@ import {
 } from './dienste.ts';
 import {
 	GESPRAECH_SCHNITTSTELLEN,
-	getAdminGespraech,
 	getGespraech,
+	postGelesen,
+	postGespraech
+} from './gespraech/schnittstellen.ts';
+import {
+	getAdminGespraech,
 	getGespraeche,
 	postAntwort,
-	postGelesen,
-	postGespraech,
 	postZustand
-} from './gespraech/schnittstellen.ts';
+} from './gespraech/verwaltung-schnittstellen.ts';
 import {
 	PASSKEY_SCHNITTSTELLEN,
 	getPasskeys,
@@ -109,17 +126,19 @@ import {
 import { getSitzung } from './sitzung/schnittstellen.ts';
 import {
 	MITTEILUNG_SCHNITTSTELLEN,
-	getAnlassMitteilungen,
 	getBenachrichtigungen,
-	getVereinMitteilungen,
 	postAbo,
 	postAboLoeschen,
+	postThemen
+} from './mitteilung/schnittstellen.ts';
+import {
+	getAnlassMitteilungen,
+	getVereinMitteilungen,
 	postAnlassSenden,
 	postAnlassVorschau,
-	postThemen,
 	postVereinSenden,
 	postVereinVorschau
-} from './mitteilung/schnittstellen.ts';
+} from './mitteilung/verwaltung-schnittstellen.ts';
 import {
 	PROFIL_SCHNITTSTELLEN,
 	getProfil,
@@ -130,28 +149,15 @@ import {
 	postRufname
 } from './profil/schnittstellen.ts';
 import {
-	getAnmeldungen,
-	getDoppel,
 	getKategorie,
-	getSpieler,
 	getTurnier,
 	getTurniere,
-	postAnfrageAlsPaar,
-	postAnfrageLoeschen,
-	postAnmeldungLoeschen,
-	postAnmeldungVonHand,
-	postDoppelVonHand,
-	postEntscheid,
 	postKategorie,
 	postKategorieAbsagen,
 	postKategorien,
-	postKlassierung as postKlassierungVerwaltung,
-	postPartnerAendern,
 	postTurnier,
 	postTurnierStatus,
-	postTurniere,
-	postVerschieben,
-	postZusammenlegen
+	postTurniere
 } from './turnier/schnittstellen.ts';
 
 /** Die Dienste-Einstiege; jede Route bekommt ihre Dienste von genau einem davon. */

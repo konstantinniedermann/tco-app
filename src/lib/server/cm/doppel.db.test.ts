@@ -1,6 +1,7 @@
 import { and, asc, eq, sql } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { erstelleDb, type DbOderTx } from '../db/index.ts';
 import {
 	anmeldung,
@@ -35,12 +36,13 @@ afterAll(async () => {
 	await db.$client.end();
 });
 
-// Die gemeinsame Test-Datenbank hat Turniere anderer Tests: jedes Turnier bekommt ein eigenes Jahr.
-const zufallsJahr = () => 3000 + Math.floor(Math.random() * 6000);
+// Die gemeinsame Test-Datenbank hat Turniere anderer Tests: jedes Turnier bekommt ein eigenes Jahr
+// aus dem Bereich dieser Datei (`tests/hilfen/turnierjahre.ts`).
+const naechstesJahr = turnierjahre(import.meta.url);
 
 async function doppelKategorie() {
 	for (;;) {
-		const jahr = zufallsJahr();
+		const jahr = naechstesJahr();
 		const t = await legeTurnierAn(db, {
 			jahr,
 			name: `Clubmeisterschaft ${jahr}`,
@@ -123,7 +125,7 @@ const spaetIn = (jahr: number) => new Date(`${jahr}-06-01T10:00:00Z`);
 /** Offenes Turnier mit Doppel (Mindestsumme 9) und je drei Einzel für Damen und Herren. */
 async function offenesDoppel() {
 	for (;;) {
-		const jahr = zufallsJahr();
+		const jahr = naechstesJahr();
 		const t = await legeTurnierAn(db, {
 			jahr,
 			name: `Clubmeisterschaft ${jahr}`,

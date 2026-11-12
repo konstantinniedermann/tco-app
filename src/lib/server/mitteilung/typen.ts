@@ -1,5 +1,6 @@
-// Dienst-Typen der Mitteilungen. Keine Schnittstellen-Datei: Die Verwaltung, das Gespräch, das
-// Turnier und der Zusammenbau der Dienste holen sie von hier.
+// Dienst-Typen der Mitteilungen. Keine Schnittstellen-Datei: Die Schnittstellen der Mitglieder und
+// der Verwaltung (`schnittstellen.ts`, `verwaltung-schnittstellen.ts`), die Verwaltung von Turnier,
+// CM und Gespräch und der Zusammenbau der Dienste holen sie von hier.
 import type { AdminDienste } from '../admin/rechte.ts';
 import type { Db } from '../db/index.ts';
 import type { Mailer } from '../login/dienst.ts';

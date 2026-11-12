@@ -27,10 +27,20 @@ async function meldungen(datei: string, code: string, mit = eslint): Promise<str
 }
 
 // Gestellte Ausnahme für die Fälle, die eine Datei mit Ausnahme brauchen: Sie hängen so an keinem
-// Eintrag in `AUSNAHMEN` und prüfen weiter, wenn Schritt 12 die Liste leert.
+// Eintrag in `AUSNAHMEN` und prüfen weiter, auch wenn die Liste leer ist.
 const GESTELLT = mitAusnahmen([
 	{ von: 'login/gestellt.ts', nach: 'admin/rollen.ts', schritt: 'gestellt für den Test' }
 ]);
+// Zweite gestellte Ausnahme: eine Datei in einem Thema mit zwei Zielen in zwei Modulen.
+const ZWEI_ZIELE = [
+	{ von: 'cm/gestellt.ts', nach: 'turnier/schnittstellen.ts', schritt: 'gestellt für den Test' },
+	{
+		von: 'cm/gestellt.ts',
+		nach: 'anlass/verwaltung-schnittstellen.ts',
+		schritt: 'gestellt für den Test'
+	}
+];
+const GESTELLT_THEMA = mitAusnahmen(ZWEI_ZIELE);
 
 describe('Richtung der Importe zwischen den Server-Modulen', () => {
 	// Dateien ohne Ausnahme: jede Schicht einmal.
@@ -132,6 +142,34 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 		).toHaveLength(1);
 		expect(await meldungen('login/neu.ts', rollen, GESTELLT)).toHaveLength(1);
 	});
+
+	it('eine Datei in einem Thema mit zwei Ausnahmen: beide Ziele frei, jedes andere gemeldet', async () => {
+		const turnier = "import { x } from '../turnier/schnittstellen.ts';";
+		const anlass = "import { x } from '$lib/server/anlass/verwaltung-schnittstellen';";
+		expect(await meldungen('cm/gestellt.ts', turnier, GESTELLT_THEMA)).toEqual([]);
+		expect(await meldungen('cm/gestellt.ts', anlass, GESTELLT_THEMA)).toEqual([]);
+		for (const anderes of [
+			"import { x } from '../admin/schnittstellen.ts';",
+			"import { x } from '../turnier/verwaltung-schnittstellen.ts';",
+			"import { x } from '../anlass/schnittstellen.ts';",
+			"import { x } from '../dienste.ts';"
+		]) {
+			expect(await meldungen('cm/gestellt.ts', anderes, GESTELLT_THEMA), anderes).toHaveLength(1);
+		}
+		expect(await meldungen('cm/neu.ts', turnier, GESTELLT_THEMA)).toHaveLength(1);
+		expect(await meldungen('cm/neu.ts', anlass, GESTELLT_THEMA)).toHaveLength(1);
+	});
+
+	it.each(ZWEI_ZIELE.map((a) => [a.nach, a] as const))(
+		'ohne die gestellte Ausnahme nach %s meldet die Datei genau dieses Ziel',
+		async (nach, a) => {
+			const ohne = mitAusnahmen(ZWEI_ZIELE.filter((x) => x !== a));
+			const [andere] = ZWEI_ZIELE.filter((x) => x !== a);
+			const importiere = (ziel: string) => `import { x } from '../${ziel}';`;
+			expect(await meldungen('cm/gestellt.ts', importiere(nach), ohne)).toHaveLength(1);
+			expect(await meldungen('cm/gestellt.ts', importiere(andere.nach), ohne)).toEqual([]);
+		}
+	);
 
 	it('db, login und die Themen sind genau die Ordner unter src/lib/server/', () => {
 		const ordner = readdirSync(SERVER, { withFileTypes: true })

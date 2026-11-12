@@ -2,6 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { erstelleDb } from '../db/index.ts';
 import {
 	anmeldung,
@@ -832,10 +833,13 @@ describe('Mitgliedschaft: Austritt, Wiedereintritt, Löschung', () => {
 		}
 	});
 
+	// Eigene Turnierjahre dieser Datei (`tests/hilfen/turnierjahre.ts`), gemeinsame Test-Datenbank.
+	const naechstesJahr = turnierjahre(import.meta.url);
+
 	/** Offenes Doppel in einem freien Jahr mit Anmeldeschluss nach `start`. */
 	async function offenesDoppel() {
 		for (;;) {
-			const jahr = 3000 + Math.floor(Math.random() * 6000);
+			const jahr = naechstesJahr();
 			const t = await legeTurnierAn(db, {
 				jahr,
 				name: `Clubmeisterschaft ${jahr}`,

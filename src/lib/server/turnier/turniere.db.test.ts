@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { ladeCmAnsicht, laufendeTurniere, meldeAb, meldeAn } from '../cm/anmeldungen.ts';
 import { erstelleDb } from '../db/index.ts';
 import {
@@ -31,10 +32,11 @@ afterAll(async () => {
 	await db.$client.end();
 });
 
-// Die gemeinsame Test-Datenbank hat Turniere anderer Tests: jedes Turnier bekommt ein eigenes Jahr.
-const zufallsJahr = () => 3000 + Math.floor(Math.random() * 6000);
+// Die gemeinsame Test-Datenbank hat Turniere anderer Tests: jedes Turnier bekommt ein eigenes Jahr
+// aus dem Bereich dieser Datei (`tests/hilfen/turnierjahre.ts`).
+const naechstesJahr = turnierjahre(import.meta.url);
 const werte = (teil: Partial<TurnierWerte> = {}): TurnierWerte => {
-	const jahr = teil.jahr ?? zufallsJahr();
+	const jahr = teil.jahr ?? naechstesJahr();
 	return {
 		jahr,
 		name: `Clubmeisterschaft ${jahr}`,

@@ -8,6 +8,16 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.17 — Verwaltung von CM, Gespräch und Mitteilungen beim eigenen Thema (Refactoring Schritt 11)
+
+- Die Verwaltungs-Schnittstellen der Clubmeisterschaft, des Gesprächs und der Mitteilungen liegen
+  unverändert in je einer eigenen Datei ihres Themas (`verwaltung-schnittstellen.ts`); beim Turnier
+  bleiben neun. Am Verhalten ändert sich nichts (#80).
+- Die Bauregel schützt alle Verwaltungs-Dateien einheitlich über den Pfad, die Sperrliste nach Namen
+  entfällt; die Importregel zwischen den Server-Modulen hat keine Ausnahme mehr.
+- Die Datenbanktests legen Turniere mit eindeutigen Jahren je Testdatei an; der Test, der dadurch
+  gelegentlich scheiterte, ist stabil.
+
 ## 0.20.16 — Sitzungs-Antwort in eigenem Modul (Refactoring Schritt 10)
 
 - `getSitzung` liegt unverändert in `src/lib/server/sitzung/schnittstellen.ts`; `login` hängt nicht

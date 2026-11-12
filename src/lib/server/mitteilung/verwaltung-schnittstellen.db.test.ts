@@ -24,7 +24,7 @@ import {
 	postAnlassVorschau,
 	postVereinSenden,
 	postVereinVorschau
-} from './schnittstellen.ts';
+} from './verwaltung-schnittstellen.ts';
 import type { MitteilungAdminDienste } from './typen.ts';
 import type { PushSender } from './versand.ts';
 

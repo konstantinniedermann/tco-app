@@ -15,6 +15,7 @@ import {
 	type EigeneDatenbank
 } from '../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../tests/hilfen/turnierjahre.ts';
 import { holeDb } from '../../lib/server/db/index.ts';
 import { gespraech, mitglied, turnier } from '../../lib/server/db/schema.ts';
 import { erstelleSitzung, pruefeSitzung } from '../../lib/server/login/sitzung.ts';
@@ -124,11 +125,14 @@ async function bestaetigterAdmin(rollen: string[]): Promise<Mitglied> {
 	return a;
 }
 
+// Eigene Turnierjahre dieser Datei (`tests/hilfen/turnierjahre.ts`), gemeinsame Test-Datenbank.
+const naechstesJahr = turnierjahre(import.meta.url);
+
 /** Offenes Turnier in einem freien Jahr mit einer Herren-Kategorie; Anmeldeschluss in der Zukunft. */
 async function offenesTurnier(kontaktMitgliedId: number) {
 	const db = holeDb();
 	for (;;) {
-		const jahr = 9960 + Math.floor(Math.random() * 40);
+		const jahr = naechstesJahr();
 		const t = await legeTurnierAn(db, {
 			jahr,
 			name: `Clubmeisterschaft ${jahr}`,

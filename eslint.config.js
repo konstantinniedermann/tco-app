@@ -19,9 +19,9 @@ import { defineConfig } from 'eslint/config';
 // normalisierte Pfade wie `./../cm/…`, `import()`, Importe zwischen `src/lib/server/` und dem Rest
 // von `src/lib/` (B-25) und Tests (`*.test.ts` überspannen die Module von Berufs wegen). Unterordner
 // in Modulen gibt es nicht; der Test meldet sie.
-// Jede heutige Verletzung steht einzeln in AUSNAHMEN, mit dem Schritt, der sie abbaut. Schritt 12
-// leert die Liste und stellt die Regel damit scharf. Im Code unter `src/` steht dafür kein
-// `eslint-disable`.
+// Verletzungen standen einzeln in AUSNAHMEN, je mit dem Schritt, der sie abbaut; seit Schritt 11 ist
+// die Liste leer, die Regel gilt damit ohne Ausnahme. Eine neue Ausnahme braucht einen Entscheid des
+// Projektleiters. Im Code unter `src/` steht dafür kein `eslint-disable`.
 const SERVER = 'src/lib/server';
 const THEMEN = [
 	'admin',
@@ -49,13 +49,7 @@ export const MODULE = ['db', 'login', ...THEMEN];
  * Eine Ausnahme gilt je Datei und Zieldatei, nicht je importiertem Namen.
  * @type {{ von: string; nach: string; schritt: string }[]}
  */
-export const AUSNAHMEN = [
-	{
-		von: 'turnier/schnittstellen.ts',
-		nach: 'gespraech/schnittstellen.ts',
-		schritt: '11: die Gesprächs-Schnittstellen ziehen von turnier nach gespraech'
-	}
-];
+export const AUSNAHMEN = [];
 
 /**
  * Gruppe einer Quelldatei: wer wohin nicht importieren darf. `ziele` sind [Modul, Dateimuster];
