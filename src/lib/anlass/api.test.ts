@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
 import { holeAnlaesse, holeAnlass, sendeAntwort } from './api.ts';
 
 type Aufruf = { pfad: string; init: RequestInit };
@@ -13,7 +14,10 @@ function holer(antwort: Response | Error) {
 	return { aufrufe, holen };
 }
 
-const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an
+// (src/lib/fehler.ts), damit ein Wort oder eine Form, die der Server nicht kennt, hier auffällt.
+type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
+const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
 
 describe('Anfragen der Mitglieder zu Anlässen', () => {
 	test('A-ANLASS-01: Liste und einzelner Anlass', async () => {
@@ -39,7 +43,7 @@ describe('Anfragen der Mitglieder zu Anlässen', () => {
 	});
 
 	test('Statuscodes werden zu Ergebnissen', async () => {
-		const ergebnis = async (status: number, inhalt: unknown) =>
+		const ergebnis = async <S extends number>(status: S, inhalt: Koerper<S>) =>
 			sendeAntwort(1, { antwort: 'kommt', bemerkung: null }, holer(json(status, inhalt)).holen);
 		expect(await ergebnis(401, { fehler: 'abgemeldet' })).toEqual({ art: 'abgemeldet' });
 		expect(await ergebnis(404, { fehler: 'nicht-gefunden' })).toEqual({ art: 'nicht-gefunden' });

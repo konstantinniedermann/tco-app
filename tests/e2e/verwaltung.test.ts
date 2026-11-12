@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { MELDUNG } from '../../src/lib/login/anmelden.ts';
+import type { Fehlerkoerper } from '../../src/lib/fehler.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
 	holeMailCode,
@@ -206,7 +207,7 @@ test('RR-03: der letzte MyTCO-Admin sieht die Meldung beim Entzug seiner Rolle',
 	await oeffneVerwaltung(page, admin);
 	await page.goto(`/verwaltung/mitglieder/${admin.mitgliedId}`);
 	await page.route('**/api/admin/mitglieder/*/rollen', (route) =>
-		route.fulfill({ status: 409, json: { fehler: 'letzter-mytco' } })
+		route.fulfill({ status: 409, json: { fehler: 'letzter-mytco' } satisfies Fehlerkoerper })
 	);
 	await page.locator('summary', { hasText: 'Rollen' }).click();
 	await page.getByLabel('MyTCO-Admin', { exact: true }).uncheck();
@@ -585,7 +586,7 @@ test('A-MITGLIED-02: Rollen speichern, inzwischen geändert – Meldung mit «Ne
 	await oeffneVerwaltung(page, mytco);
 	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
 	await page.route('**/api/admin/mitglieder/*/rollen', (route) =>
-		route.fulfill({ status: 409, json: { fehler: 'veraltet' } })
+		route.fulfill({ status: 409, json: { fehler: 'veraltet' } satisfies Fehlerkoerper })
 	);
 	await page.locator('summary', { hasText: 'Rollen' }).click();
 	await page.getByLabel('Lizenz-Admin').check();

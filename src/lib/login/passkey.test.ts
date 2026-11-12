@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
 import {
 	entfernePasskey,
 	hinweisErledigt,
@@ -22,7 +23,10 @@ function fakeHolen(...antworten: (Response | Error)[]) {
 	return { holen, aufrufe };
 }
 
-const json = (inhalt: unknown, status = 200) =>
+// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an
+// (src/lib/fehler.ts), damit ein Wort oder eine Form, die der Server nicht kennt, hier auffällt.
+type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
+const json = <S extends number = 200>(inhalt: Koerper<S>, status: S = 200 as S) =>
 	new Response(JSON.stringify(inhalt), { status, headers: { 'content-type': 'application/json' } });
 const leer = (status: number) => new Response(null, { status });
 

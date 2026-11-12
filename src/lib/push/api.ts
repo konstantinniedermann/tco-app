@@ -1,6 +1,7 @@
 // Anfragen zu Benachrichtigungen (`/api/benachrichtigungen…`, FR-40, FR-41) und ihre Antworten
 // als typisierte Ergebnisse. Die Oberfläche zeigt die Meldungen; hier steht nur, was die
 // Statuscodes bedeuten.
+import { istFehlerwort } from '../fehler.ts';
 import { jsonPost } from '../json-post.ts';
 import type { Holen } from '../verwaltung/api.ts';
 
@@ -18,8 +19,9 @@ async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<E
 		const r = await holen(pfad, init);
 		const k = (await r.json()) as { fehler?: unknown };
 		if (r.ok) return { art: 'ok', daten: k as T };
+		const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
 		if (r.status === 401) return { art: 'abgemeldet' };
-		if (r.status === 409 && k.fehler === 'push-aus') return { art: 'push-aus' };
+		if (r.status === 409 && fehler === 'push-aus') return { art: 'push-aus' };
 		return { art: 'stoerung' };
 	} catch {
 		return { art: 'stoerung' };

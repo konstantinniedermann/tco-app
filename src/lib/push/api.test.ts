@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
 import { holeBenachrichtigungen, loescheAbo, sendeAbo, speichereThemen } from './api.ts';
 
 type Aufruf = { pfad: string; init: RequestInit };
@@ -13,7 +14,13 @@ function holer(antwort: Response | Error) {
 	return { aufrufe, holen };
 }
 
-const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an
+// (src/lib/fehler.ts), damit ein Wort oder eine Form, die der Server nicht kennt, hier auffällt.
+type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
+const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
+
+/** Absichtlich ausserhalb der Liste: Antworten, die der Server nie so sendet. */
+const ungeprueft = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
 const STAND = {
 	themen: { anlaesse: true, cm: false, verein: true },
 	pushHier: false,
@@ -55,7 +62,7 @@ describe('Anfragen zu Benachrichtigungen (FR-40, FR-41)', () => {
 		const abo = async (antwort: Response | Error) => sendeAbo(ABO, holer(antwort).holen);
 		expect(await abo(json(401, { fehler: 'abgemeldet' }))).toEqual({ art: 'abgemeldet' });
 		expect(await abo(json(409, { fehler: 'push-aus' }))).toEqual({ art: 'push-aus' });
-		expect(await abo(json(409, { fehler: 'anderes' }))).toEqual({ art: 'stoerung' });
+		expect(await abo(ungeprueft(409, { fehler: 'anderes' }))).toEqual({ art: 'stoerung' });
 		expect(await abo(json(400, { fehler: 'eingabe' }))).toEqual({ art: 'stoerung' });
 		expect(await abo(json(500, {}))).toEqual({ art: 'stoerung' });
 		expect(await abo(new Error('weg'))).toEqual({ art: 'stoerung' });

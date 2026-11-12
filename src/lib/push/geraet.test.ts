@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import type { Fehlerkoerper } from '../fehler.ts';
 import {
 	HINWEIS_SCHLUESSEL,
 	hinweisAbgelehnt,
@@ -173,8 +174,8 @@ describe('Push einschalten und ausschalten (FR-40)', () => {
 
 	test('FR-40: lehnt der Server ab (409 push-aus, 401, 500, Netz weg), wird das neue Abo im Browser wieder abgemeldet', async () => {
 		const antworten = [
-			Response.json({ fehler: 'push-aus' }, { status: 409 }),
-			Response.json({ fehler: 'abgemeldet' }, { status: 401 }),
+			Response.json({ fehler: 'push-aus' } satisfies Fehlerkoerper, { status: 409 }),
+			Response.json({ fehler: 'abgemeldet' } satisfies Fehlerkoerper, { status: 401 }),
 			Response.json({}, { status: 500 }),
 			new Error('Netz weg')
 		];
@@ -188,7 +189,7 @@ describe('Push einschalten und ausschalten (FR-40)', () => {
 	test('FR-40: 401 beim Einschalten ergibt Störung, ein schon vorhandenes Abo bleibt', async () => {
 		const h = geraet({
 			vorhanden: { schluessel: schluesselBytes(SCHLUESSEL) },
-			antwort: Response.json({ fehler: 'abgemeldet' }, { status: 401 })
+			antwort: Response.json({ fehler: 'abgemeldet' } satisfies Fehlerkoerper, { status: 401 })
 		});
 		expect(await schalteEin(SCHLUESSEL, h.g)).toBe('stoerung');
 		expect(h.protokoll).toEqual(['erlaubnis']);

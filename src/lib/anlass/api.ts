@@ -1,4 +1,5 @@
 // Anfragen der Mitglieder an `/api/anlaesse/…` und ihre Antworten als typisierte Ergebnisse.
+import { istFehlerwort } from '../fehler.ts';
 import { jsonPost } from '../json-post.ts';
 import type { AnlassMitglied } from '../server/anlass/anlaesse.ts';
 import type { Antwort as AntwortArt } from '../server/db/schema.ts';
@@ -20,9 +21,10 @@ async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<E
 		const r = await holen(pfad, init);
 		const k = (await r.json()) as { fehler?: unknown; feld?: unknown };
 		if (r.ok) return { art: 'ok', daten: k as T };
+		const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
 		if (r.status === 401) return { art: 'abgemeldet' };
 		if (r.status === 404) return { art: 'nicht-gefunden' };
-		if (r.status === 409 && k.fehler === 'geschlossen') return { art: 'geschlossen' };
+		if (r.status === 409 && fehler === 'geschlossen') return { art: 'geschlossen' };
 		if (r.status === 400 && (k.feld === 'antwort' || k.feld === 'bemerkung'))
 			return { art: 'eingabe', feld: k.feld };
 		return { art: 'stoerung' };

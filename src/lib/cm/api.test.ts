@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
 import {
 	doppelZurWahl,
 	holeCmAnsicht,
@@ -31,7 +32,13 @@ function holer(antwort: Response | Error) {
 	return { aufrufe, holen };
 }
 
-const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an
+// (src/lib/fehler.ts), damit ein Wort oder eine Form, die der Server nicht kennt, hier auffällt.
+type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
+const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
+
+/** Absichtlich ausserhalb der Liste: Antworten, die der Server nie so sendet. */
+const ungeprueft = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
 
 const istJsonPost = (a: Aufruf) =>
 	a.init.method === 'POST' &&
@@ -85,7 +92,7 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 	});
 
 	test('FR-06: 409 voll wird eigenes Ergebnis', async () => {
-		const ergebnis = async (status: number, inhalt: unknown) =>
+		const ergebnis = async <S extends number>(status: S, inhalt: Koerper<S>) =>
 			meldeAn(1, null, holer(json(status, inhalt)).holen);
 		expect(await ergebnis(409, { fehler: 'voll' })).toEqual({ art: 'voll' });
 		expect(await ergebnis(409, { fehler: 'geschlossen' })).toEqual({ art: 'geschlossen' });
@@ -94,7 +101,9 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 			art: 'schon-angemeldet'
 		});
 		expect(await ergebnis(409, { fehler: 'angaben-fehlen' })).toEqual({ art: 'angaben-fehlen' });
-		expect(await ergebnis(409, { fehler: 'unbekannt' })).toEqual({ art: 'stoerung' });
+		expect(await meldeAn(1, null, holer(ungeprueft(409, { fehler: 'unbekannt' })).holen)).toEqual({
+			art: 'stoerung'
+		});
 		expect(await ergebnis(401, { fehler: 'abgemeldet' })).toEqual({ art: 'abgemeldet' });
 		expect(await ergebnis(404, { fehler: 'nicht-gefunden' })).toEqual({ art: 'nicht-gefunden' });
 		expect(await ergebnis(500, {})).toEqual({ art: 'stoerung' });
@@ -108,7 +117,7 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 		expect(istJsonPost(h.aufrufe[0])).toBe(true);
 		expect(JSON.parse(String(h.aufrufe[0].init.body))).toEqual({ kommentar: 'Ich spiele gern.' });
 
-		const ergebnis = async (status: number, inhalt: unknown) =>
+		const ergebnis = async <S extends number>(status: S, inhalt: Koerper<S>) =>
 			beantrageWildcard(1, 'x', holer(json(status, inhalt)).holen);
 		expect(await ergebnis(409, { fehler: 'keine-wildcard' })).toEqual({ art: 'keine-wildcard' });
 		expect(await ergebnis(409, { fehler: 'voll' })).toEqual({ art: 'voll' });
@@ -150,7 +159,7 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 		await fall((h) => lehneAnfrageAb(8, h), '/api/cm/anfragen/8/ablehnen', {});
 		await fall((h) => zieheAnfrageZurueck(8, h), '/api/cm/anfragen/8/zurueckziehen', {});
 
-		const ergebnis = async (status: number, inhalt: unknown) =>
+		const ergebnis = async <S extends number>(status: S, inhalt: Koerper<S>) =>
 			stelleAnfrage(1, 2, holer(json(status, inhalt)).holen);
 		expect(await ergebnis(409, { fehler: 'schon-angefragt' })).toEqual({ art: 'schon-angefragt' });
 		expect(await ergebnis(409, { fehler: 'anfrage-offen' })).toEqual({ art: 'anfrage-offen' });
