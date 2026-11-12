@@ -90,8 +90,9 @@ const ERLAUBT_DIENSTE = VERWALTUNGS_EINSTIEGE.join(' und ');
 const ERLAUBT_MITGLIEDER = `erlaubt sind nur ${MITGLIEDER_EINSTIEGE.join(', ')}`;
 const ERLAUBT_IMPORT = `erlaubt sind nur ${aufzaehlung(['dienste.ts', ...VERWALTUNGS_DATEIEN.map((v) => v.datei)])}`;
 const ERLAUBT_LISTEN = `erlaubt sind nur Einträge aus ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.liste))}`;
-// Ausserhalb von api/admin: aus dem Zusammenbau der Dienste nur, was den Mitgliedern dient. `dienste.ts` mit und ohne Endung (auch `.js`, das Vite auf `.ts` auflöst),
-// über `$lib` und mit Anhang (`?…`): Der Schutz hängt hier am Namen, nicht mehr am Pfad.
+// Ausserhalb von api/admin: aus dem Zusammenbau der Dienste nur, was den Mitgliedern dient.
+// `dienste.ts` mit und ohne Endung (auch `.js`, das Vite auf `.ts` auflöst), über `$lib` und mit
+// Anhang (`?…`): Der Schutz hängt hier am Namen, nicht mehr am Pfad.
 const DIENSTE_MODUL = /(?:^|\/|^\$)lib\/server\/dienste(?:\.(?:ts|js))?(?:[?#].*)?$/;
 // Am Pfad gesperrte Dateien (`aussen: 'pfad'`): der Pfad ohne Endung, danach alles ausser einem
 // weiteren Zeichen des Dateinamens (`.ts`, `.js`, ohne, `.mjs`, `?…`, `#…`), auch über `$lib`.
