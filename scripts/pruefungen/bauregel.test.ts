@@ -921,6 +921,73 @@ describe('Kommentare nur ausserhalb von Texten (Schritt 12a)', () => {
 	});
 });
 
+// Schritt 12a, Punkt 1 (N-02): Die Routen-Regeln prüfen den Pfad, wie er steht, und die Datei, auf
+// die er zeigt; `..`, `./`, `//` und Pfade ab `/src/` umgehen keine Sperre. Eine Admin-Route nimmt
+// nur Pfade, die wirklich auf eine erlaubte Datei zeigen.
+describe('Importpfade auch in Routen aufgelöst (Schritt 12a)', () => {
+	const route = 'src/routes/api/profil/+server.ts';
+	const listen: [string, string][] = [
+		[
+			'src/lib/server/admin/schnittstellen.ts',
+			'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+		],
+		[
+			'src/lib/server/anlass/verwaltung-schnittstellen.ts',
+			'export const ANLASS_ADMIN_SCHNITTSTELLEN = {\n\tgetAdminAnlaesse\n} satisfies Record<string, unknown>;'
+		]
+	];
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([...listen, [pfad, code]]));
+	const adminModul = `${route}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`;
+
+	it.each([
+		"import { liest } from '$lib/server/cm/../admin/rechte';",
+		"import { x } from '../../../lib/server/cm/../admin/rollen.ts';",
+		"import { x } from '$lib/server/./admin/rollen.ts';",
+		"import { x } from '$lib/server//admin/rollen.ts';",
+		"import { x } from '/src/lib/server/x/../admin';",
+		"const m = await import('../../../lib/server/cm/../admin/rollen.ts');"
+	])('RR-07: Mitglieder-Route, lib/server/admin über %s', (code) => {
+		expect(pruefe(route, code)).toEqual([adminModul]);
+	});
+
+	it.each([
+		"import { getAdminAnlaesse } from '$lib/server/cm/../anlass/verwaltung-schnittstellen';",
+		"import { getAdminAnlaesse } from '../../../lib/server//anlass/verwaltung-schnittstellen.ts';",
+		"export * from '/src/lib/server/./anlass/verwaltung-schnittstellen.ts';"
+	])('RR-07: Mitglieder-Route, Pfad-Sperre über %s', (code) => {
+		expect(pruefe(route, code)).toEqual([
+			`${route}: nur Routen unter src/routes/api/admin/ dürfen lib/server/anlass/verwaltung-schnittstellen.ts nutzen`
+		]);
+	});
+
+	it.each([
+		[
+			"import { holeAdminDienste } from '$lib/server/cm/../dienste';",
+			`${route}: nur Routen unter src/routes/api/admin/ dürfen 'holeAdminDienste' nutzen`
+		],
+		[
+			"import * as d from '/src/lib/server/./dienste.ts';",
+			`${route}: '/src/lib/server/./dienste.ts' nur statisch und mit Namen importieren`
+		]
+	])('RR-07: Mitglieder-Route, dienste.ts über %s', (code, befund) => {
+		expect(pruefe(route, code)).toEqual([befund]);
+	});
+
+	// Der geschriebene Pfad endet wie eine erlaubte Datei, zeigt aber nicht auf sie.
+	it.each([
+		"import { getMitglied } from '../lib/server/admin/schnittstellen.ts';",
+		"import { getMitglied } from 'paket/lib/server/admin/schnittstellen.ts';",
+		"import { holeAdminDienste } from '/lib/server/dienste.ts';",
+		"import { holeAdminDienste } from '../../../../lib/server/dienste.ts';"
+	])('RR-07: Admin-Route, Pfad zeigt nicht auf die erlaubte Datei: %s', (zeile) => {
+		const admin = 'src/routes/api/admin/mitglieder/[id]/+server.ts';
+		const quelle = /'([^']+)'/.exec(zeile)?.[1];
+		expect(pruefe(admin, zeile)).toEqual([
+			`${admin}: Admin-Route importiert '${quelle}'; ${DATEIEN}`
+		]);
+	});
+});
+
 describe('betrifftBauregel', () => {
 	it.each([
 		'src/routes/+page.ts',

@@ -69,6 +69,12 @@ const SCHNITTSTELLEN_IMPORT = new RegExp(
 const ERLAUBTER_IMPORT = new RegExp(
 	`${SCHNITTSTELLEN_IMPORT.source}|(?:^|\\/)lib\\/server\\/dienste\\.ts$|^\\.\\/\\$types$`
 );
+// Wohin ein erlaubter Import einer Admin-Route zeigen muss (aufgelöst, ohne Endung): Ein Pfad, der
+// nur so endet wie eine erlaubte Datei (falsche Tiefe, Paket, `/lib/…` ohne `src`), ist ein Befund.
+const ZIELE_DER_ADMIN_ROUTE = new Set([
+	`${SERVER}dienste`,
+	...VERWALTUNGS_DATEIEN.map((v) => SERVER + ohneEndung(v.datei))
+]);
 // Die Einstiege der Verwaltung in `dienste.ts`: Admin-Routen dürfen aus `dienste.ts` nur diese.
 // Ein neuer Einstieg der Verwaltung, der hier fehlt, ist für Admin-Routen gesperrt und fällt sofort
 // auf. Ausserhalb von api/admin gilt die Erlaubt-Liste MITGLIEDER_EINSTIEGE; ein Name von hier
@@ -253,7 +259,9 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 			);
 			continue;
 		}
-		if (!ERLAUBTER_IMPORT.test(imp.quelle)) {
+		const amZiel =
+			imp.quelle === './$types' || ZIELE_DER_ADMIN_ROUTE.has(zielVon(pfad, imp.quelle) ?? '');
+		if (!ERLAUBTER_IMPORT.test(imp.quelle) || !amZiel) {
 			befunde.push(`${pfad}: Admin-Route importiert '${imp.quelle}'; ${ERLAUBT_IMPORT}`);
 			continue;
 		}
@@ -297,7 +305,7 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 function pruefeDiensteImporte(pfad: string, imp: Import[]): string[] {
 	const befunde: string[] = [];
 	for (const i of imp) {
-		if (i.quelle === null || !DIENSTE_MODUL.test(i.quelle)) continue;
+		if (i.quelle === null || !trifft(DIENSTE_MODUL, pfad, i.quelle)) continue;
 		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
 		if (namen === null) {
 			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
@@ -322,15 +330,30 @@ function pruefeDiensteImporte(pfad: string, imp: Import[]): string[] {
  * Paket. Über `$lib`, ab der Projektwurzel (`/src/…`, so löst Vite auf) oder relativ zur Datei.
  */
 function zielVon(pfad: string, quelle: string): string | null {
+	const voll = aufgeloest(pfad, quelle);
+	return voll === null ? null : voll.replace(/\.(?:ts|js)$/, '');
+}
+
+/** Wie `zielVon`, aber mit der Endung, wie sie steht. */
+function aufgeloest(pfad: string, quelle: string): string | null {
 	const ohneAnhang = quelle.replace(/[?#].*$/, '');
-	const voll = ohneAnhang.startsWith('$lib/')
+	return ohneAnhang.startsWith('$lib/')
 		? posix.normalize(`src/lib/${ohneAnhang.slice('$lib/'.length)}`)
 		: ohneAnhang.startsWith('/')
 			? posix.normalize(ohneAnhang.slice(1))
 			: ohneAnhang.startsWith('.')
 				? posix.join(posix.dirname(pfad), ohneAnhang)
 				: null;
-	return voll === null ? null : voll.replace(/\.(?:ts|js)$/, '');
+}
+
+/**
+ * Ob eine Sperre einen Import trifft: am Pfad, wie er steht, oder am aufgelösten Pfad (mit Endung,
+ * ohne Anhang). So bleibt jeder Befund am geschriebenen Pfad, und `..`, `./` oder `//` umgehen keine
+ * Sperre (Schritt 12a).
+ */
+function trifft(muster: RegExp, pfad: string, quelle: string): boolean {
+	const ziel = aufgeloest(pfad, quelle);
+	return muster.test(quelle) || (ziel !== null && muster.test(ziel));
 }
 
 /**
@@ -391,13 +414,13 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 			if (liste !== null) befunde.push(...pruefeAdminRoute(pfad, inhalt, liste));
 		} else if (inRoutes) {
 			const imp = importe(inhalt);
-			if (imp.some((i) => i.quelle !== null && ADMIN_MODUL.test(i.quelle))) {
+			if (imp.some((i) => i.quelle !== null && trifft(ADMIN_MODUL, pfad, i.quelle))) {
 				befunde.push(
 					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
 				);
 			}
 			for (const v of NUR_VERWALTUNG) {
-				if (imp.some((i) => i.quelle !== null && v.muster.test(i.quelle))) {
+				if (imp.some((i) => i.quelle !== null && trifft(v.muster, pfad, i.quelle))) {
 					befunde.push(
 						`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/${v.datei} nutzen`
 					);
