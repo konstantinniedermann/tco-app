@@ -23,7 +23,17 @@ import { defineConfig } from 'eslint/config';
 // leert die Liste und stellt die Regel damit scharf. Im Code unter `src/` steht dafür kein
 // `eslint-disable`.
 const SERVER = 'src/lib/server';
-const THEMEN = ['admin', 'anlass', 'brief', 'cm', 'gespraech', 'mitteilung', 'profil', 'turnier'];
+const THEMEN = [
+	'admin',
+	'anlass',
+	'brief',
+	'cm',
+	'gespraech',
+	'mitteilung',
+	'profil',
+	'sitzung',
+	'turnier'
+];
 const JEDE_DATEI = '[^/]+';
 // Vorsatz aus Kleinbuchstaben mit Bindestrich: `passkey-schnittstellen`, `verwaltung-schnittstellen`.
 const SCHNITTSTELLEN = '(?:[a-z]+-)?schnittstellen';
@@ -44,16 +54,6 @@ export const AUSNAHMEN = [
 		von: 'turnier/schnittstellen.ts',
 		nach: 'gespraech/schnittstellen.ts',
 		schritt: '11: die Gesprächs-Schnittstellen ziehen von turnier nach gespraech'
-	},
-	{
-		von: 'login/schnittstellen.ts',
-		nach: 'admin/rollen.ts',
-		schritt: '10: getSitzung wird ausserhalb von login gebaut'
-	},
-	{
-		von: 'login/schnittstellen.ts',
-		nach: 'gespraech/gespraech.ts',
-		schritt: '10: getSitzung wird ausserhalb von login gebaut'
 	}
 ];
 

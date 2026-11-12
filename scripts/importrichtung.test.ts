@@ -55,7 +55,11 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 		// Schnittstellen-Dateien mit Vorsatz (Schritt 09): `verwaltung-schnittstellen.ts`
 		['cm/neu.ts', "import { x } from '../anlass/verwaltung-schnittstellen.ts';"],
 		['admin/neu.ts', "import { x } from '$lib/server/anlass/verwaltung-schnittstellen';"],
-		['turnier/neu.ts', "export { x } from '../anlass/verwaltung-schnittstellen.js';"]
+		['turnier/neu.ts', "export { x } from '../anlass/verwaltung-schnittstellen.js';"],
+		// Thema `sitzung` (Schritt 10): die Antwort von /api/sitzung steht über login und den Themen.
+		['login/neu.ts', "import { x } from '../sitzung/schnittstellen.ts';"],
+		['anlass/neu.ts', "import { x } from '../sitzung/schnittstellen.ts';"],
+		['sitzung/neu.ts', "import { x } from '../admin/schnittstellen.ts';"]
 	])('meldet in %s den Import %s', async (datei, code) => {
 		// Mehr als eine Meldung ist möglich (`../admin` aus db: als Datei und als Modul).
 		expect((await meldungen(datei, code)).length).toBeGreaterThan(0);
@@ -69,7 +73,11 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 		['anlass/neu.ts', "import { x } from '../cm/verwaltungschnittstellen.ts';"],
 		['anlass/neu.ts', "import { x } from '../../turnier/zeit.ts';"],
 		['login/neu.ts', "import { x } from '../db/index.ts';"],
-		['datum.ts', "import { x } from './db/index.ts';"]
+		['datum.ts', "import { x } from './db/index.ts';"],
+		// `sitzung` setzt Fachlogik anderer Themen und die Sitzung aus login zusammen.
+		['sitzung/neu.ts', "import { x } from '../admin/rollen.ts';"],
+		['sitzung/neu.ts', "import { x } from '../gespraech/gespraech.ts';"],
+		['sitzung/neu.ts', "import { x } from '../login/sitzung.ts';"]
 	])('lässt in %s den Import %s zu', async (datei, code) => {
 		expect(await meldungen(datei, code)).toEqual([]);
 	});

@@ -3,12 +3,12 @@ import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { holeLoginDienst } from '../dienste.ts';
+import { getSitzung } from '../sitzung/schnittstellen.ts';
 import { erstelleBremsen } from './bremse.ts';
 import { erzeugeBriefCode, erzeugeMailCode } from './codes.ts';
 import { erstelleLoginDienst, type LoginDienst } from './dienst.ts';
 import {
 	behandleFehler,
-	getSitzung,
 	ladeSitzung,
 	ladeSitzungSicher,
 	postBrief,
