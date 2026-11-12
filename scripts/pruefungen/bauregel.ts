@@ -57,9 +57,10 @@ const SCHNITTSTELLEN_IMPORT = new RegExp(
 const ERLAUBTER_IMPORT = new RegExp(
 	`${SCHNITTSTELLEN_IMPORT.source}|(?:^|\\/)lib\\/server\\/dienste\\.ts$|^\\.\\/\\$types$`
 );
-// Die Einstiege der Verwaltung in `dienste.ts`. Eine Liste für beide Richtungen: Admin-Routen dürfen
-// aus `dienste.ts` nur diese, alle anderen Routen alles ausser diesen. Ein neuer Einstieg der
-// Verwaltung, der hier fehlt, ist für Admin-Routen gesperrt und fällt sofort auf.
+// Die Einstiege der Verwaltung in `dienste.ts`: Admin-Routen dürfen aus `dienste.ts` nur diese.
+// Ein neuer Einstieg der Verwaltung, der hier fehlt, ist für Admin-Routen gesperrt und fällt sofort
+// auf. Ausserhalb von api/admin gilt die Erlaubt-Liste MITGLIEDER_EINSTIEGE; ein Name von hier
+// bekommt dort die eigene Meldung «nur Routen unter src/routes/api/admin/ …».
 const VERWALTUNGS_EINSTIEGE = ['holeAdminDienste', 'holeMitteilungAdminDienste'];
 // Die Einstiege der Mitglieder: das Einzige, was eine Route ausserhalb von api/admin aus `dienste.ts`
 // holen darf. Erlaubt-Liste, keine Sperrliste: Was die Prüfung nicht genau als einen dieser Namen
@@ -100,12 +101,15 @@ function ohneKommentare(inhalt: string): string {
 	return inhalt.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
 }
 
-// `klausel`: was zwischen `import`/`export` und `from` steht; `null` bei `import '…'`.
+// `klausel`: was zwischen `import`/`export` und `from` steht; `null` bei `import '…'`. Sie darf
+// Namen in Anführungszeichen enthalten (`{ 'x' as y }`, ES2022), je als Ganzes bis zum schliessenden
+// Zeichen derselben Zeile; ein `from` oder `;` darin beendet sie nicht, ausserhalb beendet sie ein
+// `;`. Sie findet damit jeden Import, den sie ohne Anführungszeichen fand.
 // Dynamisch: `quelle` ist `null`, wenn der Pfad berechnet wird (`import(variable)`).
 function importe(inhalt: string): Import[] {
 	const text = ohneKommentare(inhalt);
 	const statisch =
-		/\b(?:import|export)\b([^'";]*?)\bfrom\s*['"]([^'"]+)['"]|\bimport\s*['"]([^'"]+)['"]/g;
+		/\b(?:import|export)\b((?:[^'";]|'[^'\n]*'|"[^"\n]*")*?)\bfrom\s*['"]([^'"]+)['"]|\bimport\s*['"]([^'"]+)['"]/g;
 	const dynamisch = /\bimport\s*\(\s*(?:['"`]([^'"`$]+)['"`]\s*\))?/g;
 	return [
 		...[...text.matchAll(statisch)].map((m): Import =>
@@ -120,6 +124,17 @@ function importe(inhalt: string): Import[] {
 	];
 }
 
+/**
+ * Ein Name in Anführungszeichen ohne Escape ist derselbe Name wie ohne (`'x'` = `x`). Mit Escape,
+ * anderem Inhalt oder unvollständig bleibt er, wie er steht, samt Anführungszeichen: Dann passt er
+ * auf keine Liste, und die Sperrliste meldet ihn eigens (`pruefeVerwaltungImporte`).
+ */
+function leseName(roh: string): string {
+	const text = /^(['"])([^'"\\\n]*)\1$/.exec(roh);
+	return text ? text[2] : roh;
+}
+const inAnfuehrungszeichen = (name: string) => /^['"]/.test(name);
+
 /** Paare [importiert, lokal] aus `{ a, b as c }` (ohne `type`); `null` bei Standard- oder Namensraum-Import. */
 function benannteNamen(klausel: string): [string, string][] | null {
 	const t = klausel.replace(/^type\s+/, '');
@@ -131,7 +146,7 @@ function benannteNamen(klausel: string): [string, string][] | null {
 		.filter((e) => e !== '')
 		.map((e): [string, string] => {
 			const [importiert, lokal] = e.split(/\s+as\s+/);
-			return [importiert, lokal ?? importiert];
+			return [leseName(importiert), lokal ?? importiert];
 		});
 }
 
@@ -237,6 +252,10 @@ function pruefeVerwaltungImporte(
 			}
 			if (ausDiensten || (verwaltung?.has(name) ?? false)) {
 				befunde.push(`${pfad}: nur Routen unter src/routes/api/admin/ dürfen '${name}' nutzen`);
+			} else if (inAnfuehrungszeichen(name)) {
+				befunde.push(
+					`${pfad}: Name ${name} aus '${quelle}' lässt sich nicht lesen; ohne Escape schreiben`
+				);
 			}
 		}
 	}

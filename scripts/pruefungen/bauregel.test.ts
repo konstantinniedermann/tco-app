@@ -388,6 +388,110 @@ describe('Mitteilungen ausserhalb von api/admin', () => {
 	});
 });
 
+// Namen in Anführungszeichen (ES2022, `import { 'x' as y } from …`): Die Zeile ist ein Import wie
+// jeder andere und wird nach denselben Regeln beurteilt; einen Namen mit Escape liest die Prüfung
+// nicht, er ist ein Befund (Schritt 09).
+describe('Namen in Anführungszeichen', () => {
+	const liste: [string, string] = [
+		'src/lib/server/admin/schnittstellen.ts',
+		'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+	];
+	const mListe: [string, string] = [
+		'src/lib/server/mitteilung/schnittstellen.ts',
+		'export const MITTEILUNG_ADMIN_SCHNITTSTELLEN = {\n\tpostVereinSenden\n} satisfies Record<string, unknown>;'
+	];
+	const admin = 'src/routes/api/admin/mitglieder/[id]/+server.ts';
+	const adminGut = [
+		"import { holeAdminDienste } from '../../../../../lib/server/dienste.ts';",
+		"import { 'getMitglied' as g } from '../../../../../lib/server/admin/schnittstellen.ts';",
+		'export const GET = (e) => g(holeAdminDienste(), e);'
+	].join('\n');
+	const mitglied = 'src/routes/api/profil/+server.ts';
+	const mitgliedGut = [
+		"import { 'holeProfilDienste' as h } from '../../../lib/server/dienste.ts';",
+		'import { "getProfil" as g } from \'../../../lib/server/profil/schnittstellen.ts\';',
+		'export const GET = (e) => g(h(), e);'
+	].join('\n');
+	const pruefe = (pfad: string, inhalt: string) =>
+		pruefeBauregel(new Map([liste, mListe, [pfad, inhalt]]));
+
+	it('RR-07: ein gelisteter Name in Anführungszeichen gilt wie ohne', () => {
+		expect(pruefe(admin, adminGut)).toEqual([]);
+		expect(pruefe(mitglied, mitgliedGut)).toEqual([]);
+	});
+	it('RR-07: Admin-Route: Quelle und Name in Anführungszeichen nach denselben Regeln', () => {
+		for (const [zeile, befund] of [
+			[
+				"import { 'erstelleDb' as e } from '../../../../../lib/server/db/index.ts';",
+				`${admin}: Admin-Route importiert '../../../../../lib/server/db/index.ts'; erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts und mitteilung/schnittstellen.ts`
+			],
+			[
+				"import { 'liest' as l } from '../../../../../lib/server/admin/schnittstellen.ts';",
+				`${admin}: Admin-Route nutzt 'liest'; erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN und MITTEILUNG_ADMIN_SCHNITTSTELLEN`
+			],
+			[
+				'import { "holeDb" as d } from \'../../../../../lib/server/dienste.ts\';',
+				`${admin}: Admin-Route importiert 'holeDb' aus ../../../../../lib/server/dienste.ts; erlaubt sind nur holeAdminDienste und holeMitteilungAdminDienste`
+			],
+			[
+				"export { 'erstelleDb' as e } from '../../../../../lib/server/db/index.ts';",
+				`${admin}: Admin-Route importiert '../../../../../lib/server/db/index.ts'; erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts und mitteilung/schnittstellen.ts`
+			]
+		]) {
+			expect(pruefe(admin, `${adminGut}\n${zeile}`), zeile).toEqual([befund]);
+		}
+	});
+	it('RR-07: Mitglieder-Route: Quelle und Name in Anführungszeichen nach denselben Regeln', () => {
+		for (const [zeile, befund] of [
+			[
+				"import { 'listeMitglieder' as l } from '$lib/server/admin/mitglieder.ts';",
+				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
+			],
+			[
+				"import { 'holeAdminDienste' as h2 } from '../../../lib/server/dienste.ts';",
+				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen 'holeAdminDienste' nutzen`
+			],
+			[
+				"import { 'holeBremsen' as b } from '../../../lib/server/dienste.ts';",
+				`${mitglied}: aus dienste.ts nur Einstiege der Mitglieder, nicht 'holeBremsen'; erlaubt sind nur holeLoginDienst, holePasskeyDienst, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste`
+			],
+			[
+				"export { 'postVereinSenden' as p } from '../../../lib/server/mitteilung/schnittstellen.ts';",
+				`${mitglied}: nur Routen unter src/routes/api/admin/ dürfen 'postVereinSenden' nutzen`
+			]
+		]) {
+			expect(pruefe(mitglied, `${mitgliedGut}\n${zeile}`), zeile).toEqual([befund]);
+		}
+	});
+	it('RR-07: ein Name in Anführungszeichen mit Escape ist ein Befund', () => {
+		// Die Prüfung entschlüsselt keine Escapes: gesperrt im Zweifel, auch bei der Sperrliste.
+		for (const [pfad, zeile, name] of [
+			[
+				admin,
+				"import { 'getMitglie\\u0064' as g2 } from '../../../../../lib/server/admin/schnittstellen.ts';",
+				"'getMitglie\\u0064'"
+			],
+			[
+				mitglied,
+				"import { 'postVereinSende\\x6e' as p } from '../../../lib/server/mitteilung/schnittstellen.ts';",
+				"'postVereinSende\\x6e'"
+			]
+		]) {
+			expect(pruefe(pfad, `${pfad === admin ? adminGut : mitgliedGut}\n${zeile}`), zeile).toEqual([
+				expect.stringContaining(name)
+			]);
+		}
+	});
+	it('ein Text in Anführungszeichen ausserhalb eines Imports ändert nichts', () => {
+		const code = [
+			"export const prerender = 'auto';",
+			"import { getProfil } from '../../../lib/server/profil/schnittstellen.ts';",
+			"import { 'x' as y } from '../../../lib/zeit.ts';"
+		].join('\n');
+		expect(pruefe(mitglied, code)).toEqual([]);
+	});
+});
+
 describe('betrifftBauregel', () => {
 	it.each([
 		'src/routes/+page.ts',
