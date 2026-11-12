@@ -99,10 +99,11 @@ Abschluss des Plans.
 - Ab Schritt 06a: `liest` und `schreibt` kommen nur aus `src/lib/server/admin/rechte.ts`; keine
   neue Schnittstelle prüft Rollen selbst (`zugang.pruefe`). Typen, die ein anderes Modul braucht,
   stehen nicht in einer `schnittstellen.ts`.
-- Ab Schritt 07: Dienste, Mail- und Push-Versender entstehen nur in
-  `src/lib/server/dienste.ts`; kein Modul unter `src/lib/server/` importiert diese Datei.
-- Ab Schritt 08: eine Fehlerform `{ fehler, felder? }`; Fehlerwörter nur aus der gemeinsamen
-  Liste, die Server und Oberfläche teilen.
+- Ab Schritt 07: Im Server (unter `src/`, ohne Tests) entstehen Dienste, Mail- und
+  Push-Versender nur in `src/lib/server/dienste.ts`; Skripte und Tests bauen ihre eigenen. Kein
+  Modul unter `src/lib/server/` importiert diese Datei.
+- Ab Schritt 08: eine Fehlerform `{ fehler, felder? }`; Zusatzangaben nur, wo `src/lib/fehler.ts`
+  sie für ein Wort nennt. Fehlerwörter nur aus dieser Liste, die Server und Oberfläche teilen.
 - Die Importrichtung zwischen den Server-Modulen setzt ESLint durch. Keine neue Ausnahme in
   `AUSNAHMEN` (`eslint.config.js`) ohne Entscheid des Projektleiters; ab Schritt 12 ist die
   Liste leer.

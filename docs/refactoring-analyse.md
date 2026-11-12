@@ -29,12 +29,12 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 | **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b), **Etappe 1 freigegeben** (E-30) |
 | **Erledigte Schritte** | 01 Startpaket, 02 E2E-Flakes, 03 Vertragstests, 04 Hilfsmittel für Etappe 2, 05 Lint-Regeln für die Richtung der Importe (Kurzfassung in 7.2, Protokoll in Anhang C); 06 Grundbausteine in `http.ts` (Review «ok», Version 0.20.10; Ergebnis in 7.3, Protokoll in Anhang D.1) |
 | **Zuletzt erledigt** | **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **09**: Nachmessen erledigt am 12.11.2026 (Anhang D.7). **Wartet auf die Antwort des Projektleiters auf F-17** (mit den zwei Zusätzen aus D.7); vorher startet der Schritt nicht. Worktree `.claude/worktrees/refactor-schritt-09` (Branch `refactor/schritt-09`) steht bereit und trägt D.7. Danach 10 bis 12 in dieser Reihenfolge. CI auf `dev` zu den Merges von 07 und 08 grün (Läufe 43125290406 und 43133066457) |
-| **Wartet auf Freigabe des Projektleiters** | **F-21, vorläufig vom Orchestrator gesetzt (12.11.2026, Projektleiter abwesend, Auftrag «arbeite selbstständig»):** Schritt 08 läuft nach Variante A (Zusatzangaben bleiben, je Wort in der Liste benannt); B bleibt danach möglich. Den Wortlaut der Übergangsregel «Ab Schritt 08» in `CLAUDE.md` ändert der Schritt nicht, er steht als Vorschlag in D.6 und braucht die Bestätigung des Projektleiters. Ebenso übergangen: das «ok» zum Checkpoint nach Schritt 07 (E-30); F-20 (Wortlaut «Ab Schritt 07», Abschnitt 9.1); Kenntnisnahme: der Import-Parser der Bauregel übersieht Importe mit Namen in Anführungszeichen (D.4, Korrekturrunde); Kenntnisnahme: die drei Dienst-Typen sind entgegen E-33 verschoben (D.4) |
-| **Offene Fragen** | **F-17** (Ablage der Verwaltungs-Schnittstellen ausserhalb von `admin/`): Das Nachmessen liegt vor (12.11.2026, Anhang D.7), Empfehlung A mit zwei Zusätzen (auch `mitteilung` trennen, in Schritt 11; die Lücke «Namen in Anführungszeichen» der Bauregel als eigener Commit in Schritt 09). Der Orchestrator stellt die Frage jetzt; Schritt 09 startet erst mit der Antwort. **F-15** (Version, solange es Test nicht gibt): vor Schritt 23. **F-20** [neu] (für wen gilt die Übergangsregel «Ab Schritt 07»; Wortlaut der `CLAUDE.md`): zum Checkpoint nach Schritt 07. **F-21** [neu] (was eine Fehlerantwort neben `fehler` und `felder` enthalten darf; Wortlaut «Ab Schritt 08»): vor Schritt 08. Alle vier in Abschnitt 9.1 |
+| **Nächster offener Schritt** | **09** Verwaltungs-Schnittstellen des Anlasses in eigener Datei (Variante A von F-17, E-38), samt Commit für die Lücke «Namen in Anführungszeichen» der Bauregel; Nachmessen erledigt (Anhang D.7). Danach 10 bis 12 in dieser Reihenfolge. CI auf `dev` zu den Merges von 07 und 08 grün (Läufe 43125290406 und 43133066457) |
+| **Wartet auf Freigabe des Projektleiters** | nichts. F-17, F-20 und F-21 sind beantwortet (E-36 bis E-38), die Abweichungen der Schritte 07 und 08 gebilligt (E-39); der Orchestrator arbeitet in der laufenden Session ohne Halt weiter (E-40) |
+| **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. F-17, F-20 und F-21 stehen noch in 9.1, sind aber beantwortet (E-36 bis E-38) |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
 | **Vorab nachzumessen** | vor Schritt 10, 11, 13, 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7). Schritte 06 und 06a brauchen keines |
-| **Nächster Checkpoint** | nach Schritt 08: Kurzbericht, weiter auf «ok» (E-30); so nach jedem Schritt der Etappen 1 und 2 |
+| **Nächster Checkpoint** | in der laufenden Session Kurzbericht je Schritt ohne Halt (E-40); sonst nach jedem Schritt der Etappen 1 und 2 (E-30) |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32) |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
 
@@ -1860,6 +1860,11 @@ sie hebt die Übergangsregeln auf.
 | **E-33** [neu] | (11.11.2026, Checkpoint nach Schritt 06a) Die Übergangsregel «Ab Schritt 06a» in `CLAUDE.md` ist präzisiert: `liest` und `schreibt` kommen nur aus `admin/rechte.ts`; keine neue Schnittstelle prüft Rollen selbst; Typen, die ein anderes Modul braucht, stehen nicht in einer `schnittstellen.ts`. Die vier Dienst-Typen, die nur ihr eigenes Modul braucht (`AnlassDienste`, `AnlassEreignis`, `ProfilDienste`, `MitteilungDienste`), bleiben, wo sie sind. |
 | **E-34** [neu] | (11.11.2026) `mitKonto` der Verwaltung bleibt exportiert in `admin/rechte.ts`; benutzt wird es nur von `postZugangCode` und `postZugang`. |
 | **E-35** [neu] | (11.11.2026) Ok für Schritt 07 (Nachmessen, dann Umsetzung); danach Checkpoint. |
+| **E-36** [neu] | (F-21, 12.11.2026) Antwort A, bestätigt nach der vorläufigen Umsetzung in Schritt 08: Zusatzangaben zu einem Fehlerwort bleiben, je Wort in `src/lib/fehler.ts` benannt. Die Übergangsregel «Ab Schritt 08» in `CLAUDE.md` lautet: «eine Fehlerform `{ fehler, felder? }`; Zusatzangaben nur, wo `src/lib/fehler.ts` sie für ein Wort nennt. Fehlerwörter nur aus dieser Liste, die Server und Oberfläche teilen.» |
+| **E-37** [neu] | (F-20, 12.11.2026) Antwort A: Die Übergangsregel «Ab Schritt 07» gilt für den Server unter `src/` ohne Tests; Skripte und Tests bauen ihre Dienste selbst. Wortlaut in `CLAUDE.md` präzisiert. |
+| **E-38** [neu] | (F-17, 12.11.2026) Antwort A: Verwaltungs-Schnittstellen ausserhalb von `admin/` liegen in einer eigenen Datei je Thema mit eigener Liste; der Schutz hängt am Dateipfad. Dazu beide Zusätze aus D.7: (1) `mitteilung/` wird in Schritt 11 ebenfalls getrennt, sodass eine Form bleibt; (2) Schritt 09 schliesst als eigener Commit die Lücke der Bauregel «Import mit Namen in Anführungszeichen». |
+| **E-39** [neu] | (12.11.2026) Zur Kenntnis genommen und gebilligt: die drei Dienst-Typen sind entgegen E-33 nach `typen.ts` verschoben (Schritt 07, D.4); die Erlaubt-Liste der Mitglieder-Einstiege in der Bauregel (Schritt 07, Korrekturrunde); der Checkpoint nach Schritt 07 lief ohne Halt. |
+| **E-40** [neu] | (12.11.2026) Der Orchestrator arbeitet in der laufenden Session selbstständig weiter («passt alles. mach selbstständig weiter»): Die Schritte der Etappe 1 laufen ohne Halt am Checkpoint, mit Kurzbericht je Schritt. Angehalten wird weiter bei allem aus E-06, bei einer sichtbaren Verhaltensänderung, bei einem Abbruch eines Subagenten, bei zweimal Befunden im Review, bei roter CI und bei einer Frage, die das Dokument dem Projektleiter vorbehält. Der Halt nach jedem Schritt (E-30) gilt wieder ab der nächsten Session, sofern der Projektleiter nichts anderes sagt. |
 
 ---
 
@@ -1871,7 +1876,7 @@ Ende der Etappe 0). Der Entscheid steht je in Abschnitt 8.
 
 ### 9.1 Offene Fragen
 
-**F-21 [neu, OFFEN] — Was darf eine Fehlerantwort neben dem Fehlerwort und den Feldmeldungen
+**F-21 [neu, BEANTWORTET 12.11.2026: A, E-36] — Was darf eine Fehlerantwort neben dem Fehlerwort und den Feldmeldungen
 enthalten?** (B-15; Schritt 08; Übergangsregel «Ab Schritt 08» der `CLAUDE.md`; aufgekommen beim
 Nachmessen, Anhang D.5)
 
@@ -1901,7 +1906,7 @@ genommen verbietet die Regel «eine Fehlerform `{ fehler, felder? }`» diese Ang
   bleibt möglich. Offen sind die Bestätigung von A und der Wortlaut der Übergangsregel (Vorschlag
   in D.6).
 
-**F-17 [neu, OFFEN] — Wie liegen Verwaltungs-Schnittstellen ausserhalb von `admin/` (Schritte 09,
+**F-17 [neu, BEANTWORTET 12.11.2026: A mit beiden Zusätzen, E-38] — Wie liegen Verwaltungs-Schnittstellen ausserhalb von `admin/` (Schritte 09,
 11)?** (B-14, B-37, A-18)
 
 **Frist: vor Schritt 09.** Das Nachmessen liegt vor (12.11.2026, Anhang D.7); der Orchestrator
@@ -1949,7 +1954,7 @@ bewegt fünf Funktionen und drei Routen, Schritt 11 17 Funktionen und 14 Routen.
     ändert und der Reviewer den Diff ganz liest. Das verschärft eine Prüfung über die Zeile 09
     hinaus, ändert aber kein Verhalten der App.
 
-**F-20 [neu, OFFEN] — Für wen gilt «Dienste, Mail- und Push-Versender entstehen nur in
+**F-20 [neu, BEANTWORTET 12.11.2026: A, E-37] — Für wen gilt «Dienste, Mail- und Push-Versender entstehen nur in
 `dienste.ts`»?** (Übergangsregel «Ab Schritt 07» der `CLAUDE.md`; aufgekommen beim Nachmessen,
 Anhang D.3)
 
@@ -3248,7 +3253,7 @@ träge», «`init` läuft beim Bauen mit», die fünf Stellen mit `leiteUm`.
 
 #### Frage an den Projektleiter
 
-**F-20 [neu, OFFEN] — Für wen gilt «Dienste, Mail- und Push-Versender entstehen nur in
+**F-20 [neu, BEANTWORTET 12.11.2026: A, E-37] — Für wen gilt «Dienste, Mail- und Push-Versender entstehen nur in
 `dienste.ts`»?** (Übergangsregel «Ab Schritt 07» der `CLAUDE.md`; nicht dringend, hält Schritt 07
 nicht auf)
 
