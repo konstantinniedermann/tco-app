@@ -123,7 +123,11 @@ const RECHTE_PRUEFUNG = ['liest', 'schreibt', 'mitKonto'];
 const BEZEICHNER = /^[A-Za-z_$][\w$]*$/;
 const NUR_VERWALTUNG_RECHTE = `${aufzaehlung(RECHTE_PRUEFUNG)} nur in ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.datei))}`;
 
+// Ein Text in Anführungszeichen, je bis zum schliessenden Zeichen derselben Zeile; ein Escape (`\'`,
+// `\"`, `\\`) beendet ihn nicht.
+const TEXT = `'(?:[^'\\\\\\n]|\\\\.)*'|"(?:[^"\\\\\\n]|\\\\.)*"`;
 // Die Dateien der Tabelle rufen die Rechteprüfung nur auf und reichen sie nicht weiter (Schritt 12a).
+const NUR_TEXTE = new RegExp(TEXT, 'g');
 const NUR_AUFRUFEN = `${aufzaehlung(RECHTE_PRUEFUNG)} nur aufrufen, nicht weiterreichen`;
 
 // Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
@@ -165,9 +169,20 @@ function ohneKommentare(inhalt: string): string {
 	return inhalt.replace(TEXT_ODER_KOMMENTAR, (_treffer, text?: string) => text ?? '');
 }
 
-// Ein Text in Anführungszeichen, je bis zum schliessenden Zeichen derselben Zeile; ein Escape (`\'`,
-// `\"`, `\\`) beendet ihn nicht.
-const TEXT = `'(?:[^'\\\\\\n]|\\\\.)*'|"(?:[^"\\\\\\n]|\\\\.)*"`;
+/**
+ * Die Lesart bis Schritt 12: jedes `/*…*\/` und jedes `//…` ausser direkt nach `:`, `'`, `"`,
+ * Backtick oder `\`, ohne Rücksicht auf Texte.
+ */
+function ohneKommentareBisher(inhalt: string): string {
+	return inhalt.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+}
+
+// Zwei Lesarten ohne Kommentare: Das Muster oben kennt keine Syntax und kann einen Text zu weit oder
+// zu kurz lesen (z. B. ein Regex-Literal nach `)`, eine Division nach `a!`). Jede Regel, die von den
+// Kommentaren abhängt, prüft darum beide Lesarten; ein Befund aus einer von beiden gilt. So ist die
+// Bauregel nirgends lockerer als bis Schritt 12 (Korrekturrunde Schritt 12a).
+const LESARTEN = [ohneKommentare, ohneKommentareBisher];
+
 const SCHLUESSELWORT = /\b(?:import|export)\b/g;
 const OHNE_KLAUSEL = /\s*['"]([^'"]+)['"]/y;
 const BIS_FROM = `\\bfrom\\s*['"]([^'"]+)['"]`;
@@ -193,12 +208,8 @@ function ab(muster: RegExp, text: string, stelle: number): RegExpExecArray | nul
 // ohne Klausel (nur nach `import`), dann die Klausel ohne Anführungszeichen, erst dann die mit Namen
 // in Anführungszeichen. So gibt es jeden Treffer der Fassung vor Schritt 09 weiter, mit derselben
 // Klausel; dazu kommen Treffer, die sie verbraucht oder nicht erkannt hatte.
-// Dynamisch: `quelle` ist `null`, wenn der Pfad berechnet wird (`import(variable)`).
-function importe(inhalt: string): Import[] {
-	return importeAus(ohneKommentare(inhalt));
-}
-
-/** Wie `importe`, für einen Text, aus dem die Kommentare schon entfernt sind. */
+// Dynamisch: `quelle` ist `null`, wenn der Pfad berechnet wird (`import(variable)`). `text` ist eine
+// Lesart ohne Kommentare (LESARTEN).
 function importeAus(text: string): Import[] {
 	const statisch: Import[] = [];
 	for (const wort of text.matchAll(SCHLUESSELWORT)) {
@@ -277,11 +288,11 @@ function adminSchnittstellen(dateien: Map<string, string>): Set<string> | null {
 	return new Set([...admin, ...weitere.flatMap((v) => [...(listeAus(dateien, v) ?? [])])]);
 }
 
-function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): string[] {
+function pruefeAdminRoute(pfad: string, text: string, erlaubt: Set<string>): string[] {
 	const befunde: string[] = [];
 	// Lokale Namen der erlaubten Schnittstellen (auch mit `as` umbenannt).
 	const schnittstellen = new Set<string>();
-	for (const imp of importe(inhalt)) {
+	for (const imp of importeAus(text)) {
 		if (imp.art === 'dynamisch') {
 			befunde.push(
 				`${pfad}: Admin-Route lädt '${imp.quelle ?? '(berechnet)'}' dynamisch; nur statische Importe`
@@ -315,7 +326,7 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 		}
 	}
 	// Die Dienste nur einer Schnittstelle übergeben: Wer `.db` herausholt, umgeht die Rechteprüfung.
-	const code = ohneKommentare(inhalt).replace(/\bimport\b[^;]*?\bfrom\s*['"][^'"]+['"]\s*;?/g, '');
+	const code = text.replace(/\bimport\b[^;]*?\bfrom\s*['"][^'"]+['"]\s*;?/g, '');
 	for (const treffer of code.matchAll(
 		new RegExp(`\\b(?:${VERWALTUNGS_EINSTIEGE.join('|')})\\b`, 'g')
 	)) {
@@ -413,9 +424,8 @@ function pruefeRechteImporte(pfad: string, imp: Import[]): string[] {
  * vor `(`. Jede andere Stelle (`export { liest }`, `export default`, `const a = liest`, `{ liest }`)
  * reicht sie weiter, ebenso `export { liest } from` und `export * from` admin/rechte.ts (Schritt 12a).
  */
-function pruefeWeiterreichen(pfad: string, inhalt: string): string[] {
+function pruefeWeiterreichen(pfad: string, text: string): string[] {
 	const befunde: string[] = [];
-	const text = ohneKommentare(inhalt);
 	const lokal = new Set<string>();
 	let code = text;
 	for (const i of importeAus(text)) {
@@ -435,15 +445,21 @@ function pruefeWeiterreichen(pfad: string, inhalt: string): string[] {
 			} else lokal.add(alias.trim());
 		}
 	}
-	// Texte zählen nicht: «Die Verwaltung liest …» in einer Meldung ist kein Weiterreichen.
-	const ohneTexte = code.replace(TEXT_ODER_KOMMENTAR, '');
-	for (const name of lokal) {
-		for (const t of ohneTexte.matchAll(new RegExp(`(?<![\\w$.])${escape(name)}(?![\\w$])`, 'g'))) {
-			if (/^\s*\(/.test(ohneTexte.slice(t.index + name.length))) continue;
-			befunde.push(`${pfad}: reicht '${name}' aus admin/rechte.ts weiter; ${NUR_AUFRUFEN}`);
+	// Texte zählen nicht: «Die Verwaltung liest …» in einer Meldung ist kein Weiterreichen. Auch hier
+	// zwei Lesarten: ohne alle Texte (auch Template- und Regex-Literale) und nur ohne '…' und "…";
+	// eine Stelle aus einer von beiden gilt.
+	for (const ohneTexte of [code.replace(TEXT_ODER_KOMMENTAR, ''), code.replace(NUR_TEXTE, "''")]) {
+		for (const name of lokal) {
+			for (const t of ohneTexte.matchAll(
+				new RegExp(`(?<![\\w$.])(?<!\\btypeof\\s+)${escape(name)}(?![\\w$])`, 'g')
+			)) {
+				// Ein Aufruf, auch mit Typ-Argument (`liest<T>(…)`), ist kein Weiterreichen.
+				if (/^\s*(?:<[^<>()]*>\s*)?\(/.test(ohneTexte.slice(t.index + name.length))) continue;
+				befunde.push(`${pfad}: reicht '${name}' aus admin/rechte.ts weiter; ${NUR_AUFRUFEN}`);
+			}
 		}
 	}
-	return befunde;
+	return [...new Set(befunde)];
 }
 
 /**
@@ -459,20 +475,54 @@ export function betrifftRechteImporte(pfad: string): boolean {
 	);
 }
 
-// Laden, dessen Ziel die Prüfung nicht liest: `import.meta.glob` (Vite) und `require` samt
-// `createRequire` (ohne Methoden wie `x.require`). In Routen und in den Dateien der Rechte-Regel ein
-// Befund, gesperrt im Zweifel (Schritt 12a).
+// Laden, dessen Ziel die Prüfung nicht liest: `import.meta.glob` (Vite, auch `globEager`) und
+// `require` samt `createRequire` (ohne Methoden wie `x.require` und ohne `function require(`). In
+// Routen und in den Dateien der Rechte-Regel ein Befund, gesperrt im Zweifel (Schritt 12a).
 const NICHT_PRUEFBAR =
-	/\bimport\s*\.\s*meta\s*\.\s*glob|(?<![\w$.])(?:require|createRequire)\s*\(/g;
+	/\bimport\s*\.\s*meta\s*\.\s*glob|(?<![\w$.])(?<!\bfunction\s+)(?:require|createRequire)\s*\(/g;
 const BERECHNET = 'dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen';
 
-function pruefeNichtPruefbar(pfad: string, inhalt: string): string[] {
-	const woerter = [...ohneKommentare(inhalt).matchAll(NICHT_PRUEFBAR)].map((t) =>
+function pruefeNichtPruefbar(pfad: string, text: string): string[] {
+	const woerter = [...text.matchAll(NICHT_PRUEFBAR)].map((t) =>
 		t[0].startsWith('import') ? 'import.meta.glob' : t[0].replace(/\s*\($/, '')
 	);
 	return [...new Set(woerter)].map(
 		(wort) => `${pfad}: ${wort} lässt sich nicht prüfen; nur statische Importe`
 	);
+}
+
+/** Die Regeln, die von den Kommentaren abhängen, für eine Lesart `text` ohne Kommentare. */
+function pruefeLesart(pfad: string, text: string, liste: Set<string> | null): string[] {
+	const befunde: string[] = [];
+	const inRoutes = pfad.startsWith('src/routes/');
+	if (ADMIN_ROUTE.test(pfad)) {
+		if (liste !== null) befunde.push(...pruefeAdminRoute(pfad, text, liste));
+	} else if (inRoutes) {
+		const imp = importeAus(text);
+		if (imp.some((i) => i.quelle !== null && trifft(ADMIN_MODUL, pfad, i.quelle))) {
+			befunde.push(
+				`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
+			);
+		}
+		for (const v of NUR_VERWALTUNG) {
+			if (imp.some((i) => i.quelle !== null && trifft(v.muster, pfad, i.quelle))) {
+				befunde.push(
+					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/${v.datei} nutzen`
+				);
+			}
+		}
+		befunde.push(...pruefeDiensteImporte(pfad, imp));
+		if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
+	}
+	if (inRoutes || betrifftRechteImporte(pfad)) befunde.push(...pruefeNichtPruefbar(pfad, text));
+	if (betrifftRechteImporte(pfad)) {
+		const imp = importeAus(text);
+		if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
+		if (VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei)) {
+			befunde.push(...pruefeWeiterreichen(pfad, text));
+		} else befunde.push(...pruefeRechteImporte(pfad, imp));
+	}
+	return befunde;
 }
 
 /**
@@ -497,33 +547,9 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 		if (inRoutes && (ACTIONS_DEKLARATION.test(inhalt) || exportiertActions(inhalt))) {
 			befunde.push(`${pfad}: Form Actions sind nicht vorgesehen`);
 		}
-		if (ADMIN_ROUTE.test(pfad)) {
-			if (liste !== null) befunde.push(...pruefeAdminRoute(pfad, inhalt, liste));
-		} else if (inRoutes) {
-			const imp = importe(inhalt);
-			if (imp.some((i) => i.quelle !== null && trifft(ADMIN_MODUL, pfad, i.quelle))) {
-				befunde.push(
-					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
-				);
-			}
-			for (const v of NUR_VERWALTUNG) {
-				if (imp.some((i) => i.quelle !== null && trifft(v.muster, pfad, i.quelle))) {
-					befunde.push(
-						`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/${v.datei} nutzen`
-					);
-				}
-			}
-			befunde.push(...pruefeDiensteImporte(pfad, imp));
-			if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
-		}
-		if (inRoutes || betrifftRechteImporte(pfad)) befunde.push(...pruefeNichtPruefbar(pfad, inhalt));
-		if (betrifftRechteImporte(pfad)) {
-			const imp = importe(inhalt);
-			if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
-			if (VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei)) {
-				befunde.push(...pruefeWeiterreichen(pfad, inhalt));
-			} else befunde.push(...pruefeRechteImporte(pfad, imp));
-		}
+		// Jede Lesart ohne Kommentare für sich; gleiche Befunde zählen einmal.
+		const jeLesart = LESARTEN.flatMap((lesart) => pruefeLesart(pfad, lesart(inhalt), liste));
+		befunde.push(...new Set(jeLesart));
 		if (/\.remote\.(ts|js)$/.test(name)) {
 			befunde.push(`${pfad}: Remote Functions sind nicht vorgesehen`);
 		}

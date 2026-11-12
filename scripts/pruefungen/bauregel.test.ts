@@ -1099,6 +1099,99 @@ describe('Rechteprüfung nicht weiterreichen (Schritt 12a)', () => {
 	});
 });
 
+// Korrekturrunde Schritt 12a (M-1, H-3): Das Muster für Texte kennt keine Syntax. Liest es einen
+// Text zu weit oder zu kurz (Regex-Literal nach `)`, Division nach `a!` oder `i++`, Backtick in einem
+// Ausdruck oder im Markup), darf kein Import und kein Weiterreichen verschwinden, das die Fassung bis
+// Schritt 12 sah: Jede Regel prüft beide Lesarten ohne Kommentare. Fälle aus dem Review.
+describe('Zwei Lesarten ohne Kommentare (Korrekturrunde Schritt 12a)', () => {
+	const mitglied = 'src/lib/server/cm/hilfe.ts';
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
+	const mehr = (quelle: string) => `import {\n\tfremd2, // geht's\n\tliest\n} from '${quelle}';`;
+	const rechte = mehr('../admin/rechte.ts');
+
+	it.each([
+		['if (x) /`/.test(a);\n' + rechte + '\nconst t = `x`;'],
+		['const d = a! / 2 + `a/b`;\n' + rechte + '\nconst t = `x`;'],
+		["const h = a! / 2; import { fremd2, /* it's */ liest } from '../admin/rechte.ts';"],
+		["let h = i++ / 2; import { fremd2, /* it's */ liest } from '../admin/rechte.ts';"],
+		['const t = `${"`"}`;\n' + rechte + '\nconst u = `x`;'],
+		['const t = `${a /* ` */}`;\n' + rechte + '\nconst u = `x`;']
+	])('RR-07: Datei der Mitglieder: %s', (code) => {
+		expect(pruefe(mitglied, code)).toEqual([rechteBefund(mitglied, 'liest')]);
+	});
+
+	it.each([
+		[
+			'src/routes/api/profil/+server.ts',
+			"if (x) /'/.test(a); const u = '//cdn/x'; const m = await import('../../../lib/server/admin/rollen.ts');"
+		],
+		[
+			'src/routes/api/profil/+server.ts',
+			'const t = `${"`"}`; const a = "//"; import { getMitglieder } from \'$lib/server/admin/schnittstellen.ts\';'
+		],
+		[
+			'src/routes/x/+page.svelte',
+			`<p>Tippe \`</p>\n<script lang="ts">\n${mehr('$lib/server/admin/rollen.ts')}\nconst t = \`x\`;\n</script>`
+		]
+	])('RR-07: Route %s: %s', (pfad, code) => {
+		expect(pruefe(pfad, code)).toContain(
+			`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
+		);
+	});
+
+	it('RR-07: Admin-Route: ein Regex-Literal mit Backtick nach ) verdeckt keinen Import', () => {
+		const admin = 'src/routes/api/admin/x/+server.ts';
+		const liste: [string, string] = [
+			'src/lib/server/admin/schnittstellen.ts',
+			'export const ADMIN_SCHNITTSTELLEN = {\n\tgetMitglied\n} satisfies Record<string, unknown>;'
+		];
+		const code =
+			'if (x) /`/.test(a);\n' + mehr('../../../../lib/server/db/index.ts') + '\nconst t = `x`;';
+		expect(pruefeBauregel(new Map([liste, [admin, code]]))).toContain(
+			`${admin}: Admin-Route importiert '../../../../lib/server/db/index.ts'; ${DATEIEN}`
+		);
+	});
+
+	it('RR-07: Datei der Tabelle: eine Division nach a! verdeckt kein Weiterreichen (H-3)', () => {
+		const datei = 'src/lib/server/cm/verwaltung-schnittstellen.ts';
+		const code = [
+			"import { liest } from '../admin/rechte.ts';",
+			'const r = a! / 2; export const x = liest; const s = 1 / 2;'
+		].join('\n');
+		expect(pruefe(datei, code)).toEqual([
+			`${datei}: reicht 'liest' aus admin/rechte.ts weiter; liest, schreibt und mitKonto nur aufrufen, nicht weiterreichen`
+		]);
+	});
+});
+
+// Korrekturrunde Schritt 12a (H-4, H-1, H-2): Was die neuen Regeln der Punkte 4 und 5 nicht melden.
+describe('Keine Fehlalarme der Punkte 4 und 5 (Korrekturrunde Schritt 12a)', () => {
+	const datei = 'src/lib/server/cm/verwaltung-schnittstellen.ts';
+	const pruefe = (pfad: string, code: string) => pruefeBauregel(new Map([[pfad, code]]));
+	const r = "import { liest, schreibt, type AdminDienste } from '../admin/rechte.ts';";
+
+	it.each([
+		`${r}\nexport const getX = liest('cm', async (d, e) => e);`,
+		`${r}\nexport const postX = schreibt(\n\t'cm',\n\tasync (d, e) => e\n);`,
+		`${r}\nexport const getY = liest<AdminDienste>('cm', (d, e) => e);`,
+		`${r}\nconst meldung = 'Die Verwaltung liest und schreibt';\nexport const g = liest('cm', (d, e) => e);`,
+		`${r}\ntype Pruefung = typeof liest;\nexport const g = schreibt('cm', (d, e) => e);`
+	])('lässt in einer Datei der Tabelle zu: %s', (code) => {
+		expect(pruefe(datei, code)).toEqual([]);
+	});
+
+	it.each([
+		['src/lib/server/cm/schnittstellen.ts', "const r = x.require('a');"],
+		['src/lib/server/cm/schnittstellen.ts', 'declare function require(id: string): unknown;'],
+		[
+			'src/routes/api/profil/+server.ts',
+			'const m = meta.glob;\nexport const h = (a) => a.require(1);'
+		]
+	])('lässt in %s zu: %s', (pfad, code) => {
+		expect(pruefe(pfad, code)).toEqual([]);
+	});
+});
+
 describe('betrifftBauregel', () => {
 	it.each([
 		'src/routes/+page.ts',
