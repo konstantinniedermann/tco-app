@@ -54,11 +54,6 @@ export const AUSNAHMEN = [
 		von: 'login/schnittstellen.ts',
 		nach: 'gespraech/gespraech.ts',
 		schritt: '10: getSitzung wird ausserhalb von login gebaut'
-	},
-	{
-		von: 'login/sitzung.ts',
-		nach: 'admin/rollen.ts',
-		schritt: '10: nur der Typ AnsichtRolle; Schritt 10 muss ihn mitnehmen (nicht im Plan genannt)'
 	}
 ];
 

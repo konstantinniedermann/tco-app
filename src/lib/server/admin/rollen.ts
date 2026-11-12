@@ -1,6 +1,7 @@
 import { and, asc, count, eq, inArray, ne, sql } from 'drizzle-orm';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, kontoRolle, mitglied, sitzung } from '../db/schema.ts';
+import { ANSICHT_ROLLEN, type AnsichtRolle } from '../login/sitzung.ts';
 import { schreibeVerlauf, type Eintrag, type Urheber } from './verlauf.ts';
 
 export const ROLLEN = ['mytco', 'mitglieder', 'cm', 'lizenz'] as const;
@@ -81,10 +82,9 @@ export async function verwaltungsrollen(
 	return VERWALTUNGSROLLEN.filter((r) => vorhanden.has(r));
 }
 
-// «Ansicht als …»: Der MyTCO-Admin sieht MyTCO wie jemand mit genau dieser Rolle (oder ohne
-// Admin-Rolle, `mitglied`). Liste wie die Prüfung `sitzung_ansicht_rolle_check`.
-export const ANSICHT_ROLLEN = ['mitglied', 'mitglieder', 'cm', 'lizenz'] as const;
-export type AnsichtRolle = (typeof ANSICHT_ROLLEN)[number];
+// «Ansicht als …»: Liste und Typ stehen bei der Sitzung (`login/sitzung.ts`), die sie trägt; hier
+// weitergereicht, damit Verwaltung und Oberfläche sie weiter von hier holen.
+export { ANSICHT_ROLLEN, type AnsichtRolle };
 
 export const istAnsichtRolle = (r: unknown): r is AnsichtRolle =>
 	(ANSICHT_ROLLEN as readonly unknown[]).includes(r);
