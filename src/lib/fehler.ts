@@ -106,8 +106,6 @@ export type WortOhneZusatz = {
  * nimmt der Typ sie an.
  */
 type Altform =
-	// 401 ohne Wort (Passkey, `getSitzung`).
-	| Record<string, never>
 	// Anlass: der Name des Felds statt `felder`.
 	| { fehler: 'eingabe'; feld: 'antwort' | 'bemerkung' }
 	// Mitteilungen: `felder` als Liste der Namen.

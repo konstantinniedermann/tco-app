@@ -1,7 +1,7 @@
 import type { Db } from '../db/index.ts';
 import { offeneGespraecheGesamt } from '../gespraech/gespraech.ts';
 import { effektiveRollen, verwaltungsrollen } from '../admin/rollen.ts';
-import { antwort, formatFehler, istJson, leseKoerper, type Ereignis } from '../http.ts';
+import { abgemeldet, antwort, formatFehler, istJson, leseKoerper, type Ereignis } from '../http.ts';
 import type { LoginDienst, LoginErgebnis } from './dienst.ts';
 import { SITZUNG_COOKIE, SITZUNG_GUELTIG_MS } from './sitzung.ts';
 
@@ -68,7 +68,7 @@ export async function getSitzung(
 	jetzt: () => Date = () => new Date()
 ): Promise<Response> {
 	const konto = e.locals.konto;
-	if (!konto) return antwort(401, {});
+	if (!konto) return abgemeldet();
 	const rollen = effektiveRollen(await verwaltungsrollen(db, konto.kontoId), konto.ansicht);
 	return antwort(200, {
 		vorname: konto.vorname,

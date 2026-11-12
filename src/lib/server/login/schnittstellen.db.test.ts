@@ -227,7 +227,7 @@ describe('Schnittstellen', () => {
 			await ladeSitzung(s.dienst, ohne);
 			const r0 = await getSitzung(ohne, db);
 			expect(r0.status).toBe(401);
-			expect(await r0.json()).toEqual({});
+			expect(await r0.json()).toEqual({ fehler: 'abgemeldet' });
 			expect(r0.headers.get('cache-control')).toBe('no-store');
 
 			const mit = ereignis({ cookie: s.kennung });

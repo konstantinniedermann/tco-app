@@ -67,7 +67,7 @@ describe('Anfragen zu Benachrichtigungen (FR-40, FR-41)', () => {
 		expect(await abo(json(500, {}))).toEqual({ art: 'stoerung' });
 		expect(await abo(new Error('weg'))).toEqual({ art: 'stoerung' });
 		expect(await abo(new Response('kein JSON', { status: 502 }))).toEqual({ art: 'stoerung' });
-		expect(await holeBenachrichtigungen(holer(json(401, {})).holen)).toEqual({
+		expect(await holeBenachrichtigungen(holer(json(401, { fehler: 'abgemeldet' })).holen)).toEqual({
 			art: 'abgemeldet'
 		});
 	});
