@@ -268,7 +268,10 @@ describe('SI-17: MAIL_NUR_AN leitet jede Mail über jeden Einstieg um', () => {
 		const params = { id: String(turnierId) };
 		const r = await rufe(gespraechSchreiben, { body: { text: 'Frage' }, params, konto: m.konto });
 		expect(r.status).toBe(200);
-		// Die Meldung an die Kontaktperson (vorheriger Test) muss draussen sein, bevor gezählt wird.
+		// Die Meldung an die Kontaktperson (eben ausgelöst, Weg aus dem sechsten Test) muss draussen
+		// sein, bevor gezählt wird. Fenster: `weg` zählt jede Mail ab dem Auslösen. Ein Nachzügler der
+		// Mitteilung aus dem vorigen Test fiele hinein und liefe wie diese Meldung über den Pool, würde
+		// also nicht auffallen; die Route der Mitteilung wartet aber den Versand ab, bevor sie antwortet.
 		await vi.waitFor(() => expect(mails.filter(fuer(kontakt.email))).toHaveLength(2), WARTEN);
 		const [g] = await holeDb()
 			.select({ id: gespraech.id })
