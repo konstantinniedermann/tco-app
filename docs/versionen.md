@@ -8,6 +8,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.18 — Importregeln ohne Ausnahme (Refactoring Schritt 12)
+
+- Die Importregel zwischen den Server-Modulen gilt ohne Ausnahme; ein Test hält fest, dass die Liste
+  der Ausnahmen leer bleibt. Am Verhalten ändert sich nichts (#80).
+- Die Bauregel lässt die Rechteprüfungen der Verwaltung (`liest`, `schreibt`, `mitKonto`) nur in den
+  Verwaltungs-Dateien zu.
+
 ## 0.20.17 — Verwaltung von CM, Gespräch und Mitteilungen beim eigenen Thema (Refactoring Schritt 11)
 
 - Die Verwaltungs-Schnittstellen der Clubmeisterschaft, des Gesprächs und der Mitteilungen liegen

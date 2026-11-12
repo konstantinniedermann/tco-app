@@ -44,9 +44,11 @@ const DIENSTE = 'dienste';
 export const MODULE = ['db', 'login', ...THEMEN];
 
 /**
- * Heutige Verletzungen: `von` und `nach` sind Dateien relativ zu src/lib/server/. `schritt` nennt den
- * Schritt aus docs/refactoring-analyse.md, der die Ausnahme abbaut, oder «bleibt: …» mit Grund.
- * Eine Ausnahme gilt je Datei und Zieldatei, nicht je importiertem Namen.
+ * Ausnahmen von der Regel; leer, ein neuer Eintrag braucht den Entscheid des Projektleiters (der Test
+ * «AUSNAHMEN ist leer» in scripts/importrichtung.test.ts wird dann rot). `von` und `nach` sind Dateien
+ * relativ zu src/lib/server/. `schritt` nennt den Schritt aus docs/refactoring-analyse.md, der die
+ * Ausnahme abbaut, oder «bleibt: …» mit Grund. Eine Ausnahme gilt je Datei und Zieldatei, nicht je
+ * importiertem Namen.
  * @type {{ von: string; nach: string; schritt: string }[]}
  */
 export const AUSNAHMEN = [];
@@ -106,7 +108,7 @@ function regel(modul, frei) {
 	const vorsatz = modul === '.' ? '\\./' : '\\.\\./';
 	/** @param {string} e */
 	const meldung = (e) =>
-		`Falsche Richtung: ${e}. Heutige Verletzungen stehen in AUSNAHMEN (eslint.config.js).`;
+		`Falsche Richtung: ${e}. Es gibt keine Ausnahme; eine neue (AUSNAHMEN in eslint.config.js) braucht den Entscheid des Projektleiters.`;
 	const message = meldung(ebene);
 	return {
 		'no-restricted-imports': [
