@@ -62,6 +62,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 | 09.11.2026 | N-DATENSCHUTZ-02: Kontaktdaten für CM- und Lizenz-Admin nach Aufgabe statt von allen (K-42 eingegrenzt) | Projektleiter |
 | 09.11.2026 | Gespräch mit der Turnierleitung ([#71](https://github.com/konstantinniedermann/tco-app/issues/71), [Design](../superpowers/specs/2026-11-09-gespraech-turnierleitung-design.md)): neu A-TURNIER-04 (*geplant*) | Projektleiter |
 | 09.11.2026 | Gespräch mit der Turnierleitung umgesetzt ([#71](https://github.com/konstantinniedermann/tco-app/issues/71)): A-TURNIER-04 auf *umgesetzt* (FR-50 bis FR-54); A-MITGLIED-03 auf *umgesetzt* (Löschen mit Bedenkzeit) | Projektleiter |
+| 12.11.2026 | Antworten des Vorstands: Die vier Admin-Rollen und ihre Besetzung gelten (K-18.4). Junioren ohne Altersgrenze: jedes Kind ein eigenes Konto; ein Elternteil führt es nur, solange das Kind keine eigene Adresse hat (A-MITGLIED-08, Vorschlag K-08, Bestätigung ausstehend) | Hauptansprechperson im Vorstand |
 
 ## Offene Fragen an den Verein
 

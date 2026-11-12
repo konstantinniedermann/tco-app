@@ -174,6 +174,6 @@ Bis der Projektleiter bestätigt, gelten diese beiden Punkte als nicht angenomme
 
 ## Offene Fragen an den Verein
 
-K-12.2 (weitere Vorgaben), K-16.1 (Briefversand), K-18.2 und K-18.4 (wer welche Rolle), K-21 (Kontakt bei
+K-12.2 (weitere Vorgaben), K-16.1 (Briefversand), K-21 (Kontakt bei
 Login-Problemen) — alle in den
 [Abklärungen](abklaerungen.md).

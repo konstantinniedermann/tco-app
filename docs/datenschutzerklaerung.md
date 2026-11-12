@@ -33,7 +33,7 @@ du selbst einschaltest. Für nichts anderes.
 - Die **Mitglieder-Admins** führen die Mitgliederliste. Sie sehen alle deine Daten und, ohne
   Inhalt, wer wann welche Angabe geändert oder welche Aktion ausgelöst hat (12 Monate).
 - Die **MyTCO-Admins** betreuen MyTCO technisch und vergeben die Rollen
-  [Personen, **Vorschlag K-18.4:** Projektleiter und Stellvertretung]. Sie sehen dieselben
+  [Personen: Projektleiter und Hauptansprechperson im Vorstand (K-18.4)]. Sie sehen dieselben
   Daten wie alle anderen Rollen, ändern sie aber nicht. Das brauchen sie, um den anderen zu
   helfen, Fehler zu finden und die Vergabe der Rollen zu prüfen.
 - Die **CM-Admins** und **Lizenz-Admins** sehen nur, was sie für ihre Aufgabe brauchen. Deine
