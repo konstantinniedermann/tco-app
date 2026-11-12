@@ -20,8 +20,8 @@
   Schnittstelle ausserhalb der Listen.
 - Fachfunktionen kennen kein HTTP: Sie bekommen Datenbank und Zeit hineingereicht und geben ein
   Ergebnis-Wort zurück. Statuscode und Antwort bauen nur Schnittstellen-Dateien, ihre Antwort-Hilfen, die
-  Rechteprüfung und der Riegel der Ansicht, immer mit den Bausteinen aus
-  `src/lib/server/http.ts`; nie eine Fachfunktion.
+  Rechteprüfung und der Riegel der Ansicht, mit den Bausteinen aus `src/lib/server/http.ts`
+  (ausser Datei-Antworten wie die Kalender-Datei); nie eine Fachfunktion.
 - Die Zeit kommt über die Dienste (`jetzt`), nie direkt aus `new Date()`.
 - Schreibende Schnittstellen nehmen nur JSON an.
 - Logs enthalten nur feste Texte: nie Fehlermeldungen, Eingaben, Adressen oder Codes.
