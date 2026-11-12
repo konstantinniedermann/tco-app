@@ -28,13 +28,13 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 |---|---|
 | **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b), **Etappe 1 freigegeben** (E-30) |
 | **Erledigte Schritte** | 01 Startpaket, 02 E2E-Flakes, 03 Vertragstests, 04 Hilfsmittel für Etappe 2, 05 Lint-Regeln für die Richtung der Importe (Kurzfassung in 7.2, Protokoll in Anhang C); 06 Grundbausteine in `http.ts` (Review «ok», Version 0.20.10; Ergebnis in 7.3, Protokoll in Anhang D.1) |
-| **Zuletzt erledigt** | **07** Zusammenbau der Dienste (`dienste.ts`): Review «ok» nach einer Korrekturrunde, Version 0.20.12 (Ergebnis in 7.3, Nachmessen in Anhang D.3, Protokoll in Anhang D.4). Davor 06a (Version 0.20.11, Anhang D.2) |
-| **Nächster offener Schritt** | **08** eine Fehlerform: Nachmessen erledigt am 12.11.2026 (Anhang D.5), Umsetzung nach Variante A von F-21 (vorläufig, siehe nächste Zeile). Danach 09 bis 12 in dieser Reihenfolge |
-| **Wartet auf Freigabe des Projektleiters** | **F-21, vorläufig vom Orchestrator gesetzt (12.11.2026, Projektleiter abwesend, Auftrag «arbeite selbstständig»):** Schritt 08 läuft nach Variante A (Zusatzangaben bleiben, je Wort in der Liste benannt); B bleibt danach möglich. Den Wortlaut der Übergangsregel «Ab Schritt 08» in `CLAUDE.md` ändert der Schritt nicht, er steht als Vorschlag in D.5 und braucht die Bestätigung des Projektleiters. Ebenso übergangen: das «ok» zum Checkpoint nach Schritt 07 (E-30); F-20 (Wortlaut «Ab Schritt 07», Abschnitt 9.1); Kenntnisnahme: der Import-Parser der Bauregel übersieht Importe mit Namen in Anführungszeichen (D.4, Korrekturrunde); Kenntnisnahme: die drei Dienst-Typen sind entgegen E-33 verschoben (D.4) |
+| **Zuletzt erledigt** | **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): umgesetzt am 12.11.2026 nach Variante A von F-21 (vorläufig), Review und Merge offen (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
+| **Nächster offener Schritt** | Review von **08** (Branch `refactor/schritt-08`), danach **09** (braucht Nachmessen vorab und die Antwort auf F-17). Danach 10 bis 12 in dieser Reihenfolge |
+| **Wartet auf Freigabe des Projektleiters** | **F-21, vorläufig vom Orchestrator gesetzt (12.11.2026, Projektleiter abwesend, Auftrag «arbeite selbstständig»):** Schritt 08 läuft nach Variante A (Zusatzangaben bleiben, je Wort in der Liste benannt); B bleibt danach möglich. Den Wortlaut der Übergangsregel «Ab Schritt 08» in `CLAUDE.md` ändert der Schritt nicht, er steht als Vorschlag in D.6 und braucht die Bestätigung des Projektleiters. Ebenso übergangen: das «ok» zum Checkpoint nach Schritt 07 (E-30); F-20 (Wortlaut «Ab Schritt 07», Abschnitt 9.1); Kenntnisnahme: der Import-Parser der Bauregel übersieht Importe mit Namen in Anführungszeichen (D.4, Korrekturrunde); Kenntnisnahme: die drei Dienst-Typen sind entgegen E-33 verschoben (D.4) |
 | **Offene Fragen** | **F-17** (Ablage der Verwaltungs-Schnittstellen ausserhalb von `admin/`): stellt der Orchestrator nach dem Nachmessen vor Schritt 09. **F-15** (Version, solange es Test nicht gibt): vor Schritt 23. **F-20** [neu] (für wen gilt die Übergangsregel «Ab Schritt 07»; Wortlaut der `CLAUDE.md`): zum Checkpoint nach Schritt 07. **F-21** [neu] (was eine Fehlerantwort neben `fehler` und `felder` enthalten darf; Wortlaut «Ab Schritt 08»): vor Schritt 08. Alle vier in Abschnitt 9.1 |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
 | **Vorab nachzumessen** | vor Schritt 09, 10, 11, 13, 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5). Schritte 06 und 06a brauchen keines |
-| **Nächster Checkpoint** | nach Schritt 07: Kurzbericht, weiter auf «ok» (E-30); so nach jedem Schritt der Etappen 1 und 2 |
+| **Nächster Checkpoint** | nach Schritt 08: Kurzbericht, weiter auf «ok» (E-30); so nach jedem Schritt der Etappen 1 und 2 |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32) |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
 
@@ -566,6 +566,11 @@ Aufwand oder birgt ein benennbares Risiko; **niedrig** = Schönheitsfehler oder 
   einzelner Name (Anlass, «vergeben»), `felder` als Liste (Mitteilungen; die Oberfläche hat
   dafür einen Übersetzer). Die 23 Fehlerwörter sind lose Zeichenketten; die Liste der
   Ablehnungsgründe der CM wird auf dem Server und in der Oberfläche getrennt gepflegt.
+- **Berichtigt (Nachmessen Schritt 08, Anhang D.5; Tabelle «Vorab nachzumessen» in 7.7):** Es sind
+  **41 Fehlerwörter**, nicht 23 (18 sendet der Server über eine Variable aus der Fachfunktion).
+  `vergeben` ist kein Eingabefehler (409), und dazu kommen Zusatzangaben zu einem Wort (F-21).
+  **Erledigt in Schritt 08 (Anhang D.6):** eine Liste in `src/lib/fehler.ts`, `felder` immer
+  «Feldname → Satz», 401 immer mit `abgemeldet`; Zusatzangaben bleiben, je Wort benannt.
 
 #### B-16 — Zustand im Arbeitsspeicher des Prozesses · niedrig · [G] (Absicht: [V])
 
@@ -791,7 +796,9 @@ ihm im Weg steht.
   die `schnittstellen.db.test.ts` (prüfen dieselben Formen von der anderen Seite, z. B.
   `{ fehler: 'eingabe', feld: 'bemerkung' }` in `anlass/schnittstellen.db.test.ts`);
   12 Stellen in den E2E-Tests, an denen die Antwort des Servers gestellt ist (`page.route`,
-  z. B. «letzter MyTCO-Admin» und «503» in `tests/e2e/verwaltung.test.ts`).
+  z. B. «letzter MyTCO-Admin» und «503» in `tests/e2e/verwaltung.test.ts`). **Berichtigt
+  (Anhang D.5; Tabelle «Vorab nachzumessen» in 7.7):** 13 Stellen, davon tragen drei ein
+  Fehlerwort.
 - **Beobachtung:** Die Typen der Daten teilen sich beide Seiten (gut). Adressen, Methoden und
   Fehlerwörter teilen sie nicht: Sie stehen als Zeichenketten je einmal im Server, in der
   Oberfläche und in zwei Testsätzen.
@@ -799,6 +806,10 @@ ihm im Weg steht.
   beide Testsätze grün, weil jeder seine eigene Annahme prüft. Auffallen würde es nur, wenn ein
   E2E-Test genau diesen Fehlerweg echt durchläuft. Abhilfe in Schritt 08: eine gemeinsame Liste
   der Fehlerwörter, die Server, Oberfläche und beide Testsätze importieren.
+- **Für die Fehlerwörter erledigt in Schritt 08 (Anhang D.6):** Server (`antwort`), Abruf-Module
+  und die gestellten Antworten der Einheitstests und der drei `page.route`-Stellen sind gegen
+  `src/lib/fehler.ts` getippt; ein Wort oder eine Form, die nur eine Seite kennt, macht
+  `svelte-check` rot. Adressen und Methoden teilen die Seiten weiter nicht.
 
 #### B-30 — Mitglieder-Schnittstellen haben keine Liste und keine durchgehende Grundprüfung · niedrig · [G]
 
@@ -1310,7 +1321,7 @@ bewusst nicht. Protokoll: Anhang C.5.
 | 06 | [geändert] Grundbausteine der Schnittstellen an einem Ort (`http.ts`); Duplikate entfernt (B-12, B-38). Streicht acht Ausnahmen in `AUSNAHMEN`. An drei Stellen (`mitKonto`, `aendernd`, `jetzt`) ist es kein reines Verschieben: Der Schritt legt die Form fest und begründet sie. `http.ts` importiert nur `db/`. Einzelheiten: Hinweise zu Schritt 06 | neu `src/lib/server/http.ts`; `src/lib/server/*/schnittstellen.ts`, `login/passkey-schnittstellen.ts`, `admin/ansicht.ts`; die Tests, die `antwort` oder `Ereignis` aus `login/schnittstellen.ts` holen; `eslint.config.js` (`AUSNAHMEN`). Nicht betroffen: Routen, `src/hooks.server.ts`, `bauregel.ts` | Eine Stelle statt sechs; `login` ist nicht mehr Unterbau aller Module | niedrig | Schritt 03 (Grundprüfung, Routen-Test) grün vor und nach; kein geändertes Verhalten; Lint grün ohne Regeländerung. **[neu] Charakterisierungstest vorab:** «ohne Sitzung und ohne JSON antwortet 415» für eine schreibende Schnittstelle der Mitglieder | 03, 05 (erledigt) | Opus | Subagent | nein | **erledigt** 11.11.2026 (Test-Commit `17d71cf`, sieben `refactor:`-Commits; Review «ok»; Merge `81745c1`, Version 0.20.10). Ergebnis unten, Protokoll Anhang D.1 |
 | 06a | [neu] **Rechteprüfung und Dienst-Typen stehen nicht mehr in Schnittstellen-Dateien (E-28).** `mitRolle`, `liest`, `schreibt` und die Typen `AdminDienste`, `AdminEreignis`, `AdminUrheber` ziehen nach `admin/rechte.ts` (Arbeitstitel); `MitteilungAdminDienste`, `CmDienste`, `CmEreignis` in eine Nicht-Schnittstellen-Datei ihres Moduls. Reines Verschieben: Die Rechteprüfung bleibt an einer Stelle und unverändert. Streicht die sieben Ausnahmen «ohne Schritt». Branch `refactor/schritt-06a`. Einzelheiten: Hinweise zu Schritt 06a | `src/lib/server/admin/`, `mitteilung/`, `cm/`, `gespraech/`, `turnier/` (Importe), ihre Tests, `eslint.config.js` (`AUSNAHMEN`) | Die Schritte 07, 09 und 11 brauchen keine neue Ausnahme; Schritt 12 kann die Liste leeren | niedrig (Verschieben innerhalb der Module) | Unverändert grün: Rechte-Matrix, `admin/schnittstellen.db.test.ts`, `turnier/schnittstellen.db.test.ts`, `mitteilung/admin-schnittstellen.db.test.ts`, Grundprüfung, Routen-Test; die Lint-Probe «Ausnahme ist noch nötig». Der Reviewer prüft, dass `mitRolle` bis auf den Ort gleich ist | 06 | Opus | Subagent | nein | **erledigt** 11.11.2026, Review «ok», Version 0.20.11 (Branch `refactor/schritt-06a`, vier `refactor:`-Commits `4db07da`, `17100d6`, `fc77d1b`, `2ccbbca`, kein Test-Commit). Ergebnis unten, Protokoll Anhang D.2 |
 | 07 | [geändert] Ein Zusammenbau der Dienste (`dienste.ts`): Mail- und Push-Versender entstehen nur dort, Bremsen einmal (B-13). Die Einstiege bleiben träge. `dienste.ts` wird in der Lint-Regel die oberste Schicht, in beide Richtungen. Einzelheiten: Hinweise zu Schritt 07 | [geändert] neu `src/lib/server/dienste.ts`; die sechs `index.ts` (fallen weg; `db/index.ts` bleibt); 87 der 90 `+server.ts` (Import-Zeile; `/api/sitzung`, `/api/status` und `/api/kontakt` nicht); `src/hooks.server.ts` (nur `holeLoginDienst`; `holeDb` bleibt in `db/`); `login/schnittstellen.db.test.ts`, `routen.test.ts` (Import-Zeilen); neu ein Test für `MAIL_NUR_AN` neben `src/routes/api/bremsen.db.test.ts`; `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`; `eslint.config.js` und `scripts/importrichtung.test.ts`; die drei Dienst-Typen, die noch in einer `schnittstellen.ts` stehen (Anhang D.3) | Überblick, was der Server braucht; [geändert] zwei Mail-Versender (einer mit Pool) statt fünf, ein Push-Versender statt zwei | mittel (Lebensdauer der Einzelstücke, Bremsen müssen geteilt bleiben) | E2E Login, Profil, Mitteilungen, CM; DB-Tests der Schnittstellen; `tests/e2e/cookie.test.ts`; Routen-Test und Bremsen-Test. **[neu] Charakterisierungstest vorab:** Mit gesetztem `MAIL_NUR_AN` geht jede Mail über jeden Einstieg nur an diese Adresse. **[geändert] Bauregel:** je geändertes Muster ein Fall in `bauregel.test.ts`, einmal rot; der Reviewer liest den Diff an `bauregel.ts` ganz. **[geändert]** Dazu der Fall «Route ausserhalb von `api/admin/` holt `holeAdminDienste` aus `dienste.ts`»; der Reviewer prüft die Exportliste von `dienste.ts` (Anhang D.3) | 06, 06a | Opus | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.3).** War: `mitteilung/`, `profil/`, `gespraech/` sind nur in Auszügen gelesen; vorab klären, welche Einzelstücke Zustand tragen (Bremsen, Passkey-Anfragen, E-Mail-Wechsel, SMTP-Pool) | **erledigt** 12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.12 (Branch `refactor/schritt-07`: `test:` `bc111d6`, `refactor:` `bad5f36` und `a3ab6b5`; Korrekturrunde nach dem Review `1193548`, `06cf0d2`, `51fae98`). Ergebnis unten, Protokoll Anhang D.4 |
-| 08 | [geändert] Eine Fehlerform und eine Liste der Fehlerwörter; Oberfläche im selben Schritt angepasst (B-15, B-29). Dazu gehört das 401 mit `{}` von Passkey und `getSitzung`. **[geändert]** Was neben `fehler` und `felder` im Körper stehen darf, ist F-21; die Ergebnisse der Abruf-Module bleiben in diesem Schritt gleich (Anhang D.5). Einzelheiten: Hinweise zu Schritt 08 | `src/lib/server/*/schnittstellen.ts`, `login/passkey-schnittstellen.ts` und `login/schnittstellen.ts` (401 `{}`) mit ihren Gegenstücken in der Oberfläche; neue geteilte Datei für die Fehlerwörter; `src/lib/anlass/api.ts`, `src/lib/verwaltung/mitteilung-api.ts`, `src/lib/cm/api.ts`; `grundpruefung.db.test.ts` (`OHNE_SITZUNG_ANDERS`); betroffene Tests. **[geändert]** Dazu `src/lib/server/http.ts` (dort wird die Form zum Typ), `admin/rechte.ts`, `src/lib/verwaltung/api.ts`, `push/api.ts`, `profil/angaben.ts`, `login/anmelden.ts`, die neun Einheitstests der Abruf-Module, `tests/e2e/anlass.test.ts` und `verwaltung.test.ts` (drei Stellen). Keine Seite, keine Route; für das 401 `{}` ändert sich keine Datei der Oberfläche (Anhang D.5) | Voraussetzung für Schritt 13; ein Übersetzer entfällt | mittel (Verhaltensänderung an internen Schnittstellen) | Schritt 03 wird bewusst an genau diesen Stellen angepasst; E2E Anlass und Mitteilungen. **[geändert]** Server und Abruf-Module sind beide gegen die gemeinsame Liste getippt (ein fehlendes Wort macht `svelte-check` rot); Einheitstests der Abruf-Module und die `page.route`-Stellen der Prüfliste (b) nehmen ihre Wörter aus der Liste, nicht als Text. **[geändert]** «Aus der Liste» heisst: gegen die Liste getippt (Helfer der Tests). Die genannten E2E laufen die geänderten Fehlerwege nicht ab; das Netz sind die Tests der Module beider Seiten, in denen nur die gefütterte Antwort wechselt, nicht das erwartete Ergebnis. Für `getSitzung` zuerst eine Erwartung an den Körper (Anhang D.5) | 06 (E-18: Format darf sich ändern, Server und Oberfläche im selben Schritt) | Opus | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.5).** War: vollständige Liste aller Abweichungen von der Fehlerform über alle `schnittstellen.ts` und alle Abruf-Module; die Stellen mit `page.route` aus der Prüfliste (b) in 7.4 (Pfade und Fehlerwort); welche Dateien der Oberfläche das 401 `{}` deuten | offen |
+| 08 | [geändert] Eine Fehlerform und eine Liste der Fehlerwörter; Oberfläche im selben Schritt angepasst (B-15, B-29). Dazu gehört das 401 mit `{}` von Passkey und `getSitzung`. **[geändert]** Was neben `fehler` und `felder` im Körper stehen darf, ist F-21; die Ergebnisse der Abruf-Module bleiben in diesem Schritt gleich (Anhang D.5). Einzelheiten: Hinweise zu Schritt 08 | `src/lib/server/*/schnittstellen.ts`, `login/passkey-schnittstellen.ts` und `login/schnittstellen.ts` (401 `{}`) mit ihren Gegenstücken in der Oberfläche; neue geteilte Datei für die Fehlerwörter; `src/lib/anlass/api.ts`, `src/lib/verwaltung/mitteilung-api.ts`, `src/lib/cm/api.ts`; `grundpruefung.db.test.ts` (`OHNE_SITZUNG_ANDERS`); betroffene Tests. **[geändert]** Dazu `src/lib/server/http.ts` (dort wird die Form zum Typ), `admin/rechte.ts`, `src/lib/verwaltung/api.ts`, `push/api.ts`, `profil/angaben.ts`, `login/anmelden.ts`, die neun Einheitstests der Abruf-Module, `tests/e2e/anlass.test.ts` und `verwaltung.test.ts` (drei Stellen). Keine Seite, keine Route; für das 401 `{}` ändert sich keine Datei der Oberfläche (Anhang D.5) | Voraussetzung für Schritt 13; ein Übersetzer entfällt | mittel (Verhaltensänderung an internen Schnittstellen) | Schritt 03 wird bewusst an genau diesen Stellen angepasst; E2E Anlass und Mitteilungen. **[geändert]** Server und Abruf-Module sind beide gegen die gemeinsame Liste getippt (ein fehlendes Wort macht `svelte-check` rot); Einheitstests der Abruf-Module und die `page.route`-Stellen der Prüfliste (b) nehmen ihre Wörter aus der Liste, nicht als Text. **[geändert]** «Aus der Liste» heisst: gegen die Liste getippt (Helfer der Tests). Die genannten E2E laufen die geänderten Fehlerwege nicht ab; das Netz sind die Tests der Module beider Seiten, in denen nur die gefütterte Antwort wechselt, nicht das erwartete Ergebnis. Für `getSitzung` zuerst eine Erwartung an den Körper (Anhang D.5) | 06 (E-18: Format darf sich ändern, Server und Oberfläche im selben Schritt) | Opus | Subagent | [geändert] **erledigt 12.11.2026 (Anhang D.5).** War: vollständige Liste aller Abweichungen von der Fehlerform über alle `schnittstellen.ts` und alle Abruf-Module; die Stellen mit `page.route` aus der Prüfliste (b) in 7.4 (Pfade und Fehlerwort); welche Dateien der Oberfläche das 401 `{}` deuten | **umgesetzt** 12.11.2026, Review und Merge offen (Branch `refactor/schritt-08`: `refactor:` `ec52ab7`, `eb054ab`, `c8ef953`, `8cf5734`, `ae408d7`, `404eaca`). Ergebnis unten, Protokoll Anhang D.6 |
 | 09 | [geändert] Verwaltung der Anlässe liegt beim Thema Anlass (B-14), nach dem Muster aus F-17. Streicht keine Ausnahme und braucht keine neue (`liest` und `schreibt` kommen seit 06a aus `admin/rechte.ts`). Der Schritt ändert den Schutz der Bauregel, nicht nur feste Pfade. Einzelheiten: Hinweise zu Schritt 09 | `src/lib/server/admin/schnittstellen.ts`, `src/lib/server/anlass/`, Routen `src/routes/api/admin/anlaesse/`, `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`, `rechte-matrix.db.test.ts`, `grundpruefung.db.test.ts`, `routen.test.ts` | `admin/schnittstellen.ts` wird kleiner; Thema an einem Ort | **mittel** (vorher niedrig: neue Verwaltungs-Liste, Bauregel) | **[neu] Charakterisierungstest vorab (erster Commit):** eine Schleife «ohne Sitzung 401, ohne Rolle 403 `kein-admin`, unbestätigt 403 `unbestaetigt`» über **alle** Verwaltungs-Listen an einer Stelle (Grundprüfung, `verwaltungsDienste()`), mit den vier benannten Ausnahmen. Dazu Rechte-Matrix-Test, `tests/e2e/anlass.test.ts`, Routen-Test und Grundprüfung; je geändertes Muster der Bauregel ein Fall in `bauregel.test.ts`, einmal rot; der Reviewer liest den Diff an `bauregel.ts` ganz | 06a, 07; **F-17 beantwortet** | Opus | Subagent | **ja:** die zwei Muster für Verwaltungs-Schnittstellen ausserhalb von `admin/` am Code gegenüberstellen (eigene Datei je Modul mit eigener Liste, oder gemischte Datei mit Namens-Wächter) und was jedes an `bauregel.ts` ändert; Ergebnis ist die Grundlage für F-17 | offen |
 | 10 | [geändert] `login` hängt nicht mehr von `admin` und `gespraech` ab: Die Antwort von `/api/sitzung` wird ausserhalb von `login` gebaut (B-14); der Typ `AnsichtRolle` zieht nach unten (`login/` oder `db/`). Streicht drei Ausnahmen. Einzelheiten: Hinweise zu Schritt 10 | `src/lib/server/login/schnittstellen.ts` → `getSitzung` (neuer Ort nach dem Nachmessen), `login/sitzung.ts`, `admin/rollen.ts`, Route `src/routes/api/sitzung/+server.ts`, `scripts/importrichtung.test.ts`, `eslint.config.js` (`AUSNAHMEN`), Tests | Ein Zyklus weniger; Login ist wieder unterste Schicht | niedrig | `login/schnittstellen.db.test.ts` (zieht mit), Routen-Test (`OHNE_LISTE`), E2E Startseite und Navigation | 06 | **Opus** (vorher Sonnet), solange das Ziel für `getSitzung` nicht feststeht | Subagent | **ja (kurz):** den Ort für `getSitzung` festlegen (Bedingungen in den Hinweisen); kein Entscheid des Projektleiters nötig | offen |
 | 11 | [geändert] Schnitt nach E-12, nur die klaren Fälle: Die Schnittstellen der CM-Anmeldungsverwaltung ziehen von `turnier/schnittstellen.ts` zu `cm`, die des Gesprächs bekommen in `gespraech` ihre eigene Liste (sie liegen schon dort). `admin/` wird nicht aufgeteilt. Muster wie Schritt 09 (F-17). Streicht die Ausnahme `turnier/schnittstellen.ts` → `gespraech/schnittstellen.ts`. Einzelheiten: Hinweise zu Schritt 11 | `src/lib/server/turnier/schnittstellen.ts`, `cm/`, `gespraech/`, Routen unter `src/routes/api/admin/`, `scripts/pruefungen/bauregel.ts` und `bauregel.test.ts`, `rechte-matrix.db.test.ts`, `grundpruefung.db.test.ts`, `routen.test.ts`, `eslint.config.js` (`AUSNAHMEN`) | Ordnername sagt, wo etwas liegt | mittel (viele Routen, Prüfskript) | Rechte-Matrix-Test, alle `cm-*`-E2E, `turnier.test.ts`; Routen-Test und Grundprüfung mit der Schleife aus Schritt 09 über die neuen Listen; je geändertes Muster der Bauregel ein Fall in `bauregel.test.ts`, einmal rot | 06a, 07, 09 (E-12; Muster nach F-17) | Opus | Subagent | ja: `turnier/schnittstellen.ts` (ab Zeile 110), `gespraech/schnittstellen.ts` und `cm/verwaltung*.ts` sind nur in Auszügen gelesen; vorab die genaue Zuordnung der 26 Einträge von `TURNIER_SCHNITTSTELLEN` festhalten | offen |
@@ -1498,6 +1509,15 @@ die Folgeschritte»); das Wichtigste ist hier je Schritt wiederholt.
   Typisierung und Reihenfolge der Commits stehen dort. **Offen: F-21** (was neben `fehler` und
   `felder` im Körper stehen darf).
 
+**Ergebnis Schritt 08** (12.11.2026; umgesetzt nach Variante A von F-21, vorläufig; Review und
+Merge offen)
+
+- **Wo jetzt was liegt:** `src/lib/fehler.ts` (importiert nichts) hat die 41 Fehlerwörter, `istFehlerwort`, die Fehler-Status und den Typ `Fehlerkoerper` (`{ fehler, felder? }` und die Zusatzangaben von neun Wörtern). `antwort` in `http.ts` nimmt bei einem Fehler-Status nur diesen Typ an; dort neu `abgemeldet`. Die 18 von Hand geschriebenen Standardantworten kommen aus `http.ts`.
+- **Form:** 401 trägt überall `abgemeldet` (Passkey prüft weiter mit `angemeldet`); Anlass und Mitteilungen antworten `felder` als «Feldname → Satz» (Sätze in `anlass/angaben.ts` bzw. `src/lib/mitteilung/vorlagen.ts`); `mitMeldungen` entfällt. `vergeben` mit `feld` und die übrigen Zusatzangaben bleiben (Variante A).
+- **Oberfläche:** Die Abruf-Module lesen `fehler` über die Liste, ihre Ergebnisse sind gleich; keine Seite und keine Route geändert. Für die Nutzerin ändert sich nichts.
+- **Netz belegt:** Ein verschriebenes oder fehlendes Wort und jede abgebaute Form machen `svelte-check` auf Server, Modul, Einheitstest und E2E rot; die neuen Erwartungen der Datenbanktests waren gegen den alten Server rot (D.6). `OHNE_SITZUNG_ANDERS` hat nur noch die drei gewollten Ausnahmen.
+- **Folgt daraus:** 13 kann sich darauf verlassen, dass jede Fehlerantwort ein Wort der Liste trägt. Den Wortlaut «Ab Schritt 08» entscheidet der Projektleiter mit F-21 (Vorschlag in D.6).
+
 **Hinweise zu Schritt 09** [geändert]
 
 - **Warum Risiko mittel und Nachmessen:** (1) Die Menge der Verwaltungs-Listen führen fünf Stellen
@@ -1580,7 +1600,7 @@ Ergebnis der Zwischenrevision, aus dem Code gelesen, nichts ausgeführt.
 | 06 | Grundprüfung (401 über 36, 415 über 26 und 42, je mit Körper und `no-store`), Tests der Module, `ansicht.db.test.ts` für den Riegel | Reihenfolge «415 vor 401» ohne Sitzung (darum der Test in Schritt 06); der Hook selbst hat keinen eigenen Test, er läuft nur in E2E mit [E] |
 | 06a | Rechte-Matrix und die Schleifen je Liste; die Lint-Probe «Ausnahme ist noch nötig» | nichts Benennbares |
 | 07 | Routen-Test (Funktion, Einstieg, Einzelstück), Bremsen-Test (Wirkung über vier Wege), E2E | Umleitung `MAIL_NUR_AN` je Weg (darum der Test in Schritt 07); welcher Versender (einzeln oder Pool) einen Weg bedient; die Fehlergrenzen für Passkey, Brief und Mail-Code und die Mitteilungs-Verwaltung (Anhang C.2) |
-| 08 | Grundprüfung (Körper je Antwort), Tests der Module | Wort auf dem Server geändert, in der Oberfläche nicht (B-29; Absicherung von Schritt 08) |
+| 08 | Grundprüfung (Körper je Antwort), Tests der Module | Wort auf dem Server geändert, in der Oberfläche nicht (B-29; Absicherung von Schritt 08). **Nachtrag Schritt 08:** für Wörter und Formen durch die gemeinsame Liste geschlossen; Feldnamen in `felder` und der innere Aufbau der Zusatzangaben bleiben offen (D.6) |
 | 09, 11 | Routen-Test: Admin-Routen rufen nur Einträge der Verwaltungs-Listen, andere Routen nie (das Gegenstück zur Bauregel als Verhalten); Rechte-Matrix für die bekannten Listen | Eine **neue** Liste steht in keiner 401/403-Schleife und nicht in der Rechte-Matrix, bis jemand sie einträgt (darum der Test in Schritt 09); eine zu weit gefasste Bauregel fällt nur an `bauregel.test.ts` auf |
 | 10 | `login/schnittstellen.db.test.ts` (zieht mit), Routen-Test (`OHNE_LISTE`), E2E Startseite | `getSitzung` steht in keiner Liste; ihr 401 prüft nur ihr eigener Test |
 
@@ -1761,7 +1781,7 @@ sie auf oder verwirft sie ausdrücklich im Bericht:
 | Schritt | Was | Folge |
 |--------:|-----|-------|
 | 07 | welche Einzelstücke Zustand tragen | Schnitt von `dienste.ts` |
-| 08 | alle Abweichungen von der Fehlerform; `page.route`-Stellen; Deutung des 401 `{}` in der Oberfläche | Umfang des Schritts |
+| 08 | alle Abweichungen von der Fehlerform; `page.route`-Stellen; Deutung des 401 `{}` in der Oberfläche | Umfang des Schritts. **Erledigt** 12.11.2026 (Anhang D.5): 41 Wörter (B-15 nannte 23), 13 `page.route`-Stellen (B-29 nannte 12) |
 | 09 [neu] | die zwei Muster für Verwaltungs-Schnittstellen ausserhalb von `admin/` | danach stellt der Orchestrator **F-17** |
 | 10 [neu] | Ort für `getSitzung` (kurz) | kein Entscheid des Projektleiters nötig |
 | 11 | Zuordnung der 26 Einträge von `TURNIER_SCHNITTSTELLEN` | Umfang des Schritts |
@@ -1770,7 +1790,7 @@ sie auf oder verwirft sie ausdrücklich im Bericht:
 | 20 | ungenutzte Exporte je Name bestätigen | Liste des Schritts |
 | 23 | `release.ts`, `gruener-stand.ts`, Abschnitt «Versionen» | davor **F-15** |
 
-Erledigt: Nachmessen für Schritt 04 (Anhang C.3). Kein Nachmessen: 06, 06a, 12, 14 bis 18, 21, 22,
+Erledigt: Nachmessen für Schritt 04 (Anhang C.3), 07 (Anhang D.3), 08 (Anhang D.5). Kein Nachmessen: 06, 06a, 12, 14 bis 18, 21, 22,
 24, 25.
 
 **Checkpoints [geändert]** (für die Etappen 1 und 2 entschieden mit E-26 und E-30):
@@ -1865,6 +1885,9 @@ genommen verbietet die Regel «eine Fehlerform `{ fehler, felder? }`» diese Ang
 - **Empfehlung: A.** Die Zusatzangaben sind Daten zu einem Wort, kein zweites Format; Schritt 13
   braucht nur, dass jede Fehlerantwort ein Wort aus der Liste trägt. B lässt sich später
   nachholen, weil es auf A aufbaut.
+- **Stand:** Schritt 08 ist nach A umgesetzt (vorläufig vom Orchestrator gesetzt, Anhang D.6); B
+  bleibt möglich. Offen sind die Bestätigung von A und der Wortlaut der Übergangsregel (Vorschlag
+  in D.6).
 
 **F-17 [neu, OFFEN] — Wie liegen Verwaltungs-Schnittstellen ausserhalb von `admin/` (Schritte 09,
 11)?** (B-14, B-37, A-18)
@@ -3778,4 +3801,152 @@ baut auf A auf, C ist eine andere Form; ohne Antwort ist darum nur A ohne Folgen
 - **Nicht nachgeführt:** Die Zeile «Nächster offener Schritt» oben sagt weiter «braucht Nachmessen
   vorab», die Tabelle «Vorab nachzumessen» in 7.7 nennt Schritt 08 weiter, B-15 und B-29 nennen
   weiter 23 Wörter und zwölf Stellen (der Auftrag liess sonst nichts umschreiben). Erledigt ist
-  das Nachmessen laut Zeile 08 und diesem Abschnitt.
+  das Nachmessen laut Zeile 08 und diesem Abschnitt. *(Nachgeführt mit Schritt 08, Anhang D.6.)*
+
+### D.6 Schritt 08
+
+**Erkenntnisse Schritt 08** (12.11.2026, Branch `refactor/schritt-08`, ab `6c6dd27` und dem
+Doku-Commit `898341b`; F-21 nach Variante A, vorläufig vom Orchestrator gesetzt)
+
+- **Commits:** `ec52ab7` `refactor:` `src/lib/fehler.ts` und der Typ an `antwort`; `eb054ab`
+  `refactor:` Abruf-Module und gestellte Antworten der Tests gegen die Liste; `c8ef953`
+  `refactor:` die 18 Standardantworten von Hand aus `http.ts` (neu dort `abgemeldet`); `8cf5734`
+  `refactor:` 401 `{}` wird `abgemeldet`; `ae408d7` `refactor:` Anlass; `404eaca` `refactor:`
+  Mitteilungen, `mitMeldungen` weg. Dazu dieser `docs:`-Commit. Sieben Commits wie in D.5, jeder
+  mit dem Hook `check-schnell` und zusätzlich von Hand mit den Datenbanktests (ab Commit 3) grün.
+  36 Dateien (D.5: rund 34), keine `.svelte`-Datei, keine `+server.ts`, keine Änderung an
+  `eslint.config.js` oder `AUSNAHMEN`, `CLAUDE.md` unverändert.
+- **`src/lib/fehler.ts`** (importiert nichts): `FEHLERWOERTER` (die 41 Wörter aus D.5, nach Status
+  geordnet), `Fehlerwort`, `istFehlerwort`, `FehlerStatus` (400, 401, 403, 404, 409, 415, 429),
+  `Feldmeldungen` («Feldname → Satz»), `WortOhneZusatz` und `Fehlerkoerper`. Die Zusatzangaben
+  stehen je Wort im privaten Typ `Zusatz`: `eingabe` (`fremd?`), `benutzt` (`kontakt`),
+  `vergeben` (`feld`), `datei` (`datei`), `nicht-moeglich`, `unpassend`, `hat-anmeldungen`
+  (`anzahl`), `warnung` (`warnungen`), `inzwischen` (`gespraech`). `felder` ist bei jedem Wort
+  erlaubt; damit verbaut nichts Variante B (`vergeben` mit `felder`). Weil die Datei nichts
+  importiert, sind die grossen Zusatzangaben nur grob getippt (`datei: object`,
+  `gespraech: object | null`, `warnungen: readonly string[]`).
+- **Typ an `antwort`** (`http.ts`, zwei Überladungen): Fehler-Status nur mit `Fehlerkoerper`,
+  Erfolg (200, 201, 202, 204) wie bisher mit beliebigem Körper. Ein Fehler-Status ohne Körper, ein
+  anderer Status oder ein Wort aus einer `string`-Variablen sind Typfehler. Die Vermutung aus D.5
+  [V] ist damit bestätigt, mit zwei Ergänzungen (Abweichungen 2 und 3 unten).
+- **Abruf-Module:** `anlass`, `cm`, `push`, `verwaltung`, `profil/angaben.ts`, `login/anmelden.ts`
+  lesen `fehler` einmal über `istFehlerwort` und vergleichen danach nur noch mit Wörtern der
+  Liste; ein verschriebenes Wort ist ein Typfehler. `ABGELEHNT` in `src/lib/cm/api.ts` ist mit
+  `satisfies readonly Fehlerwort[]` gegen die Liste getippt, `FEHLER` in `cm/schnittstellen.ts`
+  über den neuen Typwächter `istAbgelehnt` und `antwort`. `login/passkey.ts` und
+  `login/sitzung.ts` lesen kein Wort und sind unverändert.
+- **Gestellte Antworten der Tests:** Der Helfer `json` in acht Einheitstests nimmt bei einem
+  Fehler-Status nur einen `Fehlerkoerper` an (`Koerper<S>`, bedingter Typ über den Status);
+  Hüllen wie `ergebnis(status, inhalt)` sind dafür generisch. `push/geraet.test.ts` und die drei
+  `page.route`-Stellen mit Fehlerwort (`anlass.test.ts:147`, `verwaltung.test.ts:208`, `:587`)
+  tippen den Körper mit `satisfies Fehlerkoerper`. Vier Antworten sind absichtlich falsch und
+  laufen über den Helfer `ungeprueft`: die drei unbekannten Wörter (`unbekannt`, `anderes`,
+  `sonst`) und `warnung` ohne Liste.
+- **Formänderungen (Server und Oberfläche je im selben Commit):**
+  - 401: Passkey (`postEinrichtenOptionen`, `postEinrichten`, `getPasskeys`, `postEntfernen`,
+    `postHinweis`) und `getSitzung` antworten `{ fehler: 'abgemeldet' }`. Der Passkey prüft weiter
+    mit `angemeldet` (Konto und Cookie), nicht mit `mitSitzung`. `nichtAngemeldet` entfällt.
+  - Anlass: `postAnmeldung` antwortet `felder: { antwort | bemerkung: Satz }`. Die zwei Sätze
+    stehen als `ANTWORT_MELDUNG` in `src/lib/server/anlass/angaben.ts`, gleich lautend wie auf der
+    Seite; `pruefeAntwort` ist unverändert, die Schnittstelle setzt den Satz ein.
+    `src/lib/anlass/api.ts` liest das Feld aus `felder` (`feldAus`) und gibt wie bisher
+    `{ art: 'eingabe', feld }` zurück.
+  - Mitteilungen: die vier Schnittstellen antworten `felder: { Feld: Satz }`. Die vier Sätze
+    stehen als `FELD_MELDUNG` in `src/lib/mitteilung/vorlagen.ts` neben `MAX_TITEL` und `MAX_TEXT`;
+    `pruefeMitteilung` gibt weiter die Liste der Namen, die Schnittstelle setzt die Sätze ein.
+    `mitMeldungen` und die Liste der Sätze in `mitteilung-api.ts` entfallen.
+  - Die Altformen 1 bis 3 standen ab Commit 1 im Typ und fielen je mit ihrem Commit weg; seit
+    `404eaca` gibt es keine mehr.
+- **Rot belegt** (je aus einer Sicherungskopie zurückgesetzt, `git status` danach sauber):
+  - Commit 1, `svelte-check`: `veraltett` in `profil/schnittstellen.ts` → 1 Fehler; dazu eine
+    Probedatei mit fünf Fällen → je ein Fehler: `vergeben` ohne `feld`, `veraltet` mit `anzahl`,
+    `gleich` mit `feld`, 403 ohne Körper, Wort aus einer `string`-Variablen. 6 Fehler in 2
+    Dateien.
+  - Commit 2, `svelte-check`: `letzter-mytko` in `verwaltung/api.test.ts`, `veraltt` in
+    `tests/e2e/verwaltung.test.ts`, `frist-abgelaufn` als Vergleich in `verwaltung/api.ts` → 3
+    Fehler in 3 Dateien. Vorher hatte der getippte Helfer genau die vier absichtlich falschen
+    Antworten gemeldet (darum `ungeprueft`).
+  - Commit 4, gegen den alten Server: Grundprüfung «ohne Sitzung 401» rot
+    (`passkey.postEinrichtenOptionen`: erwartet `{ fehler: 'abgemeldet' }`, erhalten `{}`) und
+    `GET /api/sitzung` rot («expected {} to deeply equal { fehler: 'abgemeldet' }»); 2 von 38.
+  - Commit 5, gegen den alten Stand: `anlass/schnittstellen.db.test.ts` 2 von 8 rot (zu lange
+    Bemerkung, ungültige Antwort), `anlass/api.test.ts` 1 von 3 rot («expected { art: 'stoerung' }
+    to deeply equal { art: 'eingabe', feld: 'bemerkung' }»).
+  - Commit 6, gegen den alten Server: `admin-schnittstellen.db.test.ts` 2 von 10 rot. Der
+    Einheitstest von `mitteilung-api.ts` mit der neuen Form war schon auf dem alten Stand grün
+    (`mitMeldungen` liess ein Objekt durch); das belegt, dass die neue Form dasselbe Ergebnis gibt.
+  - Nach Commit 6, `svelte-check`: Server mit `feld` (Anlass) bzw. mit der Liste (Mitteilungen)
+    und ein Test, der die Liste füttert → 3 Fehler in 3 Dateien. Damit ist das falsche Grün aus
+    B-29 für diese Formen zu: Eine Seite allein lässt sich nicht mehr ändern.
+- **Prüfläufe:** jeder Commit mit dem Hook `check-schnell` (Einheitstests 95 Dateien, 1166 Tests);
+  Datenbanktests von Hand nach den Commits 3 bis 6 (54 Dateien, 739 bzw. ab Commit 5 740 Tests).
+  Voller `make check` auf dem Code-Endstand `404eaca`: Exit 0 (Lint; `svelte-check` 1523 Dateien
+  ohne Fehler; Prüfskripte samt `bauregel: ok`; Einheits- und Datenbanktests 149 Dateien mit 1906
+  Tests, Abdeckung 97,07 % Anweisungen und 93,56 % Zweige; beide Builds; E2E 414 bestanden, 57
+  übersprungen, 3,6 Minuten; Image; grüner Stand `12cfb50766ef` gemerkt). Auf dem Doku-Commit
+  läuft `make check` noch einmal voll; sein Ergebnis steht im Bericht an den Orchestrator (der
+  Code ist derselbe, der grüne Stand zählt Doku nicht mit).
+- **Abweichungen von D.5:**
+  1. **`getSitzung` war am Körper festgehalten:** `login/schnittstellen.db.test.ts:230` erwartet
+     seit #29 `toEqual({})`. D.5 nannte nur die Zeilen mit dem Status. Die «neue Erwartung» ist
+     darum diese Zeile, auf `{ fehler: 'abgemeldet' }` umgestellt und gegen den alten Server rot;
+     ein eigener `test:`-Commit war nicht nötig. Am Plan ändert das nichts, das Netz war dichter
+     als gemessen.
+  2. **Drei Stellen statt einer brauchten einen engeren Typ:** neben `ablehnung` (Typwächter) auch
+     `uebergang` und `mitRueckzug` in `admin/schnittstellen.ts`, deren Wort aus einer generischen
+     Fachfunktion kommt (`E extends string` → `E extends WortOhneZusatz`).
+  3. **Ein Glied für die Wörter ohne Zusatz:** TypeScript prüft ein Objekt mit einem
+     zusammengesetzten Wort (`{ fehler: r }`) gegen eine Vereinigung nur bis 25 Kombinationen. Darum
+     stehen die Wörter ohne Zusatz in einem Glied `{ fehler: WortOhneZusatz; felder? }`, die neun
+     mit Zusatz je in einem eigenen.
+  4. **Zwei weitere gestellte Antworten mit `{}`:** `push/api.test.ts` (401) und
+     `verwaltung/api.test.ts` (404) fütterten `{}`, eine Form, die der Server dort nie sendete.
+     Mit Altform 1 fiel sie aus dem Typ; die Antworten tragen jetzt das Wort des Servers, das
+     erwartete Ergebnis ist gleich.
+  5. **Die Sätze der Mitteilungen in den Tests:** D.5 sah vor, dass beide Testsätze sie aus
+     `FELD_MELDUNG` nehmen. Der Datenbanktest erwartet sie wörtlich (so fällt eine Änderung am
+     Wortlaut auf), der Einheitstest füttert sie aus `FELD_MELDUNG` und erwartet die Sätze wie
+     bisher wörtlich.
+  6. **Anlass, strenger gelesen:** `anlass/api.ts` verlangt jetzt neben dem Feld auch das Wort
+     `eingabe`. Vorher zählte jede 400 mit `feld` als Eingabefehler. Der Server sendet die 400 nur
+     mit `eingabe`; für echte Antworten ändert sich nichts.
+  7. **Neue Fälle:** Datenbanktest «ungültige Antwort 400 mit Feld» (vorher deckte kein Test das
+     Feld `antwort` an der Schnittstelle), in `anlass/api.test.ts` das Feld `antwort` und «`eingabe`
+     ohne `felder` bleibt Störung».
+  8. **Neun statt acht Wörter mit Zusatz:** D.5 zählte `eingabe` mit `fremd` nicht mit.
+- **Für die Nutzerin geändert: nichts.** Kein Meldungstext, keine Seite, keine Route; die Ergebnisse
+  der Abruf-Module sind gleich (in deren Tests wechselt nur die gefütterte Antwort, kein erwartetes
+  Ergebnis). Die Sätze von Anlass und Mitteilungen lauten wie vorher.
+- **Was kein Test sieht:**
+  - eine `Response` mit Fehler, die jemand an `antwort` vorbei baut (D.5; heute keine);
+  - die Namen in `felder`: Jeder Feldname passt in den Typ; ein umbenanntes Feld fällt nicht auf;
+  - den inneren Aufbau der grossen Zusatzangaben (`datei`, `gespraech`, `warnungen`): Die Liste
+    prüft nur, dass es sie gibt; die Abruf-Module lesen sie weiter mit `as`;
+  - eine Hülle in einem Test mit `status: number`: Dann greift der bedingte Typ nicht (bei einem
+    breiten `number` gilt `unknown`). Heute ist jede Hülle generisch; das hält nur das Review;
+  - `ungeprueft` umgeht die Liste mit Absicht; ein neuer Aufruf dort fällt nur im Review auf;
+  - die zwei geänderten Fehlerwege (Anlass 400, Mitteilung 400) im Browser: kein E2E (D.5);
+  - dass die Seite des Anlasses denselben Satz zeigt wie `ANTWORT_MELDUNG`: zwei Stellen, kein
+    Test vergleicht sie (die Seite zeigt weiter ihren eigenen).
+- **Ausserhalb des Schritts aufgefallen (nicht behoben):**
+  - Die zwei Listen `FEHLER` (`cm/schnittstellen.ts`) und `ABGELEHNT` (`src/lib/cm/api.ts`) gibt
+    es weiter doppelt; beide sind jetzt gegen die gemeinsame Liste getippt, aber nicht
+    gegeneinander. Ein Grund, den der Server neu kennt, fällt in der Oberfläche als Störung an.
+    Kandidat für Schritt 13.
+  - `profil` → `postProfil` antwortet bei einem unlesbaren Stand `{ fehler: 'eingabe', felder: {} }`
+    (ohne `fremd`); die Seite zeigt dann keine Feldmeldung. Unverändert, war so.
+  - `deute` in `src/lib/verwaltung/api.ts` liess eine Liste als `felder` durch («Liste gilt als
+    Objekt», D.5). Der Server sendet keine mehr, der Typ verbietet sie; die Prüfung im Modul ist
+    unverändert (Schritt 13).
+- **Vorschlag für den Wortlaut der Übergangsregel «Ab Schritt 08»** (nicht eingespielt;
+  `CLAUDE.md` unverändert, Entscheid des Projektleiters mit F-21):
+  «Ab Schritt 08: eine Fehlerform `{ fehler, felder? }`; Zusatzangaben nur, wo
+  `src/lib/fehler.ts` sie für ein Wort nennt. Fehlerwörter nur aus dieser Liste, die Server und
+  Oberfläche teilen.»
+- **Für die Folgeschritte:**
+  - **09 bis 11:** Eine verschobene Schnittstelle behält ihre Antworten; der Typ an `antwort`
+    prüft sie am neuen Ort mit.
+  - **13:** Jede Fehlerantwort trägt ein Wort der Liste; die Module lesen es schon über
+    `istFehlerwort`. Offen bleiben die Sonderfälle aus D.5 und die doppelte Liste der CM.
+  - **Variante B von F-21:** `vergeben` darf `felder` schon tragen; es fiele nur `feld` aus
+    `Zusatz` weg, und der Compiler zeigte die sechs Stellen im Server und die zwei Tests.
