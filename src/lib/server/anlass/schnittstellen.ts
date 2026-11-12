@@ -12,7 +12,7 @@ import {
 	nichtGefunden,
 	type Ereignis
 } from '../http.ts';
-import { pruefeAntwort } from './angaben.ts';
+import { ANTWORT_MELDUNG, pruefeAntwort } from './angaben.ts';
 import {
 	kommendeAnlaesse,
 	ladeAnlassFuerMitglied,
@@ -51,7 +51,8 @@ export async function postAnmeldung(d: AnlassDienste, e: AnlassEreignis): Promis
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const p = pruefeAntwort(await leseKoerper(e));
-		if (!p.ok) return antwort(400, { fehler: 'eingabe', feld: p.feld });
+		if (!p.ok)
+			return antwort(400, { fehler: 'eingabe', felder: { [p.feld]: ANTWORT_MELDUNG[p.feld] } });
 		const t = jetzt(d);
 		const r = await melde(d.db, id, konto.mitgliedId, p, t);
 		if (r === 'geschlossen') return antwort(409, { fehler: 'geschlossen' });

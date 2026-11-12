@@ -107,7 +107,7 @@ export function postTurnierStatus(d: AdminDienste, e: AdminEreignis): Promise<Re
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const ziel = koerper.status;
-		if (ziel !== 'offen' && ziel !== 'geschlossen') return antwort(400, { fehler: 'eingabe' });
+		if (ziel !== 'offen' && ziel !== 'geschlossen') return eingabeFehler();
 		const r = await setzeStatus(d.db, id, ziel, jetzt(d));
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r !== 'ok') return antwort(409, { fehler: r });

@@ -1,6 +1,7 @@
 // Anfragen der Login-Seiten an die Schnittstellen und die Meldungen dazu (UI-06).
 // Texte wörtlich aus der Spec «Login per Einmal-Code», Abschnitt «Ablauf in der App».
 
+import { istFehlerwort } from '../fehler.ts';
 import { jsonPost } from '../json-post';
 
 export type Ergebnis =
@@ -28,9 +29,10 @@ export async function sende(pfad: string, inhalt: object, holen: Holen = fetch):
 		if (antwort.ok) return { ergebnis: 'ok' };
 		if (antwort.status === 429) return { ergebnis: 'zu-viele' };
 		if (antwort.status === 400) {
-			const { fehler, kontakt } = (await antwort.json()) as { fehler?: unknown; kontakt?: unknown };
-			if (fehler === 'benutzt' && typeof kontakt === 'string')
-				return { ergebnis: 'benutzt', kontakt };
+			const k = (await antwort.json()) as { fehler?: unknown; kontakt?: unknown };
+			const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
+			if (fehler === 'benutzt' && typeof k.kontakt === 'string')
+				return { ergebnis: 'benutzt', kontakt: k.kontakt };
 			if (fehler === 'falsch') return { ergebnis: 'falsch' };
 		}
 	} catch {

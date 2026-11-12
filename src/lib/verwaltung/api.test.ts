@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
 import {
 	aendereAnlass,
 	bestaetige,
@@ -57,7 +58,13 @@ function holer(antwort: Response | Error) {
 	return { aufrufe, holen };
 }
 
-const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an
+// (src/lib/fehler.ts), damit ein Wort oder eine Form, die der Server nicht kennt, hier auffällt.
+type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
+const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
+
+/** Absichtlich ausserhalb der Liste: Antworten, die der Server nie so sendet. */
+const ungeprueft = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
 
 describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 	it('Regel 3: 403 kein-recht und nur-ansehen kommen als eigene Antwort an', async () => {
@@ -199,7 +206,7 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			art: 'stoerung'
 		});
 		expect(await ladeZugang(holer(json(500, {})).holen)).toEqual({ art: 'stoerung' });
-		expect(await ladeZugang(holer(json(409, { fehler: 'sonst' })).holen)).toEqual({
+		expect(await ladeZugang(holer(ungeprueft(409, { fehler: 'sonst' })).holen)).toEqual({
 			art: 'stoerung'
 		});
 	});
@@ -452,7 +459,7 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			warnungen: ['geschlossen']
 		});
 		// Ohne Liste der Warnungen ist die Antwort nicht lesbar.
-		const kaputt = holer(json(409, { fehler: 'warnung' }));
+		const kaputt = holer(ungeprueft(409, { fehler: 'warnung' }));
 		expect(await meldeVonHandAn(4, 12, false, kaputt.holen)).toEqual({ art: 'stoerung' });
 	});
 
@@ -502,13 +509,13 @@ describe('Mitgliedschaft: Austritt, Löschung, Auskunft', () => {
 	});
 
 	it.each(aktionen)('409 und weitere Antworten werden eigene Ergebnisse (%#)', async (aktion) => {
-		const mit = (s: number, i: unknown) => aktion(1, holer(json(s, i)).holen);
+		const mit = <S extends number>(s: S, i: Koerper<S>) => aktion(1, holer(json(s, i)).holen);
 		expect(await mit(409, { fehler: 'veraltet' })).toEqual({ art: 'veraltet' });
 		expect(await mit(409, { fehler: 'letzter-mytco' })).toEqual({ art: 'letzter-mytco' });
 		expect(await mit(409, { fehler: 'frist-abgelaufen' })).toEqual({ art: 'frist-abgelaufen' });
 		expect(await mit(409, { fehler: 'eigenes-konto' })).toEqual({ art: 'eigenes-konto' });
 		expect(await mit(403, { fehler: 'nur-ansehen' })).toEqual({ art: 'nur-ansehen' });
-		expect(await mit(404, {})).toEqual({ art: 'nicht-gefunden' });
+		expect(await mit(404, { fehler: 'nicht-gefunden' })).toEqual({ art: 'nicht-gefunden' });
 		expect(await mit(500, {})).toEqual({ art: 'stoerung' });
 		expect(await aktion(1, holer(new Error('weg')).holen)).toEqual({ art: 'stoerung' });
 	});

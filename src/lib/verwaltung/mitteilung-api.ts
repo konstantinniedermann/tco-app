@@ -2,12 +2,12 @@
 // die Texte, mit denen Formular, Vorschau und Verlauf Auswahl, Weg und Zahlen in Worten zeigen.
 import type { Namensteile } from '../name.ts';
 import type { AnlassAuswahl } from '../mitteilung/auswahl.ts';
-import { MAX_TEXT, MAX_TITEL, type Vorlage } from '../mitteilung/vorlagen.ts';
+import type { Vorlage } from '../mitteilung/vorlagen.ts';
 import type { Weg } from '../server/db/schema.ts';
 import type { MitteilungFeld } from '../server/mitteilung/angaben.ts';
 import type { Bezug, VerlaufEintrag } from '../server/mitteilung/verlauf.ts';
 import type { Zahlen } from '../server/mitteilung/versand.ts';
-import { lese, schicke, type Antwort, type Holen, type Json } from './api.ts';
+import { lese, schicke, type Holen, type Json } from './api.ts';
 
 export type { Bezug, MitteilungFeld, Vorlage, Weg, Zahlen };
 export type MitteilungWerte = { titel: string; text: string; auswahl: string; weg: Weg };
@@ -17,22 +17,6 @@ export type Vorschau = Omit<Zahlen, 'ersatzMails'> & { anzahl: number; namen: Na
 
 const pfad = (b: Bezug) =>
 	b.art === 'anlass' ? `/api/admin/anlaesse/${b.anlassId}/mitteilungen` : '/api/admin/mitteilungen';
-
-const FELD_MELDUNG: Record<MitteilungFeld, string> = {
-	titel: `Bitte einen Titel mit höchstens ${MAX_TITEL} Zeichen angeben.`,
-	text: `Bitte einen Text mit höchstens ${MAX_TEXT} Zeichen angeben.`,
-	auswahl: 'Bitte die Empfänger wählen.',
-	weg: 'Bitte einen Weg wählen.'
-};
-
-/** Der Server nennt die falschen Felder als Liste; die Seite zeigt je Feld einen Satz (UI-06). */
-function mitMeldungen<T>(a: Antwort<T>): Antwort<T> {
-	if (a.art !== 'eingabe' || !Array.isArray(a.felder)) return a;
-	const felder = (a.felder as unknown[]).filter((f): f is MitteilungFeld =>
-		Object.hasOwn(FELD_MELDUNG, String(f))
-	);
-	return { art: 'eingabe', felder: Object.fromEntries(felder.map((f) => [f, FELD_MELDUNG[f]])) };
-}
 
 /** FR-43: Eine Vorschau gilt nur für genau die Werte, mit denen sie geholt wurde. */
 export const gleicheWerte = (a: MitteilungWerte | null, b: MitteilungWerte) =>
@@ -46,12 +30,12 @@ export const ladeMitteilungen = (b: Bezug, holen: Holen = fetch) =>
 	lese<Mitteilungen>(pfad(b), holen);
 
 /** FR-43: wer die Mitteilung bekäme; schickt und speichert nichts. */
-export const zeigeVorschau = async (b: Bezug, werte: MitteilungWerte, holen: Holen = fetch) =>
-	mitMeldungen(await schicke<Vorschau>(`${pfad(b)}/vorschau`, werte, holen));
+export const zeigeVorschau = (b: Bezug, werte: MitteilungWerte, holen: Holen = fetch) =>
+	schicke<Vorschau>(`${pfad(b)}/vorschau`, werte, holen);
 
 /** FR-42: schickt die Mitteilung; die Antwort kommt erst, wenn alle Pushes und Mails durch sind. */
-export const sendeMitteilung = async (b: Bezug, werte: MitteilungWerte, holen: Holen = fetch) =>
-	mitMeldungen(await schicke<Zahlen>(`${pfad(b)}/senden`, werte, holen));
+export const sendeMitteilung = (b: Bezug, werte: MitteilungWerte, holen: Holen = fetch) =>
+	schicke<Zahlen>(`${pfad(b)}/senden`, werte, holen);
 
 export const AUSWAHL_NAMEN: Record<AnlassAuswahl, string> = {
 	alle: 'Alle aktiven Mitglieder',

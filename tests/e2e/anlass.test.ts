@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
+import type { Fehlerkoerper } from '../../src/lib/fehler.ts';
 import {
 	holeMailCode,
 	legeAdminMitBriefCodeAn,
@@ -145,7 +146,7 @@ test('A-ANLASS-01, FR-27, FR-29, FR-30: Admin erstellt Anlass, Mitglied meldet s
 	await pruefeBildschirm(seite, info, 'anlass-zu-pruefen');
 	// Schliesst die Anmeldung inzwischen, sagt die Seite es, statt still nichts zu tun.
 	await seite.route('**/api/anlaesse/*/anmeldung', (r) =>
-		r.fulfill({ status: 409, json: { fehler: 'geschlossen' } })
+		r.fulfill({ status: 409, json: { fehler: 'geschlossen' } satisfies Fehlerkoerper })
 	);
 	await seite.getByRole('button', { name: 'Antwort stimmt so' }).click();
 	await expect(seite.getByRole('alert')).toHaveText('Die Anmeldung ist geschlossen.');

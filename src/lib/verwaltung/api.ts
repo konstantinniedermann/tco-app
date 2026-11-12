@@ -1,5 +1,6 @@
 // Anfragen der Verwaltungsseiten an `/api/admin/…` und ihre Antworten als typisierte Ergebnisse.
 // Die Seiten zeigen die Meldungen; hier steht nur, was die Statuscodes bedeuten.
+import { istFehlerwort } from '../fehler.ts';
 import { jsonPost } from '../json-post.ts';
 import type { Angaben, Feld } from '../server/admin/angaben.ts';
 import type { AnlassFeld } from '../server/anlass/angaben.ts';
@@ -109,47 +110,48 @@ function deute<T>(status: number, koerper: unknown): Antwort<T> {
 		gespraech?: unknown;
 	};
 	if (status >= 200 && status < 300) return { art: 'ok', daten: koerper as T };
+	const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
 	if (status === 401) return { art: 'abgemeldet' };
 	if (status === 403) {
-		if (k.fehler === 'kein-admin') return { art: 'kein-admin' };
-		if (k.fehler === 'unbestaetigt') return { art: 'unbestaetigt' };
-		if (k.fehler === 'kein-recht') return { art: 'kein-recht' };
-		if (k.fehler === 'nur-ansehen') return { art: 'nur-ansehen' };
+		if (fehler === 'kein-admin') return { art: 'kein-admin' };
+		if (fehler === 'unbestaetigt') return { art: 'unbestaetigt' };
+		if (fehler === 'kein-recht') return { art: 'kein-recht' };
+		if (fehler === 'nur-ansehen') return { art: 'nur-ansehen' };
 	}
 	if (status === 404) return { art: 'nicht-gefunden' };
 	if (status === 429) return { art: 'zu-viele' };
 	if (status === 400) {
-		if (k.fehler === 'falsch') return { art: 'falsch' };
-		if (k.fehler === 'datei' && k.datei && typeof k.datei === 'object')
+		if (fehler === 'falsch') return { art: 'falsch' };
+		if (fehler === 'datei' && k.datei && typeof k.datei === 'object')
 			return { art: 'datei', datei: k.datei as DateiFehler };
-		if (k.fehler === 'eingabe' && k.felder && typeof k.felder === 'object')
+		if (fehler === 'eingabe' && k.felder && typeof k.felder === 'object')
 			return { art: 'eingabe', felder: k.felder as Partial<Record<AlleFelder, string>> };
 	}
 	if (status === 409) {
-		if (k.fehler === 'letzter-mytco') return { art: 'letzter-mytco' };
-		if (k.fehler === 'eigenes-konto') return { art: 'eigenes-konto' };
-		if (k.fehler === 'veraltet') return { art: 'veraltet' };
-		if (k.fehler === 'frist-abgelaufen') return { art: 'frist-abgelaufen' };
-		if (k.fehler === 'schluss-vorbei') return { art: 'schluss-vorbei' };
-		if (k.fehler === 'keine-kategorie') return { art: 'keine-kategorie' };
-		if (k.fehler === 'unzulaessig') return { art: 'unzulaessig' };
-		if (k.fehler === 'abgesagt') return { art: 'abgesagt' };
-		if (k.fehler === 'art-gesperrt') return { art: 'art-gesperrt' };
-		if (k.fehler === 'unpassend' && typeof k.anzahl === 'number')
+		if (fehler === 'letzter-mytco') return { art: 'letzter-mytco' };
+		if (fehler === 'eigenes-konto') return { art: 'eigenes-konto' };
+		if (fehler === 'veraltet') return { art: 'veraltet' };
+		if (fehler === 'frist-abgelaufen') return { art: 'frist-abgelaufen' };
+		if (fehler === 'schluss-vorbei') return { art: 'schluss-vorbei' };
+		if (fehler === 'keine-kategorie') return { art: 'keine-kategorie' };
+		if (fehler === 'unzulaessig') return { art: 'unzulaessig' };
+		if (fehler === 'abgesagt') return { art: 'abgesagt' };
+		if (fehler === 'art-gesperrt') return { art: 'art-gesperrt' };
+		if (fehler === 'unpassend' && typeof k.anzahl === 'number')
 			return { art: 'unpassend', anzahl: k.anzahl };
-		if (k.fehler === 'hat-anmeldungen' && typeof k.anzahl === 'number')
+		if (fehler === 'hat-anmeldungen' && typeof k.anzahl === 'number')
 			return { art: 'hat-anmeldungen', anzahl: k.anzahl };
-		if (k.fehler === 'nicht-moeglich' && typeof k.anzahl === 'number')
+		if (fehler === 'nicht-moeglich' && typeof k.anzahl === 'number')
 			return { art: 'nicht-moeglich', anzahl: k.anzahl };
-		if (k.fehler === 'vergeben' && typeof k.feld === 'string')
+		if (fehler === 'vergeben' && typeof k.feld === 'string')
 			return { art: 'vergeben', feld: k.feld as Feld | 'jahr' | 'name' };
-		if (k.fehler === 'warnung' && Array.isArray(k.warnungen))
+		if (fehler === 'warnung' && Array.isArray(k.warnungen))
 			return { art: 'warnung', warnungen: k.warnungen as Warnung[] };
-		if (k.fehler === 'schon-angemeldet') return { art: 'schon-angemeldet' };
-		if (k.fehler === 'vorbereitung') return { art: 'vorbereitung' };
-		if (k.fehler === 'nicht-beantragt') return { art: 'nicht-beantragt' };
-		if (k.fehler === 'nur-lesen') return { art: 'nur-lesen' };
-		if (k.fehler === 'inzwischen' && k.gespraech && typeof k.gespraech === 'object')
+		if (fehler === 'schon-angemeldet') return { art: 'schon-angemeldet' };
+		if (fehler === 'vorbereitung') return { art: 'vorbereitung' };
+		if (fehler === 'nicht-beantragt') return { art: 'nicht-beantragt' };
+		if (fehler === 'nur-lesen') return { art: 'nur-lesen' };
+		if (fehler === 'inzwischen' && k.gespraech && typeof k.gespraech === 'object')
 			return { art: 'inzwischen', gespraech: k.gespraech as GespraechVerlauf };
 	}
 	return STOERUNG;

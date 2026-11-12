@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
+import { FELD_MELDUNG } from '../mitteilung/vorlagen.ts';
 import {
 	AUSWAHL_NAMEN,
 	WEG_NAMEN,
@@ -26,7 +28,10 @@ function holer(antwort: Response | Error) {
 	return { aufrufe, holen };
 }
 
-const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an
+// (src/lib/fehler.ts), damit ein Wort oder eine Form, die der Server nicht kennt, hier auffällt.
+type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
+const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
 
 const WERTE: MitteilungWerte = {
 	titel: 'Erinnerung: GV',
@@ -86,7 +91,12 @@ describe('Mitteilungen in der Verwaltung: Anfragen', () => {
 	});
 
 	it('FR-42: Eingabefehler kommen je Feld als Satz an, andere Antworten unverändert', async () => {
-		const falsch = holer(json(400, { fehler: 'eingabe', felder: ['titel', 'text'] }));
+		const falsch = holer(
+			json(400, {
+				fehler: 'eingabe',
+				felder: { titel: FELD_MELDUNG.titel, text: FELD_MELDUNG.text }
+			})
+		);
 		expect(await zeigeVorschau({ art: 'verein' }, WERTE, falsch.holen)).toEqual({
 			art: 'eingabe',
 			felder: {

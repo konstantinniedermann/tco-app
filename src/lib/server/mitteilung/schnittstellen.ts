@@ -5,10 +5,11 @@ import {
 	VEREIN_AUSWAHLEN,
 	type AnlassAuswahl
 } from '../../mitteilung/auswahl.ts';
-import { vorlagenAnlass } from '../../mitteilung/vorlagen.ts';
+import { FELD_MELDUNG, vorlagenAnlass } from '../../mitteilung/vorlagen.ts';
 import { liest, schreibt, type AdminEreignis } from '../admin/rechte.ts';
 import {
 	antwort,
+	eingabeFehler,
 	formatFehler,
 	istJson,
 	jetzt,
@@ -42,7 +43,7 @@ export async function postThemen(d: MitteilungDienste, e: Ereignis): Promise<Res
 	if (!istJson(e)) return formatFehler();
 	return mitSitzung(e, async (konto) => {
 		const themen = pruefeThemen((await leseKoerper(e)).themen);
-		if (!themen) return antwort(400, { fehler: 'eingabe' });
+		if (!themen) return eingabeFehler();
 		await setzeThemen(d.db, konto.kontoId, themen);
 		return antwort(200, await stand(d, konto));
 	});
@@ -53,7 +54,7 @@ export async function postAbo(d: MitteilungDienste, e: Ereignis): Promise<Respon
 	return mitSitzung(e, async (konto) => {
 		if (d.vapidOeffentlich === null) return antwort(409, { fehler: 'push-aus' });
 		const p = pruefeAbo(await leseKoerper(e));
-		if (!p.ok) return antwort(400, { fehler: 'eingabe' });
+		if (!p.ok) return eingabeFehler();
 		await speichereAbo(d.db, konto.kontoId, konto.sitzungHash, p.abo, jetzt(d));
 		return antwort(200, { pushHier: true });
 	});
@@ -123,14 +124,17 @@ type Versand = {
 	absenderId: number;
 };
 
-/** Prüft die Angaben (400 mit den Feldern) und sucht die Empfänger nach der Auswahl. */
+/** Prüft die Angaben (400 mit einem Satz je Feld) und sucht die Empfänger nach der Auswahl. */
 function mitEmpfaengern(art: Ziel['art'], fn: (v: Versand) => Promise<Response>): AdminHandler {
 	return (d, e) =>
 		schreibt(d, e, 'mitglieder', (urheber, koerper) =>
 			mitZiel(d, e, art, async (ziel) => {
 				const auswahlen = ziel.art === 'anlass' ? ANLASS_AUSWAHLEN : VEREIN_AUSWAHLEN;
 				const p = pruefeMitteilung(koerper, auswahlen);
-				if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.felder });
+				if (!p.ok) {
+					const felder = Object.fromEntries(p.felder.map((f) => [f, FELD_MELDUNG[f]]));
+					return antwort(400, { fehler: 'eingabe', felder });
+				}
 				const empf =
 					ziel.art === 'anlass'
 						? await anlassEmpfaenger(

@@ -8,6 +8,14 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.13 — Eine Fehlerform und eine Liste der Fehlerwörter (Refactoring Schritt 08)
+
+- Server und Oberfläche teilen eine Liste der Fehlerwörter (`src/lib/fehler.ts`); eine falsche
+  Fehlerantwort fällt schon bei der Typprüfung auf.
+- Intern vereinheitlicht: Ohne Anmeldung antworten Passkey und Sitzung mit dem Wort `abgemeldet`
+  statt mit leerem Körper; Eingabefehler bei Anlass und Mitteilungen kommen als `felder`. Für
+  Mitglieder und Verwaltung ändert sich nichts (#80).
+
 ## 0.20.12 — Ein Zusammenbau der Dienste (Refactoring Schritt 07)
 
 - Die Dienste des Servers entstehen an einer Stelle, `src/lib/server/dienste.ts`, statt in sechs

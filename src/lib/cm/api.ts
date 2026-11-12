@@ -1,5 +1,6 @@
 // Anfragen der Mitglieder an `/api/cm/…` und `/api/profil/klassierung` und ihre Antworten als
 // typisierte Ergebnisse. Die Seiten zeigen die Meldungen; hier steht nur, was die Statuscodes bedeuten.
+import { istFehlerwort, type Fehlerwort } from '../fehler.ts';
 import { jsonPost } from '../json-post.ts';
 import type {
 	CmAnsicht as ServerCmAnsicht,
@@ -58,7 +59,7 @@ const ABGELEHNT = [
 	'angaben-fehlen',
 	'keine-wildcard',
 	'nur-lesen'
-] as const;
+] as const satisfies readonly Fehlerwort[];
 type Abgelehnt = (typeof ABGELEHNT)[number];
 
 /** Felder, die der Server bei 400 melden kann. */
@@ -85,10 +86,11 @@ async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<E
 		if (r.status === 204) return { art: 'ok', daten: {} as T };
 		const k = (await r.json()) as { fehler?: unknown; felder?: unknown };
 		if (r.ok) return { art: 'ok', daten: k as T };
+		const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
 		if (r.status === 401) return { art: 'abgemeldet' };
 		if (r.status === 404) return { art: 'nicht-gefunden' };
-		if (r.status === 409 && istAbgelehnt(k.fehler)) return { art: k.fehler };
-		if (r.status === 400 && k.fehler === 'eingabe' && istObjekt(k.felder))
+		if (r.status === 409 && istAbgelehnt(fehler)) return { art: fehler };
+		if (r.status === 400 && fehler === 'eingabe' && istObjekt(k.felder))
 			return { art: 'eingabe', felder: k.felder as CmFelder };
 		return { art: 'stoerung' };
 	} catch {

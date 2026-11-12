@@ -3,6 +3,7 @@
 // Annahme K-19.1: Telefon, Lizenznummer und E-Mail ändert das Mitglied selbst.
 // Annahme K-19.2: die Adresse (Strasse, PLZ, Ort) ebenso.
 
+import { istFehlerwort } from '../fehler.ts';
 import { jsonPost } from '../json-post.ts';
 import type { Holen } from '../login/anmelden.ts';
 import type { EigeneAngaben, EigenesFeld } from '../server/profil/angaben.ts';
@@ -86,10 +87,11 @@ async function leseJson(antwort: Response): Promise<Record<string, unknown>> {
 /** Was Status und `fehler` der Schnittstelle bedeuten. */
 function deute(status: number, k: Record<string, unknown>): Ergebnis {
 	if (status >= 200 && status < 300) return 'ok';
-	if (status === 409 && k.fehler === 'veraltet') return 'veraltet';
+	const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
+	if (status === 409 && fehler === 'veraltet') return 'veraltet';
 	if (status === 429) return 'zu-viele';
-	if (status === 400 && (k.fehler === 'eingabe' || k.fehler === 'gleich' || k.fehler === 'falsch'))
-		return k.fehler;
+	if (status === 400 && (fehler === 'eingabe' || fehler === 'gleich' || fehler === 'falsch'))
+		return fehler;
 	return 'stoerung';
 }
 

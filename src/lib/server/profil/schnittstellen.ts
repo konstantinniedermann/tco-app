@@ -1,7 +1,15 @@
 import { eq } from 'drizzle-orm';
 import { mitglied } from '../db/schema.ts';
 import { leseStand } from '../admin/angaben.ts';
-import { aenderndMitKoerper, antwort, jetzt, mitSitzung, type Ereignis } from '../http.ts';
+import {
+	aenderndMitKoerper,
+	antwort,
+	eingabeFehler,
+	jetzt,
+	mitSitzung,
+	nichtGefunden,
+	type Ereignis
+} from '../http.ts';
 import { setzeKlassierung } from '../cm/angaben.ts';
 import { EIGENE_FELDER, aendereEigeneAngaben, ladeEigeneAngaben, setzeRufname } from './angaben.ts';
 import type { ProfilDienste } from './typen.ts';
@@ -12,7 +20,7 @@ import type { ProfilDienste } from './typen.ts';
 export function getProfil(d: ProfilDienste, e: Ereignis): Promise<Response> {
 	return mitSitzung(e, async (konto) => {
 		const angaben = await ladeEigeneAngaben(d.db, konto.mitgliedId);
-		if (!angaben) return antwort(404, { fehler: 'nicht-gefunden' });
+		if (!angaben) return nichtGefunden();
 		// FR-37: Die Klassierung gehört nicht zu den Angaben der Verwaltung, das Profil zeigt sie extra.
 		const [m] = await d.db
 			.select({ klassierung: mitglied.klassierung, rufname: mitglied.rufname })
@@ -46,7 +54,7 @@ export function postProfil(d: ProfilDienste, e: Ereignis): Promise<Response> {
 			case 'veraltet':
 				return antwort(409, { fehler: 'veraltet' });
 			case 'nicht-gefunden':
-				return antwort(404, { fehler: 'nicht-gefunden' });
+				return nichtGefunden();
 			case 'eingabe': {
 				// Nur eigene Felder an die Oberfläche. Scheitert die Prüfung an Altdaten in anderen
 				// Feldern, meldet `fremd` das, ohne deren Namen oder Inhalt preiszugeben.
@@ -73,7 +81,7 @@ export function postKlassierung(d: ProfilDienste, e: Ereignis): Promise<Response
 					felder: { klassierung: 'Bitte deine Klassierung wählen.' }
 				});
 			case 'nicht-gefunden':
-				return antwort(404, { fehler: 'nicht-gefunden' });
+				return nichtGefunden();
 		}
 	});
 }
@@ -93,7 +101,7 @@ export function postRufname(d: ProfilDienste, e: Ereignis): Promise<Response> {
 			case 'eingabe':
 				return antwort(400, { fehler: 'eingabe', felder: { rufname: r.fehler } });
 			case 'nicht-gefunden':
-				return antwort(404, { fehler: 'nicht-gefunden' });
+				return nichtGefunden();
 		}
 	});
 }
@@ -110,7 +118,7 @@ export function postEmail(d: ProfilDienste, e: Ereignis): Promise<Response> {
 			case 'gleich':
 				return antwort(400, { fehler: 'gleich' });
 			default:
-				return antwort(400, { fehler: 'eingabe' });
+				return eingabeFehler();
 		}
 	});
 }

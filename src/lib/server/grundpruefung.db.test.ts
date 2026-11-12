@@ -163,21 +163,14 @@ async function antwortVon(name: string, r: Response) {
 
 /**
  * Ausnahmen von «ohne Sitzung 401 { fehler: 'abgemeldet' }», mit der heutigen Antwort.
- * Gewollt: Kalender und Passkey-Anmeldung sind ohne Sitzung erreichbar. Befund: Die übrigen
- * Passkey-Schnittstellen antworten 401 ohne Fehlerwort (Fehlerform, B-15; Schritt 08).
+ * Gewollt: Kalender und Passkey-Anmeldung sind ohne Sitzung erreichbar.
  */
 const OHNE_SITZUNG_ANDERS: Record<string, [number, unknown]> = {
 	// SI-19: Die Kalenderdatei gibt es ohne Sitzung, nur über ihre nicht erratbare Kennung.
 	'anlass.getKalender': [404, { fehler: 'nicht-gefunden' }],
 	// Anmelden mit Passkey: vor dem Login, darum ohne Sitzung.
 	'passkey.postAnmeldenOptionen': [200, expect.objectContaining({ vorgang: expect.any(String) })],
-	'passkey.postAnmelden': [400, { fehler: 'falsch' }],
-	// Befund (Schritt 03): 401 mit leerem Körper statt { fehler: 'abgemeldet' }.
-	'passkey.postEinrichtenOptionen': [401, {}],
-	'passkey.postEinrichten': [401, {}],
-	'passkey.getPasskeys': [401, {}],
-	'passkey.postEntfernen': [401, {}],
-	'passkey.postHinweis': [401, {}]
+	'passkey.postAnmelden': [400, { fehler: 'falsch' }]
 };
 
 /** Ausnahmen von «schreibend ohne JSON 415 { fehler: 'format' }», mit der heutigen Antwort. */

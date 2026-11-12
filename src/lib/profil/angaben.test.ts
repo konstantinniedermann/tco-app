@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
 import {
 	MELDUNG_PROFIL,
 	bestaetigeWechsel,
@@ -27,7 +28,10 @@ function holer(antwort: Response | Error) {
 	return { aufrufe, holen };
 }
 
-const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an
+// (src/lib/fehler.ts), damit ein Wort oder eine Form, die der Server nicht kennt, hier auffällt.
+type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
+const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
 
 const LEA: EigeneAngaben = {
 	mitgliedernummer: '1042',

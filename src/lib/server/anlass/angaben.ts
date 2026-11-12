@@ -51,6 +51,12 @@ export function pruefeAnlass(
 	return { ok: true, werte: { titel, beginn, ort, einladung, anmeldeschluss } };
 }
 
+/** Satz je Feld, wenn eine Antwort nicht passt; die Seite des Anlasses zeigt denselben Satz. */
+export const ANTWORT_MELDUNG = {
+	antwort: 'Bitte wähle «Ich komme» oder «Ich komme nicht».',
+	bemerkung: `Die Bemerkung darf höchstens ${MAX_BEMERKUNG} Zeichen lang sein.`
+} as const;
+
 export function pruefeAntwort(
 	roh: Record<string, unknown>
 ):

@@ -1,8 +1,10 @@
 // Grundbausteine der Schnittstellen: Antwort bauen, JSON prüfen, Körper lesen, die
 // Standardantworten, «mit Sitzung», «ändernd» und «jetzt». Kein Themen-Modul definiert sie selbst.
 // Diese Datei importiert aus dem Server nichts (Lint-Regel: Dateien direkt unter src/lib/server/
-// importieren nur db/); den Typ des angemeldeten Kontos bezieht sie darum über App.Locals.
+// importieren nur db/); den Typ des angemeldeten Kontos bezieht sie darum über App.Locals. Die
+// Form der Fehlerantworten kommt aus der Liste, die Server und Oberfläche teilen (`src/lib/fehler.ts`).
 import type { RequestEvent } from '@sveltejs/kit';
+import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
 
 export type Ereignis = Pick<
 	RequestEvent,
@@ -14,6 +16,12 @@ export type Konto = NonNullable<App.Locals['konto']>;
 
 const KOPF = { 'cache-control': 'no-store' };
 
+/** Die Statuscodes einer Antwort mit Erfolg; ihr Körper ist frei. */
+type ErfolgStatus = 200 | 201 | 202 | 204;
+
+/** Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an, ein Erfolg jeden. */
+export function antwort(status: FehlerStatus, inhalt: Fehlerkoerper): Response;
+export function antwort(status: ErfolgStatus, inhalt?: object): Response;
 export function antwort(status: number, inhalt?: object): Response {
 	if (inhalt === undefined) return new Response(null, { status, headers: KOPF });
 	return Response.json(inhalt, { status, headers: KOPF });
@@ -38,6 +46,7 @@ export async function leseKoerper(e: Ereignis): Promise<Record<string, unknown>>
 export const formatFehler = () => antwort(415, { fehler: 'format' });
 export const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
 export const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });
+export const abgemeldet = () => antwort(401, { fehler: 'abgemeldet' });
 
 /** Die Zeit aus den Diensten (Tests reichen sie hinein), sonst die Uhr. */
 export const jetzt = (d: { jetzt?: () => Date }): Date => (d.jetzt ?? (() => new Date()))();
@@ -48,7 +57,7 @@ export async function mitSitzung(
 	fn: (konto: Konto) => Promise<Response>
 ): Promise<Response> {
 	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
+	if (!konto) return abgemeldet();
 	return fn(konto);
 }
 

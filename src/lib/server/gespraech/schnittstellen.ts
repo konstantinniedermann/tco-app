@@ -3,7 +3,15 @@
 // Verlauf, Antworten, Zustand; der MyTCO-Admin liest nur (Regel 3).
 import { liest, schreibt, type AdminEreignis, type AdminUrheber } from '../admin/rechte.ts';
 import type { CmDienste, CmEreignis } from '../cm/typen.ts';
-import { aendernd, antwort, jetzt, leseKoerper, mitSitzung, nichtGefunden } from '../http.ts';
+import {
+	aendernd,
+	antwort,
+	eingabeFehler,
+	jetzt,
+	leseKoerper,
+	mitSitzung,
+	nichtGefunden
+} from '../http.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
 import { parseId } from '../parse-id.ts';
@@ -82,7 +90,7 @@ export function postGelesen(d: CmDienste, e: CmEreignis): Promise<Response> {
 		if (id === null) return nichtGefunden();
 		const roh = (await leseKoerper(e)).bis;
 		const bis = typeof roh === 'string' ? new Date(roh) : null;
-		if (bis === null || Number.isNaN(bis.getTime())) return antwort(400, { fehler: 'eingabe' });
+		if (bis === null || Number.isNaN(bis.getTime())) return eingabeFehler();
 		// Nie über «jetzt» hinaus: Die Marke geht nur vorwärts und würde spätere Antworten verdecken.
 		const t = jetzt(d);
 		await markiereGelesen(d.db, id, konto.mitgliedId, bis > t ? t : bis);
@@ -130,8 +138,7 @@ export function postAntwort(d: MitteilungAdminDienste, e: AdminEreignis): Promis
 		const text = pruefeText(koerper.text);
 		if (text === null) return textFehler();
 		const nach = koerper.nachLetzter;
-		if (typeof nach !== 'number' || !Number.isSafeInteger(nach) || nach < 0)
-			return antwort(400, { fehler: 'eingabe' });
+		if (typeof nach !== 'number' || !Number.isSafeInteger(nach) || nach < 0) return eingabeFehler();
 		const t = jetzt(d);
 		const r = await antworte(
 			d.db,
@@ -160,7 +167,7 @@ export function postZustand(d: MitteilungAdminDienste, e: AdminEreignis): Promis
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const z = koerper.zustand;
-		if (z !== 'offen' && z !== 'erledigt') return antwort(400, { fehler: 'eingabe' });
+		if (z !== 'offen' && z !== 'erledigt') return eingabeFehler();
 		const t = jetzt(d);
 		const r = await setzeZustand(d.db, id, z, t);
 		if (r === 'nicht-gefunden') return nichtGefunden();
