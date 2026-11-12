@@ -11,12 +11,26 @@ import { AUSNAHMEN, MODULE, baueImportrichtung } from '../eslint.config.js';
 const SERVER = 'src/lib/server';
 const eslint = new ESLint();
 
-async function meldungen(datei: string, code: string): Promise<string[]> {
-	const [ergebnis] = await eslint.lintText(code, { filePath: `${SERVER}/${datei}` });
+/** ESLint mit der Regel für genau diese Ausnahmen statt der aus `AUSNAHMEN`. */
+function mitAusnahmen(ausnahmen: typeof AUSNAHMEN): ESLint {
+	return new ESLint({
+		overrideConfigFile: true,
+		overrideConfig: [{ languageOptions: { parser: ts.parser } }, ...baueImportrichtung(ausnahmen)]
+	});
+}
+
+async function meldungen(datei: string, code: string, mit = eslint): Promise<string[]> {
+	const [ergebnis] = await mit.lintText(code, { filePath: `${SERVER}/${datei}` });
 	return ergebnis.messages
 		.filter((m) => m.ruleId === 'no-restricted-imports')
 		.map((m) => m.message);
 }
+
+// Gestellte Ausnahme für die Fälle, die eine Datei mit Ausnahme brauchen: Sie hängen so an keinem
+// Eintrag in `AUSNAHMEN` und prüfen weiter, wenn Schritt 12 die Liste leert.
+const GESTELLT = mitAusnahmen([
+	{ von: 'login/gestellt.ts', nach: 'admin/rollen.ts', schritt: 'gestellt für den Test' }
+]);
 
 describe('Richtung der Importe zwischen den Server-Modulen', () => {
 	// Dateien ohne Ausnahme: jede Schicht einmal.
@@ -69,12 +83,17 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 		['login/neu.ts', "import { x } from '../dienste.ts';"],
 		['login/neu.ts', "import { x } from '../dienste';"],
 		['datum.ts', "import { x } from './dienste.ts';"],
-		['datum.ts', "import { x } from '$lib/server/dienste.js';"],
-		['login/sitzung.ts', "import { x } from '../dienste.ts';"]
+		['datum.ts', "import { x } from '$lib/server/dienste.js';"]
 	])('meldet in %s den Import von dienste.ts: %s', async (datei, code) => {
 		expect(await meldungen(datei, code)).toEqual([
 			expect.stringContaining('kein Modul unter src/lib/server/ importiert dienste.ts')
 		]);
+	});
+
+	it('meldet den Import von dienste.ts auch in einer Datei mit Ausnahme', async () => {
+		expect(
+			await meldungen('login/gestellt.ts', "import { x } from '../dienste.ts';", GESTELLT)
+		).toEqual([expect.stringContaining('kein Modul unter src/lib/server/ importiert dienste.ts')]);
 	});
 
 	it('meldet in db den Import von dienste.ts', async () => {
@@ -97,16 +116,13 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 	});
 
 	it('eine Ausnahme gibt nur ihre Datei und ihr Ziel frei', async () => {
-		// login/sitzung.ts → admin/rollen.ts ist Ausnahme (Schritt 10), aber kein anderes Admin-Ziel.
-		expect(await meldungen('login/sitzung.ts', "import { x } from '../admin/rollen.ts';")).toEqual(
-			[]
-		);
+		// Gestellt: login/gestellt.ts → admin/rollen.ts ist Ausnahme, aber kein anderes Admin-Ziel.
+		const rollen = "import { x } from '../admin/rollen.ts';";
+		expect(await meldungen('login/gestellt.ts', rollen, GESTELLT)).toEqual([]);
 		expect(
-			await meldungen('login/sitzung.ts', "import { x } from '../admin/mitglieder.ts';")
+			await meldungen('login/gestellt.ts', "import { x } from '../admin/mitglieder.ts';", GESTELLT)
 		).toHaveLength(1);
-		expect(await meldungen('login/neu.ts', "import { x } from '../admin/rollen.ts';")).toHaveLength(
-			1
-		);
+		expect(await meldungen('login/neu.ts', rollen, GESTELLT)).toHaveLength(1);
 	});
 
 	it('db, login und die Themen sind genau die Ordner unter src/lib/server/', () => {
@@ -136,13 +152,7 @@ describe('Richtung der Importe zwischen den Server-Modulen', () => {
 	it.each(AUSNAHMEN.map((a) => [a.von, a.nach, a] as const))(
 		'Ausnahme %s → %s ist noch nötig',
 		async (von, nach, a) => {
-			const ohne = new ESLint({
-				overrideConfigFile: true,
-				overrideConfig: [
-					{ languageOptions: { parser: ts.parser } },
-					...baueImportrichtung(AUSNAHMEN.filter((x) => x !== a))
-				]
-			});
+			const ohne = mitAusnahmen(AUSNAHMEN.filter((x) => x !== a));
 			const [ergebnis] = await ohne.lintFiles([`${SERVER}/${von}`]);
 			const ziel = nach.replace(/\.ts$/, '');
 			const gemeldet = ergebnis.messages.some(
