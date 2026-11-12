@@ -17,18 +17,46 @@ function exportiertActions(inhalt: string): boolean {
 }
 
 // Admin-Routen sind dünn: Sie importieren aus dem Zusammenbau der Dienste nur die Einstiege der
-// Verwaltung und von den Schnittstellen nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN
-// (Bereich Clubmeisterschaft, offen auch für `cm`) oder MITTEILUNG_ADMIN_SCHNITTSTELLEN (Mitteilungen
-// der Verwaltung). Nur diese decken die Rechte-Tests ab.
+// Verwaltung und von den Schnittstellen nur Einträge der Listen in VERWALTUNGS_DATEIEN. Nur diese
+// decken die Rechte-Tests ab.
 const ADMIN_ROUTE = /^src\/routes\/api\/admin\/(?:.*\/)?\+server\.(ts|js)$/;
-const ERLAUBTER_IMPORT =
-	/(?:^|\/)lib\/server\/(?:dienste|(?:admin|mitteilung|turnier)\/schnittstellen)\.ts$|^\.\/\$types$/;
 const ADMIN_MODUL = /(?:^|\/|^\$)lib\/server\/admin(?:\/|$)/;
-const SCHNITTSTELLEN_DATEI = 'src/lib/server/admin/schnittstellen.ts';
-const TURNIER_DATEI = 'src/lib/server/turnier/schnittstellen.ts';
-const MITTEILUNG_DATEI = 'src/lib/server/mitteilung/schnittstellen.ts';
-const SCHNITTSTELLEN_IMPORT =
-	/(?:^|\/)lib\/server\/(?:admin|turnier|mitteilung)\/schnittstellen\.ts$/;
+const SERVER = 'src/lib/server/';
+
+/**
+ * Was eine Route ausserhalb von api/admin aus einer Verwaltungs-Datei darf: `ordner` = nichts, der
+ * ganze Ordner `lib/server/admin` ist gesperrt (ADMIN_MODUL); `namen` = keinen Namen der Liste
+ * (gemischte Datei mit Schnittstellen der Mitglieder, Sperrliste); `offen` = dafür gibt es heute
+ * keine Regel (Lücke, D.7).
+ */
+type Aussen = 'ordner' | 'namen' | 'offen';
+
+// Die Schnittstellen-Dateien der Verwaltung (relativ zu src/lib/server/) mit ihrer Liste: die eine
+// Stelle für die Menge der Listen in der Bauregel. Die erste muss es geben (ADMIN_SCHNITTSTELLEN);
+// fehlt eine andere Liste, gilt sie als leer. Bereich Clubmeisterschaft: TURNIER_SCHNITTSTELLEN,
+// offen auch für `cm`; Mitteilungen der Verwaltung: MITTEILUNG_ADMIN_SCHNITTSTELLEN.
+const VERWALTUNGS_DATEIEN: readonly { datei: string; liste: string; aussen: Aussen }[] = [
+	{ datei: 'admin/schnittstellen.ts', liste: 'ADMIN_SCHNITTSTELLEN', aussen: 'ordner' },
+	{ datei: 'turnier/schnittstellen.ts', liste: 'TURNIER_SCHNITTSTELLEN', aussen: 'offen' },
+	{
+		datei: 'mitteilung/schnittstellen.ts',
+		liste: 'MITTEILUNG_ADMIN_SCHNITTSTELLEN',
+		aussen: 'namen'
+	}
+];
+
+const escape = (t: string) => t.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+/** «a, b und c» */
+const aufzaehlung = (teile: readonly string[]) =>
+	teile.length < 2 ? teile.join('') : `${teile.slice(0, -1).join(', ')} und ${teile.at(-1)}`;
+const ohneEndung = (datei: string) => datei.replace(/\.ts$/, '');
+
+const SCHNITTSTELLEN_IMPORT = new RegExp(
+	`(?:^|\\/)lib\\/server\\/(?:${VERWALTUNGS_DATEIEN.map((v) => escape(ohneEndung(v.datei))).join('|')})\\.ts$`
+);
+const ERLAUBTER_IMPORT = new RegExp(
+	`${SCHNITTSTELLEN_IMPORT.source}|(?:^|\\/)lib\\/server\\/dienste\\.ts$|^\\.\\/\\$types$`
+);
 // Die Einstiege der Verwaltung in `dienste.ts`. Eine Liste für beide Richtungen: Admin-Routen dürfen
 // aus `dienste.ts` nur diese, alle anderen Routen alles ausser diesen. Ein neuer Einstieg der
 // Verwaltung, der hier fehlt, ist für Admin-Routen gesperrt und fällt sofort auf.
@@ -48,15 +76,17 @@ const MITGLIEDER_EINSTIEGE = [
 const AUS_DIENSTEN = /(?:^|\/)lib\/server\/dienste\.ts$/;
 const ERLAUBT_DIENSTE = VERWALTUNGS_EINSTIEGE.join(' und ');
 const ERLAUBT_MITGLIEDER = `erlaubt sind nur ${MITGLIEDER_EINSTIEGE.join(', ')}`;
-const ERLAUBT_IMPORT =
-	'erlaubt sind nur dienste.ts und die Schnittstellen aus admin/, turnier/ und mitteilung/';
-const ERLAUBT_LISTEN =
-	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN und MITTEILUNG_ADMIN_SCHNITTSTELLEN';
-// Ausserhalb von api/admin: aus dem Zusammenbau der Dienste und aus den Mitteilungen nur, was den
-// Mitgliedern dient. `dienste.ts` mit und ohne Endung (auch `.js`, das Vite auf `.ts` auflöst), über
-// `$lib` und mit Anhang (`?…`): Der Schutz hängt hier am Namen, nicht mehr am Pfad.
+const ERLAUBT_IMPORT = `erlaubt sind nur ${aufzaehlung(['dienste.ts', ...VERWALTUNGS_DATEIEN.map((v) => v.datei)])}`;
+const ERLAUBT_LISTEN = `erlaubt sind nur Einträge aus ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.liste))}`;
+// Ausserhalb von api/admin: aus dem Zusammenbau der Dienste und aus den gemischten Dateien nur, was
+// den Mitgliedern dient. `dienste.ts` mit und ohne Endung (auch `.js`, das Vite auf `.ts` auflöst),
+// über `$lib` und mit Anhang (`?…`): Der Schutz hängt hier am Namen, nicht mehr am Pfad.
 const DIENSTE_MODUL = /(?:^|\/|^\$)lib\/server\/dienste(?:\.(?:ts|js))?(?:[?#].*)?$/;
-const MITTEILUNG_SCHNITTSTELLEN = /(?:^|\/|^\$)lib\/server\/mitteilung\/schnittstellen(?:\.ts)?$/;
+// Gemischte Dateien (`aussen: 'namen'`): mit und ohne `.ts`, über `$lib`.
+const GEMISCHT = VERWALTUNGS_DATEIEN.filter((v) => v.aussen === 'namen').map((v) => ({
+	...v,
+	muster: new RegExp(`(?:^|\\/|^\\$)lib\\/server\\/${escape(ohneEndung(v.datei))}(?:\\.ts)?$`)
+}));
 
 // Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
 // weiterreicht, fällt hier nicht auf; das bleibt Aufgabe des Reviews.
@@ -116,18 +146,15 @@ function schnittstellenListe(inhalt: string, konstante: string): Set<string> | n
 	);
 }
 
+const listeAus = (dateien: Map<string, string>, v: (typeof VERWALTUNGS_DATEIEN)[number]) =>
+	schnittstellenListe(dateien.get(SERVER + v.datei) ?? '', v.liste);
+
+/** Alle Namen der Verwaltungs-Listen; `null`, wenn die erste Liste fehlt. */
 function adminSchnittstellen(dateien: Map<string, string>): Set<string> | null {
-	const admin = schnittstellenListe(
-		dateien.get(SCHNITTSTELLEN_DATEI) ?? '',
-		'ADMIN_SCHNITTSTELLEN'
-	);
+	const [erste, ...weitere] = VERWALTUNGS_DATEIEN;
+	const admin = listeAus(dateien, erste);
 	if (admin === null) return null;
-	const turnier = schnittstellenListe(dateien.get(TURNIER_DATEI) ?? '', 'TURNIER_SCHNITTSTELLEN');
-	const mitteilung = schnittstellenListe(
-		dateien.get(MITTEILUNG_DATEI) ?? '',
-		'MITTEILUNG_ADMIN_SCHNITTSTELLEN'
-	);
-	return new Set([...admin, ...(turnier ?? []), ...(mitteilung ?? [])]);
+	return new Set([...admin, ...weitere.flatMap((v) => [...(listeAus(dateien, v) ?? [])])]);
 }
 
 function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): string[] {
@@ -181,17 +208,20 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 	return befunde;
 }
 
-/** Ausserhalb von api/admin: aus `dienste.ts` nur Einstiege der Mitglieder, keine Schnittstellen der Mitteilungs-Verwaltung. */
+/** Ausserhalb von api/admin: aus `dienste.ts` nur Einstiege der Mitglieder, aus einer gemischten Datei keine Schnittstelle ihrer Verwaltungs-Liste. */
 function pruefeVerwaltungImporte(
 	pfad: string,
 	imp: Import[],
-	verwaltung: Set<string> | null
+	gemischt: { muster: RegExp; namen: Set<string> | null }[]
 ): string[] {
 	const befunde: string[] = [];
 	for (const i of imp) {
 		if (i.quelle === null) continue;
-		const ausDiensten = DIENSTE_MODUL.test(i.quelle);
-		if (!ausDiensten && !MITTEILUNG_SCHNITTSTELLEN.test(i.quelle)) continue;
+		const quelle = i.quelle;
+		const ausDiensten = DIENSTE_MODUL.test(quelle);
+		const datei = gemischt.find((g) => g.muster.test(quelle));
+		if (!ausDiensten && datei === undefined) continue;
+		const verwaltung = datei?.namen ?? null;
 		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
 		if (namen === null) {
 			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
@@ -217,13 +247,11 @@ function pruefeVerwaltungImporte(
 export function pruefeBauregel(dateien: Map<string, string>): string[] {
 	const befunde: string[] = [];
 	const liste = adminSchnittstellen(dateien);
-	const mitteilungVerwaltung = schnittstellenListe(
-		dateien.get(MITTEILUNG_DATEI) ?? '',
-		'MITTEILUNG_ADMIN_SCHNITTSTELLEN'
-	);
+	const gemischt = GEMISCHT.map((g) => ({ muster: g.muster, namen: listeAus(dateien, g) }));
 	const mitAdminRoute = [...dateien.keys()].some((p) => ADMIN_ROUTE.test(p));
 	if (mitAdminRoute && liste === null) {
-		befunde.push(`${SCHNITTSTELLEN_DATEI}: ADMIN_SCHNITTSTELLEN nicht gefunden`);
+		const [erste] = VERWALTUNGS_DATEIEN;
+		befunde.push(`${SERVER}${erste.datei}: ${erste.liste} nicht gefunden`);
 	}
 	for (const [pfad, inhalt] of dateien) {
 		const name = pfad.split('/').pop() ?? pfad;
@@ -244,7 +272,7 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
 				);
 			}
-			befunde.push(...pruefeVerwaltungImporte(pfad, imp, mitteilungVerwaltung));
+			befunde.push(...pruefeVerwaltungImporte(pfad, imp, gemischt));
 			if (imp.some((i) => i.quelle === null)) {
 				befunde.push(`${pfad}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`);
 			}
@@ -259,13 +287,11 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 	return befunde;
 }
 
-/** Dateien, die die Bauregel betreffen: Routen, Konfiguration, jede `*.remote.*` und die Liste der Admin-Schnittstellen. */
+/** Dateien, die die Bauregel betreffen: Routen, Konfiguration, jede `*.remote.*` und die Dateien mit den Verwaltungs-Listen. */
 export function betrifftBauregel(pfad: string): boolean {
 	return (
 		pfad.startsWith('src/routes/') ||
-		pfad === SCHNITTSTELLEN_DATEI ||
-		pfad === TURNIER_DATEI ||
-		pfad === MITTEILUNG_DATEI ||
+		VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei) ||
 		/^(vite|svelte)\.config\.[cm]?[tj]s$/.test(pfad) ||
 		/\.remote\.(ts|js)$/.test(pfad)
 	);

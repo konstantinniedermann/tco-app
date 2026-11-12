@@ -158,7 +158,7 @@ describe('Admin-Routen', () => {
 		for (const alt of ['admin/index.ts', 'mitteilung/index.ts']) {
 			const quer = rumpf('getVereinMitteilungen').replace('dienste.ts', alt);
 			expect(mit(quer)).toEqual([
-				`${mRoute}: Admin-Route importiert '../../../../lib/server/${alt}'; erlaubt sind nur dienste.ts und die Schnittstellen aus admin/, turnier/ und mitteilung/`
+				`${mRoute}: Admin-Route importiert '../../../../lib/server/${alt}'; erlaubt sind nur dienste.ts, admin/schnittstellen.ts, turnier/schnittstellen.ts und mitteilung/schnittstellen.ts`
 			]);
 		}
 	});
