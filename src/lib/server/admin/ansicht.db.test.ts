@@ -15,8 +15,9 @@ import {
 } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleLoginDienst } from '../login/dienst.ts';
-import { getSitzung, postLogout } from '../login/schnittstellen.ts';
+import { postLogout } from '../login/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
+import { getSitzung } from '../sitzung/schnittstellen.ts';
 import { postTurniere } from '../turnier/schnittstellen.ts';
 import { riegel } from './ansicht.ts';
 import { setzeRollen } from './rollen.ts';

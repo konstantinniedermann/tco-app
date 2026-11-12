@@ -101,12 +101,12 @@ import {
 	postHinweis
 } from './login/passkey-schnittstellen.ts';
 import {
-	getSitzung,
 	postBrief as postBriefLogin,
 	postLogout,
 	postMail,
 	postMailCode
 } from './login/schnittstellen.ts';
+import { getSitzung } from './sitzung/schnittstellen.ts';
 import {
 	MITTEILUNG_SCHNITTSTELLEN,
 	getAnlassMitteilungen,

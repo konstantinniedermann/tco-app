@@ -1,12 +1,16 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { eq, lt, sql } from 'drizzle-orm';
-import type { AnsichtRolle } from '../admin/rollen.ts';
 import type { Db, DbOderTx } from '../db/index.ts';
 import { konto, kontoRolle, mitglied, sitzung } from '../db/schema.ts';
 
 export const SITZUNG_COOKIE = 'mytco_sitzung';
 export const SITZUNG_GUELTIG_MS = 365 * 24 * 60 * 60 * 1000;
 export const VERLAENGERN_NACH_MS = 24 * 60 * 60 * 1000;
+
+// «Ansicht als …»: Der MyTCO-Admin sieht MyTCO wie jemand mit genau dieser Rolle (oder ohne
+// Admin-Rolle, `mitglied`). Liste wie die Prüfung `sitzung_ansicht_rolle_check`.
+export const ANSICHT_ROLLEN = ['mitglied', 'mitglieder', 'cm', 'lizenz'] as const;
+export type AnsichtRolle = (typeof ANSICHT_ROLLEN)[number];
 
 export type AngemeldetesKonto = {
 	kontoId: number;

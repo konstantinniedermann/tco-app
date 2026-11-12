@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.16 — Sitzungs-Antwort in eigenem Modul (Refactoring Schritt 10)
+
+- `getSitzung` liegt unverändert in `src/lib/server/sitzung/schnittstellen.ts`; `login` hängt nicht
+  mehr von `admin` und `gespraech` ab. In der Importregel bleibt eine Ausnahme statt vier. Am
+  Verhalten ändert sich nichts (#80).
+
 ## 0.20.15 — Antworten des Vorstands vom 11.11. übertragen
 
 - Die vier Admin-Rollen und ihre Besetzung zum Start gelten (K-18.4); Annahmen in Doku und

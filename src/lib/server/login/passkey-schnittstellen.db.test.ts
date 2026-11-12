@@ -4,6 +4,7 @@ import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { testPruefer } from '../../../../tests/hilfen/passkey-pruefer.ts';
 import { erstelleDb } from '../db/index.ts';
+import { getSitzung } from '../sitzung/schnittstellen.ts';
 import { erstelleBremsen } from './bremse.ts';
 import { ChallengeSpeicher, CHALLENGE_GUELTIG_MS } from './challenge.ts';
 import {
@@ -16,7 +17,6 @@ import {
 	postHinweis
 } from './passkey-schnittstellen.ts';
 import { erstellePasskeyDienst } from './passkey.ts';
-import { getSitzung } from './schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, SITZUNG_COOKIE } from './sitzung.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
