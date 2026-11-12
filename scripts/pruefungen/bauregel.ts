@@ -24,13 +24,11 @@ const ADMIN_MODUL = /(?:^|\/|^\$)lib\/server\/admin(?:\/|$)/;
 const SERVER = 'src/lib/server/';
 
 /**
- * Was eine Route ausserhalb von api/admin aus einer Verwaltungs-Datei darf: `ordner` = nichts, der
- * ganze Ordner `lib/server/admin` ist gesperrt (ADMIN_MODUL); `pfad` = nichts, die Datei ist am
- * Pfad gesperrt (reine Verwaltungs-Datei in einem Thema, E-38); `namen` = keinen Namen der Liste
- * (gemischte Datei mit Schnittstellen der Mitglieder, Sperrliste); `offen` = dafür gibt es heute
- * keine Regel (Lücke, D.7).
+ * Wie eine Verwaltungs-Datei ausserhalb von api/admin gesperrt ist; eine Route dort darf aus ihr
+ * nichts: `ordner` = der ganze Ordner `lib/server/admin` (ADMIN_MODUL); `pfad` = die Datei an ihrem
+ * Pfad (reine Verwaltungs-Datei in einem Thema, E-38).
  */
-type Aussen = 'ordner' | 'pfad' | 'namen' | 'offen';
+type Aussen = 'ordner' | 'pfad';
 
 // Die Schnittstellen-Dateien der Verwaltung (relativ zu src/lib/server/) mit ihrer Liste: die eine
 // Stelle für die Menge der Listen in der Bauregel. Die erste muss es geben (ADMIN_SCHNITTSTELLEN);
@@ -92,8 +90,7 @@ const ERLAUBT_DIENSTE = VERWALTUNGS_EINSTIEGE.join(' und ');
 const ERLAUBT_MITGLIEDER = `erlaubt sind nur ${MITGLIEDER_EINSTIEGE.join(', ')}`;
 const ERLAUBT_IMPORT = `erlaubt sind nur ${aufzaehlung(['dienste.ts', ...VERWALTUNGS_DATEIEN.map((v) => v.datei)])}`;
 const ERLAUBT_LISTEN = `erlaubt sind nur Einträge aus ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.liste))}`;
-// Ausserhalb von api/admin: aus dem Zusammenbau der Dienste und aus den gemischten Dateien nur, was
-// den Mitgliedern dient. `dienste.ts` mit und ohne Endung (auch `.js`, das Vite auf `.ts` auflöst),
+// Ausserhalb von api/admin: aus dem Zusammenbau der Dienste nur, was den Mitgliedern dient. `dienste.ts` mit und ohne Endung (auch `.js`, das Vite auf `.ts` auflöst),
 // über `$lib` und mit Anhang (`?…`): Der Schutz hängt hier am Namen, nicht mehr am Pfad.
 const DIENSTE_MODUL = /(?:^|\/|^\$)lib\/server\/dienste(?:\.(?:ts|js))?(?:[?#].*)?$/;
 // Am Pfad gesperrte Dateien (`aussen: 'pfad'`): der Pfad ohne Endung, danach alles ausser einem
@@ -101,11 +98,6 @@ const DIENSTE_MODUL = /(?:^|\/|^\$)lib\/server\/dienste(?:\.(?:ts|js))?(?:[?#].*
 const NUR_VERWALTUNG = VERWALTUNGS_DATEIEN.filter((v) => v.aussen === 'pfad').map((v) => ({
 	...v,
 	muster: new RegExp(`(?:^|\\/|^\\$)lib\\/server\\/${escape(ohneEndung(v.datei))}(?![\\w-])`)
-}));
-// Gemischte Dateien (`aussen: 'namen'`): mit und ohne `.ts`, über `$lib`.
-const GEMISCHT = VERWALTUNGS_DATEIEN.filter((v) => v.aussen === 'namen').map((v) => ({
-	...v,
-	muster: new RegExp(`(?:^|\\/|^\\$)lib\\/server\\/${escape(ohneEndung(v.datei))}(?:\\.ts)?$`)
 }));
 
 // Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
@@ -175,13 +167,12 @@ function importe(inhalt: string): Import[] {
 /**
  * Ein Name in Anführungszeichen ohne Escape ist derselbe Name wie ohne (`'x'` = `x`). Mit Escape,
  * anderem Inhalt oder unvollständig bleibt er, wie er steht, samt Anführungszeichen: Dann passt er
- * auf keine Liste, und die Sperrliste meldet ihn eigens (`pruefeVerwaltungImporte`).
+ * auf keine Liste und auf keine Erlaubt-Liste (`pruefeDiensteImporte`): ein Befund.
  */
 function leseName(roh: string): string {
 	const text = /^(['"])([^'"\\\n]*)\1$/.exec(roh);
 	return text ? text[2] : roh;
 }
-const inAnfuehrungszeichen = (name: string) => /^['"]/.test(name);
 
 /** Paare [importiert, lokal] aus `{ a, b as c }` (ohne `type`); `null` bei Standard- oder Namensraum-Import. */
 function benannteNamen(klausel: string): [string, string][] | null {
@@ -271,40 +262,25 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 	return befunde;
 }
 
-/** Ausserhalb von api/admin: aus `dienste.ts` nur Einstiege der Mitglieder, aus einer gemischten Datei keine Schnittstelle ihrer Verwaltungs-Liste. */
-function pruefeVerwaltungImporte(
-	pfad: string,
-	imp: Import[],
-	gemischt: { muster: RegExp; namen: Set<string> | null }[]
-): string[] {
+/** Ausserhalb von api/admin: aus `dienste.ts` nur Einstiege der Mitglieder, statisch und mit Namen. */
+function pruefeDiensteImporte(pfad: string, imp: Import[]): string[] {
 	const befunde: string[] = [];
 	for (const i of imp) {
-		if (i.quelle === null) continue;
-		const quelle = i.quelle;
-		const ausDiensten = DIENSTE_MODUL.test(quelle);
-		const datei = gemischt.find((g) => g.muster.test(quelle));
-		if (!ausDiensten && datei === undefined) continue;
-		const verwaltung = datei?.namen ?? null;
+		if (i.quelle === null || !DIENSTE_MODUL.test(i.quelle)) continue;
 		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
 		if (namen === null) {
 			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
 			continue;
 		}
 		for (const [name] of namen) {
-			if (ausDiensten && MITGLIEDER_EINSTIEGE.includes(name)) continue;
-			if (ausDiensten && !VERWALTUNGS_EINSTIEGE.includes(name)) {
+			if (MITGLIEDER_EINSTIEGE.includes(name)) continue;
+			if (!VERWALTUNGS_EINSTIEGE.includes(name)) {
 				befunde.push(
 					`${pfad}: aus dienste.ts nur Einstiege der Mitglieder, nicht '${name}'; ${ERLAUBT_MITGLIEDER}`
 				);
 				continue;
 			}
-			if (ausDiensten || (verwaltung?.has(name) ?? false)) {
-				befunde.push(`${pfad}: nur Routen unter src/routes/api/admin/ dürfen '${name}' nutzen`);
-			} else if (inAnfuehrungszeichen(name)) {
-				befunde.push(
-					`${pfad}: Name ${name} aus '${quelle}' lässt sich nicht lesen; ohne Escape schreiben`
-				);
-			}
+			befunde.push(`${pfad}: nur Routen unter src/routes/api/admin/ dürfen '${name}' nutzen`);
 		}
 	}
 	return befunde;
@@ -314,7 +290,6 @@ function pruefeVerwaltungImporte(
 export function pruefeBauregel(dateien: Map<string, string>): string[] {
 	const befunde: string[] = [];
 	const liste = adminSchnittstellen(dateien);
-	const gemischt = GEMISCHT.map((g) => ({ muster: g.muster, namen: listeAus(dateien, g) }));
 	const mitAdminRoute = [...dateien.keys()].some((p) => ADMIN_ROUTE.test(p));
 	if (mitAdminRoute && liste === null) {
 		const [erste] = VERWALTUNGS_DATEIEN;
@@ -346,7 +321,7 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 					);
 				}
 			}
-			befunde.push(...pruefeVerwaltungImporte(pfad, imp, gemischt));
+			befunde.push(...pruefeDiensteImporte(pfad, imp));
 			if (imp.some((i) => i.quelle === null)) {
 				befunde.push(`${pfad}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`);
 			}
