@@ -7,6 +7,14 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Erledigt im Refactoring, Schritt 11 (12.11.2026) — ausserhalb einer Auswertung
+
+**Mitgemacht**
+
+- 2026-11-12 — Datenbanktests legen Turniere mit zufälligem Jahr an und können sich treffen → e2aafd6
+  (`tests/hilfen/turnierjahre.ts`: eigener Jahresbereich je Testdatei, fortlaufend gezählt; jeder
+  Lauf hat eine frische Datenbank; `docs/refactoring-analyse.md`, Anhang D.12)
+
 ### Erledigt im Refactoring, Schritt 02 (11.11.2026) — ausserhalb einer Auswertung
 
 **Mitgemacht**
