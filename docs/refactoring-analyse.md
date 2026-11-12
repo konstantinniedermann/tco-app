@@ -29,12 +29,12 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 | **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende offen |
 | **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D). Die Überschriften «Ergebnis Schritt 07/08/09» in 7.3 nennen noch «Review und Merge offen»; es gilt diese Zeile |
 | **Zuletzt erledigt** | **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **Checkpoint am Ende der Etappe 1** mit dem Projektleiter: Zwischenrevision in Abschnitt 1c (Vorschlag, nicht eingespielt), Fragen F-24 bis F-27 in 9.1. Danach, je nach Antwort: Schritt 12a (Reste der Bauregel) und Etappe 2 ab Schritt 13 mit Nachmessen vorab |
-| **Wartet auf Freigabe des Projektleiters** | **Checkpoint am Ende der Etappe 1:** die vier Fragen F-24 bis F-27 (Abschnitt 9.1) als eine Auswahlrunde: Ok für die Etappe 2 mit den Änderungen aus 1c (F-24), eigener Schritt 12a für die Reste der Bauregel (F-25), Vorschlag zur `CLAUDE.md` (F-26), Verhalten des Wächters in Schritt 15 (F-27). Die Vorschläge der Zwischenrevision (Abschnitt 1c) sind nicht eingespielt; der Orchestrator arbeitet ein, was freigegeben ist. E-40 (ohne Halt) galt für die Session der Etappe 1 |
-| **Offene Fragen** | **F-24 bis F-27** (Checkpoint Etappe 1, Abschnitt 9.1, je mit Empfehlung; F-24 bis F-26 vor Schritt 13, F-27 vor Schritt 15). **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. **F-22** ist durch den Ablauf erledigt (ein Schritt, zwei Läufe mit je eigenem Review, D.13), **F-23** geht in F-26 auf. F-17, F-20 und F-21 stehen noch in 9.1, sind aber beantwortet (E-36 bis E-38) |
+| **Nächster offener Schritt** | **12a** Reste der Bauregel (E-42; Plan-Zeile in 7.3 nach Abschnitt 1c), dann Etappe 2 ab **13** mit Nachmessen vorab, in zwei Läufen (E-41) |
+| **Wartet auf Freigabe des Projektleiters** | nichts. Checkpoint am Ende der Etappe 1 erledigt am 12.11.2026 (E-41 bis E-44); die Berichtigungen der `CLAUDE.md` sind eingespielt (E-43) |
+| **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen Fragen sind beantwortet (F-22 durch den Ablauf erledigt, F-23 in F-26 aufgegangen) |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
 | **Vorab nachzumessen** | vor Schritt 13, 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
-| **Nächster Checkpoint** | in der laufenden Session Kurzbericht je Schritt ohne Halt (E-40); sonst nach jedem Schritt der Etappen 1 und 2 (E-30) |
+| **Nächster Checkpoint** | Etappe 2 ist Kern der Anwendung: Checkpoint nach jedem Schritt (E-26, E-30); in einer Session, in der der Projektleiter selbstständiges Weiterarbeiten freigibt, Kurzbericht je Schritt ohne Halt (wie E-40). Zusätzlich in Schritt 17 der Checkpoint vor dem Merge (E-21) |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32) |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
 
@@ -2157,6 +2157,10 @@ sie hebt die Übergangsregeln auf.
 | **E-38** [neu] | (F-17, 12.11.2026) Antwort A: Verwaltungs-Schnittstellen ausserhalb von `admin/` liegen in einer eigenen Datei je Thema mit eigener Liste; der Schutz hängt am Dateipfad. Dazu beide Zusätze aus D.7: (1) `mitteilung/` wird in Schritt 11 ebenfalls getrennt, sodass eine Form bleibt; (2) Schritt 09 schliesst als eigener Commit die Lücke der Bauregel «Import mit Namen in Anführungszeichen». |
 | **E-39** [neu] | (12.11.2026) Zur Kenntnis genommen und gebilligt: die drei Dienst-Typen sind entgegen E-33 nach `typen.ts` verschoben (Schritt 07, D.4); die Erlaubt-Liste der Mitglieder-Einstiege in der Bauregel (Schritt 07, Korrekturrunde); der Checkpoint nach Schritt 07 lief ohne Halt. |
 | **E-40** [neu] | (12.11.2026) Der Orchestrator arbeitet in der laufenden Session selbstständig weiter («passt alles. mach selbstständig weiter»): Die Schritte der Etappe 1 laufen ohne Halt am Checkpoint, mit Kurzbericht je Schritt. Angehalten wird weiter bei allem aus E-06, bei einer sichtbaren Verhaltensänderung, bei einem Abbruch eines Subagenten, bei zweimal Befunden im Review, bei roter CI und bei einer Frage, die das Dokument dem Projektleiter vorbehält. Der Halt nach jedem Schritt (E-30) gilt wieder ab der nächsten Session, sofern der Projektleiter nichts anderes sagt. |
+| **E-41** [neu] | (F-24, 12.11.2026, Checkpoint Etappe 1) Ok für die Etappe 2 mit den Änderungen der Zwischenrevision (Abschnitt 1c): Schritt 13 in zwei Läufen mit je eigenem Review und Vorab-Tests der Sonderfälle (Lauf 2 benennt `ergebnis` in `art` um), Schritt 15 mit Nachmessen, Risiko mittel und einem Vorab-Test der Umleitungen, Schritt 16 nach 15, die Hinweise zu den Schritten 20 und 21. |
+| **E-42** [neu] | (F-25, 12.11.2026) Eigener kleiner Schritt **12a** für die Reste der Bauregel, vor Schritt 13 (Plan-Zeile nach 1c). Nur Prüfskript, kein App-Code. |
+| **E-43** [neu] | (F-26 und F-23, 12.11.2026) Die Berichtigungen C-1, C-2, C-3 und C-5 an der Projekt-`CLAUDE.md` gelten und sind eingespielt (Orchestrator); C-4 bleibt unverändert, weil Schritt 13 umbenennt. Die Übergangsregeln 06 bis 08 werden erst mit Schritt 24 zu Dauerregeln (C-7 bis C-10 bleiben Entwurf). |
+| **E-44** [neu] | (F-27, 12.11.2026) Schritt 15 vereinheitlicht die Umleitungen bei «nicht angemeldet» nicht: Der gemeinsame Wächter bildet das heutige Verhalten genau nach, die Abweichungen werden benannte Fälle. |
 
 ---
 
@@ -2168,7 +2172,7 @@ Ende der Etappe 0). Der Entscheid steht je in Abschnitt 8.
 
 ### 9.1 Offene Fragen
 
-**F-24 [neu, OFFEN] — Ok für die Etappe 2, und in welcher Form?** (Zwischenrevision Etappe 1,
+**F-24 [BEANTWORTET 12.11.2026: wie empfohlen, E-41] — Ok für die Etappe 2, und in welcher Form?** (Zwischenrevision Etappe 1,
 Abschnitt 1c, Tabellen P und «Netz»)
 
 **Frist: Checkpoint am Ende der Etappe 1; vor Schritt 13.** Die Etappe 2 baut die Oberfläche um.
@@ -2187,7 +2191,7 @@ festhält, bevor umgebaut wird.
   Umbau heute unbemerkt etwas ändern könnte. C spart Risiko, lässt aber genau die Duplikate
   stehen, die das Kurzfazit als Wachstumsspuren nennt.
 
-**F-25 [neu, OFFEN] — Bekommen die Reste der Bauregel einen eigenen kleinen Schritt 12a?**
+**F-25 [BEANTWORTET 12.11.2026: wie empfohlen, E-42] — Bekommen die Reste der Bauregel einen eigenen kleinen Schritt 12a?**
 (Abschnitt 1c, Plan-Zeile 12a und Befunde N-01 bis N-06; Eintrag «Sicherheit» in
 `docs/beobachtungen.md`)
 
@@ -2205,7 +2209,7 @@ Anfrage; es geht um das zweite Netz. Für die Nutzerin ändert keine Antwort etw
   Feature-Stopps entsteht keine neue Schnittstelle); A nur, weil ein offener Eintrag zum Schutz
   nicht über drei Etappen liegen soll.
 
-**F-26 [neu, OFFEN] — Gilt der Vorschlag der Zwischenrevision zur `CLAUDE.md`?** (Abschnitt 1c,
+**F-26 [BEANTWORTET 12.11.2026: wie empfohlen, E-43] — Gilt der Vorschlag der Zwischenrevision zur `CLAUDE.md`?** (Abschnitt 1c,
 Tabelle C; ersetzt F-23)
 
 **Frist: vor Schritt 13.** Fünf Sätze der Datei stimmen nach der Etappe 1 im Wortlaut nicht mehr
@@ -2219,7 +2223,7 @@ immer und könnten Dauerregeln werden (Teil 2); der Plan sieht das erst für Sch
   ist richtig, aber nicht eilig: Die Regeln gelten auch mit «Ab Schritt NN», und Schritt 24 löst
   den Block ohnehin im Gespräch mit dem Projektleiter auf.
 
-**F-27 [neu, OFFEN] — Darf Schritt 15 die Umleitungen bei «nicht angemeldet» vereinheitlichen?**
+**F-27 [BEANTWORTET 12.11.2026: wie empfohlen, E-44] — Darf Schritt 15 die Umleitungen bei «nicht angemeldet» vereinheitlichen?**
 (B-21; Abschnitt 1c, Zeile 15 der Tabelle P)
 
 **Frist: vor Schritt 15.** Heute reagieren nicht alle Seiten gleich, wenn die Anmeldung fehlt: Die
