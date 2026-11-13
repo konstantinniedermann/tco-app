@@ -4,6 +4,7 @@
 import { rufeAb, type Holen, type Json, type Vertrag } from '../abruf.ts';
 import type { Fehlerwort } from '../fehler.ts';
 import { jsonPost } from '../json-post.ts';
+import { ABLEHNUNGEN } from './ablehnung.ts';
 import type {
 	CmAnsicht as ServerCmAnsicht,
 	CmStand as ServerCmStand
@@ -48,19 +49,11 @@ export function kategorieZumAnsehen(
 	return w ? { kategorie: w, wildcard: true } : null;
 }
 
-/** Gründe, aus denen der Server eine Anmeldung oder Anfrage ablehnt (409). */
-const ABGELEHNT = [
-	'geschlossen',
-	'voll',
-	'passt-nicht',
-	'schon-angemeldet',
-	'schon-angefragt',
-	'anfrage-offen',
-	'hinfaellig',
-	'angaben-fehlen',
-	'keine-wildcard',
-	'nur-lesen'
-] as const satisfies readonly Fehlerwort[];
+/**
+ * Gründe, aus denen der Server ablehnt: die mit dem Server geteilte Liste der Anmeldung und Anfrage,
+ * dazu `nur-lesen` aus dem Gespräch (FR-50).
+ */
+const ABGELEHNT = [...ABLEHNUNGEN, 'nur-lesen'] as const satisfies readonly Fehlerwort[];
 type Abgelehnt = (typeof ABGELEHNT)[number];
 
 /** Felder, die der Server bei 400 melden kann. */
