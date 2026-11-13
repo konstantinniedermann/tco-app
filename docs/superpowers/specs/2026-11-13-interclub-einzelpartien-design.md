@@ -12,6 +12,13 @@ Ausblick (Entscheid PL, nicht in dieser Session): Die Daten bleiben über die Sa
 später Verläufe zeigen kann (je Spieler, Team, Saison, Rangliste). Deshalb werden für TCO-Spieler
 schon jetzt Personennummer und Rangliste-Nummer von Swiss Tennis mitgespeichert.
 
+## Nachtrag nach dem ersten Entwurf (Entscheid PL)
+
+- **Gegner mit Name und Klassierung** (ohne Personen- und Rangliste-Nummer), sichtbar beim
+  Aufklappen einer Partie. Ersetzt «Gegner nur mit Teamnamen» in dieser Spec.
+- Seite *Begegnung* kompakt: Umschalter «Einzel · Doppel» (wie «Resultate · Teams»), Partien
+  einzeilig, aufklappbar.
+
 ## Ziele
 
 1. **Datenschutz zuerst** (vor jedem Code, eigener Commit): `docs/datenschutz.md` und

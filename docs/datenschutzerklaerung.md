@@ -70,7 +70,7 @@ du selbst einschaltest. Für nichts anderes.
   Login abrufbar; sie enthält keine Angaben zu Personen.
 - Alle eingeloggten Mitglieder sehen die Interclub-Resultate der TCO-Teams, auch die Einzelpartien mit Name und
   Klassierung der TCO-Spieler, auch von Junioren. MyTCO übernimmt sie von Swiss Tennis, wo sie öffentlich sind,
-  und zeigt nicht mehr als dort. Gegner erscheinen nur mit ihrem Team.
+  und zeigt nicht mehr als dort. Bei den Gegnern stehen ebenfalls Name und Klassierung.
 - Swiss Tennis erhält Anmeldungen, Resultate und Lizenzanträge.
 
 **Wo:** Die Daten liegen bei Infomaniak in der Schweiz; E-Mails versendet [E-Mail-Dienst].
