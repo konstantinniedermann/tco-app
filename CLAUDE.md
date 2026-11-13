@@ -109,8 +109,9 @@ Abschluss des Plans.
   sie für ein Wort nennt. Fehlerwörter nur aus dieser Liste, die Server und Oberfläche teilen.
 - Die Importrichtung zwischen den Server-Modulen setzt ESLint ohne Ausnahme durch; eine Ausnahme
   in `AUSNAHMEN` (`eslint.config.js`) nur mit Entscheid des Projektleiters.
-- Ab Schritt 13: Abruf-Module nutzen den gemeinsamen Abruf-Baustein; keine eigene Deutung von
-  Statuscodes, das Ergebnis heisst `art`.
+- Ab Schritt 13: Statuscodes deutet nur der Abruf-Baustein (`src/lib/abruf.ts`); ein einzelner
+  Abruf gibt `{ art }` zurück. Abläufe aus mehreren Anfragen (Passkey, Push auf dem Gerät) und
+  Lade-Hilfen («Daten oder `null`», Wahrheitswert) dürfen eine andere Form haben.
 - Ab Schritt 15: Fehlende Sitzung, Rolle oder Bestätigung behandelt nur die gemeinsame
   Wächter-Funktion, in der Ladefunktion und nach einer Aktion; keine Seite schreibt die Umleitung
   zum Login selbst, keine Ladefunktion ruft `fetch` direkt. Das erste Laden einer Seite steht in
