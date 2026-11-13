@@ -3,6 +3,8 @@
 import { readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { erstelleDb, type Db } from '../src/lib/server/db/index.ts';
+import { importiereSaison } from '../src/lib/server/interclub/import.ts';
 import type { Wettbewerb } from '../src/lib/server/interclub/swiss-tennis.ts';
 
 const ORDNER = join(dirname(fileURLToPath(import.meta.url)), 'beispiel-interclub', '2026');
@@ -35,4 +37,27 @@ export function beispielAbruf(
 		}
 		return antwort(404, '{}');
 	};
+}
+
+/** Legt die Saison 2026 des Vereins 2202 aus den Dateien an; ein zweiter Lauf ersetzt sie vollständig. */
+export async function legeBeispielInterclubAn(db: Db, jetzt: Date): Promise<void> {
+	await importiereSaison(
+		{ db, holen: beispielAbruf(), jetzt: () => jetzt, pause: async () => {} },
+		2026,
+		2202
+	);
+}
+
+if (import.meta.main) {
+	const url = process.env.DATABASE_URL;
+	if (!url) {
+		console.error('DATABASE_URL fehlt');
+		process.exit(1);
+	}
+	const db = erstelleDb(url);
+	try {
+		await legeBeispielInterclubAn(db, new Date());
+	} finally {
+		await db.$client.end();
+	}
 }
