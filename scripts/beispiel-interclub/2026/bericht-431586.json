@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "05. Juni 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 3,
+		"sets": 6,
+		"games": 36
+	},
+	"awayTeam": {
+		"name": "Neufeld BE 2",
+		"clubNumber": 2063,
+		"points": 0,
+		"sets": 0,
+		"games": 8
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900292,
+							"name": "Luca Aufschlag R7 (13550)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900296,
+							"name": "Pascal Lob R9 (61137)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:2", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900295,
+							"name": "Olivia Volley R8 (27551)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900297,
+							"name": "Rahel Stopp R9 (60990)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900292,
+							"name": "Luca Aufschlag R7 (13550)"
+						},
+						{
+							"id": 900294,
+							"name": "Nico Rückhand R9 (34628)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900298,
+							"name": "Silvan Satzball R8 (25861)"
+						},
+						{
+							"id": 900297,
+							"name": "Rahel Stopp R9 (60990)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:3", ""]
+		}
+	],
+	"leagueId": 1,
+	"groupId": 39
+}

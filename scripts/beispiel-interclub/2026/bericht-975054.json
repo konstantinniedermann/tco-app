@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "06. Juni 2026",
+	"homeTeam": {
+		"name": "Saignelégier",
+		"clubNumber": 2220,
+		"points": 0,
+		"sets": 0,
+		"games": 19
+	},
+	"awayTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 9,
+		"sets": 18,
+		"games": 108
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900194,
+							"name": "Jan Schiedsstuhl R9 (33400)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900167,
+							"name": "Gina Skizze R4 (2033)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "0:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900195,
+							"name": "Kim Ballkind R7 (17062)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900169,
+							"name": "Ines Schablone R6 (9460)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "4:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900196,
+							"name": "Leo Matchball R9 (32094)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900171,
+							"name": "Klara Kulisse R7 (13217)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "0:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900197,
+							"name": "Maja Muster R9 (60074)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900173,
+							"name": "Mia Netzroller R7 (11688)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "1:6", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900198,
+							"name": "Noah Beispiel R9 (34476)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900175,
+							"name": "Olivia Aufschlag R6 (10115)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "0:6", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900199,
+							"name": "Paula Platzhalter R9 (61424)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900179,
+							"name": "Tanja Lob R7 (19707)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "1:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900194,
+							"name": "Jan Schiedsstuhl R9 (33400)"
+						},
+						{
+							"id": 900198,
+							"name": "Noah Beispiel R9 (34476)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900169,
+							"name": "Ines Schablone R6 (9460)"
+						},
+						{
+							"id": 900171,
+							"name": "Klara Kulisse R7 (13217)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "1:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900195,
+							"name": "Kim Ballkind R7 (17062)"
+						},
+						{
+							"id": 900197,
+							"name": "Maja Muster R9 (60074)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900167,
+							"name": "Gina Skizze R4 (2033)"
+						},
+						{
+							"id": 900173,
+							"name": "Mia Netzroller R7 (11688)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "0:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900196,
+							"name": "Leo Matchball R9 (32094)"
+						},
+						{
+							"id": 900199,
+							"name": "Paula Platzhalter R9 (61424)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900179,
+							"name": "Tanja Lob R7 (19707)"
+						},
+						{
+							"id": 900177,
+							"name": "Rahel Rückhand R7 (17237)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "1:6", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 38
+}

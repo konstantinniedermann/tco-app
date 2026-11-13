@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "06. Juni 2026",
+	"homeTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 5,
+		"sets": 10,
+		"games": 90
+	},
+	"awayTeam": {
+		"name": "Schüpfen 1",
+		"clubNumber": 2229,
+		"points": 4,
+		"sets": 8,
+		"games": 58
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900100,
+							"name": "Urs Volley R5 (2888)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900368,
+							"name": "Hugo Netzroller R5 (4266)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "6:7", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900102,
+							"name": "Willi Stopp R6 (6527)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900369,
+							"name": "Ines Grundlinie R6 (7353)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "4:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900116,
+							"name": "Leo Schiedsstuhl R6 (9029)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900370,
+							"name": "Jonas Aufschlag R5 (4634)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "2:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900106,
+							"name": "Bruno Linienrichter R7 (11874)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900371,
+							"name": "Klara Vorhand R9 (61826)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900108,
+							"name": "Dominik Hallenbach R8 (27369)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900372,
+							"name": "Luca Rückhand R9 (61702)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900121,
+							"name": "Anna Vorlage R8 (26046)"
+						}
+					],
+					"wo": 1
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900373,
+							"name": "Mia Volley R8 (25096)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["", "", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900100,
+							"name": "Urs Volley R5 (2888)"
+						},
+						{
+							"id": 900106,
+							"name": "Bruno Linienrichter R7 (11874)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900370,
+							"name": "Jonas Aufschlag R5 (4634)"
+						},
+						{
+							"id": 900368,
+							"name": "Hugo Netzroller R5 (4266)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "6:7", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900102,
+							"name": "Willi Stopp R6 (6527)"
+						},
+						{
+							"id": 900121,
+							"name": "Anna Vorlage R8 (26046)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900372,
+							"name": "Luca Rückhand R9 (61702)"
+						},
+						{
+							"id": 900369,
+							"name": "Ines Grundlinie R6 (7353)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "7:5", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900108,
+							"name": "Dominik Hallenbach R8 (27369)"
+						},
+						{
+							"id": 900116,
+							"name": "Leo Schiedsstuhl R6 (9029)"
+						}
+					],
+					"wo": 1
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900371,
+							"name": "Klara Vorhand R9 (61826)"
+						},
+						{
+							"id": 900373,
+							"name": "Mia Volley R8 (25096)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["", "", ""]
+		}
+	],
+	"leagueId": 9,
+	"groupId": -1
+}

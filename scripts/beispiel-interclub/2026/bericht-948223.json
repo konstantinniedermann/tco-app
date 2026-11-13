@@ -1,0 +1,184 @@
+{
+	"title": "Beispiel",
+	"subtitle": "09. Mai 2026",
+	"homeTeam": {
+		"name": "Mellingen",
+		"clubNumber": 2179,
+		"points": 4,
+		"sets": 9,
+		"games": 63
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 2,
+		"sets": 5,
+		"games": 51
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900018,
+							"name": "Silvan Grundlinie R7 (4206)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900001,
+							"name": "Anna Muster R6 (3805)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900019,
+							"name": "Tanja Aufschlag R7 (6116)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900005,
+							"name": "Elena Punktgewinn R6 (3875)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "1:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900020,
+							"name": "Urs Vorhand R7 (4405)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900007,
+							"name": "Gina Testmann R8 (9040)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "7:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900021,
+							"name": "Vera Rückhand R7 (5652)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900009,
+							"name": "Ines Annahme R8 (11250)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "6:3", "6:3"]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900018,
+							"name": "Silvan Grundlinie R7 (4206)"
+						},
+						{
+							"id": 900020,
+							"name": "Urs Vorhand R7 (4405)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900001,
+							"name": "Anna Muster R6 (3805)"
+						},
+						{
+							"id": 900005,
+							"name": "Elena Punktgewinn R6 (3875)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "7:5", "7:10"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900019,
+							"name": "Tanja Aufschlag R7 (6116)"
+						},
+						{
+							"id": 900022,
+							"name": "Willi Volley R7 (4545)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900007,
+							"name": "Gina Testmann R8 (9040)"
+						},
+						{
+							"id": 900003,
+							"name": "Carla Platzhalter R7 (6907)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		}
+	],
+	"leagueId": 21,
+	"groupId": 16
+}

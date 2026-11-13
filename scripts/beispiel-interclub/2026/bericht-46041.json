@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "14. Juni 2026",
+	"homeTeam": {
+		"name": "Casino BS",
+		"clubNumber": 2027,
+		"points": 5,
+		"sets": 10,
+		"games": 86
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 4,
+		"sets": 11,
+		"games": 91
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900404,
+							"name": "Dario Attrappe R5 (4524)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900044,
+							"name": "Dario Punktgewinn R6 (5438)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "7:6", "6:4"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900405,
+							"name": "Elena Kulisse R5 (4653)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900046,
+							"name": "Fabio Testmann R6 (9117)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:2", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900406,
+							"name": "Fabio Spielball R6 (6406)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900048,
+							"name": "Hugo Annahme R6 (7150)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "2:6", "6:2"]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900407,
+							"name": "Gina Netzroller R6 (7217)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900050,
+							"name": "Jonas Skizze R6 (8145)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "6:0", "6:2"]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900408,
+							"name": "Hugo Grundlinie R8 (24187)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900060,
+							"name": "Urs Rückhand R7 (10789)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "1:6", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900409,
+							"name": "Ines Aufschlag R9 (33057)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900052,
+							"name": "Luca Schablone R7 (12372)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:7", "5:7", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900404,
+							"name": "Dario Attrappe R5 (4524)"
+						},
+						{
+							"id": 900405,
+							"name": "Elena Kulisse R5 (4653)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900044,
+							"name": "Dario Punktgewinn R6 (5438)"
+						},
+						{
+							"id": 900046,
+							"name": "Fabio Testmann R6 (9117)"
+						}
+					],
+					"wo": 1
+				}
+			},
+			"results": ["4:6", "", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900406,
+							"name": "Fabio Spielball R6 (6406)"
+						},
+						{
+							"id": 900407,
+							"name": "Gina Netzroller R6 (7217)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900048,
+							"name": "Hugo Annahme R6 (7150)"
+						},
+						{
+							"id": 900050,
+							"name": "Jonas Skizze R6 (8145)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900408,
+							"name": "Hugo Grundlinie R8 (24187)"
+						},
+						{
+							"id": 900409,
+							"name": "Ines Aufschlag R9 (33057)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900060,
+							"name": "Urs Rückhand R7 (10789)"
+						},
+						{
+							"id": 900052,
+							"name": "Luca Schablone R7 (12372)"
+						}
+					],
+					"wo": 1
+				}
+			},
+			"results": ["", "", ""]
+		}
+	],
+	"leagueId": 17,
+	"groupId": -1
+}

@@ -235,11 +235,18 @@ function pruefeSeiteRoh(roh: unknown): SeiteRoh | null {
 	return { members: roh.members, wo: roh.wo };
 }
 
-function pruefePartie(roh: unknown, art: StPartie['art'], tcoHeim: boolean): StPartie | null {
+// 'nicht-gespielt': Die Begegnung war vorher entschieden (beide Seiten w.o., ohne Spieler und Sätze).
+function pruefePartie(
+	roh: unknown,
+	art: StPartie['art'],
+	tcoHeim: boolean
+): StPartie | 'nicht-gespielt' | null {
 	if (!istObjekt(roh) || !istZahl(roh.position) || !istObjekt(roh.players)) return null;
 	const heim = pruefeSeiteRoh(roh.players.home);
 	const gast = pruefeSeiteRoh(roh.players.away);
 	if (!heim || !gast || !Array.isArray(roh.results) || roh.results.length !== 3) return null;
+	const leer = (s: SeiteRoh) => s.wo === 1 && s.members.length === 0;
+	if (leer(heim) && leer(gast) && roh.results.every((r) => r === '')) return 'nicht-gespielt';
 	const tco = tcoHeim ? heim : gast;
 	const gegner = tcoHeim ? gast : heim;
 	if (tco.members.length !== (art === 'einzel' ? 1 : 2)) return null;
@@ -277,7 +284,7 @@ export function pruefeBericht(json: unknown, verein: number): StBericht | 'fehlt
 		for (const roh of liste) {
 			const p = pruefePartie(roh, art, tcoHeim);
 			if (!p) return null;
-			partien.push(p);
+			if (p !== 'nicht-gespielt') partien.push(p);
 		}
 	}
 	return {

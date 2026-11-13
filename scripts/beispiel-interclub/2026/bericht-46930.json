@@ -1,0 +1,210 @@
+{
+	"title": "Beispiel",
+	"subtitle": "07. Juni 2026",
+	"homeTeam": {
+		"name": "Seeblick ZH",
+		"clubNumber": 1249,
+		"points": 6,
+		"sets": 12,
+		"games": 74
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 0,
+		"sets": 0,
+		"games": 31
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900418,
+							"name": "Silvan Linienrichter N4 (111)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900240,
+							"name": "Remo Punktgewinn R3 (1261)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900419,
+							"name": "Tanja Sandplatz R1 (231)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900238,
+							"name": "Noah Platzhalter R1 (177)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:1", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900420,
+							"name": "Urs Hallenbach R2 (597)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900244,
+							"name": "Dario Entwurf R4 (2050)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:2", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900421,
+							"name": "Vera Seitenwechsel R3 (1249)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900242,
+							"name": "Beat Fiktiv R3 (846)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "7:6", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900422,
+							"name": "Willi Ballwand R4 (2159)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900248,
+							"name": "Hugo Attrappe R4 (1946)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:2", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900423,
+							"name": "Yara Saitenbett R5 (2972)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900246,
+							"name": "Fabio Modell R4 (1880)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:2", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [],
+					"wo": 1
+				},
+				"away": {
+					"members": [],
+					"wo": 1
+				}
+			},
+			"results": ["", "", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [],
+					"wo": 1
+				},
+				"away": {
+					"members": [],
+					"wo": 1
+				}
+			},
+			"results": ["", "", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [],
+					"wo": 1
+				},
+				"away": {
+					"members": [],
+					"wo": 1
+				}
+			},
+			"results": ["", "", ""]
+		}
+	],
+	"leagueId": 13,
+	"groupId": -1
+}

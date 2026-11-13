@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "10. Mai 2026",
+	"homeTeam": {
+		"name": "Breitenbach",
+		"clubNumber": 2083,
+		"points": 2,
+		"sets": 5,
+		"games": 71
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 7,
+		"sets": 16,
+		"games": 111
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900158,
+							"name": "Noah Muster R7 (14107)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900137,
+							"name": "Rahel Vorhand R5 (2818)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "1:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900159,
+							"name": "Paula Beispiel R6 (9083)"
+						}
+					],
+					"wo": 1
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900160,
+							"name": "Remo Platzhalter R6 (8727)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "6:3", "3:0"]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900161,
+							"name": "Anna Punktgewinn R7 (12108)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900143,
+							"name": "Yara Tiebreak R7 (10525)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "7:5", "3:6"]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900162,
+							"name": "Beat Erfunden R7 (19327)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900145,
+							"name": "Alma Linienrichter R7 (13521)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["5:7", "6:7", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900163,
+							"name": "Carla Testmann R7 (13901)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900147,
+							"name": "Cleo Hallenbach R6 (9798)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "3:6", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900164,
+							"name": "Dario Fiktiv R8 (24820)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900165,
+							"name": "Elena Annahme R8 (22714)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "0:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900158,
+							"name": "Noah Muster R7 (14107)"
+						},
+						{
+							"id": 900159,
+							"name": "Paula Beispiel R6 (9083)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900137,
+							"name": "Rahel Vorhand R5 (2818)"
+						},
+						{
+							"id": 900145,
+							"name": "Alma Linienrichter R7 (13521)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "6:4", "10:7"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900162,
+							"name": "Beat Erfunden R7 (19327)"
+						},
+						{
+							"id": 900164,
+							"name": "Dario Fiktiv R8 (24820)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900160,
+							"name": "Remo Platzhalter R6 (8727)"
+						},
+						{
+							"id": 900143,
+							"name": "Yara Tiebreak R7 (10525)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "6:7", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900166,
+							"name": "Fabio Entwurf R6 (9631)"
+						},
+						{
+							"id": 900163,
+							"name": "Carla Testmann R7 (13901)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900147,
+							"name": "Cleo Hallenbach R6 (9798)"
+						},
+						{
+							"id": 900165,
+							"name": "Elena Annahme R8 (22714)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "4:6", ""]
+		}
+	],
+	"leagueId": 16,
+	"groupId": 18
+}

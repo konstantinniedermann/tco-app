@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "28. Juni 2026",
+	"homeTeam": {
+		"name": "Aarberg 2",
+		"clubNumber": 2002,
+		"points": 0,
+		"sets": 0,
+		"games": 12
+	},
+	"awayTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 3,
+		"sets": 6,
+		"games": 36
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900318,
+							"name": "Noah Punktgewinn R9 (61473)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900312,
+							"name": "Hannes Ballkind R8 (24949)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "4:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900319,
+							"name": "Paula Erfunden R9 (61048)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900314,
+							"name": "Jan Muster R7 (18823)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "1:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900318,
+							"name": "Noah Punktgewinn R9 (61473)"
+						},
+						{
+							"id": 900319,
+							"name": "Paula Erfunden R9 (61048)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900310,
+							"name": "Flurin Netzpfosten R8 (24031)"
+						},
+						{
+							"id": 900312,
+							"name": "Hannes Ballkind R8 (24949)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "4:6", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 79
+}

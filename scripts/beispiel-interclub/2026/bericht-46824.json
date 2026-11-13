@@ -1,0 +1,184 @@
+{
+	"title": "Beispiel",
+	"subtitle": "09. Juni 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 2,
+		"sets": 6,
+		"games": 48
+	},
+	"awayTeam": {
+		"name": "Neuenhof 2",
+		"clubNumber": 2193,
+		"points": 4,
+		"sets": 8,
+		"games": 48
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900023,
+							"name": "Yara Lob R6 (5375)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900414,
+							"name": "Nico Stopp R6 (10113)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900025,
+							"name": "Alma Satzball R7 (12534)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900415,
+							"name": "Olivia Satzball R7 (11006)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "0:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900027,
+							"name": "Cleo Doppelfehler R7 (16735)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900416,
+							"name": "Pascal Tiebreak R7 (17870)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "1:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900029,
+							"name": "Edith Sandplatz R7 (10664)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900417,
+							"name": "Rahel Doppelfehler R7 (20261)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "2:6", "9:11"]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900023,
+							"name": "Yara Lob R6 (5375)"
+						},
+						{
+							"id": 900031,
+							"name": "Greta Seitenwechsel R9 (34628)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900414,
+							"name": "Nico Stopp R6 (10113)"
+						},
+						{
+							"id": 900417,
+							"name": "Rahel Doppelfehler R7 (20261)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:2", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900025,
+							"name": "Alma Satzball R7 (12534)"
+						},
+						{
+							"id": 900043,
+							"name": "Carla Vorlage R7 (11587)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900415,
+							"name": "Olivia Satzball R7 (11006)"
+						},
+						{
+							"id": 900416,
+							"name": "Pascal Tiebreak R7 (17870)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "3:6", "5:10"]
+		}
+	],
+	"leagueId": 62,
+	"groupId": -1
+}

@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "09. Mai 2026",
+	"homeTeam": {
+		"name": "Port",
+		"clubNumber": 2353,
+		"points": 8,
+		"sets": 16,
+		"games": 106
+	},
+	"awayTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 1,
+		"sets": 3,
+		"games": 53
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900099,
+							"name": "Tanja Rückhand R6 (5189)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900100,
+							"name": "Urs Volley R5 (2888)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:4", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900101,
+							"name": "Vera Lob R6 (9932)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900102,
+							"name": "Willi Stopp R6 (6527)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:7", "2:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900103,
+							"name": "Yara Satzball R6 (9981)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900104,
+							"name": "Zeno Tiebreak R7 (18682)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:0", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900105,
+							"name": "Alma Doppelfehler R7 (10671)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900106,
+							"name": "Bruno Linienrichter R7 (11874)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900107,
+							"name": "Cleo Sandplatz R7 (18258)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900108,
+							"name": "Dominik Hallenbach R8 (27369)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:2", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900109,
+							"name": "Edith Seitenwechsel R7 (17029)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900110,
+							"name": "Flurin Ballwand R9 (32621)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900099,
+							"name": "Tanja Rückhand R6 (5189)"
+						},
+						{
+							"id": 900105,
+							"name": "Alma Doppelfehler R7 (10671)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900100,
+							"name": "Urs Volley R5 (2888)"
+						},
+						{
+							"id": 900104,
+							"name": "Zeno Tiebreak R7 (18682)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:7", "6:0", "10:3"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900111,
+							"name": "Greta Saitenbett R6 (7168)"
+						},
+						{
+							"id": 900103,
+							"name": "Yara Satzball R6 (9981)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900102,
+							"name": "Willi Stopp R6 (6527)"
+						},
+						{
+							"id": 900106,
+							"name": "Bruno Linienrichter R7 (11874)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "6:4", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900112,
+							"name": "Hannes Griffband R7 (10526)"
+						},
+						{
+							"id": 900113,
+							"name": "Ida Schlägerkopf R7 (14609)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900108,
+							"name": "Dominik Hallenbach R8 (27369)"
+						},
+						{
+							"id": 900110,
+							"name": "Flurin Ballwand R9 (32621)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:4", ""]
+		}
+	],
+	"leagueId": 9,
+	"groupId": 78
+}

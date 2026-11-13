@@ -1,0 +1,184 @@
+{
+	"title": "Beispiel",
+	"subtitle": "05. Mai 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 1,
+		"sets": 4,
+		"games": 50
+	},
+	"awayTeam": {
+		"name": "Bad Schinznach",
+		"clubNumber": 2224,
+		"points": 5,
+		"sets": 11,
+		"games": 70
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900023,
+							"name": "Yara Lob R6 (5375)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900033,
+							"name": "Ida Saitenbett R6 (7382)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "7:6", "10:12"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900025,
+							"name": "Alma Satzball R7 (12534)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900034,
+							"name": "Jan Griffband R7 (11145)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["5:7", "6:1", "13:11"]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900027,
+							"name": "Cleo Doppelfehler R7 (16735)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900035,
+							"name": "Kim Schlägerkopf R7 (14253)"
+						}
+					],
+					"wo": 1
+				}
+			},
+			"results": ["6:3", "5:3", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900029,
+							"name": "Edith Sandplatz R7 (10664)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900036,
+							"name": "Leo Filzball R7 (14944)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "5:7", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900023,
+							"name": "Yara Lob R6 (5375)"
+						},
+						{
+							"id": 900025,
+							"name": "Alma Satzball R7 (12534)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900033,
+							"name": "Ida Saitenbett R6 (7382)"
+						},
+						{
+							"id": 900034,
+							"name": "Jan Griffband R7 (11145)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "5:7", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900031,
+							"name": "Greta Seitenwechsel R9 (34628)"
+						},
+						{
+							"id": 900032,
+							"name": "Hannes Ballwand R7 (14157)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900035,
+							"name": "Kim Schlägerkopf R7 (14253)"
+						},
+						{
+							"id": 900037,
+							"name": "Maja Netzpfosten R8 (28195)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "4:6", ""]
+		}
+	],
+	"leagueId": 62,
+	"groupId": 6
+}

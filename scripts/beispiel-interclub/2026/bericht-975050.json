@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "17. Mai 2026",
+	"homeTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 9,
+		"sets": 18,
+		"games": 112
+	},
+	"awayTeam": {
+		"name": "Langenthal",
+		"clubNumber": 2149,
+		"points": 0,
+		"sets": 1,
+		"games": 39
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900167,
+							"name": "Gina Skizze R4 (2033)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900168,
+							"name": "Hugo Modell R7 (19571)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900169,
+							"name": "Ines Schablone R6 (9460)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900170,
+							"name": "Jonas Attrappe R7 (16331)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:1", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900171,
+							"name": "Klara Kulisse R7 (13217)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900172,
+							"name": "Luca Spielball R8 (28170)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:3", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900173,
+							"name": "Mia Netzroller R7 (11688)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900174,
+							"name": "Nico Grundlinie R9 (60990)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "6:4", "6:1"]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900175,
+							"name": "Olivia Aufschlag R6 (10115)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900176,
+							"name": "Pascal Vorhand R9 (31264)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900177,
+							"name": "Rahel Rückhand R7 (17237)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900178,
+							"name": "Silvan Volley R9 (32952)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900169,
+							"name": "Ines Schablone R6 (9460)"
+						},
+						{
+							"id": 900171,
+							"name": "Klara Kulisse R7 (13217)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900168,
+							"name": "Hugo Modell R7 (19571)"
+						},
+						{
+							"id": 900176,
+							"name": "Pascal Vorhand R9 (31264)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900167,
+							"name": "Gina Skizze R4 (2033)"
+						},
+						{
+							"id": 900173,
+							"name": "Mia Netzroller R7 (11688)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900170,
+							"name": "Jonas Attrappe R7 (16331)"
+						},
+						{
+							"id": 900174,
+							"name": "Nico Grundlinie R9 (60990)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:4", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900177,
+							"name": "Rahel Rückhand R7 (17237)"
+						},
+						{
+							"id": 900179,
+							"name": "Tanja Lob R7 (19707)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900172,
+							"name": "Luca Spielball R8 (28170)"
+						},
+						{
+							"id": 900178,
+							"name": "Silvan Volley R9 (32952)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "7:5", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 38
+}

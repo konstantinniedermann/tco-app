@@ -116,6 +116,12 @@ describe('pruefeBericht', () => {
 		expect(pruefeBericht(null, 2202)).toBe('fehlt');
 	});
 
+	it('lässt nicht gespielte Partien weg (beide Seiten w.o., ohne Spieler)', () => {
+		const leer = partie(seite(1), seite(1), ['', '', '']);
+		const r = gelesen(bericht({ doppel: [leer, { ...leer, position: 2 }] }));
+		expect(r.partien.map((p) => p.art)).toEqual(['einzel']);
+	});
+
 	it('weist abweichende Formen ab', () => {
 		const gast = seite(0, [900101, GERD]);
 		const mitEinzel = (p: unknown) => bericht({ einzel: [p], doppel: [] });

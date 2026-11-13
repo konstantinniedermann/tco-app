@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "03. Juni 2026",
+	"homeTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 0,
+		"sets": 1,
+		"games": 14
+	},
+	"awayTeam": {
+		"name": "Schützenmatt SO 2",
+		"clubNumber": 2237,
+		"points": 3,
+		"sets": 6,
+		"games": 39
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900343,
+							"name": "Yara Seitenwechsel R8 (28209)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900347,
+							"name": "Cleo Schlägerkopf R7 (15254)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "2:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900345,
+							"name": "Alma Saitenbett R9 (61237)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900348,
+							"name": "Dominik Filzball R8 (22925)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "1:6", "3:6"]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900343,
+							"name": "Yara Seitenwechsel R8 (28209)"
+						},
+						{
+							"id": 900345,
+							"name": "Alma Saitenbett R9 (61237)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900349,
+							"name": "Edith Netzpfosten R9 (32615)"
+						},
+						{
+							"id": 900347,
+							"name": "Cleo Schlägerkopf R7 (15254)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "2:6", ""]
+		}
+	],
+	"leagueId": 13,
+	"groupId": 64
+}

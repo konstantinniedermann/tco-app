@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "17. Mai 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 6,
+		"sets": 14,
+		"games": 97
+	},
+	"awayTeam": {
+		"name": "Solothurn",
+		"clubNumber": 2239,
+		"points": 3,
+		"sets": 6,
+		"games": 57
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900046,
+							"name": "Fabio Testmann R6 (9117)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900057,
+							"name": "Rahel Grundlinie R6 (5598)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "1:6", "4:6"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900048,
+							"name": "Hugo Annahme R6 (7150)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900058,
+							"name": "Silvan Aufschlag R7 (10344)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900050,
+							"name": "Jonas Skizze R6 (8145)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900059,
+							"name": "Tanja Vorhand R7 (16304)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900060,
+							"name": "Urs Rückhand R7 (10789)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900061,
+							"name": "Vera Volley R7 (14873)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900052,
+							"name": "Luca Schablone R7 (12372)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900062,
+							"name": "Willi Lob R7 (15264)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:2", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900054,
+							"name": "Nico Kulisse R9 (61131)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900063,
+							"name": "Yara Stopp R7 (18916)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "2:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900046,
+							"name": "Fabio Testmann R6 (9117)"
+						},
+						{
+							"id": 900060,
+							"name": "Urs Rückhand R7 (10789)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900057,
+							"name": "Rahel Grundlinie R6 (5598)"
+						},
+						{
+							"id": 900058,
+							"name": "Silvan Aufschlag R7 (10344)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "7:5", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900048,
+							"name": "Hugo Annahme R6 (7150)"
+						},
+						{
+							"id": 900054,
+							"name": "Nico Kulisse R9 (61131)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900061,
+							"name": "Vera Volley R7 (14873)"
+						},
+						{
+							"id": 900063,
+							"name": "Yara Stopp R7 (18916)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "1:6", "6:10"]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900052,
+							"name": "Luca Schablone R7 (12372)"
+						},
+						{
+							"id": 900050,
+							"name": "Jonas Skizze R6 (8145)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900059,
+							"name": "Tanja Vorhand R7 (16304)"
+						},
+						{
+							"id": 900064,
+							"name": "Zeno Satzball R7 (16266)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:4", ""]
+		}
+	],
+	"leagueId": 17,
+	"groupId": 39
+}

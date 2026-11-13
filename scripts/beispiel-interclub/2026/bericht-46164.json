@@ -1,0 +1,184 @@
+{
+	"title": "Beispiel",
+	"subtitle": "06. Juni 2026",
+	"homeTeam": {
+		"name": "Cham",
+		"clubNumber": 2095,
+		"points": 6,
+		"sets": 12,
+		"games": 72
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 0,
+		"sets": 0,
+		"games": 20
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900410,
+							"name": "Jonas Vorhand R4 (870)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900001,
+							"name": "Anna Muster R6 (3805)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900411,
+							"name": "Klara Rückhand R6 (2719)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900009,
+							"name": "Ines Annahme R8 (11250)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:2", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900412,
+							"name": "Luca Volley R6 (3170)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900003,
+							"name": "Carla Platzhalter R7 (6907)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:3", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900413,
+							"name": "Mia Lob R6 (2495)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900007,
+							"name": "Gina Testmann R8 (9040)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:1", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900410,
+							"name": "Jonas Vorhand R4 (870)"
+						},
+						{
+							"id": 900412,
+							"name": "Luca Volley R6 (3170)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900001,
+							"name": "Anna Muster R6 (3805)"
+						},
+						{
+							"id": 900007,
+							"name": "Gina Testmann R8 (9040)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:3", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900411,
+							"name": "Klara Rückhand R6 (2719)"
+						},
+						{
+							"id": 900413,
+							"name": "Mia Lob R6 (2495)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900003,
+							"name": "Carla Platzhalter R7 (6907)"
+						},
+						{
+							"id": 900009,
+							"name": "Ines Annahme R8 (11250)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:3", ""]
+		}
+	],
+	"leagueId": 21,
+	"groupId": -1
+}

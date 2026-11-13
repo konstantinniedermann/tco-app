@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "20. Juni 2026",
+	"homeTeam": {
+		"name": "Aarberg 1",
+		"clubNumber": 2002,
+		"points": 0,
+		"sets": 0,
+		"games": 14
+	},
+	"awayTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 3,
+		"sets": 6,
+		"games": 36
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900301,
+							"name": "Vera Linienrichter R9 (61546)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900302,
+							"name": "Willi Sandplatz R8 (21578)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "3:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900303,
+							"name": "Yara Hallenbach R9 (61782)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900304,
+							"name": "Zeno Seitenwechsel R8 (27281)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "4:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900303,
+							"name": "Yara Hallenbach R9 (61782)"
+						},
+						{
+							"id": 900301,
+							"name": "Vera Linienrichter R9 (61546)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900305,
+							"name": "Alma Ballwand R7 (18961)"
+						},
+						{
+							"id": 900302,
+							"name": "Willi Sandplatz R8 (21578)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "3:6", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 74
+}

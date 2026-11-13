@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "02. Mai 2026",
+	"homeTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 8,
+		"sets": 16,
+		"games": 99
+	},
+	"awayTeam": {
+		"name": "Villmergen",
+		"clubNumber": 2264,
+		"points": 1,
+		"sets": 3,
+		"games": 55
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900072,
+							"name": "Hannes Saitenbett R6 (9497)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900085,
+							"name": "Elena Testmann R5 (3876)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["5:7", "0:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900086,
+							"name": "Fabio Fiktiv R6 (6447)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900087,
+							"name": "Gina Annahme R7 (15639)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:3", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900074,
+							"name": "Jan Schlägerkopf R6 (8088)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900088,
+							"name": "Hugo Entwurf R9 (32324)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900078,
+							"name": "Noah Ballkind R6 (7318)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900089,
+							"name": "Ines Skizze R9 (61131)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900080,
+							"name": "Remo Muster R6 (10094)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900090,
+							"name": "Jonas Modell R9 (33207)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "7:5", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900084,
+							"name": "Dario Erfunden R7 (17811)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900091,
+							"name": "Klara Schablone R9 (61449)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "6:3", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900074,
+							"name": "Jan Schlägerkopf R6 (8088)"
+						},
+						{
+							"id": 900080,
+							"name": "Remo Muster R6 (10094)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900087,
+							"name": "Gina Annahme R7 (15639)"
+						},
+						{
+							"id": 900091,
+							"name": "Klara Schablone R9 (61449)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "7:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900086,
+							"name": "Fabio Fiktiv R6 (6447)"
+						},
+						{
+							"id": 900076,
+							"name": "Leo Netzpfosten R6 (8871)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900085,
+							"name": "Elena Testmann R5 (3876)"
+						},
+						{
+							"id": 900092,
+							"name": "Luca Attrappe R8 (26027)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "6:4", "11:9"]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900078,
+							"name": "Noah Ballkind R6 (7318)"
+						},
+						{
+							"id": 900084,
+							"name": "Dario Erfunden R7 (17811)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900089,
+							"name": "Ines Skizze R9 (61131)"
+						},
+						{
+							"id": 900090,
+							"name": "Jonas Modell R9 (33207)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		}
+	],
+	"leagueId": 9,
+	"groupId": 62
+}

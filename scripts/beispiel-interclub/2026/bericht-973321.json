@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "16. Mai 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 6,
+		"sets": 14,
+		"games": 95
+	},
+	"awayTeam": {
+		"name": "Delémont",
+		"clubNumber": 2100,
+		"points": 3,
+		"sets": 7,
+		"games": 70
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900137,
+							"name": "Rahel Vorhand R5 (2818)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900150,
+							"name": "Flurin Saitenbett R6 (8012)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "3:6", "6:3"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900151,
+							"name": "Greta Griffband R5 (4204)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900152,
+							"name": "Hannes Schlägerkopf R5 (2688)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:2", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900141,
+							"name": "Vera Stopp R5 (4625)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900153,
+							"name": "Ida Filzball R6 (8163)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:2", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900143,
+							"name": "Yara Tiebreak R7 (10525)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900154,
+							"name": "Jan Netzpfosten R6 (5200)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "1:6", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900147,
+							"name": "Cleo Hallenbach R6 (9798)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900155,
+							"name": "Kim Schiedsstuhl R7 (10699)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "7:6", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900145,
+							"name": "Alma Linienrichter R7 (13521)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900156,
+							"name": "Leo Ballkind R9 (32405)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900151,
+							"name": "Greta Griffband R5 (4204)"
+						},
+						{
+							"id": 900147,
+							"name": "Cleo Hallenbach R6 (9798)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900152,
+							"name": "Hannes Schlägerkopf R5 (2688)"
+						},
+						{
+							"id": 900153,
+							"name": "Ida Filzball R6 (8163)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "6:4", "3:10"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900141,
+							"name": "Vera Stopp R5 (4625)"
+						},
+						{
+							"id": 900143,
+							"name": "Yara Tiebreak R7 (10525)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900150,
+							"name": "Flurin Saitenbett R6 (8012)"
+						},
+						{
+							"id": 900154,
+							"name": "Jan Netzpfosten R6 (5200)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "3:6", "5:10"]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900137,
+							"name": "Rahel Vorhand R5 (2818)"
+						},
+						{
+							"id": 900145,
+							"name": "Alma Linienrichter R7 (13521)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900156,
+							"name": "Leo Ballkind R9 (32405)"
+						},
+						{
+							"id": 900157,
+							"name": "Maja Matchball R9 (34628)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:2", ""]
+		}
+	],
+	"leagueId": 16,
+	"groupId": 18
+}

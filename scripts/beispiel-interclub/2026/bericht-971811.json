@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "10. Mai 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 6,
+		"sets": 12,
+		"games": 95
+	},
+	"awayTeam": {
+		"name": "Belchen",
+		"clubNumber": 2128,
+		"points": 3,
+		"sets": 7,
+		"games": 60
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900044,
+							"name": "Dario Punktgewinn R6 (5438)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900045,
+							"name": "Elena Erfunden R6 (10223)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900046,
+							"name": "Fabio Testmann R6 (9117)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900047,
+							"name": "Gina Fiktiv R7 (12663)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900048,
+							"name": "Hugo Annahme R6 (7150)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900049,
+							"name": "Ines Entwurf R7 (20106)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "5:7", "6:1"]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900050,
+							"name": "Jonas Skizze R6 (8145)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900051,
+							"name": "Klara Modell R7 (16421)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:3", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900052,
+							"name": "Luca Schablone R7 (12372)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900053,
+							"name": "Mia Attrappe R7 (14312)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:7", "4:6", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900054,
+							"name": "Nico Kulisse R9 (61131)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900055,
+							"name": "Olivia Spielball R8 (21041)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "3:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900044,
+							"name": "Dario Punktgewinn R6 (5438)"
+						},
+						{
+							"id": 900046,
+							"name": "Fabio Testmann R6 (9117)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900045,
+							"name": "Elena Erfunden R6 (10223)"
+						},
+						{
+							"id": 900049,
+							"name": "Ines Entwurf R7 (20106)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:3", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900048,
+							"name": "Hugo Annahme R6 (7150)"
+						},
+						{
+							"id": 900054,
+							"name": "Nico Kulisse R9 (61131)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900047,
+							"name": "Gina Fiktiv R7 (12663)"
+						},
+						{
+							"id": 900051,
+							"name": "Klara Modell R7 (16421)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "2:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900050,
+							"name": "Jonas Skizze R6 (8145)"
+						},
+						{
+							"id": 900052,
+							"name": "Luca Schablone R7 (12372)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900055,
+							"name": "Olivia Spielball R8 (21041)"
+						},
+						{
+							"id": 900056,
+							"name": "Pascal Netzroller R9 (33407)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:2", ""]
+		}
+	],
+	"leagueId": 17,
+	"groupId": 39
+}

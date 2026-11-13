@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "24. Juni 2026",
+	"homeTeam": {
+		"name": "Born Kappel",
+		"clubNumber": 2305,
+		"points": 0,
+		"sets": 0,
+		"games": 11
+	},
+	"awayTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 3,
+		"sets": 6,
+		"games": 37
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900308,
+							"name": "Dominik Schlägerkopf R8 (30689)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900305,
+							"name": "Alma Ballwand R7 (18961)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "0:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900309,
+							"name": "Edith Filzball R9 (32050)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900304,
+							"name": "Zeno Seitenwechsel R8 (27281)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "3:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900309,
+							"name": "Edith Filzball R9 (32050)"
+						},
+						{
+							"id": 900308,
+							"name": "Dominik Schlägerkopf R8 (30689)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900302,
+							"name": "Willi Sandplatz R8 (21578)"
+						},
+						{
+							"id": 900304,
+							"name": "Zeno Seitenwechsel R8 (27281)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["5:7", "2:6", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 74
+}

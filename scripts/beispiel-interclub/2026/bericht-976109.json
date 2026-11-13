@@ -1,0 +1,184 @@
+{
+	"title": "Beispiel",
+	"subtitle": "09. Mai 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 5,
+		"sets": 10,
+		"games": 66
+	},
+	"awayTeam": {
+		"name": "Belchen 2",
+		"clubNumber": 2128,
+		"points": 1,
+		"sets": 2,
+		"games": 26
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900012,
+							"name": "Luca Modell R5 (1417)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900286,
+							"name": "Fabio Schablone R7 (4044)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:0", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900277,
+							"name": "Maja Platzhalter R5 (1903)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900287,
+							"name": "Gina Attrappe R6 (3831)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900274,
+							"name": "Jan Matchball R7 (5112)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900288,
+							"name": "Hugo Kulisse R7 (4980)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "2:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900275,
+							"name": "Kim Muster R7 (6642)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900289,
+							"name": "Ines Spielball R7 (7494)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:0", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900277,
+							"name": "Maja Platzhalter R5 (1903)"
+						},
+						{
+							"id": 900290,
+							"name": "Jonas Netzroller R9 (12550)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900286,
+							"name": "Fabio Schablone R7 (4044)"
+						},
+						{
+							"id": 900287,
+							"name": "Gina Attrappe R6 (3831)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900271,
+							"name": "Greta Netzpfosten R8 (8606)"
+						},
+						{
+							"id": 900269,
+							"name": "Edith Schlägerkopf R7 (6502)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900288,
+							"name": "Hugo Kulisse R7 (4980)"
+						},
+						{
+							"id": 900289,
+							"name": "Ines Spielball R7 (7494)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:4", ""]
+		}
+	],
+	"leagueId": 10,
+	"groupId": 28
+}

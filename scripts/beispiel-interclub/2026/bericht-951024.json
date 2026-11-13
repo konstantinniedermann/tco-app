@@ -1,0 +1,184 @@
+{
+	"title": "Beispiel",
+	"subtitle": "28. Apr. 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 6,
+		"sets": 12,
+		"games": 74
+	},
+	"awayTeam": {
+		"name": "Novartis Basel",
+		"clubNumber": 2046,
+		"points": 0,
+		"sets": 0,
+		"games": 25
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900023,
+							"name": "Yara Lob R6 (5375)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900024,
+							"name": "Zeno Stopp R7 (16322)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900025,
+							"name": "Alma Satzball R7 (12534)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900026,
+							"name": "Bruno Tiebreak R8 (25550)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "6:2", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900027,
+							"name": "Cleo Doppelfehler R7 (16735)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900028,
+							"name": "Dominik Linienrichter R8 (28603)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:1", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900029,
+							"name": "Edith Sandplatz R7 (10664)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900030,
+							"name": "Flurin Hallenbach R8 (30760)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900023,
+							"name": "Yara Lob R6 (5375)"
+						},
+						{
+							"id": 900027,
+							"name": "Cleo Doppelfehler R7 (16735)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900024,
+							"name": "Zeno Stopp R7 (16322)"
+						},
+						{
+							"id": 900028,
+							"name": "Dominik Linienrichter R8 (28603)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "6:3", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900031,
+							"name": "Greta Seitenwechsel R9 (34628)"
+						},
+						{
+							"id": 900032,
+							"name": "Hannes Ballwand R7 (14157)"
+						}
+					],
+					"wo": 1
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900026,
+							"name": "Bruno Tiebreak R8 (25550)"
+						},
+						{
+							"id": 900030,
+							"name": "Flurin Hallenbach R8 (30760)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "4:3", ""]
+		}
+	],
+	"leagueId": 62,
+	"groupId": 6
+}

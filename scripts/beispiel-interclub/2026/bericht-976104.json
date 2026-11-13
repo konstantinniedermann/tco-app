@@ -1,0 +1,184 @@
+{
+	"title": "Beispiel",
+	"subtitle": "17. Mai 2026",
+	"homeTeam": {
+		"name": "Langenthal",
+		"clubNumber": 2149,
+		"points": 0,
+		"sets": 1,
+		"games": 26
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 6,
+		"sets": 12,
+		"games": 77
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900266,
+							"name": "Bruno Ballwand R6 (3844)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900267,
+							"name": "Cleo Saitenbett R6 (2749)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "1:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900268,
+							"name": "Dominik Griffband R8 (10818)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900269,
+							"name": "Edith Schlägerkopf R7 (6502)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "0:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900270,
+							"name": "Flurin Filzball R9 (11900)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900271,
+							"name": "Greta Netzpfosten R8 (8606)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["5:7", "0:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900272,
+							"name": "Hannes Schiedsstuhl R9 (22773)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900273,
+							"name": "Ida Ballkind R8 (9075)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "5:7", "1:6"]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900266,
+							"name": "Bruno Ballwand R6 (3844)"
+						},
+						{
+							"id": 900268,
+							"name": "Dominik Griffband R8 (10818)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900271,
+							"name": "Greta Netzpfosten R8 (8606)"
+						},
+						{
+							"id": 900269,
+							"name": "Edith Schlägerkopf R7 (6502)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "2:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900270,
+							"name": "Flurin Filzball R9 (11900)"
+						},
+						{
+							"id": 900272,
+							"name": "Hannes Schiedsstuhl R9 (22773)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900274,
+							"name": "Jan Matchball R7 (5112)"
+						},
+						{
+							"id": 900275,
+							"name": "Kim Muster R7 (6642)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "0:6", ""]
+		}
+	],
+	"leagueId": 10,
+	"groupId": 28
+}

@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "21. Juni 2026",
+	"homeTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 3,
+		"sets": 6,
+		"games": 38
+	},
+	"awayTeam": {
+		"name": "Scheuren 4",
+		"clubNumber": 2223,
+		"points": 0,
+		"sets": 0,
+		"games": 18
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900310,
+							"name": "Flurin Netzpfosten R8 (24031)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900315,
+							"name": "Kim Beispiel R9 (31896)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "7:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900314,
+							"name": "Jan Muster R7 (18823)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900316,
+							"name": "Leo Platzhalter R8 (30003)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:0", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900314,
+							"name": "Jan Muster R7 (18823)"
+						},
+						{
+							"id": 900312,
+							"name": "Hannes Ballkind R8 (24949)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900316,
+							"name": "Leo Platzhalter R8 (30003)"
+						},
+						{
+							"id": 900317,
+							"name": "Maja Vorlage R8 (30155)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:2", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 79
+}

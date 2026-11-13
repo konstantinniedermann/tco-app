@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "02. Mai 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 5,
+		"sets": 11,
+		"games": 85
+	},
+	"awayTeam": {
+		"name": "Rotweiss BE",
+		"clubNumber": 2064,
+		"points": 4,
+		"sets": 9,
+		"games": 81
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900238,
+							"name": "Noah Platzhalter R1 (177)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900239,
+							"name": "Paula Vorlage R1 (250)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900240,
+							"name": "Remo Punktgewinn R3 (1261)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900241,
+							"name": "Anna Testmann R4 (1882)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "4:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900242,
+							"name": "Beat Fiktiv R3 (846)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900243,
+							"name": "Carla Annahme R3 (801)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "0:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900244,
+							"name": "Dario Entwurf R4 (2050)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900245,
+							"name": "Elena Skizze R4 (2005)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:2", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900246,
+							"name": "Fabio Modell R4 (1880)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900247,
+							"name": "Gina Schablone R5 (4694)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "3:6", "2:6"]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900248,
+							"name": "Hugo Attrappe R4 (1946)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900249,
+							"name": "Ines Kulisse R8 (23874)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:1", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900238,
+							"name": "Noah Platzhalter R1 (177)"
+						},
+						{
+							"id": 900248,
+							"name": "Hugo Attrappe R4 (1946)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900241,
+							"name": "Anna Testmann R4 (1882)"
+						},
+						{
+							"id": 900239,
+							"name": "Paula Vorlage R1 (250)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:7", "10:7"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900244,
+							"name": "Dario Entwurf R4 (2050)"
+						},
+						{
+							"id": 900242,
+							"name": "Beat Fiktiv R3 (846)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900245,
+							"name": "Elena Skizze R4 (2005)"
+						},
+						{
+							"id": 900243,
+							"name": "Carla Annahme R3 (801)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:2", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900250,
+							"name": "Jonas Spielball R6 (9775)"
+						},
+						{
+							"id": 900240,
+							"name": "Remo Punktgewinn R3 (1261)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900251,
+							"name": "Klara Netzroller R1 (231)"
+						},
+						{
+							"id": 900247,
+							"name": "Gina Schablone R5 (4694)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "3:6", ""]
+		}
+	],
+	"leagueId": 13,
+	"groupId": 2
+}

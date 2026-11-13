@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "02. Mai 2026",
+	"homeTeam": {
+		"name": "Schlossmatte 1",
+		"clubNumber": 2075,
+		"points": 8,
+		"sets": 17,
+		"games": 108
+	},
+	"awayTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 1,
+		"sets": 3,
+		"games": 53
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900128,
+							"name": "Hugo Skizze R4 (2221)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900100,
+							"name": "Urs Volley R5 (2888)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900129,
+							"name": "Ines Modell R5 (2976)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900130,
+							"name": "Jonas Schablone R6 (10185)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900131,
+							"name": "Klara Attrappe R6 (6316)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900102,
+							"name": "Willi Stopp R6 (6527)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "6:0", "6:0"]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900132,
+							"name": "Luca Kulisse R6 (8335)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900104,
+							"name": "Zeno Tiebreak R7 (18682)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "7:5", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900133,
+							"name": "Mia Spielball R7 (12518)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900118,
+							"name": "Noah Matchball R7 (12795)"
+						}
+					],
+					"wo": 1
+				}
+			},
+			"results": ["7:5", "1:2", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900134,
+							"name": "Nico Netzroller R7 (12511)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900106,
+							"name": "Bruno Linienrichter R7 (11874)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:3", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900131,
+							"name": "Klara Attrappe R6 (6316)"
+						},
+						{
+							"id": 900129,
+							"name": "Ines Modell R5 (2976)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900102,
+							"name": "Willi Stopp R6 (6527)"
+						},
+						{
+							"id": 900121,
+							"name": "Anna Vorlage R8 (26046)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:0", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900128,
+							"name": "Hugo Skizze R4 (2221)"
+						},
+						{
+							"id": 900134,
+							"name": "Nico Netzroller R7 (12511)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900100,
+							"name": "Urs Volley R5 (2888)"
+						},
+						{
+							"id": 900110,
+							"name": "Flurin Ballwand R9 (32621)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "6:2", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900132,
+							"name": "Luca Kulisse R6 (8335)"
+						},
+						{
+							"id": 900135,
+							"name": "Olivia Grundlinie R6 (10034)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900108,
+							"name": "Dominik Hallenbach R8 (27369)"
+						},
+						{
+							"id": 900118,
+							"name": "Noah Matchball R7 (12795)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:3", ""]
+		}
+	],
+	"leagueId": 9,
+	"groupId": 78
+}
