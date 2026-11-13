@@ -1,4 +1,4 @@
-import type { AnsichtRolle } from '../lib/verwaltung/zugang-api.ts';
+import { ladeSitzung } from '../lib/login/sitzung.ts';
 import type { LayoutLoad } from './$types';
 
 export const ssr = false;
@@ -10,14 +10,9 @@ export const prerender = false;
 // Taste «Ansehen» löst es aus). Läuft eine, prüft jeder Seitenwechsel neu: So verschwindet das
 // Band auch nach dem Abmelden oder wenn jemand die Sitzungen beendet hat.
 export const load: LayoutLoad = async ({ fetch, url }) => {
-	let ansicht: AnsichtRolle | null = null;
-	try {
-		const antwort = await fetch('/api/sitzung');
-		if (antwort.ok)
-			ansicht = ((await antwort.json()) as { ansicht?: AnsichtRolle }).ansicht ?? null;
-	} catch {
-		// Netz weg: kein Band; die Seiten melden die Störung selbst.
-	}
+	// Netz weg: kein Band; die Seiten melden die Störung selbst.
+	const r = await ladeSitzung(fetch);
+	const ansicht = r.art === 'ok' ? (r.daten?.ansicht ?? null) : null;
 	if (ansicht !== null) void url.pathname;
 	return { ansicht };
 };
