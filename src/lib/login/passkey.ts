@@ -7,8 +7,9 @@ import {
 	startAuthentication,
 	startRegistration
 } from '@simplewebauthn/browser';
+import { rufeAb, type Holen, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post';
-import { sende, type Holen } from './anmelden';
+import { sende } from './anmelden';
 
 export type Webauthn = {
 	unterstuetzt(): boolean;
@@ -47,22 +48,16 @@ const istAbbruch = (fehler: unknown) => hatName(fehler, 'NotAllowedError');
 /** Das Gerät hat schon einen Passkey für dieses Konto (excludeCredentials). */
 const istVorhanden = (fehler: unknown) => hatName(fehler, 'InvalidStateError');
 
-/** POST mit JSON-Körper; null bei Netzfehler. */
-async function post(pfad: string, inhalt: object, holen: Holen): Promise<Response | null> {
-	try {
-		return await holen(pfad, jsonPost(inhalt));
-	} catch {
-		return null;
-	}
-}
-
-async function leseJson(antwort: Response): Promise<unknown> {
-	try {
-		return await antwort.json();
-	} catch {
-		return null;
-	}
-}
+/** Nur Daten: Jede Antwort ausser einem Erfolg ist eine Störung; ohne lesbaren Körper keine Daten. */
+const NUR_DATEN: Vertrag<never> = { woerter: [], koerper: 'nachsichtig' };
+/** Optionen der Anmeldung: dazu 429 nach dem Status allein. */
+const OPTIONEN_ANMELDEN: Vertrag<'zu-viele'> = { woerter: ['zu-viele'], koerper: 'nachsichtig' };
+/** Entfernen: nur genau 204 ist ein Erfolg. */
+const NUR_OHNE_KOERPER: Vertrag<never> = {
+	woerter: [],
+	koerper: 'nachsichtig',
+	ohneKoerper: 'einzig'
+};
 
 function istObjekt(x: unknown): x is Record<string, unknown> {
 	return typeof x === 'object' && x !== null && !Array.isArray(x);
@@ -72,9 +67,14 @@ export async function richtePasskeyEin(
 	holen: Holen = fetch,
 	w: Webauthn = browserWebauthn
 ): Promise<'ok' | 'vorhanden' | 'abgebrochen' | 'fehler'> {
-	const optionen = await post('/api/passkey/einrichten/optionen', {}, holen);
-	if (!optionen?.ok) return 'fehler';
-	const opt = await leseJson(optionen);
+	const optionen = await rufeAb<unknown, never>(
+		'/api/passkey/einrichten/optionen',
+		jsonPost({}),
+		holen,
+		NUR_DATEN
+	);
+	if (optionen.art !== 'ok') return 'fehler';
+	const opt = optionen.daten;
 	if (!istObjekt(opt)) return 'fehler';
 	let antwort: unknown;
 	try {
@@ -91,11 +91,15 @@ export async function meldeMitPasskeyAn(
 	holen: Holen = fetch,
 	w: Webauthn = browserWebauthn
 ): Promise<'ok' | 'abgebrochen' | 'falsch' | 'zu-viele' | 'stoerung'> {
-	const antwortOpt = await post('/api/passkey/anmelden/optionen', {}, holen);
-	if (!antwortOpt) return 'stoerung';
-	if (antwortOpt.status === 429) return 'zu-viele';
-	if (!antwortOpt.ok) return 'stoerung';
-	const inhalt = await leseJson(antwortOpt);
+	const antwortOpt = await rufeAb<unknown, 'zu-viele'>(
+		'/api/passkey/anmelden/optionen',
+		jsonPost({}),
+		holen,
+		OPTIONEN_ANMELDEN
+	);
+	if (antwortOpt.art === 'zu-viele') return 'zu-viele';
+	if (antwortOpt.art !== 'ok') return 'stoerung';
+	const inhalt = antwortOpt.daten;
 	if (!istObjekt(inhalt) || !istObjekt(inhalt.optionen) || typeof inhalt.vorgang !== 'string')
 		return 'stoerung';
 	let antwort: unknown;
@@ -111,11 +115,11 @@ export async function meldeMitPasskeyAn(
 }
 
 export async function ladePasskeys(holen: Holen = fetch): Promise<PasskeyAnzeige[] | null> {
+	const antwort = await rufeAb<unknown, never>('/api/passkey', { method: 'GET' }, holen, NUR_DATEN);
+	if (antwort.art !== 'ok') return null;
+	const inhalt = antwort.daten;
+	if (!istObjekt(inhalt) || !Array.isArray(inhalt.passkeys)) return null;
 	try {
-		const antwort = await holen('/api/passkey', { method: 'GET' });
-		if (!antwort.ok) return null;
-		const inhalt = await leseJson(antwort);
-		if (!istObjekt(inhalt) || !Array.isArray(inhalt.passkeys)) return null;
 		return inhalt.passkeys.map((p: Record<string, string | null>) => ({
 			kennung: p.kennung as string,
 			geraet: p.geraet as string,
@@ -144,12 +148,17 @@ export async function entfernePasskey(
 	kennung: string,
 	holen: Holen = fetch
 ): Promise<'ok' | 'fehler'> {
-	const antwort = await post('/api/passkey/entfernen', { kennung }, holen);
-	if (!antwort || antwort.status !== 204) return 'fehler';
+	const antwort = await rufeAb(
+		'/api/passkey/entfernen',
+		jsonPost({ kennung }),
+		holen,
+		NUR_OHNE_KOERPER
+	);
+	if (antwort.art !== 'ok') return 'fehler';
 	await meldeEntfernt(kennung);
 	return 'ok';
 }
 
 export async function hinweisErledigt(holen: Holen = fetch): Promise<void> {
-	await post('/api/passkey/hinweis', {}, holen);
+	await rufeAb('/api/passkey/hinweis', jsonPost({}), holen, NUR_DATEN);
 }

@@ -3,7 +3,7 @@
 // ohne Browser testbar ist.
 import { erkenneGeraet, laeuftVomSymbol } from '../hilfe/geraet.ts';
 import type { Speicher } from '../login/mailanfrage.ts';
-import type { Holen } from '../verwaltung/api.ts';
+import type { Holen } from '../abruf.ts';
 import { loescheAbo, sendeAbo } from './api.ts';
 
 export type PushMoeglich = 'ja' | 'iphone-startbildschirm' | 'nein';

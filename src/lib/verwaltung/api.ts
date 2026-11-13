@@ -31,9 +31,6 @@ import type {
 import type { VerlaufZeile } from '../server/admin/verlauf.ts';
 import type { Klassierung } from '../turnier/klassierung.ts';
 
-// `Holen` steht im Abruf-Baustein; hier weitergereicht für `push/geraet.ts` (Schritt 13, Lauf 2).
-export type { Holen };
-
 export type MitgliedDetail = Json<Detail>;
 export type AuskunftAnsicht = Json<Auskunft>;
 export type MitgliedZeile = Json<Listenzeile>;

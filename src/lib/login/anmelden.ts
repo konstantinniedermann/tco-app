@@ -1,7 +1,7 @@
 // Anfragen der Login-Seiten an die Schnittstellen und die Meldungen dazu (UI-06).
 // Texte wörtlich aus der Spec «Login per Einmal-Code», Abschnitt «Ablauf in der App».
 
-import { istFehlerwort } from '../fehler.ts';
+import { rufeAb, type Holen, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post';
 
 export type Ergebnis =
@@ -21,24 +21,28 @@ export const MELDUNG = {
 	passkeyEinrichten: 'Das hat nicht geklappt. Du kannst dich weiterhin mit einem Code anmelden.'
 } as const;
 
-export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
+/** Die Fehlerwörter des Logins; der Körper ist nachsichtig (Erfolg und 429 brauchen keinen). */
+type Wort = 'falsch' | 'benutzt' | 'zu-viele';
+const VERTRAG: Vertrag<Wort> = {
+	woerter: ['falsch', 'benutzt', 'zu-viele'],
+	koerper: 'nachsichtig'
+};
 
 export async function sende(pfad: string, inhalt: object, holen: Holen = fetch): Promise<Ergebnis> {
-	try {
-		const antwort = await holen(pfad, jsonPost(inhalt));
-		if (antwort.ok) return { ergebnis: 'ok' };
-		if (antwort.status === 429) return { ergebnis: 'zu-viele' };
-		if (antwort.status === 400) {
-			const k = (await antwort.json()) as { fehler?: unknown; kontakt?: unknown };
-			const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
-			if (fehler === 'benutzt' && typeof k.kontakt === 'string')
-				return { ergebnis: 'benutzt', kontakt: k.kontakt };
-			if (fehler === 'falsch') return { ergebnis: 'falsch' };
-		}
-	} catch {
-		// Netz weg oder Körper nicht lesbar: unten als Störung.
+	const r = await rufeAb<unknown, Wort>(pfad, jsonPost(inhalt), holen, VERTRAG);
+	switch (r.art) {
+		case 'ok':
+			return { ergebnis: 'ok' };
+		case 'falsch':
+		case 'zu-viele':
+			return { ergebnis: r.art };
+		case 'benutzt':
+			return typeof r.koerper.kontakt === 'string'
+				? { ergebnis: 'benutzt', kontakt: r.koerper.kontakt }
+				: { ergebnis: 'stoerung' };
+		default:
+			return { ergebnis: 'stoerung' };
 	}
-	return { ergebnis: 'stoerung' };
 }
 
 /** Meldung beim Feld; `falsch` ist je nach Seite verschieden. */
