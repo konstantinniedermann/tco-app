@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { ladeAuskunft } from '../../../../../lib/verwaltung/api.ts';
+import { ladeAuskunft } from '../../../../../lib/verwaltung/mitglieder-api.ts';
 import type { PageLoad } from './$types';
 
 // Läuft nur im Browser (ssr = false). Der Server legt beim Abruf den Verlaufseintrag «Auskunft

@@ -2,7 +2,7 @@
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
-	import { ladeMitglieder, type MitgliedZeile } from '../../../lib/verwaltung/api.ts';
+	import { ladeMitglieder, type MitgliedZeile } from '../../../lib/verwaltung/mitglieder-api.ts';
 	import { plakette } from '../../../lib/verwaltung/anzeige.ts';
 	import { ROLLEN_NAME } from '../../../lib/verwaltung/rollen-namen.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';

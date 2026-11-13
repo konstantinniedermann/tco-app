@@ -8,15 +8,15 @@
 		werteAus,
 		type Werte
 	} from '../../../../lib/verwaltung/Angabenformular.svelte';
+	import { type Feld } from '../../../../lib/verwaltung/api.ts';
 	import {
 		beendeSitzungen,
 		erzeugeBrief,
 		speichereAngaben,
 		speichereRollen,
 		type AusgestellterBrief,
-		type Feld,
 		type Rolle
-	} from '../../../../lib/verwaltung/api.ts';
+	} from '../../../../lib/verwaltung/mitglieder-api.ts';
 	import {
 		VERALTET,
 		VERGEBEN,
