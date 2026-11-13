@@ -19,6 +19,10 @@ function holer(antwort: Response | Error) {
 type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
 const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
 
+/** Absichtlich ausserhalb der Liste: Antworten, die der Server nie so sendet. */
+const ungeprueft = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+const unlesbar = (status: number) => new Response('kein JSON', { status });
+
 describe('Anfrage an die Login-Schnittstellen', () => {
 	it('schickt JSON mit POST', async () => {
 		const { aufrufe, holen } = holer(json(200, {}));
@@ -88,5 +92,35 @@ describe('Meldungen beim Feld (UI-06)', () => {
 
 	it('ok hat keine Meldung', () => {
 		expect(meldung({ ergebnis: 'ok' }, 'F')).toBeNull();
+	});
+});
+
+// Ränder, die der gemeinsame Abruf-Baustein genau so erhalten muss (Charakterisierung vor Schritt 13).
+describe('Login-Schnittstellen: Ränder der Deutung', () => {
+	const ab = async (r: Response) => sende('/api/login/brief', { code: 'abc' }, holer(r).holen);
+	const STOERUNG = { ergebnis: 'stoerung' };
+
+	it('429 ist zu-viele, auch ohne lesbaren Körper', async () => {
+		expect(await ab(unlesbar(429))).toEqual({ ergebnis: 'zu-viele' });
+	});
+
+	it('jedes 2xx ist ok, auch ohne Körper und ohne lesbaren Körper', async () => {
+		expect(await ab(new Response(null, { status: 204 }))).toEqual({ ergebnis: 'ok' });
+		expect(await ab(unlesbar(200))).toEqual({ ergebnis: 'ok' });
+	});
+
+	it('401 und 404 sind Störung', async () => {
+		expect(await ab(json(401, { fehler: 'abgemeldet' }))).toEqual(STOERUNG);
+		expect(await ab(json(404, { fehler: 'nicht-gefunden' }))).toEqual(STOERUNG);
+	});
+
+	it('benutzt nur mit kontakt', async () => {
+		expect(await ab(ungeprueft(400, { fehler: 'benutzt' }))).toEqual(STOERUNG);
+	});
+
+	it('Wort mit falschem Status, fremdes Wort und JSON null bei 400 sind Störung', async () => {
+		expect(await ab(json(409, { fehler: 'falsch' }))).toEqual(STOERUNG);
+		expect(await ab(json(400, { fehler: 'eingabe' }))).toEqual(STOERUNG);
+		expect(await ab(ungeprueft(400, null))).toEqual(STOERUNG);
 	});
 });

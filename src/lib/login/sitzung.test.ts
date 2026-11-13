@@ -19,3 +19,9 @@ describe('hatSitzung', () => {
 		expect(await hatSitzung(weg)).toBe(false);
 	});
 });
+
+describe('hatSitzung: Ränder', () => {
+	it('ist nicht angemeldet, wenn der Server gestört ist (503)', async () => {
+		expect(await hatSitzung(antwortMit(503))).toBe(false);
+	});
+});

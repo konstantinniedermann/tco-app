@@ -33,6 +33,10 @@ function holer(antwort: Response | Error) {
 type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
 const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
 
+/** Absichtlich ausserhalb der Liste: Antworten, die der Server nie so sendet. */
+const ungeprueft = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+const unlesbar = (status: number) => new Response('kein JSON', { status });
+
 const LEA: EigeneAngaben = {
 	mitgliedernummer: '1042',
 	vorname: 'Lea',
@@ -220,5 +224,73 @@ describe('UI-06: Prüfung im Browser vor dem E-Mail-Wechsel', () => {
 		expect(codeEingabeFehler('123456', '')).toBe(MELDUNG_PROFIL.codesFehlen);
 		expect(codeEingabeFehler(' ', '123456')).toBe(MELDUNG_PROFIL.codesFehlen);
 		expect(codeEingabeFehler('123456', '654321')).toBeNull();
+	});
+});
+
+// Ränder, die der gemeinsame Abruf-Baustein genau so erhalten muss (Charakterisierung vor Schritt 13).
+describe('Profil: Ränder der Deutung', () => {
+	const speichere = async (r: Response) => speichereAngaben({ ort: 'Olten' }, LEA, holer(r).holen);
+	const wechsel = async (r: Response) => starteWechsel('neu@example.org', holer(r).holen);
+	const rufname = async (r: Response) => speichereRufname('Lea', holer(r).holen);
+	const STOERUNG = { ergebnis: 'stoerung' };
+
+	it('401 und 404 sind Störung, beim Speichern und beim E-Mail-Wechsel', async () => {
+		expect(await speichere(json(401, { fehler: 'abgemeldet' }))).toEqual(STOERUNG);
+		expect(await speichere(json(404, { fehler: 'nicht-gefunden' }))).toEqual(STOERUNG);
+		expect(await wechsel(json(401, { fehler: 'abgemeldet' }))).toBe('stoerung');
+		expect(await wechsel(json(404, { fehler: 'nicht-gefunden' }))).toBe('stoerung');
+	});
+
+	it('429 ist zu-viele, auch ohne lesbaren Körper und mit JSON null', async () => {
+		expect(await wechsel(unlesbar(429))).toBe('zu-viele');
+		expect(await wechsel(ungeprueft(429, null))).toBe('zu-viele');
+	});
+
+	it('jedes 2xx ist ok, auch ohne lesbaren Körper und ohne Körper', async () => {
+		expect(await bestaetigeWechsel('1', '2', holer(unlesbar(200)).holen)).toBe('ok');
+		expect(await rufname(unlesbar(200))).toEqual({ ergebnis: 'ok', rufname: null });
+		expect(await speichere(new Response(null, { status: 204 }))).toEqual({ ergebnis: 'ok' });
+	});
+
+	it('eingabe ohne felder ist gültig, mit drei Folgen', async () => {
+		expect(await speichere(json(400, { fehler: 'eingabe' }))).toEqual({
+			ergebnis: 'eingabe',
+			felder: {},
+			fremd: false
+		});
+		expect(await rufname(json(400, { fehler: 'eingabe' }))).toEqual({
+			ergebnis: 'eingabe',
+			fehler: 'Ungültig.'
+		});
+		expect(await wechsel(json(400, { fehler: 'eingabe' }))).toBe('eingabe');
+	});
+
+	it('eingabe mit felder als Liste: leere Feldmeldungen', async () => {
+		expect(await speichere(ungeprueft(400, { fehler: 'eingabe', felder: ['plz'] }))).toEqual({
+			ergebnis: 'eingabe',
+			felder: {},
+			fremd: false
+		});
+	});
+
+	it('gleich, falsch und zu-viele werden beim Speichern zu Störung, veraltet beim Rufnamen', async () => {
+		expect(await speichere(json(400, { fehler: 'gleich' }))).toEqual(STOERUNG);
+		expect(await speichere(json(400, { fehler: 'falsch' }))).toEqual(STOERUNG);
+		expect(await speichere(json(429, { fehler: 'zu-viele' }))).toEqual(STOERUNG);
+		expect(await rufname(json(409, { fehler: 'veraltet' }))).toEqual(STOERUNG);
+	});
+
+	it('ein Wort gilt nur mit seinem Status; JSON null bei 400 ist Störung', async () => {
+		expect(await wechsel(json(400, { fehler: 'veraltet' }))).toBe('stoerung');
+		expect(await wechsel(json(409, { fehler: 'gleich' }))).toBe('stoerung');
+		expect(await wechsel(json(409, { fehler: 'eingabe' }))).toBe('stoerung');
+		expect(await wechsel(ungeprueft(400, null))).toBe('stoerung');
+	});
+
+	it('Laden: unlesbarer Körper, falsche Form und Netzfehler geben null', async () => {
+		expect(await ladeProfil(holer(unlesbar(200)).holen)).toBeNull();
+		expect(await ladeProfil(holer(json(200, { angaben: 'Lea' })).holen)).toBeNull();
+		expect(await ladeKontakt(holer(json(200, { kontakt: 5 })).holen)).toBeNull();
+		expect(await ladeKontakt(holer(new Error('weg')).holen)).toBeNull();
 	});
 });
