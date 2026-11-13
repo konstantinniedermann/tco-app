@@ -5,10 +5,14 @@
 export type Uebergang = 'blende' | 'tiefer' | 'zurueck';
 
 /** Bereich einer Seite = ihr Reiter (UI-Leitbild, feste Ordnung). */
-export type Bereich = '/' | '/clubmeisterschaft' | '/profil';
+export type Bereich = '/' | '/clubmeisterschaft' | '/interclub' | '/profil';
 
-/** Die Reiter in ihrer Reihenfolge: Start · CM · Profil. */
-export const REITER: readonly Bereich[] = ['/', '/clubmeisterschaft', '/profil'];
+/** Die Reiter in ihrer Reihenfolge: Start · CM · IC · Profil; IC nur mit Interclub-Daten. */
+export function reiterFuer(interclub: boolean): readonly Bereich[] {
+	return interclub
+		? ['/', '/clubmeisterschaft', '/interclub', '/profil']
+		: ['/', '/clubmeisterschaft', '/profil'];
+}
 
 const BEREICH: Record<string, Bereich> = {
 	'/': '/',
@@ -20,6 +24,8 @@ const BEREICH: Record<string, Bereich> = {
 	'/clubmeisterschaft/[id]/doppel/[kid]': '/clubmeisterschaft',
 	'/clubmeisterschaft/[id]/kategorie/[kid]': '/clubmeisterschaft',
 	'/clubmeisterschaft/[id]/kontakt': '/clubmeisterschaft',
+	'/interclub': '/interclub',
+	'/interclub/[id]': '/interclub',
 	'/profil': '/profil',
 	'/profil/email': '/profil'
 };
@@ -43,7 +49,9 @@ const EBENE: Record<string, number> = {
 	'/clubmeisterschaft/[id]': 1,
 	'/clubmeisterschaft/[id]/doppel/[kid]': 2,
 	'/clubmeisterschaft/[id]/kategorie/[kid]': 2,
-	'/clubmeisterschaft/[id]/kontakt': 2
+	'/clubmeisterschaft/[id]/kontakt': 2,
+	'/interclub': 0,
+	'/interclub/[id]': 1
 };
 
 const FUSSZEILE = new Set(['/', '/login', '/login/mail', '/willkommen']);
@@ -89,6 +97,8 @@ export function elternVon(
 		case '/clubmeisterschaft/[id]/kategorie/[kid]':
 		case '/clubmeisterschaft/[id]/kontakt':
 			return { route: '/clubmeisterschaft/[id]', text: null };
+		case '/interclub/[id]':
+			return { route: '/interclub', text: 'Interclub' };
 		default:
 			return null;
 	}

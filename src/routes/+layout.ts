@@ -9,15 +9,24 @@ export const prerender = false;
 // gibt es kein Band. Läuft keine Ansicht, lädt das Layout erst nach `refreshAll()` wieder (die
 // Taste «Ansehen» löst es aus). Läuft eine, prüft jeder Seitenwechsel neu: So verschwindet das
 // Band auch nach dem Abmelden oder wenn jemand die Sitzungen beendet hat.
+// `interclub`: Reiter IC nur, wenn es Interclub-Daten gibt. Ohne Sitzung prüft jeder
+// Seitenwechsel neu, damit der Reiter gleich nach dem Login steht (die Login-Seiten wechseln
+// ohne `refreshAll()` zur Startseite).
 export const load: LayoutLoad = async ({ fetch, url }) => {
 	let ansicht: AnsichtRolle | null = null;
+	let interclub = false;
+	let angemeldet = false;
 	try {
 		const antwort = await fetch('/api/sitzung');
-		if (antwort.ok)
-			ansicht = ((await antwort.json()) as { ansicht?: AnsichtRolle }).ansicht ?? null;
+		if (antwort.ok) {
+			const sitzung = (await antwort.json()) as { ansicht?: AnsichtRolle; interclub?: boolean };
+			ansicht = sitzung.ansicht ?? null;
+			interclub = sitzung.interclub === true;
+			angemeldet = true;
+		}
 	} catch {
 		// Netz weg: kein Band; die Seiten melden die Störung selbst.
 	}
-	if (ansicht !== null) void url.pathname;
-	return { ansicht };
+	if (ansicht !== null || !angemeldet) void url.pathname;
+	return { ansicht, interclub };
 };
