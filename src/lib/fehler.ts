@@ -65,6 +65,54 @@ export const istFehlerwort = (x: unknown): x is Fehlerwort =>
 /** Die Statuscodes einer Fehlerantwort; ihr Körper hat immer die Form `Fehlerkoerper`. */
 export type FehlerStatus = 400 | 401 | 403 | 404 | 409 | 415 | 429;
 
+/**
+ * Der Status, mit dem der Server jedes Wort sendet. Die Oberfläche lässt ein Wort nur mit diesem
+ * Status gelten (`src/lib/abruf.ts`); ein Wort ohne Zeile oder eine Zeile ohne Wort ist ein Typfehler.
+ */
+export const STATUS_DES_WORTS = {
+	eingabe: 400,
+	falsch: 400,
+	benutzt: 400,
+	datei: 400,
+	gleich: 400,
+	abgemeldet: 401,
+	'kein-admin': 403,
+	unbestaetigt: 403,
+	'kein-recht': 403,
+	'nur-ansehen': 403,
+	'nicht-gefunden': 404,
+	vergeben: 409,
+	veraltet: 409,
+	'letzter-mytco': 409,
+	'eigenes-konto': 409,
+	'frist-abgelaufen': 409,
+	'nicht-moeglich': 409,
+	'push-aus': 409,
+	geschlossen: 409,
+	voll: 409,
+	'passt-nicht': 409,
+	'keine-wildcard': 409,
+	'schon-angefragt': 409,
+	'anfrage-offen': 409,
+	hinfaellig: 409,
+	'angaben-fehlen': 409,
+	'schon-angemeldet': 409,
+	vorbereitung: 409,
+	'nicht-beantragt': 409,
+	'nur-lesen': 409,
+	inzwischen: 409,
+	'schluss-vorbei': 409,
+	'keine-kategorie': 409,
+	unzulaessig: 409,
+	abgesagt: 409,
+	'art-gesperrt': 409,
+	unpassend: 409,
+	'hat-anmeldungen': 409,
+	warnung: 409,
+	format: 415,
+	'zu-viele': 429
+} as const satisfies { readonly [W in Fehlerwort]: FehlerStatus };
+
 /** Feldname → Satz, den die Oberfläche beim Feld zeigen kann. */
 export type Feldmeldungen = { readonly [feld: string]: string | undefined };
 

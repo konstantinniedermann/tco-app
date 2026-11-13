@@ -8,6 +8,15 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.20 — Ein Abruf-Baustein für die Oberfläche (Refactoring Schritt 13)
+
+- Alle Abruf-Module der Oberfläche sprechen über einen gemeinsamen Baustein (`src/lib/abruf.ts`) mit
+  dem Server; nur er deutet Statuscodes und Fehlerwörter. Das Ergebnis eines Abrufs heisst überall
+  `art`. Für Mitglieder und Verwaltung ändert sich nichts (#80).
+- Neue Tests halten das bisherige Verhalten der Abruf-Module an ihren Rändern fest. Die
+  Ablehnungsgründe der Clubmeisterschaft und die Sätze zur Antwort auf einen Anlass stehen je an
+  einem Ort, den Server und Oberfläche teilen.
+
 ## 0.20.19 — Reste der Bauregel geschlossen (Refactoring Schritt 12a)
 
 - Die Bauregel prüft Importpfade am aufgelösten Ziel, lässt sich von `//` in Pfaden und Texten nicht

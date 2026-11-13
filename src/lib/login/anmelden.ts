@@ -1,15 +1,15 @@
 // Anfragen der Login-Seiten an die Schnittstellen und die Meldungen dazu (UI-06).
 // Texte wörtlich aus der Spec «Login per Einmal-Code», Abschnitt «Ablauf in der App».
 
-import { istFehlerwort } from '../fehler.ts';
+import { rufeAb, woerterAus, type Holen, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post';
 
 export type Ergebnis =
-	| { ergebnis: 'ok' }
-	| { ergebnis: 'falsch' }
-	| { ergebnis: 'benutzt'; kontakt: string }
-	| { ergebnis: 'zu-viele' }
-	| { ergebnis: 'stoerung' };
+	| { art: 'ok' }
+	| { art: 'falsch' }
+	| { art: 'benutzt'; kontakt: string }
+	| { art: 'zu-viele' }
+	| { art: 'stoerung' };
 
 export const MELDUNG = {
 	briefFalsch: 'Dieser Code stimmt nicht. Prüf ihn oder lass dir einen neuen per E-Mail schicken.',
@@ -21,29 +21,48 @@ export const MELDUNG = {
 	passkeyEinrichten: 'Das hat nicht geklappt. Du kannst dich weiterhin mit einem Code anmelden.'
 } as const;
 
-export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
+/** Die Fehlerwörter des Logins; der Körper ist nachsichtig (Erfolg und 429 brauchen keinen). */
+type Wort = Exclude<Ergebnis['art'], 'ok' | 'stoerung'>;
+const VERTRAG: Vertrag<Wort> = {
+	woerter: woerterAus<Wort>({ falsch: true, benutzt: true, 'zu-viele': true }),
+	koerper: 'nachsichtig'
+};
 
 export async function sende(pfad: string, inhalt: object, holen: Holen = fetch): Promise<Ergebnis> {
-	try {
-		const antwort = await holen(pfad, jsonPost(inhalt));
-		if (antwort.ok) return { ergebnis: 'ok' };
-		if (antwort.status === 429) return { ergebnis: 'zu-viele' };
-		if (antwort.status === 400) {
-			const k = (await antwort.json()) as { fehler?: unknown; kontakt?: unknown };
-			const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
-			if (fehler === 'benutzt' && typeof k.kontakt === 'string')
-				return { ergebnis: 'benutzt', kontakt: k.kontakt };
-			if (fehler === 'falsch') return { ergebnis: 'falsch' };
-		}
-	} catch {
-		// Netz weg oder Körper nicht lesbar: unten als Störung.
+	const r = await rufeAb<unknown, Wort>(pfad, jsonPost(inhalt), holen, VERTRAG);
+	switch (r.art) {
+		case 'ok':
+			return { art: 'ok' };
+		case 'falsch':
+		case 'zu-viele':
+			return { art: r.art };
+		case 'benutzt':
+			return typeof r.koerper.kontakt === 'string'
+				? { art: 'benutzt', kontakt: r.koerper.kontakt }
+				: { art: 'stoerung' };
+		default:
+			return { art: 'stoerung' };
 	}
-	return { ergebnis: 'stoerung' };
 }
+
+/** A-LOGIN-01: mit dem Code aus dem Brief anmelden. */
+export const meldeMitBriefAn = (code: string, holen: Holen = fetch) =>
+	sende('/api/login/brief', { code }, holen);
+
+/** Einen Code per E-Mail anfordern. */
+export const fordereMailCodeAn = (email: string, holen: Holen = fetch) =>
+	sende('/api/login/mail-code', { email }, holen);
+
+/** Mit dem Code aus der E-Mail anmelden. */
+export const meldeMitMailAn = (email: string, code: string, holen: Holen = fetch) =>
+	sende('/api/login/mail', { email, code }, holen);
+
+/** Abmelden; der Server antwortet auch ohne Sitzung mit Erfolg. */
+export const meldeSichAb = (holen: Holen = fetch) => sende('/api/logout', {}, holen);
 
 /** Meldung beim Feld; `falsch` ist je nach Seite verschieden. */
 export function meldung(r: Ergebnis, falsch: string): string | null {
-	switch (r.ergebnis) {
+	switch (r.art) {
 		case 'ok':
 			return null;
 		case 'falsch':

@@ -1,6 +1,7 @@
 // Anfragen der Verwaltungsseiten an `/api/admin/…` und ihre Antworten als typisierte Ergebnisse.
-// Die Seiten zeigen die Meldungen; hier steht nur, was die Statuscodes bedeuten.
-import { istFehlerwort } from '../fehler.ts';
+// Die Seiten zeigen die Meldungen; hier steht nur, welche Fehlerwörter das Modul kennt (gedeutet im
+// Abruf-Baustein) und welche Zusatzangaben sie tragen.
+import { rufeAb, woerterAus, type Holen, type Json, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post.ts';
 import type { Angaben, Feld } from '../server/admin/angaben.ts';
 import type { AnlassFeld } from '../server/anlass/angaben.ts';
@@ -29,15 +30,6 @@ import type {
 } from '../server/turnier/turniere.ts';
 import type { VerlaufZeile } from '../server/admin/verlauf.ts';
 import type { Klassierung } from '../turnier/klassierung.ts';
-
-// Was nach JSON im Browser ankommt: Zeitpunkte sind Zeichenketten.
-export type Json<T> = T extends Date
-	? string
-	: T extends (infer U)[]
-		? Json<U>[]
-		: T extends object
-			? { [K in keyof T]: Json<T[K]> }
-			: T;
 
 export type MitgliedDetail = Json<Detail>;
 export type AuskunftAnsicht = Json<Auskunft>;
@@ -95,75 +87,83 @@ export type Antwort<T> =
 	| { art: 'inzwischen'; gespraech: GespraechVerlauf }
 	| { art: 'stoerung' };
 
-export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
-
 const STOERUNG: Antwort<never> = { art: 'stoerung' };
 
-function deute<T>(status: number, koerper: unknown): Antwort<T> {
-	const k = (koerper ?? {}) as {
-		fehler?: unknown;
-		felder?: unknown;
-		feld?: unknown;
-		anzahl?: unknown;
-		warnungen?: unknown;
-		datei?: unknown;
-		gespraech?: unknown;
-	};
-	if (status >= 200 && status < 300) return { art: 'ok', daten: koerper as T };
-	const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
-	if (status === 401) return { art: 'abgemeldet' };
-	if (status === 403) {
-		if (fehler === 'kein-admin') return { art: 'kein-admin' };
-		if (fehler === 'unbestaetigt') return { art: 'unbestaetigt' };
-		if (fehler === 'kein-recht') return { art: 'kein-recht' };
-		if (fehler === 'nur-ansehen') return { art: 'nur-ansehen' };
-	}
-	if (status === 404) return { art: 'nicht-gefunden' };
-	if (status === 429) return { art: 'zu-viele' };
-	if (status === 400) {
-		if (fehler === 'falsch') return { art: 'falsch' };
-		if (fehler === 'datei' && k.datei && typeof k.datei === 'object')
-			return { art: 'datei', datei: k.datei as DateiFehler };
-		if (fehler === 'eingabe' && k.felder && typeof k.felder === 'object')
-			return { art: 'eingabe', felder: k.felder as Partial<Record<AlleFelder, string>> };
-	}
-	if (status === 409) {
-		if (fehler === 'letzter-mytco') return { art: 'letzter-mytco' };
-		if (fehler === 'eigenes-konto') return { art: 'eigenes-konto' };
-		if (fehler === 'veraltet') return { art: 'veraltet' };
-		if (fehler === 'frist-abgelaufen') return { art: 'frist-abgelaufen' };
-		if (fehler === 'schluss-vorbei') return { art: 'schluss-vorbei' };
-		if (fehler === 'keine-kategorie') return { art: 'keine-kategorie' };
-		if (fehler === 'unzulaessig') return { art: 'unzulaessig' };
-		if (fehler === 'abgesagt') return { art: 'abgesagt' };
-		if (fehler === 'art-gesperrt') return { art: 'art-gesperrt' };
-		if (fehler === 'unpassend' && typeof k.anzahl === 'number')
-			return { art: 'unpassend', anzahl: k.anzahl };
-		if (fehler === 'hat-anmeldungen' && typeof k.anzahl === 'number')
-			return { art: 'hat-anmeldungen', anzahl: k.anzahl };
-		if (fehler === 'nicht-moeglich' && typeof k.anzahl === 'number')
-			return { art: 'nicht-moeglich', anzahl: k.anzahl };
-		if (fehler === 'vergeben' && typeof k.feld === 'string')
-			return { art: 'vergeben', feld: k.feld as Feld | 'jahr' | 'name' };
-		if (fehler === 'warnung' && Array.isArray(k.warnungen))
-			return { art: 'warnung', warnungen: k.warnungen as Warnung[] };
-		if (fehler === 'schon-angemeldet') return { art: 'schon-angemeldet' };
-		if (fehler === 'vorbereitung') return { art: 'vorbereitung' };
-		if (fehler === 'nicht-beantragt') return { art: 'nicht-beantragt' };
-		if (fehler === 'nur-lesen') return { art: 'nur-lesen' };
-		if (fehler === 'inzwischen' && k.gespraech && typeof k.gespraech === 'object')
-			return { art: 'inzwischen', gespraech: k.gespraech as GespraechVerlauf };
-	}
-	return STOERUNG;
-}
+/** Die Fehlerwörter, die die Verwaltung kennt: genau die Arten von `Antwort` ausser ok und Störung. */
+type Wort = Exclude<Antwort<unknown>['art'], 'ok' | 'stoerung'>;
+const WOERTER: Record<Wort, true> = {
+	abgemeldet: true,
+	'kein-admin': true,
+	unbestaetigt: true,
+	'kein-recht': true,
+	'nur-ansehen': true,
+	falsch: true,
+	'zu-viele': true,
+	'nicht-gefunden': true,
+	eingabe: true,
+	vergeben: true,
+	'letzter-mytco': true,
+	'eigenes-konto': true,
+	veraltet: true,
+	'frist-abgelaufen': true,
+	'schluss-vorbei': true,
+	'keine-kategorie': true,
+	unzulaessig: true,
+	abgesagt: true,
+	'art-gesperrt': true,
+	unpassend: true,
+	'hat-anmeldungen': true,
+	'nicht-moeglich': true,
+	datei: true,
+	warnung: true,
+	'schon-angemeldet': true,
+	vorbereitung: true,
+	'nicht-beantragt': true,
+	'nur-lesen': true,
+	inzwischen: true
+};
+
+/** Körper Pflicht; JSON `null` als Fehlerkörper gilt als `{}` (so war es hier immer). */
+const VERTRAG: Vertrag<Wort> = {
+	woerter: woerterAus<Wort>(WOERTER),
+	koerper: 'pflicht',
+	nullAlsLeer: true
+};
+
+/** Ein Objekt, auch eine Liste (so liess es die Verwaltung immer durch). */
+const istObjektOderListe = (x: unknown): x is object => typeof x === 'object' && x !== null;
 
 async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<Antwort<T>> {
-	try {
-		const antwort = await holen(pfad, init);
-		return deute<T>(antwort.status, await antwort.json());
-	} catch {
-		// Netz weg oder Körper nicht lesbar.
-		return STOERUNG;
+	const r = await rufeAb<T, Wort>(pfad, init, holen, VERTRAG);
+	if (r.art === 'ok' || r.art === 'stoerung') return r;
+	const k = r.koerper;
+	switch (r.art) {
+		case 'eingabe':
+			return istObjektOderListe(k.felder)
+				? { art: 'eingabe', felder: k.felder as Partial<Record<AlleFelder, string>> }
+				: STOERUNG;
+		case 'datei':
+			return istObjektOderListe(k.datei)
+				? { art: 'datei', datei: k.datei as DateiFehler }
+				: STOERUNG;
+		case 'vergeben':
+			return typeof k.feld === 'string'
+				? { art: 'vergeben', feld: k.feld as Feld | 'jahr' | 'name' }
+				: STOERUNG;
+		case 'unpassend':
+		case 'hat-anmeldungen':
+		case 'nicht-moeglich':
+			return typeof k.anzahl === 'number' ? { art: r.art, anzahl: k.anzahl } : STOERUNG;
+		case 'warnung':
+			return Array.isArray(k.warnungen)
+				? { art: 'warnung', warnungen: k.warnungen as Warnung[] }
+				: STOERUNG;
+		case 'inzwischen':
+			return istObjektOderListe(k.gespraech)
+				? { art: 'inzwischen', gespraech: k.gespraech as GespraechVerlauf }
+				: STOERUNG;
+		default:
+			return { art: r.art };
 	}
 }
 

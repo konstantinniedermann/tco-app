@@ -1,5 +1,6 @@
 // Schnittstellen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01…05, A-ANMELDUNG-10). Alles
 // nur mit Sitzung.
+import { ABLEHNUNGEN } from '../../cm/ablehnung.ts';
 import { INTEGER_MAX, parseId } from '../parse-id.ts';
 import { aendernd, antwort, jetzt, leseKoerper, mitSitzung, nichtGefunden } from '../http.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
@@ -79,17 +80,8 @@ type Ablehnung = Exclude<
 	'ok' | 'nicht-gefunden'
 >;
 
-const FEHLER = [
-	'geschlossen',
-	'voll',
-	'passt-nicht',
-	'keine-wildcard',
-	'schon-angemeldet',
-	'schon-angefragt',
-	'anfrage-offen',
-	'hinfaellig',
-	'angaben-fehlen'
-] satisfies readonly Ablehnung[];
+/** Die Liste teilt der Server mit der Oberfläche (`src/lib/cm/ablehnung.ts`, N-10). */
+const FEHLER = ABLEHNUNGEN satisfies readonly Ablehnung[];
 
 const istAbgelehnt = (r: string): r is (typeof FEHLER)[number] =>
 	(FEHLER as readonly string[]).includes(r);

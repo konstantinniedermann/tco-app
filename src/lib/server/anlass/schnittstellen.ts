@@ -12,7 +12,8 @@ import {
 	nichtGefunden,
 	type Ereignis
 } from '../http.ts';
-import { ANTWORT_MELDUNG, pruefeAntwort } from './angaben.ts';
+import { ANTWORT_MELDUNG } from '../../anlass/antwort.ts';
+import { pruefeAntwort } from './angaben.ts';
 import {
 	kommendeAnlaesse,
 	ladeAnlassFuerMitglied,

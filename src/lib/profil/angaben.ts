@@ -3,9 +3,8 @@
 // Annahme K-19.1: Telefon, Lizenznummer und E-Mail ändert das Mitglied selbst.
 // Annahme K-19.2: die Adresse (Strasse, PLZ, Ort) ebenso.
 
-import { istFehlerwort } from '../fehler.ts';
+import { rufeAb, woerterAus, type Holen, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post.ts';
-import type { Holen } from '../login/anmelden.ts';
 import type { EigeneAngaben, EigenesFeld } from '../server/profil/angaben.ts';
 import { istKlassierung, type Klassierung } from '../turnier/klassierung.ts';
 
@@ -15,9 +14,9 @@ export type Ergebnis =
 	'ok' | 'veraltet' | 'eingabe' | 'gleich' | 'zu-viele' | 'falsch' | 'stoerung';
 
 export type Speichern =
-	| { ergebnis: 'ok' | 'veraltet' | 'stoerung' }
+	| { art: 'ok' | 'veraltet' | 'stoerung' }
 	| {
-			ergebnis: 'eingabe';
+			art: 'eingabe';
 			felder: Partial<Record<EigenesFeld, string>>;
 			/** Die Prüfung scheitert an einem Feld, das nur der Mitglieder-Admin ändert (Altdaten). */
 			fremd: boolean;
@@ -75,39 +74,41 @@ function istObjekt(x: unknown): x is Record<string, unknown> {
 	return typeof x === 'object' && x !== null && !Array.isArray(x);
 }
 
-async function leseJson(antwort: Response): Promise<Record<string, unknown>> {
-	try {
-		const inhalt: unknown = await antwort.json();
-		return istObjekt(inhalt) ? inhalt : {};
-	} catch {
-		return {};
-	}
-}
+/**
+ * Die Fehlerwörter, die das Profil kennt. Der Körper ist nachsichtig: unlesbar gilt als leer. 401 und
+ * 404 kennt das Profil nicht, sie bleiben Störung.
+ */
+type Wort = Exclude<Ergebnis, 'ok' | 'stoerung'>;
+const VERTRAG: Vertrag<Wort> = {
+	woerter: woerterAus<Wort>({
+		veraltet: true,
+		eingabe: true,
+		gleich: true,
+		falsch: true,
+		'zu-viele': true
+	}),
+	koerper: 'nachsichtig'
+};
 
-/** Was Status und `fehler` der Schnittstelle bedeuten. */
-function deute(status: number, k: Record<string, unknown>): Ergebnis {
-	if (status >= 200 && status < 300) return 'ok';
-	const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
-	if (status === 409 && fehler === 'veraltet') return 'veraltet';
-	if (status === 429) return 'zu-viele';
-	if (status === 400 && (fehler === 'eingabe' || fehler === 'gleich' || fehler === 'falsch'))
-		return fehler;
-	return 'stoerung';
-}
+/** Nur Daten: Jede Antwort ausser einem Erfolg ist `null`. */
+const NUR_DATEN: Vertrag<never> = { woerter: [], koerper: 'nachsichtig' };
 
 async function schicke(
 	pfad: string,
 	inhalt: object,
 	holen: Holen
-): Promise<{ ergebnis: Ergebnis; koerper: Record<string, unknown> }> {
-	try {
-		const antwort = await holen(pfad, jsonPost(inhalt));
-		const koerper = await leseJson(antwort);
-		return { ergebnis: deute(antwort.status, koerper), koerper };
-	} catch {
-		// Netz weg.
-		return { ergebnis: 'stoerung', koerper: {} };
-	}
+): Promise<{ art: Ergebnis; koerper: Record<string, unknown> }> {
+	const r = await rufeAb<unknown, Wort>(pfad, jsonPost(inhalt), holen, VERTRAG);
+	if (r.art === 'ok') return { art: 'ok', koerper: istObjekt(r.daten) ? r.daten : {} };
+	if (r.art === 'stoerung') return { art: 'stoerung', koerper: {} };
+	return { art: r.art, koerper: r.koerper };
+}
+
+/** Der Körper eines Erfolgs (kein Objekt gilt als leer); `null` bei jeder anderen Antwort. */
+async function lade(pfad: string, holen: Holen): Promise<Record<string, unknown> | null> {
+	const r = await rufeAb<unknown, never>(pfad, { method: 'GET' }, holen, NUR_DATEN);
+	if (r.art !== 'ok') return null;
+	return istObjekt(r.daten) ? r.daten : {};
 }
 
 /**
@@ -119,19 +120,13 @@ export async function ladeProfil(holen: Holen = fetch): Promise<{
 	klassierung: Klassierung | null;
 	rufname: string | null;
 } | null> {
-	try {
-		const antwort = await holen('/api/profil', { method: 'GET' });
-		if (!antwort.ok) return null;
-		const { angaben, klassierung, rufname } = await leseJson(antwort);
-		if (!istObjekt(angaben)) return null;
-		return {
-			angaben: angaben as EigeneAngaben,
-			klassierung: istKlassierung(klassierung) ? klassierung : null,
-			rufname: typeof rufname === 'string' ? rufname : null
-		};
-	} catch {
-		return null;
-	}
+	const k = await lade('/api/profil', holen);
+	if (k === null || !istObjekt(k.angaben)) return null;
+	return {
+		angaben: k.angaben as EigeneAngaben,
+		klassierung: istKlassierung(k.klassierung) ? k.klassierung : null,
+		rufname: typeof k.rufname === 'string' ? k.rufname : null
+	};
 }
 
 /** Angaben des angemeldeten Mitglieds; `null` bei Störung oder ohne Sitzung. */
@@ -141,14 +136,8 @@ export async function ladeAngaben(holen: Holen = fetch): Promise<EigeneAngaben |
 
 /** Kontakt des Vereins für Fragen (Annahme K-21); `null`, wenn er sich nicht laden lässt. */
 export async function ladeKontakt(holen: Holen = fetch): Promise<string | null> {
-	try {
-		const antwort = await holen('/api/kontakt', { method: 'GET' });
-		if (!antwort.ok) return null;
-		const { kontakt } = await leseJson(antwort);
-		return typeof kontakt === 'string' ? kontakt : null;
-	} catch {
-		return null;
-	}
+	const k = await lade('/api/kontakt', holen);
+	return typeof k?.kontakt === 'string' ? k.kontakt : null;
 }
 
 /** `vorher`: die Angaben, wie die Seite sie geladen hat; sonst `veraltet` (zweiter Tab, Mitglieder-Admin). */
@@ -157,28 +146,31 @@ export async function speichereAngaben(
 	vorher: EigeneAngaben,
 	holen: Holen = fetch
 ): Promise<Speichern> {
-	const { ergebnis, koerper } = await schicke('/api/profil', { angaben: neu, vorher }, holen);
-	if (ergebnis === 'ok' || ergebnis === 'veraltet') return { ergebnis };
-	if (ergebnis === 'eingabe') {
+	const { art, koerper } = await schicke('/api/profil', { angaben: neu, vorher }, holen);
+	if (art === 'ok' || art === 'veraltet') return { art };
+	if (art === 'eingabe') {
 		const felder = istObjekt(koerper.felder)
 			? (koerper.felder as Partial<Record<EigenesFeld, string>>)
 			: {};
-		return { ergebnis, felder, fremd: koerper.fremd === true };
+		return { art, felder, fremd: koerper.fremd === true };
 	}
-	return { ergebnis: 'stoerung' };
+	return { art: 'stoerung' };
 }
 
 /** Schickt je einen Code an die bisherige und die neue Adresse. */
-export async function starteWechsel(email: string, holen: Holen = fetch): Promise<Ergebnis> {
-	return (await schicke('/api/profil/email', { email }, holen)).ergebnis;
+export async function starteWechsel(
+	email: string,
+	holen: Holen = fetch
+): Promise<{ art: Ergebnis }> {
+	return { art: (await schicke('/api/profil/email', { email }, holen)).art };
 }
 
 export async function bestaetigeWechsel(
 	codeAlt: string,
 	codeNeu: string,
 	holen: Holen = fetch
-): Promise<Ergebnis> {
-	return (await schicke('/api/profil/email/bestaetigen', { codeAlt, codeNeu }, holen)).ergebnis;
+): Promise<{ art: Ergebnis }> {
+	return { art: (await schicke('/api/profil/email/bestaetigen', { codeAlt, codeNeu }, holen)).art };
 }
 
 /** Rufname im Profil setzen; leer löscht ihn. Bei `eingabe` steht die Meldung des Servers bereit. */
@@ -186,20 +178,18 @@ export async function speichereRufname(
 	rufname: string,
 	holen: Holen = fetch
 ): Promise<
-	| { ergebnis: 'ok'; rufname: string | null }
-	| { ergebnis: 'eingabe'; fehler: string }
-	| { ergebnis: 'stoerung' }
+	{ art: 'ok'; rufname: string | null } | { art: 'eingabe'; fehler: string } | { art: 'stoerung' }
 > {
-	const { ergebnis, koerper } = await schicke('/api/profil/rufname', { rufname }, holen);
-	if (ergebnis === 'ok') {
-		return { ergebnis, rufname: typeof koerper.rufname === 'string' ? koerper.rufname : null };
+	const { art, koerper } = await schicke('/api/profil/rufname', { rufname }, holen);
+	if (art === 'ok') {
+		return { art, rufname: typeof koerper.rufname === 'string' ? koerper.rufname : null };
 	}
-	if (ergebnis === 'eingabe') {
+	if (art === 'eingabe') {
 		const felder = istObjekt(koerper.felder) ? koerper.felder : {};
 		return {
-			ergebnis,
+			art,
 			fehler: typeof felder.rufname === 'string' ? felder.rufname : 'Ungültig.'
 		};
 	}
-	return { ergebnis: 'stoerung' };
+	return { art: 'stoerung' };
 }

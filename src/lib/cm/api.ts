@@ -1,7 +1,10 @@
 // Anfragen der Mitglieder an `/api/cm/…` und `/api/profil/klassierung` und ihre Antworten als
-// typisierte Ergebnisse. Die Seiten zeigen die Meldungen; hier steht nur, was die Statuscodes bedeuten.
-import { istFehlerwort, type Fehlerwort } from '../fehler.ts';
+// typisierte Ergebnisse. Die Seiten zeigen die Meldungen; hier steht nur, welche Fehlerwörter das
+// Modul kennt (gedeutet im Abruf-Baustein).
+import { rufeAb, woerterAus, type Holen, type Json, type Vertrag } from '../abruf.ts';
+import type { Fehlerwort } from '../fehler.ts';
 import { jsonPost } from '../json-post.ts';
+import { ABLEHNUNGEN } from './ablehnung.ts';
 import type {
 	CmAnsicht as ServerCmAnsicht,
 	CmStand as ServerCmStand
@@ -10,7 +13,6 @@ import type { PartnerTreffer as ServerPartnerTreffer } from '../server/cm/doppel
 import type { EigenesGespraech as ServerEigenesGespraech } from '../server/gespraech/gespraech.ts';
 import type { Klassierung } from '../turnier/klassierung.ts';
 import type { CmAngabe } from '../turnier/passung.ts';
-import type { Holen, Json } from '../verwaltung/api.ts';
 
 export type CmStand = Json<ServerCmStand>;
 export type CmAnsicht = Json<ServerCmAnsicht>;
@@ -47,19 +49,11 @@ export function kategorieZumAnsehen(
 	return w ? { kategorie: w, wildcard: true } : null;
 }
 
-/** Gründe, aus denen der Server eine Anmeldung oder Anfrage ablehnt (409). */
-const ABGELEHNT = [
-	'geschlossen',
-	'voll',
-	'passt-nicht',
-	'schon-angemeldet',
-	'schon-angefragt',
-	'anfrage-offen',
-	'hinfaellig',
-	'angaben-fehlen',
-	'keine-wildcard',
-	'nur-lesen'
-] as const satisfies readonly Fehlerwort[];
+/**
+ * Gründe, aus denen der Server ablehnt: die mit dem Server geteilte Liste der Anmeldung und Anfrage,
+ * dazu `nur-lesen` aus dem Gespräch (FR-50).
+ */
+const ABGELEHNT = [...ABLEHNUNGEN, 'nur-lesen'] as const satisfies readonly Fehlerwort[];
 type Abgelehnt = (typeof ABGELEHNT)[number];
 
 /** Felder, die der Server bei 400 melden kann. */
@@ -73,28 +67,36 @@ export type Ergebnis<T> =
 	| { art: 'eingabe'; felder: CmFelder }
 	| { art: 'stoerung' };
 
-const istAbgelehnt = (x: unknown): x is Abgelehnt =>
-	typeof x === 'string' && (ABGELEHNT as readonly string[]).includes(x);
-
 const istObjekt = (x: unknown): x is Record<string, unknown> =>
 	typeof x === 'object' && x !== null && !Array.isArray(x);
 
+/** Die Fehlerwörter, die die CM kennt; der Körper muss lesbar sein, 204 ohne Körper ist Erfolg. */
+type Wort = Exclude<Ergebnis<unknown>['art'], 'ok' | 'stoerung'>;
+const VERTRAG: Vertrag<Wort> = {
+	woerter: [
+		...ABGELEHNT,
+		...woerterAus<Exclude<Wort, Abgelehnt>>({
+			abgemeldet: true,
+			'nicht-gefunden': true,
+			eingabe: true
+		})
+	],
+	koerper: 'pflicht',
+	ohneKoerper: 'erfolg'
+};
+
 async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<Ergebnis<T>> {
-	try {
-		const r = await holen(pfad, init);
-		// 204 hat keinen Körper.
-		if (r.status === 204) return { art: 'ok', daten: {} as T };
-		const k = (await r.json()) as { fehler?: unknown; felder?: unknown };
-		if (r.ok) return { art: 'ok', daten: k as T };
-		const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
-		if (r.status === 401) return { art: 'abgemeldet' };
-		if (r.status === 404) return { art: 'nicht-gefunden' };
-		if (r.status === 409 && istAbgelehnt(fehler)) return { art: fehler };
-		if (r.status === 400 && fehler === 'eingabe' && istObjekt(k.felder))
-			return { art: 'eingabe', felder: k.felder as CmFelder };
-		return { art: 'stoerung' };
-	} catch {
-		return { art: 'stoerung' };
+	const r = await rufeAb<T, Wort>(pfad, init, holen, VERTRAG);
+	switch (r.art) {
+		case 'ok':
+		case 'stoerung':
+			return r;
+		case 'eingabe':
+			return istObjekt(r.koerper.felder)
+				? { art: 'eingabe', felder: r.koerper.felder as CmFelder }
+				: { art: 'stoerung' };
+		default:
+			return { art: r.art };
 	}
 }
 

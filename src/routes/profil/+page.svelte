@@ -2,7 +2,7 @@
 	import { tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { MELDUNG, meldung, sende } from '../../lib/login/anmelden.ts';
+	import { MELDUNG, meldeSichAb, meldung } from '../../lib/login/anmelden.ts';
 	import { speichereKlassierung } from '../../lib/cm/api.ts';
 	import { holeSpeicher } from '../../lib/login/mailanfrage.ts';
 	import {
@@ -209,10 +209,10 @@
 		}
 		speichert = true;
 		const r = await speichereRufname(rufnameWert);
-		if (r.ergebnis === 'ok') {
+		if (r.art === 'ok') {
 			rufname = r.rufname;
 			await schliesse();
-		} else if (r.ergebnis === 'eingabe') {
+		} else if (r.art === 'eingabe') {
 			rufnameFehler = r.fehler;
 			await tick();
 			formular?.querySelector('input')?.focus();
@@ -229,22 +229,22 @@
 		formularFehler = null;
 		const neu = Object.fromEntries(FELDER[a].map((f) => [f, werte[f]]));
 		const r = await speichereAngaben(neu, angaben);
-		if (r.ergebnis === 'ok') {
+		if (r.art === 'ok') {
 			angaben = (await ladeAngaben()) ?? mitAenderung(angaben, neu);
 			await schliesse();
-		} else if (r.ergebnis === 'veraltet') {
+		} else if (r.art === 'veraltet') {
 			const frisch = await ladeAngaben();
 			if (frisch) {
 				angaben = frisch;
 				await schliesse();
 				veraltetBei = a;
 			} else formularFehler = MELDUNG.stoerung;
-		} else if (r.ergebnis === 'eingabe' && !r.fremd && Object.keys(r.felder).length > 0) {
+		} else if (r.art === 'eingabe' && !r.fremd && Object.keys(r.felder).length > 0) {
 			feldFehler = r.felder;
 			await tick();
 			const erstes = FELDER[a].find((f) => r.felder[f]);
 			if (erstes) formular?.querySelector<HTMLElement>(`#angabe-${erstes}`)?.focus();
-		} else if (r.ergebnis === 'eingabe') {
+		} else if (r.art === 'eingabe') {
 			formularFehler = fremdMeldung(data.kontakt);
 		} else formularFehler = MELDUNG.stoerung;
 		speichert = false;
@@ -344,9 +344,9 @@
 		if (abmeldenLaeuft) return;
 		abmeldenLaeuft = true;
 		abmeldenFehler = null;
-		const r = await sende('/api/logout', {});
+		const r = await meldeSichAb();
 		abmeldenLaeuft = false;
-		if (r.ergebnis === 'ok') {
+		if (r.art === 'ok') {
 			// A-KONTO-01: Die gemerkte neue Adresse eines laufenden E-Mail-Wechsels bleibt nicht liegen.
 			vergissWechsel(holeSpeicher());
 			await goto(resolve('/login'));

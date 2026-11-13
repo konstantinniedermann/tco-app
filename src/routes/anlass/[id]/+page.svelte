@@ -3,6 +3,7 @@
 	import Zurueck from '../../../lib/ui/Zurueck.svelte';
 	import { resolve } from '$app/paths';
 	import { sendeAntwort, type AnlassAnsicht, type AntwortArt } from '../../../lib/anlass/api.ts';
+	import { ANTWORT_MELDUNG, MAX_BEMERKUNG } from '../../../lib/anlass/antwort.ts';
 	import { formatiereBeginn } from '../../../lib/anlass/zeit.ts';
 	import type { PageProps } from './$types';
 
@@ -48,7 +49,7 @@
 	async function senden() {
 		if (!anlass || laeuft) return;
 		if (wahl === null) {
-			fehler = { feld: 'antwort', text: 'Bitte wähle «Ich komme» oder «Ich komme nicht».' };
+			fehler = { feld: 'antwort', text: ANTWORT_MELDUNG.antwort };
 			return;
 		}
 		laeuft = true;
@@ -78,8 +79,8 @@
 			case 'eingabe':
 				fehler =
 					r.feld === 'bemerkung'
-						? { feld: 'bemerkung', text: 'Die Bemerkung darf höchstens 500 Zeichen lang sein.' }
-						: { feld: 'antwort', text: 'Bitte wähle «Ich komme» oder «Ich komme nicht».' };
+						? { feld: 'bemerkung', text: ANTWORT_MELDUNG.bemerkung }
+						: { feld: 'antwort', text: ANTWORT_MELDUNG.antwort };
 				return;
 			default:
 				fehler = {
@@ -155,7 +156,7 @@
 					<textarea
 						id="bemerkung"
 						rows="3"
-						maxlength="500"
+						maxlength={MAX_BEMERKUNG}
 						bind:value={bemerkung}
 						aria-describedby={fehler?.feld === 'bemerkung'
 							? 'bemerkung-hilfe fehler-bemerkung'

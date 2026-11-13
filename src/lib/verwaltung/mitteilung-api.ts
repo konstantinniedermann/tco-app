@@ -7,7 +7,8 @@ import type { Weg } from '../server/db/schema.ts';
 import type { MitteilungFeld } from '../server/mitteilung/angaben.ts';
 import type { Bezug, VerlaufEintrag } from '../server/mitteilung/verlauf.ts';
 import type { Zahlen } from '../server/mitteilung/versand.ts';
-import { lese, schicke, type Holen, type Json } from './api.ts';
+import type { Holen, Json } from '../abruf.ts';
+import { lese, schicke } from './api.ts';
 
 export type { Bezug, MitteilungFeld, Vorlage, Weg, Zahlen };
 export type MitteilungWerte = { titel: string; text: string; auswahl: string; weg: Weg };

@@ -3,7 +3,12 @@
 	import Zurueck from '../../../lib/ui/Zurueck.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { MELDUNG, meldung, sende } from '../../../lib/login/anmelden.ts';
+	import {
+		MELDUNG,
+		fordereMailCodeAn,
+		meldeMitMailAn,
+		meldung
+	} from '../../../lib/login/anmelden.ts';
 	import {
 		holeSpeicher,
 		leseMailanfrage,
@@ -38,9 +43,9 @@
 		fehler = null;
 		// Eine andere Adresse ersetzt die gemerkte Anfrage.
 		if (email !== leseMailanfrage(speicher, Date.now())) vergissMailanfrage(speicher);
-		const r = await sende('/api/login/mail-code', { email });
+		const r = await fordereMailCodeAn(email);
 		laeuft = false;
-		if (r.ergebnis === 'ok') {
+		if (r.art === 'ok') {
 			merkeMailanfrage(speicher, email, Date.now());
 			code = '';
 			await wechsle('code');
@@ -55,8 +60,8 @@
 		if (laeuft) return;
 		laeuft = true;
 		fehler = null;
-		const r = await sende('/api/login/mail', { email, code });
-		if (r.ergebnis === 'ok') {
+		const r = await meldeMitMailAn(email, code);
+		if (r.art === 'ok') {
 			vergissMailanfrage(speicher);
 			await goto(resolve('/'));
 			return;

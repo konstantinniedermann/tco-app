@@ -114,6 +114,25 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ---
 
+### 2026-11-13 — Datenbanktest «Liste mit Suche» der Verwaltung ist gelegentlich rot
+
+**Thema:** Tests
+
+**Fundort:** `src/lib/server/admin/schnittstellen.db.test.ts`, Test «A-MITGLIED-02: Liste mit Suche
+und Status; ungültiger Status → 400» (Suche nach `Qwxz`).
+
+**Beobachtung:** In einem vollen `make check` gab die Suche 15 Mitglieder statt des einen zurück
+(IDs 203 bis 233, das erwartete zuletzt); der nächste Lauf war grün. Einmal in sechs Durchläufen.
+
+**Ursprung:** Refactoring Schritt 13 (#80), Review von Lauf 2; `docs/refactoring-analyse.md`,
+Anhang E.3. Der Schritt fasst weder die Datei noch `admin/` an.
+
+**Einschätzung:** Ursache offen. Vermutung: Die Suche trifft auch ein anderes Feld (z. B. E-Mail
+oder Vorname), und ein zufälliger Bestandteil der Testdaten dieser Datei enthielt in diesem Lauf
+die Buchstabenfolge. Dann wäre es ein Testproblem (Suchwort länger oder eindeutig wählen). Zu
+prüfen ist aber auch, ob die Suche den Filter unter einer Bedingung nicht anwendet; das wäre ein
+Fehler der App.
+
 ## Offen
 
 ### 2026-11-12 — Kostenseite hinkt der Schätzung für den Vorstand nach

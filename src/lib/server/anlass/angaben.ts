@@ -1,4 +1,5 @@
 // Angaben eines Anlasses und Antworten der Mitglieder prüfen, ohne Datenbank.
+import { MAX_BEMERKUNG } from '../../anlass/antwort.ts';
 import { zuerichZuUtc } from '../../anlass/zeit.ts';
 import type { Antwort } from '../db/schema.ts';
 
@@ -14,7 +15,6 @@ export type AnlassWerte = {
 
 export const MAX_KURZ = 120;
 export const MAX_EINLADUNG = 5000;
-export const MAX_BEMERKUNG = 500;
 
 const MELDUNG = {
 	titel: 'Bitte einen Titel angeben.',
@@ -50,12 +50,6 @@ export function pruefeAnlass(
 	if (Object.keys(felder).length > 0 || !beginn || !anmeldeschluss) return { ok: false, felder };
 	return { ok: true, werte: { titel, beginn, ort, einladung, anmeldeschluss } };
 }
-
-/** Satz je Feld, wenn eine Antwort nicht passt; die Seite des Anlasses zeigt denselben Satz. */
-export const ANTWORT_MELDUNG = {
-	antwort: 'Bitte wähle «Ich komme» oder «Ich komme nicht».',
-	bemerkung: `Die Bemerkung darf höchstens ${MAX_BEMERKUNG} Zeichen lang sein.`
-} as const;
 
 export function pruefeAntwort(
 	roh: Record<string, unknown>

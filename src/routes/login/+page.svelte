@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { MELDUNG, meldung, sende } from '../../lib/login/anmelden.ts';
+	import { MELDUNG, meldeMitBriefAn, meldung } from '../../lib/login/anmelden.ts';
 	import { holeSpeicher, vergissMailanfrage } from '../../lib/login/mailanfrage.ts';
 	import { kannPasskey, meldeMitPasskeyAn } from '../../lib/login/passkey.ts';
 
@@ -21,8 +21,8 @@
 		laeuft = true;
 		fehler = null;
 		// Der Server ignoriert Gross-/Kleinschreibung, Leerzeichen und Bindestriche (UI-07).
-		const r = await sende('/api/login/brief', { code });
-		if (r.ergebnis === 'ok') {
+		const r = await meldeMitBriefAn(code);
+		if (r.art === 'ok') {
 			// Eine offene Mail-Anfrage braucht es nach dem Login nicht mehr.
 			vergissMailanfrage(holeSpeicher());
 			await goto(resolve('/'));
