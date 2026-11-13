@@ -152,16 +152,19 @@ export async function speichereAngaben(
 }
 
 /** Schickt je einen Code an die bisherige und die neue Adresse. */
-export async function starteWechsel(email: string, holen: Holen = fetch): Promise<Ergebnis> {
-	return (await schicke('/api/profil/email', { email }, holen)).art;
+export async function starteWechsel(
+	email: string,
+	holen: Holen = fetch
+): Promise<{ art: Ergebnis }> {
+	return { art: (await schicke('/api/profil/email', { email }, holen)).art };
 }
 
 export async function bestaetigeWechsel(
 	codeAlt: string,
 	codeNeu: string,
 	holen: Holen = fetch
-): Promise<Ergebnis> {
-	return (await schicke('/api/profil/email/bestaetigen', { codeAlt, codeNeu }, holen)).art;
+): Promise<{ art: Ergebnis }> {
+	return { art: (await schicke('/api/profil/email/bestaetigen', { codeAlt, codeNeu }, holen)).art };
 }
 
 /** Rufname im Profil setzen; leer löscht ihn. Bei `eingabe` steht die Meldung des Servers bereit. */

@@ -62,7 +62,7 @@
 			return;
 		}
 		laeuft = true;
-		const r = await starteWechsel(email);
+		const r = (await starteWechsel(email)).art;
 		laeuft = false;
 		if (r === 'ok') {
 			merkeWechsel(speicher, email, Date.now());
@@ -95,7 +95,7 @@
 		fehler = null;
 		status = null;
 		vergissWechsel(speicher);
-		const r = await starteWechsel(email);
+		const r = (await starteWechsel(email)).art;
 		laeuft = false;
 		if (r === 'ok') {
 			merkeWechsel(speicher, email, Date.now());
@@ -116,7 +116,7 @@
 			return;
 		}
 		laeuft = true;
-		const r = await bestaetigeWechsel(codeAlt, codeNeu);
+		const r = (await bestaetigeWechsel(codeAlt, codeNeu)).art;
 		if (r === 'ok') {
 			vergissWechsel(speicher);
 			await goto(resolve('/profil?email=geaendert'));

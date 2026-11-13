@@ -146,7 +146,7 @@ describe('A-KONTO-01: eigene Angaben speichern', () => {
 describe('A-KONTO-01: E-Mail-Wechsel', () => {
 	it('202 → ok, schickt die neue Adresse', async () => {
 		const { aufrufe, holen } = holer(json(202, {}));
-		expect(await starteWechsel('lea.neu@example.org', holen)).toBe('ok');
+		expect(await starteWechsel('lea.neu@example.org', holen)).toEqual({ art: 'ok' });
 		expect(aufrufe[0].pfad).toBe('/api/profil/email');
 		expect(JSON.parse(aufrufe[0].init.body as string)).toEqual({ email: 'lea.neu@example.org' });
 	});
@@ -156,11 +156,13 @@ describe('A-KONTO-01: E-Mail-Wechsel', () => {
 			'Lea.Beispiel@EXAMPLE.org',
 			holer(json(400, { fehler: 'gleich' })).holen
 		);
-		expect(r).toBe('gleich');
+		expect(r).toEqual({ art: 'gleich' });
 	});
 
 	it('400 eingabe → eingabe', async () => {
-		expect(await starteWechsel('x', holer(json(400, { fehler: 'eingabe' })).holen)).toBe('eingabe');
+		expect(await starteWechsel('x', holer(json(400, { fehler: 'eingabe' })).holen)).toEqual({
+			art: 'eingabe'
+		});
 	});
 
 	it('429 → zu-viele', async () => {
@@ -168,18 +170,20 @@ describe('A-KONTO-01: E-Mail-Wechsel', () => {
 			'lea.neu@example.org',
 			holer(json(429, { fehler: 'zu-viele' })).holen
 		);
-		expect(r).toBe('zu-viele');
+		expect(r).toEqual({ art: 'zu-viele' });
 	});
 
 	it('Netzfehler → stoerung', async () => {
-		expect(await starteWechsel('lea.neu@example.org', holer(new TypeError('offline')).holen)).toBe(
-			'stoerung'
-		);
+		expect(
+			await starteWechsel('lea.neu@example.org', holer(new TypeError('offline')).holen)
+		).toEqual({
+			art: 'stoerung'
+		});
 	});
 
 	it('Bestätigen schickt beide Codes, 200 → ok', async () => {
 		const { aufrufe, holen } = holer(json(200, {}));
-		expect(await bestaetigeWechsel('111111', '222222', holen)).toBe('ok');
+		expect(await bestaetigeWechsel('111111', '222222', holen)).toEqual({ art: 'ok' });
 		expect(aufrufe[0].pfad).toBe('/api/profil/email/bestaetigen');
 		expect(JSON.parse(aufrufe[0].init.body as string)).toEqual({
 			codeAlt: '111111',
@@ -189,11 +193,13 @@ describe('A-KONTO-01: E-Mail-Wechsel', () => {
 
 	it('Bestätigen 400 falsch → falsch', async () => {
 		const r = await bestaetigeWechsel('1', '2', holer(json(400, { fehler: 'falsch' })).holen);
-		expect(r).toBe('falsch');
+		expect(r).toEqual({ art: 'falsch' });
 	});
 
 	it('unbekannte Antwort → stoerung', async () => {
-		expect(await bestaetigeWechsel('1', '2', holer(json(500, {})).holen)).toBe('stoerung');
+		expect(await bestaetigeWechsel('1', '2', holer(json(500, {})).holen)).toEqual({
+			art: 'stoerung'
+		});
 	});
 });
 
@@ -237,17 +243,17 @@ describe('Profil: Ränder der Deutung', () => {
 	it('401 und 404 sind Störung, beim Speichern und beim E-Mail-Wechsel', async () => {
 		expect(await speichere(json(401, { fehler: 'abgemeldet' }))).toEqual(STOERUNG);
 		expect(await speichere(json(404, { fehler: 'nicht-gefunden' }))).toEqual(STOERUNG);
-		expect(await wechsel(json(401, { fehler: 'abgemeldet' }))).toBe('stoerung');
-		expect(await wechsel(json(404, { fehler: 'nicht-gefunden' }))).toBe('stoerung');
+		expect(await wechsel(json(401, { fehler: 'abgemeldet' }))).toEqual({ art: 'stoerung' });
+		expect(await wechsel(json(404, { fehler: 'nicht-gefunden' }))).toEqual({ art: 'stoerung' });
 	});
 
 	it('429 ist zu-viele, auch ohne lesbaren Körper und mit JSON null', async () => {
-		expect(await wechsel(unlesbar(429))).toBe('zu-viele');
-		expect(await wechsel(ungeprueft(429, null))).toBe('zu-viele');
+		expect(await wechsel(unlesbar(429))).toEqual({ art: 'zu-viele' });
+		expect(await wechsel(ungeprueft(429, null))).toEqual({ art: 'zu-viele' });
 	});
 
 	it('jedes 2xx ist ok, auch ohne lesbaren Körper und ohne Körper', async () => {
-		expect(await bestaetigeWechsel('1', '2', holer(unlesbar(200)).holen)).toBe('ok');
+		expect(await bestaetigeWechsel('1', '2', holer(unlesbar(200)).holen)).toEqual({ art: 'ok' });
 		expect(await rufname(unlesbar(200))).toEqual({ art: 'ok', rufname: null });
 		expect(await speichere(new Response(null, { status: 204 }))).toEqual({ art: 'ok' });
 	});
@@ -262,7 +268,7 @@ describe('Profil: Ränder der Deutung', () => {
 			art: 'eingabe',
 			fehler: 'Ungültig.'
 		});
-		expect(await wechsel(json(400, { fehler: 'eingabe' }))).toBe('eingabe');
+		expect(await wechsel(json(400, { fehler: 'eingabe' }))).toEqual({ art: 'eingabe' });
 	});
 
 	it('eingabe mit felder als Liste: leere Feldmeldungen', async () => {
@@ -281,10 +287,10 @@ describe('Profil: Ränder der Deutung', () => {
 	});
 
 	it('ein Wort gilt nur mit seinem Status; JSON null bei 400 ist Störung', async () => {
-		expect(await wechsel(json(400, { fehler: 'veraltet' }))).toBe('stoerung');
-		expect(await wechsel(json(409, { fehler: 'gleich' }))).toBe('stoerung');
-		expect(await wechsel(json(409, { fehler: 'eingabe' }))).toBe('stoerung');
-		expect(await wechsel(ungeprueft(400, null))).toBe('stoerung');
+		expect(await wechsel(json(400, { fehler: 'veraltet' }))).toEqual({ art: 'stoerung' });
+		expect(await wechsel(json(409, { fehler: 'gleich' }))).toEqual({ art: 'stoerung' });
+		expect(await wechsel(json(409, { fehler: 'eingabe' }))).toEqual({ art: 'stoerung' });
+		expect(await wechsel(ungeprueft(400, null))).toEqual({ art: 'stoerung' });
 	});
 
 	it('Laden: unlesbarer Körper, falsche Form und Netzfehler geben null', async () => {
