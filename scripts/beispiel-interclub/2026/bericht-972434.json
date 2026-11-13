@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900099,
-							"name": "Tanja Rückhand R6 (5189)"
+							"name": "Rückhand Tanja R6 (5189)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900100,
-							"name": "Urs Volley R5 (2888)"
+							"name": "Volley Urs R5 (2888)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900101,
-							"name": "Vera Lob R6 (9932)"
+							"name": "Lob Vera R6 (9932)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900102,
-							"name": "Willi Stopp R6 (6527)"
+							"name": "Stopp Willi R6 (6527)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900103,
-							"name": "Yara Satzball R6 (9981)"
+							"name": "Satzball Yara R6 (9981)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900104,
-							"name": "Zeno Tiebreak R7 (18682)"
+							"name": "Tiebreak Zeno R7 (18682)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900105,
-							"name": "Alma Doppelfehler R7 (10671)"
+							"name": "Doppelfehler Alma R7 (10671)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900106,
-							"name": "Bruno Linienrichter R7 (11874)"
+							"name": "Linienrichter Bruno R7 (11874)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900107,
-							"name": "Cleo Sandplatz R7 (18258)"
+							"name": "Sandplatz Cleo R7 (18258)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900108,
-							"name": "Dominik Hallenbach R8 (27369)"
+							"name": "Hallenbach Dominik R8 (27369)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900109,
-							"name": "Edith Seitenwechsel R7 (17029)"
+							"name": "Seitenwechsel Edith R7 (17029)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900110,
-							"name": "Flurin Ballwand R9 (32621)"
+							"name": "Ballwand Flurin R9 (32621)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900099,
-							"name": "Tanja Rückhand R6 (5189)"
+							"name": "Rückhand Tanja R6 (5189)"
 						},
 						{
 							"id": 900105,
-							"name": "Alma Doppelfehler R7 (10671)"
+							"name": "Doppelfehler Alma R7 (10671)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900100,
-							"name": "Urs Volley R5 (2888)"
+							"name": "Volley Urs R5 (2888)"
 						},
 						{
 							"id": 900104,
-							"name": "Zeno Tiebreak R7 (18682)"
+							"name": "Tiebreak Zeno R7 (18682)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900111,
-							"name": "Greta Saitenbett R6 (7168)"
+							"name": "Saitenbett Greta R6 (7168)"
 						},
 						{
 							"id": 900103,
-							"name": "Yara Satzball R6 (9981)"
+							"name": "Satzball Yara R6 (9981)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900102,
-							"name": "Willi Stopp R6 (6527)"
+							"name": "Stopp Willi R6 (6527)"
 						},
 						{
 							"id": 900106,
-							"name": "Bruno Linienrichter R7 (11874)"
+							"name": "Linienrichter Bruno R7 (11874)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900112,
-							"name": "Hannes Griffband R7 (10526)"
+							"name": "Griffband Hannes R7 (10526)"
 						},
 						{
 							"id": 900113,
-							"name": "Ida Schlägerkopf R7 (14609)"
+							"name": "Schlägerkopf Ida R7 (14609)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900108,
-							"name": "Dominik Hallenbach R8 (27369)"
+							"name": "Hallenbach Dominik R8 (27369)"
 						},
 						{
 							"id": 900110,
-							"name": "Flurin Ballwand R9 (32621)"
+							"name": "Ballwand Flurin R9 (32621)"
 						}
 					],
 					"wo": 0

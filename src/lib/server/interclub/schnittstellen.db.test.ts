@@ -96,8 +96,8 @@ describe('Schnittstellen für Interclub (Mitglied)', () => {
 		expect(r.headers.get('cache-control')).toBe('no-store');
 		const text = await r.text();
 		expect(JSON.parse(text)).toMatchObject({ teamId: 7398, gegner: 'Villmergen' });
-		expect(text).toContain('Hannes Saitenbett');
-		expect(text).toContain('Elena Testmann');
+		expect(text).toContain('Saitenbett Hannes');
+		expect(text).toContain('Testmann Elena');
 		expect(text).not.toContain('stId');
 		expect(text).not.toContain('rangliste');
 		for (const params of [

@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900072,
-							"name": "Hannes Saitenbett R6 (9497)"
+							"name": "Saitenbett Hannes R6 (9497)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900085,
-							"name": "Elena Testmann R5 (3876)"
+							"name": "Testmann Elena R5 (3876)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900086,
-							"name": "Fabio Fiktiv R6 (6447)"
+							"name": "Fiktiv Fabio R6 (6447)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900087,
-							"name": "Gina Annahme R7 (15639)"
+							"name": "Annahme Gina R7 (15639)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900074,
-							"name": "Jan Schlägerkopf R6 (8088)"
+							"name": "Schlägerkopf Jan R6 (8088)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900088,
-							"name": "Hugo Entwurf R9 (32324)"
+							"name": "Entwurf Hugo R9 (32324)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900078,
-							"name": "Noah Ballkind R6 (7318)"
+							"name": "Ballkind Noah R6 (7318)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900089,
-							"name": "Ines Skizze R9 (61131)"
+							"name": "Skizze Ines R9 (61131)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900080,
-							"name": "Remo Muster R6 (10094)"
+							"name": "Muster Remo R6 (10094)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900090,
-							"name": "Jonas Modell R9 (33207)"
+							"name": "Modell Jonas R9 (33207)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900084,
-							"name": "Dario Erfunden R7 (17811)"
+							"name": "Erfunden Dario R7 (17811)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900091,
-							"name": "Klara Schablone R9 (61449)"
+							"name": "Schablone Klara R9 (61449)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900074,
-							"name": "Jan Schlägerkopf R6 (8088)"
+							"name": "Schlägerkopf Jan R6 (8088)"
 						},
 						{
 							"id": 900080,
-							"name": "Remo Muster R6 (10094)"
+							"name": "Muster Remo R6 (10094)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900087,
-							"name": "Gina Annahme R7 (15639)"
+							"name": "Annahme Gina R7 (15639)"
 						},
 						{
 							"id": 900091,
-							"name": "Klara Schablone R9 (61449)"
+							"name": "Schablone Klara R9 (61449)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900086,
-							"name": "Fabio Fiktiv R6 (6447)"
+							"name": "Fiktiv Fabio R6 (6447)"
 						},
 						{
 							"id": 900076,
-							"name": "Leo Netzpfosten R6 (8871)"
+							"name": "Netzpfosten Leo R6 (8871)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900085,
-							"name": "Elena Testmann R5 (3876)"
+							"name": "Testmann Elena R5 (3876)"
 						},
 						{
 							"id": 900092,
-							"name": "Luca Attrappe R8 (26027)"
+							"name": "Attrappe Luca R8 (26027)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900078,
-							"name": "Noah Ballkind R6 (7318)"
+							"name": "Ballkind Noah R6 (7318)"
 						},
 						{
 							"id": 900084,
-							"name": "Dario Erfunden R7 (17811)"
+							"name": "Erfunden Dario R7 (17811)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900089,
-							"name": "Ines Skizze R9 (61131)"
+							"name": "Skizze Ines R9 (61131)"
 						},
 						{
 							"id": 900090,
-							"name": "Jonas Modell R9 (33207)"
+							"name": "Modell Jonas R9 (33207)"
 						}
 					],
 					"wo": 0

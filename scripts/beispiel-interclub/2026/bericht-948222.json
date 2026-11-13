@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900011,
-							"name": "Klara Skizze R6 (2846)"
+							"name": "Skizze Klara R6 (2846)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900012,
-							"name": "Luca Modell R5 (1417)"
+							"name": "Modell Luca R5 (1417)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900013,
-							"name": "Mia Schablone R6 (2200)"
+							"name": "Schablone Mia R6 (2200)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900001,
-							"name": "Anna Muster R6 (3805)"
+							"name": "Muster Anna R6 (3805)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900014,
-							"name": "Nico Attrappe R7 (6865)"
+							"name": "Attrappe Nico R7 (6865)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900005,
-							"name": "Elena Punktgewinn R6 (3875)"
+							"name": "Punktgewinn Elena R6 (3875)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900015,
-							"name": "Olivia Kulisse R8 (7998)"
+							"name": "Kulisse Olivia R8 (7998)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900003,
-							"name": "Carla Platzhalter R7 (6907)"
+							"name": "Platzhalter Carla R7 (6907)"
 						}
 					],
 					"wo": 0
@@ -121,11 +121,11 @@
 					"members": [
 						{
 							"id": 900013,
-							"name": "Mia Schablone R6 (2200)"
+							"name": "Schablone Mia R6 (2200)"
 						},
 						{
 							"id": 900016,
-							"name": "Pascal Spielball R9 (22256)"
+							"name": "Spielball Pascal R9 (22256)"
 						}
 					],
 					"wo": 0
@@ -134,11 +134,11 @@
 					"members": [
 						{
 							"id": 900001,
-							"name": "Anna Muster R6 (3805)"
+							"name": "Muster Anna R6 (3805)"
 						},
 						{
 							"id": 900003,
-							"name": "Carla Platzhalter R7 (6907)"
+							"name": "Platzhalter Carla R7 (6907)"
 						}
 					],
 					"wo": 0
@@ -153,11 +153,11 @@
 					"members": [
 						{
 							"id": 900011,
-							"name": "Klara Skizze R6 (2846)"
+							"name": "Skizze Klara R6 (2846)"
 						},
 						{
 							"id": 900017,
-							"name": "Rahel Netzroller R9 (12293)"
+							"name": "Netzroller Rahel R9 (12293)"
 						}
 					],
 					"wo": 0
@@ -166,11 +166,11 @@
 					"members": [
 						{
 							"id": 900012,
-							"name": "Luca Modell R5 (1417)"
+							"name": "Modell Luca R5 (1417)"
 						},
 						{
 							"id": 900007,
-							"name": "Gina Testmann R8 (9040)"
+							"name": "Testmann Gina R8 (9040)"
 						}
 					],
 					"wo": 0

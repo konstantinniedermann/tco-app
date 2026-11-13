@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900093,
-							"name": "Mia Kulisse R4 (1923)"
+							"name": "Kulisse Mia R4 (1923)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900072,
-							"name": "Hannes Saitenbett R6 (9497)"
+							"name": "Saitenbett Hannes R6 (9497)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900094,
-							"name": "Nico Spielball R5 (4310)"
+							"name": "Spielball Nico R5 (4310)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900086,
-							"name": "Fabio Fiktiv R6 (6447)"
+							"name": "Fiktiv Fabio R6 (6447)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900095,
-							"name": "Olivia Netzroller R6 (5855)"
+							"name": "Netzroller Olivia R6 (5855)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900076,
-							"name": "Leo Netzpfosten R6 (8871)"
+							"name": "Netzpfosten Leo R6 (8871)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900096,
-							"name": "Pascal Grundlinie R6 (9512)"
+							"name": "Grundlinie Pascal R6 (9512)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900074,
-							"name": "Jan Schlägerkopf R6 (8088)"
+							"name": "Schlägerkopf Jan R6 (8088)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900097,
-							"name": "Rahel Aufschlag R7 (10284)"
+							"name": "Aufschlag Rahel R7 (10284)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900084,
-							"name": "Dario Erfunden R7 (17811)"
+							"name": "Erfunden Dario R7 (17811)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900098,
-							"name": "Silvan Vorhand R7 (19730)"
+							"name": "Vorhand Silvan R7 (19730)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900082,
-							"name": "Beat Vorlage R8 (20850)"
+							"name": "Vorlage Beat R8 (20850)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900093,
-							"name": "Mia Kulisse R4 (1923)"
+							"name": "Kulisse Mia R4 (1923)"
 						},
 						{
 							"id": 900097,
-							"name": "Rahel Aufschlag R7 (10284)"
+							"name": "Aufschlag Rahel R7 (10284)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900086,
-							"name": "Fabio Fiktiv R6 (6447)"
+							"name": "Fiktiv Fabio R6 (6447)"
 						},
 						{
 							"id": 900074,
-							"name": "Jan Schlägerkopf R6 (8088)"
+							"name": "Schlägerkopf Jan R6 (8088)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900095,
-							"name": "Olivia Netzroller R6 (5855)"
+							"name": "Netzroller Olivia R6 (5855)"
 						},
 						{
 							"id": 900096,
-							"name": "Pascal Grundlinie R6 (9512)"
+							"name": "Grundlinie Pascal R6 (9512)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900072,
-							"name": "Hannes Saitenbett R6 (9497)"
+							"name": "Saitenbett Hannes R6 (9497)"
 						},
 						{
 							"id": 900082,
-							"name": "Beat Vorlage R8 (20850)"
+							"name": "Vorlage Beat R8 (20850)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900094,
-							"name": "Nico Spielball R5 (4310)"
+							"name": "Spielball Nico R5 (4310)"
 						},
 						{
 							"id": 900098,
-							"name": "Silvan Vorhand R7 (19730)"
+							"name": "Vorhand Silvan R7 (19730)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900076,
-							"name": "Leo Netzpfosten R6 (8871)"
+							"name": "Netzpfosten Leo R6 (8871)"
 						},
 						{
 							"id": 900084,
-							"name": "Dario Erfunden R7 (17811)"
+							"name": "Erfunden Dario R7 (17811)"
 						}
 					],
 					"wo": 0

@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900167,
-							"name": "Gina Skizze R4 (2033)"
+							"name": "Skizze Gina R4 (2033)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900168,
-							"name": "Hugo Modell R7 (19571)"
+							"name": "Modell Hugo R7 (19571)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900169,
-							"name": "Ines Schablone R6 (9460)"
+							"name": "Schablone Ines R6 (9460)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900170,
-							"name": "Jonas Attrappe R7 (16331)"
+							"name": "Attrappe Jonas R7 (16331)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900171,
-							"name": "Klara Kulisse R7 (13217)"
+							"name": "Kulisse Klara R7 (13217)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900172,
-							"name": "Luca Spielball R8 (28170)"
+							"name": "Spielball Luca R8 (28170)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900173,
-							"name": "Mia Netzroller R7 (11688)"
+							"name": "Netzroller Mia R7 (11688)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900174,
-							"name": "Nico Grundlinie R9 (60990)"
+							"name": "Grundlinie Nico R9 (60990)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900175,
-							"name": "Olivia Aufschlag R6 (10115)"
+							"name": "Aufschlag Olivia R6 (10115)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900176,
-							"name": "Pascal Vorhand R9 (31264)"
+							"name": "Vorhand Pascal R9 (31264)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900177,
-							"name": "Rahel Rückhand R7 (17237)"
+							"name": "Rückhand Rahel R7 (17237)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900178,
-							"name": "Silvan Volley R9 (32952)"
+							"name": "Volley Silvan R9 (32952)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900169,
-							"name": "Ines Schablone R6 (9460)"
+							"name": "Schablone Ines R6 (9460)"
 						},
 						{
 							"id": 900171,
-							"name": "Klara Kulisse R7 (13217)"
+							"name": "Kulisse Klara R7 (13217)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900168,
-							"name": "Hugo Modell R7 (19571)"
+							"name": "Modell Hugo R7 (19571)"
 						},
 						{
 							"id": 900176,
-							"name": "Pascal Vorhand R9 (31264)"
+							"name": "Vorhand Pascal R9 (31264)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900167,
-							"name": "Gina Skizze R4 (2033)"
+							"name": "Skizze Gina R4 (2033)"
 						},
 						{
 							"id": 900173,
-							"name": "Mia Netzroller R7 (11688)"
+							"name": "Netzroller Mia R7 (11688)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900170,
-							"name": "Jonas Attrappe R7 (16331)"
+							"name": "Attrappe Jonas R7 (16331)"
 						},
 						{
 							"id": 900174,
-							"name": "Nico Grundlinie R9 (60990)"
+							"name": "Grundlinie Nico R9 (60990)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900177,
-							"name": "Rahel Rückhand R7 (17237)"
+							"name": "Rückhand Rahel R7 (17237)"
 						},
 						{
 							"id": 900179,
-							"name": "Tanja Lob R7 (19707)"
+							"name": "Lob Tanja R7 (19707)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900172,
-							"name": "Luca Spielball R8 (28170)"
+							"name": "Spielball Luca R8 (28170)"
 						},
 						{
 							"id": 900178,
-							"name": "Silvan Volley R9 (32952)"
+							"name": "Volley Silvan R9 (32952)"
 						}
 					],
 					"wo": 0

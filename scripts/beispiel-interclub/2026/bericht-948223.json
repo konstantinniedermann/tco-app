@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900018,
-							"name": "Silvan Grundlinie R7 (4206)"
+							"name": "Grundlinie Silvan R7 (4206)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900001,
-							"name": "Anna Muster R6 (3805)"
+							"name": "Muster Anna R6 (3805)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900019,
-							"name": "Tanja Aufschlag R7 (6116)"
+							"name": "Aufschlag Tanja R7 (6116)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900005,
-							"name": "Elena Punktgewinn R6 (3875)"
+							"name": "Punktgewinn Elena R6 (3875)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900020,
-							"name": "Urs Vorhand R7 (4405)"
+							"name": "Vorhand Urs R7 (4405)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900007,
-							"name": "Gina Testmann R8 (9040)"
+							"name": "Testmann Gina R8 (9040)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900021,
-							"name": "Vera Rückhand R7 (5652)"
+							"name": "Rückhand Vera R7 (5652)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900009,
-							"name": "Ines Annahme R8 (11250)"
+							"name": "Annahme Ines R8 (11250)"
 						}
 					],
 					"wo": 0
@@ -121,11 +121,11 @@
 					"members": [
 						{
 							"id": 900018,
-							"name": "Silvan Grundlinie R7 (4206)"
+							"name": "Grundlinie Silvan R7 (4206)"
 						},
 						{
 							"id": 900020,
-							"name": "Urs Vorhand R7 (4405)"
+							"name": "Vorhand Urs R7 (4405)"
 						}
 					],
 					"wo": 0
@@ -134,11 +134,11 @@
 					"members": [
 						{
 							"id": 900001,
-							"name": "Anna Muster R6 (3805)"
+							"name": "Muster Anna R6 (3805)"
 						},
 						{
 							"id": 900005,
-							"name": "Elena Punktgewinn R6 (3875)"
+							"name": "Punktgewinn Elena R6 (3875)"
 						}
 					],
 					"wo": 0
@@ -153,11 +153,11 @@
 					"members": [
 						{
 							"id": 900019,
-							"name": "Tanja Aufschlag R7 (6116)"
+							"name": "Aufschlag Tanja R7 (6116)"
 						},
 						{
 							"id": 900022,
-							"name": "Willi Volley R7 (4545)"
+							"name": "Volley Willi R7 (4545)"
 						}
 					],
 					"wo": 0
@@ -166,11 +166,11 @@
 					"members": [
 						{
 							"id": 900007,
-							"name": "Gina Testmann R8 (9040)"
+							"name": "Testmann Gina R8 (9040)"
 						},
 						{
 							"id": 900003,
-							"name": "Carla Platzhalter R7 (6907)"
+							"name": "Platzhalter Carla R7 (6907)"
 						}
 					],
 					"wo": 0

@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900404,
-							"name": "Dario Attrappe R5 (4524)"
+							"name": "Attrappe Dario R5 (4524)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900044,
-							"name": "Dario Punktgewinn R6 (5438)"
+							"name": "Punktgewinn Dario R6 (5438)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900405,
-							"name": "Elena Kulisse R5 (4653)"
+							"name": "Kulisse Elena R5 (4653)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900046,
-							"name": "Fabio Testmann R6 (9117)"
+							"name": "Testmann Fabio R6 (9117)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900406,
-							"name": "Fabio Spielball R6 (6406)"
+							"name": "Spielball Fabio R6 (6406)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900048,
-							"name": "Hugo Annahme R6 (7150)"
+							"name": "Annahme Hugo R6 (7150)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900407,
-							"name": "Gina Netzroller R6 (7217)"
+							"name": "Netzroller Gina R6 (7217)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900050,
-							"name": "Jonas Skizze R6 (8145)"
+							"name": "Skizze Jonas R6 (8145)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900408,
-							"name": "Hugo Grundlinie R8 (24187)"
+							"name": "Grundlinie Hugo R8 (24187)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900060,
-							"name": "Urs Rückhand R7 (10789)"
+							"name": "Rückhand Urs R7 (10789)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900409,
-							"name": "Ines Aufschlag R9 (33057)"
+							"name": "Aufschlag Ines R9 (33057)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900052,
-							"name": "Luca Schablone R7 (12372)"
+							"name": "Schablone Luca R7 (12372)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900404,
-							"name": "Dario Attrappe R5 (4524)"
+							"name": "Attrappe Dario R5 (4524)"
 						},
 						{
 							"id": 900405,
-							"name": "Elena Kulisse R5 (4653)"
+							"name": "Kulisse Elena R5 (4653)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900044,
-							"name": "Dario Punktgewinn R6 (5438)"
+							"name": "Punktgewinn Dario R6 (5438)"
 						},
 						{
 							"id": 900046,
-							"name": "Fabio Testmann R6 (9117)"
+							"name": "Testmann Fabio R6 (9117)"
 						}
 					],
 					"wo": 1
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900406,
-							"name": "Fabio Spielball R6 (6406)"
+							"name": "Spielball Fabio R6 (6406)"
 						},
 						{
 							"id": 900407,
-							"name": "Gina Netzroller R6 (7217)"
+							"name": "Netzroller Gina R6 (7217)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900048,
-							"name": "Hugo Annahme R6 (7150)"
+							"name": "Annahme Hugo R6 (7150)"
 						},
 						{
 							"id": 900050,
-							"name": "Jonas Skizze R6 (8145)"
+							"name": "Skizze Jonas R6 (8145)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900408,
-							"name": "Hugo Grundlinie R8 (24187)"
+							"name": "Grundlinie Hugo R8 (24187)"
 						},
 						{
 							"id": 900409,
-							"name": "Ines Aufschlag R9 (33057)"
+							"name": "Aufschlag Ines R9 (33057)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900060,
-							"name": "Urs Rückhand R7 (10789)"
+							"name": "Rückhand Urs R7 (10789)"
 						},
 						{
 							"id": 900052,
-							"name": "Luca Schablone R7 (12372)"
+							"name": "Schablone Luca R7 (12372)"
 						}
 					],
 					"wo": 1

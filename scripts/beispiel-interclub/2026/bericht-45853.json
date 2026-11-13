@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900137,
-							"name": "Rahel Vorhand R5 (2818)"
+							"name": "Vorhand Rahel R5 (2818)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900374,
-							"name": "Nico Lob R3 (1219)"
+							"name": "Lob Nico R3 (1219)"
 						}
 					],
 					"wo": 1
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900139,
-							"name": "Tanja Volley R5 (3269)"
+							"name": "Volley Tanja R5 (3269)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900375,
-							"name": "Olivia Stopp R5 (4870)"
+							"name": "Stopp Olivia R5 (4870)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900141,
-							"name": "Vera Stopp R5 (4625)"
+							"name": "Stopp Vera R5 (4625)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900376,
-							"name": "Pascal Satzball R6 (8195)"
+							"name": "Satzball Pascal R6 (8195)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900377,
-							"name": "Rahel Tiebreak R5 (4831)"
+							"name": "Tiebreak Rahel R5 (4831)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900378,
-							"name": "Silvan Doppelfehler R6 (6515)"
+							"name": "Doppelfehler Silvan R6 (6515)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900143,
-							"name": "Yara Tiebreak R7 (10525)"
+							"name": "Tiebreak Yara R7 (10525)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900379,
-							"name": "Tanja Linienrichter R6 (6937)"
+							"name": "Linienrichter Tanja R6 (6937)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900145,
-							"name": "Alma Linienrichter R7 (13521)"
+							"name": "Linienrichter Alma R7 (13521)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900380,
-							"name": "Urs Sandplatz R6 (7401)"
+							"name": "Sandplatz Urs R6 (7401)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900141,
-							"name": "Vera Stopp R5 (4625)"
+							"name": "Stopp Vera R5 (4625)"
 						},
 						{
 							"id": 900377,
-							"name": "Rahel Tiebreak R5 (4831)"
+							"name": "Tiebreak Rahel R5 (4831)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900374,
-							"name": "Nico Lob R3 (1219)"
+							"name": "Lob Nico R3 (1219)"
 						},
 						{
 							"id": 900379,
-							"name": "Tanja Linienrichter R6 (6937)"
+							"name": "Linienrichter Tanja R6 (6937)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900139,
-							"name": "Tanja Volley R5 (3269)"
+							"name": "Volley Tanja R5 (3269)"
 						},
 						{
 							"id": 900143,
-							"name": "Yara Tiebreak R7 (10525)"
+							"name": "Tiebreak Yara R7 (10525)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900380,
-							"name": "Urs Sandplatz R6 (7401)"
+							"name": "Sandplatz Urs R6 (7401)"
 						},
 						{
 							"id": 900381,
-							"name": "Vera Hallenbach R5 (3078)"
+							"name": "Hallenbach Vera R5 (3078)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900137,
-							"name": "Rahel Vorhand R5 (2818)"
+							"name": "Vorhand Rahel R5 (2818)"
 						},
 						{
 							"id": 900145,
-							"name": "Alma Linienrichter R7 (13521)"
+							"name": "Linienrichter Alma R7 (13521)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900382,
-							"name": "Willi Seitenwechsel R5 (4358)"
+							"name": "Seitenwechsel Willi R5 (4358)"
 						},
 						{
 							"id": 900383,
-							"name": "Yara Ballwand R7 (10496)"
+							"name": "Ballwand Yara R7 (10496)"
 						}
 					],
 					"wo": 0

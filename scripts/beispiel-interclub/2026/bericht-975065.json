@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900213,
-							"name": "Mia Grundlinie R5 (3089)"
+							"name": "Grundlinie Mia R5 (3089)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900201,
-							"name": "Anna Erfunden R6 (5349)"
+							"name": "Erfunden Anna R6 (5349)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900214,
-							"name": "Nico Aufschlag R7 (10735)"
+							"name": "Aufschlag Nico R7 (10735)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900203,
-							"name": "Carla Fiktiv R7 (13149)"
+							"name": "Fiktiv Carla R7 (13149)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900215,
-							"name": "Olivia Vorhand R7 (11268)"
+							"name": "Vorhand Olivia R7 (11268)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900205,
-							"name": "Elena Entwurf R9 (32048)"
+							"name": "Entwurf Elena R9 (32048)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900216,
-							"name": "Pascal Rückhand R8 (30659)"
+							"name": "Rückhand Pascal R8 (30659)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900217,
-							"name": "Rahel Volley R8 (26173)"
+							"name": "Volley Rahel R8 (26173)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900218,
-							"name": "Silvan Lob R8 (21549)"
+							"name": "Lob Silvan R8 (21549)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900209,
-							"name": "Ines Attrappe R9 (60852)"
+							"name": "Attrappe Ines R9 (60852)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900219,
-							"name": "Tanja Stopp R9 (61275)"
+							"name": "Stopp Tanja R9 (61275)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900211,
-							"name": "Klara Spielball R8 (28836)"
+							"name": "Spielball Klara R8 (28836)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900214,
-							"name": "Nico Aufschlag R7 (10735)"
+							"name": "Aufschlag Nico R7 (10735)"
 						},
 						{
 							"id": 900215,
-							"name": "Olivia Vorhand R7 (11268)"
+							"name": "Vorhand Olivia R7 (11268)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900205,
-							"name": "Elena Entwurf R9 (32048)"
+							"name": "Entwurf Elena R9 (32048)"
 						},
 						{
 							"id": 900217,
-							"name": "Rahel Volley R8 (26173)"
+							"name": "Volley Rahel R8 (26173)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900220,
-							"name": "Urs Satzball R7 (15761)"
+							"name": "Satzball Urs R7 (15761)"
 						},
 						{
 							"id": 900221,
-							"name": "Vera Tiebreak R8 (21262)"
+							"name": "Tiebreak Vera R8 (21262)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900201,
-							"name": "Anna Erfunden R6 (5349)"
+							"name": "Erfunden Anna R6 (5349)"
 						},
 						{
 							"id": 900211,
-							"name": "Klara Spielball R8 (28836)"
+							"name": "Spielball Klara R8 (28836)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900222,
-							"name": "Willi Doppelfehler R9 (61264)"
+							"name": "Doppelfehler Willi R9 (61264)"
 						},
 						{
 							"id": 900223,
-							"name": "Yara Linienrichter R8 (22492)"
+							"name": "Linienrichter Yara R8 (22492)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900203,
-							"name": "Carla Fiktiv R7 (13149)"
+							"name": "Fiktiv Carla R7 (13149)"
 						},
 						{
 							"id": 900224,
-							"name": "Zeno Sandplatz R9 (34440)"
+							"name": "Sandplatz Zeno R9 (34440)"
 						}
 					],
 					"wo": 0

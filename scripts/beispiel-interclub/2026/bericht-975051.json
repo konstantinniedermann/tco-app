@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900167,
-							"name": "Gina Skizze R4 (2033)"
+							"name": "Skizze Gina R4 (2033)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900180,
-							"name": "Urs Stopp R6 (9216)"
+							"name": "Stopp Urs R6 (9216)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900171,
-							"name": "Klara Kulisse R7 (13217)"
+							"name": "Kulisse Klara R7 (13217)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900181,
-							"name": "Vera Satzball R7 (12495)"
+							"name": "Satzball Vera R7 (12495)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900169,
-							"name": "Ines Schablone R6 (9460)"
+							"name": "Schablone Ines R6 (9460)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900182,
-							"name": "Willi Tiebreak R8 (21810)"
+							"name": "Tiebreak Willi R8 (21810)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900173,
-							"name": "Mia Netzroller R7 (11688)"
+							"name": "Netzroller Mia R7 (11688)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900183,
-							"name": "Yara Doppelfehler R9 (32181)"
+							"name": "Doppelfehler Yara R9 (32181)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900179,
-							"name": "Tanja Lob R7 (19707)"
+							"name": "Lob Tanja R7 (19707)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900184,
-							"name": "Zeno Linienrichter R8 (29974)"
+							"name": "Linienrichter Zeno R8 (29974)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900177,
-							"name": "Rahel Rückhand R7 (17237)"
+							"name": "Rückhand Rahel R7 (17237)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900185,
-							"name": "Alma Sandplatz R7 (11241)"
+							"name": "Sandplatz Alma R7 (11241)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900171,
-							"name": "Klara Kulisse R7 (13217)"
+							"name": "Kulisse Klara R7 (13217)"
 						},
 						{
 							"id": 900167,
-							"name": "Gina Skizze R4 (2033)"
+							"name": "Skizze Gina R4 (2033)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900180,
-							"name": "Urs Stopp R6 (9216)"
+							"name": "Stopp Urs R6 (9216)"
 						},
 						{
 							"id": 900181,
-							"name": "Vera Satzball R7 (12495)"
+							"name": "Satzball Vera R7 (12495)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900177,
-							"name": "Rahel Rückhand R7 (17237)"
+							"name": "Rückhand Rahel R7 (17237)"
 						},
 						{
 							"id": 900173,
-							"name": "Mia Netzroller R7 (11688)"
+							"name": "Netzroller Mia R7 (11688)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900183,
-							"name": "Yara Doppelfehler R9 (32181)"
+							"name": "Doppelfehler Yara R9 (32181)"
 						},
 						{
 							"id": 900182,
-							"name": "Willi Tiebreak R8 (21810)"
+							"name": "Tiebreak Willi R8 (21810)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900175,
-							"name": "Olivia Aufschlag R6 (10115)"
+							"name": "Aufschlag Olivia R6 (10115)"
 						},
 						{
 							"id": 900186,
-							"name": "Bruno Hallenbach R8 (26121)"
+							"name": "Hallenbach Bruno R8 (26121)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900184,
-							"name": "Zeno Linienrichter R8 (29974)"
+							"name": "Linienrichter Zeno R8 (29974)"
 						},
 						{
 							"id": 900185,
-							"name": "Alma Sandplatz R7 (11241)"
+							"name": "Sandplatz Alma R7 (11241)"
 						}
 					],
 					"wo": 0

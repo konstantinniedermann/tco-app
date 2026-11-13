@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900343,
-							"name": "Yara Seitenwechsel R8 (28209)"
+							"name": "Seitenwechsel Yara R8 (28209)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900347,
-							"name": "Cleo Schlägerkopf R7 (15254)"
+							"name": "Schlägerkopf Cleo R7 (15254)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900345,
-							"name": "Alma Saitenbett R9 (61237)"
+							"name": "Saitenbett Alma R9 (61237)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900348,
-							"name": "Dominik Filzball R8 (22925)"
+							"name": "Filzball Dominik R8 (22925)"
 						}
 					],
 					"wo": 0
@@ -73,11 +73,11 @@
 					"members": [
 						{
 							"id": 900343,
-							"name": "Yara Seitenwechsel R8 (28209)"
+							"name": "Seitenwechsel Yara R8 (28209)"
 						},
 						{
 							"id": 900345,
-							"name": "Alma Saitenbett R9 (61237)"
+							"name": "Saitenbett Alma R9 (61237)"
 						}
 					],
 					"wo": 0
@@ -86,11 +86,11 @@
 					"members": [
 						{
 							"id": 900349,
-							"name": "Edith Netzpfosten R9 (32615)"
+							"name": "Netzpfosten Edith R9 (32615)"
 						},
 						{
 							"id": 900347,
-							"name": "Cleo Schlägerkopf R7 (15254)"
+							"name": "Schlägerkopf Cleo R7 (15254)"
 						}
 					],
 					"wo": 0

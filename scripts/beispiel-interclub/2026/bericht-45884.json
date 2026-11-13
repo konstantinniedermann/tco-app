@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900392,
-							"name": "Hannes Muster R4 (1656)"
+							"name": "Muster Hannes R4 (1656)"
 						}
 					],
 					"wo": 1
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900137,
-							"name": "Rahel Vorhand R5 (2818)"
+							"name": "Vorhand Rahel R5 (2818)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900393,
-							"name": "Ida Beispiel R4 (2183)"
+							"name": "Beispiel Ida R4 (2183)"
 						}
 					],
 					"wo": 1
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900139,
-							"name": "Tanja Volley R5 (3269)"
+							"name": "Volley Tanja R5 (3269)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900394,
-							"name": "Jan Platzhalter R5 (4042)"
+							"name": "Platzhalter Jan R5 (4042)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900151,
-							"name": "Greta Griffband R5 (4204)"
+							"name": "Griffband Greta R5 (4204)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900395,
-							"name": "Kim Vorlage R4 (2528)"
+							"name": "Vorlage Kim R4 (2528)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900141,
-							"name": "Vera Stopp R5 (4625)"
+							"name": "Stopp Vera R5 (4625)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900396,
-							"name": "Leo Punktgewinn R6 (7357)"
+							"name": "Punktgewinn Leo R6 (7357)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900377,
-							"name": "Rahel Tiebreak R5 (4831)"
+							"name": "Tiebreak Rahel R5 (4831)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900397,
-							"name": "Maja Erfunden R7 (16952)"
+							"name": "Erfunden Maja R7 (16952)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900145,
-							"name": "Alma Linienrichter R7 (13521)"
+							"name": "Linienrichter Alma R7 (13521)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900392,
-							"name": "Hannes Muster R4 (1656)"
+							"name": "Muster Hannes R4 (1656)"
 						},
 						{
 							"id": 900394,
-							"name": "Jan Platzhalter R5 (4042)"
+							"name": "Platzhalter Jan R5 (4042)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900139,
-							"name": "Tanja Volley R5 (3269)"
+							"name": "Volley Tanja R5 (3269)"
 						},
 						{
 							"id": 900151,
-							"name": "Greta Griffband R5 (4204)"
+							"name": "Griffband Greta R5 (4204)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900393,
-							"name": "Ida Beispiel R4 (2183)"
+							"name": "Beispiel Ida R4 (2183)"
 						},
 						{
 							"id": 900395,
-							"name": "Kim Vorlage R4 (2528)"
+							"name": "Vorlage Kim R4 (2528)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900137,
-							"name": "Rahel Vorhand R5 (2818)"
+							"name": "Vorhand Rahel R5 (2818)"
 						},
 						{
 							"id": 900145,
-							"name": "Alma Linienrichter R7 (13521)"
+							"name": "Linienrichter Alma R7 (13521)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900396,
-							"name": "Leo Punktgewinn R6 (7357)"
+							"name": "Punktgewinn Leo R6 (7357)"
 						},
 						{
 							"id": 900397,
-							"name": "Maja Erfunden R7 (16952)"
+							"name": "Erfunden Maja R7 (16952)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900141,
-							"name": "Vera Stopp R5 (4625)"
+							"name": "Stopp Vera R5 (4625)"
 						},
 						{
 							"id": 900377,
-							"name": "Rahel Tiebreak R5 (4831)"
+							"name": "Tiebreak Rahel R5 (4831)"
 						}
 					],
 					"wo": 0

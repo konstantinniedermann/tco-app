@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900240,
-							"name": "Remo Punktgewinn R3 (1261)"
+							"name": "Punktgewinn Remo R3 (1261)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900252,
-							"name": "Luca Grundlinie N1 (9)"
+							"name": "Grundlinie Luca N1 (9)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900238,
-							"name": "Noah Platzhalter R1 (177)"
+							"name": "Platzhalter Noah R1 (177)"
 						}
 					],
 					"wo": 1
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900253,
-							"name": "Mia Aufschlag N4 (120)"
+							"name": "Aufschlag Mia N4 (120)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900242,
-							"name": "Beat Fiktiv R3 (846)"
+							"name": "Fiktiv Beat R3 (846)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900254,
-							"name": "Nico Vorhand R1 (254)"
+							"name": "Vorhand Nico R1 (254)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900244,
-							"name": "Dario Entwurf R4 (2050)"
+							"name": "Entwurf Dario R4 (2050)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900255,
-							"name": "Olivia Rückhand R3 (1102)"
+							"name": "Rückhand Olivia R3 (1102)"
 						}
 					],
 					"wo": 1
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900248,
-							"name": "Hugo Attrappe R4 (1946)"
+							"name": "Attrappe Hugo R4 (1946)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900256,
-							"name": "Pascal Volley R5 (4611)"
+							"name": "Volley Pascal R5 (4611)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900250,
-							"name": "Jonas Spielball R6 (9775)"
+							"name": "Spielball Jonas R6 (9775)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900257,
-							"name": "Rahel Lob R6 (8783)"
+							"name": "Lob Rahel R6 (8783)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900240,
-							"name": "Remo Punktgewinn R3 (1261)"
+							"name": "Punktgewinn Remo R3 (1261)"
 						},
 						{
 							"id": 900242,
-							"name": "Beat Fiktiv R3 (846)"
+							"name": "Fiktiv Beat R3 (846)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900254,
-							"name": "Nico Vorhand R1 (254)"
+							"name": "Vorhand Nico R1 (254)"
 						},
 						{
 							"id": 900255,
-							"name": "Olivia Rückhand R3 (1102)"
+							"name": "Rückhand Olivia R3 (1102)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900238,
-							"name": "Noah Platzhalter R1 (177)"
+							"name": "Platzhalter Noah R1 (177)"
 						},
 						{
 							"id": 900248,
-							"name": "Hugo Attrappe R4 (1946)"
+							"name": "Attrappe Hugo R4 (1946)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900252,
-							"name": "Luca Grundlinie N1 (9)"
+							"name": "Grundlinie Luca N1 (9)"
 						},
 						{
 							"id": 900257,
-							"name": "Rahel Lob R6 (8783)"
+							"name": "Lob Rahel R6 (8783)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900250,
-							"name": "Jonas Spielball R6 (9775)"
+							"name": "Spielball Jonas R6 (9775)"
 						},
 						{
 							"id": 900246,
-							"name": "Fabio Modell R4 (1880)"
+							"name": "Modell Fabio R4 (1880)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900258,
-							"name": "Silvan Stopp R9 (34628)"
+							"name": "Stopp Silvan R9 (34628)"
 						},
 						{
 							"id": 900256,
-							"name": "Pascal Volley R5 (4611)"
+							"name": "Volley Pascal R5 (4611)"
 						}
 					],
 					"wo": 0

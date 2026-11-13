@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900410,
-							"name": "Jonas Vorhand R4 (870)"
+							"name": "Vorhand Jonas R4 (870)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900001,
-							"name": "Anna Muster R6 (3805)"
+							"name": "Muster Anna R6 (3805)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900411,
-							"name": "Klara Rückhand R6 (2719)"
+							"name": "Rückhand Klara R6 (2719)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900009,
-							"name": "Ines Annahme R8 (11250)"
+							"name": "Annahme Ines R8 (11250)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900412,
-							"name": "Luca Volley R6 (3170)"
+							"name": "Volley Luca R6 (3170)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900003,
-							"name": "Carla Platzhalter R7 (6907)"
+							"name": "Platzhalter Carla R7 (6907)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900413,
-							"name": "Mia Lob R6 (2495)"
+							"name": "Lob Mia R6 (2495)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900007,
-							"name": "Gina Testmann R8 (9040)"
+							"name": "Testmann Gina R8 (9040)"
 						}
 					],
 					"wo": 0
@@ -121,11 +121,11 @@
 					"members": [
 						{
 							"id": 900410,
-							"name": "Jonas Vorhand R4 (870)"
+							"name": "Vorhand Jonas R4 (870)"
 						},
 						{
 							"id": 900412,
-							"name": "Luca Volley R6 (3170)"
+							"name": "Volley Luca R6 (3170)"
 						}
 					],
 					"wo": 0
@@ -134,11 +134,11 @@
 					"members": [
 						{
 							"id": 900001,
-							"name": "Anna Muster R6 (3805)"
+							"name": "Muster Anna R6 (3805)"
 						},
 						{
 							"id": 900007,
-							"name": "Gina Testmann R8 (9040)"
+							"name": "Testmann Gina R8 (9040)"
 						}
 					],
 					"wo": 0
@@ -153,11 +153,11 @@
 					"members": [
 						{
 							"id": 900411,
-							"name": "Klara Rückhand R6 (2719)"
+							"name": "Rückhand Klara R6 (2719)"
 						},
 						{
 							"id": 900413,
-							"name": "Mia Lob R6 (2495)"
+							"name": "Lob Mia R6 (2495)"
 						}
 					],
 					"wo": 0
@@ -166,11 +166,11 @@
 					"members": [
 						{
 							"id": 900003,
-							"name": "Carla Platzhalter R7 (6907)"
+							"name": "Platzhalter Carla R7 (6907)"
 						},
 						{
 							"id": 900009,
-							"name": "Ines Annahme R8 (11250)"
+							"name": "Annahme Ines R8 (11250)"
 						}
 					],
 					"wo": 0

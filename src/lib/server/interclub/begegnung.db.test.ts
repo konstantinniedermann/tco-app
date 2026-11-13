@@ -47,8 +47,8 @@ describe('ladeBegegnung', () => {
 			expect(p.doppel.map((x) => x.position)).toEqual([1, 2, 3]);
 			expect(p.einzel[0]).toEqual({
 				position: 1,
-				spieler: [{ name: 'Hannes Saitenbett', klassierung: 'R6' }],
-				gegner: [{ name: 'Elena Testmann', klassierung: 'R5' }],
+				spieler: [{ name: 'Saitenbett Hannes', klassierung: 'R6' }],
+				gegner: [{ name: 'Testmann Elena', klassierung: 'R5' }],
 				saetze: ['5:7', '0:6'],
 				ergebnis: 'niederlage',
 				aufgabe: null
@@ -56,12 +56,12 @@ describe('ladeBegegnung', () => {
 			expect(p.doppel[1]).toEqual({
 				position: 2,
 				spieler: [
-					{ name: 'Fabio Fiktiv', klassierung: 'R6' },
-					{ name: 'Leo Netzpfosten', klassierung: 'R6' }
+					{ name: 'Fiktiv Fabio', klassierung: 'R6' },
+					{ name: 'Netzpfosten Leo', klassierung: 'R6' }
 				],
 				gegner: [
-					{ name: 'Elena Testmann', klassierung: 'R5' },
-					{ name: 'Luca Attrappe', klassierung: 'R8' }
+					{ name: 'Testmann Elena', klassierung: 'R5' },
+					{ name: 'Attrappe Luca', klassierung: 'R8' }
 				],
 				saetze: ['0:6', '6:4', '11:9'],
 				ergebnis: 'sieg',
@@ -80,7 +80,7 @@ describe('ladeBegegnung', () => {
 		expect(b.gegner).toBe('Muhen');
 		expect(b.saetze).toEqual({ tco: 1, gegner: 18 });
 		expect(b.partien!.einzel[0]).toMatchObject({
-			spieler: [{ name: 'Hannes Saitenbett', klassierung: 'R6' }],
+			spieler: [{ name: 'Saitenbett Hannes', klassierung: 'R6' }],
 			saetze: ['0:6', '2:6'],
 			ergebnis: 'niederlage'
 		});

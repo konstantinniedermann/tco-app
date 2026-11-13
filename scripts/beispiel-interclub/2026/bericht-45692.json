@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900100,
-							"name": "Urs Volley R5 (2888)"
+							"name": "Volley Urs R5 (2888)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900368,
-							"name": "Hugo Netzroller R5 (4266)"
+							"name": "Netzroller Hugo R5 (4266)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900102,
-							"name": "Willi Stopp R6 (6527)"
+							"name": "Stopp Willi R6 (6527)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900369,
-							"name": "Ines Grundlinie R6 (7353)"
+							"name": "Grundlinie Ines R6 (7353)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900116,
-							"name": "Leo Schiedsstuhl R6 (9029)"
+							"name": "Schiedsstuhl Leo R6 (9029)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900370,
-							"name": "Jonas Aufschlag R5 (4634)"
+							"name": "Aufschlag Jonas R5 (4634)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900106,
-							"name": "Bruno Linienrichter R7 (11874)"
+							"name": "Linienrichter Bruno R7 (11874)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900371,
-							"name": "Klara Vorhand R9 (61826)"
+							"name": "Vorhand Klara R9 (61826)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900108,
-							"name": "Dominik Hallenbach R8 (27369)"
+							"name": "Hallenbach Dominik R8 (27369)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900372,
-							"name": "Luca Rückhand R9 (61702)"
+							"name": "Rückhand Luca R9 (61702)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900121,
-							"name": "Anna Vorlage R8 (26046)"
+							"name": "Vorlage Anna R8 (26046)"
 						}
 					],
 					"wo": 1
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900373,
-							"name": "Mia Volley R8 (25096)"
+							"name": "Volley Mia R8 (25096)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900100,
-							"name": "Urs Volley R5 (2888)"
+							"name": "Volley Urs R5 (2888)"
 						},
 						{
 							"id": 900106,
-							"name": "Bruno Linienrichter R7 (11874)"
+							"name": "Linienrichter Bruno R7 (11874)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900370,
-							"name": "Jonas Aufschlag R5 (4634)"
+							"name": "Aufschlag Jonas R5 (4634)"
 						},
 						{
 							"id": 900368,
-							"name": "Hugo Netzroller R5 (4266)"
+							"name": "Netzroller Hugo R5 (4266)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900102,
-							"name": "Willi Stopp R6 (6527)"
+							"name": "Stopp Willi R6 (6527)"
 						},
 						{
 							"id": 900121,
-							"name": "Anna Vorlage R8 (26046)"
+							"name": "Vorlage Anna R8 (26046)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900372,
-							"name": "Luca Rückhand R9 (61702)"
+							"name": "Rückhand Luca R9 (61702)"
 						},
 						{
 							"id": 900369,
-							"name": "Ines Grundlinie R6 (7353)"
+							"name": "Grundlinie Ines R6 (7353)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900108,
-							"name": "Dominik Hallenbach R8 (27369)"
+							"name": "Hallenbach Dominik R8 (27369)"
 						},
 						{
 							"id": 900116,
-							"name": "Leo Schiedsstuhl R6 (9029)"
+							"name": "Schiedsstuhl Leo R6 (9029)"
 						}
 					],
 					"wo": 1
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900371,
-							"name": "Klara Vorhand R9 (61826)"
+							"name": "Vorhand Klara R9 (61826)"
 						},
 						{
 							"id": 900373,
-							"name": "Mia Volley R8 (25096)"
+							"name": "Volley Mia R8 (25096)"
 						}
 					],
 					"wo": 0

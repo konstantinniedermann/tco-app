@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900046,
-							"name": "Fabio Testmann R6 (9117)"
+							"name": "Testmann Fabio R6 (9117)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900057,
-							"name": "Rahel Grundlinie R6 (5598)"
+							"name": "Grundlinie Rahel R6 (5598)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900048,
-							"name": "Hugo Annahme R6 (7150)"
+							"name": "Annahme Hugo R6 (7150)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900058,
-							"name": "Silvan Aufschlag R7 (10344)"
+							"name": "Aufschlag Silvan R7 (10344)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900050,
-							"name": "Jonas Skizze R6 (8145)"
+							"name": "Skizze Jonas R6 (8145)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900059,
-							"name": "Tanja Vorhand R7 (16304)"
+							"name": "Vorhand Tanja R7 (16304)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900060,
-							"name": "Urs Rückhand R7 (10789)"
+							"name": "Rückhand Urs R7 (10789)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900061,
-							"name": "Vera Volley R7 (14873)"
+							"name": "Volley Vera R7 (14873)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900052,
-							"name": "Luca Schablone R7 (12372)"
+							"name": "Schablone Luca R7 (12372)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900062,
-							"name": "Willi Lob R7 (15264)"
+							"name": "Lob Willi R7 (15264)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900054,
-							"name": "Nico Kulisse R9 (61131)"
+							"name": "Kulisse Nico R9 (61131)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900063,
-							"name": "Yara Stopp R7 (18916)"
+							"name": "Stopp Yara R7 (18916)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900046,
-							"name": "Fabio Testmann R6 (9117)"
+							"name": "Testmann Fabio R6 (9117)"
 						},
 						{
 							"id": 900060,
-							"name": "Urs Rückhand R7 (10789)"
+							"name": "Rückhand Urs R7 (10789)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900057,
-							"name": "Rahel Grundlinie R6 (5598)"
+							"name": "Grundlinie Rahel R6 (5598)"
 						},
 						{
 							"id": 900058,
-							"name": "Silvan Aufschlag R7 (10344)"
+							"name": "Aufschlag Silvan R7 (10344)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900048,
-							"name": "Hugo Annahme R6 (7150)"
+							"name": "Annahme Hugo R6 (7150)"
 						},
 						{
 							"id": 900054,
-							"name": "Nico Kulisse R9 (61131)"
+							"name": "Kulisse Nico R9 (61131)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900061,
-							"name": "Vera Volley R7 (14873)"
+							"name": "Volley Vera R7 (14873)"
 						},
 						{
 							"id": 900063,
-							"name": "Yara Stopp R7 (18916)"
+							"name": "Stopp Yara R7 (18916)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900052,
-							"name": "Luca Schablone R7 (12372)"
+							"name": "Schablone Luca R7 (12372)"
 						},
 						{
 							"id": 900050,
-							"name": "Jonas Skizze R6 (8145)"
+							"name": "Skizze Jonas R6 (8145)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900059,
-							"name": "Tanja Vorhand R7 (16304)"
+							"name": "Vorhand Tanja R7 (16304)"
 						},
 						{
 							"id": 900064,
-							"name": "Zeno Satzball R7 (16266)"
+							"name": "Satzball Zeno R7 (16266)"
 						}
 					],
 					"wo": 0

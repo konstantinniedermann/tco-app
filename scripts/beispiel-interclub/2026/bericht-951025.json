@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900023,
-							"name": "Yara Lob R6 (5375)"
+							"name": "Lob Yara R6 (5375)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900033,
-							"name": "Ida Saitenbett R6 (7382)"
+							"name": "Saitenbett Ida R6 (7382)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900025,
-							"name": "Alma Satzball R7 (12534)"
+							"name": "Satzball Alma R7 (12534)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900034,
-							"name": "Jan Griffband R7 (11145)"
+							"name": "Griffband Jan R7 (11145)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900027,
-							"name": "Cleo Doppelfehler R7 (16735)"
+							"name": "Doppelfehler Cleo R7 (16735)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900035,
-							"name": "Kim Schlägerkopf R7 (14253)"
+							"name": "Schlägerkopf Kim R7 (14253)"
 						}
 					],
 					"wo": 1
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900029,
-							"name": "Edith Sandplatz R7 (10664)"
+							"name": "Sandplatz Edith R7 (10664)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900036,
-							"name": "Leo Filzball R7 (14944)"
+							"name": "Filzball Leo R7 (14944)"
 						}
 					],
 					"wo": 0
@@ -121,11 +121,11 @@
 					"members": [
 						{
 							"id": 900023,
-							"name": "Yara Lob R6 (5375)"
+							"name": "Lob Yara R6 (5375)"
 						},
 						{
 							"id": 900025,
-							"name": "Alma Satzball R7 (12534)"
+							"name": "Satzball Alma R7 (12534)"
 						}
 					],
 					"wo": 0
@@ -134,11 +134,11 @@
 					"members": [
 						{
 							"id": 900033,
-							"name": "Ida Saitenbett R6 (7382)"
+							"name": "Saitenbett Ida R6 (7382)"
 						},
 						{
 							"id": 900034,
-							"name": "Jan Griffband R7 (11145)"
+							"name": "Griffband Jan R7 (11145)"
 						}
 					],
 					"wo": 0
@@ -153,11 +153,11 @@
 					"members": [
 						{
 							"id": 900031,
-							"name": "Greta Seitenwechsel R9 (34628)"
+							"name": "Seitenwechsel Greta R9 (34628)"
 						},
 						{
 							"id": 900032,
-							"name": "Hannes Ballwand R7 (14157)"
+							"name": "Ballwand Hannes R7 (14157)"
 						}
 					],
 					"wo": 0
@@ -166,11 +166,11 @@
 					"members": [
 						{
 							"id": 900035,
-							"name": "Kim Schlägerkopf R7 (14253)"
+							"name": "Schlägerkopf Kim R7 (14253)"
 						},
 						{
 							"id": 900037,
-							"name": "Maja Netzpfosten R8 (28195)"
+							"name": "Netzpfosten Maja R8 (28195)"
 						}
 					],
 					"wo": 0

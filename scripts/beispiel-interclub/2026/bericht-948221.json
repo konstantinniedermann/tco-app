@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900001,
-							"name": "Anna Muster R6 (3805)"
+							"name": "Muster Anna R6 (3805)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900002,
-							"name": "Beat Beispiel R6 (2933)"
+							"name": "Beispiel Beat R6 (2933)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900003,
-							"name": "Carla Platzhalter R7 (6907)"
+							"name": "Platzhalter Carla R7 (6907)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900004,
-							"name": "Dario Vorlage R6 (2284)"
+							"name": "Vorlage Dario R6 (2284)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900005,
-							"name": "Elena Punktgewinn R6 (3875)"
+							"name": "Punktgewinn Elena R6 (3875)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900006,
-							"name": "Fabio Erfunden R7 (4230)"
+							"name": "Erfunden Fabio R7 (4230)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900007,
-							"name": "Gina Testmann R8 (9040)"
+							"name": "Testmann Gina R8 (9040)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900008,
-							"name": "Hugo Fiktiv R8 (8396)"
+							"name": "Fiktiv Hugo R8 (8396)"
 						}
 					],
 					"wo": 0
@@ -121,11 +121,11 @@
 					"members": [
 						{
 							"id": 900001,
-							"name": "Anna Muster R6 (3805)"
+							"name": "Muster Anna R6 (3805)"
 						},
 						{
 							"id": 900003,
-							"name": "Carla Platzhalter R7 (6907)"
+							"name": "Platzhalter Carla R7 (6907)"
 						}
 					],
 					"wo": 0
@@ -134,11 +134,11 @@
 					"members": [
 						{
 							"id": 900008,
-							"name": "Hugo Fiktiv R8 (8396)"
+							"name": "Fiktiv Hugo R8 (8396)"
 						},
 						{
 							"id": 900004,
-							"name": "Dario Vorlage R6 (2284)"
+							"name": "Vorlage Dario R6 (2284)"
 						}
 					],
 					"wo": 0
@@ -153,11 +153,11 @@
 					"members": [
 						{
 							"id": 900007,
-							"name": "Gina Testmann R8 (9040)"
+							"name": "Testmann Gina R8 (9040)"
 						},
 						{
 							"id": 900009,
-							"name": "Ines Annahme R8 (11250)"
+							"name": "Annahme Ines R8 (11250)"
 						}
 					],
 					"wo": 0
@@ -166,11 +166,11 @@
 					"members": [
 						{
 							"id": 900006,
-							"name": "Fabio Erfunden R7 (4230)"
+							"name": "Erfunden Fabio R7 (4230)"
 						},
 						{
 							"id": 900010,
-							"name": "Jonas Entwurf R7 (6130)"
+							"name": "Entwurf Jonas R7 (6130)"
 						}
 					],
 					"wo": 0

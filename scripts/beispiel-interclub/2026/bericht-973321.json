@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900137,
-							"name": "Rahel Vorhand R5 (2818)"
+							"name": "Vorhand Rahel R5 (2818)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900150,
-							"name": "Flurin Saitenbett R6 (8012)"
+							"name": "Saitenbett Flurin R6 (8012)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900151,
-							"name": "Greta Griffband R5 (4204)"
+							"name": "Griffband Greta R5 (4204)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900152,
-							"name": "Hannes Schlägerkopf R5 (2688)"
+							"name": "Schlägerkopf Hannes R5 (2688)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900141,
-							"name": "Vera Stopp R5 (4625)"
+							"name": "Stopp Vera R5 (4625)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900153,
-							"name": "Ida Filzball R6 (8163)"
+							"name": "Filzball Ida R6 (8163)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900143,
-							"name": "Yara Tiebreak R7 (10525)"
+							"name": "Tiebreak Yara R7 (10525)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900154,
-							"name": "Jan Netzpfosten R6 (5200)"
+							"name": "Netzpfosten Jan R6 (5200)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900147,
-							"name": "Cleo Hallenbach R6 (9798)"
+							"name": "Hallenbach Cleo R6 (9798)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900155,
-							"name": "Kim Schiedsstuhl R7 (10699)"
+							"name": "Schiedsstuhl Kim R7 (10699)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900145,
-							"name": "Alma Linienrichter R7 (13521)"
+							"name": "Linienrichter Alma R7 (13521)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900156,
-							"name": "Leo Ballkind R9 (32405)"
+							"name": "Ballkind Leo R9 (32405)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900151,
-							"name": "Greta Griffband R5 (4204)"
+							"name": "Griffband Greta R5 (4204)"
 						},
 						{
 							"id": 900147,
-							"name": "Cleo Hallenbach R6 (9798)"
+							"name": "Hallenbach Cleo R6 (9798)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900152,
-							"name": "Hannes Schlägerkopf R5 (2688)"
+							"name": "Schlägerkopf Hannes R5 (2688)"
 						},
 						{
 							"id": 900153,
-							"name": "Ida Filzball R6 (8163)"
+							"name": "Filzball Ida R6 (8163)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900141,
-							"name": "Vera Stopp R5 (4625)"
+							"name": "Stopp Vera R5 (4625)"
 						},
 						{
 							"id": 900143,
-							"name": "Yara Tiebreak R7 (10525)"
+							"name": "Tiebreak Yara R7 (10525)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900150,
-							"name": "Flurin Saitenbett R6 (8012)"
+							"name": "Saitenbett Flurin R6 (8012)"
 						},
 						{
 							"id": 900154,
-							"name": "Jan Netzpfosten R6 (5200)"
+							"name": "Netzpfosten Jan R6 (5200)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900137,
-							"name": "Rahel Vorhand R5 (2818)"
+							"name": "Vorhand Rahel R5 (2818)"
 						},
 						{
 							"id": 900145,
-							"name": "Alma Linienrichter R7 (13521)"
+							"name": "Linienrichter Alma R7 (13521)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900156,
-							"name": "Leo Ballkind R9 (32405)"
+							"name": "Ballkind Leo R9 (32405)"
 						},
 						{
 							"id": 900157,
-							"name": "Maja Matchball R9 (34628)"
+							"name": "Matchball Maja R9 (34628)"
 						}
 					],
 					"wo": 0

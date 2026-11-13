@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900023,
-							"name": "Yara Lob R6 (5375)"
+							"name": "Lob Yara R6 (5375)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900414,
-							"name": "Nico Stopp R6 (10113)"
+							"name": "Stopp Nico R6 (10113)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900025,
-							"name": "Alma Satzball R7 (12534)"
+							"name": "Satzball Alma R7 (12534)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900415,
-							"name": "Olivia Satzball R7 (11006)"
+							"name": "Satzball Olivia R7 (11006)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900027,
-							"name": "Cleo Doppelfehler R7 (16735)"
+							"name": "Doppelfehler Cleo R7 (16735)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900416,
-							"name": "Pascal Tiebreak R7 (17870)"
+							"name": "Tiebreak Pascal R7 (17870)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900029,
-							"name": "Edith Sandplatz R7 (10664)"
+							"name": "Sandplatz Edith R7 (10664)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900417,
-							"name": "Rahel Doppelfehler R7 (20261)"
+							"name": "Doppelfehler Rahel R7 (20261)"
 						}
 					],
 					"wo": 0
@@ -121,11 +121,11 @@
 					"members": [
 						{
 							"id": 900023,
-							"name": "Yara Lob R6 (5375)"
+							"name": "Lob Yara R6 (5375)"
 						},
 						{
 							"id": 900031,
-							"name": "Greta Seitenwechsel R9 (34628)"
+							"name": "Seitenwechsel Greta R9 (34628)"
 						}
 					],
 					"wo": 0
@@ -134,11 +134,11 @@
 					"members": [
 						{
 							"id": 900414,
-							"name": "Nico Stopp R6 (10113)"
+							"name": "Stopp Nico R6 (10113)"
 						},
 						{
 							"id": 900417,
-							"name": "Rahel Doppelfehler R7 (20261)"
+							"name": "Doppelfehler Rahel R7 (20261)"
 						}
 					],
 					"wo": 0
@@ -153,11 +153,11 @@
 					"members": [
 						{
 							"id": 900025,
-							"name": "Alma Satzball R7 (12534)"
+							"name": "Satzball Alma R7 (12534)"
 						},
 						{
 							"id": 900043,
-							"name": "Carla Vorlage R7 (11587)"
+							"name": "Vorlage Carla R7 (11587)"
 						}
 					],
 					"wo": 0
@@ -166,11 +166,11 @@
 					"members": [
 						{
 							"id": 900415,
-							"name": "Olivia Satzball R7 (11006)"
+							"name": "Satzball Olivia R7 (11006)"
 						},
 						{
 							"id": 900416,
-							"name": "Pascal Tiebreak R7 (17870)"
+							"name": "Tiebreak Pascal R7 (17870)"
 						}
 					],
 					"wo": 0

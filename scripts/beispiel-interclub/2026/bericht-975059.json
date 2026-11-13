@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900200,
-							"name": "Remo Vorlage R5 (3753)"
+							"name": "Vorlage Remo R5 (3753)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900201,
-							"name": "Anna Erfunden R6 (5349)"
+							"name": "Erfunden Anna R6 (5349)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900202,
-							"name": "Beat Testmann R7 (12289)"
+							"name": "Testmann Beat R7 (12289)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900203,
-							"name": "Carla Fiktiv R7 (13149)"
+							"name": "Fiktiv Carla R7 (13149)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900204,
-							"name": "Dario Annahme R7 (17388)"
+							"name": "Annahme Dario R7 (17388)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900205,
-							"name": "Elena Entwurf R9 (32048)"
+							"name": "Entwurf Elena R9 (32048)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900206,
-							"name": "Fabio Skizze R9 (32835)"
+							"name": "Skizze Fabio R9 (32835)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900207,
-							"name": "Gina Modell R7 (18022)"
+							"name": "Modell Gina R7 (18022)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900208,
-							"name": "Hugo Schablone R8 (23986)"
+							"name": "Schablone Hugo R8 (23986)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900209,
-							"name": "Ines Attrappe R9 (60852)"
+							"name": "Attrappe Ines R9 (60852)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900210,
-							"name": "Jonas Kulisse R9 (61879)"
+							"name": "Kulisse Jonas R9 (61879)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900211,
-							"name": "Klara Spielball R8 (28836)"
+							"name": "Spielball Klara R8 (28836)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900204,
-							"name": "Dario Annahme R7 (17388)"
+							"name": "Annahme Dario R7 (17388)"
 						},
 						{
 							"id": 900208,
-							"name": "Hugo Schablone R8 (23986)"
+							"name": "Schablone Hugo R8 (23986)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900201,
-							"name": "Anna Erfunden R6 (5349)"
+							"name": "Erfunden Anna R6 (5349)"
 						},
 						{
 							"id": 900205,
-							"name": "Elena Entwurf R9 (32048)"
+							"name": "Entwurf Elena R9 (32048)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900200,
-							"name": "Remo Vorlage R5 (3753)"
+							"name": "Vorlage Remo R5 (3753)"
 						},
 						{
 							"id": 900212,
-							"name": "Luca Netzroller R8 (28511)"
+							"name": "Netzroller Luca R8 (28511)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900203,
-							"name": "Carla Fiktiv R7 (13149)"
+							"name": "Fiktiv Carla R7 (13149)"
 						},
 						{
 							"id": 900207,
-							"name": "Gina Modell R7 (18022)"
+							"name": "Modell Gina R7 (18022)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900202,
-							"name": "Beat Testmann R7 (12289)"
+							"name": "Testmann Beat R7 (12289)"
 						},
 						{
 							"id": 900210,
-							"name": "Jonas Kulisse R9 (61879)"
+							"name": "Kulisse Jonas R9 (61879)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900209,
-							"name": "Ines Attrappe R9 (60852)"
+							"name": "Attrappe Ines R9 (60852)"
 						},
 						{
 							"id": 900211,
-							"name": "Klara Spielball R8 (28836)"
+							"name": "Spielball Klara R8 (28836)"
 						}
 					],
 					"wo": 0

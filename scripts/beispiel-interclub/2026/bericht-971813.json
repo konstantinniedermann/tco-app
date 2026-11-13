@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900065,
-							"name": "Alma Tiebreak R5 (4233)"
+							"name": "Tiebreak Alma R5 (4233)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900044,
-							"name": "Dario Punktgewinn R6 (5438)"
+							"name": "Punktgewinn Dario R6 (5438)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900066,
-							"name": "Bruno Doppelfehler R6 (6031)"
+							"name": "Doppelfehler Bruno R6 (6031)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900050,
-							"name": "Jonas Skizze R6 (8145)"
+							"name": "Skizze Jonas R6 (8145)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900067,
-							"name": "Cleo Linienrichter R7 (10263)"
+							"name": "Linienrichter Cleo R7 (10263)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900046,
-							"name": "Fabio Testmann R6 (9117)"
+							"name": "Testmann Fabio R6 (9117)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900068,
-							"name": "Dominik Sandplatz R7 (16366)"
+							"name": "Sandplatz Dominik R7 (16366)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900060,
-							"name": "Urs Rückhand R7 (10789)"
+							"name": "Rückhand Urs R7 (10789)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900069,
-							"name": "Edith Hallenbach R8 (20613)"
+							"name": "Hallenbach Edith R8 (20613)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900052,
-							"name": "Luca Schablone R7 (12372)"
+							"name": "Schablone Luca R7 (12372)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900070,
-							"name": "Flurin Seitenwechsel R7 (15021)"
+							"name": "Seitenwechsel Flurin R7 (15021)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900071,
-							"name": "Greta Ballwand R7 (15364)"
+							"name": "Ballwand Greta R7 (15364)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900065,
-							"name": "Alma Tiebreak R5 (4233)"
+							"name": "Tiebreak Alma R5 (4233)"
 						},
 						{
 							"id": 900068,
-							"name": "Dominik Sandplatz R7 (16366)"
+							"name": "Sandplatz Dominik R7 (16366)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900044,
-							"name": "Dario Punktgewinn R6 (5438)"
+							"name": "Punktgewinn Dario R6 (5438)"
 						},
 						{
 							"id": 900046,
-							"name": "Fabio Testmann R6 (9117)"
+							"name": "Testmann Fabio R6 (9117)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900066,
-							"name": "Bruno Doppelfehler R6 (6031)"
+							"name": "Doppelfehler Bruno R6 (6031)"
 						},
 						{
 							"id": 900070,
-							"name": "Flurin Seitenwechsel R7 (15021)"
+							"name": "Seitenwechsel Flurin R7 (15021)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900050,
-							"name": "Jonas Skizze R6 (8145)"
+							"name": "Skizze Jonas R6 (8145)"
 						},
 						{
 							"id": 900071,
-							"name": "Greta Ballwand R7 (15364)"
+							"name": "Ballwand Greta R7 (15364)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900069,
-							"name": "Edith Hallenbach R8 (20613)"
+							"name": "Hallenbach Edith R8 (20613)"
 						},
 						{
 							"id": 900067,
-							"name": "Cleo Linienrichter R7 (10263)"
+							"name": "Linienrichter Cleo R7 (10263)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900060,
-							"name": "Urs Rückhand R7 (10789)"
+							"name": "Rückhand Urs R7 (10789)"
 						},
 						{
 							"id": 900052,
-							"name": "Luca Schablone R7 (12372)"
+							"name": "Schablone Luca R7 (12372)"
 						}
 					],
 					"wo": 0

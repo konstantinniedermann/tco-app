@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900044,
-							"name": "Dario Punktgewinn R6 (5438)"
+							"name": "Punktgewinn Dario R6 (5438)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900045,
-							"name": "Elena Erfunden R6 (10223)"
+							"name": "Erfunden Elena R6 (10223)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900046,
-							"name": "Fabio Testmann R6 (9117)"
+							"name": "Testmann Fabio R6 (9117)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900047,
-							"name": "Gina Fiktiv R7 (12663)"
+							"name": "Fiktiv Gina R7 (12663)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900048,
-							"name": "Hugo Annahme R6 (7150)"
+							"name": "Annahme Hugo R6 (7150)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900049,
-							"name": "Ines Entwurf R7 (20106)"
+							"name": "Entwurf Ines R7 (20106)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900050,
-							"name": "Jonas Skizze R6 (8145)"
+							"name": "Skizze Jonas R6 (8145)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900051,
-							"name": "Klara Modell R7 (16421)"
+							"name": "Modell Klara R7 (16421)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900052,
-							"name": "Luca Schablone R7 (12372)"
+							"name": "Schablone Luca R7 (12372)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900053,
-							"name": "Mia Attrappe R7 (14312)"
+							"name": "Attrappe Mia R7 (14312)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900054,
-							"name": "Nico Kulisse R9 (61131)"
+							"name": "Kulisse Nico R9 (61131)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900055,
-							"name": "Olivia Spielball R8 (21041)"
+							"name": "Spielball Olivia R8 (21041)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900044,
-							"name": "Dario Punktgewinn R6 (5438)"
+							"name": "Punktgewinn Dario R6 (5438)"
 						},
 						{
 							"id": 900046,
-							"name": "Fabio Testmann R6 (9117)"
+							"name": "Testmann Fabio R6 (9117)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900045,
-							"name": "Elena Erfunden R6 (10223)"
+							"name": "Erfunden Elena R6 (10223)"
 						},
 						{
 							"id": 900049,
-							"name": "Ines Entwurf R7 (20106)"
+							"name": "Entwurf Ines R7 (20106)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900048,
-							"name": "Hugo Annahme R6 (7150)"
+							"name": "Annahme Hugo R6 (7150)"
 						},
 						{
 							"id": 900054,
-							"name": "Nico Kulisse R9 (61131)"
+							"name": "Kulisse Nico R9 (61131)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900047,
-							"name": "Gina Fiktiv R7 (12663)"
+							"name": "Fiktiv Gina R7 (12663)"
 						},
 						{
 							"id": 900051,
-							"name": "Klara Modell R7 (16421)"
+							"name": "Modell Klara R7 (16421)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900050,
-							"name": "Jonas Skizze R6 (8145)"
+							"name": "Skizze Jonas R6 (8145)"
 						},
 						{
 							"id": 900052,
-							"name": "Luca Schablone R7 (12372)"
+							"name": "Schablone Luca R7 (12372)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900055,
-							"name": "Olivia Spielball R8 (21041)"
+							"name": "Spielball Olivia R8 (21041)"
 						},
 						{
 							"id": 900056,
-							"name": "Pascal Netzroller R9 (33407)"
+							"name": "Netzroller Pascal R9 (33407)"
 						}
 					],
 					"wo": 0

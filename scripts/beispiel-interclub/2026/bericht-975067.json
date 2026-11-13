@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900201,
-							"name": "Anna Erfunden R6 (5349)"
+							"name": "Erfunden Anna R6 (5349)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900231,
-							"name": "Greta Filzball R4 (2038)"
+							"name": "Filzball Greta R4 (2038)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900071,
-							"name": "Greta Ballwand R7 (15364)"
+							"name": "Ballwand Greta R7 (15364)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900232,
-							"name": "Hannes Netzpfosten R6 (9340)"
+							"name": "Netzpfosten Hannes R6 (9340)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900205,
-							"name": "Elena Entwurf R9 (32048)"
+							"name": "Entwurf Elena R9 (32048)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900233,
-							"name": "Ida Schiedsstuhl R7 (10479)"
+							"name": "Schiedsstuhl Ida R7 (10479)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900207,
-							"name": "Gina Modell R7 (18022)"
+							"name": "Modell Gina R7 (18022)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900234,
-							"name": "Jan Ballkind R6 (9081)"
+							"name": "Ballkind Jan R6 (9081)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900224,
-							"name": "Zeno Sandplatz R9 (34440)"
+							"name": "Sandplatz Zeno R9 (34440)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900235,
-							"name": "Kim Matchball R6 (8328)"
+							"name": "Matchball Kim R6 (8328)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900211,
-							"name": "Klara Spielball R8 (28836)"
+							"name": "Spielball Klara R8 (28836)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900236,
-							"name": "Leo Muster R7 (20328)"
+							"name": "Muster Leo R7 (20328)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900201,
-							"name": "Anna Erfunden R6 (5349)"
+							"name": "Erfunden Anna R6 (5349)"
 						},
 						{
 							"id": 900205,
-							"name": "Elena Entwurf R9 (32048)"
+							"name": "Entwurf Elena R9 (32048)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900231,
-							"name": "Greta Filzball R4 (2038)"
+							"name": "Filzball Greta R4 (2038)"
 						},
 						{
 							"id": 900235,
-							"name": "Kim Matchball R6 (8328)"
+							"name": "Matchball Kim R6 (8328)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900071,
-							"name": "Greta Ballwand R7 (15364)"
+							"name": "Ballwand Greta R7 (15364)"
 						},
 						{
 							"id": 900224,
-							"name": "Zeno Sandplatz R9 (34440)"
+							"name": "Sandplatz Zeno R9 (34440)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900232,
-							"name": "Hannes Netzpfosten R6 (9340)"
+							"name": "Netzpfosten Hannes R6 (9340)"
 						},
 						{
 							"id": 900234,
-							"name": "Jan Ballkind R6 (9081)"
+							"name": "Ballkind Jan R6 (9081)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900211,
-							"name": "Klara Spielball R8 (28836)"
+							"name": "Spielball Klara R8 (28836)"
 						},
 						{
 							"id": 900207,
-							"name": "Gina Modell R7 (18022)"
+							"name": "Modell Gina R7 (18022)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900233,
-							"name": "Ida Schiedsstuhl R7 (10479)"
+							"name": "Schiedsstuhl Ida R7 (10479)"
 						},
 						{
 							"id": 900237,
-							"name": "Maja Beispiel R6 (8985)"
+							"name": "Beispiel Maja R6 (8985)"
 						}
 					],
 					"wo": 0

@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900023,
-							"name": "Yara Lob R6 (5375)"
+							"name": "Lob Yara R6 (5375)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900024,
-							"name": "Zeno Stopp R7 (16322)"
+							"name": "Stopp Zeno R7 (16322)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900025,
-							"name": "Alma Satzball R7 (12534)"
+							"name": "Satzball Alma R7 (12534)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900026,
-							"name": "Bruno Tiebreak R8 (25550)"
+							"name": "Tiebreak Bruno R8 (25550)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900027,
-							"name": "Cleo Doppelfehler R7 (16735)"
+							"name": "Doppelfehler Cleo R7 (16735)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900028,
-							"name": "Dominik Linienrichter R8 (28603)"
+							"name": "Linienrichter Dominik R8 (28603)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900029,
-							"name": "Edith Sandplatz R7 (10664)"
+							"name": "Sandplatz Edith R7 (10664)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900030,
-							"name": "Flurin Hallenbach R8 (30760)"
+							"name": "Hallenbach Flurin R8 (30760)"
 						}
 					],
 					"wo": 0
@@ -121,11 +121,11 @@
 					"members": [
 						{
 							"id": 900023,
-							"name": "Yara Lob R6 (5375)"
+							"name": "Lob Yara R6 (5375)"
 						},
 						{
 							"id": 900027,
-							"name": "Cleo Doppelfehler R7 (16735)"
+							"name": "Doppelfehler Cleo R7 (16735)"
 						}
 					],
 					"wo": 0
@@ -134,11 +134,11 @@
 					"members": [
 						{
 							"id": 900024,
-							"name": "Zeno Stopp R7 (16322)"
+							"name": "Stopp Zeno R7 (16322)"
 						},
 						{
 							"id": 900028,
-							"name": "Dominik Linienrichter R8 (28603)"
+							"name": "Linienrichter Dominik R8 (28603)"
 						}
 					],
 					"wo": 0
@@ -153,11 +153,11 @@
 					"members": [
 						{
 							"id": 900031,
-							"name": "Greta Seitenwechsel R9 (34628)"
+							"name": "Seitenwechsel Greta R9 (34628)"
 						},
 						{
 							"id": 900032,
-							"name": "Hannes Ballwand R7 (14157)"
+							"name": "Ballwand Hannes R7 (14157)"
 						}
 					],
 					"wo": 1
@@ -166,11 +166,11 @@
 					"members": [
 						{
 							"id": 900026,
-							"name": "Bruno Tiebreak R8 (25550)"
+							"name": "Tiebreak Bruno R8 (25550)"
 						},
 						{
 							"id": 900030,
-							"name": "Flurin Hallenbach R8 (30760)"
+							"name": "Hallenbach Flurin R8 (30760)"
 						}
 					],
 					"wo": 0

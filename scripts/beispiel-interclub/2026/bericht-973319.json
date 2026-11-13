@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900136,
-							"name": "Pascal Aufschlag R5 (2859)"
+							"name": "Aufschlag Pascal R5 (2859)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900137,
-							"name": "Rahel Vorhand R5 (2818)"
+							"name": "Vorhand Rahel R5 (2818)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900138,
-							"name": "Silvan Rückhand R7 (12613)"
+							"name": "Rückhand Silvan R7 (12613)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900139,
-							"name": "Tanja Volley R5 (3269)"
+							"name": "Volley Tanja R5 (3269)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900140,
-							"name": "Urs Lob R6 (8842)"
+							"name": "Lob Urs R6 (8842)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900141,
-							"name": "Vera Stopp R5 (4625)"
+							"name": "Stopp Vera R5 (4625)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900142,
-							"name": "Willi Satzball R6 (8864)"
+							"name": "Satzball Willi R6 (8864)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900143,
-							"name": "Yara Tiebreak R7 (10525)"
+							"name": "Tiebreak Yara R7 (10525)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900144,
-							"name": "Zeno Doppelfehler R7 (15562)"
+							"name": "Doppelfehler Zeno R7 (15562)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900145,
-							"name": "Alma Linienrichter R7 (13521)"
+							"name": "Linienrichter Alma R7 (13521)"
 						}
 					],
 					"wo": 0
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900146,
-							"name": "Bruno Sandplatz R7 (12872)"
+							"name": "Sandplatz Bruno R7 (12872)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900147,
-							"name": "Cleo Hallenbach R6 (9798)"
+							"name": "Hallenbach Cleo R6 (9798)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900142,
-							"name": "Willi Satzball R6 (8864)"
+							"name": "Satzball Willi R6 (8864)"
 						},
 						{
 							"id": 900138,
-							"name": "Silvan Rückhand R7 (12613)"
+							"name": "Rückhand Silvan R7 (12613)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900137,
-							"name": "Rahel Vorhand R5 (2818)"
+							"name": "Vorhand Rahel R5 (2818)"
 						},
 						{
 							"id": 900147,
-							"name": "Cleo Hallenbach R6 (9798)"
+							"name": "Hallenbach Cleo R6 (9798)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900136,
-							"name": "Pascal Aufschlag R5 (2859)"
+							"name": "Aufschlag Pascal R5 (2859)"
 						},
 						{
 							"id": 900148,
-							"name": "Dominik Seitenwechsel R8 (20515)"
+							"name": "Seitenwechsel Dominik R8 (20515)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900141,
-							"name": "Vera Stopp R5 (4625)"
+							"name": "Stopp Vera R5 (4625)"
 						},
 						{
 							"id": 900143,
-							"name": "Yara Tiebreak R7 (10525)"
+							"name": "Tiebreak Yara R7 (10525)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900149,
-							"name": "Edith Ballwand R7 (12045)"
+							"name": "Ballwand Edith R7 (12045)"
 						},
 						{
 							"id": 900146,
-							"name": "Bruno Sandplatz R7 (12872)"
+							"name": "Sandplatz Bruno R7 (12872)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900145,
-							"name": "Alma Linienrichter R7 (13521)"
+							"name": "Linienrichter Alma R7 (13521)"
 						},
 						{
 							"id": 900139,
-							"name": "Tanja Volley R5 (3269)"
+							"name": "Volley Tanja R5 (3269)"
 						}
 					],
 					"wo": 0

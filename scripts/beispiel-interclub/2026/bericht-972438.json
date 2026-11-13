@@ -23,7 +23,7 @@
 					"members": [
 						{
 							"id": 900128,
-							"name": "Hugo Skizze R4 (2221)"
+							"name": "Skizze Hugo R4 (2221)"
 						}
 					],
 					"wo": 0
@@ -32,7 +32,7 @@
 					"members": [
 						{
 							"id": 900100,
-							"name": "Urs Volley R5 (2888)"
+							"name": "Volley Urs R5 (2888)"
 						}
 					],
 					"wo": 0
@@ -47,7 +47,7 @@
 					"members": [
 						{
 							"id": 900129,
-							"name": "Ines Modell R5 (2976)"
+							"name": "Modell Ines R5 (2976)"
 						}
 					],
 					"wo": 0
@@ -56,7 +56,7 @@
 					"members": [
 						{
 							"id": 900130,
-							"name": "Jonas Schablone R6 (10185)"
+							"name": "Schablone Jonas R6 (10185)"
 						}
 					],
 					"wo": 0
@@ -71,7 +71,7 @@
 					"members": [
 						{
 							"id": 900131,
-							"name": "Klara Attrappe R6 (6316)"
+							"name": "Attrappe Klara R6 (6316)"
 						}
 					],
 					"wo": 0
@@ -80,7 +80,7 @@
 					"members": [
 						{
 							"id": 900102,
-							"name": "Willi Stopp R6 (6527)"
+							"name": "Stopp Willi R6 (6527)"
 						}
 					],
 					"wo": 0
@@ -95,7 +95,7 @@
 					"members": [
 						{
 							"id": 900132,
-							"name": "Luca Kulisse R6 (8335)"
+							"name": "Kulisse Luca R6 (8335)"
 						}
 					],
 					"wo": 0
@@ -104,7 +104,7 @@
 					"members": [
 						{
 							"id": 900104,
-							"name": "Zeno Tiebreak R7 (18682)"
+							"name": "Tiebreak Zeno R7 (18682)"
 						}
 					],
 					"wo": 0
@@ -119,7 +119,7 @@
 					"members": [
 						{
 							"id": 900133,
-							"name": "Mia Spielball R7 (12518)"
+							"name": "Spielball Mia R7 (12518)"
 						}
 					],
 					"wo": 0
@@ -128,7 +128,7 @@
 					"members": [
 						{
 							"id": 900118,
-							"name": "Noah Matchball R7 (12795)"
+							"name": "Matchball Noah R7 (12795)"
 						}
 					],
 					"wo": 1
@@ -143,7 +143,7 @@
 					"members": [
 						{
 							"id": 900134,
-							"name": "Nico Netzroller R7 (12511)"
+							"name": "Netzroller Nico R7 (12511)"
 						}
 					],
 					"wo": 0
@@ -152,7 +152,7 @@
 					"members": [
 						{
 							"id": 900106,
-							"name": "Bruno Linienrichter R7 (11874)"
+							"name": "Linienrichter Bruno R7 (11874)"
 						}
 					],
 					"wo": 0
@@ -169,11 +169,11 @@
 					"members": [
 						{
 							"id": 900131,
-							"name": "Klara Attrappe R6 (6316)"
+							"name": "Attrappe Klara R6 (6316)"
 						},
 						{
 							"id": 900129,
-							"name": "Ines Modell R5 (2976)"
+							"name": "Modell Ines R5 (2976)"
 						}
 					],
 					"wo": 0
@@ -182,11 +182,11 @@
 					"members": [
 						{
 							"id": 900102,
-							"name": "Willi Stopp R6 (6527)"
+							"name": "Stopp Willi R6 (6527)"
 						},
 						{
 							"id": 900121,
-							"name": "Anna Vorlage R8 (26046)"
+							"name": "Vorlage Anna R8 (26046)"
 						}
 					],
 					"wo": 0
@@ -201,11 +201,11 @@
 					"members": [
 						{
 							"id": 900128,
-							"name": "Hugo Skizze R4 (2221)"
+							"name": "Skizze Hugo R4 (2221)"
 						},
 						{
 							"id": 900134,
-							"name": "Nico Netzroller R7 (12511)"
+							"name": "Netzroller Nico R7 (12511)"
 						}
 					],
 					"wo": 0
@@ -214,11 +214,11 @@
 					"members": [
 						{
 							"id": 900100,
-							"name": "Urs Volley R5 (2888)"
+							"name": "Volley Urs R5 (2888)"
 						},
 						{
 							"id": 900110,
-							"name": "Flurin Ballwand R9 (32621)"
+							"name": "Ballwand Flurin R9 (32621)"
 						}
 					],
 					"wo": 0
@@ -233,11 +233,11 @@
 					"members": [
 						{
 							"id": 900132,
-							"name": "Luca Kulisse R6 (8335)"
+							"name": "Kulisse Luca R6 (8335)"
 						},
 						{
 							"id": 900135,
-							"name": "Olivia Grundlinie R6 (10034)"
+							"name": "Grundlinie Olivia R6 (10034)"
 						}
 					],
 					"wo": 0
@@ -246,11 +246,11 @@
 					"members": [
 						{
 							"id": 900108,
-							"name": "Dominik Hallenbach R8 (27369)"
+							"name": "Hallenbach Dominik R8 (27369)"
 						},
 						{
 							"id": 900118,
-							"name": "Noah Matchball R7 (12795)"
+							"name": "Matchball Noah R7 (12795)"
 						}
 					],
 					"wo": 0
