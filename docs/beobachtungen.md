@@ -135,6 +135,18 @@ Fehler der App.
 
 ## Offen
 
+### 2026-11-13 — Interclub: Randfälle der Übersicht und Import ohne Zeitgrenze
+
+**Thema:** Interclub
+
+**Fundort:** `src/lib/server/interclub/ansicht.ts` (`ladeUebersicht`), `scripts/ic-import.ts`
+
+**Beobachtung:** (1) Ein Spiel, dessen Datum vorbei ist, aber noch ohne Resultat, fällt aus beiden Karten der Übersicht (letzte Resultate und nächste Spiele) und kann die Pausen-Karte falsch machen. (2) Spielen zwei TCO-Teams in derselben Gruppe gegeneinander, erscheint dieselbe Begegnung zweimal in «Letzte Resultate» (einmal als Sieg, einmal als Niederlage). (3) `scripts/ic-import.ts` hat keine Zeitgrenze für den Abruf (`fetch` ohne Timeout).
+
+**Ursprung:** #81 Teil 1, Reviews
+
+**Einschätzung:** Für Teil 3 (Aktualität, regelmässiger Abruf) prüfen: (1) und (2) betreffen die Ansicht in der Saison, (3) wird mit dem regelmässigen Abruf wichtig. Vorläufig.
+
 ### 2026-11-13 — Rangliste läuft bei 320 px und grosser Schrift über
 
 **Thema:** Interclub

@@ -21,6 +21,7 @@ Datei aus Fairgate (A-MITGLIED-07); warum: [ADR-006](adr/adr-006-eigenstaendig-o
 | **Mitglieder-Login** | 28.02.2027 | Version 1.0.0 für alle Mitglieder: Befunde aus dem Pilot eingearbeitet, Mitgliederverwaltung für Mitglieder-Admins fertig (Mitglieder von Hand anlegen oder als CSV-Datei einlesen – Einlesen gebaut, #43 Etappe 2b –, bearbeiten, Austritt), Briefversand mit Einmal-Code an alle. Was im Pilot schon läuft: Login ohne Passwort per Einmal-Code, danach eingeloggt bleiben; neuer Code per E-Mail ([#29](https://github.com/konstantinniedermann/tco-app/issues/29)); freiwillig ein Passkey (A-LOGIN-07). Noch offen: beim ersten Login Pflicht zum Ergänzen fehlender Daten (FR-02) |
 | **CM-Anmeldung** | 15.04.2027 | Anmeldung zur Clubmeisterschaft ist offen, auch für Junioren (K-46) |
 | **CM-Betrieb** | 01.06.2027 | Datenaustausch mit Swiss Tennis in beide Richtungen, Spieler melden ihre Resultate selbst |
+| **Interclub** | Saisonstart Interclub, Anfang Mai 2027 | Mitglieder sehen die Interclub-Resultate der TCO-Teams aus Swiss Tennis (Endstände, Spielplan, Tabelle); Einzelpartien und Push folgen in späteren Teilen ([#81](https://github.com/konstantinniedermann/tco-app/issues/81), [ADR-011](adr/adr-011-interclub-schnittstelle-swiss-tennis.md)) |
 | **Lizenzanträge** | 01.04.2028 | Mitglieder beantragen eine Lizenz oder deren Storno. Der Lizenzverantwortliche sieht zu einem Stichtag die Liste der Anträge, exportiert sie und trägt sie von Hand bei Swiss Tennis ein |
 | **Backlog / Optional** | — | Alles ohne festen Termin |
 

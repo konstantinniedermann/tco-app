@@ -21,3 +21,4 @@ Eine neue ADR kommt in diese Tabelle und mit einer Zeile in die
 | [ADR-008](adr-008-zeitgeber-in-der-app.md) | Die Löschfristen setzt ein täglicher Zeitgeber in der App durch | Entschieden | 2026-11-07 |
 | [ADR-009](adr-009-gruener-stand.md) | Ein schon grün geprüfter Stand wird vor dem Push nicht noch einmal voll geprüft | Entschieden | 2026-11-06 |
 | [ADR-010](adr-010-repo-oeffentlich.md) | Das Repo ist öffentlich | Entschieden | 2026-11-06 |
+| [ADR-011](adr-011-interclub-schnittstelle-swiss-tennis.md) | MyTCO liest die Interclub-Daten von der nicht dokumentierten Schnittstelle von Swiss Tennis | Entschieden | 2026-11-13 |
