@@ -70,6 +70,7 @@ describe('Reiter', () => {
 		['/clubmeisterschaft/[id]/kontakt', '/clubmeisterschaft'],
 		['/interclub', '/interclub'],
 		['/interclub/[id]', '/interclub'],
+		['/interclub/[id]/[begegnung]', '/interclub'],
 		['/profil', '/profil'],
 		['/profil/email', '/profil'],
 		['/login', null],
@@ -85,6 +86,7 @@ describe('Reiter', () => {
 		expect(zeigtReiter('/anlass/[id]', false)).toBe(true);
 		expect(zeigtReiter('/profil/email', true)).toBe(true);
 		expect(zeigtReiter('/interclub/[id]', true)).toBe(true);
+		expect(zeigtReiter('/interclub/[id]/[begegnung]', true)).toBe(true);
 		expect(zeigtReiter('/hilfe', true)).toBe(true);
 		expect(zeigtReiter('/hilfe', false)).toBe(false);
 		expect(zeigtReiter('/datenschutz', false)).toBe(false);
@@ -134,6 +136,7 @@ describe('Zurück-Link führt eine Stufe höher in der festen Ordnung', () => {
 		],
 		['/clubmeisterschaft/[id]/kontakt', k, { route: '/clubmeisterschaft/[id]', text: null }],
 		['/interclub/[id]', k, { route: '/interclub', text: 'Interclub' }],
+		['/interclub/[id]/[begegnung]', k, { route: '/interclub/[id]', text: null }],
 		['/interclub', k, null],
 		['/hilfe', k, { route: '/', text: 'Start' }],
 		['/datenschutz', k, { route: '/', text: 'Start' }],
@@ -167,6 +170,8 @@ describe('Wechsel des Bereichs blendet über', () => {
 		expect(uebergang('/login', '/hilfe', 'link')).toBe('tiefer');
 		expect(uebergang('/interclub', '/interclub/[id]', 'link')).toBe('tiefer');
 		expect(uebergang('/interclub/[id]', '/interclub', 'link')).toBe('zurueck');
+		expect(uebergang('/interclub/[id]', '/interclub/[id]/[begegnung]', 'link')).toBe('tiefer');
+		expect(uebergang('/interclub/[id]/[begegnung]', '/interclub/[id]', 'link')).toBe('zurueck');
 	});
 });
 

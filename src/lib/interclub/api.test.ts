@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
-import { holeInterclub, holeInterclubTeam } from './api.ts';
+import { holeInterclub, holeInterclubBegegnung, holeInterclubTeam } from './api.ts';
 
 type Aufruf = { pfad: string; init: RequestInit };
 
@@ -34,6 +34,18 @@ describe('Anfragen der Mitglieder zu Interclub', () => {
 			pfad: '/api/interclub/teams/7398',
 			init: { method: 'GET' }
 		});
+		const b = holer(json(200, { teamId: 7398 }));
+		expect(await holeInterclubBegegnung(7398, 972338, b.holen)).toEqual({
+			art: 'ok',
+			daten: { teamId: 7398 }
+		});
+		expect(b.aufrufe[0]).toMatchObject({
+			pfad: '/api/interclub/teams/7398/begegnungen/972338',
+			init: { method: 'GET' }
+		});
+		expect(
+			await holeInterclubBegegnung(1, 2, holer(json(404, { fehler: 'nicht-gefunden' })).holen)
+		).toEqual({ art: 'nicht-gefunden' });
 	});
 
 	test('Statuscodes werden zu Ergebnissen', async () => {

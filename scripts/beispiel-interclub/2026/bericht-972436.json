@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "16. Mai 2026",
+	"homeTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 7,
+		"sets": 15,
+		"games": 99
+	},
+	"awayTeam": {
+		"name": "ETA ",
+		"clubNumber": 2070,
+		"points": 2,
+		"sets": 4,
+		"games": 56
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900100,
+							"name": "Volley Urs R5 (2888)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900114,
+							"name": "Filzball Jan R6 (5873)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "6:4", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900102,
+							"name": "Stopp Willi R6 (6527)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900115,
+							"name": "Netzpfosten Kim R7 (16797)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900116,
+							"name": "Schiedsstuhl Leo R6 (9029)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900117,
+							"name": "Ballkind Maja R6 (9771)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "6:4", "3:6"]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900118,
+							"name": "Matchball Noah R7 (12795)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900119,
+							"name": "Muster Paula R7 (14406)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:1", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900106,
+							"name": "Linienrichter Bruno R7 (11874)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900120,
+							"name": "Beispiel Remo R7 (16765)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:4", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900121,
+							"name": "Vorlage Anna R8 (26046)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900122,
+							"name": "Punktgewinn Beat R8 (29373)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:3", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900104,
+							"name": "Tiebreak Zeno R7 (18682)"
+						},
+						{
+							"id": 900116,
+							"name": "Schiedsstuhl Leo R6 (9029)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900115,
+							"name": "Netzpfosten Kim R7 (16797)"
+						},
+						{
+							"id": 900114,
+							"name": "Filzball Jan R6 (5873)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "3:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900123,
+							"name": "Erfunden Carla R7 (11591)"
+						},
+						{
+							"id": 900100,
+							"name": "Volley Urs R5 (2888)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900124,
+							"name": "Testmann Dario R9 (60909)"
+						},
+						{
+							"id": 900125,
+							"name": "Fiktiv Elena R8 (30476)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900108,
+							"name": "Hallenbach Dominik R8 (27369)"
+						},
+						{
+							"id": 900106,
+							"name": "Linienrichter Bruno R7 (11874)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900126,
+							"name": "Annahme Fabio R9 (61048)"
+						},
+						{
+							"id": 900127,
+							"name": "Entwurf Gina R9 (31545)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:0", ""]
+		}
+	],
+	"leagueId": 9,
+	"groupId": 78
+}

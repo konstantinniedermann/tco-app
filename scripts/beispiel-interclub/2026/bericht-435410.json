@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "24. Juni 2026",
+	"homeTeam": {
+		"name": "Scheuren",
+		"clubNumber": 2223,
+		"points": 2,
+		"sets": 5,
+		"games": 35
+	},
+	"awayTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 1,
+		"sets": 2,
+		"games": 17
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900350,
+							"name": "Schiedsstuhl Flurin R8 (25141)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900343,
+							"name": "Seitenwechsel Yara R8 (28209)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900351,
+							"name": "Ballkind Greta R8 (28655)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900345,
+							"name": "Saitenbett Alma R9 (61237)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:2", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900350,
+							"name": "Schiedsstuhl Flurin R8 (25141)"
+						},
+						{
+							"id": 900352,
+							"name": "Matchball Hannes R9 (61469)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900345,
+							"name": "Saitenbett Alma R9 (61237)"
+						},
+						{
+							"id": 900343,
+							"name": "Seitenwechsel Yara R8 (28209)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "7:5", "5:10"]
+		}
+	],
+	"leagueId": 13,
+	"groupId": 64
+}

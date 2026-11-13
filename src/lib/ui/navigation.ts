@@ -26,6 +26,7 @@ const BEREICH: Record<string, Bereich> = {
 	'/clubmeisterschaft/[id]/kontakt': '/clubmeisterschaft',
 	'/interclub': '/interclub',
 	'/interclub/[id]': '/interclub',
+	'/interclub/[id]/[begegnung]': '/interclub',
 	'/profil': '/profil',
 	'/profil/email': '/profil'
 };
@@ -51,7 +52,8 @@ const EBENE: Record<string, number> = {
 	'/clubmeisterschaft/[id]/kategorie/[kid]': 2,
 	'/clubmeisterschaft/[id]/kontakt': 2,
 	'/interclub': 0,
-	'/interclub/[id]': 1
+	'/interclub/[id]': 1,
+	'/interclub/[id]/[begegnung]': 2
 };
 
 const FUSSZEILE = new Set(['/', '/login', '/login/mail', '/willkommen']);
@@ -99,6 +101,8 @@ export function elternVon(
 			return { route: '/clubmeisterschaft/[id]', text: null };
 		case '/interclub/[id]':
 			return { route: '/interclub', text: 'Interclub' };
+		case '/interclub/[id]/[begegnung]':
+			return { route: '/interclub/[id]', text: null };
 		default:
 			return null;
 	}

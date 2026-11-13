@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "02. Mai 2026",
+	"homeTeam": {
+		"name": "Schützenmatt SO",
+		"clubNumber": 2237,
+		"points": 6,
+		"sets": 13,
+		"games": 99
+	},
+	"awayTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 3,
+		"sets": 7,
+		"games": 74
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900213,
+							"name": "Grundlinie Mia R5 (3089)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900201,
+							"name": "Erfunden Anna R6 (5349)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "3:6", "6:2"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900214,
+							"name": "Aufschlag Nico R7 (10735)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900203,
+							"name": "Fiktiv Carla R7 (13149)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:3", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900215,
+							"name": "Vorhand Olivia R7 (11268)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900205,
+							"name": "Entwurf Elena R9 (32048)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:1", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900216,
+							"name": "Rückhand Pascal R8 (30659)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900217,
+							"name": "Volley Rahel R8 (26173)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "2:6", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900218,
+							"name": "Lob Silvan R8 (21549)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900209,
+							"name": "Attrappe Ines R9 (60852)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:2", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900219,
+							"name": "Stopp Tanja R9 (61275)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900211,
+							"name": "Spielball Klara R8 (28836)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "1:6", "3:6"]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900214,
+							"name": "Aufschlag Nico R7 (10735)"
+						},
+						{
+							"id": 900215,
+							"name": "Vorhand Olivia R7 (11268)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900205,
+							"name": "Entwurf Elena R9 (32048)"
+						},
+						{
+							"id": 900217,
+							"name": "Volley Rahel R8 (26173)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "7:5", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900220,
+							"name": "Satzball Urs R7 (15761)"
+						},
+						{
+							"id": 900221,
+							"name": "Tiebreak Vera R8 (21262)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900201,
+							"name": "Erfunden Anna R6 (5349)"
+						},
+						{
+							"id": 900211,
+							"name": "Spielball Klara R8 (28836)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900222,
+							"name": "Doppelfehler Willi R9 (61264)"
+						},
+						{
+							"id": 900223,
+							"name": "Linienrichter Yara R8 (22492)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900203,
+							"name": "Fiktiv Carla R7 (13149)"
+						},
+						{
+							"id": 900224,
+							"name": "Sandplatz Zeno R9 (34440)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "2:6", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 39
+}

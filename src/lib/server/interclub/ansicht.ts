@@ -3,12 +3,22 @@
 import { and, asc, desc, eq, inArray, max } from 'drizzle-orm';
 import { utcZuZuerich } from '../../anlass/zeit.ts';
 import type { Db } from '../db/index.ts';
-import { icBegegnung, icEntscheid, icRang, icStand, icTeam } from '../db/schema.ts';
+import {
+	icBegegnung,
+	icBericht,
+	icEntscheid,
+	icPartie,
+	icRang,
+	icSpieler,
+	icStand,
+	icTeam
+} from '../db/schema.ts';
 
 export type IcErgebnis = 'sieg' | 'niederlage' | 'unentschieden' | null; // null = noch offen
 export type IcArt = 'gruppe' | 'aufstieg' | 'abstieg';
 export type IcSpiel = {
 	teamId: number;
+	begegnungId: number;
 	liga: string;
 	art: IcArt;
 	runde: number;
@@ -81,6 +91,7 @@ function ergebnisAusSicht(
 function gruppenSpiel(
 	team: TeamZeile,
 	b: {
+		begegnungId: number;
 		runde: number;
 		datum: string;
 		heim: string;
@@ -94,6 +105,7 @@ function gruppenSpiel(
 	const eigen = tcoHeim || b.gast === team.teamName;
 	return {
 		teamId: team.teamId,
+		begegnungId: b.begegnungId,
 		liga: team.liga,
 		art: 'gruppe',
 		runde: b.runde,
@@ -114,6 +126,7 @@ function entscheidSpiel(team: TeamZeile, e: typeof icEntscheid.$inferSelect): Ic
 	const eigen = tcoHeim || e.gastId === team.teamId;
 	return {
 		teamId: team.teamId,
+		begegnungId: e.begegnungId,
 		liga: team.liga,
 		art: e.art,
 		runde: e.runde,
@@ -277,5 +290,135 @@ export async function ladeTeam(db: Db, teamId: number): Promise<IcTeam | null> {
 			eigen: r.stTeamId === teamId
 		})),
 		entscheide: entscheide.length ? { art: entscheide[0].art, spiele: entscheidSpiele } : null
+	};
+}
+
+export type IcPartie = {
+	position: number;
+	spieler: { name: string; klassierung: string }[]; // TCO-Spieler
+	gegner: { name: string; klassierung: string }[];
+	saetze: string[]; // aus Sicht des TCO
+	ergebnis: 'sieg' | 'niederlage' | null; // null = weder Aufgabe noch Satzmehrheit
+	aufgabe: 'tco' | 'gegner' | null;
+};
+export type IcBegegnung = {
+	saison: number;
+	teamId: number;
+	liga: string;
+	spiel: IcSpiel;
+	gegner: string;
+	saetze: { tco: number; gegner: number } | null; // null = kein Bericht
+	partien: { einzel: IcPartie[]; doppel: IcPartie[] } | null; // null = noch keine Einzelpartien
+};
+
+// Wer gewonnen hat: Bei einer Aufgabe die andere Seite, sonst die Mehrheit der Sätze.
+function partieErgebnis(saetze: string[], aufgabe: 'tco' | 'gegner' | null): IcPartie['ergebnis'] {
+	if (aufgabe) return aufgabe === 'gegner' ? 'sieg' : 'niederlage';
+	let wir = 0;
+	let sie = 0;
+	for (const s of saetze) {
+		const [a, b] = s.split(':').map(Number);
+		if (a > b) wir++;
+		else if (b > a) sie++;
+	}
+	return wir > sie ? 'sieg' : sie > wir ? 'niederlage' : null;
+}
+
+/** Eine eigene Begegnung (Gruppe oder Auf-/Abstieg) der neuesten Saison des Teams; sonst null. */
+export async function ladeBegegnung(
+	db: Db,
+	teamId: number,
+	begegnungId: number
+): Promise<IcBegegnung | null> {
+	const [team] = await db
+		.select()
+		.from(icTeam)
+		.where(eq(icTeam.teamId, teamId))
+		.orderBy(desc(icTeam.saison))
+		.limit(1);
+	if (!team) return null;
+	const saison = team.saison;
+
+	const [gruppe] = await db
+		.select()
+		.from(icBegegnung)
+		.where(
+			and(
+				eq(icBegegnung.saison, saison),
+				eq(icBegegnung.teamId, teamId),
+				eq(icBegegnung.begegnungId, begegnungId)
+			)
+		);
+	const [entscheid] = gruppe
+		? []
+		: await db
+				.select()
+				.from(icEntscheid)
+				.where(
+					and(
+						eq(icEntscheid.saison, saison),
+						eq(icEntscheid.teamId, teamId),
+						eq(icEntscheid.begegnungId, begegnungId)
+					)
+				);
+	const spiel = gruppe
+		? gruppenSpiel(team, gruppe)
+		: entscheid
+			? entscheidSpiel(team, entscheid)
+			: null;
+	if (!spiel || !spiel.eigen) return null;
+
+	const schluessel = { saison, teamId, begegnungId };
+	const wo = <T extends typeof icBericht | typeof icPartie | typeof icSpieler>(t: T) =>
+		and(
+			eq(t.saison, schluessel.saison),
+			eq(t.teamId, schluessel.teamId),
+			eq(t.begegnungId, schluessel.begegnungId)
+		);
+	const [bericht] = await db.select().from(icBericht).where(wo(icBericht));
+	const kopf = {
+		saison,
+		teamId,
+		liga: team.liga,
+		spiel,
+		gegner: spiel.tcoHeim ? spiel.gast : spiel.heim
+	};
+	if (!bericht) return { ...kopf, saetze: null, partien: null };
+
+	const partien = await db
+		.select()
+		.from(icPartie)
+		.where(wo(icPartie))
+		.orderBy(asc(icPartie.position));
+	const spieler = await db
+		.select({
+			art: icSpieler.art,
+			position: icSpieler.position,
+			seite: icSpieler.seite,
+			name: icSpieler.name,
+			klassierung: icSpieler.klassierung
+		})
+		.from(icSpieler)
+		.where(wo(icSpieler))
+		.orderBy(asc(icSpieler.nr));
+	const seite = (p: typeof icPartie.$inferSelect, s: 'tco' | 'gegner') =>
+		spieler
+			.filter((x) => x.art === p.art && x.position === p.position && x.seite === s)
+			.map((x) => ({ name: x.name, klassierung: x.klassierung }));
+	const partie = (p: typeof icPartie.$inferSelect): IcPartie => ({
+		position: p.position,
+		spieler: seite(p, 'tco'),
+		gegner: seite(p, 'gegner'),
+		saetze: p.saetze,
+		ergebnis: partieErgebnis(p.saetze, p.aufgabe),
+		aufgabe: p.aufgabe
+	});
+	return {
+		...kopf,
+		saetze: { tco: bericht.tcoSaetze, gegner: bericht.gegnerSaetze },
+		partien: {
+			einzel: partien.filter((p) => p.art === 'einzel').map(partie),
+			doppel: partien.filter((p) => p.art === 'doppel').map(partie)
+		}
 	};
 }

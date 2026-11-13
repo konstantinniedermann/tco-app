@@ -135,6 +135,30 @@ Fehler der App.
 
 ## Offen
 
+### 2026-11-13 — Interclub: Kleinigkeiten der Seite einer Begegnung
+
+**Thema:** Interclub
+
+**Fundort:** `src/routes/interclub/[id]/[begegnung]/+page.svelte`, `src/lib/server/interclub/swiss-tennis.ts` (`pruefeBericht`)
+
+**Beobachtung:** (1) «Einzelpartien noch nicht da» steht auch, wenn Swiss Tennis einen Bericht dauerhaft nicht hat (z. B. ältere Saisons nach `make ic-import JAHR=2021`). (2) Der Leertext «Nicht gespielt: Die Begegnung war nach den Einzeln entschieden.» erschiene auch im Reiter *Einzel*, wenn dort keine Partie steht (in den Daten 2026 nie). (3) Eine doppelte Position im selben Bericht meldet der Import als `stoerung` statt `form`; der alte Stand bleibt in beiden Fällen.
+
+**Ursprung:** #81 Teil 2, Code-Review (als klein eingestuft)
+
+**Einschätzung:** Beim Nachladen alter Saisons (1) prüfen; (2) und (3) nur bei Bedarf. Vorläufig.
+
+### 2026-11-13 — E2E «Reiter ist beim Antippen sofort aktiv» wackelt unter Last
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/bewegung.test.ts:93` (Zeitgrenze 500 ms auf `aria-current`)
+
+**Beobachtung:** Im vollen `make check` einmal rot auf Android, einzeln 3× grün (54/54). Die 500 ms reichen bei voller Last mit drei Workern knapp nicht.
+
+**Ursprung:** #81 Teil 2, `make check` vor dem Merge
+
+**Einschätzung:** Kein Fehler der App; bei Wiederholung die Zeitgrenze des Tests prüfen. Vorläufig.
+
 ### 2026-11-13 — Interclub: Randfälle der Übersicht und Import ohne Zeitgrenze
 
 **Thema:** Interclub

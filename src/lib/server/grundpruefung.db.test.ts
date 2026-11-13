@@ -202,9 +202,9 @@ const OHNE_BEIDES_ANDERS: Record<string, [number, unknown]> = {};
 describe('Grundprüfung der Schnittstellen', () => {
 	// Hier nur Zählung und Ausnahmen. Dass keine Route an den Listen vorbei eine Funktion ruft,
 	// sichert der dritte Test in `routen.test.ts`.
-	test('die Listen der Mitglieder haben 38 Einträge, und jede Ausnahme gehört zu einem', () => {
+	test('die Listen der Mitglieder haben 39 Einträge, und jede Ausnahme gehört zu einem', () => {
 		const namen = mitgliederDienste().map(([name]) => name);
-		expect(namen).toHaveLength(38);
+		expect(namen).toHaveLength(39);
 		// Jede Ausnahme gehört zu einem Eintrag; eine veraltete Ausnahme fällt so auf.
 		for (const name of Object.keys(OHNE_SITZUNG_ANDERS)) expect(namen).toContain(name);
 	});

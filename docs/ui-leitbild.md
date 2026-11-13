@@ -197,7 +197,9 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Verlauf-Nachricht | `.verlauf-nachricht` | Verwaltung, eine Nachricht im Verlauf eines Gesprächs (Kartenteil): Absenderzeile (`.leise`) und Text ohne Absatzabstand, dazwischen `--abstand-1` |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`, `.plakette-niederlage`, `.plakette-leise`) | Status immer mit Text (UI-05). Zustände der Mitgliedschaft: *ausgetreten* = `.plakette`, *wird gelöscht* = `.plakette-gesperrt`. Ergebnis im Interclub: *Sieg* = `.plakette-ok`, *Niederlage* = `.plakette-niederlage` (`--farbe-fehler` auf `--farbe-fehler-flaeche`), *Unentschieden* = `.plakette-leise` (`--farbe-text-leise` auf `--farbe-hintergrund`) |
 | Umschalter | `.umschalter` | Unterreiter mit Balken oben auf einer Seite (*Resultate · Teams*, *Spiele · Tabelle*): Tasten in einer Zeile mit Trennlinie `--farbe-linie` darunter, je mindestens `--tippflaeche` hoch; der aktive in `--farbe-marke`, fett, mit Balken `--rand-akzent` unten (`aria-pressed="true"`), die anderen in `--farbe-text-leise`; wechselt den Inhalt auf derselben Seite, ohne neue Stufe und ohne Seitenwechsel-Bewegung. Segmente (Knopfgruppe) sind verworfen |
-| Resultatzeile | `.resultat` (`.resultat-stand`, `.resultat-tag`) | eine Begegnung im Interclub, als Kartenteil in einer Karte: links fett die Liga (Übersicht) bzw. «Heim – Gast», darunter «Heim – Gast» bzw. leise Datum und *Heim*/*Auswärts*; Auf- und Abstiegsspiele mit Uhrzeit («<Wochentag> <TT.MM.>, <HH:MM>»), auch kommende in der Übersicht; rechts der Endstand in `--groesse-gross` (`.resultat-stand`) und darunter die Plakette des Ergebnisses. Endstand eines Siegs in `--farbe-marke`, einer Niederlage in `--farbe-fehler`, sonst `--farbe-text`; Begegnungen ohne TCO-Team ohne Farbe und Plakette, kommende ohne Endstand. Bricht bei grosser Schrift um: Endstand und Plakette rutschen unter den Text. In der Übersicht steht über den Begegnungen eines Tages leise und halbfett der Tag (`.resultat-tag`) |
+| Resultatzeile | `.resultat` (`.resultat-stand`, `.resultat-tag`) | eine Begegnung im Interclub, als Kartenteil in einer Karte: links fett die Liga (Übersicht) bzw. «Heim – Gast», darunter «Heim – Gast» bzw. leise Datum und *Heim*/*Auswärts*; Auf- und Abstiegsspiele mit Uhrzeit («<Wochentag> <TT.MM.>, <HH:MM>»), auch kommende in der Übersicht; rechts der Endstand in `--groesse-gross` (`.resultat-stand`) und darunter die Plakette des Ergebnisses. Endstand eines Siegs in `--farbe-marke`, einer Niederlage in `--farbe-fehler`, sonst `--farbe-text`; Begegnungen ohne TCO-Team ohne Farbe und Plakette, kommende ohne Endstand. Bricht bei grosser Schrift um: Endstand und Plakette rutschen unter den Text. In der Übersicht steht über den Begegnungen eines Tages leise und halbfett der Tag (`.resultat-tag`). Eine eigene, gespielte Begegnung ist ein Link auf ihre Seite (`a.resultat`), rechts mit dem Pfeil `.kachel-pfeil` |
+| Partie | `details.partie` (`.partie-titel`, `.partie-nr`, `.partie-saetze`, `.partie-gegner`) | eine Einzelpartie im Interclub als *Aufklappbereich* in der Karte, ab der zweiten als Kartenteil. Titelzeile in normaler Schrift: leise die Position, die TCO-Spieler «Nachname Vorname» wie bei Swiss Tennis mit leiser Klassierung (im Doppel untereinander), rechts fett die Sätze aus Sicht des TCO, bei Sieg in `--farbe-marke`, bei Niederlage in `--farbe-fehler`, dazu der *Vorlesetext* «gewonnen» bzw. «verloren»; Pfeil wie beim *Aufklappbereich*. Aufgeklappt, eingerückt unter die Namen: leise «gegen», die Gegner mit leiser Klassierung (im Doppel untereinander), bei einer Aufgabe darunter leise «Gegner hat aufgegeben» bzw. «TCO hat aufgegeben». Ohne eingetragenen TCO-Spieler (w.o.) steht statt der Namen «–», ohne gespielte Sätze statt der Sätze «w.o.» bei einer Aufgabe, sonst «–». Ohne Plakette und ohne Verein des Gegners |
+| Vorlesetext | `.vorlesen` | Text nur für Screenreader, auf dem Bildschirm unsichtbar; nur wo die Bedeutung sonst allein an einer Farbe hinge (z. B. *Partie*) |
 | Rangliste | `table.rangliste` | einzige Tabelle der Mitglieder-App: Kopfzeile *Rang · Team · Partien · Sätze* in `.leise`, Trennlinie `--farbe-linie`; Zahlen rechtsbündig in gleicher Ziffernbreite; Rang und Zahlen brechen nie um, der Teamname wird nie gekürzt (zu lang: er bricht um). Bei normaler Schrift ist jede Zeile einzeilig. Ist in der Karte weniger als `18rem` Platz (grosse Schrift oder schmaler Bildschirm; Container-Abfrage auf der Karte, der Wert steht nur in `basis.css`), wird jede Zeile zweizeilig: oben Rang und Team, darunter Partien und Sätze (in `--groesse-klein`); alle Zeilen teilen dieselben Spalten, die Rollen der Tabelle stehen ausdrücklich im Markup; die Zeile des eigenen Teams (`.rangliste-eigen`) fett auf `--farbe-marke-zart`. *Partien* = gewonnene : verlorene Einzelpartien |
 | Briefdruck | `.briefdruck` | nur Verwaltung: Druckansicht frisch erzeugter Briefe, siehe [Briefdruck](#briefdruck) |
 | Druckseite | `.druckseite` | nur Verwaltung: Auskunft über die Daten eines Mitglieds, siehe [Druckseite](#druckseite-auskunft); Klasse `.nicht-drucken` blendet unter `@media print` aus |
@@ -305,6 +307,16 @@ er nie.
   *Rangliste* (ohne Rangliste statt ihrer «Die Tabelle steht nach der ersten Runde.»); darunter,
   falls vorhanden, Karte «Aufstiegsspiele» bzw. «Abstiegsspiele» mit
   Datum und Uhrzeit. Gegner stehen nur mit Team- bzw. Vereinsnamen.
+- **Seite einer Begegnung** (`/interclub/[id]/[begegnung]`): erreichbar über die eigenen, gespielten
+  Begegnungen in *Spiele* und *Resultate* (auch Auf- und Abstiegsspiele). Zurück «‹ <Liga>», Titel
+  «<Heim> – <Gast>», darunter leise «<Wochentag> <TT.MM.> · Heim/Auswärts · Runde <n>», bei Auf- und
+  Abstiegsspielen mit Uhrzeit und «· Aufstiegsspiel» bzw. «· Abstiegsspiel» statt der Runde. Eine
+  Karte mit dem Endstand in einer Zeile: links leise «Endstand · Sätze <Heim>:<Gast>» (in derselben Reihenfolge wie der Endstand), rechts der
+  Endstand wie in der *Resultatzeile* mit Plakette. Umschalter **Einzel · Doppel**, darunter eine
+  Karte mit einer *Partie* je Einzel bzw. Doppel; gibt es keine Doppel, «Nicht gespielt: Die
+  Begegnung war nach den Einzeln entschieden.». Ohne Einzelpartien von Swiss Tennis statt
+  Umschalter und Karte: «Einzelpartien noch nicht da.». Entwurf: Design-Artifact «MyTCO Interclub»,
+  Reihe 7 (#81).
 - **Startseite:** „Hoi <Rufname, sonst Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
   „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben); Anlässe stehen als Kacheln unter „Jetzt aktuell" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
   stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
@@ -395,6 +407,7 @@ Verlauf zurück. Gebaut in `src/lib/ui/navigation.ts`.
 | Gespräch mit der Turnierleitung | CM | „‹ <Name der CM>" |
 | Interclub (Übersicht) | IC | — |
 | Seite eines Teams | IC | „‹ Interclub" |
+| Seite einer Begegnung | IC | „‹ <Liga>" |
 | Profil | Profil | — |
 | E-Mail ändern | Profil | „‹ Profil" |
 

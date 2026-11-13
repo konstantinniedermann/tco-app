@@ -48,6 +48,7 @@ Nur diese Felder (vom Vorstand bestätigt, K-07):
 | Anmeldungen zu Anlässen: Antwort *kommt* / *kommt nicht*, freiwillige Bemerkung (ohne Angaben zur Gesundheit) | Planung des Anlasses, z. B. der Generalversammlung (A-ANLASS-01) | nein |
 | *Erstellt von* am Anlass: der Mitglieder-Admin, der ihn angelegt hat | Rückfragen zum Anlass: nachvollziehen, wer ihn angelegt hat | — |
 | *Kontaktperson* am Turnier: ein CM-Admin, den der CM-Admin wählt | Mitglieder wissen, an wen sie sich bei Fragen zur CM wenden | nein |
+| Interclub-Einzelpartien der TCO-Teams (A-INTERCLUB-01): Einzel oder Doppel, Position, Sätze, w.o.; von den TCO-Spielern Vor- und Nachname, Klassierung, Rangliste-Nummer und Personennummer bei Swiss Tennis, übernommen von Swiss Tennis, wo sie öffentlich sind; von den Gegnern (keine Mitglieder) Vor- und Nachname und Klassierung, ohne Nummern | Resultate der TCO-Teams zeigen und über die Saisons verfolgen | — |
 | Austrittsdatum; Zeitpunkt der Löschvormerkung und Zustand davor | Löschfrist, Bedenkzeit, Rückgängig | — |
 | *Verwaltet von*: Elternteil, der das Konto eines Juniors führt (Vorschlag K-08) | Kind ohne eigenes Login | — |
 | Änderungsverlauf: wer hat wann welches Feld geändert oder welche Aktion ausgelöst, ohne Werte (SI-12) | Fehler und Missbrauch nachvollziehen, Abgleich mit Fairgate (A-MITGLIED-07) | — |
@@ -69,7 +70,7 @@ Bankdaten.
 | MyTCO-Admin | alles, was eine der anderen Rollen sieht, auch Bemerkungen zu Anlässen und Wildcard-Kommentare, und den Änderungsverlauf, auch die Gespräche mit der Turnierleitung; nur lesend. **Zweck:** die anderen Rollen unterstützen, Fehler suchen, die Rollenvergabe prüfen. *Ansicht als …* zeigt ihm nichts darüber hinaus. Die Rolle erhalten nur Personen, die MyTCO technisch betreuen: zum Start Projektleiter und Hauptansprechperson im Vorstand als Stellvertretung (K-18.4, vgl. SI-16), nicht weitere Vorstandsmitglieder; eine Abmachung des Vereins, die App erzwingt sie nicht |
 | CM-Admin | Namen aller Mitglieder; E-Mail und Telefon nur der Spieler eines Turniers: wer eine aktive Anmeldung hat (bestätigt oder als Wildcard beantragt, auch *sucht Partner*) oder an einer offenen Partner-Anfrage beteiligt ist, auch nach Austritt oder Löschvormerkung, bis zum 1.1. nach dem Turnierjahr (K-42, eingegrenzt); Anmeldungen mit Kommentar und Wildcard-Antrag; Klassierung, Geschlecht und Jahrgang der Spieler (zum Zuordnen in Kategorien). Die Klassierung korrigiert auch der CM-Admin (A-ANMELDUNG-06, Matrix in `rollen-und-rechte.md`); Geschlecht und Jahrgang ändert nur der Mitglieder-Admin; offene Partner-Anfragen (von, an, seit wann); alle Gespräche mit der Turnierleitung, auch wer geantwortet hat |
 | Lizenz-Admin | Name, E-Mail und Telefon der Mitglieder mit Lizenz oder Lizenzantrag (K-42, eingegrenzt; umgesetzt mit [#53](https://github.com/konstantinniedermann/tco-app/issues/53)); Lizenzanträge |
-| Alle Mitglieder | Name und Rufname, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft; Name und Rufname der Kontaktperson, die der CM-Admin für das Turnier gewählt hat (die Seite zeigt Vor- und Nachname), ohne E-Mail und Telefon, solange sie als Kontaktperson gültig ist (FR-55); wer in einer Doppelkategorie *sucht Partner* mit seinem Kommentar; bei der Wahl des Doppelpartners die Namen und die Klassierung der Mitglieder, die für die Kategorie passen, dazu den Vermerk *Klassierung fehlt* oder *Angaben fehlen* (im Doppel: Geschlecht fehlt) |
+| Alle Mitglieder | Name und Rufname, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft; Name und Rufname der Kontaktperson, die der CM-Admin für das Turnier gewählt hat (die Seite zeigt Vor- und Nachname), ohne E-Mail und Telefon, solange sie als Kontaktperson gültig ist (FR-55); wer in einer Doppelkategorie *sucht Partner* mit seinem Kommentar; bei der Wahl des Doppelpartners die Namen und die Klassierung der Mitglieder, die für die Kategorie passen, dazu den Vermerk *Klassierung fehlt* oder *Angaben fehlen* (im Doppel: Geschlecht fehlt); die Interclub-Resultate der TCO-Teams mit den Einzelpartien, darin Name und Klassierung der Spieler beider Teams (Rangliste- und Personennummer zeigt MyTCO nicht) |
 | Angefragter Doppelpartner | mit der Anfrage Name, Klassierung und Telefonnummer (sonst E-Mail) des Anfragenden, den dieser damit freigibt; die Kontaktdaten des Angefragten sieht der Anfragende erst nach dem Annehmen |
 | Gegner und Doppelpartner | E-Mail und Telefon, bis zum Ende der CM, ohne weitere Einwilligung (K-31); beim Doppelpartner erst nach dem Annehmen der Anfrage und nicht mehr, wenn der Partner ausgetreten oder zum Löschen vorgemerkt ist |
 | Alle, ohne Login | Kalenderdatei eines Anlasses über einen nicht erratbaren Link: Titel, Beginn, Ort, Einladung, keine Personendaten |
@@ -106,7 +107,7 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
   eines Turniers wird leer.
 - **Auskunft** (Mitglieder-Admin, DS-07): druckbare Seite mit allen gespeicherten Daten des Mitglieds
   ausser Geheimnissen; Verlauf-Einträge, in denen die Person nur Urheber bei anderen ist, fehlen (sie
-  nennen Dritte). Schritte der Verwaltung zeigt die Auskunft als «Mitgliederverwaltung», nicht mit dem
+  nennen Dritte). Interclub-Einzelpartien fehlen, weil sie nicht am Konto hängen (Abschnitt *Interclub*). Schritte der Verwaltung zeigt die Auskunft als «Mitgliederverwaltung», nicht mit dem
   Namen des Admins. Von der CM enthält sie nur bestätigte Anmeldungen, ohne Wildcard-Kommentar, weil
   der Mitglieder-Admin Wildcard-Anträge nicht sieht; die übrigen Anmeldungen, Wildcard-Anträge und Kommentare
   gibt auf Wunsch der CM-Admin bekannt, ebenso die Gespräche mit der Turnierleitung. Das Erstellen steht im Änderungsverlauf, auch wenn der MyTCO-Admin
@@ -115,6 +116,7 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
   im Zustand *Löschung vorgemerkt*, das Login ist gesperrt, und der Mitglieder-Admin kann die Löschung
   rückgängig machen; dann gilt wieder der Zustand davor (*aktiv*, oder *ausgetreten* mit dem alten Austrittsdatum). Nach der Woche wird gelöscht wie nach der Frist beim Austritt.
 - **CM-Anmeldungen:** bleiben beim vergangenen Turnier, wie Resultate. Wird ein Mitglied gelöscht, bleibt in seinen Anmeldungen nur der Name (der Wildcard-Kommentar einer Einzel-Anmeldung und der Kommentar *sucht Partner* werden geleert, Partner-Anfragen gelöscht); Grund: Die Turniergeschichte mit Namen und Resultaten ist bei Swiss Tennis ohnehin öffentlich einsehbar.
+- **Interclub:** Resultate und Einzelpartien bleiben über die Saisons, wie bei Swiss Tennis öffentlich. Sie hängen nicht an Konten: Austritt und Löschung eines Mitglieds ändern daran nichts, und die Auskunft (DS-07) enthält sie nicht. Ausblenden auf Wunsch gibt es nicht; MyTCO zeigt nicht mehr als Swiss Tennis.
 - **Partner-Anfragen:** Erledigte Anfragen werden sofort gelöscht (abgelehnte, zurückgezogene, verfallene); angenommene werden zur Anmeldung. Der Kommentar *sucht Partner* wird gelöscht, sobald ein Partner gefunden ist oder der Spieler abmeldet.
 - **Gespräche mit der Turnierleitung:** alle Gespräche eines Turniers samt Nachrichten ab dem 1.1. nach dem Turnierjahr (Schweizer Kalenderzeit), vom Zeitgeber; das Gespräch eines Mitglieds mit seiner endgültigen Löschung (nicht schon beim Vormerken). Antwortende Admins erscheinen danach als *gelöschtes Konto*. DS-05 gilt: Meldungen ohne Inhalt und ohne Namen.
 - **Ende der CM:** Kontaktdaten sind für Gegner nicht mehr sichtbar.
@@ -187,7 +189,9 @@ damit geschieht und wann es gelöscht wird.
 
 Junioren spielen ab der Clubmeisterschaft 2027 mit (K-46). Über Junioren speichert MyTCO nicht
 mehr als über Erwachsene. Sie werden zum Start mit allen Mitgliedern erfasst (K-17.1),
-spätestens bis zur CM-Anmeldung.
+spätestens bis zur CM-Anmeldung. Spielt ein Junior Interclub, sehen alle eingeloggten Mitglieder
+seinen Namen und seine Klassierung in den Einzelpartien, wie bei Swiss Tennis öffentlich; ebenso
+von Junioren anderer Vereine, die gegen den TCO spielen.
 
 **Vorschlag K-08:**
 
@@ -223,7 +227,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“). Ausnahme: Einzelmeldungen zum Doppel an die Beteiligten nennen den anderen Spieler (Partner, Anfragender oder Angefragter), nie dessen Telefon oder E-Mail und nie den Namen des CM-Admins (die Rolle «Der CM-Admin» darf stehen). E-Mails gehen je Empfänger einzeln, nie mehrere Adressen in einem Empfängerfeld. Bei Mitteilungen (FR-42) weist das Formular darauf hin; die Vorschau zeigt dem Mitglieder-Admin nur Namen, die er schon sehen darf |
 | DS-06 | Löschfristen aus [Löschen](#löschen) sind umgesetzt; Logs ohne Inhalte (keine Einmal-Codes, Kontaktdaten, Resultate); IP-Adressen höchstens 24 Stunden, auch in Logs |
 | DS-07 | Der Mitglieder-Admin kann die Daten eines Mitglieds als druckbare Auskunft ausgeben und das Mitglied löschen (umgesetzt, Etappe 3 von #43) |
-| DS-08 | Entwicklung und Tests nur mit erfundenen Personendaten; öffentliche Daten ohne Personennamen (z. B. Interclub-Resultate der Teams von Swiss Tennis) dürfen 1:1 verwendet werden |
+| DS-08 | Entwicklung und Tests nur mit erfundenen Personendaten; öffentliche Daten ohne Personennamen (z. B. Interclub-Resultate der Teams von Swiss Tennis) dürfen 1:1 verwendet werden; in Beispiel-Einzelpartien sind Namen und Personennummern der Spieler erfunden; Begegnungsnummer, Position, Klassierung und Rangliste-Nummer bleiben echt, obwohl sie über Swiss Tennis zur echten Person führen (dort öffentlich, Entscheid Projektleiter) |
 | DS-09 | Die Datenschutzerklärung ist in MyTCO auch ohne Login erreichbar |
 | DS-10 | Datensicherheit (verschlüsselte Verbindung, Einmal-Codes nur als Hash, Zugriff nach Rolle) regelt das [Sicherheitskonzept](sicherheitskonzept.md) |
 
@@ -242,6 +246,8 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
 
+- 13.11.2026: Auskunft ohne Interclub-Einzelpartien (hängen nicht am Konto, in der Erklärung genannt); DS-08: Beispiel-Einzelpartien mit echten Begegnungsnummern, Positionen und Ranglisten (Entscheid Projektleiter, #81 Teil 2).
+- 13.11.2026: Interclub-Einzelpartien (Entscheid Projektleiter, #81 Teil 2): Name, Klassierung, Rangliste- und Personennummer der TCO-Spieler, auch von Junioren; sichtbar für alle eingeloggten Mitglieder nur Name und Klassierung; von den Gegnern (keine Mitglieder, auch Junioren) Name und Klassierung, ohne Nummern, wie bei Swiss Tennis öffentlich; bleiben über die Saisons; kein Ausblenden auf Wunsch.
 - 13.11.2026: DS-08 präzisiert (Entscheid Projektleiter): gilt für Personendaten; öffentliche Daten ohne Personennamen wie die Interclub-Resultate der Teams dürfen 1:1 in Tests und Seed (#81, Teil 1 ohne Spielernamen).
 - 09.11.2026: Kontaktdaten für CM- und Lizenz-Admin nach Aufgabe statt von allen (K-42 eingegrenzt, Entscheid Projektleiter): CM-Admin nur die Spieler eines Turniers (aktive Anmeldung oder offene Partner-Anfrage) bis zum 1.1. nach dem Turnierjahr, Lizenz-Admin nur Mitglieder mit Lizenz oder Lizenzantrag.
 - 09.11.2026: Zusagen an den Code angeglichen (Beobachtungs-Auswertung, Entscheid Projektleiter): Alle Mitglieder bekommen Name und Rufname der Kontaktperson, solange sie nach FR-55 gültig ist (aktiv, Konto nicht gesperrt, CM-Admin); das Öffnen einer Auskunft steht auch beim nur lesenden MyTCO-Admin und in der «Ansicht als …» im Änderungsverlauf.

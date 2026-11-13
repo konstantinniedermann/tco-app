@@ -1171,6 +1171,21 @@ a.kachel.karte-teil {
 	color: var(--farbe-fehler);
 }
 
+/* Eigene, gespielte Begegnung als Link auf ihre Seite; der Pfeil bleibt rechts neben dem Endstand */
+a.resultat {
+	color: var(--farbe-text);
+	text-decoration: none;
+	min-height: var(--tippflaeche);
+}
+
+a.resultat:active {
+	background-color: var(--farbe-marke-zart);
+}
+
+a.resultat > .kachel-pfeil {
+	flex: 0 0 auto;
+}
+
 /* Tag über den Begegnungen eines Tages (Übersicht); direkt unter dem Kartentitel ohne Abstand */
 .resultat-tag {
 	margin: var(--abstand-4) 0 0;
@@ -1179,6 +1194,57 @@ a.kachel.karte-teil {
 
 h2 + .resultat-tag {
 	margin-top: 0;
+}
+
+/* Partie: eine Einzelpartie im Interclub als Aufklappbereich; Titelzeile in normaler Schrift */
+details.klappe.partie > .partie-titel {
+	justify-content: flex-start;
+	font-weight: 400;
+}
+
+.partie-nr {
+	min-width: 1.2em;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+.partie-titel > .partie-nr + * {
+	flex: 1;
+	min-width: 0;
+}
+
+.partie-saetze {
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+	font-weight: 700;
+}
+
+.partie-saetze[data-ergebnis='sieg'] {
+	color: var(--farbe-marke);
+}
+
+.partie-saetze[data-ergebnis='niederlage'] {
+	color: var(--farbe-fehler);
+}
+
+/* Gegner unter die Namen eingerückt: Breite der Position plus Abstand der Titelzeile */
+.partie-gegner {
+	margin: 0;
+	padding: 0 0 var(--abstand-2) calc(1.2em + var(--abstand-3));
+}
+
+details.partie[open] > .partie-titel {
+	margin-bottom: var(--abstand-1);
+}
+
+/* Vorlesetext: nur für Screenreader, auf dem Bildschirm unsichtbar */
+.vorlesen {
+	position: absolute;
+	width: 0.0625rem;
+	height: 0.0625rem;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
 }
 
 /* Rangliste: einzige Tabelle der App; Rang und Zahlen brechen nie um, der Teamname wird nie gekürzt */

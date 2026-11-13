@@ -126,6 +126,7 @@ import {
 } from './login/schnittstellen.ts';
 import {
 	getInterclub,
+	getInterclubBegegnung,
 	getInterclubTeam,
 	INTERCLUB_SCHNITTSTELLEN
 } from './interclub/schnittstellen.ts';
@@ -277,6 +278,9 @@ const ROUTEN: Record<string, Partial<Record<Methode, Verdrahtung>> | typeof EIGE
 	'/api/cm/kategorien/[id]/wildcard': { POST: [postCmWildcard, 'cm'] },
 	'/api/interclub': { GET: [getInterclub, 'interclub'] },
 	'/api/interclub/teams/[id]': { GET: [getInterclubTeam, 'interclub'] },
+	'/api/interclub/teams/[id]/begegnungen/[begegnung]': {
+		GET: [getInterclubBegegnung, 'interclub']
+	},
 	'/api/kalender/[kennung]': { GET: [getKalender, 'anlass'] },
 	'/api/kontakt': EIGEN,
 	'/api/login/brief': { POST: [postBriefLogin, 'login'] },

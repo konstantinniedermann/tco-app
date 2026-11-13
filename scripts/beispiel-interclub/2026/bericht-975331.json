@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "16. Mai 2026",
+	"homeTeam": {
+		"name": "Genève E.V.",
+		"clubNumber": 3022,
+		"points": 6,
+		"sets": 12,
+		"games": 94
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 3,
+		"sets": 9,
+		"games": 88
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900259,
+							"name": "Satzball Tanja R2 (491)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900240,
+							"name": "Punktgewinn Remo R3 (1261)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:2", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900260,
+							"name": "Tiebreak Urs R2 (382)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900238,
+							"name": "Platzhalter Noah R1 (177)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:7", "6:3", "6:3"]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900261,
+							"name": "Doppelfehler Vera R5 (2649)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900242,
+							"name": "Fiktiv Beat R3 (846)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "1:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900262,
+							"name": "Linienrichter Willi R5 (2761)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900248,
+							"name": "Attrappe Hugo R4 (1946)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "1:6", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900263,
+							"name": "Sandplatz Yara R5 (3951)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900246,
+							"name": "Modell Fabio R4 (1880)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:2", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900264,
+							"name": "Hallenbach Zeno R6 (8531)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900250,
+							"name": "Spielball Jonas R6 (9775)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "4:6", "6:2"]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900259,
+							"name": "Satzball Tanja R2 (491)"
+						},
+						{
+							"id": 900260,
+							"name": "Tiebreak Urs R2 (382)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900238,
+							"name": "Platzhalter Noah R1 (177)"
+						},
+						{
+							"id": 900242,
+							"name": "Fiktiv Beat R3 (846)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "3:6", "10:5"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900261,
+							"name": "Doppelfehler Vera R5 (2649)"
+						},
+						{
+							"id": 900265,
+							"name": "Seitenwechsel Alma R9 (34628)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900240,
+							"name": "Punktgewinn Remo R3 (1261)"
+						},
+						{
+							"id": 900250,
+							"name": "Spielball Jonas R6 (9775)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "0:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900263,
+							"name": "Sandplatz Yara R5 (3951)"
+						},
+						{
+							"id": 900264,
+							"name": "Hallenbach Zeno R6 (8531)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900248,
+							"name": "Attrappe Hugo R4 (1946)"
+						},
+						{
+							"id": 900246,
+							"name": "Modell Fabio R4 (1880)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "6:3", ""]
+		}
+	],
+	"leagueId": 13,
+	"groupId": 2
+}

@@ -2,12 +2,23 @@
 // einer Transaktion ersetzen. Bei jeder Abweichung bleibt der alte Stand unverändert.
 import { and, eq } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
-import { icBegegnung, icEntscheid, icRang, icStand, icTeam } from '../db/schema.ts';
+import {
+	icBegegnung,
+	icBericht,
+	icEntscheid,
+	icPartie,
+	icRang,
+	icSpieler,
+	icStand,
+	icTeam
+} from '../db/schema.ts';
 import {
 	istNochNichtFreigeschaltet,
+	pruefeBericht,
 	pruefeClubTeams,
 	pruefeTeamResultate,
 	WETTBEWERBE,
+	type StBericht,
 	type StTeam,
 	type StTeamResultate,
 	type Wettbewerb
@@ -39,11 +50,13 @@ export async function importiereSaison(
 		erste = false;
 		try {
 			const r = await d.holen(url);
-			let json: unknown = null;
+			// Unlesbarer Körper: undefined, nie null. `null` heisst bei einem Spielbericht «fehlt noch»;
+			// eine HTML-Fehlerseite darf keinen gespeicherten Bericht still löschen.
+			let json: unknown = undefined;
 			try {
 				json = await r.json();
 			} catch {
-				json = null;
+				json = undefined;
 			}
 			return { status: r.status, json };
 		} catch {
@@ -62,7 +75,11 @@ export async function importiereSaison(
 		if (!teams || !eindeutig(teams.map((t) => t.teamId))) return 'form';
 		if (teams.length === 0) return 'keine-teams';
 
-		const ergebnisse: { team: StTeam; daten: StTeamResultate }[] = [];
+		const ergebnisse: {
+			team: StTeam;
+			daten: StTeamResultate;
+			berichte: { begegnungId: number; bericht: StBericht }[];
+		}[] = [];
 		for (const team of teams) {
 			const a = await abrufen(
 				`${SWISS_TENNIS}/team-results?teamId=${team.teamId}&competition=${w}&year=${jahr}&lang=de`
@@ -76,13 +93,43 @@ export async function importiereSaison(
 				!eindeutig(daten.entscheide.map((e) => e.begegnungId))
 			)
 				return 'form';
-			ergebnisse.push({ team, daten });
+
+			// Spielberichte der eigenen, gespielten Begegnungen: Gruppe über `encounter-results`,
+			// Auf-/Abstieg über `tableau-results`. Ohne Bericht (null) bleibt die Begegnung ohne Partien.
+			const gespielt = (a: number | null, b: number | null) => a !== null && b !== null;
+			const abfragen = [
+				...daten.begegnungen
+					.filter(
+						(b) =>
+							(b.heim === daten.teamName || b.gast === daten.teamName) &&
+							gespielt(b.heimPunkte, b.gastPunkte)
+					)
+					.map((b) => ({ begegnungId: b.begegnungId, pfad: 'encounter-results' })),
+				...daten.entscheide
+					.filter(
+						(e) =>
+							(e.heim.stTeamId === team.teamId || e.gast.stTeamId === team.teamId) &&
+							gespielt(e.heim.punkte, e.gast.punkte)
+					)
+					.map((e) => ({ begegnungId: e.begegnungId, pfad: 'tableau-results' }))
+			];
+			const berichte: { begegnungId: number; bericht: StBericht }[] = [];
+			for (const { begegnungId, pfad } of abfragen) {
+				const b = await abrufen(
+					`${SWISS_TENNIS}/${pfad}?encounterId=${begegnungId}&competition=${w}&year=${jahr}&lang=de`
+				);
+				if (!b || b.status !== 200) return 'stoerung';
+				const bericht = pruefeBericht(b.json, verein);
+				if (bericht === null) return 'form';
+				if (bericht !== 'fehlt') berichte.push({ begegnungId, bericht });
+			}
+			ergebnisse.push({ team, daten, berichte });
 		}
 
 		try {
 			await d.db.transaction(async (tx) => {
 				await tx.delete(icTeam).where(and(eq(icTeam.saison, jahr), eq(icTeam.wettbewerb, w)));
-				for (const { team, daten } of ergebnisse) {
+				for (const { team, daten, berichte } of ergebnisse) {
 					const schluessel = { saison: jahr, teamId: team.teamId };
 					await tx.insert(icTeam).values({
 						...schluessel,
@@ -92,6 +139,46 @@ export async function importiereSaison(
 						gruppe: team.gruppe,
 						reihenfolge: team.reihenfolge
 					});
+					for (const { begegnungId, bericht } of berichte) {
+						const b = { ...schluessel, begegnungId };
+						await tx.insert(icBericht).values({
+							...b,
+							tcoHeim: bericht.tcoHeim,
+							tcoSaetze: bericht.saetze.tco,
+							gegnerSaetze: bericht.saetze.gegner,
+							tcoGames: bericht.games.tco,
+							gegnerGames: bericht.games.gegner
+						});
+						if (!bericht.partien.length) continue;
+						await tx.insert(icPartie).values(
+							bericht.partien.map((p) => ({
+								...b,
+								art: p.art,
+								position: p.position,
+								saetze: p.saetze,
+								aufgabe: p.aufgabe
+							}))
+						);
+						const spieler = bericht.partien.flatMap((p) => [
+							...p.spieler.map((s, i) => ({
+								...b,
+								art: p.art,
+								position: p.position,
+								seite: 'tco' as const,
+								nr: i + 1,
+								...s
+							})),
+							...p.gegner.map((s, i) => ({
+								...b,
+								art: p.art,
+								position: p.position,
+								seite: 'gegner' as const,
+								nr: i + 1,
+								...s
+							}))
+						]);
+						if (spieler.length) await tx.insert(icSpieler).values(spieler);
+					}
 					if (daten.begegnungen.length)
 						await tx
 							.insert(icBegegnung)

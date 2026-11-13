@@ -1,13 +1,17 @@
 // Anfragen der Mitglieder an `/api/interclub/…` und ihre Antworten als typisierte Ergebnisse.
 import { rufeAb, woerterAus, type Holen, type Json, type Vertrag } from '../abruf.ts';
 import type {
+	IcBegegnung,
 	IcKachel,
+	IcPartie,
 	IcRangZeile,
 	IcSpiel,
 	IcTeam,
 	IcUebersicht
 } from '../server/interclub/ansicht.ts';
 
+export type Begegnung = Json<IcBegegnung>;
+export type Partie = Json<IcPartie>;
 export type Uebersicht = Json<IcUebersicht>;
 export type Team = Json<IcTeam>;
 export type Spiel = Json<IcSpiel>;
@@ -34,3 +38,7 @@ export const holeInterclub = (holen: Holen = fetch) => hole<Uebersicht>('/api/in
 
 export const holeInterclubTeam = (id: number, holen: Holen = fetch) =>
 	hole<Team>(`/api/interclub/teams/${id}`, holen);
+
+/** `nicht-gefunden`: keine eigene Begegnung dieses Teams. */
+export const holeInterclubBegegnung = (teamId: number, begegnungId: number, holen: Holen = fetch) =>
+	hole<Begegnung>(`/api/interclub/teams/${teamId}/begegnungen/${begegnungId}`, holen);

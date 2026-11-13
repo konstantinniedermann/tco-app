@@ -108,3 +108,39 @@ export const nachTag = <T extends { datum: string }>(spiele: readonly T[]) =>
 /** Aufeinanderfolgende Spiele derselben Runde, in der gelieferten Reihenfolge. */
 export const nachRunde = <T extends { runde: number }>(spiele: readonly T[]) =>
 	gruppiere(spiele, (s) => s.runde).map(({ k, spiele }) => ({ runde: k, spiele }));
+
+// Seite einer Begegnung (UI-Leitbild, Seite einer Begegnung, Baustein Partie).
+const ART_TEXT: Record<Entscheid, string> = {
+	aufstieg: 'Aufstiegsspiel',
+	abstieg: 'Abstiegsspiel'
+};
+
+/** «Sa 02.05. · Heim · Runde 1»; Auf-/Abstieg «So 07.06., 09:00 · Auswärts · Aufstiegsspiel». */
+export function begegnungText(s: {
+	datum: string;
+	zeit: string | null;
+	tcoHeim: boolean;
+	art: 'gruppe' | Entscheid;
+	runde: number;
+}): string {
+	const letztes = s.art === 'gruppe' ? `Runde ${s.runde}` : ART_TEXT[s.art];
+	return [datumText(s.datum, s.zeit), ortText(s.tcoHeim), letztes].join(' · ');
+}
+
+/** Sätze in der Reihenfolge Heim:Gast, wie der Endstand daneben. */
+export function endstandText(saetze: { tco: number; gegner: number }, tcoHeim: boolean): string {
+	const [heim, gast] = tcoHeim ? [saetze.tco, saetze.gegner] : [saetze.gegner, saetze.tco];
+	return `Endstand · Sätze ${heim}:${gast}`;
+}
+
+/** Wer aufgegeben hat, als Wort unter dem Gegner; ohne Aufgabe null. */
+export function aufgabeText(aufgabe: 'tco' | 'gegner' | null): string | null {
+	if (aufgabe === null) return null;
+	return aufgabe === 'gegner' ? 'Gegner hat aufgegeben' : 'TCO hat aufgegeben';
+}
+
+/** Vorlesetext zur Farbe der Sätze: Die Bedeutung hängt nicht allein an der Farbe. */
+export function vorlesetext(ergebnis: 'sieg' | 'niederlage' | null): string {
+	if (ergebnis === null) return '';
+	return ergebnis === 'sieg' ? 'gewonnen' : 'verloren';
+}

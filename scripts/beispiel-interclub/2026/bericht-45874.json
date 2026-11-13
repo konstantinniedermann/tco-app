@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "14. Juni 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 5,
+		"sets": 11,
+		"games": 81
+	},
+	"awayTeam": {
+		"name": "Böckten",
+		"clubNumber": 2234,
+		"points": 4,
+		"sets": 9,
+		"games": 89
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900139,
+							"name": "Volley Tanja R5 (3269)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900384,
+							"name": "Saitenbett Zeno R5 (2908)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "7:6", "6:4"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900137,
+							"name": "Vorhand Rahel R5 (2818)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900385,
+							"name": "Griffband Alma R5 (4129)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:0", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900143,
+							"name": "Tiebreak Yara R7 (10525)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900386,
+							"name": "Schlägerkopf Bruno R6 (6070)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "0:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900141,
+							"name": "Stopp Vera R5 (4625)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900387,
+							"name": "Filzball Cleo R5 (4288)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "0:6", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900377,
+							"name": "Tiebreak Rahel R5 (4831)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900388,
+							"name": "Netzpfosten Dominik R7 (12514)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "7:5", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900145,
+							"name": "Linienrichter Alma R7 (13521)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900389,
+							"name": "Schiedsstuhl Edith R6 (6611)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "6:3", "1:6"]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900137,
+							"name": "Vorhand Rahel R5 (2818)"
+						},
+						{
+							"id": 900145,
+							"name": "Linienrichter Alma R7 (13521)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900386,
+							"name": "Schlägerkopf Bruno R6 (6070)"
+						},
+						{
+							"id": 900387,
+							"name": "Filzball Cleo R5 (4288)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "2:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900139,
+							"name": "Volley Tanja R5 (3269)"
+						},
+						{
+							"id": 900160,
+							"name": "Platzhalter Remo R6 (8727)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900384,
+							"name": "Saitenbett Zeno R5 (2908)"
+						},
+						{
+							"id": 900389,
+							"name": "Schiedsstuhl Edith R6 (6611)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:4", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900141,
+							"name": "Stopp Vera R5 (4625)"
+						},
+						{
+							"id": 900377,
+							"name": "Tiebreak Rahel R5 (4831)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900390,
+							"name": "Ballkind Flurin R8 (22329)"
+						},
+						{
+							"id": 900391,
+							"name": "Matchball Greta R7 (11014)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:2", ""]
+		}
+	],
+	"leagueId": 16,
+	"groupId": -1
+}
