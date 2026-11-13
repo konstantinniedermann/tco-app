@@ -22,7 +22,7 @@
 		fehler = null;
 		// Der Server ignoriert Gross-/Kleinschreibung, Leerzeichen und Bindestriche (UI-07).
 		const r = await sende('/api/login/brief', { code });
-		if (r.ergebnis === 'ok') {
+		if (r.art === 'ok') {
 			// Eine offene Mail-Anfrage braucht es nach dem Login nicht mehr.
 			vergissMailanfrage(holeSpeicher());
 			await goto(resolve('/'));

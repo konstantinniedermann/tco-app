@@ -84,7 +84,7 @@ export async function richtePasskeyEin(
 		return istAbbruch(fehler) ? 'abgebrochen' : 'fehler';
 	}
 	const r = await sende('/api/passkey/einrichten', { antwort }, holen);
-	return r.ergebnis === 'ok' ? 'ok' : 'fehler';
+	return r.art === 'ok' ? 'ok' : 'fehler';
 }
 
 export async function meldeMitPasskeyAn(
@@ -109,9 +109,7 @@ export async function meldeMitPasskeyAn(
 		return istAbbruch(fehler) ? 'abgebrochen' : 'falsch';
 	}
 	const r = await sende('/api/passkey/anmelden', { vorgang: inhalt.vorgang, antwort }, holen);
-	return r.ergebnis === 'ok' || r.ergebnis === 'falsch' || r.ergebnis === 'zu-viele'
-		? r.ergebnis
-		: 'stoerung';
+	return r.art === 'ok' || r.art === 'falsch' || r.art === 'zu-viele' ? r.art : 'stoerung';
 }
 
 export async function ladePasskeys(holen: Holen = fetch): Promise<PasskeyAnzeige[] | null> {

@@ -90,19 +90,19 @@ describe('A-KONTO-01: eigene Angaben laden', () => {
 
 	it('Rufname speichern: ok, Meldung des Servers bei Eingabefehler, sonst Störung', async () => {
 		const { aufrufe, holen } = holer(json(200, { rufname: 'Hannes' }));
-		expect(await speichereRufname('Hannes', holen)).toEqual({ ergebnis: 'ok', rufname: 'Hannes' });
+		expect(await speichereRufname('Hannes', holen)).toEqual({ art: 'ok', rufname: 'Hannes' });
 		expect(aufrufe[0].pfad).toBe('/api/profil/rufname');
 		expect(await speichereRufname('', holer(json(200, { rufname: null })).holen)).toEqual({
-			ergebnis: 'ok',
+			art: 'ok',
 			rufname: null
 		});
 		const zuLang = json(400, { fehler: 'eingabe', felder: { rufname: 'Höchstens 10 Zeichen.' } });
 		expect(await speichereRufname('x', holer(zuLang).holen)).toEqual({
-			ergebnis: 'eingabe',
+			art: 'eingabe',
 			fehler: 'Höchstens 10 Zeichen.'
 		});
 		expect(await speichereRufname('x', holer(json(500, {})).holen)).toEqual({
-			ergebnis: 'stoerung'
+			art: 'stoerung'
 		});
 	});
 });
@@ -111,7 +111,7 @@ describe('A-KONTO-01: eigene Angaben speichern', () => {
 	it('schickt Änderung und geladenen Stand als JSON', async () => {
 		const { aufrufe, holen } = holer(json(200, { geaendert: ['telefon'] }));
 		const r = await speichereAngaben({ telefon: '079 000 00 00' }, LEA, holen);
-		expect(r).toEqual({ ergebnis: 'ok' });
+		expect(r).toEqual({ art: 'ok' });
 		expect(aufrufe[0].pfad).toBe('/api/profil');
 		expect(aufrufe[0].init.method).toBe('POST');
 		expect(JSON.parse(aufrufe[0].init.body as string)).toEqual({
@@ -122,24 +122,24 @@ describe('A-KONTO-01: eigene Angaben speichern', () => {
 
 	it('409 → veraltet', async () => {
 		const r = await speichereAngaben({}, LEA, holer(json(409, { fehler: 'veraltet' })).holen);
-		expect(r).toEqual({ ergebnis: 'veraltet' });
+		expect(r).toEqual({ art: 'veraltet' });
 	});
 
 	it('400 eingabe mit Feldern', async () => {
 		const antwort = json(400, { fehler: 'eingabe', felder: { plz: '4 Ziffern' } });
 		const r = await speichereAngaben({ plz: '46' }, LEA, holer(antwort).holen);
-		expect(r).toEqual({ ergebnis: 'eingabe', felder: { plz: '4 Ziffern' }, fremd: false });
+		expect(r).toEqual({ art: 'eingabe', felder: { plz: '4 Ziffern' }, fremd: false });
 	});
 
 	it('400 eingabe mit fremd: Altdaten in einem Feld, das das Mitglied nicht ändert', async () => {
 		const antwort = json(400, { fehler: 'eingabe', felder: {}, fremd: true });
 		const r = await speichereAngaben({ telefon: '' }, LEA, holer(antwort).holen);
-		expect(r).toEqual({ ergebnis: 'eingabe', felder: {}, fremd: true });
+		expect(r).toEqual({ art: 'eingabe', felder: {}, fremd: true });
 	});
 
 	it('Netzfehler → stoerung', async () => {
 		const r = await speichereAngaben({}, LEA, holer(new TypeError('offline')).holen);
-		expect(r).toEqual({ ergebnis: 'stoerung' });
+		expect(r).toEqual({ art: 'stoerung' });
 	});
 });
 
@@ -232,7 +232,7 @@ describe('Profil: Ränder der Deutung', () => {
 	const speichere = async (r: Response) => speichereAngaben({ ort: 'Olten' }, LEA, holer(r).holen);
 	const wechsel = async (r: Response) => starteWechsel('neu@example.org', holer(r).holen);
 	const rufname = async (r: Response) => speichereRufname('Lea', holer(r).holen);
-	const STOERUNG = { ergebnis: 'stoerung' };
+	const STOERUNG = { art: 'stoerung' };
 
 	it('401 und 404 sind Störung, beim Speichern und beim E-Mail-Wechsel', async () => {
 		expect(await speichere(json(401, { fehler: 'abgemeldet' }))).toEqual(STOERUNG);
@@ -248,18 +248,18 @@ describe('Profil: Ränder der Deutung', () => {
 
 	it('jedes 2xx ist ok, auch ohne lesbaren Körper und ohne Körper', async () => {
 		expect(await bestaetigeWechsel('1', '2', holer(unlesbar(200)).holen)).toBe('ok');
-		expect(await rufname(unlesbar(200))).toEqual({ ergebnis: 'ok', rufname: null });
-		expect(await speichere(new Response(null, { status: 204 }))).toEqual({ ergebnis: 'ok' });
+		expect(await rufname(unlesbar(200))).toEqual({ art: 'ok', rufname: null });
+		expect(await speichere(new Response(null, { status: 204 }))).toEqual({ art: 'ok' });
 	});
 
 	it('eingabe ohne felder ist gültig, mit drei Folgen', async () => {
 		expect(await speichere(json(400, { fehler: 'eingabe' }))).toEqual({
-			ergebnis: 'eingabe',
+			art: 'eingabe',
 			felder: {},
 			fremd: false
 		});
 		expect(await rufname(json(400, { fehler: 'eingabe' }))).toEqual({
-			ergebnis: 'eingabe',
+			art: 'eingabe',
 			fehler: 'Ungültig.'
 		});
 		expect(await wechsel(json(400, { fehler: 'eingabe' }))).toBe('eingabe');
@@ -267,7 +267,7 @@ describe('Profil: Ränder der Deutung', () => {
 
 	it('eingabe mit felder als Liste: leere Feldmeldungen', async () => {
 		expect(await speichere(ungeprueft(400, { fehler: 'eingabe', felder: ['plz'] }))).toEqual({
-			ergebnis: 'eingabe',
+			art: 'eingabe',
 			felder: {},
 			fremd: false
 		});

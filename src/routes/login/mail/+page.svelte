@@ -40,7 +40,7 @@
 		if (email !== leseMailanfrage(speicher, Date.now())) vergissMailanfrage(speicher);
 		const r = await sende('/api/login/mail-code', { email });
 		laeuft = false;
-		if (r.ergebnis === 'ok') {
+		if (r.art === 'ok') {
 			merkeMailanfrage(speicher, email, Date.now());
 			code = '';
 			await wechsle('code');
@@ -56,7 +56,7 @@
 		laeuft = true;
 		fehler = null;
 		const r = await sende('/api/login/mail', { email, code });
-		if (r.ergebnis === 'ok') {
+		if (r.art === 'ok') {
 			vergissMailanfrage(speicher);
 			await goto(resolve('/'));
 			return;

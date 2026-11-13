@@ -5,11 +5,11 @@ import { rufeAb, type Holen, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post';
 
 export type Ergebnis =
-	| { ergebnis: 'ok' }
-	| { ergebnis: 'falsch' }
-	| { ergebnis: 'benutzt'; kontakt: string }
-	| { ergebnis: 'zu-viele' }
-	| { ergebnis: 'stoerung' };
+	| { art: 'ok' }
+	| { art: 'falsch' }
+	| { art: 'benutzt'; kontakt: string }
+	| { art: 'zu-viele' }
+	| { art: 'stoerung' };
 
 export const MELDUNG = {
 	briefFalsch: 'Dieser Code stimmt nicht. Prüf ihn oder lass dir einen neuen per E-Mail schicken.',
@@ -32,22 +32,22 @@ export async function sende(pfad: string, inhalt: object, holen: Holen = fetch):
 	const r = await rufeAb<unknown, Wort>(pfad, jsonPost(inhalt), holen, VERTRAG);
 	switch (r.art) {
 		case 'ok':
-			return { ergebnis: 'ok' };
+			return { art: 'ok' };
 		case 'falsch':
 		case 'zu-viele':
-			return { ergebnis: r.art };
+			return { art: r.art };
 		case 'benutzt':
 			return typeof r.koerper.kontakt === 'string'
-				? { ergebnis: 'benutzt', kontakt: r.koerper.kontakt }
-				: { ergebnis: 'stoerung' };
+				? { art: 'benutzt', kontakt: r.koerper.kontakt }
+				: { art: 'stoerung' };
 		default:
-			return { ergebnis: 'stoerung' };
+			return { art: 'stoerung' };
 	}
 }
 
 /** Meldung beim Feld; `falsch` ist je nach Seite verschieden. */
 export function meldung(r: Ergebnis, falsch: string): string | null {
-	switch (r.ergebnis) {
+	switch (r.art) {
 		case 'ok':
 			return null;
 		case 'falsch':

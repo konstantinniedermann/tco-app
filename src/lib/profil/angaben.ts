@@ -14,9 +14,9 @@ export type Ergebnis =
 	'ok' | 'veraltet' | 'eingabe' | 'gleich' | 'zu-viele' | 'falsch' | 'stoerung';
 
 export type Speichern =
-	| { ergebnis: 'ok' | 'veraltet' | 'stoerung' }
+	| { art: 'ok' | 'veraltet' | 'stoerung' }
 	| {
-			ergebnis: 'eingabe';
+			art: 'eingabe';
 			felder: Partial<Record<EigenesFeld, string>>;
 			/** Die Prüfung scheitert an einem Feld, das nur der Mitglieder-Admin ändert (Altdaten). */
 			fremd: boolean;
@@ -91,11 +91,11 @@ async function schicke(
 	pfad: string,
 	inhalt: object,
 	holen: Holen
-): Promise<{ ergebnis: Ergebnis; koerper: Record<string, unknown> }> {
+): Promise<{ art: Ergebnis; koerper: Record<string, unknown> }> {
 	const r = await rufeAb<unknown, Wort>(pfad, jsonPost(inhalt), holen, VERTRAG);
-	if (r.art === 'ok') return { ergebnis: 'ok', koerper: istObjekt(r.daten) ? r.daten : {} };
-	if (r.art === 'stoerung') return { ergebnis: 'stoerung', koerper: {} };
-	return { ergebnis: r.art, koerper: r.koerper };
+	if (r.art === 'ok') return { art: 'ok', koerper: istObjekt(r.daten) ? r.daten : {} };
+	if (r.art === 'stoerung') return { art: 'stoerung', koerper: {} };
+	return { art: r.art, koerper: r.koerper };
 }
 
 /** Der Körper eines Erfolgs (kein Objekt gilt als leer); `null` bei jeder anderen Antwort. */
@@ -140,20 +140,20 @@ export async function speichereAngaben(
 	vorher: EigeneAngaben,
 	holen: Holen = fetch
 ): Promise<Speichern> {
-	const { ergebnis, koerper } = await schicke('/api/profil', { angaben: neu, vorher }, holen);
-	if (ergebnis === 'ok' || ergebnis === 'veraltet') return { ergebnis };
-	if (ergebnis === 'eingabe') {
+	const { art, koerper } = await schicke('/api/profil', { angaben: neu, vorher }, holen);
+	if (art === 'ok' || art === 'veraltet') return { art };
+	if (art === 'eingabe') {
 		const felder = istObjekt(koerper.felder)
 			? (koerper.felder as Partial<Record<EigenesFeld, string>>)
 			: {};
-		return { ergebnis, felder, fremd: koerper.fremd === true };
+		return { art, felder, fremd: koerper.fremd === true };
 	}
-	return { ergebnis: 'stoerung' };
+	return { art: 'stoerung' };
 }
 
 /** Schickt je einen Code an die bisherige und die neue Adresse. */
 export async function starteWechsel(email: string, holen: Holen = fetch): Promise<Ergebnis> {
-	return (await schicke('/api/profil/email', { email }, holen)).ergebnis;
+	return (await schicke('/api/profil/email', { email }, holen)).art;
 }
 
 export async function bestaetigeWechsel(
@@ -161,7 +161,7 @@ export async function bestaetigeWechsel(
 	codeNeu: string,
 	holen: Holen = fetch
 ): Promise<Ergebnis> {
-	return (await schicke('/api/profil/email/bestaetigen', { codeAlt, codeNeu }, holen)).ergebnis;
+	return (await schicke('/api/profil/email/bestaetigen', { codeAlt, codeNeu }, holen)).art;
 }
 
 /** Rufname im Profil setzen; leer löscht ihn. Bei `eingabe` steht die Meldung des Servers bereit. */
@@ -169,20 +169,18 @@ export async function speichereRufname(
 	rufname: string,
 	holen: Holen = fetch
 ): Promise<
-	| { ergebnis: 'ok'; rufname: string | null }
-	| { ergebnis: 'eingabe'; fehler: string }
-	| { ergebnis: 'stoerung' }
+	{ art: 'ok'; rufname: string | null } | { art: 'eingabe'; fehler: string } | { art: 'stoerung' }
 > {
-	const { ergebnis, koerper } = await schicke('/api/profil/rufname', { rufname }, holen);
-	if (ergebnis === 'ok') {
-		return { ergebnis, rufname: typeof koerper.rufname === 'string' ? koerper.rufname : null };
+	const { art, koerper } = await schicke('/api/profil/rufname', { rufname }, holen);
+	if (art === 'ok') {
+		return { art, rufname: typeof koerper.rufname === 'string' ? koerper.rufname : null };
 	}
-	if (ergebnis === 'eingabe') {
+	if (art === 'eingabe') {
 		const felder = istObjekt(koerper.felder) ? koerper.felder : {};
 		return {
-			ergebnis,
+			art,
 			fehler: typeof felder.rufname === 'string' ? felder.rufname : 'Ungültig.'
 		};
 	}
-	return { ergebnis: 'stoerung' };
+	return { art: 'stoerung' };
 }
