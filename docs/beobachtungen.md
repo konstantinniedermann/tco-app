@@ -135,6 +135,30 @@ Fehler der App.
 
 ## Offen
 
+### 2026-11-13 — Interclub: Bedeutung des «*» bei Auf- und Abstiegsspielen unklar
+
+**Thema:** Interclub
+
+**Fundort:** Swiss-Tennis-Schnittstelle `/interclub/team-results`, Feld `tableau.results[].team.home|visitor.name`
+
+**Beobachtung:** Ein führendes «* » im Teamnamen markiert nicht den Sieger nach Endstand: 65+ 1L Herren (Team 7396) zeigt «Neuenhof 2 4 : 2 * Olten». MyTCO speichert die Markierung, zeigt sie aber nicht und leitet Sieg/Niederlage aus dem Endstand ab.
+
+**Ursprung:** #81, Teil 1 (Session 13.11.2026), Abruf der Daten 2026
+
+**Einschätzung:** Vermutlich «bleibt in der Liga» bzw. «steigt auf» nach Reglement. Bei Gelegenheit gegen mytennis.ch prüfen; erst dann eine Anzeige (z. B. «steigt auf») erwägen.
+
+### 2026-11-13 — Interclub: Form noch nicht gespielter Begegnungen erst 2027 prüfbar
+
+**Thema:** Interclub
+
+**Fundort:** Swiss-Tennis-Schnittstelle `/interclub/team-results`, Felder `homeTeamScore`, `visitTeamScore`, `date`
+
+**Beobachtung:** 2026 sind alle Begegnungen gespielt; wie eine offene Begegnung aussieht (Endstand `null`, fehlend oder 0), ist nicht beobachtbar. Der Import nimmt `null` und fehlend als «noch offen» an. Auch die Saison 2027 liefert heute HTTP 500 («Upstream responded with HTTP 404»).
+
+**Ursprung:** #81, Teil 1 (Session 13.11.2026)
+
+**Einschätzung:** Sobald Swiss Tennis den Spielplan 2027 freischaltet (Frühling), einmal `make ic-import JAHR=2027` und die Antwort prüfen; spätestens in Session 3 von #81 (regelmässiger Abruf).
+
 ### 2026-11-12 — Kostenseite hinkt der Schätzung für den Vorstand nach
 
 **Thema:** Kosten

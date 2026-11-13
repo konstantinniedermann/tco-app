@@ -223,7 +223,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“). Ausnahme: Einzelmeldungen zum Doppel an die Beteiligten nennen den anderen Spieler (Partner, Anfragender oder Angefragter), nie dessen Telefon oder E-Mail und nie den Namen des CM-Admins (die Rolle «Der CM-Admin» darf stehen). E-Mails gehen je Empfänger einzeln, nie mehrere Adressen in einem Empfängerfeld. Bei Mitteilungen (FR-42) weist das Formular darauf hin; die Vorschau zeigt dem Mitglieder-Admin nur Namen, die er schon sehen darf |
 | DS-06 | Löschfristen aus [Löschen](#löschen) sind umgesetzt; Logs ohne Inhalte (keine Einmal-Codes, Kontaktdaten, Resultate); IP-Adressen höchstens 24 Stunden, auch in Logs |
 | DS-07 | Der Mitglieder-Admin kann die Daten eines Mitglieds als druckbare Auskunft ausgeben und das Mitglied löschen (umgesetzt, Etappe 3 von #43) |
-| DS-08 | Entwicklung und Tests nur mit erfundenen Daten |
+| DS-08 | Entwicklung und Tests nur mit erfundenen Personendaten; öffentliche Daten ohne Personennamen (z. B. Interclub-Resultate der Teams von Swiss Tennis) dürfen 1:1 verwendet werden |
 | DS-09 | Die Datenschutzerklärung ist in MyTCO auch ohne Login erreichbar |
 | DS-10 | Datensicherheit (verschlüsselte Verbindung, Einmal-Codes nur als Hash, Zugriff nach Rolle) regelt das [Sicherheitskonzept](sicherheitskonzept.md) |
 
@@ -242,6 +242,7 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
 
+- 13.11.2026: DS-08 präzisiert (Entscheid Projektleiter): gilt für Personendaten; öffentliche Daten ohne Personennamen wie die Interclub-Resultate der Teams dürfen 1:1 in Tests und Seed (#81, Teil 1 ohne Spielernamen).
 - 09.11.2026: Kontaktdaten für CM- und Lizenz-Admin nach Aufgabe statt von allen (K-42 eingegrenzt, Entscheid Projektleiter): CM-Admin nur die Spieler eines Turniers (aktive Anmeldung oder offene Partner-Anfrage) bis zum 1.1. nach dem Turnierjahr, Lizenz-Admin nur Mitglieder mit Lizenz oder Lizenzantrag.
 - 09.11.2026: Zusagen an den Code angeglichen (Beobachtungs-Auswertung, Entscheid Projektleiter): Alle Mitglieder bekommen Name und Rufname der Kontaktperson, solange sie nach FR-55 gültig ist (aktiv, Konto nicht gesperrt, CM-Admin); das Öffnen einer Auskunft steht auch beim nur lesenden MyTCO-Admin und in der «Ansicht als …» im Änderungsverlauf.
 - 09.11.2026: Gespräche mit der Turnierleitung: Nachrichten des Mitglieds und Antworten der CM-Admins, lesbar für alle CM-Admins und lesend für den MyTCO-Admin, nicht für den Mitglieder-Admin; gelöscht ab dem 1.1. nach dem Turnierjahr (#71).
