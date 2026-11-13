@@ -134,6 +134,13 @@
       "when": 1794225599450,
       "tag": "0018_tan_toad",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794561600026,
+      "tag": "0019_certain_banshee",
+      "breakpoints": true
     }
   ]
 }

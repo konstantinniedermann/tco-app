@@ -4,6 +4,7 @@ import {
 	boolean,
 	check,
 	date,
+	foreignKey,
 	index,
 	integer,
 	pgTable,
@@ -477,5 +478,108 @@ export const nachricht = pgTable(
 		check('nachricht_von_check', sql`${t.von} in ('mitglied', 'leitung')`),
 		check('nachricht_text_check', sql`char_length(${t.text}) between 1 and 1000`),
 		index('nachricht_gespraech_idx').on(t.gespraechId)
+	]
+);
+
+// Interclub-Ansicht: Spiegel der Antworten von Swiss Tennis, je Saison und Wettbewerb ('ic' oder 'jic').
+export const icTeam = pgTable(
+	'ic_team',
+	{
+		saison: integer('saison').notNull(),
+		teamId: integer('team_id').notNull(),
+		wettbewerb: text('wettbewerb').$type<'ic' | 'jic'>().notNull(),
+		teamName: text('team_name').notNull(),
+		liga: text('liga').notNull(),
+		gruppe: integer('gruppe').notNull(),
+		reihenfolge: integer('reihenfolge').notNull()
+	},
+	(t) => [
+		primaryKey({ columns: [t.saison, t.teamId] }),
+		check('ic_team_wettbewerb_check', sql`${t.wettbewerb} in ('ic', 'jic')`)
+	]
+);
+
+export const icBegegnung = pgTable(
+	'ic_begegnung',
+	{
+		saison: integer('saison').notNull(),
+		teamId: integer('team_id').notNull(),
+		begegnungId: integer('begegnung_id').notNull(),
+		runde: integer('runde').notNull(),
+		datum: date('datum', { mode: 'string' }).notNull(),
+		heim: text('heim').notNull(),
+		gast: text('gast').notNull(),
+		heimPunkte: integer('heim_punkte'),
+		gastPunkte: integer('gast_punkte')
+	},
+	(t) => [
+		primaryKey({ columns: [t.saison, t.teamId, t.begegnungId] }),
+		foreignKey({
+			columns: [t.saison, t.teamId],
+			foreignColumns: [icTeam.saison, icTeam.teamId]
+		}).onDelete('cascade')
+	]
+);
+
+export const icRang = pgTable(
+	'ic_rang',
+	{
+		saison: integer('saison').notNull(),
+		teamId: integer('team_id').notNull(),
+		rang: integer('rang').notNull(),
+		teamName: text('team_name').notNull(),
+		stTeamId: integer('st_team_id').notNull(),
+		punkte: integer('punkte').notNull(),
+		saetze: text('saetze').notNull()
+	},
+	(t) => [
+		primaryKey({ columns: [t.saison, t.teamId, t.stTeamId] }),
+		foreignKey({
+			columns: [t.saison, t.teamId],
+			foreignColumns: [icTeam.saison, icTeam.teamId]
+		}).onDelete('cascade')
+	]
+);
+
+export const icEntscheid = pgTable(
+	'ic_entscheid',
+	{
+		saison: integer('saison').notNull(),
+		teamId: integer('team_id').notNull(),
+		begegnungId: integer('begegnung_id').notNull(),
+		art: text('art').$type<'aufstieg' | 'abstieg'>().notNull(),
+		runde: integer('runde').notNull(),
+		datum: date('datum', { mode: 'string' }).notNull(),
+		zeit: text('zeit'),
+		heimId: integer('heim_id').notNull(),
+		heimName: text('heim_name').notNull(),
+		heimPunkte: integer('heim_punkte'),
+		heimMarkiert: boolean('heim_markiert').notNull(),
+		gastId: integer('gast_id').notNull(),
+		gastName: text('gast_name').notNull(),
+		gastPunkte: integer('gast_punkte'),
+		gastMarkiert: boolean('gast_markiert').notNull()
+	},
+	(t) => [
+		primaryKey({ columns: [t.saison, t.teamId, t.begegnungId] }),
+		foreignKey({
+			columns: [t.saison, t.teamId],
+			foreignColumns: [icTeam.saison, icTeam.teamId]
+		}).onDelete('cascade'),
+		check('ic_entscheid_art_check', sql`${t.art} in ('aufstieg', 'abstieg')`)
+	]
+);
+
+// Wann ein Wettbewerb einer Saison zuletzt vollständig abgerufen wurde.
+export const icStand = pgTable(
+	'ic_stand',
+	{
+		saison: integer('saison').notNull(),
+		wettbewerb: text('wettbewerb').$type<'ic' | 'jic'>().notNull(),
+		abgerufenAm: timestamp('abgerufen_am', { withTimezone: true }).notNull()
+	},
+	(t) => [
+		primaryKey({ columns: [t.saison, t.wettbewerb] }),
+		check('ic_stand_wettbewerb_check', sql`${t.wettbewerb} in ('ic', 'jic')`)
 	]
 );
