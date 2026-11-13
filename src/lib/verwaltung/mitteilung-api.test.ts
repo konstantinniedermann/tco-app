@@ -113,6 +113,13 @@ describe('Mitteilungen in der Verwaltung: Anfragen', () => {
 			art: 'stoerung'
 		});
 	});
+
+	// Rand, den der gemeinsame Abruf-Baustein genau so erhalten muss (Charakterisierung vor Schritt 13).
+	it('FR-42: 409 veraltet beim Senden kommt als eigenes Ergebnis an', async () => {
+		const v = holer(json(409, { fehler: 'veraltet' }));
+		expect(await sendeMitteilung({ art: 'verein' }, WERTE, v.holen)).toEqual({ art: 'veraltet' });
+		expect(v.aufrufe[0].pfad).toBe('/api/admin/mitteilungen/senden');
+	});
 });
 
 describe('Mitteilungen in der Verwaltung: Texte', () => {

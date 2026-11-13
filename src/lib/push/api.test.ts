@@ -72,3 +72,31 @@ describe('Anfragen zu Benachrichtigungen (FR-40, FR-41)', () => {
 		});
 	});
 });
+
+// Ränder, die der gemeinsame Abruf-Baustein genau so erhalten muss (Charakterisierung vor Schritt 13).
+describe('Benachrichtigungen: Ränder der Deutung', () => {
+	const abo = async (antwort: Response | Error) => sendeAbo(ABO, holer(antwort).holen);
+	const STOERUNG = { art: 'stoerung' };
+
+	test('401 genügt als Status, auch ohne Wort; ohne lesbaren Körper Störung', async () => {
+		expect(await abo(ungeprueft(401, {}))).toEqual({ art: 'abgemeldet' });
+		expect(await abo(new Response('kein JSON', { status: 401 }))).toEqual(STOERUNG);
+		expect(await abo(ungeprueft(401, null))).toEqual(STOERUNG);
+	});
+
+	test('JSON null bei Erfolg kommt als Daten an', async () => {
+		expect(await abo(ungeprueft(200, null))).toEqual({ art: 'ok', daten: null });
+	});
+
+	test('Status, die Push nicht kennt, sind Störung', async () => {
+		expect(await abo(json(404, { fehler: 'nicht-gefunden' }))).toEqual(STOERUNG);
+		expect(await abo(new Response(null, { status: 204 }))).toEqual(STOERUNG);
+		expect(await abo(json(429, { fehler: 'zu-viele' }))).toEqual(STOERUNG);
+		expect(await abo(json(403, { fehler: 'nur-ansehen' }))).toEqual(STOERUNG);
+	});
+
+	test('ein Wort gilt nur mit seinem Status und nur, wenn Push es kennt', async () => {
+		expect(await abo(json(409, { fehler: 'veraltet' }))).toEqual(STOERUNG);
+		expect(await abo(json(400, { fehler: 'push-aus' }))).toEqual(STOERUNG);
+	});
+});
