@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { formatiereZeitpunkt } from '../../../lib/anlass/zeit.ts';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
-	import { ladeAnlaesseAdmin, type AnlassZeile } from '../../../lib/verwaltung/api.ts';
+	import { ladeAnlaesseAdmin, type AnlassZeile } from '../../../lib/verwaltung/anlass-api.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 
 	let { data } = $props();

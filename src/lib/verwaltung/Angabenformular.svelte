@@ -1,5 +1,6 @@
 <script lang="ts" module>
-	import type { Angaben, Feld } from './api.ts';
+	import type { Feld } from './api.ts';
+	import type { Angaben } from './mitglieder-api.ts';
 
 	/** Alle Felder als Text, wie sie in den Eingabefeldern stehen. */
 	export type Werte = Record<Feld, string>;

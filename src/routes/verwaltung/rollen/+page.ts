@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { ladeRollenListe } from '../../../lib/verwaltung/api.ts';
+import { ladeRollenListe } from '../../../lib/verwaltung/zugang-api.ts';
 import type { PageLoad } from './$types';
 
 // Läuft nur im Browser (ssr = false). Regel 2: wer welche Rolle hat; nur der MyTCO-Admin (das

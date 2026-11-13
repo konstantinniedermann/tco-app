@@ -6,13 +6,13 @@
 		werteAusTurnier,
 		type TurnierWerte
 	} from '../../../../lib/verwaltung/Turnierformular.svelte';
+	import { type TurnierFeld } from '../../../../lib/verwaltung/api.ts';
 	import {
 		aendereTurnier,
 		ladeTurnier,
 		setzeTurnierStatus,
-		type TurnierAnsicht,
-		type TurnierFeld
-	} from '../../../../lib/verwaltung/api.ts';
+		type TurnierAnsicht
+	} from '../../../../lib/verwaltung/turnier-api.ts';
 	import {
 		datumLang,
 		geschlechtText,

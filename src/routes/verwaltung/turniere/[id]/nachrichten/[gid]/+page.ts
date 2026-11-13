@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { holeGespraech } from '../../../../../../lib/verwaltung/api.ts';
+import { holeGespraech } from '../../../../../../lib/verwaltung/gespraech-api.ts';
 import type { PageLoad } from './$types';
 
 // Läuft nur im Browser (ssr = false). Ein Gespräch gibt es nur unter seinem eigenen Turnier;

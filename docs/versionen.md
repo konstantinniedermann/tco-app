@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.20.21 — Abruf-Funktionen der Verwaltung nach Bereichen (Refactoring Schritt 14)
+
+- Die 56 Abruf-Funktionen der Verwaltung liegen unverändert in fünf Dateien nach Bereich (Zugang,
+  Anlass, Gespräch, Mitglieder, Turnier) statt in einer grossen; der gemeinsame Kern bleibt an einer
+  Stelle. In den Seiten ändern sich nur Importe, am Verhalten nichts (#80).
+
 ## 0.20.20 — Ein Abruf-Baustein für die Oberfläche (Refactoring Schritt 13)
 
 - Alle Abruf-Module der Oberfläche sprechen über einen gemeinsamen Baustein (`src/lib/abruf.ts`) mit

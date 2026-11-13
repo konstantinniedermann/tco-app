@@ -4,7 +4,7 @@
 	import { NACHRICHT_MAX, zeitText } from '../../../../../../lib/cm/anzeige.ts';
 	import { MELDUNG } from '../../../../../../lib/login/anmelden.ts';
 	import { amtlicherName, anredeName } from '../../../../../../lib/name.ts';
-	import { sendeAntwort, setzeZustand } from '../../../../../../lib/verwaltung/api.ts';
+	import { sendeAntwort, setzeZustand } from '../../../../../../lib/verwaltung/gespraech-api.ts';
 	import { fehlerText } from '../../../../../../lib/verwaltung/anzeige.ts';
 	import Seitenkopf from '../../../../../../lib/verwaltung/Seitenkopf.svelte';
 	import { leiteUm } from '../../../../../../lib/verwaltung/umleiten.ts';

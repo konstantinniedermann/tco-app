@@ -5,7 +5,7 @@
 		liesMitgliederEin,
 		zeigeEinleseVorschau,
 		type Vorschau
-	} from '../../../lib/verwaltung/api.ts';
+	} from '../../../lib/verwaltung/mitglieder-api.ts';
 	import { fehlerText } from '../../../lib/verwaltung/anzeige.ts';
 	import {
 		dateiFehlerText,

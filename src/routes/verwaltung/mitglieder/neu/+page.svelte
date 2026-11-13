@@ -6,7 +6,8 @@
 		LEERE_WERTE,
 		type Werte
 	} from '../../../../lib/verwaltung/Angabenformular.svelte';
-	import { legeMitgliedAn, type Feld } from '../../../../lib/verwaltung/api.ts';
+	import { type Feld } from '../../../../lib/verwaltung/api.ts';
+	import { legeMitgliedAn } from '../../../../lib/verwaltung/mitglieder-api.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 	import { VERGEBEN, fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
 

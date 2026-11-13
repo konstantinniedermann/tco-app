@@ -15,16 +15,15 @@
 	import Zeilentasten from './Zeilentasten.svelte';
 	import type { Zeilenaktion } from './zeilenaktionen.ts';
 	import { KLASSIERUNGEN, klassierungName, type Klassierung } from '../turnier/klassierung.ts';
+	import { type Antwort, type Warnung } from './api.ts';
 	import {
 		entscheideAntrag,
 		korrigiereKlassierung,
 		loescheAnmeldung,
 		meldeVonHandAn,
 		verschiebeAnmeldung,
-		type Antwort,
-		type AnmeldungZeile,
-		type Warnung
-	} from './api.ts';
+		type AnmeldungZeile
+	} from './turnier-api.ts';
 	import { fehlerText } from './anzeige.ts';
 	import {
 		anmeldungStatus,

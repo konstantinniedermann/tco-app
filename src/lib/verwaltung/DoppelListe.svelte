@@ -28,7 +28,7 @@
 		verschiebeAnmeldung,
 		type DoppelVerwaltung,
 		type SpielerTreffer
-	} from './api.ts';
+	} from './turnier-api.ts';
 	import { datumText } from './anzeige.ts';
 	import {
 		mitgliedVermerk,
