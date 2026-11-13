@@ -240,7 +240,8 @@ describe('Schnittstellen', () => {
 				passkeyHinweis: true,
 				verwaltung: false,
 				ansicht: null,
-				nachrichtenOffen: 0
+				nachrichtenOffen: 0,
+				interclub: expect.any(Boolean)
 			});
 
 			await s.dienst.beendeAlleSitzungen(s.kontoId);

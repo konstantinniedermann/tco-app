@@ -3,7 +3,7 @@ import {
 	aktiverReiter,
 	bereichVon,
 	elternVon,
-	REITER,
+	reiterFuer,
 	stelltStandWiederHer,
 	uebergang,
 	vergisstStand,
@@ -53,8 +53,9 @@ describe('Übergänge beim Seitenwechsel (UI-09)', () => {
 });
 
 describe('Reiter', () => {
-	it('hat die Reiter Start · CM · Profil', () => {
-		expect(REITER).toEqual(['/', '/clubmeisterschaft', '/profil']);
+	it('hat die Reiter Start · CM · Profil, mit Interclub-Daten Start · CM · IC · Profil', () => {
+		expect(reiterFuer(false)).toEqual(['/', '/clubmeisterschaft', '/profil']);
+		expect(reiterFuer(true)).toEqual(['/', '/clubmeisterschaft', '/interclub', '/profil']);
 	});
 
 	it.each([
@@ -67,6 +68,8 @@ describe('Reiter', () => {
 		['/clubmeisterschaft/[id]/doppel/[kid]', '/clubmeisterschaft'],
 		['/clubmeisterschaft/[id]/kategorie/[kid]', '/clubmeisterschaft'],
 		['/clubmeisterschaft/[id]/kontakt', '/clubmeisterschaft'],
+		['/interclub', '/interclub'],
+		['/interclub/[id]', '/interclub'],
 		['/profil', '/profil'],
 		['/profil/email', '/profil'],
 		['/login', null],
@@ -81,6 +84,7 @@ describe('Reiter', () => {
 	it('zeigt die Reiter nach dem Login überall, Hilfe und Datenschutz ohne Sitzung ohne', () => {
 		expect(zeigtReiter('/anlass/[id]', false)).toBe(true);
 		expect(zeigtReiter('/profil/email', true)).toBe(true);
+		expect(zeigtReiter('/interclub/[id]', true)).toBe(true);
 		expect(zeigtReiter('/hilfe', true)).toBe(true);
 		expect(zeigtReiter('/hilfe', false)).toBe(false);
 		expect(zeigtReiter('/datenschutz', false)).toBe(false);
@@ -129,6 +133,8 @@ describe('Zurück-Link führt eine Stufe höher in der festen Ordnung', () => {
 			{ route: '/clubmeisterschaft/[id]', text: null }
 		],
 		['/clubmeisterschaft/[id]/kontakt', k, { route: '/clubmeisterschaft/[id]', text: null }],
+		['/interclub/[id]', k, { route: '/interclub', text: 'Interclub' }],
+		['/interclub', k, null],
 		['/hilfe', k, { route: '/', text: 'Start' }],
 		['/datenschutz', k, { route: '/', text: 'Start' }],
 		['/hilfe', { ...k, angemeldet: false }, { route: '/login', text: 'Anmelden' }],
@@ -150,6 +156,8 @@ describe('Wechsel des Bereichs blendet über', () => {
 		expect(uebergang('/profil', '/hilfe', 'link')).toBe('blende');
 		expect(uebergang('/profil/email', '/', 'link')).toBe('blende');
 		expect(uebergang('/', '/clubmeisterschaft', 'link')).toBe('blende');
+		expect(uebergang('/clubmeisterschaft', '/interclub', 'link')).toBe('blende');
+		expect(uebergang('/interclub/[id]', '/profil', 'link')).toBe('blende');
 	});
 
 	it('schiebt im selben Bereich weiter nach Ebenen', () => {
@@ -157,6 +165,8 @@ describe('Wechsel des Bereichs blendet über', () => {
 		expect(uebergang('/profil/email', '/profil', 'link')).toBe('zurueck');
 		expect(uebergang('/clubmeisterschaft', '/clubmeisterschaft/[id]', 'link')).toBe('tiefer');
 		expect(uebergang('/login', '/hilfe', 'link')).toBe('tiefer');
+		expect(uebergang('/interclub', '/interclub/[id]', 'link')).toBe('tiefer');
+		expect(uebergang('/interclub/[id]', '/interclub', 'link')).toBe('zurueck');
 	});
 });
 

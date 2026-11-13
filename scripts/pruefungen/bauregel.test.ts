@@ -319,12 +319,12 @@ describe('Einstiege der Verwaltung ausserhalb von api/admin (Schritt 07)', () =>
 	// Ausserhalb von api/admin eine Erlaubt-Liste: Was nicht genau ein Einstieg der Mitglieder ist,
 	// ist ein Befund (gesperrt im Zweifel).
 	const fremd = (name: string) =>
-		`${pfad}: aus dienste.ts nur Einstiege der Mitglieder, nicht '${name}'; erlaubt sind nur holeLoginDienst, holePasskeyDienst, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste`;
+		`${pfad}: aus dienste.ts nur Einstiege der Mitglieder, nicht '${name}'; erlaubt sind nur holeLoginDienst, holePasskeyDienst, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste, holeInterclubDienste`;
 	const mit = (zeile: string) => pruefeBauregel(new Map([[pfad, `${gut}\n${zeile}`]]));
-	it('RR-07: ausserhalb von api/admin sind alle sechs Einstiege der Mitglieder erlaubt', () => {
+	it('RR-07: ausserhalb von api/admin sind alle sieben Einstiege der Mitglieder erlaubt', () => {
 		expect(
 			mit(
-				"import { holeLoginDienst, holePasskeyDienst as p, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste } from '$lib/server/dienste';"
+				"import { holeLoginDienst, holePasskeyDienst as p, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste, holeInterclubDienste } from '$lib/server/dienste';"
 			)
 		).toEqual([]);
 	});
@@ -640,7 +640,7 @@ describe('Namen in Anführungszeichen', () => {
 			],
 			[
 				"import { 'holeBremsen' as b } from '../../../lib/server/dienste.ts';",
-				`${mitglied}: aus dienste.ts nur Einstiege der Mitglieder, nicht 'holeBremsen'; erlaubt sind nur holeLoginDienst, holePasskeyDienst, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste`
+				`${mitglied}: aus dienste.ts nur Einstiege der Mitglieder, nicht 'holeBremsen'; erlaubt sind nur holeLoginDienst, holePasskeyDienst, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste, holeInterclubDienste`
 			],
 			[
 				"export { 'postVereinSenden' as p } from '../../../lib/server/mitteilung/verwaltung-schnittstellen.ts';",

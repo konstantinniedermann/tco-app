@@ -2,7 +2,7 @@
 // und die Versender. Oberste Schicht: Diese Datei darf jedes Modul importieren, und kein Modul unter
 // src/lib/server/ importiert sie (eslint.config.js); sie holen nur Routen, der Hook und Tests.
 //
-// Exportiert sind genau die acht Einstiege. Bremsen und Versender bleiben privat: Die Bauregel
+// Exportiert sind genau die neun Einstiege. Bremsen und Versender bleiben privat: Die Bauregel
 // verbietet ausserhalb von api/admin/ nur die Einstiege der Verwaltung, nicht weitere Namen.
 //
 // Alles entsteht träge beim ersten Aufruf und wird erst nach gelungenem Bau gemerkt: Wirft
@@ -12,6 +12,7 @@ import { erstelleHinweis } from './admin/hinweis-mail.ts';
 import type { AdminDienste } from './admin/rechte.ts';
 import { erstelleZugangDienst } from './admin/zugang.ts';
 import type { AnlassDienste } from './anlass/typen.ts';
+import type { InterclubDienste } from './interclub/typen.ts';
 import { erstelleBestaetigung } from './cm/mail.ts';
 import type { CmDienste } from './cm/typen.ts';
 import { holeDb } from './db/index.ts';
@@ -83,6 +84,7 @@ let profilDienste: ProfilDienste | undefined;
 let cmDienste: CmDienste | undefined;
 let mitteilungDienste: MitteilungDienste | undefined;
 let anlassDienste: AnlassDienste | undefined;
+let interclubDienste: InterclubDienste | undefined;
 
 export function holeLoginDienst(): LoginDienst {
 	if (!loginDienst) {
@@ -195,4 +197,9 @@ export function holeMitteilungDienste(): MitteilungDienste {
 export function holeAnlassDienste(): AnlassDienste {
 	anlassDienste ??= { db: holeDb() };
 	return anlassDienste;
+}
+
+export function holeInterclubDienste(): InterclubDienste {
+	interclubDienste ??= { db: holeDb() };
+	return interclubDienste;
 }

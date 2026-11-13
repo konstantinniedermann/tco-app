@@ -48,7 +48,7 @@ export default defineConfig({
 	webServer: {
 		// Mailpit (`make db`) fängt die Code-Mails; die Tests lesen sie über seine API.
 		// Baut nach MYTCO_E2E_BUILD (vite.config.ts) und startet den Server von dort.
-		command: `npm run build && node scripts/migrate.ts && node ${buildOrdner}/build`,
+		command: `npm run build && node scripts/migrate.ts && node scripts/beispiel-interclub.ts && node ${buildOrdner}/build`,
 		url: baseURL,
 		env: {
 			PORT: String(port),

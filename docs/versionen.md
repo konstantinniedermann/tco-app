@@ -8,6 +8,18 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.21.0 — Interclub-Resultate der TCO-Teams (Teil 1)
+
+- Neuer Reiter «IC» mit den Interclub-Resultaten aller 17 TCO-Teams von Swiss Tennis: Übersicht mit
+  Umschalter «Resultate · Teams» (letzte und nächste 7 Tage, Schlussrang je Team) und Seite eines
+  Teams mit «Spiele · Tabelle» (Begegnungen je Runde, Rangliste mit Partien und Sätzen, Auf- und
+  Abstiegsspiele). Der Reiter erscheint nur, wenn Interclub-Daten vorhanden sind (#81).
+- Die Daten holt der Server per Befehl `make ic-import JAHR=…` von Swiss Tennis, prüft die Form und
+  speichert sie je Saison und Wettbewerb ganz oder gar nicht; der regelmässige Abruf folgt in Teil 3.
+  Keine Personendaten. Begründung der Schnittstelle: ADR-011.
+- Ausnahme vom Feature-Stopp des Refactorings (E-47); DS-08 präzisiert (öffentliche Daten ohne
+  Personennamen dürfen in Tests und Seed).
+
 ## 0.20.21 — Abruf-Funktionen der Verwaltung nach Bereichen (Refactoring Schritt 14)
 
 - Die 56 Abruf-Funktionen der Verwaltung liegen unverändert in fünf Dateien nach Bereich (Zugang,

@@ -1,0 +1,103 @@
+{
+	"title": { "de": "Olten 2", "fr": "Olten 2" },
+	"leagueId": "9",
+	"clubId": "2202",
+	"group": 78,
+	"subtitle": { "de": "2L Herren", "fr": "2L Messieurs" },
+	"results": [
+		{
+			"id": "972438",
+			"round": "1",
+			"date": "02.05",
+			"homeTeamName": "Schlossmatte 1",
+			"visitTeamName": "Olten 2",
+			"homeTeamScore": 8,
+			"visitTeamScore": 1,
+			"encounterId": 972438
+		},
+		{
+			"id": "972435",
+			"round": "1",
+			"date": "02.05",
+			"homeTeamName": "ETA",
+			"visitTeamName": "Port",
+			"homeTeamScore": 0,
+			"visitTeamScore": 9,
+			"encounterId": 972435
+		},
+		{
+			"id": "972437",
+			"round": "2",
+			"date": "10.05",
+			"homeTeamName": "Schlossmatte 1",
+			"visitTeamName": "ETA",
+			"homeTeamScore": 9,
+			"visitTeamScore": 0,
+			"encounterId": 972437
+		},
+		{
+			"id": "972434",
+			"round": "2",
+			"date": "09.05",
+			"homeTeamName": "Port",
+			"visitTeamName": "Olten 2",
+			"homeTeamScore": 8,
+			"visitTeamScore": 1,
+			"encounterId": 972434
+		},
+		{
+			"id": "972433",
+			"round": "3",
+			"date": "17.05",
+			"homeTeamName": "Port",
+			"visitTeamName": "Schlossmatte 1",
+			"homeTeamScore": 4,
+			"visitTeamScore": 5,
+			"encounterId": 972433
+		},
+		{
+			"id": "972436",
+			"round": "3",
+			"date": "16.05",
+			"homeTeamName": "Olten 2",
+			"visitTeamName": "ETA",
+			"homeTeamScore": 7,
+			"visitTeamScore": 2,
+			"encounterId": 972436
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Schlossmatte 1", "teamId": 7440, "points": 22, "sets": "47 - 13" },
+		{ "rank": 2, "teamName": "Port", "teamId": 16405, "points": 21, "sets": "44 - 16" },
+		{ "rank": 3, "teamName": "Olten 2", "teamId": 14131, "points": 9, "sets": "21 - 37" },
+		{ "rank": 4, "teamName": "ETA", "teamId": 16654, "points": 2, "sets": "5 - 51" }
+	],
+	"tableau": {
+		"isPromotion": false,
+		"results": [
+			{
+				"id": "45692",
+				"round": "4",
+				"date": "06.06 - 09:30",
+				"encounterId": 45692,
+				"isPromotion": false,
+				"team": {
+					"home": {
+						"id": 16478,
+						"name": "Schüpfen 1",
+						"score": 4,
+						"group": { "id": 77, "rank": 4 },
+						"league": { "id": 9 }
+					},
+					"visitor": {
+						"id": 14131,
+						"name": "* Olten 2",
+						"score": 5,
+						"group": { "id": 78, "rank": 3 },
+						"league": { "id": 9 }
+					}
+				}
+			}
+		]
+	}
+}

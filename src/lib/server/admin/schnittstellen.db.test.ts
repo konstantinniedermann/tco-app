@@ -761,7 +761,8 @@ describe('Admin-Schnittstellen', () => {
 			passkeyHinweis: false,
 			verwaltung: true,
 			ansicht: null,
-			nachrichtenOffen: 0
+			nachrichtenOffen: 0,
+			interclub: expect.any(Boolean)
 		});
 		expect(await rn.json()).toMatchObject({ verwaltung: false });
 		expect((await getSitzung(ereignis(), db)).status).toBe(401);
