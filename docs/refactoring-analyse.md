@@ -7,8 +7,8 @@ weiterarbeiten können: Es enthält den Ist-Zustand, die Befunde, das Zielbild, 
 je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 [#80](https://github.com/konstantinniedermann/tco-app/issues/80).
 
-- **Stand des Dokuments:** 13.11.2026, Schritt 13 Lauf 1 umgesetzt (Review offen); zuvor Schritt
-  12a (Review «ok», Version 0.20.19). Die Etappen 0 und 1 sind umgesetzt; die Zwischenrevision am
+- **Stand des Dokuments:** 13.11.2026, Schritt 13 in beiden Läufen umgesetzt (Review von Lauf 1
+  «ok», Review von Lauf 2 und Merge offen); zuvor Schritt 12a (Review «ok», Version 0.20.19). Die Etappen 0 und 1 sind umgesetzt; die Zwischenrevision am
   Ende der Etappe 1 (Abschnitt 1c) ist am Checkpoint entschieden und eingearbeitet (E-41 bis E-44).
   Danach die Etappe 2.
 - **Stand der Analyse (Abschnitte 1 bis 5 und 10):** 11.11.2026, Version 0.20.5, vor Schritt 01.
@@ -22,7 +22,7 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
   zeigt der Git-Verlauf dieser Datei.
 - **Aufbau:** Abschnitte 1 bis 5 Befunde, 6 Zielbild, 7 Plan, 8 Entscheide, 9 Fragen, 10 Grenzen;
   Anhang A und B Anweisungsdateien, Anhang C das Protokoll der Etappe 0, Anhang D das der Etappe 1
-  (bis D.15, Schritt 12a), Anhang E das der Etappe 2 (bis E.2, Schritt 13 Lauf 1).
+  (bis D.15, Schritt 12a), Anhang E das der Etappe 2 (bis E.3, Schritt 13 Lauf 2).
 
 ## Stand und nächster Schritt
 
@@ -30,10 +30,10 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 
 | | |
 |---|---|
-| **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt und gemergt (0.20.19). **Etappe 2:** Schritt 13 Lauf 1 umgesetzt, Review offen; Lauf 2 offen |
-| **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D) |
-| **Zuletzt erledigt** | **13, Lauf 1** Abruf-Baustein (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **13**: Review 1 auf dem Zwischenstand von Lauf 1 (`291e4a8` plus Doku-Commit), dann **Lauf 2** Profil, Login, Passkey mit Umbenennung `ergebnis` → `art`, im selben Branch (Anhang E.1, «Schnitt»; Hinweise für Lauf 2 in E.2). Ein Merge, eine Version. Etappe 2 läuft ohne Halt mit Kurzbericht je Schritt (E-45). CI auf `dev` zum Merge von 12a grün (Lauf 43281391747) |
+| **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt und gemergt (0.20.19). **Etappe 2:** Schritt 13 umgesetzt (zwei Läufe), Review von Lauf 1 «ok», Review von Lauf 2 und Merge offen |
+| **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), 12a (0.20.19), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D) |
+| **Zuletzt erledigt** | **13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.3): Profil, Login, Passkey und `hatSitzung` auf dem Baustein, Umbenennung `ergebnis` → `art`, beide Kleinfragen aufgenommen (`{ art }` beim E-Mail-Wechsel, vier benannte Anfragen der Login-Seiten), N-09 (`src/lib/anlass/antwort.ts`), Wortlisten der Verträge an den Typ gebunden, `abruf.ts` in der Abdeckung; die Lint-Regel zu `fetch` verworfen (98 Meldungen am heutigen Repo, Vorschlag an Schritt 15); voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 1** Abruf-Baustein (13.11.2026, Review «ok» ohne Befund; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
+| **Nächster offener Schritt** | **13**: Review 2 auf dem Endstand von Lauf 2, dann ein Merge und eine Version für beide Läufe. Danach **14** `verwaltung/api.ts` nach Bereichen teilen (Hinweise zu Schritt 14; die 13 Funktionen ohne Aufruf im Test aus E.1). Ein Merge, eine Version. Etappe 2 läuft ohne Halt mit Kurzbericht je Schritt (E-45). CI auf `dev` zum Merge von 12a grün (Lauf 43281391747) |
 | **Wartet auf Freigabe des Projektleiters** | nichts. Checkpoint am Ende der Etappe 1 erledigt am 12.11.2026 (E-41 bis E-44); die Berichtigungen der `CLAUDE.md` sind eingespielt (E-43) |
 | **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen Fragen sind beantwortet (F-22 durch den Ablauf erledigt, F-23 in F-26 aufgegangen) |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
@@ -259,7 +259,7 @@ Abweichungen bleiben)
 
 | Schritt | Urteil | Vorschlag |
 |--------:|--------|-----------|
-| 13 | **Zu ändern.** (1) Die Dateiliste ist unvollständig: `verwaltung/mitteilung-api.ts` (baut auf `lese`/`schicke`), `login/sitzung.ts`; `Holen` und `Json` holen `anlass`, `cm`, `push` und `push/geraet.ts` heute aus `verwaltung/api.ts` [G]. (2) Widerspruch: `profil/angaben.ts`, `login/anmelden.ts` und über sie `passkey.ts` heissen `ergebnis`, vier Seiten lesen es (`login`, `login/mail`, `profil`, `willkommen`) [G, Textsuche]; «Tests unverändert grün» und «heisst `art`» gehen nicht zusammen. (3) Jedes Modul lässt ein Wort nur mit seinem Status gelten (`409 && fehler === …`); ein Baustein, der nur das Wort liest, ändert die Ränder. (4) Die Module weichen bei Sonderfällen voneinander ab: 204 ohne Körper ist nur in `cm` ein Erfolg, in `verwaltung`, `anlass`, `push` eine Störung (der Server sendet 204 nur für Gespräch, Logout und Passkey [G]); `anmelden` deutet 429 ohne den Körper zu lesen, `verwaltung` nur mit lesbarem JSON; `eingabe` ohne `felder` ist im Profil gültig, sonst Störung (D.5); 401 wird in Profil und Login zur Störung | **P-13a:** Dateiliste ergänzen; `Holen` und `Json` ziehen in den Baustein (Ort z. B. `src/lib/abruf.ts` neben `fehler.ts` und `json-post.ts`; `src/lib/api/` verwechselt sich mit `src/routes/api/`). **P-13b:** ein Schritt, zwei Läufe mit je eigenem Review (wie Schritt 11): Lauf 1 Baustein und die Module mit `art` (`anlass`, `cm`, `push`, `verwaltung`, `mitteilung-api`), Tests unverändert; Lauf 2 `profil`, `anmelden`, `passkey` mit Umbenennung `ergebnis` → `art`, Tests und vier Seiten ändern nur den Namen (der Reviewer prüft das am Diff). **P-13c:** «Nachmessen vorab» erweitern: je Modul eine Tabelle der Sonderfälle oben, und der Entscheid «Wort gilt nur mit seinem Status» (dann eine Tabelle Wort → Status in `fehler.ts`, die auch N-08 schliesst). **P-13d:** Absicherung: vorab je Sonderfall ein Fall in den Einheitstests der Module (Charakterisierung), darunter die zwei entfallenen «Status allein genügt» mit `ungeprueft(…, {})`. **P-13e:** nimmt N-09 und N-10 auf. Die Zeilennummern der `page.route`-Stellen in der Prüfliste (b) neu bestimmen: fünf sind seit Schritt 08 um eine Zeile verschoben (`anlass:148`, `mitteilungen:206`, `verwaltung:209`, `:388`, `:588`) [G] |
+| 13 | **Zu ändern.** (1) Die Dateiliste ist unvollständig: `verwaltung/mitteilung-api.ts` (baut auf `lese`/`schicke`), `login/sitzung.ts`; `Holen` und `Json` holen `anlass`, `cm`, `push` und `push/geraet.ts` heute aus `verwaltung/api.ts` [G]. (2) Widerspruch: `profil/angaben.ts`, `login/anmelden.ts` und über sie `passkey.ts` heissen `ergebnis`, vier Seiten lesen es (`login`, `login/mail`, `profil`, `willkommen`) [G, Textsuche] **[berichtigt, E.1: drei; `willkommen` liest kein Ergebnis eines Abruf-Moduls]**; «Tests unverändert grün» und «heisst `art`» gehen nicht zusammen. (3) Jedes Modul lässt ein Wort nur mit seinem Status gelten (`409 && fehler === …`); ein Baustein, der nur das Wort liest, ändert die Ränder. (4) Die Module weichen bei Sonderfällen voneinander ab: 204 ohne Körper ist nur in `cm` ein Erfolg, in `verwaltung`, `anlass`, `push` eine Störung (der Server sendet 204 nur für Gespräch, Logout und Passkey [G]); `anmelden` deutet 429 ohne den Körper zu lesen, `verwaltung` nur mit lesbarem JSON; `eingabe` ohne `felder` ist im Profil gültig, sonst Störung (D.5); 401 wird in Profil und Login zur Störung | **P-13a:** Dateiliste ergänzen; `Holen` und `Json` ziehen in den Baustein (Ort z. B. `src/lib/abruf.ts` neben `fehler.ts` und `json-post.ts`; `src/lib/api/` verwechselt sich mit `src/routes/api/`). **P-13b:** ein Schritt, zwei Läufe mit je eigenem Review (wie Schritt 11): Lauf 1 Baustein und die Module mit `art` (`anlass`, `cm`, `push`, `verwaltung`, `mitteilung-api`), Tests unverändert; Lauf 2 `profil`, `anmelden`, `passkey` mit Umbenennung `ergebnis` → `art`, Tests und vier Seiten ändern nur den Namen (der Reviewer prüft das am Diff). **P-13c:** «Nachmessen vorab» erweitern: je Modul eine Tabelle der Sonderfälle oben, und der Entscheid «Wort gilt nur mit seinem Status» (dann eine Tabelle Wort → Status in `fehler.ts`, die auch N-08 schliesst). **P-13d:** Absicherung: vorab je Sonderfall ein Fall in den Einheitstests der Module (Charakterisierung), darunter die zwei entfallenen «Status allein genügt» mit `ungeprueft(…, {})`. **P-13e:** nimmt N-09 und N-10 auf. Die Zeilennummern der `page.route`-Stellen in der Prüfliste (b) neu bestimmen: fünf sind seit Schritt 08 um eine Zeile verschoben (`anlass:148`, `mitteilungen:206`, `verwaltung:209`, `:388`, `:588`) [G] |
 | 14 | stimmt | Hinweis: `Antwort<T>`, `lese`, `schicke` bleiben an einer Stelle (61 Dateien importieren `verwaltung/api.ts` [G, gezählt per Textsuche]); `api.test.ts` (550 Zeilen) wird mitgeteilt, Fälle verschoben, nicht geändert; keine Sammeldatei, die alles weiterreicht (sonst bleibt der Hotspot) |
 | 15 | **Zu ändern.** Fünf Wächter statt einem [G]: Startseite (drei Ziele: `/login/mail`, `/willkommen`, `/login`); `profil`, fünf CM-Ladefunktionen, `anlass/[id]` (Mail-Code, sonst `/login`); `profil/email` (nur `/login`, kein Mail-Code); Verwaltung (Layout und elf `+page.ts` mit dem dreizeiligen Block, `kein-admin` → `/`); `verwaltung/rollen` (derselbe Block, aber `kein-admin` → `/verwaltung`). Dazu die laufende Aktion: `leiteUm` in der Verwaltung, in der Mitglieder-App `goto('/login')` von Hand ohne Mail-Code (CM-Seite neun Stellen, Doppel-Seite fünf). Vier Ladefunktionen rufen `fetch('/api/sitzung')` selbst und deuten 401 am Status. Im Baustein laden vier Seiten, nicht zwei: `turniere`, `anlaesse`, `mitglieder`, `verlauf`; die letzten zwei laden nach Suche und Filter erneut | **P-15a:** «Nachmessen vorab: ja»: Tabelle aller Einstiege mit heutigem Ziel, mit und ohne wartende Mail-Anfrage. **P-15b:** Risiko «mittel» (27 Ladefunktionen, kein Test ruft eine [G: keine Testdatei unter `src/routes/` ausserhalb `api/`]). **P-15c:** Absicherung vorab: ein Test «ohne Sitzung auf jeder geschützten Seite → heutiges Ziel» (E2E-Schleife oder Einheitstests der Ladefunktionen mit gestelltem `fetch`), einmal rot. **P-15d:** Dateien: ein typisierter Abruf der Sitzung in `src/lib/login/sitzung.ts` auf dem Baustein aus 13; die vier `fetch('/api/sitzung')` und `/api/kontakt` in `hilfe/+page.ts` verschwinden. **P-15e:** «die beiden Seiten» → das erste Laden von vier Seiten; erneutes Laden nach Suche bleibt im Baustein. **P-15f:** Ob die Abweichungen (`profil/email`, `rollen`, Aktionen ohne Mail-Code) bleiben, entscheidet F-27 |
 | 16 | stimmt, eine Abhängigkeit fehlt | **P-16:** Voraussetzung «04, 13, 15»: Die Ablauf-Funktion nimmt «abgemeldet → Login» aus 15 statt neun eigener Stellen. Die Doppel-Seite (`doppel/[kid]/+page.svelte`, 425 Zeilen, fünf Stellen) steht in keinem Schritt: aufnehmen oder im Bericht ausdrücklich verwerfen |
@@ -864,7 +864,13 @@ Aufwand oder birgt ein benennbares Risiko; **niedrig** = Schönheitsfehler oder 
   als `ergebnis` (`src/lib/login/anmelden.ts`, `src/lib/profil/angaben.ts`). Die Profil-Seite
   benutzt beide nebeneinander. Gut und zu erhalten: Jedes Modul nimmt den Abruf als Argument
   (`holen`), darum sind die Tests (`api.test.ts`) ohne Browser möglich und überstehen Schritt 13
-  unverändert.
+  unverändert **[berichtigt: in Lauf 1 unverändert; in Lauf 2 ändern Profil- und Login-Tests den
+  Namen `ergebnis` → `art` und beim E-Mail-Wechsel die Form `{ art }`, E.3]**.
+- **Erledigt in Schritt 13 (Anhang E.2, E.3):** Ein Baustein `src/lib/abruf.ts` deutet die
+  Statuscodes; die neun Abruf-Module nennen keinen Statuscode mehr, sondern ihren Vertrag (Wörter
+  und drei Angaben zum Körper) und bilden nur Zusatzangaben ab. Ein neues Fehlerwort heisst jetzt:
+  Server, Liste in `fehler.ts` mit Status, Ergebnis-Typ des Moduls (die Wortliste folgt ihm als
+  Typ) und Seite. Alle einzelnen Abrufe heissen `art`; die Ausnahmen der Form stehen in E.3.
 
 #### B-21 — Der Anmelde-Wächter ist in jede Seite kopiert · mittel · [G]
 
@@ -1044,6 +1050,12 @@ ihm im Weg steht.
   und die gestellten Antworten der Einheitstests und der drei `page.route`-Stellen sind gegen
   `src/lib/fehler.ts` getippt; ein Wort oder eine Form, die nur eine Seite kennt, macht
   `svelte-check` rot. Adressen und Methoden teilen die Seiten weiter nicht.
+- **Schritt 13 (Anhang E.2, E.3):** Wort und Status sind jetzt an einer Stelle gebunden
+  (`STATUS_DES_WORTS`, im Baustein durchgesetzt; der Server ist nicht daran gebunden, N-08). Server
+  und Oberfläche teilen dazu die Ablehnungsgründe der CM (`src/lib/cm/ablehnung.ts`) und die Sätze
+  der Antwort auf einen Anlass (`src/lib/anlass/antwort.ts`); ein Grund oder Satz, den nur eine
+  Seite kennt, ist ein Typfehler bzw. fällt im Datenbanktest auf. Adressen stehen weiter je einmal
+  im Server und im Abruf-Modul; die Seiten nennen keine mehr.
 
 #### B-30 — Mitglieder-Schnittstellen haben keine Liste und keine durchgehende Grundprüfung · niedrig · [G]
 
@@ -2033,12 +2045,22 @@ Der wichtigste ist der dritte.
 
 | Nr. | Ziel | Dateien | Nutzen | Risiko | Absicherung | Voraussetzung | Modell | Weg | Nachmessen vorab | Status |
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
-| 13 | [geändert] Ein Abruf-Baustein mit einem Ergebnis-Typ; die Abruf-Module nutzen ihn und deuten keinen Statuscode mehr (B-20). Die Typen `Holen` und `Json` ziehen in den Baustein. **Ein Schritt, zwei Läufe mit je eigenem Review und committetem Zwischenstand (E-41, wie Schritt 11).** *Lauf 1:* der Baustein und die Module, deren Ergebnis schon `art` heisst (`anlass`, `cm`, `push`, `verwaltung`, `mitteilung-api`), bei unveränderten Tests. *Lauf 2:* `profil`, `anmelden` und `passkey` mit der Umbenennung `ergebnis` → `art`; Tests und drei Seiten ändern nur den Namen **[geändert, Anhang E.1: drei Seiten, nicht vier; `passkey.ts` gibt blanke Wörter zurück und liest nur das Ergebnis von `sende`, drei Zeilen]**. Nimmt N-10 auf (eine geteilte Liste für `FEHLER` und `ABGELEHNT`) und N-09 (die doppelten Sätze des Anlasses: aufnehmen oder ausdrücklich verwerfen). Einzelheiten: Hinweise zu Schritt 13 | [geändert] neu der Baustein (Ort z. B. `src/lib/abruf.ts` neben `fehler.ts` und `json-post.ts`; nicht `src/lib/api/`, das sich mit `src/routes/api/` verwechselt); `src/lib/anlass/api.ts`, `cm/api.ts`, `push/api.ts`, `push/geraet.ts`, `verwaltung/api.ts`, `verwaltung/mitteilung-api.ts`, `profil/angaben.ts`, `login/passkey.ts`, `login/anmelden.ts`, `login/sitzung.ts` und ihre Tests; in Lauf 2 die drei Seiten `login`, `login/mail`, `profil` (nur der Name) **[geändert, Anhang E.1: `willkommen` liest kein Ergebnis eines Abruf-Moduls; dazu `src/lib/fehler.ts` (Tabelle Wort → Status) und `src/lib/abruf.test.ts`; `login/sitzung.ts` ändert sich erst in Schritt 15]**. Für N-10 `src/lib/server/cm/schnittstellen.ts` und der Ort der geteilten Liste; für N-09 allenfalls `src/lib/server/anlass/angaben.ts` und die Seite des Anlasses | Statuscodes werden an einer Stelle gedeutet; ein neuer Ablehnungsgrund des Servers fällt in der Oberfläche nicht mehr still als Störung an (N-10) | mittel | [geändert] **Vorab-Tests (erster Commit, Charakterisierung):** je Sonderfall aus der Tabelle des Nachmessens ein Fall in den Einheitstests der Module, darunter die zwei entfallenen «Status allein genügt» (`push/api.test.ts` 401, `verwaltung/api.test.ts` 404, mit `ungeprueft(…, {})`; N-15); jeder einmal absichtlich rot belegt. *Lauf 1:* Die bestehenden Einheitstests der Module (`api.test.ts` u. a.) bleiben unverändert grün. *Lauf 2:* Tests und Seiten ändern nur den Namen `ergebnis` → `art`; der Reviewer prüft das am Diff, `svelte-check` hält die Seiten. E2E voll nach jedem Lauf. Probe für den Reviewer: Der Diff unter `src/lib/server/` und `src/routes/api/` ist leer, ausser für N-10 | 08 (und 12a, weil Schritte strikt nacheinander laufen; inhaltlich hängt 13 nicht an 12a) | Opus | Subagent, zwei Läufe | [geändert] **ja, erweitert (E-41):** (1) `src/lib/profil/angaben.ts`, `src/lib/login/passkey.ts` und `src/lib/login/anmelden.ts` ganz lesen (bisher nur Auszüge); (2) je Modul eine Tabelle der Sonderfälle: 204 ohne Körper, 429 ohne lesbaren Körper, `eingabe` ohne `felder`, 401 als Störung, unlesbares JSON, `ergebnis` statt `art`; (3) Empfehlung zu «ein Wort gilt nur mit seinem Status» (dann eine Tabelle Wort → Status in `fehler.ts`, die auch N-08 zum Teil schliesst); (4) die 13 Stellen mit `page.route` neu bestimmen (Nachtrag zur Prüfliste (b) unten); (5) Ort des Bausteins; (6) N-09: aufnehmen oder verwerfen. Ändert eine Empfehlung ein Ergebnis an den Rändern, geht sie als Frage an den Projektleiter. **Erledigt** 12.11.2026 (Anhang E.1): kein Entscheid nötig | **Lauf 1 umgesetzt** 13.11.2026, Review offen (Branch `refactor/schritt-13`: `test:` `fcd3250`; `refactor:` `17008e9`, `9cf1969`, `41fde29`, `fb6e07a`, `291e4a8`; Protokoll Anhang E.2); **Lauf 2 offen** |
+| 13 | [geändert] Ein Abruf-Baustein mit einem Ergebnis-Typ; die Abruf-Module nutzen ihn und deuten keinen Statuscode mehr (B-20). Die Typen `Holen` und `Json` ziehen in den Baustein. **Ein Schritt, zwei Läufe mit je eigenem Review und committetem Zwischenstand (E-41, wie Schritt 11).** *Lauf 1:* der Baustein und die Module, deren Ergebnis schon `art` heisst (`anlass`, `cm`, `push`, `verwaltung`, `mitteilung-api`), bei unveränderten Tests. *Lauf 2:* `profil`, `anmelden` und `passkey` mit der Umbenennung `ergebnis` → `art`; Tests und drei Seiten ändern nur den Namen **[geändert, Anhang E.1: drei Seiten, nicht vier; `passkey.ts` gibt blanke Wörter zurück und liest nur das Ergebnis von `sende`, drei Zeilen]**. Nimmt N-10 auf (eine geteilte Liste für `FEHLER` und `ABGELEHNT`) und N-09 (die doppelten Sätze des Anlasses: aufnehmen oder ausdrücklich verwerfen). Einzelheiten: Hinweise zu Schritt 13 | [geändert] neu der Baustein (Ort z. B. `src/lib/abruf.ts` neben `fehler.ts` und `json-post.ts`; nicht `src/lib/api/`, das sich mit `src/routes/api/` verwechselt); `src/lib/anlass/api.ts`, `cm/api.ts`, `push/api.ts`, `push/geraet.ts`, `verwaltung/api.ts`, `verwaltung/mitteilung-api.ts`, `profil/angaben.ts`, `login/passkey.ts`, `login/anmelden.ts`, `login/sitzung.ts` und ihre Tests; in Lauf 2 die drei Seiten `login`, `login/mail`, `profil` (nur der Name) **[geändert, Anhang E.1: `willkommen` liest kein Ergebnis eines Abruf-Moduls; dazu `src/lib/fehler.ts` (Tabelle Wort → Status) und `src/lib/abruf.test.ts`; `login/sitzung.ts` ändert sich erst in Schritt 15]**. Für N-10 `src/lib/server/cm/schnittstellen.ts` und der Ort der geteilten Liste; für N-09 allenfalls `src/lib/server/anlass/angaben.ts` und die Seite des Anlasses | Statuscodes werden an einer Stelle gedeutet; ein neuer Ablehnungsgrund des Servers fällt in der Oberfläche nicht mehr still als Störung an (N-10) | mittel | [geändert] **Vorab-Tests (erster Commit, Charakterisierung):** je Sonderfall aus der Tabelle des Nachmessens ein Fall in den Einheitstests der Module, darunter die zwei entfallenen «Status allein genügt» (`push/api.test.ts` 401, `verwaltung/api.test.ts` 404, mit `ungeprueft(…, {})`; N-15); jeder einmal absichtlich rot belegt. *Lauf 1:* Die bestehenden Einheitstests der Module (`api.test.ts` u. a.) bleiben unverändert grün. *Lauf 2:* Tests und Seiten ändern nur den Namen `ergebnis` → `art`; der Reviewer prüft das am Diff, `svelte-check` hält die Seiten. E2E voll nach jedem Lauf. Probe für den Reviewer: Der Diff unter `src/lib/server/` und `src/routes/api/` ist leer, ausser für N-10 | 08 (und 12a, weil Schritte strikt nacheinander laufen; inhaltlich hängt 13 nicht an 12a) | Opus | Subagent, zwei Läufe | [geändert] **ja, erweitert (E-41):** (1) `src/lib/profil/angaben.ts`, `src/lib/login/passkey.ts` und `src/lib/login/anmelden.ts` ganz lesen (bisher nur Auszüge); (2) je Modul eine Tabelle der Sonderfälle: 204 ohne Körper, 429 ohne lesbaren Körper, `eingabe` ohne `felder`, 401 als Störung, unlesbares JSON, `ergebnis` statt `art`; (3) Empfehlung zu «ein Wort gilt nur mit seinem Status» (dann eine Tabelle Wort → Status in `fehler.ts`, die auch N-08 zum Teil schliesst); (4) die 13 Stellen mit `page.route` neu bestimmen (Nachtrag zur Prüfliste (b) unten); (5) Ort des Bausteins; (6) N-09: aufnehmen oder verwerfen. Ändert eine Empfehlung ein Ergebnis an den Rändern, geht sie als Frage an den Projektleiter. **Erledigt** 12.11.2026 (Anhang E.1): kein Entscheid nötig | **umgesetzt** 13.11.2026, Review von Lauf 2 und Merge offen (Branch `refactor/schritt-13`. Lauf 1, Review «ok»: `test:` `fcd3250`; `refactor:` `17008e9`, `9cf1969`, `41fde29`, `fb6e07a`, `291e4a8`; Anhang E.2. Lauf 2: `test:` `99b6406`; `refactor:` `5f3ab9d`, `3c47eb7`, `c502044`, `119180c`, `0eee143`, `74752c3`; `test:` `bc41749`; Anhang E.3). Ergebnis unten |
 | 14 | `verwaltung/api.ts` nach Bereichen geteilt (Mitglieder, Turnier, Gespräch, Anlass, Zugang) | `src/lib/verwaltung/api.ts`, alle Importe in `src/routes/verwaltung/` und `src/lib/verwaltung/` | Hotspot entschärft, weniger Merge-Reibung | niedrig | `svelte-check`, Einheitstests, E2E Verwaltung | 13 | Sonnet | Subagent | nein | offen |
 | 15 | [geändert] Die kopierten Wächter werden eine gemeinsame Funktion je App (Mitglieder, Verwaltung), die jede Ladefunktion aufruft und die auch nach einer Aktion im Baustein gilt; keine Seite und kein Baustein schreibt die Umleitung zum Login selbst, keine Ladefunktion ruft `fetch` direkt (B-21). **Das heutige Verhalten bleibt genau (E-44):** Der Schritt vereinheitlicht die Umleitungen nicht; die Abweichungen (`profil/email`, `verwaltung/rollen`, Aktionen ohne Mail-Code) sind benannte Fälle der Funktion. Die vier Seiten, die im Baustein laden (`turniere`, `anlaesse`, `mitglieder`, `verlauf`), bekommen ihr erstes Laden in einer `+page.ts`; erneutes Laden nach Suche, Filter oder Aktion bleibt im Baustein. **Die Prüfung der Sitzung bei jedem Seitenwechsel bleibt** (gewollt, B-21); darum kein einmaliges Laden im Layout und vorerst keine Routen-Gruppe. Einzelheiten: Hinweise zu Schritt 15 | [geändert] neu z. B. `src/lib/login/waechter.ts` mit Einheitstest; `src/lib/login/sitzung.ts` (ein typisierter Abruf der Sitzung auf dem Baustein aus 13; die vier `fetch('/api/sitzung')` in Ladefunktionen und der Abruf von `/api/kontakt` in `hilfe/+page.ts` verschwinden); alle `+page.ts` und `+layout.ts` der Mitglieder-App und der Verwaltung (27 Ladefunktionen); `src/lib/verwaltung/umleiten.ts`; die Bausteine, die nach einer Aktion von Hand zum Login leiten (CM-Seite neun Stellen, Doppel-Seite fünf: nur der Aufruf wechselt); `src/routes/verwaltung/turniere`, `anlaesse`, `mitglieder`, `verlauf` (je `+page.svelte` und eine neue `+page.ts`) | Ein Ort für den Einstieg; kein geändertes Verhalten | [geändert] **mittel** (vorher niedrig: 27 Ladefunktionen, fünf verschiedene Wächter, kein Test ruft eine Ladefunktion) | [geändert] **Vorab-Test (erster Commit, einmal rot):** «ohne Sitzung führt jede geschützte Seite an ihr heutiges Ziel», mit und ohne wartende Mail-Anfrage; die Erwartung ist die Tabelle aus dem Nachmessen; der Test bleibt durch den Umbau unverändert. Dann der Einheitstest der Wächter-Funktion zuerst; `tests/e2e/navigation.test.ts`, `login.test.ts`, `startseite.test.ts`, `verwaltung.test.ts` («SI-07»), `bewegung.test.ts` («Reiter … sofort aktiv» hängt an `/api/sitzung`, B-31) auf allen drei Geräten; Prüfliste (b) unten | 13 | Opus | Subagent | [geändert] **ja (E-41):** Tabelle aller Einstiege (Ladefunktionen und Aktionen im Baustein) mit ihrem heutigen Ziel, mit und ohne wartende Mail-Anfrage; die Form des Vorab-Tests (E2E-Schleife oder Einheitstests der Ladefunktionen mit gestelltem `fetch`, siehe Hinweise) | offen |
 | 16 | CM-Seite: zuerst das gemeinsame Gerüst der acht Handler als eine Funktion mit Einheitstests (Antwort → Meldung, Fehlertext, neu laden oder Login), dann die beiden gleichen Text-Dialoge («Wildcard», «Kommentar ändern») als ein Baustein. Die neun Abschnitte des Markups bleiben in der Seite; es gibt kein Ziel für die Zeilenzahl (B-22, B-34). **[geändert]** «Login» nimmt die Ablauf-Funktion vom Wächter aus Schritt 15, nicht aus eigenen Stellen. Die Doppel-Seite ist eine offene Kleinfrage (Hinweise zu Schritt 16) | `src/routes/clubmeisterschaft/[id]/+page.svelte`; neu unter `src/lib/cm/` (Ablauf-Funktion mit Test, ein Dialog-Baustein) | Der Fix-Hotspot verliert rund 250 Zeilen wiederholten Ablauf; der Ablauf ist erstmals ohne Browser prüfbar | mittel (Fokus nach jeder Aktion, WCAG 2.4.3) | Neue Einheitstests zuerst; alle `cm-*`-E2E und `navigation.test.ts` («lädt nicht neu»); Klassen und Verschachtelung unverändert (Prüfliste (b) unten) | [geändert] 04, 13, **15** | Opus | Subagent | [geändert] kurz: nur die Doppel-Seite, aufnehmen oder ausdrücklich verwerfen (Hinweise zu Schritt 16) | offen |
 | 17 | `Anmeldungsliste.svelte` nutzt den vorhandenen `Aktionsdialog` statt `fuehreAus` und fünf roher Dialoge. `DoppelListe.svelte` bleibt unverändert. Der Dialog «Wildcard-Antrag» hat zwei Entscheid-Tasten; ob der Baustein dafür erweitert wird oder dieser eine Dialog von Hand bleibt, entscheidet der Schritt und begründet es. **Checkpoint (E-21):** Vor dem Merge sieht der Projektleiter ein Vorher-Nachher-Bild der Warnung (heute ein Satz, im Baustein eine Liste) und entscheidet, ob es so bleibt | `src/lib/verwaltung/Anmeldungsliste.svelte`, allenfalls `Aktionsdialog.svelte` | Zwei statt drei Baustufen desselben Ablaufs; rund 150 Zeilen weniger | mittel (die Warnung steht heute als Satz, im Baustein als Liste: sichtbare Abweichung, vorab dem Projektleiter zeigen) | `cm-verwaltung.test.ts`, `turnier.test.ts`, `cm-anmeldung.test.ts` (zweiter Test); Prüfliste (b) unten | 04, 14 | Opus | Subagent, vor dem Merge Checkpoint mit dem Projektleiter | nein | offen |
 | 18 | [geändert] `basis.css` in mehrere Dateien schneiden, **in der bestehenden Reihenfolge** (E-13; z. B. Grundlagen, Rahmen und Kopfleiste, Bedienelemente, Karten und Listen, Verwaltung, Anleitung, Übergänge, PC-Layout, Druck). Keine Regel wird verschoben, umbenannt oder gelöscht; es gibt keine tote Klasse zu entfernen (B-23). Bedingungen für den Schnitt: Hinweise zu Schritt 18 | `src/lib/design/`, `src/routes/+layout.svelte` (Importe in derselben Reihenfolge), `scripts/pruefungen/design-festwerte.ts` (Pfade), die vier Mockups unter `docs/ui-mockups/*.html`, `docs/ui-leitbild.md` | Weniger Merge-Reibung an der meistgeänderten Code-Datei | niedrig (vorher mittel), solange der Beweis hält | Gebautes Stylesheet vor und nach Zeichen für Zeichen gleich (`make css-vergleich`, Schritt 04); **[geändert]** dazu den Vergleich einmal für den SPA-Build ziehen oder begründen, warum nicht; `make check` | 04 (E-13) | Sonnet | Subagent | nein | offen |
+
+**Ergebnis Schritt 13** (13.11.2026; zwei Läufe, Review von Lauf 1 «ok», Review von Lauf 2 und Merge offen; Protokolle in E.2 und E.3)
+
+- **Baustein:** `src/lib/abruf.ts` (`rufeAb`, `Vertrag`, `Holen`, `Json`, `woerterAus`) deutet alle Statuscodes der Oberfläche; er wirft nie und gibt `ok` mit Daten, ein Wort des Vertrags mit dem Körper oder `stoerung`. Ein Wort gilt nur mit seinem Status (Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`), für 401, 404 und 429 genügt der Status. Der Vertrag je Modul hat vier Angaben (Wörter, Körper Pflicht oder nachsichtig, 204 ohne Körper, JSON `null` als `{}`); damit bleibt jeder Rand der Module genau, wie er war (E.1, Linie von E-44).
+- **Module:** `anlass`, `push`, `cm`, `verwaltung`, `mitteilung-api`, `profil/angaben.ts`, `login/anmelden.ts`, `login/passkey.ts` und `login/sitzung.ts` nennen keinen Statuscode mehr; sie bilden nur noch Zusatzangaben ab. Jeder einzelne Abruf gibt `{ art }`; benannte Ausnahmen der Form sind die Abläufe auf dem Gerät (Passkey, `push/geraet.ts`), «Daten oder `null`» und `hatSitzung` (Liste in E.3). Die Login-Seiten nennen keine Adresse mehr (vier benannte Funktionen).
+- **Geteilt:** die Ablehnungsgründe der CM (`src/lib/cm/ablehnung.ts`, N-10) und Grenze und Sätze der Antwort auf einen Anlass (`src/lib/anlass/antwort.ts`, N-09).
+- **Netz:** 47 Vorab-Fälle (E.1 Zeilen 1 bis 57 und einige mehr), alle auf dem alten Stand grün, je Modul einmal rot; `abruf.test.ts` 18 Fälle, Abdeckung des Bausteins 100 % und neu in der Messung. Die bestehenden Erwartungen sind gleich geblieben, ausser dem Namen `art` und der Form `{ art }` beim E-Mail-Wechsel.
+- **Verworfen:** die Lint-Regel «kein `fetch` ausserhalb des Bausteins» (98 Meldungen am heutigen Repo; Vorschlag an Schritt 15 in E.3).
+- **Für die Nutzerin:** nichts; kein Satz, keine Anfrage, kein Ergebnis an einem Rand.
+- **Folgt daraus:** Schritt 14 teilt `verwaltung/api.ts`; `lese` und `schicke` bleiben dafür exportiert. Schritt 15 baut den typisierten Abruf der Sitzung auf dem Baustein und kann die Lint-Regel zu `fetch` mitnehmen.
 
 **Hinweise zu Schritt 13** [neu]
 
@@ -2048,7 +2070,7 @@ Abruf-Module sind bis und mit der Deutung gelesen, der Rest per Textsuche.
 - **Warum zwei Läufe:** Die alte Zeile widersprach sich. «Tests unverändert grün» und «das Ergebnis
   heisst `art`» gehen nicht zusammen, weil `profil/angaben.ts`, `login/anmelden.ts` und über sie
   `passkey.ts` heute `ergebnis` heissen und vier Seiten es lesen (`login`, `login/mail`, `profil`,
-  `willkommen`). Lauf 1 hält die Tests unverändert, Lauf 2 benennt um und ändert an Tests und
+  `willkommen`) **[berichtigt, E.1: drei Seiten; `willkommen` liest kein Ergebnis eines Abruf-Moduls]**. Lauf 1 hält die Tests unverändert, Lauf 2 benennt um und ändert an Tests und
   Seiten nur den Namen. Je Lauf ein committeter Zwischenstand und ein eigenes Review; ein Merge
   und eine Version am Ende, wie bei Schritt 11. Die Übergangsregel «Ab Schritt 13 … das Ergebnis
   heisst `art`» der `CLAUDE.md` bleibt darum unverändert (C-4, E-43).
@@ -7332,7 +7354,7 @@ eine Stelle für die Umleitungen der Verwaltung.
 - **Zeilenzahlen der Aufrufer** sind per Textsuche nach `ergebnis` gezählt und an den Seiten
   einzeln gelesen; mehrzeilige Stellen ohne das Wort fehlen in der Zahl nicht, weil jede Lese-
   und Schreibstelle das Wort trägt.
-- **Nicht nachgeführt (der Auftrag liess sonst nichts umschreiben):** «vier Seiten» steht weiter
+- **Nicht nachgeführt (der Auftrag liess sonst nichts umschreiben)** [in Lauf 2 nachgeführt, E.3]: «vier Seiten» steht weiter
   im ersten Hinweis zu Schritt 13 und in 1c (Tabelle P);
   B-20 sagt weiter «überstehen Schritt 13 unverändert»; die Zeile «Nächster offener Schritt» oben
   sagt weiter «mit Nachmessen vorab». Es gelten die Zeile 13, der neue Hinweis und dieser
@@ -7475,3 +7497,180 @@ eine Stelle für die Umleitungen der Verwaltung.
   (`entfernePasskey` mit `ohneKoerper: 'einzig'`); `push/geraet.ts` und die zwei Module des Logins
   holen `Holen` aus `abruf.ts`, danach entfallen die Weitergabe in `verwaltung/api.ts` und die
   zweite Definition in `login/anmelden.ts`; die Vorab-Fälle 35 bis 56 zuerst.
+
+### E.3 Schritt 13, Lauf 2
+
+**Erkenntnisse Schritt 13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13` ab `970c072`, nach Review 1
+«ok» ohne Befund; Profil, Login, Passkey, Umbenennung, Kleinfragen, N-09, Punkte aus dem Review)
+
+- **Voraussetzungen geprüft:** Review von Lauf 1 «ok» (Differenztest des Reviewers alt gegen neu,
+  rund 5 Millionen Fälle, 0 Abweichungen). Keine neue Abhängigkeit, keine Lint-Ausnahme, `AUSNAHMEN`
+  leer, `CLAUDE.md` unverändert, keine Version. Svelte-Doku vor dem ersten Diff an einer `.svelte`-Datei
+  über den MCP-Server geholt (`kit/load`: `fetch` der Ladefunktion, `invalidate`, Einbetten gelesener
+  Antworten bei SSR; die App hat `ssr = false`, darum liest der Baustein ohne Folge auch dort den
+  Körper, wo das alte Modul es nicht tat).
+- **Commits:**
+
+  | Nr. | Commit | Inhalt |
+  |----:|--------|--------|
+  | 0 | `99b6406` `test:` | Vorab-Tests der Zeilen 35 bis 56 (20 Fälle in vier Dateien) |
+  | 1 | `5f3ab9d` `refactor:` | Profil, Login, Passkey, Sitzung auf dem Baustein, noch mit `ergebnis`; `Holen` überall aus `abruf.ts` |
+  | 2 | `3c47eb7` `refactor:` | Umbenennung `ergebnis` → `art`, allein |
+  | 3 | `c502044` `refactor:` | Kleinfrage: `starteWechsel`, `bestaetigeWechsel` geben `{ art }` |
+  | 4 | `119180c` `refactor:` | Kleinfrage: vier benannte Anfragen statt `sende` mit Adresse |
+  | 5 | `0eee143` `refactor:` | N-09: `src/lib/anlass/antwort.ts` |
+  | 6 | — | Lint-Regel zu `fetch`: **verworfen** (unten) |
+  | 7a | `74752c3` `refactor:` | Wortlisten der Verträge an den Typ gebunden (`woerterAus`) |
+  | 7b | `bc41749` `test:` | `src/lib/abruf.ts` in der Abdeckung |
+  | 8 | dieser `docs:`-Commit | |
+
+  Jeder Commit lief durch den Hook `check-schnell` (Lint, `svelte-check`, Prüfskripte,
+  Einheitstests: 97 Dateien, 1406 bis 1408 Tests); die Datenbanktests des Anlasses (25) liefen nach
+  Commit 5 von Hand, `npm test` (153 Dateien, 2156 Tests) nach Commit 7b.
+- **Commit 1, die Verträge** (alle `koerper: 'nachsichtig'`, keiner mit `nullAlsLeer`, das dort
+  ohne Belang ist):
+
+  | Modul | Funktionen | Wörter | Angabe 3 |
+  |-------|------------|--------|----------|
+  | `profil/angaben.ts` → `schicke` | `speichereAngaben`, `starteWechsel`, `bestaetigeWechsel`, `speichereRufname` | `veraltet`, `eingabe`, `gleich`, `falsch`, `zu-viele` | — |
+  | `profil/angaben.ts` → `lade` | `ladeProfil` (und `ladeAngaben`), `ladeKontakt` | keine | — |
+  | `login/anmelden.ts` → `sende` | `sende` und die vier neuen Funktionen | `falsch`, `benutzt`, `zu-viele` | — |
+  | `login/passkey.ts` | Optionen von `richtePasskeyEin`, `ladePasskeys`, `hinweisErledigt` | keine | — |
+  | `login/passkey.ts` | Optionen von `meldeMitPasskeyAn` | `zu-viele` | — |
+  | `login/passkey.ts` | `entfernePasskey` | keine | `einzig` (nur ohne Körper ist Erfolg) |
+  | `login/sitzung.ts` | `hatSitzung` | keine | — |
+
+  Die Module bilden wie vorher ab: Profil liest `felder`, `fremd`, `rufname` aus dem Körper (kein
+  Objekt gilt als `{}`), `speichereAngaben` macht aus `gleich`, `falsch`, `zu-viele` Störung,
+  `speichereRufname` dazu aus `veraltet`; `sende` gibt `benutzt` nur mit `kontakt` als Text;
+  `richtePasskeyEin` öffnet den Dialog nur mit einem gelesenen Objekt (`daten` ist bei unlesbarem
+  Körper `undefined`, die Falle aus E.1 trägt); `ladePasskeys` behält das `try` um die Umwandlung.
+  Die Hilfen `leseJson` (Profil, Passkey), `deute` (Profil) und `post` (Passkey) entfallen. `Holen`
+  steht nur noch in `abruf.ts`: `push/geraet.ts`, `profil/angaben.ts`, `login/passkey.ts` holen es
+  dort; die Weitergabe in `verwaltung/api.ts` und die zweite Definition in `login/anmelden.ts`
+  sind weg. **`login/sitzung.ts` ist mit umgestellt** (E.1 sah das erst in Schritt 15 vor):
+  `hatSitzung` las `.ok`; jetzt `rufeAb` mit einem Vertrag ohne Wörter, das Ergebnis bleibt ein
+  Wahrheitswert, die Anfrage ist `GET` wie vorher (E.1 zählte `holen(pfad)` mit einem Argument; für
+  `fetch` ist das dieselbe Anfrage). Der typisierte Abruf der Sitzung bleibt Schritt 15. Die
+  Attrappe `fakeHolen` in `passkey.test.ts` gibt echte `Response`s zurück; sie brauchte keine
+  Änderung.
+- **Commit 2, Umbenennung:** 81 Vorkommen des Worts `ergebnis` als Feld bzw. lokale Variable, nur
+  in den acht Dateien `profil/angaben.ts` (24), `login/anmelden.ts` (11), `login/passkey.ts` (5),
+  `profil/angaben.test.ts` (15), `login/anmelden.test.ts` (16), `routes/profil/+page.svelte` (7),
+  `routes/login/+page.svelte` (1), `routes/login/mail/+page.svelte` (2). Mehr als die 66 aus E.1,
+  weil die 20 Vorab-Fälle dazukamen und `schicke` im Profil seine lokale Variable mitbenennt. Der
+  Wort-Diff enthält nur `ergebnis` → `art` (52 Felder, 10 `r.ergebnis`, Rest Kurzformen), dazu
+  zwei von Prettier umgebrochene Zeilen. Nicht angefasst: `ergebnis` der Fachfunktionen des
+  Servers, der Helfer `ergebnis(status, inhalt)` in `cm/api.test.ts` und `anlass/api.test.ts`, die
+  Zustände in `willkommen/+page.svelte` und `Mitteilungsformular.svelte`, `tests/e2e/`,
+  `scripts/`. Rot belegt: `r.ergebnis` zurück in `login/+page.svelte` → `svelte-check` 1 Fehler
+  («Property 'ergebnis' does not exist on type 'Ergebnis'»).
+- **Commit 3, Kleinfrage `{ art }`: aufgenommen.** Die Seite `profil/email` ändert drei Zeilen,
+  je `const r = (await starteWechsel(email)).art;` bzw. `bestaetigeWechsel`; Vergleiche und
+  `meldungFuer` bleiben. In `angaben.test.ts` werden 18 Erwartungen von `toBe('x')` zu
+  `toEqual({ art: 'x' })`, dieselben Wörter. Das ist die einzige Stelle, an der eine Erwartung
+  ihre Form ändert (nicht ihren Wert).
+- **Commit 4, Kleinfrage benannte Anfragen: aufgenommen.** `meldeMitBriefAn(code)`,
+  `fordereMailCodeAn(email)`, `meldeMitMailAn(email, code)`, `meldeSichAb()` in
+  `login/anmelden.ts`; die drei Seiten ändern Import und je eine Zeile (Funktionsname, die
+  Adresse fällt weg, die Angaben stehen als Argumente). Anfrage gleich (neuer Test je Funktion:
+  Pfad, Methode, Kopfzeile, Körper als Text; rot belegt mit vertauschter Reihenfolge `{ code,
+  email }`). **Abweichung von E.1:** `sende` bleibt exportiert, weil `passkey.ts` die zweite
+  Anfrage beider Abläufe darüber schickt; die bestehenden Tests von `sende` bleiben, wie sie sind.
+- **Commit 5, N-09: aufgenommen.** `src/lib/anlass/antwort.ts` (importiert nichts) mit
+  `MAX_BEMERKUNG` und `ANTWORT_MELDUNG`; `server/anlass/angaben.ts` nimmt die Grenze von dort,
+  `server/anlass/schnittstellen.ts` die Sätze, die Seite `anlass/[id]` beide (drei Sätze,
+  `maxlength={MAX_BEMERKUNG}`). Zeichengleich belegt: Die alte Seite enthielt den Satz zu `antwort`
+  zweimal, den zu `bemerkung` einmal und `maxlength="500"`; die Konstanten sind mit diesen Texten
+  identisch (`===`, mit Node geprüft). Der Datenbanktest hält beide Sätze wörtlich; ein geänderter
+  Satz macht ihn rot (1 von 8). Lint und Bauregel ohne Ausnahme.
+- **Punkt 6, Lint-Regel zu `fetch`: verworfen, als Vorschlag an Schritt 15.** Gemessen mit
+  `no-restricted-globals` für `fetch` über `src/lib` und `src/routes` (ohne Server, Tests,
+  `routes/api/`): **98 Meldungen** in zehn Dateien: die Vorgaben `holen: Holen = fetch` (Verwaltung
+  53, CM 16, Profil 7, Login 5, Passkey 5, Push 4, Anlass 3, Mitteilungen 3), `push/geraet.ts` →
+  `browser()` (1) und die Doppel-Seite, die das globale `fetch` für `signal` durchreicht (1). Das
+  `fetch` der Ladefunktionen (Parameter) und `typeof fetch` in `login/sitzung.ts` und
+  `hilfe/+page.ts` meldet die Regel nicht. Am heutigen Repo ist sie also nicht grün; grün würde
+  sie erst mit rund 97 geänderten Signaturen und einer Seite, die mehr als einen Namen ändert. Das
+  ist mehr, als der Auftrag erlaubt. **Vorschlag für Schritt 15:** (1) `rufeAb` nimmt `holen`
+  freiwillig (`holen ?? fetch`), die Abruf-Funktionen schreiben `holen?: Holen`; (2)
+  `sucheDoppelPartner` nimmt `signal` vor `holen` oder in einem Objekt; (3) `geraet.ts` lässt
+  `holen` weg; (4) dann die Regel für `src/lib/**` und `src/routes/**` ohne `server/`, `api/`,
+  Tests und ohne `abruf.ts`, einmal rot belegt. `clubmeisterschaft/[id]/+page.ts`, das
+  `holeCmTurniere()` bewusst ohne das `fetch` der Ladefunktion ruft, bleibt dabei, wie es ist.
+- **Punkt 7a, Wortlisten an den Typ gebunden.** `woerterAus<Wort>({ … })` in `abruf.ts`; `Wort`
+  kommt in `anlass`, `push`, `cm`, Verwaltung, Profil und Login aus dem Ergebnis-Typ des Moduls
+  (`Exclude<…, 'ok' | 'stoerung'>`), die CM hängt die geteilten Ablehnungen an. Die Optionen der
+  Passkey-Anmeldung nennen `zu-viele` über denselben Helfer; die Verträge ohne Wörter
+  (`Vertrag<never>`) können nichts vergessen. Rot belegt: `geschlossen` aus dem Objekt von `anlass`
+  → `svelte-check` 1 Fehler (fehlende Eigenschaft); `veraltet` dazu in `push` → 1 Fehler
+  (überzählige Eigenschaft). Ein Fall für `woerterAus` in `abruf.test.ts` (17 → 18).
+- **Punkt 7b, Abdeckung.** `src/lib/abruf.ts` steht in `coverage.include`; der Baustein ist ganz
+  gedeckt, die Schwellen halten (97,1 % Anweisungen, 93,64 % Zweige gesamt).
+- **Vorab-Tests** (`99b6406`, 20 Fälle): die Zeilen 35 bis 56 aus E.1, als je ein `describe`-Block
+  «Ränder der Deutung» angehängt; dazu über E.1 hinaus 204 an `speichereAngaben` (`ok`), 429 mit
+  JSON `null` (`zu-viele`), 400 mit JSON `null` (Störung) und `eingabe` ohne `felder` an
+  `starteWechsel`. **E.1 irrt an keinem Rand.** Rot belegt (aus Sicherungskopien zurück, `git
+  status` danach sauber): Profil die 429-Zeile an das Wort gebunden und `leseJson` werfen lassen,
+  `sende` 429 erst nach dem Lesen des Körpers, Passkey `status !== 204` durch `!ok`, `hatSitzung`
+  `status !== 401` statt `ok` → 5 von 105 rot, je Modul ein Vorab-Fall; getrennt `istObjekt(opt)`
+  in `richtePasskeyEin` weg → 1 rot («Dialog öffnet nur mit einem gelesenen Objekt»).
+- **Beleg des Laufs** (Befehle im Worktree):
+  - `git diff --stat 99b6406 HEAD -- '*.test.ts' tests/` → nur `abruf.test.ts` (ein neuer Fall),
+    `anmelden.test.ts` (Umbenennung, Import, ein neuer `describe`), `angaben.test.ts` (Umbenennung,
+    Kleinfrage 3); `passkey.test.ts`, `sitzung.test.ts` und `tests/` ohne Diff.
+  - `git diff --word-diff=porcelain 99b6406 HEAD -- '*.test.ts'`, alle entfernten Wörter: 31×
+    `ergebnis:` und 18 Erwartungen `toBe('…')` aus Kleinfrage 3 (sonst nichts).
+  - `.svelte` (`git diff --stat 99b6406 HEAD -- '*.svelte'`): `login`, `login/mail`, `profil`
+    (Feldname und, aus Kleinfrage 4, Import und Funktionsname), `profil/email` (drei Zeilen,
+    Kleinfrage 3), `anlass/[id]` (N-09: Import, drei Sätze, `maxlength`). Kein Wert und kein Text
+    hat sich geändert.
+  - Unter `src/lib/server/` nur `anlass/angaben.ts` und `anlass/schnittstellen.ts` (N-09), unter
+    `src/routes/api/` nichts.
+- **Voller `make check`** auf dem Code-Endstand `bc41749` bei sauberem Arbeitsbaum, im
+  Hintergrund, kein zweiter Lauf im Ordner: Exit 0. Lint; `svelte-check` 1539 Dateien ohne Fehler
+  und Warnung; Prüfskripte samt `bauregel: ok`; Einheits- und Datenbanktests 153 Dateien mit 2156
+  Tests, Abdeckung 97,1 % Anweisungen und 93,64 % Zweige (jetzt mit `abruf.ts`); beide Builds; E2E
+  414 bestanden, 57 übersprungen, 3,5 Minuten; Image; grüner Stand `9cba996ee11c` gemerkt. Der
+  Doku-Commit ändert keinen Code.
+- **Abweichungen von E.1:**
+  1. `login/sitzung.ts` ist in Lauf 2 auf dem Baustein (E.1: erst Schritt 15); die Form des
+     Ergebnisses (Wahrheitswert) bleibt.
+  2. `sende` bleibt exportiert (Kleinfrage 4, oben).
+  3. Die Umbenennung zählt 81 statt 66 Stellen (oben).
+  4. Die Lint-Regel zu `fetch` ist nicht gebaut (oben); E.1 sah das als möglichen Ausgang vor.
+  5. In `.svelte`-Dateien ändert N-09 die Seite des Anlasses, nicht nur Namen; das verlangt N-09
+     selbst (Server und Seite nehmen die Sätze vom selben Ort).
+  6. Die Attrappe in `passkey.test.ts` brauchte keine Änderung.
+- **Benannte Ausnahmen zur Übergangsregel «Ab Schritt 13 … das Ergebnis heisst `art`»** (für den
+  Wortlaut der Regel, Entscheid beim Projektleiter, `CLAUDE.md` unverändert). Kein Abruf-Modul
+  deutet nach Lauf 2 einen Statuscode selbst; die Form des Ergebnisses weicht hier ab:
+  - **Blanke Wörter eines Ablaufs auf dem Gerät** (zwei Anfragen und ein Dialog, Wörter teils vom
+    Browser): `richtePasskeyEin` → `'ok' | 'vorhanden' | 'abgebrochen' | 'fehler'`,
+    `meldeMitPasskeyAn` → `'ok' | 'abgebrochen' | 'falsch' | 'zu-viele' | 'stoerung'`,
+    `entfernePasskey` → `'ok' | 'fehler'`; in `push/geraet.ts` `schalteEin` → `'ein' |
+    'abgelehnt' | 'stoerung'` und `schalteAus` → `'aus' | 'stoerung'` (sie lesen `r.art` von
+    `sendeAbo` und `loescheAbo`).
+  - **Daten oder `null`:** `ladeProfil`, `ladeAngaben`, `ladeKontakt` (Profil), `ladePasskeys`
+    (Liste oder `null`); 401 ist dort von einer Störung nicht zu unterscheiden, so gewollt.
+  - **Wahrheitswert:** `hatSitzung`.
+  - **Nichts:** `hinweisErledigt`.
+  - Vorschlag für den Wortlaut: «Ab Schritt 13: Abruf-Module nutzen den gemeinsamen Abruf-Baustein;
+    keine eigene Deutung von Statuscodes. Ein einzelner Abruf gibt `{ art }`; Abläufe auf dem
+    Gerät (Passkey, Push), Ladefunktionen mit „Daten oder `null`“ und `hatSitzung` sind benannte
+    Ausnahmen in E.3.»
+- **Für die Nutzerin geändert: nichts.** Kein Satz, keine Anfrage, kein Ergebnis an einem Rand
+  (Vorab-Tests und bestehende Erwartungen mit denselben Werten grün, E2E unverändert grün).
+- **Was kein Test sieht:**
+  - Dass der Baustein bei 2xx und 429 im Login, bei Fehlern des Passkeys und bei `hatSitzung`
+    den Körper liest, wo das alte Modul es nicht tat: gleiches Ergebnis, nur liest er bis zum
+    Ende. Ein Körper, der nie endet, liesse den Aufruf warten statt sofort zu antworten [V: kein
+    solcher Sender]. Mit `ssr = false` bettet SvelteKit keine gelesene Antwort ein.
+  - Was die Seiten aus `art` machen, hält in Lauf 2 nur `svelte-check` (wie E.1).
+  - Die Lint-Regel zu `fetch` fehlt; ein neues `fetch` in einem Baustein fiele nur im Review auf.
+  - Die Gegenrichtung von N-10 bleibt offen (E.2).
+- **Ausserhalb des Schritts aufgefallen (nicht behoben):**
+  - `hilfe/+page.ts` → `holeKontakt` ruft `/api/kontakt` neben `ladeKontakt` im Profil (Schritt 15,
+    E.1).
+  - Die Abruf-Module der Login-Seiten heissen nach Kleinfrage 4 `meldeMitBriefAn` usw.;
+    `meldeAb` gibt es schon in `cm/api.ts` (CM abmelden), darum `meldeSichAb`.
