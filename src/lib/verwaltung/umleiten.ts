@@ -1,26 +1,16 @@
 // Gemeinsame Reaktion der Verwaltungsseiten, wenn die Sitzung oder die Code-Bestätigung fehlt,
 // und welche Seite welchem Bereich angehört (RR-07, Design Rollen schärfen Regeln 3 und 7).
-import { goto } from '$app/navigation';
-import { resolve } from '$app/paths';
+import { leiteUmNachAktion } from '../login/waechter.ts';
 import type { Antwort } from './api.ts';
 import type { VerwaltungsRolle } from './zugang-api.ts';
 import { darf, type Bereich } from './bereiche.ts';
 
-/** Leitet bei fehlender Anmeldung, Rolle oder Bestätigung um; `true`, wenn umgeleitet wurde. */
+/**
+ * Leitet bei fehlender Anmeldung, Rolle oder Bestätigung um; `true`, wenn umgeleitet wurde. Die
+ * Ziele stehen in der Tabelle des Wächters (Fall `verwaltung`).
+ */
 export async function leiteUm(a: Antwort<unknown>): Promise<boolean> {
-	switch (a.art) {
-		case 'abgemeldet':
-			await goto(resolve('/login'));
-			return true;
-		case 'kein-admin':
-			await goto(resolve('/'));
-			return true;
-		case 'unbestaetigt':
-			await goto(resolve('/verwaltung/bestaetigen'));
-			return true;
-		default:
-			return false;
-	}
+	return leiteUmNachAktion(a, 'verwaltung');
 }
 
 const BEREICHE_IN_REIHE: readonly Bereich[] = ['mitglieder', 'cm', 'rollen'];
