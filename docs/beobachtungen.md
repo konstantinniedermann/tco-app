@@ -135,6 +135,18 @@ Fehler der App.
 
 ## Offen
 
+### 2026-11-13 — Rangliste läuft bei 320 px und grosser Schrift über
+
+**Thema:** Interclub
+
+**Fundort:** Rangliste auf der Team-Seite (`src/routes/interclub/[id]/+page.svelte`, Stile unter `src/lib/design/`)
+
+**Beobachtung:** Auf 320 px breiten Bildschirmen ab etwa 175 % Schrift läuft die Rangliste (zweizeilige Form) noch über: Die Köpfe «Partien» und «Sätze» passen nicht nebeneinander. Die E2E-Geräte (393/412 px, PC) sind nicht betroffen.
+
+**Ursprung:** #81 Teil 1, E2E (Task 9)
+
+**Einschätzung:** Randfall; Kopfbeschriftung kürzen oder die Spalten bei sehr schmalem Platz umbrechen. Vorläufig.
+
 ### 2026-11-13 — Allgemeine Zeithilfe liegt im Thema Anlass
 
 **Thema:** Struktur
