@@ -7,8 +7,8 @@ weiterarbeiten können: Es enthält den Ist-Zustand, die Befunde, das Zielbild, 
 je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 [#80](https://github.com/konstantinniedermann/tco-app/issues/80).
 
-- **Stand des Dokuments:** 12.11.2026, nach Schritt 12a (Review «ok», Version 0.20.19; zuletzt
-  gemergt Schritt 12, Version 0.20.18). Die Etappen 0 und 1 sind umgesetzt; die Zwischenrevision am
+- **Stand des Dokuments:** 13.11.2026, Schritt 13 Lauf 1 umgesetzt (Review offen); zuvor Schritt
+  12a (Review «ok», Version 0.20.19). Die Etappen 0 und 1 sind umgesetzt; die Zwischenrevision am
   Ende der Etappe 1 (Abschnitt 1c) ist am Checkpoint entschieden und eingearbeitet (E-41 bis E-44).
   Danach die Etappe 2.
 - **Stand der Analyse (Abschnitte 1 bis 5 und 10):** 11.11.2026, Version 0.20.5, vor Schritt 01.
@@ -22,7 +22,7 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
   zeigt der Git-Verlauf dieser Datei.
 - **Aufbau:** Abschnitte 1 bis 5 Befunde, 6 Zielbild, 7 Plan, 8 Entscheide, 9 Fragen, 10 Grenzen;
   Anhang A und B Anweisungsdateien, Anhang C das Protokoll der Etappe 0, Anhang D das der Etappe 1
-  (bis D.15, Schritt 12a), Anhang E das der Etappe 2 (bis E.1, Nachmessen Schritt 13).
+  (bis D.15, Schritt 12a), Anhang E das der Etappe 2 (bis E.2, Schritt 13 Lauf 1).
 
 ## Stand und nächster Schritt
 
@@ -30,10 +30,10 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 
 | | |
 |---|---|
-| **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt, Review und Merge offen |
+| **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt und gemergt (0.20.19). **Etappe 2:** Schritt 13 Lauf 1 umgesetzt, Review offen; Lauf 2 offen |
 | **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D) |
-| **Zuletzt erledigt** | **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **13** Abruf-Baustein `src/lib/abruf.ts`: Nachmessen erledigt (Anhang E.1, kein Entscheid nötig, jeder heutige Rand bleibt genau erhalten). Zwei Läufe mit je eigenem Review (E-41): Lauf 1 Vorab-Tests, Baustein, `anlass`, `push`, `cm`, Verwaltung; Lauf 2 Profil, Login, Passkey mit Umbenennung `ergebnis` → `art`. Ein Merge, eine Version. Etappe 2 läuft ohne Halt mit Kurzbericht je Schritt (E-45). CI auf `dev` zum Merge von 12a grün (Lauf 43281391747) |
+| **Zuletzt erledigt** | **13, Lauf 1** Abruf-Baustein (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
+| **Nächster offener Schritt** | **13**: Review 1 auf dem Zwischenstand von Lauf 1 (`291e4a8` plus Doku-Commit), dann **Lauf 2** Profil, Login, Passkey mit Umbenennung `ergebnis` → `art`, im selben Branch (Anhang E.1, «Schnitt»; Hinweise für Lauf 2 in E.2). Ein Merge, eine Version. Etappe 2 läuft ohne Halt mit Kurzbericht je Schritt (E-45). CI auf `dev` zum Merge von 12a grün (Lauf 43281391747) |
 | **Wartet auf Freigabe des Projektleiters** | nichts. Checkpoint am Ende der Etappe 1 erledigt am 12.11.2026 (E-41 bis E-44); die Berichtigungen der `CLAUDE.md` sind eingespielt (E-43) |
 | **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen Fragen sind beantwortet (F-22 durch den Ablauf erledigt, F-23 in F-26 aufgegangen) |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
@@ -2033,7 +2033,7 @@ Der wichtigste ist der dritte.
 
 | Nr. | Ziel | Dateien | Nutzen | Risiko | Absicherung | Voraussetzung | Modell | Weg | Nachmessen vorab | Status |
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
-| 13 | [geändert] Ein Abruf-Baustein mit einem Ergebnis-Typ; die Abruf-Module nutzen ihn und deuten keinen Statuscode mehr (B-20). Die Typen `Holen` und `Json` ziehen in den Baustein. **Ein Schritt, zwei Läufe mit je eigenem Review und committetem Zwischenstand (E-41, wie Schritt 11).** *Lauf 1:* der Baustein und die Module, deren Ergebnis schon `art` heisst (`anlass`, `cm`, `push`, `verwaltung`, `mitteilung-api`), bei unveränderten Tests. *Lauf 2:* `profil`, `anmelden` und `passkey` mit der Umbenennung `ergebnis` → `art`; Tests und drei Seiten ändern nur den Namen **[geändert, Anhang E.1: drei Seiten, nicht vier; `passkey.ts` gibt blanke Wörter zurück und liest nur das Ergebnis von `sende`, drei Zeilen]**. Nimmt N-10 auf (eine geteilte Liste für `FEHLER` und `ABGELEHNT`) und N-09 (die doppelten Sätze des Anlasses: aufnehmen oder ausdrücklich verwerfen). Einzelheiten: Hinweise zu Schritt 13 | [geändert] neu der Baustein (Ort z. B. `src/lib/abruf.ts` neben `fehler.ts` und `json-post.ts`; nicht `src/lib/api/`, das sich mit `src/routes/api/` verwechselt); `src/lib/anlass/api.ts`, `cm/api.ts`, `push/api.ts`, `push/geraet.ts`, `verwaltung/api.ts`, `verwaltung/mitteilung-api.ts`, `profil/angaben.ts`, `login/passkey.ts`, `login/anmelden.ts`, `login/sitzung.ts` und ihre Tests; in Lauf 2 die drei Seiten `login`, `login/mail`, `profil` (nur der Name) **[geändert, Anhang E.1: `willkommen` liest kein Ergebnis eines Abruf-Moduls; dazu `src/lib/fehler.ts` (Tabelle Wort → Status) und `src/lib/abruf.test.ts`; `login/sitzung.ts` ändert sich erst in Schritt 15]**. Für N-10 `src/lib/server/cm/schnittstellen.ts` und der Ort der geteilten Liste; für N-09 allenfalls `src/lib/server/anlass/angaben.ts` und die Seite des Anlasses | Statuscodes werden an einer Stelle gedeutet; ein neuer Ablehnungsgrund des Servers fällt in der Oberfläche nicht mehr still als Störung an (N-10) | mittel | [geändert] **Vorab-Tests (erster Commit, Charakterisierung):** je Sonderfall aus der Tabelle des Nachmessens ein Fall in den Einheitstests der Module, darunter die zwei entfallenen «Status allein genügt» (`push/api.test.ts` 401, `verwaltung/api.test.ts` 404, mit `ungeprueft(…, {})`; N-15); jeder einmal absichtlich rot belegt. *Lauf 1:* Die bestehenden Einheitstests der Module (`api.test.ts` u. a.) bleiben unverändert grün. *Lauf 2:* Tests und Seiten ändern nur den Namen `ergebnis` → `art`; der Reviewer prüft das am Diff, `svelte-check` hält die Seiten. E2E voll nach jedem Lauf. Probe für den Reviewer: Der Diff unter `src/lib/server/` und `src/routes/api/` ist leer, ausser für N-10 | 08 (und 12a, weil Schritte strikt nacheinander laufen; inhaltlich hängt 13 nicht an 12a) | Opus | Subagent, zwei Läufe | [geändert] **ja, erweitert (E-41):** (1) `src/lib/profil/angaben.ts`, `src/lib/login/passkey.ts` und `src/lib/login/anmelden.ts` ganz lesen (bisher nur Auszüge); (2) je Modul eine Tabelle der Sonderfälle: 204 ohne Körper, 429 ohne lesbaren Körper, `eingabe` ohne `felder`, 401 als Störung, unlesbares JSON, `ergebnis` statt `art`; (3) Empfehlung zu «ein Wort gilt nur mit seinem Status» (dann eine Tabelle Wort → Status in `fehler.ts`, die auch N-08 zum Teil schliesst); (4) die 13 Stellen mit `page.route` neu bestimmen (Nachtrag zur Prüfliste (b) unten); (5) Ort des Bausteins; (6) N-09: aufnehmen oder verwerfen. Ändert eine Empfehlung ein Ergebnis an den Rändern, geht sie als Frage an den Projektleiter. **Erledigt** 12.11.2026 (Anhang E.1): kein Entscheid nötig | offen |
+| 13 | [geändert] Ein Abruf-Baustein mit einem Ergebnis-Typ; die Abruf-Module nutzen ihn und deuten keinen Statuscode mehr (B-20). Die Typen `Holen` und `Json` ziehen in den Baustein. **Ein Schritt, zwei Läufe mit je eigenem Review und committetem Zwischenstand (E-41, wie Schritt 11).** *Lauf 1:* der Baustein und die Module, deren Ergebnis schon `art` heisst (`anlass`, `cm`, `push`, `verwaltung`, `mitteilung-api`), bei unveränderten Tests. *Lauf 2:* `profil`, `anmelden` und `passkey` mit der Umbenennung `ergebnis` → `art`; Tests und drei Seiten ändern nur den Namen **[geändert, Anhang E.1: drei Seiten, nicht vier; `passkey.ts` gibt blanke Wörter zurück und liest nur das Ergebnis von `sende`, drei Zeilen]**. Nimmt N-10 auf (eine geteilte Liste für `FEHLER` und `ABGELEHNT`) und N-09 (die doppelten Sätze des Anlasses: aufnehmen oder ausdrücklich verwerfen). Einzelheiten: Hinweise zu Schritt 13 | [geändert] neu der Baustein (Ort z. B. `src/lib/abruf.ts` neben `fehler.ts` und `json-post.ts`; nicht `src/lib/api/`, das sich mit `src/routes/api/` verwechselt); `src/lib/anlass/api.ts`, `cm/api.ts`, `push/api.ts`, `push/geraet.ts`, `verwaltung/api.ts`, `verwaltung/mitteilung-api.ts`, `profil/angaben.ts`, `login/passkey.ts`, `login/anmelden.ts`, `login/sitzung.ts` und ihre Tests; in Lauf 2 die drei Seiten `login`, `login/mail`, `profil` (nur der Name) **[geändert, Anhang E.1: `willkommen` liest kein Ergebnis eines Abruf-Moduls; dazu `src/lib/fehler.ts` (Tabelle Wort → Status) und `src/lib/abruf.test.ts`; `login/sitzung.ts` ändert sich erst in Schritt 15]**. Für N-10 `src/lib/server/cm/schnittstellen.ts` und der Ort der geteilten Liste; für N-09 allenfalls `src/lib/server/anlass/angaben.ts` und die Seite des Anlasses | Statuscodes werden an einer Stelle gedeutet; ein neuer Ablehnungsgrund des Servers fällt in der Oberfläche nicht mehr still als Störung an (N-10) | mittel | [geändert] **Vorab-Tests (erster Commit, Charakterisierung):** je Sonderfall aus der Tabelle des Nachmessens ein Fall in den Einheitstests der Module, darunter die zwei entfallenen «Status allein genügt» (`push/api.test.ts` 401, `verwaltung/api.test.ts` 404, mit `ungeprueft(…, {})`; N-15); jeder einmal absichtlich rot belegt. *Lauf 1:* Die bestehenden Einheitstests der Module (`api.test.ts` u. a.) bleiben unverändert grün. *Lauf 2:* Tests und Seiten ändern nur den Namen `ergebnis` → `art`; der Reviewer prüft das am Diff, `svelte-check` hält die Seiten. E2E voll nach jedem Lauf. Probe für den Reviewer: Der Diff unter `src/lib/server/` und `src/routes/api/` ist leer, ausser für N-10 | 08 (und 12a, weil Schritte strikt nacheinander laufen; inhaltlich hängt 13 nicht an 12a) | Opus | Subagent, zwei Läufe | [geändert] **ja, erweitert (E-41):** (1) `src/lib/profil/angaben.ts`, `src/lib/login/passkey.ts` und `src/lib/login/anmelden.ts` ganz lesen (bisher nur Auszüge); (2) je Modul eine Tabelle der Sonderfälle: 204 ohne Körper, 429 ohne lesbaren Körper, `eingabe` ohne `felder`, 401 als Störung, unlesbares JSON, `ergebnis` statt `art`; (3) Empfehlung zu «ein Wort gilt nur mit seinem Status» (dann eine Tabelle Wort → Status in `fehler.ts`, die auch N-08 zum Teil schliesst); (4) die 13 Stellen mit `page.route` neu bestimmen (Nachtrag zur Prüfliste (b) unten); (5) Ort des Bausteins; (6) N-09: aufnehmen oder verwerfen. Ändert eine Empfehlung ein Ergebnis an den Rändern, geht sie als Frage an den Projektleiter. **Erledigt** 12.11.2026 (Anhang E.1): kein Entscheid nötig | **Lauf 1 umgesetzt** 13.11.2026, Review offen (Branch `refactor/schritt-13`: `test:` `fcd3250`; `refactor:` `17008e9`, `9cf1969`, `41fde29`, `fb6e07a`, `291e4a8`; Protokoll Anhang E.2); **Lauf 2 offen** |
 | 14 | `verwaltung/api.ts` nach Bereichen geteilt (Mitglieder, Turnier, Gespräch, Anlass, Zugang) | `src/lib/verwaltung/api.ts`, alle Importe in `src/routes/verwaltung/` und `src/lib/verwaltung/` | Hotspot entschärft, weniger Merge-Reibung | niedrig | `svelte-check`, Einheitstests, E2E Verwaltung | 13 | Sonnet | Subagent | nein | offen |
 | 15 | [geändert] Die kopierten Wächter werden eine gemeinsame Funktion je App (Mitglieder, Verwaltung), die jede Ladefunktion aufruft und die auch nach einer Aktion im Baustein gilt; keine Seite und kein Baustein schreibt die Umleitung zum Login selbst, keine Ladefunktion ruft `fetch` direkt (B-21). **Das heutige Verhalten bleibt genau (E-44):** Der Schritt vereinheitlicht die Umleitungen nicht; die Abweichungen (`profil/email`, `verwaltung/rollen`, Aktionen ohne Mail-Code) sind benannte Fälle der Funktion. Die vier Seiten, die im Baustein laden (`turniere`, `anlaesse`, `mitglieder`, `verlauf`), bekommen ihr erstes Laden in einer `+page.ts`; erneutes Laden nach Suche, Filter oder Aktion bleibt im Baustein. **Die Prüfung der Sitzung bei jedem Seitenwechsel bleibt** (gewollt, B-21); darum kein einmaliges Laden im Layout und vorerst keine Routen-Gruppe. Einzelheiten: Hinweise zu Schritt 15 | [geändert] neu z. B. `src/lib/login/waechter.ts` mit Einheitstest; `src/lib/login/sitzung.ts` (ein typisierter Abruf der Sitzung auf dem Baustein aus 13; die vier `fetch('/api/sitzung')` in Ladefunktionen und der Abruf von `/api/kontakt` in `hilfe/+page.ts` verschwinden); alle `+page.ts` und `+layout.ts` der Mitglieder-App und der Verwaltung (27 Ladefunktionen); `src/lib/verwaltung/umleiten.ts`; die Bausteine, die nach einer Aktion von Hand zum Login leiten (CM-Seite neun Stellen, Doppel-Seite fünf: nur der Aufruf wechselt); `src/routes/verwaltung/turniere`, `anlaesse`, `mitglieder`, `verlauf` (je `+page.svelte` und eine neue `+page.ts`) | Ein Ort für den Einstieg; kein geändertes Verhalten | [geändert] **mittel** (vorher niedrig: 27 Ladefunktionen, fünf verschiedene Wächter, kein Test ruft eine Ladefunktion) | [geändert] **Vorab-Test (erster Commit, einmal rot):** «ohne Sitzung führt jede geschützte Seite an ihr heutiges Ziel», mit und ohne wartende Mail-Anfrage; die Erwartung ist die Tabelle aus dem Nachmessen; der Test bleibt durch den Umbau unverändert. Dann der Einheitstest der Wächter-Funktion zuerst; `tests/e2e/navigation.test.ts`, `login.test.ts`, `startseite.test.ts`, `verwaltung.test.ts` («SI-07»), `bewegung.test.ts` («Reiter … sofort aktiv» hängt an `/api/sitzung`, B-31) auf allen drei Geräten; Prüfliste (b) unten | 13 | Opus | Subagent | [geändert] **ja (E-41):** Tabelle aller Einstiege (Ladefunktionen und Aktionen im Baustein) mit ihrem heutigen Ziel, mit und ohne wartende Mail-Anfrage; die Form des Vorab-Tests (E2E-Schleife oder Einheitstests der Ladefunktionen mit gestelltem `fetch`, siehe Hinweise) | offen |
 | 16 | CM-Seite: zuerst das gemeinsame Gerüst der acht Handler als eine Funktion mit Einheitstests (Antwort → Meldung, Fehlertext, neu laden oder Login), dann die beiden gleichen Text-Dialoge («Wildcard», «Kommentar ändern») als ein Baustein. Die neun Abschnitte des Markups bleiben in der Seite; es gibt kein Ziel für die Zeilenzahl (B-22, B-34). **[geändert]** «Login» nimmt die Ablauf-Funktion vom Wächter aus Schritt 15, nicht aus eigenen Stellen. Die Doppel-Seite ist eine offene Kleinfrage (Hinweise zu Schritt 16) | `src/routes/clubmeisterschaft/[id]/+page.svelte`; neu unter `src/lib/cm/` (Ablauf-Funktion mit Test, ein Dialog-Baustein) | Der Fix-Hotspot verliert rund 250 Zeilen wiederholten Ablauf; der Ablauf ist erstmals ohne Browser prüfbar | mittel (Fokus nach jeder Aktion, WCAG 2.4.3) | Neue Einheitstests zuerst; alle `cm-*`-E2E und `navigation.test.ts` («lädt nicht neu»); Klassen und Verschachtelung unverändert (Prüfliste (b) unten) | [geändert] 04, 13, **15** | Opus | Subagent | [geändert] kurz: nur die Doppel-Seite, aufnehmen oder ausdrücklich verwerfen (Hinweise zu Schritt 16) | offen |
@@ -7339,3 +7339,139 @@ eine Stelle für die Umleitungen der Verwaltung.
   Abschnitt. Die `CLAUDE.md` ist nicht geändert; die benannte Ausnahme «blanke Wörter des
   Passkeys und von `push/geraet.ts`» zur Übergangsregel «Ab Schritt 13» ist ein Vorschlag für
   den Bericht von Lauf 2 bzw. für Schritt 24.
+
+### E.2 Schritt 13, Lauf 1
+
+**Erkenntnisse Schritt 13, Lauf 1** (13.11.2026, Branch `refactor/schritt-13` ab `origin/dev`
+`9c90b0f` mit dem Doku-Commit `ed043c7`; Baustein und die Module mit `art`)
+
+- **Voraussetzungen geprüft:** Schritt 12a erledigt, Nachmessen erledigt (E.1), kein Entscheid
+  nötig. Keine neue Abhängigkeit (im Worktree nur `npm ci --ignore-scripts`), keine Lint-Ausnahme,
+  `AUSNAHMEN` leer, `CLAUDE.md` unverändert, keine Version.
+- **Commits:** `fcd3250` `test:` Vorab-Tests (Charakterisierung); `17008e9` `refactor:` Tabelle
+  Wort → Status und Baustein; `9cf1969` `refactor:` `anlass` und `push`; `41fde29` `refactor:`
+  `cm`; `fb6e07a` `refactor:` Verwaltung und `mitteilung-api`; `291e4a8` `refactor:` N-10; dazu
+  dieser `docs:`-Commit. Jeder Commit lief durch den Hook `check-schnell` (Lint, `svelte-check`,
+  Prüfskripte, Einheitstests, ab Commit 2 97 Dateien mit 1386 Tests); die Datenbanktests der CM
+  (7 Dateien, 137 Tests) liefen von Hand nach Commit 6, dem einzigen Diff unter `src/lib/server/`.
+- **`src/lib/fehler.ts`:** neu `STATUS_DES_WORTS`, der Status je Wort, getippt als
+  `{ readonly [W in Fehlerwort]: FehlerStatus }` (ein Wort ohne Zeile oder eine Zeile ohne Wort ist
+  ein Typfehler). Gegen den Server gelesen: Die 22 wörtlich geschriebenen Wörter stehen dort mit
+  genau diesem Status, die übrigen kommen über Variablen mit 409 [G: Textsuche nach
+  `antwort(4xx`]. Die Datei importiert weiter nichts. `antwort` im Server ist nicht an die Tabelle
+  gebunden (E.1, «nicht empfohlen»).
+- **`src/lib/abruf.ts`** (importiert nur `./fehler.ts`): `Holen`, `Json` (aus `verwaltung/api.ts`
+  hierher gezogen), `Vertrag<W>`, `Abruf<T, W>`, `STATUS_ALLEIN` (401 `abgemeldet`, 404
+  `nicht-gefunden`, 429 `zu-viele`) und `rufeAb(pfad, init, holen, vertrag)`. Wirft nie; gibt
+  `{ art: 'ok', daten }`, `{ art: <Wort des Vertrags>, koerper }` oder `{ art: 'stoerung' }`.
+  Reihenfolge: Netzfehler → Störung; 204 nach Angabe 3; Körper lesen nach Angabe 2; 2xx → `ok`;
+  JSON `null` als Fehlerkörper nach Angabe 4; 401, 404, 429 → das Wort des Status, wenn der Vertrag
+  es nennt; sonst das Wort aus dem Körper, wenn es in der Liste steht, laut Tabelle zu diesem Status
+  gehört und im Vertrag steht; sonst Störung. Der Vertrag hat die vier Angaben aus E.1: `woerter`,
+  `koerper: 'pflicht' | 'nachsichtig'`, `ohneKoerper?: 'erfolg' | 'einzig'` (204 ohne zu lesen; bei
+  `einzig` ist jedes andere 2xx Störung, für `entfernePasskey`), `nullAlsLeer?`. Bei `nachsichtig`
+  und unlesbarem Körper ist `daten` `undefined`, nicht `{}` (die Falle aus E.1). `holen` bleibt
+  Pflicht-Parameter; die Vorgabe `fetch` steht weiter je Abruf-Funktion. `abruf.test.ts`: 17 Fälle,
+  je Regel und je Angabe einer; Abdeckung des Bausteins 100 % (Anweisungen und Zweige, von Hand mit
+  `--coverage.include=src/lib/abruf.ts` gemessen; `vitest.config.ts` misst ihn nicht, unten).
+- **Die Module:** `anlass`, `push`, `cm` und `verwaltung/api.ts` rufen `rufeAb` mit ihrem Vertrag
+  und bilden nur noch Zusatzangaben ab, mit denselben Prüfungen wie vorher (`feldAus`; `felder` als
+  Objekt in der CM; in der Verwaltung `felder`, `datei`, `gespraech` als «Objekt oder Liste»,
+  `anzahl` als Zahl, `feld` als Text, `warnungen` als Liste). Kein Modul nennt im Code mehr einen
+  Statuscode und keines liest `istFehlerwort`. Verträge: `anlass` 4 Wörter, `push` 2, `cm` 13
+  (`abgemeldet`, `nicht-gefunden`, zehn Ablehnungen, `eingabe`) mit `ohneKoerper: 'erfolg'`,
+  Verwaltung 29 mit `nullAlsLeer`; alle `koerper: 'pflicht'`. Die Wörter der Verwaltung kommen aus
+  `Antwort<T>` (`Exclude<…['art'], 'ok' | 'stoerung'>`) und stehen in einem `Record<Wort, true>`:
+  Ein fehlendes oder überzähliges Wort ist ein Typfehler. `deute` entfällt; `lese` und `schicke`
+  bleiben exportiert (Hinweis zu Schritt 14). Die Ergebnis-Typen (`Ergebnis<T>` je Modul,
+  `Antwort<T>` mit 31 Varianten) sind Zeichen für Zeichen gleich; `svelte-check` trägt das ohne
+  Änderung an einer Seite. **Die Abbruchstelle aus E.1 trat nicht ein:** Die 21 Wörter ohne Zusatz
+  der Verwaltung gibt `{ art: r.art }` als ein Objekt zurück; TypeScript prüft das gegen die
+  Vereinigung, solange es höchstens 25 Varianten sind (dieselbe Grenze wie in D.6, Abweichung 3).
+  Ein 22. bis 25. Wort ohne Zusatz geht noch; danach braucht `rufe` einen Zweig mehr.
+- **N-10:** `src/lib/cm/ablehnung.ts` mit `ABLEHNUNGEN` (die neun Gründe, gegen die Liste
+  getippt, holt aus `fehler.ts` nur einen Typ). `server/cm/schnittstellen.ts`:
+  `const FEHLER = ABLEHNUNGEN satisfies readonly Ablehnung[]`; `cm/api.ts`:
+  `ABGELEHNT = [...ABLEHNUNGEN, 'nur-lesen']`. Lint (Importrichtung) und Bauregel lassen den Import
+  aus `src/lib/cm/` in den Server ohne Ausnahme zu (`npm run lint`, `bauregel: ok`); der Server holt
+  schon aus `src/lib/turnier/`, `mitteilung/` und `name.ts`.
+- **Vorab-Tests** (`fcd3250`, 27 Tests in fünf Dateien, als je ein eigener `describe`-Block
+  «Ränder der Deutung» angehängt; die bestehenden Fälle unberührt): die Zeilen 1 bis 34 und 57 aus
+  E.1. Die Zeilen 35 bis 56 (Profil, `sende`, Passkey, `sitzung`) gehören zu Lauf 2. Auf dem alten
+  Stand alle grün; **E.1 irrt an keinem Rand**, auch nicht an den zwei dünnsten Stellen
+  (`Response.json(null)` und eine `Response` ohne Körper, Fälle 8, 15, 23, 34, verhalten sich wie
+  gelesen). Dazu, über E.1 hinaus: 200 mit JSON `null` in `anlass`, `cm`, `push` (`ok` mit
+  `daten: null`, wie in der Verwaltung, Fall 34); in der Verwaltung 409 mit `null` (Störung),
+  `eingabe` mit `felder` als Text, `datei` als Text, `unpassend` mit `anzahl` als Text, `vergeben`
+  mit `feld` als Zahl, `warnung` mit `warnungen` als Objekt (je Störung).
+- **Rot belegt** (je aus einer Sicherungskopie im Scratchpad zurückgesetzt, `git status` danach
+  sauber; kein `git checkout`):
+  - Vorab-Tests gegen die alte Deutung, in einem Lauf: 401 an das Wort `abgemeldet` gebunden in
+    `push`, `anlass`, `cm`, Verwaltung; 404 an `nicht-gefunden` in der Verwaltung; die 204-Zeile der
+    CM weg; `k.gespraech &&` weg; die Zeile `veraltet` der Verwaltung weg → 14 von 86 rot, darunter
+    je Modul ein Vorab-Fall (push «401 genügt als Status…», anlass und cm «401 und 404 genügen…»,
+    cm «204 ohne Körper ist Erfolg…», Verwaltung «401 und 404…», «JSON null…», «409 inzwischen…»,
+    `mitteilung-api` «409 veraltet beim Senden…»: «expected { art: 'stoerung' } to deeply equal
+    { art: 'veraltet' }»). Getrennt: die Bedingung `status === 409` um den 409-Block weg → 2 rot
+    («403 braucht eines seiner vier Wörter», «ein Wort gilt nur mit seinem Status»: «expected
+    { art: 'veraltet' } to deeply equal { art: 'stoerung' }»).
+  - Baustein: `abruf.test.ts` vor `abruf.ts` rot («Cannot find module './abruf.ts'»). Tabelle
+    `veraltet: 400` → 2 von 17 rot; die Regel «Status allein» weg → 4 von 17 rot. Nach Commit 5
+    dieselbe Tabellen-Zeile → 10 rot in `abruf`, Verwaltung und `mitteilung-api` (die bestehenden
+    409-Fälle mit `veraltet`). `nullAlsLeer: false` in der Verwaltung → 1 rot (Fall 34).
+  - Typen: `inzwischen` aus dem `Record<Wort, true>` der Verwaltung weg → `svelte-check` 1 Fehler
+    («Property 'inzwischen' is missing …»).
+  - N-10, beide Richtungen: ein Wort, das keine Fachfunktion der CM zurückgibt (`vorbereitung`), in
+    `ABLEHNUNGEN` → `svelte-check` 1 Fehler in `server/cm/schnittstellen.ts` (`satisfies`); `voll`
+    aus `ABLEHNUNGEN` weg → 5 Fehler in den zwei CM-Seiten («Type '"voll"' is not comparable …»).
+- **Beleg «Tests unverändert, keine Seite»** (Befehle im Worktree, Ausgabe vollständig):
+  `git diff --name-status fcd3250 HEAD -- '*.test.ts'` → nur `A src/lib/abruf.test.ts`;
+  `git diff --name-only fcd3250 HEAD -- '*.svelte' '*+page.ts' '*+layout.ts' src/routes` → leer;
+  `git diff --name-only fcd3250 HEAD -- src/lib/server` → nur `src/lib/server/cm/schnittstellen.ts`
+  (N-10). Kein Helfer eines Tests geändert, auch keine Import-Quelle (die Tests importieren `Holen`
+  und `Json` nicht).
+- **Voller `make check`** auf dem Code-Endstand `291e4a8` bei sauberem Arbeitsbaum, im
+  Hintergrund, kein zweiter Lauf im Ordner: Exit 0. Lint; `svelte-check` 1538 Dateien ohne Fehler
+  und Warnung; Prüfskripte samt `bauregel: ok`; Einheits- und Datenbanktests 153 Dateien mit 2134
+  Tests, Abdeckung 97,07 % Anweisungen und 93,56 % Zweige (unverändert, der Baustein zählt nicht
+  mit); beide Builds; E2E 414 bestanden, 57 übersprungen, 3,4 Minuten; Image; grüner Stand
+  `6d52571e140e` gemerkt. Der Doku-Commit ändert keinen Code.
+- **Abweichungen von E.1:**
+  1. **Vorab-Tests nur für die Module von Lauf 1** (Auftrag): Zeilen 1 bis 34 und 57; 35 bis 56
+     entstehen in Lauf 2, zusammen mit dem Umbau dieser Module.
+  2. **`push/geraet.ts` ändert in Lauf 1 nichts** (Auftrag: nicht in diesem Lauf). Darum reicht
+     `verwaltung/api.ts` `Holen` aus dem Baustein weiter (`export type { Holen }`, mit Kommentar);
+     Lauf 2 stellt den Import in `geraet.ts` um und streicht die Zeile. `profil/angaben.ts` und
+     `login/passkey.ts` holen `Holen` weiter aus `login/anmelden.ts` (dort noch eine eigene,
+     gleich lautende Definition; Lauf 2). E.1 zählte sieben Importe; in Lauf 1 wechseln vier
+     (`anlass`, `cm`, `push`, `mitteilung-api`).
+  3. **Der Baustein importiert `json-post.ts` nicht** (E.1 erlaubte es): Die Module bauen ihre
+     Anfrage wie bisher selbst.
+  4. **Mehr Vorab-Fälle als E.1** (oben) und eine Vollständigkeitsprüfung der Wörter der
+     Verwaltung über den Typ, die E.1 nicht vorsah.
+  5. **N-10, «einmal rot»:** E.1 schlug «ein Grund, den nur der Server führt» vor. Mit der
+     geteilten Liste gibt es keine Server-Liste mehr; belegt sind darum die zwei Richtungen, in
+     denen die Liste jetzt bindet (oben).
+- **Für die Nutzerin geändert: nichts.** Kein Meldungstext, keine Seite, keine Route; jede Antwort
+  ergibt dasselbe Ergebnis wie vorher (Vorab-Tests und bestehende Tests unverändert grün).
+- **Was kein Test sieht:**
+  - Die Angaben `nachsichtig` und `einzig` haben in Lauf 1 keinen Nutzer; nur `abruf.test.ts`
+    hält sie. Ob sie für Profil, `sende` und Passkey genau passen, zeigt erst Lauf 2 mit den
+    Vorab-Fällen 35 bis 56.
+  - `vitest.config.ts` misst die Abdeckung von `src/lib/abruf.ts` nicht (E.1); ein toter Zweig fällt
+    im `make check` nicht auf. Heute 100 %, von Hand gemessen.
+  - Die Gegenrichtung von N-10 bleibt offen: Gibt eine Fachfunktion der CM einen neuen Grund zurück,
+    der nicht in `ABLEHNUNGEN` steht, sendet `ablehnung` still `geschlossen`; kein Typ prüft, dass
+    `Ablehnung` in der Liste aufgeht (E.1, nicht Teil von N-10).
+  - E2E läuft die Fehlerwege weiter nur an den sechs Stellen mit gestellter Antwort (E.1, Tests).
+  - Die Grenze von 25 Varianten (oben) meldet sich erst, wenn sie erreicht ist, als Typfehler in
+    `verwaltung/api.ts`, nicht vorher.
+- **Ausserhalb des Schritts aufgefallen (nicht behoben):**
+  - Der Kommentar zu `CmFelder` in `cm/api.ts` nennt weiter «bei 400»; das beschreibt den Server,
+    kein Code deutet den Status. Unverändert gelassen.
+  - Die Vorgabe `holen: Holen = fetch` steht weiter an jeder Abruf-Funktion (Lint-Regel zu `fetch`
+    ist Lauf 2 bzw. Schritt 15).
+- **Für Lauf 2:** Profil, `sende`, Passkey auf `rufeAb` mit `koerper: 'nachsichtig'`
+  (`entfernePasskey` mit `ohneKoerper: 'einzig'`); `push/geraet.ts` und die zwei Module des Logins
+  holen `Holen` aus `abruf.ts`, danach entfallen die Weitergabe in `verwaltung/api.ts` und die
+  zweite Definition in `login/anmelden.ts`; die Vorab-Fälle 35 bis 56 zuerst.
