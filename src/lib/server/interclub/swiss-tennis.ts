@@ -193,3 +193,97 @@ export function istNochNichtFreigeschaltet(status: number, json: unknown): boole
 		json.error === 'Java API error: Upstream responded with HTTP 404'
 	);
 }
+
+// Spielbericht einer Begegnung (`encounter-results`, für Auf-/Abstieg `tableau-results`). Von der
+// Gegnerseite wird nur die Form geprüft, nie ein Name oder eine Nummer übernommen.
+export type StSpieler = { stId: number; name: string; klassierung: string; rangliste: number };
+export type StPartie = {
+	art: 'einzel' | 'doppel';
+	position: number;
+	saetze: string[]; // nur gespielte Sätze, aus TCO-Sicht («7:5» = TCO 7)
+	aufgabe: 'tco' | 'gegner' | null; // welche Seite w.o. gegeben bzw. aufgegeben hat
+	spieler: StSpieler[]; // TCO-Seite: 1 im Einzel, 2 im Doppel
+};
+export type StBericht = {
+	tcoHeim: boolean;
+	saetze: { tco: number; gegner: number };
+	games: { tco: number; gegner: number };
+	partien: StPartie[];
+};
+
+// «Vorname Nachname R6 (9497)»: Klassierung und Platz in der Rangliste hängen am Namen.
+const SPIELER = /^(.*\S) ([RN]\d) \((\d+)\)$/;
+const SATZ = /^(\d+):(\d+)$/;
+
+type Mannschaft = { verein: number; saetze: number; games: number };
+function pruefeMannschaft(roh: unknown): Mannschaft | null {
+	if (!istObjekt(roh) || !istText(roh.name) || !istZahl(roh.clubNumber)) return null;
+	if (!istZahl(roh.points) || !istZahl(roh.sets) || !istZahl(roh.games)) return null;
+	return { verein: roh.clubNumber, saetze: roh.sets, games: roh.games };
+}
+
+function pruefeSpieler(roh: unknown): StSpieler | null {
+	if (!istObjekt(roh) || !istZahl(roh.id) || typeof roh.name !== 'string') return null;
+	const m = SPIELER.exec(roh.name.trim());
+	if (!m) return null;
+	return { stId: roh.id, name: m[1], klassierung: m[2], rangliste: Number(m[3]) };
+}
+
+type SeiteRoh = { members: unknown[]; wo: 0 | 1 };
+function pruefeSeiteRoh(roh: unknown): SeiteRoh | null {
+	if (!istObjekt(roh) || !Array.isArray(roh.members) || (roh.wo !== 0 && roh.wo !== 1)) return null;
+	return { members: roh.members, wo: roh.wo };
+}
+
+function pruefePartie(roh: unknown, art: StPartie['art'], tcoHeim: boolean): StPartie | null {
+	if (!istObjekt(roh) || !istZahl(roh.position) || !istObjekt(roh.players)) return null;
+	const heim = pruefeSeiteRoh(roh.players.home);
+	const gast = pruefeSeiteRoh(roh.players.away);
+	if (!heim || !gast || !Array.isArray(roh.results) || roh.results.length !== 3) return null;
+	const tco = tcoHeim ? heim : gast;
+	const gegner = tcoHeim ? gast : heim;
+	if (tco.members.length !== (art === 'einzel' ? 1 : 2)) return null;
+	const spieler: StSpieler[] = [];
+	for (const m of tco.members) {
+		const s = pruefeSpieler(m);
+		if (!s) return null;
+		spieler.push(s);
+	}
+	const saetze: string[] = [];
+	for (const r of roh.results) {
+		if (r === '') continue;
+		const m = typeof r === 'string' ? SATZ.exec(r) : null;
+		if (!m) return null;
+		saetze.push(tcoHeim ? `${m[1]}:${m[2]}` : `${m[2]}:${m[1]}`);
+	}
+	const aufgabe = tco.wo === 1 ? 'tco' : gegner.wo === 1 ? 'gegner' : null;
+	return { art, position: roh.position, saetze, aufgabe, spieler };
+}
+
+/** null = Form weicht ab; 'fehlt' = Swiss Tennis hat keinen Bericht (Antwort `null`). */
+export function pruefeBericht(json: unknown, verein: number): StBericht | 'fehlt' | null {
+	if (json === null) return 'fehlt';
+	if (!istObjekt(json) || !Array.isArray(json.singles) || !Array.isArray(json.doubles)) return null;
+	const heim = pruefeMannschaft(json.homeTeam);
+	const gast = pruefeMannschaft(json.awayTeam);
+	if (!heim || !gast || (heim.verein === verein) === (gast.verein === verein)) return null;
+	const tcoHeim = heim.verein === verein;
+	const [tco, gegner] = tcoHeim ? [heim, gast] : [gast, heim];
+	const partien: StPartie[] = [];
+	for (const [art, liste] of [
+		['einzel', json.singles],
+		['doppel', json.doubles]
+	] as const) {
+		for (const roh of liste) {
+			const p = pruefePartie(roh, art, tcoHeim);
+			if (!p) return null;
+			partien.push(p);
+		}
+	}
+	return {
+		tcoHeim,
+		saetze: { tco: tco.saetze, gegner: gegner.saetze },
+		games: { tco: tco.games, gegner: gegner.games },
+		partien
+	};
+}
