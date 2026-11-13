@@ -141,6 +141,13 @@
       "when": 1794561600026,
       "tag": "0019_certain_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794575281845,
+      "tag": "0020_worthless_sunspot",
+      "breakpoints": true
     }
   ]
 }

@@ -583,3 +583,83 @@ export const icStand = pgTable(
 		check('ic_stand_wettbewerb_check', sql`${t.wettbewerb} in ('ic', 'jic')`)
 	]
 );
+
+// Spielbericht einer gespielten Begegnung eines TCO-Teams (Gruppe oder Auf-/Abstieg). Fehlt die Zeile,
+// hat Swiss Tennis noch keine Einzelpartien. Sätze und Games aus TCO-Sicht.
+export const icBericht = pgTable(
+	'ic_bericht',
+	{
+		saison: integer('saison').notNull(),
+		teamId: integer('team_id').notNull(),
+		begegnungId: integer('begegnung_id').notNull(),
+		tcoHeim: boolean('tco_heim').notNull(),
+		tcoSaetze: integer('tco_saetze').notNull(),
+		gegnerSaetze: integer('gegner_saetze').notNull(),
+		tcoGames: integer('tco_games').notNull(),
+		gegnerGames: integer('gegner_games').notNull()
+	},
+	(t) => [
+		primaryKey({ columns: [t.saison, t.teamId, t.begegnungId] }),
+		foreignKey({
+			columns: [t.saison, t.teamId],
+			foreignColumns: [icTeam.saison, icTeam.teamId]
+		}).onDelete('cascade')
+	]
+);
+
+// Einzelpartie eines Berichts; Sätze aus TCO-Sicht («7:5» = TCO 7), nur gespielte.
+export const icPartie = pgTable(
+	'ic_partie',
+	{
+		saison: integer('saison').notNull(),
+		teamId: integer('team_id').notNull(),
+		begegnungId: integer('begegnung_id').notNull(),
+		art: text('art').$type<'einzel' | 'doppel'>().notNull(),
+		position: integer('position').notNull(),
+		saetze: text('saetze').array().notNull(),
+		aufgabe: text('aufgabe').$type<'tco' | 'gegner'>()
+	},
+	(t) => [
+		primaryKey({ columns: [t.saison, t.teamId, t.begegnungId, t.art, t.position] }),
+		foreignKey({
+			name: 'ic_partie_bericht_fk',
+			columns: [t.saison, t.teamId, t.begegnungId],
+			foreignColumns: [icBericht.saison, icBericht.teamId, icBericht.begegnungId]
+		}).onDelete('cascade'),
+		check('ic_partie_art_check', sql`${t.art} in ('einzel', 'doppel')`),
+		check('ic_partie_aufgabe_check', sql`${t.aufgabe} in ('tco', 'gegner')`)
+	]
+);
+
+// TCO-Spieler einer Partie (nur die TCO-Seite; von Gegnern speichert MyTCO nichts). `stId` und
+// `rangliste` sind Nummern von Swiss Tennis für spätere Verläufe; die Oberfläche bekommt sie nicht.
+export const icSpieler = pgTable(
+	'ic_spieler',
+	{
+		saison: integer('saison').notNull(),
+		teamId: integer('team_id').notNull(),
+		begegnungId: integer('begegnung_id').notNull(),
+		art: text('art').$type<'einzel' | 'doppel'>().notNull(),
+		position: integer('position').notNull(),
+		nr: integer('nr').notNull(),
+		stId: integer('st_id').notNull(),
+		name: text('name').notNull(),
+		klassierung: text('klassierung').notNull(),
+		rangliste: integer('rangliste').notNull()
+	},
+	(t) => [
+		primaryKey({ columns: [t.saison, t.teamId, t.begegnungId, t.art, t.position, t.nr] }),
+		foreignKey({
+			name: 'ic_spieler_partie_fk',
+			columns: [t.saison, t.teamId, t.begegnungId, t.art, t.position],
+			foreignColumns: [
+				icPartie.saison,
+				icPartie.teamId,
+				icPartie.begegnungId,
+				icPartie.art,
+				icPartie.position
+			]
+		}).onDelete('cascade'),
+		check('ic_spieler_nr_check', sql`${t.nr} in (1, 2)`)
+	]
+);
