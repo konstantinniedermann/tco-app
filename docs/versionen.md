@@ -8,6 +8,11 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Interclub, Teil 2: Jede gespielte Begegnung eines TCO-Teams hat eine eigene Seite mit den
+  Einzelpartien (Umschalter «Einzel · Doppel»), Sätzen aus Sicht des TCO und aufklappbar den Gegnern;
+  Spieler beider Teams mit Name und Klassierung wie bei Swiss Tennis. `make ic-import` holt die
+  Spielberichte mit; Datenschutzkonzept und -erklärung nachgeführt (#81).
+
 ## 0.21.0 — Interclub-Resultate der TCO-Teams (Teil 1)
 
 - Neuer Reiter «IC» mit den Interclub-Resultaten aller 17 TCO-Teams von Swiss Tennis: Übersicht mit
