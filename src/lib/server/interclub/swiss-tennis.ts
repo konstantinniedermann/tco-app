@@ -231,6 +231,17 @@ function pruefeSpieler(roh: unknown): StSpieler | null {
 	return { stId: roh.id, name: m[1], klassierung: m[2], rangliste: Number(m[3]) };
 }
 
+// Gegner: Name und, wenn erkennbar, Klassierung; eine fremde Schreibweise (Gastspieler ohne
+// Klassierung oder Nummer) hält den Import nicht auf. Nummern werden nie übernommen.
+function pruefeGegner(roh: unknown): StGegner | null {
+	if (!istObjekt(roh) || !istText(roh.name)) return null;
+	const name = roh.name.trim();
+	const m = SPIELER.exec(name);
+	return m
+		? { name: m[1], klassierung: m[2] }
+		: { name: name.replace(/\s*\(\d+\)$/, ''), klassierung: '' };
+}
+
 type SeiteRoh = { members: unknown[]; wo: 0 | 1 };
 function pruefeSeiteRoh(roh: unknown): SeiteRoh | null {
 	if (!istObjekt(roh) || !Array.isArray(roh.members) || (roh.wo !== 0 && roh.wo !== 1)) return null;
@@ -252,7 +263,9 @@ function pruefePartie(
 	const tco = tcoHeim ? heim : gast;
 	const gegner = tcoHeim ? gast : heim;
 	const anzahl = art === 'einzel' ? 1 : 2;
-	if (tco.members.length !== anzahl || gegner.members.length > anzahl) return null;
+	// Ohne eingetragenen TCO-Spieler nur bei einem w.o. des TCO (Spieler fehlte).
+	const ohneTco = tco.wo === 1 && tco.members.length === 0;
+	if ((!ohneTco && tco.members.length !== anzahl) || gegner.members.length > anzahl) return null;
 	const spieler: StSpieler[] = [];
 	for (const m of tco.members) {
 		const s = pruefeSpieler(m);
@@ -269,9 +282,9 @@ function pruefePartie(
 	const aufgabe = tco.wo === 1 ? 'tco' : gegner.wo === 1 ? 'gegner' : null;
 	const gegnerSpieler: StGegner[] = [];
 	for (const m of gegner.members) {
-		const s = pruefeSpieler(m);
-		if (!s) return null;
-		gegnerSpieler.push({ name: s.name, klassierung: s.klassierung });
+		const g = pruefeGegner(m);
+		if (!g) return null;
+		gegnerSpieler.push(g);
 	}
 	return { art, position: roh.position, saetze, aufgabe, spieler, gegner: gegnerSpieler };
 }

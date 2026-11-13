@@ -159,26 +159,25 @@ export async function importiereSaison(
 								aufgabe: p.aufgabe
 							}))
 						);
-						await tx.insert(icSpieler).values(
-							bericht.partien.flatMap((p) => [
-								...p.spieler.map((s, i) => ({
-									...b,
-									art: p.art,
-									position: p.position,
-									seite: 'tco' as const,
-									nr: i + 1,
-									...s
-								})),
-								...p.gegner.map((s, i) => ({
-									...b,
-									art: p.art,
-									position: p.position,
-									seite: 'gegner' as const,
-									nr: i + 1,
-									...s
-								}))
-							])
-						);
+						const spieler = bericht.partien.flatMap((p) => [
+							...p.spieler.map((s, i) => ({
+								...b,
+								art: p.art,
+								position: p.position,
+								seite: 'tco' as const,
+								nr: i + 1,
+								...s
+							})),
+							...p.gegner.map((s, i) => ({
+								...b,
+								art: p.art,
+								position: p.position,
+								seite: 'gegner' as const,
+								nr: i + 1,
+								...s
+							}))
+						]);
+						if (spieler.length) await tx.insert(icSpieler).values(spieler);
 					}
 					if (daten.begegnungen.length)
 						await tx

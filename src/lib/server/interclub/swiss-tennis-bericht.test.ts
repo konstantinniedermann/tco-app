@@ -127,6 +127,22 @@ describe('pruefeBericht', () => {
 		expect(r.partien.map((p) => p.art)).toEqual(['einzel']);
 	});
 
+	it('nimmt ein w.o. des TCO ohne eingetragenen Spieler an', () => {
+		const r = gelesen(
+			bericht({ einzel: [partie(seite(1), seite(0, [900101, GERD]), ['', '', ''])], doppel: [] })
+		);
+		expect(r.partien[0]).toMatchObject({ spieler: [], saetze: [], aufgabe: 'tco' });
+		expect(r.partien[0].gegner).toEqual([{ name: 'Gerd Gegner', klassierung: 'R5' }]);
+	});
+
+	it('nimmt einen Gegner ohne Klassierung und ohne Nummer an', () => {
+		const ohne = { members: [{ id: null, name: 'Gast Spieler' }], wo: 0 } as unknown as Seite;
+		const r = gelesen(
+			bericht({ einzel: [partie(seite(0, [900001, MAX]), ohne, ['6:0', '6:0', ''])], doppel: [] })
+		);
+		expect(r.partien[0].gegner).toEqual([{ name: 'Gast Spieler', klassierung: '' }]);
+	});
+
 	it('weist abweichende Formen ab', () => {
 		const gast = seite(0, [900101, GERD]);
 		const mitEinzel = (p: unknown) => bericht({ einzel: [p], doppel: [] });
@@ -167,12 +183,6 @@ describe('pruefeBericht', () => {
 				einzelVon({ members: [{ id: '1' as unknown as number, name: MAX }], wo: 0 })
 			],
 			['Punkte fehlen', { ...bericht(), homeTeam: { name: 'Olten 1', clubNumber: 2202 } }],
-			[
-				'Gegnername ohne Klassierung',
-				mitEinzel(
-					partie(seite(0, [900001, MAX]), seite(0, [900101, 'Gerd Gegner']), ['6:0', '6:0', ''])
-				)
-			],
 			[
 				'Einzel mit zwei Gegnern',
 				mitEinzel(
