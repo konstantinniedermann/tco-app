@@ -2,7 +2,7 @@
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
-	import { ladeTurniere, type TurnierListe } from '../../../lib/verwaltung/api.ts';
+	import { ladeTurniere, type TurnierListe } from '../../../lib/verwaltung/turnier-api.ts';
 	import { datumKurz, statusText } from '../../../lib/verwaltung/turnier-anzeige.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 

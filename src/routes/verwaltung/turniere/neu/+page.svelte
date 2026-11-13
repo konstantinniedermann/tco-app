@@ -6,7 +6,8 @@
 		neuesTurnier,
 		type TurnierWerte
 	} from '../../../../lib/verwaltung/Turnierformular.svelte';
-	import { legeTurnierAn, type TurnierFeld } from '../../../../lib/verwaltung/api.ts';
+	import { type TurnierFeld } from '../../../../lib/verwaltung/api.ts';
+	import { legeTurnierAn } from '../../../../lib/verwaltung/turnier-api.ts';
 	import { fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 
