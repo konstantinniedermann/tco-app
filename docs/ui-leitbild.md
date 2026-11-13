@@ -197,8 +197,8 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Verlauf-Nachricht | `.verlauf-nachricht` | Verwaltung, eine Nachricht im Verlauf eines Gesprächs (Kartenteil): Absenderzeile (`.leise`) und Text ohne Absatzabstand, dazwischen `--abstand-1` |
 | Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`, `.plakette-niederlage`, `.plakette-leise`) | Status immer mit Text (UI-05). Zustände der Mitgliedschaft: *ausgetreten* = `.plakette`, *wird gelöscht* = `.plakette-gesperrt`. Ergebnis im Interclub: *Sieg* = `.plakette-ok`, *Niederlage* = `.plakette-niederlage` (`--farbe-fehler` auf `--farbe-fehler-flaeche`), *Unentschieden* = `.plakette-leise` (`--farbe-text-leise` auf `--farbe-hintergrund`) |
 | Umschalter | `.umschalter` | Unterreiter mit Balken oben auf einer Seite (*Resultate · Teams*, *Spiele · Tabelle*): Tasten in einer Zeile mit Trennlinie `--farbe-linie` darunter, je mindestens `--tippflaeche` hoch; der aktive in `--farbe-marke`, fett, mit Balken `--rand-akzent` unten (`aria-pressed="true"`), die anderen in `--farbe-text-leise`; wechselt den Inhalt auf derselben Seite, ohne neue Stufe und ohne Seitenwechsel-Bewegung. Segmente (Knopfgruppe) sind verworfen |
-| Resultatzeile | `.resultat` (`.resultat-stand`, `.resultat-tag`) | eine Begegnung im Interclub, als Kartenteil in einer Karte: links fett die Liga (Übersicht) bzw. «Heim – Gast», darunter «Heim – Gast» bzw. leise Datum und *Heim*/*Auswärts*; rechts der Endstand in `--groesse-gross` (`.resultat-stand`) und darunter die Plakette des Ergebnisses. Endstand eines Siegs in `--farbe-marke`, einer Niederlage in `--farbe-fehler`, sonst `--farbe-text`; Begegnungen ohne TCO-Team ohne Farbe und Plakette, kommende ohne Endstand. Bricht bei grosser Schrift um: Endstand und Plakette rutschen unter den Text. In der Übersicht steht über den Begegnungen eines Tages leise und halbfett der Tag (`.resultat-tag`) |
-| Rangliste | `table.rangliste` | einzige Tabelle der Mitglieder-App (Ausnahme zu UI-02): Kopfzeile *Rang · Team · Partien · Sätze* in `.leise`, jede Zeile einzeilig, Trennlinie `--farbe-linie`; Zahlen rechtsbündig in gleicher Ziffernbreite; ein zu langer Teamname endet mit „…", Rang und Zahlen stehen immer ganz; die Zeile des eigenen Teams (`.rangliste-eigen`) fett auf `--farbe-marke-zart`. *Partien* = gewonnene : verlorene Einzelpartien |
+| Resultatzeile | `.resultat` (`.resultat-stand`, `.resultat-tag`) | eine Begegnung im Interclub, als Kartenteil in einer Karte: links fett die Liga (Übersicht) bzw. «Heim – Gast», darunter «Heim – Gast» bzw. leise Datum und *Heim*/*Auswärts*; Auf- und Abstiegsspiele mit Uhrzeit («<Wochentag> <TT.MM.>, <HH:MM>»), auch kommende in der Übersicht; rechts der Endstand in `--groesse-gross` (`.resultat-stand`) und darunter die Plakette des Ergebnisses. Endstand eines Siegs in `--farbe-marke`, einer Niederlage in `--farbe-fehler`, sonst `--farbe-text`; Begegnungen ohne TCO-Team ohne Farbe und Plakette, kommende ohne Endstand. Bricht bei grosser Schrift um: Endstand und Plakette rutschen unter den Text. In der Übersicht steht über den Begegnungen eines Tages leise und halbfett der Tag (`.resultat-tag`) |
+| Rangliste | `table.rangliste` | einzige Tabelle der Mitglieder-App: Kopfzeile *Rang · Team · Partien · Sätze* in `.leise`, Trennlinie `--farbe-linie`; Zahlen rechtsbündig in gleicher Ziffernbreite; Rang und Zahlen brechen nie um, der Teamname wird nie gekürzt (zu lang: er bricht um). Bei normaler Schrift ist jede Zeile einzeilig. Ist in der Karte weniger als `18rem` Platz (grosse Schrift oder schmaler Bildschirm; Container-Abfrage auf der Karte, der Wert steht nur in `basis.css`), wird jede Zeile zweizeilig: oben Rang und Team, darunter Partien und Sätze (in `--groesse-klein`); alle Zeilen teilen dieselben Spalten, die Rollen der Tabelle stehen ausdrücklich im Markup; die Zeile des eigenen Teams (`.rangliste-eigen`) fett auf `--farbe-marke-zart`. *Partien* = gewonnene : verlorene Einzelpartien |
 | Briefdruck | `.briefdruck` | nur Verwaltung: Druckansicht frisch erzeugter Briefe, siehe [Briefdruck](#briefdruck) |
 | Druckseite | `.druckseite` | nur Verwaltung: Auskunft über die Daten eines Mitglieds, siehe [Druckseite](#druckseite-auskunft); Klasse `.nicht-drucken` blendet unter `@media print` aus |
 | Anleitung | `.anleitung` | gezeichnetes Handy (`.anleitung-film`, ein `.anleitung-bild` pro Schritt), darunter die Taste (`.anleitung-taste`) und die nummerierten Schritte (`.anleitung-schritte`), am Schluss ein Eintrag „Fertig!" (`.anleitung-fertig`, mit ✓ statt Nummer); die Zeichnung ist für Screenreader verborgen, die Schritte tragen die Bedeutung; ein Schritt gehört zu genau einem Bild; in der Zeichnung nur Beschriftungen, die in der Hilfe von Apple bzw. Google belegt sind, sonst graue Balken (`.anleitung-eintrag.leer`); der Tipp-Kreis (`.anleitung-tipp`) zeigt, wo man tippt; Bewegung nach UI-09 |
@@ -285,12 +285,14 @@ er nie.
   Paare und Suchende mit Kommentar) und hat keine Tasten.
 - **Reiter IC:** oberste Seite `/interclub`, Titel «Interclub <Jahr>» (neueste Saison mit Daten),
   darunter leise «Stand: <TT.MM.JJJJ>, <HH:MM>». Umschalter **Resultate · Teams**; vorgewählt ist
-  *Resultate* während der Saison und *Teams*, wenn die Saison abgeschlossen ist. *Resultate*: Karte
+  *Resultate* während der Saison und *Teams*, wenn die Saison abgeschlossen ist oder in den letzten
+  und den nächsten 7 Tagen kein TCO-Team spielt (Pause zwischen Spieltagen). *Resultate*: Karte
   «Letzte Resultate» (Begegnungen der TCO-Teams der letzten 7 Tage, nach Tag gruppiert, neueste
   zuerst), darunter Karte «Nächste Spiele» (nächste 7 Tage, früheste zuerst); je Begegnung eine
   *Resultatzeile*; leere Karten fallen weg; ist die Saison abgeschlossen, steht stattdessen eine
   Karte «Saison <Jahr> abgeschlossen. Die Saison <Jahr+1> steht hier, sobald Swiss Tennis den
-  Spielplan veröffentlicht.». *Teams*: Zwischentitel «Aktive und Senioren» und «Junioren», je Team
+  Spielplan veröffentlicht.»; in einer Pause zwischen Spieltagen eine Karte «In den letzten und den
+  nächsten 7 Tagen spielt kein TCO-Team.». *Teams*: Zwischentitel «Aktive und Senioren» und «Junioren», je Team
   eine Kachel mit der Liga, darunter leise «<Teamname> · <Rang>. von <N>», gegebenenfalls
   « · Aufstiegsspiele» bzw. « · Abstiegsspiele»; ist die Saison abgeschlossen, darüber leise
   «Saison <Jahr> abgeschlossen: Schlussrang jedes Teams.». Fehlt in diesem Jahr ein Wettbewerb,
@@ -300,7 +302,8 @@ er nie.
   «<Teamname> · Gruppe <G> · <Rang>. von <N>». Umschalter **Spiele · Tabelle**. *Spiele*: je Runde
   eine Karte «Runde <n>» mit allen Begegnungen der Gruppe als *Resultatzeile*; die des eigenen
   Teams fett, mit Heim/Auswärts und Ergebnis. *Tabelle*: Karte «Gruppe <G>» mit dem Baustein
-  *Rangliste*; darunter, falls vorhanden, Karte «Aufstiegsspiele» bzw. «Abstiegsspiele» mit
+  *Rangliste* (ohne Rangliste statt ihrer «Die Tabelle steht nach der ersten Runde.»); darunter,
+  falls vorhanden, Karte «Aufstiegsspiele» bzw. «Abstiegsspiele» mit
   Datum und Uhrzeit. Gegner stehen nur mit Team- bzw. Vereinsnamen.
 - **Startseite:** „Hoi <Rufname, sonst Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
   „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben); Anlässe stehen als Kacheln unter „Jetzt aktuell" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
@@ -590,7 +593,7 @@ Seite *Auskunft*.
 | ID | Regel |
 |----|-------|
 | UI-01 | WCAG 2.2 Stufe AA ist die Untergrenze; die E2E-Tests prüfen jeden Bildschirm mit axe auf iPhone, Android und PC. |
-| UI-02 | Schrift folgt der Systemeinstellung des Geräts; Grössen und Abstände nur in `rem`. Bis 200 % Schrift wird nichts abgeschnitten und nichts waagrecht gescrollt, ausser Tabellen der Verwaltung; in der *Rangliste* der App endet ein zu langer Teamname mit „…" (Entscheid Projektleiter, #81). |
+| UI-02 | Schrift folgt der Systemeinstellung des Geräts; Grössen und Abstände nur in `rem`. Bis 200 % Schrift wird nichts abgeschnitten und nichts waagrecht gescrollt, ausser Tabellen der Verwaltung; die *Rangliste* der App wird dafür zweizeilig (Baustein *Rangliste*). |
 | UI-03 | Tasten, Felder und Reiter sind mindestens 48 × 48 px gross (`--tippflaeche`). Der Fokus ist immer sichtbar (`--farbe-marke`, `--fokus-breite`); auf grünen Flächen (Kopfleiste, Seitenleiste, Reiter am PC) in `--farbe-marke-hell`. |
 | UI-04 | Höchstens eine Haupttaste pro Bildschirm. |
 | UI-05 | Bedeutung nie nur über Farbe: Status als Plakette mit Text, Symbole immer mit Text. |

@@ -76,9 +76,19 @@ export function teamText(
 	return teile.join(' · ');
 }
 
-/** Vorgewählt im Umschalter der Übersicht: nach der Saison die Teams, sonst die Resultate. */
-export const vorgewaehlt = (abgeschlossen: boolean): Ansicht =>
-	abgeschlossen ? 'teams' : 'resultate';
+type Saisonstand = {
+	abgeschlossen: boolean;
+	letzte: readonly unknown[];
+	naechste: readonly unknown[];
+};
+
+/** Pause zwischen Spieltagen: Die Saison läuft, aber 7 Tage zurück und voraus spielt kein TCO-Team. */
+export const pause = (u: Saisonstand): boolean =>
+	!u.abgeschlossen && u.letzte.length === 0 && u.naechste.length === 0;
+
+/** Vorgewählt im Umschalter der Übersicht: nach der Saison und in einer Pause die Teams. */
+export const vorgewaehlt = (u: Saisonstand): Ansicht =>
+	u.abgeschlossen || pause(u) ? 'teams' : 'resultate';
 
 function gruppiere<T, K>(liste: readonly T[], schluessel: (x: T) => K): { k: K; spiele: T[] }[] {
 	const gruppen: { k: K; spiele: T[] }[] = [];

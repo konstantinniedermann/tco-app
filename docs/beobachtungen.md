@@ -135,6 +135,18 @@ Fehler der App.
 
 ## Offen
 
+### 2026-11-13 — Allgemeine Zeithilfe liegt im Thema Anlass
+
+**Thema:** Struktur
+
+**Fundort:** `src/lib/interclub/anzeige.ts` und `src/lib/server/interclub/ansicht.ts` importieren `utcZuZuerich` aus `src/lib/anlass/zeit.ts`
+
+**Beobachtung:** Die Umrechnung in Zürcher Zeit ist eine allgemeine Hilfe, liegt aber im Thema Anlass; Interclub hängt damit für die Zeit am Anlass.
+
+**Ursprung:** #81, Review von Task 8 (Oberfläche Interclub)
+
+**Einschätzung:** Kein Fehler. Bei Gelegenheit die Zürcher-Zeit-Funktionen in ein neutrales Modul (z. B. `src/lib/zeit.ts`) verschieben; betrifft auch die Abdeckungsliste in `vitest.config.ts`.
+
 ### 2026-11-13 — Interclub: Bedeutung des «*» bei Auf- und Abstiegsspielen unklar
 
 **Thema:** Interclub

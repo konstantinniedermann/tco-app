@@ -5,6 +5,7 @@
 		datumText,
 		kachelText,
 		nachTag,
+		pause,
 		standText,
 		vorgewaehlt,
 		type Ansicht
@@ -17,7 +18,7 @@
 	// vorgewählt nach dem Stand der Saison; ein Tipp wechselt nur den Inhalt.
 	let { data }: PageProps = $props();
 	const u = $derived(data.uebersicht);
-	let ansicht = $derived<Ansicht>(vorgewaehlt(data.uebersicht?.abgeschlossen ?? false));
+	let ansicht = $derived<Ansicht>(data.uebersicht ? vorgewaehlt(data.uebersicht) : 'resultate');
 
 	const OPTIONEN: readonly { wert: Ansicht; text: string }[] = [
 		{ wert: 'resultate', text: 'Resultate' },
@@ -73,6 +74,8 @@
 				Saison {u.saison} abgeschlossen. Die Saison {u.saison + 1} steht hier, sobald Swiss Tennis den
 				Spielplan veröffentlicht.
 			</p>
+		{:else if pause(u)}
+			<p class="karte">In den letzten und den nächsten 7 Tagen spielt kein TCO-Team.</p>
 		{:else}
 			{@render spieltage('Letzte Resultate', 'ic-letzte', u.letzte)}
 			{@render spieltage('Nächste Spiele', 'ic-naechste', u.naechste)}

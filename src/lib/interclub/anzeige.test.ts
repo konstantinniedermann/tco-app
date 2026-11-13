@@ -7,6 +7,7 @@ import {
 	nachRunde,
 	nachTag,
 	ortText,
+	pause,
 	plakette,
 	standText,
 	teamText,
@@ -66,9 +67,25 @@ describe('Texte der Interclub-Ansicht', () => {
 		expect(entscheidText('abstieg')).toBe('Abstiegsspiele');
 	});
 
-	test('vorgewählt ist Teams nach der Saison, sonst Resultate', () => {
-		expect(vorgewaehlt(true)).toBe('teams');
-		expect(vorgewaehlt(false)).toBe('resultate');
+	const spiel = { datum: '2026-05-10' };
+	const stand = (abgeschlossen: boolean, letzte: object[], naechste: object[]) => ({
+		abgeschlossen,
+		letzte,
+		naechste
+	});
+
+	test('Pause: Saison läuft, aber 7 Tage zurück und voraus spielt kein TCO-Team', () => {
+		expect(pause(stand(false, [], []))).toBe(true);
+		expect(pause(stand(false, [spiel], []))).toBe(false);
+		expect(pause(stand(false, [], [spiel]))).toBe(false);
+		expect(pause(stand(true, [], []))).toBe(false);
+	});
+
+	test('vorgewählt ist Teams nach der Saison und in einer Pause, sonst Resultate', () => {
+		expect(vorgewaehlt(stand(true, [], []))).toBe('teams');
+		expect(vorgewaehlt(stand(false, [], []))).toBe('teams');
+		expect(vorgewaehlt(stand(false, [spiel], []))).toBe('resultate');
+		expect(vorgewaehlt(stand(false, [], [spiel]))).toBe('resultate');
 	});
 });
 

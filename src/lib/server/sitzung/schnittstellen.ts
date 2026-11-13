@@ -29,7 +29,7 @@ export async function getSitzung(
 		ansicht: konto.ansicht,
 		// FR-52: Kachel der Verwaltung; nur wer als CM-Admin gilt (auch in der Ansicht), sonst 0.
 		nachrichtenOffen: rollen.includes('cm') ? await offeneGespraecheGesamt(db, jetzt()) : 0,
-		// Kachel «Interclub» nur, wenn es Resultate gibt.
+		// Reiter IC nur, wenn es Interclub-Daten gibt.
 		interclub: await hatInterclub(db)
 	});
 }
