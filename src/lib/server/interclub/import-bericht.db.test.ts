@@ -159,6 +159,24 @@ describe('importiereSaison: Einzelpartien', () => {
 		expect(await hatBericht(2085, 972338)).toBe(true);
 	});
 
+	test('unlesbarer Bericht (kein JSON): form, alter Bericht bleibt', async () => {
+		await importiereSaison(dienste(beispielAbruf()), 2085, VEREIN);
+		const vorher = await anzahl(2085);
+		const fake = beispielAbruf();
+		const wort = await importiereSaison(
+			dienste(async (u) =>
+				u.includes('encounterId=972338')
+					? new Response('<html>Fehler</html>', { status: 200 })
+					: fake(u)
+			),
+			2085,
+			VEREIN
+		);
+		expect(wort).toEqual({ ic: 'form', jic: 'ok' });
+		expect(await anzahl(2085)).toEqual(vorher);
+		expect(await hatBericht(2085, 972338)).toBe(true);
+	});
+
 	test('zweiter Import ersetzt die Berichte', async () => {
 		await importiereSaison(dienste(beispielAbruf()), 2086, VEREIN);
 		const vorher = await anzahl(2086);

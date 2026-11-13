@@ -50,11 +50,13 @@ export async function importiereSaison(
 		erste = false;
 		try {
 			const r = await d.holen(url);
-			let json: unknown = null;
+			// Unlesbarer Körper: undefined, nie null. `null` heisst bei einem Spielbericht «fehlt noch»;
+			// eine HTML-Fehlerseite darf keinen gespeicherten Bericht still löschen.
+			let json: unknown = undefined;
 			try {
 				json = await r.json();
 			} catch {
-				json = null;
+				json = undefined;
 			}
 			return { status: r.status, json };
 		} catch {
