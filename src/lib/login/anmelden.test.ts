@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
-import { MELDUNG, meldung, sende } from './anmelden.ts';
+import {
+	MELDUNG,
+	fordereMailCodeAn,
+	meldeMitBriefAn,
+	meldeMitMailAn,
+	meldeSichAb,
+	meldung,
+	sende
+} from './anmelden.ts';
 
 type Aufruf = { pfad: string; init: RequestInit };
 
@@ -122,5 +130,37 @@ describe('Login-Schnittstellen: Ränder der Deutung', () => {
 		expect(await ab(json(409, { fehler: 'falsch' }))).toEqual(STOERUNG);
 		expect(await ab(json(400, { fehler: 'eingabe' }))).toEqual(STOERUNG);
 		expect(await ab(ungeprueft(400, null))).toEqual(STOERUNG);
+	});
+});
+
+describe('Benannte Anfragen der Login-Seiten', () => {
+	it('A-LOGIN-01: jede Funktion nennt ihre Adresse und schickt ihre Angaben', async () => {
+		const fall = async (
+			aufruf: (holen: ReturnType<typeof holer>['holen']) => Promise<{ art: string }>,
+			pfad: string,
+			koerper: object
+		) => {
+			const h = holer(json(200, {}));
+			expect(await aufruf(h.holen)).toEqual({ art: 'ok' });
+			expect(h.aufrufe).toEqual([
+				{
+					pfad,
+					init: {
+						method: 'POST',
+						headers: { 'content-type': 'application/json' },
+						body: JSON.stringify(koerper)
+					}
+				}
+			]);
+		};
+		await fall((h) => meldeMitBriefAn('ABCD-1234', h), '/api/login/brief', { code: 'ABCD-1234' });
+		await fall((h) => fordereMailCodeAn('lea@example.org', h), '/api/login/mail-code', {
+			email: 'lea@example.org'
+		});
+		await fall((h) => meldeMitMailAn('lea@example.org', '123456', h), '/api/login/mail', {
+			email: 'lea@example.org',
+			code: '123456'
+		});
+		await fall((h) => meldeSichAb(h), '/api/logout', {});
 	});
 });

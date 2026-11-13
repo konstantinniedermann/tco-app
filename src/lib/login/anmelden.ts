@@ -45,6 +45,21 @@ export async function sende(pfad: string, inhalt: object, holen: Holen = fetch):
 	}
 }
 
+/** A-LOGIN-01: mit dem Code aus dem Brief anmelden. */
+export const meldeMitBriefAn = (code: string, holen: Holen = fetch) =>
+	sende('/api/login/brief', { code }, holen);
+
+/** Einen Code per E-Mail anfordern. */
+export const fordereMailCodeAn = (email: string, holen: Holen = fetch) =>
+	sende('/api/login/mail-code', { email }, holen);
+
+/** Mit dem Code aus der E-Mail anmelden. */
+export const meldeMitMailAn = (email: string, code: string, holen: Holen = fetch) =>
+	sende('/api/login/mail', { email, code }, holen);
+
+/** Abmelden; der Server antwortet auch ohne Sitzung mit Erfolg. */
+export const meldeSichAb = (holen: Holen = fetch) => sende('/api/logout', {}, holen);
+
 /** Meldung beim Feld; `falsch` ist je nach Seite verschieden. */
 export function meldung(r: Ergebnis, falsch: string): string | null {
 	switch (r.art) {

@@ -2,7 +2,7 @@
 	import { tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { MELDUNG, meldung, sende } from '../../lib/login/anmelden.ts';
+	import { MELDUNG, meldeSichAb, meldung } from '../../lib/login/anmelden.ts';
 	import { speichereKlassierung } from '../../lib/cm/api.ts';
 	import { holeSpeicher } from '../../lib/login/mailanfrage.ts';
 	import {
@@ -344,7 +344,7 @@
 		if (abmeldenLaeuft) return;
 		abmeldenLaeuft = true;
 		abmeldenFehler = null;
-		const r = await sende('/api/logout', {});
+		const r = await meldeSichAb();
 		abmeldenLaeuft = false;
 		if (r.art === 'ok') {
 			// A-KONTO-01: Die gemerkte neue Adresse eines laufenden E-Mail-Wechsels bleibt nicht liegen.
