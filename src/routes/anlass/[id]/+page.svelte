@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import Zurueck from '../../../lib/ui/Zurueck.svelte';
-	import { resolve } from '$app/paths';
 	import { sendeAntwort, type AnlassAnsicht, type AntwortArt } from '../../../lib/anlass/api.ts';
 	import { ANTWORT_MELDUNG, MAX_BEMERKUNG } from '../../../lib/anlass/antwort.ts';
 	import { formatiereBeginn } from '../../../lib/anlass/zeit.ts';
+	import { leiteUmNachAktion } from '../../../lib/login/waechter.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -65,7 +64,7 @@
 				bearbeiten = false;
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'nicht-gefunden':
 				anlass = null;

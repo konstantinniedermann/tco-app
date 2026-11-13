@@ -5,6 +5,7 @@
 	import { MELDUNG, meldeSichAb, meldung } from '../../lib/login/anmelden.ts';
 	import { speichereKlassierung } from '../../lib/cm/api.ts';
 	import { holeSpeicher } from '../../lib/login/mailanfrage.ts';
+	import { leiteUmNachAktion } from '../../lib/login/waechter.ts';
 	import {
 		entfernePasskey,
 		kannPasskey,
@@ -349,7 +350,7 @@
 		if (r.art === 'ok') {
 			// A-KONTO-01: Die gemerkte neue Adresse eines laufenden E-Mail-Wechsels bleibt nicht liegen.
 			vergissWechsel(holeSpeicher());
-			await goto(resolve('/login'));
+			await leiteUmNachAktion({ art: 'abgemeldet' });
 		} else abmeldenFehler = meldung(r, MELDUNG.stoerung);
 	}
 </script>
