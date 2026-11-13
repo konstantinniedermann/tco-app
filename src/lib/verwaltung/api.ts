@@ -1,5 +1,6 @@
 // Anfragen der Verwaltungsseiten an `/api/admin/…` und ihre Antworten als typisierte Ergebnisse.
 // Die Seiten zeigen die Meldungen; hier steht nur, was die Statuscodes bedeuten.
+import type { Holen, Json } from '../abruf.ts';
 import { istFehlerwort } from '../fehler.ts';
 import { jsonPost } from '../json-post.ts';
 import type { Angaben, Feld } from '../server/admin/angaben.ts';
@@ -30,14 +31,8 @@ import type {
 import type { VerlaufZeile } from '../server/admin/verlauf.ts';
 import type { Klassierung } from '../turnier/klassierung.ts';
 
-// Was nach JSON im Browser ankommt: Zeitpunkte sind Zeichenketten.
-export type Json<T> = T extends Date
-	? string
-	: T extends (infer U)[]
-		? Json<U>[]
-		: T extends object
-			? { [K in keyof T]: Json<T[K]> }
-			: T;
+// `Holen` und `Json` stehen im Abruf-Baustein; hier weitergereicht, bis alle Module ihn nutzen.
+export type { Holen, Json };
 
 export type MitgliedDetail = Json<Detail>;
 export type AuskunftAnsicht = Json<Auskunft>;
@@ -94,8 +89,6 @@ export type Antwort<T> =
 	| { art: 'nur-lesen' }
 	| { art: 'inzwischen'; gespraech: GespraechVerlauf }
 	| { art: 'stoerung' };
-
-export type Holen = (pfad: string, init: RequestInit) => Promise<Response>;
 
 const STOERUNG: Antwort<never> = { art: 'stoerung' };
 
