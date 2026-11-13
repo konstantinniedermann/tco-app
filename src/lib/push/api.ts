@@ -1,7 +1,7 @@
 // Anfragen zu Benachrichtigungen (`/api/benachrichtigungen…`, FR-40, FR-41) und ihre Antworten
 // als typisierte Ergebnisse. Die Oberfläche zeigt die Meldungen; hier steht nur, welche
 // Fehlerwörter das Modul kennt (gedeutet im Abruf-Baustein).
-import { rufeAb, type Holen, type Vertrag } from '../abruf.ts';
+import { rufeAb, woerterAus, type Holen, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post.ts';
 
 export type Thema = 'anlaesse' | 'cm' | 'verein';
@@ -14,8 +14,11 @@ export type Ergebnis<T> =
 	{ art: 'ok'; daten: T } | { art: 'abgemeldet' } | { art: 'push-aus' } | { art: 'stoerung' };
 
 /** Die Fehlerwörter, die Push kennt; der Körper muss lesbar sein. */
-type Wort = 'abgemeldet' | 'push-aus';
-const VERTRAG: Vertrag<Wort> = { woerter: ['abgemeldet', 'push-aus'], koerper: 'pflicht' };
+type Wort = Exclude<Ergebnis<unknown>['art'], 'ok' | 'stoerung'>;
+const VERTRAG: Vertrag<Wort> = {
+	woerter: woerterAus<Wort>({ abgemeldet: true, 'push-aus': true }),
+	koerper: 'pflicht'
+};
 
 async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<Ergebnis<T>> {
 	const r = await rufeAb<T, Wort>(pfad, init, holen, VERTRAG);

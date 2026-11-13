@@ -1,5 +1,5 @@
 // Anfragen der Mitglieder an `/api/anlaesse/…` und ihre Antworten als typisierte Ergebnisse.
-import { rufeAb, type Holen, type Json, type Vertrag } from '../abruf.ts';
+import { rufeAb, woerterAus, type Holen, type Json, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post.ts';
 import type { AnlassMitglied } from '../server/anlass/anlaesse.ts';
 import type { Antwort as AntwortArt } from '../server/db/schema.ts';
@@ -25,9 +25,14 @@ function feldAus(felder: unknown): 'antwort' | 'bemerkung' | null {
 }
 
 /** Die Fehlerwörter, die der Anlass kennt; der Körper muss lesbar sein. */
-type Wort = 'abgemeldet' | 'nicht-gefunden' | 'geschlossen' | 'eingabe';
+type Wort = Exclude<Ergebnis<unknown>['art'], 'ok' | 'stoerung'>;
 const VERTRAG: Vertrag<Wort> = {
-	woerter: ['abgemeldet', 'nicht-gefunden', 'geschlossen', 'eingabe'],
+	woerter: woerterAus<Wort>({
+		abgemeldet: true,
+		'nicht-gefunden': true,
+		geschlossen: true,
+		eingabe: true
+	}),
 	koerper: 'pflicht'
 };
 

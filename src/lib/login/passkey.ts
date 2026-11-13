@@ -7,7 +7,7 @@ import {
 	startAuthentication,
 	startRegistration
 } from '@simplewebauthn/browser';
-import { rufeAb, type Holen, type Vertrag } from '../abruf.ts';
+import { rufeAb, woerterAus, type Holen, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post';
 import { sende } from './anmelden';
 
@@ -51,7 +51,10 @@ const istVorhanden = (fehler: unknown) => hatName(fehler, 'InvalidStateError');
 /** Nur Daten: Jede Antwort ausser einem Erfolg ist eine Störung; ohne lesbaren Körper keine Daten. */
 const NUR_DATEN: Vertrag<never> = { woerter: [], koerper: 'nachsichtig' };
 /** Optionen der Anmeldung: dazu 429 nach dem Status allein. */
-const OPTIONEN_ANMELDEN: Vertrag<'zu-viele'> = { woerter: ['zu-viele'], koerper: 'nachsichtig' };
+const OPTIONEN_ANMELDEN: Vertrag<'zu-viele'> = {
+	woerter: woerterAus<'zu-viele'>({ 'zu-viele': true }),
+	koerper: 'nachsichtig'
+};
 /** Entfernen: nur genau 204 ist ein Erfolg. */
 const NUR_OHNE_KOERPER: Vertrag<never> = {
 	woerter: [],

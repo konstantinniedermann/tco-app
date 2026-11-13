@@ -40,6 +40,14 @@ export type Vertrag<W extends Fehlerwort> = {
 	readonly nullAlsLeer?: boolean;
 };
 
+/**
+ * Die Wörter eines Vertrags aus einem Objekt mit genau einem Schlüssel je Wort. Mit dem Typ der
+ * Wörter angegeben (`woerterAus<Wort>({ … })`) ist die Liste an ihn gebunden: Ein fehlendes oder ein
+ * überzähliges Wort ist ein Typfehler.
+ */
+export const woerterAus = <W extends Fehlerwort>(woerter: Record<W, true>): readonly W[] =>
+	Object.keys(woerter) as W[];
+
 /** Der Körper einer Fehlerantwort, wie er ankam; Zusatzangaben liest das Modul selbst. */
 export type Fehlerangaben = Readonly<Record<string, unknown>>;
 

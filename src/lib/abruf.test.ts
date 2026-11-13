@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { STATUS_ALLEIN, rufeAb, type Holen, type Vertrag } from './abruf.ts';
+import { STATUS_ALLEIN, rufeAb, woerterAus, type Holen, type Vertrag } from './abruf.ts';
 import {
 	FEHLERWOERTER,
 	STATUS_DES_WORTS,
@@ -195,5 +195,15 @@ describe('Abruf-Baustein: Vertrag, Angaben 3 und 4 (204, JSON null)', () => {
 		expect(await ab(ungeprueft(401, null), v)).toEqual({ art: 'abgemeldet', koerper: {} });
 		expect(await ab(ungeprueft(409, null), v)).toEqual(STOERUNG);
 		expect(await ab(ungeprueft(200, null), v)).toEqual({ art: 'ok', daten: null });
+	});
+});
+
+describe('Abruf-Baustein: Wörter eines Vertrags', () => {
+	test('woerterAus gibt genau die Schlüssel als Liste', () => {
+		expect(woerterAus<'veraltet' | 'zu-viele'>({ veraltet: true, 'zu-viele': true })).toEqual([
+			'veraltet',
+			'zu-viele'
+		]);
+		expect(woerterAus<never>({})).toEqual([]);
 	});
 });

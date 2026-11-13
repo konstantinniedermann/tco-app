@@ -1,7 +1,7 @@
 // Anfragen der Verwaltungsseiten an `/api/admin/…` und ihre Antworten als typisierte Ergebnisse.
 // Die Seiten zeigen die Meldungen; hier steht nur, welche Fehlerwörter das Modul kennt (gedeutet im
 // Abruf-Baustein) und welche Zusatzangaben sie tragen.
-import { rufeAb, type Holen, type Json, type Vertrag } from '../abruf.ts';
+import { rufeAb, woerterAus, type Holen, type Json, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post.ts';
 import type { Angaben, Feld } from '../server/admin/angaben.ts';
 import type { AnlassFeld } from '../server/anlass/angaben.ts';
@@ -125,7 +125,7 @@ const WOERTER: Record<Wort, true> = {
 
 /** Körper Pflicht; JSON `null` als Fehlerkörper gilt als `{}` (so war es hier immer). */
 const VERTRAG: Vertrag<Wort> = {
-	woerter: Object.keys(WOERTER) as Wort[],
+	woerter: woerterAus<Wort>(WOERTER),
 	koerper: 'pflicht',
 	nullAlsLeer: true
 };

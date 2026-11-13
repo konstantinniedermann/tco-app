@@ -3,7 +3,7 @@
 // Annahme K-19.1: Telefon, Lizenznummer und E-Mail ändert das Mitglied selbst.
 // Annahme K-19.2: die Adresse (Strasse, PLZ, Ort) ebenso.
 
-import { rufeAb, type Holen, type Vertrag } from '../abruf.ts';
+import { rufeAb, woerterAus, type Holen, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post.ts';
 import type { EigeneAngaben, EigenesFeld } from '../server/profil/angaben.ts';
 import { istKlassierung, type Klassierung } from '../turnier/klassierung.ts';
@@ -78,9 +78,15 @@ function istObjekt(x: unknown): x is Record<string, unknown> {
  * Die Fehlerwörter, die das Profil kennt. Der Körper ist nachsichtig: unlesbar gilt als leer. 401 und
  * 404 kennt das Profil nicht, sie bleiben Störung.
  */
-type Wort = 'veraltet' | 'eingabe' | 'gleich' | 'falsch' | 'zu-viele';
+type Wort = Exclude<Ergebnis, 'ok' | 'stoerung'>;
 const VERTRAG: Vertrag<Wort> = {
-	woerter: ['veraltet', 'eingabe', 'gleich', 'falsch', 'zu-viele'],
+	woerter: woerterAus<Wort>({
+		veraltet: true,
+		eingabe: true,
+		gleich: true,
+		falsch: true,
+		'zu-viele': true
+	}),
 	koerper: 'nachsichtig'
 };
 

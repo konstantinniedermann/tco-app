@@ -1,7 +1,7 @@
 // Anfragen der Mitglieder an `/api/cm/…` und `/api/profil/klassierung` und ihre Antworten als
 // typisierte Ergebnisse. Die Seiten zeigen die Meldungen; hier steht nur, welche Fehlerwörter das
 // Modul kennt (gedeutet im Abruf-Baustein).
-import { rufeAb, type Holen, type Json, type Vertrag } from '../abruf.ts';
+import { rufeAb, woerterAus, type Holen, type Json, type Vertrag } from '../abruf.ts';
 import type { Fehlerwort } from '../fehler.ts';
 import { jsonPost } from '../json-post.ts';
 import { ABLEHNUNGEN } from './ablehnung.ts';
@@ -71,9 +71,16 @@ const istObjekt = (x: unknown): x is Record<string, unknown> =>
 	typeof x === 'object' && x !== null && !Array.isArray(x);
 
 /** Die Fehlerwörter, die die CM kennt; der Körper muss lesbar sein, 204 ohne Körper ist Erfolg. */
-type Wort = 'abgemeldet' | 'nicht-gefunden' | Abgelehnt | 'eingabe';
+type Wort = Exclude<Ergebnis<unknown>['art'], 'ok' | 'stoerung'>;
 const VERTRAG: Vertrag<Wort> = {
-	woerter: ['abgemeldet', 'nicht-gefunden', ...ABGELEHNT, 'eingabe'],
+	woerter: [
+		...ABGELEHNT,
+		...woerterAus<Exclude<Wort, Abgelehnt>>({
+			abgemeldet: true,
+			'nicht-gefunden': true,
+			eingabe: true
+		})
+	],
 	koerper: 'pflicht',
 	ohneKoerper: 'erfolg'
 };

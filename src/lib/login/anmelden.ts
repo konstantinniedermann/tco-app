@@ -1,7 +1,7 @@
 // Anfragen der Login-Seiten an die Schnittstellen und die Meldungen dazu (UI-06).
 // Texte wörtlich aus der Spec «Login per Einmal-Code», Abschnitt «Ablauf in der App».
 
-import { rufeAb, type Holen, type Vertrag } from '../abruf.ts';
+import { rufeAb, woerterAus, type Holen, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post';
 
 export type Ergebnis =
@@ -22,9 +22,9 @@ export const MELDUNG = {
 } as const;
 
 /** Die Fehlerwörter des Logins; der Körper ist nachsichtig (Erfolg und 429 brauchen keinen). */
-type Wort = 'falsch' | 'benutzt' | 'zu-viele';
+type Wort = Exclude<Ergebnis['art'], 'ok' | 'stoerung'>;
 const VERTRAG: Vertrag<Wort> = {
-	woerter: ['falsch', 'benutzt', 'zu-viele'],
+	woerter: woerterAus<Wort>({ falsch: true, benutzt: true, 'zu-viele': true }),
 	koerper: 'nachsichtig'
 };
 
