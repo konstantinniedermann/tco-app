@@ -74,3 +74,59 @@ test('#81: Mitglied sieht den Reiter IC, die Übersicht und die Team-Seite mit T
 	await expect(page.getByRole('heading', { level: 1, name: 'Interclub 2026' })).toBeVisible();
 	expect(fehler).toEqual([]);
 });
+
+test('#81: Mitglied öffnet eine Begegnung mit Einzel und Doppel, Gegner aufgeklappt', async ({
+	page,
+	isMobile
+}, info) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	if (isMobile) await startetVomSymbol(page);
+	const konto = await legeKontoMitBriefCodeAn('Ida');
+	await page.goto('/login');
+	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
+	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Ida' })).toBeVisible();
+	await wartetAufVorladen(page);
+
+	await reiterleiste(page).getByRole('link', { name: 'IC', exact: true }).click();
+	await page.getByRole('link', { name: /2L Herren 1/ }).click();
+	await expect(page.getByRole('heading', { level: 1, name: /2L Herren 1/ })).toBeVisible();
+	// Nur eigene, gespielte Begegnungen sind Links.
+	await expect(page.getByRole('link', { name: /Aarau 2 – Muhen/ })).toHaveCount(0);
+	await page.getByRole('link', { name: /Olten 1 – Villmergen/ }).click();
+
+	await expect(page.getByRole('heading', { level: 1, name: 'Olten 1 – Villmergen' })).toBeVisible();
+	await expect(page.getByText('Sa 02.05. · Heim · Runde 1')).toBeVisible();
+	await expect(page.getByRole('region', { name: 'Endstand' })).toContainText('Sätze 16:3');
+	const erste = page.getByRole('region', { name: 'Einzel' }).getByRole('group').first();
+	await expect(erste).toContainText('Saitenbett Hannes');
+	await expect(erste).toContainText('verloren');
+	// Gegner erst nach dem Aufklappen sichtbar.
+	await expect(page.getByText('Testmann Elena')).toBeHidden();
+	await erste.getByText('Saitenbett Hannes').click();
+	await expect(erste.getByText('Testmann Elena')).toBeVisible();
+	await pruefeBildschirm(page, info, 'interclub-begegnung-einzel');
+
+	await page.getByRole('button', { name: 'Doppel', exact: true }).click();
+	const doppel = page.getByRole('region', { name: 'Doppel' });
+	await expect(doppel.getByRole('group')).toHaveCount(3);
+	await expect(doppel.getByRole('group').nth(1)).toContainText('0:6 6:4 11:9');
+	await pruefeBildschirm(page, info, 'interclub-begegnung-doppel');
+
+	await page.getByRole('link', { name: '‹ 2L Herren 1', exact: true }).click();
+	await expect(page.getByRole('heading', { level: 1, name: /2L Herren 1/ })).toBeVisible();
+
+	// Aufstiegsspiel: die Doppel wurden nicht gespielt.
+	await page.getByRole('button', { name: 'Tabelle', exact: true }).click();
+	await page
+		.getByRole('region', { name: 'Aufstiegsspiele' })
+		.getByRole('link', { name: /Schlieren – Olten 1/ })
+		.click();
+	await expect(page.getByText('So 07.06., 09:00 · Auswärts · Aufstiegsspiel')).toBeVisible();
+	await page.getByRole('button', { name: 'Doppel', exact: true }).click();
+	await expect(
+		page.getByText('Nicht gespielt: Die Begegnung war nach den Einzeln entschieden.')
+	).toBeVisible();
+	expect(fehler).toEqual([]);
+});
