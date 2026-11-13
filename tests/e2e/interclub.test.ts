@@ -5,7 +5,8 @@ import { startetVomSymbol } from './hilfen/geraet.ts';
 import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
 // Reiter IC (#81): Übersicht und Team-Seite mit den Beispieldaten der Saison 2026, die jeder
-// E2E-Lauf einspielt (playwright.config.ts). Die Uhr steht im November 2026: Saison abgeschlossen.
+// E2E-Lauf einspielt (playwright.config.ts). Der E2E-Server läuft mit der echten Uhr; der Stand ist stabil,
+// weil alle Spiele 2026 ein Resultat haben (Saison abgeschlossen).
 // Die Anmeldung geht per Brief-Code, damit kein Mail-Code das Budget pro IP verbraucht.
 
 test.afterAll(async () => {

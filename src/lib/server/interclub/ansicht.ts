@@ -185,7 +185,10 @@ export async function ladeUebersicht(db: Db, jetzt: Date): Promise<IcUebersicht 
 		.filter((s) => s.ergebnis === null && s.datum >= heute && s.datum <= bis)
 		.sort(reihenfolge);
 	const abgeschlossen =
-		letzte.length === 0 && naechste.length === 0 && eigene.every((s) => s.ergebnis !== null);
+		eigene.length > 0 &&
+		letzte.length === 0 &&
+		naechste.length === 0 &&
+		eigene.every((s) => s.ergebnis !== null);
 
 	const kachel = (team: TeamZeile): IcKachel => {
 		const gruppe = raenge.filter((r) => r.teamId === team.teamId);

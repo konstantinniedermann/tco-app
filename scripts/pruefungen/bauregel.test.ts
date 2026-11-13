@@ -321,10 +321,10 @@ describe('Einstiege der Verwaltung ausserhalb von api/admin (Schritt 07)', () =>
 	const fremd = (name: string) =>
 		`${pfad}: aus dienste.ts nur Einstiege der Mitglieder, nicht '${name}'; erlaubt sind nur holeLoginDienst, holePasskeyDienst, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste, holeInterclubDienste`;
 	const mit = (zeile: string) => pruefeBauregel(new Map([[pfad, `${gut}\n${zeile}`]]));
-	it('RR-07: ausserhalb von api/admin sind alle sechs Einstiege der Mitglieder erlaubt', () => {
+	it('RR-07: ausserhalb von api/admin sind alle sieben Einstiege der Mitglieder erlaubt', () => {
 		expect(
 			mit(
-				"import { holeLoginDienst, holePasskeyDienst as p, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste } from '$lib/server/dienste';"
+				"import { holeLoginDienst, holePasskeyDienst as p, holeProfilDienste, holeCmDienste, holeMitteilungDienste, holeAnlassDienste, holeInterclubDienste } from '$lib/server/dienste';"
 			)
 		).toEqual([]);
 	});

@@ -29,6 +29,31 @@ describe('leere Datenbank', () => {
 	});
 });
 
+describe('Saison ohne Begegnungen', () => {
+	let e: EigeneDatenbank;
+	beforeAll(async () => {
+		e = await legeEigeneDatenbankAn('icansicht');
+		await e.db.insert(icTeam).values({
+			saison: 2027,
+			teamId: 1,
+			wettbewerb: 'ic',
+			teamName: 'Olten 1',
+			liga: '2L Herren 1',
+			gruppe: 1,
+			reihenfolge: 1
+		});
+	}, 30_000);
+	afterAll(async () => {
+		await e.abbauen();
+	});
+
+	test('Teams ohne Begegnungen: Saison nicht abgeschlossen', ZEIT_EIGENE_DB, async () => {
+		const u = (await ladeUebersicht(e.db, J('2027-03-01T10:00:00Z')))!;
+		expect(u.saison).toBe(2027);
+		expect(u.abgeschlossen).toBe(false);
+	});
+});
+
 describe('Saison 2026', () => {
 	let e: EigeneDatenbank;
 	beforeAll(async () => {

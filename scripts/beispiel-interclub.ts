@@ -39,13 +39,22 @@ export function beispielAbruf(
 	};
 }
 
-/** Legt die Saison 2026 des Vereins 2202 aus den Dateien an; ein zweiter Lauf ersetzt sie vollständig. */
-export async function legeBeispielInterclubAn(db: Db, jetzt: Date): Promise<void> {
-	await importiereSaison(
-		{ db, holen: beispielAbruf(), jetzt: () => jetzt, pause: async () => {} },
+/**
+ * Legt die Saison 2026 des Vereins 2202 aus den Dateien an; ein zweiter Lauf ersetzt sie vollständig.
+ * Scheitert mit festem Text, wenn eine Antwort fehlt oder fehlerhaft ist (damit `make seed` und E2E laut abbrechen).
+ */
+export async function legeBeispielInterclubAn(
+	db: Db,
+	jetzt: Date,
+	holen: (url: string) => Promise<Response> = beispielAbruf()
+): Promise<void> {
+	const worte = await importiereSaison(
+		{ db, holen, jetzt: () => jetzt, pause: async () => {} },
 		2026,
 		2202
 	);
+	if (worte.ic !== 'ok' || worte.jic !== 'ok')
+		throw new Error('Interclub-Beispieldaten fehlerhaft');
 }
 
 if (import.meta.main) {

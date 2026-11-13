@@ -4,9 +4,9 @@ import { erstelleDb } from '../src/lib/server/db/index.ts';
 import { importiereSaison } from '../src/lib/server/interclub/import.ts';
 
 const jahr = Number(process.env.JAHR);
-const verein = Number(process.env.IC_VEREIN ?? '2202');
+const verein = Number(process.env.IC_VEREIN || '2202');
 const url = process.env.DATABASE_URL;
-if (!Number.isInteger(jahr) || jahr < 2000 || !Number.isInteger(verein)) {
+if (!Number.isInteger(jahr) || jahr < 2000 || !Number.isInteger(verein) || verein <= 0) {
 	console.error('Aufruf: make ic-import JAHR=2026 (optional IC_VEREIN)');
 	process.exit(1);
 }

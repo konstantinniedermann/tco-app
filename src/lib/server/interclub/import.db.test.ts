@@ -190,9 +190,14 @@ describe('importiereSaison', () => {
 		expect(await rest(icTeam)).toBe(0);
 		expect(await rest(icBegegnung)).toBe(0);
 		expect(await rest(icRang)).toBe(0);
-		expect((await db.select().from(icEntscheid).where(eq(icEntscheid.teamId, 7398))).length).toBe(
-			0
-		);
+		expect(
+			(
+				await db
+					.select()
+					.from(icEntscheid)
+					.where(and(eq(icEntscheid.saison, 2076), eq(icEntscheid.teamId, 7398)))
+			).length
+		).toBe(0);
 		expect((await zaehle(2076)).teams).toBe(16);
 	});
 
