@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { ladeMitglied } from '../../../../lib/verwaltung/api.ts';
+import { ladeMitglied } from '../../../../lib/verwaltung/mitglieder-api.ts';
 import type { PageLoad } from './$types';
 
 // Läuft nur im Browser (ssr = false). Fehlt die Bestätigung mitten in der Sitzung, geht es zurück

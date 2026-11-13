@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
-	import { ladeVerlauf, type VerlaufEintrag } from '../../../lib/verwaltung/api.ts';
+	import { ladeVerlauf, type VerlaufEintrag } from '../../../lib/verwaltung/mitglieder-api.ts';
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { aktionText, zeitText } from '../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';

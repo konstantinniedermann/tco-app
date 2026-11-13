@@ -2,7 +2,8 @@
 // und welche Seite welchem Bereich angehört (RR-07, Design Rollen schärfen Regeln 3 und 7).
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import type { Antwort, VerwaltungsRolle } from './api.ts';
+import type { Antwort } from './api.ts';
+import type { VerwaltungsRolle } from './zugang-api.ts';
 import { darf, type Bereich } from './bereiche.ts';
 
 /** Leitet bei fehlender Anmeldung, Rolle oder Bestätigung um; `true`, wenn umgeleitet wurde. */

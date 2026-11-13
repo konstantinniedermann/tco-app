@@ -6,7 +6,8 @@
 		LEERER_ANLASS,
 		type AnlassWerte
 	} from '../../../../lib/verwaltung/Anlassformular.svelte';
-	import { legeAnlassAn, type AnlassFeld } from '../../../../lib/verwaltung/api.ts';
+	import { type AnlassFeld } from '../../../../lib/verwaltung/api.ts';
+	import { legeAnlassAn } from '../../../../lib/verwaltung/anlass-api.ts';
 	import { fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 

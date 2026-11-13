@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { ladeAnlassAdmin } from '../../../../lib/verwaltung/api.ts';
+import { ladeAnlassAdmin } from '../../../../lib/verwaltung/anlass-api.ts';
 import { ladeMitteilungen } from '../../../../lib/verwaltung/mitteilung-api.ts';
 import type { PageLoad } from './$types';
 

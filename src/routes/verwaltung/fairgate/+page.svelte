@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { invalidate } from '$app/navigation';
-	import { uebertrageFairgate } from '../../../lib/verwaltung/api.ts';
+	import { uebertrageFairgate } from '../../../lib/verwaltung/mitglieder-api.ts';
 	import {
 		geaendertText,
 		neueAngaben,

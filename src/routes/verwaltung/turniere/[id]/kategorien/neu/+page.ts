@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { ladeTurnier } from '../../../../../../lib/verwaltung/api.ts';
+import { ladeTurnier } from '../../../../../../lib/verwaltung/turnier-api.ts';
 import type { PageLoad } from './$types';
 
 // Läuft nur im Browser (ssr = false). Die Seite braucht den Namen des Turniers für den Rückweg.

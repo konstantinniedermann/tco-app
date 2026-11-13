@@ -6,7 +6,7 @@ import {
 	ladeTurnier,
 	type AnmeldungZeile,
 	type DoppelVerwaltung
-} from '../../../../../../lib/verwaltung/api.ts';
+} from '../../../../../../lib/verwaltung/turnier-api.ts';
 import type { PageLoad } from './$types';
 
 // Läuft nur im Browser (ssr = false). Eine Kategorie gibt es nur unter ihrem eigenen Turnier.
