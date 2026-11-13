@@ -5,7 +5,6 @@ import { rufeAb, woerterAus, type Holen, type Json, type Vertrag } from '../abru
 import { jsonPost } from '../json-post.ts';
 import type { Angaben, Feld } from '../server/admin/angaben.ts';
 import type { AnlassFeld } from '../server/anlass/angaben.ts';
-import type { AnlassAdmin, AnlassListe } from '../server/anlass/anlaesse.ts';
 import type { FairgateZeile as ServerFairgateZeile } from '../server/admin/fairgate.ts';
 import type { Auskunft } from '../server/admin/auskunft.ts';
 import type { AusgestellterBrief, BriefZeile } from '../server/admin/briefe.ts';
@@ -13,11 +12,7 @@ import type { DateiFehler, Vorschau } from '../server/admin/einlesen.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
 import type { Rolle } from '../server/admin/rollen.ts';
 import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
-import type {
-	GespraechZeile as ServerGespraechZeile,
-	ladeGespraech as ServerLadeGespraech,
-	listeGespraeche as ServerListeGespraeche
-} from '../server/gespraech/gespraech.ts';
+import type { ladeGespraech as ServerLadeGespraech } from '../server/gespraech/gespraech.ts';
 import type { DoppelVerwaltung as ServerDoppelVerwaltung } from '../server/cm/verwaltung-doppel.ts';
 import type { TurnierStatus } from '../server/db/schema.ts';
 import type { MitteilungFeld } from '../server/mitteilung/angaben.ts';
@@ -35,8 +30,6 @@ export type MitgliedDetail = Json<Detail>;
 export type AuskunftAnsicht = Json<Auskunft>;
 export type MitgliedZeile = Json<Listenzeile>;
 export type VerlaufEintrag = Json<VerlaufZeile>;
-export type AnlassZeile = Json<AnlassListe>;
-export type AnlassDetail = Json<AnlassAdmin> & { beginnLokal: string; schlussLokal: string };
 export type { AnlassFeld };
 export type TurnierListe = Json<TurnierZeile>[];
 export type TurnierAnsicht = Json<TurnierDetail>;
@@ -44,9 +37,7 @@ export type KategorieAnsicht = Json<NonNullable<Awaited<ReturnType<typeof Server
 export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus };
 export type { AnmeldungZeile, SpielerTreffer, Warnung };
 export type DoppelVerwaltung = Json<ServerDoppelVerwaltung>;
-export type GespraechListe = Json<NonNullable<Awaited<ReturnType<typeof ServerListeGespraeche>>>>;
 export type GespraechVerlauf = Json<NonNullable<Awaited<ReturnType<typeof ServerLadeGespraech>>>>;
-export type GespraechZeile = Json<ServerGespraechZeile>;
 type AlleFelder = Feld | AnlassFeld | TurnierFeld | KategorieFeld | MitteilungFeld | 'text';
 export type FairgateZeile = Json<ServerFairgateZeile>;
 export type BriefListe = Json<BriefZeile>[];
@@ -262,22 +253,6 @@ export const ladeFairgate = (holen: Holen = fetch) =>
 export const uebertrageFairgate = (id: number, seit: string, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/fairgate/${id}`, { seit }, holen);
 
-export const ladeAnlaesseAdmin = (holen: Holen = fetch) =>
-	lese<AnlassZeile[]>(`${ADMIN}/anlaesse`, holen);
-
-export const ladeAnlassAdmin = (id: number, holen: Holen = fetch) =>
-	lese<AnlassDetail>(`${ADMIN}/anlaesse/${id}`, holen);
-
-/** `angaben`: Titel, Ort, Einladung und Zeiten in Schweizer Zeit (`YYYY-MM-DDTHH:MM`). */
-export const legeAnlassAn = (angaben: object, holen: Holen = fetch) =>
-	schicke<{ id: number }>(`${ADMIN}/anlaesse`, angaben, holen);
-
-export const aendereAnlass = (id: number, angaben: object, holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/anlaesse/${id}`, angaben, holen);
-
-export const loescheAnlass = (id: number, holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/anlaesse/${id}/loeschen`, {}, holen);
-
 export const ladeTurniere = (holen: Holen = fetch) =>
 	lese<TurnierListe>(`${ADMIN}/turniere`, holen);
 
@@ -446,22 +421,3 @@ export const meldeAnfrageAlsPaarAn = (anfrageId: number, trotzdem = false, holen
 /** FR-46, FR-48: eine offene Partner-Anfrage löschen; der Anfragende erfährt es. */
 export const loescheAnfrage = (anfrageId: number, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/anfragen/${anfrageId}/loeschen`, {}, holen);
-
-/** FR-52: die Gespräche eines Turniers für den Posteingang der Turnierleitung. */
-export const holeGespraeche = (turnierId: number, holen: Holen = fetch) =>
-	lese<GespraechListe>(`${ADMIN}/turniere/${turnierId}/gespraeche`, holen);
-
-/** Ein Gespräch mit Verlauf, mit den Namen der antwortenden Admins. */
-export const holeGespraech = (id: number, holen: Holen = fetch) =>
-	lese<GespraechVerlauf>(`${ADMIN}/gespraeche/${id}`, holen);
-
-/** FR-50: Antwort der Turnierleitung; `nachLetzter`: Id der letzten Nachricht, die die Seite kennt. */
-export const sendeAntwort = (
-	id: number,
-	antwort: { text: string; nachLetzter: number; trotzdem?: boolean },
-	holen: Holen = fetch
-) => schicke<GespraechVerlauf>(`${ADMIN}/gespraeche/${id}`, antwort, holen);
-
-/** FR-52: Gespräch als erledigt markieren oder wieder öffnen. */
-export const setzeZustand = (id: number, zustand: 'offen' | 'erledigt', holen: Holen = fetch) =>
-	schicke<GespraechVerlauf>(`${ADMIN}/gespraeche/${id}/zustand`, { zustand }, holen);
