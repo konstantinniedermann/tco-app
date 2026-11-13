@@ -29,6 +29,7 @@ const THEMEN = [
 	'brief',
 	'cm',
 	'gespraech',
+	'interclub',
 	'mitteilung',
 	'profil',
 	'sitzung',
