@@ -1,5 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
-import { ladeFairgate, ladeZugang } from '../../lib/verwaltung/api.ts';
+import { ladeFairgate } from '../../lib/verwaltung/api.ts';
+import { ladeZugang } from '../../lib/verwaltung/zugang-api.ts';
 import { rechte, startziel, umleitung } from '../../lib/verwaltung/umleiten.ts';
 import type { LayoutLoad } from './$types';
 

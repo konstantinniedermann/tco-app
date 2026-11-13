@@ -1,28 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
+import { holer, json, ungeprueft, type Koerper } from '../../../tests/hilfen/verwaltung-abruf.ts';
 import {
-	aendereAnlass,
-	bestaetige,
 	ladeAnlaesseAdmin,
 	ladeAnlassAdmin,
 	legeAnlassAn,
+	aendereAnlass,
 	loescheAnlass,
-	fordereCodeAn,
+	sendeAntwort,
 	ladeMitglieder,
 	ladeMitglied,
-	ladeZugang,
 	legeMitgliedAn,
 	speichereAngaben,
 	speichereRollen,
-	ladeTurniere,
-	legeTurnierAn,
-	setzeTurnierStatus,
-	legeKategorieAn,
-	sageKategorieAb,
-	aendereKategorie,
-	beendeAnsicht,
-	ladeRollenListe,
-	schaueAls,
 	erfasseAustritt,
 	erfasseWiedereintritt,
 	loescheMitglied,
@@ -31,6 +20,14 @@ import {
 	ladeBriefe,
 	erzeugeBriefe,
 	erzeugeBrief,
+	zeigeEinleseVorschau,
+	liesMitgliederEin,
+	ladeTurniere,
+	legeTurnierAn,
+	setzeTurnierStatus,
+	legeKategorieAn,
+	sageKategorieAb,
+	aendereKategorie,
 	ladeAnmeldungen,
 	meldeVonHandAn,
 	verschiebeAnmeldung,
@@ -43,31 +40,9 @@ import {
 	legeZusammen,
 	aenderePartner,
 	meldeAnfrageAlsPaarAn,
-	loescheAnfrage,
-	zeigeEinleseVorschau,
-	liesMitgliederEin,
-	sendeAntwort
+	loescheAnfrage
 } from './api.ts';
-
-type Aufruf = { pfad: string; init: RequestInit };
-
-function holer(antwort: Response | Error) {
-	const aufrufe: Aufruf[] = [];
-	const holen = async (pfad: string, init: RequestInit) => {
-		aufrufe.push({ pfad, init });
-		if (antwort instanceof Error) throw antwort;
-		return antwort;
-	};
-	return { aufrufe, holen };
-}
-
-// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an
-// (src/lib/fehler.ts), damit ein Wort oder eine Form, die der Server nicht kennt, hier auffällt.
-type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
-const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
-
-/** Absichtlich ausserhalb der Liste: Antworten, die der Server nie so sendet. */
-const ungeprueft = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+import { ladeZugang } from './zugang-api.ts';
 
 describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 	it('Regel 3: 403 kein-recht und nur-ansehen kommen als eigene Antwort an', async () => {
@@ -81,37 +56,6 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 		expect([a, b]).toEqual([{ art: 'kein-recht' }, { art: 'nur-ansehen' }]);
 	});
 
-	it('Regel 2: Rollen-Übersicht liest /api/admin/rollen', async () => {
-		const liste = [{ rolle: 'cm', mitglieder: [{ id: 3, name: 'Muster, Hanna' }] }];
-		const h = holer(json(200, liste));
-		expect(await ladeRollenListe(h.holen)).toEqual({ art: 'ok', daten: liste });
-		expect(h.aufrufe[0].pfad).toBe('/api/admin/rollen');
-	});
-
-	it('Ansicht als …: einschalten schickt die Rolle; läuft schon eine, wird sie zuerst beendet', async () => {
-		const ohne = holer(json(200, {}));
-		expect(await schaueAls('cm', null, ohne.holen)).toEqual({ art: 'ok', daten: {} });
-		expect(ohne.aufrufe.map((a) => [a.pfad, a.init.body])).toEqual([
-			['/api/admin/ansicht', JSON.stringify({ rolle: 'cm' })]
-		]);
-
-		const mit = holer(json(200, {}));
-		await schaueAls('mitglied', 'cm', mit.holen);
-		expect(mit.aufrufe.map((a) => a.pfad)).toEqual([
-			'/api/admin/ansicht/beenden',
-			'/api/admin/ansicht'
-		]);
-
-		// Lässt sich die laufende Ansicht nicht beenden, schaltet die Seite keine neue ein.
-		const kaputt = holer(new Error('Netz weg'));
-		expect(await schaueAls('mitglied', 'cm', kaputt.holen)).toEqual({ art: 'stoerung' });
-		expect(kaputt.aufrufe).toHaveLength(1);
-
-		const ende = holer(json(200, {}));
-		expect(await beendeAnsicht(ende.holen)).toEqual({ art: 'ok', daten: {} });
-		expect(ende.aufrufe[0].init.method).toBe('POST');
-	});
-
 	it('RR-07: 401 wird abgemeldet, 403 kein-admin und unbestaetigt bleiben getrennt', async () => {
 		const a = await ladeZugang(holer(json(401, { fehler: 'abgemeldet' })).holen);
 		const b = await ladeZugang(holer(json(403, { fehler: 'kein-admin' })).holen);
@@ -120,32 +64,6 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			{ art: 'abgemeldet' },
 			{ art: 'kein-admin' },
 			{ art: 'unbestaetigt' }
-		]);
-	});
-
-	it('SI-08: Zugang liefert bestaetigt; Code anfordern 202 ok, 429 zu-viele', async () => {
-		expect(await ladeZugang(holer(json(200, { bestaetigt: true })).holen)).toEqual({
-			art: 'ok',
-			daten: { bestaetigt: true }
-		});
-		expect(await fordereCodeAn(holer(json(202, {})).holen)).toEqual({ art: 'ok', daten: {} });
-		expect(await fordereCodeAn(holer(json(429, { fehler: 'zu-viele' })).holen)).toEqual({
-			art: 'zu-viele'
-		});
-	});
-
-	it('SI-08: Bestätigen schickt JSON, 400 falsch wird falsch', async () => {
-		const { aufrufe, holen } = holer(json(400, { fehler: 'falsch' }));
-		expect(await bestaetige('123456', holen)).toEqual({ art: 'falsch' });
-		expect(aufrufe).toEqual([
-			{
-				pfad: '/api/admin/zugang',
-				init: {
-					method: 'POST',
-					headers: { 'content-type': 'application/json' },
-					body: '{"code":"123456"}'
-				}
-			}
 		]);
 	});
 
@@ -304,17 +222,6 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 			['POST', '/api/admin/kategorien/9/absagen']
 		]);
 		expect(JSON.parse(String(h.aufrufe[1].init.body))).toEqual({ status: 'offen' });
-	});
-
-	it('RR-07: ladeZugang liefert die Rollen', async () => {
-		const r = await ladeZugang(
-			holer(json(200, { bestaetigt: true, mitgliedId: 3, rollen: ['cm'] })).holen
-		);
-		expect(r).toEqual({
-			art: 'ok',
-			daten: { bestaetigt: true, mitgliedId: 3, rollen: ['cm'] }
-		});
-		if (r.art === 'ok') expect(r.daten.rollen).toEqual(['cm']);
 	});
 
 	it('A-ANMELDUNG-06, FR-46, FR-08: Anmeldungen verwalten mit Pfad, Methode und Körper', async () => {

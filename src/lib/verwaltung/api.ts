@@ -11,7 +11,7 @@ import type { Auskunft } from '../server/admin/auskunft.ts';
 import type { AusgestellterBrief, BriefZeile } from '../server/admin/briefe.ts';
 import type { DateiFehler, Vorschau } from '../server/admin/einlesen.ts';
 import type { Detail, Listenzeile, MitgliedStatus } from '../server/admin/mitglieder.ts';
-import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
+import type { Rolle } from '../server/admin/rollen.ts';
 import type { AnmeldungZeile, SpielerTreffer, Warnung } from '../server/cm/verwaltung.ts';
 import type {
 	GespraechZeile as ServerGespraechZeile,
@@ -41,7 +41,7 @@ export type { AnlassFeld };
 export type TurnierListe = Json<TurnierZeile>[];
 export type TurnierAnsicht = Json<TurnierDetail>;
 export type KategorieAnsicht = Json<NonNullable<Awaited<ReturnType<typeof ServerLadeKategorie>>>>;
-export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus, VerwaltungsRolle };
+export type { KategorieZeile, KategorieFeld, TurnierFeld, TurnierStatus };
 export type { AnmeldungZeile, SpielerTreffer, Warnung };
 export type DoppelVerwaltung = Json<ServerDoppelVerwaltung>;
 export type GespraechListe = Json<NonNullable<Awaited<ReturnType<typeof ServerListeGespraeche>>>>;
@@ -52,7 +52,7 @@ export type FairgateZeile = Json<ServerFairgateZeile>;
 export type BriefListe = Json<BriefZeile>[];
 export type { AusgestellterBrief };
 export type { DateiFehler, Vorschau };
-export type { Angaben, AnsichtRolle, Feld, MitgliedStatus, Rolle, RollenListe };
+export type { Angaben, Feld, MitgliedStatus, Rolle };
 
 export type Antwort<T> =
 	| { art: 'ok'; daten: T }
@@ -172,43 +172,7 @@ export const lese = <T>(pfad: string, holen: Holen) => rufe<T>(pfad, { method: '
 export const schicke = <T>(pfad: string, inhalt: object, holen: Holen) =>
 	rufe<T>(pfad, jsonPost(inhalt), holen);
 
-const ADMIN = '/api/admin';
-
-export const ladeZugang = (holen: Holen = fetch) =>
-	lese<{ bestaetigt: boolean; mitgliedId?: number; rollen: VerwaltungsRolle[] }>(
-		`${ADMIN}/zugang`,
-		holen
-	);
-
-export const fordereCodeAn = (holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/zugang/code`, {}, holen);
-
-export const bestaetige = (code: string, holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/zugang`, { code }, holen);
-
-/** Regel 2: wer welche Rolle hat (nur MyTCO-Admin). */
-export const ladeRollenListe = (holen: Holen = fetch) =>
-	lese<RollenListe>(`${ADMIN}/rollen`, holen);
-
-/**
- * Schaltet «Ansicht als …» ein. Läuft schon eine Ansicht, beendet die Seite sie zuerst: Von einer
- * Ansicht direkt in eine andere weist der Server ab (`nur-ansehen`).
- */
-export async function schaueAls(
-	rolle: AnsichtRolle,
-	laufend: AnsichtRolle | null,
-	holen: Holen = fetch
-): Promise<Antwort<Record<string, never>>> {
-	if (laufend !== null) {
-		const ende = await beendeAnsicht(holen);
-		if (ende.art !== 'ok') return ende;
-	}
-	return schicke<Record<string, never>>(`${ADMIN}/ansicht`, { rolle }, holen);
-}
-
-/** Beendet die Ansicht dieser Sitzung; geht immer, auch ohne laufende Ansicht. */
-export const beendeAnsicht = (holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/ansicht/beenden`, {}, holen);
+export const ADMIN = '/api/admin';
 
 export function ladeMitglieder(
 	filter: { suche?: string; status?: string },

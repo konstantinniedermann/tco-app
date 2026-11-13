@@ -1,4 +1,4 @@
-import type { AnsichtRolle } from '../lib/verwaltung/api.ts';
+import type { AnsichtRolle } from '../lib/verwaltung/zugang-api.ts';
 import type { LayoutLoad } from './$types';
 
 export const ssr = false;
