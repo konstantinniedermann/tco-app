@@ -36,11 +36,13 @@
 			<span>
 				{#each p.spieler as x, i (i)}
 					{#if i > 0}<br />{/if}{x.name}&nbsp;<span class="leise">{x.klassierung}</span>
+				{:else}
+					–
 				{/each}
 			</span>
 			<span class="partie-saetze" data-ergebnis={p.ergebnis}
-				>{p.saetze.length ? p.saetze.join(' ') : 'w.o.'}{#if p.ergebnis}<span class="vorlesen"
-						>, {vorlesetext(p.ergebnis)}</span
+				>{p.saetze.length ? p.saetze.join(' ') : p.aufgabe ? 'w.o.' : '–'}{#if p.ergebnis}<span
+						class="vorlesen">, {vorlesetext(p.ergebnis)}</span
 					>{/if}</span
 			>
 		</summary>
@@ -62,7 +64,7 @@
 
 {#if b.saetze && b.partien}
 	<section class="karte resultat" aria-label="Endstand">
-		<span class="leise">{endstandText(b.saetze)}</span>
+		<span class="leise">{endstandText(b.saetze, s.tcoHeim)}</span>
 		<div>
 			<strong class="resultat-stand" data-ergebnis={s.ergebnis}
 				>{s.heimPunkte}:{s.gastPunkte}</strong

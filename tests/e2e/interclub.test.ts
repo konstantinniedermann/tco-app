@@ -124,6 +124,8 @@ test('#81: Mitglied öffnet eine Begegnung mit Einzel und Doppel, Gegner aufgekl
 		.getByRole('link', { name: /Schlieren – Olten 1/ })
 		.click();
 	await expect(page.getByText('So 07.06., 09:00 · Auswärts · Aufstiegsspiel')).toBeVisible();
+	// Sätze in der Reihenfolge Heim:Gast wie der Endstand 5:1.
+	await expect(page.getByRole('region', { name: 'Endstand' })).toContainText('Sätze 10:2');
 	await page.getByRole('button', { name: 'Doppel', exact: true }).click();
 	await expect(
 		page.getByText('Nicht gespielt: Die Begegnung war nach den Einzeln entschieden.')

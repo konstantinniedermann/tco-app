@@ -21,13 +21,14 @@ describe('Texte der Seite einer Begegnung', () => {
 		).toBe('So 14.06. · Heim · Abstiegsspiel');
 	});
 
-	test('Endstand mit Sätzen aus Sicht des TCO', () => {
-		expect(endstandText({ tco: 16, gegner: 3 })).toBe('Endstand · Sätze 16:3');
+	test('Endstand mit Sätzen in der Reihenfolge Heim:Gast wie der Endstand', () => {
+		expect(endstandText({ tco: 16, gegner: 3 }, true)).toBe('Endstand · Sätze 16:3');
+		expect(endstandText({ tco: 4, gegner: 11 }, false)).toBe('Endstand · Sätze 11:4');
 	});
 
 	test('Aufgabe als Wort, sonst nichts', () => {
 		expect(aufgabeText('gegner')).toBe('Gegner hat aufgegeben');
-		expect(aufgabeText('tco')).toBe('aufgegeben');
+		expect(aufgabeText('tco')).toBe('TCO hat aufgegeben');
 		expect(aufgabeText(null)).toBeNull();
 	});
 

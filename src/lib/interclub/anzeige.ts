@@ -127,13 +127,16 @@ export function begegnungText(s: {
 	return [datumText(s.datum, s.zeit), ortText(s.tcoHeim), letztes].join(' · ');
 }
 
-export const endstandText = (saetze: { tco: number; gegner: number }): string =>
-	`Endstand · Sätze ${saetze.tco}:${saetze.gegner}`;
+/** Sätze in der Reihenfolge Heim:Gast, wie der Endstand daneben. */
+export function endstandText(saetze: { tco: number; gegner: number }, tcoHeim: boolean): string {
+	const [heim, gast] = tcoHeim ? [saetze.tco, saetze.gegner] : [saetze.gegner, saetze.tco];
+	return `Endstand · Sätze ${heim}:${gast}`;
+}
 
 /** Wer aufgegeben hat, als Wort unter dem Gegner; ohne Aufgabe null. */
 export function aufgabeText(aufgabe: 'tco' | 'gegner' | null): string | null {
 	if (aufgabe === null) return null;
-	return aufgabe === 'gegner' ? 'Gegner hat aufgegeben' : 'aufgegeben';
+	return aufgabe === 'gegner' ? 'Gegner hat aufgegeben' : 'TCO hat aufgegeben';
 }
 
 /** Vorlesetext zur Farbe der Sätze: Die Bedeutung hängt nicht allein an der Farbe. */
