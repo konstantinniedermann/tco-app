@@ -32,11 +32,11 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 | **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt und gemergt (0.20.19). **Etappe 2:** Schritt 13 erledigt (zwei Läufe, Review je «ok», Version 0.20.20); Schritt 14 umgesetzt (Branch `refactor/schritt-14`, voller `make check` grün, Review und Merge offen) |
 | **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), 12a (0.20.19), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D) |
 | **Zuletzt erledigt** | **14** (13.11.2026, Review «ok» ohne Befund, Version 0.20.21; Ergebnis in 7.4, Protokoll Anhang E.4): `verwaltung/api.ts` nach Bereichen geteilt, in `zugang-api.ts`, `anlass-api.ts`, `gespraech-api.ts`, `mitglieder-api.ts` und `turnier-api.ts`; `api.ts` bleibt der Kern (`Antwort<T>`, Vertrag, `lese`, `schicke`) und reicht nichts weiter; 42 Dateien wechseln nur Import-Zeilen, 44 Tests auf fünf Dateien verteilt, keiner geändert; voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.3): Profil, Login, Passkey und `hatSitzung` auf dem Baustein, Umbenennung `ergebnis` → `art`, beide Kleinfragen aufgenommen (`{ art }` beim E-Mail-Wechsel, vier benannte Anfragen der Login-Seiten), N-09 (`src/lib/anlass/antwort.ts`), Wortlisten der Verträge an den Typ gebunden, `abruf.ts` in der Abdeckung; die Lint-Regel zu `fetch` verworfen (98 Meldungen am heutigen Repo, Vorschlag an Schritt 15); voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 1** Abruf-Baustein (13.11.2026, Review «ok» ohne Befund; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **15** mit Nachmessen vorab (Zeile in 7.4 und Hinweise zu Schritt 15; das Nachmessen fehlt noch im Dokument, also zuerst nachmessen). Etappe 2 läuft ohne Halt mit Kurzbericht je Schritt (E-45). **Schritt 14** ist erledigt: Review «ok», Version 0.20.21 (Ergebnis in 7.4, Protokoll in E.4); **Schritt 13** ist erledigt: Review «ok» für beide Läufe, Version 0.20.20 (Ergebnis in 7.4, Protokoll in E.2 und E.3) |
+| **Nächster offener Schritt** | **15** gemeinsamer Wächter: Nachmessen erledigt (Anhang E.5). Zwei Läufe mit je eigenem Review, ein Merge (wie Schritt 13): **Lauf 1** Vorab-Tests in drei Teilen, `ladeSitzung`, Wächter-Tabelle `src/lib/login/waechter.ts`, alle betroffenen Ladefunktionen, die 17 Stellen von Hand; für die Nutzerin ändert sich nichts (E-44, elf benannte Fälle A bis K). **Lauf 2** (vier Listen der Verwaltung laden in `+page.ts`) wartet auf die Antwort des Projektleiters auf **F-28**. CI auf `dev` zu den Merges von 13 und 14 grün (Läufe 43391433997, 43395087062) |
 | **Wartet auf Freigabe des Projektleiters** | nichts. Checkpoint am Ende der Etappe 1 erledigt am 12.11.2026 (E-41 bis E-44); die Berichtigungen der `CLAUDE.md` sind eingespielt (E-43) |
-| **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen Fragen sind beantwortet (F-22 durch den Ablauf erledigt, F-23 in F-26 aufgegangen) |
+| **Offene Fragen** | **F-28** (vier Listen der Verwaltung: Laden vor dem Anzeigen, zwei kleine sichtbare Folgen): vor Lauf 2 von Schritt 15, hält Lauf 1 nicht auf. **F-29** (zwei Bausteine laden beim Einhängen selbst: Ausnahme oder umziehen): hält nichts auf, ohne Antwort gilt A. Beide neu aus dem Nachmessen vom 13.11.2026 (Anhang E.5), Abschnitt 9.1. **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen Fragen sind beantwortet (F-22 durch den Ablauf erledigt, F-23 in F-26 aufgegangen) |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
-| **Vorab nachzumessen** | vor Schritt 15 (neu, E-41), 16 (kurz: nur die Doppel-Seite), 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). **Für Schritt 13 erledigt am 12.11.2026 (Anhang E.1):** kein Entscheid des Projektleiters nötig, der Baustein erhält jeden heutigen Rand; «ein Wort gilt nur mit seinem Status» bleibt, dazu «für 401, 404 und 429 genügt der Status»; 57 Zeilen Vorab-Tests; Baustein `src/lib/abruf.ts`; drei Seiten statt vier (`willkommen` liest kein Ergebnis); N-09 aufnehmen, N-10 als geteilte Liste unter `src/lib/cm/`. Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
+| **Vorab nachzumessen** | vor Schritt 16 (kurz: nur die Doppel-Seite), 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). **Für Schritt 15 erledigt am 13.11.2026 (Anhang E.5):** Tabelle aller 36 Adressen mit Ziel; 17 statt 14 Stellen «nach einer Aktion»; acht benannte Fälle mehr (D bis K); Vorab-Test als E2E-Tabelle ohne Konto und Mail-Code plus Einheitstests der Ladefunktionen der Verwaltung; Wächter als Tabelle in `src/lib/login/waechter.ts` mit zwei Hüllen, `ladeSitzung` in `sitzung.ts`; zwei Läufe, ein Merge; Lauf 1 ändert für die Nutzerin nichts, Lauf 2 (vier Listen) wartet auf F-28. **Für Schritt 13 erledigt am 12.11.2026 (Anhang E.1):** kein Entscheid des Projektleiters nötig, der Baustein erhält jeden heutigen Rand; «ein Wort gilt nur mit seinem Status» bleibt, dazu «für 401, 404 und 429 genügt der Status»; 57 Zeilen Vorab-Tests; Baustein `src/lib/abruf.ts`; drei Seiten statt vier (`willkommen` liest kein Ergebnis); N-09 aufnehmen, N-10 als geteilte Liste unter `src/lib/cm/`. Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
 | **Nächster Checkpoint** | Etappe 2 läuft ohne Halt mit Kurzbericht je Schritt (E-45). Fester Halt: Schritt 17 vor dem Merge (Vorher-Nachher-Bild, E-21); sonst nur bei den in E-45 genannten Anlässen. Am Ende der Etappe 2 Zwischenrevision und Checkpoint |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32) |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
@@ -2046,7 +2046,7 @@ Der wichtigste ist der dritte.
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
 | 13 | [geändert] Ein Abruf-Baustein mit einem Ergebnis-Typ; die Abruf-Module nutzen ihn und deuten keinen Statuscode mehr (B-20). Die Typen `Holen` und `Json` ziehen in den Baustein. **Ein Schritt, zwei Läufe mit je eigenem Review und committetem Zwischenstand (E-41, wie Schritt 11).** *Lauf 1:* der Baustein und die Module, deren Ergebnis schon `art` heisst (`anlass`, `cm`, `push`, `verwaltung`, `mitteilung-api`), bei unveränderten Tests. *Lauf 2:* `profil`, `anmelden` und `passkey` mit der Umbenennung `ergebnis` → `art`; Tests und drei Seiten ändern nur den Namen **[geändert, Anhang E.1: drei Seiten, nicht vier; `passkey.ts` gibt blanke Wörter zurück und liest nur das Ergebnis von `sende`, drei Zeilen]**. Nimmt N-10 auf (eine geteilte Liste für `FEHLER` und `ABGELEHNT`) und N-09 (die doppelten Sätze des Anlasses: aufnehmen oder ausdrücklich verwerfen). Einzelheiten: Hinweise zu Schritt 13 | [geändert] neu der Baustein (Ort z. B. `src/lib/abruf.ts` neben `fehler.ts` und `json-post.ts`; nicht `src/lib/api/`, das sich mit `src/routes/api/` verwechselt); `src/lib/anlass/api.ts`, `cm/api.ts`, `push/api.ts`, `push/geraet.ts`, `verwaltung/api.ts`, `verwaltung/mitteilung-api.ts`, `profil/angaben.ts`, `login/passkey.ts`, `login/anmelden.ts`, `login/sitzung.ts` und ihre Tests; in Lauf 2 die drei Seiten `login`, `login/mail`, `profil` (nur der Name) **[geändert, Anhang E.1: `willkommen` liest kein Ergebnis eines Abruf-Moduls; dazu `src/lib/fehler.ts` (Tabelle Wort → Status) und `src/lib/abruf.test.ts`; `login/sitzung.ts` ändert sich erst in Schritt 15]**. Für N-10 `src/lib/server/cm/schnittstellen.ts` und der Ort der geteilten Liste; für N-09 allenfalls `src/lib/server/anlass/angaben.ts` und die Seite des Anlasses | Statuscodes werden an einer Stelle gedeutet; ein neuer Ablehnungsgrund des Servers fällt in der Oberfläche nicht mehr still als Störung an (N-10) | mittel | [geändert] **Vorab-Tests (erster Commit, Charakterisierung):** je Sonderfall aus der Tabelle des Nachmessens ein Fall in den Einheitstests der Module, darunter die zwei entfallenen «Status allein genügt» (`push/api.test.ts` 401, `verwaltung/api.test.ts` 404, mit `ungeprueft(…, {})`; N-15); jeder einmal absichtlich rot belegt. *Lauf 1:* Die bestehenden Einheitstests der Module (`api.test.ts` u. a.) bleiben unverändert grün. *Lauf 2:* Tests und Seiten ändern nur den Namen `ergebnis` → `art`; der Reviewer prüft das am Diff, `svelte-check` hält die Seiten. E2E voll nach jedem Lauf. Probe für den Reviewer: Der Diff unter `src/lib/server/` und `src/routes/api/` ist leer, ausser für N-10 | 08 (und 12a, weil Schritte strikt nacheinander laufen; inhaltlich hängt 13 nicht an 12a) | Opus | Subagent, zwei Läufe | [geändert] **ja, erweitert (E-41):** (1) `src/lib/profil/angaben.ts`, `src/lib/login/passkey.ts` und `src/lib/login/anmelden.ts` ganz lesen (bisher nur Auszüge); (2) je Modul eine Tabelle der Sonderfälle: 204 ohne Körper, 429 ohne lesbaren Körper, `eingabe` ohne `felder`, 401 als Störung, unlesbares JSON, `ergebnis` statt `art`; (3) Empfehlung zu «ein Wort gilt nur mit seinem Status» (dann eine Tabelle Wort → Status in `fehler.ts`, die auch N-08 zum Teil schliesst); (4) die 13 Stellen mit `page.route` neu bestimmen (Nachtrag zur Prüfliste (b) unten); (5) Ort des Bausteins; (6) N-09: aufnehmen oder verwerfen. Ändert eine Empfehlung ein Ergebnis an den Rändern, geht sie als Frage an den Projektleiter. **Erledigt** 12.11.2026 (Anhang E.1): kein Entscheid nötig | **erledigt** 13.11.2026, Review «ok» für beide Läufe, Version 0.20.20 (Branch `refactor/schritt-13`. Lauf 1, Review «ok»: `test:` `fcd3250`; `refactor:` `17008e9`, `9cf1969`, `41fde29`, `fb6e07a`, `291e4a8`; Anhang E.2. Lauf 2: `test:` `99b6406`; `refactor:` `5f3ab9d`, `3c47eb7`, `c502044`, `119180c`, `0eee143`, `74752c3`; `test:` `bc41749`; Anhang E.3). Ergebnis unten |
 | 14 | `verwaltung/api.ts` nach Bereichen geteilt (Mitglieder, Turnier, Gespräch, Anlass, Zugang) | `src/lib/verwaltung/api.ts`, alle Importe in `src/routes/verwaltung/` und `src/lib/verwaltung/` | Hotspot entschärft, weniger Merge-Reibung | niedrig | `svelte-check`, Einheitstests, E2E Verwaltung | 13 | Sonnet | Subagent | nein | **erledigt** 13.11.2026, Review «ok», Version 0.20.21 (Branch `refactor/schritt-14`; `refactor:` `a7e3a26`, `70c7078`, `a60440c`, `18ec293`; Anhang E.4). Ergebnis unten |
-| 15 | [geändert] Die kopierten Wächter werden eine gemeinsame Funktion je App (Mitglieder, Verwaltung), die jede Ladefunktion aufruft und die auch nach einer Aktion im Baustein gilt; keine Seite und kein Baustein schreibt die Umleitung zum Login selbst, keine Ladefunktion ruft `fetch` direkt (B-21). **Das heutige Verhalten bleibt genau (E-44):** Der Schritt vereinheitlicht die Umleitungen nicht; die Abweichungen (`profil/email`, `verwaltung/rollen`, Aktionen ohne Mail-Code) sind benannte Fälle der Funktion. Die vier Seiten, die im Baustein laden (`turniere`, `anlaesse`, `mitglieder`, `verlauf`), bekommen ihr erstes Laden in einer `+page.ts`; erneutes Laden nach Suche, Filter oder Aktion bleibt im Baustein. **Die Prüfung der Sitzung bei jedem Seitenwechsel bleibt** (gewollt, B-21); darum kein einmaliges Laden im Layout und vorerst keine Routen-Gruppe. Einzelheiten: Hinweise zu Schritt 15 | [geändert] neu z. B. `src/lib/login/waechter.ts` mit Einheitstest; `src/lib/login/sitzung.ts` (ein typisierter Abruf der Sitzung auf dem Baustein aus 13; die vier `fetch('/api/sitzung')` in Ladefunktionen und der Abruf von `/api/kontakt` in `hilfe/+page.ts` verschwinden); alle `+page.ts` und `+layout.ts` der Mitglieder-App und der Verwaltung (27 Ladefunktionen); `src/lib/verwaltung/umleiten.ts`; die Bausteine, die nach einer Aktion von Hand zum Login leiten (CM-Seite neun Stellen, Doppel-Seite fünf: nur der Aufruf wechselt); `src/routes/verwaltung/turniere`, `anlaesse`, `mitglieder`, `verlauf` (je `+page.svelte` und eine neue `+page.ts`) | Ein Ort für den Einstieg; kein geändertes Verhalten | [geändert] **mittel** (vorher niedrig: 27 Ladefunktionen, fünf verschiedene Wächter, kein Test ruft eine Ladefunktion) | [geändert] **Vorab-Test (erster Commit, einmal rot):** «ohne Sitzung führt jede geschützte Seite an ihr heutiges Ziel», mit und ohne wartende Mail-Anfrage; die Erwartung ist die Tabelle aus dem Nachmessen; der Test bleibt durch den Umbau unverändert. Dann der Einheitstest der Wächter-Funktion zuerst; `tests/e2e/navigation.test.ts`, `login.test.ts`, `startseite.test.ts`, `verwaltung.test.ts` («SI-07»), `bewegung.test.ts` («Reiter … sofort aktiv» hängt an `/api/sitzung`, B-31) auf allen drei Geräten; Prüfliste (b) unten | 13 | Opus | Subagent | [geändert] **ja (E-41):** Tabelle aller Einstiege (Ladefunktionen und Aktionen im Baustein) mit ihrem heutigen Ziel, mit und ohne wartende Mail-Anfrage; die Form des Vorab-Tests (E2E-Schleife oder Einheitstests der Ladefunktionen mit gestelltem `fetch`, siehe Hinweise) | offen |
+| 15 | [geändert] Die kopierten Wächter werden eine gemeinsame Funktion je App (Mitglieder, Verwaltung), die jede Ladefunktion aufruft und die auch nach einer Aktion im Baustein gilt; keine Seite und kein Baustein schreibt die Umleitung zum Login selbst, keine Ladefunktion ruft `fetch` direkt (B-21). **Das heutige Verhalten bleibt genau (E-44):** Der Schritt vereinheitlicht die Umleitungen nicht; die Abweichungen (`profil/email`, `verwaltung/rollen`, Aktionen ohne Mail-Code) sind benannte Fälle der Funktion. Die vier Seiten, die im Baustein laden (`turniere`, `anlaesse`, `mitglieder`, `verlauf`), bekommen ihr erstes Laden in einer `+page.ts`; erneutes Laden nach Suche, Filter oder Aktion bleibt im Baustein **[geändert, Anhang E.5: ein Schritt, zwei Läufe mit je eigenem Review und einem Merge; Lauf 2 sind die vier Seiten und wartet auf F-28; `verlauf` hat kein erneutes Laden im Baustein, sein Filter ist die Adresse]**. **Die Prüfung der Sitzung bei jedem Seitenwechsel bleibt** (gewollt, B-21); darum kein einmaliges Laden im Layout und vorerst keine Routen-Gruppe. Einzelheiten: Hinweise zu Schritt 15 | [geändert] neu z. B. `src/lib/login/waechter.ts` mit Einheitstest; `src/lib/login/sitzung.ts` (ein typisierter Abruf der Sitzung auf dem Baustein aus 13; die vier `fetch('/api/sitzung')` in Ladefunktionen und der Abruf von `/api/kontakt` in `hilfe/+page.ts` verschwinden); alle `+page.ts` und `+layout.ts` der Mitglieder-App und der Verwaltung (27 Ladefunktionen); `src/lib/verwaltung/umleiten.ts`; die Bausteine, die nach einer Aktion von Hand zum Login leiten (CM-Seite neun Stellen, Doppel-Seite fünf: nur der Aufruf wechselt) **[geändert, Anhang E.5: dazu je eine Stelle in `anlass/[id]/+page.svelte`, `src/lib/push/Benachrichtigungen.svelte` und `clubmeisterschaft/[id]/kontakt/+page.svelte` (dort `window.location.assign`, bleibt als benannter Fall), zusammen 17 Stellen in fünf Dateien; `leiteUm` behält Namen und Signatur, seine 32 Aufrufe bleiben; `hilfe/+page.ts` nimmt `ladeKontakt` aus `src/lib/profil/angaben.ts`; neu die Vorab-Tests `tests/e2e/waechter.test.ts` und z. B. `tests/oberflaeche/ladefunktionen.test.ts`]**; `src/routes/verwaltung/turniere`, `anlaesse`, `mitglieder`, `verlauf` (je `+page.svelte` und eine neue `+page.ts`) | Ein Ort für den Einstieg; kein geändertes Verhalten | [geändert] **mittel** (vorher niedrig: 27 Ladefunktionen, fünf verschiedene Wächter, kein Test ruft eine Ladefunktion) | [geändert] **Vorab-Test (erster Commit, einmal rot):** «ohne Sitzung führt jede geschützte Seite an ihr heutiges Ziel», mit und ohne wartende Mail-Anfrage; die Erwartung ist die Tabelle aus dem Nachmessen; der Test bleibt durch den Umbau unverändert. **[geändert, Anhang E.5: drei Teile: eine E2E-Tabelle über 31 Adressen ohne Konto und ohne Mail-Code, zehn E2E-Fälle mit Konto (ohne Rolle, unbestätigt, 401 nach einer Aktion) und Einheitstests der Ladefunktionen der Verwaltung mit gestelltem `fetch`, weil E2E deren Blöcke hinter dem Layout nicht sieht; je Teil einmal rot]** Dann der Einheitstest der Wächter-Funktion zuerst; `tests/e2e/navigation.test.ts`, `login.test.ts`, `startseite.test.ts`, `verwaltung.test.ts` («SI-07»), `bewegung.test.ts` («Reiter … sofort aktiv» hängt an `/api/sitzung`, B-31) auf allen drei Geräten; Prüfliste (b) unten | 13 | Opus | Subagent | [geändert] **ja (E-41):** Tabelle aller Einstiege (Ladefunktionen und Aktionen im Baustein) mit ihrem heutigen Ziel, mit und ohne wartende Mail-Anfrage; die Form des Vorab-Tests (E2E-Schleife oder Einheitstests der Ladefunktionen mit gestelltem `fetch`, siehe Hinweise). **Erledigt** 13.11.2026 (Anhang E.5): beide Wege gehen ohne neue Ausnahme, empfohlen ist die Verbindung; zwei Fragen an den Projektleiter (F-28 vor Lauf 2, F-29), keine hält Lauf 1 auf | offen |
 | 16 | CM-Seite: zuerst das gemeinsame Gerüst der acht Handler als eine Funktion mit Einheitstests (Antwort → Meldung, Fehlertext, neu laden oder Login), dann die beiden gleichen Text-Dialoge («Wildcard», «Kommentar ändern») als ein Baustein. Die neun Abschnitte des Markups bleiben in der Seite; es gibt kein Ziel für die Zeilenzahl (B-22, B-34). **[geändert]** «Login» nimmt die Ablauf-Funktion vom Wächter aus Schritt 15, nicht aus eigenen Stellen. Die Doppel-Seite ist eine offene Kleinfrage (Hinweise zu Schritt 16) | `src/routes/clubmeisterschaft/[id]/+page.svelte`; neu unter `src/lib/cm/` (Ablauf-Funktion mit Test, ein Dialog-Baustein) | Der Fix-Hotspot verliert rund 250 Zeilen wiederholten Ablauf; der Ablauf ist erstmals ohne Browser prüfbar | mittel (Fokus nach jeder Aktion, WCAG 2.4.3) | Neue Einheitstests zuerst; alle `cm-*`-E2E und `navigation.test.ts` («lädt nicht neu»); Klassen und Verschachtelung unverändert (Prüfliste (b) unten) | [geändert] 04, 13, **15** | Opus | Subagent | [geändert] kurz: nur die Doppel-Seite, aufnehmen oder ausdrücklich verwerfen (Hinweise zu Schritt 16) | offen |
 | 17 | `Anmeldungsliste.svelte` nutzt den vorhandenen `Aktionsdialog` statt `fuehreAus` und fünf roher Dialoge. `DoppelListe.svelte` bleibt unverändert. Der Dialog «Wildcard-Antrag» hat zwei Entscheid-Tasten; ob der Baustein dafür erweitert wird oder dieser eine Dialog von Hand bleibt, entscheidet der Schritt und begründet es. **Checkpoint (E-21):** Vor dem Merge sieht der Projektleiter ein Vorher-Nachher-Bild der Warnung (heute ein Satz, im Baustein eine Liste) und entscheidet, ob es so bleibt | `src/lib/verwaltung/Anmeldungsliste.svelte`, allenfalls `Aktionsdialog.svelte` | Zwei statt drei Baustufen desselben Ablaufs; rund 150 Zeilen weniger | mittel (die Warnung steht heute als Satz, im Baustein als Liste: sichtbare Abweichung, vorab dem Projektleiter zeigen) | `cm-verwaltung.test.ts`, `turnier.test.ts`, `cm-anmeldung.test.ts` (zweiter Test); Prüfliste (b) unten | 04, 14 | Opus | Subagent, vor dem Merge Checkpoint mit dem Projektleiter | nein | offen |
 | 18 | [geändert] `basis.css` in mehrere Dateien schneiden, **in der bestehenden Reihenfolge** (E-13; z. B. Grundlagen, Rahmen und Kopfleiste, Bedienelemente, Karten und Listen, Verwaltung, Anleitung, Übergänge, PC-Layout, Druck). Keine Regel wird verschoben, umbenannt oder gelöscht; es gibt keine tote Klasse zu entfernen (B-23). Bedingungen für den Schnitt: Hinweise zu Schritt 18 | `src/lib/design/`, `src/routes/+layout.svelte` (Importe in derselben Reihenfolge), `scripts/pruefungen/design-festwerte.ts` (Pfade), die vier Mockups unter `docs/ui-mockups/*.html`, `docs/ui-leitbild.md` | Weniger Merge-Reibung an der meistgeänderten Code-Datei | niedrig (vorher mittel), solange der Beweis hält | Gebautes Stylesheet vor und nach Zeichen für Zeichen gleich (`make css-vergleich`, Schritt 04); **[geändert]** dazu den Vergleich einmal für den SPA-Build ziehen oder begründen, warum nicht; `make check` | 04 (E-13) | Sonnet | Subagent | nein | offen |
@@ -2178,6 +2178,21 @@ Ladefunktionen sind dort gelesen, der Rest per Textsuche.
   darf keinen Mail-Code anfordern, der das Budget je Adresse der E2E-Läufe aufbraucht [V].
 - **Bleibt:** die Prüfung der Sitzung bei jedem Seitenwechsel; `bewegung.test.ts` («Reiter …
   sofort aktiv») hängt an `/api/sitzung` (Prüfliste (b), B-31 Nr. 1).
+- **Nachmessen erledigt (13.11.2026, Anhang E.5) [neu]:** Dort stehen die Tabelle «Seite ×
+  Auslöser → Ziel» für alle 36 Adressen, die benannten Fälle A bis K, die Liste der Vorab-Tests,
+  der Vorschlag für `ladeSitzung` und den Wächter und der Schnitt je Lauf. Es gehen vor: (1) **17
+  Stellen, nicht 14,** leiten in der Mitglieder-App nach einer Aktion von Hand um (dazu Anlass,
+  Benachrichtigungen im Profil, Gespräch); das Gespräch lädt dabei die App ganz neu und bleibt so
+  (Fall D). (2) Abweichung 5 und die Blöcke der Verwaltungsseiten liegen hinter dem Layout und
+  sind im Browser nicht zu sehen; **der Vorab-Test ist darum eine E2E-Tabelle plus Einheitstests
+  der Ladefunktionen der Verwaltung unter `tests/`** (B-39 unberührt, kein Mail-Code, keine neue
+  Abhängigkeit). (3) «Netz weg beim Prüfen der Sitzung» zeigt heute einen anderen Satz als eine
+  Server-Störung; `ladeSitzung` bildet das nach (Fall G). (4) Der Wächter fragt die Sitzung nicht
+  selbst, er nimmt das Ergebnis eines Abrufs; `leiteUm` behält Namen und Signatur. (5) **Zwei
+  Läufe, ein Merge:** Lauf 1 ohne die vier Listen, Lauf 2 nach der Antwort auf **F-28**; dazu
+  **F-29** (zwei Bausteine unter `src/lib/push/` laden beim Einhängen selbst). (6) `verlauf` behält
+  kein Laden im Baustein. (7) Die Lint-Regel zu `fetch` aus E.3 wird auch nach diesem Schritt
+  nicht grün; möglich ist eine engere Regel «kein Aufruf `fetch(…)`».
 
 **Hinweise zu Schritt 16** [neu]
 
@@ -2399,13 +2414,13 @@ jeden auf oder verwirft ihn ausdrücklich im Bericht:
 | 10 [neu] | Ort für `getSitzung` (kurz) | kein Entscheid des Projektleiters nötig. **Erledigt** 12.11.2026 (Anhang D.9): neues Modul `sitzung/`, reines Verschieben, `AUSNAHMEN` 4 → 1 |
 | 11 | Zuordnung der 26 Einträge von `TURNIER_SCHNITTSTELLEN` | Umfang des Schritts. **Erledigt** 12.11.2026 (Anhang D.11): 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; Empfehlung zwei Teile 11a und 11b (**F-22**) |
 | 13 [geändert] | drei Module ganz lesen; je Modul die Tabelle der Sonderfälle (204, 429, `eingabe` ohne `felder`, 401, unlesbares JSON, `ergebnis` statt `art`); Empfehlung «Wort gilt nur mit seinem Status»; die 13 `page.route`-Stellen; Ort des Bausteins; N-09 | Form des Bausteins; Liste der Vorab-Tests; allenfalls eine Frage an den Projektleiter. **Erledigt** 12.11.2026 (Anhang E.1): keine Frage nötig; 57 Zeilen Vorab-Tests; drei Seiten statt vier; Baustein `src/lib/abruf.ts` mit einem Vertrag je Modul |
-| 15 [neu] | alle Einstiege (Ladefunktionen und Aktionen im Baustein) mit ihrem heutigen Ziel, mit und ohne wartende Mail-Anfrage; Form des Vorab-Tests | Erwartung des Vorab-Tests; benannte Fälle des Wächters (E-44) |
+| 15 [neu] | alle Einstiege (Ladefunktionen und Aktionen im Baustein) mit ihrem heutigen Ziel, mit und ohne wartende Mail-Anfrage; Form des Vorab-Tests | Erwartung des Vorab-Tests; benannte Fälle des Wächters (E-44). **Erledigt** 13.11.2026 (Anhang E.5): 36 Adressen, elf benannte Fälle (A bis K), 17 Stellen nach einer Aktion; Vorab-Test in drei Teilen; zwei Läufe; Fragen **F-28** (vor Lauf 2) und **F-29** |
 | 16 [neu] | kurz: nur die Doppel-Seite (passt die Ablauf-Funktion der CM-Seite?) | aufnehmen oder ausdrücklich verwerfen |
 | 19 | was das Bordmittel von SvelteKit deckt | Checkpoint: Bordmittel oder nur entfernen |
 | 20 | ungenutzte Exporte je Name bestätigen | Liste des Schritts |
 | 23 | `release.ts`, `gruener-stand.ts`, Abschnitt «Versionen» | davor **F-15** |
 
-Erledigt: Nachmessen für Schritt 04 (Anhang C.3), 07 (Anhang D.3), 08 (Anhang D.5), 09 (Anhang D.7), 10 (Anhang D.9), 11 (Anhang D.11), 13 (Anhang E.1). [geändert] Kein Nachmessen: 06, 06a, 12, 12a, 14, 17, 18, 21,
+Erledigt: Nachmessen für Schritt 04 (Anhang C.3), 07 (Anhang D.3), 08 (Anhang D.5), 09 (Anhang D.7), 10 (Anhang D.9), 11 (Anhang D.11), 13 (Anhang E.1), 15 (Anhang E.5). [geändert] Kein Nachmessen: 06, 06a, 12, 12a, 14, 17, 18, 21,
 22, 24, 25.
 
 **Checkpoints [geändert]** (für die Etappen 1 und 2 entschieden mit E-26 und E-30):
@@ -2708,6 +2723,48 @@ für eine neue Nummer, und die Fusszeile der App zeigte über Wochen dieselbe Ve
   braucht keinen Hook auf `dev`.
 - **Stand am Checkpoint der Etappe 0:** unverändert offen. Kein neuer Entscheid nötig: E-07 gilt,
   die Kosten sind benannt (vier Versionen in Etappe 0, acht in Etappe 1).
+
+**F-28 [neu, OFFEN] — Dürfen die vier Listen der Verwaltung vor dem Anzeigen laden, auch wenn sich dabei zwei Kleinigkeiten sichtbar ändern?**
+(Zeile 15, Übergangsregel «Ab Schritt 15»; aufgekommen beim Nachmessen, Anhang E.5, S7 und S8)
+
+**Frist: vor Lauf 2 von Schritt 15.** Lauf 1 (der gemeinsame Wächter) hält die Frage nicht auf.
+
+Die Listen «Mitglieder», «Anlässe», «Turniere» und «Änderungsverlauf» holen ihre Zeilen heute
+erst, wenn die Seite schon dasteht. Alle anderen Seiten laden, bevor sie erscheinen. Der Plan
+zieht die vier nach. Das hat zwei Folgen, die sich nicht wegbauen lassen:
+
+1. Die Seite erscheint einen Augenblick später, dafür gleich mit ihren Zeilen. Heute stehen Titel
+   und Tasten sofort da, die Zeilen folgen.
+2. Die App lädt eine Seite schon vor, sobald man einen Link berührt. Wer den Link zur Liste
+   berührt, ihm nicht folgt, dann am Turnier oder Anlass etwas ändert und erst danach zur Liste
+   geht, sieht dort einmal den Stand vor der Änderung. Dasselbe gilt heute schon für alle
+   anderen Seiten der App.
+
+- A: Umziehen wie geplant; beide Folgen gelten als Teil des Schritts.
+- B: Die vier Listen laden weiter wie heute. Der gemeinsame Wächter kommt trotzdem; Lauf 2
+  entfällt, und die Regel nennt die vier Seiten als Ausnahme.
+- C: Umziehen und zusätzlich die Links zu den vier Listen vom Vorladen ausnehmen. Folge 2
+  entfällt, Folge 1 bleibt; dafür mehr Änderung, und diese Listen öffnen etwas träger als die
+  übrigen Seiten.
+- **Empfehlung: A.** Folge 1 merkt man bei schnellem Server kaum, Folge 2 braucht eine seltene
+  Abfolge und besteht überall sonst schon. B hält das Verhalten ganz genau, lässt aber zwei Arten
+  zu laden nebeneinander stehen, also genau das, was der Schritt aufräumen soll.
+
+**F-29 [neu, OFFEN] — Zwei Bausteine laden ihren Stand selbst, sobald sie erscheinen: Ausnahme oder umziehen?**
+(Übergangsregel «Ab Schritt 15»; aufgekommen beim Nachmessen, Anhang E.5, «Wo geladen wird»)
+
+**Frist: keine; hält nichts auf.** Ohne Antwort gilt A.
+
+Die Karte «Benachrichtigungen» im Profil und der Push-Hinweis auf der Startseite holen ihren
+Stand selbst, sobald sie auf dem Bildschirm sind. Die Regel sagt dem Wortlaut nach, das erste
+Laden gehöre zur Seite, nicht in einen Baustein. Der Plan kennt die zwei Stellen nicht.
+
+- A: Sie bleiben, wie sie sind. Der Bericht des Schritts nennt sie als benannte Ausnahme; der
+  Wortlaut der Regel wird in Schritt 24 geschärft (gemeint sind Seiten, nicht Bausteine mit
+  eigenem Stand).
+- B: Umziehen in die Seiten Profil und Startseite. Dann wartet das Profil auf eine Abfrage mehr,
+  und der Text «Wird geladen …» in der Karte entfällt: eine kleine sichtbare Änderung.
+- **Empfehlung: A.** Für die Nutzerin ändert sich nichts, und der Schritt wird nicht grösser.
 
 ### 9.2 Beantwortete Fragen
 
@@ -7799,3 +7856,511 @@ eine Stelle für die Umleitungen der Verwaltung.
   als `import { type X }` statt `import type { X }` (ohne Wirkung, Lint grün). Dass jeder der vier
   `refactor:`-Commits für sich grün war, ist nur vom Implementer belegt.
 - **Modell:** Der Schritt lief mit Sonnet (Plan), das Review mit Fable.
+
+### E.5 Nachmessen Schritt 15
+
+**Nachmessen Schritt 15** (13.11.2026, Worktree `refactor-schritt-15`, Stand `origin/dev` nach
+Schritt 14, `baae295`, Version 0.20.21)
+
+Am Code gelesen und gezählt, **nichts ausgeführt** (kein Test, kein Lint, kein `svelte-check`, kein
+Build, keine Datenbank). Pfade unter `src/routes/`, wenn nichts anderes steht; «Zeile» meint die
+Datei im genannten Stand.
+
+- **Ganz gelesen [G]:** alle 27 Ladefunktionen (`+layout.ts`, `+page.ts`, die 24 weiteren
+  `+page.ts`, `verwaltung/+layout.ts`); `+layout.svelte`, `+page.svelte`, `+error.svelte`,
+  `login/+page.svelte`, `login/mail/+page.svelte`, `willkommen/+page.svelte`,
+  `clubmeisterschaft/+page.svelte`, `clubmeisterschaft/[id]/kontakt/+page.svelte`,
+  `verwaltung/+layout.svelte`, `verwaltung/turniere/+page.svelte`, `anlaesse/+page.svelte`,
+  `mitglieder/+page.svelte`, `verlauf/+page.svelte`, `bestaetigen/+page.svelte`,
+  `rollen/+page.svelte`; unter `src/lib/`: `abruf.ts`, `login/sitzung.ts`, `login/sitzung.test.ts`,
+  `login/mailanfrage.ts`, `verwaltung/umleiten.ts`, `verwaltung/umleiten.test.ts`,
+  `verwaltung/zugang-api.ts`, `verwaltung/AnsichtWahl.svelte`, `hilfe/geraet.ts`,
+  `ui/fehlerseite.ts`, `ui/Zurueck.svelte`, `push/PushHinweis.svelte`,
+  `server/admin/rechte.ts`, `server/sitzung/schnittstellen.ts`; `src/hooks.client.ts`;
+  `tests/e2e/startseite.test.ts` (bis Zeile 60), `tests/e2e/hilfen/geraet.ts`,
+  `tests/e2e/hilfen/login.ts`; `CLAUDE.md`.
+- **Das Skript ganz, das Markup per Textsuche [G für das Skript]:** `profil/+page.svelte`,
+  `profil/email/+page.svelte`, `clubmeisterschaft/[id]/+page.svelte`,
+  `clubmeisterschaft/[id]/doppel/[kid]/+page.svelte`, `anlass/[id]/+page.svelte`,
+  `src/lib/push/Benachrichtigungen.svelte`.
+- **In Auszügen [G für die Stelle]:** die 32 Aufrufe von `leiteUm` und die fünf Stellen «Nachladen
+  ohne `leiteUm`» in der Verwaltung; `src/lib/ui/navigation.ts` (Zeilen 28 bis 110);
+  `src/lib/profil/angaben.ts` (`lade`, `ladeKontakt`); die E2E-Stellen, die ein Ziel einer
+  Umleitung prüfen (`login`, `hilfe`, `bewegung`, `verwaltung`, `turnier`, `navigation`, `profil`,
+  `passkey`, `mitteilungen`, `cm-gespraech`); `playwright.config.ts`, `vitest.config.ts`,
+  `scripts/pruefungen/testmuster.ts`; aus `node_modules/@sveltejs/kit` (Version 3.1.1, im
+  Hauptordner, der Worktree hat kein eigenes) `src/runtime/client/client.js`, Zeilen 1395 bis 1529
+  und die Stellen mit `load_cache`.
+- **Nur per Textsuche [E]:** alle übrigen `.svelte`-Dateien unter `src/routes/` und `src/lib/`
+  (gesucht: `goto(`, `redirect(`, `location.`, `leiteUm`, `abgemeldet`, `kein-admin`,
+  `unbestaetigt`, `/login`, `/willkommen`, `invalidate`, `refreshAll`, `onMount`, `$effect`,
+  `hatSitzung`, `weiter=`, `fetch(`, `holen(`); `tests/e2e/` (gesucht: `toHaveURL`, `waitForURL`,
+  `clearCookies`, `beendeAlleSitzungen`, `localStorage`).
+- **SvelteKit-Doku nachgeschlagen** (13.11.2026, lesend über `svelte.dev/llms.txt`, Seiten
+  `kit/load`, `kit/page-options`, `kit/$app-navigation`, `kit/link-options`, `kit/@sveltejs-kit`):
+  `redirect` wirft und darf darum in einer Hilfsfunktion stehen, nicht in einem `try`; Layout- und
+  Seiten-Ladefunktionen laufen gleichzeitig; eine Ladefunktion läuft neu, wenn sich ein gelesener
+  Teil von `url` oder `params` ändert, wenn `invalidate` eine mit ihrem `fetch` geholte Adresse
+  trifft oder nach `refreshAll`; `url.searchParams.get(…)` wird je Parameter verfolgt; ein neuer
+  Lauf erzeugt den Baustein nicht neu; mit `ssr = false` laufen universelle Ladefunktionen immer
+  im Browser; `data-sveltekit-preload-data="tap"` ruft `load` schon bei `touchstart` oder
+  `mousedown`; `isRedirect` gibt es als Prüfhilfe.
+
+#### Ergebnis in Kürze
+
+- **Die Tabelle der Einstiege steht** (unten, 36 Adressen). Die «fünf Wächter» aus 1c stimmen
+  in der Sache; dazu kommen **acht benannte Fälle, die 1c und die Hinweise nicht nennen** (Liste
+  «Benannte Fälle»).
+- **17 statt 14 Stellen** leiten in der Mitglieder-App nach einer Aktion von Hand zum Login:
+  CM-Seite neun, Doppel-Seite fünf, dazu Anlass, Benachrichtigungen im Profil und das Gespräch
+  mit der Turnierleitung. Das Gespräch nimmt `window.location.assign('/login')` und lädt damit die
+  App ganz neu; alle anderen nehmen `goto`.
+- **Die Abweichung «Rollen» ist im Browser nicht zu sehen.** Layout und Seite laden gleichzeitig,
+  SvelteKit wertet aber vom Layout her aus: Die erste Umleitung von aussen gewinnt [G:
+  `client.js`, Schleife ab Zeile 1510]. Das Layout der Verwaltung läuft bei jedem Wechsel der
+  Adresse neu (es liest `url.pathname`). Die dreizeiligen Blöcke der zwölf Seiten greifen darum
+  nur, wenn sich zwischen zwei gleichzeitigen Abfragen etwas ändert. Folge für das Netz: **E2E
+  kann diese zwölf Blöcke nicht festhalten**, nur ein Einheitstest der Ladefunktion.
+- **Kein Test hält heute fest**, wohin `/profil`, `/profil/email`, die fünf CM-Seiten,
+  `/anlass/[id]` und irgendeine Seite der Verwaltung ohne Sitzung führen, und keiner läuft ein
+  401 nach einer Aktion ab. Gedeckt sind nur `/`, `/willkommen`, `/verwaltung` ohne Rolle und
+  «unbestätigt» ab `/verwaltung`.
+- **Vorab-Test: beide Wege gehen ohne neue Ausnahme, empfohlen ist die Verbindung.** Eine
+  E2E-Tabelle über 31 Adressen ohne Anmeldung (kein Konto, kein Mail-Code: die wartende
+  Mail-Anfrage wird in den Gerätespeicher geschrieben), acht E2E-Fälle «401 nach einer Aktion»
+  und Einheitstests der Ladefunktionen der Verwaltung mit gestelltem `fetch` unter `tests/`
+  (B-39 bleibt unberührt, unter `src/routes/` entsteht keine Testdatei).
+- **Wächter:** eine reine Tabelle «Antwort, Fall, Lage → Ziel» in `src/lib/login/waechter.ts`
+  mit zwei dünnen Hüllen (Ladefunktion: `redirect`; nach einer Aktion: `goto`), ein typisierter
+  `ladeSitzung` in `src/lib/login/sitzung.ts`. `leiteUm` behält Namen und Signatur.
+- **Schnitt: zwei Läufe, ein Merge.** Lauf 1 (Vorab-Tests, Sitzung, Wächter, alle bestehenden
+  Ladefunktionen, Aktionen) ändert für die Nutzerin nichts. Lauf 2 (die vier Listen der
+  Verwaltung nach `+page.ts`) hat zwei kleine sichtbare Folgen, die sich nicht vermeiden lassen:
+  **Frage F-28**. Dazu **F-29** (zwei Bausteine laden beim Einhängen selbst). Keine der beiden
+  Fragen hält Lauf 1 auf.
+- **Die Lint-Regel «kein `fetch` ausserhalb des Bausteins» wird auch nach Schritt 15 nicht ohne
+  Ausnahme grün** (weiter 98 Meldungen). Möglich wird eine engere Regel: kein Aufruf `fetch(…)`.
+
+#### Einstiege: Seite × Auslöser → Ziel [G]
+
+Alle Umleitungen der Ladefunktionen sind `redirect(307, …)`. «Mail-Code wartet» heisst: Im
+Gerätespeicher steht eine höchstens 15 Minuten alte Mail-Anfrage (`leseMailanfrage`). Bis zur
+Umleitung zeigt eine Ladefunktion nichts von der Zielseite: Beim ersten Aufruf steht die leere
+Schale, bei einem Wechsel in der App bleibt die alte Seite stehen. Kein Ziel trägt einen Parameter
+(kein `?weiter=`); nach dem Login geht es immer nach `/`.
+
+*Mitglieder-App und offene Seiten*
+
+| Nr. | Adresse | Stelle, Auslöser | Ohne Sitzung | Ohne Sitzung, Mail-Code wartet | Sonst in der Ladefunktion | Test heute |
+|----:|---------|------------------|--------------|--------------------------------|---------------------------|------------|
+| 1 | `/` | `+page.ts:12–19`, 401 von `/api/sitzung` | Handy im Browser: `/willkommen`; vom Symbol und am PC: `/login` | `/login/mail`, auch auf dem Handy im Browser | nicht `ok`: Fehlerseite 503 «Die Anmeldung lässt sich gerade nicht prüfen.»; Netz weg: Fehlerseite 500 mit dem allgemeinen Satz | E2E `hilfe:121`, `:141`, `startseite:12`, `login:86`, `:200`, `:251`, `verwaltung` «SI-07» |
+| 2 | `/profil` | `profil/+page.ts:10–15`, 401 von `/api/sitzung` | `/login`, auch auf dem Handy im Browser | `/login/mail` | wie 1 | keiner |
+| 3 | `/profil/email` | `profil/email/+page.ts:9–12`, 401 von `/api/sitzung` | `/login` | **`/login`** | wie 1; läuft eine «Ansicht als …»: `/profil`; Angaben nicht ladbar: 503 | keiner |
+| 4 | `/anlass/[id]` | `anlass/[id]/+page.ts:11–14`, `abgemeldet` von `holeAnlass` | `/login` | `/login/mail` | Störung: 503. **Ist die Nummer keine Zahl, fragt die Seite nichts ab und zeigt auch ohne Sitzung «Diesen Anlass gibt es nicht»** | keiner |
+| 5 | `/clubmeisterschaft` | `clubmeisterschaft/+page.ts:13–16`, `abgemeldet` von `holeCmTurniere` | `/login` | `/login/mail` | läuft genau eine CM: ihre Seite; Störung: 503 | keiner ohne Sitzung |
+| 6 | `/clubmeisterschaft/[id]` | `[id]/+page.ts:16–19`, `abgemeldet` von `holeCmAnsicht` | `/login` | `/login/mail` | Nummer keine Zahl (vor jeder Abfrage) oder `nicht-gefunden`: `/`, von dort weiter wie Zeile 1; Störung: 503 | keiner ohne Sitzung |
+| 7 | `…/[id]/doppel/[kid]` | `doppel/[kid]/+page.ts:17–20`, wie 6 | `/login` | `/login/mail` | wie 6; keine wählbare Kategorie: CM-Seite | keiner ohne Sitzung |
+| 8 | `…/[id]/kategorie/[kid]` | `kategorie/[kid]/+page.ts:16–19`, wie 6 | `/login` | `/login/mail` | wie 7 | keiner ohne Sitzung |
+| 9 | `…/[id]/kontakt` | `kontakt/+page.ts:14–17`, `abgemeldet` von `holeGespraech` | `/login` | `/login/mail` | wie 6 | keiner ohne Sitzung |
+| 10 | `/hilfe`, `/datenschutz` | `hatSitzung` in der Ladefunktion | Seite bleibt, ohne Reiter, Zurück-Link «‹ Anmelden» nach `/login` (`Zurueck.svelte`, `elternVon`) | gleich | `/hilfe`: Kontakt nicht ladbar: Verweis auf den Brief | E2E `navigation:136`, `hilfe:50` |
+| 11 | `/willkommen` | `willkommen/+page.ts:13`, das Gerät, nicht die Sitzung | am PC und vom Symbol: `/login`; Handy im Browser: bleibt (auch mit Sitzung) | gleich | Link «Ohne Startbildschirm weiter» nach `/login` | E2E `hilfe:141`, `:163`, `bewegung:54` |
+| 12 | `/login`, `/login/mail` | keine Ladefunktion | bleibt | `/login/mail` beginnt beim Feld «Code aus der Mail» | mit Sitzung bleibt die Seite ebenfalls (kein Wächter zurück); nach Erfolg `goto('/')` | E2E `login`, `passkey` |
+| 13 | Fehlerseite | `+error.svelte` | Link «Zur Startseite» bzw. unter `/verwaltung` «Zur Verwaltung» (`fehlerseite.ts`) | gleich | | Einheitstest `fehlerseite.test.ts` |
+
+*Verwaltung.* Das Layout prüft jede Adresse unter `/verwaltung`, bei jedem Wechsel der Adresse
+neu. Es schaut nie auf den Mail-Code.
+
+| Nr. | Adresse | Stelle, Auslöser | Ziel | Test heute |
+|----:|---------|------------------|------|------------|
+| 14 | alle 22 Adressen unter `/verwaltung` | `verwaltung/+layout.ts:15`, `abgemeldet` von `ladeZugang` | `/login`, auch wenn ein Mail-Code wartet | keiner |
+| 15 | dieselben | `:16`, `kein-admin` | `/` | E2E `verwaltung:187` (nur `/verwaltung`) |
+| 16 | dieselben | `:17`, sonst nicht `ok` | Fehlerseite 503 «Die Verwaltung lässt sich gerade nicht öffnen.» | E2E `verwaltung:388` (gestellte 503) |
+| 17 | alle ausser `bestaetigen` | `:20`, `bestaetigt` ist falsch | `/verwaltung/bestaetigen` | E2E ab `/verwaltung` (`verwaltung:59`, `briefe:69`, `einlesen:52`, `mitgliedschaft:54`), ab `/verwaltung/mitglieder` (`turnier:188`) |
+| 18 | `/verwaltung/bestaetigen` | `:21`, schon bestätigt | Startziel der Rollen (`/verwaltung/mitglieder`, nur CM: `/verwaltung/turniere`) | Einheitstest `startziel` |
+| 19 | Seite ausserhalb der lesbaren Bereiche | `:22–23`, `umleitung` | Startziel | E2E `turnier:193`, `:196`, `mitteilungen:366`, `verwaltung:614`; Einheitstest `umleitung` |
+| 20 | `…/neu` ohne Schreibrecht | `:22–23`, `umleitung` | Liste des Bereichs | Einheitstest `umleitung` |
+| 21 | `/verwaltung` | `verwaltung/+page.ts:8` | Startziel | E2E (jeder Einstieg in die Verwaltung) |
+| 22 | elf Seiten mit `+page.ts`: `anlaesse/[id]:16–18`, `briefe:10–12`, `fairgate:11–13`, `mitglieder/[id]:10–12`, `mitglieder/[id]/auskunft:10–12`, `mitteilungen:10–12`, `turniere/[id]:10–12`, `…/kategorien/[kid]:48–50`, `…/kategorien/neu:9–11`, `…/nachrichten:9–11`, `…/nachrichten/[gid]:11–13` | der dreizeilige Block auf die eigene Abfrage | `abgemeldet`: `/login`; `kein-admin`: `/`; `unbestaetigt`: `/verwaltung/bestaetigen` | keiner (und im Browser hinter dem Layout nicht zu sehen) |
+| 23 | `/verwaltung/rollen` | `rollen/+page.ts:11–13` | wie 22, aber **`kein-admin`: `/verwaltung`** | keiner |
+| 24 | `turniere`, `anlaesse`, `mitglieder`, `verlauf` (keine `+page.ts`) | `leiteUm` nach dem ersten Laden im Baustein | wie 22; bis dahin steht die Seite mit Titel und leerer Liste | keiner |
+| 25 | `turniere/neu`, `anlaesse/neu`, `mitglieder/neu`, `einlesen`, `bestaetigen` (keine `+page.ts`, kein erstes Laden) | nur das Layout | Zeilen 14 bis 20 | wie dort |
+| 26 | Seiten mit eigener Umleitung ohne Bezug zum Zugang | `…/nachrichten/[gid]:14–15`: Gespräch gehört zu einem anderen Turnier oder fehlt | Posteingang des Turniers | E2E `cm-gespraech:412` |
+
+*Nach einer Aktion (im Baustein)*
+
+| Nr. | Wo | Auslöser | Ziel, Art |
+|----:|----|----------|-----------|
+| 27 | CM-Seite `clubmeisterschaft/[id]/+page.svelte`, neun Stellen: `:137` (`neuLaden`), `:164`, `:228`, `:269`, `:301`, `:347`, `:387`, `:418`, `:463` | `abgemeldet` | `goto('/login')`, ohne Blick auf den Mail-Code |
+| 28 | Doppel-Seite `doppel/[kid]/+page.svelte`, fünf Stellen: `:77` (Suche), `:131` (`neuLaden`), `:154`, `:203`, `:247` | `abgemeldet` | wie 27 |
+| 29 | Anlass `anlass/[id]/+page.svelte:68` | `abgemeldet` | wie 27 |
+| 30 | Benachrichtigungen im Profil `src/lib/push/Benachrichtigungen.svelte:79` (Thema schalten) | `abgemeldet` | wie 27 |
+| 31 | Gespräch `clubmeisterschaft/[id]/kontakt/+page.svelte:67` (Senden) | `abgemeldet` | **`window.location.assign('/login')`: die App lädt ganz neu** |
+| 32 | CM-Seite `:136`, Doppel-Seite `:130` | `nicht-gefunden` beim Nachladen | `goto('/')` (kein Zugangsfall, bleibt in der Seite) |
+| 33 | Verwaltung: `leiteUm` (`src/lib/verwaltung/umleiten.ts`), 32 Aufrufe in 23 Dateien (17 Seiten, sechs Bausteine unter `src/lib/verwaltung/`); vier davon sind das erste Laden aus Zeile 24 | `abgemeldet`, `kein-admin`, `unbestaetigt` | `goto` nach `/login`, `/`, `/verwaltung/bestaetigen` |
+| 34 | Band «Ansicht als …», `+layout.svelte:132` («Beenden») | `abgemeldet` | `refreshAll()`: Die Ladefunktion der Seite leitet dann selbst um |
+| 35 | Profil: Angaben, Rufname, Klassierung, Passkey einrichten und entfernen; E-Mail ändern; Passkey- und Push-Hinweis der Startseite; «gelesen» im Gespräch; Push ein und aus | 401 | **keine Umleitung:** Meldung «Das hat nicht geklappt …» bzw. nichts (E.1, Fall 5) |
+| 36 | Verwaltung, Nachladen nach einer Aktion ohne `leiteUm`: `mitteilungen/+page.svelte:14`, `anlaesse/[id]/+page.svelte:40`, `:61`, `turniere/[id]/+page.svelte:60`, `…/kategorien/[kid]/+page.svelte:48` | alles ausser `ok` | **nichts:** Der alte Stand bleibt stehen |
+| 37 | Profil `profil/+page.svelte:352` | Abmelden gelungen | `goto('/login')` (kein Wächter, aber eine von Hand geschriebene Umleitung zum Login) |
+
+Gezählt [G]: 51 Zeilen unter `src/routes/` und `src/lib/` (ohne Server, Tests und die
+Abruf-Module des Logins) nennen `/login`; B-21 zählte 47.
+
+#### Gruppen und Abweichungen
+
+1. **Startseite** (Zeile 1): drei Ziele. Der Mail-Code geht der Einstiegsseite vor.
+2. **Mitglieder-Seiten mit Mail-Code** (Zeilen 2, 4 bis 9): Mail-Code wartet → `/login/mail`,
+   sonst `/login`. Innerhalb der Gruppe zwei Auslöser: `/profil` fragt `/api/sitzung`, die sechs
+   anderen lesen `abgemeldet` aus ihrer eigenen Abfrage und fragen die Sitzung nie. Keine führt zur
+   Einstiegsseite: Auf dem Handy im Browser führt nur `/` nach `/willkommen`.
+3. **`/profil/email`** (Zeile 3): nur `/login`.
+4. **Verwaltung** (Zeilen 14 bis 22, 24, 33): `/login` ohne Mail-Code, `kein-admin` → `/`,
+   `unbestaetigt` → `/verwaltung/bestaetigen`.
+5. **`/verwaltung/rollen`** (Zeile 23): `kein-admin` → `/verwaltung`.
+6. **Aktionen** (Zeilen 27 bis 31): immer `/login`, ohne Mail-Code.
+
+**Benannte Fälle für den Wächter (E-44).** A bis C nennt der Plan schon, D bis K sind neu:
+
+- **A** `/profil/email` ohne Mail-Code (Zeile 3).
+- **B** `rollen`: `kein-admin` → `/verwaltung` (Zeile 23). Im Browser endet der Weg trotzdem am
+  selben Ort wie überall: Das Layout leitet zuerst um; und käme die Seite doch zum Zug, führte
+  `/verwaltung` über das Layout weiter nach `/` oder zum Startziel.
+- **C** Aktionen ohne Mail-Code (Zeilen 27 bis 30).
+- **D** Das Gespräch lädt die App beim Umleiten ganz neu (Zeile 31). Mit `goto` bliebe der Zustand
+  der App im Speicher (gemerkte Klappen, Rollpositionen, Vorgeladenes). Bleibt als eigene Art des
+  Falls «nach einer Aktion».
+- **E** Die Verwaltung schaut nie auf den Mail-Code (Zeile 14); das ist dieselbe Abweichung wie A,
+  nur steht sie in 1c nicht als solche.
+- **F** Nur `/` kennt die Einstiegsseite; `/profil` und die Datenseiten führen auch auf dem Handy
+  im Browser nach `/login` (Zeilen 2, 4 bis 9).
+- **G** Netz weg beim Prüfen der Sitzung: `+page.ts`, `profil/+page.ts` und `profil/email/+page.ts`
+  fangen den Wurf von `fetch` nicht; es erscheint die Fehlerseite mit Status 500 und dem
+  allgemeinen Satz «Etwas ist schiefgelaufen …». Antwortet der Server mit einer Störung, steht
+  dort 503 und «Die Anmeldung lässt sich gerade nicht prüfen.». `+layout.ts` fängt beides und
+  zeigt nur kein Band (E.1 nannte den Wurf schon). Der Abruf-Baustein wirft nie: Ohne Vorkehrung
+  würde aus dem ersten Fall der zweite.
+- **H** `/anlass/<keine Zahl>` zeigt ohne Sitzung die Seite «gibt es nicht» samt Reitern; eine
+  CM-Adresse mit ungültiger Nummer führt vor jeder Abfrage nach `/` (Zeilen 4 und 6).
+- **I** Aktionen, die bei 401 nicht umleiten (Zeilen 35 und 36). Sie sind kein Fall des
+  Wächters, stehen aber hier, damit der Schritt sie nicht «mitrepariert».
+- **J** «Ansicht beenden» leitet nicht selbst um (Zeile 34).
+- **K** `/willkommen` leitet nach dem Gerät um, nicht nach der Sitzung (Zeile 11); die Stelle
+  bleibt in ihrer Ladefunktion und ist die einzige erlaubte Umleitung zum Login ausserhalb des
+  Wächters. Das Abmelden (Zeile 37) nimmt die Aktions-Hülle des Wächters.
+
+#### Wo geladen wird [G]
+
+- **36 Adressen**, 35 mit Baustein und `/verwaltung` nur mit Ladefunktion. **27 Ladefunktionen**
+  (2 Layouts, 25 Seiten). **Elf Seiten haben keine `+page.ts`:** `login`, `login/mail` und in der
+  Verwaltung `turniere`, `anlaesse`, `mitglieder`, `verlauf`, `turniere/neu`, `anlaesse/neu`,
+  `mitglieder/neu`, `einlesen`, `bestaetigen`.
+- **Erstes Laden im Baustein einer Seite: vier**, wie die Hinweise sagen: `turniere` und
+  `anlaesse` (`$effect` mit `lade()`), `mitglieder` (`$effect` mit 200 ms Wartezeit, auch für
+  Suche und Filter), `verlauf` (`$effect` auf `?mitglied=` aus der Adresse). Die fünf anderen
+  Seiten ohne `+page.ts` laden nichts.
+- **Erstes Laden in einem Baustein unter `src/lib/`: zwei, in keinem Dokument genannt:**
+  `push/Benachrichtigungen.svelte:36` (`onMount`, im Profil; zeigt bis dahin «Wird geladen …») und
+  `push/PushHinweis.svelte:31` (`onMount`, auf der Startseite, nur auf dem Handy mit Push-fähigem
+  Browser). Beide rufen `holeBenachrichtigungen`; bei 401 zeigen sie die Störung bzw. nichts.
+  Der Wortlaut von C-5 («im Baustein nur erneutes Laden nach Eingabe oder Aktion») deckt sie
+  nicht: Frage F-29.
+- **`fetch` direkt in einer Ladefunktion: fünf Stellen**, sonst keine [G: Textsuche nach `fetch(`
+  und `holen(`]: `/api/sitzung` in `+layout.ts:15`, `+page.ts:12`, `profil/+page.ts:10`,
+  `profil/email/+page.ts:9`; `/api/kontakt` in `hilfe/+page.ts:13` (`holeKontakt`). Alle anderen
+  reichen das `fetch` der Ladefunktion an ein Abruf-Modul; `clubmeisterschaft/[id]/+page.ts:15`
+  ruft `holeCmTurniere()` bewusst ohne (E.1).
+- **Erneutes Laden nach Eingabe oder Aktion (bleibt im Baustein):** Suche und Filter der
+  Mitgliederliste; `neuLaden` der CM-Seite, der Doppel-Seite und der Seiten der Verwaltung
+  (Zeile 36); Passkey-Liste und Angaben im Profil; Partnersuche und Spielersuche. `verlauf` hat
+  **kein** erneutes Laden im Baustein: Sein Filter ist die Adresse, also ein Seitenwechsel; die
+  ganze Abfrage zieht in die `+page.ts` (Abweichung vom Hinweis «`mitglieder` und `verlauf` laden
+  nach Suche und Filter erneut; das bleibt im Baustein»).
+- **Umfang des Umbaus:**
+
+  | Art | Dateien |
+  |-----|--------:|
+  | Ladefunktion, nur der Wächter wechselt (9 Mitglieder-App, Layout und 12 Seiten der Verwaltung) | 22 |
+  | Ladefunktion, nur der Abruf wechselt (`+layout.ts` Sitzung, `hilfe/+page.ts` Kontakt) | 2 |
+  | Ladefunktion unverändert (`datenschutz`, `willkommen`, `verwaltung/+page.ts`) | 3 |
+  | Baustein, nur der Aufruf wechselt (CM, Doppel, Anlass, Gespräch, Benachrichtigungen, Abmelden im Profil) | 6 |
+  | Laden nach `+page.ts` verschieben (vier neue `+page.ts`, vier `+page.svelte`) | 8 |
+  | Neu oder geändert unter `src/lib/` (`login/waechter.ts` mit Test, `login/sitzung.ts` mit Test, `verwaltung/umleiten.ts`) | 5 |
+  | Vorab-Tests (zwei neue Dateien unter `tests/`) | 2 |
+
+  Zusammen rund 45 Dateien ohne dieses Dokument. Die 32 Aufrufe von `leiteUm` bleiben, wenn die
+  Funktion ihren Namen behält.
+
+#### Das Netz [G für die genannten Stellen, E für «sonst keiner»]
+
+- **E2E, die ein Ziel ohne Sitzung festhalten:** nur für `/` (`hilfe:121` je Gerät, `hilfe:141`,
+  `startseite:12`, `login:86` nach dem Abmelden, `login:200` mit wartendem Mail-Code, `login:251`
+  und `verwaltung` «SI-07» nach beendeten Sitzungen, beide laden `/` neu) und `/willkommen`
+  (`hilfe:141`, `bewegung:54`). Für die Verwaltung: ohne Rolle ab `/verwaltung`
+  (`verwaltung:187`), unbestätigt ab `/verwaltung` und einmal ab `/verwaltung/mitglieder`, falscher
+  Bereich an vier Stellen. Die Geräte unterscheiden die Tests über `startetVomSymbol` und den
+  Projektnamen.
+- **Einheitstests:** `login/sitzung.test.ts` (vier Fälle zu `hatSitzung`), `mailanfrage.test.ts`,
+  `hilfe/geraet.test.ts`, `ui/navigation.test.ts`, `ui/fehlerseite.test.ts`,
+  `verwaltung/umleiten.test.ts` (`umleitung`, `startziel`, `rechte`, `bereichVon`, `nurAnsehen`).
+  **`leiteUm` ruft kein Test auf.** Unter `src/routes/` gibt es ausserhalb von `api/` keine
+  Testdatei; keine Ladefunktion wird von einem Test gerufen.
+- **Ohne Test sind damit** aus der Tabelle: Zeilen 2 bis 9 (ohne Sitzung), 14 (jede Seite der
+  Verwaltung ohne Sitzung), 15 und 17 für alle Seiten ausser dem Einstieg, 22 bis 24 ganz, und
+  alle Aktionen 27 bis 37. Dass die Sitzung bei jedem Seitenwechsel geprüft wird (B-21), hält nur
+  das Neuladen fest, nicht der Wechsel in der App.
+- **Was E2E nicht sehen kann:** die Blöcke der Zeilen 22 und 23 (das Layout gewinnt) und den
+  Unterschied zwischen `goto` und `redirect`. Den Unterschied zwischen `goto` und vollem Neuladen
+  (Fall D) sieht ein Test nur über eine Marke am `window`, die das Neuladen löscht.
+
+#### Vorab-Test (erster Commit von Lauf 1, Charakterisierung)
+
+**Empfehlung: Verbindung aus drei Teilen.** Die Einheitstests der Wächter-Funktion allein können
+nicht «vorab» sein, weil es die Funktion noch nicht gibt; die E2E-Tabelle allein sieht die Blöcke
+der Verwaltungsseiten nicht.
+
+- **Teil 1, E2E-Tabelle** (neu `tests/e2e/waechter.test.ts`, alle drei Geräte, im Browser-Modus
+  ohne `startetVomSymbol`, kein Konto, keine Datenbank-Hilfe, kein Mail-Code). Der Server prüft
+  die Sitzung vor der Nummer (`mitSitzung`), darum genügt eine beliebige Nummer.
+
+  | Zustand | Adressen | Erwartetes Ziel |
+  |---------|----------|-----------------|
+  | ohne Sitzung | `/` | PC `/login`, Handy `/willkommen` |
+  | ohne Sitzung | `/profil`, `/profil/email`, `/anlass/1`, `/clubmeisterschaft`, `/clubmeisterschaft/1`, `…/1/kategorie/1`, `…/1/doppel/1`, `…/1/kontakt` | `/login` |
+  | ohne Sitzung | die 22 Adressen der Verwaltung (Nummern beliebig) | `/login` |
+  | ohne Sitzung, Mail-Anfrage im Gerätespeicher (wie `login.test.ts:239`, per `addInitScript`) | `/` und die acht Mitglieder-Seiten ausser `/profil/email` | `/login/mail` |
+  | dasselbe | `/profil/email` und die 22 Adressen der Verwaltung | `/login` |
+  | ohne Sitzung | `/anlass/abc` | bleibt, Text «gibt es nicht» (Fall H) |
+  | ohne Sitzung | `/clubmeisterschaft/abc` | PC `/login`, Handy `/willkommen` (Fall H) |
+
+- **Teil 2, E2E mit Konto** (dieselbe Datei; Login mit Brief-Code aus den Hilfen, kein
+  Mail-Code):
+
+  | Zustand | Handlung | Erwartung |
+  |---------|----------|-----------|
+  | Mitglied ohne Rolle | die 22 Adressen der Verwaltung | `/` mit «Hoi …» |
+  | Admin, nicht bestätigt | die 21 Adressen ausser `bestaetigen` | `/verwaltung/bestaetigen` |
+  | Mitglied, Cookies gelöscht | Reiter «Profil» antippen | `/login`; mit Mail-Anfrage `/login/mail` (Prüfung bei jedem Seitenwechsel, B-21) |
+  | Mitglied auf der CM-Seite, Cookies gelöscht | «Anmelden» | `/login`, auch mit Mail-Anfrage (Fall C) |
+  | Mitglied auf der Doppel-Seite, Cookies gelöscht | Partner suchen | `/login` |
+  | Mitglied auf dem Anlass, Cookies gelöscht | Antwort senden | `/login` |
+  | Mitglied im Gespräch, Cookies gelöscht | Nachricht senden | `/login`, und die Marke am `window` ist weg (Fall D) |
+  | Mitglied im Profil, Cookies gelöscht | ein Thema der Benachrichtigungen schalten | `/login` |
+  | Mitglied im Profil, Cookies gelöscht | Telefon speichern | bleibt auf `/profil`, Meldung der Störung (Fall I) |
+  | Admin auf `bestaetigen`, Cookies gelöscht | «Code schicken» | `/login` (`leiteUm`, ohne dass ein Code verschickt wird) |
+
+- **Teil 3, Einheitstests der Ladefunktionen der Verwaltung** (neu z. B.
+  `tests/oberflaeche/ladefunktionen.test.ts`, Projekt `einheit`): je `+page.ts` der Zeilen 22 und
+  23 mit gestelltem `fetch` die Antworten 401, 403 `kein-admin`, 403 `unbestaetigt`, 404 und 503;
+  erwartet wird der Wurf (`isRedirect` und `location`, bzw. der Status des Fehlers). Dazu
+  `verwaltung/+layout.ts` mit gestelltem `url`, `depends` und `parent` für die Zeilen 14 bis 20.
+  Rund 70 Fälle, als Tabelle. Diese Ladefunktionen brauchen keinen Browser (`window`, `navigator`
+  und der Gerätespeicher kommen dort nicht vor); die der Mitglieder-App brauchen ihn, darum deckt
+  sie Teil 1. Der Test importiert die Ladefunktion, er liest keinen Quelltext. Er liegt unter
+  `tests/`, **B-39 ist nicht berührt** und es braucht keine neue Abhängigkeit [V: nicht
+  ausgeführt; `./$types` ist ein reiner Typ-Import, `umleiten.test.ts` zeigt, dass der
+  Einheitslauf `$app/…` auflöst].
+- **Einmal rot:** je Teil eine Probe aus Sicherungskopien, z. B. in `profil/email/+page.ts` den
+  Mail-Code beachten (Teil 1 rot), in `kontakt/+page.svelte` `goto` statt `assign` (Teil 2 rot), in
+  `rollen/+page.ts` `/` statt `/verwaltung` (Teil 3 rot; Teil 1 und 2 bleiben dabei grün, das ist
+  der Beleg für «E2E sieht es nicht»).
+- **Kosten [V, nicht gemessen]:** Teil 1 rund 65 Aufrufe je Gerät, Teil 2 rund 45 Aufrufe und
+  zehn Logins je Gerät; jeder Aufruf ist ein Kaltstart der App. Geschätzt ein bis drei Minuten
+  Arbeitszeit der Läufer über alle drei Geräte, bei 3,4 bis 5,3 Minuten heute. Als mehrere Tests
+  je Zustand schneiden und `test.setTimeout(90_000)` setzen (Falle «Zeitgrenze WebKit-CI»). Ist
+  das zu teuer, laufen die zwei Tabellen der Verwaltung aus Teil 2 nur auf dem PC: Ihr Ziel hängt
+  nicht am Gerät. Das Budget der Mail-Codes je IP ist nicht berührt.
+- **Für Lauf 2 dazu (vor dem Verschieben, auf dem alten Stand grün):** je Liste ein E2E-Fall mit
+  gestellter 503 auf die Listen-Abfrage: Der Seitenkopf bleibt, die Meldung der Störung steht in
+  der Seite, keine Fehlerseite. Für `mitglieder`: Beim Öffnen geht genau eine Abfrage an
+  `/api/admin/mitglieder` (zählen wie `navigation.test.ts:312`).
+- **Nachtrag zur Prüfliste (b):** `tests/e2e/waechter.test.ts` ist nach dem Schritt die Stelle, an
+  der E2E am Ziel einer Umleitung hängt. `bewegung.test.ts:84` mit der Verzögerung in `:88`
+  stimmt weiter (Zeilen geprüft); `wartetAufVorladen` steht in `hilfen/seite.ts:71`,
+  `wartetAufMitgliederliste` in `:102`. Der zweite hängt am Status «N Mitglied(er)» und damit an
+  der Mitgliederliste, die Lauf 2 umbaut.
+
+#### Vorschlag für Sitzung und Wächter [V: Entwurf in Worten, nicht getippt]
+
+- **`src/lib/login/sitzung.ts`:** `ladeSitzung(holen)` auf `rufeAb`, Vertrag mit dem Wort
+  `abgemeldet` und Körper «nachsichtig» (401 gilt nach dem Status, wie heute). Ergebnis: `ok` mit
+  den sechs Feldern von `getSitzung`, `abgemeldet`, `stoerung`. `hatSitzung` bleibt als
+  `ladeSitzung(…).art === 'ok'`, seine vier Tests bleiben. Die vier Ladefunktionen reichen ihr
+  `fetch` hinein: Damit bleibt `/api/sitzung` eine Abhängigkeit der Ladefunktion wie heute, und
+  die Anfrage bleibt ein `GET` ohne Kopfzeile.
+  - *Fall G genau nachbilden:* `ladeSitzung` merkt sich, ob `holen` geworfen hat, und gibt den Wurf
+    bei den drei Seiten weiter (im Layout nicht). Das sind wenige Zeilen in dieser einen Datei und
+    ein Fall im Test. Ohne das zeigte «Netz weg» den Satz der Server-Störung statt des allgemeinen:
+    eine sichtbare Änderung, die E-44 nicht deckt.
+  - *Keine neue Abfrage:* Die sechs Datenseiten und die Verwaltung fragen `/api/sitzung` heute
+    nicht und sollen es auch danach nicht (sonst eine Anfrage mehr je Seitenwechsel, und
+    `navigation.test.ts` «lädt nicht neu» zählt Anfragen).
+- **`src/lib/login/waechter.ts`:** der Kern ist eine reine Funktion ohne Browser, etwa
+  `zielOhneZugang(art, fall, lage)`: `art` ist `abgemeldet`, `kein-admin` oder `unbestaetigt`;
+  `fall` ist einer der benannten Fälle; `lage` nennt «Mail-Code wartet» und «Einstiegsseite
+  zeigen». Sie gibt die Adresse zurück. Die Fälle als Wörter:
+
+  | `fall` | `abgemeldet` | `kein-admin` | `unbestaetigt` | Wer |
+  |--------|--------------|--------------|----------------|-----|
+  | `start` | Mail-Code → `/login/mail`; Einstieg → `/willkommen`; sonst `/login` | | | `/` |
+  | `mitglied` | Mail-Code → `/login/mail`; sonst `/login` | | | `/profil`, Anlass, fünf CM-Seiten |
+  | `ohne-mailcode` | `/login` | | | `/profil/email`; jede Aktion der Mitglieder-App |
+  | `verwaltung` | `/login` | `/` | `/verwaltung/bestaetigen` | Layout, elf Seiten, `leiteUm` |
+  | `verwaltung-rollen` | `/login` | `/verwaltung` | `/verwaltung/bestaetigen` | `rollen/+page.ts` |
+
+  Ein Einheitstest läuft die Tabelle ganz ab (15 Zellen mal Lage), vor der Funktion geschrieben.
+- **Zwei Hüllen**, beide ohne eigene Entscheidung:
+  - *für die Ladefunktion:* nimmt das Ergebnis eines Abrufs und den Fall, liest für `start` und
+    `mitglied` Gerätespeicher und Gerät und ruft `redirect(307, ziel)`; sonst kehrt sie zurück.
+    Als Zusicherung getippt, damit die Ladefunktion danach mit dem verengten Typ weiterarbeitet
+    und der Typprüfer einen vergessenen Aufruf an den Folgezeilen merkt. Nie in einem `try`
+    (Doku, `kit/load`).
+  - *nach einer Aktion:* `goto` zum Ziel, Rückgabe «umgeleitet» wie `leiteUm`. Für das Gespräch
+    eine Angabe «ganz neu laden» (Fall D). `leiteUm` in `umleiten.ts` bleibt mit Namen und
+    Signatur und nimmt sein Ziel aus der Tabelle (Fall `verwaltung`); so bleiben seine 32
+    Aufrufe ohne Diff. Die 17 Stellen der Mitglieder-App und das Abmelden rufen die Hülle statt
+    `goto(resolve('/login'))`.
+- **Zielbild «eine Funktion je App»:** Mit einer Tabelle und zwei Hüllen ist es eine Tabelle für
+  beide Apps; `leiteUm` ist die Hülle der Verwaltung. Das erfüllt 6.1 Punkt 5 im Sinn, nicht im
+  Wortlaut («eine für die Mitglieder-App und eine für die Verwaltung»).
+- **`hilfe/+page.ts`:** `holeKontakt` entfällt, die Seite ruft `ladeKontakt(fetch)` aus
+  `src/lib/profil/angaben.ts`. Beide geben bei jeder Störung `null`; sie unterscheiden sich nur,
+  wenn `kontakt` kein Text ist (dann `null` statt des Werts), und das sendet der Server nie [G:
+  `routes/api/kontakt/+server.ts`]. `hilfe.test.ts:51` (abgebrochene Anfrage) hält den Weg.
+  Kleinigkeit ohne Entscheid: `ladeKontakt` liegt im Thema `profil`; ein Umzug wäre ein eigener
+  Diff und gehört nicht hierher.
+- **Lint-Regel zu `fetch`:**
+  - Die in E.3 verworfene Regel (`no-restricted-globals` für `fetch`) meldet nach Schritt 15
+    unverändert 98 Stellen [V: nicht ausgeführt; die fünf Stellen des Schritts meldet sie laut E.3
+    gar nicht, weil dort `fetch` ein Parameter ist]. Ohne Ausnahme grün wird sie erst mit den vier
+    Punkten aus E.3 (`holen` freiwillig in `rufeAb` und in rund 97 Signaturen, `signal` der
+    Partnersuche, `push/geraet.ts`). Das ist ein eigener Umbau an zehn Abruf-Modulen ohne Bezug
+    zum Wächter. **Empfehlung: nicht in Schritt 15;** als Hinweis an Schritt 20 oder verwerfen.
+  - **Neu möglich** ist eine engere Regel, die den Satz der Übergangsregel trifft: kein Aufruf
+    `fetch(…)` unter `src/routes/` (ohne `api/`) und `src/lib/` (ohne `server/`, ohne Tests), z. B.
+    über `no-restricted-syntax`. Nach Lauf 1 gibt es dort keinen solchen Aufruf mehr [G: heute
+    genau die fünf Stellen des Schritts]. Sie fängt nicht `window.fetch(…)` und kein
+    weitergereichtes `fetch`. Aufnehmen als letzter Commit von Lauf 1, einmal rot belegt, oder im
+    Bericht ausdrücklich verwerfen.
+  - Für «keine Seite schreibt die Umleitung zum Login selbst» gibt es keine billige Regel:
+    `/login` steht zu Recht in Links, im Zurück-Baustein und in `willkommen/+page.ts`. Der
+    Reviewer prüft per Textsuche: Nach dem Schritt nennen `/login` voraussichtlich [V] nur noch `waechter.ts`,
+    `ui/navigation.ts`, `willkommen/+page.ts`, `willkommen/+page.svelte` und
+    `login/+page.svelte` (Link auf `/login/mail`).
+
+#### Schnitt und Risiko
+
+- **Ein Schritt, zwei Läufe mit je eigenem Review und committetem Zwischenstand, ein Merge, eine
+  Version** (wie Schritt 13). Modell Opus für beide Läufe, Review wie bisher. Risiko «mittel»
+  stimmt: viele Dateien, aber jede Änderung ist klein und gleichförmig; das Wagnis liegt in den
+  Fällen, die kein Test sah, und die hält jetzt der Vorab-Test.
+- **Lauf 1** (ändert für die Nutzerin nichts):
+
+  | Nr. | Commit | Inhalt |
+  |----:|--------|--------|
+  | 0 | `test:` | Vorab-Tests Teil 1 bis 3, auf dem alten Stand grün, je Teil einmal rot belegt |
+  | 1 | `refactor:` | `ladeSitzung` mit Test; `+layout.ts`, `+page.ts`, `profil/+page.ts`, `profil/email/+page.ts` darauf; `hilfe/+page.ts` auf `ladeKontakt` |
+  | 2 | `refactor:` | `waechter.ts`: Tabelle und Hüllen, Einheitstest zuerst |
+  | 3 | `refactor:` | die neun Ladefunktionen der Mitglieder-App auf dem Wächter |
+  | 4 | `refactor:` | `verwaltung/+layout.ts` und die zwölf `+page.ts` auf dem Wächter; `leiteUm` nimmt die Tabelle |
+  | 5 | `refactor:` | die 17 Stellen der Mitglieder-App und das Abmelden auf der Aktions-Hülle |
+  | 6 | `refactor:` | engere Lint-Regel zu `fetch(…)`, oder im Bericht verworfen |
+
+  Probe für den Reviewer: Der Diff der Vorab-Tests nach Commit 0 ist leer; der Diff unter
+  `src/lib/server/` und `src/routes/api/` ist leer; in den fünf Bausteinen aus Commit 5 ändert
+  sich je Stelle genau die eine Zeile mit `goto` bzw. `assign`.
+- **Lauf 2** (nach der Antwort auf F-28): zuerst die zwei Vorab-Fälle je Liste, dann je Seite
+  ein Commit: `turniere`, `anlaesse`, `verlauf`, zuletzt `mitglieder` (die einzige mit erneutem
+  Laden im Baustein; der `$effect` darf beim Einhängen keine zweite Abfrage schicken). Die
+  Störung bleibt eine Meldung in der Seite: Die Ladefunktion gibt dafür «nicht geladen» zurück und
+  ruft kein `error(503)`. Lautet die Antwort auf F-28 «B», entfällt Lauf 2, und die Übergangsregel
+  bekommt die vier Seiten als benannte Ausnahme.
+- **Schnitt zu Schritt 16:** bleibt wie im Hinweis. An den neun Stellen der CM-Seite und den fünf
+  der Doppel-Seite wechselt nur der Aufruf.
+- **Wo sich etwas sichtbar ändern könnte:**
+
+  | Nr. | Stelle | Vermeidbar? |
+  |----:|--------|-------------|
+  | S1 | Netz weg beim Prüfen der Sitzung: anderer Satz auf der Fehlerseite (Fall G) | ja, `ladeSitzung` gibt den Wurf weiter |
+  | S2 | Gespräch: `goto` statt vollem Neuladen (Fall D) | ja, benannter Fall |
+  | S3 | `profil/email`, `rollen`, Aktionen: Mail-Code bzw. Ziel vereinheitlicht (Fälle A bis C, E, F) | ja, Tabelle des Wächters; der Vorab-Test hält A, C, E und F im Browser, B im Einheitstest |
+  | S4 | Eine zusätzliche Abfrage von `/api/sitzung` auf Seiten, die sie heute nicht stellen | ja, der Wächter fragt nicht selbst |
+  | S5 | Reihenfolge der Abfragen im Profil (erst Sitzung, dann drei zugleich) und in der Verwaltung (`ladeZugang` und `parent()` zugleich) | ja, bleibt, wie sie steht; `bewegung.test.ts:84` hängt daran |
+  | S6 | Vier Listen: Die Störung erschiene als Fehlerseite statt als Meldung in der Seite | ja, siehe Lauf 2 |
+  | S7 | Vier Listen: Die Seite erscheint erst, wenn die Liste da ist. Heute stehen Titel und Tasten sofort, die Zeilen folgen | **nein**, das ist die Wirkung von `+page.ts` (F-28) |
+  | S8 | Vier Listen: SvelteKit lädt die Liste schon beim Berühren eines Links vor. Wer einen Link zur Liste berührt, ihm nicht folgt, auf der Seite etwas ändert, das ohne `invalidate` nachlädt (Status oder Angaben eines Turniers, Angaben eines Anlasses), und dann doch zur Liste geht, sieht dort den Stand vor der Änderung, bis zum nächsten Wechsel. Heute lädt die Liste immer frisch | **nein**, ohne zusätzlichen Code (F-28). Denselben Rand haben heute schon alle Seiten mit `+page.ts` (Kommentar in `…/kategorien/[kid]/+page.svelte:67`) [G: `client.js`, `load_cache`] |
+  | S9 | Vier Listen: Das kurze Aufblitzen der leeren Liste vor einer Umleitung fällt weg; `mitglieder` fragt sofort statt nach 200 ms | nein, aber nur im Rennen bzw. gar nicht zu sehen |
+  | S10 | Benachrichtigungen: «Wird geladen …» fiele weg, wenn das Laden in die `+page.ts` des Profils zöge | ja, wenn die zwei Bausteine bleiben (F-29) |
+
+#### Abweichungen von Zeile 15, den Hinweisen und Zeile 16
+
+1. **17 Stellen, nicht 14,** leiten in der Mitglieder-App nach einer Aktion von Hand um (dazu
+   Anlass, Benachrichtigungen, Gespräch); die Spalte «Dateien» nannte nur CM- und Doppel-Seite.
+   Die Stelle im Gespräch gehört zum Wächter, als eigener Fall D. In Zeile 15 nachgetragen.
+2. **Die fünf Wächter stimmen, sind aber nicht alle sichtbar:** Abweichung 5 (`rollen`) und die
+   elf Blöcke der Verwaltungsseiten liegen hinter dem Layout. Der Hinweis «je mit einem Fall im
+   Vorab-Test» geht für sie nur als Einheitstest der Ladefunktion.
+3. **Gruppe 2 hat zwei Auslöser** (`/api/sitzung` in `/profil`, die eigene Abfrage in den sechs
+   anderen); der Wächter nimmt darum das Ergebnis eines Abrufs entgegen und fragt nicht selbst.
+4. **Acht benannte Fälle mehr** (D bis K), davon zwei mit sichtbarer Wirkung, wenn man sie
+   übersieht (D, G).
+5. **`verlauf` behält kein Laden im Baustein** (sein Filter ist die Adresse); der Hinweis nannte
+   es neben `mitglieder`.
+6. **Zwei Bausteine unter `src/lib/push/` laden beim Einhängen selbst;** Zeile, Hinweise und C-5
+   kennen sie nicht (F-29).
+7. **Der Umzug der vier Listen ist nicht ganz ohne sichtbare Wirkung** (S7, S8); die Zeile sagt
+   «kein geändertes Verhalten» (F-28).
+8. **`login/sitzung.ts` ist schon auf dem Baustein** (seit Schritt 13, Lauf 2); neu ist nur
+   `ladeSitzung`. `leiteUm` braucht keinen neuen Aufruf an 32 Stellen.
+9. **Der Hinweis zum Mail-Code [V] ist bestätigt:** Die wartende Anfrage lässt sich in den
+   Gerätespeicher schreiben; kein Vorab-Fall fordert einen Code an.
+10. **«Schritt 15 kann die Lint-Regel zu `fetch` mitnehmen»** (Ergebnis Schritt 13) stimmt nur für
+    die engere Regel.
+11. **Zeile 16 stimmt:** neun Stellen der CM-Seite [G, einzeln gelesen], Voraussetzung 15, die
+    Doppel-Seite hat 425 Zeilen und fünf Stellen [G]. Die Kleinfrage zur Doppel-Seite bleibt, wie
+    sie steht; aus diesem Nachmessen nur ein Beitrag: Ihre vier Handler und `neuLaden` gleichen
+    denen der CM-Seite im Gerüst, die Suche mit Abbruch (`:64–82`) hat dort kein Gegenstück.
+12. **1c, Tabelle «Netz»:** «SI-07 (Login und Verwaltung)» prüft in beiden Dateien das Neuladen
+    von `/`, keine Seite der Verwaltung.
+
+#### Fragen an den Projektleiter
+
+**F-28** und **F-29** stehen in Abschnitt 9.1. Keine hält Lauf 1 auf; F-28 ist vor Lauf 2 zu
+beantworten.
+
+#### Bleibt (gut gelöst)
+
+- `leiteUm` ist für die Verwaltung schon der eine Ort «nach einer Aktion»; alle 32 Stellen nutzen
+  ihn gleich.
+- `mailanfrage.ts` nimmt den Speicher als Parameter und fängt jeden Zugriff; `geraet.ts` nimmt
+  Kennung und Fenster als Parameter. Der Wächter kann beides ohne Browser prüfen.
+- Die Umleitungen der Ladefunktionen stehen vor jeder Anzeige; keine Seite zeigt Inhalt und
+  leitet danach um, ausser den vier Listen.
+- Das Layout der Verwaltung prüft bei jedem Wechsel und entscheidet Bereich und Schreibrecht an
+  einer Stelle (`umleitung`, mit Einheitstest).
+- Die Trennung «Ladefunktion reicht ihr `fetch` weiter, die CM-Seite bewusst nicht» ist
+  kommentiert und durch einen E2E-Test gehalten.
+
+#### Nicht geprüft, dünn belegt
+
+- **Nichts ausgeführt.** Dass die Vorab-Fälle auf dem heutigen Stand grün sind, ist aus dem Code
+  gelesen. Am dünnsten: ob die E2E-Tabelle ohne Konto auf jeder Adresse sauber endet (keine
+  Konsolenfehler, kein hängender Übergang), und die Laufzeit [V].
+- **Einheitstest der Ladefunktionen [V]:** dass sich `+page.ts` und `+layout.ts` der Verwaltung
+  im Einheitslauf importieren lassen, ist aus den Importen geschlossen, nicht probiert.
+- **Der Wächter ist ein Entwurf in Worten [V];** ob die Zusicherung im Typ an allen 22
+  Ladefunktionen ohne Umstellen der Folgezeilen passt, zeigt Lauf 1.
+- **Lint [V]:** Die Zahl 98 stammt aus E.3; die engere Regel ist nicht gelaufen.
+- **Markup der grossen Seiten nur per Textsuche [E]:** `profil`, CM-Seite, Doppel-Seite, Anlass und
+  alle Seiten der Verwaltung ausser den genannten; gesucht war nach Umleitungen und Links zum
+  Login, nicht nach jedem Link.
+- **«Im Browser nicht zu sehen» für `rollen` [G für den Ablauf in `client.js`, V für das Rennen]:**
+  Gelesen ist, dass die Umleitung des Layouts vor der der Seite gewertet wird; nicht nachgestellt
+  ist der Fall, in dem das Layout durchlässt und die Seite `kein-admin` bekommt.
+- **Vorladen (S8) [G für `load_cache`, V für die Wirkung an den vier Listen]:** nicht im Browser
+  nachgestellt.
+- **`node_modules` im Hauptordner gelesen,** weil der Worktree keines hat; die Version (3.1.1)
+  steht in dessen `package.json` und passt zum Manifest (`^3.1.1`).
+- **Nicht nachgeführt (der Auftrag liess sonst nichts umschreiben):** Die Zeile «Nächster offener
+  Schritt» oben sagt weiter «das Nachmessen fehlt noch im Dokument»; der Kopf von Abschnitt 9
+  nennt weiter nur F-15 als offen; 1c (Tabelle P, «Netz») und B-21 nennen weiter 14 Stellen bzw.
+  47 Zeilen; der Kopf des Dokuments nennt Anhang E «bis E.3». Es gelten die Zeile 15, der neue
+  Hinweis und dieser Abschnitt. Die `CLAUDE.md` ist nicht geändert.
