@@ -1,9 +1,8 @@
 // Anfragen der Mitglieder an `/api/anlaesse/…` und ihre Antworten als typisierte Ergebnisse.
-import { istFehlerwort } from '../fehler.ts';
+import { rufeAb, type Holen, type Json, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post.ts';
 import type { AnlassMitglied } from '../server/anlass/anlaesse.ts';
 import type { Antwort as AntwortArt } from '../server/db/schema.ts';
-import type { Holen, Json } from '../verwaltung/api.ts';
 
 export type AnlassAnsicht = Json<Omit<AnlassMitglied, 'kalenderKennung'>> & { kalender: string };
 export type { AntwortArt };
@@ -25,22 +24,25 @@ function feldAus(felder: unknown): 'antwort' | 'bemerkung' | null {
 	return null;
 }
 
+/** Die Fehlerwörter, die der Anlass kennt; der Körper muss lesbar sein. */
+type Wort = 'abgemeldet' | 'nicht-gefunden' | 'geschlossen' | 'eingabe';
+const VERTRAG: Vertrag<Wort> = {
+	woerter: ['abgemeldet', 'nicht-gefunden', 'geschlossen', 'eingabe'],
+	koerper: 'pflicht'
+};
+
 async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<Ergebnis<T>> {
-	try {
-		const r = await holen(pfad, init);
-		const k = (await r.json()) as { fehler?: unknown; felder?: unknown };
-		if (r.ok) return { art: 'ok', daten: k as T };
-		const fehler = istFehlerwort(k.fehler) ? k.fehler : null;
-		if (r.status === 401) return { art: 'abgemeldet' };
-		if (r.status === 404) return { art: 'nicht-gefunden' };
-		if (r.status === 409 && fehler === 'geschlossen') return { art: 'geschlossen' };
-		if (r.status === 400 && fehler === 'eingabe') {
-			const feld = feldAus(k.felder);
-			if (feld) return { art: 'eingabe', feld };
+	const r = await rufeAb<T, Wort>(pfad, init, holen, VERTRAG);
+	switch (r.art) {
+		case 'ok':
+		case 'stoerung':
+			return r;
+		case 'eingabe': {
+			const feld = feldAus(r.koerper.felder);
+			return feld ? { art: 'eingabe', feld } : { art: 'stoerung' };
 		}
-		return { art: 'stoerung' };
-	} catch {
-		return { art: 'stoerung' };
+		default:
+			return { art: r.art };
 	}
 }
 
