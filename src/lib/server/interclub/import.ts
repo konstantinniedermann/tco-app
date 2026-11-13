@@ -158,15 +158,24 @@ export async function importiereSaison(
 							}))
 						);
 						await tx.insert(icSpieler).values(
-							bericht.partien.flatMap((p) =>
-								p.spieler.map((s, i) => ({
+							bericht.partien.flatMap((p) => [
+								...p.spieler.map((s, i) => ({
 									...b,
 									art: p.art,
 									position: p.position,
+									seite: 'tco' as const,
+									nr: i + 1,
+									...s
+								})),
+								...p.gegner.map((s, i) => ({
+									...b,
+									art: p.art,
+									position: p.position,
+									seite: 'gegner' as const,
 									nr: i + 1,
 									...s
 								}))
-							)
+							])
 						);
 					}
 					if (daten.begegnungen.length)

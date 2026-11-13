@@ -631,8 +631,8 @@ export const icPartie = pgTable(
 	]
 );
 
-// TCO-Spieler einer Partie (nur die TCO-Seite; von Gegnern speichert MyTCO nichts). `stId` und
-// `rangliste` sind Nummern von Swiss Tennis für spätere Verläufe; die Oberfläche bekommt sie nicht.
+// Spieler einer Partie, je Seite. `stId` und `rangliste` (Nummern von Swiss Tennis, für spätere
+// Verläufe) nur bei TCO-Spielern; die Oberfläche bekommt sie nicht. Von Gegnern nur Name und Klassierung.
 export const icSpieler = pgTable(
 	'ic_spieler',
 	{
@@ -641,14 +641,15 @@ export const icSpieler = pgTable(
 		begegnungId: integer('begegnung_id').notNull(),
 		art: text('art').$type<'einzel' | 'doppel'>().notNull(),
 		position: integer('position').notNull(),
+		seite: text('seite').$type<'tco' | 'gegner'>().notNull(),
 		nr: integer('nr').notNull(),
-		stId: integer('st_id').notNull(),
+		stId: integer('st_id'),
 		name: text('name').notNull(),
 		klassierung: text('klassierung').notNull(),
-		rangliste: integer('rangliste').notNull()
+		rangliste: integer('rangliste')
 	},
 	(t) => [
-		primaryKey({ columns: [t.saison, t.teamId, t.begegnungId, t.art, t.position, t.nr] }),
+		primaryKey({ columns: [t.saison, t.teamId, t.begegnungId, t.art, t.position, t.seite, t.nr] }),
 		foreignKey({
 			name: 'ic_spieler_partie_fk',
 			columns: [t.saison, t.teamId, t.begegnungId, t.art, t.position],
@@ -660,6 +661,10 @@ export const icSpieler = pgTable(
 				icPartie.position
 			]
 		}).onDelete('cascade'),
-		check('ic_spieler_nr_check', sql`${t.nr} in (1, 2)`)
+		check('ic_spieler_nr_check', sql`${t.nr} in (1, 2)`),
+		check(
+			'ic_spieler_nummern_check',
+			sql`(${t.seite} = 'tco' and ${t.stId} is not null and ${t.rangliste} is not null) or (${t.seite} = 'gegner' and ${t.stId} is null and ${t.rangliste} is null)`
+		)
 	]
 );

@@ -48,6 +48,7 @@ describe('ladeBegegnung', () => {
 			expect(p.einzel[0]).toEqual({
 				position: 1,
 				spieler: [{ name: 'Hannes Saitenbett', klassierung: 'R6' }],
+				gegner: [{ name: 'Elena Testmann', klassierung: 'R5' }],
 				saetze: ['5:7', '0:6'],
 				ergebnis: 'niederlage',
 				aufgabe: null
@@ -58,12 +59,15 @@ describe('ladeBegegnung', () => {
 					{ name: 'Fabio Fiktiv', klassierung: 'R6' },
 					{ name: 'Leo Netzpfosten', klassierung: 'R6' }
 				],
+				gegner: [
+					{ name: 'Elena Testmann', klassierung: 'R5' },
+					{ name: 'Luca Attrappe', klassierung: 'R8' }
+				],
 				saetze: ['0:6', '6:4', '11:9'],
 				ergebnis: 'sieg',
 				aufgabe: null
 			});
 			const text = JSON.stringify(b);
-			expect(text).not.toContain('Elena Testmann');
 			expect(text).not.toContain('9497');
 			expect(text).not.toContain('stId');
 			expect(text).not.toContain('rangliste');

@@ -56,7 +56,8 @@ describe('pruefeBericht', () => {
 					position: 1,
 					saetze: ['5:7', '0:6'],
 					aufgabe: null,
-					spieler: [{ stId: 900001, name: 'Max Muster', klassierung: 'R6', rangliste: 9497 }]
+					spieler: [{ stId: 900001, name: 'Max Muster', klassierung: 'R6', rangliste: 9497 }],
+					gegner: [{ name: 'Gerd Gegner', klassierung: 'R5' }]
 				},
 				{
 					art: 'doppel',
@@ -66,6 +67,10 @@ describe('pruefeBericht', () => {
 					spieler: [
 						{ stId: 900001, name: 'Max Muster', klassierung: 'R6', rangliste: 9497 },
 						{ stId: 900002, name: 'Erika Beispiel', klassierung: 'N4', rangliste: 120 }
+					],
+					gegner: [
+						{ name: 'Gerd Gegner', klassierung: 'R5' },
+						{ name: 'Gina Gegner', klassierung: 'R9' }
 					]
 				}
 			]
@@ -84,6 +89,7 @@ describe('pruefeBericht', () => {
 		expect(r.saetze).toEqual({ tco: 16, gegner: 3 });
 		expect(r.partien[0].saetze).toEqual(['3:6', '6:4', '7:10']);
 		expect(r.partien[0].spieler.map((s) => s.name)).toEqual(['Max Muster']);
+		expect(r.partien[0].gegner).toEqual([{ name: 'Gerd Gegner', klassierung: 'R5' }]);
 	});
 
 	it('merkt, welche Seite aufgegeben hat', () => {
@@ -103,10 +109,9 @@ describe('pruefeBericht', () => {
 		]);
 	});
 
-	it('übernimmt nichts von den Gegnern', () => {
-		const text = JSON.stringify(gelesen(bericht()));
-		expect(text).not.toContain('Gegner');
-		expect(text).not.toContain('Gina');
+	it('übernimmt vom Gegner nur Name und Klassierung, keine Nummern', () => {
+		const text = JSON.stringify(gelesen(bericht()).partien.map((p) => p.gegner));
+		expect(text).toContain('Gerd Gegner');
 		expect(text).not.toContain('900101');
 		expect(text).not.toContain('3876');
 		expect(text).not.toContain('61449');
@@ -161,7 +166,23 @@ describe('pruefeBericht', () => {
 				'Spieler-Id als Text',
 				einzelVon({ members: [{ id: '1' as unknown as number, name: MAX }], wo: 0 })
 			],
-			['Punkte fehlen', { ...bericht(), homeTeam: { name: 'Olten 1', clubNumber: 2202 } }]
+			['Punkte fehlen', { ...bericht(), homeTeam: { name: 'Olten 1', clubNumber: 2202 } }],
+			[
+				'Gegnername ohne Klassierung',
+				mitEinzel(
+					partie(seite(0, [900001, MAX]), seite(0, [900101, 'Gerd Gegner']), ['6:0', '6:0', ''])
+				)
+			],
+			[
+				'Einzel mit zwei Gegnern',
+				mitEinzel(
+					partie(
+						seite(0, [900001, MAX]),
+						seite(0, [900101, GERD], [900102, 'Gina Gegner R9 (1)']),
+						['6:0', '6:0', '']
+					)
+				)
+			]
 		];
 		for (const [name, f] of faelle) expect(pruefeBericht(f, 2202), name).toBeNull();
 	});

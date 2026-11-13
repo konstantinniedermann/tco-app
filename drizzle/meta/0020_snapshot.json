@@ -1,5 +1,5 @@
 {
-  "id": "ed709612-0b22-4292-8552-17a911651ce1",
+  "id": "84ece7dd-0be8-42cc-9349-f05aeae09a7b",
   "prevId": "c9563740-461d-4464-8bd5-33819dac8f75",
   "version": "7",
   "dialect": "postgresql",
@@ -1098,6 +1098,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "seite": {
+          "name": "seite",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "nr": {
           "name": "nr",
           "type": "integer",
@@ -1108,7 +1114,7 @@
           "name": "st_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "name": {
           "name": "name",
@@ -1126,7 +1132,7 @@
           "name": "rangliste",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {},
@@ -1154,14 +1160,15 @@
         }
       },
       "compositePrimaryKeys": {
-        "ic_spieler_saison_team_id_begegnung_id_art_position_nr_pk": {
-          "name": "ic_spieler_saison_team_id_begegnung_id_art_position_nr_pk",
+        "ic_spieler_saison_team_id_begegnung_id_art_position_seite_nr_pk": {
+          "name": "ic_spieler_saison_team_id_begegnung_id_art_position_seite_nr_pk",
           "columns": [
             "saison",
             "team_id",
             "begegnung_id",
             "art",
             "position",
+            "seite",
             "nr"
           ]
         }
@@ -1172,6 +1179,10 @@
         "ic_spieler_nr_check": {
           "name": "ic_spieler_nr_check",
           "value": "\"ic_spieler\".\"nr\" in (1, 2)"
+        },
+        "ic_spieler_nummern_check": {
+          "name": "ic_spieler_nummern_check",
+          "value": "(\"ic_spieler\".\"seite\" = 'tco' and \"ic_spieler\".\"st_id\" is not null and \"ic_spieler\".\"rangliste\" is not null) or (\"ic_spieler\".\"seite\" = 'gegner' and \"ic_spieler\".\"st_id\" is null and \"ic_spieler\".\"rangliste\" is null)"
         }
       },
       "isRLSEnabled": false

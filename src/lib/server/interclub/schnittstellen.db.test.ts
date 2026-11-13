@@ -84,7 +84,7 @@ describe('Schnittstellen für Interclub (Mitglied)', () => {
 		expect(await sitzung(konto)).toBe(true);
 	});
 
-	test('Begegnung: 401 ohne Sitzung, 200 mit Einzelpartien ohne Gegner und Nummern, 404 sonst', async () => {
+	test('Begegnung: 401 ohne Sitzung, 200 mit Einzelpartien ohne Nummern, 404 sonst', async () => {
 		const ohne = await getInterclubBegegnung(
 			d,
 			get(undefined, { id: '7398', begegnung: '972338' })
@@ -97,7 +97,7 @@ describe('Schnittstellen für Interclub (Mitglied)', () => {
 		const text = await r.text();
 		expect(JSON.parse(text)).toMatchObject({ teamId: 7398, gegner: 'Villmergen' });
 		expect(text).toContain('Hannes Saitenbett');
-		expect(text).not.toContain('Elena Testmann');
+		expect(text).toContain('Elena Testmann');
 		expect(text).not.toContain('stId');
 		expect(text).not.toContain('rangliste');
 		for (const params of [

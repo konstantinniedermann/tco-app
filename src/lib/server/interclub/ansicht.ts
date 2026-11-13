@@ -295,7 +295,8 @@ export async function ladeTeam(db: Db, teamId: number): Promise<IcTeam | null> {
 
 export type IcPartie = {
 	position: number;
-	spieler: { name: string; klassierung: string }[]; // nur TCO-Spieler
+	spieler: { name: string; klassierung: string }[]; // TCO-Spieler
+	gegner: { name: string; klassierung: string }[];
 	saetze: string[]; // aus Sicht des TCO
 	ergebnis: 'sieg' | 'niederlage' | null; // null = weder Aufgabe noch Satzmehrheit
 	aufgabe: 'tco' | 'gegner' | null;
@@ -393,17 +394,21 @@ export async function ladeBegegnung(
 		.select({
 			art: icSpieler.art,
 			position: icSpieler.position,
+			seite: icSpieler.seite,
 			name: icSpieler.name,
 			klassierung: icSpieler.klassierung
 		})
 		.from(icSpieler)
 		.where(wo(icSpieler))
 		.orderBy(asc(icSpieler.nr));
+	const seite = (p: typeof icPartie.$inferSelect, s: 'tco' | 'gegner') =>
+		spieler
+			.filter((x) => x.art === p.art && x.position === p.position && x.seite === s)
+			.map((x) => ({ name: x.name, klassierung: x.klassierung }));
 	const partie = (p: typeof icPartie.$inferSelect): IcPartie => ({
 		position: p.position,
-		spieler: spieler
-			.filter((s) => s.art === p.art && s.position === p.position)
-			.map((s) => ({ name: s.name, klassierung: s.klassierung })),
+		spieler: seite(p, 'tco'),
+		gegner: seite(p, 'gegner'),
 		saetze: p.saetze,
 		ergebnis: partieErgebnis(p.saetze, p.aufgabe),
 		aufgabe: p.aufgabe

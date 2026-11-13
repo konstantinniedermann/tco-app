@@ -69,7 +69,7 @@ afterAll(async () => {
 });
 
 describe('importiereSaison: Einzelpartien', () => {
-	test('holt die Berichte aller eigenen, gespielten Begegnungen und speichert nur TCO-Spieler', async () => {
+	test('holt die Berichte aller eigenen, gespielten Begegnungen mit beiden Seiten', async () => {
 		const urls: string[] = [];
 		const fake = beispielAbruf();
 		const wort = await importiereSaison(
@@ -82,7 +82,7 @@ describe('importiereSaison: Einzelpartien', () => {
 		expect(await anzahl(2081)).toEqual({
 			berichte: 63,
 			partien: erwartet.partien,
-			spieler: erwartet.tco.length
+			spieler: erwartet.tco.length + erwartet.gegner.length
 		});
 		expect(urls).toContain(
 			`${ST}/encounter-results?encounterId=972338&competition=ic&year=2081&lang=de`
@@ -107,17 +107,17 @@ describe('importiereSaison: Einzelpartien', () => {
 		expect(await hatBericht(2082, 45486)).toBe(true);
 	});
 
-	test('übernimmt keine Angaben zu Gegnerspielern', async () => {
+	test('Gegner nur mit Name und Klassierung, Nummern nur bei TCO-Spielern', async () => {
 		await importiereSaison(dienste(beispielAbruf()), 2083, VEREIN);
 		const zeilen = await db.select().from(icSpieler).where(eq(icSpieler.saison, 2083));
+		const tco = zeilen.filter((z) => z.seite === 'tco');
+		const gegner = zeilen.filter((z) => z.seite === 'gegner');
+		expect(gegner).toHaveLength(erwartet.gegner.length);
+		expect(gegner.every((z) => z.stId === null && z.rangliste === null)).toBe(true);
+		expect(gegner.every((z) => /^[RN]\d$/.test(z.klassierung))).toBe(true);
 		const tcoIds = new Set(erwartet.tco.map((m) => m.id));
-		expect(zeilen.every((z) => tcoIds.has(z.stId))).toBe(true);
-		const gespeichert = new Set(zeilen.map((z) => z.name));
-		const nurGegner = erwartet.gegner
-			.map((m) => m.name.replace(/ [RN]\d \(\d+\)$/, ''))
-			.filter((n) => !erwartet.tco.some((t) => t.name.startsWith(`${n} `)));
-		expect(nurGegner.length).toBeGreaterThan(0);
-		expect(nurGegner.filter((n) => gespeichert.has(n))).toEqual([]);
+		expect(tco.every((z) => z.stId !== null && tcoIds.has(z.stId))).toBe(true);
+		expect(zeilen.every((z) => !/\(/.test(z.name))).toBe(true);
 	});
 
 	test('fehlender Bericht: Begegnung bleibt ohne Einzelpartien, Import ok', async () => {

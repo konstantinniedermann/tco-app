@@ -195,14 +195,16 @@ export function istNochNichtFreigeschaltet(status: number, json: unknown): boole
 }
 
 // Spielbericht einer Begegnung (`encounter-results`, für Auf-/Abstieg `tableau-results`). Von der
-// Gegnerseite wird nur die Form geprüft, nie ein Name oder eine Nummer übernommen.
+// Gegnerseite werden nur Name und Klassierung übernommen, nie eine Nummer.
 export type StSpieler = { stId: number; name: string; klassierung: string; rangliste: number };
+export type StGegner = { name: string; klassierung: string };
 export type StPartie = {
 	art: 'einzel' | 'doppel';
 	position: number;
 	saetze: string[]; // nur gespielte Sätze, aus TCO-Sicht («7:5» = TCO 7)
 	aufgabe: 'tco' | 'gegner' | null; // welche Seite w.o. gegeben bzw. aufgegeben hat
 	spieler: StSpieler[]; // TCO-Seite: 1 im Einzel, 2 im Doppel
+	gegner: StGegner[]; // höchstens 1 bzw. 2, ohne Nummern
 };
 export type StBericht = {
 	tcoHeim: boolean;
@@ -249,7 +251,8 @@ function pruefePartie(
 	if (leer(heim) && leer(gast) && roh.results.every((r) => r === '')) return 'nicht-gespielt';
 	const tco = tcoHeim ? heim : gast;
 	const gegner = tcoHeim ? gast : heim;
-	if (tco.members.length !== (art === 'einzel' ? 1 : 2)) return null;
+	const anzahl = art === 'einzel' ? 1 : 2;
+	if (tco.members.length !== anzahl || gegner.members.length > anzahl) return null;
 	const spieler: StSpieler[] = [];
 	for (const m of tco.members) {
 		const s = pruefeSpieler(m);
@@ -264,7 +267,13 @@ function pruefePartie(
 		saetze.push(tcoHeim ? `${m[1]}:${m[2]}` : `${m[2]}:${m[1]}`);
 	}
 	const aufgabe = tco.wo === 1 ? 'tco' : gegner.wo === 1 ? 'gegner' : null;
-	return { art, position: roh.position, saetze, aufgabe, spieler };
+	const gegnerSpieler: StGegner[] = [];
+	for (const m of gegner.members) {
+		const s = pruefeSpieler(m);
+		if (!s) return null;
+		gegnerSpieler.push({ name: s.name, klassierung: s.klassierung });
+	}
+	return { art, position: roh.position, saetze, aufgabe, spieler, gegner: gegnerSpieler };
 }
 
 /** null = Form weicht ab; 'fehlt' = Swiss Tennis hat keinen Bericht (Antwort `null`). */
