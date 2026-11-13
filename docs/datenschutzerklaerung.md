@@ -91,6 +91,8 @@ Auf Wunsch erhältst du eine Auskunft über alle Daten, die wir von dir gespeich
 Änderungen, die du bei anderen Mitgliedern ausgelöst hast, stehen nicht darin, weil sie andere
 betreffen. Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge,
 zurückgezogene Anmeldungen und dein Gespräch mit der Turnierleitung geben dir die CM-Admins Auskunft.
+Interclub-Resultate stehen nicht darin, weil sie nicht an deinem Konto hängen; du findest sie in MyTCO
+und bei Swiss Tennis.
 
 **Login:** Du loggst dich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 dein Gerät das Login mit einem Cookie, bis du MyTCO ein Jahr nicht genutzt hast oder dich

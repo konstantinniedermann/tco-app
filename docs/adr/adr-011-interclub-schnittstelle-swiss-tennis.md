@@ -28,6 +28,7 @@ Option A, Entscheid des Projektleiters: MyTCO nutzt die Schnittstelle ohne Anfra
 - Der Abruf prüft die Form der Antwort, bevor er speichert; eine veränderte Form lässt den alten Stand stehen.
 - Wenig Last: nur die Teams des Vereins, mit Pausen zwischen den Abfragen.
 - Logs enthalten nur feste Texte.
+- Seit Teil 2 gehen auch Begegnungsnummern hinaus, und es kommen Personendaten herein: die Spieler der Einzelpartien beider Teams, auch Nicht-Mitglieder ([Datenschutzkonzept](../datenschutz.md)).
 - Kosten: keine laufenden.
 
 ## Reevaluations-Trigger

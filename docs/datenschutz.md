@@ -107,7 +107,7 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
   eines Turniers wird leer.
 - **Auskunft** (Mitglieder-Admin, DS-07): druckbare Seite mit allen gespeicherten Daten des Mitglieds
   ausser Geheimnissen; Verlauf-Einträge, in denen die Person nur Urheber bei anderen ist, fehlen (sie
-  nennen Dritte). Schritte der Verwaltung zeigt die Auskunft als «Mitgliederverwaltung», nicht mit dem
+  nennen Dritte). Interclub-Einzelpartien fehlen, weil sie nicht am Konto hängen (Abschnitt *Interclub*). Schritte der Verwaltung zeigt die Auskunft als «Mitgliederverwaltung», nicht mit dem
   Namen des Admins. Von der CM enthält sie nur bestätigte Anmeldungen, ohne Wildcard-Kommentar, weil
   der Mitglieder-Admin Wildcard-Anträge nicht sieht; die übrigen Anmeldungen, Wildcard-Anträge und Kommentare
   gibt auf Wunsch der CM-Admin bekannt, ebenso die Gespräche mit der Turnierleitung. Das Erstellen steht im Änderungsverlauf, auch wenn der MyTCO-Admin
@@ -227,7 +227,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“). Ausnahme: Einzelmeldungen zum Doppel an die Beteiligten nennen den anderen Spieler (Partner, Anfragender oder Angefragter), nie dessen Telefon oder E-Mail und nie den Namen des CM-Admins (die Rolle «Der CM-Admin» darf stehen). E-Mails gehen je Empfänger einzeln, nie mehrere Adressen in einem Empfängerfeld. Bei Mitteilungen (FR-42) weist das Formular darauf hin; die Vorschau zeigt dem Mitglieder-Admin nur Namen, die er schon sehen darf |
 | DS-06 | Löschfristen aus [Löschen](#löschen) sind umgesetzt; Logs ohne Inhalte (keine Einmal-Codes, Kontaktdaten, Resultate); IP-Adressen höchstens 24 Stunden, auch in Logs |
 | DS-07 | Der Mitglieder-Admin kann die Daten eines Mitglieds als druckbare Auskunft ausgeben und das Mitglied löschen (umgesetzt, Etappe 3 von #43) |
-| DS-08 | Entwicklung und Tests nur mit erfundenen Personendaten; öffentliche Daten ohne Personennamen (z. B. Interclub-Resultate der Teams von Swiss Tennis) dürfen 1:1 verwendet werden; in Beispiel-Einzelpartien sind Namen und Personennummern der Spieler erfunden |
+| DS-08 | Entwicklung und Tests nur mit erfundenen Personendaten; öffentliche Daten ohne Personennamen (z. B. Interclub-Resultate der Teams von Swiss Tennis) dürfen 1:1 verwendet werden; in Beispiel-Einzelpartien sind Namen und Personennummern der Spieler erfunden; Begegnungsnummer, Position, Klassierung und Rangliste-Nummer bleiben echt, obwohl sie über Swiss Tennis zur echten Person führen (dort öffentlich, Entscheid Projektleiter) |
 | DS-09 | Die Datenschutzerklärung ist in MyTCO auch ohne Login erreichbar |
 | DS-10 | Datensicherheit (verschlüsselte Verbindung, Einmal-Codes nur als Hash, Zugriff nach Rolle) regelt das [Sicherheitskonzept](sicherheitskonzept.md) |
 
@@ -246,6 +246,7 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
 
+- 13.11.2026: Auskunft ohne Interclub-Einzelpartien (hängen nicht am Konto, in der Erklärung genannt); DS-08: Beispiel-Einzelpartien mit echten Begegnungsnummern, Positionen und Ranglisten (Entscheid Projektleiter, #81 Teil 2).
 - 13.11.2026: Interclub-Einzelpartien (Entscheid Projektleiter, #81 Teil 2): Name, Klassierung, Rangliste- und Personennummer der TCO-Spieler, auch von Junioren; sichtbar für alle eingeloggten Mitglieder nur Name und Klassierung; von den Gegnern (keine Mitglieder, auch Junioren) Name und Klassierung, ohne Nummern, wie bei Swiss Tennis öffentlich; bleiben über die Saisons; kein Ausblenden auf Wunsch.
 - 13.11.2026: DS-08 präzisiert (Entscheid Projektleiter): gilt für Personendaten; öffentliche Daten ohne Personennamen wie die Interclub-Resultate der Teams dürfen 1:1 in Tests und Seed (#81, Teil 1 ohne Spielernamen).
 - 09.11.2026: Kontaktdaten für CM- und Lizenz-Admin nach Aufgabe statt von allen (K-42 eingegrenzt, Entscheid Projektleiter): CM-Admin nur die Spieler eines Turniers (aktive Anmeldung oder offene Partner-Anfrage) bis zum 1.1. nach dem Turnierjahr, Lizenz-Admin nur Mitglieder mit Lizenz oder Lizenzantrag.
