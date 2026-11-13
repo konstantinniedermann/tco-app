@@ -9,7 +9,7 @@ import { importiereBeispiel } from '../../../../tests/hilfen/interclub.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
 import { getSitzung } from '../sitzung/schnittstellen.ts';
-import { getInterclub, getInterclubTeam } from './schnittstellen.ts';
+import { getInterclub, getInterclubBegegnung, getInterclubTeam } from './schnittstellen.ts';
 import type { InterclubDienste } from './typen.ts';
 
 const logs = [
@@ -82,5 +82,32 @@ describe('Schnittstellen für Interclub (Mitglied)', () => {
 			expect([r.status, await r.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
 		}
 		expect(await sitzung(konto)).toBe(true);
+	});
+
+	test('Begegnung: 401 ohne Sitzung, 200 mit Einzelpartien ohne Gegner und Nummern, 404 sonst', async () => {
+		const ohne = await getInterclubBegegnung(
+			d,
+			get(undefined, { id: '7398', begegnung: '972338' })
+		);
+		expect(ohne.status).toBe(401);
+		const konto = await einloggen();
+		const r = await getInterclubBegegnung(d, get(konto, { id: '7398', begegnung: '972338' }));
+		expect(r.status).toBe(200);
+		expect(r.headers.get('cache-control')).toBe('no-store');
+		const text = await r.text();
+		expect(JSON.parse(text)).toMatchObject({ teamId: 7398, gegner: 'Villmergen' });
+		expect(text).toContain('Hannes Saitenbett');
+		expect(text).not.toContain('Elena Testmann');
+		expect(text).not.toContain('stId');
+		expect(text).not.toContain('rangliste');
+		for (const params of [
+			{ id: '7398', begegnung: 'abc' },
+			{ id: 'abc', begegnung: '972338' },
+			{ id: '7398', begegnung: '972340' },
+			{ id: '7396', begegnung: '972338' }
+		]) {
+			const f = await getInterclubBegegnung(d, get(konto, params));
+			expect([f.status, await f.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
+		}
 	});
 });

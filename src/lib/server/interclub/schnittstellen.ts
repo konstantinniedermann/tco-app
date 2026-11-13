@@ -2,7 +2,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { antwort, jetzt, mitSitzung, nichtGefunden, type Ereignis } from '../http.ts';
 import { parseId } from '../parse-id.ts';
-import { ladeTeam, ladeUebersicht } from './ansicht.ts';
+import { ladeBegegnung, ladeTeam, ladeUebersicht } from './ansicht.ts';
 import type { InterclubDienste } from './typen.ts';
 
 export type InterclubEreignis = Ereignis & Pick<RequestEvent, 'params'>;
@@ -23,9 +23,23 @@ export function getInterclubTeam(d: InterclubDienste, e: InterclubEreignis): Pro
 	});
 }
 
+export function getInterclubBegegnung(
+	d: InterclubDienste,
+	e: InterclubEreignis
+): Promise<Response> {
+	return mitSitzung(e, async () => {
+		const id = parseId(e.params.id);
+		const begegnung = parseId(e.params.begegnung);
+		if (id === null || begegnung === null) return nichtGefunden();
+		const b = await ladeBegegnung(d.db, id, begegnung);
+		return b ? antwort(200, b) : nichtGefunden();
+	});
+}
+
 // Alle Schnittstellen der Mitglieder zu Interclub; die Grundprüfung
 // (`src/lib/server/grundpruefung.db.test.ts`) läuft über jeden Eintrag.
 export const INTERCLUB_SCHNITTSTELLEN = {
 	getInterclub,
-	getInterclubTeam
+	getInterclubTeam,
+	getInterclubBegegnung
 } satisfies Record<string, (d: InterclubDienste, e: InterclubEreignis) => Promise<Response>>;
