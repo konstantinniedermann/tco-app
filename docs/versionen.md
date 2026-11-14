@@ -8,6 +8,11 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Zwei Struktur-Prüfungen (Refactoring Schritt 20a): ESLint meldet jeden Aufruf von `fetch`
+  unter `src/`, Daten holen nur die Abruf-Module; ein Test prüft, dass die Design-Dateien nur im
+  Wurzel-Layout stehen, vollständig und in fester Reihenfolge, `brief.css` nur im Briefdruck.
+  An der App ändert sich nichts.
+
 ## 0.22.8 — Altlasten in Code und Tests aufgeräumt, Spur per Handstart (Refactoring Schritt 20)
 
 - Aufräumen: drei ungenutzte Namen und 25 unnötige `export`
