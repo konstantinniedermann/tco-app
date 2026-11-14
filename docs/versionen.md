@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.22.3 — Wacklige Fokus-Prüfung aus dem CM-Ablauftest (Nachtrag zu Schritt 16)
+
+- Der E2E-Test der CM-Seite prüft nicht mehr, dass der Fokus nach einer gesperrten Taste im
+  Seitenkörper liegt: Das hing vom Browser ab und wackelte auf der iPhone-CI (E-54). Satz,
+  Neuladen und der Fokus auf benannten Tasten bleiben geprüft. An der App ändert sich nichts.
+
 ## 0.22.2 — Ein Ablauf für die Aktionen der CM-Seite (Refactoring Schritt 16)
 
 - Sieben der acht Aktionen der Clubmeisterschafts-Seite laufen über eine gemeinsame
