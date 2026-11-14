@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Refactoring Schritt 17: Die Einzel-Anmeldungsliste der Verwaltung nutzt für ihre fünf
+  Rückfragen den gemeinsamen Baustein `Aktionsdialog` wie die Doppel-Liste; er kann dafür eine
+  zweite Entscheid-Taste («Ablehnen» beim Wildcard-Antrag) und einen Dialog nur mit «Abbrechen».
+  Warnungen stehen jetzt als Liste statt als ein Satz (Checkpoint E-21, Entscheid des
+  Projektleiters offen).
+
 ## 0.22.2 — Ein Ablauf für die Aktionen der CM-Seite (Refactoring Schritt 16)
 
 - Sieben der acht Aktionen der Clubmeisterschafts-Seite laufen über eine gemeinsame
