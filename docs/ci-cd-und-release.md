@@ -414,14 +414,26 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
 
 ## Alte Versionen auf dem Handy
 
-Die Web-App speichert sich auf dem Handy zwischen (Service Worker). Damit niemand mit einer
-alten Version arbeitet:
+Der Service Worker speichert nichts zwischen: Er ist nur für Push da und hat keinen Cache, die
+Seite kommt bei jedem Start vom Server.
 
-- Eine neue Version lädt **beim nächsten Start** von selbst.
-- Der Server nennt bei jeder Antwort die **Mindestversion**, die er versteht. Ist eine
-  offene App älter, lädt sie neu; eine angefangene Eingabe bleibt dabei erhalten.
-- Die Mindestversion steigt nur, wenn eine Schnittstelle sich unverträglich ändert. Sonst
-  bleiben Schnittstellen mit dem vorherigen Release verträglich.
+- **Beim nächsten Start** läuft die neue Version, ohne Zutun.
+- **Ist die App offen,** merkt sie eine neue Auslieferung mit dem Bordmittel von SvelteKit: Sie
+  vergleicht die Kennung ihres Builds mit `_app/version.json` des Servers, wenn sie wieder in den
+  Vordergrund kommt, und sonst stündlich. Die Kennung ist der Zeitstempel des Builds (`version`
+  in `vite.config.ts` ist mit Absicht nicht gesetzt), also bei jeder Auslieferung neu, auch bei
+  gleicher Versionsnummer. Sie ist nicht die Versionsnummer der Fusszeile.
+- Von selbst neu geladen wird **nur, wenn ein Seitenwechsel scheitert** und der Server dabei
+  eine neue Kennung meldet: wenn der Code der Zielseite auf dem neuen Server fehlt oder die
+  Zielseite mit einem Fehler endet. Dann lädt SvelteKit die Zielseite ganz neu, mit dem neuen
+  Code. Ein Seitenwechsel, der gelingt, bleibt in der App, auch wenn sie die neue Auslieferung
+  schon bemerkt hat; sie arbeitet dann bis zum nächsten Start mit dem alten Code weiter.
+- Eine angefangene Eingabe bleibt beim Neuladen nicht erhalten.
+- Der Server zwingt eine alte App nicht: Es gibt keine Mindestversion. Wer nach einer
+  Auslieferung mit der offenen App weiterarbeitet, schickt mit altem Code an die neuen
+  Schnittstellen. Darum bleiben Schnittstellen mit dem vorherigen Release verträglich.
+- `/api/status` nennt nur `status` und `version` (die Versionsnummer); der Healthcheck liest nur
+  `status`.
 
 ## Actions-Minuten
 
@@ -463,5 +475,6 @@ Erst wenn ein Trigger aus ADR-001 greift (K-22). Dann:
 - Testverteilung über TestFlight (Apple) und interne Tests (Google), dann die Prüfung durch
   die Stores. Der Upload in die Stores ist ein eigener, von Hand ausgelöster Schritt nach dem
   Release.
-- Die Store-App prüft dieselbe Mindestversion, zeigt aber statt Neuladen „Bitte
-  aktualisieren“ mit Link in den Store.
+- Eine Store-App bringt `version.json` selbst mit; das Bordmittel aus «Alte Versionen auf dem
+  Handy» bleibt dort stumm. Ein „Bitte aktualisieren“ mit Link in den Store gibt es noch nicht;
+  es ist mit der Store-App zu bauen.

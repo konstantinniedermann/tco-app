@@ -10,8 +10,13 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 - **Stand des Dokuments:** 14.11.2026, nach dem Checkpoint am Ende der Etappe 2. Die Etappen 0, 1
   und 2 sind umgesetzt (zuletzt Schritt 18, Version 0.22.5). Die Zwischenrevision am Ende der
   Etappe 2 (Abschnitt 1d) ist am Checkpoint entschieden und eingearbeitet (E-55 bis E-60); davor
-  die der Etappe 1 (Abschnitt 1c, E-41 bis E-44). Als Nächstes der Nachtrag zur Etappe 2 (7.5),
-  danach die Etappe 3 ab Schritt 19.
+  die der Etappe 1 (Abschnitt 1c, E-41 bis E-44). Der Nachtrag zur Etappe 2 (7.5) ist gemergt, die
+  Etappe 3 läuft ab Schritt 19. Das Nachmessen zu Schritt 19 liegt vor (14.11.2026,
+  Anhang F.1); F-35: B und F-36: A sind beantwortet (E-61, E-62); Schritt 19 ist mit Antwort A erledigt (Abbruchstelle 2, Anhang F.2; Version 0.22.7).
+  **Schritt 19 ist umgesetzt, mit Antwort A** (14.11.2026, Branch `refactor/schritt-19`, nicht
+  gemergt; Ergebnis in 7.5, Protokoll Anhang F.2): Eigenbau weg; die Ergänzung nach B hielt das
+  Verhalten, scheiterte aber an Abbruchstelle 2 (Konsolenfehler auf WebKit) und ist nicht im
+  Branch.
 - **Stand der Analyse (Abschnitte 1 bis 5 und 10):** 11.11.2026, Version 0.20.5, vor Schritt 01.
   Zahlen und Fundstellen dort gelten für diesen Stand; was die Etappe 0 berichtigt hat, steht
   beim Befund. Der Vermerk «Nachtrag» ohne Schrittnummer meint den zweiten Durchgang der Analyse
@@ -27,7 +32,9 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
   Anhang A und B Anweisungsdateien, Anhang C das Protokoll der Etappe 0, Anhang D das der Etappe 1
   (bis D.15, Schritt 12a), Anhang E das der Etappe 2 (bis E.13, Schritt 18). Beschlossen, aber
   noch nicht ausgeführt: Die Protokolle ziehen je Etappe in eine eigene Datei (E-60); bis dahin
-  stehen sie hier.
+  stehen sie hier. [G am 14.11.2026, Stand `7159355`: Die Anhänge C bis E stehen schon in
+  eigenen Dateien, siehe das Ende dieses Dokuments.] Anhang F ist das Protokoll der laufenden
+  Etappe 3 (ab F.1, Nachmessen Schritt 19) und steht hier.
 
 ## Stand und nächster Schritt
 
@@ -37,12 +44,12 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 |---|---|
 | **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt und gemergt (0.20.19). **Etappe 2:** Schritt 13 erledigt (zwei Läufe, Review je «ok», Version 0.20.20); Schritt 14 erledigt (Review «ok», Version 0.20.21); **Schritt 15 erledigt** (Läufe 1, 1b mit Interclub und 2; Review je «ok» am 14.11.2026, Version 0.22.1); **Schritt 16 erledigt** (CM-Seite; Review «ok» am 14.11.2026; die Doppel-Seite ist verworfen, F-30: A, E-51; Version 0.22.2); **Schritt 17 erledigt** (Review «ok» am 14.11.2026, Checkpoint E-21 erledigt: E-52, E-53; Version 0.22.4); **Schritt 18 erledigt** (Review «ok» nach einem Doku-Befund am 14.11.2026, Version 0.22.5). **Damit ist die Etappe 2 abgeschlossen**; Zwischenrevision und Checkpoint am Etappenende erledigt am 14.11.2026 (Abschnitt 1d, E-55 bis E-60) und in Zielbild und Plan eingearbeitet. **Etappe 3:** freigegeben (E-58), läuft ohne Halt mit Kurzbericht je Schritt (E-59); davor der Nachtrag zur Etappe 2 (7.5) |
 | **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), 12a (0.20.19), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D). Etappe 2: 13 (0.20.20), 14 (0.20.21), 15 (0.22.1), 16 ohne die Doppel-Seite (0.22.2, Nachtrag 0.22.3), 17 (0.22.4), 18 (0.22.5), alle mit Review «ok» auf `dev` (Ergebnisse in 7.4, Protokolle in Anhang E); die CI auf `dev` ist zum Merge von Schritt 18 im Job «E2E (iphone)» rot (Fokus-Wackler, siehe «Nächster offener Schritt») |
-| **Zuletzt erledigt** | **18** (14.11.2026, Review «ok» nach einem Doku-Befund, gemergt als Version 0.22.5; Ergebnis in 7.4, Protokoll Anhang E.13): `basis.css` in zehn Dateien unter `src/lib/design/` geschnitten (`grundlagen`, `rahmen`, `bedienelemente`, `karten`, `verwaltung`, `anleitung`, `uebergaenge`, `pc-layout`, `druck`, `verlauf`), Importe in `+layout.svelte` in dieser Reihenfolge nach `tokens.css`, Mockups und Leitbild nachgezogen; gebautes CSS vor und nach gleich (Node und SPA), Rot-Probe belegt; voller `make check` grün (2427 Tests, E2E 524/64, 5,6 Minuten). Davor **17** (14.11.2026, Review «ok», Checkpoint E-21 erledigt mit E-52 und E-53, gemergt als Version 0.22.4; davor der Nachtrag zu Schritt 16 als Version 0.22.3, E-54; Ergebnis in 7.4, Protokoll Anhang E.12): Vorab-E2E `tests/e2e/anmeldungsliste-ablauf.test.ts` (vier Fälle je Handy, auf dem alten Stand grün, einmal rot), `Aktionsdialog` um `neben` (zweite Entscheid-Taste) und `ohneHaupttaste` erweitert, die fünf Rückfragen der Einzel-Anmeldungsliste darauf (`fuehreAus`, eigene Sperre und rohe Dialoge weg); der Wildcard-Antrag nutzt den Baustein (nicht von Hand). Sichtbar anders: die Warnung als Liste (Bilder für E-21 im Scratchpad, siehe E.12) und drei Randfälle (E.12); `cm-verwaltung`, `turnier`, `cm-anmeldung`, `cm-doppel-verwaltung` grün; voller `make check` grün (2427 Tests, E2E 524/64, 5,4 Minuten). Davor **16** (14.11.2026, Review «ok», gemergt als Version 0.22.2; Teil 2 mit der Doppel-Seite verworfen, F-30: A, E-51; Ergebnis in 7.4, Protokoll Anhang E.11): Vorab-E2E `tests/e2e/cm-ablauf.test.ts` (drei Fälle je Handy, auf dem alten Stand grün, einmal rot), die Ablauf-Funktion `src/lib/cm/ablauf.ts` mit 15 Einheitsfällen (Abdeckung 100 %), sieben der acht Handler der CM-Seite darauf, `angabenSenden` bleibt von Hand (Abbruchstelle 2), die zwei Text-Dialoge als `src/lib/cm/Textdialog.svelte`; Sätze, Reihenfolge und Fokus unverändert, Markup gleich bis auf die `id`s; für die Nutzerin nichts; voller `make check` grün (2427 Tests, E2E 516/60, 5,3 Minuten). Davor **15, Lauf 2** (14.11.2026, Review «ok», mit Lauf 1 und 1b gemergt als Version 0.22.1; Ergebnis in 7.4, Protokoll Anhang E.9): die vier Listen der Verwaltung (`turniere`, `anlaesse`, `verlauf`, `mitglieder`) laden ihr erstes Laden in einer neuen `+page.ts` über den Wächter (Fall `verwaltung`); eine Störung bleibt eine Meldung in der Seite (`zeilen: null`, keine Fehlerseite); `mitglieder` lädt nach Suche und Filter weiter im Baustein, ohne zweite Abfrage beim Einhängen; Vorab-Tests (E2E 5 Fälle je Gerät, auf dem alten Stand grün, einmal rot) und 13 Einheitsfälle der vier Ladefunktionen; für die Nutzerin nur die zwei Folgen aus E-48; voller `make check` grün (2412 Tests, E2E 510/57, 3,9 Minuten). Davor **15, Lauf 1b (Interclub)** (14.11.2026, Review «ok» am 14.11.2026 zusammen mit Lauf 1; Ergebnis in 7.4, Nachmessen Anhang E.7, Protokoll Anhang E.8): `origin/dev` mit #81 eingemergt (Layout in der Fassung von `dev`, Entscheide des Branches neu E-48 bis E-50), Vorab-Tests für die drei Interclub-Seiten und das Wurzel-Layout (E2E vier Fälle mehr und drei Adressen mehr in der Tabelle, 15 Einheitsfälle, je Gruppe einmal rot), Wurzel-Layout auf `ladeSitzung` (Typ `Sitzung` mit `interclub`), die drei Interclub-Ladefunktionen auf dem Wächter (Fall `mitglied`); keine Zeile mehr in der Wächter-Tabelle, Fälle L und M benannt und unverändert; für die Nutzerin ändert sich nichts; voller `make check` grün (2399 Tests, E2E 495/57, 3,4 Minuten). Davor **15, Lauf 1** (13.11.2026, Branch `refactor/schritt-15`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.6): Vorab-Tests in drei Teilen (E2E 21 Fälle auf drei Geräten, 91 Einheitsfälle der Ladefunktionen, je Teil einmal rot), `ladeSitzung` und die Wächter-Tabelle `src/lib/login/waechter.ts` mit zwei Hüllen und sechs benannten Fällen (neu `verwaltung-zugang`), 22 Ladefunktionen, das Wurzel-Layout, 17 Stellen nach einer Aktion und das Abmelden umgestellt, `hilfe/+page.ts` auf `ladeKontakt`; keine Ladefunktion ruft `fetch`, keine Seite schreibt die Umleitung zum Login; für die Nutzerin ändert sich nichts; voller `make check` grün (2300 Tests, E2E 477/57, 4,1 Minuten); Review «ok» am 14.11.2026 (mit Lauf 1b). Davor **14** (13.11.2026, Review «ok» ohne Befund, Version 0.20.21; Ergebnis in 7.4, Protokoll Anhang E.4): `verwaltung/api.ts` nach Bereichen geteilt, in `zugang-api.ts`, `anlass-api.ts`, `gespraech-api.ts`, `mitglieder-api.ts` und `turnier-api.ts`; `api.ts` bleibt der Kern (`Antwort<T>`, Vertrag, `lese`, `schicke`) und reicht nichts weiter; 42 Dateien wechseln nur Import-Zeilen, 44 Tests auf fünf Dateien verteilt, keiner geändert; voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.3): Profil, Login, Passkey und `hatSitzung` auf dem Baustein, Umbenennung `ergebnis` → `art`, beide Kleinfragen aufgenommen (`{ art }` beim E-Mail-Wechsel, vier benannte Anfragen der Login-Seiten), N-09 (`src/lib/anlass/antwort.ts`), Wortlisten der Verträge an den Typ gebunden, `abruf.ts` in der Abdeckung; die Lint-Regel zu `fetch` verworfen (98 Meldungen am heutigen Repo, Vorschlag an Schritt 15); voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 1** Abruf-Baustein (13.11.2026, Review «ok» ohne Befund; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **1. Der Nachtrag zur Etappe 2** (kein Plan-Schritt; Branch `refactor/nachtrag-etappe-2`, umgesetzt und reviewt am 14.11.2026, Merge als Version 0.22.6 nach einem grünen CI-Lauf auf dem Branch; Umfang und Stand in 7.5, «Nachtrag zur Etappe 2»): (a) die Fokus-Prüfung nach «hinfällig» in `tests/e2e/cm-ablauf.test.ts` gelockert auf «nicht im Seitenkörper verloren», kein Eingriff in die App (E-55); (b) `docs/ui-leitbild.md` nachgeführt: zweite Entscheid-Taste, Warnung als Liste, `Textdialog` (E-58). Vor dem Merge einmal die WebKit-CI auf dem Branch (N-23). **Das Ergebnis trägt der Orchestrator nach.** Bis dahin ist `dev` rot: Lauf 43616298374 zum Merge von Schritt 18, Job «E2E (iphone)», derselbe Fokus-Wackler wie nach Schritt 17 [G: am 14.11.2026 abgefragt, nicht neu gestartet] (1d, Unterabschnitt «Fokus-Wackler»). **2. Danach Schritt 19** (alte offene App-Versionen, E-09; Zeile und Hinweise in 7.5). Zuerst das **Nachmessen vorab** durch den `refactor-analyst`, zwingend und offen: was SvelteKit in der eingesetzten Version bietet (Name und Ort der Versionskennung, Abfrage-Abstand, Verhalten bei `ssr = false`); ob der Service Worker eine alte App am Leben hält; was eine feste Kennung für den Build-Ordner je E2E-Lauf (E-27) und für «neu ausgeliefert, gleiche Versionsnummer» bedeutet; ob die Kennung die Paketversion sein soll (hängt an F-15, wird nicht vorweggenommen). Danach **Halt: Checkpoint** «Bordmittel oder nur entfernen». **Dateien, die Schritt 19 anfasst:** `vite.config.ts`, `src/routes/+layout.svelte`, `src/lib/server/version.ts` und `version.test.ts`, `status.ts`, `src/routes/api/status/status.db.test.ts`, `Dockerfile` (Zeile 9), `docs/ci-cd-und-release.md` (Zeilen 415 bis 424 und 466), `docs/testkonzept.md:126`, allenfalls `src/service-worker/index.ts`; je nach Bordmittel ein neuer Test. **3. Danach 20, dann 20a** (7.5). Übergangsregel «Ab Schritt 15»: Der Satz der benannten Ausnahmen ist entschieden (E-57), das Einspielen in die `CLAUDE.md` durch den Orchestrator steht aus [G: `CLAUDE.md` im Worktree am 14.11.2026 gelesen, der Satz fehlt] |
-| **Wartet auf Freigabe des Projektleiters** | nichts. Checkpoint am Ende der Etappe 2 erledigt am 14.11.2026 (E-55 bis E-60). Checkpoint E-21 zu Schritt 17 erledigt am 14.11.2026 (E-52, E-53). Checkpoint am Ende der Etappe 1 erledigt am 12.11.2026 (E-41 bis E-44); die Berichtigungen der `CLAUDE.md` sind eingespielt (E-43). **Wartet auf den Orchestrator** (entschieden, nicht ausgeführt): der Satz C-11 in der `CLAUDE.md` (E-57); das Auslagern der Anhänge C, D und E in eigene Dateien (E-60); das Ergebnis des Nachtrags (7.5) |
-| **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen Fragen sind beantwortet, zuletzt F-31 bis F-34 am Checkpoint der Etappe 2 (jede mit A: E-55 bis E-58; Abschnitt 9.2). Eine Lesart dieses Laufs steht zur Bestätigung in 7.7 («Checkpoints», Etappe 3): Der Halt nach dem Nachmessen zu Schritt 19 bleibt trotz «ohne Halt» |
+| **Zuletzt erledigt** | **19, mit Antwort A** (14.11.2026, Review «ok», gemergt als Version 0.22.7; Ergebnis in 7.5, Protokoll Anhang F.2): `MINDESTVERSION`, `istVersionVertraeglich` und `mindestversion` in `/api/status` entfernt (Test zuerst rot, 4 von 9); die Ergänzung nach B (der nächste Link lädt nach einer neuen Auslieferung ganz neu) gebaut, im Verhalten auf allen drei Geräten gelungen, aber **Abbruchstelle 2**: Auf dem iPhone-Profil (WebKit) meldet die Konsole abgebrochene Abrufe (mit `cancel()` 9 von 45 Läufen rot, mit der wörtlichen Vorlage der Doku 2 von 45); nach E-61 ohne Umweg mit A beendet, E2E zurückgenommen; Doku «Alte Versionen auf dem Handy» neu (Neuladen nur, wenn ein Seitenwechsel scheitert; keine Mindestversion; Eingabe bleibt nicht erhalten); für die Nutzerin nichts; voller `make check` grün (2411 Tests, E2E 524/64, 3,5 Minuten). Davor **18** (14.11.2026, Review «ok» nach einem Doku-Befund, gemergt als Version 0.22.5; Ergebnis in 7.4, Protokoll Anhang E.13): `basis.css` in zehn Dateien unter `src/lib/design/` geschnitten (`grundlagen`, `rahmen`, `bedienelemente`, `karten`, `verwaltung`, `anleitung`, `uebergaenge`, `pc-layout`, `druck`, `verlauf`), Importe in `+layout.svelte` in dieser Reihenfolge nach `tokens.css`, Mockups und Leitbild nachgezogen; gebautes CSS vor und nach gleich (Node und SPA), Rot-Probe belegt; voller `make check` grün (2427 Tests, E2E 524/64, 5,6 Minuten). Davor **17** (14.11.2026, Review «ok», Checkpoint E-21 erledigt mit E-52 und E-53, gemergt als Version 0.22.4; davor der Nachtrag zu Schritt 16 als Version 0.22.3, E-54; Ergebnis in 7.4, Protokoll Anhang E.12): Vorab-E2E `tests/e2e/anmeldungsliste-ablauf.test.ts` (vier Fälle je Handy, auf dem alten Stand grün, einmal rot), `Aktionsdialog` um `neben` (zweite Entscheid-Taste) und `ohneHaupttaste` erweitert, die fünf Rückfragen der Einzel-Anmeldungsliste darauf (`fuehreAus`, eigene Sperre und rohe Dialoge weg); der Wildcard-Antrag nutzt den Baustein (nicht von Hand). Sichtbar anders: die Warnung als Liste (Bilder für E-21 im Scratchpad, siehe E.12) und drei Randfälle (E.12); `cm-verwaltung`, `turnier`, `cm-anmeldung`, `cm-doppel-verwaltung` grün; voller `make check` grün (2427 Tests, E2E 524/64, 5,4 Minuten). Davor **16** (14.11.2026, Review «ok», gemergt als Version 0.22.2; Teil 2 mit der Doppel-Seite verworfen, F-30: A, E-51; Ergebnis in 7.4, Protokoll Anhang E.11): Vorab-E2E `tests/e2e/cm-ablauf.test.ts` (drei Fälle je Handy, auf dem alten Stand grün, einmal rot), die Ablauf-Funktion `src/lib/cm/ablauf.ts` mit 15 Einheitsfällen (Abdeckung 100 %), sieben der acht Handler der CM-Seite darauf, `angabenSenden` bleibt von Hand (Abbruchstelle 2), die zwei Text-Dialoge als `src/lib/cm/Textdialog.svelte`; Sätze, Reihenfolge und Fokus unverändert, Markup gleich bis auf die `id`s; für die Nutzerin nichts; voller `make check` grün (2427 Tests, E2E 516/60, 5,3 Minuten). Davor **15, Lauf 2** (14.11.2026, Review «ok», mit Lauf 1 und 1b gemergt als Version 0.22.1; Ergebnis in 7.4, Protokoll Anhang E.9): die vier Listen der Verwaltung (`turniere`, `anlaesse`, `verlauf`, `mitglieder`) laden ihr erstes Laden in einer neuen `+page.ts` über den Wächter (Fall `verwaltung`); eine Störung bleibt eine Meldung in der Seite (`zeilen: null`, keine Fehlerseite); `mitglieder` lädt nach Suche und Filter weiter im Baustein, ohne zweite Abfrage beim Einhängen; Vorab-Tests (E2E 5 Fälle je Gerät, auf dem alten Stand grün, einmal rot) und 13 Einheitsfälle der vier Ladefunktionen; für die Nutzerin nur die zwei Folgen aus E-48; voller `make check` grün (2412 Tests, E2E 510/57, 3,9 Minuten). Davor **15, Lauf 1b (Interclub)** (14.11.2026, Review «ok» am 14.11.2026 zusammen mit Lauf 1; Ergebnis in 7.4, Nachmessen Anhang E.7, Protokoll Anhang E.8): `origin/dev` mit #81 eingemergt (Layout in der Fassung von `dev`, Entscheide des Branches neu E-48 bis E-50), Vorab-Tests für die drei Interclub-Seiten und das Wurzel-Layout (E2E vier Fälle mehr und drei Adressen mehr in der Tabelle, 15 Einheitsfälle, je Gruppe einmal rot), Wurzel-Layout auf `ladeSitzung` (Typ `Sitzung` mit `interclub`), die drei Interclub-Ladefunktionen auf dem Wächter (Fall `mitglied`); keine Zeile mehr in der Wächter-Tabelle, Fälle L und M benannt und unverändert; für die Nutzerin ändert sich nichts; voller `make check` grün (2399 Tests, E2E 495/57, 3,4 Minuten). Davor **15, Lauf 1** (13.11.2026, Branch `refactor/schritt-15`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.6): Vorab-Tests in drei Teilen (E2E 21 Fälle auf drei Geräten, 91 Einheitsfälle der Ladefunktionen, je Teil einmal rot), `ladeSitzung` und die Wächter-Tabelle `src/lib/login/waechter.ts` mit zwei Hüllen und sechs benannten Fällen (neu `verwaltung-zugang`), 22 Ladefunktionen, das Wurzel-Layout, 17 Stellen nach einer Aktion und das Abmelden umgestellt, `hilfe/+page.ts` auf `ladeKontakt`; keine Ladefunktion ruft `fetch`, keine Seite schreibt die Umleitung zum Login; für die Nutzerin ändert sich nichts; voller `make check` grün (2300 Tests, E2E 477/57, 4,1 Minuten); Review «ok» am 14.11.2026 (mit Lauf 1b). Davor **14** (13.11.2026, Review «ok» ohne Befund, Version 0.20.21; Ergebnis in 7.4, Protokoll Anhang E.4): `verwaltung/api.ts` nach Bereichen geteilt, in `zugang-api.ts`, `anlass-api.ts`, `gespraech-api.ts`, `mitglieder-api.ts` und `turnier-api.ts`; `api.ts` bleibt der Kern (`Antwort<T>`, Vertrag, `lese`, `schicke`) und reicht nichts weiter; 42 Dateien wechseln nur Import-Zeilen, 44 Tests auf fünf Dateien verteilt, keiner geändert; voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.3): Profil, Login, Passkey und `hatSitzung` auf dem Baustein, Umbenennung `ergebnis` → `art`, beide Kleinfragen aufgenommen (`{ art }` beim E-Mail-Wechsel, vier benannte Anfragen der Login-Seiten), N-09 (`src/lib/anlass/antwort.ts`), Wortlisten der Verträge an den Typ gebunden, `abruf.ts` in der Abdeckung; die Lint-Regel zu `fetch` verworfen (98 Meldungen am heutigen Repo, Vorschlag an Schritt 15); voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 1** Abruf-Baustein (13.11.2026, Review «ok» ohne Befund; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
+| **Nächster offener Schritt** | **19: Review und Merge** des Branches `refactor/schritt-19` (umgesetzt mit Antwort A, F.2). Ob das Ende an Abbruchstelle 2 ein Halt nach E-45 ist («Abbruch eines Subagenten»), entscheidet der Orchestrator; E-61 hat das Ende mit A vorab freigegeben. Die CI auf dem Branch vor dem Merge (N-23, P2-19c) ist nicht mehr zwingend: Der Branch bringt keinen neuen E2E. Nach dem Schritt Kurzbericht (E-62). Danach 20 (vorab nachmessen), dann 20a. **Der Nachtrag zur Etappe 2** ist erledigt: Review, CI auf dem Branch grün (Lauf 43620595027, alle drei Geräte), gemergt als Version 0.22.6; damit ist `dev` nach dem roten Lauf zu Schritt 18 wieder auf einem Stand, dessen gelockerte Prüfung auf der iPhone-CI gehalten hat |
+| **Wartet auf Freigabe des Projektleiters** | nichts. F-35 und F-36 beantwortet am 14.11.2026 (E-61, E-62); Checkpoint am Ende der Etappe 2 erledigt am 14.11.2026 (E-55 bis E-60) |
+| **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen sind beantwortet (zuletzt F-35: B, E-61; F-36: A, E-62) |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
-| **Vorab nachzumessen** | vor Schritt 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7); 20a braucht keines. **Für Schritt 16 erledigt am 14.11.2026 (Anhang E.10):** kein Entscheid des Projektleiters nötig, keine neue Frage; die Doppel-Seite wird **aufgenommen** (drei Handler, als zweiter Teil mit eigener Abbruchstelle; `suchen` und `neuLaden` bleiben von Hand); die Funktion passt für sieben der acht Handler der CM-Seite, `angabenSenden` nur mit eigener Angabe; den Fokus nach einer Aktion hält heute eine einzige E2E-Stelle, vier Handler haben keinen E2E-Fall, darum vier Vorab-E2E (`tests/e2e/cm-ablauf.test.ts`, ohne Mail-Code) zusätzlich zu den Einheitstests; «rund 250 Zeilen» eher 170 bis 210; keine gemeinsame Datei mit Schritt 17. **Für Schritt 15, Lauf 1b (Interclub) erledigt am 14.11.2026 (Anhang E.7):** mit #81 39 Adressen, 30 Ladefunktionen, 25 «nur der Wächter wechselt»; kein neuer Fall in der Wächter-Tabelle, zwei neue benannte Fälle L und M ausserhalb der Tabelle; zwei Ränder des Layouts; ein Vorab-Test aus Lauf 1 muss mit dem Merge mit. **Für Schritt 15 erledigt am 13.11.2026 (Anhang E.5):** Tabelle aller 36 Adressen mit Ziel; 17 statt 14 Stellen «nach einer Aktion»; acht benannte Fälle mehr (D bis K); Vorab-Test als E2E-Tabelle ohne Konto und Mail-Code plus Einheitstests der Ladefunktionen der Verwaltung; Wächter als Tabelle in `src/lib/login/waechter.ts` mit zwei Hüllen, `ladeSitzung` in `sitzung.ts`; zwei Läufe, ein Merge; Lauf 1 ändert für die Nutzerin nichts, Lauf 2 (vier Listen) freigegeben mit F-28 (E-48). **Für Schritt 13 erledigt am 12.11.2026 (Anhang E.1):** kein Entscheid des Projektleiters nötig, der Baustein erhält jeden heutigen Rand; «ein Wort gilt nur mit seinem Status» bleibt, dazu «für 401, 404 und 429 genügt der Status»; 57 Zeilen Vorab-Tests; Baustein `src/lib/abruf.ts`; drei Seiten statt vier (`willkommen` liest kein Ergebnis); N-09 aufnehmen, N-10 als geteilte Liste unter `src/lib/cm/`. Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
+| **Vorab nachzumessen** | vor Schritt 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7); 20a braucht keines. **Für Schritt 19 erledigt am 14.11.2026 (Anhang F.1):** Entscheid des Projektleiters nötig (F-35, F-36); den Eigenbau liest niemand (`mindestversion` nur in Tests, `istVersionVertraeglich` nur im eigenen Test); das Bordmittel ist aktiv, lädt aber nur im Fehlerfall neu; Kennung bleibt der Zeitstempel des Builds (Probe-Build: zwei Builds desselben Quelltexts unterscheiden sich nur in `version.json` und `service-worker.js`); der Service Worker hat keinen Cache; `Dockerfile` und Service Worker fallen aus der Dateiliste; ein neuer E2E mit untergeschobener `version.json` und Fokus-Ereignis, vorher rot. **Für Schritt 16 erledigt am 14.11.2026 (Anhang E.10):** kein Entscheid des Projektleiters nötig, keine neue Frage; die Doppel-Seite wird **aufgenommen** (drei Handler, als zweiter Teil mit eigener Abbruchstelle; `suchen` und `neuLaden` bleiben von Hand); die Funktion passt für sieben der acht Handler der CM-Seite, `angabenSenden` nur mit eigener Angabe; den Fokus nach einer Aktion hält heute eine einzige E2E-Stelle, vier Handler haben keinen E2E-Fall, darum vier Vorab-E2E (`tests/e2e/cm-ablauf.test.ts`, ohne Mail-Code) zusätzlich zu den Einheitstests; «rund 250 Zeilen» eher 170 bis 210; keine gemeinsame Datei mit Schritt 17. **Für Schritt 15, Lauf 1b (Interclub) erledigt am 14.11.2026 (Anhang E.7):** mit #81 39 Adressen, 30 Ladefunktionen, 25 «nur der Wächter wechselt»; kein neuer Fall in der Wächter-Tabelle, zwei neue benannte Fälle L und M ausserhalb der Tabelle; zwei Ränder des Layouts; ein Vorab-Test aus Lauf 1 muss mit dem Merge mit. **Für Schritt 15 erledigt am 13.11.2026 (Anhang E.5):** Tabelle aller 36 Adressen mit Ziel; 17 statt 14 Stellen «nach einer Aktion»; acht benannte Fälle mehr (D bis K); Vorab-Test als E2E-Tabelle ohne Konto und Mail-Code plus Einheitstests der Ladefunktionen der Verwaltung; Wächter als Tabelle in `src/lib/login/waechter.ts` mit zwei Hüllen, `ladeSitzung` in `sitzung.ts`; zwei Läufe, ein Merge; Lauf 1 ändert für die Nutzerin nichts, Lauf 2 (vier Listen) freigegeben mit F-28 (E-48). **Für Schritt 13 erledigt am 12.11.2026 (Anhang E.1):** kein Entscheid des Projektleiters nötig, der Baustein erhält jeden heutigen Rand; «ein Wort gilt nur mit seinem Status» bleibt, dazu «für 401, 404 und 429 genügt der Status»; 57 Zeilen Vorab-Tests; Baustein `src/lib/abruf.ts`; drei Seiten statt vier (`willkommen` liest kein Ergebnis); N-09 aufnehmen, N-10 als geteilte Liste unter `src/lib/cm/`. Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
 | **Nächster Checkpoint** | **Am Ende der Etappe 3** (nach dem Merge von 20a; 7.7). Bis dahin läuft die Etappe 3 ohne Halt mit Kurzbericht je Schritt (E-59; E-45 gilt weiter). **Halt davor** nur bei den Anlässen aus E-45: alles aus E-06, eine sichtbare Verhaltensänderung, Abbruch eines Subagenten, zweimal Befunde im Review, rote CI, eine Frage, die das Dokument dem Projektleiter vorbehält. Eine solche Frage steht schon fest: **nach dem Nachmessen zu Schritt 19** («Bordmittel oder nur entfernen», E-09). Der Checkpoint am Ende der Etappe 2 ist erledigt (14.11.2026) |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32) |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
@@ -2833,12 +2840,12 @@ Nummer; Vorbild ist der Nachtrag zu Schritt 16, E-54)
   und Fehler» nur in den Dialogen mit Warnung; Warnung als Liste, Fehler im Dialog und Satz mit
   Fokus gelten für die Anmeldelisten (`Aktionsdialog`), nicht für jede Rückfrage. Hinweis des
   Reviewers: Die neue Prüfung ist bewusst schwach (E-55). Vor dem Merge läuft die CI einmal auf
-  dem Branch (Lauf 43620595027, N-23); Merge danach als Version 0.22.6. Ergebnis der CI und der
+  dem Branch (Lauf 43620595027, N-23); CI auf dem Branch grün (alle drei Geräte); gemergt als Version 0.22.6. Ergebnis der CI und der
   Stand von `dev`: im Kopf «Stand».
 
 | Nr. | Ziel | Dateien | Nutzen | Risiko | Absicherung | Voraussetzung | Modell | Weg | Nachmessen vorab | Status |
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
-| 19 | [geändert] Alte offene App-Versionen (E-09): Die App erkennt mit den Bordmitteln von SvelteKit, dass eine neue Version ausgeliefert ist, und lädt beim nächsten Seitenwechsel neu. Der Eigenbau (`MINDESTVERSION`, `istVersionVertraeglich`) wird entfernt, `/api/status` nennt nur noch Status und Version. Die Doku sagt danach genau das. **Deckt das Bordmittel die Anforderung nicht, nur entfernen und die Doku auf «gibt es noch nicht» korrigieren** | `vite.config.ts`, `src/routes/+layout.svelte`, `src/lib/server/version.ts`, `status.ts` und ihre Tests, `Dockerfile` (Healthcheck liest nur `status`), `docs/ci-cd-und-release.md`; **[geändert, 1d P2-19a]** namentlich `src/lib/server/version.test.ts` und `src/routes/api/status/status.db.test.ts` (vier Stellen mit `mindestversion`), in `docs/ci-cd-und-release.md` auch der Satz zur Store-App (Zeile 466), `docs/testkonzept.md:126` und `Dockerfile:9` (nennen `version.json`), allenfalls `src/service-worker/index.ts`. Eine `svelte.config.js` gibt es nicht (Hinweise) | Doku und Code sagen dasselbe (B-04) | mittel | Neuer Test «nach neuer Version lädt der nächste Seitenwechsel neu» (E2E oder Einheit, je nach Bordmittel); `status.db.test.ts` angepasst; Rauchtest des Images; **[geändert, P2-19c]** bringt der Schritt einen neuen E2E, läuft er vor dem Merge einmal auf der WebKit-CI (N-23) | [geändert] der Nachtrag zur Etappe 2 ist gemergt; das Nachmessen muss vorliegen (es ist **offen**), danach Checkpoint | Opus | Subagent | **ja, zwingend (E-09):** über den Svelte-MCP-Server prüfen, was SvelteKit in der eingesetzten Version bietet (Versionskennung des Builds, Abfrage-Abstand, Verhalten bei `ssr = false`) und ob es die Zusage «alte App lädt neu» deckt [V]. **[geändert, P2-19b]** Dazu: (a) Name und Ort der Versionskennung (Einstellungen stehen im Plugin in `vite.config.ts`); (b) ob der Service Worker etwas zwischenspeichert, das eine alte App am Leben hält; (c) Folge einer festen Kennung für E-27 und für «neu ausgeliefert, gleiche Versionsnummer»; (d) ob die Kennung die Paketversion sein soll, ohne F-15 vorwegzunehmen. Ausgangspunkt: Hinweise zu Schritt 19 | offen |
+| 19 | [geändert] Alte offene App-Versionen (E-09): Die App erkennt mit den Bordmitteln von SvelteKit, dass eine neue Version ausgeliefert ist, und lädt beim nächsten Seitenwechsel neu. Der Eigenbau (`MINDESTVERSION`, `istVersionVertraeglich`) wird entfernt, `/api/status` nennt nur noch Status und Version. Die Doku sagt danach genau das. **Deckt das Bordmittel die Anforderung nicht, nur entfernen und die Doku auf «gibt es noch nicht» korrigieren** | `vite.config.ts`, `src/routes/+layout.svelte`, `src/lib/server/version.ts`, `status.ts` und ihre Tests, `Dockerfile` (Healthcheck liest nur `status`), `docs/ci-cd-und-release.md`; **[geändert, 1d P2-19a]** namentlich `src/lib/server/version.test.ts` und `src/routes/api/status/status.db.test.ts` (vier Stellen mit `mindestversion`), in `docs/ci-cd-und-release.md` auch der Satz zur Store-App (Zeile 466), `docs/testkonzept.md:126` und `Dockerfile:9` (nennen `version.json`), allenfalls `src/service-worker/index.ts`. Eine `svelte.config.js` gibt es nicht (Hinweise) | Doku und Code sagen dasselbe (B-04) | mittel | Neuer Test «nach neuer Version lädt der nächste Seitenwechsel neu» (E2E oder Einheit, je nach Bordmittel); `status.db.test.ts` angepasst; Rauchtest des Images; **[geändert, P2-19c]** bringt der Schritt einen neuen E2E, läuft er vor dem Merge einmal auf der WebKit-CI (N-23) | [geändert] der Nachtrag zur Etappe 2 ist gemergt; das Nachmessen muss vorliegen (es ist **offen**), danach Checkpoint | Opus | Subagent | **ja, zwingend (E-09):** über den Svelte-MCP-Server prüfen, was SvelteKit in der eingesetzten Version bietet (Versionskennung des Builds, Abfrage-Abstand, Verhalten bei `ssr = false`) und ob es die Zusage «alte App lädt neu» deckt [V]. **[geändert, P2-19b]** Dazu: (a) Name und Ort der Versionskennung (Einstellungen stehen im Plugin in `vite.config.ts`); (b) ob der Service Worker etwas zwischenspeichert, das eine alte App am Leben hält; (c) Folge einer festen Kennung für E-27 und für «neu ausgeliefert, gleiche Versionsnummer»; (d) ob die Kennung die Paketversion sein soll, ohne F-15 vorwegzunehmen. Ausgangspunkt: Hinweise zu Schritt 19. **Erledigt 14.11.2026 (Anhang F.1):** Bordmittel aktiv, lädt nur im Fehlerfall neu; für den Seitenwechsel die Ergänzung aus der Doku von SvelteKit; (a) `version: { name, pollInterval }` im Plugin, nicht gesetzt, Voreinstellung Zeitstempel und eine Stunde; (b) nein, kein Cache; (c) E-27 unberührt, der Zeitstempel erkennt «gleiche Versionsnummer»; (d) nein, nicht die Paketversion. Dateien berichtigt: ohne `Dockerfile` und Service Worker, dazu eine Funktion mit Test unter `src/lib/ui/` und ein E2E (Liste in F.1, Abschnitt 6) | **umgesetzt mit Antwort A** (14.11.2026, Branch `refactor/schritt-19`, nicht gemergt; Ergebnis unten, Protokoll Anhang F.2): Eigenbau weg; die Ergänzung nach B (E-61) an Abbruchstelle 2 abgebrochen (Konsolenfehler auf WebKit), nicht im Branch |
 | 20 | [geändert] E2E-Hilfen aufgeräumt (der alte Weg mit festem Turnierjahr weg, Datei nach Themen geteilt); ungenutzte Exporte entfernt. **[geändert, 1d P2-20a]** Elf Hinweise (zwei aus der Etappe 0, drei aus der Etappe 1, sechs aus der Etappe 2) aufnehmen oder ausdrücklich verwerfen (Hinweise zu Schritt 20). Die zwei Struktur-Prüfungen gehören nicht hierher, sondern in Schritt 20a | `tests/e2e/hilfen/login.ts`, einzelne Dateien unter `src/lib/`; allenfalls `scripts/e2e.ts`, `grundpruefung.db.test.ts`, `routen.test.ts`; für die Hinweise (c) bis (e) allenfalls eine neue Datei unter `tests/hilfen/`, `mitteilung/typen.ts` mit seinen Importen, `scripts/pruefungen/bauregel.ts`; **[geändert]** für die Hinweise (f) bis (k) allenfalls `src/lib/verwaltung/turnier-anzeige.ts` mit Test und `Aktionsdialog.svelte`, `tests/e2e/cm-ablauf.test.ts`, die sieben Testdateien aus H-18 mit `tests/hilfen/verwaltung-abruf.ts`, E2E-Dateien der Verwaltung, `src/lib/cm/api.ts` und `src/routes/+layout.svelte` (je ein Kommentar), `playwright.config.ts`; der Eintrag vom 09.11.2026 in `docs/beobachtungen.md` (N-26) | Kleinere Hilfen, weniger tote Namen (B-11, B-18) | niedrig | E2E voll; `svelte-check` | 11 (E-11: reicht Handarbeit nicht, Paketvorschlag zur Freigabe) | Sonnet | Subagent | ja: Die Liste ungenutzter Exporte stammt aus einer Textsuche [E]; vorab je Name bestätigen. **[geändert, P2-20c]** Dazu: was vom festen Turnierjahr noch offen ist (N-26); welche E2E-Tests der Verwaltung die Bestätigung per Mail-Code selbst prüfen (für (i)); die Stellen für Hinweis (d) | offen |
 | 20a | **[neu, E-56]** Zwei kleine Struktur-Prüfungen, damit die Regeln der Etappe 2 nicht nur im Review gehalten werden: (1) ESLint: kein Aufruf `fetch(` unter `src/`; (2) eine Prüfung «Die Design-Dateien werden nur im Wurzel-Layout importiert, vollständig und in der Reihenfolge der Liste; `brief.css` nur im Briefdruck». Kein App-Code, kein Verhalten | `eslint.config.js`, ein Test unter `scripts/` (Vorbild `importrichtung.test.ts`), `docs/ci-cd-und-release.md` (Liste der Prüfungen) | Die Regeln «Ab Schritt 15» und «Ab Schritt 18» haben ein Werkzeug, bevor sie in Schritt 24 Dauerregeln werden (H-07, H-13) | niedrig für die App, mittel für das Werkzeug | Je Regel eine Probe, vorher rot (ein `fetch(` in einem Baustein; eine vertauschte und eine fehlende Import-Zeile); am echten Repo grün ohne Ausnahme | 18, 20 | Opus | Subagent | nein (E.6 und E.13 haben gemessen) | offen |
 
@@ -2863,6 +2870,51 @@ Nummer; Vorbild ist der Nachtrag zu Schritt 16, E-54)
 - **Betriebsrisiko für den Checkpoint:** die Endlosschleife bei dauerhaft abweichender
   `version.json` (Anhang C.1).
 - **Test:** Ein Test kann `version.json` per `page.route` unterschieben.
+- **[neu] Ergebnis des Nachmessens (14.11.2026, Anhang F.1):**
+  - Der Ausgangspunkt oben stimmt für SvelteKit 3.1.1 [G: Paket und Doku]; dazu prüft die App
+    auch, wenn das Fenster den Fokus bekommt. Die Kopfzeile `x-sveltekit-version` greift bei
+    MyTCO nie (nur Server-Ladefunktionen, Form Actions, Remote Functions).
+  - «Lädt beim nächsten Seitenwechsel neu» leistet das Bordmittel nicht allein. Die Doku von
+    SvelteKit nennt dafür `beforeNavigate` mit `updated` aus `$app/state` im Wurzel-Layout.
+    Vorschlag: nur für angetippte Links, nach der Rückfrage «Nicht gespeichert», als reine
+    Funktion mit Test unter `src/lib/ui/`.
+  - `version.name` **nicht setzen** (Zeitstempel des Builds): erkennt «neu ausgeliefert, gleiche
+    Versionsnummer», nimmt F-15 nicht vorweg; `.dockerignore` schliesst `.git` aus, der Commit als
+    Kennung ginge nur mit Umbau. `pollInterval` bleibt.
+  - Der Service Worker hat keinen Cache und wird nicht angefasst. `Dockerfile:9` und
+    `docs/testkonzept.md:126` bleiben in der Sache richtig; `Dockerfile` fällt aus der Liste.
+  - Die Endlosschleife aus Anhang C.1 ist Bordmittel und bleibt; die Ergänzung erzeugt keine
+    (ein Laden je angetipptem Link).
+  - Die heutige Zusage der Doku (Mindestversion bei jeder Antwort, Eingabe bleibt erhalten,
+    Store-App prüft dieselbe Mindestversion) deckt keine Antwort; der Abschnitt wird neu
+    geschrieben.
+  - Entscheid: **F-35** und **F-36** (9.1). Dateiliste, Schnitt in Commits und fünf
+    Abbruchstellen: F.1, Abschnitt 6.
+
+**Ergebnis Schritt 19** (14.11.2026; umgesetzt mit Antwort A, Review «ok», Version 0.22.7;
+Protokoll in F.2)
+
+- **Entfernt:** `src/lib/server/version.ts` mit Test (`MINDESTVERSION`,
+  `istVersionVertraeglich`), in `status.ts` das Feld `mindestversion`; `/api/status` antwortet
+  mit `{ status, version }` (`status.db.test.ts` zuerst rot, 4 von 9). `APP_VERSION` bleibt.
+- **Ergänzung nach B: gebaut, abgebrochen.** Funktion `laedtGanzNeu` unter `src/lib/ui/` und
+  ein Zweig im `beforeNavigate` des Wurzel-Layouts nach der Rückfrage; ein E2E mit
+  untergeschobener `version.json` und `focus` (auf dem alten Stand 6 von 9 rot). Das Verhalten
+  stimmte auf allen drei Geräten (Rückfrage zuerst, `goto` und Zurück in der App, der nächste
+  Link lädt ganz neu; Abbruchstelle 1 nicht eingetreten). Aber das ganze Laden bricht laufende
+  Abrufe ab, und WebKit meldet das in der Konsole: iPhone-Profil 9 von 45 Läufen rot (mit
+  `cancel()`), 2 von 45 mit der wörtlichen Vorlage der SvelteKit-Doku; Android und Desktop
+  90 von 90 grün. Das ist **Abbruchstelle 2**; nach E-61 endet der Schritt mit A. Der E2E ist
+  zurückgenommen (eigener `test:`-Commit), Funktion und Layout sind nie committet.
+- **Doku:** `docs/ci-cd-und-release.md` «Alte Versionen auf dem Handy» neu (kein Zwischenspeicher;
+  neue Version beim nächsten Start; eine offene App bemerkt die Auslieferung, lädt aber nur neu,
+  wenn ein Seitenwechsel scheitert; keine Mindestversion; eine Eingabe bleibt nicht erhalten),
+  Satz zur Store-App auf «gibt es noch nicht»; Kommentar in `vite.config.ts` («`version` mit
+  Absicht nicht gesetzt»); `docs/testkonzept.md` bleibt richtig und unverändert;
+  `docs/datenschutz.md` nicht berührt.
+- **Für die Nutzerin:** nichts.
+- **Offen für den Projektleiter, falls B weiter gewünscht:** jede Rettung wäre neu zu
+  entscheiden (F.2, Abschnitt 2); kein Eintrag in 9.1 von diesem Lauf.
 
 **Hinweise zu Schritt 20** [geändert]
 
@@ -3001,11 +3053,11 @@ Schritt nimmt jeden auf oder verwirft ihn ausdrücklich im Bericht:
 | 13 [geändert] | drei Module ganz lesen; je Modul die Tabelle der Sonderfälle (204, 429, `eingabe` ohne `felder`, 401, unlesbares JSON, `ergebnis` statt `art`); Empfehlung «Wort gilt nur mit seinem Status»; die 13 `page.route`-Stellen; Ort des Bausteins; N-09 | Form des Bausteins; Liste der Vorab-Tests; allenfalls eine Frage an den Projektleiter. **Erledigt** 12.11.2026 (Anhang E.1): keine Frage nötig; 57 Zeilen Vorab-Tests; drei Seiten statt vier; Baustein `src/lib/abruf.ts` mit einem Vertrag je Modul |
 | 15 [neu] | alle Einstiege (Ladefunktionen und Aktionen im Baustein) mit ihrem heutigen Ziel, mit und ohne wartende Mail-Anfrage; Form des Vorab-Tests | Erwartung des Vorab-Tests; benannte Fälle des Wächters (E-44). **Erledigt** 13.11.2026 (Anhang E.5): 36 Adressen, elf benannte Fälle (A bis K), 17 Stellen nach einer Aktion; Vorab-Test in drei Teilen; zwei Läufe; Fragen **F-28** (vor Lauf 2) und **F-29**. Für Lauf 1b (Interclub) 14.11.2026 (Anhang E.7): 39 Adressen, Fälle L und M, keine Frage |
 | 16 [neu] | kurz: nur die Doppel-Seite (passt die Ablauf-Funktion der CM-Seite?) | aufnehmen oder ausdrücklich verwerfen. **Erledigt** 14.11.2026 (Anhang E.10): **aufnehmen** (drei Handler, zweiter Teil mit Abbruchstelle); sieben der acht Handler der CM-Seite passen ohne Rest; vier Vorab-E2E zum Fokus; keine Frage |
-| 19 [geändert] | was das Bordmittel von SvelteKit deckt; Name und Ort der Versionskennung; der Service Worker; Folge für E-27 und für «neu ausgeliefert, gleiche Versionsnummer»; Kennung und Paketversion, ohne F-15 vorwegzunehmen (Zeile 19, 1d P2-19b) | Checkpoint: Bordmittel oder nur entfernen |
+| 19 [geändert] | was das Bordmittel von SvelteKit deckt; Name und Ort der Versionskennung; der Service Worker; Folge für E-27 und für «neu ausgeliefert, gleiche Versionsnummer»; Kennung und Paketversion, ohne F-15 vorwegzunehmen (Zeile 19, 1d P2-19b) | Checkpoint: Bordmittel oder nur entfernen. **Erledigt** 14.11.2026 (Anhang F.1): Bordmittel aktiv, lädt nur im Fehlerfall neu; Kennung bleibt der Zeitstempel; Fragen **F-35** und **F-36** |
 | 20 [geändert] | ungenutzte Exporte je Name bestätigen; was vom festen Turnierjahr offen ist; welche E2E der Verwaltung die Bestätigung selbst prüfen; die Stellen für Hinweis (d) (1d P2-20c) | Liste des Schritts; je Hinweis «aufnehmen oder verwerfen» |
 | 23 | `release.ts`, `gruener-stand.ts`, Abschnitt «Versionen» | davor **F-15** |
 
-Erledigt: Nachmessen für Schritt 04 (Anhang C.3), 07 (Anhang D.3), 08 (Anhang D.5), 09 (Anhang D.7), 10 (Anhang D.9), 11 (Anhang D.11), 13 (Anhang E.1), 15 (Anhang E.5; Lauf 1b Anhang E.7), 16 (Anhang E.10). [geändert] Kein Nachmessen: 06, 06a, 12, 12a, 14, 17, 18, 20a, 21,
+Erledigt: Nachmessen für Schritt 04 (Anhang C.3), 07 (Anhang D.3), 08 (Anhang D.5), 09 (Anhang D.7), 10 (Anhang D.9), 11 (Anhang D.11), 13 (Anhang E.1), 15 (Anhang E.5; Lauf 1b Anhang E.7), 16 (Anhang E.10), 19 (Anhang F.1). [geändert] Kein Nachmessen: 06, 06a, 12, 12a, 14, 17, 18, 20a, 21,
 22, 24, 25; auch der Nachtrag zur Etappe 2 braucht keines (die Belege stehen in 1d).
 
 **Checkpoints [geändert]** (für die Etappen 1 und 2 entschieden mit E-26 und E-30, für die
@@ -3089,12 +3141,14 @@ sie hebt die Übergangsregeln auf.
 | **E-58** [neu] | (F-34, 14.11.2026) Antwort A: Ok für die Etappen 3 und 4 mit den Änderungen der Zwischenrevision (Abschnitt 1d): Zielbild Z2-4 bis Z2-7, Plan-Zeilen 19, 20, 21 und 25, 7.7, die Zuordnung der Tabellen H und N. Das UI-Leitbild wird **sofort** nachgeführt (zweite Entscheid-Taste, Warnung als Liste, `Textdialog`), im selben Nachtrag wie E-55, nicht erst in Schritt 21. **Das ändert E-52 in dem Punkt «spätestens in Schritt 24».** In Schritt 21 bleibt nur, was der Nachtrag nicht deckt: der Kommentar in `grundlagen.css:4` und die Liste der Bausteine der Etappe 2, dazu vom Leitbild, was dann noch offen ist. |
 | **E-59** [neu] | (14.11.2026) Die Etappe 3 läuft wie die Etappe 2 ohne Halt, mit Kurzbericht je Schritt; E-45 gilt weiter. Angehalten wird bei den dort genannten Anlässen. |
 | **E-60** [neu] | (Zusatz zu F-34, 14.11.2026) Die Protokolle (Anhänge C, D und E) werden je Etappe in eine eigene Datei ausgelagert; der Stand bleibt in diesem Dokument. Ausgeführt am 14.11.2026 (Orchestrator): `docs/refactoring-protokoll-etappe-0.md`, `-1.md`, `-2.md`; kein Wort der Protokolle geändert. Das Protokoll der Etappe 3 kommt als Anhang F in dieses Dokument. |
+| **E-61** [neu] | (F-35, 14.11.2026) Antwort B: Schritt 19 entfernt den Eigenbau (`MINDESTVERSION`, `istVersionVertraeglich`, `mindestversion` in `/api/status`) und baut die Ergänzung zum Bordmittel von SvelteKit: Hat die App eine neue Auslieferung bemerkt, lädt der nächste angetippte Link die Seite einmal ganz neu; nur Links, nicht `goto` und nicht die Zurück-Geste; die Rückfrage «Nicht gespeichert» kommt vorher. `version.name` wird nicht gesetzt. Die Zusage «Mindestversion» fällt aus der Doku; eine erzwungene Mindestversion wäre neue Funktion. Geht die Ergänzung nicht auf (Abbruchstellen in F.1), endet der Schritt mit A (nur Bordmittel, Doku beschreibt den Fehlerfall). Die kleine sichtbare Änderung ist damit freigegeben. **Ausgang (14.11.2026): umgesetzt ist A.** Die Ergänzung tat das Richtige, erzeugte auf WebKit aber Konsolenfehler aus abgebrochenen Abrufen (Abbruchstelle 2, dem Sinn nach; Anhang F.2). B bleibt als Beobachtung für nach dem Feature-Stopp (`docs/beobachtungen.md`). |
+| **E-62** [neu] | (F-36, 14.11.2026) Antwort A: Nach Schritt 19 genügt ein Kurzbericht, kein Halt vor dem Merge. |
 
 ---
 
 ## 9 Fragen [geändert]
 
-Vierunddreissig Fragen an den Projektleiter (F-01 bis F-34). **[geändert] Offen ist eine: F-15** (vor Schritt 23).
+Sechsunddreissig Fragen an den Projektleiter (F-01 bis F-36). **[geändert] Offen sind drei: F-15** (vor Schritt 23), **F-35 und F-36** (vor Schritt 19, aus dem Nachmessen in Anhang F.1).
 F-17 und F-20 bis F-30 stehen noch unter 9.1, sind aber beantwortet oder erledigt: F-17, F-20 und
 F-21 mit E-36 bis E-38, F-24 bis F-27 am Checkpoint der Etappe 1 mit E-41 bis E-44 (12.11.2026,
 jede wie empfohlen), F-28 und F-29 mit E-48 und E-49 (13.11.2026), F-30 mit E-51 (14.11.2026); F-22 hat der Ablauf erledigt, F-23 ist in F-26 aufgegangen. **[neu]** F-31 bis F-34 sind am Checkpoint der Etappe 2 beantwortet
@@ -3385,6 +3439,49 @@ Laden gehöre zur Seite, nicht in einen Baustein. Der Plan kennt die zwei Stelle
   in E.10 (Vorab-E2E T4, drei Handler), eigenes Review. Mehr Angaben in der Funktion für eine
   einzige Seite.
 - **Hält auf:** nur Teil 2 und den Merge von Schritt 16.
+
+**F-35 [BEANTWORTET 14.11.2026: B, E-61; umgesetzt mit A, Anhang F.2] [neu] — Alte offene App nach einer Auslieferung: was soll Schritt 19 bauen?**
+(E-09, B-04; Zeile 19; Nachmessen Anhang F.1)
+
+**Frist: vor Schritt 19 (Checkpoint nach dem Nachmessen).** Gemessen ist: Der Eigenbau
+«Mindestversion» wirkt nirgends und kann ohne Folgen weg. SvelteKit bringt die Erkennung einer
+neuen Auslieferung schon mit, sie ist heute aktiv; von selbst neu geladen wird aber nur, wenn
+beim Seitenwechsel etwas scheitert. Was die Doku heute zusagt (der Server nennt bei jeder
+Antwort eine Mindestversion, eine angefangene Eingabe bleibt erhalten), deckt keine der drei
+Antworten; das war nie gebaut.
+
+- **A: Nur das Bordmittel, kein neuer Code.** Eigenbau weg. Die Doku sagt, was gilt: Ein Neustart
+  der App holt immer den neuen Stand; eine offene App lädt neu, sobald ihr beim Seitenwechsel ein
+  Baustein fehlt. **Folge:** für die Nutzerin ändert sich nichts. Eine offene App, die nichts
+  nachladen muss, arbeitet bis zum nächsten Start mit altem Code weiter. Risiko niedrig.
+- **B: Bordmittel plus die von SvelteKit dokumentierte Ergänzung.** Wie A, dazu wenige Zeilen im
+  Wurzel-Layout: Hat die App eine neue Auslieferung bemerkt (wenn sie in den Vordergrund kommt,
+  sonst stündlich), lädt der nächste angetippte Link die Seite ganz neu. **Folge:** einmal je
+  Auslieferung ein kurzer Neuaufbau statt des Schiebe-Übergangs; gemerkte Rollstände sind weg.
+  Ein geändertes Formular fragt zuerst «Nicht gespeichert», wie heute. Ein neuer E2E, einmal auf
+  der WebKit-CI vor dem Merge. Risiko mittel. Das ist, was die Zeile 19 beschreibt.
+- **C: Nur entfernen** (Rückfall aus E-09). Eigenbau weg, die Doku sagt «gibt es noch nicht».
+  **Folge:** wie A im Verhalten; die Doku sagte aber weniger, als gilt, denn der Fehlerfall ist
+  gebaut. Risiko niedrig.
+- **Bei allen dreien:** Die Kennung des Builds bleibt der Zeitstempel (nichts einstellen); die
+  Paketversion und F-15 bleiben unberührt. Die Zusage «Mindestversion» fällt aus der Doku; für
+  eine spätere Store-App gibt es dazu noch nichts. Eine vom Server erzwungene Mindestversion
+  wäre neue Funktion (Feature-Stopp) und steht nicht zur Wahl.
+- **Empfehlung: B**, eng gefasst (nur angetippte Links, nicht `goto` und nicht die
+  Zurück-Geste). Bricht der Schritt an einer der Abbruchstellen aus F.1 ab, endet er mit A.
+- **Hält auf:** Schritt 19. Die Schritte 20 und 20a hängen nicht daran.
+
+**F-36 [BEANTWORTET 14.11.2026: A, E-62] [neu] — Schritt 19 mit Antwort B: Halt nach dem Schritt oder Kurzbericht?**
+(E-45, E-59; 7.7 «Checkpoints», Lesart zur Etappe 3)
+
+**Frist: mit F-35.** Antwort B ändert für die Nutzerin sichtbar etwas, wenn auch nur einmal je
+Auslieferung; E-45 nennt eine sichtbare Verhaltensänderung als Anlass für einen Halt.
+
+- **A: Kurzbericht genügt.** Die Änderung ist mit F-35 beschrieben und freigegeben; die Etappe 3
+  läuft nach Schritt 19 ohne Halt weiter (Lesart aus 7.7 bestätigt).
+- **B: Halt nach dem Schritt**, mit dem Ergebnis des E2E und einem Bild vor dem Merge.
+- **Empfehlung: A.** Zu zeigen gibt es ausser einem Neuladen nichts; der Nachweis ist der Test.
+- **Hält auf:** nur den Merge von Schritt 19, und nur bei Antwort B.
 
 ### 9.2 Beantwortete Fragen
 
@@ -3755,3 +3852,465 @@ wie «Anhang D.5» oder «E.11» meinen die Abschnitte dort.
 
 Das Protokoll der laufenden Etappe 3 kommt als Anhang F in dieses Dokument und wird am Ende der
 Etappe ebenso ausgelagert.
+
+---
+
+## Anhang F — Protokoll Etappe 3 [neu]
+
+Nachmessen und Protokolle der Schritte 19, 20 und 20a. Die Kurzfassung je Schritt steht in 7.5.
+
+### F.1 Nachmessen Schritt 19
+
+**Nachmessen vor Schritt 19** (14.11.2026, Worktree `refactor/schritt-19` auf `7159355` =
+`origin/dev`, Version 0.22.5; gelesen, gezählt und ein Probe-Build in einer Kopie im Scratchpad;
+kein `make check`, kein E2E, keine Datenbank, kein laufender Server). Ganz gelesen [G]:
+`src/lib/server/version.ts`, `version.test.ts`, `status.ts`, `src/lib/version.ts`,
+`src/routes/api/status/+server.ts`, `vite.config.ts`, `Dockerfile`, `src/service-worker/index.ts`,
+`src/routes/+layout.ts`, `src/app.html`, `src/app.d.ts`, `src/hooks.client.ts`,
+`src/lib/ui/ungespeichert.ts`, `.dockerignore`. In Auszügen [E]: `src/routes/+layout.svelte`
+(Zeilen 1 bis 135 und 221), `src/hooks.server.ts`, `status.db.test.ts`, `status.test.ts`,
+`tests/e2e/startseite.test.ts`, `playwright.config.ts`, `betrieb/nachweis/nachweis.sh`,
+`.github/workflows/check.yml` (Job `image`), `docs/ci-cd-und-release.md` (Zeilen 382 bis 467),
+`docs/testkonzept.md:118–127`. SvelteKit: das **installierte Paket 3.1.1**
+(`node_modules/@sveltejs/kit`, Quelltext und Typen) [G] und die Doku-Seiten von svelte.dev
+(`@sveltejs-kit-vite`, `$app-state`, `service-workers`, `link-options`, `single-page-apps`, am
+14.11.2026 abgerufen) [G]; der Text zu `version` ist in Paket und Doku wortgleich. Die Werkzeuge
+des Svelte-MCP-Servers standen diesem Lauf nicht zur Verfügung.
+
+**Kurz:** Das Ziel der Zeile 19 stimmt, aber drei Annahmen gehen der Zeile vor. (1) **Das
+Bordmittel ist schon heute aktiv und braucht keine Einstellung**; es lädt aber **nur im
+Fehlerfall** neu, nicht «beim nächsten Seitenwechsel». Für den Seitenwechsel nennt die Doku von
+SvelteKit eine Ergänzung von fünf Zeilen im Wurzel-Layout; das ist eigener Code, klein, aber
+keine reine Einstellung. (2) **Die Kennung bleibt der Zeitstempel des Builds** (nichts setzen):
+Sie erkennt auch «neu ausgeliefert, gleiche Versionsnummer» und hängt nicht an F-15. (3) **Was
+die Doku heute verspricht, deckt kein Bordmittel**: eine vom Server bei jeder Antwort genannte
+Mindestversion und «eine angefangene Eingabe bleibt erhalten». Beides ist auch heute nicht
+gebaut. Es braucht einen Entscheid des Projektleiters (**F-35**, dazu kurz **F-36**).
+`Dockerfile` und `src/service-worker/index.ts` fallen aus der Dateiliste.
+
+#### 1 Der Eigenbau heute [G]
+
+| Stück | Fundstelle | Was es tut | Wer es liest |
+|---|---|---|---|
+| `MINDESTVERSION = '0.1.0'` | `src/lib/server/version.ts:2` | feste Zeichenkette, seit dem Gerüst nie erhöht | `status.ts:4`, `version.test.ts`, `status.db.test.ts` (Import und vier Erwartungen) |
+| `istVersionVertraeglich` | `src/lib/server/version.ts:16` | vergleicht zwei Nummern `x.y.z` | nur `version.test.ts` (16 Fälle); kein Aufruf unter `src/` ausserhalb des Tests |
+| Feld `mindestversion` | `status.ts:9` und `:23` (`StatusAntwort`, `ermittleStatus`) | steht in der Antwort von `/api/status` | niemand: keine Oberfläche, kein Skript, kein Betrieb [G: Textsuche über das Repo ohne `node_modules`] |
+| Feld `version` | `status.ts:23`, aus `APP_VERSION` (`src/lib/version.ts`, von `vite.config.ts:53` aus `package.json` eingesetzt) | Paketversion in der Antwort | niemand ausser den Tests; die Fusszeile liest `APP_VERSION` direkt (`+layout.svelte:221`) |
+| Kopfzeile «Mindestversion bei jeder Antwort» | **gibt es nicht** | die Doku nennt sie (`ci-cd-und-release.md:421`) | — |
+| Prüfung in der Oberfläche | **gibt es nicht** | kein `updated`, kein Vergleich, kein Neuladen wegen einer Version unter `src/` | — |
+
+- **Wer `/api/status` liest, und was davon [G]:** der Healthcheck (`Dockerfile:31`, nur
+  `j.status`), `betrieb/nachweis/nachweis.sh` (Statuscode und die Zeichenfolge `"status":"ok"`,
+  Zeilen 254 bis 269, 551, 1169), `betrieb/nachweis/rauchtest.sh` und der CI-Job `image` (warten
+  auf «healthy», also wieder nur `status`), `tests/e2e/startseite.test.ts:120` (nur Kopfzeilen),
+  `routen.test.ts:303` (Eintrag `EIGEN`), `status.test.ts` (nur `antwort.status` und das Log),
+  `docs/betrieb-und-uebergabe.md:81` (Überwachung: «ok»). **Keiner liest `mindestversion`.**
+- **Was beim Entfernen frei wird:** die Datei `src/lib/server/version.ts` (31 Zeilen) und
+  `version.test.ts` (33 Zeilen) ganz; in `status.ts` ein Import, ein Feld des Typs, ein Feld der
+  Antwort; in `status.db.test.ts` ein Import und vier Erwartungen. `src/lib/version.ts`
+  (`APP_VERSION`) und `__APP_VERSION__` bleiben: Fusszeile und `/api/status`.
+- **Was daran hängt:** nichts im Betrieb. Die Antwort von `/api/status` verliert ein Feld; das
+  ist eine Änderung der Schnittstelle nach aussen, die die Zeile 19 nennt. Die Abdeckung
+  (`vitest.config.ts`, `src/lib/server/**`, Schwelle 90 %) verliert eine voll gedeckte Datei
+  [V: Wirkung auf die Zahl nicht gemessen, bei rund 31 Zeilen vernachlässigbar].
+- **Historische Stellen, die der Schritt nicht anfasst:** `docs/superpowers/plans/` und
+  `…/specs/` (Gerüst, Auslieferung) nennen `MINDESTVERSION`; sie sind abgelegte Pläne (B-06,
+  Schritt 22). `docs/beobachtungen-archiv.md:640` und `:680` ebenso.
+
+#### 2 Was SvelteKit 3.1.1 mitbringt [G: Paket und Doku]
+
+- **Ort der Einstellung:** `version: { name, pollInterval }` im Aufruf `sveltekit({ … })` in
+  `vite.config.ts` (es gibt keine `svelte.config.js`; die Doku-Seite heisst «@sveltejs/kit/vite»).
+  Heute ist nichts gesetzt.
+- **Kennung (`name`):** Voreinstellung ist `Date.now()` beim Laden der Konfiguration
+  (`core/config/options.js:279`). Wer `name` setzt, muss einen festen Wert liefern (die Doku nennt
+  den Commit). Die Kennung steht an drei Stellen des Builds: in `_app/version.json`, in der
+  ausgelieferten HTML-Hülle (dort liest sie die App beim Start) und im gebündelten Service
+  Worker. **In keinem der Bausteine unter `_app/immutable/`.**
+- **Probe-Build [G]:** zweimal `vite build` auf demselben Quelltext: Kennungen `1794677043246`
+  und `1794677053312`; von 329 Dateien unter `build/client` unterscheiden sich genau
+  `version.json` und `service-worker.js` (je mit `.br` und `.gz`), alle Bausteine haben dieselben
+  Namen und Inhalte. Der statische Build (`MYTCO_SPA=1`) schreibt dieselbe Kennung in
+  `build/_app/version.json` und in `index.html`.
+- **Wann geprüft wird** (`runtime/app/state/client.svelte.js`, `runtime/client/client.js`):
+  - nach `pollInterval` (Voreinstellung eine Stunde, `0` schaltet nur das ab);
+  - wenn das Fenster den Fokus bekommt und wenn der Tab wieder sichtbar wird
+    (`client.js:3125–3133`); beim Handy also, wenn die App in den Vordergrund kommt [V: auf
+    einem echten iPhone als Startbildschirm-App nicht geprüft];
+  - wenn ein Seitenwechsel scheitert (siehe unten);
+  - über die Kopfzeile `x-sveltekit-version`. **Die greift bei MyTCO nie:** Der Server setzt sie
+    nur auf Antworten von Server-Ladefunktionen (`__data.json`), Form Actions und Remote
+    Functions (`with_version_header`, vier Aufrufstellen), und die Bauregel verbietet alle drei.
+    Die eigenen Schnittstellen unter `/api/` tragen sie nicht.
+  - Geprüft wird mit einem Abruf von `_app/version.json` (Anfrage mit `cache-control: no-cache`);
+    weicht die Kennung ab, wird `updated.current` wahr und bleibt es. Im Entwicklungsserver ist
+    die Prüfung aus (`if (DEV) return false`).
+- **Wann von selbst neu geladen wird:** nur in zwei Fällen, je nach einer Prüfung mit Ergebnis
+  «neue Version»: (a) der Code der Zielseite lässt sich nicht laden (`client.js:1538`; der alte
+  Baustein fehlt auf dem neuen Server); (b) die Zielseite endet mit einem Status ab 400
+  (`client.js:2072`). Dann aktualisiert SvelteKit erst den Service Worker und lädt die Zieladresse
+  als ganzes Dokument. **Ein gewöhnlicher Seitenwechsel lädt nicht neu**, auch wenn
+  `updated.current` wahr ist. Der Ausgangspunkt aus dem Review von Schritt 02 stimmt also; neu ist
+  nur die Prüfung bei Fokus (damals: «Tab wieder im Vordergrund»).
+- **Für den gewöhnlichen Seitenwechsel** nennt die Doku eine Ergänzung im Wurzel-Layout:
+  `beforeNavigate(({ willUnload, to }) => { if (updated.current && !willUnload && to?.url)
+  location.href = to.url.href; })`, mit `updated` aus `$app/state`. Das ist der Baustein für die
+  Zeile 19 («lädt beim nächsten Seitenwechsel neu»).
+- **`data-sveltekit-reload`:** ein Attribut an einem Link (oder einem Element darüber), das
+  diesen Link immer als ganzes Dokument lädt. Für Schritt 19 unpassend: Es gilt immer, nicht nur
+  nach einer neuen Version.
+- **`ssr = false`** (`+layout.ts:4`): ändert nichts. Die Hülle rendert der Node-Server bei jeder
+  Anfrage mit seiner Kennung; ein Neustart der App holt also immer den Stand des Servers.
+- **Node-Adapter:** `version.json` liegt ausserhalb von `_app/immutable/` und bekommt darum
+  nicht «ein Jahr unveränderlich» (`adapter-node/src/static.js:142–145`). Die Hülle trägt einen
+  `etag` über ihren Inhalt (`render.js:624`) und keine eigene Cache-Angabe [G: Quelltext; **nicht
+  an einem laufenden Server gemessen**, auch nicht hinter Caddy].
+- **Service Worker der App:** `src/service-worker/index.ts` hat nur `push` und
+  `notificationclick`, keinen `fetch`-Handler und keinen Cache (Kommentar Zeile 2, bestätigt
+  gelesen). **Er hält keine alte App am Leben.** Er importiert keine `version`; die Kennung
+  gelangt trotzdem in sein Bündel (als Wert der globalen Startangaben), darum ist die Datei nach
+  jedem Build neu, und der Browser richtet nach jeder Auslieferung einen neuen ein. Das ist heute
+  schon so und folgenlos, solange alter und neuer dasselbe tun. Randfall, **Beobachtung, nicht
+  Schritt 19** [V]: Ändert ein Release die Form der Push-Nutzlast, zeigt ein noch aktiver alter
+  Service Worker den Push nicht an (`leseNutzlast` gibt `null`), bis er abgelöst ist.
+- **Statischer Build (E-10):** `updated` und `beforeNavigate` laufen dort gleich; die Ergänzung
+  bräche den Build nicht [V: nicht gebaut, weil kein Code geschrieben wurde]. In einer
+  Store-App läge `version.json` aber **in** der App und wäre immer gleich der eigenen Kennung:
+  Das Bordmittel bliebe dort stumm. Eine Store-App braucht für «Bitte aktualisieren» eine eigene
+  Lösung; die gibt es nicht, und E-09 baut sie nicht.
+- **E-27 (eigener Build-Ordner je E2E-Lauf):** bleibt nötig und unberührt, solange die Kennung
+  der Zeitstempel ist. Eine feste Kennung (Paketversion) hätte den Fall aus Anhang C.1 («zweiter
+  Build im selben Ordner») nur verdeckt, wenn beide Builds dieselbe Nummer tragen.
+
+#### 3 Zusage der Doku gegen Code und Bordmittel
+
+Die Anforderung steht nur in `docs/ci-cd-und-release.md`, Abschnitt «Alte Versionen auf dem
+Handy» (Zeilen 415 bis 424), dazu ein Satz im Ausblick (Zeile 466). In den Anforderungen, im
+Datenschutzkonzept und in den ADR steht dazu nichts [G: Textsuche unter `docs/` nach
+«Mindestversion», «alte Version», «lädt neu»].
+
+| Satz der Doku | Code heute | Bordmittel ohne Zutun | mit der Ergänzung im Layout |
+|---|---|---|---|
+| «Die Web-App speichert sich auf dem Handy zwischen (Service Worker)» | **falsch**: kein Cache, mit Absicht | — | — |
+| «Eine neue Version lädt beim nächsten Start von selbst» | **stimmt**, weil nichts zwischengespeichert wird und der Server die Hülle je Anfrage liefert | stimmt | stimmt |
+| «Der Server nennt bei jeder Antwort die Mindestversion» | **nicht gebaut** (nur ein Feld in `/api/status`, das niemand liest) | **nein**: `x-sveltekit-version` gibt es nur für Antworten, die MyTCO nicht hat | nein |
+| «Ist eine offene App älter, lädt sie neu» | **nicht gebaut**; es wirkt nur das Bordmittel im Fehlerfall | nur, wenn ein Baustein fehlt oder die Zielseite mit Status ab 400 endet | beim nächsten Seitenwechsel, nachdem die App die neue Version bemerkt hat (Vordergrund, Fokus, stündlich) |
+| «eine angefangene Eingabe bleibt dabei erhalten» | **nicht gebaut** | **nein** | nein; es bleibt die Rückfrage «Nicht gespeichert» (siehe 5) |
+| «Die Mindestversion steigt nur, wenn eine Schnittstelle sich unverträglich ändert. Sonst bleiben Schnittstellen mit dem vorherigen Release verträglich» | erster Halbsatz gegenstandslos; der zweite ist eine Arbeitsregel ohne Werkzeug | — | — |
+| «Die Store-App prüft dieselbe Mindestversion …» (Zeile 466) | nicht gebaut | nein (siehe 2) | nein |
+
+- **Was das Bordmittel deckt:** den häufigen Fall «App offen, neue Auslieferung, die Nutzerin
+  wechselt die Seite». Mit der Ergänzung wird aus «nur wenn etwas scheitert» ein «beim nächsten
+  Seitenwechsel».
+- **Was kein Bordmittel deckt, und was mit E-09 verloren geht:** Der Server kann eine alte App
+  nicht **zwingen**. Wer nach einer Auslieferung auf derselben Seite bleibt und dort speichert,
+  schickt mit altem Code an neue Schnittstellen; die App bemerkt die neue Version zwar (Fokus,
+  Stunde), handelt aber erst beim Seitenwechsel. Den Hebel «diese Auslieferung ist unverträglich,
+  alle müssen sofort neu laden» gibt es dann nicht. Verloren geht damit nur ein Versprechen, kein
+  Verhalten: Gebaut war er nie. Ersatz ist die Arbeitsregel «Schnittstellen bleiben mit dem
+  vorherigen Release verträglich», die schon dasteht.
+- **Kritisch gelesen:** Der Rückfall aus E-09 («Doku auf ‹gibt es noch nicht›») wäre für den
+  Fehlerfall selbst falsch, denn der ist gebaut (von SvelteKit) und in Anhang C.1 beobachtet. Auch
+  beim Rückfall müsste die Doku sagen, was heute gilt.
+
+#### 4 Kennung, Paketversion und F-15
+
+- **Zwei Dinge, die heute beide «Version» heissen [G]:** (a) die **Paketversion** aus
+  `package.json` (`__APP_VERSION__` → `APP_VERSION`): Fusszeile, `/api/status`, Changelog, Tag;
+  an ihr hängen ADR-007, die Regel «jeder Merge mit Code bekommt eine Version», E-07 und F-15.
+  (b) die **Kennung des Builds** von SvelteKit: Zeitstempel, für Menschen unsichtbar, nur für
+  «ist der Server neuer als meine App».
+- **Empfehlung: `version.name` nicht setzen.** Gründe: (1) Der Zeitstempel ist je Build neu,
+  erkennt also auch «neu ausgeliefert, gleiche Versionsnummer»; die Paketversion als Kennung
+  erkennte das nicht. (2) Er hängt nicht an F-15: Was nach Schritt 23 eine Version ist und wie
+  oft sie steigt, ändert an der Erkennung nichts. Die Paketversion als Kennung nähme F-15 vorweg
+  (bei Antwort B von F-15 stiege sie gar nicht). (3) Test und Live bekommen dasselbe Image
+  (`check.yml`, Kommentar zur Auslieferung), also dieselbe Kennung; Live «bemerkt» nichts, was
+  nicht ausgeliefert wurde. (4) Der Commit als Kennung (Vorschlag der Doku) ginge im Image nicht
+  ohne Umbau: `.dockerignore` schliesst `.git` aus; es bräuchte ein Build-Argument in CI und
+  `Dockerfile` (ausserhalb des Schritts, E-16).
+- **Folge:** Schritt 19 berührt weder die Paketversion noch die Versionsregel. Er selbst bekommt
+  wie jeder Merge mit Code eine Version (E-07 gilt bis Schritt 23).
+- **«Bewusst festzulegen»** (Hinweis aus dem Review von Schritt 02) heisst danach: bewusst
+  **nicht** setzen und das an der Stelle sagen (ein Kommentar in `vite.config.ts`, ein Satz in
+  der Doku). `Dockerfile:9` und `docs/testkonzept.md:126` nennen den «Bauzeitstempel von
+  `version.json`» und bleiben damit richtig.
+- **`pollInterval`:** Voreinstellung lassen. Für eine App, die auf dem Handy in den Vordergrund
+  geholt wird, trägt die Prüfung bei Sichtbarkeit; die Stunde ist nur der Boden für einen Tab,
+  der offen bleibt.
+
+#### 5 Sichtbar für die Nutzerin, Absicherung
+
+- **Entfernen des Eigenbaus:** nichts sichtbar [G: niemand liest ihn].
+- **Die Ergänzung im Layout, ohne neue Auslieferung:** nichts sichtbar; `updated.current` bleibt
+  falsch.
+- **Nach einer Auslieferung, App war offen:** Der nächste Seitenwechsel lädt die Zielseite als
+  ganzes Dokument statt in der App. Sichtbar: kurzer Neuaufbau statt des Schiebe-Übergangs
+  (`onNavigate`, `+layout.svelte:98`); die gemerkten Rollstände und Klappen sind weg (`stand`,
+  `vergissKlappen`, nur im Speicher). Einmal je Auslieferung und Gerät. **Das ist eine sichtbare
+  Verhaltensänderung im Sinn von E-45**, klein und selten (F-36).
+- **Halb ausgefülltes Formular [G]:** Das Wurzel-Layout hat schon ein `beforeNavigate`
+  (`+layout.svelte:74`): Trägt die Seite ein Formular mit `data-ungespeichert` und kommt der
+  Wechsel von einem Link, bricht es ab und zeigt die Rückfrage; «Verlassen» wechselt mit `goto`.
+  Die Ergänzung muss **nach** dieser Prüfung stehen, dann fragt die App zuerst, wie heute. Zehn
+  Stellen tragen das Merkmal [E: Textsuche; fünf Formulare der Verwaltung, Profil, CM-Seite,
+  Doppel-Seite, Mitglied, Anlass]. Eingaben ohne Merkmal (Suchfelder, Filter) gehen beim
+  Seitenwechsel schon heute verloren.
+- **Drei Ränder der Vorlage aus der Doku, die der Schritt entscheiden muss [G für die Stellen, V
+  für die Wirkung]:** (a) `goto` mit Zustand: `clubmeisterschaft/[id]/doppel/[kid]/+page.svelte:118`
+  reicht `cmMeldung` als `state` mit; ein ganzes Laden verlöre die Rückmeldung. (b) Wechsel mit
+  `replaceState` (Wächter, Umleitungen): `location.href` legte einen Eintrag im Verlauf an statt
+  ihn zu ersetzen. (c) Zurück-Geste (`popstate`): `location.href = to.url.href` schöbe einen
+  neuen Eintrag nach, statt zurückzugehen. **Vorschlag:** nur Wechsel der Art `link` laden neu
+  (Reiter, Karten, Zurück-Link sind Links [E]); `goto` und `popstate` bleiben in der App. Das ist
+  enger als die Vorlage und genügt: Der nächste angetippte Link kommt bald. Als reine Funktion
+  neben `fragtVorWechsel` (`src/lib/ui/`), mit Einheitstest, wie `ungespeichert.ts`.
+- **Endlosschleife (Betriebsrisiko aus Anhang C.1):** Die Ergänzung erzeugt keine. Sie lädt je
+  angetipptem Link einmal; die neu geladene App liest ihre Kennung aus der frischen Hülle.
+  Weicht `version.json` dauerhaft von der Hülle ab (nur denkbar bei einem Zwischenspeicher vor
+  dem Server oder beim Fall aus C.1), lädt jeder Link ganz, bleibt aber bedienbar. Die Schleife
+  aus C.1 (Fehlerseite ab Status 400) ist Bordmittel, besteht heute und bleibt.
+- **Tests heute [G]:** keiner prüft eine neue Version. `tests/e2e/startseite.test.ts:20` und
+  `bewegung.test.ts:47` prüfen die Paketversion in der Fusszeile; `ungespeichert.test.ts` und
+  `tests/e2e/navigation.test.ts` die Rückfrage.
+- **Tests für den Schritt:**
+  1. `status.db.test.ts`: die vier Erwartungen auf `{ status, version }`, zuerst im Test (rot),
+     dann der Code. `toEqual` hält fest, dass kein drittes Feld bleibt.
+  2. Einheit: die neue Funktion «lädt dieser Wechsel neu?» (`link` und neue Version → ja; `goto`,
+     `popstate`, `willUnload`, ohne neue Version → nein), vorher rot.
+  3. E2E, eine Datei, ohne Konto und ohne Mail-Code (Seiten vor dem Login: `/login`, `/hilfe`,
+     `/datenschutz`): `page.route('**/_app/version.json')` schiebt eine fremde Kennung unter;
+     die Prüfung löst der Test mit einem `focus`-Ereignis am Fenster aus und wartet auf die
+     Antwort (keine feste Wartezeit); dann ein Link. Erwartung: Die Zielseite ist als Dokument
+     geladen (eine Marke am `window` ist weg). Gegenprobe im selben Test: ohne fremde Kennung
+     bleibt die Marke. **Auf dem alten Stand rot** (heute lädt der Link nicht neu), das ist der
+     Test «vorher rot» für die Verhaltensänderung. Dazu ein Fall «geändertes Formular: zuerst
+     die Rückfrage» nur, wenn er ohne Konto geht; sonst deckt ihn die Reihenfolge im Einheitstest
+     [V].
+  4. Charakterisierung des Bordmittels (fehlender Baustein lädt neu): **nicht empfohlen**; der
+     Test müsste den Namen eines gebündelten Bausteins erraten und prüfte SvelteKit, nicht MyTCO.
+  5. E2E läuft gegen den gebauten Server; im Entwicklungsserver ist die Prüfung aus, dort ist
+     nichts zu sehen. Vor dem Merge einmal die WebKit-CI auf dem Branch (N-23, P2-19c).
+  6. Beide Builds (`npm run build`, `build:spa`) sind Teil von `make check`.
+- **Nur von Hand prüfbar:** eine echte Auslieferung (alter Container weg, neuer da) mit einer
+  offenen App auf einem echten Handy, auch als Startbildschirm-App auf dem iPhone. Das geht erst,
+  wenn eine Umgebung läuft (B-02); bis dahin trägt der E2E mit untergeschobener Kennung.
+
+#### 6 Dateien, Schnitt, Abbruchstellen, Risiko
+
+**Dateiliste bei Antwort B (Empfehlung):**
+
+| Datei | Änderung |
+|---|---|
+| `src/lib/server/version.ts`, `src/lib/server/version.test.ts` | entfallen |
+| `src/lib/server/status.ts` | Import und Feld `mindestversion` weg |
+| `src/routes/api/status/status.db.test.ts` | Import weg, vier Erwartungen ohne `mindestversion` |
+| `src/lib/ui/` neue Datei mit Test (Name beim Schritt, Vorbild `ungespeichert.ts`) | reine Funktion «lädt dieser Wechsel neu?» |
+| `src/routes/+layout.svelte` | Import `updated`; im vorhandenen `beforeNavigate` nach der Rückfrage der Aufruf |
+| `tests/e2e/` neue Datei | der E2E aus 5 |
+| `vite.config.ts` | nur ein Kommentar: Kennung ist mit Absicht der Zeitstempel des Builds |
+| `docs/ci-cd-und-release.md` | Abschnitt «Alte Versionen auf dem Handy» (415 bis 424) neu, Satz zur Store-App (466) auf «gibt es noch nicht» |
+| `docs/testkonzept.md:126` | ein Halbsatz: mit einer fremden `version.json` lädt auch jeder Link ganz |
+| `docs/refactoring-analyse.md` | Stand, Zeile 19, Anhang F.2 |
+| `package.json`, `package-lock.json`, `docs/versionen.md` | Version beim Merge, wie bei jedem Schritt [E] |
+
+- **Nicht mehr in der Liste:** `Dockerfile` (der Healthcheck liest nur `status`, die Zeile 9
+  bleibt richtig), `src/service-worker/index.ts` (kein Cache, nichts zu ändern),
+  `status.test.ts`, `routen.test.ts`, `tests/e2e/startseite.test.ts`, `betrieb/` (E-16).
+- **Bei Antwort A:** ohne die neue Funktion, ohne `+layout.svelte`, ohne E2E; die Doku
+  beschreibt den Fehlerfall. **Bei Antwort C:** wie A, die Doku sagt «gibt es noch nicht».
+- **`docs/ui-leitbild.md`:** bei B nicht nötig (keine neue Fläche, kein Text). Ein sichtbarer
+  Hinweis «Neue Version» wäre neue Oberfläche und fiele unter «erst Leitbild, dann Code»; nicht
+  vorgeschlagen.
+
+**Schnitt in Commits (B):** (1) Eigenbau weg: Test zuerst, dann `version.ts`, `status.ts`.
+(2) `test:` Einheitstest der neuen Funktion und der E2E, rot belegt. (3) Funktion und Layout,
+Kommentar in `vite.config.ts`. (4) `docs:` beide Doku-Dateien und dieses Dokument. Commit (1) ist
+für sich mergbar; an ihm endet der Schritt, wenn (2) oder (3) abbricht.
+
+**Abbruchstellen:**
+
+1. Die untergeschobene `version.json` macht `updated.current` im E2E nicht verlässlich wahr
+   (auf einem der drei Geräte, besonders WebKit): kein Umweg über feste Wartezeiten; der Schritt
+   endet nach Commit (1) mit der Doku nach Antwort A und meldet es.
+2. Das ganze Laden stört die Rückfrage «Nicht gespeichert», den Schiebe-Übergang oder erzeugt
+   Konsolenfehler, die `startseite.test.ts` fängt: abbrechen, melden.
+3. Ein bestehender E2E wird rot, obwohl keine fremde Kennung im Spiel ist: abbrechen (die
+   Ergänzung muss ohne neue Version wirkungslos sein).
+4. Der statische Build bricht.
+5. Es zeigt sich ein Leser von `mindestversion` ausserhalb der Textsuche (etwa im Ordner
+   `intern/`, den dieser Lauf nicht liest): melden, nicht anpassen.
+
+**Risiko:** Antwort B «mittel» (Wurzel-Layout und Navigation, ein neuer E2E auf WebKit; aber
+wirkungslos ohne neue Version, und eine einzige Verzweigung). Antwort A und C «niedrig».
+**Modell:** bei B Opus, wie die Zeile; bei A oder C genügt Sonnet. **Weg:** Subagent, ein Lauf;
+der Schritt ist klein (unter 100 Zeilen Code und Tests ohne die Doku [V]) und fasst keine Datei
+an, die 20 oder 20a brauchen, ausser `+layout.svelte` (Schritt 20, Hinweis (j), ein Kommentar).
+
+#### Abweichungen von der Zeile 19 und den Hinweisen
+
+- «Mit den Bordmitteln … lädt beim nächsten Seitenwechsel neu»: Das Bordmittel allein tut das
+  nicht; es braucht die Ergänzung aus der Doku (eigener Code im Layout).
+- «`kit.version.name` ist bewusst festzulegen»: Ergebnis ist «bewusst nicht setzen».
+- «`Dockerfile` (Zeile 9)», «allenfalls `src/service-worker/index.ts`»: entfallen.
+- «Ein Test kann `version.json` per `page.route` unterschieben»: bestätigt als Weg; dazu braucht
+  es einen Auslöser der Prüfung (Fokus-Ereignis), sonst wartet der Test eine Stunde.
+- Zeile 19 nennt als Nutzen nur B-04. Der Abschnitt der Doku wird bei jeder Antwort neu
+  geschrieben; fünf seiner sieben Sätze stimmen heute nicht (Tabelle in 3).
+- Voraussetzung «der Nachtrag zur Etappe 2 ist gemergt»: Im gemessenen Stand `7159355` ist er
+  es nicht (`package.json` 0.22.5) [G]. Der Nachtrag ändert keine Datei dieses Schritts.
+
+#### Fragen an den Projektleiter
+
+F-35 (Bordmittel, Ergänzung oder nur entfernen) und F-36 (Halt nach dem Schritt), Wortlaut in
+9.1. Kein weiterer Entscheid nötig: Kennung, Abfrage-Abstand, Schnitt und Tests folgen aus dem
+Gemessenen.
+
+#### Bleibt (gut gelöst)
+
+- Der Service Worker ohne Cache: Er ist der Grund, warum «neue Version beim nächsten Start» ohne
+  jeden Code stimmt.
+- `APP_VERSION` an einer Stelle (`src/lib/version.ts`) und die Fusszeile mit Test.
+- `/api/status` mit `no-store`, ohne Details im Fehlerfall, und der Healthcheck, der nur
+  `status` liest: Darum ist das Entfernen ohne Folgen für den Betrieb.
+- Die Rückfrage «Nicht gespeichert» als reine Funktion mit Test; sie ist das Vorbild für die
+  neue Funktion.
+- Der eigene Build-Ordner je E2E-Lauf (E-27).
+
+#### Nicht geprüft, dünn belegt
+
+- Kein laufender Server: Kopfzeilen der Hülle und von `version.json` (Cache) sind aus dem
+  Quelltext gelesen, nicht gemessen; Caddy (`betrieb/caddy/`) nur nach Cache-Angaben durchsucht
+  (keine gefunden) [E].
+- Die Ergänzung ist nicht getippt und nicht gebaut; dass `focus` am Fenster die Prüfung in
+  allen drei Geräteprofilen auslöst, folgt aus dem Quelltext von SvelteKit, nicht aus einem Lauf
+  [V]. Darum Abbruchstelle 1.
+- Verhalten auf einem echten Handy (Startbildschirm-App im Hintergrund, Rückkehr) [V].
+- Vorladen beim Antippen (`data-sveltekit-preload-data="tap"`, `app.html:22`): Wie ein
+  gescheitertes Vorladen und das Neuladen im Fehlerfall zusammenspielen, ist nicht gelesen [V].
+- `+layout.svelte` ab Zeile 136 und die 36 Seiten sind nicht darauf gelesen, ob eine von ihnen
+  Zustand über einen Link-Wechsel im Speicher trägt; gefunden ist nur `cmMeldung` (über `goto`)
+  [E: Textsuche nach `state:`].
+- «Zehn Stellen mit `data-ungespeichert`» und «Reiter sind Links» aus Textsuche [E].
+- Der Ordner `intern/` ist nicht gelesen; `docs/superpowers/` nur über die Textsuche.
+- Die Wirkung auf die Abdeckung ist nicht gemessen.
+
+### F.2 Schritt 19
+
+**Lauf** (14.11.2026, refactor-implementer auf Opus, Worktree `refactor/schritt-19` auf
+`origin/dev` `8c4f8d2`, Version 0.22.6, plus das Nachmessen; Auftrag nach E-61, Antwort B).
+Gelesen [G]: Kopf, Zeile 19 mit den Hinweisen, F.1, E-09, E-61, E-62, F-35, F-36; beide
+`CLAUDE.md`; `docs/ci-cd-und-release.md` (Abschnitte «Alte Versionen auf dem Handy» und
+«Ausblick: Store-App»), `docs/testkonzept.md` (Testdaten, Zeile 126), `docs/datenschutz.md`
+(Textsuche). SvelteKit-Doku über den Svelte-MCP-Server (`$app/state`, `$app/navigation`,
+`@sveltejs/kit/vite`, 14.11.2026) und der Quelltext des installierten Pakets 3.1.1
+(`runtime/app/state/client.svelte.js`, `runtime/client/client.js`: `updated.check`, Ereignisse
+`focus` und `visibilitychange`, `_before_navigate`, Klick auf Links) [G].
+
+**Ergebnis: Antwort A.** Der Eigenbau ist weg. Die Ergänzung zum Bordmittel ist gebaut und im
+Verhalten auf allen drei Geräten gelungen, aber an **Abbruchstelle 2** gescheitert: Das ganze
+Laden erzeugt auf dem iPhone-Profil (WebKit) Konsolenfehler. Nach E-61 endet der Schritt darum
+mit A, ohne Umweg; die Ergänzung ist nicht im Branch.
+
+#### 1 Was gebaut und geprüft wurde
+
+- **Eigenbau weg (bleibt):** `src/lib/server/version.ts` und `version.test.ts` gelöscht, in
+  `src/lib/server/status.ts` Import, Feld des Typs und Feld der Antwort weg; `status.db.test.ts`
+  erwartet `{ status, version }` (viermal `toEqual`). `APP_VERSION` bleibt für Fusszeile und
+  `/api/status`. Abbruchstelle 5 nicht eingetreten: kein Leser von `mindestversion` ausserhalb
+  der Tests, auch nicht in `intern/` (den Ordner gibt es im Hauptordner nicht) [G: Textsuche über
+  das Repo ohne `node_modules`, `.git`, Build-Ordner].
+- **Ergänzung (verworfen):** eine reine Funktion `laedtGanzNeu(wechsel, { neueVersion,
+  ungespeichert })` unter `src/lib/ui/neue-version.ts` (wahr nur für `link`, ohne `willUnload`,
+  mit neuer Version und wenn die Rückfrage nicht kommt), fünf Einheitsfälle; im vorhandenen
+  `beforeNavigate` des Wurzel-Layouts nach der Rückfrage:
+  `if (to && laedtGanzNeu(navigation, { neueVersion: updated.current, ungespeichert })) { navigation.cancel(); location.href = to.url.href; return; }`.
+  `cancel()` statt der Vorlage, damit der Wechsel in der App nicht neben dem Laden weiterläuft.
+  Autofixer: keine Probleme.
+- **E2E (verworfen):** `tests/e2e/neue-version.test.ts`, drei Fälle, ohne Mail-Code (Brief-Code),
+  über Rolle und Beschriftung, ohne feste Wartezeit: `page.route('**/_app/version.json')` mit
+  fremder Kennung, `focus` am Fenster, Warten auf die Antwort; ganzes Laden erkannt an einer
+  Marke am `window`. (1) Gegenprobe ohne fremde Kennung; (2) Link nach neuer Version; (3)
+  geändertes Formular: Rückfrage zuerst, «Abbrechen» behält die Eingabe, «Verlassen» (`goto`)
+  und die Zurück-Geste bleiben in der App, erst der nächste Link lädt neu.
+  Abbruchstelle 1 **nicht** eingetreten: `updated` wurde in jedem Lauf wahr.
+
+#### 2 Zahlen
+
+| Lauf | Ergebnis |
+|---|---|
+| `status.db.test.ts` auf dem alten Code | rot, 4 von 9 (die vier Erwartungen) |
+| E2E auf dem alten Stand (ohne Ergänzung) | rot, 6 von 9: Fälle 2 und 3 je Gerät, genau an der Erwartung «Marke weg»; Rückfrage, `goto` und Zurück schon grün; Gegenprobe grün |
+| Einheitstest, zwei Mutationen | je 1 von 5 rot (ohne Rückfrage-Prüfung; `type !== 'leave'` statt `=== 'link'`), danach 5 von 5 |
+| E2E mit der Ergänzung (`cancel`), 15 Wiederholungen | Android und Desktop 90 von 90 grün; iPhone 36 von 45, **9 rot**, alle nur an `expect(fehler).toEqual([])`: `TypeError: Load failed` (7), `… /api/kontakt due to access control checks.` (1), `… /api/sitzung due to access control checks.` (1), `TypeError: Importing a module script failed.` (1); Fall 2: 2 von 15 rot, Fall 3: 7 von 15 |
+| E2E mit der wörtlichen Vorlage der SvelteKit-Doku (ohne `cancel`, kein `return`), nur iPhone, 15 Wiederholungen | 43 von 45, **2 rot**, ebenso Konsolenfehler (`… /api/anlaesse`, `/api/cm`, `/api/kontakt`, `/api/sitzung … due to access control checks.`) |
+| voller `make check` auf `28a37df` (Stand A) | grün, Exit 0: Lint, `svelte-check`, Prüfskripte, 2411 Tests in 170 Dateien (vorher 2427; 16 Fälle von `version.test.ts` entfallen), Abdeckung 96,98 % Anweisungen, beide Builds, E2E 524 bestanden, 64 übersprungen, 3,5 Minuten |
+
+- **Deutung [E]:** Das ganze Laden bricht Abrufe und Modul-Ladevorgänge ab, die beim Antippen
+  schon laufen (Vorladen beim Antippen, `data-sveltekit-preload-data="tap"`; die Reiter laden
+  ihren Code `eager`). WebKit meldet abgebrochene Abrufe als Fehler in der Konsole; Chromium
+  nicht. Für die Nutzerin ist nichts zu sehen, das Verhalten stimmt. Der Wortlaut von
+  Abbruchstelle 2 («erzeugt Konsolenfehler, die `startseite.test.ts` fängt») trifft aber zu,
+  und dieselbe Sammlung (`sammleKonsolenfehler`) hält jeder E2E fest, der einen solchen Link
+  antippt.
+- **Warum kein Umweg:** Jede Rettung wäre ein Umweg im Sinn von E-61: im Test die Meldungen von
+  WebKit herausfiltern (schwächt die Konsolen-Prüfung), das Vorladen nach einer neuen Version
+  abschalten oder abwarten (neues Verhalten), das Neuladen nach dem Wechsel in der App
+  (`afterNavigate` und `location.reload()`, lädt doppelt). Entscheiden müsste das der
+  Projektleiter.
+
+#### 3 Was im Branch bleibt (Antwort A)
+
+| Commit | Inhalt |
+|---|---|
+| `92a23a1` `test:` | `status.db.test.ts` ohne `mindestversion` (rot belegt) |
+| `7b9b38e` `refactor:` | `version.ts` mit Test weg, `status.ts` ohne Feld |
+| `8ba6016` `test:` | E2E zur Ergänzung (auf dem alten Stand rot belegt) |
+| `38979d7` `test:` | derselbe E2E zurückgenommen (Abbruchstelle 2) |
+| `28a37df` `docs:` | `docs/ci-cd-und-release.md` («Alte Versionen auf dem Handy» neu, Satz zur Store-App), Kommentar in `vite.config.ts`, `docs/versionen.md` «Unveröffentlicht» |
+
+- Die Funktion `neue-version.ts` mit Test und die Änderung am Layout sind **nie committet**; der
+  E2E steht in `8ba6016` im Verlauf. Für einen späteren Versuch genügt die Zeile oben.
+- `docs/testkonzept.md` bleibt unverändert: Zeile 126 ist bei A in der Sache richtig (F.1,
+  Abschnitt 4), die Datei nennt sonst weder Mindestversion noch Neuladen [G].
+- `docs/ui-leitbild.md` unverändert (keine Fläche, kein Text).
+- **Datenschutz:** nicht berührt. Entfernt wird ein Feld ohne Personenbezug; das Bordmittel
+  ruft nur die statische Datei `_app/version.json` ab; der Gerätespeicher (Code- und
+  Wechselanfrage) übersteht ein Neuladen wie bisher [G: Textsuche in `docs/datenschutz.md`].
+
+#### 4 Für die Nutzerin
+
+Nichts. Was die Doku bisher zusagte (Mindestversion bei jeder Antwort, Eingabe bleibt erhalten,
+Store-App prüft die Mindestversion), war nie gebaut und steht nicht mehr da. Eine offene App
+lädt wie bisher nur neu, wenn ein Seitenwechsel scheitert; sonst läuft der alte Code bis zum
+nächsten Start.
+
+#### 5 Ausserhalb des Schritts (Beobachtungen, nicht behoben)
+
+- **WebKit und abgebrochene Abrufe:** Dasselbe gilt für das Neuladen, das das Bordmittel im
+  Fehlerfall heute schon macht: Auch dort meldet WebKit abgebrochene Abrufe in der Konsole. Kein
+  E2E prüft den Fehlerfall (F.1, Test 4: nicht empfohlen); für die Nutzerin unsichtbar.
+- **Autofixer zum Wurzel-Layout:** schlägt für bestehenden Code vor, `zeigeTitel` und
+  `kopftitel` nicht in einem `$effect` zu setzen und `bind:this` durch eine Attachment zu
+  ersetzen; keine Fehler. Nicht Teil dieses Schritts (Schritt 20 kennt das Layout nur für einen
+  Kommentar).
+- **Hook und roter Einheitstest (A-15):** wie bekannt; der rote Einheitstest der Funktion stand
+  darum nur im Bericht.
+
+#### 6 Nicht geprüft
+
+- Ein echtes Handy, auch als Startbildschirm-App auf dem iPhone; eine echte Auslieferung mit
+  offener App (B-02).
+- WebKit unter Linux (iPhone-CI): nicht gelaufen. Für A ohne neuen E2E nicht nötig (P2-19c).
+- Ob die Konsolenfehler auch auf einem echten iPhone (Safari) auftreten [V].
+- Der Fehlerfall des Bordmittels (fehlender Baustein, Status ab 400) ist nur aus dem Quelltext
+  belegt (F.1), nicht in einem Lauf.
+- **Review (14.11.2026, refactor-reviewer): «ok», nichts vor dem Merge zu beheben.** Stand entspricht
+  Antwort A, von B ist nichts übrig, der Eigenbau ist ganz weg (kein Leser in `betrieb/`, CI,
+  `Dockerfile`, Skripten); die Aussagen der Doku sind an SvelteKit 3.1.1 und am Service Worker
+  nachgelesen. Hinweise, erledigt (Orchestrator): Einleitungssatz in `docs/ci-cd-und-release.md`
+  enger gefasst («Der Service Worker speichert nichts zwischen», der Browser hält die gehashten
+  Bausteine); E-61 und F-35 tragen den Ausgang; Kopf nachgeführt. Lesart, offengelegt:
+  Abbruchstelle 2 nennt Konsolenfehler, «die `startseite.test.ts` fängt»; gefangen hat sie der
+  neue E2E über dieselbe Sammlung, die Stelle trifft dem Sinn nach zu. Nicht geprüft vom Reviewer:
+  die Messläufe zu B (nie committet), `make check` (grüner Stand bestätigt), WebKit unter Linux.

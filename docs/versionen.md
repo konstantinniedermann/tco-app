@@ -8,6 +8,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.22.7 — Eigenbau «Mindestversion» entfernt (Refactoring Schritt 19)
+
+- `/api/status` nennt nur noch
+  `status` und `version`. Niemand las die Mindestversion; an der App ändert sich nichts. Die Doku
+  sagt jetzt, was bei einer neuen Auslieferung gilt: neue Version beim nächsten Start, eine offene
+  App lädt nur neu, wenn ein Seitenwechsel scheitert (Bordmittel von SvelteKit, E-61, Antwort A).
+
 ## 0.22.6 — Fokus-Prüfung der CM-Seite gelockert, UI-Leitbild zur Rückfrage (Nachtrag zur Etappe 2)
 
 - Der E2E-Test der CM-Seite prüft nach einer hinfälligen Anfrage nur noch, dass der Fokus nicht

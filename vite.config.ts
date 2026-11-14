@@ -22,6 +22,10 @@ export default defineConfig({
 				runes: true
 			},
 			outDir: e2eBuild && `${e2eBuild}/svelte-kit`,
+			// `version` ist mit Absicht nicht gesetzt: Die Kennung des Builds bleibt sein Zeitstempel,
+			// so erkennt eine offene App jede neue Auslieferung, auch mit gleicher Versionsnummer
+			// (docs/ci-cd-und-release.md, «Alte Versionen auf dem Handy»). Sie ist nicht die
+			// Paketversion (__APP_VERSION__ unten).
 			adapter: spa
 				? adapterStatic({ fallback: 'index.html' })
 				: adapterNode({ out: e2eBuild ? `${e2eBuild}/build` : 'build' }),
