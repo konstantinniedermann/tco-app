@@ -112,26 +112,8 @@ async function legeTurnierImJahrAn(jahr: number) {
 /**
  * Erfundenes Turnier in Vorbereitung, ohne Kategorien, in einem freien Jahr. Gibt Nummer und Jahr
  * zurück; der Name ist «Clubmeisterschaft <Jahr>».
- *
- * Ein festes Jahr nur für Tests aus Branches, die vor dieser Umstellung entstanden sind: Dann wird
- * ein altes Turnier desselben Jahres vorher gelöscht, und wie früher kommt nur die Nummer zurück.
- * Neue Tests geben kein Jahr an.
  */
-export async function legeTurnierAn(): Promise<TestTurnier>;
-export async function legeTurnierAn(festesJahr: number): Promise<number>;
-export async function legeTurnierAn(festesJahr?: number): Promise<TestTurnier | number> {
-	if (festesJahr !== undefined) return (await legeTurnierMitFestemJahrAn(festesJahr)).turnierId;
-	return legeTurnierInFreiemJahrAn();
-}
-
-async function legeTurnierMitFestemJahrAn(jahr: number): Promise<TestTurnier> {
-	await loescheTurnier(jahr);
-	const r = await legeTurnierImJahrAn(jahr);
-	if (r.ergebnis !== 'ok') throw new Error(`Turnier ${jahr} liess sich nicht anlegen`);
-	return { turnierId: r.id, jahr };
-}
-
-async function legeTurnierInFreiemJahrAn(): Promise<TestTurnier> {
+export async function legeTurnierAn(): Promise<TestTurnier> {
 	for (let versuch = 0; versuch < 20; versuch++) {
 		const frei =
 			FREIE_JAHRE.von + Math.floor(Math.random() * (FREIE_JAHRE.bis - FREIE_JAHRE.von + 1));
@@ -157,24 +139,12 @@ export async function benenneTurnier(turnierId: number, name: string): Promise<v
 /**
  * Wie `legeTurnierAn`, dazu diese Kategorien und offene Anmeldung (Anmeldeschluss 31. Mai des
  * Jahres). Gibt Nummer und Jahr des Turniers und die Nummern der Kategorien zurück, in der
- * Reihenfolge der Werte. Das feste Jahr wie bei `legeTurnierAn` nur für ältere Branches.
+ * Reihenfolge der Werte.
  */
 export async function legeOffenesTurnierAn(
 	kategorien: KategorieWerte[]
-): Promise<TestTurnier & { kategorieIds: number[] }>;
-export async function legeOffenesTurnierAn(
-	festesJahr: number,
-	kategorien: KategorieWerte[]
-): Promise<TestTurnier & { kategorieIds: number[] }>;
-export async function legeOffenesTurnierAn(
-	erstes: number | KategorieWerte[],
-	zweites?: KategorieWerte[]
 ): Promise<TestTurnier & { kategorieIds: number[] }> {
-	const kategorien = typeof erstes === 'number' ? (zweites ?? []) : erstes;
-	const { turnierId, jahr } =
-		typeof erstes === 'number'
-			? await legeTurnierMitFestemJahrAn(erstes)
-			: await legeTurnierInFreiemJahrAn();
+	const { turnierId, jahr } = await legeTurnierAn();
 	const kategorieIds: number[] = [];
 	for (const werte of kategorien) {
 		const r = await legeKategorieAn(hole().db, turnierId, werte);
