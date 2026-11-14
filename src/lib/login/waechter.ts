@@ -20,7 +20,8 @@ export type OhneZugang = 'abgemeldet' | 'kein-admin' | 'unbestaetigt';
  * Die benannten Fälle:
  * - `start`: die Startseite; wartet ein Mail-Code, dorthin, sonst auf dem Handy im Browser zur
  *   Einstiegsseite, sonst zum Login.
- * - `mitglied`: Profil, Anlass, die CM-Seiten; Mail-Code, sonst Login, nie die Einstiegsseite (F).
+ * - `mitglied`: Profil, Anlass, die CM- und die Interclub-Seiten; Mail-Code, sonst Login, nie die
+ *   Einstiegsseite (F).
  * - `ohne-mailcode`: `/profil/email` (A) und jede Aktion der Mitglieder-App (C); nur Login.
  * - `verwaltung`: die Seiten der Verwaltung und `leiteUm`; ohne Mail-Code (E).
  * - `verwaltung-zugang`: das Layout der Verwaltung; die Bestätigung liest es aus den Daten.

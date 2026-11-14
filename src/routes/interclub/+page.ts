@@ -1,6 +1,6 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { holeInterclub } from '../../lib/interclub/api.ts';
-import { holeSpeicher, leseMailanfrage } from '../../lib/login/mailanfrage.ts';
+import { leiteUmBeimLaden } from '../../lib/login/waechter.ts';
 import type { PageLoad } from './$types';
 
 // Oberste Seite des Reiters IC (UI-Leitbild, Reiter IC). Läuft nur im Browser (ssr = false).
@@ -8,10 +8,7 @@ import type { PageLoad } from './$types';
 // Nicht `interclub` nennen: Das Layout meldet unter diesem Namen, ob der Reiter IC steht.
 export const load: PageLoad = async ({ fetch }) => {
 	const r = await holeInterclub(fetch);
-	if (r.art === 'abgemeldet') {
-		const wartend = leseMailanfrage(holeSpeicher(), Date.now());
-		redirect(307, wartend ? '/login/mail' : '/login');
-	}
+	leiteUmBeimLaden(r, 'mitglied');
 	if (r.art === 'stoerung') error(503, 'Die Interclub-Resultate lassen sich gerade nicht laden.');
 	return { uebersicht: r.art === 'ok' ? r.daten : null };
 };
