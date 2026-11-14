@@ -8520,3 +8520,411 @@ beantworten.
   E2E-Hilfe `klappeAuf` und der Profil-Test greifen über CSS-Klassen (`.klappe`, `.kachel`, B-31
   Nr. 3); der neue Test nimmt `klappeAuf` mit und sucht die Kachel «Telefon» über die innerste
   Fläche mit diesem Text statt über `.kachel`.
+
+### E.7 Nachmessen Schritt 15, Lauf 1b (Interclub)
+
+**Nachmessen Schritt 15, Lauf 1b** (14.11.2026; Branch-Stand im Worktree `refactor-schritt-15`,
+`473566b`, neun Commits vor `baae295`; dev-Stand im Hauptordner, `origin/dev` = `e0d14a7`, 34
+Commits nach `baae295`, Version 0.22.0, Issue #81 gemergt)
+
+Anlass: Entscheid des Projektleiters vom 14.11.2026, Interclub in Schritt 15 aufzunehmen (auf dev
+steht dazu **E-47**: «der neue Code passt sich den Schritten an, die ihn berühren»). Am Code
+gelesen und gezählt, **nichts ausgeführt** (kein Test, kein Lint, kein `svelte-check`, kein Build,
+keine Datenbank); einzig `git merge-tree --write-tree origin/dev refactor/schritt-15` als Probe.
+Pfade unter `src/routes/`, wenn nichts anderes steht; «dev» meint `e0d14a7`, «Branch» `473566b`.
+
+- **Ganz gelesen [G], dev:** `+layout.ts`, `interclub/+page.ts`, `interclub/[id]/+page.ts`,
+  `interclub/[id]/[begegnung]/+page.ts` und die drei `+page.svelte` dazu;
+  `src/lib/interclub/api.ts`, `api.test.ts`, `Resultat.svelte`; `src/lib/ui/Umschalter.svelte`,
+  `ui/navigation.ts`; `src/lib/server/sitzung/schnittstellen.ts`,
+  `server/interclub/schnittstellen.ts`, `server/parse-id.ts`; `tests/e2e/interclub.test.ts`,
+  `tests/hilfen/interclub.ts`, `scripts/beispiel-interclub.ts`.
+- **Ganz gelesen [G], Branch:** `src/lib/login/waechter.ts`, `login/sitzung.ts`,
+  `login/sitzung.test.ts`, `src/lib/abruf.ts`, `+layout.ts`, `+page.ts`,
+  `clubmeisterschaft/+page.ts`, `clubmeisterschaft/[id]/+page.ts`, `anlass/[id]/+page.ts`.
+- **Als Diff `baae295..origin/dev` gelesen [G]:** `CLAUDE.md`, `docs/refactoring-analyse.md`,
+  `eslint.config.js`, `playwright.config.ts`, `scripts/pruefungen/bauregel.ts`,
+  `scripts/seed-lokal.ts`, `src/lib/server/dienste.ts`, `grundpruefung.db.test.ts`,
+  `routen.test.ts`, die drei Server-Tests mit der Antwort von `getSitzung`, `ui/Reiter.svelte`,
+  `tests/e2e/navigation.test.ts`.
+- **In Auszügen [E]:** `tests/e2e/waechter.test.ts` (Zeilen 1 bis 190, 265 bis 300, sonst die
+  Titel), `tests/oberflaeche/ladefunktionen.test.ts` (Zeilen 1 bis 150, 335 bis 424, sonst die
+  Titel); `server/interclub/ansicht.ts` (`hatInterclub`, Kopf von `ladeTeam` und `ladeBegegnung`);
+  `server/http.ts` (`mitSitzung`); `login/mailanfrage.ts` (`holeSpeicher`); `+layout.svelte` und
+  die Login-Seiten per Textsuche (`data.`, `goto(`, `refreshAll`, `invalidate`).
+- **Nicht gelesen:** `src/lib/interclub/anzeige.ts` (nur Anzeige, kein Abruf: Textsuche ohne
+  Treffer), der Import (`server/interclub/import.ts`, `swiss-tennis.ts`), `basis.css`, die
+  Beispieldateien, ADR-011, die Doku von #81.
+
+#### Ergebnis in Kürze
+
+- **Kein neuer Fall in der Wächter-Tabelle, keine Frage an den Projektleiter.** Die drei
+  Interclub-Ladefunktionen sind genau der Fall `mitglied`; je Datei fällt ein Block von vier Zeilen
+  weg. Keine sichtbare Änderung ist nötig.
+- **`ladeSitzung` muss nichts Neues zurückgeben.** Es reicht, dass der Typ `Sitzung` das Feld
+  `interclub` bekommt; `angemeldet` leitet das Layout aus dem Ergebnis ab (Regel unten, mit zwei
+  Rändern, die man treffen muss).
+- **Ein Vorab-Test aus Lauf 1 wird durch den Merge rot,** nicht durch den Umbau: «das
+  Wurzel-Layout zeigt das Band …» erwartet `{ ansicht }`, dev gibt `{ ansicht, interclub }`. Die
+  Erwartung muss im Merge-Commit mit; das ist die eine benannte Ausnahme von «die Vorab-Tests sind
+  seit `db9997f` unverändert».
+- **#81 berührt von den Dateien aus Lauf 1 nur drei:** `+layout.ts`, `CLAUDE.md` (mergt von
+  selbst), dieses Dokument (ein Konflikt-Block, die Entscheid-Tabelle). Keine Seite der
+  Verwaltung, keine der 22 umgestellten Ladefunktionen, kein `leiteUm`, keine E2E-Hilfe.
+- **Zahlen:** 39 statt 36 Adressen, 30 statt 27 Ladefunktionen, 25 statt 22 «nur der Wächter
+  wechselt»; die 17 Stellen nach einer Aktion bleiben 17. Für Lauf 2 ändert sich nichts.
+- **Zwei Eigenheiten der Interclub-Seiten, die bleiben** (E-44): eine ungültige Nummer führt zur
+  Übersicht `/interclub` und von dort zum Login, auf dem Handy im Browser also nicht zur
+  Einstiegsseite (anders als bei der CM, neu **Fall L**); ein 401 ohne lesbaren Körper ist bei
+  Interclub eine Störung, bei CM und Anlass «abgemeldet» (neu **Fall M**, im Abruf-Modul, nicht im
+  Wächter).
+
+#### 1 Die drei Interclub-Seiten: Seite × Auslöser → Ziel [G]
+
+Fortsetzung der Tabelle aus E.5 (dort Zeilen 1 bis 37), gleiche Spalten. Stand dev. Alle
+Umleitungen sind `redirect(307, …)`. Der Server prüft die Sitzung vor der Nummer
+(`mitSitzung` in `getInterclub`, `getInterclubTeam`, `getInterclubBegegnung`): Ohne Sitzung
+antwortet jede gültig geformte Nummer mit 401, Daten braucht es dafür keine.
+
+| Nr. | Adresse | Stelle, Auslöser | Ohne Sitzung | Ohne Sitzung, Mail-Code wartet | Sonst in der Ladefunktion | Test heute |
+|----:|---------|------------------|--------------|--------------------------------|---------------------------|------------|
+| 38 | `/interclub` | `interclub/+page.ts:11–14`, `abgemeldet` von `holeInterclub` | `/login`, auch auf dem Handy im Browser | `/login/mail` | `nicht-gefunden` (keine Interclub-Daten): Seite bleibt mit «Zurzeit gibt es keine Interclub-Resultate.»; Störung oder Netz weg: Fehlerseite 503 «Die Interclub-Resultate lassen sich gerade nicht laden.» | E2E `interclub:35` nur mit Sitzung; ohne Sitzung keiner |
+| 39 | `/interclub/[id]` | `[id]/+page.ts:13–16`, `abgemeldet` von `holeInterclubTeam` | `/login` | `/login/mail` | Nummer keine positive ganze Zahl (`:11`, vor jeder Abfrage) oder `nicht-gefunden` (`:17`): `/interclub`, von dort weiter wie Zeile 38; Störung: 503 «Das Team lässt sich gerade nicht laden.» | E2E `interclub:59` nur mit Sitzung und bekanntem Team |
+| 40 | `/interclub/[id]/[begegnung]` | `[begegnung]/+page.ts:16–19`, `abgemeldet` von `holeInterclubBegegnung` | `/login` | `/login/mail` | Team-Nummer ungültig (`:12`): `/interclub`; Begegnungs-Nummer ungültig (`:14`) oder `nicht-gefunden` (`:20`, auch fremde Begegnung): Seite des Teams, von dort weiter wie Zeile 39; Störung: 503 «Die Begegnung lässt sich gerade nicht laden.» | E2E `interclub:97` nur mit Sitzung und bekannter Begegnung |
+| 41 | jede Adresse (Wurzel-Layout) | `+layout.ts:15–32` (dev) | kein Band, kein Reiter IC; **prüft bei jedem Seitenwechsel neu** | gleich | mit Sitzung: `ansicht` und `interclub` aus `/api/sitzung`; neu geprüft wird dann nur, solange eine «Ansicht als …» läuft, sonst erst nach `refreshAll()` | E2E `interclub:32` (Reiter IC gleich nach dem Login, ohne Neuladen), `navigation:101`, `:335`, `:348` |
+
+Abgeleitet aus den Zeilen, je ohne Sitzung [G für die Kette im Code, V für den Browser, nicht
+ausgeführt]:
+
+| Adresse | Weg | Ziel ohne Mail-Code | Ziel mit Mail-Code |
+|---------|-----|---------------------|--------------------|
+| `/interclub`, `/interclub/1`, `/interclub/1/1` | 401 auf die eigene Abfrage | `/login` (alle Geräte) | `/login/mail` |
+| `/interclub/abc`, `/interclub/0`, `/interclub/abc/1` | ohne Abfrage nach `/interclub`, dort 401 | `/login` (alle Geräte, **nicht** `/willkommen`) | `/login/mail` |
+| `/interclub/1/abc` | ohne Abfrage nach `/interclub/1`, dort 401 | `/login` | `/login/mail` |
+
+**Passt in die Wächter-Tabelle?** Ja, alle drei in den Fall `mitglied` (`waechter.ts`, `TABELLE`:
+Mail-Code wartet → `/login/mail`, sonst `/login`, nie die Einstiegsseite). Der Block
+
+```ts
+if (r.art === 'abgemeldet') {
+	const wartend = leseMailanfrage(holeSpeicher(), Date.now());
+	redirect(307, wartend ? '/login/mail' : '/login');
+}
+```
+
+wird je Datei zu `leiteUmBeimLaden(r, 'mitglied');` an derselben Stelle, wie in
+`clubmeisterschaft/[id]/+page.ts:16`. Gleich bleibt dabei [G]: Der Gerätespeicher wird nur bei
+`abgemeldet` gelesen (`LAGE_IM_BROWSER` liest erst, wenn die Zelle fragt); die Reihenfolge
+«Nummer prüfen, abfragen, abgemeldet, nicht gefunden, Störung» bleibt; das Ziel ohne `resolve`
+wie vorher. `Ergebnis<T>` in `interclub/api.ts` hat `art` als Unterscheider, die Zusicherung
+`asserts r is Exclude<…>` greift wie bei `cm` [V: nicht mit `svelte-check` geprüft]. In
+`interclub/+page.ts` fällt der Import `redirect` weg, in allen drei der Import aus
+`mailanfrage.ts`. Die Umleitungen nach `/interclub` und zur Seite des Teams sind keine Fälle des
+Wächters und bleiben in der Seite, wie `redirect(307, '/')` bei der CM.
+
+**Zwei neue benannte Fälle** (Fortsetzung von A bis K aus E.5; beide liegen ausserhalb der
+Tabelle und stehen hier, damit Lauf 1b sie nicht «mitrepariert»):
+
+- **L** Eine Interclub-Adresse mit ungültiger oder unbekannter Nummer führt zur Übersicht bzw.
+  zur Seite des Teams, nicht zur Startseite. Ohne Sitzung endet der Weg darum auf dem Handy im
+  Browser auf `/login`; bei der CM (Fall H) über `/` auf `/willkommen`.
+- **M** `interclub/api.ts` hat den Vertrag «Körper Pflicht» (`VERTRAG`, `koerper: 'pflicht'`):
+  Ein 401 ohne lesbaren Körper ist eine Störung (Fehlerseite 503), keine Umleitung
+  [G: `abruf.ts:98`]. CM, Anlass und `ladeSitzung` deuten ihn als «abgemeldet» [E: E.6,
+  «Ausserhalb des Schritts aufgefallen (1)»]. Der Server sendet bei 401 immer einen Körper;
+  sichtbar ist es nicht. Der Wächter bekommt in dem Fall `stoerung` und tut nichts.
+
+**Nach einer Aktion, eigenes `fetch`, Laden beim Einhängen: nichts.** Die drei Seiten und die
+zwei neuen Bausteine (`src/lib/interclub/Resultat.svelte`, `src/lib/ui/Umschalter.svelte`) sind
+nur lesend: kein `fetch(`, kein `holen(`, kein `onMount`, kein `$effect`, kein `goto(`, kein
+`invalidate`, kein `/login` [G: die fünf `.svelte`-Dateien ganz gelesen; Textsuche über
+`src/routes/interclub`, `src/lib/interclub`, `Umschalter.svelte` trifft nur die drei Blöcke oben].
+Die Umschalter wechseln nur einen Zustand der Seite. `Reiter.svelte` liest `page.data.interclub`.
+**Die 17 Stellen bleiben 17.**
+
+#### 2 `+layout.ts`: was erhalten bleiben muss [G]
+
+Verhalten auf dev, Zeile für Zeile aus `load` gelesen, daneben, was `ladeSitzung` (Branch,
+Vertrag «nachsichtig», Wort `abgemeldet`) für dieselbe Antwort gibt:
+
+| Antwort von `/api/sitzung` | dev: `ansicht` | dev: `interclub` | dev: liest `url.pathname` (prüft beim nächsten Wechsel neu) | `ladeSitzung` gibt |
+|---|---|---|---|---|
+| Netz weg | `null` | `false` | ja | `stoerung` |
+| 401, 503, jeder Status ausserhalb 2xx | `null` | `false` | ja | `abgemeldet` bzw. `stoerung` |
+| 2xx, Körper nicht lesbar (auch 204) | `null` | `false` | **ja** (`.json()` wirft im `try`, `angemeldet` bleibt falsch) | `ok`, `daten: undefined` |
+| 2xx, Körper JSON `null` | `null` | `false` | **ja** (Lesen von `null.ansicht` wirft im `try`) | `ok`, `daten: null` |
+| 2xx, Objekt ohne laufende Ansicht | `null` | `interclub === true` | nein | `ok` mit dem Objekt |
+| 2xx, Objekt mit `ansicht` | der Wert | `interclub === true` | ja | `ok` mit dem Objekt |
+
+Rückgabe auf dev: genau `{ ansicht, interclub }`. `angemeldet` ist eine lokale Variable und geht
+nicht in die Daten.
+
+**Folgerung für Lauf 1b:**
+
+- `ladeSitzung` bleibt, wie es ist; Signatur und Ergebnis ändern sich nicht. Nur der Typ `Sitzung`
+  (`src/lib/login/sitzung.ts`) bekommt `interclub: boolean` als siebtes Feld, wie `getSitzung` es
+  sendet.
+- Das Layout leitet drei Werte ab, sinngemäss: `s` = die Daten, wenn `art === 'ok'` und die Daten
+  weder `undefined` noch `null` sind, sonst `null`; `ansicht = s?.ansicht ?? null`;
+  `interclub = s?.interclub === true`; `angemeldet = s !== null`; danach wie dev
+  `if (ansicht !== null || !angemeldet) void url.pathname` und `return { ansicht, interclub }`.
+- **Zwei Ränder, an denen eine naheliegende Fassung abweicht:** (1) `angemeldet = r.art === 'ok'`
+  allein wäre bei «2xx ohne lesbaren Körper» und «2xx mit `null`» wahr, dev prüft dort neu. (2)
+  `interclub` streng mit `=== true`, nicht «wahrhaftig». Beide sendet der Server nie; sie gehören
+  trotzdem in den Einheitstest (E-44).
+- **`angemeldet` nicht in die Rückgabe aufnehmen.** `+layout.svelte:30` liest
+  `page.data.angemeldet !== false` für die Reiter; das Feld kommt heute nur von `hilfe` und
+  `datenschutz`. Gäbe das Layout es mit, stünde es auf jeder Seite in `page.data`.
+- Der Aufruf bleibt `ladeSitzung(fetch)` ohne `'wurf'` (Netz weg ist im Layout keine Fehlerseite,
+  Fall G) und mit dem `fetch` der Ladefunktion: `GET` ohne Kopfzeile, wie dev.
+
+**Welche Tests halten das dev-Verhalten fest:**
+
+| Test | hält fest | hält nicht fest |
+|------|-----------|-----------------|
+| E2E `interclub.test.ts:30–32` (drei Geräte) | Reiter IC steht gleich nach dem Login ohne Neuladen: Das Layout prüft ohne Sitzung beim Wechsel `/login` → `/` neu, und `interclub` kommt an | den Fall «keine Daten» |
+| E2E `navigation.test.ts:99–101` (Handy), `:335` (PC, nach `page.goto`), `:348` (vier Symbole) | vier Reiter in der Reihenfolge Start · CM · IC · Profil | `:335` und `:348` laden frisch, sie sehen das erneute Prüfen nicht |
+| Einheit `src/lib/ui/navigation.test.ts` | `reiterFuer(true/false)`, Bereich und Ebene der drei Seiten | |
+| DB `server/interclub/schnittstellen.db.test.ts:61`, `:70`; `ansicht.db.test.ts:26`, `:68` | `getSitzung` meldet `interclub` falsch ohne und wahr mit Daten [E: Titel und Zeile, Rumpf nicht gelesen] | |
+| DB `login/…`, `admin/schnittstellen…`, `admin/ansicht.db.test.ts` | das Feld `interclub` steht in der Antwort (`expect.any(Boolean)`) | den Wert |
+
+**Was auf dev kein Test sieht:** dass im Browser ohne Interclub-Daten drei Reiter stehen (die
+E2E-Datenbank hat immer Beispieldaten); dass das Layout mit Sitzung und ohne Ansicht beim Wechsel
+**nicht** neu fragt; dass es nach einer Störung oder ohne Netz beim nächsten Wechsel neu fragt
+(neu seit #81: `!angemeldet` trifft auch die Störung); die zwei Ränder oben; dass `interclub`
+streng geprüft wird. Auf dev ruft kein Test das Layout auf; der Einheitstest dazu steht nur im
+Branch und kennt `interclub` noch nicht.
+
+#### 3 Weitere Berührungen von #81 mit Lauf 1 und Lauf 2 [G]
+
+- **Schnittmenge der geänderten Dateien** (`git diff --name-only baae295 origin/dev` gegen
+  `… baae295 refactor/schritt-15`): `CLAUDE.md`, `docs/refactoring-analyse.md`,
+  `src/routes/+layout.ts`. Sonst keine der 39 Dateien des Branches.
+- **Probe-Merge:** zwei Konflikte. `+layout.ts` (der ganze Rumpf von `load`; Importzeile und
+  Kommentar mergen von selbst, die Importzeile `ladeSitzung` steht schon). Dieses Dokument: **ein
+  Block, die Entscheid-Tabelle in Abschnitt 8** (dev: eine Zeile E-47; Branch: drei Zeilen E-47
+  bis E-49). Der Abschnitt «Stand und nächster Schritt» mergt textlich ohne Konflikt (dev hat ihn
+  nicht geändert), sein Inhalt ist aber überholt. `CLAUDE.md` mergt von selbst: dev ändert zwei
+  Sätze zu den Mitgliederdaten und fügt «Ausnahme vom Feature-Stopp: #81 (E-47)» ein, der Branch
+  die Regel «Ab Schritt 13».
+- **`/api/sitzung` auf der Oberfläche:** dev ändert nur `+layout.ts`; `+page.ts`,
+  `profil/+page.ts`, `profil/email/+page.ts` und `src/lib/login/sitzung.ts` sind auf dev
+  unverändert. Neu liest `src/lib/ui/Reiter.svelte` `page.data.interclub` (kein Abruf).
+- **`leiteUm`, `goto('/login')`, Seiten der Verwaltung:** kein Treffer im Diff von dev; keine
+  Datei unter `src/routes/verwaltung/` oder `src/lib/verwaltung/` ist geändert. Die
+  Login-Seiten sind unverändert (`goto(resolve('/'))` ohne `refreshAll`, darum das erneute Prüfen
+  im Layout).
+- **Vertrag von `GET /api/sitzung`:** ein Feld mehr, `interclub: boolean`
+  (`getSitzung`, `await hatInterclub(db)`); die sechs alten Felder, der 401 mit `abgemeldet()` und
+  die Reihenfolge bleiben. Für `ladeSitzung` ändert sich an der Deutung nichts. Nebenwirkung auf
+  dev, nicht Sache von Lauf 1b: je Antwort mit Sitzung eine Datenbank-Abfrage mehr, und ohne
+  Sitzung fragt das Layout bei jedem Wechsel (auch zwischen den Login-Seiten).
+- **Server sonst:** drei neue Mitglieder-Schnittstellen in `INTERCLUB_SCHNITTSTELLEN`
+  (Grundprüfung 36 → 39 Einträge), `holeInterclubDienste` als neunter Einstieg in `dienste.ts`,
+  `interclub` in `THEMEN` (`eslint.config.js`) und in `MITGLIEDER_EINSTIEGE` (`bauregel.ts`). Das
+  berührt Lauf 1b nicht: Sein Diff unter `src/lib/server/` und `src/routes/api/` gegen
+  `origin/dev` muss leer sein.
+- **E2E-Umgebung:** `playwright.config.ts` startet den Server neu mit
+  `node scripts/beispiel-interclub.ts` vor dem Build-Start; jeder E2E-Lauf hat die Saison 2026 als
+  Beispieldaten (öffentliche Resultate, Personen in den Einzelpartien erfunden laut DS-08 [E: nur
+  die Regel in `CLAUDE.md` und `testkonzept.md` gelesen, nicht die Dateien]). Die E2E-Hilfen
+  (`tests/e2e/hilfen/`) sind unverändert.
+- **Version:** dev steht auf 0.22.0, der Branch auf 0.20.21. Nach dem Einmergen trägt der Branch
+  0.22.0; die Version des Schritts kommt wie geplant mit dem einen Merge nach Lauf 2.
+
+#### 4 Vorab-Tests für Lauf 1b
+
+Alle neuen Zeilen müssen auf dem Stand «dev eingemergt, drei Interclub-Seiten und Layout noch wie
+dev» grün sein (Commit 2 unten). Kein Fall fordert einen Mail-Code an; die wartende Mail-Anfrage
+steht wie in Lauf 1 im Gerätespeicher (`mailAnfrageWartet`). Das Budget je IP ist nicht berührt.
+
+**(a) `tests/e2e/waechter.test.ts`, Teil 1 (ohne Konto, ohne Daten):**
+
+| Vorbedingung | Adresse | Erwartetes Ziel | Wie |
+|---|---|---|---|
+| ohne Sitzung | `/interclub`, `/interclub/1`, `/interclub/1/1` | `/login`, auf allen drei Geräten (Fall F) | drei Einträge mehr in `MITGLIEDER_SEITEN`; der Test «die Seiten der Mitglieder-App führen zum Login» nimmt sie mit |
+| ohne Sitzung, Mail-Anfrage wartet | dieselben drei | `/login/mail` | derselbe Eintrag; der Test «mit wartender Mail-Anfrage …» nimmt sie mit |
+| ohne Sitzung | `/interclub/abc`, `/interclub/abc/1`, `/interclub/1/abc` | `/login`, **auch auf dem Handy** (Fall L) | ein neuer Test neben «eine CM ohne Zahl …» |
+| ohne Sitzung, Mail-Anfrage wartet | `/interclub/abc` | `/login/mail` | im selben neuen Test oder ein zweiter |
+
+Daten braucht Teil 1 keine: Der Server antwortet ohne Sitzung vor der Nummer mit 401 [G].
+
+**(b) `tests/e2e/waechter.test.ts`, Teil 2 (ein Konto mit Brief-Code je Test, wie die übrigen
+Fälle; braucht die Beispieldaten, die jeder E2E-Lauf einspielt):**
+
+| Vorbedingung | Handlung | Erwartung |
+|---|---|---|
+| Mitglied, Cookies gelöscht | Reiter «IC» antippen | `/login`, die Marke am Fenster bleibt (Wechsel in der App, Fall `mitglied`) |
+| Mitglied | `/interclub/abc` und `/interclub/1` (kein Team trägt die Nummer 1: Die Nummern sind die von Swiss Tennis, die kleinste in den Beispieldaten ist 7395 [G: Dateinamen `team-results-*.json`]) | `/interclub` mit Titel «Interclub 2026» |
+| Mitglied, auf der Seite eines Teams (über die Kachel geöffnet, Nummer aus der Adresse gelesen) | `<Adresse des Teams>/1` und `<Adresse des Teams>/abc` | zurück auf die Seite des Teams (Fall L) |
+
+Die erste Zeile ist für den Wächter nötig, die zwei anderen halten die Umleitungen fest, die in
+denselben Dateien stehen und beim Umstellen mit angefasst werden. Sind sie zu teuer, genügt für
+sie (c). Kosten [V]: drei Logins und rund zehn Aufrufe je Gerät.
+
+**(c) `tests/oberflaeche/ladefunktionen.test.ts`, neuer Block «Interclub»** (gestelltes `fetch`
+wie bei der Verwaltung; die drei Ladefunktionen brauchen keinen Browser ausser dem
+Gerätespeicher, den `holeSpeicher` abfängt und den der Fall A schon per `vi.stubGlobal` stellt):
+
+| Ladefunktion | Antwort bzw. Parameter | Erwartung |
+|---|---|---|
+| alle drei | 401 mit `{ fehler: 'abgemeldet' }` | Umleitung `/login`; mit gestelltem Gerätespeicher `/login/mail` |
+| alle drei | 401 ohne lesbaren Körper | Fehlerseite 503 mit dem Satz der Seite (Fall M) |
+| alle drei | 503 und Netz weg | Fehlerseite 503 mit dem Satz der Seite (drei verschiedene Sätze, Tabelle in 1) |
+| `/interclub` | 404 `nicht-gefunden` | Daten `{ uebersicht: null }` |
+| `/interclub` | 200 mit Körper | Daten `{ uebersicht: <Körper> }`, angefragt `/api/interclub` |
+| `[id]` | `id` = `abc`, `0`, `-1`, `1.5` | Umleitung `/interclub`, **keine Anfrage** |
+| `[id]` | 404 | Umleitung `/interclub` |
+| `[id]` | 200 | Daten `{ team: <Körper> }`, angefragt `/api/interclub/teams/7` |
+| `[begegnung]` | `id` ungültig, `begegnung` gültig | Umleitung `/interclub`, keine Anfrage |
+| `[begegnung]` | `id` = `7`, `begegnung` = `abc` oder `0` | Umleitung `/interclub/7`, keine Anfrage |
+| `[begegnung]` | 404 | Umleitung `/interclub/7` |
+| `[begegnung]` | 200 | Daten `{ begegnung: <Körper> }`, angefragt `/api/interclub/teams/7/begegnungen/9` |
+
+Rund 30 Fälle.
+
+**(d) Derselbe Block «Mitglieder-App», Test zum Wurzel-Layout** (heute «das Wurzel-Layout zeigt
+das Band nur mit Sitzung und laufender Ansicht», sechs Erwartungen `{ ansicht }`):
+
+| Antwort | Erwartete Daten | `url.pathname` gelesen |
+|---|---|---|
+| 200, Sitzung mit `ansicht: 'cm'`, `interclub: true` | `{ ansicht: 'cm', interclub: true }` | ja |
+| 200, Sitzung ohne Ansicht, `interclub: true` | `{ ansicht: null, interclub: true }` | **nein** |
+| 200, Sitzung ohne Feld `interclub`, und mit `interclub: 'ja'` | `{ ansicht: null, interclub: false }` | nein |
+| 200 ohne lesbaren Körper; 200 mit JSON `null` | `{ ansicht: null, interclub: false }` | **ja** |
+| 401; 503; Netz weg | `{ ansicht: null, interclub: false }` | ja |
+
+Ob `url.pathname` gelesen wird, sieht der Test über ein gestelltes `url`, dessen `pathname` ein
+Zähler-Getter ist (so merkt sich auch SvelteKit die Abhängigkeit); `ereignis` nimmt dafür ein
+fertiges `url` entgegen. Das ist Verhalten, kein Quelltext.
+
+**Zwingend schon im Merge-Commit:** Die sechs bestehenden Erwartungen `{ ansicht: … }` bekommen
+`interclub: false`. Ohne das ist der Einheitslauf nach dem Einmergen rot (`toEqual` übergeht kein
+`false`), und der Commit-Hook lässt den Merge-Commit nicht durch [V: dass der Hook beim
+Abschliessen eines Merges mit Konflikt läuft, ist aus dem Verhalten von Git geschlossen, nicht
+probiert]. Grund ist die Verhaltensänderung von #81, nicht der Umbau.
+
+**Einmal rot** (aus Sicherungskopien im Scratchpad, kein `git checkout`; auf dem Stand von
+Commit 2):
+
+- (a) `interclub/[id]/+page.ts` ohne Blick auf den Mail-Code: E2E «mit wartender Mail-Anfrage …»
+  rot.
+- (c) `[begegnung]/+page.ts` leitet bei ungültiger Begegnung nach `/interclub` statt zum Team:
+  Einheitstest rot, E2E Teil 1 bleibt grün.
+- (d) `+layout.ts` mit `if (ansicht !== null)` allein: Einheitstest rot («401 liest `pathname`»);
+  dazu erwartet `interclub.test.ts:32` rot (der Reiter IC fehlt nach dem Login).
+
+**Nicht als Vorab-Test, sondern mit dem Umbau:** `src/lib/login/sitzung.test.ts` bekommt
+`interclub` in seine Beispiel-Sitzung (der Test vergleicht den durchgereichten Körper; er bleibt
+auch ohne grün). `src/lib/login/waechter.test.ts` bleibt unverändert: Die Tabelle bekommt keine
+Zeile.
+
+#### 5 Überholte Befunde in E.5, E.6 und Zeile 15
+
+| Stelle | Stand Branch | Nach #81 | Beleg |
+|---|---|---|---|
+| Adressen | 36 (35 mit Baustein, dazu `/verwaltung`) | **39** (38 mit Baustein) | [G: 38 `+page.svelte` auf dev] |
+| Ladefunktionen | 27 (2 Layouts, 25 Seiten) | **30** (2 Layouts, 28 Seiten) | [G: 28 `+page.ts`, 2 `+layout.ts`] |
+| «nur der Wächter wechselt» | 22 (9 Mitglieder-App, Layout und 12 der Verwaltung) | **25** (12 Mitglieder-App) | [G] |
+| «nur der Abruf wechselt» | 2 (`+layout.ts`, `hilfe/+page.ts`) | 2; das Layout leitet neu drei Werte ab | [G] |
+| Stellen «nach einer Aktion» | 17, dazu das Abmelden | **unverändert 17** | [G: Textsuche, Abschnitt 1] |
+| Aufrufe `leiteUm` | 32 | unverändert | [G: keine Datei der Verwaltung im Diff] |
+| benannte Fälle | A bis K; sechs Zeilen in `TABELLE` | dazu L und M, beide ausserhalb der Tabelle; **sechs Zeilen bleiben** | Abschnitt 1 |
+| Seiten im Fall `mitglied` | Profil, Anlass, fünf CM-Seiten | dazu drei Interclub-Seiten | [G] |
+| E2E Teil 1, Mitglieder-Seiten | 8 | 11, dazu drei Adressen ohne Zahl | Abschnitt 4 |
+| Felder von `getSitzung` | sechs (E.5, «Vorschlag für Sitzung und Wächter») | sieben | [G] |
+| «Läuft keine Ansicht, lädt das Layout erst nach `refreshAll()` wieder» (E.5, Kommentar im Layout) | galt immer | gilt nur noch mit Sitzung; ohne Sitzung prüft jeder Wechsel | [G] |
+| Umleitungen zum Login von Hand (Probe aus E.6: nur `willkommen/+page.ts`) | 1 | auf dev 3 mehr; nach Lauf 1b wieder 1 | [G] |
+| `fetch(` in Ladefunktionen (Probe aus E.6: keine) | 0 | zwischen Commit 1 und 3 unten eine (`+layout.ts` wie dev), danach 0 | [G] |
+| Testzahlen (2300 Tests, E2E 477/57, 4,1 Minuten; Grundprüfung 36 Einträge) | Stand Branch | auf dev höher (Grundprüfung 39, zwei E2E-Tests mehr je Gerät, Server-Tests zu Interclub); **nicht gemessen** | [G für 39, sonst V] |
+| S4 «keine zusätzliche Abfrage von `/api/sitzung`» | gilt | gilt weiter für Lauf 1b: Die drei Interclub-Seiten fragen die Sitzung nicht und sollen es auch danach nicht | [G] |
+
+**Lauf 2 (vier Listen der Verwaltung): unverändert.** #81 hat keine Datei unter
+`src/routes/verwaltung/`, `src/lib/verwaltung/` oder `tests/e2e/hilfen/` geändert [G]. Die
+Ladefunktion der Verwaltung ruft `parent()`; dessen Daten tragen neu auch `interclub`, was sie
+nicht liest. Schnitt, Vorab-Fälle und S6 bis S9 aus E.5 gelten weiter.
+
+#### Schnitt für Lauf 1b
+
+Im Worktree `refactor-schritt-15`, auf dem Branch, ohne Push. Vor dem ersten Commit prüfen:
+`origin/dev` ist noch `e0d14a7`; sonst zuerst den Diff seit `e0d14a7` auf `+layout.ts`,
+`src/routes/interclub/`, `src/lib/interclub/api.ts` und `server/sitzung/schnittstellen.ts` lesen.
+
+| Nr. | Commit | Inhalt |
+|----:|--------|--------|
+| 1 | Merge-Commit | `origin/dev` einmergen (Merge-Commit, kein Rebase). Konflikt `+layout.ts`: **die Fassung von dev unverändert** (eigenes `fetch`, noch nicht `ladeSitzung`); so trägt der Stand genau das Verhalten von dev. Konflikt Dokument: beide Seiten behalten, die Zeile von dev bleibt **E-47**, die drei Zeilen des Branches bekommen in der Tabelle die Nummern **E-48, E-49, E-50** (sonst stünde eine Nummer zweimal). Dazu die sechs Erwartungen des Layout-Tests um `interclub: false` (Abschnitt 4). Sonst nichts |
+| 2 | `test:` | Vorab-Tests (a) bis (d), auf diesem Stand grün, je Gruppe einmal rot belegt |
+| 3 | `refactor:` | `Sitzung` bekommt `interclub`; `+layout.ts` auf `ladeSitzung` mit den drei abgeleiteten Werten (Abschnitt 2); `sitzung.test.ts` nachgezogen |
+| 4 | `refactor:` | die drei Interclub-Ladefunktionen auf `leiteUmBeimLaden(r, 'mitglied')`; im Kommentar zu `mitglied` in `waechter.ts` die Interclub-Seiten nennen |
+| 5 | `docs:` | die Verweise auf die drei umnummerierten Entscheide nachziehen: F-28 → E-48 (Kopf «Stand», Zeile 15 in 7.4, Ergebnis Lauf 1 in 7.4, Titel von F-28 in 9.1, Kopf von E.6), F-29 → E-49 (Titel von F-29), «Ab Schritt 13» → E-50; im Branch nennen vor diesem Nachmessen neun Zeilen eine der drei Nummern [G: Textsuche]. Die Nennungen in E.7 meinen den Stand vor dem Umnummerieren und bleiben. Protokoll als E.8, Ergebnis in 7.4, Zeile 15 und «Stand» nachführen, dort auch Lauf 1b und #81 nennen |
+
+Commit 3 und 4 dürfen ein Commit sein. Danach der volle `make check` auf dem committeten Stand
+(E2E im Hintergrund starten).
+
+**Proben für den Reviewer:**
+
+- `git diff origin/dev HEAD -- src/lib/server src/routes/api` ist leer.
+- `git diff <Commit 2> HEAD -- tests/e2e/waechter.test.ts tests/oberflaeche/ladefunktionen.test.ts`
+  ist leer.
+- Gegenüber `db9997f` ändern sich die zwei Vorab-Dateien nur um Zusätze, mit einer Ausnahme: die
+  sechs Erwartungen des Layout-Tests (Merge, wegen #81).
+- Der Diff von Commit 4 je Datei: der Block von vier Zeilen wird eine Zeile, die Importe folgen;
+  keine andere Zeile.
+- Die Textsuchen aus E.6 geben wieder dasselbe: Umleitung zum Login von Hand nur in
+  `willkommen/+page.ts`; kein `fetch(` in einer Ladefunktion.
+- `tests/e2e/interclub.test.ts` und `tests/e2e/navigation.test.ts` sind gegenüber dev unverändert
+  und grün.
+
+**Abbruchstellen** (abbrechen und melden, keinen Umweg bauen):
+
+1. Der Merge zeigt mehr als die zwei Konflikte, oder `origin/dev` ist weitergezogen und der neue
+   Diff berührt eine Datei des Branches.
+2. Nach Commit 1 ist ausser dem genannten Layout-Test ein weiterer Test aus Lauf 1 rot.
+3. Eine neue Vorab-Zeile ist auf dem Stand von Commit 2 rot und die Ursache ist nicht ein
+   Lesefehler dieses Nachmessens: Dann stimmt eine Zeile der Tabelle in Abschnitt 1 oder 2 nicht.
+   Ist es ein Lesefehler, die Erwartung dem Verhalten anpassen und im Protokoll nennen.
+4. Die Umstellung braucht eine neue Zeile in `TABELLE` oder eine Änderung an `ladeSitzung` über
+   den Typ hinaus.
+5. Nach Commit 3 ist `interclub.test.ts`, `navigation.test.ts` oder `bewegung.test.ts` rot.
+6. Der Diff unter `src/lib/server/` oder `src/routes/api/` gegen `origin/dev` ist nicht leer.
+
+**Modell:** Opus, wie Lauf 1. Der Umbau selbst ist klein (vier Dateien, je wenige Zeilen); das
+Wagnis liegt im Merge (ein Test muss mit, ein Block in diesem Dokument), in den zwei Rändern des
+Layouts und im Umnummerieren quer durch ein langes Dokument.
+
+#### Fragen an den Projektleiter
+
+Keine. Keine sichtbare Änderung ist nötig; die Fälle L und M bleiben nach E-44, wie sie sind.
+
+#### Bleibt (gut gelöst)
+
+- Die drei Interclub-Ladefunktionen folgen schon dem Muster der CM-Seiten: Sie reichen ihr `fetch`
+  an das Abruf-Modul, prüfen die Nummer vor der Abfrage und fragen `/api/sitzung` nicht.
+- `src/lib/interclub/api.ts` steht auf dem Abruf-Baustein, mit an den Typ gebundenen Wörtern
+  (`woerterAus<Wort>`) und eigenem Einheitstest; die Regel «Ab Schritt 13» ist eingehalten.
+- Die Seiten und Bausteine von #81 haben kein eigenes `fetch`, kein Laden beim Einhängen und keine
+  Aktion; die Regel «Ab Schritt 15» verletzt nur der eine kopierte Block.
+- Der Server prüft die Sitzung vor der Nummer; die Schnittstellen stehen in ihrer Liste und in
+  der Grundprüfung.
+- Die Anmeldung in `interclub.test.ts` geht per Brief-Code; der Test verbraucht kein Mail-Budget.
+
+#### Nicht geprüft, dünn belegt
+
+- **Nichts ausgeführt.** Dass die neuen Vorab-Zeilen auf dem Stand von dev grün sind, ist aus dem
+  Code gelesen. Am dünnsten: die Ketten aus zwei Umleitungen (`/interclub/abc` → `/interclub` →
+  `/login`) im Browser [V], und ob die drei Interclub-Ladefunktionen sich im Einheitslauf mit
+  `resolve` aus `$app/paths` wie erwartet verhalten [V: die Ladefunktionen der Verwaltung und
+  `waechter.ts` tun es laut E.6].
+- **Die Vorab-Tests des Branches nur in Auszügen gelesen [E];** dass ausser dem Layout-Test kein
+  weiterer nach dem Merge rot wird, ist aus den Erwartungen der gelesenen Teile und aus der
+  Schnittmenge der Dateien geschlossen.
+- **Typ der Zusicherung [V]:** `leiteUmBeimLaden` an `Ergebnis<T>` von Interclub ist nicht mit
+  `svelte-check` geprüft.
+- **Commit-Hook beim Merge [V]** (Abschnitt 4).
+- **Server-Tests zu `interclub` in der Sitzung [E]:** nur Titel und Zeilen gelesen.
+- **Beispieldaten:** nur die Dateinamen und das Skript gelesen, nicht der Inhalt; dass keine
+  Team-Nummer 1 und keine Begegnungs-Nummer 1 vorkommt, folgt aus den Dateinamen.
+- **Laufzeit der neuen E2E-Fälle [V],** und die Testzahlen von dev nach #81 (nicht gemessen).
+- **Nicht nachgeführt (Auftrag):** «Stand und nächster Schritt», die Zahlen in E.5, E.6 und
+  Zeile 15, die Nummern E-47 bis E-49 im Branch, der Kopf von Abschnitt 9. Es gilt dieser
+  Abschnitt, bis Lauf 1b sie nachzieht.
