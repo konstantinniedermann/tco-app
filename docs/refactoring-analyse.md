@@ -9717,6 +9717,11 @@ Funktion wie `Aktionsdialog.oeffne`, `$bindable`, Snippet für die Beschriftung)
      Seitenkörper, weil die gesperrte Taste ihn verliert. Jetzt gemessen und im E2E festgehalten;
      wer es ändert, ändert den Test mit. Bei der Wildcard-Störung hängt der Fokus vom Browser ab
      (Android Körper, iPhone Dialog). Kandidat für die Zwischenrevision der Etappe 2.
+     **Nachtrag 14.11.2026 (E-54):** Der E2E hält den Seitenkörper nicht mehr fest. Die drei
+     Prüfungen wackelten auf der iPhone-CI (WebKit unter Linux, Lauf 43610003599) und sind mit
+     Version 0.22.3 entfernt; die Messwerte «Körper» in der Tabelle oben gelten für den Mac,
+     nicht als Vertrag. Möglicher nächster Wackler aus demselben Mechanismus: der Fokus nach
+     «hinfällig» (Punkt 2), im roten Lauf grün; bei einem roten Lauf dort gleich verfahren.
   2. Nach «hinfällig» geht der Fokus auf den Titel der ersten Anfrage-Karte, nicht auf die Anfrage,
      die man angetippt hat (bei mehreren Anfragen). Gleiche Ursache.
   3. Ein Feldfehler bleibt im geschlossenen Dialog stehen, bis er wieder geöffnet wird (dann

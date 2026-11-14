@@ -84,11 +84,6 @@ async function stelle(page: Page, adresse: string, status: number, json: object)
 	await page.route(adresse, (r) => r.fulfill({ status, json }), { times: 1 });
 }
 
-/** Der Fokus liegt auf keinem Element, sondern im Seitenkörper. */
-async function fokusImSeitenkoerper(page: Page) {
-	await expect.poll(() => page.evaluate(() => document.activeElement === document.body)).toBe(true);
-}
-
 /** Wartet, bis die Seite ihre Ansicht so oft neu geladen hat. */
 async function neuGeladen(zaehler: { anzahl: number }, anzahl: number) {
 	await expect.poll(() => zaehler.anzahl).toBe(anzahl);
@@ -154,14 +149,12 @@ test('Einzel und Wildcard: Satz, Neuladen und Fokus nach jeder Aktion', async ({
 	expect(wildcardAnfragen).toBe(1);
 	expect(neu.anzahl).toBe(0);
 
-	// `geschlossen`: Dialog zu, Satz auf der Seite, einmal neu geladen; der Fokus fällt in den
-	// Seitenkörper (gemessen, Anhang E.11: die Taste war während der Anfrage gesperrt).
+	// `geschlossen`: Dialog zu, Satz auf der Seite, einmal neu geladen.
 	await stelle(page, '**/api/cm/kategorien/*/wildcard', 409, { fehler: 'geschlossen' });
 	await antrag.getByRole('button', { name: 'Beantragen' }).click();
 	await expect(antrag).toBeHidden();
 	await expect(page.getByRole('alert')).toHaveText('Die Anmeldung ist inzwischen geschlossen.');
 	await neuGeladen(neu, 1);
-	await fokusImSeitenkoerper(page);
 
 	// Mit Text: Dialog zu, Satz, Fokus auf der neuen Taste «Zurückziehen» derselben Karte.
 	await wildcardKarte.getByRole('button', { name: 'Wildcard beantragen' }).click();
@@ -177,20 +170,18 @@ test('Einzel und Wildcard: Satz, Neuladen und Fokus nach jeder Aktion', async ({
 	await expect(wildcardKarte.getByRole('button', { name: 'Wildcard beantragen' })).toBeFocused();
 	expect(neu.anzahl).toBe(1);
 
-	// Anmelden mit `geschlossen`: Satz auf der Seite, genau einmal neu geladen, Fokus im Körper.
+	// Anmelden mit `geschlossen`: Satz auf der Seite, genau einmal neu geladen.
 	await stelle(page, '**/api/cm/kategorien/*/anmeldung', 409, { fehler: 'geschlossen' });
 	await einzelKarte.getByRole('button', { name: 'Anmelden' }).click();
 	await hinweis.getByRole('button', { name: 'Anmelden' }).click();
 	await expect(page.getByRole('alert')).toHaveText('Die Anmeldung ist inzwischen geschlossen.');
 	await neuGeladen(neu, 2);
-	await fokusImSeitenkoerper(page);
 
-	// Anmelden mit Störung: Satz auf der Seite, kein Neuladen, Fokus im Körper.
+	// Anmelden mit Störung: Satz auf der Seite, kein Neuladen.
 	await stelle(page, '**/api/cm/kategorien/*/anmeldung', 503, { fehler: 'stoerung' });
 	await einzelKarte.getByRole('button', { name: 'Anmelden' }).click();
 	await hinweis.getByRole('button', { name: 'Anmelden' }).click();
 	await expect(page.getByRole('alert')).toHaveText(MELDUNG.stoerung);
-	await fokusImSeitenkoerper(page);
 	expect(neu.anzahl).toBe(2);
 	await expect(page.getByRole('status')).toHaveText('');
 
