@@ -18,6 +18,7 @@
 		type CmFelder,
 		type CmKategorie
 	} from '../../../lib/cm/api.ts';
+	import { fuehreAblauf, type Seite } from '../../../lib/cm/ablauf.ts';
 	import {
 		ANNEHMEN_HINWEIS,
 		KOMMENTAR_MAX,
@@ -139,6 +140,31 @@
 		return false;
 	}
 
+	// Was der Ablauf einer Aktion von der Seite braucht (src/lib/cm/ablauf.ts); «abgemeldet» geht an
+	// den Wächter (nur Login, Fall C).
+	const seite: Seite = {
+		get laeuft() {
+			return laeuft;
+		},
+		set laeuft(wert) {
+			laeuft = wert;
+		},
+		get meldung() {
+			return meldung;
+		},
+		set meldung(wert) {
+			meldung = wert;
+		},
+		get fehler() {
+			return fehler;
+		},
+		set fehler(wert) {
+			fehler = wert;
+		},
+		neuLaden,
+		waechter: leiteUmNachAktion
+	};
+
 	async function angabenSenden(event: SubmitEvent) {
 		event.preventDefault();
 		if (laeuft) return;
@@ -207,44 +233,32 @@
 			kommentarFeld?.focus();
 			return;
 		}
-		laeuft = true;
-		meldung = null;
-		fehler = null;
-		kommentarFehler = null;
-		const r = await beantrageWildcard(k.id, kommentar);
-		laeuft = false;
-		switch (r.art) {
-			case 'ok':
-				await uebernimm(r.daten);
+		await fuehreAblauf(seite, {
+			vorher: () => (kommentarFehler = null),
+			abruf: () => beantrageWildcard(k.id, kommentar),
+			ok: async (neu) => {
+				await uebernimm(neu);
 				wildcardDialog?.close();
 				meldung = 'Wildcard beantragt. Du bekommst Bescheid.';
 				await fokusBei(k.id);
-				return;
-			case 'eingabe':
-				kommentarFehler = r.felder.kommentar ?? MELDUNG.stoerung;
+			},
+			woerter: {
+				voll: FEHLER.voll,
+				geschlossen: FEHLER.geschlossen,
+				'keine-wildcard': FEHLER['keine-wildcard'],
+				'passt-nicht': FEHLER['passt-nicht'],
+				'schon-angemeldet': null,
+				'angaben-fehlen': null,
+				'nicht-gefunden': null
+			},
+			vorWort: () => wildcardDialog?.close(),
+			eingabe: async (felder) => {
+				kommentarFehler = felder.kommentar ?? MELDUNG.stoerung;
 				await tick();
 				kommentarFeld?.focus();
-				return;
-			case 'abgemeldet':
-				await leiteUmNachAktion(r);
-				return;
-			case 'voll':
-			case 'geschlossen':
-			case 'keine-wildcard':
-			case 'passt-nicht':
-				wildcardDialog?.close();
-				fehler = FEHLER[r.art];
-				await neuLaden();
-				return;
-			case 'schon-angemeldet':
-			case 'angaben-fehlen':
-			case 'nicht-gefunden':
-				wildcardDialog?.close();
-				await neuLaden();
-				return;
-			default:
-				kommentarFehler = MELDUNG.stoerung;
-		}
+			},
+			stoerung: (satz) => (kommentarFehler = satz)
+		});
 	}
 
 	// Nach dem Wechsel der Taste (Anmelden ↔ Abmelden) bleibt der Fokus bei der Kategorie.
@@ -254,63 +268,36 @@
 	}
 
 	async function anmelden(k: CmKategorie) {
-		if (laeuft) return;
-		laeuft = true;
-		meldung = null;
-		fehler = null;
-		const r = await meldeAn(k.id);
-		laeuft = false;
-		switch (r.art) {
-			case 'ok':
-				await uebernimm(r.daten);
+		await fuehreAblauf(seite, {
+			abruf: () => meldeAn(k.id),
+			ok: async (neu) => {
+				await uebernimm(neu);
 				meldung = `Angemeldet für ${k.name}. Die Bestätigung kommt per Mail.`;
 				await fokusBei(k.id);
-				return;
-			case 'abgemeldet':
-				await leiteUmNachAktion(r);
-				return;
-			case 'voll':
-			case 'geschlossen':
-			case 'passt-nicht':
-				fehler = FEHLER[r.art];
-				await neuLaden();
-				return;
-			case 'schon-angemeldet':
-			case 'angaben-fehlen':
-			case 'nicht-gefunden':
-				await neuLaden();
-				return;
-			default:
-				fehler = MELDUNG.stoerung;
-		}
+			},
+			woerter: {
+				voll: FEHLER.voll,
+				geschlossen: FEHLER.geschlossen,
+				'passt-nicht': FEHLER['passt-nicht'],
+				'schon-angemeldet': null,
+				'angaben-fehlen': null,
+				'nicht-gefunden': null
+			}
+		});
 	}
 
 	async function abmelden(k: CmKategorie, wildcard = false) {
-		if (laeuft || k.anmeldungId === null) return;
-		laeuft = true;
-		meldung = null;
-		fehler = null;
-		const r = await meldeAb(k.anmeldungId);
-		laeuft = false;
-		switch (r.art) {
-			case 'ok':
-				await uebernimm(r.daten);
+		const anmeldungId = k.anmeldungId;
+		if (anmeldungId === null) return;
+		await fuehreAblauf(seite, {
+			abruf: () => meldeAb(anmeldungId),
+			ok: async (neu) => {
+				await uebernimm(neu);
 				meldung = wildcard ? `Antrag für ${k.name} zurückgezogen.` : `Abgemeldet von ${k.name}.`;
 				await fokusBei(k.id);
-				return;
-			case 'abgemeldet':
-				await leiteUmNachAktion(r);
-				return;
-			case 'geschlossen':
-				fehler = FEHLER.geschlossen;
-				await neuLaden();
-				return;
-			case 'nicht-gefunden':
-				await neuLaden();
-				return;
-			default:
-				fehler = MELDUNG.stoerung;
-		}
+			},
+			woerter: { geschlossen: FEHLER.geschlossen, 'nicht-gefunden': null }
+		});
 	}
 
 	/**
@@ -330,104 +317,59 @@
 		ziel?.focus();
 	}
 
+	/** Nach einem Wort beim Annehmen oder Ablehnen: neu laden, dann der Fokus wie oben. */
+	async function neuLadenNachAnfrage() {
+		await neuLaden();
+		await fokusNachAnfrage();
+	}
+
 	/** FR-48: eine Anfrage an einen selbst annehmen. */
 	async function annehmen(a: CmAnfrage) {
-		if (laeuft) return;
-		laeuft = true;
-		meldung = null;
-		fehler = null;
-		const r = await nimmAnfrageAn(a.anfrageId);
-		laeuft = false;
-		switch (r.art) {
-			case 'ok':
-				await uebernimm(r.daten);
+		await fuehreAblauf(seite, {
+			abruf: () => nimmAnfrageAn(a.anfrageId),
+			ok: async (neu) => {
+				await uebernimm(neu);
 				meldung = `Angemeldet mit ${nameText(a.von, 'vorname-zuerst')} für ${a.kategorie}. Die Bestätigung kommt per Mail.`;
 				await fokusNachAnfrage(a.kategorieId);
-				return;
-			case 'abgemeldet':
-				await leiteUmNachAktion(r);
-				return;
-			case 'voll':
-			case 'geschlossen':
-			case 'passt-nicht':
-			case 'schon-angemeldet':
-				fehler = ANNEHMEN_FEHLER[r.art];
-				await neuLaden();
-				await fokusNachAnfrage();
-				return;
-			case 'hinfaellig':
-				fehler = 'Diese Anfrage gilt nicht mehr.';
-				await neuLaden();
-				await fokusNachAnfrage();
-				return;
-			case 'angaben-fehlen':
-			case 'nicht-gefunden':
-				await neuLaden();
-				await fokusNachAnfrage();
-				return;
-			default:
-				fehler = MELDUNG.stoerung;
-		}
+			},
+			woerter: {
+				voll: ANNEHMEN_FEHLER.voll,
+				geschlossen: ANNEHMEN_FEHLER.geschlossen,
+				'passt-nicht': ANNEHMEN_FEHLER['passt-nicht'],
+				'schon-angemeldet': ANNEHMEN_FEHLER['schon-angemeldet'],
+				hinfaellig: 'Diese Anfrage gilt nicht mehr.',
+				'angaben-fehlen': null,
+				'nicht-gefunden': null
+			},
+			danach: neuLadenNachAnfrage
+		});
 	}
 
 	/** FR-48: eine Anfrage an einen selbst ablehnen, ohne Grund. */
 	async function ablehnen(a: CmAnfrage) {
-		if (laeuft) return;
-		laeuft = true;
-		meldung = null;
-		fehler = null;
-		const r = await lehneAnfrageAb(a.anfrageId);
-		laeuft = false;
-		switch (r.art) {
-			case 'ok':
-				await uebernimm(r.daten);
+		await fuehreAblauf(seite, {
+			abruf: () => lehneAnfrageAb(a.anfrageId),
+			ok: async (neu) => {
+				await uebernimm(neu);
 				meldung = `Anfrage von ${nameText(a.von, 'vorname-zuerst')} abgelehnt.`;
 				await fokusNachAnfrage();
-				return;
-			case 'abgemeldet':
-				await leiteUmNachAktion(r);
-				return;
-			case 'geschlossen':
-				fehler = FEHLER.geschlossen;
-				await neuLaden();
-				await fokusNachAnfrage();
-				return;
-			case 'nicht-gefunden':
-				await neuLaden();
-				await fokusNachAnfrage();
-				return;
-			default:
-				fehler = MELDUNG.stoerung;
-		}
+			},
+			woerter: { geschlossen: FEHLER.geschlossen, 'nicht-gefunden': null },
+			danach: neuLadenNachAnfrage
+		});
 	}
 
 	/** FR-48: eine eigene offene Anfrage zurückziehen. */
 	async function zurueckziehen(k: CmKategorie, a: CmKategorie['meineAnfragen'][number]) {
-		if (laeuft) return;
-		laeuft = true;
-		meldung = null;
-		fehler = null;
-		const r = await zieheAnfrageZurueck(a.anfrageId);
-		laeuft = false;
-		switch (r.art) {
-			case 'ok':
-				await uebernimm(r.daten);
+		await fuehreAblauf(seite, {
+			abruf: () => zieheAnfrageZurueck(a.anfrageId),
+			ok: async (neu) => {
+				await uebernimm(neu);
 				meldung = `Anfrage an ${nameText(a.an, 'vorname-zuerst')} zurückgezogen.`;
 				await fokusBei(k.id);
-				return;
-			case 'abgemeldet':
-				await leiteUmNachAktion(r);
-				return;
-			case 'geschlossen':
-				fehler = FEHLER.geschlossen;
-				await neuLaden();
-				return;
-			case 'nicht-gefunden':
-				await neuLaden();
-				return;
-			default:
-				fehler = MELDUNG.stoerung;
-		}
+			},
+			woerter: { geschlossen: FEHLER.geschlossen, 'nicht-gefunden': null }
+		});
 	}
 
 	function suchtextOeffnen(k: CmKategorie) {
@@ -441,40 +383,26 @@
 	async function suchtextSenden(event: SubmitEvent) {
 		event.preventDefault();
 		const k = suchtextZiel;
-		if (laeuft || !k || k.anmeldungId === null) return;
-		laeuft = true;
-		meldung = null;
-		fehler = null;
-		suchtextFehler = null;
-		const r = await setzeSuchtext(k.anmeldungId, suchtext);
-		laeuft = false;
-		switch (r.art) {
-			case 'ok':
+		if (!k || k.anmeldungId === null) return;
+		const anmeldungId = k.anmeldungId;
+		await fuehreAblauf(seite, {
+			vorher: () => (suchtextFehler = null),
+			abruf: () => setzeSuchtext(anmeldungId, suchtext),
+			ok: async (neu) => {
 				suchtextDialog?.close();
-				await uebernimm(r.daten);
+				await uebernimm(neu);
 				meldung = 'Kommentar gespeichert.';
 				await fokusBei(k.id);
-				return;
-			case 'eingabe':
-				suchtextFehler = r.felder.suchtext ?? MELDUNG.stoerung;
+			},
+			woerter: { geschlossen: FEHLER.geschlossen, 'nicht-gefunden': null },
+			vorWort: () => suchtextDialog?.close(),
+			eingabe: async (felder) => {
+				suchtextFehler = felder.suchtext ?? MELDUNG.stoerung;
 				await tick();
 				suchtextFeld?.focus();
-				return;
-			case 'abgemeldet':
-				await leiteUmNachAktion(r);
-				return;
-			case 'geschlossen':
-				suchtextDialog?.close();
-				fehler = FEHLER.geschlossen;
-				await neuLaden();
-				return;
-			case 'nicht-gefunden':
-				suchtextDialog?.close();
-				await neuLaden();
-				return;
-			default:
-				suchtextFehler = MELDUNG.stoerung;
-		}
+			},
+			stoerung: (satz) => (suchtextFehler = satz)
+		});
 	}
 </script>
 
