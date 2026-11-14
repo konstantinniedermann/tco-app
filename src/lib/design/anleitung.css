@@ -1,0 +1,534 @@
+/* Anleitung: gezeichnetes Handy, Schritte, Bewegung (Teil 6 von 10). */
+
+/*
+ * Anleitung (A-HILFE-02): gezeichnetes Handy, Taste, nummerierte Schritte. Die Zeichnung ist
+ * aria-hidden; die Schritte tragen die Bedeutung. Bewegung nur hier (UI-09): Das Skript der
+ * Komponente setzt `.aktiv` auf Bild und Schritt; die Bilder blenden über, Teile darin
+ * bewegen sich. Endzustand jeder Bewegung ist der normale Stil, so steht `.anleitung-ruhig`
+ * (und «Bewegung reduzieren») ohne Bewegung im Endzustand.
+ */
+.anleitung {
+	display: grid;
+	gap: var(--abstand-3);
+	margin-top: var(--abstand-3);
+}
+
+.anleitung-film {
+	position: relative;
+	width: 10rem;
+	aspect-ratio: 9 / 17;
+	margin: 0 auto;
+	border: var(--rand-dick) solid var(--farbe-text);
+	border-radius: 1.4rem;
+	overflow: hidden;
+	background: var(--farbe-hintergrund);
+	font-size: 0.6rem;
+	line-height: 1.3;
+	hyphens: manual;
+}
+
+.anleitung-bild {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	transition: opacity 0.7s ease-in-out;
+}
+
+.anleitung-bild.aktiv {
+	opacity: 1;
+}
+
+.anleitung-taste {
+	justify-self: center;
+}
+
+.anleitung-schritte {
+	display: grid;
+	gap: var(--abstand-1);
+	padding-left: 0;
+	list-style: none;
+	counter-reset: schritt;
+}
+
+.anleitung-schritte li {
+	counter-increment: schritt;
+	display: grid;
+	grid-template-columns: 1.75rem 1fr;
+	gap: var(--abstand-2);
+	padding: var(--abstand-2);
+	border-radius: var(--radius);
+	border-left: var(--rand-akzent) solid transparent;
+	transition:
+		background-color 0.7s ease-in-out,
+		border-color 0.7s ease-in-out;
+}
+
+.anleitung-schritte li::before {
+	content: counter(schritt);
+	font-weight: 700;
+	color: var(--farbe-marke);
+}
+
+.anleitung-schritte li.anleitung-fertig {
+	counter-increment: none;
+}
+
+.anleitung-schritte li.anleitung-fertig::before {
+	content: '✓';
+}
+
+.anleitung-schritte li.aktiv {
+	background: var(--farbe-marke-zart);
+	border-left-color: var(--farbe-marke);
+}
+
+.anleitung .symbol {
+	width: 1.1em;
+	height: 1.1em;
+	vertical-align: -0.15em;
+}
+
+.anleitung-angehalten * {
+	animation-play-state: paused !important;
+}
+
+.aktiv .anleitung-rein-unten {
+	animation: anleitung-rein-unten 0.8s ease-out 0.5s both;
+}
+
+.aktiv .anleitung-rein-oben {
+	animation: anleitung-rein-oben 0.8s ease-out 0.5s both;
+}
+
+.aktiv .anleitung-rein-blatt {
+	animation: anleitung-rein-blatt 0.9s ease-out 0.4s both;
+}
+
+.aktiv .anleitung-rein-dialog {
+	animation: anleitung-rein-dialog 0.8s ease-out 0.4s both;
+}
+
+.aktiv .anleitung-rein-symbol {
+	animation: anleitung-rein-symbol 0.9s ease-out 0.6s both;
+}
+
+.aktiv .anleitung-erledigt {
+	animation: anleitung-rein-symbol 0.8s ease-out 2.6s both;
+}
+
+.aktiv .anleitung-scrollt {
+	animation: anleitung-scrollt 1.2s ease-in-out 1.1s both;
+}
+
+.aktiv .anleitung-tipp {
+	animation: anleitung-tipp 1.6s ease-in-out 1.6s both;
+}
+
+.aktiv .anleitung-rein-blatt ~ .anleitung-tipp {
+	animation-delay: 2.4s;
+}
+
+@keyframes anleitung-rein-unten {
+	from {
+		opacity: 0;
+		transform: translateY(0.6rem) scale(0.92);
+	}
+}
+
+@keyframes anleitung-rein-oben {
+	from {
+		opacity: 0;
+		transform: translateY(-0.6rem) scale(0.92);
+	}
+}
+
+@keyframes anleitung-rein-blatt {
+	from {
+		transform: translateY(100%);
+	}
+}
+
+@keyframes anleitung-rein-dialog {
+	from {
+		opacity: 0;
+		transform: scale(0.94);
+	}
+}
+
+@keyframes anleitung-rein-symbol {
+	from {
+		opacity: 0;
+		transform: scale(0.4);
+	}
+}
+
+@keyframes anleitung-scrollt {
+	from {
+		transform: translateY(2.6rem);
+	}
+}
+
+@keyframes anleitung-tipp {
+	0% {
+		opacity: 0;
+		transform: scale(1.8);
+	}
+	35% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	55% {
+		transform: scale(0.8);
+	}
+	75%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+/* «Bewegung reduzieren»: keine Bewegung; mit `.anleitung-ruhig` alle Bilder still nebeneinander */
+@media (prefers-reduced-motion: reduce) {
+	.anleitung * {
+		animation: none !important;
+		transition: none !important;
+	}
+}
+
+.anleitung-ruhig * {
+	animation: none !important;
+	transition: none !important;
+}
+
+.anleitung-ruhig .anleitung-film {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--abstand-3);
+	width: 100%;
+	aspect-ratio: auto;
+	border: none;
+	border-radius: 0;
+	background: none;
+	overflow: visible;
+	counter-reset: bild;
+}
+
+.anleitung-ruhig .anleitung-bild {
+	position: relative;
+	opacity: 1;
+	aspect-ratio: 9 / 17;
+	border: var(--rand-dick) solid var(--farbe-text);
+	border-radius: 1rem;
+	overflow: hidden;
+	background: var(--farbe-hintergrund);
+	counter-increment: bild;
+}
+
+.anleitung-ruhig .anleitung-bild::after {
+	content: counter(bild);
+	position: absolute;
+	bottom: 0.3rem;
+	left: 0.3rem;
+	width: 1.4rem;
+	height: 1.4rem;
+	border-radius: 50%;
+	background: var(--farbe-text);
+	color: var(--farbe-flaeche);
+	font-size: var(--groesse-klein);
+	font-weight: 700;
+	display: grid;
+	place-items: center;
+}
+
+/* Teile der Zeichnung */
+.anleitung-kopf {
+	background: var(--farbe-marke);
+	color: var(--farbe-flaeche);
+	font-weight: 700;
+	padding: 1rem 0.5rem 0.35rem;
+}
+
+.anleitung-zeile {
+	height: 0.35rem;
+	margin: 0.5rem;
+	border-radius: var(--radius-rund);
+	background: var(--farbe-linie);
+}
+
+.anleitung-zeile.kurz {
+	width: 55%;
+}
+
+.anleitung-leiste {
+	position: absolute;
+	left: 0.4rem;
+	right: 0.4rem;
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.3rem 0.5rem;
+	border-radius: var(--radius-rund);
+	background: var(--farbe-flaeche);
+	box-shadow: var(--schatten-karte);
+}
+
+.anleitung-leiste.unten {
+	bottom: 0.7rem;
+}
+
+.anleitung-leiste.oben {
+	top: 0.8rem;
+	border-radius: var(--radius);
+}
+
+.anleitung-adresse {
+	flex: 1;
+	text-align: center;
+	color: var(--farbe-text-leise);
+}
+
+.anleitung-knopf {
+	font-weight: 700;
+}
+
+.anleitung-menue,
+.anleitung-blatt,
+.anleitung-dialog {
+	position: absolute;
+	background: var(--farbe-flaeche);
+	box-shadow: var(--schatten-karte);
+	border-radius: var(--radius);
+}
+
+.anleitung-menue {
+	right: 0.4rem;
+	width: 7.4rem;
+}
+
+.anleitung-menue.unten {
+	bottom: 2.5rem;
+	transform-origin: bottom right;
+}
+
+.anleitung-menue.oben {
+	top: 0.8rem;
+	transform-origin: top right;
+}
+
+.anleitung-eintrag {
+	min-height: 1.45rem;
+	padding: 0.3rem 0.5rem;
+	border-bottom: var(--rand-duenn) solid var(--farbe-linie);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.3rem;
+	font-weight: 700;
+}
+
+.anleitung-eintrag:last-child {
+	border-bottom: none;
+}
+
+/* Eintrag ohne belegte Beschriftung: grauer Balken statt erfundenem Text */
+.anleitung-eintrag.leer::before {
+	content: '';
+	height: 0.3rem;
+	width: 60%;
+	border-radius: var(--radius-rund);
+	background: var(--farbe-linie);
+}
+
+.anleitung-blatt {
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 58%;
+	overflow: hidden;
+	border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.anleitung-blatt-titel {
+	justify-content: center;
+	font-weight: 400;
+	color: var(--farbe-text-leise);
+	background: var(--farbe-flaeche);
+	position: relative;
+	z-index: 1;
+}
+
+.anleitung-dialog {
+	left: 0.4rem;
+	right: 0.4rem;
+	top: 1.2rem;
+	padding: 0.5rem;
+	display: grid;
+	gap: 0.5rem;
+}
+
+.anleitung-dialog.mitte {
+	top: 38%;
+}
+
+.anleitung-dialog-kopf {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: 700;
+}
+
+.anleitung-dialog-tasten {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 0.6rem;
+	font-weight: 700;
+	color: var(--farbe-marke);
+}
+
+.anleitung-dialog-tasten .anleitung-eintrag {
+	border: none;
+	padding: 0;
+	min-height: 0;
+	width: 2.5rem;
+}
+
+.anleitung-rund {
+	width: 1.1rem;
+	height: 1.1rem;
+	border-radius: 50%;
+	background: var(--farbe-linie);
+}
+
+.anleitung-app {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+}
+
+.anleitung-symbol-app {
+	width: 1.6rem;
+	height: 1.6rem;
+	border-radius: 0.4rem;
+}
+
+.anleitung-schalter {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.anleitung-schalter i {
+	width: 1.4rem;
+	height: 0.8rem;
+	border-radius: var(--radius-rund);
+	background: var(--farbe-marke);
+	position: relative;
+}
+
+.anleitung-schalter i::after {
+	content: '';
+	position: absolute;
+	right: 0.1rem;
+	top: 0.1rem;
+	width: 0.6rem;
+	height: 0.6rem;
+	border-radius: 50%;
+	background: var(--farbe-flaeche);
+}
+
+.anleitung-home {
+	position: absolute;
+	inset: 0;
+	background: var(--farbe-marke-dunkel);
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	align-content: start;
+	gap: 0.6rem 0.35rem;
+	padding: 1.3rem 0.5rem;
+	color: var(--farbe-flaeche);
+	text-align: center;
+}
+
+.anleitung-home > span {
+	aspect-ratio: 1;
+	border-radius: 0.4rem;
+	background: var(--farbe-marke-hell);
+	opacity: 0.4;
+}
+
+.anleitung-home figure {
+	margin: 0;
+	display: grid;
+	justify-items: center;
+	gap: 0.1rem;
+}
+
+.anleitung-home figure img {
+	width: 100%;
+	border-radius: 0.4rem;
+}
+
+.anleitung-home > .anleitung-erledigt {
+	aspect-ratio: auto;
+	opacity: 1;
+	grid-column: 1 / -1;
+	margin-top: 2rem;
+	justify-self: center;
+	padding: 0.3rem 0.7rem;
+	border-radius: var(--radius-rund);
+	background: var(--farbe-flaeche);
+	color: var(--farbe-marke);
+	font-weight: 700;
+	font-size: 0.75rem;
+}
+
+/* Tipp-Kreis in Sandplatz-Rot: Ausnahme zu UI-04, sagt wie die Haupttaste «hier tippen» */
+.anleitung-tipp {
+	position: absolute;
+	width: 1.6rem;
+	height: 1.6rem;
+	margin: -0.8rem 0 0 -0.8rem;
+	border-radius: 50%;
+	border: 0.2rem solid var(--farbe-aktion);
+}
+
+.anleitung-tipp-ios-1 {
+	left: 88%;
+	top: 92%;
+}
+
+.anleitung-tipp-ios-2 {
+	left: 75%;
+	top: 79%;
+}
+
+.anleitung-tipp-ios-3 {
+	left: 45%;
+	top: 82%;
+}
+
+.anleitung-tipp-ios-4 {
+	left: 79%;
+	top: 12%;
+}
+
+.anleitung-tipp-and-1 {
+	left: 90%;
+	top: 7.5%;
+}
+
+.anleitung-tipp-and-2 {
+	left: 62%;
+	top: 16%;
+}
+
+.anleitung-tipp-and-3 {
+	left: 78%;
+	top: 54%;
+}
+
+.anleitung-tipp-home {
+	left: 38%;
+	top: 12%;
+}

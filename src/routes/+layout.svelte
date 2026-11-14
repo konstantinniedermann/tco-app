@@ -1,6 +1,15 @@
 <script lang="ts">
 	import '../lib/design/tokens.css';
-	import '../lib/design/basis.css';
+	import '../lib/design/grundlagen.css';
+	import '../lib/design/rahmen.css';
+	import '../lib/design/bedienelemente.css';
+	import '../lib/design/karten.css';
+	import '../lib/design/verwaltung.css';
+	import '../lib/design/anleitung.css';
+	import '../lib/design/uebergaenge.css';
+	import '../lib/design/pc-layout.css';
+	import '../lib/design/druck.css';
+	import '../lib/design/verlauf.css';
 	import { onMount } from 'svelte';
 	import { afterNavigate, beforeNavigate, goto, onNavigate, refreshAll } from '$app/navigation';
 	import { asset, resolve } from '$app/paths';
@@ -82,7 +91,7 @@
 		rollbereich.scrollTop = zurueck ? (stand[to.url.pathname] ?? 0) : 0;
 	});
 
-	// Seitenwechsel mit View Transitions (UI-09): Die Bewegung steht in basis.css und hängt am
+	// Seitenwechsel mit View Transitions (UI-09): Die Bewegung steht in uebergaenge.css und hängt am
 	// Attribut data-uebergang. Die Callback-Form, weil Safari vor 18.2 keine `types` kennt.
 	// Ohne Unterstützung oder bei «Bewegung reduzieren» wechselt die Seite sofort.
 	let laufend: ViewTransition | null = null;

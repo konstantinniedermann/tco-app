@@ -14,7 +14,7 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Was | Code-Stelle |
 |-----|-------------|
 | Werte (Farben, Schrift, Abstände, Formen, Bewegung) | `src/lib/design/tokens.css` |
-| Grundstil und Bausteine | `src/lib/design/basis.css` |
+| Grundstil und Bausteine | `src/lib/design/grundlagen.css`, `rahmen.css`, `bedienelemente.css`, `karten.css`, `verwaltung.css`, `anleitung.css`, `uebergaenge.css`, `pc-layout.css`, `druck.css`, `verlauf.css` (Reihenfolge wie in `src/routes/+layout.svelte`, nach `tokens.css`) |
 | Wappen und App-Symbol (Farben fest in der Datei) | `static/wappen.svg`, `static/favicon.svg`, `static/*.png` |
 | Manifest (Name, Farben fest in der Datei; `theme_color` und `background_color` stimmen von Hand mit `--farbe-marke` und `--farbe-hintergrund` überein) | `static/manifest.webmanifest` |
 | Farbe der Browserleiste, Systemschrift-Einstellung, sichere Abstände zu Statusleiste und Notch über `env(safe-area-inset-*)` (`viewport-fit=cover`; nie `apple-mobile-web-app-status-bar-style` `black-translucent`, das schaltet den Schutz vor dem Schleier von iOS ab) | `src/app.html` |
@@ -111,7 +111,7 @@ Mitglied an seinem Gerät eingestellt hat:**
 - Alle Grössen und Abstände sind in `rem`, nie in `px` (UI-02). `html` setzt keine
   Schriftgrösse in px; die Grundgrösse sitzt auf `body`.
 - Android (Chrome ab Version 146): `<meta name="text-scale" content="scale">` in `src/app.html`.
-- iPhone und iPad (Safari): `html { font: -apple-system-body; }` in `basis.css` übernimmt die
+- iPhone und iPad (Safari): `html { font: -apple-system-body; }` in `grundlagen.css` übernimmt die
   Dynamic-Type-Grösse (Standard 17 px statt 16 px, Grundschrift also gut 19 px). Die Regel
   greift nur auf iOS (`-webkit-touch-callout`); Safari am Mac setzte sonst 13 px.
 - PC: Zoom und Schriftgrösse des Browsers wirken über `rem`.
@@ -140,7 +140,7 @@ Mitglied an seinem Gerät eingestellt hat:**
 Ab einer Breite von `60rem` (960 px bei Standardschrift, also auch Tablets quer) gilt das
 PC-Layout. Massgebend ist die Breite des App-Rahmens
 `.app` (Container-Abfrage), nicht die des Fensters; so zeigen auch die Mockups im
-Handy-Rahmen das Handy-Layout. Der Wert steht nur in `basis.css`, weil Abfragen keine Tokens
+Handy-Rahmen das Handy-Layout. Der Wert steht nur in den Stil-Dateien (`pc-layout.css` und wo ein Baustein ihn braucht), weil Abfragen keine Tokens
 erlauben. Weil `.app` ein Container ist, gehen Überlagerungen nur mit `<dialog>`, nicht mit
 `position: fixed`. Einzige Ausnahme ist das Statusleisten-Band; es steht ausserhalb von `.app`.
 
@@ -164,7 +164,7 @@ iPhone nachempfunden und am Muster abgenommen (#54). Wo Bewegung vorkommt, steht
 
 ## Bausteine
 
-Jeder Baustein ist genau einmal als Klasse in `src/lib/design/basis.css` gebaut. Svelte-
+Jeder Baustein ist genau einmal als Klasse in den Stil-Dateien unter `src/lib/design/` gebaut (Bedienelemente, Karten, Verwaltung und Anleitung je in ihrer Datei; die Reihenfolge der Dateien ist fest). Svelte-
 Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese Klassen.
 
 | Baustein | Klasse | Regel |
@@ -622,7 +622,7 @@ Sie trennen nicht, weil die Tabelle auf schmalem Bildschirm ohnehin waagrecht sc
 
 Vorlagen für die ersten Bildschirme (Abnahme durch den Projektleiter in #13). Die CM-Anmeldung
 (Zähler) und die Reiter am PC sind dort überholt; massgebend ist der Text dieses Leitbilds. Sie binden `tokens.css`
-und `basis.css` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im Browser öffnen:
+und die Stil-Dateien unter `src/lib/design/` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im Browser öffnen:
 
 - [Mockups](ui-mockups/index.html): Login, erstes Login (Schritt 2 von 3), Startseite mit
   Reitern, CM-Anmeldung, Mitgliederverwaltung am PC

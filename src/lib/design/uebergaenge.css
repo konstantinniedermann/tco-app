@@ -1,0 +1,142 @@
+/* Seitenübergänge (View Transitions) und reduzierte Bewegung (Teil 7 von 10). */
+
+/*
+ * Seitenwechsel (UI-09, Leitbild «Bewegung und Bedienung»): View Transitions, gesteuert über
+ * html[data-uebergang] aus +layout.svelte. Kopfleiste, Statusleisten-Band und Band «Ansicht als …» stehen still.
+ * Reiter stehen beim Überblenden still, beim Schieben auch, wenn beide Seiten sie zeigen
+ * (data-reiter-bleibt); sonst gehören sie zur Seite und gleiten mit.
+ */
+.kopf {
+	view-transition-name: kopf;
+}
+
+.statusleiste {
+	view-transition-name: statusleiste;
+}
+
+.ansicht-band {
+	view-transition-name: ansicht-band;
+}
+
+.reiter {
+	view-transition-name: reiter;
+}
+
+html[data-uebergang='tiefer']:not([data-reiter-bleibt]) .reiter,
+html[data-uebergang='zurueck']:not([data-reiter-bleibt]) .reiter {
+	view-transition-name: none;
+}
+
+::view-transition-group(kopf),
+::view-transition-group(statusleiste),
+::view-transition-group(ansicht-band),
+::view-transition-new(kopf),
+::view-transition-new(statusleiste),
+::view-transition-new(ansicht-band) {
+	animation: none;
+}
+
+::view-transition-old(kopf),
+::view-transition-old(statusleiste),
+::view-transition-old(ansicht-band) {
+	display: none;
+}
+
+html[data-uebergang='blende']::view-transition-old(root),
+html[data-uebergang='blende']::view-transition-new(root) {
+	animation-duration: var(--dauer-kurz);
+	animation-timing-function: linear;
+}
+
+/* Der Balken gleitet live im neuen Bild; das alte Bild der Reiter würde ihn doppelt zeigen */
+html[data-uebergang='blende']::view-transition-group(reiter),
+html[data-uebergang='blende']::view-transition-new(reiter),
+html[data-reiter-bleibt]::view-transition-group(reiter),
+html[data-reiter-bleibt]::view-transition-new(reiter) {
+	animation: none;
+}
+
+html[data-uebergang='blende']::view-transition-old(reiter),
+html[data-reiter-bleibt]::view-transition-old(reiter) {
+	display: none;
+}
+
+html[data-uebergang='tiefer']::view-transition-old(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-weicht-links;
+}
+
+html[data-uebergang='tiefer']::view-transition-new(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-von-rechts;
+}
+
+/* Zurück: Die Unterseite liegt oben und schiebt sich nach rechts weg */
+html[data-uebergang='zurueck']::view-transition-old(root) {
+	z-index: 1;
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-nach-rechts;
+}
+
+html[data-uebergang='zurueck']::view-transition-new(root) {
+	animation: var(--dauer-schieben) var(--kurve-schieben) both uebergang-von-links;
+}
+
+@keyframes uebergang-weicht-links {
+	to {
+		transform: translateX(-28%);
+		filter: brightness(0.92);
+	}
+}
+
+@keyframes uebergang-von-rechts {
+	from {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes uebergang-nach-rechts {
+	to {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes uebergang-von-links {
+	from {
+		transform: translateX(-28%);
+		filter: brightness(0.92);
+	}
+}
+
+/* «Bewegung reduzieren» (UI-09): alles wechselt sofort, auch Balken, Symbol, Kachel und Pfeil */
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+
+	.reiter-balken,
+	.reiter a .symbol,
+	.kachel,
+	.klappe-titel::after {
+		transition: none;
+	}
+
+	.reiter a:active .symbol,
+	a.kachel:active {
+		transform: none;
+	}
+}
+
+/* Ein Fokussprung landet nicht unter dem klebenden Seitenkopf der Verwaltung am PC (WCAG 2.4.11):
+   Abstand oben, Pfad, Titel (eine Zeile) und Abstand unten; ein umbrechender Titel ist die
+   Ausnahme. Das <html> liegt ausserhalb des Containers, darum @media statt @container. */
+@media (width >= 60rem) {
+	html:has(.seitenkopf) {
+		scroll-padding-top: calc(var(--abstand-6) + 8rem);
+	}
+}
+
+@keyframes seitenkopf-linie {
+	to {
+		border-bottom-color: var(--farbe-linie);
+	}
+}
