@@ -7,7 +7,8 @@
 // nur ROUTEN und EINSTIEGE an. Zieht eine Funktion in ein anderes Modul, ändert sich nur ihr Import;
 // das Modul muss auf `schnittstellen.ts` enden (sonst `schnittstellenModule` erweitern), und eine
 // neue Liste der Verwaltung gehört in `VERWALTUNGS_LISTEN` (`tests/hilfen/verwaltungs-listen.ts`),
-// eine der Mitglieder in `MITGLIEDER_LISTEN` (`tests/hilfen/mitglieder-listen.ts`).
+// eine der Mitglieder in `MITGLIEDER_LISTEN` (`tests/hilfen/mitglieder-listen.ts`). Der Name einer
+// Funktion beginnt mit der Methode ihrer Route (`get…` zu GET, `post…` zu POST; vierter Test).
 // Der Test liegt hier und nicht unter `src/routes/`: Dort gilt die Bauregel für jede Datei, und
 // nur Admin-Routen dürfen die Verwaltung importieren.
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
@@ -399,6 +400,32 @@ describe('Verdrahtung der Routen', () => {
 					`${methode} ${route}`,
 					true
 				]);
+			}
+		}
+	});
+
+	// Grundprüfung und Rechte-Matrix erkennen «schreibend» am Namen in der Liste (`post…` bzw.
+	// «nicht `get…`»). Das hält nur, wenn der Name zur Methode der Route passt; hier ist es geprüft,
+	// für jeden Namen, unter dem die Funktion in einer Liste steht. Ohne Liste (Login, Sitzung) gilt
+	// der Name der Funktion; die gebauten Schnittstellen der Mitteilungen haben keinen eigenen.
+	test('zu GET gehört ein Name mit get, zu POST einer mit post', () => {
+		const listenNamen = new Map<unknown, string[]>();
+		for (const liste of [
+			...Object.values(VERWALTUNGS_LISTEN),
+			...Object.values(MITGLIEDER_LISTEN)
+		]) {
+			for (const [eintrag, funktion] of Object.entries(liste)) {
+				listenNamen.set(funktion, [...(listenNamen.get(funktion) ?? []), eintrag]);
+			}
+		}
+		const praefix: Record<string, string> = { GET: 'get', POST: 'post' };
+		for (const [route, soll] of Object.entries(ROUTEN)) {
+			if ('eigen' in soll) continue;
+			for (const [methode, [funktion]] of Object.entries(soll)) {
+				if (!Object.hasOwn(praefix, methode)) continue;
+				const namen = listenNamen.get(funktion) ?? [name(funktion)];
+				const falsch = namen.filter((n) => !n.startsWith(praefix[methode]));
+				expect([`${methode} ${route}`, falsch]).toEqual([`${methode} ${route}`, []]);
 			}
 		}
 	});
