@@ -10,7 +10,7 @@
 	import type { Snippet } from 'svelte';
 	import type { Antwort } from './api.ts';
 	import { fehlerText } from './anzeige.ts';
-	import { doppelWarnungen } from './turnier-anzeige.ts';
+	import { warnungsSaetze } from './turnier-anzeige.ts';
 	import { leiteUm } from './umleiten.ts';
 
 	type Art = Antwort<unknown>['art'];
@@ -120,7 +120,7 @@
 	{#if warnungen}
 		<div role="alert">
 			<ul>
-				{#each doppelWarnungen(warnungen.warnungen, namen) as satz (satz)}
+				{#each warnungsSaetze(warnungen.warnungen, namen) as satz (satz)}
 					<li>{satz}</li>
 				{/each}
 			</ul>

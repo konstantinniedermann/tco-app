@@ -91,10 +91,10 @@ const WARNUNG: Record<Warnung, string> = {
 };
 
 /**
- * FR-46: Warnungen im Doppel als Liste, Sätze wie im Einzel. Der Server sagt bei `voll` nicht, wer
+ * FR-46: Warnungen für Einzel und Doppel als Liste von Sätzen. Der Server sagt bei `voll` nicht, wer
  * die Grenze erreicht hat; der Satz nennt darum die Spieler, für die es gelten kann.
  */
-export const doppelWarnungen = (w: readonly Warnung[], namen: readonly string[]): string[] =>
+export const warnungsSaetze = (w: readonly Warnung[], namen: readonly string[]): string[] =>
 	w.map((x) =>
 		x === 'voll' && namen.length > 0
 			? `${namen.join(' oder ')} hat schon 3 Anmeldungen.`

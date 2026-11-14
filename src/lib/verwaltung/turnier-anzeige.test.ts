@@ -6,7 +6,7 @@ import {
 	anmeldungStatus,
 	datumKurz,
 	datumLang,
-	doppelWarnungen,
+	warnungsSaetze,
 	geschlechtText,
 	jahrgangText,
 	mitgliedVermerk,
@@ -159,16 +159,16 @@ describe('Anzeigehilfen für Turniere', () => {
 	});
 
 	it('FR-46: Warnungen im Doppel als Liste wie im Einzel, «voll» nennt die Spieler', () => {
-		expect(doppelWarnungen(['passt-nicht', 'voll', 'geschlossen'], ['Max Beispiel'])).toEqual([
+		expect(warnungsSaetze(['passt-nicht', 'voll', 'geschlossen'], ['Max Beispiel'])).toEqual([
 			'Passt nicht zur Kategorie.',
 			'Max Beispiel hat schon 3 Anmeldungen.',
 			'Anmeldung ist geschlossen.'
 		]);
-		expect(doppelWarnungen(['voll'], ['Lena Muster', 'Max Beispiel'])).toEqual([
+		expect(warnungsSaetze(['voll'], ['Lena Muster', 'Max Beispiel'])).toEqual([
 			'Lena Muster oder Max Beispiel hat schon 3 Anmeldungen.'
 		]);
-		expect(doppelWarnungen(['angaben-fehlen'], [])).toEqual(['Angaben fehlen.']);
-		expect(doppelWarnungen([], ['Max Beispiel'])).toEqual([]);
+		expect(warnungsSaetze(['angaben-fehlen'], [])).toEqual(['Angaben fehlen.']);
+		expect(warnungsSaetze([], ['Max Beispiel'])).toEqual([]);
 	});
 
 	it('FR-46: wer nicht aktiv ist, bleibt nicht im Paar und wird nicht verschoben', () => {
