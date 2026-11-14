@@ -135,6 +135,26 @@ Fehler der App.
 
 ## Offen
 
+### 2026-11-14 — CM-Seite: Fokus nach einer Aktion hängt vom Zeitpunkt im Browser ab
+
+**Thema:** Barrierefreiheit
+
+**Fundort:** `src/routes/clubmeisterschaft/[id]/+page.svelte`, `fokusNachAnfrage()`; Fehlerzweige
+der Aktionen (Anmelden, Wildcard, Abmelden, Zurückziehen) über `src/lib/cm/ablauf.ts`.
+
+**Beobachtung:** Nach «hinfällig» setzt die Seite den Fokus nur dann auf den Titel der ersten
+Anfrage, wenn die gesperrte Taste ihn schon verloren hat; das entscheidet der Browser je nach
+Zeitpunkt. Sonst bleibt er auf der Taste. Gesetzt wird zudem der erste Titel, nicht die Anfrage,
+die man angetippt hat. In den Fehlerzweigen mit Neuladen fällt der Fokus in den Seitenkörper
+(WCAG 2.4.3).
+
+**Ursprung:** Refactoring Schritt 16; zwei rote Läufe der iPhone-CI am 14.11.2026
+(`docs/refactoring-analyse.md`, Abschnitt 1d «Fokus-Wackler», E-54, E-55).
+
+**Einschätzung:** Altes Verhalten, vom Refactoring nur sichtbar gemacht. Richtig wäre: Fokus
+unbedingt auf den Titel derselben Anfrage, Fehlerzweige ohne Fokusverlust. Das ändert Verhalten
+und wartet auf das Ende des Feature-Stopps. Die E2E-Prüfung ist bis dahin gelockert.
+
 ### 2026-11-13 — Interclub: Kleinigkeiten der Seite einer Begegnung
 
 **Thema:** Interclub
