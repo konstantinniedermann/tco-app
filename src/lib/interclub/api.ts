@@ -4,7 +4,6 @@ import type {
 	IcBegegnung,
 	IcKachel,
 	IcPartie,
-	IcRangZeile,
 	IcSpiel,
 	IcTeam,
 	IcUebersicht
@@ -16,7 +15,6 @@ export type Uebersicht = Json<IcUebersicht>;
 export type Team = Json<IcTeam>;
 export type Spiel = Json<IcSpiel>;
 export type Kachel = Json<IcKachel>;
-export type RangZeile = Json<IcRangZeile>;
 
 export type Ergebnis<T> =
 	{ art: 'ok'; daten: T } | { art: 'abgemeldet' } | { art: 'nicht-gefunden' } | { art: 'stoerung' };

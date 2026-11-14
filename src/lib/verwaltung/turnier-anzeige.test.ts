@@ -18,8 +18,7 @@ import {
 	statusText,
 	summeText,
 	trefferText,
-	unpassendText,
-	warnungText
+	unpassendText
 } from './turnier-anzeige.ts';
 
 describe('Anzeigehilfen für Turniere', () => {
@@ -87,16 +86,6 @@ describe('Anzeigehilfen für Turniere', () => {
 		expect(ART_GESPERRT).toBe(
 			'Einzel oder Doppel lässt sich nur ändern, solange niemand angemeldet ist.'
 		);
-	});
-
-	it('FR-46: Warnungen beim Anmelden von Hand als kurze Sätze, in fester Reihenfolge', () => {
-		expect(warnungText(['passt-nicht', 'voll'])).toBe(
-			'Passt nicht zur Kategorie. Hat schon 3 Anmeldungen.'
-		);
-		expect(warnungText(['angaben-fehlen', 'passt-nicht', 'voll', 'geschlossen'])).toBe(
-			'Angaben fehlen. Passt nicht zur Kategorie. Hat schon 3 Anmeldungen. Anmeldung ist geschlossen.'
-		);
-		expect(warnungText([])).toBe('');
 	});
 
 	it('A-ANMELDUNG-06: Zähler der Anmeldungen nennt die Wildcard-Anträge', () => {

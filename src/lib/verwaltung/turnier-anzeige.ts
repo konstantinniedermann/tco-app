@@ -90,9 +90,6 @@ const WARNUNG: Record<Warnung, string> = {
 	geschlossen: 'Anmeldung ist geschlossen.'
 };
 
-/** FR-46: Warnungen vor dem Anmelden oder Verschieben von Hand, in der Reihenfolge des Servers. */
-export const warnungText = (w: readonly Warnung[]) => w.map((x) => WARNUNG[x]).join(' ');
-
 /**
  * FR-46: Warnungen im Doppel als Liste, Sätze wie im Einzel. Der Server sagt bei `voll` nicht, wer
  * die Grenze erreicht hat; der Satz nennt darum die Spieler, für die es gelten kann.
