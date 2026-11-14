@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Refactoring Schritt 20, Lauf 1 (Aufräumen): drei ungenutzte Namen und 25 unnötige `export`
+  entfernt, eine Funktion umbenannt, die E2E-Hilfen nach Themen geteilt, kopierte Test-Hilfen
+  zusammengeführt. An der App ändert sich nichts.
+
 ## 0.22.7 — Eigenbau «Mindestversion» entfernt (Refactoring Schritt 19)
 
 - `/api/status` nennt nur noch
