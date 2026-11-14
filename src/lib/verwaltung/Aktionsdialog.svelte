@@ -1,6 +1,7 @@
 <!--
-	FR-46: Rückfrage der Doppel-Verwaltung als `<dialog class="karte">`: Inhalt der Seite, darunter
-	Warnungen als Liste und Fehler, dann Abbrechen und die Haupttaste. Nach `409 warnung` heisst die
+	FR-46, FR-08: Rückfrage der Turnier-Verwaltung (Einzel und Doppel) als `<dialog class="karte">`:
+	Inhalt der Seite, darunter Warnungen als Liste und Fehler, dann Abbrechen, wahlweise eine zweite
+	Entscheidung (`neben`, z. B. «Ablehnen») und die Haupttaste. Nach `409 warnung` heisst die
 	Haupttaste «Trotzdem …» und schickt die Aktion mit `trotzdem`. Bei Erfolg und bei den Antworten
 	in `folgen` (der Stand hat sich inzwischen geändert) schliesst der Dialog und `onfertig` lädt die
 	Seite neu und sagt es in einem Satz.
@@ -22,10 +23,17 @@
 		trotzdemTaste?: string;
 		/** Die Haupttaste geht erst, wenn alles gewählt ist. */
 		bereit?: boolean;
+		/** Es gibt nichts auszuführen (etwa kein Ziel); dann steht nur «Abbrechen». */
+		ohneHaupttaste?: boolean;
 		/** Spieler, die eine Warnung `voll` betreffen kann. */
 		namen?: string[];
 		aktion: (trotzdem: boolean) => Promise<Antwort<unknown>>;
 		erfolg: string;
+		/**
+		 * Zweite Entscheidung vor der Haupttaste, mit eigenem Satz bei Erfolg; gesperrt wie die
+		 * Haupttaste, `folgen` gelten für beide.
+		 */
+		neben?: { taste: string; aktion: () => Promise<Antwort<unknown>>; erfolg: string };
 		folgen?: Partial<Record<Art, string>>;
 		onfertig: (satz: string) => Promise<void>;
 		onschliessen?: () => void;
@@ -38,9 +46,11 @@
 		taste,
 		trotzdemTaste = taste,
 		bereit = true,
+		ohneHaupttaste = false,
 		namen = [],
 		aktion,
 		erfolg,
+		neben,
 		folgen = {},
 		onfertig,
 		onschliessen,
@@ -68,19 +78,22 @@
 		fehler = null;
 	}
 
-	async function ausfuehren() {
+	async function ausfuehren(
+		los: (trotzdem: boolean) => Promise<Antwort<unknown>>,
+		satzBeiErfolg: string
+	) {
 		if (laeuft || !bereit) return;
 		laeuft = true;
 		fehler = null;
 		// Wirft etwas (z. B. das Neuladen in `onfertig`), bleibt die Haupttaste nicht gesperrt.
 		try {
 			const nr = stand;
-			const a = await aktion(warnungen !== undefined);
+			const a = await los(warnungen !== undefined);
 			if (await leiteUm(a)) {
 				dialog?.close();
 				return;
 			}
-			const satz = a.art === 'ok' ? erfolg : a.art === 'warnung' ? undefined : folgen[a.art];
+			const satz = a.art === 'ok' ? satzBeiErfolg : a.art === 'warnung' ? undefined : folgen[a.art];
 			// Wurde der Dialog inzwischen geschlossen, neu geöffnet oder etwas anderes gewählt, gehören
 			// Warnungen und Fehler zu keinem Dialog mehr. Ein geänderter Stand lädt trotzdem neu.
 			if (nr !== stand || !dialog?.open) {
@@ -118,8 +131,22 @@
 	{/if}
 	<div class="leiste">
 		<button type="button" class="taste-neben" onclick={() => dialog?.close()}>Abbrechen</button>
-		<button type="button" class="taste-haupt" disabled={!bereit || laeuft} onclick={ausfuehren}
-			>{warnungen ? trotzdemTaste : taste}</button
-		>
+		{#if neben}
+			{@const n = neben}
+			<button
+				type="button"
+				class="taste-neben"
+				disabled={!bereit || laeuft}
+				onclick={() => ausfuehren(n.aktion, n.erfolg)}>{n.taste}</button
+			>
+		{/if}
+		{#if !ohneHaupttaste}
+			<button
+				type="button"
+				class="taste-haupt"
+				disabled={!bereit || laeuft}
+				onclick={() => ausfuehren(aktion, erfolg)}>{warnungen ? trotzdemTaste : taste}</button
+			>
+		{/if}
 	</div>
 </dialog>
