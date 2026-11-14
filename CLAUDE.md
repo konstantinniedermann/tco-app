@@ -118,7 +118,9 @@ Abschluss des Plans.
 - Ab Schritt 15: Fehlende Sitzung, Rolle oder Bestätigung behandelt nur die gemeinsame
   Wächter-Funktion, in der Ladefunktion und nach einer Aktion; keine Seite schreibt die Umleitung
   zum Login selbst, keine Ladefunktion ruft `fetch` direkt. Das erste Laden einer Seite steht in
-  `+page.ts`; im Baustein nur erneutes Laden nach Eingabe oder Aktion.
+  `+page.ts`; im Baustein nur erneutes Laden nach Eingabe oder Aktion. Benannte Ausnahmen, die
+  bleiben: die Seite `willkommen` leitet nach dem Gerät zum Login, die zwei Push-Bausteine
+  laden ihren Stand selbst.
 - Ab Schritt 17: Eine Aktion mit Rückfrage nutzt `Aktionsdialog` oder die gemeinsame
   Ablauf-Funktion; keine neue Sperre und Antwort-Verzweigung von Hand.
 - Ab Schritt 18: Stile in den Dateien unter `src/lib/design/` in ihrer festen Reihenfolge;
