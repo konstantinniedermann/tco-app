@@ -8,6 +8,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.22.4 — Rückfragen der Einzel-Anmeldungsliste im gemeinsamen Dialog (Refactoring Schritt 17)
+
+- Die Einzel-Anmeldungsliste der Verwaltung nutzt für ihre fünf
+  Rückfragen den gemeinsamen Baustein `Aktionsdialog` wie die Doppel-Liste; er kann dafür eine
+  zweite Entscheid-Taste («Ablehnen» beim Wildcard-Antrag) und einen Dialog nur mit «Abbrechen».
+  Warnungen stehen jetzt als Liste statt als ein Satz (E-52).
+
 ## 0.22.3 — Wacklige Fokus-Prüfung aus dem CM-Ablauftest (Nachtrag zu Schritt 16)
 
 - Der E2E-Test der CM-Seite prüft nicht mehr, dass der Fokus nach einer gesperrten Taste im
