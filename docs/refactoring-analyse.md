@@ -3181,6 +3181,7 @@ sie hebt die Übergangsregeln auf.
 | **E-60** [neu] | (Zusatz zu F-34, 14.11.2026) Die Protokolle (Anhänge C, D und E) werden je Etappe in eine eigene Datei ausgelagert; der Stand bleibt in diesem Dokument. Ausgeführt am 14.11.2026 (Orchestrator): `docs/refactoring-protokoll-etappe-0.md`, `-1.md`, `-2.md`; kein Wort der Protokolle geändert. Das Protokoll der Etappe 3 kommt als Anhang F in dieses Dokument. |
 | **E-61** [neu] | (F-35, 14.11.2026) Antwort B: Schritt 19 entfernt den Eigenbau (`MINDESTVERSION`, `istVersionVertraeglich`, `mindestversion` in `/api/status`) und baut die Ergänzung zum Bordmittel von SvelteKit: Hat die App eine neue Auslieferung bemerkt, lädt der nächste angetippte Link die Seite einmal ganz neu; nur Links, nicht `goto` und nicht die Zurück-Geste; die Rückfrage «Nicht gespeichert» kommt vorher. `version.name` wird nicht gesetzt. Die Zusage «Mindestversion» fällt aus der Doku; eine erzwungene Mindestversion wäre neue Funktion. Geht die Ergänzung nicht auf (Abbruchstellen in F.1), endet der Schritt mit A (nur Bordmittel, Doku beschreibt den Fehlerfall). Die kleine sichtbare Änderung ist damit freigegeben. **Ausgang (14.11.2026): umgesetzt ist A.** Die Ergänzung tat das Richtige, erzeugte auf WebKit aber Konsolenfehler aus abgebrochenen Abrufen (Abbruchstelle 2, dem Sinn nach; Anhang F.2). B bleibt als Beobachtung für nach dem Feature-Stopp (`docs/beobachtungen.md`). |
 | **E-62** [neu] | (F-36, 14.11.2026) Antwort A: Nach Schritt 19 genügt ein Kurzbericht, kein Halt vor dem Merge. |
+| **E-63** [neu] | (F-37, 14.11.2026) Antwort B: Die CI zeichnet eine Spur (Playwright-Trace) nur auf, wenn der Workflow von Hand mit einem Schalter gestartet wird. Push- und PR-Läufe bleiben unverändert: keine zusätzliche Laufzeit, keine Wiederholungen. Umgesetzt in Schritt 20, Lauf 2 (Commit 10, F.5). |
 
 ---
 
@@ -3521,7 +3522,7 @@ Auslieferung; E-45 nennt eine sichtbare Verhaltensänderung als Anlass für eine
 - **Empfehlung: A.** Zu zeigen gibt es ausser einem Neuladen nichts; der Nachweis ist der Test.
 - **Hält auf:** nur den Merge von Schritt 19, und nur bei Antwort B.
 
-**F-37 [OFFEN] [neu] — Spur bei rotem E2E in der CI: aufzeichnen, und wie?**
+**F-37 [BEANTWORTET 14.11.2026: B, E-63] [neu] — Spur bei rotem E2E in der CI: aufzeichnen, und wie?**
 (Hinweis (k) zu Schritt 20, N-23; Nachmessen in Anhang F.3, Abschnitt 4; Kosten nach E-06)
 
 **Frist: vor Lauf 2 von Schritt 20.** Wird ein E2E-Test nur in der CI rot, zeigen die Artefakte
