@@ -27,7 +27,7 @@ import type { AnlassDienste } from './typen.ts';
 export type AnlassEreignis = Ereignis & Pick<RequestEvent, 'params'>;
 
 /** Für den Browser: statt der Kennung der Link zur Kalenderdatei. */
-export function fuerBrowser({ kalenderKennung, ...rest }: AnlassMitglied) {
+function fuerBrowser({ kalenderKennung, ...rest }: AnlassMitglied) {
 	return { ...rest, kalender: `/api/kalender/${kalenderKennung}` };
 }
 

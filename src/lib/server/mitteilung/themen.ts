@@ -4,7 +4,7 @@ import type { Db } from '../db/index.ts';
 import { konto, type Thema } from '../db/schema.ts';
 import { hatAbo } from './abo.ts';
 
-export const THEMEN: readonly Thema[] = ['anlaesse', 'cm', 'verein'];
+const THEMEN: readonly Thema[] = ['anlaesse', 'cm', 'verein'];
 
 /** Alle drei Themen als Wahrheitswerte, sonst `null`. */
 export function pruefeThemen(roh: unknown): Record<Thema, boolean> | null {

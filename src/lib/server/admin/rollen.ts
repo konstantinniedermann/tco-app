@@ -56,7 +56,7 @@ export async function waereLetzterMytco(tx: DbOderTx, kontoId: number): Promise<
 	return andere.n === 0;
 }
 
-export const VERWALTUNGSROLLEN = ['mytco', 'mitglieder', 'cm'] as const satisfies readonly Rolle[];
+const VERWALTUNGSROLLEN = ['mytco', 'mitglieder', 'cm'] as const satisfies readonly Rolle[];
 export type VerwaltungsRolle = (typeof VERWALTUNGSROLLEN)[number];
 
 // RR-07, RR-08: Rollen, die die Verwaltung öffnen, für ein Konto, das nicht gesperrt ist und
