@@ -20,6 +20,10 @@ const port =
 		: 4173;
 const baseURL = `http://localhost:${port}`;
 
+// Spur (Playwright-Trace) nur auf Wunsch, für jeden Test: `MYTCO_E2E_SPUR=an`, in der CI über den
+// Schalter beim Handstart (docs/ci-cd-und-release.md). Ohne ihn zeichnet kein Lauf eine Spur auf.
+const spur = process.env.MYTCO_E2E_SPUR === 'an';
+
 export default defineConfig({
 	// Entspricht E2E in scripts/pruefungen/testmuster.ts.
 	testDir: 'tests/e2e',
@@ -29,6 +33,7 @@ export default defineConfig({
 	use: {
 		baseURL,
 		screenshot: 'on',
+		...(spur ? { trace: 'on' as const } : {}),
 		// Der Service Worker (Push, #63) bliebe sonst zwischen Seite und Netz: WebKit leitet dann
 		// Anfragen an `page.route` vorbei, und Chrome hielte die App für installierbar. Er hat
 		// keinen `fetch`-Handler; die Tests prüfen Push ohne echtes Abo.

@@ -10,7 +10,14 @@ on:
     branches: [dev, main]
   push:
     branches: [dev, main]
+  # Von Hand mit Schalter «spur»: Die E2E-Jobs zeichnen dann für jeden Test eine Spur auf
+  # (Playwright-Trace, im Artefakt). Push- und PR-Läufe haben den Schalter nicht.
   workflow_dispatch:
+    inputs:
+      spur:
+        description: 'E2E mit Spur (Playwright-Trace) für jeden Test'
+        type: boolean
+        default: false
 
 concurrency:
   # PR-Läufe teilen sich eine Gruppe pro Branch und brechen den vorherigen ab. Jeder
@@ -205,6 +212,8 @@ jobs:
       - name: E2E-Tests
         env:
           GERAET: ${{ matrix.geraet }}
+          # «an» nur beim Handstart mit gesetztem Schalter; bei Push und PR ist `inputs.spur` leer.
+          MYTCO_E2E_SPUR: ${{ inputs.spur && 'an' || 'aus' }}
         run: npm run e2e -- --project="$GERAET"
       - name: Ergebnisse und Screenshots sichern
         if: always()
