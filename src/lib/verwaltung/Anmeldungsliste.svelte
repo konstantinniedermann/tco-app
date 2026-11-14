@@ -9,13 +9,13 @@
 	import { refreshAll } from '$app/navigation';
 	import Name from '../ui/Name.svelte';
 	import { amtlicherName } from '../name.ts';
+	import Aktionsdialog from './Aktionsdialog.svelte';
 	import Spielersuche from './Spielersuche.svelte';
 	import Kontakt from './Kontakt.svelte';
 	import Zeilenaktionen from './Zeilenaktionen.svelte';
 	import Zeilentasten from './Zeilentasten.svelte';
 	import type { Zeilenaktion } from './zeilenaktionen.ts';
 	import { KLASSIERUNGEN, klassierungName, type Klassierung } from '../turnier/klassierung.ts';
-	import { type Antwort, type Warnung } from './api.ts';
 	import {
 		entscheideAntrag,
 		korrigiereKlassierung,
@@ -24,15 +24,14 @@
 		verschiebeAnmeldung,
 		type AnmeldungZeile
 	} from './turnier-api.ts';
-	import { fehlerText } from './anzeige.ts';
 	import {
 		anmeldungStatus,
 		anmeldungenText,
 		mitgliedVermerk,
-		spielerGeschlechtText,
-		warnungText
+		spielerGeschlechtText
 	} from './turnier-anzeige.ts';
-	import { leiteUm } from './umleiten.ts';
+
+	type Dialog = ReturnType<typeof Aktionsdialog>;
 
 	type Props = {
 		kategorieId: number;
@@ -61,17 +60,13 @@
 
 	let rueckmeldung = $state<string | null>(null);
 	let rueckmeldungFeld = $state<HTMLParagraphElement>();
-	let laeuft = $state(false);
-	let fehler = $state<string | null>(null);
-	// Nach `409 warnung` zeigt derselbe Dialog die Warnungen; die Haupttaste heisst dann «Trotzdem …».
-	let warnungen = $state<Warnung[]>([]);
 	let gewaehlt = $state<AnmeldungZeile | null>(null);
 
-	let anmelden = $state<HTMLDialogElement>();
-	let verschieben = $state<HTMLDialogElement>();
-	let klassierungDialog = $state<HTMLDialogElement>();
-	let loeschen = $state<HTMLDialogElement>();
-	let entscheiden = $state<HTMLDialogElement>();
+	let anmelden = $state<Dialog>();
+	let verschieben = $state<Dialog>();
+	let klassierungDialog = $state<Dialog>();
+	let loeschen = $state<Dialog>();
+	let entscheiden = $state<Dialog>();
 	let aendern = $state<ReturnType<typeof Zeilenaktionen>>();
 
 	// Jedes Öffnen von «Von Hand anmelden» beginnt mit einer leeren Suche.
@@ -81,12 +76,10 @@
 	let klassierung = $state<Klassierung | ''>('');
 	let grund = $state('');
 
-	function oeffne(dialog: HTMLDialogElement | undefined, z: AnmeldungZeile | null) {
+	function oeffne(dialog: Dialog | undefined, z: AnmeldungZeile | null) {
 		gewaehlt = z;
-		fehler = null;
-		warnungen = [];
 		rueckmeldung = null;
-		dialog?.showModal();
+		dialog?.oeffne();
 	}
 
 	function oeffneAnmelden() {
@@ -120,100 +113,13 @@
 		];
 	}
 
-	/**
-	 * Führt eine Aktion aus. Bei Erfolg und bei den Antworten in `folgen` (der Stand hat sich
-	 * inzwischen geändert) schliesst der Dialog, die Seite lädt neu und sagt es in einem Satz.
-	 */
-	async function fuehreAus(
-		dialog: HTMLDialogElement | undefined,
-		aufruf: () => Promise<Antwort<unknown>>,
-		erfolg: string,
-		folgen: Partial<Record<Antwort<unknown>['art'], string>>
-	) {
-		if (laeuft) return;
-		laeuft = true;
-		fehler = null;
-		const a = await aufruf();
-		if (await leiteUm(a)) {
-			laeuft = false;
-			dialog?.close();
-			return;
-		}
-		const satz = a.art === 'ok' ? erfolg : a.art === 'warnung' ? undefined : folgen[a.art];
-		// Wurde der Dialog inzwischen geschlossen, gehören Warnungen und Fehler zu keinem Dialog mehr
-		// (`warnungen` und `fehler` teilen sich alle Dialoge). Ein geänderter Stand lädt trotzdem neu.
-		if (!dialog?.open) {
-			if (satz !== undefined) {
-				await refreshAll();
-				rueckmeldung = satz;
-			}
-			laeuft = false;
-			return;
-		}
-		if (a.art === 'warnung') {
-			warnungen = a.warnungen;
-			laeuft = false;
-			return;
-		}
-		if (satz === undefined) {
-			fehler = fehlerText(a);
-			laeuft = false;
-			return;
-		}
-		dialog.close();
+	/** Nach einer Aktion (der Dialog ist zu): Liste neu laden, den Satz zeigen, Fokus auf ihn. */
+	async function fertig(satz: string) {
 		await refreshAll();
-		laeuft = false;
 		rueckmeldung = satz;
 		await tick();
 		rueckmeldungFeld?.focus();
 	}
-
-	const meldeAn = () =>
-		mitgliedId !== null &&
-		fuehreAus(
-			anmelden,
-			() => meldeVonHandAn(kategorieId, mitgliedId as number, warnungen.length > 0),
-			'Angemeldet.',
-			{
-				'schon-angemeldet': 'Ist schon in dieser Kategorie angemeldet.',
-				vorbereitung: VORBEREITUNG,
-				'nicht-gefunden': 'Mitglied oder Kategorie ist nicht mehr aktiv.'
-			}
-		);
-
-	const verschiebe = (z: AnmeldungZeile) =>
-		zielId !== null &&
-		fuehreAus(
-			verschieben,
-			() => verschiebeAnmeldung(z.anmeldungId, zielId as number, warnungen.length > 0),
-			'Verschoben.',
-			{
-				'schon-angemeldet': 'Ist dort schon angemeldet.',
-				vorbereitung: VORBEREITUNG,
-				'nicht-gefunden': WEG
-			}
-		);
-
-	const speichereKlassierung = (z: AnmeldungZeile, k: Klassierung) =>
-		fuehreAus(
-			klassierungDialog,
-			() => korrigiereKlassierung(z.mitgliedId, k),
-			'Klassierung gespeichert.',
-			{ 'nicht-gefunden': 'Dieses Mitglied gibt es nicht mehr.' }
-		);
-
-	const loesche = (z: AnmeldungZeile) =>
-		fuehreAus(loeschen, () => loescheAnmeldung(z.anmeldungId), 'Gelöscht.', {
-			'nicht-gefunden': WEG
-		});
-
-	const entscheide = (z: AnmeldungZeile, bestaetigt: boolean) =>
-		fuehreAus(
-			entscheiden,
-			() => entscheideAntrag(z.anmeldungId, bestaetigt, grund),
-			bestaetigt ? 'Bestätigt.' : 'Abgelehnt.',
-			{ 'nicht-beantragt': 'Darüber ist schon entschieden.', 'nicht-gefunden': WEG }
-		);
 
 	const istAngemeldet = (id: number) => (zeilen ?? []).some((z) => z.mitgliedId === id);
 </script>
@@ -321,8 +227,22 @@
 {#if !nurLesen}
 	<Zeilenaktionen bind:this={aendern} id="anmeldung-aendern" />
 
-	<dialog class="karte" bind:this={anmelden} aria-labelledby="anmelden-titel">
-		<h2 id="anmelden-titel">Von Hand anmelden</h2>
+	<Aktionsdialog
+		bind:this={anmelden}
+		id="anmelden"
+		titel="Von Hand anmelden"
+		taste="Anmelden"
+		trotzdemTaste="Trotzdem anmelden"
+		bereit={mitgliedId !== null}
+		aktion={(trotzdem) => meldeVonHandAn(kategorieId, mitgliedId as number, trotzdem)}
+		erfolg="Angemeldet."
+		folgen={{
+			'schon-angemeldet': 'Ist schon in dieser Kategorie angemeldet.',
+			vorbereitung: VORBEREITUNG,
+			'nicht-gefunden': 'Mitglied oder Kategorie ist nicht mehr aktiv.'
+		}}
+		onfertig={fertig}
+	>
 		{#key suchlauf}
 			<Spielersuche
 				id="anmelden"
@@ -331,30 +251,29 @@
 				gesperrt={(id) => (istAngemeldet(id) ? 'schon angemeldet' : null)}
 				onwahl={(t) => {
 					mitgliedId = t?.mitgliedId ?? null;
-					warnungen = [];
-					fehler = null;
+					anmelden?.verwerfe();
 				}}
 			/>
 		{/key}
-		{#if warnungen.length > 0}
-			<p role="alert">{warnungText(warnungen)}</p>
-		{/if}
-		{#if fehler}
-			<p class="fehler" role="alert">{fehler}</p>
-		{/if}
-		<div class="leiste">
-			<button type="button" class="taste-neben" onclick={() => anmelden?.close()}>Abbrechen</button>
-			<button
-				type="button"
-				class="taste-haupt"
-				disabled={mitgliedId === null || laeuft}
-				onclick={meldeAn}>{warnungen.length > 0 ? 'Trotzdem anmelden' : 'Anmelden'}</button
-			>
-		</div>
-	</dialog>
+	</Aktionsdialog>
 
-	<dialog class="karte" bind:this={verschieben} aria-labelledby="verschieben-titel">
-		<h2 id="verschieben-titel">Verschieben</h2>
+	<Aktionsdialog
+		bind:this={verschieben}
+		id="verschieben"
+		titel="Verschieben"
+		taste="Verschieben"
+		trotzdemTaste="Trotzdem verschieben"
+		bereit={zielId !== null}
+		ohneHaupttaste={andere.length === 0}
+		aktion={(trotzdem) => verschiebeAnmeldung(gewaehlt!.anmeldungId, zielId as number, trotzdem)}
+		erfolg="Verschoben."
+		folgen={{
+			'schon-angemeldet': 'Ist dort schon angemeldet.',
+			vorbereitung: VORBEREITUNG,
+			'nicht-gefunden': WEG
+		}}
+		onfertig={fertig}
+	>
 		{#if gewaehlt}
 			{@const z = gewaehlt}
 			<p><Name name={z.name} form="nachname-zuerst" /></p>
@@ -375,41 +294,29 @@
 								checked={zielId === k.id}
 								onchange={() => {
 									zielId = k.id;
-									warnungen = [];
+									verschieben?.verwerfe();
 								}}
 							/>{k.name}
 						</label>
 					{/each}
 				</fieldset>
 			{/if}
-			{#if warnungen.length > 0}
-				<p role="alert">{warnungText(warnungen)}</p>
-			{/if}
-			{#if fehler}
-				<p class="fehler" role="alert">{fehler}</p>
-			{/if}
-			<div class="leiste">
-				<button type="button" class="taste-neben" onclick={() => verschieben?.close()}
-					>Abbrechen</button
-				>
-				{#if andere.length > 0}
-					<button
-						type="button"
-						class="taste-haupt"
-						disabled={zielId === null || laeuft}
-						onclick={() => verschiebe(z)}
-						>{warnungen.length > 0 ? 'Trotzdem verschieben' : 'Verschieben'}</button
-					>
-				{/if}
-			</div>
 		{/if}
-	</dialog>
+	</Aktionsdialog>
 
-	<dialog class="karte" bind:this={klassierungDialog} aria-labelledby="klassierung-titel">
-		<h2 id="klassierung-titel">Klassierung korrigieren</h2>
+	<Aktionsdialog
+		bind:this={klassierungDialog}
+		id="klassierung"
+		titel="Klassierung korrigieren"
+		taste="Klassierung speichern"
+		bereit={gewaehlt !== null && klassierung !== '' && klassierung !== gewaehlt.klassierung}
+		aktion={() => korrigiereKlassierung(gewaehlt!.mitgliedId, klassierung as Klassierung)}
+		erfolg="Klassierung gespeichert."
+		folgen={{ 'nicht-gefunden': 'Dieses Mitglied gibt es nicht mehr.' }}
+		onfertig={fertig}
+	>
 		{#if gewaehlt}
-			{@const z = gewaehlt}
-			<p><Name name={z.name} form="nachname-zuerst" /></p>
+			<p><Name name={gewaehlt.name} form="nachname-zuerst" /></p>
 			<div class="feld">
 				<label for="klassierung-wahl">Klassierung</label>
 				<select id="klassierung-wahl" bind:value={klassierung}>
@@ -419,45 +326,40 @@
 					{/each}
 				</select>
 			</div>
-			{#if fehler}
-				<p class="fehler" role="alert">{fehler}</p>
-			{/if}
-			<div class="leiste">
-				<button type="button" class="taste-neben" onclick={() => klassierungDialog?.close()}
-					>Abbrechen</button
-				>
-				<button
-					type="button"
-					class="taste-haupt"
-					disabled={klassierung === '' || klassierung === z.klassierung || laeuft}
-					onclick={() => klassierung !== '' && speichereKlassierung(z, klassierung)}
-					>Klassierung speichern</button
-				>
-			</div>
 		{/if}
-	</dialog>
+	</Aktionsdialog>
 
-	<dialog class="karte" bind:this={loeschen} aria-labelledby="loeschen-titel">
-		<h2 id="loeschen-titel">Anmeldung löschen?</h2>
+	<Aktionsdialog
+		bind:this={loeschen}
+		id="loeschen"
+		titel="Anmeldung löschen?"
+		taste="Löschen"
+		aktion={() => loescheAnmeldung(gewaehlt!.anmeldungId)}
+		erfolg="Gelöscht."
+		folgen={{ 'nicht-gefunden': WEG }}
+		onfertig={fertig}
+	>
 		{#if gewaehlt}
-			{@const z = gewaehlt}
-			<p><Name name={z.name} form="nachname-zuerst" /></p>
-			{#if fehler}
-				<p class="fehler" role="alert">{fehler}</p>
-			{/if}
-			<div class="leiste">
-				<button type="button" class="taste-neben" onclick={() => loeschen?.close()}
-					>Abbrechen</button
-				>
-				<button type="button" class="taste-haupt" disabled={laeuft} onclick={() => loesche(z)}
-					>Löschen</button
-				>
-			</div>
+			<p><Name name={gewaehlt.name} form="nachname-zuerst" /></p>
 		{/if}
-	</dialog>
+	</Aktionsdialog>
 
-	<dialog class="karte" bind:this={entscheiden} aria-labelledby="entscheiden-titel">
-		<h2 id="entscheiden-titel">Wildcard-Antrag</h2>
+	<!-- FR-08: zwei Entscheide; «Ablehnen» steht als zweite Taste vor der Haupttaste «Bestätigen». -->
+	<Aktionsdialog
+		bind:this={entscheiden}
+		id="entscheiden"
+		titel="Wildcard-Antrag"
+		taste="Bestätigen"
+		aktion={() => entscheideAntrag(gewaehlt!.anmeldungId, true, grund)}
+		erfolg="Bestätigt."
+		neben={{
+			taste: 'Ablehnen',
+			aktion: () => entscheideAntrag(gewaehlt!.anmeldungId, false, grund),
+			erfolg: 'Abgelehnt.'
+		}}
+		folgen={{ 'nicht-beantragt': 'Darüber ist schon entschieden.', 'nicht-gefunden': WEG }}
+		onfertig={fertig}
+	>
 		{#if gewaehlt}
 			{@const z = gewaehlt}
 			<p><Name name={z.name} form="nachname-zuerst" /></p>
@@ -482,26 +384,6 @@
 					>{grund.length} von {GRUND_MAX} Zeichen</span
 				>
 			</div>
-			{#if fehler}
-				<p class="fehler" role="alert">{fehler}</p>
-			{/if}
-			<div class="leiste">
-				<button type="button" class="taste-neben" onclick={() => entscheiden?.close()}
-					>Abbrechen</button
-				>
-				<button
-					type="button"
-					class="taste-neben"
-					disabled={laeuft}
-					onclick={() => entscheide(z, false)}>Ablehnen</button
-				>
-				<button
-					type="button"
-					class="taste-haupt"
-					disabled={laeuft}
-					onclick={() => entscheide(z, true)}>Bestätigen</button
-				>
-			</div>
 		{/if}
-	</dialog>
+	</Aktionsdialog>
 {/if}
