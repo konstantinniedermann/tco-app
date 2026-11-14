@@ -8,6 +8,14 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.22.2 — Ein Ablauf für die Aktionen der CM-Seite (Refactoring Schritt 16)
+
+- Sieben der acht Aktionen der Clubmeisterschafts-Seite laufen über eine gemeinsame
+  Ablauf-Funktion (`src/lib/cm/ablauf.ts`); die zwei Text-Dialoge («Wildcard», «Kommentar ändern»)
+  sind ein Baustein (`src/lib/cm/Textdialog.svelte`). Sätze, Reihenfolge und Fokus bleiben, wie sie
+  waren.
+- Die Doppel-Seite behält ihre Aktionen von Hand (E-51).
+
 ## 0.22.1 — Ein Anmelde-Wächter für alle Seiten (Refactoring Schritt 15)
 
 - Fehlende Sitzung, Rolle oder Bestätigung behandelt eine gemeinsame Wächter-Funktion

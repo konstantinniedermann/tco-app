@@ -14,6 +14,7 @@ export default mergeConfig(
 					'src/lib/server/**',
 					'src/lib/turnier/**',
 					'src/lib/abruf.ts',
+					'src/lib/cm/ablauf.ts',
 					'src/lib/anlass/stand.ts',
 					'src/lib/anlass/zeit.ts'
 				],

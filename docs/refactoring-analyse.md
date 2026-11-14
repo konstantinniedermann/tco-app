@@ -7,7 +7,7 @@ weiterarbeiten können: Es enthält den Ist-Zustand, die Befunde, das Zielbild, 
 je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 [#80](https://github.com/konstantinniedermann/tco-app/issues/80).
 
-- **Stand des Dokuments:** 14.11.2026, nach Schritt 15 (Läufe 1, 1b und 2, Review je «ok», Version 0.22.1); davor Schritt 14 (Review «ok», Version 0.20.21); zuvor Schritt 12a (Review «ok», Version 0.20.19). Die Etappen 0 und 1 sind umgesetzt; die Zwischenrevision am
+- **Stand des Dokuments:** 14.11.2026, nach Schritt 16, Teil 1 (CM-Seite umgesetzt, Review offen, nicht gemergt); davor Schritt 15 (Läufe 1, 1b und 2, Review je «ok», Version 0.22.1); davor Schritt 14 (Review «ok», Version 0.20.21); zuvor Schritt 12a (Review «ok», Version 0.20.19). Die Etappen 0 und 1 sind umgesetzt; die Zwischenrevision am
   Ende der Etappe 1 (Abschnitt 1c) ist am Checkpoint entschieden und eingearbeitet (E-41 bis E-44).
   Danach die Etappe 2.
 - **Stand der Analyse (Abschnitte 1 bis 5 und 10):** 11.11.2026, Version 0.20.5, vor Schritt 01.
@@ -21,7 +21,7 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
   zeigt der Git-Verlauf dieser Datei.
 - **Aufbau:** Abschnitte 1 bis 5 Befunde, 6 Zielbild, 7 Plan, 8 Entscheide, 9 Fragen, 10 Grenzen;
   Anhang A und B Anweisungsdateien, Anhang C das Protokoll der Etappe 0, Anhang D das der Etappe 1
-  (bis D.15, Schritt 12a), Anhang E das der Etappe 2 (bis E.9, Schritt 15 Lauf 2).
+  (bis D.15, Schritt 12a), Anhang E das der Etappe 2 (bis E.11, Schritt 16 Teil 1).
 
 ## Stand und nächster Schritt
 
@@ -29,14 +29,14 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 
 | | |
 |---|---|
-| **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt und gemergt (0.20.19). **Etappe 2:** Schritt 13 erledigt (zwei Läufe, Review je «ok», Version 0.20.20); Schritt 14 erledigt (Review «ok», Version 0.20.21); **Schritt 15 erledigt** (Läufe 1, 1b mit Interclub und 2; Review je «ok» am 14.11.2026, Version 0.22.1) |
+| **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt und gemergt (0.20.19). **Etappe 2:** Schritt 13 erledigt (zwei Läufe, Review je «ok», Version 0.20.20); Schritt 14 erledigt (Review «ok», Version 0.20.21); **Schritt 15 erledigt** (Läufe 1, 1b mit Interclub und 2; Review je «ok» am 14.11.2026, Version 0.22.1); **Schritt 16 erledigt** (CM-Seite; Review «ok» am 14.11.2026; die Doppel-Seite ist verworfen, F-30: A, E-51; Version 0.22.2) |
 | **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), 12a (0.20.19), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D) |
-| **Zuletzt erledigt** | **15, Lauf 2** (14.11.2026, Review «ok», mit Lauf 1 und 1b gemergt als Version 0.22.1; Ergebnis in 7.4, Protokoll Anhang E.9): die vier Listen der Verwaltung (`turniere`, `anlaesse`, `verlauf`, `mitglieder`) laden ihr erstes Laden in einer neuen `+page.ts` über den Wächter (Fall `verwaltung`); eine Störung bleibt eine Meldung in der Seite (`zeilen: null`, keine Fehlerseite); `mitglieder` lädt nach Suche und Filter weiter im Baustein, ohne zweite Abfrage beim Einhängen; Vorab-Tests (E2E 5 Fälle je Gerät, auf dem alten Stand grün, einmal rot) und 13 Einheitsfälle der vier Ladefunktionen; für die Nutzerin nur die zwei Folgen aus E-48; voller `make check` grün (2412 Tests, E2E 510/57, 3,9 Minuten). Davor **15, Lauf 1b (Interclub)** (14.11.2026, Review «ok» am 14.11.2026 zusammen mit Lauf 1; Ergebnis in 7.4, Nachmessen Anhang E.7, Protokoll Anhang E.8): `origin/dev` mit #81 eingemergt (Layout in der Fassung von `dev`, Entscheide des Branches neu E-48 bis E-50), Vorab-Tests für die drei Interclub-Seiten und das Wurzel-Layout (E2E vier Fälle mehr und drei Adressen mehr in der Tabelle, 15 Einheitsfälle, je Gruppe einmal rot), Wurzel-Layout auf `ladeSitzung` (Typ `Sitzung` mit `interclub`), die drei Interclub-Ladefunktionen auf dem Wächter (Fall `mitglied`); keine Zeile mehr in der Wächter-Tabelle, Fälle L und M benannt und unverändert; für die Nutzerin ändert sich nichts; voller `make check` grün (2399 Tests, E2E 495/57, 3,4 Minuten). Davor **15, Lauf 1** (13.11.2026, Branch `refactor/schritt-15`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.6): Vorab-Tests in drei Teilen (E2E 21 Fälle auf drei Geräten, 91 Einheitsfälle der Ladefunktionen, je Teil einmal rot), `ladeSitzung` und die Wächter-Tabelle `src/lib/login/waechter.ts` mit zwei Hüllen und sechs benannten Fällen (neu `verwaltung-zugang`), 22 Ladefunktionen, das Wurzel-Layout, 17 Stellen nach einer Aktion und das Abmelden umgestellt, `hilfe/+page.ts` auf `ladeKontakt`; keine Ladefunktion ruft `fetch`, keine Seite schreibt die Umleitung zum Login; für die Nutzerin ändert sich nichts; voller `make check` grün (2300 Tests, E2E 477/57, 4,1 Minuten); Review «ok» am 14.11.2026 (mit Lauf 1b). Davor **14** (13.11.2026, Review «ok» ohne Befund, Version 0.20.21; Ergebnis in 7.4, Protokoll Anhang E.4): `verwaltung/api.ts` nach Bereichen geteilt, in `zugang-api.ts`, `anlass-api.ts`, `gespraech-api.ts`, `mitglieder-api.ts` und `turnier-api.ts`; `api.ts` bleibt der Kern (`Antwort<T>`, Vertrag, `lese`, `schicke`) und reicht nichts weiter; 42 Dateien wechseln nur Import-Zeilen, 44 Tests auf fünf Dateien verteilt, keiner geändert; voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.3): Profil, Login, Passkey und `hatSitzung` auf dem Baustein, Umbenennung `ergebnis` → `art`, beide Kleinfragen aufgenommen (`{ art }` beim E-Mail-Wechsel, vier benannte Anfragen der Login-Seiten), N-09 (`src/lib/anlass/antwort.ts`), Wortlisten der Verträge an den Typ gebunden, `abruf.ts` in der Abdeckung; die Lint-Regel zu `fetch` verworfen (98 Meldungen am heutigen Repo, Vorschlag an Schritt 15); voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 1** Abruf-Baustein (13.11.2026, Review «ok» ohne Befund; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **16** mit kurzem Nachmessen vorab (nur die Doppel-Seite; Zeile in 7.4, Übersicht in 7.7). **Schritt 15** ist erledigt: Review «ok» für Lauf 1, 1b und 2 am 14.11.2026, ein Merge, Version 0.22.1 (Ergebnis in 7.4, Protokolle E.6, E.8, E.9); der Projektleiter hat am 14.11.2026 die dritte Folge zu E-48 angenommen und E-50 bestätigt. Etappe 2 läuft ohne Halt mit Kurzbericht je Schritt (E-45); fester Halt in Schritt 17 vor dem Merge |
+| **Zuletzt erledigt** | **16** (14.11.2026, Review «ok», gemergt als Version 0.22.2; Teil 2 mit der Doppel-Seite verworfen, F-30: A, E-51; Ergebnis in 7.4, Protokoll Anhang E.11): Vorab-E2E `tests/e2e/cm-ablauf.test.ts` (drei Fälle je Handy, auf dem alten Stand grün, einmal rot), die Ablauf-Funktion `src/lib/cm/ablauf.ts` mit 15 Einheitsfällen (Abdeckung 100 %), sieben der acht Handler der CM-Seite darauf, `angabenSenden` bleibt von Hand (Abbruchstelle 2), die zwei Text-Dialoge als `src/lib/cm/Textdialog.svelte`; Sätze, Reihenfolge und Fokus unverändert, Markup gleich bis auf die `id`s; für die Nutzerin nichts; voller `make check` grün (2427 Tests, E2E 516/60, 5,3 Minuten). Davor **15, Lauf 2** (14.11.2026, Review «ok», mit Lauf 1 und 1b gemergt als Version 0.22.1; Ergebnis in 7.4, Protokoll Anhang E.9): die vier Listen der Verwaltung (`turniere`, `anlaesse`, `verlauf`, `mitglieder`) laden ihr erstes Laden in einer neuen `+page.ts` über den Wächter (Fall `verwaltung`); eine Störung bleibt eine Meldung in der Seite (`zeilen: null`, keine Fehlerseite); `mitglieder` lädt nach Suche und Filter weiter im Baustein, ohne zweite Abfrage beim Einhängen; Vorab-Tests (E2E 5 Fälle je Gerät, auf dem alten Stand grün, einmal rot) und 13 Einheitsfälle der vier Ladefunktionen; für die Nutzerin nur die zwei Folgen aus E-48; voller `make check` grün (2412 Tests, E2E 510/57, 3,9 Minuten). Davor **15, Lauf 1b (Interclub)** (14.11.2026, Review «ok» am 14.11.2026 zusammen mit Lauf 1; Ergebnis in 7.4, Nachmessen Anhang E.7, Protokoll Anhang E.8): `origin/dev` mit #81 eingemergt (Layout in der Fassung von `dev`, Entscheide des Branches neu E-48 bis E-50), Vorab-Tests für die drei Interclub-Seiten und das Wurzel-Layout (E2E vier Fälle mehr und drei Adressen mehr in der Tabelle, 15 Einheitsfälle, je Gruppe einmal rot), Wurzel-Layout auf `ladeSitzung` (Typ `Sitzung` mit `interclub`), die drei Interclub-Ladefunktionen auf dem Wächter (Fall `mitglied`); keine Zeile mehr in der Wächter-Tabelle, Fälle L und M benannt und unverändert; für die Nutzerin ändert sich nichts; voller `make check` grün (2399 Tests, E2E 495/57, 3,4 Minuten). Davor **15, Lauf 1** (13.11.2026, Branch `refactor/schritt-15`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.6): Vorab-Tests in drei Teilen (E2E 21 Fälle auf drei Geräten, 91 Einheitsfälle der Ladefunktionen, je Teil einmal rot), `ladeSitzung` und die Wächter-Tabelle `src/lib/login/waechter.ts` mit zwei Hüllen und sechs benannten Fällen (neu `verwaltung-zugang`), 22 Ladefunktionen, das Wurzel-Layout, 17 Stellen nach einer Aktion und das Abmelden umgestellt, `hilfe/+page.ts` auf `ladeKontakt`; keine Ladefunktion ruft `fetch`, keine Seite schreibt die Umleitung zum Login; für die Nutzerin ändert sich nichts; voller `make check` grün (2300 Tests, E2E 477/57, 4,1 Minuten); Review «ok» am 14.11.2026 (mit Lauf 1b). Davor **14** (13.11.2026, Review «ok» ohne Befund, Version 0.20.21; Ergebnis in 7.4, Protokoll Anhang E.4): `verwaltung/api.ts` nach Bereichen geteilt, in `zugang-api.ts`, `anlass-api.ts`, `gespraech-api.ts`, `mitglieder-api.ts` und `turnier-api.ts`; `api.ts` bleibt der Kern (`Antwort<T>`, Vertrag, `lese`, `schicke`) und reicht nichts weiter; 42 Dateien wechseln nur Import-Zeilen, 44 Tests auf fünf Dateien verteilt, keiner geändert; voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.3): Profil, Login, Passkey und `hatSitzung` auf dem Baustein, Umbenennung `ergebnis` → `art`, beide Kleinfragen aufgenommen (`{ art }` beim E-Mail-Wechsel, vier benannte Anfragen der Login-Seiten), N-09 (`src/lib/anlass/antwort.ts`), Wortlisten der Verträge an den Typ gebunden, `abruf.ts` in der Abdeckung; die Lint-Regel zu `fetch` verworfen (98 Meldungen am heutigen Repo, Vorschlag an Schritt 15); voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 1** Abruf-Baustein (13.11.2026, Review «ok» ohne Befund; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
+| **Nächster offener Schritt** | **17** (`Anmeldungsliste.svelte` auf den `Aktionsdialog`; Dateien: `src/lib/verwaltung/Anmeldungsliste.svelte`, allenfalls `Aktionsdialog.svelte`; kein Nachmessen vorab; **fester Halt vor dem Merge** mit Vorher-Nachher-Bild der Warnung, E-21). Für die Übergangsregel «Ab Schritt 17» gilt die benannte Ausnahme der Doppel-Seite (E-51). **Schritt 16** ist erledigt: Teil 1 (CM-Seite) mit Review «ok» am 14.11.2026, Teil 2 (Doppel-Seite) verworfen mit F-30: A (E-51), ein Merge, Version 0.22.2 (Ergebnis in 7.4, Nachmessen E.10, Protokoll E.11). Offene Hinweise aus dem Review von Schritt 16 stehen in E.11 (Prüfliste (b) für Schritt 18, Nachtrag im UI-Leitbild spätestens in Schritt 24, toter Getter `Seite.meldung`). Etappe 2 läuft ohne Halt mit Kurzbericht je Schritt (E-45) |
 | **Wartet auf Freigabe des Projektleiters** | nichts. Checkpoint am Ende der Etappe 1 erledigt am 12.11.2026 (E-41 bis E-44); die Berichtigungen der `CLAUDE.md` sind eingespielt (E-43) |
-| **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen Fragen sind beantwortet (F-28: A, E-48; F-29: A, E-49; F-22 durch den Ablauf erledigt, F-23 in F-26 aufgegangen); das Nachmessen von Lauf 1b (E.7) hat keine neue Frage |
+| **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen Fragen sind beantwortet (F-28: A, E-48; F-29: A, E-49; F-30: A, E-51; F-22 durch den Ablauf erledigt, F-23 in F-26 aufgegangen); das Nachmessen von Lauf 1b (E.7) hat keine neue Frage |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
-| **Vorab nachzumessen** | vor Schritt 16 (kurz: nur die Doppel-Seite), 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). **Für Schritt 15, Lauf 1b (Interclub) erledigt am 14.11.2026 (Anhang E.7):** mit #81 39 Adressen, 30 Ladefunktionen, 25 «nur der Wächter wechselt»; kein neuer Fall in der Wächter-Tabelle, zwei neue benannte Fälle L und M ausserhalb der Tabelle; zwei Ränder des Layouts; ein Vorab-Test aus Lauf 1 muss mit dem Merge mit. **Für Schritt 15 erledigt am 13.11.2026 (Anhang E.5):** Tabelle aller 36 Adressen mit Ziel; 17 statt 14 Stellen «nach einer Aktion»; acht benannte Fälle mehr (D bis K); Vorab-Test als E2E-Tabelle ohne Konto und Mail-Code plus Einheitstests der Ladefunktionen der Verwaltung; Wächter als Tabelle in `src/lib/login/waechter.ts` mit zwei Hüllen, `ladeSitzung` in `sitzung.ts`; zwei Läufe, ein Merge; Lauf 1 ändert für die Nutzerin nichts, Lauf 2 (vier Listen) freigegeben mit F-28 (E-48). **Für Schritt 13 erledigt am 12.11.2026 (Anhang E.1):** kein Entscheid des Projektleiters nötig, der Baustein erhält jeden heutigen Rand; «ein Wort gilt nur mit seinem Status» bleibt, dazu «für 401, 404 und 429 genügt der Status»; 57 Zeilen Vorab-Tests; Baustein `src/lib/abruf.ts`; drei Seiten statt vier (`willkommen` liest kein Ergebnis); N-09 aufnehmen, N-10 als geteilte Liste unter `src/lib/cm/`. Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
+| **Vorab nachzumessen** | vor Schritt 19, 20, 23 (was, steht je in der Spalte «Nachmessen vorab»; Übersicht in 7.7). **Für Schritt 16 erledigt am 14.11.2026 (Anhang E.10):** kein Entscheid des Projektleiters nötig, keine neue Frage; die Doppel-Seite wird **aufgenommen** (drei Handler, als zweiter Teil mit eigener Abbruchstelle; `suchen` und `neuLaden` bleiben von Hand); die Funktion passt für sieben der acht Handler der CM-Seite, `angabenSenden` nur mit eigener Angabe; den Fokus nach einer Aktion hält heute eine einzige E2E-Stelle, vier Handler haben keinen E2E-Fall, darum vier Vorab-E2E (`tests/e2e/cm-ablauf.test.ts`, ohne Mail-Code) zusätzlich zu den Einheitstests; «rund 250 Zeilen» eher 170 bis 210; keine gemeinsame Datei mit Schritt 17. **Für Schritt 15, Lauf 1b (Interclub) erledigt am 14.11.2026 (Anhang E.7):** mit #81 39 Adressen, 30 Ladefunktionen, 25 «nur der Wächter wechselt»; kein neuer Fall in der Wächter-Tabelle, zwei neue benannte Fälle L und M ausserhalb der Tabelle; zwei Ränder des Layouts; ein Vorab-Test aus Lauf 1 muss mit dem Merge mit. **Für Schritt 15 erledigt am 13.11.2026 (Anhang E.5):** Tabelle aller 36 Adressen mit Ziel; 17 statt 14 Stellen «nach einer Aktion»; acht benannte Fälle mehr (D bis K); Vorab-Test als E2E-Tabelle ohne Konto und Mail-Code plus Einheitstests der Ladefunktionen der Verwaltung; Wächter als Tabelle in `src/lib/login/waechter.ts` mit zwei Hüllen, `ladeSitzung` in `sitzung.ts`; zwei Läufe, ein Merge; Lauf 1 ändert für die Nutzerin nichts, Lauf 2 (vier Listen) freigegeben mit F-28 (E-48). **Für Schritt 13 erledigt am 12.11.2026 (Anhang E.1):** kein Entscheid des Projektleiters nötig, der Baustein erhält jeden heutigen Rand; «ein Wort gilt nur mit seinem Status» bleibt, dazu «für 401, 404 und 429 genügt der Status»; 57 Zeilen Vorab-Tests; Baustein `src/lib/abruf.ts`; drei Seiten statt vier (`willkommen` liest kein Ergebnis); N-09 aufnehmen, N-10 als geteilte Liste unter `src/lib/cm/`. Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
 | **Nächster Checkpoint** | Etappe 2 läuft ohne Halt mit Kurzbericht je Schritt (E-45). Fester Halt: Schritt 17 vor dem Merge (Vorher-Nachher-Bild, E-21); sonst nur bei den in E-45 genannten Anlässen. Am Ende der Etappe 2 Zwischenrevision und Checkpoint |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32) |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
@@ -2047,7 +2047,7 @@ Der wichtigste ist der dritte.
 | 13 | [geändert] Ein Abruf-Baustein mit einem Ergebnis-Typ; die Abruf-Module nutzen ihn und deuten keinen Statuscode mehr (B-20). Die Typen `Holen` und `Json` ziehen in den Baustein. **Ein Schritt, zwei Läufe mit je eigenem Review und committetem Zwischenstand (E-41, wie Schritt 11).** *Lauf 1:* der Baustein und die Module, deren Ergebnis schon `art` heisst (`anlass`, `cm`, `push`, `verwaltung`, `mitteilung-api`), bei unveränderten Tests. *Lauf 2:* `profil`, `anmelden` und `passkey` mit der Umbenennung `ergebnis` → `art`; Tests und drei Seiten ändern nur den Namen **[geändert, Anhang E.1: drei Seiten, nicht vier; `passkey.ts` gibt blanke Wörter zurück und liest nur das Ergebnis von `sende`, drei Zeilen]**. Nimmt N-10 auf (eine geteilte Liste für `FEHLER` und `ABGELEHNT`) und N-09 (die doppelten Sätze des Anlasses: aufnehmen oder ausdrücklich verwerfen). Einzelheiten: Hinweise zu Schritt 13 | [geändert] neu der Baustein (Ort z. B. `src/lib/abruf.ts` neben `fehler.ts` und `json-post.ts`; nicht `src/lib/api/`, das sich mit `src/routes/api/` verwechselt); `src/lib/anlass/api.ts`, `cm/api.ts`, `push/api.ts`, `push/geraet.ts`, `verwaltung/api.ts`, `verwaltung/mitteilung-api.ts`, `profil/angaben.ts`, `login/passkey.ts`, `login/anmelden.ts`, `login/sitzung.ts` und ihre Tests; in Lauf 2 die drei Seiten `login`, `login/mail`, `profil` (nur der Name) **[geändert, Anhang E.1: `willkommen` liest kein Ergebnis eines Abruf-Moduls; dazu `src/lib/fehler.ts` (Tabelle Wort → Status) und `src/lib/abruf.test.ts`; `login/sitzung.ts` ändert sich erst in Schritt 15]**. Für N-10 `src/lib/server/cm/schnittstellen.ts` und der Ort der geteilten Liste; für N-09 allenfalls `src/lib/server/anlass/angaben.ts` und die Seite des Anlasses | Statuscodes werden an einer Stelle gedeutet; ein neuer Ablehnungsgrund des Servers fällt in der Oberfläche nicht mehr still als Störung an (N-10) | mittel | [geändert] **Vorab-Tests (erster Commit, Charakterisierung):** je Sonderfall aus der Tabelle des Nachmessens ein Fall in den Einheitstests der Module, darunter die zwei entfallenen «Status allein genügt» (`push/api.test.ts` 401, `verwaltung/api.test.ts` 404, mit `ungeprueft(…, {})`; N-15); jeder einmal absichtlich rot belegt. *Lauf 1:* Die bestehenden Einheitstests der Module (`api.test.ts` u. a.) bleiben unverändert grün. *Lauf 2:* Tests und Seiten ändern nur den Namen `ergebnis` → `art`; der Reviewer prüft das am Diff, `svelte-check` hält die Seiten. E2E voll nach jedem Lauf. Probe für den Reviewer: Der Diff unter `src/lib/server/` und `src/routes/api/` ist leer, ausser für N-10 | 08 (und 12a, weil Schritte strikt nacheinander laufen; inhaltlich hängt 13 nicht an 12a) | Opus | Subagent, zwei Läufe | [geändert] **ja, erweitert (E-41):** (1) `src/lib/profil/angaben.ts`, `src/lib/login/passkey.ts` und `src/lib/login/anmelden.ts` ganz lesen (bisher nur Auszüge); (2) je Modul eine Tabelle der Sonderfälle: 204 ohne Körper, 429 ohne lesbaren Körper, `eingabe` ohne `felder`, 401 als Störung, unlesbares JSON, `ergebnis` statt `art`; (3) Empfehlung zu «ein Wort gilt nur mit seinem Status» (dann eine Tabelle Wort → Status in `fehler.ts`, die auch N-08 zum Teil schliesst); (4) die 13 Stellen mit `page.route` neu bestimmen (Nachtrag zur Prüfliste (b) unten); (5) Ort des Bausteins; (6) N-09: aufnehmen oder verwerfen. Ändert eine Empfehlung ein Ergebnis an den Rändern, geht sie als Frage an den Projektleiter. **Erledigt** 12.11.2026 (Anhang E.1): kein Entscheid nötig | **erledigt** 13.11.2026, Review «ok» für beide Läufe, Version 0.20.20 (Branch `refactor/schritt-13`. Lauf 1, Review «ok»: `test:` `fcd3250`; `refactor:` `17008e9`, `9cf1969`, `41fde29`, `fb6e07a`, `291e4a8`; Anhang E.2. Lauf 2: `test:` `99b6406`; `refactor:` `5f3ab9d`, `3c47eb7`, `c502044`, `119180c`, `0eee143`, `74752c3`; `test:` `bc41749`; Anhang E.3). Ergebnis unten |
 | 14 | `verwaltung/api.ts` nach Bereichen geteilt (Mitglieder, Turnier, Gespräch, Anlass, Zugang) | `src/lib/verwaltung/api.ts`, alle Importe in `src/routes/verwaltung/` und `src/lib/verwaltung/` | Hotspot entschärft, weniger Merge-Reibung | niedrig | `svelte-check`, Einheitstests, E2E Verwaltung | 13 | Sonnet | Subagent | nein | **erledigt** 13.11.2026, Review «ok», Version 0.20.21 (Branch `refactor/schritt-14`; `refactor:` `a7e3a26`, `70c7078`, `a60440c`, `18ec293`; Anhang E.4). Ergebnis unten |
 | 15 | [geändert] Die kopierten Wächter werden eine gemeinsame Funktion je App (Mitglieder, Verwaltung), die jede Ladefunktion aufruft und die auch nach einer Aktion im Baustein gilt; keine Seite und kein Baustein schreibt die Umleitung zum Login selbst, keine Ladefunktion ruft `fetch` direkt (B-21). **Das heutige Verhalten bleibt genau (E-44):** Der Schritt vereinheitlicht die Umleitungen nicht; die Abweichungen (`profil/email`, `verwaltung/rollen`, Aktionen ohne Mail-Code) sind benannte Fälle der Funktion. Die vier Seiten, die im Baustein laden (`turniere`, `anlaesse`, `mitglieder`, `verlauf`), bekommen ihr erstes Laden in einer `+page.ts`; erneutes Laden nach Suche, Filter oder Aktion bleibt im Baustein **[geändert, Anhang E.5: ein Schritt, zwei Läufe mit je eigenem Review und einem Merge; Lauf 2 sind die vier Seiten, freigegeben (F-28: A, E-48); `verlauf` hat kein erneutes Laden im Baustein, sein Filter ist die Adresse]**. **Die Prüfung der Sitzung bei jedem Seitenwechsel bleibt** (gewollt, B-21); darum kein einmaliges Laden im Layout und vorerst keine Routen-Gruppe. Einzelheiten: Hinweise zu Schritt 15 | [geändert] neu z. B. `src/lib/login/waechter.ts` mit Einheitstest; `src/lib/login/sitzung.ts` (ein typisierter Abruf der Sitzung auf dem Baustein aus 13; die vier `fetch('/api/sitzung')` in Ladefunktionen und der Abruf von `/api/kontakt` in `hilfe/+page.ts` verschwinden); alle `+page.ts` und `+layout.ts` der Mitglieder-App und der Verwaltung (27 Ladefunktionen; mit #81 30, Anhang E.7); `src/lib/verwaltung/umleiten.ts`; die Bausteine, die nach einer Aktion von Hand zum Login leiten (CM-Seite neun Stellen, Doppel-Seite fünf: nur der Aufruf wechselt) **[geändert, Anhang E.5: dazu je eine Stelle in `anlass/[id]/+page.svelte`, `src/lib/push/Benachrichtigungen.svelte` und `clubmeisterschaft/[id]/kontakt/+page.svelte` (dort `window.location.assign`, bleibt als benannter Fall), zusammen 17 Stellen in fünf Dateien; `leiteUm` behält Namen und Signatur, seine 32 Aufrufe bleiben; `hilfe/+page.ts` nimmt `ladeKontakt` aus `src/lib/profil/angaben.ts`; neu die Vorab-Tests `tests/e2e/waechter.test.ts` und z. B. `tests/oberflaeche/ladefunktionen.test.ts`]**; `src/routes/verwaltung/turniere`, `anlaesse`, `mitglieder`, `verlauf` (je `+page.svelte` und eine neue `+page.ts`) | Ein Ort für den Einstieg; kein geändertes Verhalten | [geändert] **mittel** (vorher niedrig: 27 Ladefunktionen (mit #81 30), fünf verschiedene Wächter, kein Test ruft eine Ladefunktion) | [geändert] **Vorab-Test (erster Commit, einmal rot):** «ohne Sitzung führt jede geschützte Seite an ihr heutiges Ziel», mit und ohne wartende Mail-Anfrage; die Erwartung ist die Tabelle aus dem Nachmessen; der Test bleibt durch den Umbau unverändert. **[geändert, Anhang E.5: drei Teile: eine E2E-Tabelle über 31 Adressen ohne Konto und ohne Mail-Code, zehn E2E-Fälle mit Konto (ohne Rolle, unbestätigt, 401 nach einer Aktion) und Einheitstests der Ladefunktionen der Verwaltung mit gestelltem `fetch`, weil E2E deren Blöcke hinter dem Layout nicht sieht; je Teil einmal rot]** Dann der Einheitstest der Wächter-Funktion zuerst; `tests/e2e/navigation.test.ts`, `login.test.ts`, `startseite.test.ts`, `verwaltung.test.ts` («SI-07»), `bewegung.test.ts` («Reiter … sofort aktiv» hängt an `/api/sitzung`, B-31) auf allen drei Geräten; Prüfliste (b) unten | 13 | Opus | Subagent | [geändert] **ja (E-41):** Tabelle aller Einstiege (Ladefunktionen und Aktionen im Baustein) mit ihrem heutigen Ziel, mit und ohne wartende Mail-Anfrage; die Form des Vorab-Tests (E2E-Schleife oder Einheitstests der Ladefunktionen mit gestelltem `fetch`, siehe Hinweise). **Erledigt** 13.11.2026 (Anhang E.5): beide Wege gehen ohne neue Ausnahme, empfohlen ist die Verbindung; zwei Fragen an den Projektleiter (F-28 vor Lauf 2, F-29), keine hält Lauf 1 auf. **Für Lauf 1b (Interclub) erledigt** 14.11.2026 (Anhang E.7): keine Frage, kein neuer Fall in der Tabelle | **Erledigt: Lauf 1, 1b und 2, Review je «ok» (14.11.2026), ein Merge, Version 0.22.1** (13.11.2026, Branch `refactor/schritt-15`: `test:` `db9997f`; `refactor:` `5af14dc`, `3fac549`, `491e4ed`, `edf6914`, `e04cf6d`; Protokoll Anhang E.6; voller `make check` grün. Lauf 1b (Interclub, 14.11.2026): Merge von `dev` `9ba8a8a`; `test:` `5cfa81b`; `refactor:` `39291a0`, `81a4bed`; Protokoll Anhang E.8; voller `make check` grün. Lauf 2 (E-48, 14.11.2026): `test:` `bff7321`; `refactor:` `034ad8a`, `16a8e70`, `37cac76`, `5c7daaf`; Protokoll Anhang E.9; voller `make check` grün). Ergebnis unten |
-| 16 | CM-Seite: zuerst das gemeinsame Gerüst der acht Handler als eine Funktion mit Einheitstests (Antwort → Meldung, Fehlertext, neu laden oder Login), dann die beiden gleichen Text-Dialoge («Wildcard», «Kommentar ändern») als ein Baustein. Die neun Abschnitte des Markups bleiben in der Seite; es gibt kein Ziel für die Zeilenzahl (B-22, B-34). **[geändert]** «Login» nimmt die Ablauf-Funktion vom Wächter aus Schritt 15, nicht aus eigenen Stellen. Die Doppel-Seite ist eine offene Kleinfrage (Hinweise zu Schritt 16) | `src/routes/clubmeisterschaft/[id]/+page.svelte`; neu unter `src/lib/cm/` (Ablauf-Funktion mit Test, ein Dialog-Baustein) | Der Fix-Hotspot verliert rund 250 Zeilen wiederholten Ablauf; der Ablauf ist erstmals ohne Browser prüfbar | mittel (Fokus nach jeder Aktion, WCAG 2.4.3) | Neue Einheitstests zuerst; alle `cm-*`-E2E und `navigation.test.ts` («lädt nicht neu»); Klassen und Verschachtelung unverändert (Prüfliste (b) unten) | [geändert] 04, 13, **15** | Opus | Subagent | [geändert] kurz: nur die Doppel-Seite, aufnehmen oder ausdrücklich verwerfen (Hinweise zu Schritt 16) | offen |
+| 16 | CM-Seite: zuerst das gemeinsame Gerüst der acht Handler als eine Funktion mit Einheitstests (Antwort → Meldung, Fehlertext, neu laden oder Login), dann die beiden gleichen Text-Dialoge («Wildcard», «Kommentar ändern») als ein Baustein. Die neun Abschnitte des Markups bleiben in der Seite; es gibt kein Ziel für die Zeilenzahl (B-22, B-34). **[geändert]** «Login» nimmt die Ablauf-Funktion vom Wächter aus Schritt 15, nicht aus eigenen Stellen. Die Doppel-Seite ist eine offene Kleinfrage (Hinweise zu Schritt 16) | `src/routes/clubmeisterschaft/[id]/+page.svelte`; neu unter `src/lib/cm/` (Ablauf-Funktion mit Test, ein Dialog-Baustein) | Der Fix-Hotspot verliert rund 250 Zeilen wiederholten Ablauf; der Ablauf ist erstmals ohne Browser prüfbar | mittel (Fokus nach jeder Aktion, WCAG 2.4.3) | Neue Einheitstests zuerst; alle `cm-*`-E2E und `navigation.test.ts` («lädt nicht neu»); Klassen und Verschachtelung unverändert (Prüfliste (b) unten) | [geändert] 04, 13, **15** | Opus | Subagent | [geändert] kurz: nur die Doppel-Seite, aufnehmen oder ausdrücklich verwerfen (Hinweise zu Schritt 16) | **Teil 1 umgesetzt** (14.11.2026, Branch `refactor/schritt-16`, nicht gemergt: `test:` `0f5330b`; `refactor:` `619edd5`, `7c4b823`, `15d20a6`; Protokoll Anhang E.11; voller `make check` grün), Review «ok» am 14.11.2026. **Teil 2** (Doppel-Seite) **verworfen** (F-30: A, E-51). **Erledigt**, Version 0.22.2. Ergebnis unten |
 | 17 | `Anmeldungsliste.svelte` nutzt den vorhandenen `Aktionsdialog` statt `fuehreAus` und fünf roher Dialoge. `DoppelListe.svelte` bleibt unverändert. Der Dialog «Wildcard-Antrag» hat zwei Entscheid-Tasten; ob der Baustein dafür erweitert wird oder dieser eine Dialog von Hand bleibt, entscheidet der Schritt und begründet es. **Checkpoint (E-21):** Vor dem Merge sieht der Projektleiter ein Vorher-Nachher-Bild der Warnung (heute ein Satz, im Baustein eine Liste) und entscheidet, ob es so bleibt | `src/lib/verwaltung/Anmeldungsliste.svelte`, allenfalls `Aktionsdialog.svelte` | Zwei statt drei Baustufen desselben Ablaufs; rund 150 Zeilen weniger | mittel (die Warnung steht heute als Satz, im Baustein als Liste: sichtbare Abweichung, vorab dem Projektleiter zeigen) | `cm-verwaltung.test.ts`, `turnier.test.ts`, `cm-anmeldung.test.ts` (zweiter Test); Prüfliste (b) unten | 04, 14 | Opus | Subagent, vor dem Merge Checkpoint mit dem Projektleiter | nein | offen |
 | 18 | [geändert] `basis.css` in mehrere Dateien schneiden, **in der bestehenden Reihenfolge** (E-13; z. B. Grundlagen, Rahmen und Kopfleiste, Bedienelemente, Karten und Listen, Verwaltung, Anleitung, Übergänge, PC-Layout, Druck). Keine Regel wird verschoben, umbenannt oder gelöscht; es gibt keine tote Klasse zu entfernen (B-23). Bedingungen für den Schnitt: Hinweise zu Schritt 18 | `src/lib/design/`, `src/routes/+layout.svelte` (Importe in derselben Reihenfolge), `scripts/pruefungen/design-festwerte.ts` (Pfade), die vier Mockups unter `docs/ui-mockups/*.html`, `docs/ui-leitbild.md` | Weniger Merge-Reibung an der meistgeänderten Code-Datei | niedrig (vorher mittel), solange der Beweis hält | Gebautes Stylesheet vor und nach Zeichen für Zeichen gleich (`make css-vergleich`, Schritt 04); **[geändert]** dazu den Vergleich einmal für den SPA-Build ziehen oder begründen, warum nicht; `make check` | 04 (E-13) | Sonnet | Subagent | nein | offen |
 
@@ -2095,6 +2095,14 @@ Der wichtigste ist der dritte.
 - **Netz:** Teil 4 in `tests/e2e/waechter.test.ts` (fünf Fälle je Gerät: je Liste eine gestellte 503, dazu «beim Öffnen genau eine Abfrage, nach einer Suche genau eine mehr»), auf dem alten Stand grün, einmal rot, seither unverändert; `tests/oberflaeche/ladefunktionen.test.ts` 106 → 119 Fälle. Der Diff unter `src/lib/server/` und `src/routes/api/` gegen `origin/dev` ist leer.
 - **Für die Nutzerin:** nur die zwei Folgen aus E-48 (Einzelheiten und Grenzfälle in E.9): Die vier Listen erscheinen einen Augenblick später und gleich gefüllt (Titel, Zahl und Zeilen zugleich; beim Wechsel in der App bleibt solange die vorige Seite stehen; beim Verlauf gilt das auch für den Wechsel des Filters); nach dem Vorladen eines Links kann einmal der alte Stand erscheinen.
 - **Übergangsregel «Ab Schritt 15»:** stimmt nach Lauf 2 für die vier Listen; ihr Wortlaut nennt die benannten Ausnahmen nicht (E-49: Karte «Benachrichtigungen» und Push-Hinweis; Fall K: `willkommen/+page.ts`). Nicht geändert; E-49 legt die Schärfung auf Schritt 24.
+
+**Ergebnis Schritt 16, Teil 1** (14.11.2026; Review «ok», Version 0.22.2; Teil 2 mit der Doppel-Seite verworfen, F-30: A, E-51; Nachmessen in E.10, Protokoll in E.11)
+
+- **Umgestellt:** Neu `src/lib/cm/ablauf.ts` mit `fuehreAblauf(seite, aktion)`: sperren, Meldung und Fehler leeren, abrufen, **die Sperre lösen, bevor die Folge läuft**, dann nach `art` verzweigen. Die Seite reicht Sperre, Meldung, Fehler, `neuLaden` und den Wächter (`leiteUmNachAktion`) einmal als Objekt `seite` hinein; die Aktion nennt den Abruf, was bei `ok` geschieht, je Wort den Satz oder `null` (still), und wo nötig `vorher` (Feldfehler leeren), `vorWort` (Dialog zu), `danach` (statt Neuladen: Neuladen und Fokus), `eingabe` und den Ort der Störung. Sieben der acht Handler der CM-Seite laufen darüber (`anmelden`, `abmelden`, `annehmen`, `ablehnen`, `zurueckziehen`, `wildcardSenden`, `suchtextSenden`). **`angabenSenden` bleibt von Hand** (Abbruchstelle 2): Er hält die Sperre bis zum Ende und wertet das Neuladen aus.
+- **Text-Dialog:** Neu `src/lib/cm/Textdialog.svelte` für «Wildcard beantragen» und «Kommentar ändern» (Formular mit einem Textfeld, `oeffne`, `schliesse`, `fokussiere`, Text über `bind:wert`, Beschriftung als Inhalt). Nicht auf `Aktionsdialog` gebaut. Klassen, Verschachtelung, `required`, `rows`, `maxlength` und die Reihenfolge in `aria-describedby` sind gleich; die `id`s entstehen aus einem Präfix (E.10 erlaubt es).
+- **Netz:** Vorab-E2E `tests/e2e/cm-ablauf.test.ts` (T1 bis T3, je auf iPhone und Android) halten Satz, Neuladen und Fokus nach jeder Aktion fest, auch in den Fehlerzweigen; auf dem alten Stand grün, einmal rot, durch den Umbau unverändert. `src/lib/cm/ablauf.test.ts` mit 15 Fällen; `ablauf.ts` zählt zur Abdeckung (100 %). Der Diff unter `src/lib/server`, `src/routes/api`, `src/lib/design`, `src/lib/verwaltung` und `src/lib/login` ist leer; kein bestehender Test geändert.
+- **Zahlen:** CM-Seite 1039 → 921 Zeilen (Skript 479 → 406, Markup 560 → 515); dazu `ablauf.ts` 81 und `Textdialog.svelte` 95 Zeilen. E.10 schätzte 170 bis 210 Zeilen weniger in der Seite; die Wortlisten stehen je Handler als Objekt, und `seite` braucht 24 Zeilen. Die Zeile setzt kein Ziel.
+- **Für die Nutzerin:** nichts.
 
 **Hinweise zu Schritt 13** [neu]
 
@@ -2234,6 +2242,20 @@ Ladefunktionen sind dort gelesen, der Rest per Textsuche.
   Zeile (nur die CM-Seite), und der Bericht des Schritts verwirft die Doppel-Seite ausdrücklich.
 - **Netz** (1c): alle `cm-*`-E2E, `navigation` («lädt nicht neu»), die neuen Einheitstests der
   Ablauf-Funktion. Den Fokus nach einer Aktion hält nur fest, wo ein E2E ihn prüft [V].
+- **Nachmessen erledigt (14.11.2026, Anhang E.10) [neu]:** Dort stehen die Tabelle der acht
+  Handler (Abruf, Folge je `art`, Fokus, E2E), der Vergleich mit der Doppel-Seite, die Vorab-Tests
+  und der Schnitt. Es gehen vor: (1) **Die Doppel-Seite wird aufgenommen** (`anfrageSenden`,
+  `zurueckziehen`, `alleinAnmelden`; `suchen` und `neuLaden` bleiben), als zweiter Teil; braucht
+  sie eine Angabe an der Funktion, die die CM-Seite nicht nutzt, wird sie ausdrücklich verworfen.
+  (2) Die Funktion nimmt «was bei `ok` geschieht» und «je Wort: Satz oder keiner, und was danach
+  geschieht» als Angabe und löst die Sperre **vor** der Folge (eine gesperrte Taste nimmt keinen
+  Fokus). (3) `angabenSenden` hält die Sperre bis zum Ende und wertet das Neuladen aus: nur mit
+  eigener Angabe auf die Funktion, sonst von Hand. (4) Den Fokus prüft heute eine E2E-Stelle
+  (`cm-doppel.test.ts:383`), `suchtextSenden` und `zurueckziehen` haben keinen E2E-Fall, kein
+  Fehlerzweig ist im Browser gedeckt: **vier Vorab-E2E** in `tests/e2e/cm-ablauf.test.ts`, ohne
+  Mail-Code. (5) Der Text-Dialog ist ein eigener Baustein unter `src/lib/cm/`, nicht auf
+  `Aktionsdialog` gebaut; Schritt 17 teilt keine Datei mit Schritt 16. (6) «Rund 250 Zeilen» sind
+  eher 170 bis 210 [V].
 
 
 **Hinweise zu Schritt 17** [neu]
@@ -2450,12 +2472,12 @@ jeden auf oder verwirft ihn ausdrücklich im Bericht:
 | 11 | Zuordnung der 26 Einträge von `TURNIER_SCHNITTSTELLEN` | Umfang des Schritts. **Erledigt** 12.11.2026 (Anhang D.11): 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; Empfehlung zwei Teile 11a und 11b (**F-22**) |
 | 13 [geändert] | drei Module ganz lesen; je Modul die Tabelle der Sonderfälle (204, 429, `eingabe` ohne `felder`, 401, unlesbares JSON, `ergebnis` statt `art`); Empfehlung «Wort gilt nur mit seinem Status»; die 13 `page.route`-Stellen; Ort des Bausteins; N-09 | Form des Bausteins; Liste der Vorab-Tests; allenfalls eine Frage an den Projektleiter. **Erledigt** 12.11.2026 (Anhang E.1): keine Frage nötig; 57 Zeilen Vorab-Tests; drei Seiten statt vier; Baustein `src/lib/abruf.ts` mit einem Vertrag je Modul |
 | 15 [neu] | alle Einstiege (Ladefunktionen und Aktionen im Baustein) mit ihrem heutigen Ziel, mit und ohne wartende Mail-Anfrage; Form des Vorab-Tests | Erwartung des Vorab-Tests; benannte Fälle des Wächters (E-44). **Erledigt** 13.11.2026 (Anhang E.5): 36 Adressen, elf benannte Fälle (A bis K), 17 Stellen nach einer Aktion; Vorab-Test in drei Teilen; zwei Läufe; Fragen **F-28** (vor Lauf 2) und **F-29**. Für Lauf 1b (Interclub) 14.11.2026 (Anhang E.7): 39 Adressen, Fälle L und M, keine Frage |
-| 16 [neu] | kurz: nur die Doppel-Seite (passt die Ablauf-Funktion der CM-Seite?) | aufnehmen oder ausdrücklich verwerfen |
+| 16 [neu] | kurz: nur die Doppel-Seite (passt die Ablauf-Funktion der CM-Seite?) | aufnehmen oder ausdrücklich verwerfen. **Erledigt** 14.11.2026 (Anhang E.10): **aufnehmen** (drei Handler, zweiter Teil mit Abbruchstelle); sieben der acht Handler der CM-Seite passen ohne Rest; vier Vorab-E2E zum Fokus; keine Frage |
 | 19 | was das Bordmittel von SvelteKit deckt | Checkpoint: Bordmittel oder nur entfernen |
 | 20 | ungenutzte Exporte je Name bestätigen | Liste des Schritts |
 | 23 | `release.ts`, `gruener-stand.ts`, Abschnitt «Versionen» | davor **F-15** |
 
-Erledigt: Nachmessen für Schritt 04 (Anhang C.3), 07 (Anhang D.3), 08 (Anhang D.5), 09 (Anhang D.7), 10 (Anhang D.9), 11 (Anhang D.11), 13 (Anhang E.1), 15 (Anhang E.5). [geändert] Kein Nachmessen: 06, 06a, 12, 12a, 14, 17, 18, 21,
+Erledigt: Nachmessen für Schritt 04 (Anhang C.3), 07 (Anhang D.3), 08 (Anhang D.5), 09 (Anhang D.7), 10 (Anhang D.9), 11 (Anhang D.11), 13 (Anhang E.1), 15 (Anhang E.5), 16 (Anhang E.10). [geändert] Kein Nachmessen: 06, 06a, 12, 12a, 14, 17, 18, 21,
 22, 24, 25.
 
 **Checkpoints [geändert]** (für die Etappen 1 und 2 entschieden mit E-26 und E-30):
@@ -2528,6 +2550,7 @@ sie hebt die Übergangsregeln auf.
 | **E-48** [neu] | (F-28, 13.11.2026) Antwort A: Die vier Listen der Verwaltung (`turniere`, `anlaesse`, `mitglieder`, `verlauf`) laden in Schritt 15, Lauf 2, in `+page.ts` vor dem Anzeigen. Die zwei sichtbaren Folgen sind angenommen: Die Seite erscheint einen Augenblick später und gleich gefüllt; nach dem Vorladen eines Links kann einmal der alte Stand erscheinen, wie heute schon bei allen anderen Seiten. **Nachtrag 14.11.2026 (Entscheid Projektleiter, Review von Lauf 2, Befund 1):** Eine dritte Folge ist angenommen: «Beenden» im Band «Ansicht als …» lädt auf `turniere`, `anlaesse` und `verlauf` die Liste neu; fällt genau dann nur diese Abfrage aus, erscheint die Störungsmeldung (bei `turniere` und `anlaesse` ohne Zeilen), wo vorher die Liste ohne Meldung stehen blieb. Kein Umbau. |
 | **E-49** [neu] | (F-29, 13.11.2026) Antwort A: Die Karte «Benachrichtigungen» im Profil und der Push-Hinweis der Startseite laden ihren Stand weiter selbst (benannte Ausnahme zur Übergangsregel «Ab Schritt 15»); der Wortlaut wird in Schritt 24 geschärft. |
 | **E-50** [neu] | (13.11.2026) Die Übergangsregel «Ab Schritt 13» der `CLAUDE.md` lautet: «Statuscodes deutet nur der Abruf-Baustein (`src/lib/abruf.ts`); ein einzelner Abruf gibt `{ art }` zurück. Abläufe aus mehreren Anfragen (Passkey, Push auf dem Gerät) und Lade-Hilfen («Daten oder `null`», Wahrheitswert) dürfen eine andere Form haben.» Eingespielt (Orchestrator). Vom Projektleiter am 14.11.2026 als sein Entscheid bestätigt (Hinweis (4) aus dem Review von Schritt 15). |
+| **E-51** [neu] | (F-30, 14.11.2026) Antwort A: Die Doppel-Seite (`src/routes/clubmeisterschaft/[id]/doppel/[kid]/+page.svelte`) wird in Schritt 16 **verworfen**. Ihre drei Handler (`anfrageSenden`, `zurueckziehen`, `alleinAnmelden`) bleiben von Hand; die Ablauf-Funktion `src/lib/cm/ablauf.ts` bekommt keine Angabe «Folge je Wort» nur für diese eine Seite (Abbruchstelle 5 aus E.10). Für die Übergangsregel «Ab Schritt 17» ist die Doppel-Seite eine **benannte Ausnahme**: Der Bestand bleibt, neue Abläufe mit Rückfrage folgen der Regel. Der Wortlaut der `CLAUDE.md` bleibt; geschärft wird er in Schritt 24 (wie E-49). Schritt 16 endet mit Teil 1. |
 
 ---
 
@@ -2804,6 +2827,24 @@ Laden gehöre zur Seite, nicht in einen Baustein. Der Plan kennt die zwei Stelle
 - B: Umziehen in die Seiten Profil und Startseite. Dann wartet das Profil auf eine Abfrage mehr,
   und der Text «Wird geladen …» in der Karte entfällt: eine kleine sichtbare Änderung.
 - **Empfehlung: A.** Für die Nutzerin ändert sich nichts, und der Schritt wird nicht grösser.
+
+**F-30 [BEANTWORTET 14.11.2026: A, E-51] — Schritt 16, Teil 2: Doppel-Seite verwerfen oder die Ablauf-Funktion erweitern?**
+
+- **Worum es geht:** Die Ablauf-Funktion der CM-Seite (`src/lib/cm/ablauf.ts`) kennt «was danach
+  geschieht» je Aktion. Die Doppel-Seite braucht es je Fehlerwort (`anfrageSenden`: bei drei
+  Wörtern «Suche neu», sonst Neuladen) und schliesst die Rückfrage vor jeder Verzweigung, auch
+  bei Störung. Kein Handler der CM-Seite nutzt das [G, Review Teil 1, Befund 1].
+- **Widerspruch im Dokument:** Die Hinweise zu Schritt 16 und E.10, Abschnitt 2, nehmen an, die
+  CM-Seite brauche «je Wort» ohnehin; das stimmt nicht. Abbruchstelle 5 in E.10 sagt: neue Angabe
+  nur für die Doppel-Seite heisst verwerfen.
+- **A (Empfehlung von Reviewer und Orchestrator): verwerfen.** Schritt 16 endet mit Teil 1; die
+  Doppel-Seite behält ihre drei Handler von Hand (110 Zeilen, Gewinn wäre rund 40 bis 50 Zeilen)
+  und wird bei der Übergangsregel «Ab Schritt 17» als benannte Ausnahme geführt. Dann: Review des
+  ganzen Schritts = Review von Teil 1, Merge mit Version.
+- **B: erweitern.** Die Funktion bekommt «Folge je Wort» und «vor jeder Verzweigung»; Teil 2 wie
+  in E.10 (Vorab-E2E T4, drei Handler), eigenes Review. Mehr Angaben in der Funktion für eine
+  einzige Seite.
+- **Hält auf:** nur Teil 2 und den Merge von Schritt 16.
 
 ### 9.2 Beantwortete Fragen
 
@@ -9268,3 +9309,425 @@ aufzulösen)
   - **Nicht geprüft vom Reviewer:** kein Vorleser, Befund 1 und das Vorladen nicht im Browser
     nachgestellt, Rot-Proben nicht wiederholt, CI nicht angesehen.
   - **E-50:** vom Projektleiter am 14.11.2026 bestätigt.
+
+### E.10 Nachmessen Schritt 16
+
+**Nachmessen vor Schritt 16** (14.11.2026, Worktree `refactor/schritt-16` auf `86f6430` =
+`origin/dev`, Version 0.22.1; nur gelesen und gezählt, kein `make check`, kein E2E, keine
+Datenbank). Ganz gelesen [G]: `src/routes/clubmeisterschaft/[id]/+page.svelte`,
+`…/doppel/[kid]/+page.svelte`, `src/lib/cm/api.ts`, `src/lib/login/waechter.ts`,
+`src/lib/verwaltung/Aktionsdialog.svelte`, `tests/e2e/cm-doppel.test.ts`, der erste Test von
+`cm-anmeldung.test.ts`. In Auszügen [E]: `cm-verwaltung.test.ts:189–232`,
+`cm-doppel-verwaltung.test.ts:340–362`, `navigation.test.ts:265–328`, `waechter.test.ts:364–417`,
+`Anmeldungsliste.svelte` (`fuehreAus`), `vitest.config.ts`, `src/lib/fehler.ts`.
+
+**Kurz:** Die Plan-Zeile stimmt in der Sache. Kein Entscheid des Projektleiters nötig, keine neue
+Frage. Vier Dinge gehen der Zeile vor: (1) Die Funktion passt für **sieben** der acht Handler ohne
+Rest; `angabenSenden` weicht in vier Punkten ab. (2) Die **Doppel-Seite wird aufgenommen**, als
+zweiter Teil mit eigener Abbruchstelle, sofern die Funktion «Folge je Wort» als Angabe nimmt.
+(3) Den **Fokus nach einer Aktion hält heute genau eine Stelle** in E2E, und die nur lose; vier der
+acht Handler haben gar keinen E2E-Fall. Es braucht Vorab-E2E über die Einheitstests hinaus.
+(4) «Rund 250 Zeilen» ist zu hoch gegriffen, eher 170 bis 210 [V].
+
+#### 1 CM-Seite heute (nach Schritt 15 und #81)
+
+- **Zahlen [G]:** 1039 Zeilen (Plan: 1038; eine Import-Zeile mehr aus Schritt 15), Skript 1–479.
+  Acht Handler, die eine Anfrage schicken; **neun** Aufrufe `leiteUmNachAktion(` (acht Handler plus
+  `neuLaden`, Zeilen 138, 165, 229, 270, 302, 348, 388, 419, 464); drei rohe Dialoge
+  (`kontaktHinweis`, `wildcardDialog`, `suchtextDialog`); neun `{#snippet}`. Die acht Handler
+  messen zusammen **266 Zeilen** (27 + 49 + 31 + 27 + 38 + 29 + 27 + 38), nicht «rund 330» (B-22);
+  330 kommt nur mit den Hilfen (`uebernimm`, `neuLaden`, `fokusBei`, `fokusNachAnfrage`,
+  `…Tippen`, `…Oeffnen`) zusammen. Die zwei Text-Dialoge messen 80 Zeilen Markup (678–757).
+- **Seit der Plan-Zeile berührt [G: `git log` je Datei]:** nur `edf6914` (Schritt 15: Aufruf der
+  Aktions-Hülle statt `goto('/login')`, 19 bzw. 11 Zeilen). #81 hat keine der beiden Seiten und
+  nichts unter `src/lib/cm/` angefasst.
+- **Gemeinsames Gerüst der sieben Handler mit `switch`** (`wildcardSenden`, `anmelden`,
+  `abmelden`, `annehmen`, `ablehnen`, `zurueckziehen`, `suchtextSenden`) [G]: `if (laeuft) return`
+  → `laeuft = true` → `meldung = null`, `fehler = null` → Abruf → **`laeuft = false` vor der
+  Folge** → nach `art`. Die Sperre muss vor der Folge fallen: `fokusBei` setzt den Fokus auf eine
+  Taste mit `disabled={laeuft}`; eine gesperrte Taste nimmt keinen Fokus.
+
+  | Handler | Abruf (`src/lib/cm/api.ts`) | `ok` | Wort mit Satz, dann `neuLaden` | Wort still, dann `neuLaden` | `eingabe` | sonst | Fokus danach | E2E |
+  |---|---|---|---|---|---|---|---|---|
+  | `anmelden` | `meldeAn` | `uebernimm`, Meldung «Angemeldet für …» | `voll`, `geschlossen`, `passt-nicht` (`FEHLER`) | `schon-angemeldet`, `angaben-fehlen`, `nicht-gefunden` | Störung | Störung auf der Seite | `ok`: `fokusBei(k.id)` (neue Taste «Abmelden»); Fehler: keiner | `cm-anmeldung:140–168`, `navigation:297` (lädt nicht neu), `waechter:364` (abgemeldet). Fokus: **kein Test** |
+  | `abmelden` | `meldeAb` | `uebernimm`, «Abgemeldet von …» bzw. «Antrag für … zurückgezogen.» | `geschlossen` | `nicht-gefunden` | Störung | Störung | `ok`: `fokusBei(k.id)` | `cm-anmeldung:176`, `cm-doppel:333` (nur der Satz «Abgemeldet»). Variante Wildcard («Zurückziehen») und Fokus: **kein Test** |
+  | `annehmen` | `nimmAnfrageAn` | `uebernimm`, «Angemeldet mit … für …» | `voll`, `geschlossen`, `passt-nicht`, `schon-angemeldet` (`ANNEHMEN_FEHLER`), `hinfaellig` | `angaben-fehlen`, `nicht-gefunden` | Störung | Störung | `ok`: `fokusNachAnfrage(kategorieId)`; Fehler mit Neuladen: `fokusNachAnfrage()` | `cm-doppel:196`, `:311`. Fokus: **kein Test** |
+  | `ablehnen` | `lehneAnfrageAb` | `uebernimm`, «Anfrage von … abgelehnt.» | `geschlossen` | `nicht-gefunden` | Störung | Störung | immer `fokusNachAnfrage()` (nächste Anfrage-Karte, sonst Titel «Deine Angaben», sonst Seitentitel) | `cm-doppel:378–385`: einzige Fokus-Prüfung, nur «nicht `BODY`» |
+  | `zurueckziehen` | `zieheAnfrageZurueck` | `uebernimm`, «Anfrage an … zurückgezogen.» | `geschlossen` | `nicht-gefunden` | Störung | Störung | `ok`: `fokusBei(k.id)` (im Doppel der Link «Anmelden») | **kein Test** (`cm-doppel:170` sieht die Taste nur) |
+  | `wildcardSenden` | `beantrageWildcard` | `uebernimm`, **dann** Dialog zu, «Wildcard beantragt. …» | `voll`, `geschlossen`, `keine-wildcard`, `passt-nicht`; Dialog zu | `schon-angemeldet`, `angaben-fehlen`, `nicht-gefunden`; Dialog zu | Satz am Feld (`felder.kommentar`, sonst Störung), Fokus ins Feld, Dialog bleibt | Störung **am Feld**, Dialog bleibt, kein Fokuswechsel | `ok`: `fokusBei(k.id)` (neue Taste «Zurückziehen») | `cm-verwaltung:220–232` (nur der gute Weg). Leerer Kommentar, Fehler, Fokus: **kein Test** |
+  | `suchtextSenden` | `setzeSuchtext` | Dialog zu, **dann** `uebernimm`, «Kommentar gespeichert.» | `geschlossen`; Dialog zu | `nicht-gefunden`; Dialog zu | Satz am Feld (`felder.suchtext`), Fokus ins Feld | Störung am Feld | `ok`: `fokusBei(k.id)`; das ist in `eigeneSuche` die Taste **«Abmelden»**, nicht «Kommentar ändern» | **kein Test**: `cm-doppel:270` sieht nur die Taste; der Dialog wird in keinem E2E geöffnet |
+
+  Bei `abgemeldet` rufen alle `leiteUmNachAktion(r)` (Fall C, nur Login). Den Rückgabewert von
+  `neuLaden` wertet keiner der sieben aus. «sonst» fängt auch die Wörter der Liste `ABLEHNUNGEN`,
+  die der Handler nicht nennt (etwa `voll` beim Abmelden): Störung.
+- **`angabenSenden` weicht ab [G]** (Zeilen 142–168): (a) die Sperre hält **bis zum Ende**, auch
+  über `neuLaden` und den Fokus; (b) `meldung` wird nicht geleert, dafür `feldFehler`; (c) `ok`
+  liefert keine Ansicht, darum `neuLaden` mit ausgewertetem Ergebnis (nicht geladen → Störung,
+  auch wenn `neuLaden` gerade zur Startseite oder zum Login wechselt); (d) kein Wort mit Satz:
+  alles ausser `ok`, `eingabe`, `abgemeldet` ist Störung. Fokus: `ok` → Seitentitel, `eingabe` →
+  erstes Feld mit Fehler. E2E: `cm-anmeldung:121–123` (guter Weg); Feldfehler und Fokus: kein Test.
+  **Folge:** Die Funktion nimmt ihn nur, wenn «Sperre bis zum Ende» eine Angabe ist, die kein
+  anderer Handler braucht. Sonst bleibt er von Hand und der Bericht nennt «sieben plus einer»;
+  die Sperre für ihn früher zu lösen wäre eine Verhaltensänderung (zweites Absenden während des
+  Neuladens möglich) und ist nicht erlaubt.
+- **Die zwei Text-Dialoge [G]:** gleiche Verschachtelung (`dialog.karte` › `h2`, `p.leise`, `form
+  novalidate` › `div.feld` › `label`, `span.feld-hilfe`, `textarea`, `span.feld-hilfe` (Zähler),
+  `p.fehler[role=alert]`; `div.leiste` mit «Abbrechen» und Haupttaste). Unterschiede: Titel,
+  Beschriftung (einmal mit `<span class="leise">(freiwillig)</span>`, also kein reiner Text),
+  Hinweistext, `rows` 4/3, `maxlength` 300/120, `required` nur bei der Wildcard, Zähler-Funktion,
+  Text der Haupttaste, die `id`s (`cm-kommentar-hilfe` gegen `cm-suchtext-zaehler`). Nur die
+  Wildcard prüft vor dem Senden auf leer (ohne Anfrage; Satz und Fokus ins Feld). Die Reihenfolge
+  in `aria-describedby` ist bei beiden gleich (Hinweis, Zähler, Fehler). Das Feld «Kommentar
+  (freiwillig)» der Doppel-Seite (`kommentarEingabe`) ist dasselbe Feld ohne Dialog; es bleibt
+  von Hand (E-20: kein Baustein «Feld»).
+- **Beobachtungen, nicht zu ändern (Feature-Stopp), nur festhalten:** Nach «Kommentar gespeichert»
+  steht der Fokus auf «Abmelden». Nach einem Fehler mit Neuladen bei `anmelden`, `abmelden`,
+  `zurueckziehen` setzt niemand den Fokus; verschwindet dabei die Taste, fällt er in den
+  Seitenkörper (WCAG 2.4.3) [V: gelesen, nicht im Browser nachgestellt]. Die Tabelle `FEHLER`
+  steht mit denselben drei Sätzen auch in der Doppel-Seite.
+
+#### 2 Doppel-Seite: aufnehmen
+
+- **Zahlen [G]:** 426 Zeilen, **fünf** Aufrufe `leiteUmNachAktion(` (Zeilen 78, 132, 155, 204,
+  248): `suchen`, `neuLaden` und drei Handler mit Sperre (`anfrageSenden`, `zurueckziehen`,
+  `alleinAnmelden`; zusammen 110 Zeilen).
+- **Deckt sich:** Sperre → Abruf → Sperre lösen → `switch` über `art` → `abgemeldet` an den
+  Wächter, Wörter mit Satz (`FEHLER`), stille Wörter, `eingabe` am Feld, sonst Störung. Derselbe
+  Typ `Ergebnis<CmAnsicht>`, dieselben Abruf-Funktionen (`meldeAn`, `zieheAnfrageZurueck`).
+- **Weicht ab, genau:**
+
+  | Handler | Abweichung vom Gerüst der CM-Seite |
+  |---|---|
+  | `anfrageSenden` | leert `meldung`/`fehler` nicht (das tut `anfragenTippen` beim Öffnen); schliesst die Rückfrage **vor** jeder Verzweigung, auch bei Störung; `ok` verlässt die Seite (`zurCmSeite` mit Satz im Seitenzustand `cmMeldung`); `schon-angefragt`, `passt-nicht`, `nicht-gefunden`: Satz mit Namen, danach **`suchen(true)` statt `neuLaden`**; `anfrage-offen`: still `neuLaden` |
+  | `zurueckziehen` | `ok`: Ansicht übernehmen, Vorgeladenes verwerfen, **Trefferliste von Hand nachführen**, Fokus auf die Taste des Treffers; `nicht-gefunden`: still `suchen(true)` statt `neuLaden` |
+  | `alleinAnmelden` | schliesst zuerst den Hinweis; `ok`: `kommentar = ''` (sonst fragt der Zurück-Link nach Ungespeichertem, `navigation:265`), dann `zurCmSeite`; `eingabe` am Feld mit Fokus; Störung **auf der Seite**, nicht am Feld |
+  | `suchen` | keine Aktion: keine Sperre, 250 ms, Abbruch veralteter Anfragen, eigener Merker `suchFehler`. **Bleibt von Hand** |
+  | `neuLaden` | führt zur CM-Seite, wenn die Kategorie nicht mehr zur Wahl steht (`doppelZurWahl`). **Bleibt von Hand** |
+
+- **Urteil:** Dieselbe Funktion passt für die drei Handler, **wenn** sie zwei Dinge als Angabe
+  nimmt statt fest eingebaut: was bei `ok` geschieht (die Seite gibt es mit) und **je Wort: Satz
+  oder keiner, und was danach geschieht** (Standard: neu laden; auf der Doppel-Seite an vier
+  Stellen «Suche neu»). Beides braucht die CM-Seite ohnehin (`annehmen`/`ablehnen` setzen nach dem
+  Neuladen den Fokus, die anderen nicht). Eine nur auf `uebernimm` und `fokusBei` zugeschnittene
+  Funktion passte nicht.
+- **Empfehlung: aufnehmen**, als zweiter Teil nach der grünen CM-Seite, mit eigenen Commits.
+  Gründe: (1) gleiche Fachsache, gleicher Ergebnis-Typ, gleiche Sätze; bliebe sie liegen, wäre sie
+  nach Schritt 17 die eine Seite der CM mit Sperre und Verzweigung von Hand, gegen die
+  Übergangsregel «Ab Schritt 17». (2) Die Seite steht in keinem anderen Schritt (P-16). (3) Kein
+  sichtbares Verhalten ändert sich. **Dagegen spricht:** Der Gewinn ist klein (rund 40 bis 50
+  Zeilen [V]), und das Netz ist dünner als bei der CM-Seite (unten). Darum die Abbruchstelle:
+  Braucht die Funktion für die Doppel-Seite eine Angabe, die kein Handler der CM-Seite nutzt, wird
+  die Doppel-Seite **ausdrücklich verworfen** und der Bericht sagt es; Teil 1 geht dann allein.
+- **E2E der Doppel-Seite heute [G]:** `anfrageSenden` guter Weg (`cm-doppel:152–168`, `:301–307`,
+  `cm-doppel-verwaltung:340–344`); `alleinAnmelden` guter Weg mit Hinweis (`cm-doppel:255–264`);
+  `suchen` bei `abgemeldet` (`waechter:393`); ungespeicherter Kommentar (`navigation:265`).
+  **Kein Test:** `zurueckziehen` (die Taste wird nur gesehen, `cm-doppel-verwaltung:357`), jeder
+  Fehlerzweig, jeder Fokus.
+
+#### 3 Absicherung
+
+- **Was trägt [G]:** der gute Weg von sechs der acht Handler der CM-Seite (Tabelle oben), «lädt
+  nicht neu» für `anmelden` (`navigation:297–328`: keine Anfrage an `/api/cm` und
+  `/api/cm/<id>`), `abgemeldet` für `anmelden` (`waechter:364`), die Konsolenfehler-Prüfung in
+  allen diesen Tests, das Bild der Dialoge (`pruefeBildschirm` «cm-wildcard-antrag»).
+- **Wo kein Test hinsieht [G]:** `suchtextSenden` und `zurueckziehen` ganz; die Wildcard mit
+  leerem Kommentar; **jeder** Fehlerzweig aller acht Handler (kein `page.route` auf `/api/cm/…`
+  ausser `navigation:60`); die Feldfehler der Angaben; **der Fokus nach jeder Aktion ausser
+  «Ablehnen»**, und dort nur «nicht im Seitenkörper». Der Hinweis «Den Fokus … hält nur fest, wo
+  ein E2E ihn prüft [V]» ist damit gemessen: eine Stelle.
+- **Folge: Vorab-E2E sind nötig.** Die Einheitstests der Funktion sehen weder Fokus noch die
+  Reihenfolge «Dialog zu, Ansicht übernehmen, Fokus» im Browser; genau dort liegt das Risiko der
+  Zeile (WCAG 2.4.3). Es gibt kein Werkzeug für Bausteine ohne Browser (`package.json`: Vitest und
+  Playwright, keine Testbibliothek für Svelte-Bausteine [G]); der neue Dialog-Baustein ist nur
+  über E2E prüfbar.
+- **Vorschlag Vorab-E2E** (neue Datei `tests/e2e/cm-ablauf.test.ts`, damit `cm-anmeldung.test.ts`
+  für Schritt 17 unberührt bleibt; nur Handy wie die anderen `cm-*`; Anmelden mit Brief-Code wie
+  bisher, **kein Mail-Code**; Vorbedingungen über die vorhandenen Hilfen `stelleAnfrageDirekt`,
+  `beantrageWildcardDirekt`, `setzeSpielerangaben`; Fehlerzweige mit `page.route` auf die eine
+  Schreib-Adresse, Status nach `STATUS_DES_WORTS`; Fokus mit `toBeFocused()` auf Rolle und
+  Beschriftung). Vier gebündelte Tests statt zwölf einzelner (weniger Anmeldungen, weniger Zeit):
+
+  | Test | Fälle (alle halten den heutigen Stand fest) |
+  |---|---|
+  | T1 Einzel und Wildcard | «Anmelden» (über den Hinweis) → Fokus auf «Abmelden» derselben Karte; «Abmelden» → Fokus auf «Anmelden». Wildcard: leerer Kommentar → Satz «Bitte schreib kurz …», Fokus im Feld, keine Anfrage; mit Text → Dialog zu, Fokus auf «Zurückziehen» der Karte; «Zurückziehen» → «Antrag für … zurückgezogen.», Fokus auf «Wildcard beantragen». Gestellt: Anmelden mit `geschlossen` → `alert` mit dem Satz und genau eine Anfrage `GET /api/cm/<id>`; Anmelden mit 503 → Störung auf der Seite, kein Neuladen; Wildcard mit 503 → Störung **im** Dialog, Dialog offen; Wildcard mit `geschlossen` → Dialog zu, `alert` auf der Seite |
+  | T2 Allein im Doppel | (allein angemeldet über die Doppel-Seite) «Kommentar ändern» → Feld mit dem alten Text; gestellt `eingabe` mit `felder.suchtext` → Satz am Feld, Fokus im Feld, Dialog offen; echt speichern → Dialog zu, «Kommentar gespeichert.», neuer Text in der Karte, Fokus auf «Abmelden» |
+  | T3 Anfragen | eigene Anfrage auf der CM-Seite «Zurückziehen» → Satz, Fokus auf dem Link «Anmelden» der Doppel-Karte. Zwei Anfragen an mich: erste «Ablehnen» → Fokus auf der Überschrift der verbleibenden Anfrage; «Annehmen» → Fokus auf «Abmelden» der eigenen Paar-Karte. Gestellt: «Annehmen» mit `hinfaellig` → «Diese Anfrage gilt nicht mehr.» |
+  | T4 Doppel-Seite (nur für Teil 2) | «Zurückziehen» in der Trefferliste → Satz, Taste heisst «Anfragen», Fokus darauf, **keine** Anfrage `GET /api/cm/<id>`. Gestellt: «Anfrage senden» mit `schon-angefragt` → Rückfrage zu, `alert` «Du hast … schon angefragt.», Seite bleibt, eine neue Suche folgt; «Allein anmelden» mit `eingabe` → Satz am Feld, Fokus im Feld |
+
+  Jeder Test muss auf dem alten Stand grün sein und einmal rot werden (Mutation aus einer
+  Sicherungskopie, kein `git checkout`). Zeigt ein Fall ein anderes heutiges Verhalten als hier
+  gelesen, gilt das gemessene und der Bericht nennt es. Zeitgrenze wie die Nachbarn
+  (`test.setTimeout(90_000)`), der Lauf im Hintergrund.
+- **Einheitstests der Funktion** (`src/lib/cm/ablauf.test.ts`, vor der Funktion, ohne Browser):
+  `ok` ruft die Folge der Seite und **nicht** das Neuladen; Wort mit Satz → Satz, dann Folge des
+  Worts; stilles Wort → nur die Folge; unbekanntes Wort und `stoerung` → Störung am genannten Ort;
+  `eingabe` mit und ohne Feld-Folge; `abgemeldet` → Wächter, kein Satz, kein Neuladen; zweiter
+  Aufruf während des ersten tut nichts; Meldung und Fehler sind vor dem Abruf geleert; **die
+  Sperre ist gelöst, bevor die Folge läuft**. Die Funktion bekommt Sperre, Meldung, Fehler,
+  Neuladen und Wächter hineingereicht; so braucht der Test `$app/navigation` nicht zu stellen
+  (sonst wie `src/lib/login/waechter.test.ts` mit `vi.mock`). `src/lib/cm/**` zählt heute nicht
+  zur Abdeckung (`vitest.config.ts`, `coverage.include`); ob `ablauf.ts` dort wie `abruf.ts`
+  aufgenommen wird, entscheidet der Schritt (eine Zeile, eine Datei mehr).
+
+#### 4 Abgrenzung zu Schritt 17
+
+- **Keine gemeinsame Datei [G]:** Schritt 17 fasst `src/lib/verwaltung/Anmeldungsliste.svelte` und
+  allenfalls `Aktionsdialog.svelte` an (Typ `Antwort<T>` der Verwaltung mit `warnung`/`trotzdem`,
+  `leiteUm` der Verwaltung). Schritt 16 bleibt in `src/lib/cm/` und den zwei Seiten der
+  Mitglieder-App (Typ `Ergebnis<T>`, `leiteUmNachAktion`).
+- **Gehört in 16:** die Ablauf-Funktion der CM, der Text-Dialog (zwei gleiche Dialoge mit einem
+  Textfeld in einem `<form>`), die drei Handler der Doppel-Seite, auf Wunsch die eine Tabelle
+  `FEHLER` für beide Seiten.
+- **Gehört nicht in 16:** `Aktionsdialog` anfassen, verschieben oder für die Mitglieder-App
+  öffnen; den Text-Dialog auf `Aktionsdialog` bauen (er hat kein `<form>`, zöge Typen und
+  Umleitung der Verwaltung in die Mitglieder-App und änderte das Markup); die Ablauf-Funktion so
+  allgemein machen, dass sie `fuehreAus` ersetzt (Schritt 17 ersetzt `fuehreAus` durch den
+  Baustein). Die Rückfragen ohne Textfeld (`kontaktHinweis` auf beiden Seiten, «… anfragen?» auf
+  der Doppel-Seite) bleiben rohe Dialoge; kein Schritt nennt sie, Kandidat für die
+  Zwischenrevision der Etappe 2.
+- **Nach beiden Schritten gibt es zwei Abläufe,** einen je App (`Aktionsdialog` in der
+  Verwaltung, `ablauf.ts` in der CM der Mitglieder). Das ist die Lesart der Übergangsregel «Ab
+  Schritt 17» («`Aktionsdialog` oder die gemeinsame Ablauf-Funktion») [V: Wortlaut]; Schritt 24
+  kann den Wortlaut schärfen.
+- **Merkpunkt «Abmelden mit erfundenem Ergebnis»** (`profil/+page.svelte`): berührt 16 nicht; die
+  Funktion reicht dem Wächter nur echte Ergebnisse. **Merkpunkt `verlauf/+page.svelte`** aus dem
+  Review von Schritt 15 («bei Schritt 16 oder 17 prüfen»): liegt in keiner Datei von 16 und in
+  keiner von 17; gehört zur Zwischenrevision der Etappe 2.
+
+#### 5 Überholt oder zu berichtigen
+
+1. «statt neun eigener Stellen» (Zeile 16, P-16): Die neun Stellen rufen seit Schritt 15 schon
+   den Wächter. Schritt 16 zieht acht der neun Aufrufe in die Funktion; der in `neuLaden` bleibt.
+2. «acht Handler als eine Funktion»: sieben sicher, `angabenSenden` nur mit eigener Angabe
+   (oben). «Rund 250 Zeilen»: Handler 266 → etwa 110 bis 130, Dialoge 80 → etwa 30, dazu ein
+   Dutzend Zustandszeilen; eher **170 bis 210** in der Seite [V]. Die Zeile setzt kein Ziel für
+   die Zeilenzahl; nur die Erwartung ist zu berichtigen.
+3. B-22 «rund 330 Zeilen» meint die Handler samt Hilfen; die Handler allein sind 266.
+4. Prüfliste (b), für 16 nachgeprüft [G]: `navigation:297` (Anfragen in `:312–316`, Erwartung
+   `:326`), `.karte` in `cm-anmeldung:70`, `cm-doppel:106`, `navigation:318`, `.karte-kopf
+   .plakette` in `cm-anmeldung:74`, `cm-doppel:266`, `:317`: alle Zeilen stimmen.
+5. Seit Schritt 13 heisst das Ergebnis `art`, die Ablehnungsgründe stehen in
+   `src/lib/cm/ablehnung.ts`; die Tabelle «Wort → Satz» der Funktion lässt sich daran binden.
+
+#### 6 Schnitt
+
+**Ein Branch, ein Merge, zwei Teile, ein Review am Ende** (Opus, Subagent, wie die Zeile). Vor dem
+Code die Svelte-Doku über den Svelte-MCP-Server (Baustein mit `bind:this` und exportierter
+Funktion wie `Aktionsdialog.oeffne`, `$bindable`, Snippet für die Beschriftung).
+
+| Nr. | Commit | Inhalt |
+|---|---|---|
+| 1 | `test:` | Vorab-E2E T1 bis T3 in `tests/e2e/cm-ablauf.test.ts`; auf dem alten Stand grün, je Test einmal rot |
+| 2 | `refactor:` | `src/lib/cm/ablauf.ts` mit `ablauf.test.ts` (Tests zuerst); noch von keiner Seite benutzt |
+| 3 | `refactor:` | CM-Seite: die sieben Handler auf der Funktion; `angabenSenden` nach der Regel oben. Sätze, Reihenfolge «Dialog zu / übernehmen» je Handler und Fokusziele unverändert |
+| 4 | `refactor:` | Text-Dialog als Baustein unter `src/lib/cm/` (Vorschlag `Textdialog.svelte`), die zwei Dialoge der CM-Seite darauf; Klassen, Verschachtelung, `required`, `rows`, Reihenfolge in `aria-describedby` gleich. Die `id`s dürfen aus einem Präfix entstehen, wenn Beschriftung und Beschreibung gleich verknüpft bleiben |
+| — | | **Teil 1 fertig:** voller `make check` |
+| 5 | `test:` | Vorab-E2E T4 (Doppel-Seite), auf dem Stand nach Commit 4 grün, einmal rot |
+| 6 | `refactor:` | Doppel-Seite: `anfrageSenden`, `zurueckziehen`, `alleinAnmelden` auf der Funktion; `suchen` und `neuLaden` bleiben; die Tabelle `FEHLER` einmal unter `src/lib/cm/` |
+| 7 | `docs:` | dieses Dokument (Ergebnis in 7.4, Protokoll E.11, Stand); voller `make check` auf dem committeten Stand |
+
+**Abbruchstellen:**
+
+1. Ein Vorab-Fall ist auf dem alten Stand nicht grün zu bekommen, ohne die App zu ändern →
+   Erwartung an das gemessene Verhalten angleichen und nennen; ist das Verhalten nicht stabil
+   (Flake), den Fall streichen und als Lücke melden, nicht mit Wartezeit stopfen.
+2. Die Funktion braucht für einen Handler eine Angabe, die sonst keiner nutzt → dieser Handler
+   bleibt von Hand, benannt (gilt für `angabenSenden`).
+3. Ein Fokus-Fall wird nach Commit 3 oder 4 rot und ist nur mit geänderter Reihenfolge oder
+   einem zusätzlichen `tick` an anderer Stelle zu retten → den Handler zurücknehmen und melden.
+4. Der Baustein kann das Markup eines der zwei Dialoge nicht gleich erzeugen (etwa die
+   Beschriftung mit dem `span`) → Commit 4 entfällt, die Dialoge bleiben; Teil 1 gilt trotzdem.
+5. Teil 2 braucht eine neue Angabe an der Funktion oder T4 ist nicht stabil → Doppel-Seite
+   ausdrücklich verwerfen, Commits 5 und 6 nicht mergen.
+6. Irgendeine für die Nutzerin sichtbare Änderung wird nötig → abbrechen, Frage an den
+   Projektleiter (E-45).
+
+**Proben für den Reviewer:**
+
+- `git diff --stat origin/dev HEAD -- src/lib/server src/routes/api src/lib/design
+  src/lib/verwaltung src/lib/login` → leer (kein Server, kein Stil, nichts aus Schritt 17, der
+  Wächter unverändert).
+- `git diff --stat <Commit 1> HEAD -- tests/e2e` → nur T4 kommt dazu; kein bestehender Test und
+  kein Vorab-Fall ist nach dem Umbau geändert.
+- CM-Seite: `leiteUmNachAktion(` genau einmal (`neuLaden`), dazu höchstens einmal in
+  `angabenSenden`; `laeuft = true` höchstens einmal; `<dialog` genau einmal (`kontaktHinweis`);
+  `{#snippet` weiter neun. Doppel-Seite: `leiteUmNachAktion(` genau zweimal (`suchen`,
+  `neuLaden`).
+- Jeder Satz aus `FEHLER`, `ANNEHMEN_FEHLER` und jede Meldung steht noch genau einmal im
+  Quelltext (Textsuche nach den Sätzen der Tabelle in Abschnitt 1).
+- Im geänderten Code kein `fetch(`, kein `goto(…/login`, kein `<style>`.
+- Im Browser nachstellen, was kein Test hält: «Kommentar ändern» mit der Tastatur (Enter im
+  Feld sendet nicht, die Taste «Speichern» sendet; Esc schliesst und leert das Ziel), Fokus nach
+  einem Fehler mit Neuladen.
+
+**Dateien des Schritts:** `src/routes/clubmeisterschaft/[id]/+page.svelte`,
+`src/routes/clubmeisterschaft/[id]/doppel/[kid]/+page.svelte` (Teil 2), neu
+`src/lib/cm/ablauf.ts`, `src/lib/cm/ablauf.test.ts`, `src/lib/cm/Textdialog.svelte`, neu
+`tests/e2e/cm-ablauf.test.ts`; allenfalls `src/lib/cm/anzeige.ts` (Tabelle `FEHLER`) und
+`vitest.config.ts` (Abdeckung); dieses Dokument. Keine neue Abhängigkeit, keine Migration, keine
+Änderung an `CLAUDE.md`.
+
+#### 7 Nicht geprüft, dünne Belege
+
+- Nichts ausgeführt: kein Test, kein Browser. Alle Aussagen zum Fokus sind **gelesen**, nicht
+  gesehen; besonders «Fokus auf „Abmelden“ nach dem Speichern des Kommentars» und «Fokus fällt
+  nach einem Fehler mit Neuladen in den Seitenkörper» [V]. Die Vorab-E2E entscheiden.
+- Ob `dialog.close()` den Fokus in WebKit und Chromium gleich an die öffnende Taste zurückgibt,
+  bevor `fokusBei` läuft, ist nicht geprüft; T1 und T2 laufen auf beiden.
+- Die Zeilenschätzung (170 bis 210, Doppel-Seite 40 bis 50) ist überschlagen, nicht gebaut.
+- `cm-gespraech.test.ts`, `cm-verwaltung.test.ts` und `cm-doppel-verwaltung.test.ts` nur per
+  Textsuche und in Auszügen; dass dort kein weiterer Fall die CM-Seite der Mitglieder bedient,
+  stützt sich auf die Suche nach den Beschriftungen der Tasten [E].
+- Ob das Anmelden mit Brief-Code ein eigenes Budget je Adresse hat, ist nicht nachgelesen [V];
+  die vier Tests melden je ein bis drei Konten an, wie die Nachbarn.
+- Die Lint-Regeln zur Importrichtung auf der Seite der Oberfläche (`src/lib/cm/` →
+  `src/lib/login/`) sind nicht nachgelesen; mit hineingereichtem Wächter stellt sich die Frage
+  nicht.
+
+### E.11 Schritt 16, Teil 1
+
+**Erkenntnisse Schritt 16, Teil 1** (14.11.2026, Branch `refactor/schritt-16` auf `b5907e3`
+(Nachmessen E.10) über `86f6430` = `origin/dev`; Opus, Subagent. Nur die CM-Seite; Teil 2
+(Doppel-Seite) ist nicht Teil dieses Laufs)
+
+- **Voraussetzungen geprüft:** Branch auf `b5907e3`, Arbeitsbaum sauber, `origin/dev` enthalten;
+  E.10 liegt vor (Nachmessen vorab erledigt). Die Seite stand wie in E.10 gezählt (1039 Zeilen,
+  acht Handler, neun `leiteUmNachAktion(`, drei rohe Dialoge, neun `{#snippet}`). Keine neue
+  Abhängigkeit, keine Lint-Ausnahme, keine Version, `CLAUDE.md` unverändert. Svelte-Doku vor dem
+  Code über den Svelte-MCP-Server gelesen (`$bindable`, `$props`, `{#snippet}` samt `children`,
+  `bind:` mit `bind:this` auf Bausteine und exportierten Funktionen); der Autofixer meldet am
+  Baustein keinen Fehler (nur den allgemeinen Hinweis «`bind:this` liesse sich durch ein Attachment
+  ersetzen», wie überall im Repo).
+- **Commits** (je für sich grün im Hook):
+
+  | Commit | Inhalt |
+  |---|---|
+  | `0f5330b` `test:` | Vorab-E2E T1 bis T3 in `tests/e2e/cm-ablauf.test.ts` |
+  | `619edd5` `refactor:` | `src/lib/cm/ablauf.ts` mit `ablauf.test.ts` (Tests zuerst), noch unbenutzt; `vitest.config.ts`: `ablauf.ts` zählt zur Abdeckung |
+  | `7c4b823` `refactor:` | CM-Seite: sieben Handler auf der Funktion, `angabenSenden` von Hand |
+  | `15d20a6` `refactor:` | `src/lib/cm/Textdialog.svelte`, die zwei Text-Dialoge der Seite darauf |
+
+- **Vorab-E2E, gemessen statt vermutet.** Zuerst ein Messlauf, der nach jeder Aktion
+  `document.activeElement` ausgibt (iPhone = WebKit, Android = Chromium), dann die Tests auf das
+  Gemessene. Ein früher Messwert ohne Warten auf das Neuladen («hinfällig» auf dem iPhone im
+  Seitenkörper) war ein Zeitfehler der Messung; die Tests warten darum vor jeder Fokus-Prüfung nach
+  einem Wort auf die Anfrage `GET /api/cm/<id>` (Zähler über `requestfinished`), nie mit fester
+  Wartezeit. Gemessen gegen die Spalte «Fokus danach» der Tabelle in E.10, Abschnitt 1:
+
+  | Handler und Fall | E.10 | gemessen (beide Geräte, wo nicht anders genannt) |
+  |---|---|---|
+  | `anmelden` `ok` (über den Hinweis) | `fokusBei` → «Abmelden» | «Abmelden» derselben Karte (bestätigt) |
+  | `anmelden` `geschlossen` | keiner | **Seitenkörper**; genau ein Neuladen |
+  | `anmelden` Störung | keiner | **Seitenkörper**; kein Neuladen |
+  | `abmelden` `ok` | `fokusBei` → «Anmelden» | «Anmelden» (bestätigt) |
+  | `abmelden` als Wildcard («Zurückziehen») `ok` | `fokusBei` | «Wildcard beantragen» (bestätigt); Satz «Antrag für … zurückgezogen.» |
+  | `wildcardSenden` leer | Fokus ins Feld | Feld; keine Anfrage (bestätigt) |
+  | `wildcardSenden` Störung | kein Fokuswechsel | Satz im Dialog, Dialog offen, kein Neuladen; Fokus **Android im Seitenkörper, iPhone auf dem Dialog** (der Test hält nur «nicht im Feld» fest) |
+  | `wildcardSenden` `geschlossen` | — | Dialog zu, Satz auf der Seite, ein Neuladen, **Seitenkörper** |
+  | `wildcardSenden` `ok` | `fokusBei` → «Zurückziehen» | «Zurückziehen» (bestätigt) |
+  | `suchtextSenden` `eingabe` | Fokus ins Feld | Feld, Dialog offen (bestätigt) |
+  | `suchtextSenden` `ok` | «Abmelden», nicht «Kommentar ändern» [V] | **«Abmelden»** (bestätigt) |
+  | `zurueckziehen` `ok` | Link «Anmelden» der Doppel-Karte | Link «Anmelden» (bestätigt) |
+  | `annehmen` `hinfaellig` | `fokusNachAnfrage()` | Titel der **ersten** Anfrage-Karte; die Anfrage steht noch |
+  | `ablehnen` `ok` | nächste Anfrage-Karte | Titel der verbleibenden Anfrage (bestätigt; bisher prüfte E2E nur «nicht im Körper») |
+  | `annehmen` `ok` | `fokusNachAnfrage(kategorieId)` | «Abmelden» der eigenen Paar-Karte (bestätigt) |
+
+  **Warum der Seitenkörper** (anders als in E.10 vermutet, dort «verschwindet dabei die Taste»):
+  Die auslösende Taste hat `disabled={laeuft}` und verliert den Fokus schon, während die Anfrage
+  läuft; das gilt auch, wenn sie danach stehen bleibt. Aus demselben Grund geht der Fokus nach
+  «hinfällig» nicht zurück auf «Annehmen», sondern `fokusNachAnfrage()` findet den Körper und
+  nimmt den ersten Titel.
+- **Abweichungen vom Vorschlag der Vorab-E2E (E.10, Abschnitt 3):** (1) Die Tests heissen nach
+  ihrem Inhalt, nicht T1 bis T3. (2) T2: «allein angemeldet» über die Fachlogik (`meldeZurCmAn` mit
+  Kommentar) statt über die Doppel-Seite; die Doppel-Seite gehört zu Teil 2. (3) T3: zwei
+  Doppel-Kategorien (eigene Anfrage in der einen, zwei Anfragen an mich in der anderen); «hinfällig»
+  läuft vor dem Ablehnen, sein Fokus ist zusätzlich festgehalten. (4) T1: die gestellten
+  Wildcard-Fehler vor dem echten Antrag (danach gäbe es die Taste nicht mehr); zusätzlich «Störung
+  zeigt keine Meldung» (`role="status"` leer). (5) Gestellte Antworten mit `page.route(…, { times:
+  1 })`, die Konsole lässt nur die gestellten 503 durch (wie `waechter.test.ts`, Teil 4). Kein
+  Mail-Code, Zeitgrenze 90 s; die Datei läuft auf beiden Geräten zusammen in rund 15 s.
+- **Rot-Proben:** *E2E:* Seite aus einer Sicherungskopie dreifach mutiert (`fokusBei` nach dem
+  Anmelden, `fokusBei` nach dem Speichern des Kommentars, `fokusNachAnfrage` nach dem Ablehnen
+  entfernt) → **6 von 6 rot** (je Test und Gerät an der erwarteten Zeile: `toBeFocused` auf
+  «Abmelden», auf «Abmelden» der eigenen Karte, auf dem Titel der verbleibenden Anfrage); danach die
+  Sicherungskopie zurück, Arbeitsbaum ohne Diff. *Einheitstests:* ohne `ablauf.ts` rot (Modul
+  fehlt); mit `ablauf.ts` 15 grün; Mutation «Sperre erst am Ende lösen» (`try … finally`) → die drei
+  Fälle «die Sperre ist gelöst, bevor die Folge läuft» rot, die übrigen zwölf grün. *Auf dem alten
+  Stand:* die drei E2E dreimal hintereinander grün (18 von 18).
+- **Die Funktion, Angaben:** `abruf`, `ok`, `woerter` (je Wort Satz oder `null`), `vorher`,
+  `vorWort`, `danach`, `eingabe`, `stoerung`. Jede wird von der CM-Seite gebraucht: `vorher` und
+  `stoerung` von den zwei Dialogen (Satz am Feld leeren, Störung am Feld), `vorWort` von denselben
+  (Dialog zu vor dem Satz, Reihenfolge wie vorher), `danach` von `annehmen` und `ablehnen`
+  (Neuladen, dann `fokusNachAnfrage()`), `eingabe` von den Dialogen. Nichts nur für die
+  Doppel-Seite. **`danach` gilt je Aktion, nicht je Wort:** Die CM-Seite braucht kein Wort mit
+  eigener Folge. E.10 nennt für die Doppel-Seite «je Wort … was danach geschieht» (`anfrageSenden`:
+  drei Wörter `suchen(true)`, `anfrage-offen` still `neuLaden`; `zurueckziehen`: `nicht-gefunden`
+  `suchen(true)`). Ob Teil 2 dafür eine neue Angabe braucht (etwa das Wort als Argument von
+  `danach`), ist **vor Teil 2 gegen Abbruchstelle 5 zu prüfen**; hier nicht gebaut.
+- **Abbruchstellen:** (2) **eingetreten wie vorhergesagt**: `angabenSenden` bleibt von Hand
+  («sieben plus einer»); die Sperre dort fällt weiter erst am Ende. (1), (3), (4) und (6) nicht
+  eingetreten: Alle Vorab-Fälle waren auf dem alten Stand stabil grün; kein Fokus-Fall wurde nach
+  Commit 3 oder 4 rot, kein zusätzliches `tick`; der Baustein erzeugt die Beschriftung mit dem
+  `span` gleich (Inhalt als `children`, kein `{#snippet}` in der Seite).
+- **Markup gleich, nachgewiesen:** Ein Probelauf (nicht committet) schrieb `main` der CM-Seite in
+  sieben Zuständen (Wildcard offen, leer, Störung, beantragt; Doppel mit Anfrage; Kommentar mit
+  Feldfehler; nach «Abbrechen») auf beiden Geräten heraus, ohne Kommentarknoten, Ziffern und
+  Zufallsteile vereinheitlicht. Nach Commit 3: **kein Unterschied**. Nach Commit 4 nur: (a) die
+  `id`s aus dem Präfix (`wildcard-titel` → `cm-kommentar-titel`, `cm-kommentar-hilfe` →
+  `cm-kommentar-zaehler`, `cm-fehler-kommentar` → `cm-kommentar-fehler`, ebenso `suchtext-titel` →
+  `cm-suchtext-titel`, `cm-fehler-suchtext` → `cm-suchtext-fehler`; Beschriftung, Titel und
+  Beschreibung gleich verknüpft, keine `id` sonst verwendet); (b) die Reihenfolge der Attribute
+  `required`/`maxlength` und `role`/`id`; (c) der Hinweistext der Wildcard steht ohne den
+  Zeilenumbruch und die Tabulatoren aus dem Quelltext im DOM (vorher brach Prettier den Text im
+  `span`); sichtbar und vorgelesen gleich, weil Weissraum zusammenfällt.
+- **Proben für den Reviewer (E.10, Abschnitt 6), selbst gezählt:** Diff unter `src/lib/server`,
+  `src/routes/api`, `src/lib/design`, `src/lib/verwaltung`, `src/lib/login` leer; unter
+  `tests/e2e` nur die neue Datei. CM-Seite: `leiteUmNachAktion(` **zweimal** (`neuLaden`,
+  `angabenSenden`; der Wächter geht als `waechter: leiteUmNachAktion` ohne Aufruf in `seite`),
+  `laeuft = true` einmal (`angabenSenden`), `<dialog` einmal (`kontaktHinweis`), `{#snippet` neun.
+  Jeder Satz aus `FEHLER`, `ANNEHMEN_FEHLER` und jede Meldung genau einmal im Quelltext; kein
+  `fetch(`, kein `goto(…/login`, kein `<style>`. Der Browser-Test «Kommentar ändern mit der
+  Tastatur» (Enter, Esc) ist nicht von Hand nachgestellt; das Markup des Formulars ist gleich
+  (`<form novalidate>`, `textarea`, Taste `type="submit"`).
+- **Netz zusätzlich:** alle `cm-*`-E2E, `navigation` und `waechter` nach Commit 3 grün (195 bestanden,
+  42 übersprungen), nach Commit 4 die `cm-*`-E2E und `navigation` (105/42).
+- **Voller `make check`** auf `15d20a6` (Commit 4): grün, 5,3 Minuten; 171 Testdateien, **2427
+  Tests** (vorher 2412; +15 aus `ablauf.test.ts`), Abdeckung 96,99 % Anweisungen, 93,52 % Zweige;
+  `svelte-check` 0 Fehler, 0 Warnungen; **E2E 516 bestanden, 60 übersprungen** in 3,3 Minuten
+  (vorher 510/57: drei Tests mehr, je zwei Handys bestanden und am PC übersprungen).
+- **Beobachtungen, nicht geändert (Feature-Stopp):**
+  1. WCAG 2.4.3: Nach einem Fehler mit Neuladen und nach einer Störung (Anmelden, Wildcard
+     `geschlossen`; nach E.10 ebenso Abmelden und Zurückziehen) fällt der Fokus in den
+     Seitenkörper, weil die gesperrte Taste ihn verliert. Jetzt gemessen und im E2E festgehalten;
+     wer es ändert, ändert den Test mit. Bei der Wildcard-Störung hängt der Fokus vom Browser ab
+     (Android Körper, iPhone Dialog). Kandidat für die Zwischenrevision der Etappe 2.
+  2. Nach «hinfällig» geht der Fokus auf den Titel der ersten Anfrage-Karte, nicht auf die Anfrage,
+     die man angetippt hat (bei mehreren Anfragen). Gleiche Ursache.
+  3. Ein Feldfehler bleibt im geschlossenen Dialog stehen, bis er wieder geöffnet wird (dann
+     geleert); unsichtbar, nur festgehalten.
+- **Nicht geprüft, dünne Belege:** Kein Browser von Hand (Tastatur im Dialog, VoiceOver). Der
+  Svelte-Autofixer lief nur über den neuen Baustein, nicht über die ganze Seite; `svelte-check`
+  mit `--fail-on-warnings` deckt die Seite. Teil 2 und T4 sind nicht begonnen.
+- **Review von Teil 1 (14.11.2026): «ok», nichts vor dem Merge zu beheben; keine Freigabe zum
+  Merge, solange Teil 2 offen ist.** Eigener `make check` des Reviewers auf `653ad0f` grün
+  (2427 Tests, E2E 516/60). Sieben Handler je Zweig gleich, `angabenSenden` zeichengleich; die
+  drei gemessenen Fokus-Abweichungen sind am alten Code als altes Verhalten bestätigt.
+  1. **Entscheid nötig vor Teil 2 → F-30:** `danach` gilt je Aktion, die Doppel-Seite braucht es
+     je Wort; nach dem Wortlaut Abbruchstelle 5.
+  2. **Hinweis:** `tests/e2e/cm-ablauf.test.ts:67` sucht über `div.karte` (CSS-Klasse); in die
+     Prüfliste (b) für Schritt 18 aufnehmen.
+  3. **Hinweis:** `Textdialog.svelte` fehlt in der Tabelle «Code-Stelle» von `docs/ui-leitbild.md`
+     (kein neues Muster; Nachtrag spätestens in Schritt 24).
+  4. **Hinweis:** `Seite.meldung` in `ablauf.ts` wird nur gesetzt, nie gelesen (Getter tot).
+  5. **Hinweis:** Fehlerzweige von «Abmelden» und «Zurückziehen» und der Fokus danach sind nur
+     gelesen, nicht im Browser gehalten.
+  - **Was kein Test sieht:** Tastatur im Textdialog (Enter, Esc), Fokus-Rückgabe bei
+    «Abbrechen», `abgemeldet` in sechs der sieben Handler im Browser, die stillen Wörter und
+    `voll`, `passt-nicht`, `keine-wildcard`, `schon-angemeldet`, `eingabe` der Wildcard vom
+    Server, Störung im Suchtext-Dialog.
+  - **Nicht geprüft vom Reviewer:** Rot-Proben und «vorab grün» nur nach E.11; kein Browser von
+    Hand, kein VoiceOver; WebKit-CI nicht gelaufen.
+- **Stand am Ende der Orchestrator-Session vom 14.11.2026:** Branch gepusht, Worktree
+  `refactor-schritt-16` bleibt stehen. Nächster Lauf: F-30 beantworten lassen; bei A Merge von
+  Teil 1 (vorher `origin/dev` einmergen und `make check`), bei B Teil 2.
+- **Abschluss (14.11.2026, Orchestrator):** Der Projektleiter antwortet auf F-30 mit **A, verwerfen** (E-51). Schritt 16 endet mit Teil 1; das Review von Teil 1 gilt als Review des ganzen Schritts. `origin/dev` stand unverändert auf dem Abzweigpunkt (`86f6430`), nichts einzumergen. Merge nach `dev` als Version 0.22.2.
