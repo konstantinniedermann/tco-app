@@ -4806,3 +4806,13 @@ die Rückfall-Lesart «Name der Funktion» in (b) ohne eigene Rot-Probe (fünf F
 - `scripts/pruefungen/workflow-rechte.ts` liest nur Rechte und Secrets; ob eine Eingabe von
   `workflow_dispatch` sicher in `run:` landet (Ausdruck statt Umgebungsvariable), prüft kein
   Werkzeug. Hier über `env:` gelöst.
+- **Review Lauf 1 (14.11.2026, refactor-reviewer): «ok», nichts vor dem Merge zu beheben.** Gelesen
+  am festen Commit `98b9225`, nichts ausgeführt. Die 28 geänderten Namen unabhängig nachgesucht
+  (kein Nutzer ausserhalb der eigenen Datei); die 19 E2E-Dateien ändern nur Importe; jede Zeile
+  des alten `login.ts` steht in einer der fünf Dateien, der Zustand (eine Verbindung je Prozess)
+  ist gleich geteilt; die acht Kopien sind zur Laufzeit gleich wie `tests/hilfen/abruf.ts`.
+  Hinweise: Im Archiv der Beobachtungen fehlte der Commit-Hash (nachgetragen, Orchestrator);
+  `login.ts` hatte 35 verschiedene exportierte Namen, nicht 37 (39 `export`-Zeilen wegen der
+  Überladungen; ohne Folge); `tests/e2e/hilfen/anlass.ts` und `mail.ts` stehen in keiner Zeile
+  von `docs/context-scopes.md` (Merkpunkt für Schritt 21). Nicht geprüft vom Reviewer: kein Lauf;
+  `turnier.ts` nur in den Deklarationen gelesen.
