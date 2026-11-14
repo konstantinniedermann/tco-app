@@ -34,6 +34,7 @@
 		waehlbar
 	} from '../../../lib/cm/anzeige.ts';
 	import { amtlicherName, anredeName, nameText, type Namensteile } from '../../../lib/name.ts';
+	import Textdialog from '../../../lib/cm/Textdialog.svelte';
 	import Name from '../../../lib/ui/Name.svelte';
 	import Zurueck from '../../../lib/ui/Zurueck.svelte';
 	import { istKlappeOffen, merkeKlappe } from '../../../lib/ui/klappe.ts';
@@ -89,17 +90,15 @@
 	let kontaktHinweis = $state<HTMLDialogElement>();
 	let ausstehend = $state<{ k: CmKategorie; wildcard: boolean } | null>(null);
 	// FR-08: Dialog für den Wildcard-Antrag.
-	let wildcardDialog = $state<HTMLDialogElement>();
+	let wildcardDialog = $state<ReturnType<typeof Textdialog>>();
 	let wildcardZiel = $state<CmKategorie | null>(null);
 	let kommentar = $state('');
 	let kommentarFehler = $state<string | null>(null);
-	let kommentarFeld = $state<HTMLTextAreaElement>();
 	// FR-49: Dialog für den Kommentar *sucht Partner*.
-	let suchtextDialog = $state<HTMLDialogElement>();
+	let suchtextDialog = $state<ReturnType<typeof Textdialog>>();
 	let suchtextZiel = $state<CmKategorie | null>(null);
 	let suchtext = $state('');
 	let suchtextFehler = $state<string | null>(null);
-	let suchtextFeld = $state<HTMLTextAreaElement>();
 	// Je Kategorie die Taste oder der Link, zu dem der Fokus nach einer Änderung geht.
 	const knoepfe: Record<number, HTMLElement | undefined> = {};
 
@@ -220,7 +219,7 @@
 		wildcardZiel = k;
 		kommentar = '';
 		kommentarFehler = null;
-		wildcardDialog?.showModal();
+		wildcardDialog?.oeffne();
 	}
 
 	async function wildcardSenden(event: SubmitEvent) {
@@ -230,7 +229,7 @@
 		if (kommentar.trim() === '') {
 			kommentarFehler = 'Bitte schreib kurz, warum du hier spielen möchtest.';
 			await tick();
-			kommentarFeld?.focus();
+			wildcardDialog?.fokussiere();
 			return;
 		}
 		await fuehreAblauf(seite, {
@@ -238,7 +237,7 @@
 			abruf: () => beantrageWildcard(k.id, kommentar),
 			ok: async (neu) => {
 				await uebernimm(neu);
-				wildcardDialog?.close();
+				wildcardDialog?.schliesse();
 				meldung = 'Wildcard beantragt. Du bekommst Bescheid.';
 				await fokusBei(k.id);
 			},
@@ -251,11 +250,11 @@
 				'angaben-fehlen': null,
 				'nicht-gefunden': null
 			},
-			vorWort: () => wildcardDialog?.close(),
+			vorWort: () => wildcardDialog?.schliesse(),
 			eingabe: async (felder) => {
 				kommentarFehler = felder.kommentar ?? MELDUNG.stoerung;
 				await tick();
-				kommentarFeld?.focus();
+				wildcardDialog?.fokussiere();
 			},
 			stoerung: (satz) => (kommentarFehler = satz)
 		});
@@ -376,7 +375,7 @@
 		suchtextZiel = k;
 		suchtext = k.eigen?.art === 'sucht' ? (k.eigen.kommentar ?? '') : '';
 		suchtextFehler = null;
-		suchtextDialog?.showModal();
+		suchtextDialog?.oeffne();
 	}
 
 	/** FR-49: Kommentar *sucht Partner* ändern; leer löscht ihn. */
@@ -389,17 +388,17 @@
 			vorher: () => (suchtextFehler = null),
 			abruf: () => setzeSuchtext(anmeldungId, suchtext),
 			ok: async (neu) => {
-				suchtextDialog?.close();
+				suchtextDialog?.schliesse();
 				await uebernimm(neu);
 				meldung = 'Kommentar gespeichert.';
 				await fokusBei(k.id);
 			},
 			woerter: { geschlossen: FEHLER.geschlossen, 'nicht-gefunden': null },
-			vorWort: () => suchtextDialog?.close(),
+			vorWort: () => suchtextDialog?.schliesse(),
 			eingabe: async (felder) => {
 				suchtextFehler = felder.suchtext ?? MELDUNG.stoerung;
 				await tick();
-				suchtextFeld?.focus();
+				suchtextDialog?.fokussiere();
 			},
 			stoerung: (satz) => (suchtextFehler = satz)
 		});
@@ -603,86 +602,41 @@
 	</div>
 </dialog>
 
-<dialog
-	class="karte"
+<Textdialog
 	bind:this={wildcardDialog}
-	aria-labelledby="wildcard-titel"
-	onclose={() => (wildcardZiel = null)}
+	bind:wert={kommentar}
+	id="cm-kommentar"
+	titel="Wildcard beantragen"
+	ziel={wildcardZiel?.name ?? null}
+	hinweis="Bitte keine Angaben zur Gesundheit. Den Kommentar sehen nur du, die CM-Admins und wer MyTCO technisch betreut."
+	zeilen={4}
+	laenge={KOMMENTAR_MAX}
+	pflicht
+	zaehler={kommentarZaehlerText(kommentar.length)}
+	fehler={kommentarFehler}
+	taste="Beantragen"
+	gesperrt={laeuft}
+	onsubmit={wildcardSenden}
+	onclose={() => (wildcardZiel = null)}>Warum möchtest du hier spielen?</Textdialog
 >
-	<h2 id="wildcard-titel">Wildcard beantragen</h2>
-	{#if wildcardZiel}<p class="leise">{wildcardZiel.name}</p>{/if}
-	<form onsubmit={wildcardSenden} novalidate>
-		<div class="feld">
-			<label for="cm-kommentar">Warum möchtest du hier spielen?</label>
-			<span class="feld-hilfe" id="cm-kommentar-hinweis"
-				>Bitte keine Angaben zur Gesundheit. Den Kommentar sehen nur du, die CM-Admins und wer MyTCO
-				technisch betreut.</span
-			>
-			<textarea
-				id="cm-kommentar"
-				rows="4"
-				bind:this={kommentarFeld}
-				maxlength={KOMMENTAR_MAX}
-				bind:value={kommentar}
-				required
-				aria-invalid={kommentarFehler ? 'true' : undefined}
-				aria-describedby={kommentarFehler
-					? 'cm-kommentar-hinweis cm-kommentar-hilfe cm-fehler-kommentar'
-					: 'cm-kommentar-hinweis cm-kommentar-hilfe'}></textarea>
-			<span class="feld-hilfe" id="cm-kommentar-hilfe"
-				>{kommentarZaehlerText(kommentar.length)}</span
-			>
-			{#if kommentarFehler}
-				<p class="fehler" id="cm-fehler-kommentar" role="alert">{kommentarFehler}</p>
-			{/if}
-		</div>
-		<div class="leiste">
-			<button type="button" class="taste-neben" onclick={() => wildcardDialog?.close()}
-				>Abbrechen</button
-			>
-			<button type="submit" class="taste-haupt" disabled={laeuft}>Beantragen</button>
-		</div>
-	</form>
-</dialog>
 
-<dialog
-	class="karte"
+<Textdialog
 	bind:this={suchtextDialog}
-	aria-labelledby="suchtext-titel"
+	bind:wert={suchtext}
+	id="cm-suchtext"
+	titel="Kommentar ändern"
+	ziel={suchtextZiel?.name ?? null}
+	hinweis="Alle Mitglieder sehen ihn. Bitte keine Angaben zur Gesundheit."
+	zeilen={3}
+	laenge={SUCHTEXT_MAX}
+	zaehler={suchtextZaehlerText(suchtext.length)}
+	fehler={suchtextFehler}
+	taste="Speichern"
+	gesperrt={laeuft}
+	onsubmit={suchtextSenden}
 	onclose={() => (suchtextZiel = null)}
+	>Kommentar <span class="leise">(freiwillig)</span></Textdialog
 >
-	<h2 id="suchtext-titel">Kommentar ändern</h2>
-	{#if suchtextZiel}<p class="leise">{suchtextZiel.name}</p>{/if}
-	<form onsubmit={suchtextSenden} novalidate>
-		<div class="feld">
-			<label for="cm-suchtext">Kommentar <span class="leise">(freiwillig)</span></label>
-			<span class="feld-hilfe" id="cm-suchtext-hinweis"
-				>Alle Mitglieder sehen ihn. Bitte keine Angaben zur Gesundheit.</span
-			>
-			<textarea
-				id="cm-suchtext"
-				rows="3"
-				bind:this={suchtextFeld}
-				maxlength={SUCHTEXT_MAX}
-				bind:value={suchtext}
-				aria-invalid={suchtextFehler ? 'true' : undefined}
-				aria-describedby={suchtextFehler
-					? 'cm-suchtext-hinweis cm-suchtext-zaehler cm-fehler-suchtext'
-					: 'cm-suchtext-hinweis cm-suchtext-zaehler'}></textarea>
-			<span class="feld-hilfe" id="cm-suchtext-zaehler">{suchtextZaehlerText(suchtext.length)}</span
-			>
-			{#if suchtextFehler}
-				<p class="fehler" id="cm-fehler-suchtext" role="alert">{suchtextFehler}</p>
-			{/if}
-		</div>
-		<div class="leiste">
-			<button type="button" class="taste-neben" onclick={() => suchtextDialog?.close()}
-				>Abbrechen</button
-			>
-			<button type="submit" class="taste-haupt" disabled={laeuft}>Speichern</button>
-		</div>
-	</form>
-</dialog>
 
 <!-- FR-48, FR-19: Anfrage an einen selbst, mit dem Kontakt des Anfragenden. -->
 {#snippet anfrageKarte(a: CmAnfrage, i: number)}
