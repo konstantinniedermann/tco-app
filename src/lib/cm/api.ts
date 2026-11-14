@@ -56,7 +56,7 @@ export function kategorieZumAnsehen(
 const ABGELEHNT = [...ABLEHNUNGEN, 'nur-lesen'] as const satisfies readonly Fehlerwort[];
 type Abgelehnt = (typeof ABGELEHNT)[number];
 
-/** Felder, die der Server bei 400 melden kann. */
+/** Felder, die der Server beim Fehlerwort «eingabe» melden kann. */
 export type CmFelder = Partial<Record<CmAngabe | 'kommentar' | 'suchtext' | 'text', string>>;
 
 export type Ergebnis<T> =
