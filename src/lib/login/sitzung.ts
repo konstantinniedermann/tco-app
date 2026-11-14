@@ -9,6 +9,7 @@ export type Sitzung = {
 	verwaltung: boolean;
 	ansicht: AnsichtRolle | null;
 	nachrichtenOffen: number;
+	interclub: boolean;
 };
 
 /**

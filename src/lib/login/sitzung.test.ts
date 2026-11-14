@@ -32,7 +32,8 @@ const SITZUNG = {
 	passkeyHinweis: true,
 	verwaltung: false,
 	ansicht: null,
-	nachrichtenOffen: 0
+	nachrichtenOffen: 0,
+	interclub: true
 };
 
 describe('ladeSitzung', () => {
