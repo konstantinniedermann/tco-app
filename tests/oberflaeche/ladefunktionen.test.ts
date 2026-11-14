@@ -14,6 +14,7 @@ import { load as anlaesse } from '../../src/routes/verwaltung/anlaesse/+page.ts'
 import { load as briefe } from '../../src/routes/verwaltung/briefe/+page.ts';
 import { load as fairgate } from '../../src/routes/verwaltung/fairgate/+page.ts';
 import { load as mitglied } from '../../src/routes/verwaltung/mitglieder/[id]/+page.ts';
+import { load as mitglieder } from '../../src/routes/verwaltung/mitglieder/+page.ts';
 import { load as auskunft } from '../../src/routes/verwaltung/mitglieder/[id]/auskunft/+page.ts';
 import { load as mitteilungen } from '../../src/routes/verwaltung/mitteilungen/+page.ts';
 import { load as rollen } from '../../src/routes/verwaltung/rollen/+page.ts';
@@ -627,6 +628,13 @@ const LISTEN: Liste[] = [
 		load: anlaesse,
 		pfad: '/verwaltung/anlaesse',
 		abfrage: '/api/admin/anlaesse',
+		daten: (zeilen) => ({ zeilen })
+	},
+	{
+		name: 'mitglieder',
+		load: mitglieder,
+		pfad: '/verwaltung/mitglieder',
+		abfrage: '/api/admin/mitglieder',
 		daten: (zeilen) => ({ zeilen })
 	},
 	{

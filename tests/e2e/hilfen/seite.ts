@@ -94,9 +94,10 @@ export async function wartetAufVorladen(page: Page): Promise<void> {
 }
 
 /**
- * Wartet, bis die Mitgliederliste der Verwaltung geladen ist, nicht nur ihre Überschrift: Die
- * Liste fragt erst 200 ms nach dem Anzeigen an (Warten beim Tippen). Ein `page.goto` mitten in die
- * Anfrage bricht sie ab, und WebKit meldet das als Seitenfehler («Fetch API cannot load …
+ * Wartet, bis die Mitgliederliste der Verwaltung geladen ist, nicht nur ihre Überschrift. Seit
+ * Schritt 15 lädt `+page.ts` die Liste vor dem Anzeigen, Überschrift und Zahl stehen zugleich; nach
+ * einer Suche fragt die Seite 200 ms später neu an. Ein `page.goto` mitten in eine Anfrage bricht
+ * sie ab, und WebKit meldet das als Seitenfehler («Fetch API cannot load …
  * /api/admin/mitglieder due to access control checks»).
  */
 export async function wartetAufMitgliederliste(page: Page): Promise<void> {
