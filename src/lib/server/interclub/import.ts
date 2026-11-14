@@ -32,7 +32,7 @@ export type ImportDienste = {
 };
 export type ImportWort = 'ok' | 'keine-teams' | 'form' | 'stoerung';
 
-export const SWISS_TENNIS = 'https://low-scalability.microservices.swisstennis.ch/interclub';
+const SWISS_TENNIS = 'https://low-scalability.microservices.swisstennis.ch/interclub';
 
 type Abruf = { status: number; json: unknown } | null;
 

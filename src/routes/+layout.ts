@@ -6,9 +6,9 @@ export const prerender = false;
 
 // «Ansicht als …» für das Band über der Kopfleiste (UI-Leitbild): Die Ansicht ist ein Zustand der
 // Sitzung auf dem Server, darum fragt die App `/api/sitzung`. Ohne Sitzung oder bei einer Störung
-// gibt es kein Band. Läuft keine Ansicht, lädt das Layout erst nach `refreshAll()` wieder (die
-// Taste «Ansehen» löst es aus). Läuft eine, prüft jeder Seitenwechsel neu: So verschwindet das
-// Band auch nach dem Abmelden oder wenn jemand die Sitzungen beendet hat.
+// gibt es kein Band. Mit Sitzung und ohne laufende Ansicht lädt das Layout erst nach `refreshAll()`
+// wieder (die Taste «Ansehen» löst es aus). Läuft eine Ansicht, prüft jeder Seitenwechsel neu: So
+// verschwindet das Band auch nach dem Abmelden oder wenn jemand die Sitzungen beendet hat.
 // `interclub`: Reiter IC nur, wenn es Interclub-Daten gibt. Ohne Sitzung prüft jeder
 // Seitenwechsel neu, damit der Reiter gleich nach dem Login steht (die Login-Seiten wechseln
 // ohne `refreshAll()` zur Startseite).

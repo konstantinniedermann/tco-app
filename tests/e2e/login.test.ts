@@ -4,11 +4,11 @@ import { MAILANFRAGE_SCHLUESSEL } from '../../src/lib/login/mailanfrage.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
 	beendeAlleSitzungen,
-	holeMailCode,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 import { e2eEinstellungen } from './hilfen/umgebung.ts';

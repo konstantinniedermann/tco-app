@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
-import { holeMailCode, legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
+import { legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import { klappeAuf, pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
 

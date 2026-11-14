@@ -334,6 +334,14 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Node-Hauptversion wie in `.nvmrc`, sonst enden Prüfskripte still (`pruefe-node.sh`) | — | vorhanden |
 | Jeder Merge nach `dev` mit Code erhöht die Version um einen Schritt, mit Abschnitt in den Versionen (`version-merge.ts`) | dieses Konzept | nur Hook (Push auf `dev`) |
 
+**Spur beim Handstart:** Wird ein E2E-Test nur in der CI rot, lässt sich ein Lauf von Hand mit
+Spur starten (`gh workflow run check.yml --ref <branch> -f spur=true`). Dann zeichnet Playwright
+für jeden Test eine Spur auf (Schritte, Netz, Konsole, Abbilder der Seite; `trace.zip` im Artefakt
+`test-results-<gerät>`, öffnen mit `npx playwright show-trace`); lokal genügt `MYTCO_E2E_SPUR=an`.
+Läufe bei Push und PR zeichnen keine Spur auf und wiederholen keinen Test. Ein Lauf mit Spur dauert
+rund eine Minute länger je Gerät; die Artefakte sind mit zusammen rund 1 GB etwa achtmal so gross
+und liegen wie alle Artefakte 30 Tage öffentlich beim Lauf (nur erfundene Testdaten).
+
 gitleaks und osv-scanner werden als Binary geladen (bei Störungen von GitHub bis zu 5 Wiederholungen im Abstand von 15 s) und danach per SHA-256 geprüft.
 
 **Grüner Stand** (`gruener-stand.ts`): Ein grünes `make check` merkt sich den geprüften Stand,

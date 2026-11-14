@@ -6,20 +6,21 @@ import type { Klassierung } from '../../src/lib/turnier/klassierung.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
 	gibLogin,
-	holeMailCode,
 	legeCmMitBriefCodeAn,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
+	schliesseLoginHilfen,
+	setzeAusgetreten
+} from './hilfen/login.ts';
+import {
 	legeOffenesTurnierAn,
 	meldePaarDirektAn,
 	meldeZurCmAn,
-	schliesseLoginHilfen,
 	setzeAnmeldeschluss,
-	setzeAusgetreten,
 	setzeSpielerangaben,
-	stelleAnfrageDirekt,
-	warteAufMail
-} from './hilfen/login.ts';
+	stelleAnfrageDirekt
+} from './hilfen/turnier.ts';
+import { holeMailCode, warteAufMail } from './hilfen/mail.ts';
 import {
 	pruefeBildschirm,
 	sammleKonsolenfehler,

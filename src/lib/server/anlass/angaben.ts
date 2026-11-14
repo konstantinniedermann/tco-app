@@ -13,8 +13,8 @@ export type AnlassWerte = {
 	anmeldeschluss: Date;
 };
 
-export const MAX_KURZ = 120;
-export const MAX_EINLADUNG = 5000;
+const MAX_KURZ = 120;
+const MAX_EINLADUNG = 5000;
 
 const MELDUNG = {
 	titel: 'Bitte einen Titel angeben.',

@@ -3,7 +3,7 @@
 
 export const SCHRITT_MS = 3500;
 export const FERTIG_MS = 6000;
-export const DURCHLAEUFE = 3;
+const DURCHLAEUFE = 3;
 
 /** `schritt` zählt ab 0; das letzte Bild (`anzahl - 1`) ist «Fertig». */
 export type Ablauf = { schritt: number; durchlauf: number; anzahl: number };

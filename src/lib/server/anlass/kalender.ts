@@ -1,6 +1,6 @@
 // Kalenderdatei eines Anlasses nach RFC 5545, ohne Personendaten (SI-19).
 // Annahme: Ein Anlass kennt kein Ende; im Kalender dauert er zwei Stunden.
-export const DAUER_MS = 2 * 60 * 60 * 1000;
+const DAUER_MS = 2 * 60 * 60 * 1000;
 const MAX_OKTETTE = 75;
 
 export type KalenderAnlass = {

@@ -49,7 +49,7 @@ export function ohneVersion(pfad: string, inhalt: string): string {
 }
 
 /** Prüfstand eines Commits (64 Hex-Zeichen). Wirft, wenn package.json o. ä. unlesbar ist. */
-export function pruefstand(rev: string): string {
+function pruefstand(rev: string): string {
 	const eintraege = git('-c', 'core.quotePath=false', 'ls-tree', '-r', '-z', rev)
 		.split('\0')
 		.filter(Boolean)

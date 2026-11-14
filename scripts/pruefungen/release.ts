@@ -30,7 +30,7 @@ export type Releasestand = {
 };
 
 /** Negativ, null oder positiv wie bei sort: a kleiner, gleich oder grösser als b. */
-export function vergleicheVersionen(a: string, b: string): number {
+function vergleicheVersionen(a: string, b: string): number {
 	const teileA = a.split('.').map(Number);
 	const teileB = b.split('.').map(Number);
 	for (let i = 0; i < 3; i++) if (teileA[i] !== teileB[i]) return teileA[i] - teileB[i];

@@ -17,7 +17,7 @@ export type Webauthn = {
 	melde(optionen: object): Promise<unknown>;
 };
 
-export const browserWebauthn: Webauthn = {
+const browserWebauthn: Webauthn = {
 	unterstuetzt: () => browserSupportsWebAuthn(),
 	registriere: (optionen) => startRegistration({ optionsJSON: optionen as never }),
 	melde: (optionen) => startAuthentication({ optionsJSON: optionen as never })

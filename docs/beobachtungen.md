@@ -135,6 +135,18 @@ Fehler der App.
 
 ## Offen
 
+### 2026-11-14 — Die Regel «nicht über CSS-Klassen suchen» hält die Praxis nicht
+
+**Thema:** Tests
+
+**Fundort:** `CLAUDE.md` (Abschnitt Tests); rund 108 Suchen über Klasse oder Element in 22 E2E-Dateien, z. B. `div.karte` in `cm-ablauf.test.ts`, `cm-anmeldung.test.ts`, `cm-verwaltung.test.ts`, `cm-doppel.test.ts`.
+
+**Beobachtung:** Die Karte einer Kategorie ist ein `<div class="karte">` ohne Rolle und Namen; für «Rolle und Beschriftung» bräuchte sie beides (ändert, was ein Bildschirmleser vorliest).
+
+**Ursprung:** Refactoring Schritt 20, Nachmessen (`docs/refactoring-analyse.md`, F.3, Hinweis (g)).
+
+**Einschätzung:** Gehört in die Revision der `CLAUDE.md` (Schritt 24: Regel so fassen, wie sie gilt). Zahl über ein Muster gezählt, nicht einzeln geprüft.
+
 ### 2026-11-14 — Offene App lädt nach einer Auslieferung nicht von selbst neu
 
 **Thema:** Struktur
@@ -296,18 +308,6 @@ und wartet auf das Ende des Feature-Stopps. Die E2E-Prüfung ist bis dahin geloc
 **Ursprung:** Session K-42, beim Eingrenzen der Kontaktdaten aufgefallen
 
 **Einschätzung:** Niedrig; vermutlich nur Wortlaut («der Spieler und der Treffer der Suche beim Anmelden von Hand»). Beide Wege offen: Zusage präzisieren oder Treffer ohne Jahrgang/Geschlecht.
-
-### 2026-11-09 — E2E-Hilfen nehmen noch ein festes Turnierjahr an
-
-**Thema:** Tests
-
-**Fundort:** `tests/e2e/hilfen/login.ts` → `legeTurnierAn(festesJahr)`, `legeOffenesTurnierAn(festesJahr, kategorien)`
-
-**Beobachtung:** Seit die Hilfen freie Jahre selbst vergeben, braucht kein Test auf `dev` mehr ein festes Jahr. Der Weg mit festem Jahr (vorher löschen, dann anlegen) bleibt nur, damit Tests aus Branches, die vor der Umstellung entstanden sind, nach dem Merge weiterlaufen. Ohne ihn ist eine Kollision wie früher wieder möglich, sobald zwei Dateien dasselbe feste Jahr wählen.
-
-**Ursprung:** Review (`cas-reviewer`) des Branches `test/e2e-turnierjahre`
-
-**Einschätzung:** Niedrig. Entfernen, sobald die damals offenen Branches gemergt sind; vorher mit `grep -rn "legeTurnierAn(\|legeOffenesTurnierAn(" tests/e2e` prüfen, dass niemand mehr ein Jahr übergibt.
 
 ### 2026-11-09 — Gespräch mit der Turnierleitung: keine Grenze für Nachrichten eines Mitglieds
 

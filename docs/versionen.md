@@ -8,6 +8,17 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.22.8 — Altlasten in Code und Tests aufgeräumt, Spur per Handstart (Refactoring Schritt 20)
+
+- Aufräumen: drei ungenutzte Namen und 25 unnötige `export`
+  entfernt, eine Funktion umbenannt, die E2E-Hilfen nach Themen geteilt, kopierte Test-Hilfen
+  zusammengeführt. An der App ändert sich nichts.
+- Testlogik: Die Listen der Mitglieder stehen für die Tests an
+  einer Stelle (`tests/hilfen/mitglieder-listen.ts`); der Routen-Test prüft, dass der Name einer
+  Schnittstelle zur Methode passt (`get…` zu GET, `post…` zu POST). Ein Lauf der CI von Hand kann
+  mit Schalter `spur` für jeden E2E-Test eine Spur aufzeichnen (E-63); Läufe bei Push und PR
+  bleiben, wie sie sind. An der App ändert sich nichts.
+
 ## 0.22.7 — Eigenbau «Mindestversion» entfernt (Refactoring Schritt 19)
 
 - `/api/status` nennt nur noch

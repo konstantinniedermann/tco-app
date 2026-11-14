@@ -7,6 +7,14 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Erledigt im Refactoring, Schritt 20 (14.11.2026) — ausserhalb einer Auswertung
+
+**Mitgemacht**
+
+- 2026-11-09 — E2E-Hilfen nehmen noch ein festes Turnierjahr an → Commit `98f69ca` («fester Weg des
+  Turnierjahrs weg») auf `refactor/schritt-20` (kein Test ruft den Weg mit Jahr auf, `origin`
+  führt keinen offenen Feature-Branch; `docs/refactoring-analyse.md`, Anhang F.3 und F.4)
+
 ### Erledigt im Refactoring, Schritt 12a (12.11.2026) — ausserhalb einer Auswertung
 
 **Mitgemacht**

@@ -2,15 +2,9 @@ import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import {
-	benenneTurnier,
-	legeKontoMitBriefCodeAn,
-	legeOffenenAnlassAn,
-	legeOffenesTurnierAn,
-	schliesseLoginHilfen,
-	setzeSpielerangaben,
-	setzeTelefon
-} from './hilfen/login.ts';
+import { legeKontoMitBriefCodeAn, schliesseLoginHilfen, setzeTelefon } from './hilfen/login.ts';
+import { benenneTurnier, legeOffenesTurnierAn, setzeSpielerangaben } from './hilfen/turnier.ts';
+import { legeOffenenAnlassAn } from './hilfen/anlass.ts';
 import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
 // Übersichtliche Navigation (#69, UI-Leitbild «Feste Ordnung»): Reiter Start · CM · IC · Profil auf

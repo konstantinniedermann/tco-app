@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { holer, json, ungeprueft } from '../../../tests/hilfen/verwaltung-abruf.ts';
+import { holer, json, ungeprueft } from '../../../tests/hilfen/abruf.ts';
 import { sendeAntwort } from './gespraech-api.ts';
 import {
 	ladeMitglieder,

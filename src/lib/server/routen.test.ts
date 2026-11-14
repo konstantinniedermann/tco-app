@@ -7,11 +7,13 @@
 // nur ROUTEN und EINSTIEGE an. Zieht eine Funktion in ein anderes Modul, ändert sich nur ihr Import;
 // das Modul muss auf `schnittstellen.ts` enden (sonst `schnittstellenModule` erweitern), und eine
 // neue Liste der Verwaltung gehört in `VERWALTUNGS_LISTEN` (`tests/hilfen/verwaltungs-listen.ts`),
-// eine der Mitglieder in MITGLIEDER.
+// eine der Mitglieder in `MITGLIEDER_LISTEN` (`tests/hilfen/mitglieder-listen.ts`). Der Name einer
+// Funktion beginnt mit der Methode ihrer Route (`get…` zu GET, `post…` zu POST; vierter Test).
 // Der Test liegt hier und nicht unter `src/routes/`: Dort gilt die Bauregel für jede Datei, und
 // nur Admin-Routen dürfen die Verwaltung importieren.
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../tests/hilfen/anfrage.ts';
+import { MITGLIEDER_LISTEN } from '../../../tests/hilfen/mitglieder-listen.ts';
 import { VERWALTUNGS_LISTEN } from '../../../tests/hilfen/verwaltungs-listen.ts';
 import {
 	getAuskunft,
@@ -40,13 +42,7 @@ import {
 	postZugang,
 	postZugangCode
 } from './admin/schnittstellen.ts';
-import {
-	ANLASS_SCHNITTSTELLEN,
-	getAnlaesse,
-	getAnlass,
-	getKalender,
-	postAnmeldung
-} from './anlass/schnittstellen.ts';
+import { getAnlaesse, getAnlass, getKalender, postAnmeldung } from './anlass/schnittstellen.ts';
 import {
 	getAdminAnlaesse,
 	getAdminAnlass,
@@ -55,7 +51,6 @@ import {
 	postAdminAnlassLoeschen
 } from './anlass/verwaltung-schnittstellen.ts';
 import {
-	CM_SCHNITTSTELLEN,
 	getCmAnsicht,
 	getCmPartner,
 	getCmTurniere,
@@ -96,12 +91,7 @@ import {
 	holePasskeyDienst,
 	holeProfilDienste
 } from './dienste.ts';
-import {
-	GESPRAECH_SCHNITTSTELLEN,
-	getGespraech,
-	postGelesen,
-	postGespraech
-} from './gespraech/schnittstellen.ts';
+import { getGespraech, postGelesen, postGespraech } from './gespraech/schnittstellen.ts';
 import {
 	getAdminGespraech,
 	getGespraeche,
@@ -109,7 +99,6 @@ import {
 	postZustand
 } from './gespraech/verwaltung-schnittstellen.ts';
 import {
-	PASSKEY_SCHNITTSTELLEN,
 	getPasskeys,
 	postAnmelden,
 	postAnmeldenOptionen,
@@ -127,12 +116,10 @@ import {
 import {
 	getInterclub,
 	getInterclubBegegnung,
-	getInterclubTeam,
-	INTERCLUB_SCHNITTSTELLEN
+	getInterclubTeam
 } from './interclub/schnittstellen.ts';
 import { getSitzung } from './sitzung/schnittstellen.ts';
 import {
-	MITTEILUNG_SCHNITTSTELLEN,
 	getBenachrichtigungen,
 	postAbo,
 	postAboLoeschen,
@@ -147,7 +134,6 @@ import {
 	postVereinVorschau
 } from './mitteilung/verwaltung-schnittstellen.ts';
 import {
-	PROFIL_SCHNITTSTELLEN,
 	getProfil,
 	postEmail,
 	postEmailBestaetigen,
@@ -312,21 +298,14 @@ const OHNE_LISTE = new Set<unknown>([
 	getSitzung
 ]);
 // Eine neue Liste der Verwaltung gehört in `VERWALTUNGS_LISTEN` (`tests/hilfen/verwaltungs-listen.ts`;
-// von dort nehmen sie auch Grundprüfung und Rechte-Matrix), eine der Mitglieder in MITGLIEDER und in
-// `mitgliederDienste()` in `grundpruefung.db.test.ts` (dort laufen 401 und 415 über jeden Eintrag).
+// von dort nehmen sie auch Grundprüfung und Rechte-Matrix), eine der Mitglieder in
+// `MITGLIEDER_LISTEN` (`tests/hilfen/mitglieder-listen.ts`; von dort nimmt sie die Grundprüfung,
+// dort laufen 401 und 415 über jeden Eintrag).
 const VERWALTUNG = new Set<unknown>(
 	Object.values(VERWALTUNGS_LISTEN).flatMap((l) => Object.values(l))
 );
 const MITGLIEDER = new Set<unknown>(
-	[
-		CM_SCHNITTSTELLEN,
-		ANLASS_SCHNITTSTELLEN,
-		INTERCLUB_SCHNITTSTELLEN,
-		PROFIL_SCHNITTSTELLEN,
-		GESPRAECH_SCHNITTSTELLEN,
-		PASSKEY_SCHNITTSTELLEN,
-		MITTEILUNG_SCHNITTSTELLEN
-	].flatMap((l) => Object.values(l))
+	Object.values(MITGLIEDER_LISTEN).flatMap((l) => Object.values(l))
 );
 
 const routenModule = import.meta.glob<Record<string, unknown>>('/src/routes/**/+server.ts');
@@ -421,6 +400,32 @@ describe('Verdrahtung der Routen', () => {
 					`${methode} ${route}`,
 					true
 				]);
+			}
+		}
+	});
+
+	// Grundprüfung und Rechte-Matrix erkennen «schreibend» am Namen in der Liste (`post…` bzw.
+	// «nicht `get…`»). Das hält nur, wenn der Name zur Methode der Route passt; hier ist es geprüft,
+	// für jeden Namen, unter dem die Funktion in einer Liste steht. Ohne Liste (Login, Sitzung) gilt
+	// der Name der Funktion; die gebauten Schnittstellen der Mitteilungen haben keinen eigenen.
+	test('zu GET gehört ein Name mit get, zu POST einer mit post', () => {
+		const listenNamen = new Map<unknown, string[]>();
+		for (const liste of [
+			...Object.values(VERWALTUNGS_LISTEN),
+			...Object.values(MITGLIEDER_LISTEN)
+		]) {
+			for (const [eintrag, funktion] of Object.entries(liste)) {
+				listenNamen.set(funktion, [...(listenNamen.get(funktion) ?? []), eintrag]);
+			}
+		}
+		const praefix: Record<string, string> = { GET: 'get', POST: 'post' };
+		for (const [route, soll] of Object.entries(ROUTEN)) {
+			if ('eigen' in soll) continue;
+			for (const [methode, [funktion]] of Object.entries(soll)) {
+				if (!Object.hasOwn(praefix, methode)) continue;
+				const namen = listenNamen.get(funktion) ?? [name(funktion)];
+				const falsch = namen.filter((n) => !n.startsWith(praefix[methode]));
+				expect([`${methode} ${route}`, falsch]).toEqual([`${methode} ${route}`, []]);
 			}
 		}
 	});

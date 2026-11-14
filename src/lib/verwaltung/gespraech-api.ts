@@ -1,14 +1,10 @@
 // Gespräche der Turnierleitung (Anfragen an `/api/admin/…/gespraeche`). Antwort und Abruf stehen in
 // `api.ts`; `GespraechVerlauf` steht dort, weil die Antwort `inzwischen` es trägt.
 import type { Holen, Json } from '../abruf.ts';
-import type {
-	GespraechZeile as ServerGespraechZeile,
-	listeGespraeche as ServerListeGespraeche
-} from '../server/gespraech/gespraech.ts';
+import type { listeGespraeche as ServerListeGespraeche } from '../server/gespraech/gespraech.ts';
 import { ADMIN, lese, schicke, type GespraechVerlauf } from './api.ts';
 
 export type GespraechListe = Json<NonNullable<Awaited<ReturnType<typeof ServerListeGespraeche>>>>;
-export type GespraechZeile = Json<ServerGespraechZeile>;
 
 /** FR-52: die Gespräche eines Turniers für den Posteingang der Turnierleitung. */
 export const holeGespraeche = (turnierId: number, holen: Holen = fetch) =>

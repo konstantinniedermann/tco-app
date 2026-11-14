@@ -3,12 +3,12 @@ import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
-	holeMailCode,
 	legeAdminMitBriefCodeAn,
 	legeKontoMitBriefCodeAn,
-	legeOffenenAnlassAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { legeOffenenAnlassAn } from './hilfen/anlass.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,

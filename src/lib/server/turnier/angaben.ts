@@ -34,14 +34,14 @@ export type KategorieWerte = {
 	mindestsumme: number | null;
 };
 
-export const MAX_TURNIERNAME = 120;
-export const MAX_KATEGORIENAME = 60;
-export const MAX_BEZEICHNUNG = 60;
-export const MAX_NUMMER = 12;
-export const JAHR_MIN = 2020;
-export const JAHR_MAX = 2100;
-export const JAHRGANG_MIN = 1900;
-export const SUMME_MAX = 20;
+const MAX_TURNIERNAME = 120;
+const MAX_KATEGORIENAME = 60;
+const MAX_BEZEICHNUNG = 60;
+const MAX_NUMMER = 12;
+const JAHR_MIN = 2020;
+const JAHR_MAX = 2100;
+const JAHRGANG_MIN = 1900;
+const SUMME_MAX = 20;
 
 const MELDUNG = {
 	kontakt: 'Bitte eine Person aus der Liste wählen.',

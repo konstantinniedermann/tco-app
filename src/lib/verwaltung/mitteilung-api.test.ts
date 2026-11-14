@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
 import { FELD_MELDUNG } from '../mitteilung/vorlagen.ts';
 import {
 	AUSWAHL_NAMEN,
@@ -15,23 +14,7 @@ import {
 	zeigeVorschau,
 	type MitteilungWerte
 } from './mitteilung-api.ts';
-
-type Aufruf = { pfad: string; init: RequestInit };
-
-function holer(antwort: Response | Error) {
-	const aufrufe: Aufruf[] = [];
-	const holen = async (pfad: string, init: RequestInit) => {
-		aufrufe.push({ pfad, init });
-		if (antwort instanceof Error) throw antwort;
-		return antwort;
-	};
-	return { aufrufe, holen };
-}
-
-// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an
-// (src/lib/fehler.ts), damit ein Wort oder eine Form, die der Server nicht kennt, hier auffällt.
-type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
-const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
+import { holer, json } from '../../../tests/hilfen/abruf.ts';
 
 const WERTE: MitteilungWerte = {
 	titel: 'Erinnerung: GV',

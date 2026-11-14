@@ -7,7 +7,6 @@ import {
 	formatiereBriefCode
 } from '../../src/lib/server/login/codes.ts';
 import {
-	holeMailCode,
 	laesstBriefCodeAblaufen,
 	legeAdminMitBriefCodeAn,
 	legeKontoAn,
@@ -16,6 +15,7 @@ import {
 	leereStrasse,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import {
 	pruefeBildschirm,
 	sammleKonsolenfehler,
