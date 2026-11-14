@@ -4,16 +4,16 @@ import { MELDUNG } from '../../src/lib/login/anmelden.ts';
 import type { Fehlerkoerper } from '../../src/lib/fehler.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
-	holeMailCode,
 	legeAdminMitBriefCodeAn,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
-	legeOffenenAnlassAn,
 	legeRollenkontoMitBriefCodeAn,
-	legeTurnierAn,
 	schliesseLoginHilfen,
 	setzeRufname
 } from './hilfen/login.ts';
+import { legeTurnierAn } from './hilfen/turnier.ts';
+import { legeOffenenAnlassAn } from './hilfen/anlass.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
 	klappeAuf,

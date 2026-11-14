@@ -4,18 +4,19 @@ import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
-	beantrageWildcardDirekt,
-	holeMailCode,
 	legeCmMitBriefCodeAn,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
-	legeOffenesTurnierAn,
 	legeRollenkontoMitBriefCodeAn,
-	meldeZurCmAn,
-	schliesseLoginHilfen,
-	setzeSpielerangaben,
-	warteAufMail
+	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import {
+	beantrageWildcardDirekt,
+	legeOffenesTurnierAn,
+	meldeZurCmAn,
+	setzeSpielerangaben
+} from './hilfen/turnier.ts';
+import { holeMailCode, warteAufMail } from './hilfen/mail.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,

@@ -1,12 +1,12 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
-	holeMailCode,
 	legeCmMitBriefCodeAn,
 	legeRollenkontoMitBriefCodeAn,
-	loescheTurnier,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { loescheTurnier } from './hilfen/turnier.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import {
 	pruefeBildschirm,
 	pruefePfad,

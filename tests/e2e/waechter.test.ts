@@ -8,13 +8,11 @@ import {
 	bestaetigeVerwaltungDirekt,
 	legeAdminMitBriefCodeAn,
 	legeKontoMitBriefCodeAn,
-	legeOffenenAnlassAn,
-	legeOffenesTurnierAn,
 	legeRollenkontoMitBriefCodeAn,
-	schliesseLoginHilfen,
-	setzeKontaktperson,
-	setzeSpielerangaben
+	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { legeOffenesTurnierAn, setzeKontaktperson, setzeSpielerangaben } from './hilfen/turnier.ts';
+import { legeOffenenAnlassAn } from './hilfen/anlass.ts';
 import {
 	klappeAuf,
 	sammleKonsolenfehler,

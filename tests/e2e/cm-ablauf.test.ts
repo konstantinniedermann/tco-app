@@ -4,15 +4,13 @@ import { MELDUNG } from '../../src/lib/login/anmelden.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
+import { gibLogin, legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
 import {
-	gibLogin,
-	legeKontoMitBriefCodeAn,
 	legeOffenesTurnierAn,
 	meldeZurCmAn,
-	schliesseLoginHilfen,
 	setzeSpielerangaben,
 	stelleAnfrageDirekt
-} from './hilfen/login.ts';
+} from './hilfen/turnier.ts';
 import { klappeAuf, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
 // Ablauf der Aktionen auf der CM-Seite der Mitglieder (Schritt 16, Anhang E.10 in

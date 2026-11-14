@@ -4,18 +4,19 @@ import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
-	antworteAlsLeitung,
-	entferneKontaktperson,
-	holeMailCode,
 	legeKontoMitBriefCodeAn,
-	legeOffenesTurnierAn,
 	legeRollenkontoMitBriefCodeAn,
 	schliesseLoginHilfen,
-	schreibeNachricht,
-	setzeKontaktperson,
-	stelleBriefCodeAus,
-	warteAufMail
+	stelleBriefCodeAus
 } from './hilfen/login.ts';
+import {
+	antworteAlsLeitung,
+	entferneKontaktperson,
+	legeOffenesTurnierAn,
+	schreibeNachricht,
+	setzeKontaktperson
+} from './hilfen/turnier.ts';
+import { holeMailCode, warteAufMail } from './hilfen/mail.ts';
 import {
 	pruefeBildschirm,
 	pruefePfad,

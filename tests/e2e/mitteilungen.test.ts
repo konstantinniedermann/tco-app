@@ -2,14 +2,13 @@ import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
-	holeMailCode,
 	legeCmMitBriefCodeAn,
 	legeKontoAn,
-	legeOffenenAnlassAn,
 	legeRollenkontoMitBriefCodeAn,
-	meldeZumAnlass,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { legeOffenenAnlassAn, meldeZumAnlass } from './hilfen/anlass.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,

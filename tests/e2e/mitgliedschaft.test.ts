@@ -2,12 +2,12 @@ import { mkdirSync } from 'node:fs';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
-	holeMailCode,
 	legeAdminMitBriefCodeAn,
 	legeEhemaligesAn,
 	legeKontoAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import { MAILPIT_URL } from './hilfen/umgebung.ts';
 import {
 	pruefeBildschirm,

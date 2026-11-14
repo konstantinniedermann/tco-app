@@ -4,16 +4,18 @@ import { MELDUNG } from '../../src/lib/login/anmelden.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import {
-	beantrageWildcardDirekt,
 	bestaetigeVerwaltungDirekt,
 	legeCmMitBriefCodeAn,
 	legeKontoAn,
+	schliesseLoginHilfen
+} from './hilfen/login.ts';
+import {
+	beantrageWildcardDirekt,
 	legeOffenesTurnierAn,
 	meldeZurCmAn,
-	schliesseLoginHilfen,
 	setzeAnmeldeschluss,
 	setzeSpielerangaben
-} from './hilfen/login.ts';
+} from './hilfen/turnier.ts';
 import { sammleKonsolenfehler, waehleAktion, wartetAufVorladen } from './hilfen/seite.ts';
 
 // Ablauf der Rückfragen in der Einzel-Anmeldungsliste der Verwaltung (A-ANMELDUNG-06, FR-46,
