@@ -17,6 +17,7 @@ import { load as auskunft } from '../../src/routes/verwaltung/mitglieder/[id]/au
 import { load as mitteilungen } from '../../src/routes/verwaltung/mitteilungen/+page.ts';
 import { load as rollen } from '../../src/routes/verwaltung/rollen/+page.ts';
 import { load as turnier } from '../../src/routes/verwaltung/turniere/[id]/+page.ts';
+import { load as turniere } from '../../src/routes/verwaltung/turniere/+page.ts';
 import { load as kategorie } from '../../src/routes/verwaltung/turniere/[id]/kategorien/[kid]/+page.ts';
 import { load as kategorieNeu } from '../../src/routes/verwaltung/turniere/[id]/kategorien/neu/+page.ts';
 import { load as nachrichten } from '../../src/routes/verwaltung/turniere/[id]/nachrichten/+page.ts';
@@ -596,5 +597,55 @@ describe('Interclub', () => {
 		const { r, angefragt } = await lauf(interclubBegegnung, { status: 200, koerper }, params);
 		expect(r).toEqual({ daten: { begegnung: koerper } });
 		expect(angefragt).toEqual(['/api/interclub/teams/7/begegnungen/9']);
+	});
+});
+
+// Die vier Listen der Verwaltung (Schritt 15, Lauf 2, E-48): Ihr erstes Laden steht in `+page.ts`.
+// Zugang wie die anderen Seiten der Verwaltung (Fall `verwaltung`); jede andere Antwort ist
+// «nicht geladen» (`zeilen: null`), keine Fehlerseite: Die Seite zeigt die Meldung der Störung,
+// wie vorher der Baustein.
+type Liste = {
+	name: string;
+	load: (e: never) => unknown;
+	pfad: string;
+	abfrage: string;
+	daten: (zeilen: unknown) => object;
+};
+
+const LISTEN: Liste[] = [
+	{
+		name: 'turniere',
+		load: turniere,
+		pfad: '/verwaltung/turniere',
+		abfrage: '/api/admin/turniere',
+		daten: (zeilen) => ({ zeilen })
+	}
+];
+
+describe('Listen der Verwaltung: erstes Laden', () => {
+	describe.each(LISTEN)('$name', (s) => {
+		const lauf = async (a: Antwort) => {
+			const { holen, angefragt } = stelle(a);
+			const r = await ergebnis(() => s.load(ereignis(holen, { pfad: s.pfad })));
+			return { r, angefragt };
+		};
+
+		test('ohne Sitzung, Rolle oder Bestätigung wie die anderen Seiten der Verwaltung', async () => {
+			expect((await lauf(ABGEMELDET)).r).toEqual({ umleitung: '/login' });
+			expect((await lauf(KEIN_ADMIN)).r).toEqual({ umleitung: '/' });
+			expect((await lauf(UNBESTAETIGT)).r).toEqual({ umleitung: '/verwaltung/bestaetigen' });
+		});
+
+		test('Störung, Netz weg, nicht gefunden, 401 ohne Körper: nicht geladen, keine Fehlerseite', async () => {
+			for (const a of [STOERUNG, 'netz-weg', NICHT_GEFUNDEN, { status: 401 }] as Antwort[]) {
+				expect((await lauf(a)).r, JSON.stringify(a)).toEqual({ daten: s.daten(null) });
+			}
+		});
+
+		test('mit Liste: die Zeilen, eine Anfrage', async () => {
+			const { r, angefragt } = await lauf({ status: 200, koerper: [{ id: 3 }] });
+			expect(r).toEqual({ daten: s.daten([{ id: 3 }]) });
+			expect(angefragt).toEqual([s.abfrage]);
+		});
 	});
 });
