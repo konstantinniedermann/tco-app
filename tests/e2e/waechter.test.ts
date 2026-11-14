@@ -5,6 +5,7 @@ import { MAILANFRAGE_SCHLUESSEL } from '../../src/lib/login/mailanfrage.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import {
+	bestaetigeVerwaltungDirekt,
 	legeAdminMitBriefCodeAn,
 	legeKontoMitBriefCodeAn,
 	legeOffenenAnlassAn,
@@ -14,7 +15,12 @@ import {
 	setzeKontaktperson,
 	setzeSpielerangaben
 } from './hilfen/login.ts';
-import { klappeAuf, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
+import {
+	klappeAuf,
+	sammleKonsolenfehler,
+	wartetAufMitgliederliste,
+	wartetAufVorladen
+} from './hilfen/seite.ts';
 
 // Wächter der Anmeldung (Schritt 15, Anhang E.5 in docs/refactoring-analyse.md): Wohin jede
 // geschützte Adresse ohne Sitzung, ohne Rolle oder ohne Bestätigung führt, und was nach einer
@@ -514,5 +520,109 @@ test.describe('mit Konto (Teil 2)', () => {
 		await page.getByRole('button', { name: 'Code schicken' }).click();
 		await istAuf(page, 'login', 'Verwaltung öffnen');
 		expect(fehler).toEqual([]);
+	});
+});
+
+// Die vier Listen der Verwaltung (Schritt 15, Lauf 2, Anhang E.5 «Für Lauf 2 dazu»): Sie laden heute
+// im Baustein und ziehen in eine `+page.ts`. Eine Störung beim ersten Laden bleibt eine Meldung in
+// der Seite (keine Fehlerseite), und die Mitgliederliste fragt beim Öffnen genau einmal. Die
+// Verwaltung ist direkt in der Datenbank bestätigt; kein Fall fordert einen Mail-Code an.
+test.describe('Listen der Verwaltung (Teil 4)', () => {
+	/** Admin (MyTCO und Mitglieder) mit bestätigter Verwaltung; liest alle drei Bereiche. */
+	async function meldeAdminAn(page: Page, vorname: string) {
+		const admin = await legeAdminMitBriefCodeAn(vorname);
+		await meldeAn(page, admin);
+		await bestaetigeVerwaltungDirekt(admin.kontoId);
+		return admin;
+	}
+
+	const LISTEN = [
+		{
+			adresse: '/verwaltung/turniere',
+			abfrage: '/api/admin/turniere',
+			titel: 'Clubmeisterschaft',
+			status: '0 Turniere',
+			leer: 'Noch keine Turniere.',
+			zeilen: 0
+		},
+		{
+			adresse: '/verwaltung/anlaesse',
+			abfrage: '/api/admin/anlaesse',
+			titel: 'Anlässe',
+			status: '0 Anlässe',
+			leer: 'Noch keine Anlässe.',
+			zeilen: 0
+		},
+		{
+			adresse: '/verwaltung/mitglieder',
+			abfrage: '/api/admin/mitglieder',
+			titel: 'Mitglieder',
+			status: '0 Mitglieder',
+			leer: 'Keine Mitglieder gefunden. Prüf die Suche oder den Filter.',
+			zeilen: 1
+		},
+		{
+			adresse: '/verwaltung/verlauf',
+			abfrage: '/api/admin/verlauf',
+			titel: 'Änderungsverlauf',
+			status: null,
+			leer: 'Noch keine Einträge.',
+			zeilen: 1
+		}
+	];
+
+	for (const l of LISTEN) {
+		test(`${l.adresse}: eine Störung beim Öffnen bleibt eine Meldung in der Seite`, async ({
+			page
+		}) => {
+			const fehler = sammleKonsolenfehler(page);
+			await meldeAdminAn(page, 'Wiebrecht');
+			await page.route(
+				(url) => url.pathname === l.abfrage,
+				(r) => r.fulfill({ status: 503, json: { fehler: 'stoerung' } })
+			);
+			await page.goto(l.adresse);
+			await expect(page.getByRole('alert')).toHaveText(MELDUNG.stoerung);
+			await expect(page.getByRole('heading', { level: 1 })).toHaveText(l.titel);
+			await expect(page).toHaveURL(new RegExp(`${l.adresse}$`));
+			if (l.status !== null) await expect(page.getByRole('status')).toHaveText(l.status);
+			await expect(page.getByText(l.leer)).toHaveCount(0);
+			// Keine Zeile ausser der Kopfzeile; Turniere und Anlässe zeigen ohne Zeilen keine Tabelle.
+			await expect(page.getByRole('row')).toHaveCount(l.zeilen);
+			// In der Konsole steht nur die vorgetäuschte 503.
+			expect(fehler.filter((f) => !/status of 503\b/.test(f))).toEqual([]);
+		});
+	}
+
+	test('/verwaltung/mitglieder fragt beim Öffnen genau einmal, nach einer Suche genau einmal mehr', async ({
+		page
+	}) => {
+		const admin = await meldeAdminAn(page, 'Wigbert');
+		// Zählt im Fenster jeden Aufruf von fetch an die Liste, im selben Takt wie der Aufruf.
+		await page.addInitScript(() => {
+			const w = window as unknown as { listenAbfragen: string[] };
+			w.listenAbfragen = [];
+			const echt = window.fetch;
+			window.fetch = (eingabe, init) => {
+				const url = new URL(
+					eingabe instanceof Request ? eingabe.url : String(eingabe),
+					location.href
+				);
+				if (url.pathname === '/api/admin/mitglieder') w.listenAbfragen.push(url.search);
+				return echt(eingabe, init);
+			};
+		});
+		const abfragen = () =>
+			page.evaluate(() => (window as unknown as { listenAbfragen: string[] }).listenAbfragen);
+		// Eigene Uhr: Das Warten beim Tippen (200 ms) wird vorgespult statt abgewartet.
+		await page.clock.install();
+		await page.goto('/verwaltung/mitglieder');
+		await wartetAufMitgliederliste(page);
+		await page.clock.runFor(1000);
+		expect(await abfragen()).toEqual(['']);
+		await page.getByLabel('Suchen').fill(admin.vorname);
+		await page.clock.runFor(1000);
+		await expect(page.getByRole('row').filter({ hasText: admin.email })).toBeVisible();
+		expect(await abfragen()).toEqual(['', `?suche=${admin.vorname}`]);
 	});
 });
