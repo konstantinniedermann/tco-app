@@ -4969,3 +4969,17 @@ bestanden, 64 übersprungen (unverändert), Image; grüner Stand gemerkt.
   nennt aber die Prüfung nicht. Kandidat für Schritt 21.
 - Die strengere Form der Regel (auch `x.fetch(…)`) wäre heute grün; ob sie kommt, entscheidet
   Schritt 24 mit dem Wortlaut der Dauerregel (C-13).
+- **Review (14.11.2026, refactor-reviewer): «ok», nichts vor dem Merge zu beheben.** Die wirksame
+  Konfiguration je Dateiart ist mit `--print-config` geprüft (Regel als Fehler für Bausteine,
+  Ladefunktionen, Server und Service Worker; vorher gab es kein `no-restricted-syntax`, nichts
+  wird verdrängt). Drei Rot-Proben am Repo nachgestellt (`fetch(` im Markup eines Bausteins;
+  zwei Design-Dateien vertauscht; Design-Import in einem anderen Baustein), dazu der rote Lauf
+  ohne Regel (16 von 30). Hinweise, nicht behoben (Merkpunkte für Schritt 24, wo die Regeln
+  Dauerregeln werden): (1) `import()` einer Design-Datei im Svelte-Markup bleibt in der
+  Design-Prüfung still grün und fehlt in den Listen «nicht erfasst»; (2) im Kommentar von
+  `scripts/design-importe.test.ts` steht `docs/mockups/` statt `docs/ui-mockups/`; (3) die
+  Meldung der fetch-Regel nennt «Abruf-Module des Themas», was für Server-Code nicht passt;
+  braucht der Server einmal einen eigenen Abruf, fällt ein Entscheid über eine Ausnahme an; (4)
+  `fetch-regel.test.ts` hat keinen Fall für Markup (die Regel wirkt dort); (5) die strengere
+  Form mit `x.fetch(…)` wäre heute ebenfalls ohne Meldung. Nicht geprüft vom Reviewer: CI auf dem
+  Branch, voller `make check` (grüner Stand bestätigt), die Mockups gegen die Liste.
