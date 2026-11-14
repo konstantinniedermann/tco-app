@@ -414,8 +414,8 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
 
 ## Alte Versionen auf dem Handy
 
-Die Web-App speichert auf dem Handy nichts zwischen: Der Service Worker ist nur für Push da und
-hat keinen Cache, die Seite kommt bei jedem Start vom Server.
+Der Service Worker speichert nichts zwischen: Er ist nur für Push da und hat keinen Cache, die
+Seite kommt bei jedem Start vom Server.
 
 - **Beim nächsten Start** läuft die neue Version, ohne Zutun.
 - **Ist die App offen,** merkt sie eine neue Auslieferung mit dem Bordmittel von SvelteKit: Sie

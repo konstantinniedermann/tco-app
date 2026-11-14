@@ -135,6 +135,26 @@ Fehler der App.
 
 ## Offen
 
+### 2026-11-14 — Offene App lädt nach einer Auslieferung nicht von selbst neu
+
+**Thema:** Struktur
+
+**Fundort:** `src/routes/+layout.svelte` (`beforeNavigate`), `docs/ci-cd-und-release.md`
+(«Alte Versionen auf dem Handy»).
+
+**Beobachtung:** Eine offene App bemerkt eine neue Auslieferung, lädt aber nur neu, wenn ein
+Seitenwechsel scheitert. Die Ergänzung «der nächste angetippte Link lädt ganz neu» (Vorlage aus
+der SvelteKit-Doku) tat auf allen drei Geräten das Richtige, bricht aber das Vorladen ab, das
+derselbe Tipp gestartet hat; WebKit meldet das als Konsolenfehler (je nach Fassung 2 bis 9 von
+45 Läufen).
+
+**Ursprung:** Refactoring Schritt 19, Antwort B auf F-35, beendet mit A (E-61; Protokoll in
+`docs/refactoring-analyse.md`, Anhang F.2; der E2E dazu steht im Verlauf, Commit `8ba6016`).
+
+**Einschätzung:** Sinnvoll, sobald Test und Live ausgeliefert werden. Wege: Vorladen beim
+Antippen für diesen Fall aussetzen, oder die abgebrochenen Abrufe im Test als erwartet führen.
+Beides ist ein Entscheid, kein Refactoring.
+
 ### 2026-11-14 — CM-Seite: Fokus nach einer Aktion hängt vom Zeitpunkt im Browser ab
 
 **Thema:** Barrierefreiheit
