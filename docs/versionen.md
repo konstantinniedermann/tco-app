@@ -8,6 +8,14 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.22.6 — Fokus-Prüfung der CM-Seite gelockert, UI-Leitbild zur Rückfrage (Nachtrag zur Etappe 2)
+
+- Der E2E-Test der CM-Seite prüft nach einer hinfälligen Anfrage nur noch, dass der Fokus nicht
+  im Seitenkörper verloren ist; welches Element ihn hat, hängt vom Browser ab und wackelte auf der
+  iPhone-CI (E-55). An der App ändert sich nichts.
+- Das UI-Leitbild beschreibt die Rückfrage, wie der Code sie baut: zweite Entscheid-Taste, Warnung
+  als Liste mit «Trotzdem …», Rückfrage mit Textfeld (E-58).
+
 ## 0.22.5 — Stylesheet in zehn Dateien (Refactoring Schritt 18)
 
 - `basis.css` ist in zehn Dateien unter `src/lib/design/` geschnitten, in der bisherigen
