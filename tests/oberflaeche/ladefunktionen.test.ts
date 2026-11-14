@@ -20,6 +20,7 @@ import { load as rollen } from '../../src/routes/verwaltung/rollen/+page.ts';
 import { load as turnier } from '../../src/routes/verwaltung/turniere/[id]/+page.ts';
 import { load as turniere } from '../../src/routes/verwaltung/turniere/+page.ts';
 import { load as kategorie } from '../../src/routes/verwaltung/turniere/[id]/kategorien/[kid]/+page.ts';
+import { load as verlauf } from '../../src/routes/verwaltung/verlauf/+page.ts';
 import { load as kategorieNeu } from '../../src/routes/verwaltung/turniere/[id]/kategorien/neu/+page.ts';
 import { load as nachrichten } from '../../src/routes/verwaltung/turniere/[id]/nachrichten/+page.ts';
 import { load as gespraech } from '../../src/routes/verwaltung/turniere/[id]/nachrichten/[gid]/+page.ts';
@@ -627,6 +628,13 @@ const LISTEN: Liste[] = [
 		pfad: '/verwaltung/anlaesse',
 		abfrage: '/api/admin/anlaesse',
 		daten: (zeilen) => ({ zeilen })
+	},
+	{
+		name: 'verlauf',
+		load: verlauf,
+		pfad: '/verwaltung/verlauf',
+		abfrage: '/api/admin/verlauf',
+		daten: (zeilen) => ({ mitglied: undefined, zeilen })
 	}
 ];
 
@@ -655,5 +663,21 @@ describe('Listen der Verwaltung: erstes Laden', () => {
 			expect(r).toEqual({ daten: s.daten([{ id: 3 }]) });
 			expect(angefragt).toEqual([s.abfrage]);
 		});
+	});
+
+	// Der Filter des Verlaufs ist die Adresse: nur Ziffern gelten, sonst alle Einträge.
+	test('verlauf: «?mitglied=» aus der Adresse', async () => {
+		for (const [suche, mitglied, abfrage] of [
+			['?mitglied=3', 3, '/api/admin/verlauf?mitglied=3'],
+			['?mitglied=abc', undefined, '/api/admin/verlauf'],
+			['?mitglied=', undefined, '/api/admin/verlauf']
+		] as const) {
+			const { holen, angefragt } = stelle({ status: 200, koerper: [] });
+			const r = await ergebnis(() =>
+				verlauf(ereignis(holen, { pfad: `/verwaltung/verlauf${suche}` }))
+			);
+			expect(r, suche).toEqual({ daten: { mitglied, zeilen: [] } });
+			expect(angefragt, suche).toEqual([abfrage]);
+		}
 	});
 });
