@@ -41,7 +41,10 @@ const MITGLIEDER_SEITEN = [
 	'/clubmeisterschaft/1',
 	'/clubmeisterschaft/1/kategorie/1',
 	'/clubmeisterschaft/1/doppel/1',
-	'/clubmeisterschaft/1/kontakt'
+	'/clubmeisterschaft/1/kontakt',
+	'/interclub',
+	'/interclub/1',
+	'/interclub/1/1'
 ];
 
 /** Alle 22 Adressen der Verwaltung, Nummern beliebig. */
@@ -246,6 +249,19 @@ test.describe('ohne Sitzung (Teil 1)', () => {
 	test('eine CM ohne Zahl führt über die Startseite weiter (Fall H)', async ({ page }, info) => {
 		await fuehrtZu(page, ['/clubmeisterschaft/abc'], handy(info) ? 'willkommen' : 'login');
 	});
+
+	test('Interclub ohne Zahl führt über die Übersicht bzw. das Team zum Login, auch auf dem Handy (Fall L)', async ({
+		page
+	}) => {
+		await fuehrtZu(page, ['/interclub/abc', '/interclub/abc/1', '/interclub/1/abc'], 'login');
+	});
+
+	test('Interclub ohne Zahl mit wartender Mail-Anfrage führt zum Feld «Code aus der Mail» (Fall L)', async ({
+		page
+	}) => {
+		await mailAnfrageWartet(page);
+		await fuehrtZu(page, ['/interclub/abc'], 'login-mail');
+	});
 });
 
 test.describe('mit Konto (Teil 2)', () => {
@@ -296,6 +312,47 @@ test.describe('mit Konto (Teil 2)', () => {
 			.click();
 		await istAuf(page, 'login-mail', 'Reiter Profil');
 		expect(fehler).toEqual([]);
+	});
+
+	test('Reiter IC nach abgelaufener Anmeldung führt zum Login', async ({ page }) => {
+		const fehler = sammleKonsolenfehler(page);
+		const konto = await legeKontoMitBriefCodeAn('Wiland');
+		await meldeAn(page, konto);
+		await setzeMarke(page);
+		await meldungLaeuftAb(page);
+		await page
+			.getByRole('navigation', { name: 'Hauptnavigation' })
+			.getByRole('link', { name: 'IC', exact: true })
+			.click();
+		await istAuf(page, 'login', 'Reiter IC');
+		expect(await hatMarke(page)).toBe(true);
+		expect(fehler).toEqual([]);
+	});
+
+	test('Interclub: ungültiges oder unbekanntes Team führt zur Übersicht, eine solche Begegnung zum Team (Fall L)', async ({
+		page
+	}) => {
+		const konto = await legeKontoMitBriefCodeAn('Wigald');
+		await meldeAn(page, konto);
+		const uebersicht = page.getByRole('heading', { level: 1, name: 'Interclub 2026' });
+		for (const adresse of ['/interclub/abc', '/interclub/1']) {
+			await page.goto(adresse);
+			await expect(page, `von ${adresse}`).toHaveURL(/\/interclub$/);
+			await expect(uebersicht, `von ${adresse}`).toBeVisible();
+			await wartetAufVorladen(page);
+		}
+		const titelTeam = page.getByRole('heading', { level: 1, name: /2L Herren 1/ });
+		await page.getByRole('link', { name: /2L Herren 1/ }).click();
+		await expect(titelTeam).toBeVisible();
+		const team = new URL(page.url()).pathname;
+		expect(team).toMatch(/^\/interclub\/\d+$/);
+		await wartetAufVorladen(page);
+		for (const adresse of [`${team}/1`, `${team}/abc`]) {
+			await page.goto(adresse);
+			await expect(page, `von ${adresse}`).toHaveURL(new RegExp(`${team}$`));
+			await expect(titelTeam, `von ${adresse}`).toBeVisible();
+			await wartetAufVorladen(page);
+		}
 	});
 
 	test('CM-Seite: «Anmelden» nach abgelaufener Anmeldung führt zum Login, auch mit Mail-Anfrage (Fall C)', async ({

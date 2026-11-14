@@ -2,6 +2,9 @@ import { isHttpError, isRedirect } from '@sveltejs/kit';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { load as startseite } from '../../src/routes/+page.ts';
 import { load as wurzel } from '../../src/routes/+layout.ts';
+import { load as interclub } from '../../src/routes/interclub/+page.ts';
+import { load as interclubTeam } from '../../src/routes/interclub/[id]/+page.ts';
+import { load as interclubBegegnung } from '../../src/routes/interclub/[id]/[begegnung]/+page.ts';
 import { load as profil } from '../../src/routes/profil/+page.ts';
 import { load as profilEmail } from '../../src/routes/profil/email/+page.ts';
 import { load as verwaltungLayout } from '../../src/routes/verwaltung/+layout.ts';
@@ -65,13 +68,14 @@ function ereignis(
 	{
 		pfad = '/verwaltung/mitglieder',
 		params = {},
-		eltern = { ansicht: null }
-	}: { pfad?: string; params?: Record<string, string>; eltern?: object } = {}
+		eltern = { ansicht: null },
+		url
+	}: { pfad?: string; params?: Record<string, string>; eltern?: object; url?: URL } = {}
 ) {
 	return {
 		fetch: holen,
 		params,
-		url: new URL(`http://localhost${pfad}`),
+		url: url ?? new URL(`http://localhost${pfad}`),
 		depends: () => {},
 		parent: async () => eltern
 	} as never;
@@ -422,5 +426,175 @@ describe('Mitglieder-App: Prüfung der Sitzung (Fall G)', () => {
 		expect(await band(ABGEMELDET)).toEqual({ daten: { ansicht: null, interclub: false } });
 		expect(await band(STOERUNG)).toEqual({ daten: { ansicht: null, interclub: false } });
 		expect(await band('netz-weg')).toEqual({ daten: { ansicht: null, interclub: false } });
+	});
+
+	// Anhang E.7, Abschnitt 2: Ohne Sitzung (auch bei Störung oder unlesbarer Sitzung) und mit
+	// laufender Ansicht liest das Layout die Adresse; dann lädt SvelteKit es bei jedem Wechsel neu.
+	// Mit Sitzung und ohne Ansicht nicht. `interclub` gilt nur, wenn der Server genau `true` sendet.
+	test('das Wurzel-Layout: Reiter IC nur bei interclub true, neu geprüft ohne Sitzung', async () => {
+		const lauf = async (a: Antwort) => {
+			let gelesen = 0;
+			const url = new URL('http://localhost/');
+			Object.defineProperty(url, 'pathname', {
+				get: () => {
+					gelesen++;
+					return '/';
+				}
+			});
+			const r = await ergebnis(() => wurzel(ereignis(stelle(a).holen, { url })));
+			return { ...r, liestAdresse: gelesen > 0 };
+		};
+		const ohne = { daten: { ansicht: null, interclub: false } };
+		expect(
+			await lauf({ status: 200, koerper: { ...SITZUNG, ansicht: 'cm', interclub: true } })
+		).toEqual({ daten: { ansicht: 'cm', interclub: true }, liestAdresse: true });
+		expect(await lauf({ status: 200, koerper: { ...SITZUNG, interclub: true } })).toEqual({
+			daten: { ansicht: null, interclub: true },
+			liestAdresse: false
+		});
+		expect(await lauf({ status: 200, koerper: SITZUNG })).toEqual({ ...ohne, liestAdresse: false });
+		expect(await lauf({ status: 200, koerper: { ...SITZUNG, interclub: 'ja' } })).toEqual({
+			...ohne,
+			liestAdresse: false
+		});
+		expect(await lauf({ status: 200 })).toEqual({ ...ohne, liestAdresse: true });
+		expect(await lauf({ status: 200, koerper: null })).toEqual({ ...ohne, liestAdresse: true });
+		expect(await lauf(ABGEMELDET)).toEqual({ ...ohne, liestAdresse: true });
+		expect(await lauf(STOERUNG)).toEqual({ ...ohne, liestAdresse: true });
+		expect(await lauf('netz-weg')).toEqual({ ...ohne, liestAdresse: true });
+	});
+});
+
+/** Gestellter Gerätespeicher; mit `wartet` steht die Mail-Anfrage darin (wie Fall A). */
+function geraetespeicher(wartet: boolean) {
+	const speicher = new Map<string, string>(
+		wartet
+			? [['mytco-mailanfrage', JSON.stringify({ email: 'wartet@example.org', zeit: Date.now() })]]
+			: []
+	);
+	vi.stubGlobal('localStorage', {
+		getItem: (k: string) => speicher.get(k) ?? null,
+		setItem: (k: string, v: string) => speicher.set(k, v),
+		removeItem: (k: string) => speicher.delete(k)
+	});
+}
+
+// Die drei Seiten des Reiters IC (#81, Anhang E.7 Abschnitt 1): Fall `mitglied` des Wächters; die
+// Umleitungen bei ungültiger oder unbekannter Nummer stehen in der Seite (Fall L). Der Vertrag von
+// Interclub verlangt einen lesbaren Körper: Ein 401 ohne ihn ist eine Störung (Fall M).
+describe('Interclub', () => {
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
+	const ICSEITEN: {
+		name: string;
+		load: (e: never) => unknown;
+		params: Record<string, string>;
+		satz: string;
+	}[] = [
+		{
+			name: '/interclub',
+			load: interclub,
+			params: {},
+			satz: 'Die Interclub-Resultate lassen sich gerade nicht laden.'
+		},
+		{
+			name: '/interclub/[id]',
+			load: interclubTeam,
+			params: { id: '7' },
+			satz: 'Das Team lässt sich gerade nicht laden.'
+		},
+		{
+			name: '/interclub/[id]/[begegnung]',
+			load: interclubBegegnung,
+			params: { id: '7', begegnung: '9' },
+			satz: 'Die Begegnung lässt sich gerade nicht laden.'
+		}
+	];
+
+	const lauf = (
+		load: (e: never) => unknown,
+		a: Antwort | ((pfad: string) => Antwort),
+		params: Record<string, string>
+	) => {
+		const { holen, angefragt } = stelle(a);
+		return ergebnis(() => load(ereignis(holen, { params }))).then((r) => ({ r, angefragt }));
+	};
+
+	describe.each(ICSEITEN)('$name', (s) => {
+		test('ohne Sitzung zum Login, mit wartendem Mail-Code zum Feld dafür', async () => {
+			geraetespeicher(false);
+			expect((await lauf(s.load, ABGEMELDET, s.params)).r).toEqual({ umleitung: '/login' });
+			geraetespeicher(true);
+			expect((await lauf(s.load, ABGEMELDET, s.params)).r).toEqual({
+				umleitung: '/login/mail'
+			});
+		});
+
+		test('ein 401 ohne lesbaren Körper ist eine Störung (Fall M)', async () => {
+			expect((await lauf(s.load, { status: 401 }, s.params)).r).toEqual({
+				fehler: 503,
+				text: s.satz
+			});
+		});
+
+		test('Störung des Servers und Netz weg: Fehlerseite 503 mit dem Satz der Seite', async () => {
+			expect((await lauf(s.load, STOERUNG, s.params)).r).toEqual({ fehler: 503, text: s.satz });
+			expect((await lauf(s.load, 'netz-weg', s.params)).r).toEqual({ fehler: 503, text: s.satz });
+		});
+	});
+
+	test('/interclub: ohne Interclub-Daten bleibt die Seite, mit Daten die Übersicht', async () => {
+		expect((await lauf(interclub, NICHT_GEFUNDEN, {})).r).toEqual({
+			daten: { uebersicht: null }
+		});
+		const koerper = { saison: 2026, teams: [] };
+		const { r, angefragt } = await lauf(interclub, { status: 200, koerper }, {});
+		expect(r).toEqual({ daten: { uebersicht: koerper } });
+		expect(angefragt).toEqual(['/api/interclub']);
+	});
+
+	test('/interclub/[id]: ungültige Nummer ohne Anfrage zur Übersicht', async () => {
+		for (const id of ['abc', '0', '-1', '1.5']) {
+			const { r, angefragt } = await lauf(interclubTeam, { status: 200, koerper: {} }, { id });
+			expect(r, id).toEqual({ umleitung: '/interclub' });
+			expect(angefragt, id).toEqual([]);
+		}
+	});
+
+	test('/interclub/[id]: unbekanntes Team zur Übersicht, sonst das Team', async () => {
+		expect((await lauf(interclubTeam, NICHT_GEFUNDEN, { id: '7' })).r).toEqual({
+			umleitung: '/interclub'
+		});
+		const koerper = { teamId: 7, liga: '2L' };
+		const { r, angefragt } = await lauf(interclubTeam, { status: 200, koerper }, { id: '7' });
+		expect(r).toEqual({ daten: { team: koerper } });
+		expect(angefragt).toEqual(['/api/interclub/teams/7']);
+	});
+
+	test('/interclub/[id]/[begegnung]: ungültige Nummern ohne Anfrage zur Übersicht bzw. zum Team', async () => {
+		const ok = { status: 200, koerper: {} };
+		for (const id of ['abc', '0']) {
+			const { r, angefragt } = await lauf(interclubBegegnung, ok, { id, begegnung: '9' });
+			expect(r, id).toEqual({ umleitung: '/interclub' });
+			expect(angefragt, id).toEqual([]);
+		}
+		for (const begegnung of ['abc', '0']) {
+			const { r, angefragt } = await lauf(interclubBegegnung, ok, { id: '7', begegnung });
+			expect(r, begegnung).toEqual({ umleitung: '/interclub/7' });
+			expect(angefragt, begegnung).toEqual([]);
+		}
+	});
+
+	test('/interclub/[id]/[begegnung]: unbekannte Begegnung zum Team, sonst die Begegnung', async () => {
+		const params = { id: '7', begegnung: '9' };
+		expect((await lauf(interclubBegegnung, NICHT_GEFUNDEN, params)).r).toEqual({
+			umleitung: '/interclub/7'
+		});
+		const koerper = { begegnungId: 9, heim: 'Olten 1' };
+		const { r, angefragt } = await lauf(interclubBegegnung, { status: 200, koerper }, params);
+		expect(r).toEqual({ daten: { begegnung: koerper } });
+		expect(angefragt).toEqual(['/api/interclub/teams/7/begegnungen/9']);
 	});
 });
