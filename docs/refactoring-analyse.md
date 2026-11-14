@@ -4816,3 +4816,19 @@ die Rückfall-Lesart «Name der Funktion» in (b) ohne eigene Rot-Probe (fünf F
   Überladungen; ohne Folge); `tests/e2e/hilfen/anlass.ts` und `mail.ts` stehen in keiner Zeile
   von `docs/context-scopes.md` (Merkpunkt für Schritt 21). Nicht geprüft vom Reviewer: kein Lauf;
   `turnier.ts` nur in den Deklarationen gelesen.
+- **Review Lauf 2 (14.11.2026, refactor-reviewer): «ok», nichts vor dem Merge zu beheben.** Listen und
+  Reihenfolge gleich; drei Rot-Proben zu Commit 8 und zwei zu Commit 9 nachgestellt, darunter der
+  Rückfall «Name der Funktion» (`/api/logout` als GET: rot), der oben unter «Nicht geprüft» stand.
+  Die Lesart von Hinweis (b) (Name in der Liste) trägt. Der Schalter ist sicher verdrahtet (nur
+  `workflow_dispatch`, über `env`, Job ohne Secret); in eine Spur gelangen nur erfundene Testdaten
+  des CI-Containers. Hinweise: Ein Listeneintrag ohne Route liefe in der Grundprüfung ungeprüft
+  nach seinem Präfix (heute keiner; Beobachtung); der Satz der `CLAUDE.md` unter «Tests» stimmt
+  nach dem Merge nicht mehr (Vorschlag oben; geht an den Projektleiter).
+- **Handstart mit Spur, gemessen (Orchestrator, Lauf 43629593490 auf dem Branch, `spur=true`):**
+  alle Jobs grün. E2E-Jobs: iPhone 9,0 Minuten, Desktop 5,1, Android 5,0 (ohne Spur zuletzt 10,0 /
+  3,9 / 4,1; die Spur kostet rund eine Minute, die Zeitgrenze von 20 Minuten ist weit). Artefakte:
+  Desktop 216 MB, Android 509 MB, iPhone 301 MB, zusammen rund 1 GB (ohne Spur 181 MB). Damit
+  ist `trace: 'on'` vertretbar; die Schätzung «0,4 bis 2 GB je Gerät» war zu hoch, und «die
+  Laufzeit trifft beide Formen gleich» bleibt eine Annahme [V] (nur `on` gemessen). Der Inhalt
+  einer `trace.zip` aus der CI ist nicht geöffnet worden; die Grösse der Artefakte ist der Beleg.
+  `docs/ci-cd-und-release.md` nennt Dauer, Grösse und Aufbewahrung.
