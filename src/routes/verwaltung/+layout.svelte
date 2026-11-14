@@ -15,7 +15,7 @@
 		nurLesend === null ? null : ROLLEN_NAME[BEREICHE[nurLesend].schreiben[0]]
 	);
 
-	// Titel in der Kopfleiste (src/lib/ui/kopftitel.ts), nur unter 60rem zu sehen (basis.css):
+	// Titel in der Kopfleiste (src/lib/ui/kopftitel.ts), nur unter 60rem zu sehen (rahmen.css):
 	// Hier scrollt das Dokument, die Kopfleiste klebt oben. `oben` ist ihre Unterkante im
 	// geklebten Zustand (Abstand oben plus Höhe). Der Text bleibt beim Ausblenden stehen.
 	let kopf = $state<HTMLElement>();

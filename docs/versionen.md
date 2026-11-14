@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.22.5 — Stylesheet in zehn Dateien (Refactoring Schritt 18)
+
+- `basis.css` ist in zehn Dateien unter `src/lib/design/` geschnitten, in der bisherigen
+  Reihenfolge; keine Regel ist verschoben oder geändert. Das gebaute Stylesheet ist Zeichen für
+  Zeichen gleich, am Aussehen ändert sich nichts.
+
 ## 0.22.4 — Rückfragen der Einzel-Anmeldungsliste im gemeinsamen Dialog (Refactoring Schritt 17)
 
 - Die Einzel-Anmeldungsliste der Verwaltung nutzt für ihre fünf

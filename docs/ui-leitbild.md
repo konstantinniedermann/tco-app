@@ -14,7 +14,7 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Was | Code-Stelle |
 |-----|-------------|
 | Werte (Farben, Schrift, Abstände, Formen, Bewegung) | `src/lib/design/tokens.css` |
-| Grundstil und Bausteine | `src/lib/design/basis.css` |
+| Grundstil und Bausteine | `src/lib/design/grundlagen.css`, `rahmen.css`, `bedienelemente.css`, `karten.css`, `verwaltung.css`, `anleitung.css`, `uebergaenge.css`, `pc-layout.css`, `druck.css`, `verlauf.css` (Reihenfolge wie in `src/routes/+layout.svelte`, nach `tokens.css`) |
 | Wappen und App-Symbol (Farben fest in der Datei) | `static/wappen.svg`, `static/favicon.svg`, `static/*.png` |
 | Manifest (Name, Farben fest in der Datei; `theme_color` und `background_color` stimmen von Hand mit `--farbe-marke` und `--farbe-hintergrund` überein) | `static/manifest.webmanifest` |
 | Farbe der Browserleiste, Systemschrift-Einstellung, sichere Abstände zu Statusleiste und Notch über `env(safe-area-inset-*)` (`viewport-fit=cover`; nie `apple-mobile-web-app-status-bar-style` `black-translucent`, das schaltet den Schutz vor dem Schleier von iOS ab) | `src/app.html` |
@@ -111,7 +111,7 @@ Mitglied an seinem Gerät eingestellt hat:**
 - Alle Grössen und Abstände sind in `rem`, nie in `px` (UI-02). `html` setzt keine
   Schriftgrösse in px; die Grundgrösse sitzt auf `body`.
 - Android (Chrome ab Version 146): `<meta name="text-scale" content="scale">` in `src/app.html`.
-- iPhone und iPad (Safari): `html { font: -apple-system-body; }` in `basis.css` übernimmt die
+- iPhone und iPad (Safari): `html { font: -apple-system-body; }` in `grundlagen.css` übernimmt die
   Dynamic-Type-Grösse (Standard 17 px statt 16 px, Grundschrift also gut 19 px). Die Regel
   greift nur auf iOS (`-webkit-touch-callout`); Safari am Mac setzte sonst 13 px.
 - PC: Zoom und Schriftgrösse des Browsers wirken über `rem`.
@@ -140,7 +140,7 @@ Mitglied an seinem Gerät eingestellt hat:**
 Ab einer Breite von `60rem` (960 px bei Standardschrift, also auch Tablets quer) gilt das
 PC-Layout. Massgebend ist die Breite des App-Rahmens
 `.app` (Container-Abfrage), nicht die des Fensters; so zeigen auch die Mockups im
-Handy-Rahmen das Handy-Layout. Der Wert steht nur in `basis.css`, weil Abfragen keine Tokens
+Handy-Rahmen das Handy-Layout. Der Wert steht nur in den Stil-Dateien (`pc-layout.css` und wo ein Baustein ihn braucht), weil Abfragen keine Tokens
 erlauben. Weil `.app` ein Container ist, gehen Überlagerungen nur mit `<dialog>`, nicht mit
 `position: fixed`. Einzige Ausnahme ist das Statusleisten-Band; es steht ausserhalb von `.app`.
 
@@ -164,7 +164,7 @@ iPhone nachempfunden und am Muster abgenommen (#54). Wo Bewegung vorkommt, steht
 
 ## Bausteine
 
-Jeder Baustein ist genau einmal als Klasse in `src/lib/design/basis.css` gebaut. Svelte-
+Jeder Baustein ist genau einmal als Klasse in den Stil-Dateien unter `src/lib/design/` gebaut (Bedienelemente, Karten, Verwaltung und Anleitung je in ihrer Datei; die Reihenfolge der Dateien ist fest). Svelte-
 Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese Klassen.
 
 | Baustein | Klasse | Regel |
@@ -200,7 +200,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Resultatzeile | `.resultat` (`.resultat-stand`, `.resultat-tag`) | eine Begegnung im Interclub, als Kartenteil in einer Karte: links fett die Liga (Übersicht) bzw. «Heim – Gast», darunter «Heim – Gast» bzw. leise Datum und *Heim*/*Auswärts*; Auf- und Abstiegsspiele mit Uhrzeit («<Wochentag> <TT.MM.>, <HH:MM>»), auch kommende in der Übersicht; rechts der Endstand in `--groesse-gross` (`.resultat-stand`) und darunter die Plakette des Ergebnisses. Endstand eines Siegs in `--farbe-marke`, einer Niederlage in `--farbe-fehler`, sonst `--farbe-text`; Begegnungen ohne TCO-Team ohne Farbe und Plakette, kommende ohne Endstand. Bricht bei grosser Schrift um: Endstand und Plakette rutschen unter den Text. In der Übersicht steht über den Begegnungen eines Tages leise und halbfett der Tag (`.resultat-tag`). Eine eigene, gespielte Begegnung ist ein Link auf ihre Seite (`a.resultat`), rechts mit dem Pfeil `.kachel-pfeil` |
 | Partie | `details.partie` (`.partie-titel`, `.partie-nr`, `.partie-saetze`, `.partie-gegner`) | eine Einzelpartie im Interclub als *Aufklappbereich* in der Karte, ab der zweiten als Kartenteil. Titelzeile in normaler Schrift: leise die Position, die TCO-Spieler «Nachname Vorname» wie bei Swiss Tennis mit leiser Klassierung (im Doppel untereinander), rechts fett die Sätze aus Sicht des TCO, bei Sieg in `--farbe-marke`, bei Niederlage in `--farbe-fehler`, dazu der *Vorlesetext* «gewonnen» bzw. «verloren»; Pfeil wie beim *Aufklappbereich*. Aufgeklappt, eingerückt unter die Namen: leise «gegen», die Gegner mit leiser Klassierung (im Doppel untereinander), bei einer Aufgabe darunter leise «Gegner hat aufgegeben» bzw. «TCO hat aufgegeben». Ohne eingetragenen TCO-Spieler (w.o.) steht statt der Namen «–», ohne gespielte Sätze statt der Sätze «w.o.» bei einer Aufgabe, sonst «–». Ohne Plakette und ohne Verein des Gegners |
 | Vorlesetext | `.vorlesen` | Text nur für Screenreader, auf dem Bildschirm unsichtbar; nur wo die Bedeutung sonst allein an einer Farbe hinge (z. B. *Partie*) |
-| Rangliste | `table.rangliste` | einzige Tabelle der Mitglieder-App: Kopfzeile *Rang · Team · Partien · Sätze* in `.leise`, Trennlinie `--farbe-linie`; Zahlen rechtsbündig in gleicher Ziffernbreite; Rang und Zahlen brechen nie um, der Teamname wird nie gekürzt (zu lang: er bricht um). Bei normaler Schrift ist jede Zeile einzeilig. Ist in der Karte weniger als `18rem` Platz (grosse Schrift oder schmaler Bildschirm; Container-Abfrage auf der Karte, der Wert steht nur in `basis.css`), wird jede Zeile zweizeilig: oben Rang und Team, darunter Partien und Sätze (in `--groesse-klein`); alle Zeilen teilen dieselben Spalten, die Rollen der Tabelle stehen ausdrücklich im Markup; die Zeile des eigenen Teams (`.rangliste-eigen`) fett auf `--farbe-marke-zart`. *Partien* = gewonnene : verlorene Einzelpartien |
+| Rangliste | `table.rangliste` | einzige Tabelle der Mitglieder-App: Kopfzeile *Rang · Team · Partien · Sätze* in `.leise`, Trennlinie `--farbe-linie`; Zahlen rechtsbündig in gleicher Ziffernbreite; Rang und Zahlen brechen nie um, der Teamname wird nie gekürzt (zu lang: er bricht um). Bei normaler Schrift ist jede Zeile einzeilig. Ist in der Karte weniger als `18rem` Platz (grosse Schrift oder schmaler Bildschirm; Container-Abfrage auf der Karte, der Wert steht nur in `karten.css`), wird jede Zeile zweizeilig: oben Rang und Team, darunter Partien und Sätze (in `--groesse-klein`); alle Zeilen teilen dieselben Spalten, die Rollen der Tabelle stehen ausdrücklich im Markup; die Zeile des eigenen Teams (`.rangliste-eigen`) fett auf `--farbe-marke-zart`. *Partien* = gewonnene : verlorene Einzelpartien |
 | Briefdruck | `.briefdruck` | nur Verwaltung: Druckansicht frisch erzeugter Briefe, siehe [Briefdruck](#briefdruck) |
 | Druckseite | `.druckseite` | nur Verwaltung: Auskunft über die Daten eines Mitglieds, siehe [Druckseite](#druckseite-auskunft); Klasse `.nicht-drucken` blendet unter `@media print` aus |
 | Anleitung | `.anleitung` | gezeichnetes Handy (`.anleitung-film`, ein `.anleitung-bild` pro Schritt), darunter die Taste (`.anleitung-taste`) und die nummerierten Schritte (`.anleitung-schritte`), am Schluss ein Eintrag „Fertig!" (`.anleitung-fertig`, mit ✓ statt Nummer); die Zeichnung ist für Screenreader verborgen, die Schritte tragen die Bedeutung; ein Schritt gehört zu genau einem Bild; in der Zeichnung nur Beschriftungen, die in der Hilfe von Apple bzw. Google belegt sind, sonst graue Balken (`.anleitung-eintrag.leer`); der Tipp-Kreis (`.anleitung-tipp`) zeigt, wo man tippt; Bewegung nach UI-09 |
@@ -622,7 +622,7 @@ Sie trennen nicht, weil die Tabelle auf schmalem Bildschirm ohnehin waagrecht sc
 
 Vorlagen für die ersten Bildschirme (Abnahme durch den Projektleiter in #13). Die CM-Anmeldung
 (Zähler) und die Reiter am PC sind dort überholt; massgebend ist der Text dieses Leitbilds. Sie binden `tokens.css`
-und `basis.css` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im Browser öffnen:
+und die Stil-Dateien unter `src/lib/design/` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im Browser öffnen:
 
 - [Mockups](ui-mockups/index.html): Login, erstes Login (Schritt 2 von 3), Startseite mit
   Reitern, CM-Anmeldung, Mitgliederverwaltung am PC

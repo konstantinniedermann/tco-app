@@ -1,0 +1,120 @@
+/*
+ * Grundstil und Bausteine von MyTCO — Regeln: docs/ui-leitbild.md.
+ * Nur Tokens aus tokens.css (var(--…)) und relative Einheiten; die CI prüft das (design-festwerte).
+ * Neue Bausteine erst ins Leitbild, dann hierher.
+ * Das Stylesheet liegt in zehn Dateien unter src/lib/design/; Reihenfolge der Importe in
+ * src/routes/+layout.svelte ist verbindlich (spätere Regeln übersteuern frühere):
+ * grundlagen, rahmen, bedienelemente, karten, verwaltung, anleitung, uebergaenge, pc-layout,
+ * druck, verlauf. Teil 1 von 10: Grundstil und Bedienung wie in einer App.
+ */
+
+/*
+ * Grundstil — html setzt keine Schriftgrösse, damit die Systemeinstellung wirkt (UI-02).
+ * Einzige Ausnahme iPhone/iPad: -apple-system-body übernimmt die Dynamic-Type-Grösse.
+ * -webkit-touch-callout gibt es nur auf iOS; ohne diese Bedingung griffe die Regel auch in
+ * Safari am Mac und setzte dort 13 statt 16 px.
+ */
+@supports (font: -apple-system-body) and (-webkit-touch-callout: default) {
+	html {
+		font: -apple-system-body;
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: var(--schrift-text);
+	font-size: var(--groesse-text);
+	line-height: var(--zeilenhoehe-text);
+	color: var(--farbe-text);
+	background: var(--farbe-hintergrund);
+	/* Lange deutsche Wörter trennen statt abschneiden, auch bei grosser Schrift (UI-02) */
+	hyphens: auto;
+	overflow-wrap: break-word;
+}
+
+h1,
+h2 {
+	line-height: var(--zeilenhoehe-titel);
+	margin: 0 0 var(--abstand-2);
+}
+
+h1 {
+	font-size: var(--groesse-titel);
+	color: var(--farbe-marke);
+}
+
+h2 {
+	font-size: var(--groesse-gross);
+	margin-top: var(--abstand-5);
+}
+
+p {
+	margin: 0 0 var(--abstand-4);
+}
+
+a {
+	color: var(--farbe-marke);
+	text-decoration: underline;
+}
+
+:focus-visible {
+	outline: var(--fokus-breite) solid var(--farbe-marke);
+	outline-offset: var(--fokus-abstand);
+}
+
+/* Auf grünen Flächen wäre ein grüner Rahmen unsichtbar (UI-03) */
+.kopf :focus-visible,
+.seitenleiste :focus-visible {
+	outline-color: var(--farbe-marke-hell);
+}
+
+/*
+ * Bedienung wie in einer App (Leitbild «Bewegung und Bedienung»): MyTCO ist immer hell, kein
+ * grauer Tipp-Blitz (dafür Gedrückt-Zustände bei den Bausteinen), Doppeltipp zoomt nicht
+ * (zwei Finger schon), die Schrift bläht sich im Querformat nicht auf.
+ */
+:root {
+	color-scheme: light;
+}
+
+html {
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
+/* Bedienelemente lassen sich nicht markieren und öffnen beim langen Drücken kein Link-Menü */
+.kopf,
+.reiter,
+.taste-haupt,
+.taste-neben,
+.zurueck,
+a.kachel,
+.klappe-titel,
+.umschalter {
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none;
+}
+
+a:active {
+	background-color: var(--farbe-marke-zart);
+}
+
+/* Auf grünen Flächen wäre das helle Grün unter weisser Schrift kaum lesbar */
+.kopf a:active,
+.seitenleiste a:active {
+	background-color: transparent;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}

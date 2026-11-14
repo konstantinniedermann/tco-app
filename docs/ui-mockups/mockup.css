@@ -1,6 +1,6 @@
 /*
  * Nur Geräterahmen und Anordnung der Mockups. Farben, Schrift und Bausteine kommen
- * ausschliesslich aus src/lib/design/tokens.css und basis.css (docs/ui-leitbild.md).
+ * ausschliesslich aus src/lib/design/tokens.css und den Stil-Dateien daneben (docs/ui-leitbild.md).
  */
 .mockup-seite {
 	padding: 24px;
