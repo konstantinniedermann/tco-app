@@ -3,25 +3,13 @@
 	import { resolve } from '$app/paths';
 	import { formatiereZeitpunkt } from '../../../lib/anlass/zeit.ts';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
-	import { ladeAnlaesseAdmin, type AnlassZeile } from '../../../lib/verwaltung/anlass-api.ts';
-	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
+	import type { PageProps } from './$types';
 
-	let { data } = $props();
-	let zeilen = $state<AnlassZeile[]>([]);
-	let fehler = $state<string | null>(null);
-	let geladen = $state(false);
-
-	$effect(() => {
-		void lade();
-	});
-
-	async function lade() {
-		const a = await ladeAnlaesseAdmin();
-		if (await leiteUm(a)) return;
-		geladen = true;
-		if (a.art === 'ok') zeilen = a.daten;
-		else fehler = MELDUNG.stoerung;
-	}
+	// Die Liste lädt `+page.ts` vor dem Anzeigen; `null` heisst «nicht geladen» (Störung).
+	let { data }: PageProps = $props();
+	const zeilen = $derived(data.zeilen ?? []);
+	const fehler = $derived(data.zeilen === null ? MELDUNG.stoerung : null);
+	const anzahl = $derived(`${zeilen.length} ${zeilen.length === 1 ? 'Anlass' : 'Anlässe'}`);
 </script>
 
 <svelte:head>
@@ -32,7 +20,7 @@
 	<h1>Anlässe</h1>
 </Seitenkopf>
 <p class="leise" role="status">
-	{#if geladen}{zeilen.length} {zeilen.length === 1 ? 'Anlass' : 'Anlässe'}{/if}
+	{anzahl}
 </p>
 
 {#if data.darfSchreiben.mitglieder}
@@ -45,7 +33,7 @@
 	<p class="fehler" role="alert">{fehler}</p>
 {/if}
 
-{#if geladen && !fehler && zeilen.length === 0}
+{#if !fehler && zeilen.length === 0}
 	<p>Noch keine Anlässe.</p>
 {:else if zeilen.length > 0}
 	<div class="tabelle">

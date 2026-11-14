@@ -10,6 +10,7 @@ import { load as profilEmail } from '../../src/routes/profil/email/+page.ts';
 import { load as verwaltungLayout } from '../../src/routes/verwaltung/+layout.ts';
 import { load as verwaltungEinstieg } from '../../src/routes/verwaltung/+page.ts';
 import { load as anlass } from '../../src/routes/verwaltung/anlaesse/[id]/+page.ts';
+import { load as anlaesse } from '../../src/routes/verwaltung/anlaesse/+page.ts';
 import { load as briefe } from '../../src/routes/verwaltung/briefe/+page.ts';
 import { load as fairgate } from '../../src/routes/verwaltung/fairgate/+page.ts';
 import { load as mitglied } from '../../src/routes/verwaltung/mitglieder/[id]/+page.ts';
@@ -618,6 +619,13 @@ const LISTEN: Liste[] = [
 		load: turniere,
 		pfad: '/verwaltung/turniere',
 		abfrage: '/api/admin/turniere',
+		daten: (zeilen) => ({ zeilen })
+	},
+	{
+		name: 'anlaesse',
+		load: anlaesse,
+		pfad: '/verwaltung/anlaesse',
+		abfrage: '/api/admin/anlaesse',
 		daten: (zeilen) => ({ zeilen })
 	}
 ];
