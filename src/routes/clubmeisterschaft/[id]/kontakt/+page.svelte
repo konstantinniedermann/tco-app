@@ -8,6 +8,7 @@
 	} from '../../../../lib/cm/api.ts';
 	import { NACHRICHT_MAX, NACHRICHT_NUR_LESEN, blaseKopfText } from '../../../../lib/cm/anzeige.ts';
 	import { MELDUNG } from '../../../../lib/login/anmelden.ts';
+	import { leiteUmNachAktion } from '../../../../lib/login/waechter.ts';
 	import Zurueck from '../../../../lib/ui/Zurueck.svelte';
 	import type { PageProps } from './$types';
 
@@ -64,7 +65,7 @@
 				nachladen();
 			}
 		} else if (r.art === 'abgemeldet') {
-			window.location.assign('/login');
+			await leiteUmNachAktion(r, 'ohne-mailcode', 'ganz-neu');
 		} else {
 			fehler = MELDUNG.stoerung;
 		}

@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { leiteUmBeimLaden } from '../../lib/login/waechter.ts';
 import { ladeFairgate } from '../../lib/verwaltung/mitglieder-api.ts';
 import { ladeZugang } from '../../lib/verwaltung/zugang-api.ts';
 import { rechte, startziel, umleitung } from '../../lib/verwaltung/umleiten.ts';
@@ -12,8 +13,7 @@ import type { LayoutLoad } from './$types';
 export const load: LayoutLoad = async ({ fetch, url, depends, parent }) => {
 	depends('app:fairgate');
 	const [z, { ansicht }] = await Promise.all([ladeZugang(fetch), parent()]);
-	if (z.art === 'abgemeldet') redirect(307, '/login');
-	if (z.art === 'kein-admin') redirect(307, '/');
+	leiteUmBeimLaden(z, 'verwaltung-zugang');
 	if (z.art !== 'ok') error(503, 'Die Verwaltung lässt sich gerade nicht öffnen.');
 	const { bestaetigt, rollen } = z.daten;
 	const aufBestaetigen = url.pathname === '/verwaltung/bestaetigen';

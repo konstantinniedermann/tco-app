@@ -1,4 +1,5 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
+import { leiteUmBeimLaden } from '../../../../../../lib/login/waechter.ts';
 import {
 	ladeAnmeldungen,
 	ladeDoppel,
@@ -45,9 +46,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
 					: null
 		};
 	}
-	if (a.art === 'abgemeldet') redirect(307, '/login');
-	if (a.art === 'kein-admin') redirect(307, '/');
-	if (a.art === 'unbestaetigt') redirect(307, '/verwaltung/bestaetigen');
+	leiteUmBeimLaden(a, 'verwaltung');
 	if (a.art === 'ok' || a.art === 'nicht-gefunden') error(404, 'Diese Kategorie gibt es nicht.');
 	error(503, 'Die Kategorie lässt sich gerade nicht laden.');
 };

@@ -37,6 +37,7 @@
 	import Zurueck from '../../../lib/ui/Zurueck.svelte';
 	import { istKlappeOffen, merkeKlappe } from '../../../lib/ui/klappe.ts';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
+	import { leiteUmNachAktion } from '../../../lib/login/waechter.ts';
 	import { KLASSIERUNGEN, klassierungName } from '../../../lib/turnier/klassierung.ts';
 	import { datumLang, statusText } from '../../../lib/verwaltung/turnier-anzeige.ts';
 	import type { PageProps } from './$types';
@@ -134,7 +135,7 @@
 			return true;
 		}
 		if (r.art === 'nicht-gefunden') await goto(resolve('/'));
-		else if (r.art === 'abgemeldet') await goto(resolve('/login'));
+		else if (r.art === 'abgemeldet') await leiteUmNachAktion(r);
 		return false;
 	}
 
@@ -161,7 +162,7 @@
 			await tick();
 			const erstes = (['klassierung', 'geschlecht', 'jahrgang'] as const).find((f) => r.felder[f]);
 			if (erstes) angabenForm?.querySelector<HTMLElement>(`[data-feld="${erstes}"]`)?.focus();
-		} else if (r.art === 'abgemeldet') await goto(resolve('/login'));
+		} else if (r.art === 'abgemeldet') await leiteUmNachAktion(r);
 		else fehler = MELDUNG.stoerung;
 		laeuft = false;
 	}
@@ -225,7 +226,7 @@
 				kommentarFeld?.focus();
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'voll':
 			case 'geschlossen':
@@ -266,7 +267,7 @@
 				await fokusBei(k.id);
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'voll':
 			case 'geschlossen':
@@ -298,7 +299,7 @@
 				await fokusBei(k.id);
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'geschlossen':
 				fehler = FEHLER.geschlossen;
@@ -344,7 +345,7 @@
 				await fokusNachAnfrage(a.kategorieId);
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'voll':
 			case 'geschlossen':
@@ -384,7 +385,7 @@
 				await fokusNachAnfrage();
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'geschlossen':
 				fehler = FEHLER.geschlossen;
@@ -415,7 +416,7 @@
 				await fokusBei(k.id);
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'geschlossen':
 				fehler = FEHLER.geschlossen;
@@ -460,7 +461,7 @@
 				suchtextFeld?.focus();
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'geschlossen':
 				suchtextDialog?.close();

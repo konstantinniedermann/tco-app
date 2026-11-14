@@ -1,4 +1,5 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
+import { leiteUmBeimLaden } from '../../../lib/login/waechter.ts';
 import { ladeBriefe } from '../../../lib/verwaltung/mitglieder-api.ts';
 import type { PageLoad } from './$types';
 
@@ -7,8 +8,6 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ fetch }) => {
 	const a = await ladeBriefe(fetch);
 	if (a.art === 'ok') return { zeilen: a.daten };
-	if (a.art === 'abgemeldet') redirect(307, '/login');
-	if (a.art === 'kein-admin') redirect(307, '/');
-	if (a.art === 'unbestaetigt') redirect(307, '/verwaltung/bestaetigen');
+	leiteUmBeimLaden(a, 'verwaltung');
 	error(503, 'Die Liste lässt sich gerade nicht laden.');
 };

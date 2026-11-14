@@ -25,6 +25,7 @@
 	import { anredeName, nameText } from '../../../../../lib/name.ts';
 	import Name from '../../../../../lib/ui/Name.svelte';
 	import { MELDUNG } from '../../../../../lib/login/anmelden.ts';
+	import { leiteUmNachAktion } from '../../../../../lib/login/waechter.ts';
 	import { klassierungName } from '../../../../../lib/turnier/klassierung.ts';
 	import { datumLang } from '../../../../../lib/verwaltung/turnier-anzeige.ts';
 	import type { PageProps } from './$types';
@@ -74,7 +75,7 @@
 				if (r.art === 'ok') {
 					treffer = r.daten;
 					suchFehler = false;
-				} else if (r.art === 'abgemeldet') await goto(resolve('/login'));
+				} else if (r.art === 'abgemeldet') await leiteUmNachAktion(r);
 				else suchFehler = true;
 			},
 			sofort ? 0 : 250
@@ -128,7 +129,7 @@
 				k = neu;
 			} else await zurCmSeite();
 		} else if (r.art === 'nicht-gefunden') await goto(resolve('/'));
-		else if (r.art === 'abgemeldet') await goto(resolve('/login'));
+		else if (r.art === 'abgemeldet') await leiteUmNachAktion(r);
 	}
 
 	function anfragenTippen(t: PartnerTreffer) {
@@ -151,7 +152,7 @@
 				await zurCmSeite(`Anfrage an ${nameText(t.name, 'vorname-zuerst')} gesendet.`);
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'schon-angefragt':
 				fehler = `Du hast ${nameText(t.name, 'vorname-zuerst')} schon angefragt.`;
@@ -200,7 +201,7 @@
 				knoepfe[t.mitgliedId]?.focus();
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'geschlossen':
 				fehler = FEHLER.geschlossen;
@@ -244,7 +245,7 @@
 				kommentarFeld?.focus();
 				return;
 			case 'abgemeldet':
-				await goto(resolve('/login'));
+				await leiteUmNachAktion(r);
 				return;
 			case 'voll':
 			case 'geschlossen':

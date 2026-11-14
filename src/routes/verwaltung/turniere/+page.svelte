@@ -2,26 +2,14 @@
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
-	import { ladeTurniere, type TurnierListe } from '../../../lib/verwaltung/turnier-api.ts';
 	import { datumKurz, statusText } from '../../../lib/verwaltung/turnier-anzeige.ts';
-	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
+	import type { PageProps } from './$types';
 
-	let { data } = $props();
-	let zeilen = $state<TurnierListe>([]);
-	let fehler = $state<string | null>(null);
-	let geladen = $state(false);
-
-	$effect(() => {
-		void lade();
-	});
-
-	async function lade() {
-		const a = await ladeTurniere();
-		if (await leiteUm(a)) return;
-		geladen = true;
-		if (a.art === 'ok') zeilen = a.daten;
-		else fehler = MELDUNG.stoerung;
-	}
+	// Die Liste lädt `+page.ts` vor dem Anzeigen; `null` heisst «nicht geladen» (Störung).
+	let { data }: PageProps = $props();
+	const zeilen = $derived(data.zeilen ?? []);
+	const fehler = $derived(data.zeilen === null ? MELDUNG.stoerung : null);
+	const anzahl = $derived(`${zeilen.length} ${zeilen.length === 1 ? 'Turnier' : 'Turniere'}`);
 </script>
 
 <svelte:head>
@@ -32,7 +20,7 @@
 	<h1>Clubmeisterschaft</h1>
 </Seitenkopf>
 <p class="leise" role="status">
-	{#if geladen}{zeilen.length} {zeilen.length === 1 ? 'Turnier' : 'Turniere'}{/if}
+	{anzahl}
 </p>
 
 {#if data.darfSchreiben.cm}
@@ -45,7 +33,7 @@
 	<p class="fehler" role="alert">{fehler}</p>
 {/if}
 
-{#if geladen && !fehler && zeilen.length === 0}
+{#if !fehler && zeilen.length === 0}
 	<p>Noch keine Turniere.</p>
 {:else if zeilen.length > 0}
 	<div class="tabelle">

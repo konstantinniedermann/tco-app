@@ -1,4 +1,4 @@
-import type { AnsichtRolle } from '../lib/verwaltung/zugang-api.ts';
+import { ladeSitzung } from '../lib/login/sitzung.ts';
 import type { LayoutLoad } from './$types';
 
 export const ssr = false;
@@ -13,20 +13,12 @@ export const prerender = false;
 // Seitenwechsel neu, damit der Reiter gleich nach dem Login steht (die Login-Seiten wechseln
 // ohne `refreshAll()` zur Startseite).
 export const load: LayoutLoad = async ({ fetch, url }) => {
-	let ansicht: AnsichtRolle | null = null;
-	let interclub = false;
-	let angemeldet = false;
-	try {
-		const antwort = await fetch('/api/sitzung');
-		if (antwort.ok) {
-			const sitzung = (await antwort.json()) as { ansicht?: AnsichtRolle; interclub?: boolean };
-			ansicht = sitzung.ansicht ?? null;
-			interclub = sitzung.interclub === true;
-			angemeldet = true;
-		}
-	} catch {
-		// Netz weg: kein Band; die Seiten melden die Störung selbst.
-	}
-	if (ansicht !== null || !angemeldet) void url.pathname;
+	// Netz weg: kein Band; die Seiten melden die Störung selbst. Angemeldet heisst: Erfolg mit
+	// lesbarem Körper, der nicht `null` ist (sonst prüft der nächste Wechsel neu, wie vorher).
+	const r = await ladeSitzung(fetch);
+	const sitzung = r.art === 'ok' && r.daten !== undefined && r.daten !== null ? r.daten : null;
+	const ansicht = sitzung?.ansicht ?? null;
+	const interclub = sitzung?.interclub === true;
+	if (ansicht !== null || sitzung === null) void url.pathname;
 	return { ansicht, interclub };
 };

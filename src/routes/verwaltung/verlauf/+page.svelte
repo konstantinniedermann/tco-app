@@ -1,44 +1,24 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
-	import { ladeVerlauf, type VerlaufEintrag } from '../../../lib/verwaltung/mitglieder-api.ts';
+	import type { VerlaufEintrag } from '../../../lib/verwaltung/mitglieder-api.ts';
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import { aktionText, zeitText } from '../../../lib/verwaltung/anzeige.ts';
-	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
+	import type { PageProps } from './$types';
 
-	// «?mitglied=<id>» zeigt nur die Einträge dieses Mitglieds.
-	const mitglied = $derived.by(() => {
-		const roh = page.url.searchParams.get('mitglied');
-		return roh !== null && /^\d+$/.test(roh) ? Number(roh) : undefined;
-	});
-	let zeilen = $state<VerlaufEintrag[]>([]);
+	// Den Verlauf lädt `+page.ts` vor dem Anzeigen, auch nach einem Wechsel des Filters (Adresse);
+	// `null` heisst «nicht geladen» (Störung). Dann bleibt der zuletzt geladene Stand stehen.
+	let { data }: PageProps = $props();
+	const mitglied = $derived(data.mitglied);
+	let zuletzt: VerlaufEintrag[] = [];
+	const zeilen = $derived.by(() => (zuletzt = data.zeilen ?? zuletzt));
+	const fehler = $derived(data.zeilen === null ? MELDUNG.stoerung : null);
 	// Pfad «Mitglieder › Nachname, Vorname › Änderungsverlauf»: Der Name steht in jeder Zeile des
-	// Verlaufs. Bis sie da sind (oder wenn es keine gibt), steht «Mitglied» – der Pfad ist sofort
-	// da, der Titel rutscht nicht nach, und der Rückweg fehlt nie.
+	// Verlaufs. Gibt es keine, steht «Mitglied» – der Titel rutscht nicht nach, und der Rückweg
+	// fehlt nie.
 	const name = $derived(
 		zeilen.find((z) => z.mitglied.id === mitglied)?.mitglied.name ?? 'Mitglied'
 	);
-	let fehler = $state<string | null>(null);
-	let geladen = $state(false);
-
-	$effect(() => {
-		const id = mitglied;
-		let aktuell = true;
-		ladeVerlauf({ mitglied: id }).then(async (a) => {
-			if (!aktuell || (await leiteUm(a))) return;
-			geladen = true;
-			if (a.art === 'ok') {
-				zeilen = a.daten;
-				fehler = null;
-			} else {
-				fehler = MELDUNG.stoerung;
-			}
-		});
-		return () => {
-			aktuell = false;
-		};
-	});
 </script>
 
 <svelte:head>
@@ -96,6 +76,6 @@
 		</tbody>
 	</table>
 </div>
-{#if geladen && zeilen.length === 0 && !fehler}
+{#if zeilen.length === 0 && !fehler}
 	<p class="leise">Noch keine Einträge.</p>
 {/if}

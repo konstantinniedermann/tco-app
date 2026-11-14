@@ -20,6 +20,7 @@ import {
 	konto,
 	mitglied,
 	nachricht,
+	sitzung,
 	turnier
 } from '../../../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../../../src/lib/server/turnier/angaben.ts';
@@ -399,6 +400,17 @@ export async function legeEhemaligesAn(
 
 export async function beendeAlleSitzungen(kontoId: number): Promise<void> {
 	await hole().dienst.beendeAlleSitzungen(kontoId);
+}
+
+/**
+ * Bestätigt die Verwaltung für alle Sitzungen des Kontos direkt in der Datenbank, wie es der
+ * Mail-Code auf «Verwaltung öffnen» täte; ohne Mail (Budget je Adresse, Mailpit).
+ */
+export async function bestaetigeVerwaltungDirekt(kontoId: number): Promise<void> {
+	await hole()
+		.db.update(sitzung)
+		.set({ adminBestaetigtAm: new Date() })
+		.where(eq(sitzung.kontoId, kontoId));
 }
 
 type Treffer = { messages: { ID: string }[] };

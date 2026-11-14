@@ -1,7 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import { resolve } from '$app/paths';
 import { holeInterclubBegegnung } from '../../../../lib/interclub/api.ts';
-import { holeSpeicher, leseMailanfrage } from '../../../../lib/login/mailanfrage.ts';
+import { leiteUmBeimLaden } from '../../../../lib/login/waechter.ts';
 import type { PageLoad } from './$types';
 
 // Seite einer Begegnung (UI-Leitbild). Läuft nur im Browser (ssr = false). Eine unbekannte oder
@@ -13,10 +13,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
 	const zumTeam = resolve('/interclub/[id]', { id: String(id) });
 	if (!Number.isSafeInteger(begegnung) || begegnung <= 0) redirect(307, zumTeam);
 	const r = await holeInterclubBegegnung(id, begegnung, fetch);
-	if (r.art === 'abgemeldet') {
-		const wartend = leseMailanfrage(holeSpeicher(), Date.now());
-		redirect(307, wartend ? '/login/mail' : '/login');
-	}
+	leiteUmBeimLaden(r, 'mitglied');
 	if (r.art === 'nicht-gefunden') redirect(307, zumTeam);
 	if (r.art !== 'ok') error(503, 'Die Begegnung lässt sich gerade nicht laden.');
 	return { begegnung: r.daten };

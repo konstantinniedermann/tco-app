@@ -8,6 +8,15 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.22.1 — Ein Anmelde-Wächter für alle Seiten (Refactoring Schritt 15)
+
+- Fehlende Sitzung, Rolle oder Bestätigung behandelt eine gemeinsame Wächter-Funktion
+  (`src/lib/login/waechter.ts`), in allen 30 Ladefunktionen und nach einer Aktion; die Sitzung
+  kommt über `ladeSitzung`. Die Ziele bleiben, wie sie waren; die drei Interclub-Seiten (#81) sind
+  aufgenommen.
+- Die vier Listen der Verwaltung (Turniere, Anlässe, Mitglieder, Verlauf) laden vor dem Anzeigen:
+  Sie erscheinen einen Augenblick später und gleich gefüllt (E-48).
+
 ## 0.22.0 — Interclub-Einzelpartien (Teil 2)
 
 - Interclub, Teil 2: Jede gespielte Begegnung eines TCO-Teams hat eine eigene Seite mit den

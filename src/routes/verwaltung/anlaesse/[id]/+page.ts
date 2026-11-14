@@ -1,4 +1,5 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
+import { leiteUmBeimLaden } from '../../../../lib/login/waechter.ts';
 import { ladeAnlassAdmin } from '../../../../lib/verwaltung/anlass-api.ts';
 import { ladeMitteilungen } from '../../../../lib/verwaltung/mitteilung-api.ts';
 import type { PageLoad } from './$types';
@@ -13,9 +14,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
 		ladeMitteilungen({ art: 'anlass', anlassId: id }, fetch)
 	]);
 	if (a.art === 'ok') return { detail: a.daten, mitteilungen: m.art === 'ok' ? m.daten : null };
-	if (a.art === 'abgemeldet') redirect(307, '/login');
-	if (a.art === 'kein-admin') redirect(307, '/');
-	if (a.art === 'unbestaetigt') redirect(307, '/verwaltung/bestaetigen');
+	leiteUmBeimLaden(a, 'verwaltung');
 	if (a.art === 'nicht-gefunden') error(404, 'Diesen Anlass gibt es nicht.');
 	error(503, 'Der Anlass lässt sich gerade nicht laden.');
 };
