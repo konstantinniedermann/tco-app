@@ -1,31 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import { STATUS_ALLEIN, rufeAb, woerterAus, type Holen, type Vertrag } from './abruf.ts';
-import {
-	FEHLERWOERTER,
-	STATUS_DES_WORTS,
-	type FehlerStatus,
-	type Fehlerkoerper,
-	type Fehlerwort
-} from './fehler.ts';
+import { FEHLERWOERTER, STATUS_DES_WORTS, type Fehlerwort } from './fehler.ts';
+import { holer, json, ungeprueft } from '../../tests/hilfen/abruf.ts';
 
-type Aufruf = { pfad: string; init: RequestInit };
-
-function holer(antwort: Response | Error) {
-	const aufrufe: Aufruf[] = [];
-	const holen: Holen = async (pfad, init) => {
-		aufrufe.push({ pfad, init });
-		if (antwort instanceof Error) throw antwort;
-		return antwort;
-	};
-	return { aufrufe, holen };
-}
-
-// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an.
-type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
-const json = <S extends number>(status: S, inhalt: Koerper<S>) => Response.json(inhalt, { status });
-
-/** Absichtlich ausserhalb der Liste: Antworten, die der Server nie so sendet. */
-const ungeprueft = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
 const unlesbar = (status: number) => new Response('kein JSON', { status });
 const leer = (status: number) => new Response(null, { status });
 

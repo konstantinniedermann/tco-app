@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { holer, json, type Koerper } from '../../../tests/hilfen/verwaltung-abruf.ts';
+import { holer, json, type Koerper } from '../../../tests/hilfen/abruf.ts';
 import {
 	ladeMitglieder,
 	ladeMitglied,
