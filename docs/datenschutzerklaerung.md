@@ -23,9 +23,10 @@ MyTCO ist die Mitglieder-App des Tennis-Club Olten (TCO). Fragen zum Datenschutz
 Lizenznummer und Klassierung, deine Anmeldungen zur Clubmeisterschaft (im Doppel auch Anfragen an Partner), deine Nachrichten an die Turnierleitung, Resultate und Lizenzanträge, deine An- oder
 Abmeldung zu Anlässen wie der Generalversammlung mit einer freiwilligen Bemerkung. Deine Grunddaten übernimmt
 der Verein aus seiner Mitgliederliste. Legt die Verwaltung einen Anlass an, speichert MyTCO, wer ihn
-angelegt hat, damit sich Rückfragen klären lassen.
+angelegt hat, damit sich Rückfragen klären lassen. Spielst du Interclub, übernimmt MyTCO von Swiss Tennis
+deine Einzelpartien mit Name, Klassierung, Platz in der Rangliste und deiner Nummer bei Swiss Tennis.
 
-**Wozu:** für dein Konto, die Clubmeisterschaft, Anlässe, Lizenzanträge und Benachrichtigungen, die
+**Wozu:** für dein Konto, die Clubmeisterschaft, die Interclub-Resultate, Anlässe, Lizenzanträge und Benachrichtigungen, die
 du selbst einschaltest. Für nichts anderes.
 
 **Wer sieht was:**
@@ -67,6 +68,9 @@ du selbst einschaltest. Für nichts anderes.
 - Den Spielplan des Finalwochenendes sehen alle, auch ohne Login [**Vorschlag K-39**].
 - Die Kalenderdatei eines Anlasses (Titel, Zeit, Ort, Einladung) ist über ihren Link auch ohne
   Login abrufbar; sie enthält keine Angaben zu Personen.
+- Alle eingeloggten Mitglieder sehen die Interclub-Resultate der TCO-Teams, auch die Einzelpartien mit Name und
+  Klassierung der TCO-Spieler, auch von Junioren. MyTCO übernimmt sie von Swiss Tennis, wo sie öffentlich sind,
+  und zeigt nicht mehr als dort. Bei den Gegnern stehen ebenfalls Name und Klassierung.
 - Swiss Tennis erhält Anmeldungen, Resultate und Lizenzanträge.
 
 **Wo:** Die Daten liegen bei Infomaniak in der Schweiz; E-Mails versendet [E-Mail-Dienst].
@@ -81,12 +85,14 @@ Daten bleiben noch eine Frist lang, falls du zurückkommst [Frist, **Vorschlag K
 dann gelöscht. Löscht der Verein dein Mitglied, zum Beispiel auf deinen Wunsch, ist dein Konto
 sofort gesperrt, und deine Daten werden nach einer Woche gelöscht. In beiden Fällen bleibt dein
 Name in vergangenen Resultaten und bei deinen Anmeldungen zur Clubmeisterschaft; die Turniergeschichte ist bei Swiss Tennis ohnehin öffentlich. Deine An- oder Abmeldung zu einem Anlass löschen wir ein Jahr
-nach Beginn des Anlasses [**Vorschlag K-50**].
+nach Beginn des Anlasses [**Vorschlag K-50**]. Interclub-Resultate bleiben über die Saisons, wie bei Swiss Tennis.
 
 Auf Wunsch erhältst du eine Auskunft über alle Daten, die wir von dir gespeichert haben.
 Änderungen, die du bei anderen Mitgliedern ausgelöst hast, stehen nicht darin, weil sie andere
 betreffen. Von der Clubmeisterschaft stehen nur bestätigte Anmeldungen darin; über Wildcard-Anträge,
 zurückgezogene Anmeldungen und dein Gespräch mit der Turnierleitung geben dir die CM-Admins Auskunft.
+Interclub-Resultate stehen nicht darin, weil sie nicht an deinem Konto hängen; du findest sie in MyTCO
+und bei Swiss Tennis.
 
 **Login:** Du loggst dich mit einem Einmal-Code ein, nicht mit einem Passwort. Danach merkt sich
 dein Gerät das Login mit einem Cookie, bis du MyTCO ein Jahr nicht genutzt hast oder dich

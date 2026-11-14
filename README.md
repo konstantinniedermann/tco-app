@@ -19,6 +19,8 @@ Turnier der Clubmeisterschaft mit Kategorien anlegen und Anmeldungen verwalten (
 entscheiden, von Hand anmelden) für die CM-Admins, Einzel- und Doppel-Anmeldung der Mitglieder
 zur Clubmeisterschaft (Wildcard-Antrag im Einzel, Doppel mit Partner-Anfrage),
 Mitteilungen per Push und E-Mail zu Anlässen und an den Verein für Mitglieder-Admins,
+Interclub-Resultate der TCO-Teams mit Einzelpartien im Reiter *IC* (Daten per Import-Befehl
+von Swiss Tennis),
 Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene Testdaten) sind
 gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
 den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* aus

@@ -88,6 +88,7 @@ import { holeDb } from './db/index.ts';
 import {
 	holeAdminDienste,
 	holeAnlassDienste,
+	holeInterclubDienste,
 	holeCmDienste,
 	holeLoginDienst,
 	holeMitteilungAdminDienste,
@@ -123,6 +124,12 @@ import {
 	postMail,
 	postMailCode
 } from './login/schnittstellen.ts';
+import {
+	getInterclub,
+	getInterclubBegegnung,
+	getInterclubTeam,
+	INTERCLUB_SCHNITTSTELLEN
+} from './interclub/schnittstellen.ts';
 import { getSitzung } from './sitzung/schnittstellen.ts';
 import {
 	MITTEILUNG_SCHNITTSTELLEN,
@@ -165,6 +172,7 @@ const EINSTIEGE = {
 	admin: holeAdminDienste,
 	mitteilungAdmin: holeMitteilungAdminDienste,
 	anlass: holeAnlassDienste,
+	interclub: holeInterclubDienste,
 	cm: holeCmDienste,
 	login: holeLoginDienst,
 	passkey: holePasskeyDienst,
@@ -268,6 +276,11 @@ const ROUTEN: Record<string, Partial<Record<Methode, Verdrahtung>> | typeof EIGE
 	'/api/cm/kategorien/[id]/anmeldung': { POST: [postCmAnmeldung, 'cm'] },
 	'/api/cm/kategorien/[id]/partner': { GET: [getCmPartner, 'cm'] },
 	'/api/cm/kategorien/[id]/wildcard': { POST: [postCmWildcard, 'cm'] },
+	'/api/interclub': { GET: [getInterclub, 'interclub'] },
+	'/api/interclub/teams/[id]': { GET: [getInterclubTeam, 'interclub'] },
+	'/api/interclub/teams/[id]/begegnungen/[begegnung]': {
+		GET: [getInterclubBegegnung, 'interclub']
+	},
 	'/api/kalender/[kennung]': { GET: [getKalender, 'anlass'] },
 	'/api/kontakt': EIGEN,
 	'/api/login/brief': { POST: [postBriefLogin, 'login'] },
@@ -308,6 +321,7 @@ const MITGLIEDER = new Set<unknown>(
 	[
 		CM_SCHNITTSTELLEN,
 		ANLASS_SCHNITTSTELLEN,
+		INTERCLUB_SCHNITTSTELLEN,
 		PROFIL_SCHNITTSTELLEN,
 		GESPRAECH_SCHNITTSTELLEN,
 		PASSKEY_SCHNITTSTELLEN,

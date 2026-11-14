@@ -148,7 +148,8 @@ describe('Ansicht als … (Server)', () => {
 			passkeyHinweis: false,
 			verwaltung: true,
 			ansicht: null,
-			nachrichtenOffen: 0
+			nachrichtenOffen: 0,
+			interclub: expect.any(Boolean)
 		});
 		expect((await schalteEin(a.s.d, a.konto, { rolle: 'mitglied' })).status).toBe(200);
 		const konto = (await lade(a.kennung))!;
@@ -159,7 +160,8 @@ describe('Ansicht als … (Server)', () => {
 			passkeyHinweis: false,
 			verwaltung: false,
 			ansicht: 'mitglied',
-			nachrichtenOffen: 0
+			nachrichtenOffen: 0,
+			interclub: expect.any(Boolean)
 		});
 		const z = await getZugang(a.s.d, ereignis({ method: 'GET', konto }));
 		expect([z.status, await z.json()]).toEqual([403, { fehler: 'kein-admin' }]);

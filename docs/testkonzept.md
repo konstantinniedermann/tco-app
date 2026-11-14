@@ -102,7 +102,7 @@ Tests, wo sie prüfbar sind (z. B. DS-06: keine Einmal-Codes im Log), ohne Pflic
 
 ## Testdaten
 
-Nur erfundene Daten (DS-08), nie echte Mitgliederdaten, auch nicht zur Fehlersuche und nie
+Nur erfundene Personendaten (DS-08); öffentliche Daten ohne Personennamen, etwa die Interclub-Resultate der Teams von Swiss Tennis, dürfen 1:1 verwendet werden. Nie echte Mitgliederdaten, auch nicht zur Fehlersuche und nie
 eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
 
 - Wenige erfundene Personen, von Hand geschrieben und fest im Repo, ohne Generator für Namen

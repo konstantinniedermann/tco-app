@@ -1,0 +1,184 @@
+{
+	"title": "Beispiel",
+	"subtitle": "07. Juni 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 2,
+		"sets": 4,
+		"games": 46
+	},
+	"awayTeam": {
+		"name": "Mümliswil",
+		"clubNumber": 2404,
+		"points": 4,
+		"sets": 9,
+		"games": 63
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900012,
+							"name": "Modell Luca R5 (1417)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900276,
+							"name": "Beispiel Leo R4 (933)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "4:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900277,
+							"name": "Platzhalter Maja R5 (1903)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900278,
+							"name": "Vorlage Noah R5 (1303)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:7", "6:2", "6:2"]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900269,
+							"name": "Schlägerkopf Edith R7 (6502)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900279,
+							"name": "Punktgewinn Paula R6 (2434)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "0:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900267,
+							"name": "Saitenbett Cleo R6 (2749)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900280,
+							"name": "Erfunden Remo R6 (2157)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:2", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900275,
+							"name": "Muster Kim R7 (6642)"
+						},
+						{
+							"id": 900274,
+							"name": "Matchball Jan R7 (5112)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900276,
+							"name": "Beispiel Leo R4 (933)"
+						},
+						{
+							"id": 900280,
+							"name": "Erfunden Remo R6 (2157)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "0:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900271,
+							"name": "Netzpfosten Greta R8 (8606)"
+						},
+						{
+							"id": 900273,
+							"name": "Ballkind Ida R8 (9075)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900278,
+							"name": "Vorlage Noah R5 (1303)"
+						},
+						{
+							"id": 900279,
+							"name": "Punktgewinn Paula R6 (2434)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "3:6", ""]
+		}
+	],
+	"leagueId": 10,
+	"groupId": 28
+}

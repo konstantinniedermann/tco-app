@@ -1,0 +1,126 @@
+{
+	"title": { "de": "Olten", "fr": "Olten" },
+	"leagueId": "17",
+	"clubId": "2202",
+	"group": 39,
+	"subtitle": { "de": "35+ 2L Herren", "fr": "35+ 2L Messieurs" },
+	"results": [
+		{
+			"id": "971813",
+			"round": "1",
+			"date": "02.05",
+			"homeTeamName": "Froburg Trimbach",
+			"visitTeamName": "Olten",
+			"homeTeamScore": 3,
+			"visitTeamScore": 6,
+			"encounterId": 971813
+		},
+		{
+			"id": "971810",
+			"round": "1",
+			"date": "03.05",
+			"homeTeamName": "Solothurn",
+			"visitTeamName": "Belchen",
+			"homeTeamScore": 7,
+			"visitTeamScore": 2,
+			"encounterId": 971810
+		},
+		{
+			"id": "971809",
+			"round": "2",
+			"date": "09.05",
+			"homeTeamName": "Solothurn",
+			"visitTeamName": "Froburg Trimbach",
+			"homeTeamScore": 2,
+			"visitTeamScore": 7,
+			"encounterId": 971809
+		},
+		{
+			"id": "971811",
+			"round": "2",
+			"date": "10.05",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Belchen",
+			"homeTeamScore": 6,
+			"visitTeamScore": 3,
+			"encounterId": 971811
+		},
+		{
+			"id": "971812",
+			"round": "3",
+			"date": "17.05",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Solothurn",
+			"homeTeamScore": 6,
+			"visitTeamScore": 3,
+			"encounterId": 971812
+		},
+		{
+			"id": "971814",
+			"round": "3",
+			"date": "17.05",
+			"homeTeamName": "Belchen",
+			"visitTeamName": "Froburg Trimbach",
+			"homeTeamScore": 2,
+			"visitTeamScore": 7,
+			"encounterId": 971814
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Olten", "teamId": 15907, "points": 18, "sets": "40 - 19" },
+		{ "rank": 2, "teamName": "Froburg Trimbach", "teamId": 15250, "points": 17, "sets": "35 - 25" },
+		{ "rank": 3, "teamName": "Solothurn", "teamId": 16269, "points": 12, "sets": "27 - 36" },
+		{ "rank": 4, "teamName": "Belchen", "teamId": 14500, "points": 7, "sets": "18 - 40" }
+	],
+	"tableau": {
+		"isPromotion": true,
+		"results": [
+			{
+				"id": "45996",
+				"round": "4",
+				"date": "06.06 - 13:30",
+				"encounterId": 45996,
+				"isPromotion": true,
+				"team": {
+					"home": {
+						"id": 15907,
+						"name": "* Olten",
+						"score": 5,
+						"group": { "id": 39, "rank": 1 },
+						"league": { "id": 17 }
+					},
+					"visitor": {
+						"id": 12570,
+						"name": "Neufeld BE 2",
+						"score": 4,
+						"group": { "id": 40, "rank": 2 },
+						"league": { "id": 17 }
+					}
+				}
+			},
+			{
+				"id": "46041",
+				"round": "5",
+				"date": "14.06 - 09:30",
+				"encounterId": 46041,
+				"isPromotion": true,
+				"team": {
+					"home": {
+						"id": 14356,
+						"name": "* Casino BS",
+						"score": 5,
+						"group": { "id": 0, "rank": 0 },
+						"league": { "id": 17 }
+					},
+					"visitor": {
+						"id": 15907,
+						"name": "Olten",
+						"score": 4,
+						"group": { "id": 0, "rank": 0 },
+						"league": { "id": 17 }
+					}
+				}
+			}
+		]
+	}
+}

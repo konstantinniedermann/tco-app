@@ -1,0 +1,103 @@
+{
+	"title": { "de": "Olten 1", "fr": "Olten 1" },
+	"leagueId": "9",
+	"clubId": "2202",
+	"group": 62,
+	"subtitle": { "de": "2L Herren", "fr": "2L Messieurs" },
+	"results": [
+		{
+			"id": "972340",
+			"round": "1",
+			"date": "03.05",
+			"homeTeamName": "Aarau 2",
+			"visitTeamName": "Muhen",
+			"homeTeamScore": 0,
+			"visitTeamScore": 9,
+			"encounterId": 972340
+		},
+		{
+			"id": "972338",
+			"round": "1",
+			"date": "02.05",
+			"homeTeamName": "Olten 1",
+			"visitTeamName": "Villmergen",
+			"homeTeamScore": 8,
+			"visitTeamScore": 1,
+			"encounterId": 972338
+		},
+		{
+			"id": "972341",
+			"round": "2",
+			"date": "09.05",
+			"homeTeamName": "Muhen",
+			"visitTeamName": "Villmergen",
+			"homeTeamScore": 9,
+			"visitTeamScore": 0,
+			"encounterId": 972341
+		},
+		{
+			"id": "972337",
+			"round": "2",
+			"date": "09.05",
+			"homeTeamName": "Olten 1",
+			"visitTeamName": "Aarau 2",
+			"homeTeamScore": 7,
+			"visitTeamScore": 2,
+			"encounterId": 972337
+		},
+		{
+			"id": "972339",
+			"round": "3",
+			"date": "24.05",
+			"homeTeamName": "Muhen",
+			"visitTeamName": "Olten 1",
+			"homeTeamScore": 9,
+			"visitTeamScore": 0,
+			"encounterId": 972339
+		},
+		{
+			"id": "972342",
+			"round": "3",
+			"date": "16.05",
+			"homeTeamName": "Villmergen",
+			"visitTeamName": "Aarau 2",
+			"homeTeamScore": 4,
+			"visitTeamScore": 5,
+			"encounterId": 972342
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Muhen", "teamId": 7676, "points": 27, "sets": "54 - 3" },
+		{ "rank": 2, "teamName": "Olten 1", "teamId": 7398, "points": 15, "sets": "31 - 27" },
+		{ "rank": 3, "teamName": "Aarau 2", "teamId": 13446, "points": 7, "sets": "17 - 40" },
+		{ "rank": 4, "teamName": "Villmergen", "teamId": 10949, "points": 5, "sets": "12 - 44" }
+	],
+	"tableau": {
+		"isPromotion": true,
+		"results": [
+			{
+				"id": "45486",
+				"round": "4",
+				"date": "07.06 - 09:00",
+				"encounterId": 45486,
+				"isPromotion": true,
+				"team": {
+					"home": {
+						"id": 5096,
+						"name": "* Schlieren",
+						"score": 5,
+						"group": { "id": 61, "rank": 1 },
+						"league": { "id": 9 }
+					},
+					"visitor": {
+						"id": 7398,
+						"name": "Olten 1",
+						"score": 1,
+						"group": { "id": 62, "rank": 2 },
+						"league": { "id": 9 }
+					}
+				}
+			}
+		]
+	}
+}

@@ -1,0 +1,75 @@
+{
+	"title": { "de": "Olten 2", "fr": "Olten 2" },
+	"leagueId": "11",
+	"clubId": "2202",
+	"group": 74,
+	"subtitle": { "de": "15&U Boys Liga B", "fr": "15&U Boys Ligue B" },
+	"results": [
+		{
+			"id": "433800",
+			"round": "1",
+			"date": "31.05",
+			"homeTeamName": "Olten 2",
+			"visitTeamName": "Porrentruy 1",
+			"homeTeamScore": 3,
+			"visitTeamScore": 0,
+			"encounterId": 433800
+		},
+		{
+			"id": "433797",
+			"round": "1",
+			"date": "17.06",
+			"homeTeamName": "Aarberg 1",
+			"visitTeamName": "Born Kappel",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 433797
+		},
+		{
+			"id": "433802",
+			"round": "2",
+			"date": "14.06",
+			"homeTeamName": "Porrentruy 1",
+			"visitTeamName": "Born Kappel",
+			"homeTeamScore": 3,
+			"visitTeamScore": 0,
+			"encounterId": 433802
+		},
+		{
+			"id": "433798",
+			"round": "2",
+			"date": "20.06",
+			"homeTeamName": "Aarberg 1",
+			"visitTeamName": "Olten 2",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 433798
+		},
+		{
+			"id": "433799",
+			"round": "3",
+			"date": "27.06",
+			"homeTeamName": "Porrentruy 1",
+			"visitTeamName": "Aarberg 1",
+			"homeTeamScore": 3,
+			"visitTeamScore": 0,
+			"encounterId": 433799
+		},
+		{
+			"id": "433801",
+			"round": "3",
+			"date": "24.06",
+			"homeTeamName": "Born Kappel",
+			"visitTeamName": "Olten 2",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 433801
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Olten 2", "teamId": 45330, "points": 9, "sets": "18 - 2" },
+		{ "rank": 2, "teamName": "Porrentruy 1", "teamId": 47370, "points": 6, "sets": "14 - 6" },
+		{ "rank": 3, "teamName": "Born Kappel", "teamId": 47647, "points": 3, "sets": "6 - 12" },
+		{ "rank": 4, "teamName": "Aarberg 1", "teamId": 47820, "points": 0, "sets": "0 - 18" }
+	]
+}

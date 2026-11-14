@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "14. Juni 2026",
+	"homeTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 0,
+		"sets": 0,
+		"games": 7
+	},
+	"awayTeam": {
+		"name": "Langenthal 1",
+		"clubNumber": 2149,
+		"points": 3,
+		"sets": 6,
+		"games": 36
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900310,
+							"name": "Netzpfosten Flurin R8 (24031)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900311,
+							"name": "Schiedsstuhl Greta R7 (15148)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "0:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900312,
+							"name": "Ballkind Hannes R8 (24949)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900313,
+							"name": "Matchball Ida R7 (16140)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "2:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900310,
+							"name": "Netzpfosten Flurin R8 (24031)"
+						},
+						{
+							"id": 900314,
+							"name": "Muster Jan R7 (18823)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900311,
+							"name": "Schiedsstuhl Greta R7 (15148)"
+						},
+						{
+							"id": 900313,
+							"name": "Matchball Ida R7 (16140)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "1:6", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 79
+}

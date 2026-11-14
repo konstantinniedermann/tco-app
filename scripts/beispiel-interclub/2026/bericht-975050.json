@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "17. Mai 2026",
+	"homeTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 9,
+		"sets": 18,
+		"games": 112
+	},
+	"awayTeam": {
+		"name": "Langenthal",
+		"clubNumber": 2149,
+		"points": 0,
+		"sets": 1,
+		"games": 39
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900167,
+							"name": "Skizze Gina R4 (2033)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900168,
+							"name": "Modell Hugo R7 (19571)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900169,
+							"name": "Schablone Ines R6 (9460)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900170,
+							"name": "Attrappe Jonas R7 (16331)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:1", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900171,
+							"name": "Kulisse Klara R7 (13217)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900172,
+							"name": "Spielball Luca R8 (28170)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:3", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900173,
+							"name": "Netzroller Mia R7 (11688)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900174,
+							"name": "Grundlinie Nico R9 (60990)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "6:4", "6:1"]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900175,
+							"name": "Aufschlag Olivia R6 (10115)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900176,
+							"name": "Vorhand Pascal R9 (31264)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900177,
+							"name": "Rückhand Rahel R7 (17237)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900178,
+							"name": "Volley Silvan R9 (32952)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900169,
+							"name": "Schablone Ines R6 (9460)"
+						},
+						{
+							"id": 900171,
+							"name": "Kulisse Klara R7 (13217)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900168,
+							"name": "Modell Hugo R7 (19571)"
+						},
+						{
+							"id": 900176,
+							"name": "Vorhand Pascal R9 (31264)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900167,
+							"name": "Skizze Gina R4 (2033)"
+						},
+						{
+							"id": 900173,
+							"name": "Netzroller Mia R7 (11688)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900170,
+							"name": "Attrappe Jonas R7 (16331)"
+						},
+						{
+							"id": 900174,
+							"name": "Grundlinie Nico R9 (60990)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:4", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900177,
+							"name": "Rückhand Rahel R7 (17237)"
+						},
+						{
+							"id": 900179,
+							"name": "Lob Tanja R7 (19707)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900172,
+							"name": "Spielball Luca R8 (28170)"
+						},
+						{
+							"id": 900178,
+							"name": "Volley Silvan R9 (32952)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "7:5", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 38
+}

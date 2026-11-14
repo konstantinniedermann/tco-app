@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "20. Juni 2026",
+	"homeTeam": {
+		"name": "Solothurn",
+		"clubNumber": 2239,
+		"points": 1,
+		"sets": 2,
+		"games": 22
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 2,
+		"sets": 4,
+		"games": 29
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900299,
+							"name": "Tiebreak Tanja R7 (6291)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900292,
+							"name": "Aufschlag Luca R7 (13550)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "0:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900300,
+							"name": "Doppelfehler Urs R9 (12550)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900295,
+							"name": "Volley Olivia R8 (27551)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:4", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900299,
+							"name": "Tiebreak Tanja R7 (6291)"
+						},
+						{
+							"id": 900300,
+							"name": "Doppelfehler Urs R9 (12550)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900292,
+							"name": "Aufschlag Luca R7 (13550)"
+						},
+						{
+							"id": 900294,
+							"name": "Rückhand Nico R9 (34628)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "3:6", ""]
+		}
+	],
+	"leagueId": 1,
+	"groupId": 39
+}

@@ -52,9 +52,11 @@
 ## Mitgliederdaten — Dauerverbote
 
 - Nie echte Mitgliederdaten (Namen, Adressen, Geburtsdaten, Lizenznummern, Kontaktdaten)
-  in Repo, Tests, Fixtures, Seed-Daten, Issues, Logs oder Screenshots. Testdaten sind erfunden.
+  in Repo, Tests, Fixtures, Seed-Daten, Issues, Logs oder Screenshots. Testdaten zu Personen
+  sind erfunden.
 - Nie Exporte aus Fairgate, Swiss Tennis oder Vereinslisten ins Repo kopieren. Echte
-  Vereinsunterlagen liegen nur im gitignorierten Ordner `intern/`.
+  Vereinsunterlagen liegen nur im gitignorierten Ordner `intern/`. Ausgenommen sind öffentliche
+  Daten ohne Personennamen (z. B. Interclub-Resultate der Teams); sie dürfen 1:1 in Tests und Seed.
 - Personen aus dem Verein werden in Doku und Issues mit ihrer Rolle benannt, nicht mit
   Namen. Ausnahme: das Original-Anforderungsdokument unter `docs/anforderungen/`.
 - Nie eine Funktion planen oder bauen, die Personendaten bearbeitet, ohne sie gegen
@@ -90,6 +92,7 @@ Abschluss des Plans.
 
 - **Feature-Stopp:** keine neue Funktion, keine Verhaltensänderung ausser der im Plan-Schritt
   beschriebenen. Geht ein Schritt nicht auf: abbrechen und melden, keinen Umweg bauen.
+- Ausnahme vom Feature-Stopp: #81 (E-47).
 - **Ein Schritt, ein Worktree, ein Branch** `refactor/schritt-NN` ab `origin/dev`; Schritte
   strikt nacheinander.
 - **Nach jedem Schritt der volle `make check`** auf dem committeten Stand, auch wenn nur ein

@@ -14,6 +14,8 @@ import type { AdminDienste } from './admin/rechte.ts';
 import { erstelleZugangDienst } from './admin/zugang.ts';
 import { ANLASS_SCHNITTSTELLEN } from './anlass/schnittstellen.ts';
 import type { AnlassDienste } from './anlass/typen.ts';
+import { INTERCLUB_SCHNITTSTELLEN } from './interclub/schnittstellen.ts';
+import type { InterclubDienste } from './interclub/typen.ts';
 import { CM_SCHNITTSTELLEN } from './cm/schnittstellen.ts';
 import type { CmDienste } from './cm/typen.ts';
 import { erstelleDb } from './db/index.ts';
@@ -77,6 +79,7 @@ function mitgliederDienste() {
 		jetzt: () => start
 	};
 	const anlass: AnlassDienste = { db, jetzt: () => start };
+	const interclub: InterclubDienste = { db, jetzt: () => start };
 	const profil: ProfilDienste = {
 		db,
 		wechsel: erstelleEmailWechselDienst({
@@ -100,6 +103,7 @@ function mitgliederDienste() {
 	return [
 		...eintraege('cm', CM_SCHNITTSTELLEN, cm),
 		...eintraege('anlass', ANLASS_SCHNITTSTELLEN, anlass),
+		...eintraege('interclub', INTERCLUB_SCHNITTSTELLEN, interclub),
 		...eintraege('profil', PROFIL_SCHNITTSTELLEN, profil),
 		...eintraege('gespraech', GESPRAECH_SCHNITTSTELLEN, cm),
 		...eintraege('passkey', PASSKEY_SCHNITTSTELLEN, passkey),
@@ -198,9 +202,9 @@ const OHNE_BEIDES_ANDERS: Record<string, [number, unknown]> = {};
 describe('Grundprüfung der Schnittstellen', () => {
 	// Hier nur Zählung und Ausnahmen. Dass keine Route an den Listen vorbei eine Funktion ruft,
 	// sichert der dritte Test in `routen.test.ts`.
-	test('die Listen der Mitglieder haben 36 Einträge, und jede Ausnahme gehört zu einem', () => {
+	test('die Listen der Mitglieder haben 39 Einträge, und jede Ausnahme gehört zu einem', () => {
 		const namen = mitgliederDienste().map(([name]) => name);
-		expect(namen).toHaveLength(36);
+		expect(namen).toHaveLength(39);
 		// Jede Ausnahme gehört zu einem Eintrag; eine veraltete Ausnahme fällt so auf.
 		for (const name of Object.keys(OHNE_SITZUNG_ANDERS)) expect(namen).toContain(name);
 	});

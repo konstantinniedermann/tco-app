@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "03. Juni 2026",
+	"homeTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 0,
+		"sets": 0,
+		"games": 8
+	},
+	"awayTeam": {
+		"name": "Homberg",
+		"clubNumber": 2270,
+		"points": 3,
+		"sets": 6,
+		"games": 36
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900332,
+							"name": "Vorhand Luca R9 (60866)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900333,
+							"name": "Rückhand Mia R7 (16753)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "1:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900334,
+							"name": "Volley Nico R9 (61456)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900335,
+							"name": "Lob Olivia R6 (9525)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "1:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900332,
+							"name": "Vorhand Luca R9 (60866)"
+						},
+						{
+							"id": 900336,
+							"name": "Stopp Pascal R9 (61044)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900333,
+							"name": "Rückhand Mia R7 (16753)"
+						},
+						{
+							"id": 900335,
+							"name": "Lob Olivia R6 (9525)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "1:6", ""]
+		}
+	],
+	"leagueId": 13,
+	"groupId": 63
+}

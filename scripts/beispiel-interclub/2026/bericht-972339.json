@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "24. Mai 2026",
+	"homeTeam": {
+		"name": "Muhen",
+		"clubNumber": 2183,
+		"points": 9,
+		"sets": 18,
+		"games": 109
+	},
+	"awayTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 0,
+		"sets": 1,
+		"games": 42
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900093,
+							"name": "Kulisse Mia R4 (1923)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900072,
+							"name": "Saitenbett Hannes R6 (9497)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:2", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900094,
+							"name": "Spielball Nico R5 (4310)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900086,
+							"name": "Fiktiv Fabio R6 (6447)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "7:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900095,
+							"name": "Netzroller Olivia R6 (5855)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900076,
+							"name": "Netzpfosten Leo R6 (8871)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900096,
+							"name": "Grundlinie Pascal R6 (9512)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900074,
+							"name": "Schlägerkopf Jan R6 (8088)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:4", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900097,
+							"name": "Aufschlag Rahel R7 (10284)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900084,
+							"name": "Erfunden Dario R7 (17811)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900098,
+							"name": "Vorhand Silvan R7 (19730)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900082,
+							"name": "Vorlage Beat R8 (20850)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:4", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900093,
+							"name": "Kulisse Mia R4 (1923)"
+						},
+						{
+							"id": 900097,
+							"name": "Aufschlag Rahel R7 (10284)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900086,
+							"name": "Fiktiv Fabio R6 (6447)"
+						},
+						{
+							"id": 900074,
+							"name": "Schlägerkopf Jan R6 (8088)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:2", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900095,
+							"name": "Netzroller Olivia R6 (5855)"
+						},
+						{
+							"id": 900096,
+							"name": "Grundlinie Pascal R6 (9512)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900072,
+							"name": "Saitenbett Hannes R6 (9497)"
+						},
+						{
+							"id": 900082,
+							"name": "Vorlage Beat R8 (20850)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "6:3", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900094,
+							"name": "Spielball Nico R5 (4310)"
+						},
+						{
+							"id": 900098,
+							"name": "Vorhand Silvan R7 (19730)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900076,
+							"name": "Netzpfosten Leo R6 (8871)"
+						},
+						{
+							"id": 900084,
+							"name": "Erfunden Dario R7 (17811)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "4:6", "10:6"]
+		}
+	],
+	"leagueId": 9,
+	"groupId": 62
+}

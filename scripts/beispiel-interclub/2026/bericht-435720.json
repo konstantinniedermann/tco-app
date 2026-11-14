@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "14. Juni 2026",
+	"homeTeam": {
+		"name": "Tela",
+		"clubNumber": 2387,
+		"points": 3,
+		"sets": 6,
+		"games": 36
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 0,
+		"sets": 0,
+		"games": 1
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900353,
+							"name": "Muster Ida R7 (7423)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900354,
+							"name": "Beispiel Jan R8 (9046)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900355,
+							"name": "Platzhalter Kim R8 (8961)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900356,
+							"name": "Vorlage Leo R9 (22771)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900353,
+							"name": "Muster Ida R7 (7423)"
+						},
+						{
+							"id": 900355,
+							"name": "Platzhalter Kim R8 (8961)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900357,
+							"name": "Punktgewinn Maja R9 (12155)"
+						},
+						{
+							"id": 900358,
+							"name": "Erfunden Noah R8 (10446)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:0", ""]
+		}
+	],
+	"leagueId": 14,
+	"groupId": 22
+}

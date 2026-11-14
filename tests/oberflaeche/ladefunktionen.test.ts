@@ -413,12 +413,14 @@ describe('Mitglieder-App: Prüfung der Sitzung (Fall G)', () => {
 	test('das Wurzel-Layout zeigt das Band nur mit Sitzung und laufender Ansicht', async () => {
 		const band = (a: Antwort) => ergebnis(() => wurzel(ereignis(stelle(a).holen, { pfad: '/' })));
 		expect(await band({ status: 200, koerper: { ...SITZUNG, ansicht: 'cm' } })).toEqual({
-			daten: { ansicht: 'cm' }
+			daten: { ansicht: 'cm', interclub: false }
 		});
-		expect(await band({ status: 200, koerper: SITZUNG })).toEqual({ daten: { ansicht: null } });
-		expect(await band({ status: 200 })).toEqual({ daten: { ansicht: null } });
-		expect(await band(ABGEMELDET)).toEqual({ daten: { ansicht: null } });
-		expect(await band(STOERUNG)).toEqual({ daten: { ansicht: null } });
-		expect(await band('netz-weg')).toEqual({ daten: { ansicht: null } });
+		expect(await band({ status: 200, koerper: SITZUNG })).toEqual({
+			daten: { ansicht: null, interclub: false }
+		});
+		expect(await band({ status: 200 })).toEqual({ daten: { ansicht: null, interclub: false } });
+		expect(await band(ABGEMELDET)).toEqual({ daten: { ansicht: null, interclub: false } });
+		expect(await band(STOERUNG)).toEqual({ daten: { ansicht: null, interclub: false } });
+		expect(await band('netz-weg')).toEqual({ daten: { ansicht: null, interclub: false } });
 	});
 });

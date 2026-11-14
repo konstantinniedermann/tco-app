@@ -95,7 +95,8 @@ const MITGLIEDER_EINSTIEGE = [
 	'holeProfilDienste',
 	'holeCmDienste',
 	'holeMitteilungDienste',
-	'holeAnlassDienste'
+	'holeAnlassDienste',
+	'holeInterclubDienste'
 ];
 const AUS_DIENSTEN = /(?:^|\/)lib\/server\/dienste\.ts$/;
 const ERLAUBT_DIENSTE = VERWALTUNGS_EINSTIEGE.join(' und ');

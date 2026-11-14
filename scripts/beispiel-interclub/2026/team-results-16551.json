@@ -1,0 +1,149 @@
+{
+	"title": { "de": "Olten", "fr": "Olten" },
+	"leagueId": "16",
+	"clubId": "2202",
+	"group": 18,
+	"subtitle": { "de": "35+ 1L Herren", "fr": "35+ 1L Messieurs" },
+	"results": [
+		{
+			"id": "973319",
+			"round": "1",
+			"date": "03.05",
+			"homeTeamName": "Zollikofen 2",
+			"visitTeamName": "Olten",
+			"homeTeamScore": 3,
+			"visitTeamScore": 6,
+			"encounterId": 973319
+		},
+		{
+			"id": "973322",
+			"round": "1",
+			"date": "02.05",
+			"homeTeamName": "Delémont",
+			"visitTeamName": "Breitenbach",
+			"homeTeamScore": 8,
+			"visitTeamScore": 1,
+			"encounterId": 973322
+		},
+		{
+			"id": "973320",
+			"round": "2",
+			"date": "10.05",
+			"homeTeamName": "Zollikofen 2",
+			"visitTeamName": "Delémont",
+			"homeTeamScore": 7,
+			"visitTeamScore": 2,
+			"encounterId": 973320
+		},
+		{
+			"id": "973323",
+			"round": "2",
+			"date": "10.05",
+			"homeTeamName": "Breitenbach",
+			"visitTeamName": "Olten",
+			"homeTeamScore": 2,
+			"visitTeamScore": 7,
+			"encounterId": 973323
+		},
+		{
+			"id": "973324",
+			"round": "3",
+			"date": "16.05",
+			"homeTeamName": "Breitenbach",
+			"visitTeamName": "Zollikofen 2",
+			"homeTeamScore": 3,
+			"visitTeamScore": 6,
+			"encounterId": 973324
+		},
+		{
+			"id": "973321",
+			"round": "3",
+			"date": "16.05",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Delémont",
+			"homeTeamScore": 6,
+			"visitTeamScore": 3,
+			"encounterId": 973321
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Olten", "teamId": 16551, "points": 19, "sets": "44 - 19" },
+		{ "rank": 2, "teamName": "Zollikofen 2", "teamId": 91, "points": 16, "sets": "33 - 27" },
+		{ "rank": 3, "teamName": "Delémont", "teamId": 10343, "points": 13, "sets": "28 - 31" },
+		{ "rank": 4, "teamName": "Breitenbach", "teamId": 6580, "points": 6, "sets": "16 - 44" }
+	],
+	"tableau": {
+		"isPromotion": true,
+		"results": [
+			{
+				"id": "45853",
+				"round": "4",
+				"date": "07.06 - 09:00",
+				"encounterId": 45853,
+				"isPromotion": true,
+				"team": {
+					"home": {
+						"id": 11195,
+						"name": "Lyss",
+						"score": 4,
+						"group": { "id": 17, "rank": 2 },
+						"league": { "id": 16 }
+					},
+					"visitor": {
+						"id": 16551,
+						"name": "* Olten",
+						"score": 5,
+						"group": { "id": 18, "rank": 1 },
+						"league": { "id": 16 }
+					}
+				}
+			},
+			{
+				"id": "45874",
+				"round": "5",
+				"date": "14.06 - 09:00",
+				"encounterId": 45874,
+				"isPromotion": true,
+				"team": {
+					"home": {
+						"id": 16551,
+						"name": "* Olten",
+						"score": 5,
+						"group": { "id": 0, "rank": 0 },
+						"league": { "id": 16 }
+					},
+					"visitor": {
+						"id": 13837,
+						"name": "Böckten",
+						"score": 4,
+						"group": { "id": 0, "rank": 0 },
+						"league": { "id": 16 }
+					}
+				}
+			},
+			{
+				"id": "45884",
+				"round": "6",
+				"date": "21.06 - 09:00",
+				"encounterId": 45884,
+				"isPromotion": true,
+				"team": {
+					"home": {
+						"id": 9967,
+						"name": "* Rotweiss BE",
+						"score": 7,
+						"group": { "id": 0, "rank": 0 },
+						"league": { "id": 16 }
+					},
+					"visitor": {
+						"id": 16551,
+						"name": "Olten",
+						"score": 2,
+						"group": { "id": 0, "rank": 0 },
+						"league": { "id": 16 }
+					}
+				}
+			}
+		]
+	}
+}

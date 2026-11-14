@@ -135,6 +135,90 @@ Fehler der App.
 
 ## Offen
 
+### 2026-11-13 — Interclub: Kleinigkeiten der Seite einer Begegnung
+
+**Thema:** Interclub
+
+**Fundort:** `src/routes/interclub/[id]/[begegnung]/+page.svelte`, `src/lib/server/interclub/swiss-tennis.ts` (`pruefeBericht`)
+
+**Beobachtung:** (1) «Einzelpartien noch nicht da» steht auch, wenn Swiss Tennis einen Bericht dauerhaft nicht hat (z. B. ältere Saisons nach `make ic-import JAHR=2021`). (2) Der Leertext «Nicht gespielt: Die Begegnung war nach den Einzeln entschieden.» erschiene auch im Reiter *Einzel*, wenn dort keine Partie steht (in den Daten 2026 nie). (3) Eine doppelte Position im selben Bericht meldet der Import als `stoerung` statt `form`; der alte Stand bleibt in beiden Fällen.
+
+**Ursprung:** #81 Teil 2, Code-Review (als klein eingestuft)
+
+**Einschätzung:** Beim Nachladen alter Saisons (1) prüfen; (2) und (3) nur bei Bedarf. Vorläufig.
+
+### 2026-11-13 — E2E «Reiter ist beim Antippen sofort aktiv» wackelt unter Last
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/bewegung.test.ts:93` (Zeitgrenze 500 ms auf `aria-current`)
+
+**Beobachtung:** Im vollen `make check` einmal rot auf Android, einzeln 3× grün (54/54). Die 500 ms reichen bei voller Last mit drei Workern knapp nicht.
+
+**Ursprung:** #81 Teil 2, `make check` vor dem Merge
+
+**Einschätzung:** Kein Fehler der App; bei Wiederholung die Zeitgrenze des Tests prüfen. Vorläufig.
+
+### 2026-11-13 — Interclub: Randfälle der Übersicht und Import ohne Zeitgrenze
+
+**Thema:** Interclub
+
+**Fundort:** `src/lib/server/interclub/ansicht.ts` (`ladeUebersicht`), `scripts/ic-import.ts`
+
+**Beobachtung:** (1) Ein Spiel, dessen Datum vorbei ist, aber noch ohne Resultat, fällt aus beiden Karten der Übersicht (letzte Resultate und nächste Spiele) und kann die Pausen-Karte falsch machen. (2) Spielen zwei TCO-Teams in derselben Gruppe gegeneinander, erscheint dieselbe Begegnung zweimal in «Letzte Resultate» (einmal als Sieg, einmal als Niederlage). (3) `scripts/ic-import.ts` hat keine Zeitgrenze für den Abruf (`fetch` ohne Timeout).
+
+**Ursprung:** #81 Teil 1, Reviews
+
+**Einschätzung:** Für Teil 3 (Aktualität, regelmässiger Abruf) prüfen: (1) und (2) betreffen die Ansicht in der Saison, (3) wird mit dem regelmässigen Abruf wichtig. Vorläufig.
+
+### 2026-11-13 — Rangliste läuft bei 320 px und grosser Schrift über
+
+**Thema:** Interclub
+
+**Fundort:** Rangliste auf der Team-Seite (`src/routes/interclub/[id]/+page.svelte`, Stile unter `src/lib/design/`)
+
+**Beobachtung:** Auf 320 px breiten Bildschirmen ab etwa 175 % Schrift läuft die Rangliste (zweizeilige Form) noch über: Die Köpfe «Partien» und «Sätze» passen nicht nebeneinander. Die E2E-Geräte (393/412 px, PC) sind nicht betroffen.
+
+**Ursprung:** #81 Teil 1, E2E (Task 9)
+
+**Einschätzung:** Randfall; Kopfbeschriftung kürzen oder die Spalten bei sehr schmalem Platz umbrechen. Vorläufig.
+
+### 2026-11-13 — Allgemeine Zeithilfe liegt im Thema Anlass
+
+**Thema:** Struktur
+
+**Fundort:** `src/lib/interclub/anzeige.ts` und `src/lib/server/interclub/ansicht.ts` importieren `utcZuZuerich` aus `src/lib/anlass/zeit.ts`
+
+**Beobachtung:** Die Umrechnung in Zürcher Zeit ist eine allgemeine Hilfe, liegt aber im Thema Anlass; Interclub hängt damit für die Zeit am Anlass.
+
+**Ursprung:** #81, Review von Task 8 (Oberfläche Interclub)
+
+**Einschätzung:** Kein Fehler. Bei Gelegenheit die Zürcher-Zeit-Funktionen in ein neutrales Modul (z. B. `src/lib/zeit.ts`) verschieben; betrifft auch die Abdeckungsliste in `vitest.config.ts`.
+
+### 2026-11-13 — Interclub: Bedeutung des «*» bei Auf- und Abstiegsspielen unklar
+
+**Thema:** Interclub
+
+**Fundort:** Swiss-Tennis-Schnittstelle `/interclub/team-results`, Feld `tableau.results[].team.home|visitor.name`
+
+**Beobachtung:** Ein führendes «* » im Teamnamen markiert nicht den Sieger nach Endstand: 65+ 1L Herren (Team 7396) zeigt «Neuenhof 2 4 : 2 * Olten». MyTCO speichert die Markierung, zeigt sie aber nicht und leitet Sieg/Niederlage aus dem Endstand ab.
+
+**Ursprung:** #81, Teil 1 (Session 13.11.2026), Abruf der Daten 2026
+
+**Einschätzung:** Vermutlich «bleibt in der Liga» bzw. «steigt auf» nach Reglement. Bei Gelegenheit gegen mytennis.ch prüfen; erst dann eine Anzeige (z. B. «steigt auf») erwägen.
+
+### 2026-11-13 — Interclub: Form noch nicht gespielter Begegnungen erst 2027 prüfbar
+
+**Thema:** Interclub
+
+**Fundort:** Swiss-Tennis-Schnittstelle `/interclub/team-results`, Felder `homeTeamScore`, `visitTeamScore`, `date`
+
+**Beobachtung:** 2026 sind alle Begegnungen gespielt; wie eine offene Begegnung aussieht (Endstand `null`, fehlend oder 0), ist nicht beobachtbar. Der Import nimmt `null` und fehlend als «noch offen» an. Auch die Saison 2027 liefert heute HTTP 500 («Upstream responded with HTTP 404»).
+
+**Ursprung:** #81, Teil 1 (Session 13.11.2026)
+
+**Einschätzung:** Sobald Swiss Tennis den Spielplan 2027 freischaltet (Frühling), einmal `make ic-import JAHR=2027` und die Antwort prüfen; spätestens in Session 3 von #81 (regelmässiger Abruf).
+
 ### 2026-11-12 — Kostenseite hinkt der Schätzung für den Vorstand nach
 
 **Thema:** Kosten

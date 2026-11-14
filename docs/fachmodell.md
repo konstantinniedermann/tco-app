@@ -111,6 +111,21 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 | **Resultat** | Spiel, Sätze, Sonderfall (keiner / w.o. / Aufgabe), Sieger, gemeldet von, gemeldet am, Status, bestätigt von | Sätze, gemeldet von, bestätigt von |
 | **Satz** | Games A, Games B, Tiebreak-Punkte (optional). Höchstens 3 Sätze, der dritte evtl. als Match-Tiebreak (Annahme K-41) | — |
 
+### Interclub
+
+Kopie der Antworten von Swiss Tennis ([ADR-011](adr/adr-011-interclub-schnittstelle-swiss-tennis.md)); die Spieler der Einzelpartien sind Personendaten ([Datenschutz](datenschutz.md)). Alte Saisons bleiben stehen.
+
+| Objekt | Attribute | P |
+|--------|-----------|---|
+| **Team (Interclub)** | Saison, Team-Nummer bei Swiss Tennis, Wettbewerb (*ic* Aktive und Senioren, *jic* Junioren), Teamname, Liga, Gruppe, Reihenfolge | — |
+| **Begegnung** | Saison, Team, Runde, Datum, Heim- und Gastteam, Endstand (Partien) sobald gespielt | — |
+| **Rangliste** | Saison, Team, Rang je Team der Gruppe mit Punkten, Partien und Sätzen | — |
+| **Auf-/Abstiegsspiel** | Saison, Team, Art (Aufstieg / Abstieg), Gegner und Resultat | — |
+| **Spielbericht** | Saison, Team, Begegnung (auch Auf-/Abstiegsspiel), Sätze und Games aus Sicht des TCO, ob der TCO Heimteam ist; fehlt, solange Swiss Tennis keine Einzelpartien hat | — |
+| **Einzelpartie** | Spielbericht, Einzel oder Doppel, Position, gespielte Sätze aus Sicht des TCO, Aufgabe (TCO oder Gegner hat aufgegeben bzw. w.o.); vorher entschiedene, nicht gespielte Partien fehlen | — |
+| **Spieler (Interclub)** | Einzelpartie, Seite (TCO / Gegner), Nummer (1, im Doppel 2), Name «Nachname Vorname» wie bei Swiss Tennis, Klassierung; nur bei TCO-Spielern die Personen- und die Rangliste-Nummer von Swiss Tennis | — |
+| **Stand je Saison und Wettbewerb** | Zeitpunkt des letzten erfolgreichen Abrufs; die Anzeige nennt ihn als «Stand» | — |
+
 ### Lizenzen
 
 | Objekt | Attribute | P |

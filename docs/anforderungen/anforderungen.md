@@ -18,7 +18,7 @@ Anforderungen bekommen die nächste freie Nummer im Bereich.
 in den [Abklärungen](../abklaerungen.md#beantwortet).
 
 **Etappe:** Milestone laut [Roadmap](../roadmap.md) — *Fundament*, *Mitglieder-Login*,
-*CM-Anmeldung*, *CM-Betrieb*, *Lizenzanträge* — oder *später* (Backlog / Optional).
+*CM-Anmeldung*, *CM-Betrieb*, *Interclub*, *Lizenzanträge* — oder *später* (Backlog / Optional).
 *Pilot* ist die Vorstufe von *Mitglieder-Login*: Deren Anforderungen stehen unter
 *Mitglieder-Login*, auch wenn ihr Issue im Milestone *Pilot* liegt.
 *durchgehend* heisst: gilt ab der ersten Etappe mit Produktcode für alles Weitere.
@@ -214,6 +214,12 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-01062027)).
 | A-SPIELPLAN-06 | Schnelles Verschieben, z. B. bei Regen | PDF 5e-i | später | später |
 | A-SPIELPLAN-07 | Spieler sehen den finalisierten Plan jederzeit, mit Änderungen live | PDF 5e-ii | später | später |
 | A-SPIELPLAN-08 | Der CM-Admin trägt per Klick auf ein Spiel das Resultat ein; es erscheint im Kalender der öffentlichen Seite | PDF 5e-ii | später | später |
+
+### INTERCLUB — Interclub-Resultate
+
+| ID | Anforderung | Quelle | Etappe | Status |
+|----|-------------|--------|--------|--------|
+| A-INTERCLUB-01 | Mitglieder sehen die Interclub-Resultate der Teams des Vereins (Aktive, Senioren, Junioren): Endstände, Spielplan, Tabelle, Auf-/Abstiegsspiele und die Einzelpartien jeder gespielten Begegnung mit Sätzen, Spieler beider Teams mit Name und Klassierung (Teil 2, [Datenschutz](../datenschutz.md)). Die Daten kommen von Swiss Tennis ([ADR-011](../adr/adr-011-interclub-schnittstelle-swiss-tennis.md), per Befehl `make ic-import`) | PL, [#81](https://github.com/konstantinniedermann/tco-app/issues/81) | Interclub | geplant |
 
 ## Nicht-funktionale Anforderungen
 

@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "09. Mai 2026",
+	"homeTeam": {
+		"name": "Tela 2",
+		"clubNumber": 2387,
+		"points": 5,
+		"sets": 10,
+		"games": 94
+	},
+	"awayTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 4,
+		"sets": 9,
+		"games": 85
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900200,
+							"name": "Vorlage Remo R5 (3753)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900201,
+							"name": "Erfunden Anna R6 (5349)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:7", "6:2", "6:2"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900202,
+							"name": "Testmann Beat R7 (12289)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900203,
+							"name": "Fiktiv Carla R7 (13149)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:7", "6:7", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900204,
+							"name": "Annahme Dario R7 (17388)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900205,
+							"name": "Entwurf Elena R9 (32048)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "6:1", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900206,
+							"name": "Skizze Fabio R9 (32835)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900207,
+							"name": "Modell Gina R7 (18022)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "0:6", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900208,
+							"name": "Schablone Hugo R8 (23986)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900209,
+							"name": "Attrappe Ines R9 (60852)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "6:4", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900210,
+							"name": "Kulisse Jonas R9 (61879)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900211,
+							"name": "Spielball Klara R8 (28836)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "4:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900204,
+							"name": "Annahme Dario R7 (17388)"
+						},
+						{
+							"id": 900208,
+							"name": "Schablone Hugo R8 (23986)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900201,
+							"name": "Erfunden Anna R6 (5349)"
+						},
+						{
+							"id": 900205,
+							"name": "Entwurf Elena R9 (32048)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "2:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900200,
+							"name": "Vorlage Remo R5 (3753)"
+						},
+						{
+							"id": 900212,
+							"name": "Netzroller Luca R8 (28511)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900203,
+							"name": "Fiktiv Carla R7 (13149)"
+						},
+						{
+							"id": 900207,
+							"name": "Modell Gina R7 (18022)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900202,
+							"name": "Testmann Beat R7 (12289)"
+						},
+						{
+							"id": 900210,
+							"name": "Kulisse Jonas R9 (61879)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900209,
+							"name": "Attrappe Ines R9 (60852)"
+						},
+						{
+							"id": 900211,
+							"name": "Spielball Klara R8 (28836)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:4", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 39
+}

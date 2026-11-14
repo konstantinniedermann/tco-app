@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "02. Mai 2026",
+	"homeTeam": {
+		"name": "Froburg Trimbach",
+		"clubNumber": 2259,
+		"points": 3,
+		"sets": 6,
+		"games": 61
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 6,
+		"sets": 14,
+		"games": 95
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900065,
+							"name": "Tiebreak Alma R5 (4233)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900044,
+							"name": "Punktgewinn Dario R6 (5438)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "2:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900066,
+							"name": "Doppelfehler Bruno R6 (6031)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900050,
+							"name": "Skizze Jonas R6 (8145)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:1", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900067,
+							"name": "Linienrichter Cleo R7 (10263)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900046,
+							"name": "Testmann Fabio R6 (9117)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "0:6", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900068,
+							"name": "Sandplatz Dominik R7 (16366)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900060,
+							"name": "Rückhand Urs R7 (10789)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "4:6", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900069,
+							"name": "Hallenbach Edith R8 (20613)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900052,
+							"name": "Schablone Luca R7 (12372)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "1:6", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900070,
+							"name": "Seitenwechsel Flurin R7 (15021)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900071,
+							"name": "Ballwand Greta R7 (15364)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "6:1", "6:4"]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900065,
+							"name": "Tiebreak Alma R5 (4233)"
+						},
+						{
+							"id": 900068,
+							"name": "Sandplatz Dominik R7 (16366)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900044,
+							"name": "Punktgewinn Dario R6 (5438)"
+						},
+						{
+							"id": 900046,
+							"name": "Testmann Fabio R6 (9117)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "2:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900066,
+							"name": "Doppelfehler Bruno R6 (6031)"
+						},
+						{
+							"id": 900070,
+							"name": "Seitenwechsel Flurin R7 (15021)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900050,
+							"name": "Skizze Jonas R6 (8145)"
+						},
+						{
+							"id": 900071,
+							"name": "Ballwand Greta R7 (15364)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "6:2", "10:7"]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900069,
+							"name": "Hallenbach Edith R8 (20613)"
+						},
+						{
+							"id": 900067,
+							"name": "Linienrichter Cleo R7 (10263)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900060,
+							"name": "Rückhand Urs R7 (10789)"
+						},
+						{
+							"id": 900052,
+							"name": "Schablone Luca R7 (12372)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "1:6", ""]
+		}
+	],
+	"leagueId": 17,
+	"groupId": 39
+}
