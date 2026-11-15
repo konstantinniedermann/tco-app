@@ -66,9 +66,42 @@ describe('pruefeRelease', () => {
 		).toEqual([]);
 	});
 
-	it('verlangt eine höhere Version, sobald das Release Code enthält', () => {
+	it('verlangt eine höhere Version, sobald das Release Code enthält, und rät zur neuen Nummer', () => {
+		// Späteres Release: main und dev tragen dieselbe Nummer, der Abgleich hat keine gesetzt.
 		expect(pruefeRelease({ ...sauber, versionMain: '0.2.0' })).toEqual([
-			expect.stringContaining('Release enthält Code, aber die Version bleibt 0.2.0 — beim Merge')
+			expect.stringContaining(
+				'Release enthält Code, aber die Version bleibt 0.2.0 — im Doku-Abgleich eine neue ' +
+					'Nummer setzen, aus «Unveröffentlicht» wird ihr Abschnitt'
+			)
+		]);
+	});
+
+	it('rät beim ersten Release ohne neue Nummer, eine zu setzen', () => {
+		// dev ist main schon voraus (Nummern der früheren Regel), «Unveröffentlicht» ist gefüllt.
+		const md = versionen('## Unveröffentlicht\n\n- Eintrag.', V020_NICHT, V010_NICHT);
+		expect(pruefeRelease({ ...sauber, versionen: md })).toEqual([
+			expect.stringContaining(
+				'noch keine neue Nummer für dieses Release gesetzt: neue Nummer setzen, aus ' +
+					'«Unveröffentlicht» wird ihr Abschnitt'
+			)
+		]);
+	});
+
+	it('rät nach einem späten Merge, seine Einträge in den Abschnitt der Nummer nachzurücken', () => {
+		// Der Abgleich hat 0.3.0 gesetzt, danach kam ein Merge mit Eintrag unter «Unveröffentlicht».
+		const md = versionen(
+			'## Unveröffentlicht\n\n- Später Merge.',
+			'## 0.3.0 — Release\n\n- Neu.',
+			'## 0.2.0 — Login\n\n- Login.',
+			V010_NICHT
+		);
+		expect(
+			pruefeRelease({ ...sauber, version: '0.3.0', versionMain: '0.2.0', versionen: md })
+		).toEqual([
+			expect.stringContaining(
+				'Nummer 0.3.0 schon für dieses Release gesetzt und ein Merge kam danach: seine Einträge ' +
+					'in den Abschnitt «## 0.3.0» nachrücken'
+			)
 		]);
 	});
 
@@ -91,7 +124,7 @@ describe('pruefeRelease', () => {
 		]);
 	});
 
-	it('lässt Zwischenstände ohne Tag und ohne Marker zu (jeder Merge nach dev hat seine Nummer)', () => {
+	it('lässt Zwischenstände ohne Tag und ohne Marker zu (Nummern der Merges nach der früheren Regel)', () => {
 		const md = versionen(
 			UNVEROEFFENTLICHT_LEER,
 			'## 0.2.1 — Korrektur\n\n- Fix.',
