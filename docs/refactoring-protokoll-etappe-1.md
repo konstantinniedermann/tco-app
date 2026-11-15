@@ -2,6 +2,10 @@
 
 # Refactoring MyTCO — Protokoll Etappe 1
 
+> **Abgeschlossen** (15.11.2026): Das Refactoring ist abgeschlossen. Diese Datei ist Geschichte
+> und wird nicht mehr nachgeführt; was gilt, steht in der [`CLAUDE.md`](../CLAUDE.md), in
+> [arc42](arc42.md), den [ADRs](adr/adr-index.md) und den [Beobachtungen](beobachtungen.md).
+
 Ausgelagert aus der [Refactoring-Analyse](refactoring-analyse.md) (E-60). Dort heisst dieser Teil
 weiter «Anhang D»; Verweise wie «D.3» oder «Anhang D.3» meinen die Abschnitte dieser Datei.
 Die Etappe ist abgeschlossen; diese Datei wird nicht mehr nachgeführt.
