@@ -8,6 +8,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Doku an den Code angeglichen: Bausteinsicht, Testkonzept, CI/CD, README und Übersicht nennen
+  Abruf-Baustein, Wächter, Dienste, Vertragstests und Test-Hilfen (Refactoring Schritt 21).
+  An der App ändert sich nichts.
+
 ## 0.22.10 — Die zwei Struktur-Prüfungen geschärft (Nachtrag zur Etappe 3)
 
 - Die Lint-Regel zu `fetch` fängt auch `window.fetch`, `globalThis.fetch` und `self.fetch`; ihre
