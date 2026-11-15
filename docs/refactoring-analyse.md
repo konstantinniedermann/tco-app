@@ -3557,11 +3557,29 @@ Vorbild ist der Nachtrag zur Etappe 2 in 7.5)
 - **Branch und Weg:** `refactor/nachtrag-etappe-3` ab `origin/dev`, Implementer als Subagent
   (Opus), läuft parallel zum Einarbeiten der Revision. Der Merge trägt Code und kostet nach der
   heutigen Regel eine Version (E-64: gilt bis Schritt 23). Danach ist Schritt 21 reine Doku.
-- **Status:** **läuft** (15.11.2026). [G am 15.11.2026: Branch vorhanden, ein Commit `59bb416`
+- **Status:** **erledigt** (15.11.2026, Version 0.22.10). [G am 15.11.2026: Branch vorhanden, ein Commit `59bb416`
   «test: Design-Prüfung liest import() im Svelte-Markup (Nachtrag Etappe 3)»; nur der Titel
   gelesen, nicht der Inhalt.] Nach dem Titel **fängt** die Prüfung `import()` im Markup, statt
   es nur als «nicht erfasst» zu führen, wie (1) es vorschlug; ob das trägt, beurteilt das Review.
-  Ergebnis, Review und Version trägt der Orchestrator hier nach.
+  **Umgesetzt** (15.11.2026, refactor-implementer; `test:` `59bb416`, `35350dd`, `c3c19eb`,
+  `3bed56f`; `docs:` `b2896a4`, `8c10e3e`, `bfe5e8e`): alle sechs Punkte. (1) Die Design-Prüfung
+  liest `import()` im Svelte-Markup mit dem Svelte-Parser, den sie schon nutzt (Lücke geschlossen,
+  nicht nur aufgeführt; drei neue Meldefälle vorher rot, Probe am Repo rot); (2) Pfad im
+  Kommentar; (3) eine Meldung für Oberfläche und Server; (4) zwei Fälle für Markup; (5) zweiter
+  Selektor für `window.fetch`, `globalThis.fetch`, `self.fetch` (auch mit `?.`), am Repo ohne
+  Meldung; weiter ungefangen: weitergereichtes `holen`, `fetch.call`/`apply`, Typ-Zusatz,
+  berechneter oder verschachtelter Zugriff; (6) Kopf von `grundlagen.css`, gebautes CSS laut
+  `make css-vergleich` gleich. Voller `make check` grün auf `bfe5e8e` (2484 Tests, E2E 524/64).
+  **Review (refactor-reviewer): ein Befund vor dem Merge, behoben** (`docs:` `0671555`,
+  Orchestrator): Die Liste «nicht erfasst» nannte `@import` im `<style>`-Block eines Bausteins
+  nicht (Probe des Reviewers blieb grün); jetzt steht es im Kommentar des Tests und in
+  `docs/ci-cd-und-release.md`. Sonst entspricht der Branch den sechs Punkten; wirksame
+  Konfiguration je Dateiart geprüft, drei Rot-Proben am Repo nachgestellt. **Merkpunkt für
+  Schritt 24 (aus dem Review):** Die Dauerregel «kein `<style>` in Bausteinen» setzt keine Prüfung
+  durch (`design-festwerte.ts` liest solche Blöcke nur auf Festwerte); ein Verbot schlösse die
+  `@import`-Lücke mit. Hinweis: Der Selektor meldet auch eine lokale Variable namens `self` oder
+  `window` mit einer Methode `fetch` (heute kein Treffer). Nach der Korrektur `origin/dev`
+  eingemergt und voller `make check` erneut; Merge als Version 0.22.10.
 
 | Nr. | Ziel | Dateien | Nutzen | Risiko | Absicherung | Voraussetzung | Modell | Weg | Nachmessen vorab | Status |
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
