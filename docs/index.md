@@ -1,7 +1,7 @@
 # Dokumentation MyTCO
 
-Die Doku entsteht vor dem Code. Was hier verlinkt ist, existiert; was noch fehlt, ist ein
-Issue im Milestone *Fundament*.
+Was hier verlinkt ist, existiert; was noch fehlt, ist ein Issue im Milestone seiner Etappe
+([Roadmap](roadmap.md)).
 
 ## Projekt
 
