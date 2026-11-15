@@ -188,7 +188,7 @@ Eine leichte Spannung, kein Widerspruch.
 E-89 behalten, weil er den Weg für Neues nennt. (2) Wenn es stört, in `issue-konventionen.md`
 «Doku des Branches nachgeführt» schreiben.
 
-### 2026-11-15 — Prüfung der Versionen: vier Ränder
+### 2026-11-15 — Prüfung der Versionen: drei Ränder
 
 **Thema:** Arbeitsweise
 
@@ -196,20 +196,21 @@ E-89 behalten, weil er den Weg für Neues nennt. (2) Wenn es stört, in `issue-k
 `scripts/pruefungen/release.ts` (Meldung «„Unveröffentlicht" ist nicht leer»); Skill
 `tco-branching` Schritt 4a, `docs/ci-cd-und-release.md`, ADR-012.
 
-**Beobachtung:** (1) Auch ein Revert mit Code braucht einen eigenen neuen Eintrag unter
-«Unveröffentlicht». (2) Eine Zeile, die wortgleich schon dort steht (etwa ein zweites
-«Abhängigkeiten aktualisiert»), zählt nicht als neu; der Push wird abgewiesen. (3) Die Meldung zu
+**Beobachtung:** (1) Eine Zeile, die wortgleich schon unter «Unveröffentlicht» steht (etwa ein
+zweites «Abhängigkeiten aktualisiert»), zählt nicht als neu; der Push wird abgewiesen. Dass ein
+Revert mit Code einen eigenen Eintrag braucht, steht schon im Skill und in
+`docs/ci-cd-und-release.md`; für die wortgleiche Zeile fehlt der Satz. (2) Die Meldung zu
 «Unveröffentlicht ist nicht leer» spricht von einer Version, die sich «von … auf … ändert», auch
 im ersten ihrer zwei Fälle, in dem für dieses Release noch keine Nummer gesetzt ist: beim ersten
-Release trägt `dev` schon 0.22.11 und `main` 0.20.5. (4) Beim ersten Release erkennt `make
+Release trägt `dev` schon 0.22.11 und `main` 0.20.5. (3) Beim ersten Release erkennt `make
 release-check` eine vergessene Nummer nicht, weil `dev` der Nummer von `main` schon voraus ist; die
 erste Nummer (0.23.0) steht nur in Skill, `docs/ci-cd-und-release.md` und ADR-012 (bewusst, E-81).
 
 **Ursprung:** Review von Schritt 23, Teil 3 (15.11.2026; `docs/refactoring-analyse.md`, G.4).
 
-**Einschätzung:** (1) und (2) lassen nichts Falsches durch, sie verlangen nur einen anders
-formulierten Eintrag. (3) verwirrt höchstens; die Meldung nennt beide Wege. (4) ist die einzige
-echte Lücke und gilt nur einmal. Spätestens beim ersten Release ansehen.
+**Einschätzung:** (1) lässt nichts Falsches durch, es verlangt nur einen anders formulierten
+Eintrag (einen Satz im Skill wert). (2) verwirrt höchstens; die Meldung nennt beide Wege. (3) ist
+die einzige echte Lücke und gilt nur einmal. Spätestens beim ersten Release ansehen.
 
 ### 2026-11-15 — Prüfung der Workflow-Rechte sieht Eingaben in `run:` nicht
 
