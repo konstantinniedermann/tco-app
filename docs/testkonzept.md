@@ -29,11 +29,14 @@ Fachlogik und wird über die Ende-zu-Ende-Tests und das Review geprüft. Reine L
 Das gilt auch für die Bausteine, die ohne Browser laufen: der Abruf-Baustein (`src/lib/abruf.ts`),
 der Wächter (`src/lib/login/waechter.ts`) und der Ablauf einer Aktion (`src/lib/cm/ablauf.ts`) haben
 je Einheitstests neben der Datei. Die Ladefunktionen (`+page.ts`, `+layout.ts`) prüft
-`tests/oberflaeche/ladefunktionen.test.ts`: je Ladefunktion, wohin sie bei fehlender Anmeldung,
-Rolle oder Bestätigung führt und was sie bei einer Störung zurückgibt. Die Abrufe laufen dort und in
-den Tests der Abruf-Module gegen eine Attrappe von `holen` (`tests/hilfen/abruf.ts`: `holer` und
-gestellte Antworten, deren Körper zur gemeinsamen Liste der Fehlerwörter in `src/lib/fehler.ts`
-passen müssen).
+`tests/oberflaeche/ladefunktionen.test.ts` mit gestellten Antworten: wohin sie bei fehlender
+Anmeldung, Rolle oder Bestätigung führen und was sie bei einer Störung zurückgeben. Er deckt das
+Wurzel-Layout, die Startseite, Profil, Interclub und die Verwaltung samt Layout; nicht darin stehen
+die Seiten der Clubmeisterschaft, `anlass/[id]` und die Seiten ohne Anmeldung (`datenschutz`, `hilfe`,
+`willkommen`), die über die Ende-zu-Ende-Tests laufen. Die Tests der Abruf-Module stellen
+`holen` über `tests/hilfen/abruf.ts` (`holer` und gestellte Antworten, deren Körper zur gemeinsamen
+Liste der Fehlerwörter in `src/lib/fehler.ts` passen müssen); der Ladefunktions-Test baut seine
+Antworten selbst.
 
 **Rechte:** Die Berechtigung prüft immer der Server (ADR-001), also wird sie dort getestet.
 Pro Schnittstelle gibt es einen Test, der jede Rolle durchspielt, auch ohne Login und mit
@@ -52,8 +55,9 @@ und werden rot, sobald eine Route oder ein Zusammenbau davon abweicht.
 - `src/lib/server/routen.test.ts` (Routen-Test): Jede `+server.ts` unter `src/routes/` steht in
   einer Tabelle, und jede Methode ruft genau ihre Schnittstellen-Funktion mit den Diensten ihres
   Einstiegs auf; Routen der Verwaltung rufen nur Einträge der Listen der Verwaltung, die übrigen nur
-  Listen der Mitglieder oder des Logins; der Name der Funktion beginnt mit der Methode (`get…` zu
-  GET, `post…` zu POST).
+  Listen der Mitglieder, dazu die fünf Schnittstellen von Login und Sitzung ohne Liste (`getSitzung`
+  und vier des Logins); der Name der Funktion beginnt mit der Methode (`get…` zu GET, `post…` zu
+  POST). Zwei Routen sind benannte Ausnahmen mit eigenem Test: `/api/kontakt` und `/api/status`.
 - `src/routes/api/bremsen.db.test.ts` (Bremsen-Test): Die Grenzen je Adresse und je IP zählen über
   alle Einstiege der Dienste zusammen (SI-04, SI-09).
 - `src/routes/api/mail-nur-an.db.test.ts`: Mit gesetztem `MAIL_NUR_AN` geht jede Mail über jeden
@@ -92,8 +96,8 @@ Löschen und Auskunft, Turnier und Kategorien,
 CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, Doppel mit Partner-Anfragen und Doppel-Verwaltung durch den CM-Admin, Kontaktdaten in den Anmeldelisten, Gespräch mit der Turnierleitung, Seite einer Kategorie, Navigation und Tiefe der Seiten, Titel in der Kopfleiste, Verwaltung am PC (klebender Seitenkopf, einzeilige Tabellen mit «Ändern»), dazu Bedienung (Wappen,
 Statusleiste, Fusszeile, Fokusrahmen). Drei Dateien halten das Verhalten der gemeinsamen Bausteine der
 Oberfläche fest: `waechter.test.ts` (wohin jede Adresse ohne Anmeldung, ohne Rolle oder ohne Bestätigung führt,
-auch nach abgelaufener Anmeldung mitten in einer Aktion, und dass die Listen der Verwaltung ihr erstes
-Laden einmal stellen), `cm-ablauf.test.ts` (Satz, Neuladen und Fokus nach jeder Aktion auf der CM-Seite
+auch nach abgelaufener Anmeldung mitten in einer Aktion; bei den vier Listen der Verwaltung bleibt eine
+Störung beim ersten Laden eine Meldung in der Seite, und die Mitgliederliste fragt beim Öffnen genau einmal), `cm-ablauf.test.ts` (Satz, Neuladen und Fokus nach jeder Aktion auf der CM-Seite
 der Mitglieder) und `anmeldungsliste-ablauf.test.ts` (die Rückfragen der Anmeldelisten der Verwaltung:
 Warnungen, «Trotzdem», Fehler, Folge-Satz). Später *Daten ergänzen* beim ersten Login (FR-02, noch
 geplant).
@@ -101,10 +105,11 @@ geplant).
 **Hilfen der Ende-zu-Ende-Tests** (`tests/e2e/hilfen/`): `login.ts` legt Konten, Mitglieder und
 Brief-Codes an, `turnier.ts` Turniere, Anmeldungen und Nachrichten, `anlass.ts` Anlässe, `mail.ts`
 liest Codes aus Mailpit, `seite.ts` bündelt die Prüfungen der Seite (Konsole, Barrierefreiheit,
-Warten aufs Vorladen), `geraet.ts` stellt Start vom Symbol und Install-Angebot nach, `passkey.ts`
+Warten aufs Vorladen, Pfad, Aktion wählen, Aufklappbereich), `geraet.ts` stellt Start vom Symbol und Install-Angebot nach, `passkey.ts`
 schaltet den virtuellen Authenticator ein; `verbindung.ts` hält Datenbank und Login-Dienst je
-Testprozess, `umgebung.ts` die Werte, die auch der Server bekommt. Daten legen sie über dieselbe
-Fachlogik an wie der Server und schicken nie eine Mail. Die Hilfen der Einheits- und
+Testprozess, `umgebung.ts` die Werte, die auch der Server bekommt. Konten, Turniere, Anlässe und
+Anmeldungen legen sie über die Fachlogik des Servers an, vieles andere (Rollen, Telefon, Austritt,
+Fristen) setzen sie direkt in der Datenbank; sie schicken nie eine Mail. Die Hilfen der Einheits- und
 Datenbanktests liegen unter `tests/hilfen/`: `mitglieder.ts` (Mitglied anlegen),
 `anfrage.ts` (Ereignis einer Route), `eigene-datenbank.ts` (eigene Datenbank einer Testdatei),
 `turnierjahre.ts` (Turnierjahr je Testdatei), `interclub.ts`, `passkey-pruefer.ts`, `abruf.ts` und die
@@ -172,9 +177,10 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
   `MYTCO_E2E_BUILD` in `vite.config.ts`) und löscht ihn danach: Ein anderer Build im selben Ordner
   gäbe dem laufenden Server sonst eine neue `version.json`, und SvelteKit lüde Fehlerseiten endlos
   neu.
-- Datenbanktests, die ein Turnier anlegen, nehmen ihr Turnierjahr aus `tests/hilfen/turnierjahre.ts`:
-  Jede Testdatei hat dort ihren eigenen Bereich von Jahren, kein Jahr gehört zwei Dateien. So trifft
-  kein Test das Jahr eines anderen, auch nicht parallel; eine neue Datei bekommt einen freien Bereich
+- Datenbanktests, die auf der gemeinsamen Test-Datenbank ein Turnier anlegen, nehmen ihr Turnierjahr
+  aus `tests/hilfen/turnierjahre.ts`: Jede Testdatei hat dort ihren eigenen Bereich von Jahren, kein
+  Jahr gehört zwei Dateien. So trifft kein Test das Jahr eines anderen, auch nicht parallel; Dateien
+  mit eigener Datenbank (`tests/hilfen/eigene-datenbank.ts`) können feste Jahre setzen; eine neue Datei bekommt einen freien Bereich
   (`turnierjahre.test.ts` prüft, dass sich keine zwei überlappen).
 - Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
   (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
