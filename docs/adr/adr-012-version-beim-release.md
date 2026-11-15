@@ -2,13 +2,10 @@
 
 # ADR-012: Eine Versionsnummer entsteht beim Release nach main, nicht beim Merge nach dev
 
-**Status:** Vorgeschlagen · **Datum:** 2026-11-15 · **Issue:** #80
+**Status:** Entschieden · **Datum:** 2026-11-15 · **Issue:** #80
 
-Der Kern (Option A unten) ist entschieden. Die Einzelheiten (wer die Nummer setzt, die Stufe,
-die ersten Nummern, die Prüfung des Eintrags, der Anlass zum Wiederaufnehmen) sind vorläufig,
-bis der Projektleiter sie bestätigt; sie stehen als E-71 bis E-81 in der
-[Refactoring-Analyse](../refactoring-analyse.md#8-entscheide). Mit der Bestätigung wird der
-Status «Entschieden».
+Bestätigt vom Projektleiter am Checkpoint vom 15.11.2026 (E-71 bis E-83 in der
+[Refactoring-Analyse](../refactoring-analyse.md#8-entscheide)).
 
 ## Kontext
 
@@ -44,7 +41,8 @@ oder Verwaltung etwas spürbar Neues bringt; Korrektur, wenn es nur Fehler beheb
 und Werkzeug ändert; Hauptversion nur im Auftrag des Projektleiters. Claude schlägt Nummer und
 Grund mit der Bitte um Freigabe vor; die Freigabe des Releases gilt auch für die Nummer. Der
 Abgleich setzt die Nummer nur bei einem Release mit Code; ein Release, das nur Doku enthält,
-lässt sie stehen.
+lässt sie stehen, und seine Einträge bleiben unter «Unveröffentlicht» bis zum nächsten
+Release mit Code.
 
 Begründung: Eine Nummer soll einen Stand benennen, den jemand bekommt; solange nur `main` ein
 solcher Stand ist, genügt eine Nummer je Release. Ablauf im Einzelnen:
