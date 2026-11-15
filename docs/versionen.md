@@ -8,6 +8,12 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.22.10 — Die zwei Struktur-Prüfungen geschärft (Nachtrag zur Etappe 3)
+
+- Die Lint-Regel zu `fetch` fängt auch `window.fetch`, `globalThis.fetch` und `self.fetch`; ihre
+  Meldung passt für Oberfläche und Server. Die Prüfung der Design-Dateien liest auch `import()` im
+  Markup der Bausteine. An der App ändert sich nichts (E-67).
+
 ## 0.22.9 — Zwei Struktur-Prüfungen: kein eigenes fetch, Reihenfolge der Design-Dateien (Refactoring Schritt 20a)
 
 - ESLint meldet jeden Aufruf von `fetch`

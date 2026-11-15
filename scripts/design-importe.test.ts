@@ -9,9 +9,11 @@ import { describe, expect, it } from 'vitest';
 // vollständig und in der Reihenfolge von REIHENFOLGE; `brief.css` nur im Briefdruck. Eine Datei im
 // Ordner, die in der Liste fehlt, und ein Eintrag ohne Datei sind ein Befund. Gelesen werden alle
 // Dateien unter src/ (auch Tests): Importe in Skripten und Svelte-Bausteinen (statisch, `export …
-// from`, `import()`, mit `?raw` und ähnlichem), dazu `@import` in CSS. Kommentare und Texte zählen
-// nicht. Nicht erfasst: `import.meta.glob`, ein berechneter Pfad, `<link>` im Markup und Lesen per
-// `readFileSync`; die vier Mockups unter docs/mockups/ und das Leitbild bleiben Handarbeit.
+// from`, `import()`, mit `?raw` und ähnlichem; in Bausteinen auch `import()` im Markup), dazu
+// `@import` in CSS-Dateien. Kommentare und Texte zählen nicht. Nicht erfasst: `import.meta.glob`,
+// ein berechneter Pfad, `<link>` im Markup, `@import` im `<style>`-Block eines Bausteins (solche
+// Blöcke verbietet die Bauregel der Oberfläche, geprüft wird das nicht) und Lesen per
+// `readFileSync`; die vier Mockups unter docs/ui-mockups/ und das Leitbild bleiben Handarbeit.
 
 const DESIGN = 'src/lib/design/';
 const LAYOUT = 'src/routes/+layout.svelte';
@@ -39,10 +41,15 @@ const REIHENFOLGE = [
 
 const ENDUNGEN = /\.(?:svelte|ts|js|mts|cts|mjs|cjs|css)$/;
 
+type Stelle = { start: number; end: number };
+
 /** Importierte Pfade einer Datei in der Reihenfolge, in der sie stehen. */
 function importeVon(pfad: string, inhalt: string): string[] {
-	const ausSkript = (text: string) =>
-		ts.preProcessFile(text, true, true).importedFiles.map((f) => f.fileName);
+	// Ein Stück Quelltext ab `ab` als Skript gelesen; `pos` zählt ab dem Anfang der Datei.
+	const ausSkript = (text: string, ab = 0) =>
+		ts
+			.preProcessFile(text, true, true)
+			.importedFiles.map((f) => ({ pos: ab + f.pos, quelle: f.fileName }));
 	if (pfad.endsWith('.css'))
 		return parseCss(inhalt)
 			.children.filter((k) => k.type === 'Atrule' && k.name === 'import')
@@ -50,16 +57,28 @@ function importeVon(pfad: string, inhalt: string): string[] {
 			.map((p) => /^(?:url\(\s*)?['"]?([^'")\s]+)/.exec(p)?.[1] ?? p);
 	if (pfad.endsWith('.svelte')) {
 		const ast = parse(inhalt, { modern: true, filename: pfad });
-		return [ast.module, ast.instance]
+		const skripte = [ast.module, ast.instance]
 			.filter((s) => s !== null && s !== undefined)
-			.sort((a, b) => a.start - b.start)
-			.flatMap((s) => {
-				// Der Parser setzt Anfang und Ende auch am Programm; die ESTree-Typen kennen sie nicht.
-				const { start, end } = s.content as unknown as { start: number; end: number };
-				return ausSkript(inhalt.slice(start, end));
-			});
+			// Der Parser setzt Anfang und Ende auch am Programm; die ESTree-Typen kennen sie nicht.
+			.map((s) => s.content as unknown as Stelle);
+		// Im Markup gibt es nur `import(…)` ({#await import(…)}, onclick={() => import(…)}); jeder
+		// solche Ausdruck wird wie ein Skript gelesen, damit dieselben Schreibweisen gelten.
+		return [...skripte, ...importAusdruecke(ast.fragment)]
+			.flatMap(({ start, end }) => ausSkript(inhalt.slice(start, end), start))
+			.sort((a, b) => a.pos - b.pos)
+			.map((s) => s.quelle);
 	}
-	return ausSkript(inhalt);
+	return ausSkript(inhalt).map((s) => s.quelle);
+}
+
+/** Die Ausdrücke `import(…)` im Markup eines Bausteins (Svelte-AST), in jeder Tiefe. */
+function importAusdruecke(knoten: unknown, gefunden: Stelle[] = []): Stelle[] {
+	if (typeof knoten !== 'object' || knoten === null) return gefunden;
+	const k = knoten as Partial<Stelle> & { type?: unknown };
+	if (k.type === 'ImportExpression' && k.start !== undefined && k.end !== undefined)
+		gefunden.push({ start: k.start, end: k.end });
+	else for (const wert of Object.values(knoten)) importAusdruecke(wert, gefunden);
+	return gefunden;
 }
 
 /** Datei unter src/lib/design/, auf die ein Import zeigt, sonst null. */
@@ -183,6 +202,13 @@ describe('Importe der Design-Dateien', () => {
 			]);
 		});
 
+		it('meldet ein import() im Markup des Layouts als zusätzliche Zeile', () => {
+			const mitMarkup = `${LAYOUT_HEUTE}{#await import('../lib/design/karten.css')}{/await}\n`;
+			expect(pruefeDesignImporte(gestellt({ [LAYOUT]: mitMarkup }))).toEqual([
+				`${LAYOUT}: Import von ${DESIGN}karten.css ist zu viel`
+			]);
+		});
+
 		it('liest die Schreibweisen $lib, /src und ?raw als dieselbe Datei', () => {
 			const zeilen = REIHENFOLGE.map((d, i) =>
 				i === 1
@@ -233,6 +259,16 @@ describe('Importe der Design-Dateien', () => {
 				'src/lib/ui/stil.ts',
 				"export { default } from '../design/druck.css?url';"
 			],
+			[
+				'ein import() im Markup ({#await})',
+				'src/lib/ui/Karte.svelte',
+				'<script lang="ts">\n\tlet { titel } = $props();\n</script>\n\n{#await import(\'$lib/design/karten.css\')}\n\t<p>{titel}</p>\n{/await}\n'
+			],
+			[
+				'ein import() in einem Ereignis im Markup',
+				'src/lib/ui/Karte.svelte',
+				"<button onclick={() => import('../design/druck.css')}>Drucken</button>\n"
+			],
 			['ein Test', 'src/lib/ui/stil.test.ts', "import '../design/druck.css';"],
 			[
 				'ein @import in einer Design-Datei',
@@ -272,6 +308,11 @@ describe('Importe der Design-Dateien', () => {
 				"<script>\n\timport 'paket/stil.css';\n\timport './eigen.css';\n</script>\n"
 			],
 			['ein Pfad im Text', "<script>\n\tconst pfad = '../design/karten.css';\n</script>\n"],
+			['ein import() als Text im Markup', "<p>import('../design/karten.css')</p>\n"],
+			[
+				'ein import() einer anderen Datei im Markup',
+				"{#await import('./Teil.svelte') then Teil}\n\t<Teil.default />\n{/await}\n"
+			],
 			[
 				'ein Pfad im Kommentar',
 				"<script>\n\t// import '../design/karten.css';\n</script>\n<!-- import '../design/karten.css' -->\n"

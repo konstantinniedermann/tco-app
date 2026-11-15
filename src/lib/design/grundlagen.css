@@ -1,7 +1,7 @@
 /*
  * Grundstil und Bausteine von MyTCO — Regeln: docs/ui-leitbild.md.
  * Nur Tokens aus tokens.css (var(--…)) und relative Einheiten; die CI prüft das (design-festwerte).
- * Neue Bausteine erst ins Leitbild, dann hierher.
+ * Neue Bausteine erst ins Leitbild; ihre Regeln kommen dann in die Datei ihres Bausteins (Liste unten).
  * Das Stylesheet liegt in zehn Dateien unter src/lib/design/; Reihenfolge der Importe in
  * src/routes/+layout.svelte ist verbindlich (spätere Regeln übersteuern frühere):
  * grundlagen, rahmen, bedienelemente, karten, verwaltung, anleitung, uebergaenge, pc-layout,

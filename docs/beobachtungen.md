@@ -135,6 +135,24 @@ Fehler der App.
 
 ## Offen
 
+### 2026-11-15 — Datenbanktest reisst die Zeitgrenze für die Verbindung (3 s)
+
+**Thema:** Tests
+
+**Fundort:** `src/routes/api/mail-nur-an.db.test.ts`, Test «Verwaltung: der Hinweis an die alte
+Adresse (SI-09, ohne Pool)»; `src/lib/server/db/index.ts` (`connectionTimeoutMillis: 3000`).
+
+**Beobachtung:** In einem vollen `make check` brach der Test mit «timeout exceeded when trying to
+connect» ab (in `gueltigeSitzungen`); der nächste Lauf auf demselben Stand war grün (2484 von
+2484). Der Branch änderte nur Kommentare und Doku.
+
+**Ursprung:** Refactoring, Nachtrag zur Etappe 3 (`docs/refactoring-analyse.md`, 7.6).
+
+**Einschätzung:** Kein Fehler der App. Vermutung: Last auf dem gemeinsamen Datenbank-Container
+(paralleler Prüflauf einer anderen Session oder Docker kurz nach dem Start); die Tests «ohne Pool»
+bauen je eine eigene Verbindung auf. Tritt es wieder auf, die Zeitgrenze für Tests höher setzen.
+Verwandt: der Eintrag vom 13.11.2026 zu «Liste mit Suche».
+
 ### 2026-11-14 — Die Regel «nicht über CSS-Klassen suchen» hält die Praxis nicht
 
 **Thema:** Tests
