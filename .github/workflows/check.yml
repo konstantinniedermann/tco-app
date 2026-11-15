@@ -500,7 +500,7 @@ jobs:
               *) echo "Letztes Release nicht lesbar: $vorher"; exit 1 ;;
             esac
           fi
-          # Alle Abschnitte seit dem letzten Release, denn jeder Merge nach dev mit Code hat seine Nummer.
+          # Alle Abschnitte seit dem letzten Release: meist einer, beim ersten auch die Nummern vor ADR-012.
           # Nur bei Live: Releases ohne Live-Auslieferung legen kein GitHub-Release an.
           bash scripts/ci/versionsnotizen.sh "$version" "$vorher" > "$RUNNER_TEMP/notizen.md"
           if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notizen.md"; then
