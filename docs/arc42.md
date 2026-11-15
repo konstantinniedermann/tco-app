@@ -72,6 +72,7 @@ flowchart LR
 | Grüner Stand | Der Pre-Push-Hook prüft einen schon grün geprüften Stand nicht noch einmal voll; die CI prüft jeden Push auf `dev` | [ADR-009](adr/adr-009-gruener-stand.md) |
 | Öffentliches Repo | Repo öffentlich: CI gratis, `main` geschützt; nie echte Mitgliederdaten im Repo | [ADR-010](adr/adr-010-repo-oeffentlich.md) |
 | Interclub | Der Server liest die Interclub-Daten von der nicht dokumentierten Schnittstelle von Swiss Tennis, ohne Anfrage; Kopie in der Datenbank | [ADR-011](adr/adr-011-interclub-schnittstelle-swiss-tennis.md) |
+| Struktur | Jeder gemeinsame Baustein hat einen Ort (`http.ts`, `dienste.ts`, `fehler.ts`, `admin/rechte.ts`, `abruf.ts`, `waechter.ts`, `design/`); ESLint und Prüfskripte halten Struktur und Importrichtung fest (Kapitel 5); vorgeschlagen, noch nicht entschieden | [ADR-013](adr/adr-013-gemeinsame-bausteine.md) |
 
 ## 5 Bausteinsicht
 
