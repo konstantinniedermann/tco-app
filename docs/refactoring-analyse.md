@@ -62,7 +62,8 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
   eigenen Dateien, siehe das Ende dieses Dokuments.] Anhang F ist das Protokoll der Etappe 3
   (F.1 bis F.6). **[geändert]** Die Etappe 3 ist abgeschlossen; Anhang F steht seit dem
   15.11.2026 in `docs/refactoring-protokoll-etappe-3.md` (E-60, ausgeführt vom Orchestrator). Das
-  Protokoll der Etappe 4 steht als Anhang G am Ende dieses Dokuments (G.1 Schritt 21).
+  Protokoll der Etappe 4 steht als Anhang G am Ende dieses Dokuments (G.1 Schritt 21, G.2
+  Schritt 22, G.3 Nachmessen Schritt 23).
 
 ## Stand und nächster Schritt
 
@@ -72,12 +73,12 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 |---|---|
 | **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt und gemergt (0.20.19). **Etappe 2:** Schritt 13 erledigt (zwei Läufe, Review je «ok», Version 0.20.20); Schritt 14 erledigt (Review «ok», Version 0.20.21); **Schritt 15 erledigt** (Läufe 1, 1b mit Interclub und 2; Review je «ok» am 14.11.2026, Version 0.22.1); **Schritt 16 erledigt** (CM-Seite; Review «ok» am 14.11.2026; die Doppel-Seite ist verworfen, F-30: A, E-51; Version 0.22.2); **Schritt 17 erledigt** (Review «ok» am 14.11.2026, Checkpoint E-21 erledigt: E-52, E-53; Version 0.22.4); **Schritt 18 erledigt** (Review «ok» nach einem Doku-Befund am 14.11.2026, Version 0.22.5). **Damit ist die Etappe 2 abgeschlossen**; Zwischenrevision und Checkpoint am Etappenende erledigt am 14.11.2026 (Abschnitt 1d, E-55 bis E-60) und in Zielbild und Plan eingearbeitet. **Etappe 3:** freigegeben (E-58), läuft ohne Halt mit Kurzbericht je Schritt (E-59); davor der Nachtrag zur Etappe 2 (7.5, Version 0.22.6). Schritt 19 erledigt (Version 0.22.7), Schritt 20 erledigt (zwei Läufe, Review je «ok», Version 0.22.8), **Schritt 20a erledigt** (Review «ok» am 14.11.2026, Version 0.22.9). **Damit ist die Etappe 3 abgeschlossen**; Zwischenrevision und Checkpoint am Etappenende erledigt am 15.11.2026 (Abschnitt 1e, E-64 bis E-70) und in Zielbild und Plan eingearbeitet. **Etappe 4:** Ablauf entschieden (E-66): davor der Nachtrag zur Etappe 3 (7.6, läuft), dann die Schritte 21 und 22 ohne Halt mit Kurzbericht, 23 und 24 als manuelle Sessions des Projektleiters, 25 als Abschluss durch den Projektleiter. [G am 15.11.2026: Der Nachtrag zur Etappe 3 ist gemergt (0.22.10); Schritt 21 ist umgesetzt, Review offen.] |
 | **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), 12a (0.20.19), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D). Etappe 2: 13 (0.20.20), 14 (0.20.21), 15 (0.22.1), 16 ohne die Doppel-Seite (0.22.2, Nachtrag 0.22.3), 17 (0.22.4), 18 (0.22.5), alle mit Review «ok» auf `dev` (Ergebnisse in 7.4, Protokolle in Anhang E); die CI auf `dev` ist zum Merge von Schritt 18 im Job «E2E (iphone)» rot (Fokus-Wackler, siehe «Nächster offener Schritt»). Etappe 3: Nachtrag zur Etappe 2 (0.22.6), 19 (0.22.7), 20 (0.22.8), 20a (0.22.9), alle mit Review «ok» auf `dev` (Ergebnisse in 7.5, Protokolle in Anhang F); die CI auf `dev` zum Merge von 20a ist grün (Lauf 43632851367 [G am 15.11.2026]) |
-| **Zuletzt erledigt** | **Schritt 22** (15.11.2026, Sonnet, Branch `refactor/schritt-22` ab `a79e40b`; Review mit einem Befund, behoben; reiner Doku-Merge ohne Version; Ergebnis in 7.6, Protokoll Anhang G.2): Context-Scopes auf Ordner gekürzt (299 → 255 Pfade in 23 Zeilen), `docs/superpowers/` als Geschichte gekennzeichnet; nur Doku, keine Version; `make docs` grün, `nur-doku.ts` Exit 0. Davor **Schritt 21** (15.11.2026, Sonnet, Branch `refactor/schritt-21` ab `81fff98`; Review mit Befunden in zwei Runden, alle behoben; Checkpoint mit dem Projektleiter am 15.11.2026: mergen; reiner Doku-Merge ohne Version; Ergebnis in 7.6, Protokoll Anhang G.1): Bausteinsicht in `docs/arc42.md`, Vertragstests, Listen, Oberflächentests und E2E-Hilfen in `docs/testkonzept.md`, `make css-vergleich` und Vertragstests in `docs/ci-cd-und-release.md`, die Prüfung der Reihenfolge im Leitbild, Aufbau im `README.md`, Übersicht in `docs/index.md`; nur Doku, keine Version; `make docs` grün, `nur-doku.ts` zählt den Branch als Doku. Davor der **Nachtrag zur Etappe 3** (Review mit einem Befund, behoben; gemergt als Version 0.22.10). Davor **Zwischenrevision und Checkpoint am Ende der Etappe 3** (15.11.2026; Abschnitt 1e, E-64 bis E-70; nur dieses Dokument, keine Version). Davor **20a** (14.11.2026, Review «ok», nichts vor dem Merge zu beheben; gemergt als Version 0.22.9, Merge `4c7b340`; Ergebnis in 7.5, Protokoll Anhang F.6): ESLint meldet jeden Aufruf `fetch(…)` unter `src/`, ohne erlaubte Stelle (heute 0, auch ohne Inline-Kommentare; `abruf.ts` ruft nur `holen`), Test `scripts/fetch-regel.test.ts` mit Proben und Grenzen (fängt nicht `window.fetch`, `globalThis.fetch`, ein weitergereichtes `holen`); Prüfung `scripts/design-importe.test.ts`: Design-Dateien nur im Wurzel-Layout, vollständig und in der Reihenfolge von `REIHENFOLGE`, `brief.css` nur im Briefdruck, neue Datei ohne Eintrag rot; alle Proben vorher rot; kein Diff unter `src/`; voller `make check` grün (2471 Tests, E2E 524/64, 5,5 Minuten). Davor **20** (zwei Läufe, Review je «ok», gemergt als Version 0.22.8; Ergebnis in 7.5, Protokolle F.4 und F.5). Davor **19, mit Antwort A** (14.11.2026, Review «ok», gemergt als Version 0.22.7; Ergebnis in 7.5, Protokoll Anhang F.2): `MINDESTVERSION`, `istVersionVertraeglich` und `mindestversion` in `/api/status` entfernt (Test zuerst rot, 4 von 9); die Ergänzung nach B (der nächste Link lädt nach einer neuen Auslieferung ganz neu) gebaut, im Verhalten auf allen drei Geräten gelungen, aber **Abbruchstelle 2**: Auf dem iPhone-Profil (WebKit) meldet die Konsole abgebrochene Abrufe (mit `cancel()` 9 von 45 Läufen rot, mit der wörtlichen Vorlage der Doku 2 von 45); nach E-61 ohne Umweg mit A beendet, E2E zurückgenommen; Doku «Alte Versionen auf dem Handy» neu (Neuladen nur, wenn ein Seitenwechsel scheitert; keine Mindestversion; Eingabe bleibt nicht erhalten); für die Nutzerin nichts; voller `make check` grün (2411 Tests, E2E 524/64, 3,5 Minuten). Davor **18** (14.11.2026, Review «ok» nach einem Doku-Befund, gemergt als Version 0.22.5; Ergebnis in 7.4, Protokoll Anhang E.13): `basis.css` in zehn Dateien unter `src/lib/design/` geschnitten (`grundlagen`, `rahmen`, `bedienelemente`, `karten`, `verwaltung`, `anleitung`, `uebergaenge`, `pc-layout`, `druck`, `verlauf`), Importe in `+layout.svelte` in dieser Reihenfolge nach `tokens.css`, Mockups und Leitbild nachgezogen; gebautes CSS vor und nach gleich (Node und SPA), Rot-Probe belegt; voller `make check` grün (2427 Tests, E2E 524/64, 5,6 Minuten). Davor **17** (14.11.2026, Review «ok», Checkpoint E-21 erledigt mit E-52 und E-53, gemergt als Version 0.22.4; davor der Nachtrag zu Schritt 16 als Version 0.22.3, E-54; Ergebnis in 7.4, Protokoll Anhang E.12): Vorab-E2E `tests/e2e/anmeldungsliste-ablauf.test.ts` (vier Fälle je Handy, auf dem alten Stand grün, einmal rot), `Aktionsdialog` um `neben` (zweite Entscheid-Taste) und `ohneHaupttaste` erweitert, die fünf Rückfragen der Einzel-Anmeldungsliste darauf (`fuehreAus`, eigene Sperre und rohe Dialoge weg); der Wildcard-Antrag nutzt den Baustein (nicht von Hand). Sichtbar anders: die Warnung als Liste (Bilder für E-21 im Scratchpad, siehe E.12) und drei Randfälle (E.12); `cm-verwaltung`, `turnier`, `cm-anmeldung`, `cm-doppel-verwaltung` grün; voller `make check` grün (2427 Tests, E2E 524/64, 5,4 Minuten). Davor **16** (14.11.2026, Review «ok», gemergt als Version 0.22.2; Teil 2 mit der Doppel-Seite verworfen, F-30: A, E-51; Ergebnis in 7.4, Protokoll Anhang E.11): Vorab-E2E `tests/e2e/cm-ablauf.test.ts` (drei Fälle je Handy, auf dem alten Stand grün, einmal rot), die Ablauf-Funktion `src/lib/cm/ablauf.ts` mit 15 Einheitsfällen (Abdeckung 100 %), sieben der acht Handler der CM-Seite darauf, `angabenSenden` bleibt von Hand (Abbruchstelle 2), die zwei Text-Dialoge als `src/lib/cm/Textdialog.svelte`; Sätze, Reihenfolge und Fokus unverändert, Markup gleich bis auf die `id`s; für die Nutzerin nichts; voller `make check` grün (2427 Tests, E2E 516/60, 5,3 Minuten). Davor **15, Lauf 2** (14.11.2026, Review «ok», mit Lauf 1 und 1b gemergt als Version 0.22.1; Ergebnis in 7.4, Protokoll Anhang E.9): die vier Listen der Verwaltung (`turniere`, `anlaesse`, `verlauf`, `mitglieder`) laden ihr erstes Laden in einer neuen `+page.ts` über den Wächter (Fall `verwaltung`); eine Störung bleibt eine Meldung in der Seite (`zeilen: null`, keine Fehlerseite); `mitglieder` lädt nach Suche und Filter weiter im Baustein, ohne zweite Abfrage beim Einhängen; Vorab-Tests (E2E 5 Fälle je Gerät, auf dem alten Stand grün, einmal rot) und 13 Einheitsfälle der vier Ladefunktionen; für die Nutzerin nur die zwei Folgen aus E-48; voller `make check` grün (2412 Tests, E2E 510/57, 3,9 Minuten). Davor **15, Lauf 1b (Interclub)** (14.11.2026, Review «ok» am 14.11.2026 zusammen mit Lauf 1; Ergebnis in 7.4, Nachmessen Anhang E.7, Protokoll Anhang E.8): `origin/dev` mit #81 eingemergt (Layout in der Fassung von `dev`, Entscheide des Branches neu E-48 bis E-50), Vorab-Tests für die drei Interclub-Seiten und das Wurzel-Layout (E2E vier Fälle mehr und drei Adressen mehr in der Tabelle, 15 Einheitsfälle, je Gruppe einmal rot), Wurzel-Layout auf `ladeSitzung` (Typ `Sitzung` mit `interclub`), die drei Interclub-Ladefunktionen auf dem Wächter (Fall `mitglied`); keine Zeile mehr in der Wächter-Tabelle, Fälle L und M benannt und unverändert; für die Nutzerin ändert sich nichts; voller `make check` grün (2399 Tests, E2E 495/57, 3,4 Minuten). Davor **15, Lauf 1** (13.11.2026, Branch `refactor/schritt-15`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.6): Vorab-Tests in drei Teilen (E2E 21 Fälle auf drei Geräten, 91 Einheitsfälle der Ladefunktionen, je Teil einmal rot), `ladeSitzung` und die Wächter-Tabelle `src/lib/login/waechter.ts` mit zwei Hüllen und sechs benannten Fällen (neu `verwaltung-zugang`), 22 Ladefunktionen, das Wurzel-Layout, 17 Stellen nach einer Aktion und das Abmelden umgestellt, `hilfe/+page.ts` auf `ladeKontakt`; keine Ladefunktion ruft `fetch`, keine Seite schreibt die Umleitung zum Login; für die Nutzerin ändert sich nichts; voller `make check` grün (2300 Tests, E2E 477/57, 4,1 Minuten); Review «ok» am 14.11.2026 (mit Lauf 1b). Davor **14** (13.11.2026, Review «ok» ohne Befund, Version 0.20.21; Ergebnis in 7.4, Protokoll Anhang E.4): `verwaltung/api.ts` nach Bereichen geteilt, in `zugang-api.ts`, `anlass-api.ts`, `gespraech-api.ts`, `mitglieder-api.ts` und `turnier-api.ts`; `api.ts` bleibt der Kern (`Antwort<T>`, Vertrag, `lese`, `schicke`) und reicht nichts weiter; 42 Dateien wechseln nur Import-Zeilen, 44 Tests auf fünf Dateien verteilt, keiner geändert; voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.3): Profil, Login, Passkey und `hatSitzung` auf dem Baustein, Umbenennung `ergebnis` → `art`, beide Kleinfragen aufgenommen (`{ art }` beim E-Mail-Wechsel, vier benannte Anfragen der Login-Seiten), N-09 (`src/lib/anlass/antwort.ts`), Wortlisten der Verträge an den Typ gebunden, `abruf.ts` in der Abdeckung; die Lint-Regel zu `fetch` verworfen (98 Meldungen am heutigen Repo, Vorschlag an Schritt 15); voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 1** Abruf-Baustein (13.11.2026, Review «ok» ohne Befund; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **Schritt 23, Teil 1: Nachmessen** (refactor-analyst), danach die manuelle Session des Projektleiters zu Regel und ADR (Teil 2) und der Umbau der Skripte als Subagent mit Review (Teil 3); danach die manuelle Session zu Schritt 24 (E-66). **Schritt 22** ist erledigt und gemergt (reine Doku, 15.11.2026; Ergebnis in 7.6, Protokoll G.2). **Schritt 21** ist erledigt und gemergt (reine Doku). **Was in dieser Zelle folgt, ist der Stand vor Schritt 22:** Schritt 22 (Context-Scopes auf Ordner gekürzt, `docs/superpowers/` als Geschichte gekennzeichnet; Dateien: `docs/context-scopes.md`, `docs/index.md`, neu `docs/superpowers/README.md`; Sonnet, Subagent, ohne Halt mit Kurzbericht). **Was in dieser Zelle weiter folgt, ist der Stand vor dem Schritt 21:** **Der Nachtrag zur Etappe 3** (7.6; E-67): Branch `refactor/nachtrag-etappe-3` ab `origin/dev`, läuft parallel bei einem Implementer (Opus), mit eigenem Review. Er fasst an: `eslint.config.js` (`FETCH_REGEL`: Meldung in zwei Sätzen, dazu eng `window.fetch`, `globalThis.fetch`, `self.fetch`), `scripts/fetch-regel.test.ts`, `scripts/design-importe.test.ts`, `docs/ci-cd-und-release.md` (die Zeilen der zwei Prüfungen), `src/lib/design/grundlagen.css` (nur der Kommentar). Er kostet eine Version; das Ergebnis trägt der Orchestrator in 7.6 nach. **Danach Schritt 21** (Sonnet, Subagent, reine Doku, keine Version, Kurzbericht). Er fasst an: `docs/arc42.md`, `docs/index.md`, `README.md`, `docs/testkonzept.md`, `docs/ci-cd-und-release.md`, `docs/ui-leitbild.md`; nicht `docs/context-scopes.md` (Schritt 22) und nicht `grundlagen.css` (Nachtrag). Danach 22 → 23 → 24 → 25 (7.6, 7.7). **Beim Orchestrator ausserdem offen:** C-16 in die Projekt-`CLAUDE.md` einspielen (E-70), Anhang F auslagern (E-60), den Dependabot-PR #86 nicht zwischen Nachmessen und Merge von Schritt 23 mergen (1e, N-34). **Was in dieser Zelle folgt, ist der Verlauf bis zum 14.11.2026, nicht mehr der Stand.** Davor: die Zwischenrevision am Ende der Etappe 3 als Vorschlag (14.11.2026, Abschnitt 1e, Stand `4c7b340`, Version 0.22.9), entschieden am Checkpoint vom 15.11.2026. Davor, erledigt mit dem Merge von 20a (Review «ok», Version 0.22.9; 1e, N-29): **20a, Review** (umgesetzt am 14.11.2026, F.6; Prüfwerkzeug, darum ein eigenes Review, 7.7), dann Merge (Version vergibt der Merge). Danach **Zwischenrevision und Checkpoint am Ende der Etappe 3** (7.7), dann Etappe 4. Kurzbericht zu 20a (E-59). **Schritt 20 ist gemergt** (Version 0.22.8, Review je «ok», Handstart mit Spur gemessen, F.5); was folgt, ist der Stand vor dem Merge von 20: **20, Review von Lauf 2** (umgesetzt am 14.11.2026, F.5; das Review von Lauf 1 läuft getrennt am Commit `98b9225`), dazu der Handstart der CI mit Spur auf dem Branch (`gh workflow run check.yml --ref refactor/schritt-20 -f spur=true`, Orchestrator); dann Merge, danach 20a. Vorher stand hier: **20, Review von Lauf 1** (umgesetzt am 14.11.2026, F.4), dann Lauf 2. Davor: tote Namen und `export` weg, Umbenennen, fester Weg des Turnierjahrs weg, `login.ts` geteilt, kopierte Test-Hilfen abgelöst; sieben Commits, Review, dann **Lauf 2** (Opus): Listen der Mitglieder an einer Stelle, Prüfung «Methode und Präfix», und nach **F-37** die Spur in der CI. Das Nachmessen liegt vor (14.11.2026, Anhang F.3; Branch `refactor/schritt-20` ab `29b0023`). Danach 20a. **Schritt 19 ist gemergt** (Version 0.22.7, Review «ok»); was folgt, ist der Stand vor dem Merge von 19: Review und Merge des Branches `refactor/schritt-19` (umgesetzt mit Antwort A, F.2). Ob das Ende an Abbruchstelle 2 ein Halt nach E-45 ist («Abbruch eines Subagenten»), entscheidet der Orchestrator; E-61 hat das Ende mit A vorab freigegeben. Die CI auf dem Branch vor dem Merge (N-23, P2-19c) ist nicht mehr zwingend: Der Branch bringt keinen neuen E2E. Nach dem Schritt Kurzbericht (E-62). Danach 20 (vorab nachmessen), dann 20a. **Der Nachtrag zur Etappe 2** ist erledigt: Review, CI auf dem Branch grün (Lauf 43620595027, alle drei Geräte), gemergt als Version 0.22.6; damit ist `dev` nach dem roten Lauf zu Schritt 18 wieder auf einem Stand, dessen gelockerte Prüfung auf der iPhone-CI gehalten hat |
+| **Zuletzt erledigt** | **Schritt 23, Teil 1: Nachmessen** (15.11.2026, `refactor-analyst`, Worktree `refactor/schritt-23` auf `9630d56`; nur dieses Dokument, kein Commit; Anhang G.3). Davor **Schritt 22** (15.11.2026, Sonnet, Branch `refactor/schritt-22` ab `a79e40b`; Review mit einem Befund, behoben; reiner Doku-Merge ohne Version; Ergebnis in 7.6, Protokoll Anhang G.2): Context-Scopes auf Ordner gekürzt (299 → 255 Pfade in 23 Zeilen), `docs/superpowers/` als Geschichte gekennzeichnet; nur Doku, keine Version; `make docs` grün, `nur-doku.ts` Exit 0. Davor **Schritt 21** (15.11.2026, Sonnet, Branch `refactor/schritt-21` ab `81fff98`; Review mit Befunden in zwei Runden, alle behoben; Checkpoint mit dem Projektleiter am 15.11.2026: mergen; reiner Doku-Merge ohne Version; Ergebnis in 7.6, Protokoll Anhang G.1): Bausteinsicht in `docs/arc42.md`, Vertragstests, Listen, Oberflächentests und E2E-Hilfen in `docs/testkonzept.md`, `make css-vergleich` und Vertragstests in `docs/ci-cd-und-release.md`, die Prüfung der Reihenfolge im Leitbild, Aufbau im `README.md`, Übersicht in `docs/index.md`; nur Doku, keine Version; `make docs` grün, `nur-doku.ts` zählt den Branch als Doku. Davor der **Nachtrag zur Etappe 3** (Review mit einem Befund, behoben; gemergt als Version 0.22.10). Davor **Zwischenrevision und Checkpoint am Ende der Etappe 3** (15.11.2026; Abschnitt 1e, E-64 bis E-70; nur dieses Dokument, keine Version). Davor **20a** (14.11.2026, Review «ok», nichts vor dem Merge zu beheben; gemergt als Version 0.22.9, Merge `4c7b340`; Ergebnis in 7.5, Protokoll Anhang F.6): ESLint meldet jeden Aufruf `fetch(…)` unter `src/`, ohne erlaubte Stelle (heute 0, auch ohne Inline-Kommentare; `abruf.ts` ruft nur `holen`), Test `scripts/fetch-regel.test.ts` mit Proben und Grenzen (fängt nicht `window.fetch`, `globalThis.fetch`, ein weitergereichtes `holen`); Prüfung `scripts/design-importe.test.ts`: Design-Dateien nur im Wurzel-Layout, vollständig und in der Reihenfolge von `REIHENFOLGE`, `brief.css` nur im Briefdruck, neue Datei ohne Eintrag rot; alle Proben vorher rot; kein Diff unter `src/`; voller `make check` grün (2471 Tests, E2E 524/64, 5,5 Minuten). Davor **20** (zwei Läufe, Review je «ok», gemergt als Version 0.22.8; Ergebnis in 7.5, Protokolle F.4 und F.5). Davor **19, mit Antwort A** (14.11.2026, Review «ok», gemergt als Version 0.22.7; Ergebnis in 7.5, Protokoll Anhang F.2): `MINDESTVERSION`, `istVersionVertraeglich` und `mindestversion` in `/api/status` entfernt (Test zuerst rot, 4 von 9); die Ergänzung nach B (der nächste Link lädt nach einer neuen Auslieferung ganz neu) gebaut, im Verhalten auf allen drei Geräten gelungen, aber **Abbruchstelle 2**: Auf dem iPhone-Profil (WebKit) meldet die Konsole abgebrochene Abrufe (mit `cancel()` 9 von 45 Läufen rot, mit der wörtlichen Vorlage der Doku 2 von 45); nach E-61 ohne Umweg mit A beendet, E2E zurückgenommen; Doku «Alte Versionen auf dem Handy» neu (Neuladen nur, wenn ein Seitenwechsel scheitert; keine Mindestversion; Eingabe bleibt nicht erhalten); für die Nutzerin nichts; voller `make check` grün (2411 Tests, E2E 524/64, 3,5 Minuten). Davor **18** (14.11.2026, Review «ok» nach einem Doku-Befund, gemergt als Version 0.22.5; Ergebnis in 7.4, Protokoll Anhang E.13): `basis.css` in zehn Dateien unter `src/lib/design/` geschnitten (`grundlagen`, `rahmen`, `bedienelemente`, `karten`, `verwaltung`, `anleitung`, `uebergaenge`, `pc-layout`, `druck`, `verlauf`), Importe in `+layout.svelte` in dieser Reihenfolge nach `tokens.css`, Mockups und Leitbild nachgezogen; gebautes CSS vor und nach gleich (Node und SPA), Rot-Probe belegt; voller `make check` grün (2427 Tests, E2E 524/64, 5,6 Minuten). Davor **17** (14.11.2026, Review «ok», Checkpoint E-21 erledigt mit E-52 und E-53, gemergt als Version 0.22.4; davor der Nachtrag zu Schritt 16 als Version 0.22.3, E-54; Ergebnis in 7.4, Protokoll Anhang E.12): Vorab-E2E `tests/e2e/anmeldungsliste-ablauf.test.ts` (vier Fälle je Handy, auf dem alten Stand grün, einmal rot), `Aktionsdialog` um `neben` (zweite Entscheid-Taste) und `ohneHaupttaste` erweitert, die fünf Rückfragen der Einzel-Anmeldungsliste darauf (`fuehreAus`, eigene Sperre und rohe Dialoge weg); der Wildcard-Antrag nutzt den Baustein (nicht von Hand). Sichtbar anders: die Warnung als Liste (Bilder für E-21 im Scratchpad, siehe E.12) und drei Randfälle (E.12); `cm-verwaltung`, `turnier`, `cm-anmeldung`, `cm-doppel-verwaltung` grün; voller `make check` grün (2427 Tests, E2E 524/64, 5,4 Minuten). Davor **16** (14.11.2026, Review «ok», gemergt als Version 0.22.2; Teil 2 mit der Doppel-Seite verworfen, F-30: A, E-51; Ergebnis in 7.4, Protokoll Anhang E.11): Vorab-E2E `tests/e2e/cm-ablauf.test.ts` (drei Fälle je Handy, auf dem alten Stand grün, einmal rot), die Ablauf-Funktion `src/lib/cm/ablauf.ts` mit 15 Einheitsfällen (Abdeckung 100 %), sieben der acht Handler der CM-Seite darauf, `angabenSenden` bleibt von Hand (Abbruchstelle 2), die zwei Text-Dialoge als `src/lib/cm/Textdialog.svelte`; Sätze, Reihenfolge und Fokus unverändert, Markup gleich bis auf die `id`s; für die Nutzerin nichts; voller `make check` grün (2427 Tests, E2E 516/60, 5,3 Minuten). Davor **15, Lauf 2** (14.11.2026, Review «ok», mit Lauf 1 und 1b gemergt als Version 0.22.1; Ergebnis in 7.4, Protokoll Anhang E.9): die vier Listen der Verwaltung (`turniere`, `anlaesse`, `verlauf`, `mitglieder`) laden ihr erstes Laden in einer neuen `+page.ts` über den Wächter (Fall `verwaltung`); eine Störung bleibt eine Meldung in der Seite (`zeilen: null`, keine Fehlerseite); `mitglieder` lädt nach Suche und Filter weiter im Baustein, ohne zweite Abfrage beim Einhängen; Vorab-Tests (E2E 5 Fälle je Gerät, auf dem alten Stand grün, einmal rot) und 13 Einheitsfälle der vier Ladefunktionen; für die Nutzerin nur die zwei Folgen aus E-48; voller `make check` grün (2412 Tests, E2E 510/57, 3,9 Minuten). Davor **15, Lauf 1b (Interclub)** (14.11.2026, Review «ok» am 14.11.2026 zusammen mit Lauf 1; Ergebnis in 7.4, Nachmessen Anhang E.7, Protokoll Anhang E.8): `origin/dev` mit #81 eingemergt (Layout in der Fassung von `dev`, Entscheide des Branches neu E-48 bis E-50), Vorab-Tests für die drei Interclub-Seiten und das Wurzel-Layout (E2E vier Fälle mehr und drei Adressen mehr in der Tabelle, 15 Einheitsfälle, je Gruppe einmal rot), Wurzel-Layout auf `ladeSitzung` (Typ `Sitzung` mit `interclub`), die drei Interclub-Ladefunktionen auf dem Wächter (Fall `mitglied`); keine Zeile mehr in der Wächter-Tabelle, Fälle L und M benannt und unverändert; für die Nutzerin ändert sich nichts; voller `make check` grün (2399 Tests, E2E 495/57, 3,4 Minuten). Davor **15, Lauf 1** (13.11.2026, Branch `refactor/schritt-15`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.6): Vorab-Tests in drei Teilen (E2E 21 Fälle auf drei Geräten, 91 Einheitsfälle der Ladefunktionen, je Teil einmal rot), `ladeSitzung` und die Wächter-Tabelle `src/lib/login/waechter.ts` mit zwei Hüllen und sechs benannten Fällen (neu `verwaltung-zugang`), 22 Ladefunktionen, das Wurzel-Layout, 17 Stellen nach einer Aktion und das Abmelden umgestellt, `hilfe/+page.ts` auf `ladeKontakt`; keine Ladefunktion ruft `fetch`, keine Seite schreibt die Umleitung zum Login; für die Nutzerin ändert sich nichts; voller `make check` grün (2300 Tests, E2E 477/57, 4,1 Minuten); Review «ok» am 14.11.2026 (mit Lauf 1b). Davor **14** (13.11.2026, Review «ok» ohne Befund, Version 0.20.21; Ergebnis in 7.4, Protokoll Anhang E.4): `verwaltung/api.ts` nach Bereichen geteilt, in `zugang-api.ts`, `anlass-api.ts`, `gespraech-api.ts`, `mitglieder-api.ts` und `turnier-api.ts`; `api.ts` bleibt der Kern (`Antwort<T>`, Vertrag, `lese`, `schicke`) und reicht nichts weiter; 42 Dateien wechseln nur Import-Zeilen, 44 Tests auf fünf Dateien verteilt, keiner geändert; voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.3): Profil, Login, Passkey und `hatSitzung` auf dem Baustein, Umbenennung `ergebnis` → `art`, beide Kleinfragen aufgenommen (`{ art }` beim E-Mail-Wechsel, vier benannte Anfragen der Login-Seiten), N-09 (`src/lib/anlass/antwort.ts`), Wortlisten der Verträge an den Typ gebunden, `abruf.ts` in der Abdeckung; die Lint-Regel zu `fetch` verworfen (98 Meldungen am heutigen Repo, Vorschlag an Schritt 15); voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 1** Abruf-Baustein (13.11.2026, Review «ok» ohne Befund; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
+| **Nächster offener Schritt** | **Schritt 23, Teil 2: die manuelle Session des Projektleiters** zu Regel und ADR. Grundlage ist das Nachmessen in Anhang G.3 (Teil 1, erledigt am 15.11.2026, nur dieses Dokument, nicht committet): Die Session entscheidet die elf Festlegungen S23-1 bis S23-11 (G.3.3, je mit Empfehlung), legt ADR-012 nach dem Entwurf in G.3.5 an und schreibt, was «Hinweise zu Schritt 23» (7.6) verlangt; danach Review durch den `refactor-reviewer`, dann Teil 3 (Umbau, Opus, Dateiliste und Abbruchstellen in G.3.4). Bis zum Merge von Schritt 23 keinen Dependabot-PR mergen (#86, #82, #38). **Was in dieser Zelle folgt, ist der Stand vor dem Nachmessen:** **Schritt 23, Teil 1: Nachmessen** (refactor-analyst), danach die manuelle Session des Projektleiters zu Regel und ADR (Teil 2) und der Umbau der Skripte als Subagent mit Review (Teil 3); danach die manuelle Session zu Schritt 24 (E-66). **Schritt 22** ist erledigt und gemergt (reine Doku, 15.11.2026; Ergebnis in 7.6, Protokoll G.2). **Schritt 21** ist erledigt und gemergt (reine Doku). **Was in dieser Zelle folgt, ist der Stand vor Schritt 22:** Schritt 22 (Context-Scopes auf Ordner gekürzt, `docs/superpowers/` als Geschichte gekennzeichnet; Dateien: `docs/context-scopes.md`, `docs/index.md`, neu `docs/superpowers/README.md`; Sonnet, Subagent, ohne Halt mit Kurzbericht). **Was in dieser Zelle weiter folgt, ist der Stand vor dem Schritt 21:** **Der Nachtrag zur Etappe 3** (7.6; E-67): Branch `refactor/nachtrag-etappe-3` ab `origin/dev`, läuft parallel bei einem Implementer (Opus), mit eigenem Review. Er fasst an: `eslint.config.js` (`FETCH_REGEL`: Meldung in zwei Sätzen, dazu eng `window.fetch`, `globalThis.fetch`, `self.fetch`), `scripts/fetch-regel.test.ts`, `scripts/design-importe.test.ts`, `docs/ci-cd-und-release.md` (die Zeilen der zwei Prüfungen), `src/lib/design/grundlagen.css` (nur der Kommentar). Er kostet eine Version; das Ergebnis trägt der Orchestrator in 7.6 nach. **Danach Schritt 21** (Sonnet, Subagent, reine Doku, keine Version, Kurzbericht). Er fasst an: `docs/arc42.md`, `docs/index.md`, `README.md`, `docs/testkonzept.md`, `docs/ci-cd-und-release.md`, `docs/ui-leitbild.md`; nicht `docs/context-scopes.md` (Schritt 22) und nicht `grundlagen.css` (Nachtrag). Danach 22 → 23 → 24 → 25 (7.6, 7.7). **Beim Orchestrator ausserdem offen:** C-16 in die Projekt-`CLAUDE.md` einspielen (E-70), Anhang F auslagern (E-60), den Dependabot-PR #86 nicht zwischen Nachmessen und Merge von Schritt 23 mergen (1e, N-34). **Was in dieser Zelle folgt, ist der Verlauf bis zum 14.11.2026, nicht mehr der Stand.** Davor: die Zwischenrevision am Ende der Etappe 3 als Vorschlag (14.11.2026, Abschnitt 1e, Stand `4c7b340`, Version 0.22.9), entschieden am Checkpoint vom 15.11.2026. Davor, erledigt mit dem Merge von 20a (Review «ok», Version 0.22.9; 1e, N-29): **20a, Review** (umgesetzt am 14.11.2026, F.6; Prüfwerkzeug, darum ein eigenes Review, 7.7), dann Merge (Version vergibt der Merge). Danach **Zwischenrevision und Checkpoint am Ende der Etappe 3** (7.7), dann Etappe 4. Kurzbericht zu 20a (E-59). **Schritt 20 ist gemergt** (Version 0.22.8, Review je «ok», Handstart mit Spur gemessen, F.5); was folgt, ist der Stand vor dem Merge von 20: **20, Review von Lauf 2** (umgesetzt am 14.11.2026, F.5; das Review von Lauf 1 läuft getrennt am Commit `98b9225`), dazu der Handstart der CI mit Spur auf dem Branch (`gh workflow run check.yml --ref refactor/schritt-20 -f spur=true`, Orchestrator); dann Merge, danach 20a. Vorher stand hier: **20, Review von Lauf 1** (umgesetzt am 14.11.2026, F.4), dann Lauf 2. Davor: tote Namen und `export` weg, Umbenennen, fester Weg des Turnierjahrs weg, `login.ts` geteilt, kopierte Test-Hilfen abgelöst; sieben Commits, Review, dann **Lauf 2** (Opus): Listen der Mitglieder an einer Stelle, Prüfung «Methode und Präfix», und nach **F-37** die Spur in der CI. Das Nachmessen liegt vor (14.11.2026, Anhang F.3; Branch `refactor/schritt-20` ab `29b0023`). Danach 20a. **Schritt 19 ist gemergt** (Version 0.22.7, Review «ok»); was folgt, ist der Stand vor dem Merge von 19: Review und Merge des Branches `refactor/schritt-19` (umgesetzt mit Antwort A, F.2). Ob das Ende an Abbruchstelle 2 ein Halt nach E-45 ist («Abbruch eines Subagenten»), entscheidet der Orchestrator; E-61 hat das Ende mit A vorab freigegeben. Die CI auf dem Branch vor dem Merge (N-23, P2-19c) ist nicht mehr zwingend: Der Branch bringt keinen neuen E2E. Nach dem Schritt Kurzbericht (E-62). Danach 20 (vorab nachmessen), dann 20a. **Der Nachtrag zur Etappe 2** ist erledigt: Review, CI auf dem Branch grün (Lauf 43620595027, alle drei Geräte), gemergt als Version 0.22.6; damit ist `dev` nach dem roten Lauf zu Schritt 18 wieder auf einem Stand, dessen gelockerte Prüfung auf der iPhone-CI gehalten hat |
 | **Wartet auf Freigabe des Projektleiters** | Nichts. Der Checkpoint am Ende der Etappe 3 ist erledigt am 15.11.2026: F-15 und F-38 bis F-43 beantwortet (E-64 bis E-70). Davor: F-37 beantwortet am 14.11.2026 (B, E-63). F-35 und F-36 beantwortet am 14.11.2026 (E-61, E-62); Checkpoint am Ende der Etappe 2 erledigt am 14.11.2026 (E-55 bis E-60) |
-| **Offene Fragen** | **Keine.** F-15 ist beantwortet (A, E-64), ebenso F-38 bis F-43 (E-65 bis E-70), alle am 15.11.2026 (9.2). Davor zuletzt F-37: B, E-63; F-35: B, E-61; F-36: A, E-62 |
+| **Offene Fragen** | **Keine mit F-Nummer.** Für die manuelle Session zu Schritt 23 liegen elf Festlegungen bereit (S23-1 bis S23-11, Anhang G.3.3); die Session trägt ihre Entscheide in Abschnitt 8 ein. Davor stand hier: **Keine.** F-15 ist beantwortet (A, E-64), ebenso F-38 bis F-43 (E-65 bis E-70), alle am 15.11.2026 (9.2). Davor zuletzt F-37: B, E-63; F-35: B, E-61; F-36: A, E-62 |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
-| **Vorab nachzumessen** | **Offen: nur vor Schritt 23** (`refactor-analyst`, Opus; was, steht in der Zeile 23 und in «Hinweise zu Schritt 23», 7.6; Übersicht in 7.7). Der Nachtrag zur Etappe 3 und die Schritte 21, 22, 24 und 25 brauchen keines. **Für Schritt 20 erledigt am 14.11.2026 (Anhang F.3):** von rund 1180 exportierten Namen 3 entfernen (`warnungText`, `RangZeile`, `GespraechZeile` der Verwaltung), bei 25 nur `export` weg, der Rest bleibt; Handarbeit reicht, kein Paketvorschlag (E-11); den festen Weg des Turnierjahrs ruft niemand mehr; `login.ts` in fünf Dateien, 19 Testdateien wechseln nur Importe; von den elf Hinweisen sechs aufnehmen ((b), (c), (f), (h), (j), (k) nach F-37), fünf verwerfen ((a), (d), (e), (g), (i)); die Begründung von (i) stimmt nicht (der Code der Verwaltung zählt je Adresse, nicht je IP); zwei Läufe mit je eigenem Review (Sonnet, dann Opus); eine Frage (F-37). **Für Schritt 19 erledigt am 14.11.2026 (Anhang F.1):** Entscheid des Projektleiters nötig (F-35, F-36); den Eigenbau liest niemand (`mindestversion` nur in Tests, `istVersionVertraeglich` nur im eigenen Test); das Bordmittel ist aktiv, lädt aber nur im Fehlerfall neu; Kennung bleibt der Zeitstempel des Builds (Probe-Build: zwei Builds desselben Quelltexts unterscheiden sich nur in `version.json` und `service-worker.js`); der Service Worker hat keinen Cache; `Dockerfile` und Service Worker fallen aus der Dateiliste; ein neuer E2E mit untergeschobener `version.json` und Fokus-Ereignis, vorher rot. **Für Schritt 16 erledigt am 14.11.2026 (Anhang E.10):** kein Entscheid des Projektleiters nötig, keine neue Frage; die Doppel-Seite wird **aufgenommen** (drei Handler, als zweiter Teil mit eigener Abbruchstelle; `suchen` und `neuLaden` bleiben von Hand); die Funktion passt für sieben der acht Handler der CM-Seite, `angabenSenden` nur mit eigener Angabe; den Fokus nach einer Aktion hält heute eine einzige E2E-Stelle, vier Handler haben keinen E2E-Fall, darum vier Vorab-E2E (`tests/e2e/cm-ablauf.test.ts`, ohne Mail-Code) zusätzlich zu den Einheitstests; «rund 250 Zeilen» eher 170 bis 210; keine gemeinsame Datei mit Schritt 17. **Für Schritt 15, Lauf 1b (Interclub) erledigt am 14.11.2026 (Anhang E.7):** mit #81 39 Adressen, 30 Ladefunktionen, 25 «nur der Wächter wechselt»; kein neuer Fall in der Wächter-Tabelle, zwei neue benannte Fälle L und M ausserhalb der Tabelle; zwei Ränder des Layouts; ein Vorab-Test aus Lauf 1 muss mit dem Merge mit. **Für Schritt 15 erledigt am 13.11.2026 (Anhang E.5):** Tabelle aller 36 Adressen mit Ziel; 17 statt 14 Stellen «nach einer Aktion»; acht benannte Fälle mehr (D bis K); Vorab-Test als E2E-Tabelle ohne Konto und Mail-Code plus Einheitstests der Ladefunktionen der Verwaltung; Wächter als Tabelle in `src/lib/login/waechter.ts` mit zwei Hüllen, `ladeSitzung` in `sitzung.ts`; zwei Läufe, ein Merge; Lauf 1 ändert für die Nutzerin nichts, Lauf 2 (vier Listen) freigegeben mit F-28 (E-48). **Für Schritt 13 erledigt am 12.11.2026 (Anhang E.1):** kein Entscheid des Projektleiters nötig, der Baustein erhält jeden heutigen Rand; «ein Wort gilt nur mit seinem Status» bleibt, dazu «für 401, 404 und 429 genügt der Status»; 57 Zeilen Vorab-Tests; Baustein `src/lib/abruf.ts`; drei Seiten statt vier (`willkommen` liest kein Ergebnis); N-09 aufnehmen, N-10 als geteilte Liste unter `src/lib/cm/`. Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
+| **Vorab nachzumessen** | **Offen: nichts mehr.** **Für Schritt 23 erledigt am 15.11.2026 (Anhang G.3):** Die Nummer bewacht heute nur der lokale Hook; seit `main` sind es 28 Nummern, nicht 27; `release.ts` trägt die neue Regel für jedes Release ausser dem ersten (dort kommt durch, wer die Einträge in den alten Abschnitt schiebt); den Push des Merges von Schritt 23 prüft schon die neue Fassung von Hook und Skript; die Kollisionsstelle schrumpft auf einen Textkonflikt in `docs/versionen.md`, sie verschwindet nicht; sobald Test läuft, muss die Nummer vor der Checkliste stehen (sie zählt zum Code-Stand des Images); der Dateiliste fehlten vier Stellen; elf Festlegungen für die Session. **Was in dieser Zelle folgt, ist der Stand davor:** **Offen: nur vor Schritt 23** (`refactor-analyst`, Opus; was, steht in der Zeile 23 und in «Hinweise zu Schritt 23», 7.6; Übersicht in 7.7). Der Nachtrag zur Etappe 3 und die Schritte 21, 22, 24 und 25 brauchen keines. **Für Schritt 20 erledigt am 14.11.2026 (Anhang F.3):** von rund 1180 exportierten Namen 3 entfernen (`warnungText`, `RangZeile`, `GespraechZeile` der Verwaltung), bei 25 nur `export` weg, der Rest bleibt; Handarbeit reicht, kein Paketvorschlag (E-11); den festen Weg des Turnierjahrs ruft niemand mehr; `login.ts` in fünf Dateien, 19 Testdateien wechseln nur Importe; von den elf Hinweisen sechs aufnehmen ((b), (c), (f), (h), (j), (k) nach F-37), fünf verwerfen ((a), (d), (e), (g), (i)); die Begründung von (i) stimmt nicht (der Code der Verwaltung zählt je Adresse, nicht je IP); zwei Läufe mit je eigenem Review (Sonnet, dann Opus); eine Frage (F-37). **Für Schritt 19 erledigt am 14.11.2026 (Anhang F.1):** Entscheid des Projektleiters nötig (F-35, F-36); den Eigenbau liest niemand (`mindestversion` nur in Tests, `istVersionVertraeglich` nur im eigenen Test); das Bordmittel ist aktiv, lädt aber nur im Fehlerfall neu; Kennung bleibt der Zeitstempel des Builds (Probe-Build: zwei Builds desselben Quelltexts unterscheiden sich nur in `version.json` und `service-worker.js`); der Service Worker hat keinen Cache; `Dockerfile` und Service Worker fallen aus der Dateiliste; ein neuer E2E mit untergeschobener `version.json` und Fokus-Ereignis, vorher rot. **Für Schritt 16 erledigt am 14.11.2026 (Anhang E.10):** kein Entscheid des Projektleiters nötig, keine neue Frage; die Doppel-Seite wird **aufgenommen** (drei Handler, als zweiter Teil mit eigener Abbruchstelle; `suchen` und `neuLaden` bleiben von Hand); die Funktion passt für sieben der acht Handler der CM-Seite, `angabenSenden` nur mit eigener Angabe; den Fokus nach einer Aktion hält heute eine einzige E2E-Stelle, vier Handler haben keinen E2E-Fall, darum vier Vorab-E2E (`tests/e2e/cm-ablauf.test.ts`, ohne Mail-Code) zusätzlich zu den Einheitstests; «rund 250 Zeilen» eher 170 bis 210; keine gemeinsame Datei mit Schritt 17. **Für Schritt 15, Lauf 1b (Interclub) erledigt am 14.11.2026 (Anhang E.7):** mit #81 39 Adressen, 30 Ladefunktionen, 25 «nur der Wächter wechselt»; kein neuer Fall in der Wächter-Tabelle, zwei neue benannte Fälle L und M ausserhalb der Tabelle; zwei Ränder des Layouts; ein Vorab-Test aus Lauf 1 muss mit dem Merge mit. **Für Schritt 15 erledigt am 13.11.2026 (Anhang E.5):** Tabelle aller 36 Adressen mit Ziel; 17 statt 14 Stellen «nach einer Aktion»; acht benannte Fälle mehr (D bis K); Vorab-Test als E2E-Tabelle ohne Konto und Mail-Code plus Einheitstests der Ladefunktionen der Verwaltung; Wächter als Tabelle in `src/lib/login/waechter.ts` mit zwei Hüllen, `ladeSitzung` in `sitzung.ts`; zwei Läufe, ein Merge; Lauf 1 ändert für die Nutzerin nichts, Lauf 2 (vier Listen) freigegeben mit F-28 (E-48). **Für Schritt 13 erledigt am 12.11.2026 (Anhang E.1):** kein Entscheid des Projektleiters nötig, der Baustein erhält jeden heutigen Rand; «ein Wort gilt nur mit seinem Status» bleibt, dazu «für 401, 404 und 429 genügt der Status»; 57 Zeilen Vorab-Tests; Baustein `src/lib/abruf.ts`; drei Seiten statt vier (`willkommen` liest kein Ergebnis); N-09 aufnehmen, N-10 als geteilte Liste unter `src/lib/cm/`. Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
 | **Nächster Checkpoint** | **Die manuellen Sessions des Projektleiters zu den Schritten 23 und 24 und der Abschluss in Schritt 25** (E-66; 7.7). Bis dahin laufen der Nachtrag zur Etappe 3 und die Schritte 21 und 22 ohne Halt mit Kurzbericht; Halt davor nur bei den Anlässen aus E-45. Der Checkpoint am Ende der Etappe 3 ist erledigt (15.11.2026). **Davor stand hier:** Am Ende der Etappe 3 (nach dem Merge von 20a; 7.7). Bis dahin läuft die Etappe 3 ohne Halt mit Kurzbericht je Schritt (E-59; E-45 gilt weiter). **Halt davor** nur bei den Anlässen aus E-45: alles aus E-06, eine sichtbare Verhaltensänderung, Abbruch eines Subagenten, zweimal Befunde im Review, rote CI, eine Frage, die das Dokument dem Projektleiter vorbehält. Eine solche Frage steht schon fest: **nach dem Nachmessen zu Schritt 19** («Bordmittel oder nur entfernen», E-09). Der Checkpoint am Ende der Etappe 2 ist erledigt (14.11.2026) |
 | **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32). Der Satz der benannten Ausnahmen zu «Ab Schritt 15» ist eingespielt (E-57); die Anhänge C bis E stehen in eigenen Dateien (E-60). **Offen am 15.11.2026:** der Satz unter «Tests» zu den Listen der Mitglieder (C-16, E-70) ist noch nicht eingespielt [G: `CLAUDE.md:48` im Worktree nennt noch «in Grundprüfung und Routen-Test»]; Anhang F ist noch nicht ausgelagert |
 | **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten. **Etappe 4 (E-66):** Für die Schritte 23 und 24 liefert der Orchestrator dem Projektleiter je das Modell, einen Copy-Paste-Prompt und was die Session in dieses Dokument schreiben muss (Stichworte in «Hinweise zu Schritt 23» und «Hinweise zu Schritt 24», 7.6); danach prüft der `refactor-reviewer` |
@@ -3589,7 +3590,7 @@ Vorbild ist der Nachtrag zur Etappe 2 in 7.5)
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
 | 21 | [geändert] Doku an den Code angeglichen: Bausteinsicht, Einstiegstexte, Stand. `docs/testkonzept.md` nennt die Vertragstests aus Schritt 03 (Grundprüfung, Routen-Test, Bremsen-Test, Anhang C.2); die Liste der Prüfungen nennt die Prüfung der Importrichtung und `make css-vergleich` (der Diff der Etappe 0 trägt dort nur den Build-Ordner nach [G]). **[geändert]** Aus der Etappe 1 nennt die Doku: `dienste.ts`, `src/lib/fehler.ts`, `verwaltung-schnittstellen.ts` je Thema, das Thema `sitzung/`, `tests/hilfen/verwaltungs-listen.ts`, den Test `mail-nur-an.db.test.ts`, `tests/hilfen/turnierjahre.ts`; die Bausteinsicht in `docs/arc42.md` ist nachzuziehen (1c, P-21: in der Etappe 1 dort sechs Zeilen geändert [G], Bausteinsicht nicht nachgezogen [E]). **[geändert, 1d P2-21a]** Aus der Etappe 2 nennt die Doku: `src/lib/abruf.ts` mit `STATUS_DES_WORTS`, `src/lib/login/waechter.ts` und `ladeSitzung`, `src/lib/cm/ablauf.ts` und `Textdialog.svelte`, die zehn Design-Dateien und ihre Reihenfolge, `tests/oberflaeche/`, die drei Vorab-E2E (`waechter`, `cm-ablauf`, `anmeldungsliste-ablauf`); heute nennen `docs/arc42.md`, `docs/testkonzept.md` und `docs/context-scopes.md` keinen dieser Bausteine [G, Textsuche, Stand `40a0a54`]. **[neu, Review Schritt 15, Hinweis (5)]** Der Testordner `tests/oberflaeche/` (Einheitstests der Ladefunktionen, seit Schritt 15) fehlt in `docs/testkonzept.md` und `docs/context-scopes.md`. **[geändert, E-58, E-67]** Das UI-Leitbild (H-01) kam mit dem Nachtrag zur Etappe 2 (7.5). Der Kommentar in `src/lib/design/grundlagen.css` (H-06) ist **nicht** mehr Teil dieses Schritts: Er kommt mit dem Nachtrag zur Etappe 3 (oben). **[geändert, 1e P3-21a bis P3-21d, E-66]** Aus der Etappe 3 nennt `docs/testkonzept.md`: `tests/hilfen/mitglieder-listen.ts`, `tests/hilfen/abruf.ts`, die E2E-Hilfen in fünf Dateien, den Fall «Name passt zur Methode» im Routen-Test; die zwei Struktur-Prüfungen und die Spur stehen schon in `docs/ci-cd-und-release.md`. `docs/ui-leitbild.md` nennt bei der Reihenfolge der Design-Dateien die Prüfung (H3-02). Den Eintrag `tests/oberflaeche/` in `docs/context-scopes.md` trägt Schritt 22 als Ordner ein, nicht dieser Schritt. Der Schritt ist reine Doku und kostet keine Version | `docs/arc42.md`, `docs/index.md`, `README.md`, `docs/testkonzept.md`, `docs/ci-cd-und-release.md`, **[geändert]** `docs/ui-leitbild.md`, `docs/versionen.md` (Eintrag ohne Nummer); nicht mehr: `docs/context-scopes.md` (Schritt 22), `src/lib/design/grundlagen.css` (Nachtrag zur Etappe 3) | Keine veralteten Aussagen (B-04) | niedrig | `make docs`; **[geändert]** das Review prüft jede neue Aussage am Code; `make css-vergleich` entfällt mit dem Kommentar | **[geändert]** Etappen 1 bis 3; der Nachtrag zur Etappe 3 ist gemergt (beide ändern `docs/ci-cd-und-release.md`) | Sonnet | Subagent; **[geändert, E-66]** ohne Halt, mit Kurzbericht | nein | **erledigt** (15.11.2026; Review mit Befunden in zwei Runden, alle behoben; Checkpoint mit dem Projektleiter: mergen; reiner Doku-Merge ohne Version; «Ergebnis Schritt 21» unten, Protokoll G.1) |
 | 22 | Context-Scopes auf Ordner gekürzt. `docs/superpowers/` ist als Geschichte gekennzeichnet (eine `README.md` im Ordner, ein Satz in `docs/index.md`) und steht nicht mehr in den Context-Scopes (E-15). **[geändert, 1e P3-22b, E-66]** Die Test-Ordner stehen als Ordner (`tests/e2e/hilfen/`, `tests/hilfen/`, `tests/oberflaeche/`; H3-01). Die Zeile «Refactoring (Plan, Stand, Entscheide)» bleibt bis Schritt 25 | `docs/context-scopes.md`, `docs/index.md`, neu `docs/superpowers/README.md` | Tabelle veraltet nicht mehr mit jeder Datei (B-05, B-06) | niedrig | `make docs` | **[geändert, P3-22a]** 21 (beide ändern `docs/index.md`; bisher stand hier 11) | Sonnet | Subagent; **[geändert, E-66]** ohne Halt, mit Kurzbericht | nein | **erledigt** (15.11.2026; Review mit einem Befund, behoben; reiner Doku-Merge ohne Version; «Ergebnis Schritt 22» unten, Protokoll G.2) |
-| 23 | **[geändert] Versionsregel nach dem Refactoring (E-07 in der Fassung von E-64).** Eine Version entsteht nicht mehr bei jedem Merge mit Code, sondern **nur noch beim Release `dev` → `main`**; Merges nach `dev` sammeln ihre Einträge in `docs/versionen.md` unter «Unveröffentlicht». Neue ADR, die ADR-007 ablöst und «Test geht in Betrieb» als Anlass nennt, die Regel neu anzusehen; `version-merge.ts`, Pre-Push-Hook, «grüner Stand» und Skill entsprechend. Bis der Schritt gemergt ist, gilt die heutige Regel. Bisher stand hier «wenn ein Stand auf Test ausgeliefert wird» (1e, N-27) | `docs/adr/` (neue ADR, Index, arc42 Kapitel 4), `scripts/pruefungen/version-merge.ts`, `gruener-stand.ts`, `release.ts` und ihre Tests, `.githooks/pre-push`, `.claude/skills/tco-branching/SKILL.md`, `docs/ci-cd-und-release.md`; **[geändert, 1e P3-23a]** dazu `Makefile` (Hilfetext zu `make hooks`) und in `.github/workflows/check.yml` nur der Kommentar zur Regel (oder ausdrücklich stehen lassen; die Jobs und `betrieb/` bleiben, E-16). Wo die heutige Regel in diesen Dateien überall steht: Hinweise | Die feste Kollisionsstelle paralleler Sessions fällt weg (B-03) | mittel (Umbau an den Prüfungen, die jeden Push bewachen) | Tests der Prüfskripte zuerst anpassen und einmal absichtlich brechen; ein Probe-Merge mit Code ohne Versionsnummer muss durchgehen, **[geändert, P3-23d]** geprüft lokal gegen das Skript auf einem Probe-Branch, nicht als Push; ein Push auf `main` weiterhin nicht; für den Umbau ein eigenes Review | Etappen 0 bis 3 erledigt; F-15 beantwortet (**erfüllt**, E-64); **[geändert]** in der Reihenfolge nach 22 (7.7) | **[geändert, E-66]** Opus für Nachmessen und Umbau (bisher Fable); das Modell der manuellen Session nennt der Orchestrator mit dem Prompt | **[geändert, E-66]** drei Teile: (1) Nachmessen (`refactor-analyst`); (2) manuelle Session des Projektleiters für Regel und ADR, danach Review durch den `refactor-reviewer`; (3) Umbau der Skripte als Subagent mit eigenem Review. Einzelheiten: Hinweise | ja; **[geändert, P3-23c]** erweitert: `release.ts` und `gruener-stand.ts` ganz, der Abschnitt «Versionen» in `docs/ci-cd-und-release.md`; welche Fassung von `version-merge.ts` den Push des Merges prüft, der sie ändert; was der Release-Job und `scripts/ci/versionsnotizen.sh` unter der neuen Regel tun (nur lesen); wer die Stufe wählt und welche Nummer als erste folgt | offen |
+| 23 | **[geändert] Versionsregel nach dem Refactoring (E-07 in der Fassung von E-64).** Eine Version entsteht nicht mehr bei jedem Merge mit Code, sondern **nur noch beim Release `dev` → `main`**; Merges nach `dev` sammeln ihre Einträge in `docs/versionen.md` unter «Unveröffentlicht». Neue ADR, die ADR-007 ablöst und «Test geht in Betrieb» als Anlass nennt, die Regel neu anzusehen; `version-merge.ts`, Pre-Push-Hook, «grüner Stand» und Skill entsprechend. Bis der Schritt gemergt ist, gilt die heutige Regel. Bisher stand hier «wenn ein Stand auf Test ausgeliefert wird» (1e, N-27) | `docs/adr/` (neue ADR, Index, arc42 Kapitel 4), `scripts/pruefungen/version-merge.ts`, `gruener-stand.ts`, `release.ts` und ihre Tests, `.githooks/pre-push`, `.claude/skills/tco-branching/SKILL.md`, `docs/ci-cd-und-release.md`; **[geändert, 1e P3-23a]** dazu `Makefile` (Hilfetext zu `make hooks`) und in `.github/workflows/check.yml` nur der Kommentar zur Regel (oder ausdrücklich stehen lassen; die Jobs und `betrieb/` bleiben, E-16). Wo die heutige Regel in diesen Dateien überall steht: Hinweise | Die feste Kollisionsstelle paralleler Sessions fällt weg (B-03) | mittel (Umbau an den Prüfungen, die jeden Push bewachen) | Tests der Prüfskripte zuerst anpassen und einmal absichtlich brechen; ein Probe-Merge mit Code ohne Versionsnummer muss durchgehen, **[geändert, P3-23d]** geprüft lokal gegen das Skript auf einem Probe-Branch, nicht als Push; ein Push auf `main` weiterhin nicht; für den Umbau ein eigenes Review | Etappen 0 bis 3 erledigt; F-15 beantwortet (**erfüllt**, E-64); **[geändert]** in der Reihenfolge nach 22 (7.7) | **[geändert, E-66]** Opus für Nachmessen und Umbau (bisher Fable); das Modell der manuellen Session nennt der Orchestrator mit dem Prompt | **[geändert, E-66]** drei Teile: (1) Nachmessen (`refactor-analyst`); (2) manuelle Session des Projektleiters für Regel und ADR, danach Review durch den `refactor-reviewer`; (3) Umbau der Skripte als Subagent mit eigenem Review. Einzelheiten: Hinweise | ja; **[geändert, P3-23c]** erweitert: `release.ts` und `gruener-stand.ts` ganz, der Abschnitt «Versionen» in `docs/ci-cd-und-release.md`; welche Fassung von `version-merge.ts` den Push des Merges prüft, der sie ändert; was der Release-Job und `scripts/ci/versionsnotizen.sh` unter der neuen Regel tun (nur lesen); wer die Stufe wählt und welche Nummer als erste folgt. **[G am 15.11.2026: Nachmessen erledigt, Anhang G.3]** | **Teil 1 (Nachmessen) erledigt** am 15.11.2026 (Anhang G.3: Mechanik je Stelle, elf Festlegungen S23-1 bis S23-11 für die Session, Dateiliste und Abbruchstellen des Umbaus, Entwurf der ADR-012). Teil 2 (manuelle Session) und Teil 3 (Umbau) offen |
 | 24 | **Dauerbetrieb.** In der Projekt-`CLAUDE.md` wird der Block «Übergangsregeln» aufgelöst: Was bleibt, wird Dauerregel, der Rest und der Verweis auf dieses Dokument entfallen. **[geändert, 1e P3-24c]** Mit dem Auflösen des Blocks endet der Feature-Stopp. Der Skill `tco-branching` enthält nur noch Ablauf, mit dem Rhythmus aus E-17 (README, Versionen und Doku-Abgleich vor einer Auslieferung, nicht nach jedem Issue; Beobachtungen bleiben) **[geändert]** und einem Satz zur CI auf dem Branch (C-19). Die Vorschläge «nach dem Refactoring» aus Anhang B für Dateien ausserhalb des Repos stehen als Einträge in der gemeinsamen `beobachtungen.md`. **[geändert, E-68]** Der Satz unter «Tests» zur Suche in den E2E wird so gefasst, wie er gilt (C-18); der Bestand bleibt. **Nicht in diesem Schritt [geändert]:** die Hinweise am Prüfwerkzeug (Nachtrag zur Etappe 3, E-67), die Fallen aus dem Session-Gedächtnis (E-69), der Satz zu den Listen der Mitglieder (C-16, schon eingespielt, E-70) | `CLAUDE.md`, `.claude/skills/tco-branching/SKILL.md`, `.claude/agents/` (die drei `refactor-*`-Agenten entfernen oder behalten: entscheidet der Projektleiter; **[geändert, P3-24d]** bleiben sie, fällt der Satz «Test vor der Regel committen» aus dem Auftrag des Implementers) | Neue Sessions bauen im Zielstil weiter; die Doku-Pflichten sind gebündelt (B-01, A-03, A-05) | niedrig | Entwurf dem Projektleiter zeigen, bevor die Datei ersetzt wird; `make docs`; **[geändert, E-66]** danach Review durch den `refactor-reviewer` | 23 | **[geändert, E-66]** nennt der Orchestrator mit dem Prompt (bisher Fable) | **[geändert, E-66]** manuelle Session des Projektleiters (Entwurf zeigen, Freigabe, ersetzen); der Orchestrator liefert Modell, Copy-Paste-Prompt und was die Session in dieses Dokument schreibt (Hinweise) | nein | offen |
 | 25 | Abschluss: Bleibendes steht in arc42 und ADRs, dieses Dokument ist als abgeschlossen markiert, #80 geschlossen. **[geändert, 1e P3-25c]** Dass der Feature-Stopp beendet ist, wird hier nur bestätigt; er endet in Schritt 24 (bisher stand hier «Feature-Stopp aufgehoben»). **[geändert, 1d P2-25, 1e P3-25a]** Die Punkte mit der Zuordnung «Beobachtung» aus 1c (Tabelle N), 1d (Tabellen H und N) und 1e (Tabelle H3) stehen als Einträge in `docs/beobachtungen.md`, gebündelt nach Thema; wo ein Eintrag schon besteht, wird er ergänzt, nicht verdoppelt (H3-04, H3-05, H3-13); sonst liest sie nach dem Abschluss niemand mehr (N-25). **[geändert, E-69, E-65]** Dazu geht «Fallen aus dem Session-Gedächtnis stehen im Repo» als Beobachtung für einen eigenen Vorgang nach dem Abschluss hinüber; die Ergänzung B aus Schritt 19 bleibt Beobachtung, bis Test in Betrieb geht | `docs/arc42.md`, `docs/adr/`, dieses Dokument; **[geändert]** `docs/beobachtungen.md`, `docs/index.md`, `docs/context-scopes.md` (Zeile «Refactoring»), die vier Protokoll-Dateien (Vermerk «abgeschlossen»; 1e P3-25b) | Sauberes Ende | niedrig | `make check`, `make docs` | alle | **[geändert, 1e P3-25d]** Opus (bisher Sonnet: Bündeln nach Thema und Abgleich mit dem Bestand sind Urteilsarbeit [V]) | manuelle Session (Orchestrator); **[geändert, E-66]** den Abschluss macht der Projektleiter | nein | offen |
 
@@ -3688,6 +3689,15 @@ Vorbild ist der Nachtrag zur Etappe 2 in 7.5)
   erprobt; das Nachmessen bestätigt es.
 - **Teil 1, Nachmessen** (`refactor-analyst`, Opus): was die Zeile nennt; Ergebnis hier und in
   der Zeile. Der Dependabot-PR #86 wird nicht zwischen Nachmessen und Merge gemergt (N-34).
+  **[G am 15.11.2026: erledigt, Anhang G.3.]** Was die Revision gelesen hatte, ist bestätigt
+  mit vier Zusätzen: (1) `release.ts` trägt die neue Regel erst ab dem zweiten Release; beim
+  ersten ist `dev` der Nummer von `main` schon voraus, und die Prüfung erkennt eine vergessene
+  Nummer nicht. (2) Den Push des Merges prüft die neue Fassung von Hook und Skript; sie muss
+  «Nummer steigt, mit Abschnitt» annehmen, solange dieser Merge noch 0.22.11 trägt. (3) Die
+  Kollisionsstelle schrumpft auf einen Textkonflikt in `docs/versionen.md`, sie fällt nicht
+  ganz weg. (4) Offen sind drei Dependabot-PRs (#86, #82, #38), und die Zeilennummern oben
+  gelten jetzt für `9630d56` (Tabelle in G.3.1). Die Liste «Zu entscheiden» unten steht
+  ausgearbeitet in G.3.3 (S23-1 bis S23-11).
 - **Teil 2, manuelle Session des Projektleiters** (Regel und ADR; Modell und Prompt vom
   Orchestrator). **Zu entscheiden:**
   - der Wortlaut der Regel und der Zeitpunkt: wer die Nummer vergibt und wann (die Revision
@@ -3842,7 +3852,7 @@ Vorbild ist der Nachtrag zur Etappe 2 in 7.5)
 | 16 [neu] | kurz: nur die Doppel-Seite (passt die Ablauf-Funktion der CM-Seite?) | aufnehmen oder ausdrücklich verwerfen. **Erledigt** 14.11.2026 (Anhang E.10): **aufnehmen** (drei Handler, zweiter Teil mit Abbruchstelle); sieben der acht Handler der CM-Seite passen ohne Rest; vier Vorab-E2E zum Fokus; keine Frage |
 | 19 [geändert] | was das Bordmittel von SvelteKit deckt; Name und Ort der Versionskennung; der Service Worker; Folge für E-27 und für «neu ausgeliefert, gleiche Versionsnummer»; Kennung und Paketversion, ohne F-15 vorwegzunehmen (Zeile 19, 1d P2-19b) | Checkpoint: Bordmittel oder nur entfernen. **Erledigt** 14.11.2026 (Anhang F.1): Bordmittel aktiv, lädt nur im Fehlerfall neu; Kennung bleibt der Zeitstempel; Fragen **F-35** und **F-36** |
 | 20 [geändert] | ungenutzte Exporte je Name bestätigen; was vom festen Turnierjahr offen ist; welche E2E der Verwaltung die Bestätigung selbst prüfen; die Stellen für Hinweis (d) (1d P2-20c) | Liste des Schritts; je Hinweis «aufnehmen oder verwerfen». **Erledigt** 14.11.2026 (Anhang F.3): 3 Namen entfernen, 25 nur `export` weg; sechs Hinweise aufnehmen, fünf verwerfen; zwei Läufe (Sonnet, Opus); Frage **F-37** (Spur in der CI) |
-| 23 [geändert] | `release.ts` und `gruener-stand.ts` ganz, Abschnitt «Versionen»; welche Fassung von `version-merge.ts` den Push des Merges prüft, der sie ändert; Release-Job und `scripts/ci/versionsnotizen.sh` unter der neuen Regel (nur lesen); Stufe und erste Nummer (Zeile 23, 1e P3-23c) | Grundlage der manuellen Session (Regel, ADR) und des Umbaus. F-15 ist beantwortet (E-64). **Offen** |
+| 23 [geändert] | `release.ts` und `gruener-stand.ts` ganz, Abschnitt «Versionen»; welche Fassung von `version-merge.ts` den Push des Merges prüft, der sie ändert; Release-Job und `scripts/ci/versionsnotizen.sh` unter der neuen Regel (nur lesen); Stufe und erste Nummer (Zeile 23, 1e P3-23c) | Grundlage der manuellen Session (Regel, ADR) und des Umbaus. F-15 ist beantwortet (E-64). **Erledigt am 15.11.2026 (Anhang G.3)** |
 
 Erledigt: Nachmessen für Schritt 04 (Anhang C.3), 07 (Anhang D.3), 08 (Anhang D.5), 09 (Anhang D.7), 10 (Anhang D.9), 11 (Anhang D.11), 13 (Anhang E.1), 15 (Anhang E.5; Lauf 1b Anhang E.7), 16 (Anhang E.10), 19 (Anhang F.1), 20 (Anhang F.3). [geändert] Kein Nachmessen: 06, 06a, 12, 12a, 14, 17, 18, 20a, 21,
 22, 24, 25; auch der Nachtrag zur Etappe 2 braucht keines (die Belege stehen in 1d), ebenso
@@ -4832,3 +4842,536 @@ Querschnitt-Dateien (`src/lib/fehler.ts`, `src/lib/abruf.ts`, `src/lib/server/ht
 Zeile «Refactoring» (bleibt bis Schritt 25); lebende Doku verweist an vier Stellen weiter auf Specs
 als «Design und Entscheide» (Beobachtung). Die Zelle «Phase» und ältere Absätze im Kopf sind
 stehen geblieben; der Kopf wird in Schritt 25 bereinigt. Kein zweites Review für die zwei Sätze.
+
+### G.3 Nachmessen Schritt 23
+
+**Nachmessen vor Schritt 23, Teil 1** (15.11.2026, `refactor-analyst`; Worktree
+`refactor/schritt-23` auf `9630d56` = `origin/dev`, Version 0.22.10). Geändert ist nur dieses
+Dokument. Kein Commit, kein Push, kein `make check`, kein E2E. Die Festlegungen in G.3.3 trifft
+der Projektleiter in seiner Session (Teil 2); sie tragen hier die Kennung S23-NN und sind keine
+neuen F-Nummern.
+
+**Ganz gelesen [G]:** `docs/adr/adr-007-version-pro-merge.md`, `adr-009-gruener-stand.md`,
+`vorlage.md`, `adr-index.md`; `scripts/pruefungen/version-merge.ts`, `release.ts`,
+`gruener-stand.ts`, `nur-doku.ts`, `dateien.ts`, `testmuster.ts` und die Tests zu
+`version-merge`, `release`, `nur-doku`; `scripts/ci/versionsnotizen.sh` mit Test,
+`scripts/ci/code-stand.sh`; `.githooks/pre-push`, `.githooks/pre-commit`; `Makefile`;
+`.claude/skills/tco-branching/SKILL.md`; `src/lib/version.ts`; `package.json`.
+**In Auszügen gelesen [E]:** `docs/ci-cd-und-release.md` (Zeilen 12 bis 32, 41 bis 90, 120 bis
+136, 304 bis 314, 334 bis 364, 395 bis 430, 464 bis 472, dazu eine Textsuche über die ganze
+Datei), `.github/workflows/check.yml` (Kopf bis Zeile 32, die Bedingungen aller Jobs, die Jobs
+`finden` ab «Release vorab prüfen» und `release` ganz), `docs/versionen.md` (Kopf und alle
+Überschriften), `scripts/pruefungen/gruener-stand.test.ts` (Zeilen 84 bis 135), `vite.config.ts`
+(Zeilen 18 bis 60), `docs/arc42.md` (Kapitel 4). **Ausprobiert, nur lesend [G]:**
+`make release-check`, `node scripts/pruefungen/version-merge.ts origin/main..HEAD`,
+`nur-doku.ts` mit Pfadlisten über die Eingabe, der Hook mit einer Zeile «Push auf `main`» über
+die Eingabe, die zwei reinen Prüffunktionen (`pruefeVersionsschritte`, `pruefeRelease`) mit den
+Fällen der neuen Regel, `git merge-file -p` auf drei Probedateien im Scratchpad.
+
+**Kurzfazit**
+
+1. **Die Mechanik ist, wie die Revision sie beschrieben hat, mit einer Berichtigung in der
+   Zahl:** Seit `main` (0.20.5) sind es heute **28** Nummern, nicht 27 (0.22.10 kam mit dem
+   Nachtrag zur Etappe 3 dazu); mit dem Merge von Schritt 23 werden es 29 [G:
+   `docs/versionen.md` hat auf `dev` 66 Versionsabschnitte, auf `origin/main` 38].
+2. **Die Nummer bewacht heute nur der lokale Hook.** Die CI prüft sie auf `dev` gar nicht und
+   auf `main` erst, wenn `AUSLIEFERUNG_LIVE` an ist; beide Schalter sind nicht gesetzt [G:
+   `gh variable list` gibt nichts aus], es gibt keinen Tag und kein GitHub-Release [G].
+3. **`release.ts` trägt die neue Regel für jedes Release ausser dem ersten** (Probe R4). Beim
+   ersten Release nach dem Umbau ist `dev` der Nummer von `main` schon voraus; wer die Einträge
+   aus «Unveröffentlicht» in den Abschnitt 0.22.11 schiebt, statt eine neue Nummer zu setzen,
+   kommt durch (Probe R2). Die heutige Meldung rät genau dazu (Probe R1). Das ist die eine
+   Lücke; sie lässt sich nicht billig schliessen und wird mit S23-3 und S23-11 behandelt.
+4. **Den Push des Merges von Schritt 23 prüft die neue Fassung von Hook und Skript, nicht die
+   alte** (beide laufen aus dem Arbeitsordner). Bekommt dieser Merge nach E-64 noch eine Nummer,
+   muss die neue Fassung «die Nummer steigt, mit Abschnitt» annehmen. Das ist die erste
+   Abbruchstelle des Umbaus.
+5. **Die Kollisionsstelle schrumpft, sie verschwindet nicht.** Statt drei Dateien mit einer
+   Nummer, die neu zu vergeben ist, bleibt eine Datei mit einem Textkonflikt «beide behalten»,
+   wenn zwei Branches ihren Eintrag an dieselbe Stelle schreiben (Probe K1). Der Satz «die feste
+   Kollisionsstelle fällt weg» (Zeile 23, B-03) ist in diesem Punkt zu stark. Dazu ein stiller
+   Fall: Ein Branch, der vor dem Release abgezweigt ist, bringt seinen Eintrag ohne Konflikt in
+   den Abschnitt der schon veröffentlichten Nummer (Probe K3). Das fängt nur eine Prüfung
+   «Merge mit Code hat einen Eintrag unter Unveröffentlicht» (S23-4).
+6. **Sobald Test läuft, hat «die Nummer im Doku-Abgleich» eine Folge, die heute niemand
+   bemerkt:** Die Nummer steht in `package.json`, das zählt zum Code-Stand. Wird sie nach der
+   Checkliste gesetzt, geht ein anderes Image live als das, auf dem die Checkliste lief. Heute
+   folgenlos (kein Test). Das gehört als zweiter Punkt neben den Einwand aus ADR-007 in den
+   Anlass «Test geht in Betrieb».
+7. **Der Dateiliste des Plans fehlen vier Stellen** (unten, G.3.4): der Kopf von
+   `docs/versionen.md`, `docs/arc42.md` Zeile 70, der Kommentar in `gruener-stand.ts` und die
+   Meldungen und der Kopfkommentar von `release.ts`. Offen sind drei Dependabot-PRs, nicht
+   einer: #86, #82 (Caddy unter `betrieb/`, zählt als Code) und #38 [G: `gh pr list`].
+
+#### G.3.1 Die heutige Mechanik
+
+| Stelle | Heutige Regel | Fundort [G] |
+|--------|---------------|-------------|
+| Wer vergibt die Nummer | Wer nach `dev` mergt, im Merge-Commit selbst; nie der Feature-Branch. `npm version patch` (bzw. `minor`, `major`) ohne Tag | Skill `SKILL.md:99-100`, `109-120`; `docs/ci-cd-und-release.md:403-407`; ADR-007 `:26-30` |
+| Wann | Bei jedem Merge nach `dev`, dessen Diff zum ersten Elternteil nicht nur Doku ist; reine Doku lässt die Nummer stehen | `SKILL.md:105-110`; `version-merge.ts:29-36` |
+| Was «Doku» ist | Endung `.md` oder Pfad unter `docs/`, ausser `docs/datenschutzerklaerung.md`. Skill und neue ADR allein sind Doku; Hook, `Makefile`, Skripte, `check.yml` sind Code [Probe: `nur-doku.ts` mit Pfadlisten] | `nur-doku.ts:5`, `:12-16`; dieselbe Regel in `scripts/ci/code-stand.sh:18-19` |
+| Welche Stufe | Korrektur ist der Normalfall; Nebenversion bei neuer Etappe oder spürbar neuer Funktion, Claude wählt und nennt es im Bericht; Hauptversion nur im Auftrag des Projektleiters. `1.0.0` ist für das Release «Mitglieder-Login» vorgesehen | `SKILL.md:112-115`; `docs/ci-cd-und-release.md:399-402`, `:414-417` |
+| Was der Merge sonst schreibt | Zuoberst in `docs/versionen.md` einen Abschnitt `## X.Y.Z — Kurztitel`; alle Einträge aus «Unveröffentlicht» wandern hinein, «Unveröffentlicht» bleibt leer stehen. Drei Dateien je Merge: `package.json`, `package-lock.json`, `docs/versionen.md` | `SKILL.md:122-131`; Kopf `docs/versionen.md:5-7` |
+| Was «Unveröffentlicht» heute ist | Eine Ablage auf Zeit: Einträge der Feature-Branches bis zu ihrem Merge und Einträge reiner Doku-Merges bis zum nächsten Merge mit Code. Heute stehen dort die Einträge der Schritte 21 und 22 | `docs/versionen.md:9-16`; `SKILL.md:122-125`, `:222-223`, `:306-308` |
+| Prüfung lokal, Push auf `dev` | `version-merge.ts <alt>..<neu>` über jeden Commit der Hauptlinie (erster Elternteil), ohne was schon auf `origin/main` liegt. Mit Code: Nummer genau einen Schritt höher und ihr Abschnitt zuoberst. Nur Doku: Nummer unverändert. Ein Fast-Forward mit mehreren Code-Commits scheitert, darum `--no-ff` | `.githooks/pre-push:18-21`, `:27-29`; `version-merge.ts:22-54`, `:68-96`; `docs/ci-cd-und-release.md:408-413` |
+| Welche Fassung prüft | Hook und Skript aus dem Arbeitsordner, in dem gepusht wird (`core.hooksPath` ist `.githooks`, relativ; der Hook ruft `node scripts/pruefungen/version-merge.ts` relativ). Beim Push des Merges also schon die gemergte Fassung | `git config --get core.hooksPath`; `.githooks/pre-push:28` |
+| Prüfung lokal, Push auf `main` | Abgewiesen, vor allem anderen [Probe: Exit 1 mit «Direkter Push auf main ist verboten»] | `.githooks/pre-push:13-16` |
+| Volle Prüfung beim Push | `make check`, sobald der Bereich Code enthält, ausser der Stand ist schon grün gemerkt. Der gemerkte Stand lässt Doku und die eigene Nummer in `package.json` und `package-lock.json` weg | `.githooks/pre-push:44-55`; `gruener-stand.ts:9-13`, `:22`, `:40-49`; `Makefile:7-19` |
+| Prüfung in der CI auf `dev` | Keine zur Nummer. `version-merge.ts` und `release.ts` stehen nicht in `npm run pruefungen`; ihre Tests laufen als Einheitstests mit | `package.json:22`; `testmuster.ts` (`scripts/**/*.test.ts`); `docs/ci-cd-und-release.md:337` («nur Hook») |
+| Vor dem Release | `make release-check` (`release.ts`, holt Tags und `origin/main`): genau ein Abschnitt je Nummer; der Abschnitt der Nummer aus `package.json` zuoberst; Nummer sinkt nicht; mit Code ist sie höher als auf `main`; ändert sie sich gegenüber `main`, ist «Unveröffentlicht» leer; kein Tag ohne Abschnitt, kein Tag auf einem Abschnitt «nicht ausgeliefert». Heute rot: «Unveröffentlicht ist nicht leer … Einträge in den Abschnitt 0.22.10» [G: Lauf] | `Makefile:34-36`; `release.ts:67-125`, `:133`; `SKILL.md:213-235` |
+| Was das Release mit der Nummer tut | Nichts: Live bekommt die Nummer, die `dev` trägt. Der Doku-Abgleich schiebt nur liegengebliebene Einträge in den obersten Abschnitt | `SKILL.md:199-201`, `:209-211`, `:222-223`; `docs/ci-cd-und-release.md:68-74` |
+| Tag und GitHub-Release | Nur die CI, nur auf `main`, nur wenn `AUSLIEFERUNG_LIVE` an ist und Live ausgeliefert hat. Vorab prüft `finden`: Nummer lesbar, Text vorhanden, Tag `vX.Y.Z` noch frei. `release` legt Tag und Release an; der Text sind alle Abschnitte über dem letzten GitHub-Release bis zur Nummer, je mit Überschrift (`versionsnotizen.sh <version> <vorher>`); ohne früheres Release alle. Nie von Hand | `check.yml:357-389`, `:472-511`; `versionsnotizen.sh:13-36`; `docs/ci-cd-und-release.md:418-426` |
+| Auslieferung auf Test | Bei jedem Push auf `dev` mit Code, wenn `AUSLIEFERUNG_TEST` an ist. Das Image trägt das Kennzeichen des Code-Stands; der Code-Stand zählt `package.json` mit, also auch die Nummer | `check.yml:287-292`; `code-stand.sh:18-19`; `docs/ci-cd-und-release.md:83-90`, Tabelle «Umgebungen» |
+| Fusszeile | «Version X.Y.Z» aus `package.json`, beim Bauen eingesetzt; dieselbe Nummer in `/api/status`. Zwei E2E-Tests vergleichen die Fusszeile mit `package.json`. Die Kennung, an der eine offene App eine neue Auslieferung erkennt, ist der Zeitstempel des Builds, nicht diese Nummer | `vite.config.ts:25-28`, `:57`; `src/lib/version.ts:1`; `src/routes/+layout.svelte:221`; `src/lib/server/status.ts:21`; `tests/e2e/startseite.test.ts:20`, `tests/e2e/bewegung.test.ts:47` |
+| Nach dem Release | Realign: `dev` nimmt den Merge-Commit von `main` auf; der Hook lässt ihn durch, weil er auf `main` liegt | `SKILL.md:246-255`; `version-merge.ts:68-76` |
+| Push abgewiesen, `origin/dev` weitergezogen | `git pull --no-rebase --no-commit`, die eigene Arbeit bekommt ausdrücklich die nächste freie Nummer, der eigene Abschnitt kommt über den fremden | `SKILL.md:139-151`; ADR-007 `:38-39` |
+| Dependabot | Lokal gemergt wie ein Branch, mit Korrektur und Abschnitt «Abhängigkeiten aktualisiert», weil der Hook nur lokal läuft | `SKILL.md:153-156`; `docs/ci-cd-und-release.md:412-413` |
+| Wo die Regel als Satz steht | ADR-007 (Titel, Entscheid), ADR-Index Zeile 20, `docs/arc42.md:70`, `docs/versionen.md:5-6`, `docs/ci-cd-und-release.md:45` (Mermaid), `:68-69`, `:337`, `:403-417`, Skill (oben), `.githooks/pre-push:18`, `Makefile:101`, `check.yml:503`, `release.ts:8-9` und Meldung `:93-94`, `version-merge.ts:6-9` und Meldung `:40-41`, `gruener-stand.ts:11-12`, `release.test.ts:94` (Testname) | Textsuche über das Repo ohne `docs/superpowers/`, die Refactoring-Dokumente und `docs/beobachtungen.md` |
+
+**Proben an den heutigen Prüffunktionen [G]** (Aufruf der reinen Funktionen mit erfundenen
+Ständen; nichts geschrieben):
+
+| Probe | Fall | Heutiges Ergebnis |
+|-------|------|-------------------|
+| P1 | Merge mit Code, Nummer bleibt 0.22.11 (der Normalfall der neuen Regel) | abgewiesen: «Merge mit Code, aber Version bleibt» |
+| P2 | Merge setzt 0.22.11 → 0.23.0 mit Abschnitt zuoberst (der Doku-Abgleich der neuen Regel) | angenommen |
+| P3 | Merge von Schritt 23 mit 0.22.10 → 0.22.11 und Abschnitt | angenommen |
+| R1 | Erstes Release, `main` 0.20.5, `dev` 0.22.11, Einträge unter «Unveröffentlicht» | abgewiesen, mit dem Rat «Einträge in den Abschnitt 0.22.11» |
+| R2 | Wie R1, aber die Einträge sind in den alten Abschnitt 0.22.11 geschoben, keine neue Nummer | **angenommen** (die Lücke) |
+| R3 | Erstes Release mit neuer Nummer 0.23.0, «Unveröffentlicht» leer | angenommen |
+| R4 | Späteres Release mit Code, `main` und `dev` beide 0.23.0 | abgewiesen: «Release enthält Code, aber die Version bleibt», mit dem veralteten Zusatz «beim Merge nach dev nicht erhöht» |
+| R5 | Späteres Release, Sprung 0.23.0 → 0.25.0 | **angenommen**: Die Schrittweite prüft heute nur `version-merge.ts` |
+| R6 | Späteres Release nur mit Doku, Nummer bleibt, «Unveröffentlicht» gefüllt | angenommen |
+| R7 | Abschnitt der neuen Nummer ohne Text | angenommen (die CI prüft den Text erst bei Live) |
+| K1 | Zwei Branches hängen je eine Zeile ans Ende von «Unveröffentlicht» | Textkonflikt |
+| K2 | Einer schreibt oben, einer unten | kein Konflikt |
+| K3 | Auf `dev` ist «Unveröffentlicht» zum Abschnitt der neuen Nummer geworden; ein älterer Branch hängt eine Zeile an | kein Konflikt, die Zeile landet **im Abschnitt der neuen Nummer**, «Unveröffentlicht» bleibt leer; mit `--union` dasselbe |
+
+#### G.3.2 Was sich mit der neuen Regel (E-64) je Stelle ändert
+
+| Stelle | Urteil | Was genau |
+|--------|--------|-----------|
+| Vergabe beim Merge nach `dev` (Skill Schritt 4, `SKILL.md:99-131`) | **ändert sich** | Der Merge vergibt keine Nummer und fasst `package.json` und `package-lock.json` nicht an. `--no-commit` braucht es nur noch, wenn der Eintrag fehlt (Dependabot). Der Absatz zu den Stufen zieht zum Release |
+| Eintrag unter «Unveröffentlicht» | **ändert sich** | Aus der Ablage auf Zeit wird der Ort, an dem sich alles bis zum Release sammelt. Wer schreibt und ob geprüft wird: S23-4 |
+| `version-merge.ts` und sein Aufruf im Hook | **ändert sich oder entfällt** (S23-4) | Die heutigen drei Urteile («mit Code steigt die Nummer», «genau ein Schritt», «Doku lässt sie stehen») entfallen alle. Was bleiben kann, steht unter der Tabelle |
+| Sperre «kein Push auf `main`» (`.githooks/pre-push:13-16`) | **bleibt** | unverändert, durch die Probe belegt |
+| Volle Prüfung beim Push, grüner Stand | **bleibt** | Logik unverändert; nur der Kommentar `gruener-stand.ts:11-12` und der Satz in `.githooks/pre-push:6` nennen den Anlass neu. Einzelheiten unter der Tabelle |
+| `nur-doku.ts`, `code-stand.sh` | **bleibt** | Die Einteilung Doku oder Code braucht es weiter für Hooks, CI und Auslieferung; nur nicht mehr für die Nummer |
+| `make release-check` (`release.ts`) | **bleibt in der Logik, ändert sich in zwei Texten** | Meldung `:93-94` («beim Merge nach dev nicht erhöht (Skill, Schritt 4)») und Kopfkommentar `:8-9` sind dann falsch. Was dazukommen kann, steht unter der Tabelle |
+| Doku-Abgleich vor dem Release (Skill 4a, `SKILL.md:213-231`) | **ändert sich** | Neu vergibt er die Nummer: `npm version`, aus «Unveröffentlicht» wird der Abschnitt der neuen Nummer mit Kurztitel, «Unveröffentlicht» bleibt leer stehen. Der Satz «Bringt der Abgleich Code mit, bekommt sein Merge eine Korrektur» entfällt. Der Abgleich ist damit nie mehr reine Doku: Sein Commit läuft durch `make check-schnell`, sein Push ist ein Push mit Code |
+| «Das Release erhöht die Version nicht» (`SKILL.md:199-201`, `:209-211`; `docs/ci-cd-und-release.md:68-69`) | **kehrt sich um** | Das Release vergibt die Nummer, ausser es enthält nur Doku |
+| Tag, GitHub-Release, Vorab-Prüfung in `finden` (`check.yml`) | **bleibt** | Kein Job ändert sich (E-16). «Tag noch frei» wird zur zweiten Sicherung, dass jedes Live-Release eine neue Nummer hat. `versionsnotizen.sh` bleibt: Der Bereich «über dem letzten Release bis zur Nummer» ist künftig meist ein Abschnitt, beim ersten Live-Release alle. Nur der Kommentar `check.yml:503` begründet es mit der alten Regel (S23-9) |
+| Auslieferung auf Test (`bauen`) | **bleibt, mit neuer Folge** | Mehrere Stände auf Test tragen dieselbe Nummer (der Einwand aus ADR-007). Und: Der Abgleich mit der Nummer ändert den Code-Stand, also wird nach der Checkliste noch einmal gebaut und ausgeliefert (Kurzfazit 6). Beides erst, wenn `AUSLIEFERUNG_TEST` an ist |
+| Fusszeile, `/api/status`, die zwei E2E-Tests | **bleibt** | Kein Code ändert sich. Die Fusszeile zeigt zwischen zwei Releases dieselbe Nummer (S23-5). `docs/testkonzept.md:238` («Die Fusszeile zeigt die neue Version») stimmt weiter und sagt dann mehr als heute |
+| Realign nach dem Release (`SKILL.md:246-255`) | **bleibt** | Der Befehl ist derselbe. Bleibt eine Prüfung auf `dev`, bleibt auch die Ausnahme «was auf `origin/main` liegt» (`version-merge.ts:68-76`); der Satz im Skill dazu bleibt dann wahr |
+| «Push abgewiesen, `origin/dev` ist weitergezogen» (`SKILL.md:139-151`) | **ändert sich** | `git pull --no-rebase` bleibt. Die Regel «nächste freie Nummer, ausdrücklich gesetzt» entfällt ganz. Übrig bleibt ein möglicher Textkonflikt in `docs/versionen.md` mit der Regel «beide Einträge behalten», die schon unter «Reibungspunkte» steht (`SKILL.md:306-308`); deren zweiter Satz («Versionsnummern schreibt nur der Merge nach `dev`») wird ersetzt |
+| Dependabot (`SKILL.md:153-156`) | **bleibt lokal, ohne Nummer** (S23-10) | Statt «Korrektur, Abschnitt» ein Eintrag «Abhängigkeiten aktualisiert» unter «Unveröffentlicht», geschrieben von dem, der mergt. Die Begründung «der Hook läuft nur lokal» trägt weiter, wenn eine Prüfung bleibt; sonst trägt sie nur noch für `make check` vor dem Push |
+| ADR-007, Index, `docs/arc42.md:70` | **ändert sich** | ADR-007 bekommt den Status «Ersetzt durch ADR-012» (Wortlaut der Vorlage, `vorlage.md:5`), der Text bleibt als Geschichte; Index und arc42 nennen die neue ADR (S23-7) |
+| ADR-009 (grüner Stand) | **bleibt** | Der Kontext nennt den Merge-Commit, «der nur die Versionsnummer und Doku dazubringt»; das ist die Lage von damals. Der Entscheid («nur Doku und Versionsnummer») gilt weiter, für den Push des Abgleichs. Kein Eingriff nötig |
+| `docs/ci-cd-und-release.md` | **ändert sich** an sechs Stellen | Mermaid `:45` («Merge nach dev, neue Nummer»; die Nummer gehört an den Knoten «Doku-Abgleich»), `:59-67`, `:68-74`, die Zeile der Prüfung `:337`, der Abschnitt «Versionen» `:403-421`, der Satz zum grünen Stand `:356-360` nur, falls der Anlass genannt werden soll |
+| `docs/versionen.md`, Kopf `:5-7` | **ändert sich** | «Jeder Merge nach `dev` mit Code bekommt hier seinen eigenen Abschnitt» wird falsch. Die Abschnitte selbst: S23-6 |
+| `Makefile:101`, `.githooks/pre-push:18` | **ändert sich** (S23-9) | Hilfetext «Versionsprüfung beim Push auf dev» und der Kommentar im Hook |
+| `.claude/agents/refactor-implementer.md:24` («keine Versionsnummer») | **bleibt** | gilt unter beiden Regeln |
+
+**Was `version-merge.ts` nach dem Umbau auf `dev` noch prüft.** Zwei Wege, die Wahl ist S23-4:
+
+- *Nichts.* Skript, Test und der Aufruf im Hook (`.githooks/pre-push:11`, `:18-21`, `:27-29`)
+  entfallen; `versionsabschnitte` bleibt in `release.ts`. Am einfachsten. Dann merkt niemand
+  einen fehlenden Eintrag, und der stille Fall K3 bleibt unbemerkt, bis jemand die Versionen
+  liest.
+- *Eine schmale Prüfung je Commit der Hauptlinie* (wie heute ohne was auf `origin/main` liegt):
+  (a) Bleibt die Nummer und bringt der Commit Code, muss «Unveröffentlicht» nach dem Commit
+  mehr enthalten als davor. (b) Steigt die Nummer, dann um genau einen Schritt, ihr Abschnitt
+  steht zuoberst und «Unveröffentlicht» ist leer. (c) Reine Doku mit unveränderter Nummer: keine
+  Forderung. Fall (b) nimmt den Abgleich vor dem Release an **und** den Merge von Schritt 23
+  mit 0.22.11 (Probe P3 hat dieselbe Form). Fall (a) fängt K3 und den vergessenen Eintrag; ein
+  `git pull --no-rebase` mit fremdem Code besteht ihn von selbst, weil der fremde Eintrag
+  mitkommt. `--no-ff` bleibt nötig, sonst müsste jeder einzelne Commit einen Eintrag bringen.
+  **Was diese Prüfung nicht fängt:** eine Nummer, die jemand aus Gewohnheit beim Merge
+  vergibt; sie hat dieselbe Form wie der Abgleich. Eine Regel «höchstens eine neue Nummer seit
+  `main`» liesse sich erst nach dem ersten Release unter der neuen Regel sauber prüfen, weil
+  `dev` bis dahin 29 Nummern voraus ist [V: nicht gebaut, aus dem Vergleich der Stände
+  hergeleitet].
+
+**Was `release.ts` schon verlangt und was dazukommen muss.** Schon da [G, Proben R1, R3, R4,
+R6]: Abschnitt der Nummer zuoberst und genau einmal; mit Code eine höhere Nummer als `main`;
+«Unveröffentlicht» leer, sobald sich die Nummer ändert; reine Doku darf die Nummer lassen. Das
+ist die neue Regel für jedes Release, bei dem `dev` und `main` vorher dieselbe Nummer tragen.
+Dazu kommt: (1) zwei Texte (Meldung `:93-94`, Kommentar `:8-9`) und der Rat in der Meldung
+`:107-108`, der heute «Einträge in den Abschnitt der bestehenden Nummer» sagt und künftig «neue
+Nummer setzen, aus Unveröffentlicht wird ihr Abschnitt» sagen muss; (2) nur falls
+`version-merge.ts` entfällt, die Schrittweite (R5), sonst prüft sie niemand mehr; (3) die Lücke
+R2 beim ersten Release: nicht billig zu schliessen, weil `release.ts` einer Nummer nicht ansieht,
+ob sie für dieses Release vergeben wurde. Vorschlag: nicht prüfen, sondern die erste Nummer in
+der Session festlegen (S23-3) und im Skill nennen (S23-11).
+
+**Grüner Stand.** `gruener-stand.ts` bleibt unverändert in der Logik [G: gelesen; Test
+`gruener-stand.test.ts:120-128` «bleibt grün, wenn danach nur Doku und die Versionsnummer
+dazukommen» bleibt wahr]. Der Merge nach `dev` bringt künftig weder Nummer noch (wenn der Branch
+den Eintrag schreibt) Doku dazu; sein Stand ist der geprüfte Stand des Branches, solange `dev`
+nicht weitergezogen ist. «Seither nur Doku/Version» braucht es weiter für genau einen Fall: den
+Push des Abgleichs, der die Nummer setzt. Ohne die Ausnahme für die Nummer liefe dort jedes Mal
+ein voller `make check` für drei Zeilen. Die Ausnahme zu streichen wäre darum falsch.
+
+**Tests der Prüfskripte.**
+
+| Test | Ändert sich? |
+|------|--------------|
+| `version-merge.test.ts` (8 Fälle) | Ganz: Bei «nichts» entfällt die Datei. Bei der schmalen Prüfung bleiben die zwei Fälle zu `istNaechsteVersion`; die sechs zu `pruefeVersionsschritte` werden neu geschrieben (Eintrag verlangt, Abgleich angenommen, Doku frei, K3, jeder Schritt einzeln), der Typ `Versionsschritt` bekommt den Stand von «Unveröffentlicht» vor und nach dem Commit |
+| `release.test.ts` (15 Fälle) | Zwei Texte: der erwartete Meldungstext `:71` («— beim Merge») und der Testname `:94` («jeder Merge nach dev hat seine Nummer»; der Fall selbst bleibt, er deckt die 28 alten Abschnitte). Neu ein Fall je geänderter Meldung; bei «nichts» dazu Fälle zur Schrittweite |
+| `gruener-stand.test.ts`, `nur-doku.test.ts`, `scripts/ci/versionsnotizen.test.ts`, `scripts/ci/code-stand.test.ts`, `workflow-rechte.test.ts` | Nein. Werden sie beim Umbau rot, greift der Umbau weiter als gemessen (Abbruchstelle) [E: `code-stand.test.ts` und `workflow-rechte.test.ts` nicht gelesen; `workflow-rechte.ts` prüft Rechte der Jobs, ein geänderter Kommentar berührt sie nicht, V] |
+| E2E `startseite.test.ts:20`, `bewegung.test.ts:47` | Nein: Sie lesen die Nummer aus `package.json` |
+
+#### G.3.3 Was der Projektleiter in seiner Session festlegt
+
+Elf Festlegungen. Jede ist so geschrieben, dass sie ohne Blick in den Code entschieden werden
+kann. «Abgleich» heisst hier der Doku-Abgleich vor einem Release: der letzte Arbeitsgang auf
+`dev`, bevor der Antrag (PR) nach `main` entsteht.
+
+**S23-1 — Wer vergibt die Nummer, und wann genau?**
+
+- A: Claude im Abgleich vor dem PR. Der Abgleich setzt die Nummer, macht aus «Unveröffentlicht»
+  den Abschnitt dieser Nummer und kommt als gewöhnlicher Merge nach `dev`; erst danach entsteht
+  der PR. **Folgen:** passt zu dem, was die Prüfung vor dem Release heute schon verlangt; kein
+  neues Werkzeug. Kommt zwischen Abgleich und PR noch ein Merge mit Code, wird die Prüfung rot
+  und sein Eintrag rückt in denselben Abschnitt nach (so steht es sinngemäss schon im Skill).
+- B: Claude beim Anlegen des PR, als eigener Handgriff nach dem Abgleich. **Folgen:** ein
+  zusätzlicher Merge nach `dev` je Release, ohne Gewinn; der Abgleich hätte dann eine Fassung
+  der Versionen geprüft, die es so nicht mehr gibt.
+- C: die CI beim Merge nach `main`. **Folgen:** Die CI müsste nach `dev` oder `main` schreiben
+  dürfen. Heute darf nur der Release-Job ins Repo schreiben, und nur den Tag
+  (`docs/ci-cd-und-release.md:72-73`); das wäre neue Funktion an den Jobs, die nach E-16 nicht
+  angefasst werden.
+- **Empfehlung: A.** Dazu ein Merkpunkt, kein Entscheid für heute: Sobald Test läuft, muss die
+  Nummer **vor** der Checkliste stehen, nicht danach, sonst geht ein anderes Image live als das
+  geprüfte (Kurzfazit 6). Das gehört in den Anlass der ADR (S23-7).
+
+**S23-2 — Welche Stufe bekommt ein Release, und wer wählt?**
+
+Vorgeschlagene Regel: *Nebenversion* (mittlere Zahl), wenn das Release für Mitglieder oder
+Verwaltung etwas spürbar Neues bringt; *Korrektur* (letzte Zahl), wenn es nur Fehler behebt
+oder Inneres und Werkzeug ändert; *Hauptversion* nur im Auftrag des Projektleiters (`1.0.0`
+bleibt für «Mitglieder-Login» vorgesehen).
+
+- A: Claude wählt nach dieser Regel und nennt Nummer und Grund in der Bitte um Freigabe; die
+  Freigabe des Releases gilt auch für die Nummer. **Folgen:** kein eigener Schritt; der
+  Projektleiter sieht die Nummer, bevor etwas nach `main` geht, und kann sie mit einem Wort
+  ändern.
+- B: Der Projektleiter nennt die Stufe bei jeder Freigabe selbst. **Folgen:** eine Rückfrage
+  mehr je Release.
+- C: Jedes Release ist eine Nebenversion; Korrektur nur für eine eilige Fehlerbehebung.
+  **Folgen:** nichts zu wählen; die mittlere Zahl zählt dann schlicht die Releases.
+- **Empfehlung: A.**
+
+**S23-3 — Welche Nummer trägt der Merge von Schritt 23, und welche das nächste Release?**
+
+- Merge von Schritt 23. A: **0.22.11**, als letzte Nummer nach der alten Regel; die Einträge der
+  Schritte 21 und 22 wandern mit in diesen Abschnitt. So sagt es E-64 («bis Schritt 23 gemergt
+  ist, gilt die heutige Regel»), und so nimmt es die Prüfung in beiden Fassungen an (Probe P3).
+  B: keine Nummer, die neue Regel gilt schon für den eigenen Merge; spart eine Nummer, ändert
+  aber den Zusatz von E-64. **Empfehlung: A.** Gilt nur, wenn bis dahin kein anderer Merge mit
+  Code nach `dev` kommt; sonst ist es die dann nächste freie Nummer.
+- Nächstes Release. A: **0.23.0**: Es bringt die Interclub-Resultate nach `main`, nach der Regel
+  aus S23-2 eine Nebenversion. B: 0.22.12, als blosse Fortsetzung. C: 1.0.0; das ist vergeben.
+  **Empfehlung: A**, und die Zahl in der Session festhalten: Beim ersten Release kann die
+  Prüfung eine vergessene Nummer nicht erkennen (Kurzfazit 3).
+
+**S23-4 — Wer schreibt den Eintrag unter «Unveröffentlicht», in welcher Form, und verlangt ihn eine Prüfung?**
+
+Form (Vorschlag, wie die heutigen Einträge): ein bis drei Zeilen je Merge, was sich für die
+Nutzerin ändert; bei Innerem der Satz «An der App ändert sich nichts»; Issue-Nummer, wo es eine
+gibt. Reine Doku darf einen Eintrag schreiben, muss aber nicht (wie heute).
+
+- A: Der Branch schreibt den Eintrag als Teil seiner Arbeit, und der Hook weist einen Merge mit
+  Code ab, der keinen neuen Eintrag bringt (die schmale Prüfung aus G.3.2). Bei Dependabot
+  schreibt, wer mergt. **Folgen:** Der Eintrag ist im Review sichtbar; ein vergessener Eintrag
+  und der stille Fall «Eintrag landet im schon veröffentlichten Abschnitt» fallen beim Push auf.
+  Rund 40 Zeilen Prüfskript bleiben [V]. Zwei Sessions, die gleichzeitig mergen, können einen
+  Textkonflikt in dieser einen Datei bekommen; die Regel dafür ist «beide Einträge behalten».
+- B: Der Branch schreibt den Eintrag, keine Prüfung; `version-merge.ts` und sein Aufruf
+  entfallen. **Folgen:** am wenigsten Werkzeug. Ein fehlender Eintrag fällt erst beim Abgleich
+  auf, und nur, wenn jemand die Merges gegen die Einträge hält; die Schrittweite der Nummer
+  müsste dann die Prüfung vor dem Release übernehmen.
+- C: Den Eintrag schreibt nur, wer mergt. **Folgen:** kein Textkonflikt zwischen Branches; aber
+  der Eintrag entsteht ohne Review, und wer mergt, kennt die Arbeit oft nur aus dem Bericht.
+- **Empfehlung: A.** Sie hält die Regel mit einer Prüfung statt mit Disziplin, und die Prüfung
+  ist kleiner als die heutige.
+
+**S23-5 — Die Fusszeile zeigt zwischen zwei Releases dieselbe Nummer. Annehmen?**
+
+- A: Annehmen. Zwei Stände auf `dev` unterscheidet der Commit, nicht die Nummer. **Folgen:**
+  heute keine, denn ausgeliefert wird nirgends; lokal sieht man den Stand ohnehin am Branch.
+- B: Zusatz in der Fusszeile, etwa die Kurzform des Commits. **Folgen:** neue Funktion (Bau,
+  Anzeige, Tests); im Image fehlt `.git` (`.dockerignore:5`), der Commit
+  müsste beim Bauen hineingereicht werden. Unter dem Feature-Stopp nicht in diesem Schritt.
+- **Empfehlung: A**, und B als Möglichkeit im Anlass der ADR nennen (wenn Test läuft und jemand
+  zwei Stände am Handy auseinanderhalten muss).
+
+**S23-6 — Was geschieht mit den 28 (mit Schritt 23: 29) Nummern, die seit `main` vergeben sind?**
+
+- A: Sie bleiben als Abschnitte stehen. Der Abschnitt des nächsten Releases steht darüber.
+  **Folgen:** nichts zu tun. Die Refactoring-Dokumente verweisen an rund 150 Stellen auf diese
+  Nummern [G: Textsuche, 152 Treffer]; die Verweise bleiben gültig. Geht Live eines Tages in
+  Betrieb, fasst die CI den Text des ersten GitHub-Release ohnehin aus allen Abschnitten
+  zusammen.
+- B: Beim nächsten Release zu einem Abschnitt zusammenfassen. **Folgen:** kürzere Liste; die
+  Verweise auf «Version 0.22.4» und ähnliche laufen ins Leere, und es ist Handarbeit an rund
+  220 Zeilen [G: `docs/versionen.md:18-237`, V für den Aufwand]. Die Prüfung liesse es zu (kein
+  Tag hängt an den Nummern).
+- C: Wie A, dazu im Abschnitt des nächsten Releases fünf bis zehn Zeilen «seit 0.20.5» für
+  Leser aus dem Vorstand. **Folgen:** etwas Schreibarbeit im Abgleich, keine am Bestand.
+- **Empfehlung: A.** C ist eine Frage des Abgleichs, nicht dieses Schritts.
+
+**S23-7 — Die neue ADR: Nummer, Titel, Status von ADR-007, Anlass zum Wiederaufnehmen**
+
+- Nummer: **ADR-012**, die nächste freie [G: `docs/adr/` endet bei 011; kein offener Branch
+  ausser Dependabot]. Datei `docs/adr/adr-012-version-beim-release.md` (Vorschlag).
+- Titel, als Entscheid formuliert wie die Vorlage verlangt. A: «Eine Versionsnummer entsteht
+  beim Release nach main, nicht beim Merge nach dev». B: «Nur ein Release vergibt eine
+  Versionsnummer». **Empfehlung: A** (nennt, was sich ändert).
+- Status von ADR-007: «Ersetzt durch ADR-012». Die Vorlage kennt dieses Wort, nicht «abgelöst»
+  (`vorlage.md:5`). Der Text von ADR-007 bleibt, wie er ist; nur die Statuszeile und die Zeile
+  im Index ändern sich.
+- Anlass zum Wiederaufnehmen. A: «`AUSLIEFERUNG_TEST` steht auf `an`» (ein Ereignis, das man
+  sieht), mit zwei Punkten, die dann zu entscheiden sind: ob Stände auf Test an der Nummer
+  unterscheidbar sein müssen (der Einwand aus ADR-007), und dass die Nummer vor der Checkliste
+  stehen muss. B: nur der allgemeine Satz «Test geht in Betrieb». **Empfehlung: A.** Dazu aus
+  ADR-007 übernehmen: «Merges nach `dev` laufen nicht mehr lokal».
+
+**S23-8 — Endet mit dem Schritt auch der letzte Satz von E-01?**
+
+E-01 sagt am Ende: «Bei Code vergibt der Merge eine Patch-Version (Skill `tco-branching`, Hook
+`version-merge`).»
+
+- A: Ja. E-01 bekommt einen Vermerk wie E-07: Der Satz gilt, bis Schritt 23 gemergt ist.
+- B: Nein, er bleibt für Schritte des Refactorings. **Folgen:** widerspricht E-64, sobald
+  Schritt 23 gemergt ist; die Schritte 24 und 25 sind ohnehin Doku.
+- **Empfehlung: A.**
+
+**S23-9 — Der Kommentar in `check.yml` und der Hilfetext im `Makefile`: ändern oder stehen lassen?**
+
+Der Kommentar (`check.yml:503`) begründet den Text des GitHub-Release mit «jeder Merge nach dev
+mit Code hat seine Nummer»; `make help` nennt beim Ziel `hooks` die «Versionsprüfung beim Push
+auf dev» (`Makefile:101`).
+
+- A: Beide ändern. **Folgen:** Der Merge von Schritt 23 enthält ohnehin Code (Hook, Skripte);
+  eine Kommentarzeile in `check.yml` ändert keinen Job (E-16 bleibt gewahrt).
+- B: Beide stehen lassen. **Folgen:** zwei Stellen, die die abgelöste Regel als geltend nennen.
+- C: Nur das `Makefile`, `check.yml` nicht anfassen. **Folgen:** vorsichtigste Lesart von E-16;
+  ein falscher Kommentar bleibt an der Stelle, die das Release anlegt.
+- **Empfehlung: A.**
+
+**S23-10 — Dependabot: weiter lokal mergen?**
+
+- A: Ja, wie heute im Hauptordner, ohne Nummer, mit einem Eintrag «Abhängigkeiten aktualisiert»,
+  den schreibt, wer mergt. **Folgen:** Der Ablauf bleibt bis auf die Nummer gleich.
+- B: Auf GitHub mergen, weil die Nummer als Grund wegfällt. **Folgen:** Der Merge ginge an Hook
+  und Eintrag vorbei; das ist einer der Anlässe, die ADR-007 zum Wiederaufnehmen nennt, und eine
+  Änderung der Arbeitsweise, die nicht in diesen Schritt gehört.
+- **Empfehlung: A.** Unabhängig davon: #86, #82 und #38 werden nicht zwischen diesem Nachmessen
+  und dem Merge von Schritt 23 gemergt (N-34 nennt nur #86).
+
+**S23-11 — Soll die Prüfung vor dem Release eine vergessene Nummer beim ersten Release erkennen?**
+
+- A: Nein. Die erste Nummer steht mit S23-3 fest und im Skill; ab dem zweiten Release erkennt
+  die Prüfung eine fehlende Nummer von selbst (Probe R4). Die Meldungen der Prüfung werden so
+  umgeschrieben, dass sie zur neuen Regel raten. **Folgen:** eine bekannte, einmalige Lücke.
+- B: Eine zusätzliche Prüfung «der Inhalt älterer Abschnitte ändert sich nicht mehr».
+  **Folgen:** schliesst die Lücke, verbietet aber auch, was der Abgleich heute ausdrücklich tut:
+  Einträge älterer Abschnitte gegen die echten Issue-Titel berichtigen (`SKILL.md:228-229`).
+- **Empfehlung: A.**
+
+**Was die Session ausserdem bestätigt oder berichtigt** (aus «Hinweise zu Schritt 23», 7.6): den
+Wortlaut der Regel (Vorschlag: der Absatz «Entscheidung» in G.3.5), 6.2 Punkt 7 (stimmt mit
+E-64; zu ergänzen wäre nur, wer die Nummer vergibt), Anhang B.1c (der Diff dort endet noch mit
+«wenn ein Stand auf Test ausgeliefert wird»; neu: «Die Nummer entsteht im Abgleich vor dem
+Release `dev` → `main`») und den Satz «die feste Kollisionsstelle fällt weg» in der Zeile 23
+(genauer: Sie schrumpft auf einen Textkonflikt in einer Datei).
+
+#### G.3.4 Der Umbau (Teil 3)
+
+Auf dem Branch `refactor/schritt-23`, nach den Commits der Session (ADR, Index, arc42 Kapitel
+4). Angenommen sind die empfohlenen Antworten; wo eine andere Antwort die Liste ändert, steht
+es dabei.
+
+**Dateien**
+
+| Datei | Was | Zählt als |
+|-------|-----|-----------|
+| `scripts/pruefungen/version-merge.test.ts` | neue Fälle zuerst, rot gezeigt (bei S23-4: B gelöscht) | Code |
+| `scripts/pruefungen/version-merge.ts` | die schmale Prüfung; Kopfkommentar, Meldungen (bei S23-4: B gelöscht) | Code |
+| `scripts/pruefungen/release.test.ts` | Meldungstext `:71`, Testname `:94`, je ein Fall für die neuen Meldungen (bei S23-4: B dazu Schrittweite) | Code |
+| `scripts/pruefungen/release.ts` | Kopfkommentar `:8-9`, Meldungen `:93-94` und `:107-108`; `ueberschriften` exportieren, falls `version-merge.ts` den Abschnitt «Unveröffentlicht» lesen soll | Code |
+| `scripts/pruefungen/gruener-stand.ts` | nur der Kommentar `:11-12` | Code |
+| `.githooks/pre-push` | Kommentare `:5-6` und `:18` (bei S23-4: B die Zeilen `:11`, `:18-21`, `:27-29` weg) | Code |
+| `Makefile` | Hilfetext `:101` (S23-9) | Code |
+| `.github/workflows/check.yml` | nur der Kommentar `:503` (S23-9); kein Job | Code |
+| `.claude/skills/tco-branching/SKILL.md` | Schritt 4 (`:99-151`), Dependabot (`:153-156`), Release (`:197-235`), Realign-Satz (`:254-255`), Reibungspunkte (`:306-308`); B.1c | Doku |
+| `docs/ci-cd-und-release.md` | Mermaid `:45`, `:59-74`, Zeile `:337`, «Versionen» `:403-421` | Doku |
+| `docs/versionen.md` | Kopf `:5-7`; der Eintrag des Schritts | Doku |
+| `docs/adr/adr-012-…md`, `docs/adr/adr-007-…md` (Statuszeile), `docs/adr/adr-index.md`, `docs/arc42.md:70` | von der Session (Teil 2); Teil 3 prüft nur, dass sie zum Werkzeug passen | Doku |
+| `docs/refactoring-analyse.md` | Zeile 23, Kopf, Protokoll G.4 | Doku |
+
+Gegenüber der Zeile 23 neu: `docs/versionen.md` (Kopf), `docs/arc42.md` als Zeile (bisher nur
+«arc42 Kapitel 4» bei der ADR), der Kommentar in `gruener-stand.ts`, die Texte in `release.ts`.
+Nicht angefasst: `nur-doku.ts`, `scripts/ci/`, die Jobs in `check.yml`, `betrieb/`, alles unter
+`src/` und `tests/`, ADR-009, `package.json` und `package-lock.json` (die Nummer setzt der Merge
+des Orchestrators).
+
+**Schnitt in Commits** (Tests zuerst; nach jedem `make check-schnell`, am Ende der volle
+`make check` auf dem committeten Stand):
+
+1. `test:` neue Fälle in `version-merge.test.ts`; Lauf rot, Ausgabe ins Protokoll.
+2. `refactor:` `version-merge.ts` auf die neue Regel; Lauf grün. Einmal absichtlich gebrochen
+   (eine Bedingung umgedreht), rot gezeigt, zurückgenommen.
+3. `test:` `release.test.ts` mit den neuen Meldungstexten; rot.
+4. `refactor:` `release.ts`; grün.
+5. `refactor:` Kommentare und Hilfetexte: `.githooks/pre-push`, `Makefile`, `check.yml`,
+   `gruener-stand.ts`.
+6. `docs:` Skill.
+7. `docs:` `docs/ci-cd-und-release.md`, Kopf von `docs/versionen.md`, Eintrag des Schritts.
+8. `docs:` dieses Dokument (Zeile 23, Kopf, Protokoll).
+
+Die Commits 1 bis 5 gehören zusammen vor das Review des Prüfwerkzeugs; 6 bis 8 sind Doku.
+
+**Absicherung ohne Push.** Alles lokal im Worktree, auf Probe-Branches, die nie gepusht und am
+Ende gelöscht werden; die Ausgaben stehen im Protokoll.
+
+1. *Der Hook nimmt einen Merge mit Code ohne Nummer an.* Probe-Branch `probe/dev` auf dem Stand
+   des Schritts, davon `probe/arbeit` mit einem Commit, der eine Code-Datei und eine Zeile unter
+   «Unveröffentlicht» ändert; `git merge --no-ff` nach `probe/dev`; dann
+   `node scripts/pruefungen/version-merge.ts <stand>..probe/dev`. Erwartet: «ok». Dieselbe Probe
+   mit der alten Fassung des Skripts (`git show origin/dev:scripts/pruefungen/version-merge.ts`
+   in eine Datei im Scratchpad neben eine Kopie von `nur-doku.ts`, `release.ts`, `dateien.ts`,
+   `testmuster.ts`) muss rot sein: Das zeigt, dass die Probe die Regel trifft.
+2. *Er weist einen Merge mit Code ohne Eintrag ab* (bei S23-4: A): dieselbe Probe ohne die Zeile
+   unter «Unveröffentlicht». Erwartet: rot.
+3. *Er nimmt den eigenen Merge an:* ein Probe-Merge, der wie der Merge des Orchestrators 0.22.11
+   setzt, den Abschnitt anlegt und «Unveröffentlicht» leert. Erwartet: «ok».
+4. *Das Release ohne Nummer wird abgewiesen:* `make release-check` auf dem Stand des Schritts
+   ist rot mit der neuen Meldung (heute rot mit der alten, G.3.1); dazu die Fälle R1, R4 als
+   Tests. Für «mit Nummer grün» ein Probe-Commit, der 0.23.0 setzt und den Abschnitt anlegt,
+   dann `make release-check`: grün.
+5. *Ein Push auf `main` bleibt verboten:* die Zeile über die Eingabe an den Hook, wie in diesem
+   Nachmessen (`printf 'refs/heads/dev <sha> refs/heads/main <sha>\n' | bash .githooks/pre-push`,
+   Exit 1). Den ganzen Hook mit einer Zeile für `dev` zu füttern, ist keine gute Probe: Er
+   startet bei Code einen vollen `make check`.
+
+**Abbruchstellen**
+
+1. Die neue Fassung weist den eigenen Merge ab (Probe 3 rot). Nicht umgehen, nie
+   `--no-verify`; melden.
+2. Der Umbau bräuchte mehr als eine Kommentarzeile in `check.yml` oder etwas unter `betrieb/`
+   (E-16).
+3. Ein Test ausserhalb von `version-merge.test.ts` und `release.test.ts` wird rot, oder ein
+   E2E: Der Umbau greift weiter als gemessen.
+4. `make release-check` ist am Ende aus einem anderen Grund rot als «Unveröffentlicht ist nicht
+   leer», oder unerwartet grün.
+5. Eine Festlegung fehlt, die der Umbau braucht (S23-1, S23-3, S23-4, S23-9): nicht raten.
+6. Zwischen Nachmessen und Merge ist ein fremder Merge mit Code auf `dev` angekommen (auch
+   Dependabot): Die Nummer 0.22.11 ist dann vergeben, die Zeilennummern dieses Abschnitts
+   stimmen nicht mehr; `origin/dev` einmergen, Nummer und Fundstellen neu prüfen, melden.
+7. Der Umbau würde etwas an der App ändern (Fusszeile, `/api/status`): Feature-Stopp.
+
+**Risiko: mittel.** Hook und Skript bewachen jeden Push auf `dev`; ein Fehler liesse entweder
+jeden Merge scheitern (fällt sofort auf) oder Einträge unbemerkt fehlen (fällt spät auf). Die
+Sperre für `main` und die volle Prüfung werden nicht berührt. Zwei Ränder: (1) Eine Session, die
+vor dem Merge gestartet ist, hat den alten Skill geladen und vergibt aus Gewohnheit eine
+Nummer; die schmale Prüfung nimmt das an (gleiche Form wie der Abgleich), es kostet eine Nummer,
+bricht aber nichts [V]. (2) Der Merge selbst: Der Orchestrator mergt noch nach dem alten Ablauf
+(0.22.11, Abschnitt), gepusht wird schon unter der neuen Fassung; Probe 3 deckt genau das.
+**Modell: Opus**, mit eigenem Review für die Commits 1 bis 5 (E-66). **Dauer:** [V] klein; rund
+40 Zeilen Skript, rund zehn Testfälle, der Rest Text.
+
+#### G.3.5 Entwurf des Kerns der neuen ADR
+
+Vorschlag für die Session, in der Form von `docs/adr/vorlage.md`. Eckige Klammern sind
+Platzhalter für die Wahl des Projektleiters. Links setzt die Session beim Anlegen (die Datei
+liegt unter `docs/adr/`).
+
+**ADR-012: [Eine Versionsnummer entsteht beim Release nach main, nicht beim Merge nach dev]**
+
+**Status:** Entschieden · **Datum:** [Tag der Session] · **Issue:** #80. ADR-007 trägt neu den
+Status «Ersetzt durch ADR-012».
+
+**Kontext.** Seit ADR-007 bekommt jeder Merge nach `dev` mit Code eine eigene Nummer. Der Grund
+war, dass jeder Stand auf `dev` und auf Test an der Fusszeile erkennbar sein sollte. Die
+Erfahrung: Zwischen dem letzten Stand auf `main` (0.20.5) und heute liegen [29] Nummern in
+wenigen Tagen; keine davon ist je ausgeliefert worden, es gibt weder Test noch Live, keinen Tag
+und kein GitHub-Release. Jeder Merge fasst dafür drei Dateien an, die jede parallele Session
+ebenfalls anfasst; für den Fall, dass zwei Sessions gleichzeitig mergen, brauchte es eine eigene
+Regel im Skill und mit dem «grünen Stand» (ADR-009) einen zweiten Mechanismus. Die Antwort vom
+11.11.2026 («danach nur noch bei Auslieferung auf Test») hätte nichts geändert: Test wird bei
+jedem Merge mit Code ausgeliefert.
+
+**Optionen.**
+
+| Option | Dafür | Dagegen |
+|--------|-------|---------|
+| A: Nummer beim Release `dev` → `main` | eine Nummer benennt, was `dev` verlässt; Merges nach `dev` fassen `package.json` nicht mehr an; die Regel zur Nummer bei gleichzeitigen Merges entfällt | Stände zwischen zwei Releases tragen dieselbe Nummer; sobald Test läuft, sind sie dort nur am Commit zu unterscheiden |
+| B: Nummer bei jeder Auslieferung auf Test | Stände auf Test unterscheidbar | ist dasselbe wie heute, sobald Test läuft; bis dahin entstünde gar keine Nummer |
+| C: Nummer bei jedem Merge mit Code (ADR-007 bleibt) | nichts umzubauen | die Kosten bleiben, ohne dass eine der Nummern je jemand ausserhalb des Repos sieht |
+
+**Entscheidung.** Option A. Eine Versionsnummer entsteht nur noch beim Release `dev` → `main`:
+[Claude] setzt sie im Doku-Abgleich vor dem PR und macht aus «Unveröffentlicht» den Abschnitt
+dieser Nummer. Ein Merge nach `dev` vergibt keine Nummer; [der Branch] schreibt seinen Eintrag
+unter «Unveröffentlicht» in den Versionen[, und der Pre-Push-Hook verlangt ihn bei einem Merge
+mit Code]. Die Stufe: [Nebenversion, wenn das Release für Mitglieder oder Verwaltung etwas
+spürbar Neues bringt; Korrektur sonst; Hauptversion nur im Auftrag des Projektleiters. Claude
+schlägt die Nummer mit der Bitte um Freigabe vor]. Ein Release, das nur Doku enthält, lässt die
+Nummer stehen. Begründung: Eine Nummer soll einen Stand benennen, den jemand bekommt; solange
+nur `main` ein solcher Stand ist, genügt eine Nummer je Release.
+
+**Konsequenzen.**
+
+- Die Fusszeile zeigt zwischen zwei Releases dieselbe Nummer; zwei Stände auf `dev`
+  unterscheidet der Commit. [Kein Zusatz in der Fusszeile.]
+- Ein Merge nach `dev` ändert `package.json` und `package-lock.json` nicht mehr. Gleichzeitige
+  Merges können sich nur noch in einer Datei treffen (den Versionen), mit der Regel «beide
+  Einträge behalten».
+- Der Doku-Abgleich ist nie mehr reine Doku: Er setzt die Nummer und läuft darum durch die
+  volle Prüfung, ausser sein Stand ist schon grün geprüft (ADR-009 gilt weiter, die Ausnahme für
+  die Nummer wird genau dafür gebraucht).
+- Die [29] Nummern seit 0.20.5 [bleiben als Abschnitte stehen]. Der Merge, der diese ADR
+  einführt, trägt als letzter nach der alten Regel [0.22.11]; das nächste Release trägt
+  [0.23.0].
+- Tag und GitHub-Release setzt weiter nur die CI nach einer Live-Auslieferung; an den Jobs
+  ändert sich nichts.
+
+**Reevaluations-Trigger.**
+
+- `AUSLIEFERUNG_TEST` steht auf `an`. Dann ist zu entscheiden: (1) ob Stände auf Test an der
+  Nummer unterscheidbar sein müssen (der Einwand aus ADR-007) [oder ein Zusatz wie die Kurzform
+  des Commits in der Fusszeile genügt]; (2) die Reihenfolge: Die Nummer zählt zum Code-Stand
+  des Images, sie muss vor der Checkliste auf Test gesetzt sein, sonst geht ein anderes Image
+  live als das geprüfte.
+- Merges nach `dev` laufen nicht mehr lokal (z. B. auf GitHub), so dass der Hook sie nicht
+  sieht.
+- [Zwischen zwei Releases liegt so viel, dass der Abschnitt eines Releases unlesbar wird.]
+
+#### G.3.6 Was nicht geprüft ist
+
+- **Kein Probe-Merge.** Die Proben P, R liefen gegen die reinen Prüffunktionen mit erfundenen
+  Ständen, K gegen drei Probedateien; ein echter Merge-Commit hätte ins Repo geschrieben. Dass
+  der Befehlsteil von `version-merge.ts` (Git-Aufrufe) zu den Funktionen passt, ist gelesen und
+  am heutigen Bereich `origin/main..HEAD` einmal gelaufen («ok»), nicht mit einem Fall der neuen
+  Regel.
+- **Die schmale Prüfung ist nicht gebaut.** Ihre Form (G.3.2), «rund 40 Zeilen» und «nimmt den
+  eigenen Merge an» sind aus dem Lesen hergeleitet [V]; die Proben 1 bis 3 des Umbaus belegen es
+  erst.
+- **`docs/ci-cd-und-release.md` und `check.yml` sind nicht Zeile für Zeile gelesen** [E]: Die
+  Jobs `ausliefern` und `freigeben`, der Abschnitt «Auslieferung» ab Zeile 91 und alles zu
+  Geheimnissen, Einstellungen und Abhängigkeiten nur über die Textsuche. Dass dort kein weiterer
+  Satz zur Regel steht, stützt sich auf die Suche nach «jeder Merge», «Versionsnummer»,
+  «neue Nummer», `version-merge`, «Unveröffentlicht», `npm version`.
+- **Nicht gelesen:** `scripts/ci/code-stand.test.ts`, `workflow-rechte.ts` mit Test,
+  `docs/testkonzept.md` ausser drei Treffern, die Skills ausserhalb des Repos
+  (`session-wrap-up`, `session-start`; Anhang B.4, B.5) und das Session-Gedächtnis: Ob dort die
+  alte Regel steht, ist offen. Die Pläne und Specs unter `docs/superpowers/` nennen
+  «Unveröffentlicht» an rund 30 Stellen; sie sind Geschichte (E-15) und bleiben.
+- **Die Folge für Test (Kurzfazit 6)** ist aus `code-stand.sh` und den Bedingungen der Jobs
+  hergeleitet, nicht erprobt: Es gibt keinen Server, und `make betrieb-nachweis` lief nicht.
+- **Ob eine andere Session offen ist,** die den alten Skill geladen hat (etwa zu #81), ist nicht
+  geprüft; auf `origin` gibt es ausser Dependabot keinen Feature-Branch [G: `git branch -r`].
+- **Zeilennummern** gelten für den Stand `9630d56`. Die Hinweise in 7.6 nennen sie für
+  `4c7b340`; `Makefile:101` und `check.yml:503` stimmen an beiden Ständen [G].
