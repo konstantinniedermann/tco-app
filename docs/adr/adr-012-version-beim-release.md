@@ -42,8 +42,9 @@ Abgleich kommt als gewöhnlicher Merge nach `dev`, erst danach entsteht der PR. 
 Dependabot schreibt ihn, wer mergt). Die Stufe: Nebenversion, wenn das Release für Mitglieder
 oder Verwaltung etwas spürbar Neues bringt; Korrektur, wenn es nur Fehler behebt oder Inneres
 und Werkzeug ändert; Hauptversion nur im Auftrag des Projektleiters. Claude schlägt Nummer und
-Grund mit der Bitte um Freigabe vor; die Freigabe des Releases gilt auch für die Nummer. Ein
-Release, das nur Doku enthält, lässt die Nummer stehen.
+Grund mit der Bitte um Freigabe vor; die Freigabe des Releases gilt auch für die Nummer. Der
+Abgleich setzt die Nummer nur bei einem Release mit Code; ein Release, das nur Doku enthält,
+lässt sie stehen.
 
 Begründung: Eine Nummer soll einen Stand benennen, den jemand bekommt; solange nur `main` ein
 solcher Stand ist, genügt eine Nummer je Release. Ablauf im Einzelnen:
@@ -60,9 +61,9 @@ solcher Stand ist, genügt eine Nummer je Release. Ablauf im Einzelnen:
   «Unveröffentlicht»; steigt die Nummer (im Abgleich), dann um genau einen Schritt, mit ihrem
   Abschnitt zuoberst und leerem «Unveröffentlicht». Eine Nummer, die jemand aus Gewohnheit
   beim Merge vergibt, fängt er nicht; sie hat dieselbe Form wie der Abgleich.
-- Der Doku-Abgleich ist nie mehr reine Doku: Er setzt die Nummer und läuft darum durch die
-  volle Prüfung, ausser sein Stand ist schon grün geprüft (ADR-009 gilt weiter; die Ausnahme
-  für die Nummer wird genau dafür gebraucht).
+- Der Doku-Abgleich eines Releases mit Code ist nie mehr reine Doku: Er setzt die Nummer und
+  läuft darum durch die volle Prüfung, ausser sein Stand ist schon grün geprüft (ADR-009 gilt
+  weiter; die Ausnahme für die Nummer wird genau dafür gebraucht).
 - Die 29 Nummern seit 0.20.5 bleiben als Abschnitte stehen. Der Merge, der diese ADR einführt,
   trägt als letzter nach der alten Regel 0.22.11; das nächste Release trägt 0.23.0. Beim ersten
   Release erkennt die Prüfung vor dem Release eine vergessene Nummer nicht, weil `dev` der
