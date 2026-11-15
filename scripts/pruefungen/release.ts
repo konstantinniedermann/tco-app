@@ -5,8 +5,10 @@ import { istNurDoku } from './nur-doku.ts';
 
 // Abgleich vor dem Release dev → main (`make release-check`, Ablauf im Skill tco-branching):
 // Version in package.json, Abschnitte in docs/versionen.md und Tags müssen zusammenpassen.
-// Jeder Merge nach dev mit Code hat eine eigene Nummer (Prüfung beim Push: version-merge.ts);
-// das Release übernimmt die Nummer von dev und erhöht sie nicht. Nicht Teil von `make check`,
+// Eine Nummer entsteht nur beim Release (ADR-012): Der Doku-Abgleich setzt sie und macht aus
+// «Unveröffentlicht» ihren Abschnitt; Merges nach dev sammeln dort ihre Einträge (Prüfung beim
+// Push: version-merge.ts). Beim ersten Release nach ADR-012 ist dev der Nummer von main schon
+// voraus; eine vergessene Nummer fällt dann nicht auf (ADR-012). Nicht Teil von `make check`,
 // denn zwischen zwei Releases ist der Stand absichtlich offen (Einträge unter «Unveröffentlicht»).
 
 const VERSIONEN = 'docs/versionen.md';
@@ -56,6 +58,11 @@ function ueberschriften(markdown: string): Ueberschrift[] {
 	return liste;
 }
 
+/** Der Abschnitt `## Unveröffentlicht` mit seinen Inhaltszeilen, oder undefined, wenn er fehlt. */
+export function unveroeffentlicht(markdown: string): Ueberschrift | undefined {
+	return ueberschriften(markdown).find(({ text }) => text.trim() === '## Unveröffentlicht');
+}
+
 /** Abschnitte `## X.Y.Z …` mit dem Marker «nicht ausgeliefert» aus der Überschrift. */
 export function versionsabschnitte(markdown: string): Versionsabschnitt[] {
 	return ueberschriften(markdown).flatMap(({ text, zeile }) => {
@@ -90,22 +97,24 @@ export function pruefeRelease(stand: Releasestand): string[] {
 		befunde.push(`package.json: Version sinkt von ${stand.versionMain} auf ${stand.version}`);
 	else if (vergleich === 0 && !stand.nurDoku)
 		befunde.push(
-			`package.json: Release enthält Code, aber die Version bleibt ${stand.version} — beim Merge ` +
-				`nach dev nicht erhöht (Skill tco-branching, Schritt 4)`
+			`package.json: Release enthält Code, aber die Version bleibt ${stand.version} — im ` +
+				`Doku-Abgleich eine neue Nummer setzen, aus «Unveröffentlicht» wird ihr Abschnitt ` +
+				`(Skill tco-branching, Schritt 4a)`
 		);
 
-	const unveroeffentlicht = ueberschriften(stand.versionen).find(
-		({ text }) => text.trim() === '## Unveröffentlicht'
-	);
-	if (!unveroeffentlicht) {
+	const offen = unveroeffentlicht(stand.versionen);
+	if (!offen) {
 		befunde.push(`${VERSIONEN}: Abschnitt «## Unveröffentlicht» fehlt`);
 	} else if (
 		stand.version !== stand.versionMain &&
-		unveroeffentlicht.inhalt.some((zeile) => zeile.trim() !== '')
+		offen.inhalt.some((zeile) => zeile.trim() !== '')
 	) {
 		befunde.push(
-			`${VERSIONEN}:${unveroeffentlicht.zeile}: «Unveröffentlicht» ist nicht leer, obwohl sich die Version ` +
-				`von ${stand.versionMain} auf ${stand.version} ändert — Einträge in den Abschnitt «## ${stand.version}»`
+			`${VERSIONEN}:${offen.zeile}: «Unveröffentlicht» ist nicht leer, obwohl sich die Version ` +
+				`von ${stand.versionMain} auf ${stand.version} ändert — noch keine neue Nummer für dieses ` +
+				`Release gesetzt: neue Nummer setzen, aus «Unveröffentlicht» wird ihr Abschnitt; Nummer ` +
+				`${stand.version} schon für dieses Release gesetzt und ein Merge kam danach: seine ` +
+				`Einträge in den Abschnitt «## ${stand.version}» nachrücken (Skill tco-branching, Schritt 4a)`
 		);
 	}
 

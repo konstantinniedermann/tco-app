@@ -3,7 +3,8 @@
 # Zusätzlich zur Regel «main schützen» auf GitHub auch lokal:
 # Der Weg auf main ist immer ein PR aus dev, nie ein direkter Push.
 # Enthält ein gepushter Bereich Code, läuft vor dem Push make check (wie die CI) — ausser sein
-# Stand ist schon grün geprüft und seither kamen nur Doku und Versionsnummer dazu (gruener-stand.ts).
+# Stand ist schon grün geprüft und seither kamen nur Doku und Versionsnummer dazu (gruener-stand.ts;
+# die Nummer setzt der Doku-Abgleich vor dem Release, ADR-012).
 set -euo pipefail
 
 nullsha=0000000000000000000000000000000000000000
@@ -15,7 +16,8 @@ while read -r _lokal_ref lokal_sha remote_ref remote_sha; do
     exit 1
   fi
   refs+=("$lokal_sha $remote_sha")
-  # Auf dev bringt jeder Merge mit Code seine eigene Versionsnummer (Skill tco-branching, Schritt 4).
+  # Auf dev bringt jeder Merge mit Code einen neuen Eintrag unter «Unveröffentlicht»; eine neue
+  # Nummer nur der Doku-Abgleich vor dem Release (version-merge.ts, ADR-012).
   if [ "$remote_ref" = "refs/heads/dev" ] && [ "$lokal_sha" != "$nullsha" ] && [ "$remote_sha" != "$nullsha" ]; then
     dev_bereiche+=("$remote_sha..$lokal_sha")
   fi

@@ -2,11 +2,16 @@
 
 # Versionen
 
-Versionshistorie von MyTCO, neueste zuerst. Jeder Merge nach `dev` mit Code bekommt hier
-seinen eigenen Abschnitt; ein Release fasst alle Abschnitte seit dem letzten Release zusammen.
+Versionshistorie von MyTCO, neueste zuerst. Merges nach `dev` sammeln ihre Einträge unter
+«Unveröffentlicht»; eine Nummer entsteht erst beim Release `dev` → `main`, dann wird aus
+«Unveröffentlicht» der Abschnitt dieser Nummer
+([ADR-012](adr/adr-012-version-beim-release.md)). Die Abschnitte zwischen 0.20.5 und dem
+ersten Release nach ADR-012 stammen aus der früheren Regel: eine Nummer je Merge mit Code.
 Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
+
+## 0.22.11 — Versionsnummer nur noch beim Release (ADR-012)
 
 - Doku an den Code angeglichen: Bausteinsicht, Testkonzept, CI/CD, README und Übersicht nennen
   Abruf-Baustein, Wächter, Dienste, Vertragstests und Test-Hilfen (Refactoring Schritt 21).
@@ -14,6 +19,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 - Context-Scopes nennen Ordner statt ihrer Dateien; Pläne und Specs unter `docs/superpowers/`
   sind als Geschichte gekennzeichnet und kein Lesestoff mehr (Refactoring Schritt 22). An der App
   ändert sich nichts.
+- Eine Versionsnummer entsteht nur noch beim Release `dev` → `main`: Merges nach `dev` schreiben
+  einen Eintrag unter «Unveröffentlicht», der Pre-Push-Hook verlangt ihn bei Code; die Nummer
+  setzt der Doku-Abgleich vor dem Release (ADR-012, Refactoring Schritt 23). An der App ändert
+  sich nichts.
 
 ## 0.22.10 — Die zwei Struktur-Prüfungen geschärft (Nachtrag zur Etappe 3)
 
