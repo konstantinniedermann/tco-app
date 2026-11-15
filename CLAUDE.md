@@ -45,7 +45,7 @@
   über CSS-Klassen; keine festen Wartezeiten.
 - Eine neue Schnittstelle kommt in die Liste ihres Moduls. Eine neue Liste der Verwaltung kommt
   in `tests/hilfen/verwaltungs-listen.ts` und in die Tabelle der Bauregel; eine neue Liste der
-  Mitglieder in Grundprüfung und Routen-Test.
+  Mitglieder in `tests/hilfen/mitglieder-listen.ts`.
 - Nie zwei Builds oder Prüfläufe (`make check`, `make e2e`, `npm run build`) gleichzeitig im
   selben Ordner.
 
