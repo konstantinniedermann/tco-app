@@ -42,11 +42,11 @@ Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
 
 ```mermaid
 flowchart LR
-  B[Issue-Branch] -->|make check, Hooks| D[Merge nach dev, neue Nummer]
+  B[Issue-Branch] -->|make check, Hooks| D[Merge nach dev, Eintrag unter Unveröffentlicht]
   D --> C1[CI]
   C1 -->|grün| T[Test-Umgebung]
   T --> K[Checkliste auf echten Handys]
-  K --> A[Doku-Abgleich auf dev]
+  K --> A[Doku-Abgleich auf dev, neue Nummer]
   A --> P[PR dev → main]
   P --> C2[CI]
   C2 -->|grün, Merge| L[Live]
@@ -57,7 +57,8 @@ flowchart LR
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
   abgehakt und das Release freigegeben hat (ohne Server: Ausnahmen unter [Versionen](#versionen)).
 - **Doku-Abgleich:** Vor jedem Release, auch einem reinen Doku-Release, wird die Doku gegen
-  Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Danach
+  Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Bei
+  einem Release mit Code setzt der Abgleich die neue Nummer (siehe [Versionen](#versionen)). Danach
   prüft `make release-check`, ob Version, [Versionen](versionen.md) und Tags zusammenpassen
   (genau ein Abschnitt pro Version, der von `package.json` zuoberst; die Version sinkt nicht;
   «Unveröffentlicht» ist leer, sobald sie sich ändert; kein Tag ohne Abschnitt und keiner auf
@@ -65,8 +66,8 @@ flowchart LR
   enthält das Release Code (auch Skripte oder Workflows), muss die Version seit dem letzten
   Release gestiegen sein, nur bei reiner Doku bleibt sie. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre führt,
   hält das Release auf. Ablauf im Skill `tco-branching`.
-- **Version:** Das Release erhöht die Version nicht, Live bekommt die Nummer, die `dev` gerade
-  trägt (Vergabe beim Merge, siehe [Versionen](#versionen)). Nach der erfolgreichen
+- **Version:** Das Release vergibt die Nummer: Der Doku-Abgleich setzt sie vor dem PR, Live
+  bekommt die Nummer, die `dev` danach trägt (siehe [Versionen](#versionen)). Nach der erfolgreichen
   Live-Auslieferung setzt die CI den Tag und das GitHub-Release; dessen Text fasst alle
   Abschnitte der [Versionen](versionen.md) seit dem letzten GitHub-Release zusammen (beim
   ersten alle). Nur dieser
@@ -334,7 +335,7 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Annahmen zu beantworteten Fragen an den Verein aufgelöst (`annahmen.ts`) | Abklärungen | vorhanden |
 | Oberfläche nur aus Tokens des Leitbilds (`design-tokens.ts`, `design-festwerte.ts`) | UI-Leitbild | vorhanden |
 | Node-Hauptversion wie in `.nvmrc`, sonst enden Prüfskripte still (`pruefe-node.sh`) | — | vorhanden |
-| Jeder Merge nach `dev` mit Code erhöht die Version um einen Schritt, mit Abschnitt in den Versionen (`version-merge.ts`) | dieses Konzept | nur Hook (Push auf `dev`) |
+| Jeder Merge nach `dev` mit Code bringt einen neuen Eintrag unter «Unveröffentlicht»; steigt die Nummer (Doku-Abgleich), dann um einen Schritt, mit Abschnitt zuoberst und leerem «Unveröffentlicht» (`version-merge.ts`) | ADR-012 | nur Hook (Push auf `dev`) |
 
 **Stylesheet-Vergleich:** `make css-vergleich VORHER=<Ordner> NACHHER=<Ordner>` vergleicht das
 gebaute CSS zweier Builds Zeichen für Zeichen (`scripts/css-vergleich.ts`; der Ablauf steht im Kopf
@@ -357,7 +358,8 @@ Der Pre-Push-Hook lässt `make check` aus, wenn der gepushte Stand schon grün g
 seither nur Doku und die Versionsnummer (in `package.json` und `package-lock.json`, sonst
 wörtlich verglichen) dazukamen. Die Mockups unter `docs/ui-mockups/` zählen dabei als Code,
 weil ein E2E-Test sie liest. Das ist der Normalfall beim Push des Feature-Branches nach dem Review und beim
-Push des Merge-Commits auf `dev`. Kam fremder Code von `dev` dazu, prüft der Hook voll, und
+Push des Merge-Commits auf `dev`; die Ausnahme für die Nummer braucht der Push des
+Doku-Abgleichs, der sie setzt. Kam fremder Code von `dev` dazu, prüft der Hook voll, und
 ebenso im Zweifel (keine Liste, unlesbare Datei). Die Liste liegt unversioniert im
 gemeinsamen Git-Ordner, gilt also für alle Worktrees. Die CI prüft jeden Push auf `dev`
 unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
@@ -400,21 +402,32 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   erste Release *Mitglieder-Login* wird `1.0.0`. Davor gehen eine oder mehrere Vorabversionen 0.x für den
   Pilot der [Testgruppe](testgruppe.md) auf Live (Etappe *Pilot*), mit Checkliste auf Test wie
   jedes Release.
-- **Jeder Merge nach `dev` mit Code bekommt eine neue Nummer**, im Merge-Commit selbst
-  (`package.json`, `package-lock.json` und ein eigener Abschnitt zuoberst in den
-  [Versionen](versionen.md)). Reine Doku (Regel aus `nur-doku.ts`) lässt die Nummer stehen.
-  Die Nummer vergibt, wer mergt, nicht der Feature-Branch: So beanspruchen zwei parallele
-  Sessions nie dieselbe Nummer (Begründung:
-  [ADR-007](adr/adr-007-version-pro-merge.md)). Der Pre-Push-Hook weist einen Push auf `dev` ab, in dem ein
-  Merge mit Code die Version nicht um genau einen Schritt erhöht, sein Abschnitt nicht zuoberst
-  steht oder reine Doku die Version erhöht (`version-merge.ts`); was schon auf `main` liegt, prüft er nicht.
-  Er prüft jeden Commit der Hauptlinie von `dev` einzeln: Ein direkter Commit oder ein Fast-Forward-Merge
-  mit Code scheitert, sofern nicht jeder Commit die Version erhöht; darum mergt der Skill immer mit `--no-ff`. Weil der Hook nur lokal
+- **Eine Nummer entsteht nur beim Release `dev` → `main`** (Begründung:
+  [ADR-012](adr/adr-012-version-beim-release.md), löst ADR-007 ab). Ein Merge nach `dev`
+  vergibt keine Nummer und fasst `package.json` und `package-lock.json` nicht an; der Branch
+  schreibt seinen Eintrag unter «Unveröffentlicht» in den [Versionen](versionen.md) (bei
+  Dependabot, wer mergt). Der Doku-Abgleich vor dem PR setzt die Nummer, macht aus
+  «Unveröffentlicht» den Abschnitt dieser Nummer und kommt als gewöhnlicher Merge nach `dev`;
+  erst danach entsteht der PR. Ein Release nur mit Doku (Regel aus `nur-doku.ts`) lässt die
+  Nummer stehen. Zwischen zwei Releases zeigt die Fusszeile dieselbe Nummer; zwei Stände auf
+  `dev` unterscheidet der Commit.
+- **Prüfung beim Push auf `dev`** (`version-merge.ts`, Pre-Push-Hook), je Commit der Hauptlinie
+  einzeln, ohne was schon auf `main` liegt: Bringt er Code und bleibt die Nummer, steht danach
+  unter «Unveröffentlicht» mindestens eine nicht leere Zeile, die vorher nicht dort stand
+  (Leerzeichen zählen nicht). Steigt die Nummer, dann um genau einen Schritt, mit ihrem
+  Abschnitt zuoberst und leerem «Unveröffentlicht». Reine Doku: keine Forderung. Ein direkter
+  Commit oder ein Fast-Forward-Merge mit Code scheitert, sofern nicht jeder Commit einen Eintrag
+  bringt; darum mergt der Skill immer mit `--no-ff`. Eine Nummer, die jemand beim Merge
+  vergibt, fängt die Prüfung nicht (sie hat die Form des Abgleichs). Weil der Hook nur lokal
   läuft, werden auch die PRs von Dependabot im Hauptordner gemergt, nicht auf GitHub.
-- **Korrektur** (`x.y.Z`) ist der Normalfall bei jedem Merge mit Code. **Nebenversion**
-  (`0.X.0`, Korrektur zurück auf 0) setzt Claude, wenn etwas Grösseres dazukommt: eine neue
-  Etappe oder eine spürbare neue Funktion. **Hauptversion** (`X.0.0`) nur im Auftrag des
-  Projektleiters.
+- **Stufe:** **Nebenversion** (`0.X.0`, Korrektur zurück auf 0), wenn das Release für
+  Mitglieder oder Verwaltung etwas spürbar Neues bringt; **Korrektur** (`x.y.Z`), wenn es nur
+  Fehler behebt oder Inneres und Werkzeug ändert; **Hauptversion** (`X.0.0`) nur im Auftrag
+  des Projektleiters. Claude schlägt Nummer und Grund mit der Bitte um Freigabe vor.
+- **Erstes Release nach ADR-012:** Die Abschnitte zwischen 0.20.5 und diesem Release stammen
+  aus der früheren Regel (eine Nummer je Merge mit Code) und bleiben stehen. Das erste Release
+  trägt `0.23.0`; `make release-check` erkennt bei ihm eine vergessene Nummer nicht, weil `dev`
+  der Nummer von `main` schon voraus ist. Ab dem zweiten Release erkennt es sie selbst.
 - Getaggt wird nur die Nummer, mit der ein Release live geht. Die Zwischenstände davor haben
   keinen Tag und keinen Marker; sie gehen mit diesem Release live.
 - Die Version steht in `package.json`, in der Fusszeile der App und, sobald Live ausgeliefert
