@@ -7,8 +7,14 @@ weiterarbeiten können: Es enthält den Ist-Zustand, die Befunde, das Zielbild, 
 je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 [#80](https://github.com/konstantinniedermann/tco-app/issues/80).
 
-- **Stand des Dokuments:** 14.11.2026, nach dem Checkpoint am Ende der Etappe 2. Die Etappen 0, 1
-  und 2 sind umgesetzt (zuletzt Schritt 18, Version 0.22.5). Die Zwischenrevision am Ende der
+- **Stand des Dokuments:** 15.11.2026, nach dem Checkpoint am Ende der Etappe 3. **Die Etappen 0
+  bis 3 sind umgesetzt und gemergt** (zuletzt Schritt 20a, Review «ok», Version 0.22.9, Merge
+  `4c7b340`; die CI auf `dev` zu diesem Merge ist grün, Lauf 43632851367 [G am 15.11.2026]). Die
+  Zwischenrevision am Ende der Etappe 3 (Abschnitt 1e) ist am Checkpoint vom 15.11.2026
+  entschieden und eingearbeitet (E-64 bis E-70); offene Fragen gibt es keine. Als Nächstes der
+  Nachtrag zur Etappe 3 (7.6, läuft), dann Schritt 21. **Was in diesem Punkt folgt, ist der
+  Verlauf bis zum 14.11.2026, nicht mehr der Stand:** Am 14.11.2026, nach dem Checkpoint am Ende
+  der Etappe 2, waren die Etappen 0, 1 und 2 umgesetzt (zuletzt Schritt 18, Version 0.22.5). Die Zwischenrevision am Ende der
   Etappe 2 (Abschnitt 1d) ist am Checkpoint entschieden und eingearbeitet (E-55 bis E-60); davor
   die der Etappe 1 (Abschnitt 1c, E-41 bis E-44). Der Nachtrag zur Etappe 2 (7.5) ist gemergt, die
   Etappe 3 läuft ab Schritt 19. Das Nachmessen zu Schritt 19 liegt vor (14.11.2026,
@@ -30,7 +36,8 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
   Ergebnis in 7.5, Protokoll Anhang F.6): Lint-Regel «kein Aufruf `fetch(`» unter `src/` ohne
   erlaubte Stelle und Prüfung der Design-Importe, voller `make check` grün (2471 Tests, E2E
   524/64). **Damit ist die Etappe 3 umgesetzt**; Review von 20a, Zwischenrevision und Checkpoint
-  am Etappenende stehen aus.
+  am Etappenende stehen aus. [G am 15.11.2026, Stand `4c7b340`: Schritt 20a ist gemergt, Review
+  «ok», Version 0.22.9; Zwischenrevision und Checkpoint sind erledigt (1e, N-29).]
 - **Stand der Analyse (Abschnitte 1 bis 5 und 10):** 11.11.2026, Version 0.20.5, vor Schritt 01.
   Zahlen und Fundstellen dort gelten für diesen Stand; was die Etappe 0 berichtigt hat, steht
   beim Befund. Der Vermerk «Nachtrag» ohne Schrittnummer meint den zweiten Durchgang der Analyse
@@ -40,15 +47,18 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
   geändert haben, dazu die Nachträge der Etappe 1 und was die Zwischenrevision am Ende der
   Etappe 1 mit den Entscheiden vom 12.11.2026 (E-41 bis E-44) geändert hat, und was die
   Zwischenrevision am Ende der Etappe 2 mit den Entscheiden vom 14.11.2026 (E-55 bis E-60)
-  geändert hat. Die Markierungen früherer Durchgänge sind entfernt; was davor wie lautete,
+  geändert hat, und was die Zwischenrevision am Ende der Etappe 3 mit den Entscheiden vom
+  15.11.2026 (E-64 bis E-70) geändert hat. Die Markierungen früherer Durchgänge sind entfernt; was davor wie lautete,
   zeigt der Git-Verlauf dieser Datei.
 - **Aufbau:** Abschnitte 1 bis 5 Befunde, 6 Zielbild, 7 Plan, 8 Entscheide, 9 Fragen, 10 Grenzen;
   Anhang A und B Anweisungsdateien, Anhang C das Protokoll der Etappe 0, Anhang D das der Etappe 1
   (bis D.15, Schritt 12a), Anhang E das der Etappe 2 (bis E.13, Schritt 18). Beschlossen, aber
   noch nicht ausgeführt: Die Protokolle ziehen je Etappe in eine eigene Datei (E-60); bis dahin
   stehen sie hier. [G am 14.11.2026, Stand `7159355`: Die Anhänge C bis E stehen schon in
-  eigenen Dateien, siehe das Ende dieses Dokuments.] Anhang F ist das Protokoll der laufenden
-  Etappe 3 (ab F.1, Nachmessen Schritt 19) und steht hier.
+  eigenen Dateien, siehe das Ende dieses Dokuments.] Anhang F ist das Protokoll der Etappe 3
+  (F.1 bis F.6). **[geändert]** Die Etappe 3 ist abgeschlossen; Anhang F steht seit dem
+  15.11.2026 in `docs/refactoring-protokoll-etappe-3.md` (E-60, ausgeführt vom Orchestrator). Das
+  Protokoll der Etappe 4 kommt als Anhang G in dieses Dokument.
 
 ## Stand und nächster Schritt
 
@@ -56,17 +66,17 @@ je Schritt, die Entscheide und die offenen Fragen. Sammel-Issue:
 
 | | |
 |---|---|
-| **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt und gemergt (0.20.19). **Etappe 2:** Schritt 13 erledigt (zwei Läufe, Review je «ok», Version 0.20.20); Schritt 14 erledigt (Review «ok», Version 0.20.21); **Schritt 15 erledigt** (Läufe 1, 1b mit Interclub und 2; Review je «ok» am 14.11.2026, Version 0.22.1); **Schritt 16 erledigt** (CM-Seite; Review «ok» am 14.11.2026; die Doppel-Seite ist verworfen, F-30: A, E-51; Version 0.22.2); **Schritt 17 erledigt** (Review «ok» am 14.11.2026, Checkpoint E-21 erledigt: E-52, E-53; Version 0.22.4); **Schritt 18 erledigt** (Review «ok» nach einem Doku-Befund am 14.11.2026, Version 0.22.5). **Damit ist die Etappe 2 abgeschlossen**; Zwischenrevision und Checkpoint am Etappenende erledigt am 14.11.2026 (Abschnitt 1d, E-55 bis E-60) und in Zielbild und Plan eingearbeitet. **Etappe 3:** freigegeben (E-58), läuft ohne Halt mit Kurzbericht je Schritt (E-59); davor der Nachtrag zur Etappe 2 (7.5, Version 0.22.6). Schritt 19 erledigt (Version 0.22.7), Schritt 20 erledigt (zwei Läufe, Review je «ok», Version 0.22.8), **Schritt 20a umgesetzt** (14.11.2026, Branch `refactor/schritt-20a`, Review offen). **Damit ist die Etappe 3 umgesetzt**; Zwischenrevision und Checkpoint am Etappenende stehen aus |
-| **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), 12a (0.20.19), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D). Etappe 2: 13 (0.20.20), 14 (0.20.21), 15 (0.22.1), 16 ohne die Doppel-Seite (0.22.2, Nachtrag 0.22.3), 17 (0.22.4), 18 (0.22.5), alle mit Review «ok» auf `dev` (Ergebnisse in 7.4, Protokolle in Anhang E); die CI auf `dev` ist zum Merge von Schritt 18 im Job «E2E (iphone)» rot (Fokus-Wackler, siehe «Nächster offener Schritt»). Etappe 3: Nachtrag zur Etappe 2 (0.22.6), 19 (0.22.7), 20 (0.22.8), alle mit Review «ok» auf `dev` (Ergebnisse in 7.5, Protokolle in Anhang F) |
-| **Zuletzt erledigt** | **20a umgesetzt** (14.11.2026, Branch `refactor/schritt-20a` ab `2d207f5`, nicht gemergt, Review offen; Ergebnis in 7.5, Protokoll Anhang F.6): ESLint meldet jeden Aufruf `fetch(…)` unter `src/`, ohne erlaubte Stelle (heute 0, auch ohne Inline-Kommentare; `abruf.ts` ruft nur `holen`), Test `scripts/fetch-regel.test.ts` mit Proben und Grenzen (fängt nicht `window.fetch`, `globalThis.fetch`, ein weitergereichtes `holen`); Prüfung `scripts/design-importe.test.ts`: Design-Dateien nur im Wurzel-Layout, vollständig und in der Reihenfolge von `REIHENFOLGE`, `brief.css` nur im Briefdruck, neue Datei ohne Eintrag rot; alle Proben vorher rot; kein Diff unter `src/`; voller `make check` grün (2471 Tests, E2E 524/64, 5,5 Minuten). Davor **20** (zwei Läufe, Review je «ok», gemergt als Version 0.22.8; Ergebnis in 7.5, Protokolle F.4 und F.5). Davor **19, mit Antwort A** (14.11.2026, Review «ok», gemergt als Version 0.22.7; Ergebnis in 7.5, Protokoll Anhang F.2): `MINDESTVERSION`, `istVersionVertraeglich` und `mindestversion` in `/api/status` entfernt (Test zuerst rot, 4 von 9); die Ergänzung nach B (der nächste Link lädt nach einer neuen Auslieferung ganz neu) gebaut, im Verhalten auf allen drei Geräten gelungen, aber **Abbruchstelle 2**: Auf dem iPhone-Profil (WebKit) meldet die Konsole abgebrochene Abrufe (mit `cancel()` 9 von 45 Läufen rot, mit der wörtlichen Vorlage der Doku 2 von 45); nach E-61 ohne Umweg mit A beendet, E2E zurückgenommen; Doku «Alte Versionen auf dem Handy» neu (Neuladen nur, wenn ein Seitenwechsel scheitert; keine Mindestversion; Eingabe bleibt nicht erhalten); für die Nutzerin nichts; voller `make check` grün (2411 Tests, E2E 524/64, 3,5 Minuten). Davor **18** (14.11.2026, Review «ok» nach einem Doku-Befund, gemergt als Version 0.22.5; Ergebnis in 7.4, Protokoll Anhang E.13): `basis.css` in zehn Dateien unter `src/lib/design/` geschnitten (`grundlagen`, `rahmen`, `bedienelemente`, `karten`, `verwaltung`, `anleitung`, `uebergaenge`, `pc-layout`, `druck`, `verlauf`), Importe in `+layout.svelte` in dieser Reihenfolge nach `tokens.css`, Mockups und Leitbild nachgezogen; gebautes CSS vor und nach gleich (Node und SPA), Rot-Probe belegt; voller `make check` grün (2427 Tests, E2E 524/64, 5,6 Minuten). Davor **17** (14.11.2026, Review «ok», Checkpoint E-21 erledigt mit E-52 und E-53, gemergt als Version 0.22.4; davor der Nachtrag zu Schritt 16 als Version 0.22.3, E-54; Ergebnis in 7.4, Protokoll Anhang E.12): Vorab-E2E `tests/e2e/anmeldungsliste-ablauf.test.ts` (vier Fälle je Handy, auf dem alten Stand grün, einmal rot), `Aktionsdialog` um `neben` (zweite Entscheid-Taste) und `ohneHaupttaste` erweitert, die fünf Rückfragen der Einzel-Anmeldungsliste darauf (`fuehreAus`, eigene Sperre und rohe Dialoge weg); der Wildcard-Antrag nutzt den Baustein (nicht von Hand). Sichtbar anders: die Warnung als Liste (Bilder für E-21 im Scratchpad, siehe E.12) und drei Randfälle (E.12); `cm-verwaltung`, `turnier`, `cm-anmeldung`, `cm-doppel-verwaltung` grün; voller `make check` grün (2427 Tests, E2E 524/64, 5,4 Minuten). Davor **16** (14.11.2026, Review «ok», gemergt als Version 0.22.2; Teil 2 mit der Doppel-Seite verworfen, F-30: A, E-51; Ergebnis in 7.4, Protokoll Anhang E.11): Vorab-E2E `tests/e2e/cm-ablauf.test.ts` (drei Fälle je Handy, auf dem alten Stand grün, einmal rot), die Ablauf-Funktion `src/lib/cm/ablauf.ts` mit 15 Einheitsfällen (Abdeckung 100 %), sieben der acht Handler der CM-Seite darauf, `angabenSenden` bleibt von Hand (Abbruchstelle 2), die zwei Text-Dialoge als `src/lib/cm/Textdialog.svelte`; Sätze, Reihenfolge und Fokus unverändert, Markup gleich bis auf die `id`s; für die Nutzerin nichts; voller `make check` grün (2427 Tests, E2E 516/60, 5,3 Minuten). Davor **15, Lauf 2** (14.11.2026, Review «ok», mit Lauf 1 und 1b gemergt als Version 0.22.1; Ergebnis in 7.4, Protokoll Anhang E.9): die vier Listen der Verwaltung (`turniere`, `anlaesse`, `verlauf`, `mitglieder`) laden ihr erstes Laden in einer neuen `+page.ts` über den Wächter (Fall `verwaltung`); eine Störung bleibt eine Meldung in der Seite (`zeilen: null`, keine Fehlerseite); `mitglieder` lädt nach Suche und Filter weiter im Baustein, ohne zweite Abfrage beim Einhängen; Vorab-Tests (E2E 5 Fälle je Gerät, auf dem alten Stand grün, einmal rot) und 13 Einheitsfälle der vier Ladefunktionen; für die Nutzerin nur die zwei Folgen aus E-48; voller `make check` grün (2412 Tests, E2E 510/57, 3,9 Minuten). Davor **15, Lauf 1b (Interclub)** (14.11.2026, Review «ok» am 14.11.2026 zusammen mit Lauf 1; Ergebnis in 7.4, Nachmessen Anhang E.7, Protokoll Anhang E.8): `origin/dev` mit #81 eingemergt (Layout in der Fassung von `dev`, Entscheide des Branches neu E-48 bis E-50), Vorab-Tests für die drei Interclub-Seiten und das Wurzel-Layout (E2E vier Fälle mehr und drei Adressen mehr in der Tabelle, 15 Einheitsfälle, je Gruppe einmal rot), Wurzel-Layout auf `ladeSitzung` (Typ `Sitzung` mit `interclub`), die drei Interclub-Ladefunktionen auf dem Wächter (Fall `mitglied`); keine Zeile mehr in der Wächter-Tabelle, Fälle L und M benannt und unverändert; für die Nutzerin ändert sich nichts; voller `make check` grün (2399 Tests, E2E 495/57, 3,4 Minuten). Davor **15, Lauf 1** (13.11.2026, Branch `refactor/schritt-15`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.6): Vorab-Tests in drei Teilen (E2E 21 Fälle auf drei Geräten, 91 Einheitsfälle der Ladefunktionen, je Teil einmal rot), `ladeSitzung` und die Wächter-Tabelle `src/lib/login/waechter.ts` mit zwei Hüllen und sechs benannten Fällen (neu `verwaltung-zugang`), 22 Ladefunktionen, das Wurzel-Layout, 17 Stellen nach einer Aktion und das Abmelden umgestellt, `hilfe/+page.ts` auf `ladeKontakt`; keine Ladefunktion ruft `fetch`, keine Seite schreibt die Umleitung zum Login; für die Nutzerin ändert sich nichts; voller `make check` grün (2300 Tests, E2E 477/57, 4,1 Minuten); Review «ok» am 14.11.2026 (mit Lauf 1b). Davor **14** (13.11.2026, Review «ok» ohne Befund, Version 0.20.21; Ergebnis in 7.4, Protokoll Anhang E.4): `verwaltung/api.ts` nach Bereichen geteilt, in `zugang-api.ts`, `anlass-api.ts`, `gespraech-api.ts`, `mitglieder-api.ts` und `turnier-api.ts`; `api.ts` bleibt der Kern (`Antwort<T>`, Vertrag, `lese`, `schicke`) und reicht nichts weiter; 42 Dateien wechseln nur Import-Zeilen, 44 Tests auf fünf Dateien verteilt, keiner geändert; voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.3): Profil, Login, Passkey und `hatSitzung` auf dem Baustein, Umbenennung `ergebnis` → `art`, beide Kleinfragen aufgenommen (`{ art }` beim E-Mail-Wechsel, vier benannte Anfragen der Login-Seiten), N-09 (`src/lib/anlass/antwort.ts`), Wortlisten der Verträge an den Typ gebunden, `abruf.ts` in der Abdeckung; die Lint-Regel zu `fetch` verworfen (98 Meldungen am heutigen Repo, Vorschlag an Schritt 15); voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 1** Abruf-Baustein (13.11.2026, Review «ok» ohne Befund; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
-| **Nächster offener Schritt** | **20a, Review** (umgesetzt am 14.11.2026, F.6; Prüfwerkzeug, darum ein eigenes Review, 7.7), dann Merge (Version vergibt der Merge). Danach **Zwischenrevision und Checkpoint am Ende der Etappe 3** (7.7), dann Etappe 4. Kurzbericht zu 20a (E-59). **Schritt 20 ist gemergt** (Version 0.22.8, Review je «ok», Handstart mit Spur gemessen, F.5); was folgt, ist der Stand vor dem Merge von 20: **20, Review von Lauf 2** (umgesetzt am 14.11.2026, F.5; das Review von Lauf 1 läuft getrennt am Commit `98b9225`), dazu der Handstart der CI mit Spur auf dem Branch (`gh workflow run check.yml --ref refactor/schritt-20 -f spur=true`, Orchestrator); dann Merge, danach 20a. Vorher stand hier: **20, Review von Lauf 1** (umgesetzt am 14.11.2026, F.4), dann Lauf 2. Davor: tote Namen und `export` weg, Umbenennen, fester Weg des Turnierjahrs weg, `login.ts` geteilt, kopierte Test-Hilfen abgelöst; sieben Commits, Review, dann **Lauf 2** (Opus): Listen der Mitglieder an einer Stelle, Prüfung «Methode und Präfix», und nach **F-37** die Spur in der CI. Das Nachmessen liegt vor (14.11.2026, Anhang F.3; Branch `refactor/schritt-20` ab `29b0023`). Danach 20a. **Schritt 19 ist gemergt** (Version 0.22.7, Review «ok»); was folgt, ist der Stand vor dem Merge von 19: Review und Merge des Branches `refactor/schritt-19` (umgesetzt mit Antwort A, F.2). Ob das Ende an Abbruchstelle 2 ein Halt nach E-45 ist («Abbruch eines Subagenten»), entscheidet der Orchestrator; E-61 hat das Ende mit A vorab freigegeben. Die CI auf dem Branch vor dem Merge (N-23, P2-19c) ist nicht mehr zwingend: Der Branch bringt keinen neuen E2E. Nach dem Schritt Kurzbericht (E-62). Danach 20 (vorab nachmessen), dann 20a. **Der Nachtrag zur Etappe 2** ist erledigt: Review, CI auf dem Branch grün (Lauf 43620595027, alle drei Geräte), gemergt als Version 0.22.6; damit ist `dev` nach dem roten Lauf zu Schritt 18 wieder auf einem Stand, dessen gelockerte Prüfung auf der iPhone-CI gehalten hat |
-| **Wartet auf Freigabe des Projektleiters** | Nichts. F-37 beantwortet am 14.11.2026 (B, E-63). F-35 und F-36 beantwortet am 14.11.2026 (E-61, E-62); Checkpoint am Ende der Etappe 2 erledigt am 14.11.2026 (E-55 bis E-60) |
-| **Offene Fragen** | **F-15** (Version, solange es Test nicht gibt): vor Schritt 23, Abschnitt 9.1. Alle anderen sind beantwortet (zuletzt F-37: B, E-63; F-35: B, E-61; F-36: A, E-62) |
+| **Phase** | 4 Umsetzung. **Etappe 0 abgeschlossen** (Checkpoint 11.11.2026, Abschnitt 1b). **Etappe 1 umgesetzt** (Schritte 06, 06a, 07 bis 12, alle auf `dev`, Versionen 0.20.10 bis 0.20.18); Zwischenrevision und Checkpoint am Etappenende erledigt am 12.11.2026 (Abschnitt 1c, E-41 bis E-44) und in Zielbild und Plan eingearbeitet. Der nachgeschobene Schritt **12a** (E-42) ist umgesetzt und gemergt (0.20.19). **Etappe 2:** Schritt 13 erledigt (zwei Läufe, Review je «ok», Version 0.20.20); Schritt 14 erledigt (Review «ok», Version 0.20.21); **Schritt 15 erledigt** (Läufe 1, 1b mit Interclub und 2; Review je «ok» am 14.11.2026, Version 0.22.1); **Schritt 16 erledigt** (CM-Seite; Review «ok» am 14.11.2026; die Doppel-Seite ist verworfen, F-30: A, E-51; Version 0.22.2); **Schritt 17 erledigt** (Review «ok» am 14.11.2026, Checkpoint E-21 erledigt: E-52, E-53; Version 0.22.4); **Schritt 18 erledigt** (Review «ok» nach einem Doku-Befund am 14.11.2026, Version 0.22.5). **Damit ist die Etappe 2 abgeschlossen**; Zwischenrevision und Checkpoint am Etappenende erledigt am 14.11.2026 (Abschnitt 1d, E-55 bis E-60) und in Zielbild und Plan eingearbeitet. **Etappe 3:** freigegeben (E-58), läuft ohne Halt mit Kurzbericht je Schritt (E-59); davor der Nachtrag zur Etappe 2 (7.5, Version 0.22.6). Schritt 19 erledigt (Version 0.22.7), Schritt 20 erledigt (zwei Läufe, Review je «ok», Version 0.22.8), **Schritt 20a erledigt** (Review «ok» am 14.11.2026, Version 0.22.9). **Damit ist die Etappe 3 abgeschlossen**; Zwischenrevision und Checkpoint am Etappenende erledigt am 15.11.2026 (Abschnitt 1e, E-64 bis E-70) und in Zielbild und Plan eingearbeitet. **Etappe 4:** Ablauf entschieden (E-66): davor der Nachtrag zur Etappe 3 (7.6, läuft), dann die Schritte 21 und 22 ohne Halt mit Kurzbericht, 23 und 24 als manuelle Sessions des Projektleiters, 25 als Abschluss durch den Projektleiter |
+| **Erledigte Schritte** | Etappe 0: 01 bis 05 (Kurzfassung in 7.2, Protokoll in Anhang C). Etappe 1: 06 (0.20.10), 06a (0.20.11), 07 (0.20.12), 08 (0.20.13), 09 (0.20.14), 10 (0.20.16), 11 (0.20.17), 12 (0.20.18), 12a (0.20.19), alle mit Review «ok» auf `dev` und grüner CI (Ergebnisse in 7.3, Protokolle in Anhang D). Etappe 2: 13 (0.20.20), 14 (0.20.21), 15 (0.22.1), 16 ohne die Doppel-Seite (0.22.2, Nachtrag 0.22.3), 17 (0.22.4), 18 (0.22.5), alle mit Review «ok» auf `dev` (Ergebnisse in 7.4, Protokolle in Anhang E); die CI auf `dev` ist zum Merge von Schritt 18 im Job «E2E (iphone)» rot (Fokus-Wackler, siehe «Nächster offener Schritt»). Etappe 3: Nachtrag zur Etappe 2 (0.22.6), 19 (0.22.7), 20 (0.22.8), 20a (0.22.9), alle mit Review «ok» auf `dev` (Ergebnisse in 7.5, Protokolle in Anhang F); die CI auf `dev` zum Merge von 20a ist grün (Lauf 43632851367 [G am 15.11.2026]) |
+| **Zuletzt erledigt** | **Zwischenrevision und Checkpoint am Ende der Etappe 3** (15.11.2026; Abschnitt 1e, E-64 bis E-70; nur dieses Dokument, keine Version). Davor **20a** (14.11.2026, Review «ok», nichts vor dem Merge zu beheben; gemergt als Version 0.22.9, Merge `4c7b340`; Ergebnis in 7.5, Protokoll Anhang F.6): ESLint meldet jeden Aufruf `fetch(…)` unter `src/`, ohne erlaubte Stelle (heute 0, auch ohne Inline-Kommentare; `abruf.ts` ruft nur `holen`), Test `scripts/fetch-regel.test.ts` mit Proben und Grenzen (fängt nicht `window.fetch`, `globalThis.fetch`, ein weitergereichtes `holen`); Prüfung `scripts/design-importe.test.ts`: Design-Dateien nur im Wurzel-Layout, vollständig und in der Reihenfolge von `REIHENFOLGE`, `brief.css` nur im Briefdruck, neue Datei ohne Eintrag rot; alle Proben vorher rot; kein Diff unter `src/`; voller `make check` grün (2471 Tests, E2E 524/64, 5,5 Minuten). Davor **20** (zwei Läufe, Review je «ok», gemergt als Version 0.22.8; Ergebnis in 7.5, Protokolle F.4 und F.5). Davor **19, mit Antwort A** (14.11.2026, Review «ok», gemergt als Version 0.22.7; Ergebnis in 7.5, Protokoll Anhang F.2): `MINDESTVERSION`, `istVersionVertraeglich` und `mindestversion` in `/api/status` entfernt (Test zuerst rot, 4 von 9); die Ergänzung nach B (der nächste Link lädt nach einer neuen Auslieferung ganz neu) gebaut, im Verhalten auf allen drei Geräten gelungen, aber **Abbruchstelle 2**: Auf dem iPhone-Profil (WebKit) meldet die Konsole abgebrochene Abrufe (mit `cancel()` 9 von 45 Läufen rot, mit der wörtlichen Vorlage der Doku 2 von 45); nach E-61 ohne Umweg mit A beendet, E2E zurückgenommen; Doku «Alte Versionen auf dem Handy» neu (Neuladen nur, wenn ein Seitenwechsel scheitert; keine Mindestversion; Eingabe bleibt nicht erhalten); für die Nutzerin nichts; voller `make check` grün (2411 Tests, E2E 524/64, 3,5 Minuten). Davor **18** (14.11.2026, Review «ok» nach einem Doku-Befund, gemergt als Version 0.22.5; Ergebnis in 7.4, Protokoll Anhang E.13): `basis.css` in zehn Dateien unter `src/lib/design/` geschnitten (`grundlagen`, `rahmen`, `bedienelemente`, `karten`, `verwaltung`, `anleitung`, `uebergaenge`, `pc-layout`, `druck`, `verlauf`), Importe in `+layout.svelte` in dieser Reihenfolge nach `tokens.css`, Mockups und Leitbild nachgezogen; gebautes CSS vor und nach gleich (Node und SPA), Rot-Probe belegt; voller `make check` grün (2427 Tests, E2E 524/64, 5,6 Minuten). Davor **17** (14.11.2026, Review «ok», Checkpoint E-21 erledigt mit E-52 und E-53, gemergt als Version 0.22.4; davor der Nachtrag zu Schritt 16 als Version 0.22.3, E-54; Ergebnis in 7.4, Protokoll Anhang E.12): Vorab-E2E `tests/e2e/anmeldungsliste-ablauf.test.ts` (vier Fälle je Handy, auf dem alten Stand grün, einmal rot), `Aktionsdialog` um `neben` (zweite Entscheid-Taste) und `ohneHaupttaste` erweitert, die fünf Rückfragen der Einzel-Anmeldungsliste darauf (`fuehreAus`, eigene Sperre und rohe Dialoge weg); der Wildcard-Antrag nutzt den Baustein (nicht von Hand). Sichtbar anders: die Warnung als Liste (Bilder für E-21 im Scratchpad, siehe E.12) und drei Randfälle (E.12); `cm-verwaltung`, `turnier`, `cm-anmeldung`, `cm-doppel-verwaltung` grün; voller `make check` grün (2427 Tests, E2E 524/64, 5,4 Minuten). Davor **16** (14.11.2026, Review «ok», gemergt als Version 0.22.2; Teil 2 mit der Doppel-Seite verworfen, F-30: A, E-51; Ergebnis in 7.4, Protokoll Anhang E.11): Vorab-E2E `tests/e2e/cm-ablauf.test.ts` (drei Fälle je Handy, auf dem alten Stand grün, einmal rot), die Ablauf-Funktion `src/lib/cm/ablauf.ts` mit 15 Einheitsfällen (Abdeckung 100 %), sieben der acht Handler der CM-Seite darauf, `angabenSenden` bleibt von Hand (Abbruchstelle 2), die zwei Text-Dialoge als `src/lib/cm/Textdialog.svelte`; Sätze, Reihenfolge und Fokus unverändert, Markup gleich bis auf die `id`s; für die Nutzerin nichts; voller `make check` grün (2427 Tests, E2E 516/60, 5,3 Minuten). Davor **15, Lauf 2** (14.11.2026, Review «ok», mit Lauf 1 und 1b gemergt als Version 0.22.1; Ergebnis in 7.4, Protokoll Anhang E.9): die vier Listen der Verwaltung (`turniere`, `anlaesse`, `verlauf`, `mitglieder`) laden ihr erstes Laden in einer neuen `+page.ts` über den Wächter (Fall `verwaltung`); eine Störung bleibt eine Meldung in der Seite (`zeilen: null`, keine Fehlerseite); `mitglieder` lädt nach Suche und Filter weiter im Baustein, ohne zweite Abfrage beim Einhängen; Vorab-Tests (E2E 5 Fälle je Gerät, auf dem alten Stand grün, einmal rot) und 13 Einheitsfälle der vier Ladefunktionen; für die Nutzerin nur die zwei Folgen aus E-48; voller `make check` grün (2412 Tests, E2E 510/57, 3,9 Minuten). Davor **15, Lauf 1b (Interclub)** (14.11.2026, Review «ok» am 14.11.2026 zusammen mit Lauf 1; Ergebnis in 7.4, Nachmessen Anhang E.7, Protokoll Anhang E.8): `origin/dev` mit #81 eingemergt (Layout in der Fassung von `dev`, Entscheide des Branches neu E-48 bis E-50), Vorab-Tests für die drei Interclub-Seiten und das Wurzel-Layout (E2E vier Fälle mehr und drei Adressen mehr in der Tabelle, 15 Einheitsfälle, je Gruppe einmal rot), Wurzel-Layout auf `ladeSitzung` (Typ `Sitzung` mit `interclub`), die drei Interclub-Ladefunktionen auf dem Wächter (Fall `mitglied`); keine Zeile mehr in der Wächter-Tabelle, Fälle L und M benannt und unverändert; für die Nutzerin ändert sich nichts; voller `make check` grün (2399 Tests, E2E 495/57, 3,4 Minuten). Davor **15, Lauf 1** (13.11.2026, Branch `refactor/schritt-15`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.6): Vorab-Tests in drei Teilen (E2E 21 Fälle auf drei Geräten, 91 Einheitsfälle der Ladefunktionen, je Teil einmal rot), `ladeSitzung` und die Wächter-Tabelle `src/lib/login/waechter.ts` mit zwei Hüllen und sechs benannten Fällen (neu `verwaltung-zugang`), 22 Ladefunktionen, das Wurzel-Layout, 17 Stellen nach einer Aktion und das Abmelden umgestellt, `hilfe/+page.ts` auf `ladeKontakt`; keine Ladefunktion ruft `fetch`, keine Seite schreibt die Umleitung zum Login; für die Nutzerin ändert sich nichts; voller `make check` grün (2300 Tests, E2E 477/57, 4,1 Minuten); Review «ok» am 14.11.2026 (mit Lauf 1b). Davor **14** (13.11.2026, Review «ok» ohne Befund, Version 0.20.21; Ergebnis in 7.4, Protokoll Anhang E.4): `verwaltung/api.ts` nach Bereichen geteilt, in `zugang-api.ts`, `anlass-api.ts`, `gespraech-api.ts`, `mitglieder-api.ts` und `turnier-api.ts`; `api.ts` bleibt der Kern (`Antwort<T>`, Vertrag, `lese`, `schicke`) und reicht nichts weiter; 42 Dateien wechseln nur Import-Zeilen, 44 Tests auf fünf Dateien verteilt, keiner geändert; voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 2** (13.11.2026, Branch `refactor/schritt-13`, nicht gemergt; Ergebnis in 7.4, Protokoll Anhang E.3): Profil, Login, Passkey und `hatSitzung` auf dem Baustein, Umbenennung `ergebnis` → `art`, beide Kleinfragen aufgenommen (`{ art }` beim E-Mail-Wechsel, vier benannte Anfragen der Login-Seiten), N-09 (`src/lib/anlass/antwort.ts`), Wortlisten der Verträge an den Typ gebunden, `abruf.ts` in der Abdeckung; die Lint-Regel zu `fetch` verworfen (98 Meldungen am heutigen Repo, Vorschlag an Schritt 15); voller `make check` grün (2156 Tests, E2E 414/57). Davor **13, Lauf 1** Abruf-Baustein (13.11.2026, Review «ok» ohne Befund; Protokoll Anhang E.2): Vorab-Tests (27 Fälle, E.1 Zeilen 1 bis 34 und 57, alle auf dem alten Stand grün, je Modul einmal rot), Tabelle `STATUS_DES_WORTS` in `src/lib/fehler.ts`, Baustein `src/lib/abruf.ts` (17 Fälle, Abdeckung 100 %), `anlass`, `push`, `cm`, Verwaltung und `mitteilung-api` darauf, N-10 als `src/lib/cm/ablehnung.ts`; Diff der bestehenden Tests leer, keine `.svelte`-Datei; Abbruchstelle von `Antwort<T>` nicht eingetreten; voller `make check` grün (2134 Tests, E2E 414/57). Davor **12a** Reste der Bauregel (12.11.2026, Review «ok» nach einer Korrekturrunde, Version 0.20.19; Ergebnis in 7.3, Protokoll in Anhang D.15): Punkte (1) bis (5) gebaut, (6) begründet verworfen (Schritt 20, Hinweis (e)), `.mts`, `.cts`, `.mjs` und `.cjs` aufgenommen; Korrekturrunde nach dem Review (M-1: das Muster für Texte verschluckte echte Importe; jetzt prüft jede Regel zwei Lesarten ohne Kommentare); `bauregel.test.ts` 122 → 200, je Form vorher rot; Vergleich alt gegen neu: 0 Fälle «alt Befund, neu keiner» über 25 843 536 eigene und 22 526 400 Fälle des Reviewers (Wahrheit vom TypeScript-Parser); voller `make check` grün, kein Diff unter `src/`. Davor **12** Importregeln scharf gestellt (12.11.2026, Review «ok», Nachreview des Nachtrags «ok», Version 0.20.18; Ergebnis in 7.3, Protokoll in Anhang D.14): Test «`AUSNAHMEN` ist leer», Lint-Meldung ohne veraltete Ausnahmen, jede Regel der Importrichtung einmal verletzt (22 Proben), neue Regel der Bauregel: `liest`/`schreibt` nur in den Dateien von `VERWALTUNGS_DATEIEN`. **Damit ist die Etappe 1 umgesetzt.** Davor **11** (Review «ok» für beide Läufe, Version 0.20.17; Anhang D.12, D.13). Davor **10** `getSitzung` in `sitzung/schnittstellen.ts`, `ANSICHT_ROLLEN` und `AnsichtRolle` in `login/sitzung.ts`, `AUSNAHMEN` 4 → 1: Review «ok» ohne Befund, Version 0.20.16 (Ergebnis in 7.3, Protokoll in Anhang D.10). Davor **09** Verwaltung der Anlässe in `anlass/verwaltung-schnittstellen.ts` (Variante A von F-17, E-38), samt der Lücke «Namen in Anführungszeichen» der Bauregel: Review «ok» nach einer Korrekturrunde, Version 0.20.14 (Ergebnis in 7.3, Protokoll in Anhang D.8). Davor **08** eine Fehlerform und eine Liste der Fehlerwörter (`src/lib/fehler.ts`): Review «ok» ohne Befund vor dem Merge, Version 0.20.13, umgesetzt nach Variante A von F-21 (vorläufig) (Ergebnis in 7.3, Nachmessen in Anhang D.5, Protokoll in Anhang D.6). Davor 07 (Version 0.20.12, Anhang D.4) |
+| **Nächster offener Schritt** | **Der Nachtrag zur Etappe 3** (7.6; E-67): Branch `refactor/nachtrag-etappe-3` ab `origin/dev`, läuft parallel bei einem Implementer (Opus), mit eigenem Review. Er fasst an: `eslint.config.js` (`FETCH_REGEL`: Meldung in zwei Sätzen, dazu eng `window.fetch`, `globalThis.fetch`, `self.fetch`), `scripts/fetch-regel.test.ts`, `scripts/design-importe.test.ts`, `docs/ci-cd-und-release.md` (die Zeilen der zwei Prüfungen), `src/lib/design/grundlagen.css` (nur der Kommentar). Er kostet eine Version; das Ergebnis trägt der Orchestrator in 7.6 nach. **Danach Schritt 21** (Sonnet, Subagent, reine Doku, keine Version, Kurzbericht). Er fasst an: `docs/arc42.md`, `docs/index.md`, `README.md`, `docs/testkonzept.md`, `docs/ci-cd-und-release.md`, `docs/ui-leitbild.md`; nicht `docs/context-scopes.md` (Schritt 22) und nicht `grundlagen.css` (Nachtrag). Danach 22 → 23 → 24 → 25 (7.6, 7.7). **Beim Orchestrator ausserdem offen:** C-16 in die Projekt-`CLAUDE.md` einspielen (E-70), Anhang F auslagern (E-60), den Dependabot-PR #86 nicht zwischen Nachmessen und Merge von Schritt 23 mergen (1e, N-34). **Was in dieser Zelle folgt, ist der Verlauf bis zum 14.11.2026, nicht mehr der Stand.** Davor: die Zwischenrevision am Ende der Etappe 3 als Vorschlag (14.11.2026, Abschnitt 1e, Stand `4c7b340`, Version 0.22.9), entschieden am Checkpoint vom 15.11.2026. Davor, erledigt mit dem Merge von 20a (Review «ok», Version 0.22.9; 1e, N-29): **20a, Review** (umgesetzt am 14.11.2026, F.6; Prüfwerkzeug, darum ein eigenes Review, 7.7), dann Merge (Version vergibt der Merge). Danach **Zwischenrevision und Checkpoint am Ende der Etappe 3** (7.7), dann Etappe 4. Kurzbericht zu 20a (E-59). **Schritt 20 ist gemergt** (Version 0.22.8, Review je «ok», Handstart mit Spur gemessen, F.5); was folgt, ist der Stand vor dem Merge von 20: **20, Review von Lauf 2** (umgesetzt am 14.11.2026, F.5; das Review von Lauf 1 läuft getrennt am Commit `98b9225`), dazu der Handstart der CI mit Spur auf dem Branch (`gh workflow run check.yml --ref refactor/schritt-20 -f spur=true`, Orchestrator); dann Merge, danach 20a. Vorher stand hier: **20, Review von Lauf 1** (umgesetzt am 14.11.2026, F.4), dann Lauf 2. Davor: tote Namen und `export` weg, Umbenennen, fester Weg des Turnierjahrs weg, `login.ts` geteilt, kopierte Test-Hilfen abgelöst; sieben Commits, Review, dann **Lauf 2** (Opus): Listen der Mitglieder an einer Stelle, Prüfung «Methode und Präfix», und nach **F-37** die Spur in der CI. Das Nachmessen liegt vor (14.11.2026, Anhang F.3; Branch `refactor/schritt-20` ab `29b0023`). Danach 20a. **Schritt 19 ist gemergt** (Version 0.22.7, Review «ok»); was folgt, ist der Stand vor dem Merge von 19: Review und Merge des Branches `refactor/schritt-19` (umgesetzt mit Antwort A, F.2). Ob das Ende an Abbruchstelle 2 ein Halt nach E-45 ist («Abbruch eines Subagenten»), entscheidet der Orchestrator; E-61 hat das Ende mit A vorab freigegeben. Die CI auf dem Branch vor dem Merge (N-23, P2-19c) ist nicht mehr zwingend: Der Branch bringt keinen neuen E2E. Nach dem Schritt Kurzbericht (E-62). Danach 20 (vorab nachmessen), dann 20a. **Der Nachtrag zur Etappe 2** ist erledigt: Review, CI auf dem Branch grün (Lauf 43620595027, alle drei Geräte), gemergt als Version 0.22.6; damit ist `dev` nach dem roten Lauf zu Schritt 18 wieder auf einem Stand, dessen gelockerte Prüfung auf der iPhone-CI gehalten hat |
+| **Wartet auf Freigabe des Projektleiters** | Nichts. Der Checkpoint am Ende der Etappe 3 ist erledigt am 15.11.2026: F-15 und F-38 bis F-43 beantwortet (E-64 bis E-70). Davor: F-37 beantwortet am 14.11.2026 (B, E-63). F-35 und F-36 beantwortet am 14.11.2026 (E-61, E-62); Checkpoint am Ende der Etappe 2 erledigt am 14.11.2026 (E-55 bis E-60) |
+| **Offene Fragen** | **Keine.** F-15 ist beantwortet (A, E-64), ebenso F-38 bis F-43 (E-65 bis E-70), alle am 15.11.2026 (9.2). Davor zuletzt F-37: B, E-63; F-35: B, E-61; F-36: A, E-62 |
 | **Checkpoint Etappe 0, Nachweis** | E2E dreimal voll grün auf `bad624f` (Version 0.20.9): je 414 bestanden, 57 übersprungen, 3,8 / 5,3 / 4,1 Minuten (gemessen vom Orchestrator); CI auf `dev` zum Merge von Schritt 05 grün (Lauf 43046410032, alle Prüf-Jobs und E2E auf drei Geräten) |
-| **Vorab nachzumessen** | vor Schritt 23 (was, steht in der Spalte «Nachmessen vorab»; Übersicht in 7.7); 20a braucht keines. **Für Schritt 20 erledigt am 14.11.2026 (Anhang F.3):** von rund 1180 exportierten Namen 3 entfernen (`warnungText`, `RangZeile`, `GespraechZeile` der Verwaltung), bei 25 nur `export` weg, der Rest bleibt; Handarbeit reicht, kein Paketvorschlag (E-11); den festen Weg des Turnierjahrs ruft niemand mehr; `login.ts` in fünf Dateien, 19 Testdateien wechseln nur Importe; von den elf Hinweisen sechs aufnehmen ((b), (c), (f), (h), (j), (k) nach F-37), fünf verwerfen ((a), (d), (e), (g), (i)); die Begründung von (i) stimmt nicht (der Code der Verwaltung zählt je Adresse, nicht je IP); zwei Läufe mit je eigenem Review (Sonnet, dann Opus); eine Frage (F-37). **Für Schritt 19 erledigt am 14.11.2026 (Anhang F.1):** Entscheid des Projektleiters nötig (F-35, F-36); den Eigenbau liest niemand (`mindestversion` nur in Tests, `istVersionVertraeglich` nur im eigenen Test); das Bordmittel ist aktiv, lädt aber nur im Fehlerfall neu; Kennung bleibt der Zeitstempel des Builds (Probe-Build: zwei Builds desselben Quelltexts unterscheiden sich nur in `version.json` und `service-worker.js`); der Service Worker hat keinen Cache; `Dockerfile` und Service Worker fallen aus der Dateiliste; ein neuer E2E mit untergeschobener `version.json` und Fokus-Ereignis, vorher rot. **Für Schritt 16 erledigt am 14.11.2026 (Anhang E.10):** kein Entscheid des Projektleiters nötig, keine neue Frage; die Doppel-Seite wird **aufgenommen** (drei Handler, als zweiter Teil mit eigener Abbruchstelle; `suchen` und `neuLaden` bleiben von Hand); die Funktion passt für sieben der acht Handler der CM-Seite, `angabenSenden` nur mit eigener Angabe; den Fokus nach einer Aktion hält heute eine einzige E2E-Stelle, vier Handler haben keinen E2E-Fall, darum vier Vorab-E2E (`tests/e2e/cm-ablauf.test.ts`, ohne Mail-Code) zusätzlich zu den Einheitstests; «rund 250 Zeilen» eher 170 bis 210; keine gemeinsame Datei mit Schritt 17. **Für Schritt 15, Lauf 1b (Interclub) erledigt am 14.11.2026 (Anhang E.7):** mit #81 39 Adressen, 30 Ladefunktionen, 25 «nur der Wächter wechselt»; kein neuer Fall in der Wächter-Tabelle, zwei neue benannte Fälle L und M ausserhalb der Tabelle; zwei Ränder des Layouts; ein Vorab-Test aus Lauf 1 muss mit dem Merge mit. **Für Schritt 15 erledigt am 13.11.2026 (Anhang E.5):** Tabelle aller 36 Adressen mit Ziel; 17 statt 14 Stellen «nach einer Aktion»; acht benannte Fälle mehr (D bis K); Vorab-Test als E2E-Tabelle ohne Konto und Mail-Code plus Einheitstests der Ladefunktionen der Verwaltung; Wächter als Tabelle in `src/lib/login/waechter.ts` mit zwei Hüllen, `ladeSitzung` in `sitzung.ts`; zwei Läufe, ein Merge; Lauf 1 ändert für die Nutzerin nichts, Lauf 2 (vier Listen) freigegeben mit F-28 (E-48). **Für Schritt 13 erledigt am 12.11.2026 (Anhang E.1):** kein Entscheid des Projektleiters nötig, der Baustein erhält jeden heutigen Rand; «ein Wort gilt nur mit seinem Status» bleibt, dazu «für 401, 404 und 429 genügt der Status»; 57 Zeilen Vorab-Tests; Baustein `src/lib/abruf.ts`; drei Seiten statt vier (`willkommen` liest kein Ergebnis); N-09 aufnehmen, N-10 als geteilte Liste unter `src/lib/cm/`. Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
-| **Nächster Checkpoint** | **Am Ende der Etappe 3** (nach dem Merge von 20a; 7.7). Bis dahin läuft die Etappe 3 ohne Halt mit Kurzbericht je Schritt (E-59; E-45 gilt weiter). **Halt davor** nur bei den Anlässen aus E-45: alles aus E-06, eine sichtbare Verhaltensänderung, Abbruch eines Subagenten, zweimal Befunde im Review, rote CI, eine Frage, die das Dokument dem Projektleiter vorbehält. Eine solche Frage steht schon fest: **nach dem Nachmessen zu Schritt 19** («Bordmittel oder nur entfernen», E-09). Der Checkpoint am Ende der Etappe 2 ist erledigt (14.11.2026) |
-| **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32) |
-| **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten |
+| **Vorab nachzumessen** | **Offen: nur vor Schritt 23** (`refactor-analyst`, Opus; was, steht in der Zeile 23 und in «Hinweise zu Schritt 23», 7.6; Übersicht in 7.7). Der Nachtrag zur Etappe 3 und die Schritte 21, 22, 24 und 25 brauchen keines. **Für Schritt 20 erledigt am 14.11.2026 (Anhang F.3):** von rund 1180 exportierten Namen 3 entfernen (`warnungText`, `RangZeile`, `GespraechZeile` der Verwaltung), bei 25 nur `export` weg, der Rest bleibt; Handarbeit reicht, kein Paketvorschlag (E-11); den festen Weg des Turnierjahrs ruft niemand mehr; `login.ts` in fünf Dateien, 19 Testdateien wechseln nur Importe; von den elf Hinweisen sechs aufnehmen ((b), (c), (f), (h), (j), (k) nach F-37), fünf verwerfen ((a), (d), (e), (g), (i)); die Begründung von (i) stimmt nicht (der Code der Verwaltung zählt je Adresse, nicht je IP); zwei Läufe mit je eigenem Review (Sonnet, dann Opus); eine Frage (F-37). **Für Schritt 19 erledigt am 14.11.2026 (Anhang F.1):** Entscheid des Projektleiters nötig (F-35, F-36); den Eigenbau liest niemand (`mindestversion` nur in Tests, `istVersionVertraeglich` nur im eigenen Test); das Bordmittel ist aktiv, lädt aber nur im Fehlerfall neu; Kennung bleibt der Zeitstempel des Builds (Probe-Build: zwei Builds desselben Quelltexts unterscheiden sich nur in `version.json` und `service-worker.js`); der Service Worker hat keinen Cache; `Dockerfile` und Service Worker fallen aus der Dateiliste; ein neuer E2E mit untergeschobener `version.json` und Fokus-Ereignis, vorher rot. **Für Schritt 16 erledigt am 14.11.2026 (Anhang E.10):** kein Entscheid des Projektleiters nötig, keine neue Frage; die Doppel-Seite wird **aufgenommen** (drei Handler, als zweiter Teil mit eigener Abbruchstelle; `suchen` und `neuLaden` bleiben von Hand); die Funktion passt für sieben der acht Handler der CM-Seite, `angabenSenden` nur mit eigener Angabe; den Fokus nach einer Aktion hält heute eine einzige E2E-Stelle, vier Handler haben keinen E2E-Fall, darum vier Vorab-E2E (`tests/e2e/cm-ablauf.test.ts`, ohne Mail-Code) zusätzlich zu den Einheitstests; «rund 250 Zeilen» eher 170 bis 210; keine gemeinsame Datei mit Schritt 17. **Für Schritt 15, Lauf 1b (Interclub) erledigt am 14.11.2026 (Anhang E.7):** mit #81 39 Adressen, 30 Ladefunktionen, 25 «nur der Wächter wechselt»; kein neuer Fall in der Wächter-Tabelle, zwei neue benannte Fälle L und M ausserhalb der Tabelle; zwei Ränder des Layouts; ein Vorab-Test aus Lauf 1 muss mit dem Merge mit. **Für Schritt 15 erledigt am 13.11.2026 (Anhang E.5):** Tabelle aller 36 Adressen mit Ziel; 17 statt 14 Stellen «nach einer Aktion»; acht benannte Fälle mehr (D bis K); Vorab-Test als E2E-Tabelle ohne Konto und Mail-Code plus Einheitstests der Ladefunktionen der Verwaltung; Wächter als Tabelle in `src/lib/login/waechter.ts` mit zwei Hüllen, `ladeSitzung` in `sitzung.ts`; zwei Läufe, ein Merge; Lauf 1 ändert für die Nutzerin nichts, Lauf 2 (vier Listen) freigegeben mit F-28 (E-48). **Für Schritt 13 erledigt am 12.11.2026 (Anhang E.1):** kein Entscheid des Projektleiters nötig, der Baustein erhält jeden heutigen Rand; «ein Wort gilt nur mit seinem Status» bleibt, dazu «für 401, 404 und 429 genügt der Status»; 57 Zeilen Vorab-Tests; Baustein `src/lib/abruf.ts`; drei Seiten statt vier (`willkommen` liest kein Ergebnis); N-09 aufnehmen, N-10 als geteilte Liste unter `src/lib/cm/`. Für Schritt 07 erledigt am 12.11.2026 (Anhang D.3), für Schritt 08 am 12.11.2026 (Anhang D.5), für Schritt 09 am 12.11.2026 (Anhang D.7), für Schritt 10 am 12.11.2026 (Anhang D.9: Ort ist ein neues Modul `sitzung/`, kein Entscheid nötig), für Schritt 11 am 12.11.2026 (Anhang D.11: Zuordnung 9 Turnier, 13 CM, 4 Gespräch bestätigt; mit den Mitteilungen 23 Funktionen und 20 Routen; `AUSNAHMEN` ist schon nach Schritt 11 leer; Empfehlung zwei Teile 11a und 11b, F-22). Schritte 06 und 06a brauchen keines |
+| **Nächster Checkpoint** | **Die manuellen Sessions des Projektleiters zu den Schritten 23 und 24 und der Abschluss in Schritt 25** (E-66; 7.7). Bis dahin laufen der Nachtrag zur Etappe 3 und die Schritte 21 und 22 ohne Halt mit Kurzbericht; Halt davor nur bei den Anlässen aus E-45. Der Checkpoint am Ende der Etappe 3 ist erledigt (15.11.2026). **Davor stand hier:** Am Ende der Etappe 3 (nach dem Merge von 20a; 7.7). Bis dahin läuft die Etappe 3 ohne Halt mit Kurzbericht je Schritt (E-59; E-45 gilt weiter). **Halt davor** nur bei den Anlässen aus E-45: alles aus E-06, eine sichtbare Verhaltensänderung, Abbruch eines Subagenten, zweimal Befunde im Review, rote CI, eine Frage, die das Dokument dem Projektleiter vorbehält. Eine solche Frage steht schon fest: **nach dem Nachmessen zu Schritt 19** («Bordmittel oder nur entfernen», E-09). Der Checkpoint am Ende der Etappe 2 ist erledigt (14.11.2026) |
+| **Erledigt ausserhalb des Plans** | Worktree und Branch `doppel-anfragen-verfallen` entfernt (E-14). Die Vorschläge B.3a bis B.3c, B.4a, B.5 und B.6 stehen als Eintrag vom 11.11.2026 in der gemeinsamen `beobachtungen.md` der CAS-Projekte (E-25). Die Änderungen an der Projekt-`CLAUDE.md` aus der Zwischenrevision sind eingespielt (E-29); der Agent `refactor-analyst` hat das Werkzeug Edit (E-32). Der Satz der benannten Ausnahmen zu «Ab Schritt 15» ist eingespielt (E-57); die Anhänge C bis E stehen in eigenen Dateien (E-60). **Offen am 15.11.2026:** der Satz unter «Tests» zu den Listen der Mitglieder (C-16, E-70) ist noch nicht eingespielt [G: `CLAUDE.md:48` im Worktree nennt noch «in Grundprüfung und Routen-Test»]; Anhang F ist noch nicht ausgelagert |
+| **Hinweis für den Orchestrator** | Die Agent-Typen `refactor-*` kennt eine Session erst, wenn sie nach dem Merge von Schritt 01 gestartet wurde. Sonst denselben Text als allgemeinen Agenten mit dem genannten Modell starten. **Etappe 4 (E-66):** Für die Schritte 23 und 24 liefert der Orchestrator dem Projektleiter je das Modell, einen Copy-Paste-Prompt und was die Session in dieses Dokument schreiben muss (Stichworte in «Hinweise zu Schritt 23» und «Hinweise zu Schritt 24», 7.6); danach prüft der `refactor-reviewer` |
 
 **Kennzeichnung der Belege**
 
@@ -801,6 +811,407 @@ F-15 bleibt offen und ist vor Schritt 23 fällig)
   Lauf zum Merge von Schritt 18 ist nur das Log gelesen.
 - `docs/beobachtungen.md` nur in den Überschriften und im Eintrag zum Turnierjahr gelesen;
   `intern/` nicht gelesen.
+
+---
+
+## 1e Zwischenrevision Etappe 3 (14.11.2026) [neu]
+
+Stand: `origin/dev` nach dem Merge von Schritt 20a (Commit `4c7b340`, Version 0.22.9). Gelesen:
+dieses Dokument (Kopf, 1d bis vor «Fokus-Wackler», 6, 7.5 bis 7.7, E-05 bis E-07, E-17, E-45,
+E-55 bis E-63, F-15, F-35 bis F-37, Anhang A, Anhang B Übersicht und B.1; aus Anhang F ganz F.4
+bis F.6, aus F.1 bis F.3 die Stellen «Hinweis», «Beobachtung», «nicht behoben», «Bleibt», «Nicht
+geprüft» per Textsuche mit den Absätzen darum [E]); `CLAUDE.md`; aus `docs/beobachtungen.md` die
+Überschriften und die drei Einträge vom 14.11.2026. Ganz gelesen: ADR-007,
+`scripts/pruefungen/version-merge.ts`, `nur-doku.ts`, `release.ts`, `.githooks/pre-push`,
+`docs/context-scopes.md`. In Auszügen: `docs/ci-cd-und-release.md` (Umgebungen, Ablauf, Prüfungen
+in der CI, Versionen), der Skill `tco-branching` (Schritt 4, Release, 4a),
+`.github/workflows/check.yml` (nur die Bedingungen der Auslieferungs-Jobs), `docs/arc42.md`
+Kapitel 5, `tests/hilfen/mitglieder-listen.ts`, `eslint.config.js` (`FETCH_REGEL`). Der Code sonst
+per Textsuche [E]. Mit `gh`: Issues 80 und 81, die letzten 14 Läufe von `check.yml`, offene PRs.
+Nichts gebaut, nichts getestet, kein Browser. Was nicht geprüft ist, steht am Schluss.
+
+**[geändert] Stand nach dem Checkpoint (15.11.2026):** Der Abschnitt war als Vorschlag geschrieben
+(«nichts eingearbeitet, nichts entschieden»). Die Vorschläge der Tabellen Z3 und P3, die
+Zuordnung der Tabellen H3 und N, F-15 und die Fragen F-38 bis F-43 sind entschieden, jede wie
+empfohlen, und **eingearbeitet (E-64 bis E-70)**; wo, zeigt die Tabelle «Entschieden am
+Checkpoint». Die Tabellen unten bleiben als Herleitung im Wortlaut der Revision stehen; es gelten
+Zielbild (6.1, 6.2) und Plan (7.6, 7.7). Wo ein Entscheid einen Vorschlag festlegt oder über ihn
+hinausgeht, steht es in der Zeile als **[entschieden: …]**. **«Vorschlag, nicht eingespielt» gilt
+nur noch für C-17 und C-19 und für den Wortlaut von C-18** (Entwurf für Schritt 24, zusammen mit
+C-7 bis C-10 aus 1c und C-12, C-14, C-15 aus 1d). C-16 ist entschieden (E-70); das Einspielen
+durch den Orchestrator steht aus. Die Nummern dieses Abschnitts: Z3 (Zielbild), P3 (Plan), H3
+(Hinweise aus Anhang F und den Reviews), C-16 bis C-19 (`CLAUDE.md` und Skill), N-27 bis N-34
+(neue Befunde), F-38 bis F-43 (Fragen; beantwortet, Abschnitt 9.2) und die Aufbereitung von F-15
+(beantwortet, 9.2).
+
+**Urteil**
+
+1. **Das Zielbild für den Code (6.1) stimmt nach der Etappe 3.** Die Etappe hat keinen Punkt
+   verschoben; zwei Sätze lassen sich schärfen (Z3). In 6.2 (Arbeitsweise) tragen zwei Punkte
+   nicht: Punkt 7 zur Version (N-27, F-15) und Punkt 6 zu den Fallen, für den kein Schritt steht
+   (N-30, F-42).
+2. **Der Rest des Plans trägt. Kein Schritt entfällt, jeder der fünf bekommt eine kleine
+   Änderung** (P3). Am meisten Schritt 23: Seine Dateiliste ist zu kurz, und sein Modell passt
+   nicht zur Regel «Fable nur bei Risiko hoch».
+3. **E-07 hebt sich im Wortlaut selbst auf, sobald Test läuft** (N-27): Test wird bei jedem Merge
+   nach `dev` mit Code ausgeliefert. «Eine Version, wenn ein Stand auf Test ausgeliefert wird»
+   ist dann wieder «eine Version je Merge mit Code», und die feste Kollisionsstelle (B-03) kehrt
+   zurück. Das gehört in die Antwort auf F-15.
+4. **Fremde Änderungen auf `dev` gab es in der Etappe 3 keine.** Seit `40a0a54` stehen fünf
+   Merges auf der Hauptlinie, alle `refactor/…`; es gibt keinen fremden Feature-Branch auf
+   `origin` [G: `git log --first-parent`, `git branch -r`]. #81 ist offen [G]. Offen ist der
+   Dependabot-PR #86 (N-34).
+5. **Die `CLAUDE.md` wird eingehalten.** Ein Satz unter «Tests» ist seit Schritt 20 sachlich
+   falsch (C-16). Eine Dauerregel hält die Praxis nicht, und zwar deutlicher als bisher gezählt:
+   146 Suchen über einen CSS-Selektor in den E2E, davon 104 über eine Klasse (Messung unten,
+   F-41). Eine Zeile «Ab Schritt 20a» braucht es nicht.
+6. **Der Kopf dieses Dokuments ist wieder stehen geblieben** (N-29): Er führt Schritt 20a als
+   «nicht gemergt, Review offen»; 20a ist gemergt, Review «ok», Version 0.22.9 [G].
+   **[nachgeführt am 15.11.2026 mit dem Einarbeiten]**
+7. **Bleibt (gut gelöst):** Abbruchstellen vorab benannt und eingehalten (Schritt 19 endete ohne
+   Umweg mit A, der E2E in einem eigenen Commit zurückgenommen); das Nachmessen zu Schritt 20,
+   das fünf von elf Hinweisen mit Zahlen verworfen und eine falsche Begründung berichtigt hat;
+   der Schnitt in zwei Läufe nach Art der Arbeit (Verschieben mit Sonnet, Testlogik mit Opus);
+   `tests/hilfen/mitglieder-listen.ts` mit einem Typ, der fehlende Dienste zum Typfehler macht;
+   die Spur als Schalter über `env`, gemessen statt geschätzt; die Lint-Regel ohne erlaubte
+   Stelle samt Test, der ein `eslint-disable` fängt; die Prüfung der Design-Importe über Parser
+   statt über Textmuster; die CI auf dem Branch vor dem Merge beim Nachtrag und beim Handstart
+   (N-23). Die Läufe der CI auf `dev` zu den Merges der Revision 1d, des Nachtrags und der
+   Schritte 19 und 20 sind grün; der Lauf zu 20a lief beim Lesen noch [G: `gh run list`].
+   **[G am 15.11.2026: Der Lauf zu 20a (43632851367) ist grün.]**
+
+**Entschieden am Checkpoint (15.11.2026) [neu]**
+
+| Thema | Entscheid | Steht jetzt |
+|-------|-----------|-------------|
+| F-15, Versionsregel | A: Eine Version entsteht nach dem Refactoring nur noch beim Release `dev` → `main`; Merges nach `dev` sammeln ihre Einträge unter «Unveröffentlicht»; neu ansehen, wenn Test in Betrieb geht. Ändert den Wortlaut von E-07. Bis Schritt 23 gemergt ist, gilt die heutige Regel (E-64) | 6.2 Punkt 7; Zeile 23 und «Hinweise zu Schritt 23» in 7.6; 7.7 (Kosten, Checkpoints); Kopf von Abschnitt 7; Vermerk bei E-07 in Abschnitt 8; Anhang B.1c; 9.1 und 9.2 |
+| F-38, Ergänzung B aus Schritt 19 | A: bleibt Beobachtung, bis Test in Betrieb geht (E-65) | kein Schritt; Zeile 25 in 7.6 (Übergabe, mit H3-04 und H3-05). Der Eintrag in `docs/beobachtungen.md` besteht [E: so in dieser Revision, H3-04; in diesem Lauf nicht neu gelesen] |
+| F-39, Ablauf der Etappe 4 | A: mit den Änderungen aus P3. 21 und 22 ohne Halt mit Kurzbericht (Subagent). 23 und 24 als manuelle Sessions des Projektleiters: Der Orchestrator liefert je Modell, Copy-Paste-Prompt und was die Session ins Dokument schreiben muss; danach Review durch den `refactor-reviewer`. 23 in drei Teilen (Nachmessen, manuelle Session für Regel und ADR, Umbau der Skripte als Subagent mit Review). 25 schliesst der Projektleiter ab (E-66) | 7.6 (Zeilen 21 bis 25 und Hinweise), 7.7 (Reihenfolge, Nachmessen, Checkpoints), «Spalten Modell und Weg» in 7.1, «Stand und nächster Schritt» |
+| F-40, Hinweise am Prüfwerkzeug | A: kleiner Nachtrag vor Schritt 21 mit eigenem Review: die fünf Hinweise aus dem Review von 20a (die strengere fetch-Regel nur eng) und der Kommentar in `grundlagen.css`; Branch `refactor/nachtrag-etappe-3`, parallel bei einem Implementer (E-67) | «Nachtrag zur Etappe 3» in 7.6, Status «läuft»; Zeile 21 (ohne den Kommentar); 7.7; H3-03, N-33 unten |
+| F-41, Regel zur Suche in den E2E | B: Der Wortlaut wird in Schritt 24 so gefasst, wie er gilt (C-18); der Bestand bleibt (E-68) | Zeile 24 und «Hinweise zu Schritt 24» in 7.6; Tabelle C3 unten |
+| F-42, Fallen aus dem Session-Gedächtnis | B: Beobachtung und eigener Vorgang nach dem Abschluss; im Zielbild gekennzeichnet (E-69) | 6.2 Punkt 6; Zeile 25 in 7.6 (Übergabe) |
+| F-43, Satz der `CLAUDE.md` zu den Listen der Mitglieder | A: jetzt berichtigen (C-16); der Orchestrator spielt ihn ein (E-70) | Zeile E-70 in Abschnitt 8 mit altem und neuem Wortlaut; Tabelle C3 unten; die `CLAUDE.md` selbst erst nach dem Einspielen |
+| Tabelle Z3, Zielbild | eingearbeitet (E-64, E-66, E-69): Z3-4, Z3-7 und die zwei Punkte von 6.2 | 6.1 Punkte 4 und 7; 6.2 Punkte 6 und 7 |
+| Tabelle P3, Rest des Plans | eingearbeitet (E-66, E-67): P3-21a bis P3-21d, P3-22a, P3-22b, P3-23a bis P3-23d, P3-24a bis P3-24d, P3-25a bis P3-25d, P3-77 | 7.6 (Zeilen und Hinweise), 7.7 |
+| Tabellen H3 und N | Zuordnung entschieden wie vorgeschlagen (E-66); durch E-64 bis E-70 festgelegt bei H3-03, N-27, N-30, N-32, N-33 | die Tabellen bleiben hier; die Plan-Zeilen 21 bis 25 verweisen darauf |
+| Befund N-29, Kopf des Dokuments | nachgeführt mit diesem Einarbeiten | Kopf, «Stand und nächster Schritt», Zeilen 19 und 20a und die Ergebnis-Absätze zu 20 und 20a in 7.5, 7.7, Kopf von Abschnitt 9 |
+| C3, Punkt (c): Schrittnummern in Anhang A | berichtigt mit diesem Einarbeiten (ohne «12») | Anhang A |
+| C-17, C-19, Wortlaut von C-18 | **nicht entschieden**, bleiben Entwurf für die manuelle Session zu Schritt 24 | Tabelle «Entwurf für Schritt 24» unten |
+| Protokoll der Etappe 3 (Anhang F) | Auslagern in eine eigene Datei ist beschlossen (E-60); **ausgeführt am 15.11.2026** (Orchestrator): `docs/refactoring-protokoll-etappe-3.md` | Kopf des Dokuments («Aufbau»); Absatz «Protokoll der Etappe 3 auslagern» unten |
+
+**Offen geblieben, im Plan vermerkt [neu]** (kein Entscheid des Projektleiters am Checkpoint):
+
+- **N-34, Dependabot-PR #86:** bleibt beim Orchestrator (vor Schritt 21 oder nach Schritt 25
+  mergen, nicht zwischen Nachmessen und Merge von 23); steht im Kopf unter «Nächster offener
+  Schritt».
+- **Der letzte Satz von E-01** («Bei Code vergibt der Merge eine Patch-Version») gilt dem Sinn
+  nach ebenfalls nur, bis Schritt 23 gemergt ist. Der Entscheid vom 15.11.2026 nennt nur E-07;
+  das ist die Lesart dieses Laufs, vermerkt in der Zeile E-64, zu bestätigen in der Session zu
+  Schritt 23.
+- **Ein Branch für die drei Teile von Schritt 23** und wer was schreibt (Session: ADR; Subagent:
+  Skripte, Hook, Skill, übrige Doku): Lesart dieses Laufs in «Hinweise zu Schritt 23»; der
+  Orchestrator legt es mit dem Prompt fest.
+- **Wo das Protokoll der Etappe 4 steht,** wenn Anhang F ausgelagert ist: nicht festgelegt.
+  Naheliegend ein Anhang G nach dem Vorbild von F; das entscheidet der Orchestrator. P3-25b
+  rechnet mit vier Protokoll-Dateien (Etappen 0 bis 3).
+- **Der Nachtrag weicht nach dem Commit-Titel in einem Punkt vom Vorschlag ab** (H3-03 (1):
+  fangen statt nur nennen); steht im Absatz «Nachtrag zur Etappe 3» in 7.6, beurteilt das Review.
+
+**Z3: Zielbild nach der Etappe 3** (eingearbeitet (E-64, E-66, E-69) in 6.1 und 6.2; hier der
+Wortlaut der Revision. Was nicht genannt ist, stimmt)
+
+| Punkt | Stand | Abweichung mit Beleg | Vorschlag zum Wortlaut |
+|-------|-------|----------------------|------------------------|
+| 6.1, 4 Abruf-Baustein | erreicht, jetzt mit Werkzeug | Unter `src/` steht kein Aufruf `fetch(…)`, auch nicht im Abruf-Baustein (`abruf.ts` ruft `holen`); das hält seit 20a ESLint [G: Textsuche 0 Treffer; `FETCH_REGEL` in `eslint.config.js`]. Der Punkt sagt das nicht | Z3-4: Satz dazu: «Unter `src/` steht kein Aufruf `fetch(…)`; Daten holen nur die Abruf-Module über `holen` und `src/lib/abruf.ts`. Das hält ESLint (Schritt 20a).» |
+| 6.1, 7 Stile | erreicht | «Die Reihenfolge hält ab Schritt 20a eine Prüfung» nennt die Prüfung nicht und nicht, was sie nicht hält | Z3-7: «Reihenfolge und Vollständigkeit hält `scripts/design-importe.test.ts`; die vier Mockups und das Leitbild führen die Reihenfolge von Hand nach (H-07).» |
+| 6.2, 6 Fallen im Repo | **nicht erreicht, kein Schritt** | Der Punkt geht auf B-26 zurück. Abschnitt 7 nennt ihn in keiner Zeile [G: Textsuche nach «Session-Gedächtnis», «Falle» in 7.2 bis 7.7: 0 Treffer]; B.1d verlegt nur drei Absätze des Skills | Entscheid nötig (F-42); bei Antwort B: «6. (nicht Teil des Plans) Fallen, die alle Sessions betreffen, gehören ins Repo; als Beobachtung übergeben in Schritt 25.» **[entschieden: Antwort B (E-69)]** |
+| 6.2, 7 Version | **Wortlaut trägt nicht** | «Version nur noch bei Auslieferung auf Test»: Test wird bei jedem Merge nach `dev` mit Code ausgeliefert (N-27) | hängt an F-15; bei Antwort A: «Nach dem Refactoring entsteht eine Version beim Release nach `main`, nicht beim Merge nach `dev` (E-07 in der Fassung von F-15, Schritt 23).» **[entschieden: Antwort A (E-64); bis Schritt 23 gemergt ist, gilt die heutige Regel]** |
+
+**P3: Rest des Plans** (eingearbeitet (E-66, E-67) in 7.6 und 7.7; hier der Wortlaut der Revision.
+Schritte 21 bis 25 und 7.7; was nicht genannt ist, stimmt: Ziel, Nutzen)
+
+| Schritt | Urteil | Vorschlag |
+|--------:|--------|-----------|
+| 21 | **Zu ändern: Liste ergänzen, eine Datei weg, eine dazu.** Die Zeile nennt die Etappen 0 bis 2. Heute nennt die Doku davon fast nichts: `docs/arc42.md`, `docs/testkonzept.md`, `docs/index.md` und `README.md` nennen weder `abruf.ts`, `waechter`, `ablauf.ts`, `dienste.ts`, `fehler.ts`, `tests/oberflaeche`, die Listen-Dateien noch die Vertragstests; `docs/ci-cd-und-release.md` nennt `make css-vergleich` nicht [G: Zählung je Stichwort und Datei]. Die Bausteinsicht führt die Seiten noch mit «fetch, JSON» zur Schnittstelle. Der Schritt ist also ganz offen und grösser, als «niedrig, Sonnet» vermuten lässt, bleibt aber reine Doku | **P3-21a** Aus der Etappe 3 nennt die Doku: `tests/hilfen/mitglieder-listen.ts` und `tests/hilfen/abruf.ts`, die E2E-Hilfen in fünf Dateien, den Fall «Name passt zur Methode» im Routen-Test (alles `docs/testkonzept.md`); die zwei Struktur-Prüfungen und die Spur stehen schon in `docs/ci-cd-und-release.md` (Schritte 20, 20a) [G]. **P3-21b** `docs/ui-leitbild.md` fest in die Dateiliste: Zeile 17 nennt die Prüfung der Reihenfolge (F.6). **P3-21c** `docs/context-scopes.md` aus der Dateiliste: `tests/oberflaeche/` und die E2E-Hilfen trägt Schritt 22 als Ordner ein (H3-01); sonst fasst 21 Zeilen an, die 22 gleich wieder streicht. **P3-21d** Bei F-40, Antwort A, geht der Kommentar in `grundlagen.css` in den Nachtrag; dann ist 21 reine Doku und kostet keine Version. Sonst kostet der Merge eine (0.22.10): `nur-doku.ts` zählt nur `docs/` und `.md` als Doku [G]; der Vermerk [V] in «Hinweise zu Schritt 21» ist damit geklärt. Voraussetzung: Etappen 1 bis 3. Risiko niedrig, Sonnet, Subagent, kein Nachmessen: bleiben; das Review prüft jede neue Aussage am Code. **[entschieden: F-40 mit A (E-67): Der Kommentar geht in den Nachtrag, Schritt 21 ist reine Doku ohne Version]** |
+| 22 | **stimmt, zwei Kleinigkeiten.** `docs/context-scopes.md` nennt `docs/superpowers/` 18-mal [G]; es gibt keine `docs/superpowers/README.md` [G]. Kein Prüfskript liest die Tabelle [G: Textsuche in `scripts/`, `Makefile`, `.githooks/`] | **P3-22a** Voraussetzung «21» statt «11» (beide ändern `docs/index.md`). **P3-22b** Ziel dazu: Die Test-Ordner stehen als Ordner (`tests/e2e/hilfen/`, `tests/hilfen/`, `tests/oberflaeche/`). Die Zeile «Refactoring (Plan, Stand, Entscheide)» bleibt bis Schritt 25. Sonnet, Subagent, kein Nachmessen: bleiben |
+| 23 | **Zu ändern: Dateien, Modell, Weg, Nachmessen.** (1) Der Dateiliste fehlen zwei Stellen, die die heutige Regel wörtlich nennen: `Makefile:101` (Hilfetext zu `make hooks`) und der Kommentar in `.github/workflows/check.yml:503`. In den schon genannten Dateien steht sie an mehr Orten, als die Zeile ahnen lässt: `docs/ci-cd-und-release.md` dreimal (Mermaid «Merge nach dev, neue Nummer», Tabelle der Prüfungen, Abschnitt «Versionen»), `docs/arc42.md:70`, `docs/adr/adr-index.md`, der Skill in Schritt 4, im Release-Ablauf und in der Konfliktregel [G: Textsuche nach «jeder Merge», «Versionsnummer», `version-merge`]. (2) `release.ts` beschreibt Antwort A von F-15 schon fast: Es verlangt «Version gestiegen, sobald Code dabei», «Abschnitt zuoberst», «Unveröffentlicht leer, wenn sich die Version ändert» [G]. Bei A ändert sich dort nur ein Meldungstext; umzubauen sind `version-merge.ts` und der Hook. (3) Schritt 20 hat in zwei Dateien dieses Schritts je ein `export` entfernt (`pruefstand`, `vergleicheVersionen`) [G: Diff]; ohne Folge, aber das Nachmessen liest den neuen Stand. (4) «Fable, manuelle Session» für alles passt nicht: Risiko ist «mittel», und der Umbau ist Prüfwerkzeug, das in der Etappe 1 zweimal eine zweite Review-Runde brauchte | **P3-23a** Dateien ergänzen: `Makefile` (Hilfetext), `.github/workflows/check.yml` nur der Kommentar (zählt als Code, `betrieb/` und die Jobs bleiben nach E-16) oder ausdrücklich stehen lassen. **P3-23b** Weg in drei Teilen: Nachmessen (`refactor-analyst`, Opus) → manuelle Session mit dem Projektleiter für Regel und ADR-Entwurf (auf der Antwort zu F-15) → Umbau der Skripte als Subagent (Opus) mit eigenem Review. Modell «Opus» statt «Fable». **P3-23c** Nachmessen erweitern: `release.ts` und `gruener-stand.ts` ganz; welche Fassung von `version-merge.ts` den Push des Merges prüft, der sie ändert (der Hook ruft das Skript aus dem Arbeitsordner [G: `.githooks/pre-push`]); was der Release-Job und `scripts/ci/versionsnotizen.sh` unter der neuen Regel tun (nur lesen); wer bei A die Stufe wählt (Korrektur oder Nebenversion) und welche Nummer als erste folgt. **P3-23d** Absicherung genauer: Der «Probe-Merge» läuft lokal gegen das Skript (`node scripts/pruefungen/version-merge.ts <bereich>` auf einem Probe-Branch), nicht als Push. Voraussetzung «F-15 beantwortet»: bleibt, am Checkpoint dieser Revision. **[entschieden: wie vorgeschlagen (E-66), F-15 mit A (E-64). Die manuelle Session ist eine Session des Projektleiters mit einem Prompt des Orchestrators, danach Review durch den `refactor-reviewer`; ihr Modell nennt der Orchestrator]** |
+| 24 | **Zu ändern: Entwurf ergänzt, eine Abgrenzung.** Die fünf Hinweise aus dem Review von 20a sind als «Merkpunkte für Schritt 24» vermerkt. Vier davon ändern Prüfwerkzeug (`scripts/design-importe.test.ts`, `scripts/fetch-regel.test.ts`, `eslint.config.js`); Schritt 24 ist eine Dialog-Session an `CLAUDE.md` und Skill mit der Absicherung `make docs` (N-33) | **P3-24a** Entwurf der Dauerregeln: C-7 bis C-10 (1c), C-12, C-14, C-15 (1d), C-13 in der Fassung C-17, dazu C-18 (Suche in den E2E, nach F-41) und C-19 (ein Satz im Skill, N-23); C-16, falls nicht schon eingespielt (F-43). **P3-24b** Die Hinweise am Prüfwerkzeug nicht hier (F-40). **P3-24c** Satz dazu: «Mit dem Auflösen des Blocks endet der Feature-Stopp» (N-31). **P3-24d** Zu den drei `refactor-*`-Agenten: Bleiben sie, fällt der Satz «Test vor der Regel committen» aus dem Auftrag des Implementers, denn der Pre-Commit-Hook lässt einen roten Test nicht durch (F.6, A-15). Manuelle Session, kein Nachmessen: bleiben; Modell ist das der Session. **[entschieden (E-66 bis E-70): Session des Projektleiters mit Prompt und Modell vom Orchestrator, danach Review; die Hinweise am Prüfwerkzeug gehen in den Nachtrag (E-67); C-18 nach F-41: B (E-68); C-16 ist dann schon eingespielt (E-70)]** |
+| 25 | **Zu ändern: Übergabe und Dateien.** P2-25 nennt 1c und 1d; dazu kommt dieser Abschnitt. Zusammen sind es rund 25 Punkte «Beobachtung» (1c acht bis neun, 1d zehn, hier sechs [E: Zählung über das Wort in den Tabellen]). Die Dateiliste nennt nicht, wo das Dokument sonst verankert ist | **P3-25a** Übergabe auch aus 1e (Tabelle H3); wo ein Eintrag in `docs/beobachtungen.md` schon besteht, wird er ergänzt, nicht verdoppelt (H3-04, H3-05, H3-13). **P3-25b** Dateien dazu: `docs/index.md`, `docs/context-scopes.md` (Zeile «Refactoring»), die vier Protokoll-Dateien (Vermerk «abgeschlossen»). **P3-25c** «Feature-Stopp aufgehoben» streichen (geschieht in 24) oder als «bestätigt» führen. **P3-25d** Modell Opus statt Sonnet [V]: Das Bündeln nach Thema und der Abgleich mit dem Bestand ist Urteilsarbeit. **[entschieden: wie vorgeschlagen (E-66); dazu die Übergabe der Fallen (E-69); den Abschluss macht der Projektleiter]** |
+| 7.7 | zwei Angaben veraltet | **P3-77** Kosten: Die Etappe 3 hat vier Versionen gebraucht (0.22.6 Nachtrag, 0.22.7, 0.22.8, 0.22.9) [G: `package.json` je Merge]. Reihenfolge der Etappe 4: (Nachtrag zur Etappe 3, nach F-40) → 21 → 22 → 23 → 24 → 25. «Kein Nachmessen» bleibt für 21, 22, 24, 25 |
+
+**Reihenfolge geprüft:** 21 und 22 hängen an nichts aus 23. Eine Umstellung «23 zuerst, damit die
+Etappe 4 keine Version mehr kostet» lohnt nicht: Nach dem Vorschlag kostet die Etappe 4 höchstens
+zwei Versionen (Nachtrag, Schritt 23), und 23 braucht Nachmessen und Dialog. 24 nach 23 bleibt
+(beide ändern den Skill). **Risiko:** nirgends «hoch», also kein Fable (P3-23b).
+
+**H3: Offene Hinweise und Merkpunkte aus F.1 bis F.6 und den Reviews** (jeder einmal.
+«Beobachtung» heisst: kein Schritt, Übergabe nach `docs/beobachtungen.md` in Schritt 25. Was dort
+schon steht, ist nicht noch einmal geführt: Fokus der CM-Seite, Neuladen nach einer Auslieferung,
+CSS-Suchen in den E2E. **[geändert]** Die Zuordnung gilt seit dem Checkpoint wie vorgeschlagen
+(E-66); H3-03 ist mit E-67 festgelegt. Die Plan-Zeilen 21 bis 25 verweisen auf diese Tabelle und
+führen die Punkte nicht noch einmal aus)
+
+| Nr. | Hinweis, Fundstelle | Quelle | Zuordnung (Vorschlag) |
+|-----|---------------------|--------|-----------------------|
+| H3-01 | `tests/e2e/hilfen/anlass.ts` und `mail.ts` stehen in keiner Zeile von `docs/context-scopes.md`; `turnier.ts` und `verbindung.ts` nur bei «Clubmeisterschaft (Mitglieder)» [G] | F.5, Review Lauf 1 | **Schritt 22**, nicht 21: als Ordner `tests/e2e/hilfen/` (P3-22b). Einzelne Dateinamen nachzutragen wäre Arbeit für einen Schritt |
+| H3-02 | `docs/ui-leitbild.md:17` sagt «Reihenfolge wie in `+layout.svelte`», nennt die Prüfung nicht [G] | F.6 | **Schritt 21** (P3-21b) |
+| H3-03 | Review 20a, fünf Hinweise am Prüfwerkzeug: (1) `import()` einer Design-Datei im Svelte-Markup bleibt grün und fehlt in der Liste «nicht erfasst»; (2) Kommentar nennt `docs/mockups/`, der Ordner heisst `docs/ui-mockups/` [G: `scripts/design-importe.test.ts:14`]; (3) die Meldung der fetch-Regel nennt «Abruf-Module des Themas», was für Server-Code nicht passt [G: `eslint.config.js:189`]; (4) `fetch-regel.test.ts` hat keinen Fall für Markup, obwohl die Regel dort wirkt; (5) die strengere Form mit `x.fetch(…)` wäre heute ohne Meldung | F.6, Review | **Nachtrag zur Etappe 3 vor Schritt 21** (F-40, Antwort A): (1) in die Liste «nicht erfasst» und in die Zeile der CI-Doku, nicht fangen; (2) berichtigen; (3) Meldung in zwei Sätzen, einer für die Oberfläche, einer für den Server («braucht der Server einen Abruf nach aussen: Entscheid des Projektleiters»); (4) ein Fall dazu; (5) **eng** aufnehmen: nur `window.fetch`, `globalThis.fetch`, `self.fetch`. Eine Regel für jedes `x.fetch(…)` träfe auch fremde Methoden dieses Namens [V]. Zum Server: `scripts/ic-import.ts` ruft `fetch` ausserhalb von `src/` und ist nicht betroffen [G: F.6]. **[entschieden: Antwort A (E-67), (5) nur eng; Umfang und Stand im Absatz «Nachtrag zur Etappe 3» in 7.6]** |
+| H3-04 | WebKit meldet abgebrochene Abrufe auch beim Neuladen, das das Bordmittel im Fehlerfall heute schon macht; kein E2E prüft den Fehlerfall | F.2, Abschnitt 5 | **Beobachtung**, als Ergänzung des bestehenden Eintrags «Offene App lädt nach einer Auslieferung nicht von selbst neu» (P3-25a) |
+| H3-05 | Ändert ein Release die Form der Push-Nutzlast, zeigt ein noch aktiver alter Service Worker den Push nicht an, bis er abgelöst ist [V] | F.1, Abschnitt 2 | **Beobachtung**, im selben Eintrag wie H3-04 (Thema «alte Stände nach einer Auslieferung») |
+| H3-06 | Der Autofixer schlägt im Wurzel-Layout vor, `zeigeTitel` und `kopftitel` nicht in einem `$effect` zu setzen und `bind:this` zu ersetzen | F.2, Abschnitt 5 | **bleibt so:** 6.3 nimmt das Scroll- und Übergangsverhalten im Wurzel-Layout aus (B-24); kein Fehler |
+| H3-07 | Ein Werkzeug für toten Code (ein Paket wie `knip`) bräuchte es, wenn die Liste leer bleiben soll: 83 exportierte Namen, die nur ihre Datei oder nur Tests brauchen | F.3, Abschnitt 1 | **Beobachtung** (neue Abhängigkeit, E-06, E-11) |
+| H3-08 | Der Typ `MitteilungAdminDienste` heisst nach den Mitteilungen, dient aber fünf Themen (17 Dateien, mit dem Einstieg 44) | F.3, Hinweis (d) | **Beobachtung** (so schon in F.3 entschieden; hier nur, damit Schritt 25 ihn mitnimmt) |
+| H3-09 | Testtitel «FR-46: Warnungen im Doppel als Liste wie im Einzel …» in `turnier-anzeige.test.ts:161`, die Funktion heisst `warnungsSaetze` [G] | F.4 | **bleibt so:** Der Titel nennt den Fall und die Test-ID, nicht die Funktion; der Fall prüft, was er sagt |
+| H3-10 | `legeTurnierImJahrAn` in `tests/e2e/hilfen/turnier.ts:30` hat einen Aufrufer [G] | F.4 | **bleibt so:** acht Zeilen, die «ein Versuch» von «wiederholen bis frei» trennen; hineinziehen spart nichts |
+| H3-11 | Die sechs Schnittstellen der Mitteilungen der Verwaltung haben zur Laufzeit keinen Funktionsnamen; der Routen-Test meldet «(ohne Namen)» | F.5 | **bleibt so:** Die Meldung nennt Route und Methode, geprüft wird der Name in der Liste. Einen Namen zu setzen wäre App-Code für eine Fehlermeldung im Test |
+| H3-12 | Grundprüfung leitet die Methode aus dem Präfix ab (`post…`, sonst GET): Ein Listeneintrag ohne Route läuft dort ungeprüft nach seinem Präfix, eine künftige Schnittstelle mit `put…` oder `delete…` liefe als GET; der neue Fall im Routen-Test prüft nur GET und POST | F.5, Implementer und Review Lauf 2 | **Beobachtung**, ein Eintrag für beide (Thema Tests). Heute gibt es weder einen Eintrag ohne Route noch eine dritte Methode [E: F.5]; eine Prüfung «jeder Listeneintrag hat eine Route» wäre der kleine Abschluss |
+| H3-13 | `scripts/pruefungen/workflow-rechte.ts` liest Rechte und Secrets, aber nicht, ob eine Eingabe von `workflow_dispatch` als Ausdruck in `run:` gelangt (hier über `env:` gelöst) | F.5 | **Beobachtung** (Thema CI). Heute gibt es eine Eingabe, einen Wahrheitswert [G: `check.yml`]; eine Prüfung lohnt ab der zweiten |
+| H3-14 | Lücke N-23 nach dem Schalter `spur`: Die Spur hilft beim Aufklären, aber die WebKit-CI sieht einen Schritt weiter erst nach dem Merge, wenn niemand den Lauf von Hand startet. Die Abmachung «neuer E2E: einmal CI auf dem Branch» steht nur in der Plan-Zeile 19, in keinem Skill und keinem Agenten [G: Textsuche `workflow run` unter `.claude/`: 0 Treffer]. In der Etappe 3 ist sie zweimal befolgt worden (Läufe 43620595027, 43629593490) | 1d N-23, F.5 | **Schritt 24**, als Ablauf-Satz im Skill (C-19), nicht in der `CLAUDE.md` (Aufnahmeregel: Ablauf für eine Situation). Die Etappe 4 bringt keinen neuen E2E [V: aus den Plan-Zeilen]; bis dahin fehlt nichts |
+| H3-15 | Abweichung «Test und Regel im selben Commit», weil der Pre-Commit-Hook einen roten Test nicht durchlässt | F.6; F.2 (A-15) | **Schritt 24** (P3-24d) |
+| H3-16 | Der Inhalt einer `trace.zip` aus der CI ist nie geöffnet worden; «die Laufzeit trifft `on` und `retain-on-failure` gleich» ist Annahme | F.5 | **bleibt so**, als dünner Beleg benannt: Der erste echte Gebrauch zeigt es; ein Probe-Öffnen kostet einen Download von rund 300 MB |
+| H3-17 | Ein späterer Block in `eslint.config.js`, der für dieselben Dateien `no-restricted-syntax` setzt, ersetzt die fetch-Regel still | F.6 | **bleibt so:** Der Test fährt ESLint mit der echten Konfiguration über Proben und würde rot [E: F.6, «ohne die Regel 16 von 30 rot»] |
+
+Schon zugeordnet und darum hier nicht geführt: die Hinweise (a) bis (k) zu Schritt 20 (F.3),
+die Rettungswege für die Ergänzung B (F.2, Abschnitt 2; F-38), die Grenzen der zwei Prüfungen,
+soweit sie in `docs/ci-cd-und-release.md` stehen.
+
+**C3: Projekt-`CLAUDE.md`** (am Code von `4c7b340` geprüft. **[geändert]** C-16 ist entschieden
+(E-70), das Einspielen durch den Orchestrator steht aus; C-18 ist in der Richtung entschieden
+(E-68), sein Wortlaut fällt in Schritt 24; C-17 und C-19: Vorschlag, nicht eingespielt)
+
+*Prüfung je Regel*
+
+| Regel | Eingehalten? | Wortlaut |
+|-------|--------------|----------|
+| Feature-Stopp, Ausnahme #81 | ja: Die Etappe 3 hat nur getan, was die Plan-Zeilen nennen; die Ergänzung B ist nicht im Code [G: Diff `40a0a54..4c7b340` unter `src/`: Entfernen, `export` weg, ein Umbenennen, Kommentare]. #81 ist offen [G] | stimmt |
+| Ein Schritt, ein Worktree, ein Branch; voller `make check`; Stand nur hier | ja [E: Protokolle F.2, F.4 bis F.6]. Nachtrag und Revisionen heissen `refactor/nachtrag-…`, `refactor/revision-…`: keine Schritte, kein Verstoss | stimmt |
+| Ab Schritt 06 | ja [G: `new Response` nur in `http.ts:26` und `getKalender`; `json(` nur in den Routen `status` und `kontakt`] | stimmt |
+| Ab Schritt 06a | ja [G: `zugang.pruefe` in `admin/rechte.ts` und zweimal im Bestand von `admin/schnittstellen.ts`, unverändert] | stimmt |
+| Ab Schritt 07 | ja [G: kein Import von `dienste.ts` unter `src/lib/server/`; `createTransport` nur in `login/mail.ts`] | stimmt |
+| Ab Schritt 08 | nicht neu geprüft [E: Die Etappe 3 hat unter `src/lib/server/` keine Antwort geändert ausser `status.ts`, das keine Fehlerform baut] | stimmt |
+| Importrichtung | ja [G: `AUSNAHMEN = []`, `eslint.config.js:55`] | stimmt |
+| Ab Schritt 13 | ja [G: `r.status` ausserhalb des Servers nur `src/lib/abruf.ts:95–109`] | stimmt |
+| Ab Schritt 15 | ja, mit den drei benannten Ausnahmen [G: `willkommen/+page.ts:13`; `PushHinweis.svelte:31`, `Benachrichtigungen.svelte:36`]. `onMount(nachladen)` in `clubmeisterschaft/[id]/kontakt/+page.svelte:43` lädt nicht, es meldet «gelesen» [G] | stimmt. «keine Ladefunktion ruft `fetch` direkt» ist seit 20a schwächer als das Werkzeug (kein Aufruf unter `src/`); kein Widerspruch, darum erst in Schritt 24 (C-17) |
+| Ab Schritt 17 | ja für Neues [G: 38 Stellen `laeuft = true` oder `speichert = true`, gleich viele wie in 1d, N-19] | stimmt |
+| Ab Schritt 18 | ja, jetzt mit Werkzeug [G: elf Importe in `+layout.svelte:2–12`, `brief.css` nur in `Briefdruck.svelte:4`, kein `<style>`] | stimmt |
+| «Tests»: neue Liste der Mitglieder «in Grundprüfung und Routen-Test» | **Satz falsch seit Schritt 20:** Die Listen stehen in `tests/hilfen/mitglieder-listen.ts`; Grundprüfung und Routen-Test nehmen sie von dort [G: Importe in `grundpruefung.db.test.ts:13–15`, `routen.test.ts`] | C-16 |
+| «Tests»: «nicht über CSS-Klassen» | **nein, im Bestand** (Messung unten) | C-18, F-41 |
+| «Die Zeit kommt über die Dienste» | wie in 1c (N-13): Vorgaben `() => new Date()` in vier Fachdiensten, `sitzung/schnittstellen.ts` und im Hook [G], unverändert | stimmt in der Lesart von 1c |
+
+*(a) Der Satz zu den Listen der Mitglieder.* Der Vorschlag des Implementers stimmt [G]: Eine neue
+Liste kommt in `MITGLIEDER_LISTEN`, ihre Dienste in den Typ `MitgliederDienste` derselben Datei;
+fehlt der Eintrag der Dienste in der Grundprüfung, ist das ein Typfehler, fehlt die Liste, wird
+der Routen-Test rot. Schaden richtet der alte Satz kaum an: Wer ihm folgt, landet in zwei
+Dateien, deren Kommentare auf die neue Datei zeigen [G: `grundpruefung.db.test.ts:74`]. Trotzdem
+**Empfehlung: jetzt** (F-43), wie C-11 am letzten Checkpoint: Der Satz ist eine falsche Anweisung
+in der Datei, die jede Session lädt, und die Berichtigung ist ein Doku-Commit ohne Version.
+
+```diff
+ - Eine neue Schnittstelle kommt in die Liste ihres Moduls. Eine neue Liste der Verwaltung kommt
+   in `tests/hilfen/verwaltungs-listen.ts` und in die Tabelle der Bauregel; eine neue Liste der
+-  Mitglieder in Grundprüfung und Routen-Test.
++  Mitglieder in `tests/hilfen/mitglieder-listen.ts`.
+```
+
+*(b) Die Regel «nicht über CSS-Klassen».* Gemessen am Stand `4c7b340` [G: Textsuche
+`locator('…')` unter `tests/e2e/`, jeder Selektor nach seiner Form eingeteilt]:
+
+| Suche über | Anzahl | Beispiele |
+|------------|-------:|-----------|
+| eine CSS-Klasse (auch `div.karte`, `details.klappe`) | 104 | `details.klappe` 7, `div.karte` 6, `header.kopf` 6, `.kachel` 5, `.kopf-titel` 5, `.brief-code` 5 |
+| nur ein Element | 32 | `summary` 18, `html` 4, `dialog` 2, `img` 2 |
+| ein Attribut | 5 | `[aria-current=…]`, `link[rel=manifest]`, `meta[name=…]` |
+| eine `id` | 5 | `details#passkey`, `#${id}` |
+| **zusammen** | **146** | in 24 Dateien (22 Tests, 2 Hilfen); dagegen 1527 Suchen über Rolle, Beschriftung oder Text |
+
+Die Zahl «rund 108 in 22 Dateien» aus F.3 kam aus einem engeren Muster. Sieben Dateien tragen 111
+der 146 Suchen: `verwaltung` 28, `hilfe` 17, `navigation` 15, `bewegung` 14, `briefe` 14,
+`cm-gespraech` 13, `cm-verwaltung` 10. Ein grosser Teil prüft Aufbau und Bewegung (Kopfleiste,
+Rollbereich, Klappen, Druckseite), wo es keine Rolle und keinen Namen gibt [E: Selektoren gelesen,
+nicht jede Stelle]; `summary` hat in Playwright keine eigene Rolle [V]. Nicht gezählt: 9 Stellen
+`querySelector` in `page.evaluate` und 12 Prüfungen `toHaveClass` oder `toHaveCSS` (sie suchen
+nicht, sie prüfen). Drei Wege:
+
+- **Regel lassen, Bestand dulden.** Kostet nichts. Die Regel bleibt eine, die jede zehnte Suche
+  bricht; ein Review kann sie nicht mehr anwenden.
+- **Wortlaut so fassen, wie er gilt** (C-18, in Schritt 24): Rolle und Beschriftung zuerst;
+  Element oder Klasse, wo es beides nicht gibt. Der Bestand ist dann zum grössten Teil regelgerecht.
+- **Bestand abbauen** als eigener Vorgang nach dem Refactoring. Für Karten und Klappen hiesse das,
+  ihnen Rolle und Namen zu geben; das ändert, was ein Bildschirmleser vorliest, ist also Verhalten
+  und braucht je Stelle einen Entscheid.
+
+**Empfehlung:** der zweite Weg in Schritt 24; der bestehende Eintrag in `docs/beobachtungen.md`
+bleibt für den dritten und bekommt in Schritt 25 die Zahlen von hier. Kein Eingriff jetzt: Unter
+dem Feature-Stopp entstehen kaum neue E2E. **[entschieden: so, F-41 mit B (E-68)]**
+
+```diff
+-- E2E nur über `make e2e` bzw. `npm run e2e`. Elemente über Rolle und Beschriftung suchen, nicht
+-  über CSS-Klassen; keine festen Wartezeiten.
++- E2E nur über `make e2e` bzw. `npm run e2e`. Elemente über Rolle und Beschriftung suchen; über
++  Element oder CSS-Klasse nur, wo es weder Rolle noch Beschriftung gibt. Keine festen Wartezeiten.
+```
+
+*(c) Die Übergangsregeln* sind eingehalten, ihr Wortlaut stimmt (Tabelle oben). Anhang A nennt bei
+den Schrittnummern noch «12»; die `CLAUDE.md` nennt Schritt 12 seit E-29 nicht mehr [G]. Das führt
+der Orchestrator nach. **[nachgeführt am 15.11.2026 mit dem Einarbeiten, Anhang A]**
+
+*(d) Eine Zeile «Ab Schritt 20a»* ist nicht nötig; Schritt 24 genügt. Beide Regeln von 20a hält
+ein Werkzeug, dessen Meldung den Weg nennt. Die Aufnahmeregel verlangt einen Satz nur, wo ein
+Zeiger den Schaden nicht rechtzeitig abwendet; hier wendet ihn der Lint ab, bevor ein Commit
+entsteht. In Schritt 24 nimmt C-13 das Werkzeug auf; sein Halbsatz «kein Aufruf `fetch(`
+ausserhalb der Abruf-Module» ist nach 20a ungenau (auch die Abruf-Module rufen `fetch` nicht auf).
+
+*Entwurf für Schritt 24* (zusammen mit C-7 bis C-10 aus 1c und C-12, C-14, C-15 aus 1d)
+
+| Nr. | Wo | Alter Satz | Neuer Satz | Begründung |
+|-----|----|-----------|------------|------------|
+| C-16 | `CLAUDE.md`, «Tests» | «…; eine neue Liste der Mitglieder in Grundprüfung und Routen-Test.» | «…; eine neue Liste der Mitglieder in `tests/hilfen/mitglieder-listen.ts`.» | seit Schritt 20 falsch; **Empfehlung: jetzt** (F-43). **[entschieden: jetzt (E-70); fällt damit aus dem Entwurf für Schritt 24]** |
+| C-17 | `CLAUDE.md`, «Oberfläche — Bauregeln»; ersetzt C-13 | C-13: «…; keine Seite schreibt die Umleitung zum Login selbst, kein Aufruf `fetch(` ausserhalb der Abruf-Module. Das erste Laden …» | «…; keine Seite schreibt die Umleitung zum Login selbst. Unter `src/` steht kein Aufruf `fetch(…)`: Daten holen nur die Abruf-Module, über `holen` und `src/lib/abruf.ts`. Das erste Laden …» (Rest wie C-13, mit den Ausnahmen) | sagt, was ESLint durchsetzt; gilt auch für Server und Service Worker |
+| C-18 | `CLAUDE.md`, «Tests» | «Elemente über Rolle und Beschriftung suchen, nicht über CSS-Klassen; keine festen Wartezeiten.» | «Elemente über Rolle und Beschriftung suchen; über Element oder CSS-Klasse nur, wo es weder Rolle noch Beschriftung gibt. Keine festen Wartezeiten.» | Messung (b); nach F-41. **[entschieden: B (E-68); den Wortlaut gibt die Session zu Schritt 24 frei]** |
+| C-19 | Skill `tco-branching`, vor dem Merge | (fehlt) | «Bringt der Branch einen neuen oder geänderten E2E zu Fokus, Zeit oder Navigation, läuft die CI einmal auf dem Branch, bevor gemergt wird (`gh workflow run check.yml --ref <branch>`); wird sie rot, ein zweites Mal mit `-f spur=true`.» | N-23, H3-14: Ablauf, darum Skill und nicht `CLAUDE.md` |
+
+**N: Neue Befunde aus der Etappe 3** (**[geändert]** Die Zuordnung gilt seit dem Checkpoint wie
+vorgeschlagen (E-66); wo ein Entscheid sie festlegt, steht es in der Zeile)
+
+| Nr. | Befund, Fundstelle | Schwere | Zuordnung (Vorschlag) |
+|-----|--------------------|---------|-----------------------|
+| N-27 | **E-07 im Wortlaut ist, sobald Test läuft, die heutige Regel.** Der Job `bauen` läuft bei jedem Push auf `dev` mit Code, sobald `AUSLIEFERUNG_TEST` an ist; die Doku sagt «Test: ausgeliefert bei Merge nach `dev`» [G: `check.yml`, Bedingung des Jobs; `docs/ci-cd-und-release.md`, Tabelle «Umgebungen»]. «Version bei Auslieferung auf Test» heisst dann «Version je Merge mit Code», mit derselben Kollisionsstelle (B-03). F-15 fragt bisher nur nach der Zeit davor | mittel (trifft Ziel und Nutzen von Schritt 23) | **F-15**, neu gefasst (unten); Z3, 6.2 Punkt 7. **[entschieden: A, Version beim Release nach `main` (E-64)]** |
+| N-28 | Der Dateiliste von Schritt 23 fehlen `Makefile` und der Kommentar in `check.yml`; `release.ts` passt schon fast zu Antwort A von F-15; «Fable, manuelle Session» deckt den Umbau am Prüfwerkzeug nicht | niedrig | **P3-23a bis P3-23c** |
+| N-29 | Kopf und Plan sind nach dem Merge von 20a nicht nachgeführt: «Stand des Dokuments», «Zuletzt erledigt», «Nächster offener Schritt» und die Zeile 20a in 7.5 samt «Ergebnis Schritt 20a» sagen «nicht gemergt, Review offen»; 7.7 schätzt die Kosten der Etappe 3 noch [G]. Wie N-22 in 1d | niedrig | **Orchestrator**, mit dem Einarbeiten dieser Revision. **[nachgeführt am 15.11.2026 mit dem Einarbeiten: Kopf, «Stand und nächster Schritt», Zeilen 19 und 20a, die Ergebnis-Absätze zu 20 und 20a, 7.7; mit F-38 bis F-43 sind es dreiundvierzig Fragen]** |
+| N-30 | Zielbild 6.2 Punkt 6 («Fallen stehen im Repo») hat keinen Schritt (B-26) | niedrig für den Code, mittel für das Zielbild | **F-42**. **[entschieden: B, Beobachtung und eigener Vorgang nach dem Abschluss (E-69)]** |
+| N-31 | Schritt 24 löst den Block «Übergangsregeln» auf, in dem der Feature-Stopp steht; Schritt 25 nennt «Feature-Stopp aufgehoben» noch einmal | niedrig | **P3-24c, P3-25c** |
+| N-32 | Die Dauerregel zur Suche in den E2E bricht jede zehnte Suche (146 von 1673); 1d zählte eine Stelle, F.3 «rund 108» | niedrig (kein Fehler), aber eine Dauerregel | **F-41**, C-18. **[entschieden: B, Wortlaut in Schritt 24, der Bestand bleibt (E-68)]** |
+| N-33 | Hinweise an Prüfwerkzeug sind einem Schritt zugeordnet, der kein Werkzeug prüft (24: `make docs`) | niedrig | **F-40**. **[entschieden: A, Nachtrag zur Etappe 3 vor Schritt 21 (E-67)]** |
+| N-34 | Dependabot-PR #86 (neun Pakete, darunter SvelteKit, Vite, Playwright, `eslint-plugin-svelte`) ist offen und läuft nach jedem Merge auf `dev` neu durch die CI [G: `gh pr list`, `gh run list`]. Ein Merge mitten in der Etappe 4 kostet nach der heutigen Regel eine Version und ändert das Werkzeug unter Schritt 23 | niedrig | **Orchestrator:** vor Schritt 21 oder nach Schritt 25 mergen, nicht zwischen Nachmessen und Merge von 23. #38 (TypeScript 7) bleibt liegen (E-14). **[am Checkpoint nicht entschieden; bleibt beim Orchestrator, vermerkt im Kopf]** |
+
+**F-15, aufbereitet für den Checkpoint: Wann entsteht nach dem Refactoring eine Version?**
+
+**[geändert] Entschieden am 15.11.2026 (F-15: A, E-64), wie empfohlen:** Eine Version entsteht
+nach dem Refactoring nur noch beim Release `dev` → `main`; Merges nach `dev` sammeln ihre Einträge
+unter «Unveröffentlicht»; die Regel wird neu angesehen, wenn Test in Betrieb geht. Das ändert den
+Wortlaut von E-07 (dort vermerkt). Zusatz des Entscheids: Bis Schritt 23 gemergt ist, gilt die
+heutige Regel weiter (jeder Merge mit Code eine Nummer). Darunter die Aufbereitung im Wortlaut der
+Revision.
+
+*Was heute gilt* (ADR-007): Jeder Merge nach `dev`, der Code enthält, bekommt eine neue Nummer.
+Wer mergt, vergibt sie; ein Hook weist den Push sonst ab. *Was das gekostet hat:* Zwischen dem
+letzten Stand auf `main` (0.20.5, 09.11.2026) und `dev` heute (0.22.9) liegen 27 Nummern in vier
+Tagen, 24 davon vom Refactoring; allein am 14.11.2026 waren es neun (0.22.1 bis 0.22.9) [G:
+`package.json` je Merge, `docs/versionen.md`. Der Auftrag zu dieser Revision nennt acht; gezählt
+sind neun]. Keine dieser Nummern ist je ausgeliefert worden: kein Tag, kein Release, kein Server
+[G: `git tag` leer]. *Was entschieden ist* (E-07): Nach dem Refactoring soll eine Version nur noch
+entstehen, «wenn ein Stand auf Test ausgeliefert wird». *Was dabei übersehen ist* (N-27): Test
+wird bei jedem Merge nach `dev` ausgeliefert. Die Frage ist darum nicht nur «was gilt, bis Test
+läuft», sondern «welches Ereignis macht eine Version».
+
+- **A: Beim Release nach `main`.** Ein Merge nach `dev` vergibt keine Nummer mehr; sein Eintrag
+  steht unter «Unveröffentlicht». Die Nummer entsteht einmal, im Doku-Abgleich vor dem PR `dev` →
+  `main`. Gilt ab Schritt 23 und bis auf Weiteres; die neue ADR nennt «Test geht in Betrieb» als
+  Anlass, die Regel noch einmal anzusehen. **Folgen:** Die Fusszeile zeigt zwischen zwei Releases
+  dieselbe Nummer; zwei Stände auf `dev` unterscheidet der Commit, nicht die Nummer. Die
+  Kollisionsstelle paralleler Sessions fällt weg, ebenso der Handgriff beim abgewiesenen Push.
+  Umbau klein: `release.ts` verlangt das meiste schon, umzubauen sind `version-merge.ts`, der
+  Hook und der Skill. Festzulegen bleibt, wann ein Release eine Korrektur und wann eine
+  Nebenversion ist.
+- **B: Gar nicht, bis Test läuft; danach je Auslieferung auf Test** (E-07 wörtlich). **Folgen:**
+  Die Fusszeile bleibt für unbestimmte Zeit bei 0.22.9, «Unveröffentlicht» wächst. Ein Release
+  mit Code scheitert heute an `release.ts` («Release enthält Code, aber die Version bleibt») [G];
+  die Prüfung müsste gelockert werden, oder es gibt bis dahin kein Release. Sobald Test läuft,
+  gilt wieder «je Merge» (N-27).
+- **C: Nichts ändern, bis Test läuft.** «Version je Merge» bleibt; Schritt 23 schreibt höchstens
+  die ADR vor. **Folgen:** kein Risiko am Hook, kein Umbau. Die Kosten bleiben (eine Nummer und
+  ein Abschnitt je Merge mit Code). Weil die neue Regel mit Test wieder «je Merge» hiesse, wird
+  E-07 so nie wirksam: Schritt 23 entfiele in der Sache.
+- **Empfehlung: A**, wie bisher, aber als Regel «beim Release» statt «bis Test läuft». Eine
+  Nummer benennt dann, was `dev` verlässt. Der Einwand aus ADR-007 (Stände auf Test sind an der
+  Nummer nicht zu unterscheiden) wird erst wichtig, wenn Test läuft und jemand zwei Stände am
+  Handy vergleicht; dann wird mit Erfahrung entschieden statt heute auf Vorrat. A ändert den
+  Wortlaut von E-07; das gehört ausdrücklich in den Entscheid.
+- **Hält auf:** nur Schritt 23. Die Schritte 21 und 22 hängen nicht daran.
+
+**Fragen an den Projektleiter** (**[geändert]** alle sechs beantwortet am 15.11.2026, jede wie
+empfohlen: F-38 mit A (E-65), F-39 mit A (E-66), F-40 mit A (E-67), F-41 mit B (E-68), F-42 mit B
+(E-69), F-43 mit A (E-70); dazu F-15 mit A (E-64). Die Nummern gelten. Bei drei Fragen geht der
+Entscheid über die Antwort hinaus: F-39 (die manuellen Sessions führt der Projektleiter selbst,
+mit Modell und Copy-Paste-Prompt vom Orchestrator, danach Review durch den `refactor-reviewer`),
+F-40 (Branch `refactor/nachtrag-etappe-3`, parallel bei einem Implementer) und F-15 (Übergang
+bis zum Merge von Schritt 23). Kurzfassung mit den verworfenen Antworten in 9.2; hier der
+Wortlaut der Revision)
+
+- **F-38 — Neuladen nach einer Auslieferung (Ergänzung B aus Schritt 19): bleibt es hinter dem
+  Feature-Stopp?** Die Ergänzung tat das Richtige, brach aber beim Antippen das Vorladen ab, und
+  WebKit meldete das als Fehler in der Konsole (2 bis 9 von 45 Läufen). A: Es bleibt Beobachtung
+  wie jetzt und wird aufgenommen, wenn Test in Betrieb geht. B: Jetzt nachholen, als eigener
+  Schritt in der Etappe 4 mit einem der zwei Rettungswege (Vorladen für diesen Fall aussetzen
+  oder die abgebrochenen Abrufe im Test als erwartet führen); beides ist eine Verhaltensänderung
+  oder eine gelockerte Prüfung und bräuchte eine Ausnahme vom Feature-Stopp. C: Verwerfen, den
+  Eintrag schliessen; die Doku sagt schon, was gilt. **Empfehlung: A.** Solange nichts
+  ausgeliefert wird, gibt es keine offene App, die eine Auslieferung verpasst; der fertige E2E
+  liegt im Verlauf (Commit `8ba6016`).
+- **F-39 — Wie läuft die Etappe 4?** A: mit den Änderungen aus P3; 21 und 22 ohne Halt mit
+  Kurzbericht (Subagent, Review); 23 und 24 als manuelle Sessions mit dem Projektleiter (23:
+  Regel und ADR im Dialog, der Umbau der Skripte danach als Subagent mit Review; 24: Entwurf
+  zeigen, Freigabe, ersetzen); 25 schliesst der Projektleiter ab. B: Halt nach jedem Schritt.
+  C: alle fünf ohne Halt, 23 und 24 als Subagent mit Entwurf, eine Freigabe am Schluss.
+  **Empfehlung: A.** 21 und 22 sind reine Doku; 23 und 24 legen Regeln fest, die über das
+  Refactoring hinaus gelten, und sind ohne Dialog nicht zu entscheiden.
+- **F-40 — Die fünf Hinweise aus dem Review von 20a am Prüfwerkzeug (H3-03): wohin?** A: kleiner
+  Nachtrag zur Etappe 3 vor Schritt 21 (Opus, eigenes Review), zusammen mit dem Kommentar in
+  `grundlagen.css`; kostet eine Version, dafür ist Schritt 21 reine Doku. B: in Schritt 24, wie
+  vom Reviewer vermerkt; dann braucht 24 den vollen `make check` und ein Review für Werkzeug. C:
+  nur den falschen Pfad im Kommentar berichtigen, der Rest wird Beobachtung. **Empfehlung: A.**
+  Es sind rund 30 Zeilen [V], aber an Prüfungen, die in Schritt 24 Dauerregeln tragen sollen.
+- **F-41 — Die Regel «nicht über CSS-Klassen suchen» (146 Suchen im Bestand):** A: Regel lassen,
+  Bestand dulden. B: Wortlaut in Schritt 24 so fassen, wie er gilt (C-18); der Bestand bleibt,
+  die Beobachtung bleibt für später. C: Regel streng lassen und den Bestand nach dem Refactoring
+  als eigenen Vorgang abbauen. **Empfehlung: B.** C verlangt an Karten und Klappen Rolle und
+  Namen, also Eingriffe in die App, die ein Bildschirmleser hört.
+- **F-42 — Zielbild 6.2 Punkt 6, «Fallen aus dem Session-Gedächtnis stehen im Repo», hat keinen
+  Schritt:** A: in Schritt 24 aufnehmen (die Fallen zu E2E, Datenbank und Worktree, die jede
+  Session treffen, an einen Ort im Repo; welche, wählt der Projektleiter in der Session). B: als
+  Beobachtung übergeben und nach dem Abschluss als eigenen Vorgang führen; der Punkt im Zielbild
+  wird entsprechend gefasst. C: Punkt streichen. **Empfehlung: B.** Das Gedächtnis liegt
+  ausserhalb des Repos und ist hier nicht gelesen; es sind rund 30 Notizen [E: B-26], und Schritt
+  24 ist schon der Schritt mit dem meisten Dialog.
+- **F-43 — Den falschen Satz der `CLAUDE.md` zu den Listen der Mitglieder (C-16) jetzt
+  berichtigen?** A: jetzt, der Orchestrator spielt die eine Zeile ein (wie C-11, E-57). B: erst
+  in Schritt 24. **Empfehlung: A**, knapp; B ist vertretbar, weil Typfehler und Routen-Test eine
+  Session auch ohne den Satz an die richtige Stelle führen.
+
+**Protokoll der Etappe 3 auslagern (E-60):** **[geändert]** Ausgeführt am 15.11.2026 (Orchestrator):
+`docs/refactoring-protokoll-etappe-3.md`, kein Wort des Protokolls geändert. Vor dem Auslagern stand Anhang F in diesem Dokument von der
+Überschrift «## Anhang F — Protokoll Etappe 3 [neu]» bis zum Dateiende, **Zeilen 4620 bis 5611**
+(Stand nach dem Einarbeiten vom 15.11.2026; vor dem Einarbeiten 4319 bis 5310; die Trennlinie
+`---` davor gehört zum Abschnitt «Anhänge C bis E»). Der letzte Absatz jenes Abschnitts («Das
+Protokoll der laufenden Etappe 3 kommt als Anhang F …») wird dabei zur vierten Zeile der Liste.
+Verweise auf «F.1» bis «F.6» in diesem Dokument meinen danach die Abschnitte der neuen Datei.
+
+**Nicht geprüft, dünne Belege**
+
+- Aus Anhang F sind F.1 bis F.3 nur über Stichwörter und die Absätze darum gelesen; ein Hinweis
+  ohne diese Wörter fehlt in Tabelle H3.
+- Der Code nur per Textsuche; die Prüfung der Übergangsregeln ist eine Suche nach Mustern, kein
+  Lesen der Dateien. «Ab Schritt 08» und die Dauerregeln zu Logs und Migrationen sind nicht neu
+  geprüft.
+- Die Einteilung der 146 Suchen folgt der Form des Selektors; ob eine Stelle auch über Rolle und
+  Beschriftung ginge, ist nicht je Stelle gelesen. «`summary` hat keine Rolle» ist aus dem
+  Gedächtnis [V].
+- F-15: `gruener-stand.ts` nur nach dem Wort «Version» durchsucht, `check.yml` nur in den
+  Bedingungen der Auslieferungs-Jobs, `scripts/ci/versionsnotizen.sh` nur im Kopf; der Skill nur
+  in den Abschnitten zu Version und Release. Dass `release.ts` unter Antwort A «fast unverändert»
+  bleibt, ist gelesen, nicht erprobt. Das Nachmessen vor Schritt 23 bleibt nötig.
+- Dass die Etappe 4 keinen neuen E2E bringt und dass der Nachtrag «rund 30 Zeilen» hat, sind
+  Schätzungen aus den Plan-Zeilen [V].
+- Der Lauf der CI zum Merge von 20a (43632851367) war beim Lesen noch nicht fertig. [G am
+  15.11.2026: grün.]
+- **[neu] Beim Einarbeiten am 15.11.2026 nicht geprüft:** Vom Branch `refactor/nachtrag-etappe-3`
+  ist nur der Titel des einen Commits gelesen, nicht sein Inhalt. Kein Code neu gelesen; die
+  Angaben zu den Dateien der Schritte 21 bis 25 stammen aus dieser Revision. Was die manuellen
+  Sessions zu 23 und 24 entscheiden müssen («Hinweise» in 7.6), ist aus der Revision abgeleitet,
+  nicht mit dem Projektleiter abgestimmt.
+- Das Session-Gedächtnis, `intern/` und die gemeinsame `beobachtungen.md` der CAS-Projekte sind
+  nicht gelesen; `docs/beobachtungen.md` nur in den Überschriften und drei Einträgen.
+- Kein `make check`, kein E2E, kein Build in diesem Lauf.
 
 ---
 
@@ -1851,7 +2262,10 @@ Session-Gedächtnis (Index ganz, zwei Fallen-Dateien ganz).
    sie kennen (1c, Z-4; Schritt 13). Meldungstexte und Anzeige-Hilfen der Module bleiben, wo sie
    sind. **[geändert]** Ein einzelner Abruf gibt `{ art }` zurück; Abläufe aus mehreren Anfragen
    (Passkey, Push auf dem Gerät) und Lade-Hilfen dürfen eine andere Form haben (E-50; 1d, Z2-4;
-   erreicht mit Schritt 13).
+   erreicht mit Schritt 13). **[geändert]** Unter `src/` steht kein Aufruf `fetch(…)`; Daten
+   holen nur die Abruf-Module über `holen` und `src/lib/abruf.ts`. Das hält ESLint (Schritt 20a;
+   1e, Z3-4); der Nachtrag zur Etappe 3 nimmt `window.fetch`, `globalThis.fetch` und `self.fetch`
+   dazu (E-67).
 5. **[geändert] Eine Wächter-Tabelle** (`src/lib/login/waechter.ts`) mit benannten Fällen und
    zwei Hüllen, eine für die Ladefunktion und eine nach einer Aktion; keine Seite und kein
    Baustein schreibt die Umleitung zum Login selbst (1c, Z-5). Der Wächter bildet das heutige
@@ -1873,7 +2287,9 @@ Session-Gedächtnis (Index ganz, zwei Fallen-Dateien ganz).
 7. **Stile in mehreren Dateien**, weiterhin global und nur aus Tokens (E-13); geschnitten in der bestehenden Reihenfolge, nicht neu sortiert (Nachtrag,
    siehe B-23). **[geändert]** Es sind zehn Dateien, importiert nur im Wurzel-Layout in fester
    Reihenfolge; `brief.css` gehört zum Briefdruck und nicht zur Reihenfolge (1d, Z2-7; erreicht
-   mit Schritt 18). Die Reihenfolge hält ab Schritt 20a eine Prüfung.
+   mit Schritt 18). **[geändert]** Reihenfolge und Vollständigkeit hält
+   `scripts/design-importe.test.ts` (Schritt 20a); die vier Mockups und das Leitbild führen die
+   Reihenfolge von Hand nach (H-07; 1e, Z3-7).
 8. **Abhängigkeiten zwischen den Server-Modulen in eine Richtung**, per Lint-Regel
    festgehalten: `db` und `http` unten, darüber `login`, darüber die Themen; kein Thema
    importiert die Schnittstellen eines anderen. [geändert] Der Zusammenbau (`dienste.ts`) ist die
@@ -1893,11 +2309,19 @@ Session-Gedächtnis (Index ganz, zwei Fallen-Dateien ganz).
 5. Die Projekt-`CLAUDE.md` beschreibt das Zielbild schon ab Schritt 01 (Anhang A),
    mit einem Block «Übergangsregeln», der in Schritt 24 aufgelöst wird; der Skill `tco-branching`
    enthält am Ende nur noch Ablauf.
-6. Was das Session-Gedächtnis heute als Falle führt und alle Sessions betrifft, steht im Repo
-   (Skill oder `docs/`), nicht nur auf einer Maschine.
-7. Nach dem Refactoring: Version nur noch bei Auslieferung auf Test (E-07, Schritt 23);
+6. **[geändert] Nicht Teil des Plans (E-69):** Was das Session-Gedächtnis heute als Falle führt
+   und alle Sessions betrifft, gehört ins Repo (Skill oder `docs/`), nicht nur auf eine Maschine.
+   Kein Schritt setzt das um (1e, N-30). Der Punkt geht in Schritt 25 als Beobachtung nach
+   `docs/beobachtungen.md` und wird nach dem Abschluss ein eigener Vorgang. Bisher stand der Satz
+   hier als Ziel des Refactorings.
+7. **[geändert]** Nach dem Refactoring entsteht eine Version nur noch beim Release `dev` →
+   `main`, nicht beim Merge nach `dev`; Merges nach `dev` sammeln ihre Einträge unter
+   «Unveröffentlicht» (E-64, das den Wortlaut von E-07 ändert; Schritt 23). Die Regel wird neu
+   angesehen, wenn Test in Betrieb geht. Bisher stand hier «Version nur noch bei Auslieferung
+   auf Test»; das wäre, sobald Test läuft, wieder «je Merge mit Code» gewesen (1e, N-27).
    README, Versionen und Doku-Abgleich vor einer Auslieferung statt nach jedem Issue (E-17,
-   Schritt 24). Bis dahin gelten die heutigen Regeln unverändert.
+   Schritt 24). Bis Schritt 23 gemergt ist, gilt die heutige Versionsregel (jeder Merge mit Code
+   eine Nummer); bis Schritt 24 gelten die heutigen Doku-Pflichten.
 
 ### 6.3 Was bewusst NICHT geändert wird
 
@@ -1932,7 +2356,7 @@ eingefügte Schritt 20a, E-56; die Nummern 07 bis 25 bleiben, weil
 Worktree unter `.claude/worktrees/`, Branch `refactor/schritt-NN` (NN = neue Nummer) ab
 `origin/dev`, voller `make check`, unabhängige Prüfung durch `refactor-reviewer`, dann
 Merge-Commit und Push nach `dev` durch den Orchestrator (E-22), bei Code eine Patch-Version
-(E-01, E-07). «Absicherung» nennt, was vor dem Umbau grün und einmal absichtlich rot gewesen sein
+(E-01, E-07; **[geändert]** das gilt, bis Schritt 23 gemergt ist, danach E-64). «Absicherung» nennt, was vor dem Umbau grün und einmal absichtlich rot gewesen sein
 muss. Der Status steht je Schritt in der letzten Spalte. Was nicht in eine Zelle passt, steht als
 Absatz «Hinweise zu Schritt NN» direkt unter der Tabelle der Etappe; die Hinweise gehören zum
 Schritt und sind für den Umsetzer verbindlich wie die Zeile.
@@ -1972,7 +2396,12 @@ Fable, wo eine Regel oder ein Schutz verändert wird. «Subagent» heisst `refac
 im vorbereiteten Worktree; «manuelle Session» heisst: Der Schritt braucht Dialog mit dem
 Projektleiter oder einen Entwurf zur Freigabe. Kein Schritt hat das Risiko «hoch».
 «Nachmessen vorab» heisst: Vor dem Start des Schritts misst der `refactor-analyst` das Genannte
-nach und trägt das Ergebnis beim Schritt ein.
+nach und trägt das Ergebnis beim Schritt ein. **[geändert, E-66]** Für die Etappe 4 gilt
+abweichend: «Manuelle Session» bei den Schritten 23 und 24 ist eine eigene Session des
+Projektleiters; der Orchestrator liefert dafür je das Modell, einen Copy-Paste-Prompt und was
+die Session in dieses Dokument schreiben muss, danach prüft der `refactor-reviewer`. Fable steht
+in keiner Zeile mehr fest: Kein Schritt hat das Risiko «hoch» (1e, P3-23b), der Umbau am
+Prüfwerkzeug in Schritt 23 läuft mit Opus.
 
 ### 7.2 Etappe 0 — Sicherheitsnetz
 
@@ -2859,9 +3288,9 @@ Nummer; Vorbild ist der Nachtrag zu Schritt 16, E-54)
 
 | Nr. | Ziel | Dateien | Nutzen | Risiko | Absicherung | Voraussetzung | Modell | Weg | Nachmessen vorab | Status |
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
-| 19 | [geändert] Alte offene App-Versionen (E-09): Die App erkennt mit den Bordmitteln von SvelteKit, dass eine neue Version ausgeliefert ist, und lädt beim nächsten Seitenwechsel neu. Der Eigenbau (`MINDESTVERSION`, `istVersionVertraeglich`) wird entfernt, `/api/status` nennt nur noch Status und Version. Die Doku sagt danach genau das. **Deckt das Bordmittel die Anforderung nicht, nur entfernen und die Doku auf «gibt es noch nicht» korrigieren** | `vite.config.ts`, `src/routes/+layout.svelte`, `src/lib/server/version.ts`, `status.ts` und ihre Tests, `Dockerfile` (Healthcheck liest nur `status`), `docs/ci-cd-und-release.md`; **[geändert, 1d P2-19a]** namentlich `src/lib/server/version.test.ts` und `src/routes/api/status/status.db.test.ts` (vier Stellen mit `mindestversion`), in `docs/ci-cd-und-release.md` auch der Satz zur Store-App (Zeile 466), `docs/testkonzept.md:126` und `Dockerfile:9` (nennen `version.json`), allenfalls `src/service-worker/index.ts`. Eine `svelte.config.js` gibt es nicht (Hinweise) | Doku und Code sagen dasselbe (B-04) | mittel | Neuer Test «nach neuer Version lädt der nächste Seitenwechsel neu» (E2E oder Einheit, je nach Bordmittel); `status.db.test.ts` angepasst; Rauchtest des Images; **[geändert, P2-19c]** bringt der Schritt einen neuen E2E, läuft er vor dem Merge einmal auf der WebKit-CI (N-23) | [geändert] der Nachtrag zur Etappe 2 ist gemergt; das Nachmessen muss vorliegen (es ist **offen**), danach Checkpoint | Opus | Subagent | **ja, zwingend (E-09):** über den Svelte-MCP-Server prüfen, was SvelteKit in der eingesetzten Version bietet (Versionskennung des Builds, Abfrage-Abstand, Verhalten bei `ssr = false`) und ob es die Zusage «alte App lädt neu» deckt [V]. **[geändert, P2-19b]** Dazu: (a) Name und Ort der Versionskennung (Einstellungen stehen im Plugin in `vite.config.ts`); (b) ob der Service Worker etwas zwischenspeichert, das eine alte App am Leben hält; (c) Folge einer festen Kennung für E-27 und für «neu ausgeliefert, gleiche Versionsnummer»; (d) ob die Kennung die Paketversion sein soll, ohne F-15 vorwegzunehmen. Ausgangspunkt: Hinweise zu Schritt 19. **Erledigt 14.11.2026 (Anhang F.1):** Bordmittel aktiv, lädt nur im Fehlerfall neu; für den Seitenwechsel die Ergänzung aus der Doku von SvelteKit; (a) `version: { name, pollInterval }` im Plugin, nicht gesetzt, Voreinstellung Zeitstempel und eine Stunde; (b) nein, kein Cache; (c) E-27 unberührt, der Zeitstempel erkennt «gleiche Versionsnummer»; (d) nein, nicht die Paketversion. Dateien berichtigt: ohne `Dockerfile` und Service Worker, dazu eine Funktion mit Test unter `src/lib/ui/` und ein E2E (Liste in F.1, Abschnitt 6) | **umgesetzt mit Antwort A** (14.11.2026, Branch `refactor/schritt-19`, nicht gemergt; Ergebnis unten, Protokoll Anhang F.2): Eigenbau weg; die Ergänzung nach B (E-61) an Abbruchstelle 2 abgebrochen (Konsolenfehler auf WebKit), nicht im Branch |
+| 19 | [geändert] Alte offene App-Versionen (E-09): Die App erkennt mit den Bordmitteln von SvelteKit, dass eine neue Version ausgeliefert ist, und lädt beim nächsten Seitenwechsel neu. Der Eigenbau (`MINDESTVERSION`, `istVersionVertraeglich`) wird entfernt, `/api/status` nennt nur noch Status und Version. Die Doku sagt danach genau das. **Deckt das Bordmittel die Anforderung nicht, nur entfernen und die Doku auf «gibt es noch nicht» korrigieren** | `vite.config.ts`, `src/routes/+layout.svelte`, `src/lib/server/version.ts`, `status.ts` und ihre Tests, `Dockerfile` (Healthcheck liest nur `status`), `docs/ci-cd-und-release.md`; **[geändert, 1d P2-19a]** namentlich `src/lib/server/version.test.ts` und `src/routes/api/status/status.db.test.ts` (vier Stellen mit `mindestversion`), in `docs/ci-cd-und-release.md` auch der Satz zur Store-App (Zeile 466), `docs/testkonzept.md:126` und `Dockerfile:9` (nennen `version.json`), allenfalls `src/service-worker/index.ts`. Eine `svelte.config.js` gibt es nicht (Hinweise) | Doku und Code sagen dasselbe (B-04) | mittel | Neuer Test «nach neuer Version lädt der nächste Seitenwechsel neu» (E2E oder Einheit, je nach Bordmittel); `status.db.test.ts` angepasst; Rauchtest des Images; **[geändert, P2-19c]** bringt der Schritt einen neuen E2E, läuft er vor dem Merge einmal auf der WebKit-CI (N-23) | [geändert] der Nachtrag zur Etappe 2 ist gemergt; das Nachmessen muss vorliegen (es ist **offen**), danach Checkpoint | Opus | Subagent | **ja, zwingend (E-09):** über den Svelte-MCP-Server prüfen, was SvelteKit in der eingesetzten Version bietet (Versionskennung des Builds, Abfrage-Abstand, Verhalten bei `ssr = false`) und ob es die Zusage «alte App lädt neu» deckt [V]. **[geändert, P2-19b]** Dazu: (a) Name und Ort der Versionskennung (Einstellungen stehen im Plugin in `vite.config.ts`); (b) ob der Service Worker etwas zwischenspeichert, das eine alte App am Leben hält; (c) Folge einer festen Kennung für E-27 und für «neu ausgeliefert, gleiche Versionsnummer»; (d) ob die Kennung die Paketversion sein soll, ohne F-15 vorwegzunehmen. Ausgangspunkt: Hinweise zu Schritt 19. **Erledigt 14.11.2026 (Anhang F.1):** Bordmittel aktiv, lädt nur im Fehlerfall neu; für den Seitenwechsel die Ergänzung aus der Doku von SvelteKit; (a) `version: { name, pollInterval }` im Plugin, nicht gesetzt, Voreinstellung Zeitstempel und eine Stunde; (b) nein, kein Cache; (c) E-27 unberührt, der Zeitstempel erkennt «gleiche Versionsnummer»; (d) nein, nicht die Paketversion. Dateien berichtigt: ohne `Dockerfile` und Service Worker, dazu eine Funktion mit Test unter `src/lib/ui/` und ein E2E (Liste in F.1, Abschnitt 6) | **umgesetzt mit Antwort A** (14.11.2026, Branch `refactor/schritt-19`, nicht gemergt; Ergebnis unten, Protokoll Anhang F.2): Eigenbau weg; die Ergänzung nach B (E-61) an Abbruchstelle 2 abgebrochen (Konsolenfehler auf WebKit), nicht im Branch. **Erledigt**, Review «ok», Version 0.22.7 [nachgetragen am 15.11.2026: Die Zelle stand noch auf «nicht gemergt»; Quelle «Ergebnis Schritt 19» unten] |
 | 20 | [geändert] E2E-Hilfen aufgeräumt (der alte Weg mit festem Turnierjahr weg, Datei nach Themen geteilt); ungenutzte Exporte entfernt. **[geändert, 1d P2-20a]** Elf Hinweise (zwei aus der Etappe 0, drei aus der Etappe 1, sechs aus der Etappe 2) aufnehmen oder ausdrücklich verwerfen (Hinweise zu Schritt 20). Die zwei Struktur-Prüfungen gehören nicht hierher, sondern in Schritt 20a | `tests/e2e/hilfen/login.ts`, einzelne Dateien unter `src/lib/`; allenfalls `scripts/e2e.ts`, `grundpruefung.db.test.ts`, `routen.test.ts`; für die Hinweise (c) bis (e) allenfalls eine neue Datei unter `tests/hilfen/`, `mitteilung/typen.ts` mit seinen Importen, `scripts/pruefungen/bauregel.ts`; **[geändert]** für die Hinweise (f) bis (k) allenfalls `src/lib/verwaltung/turnier-anzeige.ts` mit Test und `Aktionsdialog.svelte`, `tests/e2e/cm-ablauf.test.ts`, die sieben Testdateien aus H-18 mit `tests/hilfen/verwaltung-abruf.ts`, E2E-Dateien der Verwaltung, `src/lib/cm/api.ts` und `src/routes/+layout.svelte` (je ein Kommentar), `playwright.config.ts`; der Eintrag vom 09.11.2026 in `docs/beobachtungen.md` (N-26) | Kleinere Hilfen, weniger tote Namen (B-11, B-18) | niedrig | E2E voll; `svelte-check` | 11 (E-11: reicht Handarbeit nicht, Paketvorschlag zur Freigabe) | Sonnet | Subagent | ja: Die Liste ungenutzter Exporte stammt aus einer Textsuche [E]; vorab je Name bestätigen. **[geändert, P2-20c]** Dazu: was vom festen Turnierjahr noch offen ist (N-26); welche E2E-Tests der Verwaltung die Bestätigung per Mail-Code selbst prüfen (für (i)); die Stellen für Hinweis (d). **Erledigt 14.11.2026 (Anhang F.3):** 3 Namen entfernen, bei 25 nur `export` weg, der Rest bleibt (Typen in Signaturen, Listen, direkt geprüfte Namen); kein Paketvorschlag (E-11). Den festen Weg des Turnierjahrs ruft niemand mehr, `loescheTurnier` bleibt. `login.ts` (478 Zeilen, 37 Exporte) in fünf Dateien, 19 Testdateien wechseln nur Importe. Hinweise: aufnehmen (b), (c), (f), (h), (j), (k) nach **F-37**; verwerfen (a), (d), (e), (g), (i). Zwei Läufe: Lauf 1 Sonnet (sieben Commits), Lauf 2 Opus (Testlogik, zwei bis drei Commits). Dateien berichtigt: ohne `scripts/e2e.ts`, `mitteilung/typen.ts`, `bauregel.ts`; der Kommentar aus (j) steht in `src/routes/+layout.ts`; Liste in F.3, Abschnitt 5 | **Lauf 1 umgesetzt** (14.11.2026, F.4), Review «ok»; **Lauf 2 umgesetzt** (14.11.2026, F.5; F-37: B, E-63), Review «ok»; Handstart der CI mit Spur gemessen (Lauf 43629593490, F.5). **Erledigt**, Version 0.22.8 [nachgetragen in Schritt 20a: Die Zelle stand noch auf «Review offen»; Quelle F.5, `docs/versionen.md`, Merge `2d207f5`] |
-| 20a | **[neu, E-56]** Zwei kleine Struktur-Prüfungen, damit die Regeln der Etappe 2 nicht nur im Review gehalten werden: (1) ESLint: kein Aufruf `fetch(` unter `src/`; (2) eine Prüfung «Die Design-Dateien werden nur im Wurzel-Layout importiert, vollständig und in der Reihenfolge der Liste; `brief.css` nur im Briefdruck». Kein App-Code, kein Verhalten | `eslint.config.js`, ein Test unter `scripts/` (Vorbild `importrichtung.test.ts`), `docs/ci-cd-und-release.md` (Liste der Prüfungen) | Die Regeln «Ab Schritt 15» und «Ab Schritt 18» haben ein Werkzeug, bevor sie in Schritt 24 Dauerregeln werden (H-07, H-13) | niedrig für die App, mittel für das Werkzeug | Je Regel eine Probe, vorher rot (ein `fetch(` in einem Baustein; eine vertauschte und eine fehlende Import-Zeile); am echten Repo grün ohne Ausnahme | 18, 20 | Opus | Subagent | nein (E.6 und E.13 haben gemessen) | **Umgesetzt** (14.11.2026, Branch `refactor/schritt-20a`, nicht gemergt: `test:` `9b5bd6e`, `cb6d8ef`; `docs:` `1839963`; Protokoll Anhang F.6; voller `make check` grün), Review offen. Ergebnis unten |
+| 20a | **[neu, E-56]** Zwei kleine Struktur-Prüfungen, damit die Regeln der Etappe 2 nicht nur im Review gehalten werden: (1) ESLint: kein Aufruf `fetch(` unter `src/`; (2) eine Prüfung «Die Design-Dateien werden nur im Wurzel-Layout importiert, vollständig und in der Reihenfolge der Liste; `brief.css` nur im Briefdruck». Kein App-Code, kein Verhalten | `eslint.config.js`, ein Test unter `scripts/` (Vorbild `importrichtung.test.ts`), `docs/ci-cd-und-release.md` (Liste der Prüfungen) | Die Regeln «Ab Schritt 15» und «Ab Schritt 18» haben ein Werkzeug, bevor sie in Schritt 24 Dauerregeln werden (H-07, H-13) | niedrig für die App, mittel für das Werkzeug | Je Regel eine Probe, vorher rot (ein `fetch(` in einem Baustein; eine vertauschte und eine fehlende Import-Zeile); am echten Repo grün ohne Ausnahme | 18, 20 | Opus | Subagent | nein (E.6 und E.13 haben gemessen) | **Umgesetzt** (14.11.2026, Branch `refactor/schritt-20a`, nicht gemergt: `test:` `9b5bd6e`, `cb6d8ef`; `docs:` `1839963`; Protokoll Anhang F.6; voller `make check` grün), Review offen. Ergebnis unten. **Erledigt:** Review «ok» (14.11.2026, nichts vor dem Merge zu beheben; fünf Hinweise, die der Nachtrag zur Etappe 3 aufnimmt, E-67), gemergt als Version 0.22.9 (Merge `4c7b340`), CI auf `dev` grün (Lauf 43632851367) [nachgetragen am 15.11.2026: Die Zelle stand noch auf «nicht gemergt, Review offen» (1e, N-29); Quelle F.6, `package.json` am Merge, `gh run list`] |
 
 **Hinweise zu Schritt 19** [geändert]
 
@@ -2931,7 +3360,8 @@ Protokoll in F.2)
   entscheiden (F.2, Abschnitt 2); kein Eintrag in 9.1 von diesem Lauf.
 
 **Ergebnis Schritt 20, Lauf 1** (14.11.2026, Sonnet; Branch `refactor/schritt-20`, nicht
-gemergt, Review offen; Protokoll in F.4)
+gemergt, Review offen; Protokoll in F.4. [Nachgetragen am 15.11.2026: Review «ok», mit Lauf 2
+gemergt als Version 0.22.8; Stand in der Zeile 20])
 
 - **Sieben Commits wie in F.3:** drei tote Namen weg (`warnungText` mit seinem einen Test,
   `RangZeile`, `GespraechZeile` der Verwaltung); `export` weg bei 25 Werten; `doppelWarnungen` →
@@ -2945,7 +3375,8 @@ gemergt, Review offen; Protokoll in F.4)
 - **Für die Nutzerin:** nichts. **Offen:** Review, Lauf 2, F-37.
 
 **Ergebnis Schritt 20, Lauf 2** (14.11.2026, Opus; Branch `refactor/schritt-20`, nicht gemergt,
-Review offen; Protokoll in F.5)
+Review offen; Protokoll in F.5. [Nachgetragen am 15.11.2026: Review «ok», gemergt als Version
+0.22.8; Stand in der Zeile 20. Der Satz der `CLAUDE.md` unten ist mit E-70 entschieden])
 
 - **Drei Commits wie in F.3, keine Abbruchstelle eingetreten:** (c) `tests/hilfen/mitglieder-listen.ts`
   mit `MITGLIEDER_LISTEN` und dem Typ `MitgliederDienste`; Grundprüfung und Routen-Test nehmen
@@ -2972,8 +3403,9 @@ Review offen; Protokoll in F.5)
   Vorschlag in F.5, die Datei ist nicht geändert.
 - **Für die Nutzerin:** nichts. **Offen:** Review, Handstart der CI mit Spur (Orchestrator).
 
-**Ergebnis Schritt 20a** (14.11.2026, Opus; Branch `refactor/schritt-20a` ab `2d207f5`, nicht
-gemergt, Review offen; Protokoll in F.6)
+**Ergebnis Schritt 20a** (14.11.2026, Opus; Branch `refactor/schritt-20a` ab `2d207f5`; **Review
+«ok», gemergt als Version 0.22.9**, Merge `4c7b340` [nachgetragen am 15.11.2026: hier stand
+«nicht gemergt, Review offen» (1e, N-29)]; Protokoll in F.6)
 
 - **(1) ESLint, kein Aufruf `fetch(…)` unter `src/`:** Block `FETCH_REGEL` in `eslint.config.js`
   (`no-restricted-syntax`, Auswahl `CallExpression[callee.type='Identifier'][callee.name='fetch']`,
@@ -2989,7 +3421,9 @@ gemergt, Review offen; Protokoll in F.6)
 - **Grenzen der Regel:** Sie fängt nicht `window.fetch(…)`, `globalThis.fetch(…)`,
   `self.fetch(…)`, ein weitergereichtes `holen` (`const holen = fetch; holen(…)`), `fetch.call(…)`
   und `fetch` mit Typ-Zusatz (`(fetch as …)(…)`, `fetch!(…)`). Die Formen mit Punkt wären heute
-  auch gesperrt grün (0 Meldungen); Stoff für Schritt 24.
+  auch gesperrt grün (0 Meldungen); Stoff für Schritt 24. **[geändert, E-67]** Nicht mehr Schritt
+  24: Der Nachtrag zur Etappe 3 (7.6) nimmt `window.fetch`, `globalThis.fetch` und `self.fetch`
+  auf; die übrigen Formen bleiben Grenzen.
 - **(2) Prüfung der Design-Importe:** `scripts/design-importe.test.ts` (30 Fälle, Einheitstests)
   liest alle Dateien unter `src/` und prüft: Die Design-Dateien importiert nur
   `src/routes/+layout.svelte`, jede genau einmal und in der Reihenfolge von `REIHENFOLGE` (elf
@@ -3009,6 +3443,10 @@ gemergt, Review offen; Protokoll in F.6)
   stimmen weiter (die Regel ist strenger als «keine Ladefunktion ruft `fetch` direkt»).
 - **Für die Nutzerin:** nichts, kein Diff unter `src/`. **Offen:** Review, Merge. Damit ist die
   Etappe 3 umgesetzt; Zwischenrevision und Checkpoint am Etappenende stehen aus.
+- **[neu] Review (14.11.2026, refactor-reviewer): «ok»,** nichts vor dem Merge zu beheben; fünf
+  Hinweise am Prüfwerkzeug (F.6; 1e, H3-03). Sie gehen nicht nach Schritt 24, wie im Review
+  vermerkt, sondern in den Nachtrag zur Etappe 3 (E-67, 7.6). Zwischenrevision und Checkpoint
+  sind erledigt (15.11.2026, Abschnitt 1e).
 
 **Hinweise zu Schritt 20** [geändert]
 
@@ -3093,13 +3531,45 @@ Schritt nimmt jeden auf oder verwirft ihn ausdrücklich im Bericht:
 
 ### 7.6 Etappe 4 — Doku und Arbeitsweise
 
+**Nachtrag zur Etappe 3 (vor Schritt 21) [neu]** (E-67; kein Plan-Schritt, keine eigene Nummer;
+Vorbild ist der Nachtrag zur Etappe 2 in 7.5)
+
+- **Umfang:** die fünf Hinweise aus dem Review von Schritt 20a (Befund und Fundstelle in 1e,
+  H3-03; hier nicht wiederholt) und ein Kommentar: (1) `import()` einer Design-Datei im
+  Svelte-Markup: in die Liste «nicht erfasst» des Tests und in die Zeile von
+  `docs/ci-cd-und-release.md`; (2) im Kommentar von `scripts/design-importe.test.ts` der Pfad
+  `docs/ui-mockups/`; (3) die Meldung der fetch-Regel in zwei Sätzen, einer für die Oberfläche,
+  einer für den Server; (4) ein Fall für Markup in `scripts/fetch-regel.test.ts`; (5) die
+  strengere fetch-Regel **nur eng**: `window.fetch`, `globalThis.fetch`, `self.fetch`, keine
+  Regel für jedes `x.fetch(…)`; (6) der Kommentar in `src/lib/design/grundlagen.css` («hierher»
+  ist seit dem Schnitt die Datei des Bausteins; 1d, H-06). **Kein App-Code, kein Verhalten.**
+- **Dateien:** `eslint.config.js` (`FETCH_REGEL`), `scripts/fetch-regel.test.ts`,
+  `scripts/design-importe.test.ts`, `docs/ci-cd-und-release.md` (die Zeilen der zwei Prüfungen),
+  `src/lib/design/grundlagen.css` (nur der Kommentar).
+- **Nicht im Nachtrag:** die übrigen Grenzen der fetch-Regel (ein weitergereichtes `holen`,
+  `fetch.call`, `fetch` mit Typ-Zusatz); der Wortlaut der Dauerregeln (Schritt 24); die
+  Reihenfolge in den vier Mockups und im Leitbild (Handarbeit, H-07; den Satz im Leitbild trägt
+  Schritt 21).
+- **Absicherung:** je neue Form der fetch-Regel und für den Fall im Markup eine Probe, vorher
+  rot; am echten Repo grün ohne Ausnahme (heute 0 Meldungen für die Formen mit Punkt, F.6); für
+  den Kommentar `make css-vergleich` (das gebaute CSS bleibt gleich); voller `make check`;
+  eigenes Review (Prüfwerkzeug).
+- **Branch und Weg:** `refactor/nachtrag-etappe-3` ab `origin/dev`, Implementer als Subagent
+  (Opus), läuft parallel zum Einarbeiten der Revision. Der Merge trägt Code und kostet nach der
+  heutigen Regel eine Version (E-64: gilt bis Schritt 23). Danach ist Schritt 21 reine Doku.
+- **Status:** **läuft** (15.11.2026). [G am 15.11.2026: Branch vorhanden, ein Commit `59bb416`
+  «test: Design-Prüfung liest import() im Svelte-Markup (Nachtrag Etappe 3)»; nur der Titel
+  gelesen, nicht der Inhalt.] Nach dem Titel **fängt** die Prüfung `import()` im Markup, statt
+  es nur als «nicht erfasst» zu führen, wie (1) es vorschlug; ob das trägt, beurteilt das Review.
+  Ergebnis, Review und Version trägt der Orchestrator hier nach.
+
 | Nr. | Ziel | Dateien | Nutzen | Risiko | Absicherung | Voraussetzung | Modell | Weg | Nachmessen vorab | Status |
 |----:|------|---------|--------|--------|-------------|---------------|--------|-----|------------------|--------|
-| 21 | [geändert] Doku an den Code angeglichen: Bausteinsicht, Einstiegstexte, Stand. `docs/testkonzept.md` nennt die Vertragstests aus Schritt 03 (Grundprüfung, Routen-Test, Bremsen-Test, Anhang C.2); die Liste der Prüfungen nennt die Prüfung der Importrichtung und `make css-vergleich` (der Diff der Etappe 0 trägt dort nur den Build-Ordner nach [G]). **[geändert]** Aus der Etappe 1 nennt die Doku: `dienste.ts`, `src/lib/fehler.ts`, `verwaltung-schnittstellen.ts` je Thema, das Thema `sitzung/`, `tests/hilfen/verwaltungs-listen.ts`, den Test `mail-nur-an.db.test.ts`, `tests/hilfen/turnierjahre.ts`; die Bausteinsicht in `docs/arc42.md` ist nachzuziehen (1c, P-21: in der Etappe 1 dort sechs Zeilen geändert [G], Bausteinsicht nicht nachgezogen [E]). **[geändert, 1d P2-21a]** Aus der Etappe 2 nennt die Doku: `src/lib/abruf.ts` mit `STATUS_DES_WORTS`, `src/lib/login/waechter.ts` und `ladeSitzung`, `src/lib/cm/ablauf.ts` und `Textdialog.svelte`, die zehn Design-Dateien und ihre Reihenfolge, `tests/oberflaeche/`, die drei Vorab-E2E (`waechter`, `cm-ablauf`, `anmeldungsliste-ablauf`); heute nennen `docs/arc42.md`, `docs/testkonzept.md` und `docs/context-scopes.md` keinen dieser Bausteine [G, Textsuche, Stand `40a0a54`]. **[neu, Review Schritt 15, Hinweis (5)]** Der Testordner `tests/oberflaeche/` (Einheitstests der Ladefunktionen, seit Schritt 15) fehlt in `docs/testkonzept.md` und `docs/context-scopes.md`. **[geändert, E-58]** Der Kommentar in `src/lib/design/grundlagen.css:4` sagt, wohin neue Regeln kommen (H-06). Das UI-Leitbild (H-01) ist **nicht** mehr Teil dieses Schritts: Es kommt mit dem Nachtrag zur Etappe 2 (7.5); hier nur, was der Nachtrag offen gelassen hat | `docs/arc42.md`, `docs/index.md`, `README.md`, `docs/testkonzept.md`, `docs/ci-cd-und-release.md`; **[geändert]** `docs/context-scopes.md` (nur der Eintrag `tests/oberflaeche/`; das Kürzen ist Schritt 22), `src/lib/design/grundlagen.css` (nur der Kommentar), allenfalls `docs/ui-leitbild.md` | Keine veralteten Aussagen (B-04) | niedrig | `make docs`; **[geändert]** für den Kommentar `make css-vergleich` (das gebaute CSS bleibt gleich) | Etappen 1 und 2 | Sonnet | Subagent | nein | offen |
-| 22 | Context-Scopes auf Ordner gekürzt. `docs/superpowers/` ist als Geschichte gekennzeichnet (eine `README.md` im Ordner, ein Satz in `docs/index.md`) und steht nicht mehr in den Context-Scopes (E-15) | `docs/context-scopes.md`, `docs/index.md`, neu `docs/superpowers/README.md` | Tabelle veraltet nicht mehr mit jeder Datei (B-05, B-06) | niedrig | `make docs` | 11 | Sonnet | Subagent | nein | offen |
-| 23 | **Versionsregel nach dem Refactoring (E-07).** Eine Version entsteht nicht mehr bei jedem Merge mit Code, sondern wenn ein Stand auf Test ausgeliefert wird. Neue ADR, die ADR-007 ablöst; `version-merge.ts`, Pre-Push-Hook, «grüner Stand» und Skill entsprechend; `docs/versionen.md` sammelt dazwischen unter «Unveröffentlicht» | `docs/adr/` (neue ADR, Index, arc42 Kapitel 4), `scripts/pruefungen/version-merge.ts`, `gruener-stand.ts`, `release.ts` und ihre Tests, `.githooks/pre-push`, `.claude/skills/tco-branching/SKILL.md`, `docs/ci-cd-und-release.md` | Die feste Kollisionsstelle paralleler Sessions fällt weg (B-03) | mittel (Umbau an den Prüfungen, die jeden Push bewachen) | Tests der Prüfskripte zuerst anpassen und einmal absichtlich brechen; ein Probe-Merge mit Code ohne Versionsnummer muss durchgehen, ein Push auf `main` weiterhin nicht | Etappen 0 bis 3 erledigt; **F-15 beantwortet** | Fable | manuelle Session (Regel wird mit dem Projektleiter festgelegt) | ja: `release.ts`, `gruener-stand.ts` und der Abschnitt «Versionen» in `docs/ci-cd-und-release.md` sind nur in Auszügen gelesen | offen |
-| 24 | **Dauerbetrieb.** In der Projekt-`CLAUDE.md` wird der Block «Übergangsregeln» aufgelöst: Was bleibt, wird Dauerregel, der Rest und der Verweis auf dieses Dokument entfallen. Der Skill `tco-branching` enthält nur noch Ablauf, mit dem Rhythmus aus E-17 (README, Versionen und Doku-Abgleich vor einer Auslieferung, nicht nach jedem Issue; Beobachtungen bleiben). Die Vorschläge «nach dem Refactoring» aus Anhang B für Dateien ausserhalb des Repos stehen als Einträge in der gemeinsamen `beobachtungen.md` | `CLAUDE.md`, `.claude/skills/tco-branching/SKILL.md`, `.claude/agents/` (die drei `refactor-*`-Agenten entfernen oder behalten: entscheidet der Projektleiter) | Neue Sessions bauen im Zielstil weiter; die Doku-Pflichten sind gebündelt (B-01, A-03, A-05) | niedrig | Entwurf dem Projektleiter zeigen, bevor die Datei ersetzt wird; `make docs` | 23 | Fable | manuelle Session (Entwurf zeigen, bevor die Datei ersetzt wird) | nein | offen |
-| 25 | Abschluss: Bleibendes steht in arc42 und ADRs, dieses Dokument ist als abgeschlossen markiert, #80 geschlossen, Feature-Stopp aufgehoben. **[geändert, 1d P2-25]** Die Punkte mit der Zuordnung «Beobachtung» aus 1c (Tabelle N) und 1d (Tabellen H und N) stehen als Einträge in `docs/beobachtungen.md`, gebündelt nach Thema; sonst liest sie nach dem Abschluss niemand mehr (N-25) | `docs/arc42.md`, `docs/adr/`, dieses Dokument; **[geändert]** `docs/beobachtungen.md` | Sauberes Ende | niedrig | `make check`, `make docs` | alle | Sonnet | manuelle Session (Orchestrator) | nein | offen |
+| 21 | [geändert] Doku an den Code angeglichen: Bausteinsicht, Einstiegstexte, Stand. `docs/testkonzept.md` nennt die Vertragstests aus Schritt 03 (Grundprüfung, Routen-Test, Bremsen-Test, Anhang C.2); die Liste der Prüfungen nennt die Prüfung der Importrichtung und `make css-vergleich` (der Diff der Etappe 0 trägt dort nur den Build-Ordner nach [G]). **[geändert]** Aus der Etappe 1 nennt die Doku: `dienste.ts`, `src/lib/fehler.ts`, `verwaltung-schnittstellen.ts` je Thema, das Thema `sitzung/`, `tests/hilfen/verwaltungs-listen.ts`, den Test `mail-nur-an.db.test.ts`, `tests/hilfen/turnierjahre.ts`; die Bausteinsicht in `docs/arc42.md` ist nachzuziehen (1c, P-21: in der Etappe 1 dort sechs Zeilen geändert [G], Bausteinsicht nicht nachgezogen [E]). **[geändert, 1d P2-21a]** Aus der Etappe 2 nennt die Doku: `src/lib/abruf.ts` mit `STATUS_DES_WORTS`, `src/lib/login/waechter.ts` und `ladeSitzung`, `src/lib/cm/ablauf.ts` und `Textdialog.svelte`, die zehn Design-Dateien und ihre Reihenfolge, `tests/oberflaeche/`, die drei Vorab-E2E (`waechter`, `cm-ablauf`, `anmeldungsliste-ablauf`); heute nennen `docs/arc42.md`, `docs/testkonzept.md` und `docs/context-scopes.md` keinen dieser Bausteine [G, Textsuche, Stand `40a0a54`]. **[neu, Review Schritt 15, Hinweis (5)]** Der Testordner `tests/oberflaeche/` (Einheitstests der Ladefunktionen, seit Schritt 15) fehlt in `docs/testkonzept.md` und `docs/context-scopes.md`. **[geändert, E-58, E-67]** Das UI-Leitbild (H-01) kam mit dem Nachtrag zur Etappe 2 (7.5). Der Kommentar in `src/lib/design/grundlagen.css` (H-06) ist **nicht** mehr Teil dieses Schritts: Er kommt mit dem Nachtrag zur Etappe 3 (oben). **[geändert, 1e P3-21a bis P3-21d, E-66]** Aus der Etappe 3 nennt `docs/testkonzept.md`: `tests/hilfen/mitglieder-listen.ts`, `tests/hilfen/abruf.ts`, die E2E-Hilfen in fünf Dateien, den Fall «Name passt zur Methode» im Routen-Test; die zwei Struktur-Prüfungen und die Spur stehen schon in `docs/ci-cd-und-release.md`. `docs/ui-leitbild.md` nennt bei der Reihenfolge der Design-Dateien die Prüfung (H3-02). Den Eintrag `tests/oberflaeche/` in `docs/context-scopes.md` trägt Schritt 22 als Ordner ein, nicht dieser Schritt. Der Schritt ist reine Doku und kostet keine Version | `docs/arc42.md`, `docs/index.md`, `README.md`, `docs/testkonzept.md`, `docs/ci-cd-und-release.md`, **[geändert]** `docs/ui-leitbild.md`; nicht mehr: `docs/context-scopes.md` (Schritt 22), `src/lib/design/grundlagen.css` (Nachtrag zur Etappe 3) | Keine veralteten Aussagen (B-04) | niedrig | `make docs`; **[geändert]** das Review prüft jede neue Aussage am Code; `make css-vergleich` entfällt mit dem Kommentar | **[geändert]** Etappen 1 bis 3; der Nachtrag zur Etappe 3 ist gemergt (beide ändern `docs/ci-cd-und-release.md`) | Sonnet | Subagent; **[geändert, E-66]** ohne Halt, mit Kurzbericht | nein | offen |
+| 22 | Context-Scopes auf Ordner gekürzt. `docs/superpowers/` ist als Geschichte gekennzeichnet (eine `README.md` im Ordner, ein Satz in `docs/index.md`) und steht nicht mehr in den Context-Scopes (E-15). **[geändert, 1e P3-22b, E-66]** Die Test-Ordner stehen als Ordner (`tests/e2e/hilfen/`, `tests/hilfen/`, `tests/oberflaeche/`; H3-01). Die Zeile «Refactoring (Plan, Stand, Entscheide)» bleibt bis Schritt 25 | `docs/context-scopes.md`, `docs/index.md`, neu `docs/superpowers/README.md` | Tabelle veraltet nicht mehr mit jeder Datei (B-05, B-06) | niedrig | `make docs` | **[geändert, P3-22a]** 21 (beide ändern `docs/index.md`; bisher stand hier 11) | Sonnet | Subagent; **[geändert, E-66]** ohne Halt, mit Kurzbericht | nein | offen |
+| 23 | **[geändert] Versionsregel nach dem Refactoring (E-07 in der Fassung von E-64).** Eine Version entsteht nicht mehr bei jedem Merge mit Code, sondern **nur noch beim Release `dev` → `main`**; Merges nach `dev` sammeln ihre Einträge in `docs/versionen.md` unter «Unveröffentlicht». Neue ADR, die ADR-007 ablöst und «Test geht in Betrieb» als Anlass nennt, die Regel neu anzusehen; `version-merge.ts`, Pre-Push-Hook, «grüner Stand» und Skill entsprechend. Bis der Schritt gemergt ist, gilt die heutige Regel. Bisher stand hier «wenn ein Stand auf Test ausgeliefert wird» (1e, N-27) | `docs/adr/` (neue ADR, Index, arc42 Kapitel 4), `scripts/pruefungen/version-merge.ts`, `gruener-stand.ts`, `release.ts` und ihre Tests, `.githooks/pre-push`, `.claude/skills/tco-branching/SKILL.md`, `docs/ci-cd-und-release.md`; **[geändert, 1e P3-23a]** dazu `Makefile` (Hilfetext zu `make hooks`) und in `.github/workflows/check.yml` nur der Kommentar zur Regel (oder ausdrücklich stehen lassen; die Jobs und `betrieb/` bleiben, E-16). Wo die heutige Regel in diesen Dateien überall steht: Hinweise | Die feste Kollisionsstelle paralleler Sessions fällt weg (B-03) | mittel (Umbau an den Prüfungen, die jeden Push bewachen) | Tests der Prüfskripte zuerst anpassen und einmal absichtlich brechen; ein Probe-Merge mit Code ohne Versionsnummer muss durchgehen, **[geändert, P3-23d]** geprüft lokal gegen das Skript auf einem Probe-Branch, nicht als Push; ein Push auf `main` weiterhin nicht; für den Umbau ein eigenes Review | Etappen 0 bis 3 erledigt; F-15 beantwortet (**erfüllt**, E-64); **[geändert]** in der Reihenfolge nach 22 (7.7) | **[geändert, E-66]** Opus für Nachmessen und Umbau (bisher Fable); das Modell der manuellen Session nennt der Orchestrator mit dem Prompt | **[geändert, E-66]** drei Teile: (1) Nachmessen (`refactor-analyst`); (2) manuelle Session des Projektleiters für Regel und ADR, danach Review durch den `refactor-reviewer`; (3) Umbau der Skripte als Subagent mit eigenem Review. Einzelheiten: Hinweise | ja; **[geändert, P3-23c]** erweitert: `release.ts` und `gruener-stand.ts` ganz, der Abschnitt «Versionen» in `docs/ci-cd-und-release.md`; welche Fassung von `version-merge.ts` den Push des Merges prüft, der sie ändert; was der Release-Job und `scripts/ci/versionsnotizen.sh` unter der neuen Regel tun (nur lesen); wer die Stufe wählt und welche Nummer als erste folgt | offen |
+| 24 | **Dauerbetrieb.** In der Projekt-`CLAUDE.md` wird der Block «Übergangsregeln» aufgelöst: Was bleibt, wird Dauerregel, der Rest und der Verweis auf dieses Dokument entfallen. **[geändert, 1e P3-24c]** Mit dem Auflösen des Blocks endet der Feature-Stopp. Der Skill `tco-branching` enthält nur noch Ablauf, mit dem Rhythmus aus E-17 (README, Versionen und Doku-Abgleich vor einer Auslieferung, nicht nach jedem Issue; Beobachtungen bleiben) **[geändert]** und einem Satz zur CI auf dem Branch (C-19). Die Vorschläge «nach dem Refactoring» aus Anhang B für Dateien ausserhalb des Repos stehen als Einträge in der gemeinsamen `beobachtungen.md`. **[geändert, E-68]** Der Satz unter «Tests» zur Suche in den E2E wird so gefasst, wie er gilt (C-18); der Bestand bleibt. **Nicht in diesem Schritt [geändert]:** die Hinweise am Prüfwerkzeug (Nachtrag zur Etappe 3, E-67), die Fallen aus dem Session-Gedächtnis (E-69), der Satz zu den Listen der Mitglieder (C-16, schon eingespielt, E-70) | `CLAUDE.md`, `.claude/skills/tco-branching/SKILL.md`, `.claude/agents/` (die drei `refactor-*`-Agenten entfernen oder behalten: entscheidet der Projektleiter; **[geändert, P3-24d]** bleiben sie, fällt der Satz «Test vor der Regel committen» aus dem Auftrag des Implementers) | Neue Sessions bauen im Zielstil weiter; die Doku-Pflichten sind gebündelt (B-01, A-03, A-05) | niedrig | Entwurf dem Projektleiter zeigen, bevor die Datei ersetzt wird; `make docs`; **[geändert, E-66]** danach Review durch den `refactor-reviewer` | 23 | **[geändert, E-66]** nennt der Orchestrator mit dem Prompt (bisher Fable) | **[geändert, E-66]** manuelle Session des Projektleiters (Entwurf zeigen, Freigabe, ersetzen); der Orchestrator liefert Modell, Copy-Paste-Prompt und was die Session in dieses Dokument schreibt (Hinweise) | nein | offen |
+| 25 | Abschluss: Bleibendes steht in arc42 und ADRs, dieses Dokument ist als abgeschlossen markiert, #80 geschlossen. **[geändert, 1e P3-25c]** Dass der Feature-Stopp beendet ist, wird hier nur bestätigt; er endet in Schritt 24 (bisher stand hier «Feature-Stopp aufgehoben»). **[geändert, 1d P2-25, 1e P3-25a]** Die Punkte mit der Zuordnung «Beobachtung» aus 1c (Tabelle N), 1d (Tabellen H und N) und 1e (Tabelle H3) stehen als Einträge in `docs/beobachtungen.md`, gebündelt nach Thema; wo ein Eintrag schon besteht, wird er ergänzt, nicht verdoppelt (H3-04, H3-05, H3-13); sonst liest sie nach dem Abschluss niemand mehr (N-25). **[geändert, E-69, E-65]** Dazu geht «Fallen aus dem Session-Gedächtnis stehen im Repo» als Beobachtung für einen eigenen Vorgang nach dem Abschluss hinüber; die Ergänzung B aus Schritt 19 bleibt Beobachtung, bis Test in Betrieb geht | `docs/arc42.md`, `docs/adr/`, dieses Dokument; **[geändert]** `docs/beobachtungen.md`, `docs/index.md`, `docs/context-scopes.md` (Zeile «Refactoring»), die vier Protokoll-Dateien (Vermerk «abgeschlossen»; 1e P3-25b) | Sauberes Ende | niedrig | `make check`, `make docs` | alle | **[geändert, 1e P3-25d]** Opus (bisher Sonnet: Bündeln nach Thema und Abgleich mit dem Bestand sind Urteilsarbeit [V]) | manuelle Session (Orchestrator); **[geändert, E-66]** den Abschluss macht der Projektleiter | nein | offen |
 
 **Hinweise zu Schritt 21** [neu]
 
@@ -3107,13 +3577,115 @@ Schritt nimmt jeden auf oder verwirft ihn ausdrücklich im Bericht:
   Merge trägt damit Code im Sinn von E-07 und braucht wohl eine Version, obwohl der Schritt
   sonst nur Doku ist [V: `version-merge.ts` nicht gelesen]. Der Umsetzer prüft das vorab und
   nennt es im Bericht.
+  **[geändert, E-67]** Der Punkt ist erledigt: Der Kommentar geht in den Nachtrag zur Etappe 3
+  (oben), Schritt 21 hat keine Zeile mehr unter `src/` und kostet keine Version. Die Vermutung
+  ist geklärt: `nur-doku.ts` zählt nur `docs/` und `.md` als Doku (1e, P3-21d).
 - **UI-Leitbild:** Stand ist der Bericht des Nachtrags zur Etappe 2 (7.5). Offen bleiben kann
-  dort nur, was der Nachtrag ausdrücklich nicht gedeckt hat.
+  dort nur, was der Nachtrag ausdrücklich nicht gedeckt hat. **[geändert]** Fest im Schritt ist
+  der Satz zur Reihenfolge der Design-Dateien, der die Prüfung nennt (H3-02).
+- **[neu] Umfang (1e, P3-21):** Der Schritt ist ganz offen. `docs/arc42.md`,
+  `docs/testkonzept.md`, `docs/index.md` und `README.md` nennen von den Bausteinen der Etappen 0
+  bis 2 heute fast nichts; die Bausteinsicht führt die Seiten noch mit «fetch, JSON» zur
+  Schnittstelle [G in 1e]. Er bleibt reine Doku; das Review prüft jede neue Aussage am Code.
+
+**Hinweise zu Schritt 23** [neu]
+
+- **Herkunft:** F-15 mit A (E-64) und 1e (N-27, N-28, P3-23a bis P3-23d); der Ablauf mit E-66.
+- **Was feststeht (E-64):** Eine Version entsteht nur noch beim Release `dev` → `main`; Merges
+  nach `dev` sammeln ihre Einträge unter «Unveröffentlicht»; die neue ADR nennt «Test geht in
+  Betrieb» als Anlass, die Regel neu anzusehen; bis der Schritt gemergt ist, gilt die heutige
+  Regel.
+- **Wo die heutige Regel steht** [G in 1e, Textsuche]: `docs/ci-cd-und-release.md` dreimal
+  (Mermaid «Merge nach dev, neue Nummer», Tabelle der Prüfungen, Abschnitt «Versionen»),
+  `docs/arc42.md:70`, `docs/adr/adr-index.md`, im Skill in Schritt 4, im Release-Ablauf und in
+  der Konfliktregel, `Makefile:101`, `.github/workflows/check.yml:503` (Kommentar). Die
+  Zeilennummern gelten für den Stand `4c7b340`.
+- **Was die Revision am Code gelesen hat:** `release.ts` verlangt das meiste von Antwort A schon
+  («Version gestiegen, sobald Code dabei», «Abschnitt zuoberst», «Unveröffentlicht leer, wenn
+  sich die Version ändert»); umzubauen sind `version-merge.ts` und der Hook. Gelesen, nicht
+  erprobt; das Nachmessen bestätigt es.
+- **Teil 1, Nachmessen** (`refactor-analyst`, Opus): was die Zeile nennt; Ergebnis hier und in
+  der Zeile. Der Dependabot-PR #86 wird nicht zwischen Nachmessen und Merge gemergt (N-34).
+- **Teil 2, manuelle Session des Projektleiters** (Regel und ADR; Modell und Prompt vom
+  Orchestrator). **Zu entscheiden:**
+  - der Wortlaut der Regel und der Zeitpunkt: wer die Nummer vergibt und wann (die Revision
+    nennt den Doku-Abgleich vor dem PR `dev` → `main`);
+  - die Stufe: wann ein Release eine Korrektur und wann eine Nebenversion ist, und wer wählt;
+  - welche Nummer der Merge von Schritt 23 selbst trägt (er läuft noch unter der heutigen Regel)
+    und welche Nummer als erste nach der neuen Regel folgt;
+  - «Unveröffentlicht»: wer bei einem Merge nach `dev` den Eintrag schreibt, in welcher Form,
+    und ob eine Prüfung ihn verlangt (was `version-merge.ts` und der Hook danach noch prüfen)
+    oder ob beide für `dev` entfallen;
+  - dass die Fusszeile zwischen zwei Releases dieselbe Nummer zeigt und zwei Stände auf `dev`
+    der Commit unterscheidet: annehmen (eine Anzeige des Commits wäre neue Funktion);
+  - die ADR: Nummer, Titel, Status von ADR-007 («abgelöst»), der Anlass «Test geht in Betrieb»
+    samt dem Einwand aus ADR-007;
+  - der Kommentar in `check.yml` und der Hilfetext im `Makefile`: ändern oder ausdrücklich
+    stehen lassen;
+  - ob der letzte Satz von E-01 mit dem Schritt ebenfalls endet (Lesart von E-64);
+  - Umfang, Dateiliste und Abbruchstellen für Teil 3.
+- **Die Session schreibt in dieses Dokument:** je Festlegung eine Zeile in Abschnitt 8 ab der
+  nächsten freien Nummer, mit Datum; in der Zeile 23 den Status; hier einen Absatz «Ergebnis
+  Schritt 23, Teil 2» mit Nummer und Titel der ADR, dem Wortlaut der Regel, der Dateiliste und
+  den Abbruchstellen für Teil 3; 6.2 Punkt 7 und Anhang B.1c bestätigt oder berichtigt; «Stand
+  und nächster Schritt». Was sie sonst schreibt: den Entwurf der ADR. Danach prüft der
+  `refactor-reviewer`.
+- **Teil 3, Umbau** (Subagent, Opus, eigenes Review): Prüfskripte mit Tests, Hook, Skill, die
+  übrige Doku, `Makefile`. Tests der Prüfskripte zuerst, einmal absichtlich gebrochen; der
+  Probe-Merge lokal gegen das Skript (`node scripts/pruefungen/version-merge.ts <bereich>` auf
+  einem Probe-Branch), nicht als Push.
+- **Lesart dieses Laufs, nicht entschieden:** Alle drei Teile laufen auf einem Branch
+  `refactor/schritt-23` und kommen mit einem Merge («ein Schritt, ein Branch»); die Session
+  schreibt nur die ADR mit Index und arc42 Kapitel 4, alles, was die Regel wirksam macht
+  (Skripte, Hook, Skill, `docs/ci-cd-und-release.md`), ändert Teil 3, damit Regel und Werkzeug
+  zusammen wechseln. Der Orchestrator bestätigt oder ändert das mit dem Prompt.
 
 **Hinweise zu Schritt 24** [neu]
 
 - **Entwurf der Dauerregeln:** C-7 bis C-10 (1c, Tabelle C, Teil 2) und C-12 bis C-15 (1d,
   Tabelle C2, Teil 2). C-13 löst den Satz der benannten Ausnahmen aus C-11 (E-57) ab.
+  **[geändert, 1e P3-24a]** C-17 ersetzt C-13 (der Halbsatz zu `fetch` sagt, was ESLint seit 20a
+  durchsetzt); dazu C-18 (Suche in den E2E, E-68) für die `CLAUDE.md` und C-19 (CI auf dem
+  Branch) für den Skill (1e, Tabelle «Entwurf für Schritt 24»). C-16 gehört nicht mehr dazu
+  (E-70).
+- **[neu] Zu entscheiden in der manuellen Session des Projektleiters** (Modell und Prompt vom
+  Orchestrator, E-66):
+  - je Entwurf C-7 bis C-10, C-12, C-14, C-15, C-17 und C-18: annehmen, ändern oder verwerfen,
+    im endgültigen Wortlaut; geprüft an der Aufnahmeregel (keine Schritt- und
+    Entscheid-Nummern, kein «seit», kein «Warum»);
+  - welche Sätze des Blocks ersatzlos entfallen (Feature-Stopp und Ausnahme #81, «ein Schritt,
+    ein Worktree, ein Branch», voller `make check` nach jedem Schritt, Orchestrator im
+    Hauptordner, Stand nur in diesem Dokument) und ob die Regel zur Importrichtung samt
+    `AUSNAHMEN` Dauerregel wird;
+  - dass der Feature-Stopp mit dem Auflösen endet (P3-24c), und ab wann;
+  - der Skill `tco-branching`: C-19; der Doku-Rhythmus «vor einer Auslieferung» (E-17, B.1d);
+    was vom Abschnitt «Betrieb mit Subagenten» bleibt; abgestimmt auf das, was Schritt 23 im
+    Skill geändert hat;
+  - die drei `refactor-*`-Agenten: entfernen oder behalten; bleiben sie, fällt der Satz «Test
+    vor der Regel committen» aus dem Auftrag des Implementers (H3-15);
+  - die Vorschläge B.3d und B.4b für Dateien ausserhalb des Repos: als Einträge in die
+    gemeinsame `beobachtungen.md` (E-25); B.7 bleibt, bis der Server in Betrieb geht.
+- **[neu] Die Session schreibt in dieses Dokument:** je Festlegung eine Zeile in Abschnitt 8
+  (darunter das Ende des Feature-Stopps mit Datum); in der Zeile 24 den Status; hier einen
+  Absatz «Ergebnis Schritt 24»: welcher Entwurf in welchem Wortlaut gilt, was entfallen ist, was
+  mit den Agenten geschah; in 1c, 1d und 1e bei den Tabellen C, C2 und C3 den Vermerk
+  «eingespielt» oder «verworfen»; Anhang A (der Block ist aufgelöst) und den Stand in Anhang B
+  (B.1d, B.3d, B.4b); «Stand und nächster Schritt». Danach prüft der `refactor-reviewer`, ob
+  jede neue Dauerregel am Code hält (Textsuche wie in 1e, Tabelle «Prüfung je Regel»), und
+  `make docs`.
+- **[neu] Nicht in dieser Session:** die Hinweise am Prüfwerkzeug (Nachtrag zur Etappe 3,
+  E-67); die Fallen aus dem Session-Gedächtnis (E-69); ein Abbau der 146 Suchen über
+  CSS-Selektoren in den E2E (E-68: der Bestand bleibt).
+
+**Hinweise zu Schritt 25** [neu]
+
+- **Übergabe der Beobachtungen (1e, P3-25a):** rund 25 Punkte aus 1c, 1d und 1e [E: Zählung in
+  1e]; bündeln nach Thema; bestehende Einträge ergänzen, nicht verdoppeln. Dazu der Punkt aus
+  6.2, Punkt 6 (E-69). Die Ergänzung B aus Schritt 19 hat ihren Eintrag schon; er bekommt
+  H3-04 und H3-05 und den Vermerk «aufnehmen, wenn Test in Betrieb geht» (E-65). Der Eintrag zu
+  den CSS-Suchen bekommt die Zahlen aus 1e, C3 (b).
+- **Abschluss:** Die Übergabe und das Markieren bereitet eine Session vor (Opus); den Abschluss
+  macht der Projektleiter (E-66).
 
 ### 7.7 Reihenfolge, Checkpoints, Abbruch [geändert]
 
@@ -3146,13 +3718,33 @@ Schritt nimmt jeden auf oder verwirft ihn ausdrücklich im Bericht:
     an; 20 räumt in der Oberfläche und in den Tests auf. Technisch zwingend ist die Reihenfolge
     nicht (die Lint-Regel hätte heute 0 Meldungen, E.6); sie ist so entschieden, damit 20 klein
     bleibt und das Prüfwerkzeug ein eigenes Review bekommt (F-32, Antwort A, E-56).
-- **Etappe 4:** 21 → 22 → 23 → 24 → 25, unverändert. F-15 vor 23.
+  - **[geändert] Stand 15.11.2026:** umgesetzt, Nachtrag zur Etappe 2 und 19 bis 20a gemergt
+    (Versionen 0.22.6 bis 0.22.9). Die Zwischenrevision am Etappenende ist erledigt (Abschnitt
+    1e, E-64 bis E-70).
+- **Etappe 4 [geändert]: Nachtrag zur Etappe 3 → 21 → 22 → 23 → 24 → 25** (E-66, E-67). F-15 ist
+  beantwortet (E-64).
+  - *Nachtrag vor 21 [neu]:* Der Nachtrag (7.6) ist kein Plan-Schritt. Er kommt vor 21, weil
+    beide `docs/ci-cd-und-release.md` ändern und weil 21 so reine Doku bleibt (der Kommentar in
+    `grundlagen.css` geht mit dem Nachtrag).
+  - *22 nach 21 [geändert]:* Beide ändern `docs/index.md`; die Voraussetzung «11» in der Zeile 22
+    war veraltet (1e, P3-22a).
+  - *23 nach 22, nicht davor:* 21 und 22 hängen an nichts aus 23. «23 zuerst, damit die Etappe
+    keine Version mehr kostet» lohnt nicht: Nachtrag und Schritt 23 kosten ohnehin je eine, 21
+    und 22 keine (1e, «Reihenfolge geprüft»).
+  - *24 nach 23:* Beide ändern den Skill. *25 zuletzt.*
 - **Kosten nach E-07 [geändert]:** Die Etappe 0 hat vier Versionen erzeugt (0.20.6 bis 0.20.9).
   Die Etappe 1 hat zehn gebraucht (0.20.10 bis 0.20.19: neun Schritte; 0.20.15 stammt aus
   einer parallelen Session [G: `docs/versionen.md`]). Die Etappe 2 hat sieben gebraucht
   (0.20.20, 0.20.21, 0.22.1 bis 0.22.5; 0.22.3 ist der Nachtrag E-54), dazwischen zwei von #81
-  (0.21.0, 0.22.0) [G: `docs/versionen.md`, gelesen in der Revision 1d]. Die Etappe 3 kostet
-  mindestens drei (19, 20, 20a), dazu eine für den Nachtrag zur Etappe 2 [V].
+  (0.21.0, 0.22.0) [G: `docs/versionen.md`, gelesen in der Revision 1d]. **[geändert, 1e
+  P3-77]** Die Etappe 3 hat vier gebraucht: 0.22.6 (Nachtrag zur Etappe 2), 0.22.7 (19), 0.22.8
+  (20), 0.22.9 (20a) [G in 1e: `package.json` je Merge; 0.22.9 beim Einarbeiten nachgeprüft]. Die Schätzung,
+  die hier stand («mindestens drei, dazu eine für den Nachtrag» [V]), ist damit bestätigt.
+  Zusammen sind es seit dem letzten Stand auf `main` (0.20.5) 27 Nummern, 24 davon vom
+  Refactoring; keine ist je ausgeliefert worden (1e, F-15). **Etappe 4:** höchstens zwei (der
+  Nachtrag zur Etappe 3 und der Merge von Schritt 23, beide noch nach der heutigen Regel, E-64)
+  [V: sofern 21, 22, 24 und 25 reine Doku bleiben]; danach vergibt ein Merge nach `dev` keine
+  Nummer mehr.
 
 **Vorab nachzumessen [geändert]** (durch `refactor-analyst`, Ergebnis beim Schritt eintragen):
 
@@ -3168,21 +3760,22 @@ Schritt nimmt jeden auf oder verwirft ihn ausdrücklich im Bericht:
 | 16 [neu] | kurz: nur die Doppel-Seite (passt die Ablauf-Funktion der CM-Seite?) | aufnehmen oder ausdrücklich verwerfen. **Erledigt** 14.11.2026 (Anhang E.10): **aufnehmen** (drei Handler, zweiter Teil mit Abbruchstelle); sieben der acht Handler der CM-Seite passen ohne Rest; vier Vorab-E2E zum Fokus; keine Frage |
 | 19 [geändert] | was das Bordmittel von SvelteKit deckt; Name und Ort der Versionskennung; der Service Worker; Folge für E-27 und für «neu ausgeliefert, gleiche Versionsnummer»; Kennung und Paketversion, ohne F-15 vorwegzunehmen (Zeile 19, 1d P2-19b) | Checkpoint: Bordmittel oder nur entfernen. **Erledigt** 14.11.2026 (Anhang F.1): Bordmittel aktiv, lädt nur im Fehlerfall neu; Kennung bleibt der Zeitstempel; Fragen **F-35** und **F-36** |
 | 20 [geändert] | ungenutzte Exporte je Name bestätigen; was vom festen Turnierjahr offen ist; welche E2E der Verwaltung die Bestätigung selbst prüfen; die Stellen für Hinweis (d) (1d P2-20c) | Liste des Schritts; je Hinweis «aufnehmen oder verwerfen». **Erledigt** 14.11.2026 (Anhang F.3): 3 Namen entfernen, 25 nur `export` weg; sechs Hinweise aufnehmen, fünf verwerfen; zwei Läufe (Sonnet, Opus); Frage **F-37** (Spur in der CI) |
-| 23 | `release.ts`, `gruener-stand.ts`, Abschnitt «Versionen» | davor **F-15** |
+| 23 [geändert] | `release.ts` und `gruener-stand.ts` ganz, Abschnitt «Versionen»; welche Fassung von `version-merge.ts` den Push des Merges prüft, der sie ändert; Release-Job und `scripts/ci/versionsnotizen.sh` unter der neuen Regel (nur lesen); Stufe und erste Nummer (Zeile 23, 1e P3-23c) | Grundlage der manuellen Session (Regel, ADR) und des Umbaus. F-15 ist beantwortet (E-64). **Offen** |
 
 Erledigt: Nachmessen für Schritt 04 (Anhang C.3), 07 (Anhang D.3), 08 (Anhang D.5), 09 (Anhang D.7), 10 (Anhang D.9), 11 (Anhang D.11), 13 (Anhang E.1), 15 (Anhang E.5; Lauf 1b Anhang E.7), 16 (Anhang E.10), 19 (Anhang F.1), 20 (Anhang F.3). [geändert] Kein Nachmessen: 06, 06a, 12, 12a, 14, 17, 18, 20a, 21,
-22, 24, 25; auch der Nachtrag zur Etappe 2 braucht keines (die Belege stehen in 1d).
+22, 24, 25; auch der Nachtrag zur Etappe 2 braucht keines (die Belege stehen in 1d), ebenso
+der Nachtrag zur Etappe 3 (die Belege stehen in F.6 und 1e).
 
 **Checkpoints [geändert]** (für die Etappen 1 und 2 entschieden mit E-26 und E-30, für die
-Etappe 3 mit E-59):
+Etappe 3 mit E-59, für die Etappe 4 mit E-66):
 
 | Etappe | Art | Checkpoint |
 |--------|-----|------------|
 | 0 Sicherheitsnetz | kein Kern | **erledigt am 11.11.2026:** Freigabe der `CLAUDE.md` in Schritt 01 (E-23); Checkpoint am Etappenende mit Zwischenrevision (Abschnitt 1b), Nachweis E2E dreimal voll grün auf `bad624f` und CI grün, Entscheide E-28 bis E-32 |
 | 1 Server | **Kern der Anwendung** | **Nach jedem Schritt** (06, 06a, 07 bis 12) ein kurzer Bericht (was geändert, Prüfergebnis, Abweichung vom Plan) und weiter auf «ok» (E-30). Besonders 07, 08, 09 und 11 (Risiko mittel). Zusätzlich vor Schritt 09: Antwort auf F-17. Am Etappenende (nach dem Merge von 12) eine Zwischenrevision wie 1b |
 | 2 Oberfläche | **Kern der Anwendung** | **Nach jedem Schritt** (Ok für die Etappe mit E-41). Zusätzlich in Schritt 17 der Checkpoint **vor** dem Merge (Vorher-Nachher-Bild, E-21). **[geändert] Gelaufen ohne Halt mit Kurzbericht je Schritt (E-45); erledigt am 14.11.2026:** Checkpoint E-21 (E-52, E-53), Zwischenrevision und Checkpoint am Etappenende (Abschnitt 1d, E-55 bis E-60) |
-| 3 Altlasten | kein Kern | **[geändert, E-59]** Ohne Halt mit Kurzbericht je Schritt, wie die Etappe 2; Halt bei den Anlässen aus E-45. **Schritt 19:** Checkpoint nach dem Nachmessen (Bordmittel oder nur entfernen) bleibt, weil E-09 diese Wahl dem Projektleiter vorbehält; nach dem Schritt ein Kurzbericht, Halt nur, wenn sich für die Nutzerin sichtbar etwas ändert. *Das ist die Lesart dieses Laufs:* Die Zeile verlangte bisher auch nach dem Schritt einen Checkpoint, der Entscheid vom 14.11.2026 nennt Schritt 19 nicht eigens; der Projektleiter bestätigt oder berichtigt sie am Checkpoint nach dem Nachmessen. Schritte 20 und 20a: Kurzbericht. **Checkpoint am Etappenende** nach dem Merge von 20a (bisher: nach 20) |
-| 4 Doku und Arbeitsweise | kein Kern, aber Regeln | Ok für die Etappe mit E-58. Schritte 21 und 22: Etappenende. Schritte 23 und 24 sind selbst Dialog: Entwurf zeigen, Freigabe, dann umsetzen; vor 23 die Antwort auf F-15. Schritt 25: Abschluss durch den Projektleiter |
+| 3 Altlasten | kein Kern | **[geändert, E-59]** Ohne Halt mit Kurzbericht je Schritt, wie die Etappe 2; Halt bei den Anlässen aus E-45. **Schritt 19:** Checkpoint nach dem Nachmessen (Bordmittel oder nur entfernen) bleibt, weil E-09 diese Wahl dem Projektleiter vorbehält; nach dem Schritt ein Kurzbericht, Halt nur, wenn sich für die Nutzerin sichtbar etwas ändert. *Das ist die Lesart dieses Laufs:* Die Zeile verlangte bisher auch nach dem Schritt einen Checkpoint, der Entscheid vom 14.11.2026 nennt Schritt 19 nicht eigens; der Projektleiter bestätigt oder berichtigt sie am Checkpoint nach dem Nachmessen. Schritte 20 und 20a: Kurzbericht. **Checkpoint am Etappenende** nach dem Merge von 20a (bisher: nach 20). **[geändert] Erledigt am 15.11.2026:** gelaufen ohne Halt mit Kurzbericht, mit dem Checkpoint nach dem Nachmessen zu Schritt 19 (E-61, E-62) und der Frage F-37 (E-63); Zwischenrevision und Checkpoint am Etappenende (Abschnitt 1e, E-64 bis E-70) |
+| 4 Doku und Arbeitsweise | kein Kern, aber Regeln | Ok für die Etappe mit E-58; **[geändert, E-66]** der Ablauf: Nachtrag zur Etappe 3 und Schritte 21 und 22 ohne Halt mit Kurzbericht (Halt bei den Anlässen aus E-45). **Schritte 23 und 24 sind die Checkpoints:** manuelle Sessions des Projektleiters (Entwurf zeigen, Freigabe, dann umsetzen), je mit Modell und Copy-Paste-Prompt vom Orchestrator und Review durch den `refactor-reviewer` danach; bei 23 davor das Nachmessen, danach der Umbau als Subagent mit eigenem Review. F-15 ist beantwortet (E-64). **Schritt 25:** Abschluss durch den Projektleiter |
 
 **Abbruch:** Die Etappen 0 und 1 lohnen sich in jedem Fall. Nach jedem Schritt der Etappe 2
 kann angehalten werden. Etappe 4 ist auch dann nötig, wenn Etappe 2 oder 3 gekürzt wird, denn
@@ -3200,7 +3793,7 @@ sie hebt die Übergangsregeln auf.
 | **E-04** | Tracking: Sammel-Issue #80 auf GitHub; der Status je Schritt steht nur in diesem Dokument. |
 | **E-05** | Rollen: Die Orchestrator-Session plant und delegiert. `refactor-analyst` analysiert und misst nach, `refactor-implementer` setzt genau einen Schritt pro Lauf um (Schritte strikt nacheinander), `refactor-reviewer` prüft unabhängig. Definitionen unter `.claude/agents/`. |
 | **E-06** | Nie ohne ausdrückliches Ok des Projektleiters: Push auf `main`, Release, Prod-Deploy, Secrets, Kosten, Kontakt nach aussen, neue Abhängigkeiten. Endgültig gelöscht wird nur, was der Plan vorsieht und freigegeben ist. |
-| **E-07** | (F-01, 11.11.2026) Während des Refactorings bleibt «jeder Merge mit Code bekommt eine Version» unverändert. Danach entsteht eine Version nur noch, wenn ein Stand auf Test ausgeliefert wird (Schritt 23). |
+| **E-07** | (F-01, 11.11.2026) Während des Refactorings bleibt «jeder Merge mit Code bekommt eine Version» unverändert. Danach entsteht eine Version nur noch, wenn ein Stand auf Test ausgeliefert wird (Schritt 23). **[geändert am 15.11.2026 durch E-64]** Der zweite Satz gilt nicht mehr in diesem Wortlaut: Nach dem Refactoring entsteht eine Version nur noch beim Release `dev` → `main`. Der erste Satz gilt, bis Schritt 23 gemergt ist. |
 | **E-08** | (F-02, 11.11.2026) Die Migrationen werden erst unmittelbar vor dem ersten Live zusammengelegt, als eigener Vorgang ausserhalb des Refactorings. Im Refactoring bleibt `drizzle/` unverändert. |
 | **E-09** | (F-03, 11.11.2026) Alte offene App-Versionen: Lösung mit den Bordmitteln von SvelteKit, der Eigenbau «Mindestversion» wird entfernt. Vor dem Schritt wird geprüft, ob das die Anforderung deckt; sonst nur entfernen und die Doku korrigieren (Schritt 19). |
 | **E-10** | (F-04, 11.11.2026) Der zweite Build als statische App bleibt bei jeder Prüfung. |
@@ -3257,12 +3850,22 @@ sie hebt die Übergangsregeln auf.
 | **E-61** [neu] | (F-35, 14.11.2026) Antwort B: Schritt 19 entfernt den Eigenbau (`MINDESTVERSION`, `istVersionVertraeglich`, `mindestversion` in `/api/status`) und baut die Ergänzung zum Bordmittel von SvelteKit: Hat die App eine neue Auslieferung bemerkt, lädt der nächste angetippte Link die Seite einmal ganz neu; nur Links, nicht `goto` und nicht die Zurück-Geste; die Rückfrage «Nicht gespeichert» kommt vorher. `version.name` wird nicht gesetzt. Die Zusage «Mindestversion» fällt aus der Doku; eine erzwungene Mindestversion wäre neue Funktion. Geht die Ergänzung nicht auf (Abbruchstellen in F.1), endet der Schritt mit A (nur Bordmittel, Doku beschreibt den Fehlerfall). Die kleine sichtbare Änderung ist damit freigegeben. **Ausgang (14.11.2026): umgesetzt ist A.** Die Ergänzung tat das Richtige, erzeugte auf WebKit aber Konsolenfehler aus abgebrochenen Abrufen (Abbruchstelle 2, dem Sinn nach; Anhang F.2). B bleibt als Beobachtung für nach dem Feature-Stopp (`docs/beobachtungen.md`). |
 | **E-62** [neu] | (F-36, 14.11.2026) Antwort A: Nach Schritt 19 genügt ein Kurzbericht, kein Halt vor dem Merge. |
 | **E-63** [neu] | (F-37, 14.11.2026) Antwort B: Die CI zeichnet eine Spur (Playwright-Trace) nur auf, wenn der Workflow von Hand mit einem Schalter gestartet wird. Push- und PR-Läufe bleiben unverändert: keine zusätzliche Laufzeit, keine Wiederholungen. Umgesetzt in Schritt 20, Lauf 2 (Commit 10, F.5). |
+| **E-64** [neu] | (F-15, 15.11.2026, Checkpoint Etappe 3) Antwort A: Nach dem Refactoring entsteht eine Versionsnummer nur noch beim Release `dev` → `main`. Merges nach `dev` vergeben keine Nummer mehr und sammeln ihre Einträge unter «Unveröffentlicht». Die Regel wird neu angesehen, wenn Test in Betrieb geht. **Das ändert den Wortlaut von E-07** («wenn ein Stand auf Test ausgeliefert wird»): Test wird bei jedem Merge nach `dev` mit Code ausgeliefert, die alte Fassung wäre dann wieder «je Merge» gewesen (1e, N-27). Bis Schritt 23 gemergt ist, gilt die heutige Regel weiter: jeder Merge mit Code eine Nummer. Umsetzung in Schritt 23. Lesart dieses Laufs, nicht eigens entschieden: Auch der letzte Satz von E-01 («Bei Code vergibt der Merge eine Patch-Version») gilt nur bis dahin. |
+| **E-65** [neu] | (F-38, 15.11.2026) Antwort A: Die Ergänzung B aus Schritt 19 (nach einer neuen Auslieferung lädt der nächste angetippte Link ganz neu) bleibt Beobachtung, bis Test in Betrieb geht. Kein Schritt, keine Ausnahme vom Feature-Stopp. |
+| **E-66** [neu] | (F-39, 15.11.2026) Antwort A: Die Etappe 4 läuft mit den Änderungen der Zwischenrevision (Abschnitt 1e: Z3, P3, die Zuordnung der Tabellen H3 und N). Schritte 21 und 22 ohne Halt mit Kurzbericht, als Subagent. Schritte 23 und 24 als manuelle Sessions des Projektleiters: Der Orchestrator liefert je das Modell, einen Copy-Paste-Prompt und was die Session in dieses Dokument schreiben muss; danach Review durch den `refactor-reviewer`. Schritt 23 läuft, wie die Revision vorschlägt, in drei Teilen: Nachmessen (`refactor-analyst`), manuelle Session für Regel und ADR, Umbau der Skripte als Subagent mit Review. Schritt 25 schliesst der Projektleiter ab. E-45 gilt für die Läufe ohne Halt weiter. |
+| **E-67** [neu] | (F-40, 15.11.2026) Antwort A: kleiner Nachtrag zur Etappe 3 vor Schritt 21, mit eigenem Review: die fünf Hinweise aus dem Review von Schritt 20a am Prüfwerkzeug (1e, H3-03), die strengere fetch-Regel nur eng (`window.fetch`, `globalThis.fetch`, `self.fetch`), und der Kommentar in `src/lib/design/grundlagen.css`. Branch `refactor/nachtrag-etappe-3`; er läuft parallel bei einem Implementer, das Ergebnis trägt der Orchestrator nach (7.6). Die Hinweise sind damit nicht mehr Merkpunkte für Schritt 24; Schritt 21 ist reine Doku. |
+| **E-68** [neu] | (F-41, 15.11.2026) Antwort B: Die Dauerregel der `CLAUDE.md` zur Suche in den E2E («über Rolle und Beschriftung, nicht über CSS-Klassen») wird in Schritt 24 so gefasst, wie sie gilt (Entwurf C-18 in 1e). Der Bestand (146 Suchen über einen CSS-Selektor) bleibt. |
+| **E-69** [neu] | (F-42, 15.11.2026) Antwort B: «Fallen aus dem Session-Gedächtnis stehen im Repo» (Zielbild 6.2, Punkt 6) ist nicht Teil des Plans. Der Punkt wird Beobachtung (Übergabe in Schritt 25) und nach dem Abschluss ein eigener Vorgang; im Zielbild ist er so gekennzeichnet. |
+| **E-70** [neu] | (F-43, 15.11.2026) Antwort A: Der Satz der Projekt-`CLAUDE.md` unter «Tests» wird jetzt berichtigt (C-16 aus 1e); der Orchestrator spielt ihn ein. Bisher: «Eine neue Liste der Verwaltung kommt in `tests/hilfen/verwaltungs-listen.ts` und in die Tabelle der Bauregel; eine neue Liste der Mitglieder in Grundprüfung und Routen-Test.» Neu: derselbe Satz mit dem Schluss «…; eine neue Liste der Mitglieder in `tests/hilfen/mitglieder-listen.ts`.» Eingespielt am 15.11.2026 (Orchestrator). |
 
 ---
 
 ## 9 Fragen [geändert]
 
-Siebenunddreissig Fragen an den Projektleiter (F-01 bis F-37). **[geändert] Offen ist eine: F-15** (vor Schritt 23). F-35, F-36 und F-37 sind beantwortet (E-61, E-62, E-63).
+Dreiundvierzig Fragen an den Projektleiter (F-01 bis F-43). **[geändert] Offen ist keine.** F-15 ist
+am Checkpoint der Etappe 3 beantwortet (15.11.2026, A, E-64), ebenso F-38 bis F-43 (jede wie
+empfohlen, E-65 bis E-70); sie stehen in 9.2, ihr voller Wortlaut und die Aufbereitung von F-15 in
+Abschnitt 1e. F-35, F-36 und F-37 sind beantwortet (E-61, E-62, E-63).
 F-17 und F-20 bis F-30 stehen noch unter 9.1, sind aber beantwortet oder erledigt: F-17, F-20 und
 F-21 mit E-36 bis E-38, F-24 bis F-27 am Checkpoint der Etappe 1 mit E-41 bis E-44 (12.11.2026,
 jede wie empfohlen), F-28 und F-29 mit E-48 und E-49 (13.11.2026), F-30 mit E-51 (14.11.2026); F-22 hat der Ablauf erledigt, F-23 ist in F-26 aufgegangen. **[neu]** F-31 bis F-34 sind am Checkpoint der Etappe 2 beantwortet
@@ -3479,8 +4082,13 @@ keine Antwort etwas.
   Schritt 07.
 - **Stand nach Schritt 07:** Skripte und Tests bauen ihre Dienste unverändert selbst (Lesart A).
 
-**F-15 [OFFEN] — Wann steigt die Version, solange es die Test-Umgebung noch nicht gibt?**
+**F-15 [BEANTWORTET 15.11.2026: A in der Fassung von 1e, E-64] — Wann steigt die Version, solange es die Test-Umgebung noch nicht gibt?**
 (E-07; Schritt 23)
+
+**[geändert]** Die Zwischenrevision der Etappe 3 hat die Frage neu gefasst («Welches Ereignis
+macht eine Version?», Abschnitt 1e, N-27); entschieden ist Antwort A jener Fassung: beim Release
+`dev` → `main`, als Regel und nicht nur «bis Test läuft». Kurzfassung in 9.2. Darunter der
+Wortlaut, wie er bis zum Checkpoint hier stand.
 
 **Frist: vor Schritt 23.** Die Antwort auf F-01 bindet die Version an eine Auslieferung auf Test.
 Heute wird nirgends ausgeliefert. Ohne Zusatz gäbe es nach dem Refactoring gar keinen Anlass mehr
@@ -3648,6 +4256,13 @@ wurde.
 | **F-32** [neu] Bekommen die zwei Prüfungen (Lint-Regel zu `fetch`, Reihenfolge der Design-Dateien) einen eigenen Schritt? (H-07, H-13) | **A (14.11.2026):** eigener kleiner Schritt 20a nach Schritt 20, mit Opus | B: in Schritt 20 aufnehmen (20 würde grösser und bräuchte Opus). C: verwerfen; die Regeln hielte dann nur das Review | E-56 |
 | **F-33** [neu] Die drei Stellen gegen den Wortlaut der Regel «Ab Schritt 15»: jetzt benennen oder erst in Schritt 24? (E-49, Fall K; Tabelle C2 in 1d) | **A (14.11.2026):** jetzt mit einem Satz in der `CLAUDE.md` benennen (C-11); der Orchestrator spielt ihn ein | B: wie mit E-49 entschieden erst in Schritt 24 (bis dahin liegen sechs Schritte und #81 dazwischen, und die Regel ist als einzige ohne «neu» formuliert) | E-57 |
 | **F-34** [neu] Ok für die Etappen 3 und 4 mit den Änderungen der Zwischenrevision? Dazu: Protokolle auslagern? (Abschnitt 1d; N-21, N-24) | **A (14.11.2026):** ja, mit den Änderungen der Revision; das UI-Leitbild sofort, im selben Nachtrag wie F-31. Etappe 3 ohne Halt mit Kurzbericht je Schritt. Zusatz: ja, die Protokolle ziehen je Etappe in eine eigene Datei | B: ja, aber das Leitbild erst in Schritt 21 (die Dauerregel «erst Leitbild, dann Code» bliebe bis dahin verletzt). C: erst einzelne Punkte besprechen. Zusatz: Protokolle im Dokument lassen | E-58, E-59, E-60 |
+| **F-15** [geändert] Wann entsteht nach dem Refactoring eine Version? (E-07, N-27; Schritt 23; Aufbereitung in Abschnitt 1e, alter Wortlaut in 9.1) | **A (15.11.2026, Checkpoint Etappe 3):** nur noch beim Release `dev` → `main`; Merges nach `dev` sammeln ihre Einträge unter «Unveröffentlicht»; neu ansehen, wenn Test in Betrieb geht. Ändert den Wortlaut von E-07. Bis Schritt 23 gemergt ist, gilt die heutige Regel | B: gar nicht, bis Test läuft, danach je Auslieferung auf Test (E-07 wörtlich; ein Release mit Code scheiterte heute an `release.ts`, und sobald Test läuft, hiesse es wieder «je Merge»). C: nichts ändern, bis Test läuft (die Kosten bleiben, Schritt 23 entfiele in der Sache) | E-64 |
+| **F-38** [neu] Neuladen nach einer Auslieferung (Ergänzung B aus Schritt 19): bleibt es hinter dem Feature-Stopp? (E-61, F.2) | **A (15.11.2026):** bleibt Beobachtung und wird aufgenommen, wenn Test in Betrieb geht | B: jetzt nachholen als eigener Schritt der Etappe 4 (Verhaltensänderung oder gelockerte Prüfung, bräuchte eine Ausnahme vom Feature-Stopp). C: verwerfen und den Eintrag schliessen | E-65 |
+| **F-39** [neu] Wie läuft die Etappe 4? (Abschnitt 1e, Tabelle P3) | **A (15.11.2026):** mit den Änderungen aus P3; 21 und 22 ohne Halt mit Kurzbericht; 23 und 24 als manuelle Sessions des Projektleiters, mit Modell und Copy-Paste-Prompt vom Orchestrator und Review danach; 23 in drei Teilen; 25 schliesst der Projektleiter ab | B: Halt nach jedem Schritt. C: alle fünf ohne Halt, 23 und 24 als Subagent mit Entwurf und einer Freigabe am Schluss (23 und 24 legen Regeln fest, die über das Refactoring hinaus gelten) | E-66 |
+| **F-40** [neu] Die fünf Hinweise aus dem Review von 20a am Prüfwerkzeug: wohin? (H3-03, N-33) | **A (15.11.2026):** kleiner Nachtrag zur Etappe 3 vor Schritt 21 mit eigenem Review, zusammen mit dem Kommentar in `grundlagen.css`; die strengere fetch-Regel nur eng; Branch `refactor/nachtrag-etappe-3` | B: in Schritt 24 (der bräuchte dann den vollen `make check` und ein Review für Werkzeug). C: nur den falschen Pfad berichtigen, der Rest wird Beobachtung | E-67 |
+| **F-41** [neu] Die Regel «nicht über CSS-Klassen suchen» bei 146 Suchen im Bestand (N-32; Tabelle C3 in 1e) | **B (15.11.2026):** Der Wortlaut wird in Schritt 24 so gefasst, wie er gilt (C-18); der Bestand bleibt | A: Regel lassen, Bestand dulden (ein Review kann die Regel nicht mehr anwenden). C: Regel streng lassen und den Bestand als eigenen Vorgang abbauen (verlangt Rolle und Namen an Karten und Klappen, also Eingriffe, die ein Bildschirmleser hört) | E-68 |
+| **F-42** [neu] Zielbild 6.2 Punkt 6, «Fallen aus dem Session-Gedächtnis stehen im Repo», hat keinen Schritt (N-30, B-26) | **B (15.11.2026):** Beobachtung und eigener Vorgang nach dem Abschluss; im Zielbild entsprechend gekennzeichnet | A: in Schritt 24 aufnehmen (der Schritt mit dem meisten Dialog; das Gedächtnis liegt ausserhalb des Repos). C: Punkt streichen | E-69 |
+| **F-43** [neu] Den falschen Satz der `CLAUDE.md` zu den Listen der Mitglieder jetzt berichtigen? (C-16) | **A (15.11.2026):** jetzt; der Orchestrator spielt die Zeile ein | B: erst in Schritt 24 (vertretbar, weil Typfehler und Routen-Test auch ohne den Satz an die richtige Stelle führen) | E-70 |
 
 **Kein Entscheid des Projektleiters, klärt das Nachmessen:** der Ort von `getSitzung` (Schritt 10).
 
@@ -3785,8 +4400,16 @@ Verwaltung und «Nie zwei Builds oder Prüfläufe gleichzeitig im selben Ordner�
 Importrichtung ohne «Ab Schritt 12» (Befunde A-16, A-17, B-41).
 
 **Schrittnummern in den Übergangsregeln** (am 11.11.2026 gegen den Plan geprüft [G]): 06, 06a, 07,
-08, 12, 13, 15, 17, 18. Wer einen dieser Schritte umnummeriert oder umschneidet, zieht die
-`CLAUDE.md` mit. Der Block wird in Schritt 24 aufgelöst.
+08, 13, 15, 17, 18. **[geändert]** Hier stand auch «12»; die `CLAUDE.md` nennt Schritt 12 seit
+E-29 nicht mehr (die Regel zur Importrichtung trägt keine Nummer) [G am 15.11.2026: `CLAUDE.md`
+im Worktree; 1e, C3 Punkt (c)]. Schritt 20a steht nicht im Block und braucht keine Zeile (1e, C3
+Punkt (d)). Wer einen dieser Schritte umnummeriert oder umschneidet, zieht die `CLAUDE.md` mit.
+Der Block wird in Schritt 24 aufgelöst; damit endet der Feature-Stopp (1e, P3-24c).
+
+**Seit E-29 geändert [neu]:** die Präzisierungen zu 06a, 07 und 08 (E-33, E-36, E-37), die
+Ausnahme für Datei-Antworten (E-46), die Ausnahme #81 (E-47), «Ab Schritt 13» (E-50), der Satz
+der benannten Ausnahmen zu «Ab Schritt 15» (E-57). Entschieden und noch einzuspielen: der Satz
+unter «Tests» zu den Listen der Mitglieder (E-70).
 
 ---
 
@@ -3804,7 +4427,7 @@ Repos spielt der Projektleiter selbst ein oder gibt sie ausdrücklich frei; die 
 |-----|-------|-----------|------|-----------------|
 | B.1a | `.claude/skills/tco-branching/SKILL.md` | Satz zum Release im Arbeitsmodell nennt die Freigabe | sofort | A-01, E-06 |
 | B.1b | `.claude/skills/tco-branching/SKILL.md` | neuer Abschnitt «Betrieb mit Subagenten» | sofort | A-02, E-05, E-22 |
-| B.1c | `.claude/skills/tco-branching/SKILL.md` | Versionsregel auf «bei Auslieferung auf Test» | nach dem Refactoring (Schritt 23) | E-07, B-03 |
+| B.1c | `.claude/skills/tco-branching/SKILL.md` | Versionsregel auf «bei Auslieferung auf Test»; **[geändert]** nach E-64 auf «beim Release nach `main`» | nach dem Refactoring (Schritt 23) | E-07, E-64, B-03 |
 | B.1d | `.claude/skills/tco-branching/SKILL.md` | Doku-Rhythmus «vor einer Auslieferung»; Dauerwissen heraus, feste Pfade ersetzen | nach dem Refactoring (Schritt 24) | E-17, A-03 |
 | B.2a | `.claude/agents/refactor-implementer.md` | voller `make check` Pflicht; Abbruchregel für Nachmessen | sofort | A-11, B-09 |
 | B.2b | `.claude/agents/refactor-reviewer.md` | sagt, dass `make check` baut und den grünen Stand merkt; prüft falsches Grün | sofort | A-11, B-28, B-29 |
@@ -3833,7 +4456,9 @@ in Betrieb geht).
 
 **B.1c — nach dem Refactoring, Schritt 23 (E-07).** Schritt 4 des Skills («Versionsnummer»)
 und der Absatz zum abgewiesenen Push werden ersetzt. Der genaue Wortlaut hängt an F-15; die
-Richtung:
+Richtung (**[geändert, E-64]** F-15 ist beantwortet: Die Nummer entsteht beim Release `dev` →
+`main`, nicht bei einer Auslieferung auf Test. Der letzte Satz des Diffs unten ist so zu lesen;
+den Wortlaut legt die manuelle Session zu Schritt 23 fest):
 
 ```diff
 -**Versionsnummer** (`docs/ci-cd-und-release.md#versionen`): Bei `nur-doku` bleibt sie, weiter
@@ -3977,7 +4602,7 @@ ein Eintrag in der gemeinsamen `beobachtungen.md`.
 
 ---
 
-## Anhänge C bis E — Protokolle der Etappen 0 bis 2 (ausgelagert, E-60)
+## Anhänge C bis F — Protokolle der Etappen 0 bis 3 (ausgelagert, E-60)
 
 Die Protokolle der abgeschlossenen Etappen stehen in eigenen Dateien. Verweise in diesem Dokument
 wie «Anhang D.5» oder «E.11» meinen die Abschnitte dort.
@@ -3985,1001 +4610,7 @@ wie «Anhang D.5» oder «E.11» meinen die Abschnitte dort.
 - Anhang C: [Protokoll Etappe 0](refactoring-protokoll-etappe-0.md) (Schritte 01 bis 05)
 - Anhang D: [Protokoll Etappe 1](refactoring-protokoll-etappe-1.md) (Schritte 06 bis 12a)
 - Anhang E: [Protokoll Etappe 2](refactoring-protokoll-etappe-2.md) (Schritte 13 bis 18)
+- Anhang F: [Protokoll Etappe 3](refactoring-protokoll-etappe-3.md) (Schritte 19, 20, 20a)
 
-Das Protokoll der laufenden Etappe 3 kommt als Anhang F in dieses Dokument und wird am Ende der
-Etappe ebenso ausgelagert.
-
----
-
-## Anhang F — Protokoll Etappe 3 [neu]
-
-Nachmessen und Protokolle der Schritte 19, 20 und 20a. Die Kurzfassung je Schritt steht in 7.5.
-
-### F.1 Nachmessen Schritt 19
-
-**Nachmessen vor Schritt 19** (14.11.2026, Worktree `refactor/schritt-19` auf `7159355` =
-`origin/dev`, Version 0.22.5; gelesen, gezählt und ein Probe-Build in einer Kopie im Scratchpad;
-kein `make check`, kein E2E, keine Datenbank, kein laufender Server). Ganz gelesen [G]:
-`src/lib/server/version.ts`, `version.test.ts`, `status.ts`, `src/lib/version.ts`,
-`src/routes/api/status/+server.ts`, `vite.config.ts`, `Dockerfile`, `src/service-worker/index.ts`,
-`src/routes/+layout.ts`, `src/app.html`, `src/app.d.ts`, `src/hooks.client.ts`,
-`src/lib/ui/ungespeichert.ts`, `.dockerignore`. In Auszügen [E]: `src/routes/+layout.svelte`
-(Zeilen 1 bis 135 und 221), `src/hooks.server.ts`, `status.db.test.ts`, `status.test.ts`,
-`tests/e2e/startseite.test.ts`, `playwright.config.ts`, `betrieb/nachweis/nachweis.sh`,
-`.github/workflows/check.yml` (Job `image`), `docs/ci-cd-und-release.md` (Zeilen 382 bis 467),
-`docs/testkonzept.md:118–127`. SvelteKit: das **installierte Paket 3.1.1**
-(`node_modules/@sveltejs/kit`, Quelltext und Typen) [G] und die Doku-Seiten von svelte.dev
-(`@sveltejs-kit-vite`, `$app-state`, `service-workers`, `link-options`, `single-page-apps`, am
-14.11.2026 abgerufen) [G]; der Text zu `version` ist in Paket und Doku wortgleich. Die Werkzeuge
-des Svelte-MCP-Servers standen diesem Lauf nicht zur Verfügung.
-
-**Kurz:** Das Ziel der Zeile 19 stimmt, aber drei Annahmen gehen der Zeile vor. (1) **Das
-Bordmittel ist schon heute aktiv und braucht keine Einstellung**; es lädt aber **nur im
-Fehlerfall** neu, nicht «beim nächsten Seitenwechsel». Für den Seitenwechsel nennt die Doku von
-SvelteKit eine Ergänzung von fünf Zeilen im Wurzel-Layout; das ist eigener Code, klein, aber
-keine reine Einstellung. (2) **Die Kennung bleibt der Zeitstempel des Builds** (nichts setzen):
-Sie erkennt auch «neu ausgeliefert, gleiche Versionsnummer» und hängt nicht an F-15. (3) **Was
-die Doku heute verspricht, deckt kein Bordmittel**: eine vom Server bei jeder Antwort genannte
-Mindestversion und «eine angefangene Eingabe bleibt erhalten». Beides ist auch heute nicht
-gebaut. Es braucht einen Entscheid des Projektleiters (**F-35**, dazu kurz **F-36**).
-`Dockerfile` und `src/service-worker/index.ts` fallen aus der Dateiliste.
-
-#### 1 Der Eigenbau heute [G]
-
-| Stück | Fundstelle | Was es tut | Wer es liest |
-|---|---|---|---|
-| `MINDESTVERSION = '0.1.0'` | `src/lib/server/version.ts:2` | feste Zeichenkette, seit dem Gerüst nie erhöht | `status.ts:4`, `version.test.ts`, `status.db.test.ts` (Import und vier Erwartungen) |
-| `istVersionVertraeglich` | `src/lib/server/version.ts:16` | vergleicht zwei Nummern `x.y.z` | nur `version.test.ts` (16 Fälle); kein Aufruf unter `src/` ausserhalb des Tests |
-| Feld `mindestversion` | `status.ts:9` und `:23` (`StatusAntwort`, `ermittleStatus`) | steht in der Antwort von `/api/status` | niemand: keine Oberfläche, kein Skript, kein Betrieb [G: Textsuche über das Repo ohne `node_modules`] |
-| Feld `version` | `status.ts:23`, aus `APP_VERSION` (`src/lib/version.ts`, von `vite.config.ts:53` aus `package.json` eingesetzt) | Paketversion in der Antwort | niemand ausser den Tests; die Fusszeile liest `APP_VERSION` direkt (`+layout.svelte:221`) |
-| Kopfzeile «Mindestversion bei jeder Antwort» | **gibt es nicht** | die Doku nennt sie (`ci-cd-und-release.md:421`) | — |
-| Prüfung in der Oberfläche | **gibt es nicht** | kein `updated`, kein Vergleich, kein Neuladen wegen einer Version unter `src/` | — |
-
-- **Wer `/api/status` liest, und was davon [G]:** der Healthcheck (`Dockerfile:31`, nur
-  `j.status`), `betrieb/nachweis/nachweis.sh` (Statuscode und die Zeichenfolge `"status":"ok"`,
-  Zeilen 254 bis 269, 551, 1169), `betrieb/nachweis/rauchtest.sh` und der CI-Job `image` (warten
-  auf «healthy», also wieder nur `status`), `tests/e2e/startseite.test.ts:120` (nur Kopfzeilen),
-  `routen.test.ts:303` (Eintrag `EIGEN`), `status.test.ts` (nur `antwort.status` und das Log),
-  `docs/betrieb-und-uebergabe.md:81` (Überwachung: «ok»). **Keiner liest `mindestversion`.**
-- **Was beim Entfernen frei wird:** die Datei `src/lib/server/version.ts` (31 Zeilen) und
-  `version.test.ts` (33 Zeilen) ganz; in `status.ts` ein Import, ein Feld des Typs, ein Feld der
-  Antwort; in `status.db.test.ts` ein Import und vier Erwartungen. `src/lib/version.ts`
-  (`APP_VERSION`) und `__APP_VERSION__` bleiben: Fusszeile und `/api/status`.
-- **Was daran hängt:** nichts im Betrieb. Die Antwort von `/api/status` verliert ein Feld; das
-  ist eine Änderung der Schnittstelle nach aussen, die die Zeile 19 nennt. Die Abdeckung
-  (`vitest.config.ts`, `src/lib/server/**`, Schwelle 90 %) verliert eine voll gedeckte Datei
-  [V: Wirkung auf die Zahl nicht gemessen, bei rund 31 Zeilen vernachlässigbar].
-- **Historische Stellen, die der Schritt nicht anfasst:** `docs/superpowers/plans/` und
-  `…/specs/` (Gerüst, Auslieferung) nennen `MINDESTVERSION`; sie sind abgelegte Pläne (B-06,
-  Schritt 22). `docs/beobachtungen-archiv.md:640` und `:680` ebenso.
-
-#### 2 Was SvelteKit 3.1.1 mitbringt [G: Paket und Doku]
-
-- **Ort der Einstellung:** `version: { name, pollInterval }` im Aufruf `sveltekit({ … })` in
-  `vite.config.ts` (es gibt keine `svelte.config.js`; die Doku-Seite heisst «@sveltejs/kit/vite»).
-  Heute ist nichts gesetzt.
-- **Kennung (`name`):** Voreinstellung ist `Date.now()` beim Laden der Konfiguration
-  (`core/config/options.js:279`). Wer `name` setzt, muss einen festen Wert liefern (die Doku nennt
-  den Commit). Die Kennung steht an drei Stellen des Builds: in `_app/version.json`, in der
-  ausgelieferten HTML-Hülle (dort liest sie die App beim Start) und im gebündelten Service
-  Worker. **In keinem der Bausteine unter `_app/immutable/`.**
-- **Probe-Build [G]:** zweimal `vite build` auf demselben Quelltext: Kennungen `1794677043246`
-  und `1794677053312`; von 329 Dateien unter `build/client` unterscheiden sich genau
-  `version.json` und `service-worker.js` (je mit `.br` und `.gz`), alle Bausteine haben dieselben
-  Namen und Inhalte. Der statische Build (`MYTCO_SPA=1`) schreibt dieselbe Kennung in
-  `build/_app/version.json` und in `index.html`.
-- **Wann geprüft wird** (`runtime/app/state/client.svelte.js`, `runtime/client/client.js`):
-  - nach `pollInterval` (Voreinstellung eine Stunde, `0` schaltet nur das ab);
-  - wenn das Fenster den Fokus bekommt und wenn der Tab wieder sichtbar wird
-    (`client.js:3125–3133`); beim Handy also, wenn die App in den Vordergrund kommt [V: auf
-    einem echten iPhone als Startbildschirm-App nicht geprüft];
-  - wenn ein Seitenwechsel scheitert (siehe unten);
-  - über die Kopfzeile `x-sveltekit-version`. **Die greift bei MyTCO nie:** Der Server setzt sie
-    nur auf Antworten von Server-Ladefunktionen (`__data.json`), Form Actions und Remote
-    Functions (`with_version_header`, vier Aufrufstellen), und die Bauregel verbietet alle drei.
-    Die eigenen Schnittstellen unter `/api/` tragen sie nicht.
-  - Geprüft wird mit einem Abruf von `_app/version.json` (Anfrage mit `cache-control: no-cache`);
-    weicht die Kennung ab, wird `updated.current` wahr und bleibt es. Im Entwicklungsserver ist
-    die Prüfung aus (`if (DEV) return false`).
-- **Wann von selbst neu geladen wird:** nur in zwei Fällen, je nach einer Prüfung mit Ergebnis
-  «neue Version»: (a) der Code der Zielseite lässt sich nicht laden (`client.js:1538`; der alte
-  Baustein fehlt auf dem neuen Server); (b) die Zielseite endet mit einem Status ab 400
-  (`client.js:2072`). Dann aktualisiert SvelteKit erst den Service Worker und lädt die Zieladresse
-  als ganzes Dokument. **Ein gewöhnlicher Seitenwechsel lädt nicht neu**, auch wenn
-  `updated.current` wahr ist. Der Ausgangspunkt aus dem Review von Schritt 02 stimmt also; neu ist
-  nur die Prüfung bei Fokus (damals: «Tab wieder im Vordergrund»).
-- **Für den gewöhnlichen Seitenwechsel** nennt die Doku eine Ergänzung im Wurzel-Layout:
-  `beforeNavigate(({ willUnload, to }) => { if (updated.current && !willUnload && to?.url)
-  location.href = to.url.href; })`, mit `updated` aus `$app/state`. Das ist der Baustein für die
-  Zeile 19 («lädt beim nächsten Seitenwechsel neu»).
-- **`data-sveltekit-reload`:** ein Attribut an einem Link (oder einem Element darüber), das
-  diesen Link immer als ganzes Dokument lädt. Für Schritt 19 unpassend: Es gilt immer, nicht nur
-  nach einer neuen Version.
-- **`ssr = false`** (`+layout.ts:4`): ändert nichts. Die Hülle rendert der Node-Server bei jeder
-  Anfrage mit seiner Kennung; ein Neustart der App holt also immer den Stand des Servers.
-- **Node-Adapter:** `version.json` liegt ausserhalb von `_app/immutable/` und bekommt darum
-  nicht «ein Jahr unveränderlich» (`adapter-node/src/static.js:142–145`). Die Hülle trägt einen
-  `etag` über ihren Inhalt (`render.js:624`) und keine eigene Cache-Angabe [G: Quelltext; **nicht
-  an einem laufenden Server gemessen**, auch nicht hinter Caddy].
-- **Service Worker der App:** `src/service-worker/index.ts` hat nur `push` und
-  `notificationclick`, keinen `fetch`-Handler und keinen Cache (Kommentar Zeile 2, bestätigt
-  gelesen). **Er hält keine alte App am Leben.** Er importiert keine `version`; die Kennung
-  gelangt trotzdem in sein Bündel (als Wert der globalen Startangaben), darum ist die Datei nach
-  jedem Build neu, und der Browser richtet nach jeder Auslieferung einen neuen ein. Das ist heute
-  schon so und folgenlos, solange alter und neuer dasselbe tun. Randfall, **Beobachtung, nicht
-  Schritt 19** [V]: Ändert ein Release die Form der Push-Nutzlast, zeigt ein noch aktiver alter
-  Service Worker den Push nicht an (`leseNutzlast` gibt `null`), bis er abgelöst ist.
-- **Statischer Build (E-10):** `updated` und `beforeNavigate` laufen dort gleich; die Ergänzung
-  bräche den Build nicht [V: nicht gebaut, weil kein Code geschrieben wurde]. In einer
-  Store-App läge `version.json` aber **in** der App und wäre immer gleich der eigenen Kennung:
-  Das Bordmittel bliebe dort stumm. Eine Store-App braucht für «Bitte aktualisieren» eine eigene
-  Lösung; die gibt es nicht, und E-09 baut sie nicht.
-- **E-27 (eigener Build-Ordner je E2E-Lauf):** bleibt nötig und unberührt, solange die Kennung
-  der Zeitstempel ist. Eine feste Kennung (Paketversion) hätte den Fall aus Anhang C.1 («zweiter
-  Build im selben Ordner») nur verdeckt, wenn beide Builds dieselbe Nummer tragen.
-
-#### 3 Zusage der Doku gegen Code und Bordmittel
-
-Die Anforderung steht nur in `docs/ci-cd-und-release.md`, Abschnitt «Alte Versionen auf dem
-Handy» (Zeilen 415 bis 424), dazu ein Satz im Ausblick (Zeile 466). In den Anforderungen, im
-Datenschutzkonzept und in den ADR steht dazu nichts [G: Textsuche unter `docs/` nach
-«Mindestversion», «alte Version», «lädt neu»].
-
-| Satz der Doku | Code heute | Bordmittel ohne Zutun | mit der Ergänzung im Layout |
-|---|---|---|---|
-| «Die Web-App speichert sich auf dem Handy zwischen (Service Worker)» | **falsch**: kein Cache, mit Absicht | — | — |
-| «Eine neue Version lädt beim nächsten Start von selbst» | **stimmt**, weil nichts zwischengespeichert wird und der Server die Hülle je Anfrage liefert | stimmt | stimmt |
-| «Der Server nennt bei jeder Antwort die Mindestversion» | **nicht gebaut** (nur ein Feld in `/api/status`, das niemand liest) | **nein**: `x-sveltekit-version` gibt es nur für Antworten, die MyTCO nicht hat | nein |
-| «Ist eine offene App älter, lädt sie neu» | **nicht gebaut**; es wirkt nur das Bordmittel im Fehlerfall | nur, wenn ein Baustein fehlt oder die Zielseite mit Status ab 400 endet | beim nächsten Seitenwechsel, nachdem die App die neue Version bemerkt hat (Vordergrund, Fokus, stündlich) |
-| «eine angefangene Eingabe bleibt dabei erhalten» | **nicht gebaut** | **nein** | nein; es bleibt die Rückfrage «Nicht gespeichert» (siehe 5) |
-| «Die Mindestversion steigt nur, wenn eine Schnittstelle sich unverträglich ändert. Sonst bleiben Schnittstellen mit dem vorherigen Release verträglich» | erster Halbsatz gegenstandslos; der zweite ist eine Arbeitsregel ohne Werkzeug | — | — |
-| «Die Store-App prüft dieselbe Mindestversion …» (Zeile 466) | nicht gebaut | nein (siehe 2) | nein |
-
-- **Was das Bordmittel deckt:** den häufigen Fall «App offen, neue Auslieferung, die Nutzerin
-  wechselt die Seite». Mit der Ergänzung wird aus «nur wenn etwas scheitert» ein «beim nächsten
-  Seitenwechsel».
-- **Was kein Bordmittel deckt, und was mit E-09 verloren geht:** Der Server kann eine alte App
-  nicht **zwingen**. Wer nach einer Auslieferung auf derselben Seite bleibt und dort speichert,
-  schickt mit altem Code an neue Schnittstellen; die App bemerkt die neue Version zwar (Fokus,
-  Stunde), handelt aber erst beim Seitenwechsel. Den Hebel «diese Auslieferung ist unverträglich,
-  alle müssen sofort neu laden» gibt es dann nicht. Verloren geht damit nur ein Versprechen, kein
-  Verhalten: Gebaut war er nie. Ersatz ist die Arbeitsregel «Schnittstellen bleiben mit dem
-  vorherigen Release verträglich», die schon dasteht.
-- **Kritisch gelesen:** Der Rückfall aus E-09 («Doku auf ‹gibt es noch nicht›») wäre für den
-  Fehlerfall selbst falsch, denn der ist gebaut (von SvelteKit) und in Anhang C.1 beobachtet. Auch
-  beim Rückfall müsste die Doku sagen, was heute gilt.
-
-#### 4 Kennung, Paketversion und F-15
-
-- **Zwei Dinge, die heute beide «Version» heissen [G]:** (a) die **Paketversion** aus
-  `package.json` (`__APP_VERSION__` → `APP_VERSION`): Fusszeile, `/api/status`, Changelog, Tag;
-  an ihr hängen ADR-007, die Regel «jeder Merge mit Code bekommt eine Version», E-07 und F-15.
-  (b) die **Kennung des Builds** von SvelteKit: Zeitstempel, für Menschen unsichtbar, nur für
-  «ist der Server neuer als meine App».
-- **Empfehlung: `version.name` nicht setzen.** Gründe: (1) Der Zeitstempel ist je Build neu,
-  erkennt also auch «neu ausgeliefert, gleiche Versionsnummer»; die Paketversion als Kennung
-  erkennte das nicht. (2) Er hängt nicht an F-15: Was nach Schritt 23 eine Version ist und wie
-  oft sie steigt, ändert an der Erkennung nichts. Die Paketversion als Kennung nähme F-15 vorweg
-  (bei Antwort B von F-15 stiege sie gar nicht). (3) Test und Live bekommen dasselbe Image
-  (`check.yml`, Kommentar zur Auslieferung), also dieselbe Kennung; Live «bemerkt» nichts, was
-  nicht ausgeliefert wurde. (4) Der Commit als Kennung (Vorschlag der Doku) ginge im Image nicht
-  ohne Umbau: `.dockerignore` schliesst `.git` aus; es bräuchte ein Build-Argument in CI und
-  `Dockerfile` (ausserhalb des Schritts, E-16).
-- **Folge:** Schritt 19 berührt weder die Paketversion noch die Versionsregel. Er selbst bekommt
-  wie jeder Merge mit Code eine Version (E-07 gilt bis Schritt 23).
-- **«Bewusst festzulegen»** (Hinweis aus dem Review von Schritt 02) heisst danach: bewusst
-  **nicht** setzen und das an der Stelle sagen (ein Kommentar in `vite.config.ts`, ein Satz in
-  der Doku). `Dockerfile:9` und `docs/testkonzept.md:126` nennen den «Bauzeitstempel von
-  `version.json`» und bleiben damit richtig.
-- **`pollInterval`:** Voreinstellung lassen. Für eine App, die auf dem Handy in den Vordergrund
-  geholt wird, trägt die Prüfung bei Sichtbarkeit; die Stunde ist nur der Boden für einen Tab,
-  der offen bleibt.
-
-#### 5 Sichtbar für die Nutzerin, Absicherung
-
-- **Entfernen des Eigenbaus:** nichts sichtbar [G: niemand liest ihn].
-- **Die Ergänzung im Layout, ohne neue Auslieferung:** nichts sichtbar; `updated.current` bleibt
-  falsch.
-- **Nach einer Auslieferung, App war offen:** Der nächste Seitenwechsel lädt die Zielseite als
-  ganzes Dokument statt in der App. Sichtbar: kurzer Neuaufbau statt des Schiebe-Übergangs
-  (`onNavigate`, `+layout.svelte:98`); die gemerkten Rollstände und Klappen sind weg (`stand`,
-  `vergissKlappen`, nur im Speicher). Einmal je Auslieferung und Gerät. **Das ist eine sichtbare
-  Verhaltensänderung im Sinn von E-45**, klein und selten (F-36).
-- **Halb ausgefülltes Formular [G]:** Das Wurzel-Layout hat schon ein `beforeNavigate`
-  (`+layout.svelte:74`): Trägt die Seite ein Formular mit `data-ungespeichert` und kommt der
-  Wechsel von einem Link, bricht es ab und zeigt die Rückfrage; «Verlassen» wechselt mit `goto`.
-  Die Ergänzung muss **nach** dieser Prüfung stehen, dann fragt die App zuerst, wie heute. Zehn
-  Stellen tragen das Merkmal [E: Textsuche; fünf Formulare der Verwaltung, Profil, CM-Seite,
-  Doppel-Seite, Mitglied, Anlass]. Eingaben ohne Merkmal (Suchfelder, Filter) gehen beim
-  Seitenwechsel schon heute verloren.
-- **Drei Ränder der Vorlage aus der Doku, die der Schritt entscheiden muss [G für die Stellen, V
-  für die Wirkung]:** (a) `goto` mit Zustand: `clubmeisterschaft/[id]/doppel/[kid]/+page.svelte:118`
-  reicht `cmMeldung` als `state` mit; ein ganzes Laden verlöre die Rückmeldung. (b) Wechsel mit
-  `replaceState` (Wächter, Umleitungen): `location.href` legte einen Eintrag im Verlauf an statt
-  ihn zu ersetzen. (c) Zurück-Geste (`popstate`): `location.href = to.url.href` schöbe einen
-  neuen Eintrag nach, statt zurückzugehen. **Vorschlag:** nur Wechsel der Art `link` laden neu
-  (Reiter, Karten, Zurück-Link sind Links [E]); `goto` und `popstate` bleiben in der App. Das ist
-  enger als die Vorlage und genügt: Der nächste angetippte Link kommt bald. Als reine Funktion
-  neben `fragtVorWechsel` (`src/lib/ui/`), mit Einheitstest, wie `ungespeichert.ts`.
-- **Endlosschleife (Betriebsrisiko aus Anhang C.1):** Die Ergänzung erzeugt keine. Sie lädt je
-  angetipptem Link einmal; die neu geladene App liest ihre Kennung aus der frischen Hülle.
-  Weicht `version.json` dauerhaft von der Hülle ab (nur denkbar bei einem Zwischenspeicher vor
-  dem Server oder beim Fall aus C.1), lädt jeder Link ganz, bleibt aber bedienbar. Die Schleife
-  aus C.1 (Fehlerseite ab Status 400) ist Bordmittel, besteht heute und bleibt.
-- **Tests heute [G]:** keiner prüft eine neue Version. `tests/e2e/startseite.test.ts:20` und
-  `bewegung.test.ts:47` prüfen die Paketversion in der Fusszeile; `ungespeichert.test.ts` und
-  `tests/e2e/navigation.test.ts` die Rückfrage.
-- **Tests für den Schritt:**
-  1. `status.db.test.ts`: die vier Erwartungen auf `{ status, version }`, zuerst im Test (rot),
-     dann der Code. `toEqual` hält fest, dass kein drittes Feld bleibt.
-  2. Einheit: die neue Funktion «lädt dieser Wechsel neu?» (`link` und neue Version → ja; `goto`,
-     `popstate`, `willUnload`, ohne neue Version → nein), vorher rot.
-  3. E2E, eine Datei, ohne Konto und ohne Mail-Code (Seiten vor dem Login: `/login`, `/hilfe`,
-     `/datenschutz`): `page.route('**/_app/version.json')` schiebt eine fremde Kennung unter;
-     die Prüfung löst der Test mit einem `focus`-Ereignis am Fenster aus und wartet auf die
-     Antwort (keine feste Wartezeit); dann ein Link. Erwartung: Die Zielseite ist als Dokument
-     geladen (eine Marke am `window` ist weg). Gegenprobe im selben Test: ohne fremde Kennung
-     bleibt die Marke. **Auf dem alten Stand rot** (heute lädt der Link nicht neu), das ist der
-     Test «vorher rot» für die Verhaltensänderung. Dazu ein Fall «geändertes Formular: zuerst
-     die Rückfrage» nur, wenn er ohne Konto geht; sonst deckt ihn die Reihenfolge im Einheitstest
-     [V].
-  4. Charakterisierung des Bordmittels (fehlender Baustein lädt neu): **nicht empfohlen**; der
-     Test müsste den Namen eines gebündelten Bausteins erraten und prüfte SvelteKit, nicht MyTCO.
-  5. E2E läuft gegen den gebauten Server; im Entwicklungsserver ist die Prüfung aus, dort ist
-     nichts zu sehen. Vor dem Merge einmal die WebKit-CI auf dem Branch (N-23, P2-19c).
-  6. Beide Builds (`npm run build`, `build:spa`) sind Teil von `make check`.
-- **Nur von Hand prüfbar:** eine echte Auslieferung (alter Container weg, neuer da) mit einer
-  offenen App auf einem echten Handy, auch als Startbildschirm-App auf dem iPhone. Das geht erst,
-  wenn eine Umgebung läuft (B-02); bis dahin trägt der E2E mit untergeschobener Kennung.
-
-#### 6 Dateien, Schnitt, Abbruchstellen, Risiko
-
-**Dateiliste bei Antwort B (Empfehlung):**
-
-| Datei | Änderung |
-|---|---|
-| `src/lib/server/version.ts`, `src/lib/server/version.test.ts` | entfallen |
-| `src/lib/server/status.ts` | Import und Feld `mindestversion` weg |
-| `src/routes/api/status/status.db.test.ts` | Import weg, vier Erwartungen ohne `mindestversion` |
-| `src/lib/ui/` neue Datei mit Test (Name beim Schritt, Vorbild `ungespeichert.ts`) | reine Funktion «lädt dieser Wechsel neu?» |
-| `src/routes/+layout.svelte` | Import `updated`; im vorhandenen `beforeNavigate` nach der Rückfrage der Aufruf |
-| `tests/e2e/` neue Datei | der E2E aus 5 |
-| `vite.config.ts` | nur ein Kommentar: Kennung ist mit Absicht der Zeitstempel des Builds |
-| `docs/ci-cd-und-release.md` | Abschnitt «Alte Versionen auf dem Handy» (415 bis 424) neu, Satz zur Store-App (466) auf «gibt es noch nicht» |
-| `docs/testkonzept.md:126` | ein Halbsatz: mit einer fremden `version.json` lädt auch jeder Link ganz |
-| `docs/refactoring-analyse.md` | Stand, Zeile 19, Anhang F.2 |
-| `package.json`, `package-lock.json`, `docs/versionen.md` | Version beim Merge, wie bei jedem Schritt [E] |
-
-- **Nicht mehr in der Liste:** `Dockerfile` (der Healthcheck liest nur `status`, die Zeile 9
-  bleibt richtig), `src/service-worker/index.ts` (kein Cache, nichts zu ändern),
-  `status.test.ts`, `routen.test.ts`, `tests/e2e/startseite.test.ts`, `betrieb/` (E-16).
-- **Bei Antwort A:** ohne die neue Funktion, ohne `+layout.svelte`, ohne E2E; die Doku
-  beschreibt den Fehlerfall. **Bei Antwort C:** wie A, die Doku sagt «gibt es noch nicht».
-- **`docs/ui-leitbild.md`:** bei B nicht nötig (keine neue Fläche, kein Text). Ein sichtbarer
-  Hinweis «Neue Version» wäre neue Oberfläche und fiele unter «erst Leitbild, dann Code»; nicht
-  vorgeschlagen.
-
-**Schnitt in Commits (B):** (1) Eigenbau weg: Test zuerst, dann `version.ts`, `status.ts`.
-(2) `test:` Einheitstest der neuen Funktion und der E2E, rot belegt. (3) Funktion und Layout,
-Kommentar in `vite.config.ts`. (4) `docs:` beide Doku-Dateien und dieses Dokument. Commit (1) ist
-für sich mergbar; an ihm endet der Schritt, wenn (2) oder (3) abbricht.
-
-**Abbruchstellen:**
-
-1. Die untergeschobene `version.json` macht `updated.current` im E2E nicht verlässlich wahr
-   (auf einem der drei Geräte, besonders WebKit): kein Umweg über feste Wartezeiten; der Schritt
-   endet nach Commit (1) mit der Doku nach Antwort A und meldet es.
-2. Das ganze Laden stört die Rückfrage «Nicht gespeichert», den Schiebe-Übergang oder erzeugt
-   Konsolenfehler, die `startseite.test.ts` fängt: abbrechen, melden.
-3. Ein bestehender E2E wird rot, obwohl keine fremde Kennung im Spiel ist: abbrechen (die
-   Ergänzung muss ohne neue Version wirkungslos sein).
-4. Der statische Build bricht.
-5. Es zeigt sich ein Leser von `mindestversion` ausserhalb der Textsuche (etwa im Ordner
-   `intern/`, den dieser Lauf nicht liest): melden, nicht anpassen.
-
-**Risiko:** Antwort B «mittel» (Wurzel-Layout und Navigation, ein neuer E2E auf WebKit; aber
-wirkungslos ohne neue Version, und eine einzige Verzweigung). Antwort A und C «niedrig».
-**Modell:** bei B Opus, wie die Zeile; bei A oder C genügt Sonnet. **Weg:** Subagent, ein Lauf;
-der Schritt ist klein (unter 100 Zeilen Code und Tests ohne die Doku [V]) und fasst keine Datei
-an, die 20 oder 20a brauchen, ausser `+layout.svelte` (Schritt 20, Hinweis (j), ein Kommentar).
-
-#### Abweichungen von der Zeile 19 und den Hinweisen
-
-- «Mit den Bordmitteln … lädt beim nächsten Seitenwechsel neu»: Das Bordmittel allein tut das
-  nicht; es braucht die Ergänzung aus der Doku (eigener Code im Layout).
-- «`kit.version.name` ist bewusst festzulegen»: Ergebnis ist «bewusst nicht setzen».
-- «`Dockerfile` (Zeile 9)», «allenfalls `src/service-worker/index.ts`»: entfallen.
-- «Ein Test kann `version.json` per `page.route` unterschieben»: bestätigt als Weg; dazu braucht
-  es einen Auslöser der Prüfung (Fokus-Ereignis), sonst wartet der Test eine Stunde.
-- Zeile 19 nennt als Nutzen nur B-04. Der Abschnitt der Doku wird bei jeder Antwort neu
-  geschrieben; fünf seiner sieben Sätze stimmen heute nicht (Tabelle in 3).
-- Voraussetzung «der Nachtrag zur Etappe 2 ist gemergt»: Im gemessenen Stand `7159355` ist er
-  es nicht (`package.json` 0.22.5) [G]. Der Nachtrag ändert keine Datei dieses Schritts.
-
-#### Fragen an den Projektleiter
-
-F-35 (Bordmittel, Ergänzung oder nur entfernen) und F-36 (Halt nach dem Schritt), Wortlaut in
-9.1. Kein weiterer Entscheid nötig: Kennung, Abfrage-Abstand, Schnitt und Tests folgen aus dem
-Gemessenen.
-
-#### Bleibt (gut gelöst)
-
-- Der Service Worker ohne Cache: Er ist der Grund, warum «neue Version beim nächsten Start» ohne
-  jeden Code stimmt.
-- `APP_VERSION` an einer Stelle (`src/lib/version.ts`) und die Fusszeile mit Test.
-- `/api/status` mit `no-store`, ohne Details im Fehlerfall, und der Healthcheck, der nur
-  `status` liest: Darum ist das Entfernen ohne Folgen für den Betrieb.
-- Die Rückfrage «Nicht gespeichert» als reine Funktion mit Test; sie ist das Vorbild für die
-  neue Funktion.
-- Der eigene Build-Ordner je E2E-Lauf (E-27).
-
-#### Nicht geprüft, dünn belegt
-
-- Kein laufender Server: Kopfzeilen der Hülle und von `version.json` (Cache) sind aus dem
-  Quelltext gelesen, nicht gemessen; Caddy (`betrieb/caddy/`) nur nach Cache-Angaben durchsucht
-  (keine gefunden) [E].
-- Die Ergänzung ist nicht getippt und nicht gebaut; dass `focus` am Fenster die Prüfung in
-  allen drei Geräteprofilen auslöst, folgt aus dem Quelltext von SvelteKit, nicht aus einem Lauf
-  [V]. Darum Abbruchstelle 1.
-- Verhalten auf einem echten Handy (Startbildschirm-App im Hintergrund, Rückkehr) [V].
-- Vorladen beim Antippen (`data-sveltekit-preload-data="tap"`, `app.html:22`): Wie ein
-  gescheitertes Vorladen und das Neuladen im Fehlerfall zusammenspielen, ist nicht gelesen [V].
-- `+layout.svelte` ab Zeile 136 und die 36 Seiten sind nicht darauf gelesen, ob eine von ihnen
-  Zustand über einen Link-Wechsel im Speicher trägt; gefunden ist nur `cmMeldung` (über `goto`)
-  [E: Textsuche nach `state:`].
-- «Zehn Stellen mit `data-ungespeichert`» und «Reiter sind Links» aus Textsuche [E].
-- Der Ordner `intern/` ist nicht gelesen; `docs/superpowers/` nur über die Textsuche.
-- Die Wirkung auf die Abdeckung ist nicht gemessen.
-
-### F.2 Schritt 19
-
-**Lauf** (14.11.2026, refactor-implementer auf Opus, Worktree `refactor/schritt-19` auf
-`origin/dev` `8c4f8d2`, Version 0.22.6, plus das Nachmessen; Auftrag nach E-61, Antwort B).
-Gelesen [G]: Kopf, Zeile 19 mit den Hinweisen, F.1, E-09, E-61, E-62, F-35, F-36; beide
-`CLAUDE.md`; `docs/ci-cd-und-release.md` (Abschnitte «Alte Versionen auf dem Handy» und
-«Ausblick: Store-App»), `docs/testkonzept.md` (Testdaten, Zeile 126), `docs/datenschutz.md`
-(Textsuche). SvelteKit-Doku über den Svelte-MCP-Server (`$app/state`, `$app/navigation`,
-`@sveltejs/kit/vite`, 14.11.2026) und der Quelltext des installierten Pakets 3.1.1
-(`runtime/app/state/client.svelte.js`, `runtime/client/client.js`: `updated.check`, Ereignisse
-`focus` und `visibilitychange`, `_before_navigate`, Klick auf Links) [G].
-
-**Ergebnis: Antwort A.** Der Eigenbau ist weg. Die Ergänzung zum Bordmittel ist gebaut und im
-Verhalten auf allen drei Geräten gelungen, aber an **Abbruchstelle 2** gescheitert: Das ganze
-Laden erzeugt auf dem iPhone-Profil (WebKit) Konsolenfehler. Nach E-61 endet der Schritt darum
-mit A, ohne Umweg; die Ergänzung ist nicht im Branch.
-
-#### 1 Was gebaut und geprüft wurde
-
-- **Eigenbau weg (bleibt):** `src/lib/server/version.ts` und `version.test.ts` gelöscht, in
-  `src/lib/server/status.ts` Import, Feld des Typs und Feld der Antwort weg; `status.db.test.ts`
-  erwartet `{ status, version }` (viermal `toEqual`). `APP_VERSION` bleibt für Fusszeile und
-  `/api/status`. Abbruchstelle 5 nicht eingetreten: kein Leser von `mindestversion` ausserhalb
-  der Tests, auch nicht in `intern/` (den Ordner gibt es im Hauptordner nicht) [G: Textsuche über
-  das Repo ohne `node_modules`, `.git`, Build-Ordner].
-- **Ergänzung (verworfen):** eine reine Funktion `laedtGanzNeu(wechsel, { neueVersion,
-  ungespeichert })` unter `src/lib/ui/neue-version.ts` (wahr nur für `link`, ohne `willUnload`,
-  mit neuer Version und wenn die Rückfrage nicht kommt), fünf Einheitsfälle; im vorhandenen
-  `beforeNavigate` des Wurzel-Layouts nach der Rückfrage:
-  `if (to && laedtGanzNeu(navigation, { neueVersion: updated.current, ungespeichert })) { navigation.cancel(); location.href = to.url.href; return; }`.
-  `cancel()` statt der Vorlage, damit der Wechsel in der App nicht neben dem Laden weiterläuft.
-  Autofixer: keine Probleme.
-- **E2E (verworfen):** `tests/e2e/neue-version.test.ts`, drei Fälle, ohne Mail-Code (Brief-Code),
-  über Rolle und Beschriftung, ohne feste Wartezeit: `page.route('**/_app/version.json')` mit
-  fremder Kennung, `focus` am Fenster, Warten auf die Antwort; ganzes Laden erkannt an einer
-  Marke am `window`. (1) Gegenprobe ohne fremde Kennung; (2) Link nach neuer Version; (3)
-  geändertes Formular: Rückfrage zuerst, «Abbrechen» behält die Eingabe, «Verlassen» (`goto`)
-  und die Zurück-Geste bleiben in der App, erst der nächste Link lädt neu.
-  Abbruchstelle 1 **nicht** eingetreten: `updated` wurde in jedem Lauf wahr.
-
-#### 2 Zahlen
-
-| Lauf | Ergebnis |
-|---|---|
-| `status.db.test.ts` auf dem alten Code | rot, 4 von 9 (die vier Erwartungen) |
-| E2E auf dem alten Stand (ohne Ergänzung) | rot, 6 von 9: Fälle 2 und 3 je Gerät, genau an der Erwartung «Marke weg»; Rückfrage, `goto` und Zurück schon grün; Gegenprobe grün |
-| Einheitstest, zwei Mutationen | je 1 von 5 rot (ohne Rückfrage-Prüfung; `type !== 'leave'` statt `=== 'link'`), danach 5 von 5 |
-| E2E mit der Ergänzung (`cancel`), 15 Wiederholungen | Android und Desktop 90 von 90 grün; iPhone 36 von 45, **9 rot**, alle nur an `expect(fehler).toEqual([])`: `TypeError: Load failed` (7), `… /api/kontakt due to access control checks.` (1), `… /api/sitzung due to access control checks.` (1), `TypeError: Importing a module script failed.` (1); Fall 2: 2 von 15 rot, Fall 3: 7 von 15 |
-| E2E mit der wörtlichen Vorlage der SvelteKit-Doku (ohne `cancel`, kein `return`), nur iPhone, 15 Wiederholungen | 43 von 45, **2 rot**, ebenso Konsolenfehler (`… /api/anlaesse`, `/api/cm`, `/api/kontakt`, `/api/sitzung … due to access control checks.`) |
-| voller `make check` auf `28a37df` (Stand A) | grün, Exit 0: Lint, `svelte-check`, Prüfskripte, 2411 Tests in 170 Dateien (vorher 2427; 16 Fälle von `version.test.ts` entfallen), Abdeckung 96,98 % Anweisungen, beide Builds, E2E 524 bestanden, 64 übersprungen, 3,5 Minuten |
-
-- **Deutung [E]:** Das ganze Laden bricht Abrufe und Modul-Ladevorgänge ab, die beim Antippen
-  schon laufen (Vorladen beim Antippen, `data-sveltekit-preload-data="tap"`; die Reiter laden
-  ihren Code `eager`). WebKit meldet abgebrochene Abrufe als Fehler in der Konsole; Chromium
-  nicht. Für die Nutzerin ist nichts zu sehen, das Verhalten stimmt. Der Wortlaut von
-  Abbruchstelle 2 («erzeugt Konsolenfehler, die `startseite.test.ts` fängt») trifft aber zu,
-  und dieselbe Sammlung (`sammleKonsolenfehler`) hält jeder E2E fest, der einen solchen Link
-  antippt.
-- **Warum kein Umweg:** Jede Rettung wäre ein Umweg im Sinn von E-61: im Test die Meldungen von
-  WebKit herausfiltern (schwächt die Konsolen-Prüfung), das Vorladen nach einer neuen Version
-  abschalten oder abwarten (neues Verhalten), das Neuladen nach dem Wechsel in der App
-  (`afterNavigate` und `location.reload()`, lädt doppelt). Entscheiden müsste das der
-  Projektleiter.
-
-#### 3 Was im Branch bleibt (Antwort A)
-
-| Commit | Inhalt |
-|---|---|
-| `92a23a1` `test:` | `status.db.test.ts` ohne `mindestversion` (rot belegt) |
-| `7b9b38e` `refactor:` | `version.ts` mit Test weg, `status.ts` ohne Feld |
-| `8ba6016` `test:` | E2E zur Ergänzung (auf dem alten Stand rot belegt) |
-| `38979d7` `test:` | derselbe E2E zurückgenommen (Abbruchstelle 2) |
-| `28a37df` `docs:` | `docs/ci-cd-und-release.md` («Alte Versionen auf dem Handy» neu, Satz zur Store-App), Kommentar in `vite.config.ts`, `docs/versionen.md` «Unveröffentlicht» |
-
-- Die Funktion `neue-version.ts` mit Test und die Änderung am Layout sind **nie committet**; der
-  E2E steht in `8ba6016` im Verlauf. Für einen späteren Versuch genügt die Zeile oben.
-- `docs/testkonzept.md` bleibt unverändert: Zeile 126 ist bei A in der Sache richtig (F.1,
-  Abschnitt 4), die Datei nennt sonst weder Mindestversion noch Neuladen [G].
-- `docs/ui-leitbild.md` unverändert (keine Fläche, kein Text).
-- **Datenschutz:** nicht berührt. Entfernt wird ein Feld ohne Personenbezug; das Bordmittel
-  ruft nur die statische Datei `_app/version.json` ab; der Gerätespeicher (Code- und
-  Wechselanfrage) übersteht ein Neuladen wie bisher [G: Textsuche in `docs/datenschutz.md`].
-
-#### 4 Für die Nutzerin
-
-Nichts. Was die Doku bisher zusagte (Mindestversion bei jeder Antwort, Eingabe bleibt erhalten,
-Store-App prüft die Mindestversion), war nie gebaut und steht nicht mehr da. Eine offene App
-lädt wie bisher nur neu, wenn ein Seitenwechsel scheitert; sonst läuft der alte Code bis zum
-nächsten Start.
-
-#### 5 Ausserhalb des Schritts (Beobachtungen, nicht behoben)
-
-- **WebKit und abgebrochene Abrufe:** Dasselbe gilt für das Neuladen, das das Bordmittel im
-  Fehlerfall heute schon macht: Auch dort meldet WebKit abgebrochene Abrufe in der Konsole. Kein
-  E2E prüft den Fehlerfall (F.1, Test 4: nicht empfohlen); für die Nutzerin unsichtbar.
-- **Autofixer zum Wurzel-Layout:** schlägt für bestehenden Code vor, `zeigeTitel` und
-  `kopftitel` nicht in einem `$effect` zu setzen und `bind:this` durch eine Attachment zu
-  ersetzen; keine Fehler. Nicht Teil dieses Schritts (Schritt 20 kennt das Layout nur für einen
-  Kommentar).
-- **Hook und roter Einheitstest (A-15):** wie bekannt; der rote Einheitstest der Funktion stand
-  darum nur im Bericht.
-
-#### 6 Nicht geprüft
-
-- Ein echtes Handy, auch als Startbildschirm-App auf dem iPhone; eine echte Auslieferung mit
-  offener App (B-02).
-- WebKit unter Linux (iPhone-CI): nicht gelaufen. Für A ohne neuen E2E nicht nötig (P2-19c).
-- Ob die Konsolenfehler auch auf einem echten iPhone (Safari) auftreten [V].
-- Der Fehlerfall des Bordmittels (fehlender Baustein, Status ab 400) ist nur aus dem Quelltext
-  belegt (F.1), nicht in einem Lauf.
-- **Review (14.11.2026, refactor-reviewer): «ok», nichts vor dem Merge zu beheben.** Stand entspricht
-  Antwort A, von B ist nichts übrig, der Eigenbau ist ganz weg (kein Leser in `betrieb/`, CI,
-  `Dockerfile`, Skripten); die Aussagen der Doku sind an SvelteKit 3.1.1 und am Service Worker
-  nachgelesen. Hinweise, erledigt (Orchestrator): Einleitungssatz in `docs/ci-cd-und-release.md`
-  enger gefasst («Der Service Worker speichert nichts zwischen», der Browser hält die gehashten
-  Bausteine); E-61 und F-35 tragen den Ausgang; Kopf nachgeführt. Lesart, offengelegt:
-  Abbruchstelle 2 nennt Konsolenfehler, «die `startseite.test.ts` fängt»; gefangen hat sie der
-  neue E2E über dieselbe Sammlung, die Stelle trifft dem Sinn nach zu. Nicht geprüft vom Reviewer:
-  die Messläufe zu B (nie committet), `make check` (grüner Stand bestätigt), WebKit unter Linux.
-
-### F.3 Nachmessen Schritt 20
-
-**Nachmessen vor Schritt 20** (14.11.2026, Worktree `refactor/schritt-20` auf `29b0023` =
-`origin/dev`, Version 0.22.7; gelesen und gezählt, kein `make check`, kein E2E, keine Datenbank,
-kein laufender Server, nichts installiert). Ganz gelesen [G]: `tests/e2e/hilfen/login.ts`,
-`tests/hilfen/turnierjahre.ts`, `tests/hilfen/verwaltung-abruf.ts`, `playwright.config.ts`,
-`src/lib/server/mitteilung/typen.ts`, `src/routes/+layout.ts`. In Auszügen [E]: `scripts/e2e.ts`
-(Zeilen 58 bis 159), `.github/workflows/check.yml` (Job `e2e`), `grundpruefung.db.test.ts`
-(60 bis 150), `routen.test.ts` (285 bis 345), `tests/hilfen/verwaltungs-listen.ts`,
-`turnier-anzeige.ts` (80 bis 130), die 25 E2E-Dateien nur über Textsuche. GitHub [G]: Läufe
-43622414674 (grün) und 43616298374 (iPhone rot), Dauer der Jobs und Grösse der Artefakte.
-
-**Kurz:** Der Schritt ist kleiner in der Sache und grösser in der Zahl der Dateien, als die
-Zeile 20 sagt. (1) Von rund 1180 exportierten Namen nutzt **drei** niemand (entfernen), bei
-**25** genügt «`export` weg»; die übrigen Kandidaten sind Typen in Signaturen oder Namen, die ein
-Test direkt prüft, und bleiben. Handarbeit reicht, **kein Paketvorschlag** (E-11). (2) Den alten
-Weg mit festem Turnierjahr ruft **kein Test mehr** auf; es gibt keinen offenen Branch, der ihn
-bräuchte. (3) Von den elf Hinweisen werden **sechs aufgenommen** ((b), (c), (f), (h), (j), und
-(k) nach F-37), **fünf verworfen** ((a), (d), (e), (g), (i)). (4) Die Begründung von (i) trägt
-nicht: Der Code der Verwaltung zählt je Adresse, nicht je IP. (5) Vorschlag: **zwei Läufe** mit
-je eigenem Review, Lauf 1 Sonnet (Löschen, Umbenennen, Verschieben), Lauf 2 Opus (Testlogik).
-Eine Frage an den Projektleiter: **F-37** (Spur in der CI, Kosten nach E-06).
-
-#### 1 Ungenutzte Exporte
-
-**Wie gesucht [G für die Zählung, E für die Methode]:** Textsuche in zwei Durchgängen über alle
-versionierten Dateien unter `src`, `scripts`, `tests` (`.ts`, `.svelte`) und die
-Einstellungsdateien der Wurzel. Erfasst sind `export function`, `async function`, `const`,
-`let`, `type`, `interface`, `class`, `enum`: 1181 Namen in 175 Dateien, ohne Testdateien und
-ohne die Routen-Dateien `+*.ts` (deren `load`, `GET`, `POST`, `ssr`, `prerender` liest
-SvelteKit). Durchgang 1: Der Name kommt als ganzes Wort in keiner anderen Datei vor.
-Durchgang 2: Keine andere Datei nennt den Namen **und** importiert ein Modul dieses Dateinamens
-(findet Namen, die zufällig zweimal vorkommen, z. B. `bereichVon`, `THEMEN`, `GespraechZeile`).
-Von Hand dazu: die drei Listen `export { … }` (`einlesen.ts:13`, `rollen.ts:87`: alle fünf Namen
-haben Nutzer), `export default` (nur `tests/setup/datenbank-global.ts`, liest Vitest),
-Namespace- und dynamische Importe (`import * as schema` in `db/index.ts`, `await import` nur in
-Tests), Dateien ohne Importeur unter `src/lib` und den Test-Hilfen (keine). Bei allen Werten
-und bei den 26 nur von Tests genutzten Namen mit zwei Eigennennungen ist die Nutzung in der
-eigenen Datei als Code gelesen, nicht als Kommentar [G].
-
-**Was die Suche nicht sieht:** (a) einen Namen, den eine andere Datei nennt, die dasselbe Modul
-aus anderem Grund importiert, oder ein gleichnamiges Modul (`api`, `schnittstellen`, `angaben`
-gibt es mehrfach): Er gilt als genutzt; die Liste ist darum eine Untergrenze. (b) Nutzung, die
-nur noch von totem Code kommt (keine Erreichbarkeit von den Routen aus). (c) Eigenschaften
-exportierter Objekte und Felder von Typen. (d) Namen in Zeichenketten. Was die Suche zu viel
-meldete, fängt nach dem Entfernen `svelte-check` und ESLint (`no-unused-vars` meldet einen
-Namen, der nach «`export` weg» gar nicht mehr gebraucht wird).
-
-**Ergebnis gegen B-18** («rund 60 ohne Nutzer, weitere 35 nur von Tests», Stand 11.11.2026
-[E]): heute unter `src/lib` **83** ohne Nutzer ausserhalb der eigenen Datei und **51** nur von
-Tests genutzt [G, Zählung]; dazu `scripts/pruefungen` 7 und 22, Test-Hilfen 7.
-
-| Urteil | Zahl | Namen (Datei) |
-|---|---:|---|
-| **entfernen** | 3 | `warnungText` (`src/lib/verwaltung/turnier-anzeige.ts:94`; nur sein Test, drei Erwartungen in `turnier-anzeige.test.ts:93–99`; Hinweis (f)); `RangZeile` (`src/lib/interclub/api.ts:19`; keine Nennung, der Import `IcRangZeile` geht mit); `GespraechZeile` (`src/lib/verwaltung/gespraech-api.ts:11`; keine Nennung, der Import-Alias `ServerGespraechZeile` geht mit; der gleichnamige Typ in `server/gespraech/gespraech.ts` bleibt) |
-| **nur `export` weg** (Werte, nur in der eigenen Datei gebraucht) | 25 | `scripts/pruefungen`: `pruefstand` (`gruener-stand.ts`), `vergleicheVersionen` (`release.ts`). `src/lib`: `DURCHLAEUFE` (`hilfe/ablauf.ts`), `browserWebauthn` (`login/passkey.ts`), `RUFNAME_MAX`, `RUFNAME_MAX_TEXT` (`name.ts`), `BEDENKZEIT`, `FRIST_AUSTRITT` (`server/admin/mitgliedschaft.ts`), `VERWALTUNGSROLLEN` (`server/admin/rollen.ts`), `MAX_KURZ`, `MAX_EINLADUNG` (`server/anlass/angaben.ts`), `DAUER_MS` (`server/anlass/kalender.ts`), `fuerBrowser` (`server/anlass/schnittstellen.ts`), `SWISS_TENNIS` (`server/interclub/import.ts`), `THEMEN` (`server/mitteilung/themen.ts`), `MAX_TURNIERNAME`, `MAX_KATEGORIENAME`, `MAX_BEZEICHNUNG`, `MAX_NUMMER`, `JAHR_MIN`, `JAHR_MAX`, `JAHRGANG_MIN`, `SUMME_MAX` (`server/turnier/angaben.ts`), `titelText` (`ui/kopftitel.ts`). Test-Hilfe: `TCO_VEREIN` (`tests/hilfen/interclub.ts`) |
-| **bleibt**, weil Typ in der Signatur eines exportierten Namens oder Teil eines exportierten Typs | 70 | `src/lib` 59 Typen (u. a. die sieben `St…` in `server/interclub/swiss-tennis.ts`, die `…Abh` der Dienste, `CsvZeile`, `CsvErgebnis`, `FehlerZeile`, `GueltigeZeile`, `Dateipruefung`, `DoppelErgebnis`, `DoppelSpieler`, `Zugangsfall`, `OhneZugang`, `Fehlerangaben`, die `…Liste` und `…Zeile` der Verwaltungs-Abrufe); `scripts/pruefungen` 5 (`Fragenstand`, `Markierung`, `Releasestand`, `Dokus`, `Testmuster`); Test-Hilfen 6 (`TestTurnier`, `E2eEinstellungen`, `Jahresbereich`, `Aufruf`, `Optionen`, `VerwaltungsSchnittstelle`). «`export` weg» ginge technisch (keine Deklarations-Ausgabe), nähme dem Aufrufer aber den Namen für das, was er bekommt; kein Gewinn |
-| **bleibt**, weil eine Liste der Schnittstellen (liest Grundprüfung und Routen-Test, Dauerregel «Tests») | 7 | `ANLASS_`, `CM_`, `GESPRAECH_`, `INTERCLUB_`, `PASSKEY_`, `MITTEILUNG_`, `PROFIL_SCHNITTSTELLEN` |
-| **bleibt**, weil in der eigenen Datei gebraucht und von einem Test direkt geprüft | 43 + 22 | `src/lib` 43 (z. B. `STATUS_ALLEIN`, `FEHLERWOERTER`, `Bremse`, `WechselSpeicher`, `mussVerlaengern`, `pruefeDatei`, `baueAdminCodeMail`, `zielOhneZugang`, beide `bereichVon`); `scripts/pruefungen` 22 (die `pruefe…`-Funktionen, die ihr Test aufruft) |
-
-`doppelWarnungen` ist genutzt (`Aktionsdialog.svelte:123`), nur falsch benannt: Hinweis (f).
-
-**E-11:** Die Handarbeit reicht für diesen Schritt. Ein Werkzeug für toten Code (ein Paket wie
-`knip`) bräuchte es nur, wenn die Liste dauerhaft leer bleiben soll: Die grobe Suche vom
-11.11.2026 fand rund 60, diese 83 (ein Teil des Unterschieds ist die Methode, ein Teil kam mit
-#81 dazu). Das ist kein Antrag; Beobachtung für Schritt 24 oder danach.
-
-#### 2 Festes Turnierjahr (N-26)
-
-- **Stand [G]:** `legeTurnierAn(festesJahr)` hat **keinen** Aufrufer (einziger Aufruf:
-  `verwaltung.test.ts:438`, ohne Jahr); `legeOffenesTurnierAn(festesJahr, …)` hat **keinen**
-  (46 Aufrufe in 9 Dateien, alle mit der Liste der Kategorien als erstem Argument, auch die
-  mehrzeiligen). Es gibt keinen offenen Feature-Branch (`origin` führt nur `dev`, `main` und
-  vier von Dependabot) und keinen fremden Worktree. Die Bedingung des Eintrags vom 09.11.2026
-  («entfernen, sobald die damals offenen Branches gemergt sind») ist erfüllt.
-- **Was wegfällt:** in `login.ts` die Überladung `legeTurnierAn(festesJahr: number)`
-  (Zeilen 121 bis 125), `legeTurnierMitFestemJahrAn` (127 bis 132), die Überladung
-  `legeOffenesTurnierAn(festesJahr, kategorien)` samt der Verzweigung `typeof erstes ===
-  'number'` (ab Zeile 162), die zwei Absätze der Kommentare dazu; rund 30 Zeilen. Kein Test
-  ändert sich.
-- **Was bleibt:** `loescheTurnier(jahr)`. `turnier.test.ts:67` legt ein Turnier über das
-  Formular an (Jahr 2097 bis 2099 je Gerät) und räumt es vorher weg; das ist kein Rest des alten
-  Wegs. `FREIE_JAHRE` bleibt. `tests/hilfen/turnierjahre.ts` (Datenbanktests) ist ein anderer,
-  intakter Weg.
-- **Kosten:** ein Commit, eine Datei, dazu der Eintrag in `docs/beobachtungen.md` (schliessen).
-  Risiko: keines für die App; `svelte-check` und der E2E-Lauf zeigen einen übersehenen Aufrufer.
-
-#### 3 Teilung von `tests/e2e/hilfen/login.ts`
-
-- **Heute [G]:** 478 Zeilen, 37 Exporte (36 Funktionen, Typ `TestTurnier`), 13 Importe aus
-  `src/lib/server/`; 25 der 29 E2E-Dateien importieren daraus. Ausserhalb von `tests/e2e/` nennt
-  nur `docs/context-scopes.md:20` die Datei.
-- **Aufrufer je Export (Zahl der Testdateien) [G]:** `schliesseLoginHilfen` 25,
-  `legeKontoMitBriefCodeAn` 20, `holeMailCode` 14, `legeKontoAn` 11, `legeOffenesTurnierAn` 9,
-  `legeRollenkontoMitBriefCodeAn` 9, `setzeSpielerangaben` 8, `legeAdminMitBriefCodeAn` 7,
-  `legeCmMitBriefCodeAn` 6, `legeOffenenAnlassAn` 5, `meldeZurCmAn` 5, `warteAufMail` 4, `gibLogin`
-  3, `setzeKontaktperson` 3, `stelleAnfrageDirekt` 3, je 2: `beantrageWildcardDirekt`,
-  `bestaetigeVerwaltungDirekt`, `meldeZumAnlass`, `setzeAnmeldeschluss`, `setzeRufname`,
-  `setzeTelefon`, `stelleBriefCodeAus`; je 1: `antworteAlsLeitung`, `beendeAlleSitzungen`,
-  `benenneTurnier`, `entferneKontaktperson`, `laesstBriefCodeAblaufen`, `leereStrasse`,
-  `legeEhemaligesAn`, `legeTurnierAn`, `loescheTurnier`, `meldePaarDirektAn`, `schreibeNachricht`,
-  `setzeAusgetreten`; `TestTurnier` 0 (nur in der Datei). Jeder Export hat einen Aufrufer.
-- **Vorgeschlagener Schnitt** (fünf Dateien unter `tests/e2e/hilfen/`, keine reicht etwas
-  weiter, wie in Schritt 14):
-
-  | Datei | Inhalt | Zeilen [V] |
-  |---|---|---:|
-  | `verbindung.ts` (neu) | `hole()` (eine Datenbank-Verbindung und ein Login-Dienst je Prozess) und das Schliessen; nur für die Hilfen | 35 |
-  | `login.ts` (bleibt, kleiner) | Konten und Mitglieder: die fünf `lege…Konto…An`, `legeEhemaligesAn`, `gibLogin`, `stelleBriefCodeAus`, `laesstBriefCodeAblaufen`, `beendeAlleSitzungen`, `bestaetigeVerwaltungDirekt`, `setzeAusgetreten`, `leereStrasse`, `setzeRufname`, `setzeTelefon`, `schliesseLoginHilfen` | 160 |
-  | `turnier.ts` (neu) | Turnier, CM und Gespräch: `TestTurnier`, `legeTurnierAn`, `legeOffenesTurnierAn`, `loescheTurnier`, `benenneTurnier`, `setzeAnmeldeschluss`, `setzeKontaktperson`, `entferneKontaktperson`, `setzeSpielerangaben`, `meldeZurCmAn`, `stelleAnfrageDirekt`, `meldePaarDirektAn`, `beantrageWildcardDirekt`, `schreibeNachricht`, `antworteAlsLeitung` | 200 |
-  | `anlass.ts` (neu) | `legeOffenenAnlassAn`, `meldeZumAnlass` | 35 |
-  | `mail.ts` (neu) | `holeMailCode`, `warteAufMail` (Mailpit, ohne Datenbank) | 65 |
-
-  `login.ts` behält den Namen und `schliesseLoginHilfen`: So bleibt in allen 25 Dateien die
-  Import-Zeile auf `./hilfen/login.ts` stehen, und `test.afterAll` ändert sich nirgends.
-- **Was wechselt [G, gezählt je Datei]:** **19** Testdateien ändern nur ihre Importe (die
-  bestehende Anweisung wird kürzer, **32** Import-Anweisungen kommen dazu: 11 auf `turnier.ts`,
-  6 auf `anlass.ts`, 15 auf `mail.ts`); 6 Dateien bleiben unverändert (`benachrichtigungen`,
-  `bewegung`, `cookie`, `hilfe`, `interclub`, `passkey`). Kein Testfall ändert sich.
-- **B-11 bleibt, wie es ist:** Die Hilfen rufen weiter Fachfunktionen des Servers; aus einer
-  Fassade werden vier Dateien mit Server-Importen. Das war nie Ziel des Schritts.
-
-#### 4 Die elf Hinweise
-
-| | Stand heute, Stellen | Aufwand, Risiko | Urteil |
-|---|---|---|---|
-| **(a)** `finally` in `scripts/e2e.ts` | unverändert: `scripts/e2e.ts:150–156`, erst `entferneBuildOrdner` (`rmSync` mit `force`), dann `stelleTypenWiederHer`, dann das Löschen der Datenbank [G] | rund 10 Zeilen im Werkzeug, das jeder Prüflauf braucht; `main()` hat keinen Test | **verwerfen.** Beide Folgen heilen von selbst: alte Datenbanken und Build-Ordner räumt der nächste Lauf nach einem Tag (`raeumeAlteAuf`, `raeumeAlteBuildsAuf`), `svelte-kit sync` läuft in jedem `npm run check:svelte` (`package.json:13`). Kein Vorfall belegt [E]. Bleibt in Anhang C.1 festgehalten |
-| **(b)** «schreibend» erkennen | Grundprüfung `grundpruefung.db.test.ts:146` (`startsWith('post')`), Rechte-Matrix `rechte-matrix.db.test.ts:211` (`!startsWith('get')`); dieselbe Annahme an 12 weiteren Stellen in fünf Modul-Tests. Heute gleichwertig: alle 101 Namen der 13 Listen beginnen mit `get` (33) oder `post` (68) [G, aus den Listen gelesen] | eine Prüfung im Routen-Test, rund 8 Zeilen; Testlogik | **aufnehmen**, als eine Prüfung statt als Umbau: «Zu `GET` gehört ein Name mit `get`, zu `POST` einer mit `post`» in `routen.test.ts` (dort steht je Adresse und Methode die Funktion). Damit ist das Präfix eine geprüfte Abmachung, beide Erkennungen bleiben. Vorher rot mit einem umbenannten Eintrag |
-| **(c)** Listen der Mitglieder (N-11) | zwei Stellen von Hand: `grundpruefung.db.test.ts:74–112` (`mitgliederDienste()`, sieben Listen mit je eigenen Diensten), `routen.test.ts:320–330` (`MITGLIEDER`) [G] | neue Datei `tests/hilfen/mitglieder-listen.ts` (Schlüssel Modul → Liste), zwei Testdateien; die Grundprüfung ordnet je Schlüssel die Dienste zu, ein fehlender Schlüssel ist ein Typfehler; Testlogik | **aufnehmen.** Schliesst die Lücke aus D.8 (neue Liste läuft durch keine 401/415-Schleife). Rot-Probe: eine Liste aus der Datei nehmen (Routen-Test rot), einen Schlüssel ohne Dienste (Typfehler). **Folge:** Der Satz der `CLAUDE.md` zu neuen Listen der Mitglieder ändert sich (C-1); der Implementer meldet ihn, er ändert die Datei nicht |
-| **(d)** `MitteilungAdminDienste` (N-12) | Typ als ganzes Wort: **17 Dateien, 63 Nennungen** (8 App-Dateien, 8 Tests, `tests/hilfen/verwaltungs-listen.ts`). Dazu der Einstieg `holeMitteilungAdminDienste`: **28 Dateien, 69 Nennungen** (24 Routen unter `api/admin/`, `dienste.ts`, `routen.test.ts`, `bauregel.ts:87` in `VERWALTUNGS_EINSTIEGE`, `bauregel.test.ts`). Zusammen 44 Dateien wie in 1d gezählt; Doku 8 Dateien [G] | nur der Typ: 17 Dateien, mechanisch; mit dem Einstieg: 44 Dateien und die Erlaubt-Liste der Bauregel | **verwerfen.** Nur den Typ umzubenennen liesse `holeMitteilungAdminDienste` mit dem alten Namen stehen (halbe Arbeit); beides fasst Schutz-Code und 24 Routen an, für einen Namen. Bleibt Beobachtung (N-12) für nach dem Feature-Stopp |
-| **(e)** Hilfsdateien ohne Regel (N-06) | unverändert seit D.15: `gespraech/antworten.ts` (22 Zeilen, zwei Importeure im eigenen Modul), `cm/verwaltung-meldung.ts` (26 Zeilen, importiert von `cm/verwaltung-schnittstellen.ts:40` und `turnier/schnittstellen.ts:12`) [G] | Regel in `bauregel.ts` mit Tests; Prüfwerkzeug | **verwerfen, endgültig.** Die zwei Gründe aus D.15 gelten weiter: Beide Dateien prüfen keine Rechte, eine Regel schützte nichts; die naheliegende Form meldete sofort den Import aus `turnier/`, und App-Code wird nicht geändert |
-| **(f)** Namen der Warnungen (H-03, H-04) | `warnungText`: `turnier-anzeige.ts:94`, nur der Test. `doppelWarnungen`: `turnier-anzeige.ts:100`, `Aktionsdialog.svelte:13` und `:123`, Test `:9`, `:173–182` [G] | zwei kleine Commits, drei Dateien | **aufnehmen**, beide Teile: `warnungText` mit seinen Erwartungen weg; `doppelWarnungen` → `warnungsSaetze` (der Kommentar sagt dann «Einzel und Doppel») |
-| **(g)** Suche über `div.karte` (H-05) | `cm-ablauf.test.ts:70`; **dieselbe Hilfe** steht in `cm-anmeldung.test.ts:70`, `cm-verwaltung.test.ts:88`, `cm-doppel.test.ts:106`, dazu `navigation.test.ts:318`, `cm-gespraech.test.ts:283`. Die Karte einer Kategorie ist ein `<div class="karte">` ohne Rolle und ohne Namen (`clubmeisterschaft/[id]/+page.svelte:480`, `:528`) [G] | ohne Eingriff in die App nicht lösbar: Für «Rolle und Beschriftung» bräuchte die Karte eine Rolle und einen Namen (ändert, was ein Bildschirmleser vorliest; erst Leitbild, dann Code) | **verwerfen.** Eine Stelle von sechs zu ändern hilft nicht, und der saubere Weg ist eine Verhaltensänderung (Feature-Stopp). **Befund dazu:** Die Dauerregel «nicht über CSS-Klassen» hält die Praxis nicht: rund 108 Suchen über Klasse oder Element in 22 E2E-Dateien [E, Muster]. Das gehört in die Revision der `CLAUDE.md` (Schritt 24: Regel so fassen, wie sie gilt) und als Beobachtung in `docs/beobachtungen.md` |
-| **(h)** kopierte Test-Hilfen (H-18) | heute **acht** Kopien von `Aufruf`, `holer`, `json` (sieben aus E.4 und seit #81 `interclub/api.test.ts`): `src/lib/abruf.test.ts:11`, `anlass/api.test.ts:5`, `cm/api.test.ts:26`, `interclub/api.test.ts:5`, `login/anmelden.test.ts:13`, `profil/angaben.test.ts:19`, `push/api.test.ts:5`, `verwaltung/mitteilung-api.test.ts:19`. `login/passkey.test.ts:14` hat eine andere Hilfe (Antworten der Reihe nach) und bleibt. Fünf Verwaltungs-Tests nutzen die gemeinsame Datei schon [G] | je Datei rund 18 Zeilen weg, eine Import-Zeile dazu; mechanisch | **aufnehmen.** Die gemeinsame Datei heisst dann besser `tests/hilfen/abruf.ts` (sie dient nicht mehr nur der Verwaltung): Umbenennen mit `git mv`, fünf Import-Zeilen mehr. Weicht eine Kopie ab (z. B. der Typ `Holen` in `abruf.test.ts`), bleibt diese Datei, und der Bericht nennt sie. Zahl der Testfälle unverändert |
-| **(i)** Bestätigung ohne Mail-Code (H-19) | Den Code der Verwaltung holen **56 Tests in 12 Dateien** (je Gerät einmal, also bis 168 Codes je Lauf): `verwaltung` 16, `briefe` 8, `cm-verwaltung` 7, `mitteilungen` 6, `cm-doppel-verwaltung` 5, je 3 `cm-gespraech`, `einlesen`, `mitgliedschaft`, `turnier` 2, je 1 `anlass`, `cm-anmeldung`, `wappen` [G, über die Hilfen der Datei gezählt]. `bestaetigeVerwaltungDirekt` nutzen heute 5 Tests (`anmeldungsliste-ablauf` 4, `waechter` 1) | zwölf Hilfsfunktionen umbauen (anmelden, direkt bestätigen, Ziel aufrufen); Testlogik in 12 Dateien | **verwerfen.** Die Begründung trägt nicht: Der Code der Verwaltung zählt **je Adresse** (`admin/zugang.ts:121–127`, `mailsProAdresseStunde` und `…Tag`), nicht je IP, und jeder Test hat ein eigenes Konto. Das Budget von 10 je Stunde und IP (`login/bremse.ts:78`, `anfragenProIp`) teilen nur der Login-Code und der E-Mail-Wechsel; dort fragen heute `login.test.ts` (1 Test), `profil.test.ts` (1 Test) und `mitgliedschaft.test.ts:104` (nur Android) an. Der Gewinn wäre Laufzeit, nicht gemessen [V]. **Diese Tests prüfen die Bestätigung selbst und behielten den Code in jedem Fall:** `verwaltung.test.ts:65` (SI-08, Admin bestätigt) und `:229` (SI-08, falscher Code, zwei Codes), `turnier.test.ts:60` und `:179` (RR-07, Ziel nach der Bestätigung für die Rolle CM); ohne Code prüfen die Seite `waechter.test.ts:280` und `:510`. Wohin die Bestätigung je Rolle führt, prüfen auch die Hilfen `bestaetige` in `cm-verwaltung.test.ts:61` und `mitteilungen.test.ts:41` [E] |
-| **(j)** zwei Kommentare (H-23) | `src/lib/cm/api.ts:59` («bei 400»); der zweite steht in `src/routes/+layout.ts:9` (nicht in `+layout.svelte`, wie die Zeile 20 sagt): «Läuft keine Ansicht, lädt das Layout erst nach `refreshAll()` wieder» gilt nur mit Sitzung, die Zeilen 12 bis 14 sagen es schon richtig [G] | zwei Sätze | **aufnehmen** |
-| **(k)** Spur bei rotem E2E in der CI (N-23) | siehe unten | siehe unten | **nach F-37**; Empfehlung: als Schalter aufnehmen (Antwort B) |
-
-**Zu (k), was heute aufgezeichnet wird [G]:** `playwright.config.ts:29–36`: `screenshot: 'on'`
-(ein Bild je Test), kein `trace`, kein `video`, keine `retries`. Der Job `e2e` in `check.yml`
-(Zeilen 148 bis 215) läuft je Gerät, Zeitgrenze 20 Minuten, und lädt `test-results/` immer hoch
-(`if: always()`, 30 Tage). Gemessen am Lauf 43622414674 (grün): iPhone 10,0 Minuten, Android
-4,1, Desktop 3,9, zusammen 18 Minuten; Artefakte 78, 81 und 22 MB, zusammen 181 MB. Der rote
-Lauf 43616298374 ist gleich gross (78, 81, 22 MB): Aus den Artefakten lernt man bei Rot nicht
-mehr als bei Grün. Das Repo ist öffentlich [G]; Minuten und Speicher auf den Standard-Runnern
-kosten dann kein Geld [E, Regel von GitHub, nicht nachgelesen], wohl aber Wartezeit.
-
-**Was eine Spur kostet:** `trace: 'retain-on-failure'` zeichnet für **jeden** Test auf (Abbilder
-der Seite, Netz, Konsole) und wirft die Spur bei Grün weg. Der Zuschlag auf die Laufzeit trifft
-also jeden Lauf, auch den grünen; wie gross er hier ist, ist **nicht gemessen** [V] und ohne
-E2E-Lauf nicht messbar. Ein einzelner Messlauf entscheidet es auch nicht sicher: Der iPhone-Job
-schwankt ohnehin zwischen 7,9 und 10,8 Minuten (N-23). Die Artefakte wachsen nur bei Rot, um
-eine Datei je rotem Test [V: einige MB]. **Wiederholungen braucht es dafür nicht.**
-`on-first-retry` (Spur nur im zweiten Versuch) brauchte `retries: 1`; das kostet bei Grün
-nichts, macht aber aus einem Wackler einen bestandenen Test und zeigt im Wackel-Fall die Spur
-des gelungenen Versuchs. Nicht empfohlen.
-
-**Weg ohne laufende Kosten:** `trace` nur, wenn eine Umgebungsvariable gesetzt ist, und im
-Workflow eine Eingabe beim Handstart (`workflow_dispatch` gibt es schon, `check.yml:13`). Push-
-und PR-Läufe bleiben, wie sie sind; wer einen roten Lauf aufklären will, startet ihn von Hand
-mit Spur. Schwäche: Ein Wackler muss im zweiten Lauf wieder auftreten. Weil Kosten dem
-Projektleiter vorbehalten sind (E-06), steht die Wahl als **F-37** in 9.1.
-
-#### 5 Vorschlag für den Schritt
-
-Der Schritt fasst 66 bis 69 Dateien an, die meisten mit einer Zeile. Reines Aufräumen und
-geänderte Testlogik gehören nicht in denselben Lauf (Zeile 20 nennt Sonnet; die Etappe 1 hat
-für Prüfwerkzeug Opus gebraucht). Vorschlag: **zwei Läufe im selben Branch, je eigenes Review,
-ein Merge** (wie Schritt 13 und 15).
-
-**Lauf 1 — Löschen, Umbenennen, Verschieben (Sonnet)**
-
-| Commit | Inhalt | Absicherung | Abbruchstelle |
-|---|---|---|---|
-| 1 `refactor:` | drei tote Namen weg (`warnungText` mit seinen Erwartungen, `RangZeile`, `GespraechZeile` der Verwaltung) samt frei werdender Importe | `svelte-check`, ESLint, Vitest | ein Name hat doch einen Nutzer: Name bleibt, Bericht nennt die Stelle |
-| 2 `refactor:` | `export` weg bei den 25 Werten | `svelte-check`, ESLint (`no-unused-vars`), Vitest | wie Commit 1, je Name |
-| 3 `refactor:` | `doppelWarnungen` → `warnungsSaetze` (drei Dateien) | `svelte-check`, Test der Datei | keine |
-| 4 `docs:` | zwei Kommentare (j) | keine nötig | keine |
-| 5 `test:` | fester Weg des Turnierjahrs weg; Eintrag vom 09.11.2026 in `docs/beobachtungen.md` geschlossen | `svelte-check` (ein Aufrufer mit Jahr wäre ein Typfehler) | ein Aufrufer mit Jahr taucht auf: abbrechen und melden |
-| 6 `test:` | `login.ts` geteilt (vier neue Dateien), 19 Testdateien nur Importe; `docs/context-scopes.md:20` | `svelte-check`; Diff der Testdateien nur in Import-Anweisungen; E2E voll, Zahl der Tests wie vorher (524 bestanden, 64 übersprungen) | eine Testdatei braucht mehr als Importe: abbrechen |
-| 7 `test:` | acht Kopien von `holer`, `json`, `Aufruf` durch die gemeinsame Datei ersetzt, diese nach `tests/hilfen/abruf.ts` umbenannt | Vitest, Zahl der Fälle je Datei wie vorher | eine Kopie weicht ab: Datei bleibt, Bericht nennt sie |
-
-Am Ende des Laufs der volle `make check` auf dem committeten Stand. Erwartung: Vitest um die
-Fälle von `warnungText` kleiner, sonst gleich; E2E gleich. Für die Nutzerin nichts.
-
-**Lauf 2 — Testlogik (Opus)**
-
-| Commit | Inhalt | Absicherung | Abbruchstelle |
-|---|---|---|---|
-| 8 `test:` | (c) `tests/hilfen/mitglieder-listen.ts`; Grundprüfung und Routen-Test nehmen die Listen von dort | zwei Rot-Proben (Liste entfernt; Schlüssel ohne Dienste); Zahl der geprüften Einträge in den 401/415-Schleifen wie vorher (im Bericht) | die Dienste je Liste lassen sich nicht ohne Umbau der Grundprüfung zuordnen: verwerfen, bleibt Beobachtung |
-| 9 `test:` | (b) Prüfung «Methode und Präfix passen» im Routen-Test | einmal rot mit einem umbenannten Eintrag | ein heutiger Name verletzt sie: melden, nichts umbenennen |
-| 10 `test:` | (k) nur bei F-37 B oder C: Schalter oder feste Einstellung in `playwright.config.ts`, bei B die Eingabe in `check.yml`, ein Satz in `docs/ci-cd-und-release.md` | ein Handstart auf dem Branch mit Spur (`gh workflow run check.yml --ref refactor/schritt-20`); bei C der Vergleich der Job-Dauer mit 10,0 / 4,1 / 3,9 Minuten | `scripts/pruefungen/workflow-rechte.ts` meldet die Eingabe; bei C: iPhone-Job über 12 Minuten |
-
-Am Ende der volle `make check`. Der Implementer meldet den neuen Wortlaut für den Satz der
-`CLAUDE.md` zu den Listen der Mitglieder (C-1) und ändert die Datei nicht.
-
-**Reihenfolge und Abhängigkeiten:** Lauf 1 vor Lauf 2. Commit 5 vor 6 (sonst zieht der alte Weg
-mit um). Die Commits 1 bis 4 und 7 hängen an nichts. Lauf 2 hängt nicht an Lauf 1, ausser dass
-beide im selben Branch stehen; fällt Lauf 2 aus, ist Lauf 1 für sich mergebar.
-
-**Vollständige Dateiliste**
-
-- *Lauf 1, App und Skripte (21):* `src/lib/verwaltung/turnier-anzeige.ts`,
-  `turnier-anzeige.test.ts`, `Aktionsdialog.svelte`, `gespraech-api.ts`;
-  `src/lib/interclub/api.ts`; `src/lib/hilfe/ablauf.ts`; `src/lib/login/passkey.ts`;
-  `src/lib/name.ts`; `src/lib/ui/kopftitel.ts`; `src/lib/cm/api.ts`; `src/routes/+layout.ts`;
-  `src/lib/server/admin/mitgliedschaft.ts`, `admin/rollen.ts`, `anlass/angaben.ts`,
-  `anlass/kalender.ts`, `anlass/schnittstellen.ts`, `interclub/import.ts`,
-  `mitteilung/themen.ts`, `turnier/angaben.ts`; `scripts/pruefungen/gruener-stand.ts`,
-  `release.ts`.
-- *Lauf 1, E2E (24):* `tests/e2e/hilfen/login.ts`, neu `verbindung.ts`, `turnier.ts`,
-  `anlass.ts`, `mail.ts`; die 19 Testdateien `anlass`, `anmeldungsliste-ablauf`, `briefe`,
-  `cm-ablauf`, `cm-anmeldung`, `cm-doppel-verwaltung`, `cm-doppel`, `cm-gespraech`,
-  `cm-verwaltung`, `einlesen`, `login`, `mitgliedschaft`, `mitteilungen`, `navigation`, `profil`,
-  `turnier`, `verwaltung`, `waechter`, `wappen` (je `.test.ts`).
-- *Lauf 1, Test-Hilfen und Einheitstests (15):* `tests/hilfen/interclub.ts`;
-  `tests/hilfen/verwaltung-abruf.ts` → `tests/hilfen/abruf.ts`; `src/lib/abruf.test.ts`,
-  `anlass/api.test.ts`, `cm/api.test.ts`, `interclub/api.test.ts`, `login/anmelden.test.ts`,
-  `profil/angaben.test.ts`, `push/api.test.ts`, `verwaltung/mitteilung-api.test.ts`; wegen des
-  neuen Namens `verwaltung/anlass-api.test.ts`, `api.test.ts`, `mitglieder-api.test.ts`,
-  `turnier-api.test.ts`, `zugang-api.test.ts`.
-- *Lauf 1, Doku (3):* `docs/beobachtungen.md` (Eintrag vom 09.11.2026 schliessen; neu der Befund
-  zu den CSS-Suchen aus (g)), `docs/context-scopes.md`, `docs/refactoring-analyse.md`.
-- *Lauf 2 (3 bis 6):* neu `tests/hilfen/mitglieder-listen.ts`;
-  `src/lib/server/grundpruefung.db.test.ts`, `src/lib/server/routen.test.ts`; bei F-37 B oder C
-  `playwright.config.ts`, bei B dazu `.github/workflows/check.yml`, `docs/ci-cd-und-release.md`.
-- *Dazu je Merge:* `package.json` und `package-lock.json` (Version).
-- *Fällt gegenüber der Zeile 20 weg:* `scripts/e2e.ts` (a), `mitteilung/typen.ts` mit seinen
-  Importen (d), `scripts/pruefungen/bauregel.ts` (e), `tests/e2e/cm-ablauf.test.ts` als
-  inhaltliche Änderung (g; die Datei wechselt nur Importe), die E2E-Dateien der Verwaltung als
-  inhaltliche Änderung (i), `src/routes/+layout.svelte` (der Kommentar steht in `+layout.ts`).
-
-#### Abweichungen von der Zeile 20 und den Hinweisen
-
-- «Einzelne Dateien unter `src/lib/`» sind 19 Dateien unter `src/`, dazu zwei Skripte; «ungenutzte Exporte
-  entfernt» heisst bei 25 von 28 Namen «`export` weg», nicht «gelöscht».
-- Modell: Sonnet nur für Lauf 1; Lauf 2 mit Opus.
-- Hinweis (h): acht Kopien, nicht sieben. Hinweis (j): `+layout.ts`, nicht `+layout.svelte`.
-- Hinweis (i): Die Begründung «entlastet das Code-Budget je IP» (H-19) ist falsch [G].
-- Hinweis (d): Die Zahl 44 aus 1d stimmt nur als Teilwort-Suche; sie zählt den Einstieg
-  `holeMitteilungAdminDienste` mit. Der Typ allein steht in 17 Dateien.
-
-#### Bleibt (gut gelöst)
-
-- **Die freien Turnierjahre** (`FREIE_JAHRE`, zufällig, bei «vergeben» ein neuer Versuch) und
-  die Jahresbereiche der Datenbanktests (`tests/hilfen/turnierjahre.ts`): zwei Wege, je passend.
-- **Eine Verbindung je Testprozess** und der Login-Dienst, der beim Versuch, eine Mail zu
-  schicken, abbricht (`login.ts:36–54`).
-- **`tests/hilfen/verwaltungs-listen.ts`** als Vorbild für (c); **die Listen der Schnittstellen**
-  als Exporte nur für die Tests.
-- **`screenshot: 'on'`** und das Hochladen bei jedem Ausgang: der Nachweis je Test bleibt.
-- **`holeMailCode` mit Betreff-Filter** (parallele Meldungen an CM-Admins stören nicht).
-- **Die Bremsen je Adresse und je IP getrennt**; die Tests teilen das knappe Budget bewusst
-  (`mitgliedschaft.test.ts:97–100` fragt nur auf einem Gerät an).
-
-#### Nicht geprüft, dünn belegt
-
-- Kein Lauf: ob nach «`export` weg» wirklich alles übersetzt, zeigt erst `svelte-check`; die
-  Liste ist Textsuche in zwei Durchgängen, kein Werkzeug [E]. Die 59 Typen und die 43 nur von
-  Tests genutzten Namen sind nicht einzeln gelesen (nur die 26 mit zwei Eigennennungen).
-- Die acht Kopien aus (h) sind am Kopf verglichen, nicht Zeile für Zeile bis `json` und
-  `ungeprueft` [E].
-- Die Zahl «56 Tests mit Code der Verwaltung» stammt aus einem Zählskript über die Hilfen je
-  Datei, nicht aus einem Lauf; übersprungene Tests je Gerät sind nicht abgezogen [E].
-- Der Zuschlag einer Spur auf Laufzeit und Artefakte ist nicht gemessen [V]; die Regel von
-  GitHub zu öffentlichen Repos ist nicht nachgelesen [E].
-- Die rund 108 CSS-Suchen sind über ein Muster gezählt; welche davon Rolle und Beschriftung
-  hätten, ist nicht geprüft [E].
-- Ob `scripts/pruefungen/workflow-rechte.ts` eine neue Eingabe im Workflow beanstandet, ist
-  nicht gelesen [V].
-- Offene Branches: geprüft sind die Branches, die der lokale Stand von `origin` kennt (kein
-  `git fetch` in diesem Lauf).
-
-### F.4 Schritt 20, Lauf 1
-
-**Lauf** (14.11.2026, refactor-implementer auf Sonnet, Worktree `refactor/schritt-20` auf `29b0023`,
-Version 0.22.7, plus das Nachmessen). Gelesen: Kopf, Zeile 20, Hinweise, F.3, beide `CLAUDE.md`.
-Jeder Commit lief durch den Pre-Commit-Hook (Doku, Lint, `svelte-check`, Prüfskripte,
-Einheitstests: 1623 Fälle grün).
-
-| Commit | Titel | Inhalt |
-|---|---|---|
-| `40f23a1` | refactor: Drei ungenutzte Namen entfernt | `warnungText` und sein Test «FR-46: Warnungen beim Anmelden von Hand …» (drei Erwartungen), `RangZeile` samt Import `IcRangZeile`, `GespraechZeile` samt Alias |
-| `52d2c5b` | refactor: export bei 25 Werten entfernt | 15 Dateien; je Name per Textsuche bestätigt (`THEMEN` und `titelText` haben gleichnamige lokale Namen in `eslint.config.js`, `Benachrichtigungen.svelte`, `profil/+page.svelte`, keine Importe); ESLint und `svelte-check` ohne Meldung |
-| `716d8ba` | refactor: doppelWarnungen heisst warnungsSaetze | drei Dateien, Kommentar sagt «Einzel und Doppel» |
-| `491c791` | docs: Zwei veraltete Kommentare | `CmFelder`: «beim Fehlerwort «eingabe»»; Wurzel-Layout: das Neuladen nach `refreshAll()` gilt mit Sitzung |
-| `98f69ca` | test: Fester Weg des Turnierjahrs weg | Überladungen von `legeTurnierAn` und `legeOffenesTurnierAn`, `legeTurnierMitFestemJahrAn`; kein Aufrufer mit Jahr (Textsuche, `svelte-check`); Eintrag ins Archiv |
-| `2d1ac39` | test: E2E-Hilfen login.ts nach Themen geteilt | 4 neue Dateien; 19 Testdateien, 32 Import-Anweisungen mehr, Diff der Testdateien nur Import-Zeilen; `docs/context-scopes.md` nennt `turnier.ts` und `verbindung.ts` dazu; E2E voll 524/64 |
-| `c1c4c6f` | test: Acht Kopien … abgeloest | `git mv` nach `tests/hilfen/abruf.ts`; acht Kopien weg (dazu die Kopien von `ungeprueft` und `Koerper`, wo sie standen), jetzt unbenutzte Typ-Importe weg; fünf Verwaltungs-Tests nur Importpfad |
-
-**Abweichungen von F.3:** Keine Kopie wich ab (die in `abruf.test.ts` trug nur den Typ `Holen`, der
-Rückgabetyp passt). `passkey.test.ts` bleibt mit seiner eigenen Hilfe. Die Datei der Hilfen
-`schliesseLoginHilfen` bleibt in `login.ts` als dünne Hülle um `schliesseVerbindung` in
-`verbindung.ts` (kein Weiterreichen). Dazu: der Befund zu den CSS-Suchen aus (g) steht jetzt als Eintrag in
-`docs/beobachtungen.md`.
-
-**Rot-Probe:** Es gibt keine neue Prüfung; der Lauf entfernt, benennt um und verschiebt. Als
-Beweis dienen `svelte-check`, ESLint und die unveränderten Zahlen (Einheit 2410 statt 2411, E2E
-524/64).
-
-**Nicht geprüft:** keine CI auf dem Branch; die Spur (F-37) und Lauf 2 liegen nicht in diesem
-Lauf; E2E lief einmal auf dem Stand von Commit 6 und im vollen `make check`.
-
-**Ausserhalb des Schritts aufgefallen (nicht behoben):**
-
-- Der Titel des Tests «FR-46: Warnungen im Doppel als Liste wie im Einzel …» in
-  `turnier-anzeige.test.ts` sagt «im Doppel», die Funktion heisst jetzt `warnungsSaetze`; der
-  Test ändert nichts, was er prüft, der Titel bleibt.
-- `legeTurnierImJahrAn` in `tests/e2e/hilfen/turnier.ts` hat nach dem Entfernen des festen Jahrs
-  nur noch einen Aufrufer (`legeTurnierAn`) und könnte hineingezogen werden.
-- Die Dauerregel «Elemente über Rolle und Beschriftung» hält die Praxis nicht (F.3, Hinweis (g)).
-
-### F.5 Schritt 20, Lauf 2
-
-**Lauf** (14.11.2026, refactor-implementer auf Opus, Worktree `refactor/schritt-20` auf `98b9225`,
-nach Lauf 1). Gelesen: Kopf, Zeile 20 mit den Hinweisen, F.3, F.4, Zeile 20a, F-37; beide
-`CLAUDE.md`, `docs/ci-cd-und-release.md` (Prüfungen in der CI), `scripts/pruefungen/workflow-rechte.ts`.
-Entscheid des Projektleiters zu F-37: B (E-63). Jeder Commit lief durch den Pre-Commit-Hook.
-
-| Commit | Titel | Inhalt |
-|---|---|---|
-| `882875a` | test: Listen der Mitglieder an einer Stelle | neu `tests/hilfen/mitglieder-listen.ts`: `MITGLIEDER_LISTEN` (sieben Listen, Schlüssel und Reihenfolge wie bisher `cm`, `anlass`, `interclub`, `profil`, `gespraech`, `passkey`, `mitteilung`), Typ `MitgliederDienste` (Dienste je Schlüssel) und `MitgliederSchnittstelle<K>`; `grundpruefung.db.test.ts` baut die Einträge über `eintraegeVon(modul, dienste)` mit `dienste: MitgliederDienste`; `routen.test.ts` bildet `MITGLIEDER` aus der Datei; die sieben Listen-Importe dort fallen weg, die Kommentare zu «neue Liste» nennen die Datei |
-| `953ecbf` | test: Routen-Test prüft, dass der Name zur Methode passt | vierter Fall in `routen.test.ts`: je Route und Methode GET oder POST jeder Name, unter dem die Funktion in einer Liste der Verwaltung oder der Mitglieder steht, beginnt mit `get` bzw. `post`; ohne Liste der Name der Funktion |
-| `298835e` | test: Spur nur beim Handstart der CI mit Schalter | `check.yml`: `workflow_dispatch` mit Eingabe `spur` (boolean, Vorgabe aus), im Schritt «E2E-Tests» `MYTCO_E2E_SPUR: ${{ inputs.spur && 'an' \|\| 'aus' }}`; `playwright.config.ts`: `trace: 'on'` nur bei `MYTCO_E2E_SPUR=an`, sonst kein Schlüssel `trace`; `docs/ci-cd-und-release.md`: Absatz «Spur beim Handstart» unter den Prüfungen der CI |
-| `3f13d00` | docs: F-37 beantwortet (B, E-63) | E-63 in Abschnitt 8, F-37 in 9.1 als beantwortet, Eintrag unter «Unveröffentlicht» in `docs/versionen.md` |
-
-**Zählung unverändert (c):** Mitglieder 39 Einträge, davon 26 schreibend, zusammen mit der
-Verwaltung 26 + 42 in der Schleife «ohne Sitzung und ohne JSON»; diese Zahlen prüft die
-Grundprüfung selbst, sie blieben grün. Die Reihenfolge der Schlüssel ist die der alten
-Aufzählung. Die Namen der Einträge sind nicht vorher gegen nachher verglichen (nur Zahl und
-Reihenfolge der Listen, beide sichtbar gleich).
-
-**Rot-Proben** (jeweils auf dem committeten Stand angebracht, danach mit `git checkout` der
-betroffenen Dateien zurückgenommen, `git status` danach leer):
-
-| Commit | Probe | Ergebnis |
-|---|---|---|
-| (c) 1 | Liste `interclub` aus `mitglieder-listen.ts` (Typ und Objekt) und ihre Dienste aus der Grundprüfung genommen, wie eine nie eingetragene Liste | Routen-Test rot: `expected [ 'GET /api/interclub', false ] to deeply equal [ 'GET /api/interclub', true ]`; Grundprüfung rot: `to have a length of 39 but got 36`; 2 von 10 Fällen rot |
-| (c) 2 | Schlüssel `gespraech` ohne Dienste in der Grundprüfung | `svelte-check`: 1 Fehler, `Property 'gespraech' is missing … but required in type 'MitgliederDienste'` |
-| (c) 3 | `gespraech: anlass` (Dienste vom falschen Typ) | `tsc`: `Type 'AnlassDienste' is missing the following properties from type 'CmDienste': bestaetigung, melde` |
-| (b) 1 | Eintrag in `GESPRAECH_SCHNITTSTELLEN` umbenannt (`getGelesen: postGelesen`) | nur der neue Fall rot: `POST /api/cm/[id]/gespraech/gelesen` meldet `[ "getGelesen" ]`; 1 von 4 |
-| (b) 2 | Funktion umbenannt (`postGelesen` → `getGelesen` in Modul, Route und Routen-Test) | nur der neue Fall rot, dieselbe Meldung; die drei übrigen Fälle grün |
-| (k) | ein E2E (`datenschutz.test.ts`, Desktop) dreimal: ohne `MYTCO_E2E_SPUR`, mit `an`, mit `aus` | ohne: `test-results/` nur `datenschutz.png`, `test-finished-1.png`, `.last-run.json`; mit `an`: dazu `trace.zip` (2 104 623 Bytes); mit `aus`: wie ohne. Je 1 bestanden |
-
-**Abweichungen von F.3:**
-
-- **(b) Name in der Liste statt Name der Funktion.** Der erste Entwurf prüfte den Namen der
-  Funktion (`Function.name`) und jeden Namen in den Listen; er war am heutigen Stand rot für
-  `GET /api/admin/anlaesse/[id]/mitteilungen` mit «(ohne Namen)»: Die sechs Schnittstellen in
-  `mitteilung/verwaltung-schnittstellen.ts:132–137` sind aus Fabriken gebaut (`verlauf('verein')`
-  usw.) und haben zur Laufzeit keinen Namen. Das ist keine Verletzung der Abmachung (der Name in
-  der Liste und der Export stimmen), darum keine Abbruchstelle; geprüft wird jetzt, was
-  Grundprüfung und Rechte-Matrix lesen. Nichts umbenannt.
-- **(b) nur GET und POST.** Eine andere Methode prüft der Fall nicht (es gibt heute keine). Die
-  Rechte-Matrix fängt ein künftiges `put…`/`delete…` der Verwaltung schon («nicht `get`»); die
-  Grundprüfung schickte es als GET. Beobachtung unten.
-- **(k) `trace: 'on'`** statt `retain-on-failure` (F.3 Abschnitt 4 sprach von «behalten nur bei
-  Rot» für C): Mit `retain-on-failure` hätte ein grüner Handstart keine Spur im Artefakt, und
-  der Nachweis «die Artefakte enthalten die Spur» ginge nur mit einem roten Test. Die Laufzeit
-  ist bei beiden gleich, nur das Artefakt wächst. **Schätzung [V]:** rund 175 Tests je Gerät zu
-  2 bis 10 MB, also 0,4 bis 2 GB je Gerät und Handstart statt 22 bis 81 MB; nicht gemessen.
-- **Kein Handstart in der CI** (kein Push in diesem Lauf). Den holt der Orchestrator nach:
-  `gh workflow run check.yml --ref refactor/schritt-20 -f spur=true`, danach im Artefakt
-  `test-results-<gerät>` je Test eine `trace.zip`; Dauer der E2E-Jobs gegen 10,0 / 4,1 / 3,9
-  Minuten vergleichen (Zeitgrenze des Jobs 20 Minuten).
-
-**Prüfskripte zur Änderung am Workflow:** `workflow-rechte.ts` meldet «ok» (die Eingabe steht
-unter `on:`, ausserhalb der Jobs; keine Rechte, kein Secret); `workflow-rechte.test.ts` und
-`nur-doku.test.ts` grün (36 Fälle); `nur-doku.ts` stuft `check.yml` weiter als Code ein; die
-Datei ist gültiges YAML (mit Ruby gelesen: `on` hat `pull_request`, `push`, `workflow_dispatch`
-mit `inputs.spur`). `actionlint` ist nicht installiert, nicht geprüft.
-
-**Voller `make check`** auf `3f13d00` (4,6 Minuten, E2E 3,5 Minuten): grün; Lint, `svelte-check`, Prüfskripte,
-2411 Tests mit Abdeckung, beide Builds, E2E 524 bestanden, 64 übersprungen (unverändert), Image.
-
-**Vorschlag für die `CLAUDE.md` (C-1), nicht geändert:** Unter «Tests» steht heute «Eine neue
-Liste der Verwaltung kommt in `tests/hilfen/verwaltungs-listen.ts` und in die Tabelle der
-Bauregel; eine neue Liste der Mitglieder in Grundprüfung und Routen-Test.» Neu: «Eine neue
-Liste der Verwaltung kommt in `tests/hilfen/verwaltungs-listen.ts` und in die Tabelle der
-Bauregel; eine neue Liste der Mitglieder in `tests/hilfen/mitglieder-listen.ts`.» (Die Dienste in
-der Grundprüfung erzwingt der Typ.)
-
-**Nicht geprüft:** keine CI auf dem Branch, also auch kein Handstart mit Spur und keine Grösse
-der Artefakte unter Last; die Spur lokal nur mit einem Test auf Desktop, nicht auf WebKit; die
-Namen der 39 Einträge nicht einzeln vorher gegen nachher (nur Zahl und Reihenfolge der Listen);
-die Rückfall-Lesart «Name der Funktion» in (b) ohne eigene Rot-Probe (fünf Funktionen ohne Liste).
-
-**Ausserhalb des Schritts aufgefallen (nicht behoben):**
-
-- Die sechs Schnittstellen der Mitteilungen der Verwaltung haben zur Laufzeit keinen
-  Funktionsnamen (`verlauf('verein')` usw.); Meldungen des Routen-Tests nennen sie darum
-  «(ohne Namen)». Stört heute nicht; eine Fabrik könnte den Namen setzen (App-Code, nach dem
-  Feature-Stopp).
-- Die Grundprüfung leitet die Methode aus dem Präfix ab (`post…` → POST, sonst GET). Eine
-  künftige Schnittstelle mit `put…` oder `delete…` liefe dort als GET; der neue Fall im
-  Routen-Test prüft nur GET und POST. Stoff für Schritt 24, wenn es je eine dritte Methode gibt.
-- `scripts/pruefungen/workflow-rechte.ts` liest nur Rechte und Secrets; ob eine Eingabe von
-  `workflow_dispatch` sicher in `run:` landet (Ausdruck statt Umgebungsvariable), prüft kein
-  Werkzeug. Hier über `env:` gelöst.
-- **Review Lauf 1 (14.11.2026, refactor-reviewer): «ok», nichts vor dem Merge zu beheben.** Gelesen
-  am festen Commit `98b9225`, nichts ausgeführt. Die 28 geänderten Namen unabhängig nachgesucht
-  (kein Nutzer ausserhalb der eigenen Datei); die 19 E2E-Dateien ändern nur Importe; jede Zeile
-  des alten `login.ts` steht in einer der fünf Dateien, der Zustand (eine Verbindung je Prozess)
-  ist gleich geteilt; die acht Kopien sind zur Laufzeit gleich wie `tests/hilfen/abruf.ts`.
-  Hinweise: Im Archiv der Beobachtungen fehlte der Commit-Hash (nachgetragen, Orchestrator);
-  `login.ts` hatte 35 verschiedene exportierte Namen, nicht 37 (39 `export`-Zeilen wegen der
-  Überladungen; ohne Folge); `tests/e2e/hilfen/anlass.ts` und `mail.ts` stehen in keiner Zeile
-  von `docs/context-scopes.md` (Merkpunkt für Schritt 21). Nicht geprüft vom Reviewer: kein Lauf;
-  `turnier.ts` nur in den Deklarationen gelesen.
-- **Review Lauf 2 (14.11.2026, refactor-reviewer): «ok», nichts vor dem Merge zu beheben.** Listen und
-  Reihenfolge gleich; drei Rot-Proben zu Commit 8 und zwei zu Commit 9 nachgestellt, darunter der
-  Rückfall «Name der Funktion» (`/api/logout` als GET: rot), der oben unter «Nicht geprüft» stand.
-  Die Lesart von Hinweis (b) (Name in der Liste) trägt. Der Schalter ist sicher verdrahtet (nur
-  `workflow_dispatch`, über `env`, Job ohne Secret); in eine Spur gelangen nur erfundene Testdaten
-  des CI-Containers. Hinweise: Ein Listeneintrag ohne Route liefe in der Grundprüfung ungeprüft
-  nach seinem Präfix (heute keiner; Beobachtung); der Satz der `CLAUDE.md` unter «Tests» stimmt
-  nach dem Merge nicht mehr (Vorschlag oben; geht an den Projektleiter).
-- **Handstart mit Spur, gemessen (Orchestrator, Lauf 43629593490 auf dem Branch, `spur=true`):**
-  alle Jobs grün. E2E-Jobs: iPhone 9,0 Minuten, Desktop 5,1, Android 5,0 (ohne Spur zuletzt 10,0 /
-  3,9 / 4,1; die Spur kostet rund eine Minute, die Zeitgrenze von 20 Minuten ist weit). Artefakte:
-  Desktop 216 MB, Android 509 MB, iPhone 301 MB, zusammen rund 1 GB (ohne Spur 181 MB). Damit
-  ist `trace: 'on'` vertretbar; die Schätzung «0,4 bis 2 GB je Gerät» war zu hoch, und «die
-  Laufzeit trifft beide Formen gleich» bleibt eine Annahme [V] (nur `on` gemessen). Der Inhalt
-  einer `trace.zip` aus der CI ist nicht geöffnet worden; die Grösse der Artefakte ist der Beleg.
-  `docs/ci-cd-und-release.md` nennt Dauer, Grösse und Aufbewahrung.
-
-### F.6 Schritt 20a
-
-**Lauf** (14.11.2026, refactor-implementer auf Opus, Worktree `refactor/schritt-20a` ab
-`origin/dev` = `2d207f5`, Version 0.22.8). Gelesen: Kopf, Zeile 20a mit den Hinweisen, E-56, H-07
-und H-13 in 1d, die Übergangsregeln «Ab Schritt 15» und «Ab Schritt 18»; im Protokoll der Etappe 2
-E.3 (verworfene Regel, 98 Meldungen mit `no-restricted-globals`), E.6 (0 Meldungen mit der
-Auswahl nach dem Aufruf) und E.13 (Reihenfolge der zehn Dateien); beide `CLAUDE.md`,
-`eslint.config.js`, `scripts/importrichtung.test.ts`, `scripts/pruefungen/`,
-`docs/ci-cd-und-release.md`. Svelte-Doku über den MCP-Server (`svelte/compiler`: `parse`,
-`parseCss`). Jeder Commit lief durch den Pre-Commit-Hook.
-
-**Messung vorab** (`npx eslint --no-inline-config --rule '{"no-restricted-syntax":…
-"CallExpression[callee.name=\"fetch\"]"…}'`):
-
-| Bereich | Meldungen |
-|---|---|
-| `src/` ganz (Seiten, Bausteine, Ladefunktionen, Abruf-Module, `abruf.ts`, Server, Service Worker, Hooks, Tests) | **0** |
-| `scripts/`, `tests/` | 6 in 5 Dateien: `scripts/ic-import.ts`, `tests/e2e/hilfen/mail.ts`, `tests/e2e/mitgliedschaft.test.ts`, `tests/e2e/mitteilungen.test.ts`, `tests/e2e/verwaltung.test.ts` |
-| `src/`, Aufrufe mit Punkt (`x.fetch(…)`, `fetch.call(…)`) | 0 |
-
-Die Textsuche `fetch(` unter `src/` findet einen Treffer, den Text `'Failed to fetch'` in
-`src/lib/login/anmelden.test.ts:53`. `fetch` steht sonst nur als Vorgabe `holen: Holen = fetch`
-(rund 90 Stellen in den Abruf-Modulen) und in Kommentaren. **Erlaubte Stellen: keine.** Der
-Abruf-Baustein braucht keine (er ruft `holen(pfad, init)`, `abruf.ts:94`), Server, Service
-Worker und Tests unter `src/` auch nicht.
-
-| Commit | Titel | Inhalt |
-|---|---|---|
-| `9b5bd6e` | test: Lint-Regel kein Aufruf fetch unter src/ (Schritt 20a) | `eslint.config.js`: Block `FETCH_REGEL` (am Schluss der Konfiguration, mit Typ `Linter.Config`); neu `scripts/fetch-regel.test.ts` (30 Fälle) |
-| `cb6d8ef` | test: Prüfung der Design-Importe (Schritt 20a) | neu `scripts/design-importe.test.ts` (30 Fälle): `REIHENFOLGE`, `pruefeDesignImporte`, Proben, echtes Repo |
-| `1839963` | docs: Lint-Regel zu fetch und Prüfung der Design-Importe in CI/CD (Schritt 20a) | zwei Zeilen in «Prüfungen in der CI» |
-
-**Test vor der Regel (fetch):** `scripts/fetch-regel.test.ts` ohne den Block in
-`eslint.config.js`: `Tests 16 failed | 14 passed (30)`; rot waren alle 15 Fälle «meldet …» und
-die Meldung, grün die erlaubten Formen, die Grenzen und das echte Repo. **Abweichung vom Auftrag
-«Test vor der Regel committen»:** Test und Regel stehen im selben Commit, weil der
-Pre-Commit-Hook (`make check-schnell`) einen roten Test nicht durchlässt. Der rote Lauf ist hier
-belegt. Bei der Prüfung der Design-Importe ist der Test die Prüfung; es gibt kein «davor».
-
-**Rot-Proben am echten Repo** (nach den Commits, je mit Sicherungskopie im Scratchpad, danach
-zurückkopiert; `git status` danach leer; kein `git checkout`):
-
-| Probe | Ergebnis |
-|---|---|
-| Layout: `bedienelemente.css` und `karten.css` vertauscht | `design-importe` rot, 1 von 30 («das echte Repo hat keinen Befund») |
-| Layout: Zeile `druck.css` gelöscht | rot, 1 von 30 |
-| Layout: `karten.css` ein zweites Mal am Schluss | rot, 1 von 30 |
-| `src/lib/ui/Zurueck.svelte` importiert `$lib/design/karten.css` | rot, 1 von 30 |
-| `src/lib/verwaltung/Pfad.svelte` importiert `../design/brief.css` | rot, 1 von 30 |
-| neue Datei `src/lib/design/neu.css`, nirgends eingetragen | rot, 1 von 30 |
-| Prüfung verfälscht (Vergleich der Folge auf `false`) | rot, 1 von 30 («meldet zwei vertauschte Zeilen») |
-| `void fetch('/api/status')` in `Zurueck.svelte`, `({ fetch }) => fetch('/api/status')` in `src/routes/hilfe/+page.ts` | ESLint: 2 Fehler `no-restricted-syntax` (2:7, 12:73); `fetch-regel` rot, 1 von 30, nennt beide Stellen |
-| `fetch('/api/status')` in `hilfe/+page.ts` hinter `// eslint-disable-next-line no-restricted-syntax` | ESLint grün (Exit 0); `fetch-regel` rot, 1 von 30 (`hilfe/+page.ts:13`) |
-| nach allen Proben | beide Tests 30 von 30 grün |
-
-**Eingebettete Proben** (gestellte Dateien, kein Eingriff ins Repo): fetch: 15 Formen gemeldet
-(darunter `fetch?.(…)`, `(fetch)(…)`, `.svelte.ts`, `.js`), 7 zugelassen (Vorgabe und Übergabe von
-`holen`, das Ereignis `'fetch'`, der Text `'Failed to fetch'`, `scripts/`, `tests/e2e/`), 6 Grenzen
-als «fängt nicht». Design: vertauscht, fehlend, als Zeilen- oder Blockkommentar oder als Text
-(zählt als fehlend), doppelt, `brief.css` und eine fremde Datei im Layout, die Schreibweisen
-`$lib`, `/src` und `?inline` (gleich), fehlendes Layout; ausserhalb des Layouts Baustein,
-`<script module>`, Unter-Layout, Ladefunktion mit `?raw`, `import()`, `export … from`, Test,
-`@import` in einer Design-Datei, `@import url(…)`; `brief.css` an zweiter Stelle; Briefdruck ohne
-`brief.css` oder mit `tokens.css`; neue Datei ohne Eintrag, Eintrag ohne Datei; zugelassen fremde
-CSS, Pfad im Text, im Kommentar, Lesen per `readFileSync`.
-
-**Voller `make check`** auf `1839963` (5,5 Minuten, E2E 3,5 Minuten): grün; Lint, `svelte-check`,
-Prüfskripte, 2471 Tests in 172 Dateien mit Abdeckung (vorher 2411), beide Builds, E2E 524
-bestanden, 64 übersprungen (unverändert), Image; grüner Stand gemerkt.
-
-**Was die Prüfungen nicht fangen:**
-
-- *fetch:* `window.fetch(…)`, `globalThis.fetch(…)`, `self.fetch(…)`, ein weitergereichtes `holen`,
-  `fetch.call(…)`/`apply`, `fetch` mit Typ-Zusatz (`as`, `!`); ein späterer Konfigurationsblock,
-  der für dieselben Dateien `no-restricted-syntax` setzt, ersetzt die Regel still (ESLint mischt
-  die Optionen einer Regel nicht; im Kommentar vermerkt). Ein `eslint-disable` fängt nicht der
-  Lint, aber der Test.
-- *Design:* `import.meta.glob`, ein berechneter Pfad, `<link>` im Markup, Dateien unter
-  `src/lib/design/`, die nicht auf `.css` enden; die Reihenfolge in den vier Mockups, im Kopf von
-  `grundlagen.css` und im Leitbild (Handarbeit, H-07).
-
-**Nicht geprüft:** keine CI auf dem Branch (kein Push); die Laufzeit des Tests am echten Repo
-(rund 4 Sekunden für ESLint über `src/`) unter Last der CI.
-
-**Ausserhalb des Schritts aufgefallen (nicht behoben):**
-
-- Der Kopf «Stand» und die Zeile 20 in 7.5 standen nach dem Merge von Schritt 20 noch auf
-  «Review offen»; in diesem Lauf nach F.5 und `docs/versionen.md` nachgetragen (reine Doku).
-- `docs/ui-leitbild.md:17` sagt «Reihenfolge wie in `src/routes/+layout.svelte`»; das stimmt,
-  nennt aber die Prüfung nicht. Kandidat für Schritt 21.
-- Die strengere Form der Regel (auch `x.fetch(…)`) wäre heute grün; ob sie kommt, entscheidet
-  Schritt 24 mit dem Wortlaut der Dauerregel (C-13).
-- **Review (14.11.2026, refactor-reviewer): «ok», nichts vor dem Merge zu beheben.** Die wirksame
-  Konfiguration je Dateiart ist mit `--print-config` geprüft (Regel als Fehler für Bausteine,
-  Ladefunktionen, Server und Service Worker; vorher gab es kein `no-restricted-syntax`, nichts
-  wird verdrängt). Drei Rot-Proben am Repo nachgestellt (`fetch(` im Markup eines Bausteins;
-  zwei Design-Dateien vertauscht; Design-Import in einem anderen Baustein), dazu der rote Lauf
-  ohne Regel (16 von 30). Hinweise, nicht behoben (Merkpunkte für Schritt 24, wo die Regeln
-  Dauerregeln werden): (1) `import()` einer Design-Datei im Svelte-Markup bleibt in der
-  Design-Prüfung still grün und fehlt in den Listen «nicht erfasst»; (2) im Kommentar von
-  `scripts/design-importe.test.ts` steht `docs/mockups/` statt `docs/ui-mockups/`; (3) die
-  Meldung der fetch-Regel nennt «Abruf-Module des Themas», was für Server-Code nicht passt;
-  braucht der Server einmal einen eigenen Abruf, fällt ein Entscheid über eine Ausnahme an; (4)
-  `fetch-regel.test.ts` hat keinen Fall für Markup (die Regel wirkt dort); (5) die strengere
-  Form mit `x.fetch(…)` wäre heute ebenfalls ohne Meldung. Nicht geprüft vom Reviewer: CI auf dem
-  Branch, voller `make check` (grüner Stand bestätigt), die Mockups gegen die Liste.
+Das Protokoll der Etappe 4 kommt als Anhang G in dieses Dokument (samt dem Nachtrag zur Etappe 3)
+und wird mit dem Abschluss in Schritt 25 ebenso ausgelagert.
