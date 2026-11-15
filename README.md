@@ -11,7 +11,7 @@ oder die Website tcolten.ch.
 
 ## Stand
 
-Etappe **Pilot** (die von *Fundament* ist erledigt), noch nicht ausgeliefert (aktuelle Nummer: [Versionen](docs/versionen.md)): Login per Einmal-Code mit
+Die Etappe **Pilot** läuft, das *Fundament* ist erledigt; noch nicht ausgeliefert (aktuelle Nummer: [Versionen](docs/versionen.md)). Gebaut sind: Login per Einmal-Code mit
 Musterbrief und freiwilligem Passkey, Hilfe beim Start, Mitgliederverwaltung für Mitglieder-Admins mit
 Liste «Für Fairgate», Einlesen einer Mitgliederliste als CSV-Datei, Login-Briefen einzeln und als Serie aus einer Druckansicht, Austritt, Löschen mit Bedenkzeit, Auskunft und automatischen Löschfristen, Rollen mit *Ansicht als …* für MyTCO-Admins, eigene Angaben im Profil ändern (mit freiwilligem Rufnamen, der überall vor dem amtlichen Namen steht), Datenschutzerklärung in der App,
 Anmeldung zu Anlässen wie der Generalversammlung (Vorschlag für den Vorstand, K-50),
