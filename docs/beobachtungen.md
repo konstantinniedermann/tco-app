@@ -520,6 +520,29 @@ dem Branch (Skill `tco-branching`, Schritt 3).
 
 **Einschätzung:** Kein Fehler der App; bei Wiederholung die Zeitgrenze des Tests prüfen. Vorläufig.
 
+**Nachtrag 2026-11-15:** In der CI auf `dev` (Lauf 43728560539, Merge von Dependabot #82, mit
+SvelteKit 3.2 aus #86) war ein zweiter Test derselben Datei auf dem iPhone rot: «Zwei schnelle
+Reiter-Klicks hintereinander» (`tests/e2e/bewegung.test.ts:323`, Überschrift «Hoi …» nach 5 s
+nicht sichtbar). Lokal im vollen Lauf auf allen drei Geräten grün, in der CI beim Neustart des
+Jobs grün. Damit wackeln zwei Tests der Reiter-Bewegung; eine Regression durch SvelteKit 3.2 ist
+nicht belegt, aber auch nicht ausgeschlossen. Kommt es wieder: Trace holen, bevor die Zeitgrenze
+steigt.
+
+### 2026-11-15 — E2E «Spielersuche springt nicht» einmal rot auf Android
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/cm-verwaltung.test.ts:408` («Keine Treffer.» im Dialog nach 5 s nicht
+sichtbar)
+
+**Beobachtung:** Einmal rot in der CI auf `dev` (Lauf 43728026093, Merge von Dependabot #86 mit
+SvelteKit 3.2.0); lokal im vollen Lauf auf allen drei Geräten grün, beim Neustart des Jobs grün.
+
+**Ursprung:** Merge der Dependabot-PRs #86 und #82 nach dem Refactoring (#80).
+
+**Einschätzung:** Wackler oder Folge von SvelteKit 3.2, offen. Kommt es wieder: Trace mit Netzwerk
+holen. Vorläufig.
+
 ### 2026-11-13 — Interclub: Randfälle der Übersicht und Import ohne Zeitgrenze
 
 **Thema:** Interclub
