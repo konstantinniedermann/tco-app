@@ -47,9 +47,9 @@ export const MODULE = ['db', 'login', ...THEMEN];
 /**
  * Ausnahmen von der Regel; leer, ein neuer Eintrag braucht den Entscheid des Projektleiters (der Test
  * «AUSNAHMEN ist leer» in scripts/importrichtung.test.ts wird dann rot). `von` und `nach` sind Dateien
- * relativ zu src/lib/server/. `schritt` nennt den Schritt aus docs/refactoring-analyse.md, der die
- * Ausnahme abbaut, oder «bleibt: …» mit Grund. Eine Ausnahme gilt je Datei und Zieldatei, nicht je
- * importiertem Namen.
+ * relativ zu src/lib/server/. `schritt` nennt das Issue oder den Entscheid, der die Ausnahme abbaut,
+ * oder «bleibt: …» mit Grund (der Name stammt aus dem Refactoring). Eine Ausnahme gilt je Datei und
+ * Zieldatei, nicht je importiertem Namen.
  * @type {{ von: string; nach: string; schritt: string }[]}
  */
 export const AUSNAHMEN = [];
