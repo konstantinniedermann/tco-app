@@ -29,6 +29,12 @@ describe('kein Aufruf fetch unter src/', () => {
 			svelte("\tasync function neu() {\n\t\tawait fetch('/api/x');\n\t}")
 		],
 		['src/routes/+layout.ts', "export const load = ({ fetch }) => fetch('/api/sitzung');"],
+		// Das Markup eines Bausteins: Ereignis und {#await}.
+		['src/lib/anlass/Neu.svelte', "<button onclick={() => fetch('/api/anlass')}>Neu</button>\n"],
+		[
+			'src/routes/anlass/+page.svelte',
+			"{#await fetch('/api/anlass') then antwort}\n\t<p>{antwort.status}</p>\n{/await}\n"
+		],
 		// Auch die Abruf-Module und der Abruf-Baustein: Sie rufen `holen`, nie `fetch`.
 		['src/lib/anlass/api.ts', "export const hole = () => fetch('/api/anlass');"],
 		['src/lib/abruf.ts', 'export const rufe = (pfad: string) => fetch(pfad);'],
