@@ -6108,3 +6108,13 @@ E-08 vermerkt: Zusammenlegen widerspricht der Dauerregel «Migrationen fügen nu
 **D.** E-102 bis E-105 in Abschnitt 8; G.5, Fragen 1 bis 4 und die Tabelle «Bleibendes»; «Ergebnis
 Schritt 25», Zeile 25, Kopf und «Stand und nächster Schritt»; Eintrag unter «Unveröffentlicht» in
 `docs/versionen.md` um ADR-013 ergänzt. Der Vermerk zuoberst bleibt.
+
+**Nachweis.** `make docs` grün bei jedem Commit (Pre-Commit-Hook) und danach auf `9a675be`.
+`make check-schnell` auf dem committeten Stand `9a675be`: grün, Exit 0 (Prettier und ESLint ohne
+Befund, `svelte-check` 0 Fehler und 0 Warnungen in 1614 Dateien, Prüfskripte ok, 110 Dateien und
+1708 Einheitstests grün); ebenso der Pre-Commit-Hook beim Commit `0596a67`.
+`node scripts/pruefungen/gruener-stand.ts pruefen HEAD` auf `9a675be`: **Exit 1, der grüne Stand
+gilt nicht mehr**, erwartet, weil `eslint.config.js` zum Prüfstand zählt. Ein voller `make check`
+ist in diesem Nachtrag nicht gelaufen; ob er vor dem Merge läuft, entscheidet der Orchestrator.
+**Nicht geprüft:** kein Browser, kein E2E, keine Datenbanktests; ob ADR-013 den Ton des
+Projektleiters trifft, entscheidet er mit dem Ok.
