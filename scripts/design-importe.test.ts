@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest';
 // from`, `import()`, mit `?raw` und ähnlichem; in Bausteinen auch `import()` im Markup), dazu
 // `@import` in CSS. Kommentare und Texte zählen nicht. Nicht erfasst: `import.meta.glob`, ein
 // berechneter Pfad, `<link>` im Markup und Lesen per `readFileSync`; die vier Mockups unter
-// docs/mockups/ und das Leitbild bleiben Handarbeit.
+// docs/ui-mockups/ und das Leitbild bleiben Handarbeit.
 
 const DESIGN = 'src/lib/design/';
 const LAYOUT = 'src/routes/+layout.svelte';
