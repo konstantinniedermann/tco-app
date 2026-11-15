@@ -53,10 +53,13 @@ describe('kein Aufruf fetch unter src/', () => {
 		expect(await meldungen(datei, code)).toHaveLength(1);
 	});
 
-	it('die Meldung nennt den Weg über die Abruf-Module und dass es keine Ausnahme gibt', async () => {
-		expect(await meldungen('src/lib/anlass/neu.ts', "fetch('/x');")).toEqual([
-			'Kein Aufruf von fetch unter src/: Daten holen nur die Abruf-Module des Themas (src/lib/<thema>/), über holen und src/lib/abruf.ts. Es gibt keine Ausnahme.'
-		]);
+	it('die Meldung nennt den Weg für Oberfläche und Server und dass es keine Ausnahme gibt', async () => {
+		const meldung =
+			'Kein Aufruf von fetch unter src/. Oberfläche: Daten holen nur die Abruf-Module des Themas (src/lib/<thema>/) mit holen über src/lib/abruf.ts. Server und Service Worker: holen wird hineingereicht (im Server über die Dienste). Es gibt keine Ausnahme.';
+		expect(await meldungen('src/lib/anlass/neu.ts', "fetch('/x');")).toEqual([meldung]);
+		expect(
+			await meldungen('src/lib/server/anlass/neu.ts', "export const x = () => fetch('/x');")
+		).toEqual([meldung]);
 	});
 
 	it.each([
