@@ -4064,6 +4064,8 @@ Protokoll G.5)
   enthält.
 - **Feature-Stopp:** bestätigt beendet, mit dem Merge von Schritt 24 nach `dev` am 15.11.2026
   (Merge `f28bf8b`, E-95). Schritt 25 hebt nichts mehr auf.
+- **Nachweis:** `make docs` grün; voller `make check` grün auf `466db88` (2495 Tests, E2E 524/64,
+  5,4 Minuten); Einzelheiten in G.5.
 - **Offen für den Projektleiter:** #80 schliessen; Verbleib dieses Dokuments; die Fragen in G.5.
 
 ### 7.7 Reihenfolge, Checkpoints, Abbruch [geändert]
@@ -5898,8 +5900,9 @@ Verbleib dieses Dokuments) macht der Projektleiter.
 | `1a91b41` | refactor: Kommentare nennen die Bauregel statt der aufgelösten Übergangsregel |
 | `925cbd9` | docs: Agenten des Refactorings entfernt, Context-Scopes ohne Zeile Refactoring |
 | `4f64b92` | docs: Beobachtung zur Versionsprüfung ohne den Revert, der im Skill steht |
-| (folgt) | docs: Refactoring als abgeschlossen markiert, Schritt 25 vorbereitet |
-| (folgt) | docs: Eintrag unter «Unveröffentlicht» für Schritt 25 |
+| `d978f24` | docs: Refactoring als abgeschlossen markiert, Schritt 25 vorbereitet |
+| `466db88` | docs: Eintrag unter «Unveröffentlicht» für Schritt 25 |
+| (dieser) | docs: Nachweis zu Schritt 25, Beobachtungen am Prüflauf berichtigt |
 
 Die Nachricht von `5d23696` sagt «zwölf neue Einträge»; es sind dreizehn (gezählt nach dem
 Commit, die Nachricht ist nicht berichtigt).
@@ -5917,7 +5920,7 @@ nur aus dem Protokoll übernommen)
 | N-04 (Rest), N-07 | «Bauregel: zwei benannte Grenzen beim Schutz der Admin-Routen» | neu |
 | N-08 (Rest), N-18, H-14 [E], H-20 [E], H-21 [E] | «Vertrag zwischen Server und Oberfläche: was die Typen nicht binden» | neu |
 | N-16, N-17, H3-12 | «Tests: drei kleine Lücken im Netz ohne heutige Folge» | neu |
-| H-24 [E], H-25 | «Pre-Commit-Hook und Testausgabe: zwei Störgeräusche» | neu |
+| H-25 | «Pre-Commit-Hook prüft auch nicht versionierte E2E-Dateien» | neu |
 | H-10 [E], H-12, H-26 [E] | «Rückfragen der Verwaltung: zwei Randfälle und ein Zustand ohne Test» | neu |
 | H-16 | «Turniere und Anlässe der Verwaltung: die Zahl sagt ein Vorleser wohl nicht an» | neu |
 | H-15 | «Wächter nutzt `Object.hasOwn`; welche Geräte die App trägt, ist nicht festgelegt» | neu |
@@ -5933,9 +5936,7 @@ Fachdienste, `sitzung/schnittstellen.ts`, Hook), `antwort` ohne Bindung von Wort
 `Object.hasOwn` in `waechter.ts:74`, `role="status"` in beiden Listen, `$derived.by` im Verlauf,
 44 Dateien mit `MitteilungAdminDienste`, die Routen `status` und `kontakt`, die Umleitung in
 `verwaltung/+layout.ts:20`, die vier Zugangs-Schnittstellen, `eintragszeilen` als Menge und die
-Meldung in `release.ts:112–118`. Die Meldung zu `localStorage` (H-24) kam in der Ausgabe der
-Einheitstests beim Commit `1a91b41` nicht vor; ob sie in den Datenbanktests oder E2E noch kommt,
-zeigt der volle `make check` unten.
+Meldung in `release.ts:112–118`.
 
 **Nicht übertragen**
 
@@ -5950,6 +5951,7 @@ zeigt der volle `make check` unten.
 | Merkpunkt Schritt 24: C-16 und Anhang F «offen» | in Schritt 24 erledigt |
 | Merkpunkt Schritt 24: `~/.claude/agents/cas-reviewer.md` | gemeinsames Setup, nicht tco-app; steht in der gemeinsamen `beobachtungen.md` (Eintrag vom 12.11.2026, Nachsatz vom 15.11.2026), dort nur gelesen |
 | Review 24 (f): Zeile 24 «Skill enthält nur noch Ablauf» | betrifft nur dieses Dokument; hier in 6.2 Punkt 5 vermerkt |
+| H-24: Node meldet `localStorage` als nicht verfügbar | überholt: kommt in der ganzen Ausgabe des vollen `make check` auf `466db88` nicht mehr vor (0 Treffer); zuerst übertragen, im Nachweis-Commit wieder herausgenommen |
 | Review 23: «Ein Revert braucht einen eigenen Eintrag» | steht schon im Skill `tco-branching` und in `docs/ci-cd-und-release.md:419` |
 | Review 23: «0.23.0 steht nur im Skill» | berichtigt: steht in Skill, `docs/ci-cd-und-release.md` und ADR-012; der Punkt selbst ist übertragen |
 
@@ -6020,6 +6022,18 @@ Vierzehn Kommentare in zwölf Dateien nennen dieses Dokument als Herkunft und bl
    ohne Weiteres wahr. Falls es bleiben soll: ein Satz in arc42 oder ein ADR?
 4. **Deutsche Namen im Code** (6.3): steht nirgends ausdrücklich. Ein Satz in der `CLAUDE.md`
    ist nach der Aufnahmeregel kaum nötig (der Code zeigt es); lassen?
+
+**Nachweis.** `make docs` grün bei jedem Doku-Commit (Pre-Commit-Hook) und vor `d978f24`; der
+Commit `1a91b41` lief durch `make check-schnell` (1708 Einheitstests grün). **Voller `make check`**
+auf dem committeten Stand `466db88`, im Worktree, im Hintergrund, kein anderer Prüflauf: grün,
+Exit 0, 5,4 Minuten; Einheits- und Datenbanktests 172 Dateien, 2495 Fälle; E2E 524 bestanden, 64
+übersprungen, 3,4 Minuten; `gruener-stand: grüner Stand 4b7bf71b8255 gemerkt.`
+`node scripts/pruefungen/version-merge.ts origin/dev..HEAD` meldet auf dem Branch den Commit
+`1a91b41` ohne eigenen Eintrag (Exit 1): erwartet, denn die Prüfung geht je Schritt der
+Hauptlinie, und der Branch kommt als ein Merge. Gegen einen Probe-Merge (`git commit-tree` mit
+`origin/dev` und `HEAD` als Eltern, ohne Checkout) meldet sie `version-merge: ok` (Exit 0). Der
+Commit mit diesem Nachweis ist reine Doku; ob der grüne Stand gilt, prüft
+`gruener-stand.ts pruefen HEAD`.
 
 **Was nicht geprüft ist:** Das Session-Gedächtnis nur im Index gelesen. Die mit [E]
 gekennzeichneten Punkte sind aus den Tabellen 1c bis 1e übernommen, nicht am Code nachgestellt.

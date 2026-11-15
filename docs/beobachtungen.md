@@ -156,9 +156,9 @@ behandelt nur der Wächter»: Das Layout der Verwaltung leitet ohne frische Best
 `/verwaltung/bestaetigen` um; der Wächter (Fall `verwaltung-zugang`) deckt nur Sitzung und Rolle.
 (3) «Jede Schnittstelle der Verwaltung läuft über `liest` oder `schreibt`»: Die vier
 Zugangs-Schnittstellen sind die Zugangsprüfung selbst (`zugang.pruefe` bzw. `mitKonto`, E-34).
-(4) «Die Zeit kommt über die Dienste, nie direkt aus `new Date()`»: Vier Fachdienste,
-`getSitzung` und der Hook nehmen `new Date()` als Vorgabe, wenn keine Uhr hineingereicht wird;
-gemeint ist die Fachlogik. (5) Der Kommentar zur Regel `fetch` sagt, auch der Service Worker
+(4) «Die Zeit kommt über die Dienste, nie direkt aus `new Date()`»: Vier Fachdienste und
+`getSitzung` nehmen `new Date()` als Vorgabe, wenn keine Uhr hineingereicht wird, und der Hook
+reicht dem Löschlauf `new Date()`; gemeint ist die Fachlogik. (5) Der Kommentar zur Regel `fetch` sagt, auch der Service Worker
 bekomme `holen` hineingereicht; er holt nichts (E-89).
 
 **Ursprung:** Review von Schritt 24 (15.11.2026, Hinweise (a) bis (c)); Refactoring-Analyse 1c,
@@ -296,21 +296,19 @@ Protokolle D.4, F.5).
 **Einschätzung:** (1) nur lokal. (2) fällt beim ersten Server mit Push auf. (3) kleiner Abschluss:
 eine Prüfung «jeder Listeneintrag hat eine Route», spätestens mit der ersten dritten Methode.
 
-### 2026-11-15 — Pre-Commit-Hook und Testausgabe: zwei Störgeräusche
+### 2026-11-15 — Pre-Commit-Hook prüft auch nicht versionierte E2E-Dateien
 
 **Thema:** Tests
 
-**Fundort:** `.githooks/pre-commit` (`make check-schnell`, darin Prettier); Ausgabe der
-Einheitstests.
+**Fundort:** `.githooks/pre-commit` (`make check-schnell`, darin Prettier).
 
-**Beobachtung:** (1) Der Pre-Commit-Hook prüft mit Prettier auch nicht versionierte Dateien unter
-`tests/e2e/`; eine liegengelassene Datei hält einen Commit auf, der sie nicht enthält. (2) Node
-meldet in der Testausgabe `localStorage` als nicht verfügbar.
+**Beobachtung:** Der Pre-Commit-Hook prüft mit Prettier auch nicht versionierte Dateien unter
+`tests/e2e/`; eine liegengelassene Datei hält einen Commit auf, der sie nicht enthält.
 
-**Ursprung:** Refactoring Etappe 2 (Refactoring-Analyse 1d, H-24 und H-25; Protokoll E.8, E.12).
+**Ursprung:** Refactoring Etappe 2 (Refactoring-Analyse 1d, H-25; Protokoll E.12).
 
-**Einschätzung:** Ohne Folge für die App. (1) Prettier im Hook nur auf versionierte Dateien
-anwenden; (2) Ursache suchen, wenn die Ausgabe sonst sauber sein soll.
+**Einschätzung:** Ohne Folge für die App. Prettier im Hook nur auf versionierte Dateien anwenden,
+wenn es wieder stört.
 
 ### 2026-11-15 — Rückfragen der Verwaltung: zwei Randfälle und ein Zustand ohne Test
 
