@@ -17,8 +17,9 @@ Eine neue ADR kommt in diese Tabelle und mit einer Zeile in die
 | [ADR-004](adr-004-login-einmal-code.md) | Mitglieder melden sich mit einem Einmal-Code an, ohne Passwort | Entschieden | 2026-11-02 |
 | [ADR-005](adr-005-passkey-simplewebauthn.md) | Der freiwillige Passkey wird mit SimpleWebAuthn gebaut | Entschieden | 2026-11-04 |
 | [ADR-006](adr-006-eigenstaendig-ohne-fairgate.md) | MyTCO führt seine eigene Mitgliederliste, ohne Anbindung an Fairgate | Entschieden | 2026-10-29 |
-| [ADR-007](adr-007-version-pro-merge.md) | Jeder Merge nach dev mit Code bekommt seine eigene Versionsnummer | Entschieden | 2026-11-05 |
+| [ADR-007](adr-007-version-pro-merge.md) | Jeder Merge nach dev mit Code bekommt seine eigene Versionsnummer | Ersetzt durch ADR-012 | 2026-11-05 |
 | [ADR-008](adr-008-zeitgeber-in-der-app.md) | Die Löschfristen setzt ein täglicher Zeitgeber in der App durch | Entschieden | 2026-11-07 |
 | [ADR-009](adr-009-gruener-stand.md) | Ein schon grün geprüfter Stand wird vor dem Push nicht noch einmal voll geprüft | Entschieden | 2026-11-06 |
 | [ADR-010](adr-010-repo-oeffentlich.md) | Das Repo ist öffentlich | Entschieden | 2026-11-06 |
 | [ADR-011](adr-011-interclub-schnittstelle-swiss-tennis.md) | MyTCO liest die Interclub-Daten von der nicht dokumentierten Schnittstelle von Swiss Tennis | Entschieden | 2026-11-13 |
+| [ADR-012](adr-012-version-beim-release.md) | Eine Versionsnummer entsteht beim Release nach main, nicht beim Merge nach dev | Vorgeschlagen | 2026-11-15 |
