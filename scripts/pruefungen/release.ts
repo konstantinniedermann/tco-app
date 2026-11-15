@@ -56,6 +56,11 @@ function ueberschriften(markdown: string): Ueberschrift[] {
 	return liste;
 }
 
+/** Der Abschnitt `## Unveröffentlicht` mit seinen Inhaltszeilen, oder undefined, wenn er fehlt. */
+export function unveroeffentlicht(markdown: string): Ueberschrift | undefined {
+	return ueberschriften(markdown).find(({ text }) => text.trim() === '## Unveröffentlicht');
+}
+
 /** Abschnitte `## X.Y.Z …` mit dem Marker «nicht ausgeliefert» aus der Überschrift. */
 export function versionsabschnitte(markdown: string): Versionsabschnitt[] {
 	return ueberschriften(markdown).flatMap(({ text, zeile }) => {
@@ -94,17 +99,15 @@ export function pruefeRelease(stand: Releasestand): string[] {
 				`nach dev nicht erhöht (Skill tco-branching, Schritt 4)`
 		);
 
-	const unveroeffentlicht = ueberschriften(stand.versionen).find(
-		({ text }) => text.trim() === '## Unveröffentlicht'
-	);
-	if (!unveroeffentlicht) {
+	const offen = unveroeffentlicht(stand.versionen);
+	if (!offen) {
 		befunde.push(`${VERSIONEN}: Abschnitt «## Unveröffentlicht» fehlt`);
 	} else if (
 		stand.version !== stand.versionMain &&
-		unveroeffentlicht.inhalt.some((zeile) => zeile.trim() !== '')
+		offen.inhalt.some((zeile) => zeile.trim() !== '')
 	) {
 		befunde.push(
-			`${VERSIONEN}:${unveroeffentlicht.zeile}: «Unveröffentlicht» ist nicht leer, obwohl sich die Version ` +
+			`${VERSIONEN}:${offen.zeile}: «Unveröffentlicht» ist nicht leer, obwohl sich die Version ` +
 				`von ${stand.versionMain} auf ${stand.version} ändert — Einträge in den Abschnitt «## ${stand.version}»`
 		);
 	}
