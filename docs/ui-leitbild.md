@@ -14,7 +14,7 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Was | Code-Stelle |
 |-----|-------------|
 | Werte (Farben, Schrift, Abstände, Formen, Bewegung) | `src/lib/design/tokens.css` |
-| Grundstil und Bausteine | `src/lib/design/grundlagen.css`, `rahmen.css`, `bedienelemente.css`, `karten.css`, `verwaltung.css`, `anleitung.css`, `uebergaenge.css`, `pc-layout.css`, `druck.css`, `verlauf.css` (Reihenfolge wie in `src/routes/+layout.svelte`, nach `tokens.css`) |
+| Grundstil und Bausteine | `src/lib/design/grundlagen.css`, `rahmen.css`, `bedienelemente.css`, `karten.css`, `verwaltung.css`, `anleitung.css`, `uebergaenge.css`, `pc-layout.css`, `druck.css`, `verlauf.css` (Reihenfolge wie in `src/routes/+layout.svelte`, nach `tokens.css`; `scripts/design-importe.test.ts` prüft, dass nur das Wurzel-Layout sie vollständig und in dieser Reihenfolge importiert, `brief.css` nur der Briefdruck; die Mockups und dieses Leitbild führen die Reihenfolge von Hand nach) |
 | Wappen und App-Symbol (Farben fest in der Datei) | `static/wappen.svg`, `static/favicon.svg`, `static/*.png` |
 | Manifest (Name, Farben fest in der Datei; `theme_color` und `background_color` stimmen von Hand mit `--farbe-marke` und `--farbe-hintergrund` überein) | `static/manifest.webmanifest` |
 | Farbe der Browserleiste, Systemschrift-Einstellung, sichere Abstände zu Statusleiste und Notch über `env(safe-area-inset-*)` (`viewport-fit=cover`; nie `apple-mobile-web-app-status-bar-style` `black-translucent`, das schaltet den Schutz vor dem Schleier von iOS ab) | `src/app.html` |
