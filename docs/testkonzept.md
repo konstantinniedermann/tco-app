@@ -107,9 +107,10 @@ Brief-Codes an, `turnier.ts` Turniere, Anmeldungen und Nachrichten, `anlass.ts` 
 liest Codes aus Mailpit, `seite.ts` bündelt die Prüfungen der Seite (Konsole, Barrierefreiheit,
 Warten aufs Vorladen, Pfad, Aktion wählen, Aufklappbereich), `geraet.ts` stellt Start vom Symbol und Install-Angebot nach, `passkey.ts`
 schaltet den virtuellen Authenticator ein; `verbindung.ts` hält Datenbank und Login-Dienst je
-Testprozess, `umgebung.ts` die Werte, die auch der Server bekommt. Konten, Turniere, Anlässe und
-Anmeldungen legen sie über die Fachlogik des Servers an, vieles andere (Rollen, Telefon, Austritt,
-Fristen) setzen sie direkt in der Datenbank; sie schicken nie eine Mail. Die Hilfen der Einheits- und
+Testprozess, `umgebung.ts` die Werte, die auch der Server bekommt. Brief-Codes, Rollen, Turniere,
+Kategorien, Anlässe, Anmeldungen und Nachrichten legen sie über die Fachlogik des Servers an;
+Mitglied und Konto sowie Telefon, Austritt, Fristen und die Bestätigung der Verwaltung setzen sie
+direkt in der Datenbank; sie schicken nie eine Mail. Die Hilfen der Einheits- und
 Datenbanktests liegen unter `tests/hilfen/`: `mitglieder.ts` (Mitglied anlegen),
 `anfrage.ts` (Ereignis einer Route), `eigene-datenbank.ts` (eigene Datenbank einer Testdatei),
 `turnierjahre.ts` (Turnierjahr je Testdatei), `interclub.ts`, `passkey-pruefer.ts`, `abruf.ts` und die
@@ -179,9 +180,10 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
   neu.
 - Datenbanktests, die auf der gemeinsamen Test-Datenbank ein Turnier anlegen, nehmen ihr Turnierjahr
   aus `tests/hilfen/turnierjahre.ts`: Jede Testdatei hat dort ihren eigenen Bereich von Jahren, kein
-  Jahr gehört zwei Dateien. So trifft kein Test das Jahr eines anderen, auch nicht parallel; Dateien
-  mit eigener Datenbank (`tests/hilfen/eigene-datenbank.ts`) können feste Jahre setzen; eine neue Datei bekommt einen freien Bereich
-  (`turnierjahre.test.ts` prüft, dass sich keine zwei überlappen).
+  Jahr gehört zwei Dateien. So trifft kein Test das Jahr eines anderen, auch nicht parallel; eine
+  neue Datei bekommt einen freien Bereich (`turnierjahre.test.ts` prüft, dass sich keine zwei
+  überlappen). Dateien mit eigener Datenbank (`tests/hilfen/eigene-datenbank.ts`) können feste
+  Jahre setzen.
 - Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
   (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
 - E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern im Format

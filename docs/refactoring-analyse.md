@@ -4734,9 +4734,22 @@ Kante vom Hook zu den Diensten und einen Satz zu den Routen, die an `dienste.ts`
 Datenbank oder die Einstellungen holen (`/api/sitzung`, `/api/status`, `/api/kontakt`); der
 Routen-Test nennt `/api/kontakt` und `/api/status` als Ausnahmen und die fünf Schnittstellen ohne
 Liste; `waechter.test.ts` prüft «Störung bleibt Meldung» für alle vier Listen und «genau einmal» nur
-für die Mitgliederliste; die E2E-Hilfen legen nur Konten, Turniere, Anlässe und Anmeldungen über
-die Fachlogik an; die Zeile `tests/` im README nennt `scripts/`, `betrieb/` und `setup/`.
+für die Mitgliederliste; die E2E-Hilfen legen Brief-Codes, Rollen, Turniere, Kategorien, Anlässe, Anmeldungen und
+Nachrichten über die Fachlogik an, Mitglied und Konto direkt in der Datenbank (berichtigt nach
+dem Nachreview); die Zeile `tests/` im README nennt `scripts/`, `betrieb/` und `setup/`.
 
 Beim zweiten Gegenlesen berichtigt: der `Aktionsdialog` dient auch den Doppel-Listen; die
 Hilfen in `seite.ts` bündeln auch Pfad, Aktion wählen und Aufklappbereich.
 
+**Nachreview (15.11.2026, refactor-reviewer): zwei Stellen vor dem Merge, beide in Sätzen der
+Korrekturrunde.** Commits der Korrekturrunde: `72382a3`, `c68a022`, `673819c` (Inhalt), `704202e`
+(Protokoll). (1) `docs/testkonzept.md`, E2E-Hilfen: Konten entstehen nicht über die Fachlogik
+(`legeMitgliedAn` schreibt direkt), Rollen dagegen schon (`machAdmin`, `setzeRollen`); die zwei
+Beispiele standen auf der falschen Seite. (2) `docs/arc42.md`, Zeile «Dienste»: «nur Routen, Hook
+und die Vertragstests» stimmte nicht ganz, auch `login/schnittstellen.db.test.ts` holt
+`holeLoginDienst`; Bremsen- und `MAIL_NUR_AN`-Test nutzen die Einstiege über die Routen. Beide
+Sätze hat der Orchestrator nach den Angaben des Reviewers berichtigt und an
+`tests/e2e/hilfen/login.ts`, `turnier.ts` und `anlass.ts` selbst gegengelesen; der Satz zu den
+Turnierjahren steht jetzt als eigener Satz am Ende. Alles andere aus der ersten Runde ist laut
+Nachreview behoben und stimmt am Code; der Branch ist reine Doku geblieben. **Das Review hatte
+damit zweimal Befunde: Checkpoint mit dem Projektleiter vor dem Merge (E-45).**
