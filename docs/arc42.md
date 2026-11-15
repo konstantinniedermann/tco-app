@@ -90,7 +90,7 @@ flowchart TD
   DB --> PG[(PostgreSQL)]
 ```
 
-Das Bild vereinfacht: `/api/sitzung` und `/api/status` holen die Datenbank unmittelbar aus `db/index.ts`, `/api/kontakt` liest nur die Einstellungen; sie gehen nicht über `dienste.ts`.
+Das Bild vereinfacht: `/api/sitzung` und `/api/status` holen die Datenbank unmittelbar aus `db/index.ts`, `/api/kontakt` liest nur die Einstellungen; sie gehen nicht über `dienste.ts`. `/api/status` und `/api/kontakt` bauen ihre Antwort zudem in der Route selbst, ohne Schnittstellen-Funktion.
 
 | Baustein | Aufgabe | Regel |
 |----------|---------|-------|
@@ -138,6 +138,7 @@ flowchart LR
 |---------|-----|-----------|
 | **Server** | Infomaniak VPS mit Linux, gehärtet nach SI-13 | [ADR-003](adr/adr-003-hosting-infomaniak-vps.md), [Sicherheitskonzept](sicherheitskonzept.md) |
 | **Test und Live** | je App und eigene Datenbank, getrennt; Test nur mit erfundenen Daten | [CI/CD und Release](ci-cd-und-release.md#umgebungen) |
+| **Zustand im Arbeitsspeicher** | Die Bremsen, offene Passkey-Anfragen und laufende E-Mail-Wechsel hält die App im Arbeitsspeicher: Sie gelten nur für den einen Prozess und gehen bei Neustart und Auslieferung verloren. Das trägt, solange je Umgebung eine App läuft | [Sicherheitskonzept](sicherheitskonzept.md) (SI-09, SI-18) |
 | **Adressen** | `my.tcolten.ch` (Live), `test.my.tcolten.ch` (Test); bis dahin eine Übergangsadresse aus der IP des Servers | Annahme K-10 |
 | **Auslieferung** | Merge nach `dev` liefert auf Test, Merge des PR nach `main` auf Live | [CI/CD und Release](ci-cd-und-release.md#auslieferung) |
 | **Sicherung** | nächtlich mit Probe; das Ziel hängt an K-03 und K-48 | [Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung) |
