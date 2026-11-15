@@ -4074,8 +4074,9 @@ Protokoll G.5)
   (E-102): Stand in `README.md` und `docs/index.md` (Etappe *Pilot*), Status von Schritt 09 in
   7.3, die Beschreibung des Feldes `schritt` in `eslint.config.js` (nur Kommentar);
   `docs/adr/adr-013-gemeinsame-bausteine.md` «Vorgeschlagen» mit Index und arc42 Kapitel 4; ein
-  Abschnitt für den Body von #39 als Datei. **Offen:** das Ok des Projektleiters zu ADR-013 und
-  zum Text für #39, der Merge, #80. Protokoll: G.5, «Nachtrag».
+  Abschnitt für den Body von #39 als Datei. [Korrekturrunde, 15.11.2026, E-106: ADR-013
+  entschieden, Text für #39 freigegeben; offen nur Merge, Body von #39 und #80, alles beim
+  Orchestrator.] Protokoll: G.5, «Nachtrag».
 
 ### 7.7 Reihenfolge, Checkpoints, Abbruch [geändert]
 

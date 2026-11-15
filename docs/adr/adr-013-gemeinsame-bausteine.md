@@ -50,10 +50,11 @@ halten ESLint und die Prüfskripte unter `scripts/` fest, ohne Fremdpaket (E-11)
   «ändernd» kommen nur aus `src/lib/server/http.ts`; die Schnittstellen lesen die Zeit mit `jetzt`
   von dort (Zielbild 6.1 Punkt 1). Vier Fachdienste (Login, Passkey, Zugang der Verwaltung,
   E-Mail-Wechsel) und `getSitzung` setzen `new Date()` nur als Vorgabe, wenn keine Uhr
-  hineingereicht wird (Beobachtung «Dauerregeln der `CLAUDE.md` sagen an fünf Stellen mehr als der
-  Code»). Dienste, Mail- und Push-Versender und Bremsen entstehen nur in
-  `src/lib/server/dienste.ts`, der obersten Schicht, die kein Server-Modul importieren darf
-  (6.1 Punkte 2 und 8). Dazu gilt die Regel der `CLAUDE.md`: Die Zeit kommt über die Dienste
+  hineingereicht wird; der Zeitgeber in `src/hooks.server.ts` reicht dem Löschlauf `new Date()`
+  direkt (Beobachtung «Dauerregeln der `CLAUDE.md` sagen an fünf Stellen mehr als der Code»).
+  Dienste, Mail- und Push-Versender und Bremsen entstehen nur in `src/lib/server/dienste.ts`,
+  der obersten Schicht: Kein Modul unter `src/lib/server/` darf sie importieren (6.1 Punkte 2
+  und 8). Dazu gilt die Regel der `CLAUDE.md`: Die Zeit kommt über die Dienste
   (`jetzt`), nie direkt aus `new Date()`.
 - **Fehler:** eine Fehlerform `{ fehler, felder? }` und eine Liste der Fehlerwörter in
   `src/lib/fehler.ts`, die Server und Oberfläche teilen; Zusatzangaben nur, wo die Liste sie für
