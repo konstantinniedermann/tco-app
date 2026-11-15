@@ -322,7 +322,7 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | `svelte-check`, Typprüfung des Service Workers (`tsc`), Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
 | Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN`, `TURNIER_SCHNITTSTELLEN`, `CM_ADMIN_SCHNITTSTELLEN` und `GESPRAECH_ADMIN_SCHNITTSTELLEN` (Clubmeisterschaft: Turnier, Anmeldungen, Gespräch), `MITTEILUNG_ADMIN_SCHNITTSTELLEN` (Mitteilungen der Verwaltung) bzw. `ANLASS_ADMIN_SCHNITTSTELLEN` (Anlässe der Verwaltung; alle sechs deckt der Rechte-Test ab, Tabelle `VERWALTUNGS_DATEIEN` in `scripts/pruefungen/bauregel.ts`) und reichen `holeAdminDienste()` bzw. `holeMitteilungAdminDienste()` aus `src/lib/server/dienste.ts` nur weiter; andere Routen nutzen `lib/server/admin` und die am Pfad gesperrten Verwaltungs-Dateien (`turnier/schnittstellen.ts` und `verwaltung-schnittstellen.ts` in `cm/`, `gespraech/`, `mitteilung/` und `anlass/`) nicht und holen aus `dienste.ts` nur die sechs Einstiege der Mitglieder (Erlaubt-Liste); Importe mit Namen in Anführungszeichen gelten nach denselben Regeln; die Rechteprüfung `liest`, `schreibt` und `mitKonto` aus `src/lib/server/admin/rechte.ts` importieren nur die Dateien der Tabelle `VERWALTUNGS_DATEIEN` (geprüft in `src/` ohne Routen und Tests, auch `.mts`, `.cts`, `.mjs` und `.cjs`), und diese rufen sie nur auf, ohne sie weiterzureichen; jede Sperre gilt für den Pfad, wie er steht, und für den aufgelösten (`..`, `./`, `//`, `/src/…`), Kommentare zählen nur ausserhalb von Texten, dazu gilt die bisherige Lesart (ein Befund aus einer von beiden zählt); `export { x as 'actions' }` gilt als Form Action; `import.meta.glob`, `require` und ein berechnetes `import()` sind in Routen und in den geprüften Dateien unter `src/` ein Befund | ADR-002, RR-07 | vorhanden |
 | Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
-| Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
+| Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), dazu die Vertragstests der Schnittstellen (Grundprüfung, Routen-Test, Bremsen-Test), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
 | Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI als ein Job pro Umgebung parallel (je nur mit ihrem Browser); Screenshots als Artefakt pro Umgebung, 30 Tage; im offiziellen Playwright-Image (Browser und Systempakete schon drin, Version aus `package-lock.json`), Datenbank und Mailpit über die Service-Namen; jeder Lauf läuft über `scripts/e2e.ts` auf einer eigenen, danach gelöschten Datenbank (`mytco_e2e_…`) im Postgres-Service und baut in einen eigenen, danach gelöschten Ordner (`.e2e-build/…`) | Testkonzept | vorhanden |
@@ -335,6 +335,11 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Oberfläche nur aus Tokens des Leitbilds (`design-tokens.ts`, `design-festwerte.ts`) | UI-Leitbild | vorhanden |
 | Node-Hauptversion wie in `.nvmrc`, sonst enden Prüfskripte still (`pruefe-node.sh`) | — | vorhanden |
 | Jeder Merge nach `dev` mit Code erhöht die Version um einen Schritt, mit Abschnitt in den Versionen (`version-merge.ts`) | dieses Konzept | nur Hook (Push auf `dev`) |
+
+**Stylesheet-Vergleich:** `make css-vergleich VORHER=<Ordner> NACHHER=<Ordner>` vergleicht das
+gebaute CSS zweier Builds Zeichen für Zeichen (`scripts/css-vergleich.ts`; der Ablauf steht im Kopf
+der Datei). Es ist ein Hilfsbefehl auf Abruf, etwa nach einem Umbau der Stil-Dateien, keine Prüfung
+und nicht Teil von `make check` oder der CI.
 
 **Spur beim Handstart:** Wird ein E2E-Test nur in der CI rot, lässt sich ein Lauf von Hand mit
 Spur starten (`gh workflow run check.yml --ref <branch> -f spur=true`). Dann zeichnet Playwright
