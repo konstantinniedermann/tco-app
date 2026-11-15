@@ -2,7 +2,7 @@
 
 # Context-Scopes
 
-Welche Pfade bei welcher Aufgabe geladen werden. Ein Ordner steht für seinen ganzen Inhalt; einzelne Dateien stehen nur, wo ein Ordner zu viel lüde oder die Datei ausserhalb des Themenordners liegt. Pläne und Specs unter `docs/superpowers/` sind Geschichte und werden nicht geladen.
+Welche Pfade bei welcher Aufgabe geladen werden. Ein Ordner steht für seinen ganzen Inhalt; einzelne Dateien stehen nur, wo ein Ordner zu viel lüde oder die Datei ausserhalb des Themenordners liegt. Pläne und Specs unter `docs/superpowers/` sind Geschichte und werden nicht geladen, ebenso das abgeschlossene Refactoring (`docs/refactoring-analyse.md` und die vier `docs/refactoring-protokoll-etappe-*.md`); was davon gilt, steht in `CLAUDE.md`, arc42, den ADRs und `docs/beobachtungen.md`.
 
 | Aufgabe | Relevante Pfade | Nicht nötig |
 |---------|-----------------|-------------|
@@ -24,7 +24,6 @@ Welche Pfade bei welcher Aufgabe geladen werden. Ein Ordner steht für seinen ga
 | Brief | `src/lib/server/brief/`, `src/lib/design/brief.css`, `src/lib/server/admin/briefe.ts`, `src/routes/api/admin/briefe/`, `src/routes/api/admin/mitglieder/[id]/brief/`, `src/routes/verwaltung/briefe/`, `src/lib/verwaltung/Briefdruck.svelte`, `scripts/musterbrief.ts`, `tests/e2e/briefe.test.ts` | `docs/recherche/` |
 | Hilfe und Einstieg | `src/lib/hilfe/`, `src/lib/ui/Anleitung.svelte`, `src/lib/ui/ZeichnungAndroid.svelte`, `src/lib/ui/ZeichnungIphone.svelte`, `src/routes/hilfe/`, `src/routes/willkommen/`, `src/routes/api/kontakt/`, `src/routes/+page.ts`, `src/hooks.client.ts`, `tests/e2e/hilfe.test.ts`, `tests/e2e/hilfen/`, `docs/ui-leitbild.md`, `docs/ui-mockups/hilfe.html` | `docs/recherche/` |
 | Datenbank und Migrationen | `src/lib/server/db/`, `drizzle/`, `drizzle.config.ts`, `scripts/migrate.ts`, `scripts/seed-lokal.ts`, `scripts/testdaten.ts`, `scripts/erfundene-mitglieder.ts`, `scripts/beispiel-anlass.ts`, `scripts/beispiel-turnier.ts`, `scripts/beispiel-interclub.ts`, `scripts/beispiel-mitglieder.ts`, `docker-compose.yml`, `.env.example` | `docs/recherche/` |
-| Refactoring (Plan, Stand, Entscheide) | `docs/refactoring-analyse.md`, `CLAUDE.md`, `.claude/agents/`, `.claude/skills/tco-branching/` | `docs/superpowers/`, `docs/recherche/` |
 | Arbeitsweise, Issues | `docs/issue-konventionen.md`, `docs/abklaerungen.md`, `.github/ISSUE_TEMPLATE/`, `CLAUDE.md`, `.claude/skills/tco-branching/`, `docs/versionen.md`, `docs/beobachtungen.md` | `docs/recherche/` |
 | Tests planen und schreiben | `tests/`, die Tests neben dem Code in `src/` und `scripts/`, `vitest.config.ts`, `playwright.config.ts`, `scripts/e2e.ts`, `scripts/pruefungen/testmuster.ts`, `docs/testkonzept.md`, `docs/fachmodell.md`, `docs/rollen-und-rechte.md`, `docs/anforderungen/anforderungen.md`, `docs/datenschutz.md` | `docs/recherche/` |
 | Betrieb und Auslieferung | `betrieb/`, `tests/betrieb/`, `scripts/ci/`, `scripts/testdaten.ts`, `.github/workflows/`, `Dockerfile`, `.dockerignore`, `docs/ci-cd-und-release.md`, `docs/sicherheitskonzept.md`, `docs/betrieb-und-uebergabe.md` | `docs/recherche/` |
