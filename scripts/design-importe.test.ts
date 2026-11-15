@@ -10,9 +10,10 @@ import { describe, expect, it } from 'vitest';
 // Ordner, die in der Liste fehlt, und ein Eintrag ohne Datei sind ein Befund. Gelesen werden alle
 // Dateien unter src/ (auch Tests): Importe in Skripten und Svelte-Bausteinen (statisch, `export …
 // from`, `import()`, mit `?raw` und ähnlichem; in Bausteinen auch `import()` im Markup), dazu
-// `@import` in CSS. Kommentare und Texte zählen nicht. Nicht erfasst: `import.meta.glob`, ein
-// berechneter Pfad, `<link>` im Markup und Lesen per `readFileSync`; die vier Mockups unter
-// docs/ui-mockups/ und das Leitbild bleiben Handarbeit.
+// `@import` in CSS-Dateien. Kommentare und Texte zählen nicht. Nicht erfasst: `import.meta.glob`,
+// ein berechneter Pfad, `<link>` im Markup, `@import` im `<style>`-Block eines Bausteins (solche
+// Blöcke verbietet die Bauregel der Oberfläche, geprüft wird das nicht) und Lesen per
+// `readFileSync`; die vier Mockups unter docs/ui-mockups/ und das Leitbild bleiben Handarbeit.
 
 const DESIGN = 'src/lib/design/';
 const LAYOUT = 'src/routes/+layout.svelte';
