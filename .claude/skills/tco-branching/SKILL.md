@@ -22,7 +22,7 @@ bleibt auf `dev`) stehen in `CLAUDE.md` und werden hier nicht wiederholt.
 
 ## Betrieb mit Subagenten (Orchestrator)
 
-Läuft die Arbeit über Subagenten (z. B. beim Refactoring), gilt abweichend von «Pro Issue»:
+Läuft die Arbeit über Subagenten, gilt abweichend von «Pro Issue»:
 
 - Die Orchestrator-Session bleibt im Hauptordner und wechselt nicht mit `EnterWorktree`
   in einen Worktree: Das sperrt die Subagenten aus.
@@ -88,7 +88,10 @@ Issue-Nummer, wo es eine gibt. Eine Versionsnummer setzt der Branch nie.
 **3 — Review:** `make check` grün, Agent `cas-reviewer`, Befunde klären. `make check` zuletzt
 auf dem fertigen, committeten Stand laufen lassen: Dann merkt es sich den Stand, und die
 Pushes des Branches und des Merge-Commits auf `dev` prüfen nicht noch einmal voll
-(`docs/ci-cd-und-release.md`, «Grüner Stand»).
+(`docs/ci-cd-und-release.md`, «Grüner Stand»). Bringt der Branch einen neuen oder geänderten
+E2E zu Fokus, Zeit oder Navigation, läuft die CI einmal auf dem Branch, bevor gemergt wird
+(`gh workflow run check.yml --ref <branch>`); wird sie rot, ein zweites Mal mit
+`-f spur=true`.
 
 **4 — Nach `dev` mergen (im Hauptordner):** Vorher den Worktree mit `ExitWorktree` (`keep`)
 verlassen — aus dem Worktree heraus verweigert Claude Code Git-Befehle auf den Hauptordner.
@@ -332,6 +335,11 @@ noch offen (Hauptordner besetzt): Branch pushen, Worktree und `in-arbeit` bleibe
 Bericht als offen nennen. Nicht fertige Arbeit: Branch pushen, der Worktree bleibt stehen,
 im Bericht nennen; bei unfertig abgegebener Arbeit (niemand führt sie weiter) `in-arbeit`
 entfernen.
+
+Abweichend von `session-wrap-up` werden README und Doku nicht nach jedem Issue nachgeführt,
+sondern im Doku-Abgleich vor einem Release (Schritt 4a). Nach jedem Issue bleiben: der Eintrag
+unter «Unveröffentlicht», die Doku, die der Branch selbst ändert, Beobachtungen, Issues und
+Labels, Aufräumen, Memories.
 
 ## Reibungspunkte bei Parallel-Arbeit
 
