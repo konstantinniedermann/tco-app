@@ -20,16 +20,16 @@ Issue im Milestone *Fundament*.
 
 | Dokument | Inhalt |
 |----------|--------|
-| [arc42](arc42.md) | Gesamtbild: Ziele, Kontext mit Nachbarsystemen, Bausteine, Server, Querschnittskonzepte, Risiken — mit Verweisen auf die Einzeldokumente |
+| [arc42](arc42.md) | Gesamtbild: Ziele, Kontext mit Nachbarsystemen, Bausteine von Oberfläche und Server, Verteilung auf den Server, Querschnittskonzepte, Risiken — mit Verweisen auf die Einzeldokumente |
 | [ADR-Index](adr/adr-index.md) | Architektur-Entscheidungen mit Begründung |
 | [Fachmodell](fachmodell.md) | Objekte, Beziehungen, Fachregeln `FR-NN` und Lebenszyklen bis zur Etappe *Lizenzanträge*; Grundlage für Datenbank und Code |
 | [Datenschutzkonzept](datenschutz.md) | Was MyTCO mit Personendaten tut, nach nDSG; Vorgaben `DS-NN` für Technik und Hosting; Grundlage für jede neue Funktion |
 | [Rollen und Rechte](rollen-und-rechte.md) | Rollen bis zur Etappe *Lizenzanträge*, Grundsätze `RR-NN` und Matrix, wer was sehen und ändern darf |
 | [Datenschutzerklärung (Entwurf)](datenschutzerklaerung.md) | Text für die Mitglieder in der App und in den Login-Briefen |
-| [CI/CD und Release](ci-cd-und-release.md) | Test- und Live-Umgebung, Ablauf bis live, Prüfungen in der CI, Versionen, alte App-Versionen, Actions-Minuten |
+| [CI/CD und Release](ci-cd-und-release.md) | Test- und Live-Umgebung, Ablauf bis live, Prüfungen in der CI und Hilfsbefehle, Versionen, alte App-Versionen, Actions-Minuten |
 | [Betrieb und Übergabe](betrieb-und-uebergabe.md) | Konten und Eigentum, Geheimnisse, Grundsätze für Sicherung und Überwachung, Übergabe-Checkliste |
 | [Sicherheitskonzept](sicherheitskonzept.md) | Bedrohungen und Massnahmen, Login mit Einmal-Code, Vorgaben `SI-NN`, Restrisiken |
-| [Testkonzept](testkonzept.md) | Testebenen und Werkzeuge, Abdeckung, Zuordnung Anforderung → Test, Testdaten, Checkliste vor dem Release |
+| [Testkonzept](testkonzept.md) | Testebenen und Werkzeuge, Vertragstests der Schnittstellen, Hilfen der Tests, Abdeckung, Zuordnung Anforderung → Test, Testdaten, Checkliste vor dem Release |
 | [Testgruppe](testgruppe.md) | Pilot vor dem Briefversand: Ablauf, Aufträge, Texte für Mail und Chat, Formular, Auswertung |
 | [UI-Leitbild](ui-leitbild.md) | Corporate Design: Farben, Schrift, Bausteine, Navigation, Sprache, Barrierefreiheit `UI-NN`; Mockups |
 
