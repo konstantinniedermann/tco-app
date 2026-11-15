@@ -11,6 +11,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Die Projektregeln für Claude gelten nach dem Refactoring auf Dauer: Die Übergangsregeln
+  sind aufgelöst, der Feature-Stopp endet; README und Doku werden vor einem Release
+  nachgeführt, nicht nach jedem Issue (Refactoring Schritt 24). An der App ändert sich nichts.
+
 ## 0.22.11 — Versionsnummer nur noch beim Release (ADR-012)
 
 - Doku an den Code angeglichen: Bausteinsicht, Testkonzept, CI/CD, README und Übersicht nennen

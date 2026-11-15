@@ -102,7 +102,7 @@ Nachfolge (K-05).
    des Projektleiters (unter `~/.claude/` bzw. eine Ebene über dem Repo) liegen und gehen sonst
    verloren: die übergeordnete `CLAUDE.md` (Workflow, Dependencies, Commit-Konvention, Umgang
    mit Befunden), die Skills `session-start`, `session-wrap-up`, `beobachtungen-auswerten` und
-   `doku-audit`, der Agent `cas-reviewer`, die Hooks `dep-guard` (blockt unbekannte Pakete) und
+   `doku-audit`, der Agent `merge-reviewer`, die Hooks `dep-guard` (blockt unbekannte Pakete) und
    `ps_hooks` (Lagebild und Schutz der Worktrees bei parallelen Sessions), das Plugin
    *superpowers* und die Memories mit den bekannten Fallen. Vor der Übergabe entscheiden, was davon ins Repo kommt.
 2. **Tresor:** Die Nachfolge erhält Zugang zu den Geheimnissen (K-49).

@@ -16,12 +16,23 @@
 - Eine Route (`+server.ts`) ruft genau eine Schnittstellen-Funktion auf und reicht ihr die
   Dienste. Nie Datenbank, Fachlogik oder Rechteprüfung in der Route.
 - Rechte prüft nur der Server. Jede Schnittstelle der Verwaltung läuft über `liest` oder
-  `schreibt` und steht in einer der Schnittstellen-Listen; unter `api/admin/` gibt es keine
-  Schnittstelle ausserhalb der Listen.
+  `schreibt` aus `src/lib/server/admin/rechte.ts` und steht in einer der Schnittstellen-Listen;
+  unter `api/admin/` gibt es keine Schnittstelle ausserhalb der Listen. Keine neue Schnittstelle
+  prüft Rollen selbst. Typen, die ein anderes Modul braucht, stehen nicht in einer
+  Schnittstellen-Datei.
 - Fachfunktionen kennen kein HTTP: Sie bekommen Datenbank und Zeit hineingereicht und geben ein
-  Ergebnis-Wort zurück. Statuscode und Antwort bauen nur Schnittstellen-Dateien, ihre Antwort-Hilfen, die
-  Rechteprüfung und der Riegel der Ansicht, mit den Bausteinen aus `src/lib/server/http.ts`
-  (ausser Datei-Antworten wie die Kalender-Datei); nie eine Fachfunktion.
+  Ergebnis-Wort zurück. Statuscode und Antwort bauen nur Schnittstellen-Dateien, ihre
+  Antwort-Hilfen, die Rechteprüfung und der Riegel der Ansicht, nie eine Fachfunktion. Sie nehmen
+  dafür die Bausteine aus `src/lib/server/http.ts` (Antwort, JSON-Prüfung, Körper lesen,
+  Standardantworten); kein Themen-Modul baut sie nach. Ausgenommen sind Datei-Antworten wie die
+  Kalender-Datei.
+- Fehlerantworten haben eine Form, `{ fehler, felder? }`; Zusatzangaben nur, wo
+  `src/lib/fehler.ts` sie für ein Wort nennt. Fehlerwörter kommen nur aus dieser Liste, die Server
+  und Oberfläche teilen.
+- Im Server (unter `src/`, ohne Tests) entstehen Dienste, Mail- und Push-Versender nur in
+  `src/lib/server/dienste.ts`; Skripte und Tests bauen ihre eigenen.
+- Die Importrichtung zwischen den Server-Modulen setzt ESLint durch; eine Ausnahme in
+  `AUSNAHMEN` (`eslint.config.js`) nur mit Entscheid des Projektleiters.
 - Die Zeit kommt über die Dienste (`jetzt`), nie direkt aus `new Date()`.
 - Schreibende Schnittstellen nehmen nur JSON an.
 - Logs enthalten nur feste Texte: nie Fehlermeldungen, Eingaben, Adressen oder Codes.
@@ -30,10 +41,24 @@
 
 ## Oberfläche — Bauregeln
 
-- Seiten sprechen mit dem Server nur über die Abruf-Module ihres Themas (`src/lib/<thema>/`),
-  nie mit eigenem `fetch` im Baustein.
+- Seiten sprechen mit dem Server nur über die Abruf-Module ihres Themas (`src/lib/<thema>/`).
+  Statuscodes deutet nur der Abruf-Baustein (`src/lib/abruf.ts`); ein einzelner Abruf gibt
+  `{ art }` zurück. Abläufe aus mehreren Anfragen (Passkey, Push auf dem Gerät) und Lade-Hilfen
+  («Daten oder `null`», Wahrheitswert) dürfen eine andere Form haben.
+- Unter `src/` steht kein Aufruf `fetch(…)`: In der Oberfläche holen nur die Abruf-Module Daten,
+  mit `holen` über `src/lib/abruf.ts`; der Server bekommt `holen` hineingereicht.
+- Fehlende Sitzung, Rolle oder Bestätigung behandelt nur der Wächter
+  (`src/lib/login/waechter.ts`), in der Ladefunktion und nach einer Aktion; keine Seite schreibt
+  die Umleitung zum Login selbst. Das erste Laden einer Seite steht in `+page.ts`; im Baustein
+  nur erneutes Laden nach Eingabe oder Aktion. Ausnahmen: die Seite `willkommen` leitet nach dem
+  Gerät zum Login, die zwei Push-Bausteine laden ihren Stand selbst.
+- Eine neue Aktion mit Rückfrage nutzt den `Aktionsdialog` (Verwaltung) oder die Ablauf-Funktion
+  `src/lib/cm/ablauf.ts` (CM-Seite der Mitglieder); keine neue Sperre und Antwort-Verzweigung
+  von Hand. Der Bestand von Hand bleibt, bis eine Seite ohnehin umgebaut wird.
 - Ausblenden ist kein Schutz: Was die Oberfläche nicht zeigt, weist der Server trotzdem ab.
-- Stile stehen nur unter `src/lib/design/`; kein `<style>` in Bausteinen.
+- Stile stehen nur unter `src/lib/design/`; kein `<style>` in Bausteinen. Die Dateien importiert
+  nur das Wurzel-Layout, in fester Reihenfolge; `brief.css` nur der Briefdruck. Neue Regeln
+  kommen in die Datei ihres Bausteins.
 
 ## Tests
 
@@ -41,8 +66,8 @@
 - Tests prüfen Verhalten: Kein Test liest Quelltext der App, kein Schnappschuss-Vergleich. Die
   Struktur prüfen nur ESLint und die Prüfskripte unter `scripts/`.
 - Fachlogik läuft im Test gegen die echte Datenbank; Attrappen nur für Mail, Push, Uhr und Abruf.
-- E2E nur über `make e2e` bzw. `npm run e2e`. Elemente über Rolle und Beschriftung suchen, nicht
-  über CSS-Klassen; keine festen Wartezeiten.
+- E2E nur über `make e2e` bzw. `npm run e2e`. Elemente über Rolle und Beschriftung suchen; über
+  Element oder CSS-Klasse nur, wo es weder Rolle noch Beschriftung gibt. Keine festen Wartezeiten.
 - Eine neue Schnittstelle kommt in die Liste ihres Moduls. Eine neue Liste der Verwaltung kommt
   in `tests/hilfen/verwaltungs-listen.ts` und in die Tabelle der Bauregel; eine neue Liste der
   Mitglieder in `tests/hilfen/mitglieder-listen.ts`.
@@ -84,44 +109,3 @@ beim Anlegen gibt `.github/ISSUE_TEMPLATE/` vor.
 ## Context-Scopes
 
 Welche Pfade bei welcher Aufgabe zu laden sind → `docs/context-scopes.md`.
-
-## Übergangsregeln während des Refactorings
-
-Plan, Stand und Entscheide → `docs/refactoring-analyse.md`. Dieser Block entfällt mit dem
-Abschluss des Plans.
-
-- **Feature-Stopp:** keine neue Funktion, keine Verhaltensänderung ausser der im Plan-Schritt
-  beschriebenen. Geht ein Schritt nicht auf: abbrechen und melden, keinen Umweg bauen.
-- Ausnahme vom Feature-Stopp: #81 (E-47).
-- **Ein Schritt, ein Worktree, ein Branch** `refactor/schritt-NN` ab `origin/dev`; Schritte
-  strikt nacheinander.
-- **Nach jedem Schritt der volle `make check`** auf dem committeten Stand, auch wenn nur ein
-  Ordner betroffen scheint.
-- **Die Orchestrator-Session bleibt im Hauptordner** und arbeitet mit absoluten Pfaden; sie
-  wechselt nicht mit `EnterWorktree` in einen Worktree, solange Subagenten laufen.
-- Den Stand eines Schritts führt nur `docs/refactoring-analyse.md`.
-- Ab Schritt 06: Antwort, JSON-Prüfung, Körper lesen und die Standardantworten kommen nur aus
-  `src/lib/server/http.ts`; kein Themen-Modul definiert sie selbst.
-- Ab Schritt 06a: `liest` und `schreibt` kommen nur aus `src/lib/server/admin/rechte.ts`; keine
-  neue Schnittstelle prüft Rollen selbst (`zugang.pruefe`). Typen, die ein anderes Modul braucht,
-  stehen nicht in einer `schnittstellen.ts`.
-- Ab Schritt 07: Im Server (unter `src/`, ohne Tests) entstehen Dienste, Mail- und
-  Push-Versender nur in `src/lib/server/dienste.ts`; Skripte und Tests bauen ihre eigenen. Kein
-  Modul unter `src/lib/server/` importiert diese Datei.
-- Ab Schritt 08: eine Fehlerform `{ fehler, felder? }`; Zusatzangaben nur, wo `src/lib/fehler.ts`
-  sie für ein Wort nennt. Fehlerwörter nur aus dieser Liste, die Server und Oberfläche teilen.
-- Die Importrichtung zwischen den Server-Modulen setzt ESLint ohne Ausnahme durch; eine Ausnahme
-  in `AUSNAHMEN` (`eslint.config.js`) nur mit Entscheid des Projektleiters.
-- Ab Schritt 13: Statuscodes deutet nur der Abruf-Baustein (`src/lib/abruf.ts`); ein einzelner
-  Abruf gibt `{ art }` zurück. Abläufe aus mehreren Anfragen (Passkey, Push auf dem Gerät) und
-  Lade-Hilfen («Daten oder `null`», Wahrheitswert) dürfen eine andere Form haben.
-- Ab Schritt 15: Fehlende Sitzung, Rolle oder Bestätigung behandelt nur die gemeinsame
-  Wächter-Funktion, in der Ladefunktion und nach einer Aktion; keine Seite schreibt die Umleitung
-  zum Login selbst, keine Ladefunktion ruft `fetch` direkt. Das erste Laden einer Seite steht in
-  `+page.ts`; im Baustein nur erneutes Laden nach Eingabe oder Aktion. Benannte Ausnahmen, die
-  bleiben: die Seite `willkommen` leitet nach dem Gerät zum Login, die zwei Push-Bausteine
-  laden ihren Stand selbst.
-- Ab Schritt 17: Eine Aktion mit Rückfrage nutzt `Aktionsdialog` oder die gemeinsame
-  Ablauf-Funktion; keine neue Sperre und Antwort-Verzweigung von Hand.
-- Ab Schritt 18: Stile in den Dateien unter `src/lib/design/` in ihrer festen Reihenfolge;
-  neue Regeln kommen in die Datei ihres Bausteins.

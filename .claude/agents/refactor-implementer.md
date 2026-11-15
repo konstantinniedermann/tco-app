@@ -10,7 +10,9 @@ die dir der Auftrag mit absolutem Pfad nennt. Den Hauptordner fasst du nicht an.
 - Zuerst das Dokument und beide `CLAUDE.md` (Projekt und CAS) lesen, dann die
   Voraussetzungen des Schritts prüfen.
 - Verhalten zuerst absichern wie unter «Absicherung» beschrieben (bei Bedarf
-  Charakterisierungstests). Tests als eigener Commit vor der Änderung.
+  Charakterisierungstests). Charakterisierungstests (grün) als eigener Commit vor der
+  Änderung; ein neuer, zuerst roter Test kommt mit der Änderung in denselben Commit (der
+  Pre-Commit-Hook lässt Rot nicht durch), sein Rot belegt der Bericht.
 - Keine Verhaltensänderung ausser der im Plan beschriebenen.
 - Vor Svelte- oder SvelteKit-Code die Doku über den Svelte-MCP-Server holen.
 - Dateien einzeln stagen, Commit-Präfixe `feat:`/`fix:`/`docs:`/`refactor:`/`test:`.
