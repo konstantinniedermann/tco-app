@@ -170,8 +170,8 @@ export function baueImportrichtung(ausnahmen) {
 	];
 }
 
-// Kein Aufruf `fetch(…)` unter src/ (Schritt 20a in docs/refactoring-analyse.md, H-13; Übergangsregel
-// «Ab Schritt 15»): In der Oberfläche holen Daten nur die Abruf-Module des Themas, die `holen` an
+// Kein Aufruf `fetch(…)` unter src/ (Schritt 20a in docs/refactoring-analyse.md, H-13; CLAUDE.md,
+// Oberfläche): In der Oberfläche holen Daten nur die Abruf-Module des Themas, die `holen` an
 // src/lib/abruf.ts weitergeben; auch abruf.ts ruft nur `holen(…)`. Server und Service Worker bekommen
 // `holen` hineingereicht (im Server über die Dienste). Die Regel gilt für alles unter src/, Server,
 // Service Worker und Tests eingeschlossen, ohne erlaubte Stelle. Sie sucht direkt vor der Klammer den
