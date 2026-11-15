@@ -85,7 +85,7 @@ Pflicht (der Pre-Push-Hook verlangt ihn beim Merge), bei reiner Doku freiwillig:
 Zeilen, was sich für die Nutzerin ändert; bei Innerem «An der App ändert sich nichts»; die
 Issue-Nummer, wo es eine gibt. Eine Versionsnummer setzt der Branch nie.
 
-**3 — Review:** `make check` grün, Agent `cas-reviewer`, Befunde klären. `make check` zuletzt
+**3 — Review:** `make check` grün, Agent `merge-reviewer`, Befunde klären. `make check` zuletzt
 auf dem fertigen, committeten Stand laufen lassen: Dann merkt es sich den Stand, und die
 Pushes des Branches und des Merge-Commits auf `dev` prüfen nicht noch einmal voll
 (`docs/ci-cd-und-release.md`, «Grüner Stand»). Bringt der Branch einen neuen oder geänderten
