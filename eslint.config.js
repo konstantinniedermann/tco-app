@@ -174,10 +174,14 @@ export function baueImportrichtung(ausnahmen) {
 // «Ab Schritt 15»): In der Oberfläche holen Daten nur die Abruf-Module des Themas, die `holen` an
 // src/lib/abruf.ts weitergeben; auch abruf.ts ruft nur `holen(…)`. Server und Service Worker bekommen
 // `holen` hineingereicht (im Server über die Dienste). Die Regel gilt für alles unter src/, Server,
-// Service Worker und Tests eingeschlossen, ohne erlaubte Stelle. Sie sucht den Namen direkt vor der
-// Klammer; `window.fetch(…)`, `globalThis.fetch(…)` und ein weitergereichtes `holen` fängt sie nicht.
+// Service Worker und Tests eingeschlossen, ohne erlaubte Stelle. Sie sucht direkt vor der Klammer den
+// Namen `fetch` oder genau `window.fetch`, `globalThis.fetch`, `self.fetch` (nicht jedes `x.fetch`).
+// Nicht gefangen: ein weitergereichtes `holen`, `fetch.call(…)`/`apply`, ein Typ-Zusatz (`as`, `!`),
+// ein berechneter oder verschachtelter Zugriff (`window['fetch']`, `globalThis.window.fetch`).
 // Proben und Grenzen: scripts/fetch-regel.test.ts. Setzt ein späterer Block für dieselben Dateien
 // `no-restricted-syntax`, ersetzt er diese Regel; dann beide zusammenführen.
+const FETCH_MELDUNG =
+	'Kein Aufruf von fetch unter src/. Oberfläche: Daten holen nur die Abruf-Module des Themas (src/lib/<thema>/) mit holen über src/lib/abruf.ts. Server und Service Worker: holen wird hineingereicht (im Server über die Dienste). Es gibt keine Ausnahme.';
 /** @type {import('eslint').Linter.Config} */
 const FETCH_REGEL = {
 	files: ['src/**/*.{js,mjs,cjs,ts,mts,cts,svelte}'],
@@ -186,8 +190,12 @@ const FETCH_REGEL = {
 			'error',
 			{
 				selector: "CallExpression[callee.type='Identifier'][callee.name='fetch']",
-				message:
-					'Kein Aufruf von fetch unter src/. Oberfläche: Daten holen nur die Abruf-Module des Themas (src/lib/<thema>/) mit holen über src/lib/abruf.ts. Server und Service Worker: holen wird hineingereicht (im Server über die Dienste). Es gibt keine Ausnahme.'
+				message: FETCH_MELDUNG
+			},
+			{
+				selector:
+					"CallExpression[callee.type='MemberExpression'][callee.computed=false][callee.object.type='Identifier'][callee.object.name=/^(?:window|globalThis|self)$/][callee.property.name='fetch']",
+				message: FETCH_MELDUNG
 			}
 		]
 	}
