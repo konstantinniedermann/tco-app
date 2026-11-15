@@ -72,6 +72,7 @@ flowchart LR
 | Grüner Stand | Der Pre-Push-Hook prüft einen schon grün geprüften Stand nicht noch einmal voll; die CI prüft jeden Push auf `dev` | [ADR-009](adr/adr-009-gruener-stand.md) |
 | Öffentliches Repo | Repo öffentlich: CI gratis, `main` geschützt; nie echte Mitgliederdaten im Repo | [ADR-010](adr/adr-010-repo-oeffentlich.md) |
 | Interclub | Der Server liest die Interclub-Daten von der nicht dokumentierten Schnittstelle von Swiss Tennis, ohne Anfrage; Kopie in der Datenbank | [ADR-011](adr/adr-011-interclub-schnittstelle-swiss-tennis.md) |
+| Struktur | Jeder gemeinsame Baustein hat einen Ort (`http.ts`, `dienste.ts`, `fehler.ts`, `admin/rechte.ts`, `abruf.ts`, `waechter.ts`, `design/`); ESLint und Prüfskripte halten Struktur und Importrichtung fest (Kapitel 5) | [ADR-013](adr/adr-013-gemeinsame-bausteine.md) |
 
 ## 5 Bausteinsicht
 
@@ -90,7 +91,7 @@ flowchart TD
   DB --> PG[(PostgreSQL)]
 ```
 
-Das Bild vereinfacht: `/api/sitzung` und `/api/status` holen die Datenbank unmittelbar aus `db/index.ts`, `/api/kontakt` liest nur die Einstellungen; sie gehen nicht über `dienste.ts`.
+Das Bild vereinfacht: `/api/sitzung` und `/api/status` holen die Datenbank unmittelbar aus `db/index.ts`, `/api/kontakt` liest nur die Einstellungen; sie gehen nicht über `dienste.ts`. `/api/status` und `/api/kontakt` bauen ihre Antwort zudem in der Route selbst, ohne Schnittstellen-Funktion.
 
 | Baustein | Aufgabe | Regel |
 |----------|---------|-------|
@@ -138,6 +139,7 @@ flowchart LR
 |---------|-----|-----------|
 | **Server** | Infomaniak VPS mit Linux, gehärtet nach SI-13 | [ADR-003](adr/adr-003-hosting-infomaniak-vps.md), [Sicherheitskonzept](sicherheitskonzept.md) |
 | **Test und Live** | je App und eigene Datenbank, getrennt; Test nur mit erfundenen Daten | [CI/CD und Release](ci-cd-und-release.md#umgebungen) |
+| **Zustand im Arbeitsspeicher** | Die Bremsen, offene Passkey-Anfragen und laufende E-Mail-Wechsel hält die App im Arbeitsspeicher: Sie gelten nur für den einen Prozess und gehen bei Neustart und Auslieferung verloren. Das trägt, solange je Umgebung eine App läuft | [Sicherheitskonzept](sicherheitskonzept.md) (SI-09, SI-18) |
 | **Adressen** | `my.tcolten.ch` (Live), `test.my.tcolten.ch` (Test); bis dahin eine Übergangsadresse aus der IP des Servers | Annahme K-10 |
 | **Auslieferung** | Merge nach `dev` liefert auf Test, Merge des PR nach `main` auf Live | [CI/CD und Release](ci-cd-und-release.md#auslieferung) |
 | **Sicherung** | nächtlich mit Probe; das Ziel hängt an K-03 und K-48 | [Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung) |

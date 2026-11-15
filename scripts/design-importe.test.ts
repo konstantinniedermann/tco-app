@@ -5,7 +5,7 @@ import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 // Prüft, wo die Design-Dateien unter src/lib/design/ importiert werden (Schritt 20a in
-// docs/refactoring-analyse.md, H-07; Übergangsregel «Ab Schritt 18»): nur im Wurzel-Layout,
+// docs/refactoring-analyse.md, H-07; CLAUDE.md, Oberfläche): nur im Wurzel-Layout,
 // vollständig und in der Reihenfolge von REIHENFOLGE; `brief.css` nur im Briefdruck. Eine Datei im
 // Ordner, die in der Liste fehlt, und ein Eintrag ohne Datei sind ein Befund. Gelesen werden alle
 // Dateien unter src/ (auch Tests): Importe in Skripten und Svelte-Bausteinen (statisch, `export …

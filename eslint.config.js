@@ -47,9 +47,9 @@ export const MODULE = ['db', 'login', ...THEMEN];
 /**
  * Ausnahmen von der Regel; leer, ein neuer Eintrag braucht den Entscheid des Projektleiters (der Test
  * «AUSNAHMEN ist leer» in scripts/importrichtung.test.ts wird dann rot). `von` und `nach` sind Dateien
- * relativ zu src/lib/server/. `schritt` nennt den Schritt aus docs/refactoring-analyse.md, der die
- * Ausnahme abbaut, oder «bleibt: …» mit Grund. Eine Ausnahme gilt je Datei und Zieldatei, nicht je
- * importiertem Namen.
+ * relativ zu src/lib/server/. `schritt` nennt das Issue oder den Entscheid, der die Ausnahme abbaut,
+ * oder «bleibt: …» mit Grund (der Name stammt aus dem Refactoring). Eine Ausnahme gilt je Datei und
+ * Zieldatei, nicht je importiertem Namen.
  * @type {{ von: string; nach: string; schritt: string }[]}
  */
 export const AUSNAHMEN = [];
@@ -170,8 +170,8 @@ export function baueImportrichtung(ausnahmen) {
 	];
 }
 
-// Kein Aufruf `fetch(…)` unter src/ (Schritt 20a in docs/refactoring-analyse.md, H-13; Übergangsregel
-// «Ab Schritt 15»): In der Oberfläche holen Daten nur die Abruf-Module des Themas, die `holen` an
+// Kein Aufruf `fetch(…)` unter src/ (Schritt 20a in docs/refactoring-analyse.md, H-13; CLAUDE.md,
+// Oberfläche): In der Oberfläche holen Daten nur die Abruf-Module des Themas, die `holen` an
 // src/lib/abruf.ts weitergeben; auch abruf.ts ruft nur `holen(…)`. Server und Service Worker bekommen
 // `holen` hineingereicht (im Server über die Dienste). Die Regel gilt für alles unter src/, Server,
 // Service Worker und Tests eingeschlossen, ohne erlaubte Stelle. Sie sucht direkt vor der Klammer den

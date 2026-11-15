@@ -1,7 +1,7 @@
 # Dokumentation MyTCO
 
-Die Doku entsteht vor dem Code. Was hier verlinkt ist, existiert; was noch fehlt, ist ein
-Issue im Milestone *Fundament*.
+Was hier verlinkt ist, existiert; was noch fehlt, ist ein Issue im Milestone seiner Etappe
+([Roadmap](roadmap.md)).
 
 ## Projekt
 
@@ -42,6 +42,6 @@ Issue im Milestone *Fundament*.
 | [Beobachtungen](beobachtungen.md) | Posteingang für Befunde ausserhalb des Scopes |
 | [Beobachtungen — Archiv](beobachtungen-archiv.md) | Ausgewertete Beobachtungen mit Ausgang |
 | [Versionen](versionen.md) | Versionshistorie |
-| [Refactoring-Analyse](refactoring-analyse.md) | Befunde, Zielbild, Plan und Stand des laufenden Refactorings |
+| [Refactoring-Analyse](refactoring-analyse.md) | Geschichte: Befunde, Plan und Entscheide des abgeschlossenen Refactorings (11. bis 15.11.2026) mit den Protokollen der Etappen, nicht nachgeführt und kein Lesestoff; was davon gilt, steht in `CLAUDE.md`, arc42, den ADRs und den Beobachtungen |
 | [Specs und Pläne](superpowers/README.md) | Geschichte: Entwürfe und Umsetzungspläne früherer Vorgänge, nicht nachgeführt und nicht die geltende Beschreibung (`docs/superpowers/`) |
 | [UI-Mockups](ui-mockups/) | HTML-Mockups zum UI-Leitbild (`docs/ui-mockups/`) |
