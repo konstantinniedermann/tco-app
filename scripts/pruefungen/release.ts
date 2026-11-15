@@ -5,8 +5,10 @@ import { istNurDoku } from './nur-doku.ts';
 
 // Abgleich vor dem Release dev → main (`make release-check`, Ablauf im Skill tco-branching):
 // Version in package.json, Abschnitte in docs/versionen.md und Tags müssen zusammenpassen.
-// Jeder Merge nach dev mit Code hat eine eigene Nummer (Prüfung beim Push: version-merge.ts);
-// das Release übernimmt die Nummer von dev und erhöht sie nicht. Nicht Teil von `make check`,
+// Eine Nummer entsteht nur beim Release (ADR-012): Der Doku-Abgleich setzt sie und macht aus
+// «Unveröffentlicht» ihren Abschnitt; Merges nach dev sammeln dort ihre Einträge (Prüfung beim
+// Push: version-merge.ts). Beim ersten Release nach ADR-012 ist dev der Nummer von main schon
+// voraus; eine vergessene Nummer fällt dann nicht auf (ADR-012). Nicht Teil von `make check`,
 // denn zwischen zwei Releases ist der Stand absichtlich offen (Einträge unter «Unveröffentlicht»).
 
 const VERSIONEN = 'docs/versionen.md';
@@ -95,8 +97,9 @@ export function pruefeRelease(stand: Releasestand): string[] {
 		befunde.push(`package.json: Version sinkt von ${stand.versionMain} auf ${stand.version}`);
 	else if (vergleich === 0 && !stand.nurDoku)
 		befunde.push(
-			`package.json: Release enthält Code, aber die Version bleibt ${stand.version} — beim Merge ` +
-				`nach dev nicht erhöht (Skill tco-branching, Schritt 4)`
+			`package.json: Release enthält Code, aber die Version bleibt ${stand.version} — im ` +
+				`Doku-Abgleich eine neue Nummer setzen, aus «Unveröffentlicht» wird ihr Abschnitt ` +
+				`(Skill tco-branching, Schritt 4a)`
 		);
 
 	const offen = unveroeffentlicht(stand.versionen);
@@ -108,7 +111,10 @@ export function pruefeRelease(stand: Releasestand): string[] {
 	) {
 		befunde.push(
 			`${VERSIONEN}:${offen.zeile}: «Unveröffentlicht» ist nicht leer, obwohl sich die Version ` +
-				`von ${stand.versionMain} auf ${stand.version} ändert — Einträge in den Abschnitt «## ${stand.version}»`
+				`von ${stand.versionMain} auf ${stand.version} ändert — noch keine neue Nummer für dieses ` +
+				`Release gesetzt: neue Nummer setzen, aus «Unveröffentlicht» wird ihr Abschnitt; Nummer ` +
+				`${stand.version} schon für dieses Release gesetzt und ein Merge kam danach: seine ` +
+				`Einträge in den Abschnitt «## ${stand.version}» nachrücken (Skill tco-branching, Schritt 4a)`
 		);
 	}
 
