@@ -11,6 +11,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 - Doku an den Code angeglichen: Bausteinsicht, Testkonzept, CI/CD, README und Übersicht nennen
   Abruf-Baustein, Wächter, Dienste, Vertragstests und Test-Hilfen (Refactoring Schritt 21).
   An der App ändert sich nichts.
+- Context-Scopes nennen Ordner statt ihrer Dateien; Pläne und Specs unter `docs/superpowers/`
+  sind als Geschichte gekennzeichnet und kein Lesestoff mehr (Refactoring Schritt 22). An der App
+  ändert sich nichts.
 
 ## 0.22.10 — Die zwei Struktur-Prüfungen geschärft (Nachtrag zur Etappe 3)
 
