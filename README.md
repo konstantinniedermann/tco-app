@@ -46,7 +46,7 @@ den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* 
 | `src/lib/<thema>/`, `src/lib/ui/` | Oberfläche je Thema; Daten holt nur der Abruf-Baustein `src/lib/abruf.ts` über die Abruf-Module des Themas, Umleitungen zum Login der Wächter `src/lib/login/waechter.ts` |
 | `src/lib/design/` | Stil-Dateien und Tokens |
 | `src/lib/server/<thema>/` | Fachlogik und Schnittstellen-Funktionen; `dienste.ts` baut die Dienste zusammen, `http.ts` die Antworten |
-| `tests/` | Ende-zu-Ende-Tests (`e2e/`, Hilfen in `e2e/hilfen/`), Hilfen der übrigen Tests (`hilfen/`), Tests der Ladefunktionen (`oberflaeche/`); die Einheits- und Datenbanktests liegen neben dem Code |
+| `tests/` | Ende-zu-Ende-Tests (`e2e/`, Hilfen in `e2e/hilfen/`), Hilfen der übrigen Tests (`hilfen/`), Tests der Ladefunktionen (`oberflaeche/`), Tests der Skripte (`scripts/`) und der Betriebsskripte (`betrieb/`), Einrichtung der Test-Datenbank (`setup/`); die Einheits- und Datenbanktests liegen neben dem Code |
 | `scripts/` | Prüfungen für Hook und CI (`pruefungen/`), Seed, Import, Musterbrief |
 | `docs/` | Doku; Bausteine und ihre Regeln → [`docs/arc42.md`](docs/arc42.md), Tests → [`docs/testkonzept.md`](docs/testkonzept.md) |
 
