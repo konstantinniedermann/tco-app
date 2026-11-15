@@ -149,6 +149,11 @@ dieselbe Stelle geschrieben haben: beide Einträge behalten. Der fremde Eintrag 
 erfüllt die Prüfung für diesen Commit. Brachte der Pull einen Doku-Abgleich mit neuer Nummer,
 verlangt der Hook für diesen Commit ein leeres «Unveröffentlicht»: den eigenen Eintrag in den
 Abschnitt der neuen Nummer rücken. Stagen, `git -C $M commit --no-edit`, erneut pushen.
+Dieser Rand ist selten: Liegt die Nummer des mitgebrachten Abgleichs schon auf `main`, kommt der
+eigene Eintrag danach mit einem Doku-Commit zurück unter «Unveröffentlicht».
+
+Ein Revert eines Merges mit Code braucht einen eigenen Eintrag unter «Unveröffentlicht»
+(«… zurückgenommen»), sonst weist der Hook den Push ab.
 
 **Dependabot-PRs** werden nicht auf GitHub gemergt, sondern wie ein Branch über diesen Schritt:
 `git -C $M fetch origin`, dann `git -C $M merge --no-ff --no-commit origin/<branch des PR>` und
@@ -241,9 +246,8 @@ Code ist der Abgleich nie reine Doku: Er setzt die Nummer, sein Commit läuft du
    `docs/versionen.md` unter «Unveröffentlicht» einen Abschnitt `## X.Y.Z — <Kurztitel>` anlegen
    und alle Einträge aus «Unveröffentlicht» hineinschieben; «Unveröffentlicht» bleibt leer
    stehen. Bringt der Abgleich selbst Code mit (Kleinigkeit in einem Skript), kommt sein
-   Eintrag gleich in diesen Abschnitt. Bei einem Release nur mit Doku bleibt die Nummer;
-   liegengebliebene Einträge unter «Unveröffentlicht» in den obersten Versionsabschnitt
-   schieben.
+   Eintrag gleich in diesen Abschnitt. Bei einem Release nur mit Doku bleibt die Nummer, und die
+   Einträge bleiben unter «Unveröffentlicht» stehen bis zum nächsten Release mit Code.
 3. `make release-check` muss grün sein: Version aus `package.json` hat genau einen Abschnitt
    in `docs/versionen.md`, und er steht zuoberst; die Version sinkt nicht und ist gestiegen,
    sobald Code dabei ist; ändert sie sich, ist «Unveröffentlicht» leer; keine als «nicht

@@ -409,13 +409,15 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   Dependabot, wer mergt). Der Doku-Abgleich vor dem PR setzt die Nummer, macht aus
   «Unveröffentlicht» den Abschnitt dieser Nummer und kommt als gewöhnlicher Merge nach `dev`;
   erst danach entsteht der PR. Ein Release nur mit Doku (Regel aus `nur-doku.ts`) lässt die
-  Nummer stehen. Zwischen zwei Releases zeigt die Fusszeile dieselbe Nummer; zwei Stände auf
+  Nummer stehen; seine Einträge bleiben unter «Unveröffentlicht» bis zum nächsten Release mit
+  Code. Zwischen zwei Releases zeigt die Fusszeile dieselbe Nummer; zwei Stände auf
   `dev` unterscheidet der Commit.
 - **Prüfung beim Push auf `dev`** (`version-merge.ts`, Pre-Push-Hook), je Commit der Hauptlinie
   einzeln, ohne was schon auf `main` liegt: Bringt er Code und bleibt die Nummer, steht danach
   unter «Unveröffentlicht» mindestens eine nicht leere Zeile, die vorher nicht dort stand
   (Leerzeichen zählen nicht). Steigt die Nummer, dann um genau einen Schritt, mit ihrem
-  Abschnitt zuoberst und leerem «Unveröffentlicht». Reine Doku: keine Forderung. Ein direkter
+  Abschnitt zuoberst und leerem «Unveröffentlicht». Reine Doku: keine Forderung. Ein Revert eines
+  Merges mit Code braucht einen eigenen Eintrag («… zurückgenommen»). Ein direkter
   Commit oder ein Fast-Forward-Merge mit Code scheitert, sofern nicht jeder Commit einen Eintrag
   bringt; darum mergt der Skill immer mit `--no-ff`. Eine Nummer, die jemand beim Merge
   vergibt, fängt die Prüfung nicht (sie hat die Form des Abgleichs). Weil der Hook nur lokal
