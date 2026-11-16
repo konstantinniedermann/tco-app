@@ -123,7 +123,7 @@ Kopie der Antworten von Swiss Tennis ([ADR-011](adr/adr-011-interclub-schnittste
 | **Auf-/Abstiegsspiel** | Saison, Team, Art (Aufstieg / Abstieg), Gegner und Resultat | — |
 | **Spielbericht** | Saison, Team, Begegnung (auch Auf-/Abstiegsspiel), Sätze und Games aus Sicht des TCO, ob der TCO Heimteam ist; fehlt, solange Swiss Tennis keine Einzelpartien hat | — |
 | **Einzelpartie** | Spielbericht, Einzel oder Doppel, Position, gespielte Sätze aus Sicht des TCO, Aufgabe (TCO oder Gegner hat aufgegeben bzw. w.o.); vorher entschiedene, nicht gespielte Partien fehlen | — |
-| **Spieler (Interclub)** | Einzelpartie, Seite (TCO / Gegner), Nummer (1, im Doppel 2), Name «Nachname Vorname» wie bei Swiss Tennis, Klassierung; nur bei TCO-Spielern die Personen- und die Rangliste-Nummer von Swiss Tennis | — |
+| **Spieler (Interclub)** | Einzelpartie, Seite (TCO / Gegner), Nummer (1, im Doppel 2), Name «Nachname Vorname» wie bei Swiss Tennis, Klassierung; nur bei TCO-Spielern die Personen- und die Rangliste-Nummer von Swiss Tennis | Name, Klassierung, Nummern |
 | **Stand je Saison und Wettbewerb** | Zeitpunkt des letzten erfolgreichen Abrufs; die Anzeige nennt ihn als «Stand» | — |
 
 ### Lizenzen

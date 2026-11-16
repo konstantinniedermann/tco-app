@@ -53,7 +53,7 @@ Aufruf ausführen (er setzt `M` selbst), einzelne Befehle mit ausgeschriebenem P
 
 Bei mehreren Issues in einem Branch (`issue-1-2`) das Label für jedes Issue setzen.
 
-`<typ>` folgt dem Issue-Präfix (`feat`, `fix`, `docs`, `chore`). Mehrere Issues in einem
+`<typ>` folgt dem Titel-Präfix des Issues (`feat`, `fix`, `refactor`, `docs`, `chore` …). Mehrere Issues in einem
 Branch: `docs/issue-1-2`. Danach **mit dem Tool `EnterWorktree` und `path`** in den Worktree
 wechseln — nicht mit `name`: Ein neuer Worktree über `name` zweigt von `origin/main` ab,
 nicht von `origin/dev`. Ab da gelten Pfade relativ zum Worktree; der Hauptordner wird bis
@@ -243,8 +243,9 @@ Code ist der Abgleich nie reine Doku: Er setzt die Nummer, sein Commit läuft du
 
    Claude wählt nach dieser Regel und nennt Nummer und Grund in der Bitte um Freigabe; die
    Freigabe des Releases gilt auch für die Nummer. **Das erste Release nach ADR-012 trägt
-   `0.23.0`**: Bei ihm ist `dev` der Nummer von `main` schon voraus, `make release-check`
-   erkennt eine vergessene Nummer darum nicht. Dann
+   `0.23.0`**: Bei ihm ist `dev` der Nummer von `main` schon voraus; `make release-check`
+   bietet darum auch an, die Einträge in den Abschnitt «0.22.11» nachzurücken. Diesen Weg nicht
+   wählen. Dann
    `npm version minor --no-git-tag-version --ignore-scripts` (bzw. `patch` / `major`), in
    `docs/versionen.md` unter «Unveröffentlicht» einen Abschnitt `## X.Y.Z — <Kurztitel>` anlegen
    und alle Einträge aus «Unveröffentlicht» hineinschieben; «Unveröffentlicht» bleibt leer

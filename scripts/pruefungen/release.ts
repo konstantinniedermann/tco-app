@@ -8,7 +8,9 @@ import { istNurDoku } from './nur-doku.ts';
 // Eine Nummer entsteht nur beim Release (ADR-012): Der Doku-Abgleich setzt sie und macht aus
 // «Unveröffentlicht» ihren Abschnitt; Merges nach dev sammeln dort ihre Einträge (Prüfung beim
 // Push: version-merge.ts). Beim ersten Release nach ADR-012 ist dev der Nummer von main schon
-// voraus; eine vergessene Nummer fällt dann nicht auf (ADR-012). Nicht Teil von `make check`,
+// voraus; eine ganz vergessene Nummer meldet die Prüfung trotzdem («Unveröffentlicht» nicht leer),
+// nur das Nachrücken in den Abschnitt der alten Nummer fängt sie nicht (ADR-012, Nachtrag).
+// Nicht Teil von `make check`,
 // denn zwischen zwei Releases ist der Stand absichtlich offen (Einträge unter «Unveröffentlicht»).
 
 const VERSIONEN = 'docs/versionen.md';

@@ -116,6 +116,78 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-16 — Kontakt des Doppelpartners und des Anfragenden ohne Ende der CM
+
+**Thema:** Datenschutz
+
+**Fundort:** `src/lib/server/cm/anmeldungen.ts` (`ladeCmAnsicht`: Kontakt des Partners nur nach
+`mitgliedStatus`; `offeneAnfragenAn`: Kontakt des Anfragenden ohne Jahresgrenze),
+`src/routes/api/cm/[id]/+server.ts`; `src/lib/server/admin/loeschung.ts` (offene Anfragen nur
+bei der endgültigen Löschung); `src/lib/server/db/schema.ts` (Turnier ohne Zustand
+«abgeschlossen»). Zusage: `docs/datenschutz.md` (Tabelle «Wer sieht was»: «bis zum Ende der
+CM», Löschen: «Ende der CM»), `docs/datenschutzerklaerung.md` («während der
+Clubmeisterschaft»), `docs/fachmodell.md` FR-19, K-31.
+
+**Beobachtung:** Die CM-Seite liefert für jedes Turnier, das nicht mehr in Vorbereitung ist,
+also auch für Vorjahre, E-Mail und Telefon des Doppelpartners (solange er aktiv ist) und den
+Kontakt des Anfragenden einer offenen Anfrage. Die Übersicht zeigt nur das laufende Jahr; über
+die direkte Adresse ist das alte Turnier erreichbar. Ein «Ende der CM» kennt der Code nicht; nur
+der CM-Admin hat eine Grenze (`kontaktSichtbar`, 1.1. nach dem Turnierjahr, K-42). Offene
+Partner-Anfragen haben keine Löschfrist.
+
+**Ursprung:** Doku-Audit vor Release 0.23.0 (16.11.2026), Domäne Daten/Tests; am Code
+nachgeprüft. Schweregrad hoch, vom Projektleiter für 0.23.0 übersteuert: Das Verhalten steckt
+schon auf `main`, das Release liefert nichts aus (Test und Live aus), es gibt keine echten Daten.
+
+**Einschätzung:** Muss vor `AUSLIEFERUNG_LIVE=an` behoben sein (Prüfpunkt in #39). Naheliegend:
+«Ende der CM» wie beim CM-Admin auf den 1.1. nach dem Turnierjahr legen (`kontaktSichtbar`
+gibt es schon) und offene Anfragen dann mit den Gesprächen löschen; die Grenze ist ein
+Entscheid des Projektleiters, die Zusage bleibt das Soll.
+
+### 2026-11-16 — Telefonnummern in Tests nicht im Format «+41 00 …»; Prüfung sieht sie nicht
+
+**Thema:** Tests
+
+**Fundort:** rund 16 Testdateien, z. B. `tests/e2e/navigation.test.ts`, `tests/e2e/cm-verwaltung.test.ts`,
+`tests/e2e/cm-doppel-verwaltung.test.ts`, `tests/e2e/wappen.test.ts`,
+`src/lib/server/profil/angaben.db.test.ts`, `src/lib/server/cm/*.db.test.ts`,
+`src/lib/server/admin/fairgate.db.test.ts`; `scripts/pruefungen/testdaten.ts`
+(`istTestdatei`); Regel in `docs/testkonzept.md` («Testdaten»).
+
+**Beobachtung:** (1) Die Tests nutzen Handynummern im echten Format («+41 79 …», «079 …»);
+das Testkonzept verlangt «+41 00 …». Die Prüfung der Testdaten prüft nur Mail-Domains. (2) Sie
+erkennt Dateien nur am Namen (`beispiel-…`, Ordner `seed(s)`); die JSON-Dateien unter
+`scripts/beispiel-interclub/2026/` (`bericht-*`, `team-results-*`) fallen durch. Heute stehen
+dort keine Adressen.
+
+**Ursprung:** Doku-Audit vor Release 0.23.0 (16.11.2026), Domäne Daten/Tests.
+
+**Einschätzung:** Keine Mitgliederdaten, aber womöglich vergebene Nummern in einem öffentlichen
+Repo. (1) mechanisch ersetzbar, eigener kleiner Branch; ob die Prüfung Telefonnummern prüfen
+soll, mit entscheiden. (2) Ordner mit Präfix `beispiel-` mitzählen, mit Testfall.
+
+### 2026-11-16 — Fachmodell trennt Gebautes nicht von Geplantem; drei npm-Skripte ohne Nutzer
+
+**Thema:** Struktur
+
+**Fundort:** `docs/fachmodell.md` (Turnier-Zustände *läuft*, *abgeschlossen*; Anmeldung
+*Gruppe*, *Rang-Korrektur*; Gruppe, KoTableau, Spiel, Resultat, Satz, Lizenzrunde,
+Lizenzantrag; Mitglied *verwaltet von*) gegen `src/lib/server/db/schema.ts`
+(`mitglied_geloescht_check`: kein nicht gelöschtes Mitglied ohne E-Mail); `package.json`
+(`test:db`, `db:migrate`, `format`).
+
+**Beobachtung:** (1) Das Fachmodell beschreibt Objekte, Attribute und Zustände der späteren
+Etappen ohne Vermerk «geplant»; nur die Fachregeln tragen ihren Status. Juniorenkonten ohne
+eigene Adresse (*verwaltet von*) lässt das Schema heute nicht zu. (2) Die npm-Skripte `test:db`,
+`db:migrate` und `format` nennt keine Doku, und kein Makefile, Workflow oder Dockerfile ruft sie;
+Migrationen laufen überall über `node scripts/migrate.ts`.
+
+**Ursprung:** Doku-Audit vor Release 0.23.0 (16.11.2026), Domänen Daten/Tests und Setup.
+
+**Einschätzung:** Niedrig. (1) «(geplant)» an den Stellen ergänzen, am besten mit der Etappe,
+die sie baut. (2) `format` und `test:db` im Testkonzept nennen oder `db:migrate` entfernen
+(Code-Frage).
+
 ### 2026-11-15 — Fallen aus dem Session-Gedächtnis stehen nicht im Repo
 
 **Thema:** Arbeitsweise
@@ -168,6 +240,10 @@ N-13 und N-14; (5) beim Angleichen der Kommentare in Schritt 25.
 Ränder. Eine Session, die nur die `CLAUDE.md` kennt, könnte die Stellen «reparieren». Wege: die
 Ränder in den Regeln nennen (kostet Länge) oder lassen. Entscheid des Projektleiters.
 
+**Nachtrag 2026-11-16 (Doku-Abgleich vor 0.23.0):** Zu (4) eine sechste Stelle:
+`src/lib/server/http.ts` (`jetzt` als Vorgabe) ist im Betrieb die einzige Uhr der
+Schnittstellen, weil `dienste.ts` `jetzt` nirgends setzt; ADR-013 beschreibt das richtig.
+
 ### 2026-11-15 — Regeltexte nach Schritt 24 an zwei Stellen uneinheitlich
 
 **Thema:** Arbeitsweise
@@ -211,6 +287,12 @@ erste Nummer (0.23.0) steht nur in Skill, `docs/ci-cd-und-release.md` und ADR-01
 **Einschätzung:** (1) lässt nichts Falsches durch, es verlangt nur einen anders formulierten
 Eintrag (einen Satz im Skill wert). (2) verwirrt höchstens; die Meldung nennt beide Wege. (3) ist
 die einzige echte Lücke und gilt nur einmal. Spätestens beim ersten Release ansehen.
+
+**Nachtrag 2026-11-16 (Doku-Abgleich vor 0.23.0):** (3) ist gemessen anders: `make release-check`
+meldet eine ganz vergessene Nummer auch beim ersten Release (rot, «Unveröffentlicht» nicht leer).
+Durch kommt nur, wer dem zweiten Weg der Meldung folgt und die Einträge in den Abschnitt
+«0.22.11» nachrückt. Skill, `docs/ci-cd-und-release.md` und ADR-012 (Nachtrag) sind
+entsprechend berichtigt. Mit dem Release 0.23.0 ist (3) erledigt.
 
 ### 2026-11-15 — Prüfung der Workflow-Rechte sieht Eingaben in `run:` nicht
 

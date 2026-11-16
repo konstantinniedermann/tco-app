@@ -152,7 +152,7 @@ flowchart LR
 |-------|-----|
 | Login, Sitzung, Zugang zur Verwaltung | [Sicherheitskonzept](sicherheitskonzept.md#login), [ADR-004](adr/adr-004-login-einmal-code.md) |
 | Rollen und Rechte | [Rollen und Rechte](rollen-und-rechte.md) |
-| Löschfristen zur Laufzeit | Der Zeitgeber der App löscht täglich, was fällig ist: ausgetretene Mitglieder nach 1 Jahr, vorgemerkte nach 7 Tagen, Verlauf nach 12 Monaten, Antworten zu Anlässen ein Jahr nach Beginn des Anlasses ([Datenschutzkonzept](datenschutz.md#löschen)) |
+| Löschfristen zur Laufzeit | Der Zeitgeber der App löscht täglich, was fällig ist: ausgetretene Mitglieder nach 1 Jahr, vorgemerkte nach 7 Tagen, Verlauf nach 12 Monaten, Antworten zu Anlässen ein Jahr nach Beginn des Anlasses, Gespräche mit der Turnierleitung ab dem 1.1. nach dem Turnierjahr ([Datenschutzkonzept](datenschutz.md#löschen)) |
 | Personendaten, Löschen, Logs | [Datenschutzkonzept](datenschutz.md) (`DS-NN`), [Datenschutzerklärung](datenschutzerklaerung.md) |
 | Sicherheit | [Sicherheitskonzept](sicherheitskonzept.md) (`SI-NN`) |
 | Oberfläche, Sprache, Barrierefreiheit | [UI-Leitbild](ui-leitbild.md) (`UI-NN`) |
