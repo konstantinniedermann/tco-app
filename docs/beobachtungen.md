@@ -148,7 +148,7 @@ Entscheid des Projektleiters, die Zusage bleibt das Soll.
 
 **Thema:** Tests
 
-**Fundort:** zehn Testdateien, z. B. `tests/e2e/cm-verwaltung.test.ts`,
+**Fundort:** rund 16 Testdateien, z. B. `tests/e2e/navigation.test.ts`, `tests/e2e/cm-verwaltung.test.ts`,
 `tests/e2e/cm-doppel-verwaltung.test.ts`, `tests/e2e/wappen.test.ts`,
 `src/lib/server/profil/angaben.db.test.ts`, `src/lib/server/cm/*.db.test.ts`,
 `src/lib/server/admin/fairgate.db.test.ts`; `scripts/pruefungen/testdaten.ts`

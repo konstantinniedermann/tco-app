@@ -16,6 +16,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 - Die Datenschutzerklärung zeigt in der App keine Sternchen mehr: «Klassierung fehlt»,
   «Angaben fehlen» und «sucht Partner» stehen in Anführungszeichen (Doku-Abgleich vor diesem
   Release).
+- Kommentar der Release-Prüfung an das gemessene Verhalten beim ersten Release angeglichen. An
+  der App ändert sich nichts.
 - Abhängigkeiten aktualisiert (Dependabot #82): neueres Abbild von Caddy (`caddy:2-alpine`)
   für den Webserver (Proxy) unter `betrieb/`; ausgeliefert wird es erst mit dem Server.
 - Abhängigkeiten aktualisiert (Dependabot #86): SvelteKit 3.2.0, adapter-node 6.0.2,
