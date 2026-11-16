@@ -116,6 +116,18 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-16 — Junioren-CM verlangt bei Swiss Tennis ein eigenes Turnier
+
+**Thema:** Clubmeisterschaft
+
+**Fundort:** FR-33 (`docs/fachmodell.md`, ein Turnier je Jahr), Etappe *CM-Anmeldung* mit Junioren (K-46).
+
+**Beobachtung:** Laut Ausschreibung «Club Champion Trophy» 2026 (Ziff. 10) müssen Juniorenkategorien bei Swiss Tennis ein eigenes Turnier «Next Gen Trophy» sein. In MyTCO gibt es ein Turnier je Jahr; Junioren melden sich 2027 in MyTCO an. Ob die freiwilligen Turniernummern (0..n) das schon abdecken oder Juniorenkategorien eine eigene Zuordnung brauchen, ist nicht geprüft.
+
+**Ursprung:** Recherche «CM hinter den Kulissen» (`docs/recherche/2026-11-16-cm-ablauf.md`), Frage F10 in #88.
+
+**Einschätzung:** Vermutlich reicht eine zweite Turniernummer je Jahr; spätestens nach dem Gespräch #88 prüfen, vor der Etappe *CM-Anmeldung*.
+
 ### 2026-11-16 — Kontakt des Doppelpartners und des Anfragenden ohne Ende der CM
 
 **Thema:** Datenschutz
