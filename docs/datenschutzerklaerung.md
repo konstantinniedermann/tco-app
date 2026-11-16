@@ -55,8 +55,8 @@ du selbst einschaltest. Für nichts anderes.
 - Schreibst du der Turnierleitung, lesen nur die CM-Admins und die MyTCO-Admins dein Gespräch mit; du siehst als Absender nur «Turnierleitung». Schreib bitte keine Angaben zur Gesundheit. Wir löschen alle Gespräche eines Turniers am 1. Januar nach dem Turnierjahr, dein Gespräch auch, wenn du endgültig gelöscht wirst.
 - Alle Mitglieder sehen Name, Kategorien (Namen der bestätigten Anmeldungen) und Resultate der Clubmeisterschaft. Wer einen
   Doppelpartner sucht, sieht Name und Klassierung der Mitglieder, die für die Kategorie in Frage kommen. Fehlt
-  eine Angabe, steht dort *Klassierung fehlt* oder *Angaben fehlen* (Geschlecht).
-- Meldest du dich im Doppel allein an, steht dort *sucht Partner*, für alle Mitglieder sichtbar. Du kannst einen
+  eine Angabe, steht dort «Klassierung fehlt» oder «Angaben fehlen» (Geschlecht).
+- Meldest du dich im Doppel allein an, steht dort «sucht Partner», für alle Mitglieder sichtbar. Du kannst einen
   kurzen Kommentar dazuschreiben (höchstens 120 Zeichen, freiwillig, bitte keine Angaben zur Gesundheit). Er
   wird gelöscht, sobald du einen Partner hast oder dich abmeldest.
 - Fragst du jemanden als Doppelpartner an, sieht er deinen Namen, deine Klassierung und deine Telefonnummer
