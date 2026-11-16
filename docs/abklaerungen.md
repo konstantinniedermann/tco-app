@@ -114,8 +114,8 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
-| K-24 | Wie sieht der CM-Kalender 2027 aus, und an welchem Datum schliesst die Anmeldung? Laut K-01: Anmeldung offen ab Mitte April, Auslosung Anfang Juni. | Verantwortliche CM | A-ANMELDUNG-07, [Glossar](glossar.md) |
-| K-25 | Welche Kategorien und Alterskategorien bietet die CM an (Stand: Doppel ohne Alterskategorien, Entscheid Projektleiter, 08.11.2026), und gibt es je Phase eine eigene Turniernummer? Advantage kennt ein Finaltableau direkt nach den Gruppenspielen; laut Anforderungsdokument eröffnet der TCO fürs Finalwochenende aber neue KO-Turniere. Warum, und bleibt das so? (Nenngeld: beantwortet.) | Verantwortliche CM | A-TURNIER-02, A-TURNIER-03, [Glossar](glossar.md) |
+| K-24 | Wie sieht der CM-Kalender 2027 aus, und an welchem Datum schliesst die Anmeldung? Laut K-01: Anmeldung offen ab Mitte April, Auslosung Anfang Juni. Stand 16.11.2026 ([CM hinter den Kulissen](recherche/2026-11-16-cm-ablauf.md)): 2026 lief Phase 1 bis 25.07. (Gruppen und KO bis Achtelfinal), Phase 2 bis 05.08. (Viertelfinals), Champions-Weekend 14.–16.08.; Anmeldeschluss 25.05. | Verantwortliche CM | A-ANMELDUNG-07, [Glossar](glossar.md) |
+| K-25 | Welche Kategorien und Alterskategorien bietet die CM an (Stand: Doppel ohne Alterskategorien, Entscheid Projektleiter, 08.11.2026), und gibt es je Phase eine eigene Turniernummer? Advantage kennt ein Finaltableau direkt nach den Gruppenspielen; laut Anforderungsdokument eröffnet der TCO fürs Finalwochenende aber neue KO-Turniere. Warum, und bleibt das so? (Nenngeld: beantwortet.) Stand 16.11.2026 ([CM hinter den Kulissen](recherche/2026-11-16-cm-ablauf.md)): 2026 gab es ein einziges Turnier (Club Champion Trophy); jedes Finaltableau ist eine eigene Konkurrenz im selben Turnier, kein neues Turnier. Juniorenkategorien verlangt Swiss Tennis als eigenes Turnier «Next Gen Trophy». | Verantwortliche CM | A-TURNIER-02, A-TURNIER-03, [Glossar](glossar.md) |
 | K-26 | Was läuft heute bei der Clubmeisterschaft am schlechtesten: Anmeldung, Gruppenspiele, Resultate oder Finalwochenende? | Verantwortliche CM | Priorisierung der CM-Etappen |
 | K-27 | Höchstens 3 Anmeldungen: Zählt ein Doppel für beide Partner? Muss der Doppelpartner zustimmen, und wer gilt als „verfügbar“? Stand: Zustimmung im Doppel per Anfrage (Entscheid Projektleiter, 08.11.2026); die Frage an den Verein bleibt offen. | Verantwortliche CM | A-ANMELDUNG-02, A-ANMELDUNG-04 |
 | K-28 | Wie wird die Klassierung bei der Anmeldung festgelegt: gibt der Spieler sie an, oder prüft der CM-Verantwortliche? | Verantwortliche CM | A-ANMELDUNG-03, A-ANMELDUNG-06 |
@@ -127,7 +127,7 @@ Dazu gehören auch Fragen zu späteren Etappen, die ein Fundament-Konzept schon 
 | ID | Frage | An wen | Wozu |
 |----|-------|--------|------|
 | K-32 | Muss der Gegner ein gemeldetes Resultat bestätigen? | Verantwortliche CM | A-RESULTAT-04 |
-| K-33 | Wurde der Spielplan von Advantage fürs Finalwochenende schon ausprobiert, und was fehlt dort? | Verantwortliche CM | A-SPIELPLAN |
+| K-33 | Wurde der Spielplan von Advantage fürs Finalwochenende schon ausprobiert, und was fehlt dort? Stand 16.11.2026 ([CM hinter den Kulissen](recherche/2026-11-16-cm-ablauf.md)): 2026 enthielt Advantage keinen Spielplan und keine Plätze; die Frage geht ins Gespräch mit der CM-Leitung (F9). | Verantwortliche CM | A-SPIELPLAN |
 | K-41 | Mit welchem Spielformat laufen die Spiele der CM: zwei Gewinnsätze, dritter Satz als Match-Tiebreak, je Kategorie verschieden? | Verantwortliche CM | A-RESULTAT-03, A-RESULTAT-06, [Fachmodell](fachmodell.md) |
 
 ## Vor Lizenzanträgen (01.04.2028)
