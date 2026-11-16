@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "21. Juni 2026",
+	"homeTeam": {
+		"name": "Rotweiss BE",
+		"clubNumber": 2064,
+		"points": 7,
+		"sets": 14,
+		"games": 106
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 2,
+		"sets": 5,
+		"games": 78
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900392,
+							"name": "Muster Hannes R4 (1656)"
+						}
+					],
+					"wo": 1
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900137,
+							"name": "Vorhand Rahel R5 (2818)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "7:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900393,
+							"name": "Beispiel Ida R4 (2183)"
+						}
+					],
+					"wo": 1
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900139,
+							"name": "Volley Tanja R5 (3269)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900394,
+							"name": "Platzhalter Jan R5 (4042)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900151,
+							"name": "Griffband Greta R5 (4204)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:2", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900395,
+							"name": "Vorlage Kim R4 (2528)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900141,
+							"name": "Stopp Vera R5 (4625)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "3:6", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900396,
+							"name": "Punktgewinn Leo R6 (7357)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900377,
+							"name": "Tiebreak Rahel R5 (4831)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "6:4", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900397,
+							"name": "Erfunden Maja R7 (16952)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900145,
+							"name": "Linienrichter Alma R7 (13521)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "3:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900392,
+							"name": "Muster Hannes R4 (1656)"
+						},
+						{
+							"id": 900394,
+							"name": "Platzhalter Jan R5 (4042)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900139,
+							"name": "Volley Tanja R5 (3269)"
+						},
+						{
+							"id": 900151,
+							"name": "Griffband Greta R5 (4204)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:4", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900393,
+							"name": "Beispiel Ida R4 (2183)"
+						},
+						{
+							"id": 900395,
+							"name": "Vorlage Kim R4 (2528)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900137,
+							"name": "Vorhand Rahel R5 (2818)"
+						},
+						{
+							"id": 900145,
+							"name": "Linienrichter Alma R7 (13521)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "6:3", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900396,
+							"name": "Punktgewinn Leo R6 (7357)"
+						},
+						{
+							"id": 900397,
+							"name": "Erfunden Maja R7 (16952)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900141,
+							"name": "Stopp Vera R5 (4625)"
+						},
+						{
+							"id": 900377,
+							"name": "Tiebreak Rahel R5 (4831)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "7:5", ""]
+		}
+	],
+	"leagueId": 16,
+	"groupId": -1
+}

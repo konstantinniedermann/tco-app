@@ -1,0 +1,116 @@
+{
+	"title": { "de": "Olten", "fr": "Olten" },
+	"leagueId": "10",
+	"clubId": "2202",
+	"group": 28,
+	"subtitle": { "de": "2L Damen", "fr": "2L Dames" },
+	"results": [
+		{
+			"id": "976103",
+			"round": "1",
+			"date": "03.05",
+			"homeTeamName": "Belchen 2",
+			"visitTeamName": "Mümliswil",
+			"homeTeamScore": 0,
+			"visitTeamScore": 6,
+			"encounterId": 976103
+		},
+		{
+			"id": "976102",
+			"round": "1",
+			"date": "02.05",
+			"homeTeamName": "Langenthal",
+			"visitTeamName": "Bienne",
+			"homeTeamScore": 2,
+			"visitTeamScore": 4,
+			"encounterId": 976102
+		},
+		{
+			"id": "976110",
+			"round": "2",
+			"date": "10.05",
+			"homeTeamName": "Mümliswil",
+			"visitTeamName": "Bienne",
+			"homeTeamScore": 6,
+			"visitTeamScore": 0,
+			"encounterId": 976110
+		},
+		{
+			"id": "976109",
+			"round": "2",
+			"date": "09.05",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Belchen 2",
+			"homeTeamScore": 5,
+			"visitTeamScore": 1,
+			"encounterId": 976109
+		},
+		{
+			"id": "976106",
+			"round": "3",
+			"date": "16.05",
+			"homeTeamName": "Bienne",
+			"visitTeamName": "Belchen 2",
+			"homeTeamScore": 2,
+			"visitTeamScore": 4,
+			"encounterId": 976106
+		},
+		{
+			"id": "976104",
+			"round": "3",
+			"date": "17.05",
+			"homeTeamName": "Langenthal",
+			"visitTeamName": "Olten",
+			"homeTeamScore": 0,
+			"visitTeamScore": 6,
+			"encounterId": 976104
+		},
+		{
+			"id": "976105",
+			"round": "4",
+			"date": "07.06",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Mümliswil",
+			"homeTeamScore": 2,
+			"visitTeamScore": 4,
+			"encounterId": 976105
+		},
+		{
+			"id": "976101",
+			"round": "4",
+			"date": "07.06",
+			"homeTeamName": "Langenthal",
+			"visitTeamName": "Belchen 2",
+			"homeTeamScore": 1,
+			"visitTeamScore": 5,
+			"encounterId": 976101
+		},
+		{
+			"id": "976108",
+			"round": "5",
+			"date": "14.06",
+			"homeTeamName": "Mümliswil",
+			"visitTeamName": "Langenthal",
+			"homeTeamScore": 6,
+			"visitTeamScore": 0,
+			"encounterId": 976108
+		},
+		{
+			"id": "976107",
+			"round": "5",
+			"date": "14.06",
+			"homeTeamName": "Bienne",
+			"visitTeamName": "Olten",
+			"homeTeamScore": 1,
+			"visitTeamScore": 5,
+			"encounterId": 976107
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Mümliswil", "teamId": 14416, "points": 22, "sets": "45 - 5" },
+		{ "rank": 2, "teamName": "Olten", "teamId": 15954, "points": 18, "sets": "36 - 15" },
+		{ "rank": 3, "teamName": "Belchen 2", "teamId": 17486, "points": 10, "sets": "22 - 29" },
+		{ "rank": 4, "teamName": "Bienne", "teamId": 17344, "points": 7, "sets": "17 - 38" },
+		{ "rank": 5, "teamName": "Langenthal", "teamId": 17135, "points": 3, "sets": "10 - 43" }
+	]
+}

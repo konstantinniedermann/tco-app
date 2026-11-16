@@ -9,13 +9,13 @@
 		werteAusKategorie,
 		type KategorieWerte
 	} from '../../../../../../lib/verwaltung/Kategorieformular.svelte';
+	import { type KategorieFeld } from '../../../../../../lib/verwaltung/api.ts';
 	import {
 		aendereKategorie,
 		ladeKategorie,
 		sageKategorieAb,
-		type KategorieAnsicht,
-		type KategorieFeld
-	} from '../../../../../../lib/verwaltung/api.ts';
+		type KategorieAnsicht
+	} from '../../../../../../lib/verwaltung/turnier-api.ts';
 	import { fehlerText } from '../../../../../../lib/verwaltung/anzeige.ts';
 	import {
 		absageSperreText,

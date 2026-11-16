@@ -1,0 +1,116 @@
+{
+	"title": { "de": "Olten 1", "fr": "Olten 1" },
+	"leagueId": "11",
+	"clubId": "2202",
+	"group": 39,
+	"subtitle": { "de": "3L Herren", "fr": "3L Messieurs" },
+	"results": [
+		{
+			"id": "975061",
+			"round": "1",
+			"date": "03.05",
+			"homeTeamName": "Gerlafingen",
+			"visitTeamName": "Tela 2",
+			"homeTeamScore": 7,
+			"visitTeamScore": 2,
+			"encounterId": 975061
+		},
+		{
+			"id": "975065",
+			"round": "1",
+			"date": "02.05",
+			"homeTeamName": "Schützenmatt SO",
+			"visitTeamName": "Olten 1",
+			"homeTeamScore": 6,
+			"visitTeamScore": 3,
+			"encounterId": 975065
+		},
+		{
+			"id": "975064",
+			"round": "2",
+			"date": "09.05",
+			"homeTeamName": "Aarberg",
+			"visitTeamName": "Gerlafingen",
+			"homeTeamScore": 5,
+			"visitTeamScore": 4,
+			"encounterId": 975064
+		},
+		{
+			"id": "975059",
+			"round": "2",
+			"date": "09.05",
+			"homeTeamName": "Tela 2",
+			"visitTeamName": "Olten 1",
+			"homeTeamScore": 5,
+			"visitTeamScore": 4,
+			"encounterId": 975059
+		},
+		{
+			"id": "975067",
+			"round": "3",
+			"date": "17.05",
+			"homeTeamName": "Olten 1",
+			"visitTeamName": "Gerlafingen",
+			"homeTeamScore": 1,
+			"visitTeamScore": 8,
+			"encounterId": 975067
+		},
+		{
+			"id": "975062",
+			"round": "3",
+			"date": "16.05",
+			"homeTeamName": "Schützenmatt SO",
+			"visitTeamName": "Aarberg",
+			"homeTeamScore": 5,
+			"visitTeamScore": 4,
+			"encounterId": 975062
+		},
+		{
+			"id": "975060",
+			"round": "4",
+			"date": "06.06",
+			"homeTeamName": "Aarberg",
+			"visitTeamName": "Tela 2",
+			"homeTeamScore": 6,
+			"visitTeamScore": 3,
+			"encounterId": 975060
+		},
+		{
+			"id": "975063",
+			"round": "4",
+			"date": "07.06",
+			"homeTeamName": "Gerlafingen",
+			"visitTeamName": "Schützenmatt SO",
+			"homeTeamScore": 7,
+			"visitTeamScore": 2,
+			"encounterId": 975063
+		},
+		{
+			"id": "975058",
+			"round": "5",
+			"date": "13.06",
+			"homeTeamName": "Tela 2",
+			"visitTeamName": "Schützenmatt SO",
+			"homeTeamScore": 5,
+			"visitTeamScore": 4,
+			"encounterId": 975058
+		},
+		{
+			"id": "975066",
+			"round": "5",
+			"date": "13.06",
+			"homeTeamName": "Olten 1",
+			"visitTeamName": "Aarberg",
+			"homeTeamScore": 2,
+			"visitTeamScore": 7,
+			"encounterId": 975066
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Gerlafingen", "teamId": 17431, "points": 26, "sets": "57 - 22" },
+		{ "rank": 2, "teamName": "Aarberg", "teamId": 16230, "points": 22, "sets": "47 - 38" },
+		{ "rank": 3, "teamName": "Schützenmatt SO", "teamId": 17097, "points": 17, "sets": "39 - 43" },
+		{ "rank": 4, "teamName": "Tela 2", "teamId": 16247, "points": 15, "sets": "33 - 45" },
+		{ "rank": 5, "teamName": "Olten 1", "teamId": 11956, "points": 10, "sets": "26 - 54" }
+	]
+}

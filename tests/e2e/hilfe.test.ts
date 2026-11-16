@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { FERTIG_MS, SCHRITT_MS } from '../../src/lib/hilfe/ablauf.ts';
 import { bietetInstallationAn, startetVomSymbol } from './hilfen/geraet.ts';
 import { legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
 import { pruefeBildschirm, sammleKonsolenfehler } from './hilfen/seite.ts';
@@ -65,16 +66,22 @@ test('A-HILFE-02: bei Bewegung reduzieren keine Animation und keine Taste', asyn
 });
 
 test('A-HILFE-02: Animation hält an und läuft weiter', async ({ page }) => {
+	// Eigene Uhr: Die Zeit bis zum nächsten Bild wird vorgespult statt abgewartet.
+	await page.clock.install();
 	await oeffneHilfe(page);
 	await themen(page).first().click();
 	const anleitung = page.locator('details[open] .anleitung');
-	await expect(anleitung.locator('li.aktiv')).toHaveCount(1);
+	const aktiv = anleitung.locator('li.aktiv');
+	await expect(aktiv).toHaveCount(1);
 	await anleitung.getByRole('button', { name: 'Anhalten' }).click();
-	const angehalten = await anleitung.locator('li.aktiv').textContent();
-	await page.waitForTimeout(4000);
-	await expect(anleitung.locator('li.aktiv')).toHaveText(angehalten ?? '');
+	const angehalten = (await aktiv.textContent()) ?? '';
+	// Länger, als jedes Bild steht: Liefe die Animation, stünde jetzt ein anderes Bild.
+	await page.clock.runFor(FERTIG_MS + SCHRITT_MS);
+	await expect(aktiv).toHaveText(angehalten);
 	await anleitung.getByRole('button', { name: 'Abspielen' }).click();
 	await expect(anleitung.getByRole('button', { name: 'Anhalten' })).toBeVisible();
+	await page.clock.runFor(FERTIG_MS);
+	await expect(aktiv).not.toHaveText(angehalten);
 });
 
 test('A-HILFE-02: zugeklappte Anleitung beginnt beim Aufklappen bei Schritt 1', async ({

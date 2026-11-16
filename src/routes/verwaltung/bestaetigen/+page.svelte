@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
-	import { bestaetige, fordereCodeAn } from '../../../lib/verwaltung/api.ts';
+	import { bestaetige, fordereCodeAn } from '../../../lib/verwaltung/zugang-api.ts';
 	import { leiteUm, startziel } from '../../../lib/verwaltung/umleiten.ts';
 
 	let { data } = $props();

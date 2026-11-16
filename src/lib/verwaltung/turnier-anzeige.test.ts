@@ -6,7 +6,7 @@ import {
 	anmeldungStatus,
 	datumKurz,
 	datumLang,
-	doppelWarnungen,
+	warnungsSaetze,
 	geschlechtText,
 	jahrgangText,
 	mitgliedVermerk,
@@ -18,8 +18,7 @@ import {
 	statusText,
 	summeText,
 	trefferText,
-	unpassendText,
-	warnungText
+	unpassendText
 } from './turnier-anzeige.ts';
 
 describe('Anzeigehilfen für Turniere', () => {
@@ -87,16 +86,6 @@ describe('Anzeigehilfen für Turniere', () => {
 		expect(ART_GESPERRT).toBe(
 			'Einzel oder Doppel lässt sich nur ändern, solange niemand angemeldet ist.'
 		);
-	});
-
-	it('FR-46: Warnungen beim Anmelden von Hand als kurze Sätze, in fester Reihenfolge', () => {
-		expect(warnungText(['passt-nicht', 'voll'])).toBe(
-			'Passt nicht zur Kategorie. Hat schon 3 Anmeldungen.'
-		);
-		expect(warnungText(['angaben-fehlen', 'passt-nicht', 'voll', 'geschlossen'])).toBe(
-			'Angaben fehlen. Passt nicht zur Kategorie. Hat schon 3 Anmeldungen. Anmeldung ist geschlossen.'
-		);
-		expect(warnungText([])).toBe('');
 	});
 
 	it('A-ANMELDUNG-06: Zähler der Anmeldungen nennt die Wildcard-Anträge', () => {
@@ -170,16 +159,16 @@ describe('Anzeigehilfen für Turniere', () => {
 	});
 
 	it('FR-46: Warnungen im Doppel als Liste wie im Einzel, «voll» nennt die Spieler', () => {
-		expect(doppelWarnungen(['passt-nicht', 'voll', 'geschlossen'], ['Max Beispiel'])).toEqual([
+		expect(warnungsSaetze(['passt-nicht', 'voll', 'geschlossen'], ['Max Beispiel'])).toEqual([
 			'Passt nicht zur Kategorie.',
 			'Max Beispiel hat schon 3 Anmeldungen.',
 			'Anmeldung ist geschlossen.'
 		]);
-		expect(doppelWarnungen(['voll'], ['Lena Muster', 'Max Beispiel'])).toEqual([
+		expect(warnungsSaetze(['voll'], ['Lena Muster', 'Max Beispiel'])).toEqual([
 			'Lena Muster oder Max Beispiel hat schon 3 Anmeldungen.'
 		]);
-		expect(doppelWarnungen(['angaben-fehlen'], [])).toEqual(['Angaben fehlen.']);
-		expect(doppelWarnungen([], ['Max Beispiel'])).toEqual([]);
+		expect(warnungsSaetze(['angaben-fehlen'], [])).toEqual(['Angaben fehlen.']);
+		expect(warnungsSaetze([], ['Max Beispiel'])).toEqual([]);
 	});
 
 	it('FR-46: wer nicht aktiv ist, bleibt nicht im Paar und wird nicht verschoben', () => {

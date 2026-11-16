@@ -1,8 +1,8 @@
 // Anfragen zu Benachrichtigungen (`/api/benachrichtigungen…`, FR-40, FR-41) und ihre Antworten
-// als typisierte Ergebnisse. Die Oberfläche zeigt die Meldungen; hier steht nur, was die
-// Statuscodes bedeuten.
+// als typisierte Ergebnisse. Die Oberfläche zeigt die Meldungen; hier steht nur, welche
+// Fehlerwörter das Modul kennt (gedeutet im Abruf-Baustein).
+import { rufeAb, woerterAus, type Holen, type Vertrag } from '../abruf.ts';
 import { jsonPost } from '../json-post.ts';
-import type { Holen } from '../verwaltung/api.ts';
 
 export type Thema = 'anlaesse' | 'cm' | 'verein';
 export type Themen = Record<Thema, boolean>;
@@ -13,17 +13,16 @@ export type Benachrichtigungen = { themen: Themen; pushHier: boolean; schluessel
 export type Ergebnis<T> =
 	{ art: 'ok'; daten: T } | { art: 'abgemeldet' } | { art: 'push-aus' } | { art: 'stoerung' };
 
+/** Die Fehlerwörter, die Push kennt; der Körper muss lesbar sein. */
+type Wort = Exclude<Ergebnis<unknown>['art'], 'ok' | 'stoerung'>;
+const VERTRAG: Vertrag<Wort> = {
+	woerter: woerterAus<Wort>({ abgemeldet: true, 'push-aus': true }),
+	koerper: 'pflicht'
+};
+
 async function rufe<T>(pfad: string, init: RequestInit, holen: Holen): Promise<Ergebnis<T>> {
-	try {
-		const r = await holen(pfad, init);
-		const k = (await r.json()) as { fehler?: unknown };
-		if (r.ok) return { art: 'ok', daten: k as T };
-		if (r.status === 401) return { art: 'abgemeldet' };
-		if (r.status === 409 && k.fehler === 'push-aus') return { art: 'push-aus' };
-		return { art: 'stoerung' };
-	} catch {
-		return { art: 'stoerung' };
-	}
+	const r = await rufeAb<T, Wort>(pfad, init, holen, VERTRAG);
+	return r.art === 'ok' || r.art === 'stoerung' ? r : { art: r.art };
 }
 
 export const holeBenachrichtigungen = (holen: Holen = fetch) =>

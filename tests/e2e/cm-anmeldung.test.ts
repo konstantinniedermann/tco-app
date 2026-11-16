@@ -4,18 +4,20 @@ import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
-	holeMailCode,
 	legeCmMitBriefCodeAn,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
-	legeOffenesTurnierAn,
 	legeRollenkontoMitBriefCodeAn,
-	meldeZurCmAn,
 	schliesseLoginHilfen,
-	setzeKontaktperson,
-	setzeRufname,
-	setzeSpielerangaben
+	setzeRufname
 } from './hilfen/login.ts';
+import {
+	legeOffenesTurnierAn,
+	meldeZurCmAn,
+	setzeKontaktperson,
+	setzeSpielerangaben
+} from './hilfen/turnier.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
 // CM Teil 2: Mitglieder melden sich am Handy zu Einzel-Kategorien an (A-ANMELDUNG-01 bis -03,

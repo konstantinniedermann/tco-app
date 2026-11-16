@@ -1,4 +1,4 @@
-import { holeCmDienste } from '../../../../../lib/server/cm/index.ts';
+import { holeCmDienste } from '../../../../../lib/server/dienste.ts';
 import { getGespraech, postGespraech } from '../../../../../lib/server/gespraech/schnittstellen.ts';
 import type { RequestHandler } from './$types';
 

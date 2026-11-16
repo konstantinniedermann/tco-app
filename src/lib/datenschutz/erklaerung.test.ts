@@ -61,7 +61,7 @@ describe('Datenschutzerklärung aus der Doku (DS-09)', () => {
 		const text = JSON.stringify(e);
 		expect(text).toContain('Kein Tracking:');
 		// JSON schreibt einen Zeilenumbruch als \n.
-		expect(text).not.toMatch(/\*\*|"#|\\n/);
+		expect(text).not.toMatch(/\*|"#|\\n/);
 	});
 
 	it('DS-09: Erklärung nennt CM-Anmeldungen und ihre Aufbewahrung', () => {

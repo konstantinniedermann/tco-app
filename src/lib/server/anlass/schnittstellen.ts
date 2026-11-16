@@ -2,15 +2,17 @@
 // über ihre nicht erratbare Kennung (SI-19).
 import type { RequestEvent } from '@sveltejs/kit';
 import { parseId } from '../parse-id.ts';
-import type { Db } from '../db/index.ts';
 import {
 	antwort,
 	formatFehler,
 	istJson,
+	jetzt,
 	leseKoerper,
+	mitSitzung,
+	nichtGefunden,
 	type Ereignis
-} from '../login/schnittstellen.ts';
-import type { AngemeldetesKonto } from '../login/sitzung.ts';
+} from '../http.ts';
+import { ANTWORT_MELDUNG } from '../../anlass/antwort.ts';
 import { pruefeAntwort } from './angaben.ts';
 import {
 	kommendeAnlaesse,
@@ -20,25 +22,13 @@ import {
 	type AnlassMitglied
 } from './anlaesse.ts';
 import { baueKalender } from './kalender.ts';
+import type { AnlassDienste } from './typen.ts';
 
-export type AnlassDienste = { db: Db; jetzt?: () => Date };
 export type AnlassEreignis = Ereignis & Pick<RequestEvent, 'params'>;
 
-const jetzt = (d: AnlassDienste) => (d.jetzt ?? (() => new Date()))();
-const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
-
 /** Für den Browser: statt der Kennung der Link zur Kalenderdatei. */
-export function fuerBrowser({ kalenderKennung, ...rest }: AnlassMitglied) {
+function fuerBrowser({ kalenderKennung, ...rest }: AnlassMitglied) {
 	return { ...rest, kalender: `/api/kalender/${kalenderKennung}` };
-}
-
-async function mitSitzung(
-	e: AnlassEreignis,
-	fn: (konto: AngemeldetesKonto) => Promise<Response>
-): Promise<Response> {
-	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
-	return fn(konto);
 }
 
 export function getAnlaesse(d: AnlassDienste, e: AnlassEreignis): Promise<Response> {
@@ -62,7 +52,8 @@ export async function postAnmeldung(d: AnlassDienste, e: AnlassEreignis): Promis
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const p = pruefeAntwort(await leseKoerper(e));
-		if (!p.ok) return antwort(400, { fehler: 'eingabe', feld: p.feld });
+		if (!p.ok)
+			return antwort(400, { fehler: 'eingabe', felder: { [p.feld]: ANTWORT_MELDUNG[p.feld] } });
 		const t = jetzt(d);
 		const r = await melde(d.db, id, konto.mitgliedId, p, t);
 		if (r === 'geschlossen') return antwort(409, { fehler: 'geschlossen' });
@@ -85,3 +76,12 @@ export async function getKalender(d: AnlassDienste, e: AnlassEreignis): Promise<
 		}
 	});
 }
+
+// Alle Schnittstellen der Mitglieder zu Anlässen; die Grundprüfung
+// (`src/lib/server/grundpruefung.db.test.ts`) läuft über jeden Eintrag.
+export const ANLASS_SCHNITTSTELLEN = {
+	getAnlaesse,
+	getAnlass,
+	postAnmeldung,
+	getKalender
+} satisfies Record<string, (d: AnlassDienste, e: AnlassEreignis) => Promise<Response>>;

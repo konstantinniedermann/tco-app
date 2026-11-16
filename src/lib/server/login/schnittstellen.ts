@@ -1,37 +1,6 @@
-import type { RequestEvent } from '@sveltejs/kit';
-import type { Db } from '../db/index.ts';
-import { offeneGespraecheGesamt } from '../gespraech/gespraech.ts';
-import { effektiveRollen, verwaltungsrollen } from '../admin/rollen.ts';
+import { antwort, formatFehler, istJson, leseKoerper, type Ereignis } from '../http.ts';
 import type { LoginDienst, LoginErgebnis } from './dienst.ts';
 import { SITZUNG_COOKIE, SITZUNG_GUELTIG_MS } from './sitzung.ts';
-
-export type Ereignis = Pick<
-	RequestEvent,
-	'request' | 'cookies' | 'getClientAddress' | 'locals' | 'url'
->;
-
-const KOPF = { 'cache-control': 'no-store' };
-
-export function antwort(status: number, inhalt?: object): Response {
-	if (inhalt === undefined) return new Response(null, { status, headers: KOPF });
-	return Response.json(inhalt, { status, headers: KOPF });
-}
-
-export function istJson(e: Ereignis): boolean {
-	return (e.request.headers.get('content-type') ?? '').toLowerCase().startsWith('application/json');
-}
-
-// Ein kaputter oder fremdartiger Körper zählt als leer; er wird nie geloggt (SI-05).
-export async function leseKoerper(e: Ereignis): Promise<Record<string, unknown>> {
-	try {
-		const roh: unknown = await e.request.json();
-		return typeof roh === 'object' && roh !== null && !Array.isArray(roh)
-			? (roh as Record<string, unknown>)
-			: {};
-	} catch {
-		return {};
-	}
-}
 
 // Keine explizite `secure`-Option: SvelteKit setzt sie, ausser im Entwicklungsserver (darum
 // klappt der Login bei `make dev-handy` übers WLAN) oder wenn die Anfrage-URL http://localhost
@@ -61,8 +30,6 @@ export function loginAntwort(e: Ereignis, r: LoginErgebnis): Response {
 	}
 }
 
-export const formatFehler = () => antwort(415, { fehler: 'format' });
-
 export async function postBrief(d: LoginDienst, e: Ereignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
 	const { code } = await leseKoerper(e);
@@ -87,28 +54,6 @@ export async function postMail(d: LoginDienst, e: Ereignis): Promise<Response> {
 		e,
 		await d.loginMitMailCode(email, code, e.getClientAddress(), e.cookies.get(SITZUNG_COOKIE))
 	);
-}
-
-// RR-07: `verwaltung` (eine Verwaltungsrolle, in der «Ansicht als …» die der Ansicht) blendet nur
-// die Navigation ein; durchgesetzt wird es an den Admin-Schnittstellen. `ansicht` zeigt das Band.
-// Weder `mitgliedId` noch `sitzungHash` gehen an den Browser.
-export async function getSitzung(
-	e: Ereignis,
-	db: Db,
-	jetzt: () => Date = () => new Date()
-): Promise<Response> {
-	const konto = e.locals.konto;
-	if (!konto) return antwort(401, {});
-	const rollen = effektiveRollen(await verwaltungsrollen(db, konto.kontoId), konto.ansicht);
-	return antwort(200, {
-		vorname: konto.vorname,
-		rufname: konto.rufname,
-		passkeyHinweis: konto.passkeyHinweis,
-		verwaltung: rollen.length > 0,
-		ansicht: konto.ansicht,
-		// FR-52: Kachel der Verwaltung; nur wer als CM-Admin gilt (auch in der Ansicht), sonst 0.
-		nachrichtenOffen: rollen.includes('cm') ? await offeneGespraecheGesamt(db, jetzt()) : 0
-	});
 }
 
 export async function postLogout(d: LoginDienst, e: Ereignis): Promise<Response> {

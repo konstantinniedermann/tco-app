@@ -1,5 +1,6 @@
 <script lang="ts" module>
-	import type { TurnierAnsicht, TurnierFeld } from './api.ts';
+	import type { TurnierFeld } from './api.ts';
+	import type { TurnierAnsicht } from './turnier-api.ts';
 
 	/** Felder als Text, wie sie in den Eingabefeldern stehen; Anmeldeschluss `YYYY-MM-DD`. */
 	export type TurnierWerte = {

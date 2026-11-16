@@ -7,6 +7,43 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Erledigt im Refactoring, Schritt 20 (14.11.2026) — ausserhalb einer Auswertung
+
+**Mitgemacht**
+
+- 2026-11-09 — E2E-Hilfen nehmen noch ein festes Turnierjahr an → Commit `98f69ca` («fester Weg des
+  Turnierjahrs weg») auf `refactor/schritt-20` (kein Test ruft den Weg mit Jahr auf, `origin`
+  führt keinen offenen Feature-Branch; `docs/refactoring-analyse.md`, Anhang F.3 und F.4)
+
+### Erledigt im Refactoring, Schritt 12a (12.11.2026) — ausserhalb einer Auswertung
+
+**Mitgemacht**
+
+- 2026-11-12 — Bauregel übersieht Importpfade mit `//` oder `..` vor `admin` → df46080, 4224178
+  (`ohneKommentare` entfernt Kommentare nur ausserhalb von Texten; die Routen-Regeln prüfen den
+  Pfad, wie er steht, und den aufgelösten Pfad; je Form ein Fall in `bauregel.test.ts`;
+  `docs/refactoring-analyse.md`, Anhang D.15)
+
+### Erledigt im Refactoring, Schritt 11 (12.11.2026) — ausserhalb einer Auswertung
+
+**Mitgemacht**
+
+- 2026-11-12 — Datenbanktests legen Turniere mit zufälligem Jahr an und können sich treffen → e2aafd6
+  (`tests/hilfen/turnierjahre.ts`: eigener Jahresbereich je Testdatei, fortlaufend gezählt; jeder
+  Lauf hat eine frische Datenbank; `docs/refactoring-analyse.md`, Anhang D.12)
+
+### Erledigt im Refactoring, Schritt 02 (11.11.2026) — ausserhalb einer Auswertung
+
+**Mitgemacht**
+
+- 2026-11-09 — E2E: FR-41 Benachrichtigungen auf dem iPhone im Gesamtlauf einmal rot → cd86bdd
+  (`schalte` wartet, bis die Schalter wieder frei sind; Ursache hergeleitet, im Trace nicht gesehen:
+  `docs/refactoring-analyse.md`, «Erkenntnisse Schritt 02»)
+- 2026-11-09 — E2E: zwei iPhone-Tests der Mitgliederverwaltung nur im Gesamtlauf rot → edf8d27
+  (kein Zeitbudget: ein anderer Build im selben Ordner gab dem laufenden Server eine neue
+  `version.json`; Entscheid des Projektleiters vom 11.11.2026 für einen eigenen Build-Ordner je
+  Lauf, E-27)
+
 ### Auswertung vom 09.11.2026 — 21 Einträge, gegen `dev` (e947d25) verifiziert
 
 Bilanz je Eintrag: 0 ganz verworfen · 7 abgehakt (1 davon nicht mehr reproduzierbar) · 8 mitgemacht (1 davon überholt) ·

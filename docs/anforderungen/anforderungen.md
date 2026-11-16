@@ -18,7 +18,7 @@ Anforderungen bekommen die nächste freie Nummer im Bereich.
 in den [Abklärungen](../abklaerungen.md#beantwortet).
 
 **Etappe:** Milestone laut [Roadmap](../roadmap.md) — *Fundament*, *Mitglieder-Login*,
-*CM-Anmeldung*, *CM-Betrieb*, *Lizenzanträge* — oder *später* (Backlog / Optional).
+*CM-Anmeldung*, *CM-Betrieb*, *Interclub*, *Lizenzanträge* — oder *später* (Backlog / Optional).
 *Pilot* ist die Vorstufe von *Mitglieder-Login*: Deren Anforderungen stehen unter
 *Mitglieder-Login*, auch wenn ihr Issue im Milestone *Pilot* liegt.
 *durchgehend* heisst: gilt ab der ersten Etappe mit Produktcode für alles Weitere.
@@ -59,7 +59,7 @@ nicht festlegen. Vom Verein zu bestätigen.
 | A-MITGLIED-05 | Anbindung an die Mitgliederverwaltung Fairgate prüfen | PDF 2 | später | später |
 | A-MITGLIED-06 | Mitglieder- und MyTCO-Admin sehen im Änderungsverlauf, wer wann welches Feld eines Mitglieds geändert oder welche Aktion ausgelöst hat (Verwaltung, Mitglied selbst oder automatisch), ohne alte und neue Werte; 12 Monate | PL | Mitglieder-Login | umgesetzt (Verlauf der Änderungen; Löschung nach 12 Monaten durch den Zeitgeber) |
 | A-MITGLIED-07 | Der Mitglieder-Admin liest die Mitgliederliste aus Fairgate ein (Excel oder CSV) und führt so Ein- und Austritte nach; zum Start erfasst der Projektleiter die Mitglieder ([#46](https://github.com/konstantinniedermann/tco-app/issues/46)) | K-17.1 | CM-Anmeldung\* | teilweise: Einlesen einer Datei im MyTCO-Schema umgesetzt ([#43](https://github.com/konstantinniedermann/tco-app/issues/43), Seite *Einlesen*); Umwandlung der Fairgate-Liste und Abgleich von Ein- und Austritten offen (#46, hängt an K-45) |
-| A-MITGLIED-08 | Ein Mitglied erfasst sein Kind und erledigt für es das Administrative (Daten, CM-Anmeldung), bis das Kind ab der Altersgrenze des Vereins ein eigenes Login hat (Vorschlag K-08) ([#45](https://github.com/konstantinniedermann/tco-app/issues/45)) | K-46, PL | CM-Anmeldung\* | offen (hängt an K-08) |
+| A-MITGLIED-08 | Ein Mitglied erfasst sein Kind und erledigt für es das Administrative (Daten, CM-Anmeldung), bis das Kind eine eigene E-Mail-Adresse hat und sich selbst anmeldet; keine Altersgrenze (Vorschlag K-08) ([#45](https://github.com/konstantinniedermann/tco-app/issues/45)) | K-46, PL | CM-Anmeldung\* | offen (hängt an K-08) |
 
 ### ROLLE — Benutzerrollen
 
@@ -214,6 +214,12 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-01062027)).
 | A-SPIELPLAN-06 | Schnelles Verschieben, z. B. bei Regen | PDF 5e-i | später | später |
 | A-SPIELPLAN-07 | Spieler sehen den finalisierten Plan jederzeit, mit Änderungen live | PDF 5e-ii | später | später |
 | A-SPIELPLAN-08 | Der CM-Admin trägt per Klick auf ein Spiel das Resultat ein; es erscheint im Kalender der öffentlichen Seite | PDF 5e-ii | später | später |
+
+### INTERCLUB — Interclub-Resultate
+
+| ID | Anforderung | Quelle | Etappe | Status |
+|----|-------------|--------|--------|--------|
+| A-INTERCLUB-01 | Mitglieder sehen die Interclub-Resultate der Teams des Vereins (Aktive, Senioren, Junioren): Endstände, Spielplan, Tabelle, Auf-/Abstiegsspiele und die Einzelpartien jeder gespielten Begegnung mit Sätzen, Spieler beider Teams mit Name und Klassierung (Teil 2, [Datenschutz](../datenschutz.md)). Die Daten kommen von Swiss Tennis ([ADR-011](../adr/adr-011-interclub-schnittstelle-swiss-tennis.md), per Befehl `make ic-import`) | PL, [#81](https://github.com/konstantinniedermann/tco-app/issues/81) | Interclub | geplant |
 
 ## Nicht-funktionale Anforderungen
 

@@ -1,0 +1,75 @@
+{
+	"title": { "de": "Olten 1", "fr": "Olten 1" },
+	"leagueId": "13",
+	"clubId": "2202",
+	"group": 64,
+	"subtitle": { "de": "12&U Boys Liga B", "fr": "12&U Boys Ligue B" },
+	"results": [
+		{
+			"id": "435409",
+			"round": "1",
+			"date": "03.06",
+			"homeTeamName": "Olten 1",
+			"visitTeamName": "Schützenmatt SO 2",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 435409
+		},
+		{
+			"id": "435405",
+			"round": "1",
+			"date": "10.06",
+			"homeTeamName": "Delémont",
+			"visitTeamName": "Scheuren",
+			"homeTeamScore": 3,
+			"visitTeamScore": 0,
+			"encounterId": 435405
+		},
+		{
+			"id": "435406",
+			"round": "2",
+			"date": "21.06",
+			"homeTeamName": "Schützenmatt SO 2",
+			"visitTeamName": "Scheuren",
+			"homeTeamScore": 3,
+			"visitTeamScore": 0,
+			"encounterId": 435406
+		},
+		{
+			"id": "435407",
+			"round": "2",
+			"date": "17.06",
+			"homeTeamName": "Delémont",
+			"visitTeamName": "Olten 1",
+			"homeTeamScore": 2,
+			"visitTeamScore": 1,
+			"encounterId": 435407
+		},
+		{
+			"id": "435408",
+			"round": "3",
+			"date": "28.06",
+			"homeTeamName": "Schützenmatt SO 2",
+			"visitTeamName": "Delémont",
+			"homeTeamScore": 1,
+			"visitTeamScore": 2,
+			"encounterId": 435408
+		},
+		{
+			"id": "435410",
+			"round": "3",
+			"date": "24.06",
+			"homeTeamName": "Scheuren",
+			"visitTeamName": "Olten 1",
+			"homeTeamScore": 2,
+			"visitTeamScore": 1,
+			"encounterId": 435410
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Delémont", "teamId": 47222, "points": 7, "sets": "14 - 5" },
+		{ "rank": 2, "teamName": "Schützenmatt SO 2", "teamId": 47925, "points": 7, "sets": "14 - 6" },
+		{ "rank": 3, "teamName": "Scheuren", "teamId": 46621, "points": 2, "sets": "7 - 14" },
+		{ "rank": 4, "teamName": "Olten 1", "teamId": 47726, "points": 2, "sets": "5 - 15" }
+	]
+}

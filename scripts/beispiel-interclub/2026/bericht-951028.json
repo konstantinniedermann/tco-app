@@ -1,0 +1,184 @@
+{
+	"title": "Beispiel",
+	"subtitle": "12. Mai 2026",
+	"homeTeam": {
+		"name": "Bremgarten AG",
+		"clubNumber": 2084,
+		"points": 3,
+		"sets": 7,
+		"games": 57
+	},
+	"awayTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 3,
+		"sets": 6,
+		"games": 38
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900038,
+							"name": "Schiedsstuhl Noah R7 (14299)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900023,
+							"name": "Lob Yara R6 (5375)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["5:7", "1:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900039,
+							"name": "Ballkind Paula R7 (10910)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900025,
+							"name": "Satzball Alma R7 (12534)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900040,
+							"name": "Matchball Remo R7 (17412)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900029,
+							"name": "Sandplatz Edith R7 (10664)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "6:2", "4:10"]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900041,
+							"name": "Beispiel Anna R7 (19294)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900042,
+							"name": "Platzhalter Beat R7 (13554)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900038,
+							"name": "Schiedsstuhl Noah R7 (14299)"
+						},
+						{
+							"id": 900039,
+							"name": "Ballkind Paula R7 (10910)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900023,
+							"name": "Lob Yara R6 (5375)"
+						},
+						{
+							"id": 900032,
+							"name": "Ballwand Hannes R7 (14157)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "4:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900040,
+							"name": "Matchball Remo R7 (17412)"
+						},
+						{
+							"id": 900041,
+							"name": "Beispiel Anna R7 (19294)"
+						}
+					],
+					"wo": 1
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900043,
+							"name": "Vorlage Carla R7 (11587)"
+						},
+						{
+							"id": 900031,
+							"name": "Seitenwechsel Greta R9 (34628)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:0", "", ""]
+		}
+	],
+	"leagueId": 62,
+	"groupId": 6
+}

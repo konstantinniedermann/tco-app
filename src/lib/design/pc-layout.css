@@ -1,0 +1,247 @@
+/* PC-Layout ab 60rem als ein Block; übersteuert die Regeln davor allein durch seine Stelle (Teil 8 von 10). */
+
+/* PC-Layout ab 60rem Breite des App-Rahmens (Abfragen erlauben keine Tokens; Wert im Leitbild) */
+@container app (min-width: 60rem) {
+	.pfad {
+		display: block;
+	}
+
+	.pfad-kurz {
+		display: none;
+	}
+
+	.inhalt {
+		padding: var(--abstand-6);
+	}
+
+	/* Seitenkopf (nur Verwaltung): klebt oben am Inhalt. Der negative Rand gleicht den Abstand
+	   oben von .inhalt aus, die Kopfzeile bleibt also an ihrer Stelle; der Abstand zum Inhalt
+	   darunter ist knapper als zuvor. Beim Kleben bleibt der Abstand als Luft über dem Titel.
+	   Die Linie unten ist ohne Scroll-Zeitleiste immer da, sonst wächst sie in den ersten 2rem
+	   Scrollen herein (kein JS). */
+	.seitenkopf {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		margin: calc(-1 * var(--abstand-6)) 0 var(--abstand-3);
+		padding: var(--abstand-6) 0 var(--abstand-3);
+		background: var(--farbe-hintergrund);
+		border-bottom: var(--rand-duenn) solid var(--farbe-linie);
+	}
+
+	/* Steht der Hinweis «Nur ansehen» darüber, fällt der negative Rand weg: der Seitenkopf
+	   überdeckt den Hinweis sonst unten */
+	.hinweis + .seitenkopf {
+		margin-top: 0;
+	}
+
+	.seitenkopf > :last-child {
+		margin-bottom: 0;
+	}
+
+	@supports (animation-timeline: scroll()) {
+		.seitenkopf {
+			border-bottom-color: transparent;
+			animation: seitenkopf-linie linear both;
+			animation-timeline: scroll(root block);
+			animation-range: 0 2rem;
+		}
+	}
+
+	.ansicht-band {
+		order: -3;
+	}
+
+	/* Eine Rasterzeile für die Kopfleiste: Reiter in der Mitte der ganzen Breite, Spalte 1 darf
+	   schrumpfen (min-width: 0), ohne die Reiter zu verschieben */
+	.app-rahmen {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		grid-template-rows: auto minmax(0, 1fr);
+	}
+
+	.app-rahmen > .kopf {
+		grid-row: 1;
+		grid-column: 1 / -1;
+		display: grid;
+		grid-template-columns: subgrid;
+		min-width: 0;
+	}
+
+	.app-rahmen > .kopf > * {
+		grid-column: 1;
+		min-width: 0;
+	}
+
+	/* Reiter wandern mit Symbol in die Mitte der Kopfleiste (selbe Zeile, Spalte 2) */
+	.reiter {
+		grid-row: 1;
+		grid-column: 2;
+		z-index: 2;
+		position: static;
+		align-self: center;
+		justify-content: center;
+		gap: var(--abstand-2);
+		padding: 0;
+		border-top: 0;
+		background: transparent;
+	}
+
+	.reiter a {
+		flex: none;
+		flex-direction: row;
+		padding: var(--abstand-2) var(--abstand-4);
+		border-radius: var(--radius);
+		color: var(--farbe-flaeche);
+		font-size: var(--groesse-text);
+	}
+
+	.reiter a:hover:not([aria-current='page']) {
+		background-color: var(--farbe-marke-hover);
+	}
+
+	.reiter a[aria-current='page'] {
+		background-color: var(--farbe-marke-zart);
+		color: var(--farbe-marke);
+		font-weight: 700;
+	}
+
+	/* Am PC zeigt die Pille den aktiven Reiter; der gleitende Balken gehört zum Handy */
+	.reiter .reiter-balken {
+		display: none;
+	}
+
+	.reiter a:focus-visible {
+		outline-color: var(--farbe-marke-hell);
+	}
+
+	.rollbereich {
+		grid-row: 2;
+		grid-column: 1 / -1;
+	}
+
+	.feld-zeile {
+		grid-template-columns: 11rem 1fr;
+		align-items: center;
+	}
+
+	.feld-zeile .fehler,
+	.feld-zeile .feld-hilfe {
+		grid-column: 2;
+	}
+
+	/* Tabelle: jede Zeile einzeilig und knapp (eine Zeile mit Tasten so hoch wie eine Taste plus
+	   wenig Rand); freier Text endet mit «…» (.zelle-kurz), der volle Text steht im Dialog
+	   «Ändern», in der Detailseite oder als title */
+	.tabelle th,
+	.tabelle td {
+		white-space: nowrap;
+		padding-block: var(--abstand-2);
+	}
+
+	/* Tasten in der Zeile brechen nie um, auch wo eine Zelle den Umbruch wieder erlaubt */
+	.tabelle .taste-neben,
+	.tabelle .taste-haupt {
+		white-space: nowrap;
+	}
+
+	.zelle-kurz {
+		max-width: 16rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	span.zelle-kurz {
+		display: inline-block;
+		vertical-align: bottom;
+	}
+
+	/* Spalte mit Name und Kommentar: nimmt die übrige Breite (width: 100%) und zählt mit
+	   max-width: 0 nicht zur Mindestbreite der Tabelle; Name und Kommentar kürzen sich darin,
+	   Plaketten bleiben ganz */
+	.tabelle td:has(> .zelle-dehnbar) {
+		width: 100%;
+		max-width: 0;
+	}
+
+	.zelle-dehnbar {
+		display: flex;
+		align-items: baseline;
+		gap: var(--abstand-2);
+	}
+
+	.zelle-dehnbar > * {
+		flex: none;
+	}
+
+	.zelle-dehnbar > .zelle-kurz {
+		flex: 0 1 auto;
+		min-width: 0;
+	}
+
+	/* Der Name (erstes Element) hat Vorrang; ein Kommentar dahinter nimmt nur den Rest (Basis 0).
+	   Mit Basis auto würde der lange Kommentar an seiner Höchstbreite eingefroren und das
+	   Kürzen träfe allein den Namen */
+	.zelle-dehnbar > .zelle-kurz:not(:first-child) {
+		flex: 1 1 0;
+	}
+
+	.spalten {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--abstand-5);
+		align-items: start;
+	}
+
+	/* minmax(0, 1fr): der Inhalt darf schmaler werden als sein Mindestinhalt (breite Tabelle),
+	   sonst scrollt die ganze Seite zur Seite */
+	.verwaltung {
+		display: grid;
+		grid-template-columns: 15rem minmax(0, 1fr);
+	}
+
+	/* Kopfleiste und Seitenleiste stehen beim Scrollen des Inhalts, volle Bildschirmhöhe. Was
+	   nicht passt, scrollt für sich, und zwar nur die Seitenleiste: Ein fokussierter Link landet
+	   so nie unter der Kopfleiste (WCAG 2.4.11). */
+	.verwaltung-leiste {
+		display: flex;
+		flex-direction: column;
+		position: sticky;
+		top: 0;
+		align-self: start;
+		height: 100dvh;
+		background: var(--farbe-marke-dunkel);
+	}
+
+	.verwaltung-leiste > .seitenleiste {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		overscroll-behavior-y: contain;
+	}
+
+	/* Am PC klebt der Seitenkopf im Inhalt statt des Titels in der Kopfleiste; in der schmalen
+	   Spalte steht «Verwaltung» unter «MyTCO» */
+	.verwaltung .kopf-titel {
+		display: none;
+	}
+
+	.verwaltung .kopf-marke {
+		grid-template-columns: auto minmax(0, 1fr);
+		column-gap: var(--abstand-3);
+		row-gap: 0;
+	}
+
+	.verwaltung .kopf-marke > .kopf-start {
+		grid-row: span 2;
+	}
+
+	.verwaltung .kopf-marke > .kopf-zusatz {
+		grid-area: 2 / 2;
+	}
+
+	.verwaltung .inhalt {
+		max-width: none;
+		margin: 0;
+	}
+}

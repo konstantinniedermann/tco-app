@@ -2,7 +2,7 @@
 
 # ADR-007: Jeder Merge nach dev mit Code bekommt seine eigene Versionsnummer
 
-**Status:** Entschieden · **Datum:** 2026-11-05 · **Issue:** —
+**Status:** Ersetzt durch [ADR-012](adr-012-version-beim-release.md) · **Datum:** 2026-11-05 · **Issue:** —
 
 ## Kontext
 

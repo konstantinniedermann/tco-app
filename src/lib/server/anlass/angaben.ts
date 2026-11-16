@@ -1,4 +1,5 @@
 // Angaben eines Anlasses und Antworten der Mitglieder prüfen, ohne Datenbank.
+import { MAX_BEMERKUNG } from '../../anlass/antwort.ts';
 import { zuerichZuUtc } from '../../anlass/zeit.ts';
 import type { Antwort } from '../db/schema.ts';
 
@@ -12,9 +13,8 @@ export type AnlassWerte = {
 	anmeldeschluss: Date;
 };
 
-export const MAX_KURZ = 120;
-export const MAX_EINLADUNG = 5000;
-export const MAX_BEMERKUNG = 500;
+const MAX_KURZ = 120;
+const MAX_EINLADUNG = 5000;
 
 const MELDUNG = {
 	titel: 'Bitte einen Titel angeben.',

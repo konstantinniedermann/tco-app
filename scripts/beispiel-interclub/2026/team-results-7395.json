@@ -1,0 +1,103 @@
+{
+	"title": { "de": "Olten", "fr": "Olten" },
+	"leagueId": "13",
+	"clubId": "2202",
+	"group": 2,
+	"subtitle": { "de": "35+ NLA Herren", "fr": "35+ LNA  Messieurs" },
+	"results": [
+		{
+			"id": "975329",
+			"round": "1",
+			"date": "02.05",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Rotweiss BE",
+			"homeTeamScore": 5,
+			"visitTeamScore": 4,
+			"encounterId": 975329
+		},
+		{
+			"id": "975334",
+			"round": "1",
+			"date": "03.05",
+			"homeTeamName": "Bonmont",
+			"visitTeamName": "Genève E.V.",
+			"homeTeamScore": 7,
+			"visitTeamScore": 2,
+			"encounterId": 975334
+		},
+		{
+			"id": "975330",
+			"round": "2",
+			"date": "09.05",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Bonmont",
+			"homeTeamScore": 3,
+			"visitTeamScore": 6,
+			"encounterId": 975330
+		},
+		{
+			"id": "975333",
+			"round": "2",
+			"date": "10.05",
+			"homeTeamName": "Genève E.V.",
+			"visitTeamName": "Rotweiss BE",
+			"homeTeamScore": 4,
+			"visitTeamScore": 5,
+			"encounterId": 975333
+		},
+		{
+			"id": "975331",
+			"round": "3",
+			"date": "16.05",
+			"homeTeamName": "Genève E.V.",
+			"visitTeamName": "Olten",
+			"homeTeamScore": 6,
+			"visitTeamScore": 3,
+			"encounterId": 975331
+		},
+		{
+			"id": "975332",
+			"round": "3",
+			"date": "16.05",
+			"homeTeamName": "Rotweiss BE",
+			"visitTeamName": "Bonmont",
+			"homeTeamScore": 6,
+			"visitTeamScore": 3,
+			"encounterId": 975332
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Bonmont", "teamId": 8452, "points": 16, "sets": "33 - 24" },
+		{ "rank": 2, "teamName": "Rotweiss BE", "teamId": 16679, "points": 15, "sets": "33 - 28" },
+		{ "rank": 3, "teamName": "Genève E.V.", "teamId": 8288, "points": 12, "sets": "28 - 34" },
+		{ "rank": 4, "teamName": "Olten", "teamId": 7395, "points": 11, "sets": "26 - 34" }
+	],
+	"tableau": {
+		"isPromotion": false,
+		"results": [
+			{
+				"id": "46930",
+				"round": "4",
+				"date": "07.06 - 11:00",
+				"encounterId": 46930,
+				"isPromotion": false,
+				"team": {
+					"home": {
+						"id": 5116,
+						"name": "* Seeblick ZH",
+						"score": 6,
+						"group": { "id": 1, "rank": 3 },
+						"league": { "id": 13 }
+					},
+					"visitor": {
+						"id": 7395,
+						"name": "Olten",
+						"score": 0,
+						"group": { "id": 2, "rank": 4 },
+						"league": { "id": 13 }
+					}
+				}
+			}
+		]
+	}
+}

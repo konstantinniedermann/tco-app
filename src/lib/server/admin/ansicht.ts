@@ -3,7 +3,7 @@
 import { eq } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { sitzung } from '../db/schema.ts';
-import { antwort } from '../login/schnittstellen.ts';
+import { antwort } from '../http.ts';
 import type { AnsichtRolle } from './rollen.ts';
 
 // Was in der Ansicht noch speichern darf: sie beenden, abmelden und die Verwaltung per Mail-Code

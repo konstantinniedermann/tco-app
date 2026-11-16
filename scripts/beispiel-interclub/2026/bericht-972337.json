@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "09. Mai 2026",
+	"homeTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 7,
+		"sets": 14,
+		"games": 97
+	},
+	"awayTeam": {
+		"name": "Aarau 2",
+		"clubNumber": 2001,
+		"points": 2,
+		"sets": 6,
+		"games": 70
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900072,
+							"name": "Saitenbett Hannes R6 (9497)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900073,
+							"name": "Griffband Ida R7 (13320)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900074,
+							"name": "Schlägerkopf Jan R6 (8088)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900075,
+							"name": "Filzball Kim R6 (9814)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "7:5", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900076,
+							"name": "Netzpfosten Leo R6 (8871)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900077,
+							"name": "Schiedsstuhl Maja R9 (32405)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "6:2", "6:0"]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900078,
+							"name": "Ballkind Noah R6 (7318)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900079,
+							"name": "Matchball Paula R7 (13458)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "2:6", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900080,
+							"name": "Muster Remo R6 (10094)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900081,
+							"name": "Platzhalter Anna R8 (20969)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:1", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900082,
+							"name": "Vorlage Beat R8 (20850)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900083,
+							"name": "Punktgewinn Carla R7 (18599)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "2:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900072,
+							"name": "Saitenbett Hannes R6 (9497)"
+						},
+						{
+							"id": 900076,
+							"name": "Netzpfosten Leo R6 (8871)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900073,
+							"name": "Griffband Ida R7 (13320)"
+						},
+						{
+							"id": 900083,
+							"name": "Punktgewinn Carla R7 (18599)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "7:5", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900074,
+							"name": "Schlägerkopf Jan R6 (8088)"
+						},
+						{
+							"id": 900080,
+							"name": "Muster Remo R6 (10094)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900077,
+							"name": "Schiedsstuhl Maja R9 (32405)"
+						},
+						{
+							"id": 900079,
+							"name": "Matchball Paula R7 (13458)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:4", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900078,
+							"name": "Ballkind Noah R6 (7318)"
+						},
+						{
+							"id": 900084,
+							"name": "Erfunden Dario R7 (17811)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900075,
+							"name": "Filzball Kim R6 (9814)"
+						},
+						{
+							"id": 900081,
+							"name": "Platzhalter Anna R8 (20969)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "6:4", "10:6"]
+		}
+	],
+	"leagueId": 9,
+	"groupId": 62
+}

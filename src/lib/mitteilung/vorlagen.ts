@@ -6,6 +6,14 @@ import { formatiereBeginn, formatiereTag } from '../anlass/zeit.ts';
 export const MAX_TITEL = 50;
 export const MAX_TEXT = 200;
 
+/** FR-42: Satz je Feld, wenn die Angaben einer Mitteilung nicht passen (UI-06); der Server schickt ihn. */
+export const FELD_MELDUNG = {
+	titel: `Bitte einen Titel mit höchstens ${MAX_TITEL} Zeichen angeben.`,
+	text: `Bitte einen Text mit höchstens ${MAX_TEXT} Zeichen angeben.`,
+	auswahl: 'Bitte die Empfänger wählen.',
+	weg: 'Bitte einen Weg wählen.'
+} as const;
+
 export type VorlageArt = 'erinnerung' | 'aenderung' | 'neu';
 export type Vorlage = { art: VorlageArt; titel: string; text: string };
 

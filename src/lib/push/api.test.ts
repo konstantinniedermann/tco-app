@@ -1,19 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { holeBenachrichtigungen, loescheAbo, sendeAbo, speichereThemen } from './api.ts';
+import { holer, json, ungeprueft } from '../../../tests/hilfen/abruf.ts';
 
-type Aufruf = { pfad: string; init: RequestInit };
-
-function holer(antwort: Response | Error) {
-	const aufrufe: Aufruf[] = [];
-	const holen = async (pfad: string, init: RequestInit) => {
-		aufrufe.push({ pfad, init });
-		if (antwort instanceof Error) throw antwort;
-		return antwort;
-	};
-	return { aufrufe, holen };
-}
-
-const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
 const STAND = {
 	themen: { anlaesse: true, cm: false, verein: true },
 	pushHier: false,
@@ -55,13 +43,41 @@ describe('Anfragen zu Benachrichtigungen (FR-40, FR-41)', () => {
 		const abo = async (antwort: Response | Error) => sendeAbo(ABO, holer(antwort).holen);
 		expect(await abo(json(401, { fehler: 'abgemeldet' }))).toEqual({ art: 'abgemeldet' });
 		expect(await abo(json(409, { fehler: 'push-aus' }))).toEqual({ art: 'push-aus' });
-		expect(await abo(json(409, { fehler: 'anderes' }))).toEqual({ art: 'stoerung' });
+		expect(await abo(ungeprueft(409, { fehler: 'anderes' }))).toEqual({ art: 'stoerung' });
 		expect(await abo(json(400, { fehler: 'eingabe' }))).toEqual({ art: 'stoerung' });
 		expect(await abo(json(500, {}))).toEqual({ art: 'stoerung' });
 		expect(await abo(new Error('weg'))).toEqual({ art: 'stoerung' });
 		expect(await abo(new Response('kein JSON', { status: 502 }))).toEqual({ art: 'stoerung' });
-		expect(await holeBenachrichtigungen(holer(json(401, {})).holen)).toEqual({
+		expect(await holeBenachrichtigungen(holer(json(401, { fehler: 'abgemeldet' })).holen)).toEqual({
 			art: 'abgemeldet'
 		});
+	});
+});
+
+// Ränder, die der gemeinsame Abruf-Baustein genau so erhalten muss (Charakterisierung vor Schritt 13).
+describe('Benachrichtigungen: Ränder der Deutung', () => {
+	const abo = async (antwort: Response | Error) => sendeAbo(ABO, holer(antwort).holen);
+	const STOERUNG = { art: 'stoerung' };
+
+	test('401 genügt als Status, auch ohne Wort; ohne lesbaren Körper Störung', async () => {
+		expect(await abo(ungeprueft(401, {}))).toEqual({ art: 'abgemeldet' });
+		expect(await abo(new Response('kein JSON', { status: 401 }))).toEqual(STOERUNG);
+		expect(await abo(ungeprueft(401, null))).toEqual(STOERUNG);
+	});
+
+	test('JSON null bei Erfolg kommt als Daten an', async () => {
+		expect(await abo(ungeprueft(200, null))).toEqual({ art: 'ok', daten: null });
+	});
+
+	test('Status, die Push nicht kennt, sind Störung', async () => {
+		expect(await abo(json(404, { fehler: 'nicht-gefunden' }))).toEqual(STOERUNG);
+		expect(await abo(new Response(null, { status: 204 }))).toEqual(STOERUNG);
+		expect(await abo(json(429, { fehler: 'zu-viele' }))).toEqual(STOERUNG);
+		expect(await abo(json(403, { fehler: 'nur-ansehen' }))).toEqual(STOERUNG);
+	});
+
+	test('ein Wort gilt nur mit seinem Status und nur, wenn Push es kennt', async () => {
+		expect(await abo(json(409, { fehler: 'veraltet' }))).toEqual(STOERUNG);
+		expect(await abo(json(400, { fehler: 'push-aus' }))).toEqual(STOERUNG);
 	});
 });

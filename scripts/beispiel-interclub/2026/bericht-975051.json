@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "02. Mai 2026",
+	"homeTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 7,
+		"sets": 15,
+		"games": 97
+	},
+	"awayTeam": {
+		"name": "Utzenstorf",
+		"clubNumber": 2263,
+		"points": 2,
+		"sets": 4,
+		"games": 46
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900167,
+							"name": "Skizze Gina R4 (2033)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900180,
+							"name": "Stopp Urs R6 (9216)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900171,
+							"name": "Kulisse Klara R7 (13217)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900181,
+							"name": "Satzball Vera R7 (12495)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "1:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900169,
+							"name": "Schablone Ines R6 (9460)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900182,
+							"name": "Tiebreak Willi R8 (21810)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:1", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900173,
+							"name": "Netzroller Mia R7 (11688)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900183,
+							"name": "Doppelfehler Yara R9 (32181)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:2", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900179,
+							"name": "Lob Tanja R7 (19707)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900184,
+							"name": "Linienrichter Zeno R8 (29974)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900177,
+							"name": "Rückhand Rahel R7 (17237)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900185,
+							"name": "Sandplatz Alma R7 (11241)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:1", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900171,
+							"name": "Kulisse Klara R7 (13217)"
+						},
+						{
+							"id": 900167,
+							"name": "Skizze Gina R4 (2033)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900180,
+							"name": "Stopp Urs R6 (9216)"
+						},
+						{
+							"id": 900181,
+							"name": "Satzball Vera R7 (12495)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "6:2", "5:10"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900177,
+							"name": "Rückhand Rahel R7 (17237)"
+						},
+						{
+							"id": 900173,
+							"name": "Netzroller Mia R7 (11688)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900183,
+							"name": "Doppelfehler Yara R9 (32181)"
+						},
+						{
+							"id": 900182,
+							"name": "Tiebreak Willi R8 (21810)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:6", "6:2", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900175,
+							"name": "Aufschlag Olivia R6 (10115)"
+						},
+						{
+							"id": 900186,
+							"name": "Hallenbach Bruno R8 (26121)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900184,
+							"name": "Linienrichter Zeno R8 (29974)"
+						},
+						{
+							"id": 900185,
+							"name": "Sandplatz Alma R7 (11241)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:0", ""]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 38
+}

@@ -1,0 +1,81 @@
+{
+	"title": { "de": "Olten 2", "fr": "Olten 2" },
+	"leagueId": "13",
+	"clubId": "2202",
+	"group": 63,
+	"subtitle": { "de": "12&U Boys Liga B", "fr": "12&U Boys Ligue B" },
+	"results": [
+		{
+			"id": "435403",
+			"round": "1",
+			"date": "12.06",
+			"homeTeamName": "Schützenmatt SO 1",
+			"visitTeamName": "Olten 2",
+			"homeTeamScore": 3,
+			"visitTeamScore": 0,
+			"encounterId": 435403
+		},
+		{
+			"id": "435401",
+			"round": "1",
+			"date": "14.06",
+			"homeTeamName": "Tennishalle Grenchen AG 1",
+			"visitTeamName": "Homberg",
+			"homeTeamScore": 1,
+			"visitTeamScore": 2,
+			"encounterId": 435401
+		},
+		{
+			"id": "435399",
+			"round": "2",
+			"date": "03.06",
+			"homeTeamName": "Olten 2",
+			"visitTeamName": "Homberg",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 435399
+		},
+		{
+			"id": "435400",
+			"round": "2",
+			"date": "21.06",
+			"homeTeamName": "Tennishalle Grenchen AG 1",
+			"visitTeamName": "Schützenmatt SO 1",
+			"homeTeamScore": 2,
+			"visitTeamScore": 1,
+			"encounterId": 435400
+		},
+		{
+			"id": "435402",
+			"round": "3",
+			"date": "24.06",
+			"homeTeamName": "Olten 2",
+			"visitTeamName": "Tennishalle Grenchen AG 1",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 435402
+		},
+		{
+			"id": "435404",
+			"round": "3",
+			"date": "28.06",
+			"homeTeamName": "Homberg",
+			"visitTeamName": "Schützenmatt SO 1",
+			"homeTeamScore": 2,
+			"visitTeamScore": 1,
+			"encounterId": 435404
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Homberg", "teamId": 46426, "points": 7, "sets": "14 - 5" },
+		{
+			"rank": 2,
+			"teamName": "Tennishalle Grenchen AG 1",
+			"teamId": 48354,
+			"points": 6,
+			"sets": "13 - 6"
+		},
+		{ "rank": 3, "teamName": "Schützenmatt SO 1", "teamId": 46028, "points": 5, "sets": "10 - 9" },
+		{ "rank": 4, "teamName": "Olten 2", "teamId": 42976, "points": 0, "sets": "1 - 18" }
+	]
+}

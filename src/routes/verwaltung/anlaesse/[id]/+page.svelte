@@ -7,13 +7,13 @@
 	import Anlassformular, {
 		type AnlassWerte
 	} from '../../../../lib/verwaltung/Anlassformular.svelte';
+	import { type AnlassFeld } from '../../../../lib/verwaltung/api.ts';
 	import {
 		aendereAnlass,
 		ladeAnlassAdmin,
 		loescheAnlass,
-		type AnlassDetail,
-		type AnlassFeld
-	} from '../../../../lib/verwaltung/api.ts';
+		type AnlassDetail
+	} from '../../../../lib/verwaltung/anlass-api.ts';
 	import { fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
 	import { ladeMitteilungen } from '../../../../lib/verwaltung/mitteilung-api.ts';
 	import Mitteilungsformular from '../../../../lib/verwaltung/Mitteilungsformular.svelte';

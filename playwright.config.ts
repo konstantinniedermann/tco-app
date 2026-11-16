@@ -2,9 +2,11 @@ import { defineConfig, devices } from '@playwright/test';
 import { istE2eDatenbank } from './scripts/e2e.ts';
 import { DATENBANK_URL, e2eEinstellungen } from './tests/e2e/hilfen/umgebung.ts';
 
-// Nur über `npm run e2e` (scripts/e2e.ts) mit eigener Datenbank; ein direkter Aufruf von
-// Playwright füllte sonst die gemeinsame lokale Datenbank `mytco` mit Testkonten.
-if (!istE2eDatenbank(DATENBANK_URL)) {
+// Nur über `npm run e2e` (scripts/e2e.ts) mit eigener Datenbank und eigenem Build-Ordner; ein
+// direkter Aufruf von Playwright füllte sonst die gemeinsame lokale Datenbank `mytco` mit
+// Testkonten, und ein anderer Build in `build/` veränderte den laufenden Testserver.
+const buildOrdner = process.env.MYTCO_E2E_BUILD ?? '';
+if (!istE2eDatenbank(DATENBANK_URL) || buildOrdner === '') {
 	throw new Error(
 		'E2E nur über «npm run e2e -- <datei>» starten (eigene Datenbank, scripts/e2e.ts).'
 	);
@@ -18,6 +20,10 @@ const port =
 		: 4173;
 const baseURL = `http://localhost:${port}`;
 
+// Spur (Playwright-Trace) nur auf Wunsch, für jeden Test: `MYTCO_E2E_SPUR=an`, in der CI über den
+// Schalter beim Handstart (docs/ci-cd-und-release.md). Ohne ihn zeichnet kein Lauf eine Spur auf.
+const spur = process.env.MYTCO_E2E_SPUR === 'an';
+
 export default defineConfig({
 	// Entspricht E2E in scripts/pruefungen/testmuster.ts.
 	testDir: 'tests/e2e',
@@ -27,6 +33,7 @@ export default defineConfig({
 	use: {
 		baseURL,
 		screenshot: 'on',
+		...(spur ? { trace: 'on' as const } : {}),
 		// Der Service Worker (Push, #63) bliebe sonst zwischen Seite und Netz: WebKit leitet dann
 		// Anfragen an `page.route` vorbei, und Chrome hielte die App für installierbar. Er hat
 		// keinen `fetch`-Handler; die Tests prüfen Push ohne echtes Abo.
@@ -45,7 +52,8 @@ export default defineConfig({
 	],
 	webServer: {
 		// Mailpit (`make db`) fängt die Code-Mails; die Tests lesen sie über seine API.
-		command: 'npm run build && node scripts/migrate.ts && node build',
+		// Baut nach MYTCO_E2E_BUILD (vite.config.ts) und startet den Server von dort.
+		command: `npm run build && node scripts/migrate.ts && node scripts/beispiel-interclub.ts && node ${buildOrdner}/build`,
 		url: baseURL,
 		env: {
 			PORT: String(port),

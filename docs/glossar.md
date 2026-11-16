@@ -74,6 +74,18 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Spielplanüberprüfung | Prüfung in Advantage auf Abwesenheiten, gleichzeitige Spiele und zu kurze Pausen. Das PDF spricht von Konfliktsituationen | Konflikt | ADV 7, 26, 34; PDF 5e-i |
 | Organisator | Club oder Vereinigung, die ein Turnier in Advantage führt. Das PDF spricht vom „Verantwortlichen“ der CM | CM-Admin (Rolle) | ADV 6–7, 11, 21, 30; PDF 5a |
 
+## Interclub
+
+| Begriff | Bedeutung | In MyTCO | Quelle |
+|---------|-----------|----------|--------|
+| Interclub | Mannschaftswettbewerb von Swiss Tennis (Aktive, Senioren, Junioren) mit Ligen und Gruppen; die Resultate führt Swiss Tennis | Interclub, Reiter *IC* | [ADR-011](adr/adr-011-interclub-schnittstelle-swiss-tennis.md) |
+| Begegnung (Interclub) | Ein Mannschaftsspiel zweier Teams mit Runde, Datum und Endstand. Nicht zu verwechseln mit der *Begegnung* der Clubmeisterschaft (ein einzelnes Match, Tabelle oben) | Begegnung | [Fachmodell](fachmodell.md) |
+| Partien | Gewonnene : verlorene Einzelpartien eines Teams in der Rangliste bzw. in einer Begegnung | Partien | [Fachmodell](fachmodell.md) |
+| Einzelpartie (Interclub) | Ein Einzel oder Doppel innerhalb einer Begegnung, mit Position und Sätzen; die Begegnung zählt die gewonnenen Einzelpartien | Partie | [Fachmodell](fachmodell.md) |
+| Spielbericht | Die Einzelpartien einer Begegnung, wie Swiss Tennis sie liefert | — | [Fachmodell](fachmodell.md) |
+| w.o. / Aufgabe | Eine Seite gibt eine Partie kampflos (w.o.) oder während des Spiels auf; die andere Seite gewinnt | «Gegner hat aufgegeben», «aufgegeben» | [Fachmodell](fachmodell.md) |
+| Auf-/Abstiegsspiele | Zusatzspiele am Saisonende, die über Auf- oder Abstieg des Teams entscheiden | Auf-/Abstiegsspiel | [Fachmodell](fachmodell.md) |
+
 ## Lizenz
 
 | Begriff | Bedeutung | In MyTCO | Quelle |

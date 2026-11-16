@@ -1,15 +1,8 @@
 // Schnittstellen der Mitglieder zur Clubmeisterschaft (A-ANMELDUNG-01…05, A-ANMELDUNG-10). Alles
 // nur mit Sitzung.
-import type { RequestEvent } from '@sveltejs/kit';
+import { ABLEHNUNGEN } from '../../cm/ablehnung.ts';
 import { INTEGER_MAX, parseId } from '../parse-id.ts';
-import type { Db } from '../db/index.ts';
-import {
-	antwort,
-	formatFehler,
-	istJson,
-	leseKoerper,
-	type Ereignis
-} from '../login/schnittstellen.ts';
+import { aendernd, antwort, jetzt, leseKoerper, mitSitzung, nichtGefunden } from '../http.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
 import { cmAdmins } from '../mitteilung/meldung.ts';
 import { trageCmAngabenNach } from './angaben.ts';
@@ -45,36 +38,7 @@ import {
 	type Bezug
 } from './bezug.ts';
 import type { BestaetigungInhalt } from './mail.ts';
-
-export type CmDienste = {
-	db: Db;
-	bestaetigung: (an: string, i: BestaetigungInhalt) => Promise<void>;
-	/** FR-47: persönliche Meldung, Push, sonst E-Mail; wirft nie. */
-	melde: (mitgliedIds: number[], m: { titel: string; text: string; pfad: string }) => Promise<void>;
-	jetzt?: () => Date;
-};
-export type CmEreignis = Ereignis & Pick<RequestEvent, 'params'>;
-
-const jetzt = (d: CmDienste) => (d.jetzt ?? (() => new Date()))();
-const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
-
-export async function mitSitzung(
-	e: CmEreignis,
-	fn: (konto: AngemeldetesKonto) => Promise<Response>
-): Promise<Response> {
-	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
-	return fn(konto);
-}
-
-// SI-10: ändernde Anfragen nur als JSON.
-export async function aendernd(
-	e: CmEreignis,
-	fn: (konto: AngemeldetesKonto) => Promise<Response>
-): Promise<Response> {
-	if (!istJson(e)) return formatFehler();
-	return mitSitzung(e, fn);
-}
+import type { CmDienste, CmEreignis } from './typen.ts';
 
 export function getCmTurniere(d: CmDienste, e: CmEreignis): Promise<Response> {
 	return mitSitzung(e, async (konto) =>
@@ -116,21 +80,14 @@ type Ablehnung = Exclude<
 	'ok' | 'nicht-gefunden'
 >;
 
-const FEHLER = [
-	'geschlossen',
-	'voll',
-	'passt-nicht',
-	'keine-wildcard',
-	'schon-angemeldet',
-	'schon-angefragt',
-	'anfrage-offen',
-	'hinfaellig',
-	'angaben-fehlen'
-] satisfies readonly Ablehnung[];
+/** Die Liste teilt der Server mit der Oberfläche (`src/lib/cm/ablehnung.ts`, N-10). */
+const FEHLER = ABLEHNUNGEN satisfies readonly Ablehnung[];
+
+const istAbgelehnt = (r: string): r is (typeof FEHLER)[number] =>
+	(FEHLER as readonly string[]).includes(r);
 
 /** 409 mit dem Grund; was die Liste nicht kennt, gilt als `geschlossen`. */
-const ablehnung = (r: string) =>
-	antwort(409, { fehler: (FEHLER as readonly string[]).includes(r) ? r : 'geschlossen' });
+const ablehnung = (r: string) => antwort(409, { fehler: istAbgelehnt(r) ? r : 'geschlossen' });
 
 /** FR-08: Höchstlänge des Wildcard-Kommentars (nach `trim`). */
 const KOMMENTAR_MAX = 300;
@@ -411,3 +368,20 @@ export function postCmSuchtext(d: CmDienste, e: CmEreignis): Promise<Response> {
 		return antwortMitMail(d, konto, bezug, null, t);
 	});
 }
+
+// Alle Schnittstellen der Mitglieder zur Clubmeisterschaft; die Grundprüfung
+// (`src/lib/server/grundpruefung.db.test.ts`) läuft über jeden Eintrag.
+export const CM_SCHNITTSTELLEN = {
+	getCmTurniere,
+	getCmAnsicht,
+	postCmAngaben,
+	postCmAnmeldung,
+	postCmAbmeldung,
+	postCmWildcard,
+	getCmPartner,
+	postCmAnfrage,
+	postCmAnfrageAnnehmen,
+	postCmAnfrageAblehnen,
+	postCmAnfrageZurueck,
+	postCmSuchtext
+} satisfies Record<string, (d: CmDienste, e: CmEreignis) => Promise<Response>>;

@@ -1,8 +1,8 @@
 // Wie Namen angezeigt werden. Läuft auch im Browser: keine Importe aus src/lib/server.
 
-export const RUFNAME_MAX = 10;
+const RUFNAME_MAX = 10;
 // Harte Grenze für die Textlänge: ein Graphem kann beliebig viele kombinierende Zeichen tragen.
-export const RUFNAME_MAX_TEXT = 40;
+const RUFNAME_MAX_TEXT = 40;
 
 export type Namensteile = { rufname: string | null; vorname: string; nachname: string };
 export type Namensform = 'vorname-zuerst' | 'nachname-zuerst';

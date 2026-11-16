@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { erstelleDb } from './index.ts';
 import {
 	aenderung,
@@ -209,7 +210,10 @@ describe('Schema Turnier und Kategorie', () => {
 		const c = (f as { cause?: { constraint_name?: string; constraint?: string } } | null)?.cause;
 		return c?.constraint_name ?? c?.constraint;
 	};
-	async function neuesTurnier(jahr = 3000 + Math.floor(Math.random() * 90000)) {
+	// Eigene Turnierjahre dieser Datei (`tests/hilfen/turnierjahre.ts`), gemeinsame Test-Datenbank.
+	const naechstesJahr = turnierjahre(import.meta.url);
+
+	async function neuesTurnier(jahr = naechstesJahr()) {
 		const [t] = await db
 			.insert(turnier)
 			.values({ jahr, name: `Testturnier ${jahr}`, anmeldeschluss: `${jahr}-05-31` })
@@ -235,7 +239,7 @@ describe('Schema Turnier und Kategorie', () => {
 	});
 
 	test('FR-33: Status ausserhalb von vorbereitung, offen, geschlossen wird abgewiesen', async () => {
-		const jahr = 3000 + Math.floor(Math.random() * 90000);
+		const jahr = naechstesJahr();
 		const f = await fang(
 			db.insert(turnier).values({
 				jahr,

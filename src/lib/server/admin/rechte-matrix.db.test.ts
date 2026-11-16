@@ -6,6 +6,7 @@ import {
 	type EigeneDatenbank
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { alleVerwaltung } from '../../../../tests/hilfen/verwaltungs-listen.ts';
 import type { Db } from '../db/index.ts';
 import {
 	aenderung,
@@ -20,12 +21,15 @@ import {
 } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
-import {
-	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
-	type MitteilungAdminDienste
-} from '../mitteilung/schnittstellen.ts';
+import { MITTEILUNG_ADMIN_SCHNITTSTELLEN } from '../mitteilung/verwaltung-schnittstellen.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { TURNIER_SCHNITTSTELLEN, postKategorien, postTurniere } from '../turnier/schnittstellen.ts';
 import { legeAnlassAn } from '../anlass/anlaesse.ts';
+import { CM_ADMIN_SCHNITTSTELLEN } from '../cm/verwaltung-schnittstellen.ts';
+import {
+	ANLASS_ADMIN_SCHNITTSTELLEN,
+	postAdminAnlaesse
+} from '../anlass/verwaltung-schnittstellen.ts';
 import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';
 import { ROLLEN } from './rollen.ts';
 import {
@@ -35,10 +39,9 @@ import {
 	getMitglieder,
 	getRollen,
 	getVerlauf,
-	postAdminAnlaesse,
-	postRollen,
-	type AdminDienste
+	postRollen
 } from './schnittstellen.ts';
+import type { AdminDienste } from './rechte.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 // Die Zeilenzahlen sind global; darum eine eigene Datenbank statt der gemeinsamen.
@@ -202,12 +205,11 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		const id = String(ids[0]);
 
 		const mytco = await bestaetigt(s, ['mytco']);
-		const schreibende = Object.entries({
-			...ADMIN_SCHNITTSTELLEN,
-			...TURNIER_SCHNITTSTELLEN,
-			...MITTEILUNG_ADMIN_SCHNITTSTELLEN
-			// Schreibend ist alles, was nicht liest: Auch ein künftiges delete… oder put… fällt hier auf.
-		}).filter(([name]) => !name.startsWith('get') && !ERLAUBT_FUER_MYTCO.includes(name));
+		// Alle Listen der Verwaltung (`tests/hilfen/verwaltungs-listen.ts`). Schreibend ist alles, was
+		// nicht liest: Auch ein künftiges delete… oder put… fällt hier auf.
+		const schreibende = Object.entries(alleVerwaltung()).filter(
+			([name]) => !name.startsWith('get') && !ERLAUBT_FUER_MYTCO.includes(name)
+		);
 		const namen = schreibende.map(([name]) => name);
 		for (const n of [
 			'postAustritt',
@@ -367,11 +369,11 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			await getMitglieder(s.d, hole(mytco.konto)),
 			await getMitglied(s.d, hole(mytco.konto, { params: { id: String(ziel.mitgliedId) } })),
 			await TURNIER_SCHNITTSTELLEN.getTurniere(s.d, hole(mytco.konto)),
-			await TURNIER_SCHNITTSTELLEN.getAnmeldungen(
+			await CM_ADMIN_SCHNITTSTELLEN.getAnmeldungen(
 				s.d,
 				hole(mytco.konto, { params: { id: String(kategorieId) } })
 			),
-			await TURNIER_SCHNITTSTELLEN.getSpieler(
+			await CM_ADMIN_SCHNITTSTELLEN.getSpieler(
 				s.d,
 				ereignis({
 					method: 'GET',
@@ -381,14 +383,14 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			),
 			await getVerlauf(s.d, hole(mytco.konto)),
 			await ADMIN_SCHNITTSTELLEN.getFairgate(s.d, hole(mytco.konto)),
-			await ADMIN_SCHNITTSTELLEN.getAdminAnlaesse(s.d, hole(mytco.konto)),
+			await ANLASS_ADMIN_SCHNITTSTELLEN.getAdminAnlaesse(s.d, hole(mytco.konto)),
 			await getRollen(s.d, hole(mytco.konto)),
 			await MITTEILUNG_ADMIN_SCHNITTSTELLEN.getVereinMitteilungen(s.d, hole(mytco.konto)),
 			await MITTEILUNG_ADMIN_SCHNITTSTELLEN.getAnlassMitteilungen(
 				s.d,
 				hole(mytco.konto, { params: { id: anlassId } })
 			),
-			await TURNIER_SCHNITTSTELLEN.getDoppel(
+			await CM_ADMIN_SCHNITTSTELLEN.getDoppel(
 				s.d,
 				hole(mytco.konto, { params: { id: String(dk.id) } })
 			)
@@ -422,18 +424,68 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			['postVereinSenden', cm, 403, 'kein-admin'],
 			['getVereinMitteilungen', cm, 403, 'kein-admin']
 		];
-		const alle = {
-			...ADMIN_SCHNITTSTELLEN,
-			...TURNIER_SCHNITTSTELLEN,
-			...MITTEILUNG_ADMIN_SCHNITTSTELLEN
-		};
+		const alle = alleVerwaltung();
 		for (const [name, konto, status, fehler] of faelle) {
-			const fn = alle[name as keyof typeof alle];
+			const fn = alle[name];
 			const r = await fn(
 				s.d,
 				ereignis({ method: name.startsWith('get') ? 'GET' : 'POST', body: {}, konto })
 			);
 			expect([name, r.status, await r.json()]).toEqual([name, status, { fehler }]);
+		}
+	});
+
+	// Charakterisierung zu Schritt 11 (docs/refactoring-analyse.md, Anhang D.11): Die Schnittstellen
+	// von Turnier, CM und Gespräch prüfen den Bereich `cm`, gleich, in welcher Liste sie stehen.
+	test('Bereich cm: an den 26 Schnittstellen von Turnier, CM und Gespräch bekommt der Mitglieder-Admin 403 kein-admin, der CM-Admin weder 401 noch 403', async () => {
+		const s = baue();
+		const mitglieder = await bestaetigt(s, ['mitglieder']);
+		const cm = await bestaetigt(s, ['cm']);
+		const namen = [
+			'getTurniere',
+			'postTurniere',
+			'getTurnier',
+			'postTurnier',
+			'postTurnierStatus',
+			'postKategorien',
+			'getKategorie',
+			'postKategorie',
+			'postKategorieAbsagen',
+			'getAnmeldungen',
+			'postAnmeldungVonHand',
+			'postVerschieben',
+			'postAnmeldungLoeschen',
+			'getDoppel',
+			'postDoppelVonHand',
+			'postZusammenlegen',
+			'postPartnerAendern',
+			'postAnfrageAlsPaar',
+			'postAnfrageLoeschen',
+			'postEntscheid',
+			'getSpieler',
+			'postKlassierung',
+			'getGespraeche',
+			'getAdminGespraech',
+			'postAntwort',
+			'postZustand'
+		];
+		expect(new Set(namen).size).toBe(26);
+		const alle = alleVerwaltung();
+		const mach = (name: string, konto: AngemeldetesKonto) =>
+			ereignis({
+				method: name.startsWith('get') ? 'GET' : 'POST',
+				body: {},
+				params: { id: '999999999' },
+				konto
+			});
+		for (const name of namen) {
+			const fn = alle[name];
+			expect(fn, name).toBeTypeOf('function');
+			const v = await fn(s.d, mach(name, mitglieder.konto));
+			expect([name, v.status, await v.json()]).toEqual([name, 403, { fehler: 'kein-admin' }]);
+			const a = await fn(s.d, mach(name, cm.konto));
+			expect([name, a.status]).not.toContain(401);
+			expect([name, a.status]).not.toContain(403);
 		}
 	});
 

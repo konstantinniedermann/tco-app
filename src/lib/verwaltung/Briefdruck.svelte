@@ -2,7 +2,7 @@
 	// Druckansicht frisch erzeugter Briefe (UI-Leitbild, Briefdruck). Die Codes stehen nur hier
 	// (RR-04): Die Seite gibt sie nicht weiter, «‹ Zurück» verwirft sie über `zurueck`.
 	import '../design/brief.css';
-	import type { AusgestellterBrief } from './api.ts';
+	import type { AusgestellterBrief } from './mitglieder-api.ts';
 
 	let { briefe, zurueck }: { briefe: AusgestellterBrief[]; zurueck: () => void } = $props();
 </script>

@@ -5,13 +5,8 @@ import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
 import { legeAnlassAn, loescheAnlass } from './anlaesse.ts';
-import {
-	getAnlaesse,
-	getAnlass,
-	getKalender,
-	postAnmeldung,
-	type AnlassDienste
-} from './schnittstellen.ts';
+import { getAnlaesse, getAnlass, getKalender, postAnmeldung } from './schnittstellen.ts';
+import type { AnlassDienste } from './typen.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {
@@ -127,7 +122,29 @@ describe('Schnittstellen für Anlässe (Mitglied)', () => {
 				konto
 			})
 		);
-		expect([r.status, await r.json()]).toEqual([400, { fehler: 'eingabe', feld: 'bemerkung' }]);
+		expect([r.status, await r.json()]).toEqual([
+			400,
+			{
+				fehler: 'eingabe',
+				felder: { bemerkung: 'Die Bemerkung darf höchstens 500 Zeichen lang sein.' }
+			}
+		]);
+	});
+
+	test('FR-30: ungültige Antwort 400 mit Feld', async () => {
+		const konto = await einloggen();
+		const { id } = await neuerAnlass();
+		const r = await postAnmeldung(
+			d,
+			ereignis({ body: { antwort: 'vielleicht' }, params: { id: String(id) }, konto })
+		);
+		expect([r.status, await r.json()]).toEqual([
+			400,
+			{
+				fehler: 'eingabe',
+				felder: { antwort: 'Bitte wähle «Ich komme» oder «Ich komme nicht».' }
+			}
+		]);
 	});
 
 	test('gelöschter oder unbekannter Anlass 404', async () => {

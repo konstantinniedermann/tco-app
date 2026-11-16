@@ -93,6 +93,18 @@ export async function wartetAufVorladen(page: Page): Promise<void> {
 	});
 }
 
+/**
+ * Wartet, bis die Mitgliederliste der Verwaltung geladen ist, nicht nur ihre Überschrift. Seit
+ * Schritt 15 lädt `+page.ts` die Liste vor dem Anzeigen, Überschrift und Zahl stehen zugleich; nach
+ * einer Suche fragt die Seite 200 ms später neu an. Ein `page.goto` mitten in eine Anfrage bricht
+ * sie ab, und WebKit meldet das als Seitenfehler («Fetch API cannot load …
+ * /api/admin/mitglieder due to access control checks»).
+ */
+export async function wartetAufMitgliederliste(page: Page): Promise<void> {
+	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await expect(page.getByRole('status')).toHaveText(/^\d+ Mitglied(er)?$/);
+}
+
 // WebKit: Für den Screenshot legt Playwright ein eigenes Stylesheet an (Quelle
 // web-inspector://), das an der CSP der App scheitert. Nur während des Screenshots ignoriert.
 const SCREENSHOT_STIL = /^Refused to apply a stylesheet because its hash/;

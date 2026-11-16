@@ -2,11 +2,266 @@
 
 # Versionen
 
-Versionshistorie von MyTCO, neueste zuerst. Jeder Merge nach `dev` mit Code bekommt hier
-seinen eigenen Abschnitt; ein Release fasst alle Abschnitte seit dem letzten Release zusammen.
+Versionshistorie von MyTCO, neueste zuerst. Merges nach `dev` sammeln ihre Einträge unter
+«Unveröffentlicht»; eine Nummer entsteht erst beim Release `dev` → `main`, dann wird aus
+«Unveröffentlicht» der Abschnitt dieser Nummer
+([ADR-012](adr/adr-012-version-beim-release.md)). Die Abschnitte zwischen 0.20.5 und dem
+ersten Release nach ADR-012 stammen aus der früheren Regel: eine Nummer je Merge mit Code.
 Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
+
+## 0.23.0 — Refactoring abgeschlossen, erstes Release mit Nummer nur beim Release
+
+- Die Datenschutzerklärung zeigt in der App keine Sternchen mehr: «Klassierung fehlt»,
+  «Angaben fehlen» und «sucht Partner» stehen in Anführungszeichen (Doku-Abgleich vor diesem
+  Release).
+- Kommentar der Release-Prüfung an das gemessene Verhalten beim ersten Release angeglichen. An
+  der App ändert sich nichts.
+- Abhängigkeiten aktualisiert (Dependabot #82): neueres Abbild von Caddy (`caddy:2-alpine`)
+  für den Webserver (Proxy) unter `betrieb/`; ausgeliefert wird es erst mit dem Server.
+- Abhängigkeiten aktualisiert (Dependabot #86): SvelteKit 3.2.0, adapter-node 6.0.2,
+  SimpleWebAuthn-Server 14.1.0, nodemailer 10.5.0, vite 8.3.8, Playwright 1.65.0, Prettier
+  3.10.1, typescript-eslint 8.72.2, eslint-plugin-svelte 3.24.1.
+- Die Projektregeln für Claude gelten nach dem Refactoring auf Dauer: Die Übergangsregeln
+  sind aufgelöst, der Feature-Stopp endet; README und Doku werden vor einem Release
+  nachgeführt, nicht nach jedem Issue (Refactoring Schritt 24). An der App ändert sich nichts.
+- Das Refactoring ist abgeschlossen: Offene Befunde stehen in den Beobachtungen, die Analyse ist
+  als Geschichte gekennzeichnet, die Agenten des Refactorings sind entfernt; die Architektur
+  danach ist in ADR-013 festgehalten (Refactoring Schritt 25). An der App ändert sich nichts.
+
+## 0.22.11 — Versionsnummer nur noch beim Release (ADR-012)
+
+- Doku an den Code angeglichen: Bausteinsicht, Testkonzept, CI/CD, README und Übersicht nennen
+  Abruf-Baustein, Wächter, Dienste, Vertragstests und Test-Hilfen (Refactoring Schritt 21).
+  An der App ändert sich nichts.
+- Context-Scopes nennen Ordner statt ihrer Dateien; Pläne und Specs unter `docs/superpowers/`
+  sind als Geschichte gekennzeichnet und kein Lesestoff mehr (Refactoring Schritt 22). An der App
+  ändert sich nichts.
+- Eine Versionsnummer entsteht nur noch beim Release `dev` → `main`: Merges nach `dev` schreiben
+  einen Eintrag unter «Unveröffentlicht», der Pre-Push-Hook verlangt ihn bei Code; die Nummer
+  setzt der Doku-Abgleich vor dem Release (ADR-012, Refactoring Schritt 23). An der App ändert
+  sich nichts.
+
+## 0.22.10 — Die zwei Struktur-Prüfungen geschärft (Nachtrag zur Etappe 3)
+
+- Die Lint-Regel zu `fetch` fängt auch `window.fetch`, `globalThis.fetch` und `self.fetch`; ihre
+  Meldung passt für Oberfläche und Server. Die Prüfung der Design-Dateien liest auch `import()` im
+  Markup der Bausteine. An der App ändert sich nichts (E-67).
+
+## 0.22.9 — Zwei Struktur-Prüfungen: kein eigenes fetch, Reihenfolge der Design-Dateien (Refactoring Schritt 20a)
+
+- ESLint meldet jeden Aufruf von `fetch`
+  unter `src/`, Daten holen nur die Abruf-Module; ein Test prüft, dass die Design-Dateien nur im
+  Wurzel-Layout stehen, vollständig und in fester Reihenfolge, `brief.css` nur im Briefdruck.
+  An der App ändert sich nichts.
+
+## 0.22.8 — Altlasten in Code und Tests aufgeräumt, Spur per Handstart (Refactoring Schritt 20)
+
+- Aufräumen: drei ungenutzte Namen und 25 unnötige `export`
+  entfernt, eine Funktion umbenannt, die E2E-Hilfen nach Themen geteilt, kopierte Test-Hilfen
+  zusammengeführt. An der App ändert sich nichts.
+- Testlogik: Die Listen der Mitglieder stehen für die Tests an
+  einer Stelle (`tests/hilfen/mitglieder-listen.ts`); der Routen-Test prüft, dass der Name einer
+  Schnittstelle zur Methode passt (`get…` zu GET, `post…` zu POST). Ein Lauf der CI von Hand kann
+  mit Schalter `spur` für jeden E2E-Test eine Spur aufzeichnen (E-63); Läufe bei Push und PR
+  bleiben, wie sie sind. An der App ändert sich nichts.
+
+## 0.22.7 — Eigenbau «Mindestversion» entfernt (Refactoring Schritt 19)
+
+- `/api/status` nennt nur noch
+  `status` und `version`. Niemand las die Mindestversion; an der App ändert sich nichts. Die Doku
+  sagt jetzt, was bei einer neuen Auslieferung gilt: neue Version beim nächsten Start, eine offene
+  App lädt nur neu, wenn ein Seitenwechsel scheitert (Bordmittel von SvelteKit, E-61, Antwort A).
+
+## 0.22.6 — Fokus-Prüfung der CM-Seite gelockert, UI-Leitbild zur Rückfrage (Nachtrag zur Etappe 2)
+
+- Der E2E-Test der CM-Seite prüft nach einer hinfälligen Anfrage nur noch, dass der Fokus nicht
+  im Seitenkörper verloren ist; welches Element ihn hat, hängt vom Browser ab und wackelte auf der
+  iPhone-CI (E-55). An der App ändert sich nichts.
+- Das UI-Leitbild beschreibt die Rückfrage, wie der Code sie baut: zweite Entscheid-Taste, Warnung
+  als Liste mit «Trotzdem …», Rückfrage mit Textfeld (E-58).
+
+## 0.22.5 — Stylesheet in zehn Dateien (Refactoring Schritt 18)
+
+- `basis.css` ist in zehn Dateien unter `src/lib/design/` geschnitten, in der bisherigen
+  Reihenfolge; keine Regel ist verschoben oder geändert. Das gebaute Stylesheet ist Zeichen für
+  Zeichen gleich, am Aussehen ändert sich nichts.
+
+## 0.22.4 — Rückfragen der Einzel-Anmeldungsliste im gemeinsamen Dialog (Refactoring Schritt 17)
+
+- Die Einzel-Anmeldungsliste der Verwaltung nutzt für ihre fünf
+  Rückfragen den gemeinsamen Baustein `Aktionsdialog` wie die Doppel-Liste; er kann dafür eine
+  zweite Entscheid-Taste («Ablehnen» beim Wildcard-Antrag) und einen Dialog nur mit «Abbrechen».
+  Warnungen stehen jetzt als Liste statt als ein Satz (E-52).
+
+## 0.22.3 — Wacklige Fokus-Prüfung aus dem CM-Ablauftest (Nachtrag zu Schritt 16)
+
+- Der E2E-Test der CM-Seite prüft nicht mehr, dass der Fokus nach einer gesperrten Taste im
+  Seitenkörper liegt: Das hing vom Browser ab und wackelte auf der iPhone-CI (E-54). Satz,
+  Neuladen und der Fokus auf benannten Tasten bleiben geprüft. An der App ändert sich nichts.
+
+## 0.22.2 — Ein Ablauf für die Aktionen der CM-Seite (Refactoring Schritt 16)
+
+- Sieben der acht Aktionen der Clubmeisterschafts-Seite laufen über eine gemeinsame
+  Ablauf-Funktion (`src/lib/cm/ablauf.ts`); die zwei Text-Dialoge («Wildcard», «Kommentar ändern»)
+  sind ein Baustein (`src/lib/cm/Textdialog.svelte`). Sätze, Reihenfolge und Fokus bleiben, wie sie
+  waren.
+- Die Doppel-Seite behält ihre Aktionen von Hand (E-51).
+
+## 0.22.1 — Ein Anmelde-Wächter für alle Seiten (Refactoring Schritt 15)
+
+- Fehlende Sitzung, Rolle oder Bestätigung behandelt eine gemeinsame Wächter-Funktion
+  (`src/lib/login/waechter.ts`), in allen 30 Ladefunktionen und nach einer Aktion; die Sitzung
+  kommt über `ladeSitzung`. Die Ziele bleiben, wie sie waren; die drei Interclub-Seiten (#81) sind
+  aufgenommen.
+- Die vier Listen der Verwaltung (Turniere, Anlässe, Mitglieder, Verlauf) laden vor dem Anzeigen:
+  Sie erscheinen einen Augenblick später und gleich gefüllt (E-48).
+
+## 0.22.0 — Interclub-Einzelpartien (Teil 2)
+
+- Interclub, Teil 2: Jede gespielte Begegnung eines TCO-Teams hat eine eigene Seite mit den
+  Einzelpartien (Umschalter «Einzel · Doppel»), Sätzen aus Sicht des TCO und aufklappbar den Gegnern;
+  Spieler beider Teams mit Name und Klassierung wie bei Swiss Tennis. `make ic-import` holt die
+  Spielberichte mit; Datenschutzkonzept und -erklärung nachgeführt (#81).
+
+## 0.21.0 — Interclub-Resultate der TCO-Teams (Teil 1)
+
+- Neuer Reiter «IC» mit den Interclub-Resultaten aller 17 TCO-Teams von Swiss Tennis: Übersicht mit
+  Umschalter «Resultate · Teams» (letzte und nächste 7 Tage, Schlussrang je Team) und Seite eines
+  Teams mit «Spiele · Tabelle» (Begegnungen je Runde, Rangliste mit Partien und Sätzen, Auf- und
+  Abstiegsspiele). Der Reiter erscheint nur, wenn Interclub-Daten vorhanden sind (#81).
+- Die Daten holt der Server per Befehl `make ic-import JAHR=…` von Swiss Tennis, prüft die Form und
+  speichert sie je Saison und Wettbewerb ganz oder gar nicht; der regelmässige Abruf folgt in Teil 3.
+  Keine Personendaten. Begründung der Schnittstelle: ADR-011.
+- Ausnahme vom Feature-Stopp des Refactorings (E-47); DS-08 präzisiert (öffentliche Daten ohne
+  Personennamen dürfen in Tests und Seed).
+
+## 0.20.21 — Abruf-Funktionen der Verwaltung nach Bereichen (Refactoring Schritt 14)
+
+- Die 56 Abruf-Funktionen der Verwaltung liegen unverändert in fünf Dateien nach Bereich (Zugang,
+  Anlass, Gespräch, Mitglieder, Turnier) statt in einer grossen; der gemeinsame Kern bleibt an einer
+  Stelle. In den Seiten ändern sich nur Importe, am Verhalten nichts (#80).
+
+## 0.20.20 — Ein Abruf-Baustein für die Oberfläche (Refactoring Schritt 13)
+
+- Alle Abruf-Module der Oberfläche sprechen über einen gemeinsamen Baustein (`src/lib/abruf.ts`) mit
+  dem Server; nur er deutet Statuscodes und Fehlerwörter. Das Ergebnis eines Abrufs heisst überall
+  `art`. Für Mitglieder und Verwaltung ändert sich nichts (#80).
+- Neue Tests halten das bisherige Verhalten der Abruf-Module an ihren Rändern fest. Die
+  Ablehnungsgründe der Clubmeisterschaft und die Sätze zur Antwort auf einen Anlass stehen je an
+  einem Ort, den Server und Oberfläche teilen.
+
+## 0.20.19 — Reste der Bauregel geschlossen (Refactoring Schritt 12a)
+
+- Die Bauregel prüft Importpfade am aufgelösten Ziel, lässt sich von `//` in Pfaden und Texten nicht
+  mehr täuschen, erkennt `export { x as 'actions' }`, meldet nicht prüfbares Laden
+  (`import.meta.glob`, `require`, berechnetes `import()`) und verbietet das Weiterreichen der
+  Rechteprüfungen. Nur das Prüfskript ist geändert, am Verhalten ändert sich nichts (#80).
+- Projektregeln (`CLAUDE.md`) an vier Stellen im Wortlaut berichtigt.
+
+## 0.20.18 — Importregeln ohne Ausnahme (Refactoring Schritt 12)
+
+- Die Importregel zwischen den Server-Modulen gilt ohne Ausnahme; ein Test hält fest, dass die Liste
+  der Ausnahmen leer bleibt. Am Verhalten ändert sich nichts (#80).
+- Die Bauregel lässt die Rechteprüfungen der Verwaltung (`liest`, `schreibt`, `mitKonto`) nur in den
+  Verwaltungs-Dateien zu.
+
+## 0.20.17 — Verwaltung von CM, Gespräch und Mitteilungen beim eigenen Thema (Refactoring Schritt 11)
+
+- Die Verwaltungs-Schnittstellen der Clubmeisterschaft, des Gesprächs und der Mitteilungen liegen
+  unverändert in je einer eigenen Datei ihres Themas (`verwaltung-schnittstellen.ts`); beim Turnier
+  bleiben neun. Am Verhalten ändert sich nichts (#80).
+- Die Bauregel schützt alle Verwaltungs-Dateien einheitlich über den Pfad, die Sperrliste nach Namen
+  entfällt; die Importregel zwischen den Server-Modulen hat keine Ausnahme mehr.
+- Die Datenbanktests legen Turniere mit eindeutigen Jahren je Testdatei an; der Test, der dadurch
+  gelegentlich scheiterte, ist stabil.
+
+## 0.20.16 — Sitzungs-Antwort in eigenem Modul (Refactoring Schritt 10)
+
+- `getSitzung` liegt unverändert in `src/lib/server/sitzung/schnittstellen.ts`; `login` hängt nicht
+  mehr von `admin` und `gespraech` ab. In der Importregel bleibt eine Ausnahme statt vier. Am
+  Verhalten ändert sich nichts (#80).
+
+## 0.20.15 — Antworten des Vorstands vom 11.11. übertragen
+
+- Die vier Admin-Rollen und ihre Besetzung zum Start gelten (K-18.4); Annahmen in Doku und
+  Code-Kommentaren aufgelöst, am Verhalten ändert sich nichts.
+- Junioren ohne Altersgrenze: Ein Elternteil führt das Konto des Kindes nur, solange es keine
+  eigene Adresse hat (Vorschlag K-08, Bestätigung ausstehend). Code der Website liegt auf GitLab
+  (K-44); die Fragen zu Metanet gehen an den Präsidenten.
+
+## 0.20.14 — Verwaltung der Anlässe beim Thema Anlass (Refactoring Schritt 09)
+
+- Die fünf Verwaltungs-Schnittstellen der Anlässe liegen unverändert in
+  `src/lib/server/anlass/verwaltung-schnittstellen.ts` mit eigener Liste; Routen ausserhalb der
+  Verwaltung sind für die Datei gesperrt. Am Verhalten ändert sich nichts (#80).
+- Die Bauregel erkennt Importe mit Namen in Anführungszeichen und prüft jedes `import` und `export`
+  für sich; die Listen der Verwaltung stehen für die Tests an einer Stelle, und eine Schleife prüft
+  die Rechte über alle 62 Verwaltungs-Schnittstellen.
+
+## 0.20.13 — Eine Fehlerform und eine Liste der Fehlerwörter (Refactoring Schritt 08)
+
+- Server und Oberfläche teilen eine Liste der Fehlerwörter (`src/lib/fehler.ts`); eine falsche
+  Fehlerantwort fällt schon bei der Typprüfung auf.
+- Intern vereinheitlicht: Ohne Anmeldung antworten Passkey und Sitzung mit dem Wort `abgemeldet`
+  statt mit leerem Körper; Eingabefehler bei Anlass und Mitteilungen kommen als `felder`. Für
+  Mitglieder und Verwaltung ändert sich nichts (#80).
+
+## 0.20.12 — Ein Zusammenbau der Dienste (Refactoring Schritt 07)
+
+- Die Dienste des Servers entstehen an einer Stelle, `src/lib/server/dienste.ts`, statt in sechs
+  `index.ts`: zwei Mail-Versender statt fünf, ein Push-Versender statt zwei, die Bremsen wie bisher
+  einmal. Am Verhalten ändert sich nichts (#80).
+- Die Bauregel lässt Routen ausserhalb der Verwaltung aus `dienste.ts` nur die sechs Einstiege der
+  Mitglieder holen; ein neuer Test hält fest, dass mit `MAIL_NUR_AN` jede Mail über jeden Weg
+  umgeleitet wird.
+
+## 0.20.11 — Rechteprüfung der Verwaltung in eigener Datei (Refactoring Schritt 06a)
+
+- Die Rechteprüfung der Verwaltung (`liest`, `schreibt`) steht unverändert in
+  `src/lib/server/admin/rechte.ts` statt in der Schnittstellen-Datei; Dienst-Typen, die andere
+  Module brauchen, stehen in eigenen Typ-Dateien. Reines Verschieben, am Verhalten ändert sich
+  nichts (#80).
+
+## 0.20.10 — Grundbausteine der Schnittstellen an einem Ort (Refactoring Schritt 06)
+
+- Antwort bauen, JSON prüfen, Körper lesen, die Standardantworten, «mit Sitzung», «ändernd» und die
+  Uhr stehen jetzt einmal in `src/lib/server/http.ts` statt in bis zu neun Modulen. Am Verhalten
+  der Schnittstellen ändert sich nichts; ein neuer Test hält fest, dass das Format vor der
+  Anmeldung geprüft wird (#80).
+
+## 0.20.9 — Lint-Regeln für die Importrichtung im Server (Refactoring Schritt 05)
+
+- ESLint hält die Richtung der Abhängigkeiten zwischen den Server-Modulen fest: Datenbank zuunterst,
+  darüber das Login, darüber die Themen; kein Thema importiert die Schnittstellen eines anderen. Die
+  19 heutigen Abweichungen stehen als benannte Ausnahmen in `eslint.config.js` und werden in den
+  folgenden Schritten abgebaut. Ein Prüfwerkzeug, ohne Wirkung auf die App (#80).
+
+## 0.20.8 — Hilfsmittel für den Umbau der Oberfläche (Refactoring Schritt 04)
+
+- Neuer Hilfsbefehl `make css-vergleich`: vergleicht die gebauten Stylesheets zweier Builds Byte für
+  Byte. Er dient als Beweis, wenn das Stylesheet später in mehrere Dateien geteilt wird. Ein
+  Werkzeug auf Abruf, ohne Wirkung auf die App (#80).
+- Prüfliste der Stellen, an denen E2E-Tests an CSS-Klassen, SvelteKit-Interna und Antworten der
+  Schnittstellen hängen (`docs/refactoring-analyse.md`).
+
+## 0.20.7 — Vertragstests der Schnittstellen (Refactoring Schritt 03)
+
+- Neue Tests halten das heutige Verhalten der Schnittstellen fest, bevor der Server umgebaut wird:
+  ohne Anmeldung wird abgewiesen, schreibende Anfragen ohne JSON ebenso; jede Route ruft die
+  vorgesehene Funktion mit den vorgesehenen Diensten; die Bremsen gegen Durchprobieren zählen
+  über alle Wege zusammen (#80).
+- Die Schnittstellen der Mitglieder stehen je Modul in einer Liste, wie bisher die der Verwaltung.
+  Am Verhalten der App ändert sich nichts.
+
+## 0.20.6 — E2E-Tests verlässlicher (Refactoring Schritt 02)
+
+- Jeder E2E-Lauf baut in einen eigenen Ordner (`.e2e-build/`) und räumt ihn danach weg. Ein Build
+  oder zweiter Prüflauf im selben Ordner bringt den laufenden Testserver nicht mehr durcheinander;
+  das war die Ursache der zwei Fehlerseiten-Flakes in der Verwaltung.
+- E2E-Tests warten auf die geladene Mitgliederliste und auf das Ende des Speicherns, bevor sie die
+  Seite wechseln; vier feste Wartezeiten sind ersetzt (#80).
 
 ## 0.20.5 — Doku-Abgleich vor dem Release
 

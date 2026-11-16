@@ -3,9 +3,9 @@
 	// drei Themen. Die Schalter gelten sofort, ohne Speichern-Taste (UI-Leitbild, Auswahlfläche
 	// als Schalter).
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../login/anmelden.ts';
+	import { leiteUmNachAktion } from '../login/waechter.ts';
 	import { istKlappeOffen, merkeKlappe } from '../ui/klappe.ts';
 	import {
 		holeBenachrichtigungen,
@@ -76,7 +76,7 @@
 			if (r.art !== 'ok' && r.art !== 'abgemeldet') stand.themen[thema] = !an;
 		}
 		if (r.art === 'abgemeldet') {
-			await goto(resolve('/login'));
+			await leiteUmNachAktion(r);
 			return;
 		}
 		if (r.art === 'ok') stand.themen = r.daten.themen;

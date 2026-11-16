@@ -3,13 +3,16 @@ import {
 	doppelZurWahl,
 	holeCmAnsicht,
 	holeCmTurniere,
+	holeGespraech,
 	kategorieZumAnsehen,
 	lehneAnfrageAb,
+	markiereGelesen,
 	meldeAb,
 	beantrageWildcard,
 	meldeAn,
 	nimmAnfrageAn,
 	sendeCmAngaben,
+	sendeNachricht,
 	setzeSuchtext,
 	speichereKlassierung,
 	stelleAnfrage,
@@ -18,20 +21,7 @@ import {
 } from './api.ts';
 
 import type { CmAnsicht, CmKategorie } from './api.ts';
-
-type Aufruf = { pfad: string; init: RequestInit };
-
-function holer(antwort: Response | Error) {
-	const aufrufe: Aufruf[] = [];
-	const holen = async (pfad: string, init: RequestInit) => {
-		aufrufe.push({ pfad, init });
-		if (antwort instanceof Error) throw antwort;
-		return antwort;
-	};
-	return { aufrufe, holen };
-}
-
-const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+import { type Aufruf, holer, json, ungeprueft, type Koerper } from '../../../tests/hilfen/abruf.ts';
 
 const istJsonPost = (a: Aufruf) =>
 	a.init.method === 'POST' &&
@@ -85,7 +75,7 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 	});
 
 	test('FR-06: 409 voll wird eigenes Ergebnis', async () => {
-		const ergebnis = async (status: number, inhalt: unknown) =>
+		const ergebnis = async <S extends number>(status: S, inhalt: Koerper<S>) =>
 			meldeAn(1, null, holer(json(status, inhalt)).holen);
 		expect(await ergebnis(409, { fehler: 'voll' })).toEqual({ art: 'voll' });
 		expect(await ergebnis(409, { fehler: 'geschlossen' })).toEqual({ art: 'geschlossen' });
@@ -94,7 +84,9 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 			art: 'schon-angemeldet'
 		});
 		expect(await ergebnis(409, { fehler: 'angaben-fehlen' })).toEqual({ art: 'angaben-fehlen' });
-		expect(await ergebnis(409, { fehler: 'unbekannt' })).toEqual({ art: 'stoerung' });
+		expect(await meldeAn(1, null, holer(ungeprueft(409, { fehler: 'unbekannt' })).holen)).toEqual({
+			art: 'stoerung'
+		});
 		expect(await ergebnis(401, { fehler: 'abgemeldet' })).toEqual({ art: 'abgemeldet' });
 		expect(await ergebnis(404, { fehler: 'nicht-gefunden' })).toEqual({ art: 'nicht-gefunden' });
 		expect(await ergebnis(500, {})).toEqual({ art: 'stoerung' });
@@ -108,7 +100,7 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 		expect(istJsonPost(h.aufrufe[0])).toBe(true);
 		expect(JSON.parse(String(h.aufrufe[0].init.body))).toEqual({ kommentar: 'Ich spiele gern.' });
 
-		const ergebnis = async (status: number, inhalt: unknown) =>
+		const ergebnis = async <S extends number>(status: S, inhalt: Koerper<S>) =>
 			beantrageWildcard(1, 'x', holer(json(status, inhalt)).holen);
 		expect(await ergebnis(409, { fehler: 'keine-wildcard' })).toEqual({ art: 'keine-wildcard' });
 		expect(await ergebnis(409, { fehler: 'voll' })).toEqual({ art: 'voll' });
@@ -150,7 +142,7 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 		await fall((h) => lehneAnfrageAb(8, h), '/api/cm/anfragen/8/ablehnen', {});
 		await fall((h) => zieheAnfrageZurueck(8, h), '/api/cm/anfragen/8/zurueckziehen', {});
 
-		const ergebnis = async (status: number, inhalt: unknown) =>
+		const ergebnis = async <S extends number>(status: S, inhalt: Koerper<S>) =>
 			stelleAnfrage(1, 2, holer(json(status, inhalt)).holen);
 		expect(await ergebnis(409, { fehler: 'schon-angefragt' })).toEqual({ art: 'schon-angefragt' });
 		expect(await ergebnis(409, { fehler: 'anfrage-offen' })).toEqual({ art: 'anfrage-offen' });
@@ -200,6 +192,70 @@ describe('Anfragen der Mitglieder zur Clubmeisterschaft', () => {
 		expect(doppelZurWahl(ansicht({ kategorien: [sucht] }), 4)).toBe(sucht);
 		const paar = { ...doppel, eigen: { art: 'paar' } } as unknown as CmKategorie;
 		expect(doppelZurWahl(ansicht({ kategorien: [paar] }), 4)).toBeNull();
+	});
+});
+
+// Ränder, die der gemeinsame Abruf-Baustein genau so erhalten muss (Charakterisierung vor Schritt 13).
+describe('Clubmeisterschaft: Ränder der Deutung', () => {
+	const an = async (r: Response) => meldeAn(1, null, holer(r).holen);
+	const STOERUNG = { art: 'stoerung' };
+
+	test('FR-52: 204 ohne Körper ist Erfolg mit leeren Daten', async () => {
+		const h = holer(new Response(null, { status: 204 }));
+		expect(await markiereGelesen(3, '2026-11-12T10:00:00.000Z', h.holen)).toEqual({
+			art: 'ok',
+			daten: {}
+		});
+		expect(h.aufrufe[0].pfad).toBe('/api/cm/3/gespraech/gelesen');
+		expect(h.aufrufe[0].init.method).toBe('POST');
+		expect(JSON.parse(String(h.aufrufe[0].init.body))).toEqual({
+			bis: '2026-11-12T10:00:00.000Z'
+		});
+	});
+
+	test('ohne lesbaren Körper Störung, auch bei 200 und 401; JSON null bei 401 ebenso', async () => {
+		expect(await an(new Response('kein JSON', { status: 200 }))).toEqual(STOERUNG);
+		expect(await an(new Response('kein JSON', { status: 401 }))).toEqual(STOERUNG);
+		expect(await an(ungeprueft(401, null))).toEqual(STOERUNG);
+	});
+
+	test('JSON null bei Erfolg kommt als Daten an', async () => {
+		expect(await an(ungeprueft(200, null))).toEqual({ art: 'ok', daten: null });
+	});
+
+	test('401 und 404 genügen als Status, auch ohne Wort', async () => {
+		expect(await an(ungeprueft(401, {}))).toEqual({ art: 'abgemeldet' });
+		expect(await an(ungeprueft(404, {}))).toEqual({ art: 'nicht-gefunden' });
+	});
+
+	test('Status und Wörter, die die CM nicht kennt, sind Störung', async () => {
+		expect(await an(json(429, { fehler: 'zu-viele' }))).toEqual(STOERUNG);
+		expect(await an(json(403, { fehler: 'nur-ansehen' }))).toEqual(STOERUNG);
+		expect(await an(json(409, { fehler: 'veraltet' }))).toEqual(STOERUNG);
+	});
+
+	test('ein Wort gilt nur mit seinem Status', async () => {
+		expect(await an(json(400, { fehler: 'voll' }))).toEqual(STOERUNG);
+		expect(await an(json(409, { fehler: 'eingabe', felder: { suchtext: 'Zu lang.' } }))).toEqual(
+			STOERUNG
+		);
+	});
+
+	test('eingabe nur mit felder als Objekt', async () => {
+		expect(await an(json(400, { fehler: 'eingabe' }))).toEqual(STOERUNG);
+		expect(await an(ungeprueft(400, { fehler: 'eingabe', felder: ['x'] }))).toEqual(STOERUNG);
+	});
+
+	test('FR-50: Gespräch laden und schreiben auf eigenem Pfad; nur-lesen ist eigenes Ergebnis', async () => {
+		const g = holer(json(200, { nachrichten: [] }));
+		expect(await holeGespraech(3, g.holen)).toEqual({ art: 'ok', daten: { nachrichten: [] } });
+		expect(g.aufrufe[0]).toMatchObject({ pfad: '/api/cm/3/gespraech', init: { method: 'GET' } });
+
+		const s = holer(json(409, { fehler: 'nur-lesen' }));
+		expect(await sendeNachricht(3, 'Hallo', s.holen)).toEqual({ art: 'nur-lesen' });
+		expect(s.aufrufe[0].pfad).toBe('/api/cm/3/gespraech');
+		expect(istJsonPost(s.aufrufe[0])).toBe(true);
+		expect(JSON.parse(String(s.aufrufe[0].init.body))).toEqual({ text: 'Hallo' });
 	});
 });
 

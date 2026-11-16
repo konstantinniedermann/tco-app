@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "27. Juni 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 0,
+		"sets": 0,
+		"games": 8
+	},
+	"awayTeam": {
+		"name": "Scheuren",
+		"clubNumber": 2223,
+		"points": 3,
+		"sets": 6,
+		"games": 36
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900354,
+							"name": "Beispiel Jan R8 (9046)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900359,
+							"name": "Testmann Paula R8 (8176)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "1:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900356,
+							"name": "Vorlage Leo R9 (22771)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900360,
+							"name": "Fiktiv Remo R9 (11972)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "0:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900358,
+							"name": "Erfunden Noah R8 (10446)"
+						},
+						{
+							"id": 900361,
+							"name": "Entwurf Anna R7 (7257)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900359,
+							"name": "Testmann Paula R8 (8176)"
+						},
+						{
+							"id": 900360,
+							"name": "Fiktiv Remo R9 (11972)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "2:6", ""]
+		}
+	],
+	"leagueId": 14,
+	"groupId": 22
+}

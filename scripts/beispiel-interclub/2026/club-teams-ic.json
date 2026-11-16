@@ -1,0 +1,65 @@
+{
+	"name": "Olten",
+	"teams": [
+		{
+			"id": 7395,
+			"ligue": { "name": { "de": "35+ NLA Herren", "fr": "35+ LNA  Messieurs" } },
+			"group": 2,
+			"order": 35
+		},
+		{
+			"id": 14131,
+			"ligue": { "name": { "de": "2L Herren 2", "fr": "2L Messieurs 2" } },
+			"group": 78,
+			"order": 180
+		},
+		{
+			"id": 7398,
+			"ligue": { "name": { "de": "2L Herren 1", "fr": "2L Messieurs 1" } },
+			"group": 62,
+			"order": 180
+		},
+		{
+			"id": 15954,
+			"ligue": { "name": { "de": "2L Damen", "fr": "2L Dames" } },
+			"group": 28,
+			"order": 200
+		},
+		{
+			"id": 17002,
+			"ligue": { "name": { "de": "3L Herren 2", "fr": "3L Messieurs 2" } },
+			"group": 38,
+			"order": 220
+		},
+		{
+			"id": 11956,
+			"ligue": { "name": { "de": "3L Herren 1", "fr": "3L Messieurs 1" } },
+			"group": 39,
+			"order": 220
+		},
+		{
+			"id": 16551,
+			"ligue": { "name": { "de": "35+ 1L Herren", "fr": "35+ 1L Messieurs" } },
+			"group": 18,
+			"order": 320
+		},
+		{
+			"id": 15907,
+			"ligue": { "name": { "de": "35+ 2L Herren", "fr": "35+ 2L Messieurs" } },
+			"group": 39,
+			"order": 360
+		},
+		{
+			"id": 7402,
+			"ligue": { "name": { "de": "30+ 2L Damen", "fr": "30+ 2L Dames" } },
+			"group": 16,
+			"order": 400
+		},
+		{
+			"id": 7396,
+			"ligue": { "name": { "de": "65+ 1L Herren", "fr": "65+ 1L Messieurs" } },
+			"group": 6,
+			"order": 755
+		}
+	]
+}

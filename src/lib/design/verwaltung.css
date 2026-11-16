@@ -1,0 +1,76 @@
+/* Verwaltung: Tabelle, Symbole, Leiste, Spalten, Seitenleiste und Inhalt (Teil 5 von 10). */
+
+/* Tabelle (nur Verwaltung) — Behälter scrollt waagrecht, die Seite nicht */
+.tabelle {
+	overflow-x: auto;
+	border-radius: var(--radius);
+	box-shadow: var(--schatten-karte);
+}
+
+.tabelle table {
+	width: 100%;
+	border-collapse: collapse;
+	background: var(--farbe-flaeche);
+	font-size: var(--groesse-klein);
+}
+
+.tabelle th {
+	background: var(--farbe-marke-zart);
+	text-align: left;
+	/* Kein «Num-mer»: die Tabelle scrollt waagrecht (Leitbild, Ausnahme zu UI-02) */
+	hyphens: manual;
+	padding: var(--abstand-3);
+}
+
+.tabelle td {
+	padding: var(--abstand-3);
+	border-top: var(--rand-duenn) solid var(--farbe-linie);
+}
+
+/* Tasten in der letzten Zelle: kein Abstand unter der Leiste, die Zeile bleibt so hoch wie eine Taste */
+.tabelle td .leiste {
+	margin-bottom: 0;
+}
+
+/* Symbole: eigene SVGs im 24er-Raster, immer mit Text */
+.symbol {
+	width: var(--groesse-symbol);
+	height: var(--groesse-symbol);
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* Leiste: Suche, Filter und Tasten nebeneinander, bricht bei Platzmangel um */
+.leiste {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: var(--abstand-3);
+	margin-bottom: var(--abstand-4);
+}
+
+.leiste .feld {
+	margin-bottom: 0;
+	flex: 1 1 10em;
+}
+
+/* Spalten (nur Verwaltung): untereinander, ab 60rem zwei Spalten */
+.spalten > * {
+	min-width: 0;
+}
+
+/* Verwaltung: Seitenleiste und Inhalt; auf schmalem Bildschirm untereinander */
+.verwaltung {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+/* Kopfleiste und Seitenleiste. Unter 60rem ohne eigene Box: Die Kopfleiste klebt dann über die
+   ganze Seite, die Seitenleiste darunter scrollt weg. Ab 60rem eine stehende Spalte (s. u.). */
+.verwaltung-leiste {
+	display: contents;
+}

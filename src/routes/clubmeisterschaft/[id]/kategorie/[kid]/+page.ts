@@ -1,7 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import { resolve } from '$app/paths';
 import { holeCmAnsicht, kategorieZumAnsehen } from '../../../../../lib/cm/api.ts';
-import { holeSpeicher, leseMailanfrage } from '../../../../../lib/login/mailanfrage.ts';
+import { leiteUmBeimLaden } from '../../../../../lib/login/waechter.ts';
 import type { PageLoad } from './$types';
 
 const istId = (n: number) => Number.isSafeInteger(n) && n > 0;
@@ -13,10 +13,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
 	const kategorieId = Number(params.kid);
 	if (!istId(id)) redirect(307, '/');
 	const r = await holeCmAnsicht(id, fetch);
-	if (r.art === 'abgemeldet') {
-		const wartend = leseMailanfrage(holeSpeicher(), Date.now());
-		redirect(307, wartend ? '/login/mail' : '/login');
-	}
+	leiteUmBeimLaden(r, 'mitglied');
 	if (r.art === 'nicht-gefunden') redirect(307, '/');
 	if (r.art !== 'ok') error(503, 'Die Clubmeisterschaft lässt sich gerade nicht laden.');
 	const gefunden = istId(kategorieId) ? kategorieZumAnsehen(r.daten, kategorieId) : null;

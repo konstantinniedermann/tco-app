@@ -1,6 +1,7 @@
 // Texte der Verwaltung: Namen von Feldern, Rollen und Verlaufseinträgen, Zeitangaben.
 import { MELDUNG } from '../login/anmelden.ts';
-import type { Antwort, FairgateZeile, Feld, MitgliedZeile, Rolle, VerlaufEintrag } from './api.ts';
+import type { Antwort, Feld } from './api.ts';
+import type { FairgateZeile, MitgliedZeile, Rolle, VerlaufEintrag } from './mitglieder-api.ts';
 import { ROLLEN_NAME } from './rollen-namen.ts';
 
 const NUR_ANSEHEN = 'In der Ansicht kannst du nichts speichern.';

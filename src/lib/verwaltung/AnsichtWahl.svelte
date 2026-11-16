@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { schaueAls, type AnsichtRolle } from './api.ts';
+	import { schaueAls, type AnsichtRolle } from './zugang-api.ts';
 	import { fehlerText } from './anzeige.ts';
 	import { ANSICHT_NAME } from './rollen-namen.ts';
 	import { leiteUm, startziel } from './umleiten.ts';

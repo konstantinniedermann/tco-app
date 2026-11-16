@@ -1,0 +1,210 @@
+{
+	"title": "Beispiel",
+	"subtitle": "07. Juni 2026",
+	"homeTeam": {
+		"name": "Schlieren",
+		"clubNumber": 1234,
+		"points": 5,
+		"sets": 10,
+		"games": 68
+	},
+	"awayTeam": {
+		"name": "Olten 1",
+		"clubNumber": 2202,
+		"points": 1,
+		"sets": 2,
+		"games": 39
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900362,
+							"name": "Skizze Beat R3 (1260)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900072,
+							"name": "Saitenbett Hannes R6 (9497)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:4", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900363,
+							"name": "Modell Carla R5 (3979)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900086,
+							"name": "Fiktiv Fabio R6 (6447)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:4", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900364,
+							"name": "Schablone Dario R5 (4714)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900074,
+							"name": "Schlägerkopf Jan R6 (8088)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:2", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900365,
+							"name": "Attrappe Elena R6 (6750)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900078,
+							"name": "Ballkind Noah R6 (7318)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:1", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900366,
+							"name": "Kulisse Fabio R6 (7536)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900076,
+							"name": "Netzpfosten Leo R6 (8871)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:0", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900367,
+							"name": "Spielball Gina R7 (12517)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900080,
+							"name": "Muster Remo R6 (10094)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "4:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [],
+					"wo": 1
+				},
+				"away": {
+					"members": [],
+					"wo": 1
+				}
+			},
+			"results": ["", "", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [],
+					"wo": 1
+				},
+				"away": {
+					"members": [],
+					"wo": 1
+				}
+			},
+			"results": ["", "", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [],
+					"wo": 1
+				},
+				"away": {
+					"members": [],
+					"wo": 1
+				}
+			},
+			"results": ["", "", ""]
+		}
+	],
+	"leagueId": 9,
+	"groupId": -1
+}

@@ -1,79 +1,255 @@
-import { leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
+import { posix } from 'node:path';
+import { istTestquelle, leseDateien, meldeErgebnis, versionierteDateien } from './dateien.ts';
 
 const ACTIONS_DEKLARATION = /\bexport\s+(?:const|let|var|(?:async\s+)?function\s*\*?)\s*actions\b/;
 
-/** Erkennt `export { actions }` und `export { x as actions }` (auch mit mehreren Namen). */
+/**
+ * Erkennt `export { actions }`, `export { x as actions }` und `export { x as 'actions' }` (auch mit
+ * mehreren Namen). Einen Namen mit Escape liest die Prüfung nicht: gesperrt im Zweifel (Schritt 12a).
+ */
 function exportiertActions(inhalt: string): boolean {
 	for (const block of inhalt.matchAll(/\bexport\s*\{([^}]*)\}/g)) {
 		const namen = block[1].split(',').map((eintrag) =>
-			eintrag
-				.trim()
-				.split(/\s+as\s+/)
-				.pop()
+			leseName(
+				eintrag
+					.trim()
+					.split(/\s+as\s+/)
+					.pop() ?? ''
+			)
 		);
-		if (namen.includes('actions')) return true;
+		if (namen.some((name) => name === 'actions' || name.includes('\\'))) return true;
 	}
 	return false;
 }
 
-// Admin-Routen sind dünn: Sie importieren nur einen Dienst-Einstieg und die Schnittstellen, und
-// von den Schnittstellen nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN (Bereich
-// Clubmeisterschaft, offen auch für `cm`) oder MITTEILUNG_ADMIN_SCHNITTSTELLEN (Mitteilungen der
-// Verwaltung). Nur diese decken die Rechte-Tests ab.
+// Admin-Routen sind dünn: Sie importieren aus dem Zusammenbau der Dienste nur die Einstiege der
+// Verwaltung und von den Schnittstellen nur Einträge der Listen in VERWALTUNGS_DATEIEN. Nur diese
+// decken die Rechte-Tests ab.
 const ADMIN_ROUTE = /^src\/routes\/api\/admin\/(?:.*\/)?\+server\.(ts|js)$/;
-const ERLAUBTER_IMPORT =
-	/(?:^|\/)lib\/server\/(?:(?:admin|mitteilung)\/(?:index|schnittstellen)|turnier\/schnittstellen)\.ts$|^\.\/\$types$/;
 const ADMIN_MODUL = /(?:^|\/|^\$)lib\/server\/admin(?:\/|$)/;
-const SCHNITTSTELLEN_DATEI = 'src/lib/server/admin/schnittstellen.ts';
-const TURNIER_DATEI = 'src/lib/server/turnier/schnittstellen.ts';
-const MITTEILUNG_DATEI = 'src/lib/server/mitteilung/schnittstellen.ts';
-const SCHNITTSTELLEN_IMPORT =
-	/(?:^|\/)lib\/server\/(?:admin|turnier|mitteilung)\/schnittstellen\.ts$/;
-// Je Dienst-Einstieg der eine erlaubte Name; die Mitglieder-Dienste der Mitteilungen nicht.
-const AUS_INDEX: [RegExp, string][] = [
-	[/(?:^|\/)lib\/server\/admin\/index\.ts$/, 'holeAdminDienste'],
-	[/(?:^|\/)lib\/server\/mitteilung\/index\.ts$/, 'holeMitteilungAdminDienste']
+const SERVER = 'src/lib/server/';
+
+/**
+ * Wie eine Verwaltungs-Datei ausserhalb von api/admin gesperrt ist; eine Route dort darf aus ihr
+ * nichts: `ordner` = der ganze Ordner `lib/server/admin` (ADMIN_MODUL); `pfad` = die Datei an ihrem
+ * Pfad (reine Verwaltungs-Datei in einem Thema, E-38).
+ */
+type Aussen = 'ordner' | 'pfad';
+
+// Die Schnittstellen-Dateien der Verwaltung (relativ zu src/lib/server/) mit ihrer Liste: die eine
+// Stelle für die Menge der Listen in der Bauregel. Die erste muss es geben (ADMIN_SCHNITTSTELLEN);
+// fehlt eine andere Liste, gilt sie als leer. Bereich Clubmeisterschaft: TURNIER_SCHNITTSTELLEN,
+// CM_ADMIN_SCHNITTSTELLEN, GESPRAECH_ADMIN_SCHNITTSTELLEN; Mitteilungen der Verwaltung:
+// MITTEILUNG_ADMIN_SCHNITTSTELLEN; Anlässe der Verwaltung: ANLASS_ADMIN_SCHNITTSTELLEN.
+const VERWALTUNGS_DATEIEN: readonly { datei: string; liste: string; aussen: Aussen }[] = [
+	{ datei: 'admin/schnittstellen.ts', liste: 'ADMIN_SCHNITTSTELLEN', aussen: 'ordner' },
+	{ datei: 'turnier/schnittstellen.ts', liste: 'TURNIER_SCHNITTSTELLEN', aussen: 'pfad' },
+	{ datei: 'cm/verwaltung-schnittstellen.ts', liste: 'CM_ADMIN_SCHNITTSTELLEN', aussen: 'pfad' },
+	{
+		datei: 'gespraech/verwaltung-schnittstellen.ts',
+		liste: 'GESPRAECH_ADMIN_SCHNITTSTELLEN',
+		aussen: 'pfad'
+	},
+	{
+		datei: 'mitteilung/verwaltung-schnittstellen.ts',
+		liste: 'MITTEILUNG_ADMIN_SCHNITTSTELLEN',
+		aussen: 'pfad'
+	},
+	{
+		datei: 'anlass/verwaltung-schnittstellen.ts',
+		liste: 'ANLASS_ADMIN_SCHNITTSTELLEN',
+		aussen: 'pfad'
+	}
 ];
-const DIENSTE = AUS_INDEX.map(([, name]) => name);
-const ERLAUBT_IMPORT =
-	'erlaubt sind nur admin/index.ts, mitteilung/index.ts und die Schnittstellen aus admin/, turnier/ und mitteilung/';
-const ERLAUBT_LISTEN =
-	'erlaubt sind nur Einträge aus ADMIN_SCHNITTSTELLEN, TURNIER_SCHNITTSTELLEN und MITTEILUNG_ADMIN_SCHNITTSTELLEN';
-// Ausserhalb von api/admin: aus den Mitteilungen nur, was den Mitgliedern dient (Ordner-Import
-// `$lib/server/mitteilung` löst Vite auf index.ts auf).
-const MITTEILUNG_INDEX = /(?:^|\/|^\$)lib\/server\/mitteilung(?:\/index(?:\.ts)?)?$/;
-const MITTEILUNG_SCHNITTSTELLEN = /(?:^|\/|^\$)lib\/server\/mitteilung\/schnittstellen(?:\.ts)?$/;
+
+const escape = (t: string) => t.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+/** «a, b und c» */
+const aufzaehlung = (teile: readonly string[]) =>
+	teile.length < 2 ? teile.join('') : `${teile.slice(0, -1).join(', ')} und ${teile.at(-1)}`;
+const ohneEndung = (datei: string) => datei.replace(/\.ts$/, '');
+
+const SCHNITTSTELLEN_IMPORT = new RegExp(
+	`(?:^|\\/)lib\\/server\\/(?:${VERWALTUNGS_DATEIEN.map((v) => escape(ohneEndung(v.datei))).join('|')})\\.ts$`
+);
+const ERLAUBTER_IMPORT = new RegExp(
+	`${SCHNITTSTELLEN_IMPORT.source}|(?:^|\\/)lib\\/server\\/dienste\\.ts$|^\\.\\/\\$types$`
+);
+// Wohin ein erlaubter Import einer Admin-Route zeigen muss (aufgelöst, ohne Endung): Ein Pfad, der
+// nur so endet wie eine erlaubte Datei (falsche Tiefe, Paket, `/lib/…` ohne `src`), ist ein Befund.
+const ZIELE_DER_ADMIN_ROUTE = new Set([
+	`${SERVER}dienste`,
+	...VERWALTUNGS_DATEIEN.map((v) => SERVER + ohneEndung(v.datei))
+]);
+// Die Einstiege der Verwaltung in `dienste.ts`: Admin-Routen dürfen aus `dienste.ts` nur diese.
+// Ein neuer Einstieg der Verwaltung, der hier fehlt, ist für Admin-Routen gesperrt und fällt sofort
+// auf. Ausserhalb von api/admin gilt die Erlaubt-Liste MITGLIEDER_EINSTIEGE; ein Name von hier
+// bekommt dort die eigene Meldung «nur Routen unter src/routes/api/admin/ …».
+const VERWALTUNGS_EINSTIEGE = ['holeAdminDienste', 'holeMitteilungAdminDienste'];
+// Die Einstiege der Mitglieder: das Einzige, was eine Route ausserhalb von api/admin aus `dienste.ts`
+// holen darf. Erlaubt-Liste, keine Sperrliste: Was die Prüfung nicht genau als einen dieser Namen
+// erkennt (ein neuer Export, ein Kommentar statt Leerzeichen um `as`, ein Unicode-Escape im
+// Bezeichner), ist ein Befund.
+const MITGLIEDER_EINSTIEGE = [
+	'holeLoginDienst',
+	'holePasskeyDienst',
+	'holeProfilDienste',
+	'holeCmDienste',
+	'holeMitteilungDienste',
+	'holeAnlassDienste',
+	'holeInterclubDienste'
+];
+const AUS_DIENSTEN = /(?:^|\/)lib\/server\/dienste\.ts$/;
+const ERLAUBT_DIENSTE = VERWALTUNGS_EINSTIEGE.join(' und ');
+const ERLAUBT_MITGLIEDER = `erlaubt sind nur ${MITGLIEDER_EINSTIEGE.join(', ')}`;
+const ERLAUBT_IMPORT = `erlaubt sind nur ${aufzaehlung(['dienste.ts', ...VERWALTUNGS_DATEIEN.map((v) => v.datei)])}`;
+const ERLAUBT_LISTEN = `erlaubt sind nur Einträge aus ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.liste))}`;
+// Ausserhalb von api/admin: aus dem Zusammenbau der Dienste nur, was den Mitgliedern dient.
+// `dienste.ts` mit und ohne Endung (auch `.js`, das Vite auf `.ts` auflöst), über `$lib` und mit
+// Anhang (`?…`): Der Schutz hängt hier am Namen, nicht mehr am Pfad.
+const DIENSTE_MODUL = /(?:^|\/|^\$)lib\/server\/dienste(?:\.(?:ts|js))?(?:[?#].*)?$/;
+// Am Pfad gesperrte Dateien (`aussen: 'pfad'`): der Pfad ohne Endung, danach alles ausser einem
+// weiteren Zeichen des Dateinamens (`.ts`, `.js`, ohne, `.mjs`, `?…`, `#…`), auch über `$lib`.
+const NUR_VERWALTUNG = VERWALTUNGS_DATEIEN.filter((v) => v.aussen === 'pfad').map((v) => ({
+	...v,
+	muster: new RegExp(`(?:^|\\/|^\\$)lib\\/server\\/${escape(ohneEndung(v.datei))}(?![\\w-])`)
+}));
+
+// Die Rechteprüfung der Verwaltung (`liest`, `schreibt`, `mitKonto` aus admin/rechte.ts) nutzen
+// nur die Dateien in VERWALTUNGS_DATEIEN: Eine Verwaltungs-Funktion in einer Datei der Mitglieder
+// fiele sonst durch jede 403-Schleife, ihre Rechte hingen allein an der Funktion. Geprüft wird jede
+// Datei unter src/ ausser Routen (für sie gelten die Regeln oben) und Tests (sie rufen die
+// Rechteprüfung direkt); die Typen und andere Namen aus admin/rechte.ts bleiben frei.
+const RECHTE = `${SERVER}admin/rechte`;
+const RECHTE_PRUEFUNG = ['liest', 'schreibt', 'mitKonto'];
+const BEZEICHNER = /^[A-Za-z_$][\w$]*$/;
+const NUR_VERWALTUNG_RECHTE = `${aufzaehlung(RECHTE_PRUEFUNG)} nur in ${aufzaehlung(VERWALTUNGS_DATEIEN.map((v) => v.datei))}`;
+
+// Ein Text in Anführungszeichen, je bis zum schliessenden Zeichen derselben Zeile; ein Escape (`\'`,
+// `\"`, `\\`) beendet ihn nicht.
+const TEXT = `'(?:[^'\\\\\\n]|\\\\.)*'|"(?:[^"\\\\\\n]|\\\\.)*"`;
+// Die Dateien der Tabelle rufen die Rechteprüfung nur auf und reichen sie nicht weiter (Schritt 12a).
+const NUR_TEXTE = new RegExp(TEXT, 'g');
+const NUR_AUFRUFEN = `${aufzaehlung(RECHTE_PRUEFUNG)} nur aufrufen, nicht weiterreichen`;
 
 // Grenze: Geprüft wird jede Datei für sich. Ein Modul unter src/lib, das Admin-Funktionen
-// weiterreicht, fällt hier nicht auf; das bleibt Aufgabe des Reviews.
+// weiterreicht, fällt hier nicht auf; das bleibt Aufgabe des Reviews. Ausgenommen ist die
+// Rechteprüfung selbst: Sie reicht keine Datei der Tabelle weiter (`pruefeWeiterreichen`).
 
+// `wort`: `import` oder `export`; `bereich`: Anfang und Ende der Anweisung im Text ohne Kommentare.
 type Import =
-	| { art: 'statisch'; quelle: string; klausel: string | null }
+	| {
+			art: 'statisch';
+			wort: string;
+			quelle: string;
+			klausel: string | null;
+			bereich: [number, number];
+	  }
 	| { art: 'dynamisch'; quelle: string | null };
 
-/** Entfernt Kommentare, damit z. B. ein Apostroph in einem Kommentar keinen Import verschluckt. */
+// Was kein Kommentar ist, obwohl `//` oder `/*` darin stehen kann: Texte in '…' und "…" (je auf
+// einer Zeile), Template-Literale (auch über Zeilen; `${…}` zählt mit zum Text) und Regex-Literale
+// (nach einem Zeichen oder Wort, hinter dem kein Wert endet, oder am Zeilenanfang; auf einer Zeile).
+const KEIN_KOMMENTAR = [
+	/'(?:[^'\\\n]|\\.)*'/,
+	/"(?:[^"\\\n]|\\.)*"/,
+	/`(?:[^`\\]|\\[\s\S])*`/,
+	/(?<=(?:^|[(,=:[!&|?{};+\-*%<>~^]|\b(?:return|typeof|case|do|else|in|of|new|delete|void|throw|instanceof|yield|await))\s*)\/(?![*/])(?:[^\\/\n[]|\\.|\[(?:[^\]\\\n]|\\.)*\])+\//
+];
+// Ein Zeilenkommentar beginnt nicht direkt nach `:` (eine Adresse ausserhalb eines Texts) oder `\`.
+const KOMMENTAR = [/\/\*[\s\S]*?\*\//, /(?<![:\\])\/\/[^\n]*/];
+const TEXT_ODER_KOMMENTAR = new RegExp(
+	`(${KEIN_KOMMENTAR.map((r) => r.source).join('|')})|${KOMMENTAR.map((r) => r.source).join('|')}`,
+	'gm'
+);
+
+/**
+ * Entfernt Kommentare, damit z. B. ein Apostroph in einem Kommentar keinen Import verschluckt. Texte
+ * bleiben, wie sie stehen: `//` in einem Importpfad ist kein Kommentar (Schritt 12a).
+ */
 function ohneKommentare(inhalt: string): string {
+	return inhalt.replace(TEXT_ODER_KOMMENTAR, (_treffer, text?: string) => text ?? '');
+}
+
+/**
+ * Die Lesart bis Schritt 12: jedes `/*…*\/` und jedes `//…` ausser direkt nach `:`, `'`, `"`,
+ * Backtick oder `\`, ohne Rücksicht auf Texte.
+ */
+function ohneKommentareBisher(inhalt: string): string {
 	return inhalt.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
 }
 
-// `klausel`: was zwischen `import`/`export` und `from` steht; `null` bei `import '…'`.
-// Dynamisch: `quelle` ist `null`, wenn der Pfad berechnet wird (`import(variable)`).
-function importe(inhalt: string): Import[] {
-	const text = ohneKommentare(inhalt);
-	const statisch =
-		/\b(?:import|export)\b([^'";]*?)\bfrom\s*['"]([^'"]+)['"]|\bimport\s*['"]([^'"]+)['"]/g;
+// Zwei Lesarten ohne Kommentare: Das Muster oben kennt keine Syntax und kann einen Text zu weit oder
+// zu kurz lesen (z. B. ein Regex-Literal nach `)`, eine Division nach `a!`). Jede Regel, die von den
+// Kommentaren abhängt, prüft darum beide Lesarten; ein Befund aus einer von beiden gilt. So ist die
+// Bauregel nirgends lockerer als bis Schritt 12 (Korrekturrunde Schritt 12a).
+const LESARTEN = [ohneKommentare, ohneKommentareBisher];
+
+const SCHLUESSELWORT = /\b(?:import|export)\b/g;
+const OHNE_KLAUSEL = /\s*['"]([^'"]+)['"]/y;
+const BIS_FROM = `\\bfrom\\s*['"]([^'"]+)['"]`;
+// Klausel ohne Anführungszeichen und ohne `;`: die Form, die die Bauregel vor Schritt 09 allein kannte.
+const KLAUSEL = new RegExp(`([^'";]*?)${BIS_FROM}`, 'y');
+// Klausel mit Namen in Anführungszeichen (`{ 'x' as y }`, `* as 'x'`, ES2022): Texte nur in
+// geschweiften Klammern oder direkt nach `as`, sonst weder Anführungszeichen noch `;`. Ein anderer
+// Text, etwa ein einzelner Apostroph in einem Template- oder Regex-Literal, beginnt so keine Klausel.
+const KLAUSEL_MIT_TEXT = new RegExp(
+	`((?:\\bas\\s+(?:${TEXT})|[^'";{}]|\\{(?:[^'"{}]|${TEXT})*\\})*?)${BIS_FROM}`,
+	'y'
+);
+
+/** Prüft ein Muster ab einer Stelle, ohne den Text dahinter zu verbrauchen. */
+function ab(muster: RegExp, text: string, stelle: number): RegExpExecArray | null {
+	muster.lastIndex = stelle;
+	return muster.exec(text);
+}
+
+// `klausel`: was zwischen `import`/`export` und `from` steht; `null` bei `import '…'`. Jedes
+// Schlüsselwort wird für sich geprüft, nicht fortlaufend: Ein Treffer, der über einen Import
+// hinwegläuft, verbraucht ihn nicht; der hat seinen eigenen. Je Schlüsselwort gilt zuerst die Form
+// ohne Klausel (nur nach `import`), dann die Klausel ohne Anführungszeichen, erst dann die mit Namen
+// in Anführungszeichen. So gibt es jeden Treffer der Fassung vor Schritt 09 weiter, mit derselben
+// Klausel; dazu kommen Treffer, die sie verbraucht oder nicht erkannt hatte.
+// Dynamisch: `quelle` ist `null`, wenn der Pfad berechnet wird (`import(variable)`). `text` ist eine
+// Lesart ohne Kommentare (LESARTEN).
+function importeAus(text: string): Import[] {
+	const statisch: Import[] = [];
+	for (const wort of text.matchAll(SCHLUESSELWORT)) {
+		const stelle = wort.index + wort[0].length;
+		const ohne = wort[0] === 'import' ? ab(OHNE_KLAUSEL, text, stelle) : null;
+		if (ohne) {
+			const bereich: [number, number] = [wort.index, stelle + ohne[0].length];
+			statisch.push({ art: 'statisch', wort: wort[0], quelle: ohne[1], klausel: null, bereich });
+			continue;
+		}
+		const mit = ab(KLAUSEL, text, stelle) ?? ab(KLAUSEL_MIT_TEXT, text, stelle);
+		if (!mit) continue;
+		const bereich: [number, number] = [wort.index, stelle + mit[0].length];
+		statisch.push({
+			art: 'statisch',
+			wort: wort[0],
+			quelle: mit[2],
+			klausel: mit[1].trim(),
+			bereich
+		});
+	}
 	const dynamisch = /\bimport\s*\(\s*(?:['"`]([^'"`$]+)['"`]\s*\))?/g;
 	return [
-		...[...text.matchAll(statisch)].map((m): Import =>
-			m[2] !== undefined
-				? { art: 'statisch', quelle: m[2], klausel: m[1].trim() }
-				: { art: 'statisch', quelle: m[3], klausel: null }
-		),
+		...statisch,
 		...[...text.matchAll(dynamisch)].map((m): Import => ({
 			art: 'dynamisch',
 			quelle: m[1] ?? null
 		}))
 	];
+}
+
+/**
+ * Ein Name in Anführungszeichen ohne Escape ist derselbe Name wie ohne (`'x'` = `x`). Mit Escape,
+ * anderem Inhalt oder unvollständig bleibt er, wie er steht, samt Anführungszeichen: Dann passt er
+ * auf keine Liste und auf keine Erlaubt-Liste (`pruefeDiensteImporte`): ein Befund.
+ */
+function leseName(roh: string): string {
+	const text = /^(['"])([^'"\\\n]*)\1$/.exec(roh);
+	return text ? text[2] : roh;
 }
 
 /** Paare [importiert, lokal] aus `{ a, b as c }` (ohne `type`); `null` bei Standard- oder Namensraum-Import. */
@@ -87,7 +263,7 @@ function benannteNamen(klausel: string): [string, string][] | null {
 		.filter((e) => e !== '')
 		.map((e): [string, string] => {
 			const [importiert, lokal] = e.split(/\s+as\s+/);
-			return [importiert, lokal ?? importiert];
+			return [leseName(importiert), lokal ?? importiert];
 		});
 }
 
@@ -102,58 +278,59 @@ function schnittstellenListe(inhalt: string, konstante: string): Set<string> | n
 	);
 }
 
+const listeAus = (dateien: Map<string, string>, v: (typeof VERWALTUNGS_DATEIEN)[number]) =>
+	schnittstellenListe(dateien.get(SERVER + v.datei) ?? '', v.liste);
+
+/** Alle Namen der Verwaltungs-Listen; `null`, wenn die erste Liste fehlt. */
 function adminSchnittstellen(dateien: Map<string, string>): Set<string> | null {
-	const admin = schnittstellenListe(
-		dateien.get(SCHNITTSTELLEN_DATEI) ?? '',
-		'ADMIN_SCHNITTSTELLEN'
-	);
+	const [erste, ...weitere] = VERWALTUNGS_DATEIEN;
+	const admin = listeAus(dateien, erste);
 	if (admin === null) return null;
-	const turnier = schnittstellenListe(dateien.get(TURNIER_DATEI) ?? '', 'TURNIER_SCHNITTSTELLEN');
-	const mitteilung = schnittstellenListe(
-		dateien.get(MITTEILUNG_DATEI) ?? '',
-		'MITTEILUNG_ADMIN_SCHNITTSTELLEN'
-	);
-	return new Set([...admin, ...(turnier ?? []), ...(mitteilung ?? [])]);
+	return new Set([...admin, ...weitere.flatMap((v) => [...(listeAus(dateien, v) ?? [])])]);
 }
 
-function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): string[] {
+function pruefeAdminRoute(pfad: string, text: string, erlaubt: Set<string>): string[] {
 	const befunde: string[] = [];
 	// Lokale Namen der erlaubten Schnittstellen (auch mit `as` umbenannt).
 	const schnittstellen = new Set<string>();
-	for (const imp of importe(inhalt)) {
+	for (const imp of importeAus(text)) {
 		if (imp.art === 'dynamisch') {
 			befunde.push(
 				`${pfad}: Admin-Route lädt '${imp.quelle ?? '(berechnet)'}' dynamisch; nur statische Importe`
 			);
 			continue;
 		}
-		if (!ERLAUBTER_IMPORT.test(imp.quelle)) {
+		const amZiel =
+			imp.quelle === './$types' || ZIELE_DER_ADMIN_ROUTE.has(zielVon(pfad, imp.quelle) ?? '');
+		if (!ERLAUBTER_IMPORT.test(imp.quelle) || !amZiel) {
 			befunde.push(`${pfad}: Admin-Route importiert '${imp.quelle}'; ${ERLAUBT_IMPORT}`);
 			continue;
 		}
 		const ausListe = SCHNITTSTELLEN_IMPORT.test(imp.quelle);
-		const dienst = AUS_INDEX.find(([muster]) => muster.test(imp.quelle))?.[1];
-		if (!ausListe && dienst === undefined) continue;
+		const ausDiensten = AUS_DIENSTEN.test(imp.quelle);
+		if (!ausListe && !ausDiensten) continue;
 		const namen = imp.klausel === null ? null : benannteNamen(imp.klausel);
 		if (namen === null) {
 			befunde.push(`${pfad}: Admin-Route importiert '${imp.quelle}' nicht mit Namen`);
 			continue;
 		}
 		for (const [name, lokal] of namen) {
-			if (ausListe ? erlaubt.has(name) : name === dienst) {
+			if (ausListe ? erlaubt.has(name) : VERWALTUNGS_EINSTIEGE.includes(name)) {
 				if (ausListe) schnittstellen.add(lokal);
 				continue;
 			}
 			befunde.push(
 				ausListe
 					? `${pfad}: Admin-Route nutzt '${name}'; ${ERLAUBT_LISTEN}`
-					: `${pfad}: Admin-Route importiert '${name}' aus ${imp.quelle}; erlaubt ist nur ${dienst}`
+					: `${pfad}: Admin-Route importiert '${name}' aus ${imp.quelle}; erlaubt sind nur ${ERLAUBT_DIENSTE}`
 			);
 		}
 	}
 	// Die Dienste nur einer Schnittstelle übergeben: Wer `.db` herausholt, umgeht die Rechteprüfung.
-	const code = ohneKommentare(inhalt).replace(/\bimport\b[^;]*?\bfrom\s*['"][^'"]+['"]\s*;?/g, '');
-	for (const treffer of code.matchAll(new RegExp(`\\b(?:${DIENSTE.join('|')})\\b`, 'g'))) {
+	const code = text.replace(/\bimport\b[^;]*?\bfrom\s*['"][^'"]+['"]\s*;?/g, '');
+	for (const treffer of code.matchAll(
+		new RegExp(`\\b(?:${VERWALTUNGS_EINSTIEGE.join('|')})\\b`, 'g')
+	)) {
 		const davor = /([A-Za-z_$][\w$]*)\s*\(\s*$/.exec(code.slice(0, treffer.index));
 		const danach = code.slice(treffer.index + treffer[0].length);
 		if (!davor || !schnittstellen.has(davor[1]) || !/^\s*\(\s*\)\s*[,)]/.test(danach)) {
@@ -165,45 +342,201 @@ function pruefeAdminRoute(pfad: string, inhalt: string, erlaubt: Set<string>): s
 	return befunde;
 }
 
-/** Ausserhalb von api/admin: keine Dienste und Schnittstellen der Verwaltung aus den Mitteilungen. */
-function pruefeMitteilungImporte(
-	pfad: string,
-	imp: Import[],
-	verwaltung: Set<string> | null
-): string[] {
+/** Ausserhalb von api/admin: aus `dienste.ts` nur Einstiege der Mitglieder, statisch und mit Namen. */
+function pruefeDiensteImporte(pfad: string, imp: Import[]): string[] {
 	const befunde: string[] = [];
 	for (const i of imp) {
-		if (i.quelle === null) continue;
-		const ausIndex = MITTEILUNG_INDEX.test(i.quelle);
-		if (!ausIndex && !MITTEILUNG_SCHNITTSTELLEN.test(i.quelle)) continue;
+		if (i.quelle === null || !trifft(DIENSTE_MODUL, pfad, i.quelle)) continue;
 		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
 		if (namen === null) {
 			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
 			continue;
 		}
 		for (const [name] of namen) {
-			const nurVerwaltung = ausIndex
-				? name === 'holeMitteilungAdminDienste'
-				: (verwaltung?.has(name) ?? false);
-			if (nurVerwaltung) {
-				befunde.push(`${pfad}: nur Routen unter src/routes/api/admin/ dürfen '${name}' nutzen`);
+			if (MITGLIEDER_EINSTIEGE.includes(name)) continue;
+			if (!VERWALTUNGS_EINSTIEGE.includes(name)) {
+				befunde.push(
+					`${pfad}: aus dienste.ts nur Einstiege der Mitglieder, nicht '${name}'; ${ERLAUBT_MITGLIEDER}`
+				);
+				continue;
 			}
+			befunde.push(`${pfad}: nur Routen unter src/routes/api/admin/ dürfen '${name}' nutzen`);
 		}
 	}
 	return befunde;
 }
 
-/** Prüft die Bauregel: nur API-Routen (`+server.ts`), keine Server-Dateien neben Seiten, Form Actions oder Remote Functions. */
+/**
+ * Die Datei, auf die ein Importpfad zeigt, normalisiert, ohne Endung und Anhang; `null` für ein
+ * Paket. Über `$lib`, ab der Projektwurzel (`/src/…`, so löst Vite auf) oder relativ zur Datei.
+ */
+function zielVon(pfad: string, quelle: string): string | null {
+	const voll = aufgeloest(pfad, quelle);
+	return voll === null ? null : voll.replace(/\.(?:ts|js)$/, '');
+}
+
+/** Wie `zielVon`, aber mit der Endung, wie sie steht. */
+function aufgeloest(pfad: string, quelle: string): string | null {
+	const ohneAnhang = quelle.replace(/[?#].*$/, '');
+	return ohneAnhang.startsWith('$lib/')
+		? posix.normalize(`src/lib/${ohneAnhang.slice('$lib/'.length)}`)
+		: ohneAnhang.startsWith('/')
+			? posix.normalize(ohneAnhang.slice(1))
+			: ohneAnhang.startsWith('.')
+				? posix.join(posix.dirname(pfad), ohneAnhang)
+				: null;
+}
+
+/**
+ * Ob eine Sperre einen Import trifft: am Pfad, wie er steht, oder am aufgelösten Pfad (mit Endung,
+ * ohne Anhang). So bleibt jeder Befund am geschriebenen Pfad, und `..`, `./` oder `//` umgehen keine
+ * Sperre (Schritt 12a).
+ */
+function trifft(muster: RegExp, pfad: string, quelle: string): boolean {
+	const ziel = aufgeloest(pfad, quelle);
+	return muster.test(quelle) || (ziel !== null && muster.test(ziel));
+}
+
+/**
+ * Ausserhalb der Verwaltungs-Dateien: aus admin/rechte.ts nur statisch und mit Namen, ohne
+ * die Namen aus RECHTE_PRUEFUNG.
+ */
+function pruefeRechteImporte(pfad: string, imp: Import[]): string[] {
+	const befunde: string[] = [];
+	for (const i of imp) {
+		if (i.quelle === null || zielVon(pfad, i.quelle) !== RECHTE) continue;
+		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
+		if (namen === null) {
+			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
+			continue;
+		}
+		for (const [name] of namen) {
+			// Ein Name, der kein schlichter Bezeichner ist (Escape, Anführungszeichen), ist ein Befund.
+			if (BEZEICHNER.test(name) && !RECHTE_PRUEFUNG.includes(name)) continue;
+			befunde.push(`${pfad}: '${name}' aus admin/rechte.ts; ${NUR_VERWALTUNG_RECHTE}`);
+		}
+	}
+	return befunde;
+}
+
+/**
+ * In den Dateien der Tabelle: aus admin/rechte.ts nur statisch und mit Namen; `liest`, `schreibt` und
+ * `mitKonto` (auch umbenannt, auch ein Name, den die Prüfung nicht liest) stehen im Code nur direkt
+ * vor `(`. Jede andere Stelle (`export { liest }`, `export default`, `const a = liest`, `{ liest }`)
+ * reicht sie weiter, ebenso `export { liest } from` und `export * from` admin/rechte.ts (Schritt 12a).
+ */
+function pruefeWeiterreichen(pfad: string, text: string): string[] {
+	const befunde: string[] = [];
+	const lokal = new Set<string>();
+	let code = text;
+	for (const i of importeAus(text)) {
+		if (i.quelle === null || zielVon(pfad, i.quelle) !== RECHTE) continue;
+		const namen = i.art === 'statisch' && i.klausel !== null ? benannteNamen(i.klausel) : null;
+		if (i.art === 'dynamisch' || namen === null) {
+			befunde.push(`${pfad}: '${i.quelle}' nur statisch und mit Namen importieren`);
+			continue;
+		}
+		// Die Anweisung selbst ist kein Weiterreichen; der Rest des Texts behält seine Stellen.
+		const [von, bis] = i.bereich;
+		code = code.slice(0, von) + ' '.repeat(bis - von) + code.slice(bis);
+		for (const [name, alias] of namen) {
+			if (BEZEICHNER.test(name) && !RECHTE_PRUEFUNG.includes(name)) continue;
+			if (i.wort === 'export' || !BEZEICHNER.test(alias.trim())) {
+				befunde.push(`${pfad}: reicht '${name}' aus admin/rechte.ts weiter; ${NUR_AUFRUFEN}`);
+			} else lokal.add(alias.trim());
+		}
+	}
+	// Texte zählen nicht: «Die Verwaltung liest …» in einer Meldung ist kein Weiterreichen. Auch hier
+	// zwei Lesarten: ohne alle Texte (auch Template- und Regex-Literale) und nur ohne '…' und "…";
+	// eine Stelle aus einer von beiden gilt.
+	for (const ohneTexte of [code.replace(TEXT_ODER_KOMMENTAR, ''), code.replace(NUR_TEXTE, "''")]) {
+		for (const name of lokal) {
+			for (const t of ohneTexte.matchAll(
+				new RegExp(`(?<![\\w$.])(?<!\\btypeof\\s+)${escape(name)}(?![\\w$])`, 'g')
+			)) {
+				// Ein Aufruf, auch mit Typ-Argument (`liest<T>(…)`), ist kein Weiterreichen.
+				if (/^\s*(?:<[^<>()]*>\s*)?\(/.test(ohneTexte.slice(t.index + name.length))) continue;
+				befunde.push(`${pfad}: reicht '${name}' aus admin/rechte.ts weiter; ${NUR_AUFRUFEN}`);
+			}
+		}
+	}
+	return [...new Set(befunde)];
+}
+
+/**
+ * Wo die Bauregel die Importe aus admin/rechte.ts prüft: `src/` ohne Routen und Tests, auch
+ * `.mts`, `.cts`, `.mjs` und `.cjs` (Vite lädt sie wie `.ts` und `.js`; Schritt 12a).
+ */
+export function betrifftRechteImporte(pfad: string): boolean {
+	return (
+		pfad.startsWith('src/') &&
+		!pfad.startsWith('src/routes/') &&
+		/\.[cm]?[tj]s$/.test(pfad) &&
+		!istTestquelle(pfad)
+	);
+}
+
+// Laden, dessen Ziel die Prüfung nicht liest: `import.meta.glob` (Vite, auch `globEager`) und
+// `require` samt `createRequire` (ohne Methoden wie `x.require` und ohne `function require(`). In
+// Routen und in den Dateien der Rechte-Regel ein Befund, gesperrt im Zweifel (Schritt 12a).
+const NICHT_PRUEFBAR =
+	/\bimport\s*\.\s*meta\s*\.\s*glob|(?<![\w$.])(?<!\bfunction\s+)(?:require|createRequire)\s*\(/g;
+const BERECHNET = 'dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen';
+
+function pruefeNichtPruefbar(pfad: string, text: string): string[] {
+	const woerter = [...text.matchAll(NICHT_PRUEFBAR)].map((t) =>
+		t[0].startsWith('import') ? 'import.meta.glob' : t[0].replace(/\s*\($/, '')
+	);
+	return [...new Set(woerter)].map(
+		(wort) => `${pfad}: ${wort} lässt sich nicht prüfen; nur statische Importe`
+	);
+}
+
+/** Die Regeln, die von den Kommentaren abhängen, für eine Lesart `text` ohne Kommentare. */
+function pruefeLesart(pfad: string, text: string, liste: Set<string> | null): string[] {
+	const befunde: string[] = [];
+	const inRoutes = pfad.startsWith('src/routes/');
+	if (ADMIN_ROUTE.test(pfad)) {
+		if (liste !== null) befunde.push(...pruefeAdminRoute(pfad, text, liste));
+	} else if (inRoutes) {
+		const imp = importeAus(text);
+		if (imp.some((i) => i.quelle !== null && trifft(ADMIN_MODUL, pfad, i.quelle))) {
+			befunde.push(
+				`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
+			);
+		}
+		for (const v of NUR_VERWALTUNG) {
+			if (imp.some((i) => i.quelle !== null && trifft(v.muster, pfad, i.quelle))) {
+				befunde.push(
+					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/${v.datei} nutzen`
+				);
+			}
+		}
+		befunde.push(...pruefeDiensteImporte(pfad, imp));
+		if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
+	}
+	if (inRoutes || betrifftRechteImporte(pfad)) befunde.push(...pruefeNichtPruefbar(pfad, text));
+	if (betrifftRechteImporte(pfad)) {
+		const imp = importeAus(text);
+		if (imp.some((i) => i.quelle === null)) befunde.push(`${pfad}: ${BERECHNET}`);
+		if (VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei)) {
+			befunde.push(...pruefeWeiterreichen(pfad, text));
+		} else befunde.push(...pruefeRechteImporte(pfad, imp));
+	}
+	return befunde;
+}
+
+/**
+ * Prüft die Bauregel: nur API-Routen (`+server.ts`), keine Server-Dateien neben Seiten, Form Actions
+ * oder Remote Functions; dazu, wer die Rechteprüfung der Verwaltung importiert.
+ */
 export function pruefeBauregel(dateien: Map<string, string>): string[] {
 	const befunde: string[] = [];
 	const liste = adminSchnittstellen(dateien);
-	const mitteilungVerwaltung = schnittstellenListe(
-		dateien.get(MITTEILUNG_DATEI) ?? '',
-		'MITTEILUNG_ADMIN_SCHNITTSTELLEN'
-	);
 	const mitAdminRoute = [...dateien.keys()].some((p) => ADMIN_ROUTE.test(p));
 	if (mitAdminRoute && liste === null) {
-		befunde.push(`${SCHNITTSTELLEN_DATEI}: ADMIN_SCHNITTSTELLEN nicht gefunden`);
+		const [erste] = VERWALTUNGS_DATEIEN;
+		befunde.push(`${SERVER}${erste.datei}: ${erste.liste} nicht gefunden`);
 	}
 	for (const [pfad, inhalt] of dateien) {
 		const name = pfad.split('/').pop() ?? pfad;
@@ -215,20 +548,9 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 		if (inRoutes && (ACTIONS_DEKLARATION.test(inhalt) || exportiertActions(inhalt))) {
 			befunde.push(`${pfad}: Form Actions sind nicht vorgesehen`);
 		}
-		if (ADMIN_ROUTE.test(pfad)) {
-			if (liste !== null) befunde.push(...pruefeAdminRoute(pfad, inhalt, liste));
-		} else if (inRoutes) {
-			const imp = importe(inhalt);
-			if (imp.some((i) => i.quelle !== null && ADMIN_MODUL.test(i.quelle))) {
-				befunde.push(
-					`${pfad}: nur Routen unter src/routes/api/admin/ dürfen lib/server/admin nutzen`
-				);
-			}
-			befunde.push(...pruefeMitteilungImporte(pfad, imp, mitteilungVerwaltung));
-			if (imp.some((i) => i.quelle === null)) {
-				befunde.push(`${pfad}: dynamischer Import mit berechnetem Pfad lässt sich nicht prüfen`);
-			}
-		}
+		// Jede Lesart ohne Kommentare für sich; gleiche Befunde zählen einmal.
+		const jeLesart = LESARTEN.flatMap((lesart) => pruefeLesart(pfad, lesart(inhalt), liste));
+		befunde.push(...new Set(jeLesart));
 		if (/\.remote\.(ts|js)$/.test(name)) {
 			befunde.push(`${pfad}: Remote Functions sind nicht vorgesehen`);
 		}
@@ -239,19 +561,19 @@ export function pruefeBauregel(dateien: Map<string, string>): string[] {
 	return befunde;
 }
 
-/** Dateien, die die Bauregel betreffen: Routen, Konfiguration, jede `*.remote.*` und die Liste der Admin-Schnittstellen. */
+/** Dateien, die die Bauregel betreffen: Routen, Konfiguration, jede `*.remote.*` und die Dateien mit den Verwaltungs-Listen. */
 export function betrifftBauregel(pfad: string): boolean {
 	return (
 		pfad.startsWith('src/routes/') ||
-		pfad === SCHNITTSTELLEN_DATEI ||
-		pfad === TURNIER_DATEI ||
-		pfad === MITTEILUNG_DATEI ||
+		VERWALTUNGS_DATEIEN.some((v) => pfad === SERVER + v.datei) ||
 		/^(vite|svelte)\.config\.[cm]?[tj]s$/.test(pfad) ||
 		/\.remote\.(ts|js)$/.test(pfad)
 	);
 }
 
 if (import.meta.main) {
-	const pfade = versionierteDateien().filter(betrifftBauregel);
+	const pfade = versionierteDateien().filter(
+		(p) => betrifftBauregel(p) || betrifftRechteImporte(p)
+	);
 	meldeErgebnis('bauregel', pruefeBauregel(leseDateien(pfade)));
 }

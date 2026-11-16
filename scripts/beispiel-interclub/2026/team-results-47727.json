@@ -1,0 +1,75 @@
+{
+	"title": { "de": "Olten 1", "fr": "Olten 1" },
+	"leagueId": "11",
+	"clubId": "2202",
+	"group": 79,
+	"subtitle": { "de": "15&U Boys Liga B", "fr": "15&U Boys Ligue B" },
+	"results": [
+		{
+			"id": "433830",
+			"round": "1",
+			"date": "10.06",
+			"homeTeamName": "Scheuren 4",
+			"visitTeamName": "Aarberg 2",
+			"homeTeamScore": 3,
+			"visitTeamScore": 0,
+			"encounterId": 433830
+		},
+		{
+			"id": "433827",
+			"round": "1",
+			"date": "14.06",
+			"homeTeamName": "Olten 1",
+			"visitTeamName": "Langenthal 1",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 433827
+		},
+		{
+			"id": "433832",
+			"round": "2",
+			"date": "31.05",
+			"homeTeamName": "Aarberg 2",
+			"visitTeamName": "Langenthal 1",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 433832
+		},
+		{
+			"id": "433828",
+			"round": "2",
+			"date": "21.06",
+			"homeTeamName": "Olten 1",
+			"visitTeamName": "Scheuren 4",
+			"homeTeamScore": 3,
+			"visitTeamScore": 0,
+			"encounterId": 433828
+		},
+		{
+			"id": "433829",
+			"round": "3",
+			"date": "28.06",
+			"homeTeamName": "Aarberg 2",
+			"visitTeamName": "Olten 1",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 433829
+		},
+		{
+			"id": "433831",
+			"round": "3",
+			"date": "27.06",
+			"homeTeamName": "Langenthal 1",
+			"visitTeamName": "Scheuren 4",
+			"homeTeamScore": 3,
+			"visitTeamScore": 0,
+			"encounterId": 433831
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Langenthal 1", "teamId": 48336, "points": 9, "sets": "18 - 0" },
+		{ "rank": 2, "teamName": "Olten 1", "teamId": 47727, "points": 6, "sets": "12 - 6" },
+		{ "rank": 3, "teamName": "Scheuren 4", "teamId": 46399, "points": 3, "sets": "6 - 12" },
+		{ "rank": 4, "teamName": "Aarberg 2", "teamId": 47821, "points": 0, "sets": "0 - 18" }
+	]
+}

@@ -10,8 +10,8 @@ export type AdminFestgelegt =
 	| { ergebnis: 'angelegt' | 'rolle-vergeben' | 'schon-admin' }
 	| { ergebnis: 'fehler'; fehler: Partial<Record<Feld, string>> };
 
-// Annahme K-18.4: Der erste Admin ist MyTCO-Admin und Mitglieder-Admin, bis der Verein die
-// Rollen verteilt; danach nimmt der MyTCO-Admin sie von Hand auseinander.
+// Der erste Admin ist MyTCO-Admin und Mitglieder-Admin, bis die Rollen nach K-18.4 verteilt
+// sind; danach nimmt der MyTCO-Admin sie von Hand auseinander.
 const ERSTER_ADMIN: readonly Rolle[] = ['mytco', 'mitglieder'];
 
 /** Gibt dem Konto die Rollen des ersten Admins und behält die übrigen. Urheber: automatisch. */

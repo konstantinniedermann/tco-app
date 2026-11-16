@@ -7,7 +7,7 @@
 		erzeugeBriefe,
 		type AusgestellterBrief,
 		type BriefListe
-	} from '../../../lib/verwaltung/api.ts';
+	} from '../../../lib/verwaltung/mitglieder-api.ts';
 	import { fehlerText, tagText } from '../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';

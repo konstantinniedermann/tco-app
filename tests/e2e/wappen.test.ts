@@ -3,16 +3,17 @@ import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
-	holeMailCode,
 	legeAdminMitBriefCodeAn,
 	legeKontoMitBriefCodeAn,
-	legeOffenenAnlassAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { legeOffenenAnlassAn } from './hilfen/anlass.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,
 	sammleKonsolenfehler,
+	wartetAufMitgliederliste,
 	wartetAufVorladen
 } from './hilfen/seite.ts';
 
@@ -219,7 +220,7 @@ test('Verwaltung: Wappen zur ersten Seite, Rückfrage auch bei Links der Seitenl
 	await expect(page.getByRole('heading', { level: 1, name: 'Anlässe' })).toBeVisible();
 	await sitztWieVorher(page);
 	await tippeWappen(page, finger);
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await wartetAufMitgliederliste(page);
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
 
 	// Angaben geändert: der Link der Seitenleiste fragt; Abbrechen bleibt.

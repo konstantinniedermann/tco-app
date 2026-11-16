@@ -7,7 +7,8 @@ import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pg from 'pg';
 import { erstelleDb, type Db } from '../../src/lib/server/db/index.ts';
 
-export type EigeneDatenbank = { db: Db; abbauen: () => Promise<void> };
+/** `url` für Code, der die Datenbank selbst über `DATABASE_URL` öffnet (z. B. `holeDb`). */
+export type EigeneDatenbank = { db: Db; url: string; abbauen: () => Promise<void> };
 
 /**
  * Zeitgrenze für einen Test, der seine eigene Datenbank im Testrumpf anlegt: Anlegen und alle
@@ -61,11 +62,11 @@ export async function legeEigeneDatenbankAn(
 	const name = `mytco_${praefix}_${randomBytes(4).toString('hex')}`;
 	const loesche = () =>
 		mitAdminVerbindung((c) => c.query(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`));
+	const url = new URL(process.env.DATABASE_URL!);
+	url.pathname = `/${name}`;
 	let db: Db | undefined;
 	try {
 		await mitAdminVerbindung((c) => c.query(`CREATE DATABASE ${name}`));
-		const url = new URL(process.env.DATABASE_URL!);
-		url.pathname = `/${name}`;
 		db = erstelleDb(url.toString());
 		if (optionen.bis === undefined) {
 			await migrate(drizzle(db.$client), { migrationsFolder: 'drizzle' });
@@ -83,6 +84,7 @@ export async function legeEigeneDatenbankAn(
 	const offen = db;
 	return {
 		db: offen,
+		url: url.toString(),
 		abbauen: async () => {
 			try {
 				await offen.$client.end();

@@ -42,11 +42,11 @@ Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
 
 ```mermaid
 flowchart LR
-  B[Issue-Branch] -->|make check, Hooks| D[Merge nach dev, neue Nummer]
+  B[Issue-Branch] -->|make check, Hooks| D[Merge nach dev, Eintrag unter Unveröffentlicht]
   D --> C1[CI]
   C1 -->|grün| T[Test-Umgebung]
   T --> K[Checkliste auf echten Handys]
-  K --> A[Doku-Abgleich auf dev]
+  K --> A[Doku-Abgleich auf dev, neue Nummer]
   A --> P[PR dev → main]
   P --> C2[CI]
   C2 -->|grün, Merge| L[Live]
@@ -57,7 +57,8 @@ flowchart LR
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
   abgehakt und das Release freigegeben hat (ohne Server: Ausnahmen unter [Versionen](#versionen)).
 - **Doku-Abgleich:** Vor jedem Release, auch einem reinen Doku-Release, wird die Doku gegen
-  Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Danach
+  Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Bei
+  einem Release mit Code setzt der Abgleich die neue Nummer (siehe [Versionen](#versionen)). Danach
   prüft `make release-check`, ob Version, [Versionen](versionen.md) und Tags zusammenpassen
   (genau ein Abschnitt pro Version, der von `package.json` zuoberst; die Version sinkt nicht;
   «Unveröffentlicht» ist leer, sobald sie sich ändert; kein Tag ohne Abschnitt und keiner auf
@@ -65,8 +66,8 @@ flowchart LR
   enthält das Release Code (auch Skripte oder Workflows), muss die Version seit dem letzten
   Release gestiegen sein, nur bei reiner Doku bleibt sie. Ein Befund, der Mitglieder, Vorstand oder Betrieb in die Irre führt,
   hält das Release auf. Ablauf im Skill `tco-branching`.
-- **Version:** Das Release erhöht die Version nicht, Live bekommt die Nummer, die `dev` gerade
-  trägt (Vergabe beim Merge, siehe [Versionen](#versionen)). Nach der erfolgreichen
+- **Version:** Das Release vergibt die Nummer: Der Doku-Abgleich setzt sie vor dem PR, Live
+  bekommt die Nummer, die `dev` danach trägt (siehe [Versionen](#versionen)). Nach der erfolgreichen
   Live-Auslieferung setzt die CI den Tag und das GitHub-Release; dessen Text fasst alle
   Abschnitte der [Versionen](versionen.md) seit dem letzten GitHub-Release zusammen (beim
   ersten alle). Nur dieser
@@ -134,7 +135,9 @@ Doku-Merge ändert ihn nicht.
 wenn die Repo-Variable der Umgebung auf `an` steht: `AUSLIEFERUNG_TEST` (für `dev`) bzw.
 `AUSLIEFERUNG_LIVE` (für `main`). So kann die Demo auf Test laufen, während Live noch aus ist.
 Stehen sie nicht auf `an`, gelten die Jobs als übersprungen, nicht als fehlgeschlagen. Aktiv ist
-nur der Rauchtest.
+nur der Rauchtest. Unmittelbar bevor `AUSLIEFERUNG_LIVE` zum ersten Mal auf `an` geht, werden
+die Migrationen zusammengelegt (E-08, die einzige Ausnahme von «Migrationen fügen nur hinzu»,
+[ADR-013](adr/adr-013-gemeinsame-bausteine.md)).
 
 **Sicherung und Probe:** `sichern` schreibt die Datenbank verschlüsselt mit restic ins
 Sicherungsziel, ohne unverschlüsselte Datei, und löscht Sicherungen nach 30 Tagen, gezählt ab der neuesten Sicherung
@@ -267,7 +270,7 @@ ausserhalb des Servers aufbewahrt werden müssen und wo, steht in
 ## Einstellungen der App
 
 Die App liest ihre Einstellungen aus Umgebungsvariablen. Lokal stehen sie in `.env` (Vorlage
-`.env.example`, kopieren); `make dev`, `make dev-handy`, `make seed` und `make admin` brechen ohne diese Datei ab. Fehlt ein
+`.env.example`, kopieren); `make dev`, `make dev-handy`, `make seed`, `make admin` und `make ic-import` brechen ohne diese Datei ab. Fehlt ein
 `MYTCO_*`-Pflichtwert, startet der Server nicht. Fehlt `DATABASE_URL`, startet er zwar, aber
 `/api/status` meldet einen Fehler und der Login antwortet mit einem Serverfehler. Beim Bauen
 werden sie nicht geprüft.
@@ -284,6 +287,7 @@ werden sie nicht geprüft.
 | `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text für «Wende dich an …», steht im Brief, in der Meldung «Code schon benutzt» und auf der Seite Hilfe (ohne Login lesbar, `/api/kontakt`; darum eine Vereins-Adresse, keine private Nummer; Annahme K-21) | ja |
 | `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
 | `ZEITGEBER` | Nur lokal und im E2E: `aus` schaltet den täglichen Löschlauf ab ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)); auf Test und Live nicht durchgereicht (`betrieb/compose.umgebung.yml`), dort läuft er immer | nein |
+| `IC_VEREIN` | Nur `make ic-import`: Vereinsnummer bei Swiss Tennis, Vorgabe `2202` | nein |
 
 Hinter dem Reverse Proxy liest `adapter-node` die Client-IP aus einer Kopfzeile, die nur der
 Proxy setzt (`ADDRESS_HEADER`, bei `X-Forwarded-For` dazu `XFF_DEPTH`; gesetzt in
@@ -316,14 +320,16 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Doku-Check (Links, Konfliktmarker, Mermaid) | — | vorhanden |
 | Secret-Scan (gitleaks): Hook über die gestagten Änderungen, CI und `make secrets` über die ganze Historie | — | Hook und CI |
 | Secret-Scanning von GitHub mit Sperre beim Push (Einstellung im Repo, gratis für öffentliche Repos) | — | GitHub |
-| ESLint mit Svelte-Regeln, Prettier | ADR-002, Arbeitsregeln | vorhanden |
+| ESLint mit Svelte-Regeln, Prettier; Richtung der Importe zwischen den Server-Modulen unter `src/lib/server/` (`eslint.config.js`, ohne Ausnahme) | ADR-002, Arbeitsregeln | vorhanden |
+| Kein Aufruf `fetch(…)` unter `src/`, auch nicht über `window`, `globalThis` oder `self` und auch nicht in Server, Service Worker und Tests; in der Oberfläche holen Daten nur die Abruf-Module des Themas über `holen` und `src/lib/abruf.ts`, Server und Service Worker bekommen `holen` hineingereicht (ESLint `no-restricted-syntax` in `eslint.config.js`, ohne erlaubte Stelle; `scripts/fetch-regel.test.ts` prüft Proben und das Repo ohne `eslint-disable`). Nicht gefangen: ein weitergereichtes `holen`, `fetch.call(…)`, ein Typ-Zusatz (`as`, `!`), ein berechneter oder verschachtelter Zugriff (`window['fetch']`) | Arbeitsregeln (Abruf-Module) | vorhanden |
+| Design-Dateien unter `src/lib/design/` importiert nur das Wurzel-Layout, vollständig und in der Reihenfolge der Liste `REIHENFOLGE`; `brief.css` nur der Briefdruck; eine Datei im Ordner ohne Eintrag in der Liste ist ein Befund; gelesen werden Skripte, `@import` in CSS-Dateien und `import()` im Markup der Bausteine, nicht aber `@import` im `<style>`-Block eines Bausteins (`scripts/design-importe.test.ts`, Teil der Einheitstests). Die Mockups und das Leitbild führen die Reihenfolge von Hand nach | UI-Leitbild | vorhanden |
 | `svelte-check`, Typprüfung des Service Workers (`tsc`), Runes-Modus fest eingeschaltet | ADR-002 | vorhanden |
-| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN`, `TURNIER_SCHNITTSTELLEN` (Clubmeisterschaft, auch für `cm`) bzw. `MITTEILUNG_ADMIN_SCHNITTSTELLEN` (Mitteilungen der Verwaltung; alle drei deckt der Rechte-Test ab) und reichen `holeAdminDienste()` bzw. `holeMitteilungAdminDienste()` nur weiter; andere Routen nutzen `lib/server/admin` nicht | ADR-002, RR-07 | vorhanden |
+| Bauregel: unter `src/routes` keine `*.server.ts` ausser `+server.ts`, keine Form Actions; Admin-Routen nutzen nur Einträge aus `ADMIN_SCHNITTSTELLEN`, `TURNIER_SCHNITTSTELLEN`, `CM_ADMIN_SCHNITTSTELLEN` und `GESPRAECH_ADMIN_SCHNITTSTELLEN` (Clubmeisterschaft: Turnier, Anmeldungen, Gespräch), `MITTEILUNG_ADMIN_SCHNITTSTELLEN` (Mitteilungen der Verwaltung) bzw. `ANLASS_ADMIN_SCHNITTSTELLEN` (Anlässe der Verwaltung; alle sechs deckt der Rechte-Test ab, Tabelle `VERWALTUNGS_DATEIEN` in `scripts/pruefungen/bauregel.ts`) und reichen `holeAdminDienste()` bzw. `holeMitteilungAdminDienste()` aus `src/lib/server/dienste.ts` nur weiter; andere Routen nutzen `lib/server/admin` und die am Pfad gesperrten Verwaltungs-Dateien (`turnier/schnittstellen.ts` und `verwaltung-schnittstellen.ts` in `cm/`, `gespraech/`, `mitteilung/` und `anlass/`) nicht und holen aus `dienste.ts` nur die Einstiege der Mitglieder (Erlaubt-Liste `MITGLIEDER_EINSTIEGE` in `scripts/pruefungen/bauregel.ts`); Importe mit Namen in Anführungszeichen gelten nach denselben Regeln; die Rechteprüfung `liest`, `schreibt` und `mitKonto` aus `src/lib/server/admin/rechte.ts` importieren nur die Dateien der Tabelle `VERWALTUNGS_DATEIEN` (geprüft in `src/` ohne Routen und Tests, auch `.mts`, `.cts`, `.mjs` und `.cjs`), und diese rufen sie nur auf, ohne sie weiterzureichen; jede Sperre gilt für den Pfad, wie er steht, und für den aufgelösten (`..`, `./`, `//`, `/src/…`), Kommentare zählen nur ausserhalb von Texten, dazu gilt die bisherige Lesart (ein Befund aus einer von beiden zählt); `export { x as 'actions' }` gilt als Form Action; `import.meta.glob`, `require` und ein berechnetes `import()` sind in Routen und in den geprüften Dateien unter `src/` ein Befund | ADR-002, RR-07 | vorhanden |
 | Build als reine Web-App (für die spätere Store-App) | ADR-002 | vorhanden |
-| Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
+| Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), dazu die Vertragstests der Schnittstellen (Grundprüfung, Routen-Test, Bremsen-Test), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
-| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI als ein Job pro Umgebung parallel (je nur mit ihrem Browser); Screenshots als Artefakt pro Umgebung, 30 Tage; im offiziellen Playwright-Image (Browser und Systempakete schon drin, Version aus `package-lock.json`), Datenbank und Mailpit über die Service-Namen; jeder Lauf läuft über `scripts/e2e.ts` auf einer eigenen, danach gelöschten Datenbank (`mytco_e2e_…`) im Postgres-Service | Testkonzept | vorhanden |
+| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI als ein Job pro Umgebung parallel (je nur mit ihrem Browser); Screenshots als Artefakt pro Umgebung, 30 Tage; im offiziellen Playwright-Image (Browser und Systempakete schon drin, Version aus `package-lock.json`), Datenbank und Mailpit über die Service-Namen; jeder Lauf läuft über `scripts/e2e.ts` auf einer eigenen, danach gelöschten Datenbank (`mytco_e2e_…`) im Postgres-Service und baut in einen eigenen, danach gelöschten Ordner (`.e2e-build/…`) | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
 | Docker-Image baut | ADR-003 | vorhanden |
 | Rauchtest des Images (Start, Migration, `/api/status`) | ADR-003 | vorhanden |
@@ -332,7 +338,20 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Annahmen zu beantworteten Fragen an den Verein aufgelöst (`annahmen.ts`) | Abklärungen | vorhanden |
 | Oberfläche nur aus Tokens des Leitbilds (`design-tokens.ts`, `design-festwerte.ts`) | UI-Leitbild | vorhanden |
 | Node-Hauptversion wie in `.nvmrc`, sonst enden Prüfskripte still (`pruefe-node.sh`) | — | vorhanden |
-| Jeder Merge nach `dev` mit Code erhöht die Version um einen Schritt, mit Abschnitt in den Versionen (`version-merge.ts`) | dieses Konzept | nur Hook (Push auf `dev`) |
+| Jeder Merge nach `dev` mit Code bringt einen neuen Eintrag unter «Unveröffentlicht»; steigt die Nummer (Doku-Abgleich), dann um einen Schritt, mit Abschnitt zuoberst und leerem «Unveröffentlicht» (`version-merge.ts`) | ADR-012 | nur Hook (Push auf `dev`) |
+
+**Stylesheet-Vergleich:** `make css-vergleich VORHER=<Ordner> NACHHER=<Ordner>` vergleicht das
+gebaute CSS zweier Builds Zeichen für Zeichen (`scripts/css-vergleich.ts`; der Ablauf steht im Kopf
+der Datei). Es ist ein Hilfsbefehl auf Abruf, etwa nach einem Umbau der Stil-Dateien, keine Prüfung
+und nicht Teil von `make check` oder der CI.
+
+**Spur beim Handstart:** Wird ein E2E-Test nur in der CI rot, lässt sich ein Lauf von Hand mit
+Spur starten (`gh workflow run check.yml --ref <branch> -f spur=true`). Dann zeichnet Playwright
+für jeden Test eine Spur auf (Schritte, Netz, Konsole, Abbilder der Seite; `trace.zip` im Artefakt
+`test-results-<gerät>`, öffnen mit `npx playwright show-trace`); lokal genügt `MYTCO_E2E_SPUR=an`.
+Läufe bei Push und PR zeichnen keine Spur auf und wiederholen keinen Test. Ein Lauf mit Spur dauert
+rund eine Minute länger je Gerät; die Artefakte sind mit zusammen rund 1 GB etwa achtmal so gross
+und liegen wie alle Artefakte 30 Tage öffentlich beim Lauf (nur erfundene Testdaten).
 
 gitleaks und osv-scanner werden als Binary geladen (bei Störungen von GitHub bis zu 5 Wiederholungen im Abstand von 15 s) und danach per SHA-256 geprüft.
 
@@ -342,7 +361,8 @@ Der Pre-Push-Hook lässt `make check` aus, wenn der gepushte Stand schon grün g
 seither nur Doku und die Versionsnummer (in `package.json` und `package-lock.json`, sonst
 wörtlich verglichen) dazukamen. Die Mockups unter `docs/ui-mockups/` zählen dabei als Code,
 weil ein E2E-Test sie liest. Das ist der Normalfall beim Push des Feature-Branches nach dem Review und beim
-Push des Merge-Commits auf `dev`. Kam fremder Code von `dev` dazu, prüft der Hook voll, und
+Push des Merge-Commits auf `dev`; die Ausnahme für die Nummer braucht der Push des
+Doku-Abgleichs, der sie setzt. Kam fremder Code von `dev` dazu, prüft der Hook voll, und
 ebenso im Zweifel (keine Liste, unlesbare Datei). Die Liste liegt unversioniert im
 gemeinsamen Git-Ordner, gilt also für alle Worktrees. Die CI prüft jeden Push auf `dev`
 unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
@@ -385,21 +405,36 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   erste Release *Mitglieder-Login* wird `1.0.0`. Davor gehen eine oder mehrere Vorabversionen 0.x für den
   Pilot der [Testgruppe](testgruppe.md) auf Live (Etappe *Pilot*), mit Checkliste auf Test wie
   jedes Release.
-- **Jeder Merge nach `dev` mit Code bekommt eine neue Nummer**, im Merge-Commit selbst
-  (`package.json`, `package-lock.json` und ein eigener Abschnitt zuoberst in den
-  [Versionen](versionen.md)). Reine Doku (Regel aus `nur-doku.ts`) lässt die Nummer stehen.
-  Die Nummer vergibt, wer mergt, nicht der Feature-Branch: So beanspruchen zwei parallele
-  Sessions nie dieselbe Nummer (Begründung:
-  [ADR-007](adr/adr-007-version-pro-merge.md)). Der Pre-Push-Hook weist einen Push auf `dev` ab, in dem ein
-  Merge mit Code die Version nicht um genau einen Schritt erhöht, sein Abschnitt nicht zuoberst
-  steht oder reine Doku die Version erhöht (`version-merge.ts`); was schon auf `main` liegt, prüft er nicht.
-  Er prüft jeden Commit der Hauptlinie von `dev` einzeln: Ein direkter Commit oder ein Fast-Forward-Merge
-  mit Code scheitert, sofern nicht jeder Commit die Version erhöht; darum mergt der Skill immer mit `--no-ff`. Weil der Hook nur lokal
+- **Eine Nummer entsteht nur beim Release `dev` → `main`** (Begründung:
+  [ADR-012](adr/adr-012-version-beim-release.md), löst ADR-007 ab). Ein Merge nach `dev`
+  vergibt keine Nummer und fasst `package.json` und `package-lock.json` nicht an; der Branch
+  schreibt seinen Eintrag unter «Unveröffentlicht» in den [Versionen](versionen.md) (bei
+  Dependabot, wer mergt). Der Doku-Abgleich vor dem PR setzt die Nummer, macht aus
+  «Unveröffentlicht» den Abschnitt dieser Nummer und kommt als gewöhnlicher Merge nach `dev`;
+  erst danach entsteht der PR. Ein Release nur mit Doku (Regel aus `nur-doku.ts`) lässt die
+  Nummer stehen; seine Einträge bleiben unter «Unveröffentlicht» bis zum nächsten Release mit
+  Code. Zwischen zwei Releases zeigt die Fusszeile dieselbe Nummer; zwei Stände auf
+  `dev` unterscheidet der Commit.
+- **Prüfung beim Push auf `dev`** (`version-merge.ts`, Pre-Push-Hook), je Commit der Hauptlinie
+  einzeln, ohne was schon auf `main` liegt: Bringt er Code und bleibt die Nummer, steht danach
+  unter «Unveröffentlicht» mindestens eine nicht leere Zeile, die vorher nicht dort stand
+  (Leerzeichen zählen nicht). Steigt die Nummer, dann um genau einen Schritt, mit ihrem
+  Abschnitt zuoberst und leerem «Unveröffentlicht». Reine Doku: keine Forderung. Ein Revert eines
+  Merges mit Code braucht einen eigenen Eintrag («… zurückgenommen»). Ein direkter
+  Commit oder ein Fast-Forward-Merge mit Code scheitert, sofern nicht jeder Commit einen Eintrag
+  bringt; darum mergt der Skill immer mit `--no-ff`. Eine Nummer, die jemand beim Merge
+  vergibt, fängt die Prüfung nicht (sie hat die Form des Abgleichs). Weil der Hook nur lokal
   läuft, werden auch die PRs von Dependabot im Hauptordner gemergt, nicht auf GitHub.
-- **Korrektur** (`x.y.Z`) ist der Normalfall bei jedem Merge mit Code. **Nebenversion**
-  (`0.X.0`, Korrektur zurück auf 0) setzt Claude, wenn etwas Grösseres dazukommt: eine neue
-  Etappe oder eine spürbare neue Funktion. **Hauptversion** (`X.0.0`) nur im Auftrag des
-  Projektleiters.
+- **Stufe:** **Nebenversion** (`0.X.0`, Korrektur zurück auf 0), wenn das Release für
+  Mitglieder oder Verwaltung etwas spürbar Neues bringt; **Korrektur** (`x.y.Z`), wenn es nur
+  Fehler behebt oder Inneres und Werkzeug ändert; **Hauptversion** (`X.0.0`) nur im Auftrag
+  des Projektleiters. Claude schlägt Nummer und Grund mit der Bitte um Freigabe vor.
+- **Erstes Release nach ADR-012:** Die Abschnitte zwischen 0.20.5 und diesem Release stammen
+  aus der früheren Regel (eine Nummer je Merge mit Code) und bleiben stehen. Das erste Release
+  trägt `0.23.0`. Eine ganz vergessene Nummer meldet `make release-check` auch hier (rot, weil
+  «Unveröffentlicht» nicht leer ist); den zweiten Weg der Meldung, die Einträge in den
+  Abschnitt «0.22.11» nachzurücken, beim ersten Release nicht wählen: Die Prüfung würde grün,
+  das Release ginge aber als 0.22.11 hinaus.
 - Getaggt wird nur die Nummer, mit der ein Release live geht. Die Zwischenstände davor haben
   keinen Tag und keinen Marker; sie gehen mit diesem Release live.
 - Die Version steht in `package.json`, in der Fusszeile der App und, sobald Live ausgeliefert
@@ -414,14 +449,26 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
 
 ## Alte Versionen auf dem Handy
 
-Die Web-App speichert sich auf dem Handy zwischen (Service Worker). Damit niemand mit einer
-alten Version arbeitet:
+Der Service Worker speichert nichts zwischen: Er ist nur für Push da und hat keinen Cache, die
+Seite kommt bei jedem Start vom Server.
 
-- Eine neue Version lädt **beim nächsten Start** von selbst.
-- Der Server nennt bei jeder Antwort die **Mindestversion**, die er versteht. Ist eine
-  offene App älter, lädt sie neu; eine angefangene Eingabe bleibt dabei erhalten.
-- Die Mindestversion steigt nur, wenn eine Schnittstelle sich unverträglich ändert. Sonst
-  bleiben Schnittstellen mit dem vorherigen Release verträglich.
+- **Beim nächsten Start** läuft die neue Version, ohne Zutun.
+- **Ist die App offen,** merkt sie eine neue Auslieferung mit dem Bordmittel von SvelteKit: Sie
+  vergleicht die Kennung ihres Builds mit `_app/version.json` des Servers, wenn sie wieder in den
+  Vordergrund kommt, und sonst stündlich. Die Kennung ist der Zeitstempel des Builds (`version`
+  in `vite.config.ts` ist mit Absicht nicht gesetzt), also bei jeder Auslieferung neu, auch bei
+  gleicher Versionsnummer. Sie ist nicht die Versionsnummer der Fusszeile.
+- Von selbst neu geladen wird **nur, wenn ein Seitenwechsel scheitert** und der Server dabei
+  eine neue Kennung meldet: wenn der Code der Zielseite auf dem neuen Server fehlt oder die
+  Zielseite mit einem Fehler endet. Dann lädt SvelteKit die Zielseite ganz neu, mit dem neuen
+  Code. Ein Seitenwechsel, der gelingt, bleibt in der App, auch wenn sie die neue Auslieferung
+  schon bemerkt hat; sie arbeitet dann bis zum nächsten Start mit dem alten Code weiter.
+- Eine angefangene Eingabe bleibt beim Neuladen nicht erhalten.
+- Der Server zwingt eine alte App nicht: Es gibt keine Mindestversion. Wer nach einer
+  Auslieferung mit der offenen App weiterarbeitet, schickt mit altem Code an die neuen
+  Schnittstellen. Darum bleiben Schnittstellen mit dem vorherigen Release verträglich.
+- `/api/status` nennt nur `status` und `version` (die Versionsnummer); der Healthcheck liest nur
+  `status`.
 
 ## Actions-Minuten
 
@@ -463,5 +510,6 @@ Erst wenn ein Trigger aus ADR-001 greift (K-22). Dann:
 - Testverteilung über TestFlight (Apple) und interne Tests (Google), dann die Prüfung durch
   die Stores. Der Upload in die Stores ist ein eigener, von Hand ausgelöster Schritt nach dem
   Release.
-- Die Store-App prüft dieselbe Mindestversion, zeigt aber statt Neuladen „Bitte
-  aktualisieren“ mit Link in den Store.
+- Eine Store-App bringt `version.json` selbst mit; das Bordmittel aus «Alte Versionen auf dem
+  Handy» bleibt dort stumm. Ein „Bitte aktualisieren“ mit Link in den Store gibt es noch nicht;
+  es ist mit der Store-App zu bauen.

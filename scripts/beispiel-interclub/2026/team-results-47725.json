@@ -1,0 +1,44 @@
+{
+	"title": { "de": "Olten", "fr": "Olten" },
+	"leagueId": "14",
+	"clubId": "2202",
+	"group": 22,
+	"subtitle": { "de": "12&U Girls Liga B", "fr": "12&U Girls Ligue B" },
+	"results": [
+		{
+			"id": "435720",
+			"round": "1",
+			"date": "14.06",
+			"homeTeamName": "Tela",
+			"visitTeamName": "Olten",
+			"homeTeamScore": 3,
+			"visitTeamScore": 0,
+			"encounterId": 435720
+		},
+		{
+			"id": "435721",
+			"round": "2",
+			"date": "20.06",
+			"homeTeamName": "Scheuren",
+			"visitTeamName": "Tela",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 435721
+		},
+		{
+			"id": "435722",
+			"round": "3",
+			"date": "27.06",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Scheuren",
+			"homeTeamScore": 0,
+			"visitTeamScore": 3,
+			"encounterId": 435722
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Tela", "teamId": 46032, "points": 6, "sets": "12 - 1" },
+		{ "rank": 2, "teamName": "Scheuren", "teamId": 48408, "points": 3, "sets": "7 - 6" },
+		{ "rank": 3, "teamName": "Olten", "teamId": 47725, "points": 0, "sets": "0 - 12" }
+	]
+}

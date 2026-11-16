@@ -7,7 +7,8 @@
 		anfrage,
 		type KategorieWerte
 	} from '../../../../../../lib/verwaltung/Kategorieformular.svelte';
-	import { legeKategorieAn, type KategorieFeld } from '../../../../../../lib/verwaltung/api.ts';
+	import { type KategorieFeld } from '../../../../../../lib/verwaltung/api.ts';
+	import { legeKategorieAn } from '../../../../../../lib/verwaltung/turnier-api.ts';
 	import { fehlerText } from '../../../../../../lib/verwaltung/anzeige.ts';
 	import { leiteUm } from '../../../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';

@@ -1,6 +1,7 @@
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { erstelleDb } from '../db/index.ts';
 import {
 	anmeldung,
@@ -37,8 +38,9 @@ afterAll(async () => {
 	await db.$client.end();
 });
 
-// Die gemeinsame Test-Datenbank hat Turniere anderer Tests: jedes Turnier bekommt ein eigenes Jahr.
-const zufallsJahr = () => 3000 + Math.floor(Math.random() * 6000);
+// Die gemeinsame Test-Datenbank hat Turniere anderer Tests: jedes Turnier bekommt ein eigenes Jahr
+// aus dem Bereich dieser Datei (`tests/hilfen/turnierjahre.ts`).
+const naechstesJahr = turnierjahre(import.meta.url);
 // Anfang Mai, vor dem Anmeldeschluss am 31. Mai.
 const jetztIn = (jahr: number) => new Date(`${jahr}-05-01T10:00:00Z`);
 
@@ -71,7 +73,7 @@ async function kategorieIn(turnierId: number, name: string, teil: Partial<Katego
 /** Offenes Turnier in einem freien Jahr mit Einzel-Kategorien `namen` (Herren R1–R5). */
 async function offenesTurnier(namen: string[] = ['Herren A']) {
 	for (;;) {
-		const jahr = zufallsJahr();
+		const jahr = naechstesJahr();
 		const id = await turnierIm(jahr);
 		if (id === null) continue;
 		const kategorien = [];
@@ -84,7 +86,7 @@ async function offenesTurnier(namen: string[] = ['Herren A']) {
 /** Offenes Turnier in einem freien Jahr; `lege` legt die Kategorien vor dem Öffnen an. */
 async function offenesTurnierMit<T>(lege: (turnierId: number) => Promise<T>) {
 	for (;;) {
-		const jahr = zufallsJahr();
+		const jahr = naechstesJahr();
 		const id = await turnierIm(jahr);
 		if (id === null) continue;
 		const k = await lege(id);
@@ -476,7 +478,7 @@ describe('CM-Anmeldung', () => {
 		let ids: (number | null)[];
 		let jahr: number;
 		do {
-			jahr = zufallsJahr();
+			jahr = naechstesJahr(4) + 1;
 			ids = [];
 			for (const j of [jahr - 1, jahr, jahr + 1, jahr + 2]) ids.push(await turnierIm(j));
 		} while (ids.includes(null));

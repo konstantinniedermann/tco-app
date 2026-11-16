@@ -1,0 +1,103 @@
+{
+	"title": { "de": "Olten", "fr": "Olten" },
+	"leagueId": "62",
+	"clubId": "2202",
+	"group": 6,
+	"subtitle": { "de": "65+ 1L Herren", "fr": "65+ 1L Messieurs" },
+	"results": [
+		{
+			"id": "951024",
+			"round": "1",
+			"date": "28.04",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Novartis Basel",
+			"homeTeamScore": 6,
+			"visitTeamScore": 0,
+			"encounterId": 951024
+		},
+		{
+			"id": "951027",
+			"round": "1",
+			"date": "29.04",
+			"homeTeamName": "Bad Schinznach",
+			"visitTeamName": "Bremgarten AG",
+			"homeTeamScore": 3,
+			"visitTeamScore": 3,
+			"encounterId": 951027
+		},
+		{
+			"id": "951025",
+			"round": "2",
+			"date": "05.05",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Bad Schinznach",
+			"homeTeamScore": 1,
+			"visitTeamScore": 5,
+			"encounterId": 951025
+		},
+		{
+			"id": "951026",
+			"round": "2",
+			"date": "05.05",
+			"homeTeamName": "Bremgarten AG",
+			"visitTeamName": "Novartis Basel",
+			"homeTeamScore": 5,
+			"visitTeamScore": 1,
+			"encounterId": 951026
+		},
+		{
+			"id": "951029",
+			"round": "3",
+			"date": "12.05",
+			"homeTeamName": "Novartis Basel",
+			"visitTeamName": "Bad Schinznach",
+			"homeTeamScore": 1,
+			"visitTeamScore": 5,
+			"encounterId": 951029
+		},
+		{
+			"id": "951028",
+			"round": "3",
+			"date": "12.05",
+			"homeTeamName": "Bremgarten AG",
+			"visitTeamName": "Olten",
+			"homeTeamScore": 3,
+			"visitTeamScore": 3,
+			"encounterId": 951028
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Bad Schinznach", "teamId": 7537, "points": 13, "sets": "29 - 15" },
+		{ "rank": 2, "teamName": "Bremgarten AG", "teamId": 7562, "points": 11, "sets": "24 - 15" },
+		{ "rank": 3, "teamName": "Olten", "teamId": 7396, "points": 10, "sets": "22 - 18" },
+		{ "rank": 4, "teamName": "Novartis Basel", "teamId": 13311, "points": 2, "sets": "6 - 33" }
+	],
+	"tableau": {
+		"isPromotion": false,
+		"results": [
+			{
+				"id": "46824",
+				"round": "4",
+				"date": "09.06 - 10:00",
+				"encounterId": 46824,
+				"isPromotion": false,
+				"team": {
+					"home": {
+						"id": 11769,
+						"name": "Neuenhof 2",
+						"score": 4,
+						"group": { "id": 5, "rank": 4 },
+						"league": { "id": 62 }
+					},
+					"visitor": {
+						"id": 7396,
+						"name": "* Olten",
+						"score": 2,
+						"group": { "id": 6, "rank": 3 },
+						"league": { "id": 62 }
+					}
+				}
+			}
+		]
+	}
+}

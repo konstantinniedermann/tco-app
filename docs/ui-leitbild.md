@@ -14,7 +14,7 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Was | Code-Stelle |
 |-----|-------------|
 | Werte (Farben, Schrift, Abstände, Formen, Bewegung) | `src/lib/design/tokens.css` |
-| Grundstil und Bausteine | `src/lib/design/basis.css` |
+| Grundstil und Bausteine | `src/lib/design/grundlagen.css`, `rahmen.css`, `bedienelemente.css`, `karten.css`, `verwaltung.css`, `anleitung.css`, `uebergaenge.css`, `pc-layout.css`, `druck.css`, `verlauf.css` (Reihenfolge wie in `src/routes/+layout.svelte`, nach `tokens.css`; `scripts/design-importe.test.ts` prüft, dass nur das Wurzel-Layout sie vollständig und in dieser Reihenfolge importiert, `brief.css` nur der Briefdruck; die Mockups und dieses Leitbild führen die Reihenfolge von Hand nach) |
 | Wappen und App-Symbol (Farben fest in der Datei) | `static/wappen.svg`, `static/favicon.svg`, `static/*.png` |
 | Manifest (Name, Farben fest in der Datei; `theme_color` und `background_color` stimmen von Hand mit `--farbe-marke` und `--farbe-hintergrund` überein) | `static/manifest.webmanifest` |
 | Farbe der Browserleiste, Systemschrift-Einstellung, sichere Abstände zu Statusleiste und Notch über `env(safe-area-inset-*)` (`viewport-fit=cover`; nie `apple-mobile-web-app-status-bar-style` `black-translucent`, das schaltet den Schutz vor dem Schleier von iOS ab) | `src/app.html` |
@@ -28,7 +28,8 @@ Dokument. Jede Festlegung nennt die Stelle im Code, die sie umsetzt:
 | Baustein Anleitung (Zeichnung, Ablauf) | `src/lib/ui/Anleitung.svelte`, `src/lib/ui/ZeichnungIphone.svelte`, `src/lib/ui/ZeichnungAndroid.svelte` |
 | Brief mit Einmal-Code (Druck-Layout, Symbole der Anleitung) | `src/lib/server/brief/brief.ts`, `src/lib/server/brief/symbole.ts` |
 | Druckansicht der Briefe (Seite *Briefe*, Seite eines Mitglieds) | `src/lib/verwaltung/Briefdruck.svelte` |
-| Zurück-Link, Pfad, Name mit Rufname, Trefferliste der Verwaltung, Rückfrage-Dialog | `src/lib/ui/Zurueck.svelte`, `src/lib/verwaltung/Pfad.svelte`, `src/lib/ui/Name.svelte`, `src/lib/verwaltung/Spielersuche.svelte`, `src/lib/verwaltung/Aktionsdialog.svelte` |
+| Zurück-Link, Pfad, Name mit Rufname, Trefferliste der Verwaltung, Rückfrage-Dialog der Anmeldelisten (Einzel und Doppel) | `src/lib/ui/Zurueck.svelte`, `src/lib/verwaltung/Pfad.svelte`, `src/lib/ui/Name.svelte`, `src/lib/verwaltung/Spielersuche.svelte`, `src/lib/verwaltung/Aktionsdialog.svelte` |
+| Rückfrage mit Textfeld auf der CM-Seite der Mitglieder (Wildcard beantragen, Kommentar ändern) | `src/lib/cm/Textdialog.svelte` |
 | Titel in der Kopfleiste (wann er einblendet) | `src/lib/ui/kopftitel.ts`, `src/routes/+layout.svelte`, `src/routes/verwaltung/+layout.svelte` |
 | Kontakt eines Spielers in den Anmeldelisten der Verwaltung | `src/lib/verwaltung/Kontakt.svelte` |
 | Seitenkopf der Verwaltung, Tasten einer Tabellenzeile, Dialog «Ändern» (ab drei Aktionen) | `src/lib/verwaltung/Seitenkopf.svelte`, `src/lib/verwaltung/Zeilentasten.svelte`, `src/lib/verwaltung/Zeilenaktionen.svelte`, `src/lib/verwaltung/zeilenaktionen.ts` |
@@ -77,7 +78,8 @@ Alle Paare von Text und Hintergrund erfüllen mindestens WCAG AA (gemessen).
 | `--farbe-text-leise` | `#4a5a58` | Hilfetexte, Nebeninfos | 6.7 : 1 auf Hintergrund |
 | `--farbe-rand` | `#4a5a58` | Rand von Eingabefeldern | 7.3 : 1 (mind. 3 : 1 nötig) |
 | `--farbe-linie` | `#d5ddd9` | Trennlinien, rein dekorativ | — |
-| `--farbe-fehler` | `#b3261e` | Fehlermeldungen, Plakette *gesperrt* | 6.5 : 1 |
+| `--farbe-fehler` | `#b3261e` | Fehlermeldungen, Plakette *gesperrt*; Endstand und Plakette einer Niederlage (Interclub) | 6.5 : 1 |
+| `--farbe-fehler-flaeche` | `#fce8e6` | Hintergrund der Plakette *Niederlage* | fehler darauf 5.5 : 1 |
 | `--farbe-hinweis` | `#7a5200` | Hinweise, Plakette *Brief offen* | 6.3 : 1 auf hinweis-flaeche |
 | `--farbe-hinweis-flaeche` | `#fdf3e7` | Hintergrund von Hinweisen | — |
 
@@ -110,7 +112,7 @@ Mitglied an seinem Gerät eingestellt hat:**
 - Alle Grössen und Abstände sind in `rem`, nie in `px` (UI-02). `html` setzt keine
   Schriftgrösse in px; die Grundgrösse sitzt auf `body`.
 - Android (Chrome ab Version 146): `<meta name="text-scale" content="scale">` in `src/app.html`.
-- iPhone und iPad (Safari): `html { font: -apple-system-body; }` in `basis.css` übernimmt die
+- iPhone und iPad (Safari): `html { font: -apple-system-body; }` in `grundlagen.css` übernimmt die
   Dynamic-Type-Grösse (Standard 17 px statt 16 px, Grundschrift also gut 19 px). Die Regel
   greift nur auf iOS (`-webkit-touch-callout`); Safari am Mac setzte sonst 13 px.
 - PC: Zoom und Schriftgrösse des Browsers wirken über `rem`.
@@ -139,7 +141,7 @@ Mitglied an seinem Gerät eingestellt hat:**
 Ab einer Breite von `60rem` (960 px bei Standardschrift, also auch Tablets quer) gilt das
 PC-Layout. Massgebend ist die Breite des App-Rahmens
 `.app` (Container-Abfrage), nicht die des Fensters; so zeigen auch die Mockups im
-Handy-Rahmen das Handy-Layout. Der Wert steht nur in `basis.css`, weil Abfragen keine Tokens
+Handy-Rahmen das Handy-Layout. Der Wert steht nur in den Stil-Dateien (`pc-layout.css` und wo ein Baustein ihn braucht), weil Abfragen keine Tokens
 erlauben. Weil `.app` ein Container ist, gehen Überlagerungen nur mit `<dialog>`, nicht mit
 `position: fixed`. Einzige Ausnahme ist das Statusleisten-Band; es steht ausserhalb von `.app`.
 
@@ -163,7 +165,7 @@ iPhone nachempfunden und am Muster abgenommen (#54). Wo Bewegung vorkommt, steht
 
 ## Bausteine
 
-Jeder Baustein ist genau einmal als Klasse in `src/lib/design/basis.css` gebaut. Svelte-
+Jeder Baustein ist genau einmal als Klasse in den Stil-Dateien unter `src/lib/design/` gebaut (Bedienelemente, Karten, Verwaltung und Anleitung je in ihrer Datei; die Reihenfolge der Dateien ist fest). Svelte-
 Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese Klassen.
 
 | Baustein | Klasse | Regel |
@@ -185,7 +187,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); ein Auswahlfeld (`select`) sieht aus wie ein Textfeld (gleiche Höhe, gleicher Rand) mit einem Pfeil rechts in `--farbe-text`, auf allen Geräten gleich statt im Aussehen des Browsers (UI-03); gesperrt ohne Pfeil; bei einer festen Höchstlänge zählt der Hilfetext mit („12 von 50 Zeichen", `.feld-hilfe`); als Dateiwahl (`input type="file"`, nur Verwaltung: *Einlesen*) mit dem Rand des Felds und der Wahltaste des Browsers im Aussehen der Nebentaste; Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
 | Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>`. Als Schalter (Ein/Aus, gilt sofort, ohne Speichern-Taste) dieselbe Fläche mit Häkchen statt Kreis (`type="checkbox"`), angehakt heisst ein: *Benachrichtigungen* im Profil |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
-| Karte | `.karte` | weisse Fläche auf Hintergrund; steht eine Überschrift zuoberst, hat sie oben keinen eigenen Abstand (der Innenabstand `--abstand-4` genügt, sonst klafft oben ein Loch); als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
+| Karte | `.karte` | weisse Fläche auf Hintergrund; steht eine Überschrift zuoberst, hat sie oben keinen eigenen Abstand (der Innenabstand `--abstand-4` genügt, sonst klafft oben ein Loch); als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen; Tasten, Warnung und Fehler unter *Rückfrage*); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
 | Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; innerhalb einer Karte als `details.klappe.karte-teil` ohne eigene Fläche, mit der Trennlinie des Kartenteils (z. B. «3 suchen Partner»); klappt weich auf und zu (`--dauer-mittel`) |
 | Kachel | `.kachel` | Eintrag mit Titel links und rechts entweder „›" (der ganze Eintrag ist ein Link) oder genau einer Aktion; `.hervor` = Balken links in Aktion-Farbe für das Wichtigste; ist der ganze Eintrag ein Link, gedrückt `--farbe-marke-zart` und leicht verkleinert und nicht markierbar; eine Kachel mit eigener Aktion bleibt ruhig und markierbar; innerhalb einer Karte als `a.kachel.karte-teil` (z. B. «12 angemeldet ›») |
 | Trefferliste | `ul.trefferliste` | Ergebnisse einer Suche unter dem Suchfeld: je Treffer eine Kachel mit Trennlinie oben, Name links, genau eine Nebentaste rechts; Vermerke als Plakette unter dem Namen; erscheint ab zwei Buchstaben. Ohne Suche und ohne Tasten auch als reine Namensliste (Kategorie einer CM: Angemeldete, Suchende mit Kommentar) |
@@ -194,17 +196,23 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Kartenkopf | `.karte-kopf` | erste Zeile einer Karte: Titel links, rechts oben eine Plakette mit dem eigenen Stand (z. B. «angemeldet»); bei Platzmangel steht die Plakette unter dem Titel, der Titel wird nie abgeschnitten |
 | Sprechblase | `.verlauf` (Liste), `.blase`, `.blase-eigen`, `.blase-leitung`, `.blase-kopf` | nur Mitglieder-App, Verlauf eines Gesprächs: älteste Nachricht oben; `.blase-eigen` rechts auf `--farbe-marke-zart`, `.blase-leitung` links auf `--farbe-flaeche`; im Kopf `.blase-kopf` (`.leise`) Absender («Du», «Turnierleitung») mit Wochentag, Datum und Uhrzeit, eine ungelesene Antwort trägt die Plakette «neu». In der Verwaltung gibt es keine Sprechblasen, dort ist jede Nachricht ein Kartenteil |
 | Verlauf-Nachricht | `.verlauf-nachricht` | Verwaltung, eine Nachricht im Verlauf eines Gesprächs (Kartenteil): Absenderzeile (`.leise`) und Text ohne Absatzabstand, dazwischen `--abstand-1` |
-| Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`) | Status immer mit Text (UI-05). Zustände der Mitgliedschaft: *ausgetreten* = `.plakette`, *wird gelöscht* = `.plakette-gesperrt` |
+| Plakette | `.plakette` (`.plakette-ok`, `.plakette-offen`, `.plakette-gesperrt`, `.plakette-niederlage`, `.plakette-leise`) | Status immer mit Text (UI-05). Zustände der Mitgliedschaft: *ausgetreten* = `.plakette`, *wird gelöscht* = `.plakette-gesperrt`. Ergebnis im Interclub: *Sieg* = `.plakette-ok`, *Niederlage* = `.plakette-niederlage` (`--farbe-fehler` auf `--farbe-fehler-flaeche`), *Unentschieden* = `.plakette-leise` (`--farbe-text-leise` auf `--farbe-hintergrund`) |
+| Umschalter | `.umschalter` | Unterreiter mit Balken oben auf einer Seite (*Resultate · Teams*, *Spiele · Tabelle*): Tasten in einer Zeile mit Trennlinie `--farbe-linie` darunter, je mindestens `--tippflaeche` hoch; der aktive in `--farbe-marke`, fett, mit Balken `--rand-akzent` unten (`aria-pressed="true"`), die anderen in `--farbe-text-leise`; wechselt den Inhalt auf derselben Seite, ohne neue Stufe und ohne Seitenwechsel-Bewegung. Segmente (Knopfgruppe) sind verworfen |
+| Resultatzeile | `.resultat` (`.resultat-stand`, `.resultat-tag`) | eine Begegnung im Interclub, als Kartenteil in einer Karte: links fett die Liga (Übersicht) bzw. «Heim – Gast», darunter «Heim – Gast» bzw. leise Datum und *Heim*/*Auswärts*; Auf- und Abstiegsspiele mit Uhrzeit («<Wochentag> <TT.MM.>, <HH:MM>»), auch kommende in der Übersicht; rechts der Endstand in `--groesse-gross` (`.resultat-stand`) und darunter die Plakette des Ergebnisses. Endstand eines Siegs in `--farbe-marke`, einer Niederlage in `--farbe-fehler`, sonst `--farbe-text`; Begegnungen ohne TCO-Team ohne Farbe und Plakette, kommende ohne Endstand. Bricht bei grosser Schrift um: Endstand und Plakette rutschen unter den Text. In der Übersicht steht über den Begegnungen eines Tages leise und halbfett der Tag (`.resultat-tag`). Eine eigene, gespielte Begegnung ist ein Link auf ihre Seite (`a.resultat`), rechts mit dem Pfeil `.kachel-pfeil` |
+| Partie | `details.partie` (`.partie-titel`, `.partie-nr`, `.partie-saetze`, `.partie-gegner`) | eine Einzelpartie im Interclub als *Aufklappbereich* in der Karte, ab der zweiten als Kartenteil. Titelzeile in normaler Schrift: leise die Position, die TCO-Spieler «Nachname Vorname» wie bei Swiss Tennis mit leiser Klassierung (im Doppel untereinander), rechts fett die Sätze aus Sicht des TCO, bei Sieg in `--farbe-marke`, bei Niederlage in `--farbe-fehler`, dazu der *Vorlesetext* «gewonnen» bzw. «verloren»; Pfeil wie beim *Aufklappbereich*. Aufgeklappt, eingerückt unter die Namen: leise «gegen», die Gegner mit leiser Klassierung (im Doppel untereinander), bei einer Aufgabe darunter leise «Gegner hat aufgegeben» bzw. «TCO hat aufgegeben». Ohne eingetragenen TCO-Spieler (w.o.) steht statt der Namen «–», ohne gespielte Sätze statt der Sätze «w.o.» bei einer Aufgabe, sonst «–». Ohne Plakette und ohne Verein des Gegners |
+| Vorlesetext | `.vorlesen` | Text nur für Screenreader, auf dem Bildschirm unsichtbar; nur wo die Bedeutung sonst allein an einer Farbe hinge (z. B. *Partie*) |
+| Rangliste | `table.rangliste` | einzige Tabelle der Mitglieder-App: Kopfzeile *Rang · Team · Partien · Sätze* in `.leise`, Trennlinie `--farbe-linie`; Zahlen rechtsbündig in gleicher Ziffernbreite; Rang und Zahlen brechen nie um, der Teamname wird nie gekürzt (zu lang: er bricht um). Bei normaler Schrift ist jede Zeile einzeilig. Ist in der Karte weniger als `18rem` Platz (grosse Schrift oder schmaler Bildschirm; Container-Abfrage auf der Karte, der Wert steht nur in `karten.css`), wird jede Zeile zweizeilig: oben Rang und Team, darunter Partien und Sätze (in `--groesse-klein`); alle Zeilen teilen dieselben Spalten, die Rollen der Tabelle stehen ausdrücklich im Markup; die Zeile des eigenen Teams (`.rangliste-eigen`) fett auf `--farbe-marke-zart`. *Partien* = gewonnene : verlorene Einzelpartien |
 | Briefdruck | `.briefdruck` | nur Verwaltung: Druckansicht frisch erzeugter Briefe, siehe [Briefdruck](#briefdruck) |
 | Druckseite | `.druckseite` | nur Verwaltung: Auskunft über die Daten eines Mitglieds, siehe [Druckseite](#druckseite-auskunft); Klasse `.nicht-drucken` blendet unter `@media print` aus |
 | Anleitung | `.anleitung` | gezeichnetes Handy (`.anleitung-film`, ein `.anleitung-bild` pro Schritt), darunter die Taste (`.anleitung-taste`) und die nummerierten Schritte (`.anleitung-schritte`), am Schluss ein Eintrag „Fertig!" (`.anleitung-fertig`, mit ✓ statt Nummer); die Zeichnung ist für Screenreader verborgen, die Schritte tragen die Bedeutung; ein Schritt gehört zu genau einem Bild; in der Zeichnung nur Beschriftungen, die in der Hilfe von Apple bzw. Google belegt sind, sonst graue Balken (`.anleitung-eintrag.leer`); der Tipp-Kreis (`.anleitung-tipp`) zeigt, wo man tippt; Bewegung nach UI-09 |
 | Hinweis | `.hinweis` | ocker, Balken links; immer mit einer Aktion zum Erledigen und einer zum Wegklicken („Nein, danke", „Schliessen"). Einzige Ausnahme ist *Nur ansehen*: oben auf Verwaltungsseiten, auf denen die eigene Rolle etwas nur lesen darf, «**Nur ansehen.** Ändern kann hier nur der <Rolle>.», ohne Aktion; er bleibt, solange die Rolle nur liest. In der Ansicht steht er nicht, dort sagt es das Band |
 | Nur lesen | `fieldset.nur-lesen` | Formular, das die eigene Rolle oder die Ansicht nur lesen lässt: die Felder stehen in `<fieldset disabled class="nur-lesen">` (ohne Rand und Abstand, Text in `--farbe-text`, damit er gut lesbar bleibt); Absende- und Aktions-Tasten fehlen, auch «Weitere …», «Entfernen», «… löschen» und Tasten zum Anlegen. In der Ansicht fehlen in der ganzen App alle Tasten, die etwas speichern (Profil, Antwort auf einen Anlass, Passkey); *Abmelden* bleibt |
 | Fehlermeldung | `.fehler` | rot, direkt beim Feld (UI-06); betrifft sie das ganze Formular (z. B. *Inzwischen hat jemand anderes dieses Mitglied geändert*), unter dem Formular, mit dem Lösungsweg als Nebentaste daneben (*Neuen Stand laden*) |
-| Tabelle | `.tabelle` | nur Verwaltung; auf schmalem Bildschirm (unter `60rem`) waagrecht scrollbar; ab `60rem` ist jede Zeile einzeilig und knapp (Zellen oben und unten mit `--abstand-2`): Tasten brechen nie um; Text, der nicht passt, endet mit „…" (`.zelle-kurz`); die Seite scrollt ab `60rem` nie zur Seite; würde eine Tabelle breiter als ihr Platz (Anmeldungen einer Kategorie), nimmt die Spalte mit Name und Kommentar die übrige Breite und kürzt sich (`.zelle-dehnbar`), sodass die Tabelle nicht zur Seite scrollt und die Tasten ganz im Bild liegen; der volle Text steht in der Detailseite, im Dialog oder, wo es keines von beiden gibt, als `title`; Ausnahme Fairgate: Neue Angaben werden nicht gekürzt (sie werden von dort in Fairgate abgetippt), die Tabelle scrollt dann in ihrer Box; Ausnahme Paare: in Tabellen mit Doppelpaaren und offenen Partner-Anfragen (Spalte «Von / An») steht jeder Spieler in einer eigenen einzeiligen Zeile, Status und Taste stehen nur einmal pro Paar bzw. Anfrage. Auf jeder Breite (auch unter `60rem`): höchstens zwei kurze Tasten pro Zeile, ab drei Aktionen steht dort eine Taste «Ändern», die den Dialog *Ändern* öffnet; ist nur eine Aktion möglich, bleibt sie als Taste stehen; enthält sie keine Links oder Tasten, ist der Bereich eine benannte Region mit `tabindex="0"`, damit er per Tastatur scrollt |
+| Tabelle | `.tabelle` | nur Verwaltung (in der App nur der Baustein *Rangliste*); auf schmalem Bildschirm (unter `60rem`) waagrecht scrollbar; ab `60rem` ist jede Zeile einzeilig und knapp (Zellen oben und unten mit `--abstand-2`): Tasten brechen nie um; Text, der nicht passt, endet mit „…" (`.zelle-kurz`); die Seite scrollt ab `60rem` nie zur Seite; würde eine Tabelle breiter als ihr Platz (Anmeldungen einer Kategorie), nimmt die Spalte mit Name und Kommentar die übrige Breite und kürzt sich (`.zelle-dehnbar`), sodass die Tabelle nicht zur Seite scrollt und die Tasten ganz im Bild liegen; der volle Text steht in der Detailseite, im Dialog oder, wo es keines von beiden gibt, als `title`; Ausnahme Fairgate: Neue Angaben werden nicht gekürzt (sie werden von dort in Fairgate abgetippt), die Tabelle scrollt dann in ihrer Box; Ausnahme Paare: in Tabellen mit Doppelpaaren und offenen Partner-Anfragen (Spalte «Von / An») steht jeder Spieler in einer eigenen einzeiligen Zeile, Status und Taste stehen nur einmal pro Paar bzw. Anfrage. Auf jeder Breite (auch unter `60rem`): höchstens zwei kurze Tasten pro Zeile, ab drei Aktionen steht dort eine Taste «Ändern», die den Dialog *Ändern* öffnet; ist nur eine Aktion möglich, bleibt sie als Taste stehen; enthält sie keine Links oder Tasten, ist der Bereich eine benannte Region mit `tabindex="0"`, damit er per Tastatur scrollt |
 | Zelle, gekürzt | `.zelle-kurz` | freier Text in einer Tabellenzelle (Name, Kommentar, Betreff): einzeilig, ein zu langer Text endet mit „…"; nur ab `60rem`. Die Klasse steht auf dem Textelement in der Zelle (z. B. `<span class="leise zelle-kurz">`), nicht auf dem `<td>`: dort wirkt die Höchstbreite ohne festes Tabellenlayout nicht; in `.zelle-dehnbar` wird sie schmaler, wenn der Platz fehlt |
 | Zelle, dehnbar | `.zelle-dehnbar` | nur ab `60rem`: die eine Spalte einer Tabelle mit freiem Text (Name, Kommentar) nimmt die Breite, die die übrigen Spalten lassen; `<div class="zelle-dehnbar">` als einziges Kind des `<td>`, darin Name und Kommentar als `.zelle-kurz` und Plaketten nebeneinander in einer Zeile; Plaketten bleiben ganz; der Name (erstes Element) hat Vorrang und endet erst mit „…", wenn er allein nicht passt, ein Kommentar dahinter nimmt nur den Rest und endet mit „…". Unter `60rem` steht der Inhalt wie in jeder Zelle |
 | Ändern-Dialog | `<dialog class="karte">` | öffnet die Taste «Ändern» einer Tabellenzeile (auf jeder Breite): Name der Zeile, der volle Text (z. B. Kommentar) und die Aktionen, die gerade gehen, je als Taste; jede Taste schliesst den Dialog und öffnet den Dialog der Aktion; «Abbrechen» schliesst; zählt für UI-04 als eigener Bildschirm |
+| Rückfrage | `<dialog class="karte">` | Titel, darunter der Inhalt (Name der Zeile, Auswahl, Feld), zuunterst die Tasten in einer `.leiste`: zuerst «Abbrechen» (Nebentaste), zuletzt die Haupttaste; sie nennt, was sie tut («Löschen», «Verschieben», «Beantragen»). Gibt es zwei Entscheide, steht der zweite als Nebentaste dazwischen (Wildcard-Antrag: «Abbrechen · Ablehnen · Bestätigen»); gibt es in der Einzel-Liste nichts auszuführen (Verschieben ohne andere Kategorie), steht nur «Abbrechen», in der Doppel-Liste bleibt die Haupttaste gesperrt stehen. In den Anmeldelisten der Turnier-Verwaltung (Einzel und Doppel, `Aktionsdialog`) gilt dazu: Warnt der Server, stehen die Warnungen über den Tasten als Liste, ein Satz je Punkt in der Reihenfolge des Servers (`role="alert"`); die Haupttaste heisst dann «Trotzdem …» («Trotzdem anmelden») und führt die Aktion trotz der Warnung aus; in den Dialogen, in denen der Server warnen kann, verwirft eine neue Wahl Warnungen und Fehler. Ein Fehler steht als *Fehlermeldung* über den Tasten, der Dialog bleibt offen. Bei Erfolg, oder wenn sich der Stand inzwischen geändert hat, schliesst er; die Liste lädt neu und sagt es in einem Satz über der Tabelle, der den Fokus bekommt. Mit einem Textfeld ist die Rückfrage ein Formular (CM-Seite der Mitglieder: *Wildcard beantragen*, *Kommentar ändern*): unter dem Titel leise die Kategorie, das Feld mit Hilfetext und Zähler, der Fehler direkt beim Feld (UI-06), darunter «Abbrechen» und die Haupttaste |
 | Seitenkopf | `.seitenkopf` | nur Verwaltung: Pfad und `<h1>` einer Seite zusammen; ab `60rem` klebt er oben am Inhalt, auf der Fläche in `--farbe-hintergrund` mit einer dünnen Linie in `--farbe-linie` darunter, die beim Scrollen hereinblendet (rein in CSS per `animation-timeline: scroll()`; Browser ohne diese Zeitleiste zeigen die Linie immer); Seiten ohne Pfad kleben nur mit dem Titel; steht ein Hinweis darüber (*Nur ansehen*), beginnt der Seitenkopf unter ihm und überdeckt ihn nie; unter `60rem` und im Druck klebt nichts |
 | Treffer (Spielersuche) | `.treffer` | Trefferbereich der Spielersuche unter dem Suchfeld, überall wo sie steht (Von Hand anmelden, Doppelpartner ändern): immer da, mit fester Höhe `min(26.875rem, 35dvh)`, also etwa 5 Treffer, auf niedrigen Bildschirmen höchstens 35 % der sichtbaren Höhe; `26.875rem` sind 5 Treffer zu je zwei Zeilen (Name, darunter leise Angaben): 5 × 4,9375rem je `.auswahl` (Text 1,125 × 1,5 + leise 1 × 1,5 Zeilenhöhe, 2 × `--abstand-2` Polster, 2 × `--rand-dick` Rand, `--abstand-2` Abstand unten) + 2,1875rem Legende; Tippen und Treffer ändern die Grösse nie; vor der Suche steht darin leise «Ab 2 Buchstaben.», bei keinem Ergebnis «Keine Treffer.», bei einem Fehler dessen Text, alles im selben Bereich; bei mehr Treffern scrollt nur er, mit Tastatur und Finger; die Angabe steht nicht zusätzlich als Hilfetext unter dem Feld, beschreibt das Feld aber per `aria-describedby`; kein Aussenabstand unter der Gruppe im Bereich |
 | Symbol | `.symbol` | eigene SVG-Symbole, 24er-Raster, Strich 2, immer mit Text |
@@ -257,7 +265,8 @@ aktiv: weisse Schrift auf Grün; aktiv: helle Pille (`--farbe-marke-zart`) mit S
 zwischen „MyTCO" und den Reitern und wird gekürzt, wenn der Platz fehlt; die Reiter verschiebt
 er nie.
 
-- **Reiter:** Start · CM · Profil; *Lizenz* kommt mit der Etappe *Lizenzanträge*. Höchstens
+- **Reiter:** Start · CM · IC · Profil; *IC* steht nur, wenn Interclub-Daten da sind (sonst
+  Start · CM · Profil). Wo *Lizenz* hinkommt, entscheidet die Etappe *Lizenzanträge*. Höchstens
   4 Reiter, kein verstecktes Menü (☰). „CM" ist die Kurzform, weil „Clubmeisterschaft" bei
   grosser Schrift nicht in den Reiter passt; Seitentitel schreiben es aus. Die Reiter stehen
   nach dem Login auf jeder Seite der App; jede Seite markiert den Reiter ihres Bereichs
@@ -278,6 +287,38 @@ er nie.
   Zeile «Kontaktperson», mit der Kachel «Dein Gespräch mit der Turnierleitung ›». Die Kachel steht nur, wo geschrieben werden darf oder schon ein Gespräch besteht; die Kontaktperson selbst sieht die Karte mit ihrem Namen, ohne Kachel.
   Die **Kategorie einer CM** listet alle bestätigten Anmeldungen (im Doppel
   Paare und Suchende mit Kommentar) und hat keine Tasten.
+- **Reiter IC:** oberste Seite `/interclub`, Titel «Interclub <Jahr>» (neueste Saison mit Daten),
+  darunter leise «Stand: <TT.MM.JJJJ>, <HH:MM>». Umschalter **Resultate · Teams**; vorgewählt ist
+  *Resultate* während der Saison und *Teams*, wenn die Saison abgeschlossen ist oder in den letzten
+  und den nächsten 7 Tagen kein TCO-Team spielt (Pause zwischen Spieltagen). *Resultate*: Karte
+  «Letzte Resultate» (Begegnungen der TCO-Teams der letzten 7 Tage, nach Tag gruppiert, neueste
+  zuerst), darunter Karte «Nächste Spiele» (nächste 7 Tage, früheste zuerst); je Begegnung eine
+  *Resultatzeile*; leere Karten fallen weg; ist die Saison abgeschlossen, steht stattdessen eine
+  Karte «Saison <Jahr> abgeschlossen. Die Saison <Jahr+1> steht hier, sobald Swiss Tennis den
+  Spielplan veröffentlicht.»; in einer Pause zwischen Spieltagen eine Karte «In den letzten und den
+  nächsten 7 Tagen spielt kein TCO-Team.». *Teams*: Zwischentitel «Aktive und Senioren» und «Junioren», je Team
+  eine Kachel mit der Liga, darunter leise «<Teamname> · <Rang>. von <N>», gegebenenfalls
+  « · Aufstiegsspiele» bzw. « · Abstiegsspiele»; ist die Saison abgeschlossen, darüber leise
+  «Saison <Jahr> abgeschlossen: Schlussrang jedes Teams.». Fehlt in diesem Jahr ein Wettbewerb,
+  steht in seinem Abschnitt «Spielplan <Jahr> noch nicht da». Ohne Daten (direkt aufgerufen):
+  «Zurzeit gibt es keine Interclub-Resultate.». Entwurf: Design-Artifact «MyTCO Interclub» (#81).
+- **Seite eines Teams** (`/interclub/[id]`): Zurück «‹ Interclub», Titel die Liga, darunter leise
+  «<Teamname> · Gruppe <G> · <Rang>. von <N>». Umschalter **Spiele · Tabelle**. *Spiele*: je Runde
+  eine Karte «Runde <n>» mit allen Begegnungen der Gruppe als *Resultatzeile*; die des eigenen
+  Teams fett, mit Heim/Auswärts und Ergebnis. *Tabelle*: Karte «Gruppe <G>» mit dem Baustein
+  *Rangliste* (ohne Rangliste statt ihrer «Die Tabelle steht nach der ersten Runde.»); darunter,
+  falls vorhanden, Karte «Aufstiegsspiele» bzw. «Abstiegsspiele» mit
+  Datum und Uhrzeit. Gegner stehen nur mit Team- bzw. Vereinsnamen.
+- **Seite einer Begegnung** (`/interclub/[id]/[begegnung]`): erreichbar über die eigenen, gespielten
+  Begegnungen in *Spiele* und *Resultate* (auch Auf- und Abstiegsspiele). Zurück «‹ <Liga>», Titel
+  «<Heim> – <Gast>», darunter leise «<Wochentag> <TT.MM.> · Heim/Auswärts · Runde <n>», bei Auf- und
+  Abstiegsspielen mit Uhrzeit und «· Aufstiegsspiel» bzw. «· Abstiegsspiel» statt der Runde. Eine
+  Karte mit dem Endstand in einer Zeile: links leise «Endstand · Sätze <Heim>:<Gast>» (in derselben Reihenfolge wie der Endstand), rechts der
+  Endstand wie in der *Resultatzeile* mit Plakette. Umschalter **Einzel · Doppel**, darunter eine
+  Karte mit einer *Partie* je Einzel bzw. Doppel; gibt es keine Doppel, «Nicht gespielt: Die
+  Begegnung war nach den Einzeln entschieden.». Ohne Einzelpartien von Swiss Tennis statt
+  Umschalter und Karte: «Einzelpartien noch nicht da.». Entwurf: Design-Artifact «MyTCO Interclub»,
+  Reihe 7 (#81).
 - **Startseite:** „Hoi <Rufname, sonst Vorname>", für Konten mit Verwaltungsrolle direkt darunter die Kachel
   „Verwaltung ›", dann „Jetzt aktuell" (Kacheln, die wichtigste hervorgehoben); Anlässe stehen als Kacheln unter „Jetzt aktuell" (A-STARTSEITE-02, A-STARTSEITE-04). Kommende Anlässe
   stehen unter „Jetzt aktuell" als hervorgehobene Kachel mit Datum und dem eigenen Stand
@@ -295,8 +336,8 @@ er nie.
   Formularschritte dürfen den Schritt nennen statt der Elternseite: *E-Mail ändern* Schritt 2
   „‹ Andere Adresse" (zurück zu Schritt 1).
 - **Höchstens zwei Stufen unter dem Reiter**, z. B. CM › Herren R5/R9 › Spiel gegen X. Was
-  tiefer wäre, wird ein *Umschalter* auf derselben Seite oder ein *Blatt von unten*
-  ([Vorgaben für Künftiges](#vorgaben-für-künftiges)).
+  tiefer wäre, wird ein *Umschalter* auf derselben Seite ([Bausteine](#bausteine)) oder ein
+  *Blatt von unten* ([Vorgaben für Künftiges](#vorgaben-für-künftiges)).
 - **Einstiegsseite** (nur im Handy-Browser, nicht vom Symbol aus): „Willkommen bei MyTCO", eine Karte „Zuerst auf den Startbildschirm" mit der Anleitung bzw. auf Android der Haupttaste „MyTCO installieren", darunter der Link „Ohne Startbildschirm weiter" zum Login.
 - **Hilfe:** ohne Login, über die Fusszeile; jedes Thema ein Aufklappbereich, der Kontakt eine Karte.
 - **Datenschutz:** ohne Login, über die Fusszeile (DS-09); Text der Datenschutzerklärung in einer Karte, solange er nicht freigegeben ist mit dem leisen Vermerk «Entwurf».
@@ -366,6 +407,9 @@ Verlauf zurück. Gebaut in `src/lib/ui/navigation.ts`.
 | Kategorie einer CM (alle Anmeldungen) | CM | „‹ <Name der CM>" |
 | Doppel einer CM (Partnerwahl) | CM | „‹ <Name der CM>" |
 | Gespräch mit der Turnierleitung | CM | „‹ <Name der CM>" |
+| Interclub (Übersicht) | IC | — |
+| Seite eines Teams | IC | „‹ Interclub" |
+| Seite einer Begegnung | IC | „‹ <Liga>" |
 | Profil | Profil | — |
 | E-Mail ändern | Profil | „‹ Profil" |
 
@@ -385,10 +429,6 @@ Verlauf zurück. Gebaut in `src/lib/ui/navigation.ts`.
 Noch nicht gebaut; gilt für den CM-Betrieb und alles, was tiefer als zwei Stufen würde.
 Entwurf: Design-Artifact «MyTCO Navigation und Tiefe» (#69).
 
-- **Umschalter** (Unterreiter mit Balken): Einträge wie *Spiele · Rangliste · Teilnehmer* oben
-  auf einer Seite, der aktive in `--farbe-marke` mit Balken `--rand-akzent` unten, die anderen
-  leise; wechselt den Inhalt auf derselben Seite, ohne neue Stufe. Segmente (Knopfgruppe) sind
-  verworfen.
 - **Blatt von unten** für das letzte Stück eines Ablaufs (z. B. *Resultat melden*): ein
   `<dialog>`, das von unten hereinkommt; „Abbrechen" schliesst es, die Seite darunter bleibt.
 
@@ -568,7 +608,7 @@ Seite *Auskunft*.
 | ID | Regel |
 |----|-------|
 | UI-01 | WCAG 2.2 Stufe AA ist die Untergrenze; die E2E-Tests prüfen jeden Bildschirm mit axe auf iPhone, Android und PC. |
-| UI-02 | Schrift folgt der Systemeinstellung des Geräts; Grössen und Abstände nur in `rem`. Bis 200 % Schrift wird nichts abgeschnitten und nichts waagrecht gescrollt, ausser Tabellen der Verwaltung. |
+| UI-02 | Schrift folgt der Systemeinstellung des Geräts; Grössen und Abstände nur in `rem`. Bis 200 % Schrift wird nichts abgeschnitten und nichts waagrecht gescrollt, ausser Tabellen der Verwaltung; die *Rangliste* der App wird dafür zweizeilig (Baustein *Rangliste*). |
 | UI-03 | Tasten, Felder und Reiter sind mindestens 48 × 48 px gross (`--tippflaeche`). Der Fokus ist immer sichtbar (`--farbe-marke`, `--fokus-breite`); auf grünen Flächen (Kopfleiste, Seitenleiste, Reiter am PC) in `--farbe-marke-hell`. |
 | UI-04 | Höchstens eine Haupttaste pro Bildschirm. |
 | UI-05 | Bedeutung nie nur über Farbe: Status als Plakette mit Text, Symbole immer mit Text. |
@@ -584,7 +624,7 @@ Sie trennen nicht, weil die Tabelle auf schmalem Bildschirm ohnehin waagrecht sc
 
 Vorlagen für die ersten Bildschirme (Abnahme durch den Projektleiter in #13). Die CM-Anmeldung
 (Zähler) und die Reiter am PC sind dort überholt; massgebend ist der Text dieses Leitbilds. Sie binden `tokens.css`
-und `basis.css` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im Browser öffnen:
+und die Stil-Dateien unter `src/lib/design/` direkt ein und ändern sich mit, wenn sich ein Token ändert. Im Browser öffnen:
 
 - [Mockups](ui-mockups/index.html): Login, erstes Login (Schritt 2 von 3), Startseite mit
   Reitern, CM-Anmeldung, Mitgliederverwaltung am PC

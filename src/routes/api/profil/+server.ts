@@ -1,4 +1,4 @@
-import { holeProfilDienste } from '../../../lib/server/profil/index.ts';
+import { holeProfilDienste } from '../../../lib/server/dienste.ts';
 import { getProfil, postProfil } from '../../../lib/server/profil/schnittstellen.ts';
 import type { RequestHandler } from './$types';
 

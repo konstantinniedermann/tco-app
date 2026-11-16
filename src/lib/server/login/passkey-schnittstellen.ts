@@ -2,13 +2,15 @@ import { geraetAusBrowser } from './geraet.ts';
 import type { Ort } from './passkey-pruefer.ts';
 import type { PasskeyDienst } from './passkey.ts';
 import {
+	abgemeldet,
 	antwort,
 	formatFehler,
 	istJson,
 	leseKoerper,
-	loginAntwort,
+	nichtGefunden,
 	type Ereignis
-} from './schnittstellen.ts';
+} from '../http.ts';
+import { loginAntwort } from './schnittstellen.ts';
 import { SITZUNG_COOKIE } from './sitzung.ts';
 
 const ort = (e: Ereignis): Ort => ({ rpId: e.url.hostname, herkunft: e.url.origin });
@@ -21,20 +23,19 @@ function angemeldet(e: Ereignis): { kontoId: number; kennung: string } | null {
 	return konto && kennung ? { kontoId: konto.kontoId, kennung } : null;
 }
 
-const nichtAngemeldet = () => antwort(401, {});
 const falsch = () => antwort(400, { fehler: 'falsch' });
 
 export async function postEinrichtenOptionen(d: PasskeyDienst, e: Ereignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
 	const s = angemeldet(e);
-	if (!s) return nichtAngemeldet();
+	if (!s) return abgemeldet();
 	return antwort(200, await d.optionenEinrichten(s.kontoId, ort(e)));
 }
 
 export async function postEinrichten(d: PasskeyDienst, e: Ereignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
 	const s = angemeldet(e);
-	if (!s) return nichtAngemeldet();
+	if (!s) return abgemeldet();
 	const { antwort: browserAntwort } = await leseKoerper(e);
 	const r = await d.einrichten(
 		s.kontoId,
@@ -69,7 +70,7 @@ export async function postAnmelden(d: PasskeyDienst, e: Ereignis): Promise<Respo
 
 export async function getPasskeys(d: PasskeyDienst, e: Ereignis): Promise<Response> {
 	const s = angemeldet(e);
-	if (!s) return nichtAngemeldet();
+	if (!s) return abgemeldet();
 	const liste = await d.liste(s.kontoId, ort(e));
 	return antwort(200, {
 		passkeys: liste.map((p) => ({
@@ -84,18 +85,28 @@ export async function getPasskeys(d: PasskeyDienst, e: Ereignis): Promise<Respon
 export async function postEntfernen(d: PasskeyDienst, e: Ereignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
 	const s = angemeldet(e);
-	if (!s) return nichtAngemeldet();
+	if (!s) return abgemeldet();
 	const { kennung } = await leseKoerper(e);
 	if (typeof kennung !== 'string') return falsch();
-	return (await d.entferne(s.kontoId, kennung)) === 'ok'
-		? antwort(204)
-		: antwort(404, { fehler: 'nicht-gefunden' });
+	return (await d.entferne(s.kontoId, kennung)) === 'ok' ? antwort(204) : nichtGefunden();
 }
 
 export async function postHinweis(d: PasskeyDienst, e: Ereignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
 	const s = angemeldet(e);
-	if (!s) return nichtAngemeldet();
+	if (!s) return abgemeldet();
 	await d.hinweisErledigt(s.kennung);
 	return antwort(204);
 }
+
+// Alle Schnittstellen zu Passkeys; die Grundprüfung (`src/lib/server/grundpruefung.db.test.ts`)
+// läuft über jeden Eintrag.
+export const PASSKEY_SCHNITTSTELLEN = {
+	postEinrichtenOptionen,
+	postEinrichten,
+	postAnmeldenOptionen,
+	postAnmelden,
+	getPasskeys,
+	postEntfernen,
+	postHinweis
+} satisfies Record<string, (d: PasskeyDienst, e: Ereignis) => Promise<Response>>;

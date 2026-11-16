@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { erstelleDb } from '../db/index.ts';
 import { aenderung, anmeldung, anmeldungSpieler, mitglied } from '../db/schema.ts';
 import type { KategorieWerte } from '../turnier/angaben.ts';
@@ -35,8 +36,9 @@ afterAll(async () => {
 	await db.$client.end();
 });
 
-// Die gemeinsame Test-Datenbank hat Turniere anderer Tests: jedes Turnier bekommt ein eigenes Jahr.
-const zufallsJahr = () => 3000 + Math.floor(Math.random() * 6000);
+// Die gemeinsame Test-Datenbank hat Turniere anderer Tests: jedes Turnier bekommt ein eigenes Jahr
+// aus dem Bereich dieser Datei (`tests/hilfen/turnierjahre.ts`).
+const naechstesJahr = turnierjahre(import.meta.url);
 // Anfang Mai, vor dem Anmeldeschluss am 31. Mai.
 const jetztIn = (jahr: number) => new Date(`${jahr}-05-01T10:00:00Z`);
 // Juni: nach dem Anmeldeschluss.
@@ -61,7 +63,7 @@ async function kategorieIn(turnierId: number, name: string, teil: Partial<Katego
 /** Turnier in einem freien Jahr mit Einzel-Kategorien `namen` (Herren R1–R5), offen oder nicht. */
 async function turnier(namen: string[] = ['Herren A'], offen = true) {
 	for (;;) {
-		const jahr = zufallsJahr();
+		const jahr = naechstesJahr();
 		const r = await legeTurnierAn(db, {
 			jahr,
 			name: `Clubmeisterschaft ${jahr}`,

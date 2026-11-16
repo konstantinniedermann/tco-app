@@ -6,13 +6,8 @@ import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { pushAbo } from '../db/schema.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
-import {
-	getBenachrichtigungen,
-	postAboLoeschen,
-	postAbo,
-	postThemen,
-	type MitteilungDienste
-} from './schnittstellen.ts';
+import { getBenachrichtigungen, postAboLoeschen, postAbo, postThemen } from './schnittstellen.ts';
+import type { MitteilungDienste } from './typen.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {

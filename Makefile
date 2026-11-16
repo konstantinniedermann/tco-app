@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev dev-handy seed admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief
+.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev dev-handy seed ic-import admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief css-vergleich
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -58,9 +58,12 @@ dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einste
 dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs iPhone im selben WLAN mit einem festen Namen je Rolle (Kurt, Theo, Mona, Hanna) (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
 	./scripts/dev-handy.sh
 
-seed: voraussetzungen-env db ## Lokale Datenbank migrieren und Testbestand anlegen (mehrfach ausführbar): 5 Personas mit Login und Brief-Code, rund 200 erfundene Mitglieder, eine Beispiel-GV, ein Clubabend und ein Beispielturnier 2027 (6 Spieler mit Login ohne Brief-Code, Hanna als Kontaktperson, drei Beispielgespräche mit der Turnierleitung), Brief-Codes ausgeben für Erika (MyTCO-Admin und Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin) (Einstellungen aus .env)
+seed: voraussetzungen-env db ## Lokale Datenbank migrieren und Testbestand anlegen (mehrfach ausführbar): 5 Personas mit Login und Brief-Code, rund 200 erfundene Mitglieder, eine Beispiel-GV, ein Clubabend, Interclub-Resultate 2026 und ein Beispielturnier 2027 (6 Spieler mit Login ohne Brief-Code, Hanna als Kontaktperson, drei Beispielgespräche mit der Turnierleitung), Brief-Codes ausgeben für Erika (MyTCO-Admin und Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin) (Einstellungen aus .env)
 	node --env-file=.env scripts/migrate.ts
 	node --env-file=.env scripts/seed-lokal.ts
+
+ic-import: voraussetzungen-env db ## Interclub-Resultate von Swiss Tennis holen, z. B. make ic-import JAHR=2026 (Verein aus IC_VEREIN, Vorgabe 2202; .env wird geladen)
+	JAHR=$(JAHR) node --env-file=.env scripts/ic-import.ts
 
 admin: voraussetzungen-env db ## Ersten Admin festlegen, z. B. make admin ARGS='--mitgliedernummer 1 --vorname … --nachname … --strasse … --plz … --ort … --email …'
 	node --env-file=.env scripts/admin-festlegen.ts $(ARGS)
@@ -80,6 +83,9 @@ build: ## Produktions-Build
 musterbrief: voraussetzungen ## Musterbrief als PDF mit erfundenen Daten (musterbrief/musterbrief.pdf)
 	node scripts/musterbrief.ts
 
+css-vergleich: voraussetzungen ## Gebautes CSS zweier Builds vergleichen, Beweis für Schritt 18: make css-vergleich VORHER=<Ordner> NACHHER=<Ordner> (Ablauf im Kopf von scripts/css-vergleich.ts; nicht Teil von check)
+	node scripts/css-vergleich.ts '$(VORHER)' '$(NACHHER)'
+
 image: voraussetzungen-docker ## Docker-Image bauen (mytco:lokal)
 	docker build -t mytco:lokal .
 
@@ -92,6 +98,6 @@ betrieb-nachweis: voraussetzungen-docker image ## Lokaler Gesamtnachweis auf Doc
 secrets: ## Secret-Scan über die ganze Git-Historie (gitleaks)
 	@gitleaks git --no-banner --redact --exit-code 1 .
 
-hooks: ## Versionierte Git-Hooks aktivieren (Secret-Scan, Code-Prüfung bei Commit und Push, Versionsprüfung beim Push auf dev, kein Push auf main)
+hooks: ## Versionierte Git-Hooks aktivieren (Secret-Scan, Code-Prüfung bei Commit und Push, Eintrag in den Versionen beim Push auf dev, kein Push auf main)
 	@git config core.hooksPath .githooks
 	@echo "Git-Hooks aus .githooks/ aktiv."

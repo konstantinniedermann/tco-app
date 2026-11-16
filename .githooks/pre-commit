@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Lokaler pre-commit-Hook (aktivieren: make hooks).
 # Feature-Branches prüft der CI-Secret-Scan erst nach dem Merge auf dev, daher schon hier.
-# Reine Doku-Commits: Secret-Scan + make docs (Doku-Check, Test-IDs). Sobald Code dabei ist: make check-schnell.
+# Reine Doku-Commits: Secret-Scan + make docs (Links, Struktur, Test-IDs, Annahmen, Design-Tokens). Sobald Code dabei ist: make check-schnell.
 set -euo pipefail
 
 if ! command -v gitleaks >/dev/null 2>&1; then

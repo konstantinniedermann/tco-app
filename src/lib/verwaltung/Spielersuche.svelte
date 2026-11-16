@@ -6,7 +6,7 @@
 -->
 <script lang="ts">
 	import Name from '../ui/Name.svelte';
-	import { sucheSpieler, type SpielerTreffer } from './api.ts';
+	import { sucheSpieler, type SpielerTreffer } from './turnier-api.ts';
 	import { fehlerText } from './anzeige.ts';
 	import { trefferText } from './turnier-anzeige.ts';
 	import { leiteUm } from './umleiten.ts';

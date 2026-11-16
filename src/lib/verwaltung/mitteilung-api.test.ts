@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { FELD_MELDUNG } from '../mitteilung/vorlagen.ts';
 import {
 	AUSWAHL_NAMEN,
 	WEG_NAMEN,
@@ -13,20 +14,7 @@ import {
 	zeigeVorschau,
 	type MitteilungWerte
 } from './mitteilung-api.ts';
-
-type Aufruf = { pfad: string; init: RequestInit };
-
-function holer(antwort: Response | Error) {
-	const aufrufe: Aufruf[] = [];
-	const holen = async (pfad: string, init: RequestInit) => {
-		aufrufe.push({ pfad, init });
-		if (antwort instanceof Error) throw antwort;
-		return antwort;
-	};
-	return { aufrufe, holen };
-}
-
-const json = (status: number, inhalt: unknown) => Response.json(inhalt, { status });
+import { holer, json } from '../../../tests/hilfen/abruf.ts';
 
 const WERTE: MitteilungWerte = {
 	titel: 'Erinnerung: GV',
@@ -86,7 +74,12 @@ describe('Mitteilungen in der Verwaltung: Anfragen', () => {
 	});
 
 	it('FR-42: Eingabefehler kommen je Feld als Satz an, andere Antworten unverändert', async () => {
-		const falsch = holer(json(400, { fehler: 'eingabe', felder: ['titel', 'text'] }));
+		const falsch = holer(
+			json(400, {
+				fehler: 'eingabe',
+				felder: { titel: FELD_MELDUNG.titel, text: FELD_MELDUNG.text }
+			})
+		);
 		expect(await zeigeVorschau({ art: 'verein' }, WERTE, falsch.holen)).toEqual({
 			art: 'eingabe',
 			felder: {
@@ -102,6 +95,13 @@ describe('Mitteilungen in der Verwaltung: Anfragen', () => {
 		expect(await sendeMitteilung({ art: 'verein' }, WERTE, weg.holen)).toEqual({
 			art: 'stoerung'
 		});
+	});
+
+	// Rand, den der gemeinsame Abruf-Baustein genau so erhalten muss (Charakterisierung vor Schritt 13).
+	it('FR-42: 409 veraltet beim Senden kommt als eigenes Ergebnis an', async () => {
+		const v = holer(json(409, { fehler: 'veraltet' }));
+		expect(await sendeMitteilung({ art: 'verein' }, WERTE, v.holen)).toEqual({ art: 'veraltet' });
+		expect(v.aufrufe[0].pfad).toBe('/api/admin/mitteilungen/senden');
 	});
 });
 

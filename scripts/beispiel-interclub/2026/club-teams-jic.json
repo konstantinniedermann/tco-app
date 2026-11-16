@@ -1,0 +1,47 @@
+{
+	"name": "Olten",
+	"teams": [
+		{
+			"id": 47727,
+			"ligue": { "name": { "de": "15&U Boys Liga B 1", "fr": "15&U Boys Ligue B 1" } },
+			"group": 79,
+			"order": 16
+		},
+		{
+			"id": 45330,
+			"ligue": { "name": { "de": "15&U Boys Liga B 2", "fr": "15&U Boys Ligue B 2" } },
+			"group": 74,
+			"order": 16
+		},
+		{
+			"id": 46798,
+			"ligue": { "name": { "de": "15&U Girls Liga B", "fr": "15&U Girls Ligue B" } },
+			"group": 32,
+			"order": 21
+		},
+		{
+			"id": 42976,
+			"ligue": { "name": { "de": "12&U Boys Liga B 2", "fr": "12&U Boys Ligue B 2" } },
+			"group": 63,
+			"order": 26
+		},
+		{
+			"id": 47726,
+			"ligue": { "name": { "de": "12&U Boys Liga B 1", "fr": "12&U Boys Ligue B 1" } },
+			"group": 64,
+			"order": 26
+		},
+		{
+			"id": 47725,
+			"ligue": { "name": { "de": "12&U Girls Liga B", "fr": "12&U Girls Ligue B" } },
+			"group": 22,
+			"order": 31
+		},
+		{
+			"id": 46797,
+			"ligue": { "name": { "de": "Kids 10&U", "fr": "Kids 10&U" } },
+			"group": 39,
+			"order": 35
+		}
+	]
+}

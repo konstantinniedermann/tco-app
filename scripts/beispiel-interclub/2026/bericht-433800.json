@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "31. Mai 2026",
+	"homeTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 3,
+		"sets": 6,
+		"games": 41
+	},
+	"awayTeam": {
+		"name": "Porrentruy 1",
+		"clubNumber": 2205,
+		"points": 0,
+		"sets": 2,
+		"games": 28
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900302,
+							"name": "Sandplatz Willi R8 (21578)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900306,
+							"name": "Saitenbett Bruno R8 (26728)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "6:1", "6:0"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900305,
+							"name": "Ballwand Alma R7 (18961)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900307,
+							"name": "Griffband Cleo R7 (19177)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:4", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900304,
+							"name": "Seitenwechsel Zeno R8 (27281)"
+						},
+						{
+							"id": 900305,
+							"name": "Ballwand Alma R7 (18961)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900306,
+							"name": "Saitenbett Bruno R8 (26728)"
+						},
+						{
+							"id": 900307,
+							"name": "Griffband Cleo R7 (19177)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:7", "7:6", "10:8"]
+		}
+	],
+	"leagueId": 11,
+	"groupId": 74
+}

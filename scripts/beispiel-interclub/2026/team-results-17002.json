@@ -1,0 +1,116 @@
+{
+	"title": { "de": "Olten 2", "fr": "Olten 2" },
+	"leagueId": "11",
+	"clubId": "2202",
+	"group": 38,
+	"subtitle": { "de": "3L Herren", "fr": "3L Messieurs" },
+	"results": [
+		{
+			"id": "975053",
+			"round": "1",
+			"date": "02.05",
+			"homeTeamName": "Saignelégier",
+			"visitTeamName": "Herzogenbuchsee",
+			"homeTeamScore": 1,
+			"visitTeamScore": 8,
+			"encounterId": 975053
+		},
+		{
+			"id": "975051",
+			"round": "1",
+			"date": "02.05",
+			"homeTeamName": "Olten 2",
+			"visitTeamName": "Utzenstorf",
+			"homeTeamScore": 7,
+			"visitTeamScore": 2,
+			"encounterId": 975051
+		},
+		{
+			"id": "975055",
+			"round": "2",
+			"date": "10.05",
+			"homeTeamName": "Herzogenbuchsee",
+			"visitTeamName": "Utzenstorf",
+			"homeTeamScore": 4,
+			"visitTeamScore": 5,
+			"encounterId": 975055
+		},
+		{
+			"id": "975049",
+			"round": "2",
+			"date": "10.05",
+			"homeTeamName": "Langenthal",
+			"visitTeamName": "Saignelégier",
+			"homeTeamScore": 6,
+			"visitTeamScore": 3,
+			"encounterId": 975049
+		},
+		{
+			"id": "975057",
+			"round": "3",
+			"date": "16.05",
+			"homeTeamName": "Utzenstorf",
+			"visitTeamName": "Saignelégier",
+			"homeTeamScore": 8,
+			"visitTeamScore": 1,
+			"encounterId": 975057
+		},
+		{
+			"id": "975050",
+			"round": "3",
+			"date": "17.05",
+			"homeTeamName": "Olten 2",
+			"visitTeamName": "Langenthal",
+			"homeTeamScore": 9,
+			"visitTeamScore": 0,
+			"encounterId": 975050
+		},
+		{
+			"id": "975054",
+			"round": "4",
+			"date": "06.06",
+			"homeTeamName": "Saignelégier",
+			"visitTeamName": "Olten 2",
+			"homeTeamScore": 0,
+			"visitTeamScore": 9,
+			"encounterId": 975054
+		},
+		{
+			"id": "975048",
+			"round": "4",
+			"date": "06.06",
+			"homeTeamName": "Langenthal",
+			"visitTeamName": "Herzogenbuchsee",
+			"homeTeamScore": 2,
+			"visitTeamScore": 7,
+			"encounterId": 975048
+		},
+		{
+			"id": "975052",
+			"round": "5",
+			"date": "14.06",
+			"homeTeamName": "Herzogenbuchsee",
+			"visitTeamName": "Olten 2",
+			"homeTeamScore": 5,
+			"visitTeamScore": 4,
+			"encounterId": 975052
+		},
+		{
+			"id": "975056",
+			"round": "5",
+			"date": "14.06",
+			"homeTeamName": "Utzenstorf",
+			"visitTeamName": "Langenthal",
+			"homeTeamScore": 7,
+			"visitTeamScore": 2,
+			"encounterId": 975056
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Olten 2", "teamId": 17002, "points": 29, "sets": "59 - 17" },
+		{ "rank": 2, "teamName": "Herzogenbuchsee", "teamId": 11317, "points": 24, "sets": "56 - 26" },
+		{ "rank": 3, "teamName": "Utzenstorf", "teamId": 14908, "points": 22, "sets": "46 - 36" },
+		{ "rank": 4, "teamName": "Langenthal", "teamId": 16521, "points": 10, "sets": "25 - 55" },
+		{ "rank": 5, "teamName": "Saignelégier", "teamId": 12081, "points": 5, "sets": "14 - 66" }
+	]
+}

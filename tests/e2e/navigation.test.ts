@@ -2,18 +2,12 @@ import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import {
-	benenneTurnier,
-	legeKontoMitBriefCodeAn,
-	legeOffenenAnlassAn,
-	legeOffenesTurnierAn,
-	schliesseLoginHilfen,
-	setzeSpielerangaben,
-	setzeTelefon
-} from './hilfen/login.ts';
+import { legeKontoMitBriefCodeAn, schliesseLoginHilfen, setzeTelefon } from './hilfen/login.ts';
+import { benenneTurnier, legeOffenesTurnierAn, setzeSpielerangaben } from './hilfen/turnier.ts';
+import { legeOffenenAnlassAn } from './hilfen/anlass.ts';
 import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
-// Übersichtliche Navigation (#69, UI-Leitbild «Feste Ordnung»): Reiter Start · CM · Profil auf
+// Übersichtliche Navigation (#69, UI-Leitbild «Feste Ordnung»): Reiter Start · CM · IC · Profil auf
 // allen Seiten nach dem Login, Zurück-Link mit Ziel, Reiter CM, Pfad in der Verwaltung.
 
 // Alle Browser kommen von 127.0.0.1 an denselben Server; die Grenze von 10 Code-Anfragen pro IP
@@ -96,9 +90,9 @@ const reiter = (page: Page, name: 'Start' | 'CM' | 'Profil') =>
 test.describe('Mitglieder-App', () => {
 	test.skip(({ isMobile }) => !isMobile, 'nur Handy'); // skip: Die Reiter unten sind fürs Handy; am PC stehen sie in der Kopfleiste, das prüft bewegung.test.ts
 
-	test('#69: drei Reiter Start · CM · Profil', async ({ page }) => {
+	test('#69: vier Reiter Start · CM · IC · Profil', async ({ page }) => {
 		await meldeAn(page, 'Nora');
-		await expect(reiterleiste(page).getByRole('link')).toHaveText(['Start', 'CM', 'Profil']);
+		await expect(reiterleiste(page).getByRole('link')).toHaveText(['Start', 'CM', 'IC', 'Profil']);
 	});
 
 	test('#69: Reiter stehen auf Unterseiten, der Bereich ist markiert', async ({ page }, info) => {
@@ -332,7 +326,7 @@ test.describe('am PC', () => {
 	test('#69: Reiter in der Kopfleiste auch auf Unterseiten, mit CM', async ({ page }) => {
 		await meldeAn(page, 'Ada');
 		await page.goto('/profil/email');
-		await expect(reiterleiste(page).getByRole('link')).toHaveText(['Start', 'CM', 'Profil']);
+		await expect(reiterleiste(page).getByRole('link')).toHaveText(['Start', 'CM', 'IC', 'Profil']);
 		await expect(reiter(page, 'Profil')).toHaveAttribute('aria-current', 'page');
 		await reiter(page, 'CM').click();
 		await expect(page).toHaveURL(/\/clubmeisterschaft(\/\d+)?$/);
@@ -345,7 +339,7 @@ test.describe('am PC', () => {
 		test.skip(info.project.name !== 'desktop', 'nur Desktop'); // skip: Fensterbreite und Mitte sind nur dort fest
 		await meldeAn(page, 'Mia');
 		await page.goto('/profil');
-		await expect(page.locator('nav.reiter a .symbol')).toHaveCount(3);
+		await expect(page.locator('nav.reiter a .symbol')).toHaveCount(4);
 		for (const symbol of await page.locator('nav.reiter a .symbol').all()) {
 			await expect(symbol).toBeVisible();
 		}

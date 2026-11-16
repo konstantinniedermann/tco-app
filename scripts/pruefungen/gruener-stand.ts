@@ -8,9 +8,9 @@ import { istNurDoku } from './nur-doku.ts';
 // überspringt das volle `make check` für einen schon grün geprüften Prüfstand.
 // Prüfstand = SHA-256 über alle Dateien eines Commits ausser Doku (Regel aus nur-doku.ts, aber
 // mit den Mockups, die ein Test liest) und
-// ohne die Versionsnummer in package.json/package-lock.json: Der Merge nach dev bringt die neue
-// Nummer, der Code bleibt derselbe. Die Liste liegt im gemeinsamen Git-Ordner (alle Worktrees),
-// unversioniert; die CI prüft unabhängig davon jeden Push auf dev.
+// ohne die Versionsnummer in package.json/package-lock.json: Der Doku-Abgleich vor dem Release
+// bringt die neue Nummer (ADR-012), der Code bleibt derselbe. Die Liste liegt im gemeinsamen
+// Git-Ordner (alle Worktrees), unversioniert; die CI prüft unabhängig davon jeden Push auf dev.
 //
 //   beginn          vor dem Prüfen: HEAD festhalten, wenn nichts Uncommittetes herumliegt
 //   merken          nach grünem Prüfen: Prüfstand von HEAD merken, wenn HEAD gleich und sauber blieb
@@ -49,7 +49,7 @@ export function ohneVersion(pfad: string, inhalt: string): string {
 }
 
 /** Prüfstand eines Commits (64 Hex-Zeichen). Wirft, wenn package.json o. ä. unlesbar ist. */
-export function pruefstand(rev: string): string {
+function pruefstand(rev: string): string {
 	const eintraege = git('-c', 'core.quotePath=false', 'ls-tree', '-r', '-z', rev)
 		.split('\0')
 		.filter(Boolean)

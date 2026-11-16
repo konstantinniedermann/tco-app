@@ -2,14 +2,13 @@ import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
-	holeMailCode,
 	legeCmMitBriefCodeAn,
 	legeKontoAn,
-	legeOffenenAnlassAn,
 	legeRollenkontoMitBriefCodeAn,
-	meldeZumAnlass,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { legeOffenenAnlassAn, meldeZumAnlass } from './hilfen/anlass.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,
@@ -249,7 +248,7 @@ test('FR-42: allgemeine Mitteilung an den Verein', async ({ page }, info) => {
 	).toBeVisible();
 	await pruefeBildschirm(page, info, 'mitteilung-verein-vorschau');
 
-	// Der Versand an alle aktiven Mitglieder ist in admin-schnittstellen.db.test.ts belegt; hier
+	// Der Versand an alle aktiven Mitglieder ist in verwaltung-schnittstellen.db.test.ts belegt; hier
 	// antwortet ein Ersatz, damit keine Mail an Konten paralleler Tests geht.
 	// Der erste Versuch scheitert unterwegs: Die Mitteilung kann trotzdem schon draussen sein.
 	let anfrage: unknown = null;

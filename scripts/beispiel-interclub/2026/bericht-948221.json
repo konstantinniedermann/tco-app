@@ -1,0 +1,184 @@
+{
+	"title": "Beispiel",
+	"subtitle": "03. Mai 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 2,
+		"sets": 5,
+		"games": 41
+	},
+	"awayTeam": {
+		"name": "Dagmersellen",
+		"clubNumber": 2098,
+		"points": 4,
+		"sets": 8,
+		"games": 59
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900001,
+							"name": "Muster Anna R6 (3805)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900002,
+							"name": "Beispiel Beat R6 (2933)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:4", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900003,
+							"name": "Platzhalter Carla R7 (6907)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900004,
+							"name": "Vorlage Dario R6 (2284)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "0:6", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900005,
+							"name": "Punktgewinn Elena R6 (3875)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900006,
+							"name": "Erfunden Fabio R7 (4230)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "6:3", ""]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900007,
+							"name": "Testmann Gina R8 (9040)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900008,
+							"name": "Fiktiv Hugo R8 (8396)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["0:6", "1:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900001,
+							"name": "Muster Anna R6 (3805)"
+						},
+						{
+							"id": 900003,
+							"name": "Platzhalter Carla R7 (6907)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900008,
+							"name": "Fiktiv Hugo R8 (8396)"
+						},
+						{
+							"id": 900004,
+							"name": "Vorlage Dario R6 (2284)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["7:5", "5:7", "8:10"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900007,
+							"name": "Testmann Gina R8 (9040)"
+						},
+						{
+							"id": 900009,
+							"name": "Annahme Ines R8 (11250)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900006,
+							"name": "Erfunden Fabio R7 (4230)"
+						},
+						{
+							"id": 900010,
+							"name": "Entwurf Jonas R7 (6130)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["1:6", "2:6", ""]
+		}
+	],
+	"leagueId": 21,
+	"groupId": 16
+}

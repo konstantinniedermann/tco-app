@@ -6,13 +6,15 @@ import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
 	gibLogin,
 	legeKontoMitBriefCodeAn,
-	legeOffenesTurnierAn,
 	schliesseLoginHilfen,
-	setzeSpielerangaben,
-	setzeTelefon,
-	stelleAnfrageDirekt,
-	warteAufMail
+	setzeTelefon
 } from './hilfen/login.ts';
+import {
+	legeOffenesTurnierAn,
+	setzeSpielerangaben,
+	stelleAnfrageDirekt
+} from './hilfen/turnier.ts';
+import { warteAufMail } from './hilfen/mail.ts';
 import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
 
 // CM Teil 3 Etappe 1: Doppel mit Partner-Anfrage am Handy (A-ANMELDUNG-04, FR-48, FR-49, FR-19,

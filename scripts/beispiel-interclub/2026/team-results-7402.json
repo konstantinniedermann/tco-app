@@ -1,0 +1,103 @@
+{
+	"title": { "de": "Olten", "fr": "Olten" },
+	"leagueId": "21",
+	"clubId": "2202",
+	"group": 16,
+	"subtitle": { "de": "30+ 2L Damen", "fr": "30+ 2L Dames" },
+	"results": [
+		{
+			"id": "948220",
+			"round": "1",
+			"date": "03.05",
+			"homeTeamName": "Mellingen",
+			"visitTeamName": "Triengen",
+			"homeTeamScore": 3,
+			"visitTeamScore": 3,
+			"encounterId": 948220
+		},
+		{
+			"id": "948221",
+			"round": "1",
+			"date": "03.05",
+			"homeTeamName": "Olten",
+			"visitTeamName": "Dagmersellen",
+			"homeTeamScore": 2,
+			"visitTeamScore": 4,
+			"encounterId": 948221
+		},
+		{
+			"id": "948223",
+			"round": "2",
+			"date": "09.05",
+			"homeTeamName": "Mellingen",
+			"visitTeamName": "Olten",
+			"homeTeamScore": 4,
+			"visitTeamScore": 2,
+			"encounterId": 948223
+		},
+		{
+			"id": "948219",
+			"round": "2",
+			"date": "10.05",
+			"homeTeamName": "Dagmersellen",
+			"visitTeamName": "Triengen",
+			"homeTeamScore": 6,
+			"visitTeamScore": 0,
+			"encounterId": 948219
+		},
+		{
+			"id": "948218",
+			"round": "3",
+			"date": "17.05",
+			"homeTeamName": "Dagmersellen",
+			"visitTeamName": "Mellingen",
+			"homeTeamScore": 6,
+			"visitTeamScore": 0,
+			"encounterId": 948218
+		},
+		{
+			"id": "948222",
+			"round": "3",
+			"date": "30.05",
+			"homeTeamName": "Triengen",
+			"visitTeamName": "Olten",
+			"homeTeamScore": 1,
+			"visitTeamScore": 5,
+			"encounterId": 948222
+		}
+	],
+	"ranking": [
+		{ "rank": 1, "teamName": "Dagmersellen", "teamId": 12563, "points": 16, "sets": "32 - 6" },
+		{ "rank": 2, "teamName": "Olten", "teamId": 7402, "points": 9, "sets": "20 - 20" },
+		{ "rank": 3, "teamName": "Mellingen", "teamId": 17381, "points": 7, "sets": "17 - 23" },
+		{ "rank": 4, "teamName": "Triengen", "teamId": 9201, "points": 4, "sets": "9 - 29" }
+	],
+	"tableau": {
+		"isPromotion": true,
+		"results": [
+			{
+				"id": "46164",
+				"round": "4",
+				"date": "06.06 - 08:00",
+				"encounterId": 46164,
+				"isPromotion": true,
+				"team": {
+					"home": {
+						"id": 12002,
+						"name": "* Cham",
+						"score": 6,
+						"group": { "id": 15, "rank": 1 },
+						"league": { "id": 21 }
+					},
+					"visitor": {
+						"id": 7402,
+						"name": "Olten",
+						"score": 0,
+						"group": { "id": 16, "rank": 2 },
+						"league": { "id": 21 }
+					}
+				}
+			}
+		]
+	}
+}

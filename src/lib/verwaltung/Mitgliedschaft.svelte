@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { type Antwort } from './api.ts';
 	import {
-		erfasseAustritt,
 		erfasseWiedereintritt,
 		loescheMitglied,
-		nimmLoeschungZurueck,
-		type Antwort,
-		type MitgliedDetail
-	} from './api.ts';
+		nimmLoeschungZurueck
+	} from './mitglieder-api.ts';
+	import { erfasseAustritt, type MitgliedDetail } from './mitglieder-api.ts';
 	import {
 		VERALTET,
 		datumText,

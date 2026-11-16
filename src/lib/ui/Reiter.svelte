@@ -1,13 +1,16 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { navigating, page } from '$app/state';
-	import { aktiverReiter, REITER, type Bereich } from './navigation.ts';
+	import { aktiverReiter, reiterFuer, type Bereich } from './navigation.ts';
 
 	// Reiter (UI-Leitbild, Bewegung und Bedienung): Der angetippte Reiter ist sofort aktiv, auch
 	// wenn seine Seite noch lädt; der Balken gleitet hinüber. Nochmals antippen: auf einer
 	// Unterseite zur obersten Seite des Bereichs (normaler Link), auf der obersten nach oben.
 	const aktiv = $derived(aktiverReiter(page.route.id, navigating.to?.route.id ?? null));
-	const index = $derived(REITER.findIndex((pfad) => pfad === aktiv));
+	// IC steht nur, wenn es Interclub-Daten gibt (das Layout fragt `/api/sitzung`).
+	const interclub = $derived(page.data.interclub === true);
+	const reiter = $derived(reiterFuer(interclub));
+	const index = $derived(reiter.findIndex((pfad) => pfad === aktiv));
 	// Die Seite einer CM ist die oberste des Reiters CM, wenn sie die einzige laufende ist.
 	const aufOberster = $derived(page.route.id === aktiv || page.data.bereichsWurzel === true);
 
@@ -25,7 +28,7 @@
 <nav
 	class="reiter"
 	aria-label="Hauptnavigation"
-	data-anzahl={REITER.length}
+	data-anzahl={reiter.length}
 	data-aktiv={index}
 	data-sveltekit-preload-code="eager"
 >
@@ -50,6 +53,20 @@
 			<path d="M18.4 5.6a9 9 0 0 0 0 12.8" />
 		</svg>CM
 	</a>
+	{#if interclub}
+		<a
+			href={resolve('/interclub')}
+			aria-current={aktiv === '/interclub' ? 'page' : undefined}
+			onclick={(e) => antippen(e, '/interclub')}
+		>
+			<svg class="symbol" aria-hidden="true" viewBox="0 0 24 24">
+				<path d="M3 20h18" />
+				<path d="M9.5 20V8h5v12" />
+				<path d="M4 20v-7h5.5" />
+				<path d="M14.5 11H20v9" />
+			</svg>IC
+		</a>
+	{/if}
 	<a
 		href={resolve('/profil')}
 		aria-current={aktiv === '/profil' ? 'page' : undefined}

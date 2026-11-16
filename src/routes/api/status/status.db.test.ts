@@ -4,7 +4,6 @@ import { afterAll, describe, expect, test, vi } from 'vitest';
 import { APP_VERSION } from '../../../lib/version.ts';
 import { erstelleDb as erstelleDbRoh, holeDb, type Db } from '../../../lib/server/db/index.ts';
 import { ermittleStatus } from '../../../lib/server/status.ts';
-import { MINDESTVERSION } from '../../../lib/server/version.ts';
 import { GET } from './+server.ts';
 
 const offeneDbs: Db[] = [];
@@ -39,11 +38,7 @@ describe('/api/status', () => {
 		const res = await GET();
 		expect(res.status).toBe(200);
 		expect(res.headers.get('cache-control')).toBe('no-store');
-		expect(await res.json()).toEqual({
-			status: 'ok',
-			version: APP_VERSION,
-			mindestversion: MINDESTVERSION
-		});
+		expect(await res.json()).toEqual({ status: 'ok', version: APP_VERSION });
 	});
 
 	test('GET /api/status ohne DATABASE_URL → 503 ohne Details', async () => {
@@ -56,11 +51,7 @@ describe('/api/status', () => {
 			const res = await frischesGet();
 			expect(res.status).toBe(503);
 			expect(res.headers.get('cache-control')).toBe('no-store');
-			expect(await res.json()).toEqual({
-				status: 'fehler',
-				version: APP_VERSION,
-				mindestversion: MINDESTVERSION
-			});
+			expect(await res.json()).toEqual({ status: 'fehler', version: APP_VERSION });
 		} finally {
 			process.env.DATABASE_URL = url;
 			log.mockRestore();
@@ -78,11 +69,7 @@ describe('/api/status', () => {
 			offeneDbs.push((await import('../../../lib/server/db/index.ts')).holeDb());
 			expect(res.status).toBe(503);
 			expect(res.headers.get('cache-control')).toBe('no-store');
-			expect(await res.json()).toEqual({
-				status: 'fehler',
-				version: APP_VERSION,
-				mindestversion: MINDESTVERSION
-			});
+			expect(await res.json()).toEqual({ status: 'fehler', version: APP_VERSION });
 		} finally {
 			process.env.DATABASE_URL = url;
 			log.mockRestore();
@@ -119,11 +106,7 @@ describe('/api/status', () => {
 	test('Datenbank nicht erreichbar → fehler ohne Details', async () => {
 		const tot = erstelleDb('postgres://mytco:x@127.0.0.1:1/keine');
 		const antwort = await ermittleStatus(() => tot);
-		expect(antwort).toEqual({
-			status: 'fehler',
-			version: APP_VERSION,
-			mindestversion: MINDESTVERSION
-		});
+		expect(antwort).toEqual({ status: 'fehler', version: APP_VERSION });
 	});
 
 	test('Migrationen laufen auf leerer Datenbank durch', async () => {

@@ -1,25 +1,19 @@
-import type { RequestEvent } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { mitglied } from '../db/schema.ts';
 import {
+	abgemeldet,
 	antwort,
+	eingabeFehler,
 	formatFehler,
 	istJson,
+	jetzt,
 	leseKoerper,
-	type Ereignis
-} from '../login/schnittstellen.ts';
-import { utcZuZuerich } from '../../anlass/zeit.ts';
+	nichtGefunden
+} from '../http.ts';
+import type { WortOhneZusatz } from '../../fehler.ts';
 import { jahrInZuerich } from '../datum.ts';
 import { INTEGER_MAX, parseId } from '../parse-id.ts';
-import { pruefeAnlass } from '../anlass/angaben.ts';
-import {
-	aendereAnlass,
-	ladeAnlassAdmin,
-	legeAnlassAn,
-	listeAnlaesse,
-	loescheAnlass
-} from '../anlass/anlaesse.ts';
 import { listeFuerFairgate, markiereUebertragen } from './fairgate.ts';
 import { leseStand, pruefeAngaben } from './angaben.ts';
 import {
@@ -30,7 +24,7 @@ import {
 	listeMitglieder,
 	type MitgliedStatus
 } from './mitglieder.ts';
-import { listeBriefEmpfaenger, MAX_BRIEFE, stelleBriefeAus, type BriefAbh } from './briefe.ts';
+import { listeBriefEmpfaenger, MAX_BRIEFE, stelleBriefeAus } from './briefe.ts';
 import { liesEin, nurFehler, zeigeVorschau } from './einlesen.ts';
 import { ladeAuskunft } from './auskunft.ts';
 import { setzeAnsicht } from './ansicht.ts';
@@ -41,10 +35,16 @@ import {
 	nimmLoeschungZurueck,
 	type MitRueckzug
 } from './mitgliedschaft.ts';
+import {
+	liest,
+	mitKonto,
+	schreibt,
+	type AdminDienste,
+	type AdminEreignis,
+	type AdminUrheber
+} from './rechte.ts';
 import { ROLLEN, istAnsichtRolle, listeRollen, setzeRollen, type Rolle } from './rollen.ts';
-import { ladeVerlauf, schreibeVerlauf, type Urheber } from './verlauf.ts';
-import type { ZugangDienst } from './zugang.ts';
-import { darf, type Art, type Bereich } from '../../verwaltung/bereiche.ts';
+import { ladeVerlauf, schreibeVerlauf } from './verlauf.ts';
 import type { Rueckzug } from '../cm/austritt.ts';
 import {
 	austrittAnfrageMeldung,
@@ -52,21 +52,7 @@ import {
 	type DoppelMeldung
 } from '../cm/doppel-meldung.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
-import type { MitteilungAdminDienste } from '../mitteilung/schnittstellen.ts';
-
-export type AdminEreignis = Ereignis & Pick<RequestEvent, 'params'>;
-
-export type AdminDienste = {
-	db: Db;
-	zugang: ZugangDienst;
-	// SI-09: Hinweis an die alte Adresse; wirft nie.
-	hinweis: (an: string) => Promise<void>;
-	// Schlüssel, Adresse und Kontakt für die Briefe (Brief-Code, Text).
-	brief: BriefAbh;
-	jetzt?: () => Date;
-};
-
-export type AdminUrheber = Extract<Urheber, { art: 'admin' | 'mitglied' }> & { art: 'admin' };
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 
 // Record statt Liste: Kommt ein Status dazu, meldet der Compiler die Lücke hier.
 const STATUS: Record<MitgliedStatus, true> = {
@@ -79,81 +65,10 @@ const istStatus = (s: string): s is MitgliedStatus => Object.hasOwn(STATUS, s);
 const VERLAUF_STANDARD = 100;
 const VERLAUF_MAX = 500;
 
-const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
-const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });
-
-const jetzt = (d: AdminDienste) => (d.jetzt ?? (() => new Date()))();
-
-// Sitzung und eine Verwaltungsrolle (mytco, mitglieder oder cm) genügen; die Bestätigung per Code ist hier
-// noch nicht nötig (SI-08: auch ein reiner CM muss den Code anfordern und einlösen können).
-async function mitKonto(
-	d: AdminDienste,
-	e: AdminEreignis,
-	fn: (konto: NonNullable<AdminEreignis['locals']['konto']>) => Promise<Response>
-): Promise<Response> {
-	const konto = e.locals.konto;
-	const z = await d.zugang.pruefe(konto);
-	if (!konto || z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
-	if (z.stufe === 'keine-rolle') return antwort(403, { fehler: 'kein-admin' });
-	return fn(konto);
-}
-
-// RR-07, RR-09: bestätigte Sitzung mit einer Rolle, die den Bereich so nutzen darf. Reihenfolge:
-// Wer den Bereich nicht einmal lesen darf, bekommt `kein-admin` (der Code für «dieser Bereich ist
-// dir nicht offen»), nicht die Aufforderung zum Bestätigen. Wer ihn nur lesen darf und schreiben
-// will, bekommt nach der Bestätigung `kein-recht` (Regel 3: der MyTCO-Admin liest).
-// In der «Ansicht als …» speichert keine Schnittstelle, auch ohne den Riegel im Hook (zweite Schicht);
-// lesende Aufrufe wie die Auskunft (DS-07) schreiben trotzdem ihren Verlaufseintrag.
-async function mitRolle(
-	d: AdminDienste,
-	e: AdminEreignis,
-	bereich: Bereich,
-	art: Art,
-	fn: (mitgliedId: number) => Promise<Response>
-): Promise<Response> {
-	const z = await d.zugang.pruefe(e.locals.konto);
-	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
-	if (art === 'schreiben' && e.locals.konto?.ansicht != null) {
-		return antwort(403, { fehler: 'nur-ansehen' });
-	}
-	if (z.stufe === 'keine-rolle' || !darf(z.rollen, bereich, 'lesen')) {
-		return antwort(403, { fehler: 'kein-admin' });
-	}
-	if (z.stufe === 'unbestaetigt') return antwort(403, { fehler: 'unbestaetigt' });
-	if (!darf(z.rollen, bereich, art)) return antwort(403, { fehler: 'kein-recht' });
-	return fn(z.mitgliedId);
-}
-
-/** Lesende Schnittstelle eines Bereichs (BEREICHE). */
-export function liest(
-	d: AdminDienste,
-	e: AdminEreignis,
-	bereich: Bereich,
-	fn: (mitgliedId: number) => Promise<Response>
-): Promise<Response> {
-	return mitRolle(d, e, bereich, 'lesen', fn);
-}
-
-/**
- * Schreibende Schnittstelle eines Bereichs (BEREICHE), mit dem Angemeldeten als Urheber für den
- * Änderungsverlauf. SI-10: nur als JSON; der Körper wird erst nach der Prüfung der Rechte gelesen.
- */
-export async function schreibt(
-	d: AdminDienste,
-	e: AdminEreignis,
-	bereich: Bereich,
-	fn: (urheber: AdminUrheber, koerper: Record<string, unknown>) => Promise<Response>
-): Promise<Response> {
-	if (!istJson(e)) return formatFehler();
-	return mitRolle(d, e, bereich, 'schreiben', async (mitgliedId) =>
-		fn({ art: 'admin', mitgliedId }, await leseKoerper(e))
-	);
-}
-
 // RR-07: `rollen` sagt der Oberfläche, welche Bereiche sie zeigt; durchgesetzt wird an den Schnittstellen.
 export async function getZugang(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	const z = await d.zugang.pruefe(e.locals.konto);
-	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
+	if (z.stufe === 'abgemeldet') return abgemeldet();
 	if (z.stufe === 'keine-rolle') return antwort(403, { fehler: 'kein-admin' });
 	// Nur die Nummer des Angemeldeten, damit die Seite eine Rückfrage beim eigenen Konto stellen kann.
 	if (z.stufe === 'bestaetigt') {
@@ -185,9 +100,9 @@ export async function postZugang(d: AdminDienste, e: AdminEreignis): Promise<Res
 export async function postAnsicht(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
 	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
+	if (!konto) return abgemeldet();
 	const z = await d.zugang.pruefe({ ...konto, ansicht: null });
-	if (z.stufe === 'abgemeldet') return antwort(401, { fehler: 'abgemeldet' });
+	if (z.stufe === 'abgemeldet') return abgemeldet();
 	if (z.stufe === 'keine-rolle' || !z.rollen.includes('mytco')) {
 		return antwort(403, { fehler: 'kein-admin' });
 	}
@@ -202,7 +117,7 @@ export async function postAnsicht(d: AdminDienste, e: AdminEreignis): Promise<Re
 export async function postAnsichtBeenden(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	if (!istJson(e)) return formatFehler();
 	const konto = e.locals.konto;
-	if (!konto) return antwort(401, { fehler: 'abgemeldet' });
+	if (!konto) return abgemeldet();
 	await setzeAnsicht(d.db, konto.sitzungHash, null);
 	return antwort(200, {});
 }
@@ -355,7 +270,7 @@ export function postBrief(d: AdminDienste, e: AdminEreignis): Promise<Response> 
 }
 
 // Die vier Übergänge der Mitgliedschaft: leerer JSON-Körper, die Funktion prüft den Ausgangszustand.
-function uebergang<E extends string>(
+function uebergang<E extends WortOhneZusatz>(
 	d: AdminDienste,
 	e: AdminEreignis,
 	fn: (
@@ -396,7 +311,7 @@ function meldeRueckzug(d: MitteilungAdminDienste, urheber: AdminUrheber, cm: Rue
 }
 
 // Austritt und Vormerken: wie `uebergang`, nach dem Erfolg die Meldungen zum Doppel.
-function mitRueckzug<E extends string>(
+function mitRueckzug<E extends WortOhneZusatz>(
 	d: MitteilungAdminDienste,
 	e: AdminEreignis,
 	fn: (
@@ -496,51 +411,6 @@ export function postFairgate(d: AdminDienste, e: AdminEreignis): Promise<Respons
 	});
 }
 
-export function getAdminAnlaesse(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return liest(d, e, 'mitglieder', async () => antwort(200, await listeAnlaesse(d.db)));
-}
-
-export function postAdminAnlaesse(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
-		const p = pruefeAnlass(koerper);
-		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.felder });
-		return antwort(201, { id: await legeAnlassAn(d.db, urheber.mitgliedId, p.werte) });
-	});
-}
-
-export function getAdminAnlass(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return liest(d, e, 'mitglieder', async () => {
-		const id = parseId(e.params.id);
-		const a = id === null ? null : await ladeAnlassAdmin(d.db, id);
-		if (!a) return nichtGefunden();
-		// Für das Formular in Schweizer Zeit, wie <input type="datetime-local"> sie erwartet.
-		return antwort(200, {
-			...a,
-			beginnLokal: utcZuZuerich(a.beginn),
-			schlussLokal: utcZuZuerich(a.anmeldeschluss)
-		});
-	});
-}
-
-export function postAdminAnlass(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return schreibt(d, e, 'mitglieder', async (_urheber, koerper) => {
-		const id = parseId(e.params.id);
-		if (id === null) return nichtGefunden();
-		const p = pruefeAnlass(koerper);
-		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.felder });
-		const r = await aendereAnlass(d.db, id, p.werte, jetzt(d));
-		return r === 'ok' ? antwort(200, {}) : nichtGefunden();
-	});
-}
-
-export function postAdminAnlassLoeschen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
-	return schreibt(d, e, 'mitglieder', async () => {
-		const id = parseId(e.params.id);
-		if (id === null) return nichtGefunden();
-		return (await loescheAnlass(d.db, id)) === 'ok' ? antwort(200, {}) : nichtGefunden();
-	});
-}
-
 // Mit den Diensten der Mitteilungen: Austritt und Löschung melden den Doppelpartnern.
 export const ADMIN_SCHNITTSTELLEN = {
 	getZugang,
@@ -567,10 +437,5 @@ export const ADMIN_SCHNITTSTELLEN = {
 	getAuskunft,
 	getVerlauf,
 	getFairgate,
-	postFairgate,
-	getAdminAnlaesse,
-	postAdminAnlaesse,
-	getAdminAnlass,
-	postAdminAnlass,
-	postAdminAnlassLoeschen
+	postFairgate
 } satisfies Record<string, (d: MitteilungAdminDienste, e: AdminEreignis) => Promise<Response>>;

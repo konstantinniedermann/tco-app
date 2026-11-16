@@ -1,24 +1,26 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { MELDUNG } from '../../src/lib/login/anmelden.ts';
+import type { Fehlerkoerper } from '../../src/lib/fehler.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
-	holeMailCode,
 	legeAdminMitBriefCodeAn,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
-	legeOffenenAnlassAn,
 	legeRollenkontoMitBriefCodeAn,
-	legeTurnierAn,
 	schliesseLoginHilfen,
 	setzeRufname
 } from './hilfen/login.ts';
+import { legeTurnierAn } from './hilfen/turnier.ts';
+import { legeOffenenAnlassAn } from './hilfen/anlass.ts';
+import { holeMailCode } from './hilfen/mail.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,
 	pruefePfad,
 	sammleKonsolenfehler,
+	wartetAufMitgliederliste,
 	wartetAufVorladen
 } from './hilfen/seite.ts';
 
@@ -48,10 +50,7 @@ async function bestaetige(page: Page, konto: Konto) {
 	await page.getByLabel('Code aus der Mail').fill(code);
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
-	// Erst weiter, wenn die Liste steht (das Layout hat die Zugangsprüfung dann abgeschlossen):
-	// Ein folgendes page.goto bricht sonst die laufende Anfrage ab, und WebKit unter Linux meldet
-	// das als Konsolenfehler.
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await wartetAufMitgliederliste(page);
 }
 
 async function oeffneVerwaltung(page: Page, konto: Konto) {
@@ -208,7 +207,7 @@ test('RR-03: der letzte MyTCO-Admin sieht die Meldung beim Entzug seiner Rolle',
 	await oeffneVerwaltung(page, admin);
 	await page.goto(`/verwaltung/mitglieder/${admin.mitgliedId}`);
 	await page.route('**/api/admin/mitglieder/*/rollen', (route) =>
-		route.fulfill({ status: 409, json: { fehler: 'letzter-mytco' } })
+		route.fulfill({ status: 409, json: { fehler: 'letzter-mytco' } satisfies Fehlerkoerper })
 	);
 	await page.locator('summary', { hasText: 'Rollen' }).click();
 	await page.getByLabel('MyTCO-Admin', { exact: true }).uncheck();
@@ -243,12 +242,8 @@ test('SI-08: falscher Code zeigt die Meldung, «Neuen Code schicken» führt wei
 
 	await page.getByRole('button', { name: 'Neuen Code schicken' }).click();
 	// Die neue Mail trifft kurz nach der Antwort ein; die neueste Mail trägt einen anderen Code.
-	let neu = erster;
-	for (let i = 0; i < 20 && neu === erster; i++) {
-		await page.waitForTimeout(250);
-		neu = await holeMailCode(admin.email);
-	}
-	expect(neu).not.toBe(erster);
+	await expect.poll(() => holeMailCode(admin.email)).not.toBe(erster);
+	const neu = await holeMailCode(admin.email);
 	await feld.fill(neu);
 	await page.getByRole('button', { name: 'Bestätigen' }).click();
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
@@ -560,7 +555,7 @@ test('RR-07, Regel 3: MyTCO-Admin sieht Mitglied nur lesend (fieldset disabled, 
 	await expect(page.getByRole('link', { name: 'Mitglied anlegen' })).toHaveCount(0);
 	await page.goto('/verwaltung/mitglieder/neu');
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await wartetAufMitgliederliste(page);
 
 	// Mitglied: Angaben gesperrt, ohne Speichern und ohne Sitzungen beenden; Rollen bleiben offen.
 	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
@@ -591,7 +586,7 @@ test('A-MITGLIED-02: Rollen speichern, inzwischen geändert – Meldung mit «Ne
 	await oeffneVerwaltung(page, mytco);
 	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
 	await page.route('**/api/admin/mitglieder/*/rollen', (route) =>
-		route.fulfill({ status: 409, json: { fehler: 'veraltet' } })
+		route.fulfill({ status: 409, json: { fehler: 'veraltet' } satisfies Fehlerkoerper })
 	);
 	await page.locator('summary', { hasText: 'Rollen' }).click();
 	await page.getByLabel('Lizenz-Admin').check();
@@ -617,7 +612,7 @@ test('RR-07, Regel 2: Mitglieder-Admin sieht keine Rollenvergabe', async ({ page
 	// Die Seite Rollen führt zur ersten Seite der Verwaltung.
 	await page.goto('/verwaltung/rollen');
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
-	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
+	await wartetAufMitgliederliste(page);
 
 	// Beim Mitglied: Angaben bearbeitbar, keine Klappe «Rollen».
 	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);

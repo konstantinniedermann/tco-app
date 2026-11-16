@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { FehlerStatus, Fehlerkoerper } from '../fehler.ts';
 import {
 	entfernePasskey,
 	hinweisErledigt,
@@ -22,7 +23,10 @@ function fakeHolen(...antworten: (Response | Error)[]) {
 	return { holen, aufrufe };
 }
 
-const json = (inhalt: unknown, status = 200) =>
+// Gestellte Antworten: Ein Fehler-Status nimmt nur einen Körper aus der gemeinsamen Liste an
+// (src/lib/fehler.ts), damit ein Wort oder eine Form, die der Server nicht kennt, hier auffällt.
+type Koerper<S extends number> = S extends FehlerStatus ? Fehlerkoerper : unknown;
+const json = <S extends number = 200>(inhalt: Koerper<S>, status: S = 200 as S) =>
 	new Response(JSON.stringify(inhalt), { status, headers: { 'content-type': 'application/json' } });
 const leer = (status: number) => new Response(null, { status });
 
@@ -259,5 +263,47 @@ describe('hinweisErledigt', () => {
 		expect(aufrufe[0].pfad).toBe('/api/passkey/hinweis');
 		await expect(hinweisErledigt(fakeHolen(new TypeError('netz')).holen)).resolves.toBeUndefined();
 		await expect(hinweisErledigt(fakeHolen(leer(500)).holen)).resolves.toBeUndefined();
+	});
+});
+
+// Ränder, die der gemeinsame Abruf-Baustein genau so erhalten muss (Charakterisierung vor Schritt 13).
+describe('Passkey: Ränder der Deutung', () => {
+	const unlesbar = (status: number) => new Response('kein JSON', { status });
+
+	it('entfernen: nur genau 204 ist ok; 200 ist fehler, kein Signal', async () => {
+		const signal = vi.fn();
+		vi.stubGlobal('location', { hostname: 'mytco.example.org' });
+		vi.stubGlobal('PublicKeyCredential', { signalUnknownCredential: signal });
+		expect(await entfernePasskey('k1', fakeHolen(json({})).holen)).toBe('fehler');
+		expect(signal).not.toHaveBeenCalled();
+	});
+
+	it('anmelden: 429 bei den Optionen ohne Körper ist zu-viele', async () => {
+		expect(await meldeMitPasskeyAn(fakeHolen(leer(429)).holen, fakeWebauthn())).toBe('zu-viele');
+	});
+
+	it('anmelden: 401 bei der zweiten Anfrage ist stoerung', async () => {
+		const optionen = json({ optionen: { challenge: 'c' }, vorgang: 'v1' });
+		const { holen } = fakeHolen(optionen, json({ fehler: 'abgemeldet' }, 401));
+		expect(await meldeMitPasskeyAn(holen, fakeWebauthn())).toBe('stoerung');
+	});
+
+	it('einrichten: 429 bei der zweiten Anfrage ist fehler', async () => {
+		const { holen } = fakeHolen(json({}), json({ fehler: 'zu-viele' }, 429));
+		expect(await richtePasskeyEin(holen, fakeWebauthn())).toBe('fehler');
+	});
+
+	it('einrichten: der Dialog öffnet nur mit einem gelesenen Objekt als Optionen', async () => {
+		for (const antwort of [json([{ challenge: 'c' }]), leer(204), unlesbar(200)]) {
+			const registriere = vi.fn(async () => ({ id: 'neu' }));
+			const { holen, aufrufe } = fakeHolen(antwort);
+			expect(await richtePasskeyEin(holen, fakeWebauthn({ registriere }))).toBe('fehler');
+			expect(registriere).not.toHaveBeenCalled();
+			expect(aufrufe).toHaveLength(1);
+		}
+	});
+
+	it('laden: 200 ohne lesbaren Körper gibt null', async () => {
+		expect(await ladePasskeys(fakeHolen(unlesbar(200)).holen)).toBeNull();
 	});
 });

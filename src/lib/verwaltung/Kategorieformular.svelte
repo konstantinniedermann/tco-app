@@ -1,5 +1,6 @@
 <script lang="ts" module>
-	import type { KategorieAnsicht, KategorieFeld } from './api.ts';
+	import type { KategorieFeld } from './api.ts';
+	import type { KategorieAnsicht } from './turnier-api.ts';
 
 	/** Felder als Text, wie sie in den Eingabefeldern stehen; `geschlecht` leer = noch nicht gewählt. */
 	export type KategorieWerte = {

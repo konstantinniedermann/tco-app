@@ -2,13 +2,13 @@ import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { ereignis } from '../../../../tests/hilfen/anfrage.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
+import { holeLoginDienst } from '../dienste.ts';
+import { getSitzung } from '../sitzung/schnittstellen.ts';
 import { erstelleBremsen } from './bremse.ts';
 import { erzeugeBriefCode, erzeugeMailCode } from './codes.ts';
 import { erstelleLoginDienst, type LoginDienst } from './dienst.ts';
-import { holeLoginDienst } from './index.ts';
 import {
 	behandleFehler,
-	getSitzung,
 	ladeSitzung,
 	ladeSitzungSicher,
 	postBrief,
@@ -227,7 +227,7 @@ describe('Schnittstellen', () => {
 			await ladeSitzung(s.dienst, ohne);
 			const r0 = await getSitzung(ohne, db);
 			expect(r0.status).toBe(401);
-			expect(await r0.json()).toEqual({});
+			expect(await r0.json()).toEqual({ fehler: 'abgemeldet' });
 			expect(r0.headers.get('cache-control')).toBe('no-store');
 
 			const mit = ereignis({ cookie: s.kennung });
@@ -240,7 +240,8 @@ describe('Schnittstellen', () => {
 				passkeyHinweis: true,
 				verwaltung: false,
 				ansicht: null,
-				nachrichtenOffen: 0
+				nachrichtenOffen: 0,
+				interclub: expect.any(Boolean)
 			});
 
 			await s.dienst.beendeAlleSitzungen(s.kontoId);

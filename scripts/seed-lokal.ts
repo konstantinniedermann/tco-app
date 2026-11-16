@@ -18,6 +18,7 @@ import {
 	legeBeispielClubabendAn,
 	meldeBeispielAntworten
 } from './beispiel-anlass.ts';
+import { legeBeispielInterclubAn } from './beispiel-interclub.ts';
 import { legeBeispielMitgliederAn } from './beispiel-mitglieder.ts';
 import {
 	legeBeispielGespraecheAn,
@@ -64,6 +65,8 @@ async function seed(): Promise<void> {
 		const gv = await legeBeispielAnlassAn(db, erika.id, jetzt);
 		// Eine Beispiel-Clubmeisterschaft 2027 (Rolle und Kontaktperson folgen unten).
 		await legeBeispielTurnierAn(db, jetzt);
+		// Interclub-Resultate 2026 aus Dateien, ohne Netz.
+		await legeBeispielInterclubAn(db, jetzt);
 		// Testbestand: rund 200 Mitglieder, ein zweiter Anlass, gemischte Antworten auf beide.
 		const bestand = await legeBeispielMitgliederAn(db, jetzt);
 		const clubabend = await legeBeispielClubabendAn(db, erika.id, jetzt);

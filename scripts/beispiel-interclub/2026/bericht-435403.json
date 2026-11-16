@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "12. Juni 2026",
+	"homeTeam": {
+		"name": "Schützenmatt SO 1",
+		"clubNumber": 2237,
+		"points": 3,
+		"sets": 6,
+		"games": 39
+	},
+	"awayTeam": {
+		"name": "Olten 2",
+		"clubNumber": 2202,
+		"points": 0,
+		"sets": 1,
+		"games": 15
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900339,
+							"name": "Doppelfehler Tanja R8 (28785)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900332,
+							"name": "Vorhand Luca R9 (60866)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:2", "3:6", "6:3"]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900340,
+							"name": "Linienrichter Urs R8 (30011)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900334,
+							"name": "Volley Nico R9 (61456)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900341,
+							"name": "Sandplatz Vera R9 (33034)"
+						},
+						{
+							"id": 900340,
+							"name": "Linienrichter Urs R8 (30011)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900332,
+							"name": "Vorhand Luca R9 (60866)"
+						},
+						{
+							"id": 900334,
+							"name": "Volley Nico R9 (61456)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:1", ""]
+		}
+	],
+	"leagueId": 13,
+	"groupId": 63
+}

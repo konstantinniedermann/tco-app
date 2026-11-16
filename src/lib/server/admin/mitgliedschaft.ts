@@ -12,9 +12,9 @@ import { sperreRollen, waereLetzterMytco } from './rollen.ts';
 import { schreibeVerlauf, type Aktion, type Urheber } from './verlauf.ts';
 
 // Annahme K-38: Die Daten bleiben nach dem Austritt ein Kalenderjahr, falls das Mitglied zurückkommt.
-export const FRIST_AUSTRITT = { jahre: 1 } as const;
+const FRIST_AUSTRITT = { jahre: 1 } as const;
 // Bedenkzeit nach «Mitglied löschen»: so lange lässt sich die Löschung rückgängig machen.
-export const BEDENKZEIT = { tage: 7 } as const;
+const BEDENKZEIT = { tage: 7 } as const;
 
 const MINUTE_MS = 60 * 1000;
 const STUNDE_MS = 60 * MINUTE_MS;

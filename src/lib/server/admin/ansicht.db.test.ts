@@ -15,18 +15,14 @@ import {
 } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleLoginDienst } from '../login/dienst.ts';
-import { getSitzung, postLogout } from '../login/schnittstellen.ts';
+import { postLogout } from '../login/schnittstellen.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
+import { getSitzung } from '../sitzung/schnittstellen.ts';
 import { postTurniere } from '../turnier/schnittstellen.ts';
 import { riegel } from './ansicht.ts';
 import { setzeRollen } from './rollen.ts';
-import {
-	getZugang,
-	postAnsicht,
-	postAnsichtBeenden,
-	postMitglieder,
-	type AdminDienste
-} from './schnittstellen.ts';
+import { getZugang, postAnsicht, postAnsichtBeenden, postMitglieder } from './schnittstellen.ts';
+import type { AdminDienste } from './rechte.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
@@ -152,7 +148,8 @@ describe('Ansicht als … (Server)', () => {
 			passkeyHinweis: false,
 			verwaltung: true,
 			ansicht: null,
-			nachrichtenOffen: 0
+			nachrichtenOffen: 0,
+			interclub: expect.any(Boolean)
 		});
 		expect((await schalteEin(a.s.d, a.konto, { rolle: 'mitglied' })).status).toBe(200);
 		const konto = (await lade(a.kennung))!;
@@ -163,7 +160,8 @@ describe('Ansicht als … (Server)', () => {
 			passkeyHinweis: false,
 			verwaltung: false,
 			ansicht: 'mitglied',
-			nachrichtenOffen: 0
+			nachrichtenOffen: 0,
+			interclub: expect.any(Boolean)
 		});
 		const z = await getZugang(a.s.d, ereignis({ method: 'GET', konto }));
 		expect([z.status, await z.json()]).toEqual([403, { fehler: 'kein-admin' }]);

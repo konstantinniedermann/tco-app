@@ -4,23 +4,25 @@ import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
-	beantrageWildcardDirekt,
-	holeMailCode,
 	legeCmMitBriefCodeAn,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
-	legeOffenesTurnierAn,
 	legeRollenkontoMitBriefCodeAn,
-	meldeZurCmAn,
-	schliesseLoginHilfen,
-	setzeSpielerangaben,
-	warteAufMail
+	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import {
+	beantrageWildcardDirekt,
+	legeOffenesTurnierAn,
+	meldeZurCmAn,
+	setzeSpielerangaben
+} from './hilfen/turnier.ts';
+import { holeMailCode, warteAufMail } from './hilfen/mail.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,
 	sammleKonsolenfehler,
 	waehleAktion,
+	wartetAufMitgliederliste,
 	wartetAufVorladen
 } from './hilfen/seite.ts';
 
@@ -295,8 +297,7 @@ test('RR-07, FR-08: MyTCO-Admin sieht die Anmeldungen mit Kommentar, ohne Tasten
 	await meldeAn(page, mytco);
 	await page.goto('/verwaltung');
 	await bestaetige(page, mytco, 'Mitglieder');
-	// Die Mitgliederliste lädt erst nach der Überschrift; page.goto bräche sie sonst ab (WebKit).
-	await expect(page.getByRole('status')).toHaveText(/^\d+ Mitglied(er)?$/);
+	await wartetAufMitgliederliste(page);
 	await page.goto(`/verwaltung/turniere/${turnierId}/kategorien/${kategorieId}`);
 	await expect(page.getByRole('heading', { level: 1, name: 'Herren R1–R6' })).toBeVisible();
 	await expect(page.getByText('1 Anmeldung, 1 Wildcard-Antrag', { exact: true })).toBeVisible();

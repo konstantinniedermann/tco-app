@@ -1,0 +1,264 @@
+{
+	"title": "Beispiel",
+	"subtitle": "07. Juni 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 5,
+		"sets": 10,
+		"games": 92
+	},
+	"awayTeam": {
+		"name": "Lyss",
+		"clubNumber": 2172,
+		"points": 4,
+		"sets": 10,
+		"games": 82
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900137,
+							"name": "Vorhand Rahel R5 (2818)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900374,
+							"name": "Lob Nico R3 (1219)"
+						}
+					],
+					"wo": 1
+				}
+			},
+			"results": ["4:6", "2:4", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900139,
+							"name": "Volley Tanja R5 (3269)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900375,
+							"name": "Stopp Olivia R5 (4870)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:1", "6:0", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900141,
+							"name": "Stopp Vera R5 (4625)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900376,
+							"name": "Satzball Pascal R6 (8195)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "5:7", "7:5"]
+		},
+		{
+			"position": 4,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900377,
+							"name": "Tiebreak Rahel R5 (4831)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900378,
+							"name": "Doppelfehler Silvan R6 (6515)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:3", "6:0", ""]
+		},
+		{
+			"position": 5,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900143,
+							"name": "Tiebreak Yara R7 (10525)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900379,
+							"name": "Linienrichter Tanja R6 (6937)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["5:7", "5:7", ""]
+		},
+		{
+			"position": 6,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900145,
+							"name": "Linienrichter Alma R7 (13521)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900380,
+							"name": "Sandplatz Urs R6 (7401)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:7", "0:6", ""]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900141,
+							"name": "Stopp Vera R5 (4625)"
+						},
+						{
+							"id": 900377,
+							"name": "Tiebreak Rahel R5 (4831)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900374,
+							"name": "Lob Nico R3 (1219)"
+						},
+						{
+							"id": 900379,
+							"name": "Linienrichter Tanja R6 (6937)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "4:6", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900139,
+							"name": "Volley Tanja R5 (3269)"
+						},
+						{
+							"id": 900143,
+							"name": "Tiebreak Yara R7 (10525)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900380,
+							"name": "Sandplatz Urs R6 (7401)"
+						},
+						{
+							"id": 900381,
+							"name": "Hallenbach Vera R5 (3078)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:4", "6:2", ""]
+		},
+		{
+			"position": 3,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900137,
+							"name": "Vorhand Rahel R5 (2818)"
+						},
+						{
+							"id": 900145,
+							"name": "Linienrichter Alma R7 (13521)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900382,
+							"name": "Seitenwechsel Willi R5 (4358)"
+						},
+						{
+							"id": 900383,
+							"name": "Ballwand Yara R7 (10496)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["3:6", "6:3", "10:5"]
+		}
+	],
+	"leagueId": 16,
+	"groupId": -1
+}

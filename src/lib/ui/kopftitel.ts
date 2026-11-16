@@ -108,7 +108,7 @@ export function beobachteKopftitel(o: {
  * Text des <h1> für die Kopfleiste: ohne Plaketten (`.plakette`, z. B. «aktiv» hinter dem Namen
  * eines Mitglieds), Leerraum zusammengefasst.
  */
-export function titelText(ueberschrift: HTMLElement): string {
+function titelText(ueberschrift: HTMLElement): string {
 	const kopie = ueberschrift.cloneNode(true) as HTMLElement;
 	for (const plakette of kopie.querySelectorAll('.plakette')) plakette.remove();
 	return (kopie.textContent ?? '').replace(/\s+/g, ' ').trim();

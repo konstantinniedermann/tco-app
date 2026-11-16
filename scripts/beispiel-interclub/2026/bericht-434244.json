@@ -1,0 +1,104 @@
+{
+	"title": "Beispiel",
+	"subtitle": "27. Juni 2026",
+	"homeTeam": {
+		"name": "Olten",
+		"clubNumber": 2202,
+		"points": 2,
+		"sets": 5,
+		"games": 37
+	},
+	"awayTeam": {
+		"name": "Tennishalle Grenchen AG 2",
+		"clubNumber": 2771,
+		"points": 1,
+		"sets": 3,
+		"games": 24
+	},
+	"singles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900321,
+							"name": "Annahme Anna R7 (4979)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900330,
+							"name": "Grundlinie Jonas R8 (8246)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["6:0", "6:1", ""]
+		},
+		{
+			"position": 2,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900327,
+							"name": "Kulisse Gina R8 (7950)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900331,
+							"name": "Aufschlag Klara R8 (11164)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["4:6", "6:0", "6:4"]
+		}
+	],
+	"doubles": [
+		{
+			"position": 1,
+			"players": {
+				"home": {
+					"members": [
+						{
+							"id": 900323,
+							"name": "Skizze Carla R7 (7751)"
+						},
+						{
+							"id": 900326,
+							"name": "Attrappe Fabio R8 (11101)"
+						}
+					],
+					"wo": 0
+				},
+				"away": {
+					"members": [
+						{
+							"id": 900330,
+							"name": "Grundlinie Jonas R8 (8246)"
+						},
+						{
+							"id": 900331,
+							"name": "Aufschlag Klara R8 (11164)"
+						}
+					],
+					"wo": 0
+				}
+			},
+			"results": ["2:6", "7:6", "8:10"]
+		}
+	],
+	"leagueId": 12,
+	"groupId": 32
+}
