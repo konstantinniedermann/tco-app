@@ -53,7 +53,7 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Gruppe, Gruppenspiele | Form „Round Robin“: Jeder spielt gegen jeden in seiner Gruppe. Der Organisator legt die Anzahl Gruppen fest und teilt die Spieler zu | Gruppe, Gruppenspiele | ADV 10, 39–41; PDF 5c |
 | KO-System | Wer verliert, scheidet aus. In Advantage heisst die Form *Draw*. *Vermutung:* „Draw“ ist das KO-System; das Handbuch erklärt den Begriff nicht | KO-System | PDF 5c; ADV 10 |
 | Tableau | Spielfeld einer Konkurrenz mit Positionen; die Grösse ergibt sich aus der Zahl der bestätigten Spieler | Tableau | ADV 10–11, 29–30 |
-| Finaltableau | Tableau, das in Advantage auf die Gruppenspiele folgt. Laut PDF eröffnet der TCO dafür neue KO-Turniere (siehe [K-25](abklaerungen.md#vor-cm-anmeldung-15042027)) | Finaltableau | ADV 42; PDF 5e-i |
+| Finaltableau | Tableau, das in Advantage auf die Gruppenspiele folgt. In der CM 2026 eine eigene Konkurrenz im selben Turnier, kein neues Turnier ([CM hinter den Kulissen](recherche/2026-11-16-cm-ablauf.md)) | Finaltableau | ADV 42; PDF 5e-i |
 | Setzung | Die Gesetzten werden aus der Klassierung bestimmt und nach Turnierreglement platziert | Setzung | ADV 29 |
 | Auslosung | Teilt nach der Setzung die übrigen Spieler auf die Positionen im Tableau zu | Auslosung | ADV 7, 10, 28–29 |
 | Runde | Stufe im Tableau; Spielplan und Resultate werden je Runde erfasst | Runde | ADV 30, 32, 37 |
