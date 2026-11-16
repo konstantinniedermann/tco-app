@@ -66,7 +66,10 @@ solcher Stand ist, genügt eine Nummer je Release. Ablauf im Einzelnen:
   trägt als letzter nach der alten Regel 0.22.11; das nächste Release trägt 0.23.0. Beim ersten
   Release erkennt die Prüfung vor dem Release eine vergessene Nummer nicht, weil `dev` der
   Nummer von `main` schon voraus ist; darum steht die Zahl fest. Ab dem zweiten Release erkennt
-  sie eine fehlende Nummer selbst.
+  sie eine fehlende Nummer selbst. [Nachtrag 16.11.2026, Doku-Abgleich vor 0.23.0: Gemessen
+  meldet die Prüfung eine ganz vergessene Nummer auch beim ersten Release (rot, weil
+  «Unveröffentlicht» nicht leer ist). Was sie nicht fängt, ist der zweite Weg ihrer Meldung,
+  das Nachrücken der Einträge in den Abschnitt «0.22.11»; darum steht die Zahl weiter fest.]
 - Tag und GitHub-Release setzt weiter nur die CI nach einer Live-Auslieferung; an den Jobs
   ändert sich nichts.
 

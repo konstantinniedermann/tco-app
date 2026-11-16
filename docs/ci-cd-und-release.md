@@ -135,7 +135,9 @@ Doku-Merge ändert ihn nicht.
 wenn die Repo-Variable der Umgebung auf `an` steht: `AUSLIEFERUNG_TEST` (für `dev`) bzw.
 `AUSLIEFERUNG_LIVE` (für `main`). So kann die Demo auf Test laufen, während Live noch aus ist.
 Stehen sie nicht auf `an`, gelten die Jobs als übersprungen, nicht als fehlgeschlagen. Aktiv ist
-nur der Rauchtest.
+nur der Rauchtest. Unmittelbar bevor `AUSLIEFERUNG_LIVE` zum ersten Mal auf `an` geht, werden
+die Migrationen zusammengelegt (E-08, die einzige Ausnahme von «Migrationen fügen nur hinzu»,
+[ADR-013](adr/adr-013-gemeinsame-bausteine.md)).
 
 **Sicherung und Probe:** `sichern` schreibt die Datenbank verschlüsselt mit restic ins
 Sicherungsziel, ohne unverschlüsselte Datei, und löscht Sicherungen nach 30 Tagen, gezählt ab der neuesten Sicherung
@@ -268,7 +270,7 @@ ausserhalb des Servers aufbewahrt werden müssen und wo, steht in
 ## Einstellungen der App
 
 Die App liest ihre Einstellungen aus Umgebungsvariablen. Lokal stehen sie in `.env` (Vorlage
-`.env.example`, kopieren); `make dev`, `make dev-handy`, `make seed` und `make admin` brechen ohne diese Datei ab. Fehlt ein
+`.env.example`, kopieren); `make dev`, `make dev-handy`, `make seed`, `make admin` und `make ic-import` brechen ohne diese Datei ab. Fehlt ein
 `MYTCO_*`-Pflichtwert, startet der Server nicht. Fehlt `DATABASE_URL`, startet er zwar, aber
 `/api/status` meldet einen Fehler und der Login antwortet mit einem Serverfehler. Beim Bauen
 werden sie nicht geprüft.
@@ -285,6 +287,7 @@ werden sie nicht geprüft.
 | `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text für «Wende dich an …», steht im Brief, in der Meldung «Code schon benutzt» und auf der Seite Hilfe (ohne Login lesbar, `/api/kontakt`; darum eine Vereins-Adresse, keine private Nummer; Annahme K-21) | ja |
 | `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
 | `ZEITGEBER` | Nur lokal und im E2E: `aus` schaltet den täglichen Löschlauf ab ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)); auf Test und Live nicht durchgereicht (`betrieb/compose.umgebung.yml`), dort läuft er immer | nein |
+| `IC_VEREIN` | Nur `make ic-import`: Vereinsnummer bei Swiss Tennis, Vorgabe `2202` | nein |
 
 Hinter dem Reverse Proxy liest `adapter-node` die Client-IP aus einer Kopfzeile, die nur der
 Proxy setzt (`ADDRESS_HEADER`, bei `X-Forwarded-For` dazu `XFF_DEPTH`; gesetzt in
@@ -428,8 +431,10 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   des Projektleiters. Claude schlägt Nummer und Grund mit der Bitte um Freigabe vor.
 - **Erstes Release nach ADR-012:** Die Abschnitte zwischen 0.20.5 und diesem Release stammen
   aus der früheren Regel (eine Nummer je Merge mit Code) und bleiben stehen. Das erste Release
-  trägt `0.23.0`; `make release-check` erkennt bei ihm eine vergessene Nummer nicht, weil `dev`
-  der Nummer von `main` schon voraus ist. Ab dem zweiten Release erkennt es sie selbst.
+  trägt `0.23.0`. Eine ganz vergessene Nummer meldet `make release-check` auch hier (rot, weil
+  «Unveröffentlicht» nicht leer ist); den zweiten Weg der Meldung, die Einträge in den
+  Abschnitt «0.22.11» nachzurücken, beim ersten Release nicht wählen: Die Prüfung würde grün,
+  das Release ginge aber als 0.22.11 hinaus.
 - Getaggt wird nur die Nummer, mit der ein Release live geht. Die Zwischenstände davor haben
   keinen Tag und keinen Marker; sie gehen mit diesem Release live.
 - Die Version steht in `package.json`, in der Fusszeile der App und, sobald Live ausgeliefert

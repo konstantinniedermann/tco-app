@@ -12,17 +12,16 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 ## Unveröffentlicht
 
 - Abhängigkeiten aktualisiert (Dependabot #82): neueres Abbild von Caddy (`caddy:2-alpine`)
-  für den Türsteher unter `betrieb/`; ausgeliefert wird es erst mit dem Server.
+  für den Webserver (Proxy) unter `betrieb/`; ausgeliefert wird es erst mit dem Server.
 - Abhängigkeiten aktualisiert (Dependabot #86): SvelteKit 3.2.0, adapter-node 6.0.2,
   SimpleWebAuthn-Server 14.1.0, nodemailer 10.5.0, vite 8.3.8, Playwright 1.65.0, Prettier
   3.10.1, typescript-eslint 8.72.2, eslint-plugin-svelte 3.24.1.
-
 - Die Projektregeln für Claude gelten nach dem Refactoring auf Dauer: Die Übergangsregeln
   sind aufgelöst, der Feature-Stopp endet; README und Doku werden vor einem Release
   nachgeführt, nicht nach jedem Issue (Refactoring Schritt 24). An der App ändert sich nichts.
 - Das Refactoring ist abgeschlossen: Offene Befunde stehen in den Beobachtungen, die Analyse ist
   als Geschichte gekennzeichnet, die Agenten des Refactorings sind entfernt; die Architektur
-  danach steht als Vorschlag in ADR-013 (Refactoring Schritt 25). An der App ändert sich nichts.
+  danach ist in ADR-013 festgehalten (Refactoring Schritt 25). An der App ändert sich nichts.
 
 ## 0.22.11 — Versionsnummer nur noch beim Release (ADR-012)
 

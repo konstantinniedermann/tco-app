@@ -16,12 +16,14 @@ wann ausgeliefert wird, regelt [CI/CD und Release](ci-cd-und-release.md).
 | Fachlogik | Fachregeln `FR-NN` aus dem [Fachmodell](fachmodell.md): Fristen, Grenzen, Zustände, Berechnungen | Vitest | `make check`, CI |
 | Schnittstellen und Rechte | Jede Schnittstelle (`+server.ts`) gegen eine echte PostgreSQL; für jede Rolle, ob sie zugreifen darf ([Rollen und Rechte](rollen-und-rechte.md), `RR-NN`) | Vitest, PostgreSQL im Container | `make check`, CI |
 | Ende-zu-Ende | Wichtige Abläufe durch die Oberfläche, mit Barrierefreiheits-Prüfung (N-BARRIEREFREI-01) | Playwright, axe | `make check`, CI |
+| Skripte und Migrationen | Beispielskripte (`tests/scripts/`), Migrationen und Schema (`src/lib/server/db/*.db.test.ts`, `scripts/migrate.test.ts`), Prüfskripte (`scripts/**/*.test.ts`; was sie prüfen: [CI/CD](ci-cd-und-release.md)) | Vitest, PostgreSQL im Container | `make check`, CI |
 | Betrieb | Einrichtungs- und Auslieferungsskripte (`betrieb/bin`) mit Ersatz-docker; Gesamtnachweis auf Docker Desktop | Vitest (`tests/betrieb`), `make betrieb-nachweis` | `make check` (Vitest-Teil), Nachweis von Hand |
 | Echte Geräte | Installation, Push, E-Mail auf echten Handys | von Hand, [Checkliste](#checkliste-vor-dem-release) | vor jedem Release, sobald Test läuft |
 
-**Fachlogik** liegt in Server-Modulen (Bauregel in ADR-002). Vorgabe dieses Konzepts: Die
-Fachregeln selbst greifen nicht auf Datenbank oder Oberfläche zu, sondern erhalten ihre
-Daten übergeben. So sind sie ohne Aufbau testbar; hier entstehen die meisten Tests.
+**Fachlogik** liegt in Server-Modulen (Bauregel in ADR-002). Die Fachfunktionen bekommen
+Datenbank und Zeit hineingereicht und laufen im Test gegen die echte Datenbank
+(`*.db.test.ts`); Attrappen gibt es nur für Mail, Push, Uhr und Abruf. Reine Regeln ohne
+Datenbank (Fristen, Berechnungen) haben daneben eigene Einheitstests.
 
 **Oberfläche:** Keine eigenen Tests für einzelne Bausteine der Oberfläche; sie enthält keine
 Fachlogik und wird über die Ende-zu-Ende-Tests und das Review geprüft. Reine Logik der Oberfläche
@@ -93,7 +95,7 @@ Die Ende-zu-Ende-Tests decken die Abläufe einer Etappe ab, nicht jede Einzelhei
 Datenschutzerklärung ohne Login, Profil mit E-Mail-Wechsel und Rufname, Benachrichtigungen, Anlässe,
 Mitteilungen, Verwaltung mit Rollen, Einlesen einer Datei, Briefe einzeln und als Serie mit Druckansicht, Austritt,
 Löschen und Auskunft, Turnier und Kategorien,
-CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, Doppel mit Partner-Anfragen und Doppel-Verwaltung durch den CM-Admin, Kontaktdaten in den Anmeldelisten, Gespräch mit der Turnierleitung, Seite einer Kategorie, Navigation und Tiefe der Seiten, Titel in der Kopfleiste, Verwaltung am PC (klebender Seitenkopf, einzeilige Tabellen mit «Ändern»), dazu Bedienung (Wappen,
+CM-Anmeldung mit Wildcard-Antrag und Anmeldungen verwalten, Doppel mit Partner-Anfragen und Doppel-Verwaltung durch den CM-Admin, Kontaktdaten in den Anmeldelisten, Gespräch mit der Turnierleitung, Seite einer Kategorie, Interclub-Resultate, Navigation und Tiefe der Seiten, Titel in der Kopfleiste, Verwaltung am PC (klebender Seitenkopf, einzeilige Tabellen mit «Ändern»), dazu Bedienung (Wappen,
 Statusleiste, Fusszeile, Fokusrahmen). Drei Dateien halten das Verhalten der gemeinsamen Bausteine der
 Oberfläche fest: `waechter.test.ts` (wohin jede Adresse ohne Anmeldung, ohne Rolle oder ohne Bestätigung führt,
 auch nach abgelaufener Anmeldung mitten in einer Aktion; bei den vier Listen der Verwaltung bleibt eine
@@ -125,7 +127,7 @@ der neuen Adresse nach einem E-Mail-Wechsel prüft nur das iPhone.
 
 Die CI misst, welcher Code durch Tests läuft. **Mindestens 90 %** gilt für Fachlogik und
 Rechte-Prüfung (`src/lib/server/`, dazu die Fachlogik, die auch im Browser läuft: `src/lib/turnier/`,
-`src/lib/anlass/stand.ts` und `zeit.ts`); darunter schlägt die CI an. Für die Oberfläche gibt es keine Zahl; dort
+`src/lib/anlass/stand.ts` und `zeit.ts`, der Abruf-Baustein `src/lib/abruf.ts` und die Ablauf-Funktion `src/lib/cm/ablauf.ts`); darunter schlägt die CI an. Für die Oberfläche gibt es keine Zahl; dort
 zählen die Ende-zu-Ende-Tests und das Review.
 
 ## Anforderung → Testfall
@@ -163,7 +165,10 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
   (beide aus `scripts/erfundene-mitglieder.ts`; Mona und Theo nur lokal aus `scripts/seed-lokal.ts`); der Musterbrief nimmt dieselbe erste Person, aber mit eigener Adresse.
   Die Beispiel-GV (`scripts/beispiel-anlass.ts`) legt für `make seed` fünf weitere erfundene
   Mitglieder an, das Beispielturnier (`scripts/beispiel-turnier.ts`) sechs weitere erfundene
-  Spieler mit Login (ohne Brief-Code), mit Einzel- und Doppel-Anmeldungen, einem Wildcard-Antrag, Spielern, die einen Partner suchen, und einer offenen Partner-Anfrage; Kontaktperson ist Hanna Muster (CM-Admin).
+  Spieler mit Login (ohne Brief-Code), mit Einzel- und Doppel-Anmeldungen, einem Wildcard-Antrag, Spielern, die einen Partner suchen, und einer offenen Partner-Anfrage; Kontaktperson ist Hanna Muster (CM-Admin). `make seed` legt dazu
+  drei Beispielgespräche an und spielt, wie jeder E2E-Lauf, die Interclub-Beispieldaten der
+  Saison 2026 ein (`scripts/beispiel-interclub.ts`, `scripts/beispiel-interclub/`): Resultate
+  der Teams wie bei Swiss Tennis, Namen und Personennummern der Einzelpartien erfunden (DS-08).
 - Ausnahme für die lokale Datenbank: Der Testbestand von `make seed`
   (`scripts/beispiel-mitglieder.ts`) kombiniert feste Vornamen mit erkennbar erfundenen
   Nachnamen zu 185 Mitgliedern (zusammen mit den Personas rund 200), ohne Zufall und ohne
