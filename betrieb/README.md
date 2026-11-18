@@ -36,7 +36,10 @@ mehrfach ausführbar und endet mit `server/pruefen.sh <admin-benutzer>`, das je 
   des Aufrufers bzw. von root an, ohne deren Optionen (Cloud-Images sperren root mit
   `command=…`). Kann er sich nicht anmelden oder nicht root werden, bricht es ab, bevor SSH
   umgestellt wird.
-- **Firewall:** `ufw` lässt eingehend nur 22, 80 und 443 (tcp) zu, ohne Protokoll.
+- **Firewall:** `ufw` lässt eingehend nur 22, 80 und 443 (tcp) zu, ohne Protokoll. Davor steht
+  die Firewall von Infomaniak (Manager → VPS → *Firewall*); sie lässt anfangs nur 22 und ICMP
+  herein, 80 und 443 (tcp) sind dort von Hand freizugeben. Fehlen sie, bekommt Caddy kein
+  Zertifikat (Let's Encrypt erreicht den Server nicht).
   Docker öffnet veröffentlichte Ports an `ufw` vorbei; veröffentlicht wird darum nur Caddy (80,
   443). Ein Port-Scan von aussen belegt es.
 - **Updates:** `unattended-upgrades` spielt die Sicherheits-Updates von Ubuntu täglich ein.

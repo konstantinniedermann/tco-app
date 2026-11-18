@@ -116,6 +116,36 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-18 — Türsteher-Ordner liegt in einem Ordner, der `mytco` gehört
+
+**Thema:** Sicherheit
+
+**Fundort:** `betrieb/server/einrichten.sh` (`/opt/mytco/bin` root:root 0755 in `/opt/mytco`, mytco 0750)
+
+**Beobachtung:** `mytco` kann `/opt/mytco/bin` zwar nicht beschreiben, aber im eigenen Ordner
+`/opt/mytco` umbenennen und durch einen eigenen ersetzen; der Schutz «nie aus dem Image» ist
+damit nur ein Schutz gegen Versehen. Über die Docker-Gruppe ginge es ohnehin (Restrisiko im
+Sicherheitskonzept).
+
+**Ursprung:** #39, Code-Review der Server-Einrichtung (Minor, zurückgestellt)
+
+**Einschätzung:** Ein Ort ausserhalb, z. B. `/usr/local/lib/mytco`, wäre sauberer; ändert Pfad in
+`authorized_keys`, Doku und Türsteher. Klein, aber kein Gewinn gegen die Docker-Gruppe.
+
+### 2026-11-18 — Fehlermeldung zur SMTP-URL passt nicht bei abgeschalteter Zertifikatsprüfung
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/einstellungen.ts` (`tlsErzwungen`, Meldung «MYTCO_SMTP_URL ohne TLS (smtps:// oder requireTLS=true)»)
+
+**Beobachtung:** Seit #39 weist die App auch `tls.rejectUnauthorized=false` und `ignoreTLS=true`
+ab, meldet aber dieselbe Meldung, die zu `requireTLS=true` rät, obwohl das schon gesetzt sein kann.
+
+**Ursprung:** #39, Code-Review (Minor, zurückgestellt)
+
+**Einschätzung:** Meldung um «ohne Abschalten der Zertifikatsprüfung» ergänzen; Tests prüfen den
+Wortlaut mit.
+
 ### 2026-11-18 — Restpunkte zu E-65: WebKit beim Neuladen, alter Service Worker
 
 **Thema:** Tests
