@@ -74,8 +74,8 @@ Der Projektleiter legt im Infomaniak-Manager eine **eigene Organisation** für M
 von privaten Produkten; Server und Object Storage entstehen darin. Infomaniak überträgt «fast
 alle Produkte» an eine andere Organisation, ohne Unterbruch; ausgenommen genannt ist nur kSuite
 (B: [FAQ 2024](https://www.infomaniak.com/en/support/faq/2024/transferring-a-product-from-one-organization-to-another)).
-Ob VPS Lite und Object Storage darunterfallen, nennt die Seite nicht (V, beim Anlegen im Manager
-prüfen). Später zwei Wege, beide ohne Neuaufbau:
+Ob VPS Lite und Object Storage darunterfallen, nennt die Seite nicht (V, zeigt sich beim
+Umzug). Später zwei Wege, beide ohne Neuaufbau:
 
 1. **Organisation übergeben:** Die Vereinsadresse wird Benutzerin und Administratorin der
    Organisation, Zahlungsweg und Rechnungsadresse wechseln, der Projektleiter tritt aus.
@@ -87,10 +87,10 @@ prüfen). Später zwei Wege, beide ohne Neuaufbau:
 Das Scaleway-Konto entsteht ebenfalls als eigene Organisation; ob Scaleway den Besitz einer
 Organisation übertragen kann, wird beim Anlegen geprüft (V).
 
-**Falls sich VPS Lite nicht übertragen lässt** (Entscheid Projektleiter): vor der Bestellung im
-Manager oder beim Support nachfragen, bei einem Nein trotzdem bestellen. Der Umzug kommt dann
-zum Vertragsende: neuer Server auf den Verein, Einrichtung aus dem Repo, Daten aus der Sicherung
-(Umzugsplan nach ADR-003, ca. ein halber Tag, S).
+**Falls sich VPS Lite nicht übertragen lässt** (Entscheid Projektleiter): Es wird ohne Rückfrage
+bei Infomaniak bestellt; die Kosten trägt der Verein (K-03.3). Lässt sich der Server später nicht
+übertragen, kommt der Umzug zum Vertragsende: neuer Server auf den Verein, Einrichtung aus dem
+Repo, Daten aus der Sicherung (Umzugsplan nach ADR-003, ca. ein halber Tag, S).
 
 ## Vorsorge für die Website (nur dokumentieren)
 
