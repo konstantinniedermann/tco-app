@@ -6,9 +6,7 @@ import { versionsText } from './version.ts';
 describe('versionsText', () => {
 	test('auf Test: Nummer und Kurzform des Commits', () => {
 		expect(versionsText('0.23.0', 'a1b2c3d', 'test.my.tcolten.ch')).toBe('0.23.0 · a1b2c3d');
-		expect(versionsText('0.23.0', 'a1b2c3d', 'test.179-237-82-222.sslip.io')).toBe(
-			'0.23.0 · a1b2c3d'
-		);
+		expect(versionsText('0.23.0', 'a1b2c3d', 'test.203-0-113-7.sslip.io')).toBe('0.23.0 · a1b2c3d');
 	});
 
 	test('auf Live und lokal: nur die Nummer', () => {

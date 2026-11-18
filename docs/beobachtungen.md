@@ -116,6 +116,24 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-18 — Restpunkte zu E-65: WebKit beim Neuladen, alter Service Worker
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/neue-version.test.ts`, `src/service-worker/`, `docs/ci-cd-und-release.md` («Alte Versionen auf dem Handy»)
+
+**Beobachtung:** E-65 ist mit #39 umgesetzt (Links laden nach einer neuen Fassung ganz neu). Offen
+aus der Ergänzung vom 15.11.2026: (1) WebKit meldet abgebrochene Abrufe auch beim Neuladen, das
+SvelteKit macht, wenn ein Seitenwechsel scheitert (Code der Zielseite fehlt); kein E2E prüft
+diesen Fehlerfall. (2) Ändert ein Release die Form der Push-Nutzlast, zeigt ein noch aktiver
+alter Service Worker den Push womöglich nicht an, bis er abgelöst ist (Vermutung, nicht geprüft).
+
+**Ursprung:** #39, Merge-Review zu E-65
+
+**Einschätzung:** (2) wird erst relevant, wenn sich die Push-Nutzlast ändert; dann vor dem Release
+prüfen. (1) ist mit den neuen Reload-Links seltener geworden; ein E2E dafür bräuchte einen
+fehlenden Seiten-Code auf dem Server.
+
 ### 2026-11-18 — Kein Prüflauf merkt, wenn das Image die Testdaten nicht laden kann
 
 **Thema:** Tests
