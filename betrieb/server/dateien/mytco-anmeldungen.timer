@@ -1,0 +1,9 @@
+[Unit]
+Description=MyTCO: Anmeldungen mit IP-Adresse täglich leeren
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target

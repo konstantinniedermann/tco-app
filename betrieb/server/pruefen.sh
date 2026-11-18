@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Prüft die Härtung des Servers nach SI-13 und die Fristen der Protokolle nach DS-06.
-# Als root ausführen; ändert nichts. Gibt je Massnahme "ok <name>" oder "fehler <name>" aus,
+# Als root ausführen: pruefen.sh [admin-benutzer]. Ändert nichts. Mit Admin-Benutzer prüft es
+# auch, dass er ohne Passwort root wird. Gibt je Massnahme "ok <name>" oder "fehler <name>" aus,
 # am Ende "ok" oder "fehler" (Exit 0 bzw. 1), nie einen Wert.
 # MYTCO_WURZEL (Vorgabe /) lenkt /etc und /opt um, nur für die Tests.
 # Die Prüfungen ruft `massnahme` über ihren Namen auf.
@@ -8,6 +9,7 @@
 set -uo pipefail
 W="${MYTCO_WURZEL:-/}"
 W="${W%/}"
+ADMIN="${1:-}"
 FEHLER=0
 
 melde() {
@@ -29,8 +31,7 @@ ssh_passwort() { sshd_hat 'passwordauthentication no' && sshd_hat 'kbdinteractiv
 ssh_root() { sshd_hat 'permitrootlogin no'; }
 ssh_umgebung() { sshd_hat 'permituserenvironment no'; }
 
-# Aktiv, Protokoll aus, eingehend standardmässig verboten; erlaubt genau 22, 80, 443 (tcp),
-# dazu höchstens 443/udp (HTTP/3).
+# Aktiv, Protokoll aus, eingehend standardmässig verboten; erlaubt genau 22, 80, 443 (tcp).
 firewall() {
 	local status ports port
 	status=$(ufw status verbose 2>/dev/null) || return 1
@@ -40,7 +41,7 @@ firewall() {
 	ports=$(printf '%s\n' "$status" | awk '/ ALLOW/ { print $1 }' | sort -u)
 	for port in $ports; do
 		case "$port" in
-		22/tcp | 80/tcp | 443/tcp | 443/udp) ;;
+		22/tcp | 80/tcp | 443/tcp) ;;
 		*) return 1 ;;
 		esac
 	done
@@ -50,8 +51,10 @@ firewall() {
 }
 
 updates() {
+	local apt
 	systemctl is-active unattended-upgrades || return 1
-	apt-config dump | grep -q '^APT::Periodic::Unattended-Upgrade "1";'
+	apt=$(apt-config dump) || return 1
+	printf '%s\n' "$apt" | grep -q '^APT::Periodic::Unattended-Upgrade "1";'
 }
 
 # Letzter wirksamer Wert eines Schlüssels aus `systemd-analyze cat-config`.
@@ -75,11 +78,14 @@ sekunden() {
 	esac
 }
 
+# MaxRetentionSec löscht nur abgelegte Dateien; die laufende wechselt erst nach MaxFileSec
+# (Vorgabe ein Monat). Ein Eintrag bleibt darum höchstens beide zusammen.
 journal() {
-	local frist
+	local frist datei
 	[ "$(journal_wert Storage)" = persistent ] || return 1
 	frist=$(sekunden "$(journal_wert MaxRetentionSec)") || return 1
-	[ "$frist" -gt 0 ] && [ "$frist" -le 86400 ]
+	datei=$(sekunden "$(journal_wert MaxFileSec)") || return 1
+	[ "$frist" -gt 0 ] && [ "$datei" -gt 0 ] && [ $((frist + datei)) -le 86400 ]
 }
 
 rsyslog() { ! systemctl is-active rsyslog; }
@@ -104,9 +110,11 @@ protokolle() {
 		frist_30 "$datei" '/var/lib/docker/containers/*/*-json.log'
 }
 
-# wtmp und btmp halten die Adressen der Anmeldungen: täglich, alte Datei sofort weg.
+# wtmp und btmp halten die Adressen der Anmeldungen: täglich, alte Datei sofort weg. lastlog,
+# wtmpdb und lastlog2 leert der Timer mytco-anmeldungen täglich.
 anmeldungen() {
 	local name inhalt
+	systemctl is-active mytco-anmeldungen.timer || return 1
 	for name in wtmp btmp; do
 		[ -f "$W/etc/logrotate.d/$name" ] || return 1
 		inhalt=$(block "$W/etc/logrotate.d/$name" "/var/log/$name")
@@ -131,6 +139,8 @@ massnahme rsyslog rsyslog
 massnahme protokolle protokolle
 massnahme anmeldungen anmeldungen
 massnahme betrieb betrieb
+admin() { sudo -u "$ADMIN" sudo -n true; }
+if [ -n "$ADMIN" ]; then massnahme admin admin; fi
 
 if [ "$FEHLER" = 0 ]; then
 	echo ok

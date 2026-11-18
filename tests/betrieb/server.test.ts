@@ -1,11 +1,13 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { tempOrdner } from './hilfe.ts';
 
 // pruefen.sh mit Ersatzbefehlen (tests/betrieb/stubs-server) und eigener Wurzel für /etc.
+// Die Dateien, die einrichten.sh einspielt, kommen unverändert aus betrieb/server/dateien.
 const STUBS = resolve(import.meta.dirname, 'stubs-server');
+const mitgeliefert = (name: string) => readFileSync(`betrieb/server/dateien/${name}`, 'utf-8');
 
 const SICHER_SSHD = [
 	'port 22',
@@ -26,49 +28,34 @@ const SICHER_UFW = [
 	'22/tcp                     ALLOW IN    Anywhere',
 	'80/tcp                     ALLOW IN    Anywhere',
 	'443/tcp                    ALLOW IN    Anywhere',
-	'443/udp                    ALLOW IN    Anywhere',
 	'22/tcp (v6)                ALLOW IN    Anywhere (v6)',
 	'80/tcp (v6)                ALLOW IN    Anywhere (v6)',
-	'443/tcp (v6)               ALLOW IN    Anywhere (v6)',
-	'443/udp (v6)               ALLOW IN    Anywhere (v6)'
+	'443/tcp (v6)               ALLOW IN    Anywhere (v6)'
 ].join('\n');
 
+// So gibt `systemd-analyze cat-config` die Datei der Distribution und die eigene aus.
 const SICHER_JOURNALD = [
 	'# /etc/systemd/journald.conf',
 	'[Journal]',
 	'#MaxRetentionSec=0',
+	'#MaxFileSec=1month',
 	'',
 	'# /etc/systemd/journald.conf.d/mytco.conf',
-	'[Journal]',
-	'Storage=persistent',
-	'MaxRetentionSec=24h'
+	mitgeliefert('journald-mytco.conf')
 ].join('\n');
 
-const SICHER_LOGROTATE = [
-	'/opt/mytco/*/protokoll.log {',
-	'\tsu mytco mytco',
-	'\tdaily',
-	'\trotate 30',
-	'\tmaxage 30',
-	'\tcopytruncate',
-	'\tmissingok',
-	'}',
-	'/var/lib/docker/containers/*/*-json.log {',
-	'\tdaily',
-	'\trotate 30',
-	'\tmaxage 30',
-	'\tcopytruncate',
-	'\tmissingok',
-	'}'
-].join('\n');
+const SICHER_LOGROTATE = mitgeliefert('logrotate-mytco');
 
-const SICHER_ANMELDUNGEN = '/var/log/wtmp {\n\tdaily\n\trotate 0\n\tmissingok\n}\n';
+const anmeldung = (name: string) =>
+	mitgeliefert('logrotate-anmeldung').replace('NAME', name).replace('MODUS', '0660');
 
 const SICHER: Record<string, string> = {
 	STUB_SSHD_T: SICHER_SSHD,
 	STUB_UFW: SICHER_UFW,
 	STUB_AKTIV_unattended_upgrades: 'active',
 	STUB_AKTIV_rsyslog: 'inactive',
+	STUB_AKTIV_mytco_anmeldungen_timer: 'active',
+	STUB_SUDO_OK: '1',
 	STUB_APT: 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgrade "1";',
 	STUB_JOURNALD: SICHER_JOURNALD,
 	STUB_STAT_BASIS: 'mytco:mytco 750',
@@ -78,13 +65,14 @@ const SICHER: Record<string, string> = {
 
 const SICHERE_DATEIEN: Record<string, string> = {
 	'etc/logrotate.d/mytco': SICHER_LOGROTATE,
-	'etc/logrotate.d/wtmp': SICHER_ANMELDUNGEN,
-	'etc/logrotate.d/btmp': SICHER_ANMELDUNGEN.replace('wtmp', 'btmp')
+	'etc/logrotate.d/wtmp': anmeldung('wtmp'),
+	'etc/logrotate.d/btmp': anmeldung('btmp')
 };
 
 function pruefen(
 	ersetzt: Record<string, string> = {},
-	dateien: Record<string, string | null> = {}
+	dateien: Record<string, string | null> = {},
+	args: string[] = ['verwalter']
 ) {
 	const wurzel = tempOrdner('mytco-wurzel-');
 	for (const [pfad, inhalt] of Object.entries({ ...SICHERE_DATEIEN, ...dateien })) {
@@ -92,7 +80,7 @@ function pruefen(
 		mkdirSync(dirname(join(wurzel, pfad)), { recursive: true });
 		writeFileSync(join(wurzel, pfad), inhalt);
 	}
-	const lauf = spawnSync('bash', [resolve('betrieb/server/pruefen.sh')], {
+	const lauf = spawnSync('bash', [resolve('betrieb/server/pruefen.sh'), ...args], {
 		encoding: 'utf-8',
 		env: {
 			...process.env,
@@ -116,7 +104,8 @@ const NAMEN = [
 	'rsyslog',
 	'protokolle',
 	'anmeldungen',
-	'betrieb'
+	'betrieb',
+	'admin'
 ];
 
 describe('pruefen.sh', () => {
@@ -124,6 +113,12 @@ describe('pruefen.sh', () => {
 		const lauf = pruefen();
 		expect(lauf.zeilen).toEqual([...NAMEN.map((n) => `ok ${n}`), 'ok']);
 		expect(lauf.status).toBe(0);
+	});
+
+	test('ohne Admin-Benutzer entfällt die Prüfung admin', () => {
+		const lauf = pruefen({}, {}, []);
+		expect(lauf.zeilen).not.toContain('ok admin');
+		expect(lauf.zeilen.at(-1)).toBe('ok');
 	});
 
 	test.each([
@@ -161,15 +156,24 @@ describe('pruefen.sh', () => {
 			'firewall',
 			{ STUB_UFW: SICHER_UFW.replace(/^22\/tcp .*$/gm, '').replace(/^22\/tcp \(v6\).*$/gm, '') }
 		],
+		// SI-13 nennt 443; Caddy veröffentlicht nur tcp
+		['firewall', { STUB_UFW: `${SICHER_UFW}\n443/udp                    ALLOW IN    Anywhere` }],
 		['updates', { STUB_AKTIV_unattended_upgrades: 'inactive' }],
 		['updates', { STUB_APT: 'APT::Periodic::Unattended-Upgrade "0";' }],
 		[
 			'journal',
-			{ STUB_JOURNALD: SICHER_JOURNALD.replace('MaxRetentionSec=24h', 'MaxRetentionSec=2d') }
+			{ STUB_JOURNALD: SICHER_JOURNALD.replace('MaxRetentionSec=23h', 'MaxRetentionSec=2d') }
 		],
 		[
 			'journal',
-			{ STUB_JOURNALD: SICHER_JOURNALD.replace('MaxRetentionSec=24h', '#MaxRetentionSec=24h') }
+			{ STUB_JOURNALD: SICHER_JOURNALD.replace('MaxRetentionSec=23h', '#MaxRetentionSec=23h') }
+		],
+		// MaxRetentionSec löscht nur abgelegte Dateien; die laufende wechselt erst nach MaxFileSec
+		// (Vorgabe ein Monat). Zusammen höchstens 24 Stunden.
+		['journal', { STUB_JOURNALD: SICHER_JOURNALD.replace('MaxFileSec=1h', '#MaxFileSec=1h') }],
+		[
+			'journal',
+			{ STUB_JOURNALD: SICHER_JOURNALD.replace('MaxRetentionSec=23h', 'MaxRetentionSec=24h') }
 		],
 		[
 			'journal',
@@ -179,7 +183,10 @@ describe('pruefen.sh', () => {
 		['rsyslog', { STUB_AKTIV_rsyslog: 'active' }],
 		['betrieb', { STUB_STAT_BASIS: 'root:root 755' }],
 		['betrieb', { STUB_STAT_BIN: 'mytco:mytco 755' }],
-		['betrieb', { STUB_ID: 'mytco' }]
+		['betrieb', { STUB_ID: 'mytco' }],
+		['anmeldungen', { STUB_AKTIV_mytco_anmeldungen_timer: 'inactive' }],
+		// Der Admin kommt nach dem Abschalten von root nur über sudo ohne Passwort zu root
+		['admin', { STUB_SUDO_OK: '' }]
 	])('unsicher → fehler %s, Exit 1', (name, ersetzt) => {
 		const lauf = pruefen(ersetzt);
 		expect(lauf.zeilen).toContain(`fehler ${name}`);
@@ -187,11 +194,11 @@ describe('pruefen.sh', () => {
 		expect(lauf.status).toBe(1);
 	});
 
-	test.each([['1d'], ['86400'], ['86400s'], ['12h'], ['90min']])(
-		'journal: MaxRetentionSec=%s gilt als höchstens 24 Stunden',
+	test.each([['82800'], ['82800s'], ['12h'], ['1380min']])(
+		'journal: MaxRetentionSec=%s mit MaxFileSec=1h gilt als höchstens 24 Stunden',
 		(wert) => {
 			const lauf = pruefen({
-				STUB_JOURNALD: SICHER_JOURNALD.replace('MaxRetentionSec=24h', `MaxRetentionSec=${wert}`)
+				STUB_JOURNALD: SICHER_JOURNALD.replace('MaxRetentionSec=23h', `MaxRetentionSec=${wert}`)
 			});
 			expect(lauf.zeilen).toContain('ok journal');
 		}

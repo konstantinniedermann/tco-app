@@ -25,15 +25,18 @@ sie, Geheimnisse stehen darin keine).
 
 Ein frischer Server (Ubuntu LTS) wird mit `server/einrichten.sh` eingerichtet, als root aus
 einem Checkout des Repos: `sudo betrieb/server/einrichten.sh <admin-benutzer>`. Das Skript ist
-mehrfach ausführbar und endet mit `server/pruefen.sh`, das je Massnahme `ok <name>` oder
-`fehler <name>` meldet; `pruefen.sh` lässt sich jederzeit allein laufen und ändert nichts.
+mehrfach ausführbar und endet mit `server/pruefen.sh <admin-benutzer>`, das je Massnahme
+`ok <name>` oder `fehler <name>` meldet; `pruefen.sh` lässt sich jederzeit allein laufen und
+ändert nichts.
 
 - **Anmeldung (SI-13):** nur mit Schlüssel, kein root über SSH (`/etc/ssh/sshd_config.d/00-mytco.conf`,
   vor den Dateien der Distribution gelesen; geprüft wird der wirksame Wert mit `sshd -T`). Der
-  Projektleiter meldet sich als `<admin-benutzer>` an und wird mit `sudo` root; gibt es den
-  Benutzer nicht, legt das Skript ihn mit den Schlüsseln von root an. Ohne Schlüssel bricht es
-  ab, bevor SSH umgestellt wird.
-- **Firewall:** `ufw` lässt eingehend nur 22, 80 und 443 (tcp, 443 auch udp) zu, ohne Protokoll.
+  Projektleiter meldet sich als `<admin-benutzer>` an (nur `a-z`, `0-9`, `_`, `-`) und wird mit
+  `sudo` ohne Passwort root; gibt es den Benutzer nicht, legt das Skript ihn mit den Schlüsseln
+  des Aufrufers bzw. von root an, ohne deren Optionen (Cloud-Images sperren root mit
+  `command=…`). Kann er sich nicht anmelden oder nicht root werden, bricht es ab, bevor SSH
+  umgestellt wird.
+- **Firewall:** `ufw` lässt eingehend nur 22, 80 und 443 (tcp) zu, ohne Protokoll.
   Docker öffnet veröffentlichte Ports an `ufw` vorbei; veröffentlicht wird darum nur Caddy (80,
   443). Ein Port-Scan von aussen belegt es.
 - **Updates:** `unattended-upgrades` spielt die Sicherheits-Updates von Ubuntu täglich ein.
@@ -47,12 +50,13 @@ mehrfach ausführbar und endet mit `server/pruefen.sh`, das je Massnahme `ok <na
 
 | Protokoll | Inhalt | Frist |
 |-----------|--------|-------|
-| Systemjournal (auch sshd) | Anmeldungen mit IP-Adresse | 24 Stunden (`journald.conf.d/mytco.conf`) |
+| Systemjournal (auch sshd) | Anmeldungen mit IP-Adresse | 24 Stunden (`journald.conf.d/mytco.conf`: abgelegte Dateien 23 Stunden, neue Datei jede Stunde) |
 | `/var/log/wtmp`, `/var/log/btmp` | Anmeldungen mit IP-Adresse | täglich geleert, keine alte Datei |
+| `/var/log/lastlog`, wtmpdb, lastlog2 | letzte Anmeldung je Benutzer mit IP-Adresse | täglich geleert (Timer `mytco-anmeldungen`) |
 | rsyslog (`/var/log/auth.log` usw.) | dasselbe wie das Journal | abgeschaltet |
 | Firewall | Adressen abgewiesener Pakete | kein Protokoll |
 | `<umgebung>/protokoll.log` | Ausgaben von Docker, psql und App | 30 Tage (`logrotate.d/mytco`) |
-| Logs der Container | Ausgaben der Container, ohne IP-Adressen | 30 Tage (`logrotate.d/mytco`), dazu nach Grösse (Compose) |
+| Logs der Container | Ausgaben der Container, ohne IP-Adressen | 30 Tage (`logrotate.d/mytco`); Compose hält nur eine Datei bis 10 MB |
 
 ### Platz für eine Website
 

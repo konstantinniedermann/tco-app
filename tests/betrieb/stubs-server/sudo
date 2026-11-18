@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Ersatz für `sudo -u <admin> sudo -n true`: Exit 0 nur mit gesetztem $STUB_SUDO_OK.
+[ -n "${STUB_SUDO_OK-}" ]

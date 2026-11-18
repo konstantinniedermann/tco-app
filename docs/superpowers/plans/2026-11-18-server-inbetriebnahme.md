@@ -144,7 +144,7 @@ Jede Aufgabe endet mit einem Nachweis (Befehl und Ausgabe, geschwärzt) als Komm
 
 ### Task 7: Härten nach SI-13
 
-- [ ] Als root (Konsole bzw. erster SSH-Login): Repo-Stand von `dev` holen (nur `betrieb/`), `einrichten.sh <schluessel>`; Ausgabe von `pruefen.sh` endet mit `ok`.
+- [ ] Als root (Konsole bzw. erster SSH-Login): Repo-Stand von `dev` holen (nur `betrieb/`), `sudo betrieb/server/einrichten.sh <admin-benutzer>`; Ausgabe von `pruefen.sh` endet mit `ok`. Prüfen, ob Ubuntu `lastlog`, wtmpdb oder lastlog2 schreibt (Review I1).
 - [ ] Von aussen (Mac): `ssh root@<server>` abgewiesen; `ssh -o PubkeyAuthentication=no mytco@<server>` abgewiesen; Port-Scan aller TCP-Ports zeigt nur 22, 80, 443 (Werkzeug: `nmap`, falls vorhanden, sonst Schleife mit `nc -z -w1`).
 - [ ] Konsolenzugang ohne SSH im Infomaniak-Manager ausprobieren; `betrieb-und-uebergabe.md` von V auf B.
 

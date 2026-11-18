@@ -1,0 +1,8 @@
+# MyTCO, DS-06: lastlog und die Datenbanken von wtmpdb/lastlog2 halten je Anmeldung die
+# IP-Adresse ohne Frist; täglich leeren (wtmp/btmp regelt logrotate).
+[Unit]
+Description=MyTCO: Anmeldungen mit IP-Adresse leeren
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c ': > /var/log/lastlog 2>/dev/null; rm -f /var/lib/wtmpdb/wtmp.db /var/lib/lastlog/lastlog2.db'
