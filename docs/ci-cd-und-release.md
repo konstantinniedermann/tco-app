@@ -399,8 +399,8 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   Dependabot zieht das Image also mit. Kein eigener Eintrag bei Dependabot.
 - **Keine Hauptversionen von Node, PostgreSQL und Caddy** über Dependabot (dort ausgeschlossen).
   Die Node-Hauptversion wird mit `engines` (`package.json`) und `.nvmrc` von Hand gewechselt.
-  Eine neue Hauptversion von PostgreSQL liest die Daten von Live nicht: Auf Test (leere
-  Datenbank) ginge sie durch, Live fiele aus. Sie braucht einen eigenen Plan mit Sicherung,
+  Eine neue Hauptversion von PostgreSQL liest die bestehenden Daten nicht: Live fiele aus, und
+  Test, das seine Datenbank behält, ebenso. Sie braucht einen eigenen Plan mit Sicherung,
   Dump und Wiederherstellung in die neue Version. Caddy-Hauptversionen können die
   Konfiguration ändern.
 - **Nicht von Dependabot erfasst:** die Digests von restic (`betrieb/bin/lib.sh`) und der

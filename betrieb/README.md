@@ -78,9 +78,16 @@ Test behält seine Datenbank über Auslieferungen hinweg, wie Live. Ändert ein 
 Testdaten oder Konten entstehen, erhöht er die Zahl in `betrieb/test-neu-aufsetzen` um eins.
 Die nächste Auslieferung auf Test leert dann einmal Datenbank und Mail-Fänger und legt die
 erfundenen Mitglieder neu an. Erst nach einer geglückten Auslieferung steht die Zahl in
-`test/zustand/neu-aufgesetzt`; scheitert sie, setzt die nächste wieder neu auf. Erhöhen zwei
-Branches die Zahl auf denselben Wert, setzt das Test nur einmal neu auf. Live liest den Zähler
-nie.
+`test/zustand/neu-aufgesetzt`; scheitert sie, setzt die nächste wieder neu auf. Live liest den
+Zähler nie.
+
+Zwei Branches, die die Zahl auf denselben Wert erhöhen, mergen ohne Konflikt, und Test wird nur
+einmal neu aufgesetzt; die Testdaten des später gemergten fehlen dann. Darum vor dem Merge `dev`
+einmergen: Hat `dev` die Zahl seit dem Abzweigen schon erhöht, sie im eigenen Branch noch einmal
+erhöhen. Ein frischer Stand für die [Checkliste vor dem Release](../docs/testkonzept.md#checkliste-vor-dem-release)
+entsteht auf dieselbe Weise, mit einem Commit, der nur die Zahl erhöht. Ein Image von vor dem
+Zähler (etwa ein erneut gestarteter alter Lauf) bringt sein eigenes `ausliefern` mit und setzt
+Test wie früher bei jeder Auslieferung neu auf.
 
 ### Platz für eine Website
 

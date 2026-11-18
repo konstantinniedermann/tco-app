@@ -2,6 +2,8 @@
 // Mail, die über MAIL_NUR_AN beim Projektleiter landet. Läuft im Laufzeit-Image mit
 // `node scripts/testdaten.ts` (betrieb/bin/ausliefern, Schritt «testdaten laden»).
 // Die Ausgabe landet in protokoll.log: nie Code, Adresse oder Werte aus der Datenbank (DS-06).
+// Läuft nur, wenn Test neu aufgesetzt wird: Wer hier oder in erfundene-mitglieder.ts ändert, wie
+// Testdaten oder Konten entstehen, erhöht den Zähler in betrieb/test-neu-aufsetzen.
 import { count } from 'drizzle-orm';
 import { machAdmin } from '../src/lib/server/admin/erster-admin.ts';
 import { formatiereDatum } from '../src/lib/server/datum.ts';

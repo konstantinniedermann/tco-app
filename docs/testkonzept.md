@@ -211,7 +211,9 @@ iPhone (Safari) und einem Android-Handy (Chrome) und den erfundenen Mitgliedern 
 Test-Umgebung (Erika Beispiel, Kurt Erfunden, Hanna Muster, alle `@example.org`). Test behält
 seine Daten über Auslieferungen hinweg; die Mitglieder entstehen neu, wenn Test neu aufgesetzt
 wird (erste Auslieferung, Zähler `betrieb/test-neu-aufsetzen`), und dann kommt ein Brief-Code
-für Erika Beispiel per E-Mail. Alle Mails von Test, auch die Codes per E-Mail für die erfundenen Mitglieder, gehen über
+für Erika Beispiel per E-Mail. Was eine frühere Runde geändert hat (E-Mail-Adresse, Passkey,
+Push-Abos, Mails im Mail-Fänger), bleibt sonst stehen; einen frischen Stand gibt ein Commit, der
+den Zähler erhöht ([Test neu aufsetzen](../betrieb/README.md#test-neu-aufsetzen)). Alle Mails von Test, auch die Codes per E-Mail für die erfundenen Mitglieder, gehen über
 die Umleitung (`MAIL_NUR_AN`) an den Projektleiter; der Betreff nennt den ursprünglichen
 Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39); bis dahin lässt sich die Checkliste nur lokal (`make betrieb-nachweis`) vorbereiten. Jeder Punkt nennt die IDs, die er prüft:
 
