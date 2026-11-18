@@ -116,6 +116,36 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-18 — Zähler test-neu-aufsetzen: nichts erzwingt das Erhöhen
+
+**Thema:** Arbeitsweise
+
+**Fundort:** `betrieb/test-neu-aufsetzen`, `scripts/testdaten.ts`, `scripts/erfundene-mitglieder.ts`
+
+**Beobachtung:** Ändert ein Branch, wie Testdaten oder Konten entstehen, und erhöht den Zähler
+nicht, kommen die neuen Testdaten still nie auf Test. Heute stehen nur Hinweise im Kopfkommentar
+von `testdaten.ts`, in den Context-Scopes und in `betrieb/README.md`.
+
+**Ursprung:** #39, `merge-reviewer` zum Zähler (Befund 3, Hinweise mitgemacht)
+
+**Einschätzung:** Eine Prüfung unter `scripts/pruefungen/` (Änderung an den Testdaten-Skripten
+ohne Änderung am Zähler → Warnung) wäre die stärkere Lösung; lohnt erst, wenn es einmal passiert.
+
+### 2026-11-18 — Übernahme des Zählers hängt an `zustand/aktuell`, nicht an vorhandenen Daten
+
+**Thema:** Betrieb
+
+**Fundort:** `betrieb/bin/ausliefern` (Entscheid «neu aufsetzen», Zweig ohne `neu-aufgesetzt`)
+
+**Beobachtung:** Fehlt `test/zustand/neu-aufgesetzt`, gibt es aber `zustand/aktuell`, wird der
+Zähler ohne Neuaufsetzen übernommen. Hat eine ältere Fassung Test leer zurückgelassen, bliebe es
+leer bis zur nächsten Erhöhung des Zählers.
+
+**Ursprung:** #39, `merge-reviewer` zum Zähler (Befund 6)
+
+**Einschätzung:** Nur Übergang vom alten auf das neue `ausliefern`; der laufende Test-Server hat
+Daten und den Zähler schon übernommen. Abhilfe von Hand: Zähler erhöhen.
+
 ### 2026-11-18 — Türsteher-Ordner liegt in einem Ordner, der `mytco` gehört
 
 **Thema:** Sicherheit
