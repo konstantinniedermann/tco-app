@@ -1,0 +1,23 @@
+# MyTCO, DS-06: Protokolle höchstens 30 Tage. Docker begrenzt seine Logs nur nach Grösse,
+# copytruncate leert die Datei an Ort und Stelle, ohne die Container neu zu starten.
+/opt/mytco/*/protokoll.log {
+	su mytco mytco
+	daily
+	rotate 30
+	maxage 30
+	copytruncate
+	missingok
+	notifempty
+	compress
+	delaycompress
+}
+/var/lib/docker/containers/*/*-json.log {
+	daily
+	rotate 30
+	maxage 30
+	copytruncate
+	missingok
+	notifempty
+	compress
+	delaycompress
+}

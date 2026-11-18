@@ -1,0 +1,7 @@
+# MyTCO, DS-06: Anmeldungen mit IP-Adresse höchstens 24 Stunden (ersetzt die Datei der Distribution).
+/var/log/NAME {
+	daily
+	rotate 0
+	missingok
+	create MODUS root utmp
+}

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Ersatz für `id -nG mytco`: gibt $STUB_ID aus; leer heisst: Benutzer fehlt (Exit 1).
+[ -n "${STUB_ID-}" ] || exit 1
+echo "$STUB_ID"

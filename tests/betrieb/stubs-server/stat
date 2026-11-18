@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Ersatz für `stat -c '%U:%G %a' <pfad>`: …/opt/mytco/bin → $STUB_STAT_BIN, …/opt/mytco → $STUB_STAT_BASIS.
+pfad="${*: -1}"
+case "$pfad" in
+*/opt/mytco/bin) echo "${STUB_STAT_BIN-}" ;;
+*/opt/mytco) echo "${STUB_STAT_BASIS-}" ;;
+*) exit 1 ;;
+esac

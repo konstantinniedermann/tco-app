@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Ersatz für `systemd-analyze cat-config systemd/journald.conf`: gibt $STUB_JOURNALD aus.
+printf '%s\n' "${STUB_JOURNALD-}"
