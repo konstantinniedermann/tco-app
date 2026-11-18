@@ -11,6 +11,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Test behält seine Daten bei einer neuen Fassung, wie Live. Neu aufgesetzt wird Test nur noch,
+  wenn ein Branch den Zähler `betrieb/test-neu-aufsetzen` erhöht (#39). An der App ändert sich
+  nichts.
 - Auf der Test-Umgebung zeigt die Fusszeile hinter der Versionsnummer die Kurzform des Commits
   (#39). Auf Live ändert sich nichts.
 - Nach einer neuen Fassung lädt die offene App beim nächsten angetippten Link ganz neu und zeigt

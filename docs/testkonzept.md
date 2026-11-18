@@ -208,9 +208,10 @@ blockieren keine gewollte Design-Änderung.
 
 Auf der [Test-Umgebung](ci-cd-und-release.md#umgebungen) `test.my.tcolten.ch`, mit einem
 iPhone (Safari) und einem Android-Handy (Chrome) und den erfundenen Mitgliedern der
-Test-Umgebung (Erika Beispiel, Kurt Erfunden, Hanna Muster, alle `@example.org`). Sie entstehen
-bei jeder Auslieferung neu; nach jeder Auslieferung kommt ein Brief-Code für Erika Beispiel per
-E-Mail. Alle Mails von Test, auch die Codes per E-Mail für die erfundenen Mitglieder, gehen über
+Test-Umgebung (Erika Beispiel, Kurt Erfunden, Hanna Muster, alle `@example.org`). Test behält
+seine Daten über Auslieferungen hinweg; die Mitglieder entstehen neu, wenn Test neu aufgesetzt
+wird (erste Auslieferung, Zähler `betrieb/test-neu-aufsetzen`), und dann kommt ein Brief-Code
+für Erika Beispiel per E-Mail. Alle Mails von Test, auch die Codes per E-Mail für die erfundenen Mitglieder, gehen über
 die Umleitung (`MAIL_NUR_AN`) an den Projektleiter; der Betreff nennt den ursprünglichen
 Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39); bis dahin lässt sich die Checkliste nur lokal (`make betrieb-nachweis`) vorbereiten. Jeder Punkt nennt die IDs, die er prüft:
 
@@ -226,7 +227,7 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] iPhone (Safari): QR-Code scannen → Einstiegsseite mit Anleitung; die Schritte und Beschriftungen stimmen mit Safari überein; nach dem Ablegen startet MyTCO vom Symbol direkt mit dem Login (A-HILFE-02)
 - [ ] Android (Chrome): Taste «MyTCO installieren» öffnet den Dialog von Android; die Anleitung über das Menü stimmt mit Chrome überein; im Samsung-Browser beobachten, ob die Anleitung passt (A-HILFE-02)
 - [ ] Seite Hilfe ohne Login über die Fusszeile erreichbar, der Kontakt stimmt (A-HILFE-01)
-- [ ] Anlass: «In den Kalender» auf einem echten iPhone **in der App vom Startbildschirm** und auf einem Android-Handy; der Termin landet mit Datum, Zeit und Ort im Kalender des Geräts (A-ANLASS-01, SI-19); vorher als Erika in der Verwaltung einen Anlass anlegen (Test ist nach jeder Auslieferung ohne Anlass)
+- [ ] Anlass: «In den Kalender» auf einem echten iPhone **in der App vom Startbildschirm** und auf einem Android-Handy; der Termin landet mit Datum, Zeit und Ort im Kalender des Geräts (A-ANLASS-01, SI-19); vorher als Erika in der Verwaltung einen Anlass anlegen (frisch aufgesetzt hat Test keinen Anlass)
 - [ ] iPhone, App vom Startbildschirm: Telefon und Adresse im Profil ändern; E-Mail ändern, in die Mail-App wechseln und zurück → Schritt 2 mit den zwei Code-Feldern steht da, beide Mails kommen an (über die Umleitung), danach Login mit der neuen Adresse (A-KONTO-01, A-KONTO-02, SI-09)
 - [ ] Verwaltung am PC: die Selbständerung erscheint unter *Für Fairgate* und verschwindet nach dem Abhaken (A-KONTO-02)
 - [ ] iPhone (App vom Startbildschirm) und Android: Reiterwechsel blendet über, Hilfe schiebt sich herein und mit «‹ Start» hinaus, Aufklappbereich öffnet weich, der Seitentitel blendet beim Scrollen in die Kopfleiste über, auch in der Verwaltung; kein grauer Tipp-Blitz, kein Link-Menü beim langen Drücken auf Reiter und Tasten; mit «Bewegung reduzieren» alles ohne Bewegung (UI-09, #54)

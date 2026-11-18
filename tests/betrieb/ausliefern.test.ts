@@ -112,6 +112,15 @@ const appStarts = (lauf: Ergebnis) =>
 		.map((a, i) => ({ a, i }))
 		.filter(({ a }) => a.includes('--wait-timeout') && a.endsWith(' app'));
 const MIT_DB_UP = { STUB_MUSTER_A: 'ps --status running -q db', STUB_AUSGABE_A: 'db-container' };
+// Test lief schon, mit einem anderen Zähler «neu aufsetzen» als im Image (betrieb/test-neu-aufsetzen).
+const TEST_NEU_AUFSETZEN = {
+	'test/zustand/aktuell': `${ALT}\n`,
+	'test/zustand/neu-aufgesetzt': '0\n'
+};
+const ZAEHLER_DES_IMAGES = readFileSync('betrieb/test-neu-aufsetzen', 'utf-8')
+	.split('\n')
+	.filter((z) => z.trim() !== '' && !z.startsWith('#'))[0];
+const downs = (lauf: Ergebnis) => lauf.aufrufe.filter((a) => a.includes('down --volumes'));
 
 describe('ausliefern: erster Lauf auf Test', () => {
 	const basis = baue();
@@ -263,12 +272,94 @@ describe('ausliefern: Mail-Fänger', () => {
 	});
 
 	test('der Rückfall auf Test startet den Mail-Fänger ebenfalls', () => {
-		const basis = baue({ dateien: { 'test/zustand/aktuell': `${ALT}\n` } });
+		const basis = baue({ dateien: TEST_NEU_AUFSETZEN });
 		const lauf = ausliefern('test', basis, {
 			STUB_FEHLER_BEI: 'migrate.ts',
 			STUB_FEHLER_NUR_IMAGE: `${REPO}@${NEU}`
 		});
 		expect(lauf.aufrufe.filter((a) => a.includes('up -d --wait db mailpit'))).toHaveLength(2);
+	});
+});
+
+// Test behält seine Datenbank wie Live; neu aufgesetzt wird es nur bei der ersten Auslieferung
+// oder wenn das Image einen anderen Zähler mitbringt als test/zustand/neu-aufgesetzt.
+describe('ausliefern: Test neu aufsetzen', () => {
+	test('erster Lauf: setzt neu auf und merkt sich den Zähler des Images', () => {
+		const basis = baue();
+		const lauf = ausliefern('test', basis);
+		expect(letzteZeile(lauf)).toBe('ok');
+		expect(lauf.stdout).toContain('schritt: test zuruecksetzen');
+		expect(lies(basis, 'test/zustand/neu-aufgesetzt')).toBe(ZAEHLER_DES_IMAGES);
+	});
+
+	test('gleicher Zähler: kein Zurücksetzen, keine Testdaten, migriert und startet die App', () => {
+		const basis = baue({
+			dateien: {
+				'test/zustand/aktuell': `${ALT}\n`,
+				'test/zustand/neu-aufgesetzt': `${ZAEHLER_DES_IMAGES}\n`
+			}
+		});
+		const lauf = ausliefern('test', basis);
+		expect(letzteZeile(lauf)).toBe('ok');
+		expect(downs(lauf)).toHaveLength(0);
+		expect(lauf.stdout).not.toContain('schritt: test zuruecksetzen');
+		expect(index(lauf, 'testdaten')).toBe(-1);
+		expect(index(lauf, 'up -d --wait db mailpit')).toBeGreaterThanOrEqual(0);
+		expect(index(lauf, 'migrate.ts')).toBeGreaterThanOrEqual(0);
+		expect(lauf.umwelt[appStarts(lauf)[0].i].image).toBe(`${REPO}@${NEU}`);
+		expect(lies(basis, 'test/zustand/aktuell')).toBe(NEU);
+	});
+
+	test('anderer Zähler: setzt neu auf, lädt Testdaten, führt den Zähler nach', () => {
+		const basis = baue({ dateien: TEST_NEU_AUFSETZEN });
+		const lauf = ausliefern('test', basis);
+		expect(letzteZeile(lauf)).toBe('ok');
+		expect(downs(lauf)).toHaveLength(1);
+		expect(index(lauf, 'node scripts/testdaten.ts')).toBeGreaterThan(index(lauf, 'migrate.ts'));
+		expect(lies(basis, 'test/zustand/neu-aufgesetzt')).toBe(ZAEHLER_DES_IMAGES);
+	});
+
+	test('Test läuft schon, Zähler nie gemerkt: übernimmt ihn, ohne neu aufzusetzen', () => {
+		const basis = baue({ dateien: { 'test/zustand/aktuell': `${ALT}\n` } });
+		const lauf = ausliefern('test', basis);
+		expect(letzteZeile(lauf)).toBe('ok');
+		expect(downs(lauf)).toHaveLength(0);
+		expect(index(lauf, 'testdaten')).toBe(-1);
+		expect(lies(basis, 'test/zustand/neu-aufgesetzt')).toBe(ZAEHLER_DES_IMAGES);
+	});
+
+	test('ohne Neuaufsetzen scheitert die Migration: fehler wie auf Live, nichts gelöscht', () => {
+		const basis = baue({ dateien: { 'test/zustand/aktuell': `${ALT}\n` } });
+		const lauf = ausliefern('test', basis, { STUB_FEHLER_BEI: 'migrate.ts' });
+		expect(letzteZeile(lauf)).toBe('fehler');
+		expect(downs(lauf)).toHaveLength(0);
+		expect(appStarts(lauf)).toHaveLength(0);
+		expect(lies(basis, 'test/zustand/aktuell')).toBe(ALT);
+		expect(gibt(basis, 'test/zustand/neu-aufgesetzt')).toBe(false);
+	});
+
+	test.each([['zwei'], ['1\n2'], ['# nur Kommentar'], ['']])(
+		'ungültiger Zähler %j: fehler, bevor etwas geändert wird',
+		(inhalt) => {
+			const basis = baue({ dateien: { 'test/zustand/aktuell': `${ALT}\n` } });
+			writeFileSync(join(basis, 'fassungen', NEU, 'betrieb', 'test-neu-aufsetzen'), inhalt);
+			const lauf = ausliefern('test', basis);
+			expect(lauf.status).toBe(1);
+			expect(letzteZeile(lauf)).toBe('fehler');
+			expect(lauf.aufrufe).toHaveLength(0);
+			expect(gibt(basis, 'test/betrieb')).toBe(false);
+			expect(lies(basis, 'test/protokoll.log')).toContain(
+				'ausliefern: Zähler test-neu-aufsetzen fehlt oder ungültig'
+			);
+		}
+	);
+
+	test('Live liest den Zähler nicht', () => {
+		const basis = baue();
+		rmSync(join(basis, 'fassungen', NEU, 'betrieb', 'test-neu-aufsetzen'));
+		const lauf = ausliefern('live', basis);
+		expect(letzteZeile(lauf)).toBe('ok');
+		expect(gibt(basis, 'live/zustand/neu-aufgesetzt')).toBe(false);
 	});
 });
 
@@ -282,8 +373,9 @@ describe('ausliefern: Fehlerfälle', () => {
 		expect(lies(basis, 'live/zustand/aktuell')).toBe(ALT);
 	});
 
-	// Test ist nach `down --volumes` leer: Scheitert danach ein Schritt, setzt ausliefern Test mit
-	// dem bisherigen Image neu auf (Datenbank, Migration, Testdaten, App) und meldet fehler.
+	// Wird Test neu aufgesetzt, ist es nach `down --volumes` leer: Scheitert danach ein Schritt,
+	// setzt ausliefern Test mit dem bisherigen Image neu auf (Datenbank, Migration, Testdaten, App)
+	// und meldet fehler; der Zähler im Zustand rückt nicht vor.
 	const aufrufeMit = (lauf: Ergebnis, teil: string, image: string) =>
 		lauf.aufrufe.filter((a, i) => a.includes(teil) && lauf.umwelt[i].image === image);
 
@@ -292,7 +384,7 @@ describe('ausliefern: Fehlerfälle', () => {
 		['Testdaten', 'node scripts/testdaten.ts'],
 		['App nicht gesund', '--wait-timeout']
 	])('Test: %s scheitert, mit Vorgänger: Test läuft wieder mit dem alten Image', (_n, teil) => {
-		const basis = baue({ dateien: { 'test/zustand/aktuell': `${ALT}\n` } });
+		const basis = baue({ dateien: TEST_NEU_AUFSETZEN });
 		const lauf = ausliefern('test', basis, {
 			STUB_FEHLER_BEI: teil,
 			STUB_FEHLER_NUR_IMAGE: `${REPO}@${NEU}`
@@ -307,6 +399,7 @@ describe('ausliefern: Fehlerfälle', () => {
 		expect(lauf.umwelt[starts[starts.length - 1].i].image).toBe(alt);
 		expect(index(lauf, 'down --volumes')).toBeLessThan(index(lauf, 'migrate.ts'));
 		expect(lies(basis, 'test/zustand/aktuell')).toBe(ALT);
+		expect(lies(basis, 'test/zustand/neu-aufgesetzt')).toBe('0');
 	});
 
 	test('Test: Migration scheitert beim allerersten Lauf: fehler, kein Rückfall', () => {

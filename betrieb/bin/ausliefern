@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # ausliefern <umgebung> <digest>: übernimmt die Einrichtung aus dem Image, sichert Live,
-# migriert, startet die neue App und fällt bei Fehlern auf das vorherige Image zurück.
+# migriert, startet die neue App und fällt bei Fehlern auf das vorherige Image zurück. Test
+# behält seine Datenbank; neu aufgesetzt wird es nur über den Zähler test-neu-aufsetzen.
 # Läuft aus fassungen/<digest>/betrieb/bin/. Ausgabe nur "schritt: …", "ok" oder "fehler";
 # alles von docker steht im Protokoll der Umgebung.
 set -euo pipefail
@@ -29,6 +30,8 @@ LAUFEND=""
 GESPERRT=0
 GEMELDET=0
 ALT_DIGEST=""
+NEU_AUFSETZEN=0
+ZAEHLER=""
 
 ende() {
 	local rc=$?
@@ -67,8 +70,9 @@ rueckfall() {
 	scheitern "App nicht gesund"
 }
 
-# Nur Test, nach `down --volumes`: setzt Test mit dem bisherigen Image neu auf (Datenbank,
-# Migration, Testdaten, App), denn die Datenbank ist leer oder von der neuen Fassung migriert.
+# Nur Test, nach dem Neuaufsetzen (`down --volumes`): setzt Test mit dem bisherigen Image neu
+# auf (Datenbank, Migration, Testdaten, App), denn die Datenbank ist leer oder von der neuen
+# Fassung migriert.
 # Ohne Vorgänger bleibt Test leer. Endet immer mit "fehler"; zustand/aktuell bleibt beim alten.
 rueckfall_test() {
 	local grund="$1"
@@ -89,6 +93,16 @@ rueckfall_test() {
 		fi
 	fi
 	scheitern "$grund"
+}
+
+# Zähler «Test neu aufsetzen»: genau eine Zeile ohne #, nur Ziffern; sonst Exit 1.
+lies_zaehler() {
+	local wert
+	wert=$(grep -v -e '^#' -e '^[[:space:]]*$' "$1" 2>/dev/null) || return 1
+	case "$wert" in
+	'' | *[!0-9]*) return 1 ;;
+	esac
+	printf '%s\n' "$wert"
 }
 
 # Datei atomar mit Inhalt ersetzen.
@@ -116,6 +130,17 @@ if [ "$UMGEBUNG" = live ] && mail_umleitung_gesetzt live; then
 	scheitern "MAIL_NUR_AN ist auf Live gesetzt"
 fi
 export MYTCO_IMAGE="$MYTCO_REPO@$DIGEST"
+# Test neu aufsetzen nur bei einem anderen Zähler als beim letzten Mal oder bei der ersten
+# Auslieferung. Läuft Test schon ohne gemerkten Zähler, wird er übernommen, nichts gelöscht.
+if [ "$UMGEBUNG" = test ]; then
+	ZAEHLER=$(lies_zaehler "$FASSUNG/test-neu-aufsetzen") ||
+		scheitern "Zähler test-neu-aufsetzen fehlt oder ungültig"
+	if [ -s "$U/zustand/neu-aufgesetzt" ]; then
+		if [ "$(head -n 1 "$U/zustand/neu-aufgesetzt")" != "$ZAEHLER" ]; then NEU_AUFSETZEN=1; fi
+	elif [ -z "$ALT_DIGEST" ]; then
+		NEU_AUFSETZEN=1
+	fi
+fi
 
 # --- Live sichern, bevor irgendetwas geändert wird -----------------------------------------
 # Mit der bisherigen Einrichtung und dem bisherigen Sicherungsskript; ohne laufende
@@ -257,16 +282,17 @@ protokoll "$UMGEBUNG" compose_proxy up -d || {
 rm -rf "$SICHERUNG"
 SICHERUNG=""
 
-# --- Test zurücksetzen --------------------------------------------------------------------
-if [ "$UMGEBUNG" = test ]; then
+# --- Test neu aufsetzen (nur über den Zähler) ---------------------------------------------
+if [ "$NEU_AUFSETZEN" = 1 ]; then
 	schritt "test zuruecksetzen"
 	protokoll test compose test down --volumes || scheitern "down gescheitert"
 fi
 
 # --- Datenbank und Migration --------------------------------------------------------------
 schritt "migrieren"
-# Auf Test ist die Datenbank schon geleert: jeder Fehler ab hier setzt das alte Image neu auf.
-if [ "$UMGEBUNG" = test ]; then FEHLSCHLAG=rueckfall_test; else FEHLSCHLAG=scheitern; fi
+# Neu aufgesetzt ist die Datenbank schon geleert: jeder Fehler ab hier setzt das alte Image neu
+# auf. Sonst wie Live: die alte App läuft weiter.
+if [ "$NEU_AUFSETZEN" = 1 ]; then FEHLSCHLAG=rueckfall_test; else FEHLSCHLAG=scheitern; fi
 # Test startet mit der Datenbank seinen Mail-Fänger, vor den Testdaten, die ihm schreiben.
 if [ "$UMGEBUNG" = test ]; then DIENSTE="db mailpit"; else DIENSTE="db"; fi
 # shellcheck disable=SC2086 # DIENSTE sind zwei feste Wörter
@@ -274,8 +300,8 @@ protokoll "$UMGEBUNG" compose "$UMGEBUNG" up -d --wait $DIENSTE || "$FEHLSCHLAG"
 protokoll "$UMGEBUNG" compose "$UMGEBUNG" run --rm --no-deps app node scripts/migrate.ts ||
 	"$FEHLSCHLAG" "Migration gescheitert"
 
-# --- Testdaten (nur Test, nur wenn das Image sie enthält) ---------------------------------
-if [ "$UMGEBUNG" = test ] &&
+# --- Testdaten (nur beim Neuaufsetzen von Test, nur wenn das Image sie enthält) -----------
+if [ "$NEU_AUFSETZEN" = 1 ] &&
 	protokoll test compose test run --rm --no-deps app test -f scripts/testdaten.ts; then
 	schritt "testdaten laden"
 	protokoll test compose test run --rm --no-deps app node scripts/testdaten.ts ||
@@ -284,7 +310,7 @@ fi
 
 # --- App starten --------------------------------------------------------------------------
 schritt "app starten"
-if [ "$UMGEBUNG" = test ]; then
+if [ "$NEU_AUFSETZEN" = 1 ]; then
 	protokoll test compose test up -d --wait --wait-timeout "$MYTCO_WARTEZEIT" app ||
 		rueckfall_test "App nicht gesund"
 else
@@ -298,6 +324,9 @@ if [ -n "$ALT_DIGEST" ] && [ "$ALT_DIGEST" != "$DIGEST" ]; then
 	schreibe_zustand "$U/zustand/vorher" "$ALT_DIGEST"
 fi
 schreibe_zustand "$U/zustand/aktuell" "$DIGEST"
+if [ "$UMGEBUNG" = test ]; then
+	schreibe_zustand "$U/zustand/neu-aufgesetzt" "$ZAEHLER"
+fi
 
 # Images des Repos löschen, ausser aktuell/vorher beider Umgebungen. Fehler nur ins Protokoll.
 BEHALTEN=""
