@@ -69,6 +69,8 @@ services:
     environment:
       MP_WEBROOT: /_mail/
       MP_MAX_MESSAGES: '200'
+      # Fragt sonst bei GitHub nach neuen Fassungen.
+      MP_DISABLE_VERSION_CHECK: 'true'
     networks:
       intern:
         aliases:
@@ -85,7 +87,7 @@ networks:
   # Kein Weg nach aussen: die Datenbank bleibt in diesem Netz.
   intern:
     internal: true
-  # Vom Proxy-Stapel angelegt; nur die App hängt daran.
+  # Vom Proxy-Stapel angelegt; daran hängen die App und auf Test der Mail-Fänger (für sein Postfach).
   proxy:
     external: true
     name: mytco-proxy-${MYTCO_UMGEBUNG:?MYTCO_UMGEBUNG fehlt}

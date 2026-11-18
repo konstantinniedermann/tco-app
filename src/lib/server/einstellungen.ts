@@ -93,9 +93,9 @@ function pflicht(env: Record<string, string | undefined>, name: string): string 
 /**
  * TLS ist erzwungen bei `smtps:` oder bei `smtp:` mit `requireTLS=true` (nodemailer wandelt
  * Query-Werte `true`/`false` in Booleans, `parseConnectionUrl`). Ausnahme ohne TLS nur für
- * Hosts, die nie zu einem echten Empfänger führen: Loopback und `.invalid` (RFC 2606, löst
- * nie auf). So kann auf Live keine echte Mail unverschlüsselt rausgehen, während das
- * Produktions-Image gegen `smtp://mail.invalid:25` und lokale Mailpit-Instanzen laufen kann.
+ * Hosts, die nie zu einem echten Empfänger führen: Loopback und `.invalid` (RFC 2606, löst im
+ * Internet nie auf; auf Test heisst nur der Mail-Fänger im internen Docker-Netz so). So kann auf
+ * Live keine echte Mail unverschlüsselt rausgehen, während Test an den Mail-Fänger schickt.
  */
 function tlsErzwungen(smtpUrl: string): boolean {
 	let url: URL;

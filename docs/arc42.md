@@ -125,11 +125,13 @@ flowchart LR
     C[Caddy: HTTPS, Test nur mit Passwort]
     subgraph T[Test]
       TA[App] --> TD[(PostgreSQL)]
+      TA --> TM[Mail-Fänger]
     end
     subgraph L[Live]
       LA[App] --> LD[(PostgreSQL)]
     end
     C --> TA
+    C -->|/_mail/| TM
     C --> LA
     R[Nächtliche Sicherung mit restic] --> LD
   end

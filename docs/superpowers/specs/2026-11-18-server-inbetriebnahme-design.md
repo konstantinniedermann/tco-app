@@ -48,7 +48,7 @@ hat das Hosting freigegeben (bis CHF 500 pro Jahr, K-03.1). Zugang zu Metanet (D
 | Sicherungsziel | Infomaniak Object Storage, jetzt festgelegt. |
 | Website | Nicht jetzt bauen, aber nichts verbauen: Caddy und Docker-Netze so, dass ein eigener, abgeschotteter Container dazukommen kann. |
 | Mail auf Test | *Geändert am 18.11. (Projektleiter):* Mail-Fänger (Mailpit) auf dem Server statt Scaleway; kein Konto, kein DNS. Der Mailweg für Live bleibt bei K-11.2 (Scaleway oder Postfach bei Infomaniak nach dem Website-Umzug); die zwei Punkte «`MAIL_NUR_AN` echt prüfen» und «Antwort erst nach dem ganzen Versand» (B-17) wandern dorthin. Ursprünglich: Scaleway mit Subdomain einer Domain des Projektleiters. |
-| DNS-Bitte an den Verein | Text an die Hauptansprechperson (Thema liegt dort schon): `my.tcolten.ch`, `test.my.tcolten.ch`, SPF/DKIM für Scaleway; Werte folgen mit Server und IP. |
+| DNS-Bitte an den Verein | Text an die Hauptansprechperson (Thema liegt dort schon): `my.tcolten.ch`, `test.my.tcolten.ch`, SPF/DKIM für den Mailversand von Live; Werte folgen mit Server, IP und dem Mailweg (K-11.2). |
 | Reihenfolge | wie unten, vom Projektleiter bestätigt. |
 | Freigaben | Bestellen, Konten anlegen, Geheimnisse auf GitHub und `AUSLIEFERUNG_TEST=an` nur mit Freigabe. |
 
@@ -84,8 +84,7 @@ Umzug). Später zwei Wege, beide ohne Neuaufbau:
    empfangenden bestätigt. Rechnungen bleiben zurück, Benutzer und Gruppen ziehen nicht mit (B,
    FAQ); die Rechte sind danach neu zu vergeben.
 
-Das Scaleway-Konto entsteht ebenfalls als eigene Organisation; ob Scaleway den Besitz einer
-Organisation übertragen kann, wird beim Anlegen geprüft (V).
+Ein Konto für den Mailversand entsteht erst mit dem Mailweg für Live (K-11.2).
 
 **Falls sich VPS Lite nicht übertragen lässt** (Entscheid Projektleiter): Es wird ohne Rückfrage
 bei Infomaniak bestellt; die Kosten trägt der Verein (K-03.3). Lässt sich der Server später nicht
@@ -146,18 +145,18 @@ Bestellen zu prüfen. Ob restic damit läuft, belegt ein echter Lauf (`init`, `s
      Befund nicht behoben, sondern hingenommen werden, entscheidet der Projektleiter (Haltepunkt).
    - Vorsorge für die Website dokumentieren (siehe oben).
 3. **Bestellen und Konten** (Freigabe): Infomaniak-Organisation, VPS Lite mit aktuellem Ubuntu
-   LTS und eigenem SSH-Schlüssel, Object Storage; Scaleway-Konto mit Subdomain. Zwei-Faktor-Login
+   LTS und eigenem SSH-Schlüssel, Object Storage. Zwei-Faktor-Login
    auf allen (SI-15).
 4. **Härten nach SI-13**, jede Massnahme belegt: Root-Login abgewiesen, Passwort-Login
    abgewiesen, Port-Scan zeigt nur 22/80/443, automatische Sicherheits-Updates aktiv.
 5. **Einrichten:** Docker, Benutzer `mytco`, Türsteher (`root:root` 0755), zwei CI-Schlüssel mit
    Zwangsbefehl, `geheim.env` für Test, `proxy.env` mit Übergangsadresse, `sicherung.env`,
-   restic-Repository anlegen und mit Probe belegen, Mailweg über Scaleway mit `MAIL_NUR_AN`
+   restic-Repository anlegen und mit Probe belegen, Mail-Fänger auf Test mit `MAIL_NUR_AN`
    prüfen. Timer bleibt aus bis Live. Konsolenzugang ohne SSH im Infomaniak-Konto prüfen.
 6. **Vor `AUSLIEFERUNG_TEST=an`:**
    - Entscheide des Projektleiters: Versionsnummer auf Test (ADR-012) und offene App nach
      einer Auslieferung (E-65).
-   - Antwort erst nach dem ganzen Versand (B-17) mit echtem SMTP prüfen.
+   - Antwort erst nach dem ganzen Versand (B-17): mit dem Mailweg für Live prüfen (echter SMTP), nicht auf dem Mail-Fänger.
    - Nachweis der Auslieferungskette als von Hand startbarer CI-Lauf: entscheiden, ob jetzt.
    - Server und Adressen in die sensiblen Ziele des Auto-Modus eintragen.
    - Projektleiter bestätigt das Restrisiko «Schreibrecht auf GitHub reicht bis root».
@@ -175,5 +174,5 @@ Bestellen zu prüfen. Ob restic damit läuft, belegt ein echter Lauf (`init`, `s
 
 - Werkzeuge für Härtung und Port-Scan, Form der Nachweise (Befehl plus Ausgabe im Issue).
 - Weg der zeitlichen Begrenzung der Protokolle, solange 30 Tage / 24 Stunden belegt sind.
-- Namen der Subdomain und des Absenders auf Test (nur in `test/geheim.env`, nicht im Repo).
+- Absender und Mail-Empfänger auf Test (erfunden, nur in `test/geheim.env`).
 - Wo im Repo die Messwerte stehen (Vorschlag: `docs/betrieb-und-uebergabe.md`, neuer Abschnitt).

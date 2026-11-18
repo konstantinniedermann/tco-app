@@ -20,7 +20,7 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 | Rolle | Demo und Checkliste | Testgruppe (Pilotphase), später alle Mitglieder |
 | Ausgeliefert bei | Merge nach `dev` | Merge des PR `dev` → `main` |
 | Daten | nur erfundene Testdaten; bei jeder Auslieferung neu aufgesetzt | Mitgliederdaten |
-| E-Mail | alle Mails gehen an die Adresse des Projektleiters, der Betreff nennt den ursprünglichen Empfänger; bis der Mailweg für Live steht (K-11.2), landen sie im Mail-Fänger auf dem Server (Postfach unter `/_mail/`, hinter dem Test-Passwort) und verlassen ihn nie | an die Mitglieder |
+| E-Mail | alle Mails landen im Mail-Fänger auf dem Server (Postfach unter `/_mail/`, hinter dem Test-Passwort) und verlassen ihn nie; adressiert sind sie an die Umleitungsadresse (`MAIL_NUR_AN`), der Betreff nennt den ursprünglichen Empfänger. Wer das Test-Passwort hat, liest dort die Login-Codes aller erfundenen Konten | an die Mitglieder |
 | Push, Schlüssel | eigene | eigene |
 
 Beide Adressen unter `tcolten.ch` sind erlaubt (K-10); wer sie einrichtet, hängt an K-10.2.

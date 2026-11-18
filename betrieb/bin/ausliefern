@@ -270,7 +270,7 @@ if [ "$UMGEBUNG" = test ]; then FEHLSCHLAG=rueckfall_test; else FEHLSCHLAG=schei
 # Test startet mit der Datenbank seinen Mail-Fänger, vor den Testdaten, die ihm schreiben.
 if [ "$UMGEBUNG" = test ]; then DIENSTE="db mailpit"; else DIENSTE="db"; fi
 # shellcheck disable=SC2086 # DIENSTE sind zwei feste Wörter
-protokoll "$UMGEBUNG" compose "$UMGEBUNG" up -d --wait $DIENSTE || "$FEHLSCHLAG" "Datenbank startet nicht"
+protokoll "$UMGEBUNG" compose "$UMGEBUNG" up -d --wait $DIENSTE || "$FEHLSCHLAG" "Datenbank (auf Test samt Mail-Fänger) startet nicht"
 protokoll "$UMGEBUNG" compose "$UMGEBUNG" run --rm --no-deps app node scripts/migrate.ts ||
 	"$FEHLSCHLAG" "Migration gescheitert"
 
