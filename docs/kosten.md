@@ -114,7 +114,8 @@ ca. 95–175 pro Jahr darunter, weil die Entwicklung ehrenamtlich ist.
 ## Jährliche Überprüfung
 
 Einmal im Jahr, rechtzeitig vor dem Vereinsbudget, ruft der Projektleiter die Preise neu ab
-und führt diese Seite nach: Betrag, Quelle, Datum.
+und führt diese Seite nach: Betrag, Quelle, Datum. Erstmals ins Vereinsbudget kommen die
+Kosten frühestens an der ordentlichen GV im Februar/März 2027 (Projektleiter, 18.11.2026).
 Ausserhalb des Takts löst eine Preiserhöhung beim VPS eine Überprüfung aus
 (Reevaluations-Trigger 4 in [ADR-003](adr/adr-003-hosting-infomaniak-vps.md)).
 
