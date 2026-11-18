@@ -47,14 +47,14 @@ hat das Hosting freigegeben (bis CHF 500 pro Jahr, K-03.1). Zugang zu Metanet (D
 | Konto | Vorerst auf den Projektleiter (K-04.1 sieht die Vereinsadresse vor, die es noch nicht gibt). |
 | Sicherungsziel | Infomaniak Object Storage, jetzt festgelegt. |
 | Website | Nicht jetzt bauen, aber nichts verbauen: Caddy und Docker-Netze so, dass ein eigener, abgeschotteter Container dazukommen kann. |
-| Mail auf Test | Bis SPF/DKIM bei `tcolten.ch` stehen: Scaleway, Absender auf einer Subdomain einer Domain des Projektleiters (DNS bei Infomaniak, vom Projektleiter verwaltet). Die Einträge der Hauptdomain bleiben unberührt. Danach Umstellung auf `mytco@tcolten.ch`. |
+| Mail auf Test | *Geändert am 18.11. (Projektleiter):* Mail-Fänger (Mailpit) auf dem Server statt Scaleway; kein Konto, kein DNS. Der Mailweg für Live bleibt bei K-11.2 (Scaleway oder Postfach bei Infomaniak nach dem Website-Umzug); die zwei Punkte «`MAIL_NUR_AN` echt prüfen» und «Antwort erst nach dem ganzen Versand» (B-17) wandern dorthin. Ursprünglich: Scaleway mit Subdomain einer Domain des Projektleiters. |
 | DNS-Bitte an den Verein | Text an die Hauptansprechperson (Thema liegt dort schon): `my.tcolten.ch`, `test.my.tcolten.ch`, SPF/DKIM für Scaleway; Werte folgen mit Server und IP. |
 | Reihenfolge | wie unten, vom Projektleiter bestätigt. |
 | Freigaben | Bestellen, Konten anlegen, Geheimnisse auf GitHub und `AUSLIEFERUNG_TEST=an` nur mit Freigabe. |
 
 ## Ansätze
 
-**Mail auf Test** (gewählt: A)
+**Mail auf Test** (zuerst gewählt: A; am 18.11. auf C gewechselt, weil der Live-Weg offen ist und ein Scaleway-Konto sonst ein Wegwerf-Konto werden könnte)
 
 - **A · Scaleway mit Subdomain einer eigenen Domain:** Konto braucht es für Live ohnehin; Test
   nimmt denselben Weg wie Live; DNS beim Projektleiter, darum sofort machbar.

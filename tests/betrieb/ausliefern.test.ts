@@ -247,6 +247,31 @@ describe('ausliefern: Live und Sicherung', () => {
 	});
 });
 
+// Test hat einen Mail-Fänger (Mailpit): er startet mit der Datenbank, vor den Testdaten, die
+// ihm ihre Mail schicken. Live startet ihn nie.
+describe('ausliefern: Mail-Fänger', () => {
+	test('Test startet Datenbank und Mail-Fänger vor den Testdaten', () => {
+		const lauf = ausliefern('test', baue());
+		const start = index(lauf, 'up -d --wait db mailpit');
+		expect(start).toBeGreaterThanOrEqual(0);
+		expect(start).toBeLessThan(index(lauf, 'node scripts/testdaten.ts'));
+	});
+
+	test('Live startet den Mail-Fänger nie', () => {
+		const lauf = ausliefern('live', baue());
+		expect(lauf.aufrufe.filter((a) => a.includes('mailpit'))).toEqual([]);
+	});
+
+	test('der Rückfall auf Test startet den Mail-Fänger ebenfalls', () => {
+		const basis = baue({ dateien: { 'test/zustand/aktuell': `${ALT}\n` } });
+		const lauf = ausliefern('test', basis, {
+			STUB_FEHLER_BEI: 'migrate.ts',
+			STUB_FEHLER_NUR_IMAGE: `${REPO}@${NEU}`
+		});
+		expect(lauf.aufrufe.filter((a) => a.includes('up -d --wait db mailpit'))).toHaveLength(2);
+	});
+});
+
 describe('ausliefern: Fehlerfälle', () => {
 	test('Live: Migration scheitert: fehler, kein Start der App, aktuell unverändert', () => {
 		const basis = baue({ dateien: { 'live/zustand/aktuell': `${ALT}\n` } });

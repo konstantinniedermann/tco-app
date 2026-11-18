@@ -25,8 +25,8 @@ Store-App ([ADR-001](adr/adr-001-web-app-zuerst.md), K-22).
 | Konto | Wofür | Eigentümer heute | Ziel | Zweiter Zugang | Wiederherstellung |
 |-------|-------|------------------|------|----------------|-------------------|
 | GitHub | Code, Issues, CI, Container-Ablage (`ghcr.io`), Geheimnisse der Auslieferung | Privatkonto des Projektleiters | bleibt dort bis zur Übergabe, dann Transfer an die Nachfolge (Checkliste unten) | Hauptansprechperson als Mitarbeitende mit Schreibrecht, nutzt es nur zum Lesen ([CI/CD und Release](ci-cd-und-release.md#schutz-des-auslieferungswegs)); verwalten kann nur der Projektleiter | Wiederherstellungscodes für den Zwei-Faktor-Login im Tresor (K-49) |
-| Infomaniak | Server (VPS), Sicherungsablage (Object Storage) | eigene Organisation «TC Olten – MyTCO», wird mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39) bestellt, vorerst auf den Projektleiter ([ADR-003](adr/adr-003-hosting-infomaniak-vps.md)) | Vereinsadresse (Umzug siehe unten) | Hauptansprechperson als Benutzer im Konto | über die Vereinsadresse und die Wiederherstellungscodes im Tresor; Zugriff auf den Server ohne SSH über die Konsole im Infomaniak-Konto (Vermutung, bei #39 prüfen) |
-| Mailversand | Code-Mails und Benachrichtigungen | Scaleway, eigene Organisation, vorerst auf den Projektleiter; auf Test mit einem Übergangs-Absender, bis `tcolten.ch` bereit ist (K-11.2: nach dem Website-Umzug evtl. ein Postfach bei Infomaniak) | Vereinsadresse | Hauptansprechperson | über die Vereinsadresse |
+| Infomaniak | Server (VPS), Sicherungsablage (Object Storage) | eigene Organisation «TC Olten – MyTCO», wird mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39) bestellt, vorerst auf den Projektleiter ([ADR-003](adr/adr-003-hosting-infomaniak-vps.md)) | Vereinsadresse (Umzug siehe unten) | Hauptansprechperson als Benutzer im Konto | über die Vereinsadresse und die Wiederherstellungscodes im Tresor; Zugriff auf den Server ohne SSH über die VNC-Konsole im Infomaniak-Manager (Schnellaktionen; Anmeldung als Admin-Benutzer mit Passwort, von Hand getippt, US-Tastenbelegung; belegt 18.11.2026), sonst Rescue-Modus |
+| Mailversand | Code-Mails und Benachrichtigungen | noch keines; Test schickt an einen Mail-Fänger auf dem Server. Anbieter für Live hängt an K-11.2 (Scaleway oder nach dem Website-Umzug ein Postfach bei Infomaniak) | Vereinsadresse | Hauptansprechperson | über die Vereinsadresse |
 | Vereinsadresse `mytco@tcolten.ch` | Anmeldung bei allen Konten, Empfänger der Überwachung | noch nicht eingerichtet; der Vorstand lässt sie nach dem Umzug der Website anlegen (K-04.3, K-11) | Postfach bei Infomaniak nach dem Umzug (K-48) | Hauptansprechperson | über die Person, die nach dem Umzug die Postfächer verwaltet (hängt an K-48) |
 | Metanet | Website, DNS-Einträge und Postfächer von `tcolten.ch` | Verein, betreut vom Website-Betreuer | Umzug zu Infomaniak bewilligt (K-48) | — | über den Verein |
 | hosttech | Registrierung der Domain `tcolten.ch` | Inhaber unbekannt (K-48) | Verein | — | über den Inhaber |
@@ -45,8 +45,7 @@ Organisation, getrennt von privaten Produkten des Projektleiters. Zwei Wege:
    «fast alle Produkte»; VPS Lite und Object Storage nennt die Seite nicht, V).
 
 Lässt sich der Server nicht übertragen, kommt der Umzug zum Vertragsende: neuer Server auf den
-Verein, `betrieb/server/einrichten.sh`, Daten aus der Sicherung (ca. ein halber Tag, S). Ob
-Scaleway eine Organisation übertragen kann, ist offen (V).
+Verein, `betrieb/server/einrichten.sh`, Daten aus der Sicherung (ca. ein halber Tag, S).
 
 **Restrisiko plötzlicher Ausfall:** Bis K-49 beantwortet ist und die Konten auf der
 Vereinsadresse laufen, hängt alles am Projektleiter. Fällt er plötzlich aus, läuft MyTCO

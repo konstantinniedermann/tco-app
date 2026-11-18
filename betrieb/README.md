@@ -58,6 +58,14 @@ mehrfach ausführbar und endet mit `server/pruefen.sh <admin-benutzer>`, das je 
 | `<umgebung>/protokoll.log` | Ausgaben von Docker, psql und App | 30 Tage (`logrotate.d/mytco`) |
 | Logs der Container | Ausgaben der Container, ohne IP-Adressen | 30 Tage (`logrotate.d/mytco`); Compose hält nur eine Datei bis 10 MB |
 
+### Mail-Fänger auf Test
+
+Test verschickt keine Mails nach aussen: Mit `MYTCO_SMTP_URL=smtp://mail.invalid:1025` in
+`test/geheim.env` gehen sie an einen Mailpit-Container (Dienst `mailpit`, nur Test, startet mit
+der Datenbank). Das Postfach steht unter `https://<adresse von test>/_mail/`, hinter demselben
+Passwort wie Test. Er hält höchstens 200 Mails, und `ausliefern test` leert ihn mit der
+Datenbank; danach liegt dort die Mail mit dem Brief-Code der Testdaten. Live startet ihn nie.
+
 ### Platz für eine Website
 
 Caddy hängt an einem eigenen Netz je Umgebung (`mytco-proxy-test`, `mytco-proxy-live`); die App
