@@ -53,8 +53,14 @@ export function baueAdresseVergebenMail(kontakt: string): { betreff: string; tex
 }
 
 // Versand über einen austauschbaren SMTP-Zugang (URL); Anbieter hängt an K-11.2
+// Feste Zeitlimits in ms, damit ein hängender Mailserver keine Anfrage aufhält. Bei einer URL
+// gewinnen gleichnamige Angaben aus ihrer Query (nodemailer, createTransport mit `url`).
+const ZEITLIMITS = { connectionTimeout: 10_000, greetingTimeout: 10_000, socketTimeout: 20_000 };
+
 export function erstelleSmtpMailer(transport: string | object, absender: string): Mailer {
-	const transporter = nodemailer.createTransport(transport);
+	const transporter = nodemailer.createTransport(
+		typeof transport === 'string' ? { url: transport, ...ZEITLIMITS } : transport
+	);
 	return async ({ an, betreff, text }) => {
 		await transporter.sendMail({ from: absender, to: an, subject: betreff, text });
 	};

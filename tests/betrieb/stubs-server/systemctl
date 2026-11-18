@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Ersatz für `systemctl is-active <unit>`: $STUB_AKTIV_<unit, - und . als _> (Vorgabe inactive);
+# Exit 0 nur bei "active".
+set -euo pipefail
+[ "$1" = is-active ] || exit 2
+name="${2//-/_}"
+var="STUB_AKTIV_${name//./_}"
+zustand="${!var-inactive}"
+echo "$zustand"
+[ "$zustand" = active ]

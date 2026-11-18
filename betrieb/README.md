@@ -21,10 +21,57 @@ sicherung.env                       von Hand (Rechte 600), Vorlage sicherung.env
 lesbar an; einzig die Caddy-Dateien unter `proxy/caddy/` sind für alle lesbar (der Proxy liest
 sie, Geheimnisse stehen darin keine).
 
+## Server einrichten
+
+Ein frischer Server (Ubuntu LTS) wird mit `server/einrichten.sh` eingerichtet, als root aus
+einem Checkout des Repos: `sudo betrieb/server/einrichten.sh <admin-benutzer>`. Das Skript ist
+mehrfach ausführbar und endet mit `server/pruefen.sh <admin-benutzer>`, das je Massnahme
+`ok <name>` oder `fehler <name>` meldet; `pruefen.sh` lässt sich jederzeit allein laufen und
+ändert nichts.
+
+- **Anmeldung (SI-13):** nur mit Schlüssel, kein root über SSH (`/etc/ssh/sshd_config.d/00-mytco.conf`,
+  vor den Dateien der Distribution gelesen; geprüft wird der wirksame Wert mit `sshd -T`). Der
+  Projektleiter meldet sich als `<admin-benutzer>` an (nur `a-z`, `0-9`, `_`, `-`) und wird mit
+  `sudo` ohne Passwort root; gibt es den Benutzer nicht, legt das Skript ihn mit den Schlüsseln
+  des Aufrufers bzw. von root an, ohne deren Optionen (Cloud-Images sperren root mit
+  `command=…`). Kann er sich nicht anmelden oder nicht root werden, bricht es ab, bevor SSH
+  umgestellt wird.
+- **Firewall:** `ufw` lässt eingehend nur 22, 80 und 443 (tcp) zu, ohne Protokoll.
+  Docker öffnet veröffentlichte Ports an `ufw` vorbei; veröffentlicht wird darum nur Caddy (80,
+  443). Ein Port-Scan von aussen belegt es.
+- **Updates:** `unattended-upgrades` spielt die Sicherheits-Updates von Ubuntu täglich ein.
+  Docker selbst kommt aus dem Docker-Repository und wird von Hand aktualisiert.
+- **Betriebsbenutzer `mytco`:** in der Gruppe `docker`, Besitzer von `/opt/mytco` (0750);
+  `/opt/mytco/bin` mit Türsteher und `lib.sh` gehört `root:root` (0755). Die Docker-Gruppe ist
+  so viel wie root (Restrisiko im Sicherheitskonzept). `~mytco/.ssh/authorized_keys` enthält nur
+  die zwei Schlüssel der CI (siehe unten).
+
+### Protokolle und ihre Fristen (DS-06)
+
+| Protokoll | Inhalt | Frist |
+|-----------|--------|-------|
+| Systemjournal (auch sshd) | Anmeldungen mit IP-Adresse | 24 Stunden (`journald.conf.d/mytco.conf`: abgelegte Dateien 23 Stunden, neue Datei jede Stunde) |
+| `/var/log/wtmp`, `/var/log/btmp` | Anmeldungen mit IP-Adresse | täglich geleert, keine alte Datei |
+| `/var/log/lastlog`, wtmpdb, lastlog2 | letzte Anmeldung je Benutzer mit IP-Adresse | täglich geleert (Timer `mytco-anmeldungen`) |
+| rsyslog (`/var/log/auth.log` usw.) | dasselbe wie das Journal | abgeschaltet |
+| Firewall | Adressen abgewiesener Pakete | kein Protokoll |
+| `<umgebung>/protokoll.log` | Ausgaben von Docker, psql und App | 30 Tage (`logrotate.d/mytco`) |
+| Logs der Container | Ausgaben der Container, ohne IP-Adressen | 30 Tage (`logrotate.d/mytco`); Compose hält nur eine Datei bis 10 MB |
+
+### Platz für eine Website
+
+Caddy hängt an einem eigenen Netz je Umgebung (`mytco-proxy-test`, `mytco-proxy-live`); die App
+hängt nur an ihrem Proxy-Netz und an ihrem internen Netz, die Datenbank nur am internen. Caddy
+liest jede Datei unter `proxy/caddy/umgebungen/`, und `ausliefern` überschreibt nur die Datei
+seiner Umgebung. Eine Website (K-48) käme darum dazu mit eigenem Compose-Projekt
+(`mytco-website`), eigenem Netz `mytco-proxy-website` in `compose.proxy.yml`, eigener Datei
+`umgebungen/website.caddy` und Grenzen für Speicher und CPU. Sie erreicht so weder eine Datenbank
+noch eine App von MyTCO. Gebaut ist davon nichts.
+
 ## Von Hand eingerichtet, nie von der CI
 
 - `bin/ausliefern-ssh` und `bin/lib.sh` aus diesem Ordner, Ordner und Dateien `root:root` mit
-  Rechten 0755: `mytco` kann sie so nicht versehentlich ändern. Ein schädliches Image kann das
+  Rechten 0755 (spielt `server/einrichten.sh` ein): `mytco` kann sie so nicht versehentlich ändern. Ein schädliches Image kann das
   über den Docker-Zugang von `mytco` trotzdem umgehen (Restrisiko im Sicherheitskonzept).
   Ändert sich eine der beiden Dateien im Repo, spielt der Betrieb sie als root neu ein; die CI
   tut das nie. `lib.sh` enthält fest die Container-Ablage (`MYTCO_REPO_STANDARD`), nach einem
@@ -81,9 +128,10 @@ dem aktuellen und dem vorherigen von Test und Live; ein Fehler dabei steht nur i
 
 Ist in `live/geheim.env` `MAIL_NUR_AN` gesetzt (Leerzeichen und Anführungszeichen zählen
 nicht; erkannt wird jede Zeilenform, die Compose liest, auch `export MAIL_NUR_AN=…` und
-`MAIL_NUR_AN: …`), verweigern `ausliefern live` und `zurueck live` ihre Arbeit und melden
-`fehler`. Ein `MAIL_NUR_AN` aus der Shell des Aufrufers kommt nie bei Compose an: Massgebend
-ist allein `geheim.env`.
+`MAIL_NUR_AN: …`; ein Wert in Anführungszeichen, die auf der Zeile nicht schliessen, gilt immer
+als gesetzt, weil Compose ihn über mehrere Zeilen liest), verweigern `ausliefern live` und
+`zurueck live` ihre Arbeit und melden `fehler`. Kein Wert aus der Shell des Aufrufers kommt bei
+Compose an, wenn `geheim.env` denselben Namen setzt: Massgebend ist allein die Datei.
 
 `zurueck` migriert die Datenbank nicht zurück. `wiederherstellen` spielt nur Sicherungen
 derselben Umgebung ein und braucht eine ausgelieferte Fassung (`<umgebung>/zustand/aktuell`);

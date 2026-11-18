@@ -11,6 +11,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Vorbereitung des Servers (#39): Der Mailversand gibt nach festen Zeitlimits auf, statt
+  minutenlang zu warten, und eine SMTP-Adresse, die die Zertifikatsprüfung abschaltet, wird
+  abgewiesen. Test fällt nach einer gescheiterten Auslieferung auf die vorige Fassung zurück;
+  Einrichtung des Servers als Skript; Image mit allen Modulen für die Testdaten.
 - Antworten des Vorstands übertragen: Kostenrahmen, Adresse `my.tcolten.ch`, Absender
   `mytco@tcolten.ch`, Umzug der Website. An der App ändert sich nichts.
 

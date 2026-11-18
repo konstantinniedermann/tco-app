@@ -152,6 +152,38 @@ describe('compose', () => {
 		expect(lauf.aufrufe).toHaveLength(1);
 		expect(lauf.mailNurAn).toEqual([null]);
 	});
+
+	// Compose zieht jeden Wert aus der Shell der env-Datei vor; massgebend ist allein geheim.env.
+	function mitGeheim(env: Record<string, string>) {
+		const basis = tempOrdner('mytco-compose-');
+		mkdirSync(join(basis, 'live'), { recursive: true });
+		writeFileSync(
+			join(basis, 'live', 'geheim.env'),
+			'POSTGRES_PASSWORD=datei\nexport ORIGIN=https://datei.invalid\nMYTCO_KONTAKT: datei\n'
+		);
+		const lauf = fuehreAus(TREIBER, ['compose', 'live', 'up', '-d'], {
+			basis,
+			env,
+			stub: { STUB_UMWELT_NAMEN: 'POSTGRES_PASSWORD ORIGIN MYTCO_KONTAKT MYTCO_IMAGE' }
+		});
+		const namen = readFileSync(join(basis, 'stub-protokoll.namen'), 'utf-8').trim();
+		return { lauf, namen };
+	}
+
+	test('aus der Shell exportierte Werte aus geheim.env erreichen Compose nicht', () => {
+		const { lauf, namen } = mitGeheim({
+			POSTGRES_PASSWORD: 'shell',
+			ORIGIN: 'https://shell.invalid',
+			MYTCO_KONTAKT: 'shell'
+		});
+		expect(lauf.status).toBe(0);
+		expect(namen).toBe('POSTGRES_PASSWORD!|ORIGIN!|MYTCO_KONTAKT!|MYTCO_IMAGE!');
+	});
+
+	test('MYTCO_IMAGE des Aufrufers kommt weiter bei Compose an', () => {
+		const { namen } = mitGeheim({ MYTCO_IMAGE: 'ghcr.io/x/y@sha256:1' });
+		expect(namen.split('|').at(-1)).toBe('MYTCO_IMAGE=ghcr.io/x/y@sha256:1');
+	});
 });
 
 describe('compose_proxy', () => {
@@ -235,7 +267,11 @@ describe('mail_umleitung_gesetzt', () => {
 		['eingerückt', '  MAIL_NUR_AN=pl@example.org\n'],
 		['Leerzeichen um =', 'MAIL_NUR_AN = pl@example.org\n'],
 		['Doppelpunkt', 'MAIL_NUR_AN: pl@example.org\n'],
-		['letzte Zeile mit export gesetzt', 'MAIL_NUR_AN=\nexport MAIL_NUR_AN=pl@example.org\n']
+		['letzte Zeile mit export gesetzt', 'MAIL_NUR_AN=\nexport MAIL_NUR_AN=pl@example.org\n'],
+		// Compose liest einen Wert in Anführungszeichen über mehrere Zeilen (mit `compose config`
+		// geprüft: "\npl@example.org"); die App entfernt den Zeilenumbruch.
+		['mehrzeilig, doppelte Anführungszeichen', 'MAIL_NUR_AN="\npl@example.org"\n'],
+		['mehrzeilig, einfache Anführungszeichen', "MAIL_NUR_AN='\npl@example.org'\nB=2\n"]
 	])('gilt als gesetzt: %s', (_name, inhalt) => {
 		expect(mitEnv(inhalt)).toBe(0);
 	});

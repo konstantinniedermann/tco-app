@@ -80,6 +80,23 @@ Ein Postfach @tcolten.ch ist darum erst nach dem Umzug als Weg möglich, dann be
 bis dahin versendet MyTCO über Scaleway. Ob die Website auf diesem Server oder getrennt läuft,
 ist offen.
 
+*Nachtrag 18.11.2026 (Inbetriebnahme, [#39](https://github.com/konstantinniedermann/tco-app/issues/39)):*
+Entscheide des Projektleiters:
+
+- **Server:** VPS Lite 2 vCPU / 4 GB ohne Puffer. Vergrössern («Angebot ändern», ca. 20 Min.
+  Ausfall) wird erst ein Thema, wenn der Server nicht reicht; ob die Daten dabei bleiben, ist
+  dann mit einer Sicherung vorher zu belegen (Verkleinern beschreibt Infomaniak nicht, V).
+- **Konto:** Server und Sicherungsablage liegen in einer eigenen Infomaniak-Organisation für
+  MyTCO, vorerst auf den Projektleiter; bezahlt wird ohne Rückfrage, die Kosten trägt der Verein
+  (K-03.3). Umzug ohne Neuaufbau → [Betrieb und Übergabe](../betrieb-und-uebergabe.md#konten).
+- **Sicherungsziel festgelegt:** Infomaniak Object Storage (S3, Daten in der Schweiz, nach
+  Verbrauch).
+- **Mail auf Test bis `tcolten.ch` bereit ist:** Scaleway mit einem Absender auf einer Subdomain
+  einer Domain des Projektleiters; danach `mytco@tcolten.ch`.
+- **Website:** Caddy und die Docker-Netze lassen Platz für einen eigenen, abgeschotteten
+  Container ([`betrieb/README.md`](../../betrieb/README.md), «Platz für eine Website»); ob sie auf
+  diesen Server kommt, entscheidet K-48 mit der gemessenen Auslastung.
+
 ## Konsequenzen
 
 **Leichter:** Datenschutzerklärung kann „Infomaniak, Schweiz“ nennen; volle Kontrolle,

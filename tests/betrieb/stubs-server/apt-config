@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Ersatz für `apt-config dump`: gibt $STUB_APT aus.
+printf '%s\n' "${STUB_APT-}"

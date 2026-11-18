@@ -19,8 +19,9 @@ COPY --from=bau /app/build ./build
 COPY drizzle ./drizzle
 COPY scripts/migrate.ts ./scripts/migrate.ts
 # Testdaten für Test (betrieb/bin/ausliefern); laufen wie migrate.ts mit Node-Typentfernung und
-# brauchen dafür den Server-Code als Quelle (ohne Tests, siehe .dockerignore).
-COPY src/lib/server ./src/lib/server
+# brauchen dafür den Server-Code als Quelle samt der geteilten Module unter src/lib, die er
+# importiert (ohne Tests, siehe .dockerignore).
+COPY src/lib ./src/lib
 COPY scripts/testdaten.ts scripts/erfundene-mitglieder.ts scripts/admin-festlegen.ts ./scripts/
 # Einrichtung der Umgebungen (Compose, Caddy, Skripte); der Server entnimmt sie dem Image.
 COPY betrieb ./betrieb

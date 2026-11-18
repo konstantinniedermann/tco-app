@@ -118,7 +118,11 @@ Doku-Merge ändert ihn nicht.
    bleiben die Testdaten, und das Protokoll hält «Mail mit Brief-Code nicht versandt» fest. Code
    und Adressen stehen nie im Protokoll.
 5. **Prüfen:** Antwortet die App nicht innert einer Minute (`MYTCO_WARTEZEIT`, 60 s) auf ihre Statusabfrage,
-   startet das Skript wieder das vorherige Image. Die CI erfährt nur `ok` oder `fehler`,
+   startet das Skript wieder das vorherige Image. Auf Test ist die Datenbank zu diesem Zeitpunkt
+   schon neu aufgesetzt: Scheitert dort ein Schritt ab dem Start der Datenbank (Migration,
+   Testdaten, Statusabfrage), setzt das Skript Test mit dem vorherigen Image samt Testdaten neu
+   auf und meldet `fehler`; ohne vorheriges Image bleibt Test leer. Auf Live startet bei einer
+   gescheiterten Migration keine App, die alte läuft weiter. Die CI erfährt nur `ok` oder `fehler`,
    keine Logs der App, denn CI-Logs liegen bei GitHub in den USA (DS-01, DS-06).
 6. **Freigeben (`freigeben`, nur `dev`):** Erst nach einer geglückten Auslieferung auf Test
    setzt dieser Job das Kennzeichen `code-<Hash>`. Ohne Auslieferung auf Test gibt es kein

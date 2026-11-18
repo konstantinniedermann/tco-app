@@ -109,13 +109,24 @@ sperre_freigeben() {
 	return 0
 }
 
+# Compose zieht einen Wert aus der Shell des Aufrufers der env-Datei vor. Darum entfernt
+# compose in einer Subshell jeden Namen, den geheim.env setzt (Zeilenformen wie bei
+# mail_umleitung_gesetzt): Massgebend ist allein die Datei.
 compose() {
-	local umgebung="$1"
+	local umgebung="$1" datei name
 	shift
+	datei="$MYTCO_BASIS/$umgebung/geheim.env"
 	export MYTCO_UMGEBUNG="$umgebung"
-	docker compose -p "mytco-$umgebung" \
-		-f "$MYTCO_BASIS/$umgebung/betrieb/compose.umgebung.yml" \
-		--env-file "$MYTCO_BASIS/$umgebung/geheim.env" "$@"
+	(
+		if [ -f "$datei" ]; then
+			while IFS= read -r name; do
+				unset "$name"
+			done < <(sed -nE 's/^[[:space:]]*(export[[:space:]]+)?([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*[=:].*/\2/p' "$datei")
+		fi
+		docker compose -p "mytco-$umgebung" \
+			-f "$MYTCO_BASIS/$umgebung/betrieb/compose.umgebung.yml" \
+			--env-file "$datei" "$@"
+	)
 }
 
 # Compose-Aufruf für den gemeinsamen Webserver (Projekt mytco-proxy, Dateien unter proxy/).
@@ -223,12 +234,19 @@ ZAEHL_SQL="SELECT table_schema || '.' || table_name || '|' || (xpath('/row/c/tex
 # die Compose annimmt: eingerückt, mit `export `, Leerzeichen um `=`, `:` statt `=`; Zeilen mit
 # `#` vorne nicht. Leerzeichen und umschliessende ' oder " zählen nicht (Compose entfernt die
 # Anführungszeichen, die App die Leerzeichen). Bei mehreren Zeilen gilt die letzte (wie bei
-# Compose). Fehlt die Datei: Exit 1.
+# Compose). Ein Wert in Anführungszeichen, die auf der Zeile nicht schliessen, liest Compose über
+# mehrere Zeilen; er gilt immer als gesetzt (lieber eine verweigerte Auslieferung als eine
+# Umleitung auf Live). Fehlt die Datei: Exit 1.
 mail_umleitung_gesetzt() {
-	local datei="$MYTCO_BASIS/$1/geheim.env" wert
+	local datei="$MYTCO_BASIS/$1/geheim.env" roh wert
 	[ -f "$datei" ] || return 1
-	wert=$(sed -nE 's/^[[:space:]]*(export[[:space:]]+)?MAIL_NUR_AN[[:space:]]*[=:][[:space:]]*//p' "$datei" |
-		tail -n 1 | tr -d ' \t\r"'"'"'')
+	roh=$(sed -nE 's/^[[:space:]]*(export[[:space:]]+)?MAIL_NUR_AN[[:space:]]*[=:][[:space:]]*//p' "$datei" |
+		tail -n 1 | tr -d '\r' | sed -E 's/[[:space:]]+$//')
+	case "$roh" in
+	\"*\" | \'*\') [ "${#roh}" -ge 2 ] || return 0 ;;
+	\"* | \'*) return 0 ;;
+	esac
+	wert=$(printf '%s' "$roh" | tr -d ' \t"'"'"'')
 	[ -n "$wert" ]
 }
 

@@ -20,7 +20,8 @@ services:
       driver: json-file
       options:
         max-size: 10m
-        max-file: '5'
+        # Nur eine Datei: die Zeitgrenze (30 Tage) setzt logrotate auf dem Server (betrieb/server).
+        max-file: '1'
 
 volumes:
   caddy-daten:

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Ersatz für `ufw status verbose`: gibt $STUB_UFW aus.
+printf '%s\n' "${STUB_UFW-}"

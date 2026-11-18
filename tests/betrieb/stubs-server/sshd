@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Ersatz für `sshd -T`: gibt $STUB_SSHD_T aus (wirksame Einstellungen, eine je Zeile).
+printf '%s\n' "${STUB_SSHD_T-}"

@@ -248,13 +248,48 @@ describe('ausliefern: Live und Sicherung', () => {
 });
 
 describe('ausliefern: Fehlerfälle', () => {
-	test('Migration scheitert: fehler, kein Start der App, aktuell unverändert', () => {
-		const basis = baue({ dateien: { 'test/zustand/aktuell': `${ALT}\n` } });
-		const lauf = ausliefern('test', basis, { STUB_FEHLER_BEI: 'migrate.ts' });
+	test('Live: Migration scheitert: fehler, kein Start der App, aktuell unverändert', () => {
+		const basis = baue({ dateien: { 'live/zustand/aktuell': `${ALT}\n` } });
+		const lauf = ausliefern('live', basis, { STUB_FEHLER_BEI: 'migrate.ts' });
 		expect(lauf.status).toBe(1);
 		expect(letzteZeile(lauf)).toBe('fehler');
 		expect(appStarts(lauf)).toHaveLength(0);
+		expect(lies(basis, 'live/zustand/aktuell')).toBe(ALT);
+	});
+
+	// Test ist nach `down --volumes` leer: Scheitert danach ein Schritt, setzt ausliefern Test mit
+	// dem bisherigen Image neu auf (Datenbank, Migration, Testdaten, App) und meldet fehler.
+	const aufrufeMit = (lauf: Ergebnis, teil: string, image: string) =>
+		lauf.aufrufe.filter((a, i) => a.includes(teil) && lauf.umwelt[i].image === image);
+
+	test.each([
+		['Migration', 'migrate.ts'],
+		['Testdaten', 'node scripts/testdaten.ts'],
+		['App nicht gesund', '--wait-timeout']
+	])('Test: %s scheitert, mit Vorgänger: Test läuft wieder mit dem alten Image', (_n, teil) => {
+		const basis = baue({ dateien: { 'test/zustand/aktuell': `${ALT}\n` } });
+		const lauf = ausliefern('test', basis, {
+			STUB_FEHLER_BEI: teil,
+			STUB_FEHLER_NUR_IMAGE: `${REPO}@${NEU}`
+		});
+		expect(lauf.status).toBe(1);
+		expect(letzteZeile(lauf)).toBe('fehler');
+		const alt = `${REPO}@${ALT}`;
+		expect(lauf.aufrufe.filter((a) => a.includes('down --volumes'))).toHaveLength(2);
+		expect(aufrufeMit(lauf, 'migrate.ts', alt)).toHaveLength(1);
+		expect(aufrufeMit(lauf, 'node scripts/testdaten.ts', alt)).toHaveLength(1);
+		const starts = appStarts(lauf);
+		expect(lauf.umwelt[starts[starts.length - 1].i].image).toBe(alt);
+		expect(index(lauf, 'down --volumes')).toBeLessThan(index(lauf, 'migrate.ts'));
 		expect(lies(basis, 'test/zustand/aktuell')).toBe(ALT);
+	});
+
+	test('Test: Migration scheitert beim allerersten Lauf: fehler, kein Rückfall', () => {
+		const basis = baue();
+		const lauf = ausliefern('test', basis, { STUB_FEHLER_BEI: 'migrate.ts' });
+		expect(letzteZeile(lauf)).toBe('fehler');
+		expect(appStarts(lauf)).toHaveLength(0);
+		expect(lauf.aufrufe.filter((a) => a.includes('down --volumes'))).toHaveLength(1);
 	});
 
 	test('App nicht gesund, mit Vorgänger: startet den vorherigen Digest, fehler', () => {
