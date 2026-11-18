@@ -7,6 +7,18 @@ neuester oben. Jeder Eintrag steht hier als eine Zeile mit Ausgang und Verweis; 
 Begründung lebt im Issue, im Commit oder in der Doku. Verworfene Einträge behalten ihren
 Gegenbeleg.
 
+### Erledigt mit #39 (18.11.2026) — ausserhalb einer Auswertung
+
+**Umgesetzt**
+
+- 2026-11-14 — Offene App lädt nach einer Auslieferung nicht von selbst neu (E-65) → Entscheid des
+  Projektleiters «jetzt vor der Demo»: Nach einer bemerkten neuen Fassung tragen die Links der App
+  `data-sveltekit-reload`, laden also ganz neu und werden nicht mehr vorgeladen; `goto` und die
+  Zurück-Geste bleiben in der App, ein geändertes Formular fragt zuerst. E2E
+  `tests/e2e/neue-version.test.ts` (vorher 6 von 9 rot, danach 45 von 45 grün bei fünf
+  Wiederholungen, ohne Konsolenfehler). Offen bleibt die Vermutung zum alten Service Worker bei
+  geänderter Push-Nutzlast (nicht geprüft; Nutzlast ist seither unverändert).
+
 ### Erledigt im Refactoring, Schritt 20 (14.11.2026) — ausserhalb einer Auswertung
 
 **Mitgemacht**

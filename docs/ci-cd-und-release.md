@@ -462,11 +462,12 @@ Seite kommt bei jedem Start vom Server.
   Vordergrund kommt, und sonst stündlich. Die Kennung ist der Zeitstempel des Builds (`version`
   in `vite.config.ts` ist mit Absicht nicht gesetzt), also bei jeder Auslieferung neu, auch bei
   gleicher Versionsnummer. Sie ist nicht die Versionsnummer der Fusszeile.
-- Von selbst neu geladen wird **nur, wenn ein Seitenwechsel scheitert** und der Server dabei
-  eine neue Kennung meldet: wenn der Code der Zielseite auf dem neuen Server fehlt oder die
-  Zielseite mit einem Fehler endet. Dann lädt SvelteKit die Zielseite ganz neu, mit dem neuen
-  Code. Ein Seitenwechsel, der gelingt, bleibt in der App, auch wenn sie die neue Auslieferung
-  schon bemerkt hat; sie arbeitet dann bis zum nächsten Start mit dem alten Code weiter.
+- **Hat die App eine neue Auslieferung bemerkt, lädt der nächste angetippte Link der App die
+  Seite ganz neu**, mit dem neuen Code (E-65): Das Layout setzt dann `data-sveltekit-reload` auf
+  alle Links, die damit auch nicht mehr vorgeladen werden. `goto` (z. B. nach dem Speichern) und
+  die Zurück-Geste bleiben in der App; bei einem geänderten Formular kommt zuerst die Rückfrage.
+  Scheitert ein Seitenwechsel vorher, weil der Code der Zielseite fehlt, lädt SvelteKit ebenfalls
+  ganz neu.
 - Eine angefangene Eingabe bleibt beim Neuladen nicht erhalten.
 - Der Server zwingt eine alte App nicht: Es gibt keine Mindestversion. Wer nach einer
   Auslieferung mit der offenen App weiterarbeitet, schickt mit altem Code an die neuen

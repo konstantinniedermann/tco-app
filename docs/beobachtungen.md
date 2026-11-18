@@ -554,34 +554,6 @@ weder Rolle noch Beschriftung gibt); der Bestand bleibt. Offen ist nur noch der 
 Vorgang: Karten und Klappen bräuchten Rolle und Namen, das ändert, was ein Bildschirmleser
 vorliest, und braucht je Stelle einen Entscheid.
 
-### 2026-11-14 — Offene App lädt nach einer Auslieferung nicht von selbst neu
-
-**Thema:** Struktur
-
-**Fundort:** `src/routes/+layout.svelte` (`beforeNavigate`), `docs/ci-cd-und-release.md`
-(«Alte Versionen auf dem Handy»).
-
-**Beobachtung:** Eine offene App bemerkt eine neue Auslieferung, lädt aber nur neu, wenn ein
-Seitenwechsel scheitert. Die Ergänzung «der nächste angetippte Link lädt ganz neu» (Vorlage aus
-der SvelteKit-Doku) tat auf allen drei Geräten das Richtige, bricht aber das Vorladen ab, das
-derselbe Tipp gestartet hat; WebKit meldet das als Konsolenfehler (je nach Fassung 2 bis 9 von
-45 Läufen).
-
-**Ursprung:** Refactoring Schritt 19, Antwort B auf F-35, beendet mit A (E-61; Protokoll in
-`docs/refactoring-analyse.md`, Anhang F.2; der E2E dazu steht im Verlauf, Commit `8ba6016`).
-
-**Einschätzung:** Sinnvoll, sobald Test und Live ausgeliefert werden. Wege: Vorladen beim
-Antippen für diesen Fall aussetzen, oder die abgebrochenen Abrufe im Test als erwartet führen.
-Beides ist ein Entscheid, kein Refactoring.
-
-**Ergänzung (15.11.2026, Refactoring Schritt 25).** Zwei Punkte zum selben Thema, alte Stände
-nach einer Auslieferung (Refactoring-Analyse 1e, H3-04 und H3-05; Protokoll Etappe 3, F.1 und F.2):
-(1) WebKit meldet abgebrochene Abrufe auch beim Neuladen, das das Bordmittel im Fehlerfall heute
-schon macht; kein E2E prüft diesen Fehlerfall. (2) Ändert ein Release die Form der Push-Nutzlast,
-zeigt ein noch aktiver alter Service Worker den Push nicht an, bis er abgelöst ist (Vermutung,
-nicht geprüft). Entscheid des Projektleiters (E-65): bleibt Beobachtung, **aufnehmen, wenn Test in
-Betrieb geht**.
-
 ### 2026-11-14 — CM-Seite: Fokus nach einer Aktion hängt vom Zeitpunkt im Browser ab
 
 **Thema:** Barrierefreiheit
