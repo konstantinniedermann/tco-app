@@ -75,10 +75,10 @@ solcher Stand ist, genügt eine Nummer je Release. Ablauf im Einzelnen:
 
 ## Reevaluations-Trigger
 
-- `AUSLIEFERUNG_TEST` steht auf `an`. Dann ist zu entscheiden: (1) ob Stände auf Test an der
-  Nummer unterscheidbar sein müssen (der Einwand aus ADR-007) oder ein Zusatz wie die Kurzform
-  des Commits in der Fusszeile genügt; (2) die Reihenfolge: Die Nummer zählt zum Code-Stand
-  des Images, sie muss vor der Checkliste auf Test gesetzt sein, sonst geht ein anderes Image
-  live als das geprüfte.
+- ~~`AUSLIEFERUNG_TEST` steht auf `an`.~~ Entschieden vom Projektleiter am 18.11.2026 (#39):
+  (1) Auf Test zeigt die Fusszeile hinter der Nummer die Kurzform des Commits
+  (`Version 0.23.0 · a1b2c3d`, `src/lib/version.ts`); Live zeigt dasselbe Image nur mit der
+  Nummer. (2) Die Checkliste auf Test wird erst nach dem Merge des Doku-Abgleichs abgehakt, der
+  die Nummer setzt: Erst dieses Image geht live (Skill `tco-branching`, Release).
 - Merges nach `dev` laufen nicht mehr lokal (z. B. auf GitHub), so dass der Hook sie nicht
   sieht.

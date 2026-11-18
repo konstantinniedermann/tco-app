@@ -11,6 +11,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Auf der Test-Umgebung zeigt die Fusszeile hinter der Versionsnummer die Kurzform des Commits
+  (#39). Auf Live ändert sich nichts.
+- Nach einer neuen Fassung lädt die offene App beim nächsten angetippten Link ganz neu und zeigt
+  so gleich die neue Fassung (#39).
 - Test hat einen Mail-Fänger: Alle Mails von Test landen in einem Postfach auf dem Server hinter
   dem Test-Passwort und gehen nicht hinaus (#39). An der App ändert sich nichts.
 - Vorbereitung des Servers (#39): Der Mailversand gibt nach festen Zeitlimits auf, statt

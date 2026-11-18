@@ -311,7 +311,7 @@ jobs:
         run: |
           repo="ghcr.io/$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
           stand=$(bash scripts/ci/code-stand.sh)
-          docker build -t "$repo:commit-$COMMIT" .
+          docker build --build-arg MYTCO_COMMIT="$COMMIT" -t "$repo:commit-$COMMIT" .
           printf '%s' "$TOKEN" | docker login ghcr.io -u "$AKTEUR" --password-stdin
           docker push "$repo:commit-$COMMIT"
           digest=$(docker buildx imagetools inspect "$repo:commit-$COMMIT" --format '{{.Manifest.Digest}}')

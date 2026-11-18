@@ -54,6 +54,8 @@ export default defineConfig({
 		})
 	],
 	define: {
-		__APP_VERSION__: JSON.stringify(pkg.version)
+		__APP_VERSION__: JSON.stringify(pkg.version),
+		// Kurzform des Commits; nur die Fusszeile auf Test zeigt sie (src/lib/version.ts).
+		__APP_COMMIT__: JSON.stringify((process.env.MYTCO_COMMIT ?? '').slice(0, 7))
 	}
 });

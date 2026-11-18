@@ -13,7 +13,7 @@
 	import { onMount } from 'svelte';
 	import { afterNavigate, beforeNavigate, goto, onNavigate, refreshAll } from '$app/navigation';
 	import { asset, resolve } from '$app/paths';
-	import { page } from '$app/state';
+	import { page, updated } from '$app/state';
 	import Reiter from '../lib/ui/Reiter.svelte';
 	import { beobachteKopftitel } from '../lib/ui/kopftitel.ts';
 	import { klappeWeich, vergissKlappen } from '../lib/ui/klappe.ts';
@@ -29,7 +29,7 @@
 	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 	import { raeumeWechselAuf } from '../lib/profil/wechselanfrage.ts';
-	import { APP_VERSION } from '../lib/version';
+	import { APP_COMMIT, APP_VERSION, versionsText } from '../lib/version';
 	import { beendeAnsicht } from '../lib/verwaltung/zugang-api.ts';
 	import { ANSICHT_NAME } from '../lib/verwaltung/rollen-namen.ts';
 
@@ -73,7 +73,9 @@
 
 	beforeNavigate((navigation) => {
 		const { from, to } = navigation;
-		if (to && fragtVorWechsel(navigation, hatUngespeichertes(document))) {
+		// Nach einer neuen Auslieferung lädt ein Link der App die Seite ganz neu (siehe unten).
+		const neuLaden = updated.current && to?.url.origin === location.origin;
+		if (to && fragtVorWechsel(navigation, hatUngespeichertes(document), neuLaden)) {
 			navigation.cancel();
 			ziel = to.url;
 			rueckfrage?.showModal();
@@ -177,7 +179,13 @@
 
 <div class="statusleiste"></div>
 
-<div class={['app', { schale: !verwaltung }]}>
+<!-- Neue Auslieferung (E-65): Sobald SvelteKit eine neue Fassung bemerkt hat, lädt jeder Link der
+App die Seite ganz neu, mit dem neuen Code. So entfällt auch das Vorladen dieser Links, das ein
+späteres Neuladen abbrechen würde. `goto` und die Zurück-Geste bleiben in der App. -->
+<div
+	class={['app', { schale: !verwaltung }]}
+	data-sveltekit-reload={updated.current ? 'true' : 'false'}
+>
 	{#if data.ansicht}
 		<aside class="ansicht-band" aria-label="Ansicht">
 			<p>Ansicht als {ANSICHT_NAME[data.ansicht]} — nur ansehen</p>
@@ -218,7 +226,10 @@
 							<a href={resolve('/hilfe')}>Hilfe</a>
 							·
 							<a href={resolve('/datenschutz')}>Datenschutz</a>
-							· <span data-testid="version">Version {APP_VERSION}</span>
+							·
+							<span data-testid="version"
+								>Version {versionsText(APP_VERSION, APP_COMMIT, page.url.hostname)}</span
+							>
 						</p>
 					</footer>
 				{/if}

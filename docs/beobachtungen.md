@@ -116,6 +116,24 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-18 — Restpunkte zu E-65: WebKit beim Neuladen, alter Service Worker
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/neue-version.test.ts`, `src/service-worker/`, `docs/ci-cd-und-release.md` («Alte Versionen auf dem Handy»)
+
+**Beobachtung:** E-65 ist mit #39 umgesetzt (Links laden nach einer neuen Fassung ganz neu). Offen
+aus der Ergänzung vom 15.11.2026: (1) WebKit meldet abgebrochene Abrufe auch beim Neuladen, das
+SvelteKit macht, wenn ein Seitenwechsel scheitert (Code der Zielseite fehlt); kein E2E prüft
+diesen Fehlerfall. (2) Ändert ein Release die Form der Push-Nutzlast, zeigt ein noch aktiver
+alter Service Worker den Push womöglich nicht an, bis er abgelöst ist (Vermutung, nicht geprüft).
+
+**Ursprung:** #39, Merge-Review zu E-65
+
+**Einschätzung:** (2) wird erst relevant, wenn sich die Push-Nutzlast ändert; dann vor dem Release
+prüfen. (1) ist mit den neuen Reload-Links seltener geworden; ein E2E dafür bräuchte einen
+fehlenden Seiten-Code auf dem Server.
+
 ### 2026-11-18 — Kein Prüflauf merkt, wenn das Image die Testdaten nicht laden kann
 
 **Thema:** Tests
@@ -554,34 +572,6 @@ weder Rolle noch Beschriftung gibt); der Bestand bleibt. Offen ist nur noch der 
 Vorgang: Karten und Klappen bräuchten Rolle und Namen, das ändert, was ein Bildschirmleser
 vorliest, und braucht je Stelle einen Entscheid.
 
-### 2026-11-14 — Offene App lädt nach einer Auslieferung nicht von selbst neu
-
-**Thema:** Struktur
-
-**Fundort:** `src/routes/+layout.svelte` (`beforeNavigate`), `docs/ci-cd-und-release.md`
-(«Alte Versionen auf dem Handy»).
-
-**Beobachtung:** Eine offene App bemerkt eine neue Auslieferung, lädt aber nur neu, wenn ein
-Seitenwechsel scheitert. Die Ergänzung «der nächste angetippte Link lädt ganz neu» (Vorlage aus
-der SvelteKit-Doku) tat auf allen drei Geräten das Richtige, bricht aber das Vorladen ab, das
-derselbe Tipp gestartet hat; WebKit meldet das als Konsolenfehler (je nach Fassung 2 bis 9 von
-45 Läufen).
-
-**Ursprung:** Refactoring Schritt 19, Antwort B auf F-35, beendet mit A (E-61; Protokoll in
-`docs/refactoring-analyse.md`, Anhang F.2; der E2E dazu steht im Verlauf, Commit `8ba6016`).
-
-**Einschätzung:** Sinnvoll, sobald Test und Live ausgeliefert werden. Wege: Vorladen beim
-Antippen für diesen Fall aussetzen, oder die abgebrochenen Abrufe im Test als erwartet führen.
-Beides ist ein Entscheid, kein Refactoring.
-
-**Ergänzung (15.11.2026, Refactoring Schritt 25).** Zwei Punkte zum selben Thema, alte Stände
-nach einer Auslieferung (Refactoring-Analyse 1e, H3-04 und H3-05; Protokoll Etappe 3, F.1 und F.2):
-(1) WebKit meldet abgebrochene Abrufe auch beim Neuladen, das das Bordmittel im Fehlerfall heute
-schon macht; kein E2E prüft diesen Fehlerfall. (2) Ändert ein Release die Form der Push-Nutzlast,
-zeigt ein noch aktiver alter Service Worker den Push nicht an, bis er abgelöst ist (Vermutung,
-nicht geprüft). Entscheid des Projektleiters (E-65): bleibt Beobachtung, **aufnehmen, wenn Test in
-Betrieb geht**.
-
 ### 2026-11-14 — CM-Seite: Fokus nach einer Aktion hängt vom Zeitpunkt im Browser ab
 
 **Thema:** Barrierefreiheit
@@ -640,6 +630,10 @@ nicht sichtbar). Lokal im vollen Lauf auf allen drei Geräten grün, in der CI b
 Jobs grün. Damit wackeln zwei Tests der Reiter-Bewegung; eine Regression durch SvelteKit 3.2 ist
 nicht belegt, aber auch nicht ausgeschlossen. Kommt es wieder: Trace holen, bevor die Zeitgrenze
 steigt.
+
+**Nachtrag 2026-11-18:** Wieder einmal rot im vollen `make check` (#39, Branch zu E-65), diesmal
+`aria-current` am Reiter «Start» nach 5 s nicht gesetzt (iPhone); einzeln 15× grün. Trace nicht
+geholt (lokal, voller Lauf).
 
 ### 2026-11-15 — E2E «Spielersuche springt nicht» einmal rot auf Android
 
