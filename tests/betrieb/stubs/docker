@@ -3,7 +3,8 @@
 #  - hängt die Argumente als eine Zeile ("$*") an $STUB_PROTOKOLL an
 #  - hängt MYTCO_IMAGE und MYTCO_UMGEBUNG zeilengleich an $STUB_PROTOKOLL.umwelt an
 #  - schreibt immer STUB-GEHEIM-LOG auf stderr (Ausgabetests suchen damit Lecks)
-#  - STUB_FEHLER_BEI=<muster>: Exit 1, wenn die Argumente das Muster enthalten
+#  - STUB_FEHLER_BEI=<muster>: Exit 1, wenn die Argumente das Muster enthalten; mit
+#    STUB_FEHLER_NUR_IMAGE=<image> nur, wenn MYTCO_IMAGE genau dieses Image ist
 #  - STUB_AUSGABE_<NAME>=<text> mit STUB_MUSTER_<NAME>=<muster>: gibt <text> auf stdout aus,
 #    wenn die Argumentzeile ("$*") das Muster als Teilstring enthält (Shell-Muster erlaubt,
 #    z. B. "exec*psql"). NAME ist frei wählbar (A-Z, 0-9, _). Mehrere Paare: es gewinnt der
@@ -42,7 +43,8 @@ if [ -n "${STUB_STDIN_BEI:-}" ]; then
 	esac
 fi
 
-if [ -n "${STUB_FEHLER_BEI:-}" ]; then
+if [ -n "${STUB_FEHLER_BEI:-}" ] &&
+	{ [ -z "${STUB_FEHLER_NUR_IMAGE:-}" ] || [ "${MYTCO_IMAGE-}" = "$STUB_FEHLER_NUR_IMAGE" ]; }; then
 	case "$*" in
 	*"$STUB_FEHLER_BEI"*) exit 1 ;;
 	esac
