@@ -9,6 +9,7 @@ bin/ausliefern-ssh, bin/lib.sh      Türsteher, von Hand eingerichtet
 <umgebung>/geheim.env               von Hand (Rechte 600), Vorlage geheim.env.example
 <umgebung>/betrieb/                 Einrichtung aus dem zuletzt ausgelieferten Image
 <umgebung>/zustand/aktuell|vorher   Digest des laufenden und des vorherigen Images
+test/zustand/neu-aufgesetzt         Zähler der letzten geglückten Neuaufsetzung von Test
 <umgebung>/protokoll.log            alles, was docker, psql und die App ausgeben
 fassungen/<digest>/betrieb/         aus dem Image entnommene Einrichtung
 proxy/                              compose.proxy.yml, caddy/Caddyfile, caddy/umgebungen/<umgebung>.caddy
@@ -66,8 +67,27 @@ mehrfach ausführbar und endet mit `server/pruefen.sh <admin-benutzer>`, das je 
 Test verschickt keine Mails nach aussen: Mit `MYTCO_SMTP_URL=smtp://mail.invalid:1025` in
 `test/geheim.env` gehen sie an einen Mailpit-Container (Dienst `mailpit`, nur Test, startet mit
 der Datenbank). Das Postfach steht unter `https://<adresse von test>/_mail/`, hinter demselben
-Passwort wie Test. Er hält höchstens 200 Mails, und `ausliefern test` leert ihn mit der
-Datenbank; danach liegt dort die Mail mit dem Brief-Code der Testdaten. Live startet ihn nie.
+Passwort wie Test. Er hält höchstens 200 Mails, nur im Container: Er leert sich, wenn
+`ausliefern test` Test neu aufsetzt (danach liegt dort die Mail mit dem Brief-Code der
+Testdaten) und wenn der Container neu entsteht, etwa mit einem neuen Mailpit-Image. Live startet
+ihn nie.
+
+### Test neu aufsetzen
+
+Test behält seine Datenbank über Auslieferungen hinweg, wie Live. Ändert ein Branch, wie die
+Testdaten oder Konten entstehen, erhöht er die Zahl in `betrieb/test-neu-aufsetzen` um eins.
+Die nächste Auslieferung auf Test leert dann einmal Datenbank und Mail-Fänger und legt die
+erfundenen Mitglieder neu an. Erst nach einer geglückten Auslieferung steht die Zahl in
+`test/zustand/neu-aufgesetzt`; scheitert sie, setzt die nächste wieder neu auf. Live liest den
+Zähler nie.
+
+Zwei Branches, die die Zahl auf denselben Wert erhöhen, mergen ohne Konflikt, und Test wird nur
+einmal neu aufgesetzt; die Testdaten des später gemergten fehlen dann. Darum vor dem Merge `dev`
+einmergen: Hat `dev` die Zahl seit dem Abzweigen schon erhöht, sie im eigenen Branch noch einmal
+erhöhen. Ein frischer Stand für die [Checkliste vor dem Release](../docs/testkonzept.md#checkliste-vor-dem-release)
+entsteht auf dieselbe Weise, mit einem Commit, der nur die Zahl erhöht. Ein Image von vor dem
+Zähler (etwa ein erneut gestarteter alter Lauf) bringt sein eigenes `ausliefern` mit und setzt
+Test wie früher bei jeder Auslieferung neu auf.
 
 ### Platz für eine Website
 
@@ -221,5 +241,5 @@ automatisch; sie liegt beim Betreiber.
 `make betrieb-nachweis` spielt den ganzen Ablauf auf Docker Desktop mit erfundenen Werten durch
 (Wegwerf-Server im Temp-Ordner, lokale Registry, Test und Live über den Türsteher, HTTPS über
 Caddy, Trennung, Rückfall, Anlegen des Sicherungsziels, Sicherung vor einer Live-Auslieferung,
-Wiederherstellung auch einer älteren Sicherung, Testdaten auf Test, Sperre von `MAIL_NUR_AN` auf Live, Sicherung vor dem Zurückspielen und Notschalter, keine Datenbankwerte im Protokoll, kaputte Einrichtung, Proxy-Log ohne
+Wiederherstellung auch einer älteren Sicherung, Testdaten auf Test, Test behält seine Datenbank und wird nur über den Zähler neu aufgesetzt, Sperre von `MAIL_NUR_AN` auf Live, Sicherung vor dem Zurückspielen und Notschalter, keine Datenbankwerte im Protokoll, kaputte Einrichtung, Proxy-Log ohne
 IP-Adressen) und räumt danach alles ab.

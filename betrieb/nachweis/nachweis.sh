@@ -6,7 +6,8 @@
 # Umgebungen, den Rückfall, Sicherung/Probe/Wiederherstellung (auch einer älteren Sicherung nach
 # einer neuen Migration; vorher gesichert, Notschalter ohne-sicherung, kein Wert aus der
 # Datenbank im Protokoll), die Sicherung vor einer Live-Auslieferung, das Abweisen einer kaputten
-# Einrichtung und dass der Proxy keine IP-Adressen protokolliert.
+# Einrichtung, dass Test seine Datenbank behält und nur über den Zähler test-neu-aufsetzen neu
+# aufgesetzt wird, und dass der Proxy keine IP-Adressen protokolliert.
 # Ausgabe je Prüfung "prüfung: <name> … ok|fehler", am Ende die Summe; Exit 1 bei einem Fehler.
 # Alle Werte sind erfunden. Bei jedem Ende wird aufgeräumt: Compose-Projekte mytco-test,
 # mytco-live, mytco-proxy samt Netzen und Volumes, Registry, gebaute Images, Temp-Ordner.
@@ -28,7 +29,8 @@ CADDY_IMAGE=$(sed -n 's/^[[:space:]]*image:[[:space:]]*\(caddy:[^[:space:]]*\)[[
 	"$BETRIEB/compose.proxy.yml" | sed -n 1p)
 KENNUNG="nachweis-$$"
 REGISTRY_NAME="mytco-$KENNUNG-registry"
-EIGENE_IMAGES="$BILD mytco-nachweis:d2-$$ mytco-nachweis:d3-$$ mytco-nachweis:d4-$$ mytco-nachweis:d5-$$"
+EIGENE_IMAGES="$BILD mytco-nachweis:d2-$$ mytco-nachweis:d3-$$ mytco-nachweis:d4-$$ mytco-nachweis:d5-$$
+mytco-nachweis:d6-$$ mytco-nachweis:d7-$$ mytco-nachweis:d8-$$"
 PROJEKTE="mytco-test mytco-live mytco-proxy"
 NETZE="mytco-proxy-test mytco-proxy-live"
 WARTEZEIT=60
@@ -467,6 +469,32 @@ psql_test() {
 	docker exec mytco-test-db-1 psql -U mytco -d mytco -At -c "$1"
 }
 
+# Zähler «Test neu aufsetzen», den ein Image mitbringt (die eine Zeile ohne #).
+zaehler_von() {
+	docker run --rm --entrypoint cat "$1" /app/betrieb/test-neu-aufsetzen | grep -v -e '^#' -e '^[[:space:]]*$'
+}
+
+zustand_neu_aufgesetzt() {
+	head -n 1 "$BASIS/test/zustand/neu-aufgesetzt" 2>/dev/null || true
+}
+
+# Erfundene Markerzeile in der Test-Datenbank; sie überlebt nur, wenn Test nicht neu aufgesetzt wird.
+setze_marker() {
+	psql_test "create table if not exists nachweis_behalten (id int); insert into nachweis_behalten values (1);" >/dev/null
+}
+
+# test_behalten <ausgabe>: der Lauf hat Test nicht neu aufgesetzt, die Markerzeile ist noch da.
+test_behalten() {
+	if grep -xE 'schritt: (test zuruecksetzen|testdaten laden)' <<<"$1"; then
+		echo "Test wurde neu aufgesetzt (Schritt oben)"
+		return 1
+	fi
+	[ "$(psql_test "select count(*) from nachweis_behalten")" = 1 ] || {
+		echo "Markerzeile in der Test-Datenbank fehlt"
+		return 1
+	}
+}
+
 # Testdaten nach dem Zurücksetzen von Test: Mitglieder angelegt, der Mail-Versuch scheitert
 # (smtp://mail.invalid), und das Protokoll nennt keine Adresse (DS-06).
 p1_testdaten() {
@@ -493,6 +521,20 @@ p1_testdaten() {
 		echo "live-db hat Mitglieder"
 		return 1
 	}
+	[ "$(zustand_neu_aufgesetzt)" = "$(zaehler_von "$BILD")" ] || {
+		echo "test/zustand/neu-aufgesetzt: '$(zustand_neu_aufgesetzt)', erwartet den Zähler des Images"
+		return 1
+	}
+}
+
+# Zweite Auslieferung mit demselben Zähler: Test behält seine Datenbank wie Live.
+p1_behalten() {
+	local ausgabe rc=0
+	setze_marker
+	ausgabe=$(tuersteher test "$(lies d1)") || rc=$?
+	erwarte_ausgabe ok "$rc" "$ausgabe"
+	test_behalten "$ausgabe"
+	[ "$(psql_test "select count(*) from mitglied")" = 3 ]
 }
 
 # Von Hand ein zweites Mal: bricht ab, weil schon Mitglieder da sind; nichts doppelt.
@@ -722,6 +764,8 @@ p4_danach() {
 		return 1
 	}
 	[ "$(docker inspect -f '{{.Config.Image}}' mytco-test-app-1)" = "$REPO@$(lies d1)" ]
+	# Ohne neuen Zähler fällt Test wie Live zurück, die Datenbank bleibt.
+	test_behalten ""
 }
 
 # --- 5 Sicherung --------------------------------------------------------------------------
@@ -1188,8 +1232,122 @@ p6_caddyfile() {
 	test_status_ok
 }
 
-# --- 7 Fehlerseite von Caddy --------------------------------------------------------------
-p7_fehlerseite() {
+# --- 7 Test neu aufsetzen über den Zähler -------------------------------------------------
+# D6: Zähler um eins erhöht. D7: wie D6, aber die App startet nicht. D8: Zähler ungültig.
+p7_bauen() {
+	local n
+	n=$(zaehler_von "$BILD")
+	merke_wert zaehler-alt "$n"
+	merke_wert zaehler-neu "$((n + 1))"
+	printf '# nachweis: erhöht\n%s\n' "$((n + 1))" >"$TEMP/zaehler-neu"
+	baue d6 "FROM $BILD
+COPY zaehler-neu /app/betrieb/test-neu-aufsetzen" "$TEMP/zaehler-neu"
+	schiebe "mytco-nachweis:d6-$$" d6
+	baue d7 "FROM mytco-nachweis:d6-$$
+CMD [\"node\",\"-e\",\"process.exit(1)\"]"
+	schiebe "mytco-nachweis:d7-$$" d7
+	printf '%s\n' "$((n + 1))" zwei >"$TEMP/zaehler-kaputt"
+	baue d8 "FROM $BILD
+COPY zaehler-kaputt /app/betrieb/test-neu-aufsetzen" "$TEMP/zaehler-kaputt"
+	schiebe "mytco-nachweis:d8-$$" d8
+}
+
+# Neuer Zähler, aber die App startet nicht: Test fällt samt Testdaten auf das vorige Image
+# zurück, der Zähler im Zustand rückt nicht vor (die nächste Auslieferung setzt wieder neu auf).
+p7_neu_scheitert() {
+	local vorher ausgabe rc=0
+	vorher=$(head -n 1 "$BASIS/test/zustand/aktuell")
+	setze_marker
+	ausgabe=$(tuersteher test "$(lies d7)") || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe"
+	grep -qxF "schritt: test zuruecksetzen" <<<"$ausgabe" || {
+		echo "kein Schritt test zuruecksetzen"
+		return 1
+	}
+	grep -qxF "schritt: rueckfall" <<<"$ausgabe" || {
+		echo "kein Schritt rueckfall"
+		return 1
+	}
+	[ "$(head -n 1 "$BASIS/test/zustand/aktuell")" = "$vorher" ] || {
+		echo "test/zustand/aktuell hat sich geändert"
+		return 1
+	}
+	[ "$(zustand_neu_aufgesetzt)" = "$(lies zaehler-alt)" ] || {
+		echo "test/zustand/neu-aufgesetzt ist vorgerückt: $(zustand_neu_aufgesetzt)"
+		return 1
+	}
+	test_status_ok
+	[ "$(psql_test "select count(*) from mitglied")" = 3 ]
+}
+
+# Neuer Zähler: Test wird einmal neu aufgesetzt, Testdaten neu, Zähler im Zustand nachgeführt.
+p7_neu() {
+	local ausgabe rc=0
+	setze_marker
+	ausgabe=$(tuersteher test "$(lies d6)") || rc=$?
+	erwarte_ausgabe ok "$rc" "$ausgabe"
+	grep -qxF "schritt: test zuruecksetzen" <<<"$ausgabe" || {
+		echo "kein Schritt test zuruecksetzen"
+		return 1
+	}
+	grep -qxF "schritt: testdaten laden" <<<"$ausgabe" || {
+		echo "kein Schritt testdaten laden"
+		return 1
+	}
+	[ "$(psql_test "select to_regclass('nachweis_behalten') is null")" = t ] || {
+		echo "Markerzeile hat das Neuaufsetzen überlebt"
+		return 1
+	}
+	[ "$(psql_test "select count(*) from mitglied")" = 3 ]
+	[ "$(zustand_neu_aufgesetzt)" = "$(lies zaehler-neu)" ] || {
+		echo "test/zustand/neu-aufgesetzt: $(zustand_neu_aufgesetzt)"
+		return 1
+	}
+	test_status_ok
+}
+
+# Dasselbe Image noch einmal: kein zweites Neuaufsetzen.
+p7_neu_erneut() {
+	local ausgabe rc=0
+	setze_marker
+	ausgabe=$(tuersteher test "$(lies d6)") || rc=$?
+	erwarte_ausgabe ok "$rc" "$ausgabe"
+	test_behalten "$ausgabe"
+}
+
+# Server, auf dem Test schon läuft, aber der Zustand fehlt (vor dem Zähler eingerichtet):
+# übernimmt den Zähler ohne Neuaufsetzen.
+p7_ohne_zustand() {
+	local ausgabe rc=0
+	rm -f "$BASIS/test/zustand/neu-aufgesetzt"
+	ausgabe=$(tuersteher test "$(lies d6)") || rc=$?
+	erwarte_ausgabe ok "$rc" "$ausgabe"
+	test_behalten "$ausgabe"
+	[ "$(zustand_neu_aufgesetzt)" = "$(lies zaehler-neu)" ] || {
+		echo "test/zustand/neu-aufgesetzt: '$(zustand_neu_aufgesetzt)'"
+		return 1
+	}
+}
+
+# Ungültiger Zähler: Abbruch vor jeder Änderung, Test läuft weiter wie vorher.
+p7_ungueltig() {
+	local ausgabe rc=0
+	ausgabe=$(tuersteher test "$(lies d8)") || rc=$?
+	erwarte_ausgabe fehler "$rc" "$ausgabe"
+	grep -qxF "ausliefern: Zähler test-neu-aufsetzen fehlt oder ungültig" "$BASIS/test/protokoll.log" || {
+		echo "Meldung fehlt in test/protokoll.log"
+		return 1
+	}
+	[ "$(head -n 1 "$BASIS/test/zustand/aktuell")" = "$(lies d6)" ] || {
+		echo "test/zustand/aktuell hat sich geändert"
+		return 1
+	}
+	test_behalten ""
+	test_status_ok
+}
+
+# --- 8 Fehlerseite von Caddy --------------------------------------------------------------
+p8_fehlerseite() {
 	local status
 	docker stop mytco-test-app-1 >>"$LOG" 2>&1
 	status=$(abfrage test.mytco.localhost /api/status -u "$BENUTZER:$PASSWORT")
@@ -1215,7 +1373,7 @@ p7_fehlerseite() {
 # die handle_errors beantwortet (wie der 502 oben), schreibt Caddy nur auf Stufe debug; darum
 # zusätzlich die wirksame Konfiguration: Der Standard-Logger entfernt die Felder jedes Eintrags.
 # Ohne Filter trägt u. a. jeder Eintrag der Admin-Schnittstelle remote_ip (im Lauf gesehen).
-p7_keine_ip() {
+p8_keine_ip() {
 	local log konfig feld netz ip gateways
 	konfig=$(docker exec mytco-proxy-caddy-1 wget -qO- http://127.0.0.1:2019/config/logging/logs/default)
 	for feld in remote_ip remote_port 'request\u003eremote_ip' 'request\u003eremote_port' \
@@ -1279,6 +1437,7 @@ pruefung "1 image per digest aus der registry geholt" p1_pull "$ABRUFE_VORHER"
 pruefung "1 test und live laufen mit D1" p1_laeuft
 pruefung "1 testdaten auf test geladen, mail-versuch protokolliert" p1_testdaten
 pruefung "1 testdaten zweiter lauf → abgebrochen, nichts doppelt" p1_testdaten_zweimal
+pruefung "1 ausliefern-ssh test D1 erneut → ok, test behält seine datenbank" p1_behalten
 pruefung "1 live-sperre: MAIL_NUR_AN gesetzt → ausliefern und zurueck verweigert" p1_live_umleitung
 # Ohne laufende Umgebungen sind alle weiteren Prüfungen ohne Aussage.
 [ "$ANZAHL_FEHLER" = 0 ] || summe
@@ -1297,7 +1456,7 @@ pruefung "3 test-app erreicht mytco-live-db-1 per name nicht" p3_live_name
 
 pruefung "4 image mit fehlerhaftem start (D2)" p4_bauen
 pruefung "4 ausliefern-ssh test D2 → fehler mit rückfall" p4_rueckfall
-pruefung "4 test danach ok, aktuell = D1" p4_danach
+pruefung "4 test danach ok, aktuell = D1, datenbank behalten" p4_danach
 
 pruefung "5 erfundene zeile in live-db" p5_zeile
 pruefung "5 sichern live ohne angelegtes ziel → fehler, nichts angelegt" p5_ohne_ziel
@@ -1321,7 +1480,14 @@ pruefung "6 ausliefern-ssh test D3 → fehler, test.caddy zurückgesetzt" p6_kap
 pruefung "6 live und test antworten weiter" p6_antworten
 pruefung "6 test-auslieferung (D4) lässt proxy/Caddyfile unverändert" p6_caddyfile
 
-pruefung "7 app gestoppt → caddy antwortet mit 502" p7_fehlerseite
-pruefung "7 proxy-log ohne ip-adressen" p7_keine_ip
+pruefung "7 images mit erhöhtem (D6, D7 startet nicht) und ungültigem zähler (D8)" p7_bauen
+pruefung "7 ausliefern-ssh test D7 → fehler, rückfall samt testdaten, zähler bleibt" p7_neu_scheitert
+pruefung "7 ausliefern-ssh test D6 → ok, test neu aufgesetzt, zähler nachgeführt" p7_neu
+pruefung "7 ausliefern-ssh test D6 erneut → ok, kein zweites neuaufsetzen" p7_neu_erneut
+pruefung "7 ohne zustand, test läuft schon → zähler übernommen, nichts gelöscht" p7_ohne_zustand
+pruefung "7 ausliefern-ssh test D8 (zähler ungültig) → fehler, nichts geändert" p7_ungueltig
+
+pruefung "8 app gestoppt → caddy antwortet mit 502" p8_fehlerseite
+pruefung "8 proxy-log ohne ip-adressen" p8_keine_ip
 
 summe

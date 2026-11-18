@@ -19,7 +19,7 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 | Adresse | `test.my.tcolten.ch`, nur mit Passwort (K-10) | `my.tcolten.ch` (K-10) |
 | Rolle | Demo und Checkliste | Testgruppe (Pilotphase), später alle Mitglieder |
 | Ausgeliefert bei | Merge nach `dev` | Merge des PR `dev` → `main` |
-| Daten | nur erfundene Testdaten; bei jeder Auslieferung neu aufgesetzt | Mitgliederdaten |
+| Daten | nur erfundene Testdaten; bleiben über Auslieferungen erhalten, neu aufgesetzt nur über den Zähler `betrieb/test-neu-aufsetzen` | Mitgliederdaten |
 | E-Mail | alle Mails landen im Mail-Fänger auf dem Server (Postfach unter `/_mail/`, hinter dem Test-Passwort) und verlassen ihn nie; adressiert sind sie an die Umleitungsadresse (`MAIL_NUR_AN`), der Betreff nennt den ursprünglichen Empfänger. Wer das Test-Passwort hat, liest dort die Login-Codes aller erfundenen Konten | an die Mitglieder |
 | Push, Schlüssel | eigene | eigene |
 
@@ -109,9 +109,15 @@ Doku-Merge ändert ihn nicht.
    ungültige Konfiguration wird abgewiesen, die alte bleibt aktiv). Danach lädt Caddy die neue
    Konfiguration, und der Proxy-Container wird neu erstellt, wenn sich sein Image (z. B. ein
    Update von Dependabot) oder `proxy.env` geändert hat. Dann Migrationen ausführen, Container
-   neu starten. Auf Test wird die Datenbank dabei neu aufgesetzt. Bricht der Lauf mitten in der
-   Übernahme ab, wird alles Übernommene zurückgesetzt.
-   **Testdaten (nur Test, nur wenn das Image das Skript enthält, Schritt «testdaten laden»):** Nach der Migration legt
+   neu starten. Bricht der Lauf mitten in der Übernahme ab, wird alles Übernommene zurückgesetzt.
+   **Test neu aufsetzen (Schritt «test zuruecksetzen»):** Test behält seine Datenbank wie Live;
+   Migrationen laufen dort also gegen bestehende Daten. Datenbank und Mail-Fänger werden nur
+   geleert, wenn das Image in `betrieb/test-neu-aufsetzen` eine andere Zahl mitbringt als die
+   letzte geglückte Neuaufsetzung (`test/zustand/neu-aufgesetzt`), und bei der ersten
+   Auslieferung. Ein Branch, der ändert, wie Testdaten oder Konten entstehen, erhöht die Zahl um
+   eins. Fehlt der Zustand, obwohl Test schon läuft, übernimmt der Lauf die Zahl, ohne neu
+   aufzusetzen. Ist der Zähler ungültig, bricht der Lauf ab, bevor er etwas ändert.
+   **Testdaten (nur Test, nur beim Neuaufsetzen, nur wenn das Image das Skript enthält, Schritt «testdaten laden»):** Nach der Migration legt
    `scripts/testdaten.ts` die erfundenen Mitglieder samt Konto an und schickt für Erika Beispiel
    einen Brief-Code per Mail («Brief-Code für die Test-Umgebung», mit Code, Gültigkeit und
    Adresse der App); durch die Umleitung («[Test für <Adresse>] » vor dem Betreff) landet sie beim Projektleiter, vorerst im Mail-Fänger von Test (Dienst `mailpit`, startet mit der Datenbank). Das Skript bricht ab,
@@ -120,11 +126,12 @@ Doku-Merge ändert ihn nicht.
    bleiben die Testdaten, und das Protokoll hält «Mail mit Brief-Code nicht versandt» fest. Code
    und Adressen stehen nie im Protokoll.
 5. **Prüfen:** Antwortet die App nicht innert einer Minute (`MYTCO_WARTEZEIT`, 60 s) auf ihre Statusabfrage,
-   startet das Skript wieder das vorherige Image. Auf Test ist die Datenbank zu diesem Zeitpunkt
-   schon neu aufgesetzt: Scheitert dort ein Schritt ab dem Start der Datenbank (Migration,
-   Testdaten, Statusabfrage), setzt das Skript Test mit dem vorherigen Image samt Testdaten neu
-   auf und meldet `fehler`; ohne vorheriges Image bleibt Test leer. Auf Live startet bei einer
-   gescheiterten Migration keine App, die alte läuft weiter. Die CI erfährt nur `ok` oder `fehler`,
+   startet das Skript wieder das vorherige Image. Wird Test neu aufgesetzt, ist seine Datenbank
+   zu diesem Zeitpunkt schon geleert: Scheitert dann ein Schritt ab dem Start der Datenbank
+   (Migration, Testdaten, Statusabfrage), setzt das Skript Test mit dem vorherigen Image samt
+   Testdaten neu auf und meldet `fehler`; der Zähler im Zustand rückt nicht vor, die nächste
+   Auslieferung setzt wieder neu auf. Ohne vorheriges Image bleibt Test leer. Sonst verhält sich
+   Test wie Live: Bei einer gescheiterten Migration startet keine App, die alte läuft weiter. Die CI erfährt nur `ok` oder `fehler`,
    keine Logs der App, denn CI-Logs liegen bei GitHub in den USA (DS-01, DS-06).
 6. **Freigeben (`freigeben`, nur `dev`):** Erst nach einer geglückten Auslieferung auf Test
    setzt dieser Job das Kennzeichen `code-<Hash>`. Ohne Auslieferung auf Test gibt es kein
@@ -392,8 +399,8 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   Dependabot zieht das Image also mit. Kein eigener Eintrag bei Dependabot.
 - **Keine Hauptversionen von Node, PostgreSQL und Caddy** über Dependabot (dort ausgeschlossen).
   Die Node-Hauptversion wird mit `engines` (`package.json`) und `.nvmrc` von Hand gewechselt.
-  Eine neue Hauptversion von PostgreSQL liest die Daten von Live nicht: Auf Test (leere
-  Datenbank) ginge sie durch, Live fiele aus. Sie braucht einen eigenen Plan mit Sicherung,
+  Eine neue Hauptversion von PostgreSQL liest die bestehenden Daten nicht: Live fiele aus, und
+  Test, das seine Datenbank behält, ebenso. Sie braucht einen eigenen Plan mit Sicherung,
   Dump und Wiederherstellung in die neue Version. Caddy-Hauptversionen können die
   Konfiguration ändern.
 - **Nicht von Dependabot erfasst:** die Digests von restic (`betrieb/bin/lib.sh`) und der

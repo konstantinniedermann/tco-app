@@ -1,0 +1,6 @@
+# Zähler für «Test neu aufsetzen» (betrieb/bin/ausliefern, nur Test).
+# Test behält seine Datenbank über Auslieferungen hinweg, wie Live. Ändert ein Branch, wie die
+# Testdaten oder Konten entstehen, erhöht er diese Zahl um eins: Die nächste Auslieferung auf
+# Test löscht dann einmal Datenbank und Mail-Fänger und legt die erfundenen Mitglieder neu an.
+# Eine Zeile, nur Ziffern; Zeilen mit # davor zählen nicht.
+1
