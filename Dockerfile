@@ -7,6 +7,8 @@ RUN npm ci --ignore-scripts
 COPY . .
 # Kein eigener `svelte-kit sync`: der Vite-Build synchronisiert selbst (Nachweis: gleiche Dateien,
 # Unterschied nur im Bauzeitstempel von version.json).
+# Kurzform des Commits für die Fusszeile auf Test (ADR-012); die CI übergibt den vollen Hash.
+ARG MYTCO_COMMIT=
 RUN npm run build
 
 # Stufe laufzeit: nur Produktionsabhängigkeiten, Build, Migrationen, Testdaten

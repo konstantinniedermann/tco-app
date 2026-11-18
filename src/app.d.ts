@@ -2,6 +2,8 @@
 declare global {
 	/** App-Version aus package.json, von Vite beim Bauen eingesetzt. */
 	const __APP_VERSION__: string;
+	/** Kurzform des Commits (Build-Argument MYTCO_COMMIT im Image), lokal leer. */
+	const __APP_COMMIT__: string;
 
 	namespace App {
 		// interface Error {}

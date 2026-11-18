@@ -55,7 +55,9 @@ flowchart LR
 
 - **Freigabe:** Der Merge des PR nach `main` geht ohne weiteren Knopf live; `main` ist
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
-  abgehakt und das Release freigegeben hat (ohne Server: Ausnahmen unter [Versionen](#versionen)).
+  abgehakt und das Release freigegeben hat. Abgehakt wird auf dem Image mit der neuen Nummer,
+  also nach dem Merge des Doku-Abgleichs; die Fusszeile auf Test zeigt dafür Nummer und
+  Kurzform des Commits (ADR-012) (ohne Server: Ausnahmen unter [Versionen](#versionen)).
 - **Doku-Abgleich:** Vor jedem Release, auch einem reinen Doku-Release, wird die Doku gegen
   Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Bei
   einem Release mit Code setzt der Abgleich die neue Nummer (siehe [Versionen](#versionen)). Danach

@@ -29,7 +29,7 @@
 	import { MELDUNG } from '../lib/login/anmelden.ts';
 	import { holeSpeicher, leseMailanfrage } from '../lib/login/mailanfrage.ts';
 	import { raeumeWechselAuf } from '../lib/profil/wechselanfrage.ts';
-	import { APP_VERSION } from '../lib/version';
+	import { APP_COMMIT, APP_VERSION, versionsText } from '../lib/version';
 	import { beendeAnsicht } from '../lib/verwaltung/zugang-api.ts';
 	import { ANSICHT_NAME } from '../lib/verwaltung/rollen-namen.ts';
 
@@ -226,7 +226,10 @@ späteres Neuladen abbrechen würde. `goto` und die Zurück-Geste bleiben in der
 							<a href={resolve('/hilfe')}>Hilfe</a>
 							·
 							<a href={resolve('/datenschutz')}>Datenschutz</a>
-							· <span data-testid="version">Version {APP_VERSION}</span>
+							·
+							<span data-testid="version"
+								>Version {versionsText(APP_VERSION, APP_COMMIT, page.url.hostname)}</span
+							>
 						</p>
 					</footer>
 				{/if}

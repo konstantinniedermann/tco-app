@@ -206,9 +206,10 @@ Widerspruch fragen.
 **Sobald Test und Live ausgeliefert werden** (Merge nach `dev` = Test-Umgebung, Merge nach `main` =
 live mit Mitgliederdaten, `docs/ci-cd-und-release.md`): vor dem PR muss der Projektleiter die
 Checkliste auf Test abgehakt und genau dieses Release freigegeben haben. Das Release vergibt
-die Nummer: Der Doku-Abgleich (4a) setzt sie, bevor der PR entsteht (ADR-012). Sobald Test
-läuft, ist die Regel neu anzusehen (Anlass in ADR-012: die Nummer zählt zum Image und müsste
-vor der Checkliste stehen). Den Tag und den Text des GitHub-Release (alle Abschnitte seit dem
+die Nummer: Der Doku-Abgleich (4a) setzt sie, bevor der PR entsteht (ADR-012). **Die
+Checkliste auf Test erst nach dem Merge des Abgleichs abhaken**, wenn Test das Image mit der
+neuen Nummer zeigt (Fusszeile: Nummer und Kurzform des Commits); sonst geht ein anderes Image
+live als das geprüfte. Den Tag und den Text des GitHub-Release (alle Abschnitte seit dem
 letzten Release) setzt die CI.
 
 **Code, aber noch keine Live-Auslieferung** (`AUSLIEFERUNG_LIVE` nicht `an`): Ablauf wie oben,
