@@ -52,7 +52,7 @@ export function baueAdresseVergebenMail(kontakt: string): { betreff: string; tex
 	};
 }
 
-// Annahme K-11: Versand über einen austauschbaren SMTP-Zugang (URL), Anbieter offen
+// Versand über einen austauschbaren SMTP-Zugang (URL); Anbieter hängt an K-11.2
 export function erstelleSmtpMailer(transport: string | object, absender: string): Mailer {
 	const transporter = nodemailer.createTransport(transport);
 	return async ({ an, betreff, text }) => {

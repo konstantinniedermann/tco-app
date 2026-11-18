@@ -4,8 +4,14 @@
 
 Was MyTCO den Verein kostet, mit der Technik aus [ADR-001](adr/adr-001-web-app-zuerst.md)
 und [ADR-003](adr/adr-003-hosting-infomaniak-vps.md). Den Rahmen gibt N-KOSTEN-01 vor:
-laufend im niedrigen dreistelligen Bereich pro Jahr. Die Kosten trägt der Verein; einzig
+laufend im niedrigen dreistelligen Bereich pro Jahr. Der Vorstand hat bis CHF 500 pro Jahr
+bewilligt, auch für die teuerste Variante (K-03.1). Die Kosten trägt der Verein; einzig
 GitHub läuft auf dem Privatkonto des Projektleiters (siehe unten).
+
+**Freigabe und Zahlung:** Einzelne Ausgaben gibt der Gesamtvorstand frei, die Anfrage geht
+über die Hauptansprechperson (K-03.2). Im ersten Jahr bis zur Einrichtung zahlt der
+Projektleiter, der Verein erstattet; alle Belege gehen an die Hauptansprechperson. Danach
+klärt der Projektleiter mit der Finanzverantwortlichen einen anderen Weg (K-03.3).
 
 **Legende:** **B·n** = belegt mit Quelle n · **S** = Schätzung · **V** = Vermutung.
 Beträge in CHF inkl. MwSt 8.1 %, wo nicht anders vermerkt; 1 EUR ≈ 0.94 CHF,
@@ -22,7 +28,7 @@ Die Mitgliederzahl ändert diese Kosten kaum, weil Server und Sicherung pauschal
 | oder Infomaniak Swiss Backup, 1 TB plus 1 Gerät für Cloud-Sicherung | jährlich | 78 (CHF 4.18 + 1.84 pro Monat exkl. MwSt, B·3) | belegt über Drittquelle |
 | E-Mail-Versand über Scaleway (EU) | nach Verbrauch | unter 5 (300 Mails/Monat gratis, danach EUR 0.25 pro 1000, B·4; Mengen siehe [Szenarien](#szenarien)) | belegt, Menge geschätzt |
 | Datenbank (PostgreSQL) und Test-Umgebung | — | 0 (Container auf demselben VPS, [ADR-002](adr/adr-002-sveltekit-postgresql.md), [CI/CD und Release](ci-cd-und-release.md)) | belegt |
-| Domain: Subdomain `my.tcolten.ch` | — | 0 | Annahme K-10: MyTCO läuft auf einer Subdomain der bestehenden Domain, keine eigene Domain |
+| Domain: Subdomain `my.tcolten.ch` | — | 0 | erlaubt (K-10): MyTCO läuft auf einer Subdomain der bestehenden Domain, keine eigene Domain |
 | Push-Benachrichtigungen (Web Push) | — | 0 (Push-Dienste der Browser, ohne Konto, B·5) | belegt |
 | Code-Ablage und CI: GitHub im Gratisplan | — | 0 auf dem Privatkonto des Projektleiters; das Repo ist öffentlich, Actions-Minuten sind dafür gratis und ohne Kontingent ([CI/CD und Release](ci-cd-und-release.md#actions-minuten)) | belegt |
 | **Total laufend** | | **ca. 95–175** | Schätzung |
@@ -43,9 +49,12 @@ nichts. Die Actions-Minuten sind gratis, solange das Repo öffentlich ist
 Bei Scaleway fallen ohne Gratiskontingent bei 500 Mitgliedern ca. CHF 4 pro Jahr an (S).
 Reicht ein Kontingent nicht mehr, entstehen Kosten von wenigen Franken pro Jahr (S).
 
-Annahme K-11: MyTCO verschickt seine E-Mails über Scaleway, nicht über ein Postfach von
-@tcolten.ch. ADR-003 gibt dem Postfach Vorrang, wenn K-11 es erlaubt; dessen Kosten stehen
-unter [Nur falls](#nur-falls). Damit stiege die Obergrenze auf ca. CHF 250 pro Jahr.
+Vorschlag K-11.2: MyTCO verschickt seine E-Mails über Scaleway, mit Absender
+`mytco@tcolten.ch` (K-11). Über ein Postfach bei Metanet versendet MyTCO nicht, weil es dort
+keinen Vertrag zur Auftragsbearbeitung gibt (K-09.7, Entscheid Projektleiter). ADR-003 gibt
+einem Postfach @tcolten.ch Vorrang; möglich ist das erst nach dem Umzug der Website, dann bei
+Infomaniak (K-48). Die Kosten stehen unter [Nur falls](#nur-falls); mit dem Vergleichspreis
+von Metanet stiege die Obergrenze auf ca. CHF 250 pro Jahr.
 
 ## Einmalige Kosten
 
@@ -71,7 +80,7 @@ CHF 1.10–1.40 Porto plus Druck.
 
 | Posten | Falls | CHF | Status |
 |--------|-------|----:|--------|
-| Postfach @tcolten.ch, Business Mail bei Metanet | K-11 erlaubt den Versand darüber, und das heutige Paket enthält es nicht schon (K-09) | ca. 71–77 pro Jahr (CHF 5.90/Monat, ob inkl. MwSt: offen, B·7) | belegt |
+| Postfach @tcolten.ch für den Versand | Versand über ein Postfach nach dem Umzug der Website zu Infomaniak (hängt an K-11.2, K-48) | Preis bei Infomaniak offen; zum Vergleich Business Mail bei Metanet ca. 71–77 pro Jahr (CHF 5.90/Monat, ob inkl. MwSt: offen, B·7) | offen |
 | Apple Developer Program | Store-App ([ADR-001](adr/adr-001-web-app-zuerst.md)) | ca. 80 pro Jahr (USD 99, B·9, ohne MwSt umgerechnet); 0 mit Gebührenerlass für Non-Profits (B·10), ob der TCO berechtigt ist: offen | belegt |
 | Google Play Console | Store-App | ca. 20 einmalig (USD 25, B·11, ohne MwSt umgerechnet) | belegt |
 | SMS | SMS als Kanal (hängt an K-37) | ca. 0.05–0.10 pro Nachricht | Schätzung aus der [Recherche Systemlandschaft](recherche/README.md) |
@@ -105,20 +114,17 @@ ca. 95–175 pro Jahr darunter, weil die Entwicklung ehrenamtlich ist.
 ## Jährliche Überprüfung
 
 Einmal im Jahr, rechtzeitig vor dem Vereinsbudget, ruft der Projektleiter die Preise neu ab
-und führt diese Seite nach: Betrag, Quelle, Datum. Wann das Budget entsteht, hängt an K-03.
+und führt diese Seite nach: Betrag, Quelle, Datum.
 Ausserhalb des Takts löst eine Preiserhöhung beim VPS eine Überprüfung aus
 (Reevaluations-Trigger 4 in [ADR-003](adr/adr-003-hosting-infomaniak-vps.md)).
 
 ## Offene Fragen
 
-- **K-03:** Gilt der Budgetrahmen, wer gibt die Posten frei, und wie bezahlt der Verein
-  Online-Dienste (Rechnung, Kreditkarte)? Die Freigabe der Kosten durch den Verein steht aus;
-  der Vorstand entscheidet am 16.11.2026, im Gespräch sind CHF 300–500 pro Jahr.
-- **K-09:** Was kostet das heutige Paket des Vereins bei Metanet, und enthält es schon
+- **K-09.1:** Was kostet das heutige Paket des Vereins bei Metanet, und enthält es schon
   E-Mail-Postfächer?
-- **K-48:** Lohnt es sich, die Website von Metanet zu Infomaniak umzuziehen, damit Website
-  und MyTCO bei einem Anbieter laufen? Das hängt an den Kosten aus K-09 und daran, ob die
-  E-Mail-Postfächer mitziehen. Zieht die Website auf den MyTCO-Server, braucht es zusätzlich
+- **K-48:** Der Umzug der Website von Metanet zu Infomaniak ist bewilligt, samt den
+  Postfächern. Offen sind, wer die Website danach betreut, und ob sie auf dem MyTCO-Server oder
+  getrennt bei Infomaniak läuft; davon hängen ihre Kosten ab. Zieht die Website auf den MyTCO-Server, braucht es zusätzlich
   einen Nachtrag zu ADR-003 (eigener Container, getrennt von Datenbank und Netz von MyTCO) und
   eine Bedrohung im Sicherheitskonzept (Lücke im Admin-Bereich der Website auf demselben Server).
 - **K-43:** Welche Online-Dienste nutzt der Verein heute und zu welchen Kosten? Davon hängt

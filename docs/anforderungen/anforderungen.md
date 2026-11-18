@@ -236,7 +236,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-01062027)).
 | N-SICHERHEIT-01 | Weitere Sicherheitsmassnahmen werden mit den zuständigen Personen festgelegt | PDF 2 | Fundament ([Sicherheitskonzept](../sicherheitskonzept.md), #6) | geplant |
 | N-BETRIEB-01 | Verfügbarkeit: MyTCO ist besonders während Anmeldephase, Gruppenspielen und Finalwochenende erreichbar; kein fester Zielwert, ein kurzer Ausfall wird in Kauf genommen (K-15) | PL | Fundament (Betrieb, #10) | geplant |
 | N-BARRIEREFREI-01 | MyTCO ist für Mitglieder jeden Alters bedienbar; Zielniveau WCAG 2.1 AA\* | PL | durchgehend | geplant |
-| N-KOSTEN-01 | Laufende Kosten im niedrigen dreistelligen Bereich pro Jahr | Ziel | Fundament (Kosten, #9) | geplant |
+| N-KOSTEN-01 | Laufende Kosten im niedrigen dreistelligen Bereich pro Jahr; der Vorstand hat bis CHF 500 pro Jahr bewilligt (K-03.1) | Ziel | Fundament (Kosten, #9) | geplant |
 | N-KOSTEN-02 | Die Kosten werden im Detail dokumentiert und analysiert | Ziel | Fundament (Kosten, #9) | geplant |
 | N-EIGENSTAENDIG-01 | MyTCO entsteht vorerst ohne Anbindung an Fairgate und ohne Einbindung in tcolten.ch | Ziel | durchgehend ([ADR-006](../adr/adr-006-eigenstaendig-ohne-fairgate.md)) | geplant |
 | N-ERWEITERBAR-01 | MyTCO ist modular aufgebaut: weitere Anlässe und Funktionen der Clubverwaltung lassen sich einfach ergänzen | PDF 1, 3d | Fundament (Fachmodell, #3) | geplant |

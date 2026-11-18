@@ -16,14 +16,14 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 
 | | Test | Live |
 |---|------|------|
-| Adresse | `test.my.tcolten.ch`, nur mit Passwort (Annahme K-10) | `my.tcolten.ch` (Annahme K-10) |
+| Adresse | `test.my.tcolten.ch`, nur mit Passwort (K-10) | `my.tcolten.ch` (K-10) |
 | Rolle | Demo und Checkliste | Testgruppe (Pilotphase), später alle Mitglieder |
 | Ausgeliefert bei | Merge nach `dev` | Merge des PR `dev` → `main` |
 | Daten | nur erfundene Testdaten; bei jeder Auslieferung neu aufgesetzt | Mitgliederdaten |
-| E-Mail | alle Mails gehen an die Adresse des Projektleiters, der Betreff nennt den ursprünglichen Empfänger (hängt an K-11) | an die Mitglieder |
+| E-Mail | alle Mails gehen an die Adresse des Projektleiters, der Betreff nennt den ursprünglichen Empfänger | an die Mitglieder |
 | Push, Schlüssel | eigene | eigene |
 
-Beide Adressen richtet der Website-Betreuer ein (Annahme K-10: Test und Live unter `tcolten.ch`).
+Beide Adressen unter `tcolten.ch` sind erlaubt (K-10); wer sie einrichtet, hängt an K-10.2.
 Bis dahin gilt eine Übergangsadresse, die sich aus der IP des Servers bildet; die Adressen sind
 Einstellungen, am Code ändert sich dafür nichts. Die Demo soll auf Test laufen, Live bleibt leer bis zur
 Testgruppe. Auf der Test-Umgebung läuft die
@@ -35,7 +35,7 @@ dort nie hin (DS-08).
 Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
 (43 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
-#29; die Konten laufen auf eine Vereinsadresse, K-04.1; die Adresse hängt an K-10), spätestens vor dem Pilot der [Testgruppe](testgruppe.md) (Etappe *Pilot*).
+#29; die Konten laufen auf eine Vereinsadresse, K-04.1; die Adresse ist erlaubt, K-10), spätestens vor dem Pilot der [Testgruppe](testgruppe.md) (Etappe *Pilot*).
 Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
 
 ## Ablauf
@@ -280,12 +280,12 @@ werden sie nicht geprüft.
 | `DATABASE_URL` | Verbindung zur PostgreSQL-Datenbank der Umgebung | ja |
 | `ORIGIN` | Öffentliche Adresse der Umgebung (z. B. `https://my.tcolten.ch`). Daraus leitet der Server die Adresse für Passkeys ab: Ein Wechsel macht alle Passkeys ungültig. Bei einem Adresswechsel (K-10) zusammen mit `MYTCO_ADRESSE` und den Adressen in `proxy.env` ändern | ja (auf dem Server) |
 | `MYTCO_CODE_SCHLUESSEL` | Geheimer Schlüssel für die Codes (HMAC), mindestens 32 Zeichen, je eigener für Test und Live. Ein Wechsel macht alle offenen Codes ungültig. Mit `NODE_ENV=production` (Docker-Image) lehnt die App den Beispielwert aus `.env.example` ab | ja |
-| `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Annahme K-11: Der Anbieter ist offen und wird nur über diese Einstellung gewechselt | ja |
+| `MYTCO_SMTP_URL` | Zugang zum Mail-Versand als SMTP-URL. Der Anbieter wird nur über diese Einstellung gewechselt (hängt an K-11.2) | ja |
 | `MYTCO_VAPID_OEFFENTLICH`, `MYTCO_VAPID_PRIVAT` | VAPID-Schlüsselpaar für Push (SI-22), base64url, nur zusammen; erzeugen mit `npx web-push generate-vapid-keys`. Beide leer: Push ist aus, Mitteilungen gehen nur per E-Mail. Ein Wechsel macht alle Push-Anmeldungen ungültig: danach auf dieser Umgebung `DELETE FROM push_abo;`, die Mitglieder schalten Push neu ein (der Hinweis auf der Startseite erscheint wieder). Mit `NODE_ENV=production` lehnt die App das Beispielpaar aus `.env.example` ab | nein |
 | `MAIL_NUR_AN` | Nur Test: alle Mails werden an diese eine Adresse umgeleitet. Auf Live leer. Ein Wert, der keine Mail-Adresse ist, lässt die App nicht starten. Ohne sie lädt `scripts/testdaten.ts` nichts | nein |
 | `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
 | `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text für «Wende dich an …», steht im Brief, in der Meldung «Code schon benutzt» und auf der Seite Hilfe (ohne Login lesbar, `/api/kontakt`; darum eine Vereins-Adresse, keine private Nummer; Annahme K-21) | ja |
-| `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (Annahme K-10) | nein |
+| `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (K-10) | nein |
 | `ZEITGEBER` | Nur lokal und im E2E: `aus` schaltet den täglichen Löschlauf ab ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)); auf Test und Live nicht durchgereicht (`betrieb/compose.umgebung.yml`), dort läuft er immer | nein |
 | `IC_VEREIN` | Nur `make ic-import`: Vereinsnummer bei Swiss Tennis, Vorgabe `2202` | nein |
 

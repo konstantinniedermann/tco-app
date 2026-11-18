@@ -26,9 +26,9 @@ Store-App ([ADR-001](adr/adr-001-web-app-zuerst.md), K-22).
 |-------|-------|------------------|------|----------------|-------------------|
 | GitHub | Code, Issues, CI, Container-Ablage (`ghcr.io`), Geheimnisse der Auslieferung | Privatkonto des Projektleiters | bleibt dort bis zur Übergabe, dann Transfer an die Nachfolge (Checkliste unten) | Hauptansprechperson als Mitarbeitende mit Schreibrecht, nutzt es nur zum Lesen ([CI/CD und Release](ci-cd-und-release.md#schutz-des-auslieferungswegs)); verwalten kann nur der Projektleiter | Wiederherstellungscodes für den Zwei-Faktor-Login im Tresor (K-49) |
 | Infomaniak | Server (VPS), Sicherungsablage | wird mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39) bestellt, vorerst auf den Projektleiter ([ADR-003](adr/adr-003-hosting-infomaniak-vps.md)) | Vereinsadresse | Hauptansprechperson als Benutzer im Konto | über die Vereinsadresse und die Wiederherstellungscodes im Tresor; Zugriff auf den Server ohne SSH über die Konsole im Infomaniak-Konto (Vermutung, bei #39 prüfen) |
-| Mailversand | Code-Mails und Benachrichtigungen | noch keines; Anbieter hängt an K-11 (Postfach bei Metanet oder Scaleway) | Vereinsadresse | Hauptansprechperson | über die Vereinsadresse |
-| Vereinsadresse `mytco@tcolten.ch` | Anmeldung bei allen Konten, Empfänger der Überwachung | noch nicht eingerichtet; der Vorstand lässt sie anlegen (K-04.3) | Postfach bei Metanet | Hauptansprechperson | über den Website-Betreuer, der die Postfächer bei Metanet verwaltet (Vermutung K-48) |
-| Metanet | Website, DNS-Einträge und Postfächer von `tcolten.ch` | Verein, betreut vom Website-Betreuer | bleibt beim Verein (Umzug offen, K-48) | — | über den Verein |
+| Mailversand | Code-Mails und Benachrichtigungen | noch keines; Anbieter hängt an K-11.2 (Scaleway oder nach dem Website-Umzug ein Postfach bei Infomaniak) | Vereinsadresse | Hauptansprechperson | über die Vereinsadresse |
+| Vereinsadresse `mytco@tcolten.ch` | Anmeldung bei allen Konten, Empfänger der Überwachung | noch nicht eingerichtet; der Vorstand lässt sie nach dem Umzug der Website anlegen (K-04.3, K-11) | Postfach bei Infomaniak nach dem Umzug (K-48) | Hauptansprechperson | über die Person, die nach dem Umzug die Postfächer verwaltet (hängt an K-48) |
+| Metanet | Website, DNS-Einträge und Postfächer von `tcolten.ch` | Verein, betreut vom Website-Betreuer | Umzug zu Infomaniak bewilligt (K-48) | — | über den Verein |
 | hosttech | Registrierung der Domain `tcolten.ch` | Inhaber unbekannt (K-48) | Verein | — | über den Inhaber |
 | Google Drive | Fragen-Tabelle an den Verein | Privatkonto des Projektleiters | bleibt; bei der Übergabe Besitz an die Nachfolge übertragen | — | über das Google-Konto des Projektleiters |
 | Überwachung | Prüfung von aussen und Wächter für die Sicherung | kommt mit [#39](https://github.com/konstantinniedermann/tco-app/issues/39) | Vereinsadresse | Hauptansprechperson | über die Vereinsadresse |
@@ -71,7 +71,7 @@ Technik und Befehle: [CI/CD und Release](ci-cd-und-release.md#auslieferung) (Abs
   liesse auch EU/EWR zu, DS-01).
 - **Vorschlag für die Ablage:** Infomaniak Object Storage, unter CHF 1 pro Jahr (Schätzung,
   Preisstand 2021, [Kosten](kosten.md)). Festgelegt wird sie erst, wenn das Hosting abschliessend geklärt ist
-  (hängt an K-03 und K-48). Restrisiko: Server und Sicherungen hängen am selben Konto.
+  (hängt an K-48). Restrisiko: Server und Sicherungen hängen am selben Konto.
 
 ## Überwachung
 
@@ -144,6 +144,8 @@ Nachfolge (K-05).
 - K-49: Wo werden die Zugangsdaten aufbewahrt?
 - K-04.1: Dem Vorstand mitteilen, dass der Programmcode abweichend von seiner Antwort bis zu
   einer Übergabe auf dem Privatkonto des Projektleiters bleibt.
-- K-04.3: Die Vereinsadresse ist noch nicht eingerichtet.
+- K-04.3: Die Vereinsadresse ist noch nicht eingerichtet; der Vorstand legt sie erst nach dem
+  Umzug der Website an (K-11, K-48). Bis dahin laufen Konten und Überwachung auf den
+  Projektleiter.
 - K-48: Wer ist Inhaber der Domain bei hosttech?
 - K-05: Eine Stellvertretung neben der Hauptansprechperson fehlt.

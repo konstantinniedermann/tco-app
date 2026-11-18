@@ -109,7 +109,7 @@ Kopfzeile lesen, sonst teilen alle Mitglieder eine IP und damit die Bremsen
   werden, die das Mitglied sieht, und die Messung kostet einen der 5 Versuche; akzeptiert.
 - Ein Neustart setzt die Bremsen zurück.
 
-**Kosten:** keine neuen; der Mail-Versand hängt an K-11 ([ADR-003](adr-003-hosting-infomaniak-vps.md)).
+**Kosten:** keine neuen; der Mail-Versand hängt an K-11.2 ([ADR-003](adr-003-hosting-infomaniak-vps.md)).
 
 ### Nachtrag 03.11.2026: Passwort-Wunsch des Vorstands
 

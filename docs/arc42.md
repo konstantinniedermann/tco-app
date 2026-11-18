@@ -49,9 +49,9 @@ flowchart LR
 
 | Nachbar | Was fliesst | Stand |
 |---------|-------------|-------|
-| **Mail-Versand** | Einmal-Codes und Bestätigungen über einen austauschbaren SMTP-Zugang | Anbieter hängt an K-11 (Postfach bei Metanet oder Scaleway, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md)) |
+| **Mail-Versand** | Einmal-Codes und Bestätigungen über einen austauschbaren SMTP-Zugang | Absender `mytco@tcolten.ch` (K-11); Anbieter hängt an K-11.2 (Scaleway oder nach dem Website-Umzug ein Postfach bei Infomaniak, [ADR-003](adr/adr-003-hosting-infomaniak-vps.md)) |
 | **Login-Brief** | Brief-Code und QR-Code zum ersten Login; MyTCO erzeugt die Druckansicht, gedruckt wird ausserhalb | wer druckt, hängt an K-16.1 |
-| **tcolten.ch** | Nur die Adresse: `my.tcolten.ch` und `test.my.tcolten.ch` zeigen auf den Server von MyTCO; die Website selbst bleibt bei Metanet und ist nicht verbunden | Annahme K-10, DNS nur mit Freigabe des Website-Betreuers ([Recherche](recherche/2026-11-04-tcolten-website.md)) |
+| **tcolten.ch** | Nur die Adresse: `my.tcolten.ch` und `test.my.tcolten.ch` zeigen auf den Server von MyTCO; die Website selbst ist nicht verbunden (Umzug zu Infomaniak bewilligt, K-48) | erlaubt (K-10); wer die DNS-Einträge setzt, hängt an K-10.2 ([Recherche](recherche/2026-11-04-tcolten-website.md)) |
 | **Fairgate** | Keine Schnittstelle. Hinein per Datei (A-MITGLIED-07), hinaus von Hand über die Liste *Für Fairgate* (A-KONTO-02) | [ADR-006](adr/adr-006-eigenstaendig-ohne-fairgate.md); Einlesen hängt an K-45 |
 | **Swiss Tennis Advantage** | MyTCO liefert die Lizenznummern zum Einfügen in Advantage (A-ADVANTAGE-01) und übernimmt Gruppen und Tableaus als Excel (A-ADVANTAGE-02); Resultate liefert MyTCO als Liste, eingetragen werden sie in Advantage von Hand (A-ADVANTAGE-04) | ab Etappe *CM-Betrieb* |
 | **Swiss Tennis Interclub-Schnittstelle** | Der Server von MyTCO liest die Interclub-Teams und -Resultate des Vereins (`low-scalability.microservices.swisstennis.ch/interclub`, ohne Login, nicht dokumentiert und nicht offiziell freigegeben). Bis Teil 3 nur über den Befehl `make ic-import`; hinaus gehen nur Vereinsnummer, Team- und Begegnungsnummern, keine Personendaten; herein kommen seit Teil 2 auch die Spieler der Einzelpartien ([Datenschutz](datenschutz.md)) | [ADR-011](adr/adr-011-interclub-schnittstelle-swiss-tennis.md), [#81](https://github.com/konstantinniedermann/tco-app/issues/81) |
@@ -140,9 +140,9 @@ flowchart LR
 | **Server** | Infomaniak VPS mit Linux, gehärtet nach SI-13 | [ADR-003](adr/adr-003-hosting-infomaniak-vps.md), [Sicherheitskonzept](sicherheitskonzept.md) |
 | **Test und Live** | je App und eigene Datenbank, getrennt; Test nur mit erfundenen Daten | [CI/CD und Release](ci-cd-und-release.md#umgebungen) |
 | **Zustand im Arbeitsspeicher** | Die Bremsen, offene Passkey-Anfragen und laufende E-Mail-Wechsel hält die App im Arbeitsspeicher: Sie gelten nur für den einen Prozess und gehen bei Neustart und Auslieferung verloren. Das trägt, solange je Umgebung eine App läuft | [Sicherheitskonzept](sicherheitskonzept.md) (SI-09, SI-18) |
-| **Adressen** | `my.tcolten.ch` (Live), `test.my.tcolten.ch` (Test); bis dahin eine Übergangsadresse aus der IP des Servers | Annahme K-10 |
+| **Adressen** | `my.tcolten.ch` (Live), `test.my.tcolten.ch` (Test); bis dahin eine Übergangsadresse aus der IP des Servers | erlaubt (K-10) |
 | **Auslieferung** | Merge nach `dev` liefert auf Test, Merge des PR nach `main` auf Live | [CI/CD und Release](ci-cd-und-release.md#auslieferung) |
-| **Sicherung** | nächtlich mit Probe; das Ziel hängt an K-03 und K-48 | [Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung) |
+| **Sicherung** | nächtlich mit Probe; das Ziel hängt an K-48 | [Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung) |
 | **Einrichtung von Hand** | Türsteher, Geheimnisse, Sicherungsziel, Timer | [`betrieb/README.md`](../betrieb/README.md) |
 | **Store-App** | gibt es nicht; käme später als Hülle derselben Web-App ([ADR-001](adr/adr-001-web-app-zuerst.md), hängt an K-22) | [CI/CD und Release](ci-cd-und-release.md#ausblick-store-app) |
 
