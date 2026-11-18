@@ -116,6 +116,25 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-18 — Kein Prüflauf merkt, wenn das Image die Testdaten nicht laden kann
+
+**Thema:** Tests
+
+**Fundort:** `Dockerfile` (Laufzeit-Image), `betrieb/nachweis/rauchtest.sh`, `make check`
+
+**Beobachtung:** `scripts/testdaten.ts` scheiterte im Image mit `ERR_MODULE_NOT_FOUND`
+(`src/lib/anlass/zeit.ts`), weil das Image nur `src/lib/server` kopierte, der Server-Code aber
+geteilte Module unter `src/lib` importiert. Aufgefallen ist es nur in `make betrieb-nachweis`,
+das nicht zu `make check` und nicht zur CI gehört; der Rauchtest der CI führt nur
+`migrate.ts` aus. Die erste Auslieferung auf Test wäre daran gescheitert. Behoben in #39
+(Image kopiert ganz `src/lib`).
+
+**Ursprung:** #39, lokaler Nachweis vor der Inbetriebnahme
+
+**Einschätzung:** Der Rauchtest könnte `testdaten.ts` gegen seine Wegwerf-Datenbank laufen
+lassen (mit `MAIL_NUR_AN` und einer `.invalid`-SMTP-Adresse), dann fiele ein fehlendes Modul in
+der CI auf. Klein, aber eigener Prüflauf.
+
 ### 2026-11-16 — Junioren-CM verlangt bei Swiss Tennis ein eigenes Turnier
 
 **Thema:** Clubmeisterschaft

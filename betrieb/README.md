@@ -21,10 +21,53 @@ sicherung.env                       von Hand (Rechte 600), Vorlage sicherung.env
 lesbar an; einzig die Caddy-Dateien unter `proxy/caddy/` sind für alle lesbar (der Proxy liest
 sie, Geheimnisse stehen darin keine).
 
+## Server einrichten
+
+Ein frischer Server (Ubuntu LTS) wird mit `server/einrichten.sh` eingerichtet, als root aus
+einem Checkout des Repos: `sudo betrieb/server/einrichten.sh <admin-benutzer>`. Das Skript ist
+mehrfach ausführbar und endet mit `server/pruefen.sh`, das je Massnahme `ok <name>` oder
+`fehler <name>` meldet; `pruefen.sh` lässt sich jederzeit allein laufen und ändert nichts.
+
+- **Anmeldung (SI-13):** nur mit Schlüssel, kein root über SSH (`/etc/ssh/sshd_config.d/00-mytco.conf`,
+  vor den Dateien der Distribution gelesen; geprüft wird der wirksame Wert mit `sshd -T`). Der
+  Projektleiter meldet sich als `<admin-benutzer>` an und wird mit `sudo` root; gibt es den
+  Benutzer nicht, legt das Skript ihn mit den Schlüsseln von root an. Ohne Schlüssel bricht es
+  ab, bevor SSH umgestellt wird.
+- **Firewall:** `ufw` lässt eingehend nur 22, 80 und 443 (tcp, 443 auch udp) zu, ohne Protokoll.
+  Docker öffnet veröffentlichte Ports an `ufw` vorbei; veröffentlicht wird darum nur Caddy (80,
+  443). Ein Port-Scan von aussen belegt es.
+- **Updates:** `unattended-upgrades` spielt die Sicherheits-Updates von Ubuntu täglich ein.
+  Docker selbst kommt aus dem Docker-Repository und wird von Hand aktualisiert.
+- **Betriebsbenutzer `mytco`:** in der Gruppe `docker`, Besitzer von `/opt/mytco` (0750);
+  `/opt/mytco/bin` mit Türsteher und `lib.sh` gehört `root:root` (0755). Die Docker-Gruppe ist
+  so viel wie root (Restrisiko im Sicherheitskonzept). `~mytco/.ssh/authorized_keys` enthält nur
+  die zwei Schlüssel der CI (siehe unten).
+
+### Protokolle und ihre Fristen (DS-06)
+
+| Protokoll | Inhalt | Frist |
+|-----------|--------|-------|
+| Systemjournal (auch sshd) | Anmeldungen mit IP-Adresse | 24 Stunden (`journald.conf.d/mytco.conf`) |
+| `/var/log/wtmp`, `/var/log/btmp` | Anmeldungen mit IP-Adresse | täglich geleert, keine alte Datei |
+| rsyslog (`/var/log/auth.log` usw.) | dasselbe wie das Journal | abgeschaltet |
+| Firewall | Adressen abgewiesener Pakete | kein Protokoll |
+| `<umgebung>/protokoll.log` | Ausgaben von Docker, psql und App | 30 Tage (`logrotate.d/mytco`) |
+| Logs der Container | Ausgaben der Container, ohne IP-Adressen | 30 Tage (`logrotate.d/mytco`), dazu nach Grösse (Compose) |
+
+### Platz für eine Website
+
+Caddy hängt an einem eigenen Netz je Umgebung (`mytco-proxy-test`, `mytco-proxy-live`); die App
+hängt nur an ihrem Proxy-Netz und an ihrem internen Netz, die Datenbank nur am internen. Caddy
+liest jede Datei unter `proxy/caddy/umgebungen/`, und `ausliefern` überschreibt nur die Datei
+seiner Umgebung. Eine Website (K-48) käme darum dazu mit eigenem Compose-Projekt
+(`mytco-website`), eigenem Netz `mytco-proxy-website` in `compose.proxy.yml`, eigener Datei
+`umgebungen/website.caddy` und Grenzen für Speicher und CPU. Sie erreicht so weder eine Datenbank
+noch eine App von MyTCO. Gebaut ist davon nichts.
+
 ## Von Hand eingerichtet, nie von der CI
 
 - `bin/ausliefern-ssh` und `bin/lib.sh` aus diesem Ordner, Ordner und Dateien `root:root` mit
-  Rechten 0755: `mytco` kann sie so nicht versehentlich ändern. Ein schädliches Image kann das
+  Rechten 0755 (spielt `server/einrichten.sh` ein): `mytco` kann sie so nicht versehentlich ändern. Ein schädliches Image kann das
   über den Docker-Zugang von `mytco` trotzdem umgehen (Restrisiko im Sicherheitskonzept).
   Ändert sich eine der beiden Dateien im Repo, spielt der Betrieb sie als root neu ein; die CI
   tut das nie. `lib.sh` enthält fest die Container-Ablage (`MYTCO_REPO_STANDARD`), nach einem

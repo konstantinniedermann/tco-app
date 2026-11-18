@@ -33,7 +33,7 @@ Die Mitgliederzahl ändert diese Kosten kaum, weil Server und Sicherung pauschal
 | Code-Ablage und CI: GitHub im Gratisplan | — | 0 auf dem Privatkonto des Projektleiters; das Repo ist öffentlich, Actions-Minuten sind dafür gratis und ohne Kontingent ([CI/CD und Release](ci-cd-und-release.md#actions-minuten)) | belegt |
 | **Total laufend** | | **ca. 95–175** | Schätzung |
 
-Vorschlag für die Sicherungsablage ist Object Storage ([Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung)); festgelegt wird sie, wenn das Hosting geklärt ist, bis dahin gilt die Spanne. Scaleway hat einen
+Die Sicherungsablage ist Object Storage, festgelegt am 18.11.2026 ([Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung)); die effektiven Beträge folgen mit der Bestellung (#39), bis dahin gilt die Spanne. Scaleway hat einen
 Vertrag zur Auftragsbearbeitung und verarbeitet E-Mails nur in Frankreich (B·6), damit sind
 DS-01 und DS-02 erfüllt. Den Inhalt einer Mail löscht Scaleway nach dem Versand, die
 Versandprotokolle mit Empfängeradresse bleiben aber, solange die Absender-Domain aktiv ist;
