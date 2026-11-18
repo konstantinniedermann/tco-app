@@ -11,6 +11,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Antworten des Vorstands übertragen: Kostenrahmen, Adresse `my.tcolten.ch`, Absender
+  `mytco@tcolten.ch`, Umzug der Website. An der App ändert sich nichts.
+
 ## 0.23.0 — Refactoring abgeschlossen, erstes Release mit Nummer nur beim Release
 
 - Die Datenschutzerklärung zeigt in der App keine Sternchen mehr: «Klassierung fehlt»,

@@ -22,7 +22,7 @@ const html = baueBriefHtml(
 		gueltigBis: new Date(Date.now() + BRIEF_CODE_GUELTIG_MS),
 		// Annahme K-21: Ansprechperson aus der Umgebung, sonst erfunden wie in .env.example.
 		kontakt: process.env.MYTCO_KONTAKT || 'das Sekretariat (erfunden), sekretariat@example.org',
-		// Annahme K-10: App-Adresse nur, wenn ausdrücklich gesetzt, sonst die Live-Adresse.
+		// App-Adresse nur, wenn ausdrücklich gesetzt, sonst die Live-Adresse (K-10).
 		adresse: process.env.MYTCO_ADRESSE || STANDARD_ADRESSE
 	},
 	`${readFileSync('src/lib/design/tokens.css', 'utf-8')}\n${readFileSync('src/lib/design/brief.css', 'utf-8')}`

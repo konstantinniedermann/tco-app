@@ -1,12 +1,12 @@
 export type Einstellungen = {
 	/** Geheimer Schlüssel für die Code-Verarbeitung, mindestens 32 Zeichen. */
 	codeSchluessel: string;
-	/** Annahme K-11: Versand über einen austauschbaren SMTP-Zugang (URL), Anbieter offen */
+	/** Versand über einen austauschbaren SMTP-Zugang (URL); Anbieter hängt an K-11.2 */
 	smtpUrl: string;
 	mailAbsender: string;
 	/** Annahme K-21: Ansprechperson bei Login-Problemen ist eine Einstellung */
 	kontakt: string;
-	/** Annahme K-10: App-Adresse my.tcolten.ch */
+	/** App-Adresse my.tcolten.ch (K-10) */
 	adresse: string;
 	/** Nur Test: alle Mails gehen an diese eine Adresse. Auf Live leer (undefined). */
 	mailNurAn: string | undefined;
@@ -14,7 +14,7 @@ export type Einstellungen = {
 	vapid: { oeffentlich: string; privat: string } | undefined;
 };
 
-/** Annahme K-10: App-Adresse my.tcolten.ch, wenn MYTCO_ADRESSE fehlt */
+/** App-Adresse my.tcolten.ch (K-10), wenn MYTCO_ADRESSE fehlt */
 export const STANDARD_ADRESSE = 'https://my.tcolten.ch';
 
 /** Schlüssel aus `.env.example`; öffentlich im Repo, darum in Produktion verboten. */
