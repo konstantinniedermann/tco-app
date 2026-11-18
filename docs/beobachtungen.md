@@ -631,6 +631,10 @@ Jobs grün. Damit wackeln zwei Tests der Reiter-Bewegung; eine Regression durch 
 nicht belegt, aber auch nicht ausgeschlossen. Kommt es wieder: Trace holen, bevor die Zeitgrenze
 steigt.
 
+**Nachtrag 2026-11-18:** Wieder einmal rot im vollen `make check` (#39, Branch zu E-65), diesmal
+`aria-current` am Reiter «Start» nach 5 s nicht gesetzt (iPhone); einzeln 15× grün. Trace nicht
+geholt (lokal, voller Lauf).
+
 ### 2026-11-15 — E2E «Spielersuche springt nicht» einmal rot auf Android
 
 **Thema:** Tests
