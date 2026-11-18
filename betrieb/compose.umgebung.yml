@@ -57,6 +57,29 @@ services:
       - intern
     logging: *logging
 
+  # Mail-Fänger, nur Test: nimmt jede Mail an und behält sie (nichts geht hinaus). Im internen
+  # Netz heisst er mail.invalid; diese Adresse lässt die App auch in Produktion ohne TLS zu
+  # (SI-17, nie ein echter Empfänger). Das Postfach liegt hinter dem Test-Passwort unter
+  # /_mail/ (Caddy). Das Profil hält ihn aus jedem Start ohne Namen heraus; nur
+  # `ausliefern test` startet ihn ausdrücklich.
+  mailpit:
+    image: axllent/mailpit:v1.33@sha256:aef2aacc11f075ec0fb6874275ee4a421e688e11a96ebb296134d1735c7761ce
+    profiles: [mailfaenger]
+    restart: unless-stopped
+    environment:
+      MP_WEBROOT: /_mail/
+      MP_MAX_MESSAGES: '200'
+      # Fragt sonst bei GitHub nach neuen Fassungen.
+      MP_DISABLE_VERSION_CHECK: 'true'
+    networks:
+      intern:
+        aliases:
+          - mail.invalid
+      proxy:
+        aliases:
+          - mailpit-${MYTCO_UMGEBUNG:?MYTCO_UMGEBUNG fehlt}
+    logging: *logging
+
 volumes:
   daten:
 
@@ -64,7 +87,7 @@ networks:
   # Kein Weg nach aussen: die Datenbank bleibt in diesem Netz.
   intern:
     internal: true
-  # Vom Proxy-Stapel angelegt; nur die App hängt daran.
+  # Vom Proxy-Stapel angelegt; daran hängen die App und auf Test der Mail-Fänger (für sein Postfach).
   proxy:
     external: true
     name: mytco-proxy-${MYTCO_UMGEBUNG:?MYTCO_UMGEBUNG fehlt}

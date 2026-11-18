@@ -139,8 +139,8 @@ Jede Aufgabe endet mit einem Nachweis (Befehl und Ausgabe, geschwärzt) als Komm
 ### Task 6: Bestellen und Konten ⏸
 
 - [ ] Projektleiter (Anleitung von Claude): Infomaniak-Organisation «TC Olten – MyTCO» anlegen, 2FA aktiv; VPS Lite 2 vCPU / 4 GB, aktuelles Ubuntu LTS aus der Auswahl, eigener SSH-Schlüssel (ed25519, neu, nur für diesen Server); Object Storage in derselben Organisation, ein Bucket `mytco-sicherung`, S3-Zugang nur dafür. Bei der Bestellung festhalten: Preis, Laufzeit, ob der DPA Object Storage nennt, ob der Manager eine Übertragung des VPS anbietet.
-- [ ] Projektleiter: Scaleway-Organisation, 2FA, Transactional Email, Domain = Subdomain seiner Domain; SPF/DKIM bei Infomaniak für die Subdomain eintragen, Hauptdomain unberührt; Prüfung bei Scaleway «verified». SMTP-Zugang (IAM-Schlüssel nur für TEM). Ob Scaleway eine Organisation übertragen kann, nachlesen.
-- [ ] Nachweis: Rechnungsbeträge (für `kosten.md`), Status der Domain bei Scaleway.
+- [ ] ~~Scaleway~~ entfällt (Entscheid 18.11.: Mail-Fänger auf Test, Mailweg für Live bei K-11.2).
+- [ ] Nachweis: Rechnungsbeträge (für `kosten.md`).
 
 ### Task 7: Härten nach SI-13
 
@@ -152,7 +152,7 @@ Jede Aufgabe endet mit einem Nachweis (Befehl und Ausgabe, geschwärzt) als Komm
 
 - [ ] Als root: `bin/ausliefern-ssh` und `bin/lib.sh` nach `/opt/mytco/bin/` (root:root 0755).
 - [ ] Zwei CI-Schlüssel erzeugen (ed25519, ohne Passphrase, nur lokal in einem Wegwerf-Ordner), in `~mytco/.ssh/authorized_keys` mit `command="/opt/mytco/bin/ausliefern-ssh test",restrict` bzw. `live`. Belegen: Test-Schlüssel mit beliebigem Befehl startet nur den Türsteher; Test-Schlüssel mit Ziel Live → `fehler`.
-- [ ] `test/geheim.env` (600): `ORIGIN` und `MYTCO_ADRESSE` = Übergangsadresse Test, SMTP-URL Scaleway mit `requireTLS=true`, Absender auf der Subdomain, `MAIL_NUR_AN` = Adresse des Projektleiters, neue Zufallswerte für Code-Schlüssel, DB-Passwort, VAPID-Paar. `proxy/proxy.env` (600): beide Übergangsadressen (sslip.io), Test-Benutzer und Hash. `sicherung.env` (600): `RESTIC_REPOSITORY=s3:<endpunkt>/mytco-sicherung`, neues `RESTIC_PASSWORD` (sofort in den Passwortmanager des Projektleiters), S3-Zugang.
+- [ ] `test/geheim.env` (600): `ORIGIN` und `MYTCO_ADRESSE` = Übergangsadresse Test, `MYTCO_SMTP_URL=smtp://mail.invalid:1025` (Mail-Fänger), Absender und `MAIL_NUR_AN` erfunden (`example.org`), neue Zufallswerte für Code-Schlüssel, DB-Passwort, VAPID-Paar. `proxy/proxy.env` (600): beide Übergangsadressen (sslip.io), Test-Benutzer und Hash. `sicherung.env` (600): `RESTIC_REPOSITORY=s3:<endpunkt>/mytco-sicherung`, neues `RESTIC_PASSWORD` (sofort in den Passwortmanager des Projektleiters), S3-Zugang.
 - [ ] restic: `init` wie in `betrieb/README.md`; Belege mit Test-Daten nach der ersten Auslieferung in Aufgabe 9 (`sichern test`, `probe test` → `ok`).
 - [ ] Mailweg: aus dem Image ein Testmail an eine erfundene Adresse auslösen (z. B. `scripts/testdaten.ts` im Rahmen der ersten Auslieferung); es kommt beim Projektleiter an, Betreff `[Test für …]`.
 - [ ] DB-Server-Log: auf Test absichtlich scheiterndes Einspielen (`wiederherstellen test` mit manipuliertem Lauf in einer Wegwerf-Kopie), `docker logs` der DB auf Werte ansehen; bei Werten `log_error_verbosity=terse` in `compose.umgebung.yml` (eigener Commit mit Test im Rauchtest) oder bewusst entscheiden ⏸.
@@ -165,11 +165,11 @@ Jede Aufgabe endet mit einem Nachweis (Befehl und Ausgabe, geschwärzt) als Komm
 - [ ] Projektleiter bestätigt das Restrisiko «Schreibrecht auf GitHub reicht bis root» (Sicherheitskonzept, «Neu zu bestätigen»); im Sicherheitskonzept als bestätigt nachführen.
 - [ ] ⏸ Freigabe: Geheimnisse in die GitHub-Umgebung `test` (Namen nach `docs/ci-cd-und-release.md#geheimnisse`), `AUSLIEFERUNG_TEST=an`.
 - [ ] Nächster Merge nach `dev` liefert aus; Belege: CI-Lauf `ok`; Demo nur mit Passwort (ohne → 401); Login mit Code per Mail für das erfundene Testkonto; Testdaten vorhanden; `zurueck test` einmal → altes Image läuft; danach wieder vorwärts.
-- [ ] B-17: «Mitteilung senden» an alle Testmitglieder mit echtem SMTP, Dauer bis zur Antwort messen; über ca. 30 s → `beobachtungen.md`.
+- [ ] B-17 wandert zum Mailweg für Live (auf dem Mail-Fänger ohne Aussage).
 
 ### Task 10: Messen, Kosten, Doku
 
 - [ ] Messen auf dem Server: `free -m`, `df -h /`, `docker stats --no-stream` in Ruhe; dasselbe während einer Auslieferung; Lastspitze mit `xargs -P 20` und `curl` (200 Abrufe der Startseite mit Test-Passwort), dabei `docker stats`. Werte mit Datum in `docs/betrieb-und-uebergabe.md`, neuer Abschnitt «Auslastung» (Live: «folgt mit Live»), und eine Einschätzung für K-48 (Website auf demselben Server: Reserve an RAM und Platte).
-- [ ] `docs/kosten.md`: Server und Object Storage mit effektiven Beträgen (B, Rechnung), Scaleway; Beobachtung vom 12.11.2026 abarbeiten: Posten der Vorstandsfassung (nächste VPS-Stufe als Worst Case, Überwachung, Passwort-Tresor, Website-Umzug) übernehmen oder bewusst weglassen, Totals neu; `ci-cd-und-release.md#actions-minuten` gegen das Guthaben-Modell von GitHub prüfen; Eintrag nach `docs/beobachtungen-archiv.md` gemäss Kopf von `beobachtungen.md`.
+- [ ] `docs/kosten.md`: Server und Object Storage mit effektiven Beträgen (B, Rechnung), Mailversand weiter als Schätzung (K-11.2); Beobachtung vom 12.11.2026 abarbeiten: Posten der Vorstandsfassung (nächste VPS-Stufe als Worst Case, Überwachung, Passwort-Tresor, Website-Umzug) übernehmen oder bewusst weglassen, Totals neu; `ci-cd-und-release.md#actions-minuten` gegen das Guthaben-Modell von GitHub prüfen; Eintrag nach `docs/beobachtungen-archiv.md` gemäss Kopf von `beobachtungen.md`.
 - [ ] `docs/ci-cd-und-release.md` und `docs/beobachtungen.md` nachführen; DoD-Haken in #39 setzen, Offenes für Live im Issue kommentieren.
 - [ ] `make check`, `merge-reviewer`, Merge nach `dev` nach `tco-branching`, aufräumen.

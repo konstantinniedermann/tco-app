@@ -415,6 +415,8 @@ einrichten() {
 	{
 		echo "POSTGRES_PASSWORD=nachweis-erfunden-test"
 		login_einstellungen
+		# Test schickt an den Mail-Fänger (Mailpit, Name mail.invalid im internen Netz).
+		echo "MYTCO_SMTP_URL=smtp://mail.invalid:1025"
 		echo "ORIGIN=https://test.mytco.localhost:$HTTPS_PORT"
 		echo "MAIL_NUR_AN=nachweis@example.org"
 	} >"$BASIS/test/geheim.env"
@@ -473,8 +475,8 @@ p1_testdaten() {
 		echo "Zeile «3 erfundene Mitglieder angelegt» fehlt in test/protokoll.log"
 		return 1
 	}
-	grep -qxF "testdaten: Mail mit Brief-Code nicht versandt" "$log" || {
-		echo "Zeile «Mail mit Brief-Code nicht versandt» fehlt in test/protokoll.log"
+	grep -qxF "testdaten: Mail mit Brief-Code verschickt" "$log" || {
+		echo "Zeile «Mail mit Brief-Code verschickt» fehlt in test/protokoll.log"
 		return 1
 	}
 	anzahl=$(psql_test "select count(*) from mitglied")
@@ -560,6 +562,30 @@ p2_test_ohne_passwort() {
 	erwarte_kopf_einmal Strict-Transport-Security
 	erwarte_kopf_einmal X-Content-Type-Options
 	erwarte_kopf_einmal Referrer-Policy
+}
+
+# Mail-Fänger auf Test: hinter dem Test-Passwort, hält die umgeleitete Mail der Testdaten;
+# Live hat keinen.
+p2_mailfaenger() {
+	local status
+	status=$(abfrage test.mytco.localhost /_mail/api/v1/messages)
+	[ "$status" = 401 ] || {
+		echo "ohne passwort: erwartet 401, erhalten $status"
+		return 1
+	}
+	warte_status test.mytco.localhost /_mail/api/v1/messages 200 -u "$BENUTZER:$PASSWORT"
+	grep -q '"Address":"nachweis@example.org"' "$TEMP/inhalt" || {
+		echo "keine Mail an nachweis@example.org im Mail-Fänger"
+		return 1
+	}
+	grep -q '\[Test für ' "$TEMP/inhalt" || {
+		echo "Betreff ohne [Test für …]"
+		return 1
+	}
+	[ -z "$(docker ps -q --filter name=mytco-live-mailpit)" ] || {
+		echo "live hat einen mail-fänger"
+		return 1
+	}
 }
 
 p2_app_datei() {
@@ -1260,6 +1286,7 @@ pruefung "1 live-sperre: MAIL_NUR_AN gesetzt → ausliefern und zurueck verweige
 pruefung "2 live /api/status über https → ok" live_status_ok
 pruefung "2 test ohne passwort → 401" p2_test_ohne_passwort
 pruefung "2 test mit passwort → ok" test_status_ok
+pruefung "2 mail-fänger nur auf test, hinter passwort, mit mail der testdaten" p2_mailfaenger
 pruefung "2 /_app-datei: HSTS, frame-ancestors, köpfe je einmal" p2_app_datei
 pruefung "2 seite /: CSP der app unverändert, köpfe je einmal" p2_seite
 

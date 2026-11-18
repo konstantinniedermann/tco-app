@@ -20,7 +20,7 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 | Rolle | Demo und Checkliste | Testgruppe (Pilotphase), später alle Mitglieder |
 | Ausgeliefert bei | Merge nach `dev` | Merge des PR `dev` → `main` |
 | Daten | nur erfundene Testdaten; bei jeder Auslieferung neu aufgesetzt | Mitgliederdaten |
-| E-Mail | alle Mails gehen an die Adresse des Projektleiters, der Betreff nennt den ursprünglichen Empfänger | an die Mitglieder |
+| E-Mail | alle Mails landen im Mail-Fänger auf dem Server (Postfach unter `/_mail/`, hinter dem Test-Passwort) und verlassen ihn nie; adressiert sind sie an die Umleitungsadresse (`MAIL_NUR_AN`), der Betreff nennt den ursprünglichen Empfänger. Wer das Test-Passwort hat, liest dort die Login-Codes aller erfundenen Konten | an die Mitglieder |
 | Push, Schlüssel | eigene | eigene |
 
 Beide Adressen unter `tcolten.ch` sind erlaubt (K-10); wer sie einrichtet, hängt an K-10.2.
@@ -112,7 +112,7 @@ Doku-Merge ändert ihn nicht.
    **Testdaten (nur Test, nur wenn das Image das Skript enthält, Schritt «testdaten laden»):** Nach der Migration legt
    `scripts/testdaten.ts` die erfundenen Mitglieder samt Konto an und schickt für Erika Beispiel
    einen Brief-Code per Mail («Brief-Code für die Test-Umgebung», mit Code, Gültigkeit und
-   Adresse der App); durch die Umleitung («[Test für <Adresse>] » vor dem Betreff) landet sie beim Projektleiter. Das Skript bricht ab,
+   Adresse der App); durch die Umleitung («[Test für <Adresse>] » vor dem Betreff) landet sie beim Projektleiter, vorerst im Mail-Fänger von Test (Dienst `mailpit`, startet mit der Datenbank). Das Skript bricht ab,
    ohne etwas zu schreiben, wenn `MAIL_NUR_AN` leer ist (also nie auf Live, auch nicht von Hand)
    oder schon Mitglieder da sind; dann scheitert die Auslieferung. Scheitert nur die Mail,
    bleiben die Testdaten, und das Protokoll hält «Mail mit Brief-Code nicht versandt» fest. Code

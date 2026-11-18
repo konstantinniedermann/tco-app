@@ -11,6 +11,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Test hat einen Mail-Fänger: Alle Mails von Test landen in einem Postfach auf dem Server hinter
+  dem Test-Passwort und gehen nicht hinaus (#39). An der App ändert sich nichts.
 - Vorbereitung des Servers (#39): Der Mailversand gibt nach festen Zeitlimits auf, statt
   minutenlang zu warten, und eine SMTP-Adresse, die die Zertifikatsprüfung abschaltet, wird
   abgewiesen. Test fällt nach einer gescheiterten Auslieferung auf die vorige Fassung zurück;

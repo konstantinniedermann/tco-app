@@ -91,8 +91,10 @@ Entscheide des Projektleiters:
   (K-03.3). Umzug ohne Neuaufbau → [Betrieb und Übergabe](../betrieb-und-uebergabe.md#konten).
 - **Sicherungsziel festgelegt:** Infomaniak Object Storage (S3, Daten in der Schweiz, nach
   Verbrauch).
-- **Mail auf Test bis `tcolten.ch` bereit ist:** Scaleway mit einem Absender auf einer Subdomain
-  einer Domain des Projektleiters; danach `mytco@tcolten.ch`.
+- **Mail auf Test:** ein Mail-Fänger (Mailpit) auf dem Server statt eines Versanddienstes; die
+  Mails verlassen den Server nie, das Postfach liegt hinter dem Test-Passwort. Welchen Weg Live
+  nimmt (Scaleway oder ein Postfach bei Infomaniak nach dem Website-Umzug), bleibt bei K-11.2;
+  ein Konto entsteht erst dann.
 - **Website:** Caddy und die Docker-Netze lassen Platz für einen eigenen, abgeschotteten
   Container ([`betrieb/README.md`](../../betrieb/README.md), «Platz für eine Website»); ob sie auf
   diesen Server kommt, entscheidet K-48 mit der gemessenen Auslastung.

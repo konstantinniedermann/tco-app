@@ -4,8 +4,14 @@
 	basic_auth {
 		{$MYTCO_TEST_BENUTZER} {$MYTCO_TEST_PASSWORT_HASH}
 	}
-	reverse_proxy app-test:3000 {
-		import app_ohne_sicherheit
+	# Postfach des Mail-Fängers (Mailpit), wie die App nur mit dem Test-Passwort.
+	handle /_mail* {
+		reverse_proxy mailpit-test:8025
+	}
+	handle {
+		reverse_proxy app-test:3000 {
+			import app_ohne_sicherheit
+		}
 	}
 	# Antworten von Caddy selbst (401, 502) tragen die CSP-Vorgabe ebenfalls: `?` greift dort nicht.
 	# Die CSP der App bleibt unangetastet; Caddy setzt `frame-ancestors 'none'` nur, wo keine kommt.
