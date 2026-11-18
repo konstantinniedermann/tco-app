@@ -139,7 +139,8 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
 ### Neu zu bestätigen (Stand 2026-11-02, Schutz von `main` nachgeführt 2026-11-06)
 
 Beim Gesamt-Review von #32 richtiggestellt; die frühere Annahme deckt die neue Reichweite nicht.
-Bis der Projektleiter bestätigt, gelten diese beiden Punkte als nicht angenommen.
+Der erste Punkt ist seit 18.11.2026 bestätigt; der zweite gilt bis zur Bestätigung als nicht
+angenommen.
 
 - **Schreibrecht auf GitHub reicht bis root auf dem Server.** Direkt auf `main` pushen kann
   seit 06.11.2026 niemand mehr (Repo öffentlich, Regel «main schützen» auf GitHub). Jedes
@@ -156,10 +157,12 @@ Bis der Projektleiter bestätigt, gelten diese beiden Punkte als nicht angenomme
   trotzdem Live. Die Annahme vom 01.11.2026 ging von einer kleineren Reichweite aus (Türsteher
   unveränderbar) und galt unter zwei Bedingungen: Zwei-Faktor-Login auf beiden Konten (SI-15),
   und die Hauptansprechperson im Vorstand nutzt ihren Zugang nur zum Lesen (Absprache).
-  **Neu zu bestätigen durch den Projektleiter (Stand 2026-11-02).** Neu bewerten auch: Die
-  Konten des Betriebs laufen künftig auf eine Vereinsadresse, den zweiten Zugang hat die
-  Hauptansprechperson (K-04.1, K-04.2); das Repo bleibt bis zu einer Übergabe auf dem
-  Privatkonto ([Betrieb und Übergabe](betrieb-und-uebergabe.md#konten)).
+  **Vom Projektleiter bestätigt am 18.11.2026** (vor `AUSLIEFERUNG_TEST=an`, #39), unter diesen
+  Bedingungen: Zwei-Faktor-Login auf beiden Konten (SI-15); die Hauptansprechperson nutzt ihren
+  Zugang nur zum Lesen; auf GitHub liegt bis Live nur der Test-Schlüssel, der Live-Schlüssel
+  kommt erst mit #61 in eine Deployment-Umgebung, aus der nur `main` ausliefern darf. Neu zu
+  bewerten, wenn die Konten des Betriebs auf die Vereinsadresse umziehen (K-04.1, K-04.2) oder
+  das Repo übergeben wird ([Betrieb und Übergabe](betrieb-und-uebergabe.md#konten)).
 - **Ein Schadpaket im Bau** landet im Image und läuft live, auch ohne Schlüssel, und über das
   `ausliefern` des Images mit derselben Reichweite auf dem Server; dagegen hilft nur SI-14.
   Mit der Richtigstellung oben ebenfalls neu zu bestätigen.
