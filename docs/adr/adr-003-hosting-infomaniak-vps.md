@@ -74,7 +74,7 @@ Vorschlag (Infomaniak Object Storage); festgelegt wird es erst, wenn das Hosting
 geklärt ist.
 
 *Nachtrag 18.11.2026:* Mit Metanet hat der Verein keinen Vertrag zur Auftragsbearbeitung
-(K-09.7), ein Versand über ein Postfach dort fällt weg. Der Vorstand hat den Umzug der Website
+(K-09.7); ein Versand über ein Postfach dort fällt darum weg (Entscheid Projektleiter). Der Vorstand hat den Umzug der Website
 samt Postfächern zu Infomaniak bewilligt (K-48). Der Absender ist `mytco@tcolten.ch` (K-11).
 Ein Postfach @tcolten.ch ist darum erst nach dem Umzug als Weg möglich, dann bei Infomaniak;
 bis dahin versendet MyTCO über Scaleway. Ob die Website auf diesem Server oder getrennt läuft,
@@ -97,7 +97,7 @@ genommen, ein VPS ohne SLA reicht.
 |--------|----------|--------|
 | VPS Lite 2 vCPU / 4 GB, 12 Monate | ca. 93 (CHF 7.20/Monat exkl., B·1) | belegt |
 | Sicherungsspeicher ausserhalb des Servers | ca. 20–60 | S |
-| E-Mail-Versand | 0–80 (Scaleway fast gratis bis Metanet-Postfach CHF 5.90/Monat, B·10) | S, hängt an K-11.2 |
+| E-Mail-Versand | 0–80 (Scaleway fast gratis bis Postfach @tcolten.ch nach dem Umzug, Vergleichspreis Metanet CHF 5.90/Monat, B·10) | S, hängt an K-11.2 |
 | Domain | 0 (Subdomain von tcolten.ch) | bestätigt (K-10) |
 | **Total** | **ca. 110–230** | S |
 

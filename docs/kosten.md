@@ -50,9 +50,11 @@ Bei Scaleway fallen ohne Gratiskontingent bei 500 Mitgliedern ca. CHF 4 pro Jahr
 Reicht ein Kontingent nicht mehr, entstehen Kosten von wenigen Franken pro Jahr (S).
 
 Vorschlag K-11.2: MyTCO verschickt seine E-Mails über Scaleway, mit Absender
-`mytco@tcolten.ch` (K-11). Über ein Postfach bei Metanet geht es nicht, es gibt dort keinen
-Vertrag zur Auftragsbearbeitung (K-09.7). ADR-003 gibt dem Postfach Vorrang, wenn K-11 es erlaubt; dessen Kosten stehen
-unter [Nur falls](#nur-falls). Damit stiege die Obergrenze auf ca. CHF 250 pro Jahr.
+`mytco@tcolten.ch` (K-11). Über ein Postfach bei Metanet versendet MyTCO nicht, weil es dort
+keinen Vertrag zur Auftragsbearbeitung gibt (K-09.7, Entscheid Projektleiter). ADR-003 gibt
+einem Postfach @tcolten.ch Vorrang; möglich ist das erst nach dem Umzug der Website, dann bei
+Infomaniak (K-48). Die Kosten stehen unter [Nur falls](#nur-falls); mit dem Vergleichspreis
+von Metanet stiege die Obergrenze auf ca. CHF 250 pro Jahr.
 
 ## Einmalige Kosten
 
@@ -78,7 +80,7 @@ CHF 1.10–1.40 Porto plus Druck.
 
 | Posten | Falls | CHF | Status |
 |--------|-------|----:|--------|
-| Postfach @tcolten.ch, Business Mail bei Metanet | K-11 erlaubt den Versand darüber, und das heutige Paket enthält es nicht schon (K-09) | ca. 71–77 pro Jahr (CHF 5.90/Monat, ob inkl. MwSt: offen, B·7) | belegt |
+| Postfach @tcolten.ch für den Versand | Versand über ein Postfach nach dem Umzug der Website zu Infomaniak (hängt an K-11.2, K-48) | Preis bei Infomaniak offen; zum Vergleich Business Mail bei Metanet ca. 71–77 pro Jahr (CHF 5.90/Monat, ob inkl. MwSt: offen, B·7) | offen |
 | Apple Developer Program | Store-App ([ADR-001](adr/adr-001-web-app-zuerst.md)) | ca. 80 pro Jahr (USD 99, B·9, ohne MwSt umgerechnet); 0 mit Gebührenerlass für Non-Profits (B·10), ob der TCO berechtigt ist: offen | belegt |
 | Google Play Console | Store-App | ca. 20 einmalig (USD 25, B·11, ohne MwSt umgerechnet) | belegt |
 | SMS | SMS als Kanal (hängt an K-37) | ca. 0.05–0.10 pro Nachricht | Schätzung aus der [Recherche Systemlandschaft](recherche/README.md) |

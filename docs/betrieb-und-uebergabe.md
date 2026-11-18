@@ -144,6 +144,8 @@ Nachfolge (K-05).
 - K-49: Wo werden die Zugangsdaten aufbewahrt?
 - K-04.1: Dem Vorstand mitteilen, dass der Programmcode abweichend von seiner Antwort bis zu
   einer Übergabe auf dem Privatkonto des Projektleiters bleibt.
-- K-04.3: Die Vereinsadresse ist noch nicht eingerichtet.
+- K-04.3: Die Vereinsadresse ist noch nicht eingerichtet; der Vorstand legt sie erst nach dem
+  Umzug der Website an (K-11, K-48). Bis dahin laufen Konten und Überwachung auf den
+  Projektleiter.
 - K-48: Wer ist Inhaber der Domain bei hosttech?
 - K-05: Eine Stellvertretung neben der Hauptansprechperson fehlt.

@@ -221,7 +221,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | ID | Vorgabe |
 |----|---------|
 | DS-01 | Server, Datenbank, Backups und E-Mail-Versand in der Schweiz oder in der EU/EWR (Art. 16 nDSG) |
-| DS-02 | Hoster und E-Mail-Dienst mit Auftragsbearbeitungsvertrag oder passenden AGB (Infomaniak: [ADR-003](adr/adr-003-hosting-infomaniak-vps.md); Metanet: kein Vertrag (K-09.7), darum kein Versand über ein Postfach dort; Scaleway: DPA vorhanden, [Kosten](kosten.md)) |
+| DS-02 | Hoster und E-Mail-Dienst mit Auftragsbearbeitungsvertrag oder passenden AGB (Infomaniak: [ADR-003](adr/adr-003-hosting-infomaniak-vps.md); Metanet: kein Vertrag (K-09.7), darum kein Versand über ein Postfach dort, Entscheid Projektleiter; Scaleway: DPA vorhanden, [Kosten](kosten.md)) |
 | DS-03 | Kein Tracking, keine Werbung, keine Inhalte von fremden Servern (CDN, Google Fonts); nur technisch nötige Cookies, deshalb kein Cookie-Banner |
 | DS-04 | Nur Felder aus [Welche Daten](#welche-daten); Exporte nur mit den Feldern, die Swiss Tennis braucht |
 | DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“). Ausnahme: Einzelmeldungen zum Doppel an die Beteiligten nennen den anderen Spieler (Partner, Anfragender oder Angefragter), nie dessen Telefon oder E-Mail und nie den Namen des CM-Admins (die Rolle «Der CM-Admin» darf stehen). E-Mails gehen je Empfänger einzeln, nie mehrere Adressen in einem Empfängerfeld. Bei Mitteilungen (FR-42) weist das Formular darauf hin; die Vorschau zeigt dem Mitglieder-Admin nur Namen, die er schon sehen darf |
