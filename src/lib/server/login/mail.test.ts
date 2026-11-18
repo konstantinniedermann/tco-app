@@ -10,10 +10,13 @@ import type { Mailer } from './dienst.ts';
 
 // Hält die Nachrichten fest, die nodemailer mit jsonTransport tatsächlich baut.
 const gebaut = vi.hoisted(() => [] as { message: string }[]);
+// Hält fest, womit nodemailer den Transport erzeugt (erstes Argument von createTransport).
+const transporte = vi.hoisted(() => [] as unknown[]);
 
 vi.mock('nodemailer', async (original) => {
 	const echt = await original<typeof import('nodemailer')>();
 	const createTransport = (...args: Parameters<typeof echt.default.createTransport>) => {
+		transporte.push(args[0]);
 		const transporter = echt.default.createTransport(...args);
 		const sendMail = transporter.sendMail.bind(transporter);
 		transporter.sendMail = (async (...a: Parameters<typeof sendMail>) => {
@@ -82,6 +85,17 @@ describe('erstelleSmtpMailer', () => {
 		expect(nachricht.subject).toBe('Betreff');
 		expect(nachricht.text).toBe('Inhalt 123456');
 		expect(nachricht.html).toBeUndefined();
+	});
+
+	// Ein hängender Mailserver soll eine Anfrage nicht minutenlang aufhalten (Vorgabe von
+	// nodemailer: 2 min Verbindungsaufbau, 10 min Leerlauf).
+	test('setzt bei einer SMTP-URL feste Zeitlimits', () => {
+		transporte.length = 0;
+		const url = 'smtp://mail.example.org:587?requireTLS=true';
+		erstelleSmtpMailer(url, 'MyTCO <absender@example.org>');
+		expect(transporte).toEqual([
+			{ url, connectionTimeout: 10_000, greetingTimeout: 10_000, socketTimeout: 20_000 }
+		]);
 	});
 });
 

@@ -126,12 +126,17 @@ describe('leseEinstellungen', () => {
 		});
 		const fehler = new Error('MYTCO_SMTP_URL ohne TLS (smtps:// oder requireTLS=true)');
 
-		test.each(['smtp://mail.example.org:587', 'smtp://mail.example.org:587?requireTLS=false'])(
-			'weist %s ab',
-			(url) => {
-				expect(() => leseEinstellungen(prod(url))).toThrow(fehler);
-			}
-		);
+		test.each([
+			'smtp://mail.example.org:587',
+			'smtp://mail.example.org:587?requireTLS=false',
+			// Zertifikatsprüfung oder TLS über die Query abgeschaltet (nodemailer übernimmt sie)
+			'smtp://mail.example.org:587?requireTLS=true&tls.rejectUnauthorized=false',
+			'smtps://mail.example.org:465?tls.rejectUnauthorized=false',
+			'smtps://mail.example.org:465?tls.rejectUnauthorized=0',
+			'smtp://mail.example.org:587?requireTLS=true&ignoreTLS=true'
+		])('weist %s ab', (url) => {
+			expect(() => leseEinstellungen(prod(url))).toThrow(fehler);
+		});
 
 		test.each([
 			'smtps://mail.example.org:465',

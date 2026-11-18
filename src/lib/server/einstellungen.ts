@@ -104,6 +104,10 @@ function tlsErzwungen(smtpUrl: string): boolean {
 	} catch {
 		return false;
 	}
+	// nodemailer übernimmt Optionen aus der Query; diese zwei schalten Prüfung oder TLS ab.
+	const pruefung = url.searchParams.get('tls.rejectUnauthorized');
+	if (pruefung !== null && pruefung !== 'true') return false;
+	if (url.searchParams.get('ignoreTLS') === 'true') return false;
 	if (url.protocol === 'smtps:') return true;
 	if (url.protocol !== 'smtp:') return false;
 	if (url.searchParams.get('requireTLS') === 'true') return true;
