@@ -25,6 +25,15 @@ echo "$*" >>"${STUB_PROTOKOLL:-/dev/null}"
 if [ -n "${STUB_PROTOKOLL:-}" ]; then
 	echo "${MYTCO_IMAGE-}|${MYTCO_UMGEBUNG-}|${DOCKER_CONFIG-}|${MAIL_NUR_AN+=}${MAIL_NUR_AN-}" >>"$STUB_PROTOKOLL.umwelt"
 fi
+# STUB_UMWELT_NAMEN="<name> <name>": je Aufruf eine Zeile in $STUB_PROTOKOLL.namen,
+# "<name>=<wert>" für gesetzte, "<name>!" für nicht gesetzte Variablen, durch "|" getrennt
+if [ -n "${STUB_UMWELT_NAMEN:-}" ] && [ -n "${STUB_PROTOKOLL:-}" ]; then
+	zeile=""
+	for name in $STUB_UMWELT_NAMEN; do
+		if [ -n "${!name+x}" ]; then zeile="$zeile|$name=${!name}"; else zeile="$zeile|$name!"; fi
+	done
+	echo "${zeile#|}" >>"$STUB_PROTOKOLL.namen"
+fi
 echo "STUB-GEHEIM-LOG" >&2
 
 if [ -n "${STUB_STDIN_BEI:-}" ]; then

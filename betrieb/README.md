@@ -81,9 +81,10 @@ dem aktuellen und dem vorherigen von Test und Live; ein Fehler dabei steht nur i
 
 Ist in `live/geheim.env` `MAIL_NUR_AN` gesetzt (Leerzeichen und Anführungszeichen zählen
 nicht; erkannt wird jede Zeilenform, die Compose liest, auch `export MAIL_NUR_AN=…` und
-`MAIL_NUR_AN: …`), verweigern `ausliefern live` und `zurueck live` ihre Arbeit und melden
-`fehler`. Ein `MAIL_NUR_AN` aus der Shell des Aufrufers kommt nie bei Compose an: Massgebend
-ist allein `geheim.env`.
+`MAIL_NUR_AN: …`; ein Wert in Anführungszeichen, die auf der Zeile nicht schliessen, gilt immer
+als gesetzt, weil Compose ihn über mehrere Zeilen liest), verweigern `ausliefern live` und
+`zurueck live` ihre Arbeit und melden `fehler`. Kein Wert aus der Shell des Aufrufers kommt bei
+Compose an, wenn `geheim.env` denselben Namen setzt: Massgebend ist allein die Datei.
 
 `zurueck` migriert die Datenbank nicht zurück. `wiederherstellen` spielt nur Sicherungen
 derselben Umgebung ein und braucht eine ausgelieferte Fassung (`<umgebung>/zustand/aktuell`);
