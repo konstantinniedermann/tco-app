@@ -16,7 +16,7 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 
 | | Test | Live |
 |---|------|------|
-| Adresse | `test.my.tcolten.ch`, nur mit Passwort (K-10) | `my.tcolten.ch` (K-10) |
+| Adresse | `test.my.tcolten.ch`, nur mit Passwort (K-10): einmal je Gerät in ein Formular, danach ein Zugangscookie für ein Jahr ([Betrieb](../betrieb/README.md)) | `my.tcolten.ch` (K-10) |
 | Rolle | Demo und Checkliste | Testgruppe (Pilotphase), später alle Mitglieder |
 | Ausgeliefert bei | Merge nach `dev` | Merge des PR `dev` → `main` |
 | Daten | nur erfundene Testdaten; bleiben über Auslieferungen erhalten, neu aufgesetzt nur über den Zähler `betrieb/test-neu-aufsetzen` | Mitgliederdaten |

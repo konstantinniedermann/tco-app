@@ -126,6 +126,14 @@ Der Passwort-Hash für Test kommt aus `caddy hash-password` und steht in `proxy.
 einfachen Anführungszeichen: `MYTCO_TEST_PASSWORT_HASH='$2a$14$…'`. Ohne sie frisst Compose die
 `$`-Zeichen.
 
+Die Test-Sperre (`caddy/umgebungen/test.caddy`) fragt nicht mit dem Passwortfenster des
+Browsers, sondern mit einer Seite mit Formular; danach setzt Caddy das Cookie `mytco_test_zugang`
+für ein Jahr, und mit ihm fragt er nicht mehr. Der Grund: Die App auf dem iPhone-Startbildschirm
+behält ein Passwort aus dem Browserfenster nicht über einen Neustart und fragt nicht neu, Cookies
+behält sie. Der Wert des Cookies ist der Passwort-Hash; **ein neues Passwort entwertet darum alle
+Cookies**, jedes Gerät meldet sich einmal neu an. Ohne Passwort erreichbar sind nur Manifest,
+Service Worker und Symbole (keine Daten). `curl -u` geht weiter.
+
 `MYTCO_HTTP_PORT` und `MYTCO_HTTPS_PORT` (Vorgabe 80 und 443) stehen nicht in der Vorlage;
 sie braucht nur der lokale Nachweis (`nachweis/nachweis.sh`), auf dem Server bleiben sie leer.
 
