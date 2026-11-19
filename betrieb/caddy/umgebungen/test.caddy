@@ -7,9 +7,11 @@
 	# Passwort ein Zugangscookie für ein Jahr, und mit ihm fragt er nicht mehr. Sein Wert ist der
 	# Passwort-Hash: Er ist immer gesetzt (ohne ihn startet basic_auth nicht), und ein neues Passwort
 	# entwertet alle Cookies. Frei sind die Dateien, die der Browser ohne Passwort und ohne Cookie
-	# holt (Manifest, Service Worker, Symbole); sie enthalten keine Daten.
+	# holt (Manifest, Service Worker, Symbole); sie enthalten keine Daten. Verglichen wird der Pfad
+	# genau, wie er ankommt, nicht mit `path`: Der bereinigt `..`, `%2f`, `//` und Gross/klein, App
+	# und Mail-Fänger bekämen aber den unbereinigten Pfad (z. B. /api/x/..%2f..%2fmanifest.webmanifest).
 	@gesperrt {
-		not path /manifest.webmanifest /service-worker.js /favicon.svg /apple-touch-icon.png /icon-192.png /icon-512.png
+		not expression `{http.request.uri.path} in ['/manifest.webmanifest', '/service-worker.js', '/favicon.svg', '/apple-touch-icon.png', '/icon-192.png', '/icon-512.png']`
 		not header Cookie *mytco_test_zugang={$MYTCO_TEST_PASSWORT_HASH}*
 	}
 

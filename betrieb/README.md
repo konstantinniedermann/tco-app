@@ -131,8 +131,10 @@ Browsers, sondern mit einer Seite mit Formular; danach setzt Caddy das Cookie `m
 für ein Jahr, und mit ihm fragt er nicht mehr. Der Grund: Die App auf dem iPhone-Startbildschirm
 behält ein Passwort aus dem Browserfenster nicht über einen Neustart und fragt nicht neu, Cookies
 behält sie. Der Wert des Cookies ist der Passwort-Hash; **ein neues Passwort entwertet darum alle
-Cookies**, jedes Gerät meldet sich einmal neu an. Ohne Passwort erreichbar sind nur Manifest,
-Service Worker und Symbole (keine Daten). `curl -u` geht weiter.
+Cookies**, jedes Gerät meldet sich einmal neu an. Umgekehrt öffnet der Hash Test wie das Passwort
+(alle Geräte tragen denselben Wert, einzeln sperren geht nur über ein neues Passwort); er gehört
+darum wie das Passwort nur in `proxy.env`. Ohne Passwort erreichbar sind nur Manifest, Service
+Worker und Symbole (keine Daten), und nur unter genau ihrem Pfad. `curl -u` geht weiter.
 
 `MYTCO_HTTP_PORT` und `MYTCO_HTTPS_PORT` (Vorgabe 80 und 443) stehen nicht in der Vorlage;
 sie braucht nur der lokale Nachweis (`nachweis/nachweis.sh`), auf dem Server bleiben sie leer.

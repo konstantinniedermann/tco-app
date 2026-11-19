@@ -677,11 +677,22 @@ p2_test_cookie() {
 # Was der Browser ohne Passwort und ohne Cookie holt (Manifest, Service Worker, Symbole), ist frei;
 # es enthält keine Daten.
 p2_test_frei() {
-	local pfad
+	local pfad status
 	for pfad in /manifest.webmanifest /service-worker.js /favicon.svg /apple-touch-icon.png \
 		/icon-192.png /icon-512.png; do
 		warte_status test.mytco.localhost "$pfad" 200 || return 1
 		erwarte_kein_zugangscookie || return 1
+	done
+	# Frei ist nur der Pfad genau so, wie er ankommt: Caddy bereinigt für `path` `..`, `%2f`,
+	# doppelte Schrägstriche und Gross/klein, App und Mail-Fänger bekommen aber den Pfad unverändert.
+	for pfad in '/api/x/..%2f..%2fmanifest.webmanifest' '/api/x/../../icon-192.png' \
+		'/_mail/api/v1/message/%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2fservice-worker.js' \
+		'//manifest.webmanifest' '/MANIFEST.webmanifest' '/manifest.webmanifest/../api/status'; do
+		status=$(abfrage test.mytco.localhost "$pfad" --path-as-is)
+		[ "$status" = 401 ] || {
+			echo "$pfad: erwartet 401, erhalten $status"
+			return 1
+		}
 	done
 }
 
@@ -1526,7 +1537,7 @@ pruefung "2 test ohne passwort → 401" p2_test_ohne_passwort
 pruefung "2 test mit passwort → ok" test_status_ok
 pruefung "2 test mit falschem passwort → 401, kein cookie" p2_test_falsches_passwort
 pruefung "2 test: passwort setzt zugangscookie, cookie genügt, falsches nicht" p2_test_cookie
-pruefung "2 test: manifest, service worker, symbole ohne passwort" p2_test_frei
+pruefung "2 test: manifest, service worker, symbole ohne passwort, nur genau dieser pfad" p2_test_frei
 pruefung "2 mail-fänger nur auf test, hinter passwort, mit mail der testdaten" p2_mailfaenger
 pruefung "2 /_app-datei: HSTS, frame-ancestors, köpfe je einmal" p2_app_datei
 pruefung "2 seite /: CSP der app unverändert, köpfe je einmal" p2_seite
