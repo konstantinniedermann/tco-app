@@ -11,6 +11,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Test fragt das Test-Passwort in einem Formular statt im Fenster des Browsers ab, einmal je
+  Gerät; danach merkt sich ein Cookie den Zugang für ein Jahr. So läuft Test auch als App auf dem
+  iPhone-Startbildschirm, und Manifest und Service Worker laden ohne Passwort (#39). An der App
+  ändert sich nichts.
 - Test behält seine Daten bei einer neuen Fassung, wie Live. Neu aufgesetzt wird Test nur noch,
   wenn ein Branch den Zähler `betrieb/test-neu-aufsetzen` erhöht (#39). An der App ändert sich
   nichts.

@@ -604,6 +604,96 @@ p2_test_ohne_passwort() {
 	erwarte_kopf_einmal Strict-Transport-Security
 	erwarte_kopf_einmal X-Content-Type-Options
 	erwarte_kopf_einmal Referrer-Policy
+	# Statt des Passwortfensters des Browsers eine Seite mit Formular: Die App auf dem
+	# Startbildschirm zeigt bei 401 nur den Inhalt, und Passwortmanager füllen nur Formulare aus.
+	[ "$(kopf_anzahl WWW-Authenticate)" = 0 ] || {
+		echo "401 mit WWW-Authenticate (öffnet das Passwortfenster des Browsers)"
+		return 1
+	}
+	grep -qi '^text/html' <<<"$(kopf_wert Content-Type)" || {
+		echo "401 nicht als HTML: $(kopf_wert Content-Type)"
+		return 1
+	}
+	grep -qF 'autocomplete="current-password"' "$TEMP/inhalt" || {
+		echo "401 ohne Formular mit Passwortfeld"
+		return 1
+	}
+	erwarte_kein_zugangscookie
+}
+
+erwarte_kein_zugangscookie() {
+	if tr -d '\r' <"$TEMP/kopf" | grep -qi '^set-cookie: *mytco_test_zugang='; then
+		echo "Antwort setzt das Zugangscookie"
+		return 1
+	fi
+}
+
+p2_test_falsches_passwort() {
+	local status
+	status=$(abfrage test.mytco.localhost /api/status -u "$BENUTZER:falsch")
+	[ "$status" = 401 ] || {
+		echo "erwartet 401, erhalten $status"
+		return 1
+	}
+	erwarte_kein_zugangscookie
+}
+
+# Mit Passwort setzt Caddy das Zugangscookie; danach genügt es ohne Passwort, ein falsches nicht.
+p2_test_cookie() {
+	local cookie wert status teil
+	test_status_ok
+	cookie=$(tr -d '\r' <"$TEMP/kopf" | grep -i '^set-cookie: *mytco_test_zugang=' | sed -n 1p |
+		sed 's/^[^:]*:[[:space:]]*//')
+	[ -n "$cookie" ] || {
+		echo "kein Zugangscookie nach der Anmeldung"
+		return 1
+	}
+	for teil in Secure HttpOnly SameSite=Lax Max-Age=31536000 Path=/; do
+		grep -qF "; $teil" <<<"$cookie" || {
+			echo "Zugangscookie ohne $teil: ${cookie%%=*}=…"
+			return 1
+		}
+	done
+	wert="${cookie%%;*}"
+	warte_status test.mytco.localhost /api/status 200 -H "Cookie: andere=1; $wert"
+	status_ok
+	status=$(abfrage test.mytco.localhost /_mail/api/v1/messages -H "Cookie: $wert")
+	[ "$status" = 200 ] || {
+		echo "mail-fänger mit cookie: erwartet 200, erhalten $status"
+		return 1
+	}
+	status=$(abfrage test.mytco.localhost /api/status -H "Cookie: ${wert%?}x")
+	[ "$status" = 401 ] || {
+		echo "falsches cookie: erwartet 401, erhalten $status"
+		return 1
+	}
+	status=$(abfrage test.mytco.localhost /api/status -H "Cookie: mytco_test_zugang=")
+	[ "$status" = 401 ] || {
+		echo "leeres cookie: erwartet 401, erhalten $status"
+		return 1
+	}
+}
+
+# Was der Browser ohne Passwort und ohne Cookie holt (Manifest, Service Worker, Symbole), ist frei;
+# es enthält keine Daten.
+p2_test_frei() {
+	local pfad status
+	for pfad in /manifest.webmanifest /service-worker.js /favicon.svg /apple-touch-icon.png \
+		/icon-192.png /icon-512.png; do
+		warte_status test.mytco.localhost "$pfad" 200 || return 1
+		erwarte_kein_zugangscookie || return 1
+	done
+	# Frei ist nur der Pfad genau so, wie er ankommt: Caddy bereinigt für `path` `..`, `%2f`,
+	# doppelte Schrägstriche und Gross/klein, App und Mail-Fänger bekommen aber den Pfad unverändert.
+	for pfad in '/api/x/..%2f..%2fmanifest.webmanifest' '/api/x/../../icon-192.png' \
+		'/_mail/api/v1/message/%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2fservice-worker.js' \
+		'//manifest.webmanifest' '/MANIFEST.webmanifest' '/manifest.webmanifest/../api/status'; do
+		status=$(abfrage test.mytco.localhost "$pfad" --path-as-is)
+		[ "$status" = 401 ] || {
+			echo "$pfad: erwartet 401, erhalten $status"
+			return 1
+		}
+	done
 }
 
 # Mail-Fänger auf Test: hinter dem Test-Passwort, hält die umgeleitete Mail der Testdaten;
@@ -1423,6 +1513,41 @@ p8_keine_ip() {
 	done
 }
 
+# Fehlen Benutzer und Hash in proxy.env (wie in der Vorlage), bleibt Test zu: Ein leeres oder
+# fremdes Zugangscookie darf weder die App noch den Mail-Fänger öffnen. Danach zurück.
+proxy_neu() {
+	docker compose -p mytco-proxy -f "$BASIS/proxy/compose.proxy.yml" \
+		--env-file "$BASIS/proxy/proxy.env" up -d >>"$LOG" 2>&1
+}
+
+p8_ohne_zugangsdaten_pruefen() {
+	local status pfad cookie
+	for pfad in /_mail/api/v1/messages /api/status /manifest.webmanifest; do
+		for cookie in 'mytco_test_zugang=' 'andere=mytco_test_zugang=1'; do
+			status=$(abfrage test.mytco.localhost "$pfad" -H "Cookie: $cookie")
+			[ "$status" = 503 ] || {
+				echo "$pfad mit «${cookie}»: erwartet 503, erhalten $status"
+				return 1
+			}
+		done
+	done
+}
+
+p8_ohne_zugangsdaten() {
+	local env="$BASIS/proxy/proxy.env" rc=0
+	cp -p "$env" "$env.voll"
+	sed -e 's/^MYTCO_TEST_BENUTZER=.*/MYTCO_TEST_BENUTZER=/' \
+		-e 's/^MYTCO_TEST_PASSWORT_HASH=.*/MYTCO_TEST_PASSWORT_HASH=/' "$env.voll" >"$env"
+	proxy_neu
+	warte_status test.mytco.localhost /api/status 503 || rc=1
+	[ "$rc" = 1 ] || p8_ohne_zugangsdaten_pruefen || rc=1
+	mv "$env.voll" "$env"
+	proxy_neu
+	[ "$rc" = 0 ] || return 1
+	# Wieder die Sperre (die Test-App steht seit der Prüfung der Fehlerseite still).
+	warte_status test.mytco.localhost /api/status 401
+}
+
 # --- Ablauf -------------------------------------------------------------------------------
 pruefung "0 wegwerf-server einrichten" einrichten
 [ "$ANZAHL_FEHLER" = 0 ] || summe
@@ -1445,6 +1570,9 @@ pruefung "1 live-sperre: MAIL_NUR_AN gesetzt → ausliefern und zurueck verweige
 pruefung "2 live /api/status über https → ok" live_status_ok
 pruefung "2 test ohne passwort → 401" p2_test_ohne_passwort
 pruefung "2 test mit passwort → ok" test_status_ok
+pruefung "2 test mit falschem passwort → 401, kein cookie" p2_test_falsches_passwort
+pruefung "2 test: passwort setzt zugangscookie, cookie genügt, falsches nicht" p2_test_cookie
+pruefung "2 test: manifest, service worker, symbole ohne passwort, nur genau dieser pfad" p2_test_frei
 pruefung "2 mail-fänger nur auf test, hinter passwort, mit mail der testdaten" p2_mailfaenger
 pruefung "2 /_app-datei: HSTS, frame-ancestors, köpfe je einmal" p2_app_datei
 pruefung "2 seite /: CSP der app unverändert, köpfe je einmal" p2_seite
@@ -1489,5 +1617,6 @@ pruefung "7 ausliefern-ssh test D8 (zähler ungültig) → fehler, nichts geänd
 
 pruefung "8 app gestoppt → caddy antwortet mit 502" p8_fehlerseite
 pruefung "8 proxy-log ohne ip-adressen" p8_keine_ip
+pruefung "8 proxy ohne test-zugangsdaten → test bleibt zu, auch mit leerem cookie" p8_ohne_zugangsdaten
 
 summe

@@ -1,19 +1,105 @@
 {$MYTCO_ADRESSE_TEST} {
 	import tls_{$MYTCO_TLS:automatisch}
 	import sicherheit
-	basic_auth {
-		{$MYTCO_TEST_BENUTZER} {$MYTCO_TEST_PASSWORT_HASH}
+
+	# Test-Sperre. Die App auf dem iPhone-Startbildschirm behält ein Passwort aus dem Fenster des
+	# Browsers nicht und fragt nicht neu; Cookies behält sie. Darum setzt Caddy nach dem richtigen
+	# Passwort ein Zugangscookie für ein Jahr, und mit ihm fragt er nicht mehr. Sein Wert ist der
+	# Passwort-Hash: kein zweites Geheimnis, und ein neues Passwort entwertet alle Cookies. Frei sind die Dateien, die der Browser ohne Passwort und ohne Cookie
+	# holt (Manifest, Service Worker, Symbole); sie enthalten keine Daten. Verglichen wird der Pfad
+	# genau, wie er ankommt, nicht mit `path`: Der bereinigt `..`, `%2f`, `//` und Gross/klein, App
+	# und Mail-Fänger bekämen aber den unbereinigten Pfad (z. B. /api/x/..%2f..%2fmanifest.webmanifest).
+	@gesperrt {
+		not expression `{http.request.uri.path} in ['/manifest.webmanifest', '/service-worker.js', '/favicon.svg', '/apple-touch-icon.png', '/icon-192.png', '/icon-512.png']`
+		not header Cookie *mytco_test_zugang={$MYTCO_TEST_PASSWORT_HASH}*
 	}
-	# Postfach des Mail-Fängers (Mailpit), wie die App nur mit dem Test-Passwort.
-	handle /_mail* {
-		reverse_proxy mailpit-test:8025
-	}
-	handle {
-		reverse_proxy app-test:3000 {
-			import app_ohne_sicherheit
+
+	# Fehlen Benutzer und Hash in proxy.env, startet basic_auth ohne Konto, und der Cookie-Matcher
+	# hiesse `*mytco_test_zugang=*`: Test wäre für jeden offen. Darum dann alles abweisen.
+	@ohne_zugangsdaten expression `'{$MYTCO_TEST_PASSWORT_HASH}' == '' || '{$MYTCO_TEST_BENUTZER}' == ''`
+
+	# In `route` gilt die geschriebene Reihenfolge: Das Cookie entsteht erst nach geprüftem Passwort.
+	route {
+		respond @ohne_zugangsdaten "Test ist nicht eingerichtet." 503
+		route @gesperrt {
+			basic_auth {
+				{$MYTCO_TEST_BENUTZER} {$MYTCO_TEST_PASSWORT_HASH}
+			}
+			header Set-Cookie "mytco_test_zugang={$MYTCO_TEST_PASSWORT_HASH}; Max-Age=31536000; Path=/; Secure; HttpOnly; SameSite=Lax"
+		}
+		# Postfach des Mail-Fängers (Mailpit), wie die App nur mit dem Test-Passwort.
+		handle /_mail* {
+			reverse_proxy mailpit-test:8025
+		}
+		handle {
+			reverse_proxy app-test:3000 {
+				import app_ohne_sicherheit
+			}
 		}
 	}
-	# Antworten von Caddy selbst (401, 502) tragen die CSP-Vorgabe ebenfalls: `?` greift dort nicht.
+
+	# Ohne Passwort eine Seite mit Formular statt des Passwortfensters (darum kein WWW-Authenticate):
+	# Die Startbildschirm-App zeigt bei 401 nur den Inhalt, und Passwortmanager füllen nur Formulare.
+	# Das Formular schickt das Passwort einmal mit; die Antwort setzt das Cookie, dann lädt die Seite neu.
+	handle_errors 401 {
+		header -WWW-Authenticate
+		header Content-Security-Policy "frame-ancestors 'none'"
+		header Content-Type "text/html; charset=utf-8"
+		header Cache-Control no-store
+		respond <<HTML
+			<!doctype html>
+			<html lang="de-CH">
+			<head>
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<meta name="theme-color" content="#0f6b4f">
+			<title>MyTCO Test</title>
+			<style>
+			body { font-family: system-ui, sans-serif; background: #f4f7f2; color: #1d2b24; margin: 0; padding: 2rem 1rem; }
+			main { max-width: 22rem; margin: 0 auto; }
+			h1 { color: #0f6b4f; }
+			label { display: block; margin-top: 1rem; font-weight: 600; }
+			input { width: 100%; box-sizing: border-box; font-size: 1.1rem; padding: 0.6rem; margin-top: 0.3rem; border: 2px solid #44524b; border-radius: 8px; }
+			button { margin-top: 1.5rem; width: 100%; padding: 0.8rem; font-size: 1.1rem; font-weight: 600; color: #fff; background: #0f6b4f; border: 0; border-radius: 8px; }
+			#meldung { color: #b42318; }
+			</style>
+			</head>
+			<body>
+			<main>
+			<h1>MyTCO Test</h1>
+			<p>Die Test-Umgebung ist geschützt.</p>
+			<form id="sperre">
+			<label for="benutzer">Benutzer</label>
+			<input id="benutzer" name="benutzer" autocomplete="username" autocapitalize="none" required>
+			<label for="passwort">Passwort</label>
+			<input id="passwort" name="passwort" type="password" autocomplete="current-password" required>
+			<button>Weiter</button>
+			<p id="meldung" role="alert"></p>
+			</form>
+			</main>
+			<script>
+			document.getElementById('sperre').addEventListener('submit', async (e) => {
+				e.preventDefault();
+				const f = e.target;
+				const meldung = document.getElementById('meldung');
+				meldung.textContent = '';
+				const paar = new TextEncoder().encode(f.benutzer.value + ':' + f.passwort.value);
+				const zugang = btoa(String.fromCharCode(...paar));
+				try {
+					const r = await fetch('/api/status', { headers: { Authorization: 'Basic ' + zugang }, cache: 'no-store' });
+					if (r.status === 401) meldung.textContent = 'Benutzer oder Passwort stimmt nicht.';
+					else location.reload();
+				} catch {
+					meldung.textContent = 'Keine Verbindung zum Server.';
+				}
+			});
+			</script>
+			</body>
+			</html>
+			HTML 401
+	}
+
+	# Antworten von Caddy selbst (502) tragen die CSP-Vorgabe ebenfalls: `?` greift dort nicht.
 	# Die CSP der App bleibt unangetastet; Caddy setzt `frame-ancestors 'none'` nur, wo keine kommt.
 	handle_errors {
 		header Content-Security-Policy "frame-ancestors 'none'"
