@@ -5,8 +5,7 @@
 	# Test-Sperre. Die App auf dem iPhone-Startbildschirm behält ein Passwort aus dem Fenster des
 	# Browsers nicht und fragt nicht neu; Cookies behält sie. Darum setzt Caddy nach dem richtigen
 	# Passwort ein Zugangscookie für ein Jahr, und mit ihm fragt er nicht mehr. Sein Wert ist der
-	# Passwort-Hash: Er ist immer gesetzt (ohne ihn startet basic_auth nicht), und ein neues Passwort
-	# entwertet alle Cookies. Frei sind die Dateien, die der Browser ohne Passwort und ohne Cookie
+	# Passwort-Hash: kein zweites Geheimnis, und ein neues Passwort entwertet alle Cookies. Frei sind die Dateien, die der Browser ohne Passwort und ohne Cookie
 	# holt (Manifest, Service Worker, Symbole); sie enthalten keine Daten. Verglichen wird der Pfad
 	# genau, wie er ankommt, nicht mit `path`: Der bereinigt `..`, `%2f`, `//` und Gross/klein, App
 	# und Mail-Fänger bekämen aber den unbereinigten Pfad (z. B. /api/x/..%2f..%2fmanifest.webmanifest).
@@ -15,8 +14,13 @@
 		not header Cookie *mytco_test_zugang={$MYTCO_TEST_PASSWORT_HASH}*
 	}
 
+	# Fehlen Benutzer und Hash in proxy.env, startet basic_auth ohne Konto, und der Cookie-Matcher
+	# hiesse `*mytco_test_zugang=*`: Test wäre für jeden offen. Darum dann alles abweisen.
+	@ohne_zugangsdaten expression `'{$MYTCO_TEST_PASSWORT_HASH}' == '' || '{$MYTCO_TEST_BENUTZER}' == ''`
+
 	# In `route` gilt die geschriebene Reihenfolge: Das Cookie entsteht erst nach geprüftem Passwort.
 	route {
+		respond @ohne_zugangsdaten "Test ist nicht eingerichtet." 503
 		route @gesperrt {
 			basic_auth {
 				{$MYTCO_TEST_BENUTZER} {$MYTCO_TEST_PASSWORT_HASH}

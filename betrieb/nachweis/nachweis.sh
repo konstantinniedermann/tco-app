@@ -1513,6 +1513,41 @@ p8_keine_ip() {
 	done
 }
 
+# Fehlen Benutzer und Hash in proxy.env (wie in der Vorlage), bleibt Test zu: Ein leeres oder
+# fremdes Zugangscookie darf weder die App noch den Mail-Fänger öffnen. Danach zurück.
+proxy_neu() {
+	docker compose -p mytco-proxy -f "$BASIS/proxy/compose.proxy.yml" \
+		--env-file "$BASIS/proxy/proxy.env" up -d >>"$LOG" 2>&1
+}
+
+p8_ohne_zugangsdaten_pruefen() {
+	local status pfad cookie
+	for pfad in /_mail/api/v1/messages /api/status /manifest.webmanifest; do
+		for cookie in 'mytco_test_zugang=' 'andere=mytco_test_zugang=1'; do
+			status=$(abfrage test.mytco.localhost "$pfad" -H "Cookie: $cookie")
+			[ "$status" = 503 ] || {
+				echo "$pfad mit «${cookie}»: erwartet 503, erhalten $status"
+				return 1
+			}
+		done
+	done
+}
+
+p8_ohne_zugangsdaten() {
+	local env="$BASIS/proxy/proxy.env" rc=0
+	cp -p "$env" "$env.voll"
+	sed -e 's/^MYTCO_TEST_BENUTZER=.*/MYTCO_TEST_BENUTZER=/' \
+		-e 's/^MYTCO_TEST_PASSWORT_HASH=.*/MYTCO_TEST_PASSWORT_HASH=/' "$env.voll" >"$env"
+	proxy_neu
+	warte_status test.mytco.localhost /api/status 503 || rc=1
+	[ "$rc" = 1 ] || p8_ohne_zugangsdaten_pruefen || rc=1
+	mv "$env.voll" "$env"
+	proxy_neu
+	[ "$rc" = 0 ] || return 1
+	# Wieder die Sperre (die Test-App steht seit der Prüfung der Fehlerseite still).
+	warte_status test.mytco.localhost /api/status 401
+}
+
 # --- Ablauf -------------------------------------------------------------------------------
 pruefung "0 wegwerf-server einrichten" einrichten
 [ "$ANZAHL_FEHLER" = 0 ] || summe
@@ -1582,5 +1617,6 @@ pruefung "7 ausliefern-ssh test D8 (zähler ungültig) → fehler, nichts geänd
 
 pruefung "8 app gestoppt → caddy antwortet mit 502" p8_fehlerseite
 pruefung "8 proxy-log ohne ip-adressen" p8_keine_ip
+pruefung "8 proxy ohne test-zugangsdaten → test bleibt zu, auch mit leerem cookie" p8_ohne_zugangsdaten
 
 summe

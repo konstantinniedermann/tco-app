@@ -134,7 +134,8 @@ behält sie. Der Wert des Cookies ist der Passwort-Hash; **ein neues Passwort en
 Cookies**, jedes Gerät meldet sich einmal neu an. Umgekehrt öffnet der Hash Test wie das Passwort
 (alle Geräte tragen denselben Wert, einzeln sperren geht nur über ein neues Passwort); er gehört
 darum wie das Passwort nur in `proxy.env`. Ohne Passwort erreichbar sind nur Manifest, Service
-Worker und Symbole (keine Daten), und nur unter genau ihrem Pfad. `curl -u` geht weiter.
+Worker und Symbole (keine Daten), und nur unter genau ihrem Pfad. `curl -u` geht weiter. Fehlen
+Benutzer oder Hash in `proxy.env`, antwortet Test auf alles mit 503 statt offen zu stehen.
 
 `MYTCO_HTTP_PORT` und `MYTCO_HTTPS_PORT` (Vorgabe 80 und 443) stehen nicht in der Vorlage;
 sie braucht nur der lokale Nachweis (`nachweis/nachweis.sh`), auf dem Server bleiben sie leer.
