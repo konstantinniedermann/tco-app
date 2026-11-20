@@ -1,9 +1,10 @@
 // Nur lokal (make seed): füllt das Beispielturnier 2027 auf, damit jede Kategorie 10–16 aktive
 // Anmeldungen hat und Listen, Paare und Partnersuche wie bei einer echten Clubmeisterschaft
-// aussehen. 86 erfundene Spieler mit Konto und Login (DS-08: feste Vornamen mit erkennbar
+// aussehen. 80 erfundene Spieler mit Konto und Login (DS-08: feste Vornamen mit erkennbar
 // erfundenen Nachnamen, ohne Zufall, Adressen nur unter example.org). Die Beispielspieler aus
 // beispiel-turnier.ts bleiben unberührt. Alles läuft über die Fachfunktionen wie in der App; jedes
-// Ergebnis ausser 'ok' bricht ab. Gibt es die Spieler schon, ändert ein Lauf nichts.
+// Ergebnis ausser 'ok' bricht ab. Gibt es die Spieler schon, ändert ein Lauf nichts; passt der
+// Plan nicht mehr zu den Kategorien (lokal geändert oder abgesagt), bleibt das Turnier, wie es ist.
 import { and, eq, inArray, or } from 'drizzle-orm';
 import { GRENZE, meldeAn } from '../src/lib/server/cm/anmeldungen.ts';
 import { nimmAnfrageAn, stelleAnfrage } from '../src/lib/server/cm/doppel.ts';
@@ -187,9 +188,8 @@ const NUMMER_AB = 3001;
 const ohneUmlaut = (s: string) =>
 	s.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue');
 
-/** Der Plan: Spieler je Einzel-Kategorie, Paare und Suchende je Doppel; bei jedem Aufruf gleich. */
-function plane(regeln: Map<string, KategorieRegel>) {
-	const regel = (name: string) => regeln.get(name) ?? fehler(`Kategorie fehlt: ${name}`);
+/** Die Spieler je Einzel-Kategorie, ohne Blick auf die Kategorien; bei jedem Aufruf gleich. */
+function erzeugeSpieler() {
 	const alle: Spieler[] = [];
 	const zaehler = { m: 0, w: 0 };
 	const neu = (g: G, klassierung: Klassierung, jahrgang: number): Spieler => {
@@ -221,17 +221,29 @@ function plane(regeln: Map<string, KategorieRegel>) {
 	};
 
 	const einzel = EINZEL.map((e) => {
-		const k = regel(e.name);
 		const leute = Array.from({ length: e.n }, (_, j) => {
 			const g: G = e.g === 'mw' ? (j % 2 === 0 ? 'm' : 'w') : e.g;
 			const [von, bis] = e.jahr;
-			const s = neu(g, e.klass[j % e.klass.length], von + ((j * 5) % (bis - von + 1)));
-			if (!passtEinzel(k, s.werte)) fehler(`Plan passt nicht in ${e.name}`);
-			s.anzahl++;
-			return s;
+			return neu(g, e.klass[j % e.klass.length], von + ((j * 5) % (bis - von + 1)));
 		});
 		return { name: e.name, leute };
 	});
+	return { alle, einzel };
+}
+
+/** Der Plan: prüft die Einzel gegen ihre Kategorie und bildet Paare und Suchende je Doppel. */
+function plane(
+	regeln: Map<string, KategorieRegel>,
+	{ alle, einzel }: ReturnType<typeof erzeugeSpieler>
+) {
+	const regel = (name: string) => regeln.get(name) ?? fehler(`Kategorie fehlt: ${name}`);
+	for (const e of einzel) {
+		const k = regel(e.name);
+		for (const s of e.leute) {
+			if (!passtEinzel(k, s.werte)) fehler(`Plan passt nicht in ${e.name}`);
+			s.anzahl++;
+		}
+	}
 
 	// Doppel nur mit Erwachsenen; höchstens GRENZE Anmeldungen je Person.
 	const frei = (g: G, belegt: Set<Spieler>) =>
@@ -290,18 +302,26 @@ export async function fuelleBeispielTurnierAuf(
 		.select()
 		.from(kategorie)
 		.where(and(eq(kategorie.turnierId, turnierId), eq(kategorie.status, 'aktiv')));
-	const regeln = new Map(kategorien.map((k) => [k.name, k]));
-	const ids = new Map(kategorien.map((k) => [k.name, k.id]));
-	const plan = plane(regeln);
-
-	const emails = plan.alle.map((s) => s.werte.email as string);
-	const nummern = plan.alle.map((s) => s.werte.mitgliedernummer as string);
+	const spieler = erzeugeSpieler();
+	const emails = spieler.alle.map((s) => s.werte.email as string);
+	const nummern = spieler.alle.map((s) => s.werte.mitgliedernummer as string);
 	const [vorhanden] = await db
 		.select({ id: mitglied.id })
 		.from(mitglied)
 		.where(or(inArray(mitglied.email, emails), inArray(mitglied.mitgliedernummer, nummern)))
 		.limit(1);
 	if (vorhanden) return;
+
+	const regeln = new Map(kategorien.map((k) => [k.name, k]));
+	const ids = new Map(kategorien.map((k) => [k.name, k.id]));
+	// Der ganze Plan steht vor dem ersten Eintrag; die Fachfunktionen prüfen mit denselben Regeln.
+	let plan: ReturnType<typeof plane>;
+	try {
+		plan = plane(regeln, spieler);
+	} catch {
+		console.log('Beispielturnier: Kategorien lokal geändert, nicht aufgefüllt');
+		return;
+	}
 
 	const mitgliedId = new Map<Spieler, number>();
 	for (const s of plan.alle) {
