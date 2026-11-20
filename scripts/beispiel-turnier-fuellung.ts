@@ -355,3 +355,14 @@ export async function fuelleBeispielTurnierAuf(
 		}
 	}
 }
+
+/** IDs der Spieler der Auffüllung, nach Mitgliedernummer; leer, solange keiner angelegt ist. */
+export async function beispielTurnierSpieler(db: Db): Promise<number[]> {
+	const emails = erzeugeSpieler().alle.map((s) => s.werte.email as string);
+	const zeilen = await db
+		.select({ id: mitglied.id })
+		.from(mitglied)
+		.where(inArray(mitglied.email, emails))
+		.orderBy(mitglied.mitgliedernummer);
+	return zeilen.map((z) => z.id);
+}

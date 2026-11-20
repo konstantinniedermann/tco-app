@@ -1,7 +1,10 @@
 import { and, count, eq, inArray, isNotNull, isNull, like } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { legeBeispielAnlassAn, meldeBeispielAntworten } from '../../scripts/beispiel-anlass.ts';
 import { legeBeispielTurnierAn, setzeBeispielKontakt } from '../../scripts/beispiel-turnier.ts';
+import { beispielTurnierSpieler } from '../../scripts/beispiel-turnier-fuellung.ts';
 import {
+	anlassAnmeldung,
 	anmeldung,
 	anmeldungSpieler,
 	kategorie,
@@ -280,6 +283,32 @@ describe('Beispielturnier für make seed', () => {
 		expect(await stelleAnfrage(eigene.db, damen.id, mitgliedId, treffer[0].mitgliedId, jetzt)).toBe(
 			'ok'
 		);
+	});
+
+	test('A-ANLASS-01: Die 80 Spieler der Auffüllung antworten gemischt auf die Beispiel-GV', async () => {
+		const jetzt = new Date('2026-11-06T10:00:00Z');
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		const spieler = await beispielTurnierSpieler(eigene.db);
+		expect(spieler).toHaveLength(80);
+		const mitNummer = await eigene.db
+			.select({ id: mitglied.id })
+			.from(mitglied)
+			.where(like(mitglied.mitgliedernummer, '30%'));
+		expect([...spieler].sort((a, b) => a - b)).toEqual(
+			mitNummer.map((m) => m.id).sort((a, b) => a - b)
+		);
+
+		const { mitgliedId } = await legeMitgliedAn(eigene.db);
+		const gv = await legeBeispielAnlassAn(eigene.db, mitgliedId, jetzt);
+		await meldeBeispielAntworten(eigene.db, gv, spieler, jetzt, 0);
+		const antworten = await eigene.db
+			.select({ antwort: anlassAnmeldung.antwort })
+			.from(anlassAnmeldung)
+			.where(and(eq(anlassAnmeldung.anlassId, gv), inArray(anlassAnmeldung.mitgliedId, spieler)));
+		const zahl = (a: string) => antworten.filter((x) => x.antwort === a).length;
+		expect(zahl('kommt')).toBeGreaterThan(0);
+		expect(zahl('kommt-nicht')).toBeGreaterThan(0);
+		expect(antworten.length).toBeLessThan(spieler.length);
 	});
 
 	test('FR-55: Kontaktperson: setzt sie nur, solange keine gewählt ist', async () => {
