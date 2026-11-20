@@ -20,6 +20,7 @@ import {
 } from './beispiel-anlass.ts';
 import { legeBeispielInterclubAn } from './beispiel-interclub.ts';
 import { legeBeispielMitgliederAn } from './beispiel-mitglieder.ts';
+import { beispielTurnierSpieler } from './beispiel-turnier-fuellung.ts';
 import {
 	legeBeispielGespraecheAn,
 	legeBeispielTurnierAn,
@@ -67,10 +68,12 @@ async function seed(): Promise<void> {
 		await legeBeispielTurnierAn(db, jetzt);
 		// Interclub-Resultate 2026 aus Dateien, ohne Netz.
 		await legeBeispielInterclubAn(db, jetzt);
-		// Testbestand: rund 200 Mitglieder, ein zweiter Anlass, gemischte Antworten auf beide.
+		// Testbestand: rund 200 Mitglieder, ein zweiter Anlass, gemischte Antworten auf beide (auf die
+		// GV auch die 80 Spieler des Beispielturniers).
 		const bestand = await legeBeispielMitgliederAn(db, jetzt);
 		const clubabend = await legeBeispielClubabendAn(db, erika.id, jetzt);
-		await meldeBeispielAntworten(db, gv, bestand, jetzt, 0);
+		const turnierSpieler = await beispielTurnierSpieler(db);
+		await meldeBeispielAntworten(db, gv, [...bestand, ...turnierSpieler], jetzt, 0);
 		await meldeBeispielAntworten(db, clubabend, bestand, jetzt, 1);
 		// Je eine Persona mit nur einer Admin-Rolle, damit sich die Bereiche einzeln ausprobieren lassen.
 		const einzelrollen: [number, Rolle][] = [

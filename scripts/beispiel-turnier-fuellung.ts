@@ -355,3 +355,17 @@ export async function fuelleBeispielTurnierAuf(
 		}
 	}
 }
+
+/**
+ * IDs der Spieler der Auffüllung, nach Mitgliedernummer; leer, solange keiner angelegt ist.
+ * Wiedererkannt an der Nummer wie im Testbestand: Sie bleibt, auch wenn jemand lokal die E-Mail ändert.
+ */
+export async function beispielTurnierSpieler(db: Db): Promise<number[]> {
+	const nummern = erzeugeSpieler().alle.map((s) => s.werte.mitgliedernummer as string);
+	const zeilen = await db
+		.select({ id: mitglied.id })
+		.from(mitglied)
+		.where(inArray(mitglied.mitgliedernummer, nummern))
+		.orderBy(mitglied.mitgliedernummer);
+	return zeilen.map((z) => z.id);
+}

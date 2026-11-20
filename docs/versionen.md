@@ -11,6 +11,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- `make seed`: Auf die Beispiel-GV antworten auch die 80 Spieler des Beispielturniers, gemischt
+  wie der übrige Testbestand. An der App ändert sich nichts.
 - `make seed` füllt das Beispielturnier 2027 auf: 10 Kategorien (neu «Damen R1–R3» und
   «Seniorinnen 40+») mit je 10–16 Anmeldungen, 80 weitere erfundene Spieler mit Login, Paare über
   Anfrage und Annahme wie in der App. An der App ändert sich nichts.
