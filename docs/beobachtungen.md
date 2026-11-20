@@ -116,6 +116,24 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-19 — Test-Sperre: Zugangscookie geht mit dem Passwort-Hash an App und Mail-Fänger
+
+**Thema:** Sicherheit
+
+**Fundort:** `betrieb/caddy/umgebungen/test.caddy` (Cookie `mytco_test_zugang`, `reverse_proxy`).
+
+**Beobachtung:** Caddy reicht den Cookie-Kopf unverändert an die Test-App und an Mailpit weiter,
+also auch den Passwort-Hash im Zugangscookie. Dazu zwei Randfälle im Formular der Sperre: Es wertet
+jede 401 von `/api/status` als falsches Passwort (stimmt, solange die Schnittstelle nur 200 oder 503
+gibt), und ein Passwort mit Umlauten scheitert, wenn das Gerät sie zerlegt (NFD) statt fertig (NFC)
+schickt.
+
+**Ursprung:** Code-Review zu #39 (Test-Sperre mit Formular und Zugangscookie).
+
+**Einschätzung:** Kein Leck nach aussen: App und Mailpit loggen keine Cookies, beide stehen hinter
+der Sperre. Entfernen ginge mit `header_up` im `reverse_proxy`; lohnt erst, wenn dort je Köpfe
+protokolliert werden. Die Randfälle betreffen nur Test und ein Passwort ohne Umlaute.
+
 ### 2026-11-18 — Zähler test-neu-aufsetzen: nichts erzwingt das Erhöhen
 
 **Thema:** Arbeitsweise
