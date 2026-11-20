@@ -1,5 +1,6 @@
-// Nur lokal (make seed): eine erfundene Clubmeisterschaft 2027 mit Kategorien, damit die
-// Verwaltung beim Vorzeigen nicht leer ist (DS-08).
+// Nur lokal (make seed): eine erfundene Clubmeisterschaft 2027 mit 10 Kategorien, damit die
+// Verwaltung beim Vorzeigen nicht leer ist (DS-08). Die Beispielspieler unten zeigen die
+// Sonderfälle; beispiel-turnier-fuellung.ts füllt jede Kategorie auf 10–16 Anmeldungen auf.
 import { and, eq, isNull } from 'drizzle-orm';
 import {
 	beantrageWildcard,
@@ -24,6 +25,7 @@ import {
 	turnier
 } from '../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../src/lib/server/turnier/angaben.ts';
+import { fuelleBeispielTurnierAuf } from './beispiel-turnier-fuellung.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../src/lib/server/turnier/turniere.ts';
 
 const JAHR = 2027;
@@ -59,6 +61,15 @@ const KATEGORIEN: KategorieWerte[] = [
 	},
 	{
 		...OHNE,
+		name: 'Damen R1–R3',
+		geschlecht: 'damen',
+		art: 'einzel',
+		klassierungVon: 'R1',
+		klassierungBis: 'R3',
+		mindestsumme: null
+	},
+	{
+		...OHNE,
 		name: 'Junioren U18',
 		geschlecht: 'offen',
 		art: 'einzel',
@@ -73,6 +84,16 @@ const KATEGORIEN: KategorieWerte[] = [
 		geschlecht: 'herren',
 		art: 'einzel',
 		jahrgangBis: 1982,
+		klassierungVon: 'R1',
+		klassierungBis: 'R9',
+		mindestsumme: null
+	},
+	{
+		...OHNE,
+		name: 'Seniorinnen 40+',
+		geschlecht: 'damen',
+		art: 'einzel',
+		jahrgangBis: 1987,
 		klassierungVon: 'R1',
 		klassierungBis: 'R9',
 		mindestsumme: null
@@ -243,7 +264,13 @@ export async function legeBeispielTurnierAn(db: Db, jetzt: Date): Promise<void> 
 		.from(turnier)
 		.where(eq(turnier.jahr, JAHR));
 	if (vorhanden) {
+		// Ein Turnier aus einem früheren Seed bekommt die Kategorien, die seither dazukamen.
+		for (const k of KATEGORIEN) {
+			if (!(await kategorieNamens(db, vorhanden.id, k.name)))
+				await legeKategorieAn(db, vorhanden.id, k);
+		}
 		await legeBeispielAnmeldungenAn(db, vorhanden.id, jetzt);
+		await fuelleBeispielTurnierAuf(db, vorhanden.id, jetzt);
 		return;
 	}
 	const t = await legeTurnierAn(db, {
@@ -260,6 +287,7 @@ export async function legeBeispielTurnierAn(db: Db, jetzt: Date): Promise<void> 
 	// Nach dem Anmeldeschluss bleibt das Turnier in Vorbereitung ('schluss-vorbei').
 	await setzeStatus(db, t.id, 'offen', jetzt);
 	await legeBeispielAnmeldungenAn(db, t.id, jetzt);
+	await fuelleBeispielTurnierAuf(db, t.id, jetzt);
 }
 
 /** Kontaktperson des Beispielturniers (CM-Admin der Seed-Personas), nur solange keine gewählt ist. */

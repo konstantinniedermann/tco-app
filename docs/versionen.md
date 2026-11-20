@@ -11,6 +11,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- `make seed` füllt das Beispielturnier 2027 auf: 10 Kategorien (neu «Damen R1–R3» und
+  «Seniorinnen 40+») mit je 10–16 Anmeldungen, 80 weitere erfundene Spieler mit Login, Paare über
+  Anfrage und Annahme wie in der App. An der App ändert sich nichts.
 - Test fragt das Test-Passwort in einem Formular statt im Fenster des Browsers ab, einmal je
   Gerät; danach merkt sich ein Cookie den Zugang für ein Jahr. So läuft Test auch als App auf dem
   iPhone-Startbildschirm, und Manifest und Service Worker laden ohne Passwort (#39). An der App

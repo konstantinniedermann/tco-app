@@ -173,7 +173,9 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
   (`scripts/beispiel-mitglieder.ts`) kombiniert feste Vornamen mit erkennbar erfundenen
   Nachnamen zu 185 Mitgliedern (zusammen mit den Personas rund 200), ohne Zufall und ohne
   Bibliothek; dazu ein zweiter Anlass mit gemischten Antworten. Er ist bei jedem Lauf gleich und
-  legt nichts doppelt an.
+  legt nichts doppelt an. Nach derselben Regel füllt `scripts/beispiel-turnier-fuellung.ts` das
+  Beispielturnier mit 80 weiteren erfundenen Spielern (Login ohne Brief-Code) auf 10 Kategorien zu
+  je 10–16 Anmeldungen auf.
 - Jeder E2E-Lauf (`npm run e2e`, also auch `make e2e`, `make check`, der Pre-Push-Hook und die
   CI) läuft über `scripts/e2e.ts` auf einer eigenen, frisch angelegten Datenbank
   (`mytco_e2e_<Zeit>_<Zufall>`) und löscht sie danach; Reste abgebrochener Läufe, die älter als
