@@ -116,6 +116,30 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-20 — make seed legt nach dem 31.05.2027 keine Turnier-Anmeldungen mehr an
+
+**Thema:** Tests
+
+**Fundort:** `scripts/beispiel-turnier.ts` (`JAHR = 2027`, Anmeldeschluss `2027-05-31`), `scripts/beispiel-turnier-fuellung.ts`.
+
+**Beobachtung:** `make seed` nimmt die echte Uhrzeit. Nach dem Anmeldeschluss bleibt das Beispielturnier in Vorbereitung, die Beispielanmeldungen ergeben still `geschlossen`, und die Auffüllung läuft nicht. Die DB-Tests bleiben grün, weil sie ein festes Datum nutzen.
+
+**Ursprung:** Review des Branches `feat/seed-testturnier`.
+
+**Einschätzung:** Jahr und Schluss relativ zum Seed-Datum setzen, spätestens im Frühling 2027.
+
+### 2026-11-20 — Test «pruefen.sh: alles sicher» einmal rot, danach zweimal grün
+
+**Thema:** Tests
+
+**Fundort:** `tests/betrieb/server.test.ts`, `describe('pruefen.sh')`, Test «alles sicher: jede Massnahme ok, letzte Zeile ok, Exit 0».
+
+**Beobachtung:** In `make check-schnell` schlug genau dieser Test einmal fehl; zwei Wiederholungen ohne Änderung waren grün. Der Branch fasste nur Seed-Skripte und Doku an. Die Fehlermeldung war in der gekürzten Ausgabe nicht zu sehen (vermutlich Zeitgrenze, der Test ruft ein Shell-Skript auf).
+
+**Ursprung:** Branch `feat/seed-testturnier` (Beispielturnier auffüllen).
+
+**Einschätzung:** Wackeltest; beim nächsten Auftreten die volle Meldung festhalten, dann Zeitgrenze oder Ablauf prüfen.
+
 ### 2026-11-19 — Test-Sperre: Zugangscookie geht mit dem Passwort-Hash an App und Mail-Fänger
 
 **Thema:** Sicherheit
