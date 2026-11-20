@@ -1,10 +1,11 @@
-import { and, count, eq, isNotNull, isNull } from 'drizzle-orm';
+import { and, count, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { legeBeispielTurnierAn, setzeBeispielKontakt } from '../../scripts/beispiel-turnier.ts';
 import {
 	anmeldung,
 	anmeldungSpieler,
 	kategorie,
+	konto,
 	mitglied,
 	partnerAnfrage,
 	turnier,
@@ -23,7 +24,7 @@ afterAll(async () => {
 });
 
 describe('Beispielturnier für make seed', () => {
-	test('A-TURNIER-01: Beispielturnier 2027 mit 8 Kategorien, zweiter Lauf legt nichts doppelt an', async () => {
+	test('A-TURNIER-01: Beispielturnier 2027 mit 10 Kategorien, zweiter Lauf legt nichts doppelt an', async () => {
 		const jetzt = new Date('2026-11-06T10:00:00Z');
 		await legeBeispielTurnierAn(eigene.db, jetzt);
 		await legeBeispielTurnierAn(eigene.db, jetzt);
@@ -40,14 +41,55 @@ describe('Beispielturnier für make seed', () => {
 		const kategorien = await eigene.db.select().from(kategorie);
 		expect(kategorien.map((k) => k.name).sort()).toEqual([
 			'Damen Doppel',
+			'Damen R1–R3',
 			'Damen R4–R9',
 			'Herren Doppel',
 			'Herren R1–R6',
 			'Herren R7–R9',
 			'Junioren U18',
 			'Mixed Doppel',
-			'Senioren 45+'
+			'Senioren 45+',
+			'Seniorinnen 40+'
 		]);
+	});
+
+	test('A-ANMELDUNG-01: Jede Kategorie hat 10–16 aktive Anmeldungen, jeder Spieler ein Konto mit Login, zweiter Lauf ändert nichts', async () => {
+		const jetzt = new Date('2026-11-06T10:00:00Z');
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		const zaehlen = async () =>
+			eigene.db
+				.select({ name: kategorie.name, n: count() })
+				.from(anmeldung)
+				.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
+				.where(inArray(anmeldung.status, ['bestaetigt', 'beantragt']))
+				.groupBy(kategorie.name);
+		const erste = await zaehlen();
+		expect(erste).toHaveLength(10);
+		for (const { name, n } of erste) {
+			expect(n, name).toBeGreaterThanOrEqual(10);
+			expect(n, name).toBeLessThanOrEqual(16);
+		}
+		const ohneLogin = await eigene.db
+			.select({ email: mitglied.email })
+			.from(anmeldungSpieler)
+			.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId))
+			.leftJoin(konto, eq(konto.mitgliedId, mitglied.id))
+			.where(isNull(konto.briefCodeBenutztAm));
+		expect(ohneLogin).toEqual([]);
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		expect(await zaehlen()).toEqual(erste);
+	});
+
+	test('A-TURNIER-01: Fehlen einem vorhandenen Beispielturnier Kategorien, kommen sie dazu', async () => {
+		const jetzt = new Date('2026-11-06T10:00:00Z');
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		await eigene.db.delete(kategorie).where(eq(kategorie.name, 'Seniorinnen 40+'));
+		await legeBeispielTurnierAn(eigene.db, jetzt);
+		const da = await eigene.db
+			.select({ id: kategorie.id })
+			.from(kategorie)
+			.where(eq(kategorie.name, 'Seniorinnen 40+'));
+		expect(da).toHaveLength(1);
 	});
 
 	test('A-ANMELDUNG-01: Beispielturnier hat erfundene Anmeldungen, zweiter Lauf legt nichts doppelt an', async () => {
@@ -127,7 +169,10 @@ describe('Beispielturnier für make seed', () => {
 			.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
 			.innerJoin(mitglied, eq(mitglied.id, anmeldungSpieler.mitgliedId))
 			.where(and(eq(kategorie.art, 'doppel'), eq(anmeldung.status, 'bestaetigt')));
-		const je = (name: string) => doppel.filter((d) => d.kategorie === name);
+		// Nur die Beispielspieler; die Auffüllung bringt weitere Paare und Suchende.
+		const beispiel = ['Max', 'Lena', 'Sara', 'Paul', 'Urs', 'Nico'];
+		const je = (name: string) =>
+			doppel.filter((d) => d.kategorie === name && beispiel.includes(d.vorname));
 		const mixed = je('Mixed Doppel');
 		expect(mixed.map((d) => d.vorname).sort()).toEqual(['Lena', 'Max']);
 		expect(new Set(mixed.map((d) => d.anmeldungId)).size).toBe(1);
