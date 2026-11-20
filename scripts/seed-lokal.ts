@@ -72,7 +72,6 @@ async function seed(): Promise<void> {
 		// GV auch die 80 Spieler des Beispielturniers).
 		const bestand = await legeBeispielMitgliederAn(db, jetzt);
 		const clubabend = await legeBeispielClubabendAn(db, erika.id, jetzt);
-		// Auf die GV antworten auch die Spieler des Beispielturniers.
 		const turnierSpieler = await beispielTurnierSpieler(db);
 		await meldeBeispielAntworten(db, gv, [...bestand, ...turnierSpieler], jetzt, 0);
 		await meldeBeispielAntworten(db, clubabend, bestand, jetzt, 1);
