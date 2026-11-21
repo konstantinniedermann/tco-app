@@ -382,7 +382,8 @@ describe('Beispielturnier nach dem Anmeldeschluss des laufenden Jahres', () => {
 			.from(gespraech)
 			.where(eq(gespraech.turnierId, t.id));
 		expect(gespraeche).toHaveLength(2);
-	});
+		// Ein voller Seed: einzeln rund 1 s, im vollen Lauf mit Abdeckung deutlich mehr.
+	}, 20_000);
 });
 
 describe('Beispielturnier im Folgejahr auf einer bestehenden Datenbank', () => {
@@ -419,5 +420,6 @@ describe('Beispielturnier im Folgejahr auf einer bestehenden Datenbank', () => {
 		// Ein zweiter Lauf im Folgejahr legt nichts doppelt an.
 		await legeBeispielTurnierAn(bestehend.db, spaeter);
 		expect(await zaehlen(2028)).toEqual(neu);
-	});
+		// Drei Seeds mit je 80 Spielern: einzeln rund 2 s, im vollen Lauf mit Abdeckung über 5 s.
+	}, 20_000);
 });
