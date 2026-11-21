@@ -384,3 +384,40 @@ describe('Beispielturnier nach dem Anmeldeschluss des laufenden Jahres', () => {
 		expect(gespraeche).toHaveLength(2);
 	});
 });
+
+describe('Beispielturnier im Folgejahr auf einer bestehenden Datenbank', () => {
+	let bestehend: EigeneDatenbank;
+	beforeAll(async () => {
+		bestehend = await legeEigeneDatenbankAn('beispielturnier_folgejahr');
+	});
+	afterAll(async () => {
+		await bestehend.abbauen();
+	});
+
+	test('A-ANMELDUNG-01: Nach einem Seed für 2027 füllt der Seed ab dem 1.6.2027 auch die CM 2028 auf, die CM 2027 bleibt', async () => {
+		await legeBeispielTurnierAn(bestehend.db, new Date('2026-11-06T10:00:00Z'));
+		const zaehlen = async (jahr: number) =>
+			bestehend.db
+				.select({ name: kategorie.name, n: count() })
+				.from(anmeldung)
+				.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
+				.innerJoin(turnier, eq(turnier.id, kategorie.turnierId))
+				.where(and(eq(turnier.jahr, jahr), inArray(anmeldung.status, ['bestaetigt', 'beantragt'])))
+				.groupBy(kategorie.name)
+				.orderBy(kategorie.name);
+		const vorher = await zaehlen(2027);
+
+		const spaeter = new Date('2027-06-15T10:00:00Z');
+		await legeBeispielTurnierAn(bestehend.db, spaeter);
+		const neu = await zaehlen(2028);
+		expect(neu).toHaveLength(10);
+		for (const { name, n } of neu) {
+			expect(n, name).toBeGreaterThanOrEqual(10);
+			expect(n, name).toBeLessThanOrEqual(16);
+		}
+		expect(await zaehlen(2027)).toEqual(vorher);
+		// Ein zweiter Lauf im Folgejahr legt nichts doppelt an.
+		await legeBeispielTurnierAn(bestehend.db, spaeter);
+		expect(await zaehlen(2028)).toEqual(neu);
+	});
+});
