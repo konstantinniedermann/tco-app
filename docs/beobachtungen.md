@@ -121,6 +121,26 @@ Letzte Auswertung: 21.11.2026
 
 ## Offen
 
+### 2026-11-21 — Test-Sperre: das Formular schickt das Test-Passwort im Klartext auch an die App
+
+**Thema:** Sicherheit
+
+**Fundort:** `betrieb/caddy/umgebungen/test.caddy` (Formular: `Authorization: Basic …` an
+`/api/status`; `basic_auth`, danach `reverse_proxy app-test:3000` ohne `header_up`).
+
+**Beobachtung:** Bei jedem Anmeldeversuch an der Test-Sperre geht der Kopf `Authorization` mit
+Benutzer und Passwort (Base64, also Klartext) an Caddy. Nichts in `test.caddy` oder `Caddyfile`
+entfernt ihn vor dem Weiterreichen; dann bekäme die Test-App das Passwort. Ob Caddy `basic_auth`
+den Kopf weiterreicht, ist nicht gemessen.
+
+**Ursprung:** Beobachtungs-Auswertung vom 21.11.2026, Nebenbefund beim Prüfen von «Test-Sperre:
+Zugangscookie» (jener Eintrag ist abgehakt: zurück, wenn App, Mailpit oder Caddy Köpfe
+protokollieren).
+
+**Einschätzung:** Vorläufig. Dieselbe Klasse wie der Cookie mit dem Hash, aber das Passwort
+selbst; die App protokolliert keine Köpfe, das Test-Passwort ist bewusst einfach. Abhilfe wäre
+`header_up -Authorization` (und `-Cookie`) in den `reverse_proxy`-Blöcken von Test.
+
 ### 2026-11-21 — Offene Partner-Anfragen zeigen den Kontakt, solange der Anfragende ein Login hat
 
 **Thema:** Datenschutz
@@ -262,7 +282,7 @@ dort keine Adressen.
 Repo. (1) mechanisch ersetzbar, eigener kleiner Branch; ob die Prüfung Telefonnummern prüfen
 soll, mit entscheiden. (2) Ordner mit Präfix `beispiel-` mitzählen, mit Testfall.
 
-**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`scripts/pruefungen/testdaten.ts` → nur Muster `MAIL`, `istTestdatei` ohne Ordner `beispiel-interclub/`; `docs/testkonzept.md` «Telefonnummern im Format `+41 00 …`»). Nachgezählt: 17 Dateien mit 76 Fundstellen (`git grep -lE '(\+41 ?\(?7[0-9]|07[0-9] ?[0-9]{3})' -- tests/ 'src/**/*.test.ts'`), dazu `tests/e2e/neue-version.test.ts`; unter `beispiel-interclub/` fallen 82 Dateien durch (63 `bericht-*`, 17 `team-results-*`, 2 `club-teams-*`), ohne Mail oder Telefon. Offen ist nur, ob ersetzt wird und ob die Prüfung Telefonnummern mitprüft.
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`scripts/pruefungen/testdaten.ts` → nur Muster `MAIL`, `istTestdatei` ohne Ordner `beispiel-interclub/`; `docs/testkonzept.md` «Telefonnummern im Format `+41 00 …`»). Nachgezählt: 17 Dateien mit 76 Fundstellen (`git grep -lE '(\+41 ?\(?7[0-9]|07[0-9] ?[0-9]{3})' -- tests/ 'src/**/*.test.ts'`), darunter neu `tests/e2e/neue-version.test.ts`; unter `beispiel-interclub/` fallen 82 Dateien durch (63 `bericht-*`, 17 `team-results-*`, 2 `club-teams-*`), ohne Mail oder Telefon. Offen ist nur, ob ersetzt wird und ob die Prüfung Telefonnummern mitprüft.
 
 ### 2026-11-15 — Dauerregeln der `CLAUDE.md` sagen an fünf Stellen mehr als der Code
 
@@ -331,7 +351,7 @@ unbedingt auf den Titel derselben Anfrage, wenn sie noch steht, die Fehlerzweige
 Taste der Kategorie. Aufwand dort: Seite und Vorab-E2E anpassen, vor dem Merge einmal die CI auf
 dem Branch (Skill `tco-branching`, Schritt 3).
 
-**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`src/routes/clubmeisterschaft/[id]/+page.svelte` → `fokusNachAnfrage` bricht ab, wenn die Taste den Fokus noch hat, und nimmt den ersten Titel; `src/lib/cm/ablauf.ts` ohne Fokus in den Fehlerzweigen; `tests/e2e/cm-ablauf.test.ts` prüft nur «nicht `document.body`»). B2/H-27 ist nicht umgesetzt. Am 14.11. waren es drei rote iPhone-Läufe in `cm-ablauf.test.ts`, nicht zwei. Offen ist nur, wann es gebaut wird.
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`src/routes/clubmeisterschaft/[id]/+page.svelte` → `fokusNachAnfrage` bricht ab, wenn die Taste den Fokus noch hat, und nimmt den ersten Titel; `src/lib/cm/ablauf.ts` ohne Fokus in den Fehlerzweigen; `tests/e2e/cm-ablauf.test.ts` prüft nur «nicht `document.body`»). B2/H-27 ist nicht umgesetzt. Offen ist nur, wann es gebaut wird.
 
 ### 2026-11-13 — Interclub: Kleinigkeiten der Seite einer Begegnung
 
