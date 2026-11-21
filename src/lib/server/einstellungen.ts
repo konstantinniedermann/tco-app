@@ -40,7 +40,9 @@ export function leseEinstellungen(
 	}
 	const smtpUrl = pflicht(env, 'MYTCO_SMTP_URL');
 	if (env.NODE_ENV === 'production' && !tlsErzwungen(smtpUrl)) {
-		throw new Error('MYTCO_SMTP_URL ohne TLS (smtps:// oder requireTLS=true)');
+		throw new Error(
+			'MYTCO_SMTP_URL ohne TLS (smtps:// oder requireTLS=true, ohne die Zertifikatsprüfung abzuschalten)'
+		);
 	}
 	const mailNurAn = env.MAIL_NUR_AN?.trim() || undefined;
 	// Genau eine nackte Adresse: keine Listentrenner (, ;) und keine Form «Name <a@b>».

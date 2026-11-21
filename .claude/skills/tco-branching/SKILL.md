@@ -65,7 +65,12 @@ eigene `.env` (`cp .env.example .env`); sie ist gitignoriert und fehlt in jedem 
 Alle Worktrees teilen die lokale Datenbank `mytco` für `make dev`, `make dev-handy` und
 `make seed`; `make seed` spielt dort die Migrationen des eigenen Branches ein (`make dev` nicht:
 vorher einmal `make seed`). Eine Migration, die schon eingespielt wurde, wird darum nie neu
-erzeugt — eine Änderung kommt als neue Migration dazu.
+erzeugt — eine Änderung kommt als neue Migration dazu. Zwei parallele Branches bekommen aus
+`npm run db:generate` dieselbe nächste Nummer: vor dem Merge `git log HEAD..origin/dev -- drizzle/`
+prüfen; liegt dort eine neue Migration, im Worktree `git merge origin/dev` und die von `dev`
+unverändert übernehmen. Die eigene (Datei, Snapshot, Journal-Eintrag) nur dann verwerfen und neu
+erzeugen, wenn sie nie auf `dev` oder `mytco` eingespielt wurde (auch nicht über `make seed`);
+sonst bleibt sie und eine neue Migration kommt dazu.
 
 **E2E und `make check` nehmen `mytco` nicht:** `npm run e2e` (`scripts/e2e.ts`) legt für jeden
 Lauf eine eigene, frisch migrierte Datenbank an und löscht sie danach; ebenso baut jeder Lauf in
@@ -161,7 +166,9 @@ Ein Revert eines Merges mit Code braucht einen eigenen Eintrag unter «Unveröff
 **Dependabot-PRs** werden nicht auf GitHub gemergt, sondern wie ein Branch über diesen Schritt:
 `git -C $M fetch origin`, dann `git -C $M merge --no-ff --no-commit origin/<branch des PR>` und
 weiter wie oben, ohne Nummer: Wer mergt, schreibt unter «Unveröffentlicht» den Eintrag
-«Abhängigkeiten aktualisiert». GitHub schliesst den PR nach dem Push von selbst
+«Abhängigkeiten aktualisiert (…)» mit den wichtigsten Paketen in der Klammer. Eine Zeile, die
+wortgleich schon unter «Unveröffentlicht» steht, zählt für den Hook nicht als neu (ein zweites
+nacktes «Abhängigkeiten aktualisiert» wird abgewiesen). GitHub schliesst den PR nach dem Push von selbst
 als gemergt. Ein Merge auf GitHub ginge am Hook vorbei.
 
 Brachte der Merge eine geänderte `package-lock.json`, vor dem nächsten Push im Hauptordner

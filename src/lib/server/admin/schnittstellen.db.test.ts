@@ -666,11 +666,11 @@ describe('Admin-Schnittstellen', () => {
 	test('A-MITGLIED-02: Liste mit Suche und Status; ungültiger Status → 400', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
-		const eins = await legeMitgliedAn(db, { nachname: 'Zufallsname-Qwxz' });
+		const eins = await legeMitgliedAn(db, { nachname: 'Zufallsname-Qwxz-7' });
 		const url = (q: string) => `http://localhost/api/admin/mitglieder?${q}`;
 		const liste = await getMitglieder(
 			s.d,
-			ereignis({ method: 'GET', url: url('suche=Qwxz'), konto: admin.konto })
+			ereignis({ method: 'GET', url: url('suche=Qwxz-7'), konto: admin.konto })
 		);
 		expect(liste.status).toBe(200);
 		const zeilen = (await liste.json()) as { id: number }[];
@@ -690,12 +690,12 @@ describe('Admin-Schnittstellen', () => {
 	test('A-MITGLIED-02: leerer Status-Filter («Alle») wirkt wie kein Filter', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
-		const eins = await legeMitgliedAn(db, { nachname: 'Leerfilter-Qwxy' });
+		const eins = await legeMitgliedAn(db, { nachname: 'Leerfilter-Qwxy-7' });
 		const r = await getMitglieder(
 			s.d,
 			ereignis({
 				method: 'GET',
-				url: 'http://localhost/api/admin/mitglieder?suche=Qwxy&status=',
+				url: 'http://localhost/api/admin/mitglieder?suche=Qwxy-7&status=',
 				konto: admin.konto
 			})
 		);

@@ -50,7 +50,7 @@ jeder Eintrag genau einen von sechs Ausgängen:
 
 | Ausgang | Bedeutung |
 |---------|-----------|
-| **Verworfen** | Die Behauptung trifft nicht zu. Eintrag wandert mit **Gegenbeleg** ins [Archiv](beobachtungen-archiv.md) — der Beleg verhindert, dass derselbe Fund wiederkommt |
+| **Verworfen** | Die Behauptung trifft nicht zu. Der **Gegenbeleg** steht in der Commit-Nachricht der Auswertung — er verhindert, dass derselbe Fund wiederkommt |
 | **Abhaken** | Trifft zu, wir tun bewusst nichts. Mit Begründung, und wo sinnvoll mit **Reevaluations-Trigger** („kommt zurück, wenn …") |
 | **Mitmachen** | Trivial-Fix, sofort erledigt, eigener Commit |
 | **Doku / Regel / Memory** | Erkenntnis ohne Vorgang — ADR, arc42, `CLAUDE.md` oder Memory |
@@ -106,15 +106,37 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 - **„Notieren" ist kein Ausgang.** Es klingt nach Entscheidung, ist aber
   Vertagung, und genau daran wächst die Datei. Wo etwas später wieder relevant
   wird, ist der richtige Ausgang „Abhaken **mit Trigger**".
-- **Erledigtes wird eingedampft** und wandert ins [Archiv](beobachtungen-archiv.md),
-  als neuer Block pro Auswertung (neuester oben): eine Zeile mit Ausgang und Verweis; die Begründung lebt dort, wo sie hingehört (Issue-Body, Commit,
-  Memory). Ausnahme sind verworfene Einträge — die behalten ihren Gegenbeleg.
+- **Erledigtes wird gelöscht, nicht archiviert.** Je Eintrag eine Zeile (Titel, Ausgang,
+  Verweis), die Bilanz und bei verworfenen Einträgen der Gegenbeleg stehen in der
+  Commit-Nachricht der Auswertung, deren Betreff mit `docs: Beobachtungs-Auswertung` beginnt;
+  wiederfinden mit `git log --grep='Beobachtungs-Auswertung' -- docs/beobachtungen.md`. Die
+  Begründung lebt dort, wo sie hingehört (Issue-Body, Commit, Doku, Memory).
 
-Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
+Ausgewertete Einträge bis zum 18.11.2026 stehen im [Archiv](beobachtungen-archiv.md); es wird nicht
+mehr fortgeschrieben.
+
+Letzte Auswertung: 21.11.2026
 
 ---
 
 ## Offen
+
+### 2026-11-21 — Offene Partner-Anfragen zeigen den Kontakt, solange der Anfragende ein Login hat
+
+**Thema:** Datenschutz
+
+**Fundort:** `src/lib/server/cm/anmeldungen.ts` (`offeneAnfragenAn`, Bedingung `anfrageVonMitLogin`).
+
+**Beobachtung:** Beim Anfragenden prüft die Abfrage nur, ob er ein nutzbares Login hat, nicht
+`mitglied.status`. Austritt und Löschvormerkung räumen die Anfragen heute weg
+(`zieheOffeneZurueck`) bzw. sperren das Login. Ob jeder Weg zu «nicht aktiv» eines von beiden
+tut, ist nicht geprüft.
+
+**Ursprung:** Beobachtungs-Auswertung vom 21.11.2026, Nebenbefund beim Prüfen von
+«Kontakt des Doppelpartners».
+
+**Einschätzung:** Vorläufig, ungeprüft. Gehört zur Grenze «Ende der CM» (Eintrag vom
+16.11.2026) und sollte mit ihr angesehen werden.
 
 ### 2026-11-21 — Interclub: auf Test nur die Saison 2026, ältere Saisons nachladen
 
@@ -134,6 +156,10 @@ fehlen dort. Das Aufsetzen von Test (`scripts/testdaten.ts`) legt keine Interclu
 2026 möglich; dauerhaft löst es der regelmässige Abruf (#81, Teil 3), oder Test lädt beim
 Aufsetzen selbst.
 
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`Dockerfile`: kopiert nur `migrate.ts`, `testdaten.ts`, `erfundene-mitglieder.ts`, `admin-festlegen.ts`, nicht `ic-import.ts`; `scripts/testdaten.ts` legt keine IC-Daten an; `betrieb/bin/ausliefern` → `compose test down --volumes` beim Neu-Aufsetzen). Der Stand auf Test selbst ist nicht nachgemessen.
+
+**Korrektur (21.11.2026, Beobachtungs-Auswertung).** #81 Teil 3 sieht weder das Nachladen alter Saisons noch Daten beim Aufsetzen von Test vor («regelmässiger Abruf, Push (kein Löschen alter Saisons)»); ein Abruf nur der laufenden Saison brächte 2021–2025 nach einem Neu-Aufsetzen nicht zurück. Offen ist nur die Entscheidung, ob das zu #81 kommt oder ein eigener Vorgang wird.
+
 ### 2026-11-21 — Interclub: ältere Saisons in der Ansicht kaum erreichbar
 
 **Thema:** Interclub
@@ -150,6 +176,8 @@ nicht. Sind 2021–2025 geladen, kommt man an sie nicht bequem heran.
 Entwurf (UI-Leitbild, Design-Artifact «MyTCO Interclub»), bevor gebaut wird; passt zu den
 Saisonverläufen, für die Personen- und Ranglistennummern schon gespeichert sind.
 
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`src/lib/server/interclub/ansicht.ts` → `ladeUebersicht` nimmt `max(icTeam.saison)`, `ladeTeam` und `ladeBegegnung` je Team-Nummer die neueste Saison; die Schnittstellen kennen keinen Saison-Parameter; `ansicht.db.test.ts` «Team-Id früherer Saison zeigt die neueste»). #81 enthält keine Saisonwahl. Offen ist nur, wann der Entwurf gemacht wird.
+
 ### 2026-11-20 — make seed legt nach dem 31.05.2027 keine Turnier-Anmeldungen mehr an
 
 **Thema:** Tests
@@ -162,132 +190,9 @@ Saisonverläufen, für die Personen- und Ranglistennummern schon gespeichert sin
 
 **Einschätzung:** Jahr und Schluss relativ zum Seed-Datum setzen, spätestens im Frühling 2027.
 
-### 2026-11-20 — Test «pruefen.sh: alles sicher» einmal rot, danach zweimal grün
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`scripts/seed-lokal.ts` → `new Date()` an `legeBeispielTurnierAn`; `beispiel-turnier.ts` verwirft das Ergebnis von `setzeStatus`; `beispiel-turnier-fuellung.ts` bricht ohne Meldung ab, wenn das Turnier nicht `offen` ist).
 
-**Thema:** Tests
-
-**Fundort:** `tests/betrieb/server.test.ts`, `describe('pruefen.sh')`, Test «alles sicher: jede Massnahme ok, letzte Zeile ok, Exit 0».
-
-**Beobachtung:** In `make check-schnell` schlug genau dieser Test einmal fehl; zwei Wiederholungen ohne Änderung waren grün. Der Branch fasste nur Seed-Skripte und Doku an. Die Fehlermeldung war in der gekürzten Ausgabe nicht zu sehen (vermutlich Zeitgrenze, der Test ruft ein Shell-Skript auf).
-
-**Ursprung:** Branch `feat/seed-testturnier` (Beispielturnier auffüllen).
-
-**Einschätzung:** Wackeltest; beim nächsten Auftreten die volle Meldung festhalten, dann Zeitgrenze oder Ablauf prüfen.
-
-### 2026-11-19 — Test-Sperre: Zugangscookie geht mit dem Passwort-Hash an App und Mail-Fänger
-
-**Thema:** Sicherheit
-
-**Fundort:** `betrieb/caddy/umgebungen/test.caddy` (Cookie `mytco_test_zugang`, `reverse_proxy`).
-
-**Beobachtung:** Caddy reicht den Cookie-Kopf unverändert an die Test-App und an Mailpit weiter,
-also auch den Passwort-Hash im Zugangscookie. Dazu zwei Randfälle im Formular der Sperre: Es wertet
-jede 401 von `/api/status` als falsches Passwort (stimmt, solange die Schnittstelle nur 200 oder 503
-gibt), und ein Passwort mit Umlauten scheitert, wenn das Gerät sie zerlegt (NFD) statt fertig (NFC)
-schickt.
-
-**Ursprung:** Code-Review zu #39 (Test-Sperre mit Formular und Zugangscookie).
-
-**Einschätzung:** Kein Leck nach aussen: App und Mailpit loggen keine Cookies, beide stehen hinter
-der Sperre. Entfernen ginge mit `header_up` im `reverse_proxy`; lohnt erst, wenn dort je Köpfe
-protokolliert werden. Die Randfälle betreffen nur Test und ein Passwort ohne Umlaute.
-
-### 2026-11-18 — Zähler test-neu-aufsetzen: nichts erzwingt das Erhöhen
-
-**Thema:** Arbeitsweise
-
-**Fundort:** `betrieb/test-neu-aufsetzen`, `scripts/testdaten.ts`, `scripts/erfundene-mitglieder.ts`
-
-**Beobachtung:** Ändert ein Branch, wie Testdaten oder Konten entstehen, und erhöht den Zähler
-nicht, kommen die neuen Testdaten still nie auf Test. Heute stehen nur Hinweise im Kopfkommentar
-von `testdaten.ts`, in den Context-Scopes und in `betrieb/README.md`.
-
-**Ursprung:** #39, `merge-reviewer` zum Zähler (Befund 3, Hinweise mitgemacht)
-
-**Einschätzung:** Eine Prüfung unter `scripts/pruefungen/` (Änderung an den Testdaten-Skripten
-ohne Änderung am Zähler → Warnung) wäre die stärkere Lösung; lohnt erst, wenn es einmal passiert.
-
-### 2026-11-18 — Übernahme des Zählers hängt an `zustand/aktuell`, nicht an vorhandenen Daten
-
-**Thema:** Betrieb
-
-**Fundort:** `betrieb/bin/ausliefern` (Entscheid «neu aufsetzen», Zweig ohne `neu-aufgesetzt`)
-
-**Beobachtung:** Fehlt `test/zustand/neu-aufgesetzt`, gibt es aber `zustand/aktuell`, wird der
-Zähler ohne Neuaufsetzen übernommen. Hat eine ältere Fassung Test leer zurückgelassen, bliebe es
-leer bis zur nächsten Erhöhung des Zählers.
-
-**Ursprung:** #39, `merge-reviewer` zum Zähler (Befund 6)
-
-**Einschätzung:** Nur Übergang vom alten auf das neue `ausliefern`; der laufende Test-Server hat
-Daten und den Zähler schon übernommen. Abhilfe von Hand: Zähler erhöhen.
-
-### 2026-11-18 — Türsteher-Ordner liegt in einem Ordner, der `mytco` gehört
-
-**Thema:** Sicherheit
-
-**Fundort:** `betrieb/server/einrichten.sh` (`/opt/mytco/bin` root:root 0755 in `/opt/mytco`, mytco 0750)
-
-**Beobachtung:** `mytco` kann `/opt/mytco/bin` zwar nicht beschreiben, aber im eigenen Ordner
-`/opt/mytco` umbenennen und durch einen eigenen ersetzen; der Schutz «nie aus dem Image» ist
-damit nur ein Schutz gegen Versehen. Über die Docker-Gruppe ginge es ohnehin (Restrisiko im
-Sicherheitskonzept).
-
-**Ursprung:** #39, Code-Review der Server-Einrichtung (Minor, zurückgestellt)
-
-**Einschätzung:** Ein Ort ausserhalb, z. B. `/usr/local/lib/mytco`, wäre sauberer; ändert Pfad in
-`authorized_keys`, Doku und Türsteher. Klein, aber kein Gewinn gegen die Docker-Gruppe.
-
-### 2026-11-18 — Fehlermeldung zur SMTP-URL passt nicht bei abgeschalteter Zertifikatsprüfung
-
-**Thema:** Sicherheit
-
-**Fundort:** `src/lib/server/einstellungen.ts` (`tlsErzwungen`, Meldung «MYTCO_SMTP_URL ohne TLS (smtps:// oder requireTLS=true)»)
-
-**Beobachtung:** Seit #39 weist die App auch `tls.rejectUnauthorized=false` und `ignoreTLS=true`
-ab, meldet aber dieselbe Meldung, die zu `requireTLS=true` rät, obwohl das schon gesetzt sein kann.
-
-**Ursprung:** #39, Code-Review (Minor, zurückgestellt)
-
-**Einschätzung:** Meldung um «ohne Abschalten der Zertifikatsprüfung» ergänzen; Tests prüfen den
-Wortlaut mit.
-
-### 2026-11-18 — Restpunkte zu E-65: WebKit beim Neuladen, alter Service Worker
-
-**Thema:** Tests
-
-**Fundort:** `tests/e2e/neue-version.test.ts`, `src/service-worker/`, `docs/ci-cd-und-release.md` («Alte Versionen auf dem Handy»)
-
-**Beobachtung:** E-65 ist mit #39 umgesetzt (Links laden nach einer neuen Fassung ganz neu). Offen
-aus der Ergänzung vom 15.11.2026: (1) WebKit meldet abgebrochene Abrufe auch beim Neuladen, das
-SvelteKit macht, wenn ein Seitenwechsel scheitert (Code der Zielseite fehlt); kein E2E prüft
-diesen Fehlerfall. (2) Ändert ein Release die Form der Push-Nutzlast, zeigt ein noch aktiver
-alter Service Worker den Push womöglich nicht an, bis er abgelöst ist (Vermutung, nicht geprüft).
-
-**Ursprung:** #39, Merge-Review zu E-65
-
-**Einschätzung:** (2) wird erst relevant, wenn sich die Push-Nutzlast ändert; dann vor dem Release
-prüfen. (1) ist mit den neuen Reload-Links seltener geworden; ein E2E dafür bräuchte einen
-fehlenden Seiten-Code auf dem Server.
-
-### 2026-11-18 — Kein Prüflauf merkt, wenn das Image die Testdaten nicht laden kann
-
-**Thema:** Tests
-
-**Fundort:** `Dockerfile` (Laufzeit-Image), `betrieb/nachweis/rauchtest.sh`, `make check`
-
-**Beobachtung:** `scripts/testdaten.ts` scheiterte im Image mit `ERR_MODULE_NOT_FOUND`
-(`src/lib/anlass/zeit.ts`), weil das Image nur `src/lib/server` kopierte, der Server-Code aber
-geteilte Module unter `src/lib` importiert. Aufgefallen ist es nur in `make betrieb-nachweis`,
-das nicht zu `make check` und nicht zur CI gehört; der Rauchtest der CI führt nur
-`migrate.ts` aus. Die erste Auslieferung auf Test wäre daran gescheitert. Behoben in #39
-(Image kopiert ganz `src/lib`).
-
-**Ursprung:** #39, lokaler Nachweis vor der Inbetriebnahme
-
-**Einschätzung:** Der Rauchtest könnte `testdaten.ts` gegen seine Wegwerf-Datenbank laufen
-lassen (mit `MAIL_NUR_AN` und einer `.invalid`-SMTP-Adresse), dann fiele ein fehlendes Modul in
-der CI auf. Klein, aber eigener Prüflauf.
+**Korrektur (21.11.2026, Beobachtungs-Auswertung).** Auf frischer Datenbank lautet das Wort `nicht-gefunden` (`trageEin` prüft *in Vorbereitung* vor dem Schluss), `geschlossen` nur, wenn das Turnier aus einem früheren Seed schon offen ist. Ebenso fallen die drei Beispielgespräche still weg (`sichtbaresTurnier` schliesst *in Vorbereitung* aus); ab 2028 sind sie auch bei bestehender Datenbank nur noch lesbar. Der Text von `make help` zu `seed` (Interclub 2026, Beispielturnier 2027, drei Gespräche) sagt dann mehr zu, als der Seed liefert. Offen ist nur der Zeitpunkt: spätestens im Frühling 2027.
 
 ### 2026-11-16 — Junioren-CM verlangt bei Swiss Tennis ein eigenes Turnier
 
@@ -300,6 +205,8 @@ der CI auf. Klein, aber eigener Prüflauf.
 **Ursprung:** Recherche «CM hinter den Kulissen» (`docs/recherche/2026-11-16-cm-ablauf.md`), Frage F10 in #88.
 
 **Einschätzung:** Vermutlich reicht eine zweite Turniernummer je Jahr; spätestens nach dem Gespräch #88 prüfen, vor der Etappe *CM-Anmeldung*.
+
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`schema.ts` → `turnier.jahr` eindeutig, Tabelle `turniernummer` 0..n; `kategorie` hat keinen Bezug zu `turniernummer`, eine zweite Nummer allein trennt die Junioren-Kategorien also nicht). F10 steht im Body von #88 (Lösungsrichtung 2), das Gespräch ist nicht geführt. Offen bis nach #88.
 
 ### 2026-11-16 — Kontakt des Doppelpartners und des Anfragenden ohne Ende der CM
 
@@ -329,6 +236,10 @@ schon auf `main`, das Release liefert nichts aus (Test und Live aus), es gibt ke
 gibt es schon) und offene Anfragen dann mit den Gesprächen löschen; die Grenze ist ein
 Entscheid des Projektleiters, die Zusage bleibt das Soll.
 
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`cm/schnittstellen.ts` → `getCmAnsicht` ohne Jahresprüfung; `anmeldungen.ts` → `ladeCmAnsicht` weist nur *in Vorbereitung* ab, `fuelleDoppel` gibt den Kontakt nach `mitgliedStatus`, `offeneAnfragenAn` ohne Jahresgrenze; `kontaktSichtbar` nur in `verwaltung.ts` und `verwaltung-doppel.ts`). Prüfpunkt steht offen in #39 unter «Vor `AUSLIEFERUNG_LIVE=an`».
+
+**Korrektur (21.11.2026, Beobachtungs-Auswertung).** Offene Anfragen fallen nicht nur bei der endgültigen Löschung weg, sondern auch beim Austritt (`austritt.ts` → `zieheOffeneZurueck`), bei der Absage einer Kategorie und bei jeder Paarbildung; eine Frist nach Zeit gibt es keine. Die Übersicht zeigt das laufende und alle künftigen Jahre, nicht nur das laufende. FR-19 (`docs/fachmodell.md`) steht auf «umgesetzt», seine Grenze «bis das Turnier *abgeschlossen* ist» gibt es im Code aber nicht. Offen ist nur die Grenze für «Ende der CM» (Entscheid des Projektleiters).
+
 ### 2026-11-16 — Telefonnummern in Tests nicht im Format «+41 00 …»; Prüfung sieht sie nicht
 
 **Thema:** Tests
@@ -351,47 +262,7 @@ dort keine Adressen.
 Repo. (1) mechanisch ersetzbar, eigener kleiner Branch; ob die Prüfung Telefonnummern prüfen
 soll, mit entscheiden. (2) Ordner mit Präfix `beispiel-` mitzählen, mit Testfall.
 
-### 2026-11-16 — Fachmodell trennt Gebautes nicht von Geplantem; drei npm-Skripte ohne Nutzer
-
-**Thema:** Struktur
-
-**Fundort:** `docs/fachmodell.md` (Turnier-Zustände *läuft*, *abgeschlossen*; Anmeldung
-*Gruppe*, *Rang-Korrektur*; Gruppe, KoTableau, Spiel, Resultat, Satz, Lizenzrunde,
-Lizenzantrag; Mitglied *verwaltet von*) gegen `src/lib/server/db/schema.ts`
-(`mitglied_geloescht_check`: kein nicht gelöschtes Mitglied ohne E-Mail); `package.json`
-(`test:db`, `db:migrate`, `format`).
-
-**Beobachtung:** (1) Das Fachmodell beschreibt Objekte, Attribute und Zustände der späteren
-Etappen ohne Vermerk «geplant»; nur die Fachregeln tragen ihren Status. Juniorenkonten ohne
-eigene Adresse (*verwaltet von*) lässt das Schema heute nicht zu. (2) Die npm-Skripte `test:db`,
-`db:migrate` und `format` nennt keine Doku, und kein Makefile, Workflow oder Dockerfile ruft sie;
-Migrationen laufen überall über `node scripts/migrate.ts`.
-
-**Ursprung:** Doku-Audit vor Release 0.23.0 (16.11.2026), Domänen Daten/Tests und Setup.
-
-**Einschätzung:** Niedrig. (1) «(geplant)» an den Stellen ergänzen, am besten mit der Etappe,
-die sie baut. (2) `format` und `test:db` im Testkonzept nennen oder `db:migrate` entfernen
-(Code-Frage).
-
-### 2026-11-15 — Fallen aus dem Session-Gedächtnis stehen nicht im Repo
-
-**Thema:** Arbeitsweise
-
-**Fundort:** Session-Gedächtnis von Claude Code (ausserhalb des Repos, Index `MEMORY.md`); im Repo
-`CLAUDE.md`, Skill `tco-branching`, `docs/testkonzept.md`, `docs/ci-cd-und-release.md`.
-
-**Beobachtung:** Rund 30 Notizen «Falle: …» liegen nur im Gedächtnis einer Maschine. Viele treffen
-jede Session in diesem Repo: E2E gleich im Hintergrund starten, eigene Datenbank der E2E, Budget
-der Mail-Codes je IP, Mails und `localhost`, Einstiegsseite ohne Sitzung, Sitzungen mit
-Zukunftsdatum in Datenbanktests, «neueste Saison» nur auf eigener Test-Datenbank, Migrationsnummer
-bei parallelen Branches, `git` im Worktree. Eine Session auf einer anderen Maschine kennt sie nicht.
-
-**Ursprung:** Refactoring (#80), Zielbild 6.2 Punkt 6 und Befund B-26 in
-`docs/refactoring-analyse.md`; nicht Teil des Plans (E-69), übergeben in Schritt 25.
-
-**Einschätzung:** Eigener Vorgang nach dem Abschluss des Refactorings. Je Falle entscheiden: Skill
-(Ablauf), `docs/` (Fakt), Test oder Prüfskript (wo ein Werkzeug sie abfängt), sonst Gedächtnis.
-In Schritt 25 nur der Index gelesen, die Notizen selbst nicht.
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`scripts/pruefungen/testdaten.ts` → nur Muster `MAIL`, `istTestdatei` ohne Ordner `beispiel-interclub/`; `docs/testkonzept.md` «Telefonnummern im Format `+41 00 …`»). Nachgezählt: 17 Dateien mit 76 Fundstellen (`git grep -lE '(\+41 ?\(?7[0-9]|07[0-9] ?[0-9]{3})' -- tests/ 'src/**/*.test.ts'`), dazu `tests/e2e/neue-version.test.ts`; unter `beispiel-interclub/` fallen 82 Dateien durch (63 `bericht-*`, 17 `team-results-*`, 2 `club-teams-*`), ohne Mail oder Telefon. Offen ist nur, ob ersetzt wird und ob die Prüfung Telefonnummern mitprüft.
 
 ### 2026-11-15 — Dauerregeln der `CLAUDE.md` sagen an fünf Stellen mehr als der Code
 
@@ -429,284 +300,9 @@ Ränder in den Regeln nennen (kostet Länge) oder lassen. Entscheid des Projektl
 `src/lib/server/http.ts` (`jetzt` als Vorgabe) ist im Betrieb die einzige Uhr der
 Schnittstellen, weil `dienste.ts` `jetzt` nirgends setzt; ADR-013 beschreibt das richtig.
 
-### 2026-11-15 — Regeltexte nach Schritt 24 an zwei Stellen uneinheitlich
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`CLAUDE.md` seit dem Eintrag unverändert; Stellen wie unten).
 
-**Thema:** Arbeitsweise
-
-**Fundort:** `CLAUDE.md`; `docs/issue-konventionen.md:75–77` (Definition of Done); Skill
-`tco-branching`, Ende von «Session-Ende».
-
-**Beobachtung:** (1) Schritt 24 hat einen Satz gestrichen, den ein Werkzeug hält (Import von
-`dienste.ts`, E-86), drei solche aber behalten: den Satz zu `fetch` (ESLint), die Importe der
-Design-Dateien (`scripts/design-importe.test.ts`) und den ersten Halbsatz zur Importrichtung
-(ESLint). (2) Die Definition of Done nennt «Doku nachgeführt» je Issue; der Skill legt README und
-Doku in den Abgleich vor einem Release, nach jedem Issue bleibt nur die Doku des Branches (E-97).
-Eine leichte Spannung, kein Widerspruch.
-
-**Ursprung:** Review von Schritt 24 (15.11.2026, Hinweise (d) und (e)).
-
-**Einschätzung:** (1) Kürzen oder lassen entscheidet der Projektleiter; den Satz zu `fetch` hat
-E-89 behalten, weil er den Weg für Neues nennt. (2) Wenn es stört, in `issue-konventionen.md`
-«Doku des Branches nachgeführt» schreiben.
-
-### 2026-11-15 — Prüfung der Versionen: drei Ränder
-
-**Thema:** Arbeitsweise
-
-**Fundort:** `scripts/pruefungen/version-merge.ts` (`pruefeVersionsschritte`, `eintragszeilen`),
-`scripts/pruefungen/release.ts` (Meldung «„Unveröffentlicht" ist nicht leer»); Skill
-`tco-branching` Schritt 4a, `docs/ci-cd-und-release.md`, ADR-012.
-
-**Beobachtung:** (1) Eine Zeile, die wortgleich schon unter «Unveröffentlicht» steht (etwa ein
-zweites «Abhängigkeiten aktualisiert»), zählt nicht als neu; der Push wird abgewiesen. Dass ein
-Revert mit Code einen eigenen Eintrag braucht, steht schon im Skill und in
-`docs/ci-cd-und-release.md`; für die wortgleiche Zeile fehlt der Satz. (2) Die Meldung zu
-«Unveröffentlicht ist nicht leer» spricht von einer Version, die sich «von … auf … ändert», auch
-im ersten ihrer zwei Fälle, in dem für dieses Release noch keine Nummer gesetzt ist: beim ersten
-Release trägt `dev` schon 0.22.11 und `main` 0.20.5. (3) Beim ersten Release erkennt `make
-release-check` eine vergessene Nummer nicht, weil `dev` der Nummer von `main` schon voraus ist; die
-erste Nummer (0.23.0) steht nur in Skill, `docs/ci-cd-und-release.md` und ADR-012 (bewusst, E-81).
-
-**Ursprung:** Review von Schritt 23, Teil 3 (15.11.2026; `docs/refactoring-analyse.md`, G.4).
-
-**Einschätzung:** (1) lässt nichts Falsches durch, es verlangt nur einen anders formulierten
-Eintrag (einen Satz im Skill wert). (2) verwirrt höchstens; die Meldung nennt beide Wege. (3) ist
-die einzige echte Lücke und gilt nur einmal. Spätestens beim ersten Release ansehen.
-
-**Nachtrag 2026-11-16 (Doku-Abgleich vor 0.23.0):** (3) ist gemessen anders: `make release-check`
-meldet eine ganz vergessene Nummer auch beim ersten Release (rot, «Unveröffentlicht» nicht leer).
-Durch kommt nur, wer dem zweiten Weg der Meldung folgt und die Einträge in den Abschnitt
-«0.22.11» nachrückt. Skill, `docs/ci-cd-und-release.md` und ADR-012 (Nachtrag) sind
-entsprechend berichtigt. Mit dem Release 0.23.0 ist (3) erledigt.
-
-### 2026-11-15 — Prüfung der Workflow-Rechte sieht Eingaben in `run:` nicht
-
-**Thema:** Sicherheit
-
-**Fundort:** `scripts/pruefungen/workflow-rechte.ts`; `.github/workflows/check.yml` (Eingabe `spur`
-von `workflow_dispatch`).
-
-**Beobachtung:** Die Prüfung liest Rechte und Secrets der Jobs, aber nicht, ob eine Eingabe von
-`workflow_dispatch` als Ausdruck `${{ inputs.… }}` direkt in einem `run:` landet (dort könnte sie
-Befehle einschleusen). Heute gibt es eine Eingabe, einen Wahrheitswert, und sie geht über `env:`.
-
-**Ursprung:** Refactoring Schritt 20, Lauf 2 (`docs/refactoring-protokoll-etappe-3.md`, F.5;
-Refactoring-Analyse 1e, H3-13).
-
-**Einschätzung:** Heute ohne Folge. Eine Prüfung lohnt ab der zweiten Eingabe oder der ersten mit
-freiem Text.
-
-### 2026-11-15 — Bauregel: zwei benannte Grenzen beim Schutz der Admin-Routen
-
-**Thema:** Sicherheit
-
-**Fundort:** `scripts/pruefungen/bauregel.ts` (`adminSchnittstellen`, `pruefeAdminRoute`,
-Kommentar «Geprüft wird jede Datei für sich»).
-
-**Beobachtung:** (1) Eine Admin-Route darf jeden Namen aus der Vereinigung aller Listen der
-Verwaltung nutzen, nicht nur aus der Liste ihrer Datei; ein Name in zwei Listen fällt in
-`alleVerwaltung()` (`tests/hilfen/verwaltungs-listen.ts`) auf. (2) Geprüft wird jede Datei für
-sich: Ein Modul unter `src/lib/` ausserhalb von `server/`, das Admin-Funktionen weiterreicht, fällt
-nicht auf (das Weiterreichen von `liest`, `schreibt` und `mitKonto` fängt die Regel).
-
-**Ursprung:** Refactoring Etappe 1 (Refactoring-Analyse 1c, N-04 und N-07; Protokoll Etappe 1,
-D.4, D.8, D.13, D.14).
-
-**Einschätzung:** Kein Code nutzt die Lücken; zur Laufzeit prüft jede Schnittstelle der Verwaltung
-ihre Rechte über `liest` oder `schreibt`. Schliessen nur, wenn die Bauregel ohnehin einen Parser
-bekommt (Eintrag vom 12.11.2026 zur Bauregel).
-
-### 2026-11-15 — Vertrag zwischen Server und Oberfläche: was die Typen nicht binden
-
-**Thema:** Struktur
-
-**Fundort:** `src/lib/fehler.ts` (`STATUS_DES_WORTS`, Zusatzangaben), `src/lib/server/http.ts`
-(`antwort`), `src/lib/abruf.ts` (`woerterAus`), `src/lib/cm/ablehnung.ts` (`ABLEHNUNGEN`),
-`src/lib/verwaltung/api.ts`.
-
-**Beobachtung:** (1) Der Typ bindet ein Fehlerwort nicht an seinen Status: `antwort(404, { fehler:
-'veraltet' })` geht durch; `STATUS_DES_WORTS` gilt nur in der Oberfläche. (2) Feldnamen in
-`felder` sind frei; Zusatzangaben liest die Oberfläche mit `as`. (3) `woerterAus` bindet nur mit
-Typangabe; zehn Abruf-Funktionen der Verwaltung haben keinen Aufruf im Einheitstest. (4) Dass
-`fehler.ts` nichts importiert, steht nur im Kommentar; kein Werkzeug hält es. (5) Ein neuer
-Ablehnungsgrund der CM-Fachfunktion, der nicht in `ABLEHNUNGEN` steht, wird in der Oberfläche still
-zu `geschlossen`. (6) 401 ohne lesbaren Körper deutet die Verwaltung als Störung, die
-Mitglieder-App als «abgemeldet»; der Server sendet immer einen Körper.
-
-**Ursprung:** Refactoring Etappen 1 und 2 (Refactoring-Analyse 1c, N-08 und N-18; 1d, H-14, H-20,
-H-21; Protokolle D.6, E.1 bis E.3, E.6).
-
-**Einschätzung:** Für die Nutzerin unsichtbar, solange Server und Oberfläche im selben Merge
-mitziehen. (1) und (5) zuerst ansehen, wenn eine Schnittstelle neue Wörter oder Gründe bekommt.
-(6) anzugleichen wäre eine Verhaltensänderung. In Schritt 25 nur (1), (4) und die Listen in (5)
-neu gelesen, der Rest aus den Protokollen.
-
-### 2026-11-15 — Tests: drei kleine Lücken im Netz ohne heutige Folge
-
-**Thema:** Tests
-
-**Fundort:** `tests/hilfen/turnierjahre.ts`; `src/lib/server/dienste.ts` (`holePush`);
-`src/lib/server/grundpruefung.db.test.ts` (Methode aus dem Namen), `src/lib/server/routen.test.ts`
-(Fall «Name passt zur Methode»).
-
-**Beobachtung:** (1) Der Zähler der Turnierjahre lebt im Modul, die Datenbank im Lauf: Läuft eine
-Testdatei im Watch-Modus ein zweites Mal gegen dieselbe Datenbank, vergibt sie dieselben Jahre
-(aus dem Code geschlossen, nicht ausgeführt). (2) Kein Test baut einen Push-Versender über
-`holePush`; der Zweig mit VAPID-Paar läuft im Test nie. (3) Die Grundprüfung leitet die Methode aus
-dem Namen ab (`post…`, sonst GET): Ein Listeneintrag ohne Route liefe dort nach seinem Namen, eine
-künftige Schnittstelle `put…` oder `delete…` als GET; der Routen-Test prüft «Name passt zur
-Methode» nur für GET und POST.
-
-**Ursprung:** Refactoring Etappen 1 und 3 (Refactoring-Analyse 1c, N-16 und N-17; 1e, H3-12;
-Protokolle D.4, F.5).
-
-**Einschätzung:** (1) nur lokal. (2) fällt beim ersten Server mit Push auf. (3) kleiner Abschluss:
-eine Prüfung «jeder Listeneintrag hat eine Route», spätestens mit der ersten dritten Methode.
-
-### 2026-11-15 — Pre-Commit-Hook prüft auch nicht versionierte E2E-Dateien
-
-**Thema:** Tests
-
-**Fundort:** `.githooks/pre-commit` (`make check-schnell`, darin Prettier).
-
-**Beobachtung:** Der Pre-Commit-Hook prüft mit Prettier auch nicht versionierte Dateien unter
-`tests/e2e/`; eine liegengelassene Datei hält einen Commit auf, der sie nicht enthält.
-
-**Ursprung:** Refactoring Etappe 2 (Refactoring-Analyse 1d, H-25; Protokoll E.12).
-
-**Einschätzung:** Ohne Folge für die App. Prettier im Hook nur auf versionierte Dateien anwenden,
-wenn es wieder stört.
-
-### 2026-11-15 — Rückfragen der Verwaltung: zwei Randfälle und ein Zustand ohne Test
-
-**Thema:** Verwaltung UI
-
-**Fundort:** `src/lib/verwaltung/Aktionsdialog.svelte` (`ausfuehren`), «Verschieben» in Einzel- und
-Doppel-Liste der Anmeldungen; `src/routes/verwaltung/verlauf/+page.svelte:14`.
-
-**Beobachtung:** (1) Wählt man im `Aktionsdialog` während der Anfrage neu oder tippt «Abbrechen»,
-bleibt der Dialog bei Erfolg offen, die Seite lädt neu. Hat die zweite Entscheid-Taste (`neben`)
-einmal eine Warnung ausgelöst, schickt der nächste Klick auf die Haupttaste `trotzdem`. (2)
-«Verschieben» ohne anderes Ziel: Die Doppel-Liste zeigt eine gesperrte Haupttaste, die
-Einzel-Liste nur «Abbrechen». (3) Der Verlauf hält «letzter Stand bleibt» in einem `$derived.by`
-mit Seiteneffekt; kein Test hält das fest.
-
-**Ursprung:** Refactoring Schritte 15 und 17 (Refactoring-Analyse 1d, H-10, H-12, H-26; Protokolle
-E.9, E.12; E-53).
-
-**Einschätzung:** (1) ist angenommen (E-53); «bei Erfolg immer schliessen» wäre eine Änderung am
-Baustein. (2) anzugleichen ist Verhalten und braucht einen Entscheid. (3) nur mit Test umbauen.
-
-### 2026-11-15 — Turniere und Anlässe der Verwaltung: die Zahl sagt ein Vorleser wohl nicht an
-
-**Thema:** Barrierefreiheit
-
-**Fundort:** `src/routes/verwaltung/turniere/+page.svelte:22`,
-`src/routes/verwaltung/anlaesse/+page.svelte:22` (`role="status"`).
-
-**Beobachtung:** Seit die beiden Listen in `+page.ts` laden (E-48), steht der Text mit
-`role="status"` beim Einhängen schon fertig da und ändert sich danach nicht mehr. Eine solche
-Region wird gewöhnlich nur bei Änderungen angesagt.
-
-**Ursprung:** Review von Schritt 15, Lauf 2 (Refactoring-Analyse 1d, H-16; Protokoll E.9).
-
-**Einschätzung:** Nicht mit einem Vorleser geprüft. Mit VoiceOver und TalkBack ansehen; sonst
-`role="status"` weglassen.
-
-### 2026-11-15 — Wächter nutzt `Object.hasOwn`; welche Geräte die App trägt, ist nicht festgelegt
-
-**Thema:** Struktur
-
-**Fundort:** `src/lib/login/waechter.ts:74`.
-
-**Beobachtung:** `Object.hasOwn` läuft bei jedem Laden einer Seite; Safari vor 15.4 kennt es nicht.
-Ein Build-Ziel für ältere Browser ist nicht gefunden (nicht gesucht).
-
-**Ursprung:** Review von Schritt 15 (Refactoring-Analyse 1d, H-15; Protokoll E.9).
-
-**Einschätzung:** Fachfrage, kein Refactoring: Was verspricht die App älteren Geräten? Danach
-entweder nichts tun oder die Stelle ersetzen.
-
-### 2026-11-15 — Aufräumreste: Name eines Dienst-Typs, toter Code ohne Werkzeug
-
-**Thema:** Struktur
-
-**Fundort:** `MitteilungAdminDienste` (`src/lib/server/mitteilung/typen.ts`, 44 Dateien unter
-`src/`, `scripts/`, `tests/`); exportierte Namen im ganzen Repo.
-
-**Beobachtung:** (1) Der Dienst-Typ heisst nach den Mitteilungen, dient aber fünf Themen (`admin`,
-`turnier`, `cm`, `gespraech`, `mitteilung`). (2) Am 14.11.2026 hatten unter `src/lib` 83
-exportierte Namen keinen Nutzer ausserhalb ihrer Datei, 51 nur Tests. Schritt 20 hat drei entfernt
-und bei 25 nur `export` weggenommen; der Rest bleibt mit Grund (Typen in Signaturen, Listen, von
-Tests geprüft). Dass neue tote Namen auffallen, hielte nur ein Werkzeug fest (ein Paket wie `knip`).
-
-**Ursprung:** Refactoring Schritt 20, Nachmessen (Refactoring-Analyse 1c, N-12; 1e, H3-07 und
-H3-08; Protokoll F.3).
-
-**Einschätzung:** (1) Umbenennen berührt die Erlaubt-Liste der Bauregel und 44 Dateien; nur mit
-einem Umbau dort. (2) wäre eine neue Abhängigkeit und braucht die Freigabe des Projektleiters.
-
-### 2026-11-15 — Datenbanktest reisst die Zeitgrenze für die Verbindung (3 s)
-
-**Thema:** Tests
-
-**Fundort:** `src/routes/api/mail-nur-an.db.test.ts`, Test «Verwaltung: der Hinweis an die alte
-Adresse (SI-09, ohne Pool)»; `src/lib/server/db/index.ts` (`connectionTimeoutMillis: 3000`).
-
-**Beobachtung:** In einem vollen `make check` brach der Test mit «timeout exceeded when trying to
-connect» ab (in `gueltigeSitzungen`); der nächste Lauf auf demselben Stand war grün (2484 von
-2484). Der Branch änderte nur Kommentare und Doku.
-
-**Ursprung:** Refactoring, Nachtrag zur Etappe 3 (`docs/refactoring-analyse.md`, 7.6).
-
-**Einschätzung:** Kein Fehler der App. Vermutung: Last auf dem gemeinsamen Datenbank-Container
-(paralleler Prüflauf einer anderen Session oder Docker kurz nach dem Start); die Tests «ohne Pool»
-bauen je eine eigene Verbindung auf. Tritt es wieder auf, die Zeitgrenze für Tests höher setzen.
-Verwandt: der Eintrag vom 13.11.2026 zu «Liste mit Suche».
-
-### 2026-11-13 — Datenbanktest «Liste mit Suche» der Verwaltung ist gelegentlich rot
-
-**Thema:** Tests
-
-**Fundort:** `src/lib/server/admin/schnittstellen.db.test.ts`, Test «A-MITGLIED-02: Liste mit Suche
-und Status; ungültiger Status → 400» (Suche nach `Qwxz`).
-
-**Beobachtung:** In einem vollen `make check` gab die Suche 15 Mitglieder statt des einen zurück
-(IDs 203 bis 233, das erwartete zuletzt); der nächste Lauf war grün. Einmal in sechs Durchläufen.
-
-**Ursprung:** Refactoring Schritt 13 (#80), Review von Lauf 2; `docs/refactoring-analyse.md`,
-Anhang E.3. Der Schritt fasst weder die Datei noch `admin/` an.
-
-**Einschätzung:** Ursache offen. Vermutung: Die Suche trifft auch ein anderes Feld (z. B. E-Mail
-oder Vorname), und ein zufälliger Bestandteil der Testdaten dieser Datei enthielt in diesem Lauf
-die Buchstabenfolge. Dann wäre es ein Testproblem (Suchwort länger oder eindeutig wählen). Zu
-prüfen ist aber auch, ob die Suche den Filter unter einer Bedingung nicht anwendet; das wäre ein
-Fehler der App.
-
-### 2026-11-14 — Die Regel «nicht über CSS-Klassen suchen» hält die Praxis nicht
-
-**Thema:** Tests
-
-**Fundort:** `CLAUDE.md` (Abschnitt Tests); rund 108 Suchen über Klasse oder Element in 22 E2E-Dateien, z. B. `div.karte` in `cm-ablauf.test.ts`, `cm-anmeldung.test.ts`, `cm-verwaltung.test.ts`, `cm-doppel.test.ts`.
-
-**Beobachtung:** Die Karte einer Kategorie ist ein `<div class="karte">` ohne Rolle und Namen; für «Rolle und Beschriftung» bräuchte sie beides (ändert, was ein Bildschirmleser vorliest).
-
-**Ursprung:** Refactoring Schritt 20, Nachmessen (`docs/refactoring-analyse.md`, F.3, Hinweis (g)).
-
-**Einschätzung:** Gehört in die Revision der `CLAUDE.md` (Schritt 24: Regel so fassen, wie sie gilt). Zahl über ein Muster gezählt, nicht einzeln geprüft.
-
-**Ergänzung (15.11.2026, Refactoring Schritt 25).** Gezählt am Stand `4c7b340` (Refactoring-Analyse
-1e, C3 (b), jeder Selektor nach seiner Form): 146 Suchen über einen CSS-Selektor in 24 Dateien
-(22 Tests, 2 Hilfen), davon 104 über eine Klasse (`details.klappe` 7, `div.karte` 6, `header.kopf`
-6, `.kachel` 5, `.kopf-titel` 5, `.brief-code` 5), 32 nur über ein Element (`summary` 18, `html` 4),
-5 über ein Attribut, 5 über eine `id`; dagegen 1527 über Rolle, Beschriftung oder Text. Sieben
-Dateien tragen 111 davon: `verwaltung` 28, `hilfe` 17, `navigation` 15, `bewegung` 14, `briefe`
-14, `cm-gespraech` 13, `cm-verwaltung` 10. Nicht gezählt: 9 `querySelector` in `page.evaluate`, 12
-Prüfungen `toHaveClass` oder `toHaveCSS`. Die «rund 108» oben kamen aus einem engeren Muster.
-Schritt 24 hat die Regel so gefasst, wie sie gilt (E-68, E-92: Element oder Klasse nur, wo es
-weder Rolle noch Beschriftung gibt); der Bestand bleibt. Offen ist nur noch der Abbau als eigener
-Vorgang: Karten und Klappen bräuchten Rolle und Namen, das ändert, was ein Bildschirmleser
-vorliest, und braucht je Stelle einen Entscheid.
+**Korrektur (21.11.2026, Beobachtungs-Auswertung).** (1) Drei Routen, nicht zwei: auch `src/routes/api/sitzung/+server.ts` holt selbst die Datenbank (`getSitzung(e, holeDb())`); arc42 Kapitel 5 nennt alle drei. (3) Fünf Zugangs-Schnittstellen ohne `liest`/`schreibt`: dazu `postAnsichtBeenden` (prüft nur `e.locals.konto`). (4) Mit Hook und `http.ts` sieben Stellen. (5) ist erledigt: Kommentar und Meldung der Regel in `eslint.config.js` sagen jetzt «der Service Worker holt nichts». Offen ist nur der Entscheid des Projektleiters, ob die Ränder in die `CLAUDE.md` kommen.
 
 ### 2026-11-14 — CM-Seite: Fokus nach einer Aktion hängt vom Zeitpunkt im Browser ab
 
@@ -735,6 +331,8 @@ unbedingt auf den Titel derselben Anfrage, wenn sie noch steht, die Fehlerzweige
 Taste der Kategorie. Aufwand dort: Seite und Vorab-E2E anpassen, vor dem Merge einmal die CI auf
 dem Branch (Skill `tco-branching`, Schritt 3).
 
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`src/routes/clubmeisterschaft/[id]/+page.svelte` → `fokusNachAnfrage` bricht ab, wenn die Taste den Fokus noch hat, und nimmt den ersten Titel; `src/lib/cm/ablauf.ts` ohne Fokus in den Fehlerzweigen; `tests/e2e/cm-ablauf.test.ts` prüft nur «nicht `document.body`»). B2/H-27 ist nicht umgesetzt. Am 14.11. waren es drei rote iPhone-Läufe in `cm-ablauf.test.ts`, nicht zwei. Offen ist nur, wann es gebaut wird.
+
 ### 2026-11-13 — Interclub: Kleinigkeiten der Seite einer Begegnung
 
 **Thema:** Interclub
@@ -747,44 +345,7 @@ dem Branch (Skill `tco-branching`, Schritt 3).
 
 **Einschätzung:** Beim Nachladen alter Saisons (1) prüfen; (2) und (3) nur bei Bedarf. Vorläufig.
 
-### 2026-11-13 — E2E «Reiter ist beim Antippen sofort aktiv» wackelt unter Last
-
-**Thema:** Tests
-
-**Fundort:** `tests/e2e/bewegung.test.ts:93` (Zeitgrenze 500 ms auf `aria-current`)
-
-**Beobachtung:** Im vollen `make check` einmal rot auf Android, einzeln 3× grün (54/54). Die 500 ms reichen bei voller Last mit drei Workern knapp nicht.
-
-**Ursprung:** #81 Teil 2, `make check` vor dem Merge
-
-**Einschätzung:** Kein Fehler der App; bei Wiederholung die Zeitgrenze des Tests prüfen. Vorläufig.
-
-**Nachtrag 2026-11-15:** In der CI auf `dev` (Lauf 43728560539, Merge von Dependabot #82, mit
-SvelteKit 3.2 aus #86) war ein zweiter Test derselben Datei auf dem iPhone rot: «Zwei schnelle
-Reiter-Klicks hintereinander» (`tests/e2e/bewegung.test.ts:323`, Überschrift «Hoi …» nach 5 s
-nicht sichtbar). Lokal im vollen Lauf auf allen drei Geräten grün, in der CI beim Neustart des
-Jobs grün. Damit wackeln zwei Tests der Reiter-Bewegung; eine Regression durch SvelteKit 3.2 ist
-nicht belegt, aber auch nicht ausgeschlossen. Kommt es wieder: Trace holen, bevor die Zeitgrenze
-steigt.
-
-**Nachtrag 2026-11-18:** Wieder einmal rot im vollen `make check` (#39, Branch zu E-65), diesmal
-`aria-current` am Reiter «Start» nach 5 s nicht gesetzt (iPhone); einzeln 15× grün. Trace nicht
-geholt (lokal, voller Lauf).
-
-### 2026-11-15 — E2E «Spielersuche springt nicht» einmal rot auf Android
-
-**Thema:** Tests
-
-**Fundort:** `tests/e2e/cm-verwaltung.test.ts:408` («Keine Treffer.» im Dialog nach 5 s nicht
-sichtbar)
-
-**Beobachtung:** Einmal rot in der CI auf `dev` (Lauf 43728026093, Merge von Dependabot #86 mit
-SvelteKit 3.2.0); lokal im vollen Lauf auf allen drei Geräten grün, beim Neustart des Jobs grün.
-
-**Ursprung:** Merge der Dependabot-PRs #86 und #82 nach dem Refactoring (#80).
-
-**Einschätzung:** Wackler oder Folge von SvelteKit 3.2, offen. Kommt es wieder: Trace mit Netzwerk
-holen. Vorläufig.
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt, alle drei (`[begegnung]/+page.svelte` ohne Unterschied zwischen «fehlt noch» und «fehlt dauerhaft»; `{:else}` gilt für Einzel und Doppel; `pruefeBericht` prüft keine doppelte Position, die Verletzung des Schlüssels von `icPartie` landet im `catch` als `stoerung`). Dazu aus dem Code: `Resultat.svelte` verlinkt nur gespielte eigene Begegnungen, die Seite einer offenen Begegnung erreicht man nur über die Adresse. Hinweis für #81, Session 3 (das Issue verweist auf diese Einträge).
 
 ### 2026-11-13 — Interclub: Randfälle der Übersicht und Import ohne Zeitgrenze
 
@@ -798,6 +359,8 @@ holen. Vorläufig.
 
 **Einschätzung:** Für Teil 3 (Aktualität, regelmässiger Abruf) prüfen: (1) und (2) betreffen die Ansicht in der Saison, (3) wird mit dem regelmässigen Abruf wichtig. Vorläufig.
 
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt, alle drei (`ansicht.ts` → `ladeUebersicht`: `letzte` verlangt ein Resultat, `naechste` ein Datum ab heute, `abgeschlossen` alle Resultate; Begegnungen je Team-Zeile, nicht nach `begegnungId` zusammengefasst, 2026 nie zwei TCO-Teams in einer Gruppe; `scripts/ic-import.ts` → `holen: (u) => fetch(u)` ohne `signal`, `import.ts` → `abrufen` ohne Grenze). Hinweis für #81, Session 3.
+
 ### 2026-11-13 — Rangliste läuft bei 320 px und grosser Schrift über
 
 **Thema:** Interclub
@@ -810,17 +373,7 @@ holen. Vorläufig.
 
 **Einschätzung:** Randfall; Kopfbeschriftung kürzen oder die Spalten bei sehr schmalem Platz umbrechen. Vorläufig.
 
-### 2026-11-13 — Allgemeine Zeithilfe liegt im Thema Anlass
-
-**Thema:** Struktur
-
-**Fundort:** `src/lib/interclub/anzeige.ts` und `src/lib/server/interclub/ansicht.ts` importieren `utcZuZuerich` aus `src/lib/anlass/zeit.ts`
-
-**Beobachtung:** Die Umrechnung in Zürcher Zeit ist eine allgemeine Hilfe, liegt aber im Thema Anlass; Interclub hängt damit für die Zeit am Anlass.
-
-**Ursprung:** #81, Review von Task 8 (Oberfläche Interclub)
-
-**Einschätzung:** Kein Fehler. Bei Gelegenheit die Zürcher-Zeit-Funktionen in ein neutrales Modul (z. B. `src/lib/zeit.ts`) verschieben; betrifft auch die Abdeckungsliste in `vitest.config.ts`.
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt im Code (`src/lib/design/karten.css`: `th` mit `white-space: nowrap`, unter `@container (width < 18rem)` keine weitere Stufe, nur `td` verkleinert); die Darstellung selbst ist nicht gemessen. Hinweis für #81.
 
 ### 2026-11-13 — Interclub: Bedeutung des «*» bei Auf- und Abstiegsspielen unklar
 
@@ -834,6 +387,8 @@ holen. Vorläufig.
 
 **Einschätzung:** Vermutlich «bleibt in der Liga» bzw. «steigt auf» nach Reglement. Bei Gelegenheit gegen mytennis.ch prüfen; erst dann eine Anzeige (z. B. «steigt auf») erwägen.
 
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`swiss-tennis.ts` → `pruefeSeite` setzt `markiert`, `import.ts` speichert `heimMarkiert`/`gastMarkiert`, keine Anzeige liest sie; `ansicht.ts` → `ergebnisAusSicht` nur aus den Punkten; `team-results-7396.json`: markiert ist der Verlierer). Offen ist nur die Bedeutung (mytennis.ch oder Reglement).
+
 ### 2026-11-13 — Interclub: Form noch nicht gespielter Begegnungen erst 2027 prüfbar
 
 **Thema:** Interclub
@@ -846,6 +401,8 @@ holen. Vorläufig.
 
 **Einschätzung:** Sobald Swiss Tennis den Spielplan 2027 freischaltet (Frühling), einmal `make ic-import JAHR=2027` und die Antwort prüfen; spätestens in Session 3 von #81 (regelmässiger Abruf).
 
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`swiss-tennis.ts` → `endstand`: `undefined` und `null` gelten als offen; schickt Swiss Tennis `0`, gälte das Spiel als gespielt, 0:0 unentschieden). Gemessen am 21.11.2026: `team-results` für 2027 gibt `500 {"error":"Java API error: Upstream responded with HTTP 404"}`; `club-teams` 2027, der erste Aufruf des Imports, ist nicht gemessen. Offen bis zum Spielplan 2027.
+
 ### 2026-11-12 — Kostenseite hinkt der Schätzung für den Vorstand nach
 
 **Thema:** Kosten
@@ -857,6 +414,10 @@ holen. Vorläufig.
 **Ursprung:** Kostenschätzung für den Vorstand (Nutzerauftrag, Session 12.11.2026)
 
 **Einschätzung:** `kosten.md` nach dem Vorstandsentscheid (K-03, 16.11.) nachführen, damit Repo und Vorstandsfassung dieselben Zahlen haben; den Abschnitt zu den Actions-Minuten in `ci-cd-und-release.md` auf das Guthaben-Modell prüfen.
+
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`docs/kosten.md` ohne VPS-Stufe CHF 9.00, ohne Actions-Guthaben, Healthchecks, Passwort-Tresor und Zahlen zum Website-Umzug; `docs/ci-cd-und-release.md` «Actions-Minuten» rechnet in Gratisminuten). Das Guthaben-Modell von GitHub ist nicht nachgeprüft.
+
+**Korrektur (21.11.2026, Beobachtungs-Auswertung).** Der Vorstandsentscheid zu K-03 kam am 17.11.2026 («bis CHF 500 pro Jahr», `docs/abklaerungen.md`); `kosten.md` hat K-03.1–3 nachgeführt, die Posten der Vorstandsfassung nicht. Offen ist nur, ob `kosten.md` die Zahlen übernimmt.
 
 ### 2026-11-08 — Doppel: Löscht der CM-Admin eine Anmeldung, sollen die offenen Anfragen mitverfallen
 
@@ -872,6 +433,8 @@ holen. Vorläufig.
 
 **Verifiziert:** 09.11.2026 gegen `dev` e947d25 — belegt (`verwaltung-doppel.ts` → `loescheDoppel` ruft `anfragenVerfallen` nicht auf; `doppel.ts` → `nimmAnfrageAn` ohne Prüfung der Anmeldung des Anfragenden). Offen ist nur die Umsetzung.
 
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — weiter belegt (`verwaltung-doppel.ts` → `loescheDoppel` ruft `anfragenVerfallen` nicht auf; `doppel.ts` → `nimmAnfrageAn` und `bildePaar` prüfen keine Anmeldung; `anmeldungen.ts` → `meldeAb` ebenso; kein Test zu `loescheDoppel` prüft Anfragen). `59acbd4` berührte nur `ladeDoppel`. Offen ist nur die Umsetzung.
+
 ### 2026-11-09 — Spielersuche zeigt dem CM-Admin Geschlecht und Jahrgang aller aktiven Mitglieder
 
 **Thema:** Datenschutz
@@ -884,37 +447,7 @@ holen. Vorläufig.
 
 **Einschätzung:** Niedrig; vermutlich nur Wortlaut («der Spieler und der Treffer der Suche beim Anmelden von Hand»). Beide Wege offen: Zusage präzisieren oder Treffer ohne Jahrgang/Geschlecht.
 
-### 2026-11-09 — Gespräch mit der Turnierleitung: keine Grenze für Nachrichten eines Mitglieds
-
-**Thema:** Sicherheit
-
-**Fundort:** `src/lib/server/gespraech/schnittstellen.ts` (Senden des Mitglieds), `src/lib/server/gespraech/meldung.ts`
-
-**Beobachtung:** Ein Mitglied kann beliebig viele Nachrichten pro Stunde schicken, und jede löst eine Meldung (Push, sonst E-Mail) an die Kontaktperson aus. Das Sicherheitskonzept verspricht hier nichts, darum kein Doku-Befund.
-
-**Ursprung:** Doku-Abgleich vor dem Release 0.20.5
-
-**Einschätzung:** Niedrig: Absender sind eingeloggte Vereinsmitglieder. Wenn nötig, eine Grenze pro Konto oder höchstens eine Meldung pro Gespräch und Stunde.
-
-### 2026-11-12 — Bauregel kann bei einem Kommentar hinter einer Division zu Unrecht melden
-
-**Thema:** Tests
-
-**Fundort:** `scripts/pruefungen/bauregel.ts`, `ohneKommentare` (Zeichenliste des Regex-Musters:
-`!`, `+`, `-`, `}`, `>`) und `pruefeWeiterreichen` (Muster für Typ-Argumente).
-
-**Beobachtung:** Steht hinter einer Division nach `a!`, `i++` oder `}` ein Zeilenend-Kommentar mit
-`liest`, `schreibt`, `mitKonto` oder `require(`, meldet die Bauregel in einer geprüften Datei einen
-Befund, den es nicht gibt. Ebenso gilt `liest<Map<string, number>>(a)` als Weiterreichen. Im Code
-kommt beides heute nicht vor.
-
-**Ursprung:** Refactoring Schritt 12a (#80), zweites Review; `docs/refactoring-analyse.md`, Anhang
-D.15.
-
-**Einschätzung:** Falscher roter Lauf, kein Schutzverlust. Wer darauf stösst, formuliert den
-Kommentar um oder setzt ihn auf eine eigene Zeile; eine saubere Lösung bräuchte einen Parser statt
-Mustern (neue Bauart, eigener Entscheid).
-
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`cm/verwaltung.ts` → `sucheSpieler` liefert Klassierung, Geschlecht und Jahrgang für jedes aktive Mitglied, höchstens 20 Treffer; `turnier-anzeige.ts` → `trefferText`; `docs/datenschutz.md` und `docs/rollen-und-rechte.md` nennen «der Spieler»). Offen ist nur der Weg: Zusage präzisieren oder Treffer ohne Jahrgang und Geschlecht.
 
 ### 2026-11-21 — Server ohne Swap: bei Speichermangel beendet Linux sofort einen Prozess
 
@@ -935,3 +468,5 @@ Gedanken zur Lastüberwachung im Kommentar zu #39.
 `AUSLIEFERUNG_LIVE=an`: kleine Swap-Datei (z. B. 1–2 GB, niedrige `swappiness`) und/oder
 Speichergrenzen je Container, damit nicht die Live-DB das Opfer ist. Swap-Datei liegt auf der
 Platte des Servers; Datenschutz prüfen (Speicherinhalte der Live-App können ausgelagert werden).
+
+**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt im Repo (`git grep -i swap -- betrieb` leer; auch keine Speichergrenzen je Container in `betrieb/compose.*.yml`). Die Messung auf dem Server ist vom selben Tag und nicht wiederholt. #39 führt unter «Vor `AUSLIEFERUNG_LIVE=an`» keinen Punkt zu Speicher. Offen ist nur, ob der Befund dort aufgenommen wird.

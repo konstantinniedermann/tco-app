@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest';
 // Prüft die Lint-Regel «kein Aufruf `fetch(…)` unter src/», auch nicht über `window`, `globalThis`
 // oder `self` (eslint.config.js, Schritt 20a in docs/refactoring-analyse.md, H-13): Seiten,
 // Ladefunktionen und Bausteine holen Daten nur über die Abruf-Module ihres Themas, die `holen` an den
-// Abruf-Baustein `src/lib/abruf.ts` weitergeben; Server und Service Worker bekommen `holen`
-// hineingereicht. Die Regel kennt keine erlaubte Stelle, auch `abruf.ts` ruft nur `holen(…)`. Die
+// Abruf-Baustein `src/lib/abruf.ts` weitergeben; der Server bekommt `holen` über die Dienste
+// hineingereicht, der Service Worker holt nichts. Die Regel kennt keine erlaubte Stelle, auch `abruf.ts` ruft nur `holen(…)`. Die
 // Grenzen der Regel stehen unten als eigene Fälle; sie sind bewusst nicht gefangen.
 
 const eslint = new ESLint();
@@ -63,7 +63,7 @@ describe('kein Aufruf fetch unter src/', () => {
 
 	it('die Meldung nennt den Weg für Oberfläche und Server und dass es keine Ausnahme gibt', async () => {
 		const meldung =
-			'Kein Aufruf von fetch unter src/. Oberfläche: Daten holen nur die Abruf-Module des Themas (src/lib/<thema>/) mit holen über src/lib/abruf.ts. Server und Service Worker: holen wird hineingereicht (im Server über die Dienste). Es gibt keine Ausnahme.';
+			'Kein Aufruf von fetch unter src/. Oberfläche: Daten holen nur die Abruf-Module des Themas (src/lib/<thema>/) mit holen über src/lib/abruf.ts. Server: holen wird über die Dienste hineingereicht. Der Service Worker holt nichts. Es gibt keine Ausnahme.';
 		expect(await meldungen('src/lib/anlass/neu.ts', "fetch('/x');")).toEqual([meldung]);
 		expect(
 			await meldungen('src/lib/server/anlass/neu.ts', "export const x = () => fetch('/x');")

@@ -40,7 +40,7 @@ Was hier verlinkt ist, existiert; was noch fehlt, ist ein Issue im Milestone sei
 | [Issue-Konventionen](issue-konventionen.md) | Labels, Milestones, Definition of Done |
 | [Context-Scopes](context-scopes.md) | Welche Pfade bei welcher Aufgabe relevant sind |
 | [Beobachtungen](beobachtungen.md) | Posteingang für Befunde ausserhalb des Scopes |
-| [Beobachtungen — Archiv](beobachtungen-archiv.md) | Ausgewertete Beobachtungen mit Ausgang |
+| [Beobachtungen — Archiv](beobachtungen-archiv.md) | Ausgewertete Beobachtungen mit Ausgang, Einträge bis 18.11.2026 (abgeschlossen) |
 | [Versionen](versionen.md) | Versionshistorie |
 | [Refactoring-Analyse](refactoring-analyse.md) | Geschichte: Befunde, Plan und Entscheide des abgeschlossenen Refactorings (11. bis 15.11.2026) mit den Protokollen der Etappen, nicht nachgeführt und kein Lesestoff; was davon gilt, steht in `CLAUDE.md`, arc42, den ADRs und den Beobachtungen |
 | [Specs und Pläne](superpowers/README.md) | Geschichte: Entwürfe und Umsetzungspläne früherer Vorgänge, nicht nachgeführt und nicht die geltende Beschreibung (`docs/superpowers/`) |

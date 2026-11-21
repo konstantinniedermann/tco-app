@@ -123,6 +123,15 @@ Grenze von 10 Code-Anfragen pro IP und Stunde (SI-04) gilt für den ganzen Lauf,
 und E-Mail-Wechsel zusammen. Jeder Test braucht darum nur die nötigen Anfragen; den Login mit
 der neuen Adresse nach einem E-Mail-Wechsel prüft nur das iPhone.
 
+**Einstiegsseite im Handy-Browser:** Ohne Sitzung führt `/` auf den Projekten `iphone` und
+`android` nach `/willkommen`, nicht nach `/login`. Ein E2E, der ohne Sitzung `/` aufruft oder
+nach dem Abmelden die Login-Seite erwartet, ruft vorher `startetVomSymbol(page)` aus
+`tests/e2e/hilfen/geraet.ts` auf, auch in einem zweiten `browser.newContext()`.
+
+**Mails lokal:** Mailpit lauscht auf `127.0.0.1:51025`. Eine ältere eigene `.env` kann noch
+`smtp://localhost:51025` enthalten; ob das ankommt, hängt am DNS des Netzes. Kommen bei
+`make dev` keine Mails an, dort `127.0.0.1` setzen. Die E2E setzen die Adresse selbst.
+
 ## Abdeckung
 
 Die CI misst, welcher Code durch Tests läuft. **Mindestens 90 %** gilt für Fachlogik und
@@ -257,7 +266,10 @@ Datenschutzerklärung gelten.
 
 **Älteres Handy:** ein iPhone mit iOS 16 oder 17 oder ein Android-Handy mit Android 9 bis 11
 (darunter gibt es keine Passkeys). Eine Untergrenze für MyTCO ist damit nicht festgelegt;
-die Testgruppe liefert Erfahrungswerte.
+die Testgruppe liefert Erfahrungswerte. Faktisch zielt der Build auf die Vorgabe von Vite
+(Safari und iOS 16.4, Chrome 111; kein `build.target`, keine `browserslist`), und Push braucht
+auf dem iPhone ohnehin iOS 16.4 (ADR-001). `Object.hasOwn` (ab iOS 15.4) liegt darunter und
+setzt die Grenze nicht. Ältere Geräte sind nicht ausgeschlossen, aber nicht geprüft.
 
 Ablauf, Aufträge, Texte und Auswertung → [Testgruppe](testgruppe.md).
 
