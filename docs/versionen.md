@@ -11,6 +11,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Beobachtungs-Auswertung: Die Meldung beim Start mit unsicherer SMTP-Adresse nennt auch die
+  abgeschaltete Zertifikatsprüfung; die Lint-Meldung zu `fetch` und ein Datenbanktest sind
+  berichtigt. An der App ändert sich nichts.
 - `make seed`: Auf die Beispiel-GV antworten auch die 80 Spieler des Beispielturniers, gemischt
   wie der übrige Testbestand. An der App ändert sich nichts.
 - `make seed` füllt das Beispielturnier 2027 auf: 10 Kategorien (neu «Damen R1–R3» und
