@@ -139,6 +139,31 @@ Vergangenheit an, und alle Beispielantworten (`melde`, `meldeBeispielAntworten`)
 **Einschätzung:** Vorläufig. Datum relativ zum Seed wie beim Clubabend (Titel mit Jahr, damit ein
 zweiter Lauf sie wiederfindet), mit Test; spätestens vor dem 16.03.2027.
 
+**Nachtrag (21.11.2026), dieselbe Ursache:** Die Kategorien des Beispielturniers haben feste
+Jahrgangsgrenzen für 2027 (`scripts/beispiel-turnier.ts` → `KATEGORIEN`: «Junioren U18» ab 2009,
+«Senioren 45+» bis 1982, «Seniorinnen 40+» bis 1987). Legt `beispielJahr` ab dem 1.6.2027 die CM
+2028 an, stimmen Namen und Grenzen um ein Jahr nicht mehr; die Anmeldungen gelingen trotzdem.
+
+### 2026-11-21 — `konto.gesperrt` wird überall gelesen, aber von keinem Code gesetzt
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/db/schema.ts` (`konto.gesperrt`, Vorgabe `false`); gelesen u. a. in
+`cm/anmeldungen.ts` (`hatLogin`), `admin/rollen.ts`, `admin/briefe.ts`, Login und Passkey;
+`admin/mitgliedschaft.ts` → `sperreLogin` (beendet nur Sitzungen und Push-Abos).
+
+**Beobachtung:** `git grep "gesperrt: true"` unter `src/` ohne Tests ist leer: Kein Ablauf setzt die
+Spalte. «Login sofort gesperrt» (FR-04, RR-08) wirkt über `mitglied.status`, den Login, Passkey und
+Sitzung prüfen. Abfragen, die nur `hatLogin` prüfen (z. B. `offeneAnfragenAn`), sehen ein
+ausgetretenes Mitglied darum als «mit Login»; heute ohne Folge, weil Austritt und Vormerken seine
+Anfragen löschen. FR-55 und das Fachmodell nennen «Konto gesperrt» als eigenen Zustand.
+
+**Ursprung:** Beobachtungs-Auswertung vom 21.11.2026, Nebenbefund beim Prüfen der offenen
+Partner-Anfragen (jener Eintrag ist verworfen).
+
+**Einschätzung:** Vorläufig. Entweder eine geplante Sperre durch den Admin (#43?), dann bleibt die
+Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.status` ausrichten.
+
 ### 2026-11-16 — Junioren-CM verlangt bei Swiss Tennis ein eigenes Turnier
 
 **Thema:** Clubmeisterschaft
