@@ -64,7 +64,7 @@ async function seed(): Promise<void> {
 			.where(eq(konto.id, kontoIds[0]));
 		const jetzt = new Date();
 		const gv = await legeBeispielAnlassAn(db, erika.id, jetzt);
-		// Eine Beispiel-Clubmeisterschaft 2027 (Rolle und Kontaktperson folgen unten).
+		// Eine Beispiel-Clubmeisterschaft fürs nächste offene Jahr (Rolle und Kontaktperson folgen unten).
 		await legeBeispielTurnierAn(db, jetzt);
 		// Interclub-Resultate 2026 aus Dateien, ohne Netz.
 		await legeBeispielInterclubAn(db, jetzt);
@@ -89,7 +89,7 @@ async function seed(): Promise<void> {
 			.select({ id: konto.mitgliedId })
 			.from(konto)
 			.where(eq(konto.id, kontoIds[2]));
-		await setzeBeispielKontakt(db, hanna.id);
+		await setzeBeispielKontakt(db, hanna.id, jetzt);
 		await legeBeispielGespraecheAn(db, hanna.id, jetzt);
 		const dienst = erstelleLoginDienst({
 			db,

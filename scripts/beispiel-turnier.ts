@@ -1,5 +1,5 @@
-// Nur lokal (make seed): eine erfundene Clubmeisterschaft 2027 mit 10 Kategorien, damit die
-// Verwaltung beim Vorzeigen nicht leer ist (DS-08). Die Beispielspieler unten zeigen die
+// Nur lokal (make seed): eine erfundene Clubmeisterschaft mit 10 Kategorien, damit die
+// Verwaltung beim Vorzeigen nicht leer ist (DS-08). Das Jahr folgt dem Seed-Datum (`beispielJahr`). Die Beispielspieler unten zeigen die
 // Sonderfälle; beispiel-turnier-fuellung.ts füllt jede Kategorie auf 10–16 Anmeldungen auf.
 import { and, eq, isNull } from 'drizzle-orm';
 import {
@@ -25,10 +25,22 @@ import {
 	turnier
 } from '../src/lib/server/db/schema.ts';
 import type { KategorieWerte } from '../src/lib/server/turnier/angaben.ts';
+import { vorSchluss } from '../src/lib/turnier/status.ts';
 import { fuelleBeispielTurnierAuf } from './beispiel-turnier-fuellung.ts';
 import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../src/lib/server/turnier/turniere.ts';
 
-const JAHR = 2027;
+const schlussIn = (jahr: number) => `${jahr}-05-31`;
+
+/**
+ * Das Jahr der nächsten CM, zu der man sich noch anmelden kann: das laufende, solange sein
+ * Anmeldeschluss (31.05.) nicht vorbei ist, sonst das nächste. Mit einem festen Jahr bliebe das
+ * Turnier nach dem Schluss in Vorbereitung, und Anmeldungen und Gespräche fielen still weg.
+ * Das Jahr nach UTC genügt: Um Neujahr liegt der Schluss weit weg.
+ */
+export function beispielJahr(jetzt: Date): number {
+	const jahr = jetzt.getUTCFullYear();
+	return vorSchluss(schlussIn(jahr), jetzt) ? jahr : jahr + 1;
+}
 
 const OHNE = { jahrgangVon: null, jahrgangBis: null, klassierungVon: null, klassierungBis: null };
 const KATEGORIEN: KategorieWerte[] = [
@@ -259,10 +271,11 @@ async function legeBeispielAnmeldungenAn(db: Db, turnierId: number, jetzt: Date)
 
 /** Legt die Beispiel-Clubmeisterschaft samt Anmeldungen an; vorhandene Daten bleiben unverändert. */
 export async function legeBeispielTurnierAn(db: Db, jetzt: Date): Promise<void> {
+	const jahr = beispielJahr(jetzt);
 	const [vorhanden] = await db
 		.select({ id: turnier.id })
 		.from(turnier)
-		.where(eq(turnier.jahr, JAHR));
+		.where(eq(turnier.jahr, jahr));
 	if (vorhanden) {
 		// Ein Turnier aus einem früheren Seed bekommt die Kategorien, die seither dazukamen.
 		for (const k of KATEGORIEN) {
@@ -274,9 +287,9 @@ export async function legeBeispielTurnierAn(db: Db, jetzt: Date): Promise<void> 
 		return;
 	}
 	const t = await legeTurnierAn(db, {
-		jahr: JAHR,
-		name: `Clubmeisterschaft ${JAHR}`,
-		anmeldeschluss: `${JAHR}-05-31`,
+		jahr,
+		name: `Clubmeisterschaft ${jahr}`,
+		anmeldeschluss: schlussIn(jahr),
 		nummern: [
 			{ bezeichnung: 'Gruppenphase', nummer: '123456' },
 			{ bezeichnung: 'Finalwochenende', nummer: '123457' }
@@ -284,18 +297,18 @@ export async function legeBeispielTurnierAn(db: Db, jetzt: Date): Promise<void> 
 	});
 	if (t.ergebnis !== 'ok') return;
 	for (const k of KATEGORIEN) await legeKategorieAn(db, t.id, k);
-	// Nach dem Anmeldeschluss bleibt das Turnier in Vorbereitung ('schluss-vorbei').
+	// Der Schluss liegt nach `jetzt` (`beispielJahr`), das Öffnen gelingt.
 	await setzeStatus(db, t.id, 'offen', jetzt);
 	await legeBeispielAnmeldungenAn(db, t.id, jetzt);
 	await fuelleBeispielTurnierAuf(db, t.id, jetzt);
 }
 
 /** Kontaktperson des Beispielturniers (CM-Admin der Seed-Personas), nur solange keine gewählt ist. */
-export async function setzeBeispielKontakt(db: Db, mitgliedId: number): Promise<void> {
+export async function setzeBeispielKontakt(db: Db, mitgliedId: number, jetzt: Date): Promise<void> {
 	await db
 		.update(turnier)
 		.set({ kontaktMitgliedId: mitgliedId })
-		.where(and(eq(turnier.jahr, JAHR), isNull(turnier.kontaktMitgliedId)));
+		.where(and(eq(turnier.jahr, beispielJahr(jetzt)), isNull(turnier.kontaktMitgliedId)));
 }
 
 // FR-50 bis FR-52: drei erfundene Gespräche mit der Turnierleitung. Max fragt und wartet auf
@@ -327,7 +340,10 @@ export async function legeBeispielGespraecheAn(
 	hannaId: number,
 	jetzt: Date
 ): Promise<void> {
-	const [t] = await db.select({ id: turnier.id }).from(turnier).where(eq(turnier.jahr, JAHR));
+	const [t] = await db
+		.select({ id: turnier.id })
+		.from(turnier)
+		.where(eq(turnier.jahr, beispielJahr(jetzt)));
 	if (!t) return;
 	const vor = (stunden: number) => new Date(jetzt.getTime() - stunden * 3_600_000);
 	for (const [i, g] of GESPRAECHE.entries()) {

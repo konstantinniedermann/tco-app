@@ -1,12 +1,18 @@
 import { and, count, eq, inArray, isNotNull, isNull, like } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { legeBeispielAnlassAn, meldeBeispielAntworten } from '../../scripts/beispiel-anlass.ts';
-import { legeBeispielTurnierAn, setzeBeispielKontakt } from '../../scripts/beispiel-turnier.ts';
+import {
+	beispielJahr,
+	legeBeispielGespraecheAn,
+	legeBeispielTurnierAn,
+	setzeBeispielKontakt
+} from '../../scripts/beispiel-turnier.ts';
 import { beispielTurnierSpieler } from '../../scripts/beispiel-turnier-fuellung.ts';
 import {
 	anlassAnmeldung,
 	anmeldung,
 	anmeldungSpieler,
+	gespraech,
 	kategorie,
 	konto,
 	mitglied,
@@ -316,12 +322,65 @@ describe('Beispielturnier für make seed', () => {
 		await legeBeispielTurnierAn(eigene.db, jetzt);
 		const erste = await legeMitgliedAn(eigene.db, { rollen: ['cm'] });
 		const zweite = await legeMitgliedAn(eigene.db, { rollen: ['cm'] });
-		await setzeBeispielKontakt(eigene.db, erste.mitgliedId);
-		await setzeBeispielKontakt(eigene.db, zweite.mitgliedId);
+		await setzeBeispielKontakt(eigene.db, erste.mitgliedId, jetzt);
+		await setzeBeispielKontakt(eigene.db, zweite.mitgliedId, jetzt);
 		const [t] = await eigene.db
 			.select({ kontakt: turnier.kontaktMitgliedId })
 			.from(turnier)
 			.where(eq(turnier.jahr, 2027));
 		expect(t.kontakt).toBe(erste.mitgliedId);
+	});
+});
+
+describe('Beispielturnier nach dem Anmeldeschluss des laufenden Jahres', () => {
+	test('A-TURNIER-01: Das Jahr ist das laufende bis zum Ende des 31.05. (Zürich), danach das nächste', () => {
+		expect(beispielJahr(new Date('2026-11-06T10:00:00Z'))).toBe(2027);
+		expect(beispielJahr(new Date('2027-01-01T00:30:00+01:00'))).toBe(2027);
+		expect(beispielJahr(new Date('2027-05-31T23:00:00+02:00'))).toBe(2027);
+		expect(beispielJahr(new Date('2027-06-01T00:30:00+02:00'))).toBe(2028);
+	});
+
+	let spaeter: EigeneDatenbank;
+	beforeAll(async () => {
+		spaeter = await legeEigeneDatenbankAn('beispielturnier_spaeter');
+	});
+	afterAll(async () => {
+		await spaeter.abbauen();
+	});
+
+	test('A-TURNIER-01: Nach dem 31.05. legt der Seed die CM des nächsten Jahres offen an, aufgefüllt, mit Kontaktperson und Gesprächen', async () => {
+		// 15.06.2027: Die CM 2027 ist zu, die nächste Anmeldung ist die von 2028.
+		const jetzt = new Date('2027-06-15T10:00:00Z');
+		await legeBeispielTurnierAn(spaeter.db, jetzt);
+		const [t] = await spaeter.db.select().from(turnier);
+		expect(t).toMatchObject({
+			jahr: 2028,
+			name: 'Clubmeisterschaft 2028',
+			anmeldeschluss: '2028-05-31',
+			status: 'offen'
+		});
+		const proKategorie = await spaeter.db
+			.select({ name: kategorie.name, n: count() })
+			.from(anmeldung)
+			.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
+			.where(inArray(anmeldung.status, ['bestaetigt', 'beantragt']))
+			.groupBy(kategorie.name);
+		expect(proKategorie).toHaveLength(10);
+		for (const { name, n } of proKategorie) expect(n, name).toBeGreaterThanOrEqual(10);
+
+		const hanna = await legeMitgliedAn(spaeter.db, { rollen: ['cm'] });
+		await setzeBeispielKontakt(spaeter.db, hanna.mitgliedId, jetzt);
+		await legeBeispielGespraecheAn(spaeter.db, hanna.mitgliedId, jetzt);
+		const [mitKontakt] = await spaeter.db
+			.select({ kontakt: turnier.kontaktMitgliedId })
+			.from(turnier)
+			.where(eq(turnier.jahr, 2028));
+		expect(mitKontakt.kontakt).toBe(hanna.mitgliedId);
+		// Max und Lena gehören zum Beispielturnier; Kurt (Persona) fehlt in diesem Test.
+		const gespraeche = await spaeter.db
+			.select({ id: gespraech.id })
+			.from(gespraech)
+			.where(eq(gespraech.turnierId, t.id));
+		expect(gespraeche).toHaveLength(2);
 	});
 });
