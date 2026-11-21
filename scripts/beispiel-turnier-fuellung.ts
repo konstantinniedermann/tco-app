@@ -10,6 +10,8 @@ import { GRENZE, meldeAn } from '../src/lib/server/cm/anmeldungen.ts';
 import { nimmAnfrageAn, stelleAnfrage } from '../src/lib/server/cm/doppel.ts';
 import type { Db } from '../src/lib/server/db/index.ts';
 import {
+	anmeldung,
+	anmeldungSpieler,
 	kategorie,
 	konto,
 	mitglied,
@@ -290,7 +292,11 @@ function pruefe(was: string, r: string | { ergebnis: string }): void {
 	if (wort !== 'ok') fehler(`${was} ergab ${wort}`);
 }
 
-/** Füllt das Turnier auf; tut nichts, wenn es nicht offen ist oder die Spieler schon da sind. */
+/**
+ * Füllt das Turnier auf; tut nichts, wenn es nicht offen ist oder schon einer der Spieler dort
+ * angemeldet ist. Spieler aus einem früheren Seed (anderes Jahr) werden wiederverwendet, nicht neu
+ * angelegt: Sonst bliebe das Turnier des Folgejahres auf einer bestehenden Datenbank leer.
+ */
 export async function fuelleBeispielTurnierAuf(
 	db: Db,
 	turnierId: number,
@@ -305,12 +311,32 @@ export async function fuelleBeispielTurnierAuf(
 	const spieler = erzeugeSpieler();
 	const emails = spieler.alle.map((s) => s.werte.email as string);
 	const nummern = spieler.alle.map((s) => s.werte.mitgliedernummer as string);
-	const [vorhanden] = await db
-		.select({ id: mitglied.id })
+	const vorhanden = await db
+		.select({ id: mitglied.id, email: mitglied.email, nummer: mitglied.mitgliedernummer })
 		.from(mitglied)
-		.where(or(inArray(mitglied.email, emails), inArray(mitglied.mitgliedernummer, nummern)))
-		.limit(1);
-	if (vorhanden) return;
+		.where(or(inArray(mitglied.email, emails), inArray(mitglied.mitgliedernummer, nummern)));
+	if (vorhanden.length > 0) {
+		const [schonDa] = await db
+			.select({ id: anmeldungSpieler.anmeldungId })
+			.from(anmeldungSpieler)
+			.innerJoin(anmeldung, eq(anmeldung.id, anmeldungSpieler.anmeldungId))
+			.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
+			.where(
+				and(
+					eq(kategorie.turnierId, turnierId),
+					inArray(
+						anmeldungSpieler.mitgliedId,
+						vorhanden.map((v) => v.id)
+					)
+				)
+			)
+			.limit(1);
+		if (schonDa) return;
+	}
+	// Wiedererkannt an der Nummer, sonst an der E-Mail (wie `beispielTurnierSpieler`).
+	const frueher = (s: Spieler) =>
+		vorhanden.find((v) => v.nummer === s.werte.mitgliedernummer) ??
+		vorhanden.find((v) => v.email === s.werte.email);
 
 	const regeln = new Map(kategorien.map((k) => [k.name, k]));
 	const ids = new Map(kategorien.map((k) => [k.name, k.id]));
@@ -325,6 +351,11 @@ export async function fuelleBeispielTurnierAuf(
 
 	const mitgliedId = new Map<Spieler, number>();
 	for (const s of plan.alle) {
+		const alt = frueher(s);
+		if (alt) {
+			mitgliedId.set(s, alt.id);
+			continue;
+		}
 		const [m] = await db.insert(mitglied).values(s.werte).returning({ id: mitglied.id });
 		// Login wie nach eingelöstem Brief-Code: Nur solche findet die Partnersuche (FR-48).
 		await db.insert(konto).values({ mitgliedId: m.id, briefCodeBenutztAm: jetzt });

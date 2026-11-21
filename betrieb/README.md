@@ -136,7 +136,7 @@ Cookies**, jedes Gerät meldet sich einmal neu an. Umgekehrt öffnet der Hash Te
 darum wie das Passwort nur in `proxy.env`. Ohne Passwort erreichbar sind nur Manifest, Service
 Worker und Symbole (keine Daten), und nur unter genau ihrem Pfad. `curl -u` geht weiter. Den Kopf
 `Authorization` mit Benutzer und Passwort entfernt Caddy, bevor er an App und Mail-Fänger
-weiterreicht (`header_up -Authorization`); das Zugangscookie reicht er mit den übrigen Cookies
+weiterreicht (`header_up -Authorization`, geprüft in `make betrieb-nachweis`); das Zugangscookie reicht er mit den übrigen Cookies
 weiter. Fehlen
 Benutzer oder Hash in `proxy.env`, antwortet Test auf alles mit 503 statt offen zu stehen.
 
@@ -254,6 +254,6 @@ automatisch; sie liegt beim Betreiber.
 
 `make betrieb-nachweis` spielt den ganzen Ablauf auf Docker Desktop mit erfundenen Werten durch
 (Wegwerf-Server im Temp-Ordner, lokale Registry, Test und Live über den Türsteher, HTTPS über
-Caddy, Trennung, Rückfall, Anlegen des Sicherungsziels, Sicherung vor einer Live-Auslieferung,
+Caddy, Test-Sperre ohne Weitergabe des Passworts, Trennung, Rückfall, Anlegen des Sicherungsziels, Sicherung vor einer Live-Auslieferung,
 Wiederherstellung auch einer älteren Sicherung, Testdaten auf Test, Test behält seine Datenbank und wird nur über den Zähler neu aufgesetzt, Sperre von `MAIL_NUR_AN` auf Live, Sicherung vor dem Zurückspielen und Notschalter, keine Datenbankwerte im Protokoll, kaputte Einrichtung, Proxy-Log ohne
 IP-Adressen) und räumt danach alles ab.

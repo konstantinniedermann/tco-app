@@ -11,6 +11,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Nachbesserungen aus dem Review der Beobachtungs-Auswertung: `make seed` füllt das
+  Beispielturnier im Folgejahr auch auf einer bestehenden Datenbank auf; `make betrieb-nachweis`
+  prüft, dass die Test-Sperre das Passwort nicht weiterreicht. An der App ändert sich nichts.
+
 - Test-Sperre: Caddy reicht Benutzer und Passwort der Sperre nicht mehr an App und Mail-Fänger
   weiter. Beobachtungs-Auswertung, zweiter Lauf: `make seed` legt das Beispielturnier im
   nächsten Jahr mit offener Anmeldung an statt fest 2027; Telefonnummern in Tests nur noch mit
