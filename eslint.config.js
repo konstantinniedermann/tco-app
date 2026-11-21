@@ -172,8 +172,8 @@ export function baueImportrichtung(ausnahmen) {
 
 // Kein Aufruf `fetch(…)` unter src/ (Schritt 20a in docs/refactoring-analyse.md, H-13; CLAUDE.md,
 // Oberfläche): In der Oberfläche holen Daten nur die Abruf-Module des Themas, die `holen` an
-// src/lib/abruf.ts weitergeben; auch abruf.ts ruft nur `holen(…)`. Server und Service Worker bekommen
-// `holen` hineingereicht (im Server über die Dienste). Die Regel gilt für alles unter src/, Server,
+// src/lib/abruf.ts weitergeben; auch abruf.ts ruft nur `holen(…)`. Der Server bekommt `holen` über die
+// Dienste hineingereicht; der Service Worker holt nichts (nur `push` und `notificationclick`). Die Regel gilt für alles unter src/, Server,
 // Service Worker und Tests eingeschlossen, ohne erlaubte Stelle. Sie sucht direkt vor der Klammer den
 // Namen `fetch` oder genau `window.fetch`, `globalThis.fetch`, `self.fetch` (nicht jedes `x.fetch`).
 // Nicht gefangen: ein weitergereichtes `holen`, `fetch.call(…)`/`apply`, ein Typ-Zusatz (`as`, `!`),
@@ -181,7 +181,7 @@ export function baueImportrichtung(ausnahmen) {
 // Proben und Grenzen: scripts/fetch-regel.test.ts. Setzt ein späterer Block für dieselben Dateien
 // `no-restricted-syntax`, ersetzt er diese Regel; dann beide zusammenführen.
 const FETCH_MELDUNG =
-	'Kein Aufruf von fetch unter src/. Oberfläche: Daten holen nur die Abruf-Module des Themas (src/lib/<thema>/) mit holen über src/lib/abruf.ts. Server und Service Worker: holen wird hineingereicht (im Server über die Dienste). Es gibt keine Ausnahme.';
+	'Kein Aufruf von fetch unter src/. Oberfläche: Daten holen nur die Abruf-Module des Themas (src/lib/<thema>/) mit holen über src/lib/abruf.ts. Server: holen wird über die Dienste hineingereicht. Der Service Worker holt nichts. Es gibt keine Ausnahme.';
 /** @type {import('eslint').Linter.Config} */
 const FETCH_REGEL = {
 	files: ['src/**/*.{js,mjs,cjs,ts,mts,cts,svelte}'],
