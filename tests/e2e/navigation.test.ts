@@ -163,7 +163,7 @@ test.describe('Mitglieder-App', () => {
 			jahrgang: 1992,
 			klassierung: 'R4'
 		});
-		await setzeTelefon(konto.mitgliedId, '079 000 00 69');
+		await setzeTelefon(konto.mitgliedId, '000 000 00 69');
 
 		await page.goto(`/clubmeisterschaft/${turnierId}/doppel/${kategorieId}`);
 		const zurueck = page.getByRole('link', { name: `‹ ${lang}` });
@@ -267,7 +267,7 @@ test.describe('Mitglieder-App', () => {
 			jahrgang: 1990,
 			klassierung: 'R4'
 		});
-		await setzeTelefon(konto.mitgliedId, '079 000 00 70');
+		await setzeTelefon(konto.mitgliedId, '000 000 00 70');
 		await page.goto(`/clubmeisterschaft/${turnierId}/doppel/${kategorieId}`);
 		await page.getByLabel('Kommentar (freiwillig)').fill('Eher am Wochenende.');
 		// Bei offener Tastatur sind die Reiter weg (UI-Leitbild); zuerst die Tastatur schliessen.
@@ -453,7 +453,7 @@ test.describe('Titel in der Kopfleiste', () => {
 			jahrgang: 1992,
 			klassierung: 'R4'
 		});
-		await setzeTelefon(konto.mitgliedId, '079 000 00 71');
+		await setzeTelefon(konto.mitgliedId, '000 000 00 71');
 		await page.setViewportSize({ width: page.viewportSize()!.width, height: 250 });
 		await page.goto(`/clubmeisterschaft/${turnierId}`);
 		await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();

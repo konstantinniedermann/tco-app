@@ -37,8 +37,8 @@ const MIXED: KategorieWerte = {
 };
 
 // Erfundene Nummern (DS-08).
-const TELEFON_LEA = '079 000 00 01';
-const TELEFON_MARCO = '079 000 00 02';
+const TELEFON_LEA = '000 000 00 01';
+const TELEFON_MARCO = '000 000 00 02';
 const KOMMENTAR = 'Suche jemanden auf R5–R7-Niveau, eher abends.';
 const GEGNER_HINWEIS =
 	'Dann sehen deine Gegner und dein Doppelpartner während der Clubmeisterschaft deine ' +
@@ -189,7 +189,7 @@ test('A-ANMELDUNG-04, FR-48, FR-19: Lea fragt Marco an, Marco nimmt an, beide se
 	await expect(anfrage).toContainText(`${leaName} · R4 möchte mit dir spielen.`);
 	await expect(anfrage.getByRole('link', { name: TELEFON_LEA })).toHaveAttribute(
 		'href',
-		'tel:0790000001'
+		'tel:0000000001'
 	);
 	await expect(anfrage).not.toContainText(lea.email);
 	// FR-19: Vor dem Annehmen sagt die Karte, dass auch die Gegner E-Mail und Telefon sehen.
@@ -211,7 +211,7 @@ test('A-ANMELDUNG-04, FR-48, FR-19: Lea fragt Marco an, Marco nimmt an, beide se
 	await expect(paar).toContainText(`Du spielst mit ${marcoName}.`);
 	await expect(paar.getByRole('link', { name: TELEFON_MARCO })).toHaveAttribute(
 		'href',
-		'tel:0790000002'
+		'tel:0000000002'
 	);
 	await expect(paar.getByRole('link', { name: marco.email })).toHaveAttribute(
 		'href',

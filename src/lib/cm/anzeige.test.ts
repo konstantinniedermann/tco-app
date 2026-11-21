@@ -94,8 +94,8 @@ describe('Anzeige der Clubmeisterschaft für Mitglieder', () => {
 	});
 
 	test('FR-19: Kontakt des Partners als Link', () => {
-		expect(waehlbar('079 000 00 01')).toBe('0790000001');
-		expect(waehlbar('+41 (79) 000-00-01')).toBe('+41790000001');
+		expect(waehlbar('000 000 00 01')).toBe('0000000001');
+		expect(waehlbar('+41 (00) 000-00-01')).toBe('+41000000001');
 	});
 
 	test('A-ANMELDUNG-04: Paar in der kurzen Textform mit Rufname', () => {

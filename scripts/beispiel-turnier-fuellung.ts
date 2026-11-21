@@ -1,4 +1,4 @@
-// Nur lokal (make seed): füllt das Beispielturnier 2027 auf, damit jede Kategorie 10–16 aktive
+// Nur lokal (make seed): füllt das Beispielturnier auf, damit jede Kategorie 10–16 aktive
 // Anmeldungen hat und Listen, Paare und Partnersuche wie bei einer echten Clubmeisterschaft
 // aussehen. 80 erfundene Spieler mit Konto und Login (DS-08: feste Vornamen mit erkennbar
 // erfundenen Nachnamen, ohne Zufall, Adressen nur unter example.org). Die Beispielspieler aus

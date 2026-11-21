@@ -39,6 +39,29 @@ describe('pruefeTestdaten', () => {
 			pruefeTestdaten(new Map([['tests/a.test.ts', 'postgres://user:pass@localhost:55432/db']]))
 		).toEqual([]);
 	});
+	it('meldet Telefonnummern ausser mit der Vorwahl 00 (+41 00 …, 000 …)', () => {
+		const befunde = (text: string) => pruefeTestdaten(new Map([['tests/a.test.ts', text]]));
+		expect(befunde("telefon: '+41 79 123 45 67'")).toEqual(['tests/a.test.ts: +41 79 123 45 67']);
+		expect(befunde("telefon: '079 123 45 67'")).toEqual(['tests/a.test.ts: 079 123 45 67']);
+		expect(befunde('+41 (79) 000-00-01 0041 62 212 34 56 0790000001 +41790000001')).toHaveLength(4);
+		expect(befunde("'+41 00 123 45 67' '000 123 45 67' '+41 (00) 000-00-01' '0000000001'")).toEqual(
+			[]
+		);
+	});
+	it('zählt andere Zahlen nicht als Telefonnummer', () => {
+		const befunde = (text: string) => pruefeTestdaten(new Map([['tests/a.test.ts', text]]));
+		expect(befunde("'2026-11-21T10:00:00Z' 12345678 4600 Olten 'R4' 1790 '123456' 0.5")).toEqual(
+			[]
+		);
+		expect(befunde("'schluessel-0123456789abcdef' 'rm 0123456789ab' x0791234567")).toEqual([]);
+	});
+	it('prüft auch Dateien in Ordnern mit Präfix beispiel-', () => {
+		expect(
+			pruefeTestdaten(
+				new Map([['scripts/beispiel-interclub/2026/bericht-1.json', 'bob@gmail.com']])
+			)
+		).toHaveLength(1);
+	});
 	it('erlaubt nur example.org selbst, keine Unterdomains', () => {
 		expect(pruefeTestdaten(new Map([['tests/a.test.ts', 'x@mail.example.org']]))).toHaveLength(1);
 	});

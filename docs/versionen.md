@@ -11,6 +11,11 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Test-Sperre: Caddy reicht Benutzer und Passwort der Sperre nicht mehr an App und Mail-Fänger
+  weiter. Beobachtungs-Auswertung, zweiter Lauf: `make seed` legt das Beispielturnier im
+  nächsten Jahr mit offener Anmeldung an statt fest 2027; Telefonnummern in Tests nur noch mit
+  der Vorwahl 00, und die Prüfung der Testdaten meldet andere. An der App ändert sich nichts.
+
 - Beobachtungs-Auswertung: Die Meldung beim Start mit unsicherer SMTP-Adresse nennt auch die
   abgeschaltete Zertifikatsprüfung; die Lint-Meldung zu `fetch` und ein Datenbanktest sind
   berichtigt. An der App ändert sich nichts.

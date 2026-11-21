@@ -202,10 +202,11 @@ eine Kopie der Datenbank vom Server. Die Regeln unten gelten für Daten im Repo.
   Jahre setzen.
 - Tests, die ein Mitglied anlegen, geben ihm eine eindeutige Adresse
   (`test-<UUID>@example.org`), damit parallele Tests einander nicht stören.
-- E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern im Format
-  `+41 00 …`, das es nicht gibt. Strassen erfunden.
-- Die CI meldet in Testdaten (auch denen der Test-Umgebung), Seed-Daten, Beispieldaten und Musterbrief jede
-  andere Mail-Domain.
+- E-Mail-Adressen nur `@example.org` (für Beispiele reserviert). Telefonnummern mit der Vorwahl
+  00, die es nicht gibt: `+41 00 …`, national `000 …`. Strassen erfunden.
+- Die CI meldet in Testdaten (auch denen der Test-Umgebung), Seed-Daten, Beispieldaten (auch in
+  Ordnern `beispiel-…`) und Musterbrief jede andere Mail-Domain und jede Schweizer Telefonnummer
+  mit einer anderen Vorwahl (`scripts/pruefungen/testdaten.ts`).
 - Einmal-Codes und Sitzungen in Tests sind erzeugt, nie fest eingetragen.
 
 ## Screenshots als Nachweis

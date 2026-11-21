@@ -98,7 +98,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Kontaktperson des Turniers (wählen, nur gültige nach FR-55; Mitglieder sehen nur den Namen) | – | L Name | S | L Name | L Name | L |
 | Eigene Anmeldung, bis Anmeldeschluss (FR-10) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | Anmeldungen aller (Name, Kategorie) | – | L bestätigte | S | L bestätigte | L bestätigte | L |
-| Geschlecht und Jahrgang der Spieler (zum Zuordnen) | – | – | L | – | S | L |
+| Geschlecht und Jahrgang der Spieler (zum Zuordnen) und der Treffer der Suche beim Anmelden von Hand | – | – | L | – | S | L |
 | Klassierung der Spieler korrigieren (A-ANMELDUNG-06, K-28) | – | – | S | – | – | L |
 | Wildcard-Antrag und Kommentar (FR-08) | – | S eigene | S, entscheidet | S eigene | S eigene | L |
 | Klassierung passender Mitglieder (Partnerwahl) | – | L | L | L | L | L |

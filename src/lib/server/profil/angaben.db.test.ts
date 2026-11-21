@@ -32,13 +32,13 @@ describe('aendereEigeneAngaben', () => {
 		const r = await aendereEigeneAngaben(
 			db,
 			mitgliedId,
-			{ telefon: '079 123 45 67' },
+			{ telefon: '000 123 45 67' },
 			vorher,
 			jetzt
 		);
 		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['telefon'] });
 		const z = await zeile(mitgliedId);
-		expect(z.telefon).toBe('079 123 45 67');
+		expect(z.telefon).toBe('000 123 45 67');
 		expect(z.fairgateOffenSeit).toEqual(jetzt);
 		const v = await db.select().from(aenderung).where(eq(aenderung.mitgliedId, mitgliedId));
 		expect(v).toHaveLength(1);
@@ -80,7 +80,7 @@ describe('aendereEigeneAngaben', () => {
 
 	test('A-KONTO-01: Telefon leeren ist erlaubt', async () => {
 		const { mitgliedId, vorher } = await lea();
-		await aendereEigeneAngaben(db, mitgliedId, { telefon: '079 123 45 67' }, vorher, jetzt);
+		await aendereEigeneAngaben(db, mitgliedId, { telefon: '000 123 45 67' }, vorher, jetzt);
 		const mitTelefon = await ladeEigeneAngaben(db, mitgliedId);
 		const r = await aendereEigeneAngaben(db, mitgliedId, { telefon: '' }, mitTelefon!, jetzt);
 		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['telefon'] });
@@ -94,7 +94,7 @@ describe('aendereEigeneAngaben', () => {
 			vorname: 'X',
 			email: 'x@example.org',
 			jahrgang: 1950,
-			telefon: '079 000 00 00'
+			telefon: '000 000 00 00'
 		};
 		const r = await aendereEigeneAngaben(db, mitgliedId, koerper, vorher, jetzt);
 		expect(r).toEqual({ ergebnis: 'ok', geaendert: ['telefon'] });
@@ -113,21 +113,21 @@ describe('aendereEigeneAngaben', () => {
 
 	test('A-KONTO-01: veralteter Stand (zweiter Tab) wird abgewiesen', async () => {
 		const { mitgliedId, vorher } = await lea();
-		await aendereEigeneAngaben(db, mitgliedId, { telefon: '079 111 11 11' }, vorher, jetzt);
+		await aendereEigeneAngaben(db, mitgliedId, { telefon: '000 111 11 11' }, vorher, jetzt);
 		const r = await aendereEigeneAngaben(
 			db,
 			mitgliedId,
-			{ telefon: '079 222 22 22' },
+			{ telefon: '000 222 22 22' },
 			vorher,
 			jetzt
 		);
 		expect(r).toEqual({ ergebnis: 'veraltet' });
-		expect((await zeile(mitgliedId)).telefon).toBe('079 111 11 11');
+		expect((await zeile(mitgliedId)).telefon).toBe('000 111 11 11');
 	});
 
 	test('A-KONTO-02: erneute Änderung setzt den Fairgate-Marker auf das neueste Datum', async () => {
 		const { mitgliedId, vorher } = await lea();
-		await aendereEigeneAngaben(db, mitgliedId, { telefon: '079 111 11 11' }, vorher, jetzt);
+		await aendereEigeneAngaben(db, mitgliedId, { telefon: '000 111 11 11' }, vorher, jetzt);
 		const spaeter = new Date('2026-11-06T08:00:00Z');
 		const mitTel = await ladeEigeneAngaben(db, mitgliedId);
 		await aendereEigeneAngaben(db, mitgliedId, { ort: 'Aarau' }, mitTel!, spaeter);
@@ -213,13 +213,13 @@ describe('setzeRufname', () => {
 			db,
 			{ art: 'admin', mitgliedId },
 			mitgliedId,
-			{ ...vorher, telefon: '079 111 22 33', rufname: 'Fremd' } as typeof vorher,
+			{ ...vorher, telefon: '000 111 22 33', rufname: 'Fremd' } as typeof vorher,
 			vorher,
 			jetzt
 		);
 		expect(r.ergebnis).toBe('ok');
 		const z = await zeile(mitgliedId);
-		expect(z.telefon).toBe('079 111 22 33');
+		expect(z.telefon).toBe('000 111 22 33');
 		expect(z.rufname).toBe('Hannes');
 	});
 });

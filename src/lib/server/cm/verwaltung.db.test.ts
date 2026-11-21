@@ -627,9 +627,9 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 	test('K-42: ladeAnmeldungen zeigt E-Mail und Telefon bis zum 1.1. nach dem Turnierjahr, auch nach Austritt', async () => {
 		const t = await turnier(['Herren A']);
 		const [a] = t.kategorien;
-		const aktiv = await spieler({ nachname: 'Aktiv', telefon: '079 111 22 33' });
-		const aus = await spieler({ nachname: 'Aus', telefon: '079 444 55 66' });
-		const vor = await spieler({ nachname: 'Vor', telefon: '079 777 88 99' });
+		const aktiv = await spieler({ nachname: 'Aktiv', telefon: '000 111 22 33' });
+		const aus = await spieler({ nachname: 'Aus', telefon: '000 444 55 66' });
+		const vor = await spieler({ nachname: 'Vor', telefon: '000 777 88 99' });
 		for (const id of [aktiv, aus, vor]) await anmeldungMit(a, id, 'bestaetigt', t.jetzt);
 		await db
 			.update(mitglied)
@@ -649,9 +649,9 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 
 		// 31.12. 23:59 in Zürich: noch im Turnierjahr.
 		expect(await kontakt(new Date(`${t.jahr}-12-31T22:59:00Z`))).toEqual({
-			[aktiv]: ['079 111 22 33', true],
-			[aus]: ['079 444 55 66', true],
-			[vor]: ['079 777 88 99', true]
+			[aktiv]: ['000 111 22 33', true],
+			[aus]: ['000 444 55 66', true],
+			[vor]: ['000 777 88 99', true]
 		});
 		// 1.1. 00:00 in Zürich: nur noch Namen.
 		const danach = await ladeAnmeldungen(db, a, new Date(`${t.jahr}-12-31T23:00:00Z`));
@@ -663,7 +663,7 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 			])
 		);
 		const json = JSON.stringify(danach);
-		expect(json).not.toContain('079');
+		expect(json).not.toMatch(/000 \d{3} \d{2} \d{2}/);
 		expect(json).not.toContain('@example.org');
 	});
 

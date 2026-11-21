@@ -441,7 +441,7 @@ test('PC: Anmeldungen einzeilig, Aktionen über «Ändern»', async ({ page }, i
 		jahrgang: 1975,
 		klassierung: 'R5',
 		// K-42: mit Telefon und E-Mail, der breiteste Fall der Spalte «Kontakt».
-		telefon: '+41 79 123 45 67'
+		telefon: '+41 00 123 45 67'
 	});
 	await meldeZurCmAn(kategorieId, lang.mitgliedId);
 	const cm = await legeCmMitBriefCodeAn('Cyrill');

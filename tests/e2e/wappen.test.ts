@@ -97,7 +97,7 @@ test('Wappen bei offener Tastatur schliesst nur die Tastatur', async ({ page }, 
 	const feld = await oeffneTelefon(page);
 	// Geändert: Ginge der Tipp als Link durch, stünde die Rückfrage sofort da (beforeNavigate
 	// läuft noch im Klick), nicht erst nach dem Laden der Startseite.
-	await feld.fill('079 555 02 34');
+	await feld.fill('000 555 02 34');
 	await expect(page.locator('html')).toHaveAttribute('data-tastatur');
 
 	await tippeWappen(page, true);
@@ -106,7 +106,7 @@ test('Wappen bei offener Tastatur schliesst nur die Tastatur', async ({ page }, 
 	await expect(page.locator('html')).not.toHaveAttribute('data-tastatur');
 	await expect(reiter(page, 'Start')).toBeVisible();
 	await expect(page).toHaveURL(/\/profil$/);
-	await expect(feld).toHaveValue('079 555 02 34');
+	await expect(feld).toHaveValue('000 555 02 34');
 
 	// Erst der nächste Tipp führt weiter, hier zur Rückfrage.
 	await tippeWappen(page, true);
@@ -123,7 +123,7 @@ test('Rückfrage bei Ungespeichertem: Abbrechen bleibt, Verlassen geht weiter', 
 	const konto = await legeKontoMitBriefCodeAn('Ursina');
 	await meldeAn(page, konto);
 	const feld = await oeffneTelefon(page);
-	await feld.fill('079 555 01 23');
+	await feld.fill('000 555 01 23');
 	await schliesseTastatur(page);
 
 	await tippeWappen(page, finger);
@@ -132,7 +132,7 @@ test('Rückfrage bei Ungespeichertem: Abbrechen bleibt, Verlassen geht weiter', 
 	await rueckfrage(page).getByRole('button', { name: 'Abbrechen' }).click();
 	await expect(rueckfrage(page)).toBeHidden();
 	await expect(page).toHaveURL(/\/profil$/);
-	await expect(feld).toHaveValue('079 555 01 23');
+	await expect(feld).toHaveValue('000 555 01 23');
 	await expect(reiter(page, 'Profil')).toHaveAttribute('aria-current', 'page');
 
 	// Auch der Reiter fragt; «Verlassen» führt zum Ziel.
@@ -152,7 +152,7 @@ test('Keine Rückfrage nach dem Zurücksetzen und nach dem Speichern', async ({ 
 	// Getippt und wieder zurückgesetzt: weicht nicht vom geladenen Stand ab.
 	const feld = await oeffneTelefon(page);
 	const vorher = await feld.inputValue();
-	await feld.fill('079 555 04 56');
+	await feld.fill('000 555 04 56');
 	await feld.fill(vorher);
 	await schliesseTastatur(page);
 	await tippeWappen(page, finger);
@@ -161,9 +161,9 @@ test('Keine Rückfrage nach dem Zurücksetzen und nach dem Speichern', async ({ 
 
 	// Gespeichert: nichts mehr ungespeichert.
 	const neu = await oeffneTelefon(page);
-	await neu.fill('079 555 07 89');
+	await neu.fill('000 555 07 89');
 	await page.getByRole('button', { name: 'Telefon speichern' }).click();
-	await expect(page.locator('.kachel', { hasText: 'Telefon' })).toContainText('079 555 07 89');
+	await expect(page.locator('.kachel', { hasText: 'Telefon' })).toContainText('000 555 07 89');
 	await tippeWappen(page, finger);
 	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Vreni' })).toBeVisible();
 	await expect(rueckfrage(page)).toBeHidden();

@@ -265,9 +265,9 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 		const lena = await spieler('Lena', 'Aebi', {
 			geschlecht: 'w',
 			klassierung: 'R4',
-			telefon: '079 111 22 33'
+			telefon: '000 111 22 33'
 		});
-		const max = await spieler('Max', 'Zaugg', { telefon: '079 444 55 66' });
+		const max = await spieler('Max', 'Zaugg', { telefon: '000 444 55 66' });
 		const paul = await spieler('Paul', 'Brunner');
 		const urs = await spieler('Urs', 'Christen', { klassierung: null });
 		const paar = await anmeldungMit(t.doppel, [max, lena], t.jetzt);
@@ -288,7 +288,7 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 							geschlecht: 'w',
 							klassierung: 'R4',
 							email: expect.stringMatching(/@example\.org$/),
-							telefon: '079 111 22 33'
+							telefon: '000 111 22 33'
 						},
 						{
 							mitgliedId: max,
@@ -297,7 +297,7 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 							geschlecht: 'm',
 							klassierung: 'R5',
 							email: expect.stringMatching(/@example\.org$/),
-							telefon: '079 444 55 66'
+							telefon: '000 444 55 66'
 						}
 					],
 					summe: 9
@@ -339,11 +339,11 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 		const imJahr = JSON.stringify(
 			await ladeDoppel(db, t.doppel, new Date(`${t.jahr}-12-31T22:59:00Z`))
 		);
-		expect(imJahr).toContain('079 111 22 33');
+		expect(imJahr).toContain('000 111 22 33');
 		const danach = JSON.stringify(
 			await ladeDoppel(db, t.doppel, new Date(`${t.jahr}-12-31T23:00:00Z`))
 		);
-		expect(danach).not.toContain('079');
+		expect(danach).not.toMatch(/000 \d{3} \d{2} \d{2}/);
 		expect(danach).not.toContain('@example.org');
 		expect(danach).toContain('Aebi');
 
@@ -354,7 +354,7 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 	test('A-ANMELDUNG-06: ladeDoppel: Summe null ohne Klassierung, ausgetretener Spieler mit Status, Anfragen älteste zuerst', async () => {
 		const t = await turnier();
 		const anna = await spieler('Anna', 'Graf', { geschlecht: 'w', klassierung: null });
-		const beat = await spieler('Beat', 'Huber', { telefon: '079 123 45 67' });
+		const beat = await spieler('Beat', 'Huber', { telefon: '000 123 45 67' });
 		const cla = await spieler('Claudio', 'Iten');
 		const dora = await spieler('Dora', 'Jost', { geschlecht: 'w' });
 		await anmeldungMit(t.doppel, [anna, beat], t.jetzt);
@@ -374,7 +374,7 @@ describe('A-ANMELDUNG-06, FR-46: Doppel in der Verwaltung', () => {
 			[beat, 'ausgetreten']
 		]);
 		// K-42: Der CM-Admin erreicht auch Ausgetretene bis zur Löschung.
-		expect(liste.paare[0].spieler[1].telefon).toBe('079 123 45 67');
+		expect(liste.paare[0].spieler[1].telefon).toBe('000 123 45 67');
 		expect(liste.anfragen.map((a) => a.anfrageId)).toEqual([frueher, spaeter]);
 	});
 

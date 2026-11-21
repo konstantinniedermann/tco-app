@@ -52,7 +52,7 @@ async function vollesMitglied() {
 	await db
 		.update(mitglied)
 		.set({
-			telefon: '079 000 00 00',
+			telefon: '000 000 00 00',
 			jahrgang: 1990,
 			lizenznummer: 'L-123',
 			klassierung: 'R4',
@@ -201,7 +201,7 @@ describe('ladeAuskunft (DS-07)', () => {
 		expect(a!.angaben).toMatchObject({
 			vorname: 'Erika',
 			nachname: 'Beispiel',
-			telefon: '079 000 00 00',
+			telefon: '000 000 00 00',
 			jahrgang: 1990,
 			lizenznummer: 'L-123'
 		});

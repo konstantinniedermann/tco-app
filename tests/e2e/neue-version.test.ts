@@ -116,7 +116,7 @@ test('nach einer neuen Auslieferung: zuerst die Rückfrage, goto und Zurück ble
 		jahrgang: 1990,
 		klassierung: 'R4'
 	});
-	await setzeTelefon(konto.mitgliedId, '079 000 00 71');
+	await setzeTelefon(konto.mitgliedId, '000 000 00 71');
 	await startetVomSymbol(page);
 	await page.goto('/login');
 	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
