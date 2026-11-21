@@ -72,8 +72,8 @@ describe('Liste Für Fairgate', () => {
 
 	test('A-KONTO-02: mehrere Änderungen bleiben ein Eintrag mit neuestem Datum', async () => {
 		const { mitgliedId } = await neuesMitglied();
-		await selbst(mitgliedId, { telefon: '079 123 45 67' }, t1);
-		await selbst(mitgliedId, { telefon: '079 765 43 21' }, t3);
+		await selbst(mitgliedId, { telefon: '000 123 45 67' }, t1);
+		await selbst(mitgliedId, { telefon: '000 765 43 21' }, t3);
 		const zeilen = (await listeFuerFairgate(db)).filter((z) => z.id === mitgliedId);
 		expect(zeilen).toHaveLength(1);
 		expect(zeilen[0].seit).toEqual(t3);
@@ -88,7 +88,7 @@ describe('Liste Für Fairgate', () => {
 			db,
 			{ art: 'admin', mitgliedId: adminId },
 			mitgliedId,
-			{ ...vorher, telefon: '079 000 00 00', ort: 'Aarau' },
+			{ ...vorher, telefon: '000 000 00 00', ort: 'Aarau' },
 			vorher,
 			t1
 		);
@@ -106,7 +106,7 @@ describe('Liste Für Fairgate', () => {
 
 	test('gelöschter Verlauf zu offener Markierung: felder leer, verlaufGeloescht', async () => {
 		const { mitgliedId } = await neuesMitglied();
-		await selbst(mitgliedId, { telefon: '079 123 45 67' }, t1);
+		await selbst(mitgliedId, { telefon: '000 123 45 67' }, t1);
 		expect((await zeileVon(mitgliedId))!.verlaufGeloescht).toBe(false);
 		await db.delete(aenderung).where(eq(aenderung.mitgliedId, mitgliedId));
 		const z = await zeileVon(mitgliedId);
@@ -122,7 +122,7 @@ describe('Liste Für Fairgate', () => {
 	test('A-KONTO-02: Abhaken entfernt den Eintrag und schreibt Verlauf', async () => {
 		const { mitgliedId } = await neuesMitglied();
 		const { mitgliedId: adminId } = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
-		await selbst(mitgliedId, { telefon: '079 123 45 67' }, t1);
+		await selbst(mitgliedId, { telefon: '000 123 45 67' }, t1);
 		const urheber = { art: 'admin', mitgliedId: adminId } as const;
 		expect(await markiereUebertragen(db, urheber, mitgliedId, t1, t2)).toBe('ok');
 		expect(await zeileVon(mitgliedId)).toBeUndefined();
@@ -145,7 +145,7 @@ describe('Liste Für Fairgate', () => {
 	test('A-KONTO-02: nach dem Abhaken zeigt eine neue Änderung nur die neuen Felder', async () => {
 		const { mitgliedId } = await neuesMitglied();
 		const { mitgliedId: adminId } = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
-		await selbst(mitgliedId, { telefon: '079 123 45 67' }, t1);
+		await selbst(mitgliedId, { telefon: '000 123 45 67' }, t1);
 		await markiereUebertragen(db, { art: 'admin', mitgliedId: adminId }, mitgliedId, t1, t2);
 		await selbst(mitgliedId, { ort: 'Aarau' }, t3);
 		const z = await zeileVon(mitgliedId);
@@ -156,8 +156,8 @@ describe('Liste Für Fairgate', () => {
 	test('A-KONTO-02: älteste Änderung steht zuerst', async () => {
 		const spaet = (await neuesMitglied()).mitgliedId;
 		const frueh = (await neuesMitglied()).mitgliedId;
-		await selbst(spaet, { telefon: '079 111 11 11' }, t4);
-		await selbst(frueh, { telefon: '079 222 22 22' }, t1);
+		await selbst(spaet, { telefon: '000 111 11 11' }, t4);
+		await selbst(frueh, { telefon: '000 222 22 22' }, t1);
 		const ids = (await listeFuerFairgate(db)).map((z) => z.id);
 		expect(ids.indexOf(frueh)).toBeLessThan(ids.indexOf(spaet));
 	});
@@ -165,7 +165,7 @@ describe('Liste Für Fairgate', () => {
 	test('A-KONTO-02: Abhaken nach neuerer Änderung des Mitglieds ist veraltet und lässt die Zeile stehen', async () => {
 		const { mitgliedId } = await neuesMitglied();
 		const { mitgliedId: adminId } = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
-		await selbst(mitgliedId, { telefon: '079 123 45 67' }, t1);
+		await selbst(mitgliedId, { telefon: '000 123 45 67' }, t1);
 		await selbst(mitgliedId, { ort: 'Aarau' }, t3);
 		const urheber = { art: 'admin', mitgliedId: adminId } as const;
 		expect(await markiereUebertragen(db, urheber, mitgliedId, t1, t4)).toBe('veraltet');

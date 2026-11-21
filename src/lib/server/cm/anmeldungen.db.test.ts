@@ -788,11 +788,11 @@ describe('CM-Anmeldung', () => {
 		const seppName = { rufname: 'Joe', vorname: 'Sepp', nachname: 'Aebi' };
 		const leaName = { rufname: 'Lele', vorname: 'Lea', nachname: 'Marbach' };
 		const marcoName = { rufname: null, vorname: 'Marco', nachname: 'Beispiel' };
-		await setze(sepp, kontakt('079 111 22 33', 'sepp@example.org'));
+		await setze(sepp, kontakt('000 111 22 33', 'sepp@example.org'));
 		await setze(rita, kontakt(null, 'rita@example.org'));
-		await setze(lea, kontakt('079 444 55 66', 'lea@example.org'));
-		await setze(marco, kontakt('079 777 88 99', 'marco@example.org'));
-		await setze(nina, kontakt('079 000 00 00', 'nina@example.org'));
+		await setze(lea, kontakt('000 444 55 66', 'lea@example.org'));
+		await setze(marco, kontakt('000 777 88 99', 'marco@example.org'));
+		await setze(nina, kontakt('000 000 00 00', 'nina@example.org'));
 		// Anfragen zählen nur von Mitgliedern mit Login.
 		await db
 			.update(konto)
@@ -842,7 +842,7 @@ describe('CM-Anmeldung', () => {
 				kategorie: 'Mixed Doppel',
 				von: leaName,
 				klassierung: 'R6',
-				kontakt: { art: 'telefon', wert: '079 444 55 66' }
+				kontakt: { art: 'telefon', wert: '000 444 55 66' }
 			}
 		]);
 		expect(m?.turnier.anzahl).toBe(1);
@@ -853,7 +853,7 @@ describe('CM-Anmeldung', () => {
 			art: 'email',
 			wert: 'lea@example.org'
 		});
-		await setze(lea, kontakt('079 444 55 66', 'lea@example.org'));
+		await setze(lea, kontakt('000 444 55 66', 'lea@example.org'));
 
 		// Lea: Herren Doppel nicht für sie, die eigene Anfrage an Marco, ihr Suchtext.
 		const l = await ladeCmAnsicht(db, t.id, lea, t.jetzt);
@@ -873,7 +873,7 @@ describe('CM-Anmeldung', () => {
 			paare: [[seppName, ritaName]],
 			eigen: {
 				art: 'paar',
-				partner: { name: seppName, telefon: '079 111 22 33', email: 'sepp@example.org' }
+				partner: { name: seppName, telefon: '000 111 22 33', email: 'sepp@example.org' }
 			}
 		});
 		const s = await ladeCmAnsicht(db, t.id, sepp, t.jetzt);
@@ -945,10 +945,10 @@ describe('CM-Anmeldung', () => {
 			klassierung: 'R7'
 		});
 		for (const [id, tel] of [
-			[lea, '079 444 55 66'],
-			[marco, '079 777 88 99'],
-			[paula, '079 123 45 67'],
-			[paul, '079 765 43 21']
+			[lea, '000 444 55 66'],
+			[marco, '000 777 88 99'],
+			[paula, '000 123 45 67'],
+			[paul, '000 765 43 21']
 		] as const) {
 			await db
 				.update(mitglied)
@@ -990,9 +990,10 @@ describe('CM-Anmeldung', () => {
 			]
 		});
 		const json = JSON.stringify(ansicht);
-		for (const verboten of ['079', '@example.org', 'telefon', 'email', 'R6', 'R5', 'R2', 'N4']) {
+		for (const verboten of ['@example.org', 'telefon', 'email', 'R6', 'R5', 'R2', 'N4']) {
 			expect(json).not.toContain(verboten);
 		}
+		expect(json).not.toMatch(/000 \d{3} \d{2} \d{2}/);
 		expect(ansicht?.anfragen).toEqual([]);
 	});
 });

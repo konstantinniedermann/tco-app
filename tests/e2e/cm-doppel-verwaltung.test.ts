@@ -238,7 +238,7 @@ test('FR-48: offene Anfrage als Paar anmelden und löschen', async ({ page }, in
 	const ivo = await legeHerrnAn('Ivo', 'R4');
 	const jan = await legeHerrnAn('Jan', 'R7');
 	const kurt = await legeHerrnAn('Kurt', 'R8');
-	await setzeSpielerangaben(gian.mitgliedId, { telefon: '079 555 66 77' });
+	await setzeSpielerangaben(gian.mitgliedId, { telefon: '000 555 66 77' });
 	// Angefragt werden kann nur, wer ein Login hat.
 	await gibLogin(hugo.kontoId);
 	await gibLogin(jan.kontoId);
@@ -253,8 +253,8 @@ test('FR-48: offene Anfrage als Paar anmelden und löschen', async ({ page }, in
 	await expect(anfragen.getByRole('row')).toHaveCount(3);
 	// K-42: Der CM-Admin erreicht beide Seiten einer offenen Anfrage und den Suchenden.
 	await expect(
-		zeile(anfragen, gian.nachname).getByRole('link', { name: 'Tel. 079 555 66 77' })
-	).toHaveAttribute('href', 'tel:0795556677');
+		zeile(anfragen, gian.nachname).getByRole('link', { name: 'Tel. 000 555 66 77' })
+	).toHaveAttribute('href', 'tel:0005556677');
 	for (const [wo, wer, s] of [
 		[anfragen, gian.nachname, gian],
 		[anfragen, gian.nachname, hugo],
@@ -474,7 +474,7 @@ test('PC: Anfrage mit zwei Tasten bleibt ohne «Ändern»', async ({ page }, inf
 	await stelleAnfrageDirekt(kategorieId, urs.mitgliedId, vito.mitgliedId);
 	// K-42: mit Telefon und E-Mail aller Beteiligten, der breiteste Fall der Spalte «Kontakt».
 	for (const s of [sandro, timo, urs, vito])
-		await setzeSpielerangaben(s.mitgliedId, { telefon: '+41 79 123 45 67' });
+		await setzeSpielerangaben(s.mitgliedId, { telefon: '+41 00 123 45 67' });
 	await oeffneKategorieAlsCm(page, cm, jahr);
 
 	// Anfrage: zwei Aktionen, beide als Taste in einer Zeile.

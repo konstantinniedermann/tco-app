@@ -91,12 +91,12 @@ describe('A-KONTO-01: eigene Angaben laden', () => {
 describe('A-KONTO-01: eigene Angaben speichern', () => {
 	it('schickt Änderung und geladenen Stand als JSON', async () => {
 		const { aufrufe, holen } = holer(json(200, { geaendert: ['telefon'] }));
-		const r = await speichereAngaben({ telefon: '079 000 00 00' }, LEA, holen);
+		const r = await speichereAngaben({ telefon: '000 000 00 00' }, LEA, holen);
 		expect(r).toEqual({ art: 'ok' });
 		expect(aufrufe[0].pfad).toBe('/api/profil');
 		expect(aufrufe[0].init.method).toBe('POST');
 		expect(JSON.parse(aufrufe[0].init.body as string)).toEqual({
-			angaben: { telefon: '079 000 00 00' },
+			angaben: { telefon: '000 000 00 00' },
 			vorher: LEA
 		});
 	});
@@ -194,7 +194,7 @@ describe('A-KONTO-01: Meldungen und Stand', () => {
 
 	it('Stand nach dem Speichern: getrimmt, leeres Telefon und leere Lizenznummer als null', () => {
 		const stand = mitAenderung(
-			{ ...LEA, telefon: '079 000 00 00', lizenznummer: '12345678' },
+			{ ...LEA, telefon: '000 000 00 00', lizenznummer: '12345678' },
 			{ telefon: ' ', lizenznummer: '', ort: ' Trimbach ' }
 		);
 		expect(stand).toEqual({ ...LEA, telefon: null, lizenznummer: null, ort: 'Trimbach' });

@@ -108,7 +108,7 @@ describe('pruefeAngaben', () => {
 	});
 
 	it('Telefon 6–20 Zeichen aus Ziffern, Leerzeichen, +', () => {
-		for (const telefon of ['12345', '1'.repeat(21), '079-123 45 67', 'abc def gh']) {
+		for (const telefon of ['12345', '1'.repeat(21), '000-123 45 67', 'abc def gh']) {
 			expect(fehlerVon({ ...gueltig, telefon }).telefon).toBeTruthy();
 		}
 		const r = pruefeAngaben({ ...gueltig, telefon: '123456' }, OPT);

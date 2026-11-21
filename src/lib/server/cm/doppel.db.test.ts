@@ -1013,7 +1013,7 @@ describe('FR-48, FR-19: Nachträge Etappe 2', () => {
 		const marcoMail = `marco${marcoId}@example.org`;
 		await db
 			.update(mitglied)
-			.set({ telefon: '079 555 01 99', email: marcoMail })
+			.set({ telefon: '000 555 01 99', email: marcoMail })
 			.where(eq(mitglied.id, marcoId));
 		await anmeldungMit(t.mixed, [ich, marcoId], t.jetzt);
 		const eigen = async () =>
@@ -1021,7 +1021,7 @@ describe('FR-48, FR-19: Nachträge Etappe 2', () => {
 				?.eigen;
 		expect(await eigen()).toMatchObject({
 			art: 'paar',
-			partner: { telefon: '079 555 01 99', email: marcoMail }
+			partner: { telefon: '000 555 01 99', email: marcoMail }
 		});
 
 		await db
@@ -1036,7 +1036,7 @@ describe('FR-48, FR-19: Nachträge Etappe 2', () => {
 		});
 		// Review Focus 5: Marcos Kontakt steht nirgends im JSON der Ansicht.
 		const json = JSON.stringify(ansicht);
-		expect(json).not.toContain('079 555 01 99');
+		expect(json).not.toContain('000 555 01 99');
 		expect(json).not.toContain(marcoMail);
 	});
 });

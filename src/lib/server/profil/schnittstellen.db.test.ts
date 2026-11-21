@@ -111,7 +111,7 @@ describe('Profil-Schnittstellen', () => {
 		const sende = () =>
 			postProfil(
 				d,
-				ereignis({ body: { angaben: { telefon: '079 123 45 67' }, vorher }, konto: l.konto })
+				ereignis({ body: { angaben: { telefon: '000 123 45 67' }, vorher }, konto: l.konto })
 			);
 		const erste = await sende();
 		expect([erste.status, await erste.json()]).toEqual([200, { geaendert: ['telefon'] }]);
@@ -155,7 +155,7 @@ describe('Profil-Schnittstellen', () => {
 		).json();
 		const r = await postProfil(
 			d,
-			ereignis({ body: { angaben: { telefon: '079 123 45 67' }, vorher }, konto: l.konto })
+			ereignis({ body: { angaben: { telefon: '000 123 45 67' }, vorher }, konto: l.konto })
 		);
 		expect([r.status, await r.json()]).toEqual([
 			400,
