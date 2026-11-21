@@ -27,12 +27,17 @@
 			}
 			header Set-Cookie "mytco_test_zugang={$MYTCO_TEST_PASSWORT_HASH}; Max-Age=31536000; Path=/; Secure; HttpOnly; SameSite=Lax"
 		}
+		# Das Test-Passwort bleibt bei Caddy: Den Kopf `Authorization` (Benutzer und Passwort, nur
+		# Base64) braucht dahinter niemand, ohne `-Authorization` bekämen ihn App und Mail-Fänger.
 		# Postfach des Mail-Fängers (Mailpit), wie die App nur mit dem Test-Passwort.
 		handle /_mail* {
-			reverse_proxy mailpit-test:8025
+			reverse_proxy mailpit-test:8025 {
+				header_up -Authorization
+			}
 		}
 		handle {
 			reverse_proxy app-test:3000 {
+				header_up -Authorization
 				import app_ohne_sicherheit
 			}
 		}
