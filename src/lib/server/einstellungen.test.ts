@@ -124,7 +124,9 @@ describe('leseEinstellungen', () => {
 			MYTCO_SMTP_URL,
 			NODE_ENV: 'production'
 		});
-		const fehler = new Error('MYTCO_SMTP_URL ohne TLS (smtps:// oder requireTLS=true)');
+		const fehler = new Error(
+			'MYTCO_SMTP_URL ohne TLS (smtps:// oder requireTLS=true, ohne die Zertifikatsprüfung abzuschalten)'
+		);
 
 		test.each([
 			'smtp://mail.example.org:587',
