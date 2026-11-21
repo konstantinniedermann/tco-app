@@ -915,3 +915,23 @@ D.15.
 Kommentar um oder setzt ihn auf eine eigene Zeile; eine saubere Lösung bräuchte einen Parser statt
 Mustern (neue Bauart, eigener Entscheid).
 
+
+### 2026-11-21 — Server ohne Swap: bei Speichermangel beendet Linux sofort einen Prozess
+
+**Thema:** Betrieb
+
+**Fundort:** Server (VPS Lite 2 vCPU / 4 GB), `swapon --show` leer; `betrieb/server/einrichten.sh`
+legt keinen Swap an.
+
+**Beobachtung:** Der Server hat keinen Auslagerungsspeicher. Gemessen am 21.11.2026 (nur Test
+läuft): 0.8 von 3.9 GB belegt, 3.1 GB verfügbar. Wird der Speicher knapp (Live, Website nach
+K-48, Spitze beim Build eines Containers), beendet der OOM-Killer ohne Vorwarnung einen Prozess,
+im schlimmsten Fall PostgreSQL von Live.
+
+**Ursprung:** Nutzerfrage «reicht ein Server für Test und Live?», einmalige Messung per SSH;
+Gedanken zur Lastüberwachung im Kommentar zu #39.
+
+**Einschätzung:** Heute viel Reserve, darum nicht dringend. Kandidat für die Einrichtung vor
+`AUSLIEFERUNG_LIVE=an`: kleine Swap-Datei (z. B. 1–2 GB, niedrige `swappiness`) und/oder
+Speichergrenzen je Container, damit nicht die Live-DB das Opfer ist. Swap-Datei liegt auf der
+Platte des Servers; Datenschutz prüfen (Speicherinhalte der Live-App können ausgelagert werden).
