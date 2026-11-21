@@ -116,6 +116,40 @@ Ausgewertete Einträge stehen im [Archiv](beobachtungen-archiv.md).
 
 ## Offen
 
+### 2026-11-21 — Interclub: auf Test nur die Saison 2026, ältere Saisons nachladen
+
+**Thema:** Interclub
+
+**Fundort:** Test-Datenbank; `src/lib/server/interclub/import.ts` (`importiereSaison`),
+`scripts/ic-import.ts`, `Dockerfile` (Testdaten)
+
+**Beobachtung:** Auf Test stehen seit 21.11.2026 die echten Interclub-Daten 2026 (Verein 2202),
+von Hand im App-Container eingespielt. Die Saisons 2021–2025, die Swiss Tennis noch liefert,
+fehlen dort. Das Aufsetzen von Test (`scripts/testdaten.ts`) legt keine Interclub-Daten an, und
+`scripts/ic-import.ts` ist nicht im Image: Nach dem Neu-Aufsetzen ist der Reiter IC wieder weg.
+
+**Ursprung:** Nutzerhinweis in der Session zum IC-Stand auf Test.
+
+**Einschätzung:** Nutzer will die alten Resultate später auch nachladen. Von Hand je Jahr wie
+2026 möglich; dauerhaft löst es der regelmässige Abruf (#81, Teil 3), oder Test lädt beim
+Aufsetzen selbst.
+
+### 2026-11-21 — Interclub: ältere Saisons in der Ansicht kaum erreichbar
+
+**Thema:** Interclub
+
+**Fundort:** `src/routes/interclub/+page.svelte`, `src/lib/server/interclub/ansicht.ts`
+(`ladeUebersicht`)
+
+**Beobachtung:** Die Übersicht zeigt nur die neueste Saison; eine Wahl älterer Saisons gibt es
+nicht. Sind 2021–2025 geladen, kommt man an sie nicht bequem heran.
+
+**Ursprung:** Nutzerhinweis in der Session zum IC-Stand auf Test.
+
+**Einschätzung:** Nutzer will die Browsebarkeit alter Resultate später verbessern. Braucht einen
+Entwurf (UI-Leitbild, Design-Artifact «MyTCO Interclub»), bevor gebaut wird; passt zu den
+Saisonverläufen, für die Personen- und Ranglistennummern schon gespeichert sind.
+
 ### 2026-11-20 — make seed legt nach dem 31.05.2027 keine Turnier-Anmeldungen mehr an
 
 **Thema:** Tests
