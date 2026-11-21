@@ -268,8 +268,8 @@ Datenschutzerklärung gelten.
 (darunter gibt es keine Passkeys). Eine Untergrenze für MyTCO ist damit nicht festgelegt;
 die Testgruppe liefert Erfahrungswerte. Faktisch zielt der Build auf die Vorgabe von Vite
 (Safari und iOS 16.4, Chrome 111; kein `build.target`, keine `browserslist`), und Push braucht
-auf dem iPhone ohnehin iOS 16.4 (ADR-001); der Code nutzt Funktionen dieser Stufe (z. B.
-`Object.hasOwn`). Ältere Geräte sind nicht ausgeschlossen, aber nicht geprüft.
+auf dem iPhone ohnehin iOS 16.4 (ADR-001). `Object.hasOwn` (ab iOS 15.4) liegt darunter und
+setzt die Grenze nicht. Ältere Geräte sind nicht ausgeschlossen, aber nicht geprüft.
 
 Ablauf, Aufträge, Texte und Auswertung → [Testgruppe](testgruppe.md).
 

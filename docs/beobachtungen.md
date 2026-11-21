@@ -112,7 +112,7 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
   wiederfinden mit `git log --grep='Beobachtungs-Auswertung' -- docs/beobachtungen.md`. Die
   Begründung lebt dort, wo sie hingehört (Issue-Body, Commit, Doku, Memory).
 
-Auswertungen bis zum 18.11.2026 stehen im [Archiv](beobachtungen-archiv.md); es wird nicht
+Ausgewertete Einträge bis zum 18.11.2026 stehen im [Archiv](beobachtungen-archiv.md); es wird nicht
 mehr fortgeschrieben.
 
 Letzte Auswertung: 21.11.2026
@@ -120,6 +120,23 @@ Letzte Auswertung: 21.11.2026
 ---
 
 ## Offen
+
+### 2026-11-21 — Offene Partner-Anfragen zeigen den Kontakt, solange der Anfragende ein Login hat
+
+**Thema:** Datenschutz
+
+**Fundort:** `src/lib/server/cm/anmeldungen.ts` (`offeneAnfragenAn`, Bedingung `anfrageVonMitLogin`).
+
+**Beobachtung:** Beim Anfragenden prüft die Abfrage nur, ob er ein nutzbares Login hat, nicht
+`mitglied.status`. Austritt und Löschvormerkung räumen die Anfragen heute weg
+(`zieheOffeneZurueck`) bzw. sperren das Login. Ob jeder Weg zu «nicht aktiv» eines von beiden
+tut, ist nicht geprüft.
+
+**Ursprung:** Beobachtungs-Auswertung vom 21.11.2026, Nebenbefund beim Prüfen von
+«Kontakt des Doppelpartners».
+
+**Einschätzung:** Vorläufig, ungeprüft. Gehört zur Grenze «Ende der CM» (Eintrag vom
+16.11.2026) und sollte mit ihr angesehen werden.
 
 ### 2026-11-21 — Interclub: auf Test nur die Saison 2026, ältere Saisons nachladen
 
@@ -175,7 +192,7 @@ Saisonverläufen, für die Personen- und Ranglistennummern schon gespeichert sin
 
 **Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`scripts/seed-lokal.ts` → `new Date()` an `legeBeispielTurnierAn`; `beispiel-turnier.ts` verwirft das Ergebnis von `setzeStatus`; `beispiel-turnier-fuellung.ts` bricht ohne Meldung ab, wenn das Turnier nicht `offen` ist).
 
-**Korrektur (21.11.2026, Beobachtungs-Auswertung).** Auf frischer Datenbank lautet das Wort `nicht-gefunden` (`trageEin` prüft *in Vorbereitung* vor dem Schluss), `geschlossen` nur, wenn das Turnier aus einem früheren Seed schon offen ist. Ebenso fallen die drei Beispielgespräche still weg (`sichtbaresTurnier` schliesst *in Vorbereitung* aus); ab 2028 sind sie auch bei bestehender Datenbank nur noch lesbar. Offen ist nur der Zeitpunkt: spätestens im Frühling 2027.
+**Korrektur (21.11.2026, Beobachtungs-Auswertung).** Auf frischer Datenbank lautet das Wort `nicht-gefunden` (`trageEin` prüft *in Vorbereitung* vor dem Schluss), `geschlossen` nur, wenn das Turnier aus einem früheren Seed schon offen ist. Ebenso fallen die drei Beispielgespräche still weg (`sichtbaresTurnier` schliesst *in Vorbereitung* aus); ab 2028 sind sie auch bei bestehender Datenbank nur noch lesbar. Der Text von `make help` zu `seed` (Interclub 2026, Beispielturnier 2027, drei Gespräche) sagt dann mehr zu, als der Seed liefert. Offen ist nur der Zeitpunkt: spätestens im Frühling 2027.
 
 ### 2026-11-16 — Junioren-CM verlangt bei Swiss Tennis ein eigenes Turnier
 

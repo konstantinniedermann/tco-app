@@ -66,10 +66,11 @@ Alle Worktrees teilen die lokale Datenbank `mytco` für `make dev`, `make dev-ha
 `make seed`; `make seed` spielt dort die Migrationen des eigenen Branches ein (`make dev` nicht:
 vorher einmal `make seed`). Eine Migration, die schon eingespielt wurde, wird darum nie neu
 erzeugt — eine Änderung kommt als neue Migration dazu. Zwei parallele Branches bekommen aus
-`npm run db:generate` dieselbe nächste Nummer: vor dem Merge `git log origin/dev -- drizzle/`
-prüfen; liegt dort eine neue Migration, im Worktree `git merge origin/dev`, die von `dev`
-unverändert übernehmen und die eigene (Datei, Snapshot, Journal-Eintrag) verwerfen und neu
-erzeugen — erlaubt nur, weil sie nie auf `dev` oder `mytco` eingespielt war.
+`npm run db:generate` dieselbe nächste Nummer: vor dem Merge `git log HEAD..origin/dev -- drizzle/`
+prüfen; liegt dort eine neue Migration, im Worktree `git merge origin/dev` und die von `dev`
+unverändert übernehmen. Die eigene (Datei, Snapshot, Journal-Eintrag) nur dann verwerfen und neu
+erzeugen, wenn sie nie auf `dev` oder `mytco` eingespielt wurde (auch nicht über `make seed`);
+sonst bleibt sie und eine neue Migration kommt dazu.
 
 **E2E und `make check` nehmen `mytco` nicht:** `npm run e2e` (`scripts/e2e.ts`) legt für jeden
 Lauf eine eigene, frisch migrierte Datenbank an und löscht sie danach; ebenso baut jeder Lauf in
