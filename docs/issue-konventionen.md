@@ -74,7 +74,8 @@ Ausnahme ist *Pilot*: Die Etappe hat bewusst kein Datum, sie gilt als Vorstufe v
 
 Jedes Issue enthält eine Checkliste, woran man erkennt, dass es fertig ist — nicht „Code
 geschrieben", sondern „was ist danach nachweislich wahr" (Tests grün, Verhalten sichtbar,
-Dokument freigegeben, Doku nachgeführt).
+Dokument freigegeben, Doku des Branches nachgeführt; README und übrige Doku zieht der
+Doku-Abgleich vor dem Release nach).
 
 Vor dem Schliessen werden die Haken im Body gesetzt. Wer nur den Body liest, sieht sonst ein
 unfertiges Issue; ein bewusst nicht erfüllter Punkt bleibt offen und wird im

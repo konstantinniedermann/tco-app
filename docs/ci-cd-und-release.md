@@ -476,7 +476,11 @@ Seite kommt bei jedem Start vom Server.
   alle Links, die damit auch nicht mehr vorgeladen werden. `goto` (z. B. nach dem Speichern) und
   die Zurück-Geste bleiben in der App; bei einem geänderten Formular kommt zuerst die Rückfrage.
   Scheitert ein Seitenwechsel vorher, weil der Code der Zielseite fehlt, lädt SvelteKit ebenfalls
-  ganz neu.
+  ganz neu; diesen Fall prüft kein E2E.
+- **Push mit altem Service Worker:** Ändert ein Release die Form der Push-Nutzlast
+  (`{ titel, text, link }`, gebaut in `mitteilung/meldung.ts` und `versand.ts`, gelesen in
+  `src/lib/push/nutzlast.ts`), zeigt ein noch aktiver alter Service Worker den Push womöglich
+  nicht an (nicht geprüft). Dann vor dem Release prüfen oder die alte Form weiter lesen.
 - Eine angefangene Eingabe bleibt beim Neuladen nicht erhalten.
 - Der Server zwingt eine alte App nicht: Es gibt keine Mindestversion. Wer nach einer
   Auslieferung mit der offenen App weiterarbeitet, schickt mit altem Code an die neuen

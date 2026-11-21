@@ -75,7 +75,7 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
-| **Mitglied** | Mitgliedernummer (aus Fairgate; Pflicht beim Einlesen und beim Befehl *Admin festlegen*, sonst freiwillig, A-MITGLIED-07; eindeutig ohne Rücksicht auf Gross-/Kleinschreibung, gespeichert wie eingegeben), Vorname, Nachname, Rufname (freiwillig, pflegt das Mitglied selbst; höchstens 10 Zeichen, leer = keiner, gleich wie der Vorname gilt in der Anzeige als keiner), Postadresse, E-Mail (eindeutig, FR-25; fehlt bei Junioren, die ein Elternteil führt), Telefon, Geschlecht, Jahrgang (K-40.2; für Lizenzanträge hängt an K-40.1), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28; Werte N1–N4, R1–R9 oder *keine Lizenz*, Skala: Annahme K-25.1; fehlt sie, ist sie *nicht angegeben*), Status *aktiv / ausgetreten / Löschung vorgemerkt / gelöscht*, Austrittsdatum, *vorgemerkt am* und *Status vor dem Vormerken* (für die Bedenkzeit und die Rücknahme), *verwaltet von* (Mitglied, nur bei Junioren ohne eigenes Login, Vorschlag K-08), *für Fairgate offen seit* (Zeitpunkt, gesetzt, wenn das Mitglied Adresse, E-Mail oder Telefon selbst ändert; gelöscht, wenn der Mitglieder-Admin die Angaben nach Fairgate übertragen hat — Annahme K-19.2, A-KONTO-02) | alle ausser Status |
+| **Mitglied** | Mitgliedernummer (aus Fairgate; Pflicht beim Einlesen und beim Befehl *Admin festlegen*, sonst freiwillig, A-MITGLIED-07; eindeutig ohne Rücksicht auf Gross-/Kleinschreibung, gespeichert wie eingegeben), Vorname, Nachname, Rufname (freiwillig, pflegt das Mitglied selbst; höchstens 10 Zeichen, leer = keiner, gleich wie der Vorname gilt in der Anzeige als keiner), Postadresse, E-Mail (eindeutig, FR-25; fehlt bei Junioren, die ein Elternteil führt — geplant mit #45, heute Pflicht), Telefon, Geschlecht, Jahrgang (K-40.2; für Lizenzanträge hängt an K-40.1), Lizenznummer (optional), Klassierung (optional, pflegt das Mitglied selbst — Annahme K-28; Werte N1–N4, R1–R9 oder *keine Lizenz*, Skala: Annahme K-25.1; fehlt sie, ist sie *nicht angegeben*), Status *aktiv / ausgetreten / Löschung vorgemerkt / gelöscht*, Austrittsdatum, *vorgemerkt am* und *Status vor dem Vormerken* (für die Bedenkzeit und die Rücknahme), *verwaltet von* (geplant mit #45; Mitglied, nur bei Junioren ohne eigenes Login, Vorschlag K-08), *für Fairgate offen seit* (Zeitpunkt, gesetzt, wenn das Mitglied Adresse, E-Mail oder Telefon selbst ändert; gelöscht, wenn der Mitglieder-Admin die Angaben nach Fairgate übertragen hat — Annahme K-19.2, A-KONTO-02) | alle ausser Status |
 | **Konto** | Brief-Code und Mail-Code getrennt, je nur als Hash mit Ablauf; beim Brief-Code dazu *benutzt am*, beim Mail-Code die Zahl der Fehlversuche (FR-24). Sitzungsversion, Sitzungen (eine je Gerät, mit *angemeldet am* und *zuletzt genutzt*), Daten beim ersten Login ergänzt ja/nein (geplant mit FR-02), gesperrt ja/nein, Themen *Anlässe* / *Clubmeisterschaft* / *Verein* ja/nein (für neue Konten an, FR-41), Passkeys (je Gerät öffentlicher Schlüssel, Kennung, Zähler, Übertragungswege, Domain, Gerätename, eingerichtet am, zuletzt benutzt; freiwillig, A-LOGIN-07) und die zufällige Passkey-Kennung des Kontos (gesetzt beim ersten Versuch, einen Passkey einzurichten). Je Sitzung ein Merker für den Passkey-Hinweis (gesetzt beim Login per Code) und die Bestätigung der Verwaltung mit Zeitpunkt, Admin-Code als Hash mit Ablauf und Fehlversuchen (SI-08), dazu die Rolle einer laufenden *Ansicht als …* (nur beim MyTCO-Admin, A-ROLLE-09) | alle |
 | **Rolle** | Name. Welche Rollen es gibt und was sie dürfen, legt [Rollen und Rechte](rollen-und-rechte.md) fest | — |
 | **Aenderung** | Eintrag im Änderungsverlauf: Mitglied, von (Mitglied, das die Änderung ausgelöst hat; leer bei automatisch, dann *MyTCO*; ist das auslösende Konto gelöscht, *gelöschtes Konto*), Feld oder Aktion, Zeitpunkt; ohne alte und neue Werte (FR-26) | Mitglied, von |
@@ -101,15 +101,15 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 | **Turnier** | Jahr (eindeutig), Name, Anmeldeschluss (Datum), Status, erstellt am, Kontaktperson (freiwillig, ein gültiger CM-Admin nach FR-55; Mitglieder sehen sie nur, solange sie gültig ist; wählbar nach dem Anlegen); *Anmeldung offen* gilt nur bis zum Anmeldeschluss (FR-33, siehe [Lebenszyklen](#lebenszyklen)) | Kontaktperson |
 | **Turniernummer** | Nummer bei Swiss Tennis, Bezeichnung (z. B. Gruppenphase, Finalwochenende — Annahme K-25.4), Reihenfolge. Freiwillig, 0 bis n je Turnier: Swiss Tennis vergibt sie oft erst später | — |
 | **Kategorie** | Name, Geschlecht (Herren / Damen / Mixed nur im Doppel / offen), Jahrgang von–bis (Alterskategorie, nur im Einzel, je Ende optional), Einzel mit Klassierung von–bis (Klassierungsbereich) **oder** Doppel mit Mindestsumme (vorbelegt 9, Annahme K-51), Status *aktiv* / *abgesagt* | — |
-| **Anmeldung** | Kategorie, Spieler (1 im Einzel, 1–2 im Doppel), Kommentar (nur beim Wildcard-Antrag: kein eigenes Feld, sondern eine Anmeldung mit Kommentar, die als *beantragt* beginnt; höchstens 300 Zeichen), Kommentar *sucht Partner* (nur im Doppel, wenn ein Spieler allein angemeldet ist, 0–120 Zeichen), Status *bestätigt* / *beantragt* / *abgelehnt* / *zurückgezogen*, angemeldet am, Gruppe (nach Auslosung), Rang-Korrektur (optional) | Spieler, Kommentar, Kommentar *sucht Partner* |
+| **Anmeldung** | Kategorie, Spieler (1 im Einzel, 1–2 im Doppel), Kommentar (nur beim Wildcard-Antrag: kein eigenes Feld, sondern eine Anmeldung mit Kommentar, die als *beantragt* beginnt; höchstens 300 Zeichen), Kommentar *sucht Partner* (nur im Doppel, wenn ein Spieler allein angemeldet ist, 0–120 Zeichen), Status *bestätigt* / *beantragt* / *abgelehnt* / *zurückgezogen*, angemeldet am; geplant mit #75: Gruppe (nach Auslosung), Rang-Korrektur (optional) | Spieler, Kommentar, Kommentar *sucht Partner* |
 | **Partner-Anfrage** | Kategorie, von (Mitglied), an (Mitglied), gestellt am; höchstens eine offene Anfrage je Anfragendem und Kategorie, nicht an sich selbst. Erledigte Anfragen werden gelöscht (FR-48) | von, an |
 | **Gespräch** | Turnier, Mitglied, Zustand *offen* / *erledigt*, zuletzt geöffnet vom Mitglied, Zeit der letzten Nachricht; höchstens eines je Mitglied und Turnier (FR-50) | Turnier, Mitglied |
 | **Nachricht** | Gespräch, von (Mitglied oder Turnierleitung), bei der Turnierleitung der antwortende CM-Admin, Text (1–1000 Zeichen), gesendet am; nicht änderbar (FR-50) | Text, antwortender Admin |
-| **Gruppe** | Kategorie, Name, Turniernummer. Die Rangliste wird aus den Resultaten berechnet, nicht gespeichert | — |
-| **KoTableau** | Kategorie, Grösse (Anzahl Positionen), Turniernummer. Kommt aus Advantage | — |
-| **Spiel** | Gruppe *oder* KoTableau mit Runde (z. B. Viertelfinal) und Position, Anmeldung A und B (im KO leer, bis bekannt), Folgespiel (nur KO) | — (über die Anmeldung) |
-| **Resultat** | Spiel, Sätze, Sonderfall (keiner / w.o. / Aufgabe), Sieger, gemeldet von, gemeldet am, Status, bestätigt von | Sätze, gemeldet von, bestätigt von |
-| **Satz** | Games A, Games B, Tiebreak-Punkte (optional). Höchstens 3 Sätze, der dritte evtl. als Match-Tiebreak (Annahme K-41) | — |
+| **Gruppe** *(geplant, #75)* | Kategorie, Name, Turniernummer. Die Rangliste wird aus den Resultaten berechnet, nicht gespeichert | — |
+| **KoTableau** *(geplant, #75)* | Kategorie, Grösse (Anzahl Positionen), Turniernummer. Kommt aus Advantage | — |
+| **Spiel** *(geplant, #75)* | Gruppe *oder* KoTableau mit Runde (z. B. Viertelfinal) und Position, Anmeldung A und B (im KO leer, bis bekannt), Folgespiel (nur KO) | — (über die Anmeldung) |
+| **Resultat** *(geplant, #77)* | Spiel, Sätze, Sonderfall (keiner / w.o. / Aufgabe), Sieger, gemeldet von, gemeldet am, Status, bestätigt von | Sätze, gemeldet von, bestätigt von |
+| **Satz** *(geplant, #77)* | Games A, Games B, Tiebreak-Punkte (optional). Höchstens 3 Sätze, der dritte evtl. als Match-Tiebreak (Annahme K-41) | — |
 
 ### Interclub
 
@@ -127,6 +127,8 @@ Kopie der Antworten von Swiss Tennis ([ADR-011](adr/adr-011-interclub-schnittste
 | **Stand je Saison und Wettbewerb** | Zeitpunkt des letzten erfolgreichen Abrufs; die Anzeige nennt ihn als «Stand» | — |
 
 ### Lizenzen
+
+Geplant mit #53; noch nicht gebaut.
 
 | Objekt | Attribute | P |
 |--------|-----------|---|
@@ -197,7 +199,7 @@ Kopie der Antworten von Swiss Tennis ([ADR-011](adr/adr-011-interclub-schnittste
 
 | Objekt | Zustände |
 |--------|----------|
-| Turnier | *in Vorbereitung* → *Anmeldung offen* ⇄ *Anmeldung geschlossen* (wieder öffnen nur vor dem Anmeldeschluss, FR-33; von selbst geschlossen nach dem Anmeldeschluss) → *läuft* → *abgeschlossen* |
+| Turnier | *in Vorbereitung* → *Anmeldung offen* ⇄ *Anmeldung geschlossen* (wieder öffnen nur vor dem Anmeldeschluss, FR-33; von selbst geschlossen nach dem Anmeldeschluss) → *läuft* → *abgeschlossen* (die zwei letzten geplant mit #75 und #77; der Code kennt heute nur die ersten drei) |
 | Kategorie | *aktiv* → *abgesagt* (FR-35) |
 | Partner-Anfrage | *offen* → *angenommen* (wird Anmeldung) / *abgelehnt* / *zurückgezogen* / *verfallen* (einer der beiden hat inzwischen einen Partner, Austritt oder Löschung, Kategorie abgesagt oder Art gewechselt, verschoben oder vom CM-Admin gelöscht; FR-04, FR-35, FR-36, FR-46, FR-48); erledigte Anfragen werden sofort gelöscht |
 | Gespräch | *offen* ⇄ *erledigt*: Nachricht des Mitglieds → *offen*, jeder CM-Admin setzt beides (FR-52); gelöscht nach FR-54 |
