@@ -621,6 +621,31 @@ p2_test_ohne_passwort() {
 	erwarte_kein_zugangscookie
 }
 
+# Das Formular der Sperre schickt Benutzer und Passwort als `Authorization`; dahinter braucht ihn
+# niemand. Geprüft an der laufenden Konfiguration des Proxys (Admin-Schnittstelle): Jede
+# Weiterleitung zu App und Mail-Fänger von Test entfernt den Kopf. Dass Caddy ihn ohne diese Zeile
+# weiterreicht, ist mit demselben Image gemessen (Commit «Test-Sperre reicht das Test-Passwort …»).
+p2_test_ohne_authorization() {
+	local konfig
+	konfig=$(docker exec mytco-proxy-caddy-1 wget -qO- http://127.0.0.1:2019/config/apps/http)
+	node -e '
+		const weiter = [];
+		(function lauf(o) {
+			if (Array.isArray(o)) return o.forEach(lauf);
+			if (!o || typeof o !== "object") return;
+			if (o.handler === "reverse_proxy") weiter.push(o);
+			Object.values(o).forEach(lauf);
+		})(JSON.parse(process.argv[1]));
+		for (const ziel of ["app-test:3000", "mailpit-test:8025"]) {
+			const zu = weiter.filter((w) => (w.upstreams ?? []).some((u) => u.dial === ziel));
+			if (zu.length === 0) throw new Error("keine Weiterleitung zu " + ziel);
+			for (const w of zu)
+				if (!(w.headers?.request?.delete ?? []).includes("Authorization"))
+					throw new Error("Weiterleitung zu " + ziel + " reicht Authorization weiter");
+		}
+	' "$konfig"
+}
+
 erwarte_kein_zugangscookie() {
 	if tr -d '\r' <"$TEMP/kopf" | grep -qi '^set-cookie: *mytco_test_zugang='; then
 		echo "Antwort setzt das Zugangscookie"
@@ -1572,6 +1597,7 @@ pruefung "2 test ohne passwort → 401" p2_test_ohne_passwort
 pruefung "2 test mit passwort → ok" test_status_ok
 pruefung "2 test mit falschem passwort → 401, kein cookie" p2_test_falsches_passwort
 pruefung "2 test: passwort setzt zugangscookie, cookie genügt, falsches nicht" p2_test_cookie
+pruefung "2 test: app und mail-fänger bekommen das passwort der sperre nicht" p2_test_ohne_authorization
 pruefung "2 test: manifest, service worker, symbole ohne passwort, nur genau dieser pfad" p2_test_frei
 pruefung "2 mail-fänger nur auf test, hinter passwort, mit mail der testdaten" p2_mailfaenger
 pruefung "2 /_app-datei: HSTS, frame-ancestors, köpfe je einmal" p2_app_datei
