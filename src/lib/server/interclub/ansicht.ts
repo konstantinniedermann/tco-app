@@ -1,7 +1,7 @@
 // Fachlogik der Interclub-Ansicht: liest die eingespielten Daten und bereitet sie für Übersicht und
 // Team-Seite auf. Kennt kein HTTP; die Zeit kommt als Parameter.
 import { and, asc, desc, eq, inArray, max } from 'drizzle-orm';
-import { utcZuZuerich } from '../../anlass/zeit.ts';
+import { heuteInZuerich, plusTage } from '../datum.ts';
 import type { Db } from '../db/index.ts';
 import {
 	icBegegnung,
@@ -148,11 +148,6 @@ const reihenfolge = (a: IcSpiel, b: IcSpiel) =>
 	a.teamId - b.teamId ||
 	a.runde - b.runde;
 
-function plusTage(iso: string, tage: number): string {
-	const [j, m, t] = iso.split('-').map(Number);
-	return new Date(Date.UTC(j, m - 1, t + tage)).toISOString().slice(0, 10);
-}
-
 async function standVon(db: Db, saison: number, wettbewerbe?: ('ic' | 'jic')[]): Promise<Date> {
 	const wo = wettbewerbe
 		? and(eq(icStand.saison, saison), inArray(icStand.wettbewerb, wettbewerbe))
@@ -187,21 +182,26 @@ export async function ladeUebersicht(db: Db, jetzt: Date): Promise<IcUebersicht 
 		for (const e of entscheide) if (e.teamId === team.teamId) spiele.push(entscheidSpiel(team, e));
 	}
 	const eigene = spiele.filter((s) => s.eigen);
+	// Spielen zwei TCO-Teams gegeneinander, steht die Begegnung bei beiden: nur einmal zeigen.
+	const einmal = (liste: IcSpiel[]) =>
+		liste.filter((s, i) => liste.findIndex((x) => x.begegnungId === s.begegnungId) === i);
 
-	const heute = utcZuZuerich(jetzt).slice(0, 10);
+	const heute = heuteInZuerich(jetzt);
 	const vor = plusTage(heute, -6);
 	const bis = plusTage(heute, 6);
-	const letzte = eigene
-		.filter((s) => s.ergebnis !== null && s.datum >= vor && s.datum <= heute)
-		.sort((a, b) => reihenfolge(b, a));
-	const naechste = eigene
-		.filter((s) => s.ergebnis === null && s.datum >= heute && s.datum <= bis)
-		.sort(reihenfolge);
-	const abgeschlossen =
-		eigene.length > 0 &&
-		letzte.length === 0 &&
-		naechste.length === 0 &&
-		eigene.every((s) => s.ergebnis !== null);
+	const gespielt = (s: IcSpiel) => s.heimPunkte !== null && s.gastPunkte !== null;
+	// Letzte: gespielt bis heute, dazu vergangene ohne Resultat («Resultat folgt»).
+	const letzte = einmal(
+		eigene
+			.filter((s) => s.datum >= vor && (gespielt(s) ? s.datum <= heute : s.datum < heute))
+			.sort((a, b) => reihenfolge(b, a))
+	);
+	const naechste = einmal(
+		eigene.filter((s) => !gespielt(s) && s.datum >= heute && s.datum <= bis).sort(reihenfolge)
+	);
+	// Abgeschlossen, wenn alle eigenen Spiele vor dem Fenster liegen: Ein Resultat, das nie kommt,
+	// hält die Saison nicht offen.
+	const abgeschlossen = eigene.length > 0 && eigene.every((s) => s.datum < vor);
 
 	const kachel = (team: TeamZeile): IcKachel => {
 		const gruppe = raenge.filter((r) => r.teamId === team.teamId);

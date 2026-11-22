@@ -7,12 +7,14 @@
 	// Begegnung; Datum und Heim/Auswärts nur bei kommenden Spielen. Sonst (Seite eines Teams): die
 	// Begegnung, darunter das Datum; die des eigenen Teams fett und mit Heim/Auswärts. Rechts der
 	// Endstand, beim eigenen Team farbig mit Plakette. `teil`: als Kartenteil mit Trennlinie oben.
-	// Eine eigene, gespielte Begegnung führt auf ihre Seite (mit Pfeil).
+	// Eine eigene, gespielte Begegnung führt auf ihre Seite (mit Pfeil). `folgt` («Letzte
+	// Resultate»): Eine ungespielte zeigt rechts leise «Resultat folgt».
 	let {
 		spiel: s,
 		mitLiga = false,
-		teil = false
-	}: { spiel: Spiel; mitLiga?: boolean; teil?: boolean } = $props();
+		teil = false,
+		folgt = false
+	}: { spiel: Spiel; mitLiga?: boolean; teil?: boolean; folgt?: boolean } = $props();
 
 	const begegnung = $derived(`${s.heim} – ${s.gast}`);
 	const gespielt = $derived(s.heimPunkte !== null && s.gastPunkte !== null);
@@ -56,6 +58,8 @@
 				<span class="resultat-stand">{s.heimPunkte}:{s.gastPunkte}</span>
 			{/if}
 		</div>
+	{:else if folgt}
+		<span class="leise">Resultat folgt</span>
 	{/if}
 {/snippet}
 

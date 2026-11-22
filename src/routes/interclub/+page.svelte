@@ -37,7 +37,7 @@
 			{#each nachTag(spiele) as tag (tag.datum)}
 				<p class="leise resultat-tag">{datumText(tag.datum)}</p>
 				{#each tag.spiele as s, i (`${s.teamId}-${s.art}-${s.runde}-${s.heim}`)}
-					<Resultat spiel={s} mitLiga teil={i > 0} />
+					<Resultat spiel={s} mitLiga teil={i > 0} folgt={kennung === 'ic-letzte'} />
 				{/each}
 			{/each}
 		</section>
