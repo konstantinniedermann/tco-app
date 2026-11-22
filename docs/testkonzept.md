@@ -254,6 +254,7 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [ ] Verwaltung am PC: die geänderten Funktionen einmal durchgehen
 - [x] Löschfristen gebaut (Etappe 3 von #43): Änderungsverlauf nach 12 Monaten (FR-26), Anlass-Antworten ein Jahr nach Beginn des Anlasses (K-50), Austritt plus 1 Jahr (K-38); auf Test prüfen, dass der Zeitgeber läuft (`ZEITGEBER` nicht auf `aus`)
 - [ ] `admin-festlegen` einmal auf Test über `docker compose exec` ausgeführt
+- [ ] Interclub-Abruf auf Test: «Stand: …» oben auf der Seite *Interclub* ist jünger als ein Tag (#81)
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 

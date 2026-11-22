@@ -11,6 +11,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Interclub: Die Resultate aktualisieren sich von selbst, in Spielwochen stündlich; ältere
+  Saisons ab 2021 kommen nach. Die Übersicht zeigt «Resultat folgt», die Begegnung sagt, wenn
+  Swiss Tennis keine Einzelpartien hat (#81).
 - Nachbesserungen aus dem Review der Beobachtungs-Auswertung: `make seed` füllt das
   Beispielturnier im Folgejahr auch auf einer bestehenden Datenbank auf; `make betrieb-nachweis`
   prüft, dass die Test-Sperre das Passwort nicht weiterreicht. An der App ändert sich nichts.
