@@ -25,6 +25,10 @@ services:
       # Push-Mitteilungen (#63, SI-22): optional, nur zusammen. Ohne Paar ist Push aus.
       MYTCO_VAPID_OEFFENTLICH: ${MYTCO_VAPID_OEFFENTLICH:-}
       MYTCO_VAPID_PRIVAT: ${MYTCO_VAPID_PRIVAT:-}
+      # Interclub-Abruf (#81): holt die echten Resultate von Swiss Tennis, nur auf Test und Live
+      # (DS-08: lokal und im E2E bleibt er aus).
+      IC_ABRUF: ${IC_ABRUF:-an}
+      IC_VEREIN: ${IC_VEREIN:-2202}
     networks:
       intern:
       proxy:

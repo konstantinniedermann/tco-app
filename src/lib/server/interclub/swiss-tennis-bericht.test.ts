@@ -196,4 +196,17 @@ describe('pruefeBericht', () => {
 		];
 		for (const [name, f] of faelle) expect(pruefeBericht(f, 2202), name).toBeNull();
 	});
+
+	it('doppelte Position im selben Bericht gibt null (form)', () => {
+		const einzel = [
+			partie(seite(0, [900001, MAX]), seite(0, [900101, GERD]), ['6:0', '6:0', ''], 1),
+			partie(
+				seite(0, [900002, 'Erika Beispiel N4 (120)']),
+				seite(0, [900102, 'Gina Gegner R9 (61449)']),
+				['6:0', '6:0', ''],
+				1
+			)
+		];
+		expect(pruefeBericht(bericht({ einzel }), 2202)).toBeNull();
+	});
 });

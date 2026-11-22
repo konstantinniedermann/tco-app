@@ -41,6 +41,8 @@ MYTCO_CODE_SCHLUESSEL=$schluessel
 MYTCO_SMTP_URL=smtp://mail.invalid:25
 MYTCO_MAIL_ABSENDER=MyTCO <mytco@example.org>
 MYTCO_KONTAKT=Sekretariat (erfunden), sekretariat@example.org
+# Lokal nie echte Interclub-Daten holen (DS-08).
+IC_ABRUF=aus
 EOF
 
 if {

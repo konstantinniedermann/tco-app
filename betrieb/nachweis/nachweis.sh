@@ -413,6 +413,8 @@ einrichten() {
 		echo "MYTCO_SMTP_URL=smtp://mail.invalid:25"
 		echo "MYTCO_MAIL_ABSENDER=MyTCO <mytco@example.org>"
 		echo "MYTCO_KONTAKT=Sekretariat (erfunden), sekretariat@example.org"
+		# Lokal nie echte Interclub-Daten holen (DS-08); Compose setzt sonst `an`.
+		echo "IC_ABRUF=aus"
 	}
 	{
 		echo "POSTGRES_PASSWORD=nachweis-erfunden-test"

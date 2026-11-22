@@ -20,7 +20,7 @@ try {
 	const worte = await importiereSaison(
 		{
 			db,
-			holen: (u) => fetch(u),
+			holen: (u, i) => fetch(u, i),
 			jetzt: () => new Date(),
 			pause: () => new Promise((r) => setTimeout(r, 1500))
 		},

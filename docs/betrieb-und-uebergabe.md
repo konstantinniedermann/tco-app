@@ -104,6 +104,12 @@ Grundsätze; das Werkzeug wird mit [#39](https://github.com/konstantinniedermann
    ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)). Ein Fehlschlag steht nur als «Löschlauf
    fehlgeschlagen» im Log des App-Containers (`src/lib/server/zeitgeber.ts`); die Überwachung
    meldet ihn noch nicht.
+5. **Interclub-Abruf:** Der Zeitgeber holt die Interclub-Daten selbst (#81, nur mit
+   `IC_ABRUF=an`). Ein frisch aufgesetztes Test holt die laufende Saison beim ersten Schlag und die
+   älteren Saisons ab 2021 nach, eine Saison und einen Wettbewerb pro Tag, also gut zehn Tage bis
+   alles da ist. Ob er läuft, zeigt während der Saison «Stand: …» oben auf der Seite
+   *Interclub*, sonst der letzte Versuch der laufenden Saison in der Tabelle `ic_abruf`. Fehlschläge stehen
+   nur mit festem Text im Log («Interclub-Abruf gestört» u. ä.).
 
 ## Übergabe-Checkliste
 

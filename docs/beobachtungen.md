@@ -163,3 +163,15 @@ Partner-Anfragen (jener Eintrag ist verworfen).
 
 **Einschätzung:** Vorläufig. Entweder eine geplante Sperre durch den Admin (#43?), dann bleibt die
 Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.status` ausrichten.
+
+### 2026-11-22 — Unter Last scheitern Tests an der Vorgabe-Zeitgrenze von 5 s, zuletzt ein Seed-Test
+
+**Thema:** Tests
+
+**Fundort:** `tests/scripts/beispiel-turnier.db.test.ts` («A-TURNIER-01: Ist eine Beispielkategorie lokal abgesagt …», ohne eigene Zeitgrenze); im Pre-Commit-Hook wechselnd `src/lib/server/routen.test.ts`, `scripts/importrichtung.test.ts`, `scripts/design-importe.test.ts`, `scripts/migrate.test.ts`.
+
+**Beobachtung:** Während einer parallelen Session und eines Spiels (Load 15–30) scheiterte `make check` zweimal mit 540–650 roten Tests («Connection terminated due to connection timeout» zur lokalen Datenbank) und der Pre-Commit-Hook viermal an wechselnden Tests mit 5 s. Bei Load um 9 blieb nur der Seed-Test oben rot (5 s); seine zwei Geschwister haben seit bb322e0 schon 20 s. Einzeln liefen alle grün.
+
+**Ursprung:** #81 Teil 3a, Session vom 22.11.2026.
+
+**Einschätzung:** Kein Fehler im Code. Der Seed-Test bräuchte wohl dieselben 20 s wie seine Geschwister (Minuten-Fix). Für den Rest ist offen, ob die Vorgabe-Zeitgrenze für Tests mit Kindprozessen steigen soll oder ob «kein schwerer Lauf parallel» genügt.

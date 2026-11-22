@@ -1,7 +1,7 @@
 // Fachlogik der Interclub-Ansicht: liest die eingespielten Daten und bereitet sie für Übersicht und
 // Team-Seite auf. Kennt kein HTTP; die Zeit kommt als Parameter.
 import { and, asc, desc, eq, inArray, max } from 'drizzle-orm';
-import { utcZuZuerich } from '../../anlass/zeit.ts';
+import { heuteInZuerich, plusTage } from '../datum.ts';
 import type { Db } from '../db/index.ts';
 import {
 	icBegegnung,
@@ -148,11 +148,6 @@ const reihenfolge = (a: IcSpiel, b: IcSpiel) =>
 	a.teamId - b.teamId ||
 	a.runde - b.runde;
 
-function plusTage(iso: string, tage: number): string {
-	const [j, m, t] = iso.split('-').map(Number);
-	return new Date(Date.UTC(j, m - 1, t + tage)).toISOString().slice(0, 10);
-}
-
 async function standVon(db: Db, saison: number, wettbewerbe?: ('ic' | 'jic')[]): Promise<Date> {
 	const wo = wettbewerbe
 		? and(eq(icStand.saison, saison), inArray(icStand.wettbewerb, wettbewerbe))
@@ -187,21 +182,26 @@ export async function ladeUebersicht(db: Db, jetzt: Date): Promise<IcUebersicht 
 		for (const e of entscheide) if (e.teamId === team.teamId) spiele.push(entscheidSpiel(team, e));
 	}
 	const eigene = spiele.filter((s) => s.eigen);
+	// Spielen zwei TCO-Teams gegeneinander, steht die Begegnung bei beiden: nur einmal zeigen.
+	const einmal = (liste: IcSpiel[]) =>
+		liste.filter((s, i) => liste.findIndex((x) => x.begegnungId === s.begegnungId) === i);
 
-	const heute = utcZuZuerich(jetzt).slice(0, 10);
+	const heute = heuteInZuerich(jetzt);
 	const vor = plusTage(heute, -6);
 	const bis = plusTage(heute, 6);
-	const letzte = eigene
-		.filter((s) => s.ergebnis !== null && s.datum >= vor && s.datum <= heute)
-		.sort((a, b) => reihenfolge(b, a));
-	const naechste = eigene
-		.filter((s) => s.ergebnis === null && s.datum >= heute && s.datum <= bis)
-		.sort(reihenfolge);
-	const abgeschlossen =
-		eigene.length > 0 &&
-		letzte.length === 0 &&
-		naechste.length === 0 &&
-		eigene.every((s) => s.ergebnis !== null);
+	const gespielt = (s: IcSpiel) => s.heimPunkte !== null && s.gastPunkte !== null;
+	// Letzte: gespielt bis heute, dazu vergangene ohne Resultat («Resultat folgt»).
+	const letzte = einmal(
+		eigene
+			.filter((s) => s.datum >= vor && (gespielt(s) ? s.datum <= heute : s.datum < heute))
+			.sort((a, b) => reihenfolge(b, a))
+	);
+	const naechste = einmal(
+		eigene.filter((s) => !gespielt(s) && s.datum >= heute && s.datum <= bis).sort(reihenfolge)
+	);
+	// Abgeschlossen, wenn alle eigenen Spiele vor dem Fenster liegen: Ein Resultat, das nie kommt,
+	// hält die Saison nicht offen.
+	const abgeschlossen = eigene.length > 0 && eigene.every((s) => s.datum < vor);
 
 	const kachel = (team: TeamZeile): IcKachel => {
 		const gruppe = raenge.filter((r) => r.teamId === team.teamId);
@@ -309,6 +309,8 @@ export type IcBegegnung = {
 	gegner: string;
 	saetze: { tco: number; gegner: number } | null; // null = kein Bericht
 	partien: { einzel: IcPartie[]; doppel: IcPartie[] } | null; // null = noch keine Einzelpartien
+	// Ohne Bericht: `noch` (bis 7 Tage nach dem Spiel), `keiner` (später: Swiss Tennis hat keinen); sonst null.
+	ohneBericht: 'noch' | 'keiner' | null;
 };
 
 // Wer gewonnen hat: Bei einer Aufgabe die andere Seite, sonst die Mehrheit der Sätze.
@@ -324,11 +326,15 @@ function partieErgebnis(saetze: string[], aufgabe: 'tco' | 'gegner' | null): IcP
 	return wir > sie ? 'sieg' : sie > wir ? 'niederlage' : null;
 }
 
+// Mehr als so viele Tage nach dem Spiel ohne Bericht: Swiss Tennis hat keinen (Seite sagt es).
+const BERICHT_FEHLT_TAGE = 7;
+
 /** Eine eigene Begegnung (Gruppe oder Auf-/Abstieg) der neuesten Saison des Teams; sonst null. */
 export async function ladeBegegnung(
 	db: Db,
 	teamId: number,
-	begegnungId: number
+	begegnungId: number,
+	jetzt: Date
 ): Promise<IcBegegnung | null> {
 	const [team] = await db
 		.select()
@@ -383,7 +389,10 @@ export async function ladeBegegnung(
 		spiel,
 		gegner: spiel.tcoHeim ? spiel.gast : spiel.heim
 	};
-	if (!bericht) return { ...kopf, saetze: null, partien: null };
+	if (!bericht) {
+		const spaet = spiel.datum < plusTage(heuteInZuerich(jetzt), -BERICHT_FEHLT_TAGE);
+		return { ...kopf, saetze: null, partien: null, ohneBericht: spaet ? 'keiner' : 'noch' };
+	}
 
 	const partien = await db
 		.select()
@@ -419,6 +428,7 @@ export async function ladeBegegnung(
 		partien: {
 			einzel: partien.filter((p) => p.art === 'einzel').map(partie),
 			doppel: partien.filter((p) => p.art === 'doppel').map(partie)
-		}
+		},
+		ohneBericht: null
 	};
 }

@@ -39,6 +39,15 @@ wurde, holt der Lauf nach dem Start nach.
   wirkt nur lokal und im E2E: `betrieb/compose.umgebung.yml` reicht die Variable nicht durch, auf
   Test und Live läuft der Zeitgeber immer.
 
+## Nachtrag 22.11.2026: zwei Takte (#81)
+
+Der Zeitgeber trägt seit #81 Teil 3a zwei Takte, je mit eigenem Merker und festem Log-Text: den
+täglichen Löschlauf und den stündlichen Interclub-Abruf (`fuehreAbrufAus` in
+`src/lib/server/interclub/abruf.ts`, erster Schlag zwei Minuten nach dem Start). Den Abruf gibt es
+nur mit `IC_ABRUF=an` (Test und Live, `betrieb/compose.umgebung.yml`); `ZEITGEBER=aus` schaltet
+beide ab. Ein Fehlschlag steht als «Interclub-Abruf fehlgeschlagen», «Interclub-Abruf gestört»
+oder «Interclub-Abruf: Form unerwartet» im Log.
+
 ## Reevaluations-Trigger
 
 - MyTCO läuft dauerhaft mit mehreren Instanzen oder ohne ständig laufenden Prozess (z. B.

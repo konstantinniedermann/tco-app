@@ -80,7 +80,11 @@
 		{#each liste as p, i (p.position)}
 			{@render partie(p, i > 0)}
 		{:else}
-			<p class="leise">Nicht gespielt: Die Begegnung war nach den Einzeln entschieden.</p>
+			<p class="leise">
+				{ansicht === 'doppel'
+					? 'Nicht gespielt: Die Begegnung war nach den Einzeln entschieden.'
+					: 'Keine Einzel gemeldet.'}
+			</p>
 		{/each}
 	</section>
 {:else}
@@ -95,5 +99,9 @@
 			{/if}
 		</div>
 	</section>
-	<p class="karte">Einzelpartien noch nicht da.</p>
+	<p class="karte">
+		{b.ohneBericht === 'keiner'
+			? 'Swiss Tennis hat für diese Begegnung keine Einzelpartien.'
+			: 'Einzelpartien noch nicht da.'}
+	</p>
 {/if}

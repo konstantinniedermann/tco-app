@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
 	legeEigeneDatenbankAn,
@@ -153,14 +153,51 @@ describe('Saison 2026', () => {
 			expect(draussen.naechste.some((x) => x.teamId === 7398 && x.gast === 'Villmergen')).toBe(
 				false
 			);
-			// Eine offene Begegnung nach dem Fenster hält die Saison offen.
+			// Vergangen ohne Resultat: in «Letzte Resultate» (Resultat folgt).
+			const danach = (await ladeUebersicht(e.db, J('2026-05-05T10:00:00Z')))!;
+			expect(danach.letzte).toContainEqual(
+				expect.objectContaining({ teamId: 7398, gast: 'Villmergen', ergebnis: null })
+			);
+			// Ein Resultat, das nie kommt, hält die Saison nicht offen.
 			const spaet = (await ladeUebersicht(e.db, J('2026-11-13T10:00:00Z')))!;
-			expect(spaet.abgeschlossen).toBe(false);
+			expect(spaet.abgeschlossen).toBe(true);
 		} finally {
 			await e.db
 				.update(icBegegnung)
 				.set({ heimPunkte: vorher.heimPunkte, gastPunkte: vorher.gastPunkte })
 				.where(wo);
+		}
+	});
+
+	test('zwei TCO-Teams gegeneinander: Begegnung einmal in letzte', async () => {
+		const team = (teamId: number, teamName: string) => ({
+			saison: 2026,
+			teamId,
+			wettbewerb: 'ic' as const,
+			teamName,
+			liga: '4L Herren',
+			gruppe: 9,
+			reihenfolge: 99
+		});
+		const spiel = (teamId: number) => ({
+			saison: 2026,
+			teamId,
+			begegnungId: 999001,
+			runde: 1,
+			datum: '2026-05-09',
+			heim: 'Olten 8',
+			gast: 'Olten 9',
+			heimPunkte: 5,
+			gastPunkte: 4
+		});
+		await e.db.insert(icTeam).values([team(901, 'Olten 8'), team(902, 'Olten 9')]);
+		await e.db.insert(icBegegnung).values([spiel(901), spiel(902)]);
+		try {
+			const u = (await ladeUebersicht(e.db, J('2026-05-10T10:00:00Z')))!;
+			expect(u.letzte.filter((s) => s.begegnungId === 999001)).toHaveLength(1);
+		} finally {
+			await e.db.delete(icBegegnung).where(eq(icBegegnung.begegnungId, 999001));
+			await e.db.delete(icTeam).where(inArray(icTeam.teamId, [901, 902]));
 		}
 	});
 

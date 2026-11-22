@@ -249,4 +249,26 @@ describe('leseEinstellungen', () => {
 			);
 		});
 	});
+
+	describe('Interclub-Abruf (IC_ABRUF)', () => {
+		test('ohne IC_ABRUF ist der Abruf aus', () => {
+			expect(leseEinstellungen(vollstaendig).icAbruf).toBeUndefined();
+		});
+		test('IC_ABRUF=an ohne IC_VEREIN → Verein 2202', () => {
+			expect(leseEinstellungen({ ...vollstaendig, IC_ABRUF: 'an' }).icAbruf).toEqual({
+				verein: 2202
+			});
+		});
+		test('IC_ABRUF=an mit IC_VEREIN=1234 → Verein 1234', () => {
+			const env = { ...vollstaendig, IC_ABRUF: 'an', IC_VEREIN: '1234' };
+			expect(leseEinstellungen(env).icAbruf).toEqual({ verein: 1234 });
+		});
+		test('IC_ABRUF=an mit IC_VEREIN=abc wirft', () => {
+			const env = { ...vollstaendig, IC_ABRUF: 'an', IC_VEREIN: 'abc' };
+			expect(() => leseEinstellungen(env)).toThrow('IC_VEREIN ist keine Vereinsnummer');
+		});
+		test('IC_ABRUF=ja schaltet nicht ein', () => {
+			expect(leseEinstellungen({ ...vollstaendig, IC_ABRUF: 'ja' }).icAbruf).toBeUndefined();
+		});
+	});
 });

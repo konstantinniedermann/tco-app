@@ -7,7 +7,7 @@ import { importiereSaison, type ImportDienste } from './import.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 // Eigene Saisons, die kein anderer Test benutzt; jeder Test räumt sie auf.
-const SAISONS = [2071, 2072, 2073, 2074, 2075, 2076, 2077];
+const SAISONS = [2071, 2072, 2073, 2074, 2075, 2076, 2077, 2078, 2079];
 const VEREIN = 2202;
 const JETZT = new Date('2071-05-02T10:00:00Z');
 
@@ -208,7 +208,42 @@ describe('importiereSaison', () => {
 		expect(await zaehle(2077)).toEqual(a);
 		expect((await zaehle(2071)).teams).toBe(17);
 	});
+
+	test('Zeitgrenze: holen antwortet nie → stoerung, alter Stand bleibt', async () => {
+		await importiereSaison(dienste(beispielAbruf()), 2078, VEREIN);
+		const vorher = await zaehle(2078);
+		const haengt: ImportDienste['holen'] = (_u, i) =>
+			new Promise((_, nein) =>
+				i?.signal?.addEventListener('abort', () => nein(new Error('abbruch')))
+			);
+		const wort = await importiereSaison({ ...dienste(haengt), zeitgrenze: 20 }, 2078, VEREIN);
+		expect(wort).toEqual({ ic: 'stoerung', jic: 'stoerung' });
+		expect(await zaehle(2078)).toEqual(vorher);
+	});
+
+	test('nur: holt nur den genannten Wettbewerb', async () => {
+		const urls: string[] = [];
+		const fake = beispielAbruf();
+		const wort = await importiereSaison(
+			dienste((u) => (urls.push(u), fake(u))),
+			2079,
+			VEREIN,
+			{ nur: 'ic' }
+		);
+		expect(wort).toEqual({ ic: 'ok' });
+		expect(urls.filter((u) => u.includes('competition=jic'))).toHaveLength(0);
+		expect(await zaehleJicVon(2079)).toBe(0);
+	});
 });
+
+async function zaehleJicVon(saison: number) {
+	return (
+		await db
+			.select()
+			.from(icTeam)
+			.where(and(eq(icTeam.saison, saison), eq(icTeam.wettbewerb, 'jic')))
+	).length;
+}
 
 async function zaehleJic() {
 	return (
