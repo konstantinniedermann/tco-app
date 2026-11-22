@@ -130,7 +130,9 @@ Entscheid PL 22.11.2026: **A**. Kosten: keine laufenden, alles auf dem bezahlten
 
 - Jede Abfrage bricht nach 15 Sekunden ab (`holen(url, { signal })`); ein Abbruch gilt wie heute
   als `stoerung`.
-- Bei `stoerung` oder `form` bleibt der alte Stand; der nächste Schlag versucht es wieder.
+- Bei `stoerung` oder `form` bleibt der alte Stand. Nach `stoerung` versucht es der nächste
+  Stundenschlag wieder, nach `form` erst der Tageslauf (eine fremde Form bleibt meist; Nachtrag
+  nach dem Review).
 - Läuft noch ein Abruf, startet der nächste Schlag keinen zweiten. Ein Sperrschloss der
   Datenbank verhindert, dass Zeitgeber und `make ic-import` gleichzeitig schreiben.
 - Log je Lauf nur fester Text, z. B. «Interclub-Abruf gestört» oder «Interclub-Abruf: Form

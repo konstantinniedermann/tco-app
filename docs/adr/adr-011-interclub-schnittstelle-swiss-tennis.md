@@ -29,7 +29,7 @@ Option A, Entscheid des Projektleiters: MyTCO nutzt die Schnittstelle ohne Anfra
 - Wenig Last: nur die Teams des Vereins, mit Pausen zwischen den Abfragen.
 - Logs enthalten nur feste Texte.
 - Seit Teil 2 gehen auch Begegnungsnummern hinaus, und es kommen Personendaten herein: die Spieler der Einzelpartien beider Teams, auch Nicht-Mitglieder ([Datenschutzkonzept](../datenschutz.md)).
-- Seit Teil 3a (22.11.2026) holt der Zeitgeber der App ([ADR-008](adr-008-zeitgeber-in-der-app.md)) selbst: stündlich, solange ein eigenes Spiel der letzten 7 Tage noch ohne Resultat oder Bericht ist, sonst einmal am Tag, nachts (23–7 Uhr) nie. Gespeicherte Spielberichte holt er nicht noch einmal; fehlende Saisons ab 2021 holt er nach, höchstens eine Saison und einen Wettbewerb pro Tag. Jede Abfrage bricht nach 15 Sekunden ab. Nur mit `IC_ABRUF=an` (Test, Live). `make ic-import` bleibt die volle Neuladung, nur lokal.
+- Seit Teil 3a (22.11.2026) holt der Zeitgeber der App ([ADR-008](adr-008-zeitgeber-in-der-app.md)) selbst: stündlich, solange ein eigenes Spiel der letzten 7 Tage noch ohne Resultat oder Bericht ist, sonst einmal am Tag, nachts (23–7 Uhr) nie. Gespeicherte Spielberichte holt er nicht noch einmal; fehlende Saisons ab 2021 holt er nach, höchstens eine Saison und einen Wettbewerb pro Tag. Jede Abfrage bricht nach 15 Sekunden ab. Nur mit `IC_ABRUF=an` (Test, Live). `make ic-import` bleibt die volle Neuladung, nur lokal. Folge: Korrigiert Swiss Tennis einen schon gespeicherten Spielbericht, kommt die Korrektur auf Test und Live nicht an; liefert Swiss Tennis für einen gespeicherten Bericht nichts mehr, bleibt er stehen.
 - Kosten: keine laufenden.
 
 ## Reevaluations-Trigger

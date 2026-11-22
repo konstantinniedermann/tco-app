@@ -299,7 +299,7 @@ werden sie nicht geprüft.
 | `MYTCO_MAIL_ABSENDER` | Absender der Code-Mails | ja |
 | `MYTCO_KONTAKT` | Ansprechperson bei Login-Problemen als freier Text für «Wende dich an …», steht im Brief, in der Meldung «Code schon benutzt» und auf der Seite Hilfe (ohne Login lesbar, `/api/kontakt`; darum eine Vereins-Adresse, keine private Nummer; Annahme K-21) | ja |
 | `MYTCO_ADRESSE` | App-Adresse für Brief und QR-Code, Standard `https://my.tcolten.ch` (K-10) | nein |
-| `ZEITGEBER` | Nur lokal und im E2E: `aus` schaltet den täglichen Löschlauf ab ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)); auf Test und Live nicht durchgereicht (`betrieb/compose.umgebung.yml`), dort läuft er immer | nein |
+| `ZEITGEBER` | Nur lokal und im E2E: `aus` schaltet den täglichen Löschlauf und den Interclub-Abruf ab ([ADR-008](adr/adr-008-zeitgeber-in-der-app.md)); auf Test und Live nicht durchgereicht (`betrieb/compose.umgebung.yml`), dort läuft er immer | nein |
 | `IC_VEREIN` | `make ic-import` und Interclub-Abruf: Vereinsnummer bei Swiss Tennis, Vorgabe `2202`; ungültig lässt die App mit `IC_ABRUF=an` nicht starten | nein |
 | `IC_ABRUF` | `an` schaltet den regelmässigen Interclub-Abruf ein (#81). Lokal und im E2E nie setzen (DS-08); `betrieb/compose.umgebung.yml` setzt ihn für Test und Live, der Rauchtest des Betriebs schaltet ihn ab | nein |
 
