@@ -148,6 +148,13 @@
       "when": 1794576952493,
       "tag": "0020_equal_outlaw_kid",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1795335299692,
+      "tag": "0021_bitter_boom_boom",
+      "breakpoints": true
     }
   ]
 }

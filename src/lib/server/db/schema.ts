@@ -584,6 +584,23 @@ export const icStand = pgTable(
 	]
 );
 
+// Letzter Versuch des regelmässigen Abrufs je Saison und Wettbewerb, mit Ergebnis-Wort (#81 Teil 3a).
+// Ohne Fremdschlüssel: Versuche gibt es auch ohne Teams (Spielplan noch nicht freigeschaltet).
+export const icAbruf = pgTable(
+	'ic_abruf',
+	{
+		saison: integer('saison').notNull(),
+		wettbewerb: text('wettbewerb').$type<'ic' | 'jic'>().notNull(),
+		versuchtAm: timestamp('versucht_am', { withTimezone: true }).notNull(),
+		wort: text('wort').$type<'ok' | 'keine-teams' | 'form' | 'stoerung'>().notNull()
+	},
+	(t) => [
+		primaryKey({ columns: [t.saison, t.wettbewerb] }),
+		check('ic_abruf_wettbewerb_check', sql`${t.wettbewerb} in ('ic', 'jic')`),
+		check('ic_abruf_wort_check', sql`${t.wort} in ('ok', 'keine-teams', 'form', 'stoerung')`)
+	]
+);
+
 // Spielbericht einer gespielten Begegnung eines TCO-Teams (Gruppe oder Auf-/Abstieg). Fehlt die Zeile,
 // hat Swiss Tennis noch keine Einzelpartien. Sätze und Games aus TCO-Sicht.
 export const icBericht = pgTable(
