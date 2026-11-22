@@ -12,6 +12,8 @@ export type Einstellungen = {
 	mailNurAn: string | undefined;
 	/** SI-22: VAPID-Schlüsselpaar für Push. Ohne Paar ist Push aus, Mitteilungen gehen per E-Mail. */
 	vapid: { oeffentlich: string; privat: string } | undefined;
+	/** Regelmässiger Interclub-Abruf (#81): nur mit `IC_ABRUF=an` (Test, Live), lokal aus (DS-08). */
+	icAbruf: { verein: number } | undefined;
 };
 
 /** App-Adresse my.tcolten.ch (K-10), wenn MYTCO_ADRESSE fehlt */
@@ -57,8 +59,17 @@ export function leseEinstellungen(
 		kontakt: pflicht(env, 'MYTCO_KONTAKT'),
 		adresse: env.MYTCO_ADRESSE || STANDARD_ADRESSE,
 		mailNurAn,
-		vapid
+		vapid,
+		icAbruf: leseIcAbruf(env)
 	};
+}
+
+/** Nur `IC_ABRUF=an` schaltet ein; Vereinsnummer aus `IC_VEREIN`, Vorgabe 2202 (TC Olten). */
+function leseIcAbruf(env: Record<string, string | undefined>): Einstellungen['icAbruf'] {
+	if (env.IC_ABRUF !== 'an') return undefined;
+	const roh = env.IC_VEREIN?.trim() || '2202';
+	if (!/^[1-9]\d{0,8}$/.test(roh)) throw new Error('IC_VEREIN ist keine Vereinsnummer');
+	return { verein: Number(roh) };
 }
 
 /** Beide leer: Push aus. Beide gesetzt: je base64url. Fehlertexte nennen nie den Wert (SI-05). */
