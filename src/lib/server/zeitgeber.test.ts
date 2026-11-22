@@ -86,4 +86,38 @@ describe('starteZeitgeber', () => {
 		expect(alt).not.toHaveBeenCalled();
 		expect(neu).toHaveBeenCalledTimes(2);
 	});
+
+	const TEST = { name: 'test', fehler: 'Test fehlgeschlagen' };
+
+	it('zwei Arten laufen nebeneinander, je mit eigenem Takt', async () => {
+		const a = vi.fn(async () => {});
+		const b = vi.fn(async () => {});
+		starte(a, { start: 10, abstand: 100 });
+		stopps.push(starteZeitgeber(b, { start: 20, abstand: 50 }, TEST));
+		await vi.advanceTimersByTimeAsync(120);
+		expect(a).toHaveBeenCalledTimes(2);
+		expect(b).toHaveBeenCalledTimes(3);
+	});
+
+	it('ein Wurf loggt den festen Text der Art', async () => {
+		const fehler = vi.spyOn(console, 'error').mockImplementation(() => {});
+		const b = vi.fn(async () => {
+			throw new Error('geheim');
+		});
+		stopps.push(starteZeitgeber(b, { start: 10, abstand: 100 }, TEST));
+		await vi.advanceTimersByTimeAsync(10);
+		expect(fehler).toHaveBeenCalledWith('Test fehlgeschlagen');
+		expect(JSON.stringify(fehler.mock.calls)).not.toContain('geheim');
+	});
+
+	it('der Stopp einer Art beendet die andere nicht', async () => {
+		const a = vi.fn(async () => {});
+		const b = vi.fn(async () => {});
+		const stoppA = starte(a, { start: 10, abstand: 100 });
+		stopps.push(starteZeitgeber(b, { start: 10, abstand: 100 }, TEST));
+		stoppA();
+		await vi.advanceTimersByTimeAsync(110);
+		expect(a).not.toHaveBeenCalled();
+		expect(b).toHaveBeenCalledTimes(2);
+	});
 });
