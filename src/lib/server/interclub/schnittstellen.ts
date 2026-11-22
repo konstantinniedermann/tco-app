@@ -31,7 +31,7 @@ export function getInterclubBegegnung(
 		const id = parseId(e.params.id);
 		const begegnung = parseId(e.params.begegnung);
 		if (id === null || begegnung === null) return nichtGefunden();
-		const b = await ladeBegegnung(d.db, id, begegnung);
+		const b = await ladeBegegnung(d.db, id, begegnung, jetzt(d));
 		return b ? antwort(200, b) : nichtGefunden();
 	});
 }

@@ -11,6 +11,7 @@ import { ladeBegegnung, ladeTeam, ladeUebersicht } from './ansicht.ts';
 
 // Seite einer Begegnung (#81 Teil 2) mit den Beispieldaten 2026 (erfundene Namen).
 // «Neueste Saison des Teams»: eigene Datenbank.
+const JETZT = new Date('2026-11-13T10:00:00Z');
 describe('ladeBegegnung', () => {
 	let e: EigeneDatenbank;
 	beforeAll(async () => {
@@ -25,7 +26,7 @@ describe('ladeBegegnung', () => {
 		'Heimspiel: Kopf, Einzel und Doppel nach Position, nur Name und Klassierung',
 		ZEIT_EIGENE_DB,
 		async () => {
-			const b = (await ladeBegegnung(e.db, 7398, 972338))!;
+			const b = (await ladeBegegnung(e.db, 7398, 972338, JETZT))!;
 			expect(b).toMatchObject({
 				saison: 2026,
 				teamId: 7398,
@@ -75,7 +76,7 @@ describe('ladeBegegnung', () => {
 	);
 
 	test('Auswärtsspiel: Sätze aus Sicht des TCO', ZEIT_EIGENE_DB, async () => {
-		const b = (await ladeBegegnung(e.db, 7398, 972339))!;
+		const b = (await ladeBegegnung(e.db, 7398, 972339, JETZT))!;
 		expect(b.spiel.tcoHeim).toBe(false);
 		expect(b.gegner).toBe('Muhen');
 		expect(b.saetze).toEqual({ tco: 1, gegner: 18 });
@@ -87,7 +88,7 @@ describe('ladeBegegnung', () => {
 	});
 
 	test('Aufgabe des Gegners zählt als Sieg', ZEIT_EIGENE_DB, async () => {
-		const b = (await ladeBegegnung(e.db, 7396, 951025))!;
+		const b = (await ladeBegegnung(e.db, 7396, 951025, JETZT))!;
 		expect(b.partien!.einzel.find((x) => x.position === 3)).toMatchObject({
 			saetze: ['6:3', '5:3'],
 			aufgabe: 'gegner',
@@ -96,7 +97,7 @@ describe('ladeBegegnung', () => {
 	});
 
 	test('Auf-/Abstiegsspiel mit nicht gespielten Doppeln', ZEIT_EIGENE_DB, async () => {
-		const b = (await ladeBegegnung(e.db, 7398, 45486))!;
+		const b = (await ladeBegegnung(e.db, 7398, 45486, JETZT))!;
 		expect(b.spiel.art).toBe('aufstieg');
 		expect(b.spiel.tcoHeim).toBe(false);
 		expect(b.partien!.einzel).toHaveLength(6);
@@ -112,7 +113,7 @@ describe('ladeBegegnung', () => {
 		const [vorher] = await e.db.select().from(icBericht).where(schluessel);
 		await e.db.delete(icBericht).where(schluessel);
 		try {
-			const b = (await ladeBegegnung(e.db, 7398, 972337))!;
+			const b = (await ladeBegegnung(e.db, 7398, 972337, JETZT))!;
 			expect(b.spiel.begegnungId).toBe(972337);
 			expect(b.saetze).toBeNull();
 			expect(b.partien).toBeNull();
@@ -122,10 +123,10 @@ describe('ladeBegegnung', () => {
 	});
 
 	test('fremde, unbekannte oder falsch zugeordnete Begegnung: null', ZEIT_EIGENE_DB, async () => {
-		expect(await ladeBegegnung(e.db, 7398, 972340)).toBeNull(); // Aarau 2 – Muhen
-		expect(await ladeBegegnung(e.db, 7398, 999999)).toBeNull();
-		expect(await ladeBegegnung(e.db, 7396, 972338)).toBeNull();
-		expect(await ladeBegegnung(e.db, 999999, 972338)).toBeNull();
+		expect(await ladeBegegnung(e.db, 7398, 972340, JETZT)).toBeNull(); // Aarau 2 – Muhen
+		expect(await ladeBegegnung(e.db, 7398, 999999, JETZT)).toBeNull();
+		expect(await ladeBegegnung(e.db, 7396, 972338, JETZT)).toBeNull();
+		expect(await ladeBegegnung(e.db, 999999, 972338, JETZT)).toBeNull();
 	});
 
 	test('Team-Seite und Übersicht nennen die Nummer der Begegnung', ZEIT_EIGENE_DB, async () => {
@@ -143,10 +144,41 @@ describe('ladeBegegnung', () => {
 			nichtFreigeschaltet: [{ jahr: 2027, wettbewerb: 'jic' }]
 		});
 		try {
-			expect((await ladeBegegnung(e.db, 7398, 972338))!.saison).toBe(2027);
+			expect((await ladeBegegnung(e.db, 7398, 972338, JETZT))!.saison).toBe(2027);
 		} finally {
 			await e.db.delete(icTeam).where(eq(icTeam.saison, 2027));
 			await e.db.delete(icStand).where(eq(icStand.saison, 2027));
 		}
+	});
+});
+
+describe('ladeBegegnung ohne Bericht', () => {
+	let e: EigeneDatenbank;
+	beforeAll(async () => {
+		e = await legeEigeneDatenbankAn('icohnebericht');
+		await importiereBeispiel(e.db, 2026, new Date('2026-11-12T08:00:00Z'), {
+			ohneBericht: [972338]
+		});
+	}, 30_000);
+	afterAll(async () => {
+		await e.abbauen();
+	});
+	// 972338 (Olten 1 – Villmergen) ist am 2026-05-02.
+	const am = (tag: string) => new Date(`${tag}T10:00:00Z`);
+
+	test('ohne Bericht, 3 Tage her → noch', ZEIT_EIGENE_DB, async () => {
+		const b = (await ladeBegegnung(e.db, 7398, 972338, am('2026-05-05')))!;
+		expect(b.spiel.datum).toBe('2026-05-02');
+		expect(b.ohneBericht).toBe('noch');
+	});
+
+	test('ohne Bericht, 9 Tage her → keiner', async () => {
+		const b = (await ladeBegegnung(e.db, 7398, 972338, am('2026-05-11')))!;
+		expect(b.ohneBericht).toBe('keiner');
+	});
+
+	test('mit Bericht → null', async () => {
+		const b = (await ladeBegegnung(e.db, 7398, 972337, am('2026-11-13')))!;
+		expect(b.ohneBericht).toBeNull();
 	});
 });

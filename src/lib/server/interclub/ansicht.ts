@@ -309,6 +309,8 @@ export type IcBegegnung = {
 	gegner: string;
 	saetze: { tco: number; gegner: number } | null; // null = kein Bericht
 	partien: { einzel: IcPartie[]; doppel: IcPartie[] } | null; // null = noch keine Einzelpartien
+	// Ohne Bericht: `noch` (bis 7 Tage nach dem Spiel), `keiner` (später: Swiss Tennis hat keinen); sonst null.
+	ohneBericht: 'noch' | 'keiner' | null;
 };
 
 // Wer gewonnen hat: Bei einer Aufgabe die andere Seite, sonst die Mehrheit der Sätze.
@@ -324,11 +326,15 @@ function partieErgebnis(saetze: string[], aufgabe: 'tco' | 'gegner' | null): IcP
 	return wir > sie ? 'sieg' : sie > wir ? 'niederlage' : null;
 }
 
+// Mehr als so viele Tage nach dem Spiel ohne Bericht: Swiss Tennis hat keinen (Seite sagt es).
+const BERICHT_FEHLT_TAGE = 7;
+
 /** Eine eigene Begegnung (Gruppe oder Auf-/Abstieg) der neuesten Saison des Teams; sonst null. */
 export async function ladeBegegnung(
 	db: Db,
 	teamId: number,
-	begegnungId: number
+	begegnungId: number,
+	jetzt: Date
 ): Promise<IcBegegnung | null> {
 	const [team] = await db
 		.select()
@@ -383,7 +389,10 @@ export async function ladeBegegnung(
 		spiel,
 		gegner: spiel.tcoHeim ? spiel.gast : spiel.heim
 	};
-	if (!bericht) return { ...kopf, saetze: null, partien: null };
+	if (!bericht) {
+		const spaet = spiel.datum < plusTage(heuteInZuerich(jetzt), -BERICHT_FEHLT_TAGE);
+		return { ...kopf, saetze: null, partien: null, ohneBericht: spaet ? 'keiner' : 'noch' };
+	}
 
 	const partien = await db
 		.select()
@@ -419,6 +428,7 @@ export async function ladeBegegnung(
 		partien: {
 			einzel: partien.filter((p) => p.art === 'einzel').map(partie),
 			doppel: partien.filter((p) => p.art === 'doppel').map(partie)
-		}
+		},
+		ohneBericht: null
 	};
 }

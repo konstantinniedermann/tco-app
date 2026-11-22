@@ -10,7 +10,10 @@ export async function importiereBeispiel(
 	db: Db,
 	jahr: number,
 	jetzt: Date,
-	o: { nichtFreigeschaltet?: { jahr: number; wettbewerb: Wettbewerb }[] } = {}
+	o: {
+		nichtFreigeschaltet?: { jahr: number; wettbewerb: Wettbewerb }[];
+		ohneBericht?: number[];
+	} = {}
 ) {
 	return importiereSaison(
 		{ db, holen: beispielAbruf(o), jetzt: () => jetzt, pause: async () => {} },
