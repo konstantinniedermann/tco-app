@@ -146,4 +146,25 @@ describe('istFaellig', () => {
 		const a = istFaellig(lage({ vorhanden: [], versuche: LAUFEND, ab: 2026 }));
 		expect(a).toEqual([{ saison: 2026, wettbewerb: 'ic', berichte: 'fehlende' }]);
 	});
+
+	it('Störung in ruhiger Woche: nächster Schlag nach 60 min versucht es wieder', () => {
+		const a = istFaellig(
+			lage({
+				versuche: [versuch(2027, 'ic', 60, 'stoerung'), versuch(2027, 'jic', 60, 'form')]
+			})
+		);
+		expect(a).toEqual([
+			{ saison: 2027, wettbewerb: 'ic', berichte: 'fehlende' },
+			{ saison: 2027, wettbewerb: 'jic', berichte: 'fehlende' }
+		]);
+	});
+
+	it('Störung, aber erst 30 min her → noch nicht', () => {
+		const a = istFaellig(
+			lage({
+				versuche: [versuch(2027, 'ic', 30, 'stoerung'), versuch(2027, 'jic', 30, 'ok')]
+			})
+		);
+		expect(a).toEqual([]);
+	});
 });

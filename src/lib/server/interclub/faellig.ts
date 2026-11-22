@@ -42,9 +42,11 @@ export function istFaellig(l: Lage): Auftrag[] {
 	for (const wettbewerb of WETTBEWERBE) {
 		const p = { saison: jahr, wettbewerb };
 		const v = letzter(p);
+		// Nach einer Störung oder fremden Form versucht es der nächste Stundenschlag wieder.
+		const gescheitert = v?.wort === 'stoerung' || v?.wort === 'form';
 		if (l.frisch.includes(wettbewerb)) {
 			if (!v || her(l.jetzt, v) >= STUNDENLAUF) auftraege.push({ ...p, berichte: 'frische' });
-		} else if (!v || her(l.jetzt, v) >= TAG) {
+		} else if (!v || her(l.jetzt, v) >= (gescheitert ? STUNDENLAUF : TAG)) {
 			auftraege.push({ ...p, berichte: 'fehlende' });
 		}
 	}
