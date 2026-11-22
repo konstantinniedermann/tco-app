@@ -309,6 +309,9 @@ export function pruefeBericht(json: unknown, verein: number): StBericht | 'fehlt
 			if (p !== 'nicht-gespielt') partien.push(p);
 		}
 	}
+	// Eine Position je Art: Sonst scheiterte erst der Schlüssel beim Speichern (als Störung).
+	const schluessel = partien.map((p) => `${p.art}-${p.position}`);
+	if (new Set(schluessel).size !== schluessel.length) return null;
 	return {
 		tcoHeim,
 		saetze: { tco: tco.saetze, gegner: gegner.saetze },

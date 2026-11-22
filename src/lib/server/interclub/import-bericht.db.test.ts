@@ -8,16 +8,21 @@ import { importiereSaison, type ImportDienste } from './import.ts';
 
 // Einzelpartien im Import (#81 Teil 2). Beispieldaten: echte Berichte 2026 mit erfundenen Namen.
 const db = erstelleDb(process.env.DATABASE_URL!);
-const SAISONS = [2081, 2082, 2083, 2084, 2085, 2086];
+const SAISONS = [2081, 2082, 2083, 2084, 2085, 2086, 2087, 2088, 2089];
 const VEREIN = 2202;
 const ST = 'https://low-scalability.microservices.swisstennis.ch/interclub';
 
-const dienste = (holen: ImportDienste['holen']): ImportDienste => ({
+const dienste = (
+	holen: ImportDienste['holen'],
+	jetzt = new Date('2081-05-02T10:00:00Z')
+): ImportDienste => ({
 	db,
 	holen,
-	jetzt: () => new Date('2081-05-02T10:00:00Z'),
+	jetzt: () => jetzt,
 	pause: async () => {}
 });
+const berichtAbfragen = (urls: string[]) =>
+	urls.filter((u) => /\/(encounter|tableau)-results\?/.test(u));
 
 // Erwartung unabhängig vom Import aus den Dateien: Partien mit Spielern, TCO- und Gegnerspieler.
 type Mitglied = { id: number; name: string };
@@ -185,5 +190,65 @@ describe('importiereSaison: Einzelpartien', () => {
 			jic: 'ok'
 		});
 		expect(await anzahl(2086)).toEqual(vorher);
+	});
+
+	test('fehlende: zweiter Abruf holt keinen gespeicherten Bericht neu', async () => {
+		await importiereSaison(dienste(beispielAbruf()), 2087, VEREIN);
+		const vorher = await anzahl(2087);
+		const urls: string[] = [];
+		const fake = beispielAbruf();
+		const wort = await importiereSaison(
+			dienste((u) => (urls.push(u), fake(u))),
+			2087,
+			VEREIN,
+			{ berichte: 'fehlende' }
+		);
+		expect(wort).toEqual({ ic: 'ok', jic: 'ok' });
+		expect(berichtAbfragen(urls)).toHaveLength(0);
+		expect(await anzahl(2087)).toEqual(vorher);
+	});
+
+	test('fehlende: Bericht, der beim ersten Mal fehlte, kommt beim zweiten', async () => {
+		await importiereSaison(dienste(beispielAbruf({ ohneBericht: [972338] })), 2088, VEREIN);
+		expect(await hatBericht(2088, 972338)).toBe(false);
+		const urls: string[] = [];
+		const fake = beispielAbruf();
+		await importiereSaison(
+			dienste((u) => (urls.push(u), fake(u))),
+			2088,
+			VEREIN,
+			{
+				berichte: 'fehlende'
+			}
+		);
+		expect(await hatBericht(2088, 972338)).toBe(true);
+		expect(berichtAbfragen(urls).every((u) => u.includes('encounterId=972338'))).toBe(true);
+	});
+
+	test('alle: Swiss Tennis gibt null für einen gespeicherten Bericht → er bleibt', async () => {
+		await importiereSaison(dienste(beispielAbruf()), 2089, VEREIN);
+		const vorher = await anzahl(2089);
+		const wort = await importiereSaison(
+			dienste(beispielAbruf({ ohneBericht: [972338] })),
+			2089,
+			VEREIN
+		);
+		expect(wort).toEqual({ ic: 'ok', jic: 'ok' });
+		expect(await hatBericht(2089, 972338)).toBe(true);
+		expect(await anzahl(2089)).toEqual(vorher);
+	});
+
+	test('frische: fragt nur Begegnungen der letzten 7 Tage ohne Bericht an', async () => {
+		const urls: string[] = [];
+		const fake = beispielAbruf();
+		// 12.05. Mittag in Zürich: frisch sind die Spiele vom 05.05. bis 12.05. (10 Berichte).
+		await importiereSaison(
+			dienste((u) => (urls.push(u), fake(u)), new Date('2081-05-12T10:00:00Z')),
+			2081,
+			VEREIN,
+			{ berichte: 'frische' }
+		);
+		expect(berichtAbfragen(urls)).toHaveLength(10);
+		expect((await anzahl(2081)).berichte).toBe(10);
 	});
 });
