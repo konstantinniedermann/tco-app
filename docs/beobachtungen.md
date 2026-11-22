@@ -115,7 +115,7 @@ Zwei Regeln, die sich in den Auswertungen als tragend erwiesen haben:
 Ausgewertete Einträge bis zum 18.11.2026 stehen im [Archiv](beobachtungen-archiv.md); es wird nicht
 mehr fortgeschrieben.
 
-Letzte Auswertung: 21.11.2026
+Letzte Auswertung: 22.11.2026 (nur Entscheide)
 
 ---
 
@@ -163,73 +163,3 @@ Partner-Anfragen (jener Eintrag ist verworfen).
 
 **Einschätzung:** Vorläufig. Entweder eine geplante Sperre durch den Admin (#43?), dann bleibt die
 Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.status` ausrichten.
-
-### 2026-11-16 — Junioren-CM verlangt bei Swiss Tennis ein eigenes Turnier
-
-**Thema:** Clubmeisterschaft
-
-**Fundort:** FR-33 (`docs/fachmodell.md`, ein Turnier je Jahr), Etappe *CM-Anmeldung* mit Junioren (K-46).
-
-**Beobachtung:** Laut Ausschreibung «Club Champion Trophy» 2026 (Ziff. 10) müssen Juniorenkategorien bei Swiss Tennis ein eigenes Turnier «Next Gen Trophy» sein. In MyTCO gibt es ein Turnier je Jahr; Junioren melden sich 2027 in MyTCO an. Ob die freiwilligen Turniernummern (0..n) das schon abdecken oder Juniorenkategorien eine eigene Zuordnung brauchen, ist nicht geprüft.
-
-**Ursprung:** Recherche «CM hinter den Kulissen» (`docs/recherche/2026-11-16-cm-ablauf.md`), Frage F10 in #88.
-
-**Einschätzung:** Vermutlich reicht eine zweite Turniernummer je Jahr; spätestens nach dem Gespräch #88 prüfen, vor der Etappe *CM-Anmeldung*.
-
-**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`schema.ts` → `turnier.jahr` eindeutig, Tabelle `turniernummer` 0..n; `kategorie` hat keinen Bezug zu `turniernummer`, eine zweite Nummer allein trennt die Junioren-Kategorien also nicht). F10 steht im Body von #88 (Lösungsrichtung 2), das Gespräch ist nicht geführt. Offen bis nach #88.
-
-### 2026-11-15 — Dauerregeln der `CLAUDE.md` sagen an fünf Stellen mehr als der Code
-
-**Thema:** Arbeitsweise
-
-**Fundort:** `CLAUDE.md` (Server, Oberfläche); `src/routes/api/status/+server.ts:5–10`,
-`src/routes/api/kontakt/+server.ts:6–10`; `src/routes/verwaltung/+layout.ts:20–21`;
-`src/lib/server/admin/schnittstellen.ts` (`getZugang`, `postZugangCode`, `postZugang`,
-`postAnsicht`); die Vorgabe `() => new Date()` in `login/dienst.ts`, `login/passkey.ts`,
-`admin/zugang.ts`, `profil/email-wechsel.ts`, `sitzung/schnittstellen.ts` und `hooks.server.ts`;
-Kommentar zur Regel `fetch` in `eslint.config.js`.
-
-**Beobachtung:** (1) «Nie Datenbank … in der Route» und «Statuscode und Antwort bauen nur
-Schnittstellen-Dateien …»: Die Routen `status` und `kontakt` bauen Antwort und Statuscode selbst
-mit `json` aus SvelteKit; `status` holt dort die Datenbank, `kontakt` die Einstellungen. Die
-Ausnahme stand nur im Zielbild des Refactorings und ist bewusst nicht in die `CLAUDE.md`
-aufgenommen (E-84); arc42 Kapitel 5 nennt sie. (2) «Fehlende Sitzung, Rolle oder Bestätigung
-behandelt nur der Wächter»: Das Layout der Verwaltung leitet ohne frische Bestätigung selbst nach
-`/verwaltung/bestaetigen` um; der Wächter (Fall `verwaltung-zugang`) deckt nur Sitzung und Rolle.
-(3) «Jede Schnittstelle der Verwaltung läuft über `liest` oder `schreibt`»: Die vier
-Zugangs-Schnittstellen sind die Zugangsprüfung selbst (`zugang.pruefe` bzw. `mitKonto`, E-34).
-(4) «Die Zeit kommt über die Dienste, nie direkt aus `new Date()`»: Vier Fachdienste und
-`getSitzung` nehmen `new Date()` als Vorgabe, wenn keine Uhr hineingereicht wird, und der Hook
-reicht dem Löschlauf `new Date()`; gemeint ist die Fachlogik. (5) Der Kommentar zur Regel `fetch` sagt, auch der Service Worker
-bekomme `holen` hineingereicht; er holt nichts (E-89).
-
-**Ursprung:** Review von Schritt 24 (15.11.2026, Hinweise (a) bis (c)); Refactoring-Analyse 1c,
-N-13 und N-14; (5) beim Angleichen der Kommentare in Schritt 25.
-
-**Einschätzung:** Kein Fehler im Code: Die Regeln sind absolut gefasst, der Code hat benannte
-Ränder. Eine Session, die nur die `CLAUDE.md` kennt, könnte die Stellen «reparieren». Wege: die
-Ränder in den Regeln nennen (kostet Länge) oder lassen. Entscheid des Projektleiters.
-
-**Nachtrag 2026-11-16 (Doku-Abgleich vor 0.23.0):** Zu (4) eine sechste Stelle:
-`src/lib/server/http.ts` (`jetzt` als Vorgabe) ist im Betrieb die einzige Uhr der
-Schnittstellen, weil `dienste.ts` `jetzt` nirgends setzt; ADR-013 beschreibt das richtig.
-
-**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`CLAUDE.md` seit dem Eintrag unverändert; Stellen wie unten).
-
-**Korrektur (21.11.2026, Beobachtungs-Auswertung).** (1) Drei Routen, nicht zwei: auch `src/routes/api/sitzung/+server.ts` holt selbst die Datenbank (`getSitzung(e, holeDb())`); arc42 Kapitel 5 nennt alle drei. (3) Fünf Zugangs-Schnittstellen ohne `liest`/`schreibt`: dazu `postAnsichtBeenden` (prüft nur `e.locals.konto`). (4) Mit Hook und `http.ts` sieben Stellen. (5) ist erledigt: Kommentar und Meldung der Regel in `eslint.config.js` sagen jetzt «der Service Worker holt nichts». Offen ist nur der Entscheid des Projektleiters, ob die Ränder in die `CLAUDE.md` kommen.
-
-### 2026-11-12 — Kostenseite hinkt der Schätzung für den Vorstand nach
-
-**Thema:** Kosten
-
-**Fundort:** `docs/kosten.md` (Laufende Kosten, Nur falls, Szenarien); Kostenschätzung als Artifact «MyTCO Kostenschätzung» für die Vorstandssitzung vom 16.11.2026
-
-**Beobachtung:** Die Schätzung für den Vorstand rechnet mit Posten und Preisen, die `kosten.md` nicht führt: nächste VPS-Stufe 4 vCPU / 4 GB CHF 9.00/Mt. als Worst Case (Infomaniak, 12.11.); GitHub rechnet Actions nicht mehr in Minuten, sondern als Guthaben (Free USD 12, Pro USD 18 pro Monat, Linux USD 0.006/Min.; Pro USD 4/Mt.); Überwachung (Healthchecks.io gratis bis USD 5/Mt.) und Passwort-Tresor (K-49, gratis bis ca. USD 40/Jahr); Best Case Website-Umzug (K-48): Metanet-Webhosting Listenpreise CHF 12.90–24.90/Mt. entfällt, Postfächer zu Infomaniak Mail Service ab CHF 2.29/Mt., Ersparnis ca. CHF 100–245/Jahr. Totals dort: laufend ca. 100–400, Startjahr ca. 120–440. Fairgate-Vergleich und SMS stehen nur noch in `kosten.md`.
-
-**Ursprung:** Kostenschätzung für den Vorstand (Nutzerauftrag, Session 12.11.2026)
-
-**Einschätzung:** `kosten.md` nach dem Vorstandsentscheid (K-03, 16.11.) nachführen, damit Repo und Vorstandsfassung dieselben Zahlen haben; den Abschnitt zu den Actions-Minuten in `ci-cd-und-release.md` auf das Guthaben-Modell prüfen.
-
-**Verifiziert:** 21.11.2026 gegen `dev` 8cb8edf — belegt (`docs/kosten.md` ohne VPS-Stufe CHF 9.00, ohne Actions-Guthaben, Healthchecks, Passwort-Tresor und Zahlen zum Website-Umzug; `docs/ci-cd-und-release.md` «Actions-Minuten» rechnet in Gratisminuten). Das Guthaben-Modell von GitHub ist nicht nachgeprüft.
-
-**Korrektur (21.11.2026, Beobachtungs-Auswertung).** Der Vorstandsentscheid zu K-03 kam am 17.11.2026 («bis CHF 500 pro Jahr», `docs/abklaerungen.md`); `kosten.md` hat K-03.1–3 nachgeführt, die Posten der Vorstandsfassung nicht. Offen ist nur, ob `kosten.md` die Zahlen übernimmt.
