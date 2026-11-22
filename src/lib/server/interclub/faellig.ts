@@ -22,9 +22,10 @@ export type Auftrag = Paar & { berichte: Berichte };
 
 export const ERSTE_SAISON = 2021;
 const MINUTE = 60_000;
-// Etwas unter einer Stunde, damit ein Schlag kurz nach dem letzten Versuch nicht ausfällt.
+// Etwas unter einer Stunde bzw. einem Tag: Der Versuch wird nach dem Import gemerkt, ein Schlag
+// kurz vor Ablauf soll trotzdem laufen (sonst wird aus «täglich» «alle 25 Stunden»).
 const STUNDENLAUF = 55 * MINUTE;
-const TAG = 24 * 60 * MINUTE;
+const TAG = 24 * 60 * MINUTE - 5 * MINUTE;
 const NACHT_AB = 23;
 const TAG_AB = 7;
 
@@ -42,8 +43,9 @@ export function istFaellig(l: Lage): Auftrag[] {
 	for (const wettbewerb of WETTBEWERBE) {
 		const p = { saison: jahr, wettbewerb };
 		const v = letzter(p);
-		// Nach einer Störung oder fremden Form versucht es der nächste Stundenschlag wieder.
-		const gescheitert = v?.wort === 'stoerung' || v?.wort === 'form';
+		// Nach einer Störung versucht es der nächste Stundenschlag wieder; eine fremde Form bleibt
+		// meist, darum dann erst am nächsten Tag (wenig Last, ADR-011).
+		const gescheitert = v?.wort === 'stoerung';
 		if (l.frisch.includes(wettbewerb)) {
 			if (!v || her(l.jetzt, v) >= STUNDENLAUF) auftraege.push({ ...p, berichte: 'frische' });
 		} else if (!v || her(l.jetzt, v) >= (gescheitert ? STUNDENLAUF : TAG)) {

@@ -132,3 +132,70 @@ test('#81: Mitglied öffnet eine Begegnung mit Einzel und Doppel, Gegner aufgekl
 	).toBeVisible();
 	expect(fehler).toEqual([]);
 });
+
+test('#81: «Resultat folgt», «keine Einzelpartien» und «Keine Einzel gemeldet»', async ({
+	page,
+	isMobile
+}) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	// Die Beispieldaten 2026 haben alle Resultate und Berichte: Die Antworten des Servers werden
+	// hier für diese Zustände abgeändert.
+	await page.route('**/api/interclub', async (route) => {
+		const echt = await route.fetch();
+		const u = await echt.json();
+		const offen = {
+			teamId: 7398,
+			begegnungId: 972338,
+			liga: '2L Herren 1',
+			art: 'gruppe',
+			runde: 1,
+			datum: '2026-05-02',
+			zeit: null,
+			heim: 'Olten 1',
+			gast: 'Villmergen',
+			heimPunkte: null,
+			gastPunkte: null,
+			eigen: true,
+			tcoHeim: true,
+			ergebnis: null
+		};
+		await route.fulfill({ response: echt, json: { ...u, abgeschlossen: false, letzte: [offen] } });
+	});
+	await page.route('**/api/interclub/teams/7398/begegnungen/*', async (route) => {
+		const echt = await route.fetch();
+		const b = await echt.json();
+		const json = route.request().url().endsWith('/972338')
+			? { ...b, saetze: null, partien: null, ohneBericht: 'keiner' }
+			: { ...b, partien: { ...b.partien, einzel: [] } };
+		await route.fulfill({ response: echt, json });
+	});
+	if (isMobile) await startetVomSymbol(page);
+	const konto = await legeKontoMitBriefCodeAn('Ida');
+	await page.goto('/login');
+	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
+	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Hoi Ida' })).toBeVisible();
+	await wartetAufVorladen(page);
+
+	await reiterleiste(page).getByRole('link', { name: 'IC', exact: true }).click();
+	const letzte = page.getByRole('region', { name: 'Letzte Resultate' });
+	await expect(letzte).toContainText('Olten 1 – Villmergen');
+	await expect(letzte.getByText('Resultat folgt')).toBeVisible();
+
+	await page.getByRole('button', { name: 'Teams', exact: true }).click();
+	await page.getByRole('link', { name: /2L Herren 1/ }).click();
+	await page.getByRole('link', { name: /Olten 1 – Villmergen/ }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Olten 1 – Villmergen' })).toBeVisible();
+	await expect(
+		page.getByText('Swiss Tennis hat für diese Begegnung keine Einzelpartien.')
+	).toBeVisible();
+
+	await page.getByRole('link', { name: '‹ 2L Herren 1', exact: true }).click();
+	await page.getByRole('link', { name: /Olten 1 – Aarau 2/ }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Olten 1 – Aarau 2' })).toBeVisible();
+	await expect(page.getByRole('region', { name: 'Einzel' })).toContainText(
+		'Keine Einzel gemeldet.'
+	);
+	expect(fehler).toEqual([]);
+});

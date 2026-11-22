@@ -150,13 +150,24 @@ describe('istFaellig', () => {
 	it('Störung in ruhiger Woche: nächster Schlag nach 60 min versucht es wieder', () => {
 		const a = istFaellig(
 			lage({
-				versuche: [versuch(2027, 'ic', 60, 'stoerung'), versuch(2027, 'jic', 60, 'form')]
+				versuche: [versuch(2027, 'ic', 60, 'stoerung'), versuch(2027, 'jic', 180)]
 			})
 		);
-		expect(a).toEqual([
-			{ saison: 2027, wettbewerb: 'ic', berichte: 'fehlende' },
-			{ saison: 2027, wettbewerb: 'jic', berichte: 'fehlende' }
-		]);
+		expect(a).toEqual([{ saison: 2027, wettbewerb: 'ic', berichte: 'fehlende' }]);
+	});
+
+	it('fremde Form in ruhiger Woche: erst nach einem Tag wieder (wenig Last)', () => {
+		const a = istFaellig(
+			lage({ versuche: [versuch(2027, 'ic', 60, 'form'), versuch(2027, 'jic', 180)] })
+		);
+		expect(a).toEqual([]);
+	});
+
+	it('Tageslauf mit Spielraum: 23 h 57 min nach dem letzten Versuch fällig', () => {
+		const a = istFaellig(
+			lage({ versuche: [versuch(2027, 'ic', 24 * 60 - 3), versuch(2027, 'jic', 180)] })
+		);
+		expect(a).toEqual([{ saison: 2027, wettbewerb: 'ic', berichte: 'fehlende' }]);
 	});
 
 	it('Störung, aber erst 30 min her → noch nicht', () => {
