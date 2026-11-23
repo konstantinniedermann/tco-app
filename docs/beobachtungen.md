@@ -368,3 +368,15 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** Kein neues Risiko von #92; prüfen, ob der Filter auch `request>uri` kürzen oder die Query entfernen soll (DS-06: Logs ohne Inhalte).
 
+
+### 2026-11-23 — Suche beim Vergeben einer Rolle zeigt Angaben der Clubmeisterschaft
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/routes/verwaltung/rollen/+page.svelte` (Dialog «… vergeben»), `src/lib/verwaltung/Spielersuche.svelte` (`trefferText`).
+
+**Beobachtung:** Die Seite «Rollen» nutzt die Spielersuche der Clubmeisterschaft. Unter jedem Treffer stehen darum Vermerke wie «Klassierung fehlt · Geschlecht fehlt · Jahrgang fehlt», die für eine Rollenvergabe keine Rolle spielen. Keine neuen Personendaten (der MyTCO-Admin darf sie lesen), nur unpassend.
+
+**Ursprung:** Review von #96, Session vom 23.11.2026.
+
+**Einschätzung:** Spielersuche um eine Wahl für den Text unter dem Namen ergänzen (z. B. nur Mitgliedernummer) oder eine schlanke Mitgliedersuche für die Verwaltung.
