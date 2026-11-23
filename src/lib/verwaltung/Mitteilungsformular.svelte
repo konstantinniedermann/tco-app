@@ -224,8 +224,8 @@
 					>{text.length} von {MAX_TEXT} Zeichen</span
 				>
 				<span class="feld-hilfe" id="mitteilung-text-hinweis"
-					>Keine Namen, Telefonnummern oder Resultate: Die Mitteilung kann auf dem Sperrbildschirm
-					stehen</span
+					>Keine sensiblen Infos wie z. B. Namen, Telefonnummern oder Resultate: Die Mitteilung kann
+					auf dem Sperrbildschirm stehen</span
 				>
 				{#if fehler.text}
 					<p class="fehler" id="fehler-mitteilung-text">{fehler.text}</p>
