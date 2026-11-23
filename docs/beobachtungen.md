@@ -176,6 +176,8 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** Kein Fehler im Code. Der Seed-Test bräuchte wohl dieselben 20 s wie seine Geschwister (Minuten-Fix). Für den Rest ist offen, ob die Vorgabe-Zeitgrenze für Tests mit Kindprozessen steigen soll oder ob «kein schwerer Lauf parallel» genügt.
 
+**Nachtrag 23.11.2026 (#81 Teil 3b):** `make check` wieder 9 rot bei Load 8–14, während eine andere Session E2E laufen liess: vier Interclub-DB-Tests (`abruf`, `import`, `import-bericht`) an 5 s, dazu der Seed-Test mit Folgefehlern (Aufräumen scheitert an Fremdschlüsseln, nächste Tests sehen alte Zeilen). Einzeln 140/140 grün, der zweite volle Lauf bei Load 2 ganz grün.
+
 ### 2026-11-23 — Themen, gültige Sitzungen und Passkeys werden an drei Stellen fast gleich geladen
 
 **Thema:** Code
@@ -223,3 +225,27 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Rückmeldung des Projektleiters zur Mitgliederliste, Branch fix/verwaltung-rueckmeldung.
 
 **Einschätzung:** `.tabelle-lang` auf weitere lange Listen übertragen, jeweils mit `.zelle-dehnbar` und einem E2E im schmalsten PC-Fenster. Passt eventuell zu #92 (Spalten sortieren und ziehen).
+
+### 2026-11-23 — Folgen-Schalter: drei kleine Lücken auf Teamseite und Profil
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/routes/interclub/[id]/+page.svelte`, `src/lib/push/Benachrichtigungen.svelte`, `tests/e2e/interclub.test.ts`.
+
+**Beobachtung:** (1) Der Link «Push einrichten» auf der Teamseite öffnet `/profil`, die Klappe «Benachrichtigungen» kann dort zu sein; man muss sie selbst finden. (2) Eine Störungsmeldung beim Folgen bleibt je Team gemerkt: Team A → B → A zeigt die alte Meldung von A wieder, bis zum nächsten Umschalten. (3) Die Ansicht («Ansicht als …») ist für den Schalter auf der Teamseite und die Gruppe «Interclub-Teams» im Profil nicht per Test belegt (der Server weist das Speichern ohnehin ab).
+
+**Ursprung:** Reviews #81 Teil 3b, Session vom 23.11.2026 (Ruling: geparkt, Minor).
+
+**Einschätzung:** Kein Fehler mit Folgen. (1) wäre ein Sprung auf die geöffnete Klappe, (2) ein Zurücksetzen beim Teamwechsel, (3) ein kurzer E2E; zusammen unter einer Stunde.
+
+### 2026-11-23 — A-INTERCLUB-01 und -02 stehen auf «geplant», obwohl gebaut
+
+**Thema:** Interclub
+
+**Fundort:** `docs/anforderungen/anforderungen.md` (A-INTERCLUB-01, A-INTERCLUB-02).
+
+**Beobachtung:** Beide Anforderungen sind auf `dev` gebaut, stehen aber auf «geplant». `make docs` verlangt für «umgesetzt» einen Test, der die ID nennt; keiner tut das bisher.
+
+**Ursprung:** Task 6 und merge-reviewer #81 Teil 3b, Session vom 23.11.2026.
+
+**Einschätzung:** Beim Doku-Abgleich vor dem Release klären: Test-Namen um die ID ergänzen und Status setzen, oder bewusst «geplant» lassen, bis #81 geschlossen ist.
