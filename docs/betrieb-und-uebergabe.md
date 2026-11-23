@@ -121,7 +121,9 @@ Nachfolge (K-05).
 1. **Arbeitsumgebung:** Die Nachfolge installiert Claude Code, klont das Repo und startet mit
    `make help`, [`README.md`](../README.md) und dieser Datei. Im Repo liegen die
    Projekt-`CLAUDE.md`, der Skill `tco-branching`, die Hooks der Versionsverwaltung
-   (`.githooks/`) und der Eintrag für den Svelte-MCP-Server (`.mcp.json`). Nur auf dem Rechner
+   (`.githooks/`), der Eintrag für den Svelte-MCP-Server (`.mcp.json`) und ein Claude-Hook
+   (`.claude/settings.json`, `.claude/hooks/`), der nach Änderungen an Seiten der Verwaltung
+   daran erinnert, die Seiteninfo zu prüfen; er braucht `jq` und schweigt ohne. Nur auf dem Rechner
    des Projektleiters (unter `~/.claude/` bzw. eine Ebene über dem Repo) liegen und gehen sonst
    verloren: die übergeordnete `CLAUDE.md` (Workflow, Dependencies, Commit-Konvention, Umgang
    mit Befunden), die Skills `session-start`, `session-wrap-up`, `beobachtungen-auswerten` und
