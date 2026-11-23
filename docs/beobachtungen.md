@@ -332,3 +332,15 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** Langes Wort in der Seiteninfo von «Für Fairgate» bricht in WebKit/Linux nicht um (Silbentrennung fehlt dort?). Mit `gh workflow run check.yml --ref dev -f spur=true` den Trace holen.
 
+### 2026-11-23 — Caddy-Fehlerlog könnte die Abfrage samt Suchtext enthalten
+
+**Thema:** Sicherheit
+
+**Fundort:** `betrieb/caddy/Caddyfile` (globaler `log`-Filter, Zeilen 8–18).
+
+**Beobachtung:** Der Filter entfernt IP-Adressen, aber nicht die angefragte Adresse mit Query. Schreibt Caddy zu einer Anfrage einen Fehler, könnten `suche=` (Mitgliederliste, schon heute) sowie `wer=` und `name=` (Verlauf, seit #92) mit Namensteilen im Log stehen.
+
+**Ursprung:** merge-reviewer zu #92, Session vom 23.11.2026.
+
+**Einschätzung:** Kein neues Risiko von #92; prüfen, ob der Filter auch `request>uri` kürzen oder die Query entfernen soll (DS-06: Logs ohne Inhalte).
+
