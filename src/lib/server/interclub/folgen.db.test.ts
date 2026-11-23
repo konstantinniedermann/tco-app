@@ -9,7 +9,12 @@ import {
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { icFolgen, icTeam, konto, pushAbo } from '../db/schema.ts';
 import { erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
-import { ladeFolgenStand, ladeGefolgteTeams, setzeFolgen } from './folgen.ts';
+import {
+	ladeAlleGefolgtenTeams,
+	ladeFolgenStand,
+	ladeGefolgteTeams,
+	setzeFolgen
+} from './folgen.ts';
 
 const JETZT = new Date('2026-11-13T10:00:00Z');
 
@@ -120,6 +125,27 @@ describe('Interclub-Teams folgen', () => {
 		const ohne = await neuesKonto(false);
 		expect(await ladeGefolgteTeams(e.db, ohne)).toEqual({ teams: [], push: false });
 	});
+
+	test(
+		'ladeAlleGefolgtenTeams: Liga der neuesten Saison je Team, unbekannte Teams sichtbar',
+		ZEIT_EIGENE_DB,
+		async () => {
+			const k = await neuesKonto(true);
+			for (const t of [9, 1, 2]) await setzeFolgen(e.db, k, t, true, JETZT);
+			await e.db.insert(icFolgen).values({ kontoId: k, teamId: 777, seit: JETZT });
+			const alle = await ladeAlleGefolgtenTeams(e.db, k);
+			expect(alle).toHaveLength(4);
+			expect(alle).toEqual(
+				expect.arrayContaining([
+					{ teamId: 9, liga: 'Nur 2026' },
+					{ teamId: 1, liga: '2L Herren 1' },
+					{ teamId: 2, liga: '1L Damen' },
+					{ teamId: 777, liga: 'Team 777' }
+				])
+			);
+			expect(await ladeAlleGefolgtenTeams(e.db, await neuesKonto(false))).toEqual([]);
+		}
+	);
 
 	test('Konto gelöscht: ic_folgen weg', ZEIT_EIGENE_DB, async () => {
 		const k = await neuesKonto(true);

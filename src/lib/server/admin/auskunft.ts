@@ -18,6 +18,7 @@ import {
 	type Antwort
 } from '../db/schema.ts';
 import type { Angaben } from './angaben.ts';
+import { ladeAlleGefolgtenTeams, type GefolgtesTeam } from '../interclub/folgen.ts';
 import { ladeMitglied, type Detail, type MitgliedStatus } from './mitglieder.ts';
 import type { AnsichtRolle, Rolle } from './rollen.ts';
 import { sitzungAbgelaufen } from '../login/sitzung.ts';
@@ -41,6 +42,8 @@ export type Auskunft = {
 	rollen: Rolle[];
 	/** Themen, zu denen das Mitglied Mitteilungen erhält (FR-41). */
 	themen: Thema[];
+	/** Interclub-Teams, denen das Mitglied folgt, mit ihrer Liga (neueste Saison, in der es das Team gibt). */
+	interclubTeams: GefolgtesTeam[];
 	login: {
 		/**
 		 * Gültige Sitzungen, je angemeldetes Gerät; bei Admins, wann die Verwaltung bestätigt wurde,
@@ -109,7 +112,8 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 		cm,
 		kontaktperson,
 		mitteilungen,
-		verlauf
+		verlauf,
+		interclubTeams
 	] = await Promise.all([
 		db
 			.select({
@@ -202,7 +206,8 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 			})
 			.from(aenderung)
 			.where(eq(aenderung.mitgliedId, id))
-			.orderBy(desc(aenderung.zeitpunkt), desc(aenderung.id))
+			.orderBy(desc(aenderung.zeitpunkt), desc(aenderung.id)),
+		ladeAlleGefolgtenTeams(db, m.kontoId)
 	]);
 	const name = `${m.angaben.nachname}, ${m.angaben.vorname}`;
 	const themen: Thema[] = [];
@@ -220,6 +225,7 @@ export async function ladeAuskunft(db: Db, id: number, jetzt: Date): Promise<Aus
 		mitgliedschaft: m.mitgliedschaft,
 		rollen: m.rollen,
 		themen,
+		interclubTeams,
 		login: {
 			geraete: sitzungen
 				.filter((z) => !sitzungAbgelaufen(z.zuletztGenutzt, jetzt))

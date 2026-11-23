@@ -1,5 +1,5 @@
 // Interclub-Teams folgen: wer welchem Team folgt, und ob das Konto Push eingerichtet hat.
-import { and, asc, eq, max } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, max } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { icFolgen, icTeam, pushAbo } from '../db/schema.ts';
 
@@ -71,4 +71,39 @@ export async function ladeGefolgteTeams(
 					.where(eq(icFolgen.kontoId, kontoId))
 					.orderBy(asc(icTeam.reihenfolge), asc(icTeam.teamId));
 	return { teams, push: await hatPush(db, kontoId) };
+}
+
+/**
+ * Alle Teams, denen das Konto folgt (für die Auskunft), je mit der Liga der neuesten Saison, in der
+ * es das Team gibt. Reihenfolge: neueste Saison zuerst, dann wie die Übersicht. Ein Team ohne Zeile
+ * in `ic_team` erscheint als «Team <Nr>», damit nichts Gespeichertes fehlt.
+ */
+export async function ladeAlleGefolgtenTeams(db: Db, kontoId: number): Promise<GefolgtesTeam[]> {
+	const gefolgt = await db
+		.select({ teamId: icFolgen.teamId })
+		.from(icFolgen)
+		.where(eq(icFolgen.kontoId, kontoId));
+	if (gefolgt.length === 0) return [];
+	const zeilen = await db
+		.select({ teamId: icTeam.teamId, liga: icTeam.liga })
+		.from(icTeam)
+		.where(
+			inArray(
+				icTeam.teamId,
+				gefolgt.map((z) => z.teamId)
+			)
+		)
+		.orderBy(desc(icTeam.saison), asc(icTeam.reihenfolge), asc(icTeam.teamId));
+	const ligen = new Map<number, string>();
+	const ergebnis: GefolgtesTeam[] = [];
+	for (const z of zeilen) {
+		if (ligen.has(z.teamId)) continue;
+		ligen.set(z.teamId, z.liga);
+		ergebnis.push({ teamId: z.teamId, liga: z.liga });
+	}
+	const unbekannt = gefolgt
+		.map((z) => z.teamId)
+		.filter((id) => !ligen.has(id))
+		.sort((a, b) => a - b);
+	return [...ergebnis, ...unbekannt.map((teamId) => ({ teamId, liga: `Team ${teamId}` }))];
 }
