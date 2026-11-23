@@ -11,6 +11,7 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Verwaltung: Auf der Seite eines Mitglieds zeigt die neue Karte «Einstellungen», welche Mitteilungen es bekommt, auf welchen Geräten es angemeldet ist, wo Push an ist und welche Passkeys es hat. Hilft bei Problemen mit Push und Login.
 - Abhängigkeiten aktualisiert (nodemailer 10.6, Playwright 1.65.1, ESLint 10.15). An der App ändert sich nichts.
 - Abhängigkeiten aktualisiert (Caddy-Image des Servers, neuer Stand). An der App ändert sich nichts.
 - Abhängigkeiten aktualisiert (Node-Basisimage 26-alpine, neuer Stand). An der App ändert sich nichts.
