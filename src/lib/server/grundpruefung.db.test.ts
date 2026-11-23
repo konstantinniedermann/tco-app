@@ -206,9 +206,9 @@ const OHNE_BEIDES_ANDERS: Record<string, [number, unknown]> = {};
 describe('Grundprüfung der Schnittstellen', () => {
 	// Hier nur Zählung und Ausnahmen. Dass keine Route an den Listen vorbei eine Funktion ruft,
 	// sichert der dritte Test in `routen.test.ts`.
-	test('die Listen der Mitglieder haben 39 Einträge, und jede Ausnahme gehört zu einem', () => {
+	test('die Listen der Mitglieder haben 41 Einträge, und jede Ausnahme gehört zu einem', () => {
 		const namen = mitgliederDienste().map(([name]) => name);
-		expect(namen).toHaveLength(39);
+		expect(namen).toHaveLength(41);
 		// Jede Ausnahme gehört zu einem Eintrag; eine veraltete Ausnahme fällt so auf.
 		for (const name of Object.keys(OHNE_SITZUNG_ANDERS)) expect(namen).toContain(name);
 	});
@@ -263,7 +263,7 @@ describe('Grundprüfung der Schnittstellen', () => {
 		const kennung = await erstelleSitzung(db, m.kontoId, start);
 		const konto = (await pruefeSitzung(db, kennung, start))!.konto;
 		const geprueft = mitgliederDienste().filter(([name]) => schreibend(name));
-		expect(geprueft).toHaveLength(26);
+		expect(geprueft).toHaveLength(27);
 		for (const [name, fn] of geprueft) {
 			const r = await fn(
 				anfrage(name, { body: 'kein JSON', contentType: 'text/plain', konto, cookie: kennung })
@@ -302,7 +302,7 @@ describe('Grundprüfung der Schnittstellen', () => {
 		const geprueft = [...mitgliederDienste(), ...verwaltungsDienste().liste].filter(([name]) =>
 			schreibend(name)
 		);
-		expect(geprueft).toHaveLength(26 + 42);
+		expect(geprueft).toHaveLength(27 + 42);
 		for (const name of Object.keys(OHNE_BEIDES_ANDERS)) {
 			expect(geprueft.map(([n]) => n)).toContain(name);
 		}

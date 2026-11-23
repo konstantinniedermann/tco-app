@@ -9,7 +9,14 @@ import { importiereBeispiel } from '../../../../tests/hilfen/interclub.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
 import { getSitzung } from '../sitzung/schnittstellen.ts';
-import { getInterclub, getInterclubBegegnung, getInterclubTeam } from './schnittstellen.ts';
+import { pushAbo } from '../db/schema.ts';
+import {
+	getInterclub,
+	getInterclubBegegnung,
+	getInterclubFolgen,
+	getInterclubTeam,
+	postInterclubFolgen
+} from './schnittstellen.ts';
 import type { InterclubDienste } from './typen.ts';
 
 const logs = [
@@ -109,5 +116,67 @@ describe('Schnittstellen für Interclub (Mitglied)', () => {
 			const f = await getInterclubBegegnung(d, get(konto, params));
 			expect([f.status, await f.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
 		}
+	});
+});
+
+describe('Schnittstellen: Teams folgen', () => {
+	const post = (konto: AngemeldetesKonto | undefined, body: unknown, id = '7398', ct?: string) =>
+		ereignis({ method: 'POST', konto, params: { id }, body, contentType: ct });
+	const mitAbo = async (konto: AngemeldetesKonto) => {
+		await e.db.insert(pushAbo).values({
+			endpunkt: `https://push.example/${randomUUID()}`,
+			sitzungHash: konto.sitzungHash,
+			kontoId: konto.kontoId,
+			p256dh: 'p',
+			auth: 'a',
+			eingerichtetAm: JETZT
+		});
+	};
+
+	test('Team liefert folgen; ohne Abo kein Folgen (409), mit Abo 200', async () => {
+		await importiereBeispiel(e.db, 2026, IMPORT);
+		const konto = await einloggen();
+		const t = await (await getInterclubTeam(d, get(konto, { id: '7398' }))).json();
+		expect(t).toMatchObject({ saison: 2026, folgen: { folgt: false, push: false } });
+
+		const ohne = await postInterclubFolgen(d, post(konto, { folgen: true }));
+		expect([ohne.status, await ohne.json()]).toEqual([409, { fehler: 'kein-push' }]);
+
+		await mitAbo(konto);
+		const ok = await postInterclubFolgen(d, post(konto, { folgen: true }));
+		expect([ok.status, await ok.json()]).toEqual([200, { folgt: true }]);
+		const t2 = await (await getInterclubTeam(d, get(konto, { id: '7398' }))).json();
+		expect(t2.folgen).toEqual({ folgt: true, push: true });
+
+		const liste = await getInterclubFolgen(d, get(konto));
+		expect(liste.status).toBe(200);
+		expect(await liste.json()).toEqual({
+			teams: [{ teamId: 7398, liga: expect.any(String) }],
+			push: true
+		});
+
+		const weg = await postInterclubFolgen(d, post(konto, { folgen: false }));
+		expect([weg.status, await weg.json()]).toEqual([200, { folgt: false }]);
+		expect(await (await getInterclubFolgen(d, get(konto))).json()).toEqual({
+			teams: [],
+			push: true
+		});
+	});
+
+	test('Fehlerfälle: 404, 400, 415, 401', async () => {
+		const konto = await einloggen();
+		await mitAbo(konto);
+		const unbekannt = await postInterclubFolgen(d, post(konto, { folgen: true }, '999999999'));
+		expect([unbekannt.status, await unbekannt.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
+		const keineZahl = await postInterclubFolgen(d, post(konto, { folgen: true }, 'abc'));
+		expect(keineZahl.status).toBe(404);
+		for (const body of [{ folgen: 'ja' }, {}, { folgen: 1 }]) {
+			const r = await postInterclubFolgen(d, post(konto, body));
+			expect([r.status, await r.json()]).toEqual([400, { fehler: 'eingabe' }]);
+		}
+		const kein = await postInterclubFolgen(d, post(konto, '{"folgen":true}', '7398', ''));
+		expect([kein.status, await kein.json()]).toEqual([415, { fehler: 'format' }]);
+		expect((await postInterclubFolgen(d, post(undefined, { folgen: true }))).status).toBe(401);
+		expect((await getInterclubFolgen(d, get())).status).toBe(401);
 	});
 });

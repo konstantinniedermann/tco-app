@@ -116,7 +116,9 @@ import {
 import {
 	getInterclub,
 	getInterclubBegegnung,
-	getInterclubTeam
+	getInterclubFolgen,
+	getInterclubTeam,
+	postInterclubFolgen
 } from './interclub/schnittstellen.ts';
 import { getSitzung } from './sitzung/schnittstellen.ts';
 import {
@@ -263,7 +265,9 @@ const ROUTEN: Record<string, Partial<Record<Methode, Verdrahtung>> | typeof EIGE
 	'/api/cm/kategorien/[id]/partner': { GET: [getCmPartner, 'cm'] },
 	'/api/cm/kategorien/[id]/wildcard': { POST: [postCmWildcard, 'cm'] },
 	'/api/interclub': { GET: [getInterclub, 'interclub'] },
+	'/api/interclub/folgen': { GET: [getInterclubFolgen, 'interclub'] },
 	'/api/interclub/teams/[id]': { GET: [getInterclubTeam, 'interclub'] },
+	'/api/interclub/teams/[id]/folgen': { POST: [postInterclubFolgen, 'interclub'] },
 	'/api/interclub/teams/[id]/begegnungen/[begegnung]': {
 		GET: [getInterclubBegegnung, 'interclub']
 	},

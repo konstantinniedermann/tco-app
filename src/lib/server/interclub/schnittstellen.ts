@@ -1,8 +1,19 @@
 // Schnittstellen der Mitglieder zu den Interclub-Resultaten des Vereins (nur lesend).
 import type { RequestEvent } from '@sveltejs/kit';
-import { antwort, jetzt, mitSitzung, nichtGefunden, type Ereignis } from '../http.ts';
+import {
+	antwort,
+	eingabeFehler,
+	formatFehler,
+	istJson,
+	jetzt,
+	leseKoerper,
+	mitSitzung,
+	nichtGefunden,
+	type Ereignis
+} from '../http.ts';
 import { parseId } from '../parse-id.ts';
 import { ladeBegegnung, ladeTeam, ladeUebersicht } from './ansicht.ts';
+import { ladeFolgenStand, ladeGefolgteTeams, setzeFolgen } from './folgen.ts';
 import type { InterclubDienste } from './typen.ts';
 
 export type InterclubEreignis = Ereignis & Pick<RequestEvent, 'params'>;
@@ -15,12 +26,34 @@ export function getInterclub(d: InterclubDienste, e: InterclubEreignis): Promise
 }
 
 export function getInterclubTeam(d: InterclubDienste, e: InterclubEreignis): Promise<Response> {
-	return mitSitzung(e, async () => {
+	return mitSitzung(e, async (konto) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
 		const t = await ladeTeam(d.db, id);
-		return t ? antwort(200, t) : nichtGefunden();
+		if (!t) return nichtGefunden();
+		return antwort(200, { ...t, folgen: await ladeFolgenStand(d.db, konto.kontoId, id) });
 	});
+}
+
+export async function postInterclubFolgen(
+	d: InterclubDienste,
+	e: InterclubEreignis
+): Promise<Response> {
+	if (!istJson(e)) return formatFehler();
+	return mitSitzung(e, async (konto) => {
+		const id = parseId(e.params.id);
+		if (id === null) return nichtGefunden();
+		const folgen = (await leseKoerper(e)).folgen;
+		if (typeof folgen !== 'boolean') return eingabeFehler();
+		const r = await setzeFolgen(d.db, konto.kontoId, id, folgen, jetzt(d));
+		if (r === 'nicht-gefunden') return nichtGefunden();
+		if (r === 'kein-push') return antwort(409, { fehler: 'kein-push' });
+		return antwort(200, { folgt: folgen });
+	});
+}
+
+export function getInterclubFolgen(d: InterclubDienste, e: InterclubEreignis): Promise<Response> {
+	return mitSitzung(e, async (konto) => antwort(200, await ladeGefolgteTeams(d.db, konto.kontoId)));
 }
 
 export function getInterclubBegegnung(
@@ -41,5 +74,7 @@ export function getInterclubBegegnung(
 export const INTERCLUB_SCHNITTSTELLEN = {
 	getInterclub,
 	getInterclubTeam,
+	postInterclubFolgen,
+	getInterclubFolgen,
 	getInterclubBegegnung
 } satisfies Record<string, (d: InterclubDienste, e: InterclubEreignis) => Promise<Response>>;
