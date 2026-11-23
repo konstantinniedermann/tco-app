@@ -65,6 +65,7 @@ Jede Anforderung aus beiden Quellen steht mit fester ID in
 | 12.11.2026 | Antworten des Vorstands: Die vier Admin-Rollen und ihre Besetzung gelten (K-18.4). Junioren ohne Altersgrenze: jedes Kind ein eigenes Konto; ein Elternteil führt es nur, solange das Kind keine eigene Adresse hat (A-MITGLIED-08, Vorschlag K-08, Bestätigung ausstehend) | Hauptansprechperson im Vorstand |
 | 18.11.2026 | Antworten des Vorstands: Kostenrahmen bis CHF 500 pro Jahr (N-KOSTEN-01, K-03.1); Adressen `my.tcolten.ch` und `test.my.tcolten.ch` erlaubt (K-10.1); Absender `mytco@tcolten.ch` (K-11.1); keine weiteren Sicherheitsvorgaben (K-12.2); Umzug der Website zu Infomaniak bewilligt (K-48) | Hauptansprechperson im Vorstand |
 | 22.11.2026 | A-INTERCLUB-01: Auf Test und Live holt die App die Interclub-Daten selbst von Swiss Tennis (in Spielwochen stündlich, ältere Saisons ab 2021 nach), lokal weiter per `make ic-import` ([#81](https://github.com/konstantinniedermann/tco-app/issues/81) Teil 3a) | Projektleiter |
+| 23.11.2026 | Neu A-INTERCLUB-02: Mitglieder folgen Interclub-Teams und bekommen nach jedem neuen Endstand mit Spielbericht einen Push, nur per Push ([#81](https://github.com/konstantinniedermann/tco-app/issues/81) Teil 3b, [Design](../superpowers/specs/2026-11-23-interclub-folgen-push-design.md)) | Projektleiter |
 
 ## Offene Fragen an den Verein
 
