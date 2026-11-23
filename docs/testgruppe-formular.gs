@@ -4,8 +4,9 @@
  * Baut das Google Formular für den Probelauf der Testgruppe (docs/testgruppe.md) samt
  * verknüpfter Antwort-Tabelle. Kein Teil der App: Der Projektleiter führt es einmal unter
  * script.google.com aus (Funktion `erstelleFormular`), Anleitung in docs/testgruppe.md#formular.
- * Die Schritte stammen wörtlich aus docs/testgruppe-rollenbuecher.md (erzeugt aus der
- * Einsatzliste). Formular und Tabelle nach der Auswertung löschen.
+ * Erzeugt mit `python3 docs/testgruppe-werkzeug/erzeuge.py .` aus der Einsatzliste, nicht von
+ * Hand ändern. Die Schritte stehen wörtlich so in docs/testgruppe-rollenbuecher.md.
+ * Formular und Tabelle nach der Auswertung löschen.
  */
 
 const PERSONAS = [
@@ -36,7 +37,7 @@ const SCHRITTE = {
     ],
     "3": [
       "3.2 · Zur GV zusagen",
-      "3.2 · Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen"
+      "3.2 · Klassierung laut Steckbrief eintragen"
     ],
     "4": [
       "4.1 · Die Anmeldung der Probe-CM öffnen",
@@ -50,8 +51,8 @@ const SCHRITTE = {
     ],
     "6": [
       "6.2 · Den Anmeldeschluss auf Tag 10 verschieben",
-      "6.2 · Olga Ohnehandy von Hand im Einzel Damen B anmelden",
-      "6.2 · Ihre Klassierung auf R8 korrigieren",
+      "6.2 · Olga Ohnehandy die Klassierung R8 geben",
+      "6.2 · Sie von Hand im Einzel Damen B anmelden",
       "6.2 · Das Herren-Doppel absagen"
     ],
     "8": [
@@ -68,7 +69,7 @@ const SCHRITTE = {
       "1.1 · Passkey einrichten",
       "1.1 · Am PC die Verwaltung öffnen und mit dem Code per Mail bestätigen",
       "1.1 · Auf der Seite «Rollen» dir selbst den Mitglieder-Admin und Corinne Meister den CM-Admin geben",
-      "1.4 · Die Mitglieder-Personas mit den Adressen von der Regie anlegen (Daniela Doppel, Pascal Partner, Zora Zögerlich, Stefan Spät, Olga Ohnehandy mit erfundener Adresse, Weitere Mitglieder)",
+      "1.4 · Die Mitglieder-Personas mit Geschlecht und Jahrgang laut Steckbrief und den Mail-Adressen von der Regie anlegen (Daniela Doppel, Pascal Partner, Zora Zögerlich, Stefan Spät, Olga Ohnehandy mit erfundener Adresse, Weitere Mitglieder)",
       "1.4 · Briefe als PDF erzeugen und der Regie privat schicken"
     ],
     "2": [
@@ -76,18 +77,20 @@ const SCHRITTE = {
       "2.7 · Mitteilung an den Verein «Einladung zur GV» schicken (Push, sonst E-Mail)"
     ],
     "3": [
-      "3.3 · Bei Zora Zögerlich die Telefonnummer ändern",
+      "3.3 · Als Mitglied deine Klassierung laut Steckbrief eintragen",
       "3.3 · Antworten zur GV ansehen",
-      "3.4 · Mitteilung zur GV an «noch keine Antwort» schicken",
-      "3.4 · Liste «Für Fairgate» öffnen und die selbst geänderten Angaben abhaken",
-      "3.4 · Im Verlauf die Änderungen von heute ansehen"
+      "3.3 · Bei Zora Zögerlich die Telefonnummer ändern",
+      "3.3 · Mitteilung zur GV an «noch keine Antwort» schicken",
+      "3.3 · Liste «Für Fairgate» öffnen und die selbst geänderten Angaben abhaken",
+      "3.3 · Im Verlauf die Änderungen von heute ansehen"
     ],
     "4": [
       "4.2 · Mitteilung an den Verein «Die CM ist offen» schicken",
       "4.2 · Ort der GV ändern"
     ],
     "5": [
-      "5.3 · Dich im Mixed allein anmelden mit «sucht Partner»"
+      "5.3 · Dich im Mixed allein anmelden mit «sucht Partner»",
+      "5.3 · Die Anfrage von Stefan im Herren-Doppel nicht beantworten"
     ],
     "7": [
       "7.1 · Den Austritt von Pascal Partner erfassen",
@@ -114,7 +117,7 @@ const SCHRITTE = {
       "3.1 · Telefon und Adresse im Profil ändern",
       "3.1 · Einen Rufnamen setzen",
       "3.1 · Lizenznummer eintragen",
-      "3.1 · Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen",
+      "3.1 · Klassierung laut Steckbrief eintragen",
       "3.1 · E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat)",
       "3.1 · Zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung)",
       "3.1 · Antwort einmal ändern",
@@ -162,7 +165,7 @@ const SCHRITTE = {
       "3.1 · Telefon und Adresse im Profil ändern",
       "3.1 · Einen Rufnamen setzen",
       "3.1 · Lizenznummer eintragen",
-      "3.1 · Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen",
+      "3.1 · Klassierung laut Steckbrief eintragen",
       "3.1 · E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat)",
       "3.1 · Zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung)",
       "3.1 · Antwort einmal ändern",
@@ -208,7 +211,7 @@ const SCHRITTE = {
       "3.1 · Telefon und Adresse im Profil ändern",
       "3.1 · Einen Rufnamen setzen",
       "3.1 · Lizenznummer eintragen",
-      "3.1 · Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen",
+      "3.1 · Klassierung laut Steckbrief eintragen",
       "3.1 · E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat)",
       "3.1 · Zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung)",
       "3.1 · Antwort einmal ändern",
@@ -216,11 +219,10 @@ const SCHRITTE = {
     ],
     "4": [
       "4.6 · Dich im Einzel Damen B anmelden",
-      "4.6 · Für Damen A eine Wildcard mit Begründung beantragen",
-      "4.6 · Prüfen, ob die Anfrage von Corinne angekommen ist"
+      "4.6 · Für Damen A eine Wildcard mit Begründung beantragen"
     ],
     "5": [
-      "5.2 · Die Anfrage von Corinne ablehnen",
+      "5.2 · Die Anfrage von Corinne im Damen-Doppel finden und ablehnen",
       "5.2 · Im Mixed Stefan Spät anfragen und die Anfrage wieder zurückziehen",
       "5.2 · Dich im Mixed allein anmelden mit «sucht Partner» und einem Kommentar",
       "5.9 · Die GV ist «zu prüfen» (Ort geändert): Antwort neu bestätigen"
@@ -252,7 +254,7 @@ const SCHRITTE = {
       "3.1 · Telefon und Adresse im Profil ändern",
       "3.1 · Einen Rufnamen setzen",
       "3.1 · Lizenznummer eintragen",
-      "3.1 · Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen",
+      "3.1 · Klassierung laut Steckbrief eintragen",
       "3.1 · E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat)",
       "3.1 · Zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung)",
       "3.1 · Antwort einmal ändern",
@@ -294,7 +296,7 @@ const SCHRITTE = {
       "3.1 · Telefon und Adresse im Profil ändern",
       "3.1 · Einen Rufnamen setzen",
       "3.1 · Lizenznummer eintragen",
-      "3.1 · Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen",
+      "3.1 · Klassierung laut Steckbrief eintragen",
       "3.1 · E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat)",
       "3.1 · Zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung)",
       "3.1 · Antwort einmal ändern",
@@ -338,7 +340,7 @@ const ZUSATZ = {
     ],
     "7": [
       "Auskunft für Olga Ohnehandy drucken",
-      "Olga zum Löschen vormerken und wieder rückgängig machen"
+      "Ein eingelesenes Mitglied aus Akt 3 zum Löschen vormerken und wieder rückgängig machen"
     ],
     "8": [
       "«Ansicht als …» Mitglied öffnen und wieder beenden"

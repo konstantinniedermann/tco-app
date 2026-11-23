@@ -157,8 +157,7 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
 - **Markierung für Fairgate offen:** sobald der Mitglieder-Admin die Angaben als übertragen abhakt; das
   Abhaken steht im Änderungsverlauf.
 - **Testgruppe:** Mail-Adressen der Testpersonen auf Test beim Neuaufsetzen von Test nach dem
-  Probelauf; Liste der Testpersonen nach dem letzten Lauf, spätestens zu Beginn der
-  CM-Anmeldung; Formularantworten nach der Auswertung des jeweiligen Laufs; Spalten zur
+  Probelauf; Liste der Testpersonen nach dem letzten Lauf; Formularantworten nach der Auswertung des jeweiligen Laufs; Spalten zur
   Testgruppe in der Fragen-Tabelle bei der Übernahme in die Liste ([Testgruppe](#testgruppe)).
 
 ## Testgruppe
@@ -168,7 +167,9 @@ mit erfundenen Personas ([Testgruppe](testgruppe.md)).
 
 - **Daten auf Test** sind erfunden (DS-08). **Ausnahme:** Die Persona trägt die echte
   Mail-Adresse der Testperson, mit ihrem Einverständnis, damit die Mails von MyTCO echt
-  ankommen. Die Adresse sehen auch die Admin-Personas, die die Persona anlegen und verwalten.
+  ankommen. Die Adresse sehen wie im Betrieb die Admin-Personas (Mitglieder-Admin; CM-Admin bei Spielern
+  des Turniers), der Doppelpartner nach dem Annehmen und ein Angefragter, wenn die Persona keine
+  Telefonnummer hat (FR-19); darum tragen alle eine erfundene Telefonnummer ein.
   Versand über einen Anbieter in der Schweiz oder EU (DS-01). Gelöscht beim Neuaufsetzen von
   Test nach dem Lauf. Zweite Adressen fürs «E-Mail ändern» gelten gleich.
 - **Erfundene Konten der Testdaten:** Ihre Mails werden weiter umgeleitet (heute in den

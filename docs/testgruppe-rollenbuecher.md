@@ -3,7 +3,8 @@
 # Rollenbücher der Testgruppe
 
 Ein Rollenbuch pro Persona für den [Probelauf](testgruppe.md). Erzeugt aus der
-[Einsatzliste](testgruppe.md#einsatzliste); die Schritte stehen wörtlich so im
+[Einsatzliste](testgruppe.md#einsatzliste) mit `python3 docs/testgruppe-werkzeug/erzeuge.py .`
+(nicht von Hand ändern); die Schritte stehen wörtlich so im
 [Formular](testgruppe.md#formular). Jedes Rollenbuch ist ein eigener Abschnitt, damit der
 Projektleiter es einzeln als PDF oder Google-Dokument verschicken kann. Platzhalter `[…]`
 vor dem Versand ersetzen.
@@ -75,7 +76,7 @@ Am Abig: Formular, Abschnitt «Corinne Meister – Akt 2».
 Sobald d Regie de Akt eröffnet het.
 
 1. Zur GV zusagen
-2. Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen
+2. Klassierung laut Steckbrief eintragen
 
 Meldung:
 
@@ -144,7 +145,7 @@ Meldung:
 ✅ 5.7 zusammengelegt
 ```
 
-Falls jemand fehlt: ohne Z: Markus und Stefan im Herren-Doppel.
+Falls jemand fehlt: ohne Z: entfällt.
 
 #### 5.8
 
@@ -167,8 +168,8 @@ Am Abig: Formular, Abschnitt «Corinne Meister – Akt 5».
 Du bisch dra, sobald im Chat «✅ 6.1 S zu spät» stoht.
 
 1. Den Anmeldeschluss auf Tag 10 verschieben
-2. Olga Ohnehandy von Hand im Einzel Damen B anmelden
-3. Ihre Klassierung auf R8 korrigieren
+2. Olga Ohnehandy die Klassierung R8 geben
+3. Sie von Hand im Einzel Damen B anmelden
 4. Das Herren-Doppel absagen
 
 Meldung:
@@ -176,8 +177,6 @@ Meldung:
 ```text
 ✅ 6.2 Schluss verschoben
 ```
-
-Falls jemand fehlt: ohne Z: das Damen-Doppel absagen.
 
 #### Zusatz Akt 6 (freiwillig)
 
@@ -251,7 +250,7 @@ Meldung:
 
 Du bisch dra, sobald im Chat «✅ 1.1 Rollen vergeben» stoht.
 
-1. Die Mitglieder-Personas mit den Adressen von der Regie anlegen (Daniela Doppel, Pascal Partner, Zora Zögerlich, Stefan Spät, Olga Ohnehandy mit erfundener Adresse, Weitere Mitglieder)
+1. Die Mitglieder-Personas mit Geschlecht und Jahrgang laut Steckbrief und den Mail-Adressen von der Regie anlegen (Daniela Doppel, Pascal Partner, Zora Zögerlich, Stefan Spät, Olga Ohnehandy mit erfundener Adresse, Weitere Mitglieder)
 2. Briefe als PDF erzeugen und der Regie privat schicken
 
 Meldung:
@@ -300,32 +299,22 @@ Am Abig: Formular, Abschnitt «Markus Verwalter – Akt 2».
 
 #### 3.3
 
-Sobald d Regie de Akt eröffnet het.
+Ab 18 Uhr.
 
-1. Bei Zora Zögerlich die Telefonnummer ändern
+1. Als Mitglied deine Klassierung laut Steckbrief eintragen
 2. Antworten zur GV ansehen
+3. Bei Zora Zögerlich die Telefonnummer ändern
+4. Mitteilung zur GV an «noch keine Antwort» schicken
+5. Liste «Für Fairgate» öffnen und die selbst geänderten Angaben abhaken
+6. Im Verlauf die Änderungen von heute ansehen
 
 Meldung:
 
 ```text
-✅ 3.3 Daten geändert
+✅ 3.3 Erinnerung verschickt
 ```
 
 Falls jemand fehlt: ohne Z: bei Pascal Partner.
-
-#### 3.4
-
-Ab 18 Uhr.
-
-1. Mitteilung zur GV an «noch keine Antwort» schicken
-2. Liste «Für Fairgate» öffnen und die selbst geänderten Angaben abhaken
-3. Im Verlauf die Änderungen von heute ansehen
-
-Meldung:
-
-```text
-✅ 3.4 Erinnerung verschickt
-```
 
 #### Zusatz Akt 3 (freiwillig)
 
@@ -357,6 +346,7 @@ Am Abig: Formular, Abschnitt «Markus Verwalter – Akt 4».
 Sobald d Regie de Akt eröffnet het.
 
 1. Dich im Mixed allein anmelden mit «sucht Partner»
+2. Die Anfrage von Stefan im Herren-Doppel nicht beantworten
 
 Meldung:
 
@@ -364,7 +354,7 @@ Meldung:
 ✅ 5.3 MV sucht Partner
 ```
 
-Falls jemand fehlt: ohne Z: im Herren-Doppel.
+Falls jemand fehlt: ohne Z: nur die Anfrage von Stefan nicht beantworten.
 
 Am Abig: Formular, Abschnitt «Markus Verwalter – Akt 5».
 
@@ -400,7 +390,7 @@ Falls jemand fehlt: ohne S: Sitzungen von Daniela beenden.
 #### Zusatz Akt 7 (freiwillig)
 
 1. Auskunft für Olga Ohnehandy drucken
-2. Olga zum Löschen vormerken und wieder rückgängig machen
+2. Ein eingelesenes Mitglied aus Akt 3 zum Löschen vormerken und wieder rückgängig machen
 
 Am Abig: Formular, Abschnitt «Markus Verwalter – Akt 7».
 
@@ -485,7 +475,7 @@ Sobald d Regie de Akt eröffnet het.
 1. Telefon und Adresse im Profil ändern
 2. Einen Rufnamen setzen
 3. Lizenznummer eintragen
-4. Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen
+4. Klassierung laut Steckbrief eintragen
 5. E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat)
 6. Zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung)
 7. Antwort einmal ändern
@@ -515,6 +505,8 @@ Meldung:
 ```text
 ✅ 4.4 Anfrage an P
 ```
+
+Falls jemand fehlt: ohne Z: zusätzlich für Damen A eine Wildcard mit Begründung beantragen.
 
 Am Abig: Formular, Abschnitt «Daniela Doppel – Akt 4».
 
@@ -657,7 +649,7 @@ Sobald d Regie de Akt eröffnet het.
 1. Telefon und Adresse im Profil ändern
 2. Einen Rufnamen setzen
 3. Lizenznummer eintragen
-4. Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen
+4. Klassierung laut Steckbrief eintragen
 5. E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat)
 6. Zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung)
 7. Antwort einmal ändern
@@ -834,7 +826,7 @@ Sobald d Regie de Akt eröffnet het.
 1. Telefon und Adresse im Profil ändern
 2. Einen Rufnamen setzen
 3. Lizenznummer eintragen
-4. Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen
+4. Klassierung laut Steckbrief eintragen
 5. E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat)
 6. Zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung)
 7. Antwort einmal ändern
@@ -856,7 +848,6 @@ Du bisch dra, sobald im Chat «✅ 4.2 CM angekündigt» stoht.
 
 1. Dich im Einzel Damen B anmelden
 2. Für Damen A eine Wildcard mit Begründung beantragen
-3. Prüfen, ob die Anfrage von Corinne angekommen ist
 
 Meldung:
 
@@ -872,7 +863,7 @@ Am Abig: Formular, Abschnitt «Zora Zögerlich – Akt 4».
 
 Sobald d Regie de Akt eröffnet het.
 
-1. Die Anfrage von Corinne ablehnen
+1. Die Anfrage von Corinne im Damen-Doppel finden und ablehnen
 2. Im Mixed Stefan Spät anfragen und die Anfrage wieder zurückziehen
 3. Dich im Mixed allein anmelden mit «sucht Partner» und einem Kommentar
 
@@ -987,7 +978,7 @@ Sobald d Regie de Akt eröffnet het.
 1. Telefon und Adresse im Profil ändern
 2. Einen Rufnamen setzen
 3. Lizenznummer eintragen
-4. Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen
+4. Klassierung laut Steckbrief eintragen
 5. E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat)
 6. Zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung)
 7. Antwort einmal ändern
@@ -1151,7 +1142,7 @@ Sobald d Regie de Akt eröffnet het.
 1. Telefon und Adresse im Profil ändern
 2. Einen Rufnamen setzen
 3. Lizenznummer eintragen
-4. Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen
+4. Klassierung laut Steckbrief eintragen
 5. E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat)
 6. Zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung)
 7. Antwort einmal ändern

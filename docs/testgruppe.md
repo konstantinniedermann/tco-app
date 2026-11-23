@@ -23,8 +23,8 @@ Einsatz, dessen Funktion fehlt, fällt weg.
 - [ ] **Echter Mailversand auf Test.** Weg wird entschieden, wenn der Lauf näher rückt: K-11
   (Absender `mytco@tcolten.ch` mit DNS-Einträgen) oder ein Übergangs-Absender bei einem Anbieter
   in der Schweiz oder EU (DS-01), nur für Test
-- [ ] **Erlaubt-Liste statt Umleitung auf Test:** Mails an die Adressen der Testpersonen gehen
-  hinaus, alle anderen werden wie heute umgeleitet (`MAIL_NUR_AN`)
+- [ ] **Erlaubt-Liste statt Umleitung auf Test:** Mails an die Adressen der Testpersonen (auch die
+  zweiten Adressen fürs «E-Mail ändern») gehen hinaus, alle anderen werden wie heute umgeleitet (`MAIL_NUR_AN`)
 - [ ] **Test neu aufsetzen** kurz vor Akt 0 (Zähler `betrieb/test-neu-aufsetzen`), danach die
   Interclub-Daten neu einlesen; nach dem Lauf nochmals neu aufsetzen und die Demo-Daten laden
 - [ ] Test-Passwort an die Testpersonen (Entscheid Projektleiter)
@@ -61,11 +61,9 @@ Mitglieder-Personas, zwei PCs für die Admins.
 
 **Fällt eine Rolle weg:**
 
-- ohne *Zögerin*: Die *Doppel-Sucherin* beantragt die Wildcard; Ablehnen und Zurückziehen
-  einer Anfrage fallen weg, die CM-Leitung schickt keine Doppel-Anfrage; «sucht Partner» und
-  Zusammenlegen machen die *Mitgliederverwaltung* und der *Spätzünder* (Mixed geht dann nicht:
-  beide Herren, also im Herren-Doppel, das dann nicht abgesagt wird; abgesagt wird das
-  Damen-Doppel ohne Anmeldung, die Meldung bekommt niemand).
+- ohne *Zögerin*: Die *Doppel-Sucherin* beantragt die Wildcard für Damen A (Einsatz 4.4);
+  Ablehnen und Zurückziehen einer Anfrage und das Zusammenlegen entfallen, die CM-Leitung schickt
+  keine Doppel-Anfrage, die Mitgliederverwaltung meldet sich nicht im Mixed an.
 - ohne *Spätzünder*: Die *Mitgliederverwaltung* schickt dem *Partner* die Anfrage im
   Herren-Doppel und bekommt nach der Absage die Meldung; die Spätanmeldung macht sie selbst im
   Herren-Einzel B; Sitzungen beenden trifft die *Doppel-Sucherin*.
@@ -85,10 +83,11 @@ Mitglieder-Personas, zwei PCs für die Admins.
 | Pascal Partner | Herr | 1988 | R4 | nimmt Danielas Anfrage an, tritt aus und wieder ein |
 | Zora Zögerlich | Dame | 1995 | R8 | will höher hinaus (Wildcard), sagt Corinne ab, sucht allein |
 | Stefan Spät | Herr | 1958 | R9 | kommt zu spät, Senior |
-| Olga Ohnehandy | Dame | 1950 | R9 (falsch erfasst, richtig R8) | wird von Hand angemeldet |
+| Olga Ohnehandy | Dame | 1950 | R8 (trägt die CM-Leitung ein) | wird von Hand angemeldet |
 
-Die Klassierung tragen die Personas selbst ein (Akt 3), ebenso Geschlecht und Jahrgang (FR-37).
-Adressen und Telefonnummern erfindet jede Person für ihre Persona selbst.
+Geschlecht und Jahrgang erfasst die Mitgliederverwaltung beim Anlegen (Akt 1), die Klassierung
+tragen die Personas selbst ein (Akt 3, FR-37). Adressen und Telefonnummern erfindet jede Person
+für ihre Persona selbst; alle tragen eine Telefonnummer ein.
 
 ### Kategorien der Probe-CM
 
@@ -118,7 +117,7 @@ Doppel zählen, offene Anfragen nicht).
 | P | Herren A (1) | + Mixed mit DS (2) | 2 | nach Austritt 0 | R4 in R1–R6 |
 | Z | Damen B (1), Wildcard Damen A (2) | + Mixed allein, dann mit MV (3) | 3 | 3 | Wildcard: Einzel, Damen A stärker, R8 passt nur wegen Klassierung nicht (FR-08) |
 | S | – | Anfrage Herren-Doppel an MV (0) | Herren 55+ (1), wieder ab (0) | 0 | 1958 ≤ 1971; Herr R9 + Herr R7 = 16 |
-| Olga | – | – | Damen B von Hand (1) | 1 | R9 bzw. R8 in R6–R9 |
+| Olga | – | – | Damen B von Hand (1) | 1 | R8 in R6–R9 |
 
 Im Herren-Doppel gibt es bis zur Absage nur die offene Anfrage von S (FR-35: Absagen geht nur
 ohne aktive Anmeldungen). Annehmen und Zusammenlegen in Akt 5 liegen vor dem ersten
@@ -182,7 +181,11 @@ meldet `⏭ Nr ausgelassen`; die Spalte «nach ⏭» sagt, ob der nächste trotz
 
 ## Einsatzliste
 
-Die verbindliche Reihenfolge. Schritte sind durch « · » getrennt und stehen wörtlich so im
+Die verbindliche Reihenfolge. Aus ihr erzeugt `python3 docs/testgruppe-werkzeug/erzeuge.py .` die
+[Rollenbücher](testgruppe-rollenbuecher.md) und das [Formular-Skript](testgruppe-formular.gs) und
+prüft Stichwörter, Kettenlänge (höchstens drei Übergaben), Schritte pro Akt (höchstens acht) und
+Meldungen. Nach jeder Änderung hier neu laufen lassen; der Zuschnitt auf die Besetzung heisst:
+Einsätze hier anpassen («ohne»-Spalte), dann erzeugen. Schritte sind durch « · » getrennt und stehen wörtlich so im
 Rollenbuch und im Formular. Meldungen ohne Codes, Adressen und echte Namen. «ohne» steht nur bei
 Einsätzen der Prio-2/3-Personas und bei Einsätzen, die auf sie warten.
 
@@ -190,7 +193,7 @@ Einsätzen der Prio-2/3-Personas und bei Einsätzen, die auf sie warten.
 
 | Nr | Persona | Stichwort | Schritte | Meldung |
 |---|---|---|---|---|
-| 0.1 | R | Tag 0 | Als Erika Beispiel einloggen (Brief-Code aus der Mail «Brief-Code für die Test-Umgebung») · Persona Rolf Regie mit der eigenen Adresse anlegen und ihr MyTCO-Admin und Mitglieder-Admin geben · als Rolf Regie einloggen und Erika Beispiel alle Admin-Rollen entziehen · Corinne Meister und Markus Verwalter mit den Adressen ihrer Testpersonen anlegen · Markus Verwalter den MyTCO-Admin geben · Briefe der beiden als PDF erzeugen und privat schicken, mit Rollenbuch und Test-Passwort · Kalender mit echten Daten in den Chat | `✅ 0.1 Bühne steht` |
+| 0.1 | R | Tag 0 | Als Erika Beispiel einloggen (Brief-Code aus der Mail «Brief-Code für die Test-Umgebung») · Persona Rolf Regie mit der eigenen Adresse anlegen und ihr MyTCO-Admin und Mitglieder-Admin geben · als Rolf Regie einloggen und Erika Beispiel alle Admin-Rollen entziehen · Corinne Meister und Markus Verwalter mit den Adressen ihrer Testpersonen anlegen · Markus Verwalter den MyTCO-Admin geben · Briefe der beiden als PDF erzeugen und privat schicken, mit Rollenbuch und Test-Passwort · die Mail-Adressen der Testpersonen privat an die Testperson von Markus Verwalter schicken · Kalender mit echten Daten in den Chat | `✅ 0.1 Bühne steht` |
 
 ### Akt 1 – Einstieg Verwaltung
 
@@ -199,7 +202,7 @@ Einsätzen der Prio-2/3-Personas und bei Einsätzen, die auf sie warten.
 | 1.1 | MV | Akt-Beginn | Brief am Laptop öffnen und den QR-Code mit dem Handy scannen · MyTCO auf den Startbildschirm legen · mit dem Code aus dem Brief einloggen · Passkey einrichten · am PC die Verwaltung öffnen und mit dem Code per Mail bestätigen · auf der Seite «Rollen» dir selbst den Mitglieder-Admin und Corinne Meister den CM-Admin geben | `✅ 1.1 Rollen vergeben` | nein: die Regie vergibt die Rollen |
 | 1.2 | CM | Akt-Beginn | Brief am Laptop öffnen und den QR-Code mit dem Handy scannen · MyTCO auf den Startbildschirm legen · mit dem Code aus dem Brief einloggen · Passkey einrichten | `✅ 1.2 eingeloggt` | ja |
 | 1.3 | CM | ✅ 1.1 | Am PC die Verwaltung öffnen und mit dem Code per Mail bestätigen · die Probe-CM mit Anmeldeschluss laut Kalender anlegen (Anmeldung noch nicht öffnen) · die acht Kategorien aus der Liste anlegen · dich als Kontaktperson eintragen | `✅ 1.3 CM angelegt` | ja |
-| 1.4 | MV | ✅ 1.1 | Die Mitglieder-Personas mit den Adressen von der Regie anlegen (Daniela Doppel, Pascal Partner, Zora Zögerlich, Stefan Spät, Olga Ohnehandy mit erfundener Adresse, Weitere Mitglieder) · Briefe als PDF erzeugen und der Regie privat schicken | `✅ 1.4 Briefe an Regie` | nein: Akt 2 wartet |
+| 1.4 | MV | ✅ 1.1 | Die Mitglieder-Personas mit Geschlecht und Jahrgang laut Steckbrief und den Mail-Adressen von der Regie anlegen (Daniela Doppel, Pascal Partner, Zora Zögerlich, Stefan Spät, Olga Ohnehandy mit erfundener Adresse, Weitere Mitglieder) · Briefe als PDF erzeugen und der Regie privat schicken | `✅ 1.4 Briefe an Regie` | nein: Akt 2 wartet |
 
 Zusatz MV (freiwillig): Mitgliederliste am PC nach Name sortieren und nach Ort filtern · Seiteninfo
 der Mitgliederliste lesen · Briefe als Serie für alle neuen Mitglieder erzeugen.
@@ -221,10 +224,9 @@ der Mitgliederliste lesen · Briefe als Serie für alle neuen Mitglieder erzeuge
 
 | Nr | Persona | Stichwort | Schritte | Meldung | nach ⏭ | ohne |
 |---|---|---|---|---|---|---|
-| 3.1 | DS, P, Z, S, W | Akt-Beginn | Telefon und Adresse im Profil ändern · einen Rufnamen setzen · Lizenznummer eintragen · Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen · E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat) · zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung) · Antwort einmal ändern · die GV «In den Kalender» übernehmen | `✅ 3.1 <Kürzel> Daten und GV` | ja | – |
-| 3.2 | CM | Akt-Beginn | Zur GV zusagen · Geschlecht, Jahrgang und Klassierung laut Steckbrief eintragen | `✅ 3.2 GV zugesagt` | ja | – |
-| 3.3 | MV | Akt-Beginn | Bei Zora Zögerlich die Telefonnummer ändern · Antworten zur GV ansehen | `✅ 3.3 Daten geändert` | ja | ohne Z: bei Pascal Partner |
-| 3.4 | MV | ab 18 Uhr | Mitteilung zur GV an «noch keine Antwort» schicken · Liste «Für Fairgate» öffnen und die selbst geänderten Angaben abhaken · im Verlauf die Änderungen von heute ansehen | `✅ 3.4 Erinnerung verschickt` | ja | – |
+| 3.1 | DS, P, Z, S, W | Akt-Beginn | Telefon und Adresse im Profil ändern · einen Rufnamen setzen · Lizenznummer eintragen · Klassierung laut Steckbrief eintragen · E-Mail-Adresse auf die zweite Adresse ändern (nur wer eine hat) · zur GV zu- oder absagen (Zora und Stefan sagen ab, mit Bemerkung) · Antwort einmal ändern · die GV «In den Kalender» übernehmen | `✅ 3.1 <Kürzel> Daten und GV` | ja | – |
+| 3.2 | CM | Akt-Beginn | Zur GV zusagen · Klassierung laut Steckbrief eintragen | `✅ 3.2 GV zugesagt` | ja | – |
+| 3.3 | MV | ab 18 Uhr | Als Mitglied deine Klassierung laut Steckbrief eintragen · Antworten zur GV ansehen · bei Zora Zögerlich die Telefonnummer ändern · Mitteilung zur GV an «noch keine Antwort» schicken · Liste «Für Fairgate» öffnen und die selbst geänderten Angaben abhaken · im Verlauf die Änderungen von heute ansehen | `✅ 3.3 Erinnerung verschickt` | ja | ohne Z: bei Pascal Partner |
 
 Zusatz MV (freiwillig): eine Datei mit zwei erfundenen Mitgliedern einlesen (Vorlage von der Regie).
 
@@ -235,9 +237,9 @@ Zusatz MV (freiwillig): eine Datei mit zwei erfundenen Mitgliedern einlesen (Vor
 | 4.1 | CM | Akt-Beginn | Die Anmeldung der Probe-CM öffnen | `✅ 4.1 CM offen` | nein | – |
 | 4.2 | MV | ✅ 4.1 | Mitteilung an den Verein «Die CM ist offen» schicken · Ort der GV ändern | `✅ 4.2 CM angekündigt` | ja | – |
 | 4.3 | CM | ✅ 4.1 | Dich im Einzel Damen A anmelden · im Damen-Doppel Zora Zögerlich als Partnerin anfragen | `✅ 4.3 Anfrage an Z` | ja | ohne Z: keine Anfrage |
-| 4.4 | DS | ✅ 4.2 | Prüfen, ob die Mitteilung ankam · die passenden Kategorien ansehen · dich im Einzel Damen B anmelden und die Bestätigung prüfen · im Mixed Pascal Partner als Partner anfragen | `✅ 4.4 Anfrage an P` | ja | – |
+| 4.4 | DS | ✅ 4.2 | Prüfen, ob die Mitteilung ankam · die passenden Kategorien ansehen · dich im Einzel Damen B anmelden und die Bestätigung prüfen · im Mixed Pascal Partner als Partner anfragen | `✅ 4.4 Anfrage an P` | ja | ohne Z: zusätzlich für Damen A eine Wildcard mit Begründung beantragen |
 | 4.5 | P | ✅ 4.2 | Prüfen, ob die Mitteilung ankam · dich im Einzel Herren A anmelden · im Interclub einem Team folgen | `✅ 4.5 angemeldet` | ja | – |
-| 4.6 | Z | ✅ 4.2 | Dich im Einzel Damen B anmelden · für Damen A eine Wildcard mit Begründung beantragen · prüfen, ob die Anfrage von Corinne angekommen ist | `✅ 4.6 Wildcard beantragt` | ja | ohne Z: DS beantragt die Wildcard für Damen A |
+| 4.6 | Z | ✅ 4.2 | Dich im Einzel Damen B anmelden · für Damen A eine Wildcard mit Begründung beantragen | `✅ 4.6 Wildcard beantragt` | ja | ohne Z: DS beantragt die Wildcard für Damen A |
 | 4.7 | W | ✅ 4.2 | Dich in einer passenden Einzel-Kategorie anmelden | `✅ 4.7 angemeldet` | ja | entfällt |
 
 ### Akt 5 – Antworten
@@ -245,12 +247,12 @@ Zusatz MV (freiwillig): eine Datei mit zwei erfundenen Mitgliedern einlesen (Vor
 | Nr | Persona | Stichwort | Schritte | Meldung | nach ⏭ | ohne |
 |---|---|---|---|---|---|---|
 | 5.1 | P | Akt-Beginn | Die Anfrage von Daniela annehmen | `✅ 5.1 Mixed mit DS` | ja | – |
-| 5.2 | Z | Akt-Beginn | Die Anfrage von Corinne ablehnen · im Mixed Stefan Spät anfragen und die Anfrage wieder zurückziehen · dich im Mixed allein anmelden mit «sucht Partner» und einem Kommentar | `✅ 5.2 Z sucht Partner` | ja | ohne Z: entfällt; ohne S: Anfrage an Markus statt Stefan |
-| 5.3 | MV | Akt-Beginn | Dich im Mixed allein anmelden mit «sucht Partner» | `✅ 5.3 MV sucht Partner` | ja | ohne Z: im Herren-Doppel |
+| 5.2 | Z | Akt-Beginn | Die Anfrage von Corinne im Damen-Doppel finden und ablehnen · im Mixed Stefan Spät anfragen und die Anfrage wieder zurückziehen · dich im Mixed allein anmelden mit «sucht Partner» und einem Kommentar | `✅ 5.2 Z sucht Partner` | ja | ohne Z: entfällt; ohne S: Anfrage an Markus statt Stefan |
+| 5.3 | MV | Akt-Beginn | Dich im Mixed allein anmelden mit «sucht Partner» · die Anfrage von Stefan im Herren-Doppel nicht beantworten | `✅ 5.3 MV sucht Partner` | ja | ohne Z: nur die Anfrage von Stefan nicht beantworten |
 | 5.4 | DS | Akt-Beginn | Der Turnierleitung eine Frage schreiben | `✅ 5.4 Frage gestellt` | ja | – |
 | 5.5 | S | Akt-Beginn | Im Herren-Doppel Markus Verwalter anfragen (Markus antwortet nicht) | `✅ 5.5 Anfrage an MV` | ja | ohne S: Markus fragt Pascal im Herren-Doppel an |
 | 5.6 | CM | Akt-Beginn | Den Wildcard-Antrag von Zora entscheiden (bestätigen) | `✅ 5.6 Wildcard entschieden` | ja | ohne Z: Antrag von Daniela ablehnen, mit Grund |
-| 5.7 | CM | ✅ 5.2 und ✅ 5.3 | Zora und Markus im Mixed zum Paar zusammenlegen | `✅ 5.7 zusammengelegt` | ja | ohne Z: Markus und Stefan im Herren-Doppel |
+| 5.7 | CM | ✅ 5.2 und ✅ 5.3 | Zora und Markus im Mixed zum Paar zusammenlegen | `✅ 5.7 zusammengelegt` | ja | ohne Z: entfällt |
 | 5.8 | CM | ✅ 5.4 | Die Frage beantworten und als erledigt markieren | `✅ 5.8 Frage beantwortet` | ja | – |
 | 5.9 | DS, P, Z, S, W | Akt-Beginn | Die GV ist «zu prüfen» (Ort geändert): Antwort neu bestätigen | keine | – | – |
 
@@ -259,7 +261,7 @@ Zusatz MV (freiwillig): eine Datei mit zwei erfundenen Mitgliedern einlesen (Vor
 | Nr | Persona | Stichwort | Schritte | Meldung | nach ⏭ | ohne |
 |---|---|---|---|---|---|---|
 | 6.1 | S | Akt-Beginn | Versuchen, dich im Einzel Herren 55+ anzumelden (die Anmeldung ist geschlossen) | `✅ 6.1 S zu spät` | ja | ohne S: Markus prüft Herren B |
-| 6.2 | CM | ✅ 6.1 | Den Anmeldeschluss auf Tag 10 verschieben · Olga Ohnehandy von Hand im Einzel Damen B anmelden · ihre Klassierung auf R8 korrigieren · das Herren-Doppel absagen | `✅ 6.2 Schluss verschoben` | ja | ohne Z: das Damen-Doppel absagen |
+| 6.2 | CM | ✅ 6.1 | Den Anmeldeschluss auf Tag 10 verschieben · Olga Ohnehandy die Klassierung R8 geben · sie von Hand im Einzel Damen B anmelden · das Herren-Doppel absagen | `✅ 6.2 Schluss verschoben` | ja | – |
 | 6.3 | S | ✅ 6.2 | Die Meldung zum abgesagten Herren-Doppel finden · dich im Einzel Herren 55+ anmelden · dich wieder abmelden | `✅ 6.3 S an- und abgemeldet` | ja | ohne S: Markus, im Herren B |
 | 6.4 | DS | Akt-Beginn | Die Antwort der Turnierleitung lesen · ausloggen · einen neuen Code per Mail holen und damit einloggen · ausloggen und mit dem Passkey einloggen | `✅ 6.4 DS wieder drin` | ja | – |
 | 6.5 | P, Z, W | Akt-Beginn | Push ausschalten und wieder einschalten · freiwillig: am PC mit dem Passkey vom Handy einloggen | keine | – | – |
@@ -277,8 +279,8 @@ Zusatz CM (freiwillig): bei Olga Ohnehandy die Anmeldung in ein anderes Einzel v
 | 7.5 | P | ✅ 7.4 | Mit einem neuen Code per Mail einloggen | `✅ 7.5 P eingeloggt` | ja | – |
 | 7.6 | S | ✅ 7.4 | MyTCO öffnen und wieder einloggen | `✅ 7.6 S eingeloggt` | ja | ohne S: Daniela |
 
-Zusatz MV (freiwillig): Auskunft für Olga Ohnehandy drucken · Olga zum Löschen vormerken und
-wieder rückgängig machen.
+Zusatz MV (freiwillig): Auskunft für Olga Ohnehandy drucken · ein eingelesenes Mitglied aus Akt 3
+zum Löschen vormerken und wieder rückgängig machen.
 
 ### Akt 8 – Anmeldeschluss
 
@@ -296,7 +298,7 @@ Zusatz MV (freiwillig, als MyTCO-Admin): «Ansicht als …» Mitglied öffnen un
 Alle gebauten Funktionen eines Mitglieds und die Schritte der Admins dazu (Stand 23.11.2026,
 Inventar aus `src/routes` und den Anforderungen mit Status *umgesetzt*). Die Meldung an das
 Mitglied nach einer Änderung durch die Verwaltung (#94) kommt dazu, sobald sie auf `dev` ist
-(Einsatz 3.3).
+(Einsatz 3.3, Meldung an Zora).
 
 | Bereich | Mitglied | Admin-Schritt | Einsatz |
 |---|---|---|---|
@@ -304,12 +306,12 @@ Mitglied nach einer Änderung durch die Verwaltung (#94) kommt dazu, sobald sie 
 | Einstieg | Neustart: noch angemeldet | – | 2.1 |
 | Passkey | einrichten, anmelden, am PC vom Handy, entfernen | – | 1.1, 2.1, 6.4, 6.5, 8.2 |
 | Login | Logout, neuer Code per Mail | Sitzungen beenden | 6.4, 7.4, 7.6 |
-| Daten | Telefon, Adresse, Lizenznummer, Geschlecht, Jahrgang, Klassierung | «Für Fairgate» abhaken | 3.1, 3.2, 3.4 |
+| Daten | Telefon, Adresse, Lizenznummer, Geschlecht, Jahrgang, Klassierung | «Für Fairgate» abhaken | 3.1, 3.2, 3.3 |
 | Daten | E-Mail ändern (zwei Codes, Hinweis an alte Adresse) | – | 3.1 |
-| Daten | Meldung nach Änderung durch die Verwaltung (#94) | Daten ändern, Verlauf | 3.3, 3.4, 8.3 |
+| Daten | Meldung nach Änderung durch die Verwaltung (#94) | Daten ändern, Verlauf | 3.3, 8.3 |
 | Push | ein, aus, wieder ein | – | 2.1, 6.5 |
 | Anlass | Startseite, zu-/absagen, Bemerkung, Antwort ändern, «zu prüfen», Kalender | anlegen, Ort ändern, Antworten ansehen | 2.6, 2.8, 3.1, 3.3, 4.2, 5.9 |
-| Mitteilung | empfangen (Push oder Mail) | an den Verein, an «noch keine Antwort» | 2.7, 2.8, 3.4, 4.2 |
+| Mitteilung | empfangen (Push oder Mail) | an den Verein, an «noch keine Antwort» | 2.7, 2.8, 3.3, 4.2 |
 | CM | Kategorien sehen, Einzel anmelden, Bestätigung | Turnier, Kategorien, Kontaktperson, öffnen | 1.3, 4.1, 4.3–4.7 |
 | CM | geschlossen sehen, Spätanmeldung, abmelden | Schluss verschieben | 6.1–6.3 |
 | CM | Doppel: anfragen, annehmen, ablehnen, zurückziehen | – | 4.3, 4.4, 5.1, 5.2 |
@@ -350,7 +352,8 @@ alles steht in deinem Rollenbuch (kommt privat von mir).
 Wenn du dran bist: machen, dann deine Meldung aus dem Rollenbuch hier reinkopieren.
 Regel Nr. 1: zuerst alleine probieren, mit Rollenbuch und Hilfe in MyTCO.
 Kein Code und keine Adresse in den Chat. Hier sehen alle eure Nummern.
-Deine Mail-Adresse brauche ich, weil MyTCO echte Mails schickt; nach dem Lauf wird sie gelöscht.
+Deine Mail-Adresse brauche ich, weil MyTCO echte Mails schickt. Sehen können sie die Admins
+und, wie im echten Betrieb, dein Doppelpartner. Nach dem Lauf wird sie gelöscht.
 Das Formular am Abend ist ohne Namen, ich sehe aber, welche Rolle geantwortet hat.
 ```
 

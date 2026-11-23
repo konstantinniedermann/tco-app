@@ -150,6 +150,6 @@ Aufbau (FormApp): Titel «MyTCO Probelauf – Rückmeldung», Beschreibung «Ohn
 Eigener Branch nach demselben Ablauf, sobald der PL die Besetzung nennt (Anzahl, welche Prio-Rollen besetzt, Geräte; ohne Namen).
 
 - [ ] **Step 1:** Einsatzliste in `docs/testgruppe.md` nach der Spalte «ohne diese Persona» auf die Besetzung schneiden: unbesetzte Personas und ihre Einsätze heraus, Ersatz-Einsätze und Ersatz-Stichwörter hinein; Abdeckung nachführen, was entfällt, als «entfällt mangels Besetzung» markieren.
-- [ ] **Step 2:** Rollenbücher und `SCHRITTE`/`PERSONAS` im Formular-Skript gleich schneiden; Prüfskripte aus Task 4 und Task 5 → PASS.
+- [ ] **Step 2:** `python3 docs/testgruppe-werkzeug/erzeuge.py .` erzeugt Rollenbücher und Formular-Skript neu (Generator seit dem Review im Repo); Ausgabe `ok`.
 - [ ] **Step 3:** Kalender mit echten Daten füllen (Start nach der AOGV, nicht über Neujahr).
 - [ ] **Step 4:** `make docs` → grün; Commit `docs: Probelauf auf die Besetzung zugeschnitten (#40)`; Merge wie Task 8. PL löscht das alte Formular und führt das Skript neu aus; Claude liest die Probe-Antwort wie in Task 5 Step 7.
