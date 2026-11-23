@@ -278,6 +278,18 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Stand:** Mit Zustimmung des Projektleiters als Issue #97 angelegt (23.11.2026).
 
+### 2026-11-23 — Rollen werden auf zwei Wegen geschrieben: `setzeRollen` neben `vergibRolle`/`entziehRolle`
+
+**Thema:** Architektur
+
+**Fundort:** `src/lib/server/admin/rollen.ts` (`setzeRollen`, `vergibRolle`, `entziehRolle`), `src/lib/server/admin/erster-admin.ts` (`machAdmin`), `tests/e2e/hilfen/login.ts`.
+
+**Beobachtung:** Seit #96 vergibt und entzieht die Verwaltung Rollen einzeln. `setzeRollen` (ganze Menge mit `vorher`) bleibt nur für das Skript zum ersten Admin und die E2E-Hilfe. Beide Wege enthalten die Regeln zum letzten MyTCO-Admin, zum Ende der «Ansicht als …» und zum Verlauf; eine neue Regel kann an einer Stelle fehlen. Daneben zeigt `docs/ui-mockups/index.html` noch die Taste «Rollen speichern».
+
+**Ursprung:** Review von #96, Session vom 23.11.2026.
+
+**Einschätzung:** `machAdmin` und die E2E-Hilfe auf `vergibRolle` umstellen und `setzeRollen` streichen; die Meldung «inzwischen geändert» des Skripts entfällt dann. Klein, eigener Branch.
+
 ### 2026-11-23 — Design System «MyTCO» steht bis auf die Seiteninfo auf dem Stand vom 09.11.
 
 **Thema:** Oberfläche
