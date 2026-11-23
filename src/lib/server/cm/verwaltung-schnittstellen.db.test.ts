@@ -1062,8 +1062,14 @@ describe('Häkchen der CM-Meldungen (FR-56)', () => {
 	});
 
 	test('FR-56: benachrichtigen von falschem Typ → 400, nichts geändert (Einzel, Doppel, Absagen, Klassierung)', async () => {
-		const t = await cmTurnier([['Herren A'], ['Herren B'], ['Doppel A', DOPPEL_K]]);
-		const [a, b, ka] = t.kategorien;
+		const t = await cmTurnier([
+			['Herren A'],
+			['Herren B'],
+			['Doppel A', DOPPEL_K],
+			['Doppel B', DOPPEL_K]
+		]);
+		// Doppel B ohne Anmeldungen, aber mit offener Anfrage: Absagen ginge dort durch.
+		const [a, b, ka, kb] = t.kategorien;
 		const s = baue(t.jetzt);
 		const cm = await bestaetigt(s, ['cm']);
 		const r3 = await spieler('R3');
@@ -1084,6 +1090,9 @@ describe('Häkchen der CM-Meldungen (FR-56)', () => {
 		expect(paarAn.status).toBe(200);
 		const paarId = await anmeldungIn(ka, p.mitgliedId);
 		const paar = { id: String(paarId) };
+		await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: kb, vonId: c.mitgliedId, anId: p.mitgliedId, gestelltAm: t.jetzt });
 
 		for (const falsch of [1, 'ja', null]) {
 			const fall = (r: Response) => antwortVon(r).then((x) => [falsch, ...x]);
@@ -1109,7 +1118,7 @@ describe('Häkchen der CM-Meldungen (FR-56)', () => {
 			).toEqual(fehler);
 			expect(
 				await fall(
-					await postKategorieAbsagen(s.d, post(cm, { benachrichtigen: falsch }, { id: String(ka) }))
+					await postKategorieAbsagen(s.d, post(cm, { benachrichtigen: falsch }, { id: String(kb) }))
 				)
 			).toEqual(fehler);
 			expect(
@@ -1124,7 +1133,12 @@ describe('Häkchen der CM-Meldungen (FR-56)', () => {
 		expect(await statusVon(einzelId)).toEqual({ status: 'bestaetigt', kategorieId: a });
 		expect(await statusVon(paarId)).toEqual({ status: 'bestaetigt', kategorieId: ka });
 		expect(await anmeldungIn(ka, q.mitgliedId)).toBe(paarId);
-		expect((await ladeKategorie(db, ka))?.status).toBe('aktiv');
+		expect((await ladeKategorie(db, kb))?.status).toBe('aktiv');
+		const anfragen = await db
+			.select({ von: partnerAnfrage.vonId })
+			.from(partnerAnfrage)
+			.where(eq(partnerAnfrage.kategorieId, kb));
+		expect(anfragen).toEqual([{ von: c.mitgliedId }]);
 		const [m] = await db
 			.select({ klassierung: mitglied.klassierung })
 			.from(mitglied)
