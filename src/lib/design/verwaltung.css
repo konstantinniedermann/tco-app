@@ -77,6 +77,12 @@
 	font-size: var(--groesse-klein);
 }
 
+/* Der Text darf schmaler werden als sein längstes Wort, sonst ragt es bei grosser Schrift und
+   fehlender Silbentrennung über den Rand (UI-02) */
+.seiteninfo > div {
+	min-width: 0;
+}
+
 .seiteninfo p {
 	margin: 0;
 }

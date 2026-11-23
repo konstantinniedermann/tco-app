@@ -951,11 +951,16 @@ test('#93: jede Menüseite der Verwaltung erklärt sich in ihrer Seiteninfo', as
 		if (titel === 'Briefe') await pruefeBildschirm(page, info, 'seiteninfo-briefe');
 	}
 
-	// UI-02: Bei 200 % Schrift bleibt die Seiteninfo im Fenster, auch mit langen Wörtern.
+	// UI-02: Bei 200 % Schrift bleibt die Seiteninfo im Fenster, auch mit langen Wörtern, auf dem
+	// schmalsten iPhone und ohne Silbentrennung (dem WebKit der CI fehlt das Wörterbuch dafür).
+	await page.setViewportSize({ width: 320, height: 700 });
 	for (const adresse of ['/verwaltung/fairgate', '/verwaltung/briefe']) {
 		await page.goto(adresse);
 		await expect(seiteninfo).toBeVisible();
-		await page.evaluate(() => (document.documentElement.style.fontSize = '200%'));
+		await page.evaluate(() => {
+			document.documentElement.style.fontSize = '200%';
+			document.body.style.setProperty('hyphens', 'manual');
+		});
 		const rechts = await seiteninfo.evaluate((el) => ({
 			kante: el.getBoundingClientRect().right,
 			inhalt: el.scrollWidth - el.clientWidth,
