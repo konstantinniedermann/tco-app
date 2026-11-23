@@ -10,6 +10,7 @@ import {
 	setzeJahrgang
 } from './hilfen/login.ts';
 import {
+	pruefeBildschirm,
 	sammleKonsolenfehler,
 	wartetAufMitgliederliste,
 	wartetAufVorladen
@@ -91,6 +92,8 @@ test('#92: Mitglieder sortieren und filtern im Spaltentitel, Text nie in der Adr
 	await page.getByRole('button', { name: 'Konto filtern' }).click();
 	await expect(page.getByText('Konto zeigen')).toBeVisible();
 	await page.getByRole('checkbox', { name: /^Brief offen/ }).check();
+	// UI-01: axe und Bild mit offenem Aufklapper (Bildvergleich mit dem Entwurf)
+	await pruefeBildschirm(page, info, 'mitglieder-filter-offen');
 	await page.keyboard.press('Escape');
 	await expect(zeilen(page, nachname)).toHaveCount(1);
 	await expect(zeilen(page, nachname)).toContainText('Jonas');
@@ -274,6 +277,7 @@ test('#92: Briefe zeigen den Jahrgang, filtern und wählen nur Gezeigte', async 
 
 	await page.getByRole('button', { name: 'Jahrgang filtern' }).click();
 	await page.getByLabel('Bis').fill('2010');
+	await pruefeBildschirm(page, info, 'briefe-filter-offen');
 	await page.keyboard.press('Escape');
 	await expect(zeilen(page, nachname)).toHaveCount(2);
 	await expect(page.getByRole('button', { name: 'Briefe erzeugen (1)' })).toBeVisible();
@@ -287,5 +291,43 @@ test('#92: Briefe zeigen den Jahrgang, filtern und wählen nur Gezeigte', async 
 	await page.getByRole('button', { name: 'Briefe erzeugen (1)' }).click();
 	await expect(page.getByRole('heading', { name: '1 Brief erzeugen?' })).toBeVisible();
 	await page.getByRole('button', { name: 'Abbrechen' }).click();
+	expect(fehler).toEqual([]);
+});
+
+test('#92: Verlauf filtert auf dem Server und behält die Ansicht', async ({ page }, info) => {
+	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: Filter im Titel gibt es erst ab 60rem
+	const fehler = sammleKonsolenfehler(page);
+	const nachname = zufall();
+	const admin = await legeRollenkontoMitBriefCodeAn('Tanja', ['mitglieder']);
+	// Die Rolle setzt MyTCO automatisch: ein Eintrag «Rolle CM-Admin vergeben» von MyTCO.
+	await legeRollenkontoMitBriefCodeAn('Vera', ['cm'], nachname);
+	await oeffneVerwaltung(page, admin, '/verwaltung/verlauf');
+	await expect(page.getByRole('heading', { level: 1, name: 'Änderungsverlauf' })).toBeVisible();
+
+	await filtereText(page, 'Mitglied', nachname);
+	await expect(zeilen(page, nachname)).toHaveCount(1);
+	await page.getByRole('button', { name: 'Was filtern' }).click();
+	await page.getByRole('checkbox', { name: 'Angabe geändert' }).check();
+	await expect(zeilen(page, nachname)).toHaveCount(0);
+	await page.getByRole('checkbox', { name: 'Angabe geändert' }).uncheck();
+	await page.getByRole('checkbox', { name: 'Rolle vergeben' }).check();
+	await pruefeBildschirm(page, info, 'verlauf-filter-offen');
+	await page.keyboard.press('Escape');
+	await expect(zeilen(page, nachname)).toHaveCount(1);
+	await expect(zeilen(page, nachname)).toContainText('MyTCO');
+	await expect(status(page)).toHaveText('1 Treffer');
+	await expect(page).toHaveURL(/was=rolle-vergeben/);
+	expect(page.url()).not.toContain(nachname);
+
+	await page.getByRole('link', { name: `${nachname}, Vera` }).click();
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('Vera');
+	await page.goBack();
+	await expect(zeilen(page, nachname)).toHaveCount(1);
+	await expect(page.getByText(`Mitglied: ${nachname}`)).toBeVisible();
+	await expect(page.getByText('Was: Rolle vergeben')).toBeVisible();
+
+	await page.reload();
+	await expect(page.getByText('Was: Rolle vergeben')).toBeVisible();
+	await expect(page.getByText(`Mitglied: ${nachname}`)).toBeHidden();
 	expect(fehler).toEqual([]);
 });

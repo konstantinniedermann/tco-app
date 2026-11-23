@@ -3,6 +3,8 @@ import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import { erstelleDb } from '../db/index.ts';
 import { aenderung } from '../db/schema.ts';
+import { randomUUID } from 'node:crypto';
+import { beginnDesTagesInZuerich } from '../datum.ts';
 import { ladeVerlauf, schreibeVerlauf } from './verlauf.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
@@ -131,5 +133,73 @@ describe('Änderungsverlauf', () => {
 		);
 		const zeilen = await ladeVerlauf(db, { mitgliedId: m.mitgliedId, grenze: 10 });
 		expect(zeilen[0].urheber).toBe('Beispiel, Lea (selbst)');
+	});
+
+	test('#92: ladeVerlauf filtert nach Zeit (Zürcher Tage), Wer, Name und Was', async () => {
+		const nachname = `Filter${randomUUID().slice(0, 8)}`;
+		const urheber = await legeMitgliedAn(db, { vorname: 'Ursula', nachname: '50% Studer' });
+		const m = await legeMitgliedAn(db, { vorname: 'Mara', nachname });
+		const admin = { art: 'admin' as const, mitgliedId: urheber.mitgliedId };
+		// 30.09. abends, 01.10. 00:30 und 31.10. 23:30 Zürcher Zeit, 01.11. mittags
+		await schreibeVerlauf(
+			db,
+			m.mitgliedId,
+			admin,
+			[{ aktion: 'angelegt' }],
+			new Date('2026-09-30T18:00:00Z')
+		);
+		await schreibeVerlauf(
+			db,
+			m.mitgliedId,
+			admin,
+			[{ aktion: 'rolle-vergeben', detail: 'cm' }],
+			new Date('2026-09-30T22:30:00Z')
+		);
+		await schreibeVerlauf(
+			db,
+			m.mitgliedId,
+			{ art: 'automatisch' },
+			[{ aktion: 'feld-geaendert', detail: 'ort' }],
+			new Date('2026-10-31T22:30:00Z')
+		);
+		await schreibeVerlauf(
+			db,
+			m.mitgliedId,
+			admin,
+			[{ aktion: 'rolle-entzogen', detail: 'cm' }],
+			new Date('2026-11-01T11:00:00Z')
+		);
+
+		const oktober = await ladeVerlauf(db, {
+			name: nachname,
+			von: beginnDesTagesInZuerich('2026-10-01')!,
+			bisVor: beginnDesTagesInZuerich('2026-11-01')!,
+			grenze: 100
+		});
+		expect(oktober.map((z) => z.aktion)).toEqual(['feld-geaendert', 'rolle-vergeben']);
+
+		const automatisch = await ladeVerlauf(db, { name: nachname, wer: 'mytco', grenze: 100 });
+		expect(automatisch.map((z) => z.urheber)).toEqual(['MyTCO']);
+		const wortlich = await ladeVerlauf(db, { name: nachname, wer: '50%', grenze: 100 });
+		expect(wortlich).toHaveLength(3);
+		expect(await ladeVerlauf(db, { name: nachname, wer: '5_%', grenze: 100 })).toEqual([]);
+		expect(await ladeVerlauf(db, { name: nachname, wer: 'ursula', grenze: 100 })).toHaveLength(3);
+		expect(await ladeVerlauf(db, { name: `${nachname}, mara`, grenze: 100 })).toHaveLength(4);
+
+		const rollen = await ladeVerlauf(db, {
+			name: nachname,
+			was: ['rolle-vergeben', 'rolle-entzogen'],
+			grenze: 100
+		});
+		expect(rollen.map((z) => z.aktion)).toEqual(['rolle-entzogen', 'rolle-vergeben']);
+		const neuester = await ladeVerlauf(db, {
+			name: nachname,
+			was: ['rolle-vergeben', 'rolle-entzogen'],
+			grenze: 1
+		});
+		expect(neuester.map((z) => z.aktion)).toEqual(['rolle-entzogen']);
+		expect(
+			await ladeVerlauf(db, { mitgliedId: m.mitgliedId, was: ['angelegt'], grenze: 100 })
+		).toHaveLength(1);
 	});
 });

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { formatiereDatum, heuteInZuerich, jahrInZuerich, plusTage } from './datum.ts';
+import {
+	beginnDesTagesInZuerich,
+	formatiereDatum,
+	heuteInZuerich,
+	jahrInZuerich,
+	plusTage
+} from './datum.ts';
 
 describe('Datum in Schweizer Zeit', () => {
 	it('FR-37: Jahr am Jahreswechsel: 31.12. 23:30 UTC ist in Zürich schon das neue Jahr', () => {
@@ -19,5 +25,12 @@ describe('Datum in Schweizer Zeit', () => {
 	it('plusTage rechnet über Monats- und Jahresgrenzen', () => {
 		expect(plusTage('2027-05-03', -7)).toBe('2027-04-26');
 		expect(plusTage('2026-12-30', 3)).toBe('2027-01-02');
+	});
+
+	it('#92: Beginn eines Zürcher Tages in UTC, Sommer- und Winterzeit; ungültiger Tag null', () => {
+		expect(beginnDesTagesInZuerich('2026-10-01')).toEqual(new Date('2026-09-30T22:00:00Z'));
+		expect(beginnDesTagesInZuerich('2026-11-01')).toEqual(new Date('2026-10-31T23:00:00Z'));
+		expect(beginnDesTagesInZuerich('2026-13-01')).toBeNull();
+		expect(beginnDesTagesInZuerich('gestern')).toBeNull();
 	});
 });
