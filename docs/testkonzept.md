@@ -277,7 +277,7 @@ das Release seit dem letzten Release berührt; Claude wählt sie anhand von
 Login, Passkey, Push, Startbildschirm oder Briefe ändert. Solange Live aus ist, darf die
 Android-Runde mit Grund ausgesetzt werden («Android: ausgesetzt, Grund …» im PR); vor dem
 Einschalten von Live wird sie nachgeholt, danach ist sie Pflicht. Ein iPhone hat der
-Projektleiter; Android prüft eine externe Person ([Testgruppe](testgruppe.md#bereit-für-lauf-1)).
+Projektleiter; Android prüft eine externe Person (Zugang wie im [Probelauf der Testgruppe](testgruppe.md#voraussetzungen)).
 
 #### Grundrunde (je Gerät etwa 5 Minuten)
 
@@ -343,15 +343,24 @@ Passwort von Test, ihre erfundene Persona, und meldet pro Punkt «klappt» oder 
 - [ ] Interclub: Team folgen, nach neuem Endstand mit Spielbericht kommt ein Push (ab Saisonstart
   Mai 2027, #81)
 
+#### Einmal vor 1.0.0 (Live)
+
+Was der [Probelauf der Testgruppe](testgruppe.md) auf Test nicht prüfen kann:
+
+- [ ] Live läuft unter der endgültigen Adresse `my.tcolten.ch` (K-10)
+- [ ] Ein neuer Code per Mail kommt auf Live bei verbreiteten Anbietern (Bluewin, Gmail, GMX,
+  iCloud) an und landet nicht im Spam (A-LOGIN-10)
+- [ ] Die Datenschutzerklärung ist auf Live erreichbar (DS-09)
+
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 
 ## Testgruppe
 
-Eine Testgruppe des Projektleiters prüft vor dem Briefversand, ob Mitglieder mit Brief,
-Anleitung und Hilfe alleine zurechtkommen (Etappe *Pilot*). Sie nutzt MyTCO auf Live mit
-ihren eigenen echten Daten, mit einer Vorabversion 0.x vor 1.0.0; davor gilt die
-Checkliste oben auf Test. Das ist Betrieb, kein Test im Sinne von DS-08; vorher muss die
-Datenschutzerklärung gelten.
+Eine Testgruppe des Projektleiters spielt vor dem Briefversand die ganze App in einem
+Probelauf auf Test durch (Etappe *Pilot*): erfundene Personas mit Rollen, ein Drehbuch in acht
+Akten, ein Rollenbuch pro Person und ein Formular pro Akt. Die Daten sind erfunden (DS-08), bis
+auf die Mail-Adresse der Testpersonen ([Datenschutz](datenschutz.md#testgruppe)). Was nur auf
+Live prüfbar ist, steht oben unter [Einmal vor 1.0.0](#einmal-vor-100-live).
 
 **Älteres Handy:** ein iPhone mit iOS 16 oder 17 oder ein Android-Handy mit Android 9 bis 11
 (darunter gibt es keine Passkeys). Eine Untergrenze für MyTCO ist damit nicht festgelegt;
@@ -360,7 +369,8 @@ die Testgruppe liefert Erfahrungswerte. Faktisch zielt der Build auf die Vorgabe
 auf dem iPhone ohnehin iOS 16.4 (ADR-001). `Object.hasOwn` (ab iOS 15.4) liegt darunter und
 setzt die Grenze nicht. Ältere Geräte sind nicht ausgeschlossen, aber nicht geprüft.
 
-Ablauf, Aufträge, Texte und Auswertung → [Testgruppe](testgruppe.md).
+Rollen, Drehbuch, Texte und Auswertung → [Testgruppe](testgruppe.md), Rollenbücher →
+[Rollenbücher](testgruppe-rollenbuecher.md).
 
 ## Werkzeuge
 

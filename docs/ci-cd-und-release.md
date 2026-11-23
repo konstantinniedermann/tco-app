@@ -17,18 +17,18 @@ eigenem Benutzer und eigene Docker-Netze. Die Test-App erreicht die Live-Datenba
 | | Test | Live |
 |---|------|------|
 | Adresse | `test.my.tcolten.ch`, nur mit Passwort (K-10): einmal je Gerät in ein Formular, danach ein Zugangscookie für ein Jahr ([Betrieb](../betrieb/README.md)) | `my.tcolten.ch` (K-10) |
-| Rolle | Demo und Checkliste | Testgruppe (Pilotphase), später alle Mitglieder |
+| Rolle | Demo, Checkliste und Probelauf der [Testgruppe](testgruppe.md) | alle Mitglieder ab 1.0.0 |
 | Ausgeliefert bei | Merge nach `dev` | Merge des PR `dev` → `main` |
-| Daten | nur erfundene Testdaten; bleiben über Auslieferungen erhalten, neu aufgesetzt nur über den Zähler `betrieb/test-neu-aufsetzen` | Mitgliederdaten |
-| E-Mail | alle Mails landen im Mail-Fänger auf dem Server (Postfach unter `/_mail/`, hinter dem Test-Passwort) und verlassen ihn nie; adressiert sind sie an die Umleitungsadresse (`MAIL_NUR_AN`), der Betreff nennt den ursprünglichen Empfänger. Wer das Test-Passwort hat, liest dort die Login-Codes aller erfundenen Konten | an die Mitglieder |
+| Daten | erfundene Testdaten, im Probelauf der [Testgruppe](testgruppe.md) dazu die Mail-Adressen der Testpersonen ([DS-08](datenschutz.md#vorgaben-für-technik-und-hosting)); bleiben über Auslieferungen erhalten, neu aufgesetzt nur über den Zähler `betrieb/test-neu-aufsetzen` | Mitgliederdaten |
+| E-Mail | alle Mails landen im Mail-Fänger auf dem Server (Postfach unter `/_mail/`, hinter dem Test-Passwort) und verlassen ihn nie (für den Probelauf der Testgruppe kommt eine Erlaubt-Liste mit echtem Versand an die Testpersonen); adressiert sind sie an die Umleitungsadresse (`MAIL_NUR_AN`), der Betreff nennt den ursprünglichen Empfänger. Wer das Test-Passwort hat, liest dort die Login-Codes aller erfundenen Konten | an die Mitglieder |
 | Push, Schlüssel | eigene | eigene |
 
 Beide Adressen unter `tcolten.ch` sind erlaubt (K-10); wer sie einrichtet, hängt an K-10.2.
 Bis dahin gilt eine Übergangsadresse, die sich aus der IP des Servers bildet; die Adressen sind
-Einstellungen, am Code ändert sich dafür nichts. Die Demo soll auf Test laufen, Live bleibt leer bis zur
-Testgruppe. Auf der Test-Umgebung läuft die
+Einstellungen, am Code ändert sich dafür nichts. Die Demo und der Probelauf der Testgruppe laufen auf Test, Live bleibt
+leer bis 1.0.0. Auf der Test-Umgebung läuft die
 [Checkliste vor dem Release](testkonzept.md#checkliste-vor-dem-release). Echte Daten kommen
-dort nie hin (DS-08).
+dort nicht hin, ausser den Mail-Adressen der Testpersonen im Probelauf (DS-08).
 
 **Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut.
 [#32](https://github.com/konstantinniedermann/tco-app/issues/32) baute den lokal belegbaren Teil:
@@ -37,7 +37,7 @@ Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make bet
 [#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb genommen (blockiert
 #29; die Konten laufen auf eine Vereinsadresse, K-04.1; die Adresse ist erlaubt, K-10). Seit dem
 18.11.2026 liefert Test aus (`AUSLIEFERUNG_TEST` = `an`); Live bleibt aus, bis `AUSLIEFERUNG_LIVE`
-vor dem Pilot der [Testgruppe](testgruppe.md) (Etappe *Pilot*) auf `an` geht.
+vor 1.0.0 auf `an` geht; der Probelauf der [Testgruppe](testgruppe.md) läuft auf Test.
 
 ## Ablauf
 
@@ -434,9 +434,8 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
 ## Versionen
 
 - Schema `Hauptversion.Nebenversion.Korrektur`. Die erste Version mit Code ist `0.1.0`, das
-  erste Release *Mitglieder-Login* wird `1.0.0`. Davor gehen eine oder mehrere Vorabversionen 0.x für den
-  Pilot der [Testgruppe](testgruppe.md) auf Live (Etappe *Pilot*), mit Checkliste auf Test wie
-  jedes Release.
+  erste Release *Mitglieder-Login* wird `1.0.0`. Davor laufen Vorabversionen 0.x auf Test; dort spielt die
+  [Testgruppe](testgruppe.md) den Probelauf (Etappe *Pilot*).
 - **Eine Nummer entsteht nur beim Release `dev` → `main`** (Begründung:
   [ADR-012](adr/adr-012-version-beim-release.md), löst ADR-007 ab). Ein Merge nach `dev`
   vergibt keine Nummer und fasst `package.json` und `package-lock.json` nicht an; der Branch

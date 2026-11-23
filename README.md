@@ -24,9 +24,9 @@ Interclub-Resultate der TCO-Teams mit Einzelpartien im Reiter *IC* (die App holt
 Live selbst von Swiss Tennis, lokal per Import-Befehl; Mitglieder folgen Teams und bekommen nach
 jedem neuen Endstand einen Push, Profil › Benachrichtigungen),
 Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene Testdaten; Interclub mit den öffentlichen Daten von Swiss Tennis) sind
-gebaut; die Test-Umgebung läuft auf dem Server, Live folgt mit dem Pilot, weitere Funktionen
-kommen mit den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* aus
-([`docs/testgruppe.md`](docs/testgruppe.md)). Termine und Umfang der Etappen
+gebaut; die Test-Umgebung läuft auf dem Server, Live folgt mit 1.0.0, weitere Funktionen
+kommen mit den Etappen. Vor 1.0.0 spielt eine Testgruppe die ganze App in einem Probelauf auf
+Test durch (Etappe *Pilot*, [`docs/testgruppe.md`](docs/testgruppe.md)). Termine und Umfang der Etappen
 → [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Einstieg
