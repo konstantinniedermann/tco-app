@@ -880,3 +880,50 @@ test('Tabelle: am PC bleiben die Spaltentitel der Mitgliederliste beim Scrollen 
 		.click({ trial: true });
 	expect(fehler).toEqual([]);
 });
+
+test('#93: jede Menüseite der Verwaltung erklärt sich in ihrer Seiteninfo', async ({
+	page
+}, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const mytco = await legeRollenkontoMitBriefCodeAn('Selina', ['mytco']);
+	await oeffneVerwaltung(page, mytco);
+	const seiteninfo = page.getByRole('note', { name: 'Über diese Seite' });
+
+	const seiten: [string, string, string[]][] = [
+		['/verwaltung/mitglieder', 'Mitglieder', ['über «Bearbeiten» ihre Seite öffnen']],
+		['/verwaltung/einlesen', 'Einlesen', ['Für das erste Einlesen']],
+		['/verwaltung/briefe', 'Briefe', ['Nicht für verlorene Zugänge', '«Code per E-Mail»']],
+		['/verwaltung/anlaesse', 'Anlässe', ['Erinnerungen an alle, die noch nicht geantwortet haben']],
+		['/verwaltung/mitteilungen', 'Mitteilungen', ['über die Seite eines Anlasses']],
+		['/verwaltung/fairgate', 'Für Fairgate', ['Mitgliedersystem Fairgate']],
+		['/verwaltung/verlauf', 'Änderungsverlauf', ['ohne alte und neue Werte']],
+		['/verwaltung/rollen', 'Rollen', ['in der Klappe «Rollen»']]
+	];
+	for (const [adresse, titel, saetze] of seiten) {
+		await page.goto(adresse);
+		await expect(page.getByRole('heading', { level: 1, name: titel })).toBeVisible();
+		for (const satz of saetze) await expect(seiteninfo).toContainText(satz);
+		if (titel === 'Briefe') await pruefeBildschirm(page, info, 'seiteninfo-briefe');
+	}
+
+	// UI-02: Bei 200 % Schrift bleibt die Seiteninfo im Fenster, auch mit langen Wörtern.
+	for (const adresse of ['/verwaltung/fairgate', '/verwaltung/briefe']) {
+		await page.goto(adresse);
+		await expect(seiteninfo).toBeVisible();
+		await page.evaluate(() => (document.documentElement.style.fontSize = '200%'));
+		const rechts = await seiteninfo.evaluate((el) => ({
+			kante: el.getBoundingClientRect().right,
+			inhalt: el.scrollWidth - el.clientWidth,
+			fenster: window.innerWidth
+		}));
+		expect(rechts.kante, adresse).toBeLessThanOrEqual(rechts.fenster);
+		expect(rechts.inhalt, adresse).toBe(0);
+		await page.evaluate(() => (document.documentElement.style.fontSize = ''));
+	}
+
+	// Die Clubmeisterschaft braucht keine Seiteninfo.
+	await page.goto('/verwaltung/turniere');
+	await expect(page.getByRole('heading', { level: 1, name: 'Clubmeisterschaft' })).toBeVisible();
+	await expect(seiteninfo).toHaveCount(0);
+	expect(fehler).toEqual([]);
+});

@@ -1,4 +1,4 @@
-/* Verwaltung: Tabelle, Symbole, Leiste, Spalten, Seitenleiste und Inhalt (Teil 5 von 10). */
+/* Verwaltung: Tabelle, Symbole, Leiste, Spalten, Seiteninfo, Seitenleiste und Inhalt (Teil 5 von 10). */
 
 /* Tabelle (nur Verwaltung) — Behälter scrollt waagrecht, die Seite nicht */
 .tabelle {
@@ -60,6 +60,35 @@
 /* Spalten (nur Verwaltung): untereinander, ab 60rem zwei Spalten */
 .spalten > * {
 	min-width: 0;
+}
+
+/* Seiteninfo (nur Verwaltung): wozu die Seite da ist, direkt unter dem Seitenkopf; ohne Aktion */
+.seiteninfo {
+	display: flex;
+	gap: var(--abstand-2);
+	align-items: flex-start;
+	max-width: var(--breite-inhalt);
+	margin: 0 0 var(--abstand-4);
+	padding: var(--abstand-3);
+	background: var(--farbe-flaeche);
+	border-left: var(--rand-akzent) solid var(--farbe-marke);
+	border-radius: var(--radius);
+	color: var(--farbe-text);
+	font-size: var(--groesse-klein);
+}
+
+.seiteninfo p {
+	margin: 0;
+}
+
+.seiteninfo p + p {
+	margin-top: var(--abstand-1);
+}
+
+/* Zusatz zu .symbol (Grösse und Strich von dort) */
+.seiteninfo-symbol {
+	flex: none;
+	color: var(--farbe-marke);
 }
 
 /* Verwaltung: Seitenleiste und Inhalt; auf schmalem Bildschirm untereinander */

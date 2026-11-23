@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
+	import Seiteninfo from '../../../lib/verwaltung/Seiteninfo.svelte';
 	import Mitteilungsformular from '../../../lib/verwaltung/Mitteilungsformular.svelte';
 	import Mitteilungsverlauf from '../../../lib/verwaltung/Mitteilungsverlauf.svelte';
 	import { ladeMitteilungen } from '../../../lib/verwaltung/mitteilung-api.ts';
@@ -23,10 +24,13 @@
 <Seitenkopf>
 	<h1>Mitteilungen</h1>
 </Seitenkopf>
-<p class="leise">
-	Allgemeine Mitteilungen an alle aktiven Mitglieder, per Push oder E-Mail. Mitteilungen zu einem
-	Anlass schickst du auf der Seite des Anlasses.
-</p>
+<Seiteninfo>
+	<p>Allgemeine Mitteilungen an alle aktiven Mitglieder, per Push oder E-Mail.</p>
+	<p>
+		An einen Teil der Mitglieder (z. B. wer noch nicht geantwortet hat) geht eine Mitteilung über
+		die Seite eines Anlasses.
+	</p>
+</Seiteninfo>
 
 {#if data.darfSchreiben.mitglieder}
 	<Mitteilungsformular

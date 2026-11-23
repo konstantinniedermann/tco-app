@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
+	import Seiteninfo from '../../../lib/verwaltung/Seiteninfo.svelte';
 	import { resolve } from '$app/paths';
 	import AnsichtWahl from '../../../lib/verwaltung/AnsichtWahl.svelte';
 	import { ROLLEN_NAME } from '../../../lib/verwaltung/rollen-namen.ts';
@@ -17,9 +18,10 @@
 <Seitenkopf>
 	<h1>Rollen</h1>
 </Seitenkopf>
-<p class="leise">
-	Wer welche Rolle hat. Vergeben und entziehen kannst du sie beim Mitglied, in der Klappe «Rollen».
-</p>
+<Seiteninfo>
+	<p>Wer welche Rolle hat.</p>
+	<p>Vergeben und entziehen lassen sich Rollen beim Mitglied, in der Klappe «Rollen».</p>
+</Seiteninfo>
 
 {#each data.liste as eintrag (eintrag.rolle)}
 	<details class="karte klappe">

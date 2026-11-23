@@ -252,14 +252,44 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** Beim Doku-Abgleich vor dem Release klären: Test-Namen um die ID ergänzen und Status setzen, oder bewusst «geplant» lassen, bis #81 geschlossen ist.
 
-### 2026-11-23 — Design System «MyTCO» steht auf dem Stand vom 09.11., die CSS ist seither aufgeteilt
+### 2026-11-23 — Rollen werden auf der Seite des Mitglieds vergeben, gewünscht ist nur die Seite «Rollen»
 
 **Thema:** Oberfläche
 
-**Fundort:** Design-System-Artifact «MyTCO» (`project/tokens.json`, `meta.ref` dev@6b764e8, `basis.css`), `src/lib/design/` (elf Dateien).
+**Fundort:** `src/routes/verwaltung/mitglieder/[id]/+page.svelte` (Klappe «Rollen»), `src/routes/verwaltung/rollen/+page.svelte`.
 
-**Beobachtung:** Das Design System lädt noch `basis.css`; im Repo ist die CSS inzwischen auf elf Dateien verteilt, und seit dem 09.11. kamen mehrere Bausteine dazu (u. a. Umschalter, Rangliste, Tabellen-Steuerung aus #92). Der Entwurf zu #92 musste darum die CSS direkt aus dem Repo einbinden statt aus dem Design System.
+**Beobachtung:** Der MyTCO-Admin vergibt und entzieht Rollen heute in der Klappe «Rollen» auf der Seite eines Mitglieds; die Seite «Rollen» zeigt nur, wer welche hat. Der Projektleiter möchte Vergeben und Entziehen nur noch über die Seite «Rollen» (sie sieht nur der MyTCO-Admin); der Mitglieder-Admin soll die Rollen in der Mitgliederliste sehen. Die Seiteninfo von «Rollen» beschreibt den heutigen Stand.
 
-**Ursprung:** Design-Entwurf und Plan zu #92, Session vom 23.11.2026.
+**Ursprung:** Freigabe der Texte zu #93, Session vom 23.11.2026.
 
-**Einschätzung:** Ein eigener Abgleich: alle CSS-Dateien und die neuen Bausteine ins Design System übernehmen (Falle «Design System veröffentlichen» beachten). Grösser als ein Baustein, darum nicht im Branch von #92.
+**Einschätzung:** Umbau von Oberfläche und Rechteprüfung (RR-07, Regel 2 und 3), mit E2E; danach die Seiteninfo von «Rollen» anpassen. Eher ein eigenes Issue.
+
+**Stand:** Mit Zustimmung des Projektleiters als Issue #96 angelegt (23.11.2026).
+
+### 2026-11-23 — Mitteilungen gehen nur an alle oder an Gruppen eines Anlasses; zur Clubmeisterschaft gar nicht
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/lib/mitteilung/auswahl.ts` (`VEREIN_AUSWAHLEN` nur «alle»), Seiten unter `src/routes/verwaltung/turniere/` (kein Mitteilungsformular).
+
+**Beobachtung:** Der Projektleiter beschrieb «Mitteilungen» als Versand an Mitglieder oder Untergruppen, Mitteilungen zu Anlass oder CM über die jeweilige Seite. Heute gibt es Untergruppen nur bei einem Anlass (nach Antwort); eine allgemeine Mitteilung geht an alle aktiven Mitglieder, eine Mitteilung an die Teilnehmenden einer CM gibt es nicht (nur Nachrichten mit einzelnen Mitgliedern).
+
+**Ursprung:** Freigabe der Texte zu #93, Session vom 23.11.2026.
+
+**Einschätzung:** Zwei mögliche Erweiterungen (Empfängergruppen ohne Anlass; Mitteilung an Teilnehmende einer Kategorie bzw. eines Turniers). Gegen `docs/datenschutz.md` prüfen, bevor geplant wird; dann die Seiteninfo von «Mitteilungen» anpassen.
+
+**Stand:** Mit Zustimmung des Projektleiters als Issue #97 angelegt (23.11.2026).
+
+### 2026-11-23 — Design System «MyTCO» steht bis auf die Seiteninfo auf dem Stand vom 09.11.
+
+**Thema:** Oberfläche
+
+**Fundort:** Artifact «MyTCO» (Design System, `project/components/bundle.css`, `tokens.json` mit `meta.ref` dev@6b764e8), `src/lib/design/`.
+
+**Beobachtung:** Das Design System wurde zuletzt am 09.11. abgeglichen. Seither ist `basis.css` in mehrere Dateien unter `src/lib/design/` aufgeteilt, und neue Bausteine sind dazugekommen (z. B. Umschalter, Resultatzeile, Partie, Rangliste, Sprechblase). In #93 kam nur die Seiteninfo dazu, angehängt an `bundle.css`. Entwürfe auf dem Design System binden darum besser die echten Stil-Dateien aus dem Repo ein, wie in #93.
+
+**Ursprung:** Nachführen des Design Systems in #93, Session vom 23.11.2026.
+
+**Einschätzung:** Ein ganzer Abgleich (Bausteine, Tokens, `bundle.css` aus den aufgeteilten Dateien) lohnt sich vor dem nächsten grösseren Oberflächen-Entwurf; sonst genügt es, wie in #93 die Repo-Dateien einzubinden.
+
+**Nachtrag 2026-11-23 (#92):** Auch der Baustein *Tabellen-Steuerung* fehlt im Design System; der Entwurf zu #92 band ebenfalls die Stil-Dateien aus dem Repo ein.

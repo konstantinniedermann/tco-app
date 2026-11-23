@@ -7,6 +7,7 @@
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import Spaltentitel from '../../../lib/verwaltung/Spaltentitel.svelte';
 	import Tabellenkopfzeile from '../../../lib/verwaltung/Tabellenkopfzeile.svelte';
+	import Seiteninfo from '../../../lib/verwaltung/Seiteninfo.svelte';
 	import { aktionText, zeitText } from '../../../lib/verwaltung/anzeige.ts';
 	import { sortiere } from '../../../lib/verwaltung/tabelle.ts';
 	import { Tabellenstand } from '../../../lib/verwaltung/tabellen-stand.svelte.ts';
@@ -85,13 +86,15 @@
 >
 	<h1>Änderungsverlauf</h1>
 </Seitenkopf>
+<Seiteninfo>
+	<p>Wer wann an welchem Mitglied etwas geändert hat, ohne alte und neue Werte.</p>
+</Seiteninfo>
 <p class="leise">
 	{stand.gefiltert
 		? 'Die neuesten 100 Treffer im ganzen Verlauf, neueste zuerst.'
 		: mitglied === undefined
 			? 'Die letzten 100 Einträge, neueste zuerst.'
 			: 'Nur dieses Mitglied, neueste zuerst.'}
-	Ohne alte und neue Werte.
 	{#if mitglied !== undefined}
 		<a href={resolve('/verwaltung/verlauf')}>Alle anzeigen</a>
 	{/if}
