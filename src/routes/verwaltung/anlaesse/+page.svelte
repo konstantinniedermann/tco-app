@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
+	import Seiteninfo from '../../../lib/verwaltung/Seiteninfo.svelte';
 	import { resolve } from '$app/paths';
 	import { formatiereZeitpunkt } from '../../../lib/anlass/zeit.ts';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
@@ -19,6 +20,13 @@
 <Seitenkopf>
 	<h1>Anlässe</h1>
 </Seitenkopf>
+<Seiteninfo>
+	<p>Neue Anlässe erstellen und sehen, wer kommt.</p>
+	<p>
+		Auf der Seite eines Anlasses gehen auch Erinnerungen an alle, die noch nicht geantwortet haben,
+		und andere Mitteilungen zum Anlass hinaus.
+	</p>
+</Seiteninfo>
 <p class="leise" role="status">
 	{anzahl}
 </p>

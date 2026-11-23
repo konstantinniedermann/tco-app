@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
+	import Seiteninfo from '../../../lib/verwaltung/Seiteninfo.svelte';
 	import { resolve } from '$app/paths';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import { ladeMitglieder, type MitgliedZeile } from '../../../lib/verwaltung/mitglieder-api.ts';
@@ -58,6 +59,13 @@
 <Seitenkopf>
 	<h1>Mitglieder</h1>
 </Seitenkopf>
+<Seiteninfo>
+	<p>
+		Alle Mitglieder suchen und über «Bearbeiten» ihre Seite öffnen: Angaben, Mitgliedschaft, Login
+		und Rollen.
+	</p>
+	<p>Neue Mitglieder kommen einzeln über «Mitglied anlegen» oder als Datei über «Einlesen».</p>
+</Seiteninfo>
 <p class="leise" role="status">
 	{anzahl}
 </p>

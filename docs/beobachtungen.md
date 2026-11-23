@@ -249,3 +249,27 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Task 6 und merge-reviewer #81 Teil 3b, Session vom 23.11.2026.
 
 **Einschätzung:** Beim Doku-Abgleich vor dem Release klären: Test-Namen um die ID ergänzen und Status setzen, oder bewusst «geplant» lassen, bis #81 geschlossen ist.
+
+### 2026-11-23 — Rollen werden auf der Seite des Mitglieds vergeben, gewünscht ist nur die Seite «Rollen»
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/routes/verwaltung/mitglieder/[id]/+page.svelte` (Klappe «Rollen»), `src/routes/verwaltung/rollen/+page.svelte`.
+
+**Beobachtung:** Der MyTCO-Admin vergibt und entzieht Rollen heute in der Klappe «Rollen» auf der Seite eines Mitglieds; die Seite «Rollen» zeigt nur, wer welche hat. Der Projektleiter möchte Vergeben und Entziehen nur noch über die Seite «Rollen» (sie sieht nur der MyTCO-Admin); der Mitglieder-Admin soll die Rollen in der Mitgliederliste sehen. Die Seiteninfo von «Rollen» beschreibt den heutigen Stand.
+
+**Ursprung:** Freigabe der Texte zu #93, Session vom 23.11.2026.
+
+**Einschätzung:** Umbau von Oberfläche und Rechteprüfung (RR-07, Regel 2 und 3), mit E2E; danach die Seiteninfo von «Rollen» anpassen. Eher ein eigenes Issue.
+
+### 2026-11-23 — Mitteilungen gehen nur an alle oder an Gruppen eines Anlasses; zur Clubmeisterschaft gar nicht
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/lib/mitteilung/auswahl.ts` (`VEREIN_AUSWAHLEN` nur «alle»), Seiten unter `src/routes/verwaltung/turniere/` (kein Mitteilungsformular).
+
+**Beobachtung:** Der Projektleiter beschrieb «Mitteilungen» als Versand an Mitglieder oder Untergruppen, Mitteilungen zu Anlass oder CM über die jeweilige Seite. Heute gibt es Untergruppen nur bei einem Anlass (nach Antwort); eine allgemeine Mitteilung geht an alle aktiven Mitglieder, eine Mitteilung an die Teilnehmenden einer CM gibt es nicht (nur Nachrichten mit einzelnen Mitgliedern).
+
+**Ursprung:** Freigabe der Texte zu #93, Session vom 23.11.2026.
+
+**Einschätzung:** Zwei mögliche Erweiterungen (Empfängergruppen ohne Anlass; Mitteilung an Teilnehmende einer Kategorie bzw. eines Turniers). Gegen `docs/datenschutz.md` prüfen, bevor geplant wird; dann die Seiteninfo von «Mitteilungen» anpassen.
