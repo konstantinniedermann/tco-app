@@ -175,6 +175,16 @@ test('RR-07, A-ROLLE-07, A-TURNIER-01, A-TURNIER-02, A-TURNIER-03, A-ANMELDUNG-0
 	// FR-34: Im Doppel gibt es keinen Jahrgang.
 	await expect(page.getByRole('group', { name: 'Jahrgang (freiwillig)' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'kategorie-formular');
+
+	// FR-56: Im Doppel fragt die Absage nach «Spieler benachrichtigen», angehakt; Abbrechen sagt
+	// nichts ab.
+	await page.getByRole('button', { name: 'Kategorie absagen' }).click();
+	const absageDoppel = page.getByRole('dialog', { name: 'Kategorie absagen?' });
+	await expect(
+		absageDoppel.getByRole('checkbox', { name: 'Spieler benachrichtigen' })
+	).toBeChecked();
+	await absageDoppel.getByRole('button', { name: 'Abbrechen' }).click();
+	await expect(absageDoppel).toBeHidden();
 	expect(fehler).toEqual([]);
 });
 

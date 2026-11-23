@@ -6,7 +6,7 @@
 <script lang="ts">
 	type Props = {
 		an: boolean;
-		/** Im Doppel «Spieler benachrichtigen». */
+		/** Im Doppel «Spieler benachrichtigen», in der Karte «Mitgliedschaft» nach der Aktion. */
 		text?: string;
 	};
 

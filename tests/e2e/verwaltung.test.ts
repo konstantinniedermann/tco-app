@@ -231,6 +231,8 @@ test('RR-03: der letzte MyTCO-Admin sieht die Meldung beim Entzug seiner Rolle',
 			'Du kannst danach keine Rollen mehr vergeben und siehst diese Seite nicht mehr.'
 		)
 	).toBeVisible();
+	// FR-56: Änderungen an sich selbst melden nie, also kein Häkchen.
+	await expect(rueckfrage.getByRole('checkbox')).toHaveCount(0);
 	await rueckfrage.getByRole('button', { name: 'Abbrechen' }).click();
 	await expect(rueckfrage).toBeHidden();
 	await eigener.getByRole('button', { name: 'Entziehen' }).click();
@@ -464,7 +466,8 @@ test('A-ROLLE-01, RR-07: MyTCO-Admin vergibt eine Rolle, schaut als CM-Admin, ka
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
 	const { turnierId, jahr } = await legeTurnierAn();
-	const mytco = await legeRollenkontoMitBriefCodeAn('Theo', ['mytco']);
+	const eigenerName = `Probe${randomUUID().slice(0, 8)}`;
+	const mytco = await legeRollenkontoMitBriefCodeAn('Theo', ['mytco'], eigenerName);
 	const nachname = `Probe${randomUUID().slice(0, 8)}`;
 	await legeKontoAn('Selma', nachname);
 	await oeffneVerwaltung(page, mytco);
@@ -482,8 +485,15 @@ test('A-ROLLE-01, RR-07: MyTCO-Admin vergibt eine Rolle, schaut als CM-Admin, ka
 	await cmAdmins.locator('summary').click();
 	await cmAdmins.getByRole('button', { name: 'CM-Admin vergeben' }).click();
 	const vergeben = page.getByRole('dialog', { name: 'CM-Admin vergeben' });
+	const vergebenHaekchen = vergeben.getByRole('checkbox', { name: 'Mitglied benachrichtigen' });
+	// FR-56: An sich selbst geht keine Meldung: Wählt Theo sich selbst, fehlt das Häkchen.
+	await vergeben.getByLabel('Mitglied suchen').fill(eigenerName);
+	await vergeben.getByRole('radio', { name: new RegExp(`${eigenerName}`) }).check();
+	await expect(vergeben.getByRole('button', { name: 'Vergeben' })).toBeEnabled();
+	await expect(vergebenHaekchen).toHaveCount(0);
 	await vergeben.getByLabel('Mitglied suchen').fill(nachname);
 	await vergeben.getByRole('radio', { name: new RegExp(`${nachname}`) }).check();
+	await expect(vergebenHaekchen).not.toBeChecked();
 	await pruefeBildschirm(page, info, 'rollen-vergeben');
 	await vergeben.getByRole('button', { name: 'Vergeben' }).click();
 	await expect(vergeben).toBeHidden();
@@ -509,6 +519,9 @@ test('A-ROLLE-01, RR-07: MyTCO-Admin vergibt eine Rolle, schaut als CM-Admin, ka
 	const entziehen = page.getByRole('dialog', { name: 'Rolle CM-Admin entziehen?' });
 	await expect(entziehen.getByText(`${nachname}, Selma`)).toBeVisible();
 	await expect(entziehen.getByText('Du kannst danach keine Rollen mehr vergeben')).toHaveCount(0);
+	await expect(
+		entziehen.getByRole('checkbox', { name: 'Mitglied benachrichtigen' })
+	).not.toBeChecked();
 	await entziehen.getByRole('button', { name: 'Entziehen' }).click();
 	await expect(entziehen).toBeHidden();
 	await expect(
@@ -525,6 +538,9 @@ test('A-ROLLE-01, RR-07: MyTCO-Admin vergibt eine Rolle, schaut als CM-Admin, ka
 	const ottoZeile = cmAdmins.getByRole('listitem').filter({ hasText: `${nachname}, Otto` });
 	await expect(ottoZeile.getByText('ausgetreten', { exact: true })).toBeVisible();
 	await ottoZeile.getByRole('button', { name: 'Entziehen' }).click();
+	// FR-56: Ausgetreten bekommt Otto keine Meldung, also kein Häkchen.
+	await expect(entziehen.getByText(`${nachname}, Otto`)).toBeVisible();
+	await expect(entziehen.getByRole('checkbox')).toHaveCount(0);
 	await entziehen.getByRole('button', { name: 'Entziehen' }).click();
 	await expect(
 		page.getByText(`${nachname}, Otto hat die Rolle CM-Admin nicht mehr.`)

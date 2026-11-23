@@ -202,13 +202,21 @@ test('RR-08: Wiedereintritt eines Mitglieds mit Admin-Rolle fragt nach, ohne Rol
 	const karte = page.getByRole('region', { name: /^Mitgliedschaft/ });
 	const aktiv = 'Aktiv. Kommt der Austritt';
 
-	const haekchen = karte.getByRole('checkbox', { name: 'Mitglied benachrichtigen' });
+	// FR-56: Das Häkchen in der Karte nennt die Aktion, die es betrifft (nicht «Mitglied löschen»).
+	const haekchen = karte.getByRole('checkbox', {
+		name: 'Mitglied über den Wiedereintritt benachrichtigen'
+	});
 	const offen = 'Dein Zugang zu MyTCO ist wieder offen.';
 
 	// Mit Admin-Rolle: Rückfrage; Abbrechen ändert nichts, Weiter erfasst den Wiedereintritt.
 	// FR-56: Das Häkchen in der Karte ist leer; Vera bekommt keine Meldung (geprüft bei Otto).
+	// Ausgetreten bekommt sie keine Meldung: kein Häkchen bei den Angaben.
 	await page.goto(`/verwaltung/mitglieder/${mitRolle.mitgliedId}`);
 	await expect(haekchen).not.toBeChecked();
+	await expect(page.getByRole('button', { name: 'Angaben speichern' })).toBeAttached();
+	await expect(
+		page.getByRole('checkbox', { name: 'Mitglied benachrichtigen', exact: true })
+	).toHaveCount(0);
 	await karte.getByRole('button', { name: 'Wiedereintritt erfassen' }).click();
 	const frage = page.getByRole('dialog', { name: `Wiedereintritt von Vera ${name} erfassen?` });
 	await expect(frage).toBeVisible();
@@ -237,6 +245,9 @@ test('RR-08: Wiedereintritt eines Mitglieds mit Admin-Rolle fragt nach, ohne Rol
 
 	// Löschung rückgängig: Rückfrage nur, wenn das Login zurückkommt (vorher aktiv).
 	await page.goto(`/verwaltung/mitglieder/${vorgemerkt.mitgliedId}`);
+	await expect(
+		karte.getByRole('checkbox', { name: 'Mitglied über die Rücknahme benachrichtigen' })
+	).not.toBeChecked();
 	await karte.getByRole('button', { name: 'Löschung rückgängig machen' }).click();
 	const frageZurueck = page.getByRole('dialog', {
 		name: `Löschung von Lena ${name} rückgängig machen?`
@@ -245,7 +256,10 @@ test('RR-08: Wiedereintritt eines Mitglieds mit Admin-Rolle fragt nach, ohne Rol
 	await frageZurueck.getByRole('button', { name: 'Weiter' }).click();
 	await expect(karte).toContainText(aktiv);
 
+	// Vorher ausgetreten: Das Login kommt nicht zurück, also kein Häkchen.
 	await page.goto(`/verwaltung/mitglieder/${vorgemerktAusgetreten.mitgliedId}`);
+	await expect(karte.getByRole('button', { name: 'Löschung rückgängig machen' })).toBeVisible();
+	await expect(karte.getByRole('checkbox')).toHaveCount(0);
 	await karte.getByRole('button', { name: 'Löschung rückgängig machen' }).click();
 	await expect(karte.getByText('ausgetreten', { exact: true })).toBeVisible();
 	await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -267,6 +281,11 @@ test('RR-10: auf der eigenen Seite weder Austritt noch Löschen, dafür ein Hinw
 	);
 	await expect(karte.getByRole('button', { name: 'Austritt erfassen' })).toHaveCount(0);
 	await expect(karte.getByRole('button', { name: 'Mitglied löschen' })).toHaveCount(0);
+	// FR-56: Änderungen an sich selbst melden nie, also kein Häkchen bei den Angaben.
+	await expect(page.getByRole('button', { name: 'Angaben speichern' })).toBeAttached();
+	await expect(
+		page.getByRole('checkbox', { name: 'Mitglied benachrichtigen', exact: true })
+	).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'mitgliedschaft-eigene-seite');
 	expect(fehler).toEqual([]);
 });

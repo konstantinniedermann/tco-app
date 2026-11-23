@@ -514,8 +514,8 @@ export async function meldeAnfrageAlsPaarAn(
 }
 
 /**
- * FR-46: eine offene Anfrage löschen, vor und nach dem Anmeldeschluss; der Anfragende erfährt,
- * dass sie hinfällig ist. Keine Anmeldung ändert sich, darum kein Verlaufseintrag (FR-26) und
+ * FR-46: eine offene Anfrage löschen, vor und nach dem Anmeldeschluss; mit Häkchen (FR-56)
+ * erfährt der Anfragende, dass sie hinfällig ist. Keine Anmeldung ändert sich, darum kein Verlaufseintrag (FR-26) und
  * weder Urheber noch Zeitpunkt. Sperren: beide Mitglieder, Kategorie und Turnier, dann die Anfrage.
  */
 export async function loescheAnfrage(

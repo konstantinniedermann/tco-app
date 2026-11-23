@@ -32,9 +32,15 @@
 	// vorher ausgetreten.
 	const davor = $derived(mg.austrittAm === null ? 'aktiv' : 'ausgetreten');
 	// FR-56: Kommt das Login zurück (Wiedereintritt, Rücknahme bei vorher aktiv), steht über den
-	// Tasten das Häkchen «Mitglied benachrichtigen»; sonst gäbe es niemanden zu benachrichtigen.
+	// Tasten das Häkchen; sonst gäbe es niemanden zu benachrichtigen. Es nennt die Aktion, die es
+	// betrifft: bei «ausgetreten» steht es auch über «Mitglied löschen», das nie meldet.
 	const loginKommtZurueck = $derived(
 		status === 'ausgetreten' || (status === 'vorgemerkt' && davor === 'aktiv')
+	);
+	const haekchenText = $derived(
+		status === 'ausgetreten'
+			? 'Mitglied über den Wiedereintritt benachrichtigen'
+			: 'Mitglied über die Rücknahme benachrichtigen'
 	);
 	const name = $derived(`${detail.angaben.vorname} ${detail.angaben.nachname}`);
 	const rollen = $derived(rollenText(detail.rollen));
@@ -154,7 +160,7 @@
 			<p class="leise">Deinen Austritt und dein Löschen erfasst ein anderer Mitglieder-Admin.</p>
 		{:else}
 			{#if loginKommtZurueck}
-				<Benachrichtigen bind:an={benachrichtigen} />
+				<Benachrichtigen bind:an={benachrichtigen} text={haekchenText} />
 			{/if}
 			<div class="leiste">
 				{#if status === 'aktiv'}

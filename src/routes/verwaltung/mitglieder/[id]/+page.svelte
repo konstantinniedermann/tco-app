@@ -54,8 +54,14 @@
 	let angabenFormular = $state<ReturnType<typeof Angabenformular>>();
 	const angabenUngespeichert = $derived(angabenFormular?.ungespeichert() ?? false);
 	// FR-56: Häkchen «Mitglied benachrichtigen» über «Angaben speichern»; leer, nach jedem
-	// Speichern wieder leer.
+	// Speichern wieder leer. Nur wo eine Meldung ankommen kann (der Server meldet nur aktiven
+	// Mitgliedern mit offenem Konto, nie dem Admin selbst); sonst fehlt es und schickt `false`.
 	let benachrichtigen = $state(false);
+	const meldbar = $derived(
+		detail.status === 'aktiv' &&
+			detail.login.stand !== 'gesperrt' &&
+			data.eigeneMitgliedId !== detail.id
+	);
 
 	const speichereWerte = (werte: Werte) => einzeln(() => schickeAngaben(werte));
 	async function schickeAngaben(werte: Werte) {
@@ -63,7 +69,7 @@
 		angabenMeldung = null;
 		angabenStoerung = null;
 		veraltetBei = null;
-		const a = await speichereAngaben(detail.id, werte, detail.angaben, benachrichtigen);
+		const a = await speichereAngaben(detail.id, werte, detail.angaben, meldbar && benachrichtigen);
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok') {
 			angabenMeldung = 'Gespeichert';
@@ -228,7 +234,9 @@
 						onspeichern={speichereWerte}
 					>
 						{#snippet vorTaste()}
-							<Benachrichtigen bind:an={benachrichtigen} />
+							{#if meldbar}
+								<Benachrichtigen bind:an={benachrichtigen} />
+							{/if}
 						{/snippet}
 					</Angabenformular>
 				{/key}

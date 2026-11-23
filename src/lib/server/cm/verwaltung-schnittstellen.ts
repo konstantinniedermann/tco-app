@@ -289,7 +289,7 @@ export function postAnfrageAlsPaar(d: MitteilungAdminDienste, e: AdminEreignis):
 	});
 }
 
-/** FR-46: eine offene Anfrage löschen; der Anfragende erfährt es. */
+/** FR-46: eine offene Anfrage löschen; mit Häkchen erfährt es der Anfragende (FR-56). */
 export function postAnfrageLoeschen(
 	d: MitteilungAdminDienste,
 	e: AdminEreignis
