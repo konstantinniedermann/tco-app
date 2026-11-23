@@ -69,14 +69,6 @@ export const speichereAngaben = (
 	holen: Holen = fetch
 ) => schicke<{ geaendert: string[] }>(`${ADMIN}/mitglieder/${id}`, { ...angaben, vorher }, holen);
 
-/** `vorher`: die Rollen, wie die Seite sie geladen hat; der Server speichert nur, wenn sie noch gelten. */
-export const speichereRollen = (
-	id: number,
-	rollen: Rolle[],
-	vorher: Rolle[],
-	holen: Holen = fetch
-) => schicke<Record<string, never>>(`${ADMIN}/mitglieder/${id}/rollen`, { rollen, vorher }, holen);
-
 export const beendeSitzungen = (id: number, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/mitglieder/${id}/sitzungen`, {}, holen);
 

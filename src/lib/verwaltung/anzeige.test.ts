@@ -3,6 +3,7 @@ import { MELDUNG } from '../login/anmelden.ts';
 import {
 	aktionText,
 	fehlerText,
+	LETZTER_MYTCO,
 	feldMeldung,
 	geaendertText,
 	neueAngaben,
@@ -23,6 +24,13 @@ describe('Texte der Verwaltung', () => {
 		expect(fehlerText({ art: 'kein-recht' })).toBe('Das darfst du hier nur ansehen, nicht ändern.');
 		expect(fehlerText({ art: 'stoerung' })).toBe(MELDUNG.stoerung);
 		expect(fehlerText({ art: 'veraltet' })).toBe(MELDUNG.stoerung);
+	});
+
+	it('RR-03: der letzte MyTCO-Admin erfährt, was zuerst zu tun ist', () => {
+		expect(fehlerText({ art: 'letzter-mytco' })).toBe(LETZTER_MYTCO);
+		expect(LETZTER_MYTCO).toBe(
+			'Du bist der letzte MyTCO-Admin. Gib zuerst jemand anderem die Rolle MyTCO-Admin.'
+		);
 	});
 
 	it('FR-26: Verlaufstexte nennen Feld oder Rolle, nie einen Wert', () => {

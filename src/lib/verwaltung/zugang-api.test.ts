@@ -5,6 +5,8 @@ import {
 	fordereCodeAn,
 	bestaetige,
 	ladeRollenListe,
+	vergibRolle,
+	entziehRolle,
 	schaueAls,
 	beendeAnsicht
 } from './zugang-api.ts';
@@ -15,6 +17,19 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 		const h = holer(json(200, liste));
 		expect(await ladeRollenListe(h.holen)).toEqual({ art: 'ok', daten: liste });
 		expect(h.aufrufe[0].pfad).toBe('/api/admin/rollen');
+	});
+
+	it('A-ROLLE-01, RR-03: Rolle vergeben und entziehen schicken Mitglied und Rolle; 409 letzter-mytco', async () => {
+		const v = holer(json(200, {}));
+		expect(await vergibRolle(7, 'cm', v.holen)).toEqual({ art: 'ok', daten: {} });
+		expect(v.aufrufe.map((a) => [a.pfad, JSON.parse(String(a.init.body))])).toEqual([
+			['/api/admin/rollen/vergeben', { mitgliedId: 7, rolle: 'cm' }]
+		]);
+		const e = holer(json(409, { fehler: 'letzter-mytco' }));
+		expect(await entziehRolle(7, 'mytco', e.holen)).toEqual({ art: 'letzter-mytco' });
+		expect(e.aufrufe.map((a) => [a.pfad, JSON.parse(String(a.init.body))])).toEqual([
+			['/api/admin/rollen/entziehen', { mitgliedId: 7, rolle: 'mytco' }]
+		]);
 	});
 
 	it('Ansicht als …: einschalten schickt die Rolle; läuft schon eine, wird sie zuerst beendet', async () => {

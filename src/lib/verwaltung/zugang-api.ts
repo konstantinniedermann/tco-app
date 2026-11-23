@@ -1,7 +1,7 @@
 // Zugang zur Verwaltung: Sitzung, Code, Rollen-Übersicht und «Ansicht als …» (Anfragen an
 // `/api/admin/zugang`, `/rollen` und `/ansicht`). Antwort und Abruf stehen in `api.ts`.
 import type { Holen } from '../abruf.ts';
-import type { AnsichtRolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
+import type { AnsichtRolle, Rolle, RollenListe, VerwaltungsRolle } from '../server/admin/rollen.ts';
 import { ADMIN, lese, schicke, type Antwort } from './api.ts';
 
 export type { AnsichtRolle, RollenListe, VerwaltungsRolle };
@@ -21,6 +21,14 @@ export const bestaetige = (code: string, holen: Holen = fetch) =>
 /** Regel 2: wer welche Rolle hat (nur MyTCO-Admin). */
 export const ladeRollenListe = (holen: Holen = fetch) =>
 	lese<RollenListe>(`${ADMIN}/rollen`, holen);
+
+/** A-ROLLE-01: gibt einem Mitglied eine Rolle (nur MyTCO-Admin). */
+export const vergibRolle = (mitgliedId: number, rolle: Rolle, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/rollen/vergeben`, { mitgliedId, rolle }, holen);
+
+/** A-ROLLE-01, RR-03: nimmt einem Mitglied eine Rolle; der letzte MyTCO-Admin behält seine. */
+export const entziehRolle = (mitgliedId: number, rolle: Rolle, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/rollen/entziehen`, { mitgliedId, rolle }, holen);
 
 /**
  * Schaltet «Ansicht als …» ein. Läuft schon eine Ansicht, beendet die Seite sie zuerst: Von einer

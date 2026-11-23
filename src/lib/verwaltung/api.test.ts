@@ -1,23 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { holer, json, ungeprueft } from '../../../tests/hilfen/abruf.ts';
 import { sendeAntwort } from './gespraech-api.ts';
-import {
-	ladeMitglieder,
-	speichereRollen,
-	zeigeEinleseVorschau,
-	liesMitgliederEin
-} from './mitglieder-api.ts';
+import { ladeMitglieder, zeigeEinleseVorschau, liesMitgliederEin } from './mitglieder-api.ts';
 import { legeTurnierAn } from './turnier-api.ts';
-import { ladeZugang } from './zugang-api.ts';
+import { ladeZugang, vergibRolle } from './zugang-api.ts';
 
 describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 	it('Regel 3: 403 kein-recht und nur-ansehen kommen als eigene Antwort an', async () => {
-		const a = await speichereRollen(
-			1,
-			['cm'],
-			[],
-			holer(json(403, { fehler: 'kein-recht' })).holen
-		);
+		const a = await vergibRolle(1, 'cm', holer(json(403, { fehler: 'kein-recht' })).holen);
 		const b = await legeTurnierAn({}, holer(json(403, { fehler: 'nur-ansehen' })).holen);
 		expect([a, b]).toEqual([{ art: 'kein-recht' }, { art: 'nur-ansehen' }]);
 	});
