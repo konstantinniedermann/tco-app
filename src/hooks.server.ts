@@ -23,8 +23,12 @@ export const init: ServerInit = () => {
 	if (ic)
 		starteZeitgeber(
 			async () => {
-				await fuehreAbrufAus(ic.dienste, ic.verein);
-				await meldeEndstaende(ic.melder);
+				// Melden und Abruf bleiben unabhängig: Scheitert der Abruf, läuft das Melden trotzdem.
+				try {
+					await fuehreAbrufAus(ic.dienste, ic.verein);
+				} finally {
+					await meldeEndstaende(ic.melder);
+				}
 			},
 			{ start: 2 * 60_000, abstand: STUNDE },
 			{ name: 'interclub', fehler: 'Interclub-Abruf fehlgeschlagen' }

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
-import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
 	legeEigeneDatenbankAn,
 	ZEIT_EIGENE_DB,
@@ -383,12 +383,38 @@ describe('meldeEndstaende', () => {
 		expect(JSON.stringify(gesendet[0].nutzlast)).not.toContain('Erfunden');
 	});
 
-	test('wirft nie: Datenbankfehler gibt 0', ZEIT_EIGENE_DB, async () => {
-		const kaputt = {
-			select: () => {
-				throw new Error('Datenbank weg');
+	test(
+		'wirft nie: Datenbankfehler gibt 0 und loggt nur den festen Text',
+		ZEIT_EIGENE_DB,
+		async () => {
+			const kaputt = {
+				select: () => {
+					throw new Error('Datenbank weg: geheim@example.org');
+				}
+			} as unknown as MeldeDienste['db'];
+			const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+			try {
+				expect(await meldeEndstaende(dienste({ db: kaputt }))).toBe(0);
+				expect(log.mock.calls).toEqual([['Interclub-Melden fehlgeschlagen']]);
+			} finally {
+				log.mockRestore();
 			}
-		} as unknown as MeldeDienste['db'];
-		expect(await meldeEndstaende(dienste({ db: kaputt }))).toBe(0);
-	});
+		}
+	);
+
+	test(
+		'TCO gegen TCO, Konto folgt nur dem zweiten Team: dessen Liga und Link',
+		ZEIT_EIGENE_DB,
+		async () => {
+			await neuesKonto({ folgt: [2] });
+			const id = naechsteId;
+			await spiel({ teamId: 1, heim: 'Olten 1', gast: 'Olten 2', punkte: [5, 4] });
+			naechsteId = id;
+			await spiel({ teamId: 2, heim: 'Olten 1', gast: 'Olten 2', punkte: [5, 4] });
+			expect(await meldeEndstaende(dienste())).toBe(1);
+			expect(gesendet).toHaveLength(1);
+			expect(gesendet[0].nutzlast.text).toBe('3L Herren: Olten 1 – Olten 2 5:4');
+			expect(gesendet[0].nutzlast.link).toBe(`https://mytco.example/interclub/2/${id}`);
+		}
+	);
 });

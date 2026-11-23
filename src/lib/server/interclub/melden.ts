@@ -1,7 +1,7 @@
 // Melden nach dem Abruf (#81 Teil 3b): Nach jedem Abruf bekommen Konten, die einem beteiligten
 // TCO-Team folgen, einen Push je neuem Endstand mit Spielbericht. Erst eintragen, dann senden:
 // scheitert der Versand, gibt es keinen zweiten Versuch. Der Text enthält keine Spielernamen
-// (DS-05, DS-08). Die Funktion wirft nie und loggt nichts (DS-06).
+// (DS-05, DS-08). Die Funktion wirft nie und loggt nur einen festen Text (DS-06).
 import { and, asc, between, eq, inArray, isNotNull } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { heuteInZuerich, jahrInZuerich, plusTage } from '../datum.ts';
@@ -213,6 +213,7 @@ export async function meldeEndstaende(d: MeldeDienste): Promise<number> {
 		}
 		return neu.size;
 	} catch {
+		console.error('Interclub-Melden fehlgeschlagen');
 		return 0;
 	}
 }
