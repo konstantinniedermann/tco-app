@@ -108,6 +108,22 @@ async function neuesKonto(
 	return { kontoId: m.kontoId, endpunkt };
 }
 
+// Ein weiteres Gerät desselben Kontos: eigene Sitzung, eigenes Abo.
+async function weiteresAbo(kontoId: number): Promise<string> {
+	const endpunkt = `https://push.example/${randomUUID()}`;
+	const kennung = await erstelleSitzung(e.db, kontoId, JETZT);
+	const k = (await pruefeSitzung(e.db, kennung, JETZT))!.konto;
+	await e.db.insert(pushAbo).values({
+		endpunkt,
+		sitzungHash: k.sitzungHash,
+		kontoId,
+		p256dh: 'p',
+		auth: 'a',
+		eingerichtetAm: JETZT
+	});
+	return endpunkt;
+}
+
 type Spiel = {
 	teamId?: number;
 	saison?: number;
@@ -417,4 +433,51 @@ describe('meldeEndstaende', () => {
 			expect(gesendet[0].nutzlast.link).toBe(`https://mytco.example/interclub/2/${id}`);
 		}
 	);
+	test('Konto mit zwei Abos: beide bekommen den Push', ZEIT_EIGENE_DB, async () => {
+		const k = await neuesKonto();
+		const zweites = await weiteresAbo(k.kontoId);
+		const id = await spiel({ heim: 'Olten 1', gast: 'Villmergen' });
+		expect(await meldeEndstaende(dienste())).toBe(1);
+		const nutzlast = {
+			titel: 'Interclub',
+			text: '2L Herren 1: Olten 1 – Villmergen 8:1',
+			link: `https://mytco.example/interclub/1/${id}`
+		};
+		expect(gesendet).toHaveLength(2);
+		expect(gesendet).toEqual(
+			expect.arrayContaining([
+				{ endpunkt: k.endpunkt, nutzlast },
+				{ endpunkt: zweites, nutzlast }
+			])
+		);
+	});
+
+	test('zwei Konten im selben Lauf bekommen je genau ihren Push', ZEIT_EIGENE_DB, async () => {
+		const a = await neuesKonto({ folgt: [1] });
+		const b = await neuesKonto({ folgt: [2] });
+		const id1 = await spiel({ teamId: 1, heim: 'Olten 1', gast: 'Villmergen', punkte: [8, 1] });
+		const id2 = await spiel({ teamId: 2, heim: 'Aarau', gast: 'Olten 2', punkte: [3, 6] });
+		expect(await meldeEndstaende(dienste())).toBe(2);
+		expect(gesendet).toHaveLength(2);
+		expect(gesendet).toEqual(
+			expect.arrayContaining([
+				{
+					endpunkt: a.endpunkt,
+					nutzlast: {
+						titel: 'Interclub',
+						text: '2L Herren 1: Olten 1 – Villmergen 8:1',
+						link: `https://mytco.example/interclub/1/${id1}`
+					}
+				},
+				{
+					endpunkt: b.endpunkt,
+					nutzlast: {
+						titel: 'Interclub',
+						text: '3L Herren: Aarau – Olten 2 3:6',
+						link: `https://mytco.example/interclub/2/${id2}`
+					}
+				}
+			])
+		);
+	});
 });
