@@ -8,9 +8,10 @@ import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 const TITEL = 'Clubmeisterschaft';
 
 /**
- * FR-47: persönliche Meldung an den Spieler, erst nach dem Speichern. Ohne Namen anderer
- * Mitglieder, ausser im Doppel der andere Spieler (DS-05); nie der CM-Admin. Betrifft es den CM-Admin selbst, entfällt sie. Die Antwort
- * wartet nicht auf Push und Mail; wirft `meldeMitgliedern` doch, bleibt das still (SI-05).
+ * FR-47: persönliche Meldung an den Spieler, erst nach dem Speichern, mit dem Weg zum Turnier.
+ * Ohne Namen anderer Mitglieder, ausser im Doppel der andere Spieler (DS-05); nie der CM-Admin.
+ * Versand über `meldeVerwaltung` (`admin/meldung.ts`): Betrifft es den CM-Admin selbst, entfällt
+ * sie; die Antwort wartet nicht auf Push und Mail, Fehler bleiben still (SI-05).
  */
 export function melde(
 	d: MitteilungAdminDienste,
