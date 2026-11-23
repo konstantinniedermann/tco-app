@@ -200,6 +200,190 @@
 		flex: 1 1 0;
 	}
 
+	/* Tabellen-Steuerung (#92): eigener Scrollbereich in beide Richtungen, höchstens so hoch wie
+	   der Platz unter dem Seitenkopf; Titel kleben oben in der Box, Breiten aus --breite der <col>
+	   (setzt tabellen-stand.svelte.ts). Steht nach .tabelle-lang und übersteuert es */
+	.tabelle.tabelle-steuerung {
+		overflow: auto;
+		max-height: calc(100dvh - var(--hoehe-seitenkopf, 0rem) - var(--abstand-6));
+	}
+
+	.tabelle-steuerung table {
+		table-layout: fixed;
+		width: max(100%, var(--tabellenbreite, 100%));
+	}
+
+	.tabelle-steuerung col {
+		width: var(--breite);
+	}
+
+	.tabelle-steuerung th {
+		position: sticky;
+		top: 0;
+		z-index: 2;
+		padding: 0;
+		vertical-align: bottom;
+	}
+
+	.tabelle-steuerung td {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.tabelle-steuerung .zelle-kurz {
+		display: block;
+		max-width: none;
+	}
+
+	.spaltentitel-text {
+		display: none;
+	}
+
+	.spaltentitel {
+		position: relative;
+		display: flex;
+		align-items: center;
+		min-height: var(--tippflaeche);
+		padding-right: var(--abstand-2);
+	}
+
+	.spaltentitel-fest {
+		padding-inline: var(--abstand-3);
+	}
+
+	.sortier {
+		flex: 1 1 auto;
+		display: flex;
+		align-items: center;
+		gap: var(--abstand-1);
+		min-width: 0;
+		min-height: var(--tippflaeche);
+		padding: 0 var(--abstand-1) 0 var(--abstand-3);
+		border: 0;
+		background: none;
+		font: inherit;
+		font-weight: 700;
+		color: var(--farbe-text);
+		text-align: left;
+		white-space: nowrap;
+		cursor: pointer;
+	}
+
+	.sortier:hover,
+	.sortier[data-aktiv] {
+		color: var(--farbe-marke);
+	}
+
+	.pfeil {
+		flex: none;
+		width: var(--groesse-klein);
+		height: var(--groesse-klein);
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2.5;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.pfeil-leise {
+		color: var(--farbe-text-leise);
+	}
+
+	.filter-knopf {
+		flex: none;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: var(--tippflaeche);
+		height: var(--tippflaeche);
+		padding: 0;
+		border: 0;
+		border-radius: var(--radius);
+		background: none;
+		color: var(--farbe-text-leise);
+		cursor: pointer;
+	}
+
+	.filter-knopf:hover {
+		color: var(--farbe-marke);
+	}
+
+	.filter-knopf[data-aktiv] {
+		background: var(--farbe-marke);
+		color: var(--farbe-flaeche);
+	}
+
+	.filter-knopf svg {
+		width: var(--groesse-text);
+		height: var(--groesse-text);
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linejoin: round;
+	}
+
+	.filter-knopf[data-aktiv] svg {
+		fill: currentColor;
+	}
+
+	.ziehgriff {
+		position: absolute;
+		top: 0;
+		right: calc(-1 * var(--abstand-2));
+		bottom: 0;
+		z-index: 3;
+		display: flex;
+		justify-content: center;
+		width: var(--abstand-4);
+		cursor: col-resize;
+		touch-action: none;
+	}
+
+	.ziehgriff::after {
+		content: '';
+		width: var(--rand-dick);
+		margin-block: var(--abstand-2);
+		background: var(--farbe-linie);
+	}
+
+	.ziehgriff:hover::after,
+	.ziehgriff:focus-visible::after,
+	.ziehgriff[data-zieht]::after {
+		margin-block: 0;
+		background: var(--farbe-marke);
+	}
+
+	.klebt-rechts,
+	.klebt-links {
+		position: sticky;
+		z-index: 1;
+		background: var(--farbe-flaeche);
+	}
+
+	.klebt-rechts {
+		right: 0;
+		border-left: var(--rand-duenn) solid var(--farbe-linie);
+	}
+
+	.klebt-links {
+		left: 0;
+		border-right: var(--rand-duenn) solid var(--farbe-linie);
+	}
+
+	.tabelle-steuerung th.klebt-rechts,
+	.tabelle-steuerung th.klebt-links {
+		z-index: 3;
+		background: var(--farbe-marke-zart);
+	}
+
+	.breiten-zuruecksetzen {
+		display: inline;
+	}
+
+	.status-nur-handy {
+		display: none;
+	}
+
 	.spalten {
 		display: grid;
 		grid-template-columns: 1fr 1fr;

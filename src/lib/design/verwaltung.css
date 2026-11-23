@@ -74,3 +74,139 @@
 .verwaltung-leiste {
 	display: contents;
 }
+
+/* Tabellen-Steuerung (#92): Kopfzeile über der Tabelle, Filterwörter, Textlinks, Aufklapper.
+   Sortiertaste, Trichter und Ziehgriff zeigt erst das PC-Layout (pc-layout.css). */
+.tabellen-kopfzeile {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--abstand-2) var(--abstand-4);
+	margin-bottom: var(--abstand-2);
+	font-size: var(--groesse-klein);
+}
+
+.tabellen-kopfzeile-rechts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--abstand-4);
+	margin-left: auto;
+}
+
+.breiten-zuruecksetzen {
+	display: none;
+}
+
+.filter-wort {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--abstand-1);
+	padding-left: var(--abstand-2);
+	border-radius: var(--radius-rund);
+	background: var(--farbe-marke-zart);
+	color: var(--farbe-marke);
+	font-weight: 600;
+}
+
+.filter-wort button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--tippflaeche);
+	height: var(--tippflaeche);
+	margin-block: calc(-1 * var(--abstand-3));
+	padding: 0;
+	border: 0;
+	border-radius: var(--radius-rund);
+	background: none;
+	color: inherit;
+	cursor: pointer;
+}
+
+.filter-wort svg {
+	width: var(--groesse-klein);
+	height: var(--groesse-klein);
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2.5;
+	stroke-linecap: round;
+}
+
+/* Textlink: eine Taste, die aussieht wie ein Link (Filter und Breiten zurücksetzen, Alle zeigen) */
+.textlink {
+	min-height: var(--tippflaeche);
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+	color: var(--farbe-marke);
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.spaltentitel {
+	display: none;
+}
+
+/* Aufklapper: popover in der obersten Ebene, unter dem Trichter (Lage setzt Spaltentitel.svelte) */
+.aufklapper {
+	inset: auto;
+	top: var(--anker-oben, 0);
+	left: var(--anker-links, 0);
+	width: 18rem;
+	max-height: 70dvh;
+	margin: var(--abstand-1) 0 0;
+	border: 0;
+	padding: var(--abstand-3);
+	overflow: auto;
+	color: var(--farbe-text);
+	font-weight: 400;
+	white-space: normal;
+	text-align: left;
+}
+
+.aufklapper-breit {
+	width: 32rem;
+}
+
+.aufklapper-breit .aufklapper-werte {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	column-gap: var(--abstand-2);
+}
+
+.aufklapper-titel {
+	margin: 0 0 var(--abstand-2);
+	font-size: var(--groesse-klein);
+	font-weight: 700;
+}
+
+.aufklapper .auswahl .leise {
+	margin-left: auto;
+	font-weight: 400;
+}
+
+.von-bis {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--abstand-2);
+}
+
+.von-bis .feld {
+	margin-bottom: 0;
+}
+
+.aufklapper .feld input {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.aufklapper-fuss {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: var(--abstand-3);
+	margin-top: var(--abstand-3);
+	padding-top: var(--abstand-2);
+	border-top: var(--rand-duenn) solid var(--farbe-linie);
+}

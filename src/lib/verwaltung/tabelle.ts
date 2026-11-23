@@ -170,6 +170,16 @@ export function inAdresse<Z>(
 	return neu;
 }
 
+/** Der neue Suchteil der Adresse (ohne «?») aus dem alten, für die Seite. */
+export function suchteil<Z>(
+	alt: string,
+	spalten: readonly Spalte<Z>[],
+	s: Sortierung,
+	f: Filter
+): string {
+	return inAdresse(new URLSearchParams(alt), spalten, s, f).toString();
+}
+
 /** Steht etwas von dieser Tabelle in der Adresse (dann gilt die Adresse, nicht das Gedächtnis)? */
 export function hatTabellenwerte<Z>(q: URLSearchParams, spalten: readonly Spalte<Z>[]): boolean {
 	const a = ausAdresse(q, spalten);
