@@ -1,7 +1,8 @@
 <!--
 	FR-56: Häkchen «Mitglied benachrichtigen» in einem Formular oder einer Rückfrage der Verwaltung,
-	als Auswahlfläche über der Haupttaste. Es gilt erst mit der Taste (UI-Leitbild, Auswahlfläche);
-	den Standard setzt, wer die Rückfrage öffnet.
+	als Auswahlfläche über der Haupttaste, in der Karte «Mitgliedschaft» über den Tasten. Es gilt erst
+	mit der Taste (UI-Leitbild, Auswahlfläche); den Standard setzt, wer die Rückfrage öffnet. Wo keine
+	Meldung ankommen kann, lässt die Seite es weg.
 -->
 <script lang="ts">
 	type Props = {
