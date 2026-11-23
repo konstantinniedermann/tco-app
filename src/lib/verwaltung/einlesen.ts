@@ -2,7 +2,7 @@
 // (`server/admin/einlesen.ts`); die Seite prüft die Grösse nur, um sich die Anfrage zu sparen.
 import type { Feld } from '../server/admin/angaben.ts';
 import type { DateiFehler } from '../server/admin/einlesen.ts';
-import { FELD_NAMEN } from './anzeige.ts';
+import { FELD_NAMEN } from '../feld-namen.ts';
 
 // Unter der Grenze des Servers für eine Anfrage (512 KB), samt JSON-Hülle (Projektleiter, 08.11.2026).
 export const MAX_BYTES = 400 * 1024;

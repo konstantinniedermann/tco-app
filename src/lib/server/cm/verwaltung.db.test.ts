@@ -424,7 +424,8 @@ describe('A-ANMELDUNG-06, FR-46: Anmeldungen verwalten', () => {
 		const jetzt = new Date('2026-11-07T10:00:00Z');
 		const urheber = { art: 'admin' as const, mitgliedId: cm };
 		expect(await korrigiereKlassierung(db, urheber, ich, 'R5', jetzt)).toBe('ok');
-		expect(await korrigiereKlassierung(db, urheber, ich, 'R5', jetzt)).toBe('ok');
+		// Der gleiche Wert ändert nichts; die Schnittstelle meldet dann nicht (FR-56).
+		expect(await korrigiereKlassierung(db, urheber, ich, 'R5', jetzt)).toBe('unveraendert');
 		const [m] = await db
 			.select({ klassierung: mitglied.klassierung })
 			.from(mitglied)

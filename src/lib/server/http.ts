@@ -43,6 +43,19 @@ export async function leseKoerper(e: Ereignis): Promise<Record<string, unknown>>
 	}
 }
 
+/**
+ * Das Körperfeld `benachrichtigen` («Mitglied benachrichtigen»): fehlt es, gilt `standard`;
+ * `true`/`false` gelten wie gegeben; jeder andere Typ ist ein Eingabefehler (`null`).
+ */
+export function leseBenachrichtigen(
+	koerper: Record<string, unknown>,
+	standard: boolean
+): boolean | null {
+	const wert = koerper.benachrichtigen;
+	if (wert === undefined) return standard;
+	return typeof wert === 'boolean' ? wert : null;
+}
+
 export const formatFehler = () => antwort(415, { fehler: 'format' });
 export const nichtGefunden = () => antwort(404, { fehler: 'nicht-gefunden' });
 export const eingabeFehler = () => antwort(400, { fehler: 'eingabe' });

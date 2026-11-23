@@ -234,7 +234,9 @@
 		taste="Anmelden"
 		trotzdemTaste="Trotzdem anmelden"
 		bereit={mitgliedId !== null}
-		aktion={(trotzdem) => meldeVonHandAn(kategorieId, mitgliedId as number, trotzdem)}
+		benachrichtigen={{ standard: true }}
+		aktion={(trotzdem, benachrichtigen) =>
+			meldeVonHandAn(kategorieId, mitgliedId as number, trotzdem, benachrichtigen)}
 		erfolg="Angemeldet."
 		folgen={{
 			'schon-angemeldet': 'Ist schon in dieser Kategorie angemeldet.',
@@ -265,7 +267,9 @@
 		trotzdemTaste="Trotzdem verschieben"
 		bereit={zielId !== null}
 		ohneHaupttaste={andere.length === 0}
-		aktion={(trotzdem) => verschiebeAnmeldung(gewaehlt!.anmeldungId, zielId as number, trotzdem)}
+		benachrichtigen={{ standard: true }}
+		aktion={(trotzdem, benachrichtigen) =>
+			verschiebeAnmeldung(gewaehlt!.anmeldungId, zielId as number, trotzdem, benachrichtigen)}
 		erfolg="Verschoben."
 		folgen={{
 			'schon-angemeldet': 'Ist dort schon angemeldet.',
@@ -310,7 +314,9 @@
 		titel="Klassierung korrigieren"
 		taste="Klassierung speichern"
 		bereit={gewaehlt !== null && klassierung !== '' && klassierung !== gewaehlt.klassierung}
-		aktion={() => korrigiereKlassierung(gewaehlt!.mitgliedId, klassierung as Klassierung)}
+		benachrichtigen={{ standard: false }}
+		aktion={(_, benachrichtigen) =>
+			korrigiereKlassierung(gewaehlt!.mitgliedId, klassierung as Klassierung, benachrichtigen)}
 		erfolg="Klassierung gespeichert."
 		folgen={{ 'nicht-gefunden': 'Dieses Mitglied gibt es nicht mehr.' }}
 		onfertig={fertig}
@@ -334,7 +340,8 @@
 		id="loeschen"
 		titel="Anmeldung löschen?"
 		taste="Löschen"
-		aktion={() => loescheAnmeldung(gewaehlt!.anmeldungId)}
+		benachrichtigen={{ standard: true }}
+		aktion={(_, benachrichtigen) => loescheAnmeldung(gewaehlt!.anmeldungId, benachrichtigen)}
 		erfolg="Gelöscht."
 		folgen={{ 'nicht-gefunden': WEG }}
 		onfertig={fertig}

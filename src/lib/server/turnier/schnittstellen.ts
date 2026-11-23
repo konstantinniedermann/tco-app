@@ -10,7 +10,7 @@ import {
 } from '../admin/rechte.ts';
 import { anfrageGeloeschtText } from '../cm/doppel-meldung.ts';
 import { melde } from '../cm/verwaltung-meldung.ts';
-import { antwort, eingabeFehler, jetzt, nichtGefunden } from '../http.ts';
+import { antwort, eingabeFehler, jetzt, leseBenachrichtigen, nichtGefunden } from '../http.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { parseId } from '../parse-id.ts';
 import { pruefeKategorie, pruefeTurnier } from './angaben.ts';
@@ -125,13 +125,16 @@ export function postKategorieAbsagen(
 	d: MitteilungAdminDienste,
 	e: AdminEreignis
 ): Promise<Response> {
-	return schreibt(d, e, 'cm', async (urheber) => {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
+		// FR-56: Häkchen vorbelegt wie bei den übrigen CM-Aktionen.
+		const benachrichtigen = leseBenachrichtigen(koerper, true);
+		if (benachrichtigen === null) return eingabeFehler();
 		const r = await sageKategorieAb(d.db, id);
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if ('aktiv' in r) return antwort(409, { fehler: 'hat-anmeldungen', anzahl: r.aktiv });
-		meldeHinfaellige(d, urheber, r.hinfaellig);
+		if (benachrichtigen) meldeHinfaellige(d, urheber, r.hinfaellig);
 		return antwort(200, {});
 	});
 }

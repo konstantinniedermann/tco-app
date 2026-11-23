@@ -121,6 +121,54 @@ Letzte Auswertung: 22.11.2026 (nur Entscheide)
 
 ## Offen
 
+### 2026-11-23 — Dialog «Von Hand anmelden» im Doppel ist höher als ein iPhone-Fenster
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/lib/verwaltung/DoppelListe.svelte` (Rückfrage «Von Hand anmelden»), Seite
+`verwaltung/turniere/[id]/kategorien/[kid]` einer Doppel-Kategorie.
+
+**Beobachtung:** Schon vor #94 ist der Inhalt des Dialogs auf dem iPhone höher als das Fenster
+(891 px Inhalt in 617 px, Android 1017 in 797 px). Nach dem Klick auf «Anmelden» schiebt die
+Liste der Warnungen die Knöpfe aus dem sichtbaren Bereich; erreichbar sind sie nur durch Scrollen
+im Dialog.
+
+**Ursprung:** #94, beim E2E der Doppel-Aktionen mit dem Häkchen «Spieler benachrichtigen».
+
+**Einschätzung:** Vorläufig. Bedienbar, aber leicht zu übersehen; denkbar: Warnungen über den
+Feldern zeigen oder nach der Warnung zu den Knöpfen scrollen.
+
+### 2026-11-23 — `neue-version.test.ts` auf dem iPhone einmal rot unter Last im vollen `make check`
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/neue-version.test.ts`, Projekt `iphone` (WebKit).
+
+**Beobachtung:** Im vollen `make check` schlug der Test einmal fehl mit «Importing a module script
+failed»; einzeln lief die Datei danach 9/9 grün. Der Lauf fiel in eine Zeit hoher Rechnerlast.
+
+**Ursprung:** #94, Prüflauf vor dem Abschluss.
+
+**Einschätzung:** Vorläufig. Vermutlich ein Ladefehler von WebKit unter Last (wie die bekannten
+Zeitgrenzen); erst nachgehen, wenn es sich wiederholt.
+
+### 2026-11-23 — Push-Nachweis: Abo ging in einem Lauf verloren, Meldung kam per E-Mail
+
+**Thema:** Tests
+
+**Fundort:** Lokaler Push-Nachweis (Playwright mit Chrome, `getNotifications()`), Meldung der
+Verwaltung nach FR-56; `src/lib/server/mitteilung/versand.ts` (`sendePush`).
+
+**Beobachtung:** Im ersten Lauf ging das Push-Abo verloren, und die Meldung fiel auf die E-Mail
+zurück. Ursache unbekannt, vermutlich eine Antwort 404/410 des Push-Diensts, nach der das Abo
+gelöscht wird. Der zweite Lauf, unverändert, lieferte den Push wie erwartet.
+
+**Ursprung:** #94, Push-Nachweis der Meldungen.
+
+**Einschätzung:** Vorläufig. Der Rückfall auf E-Mail wirkt wie vorgesehen; ob der Push-Dienst das
+frische Abo zurückwies oder der Testbrowser es verlor, ist offen. Beim nächsten Nachweis die
+Antwort des Push-Diensts mitschreiben.
+
 ### 2026-11-21 — make seed legt die Beispiel-GV fest am 19.03.2027 an; danach antwortet niemand mehr
 
 **Thema:** Tests

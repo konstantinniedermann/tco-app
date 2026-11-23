@@ -59,3 +59,11 @@ export async function warteAufMail(
 	}
 	throw new Error(`Keine Mail «${betreff}» mit «${inhalt}» in Mailpit angekommen`);
 }
+
+/**
+ * Texte aller Mails an `adresse` mit diesem Betreff, die schon da sind. Nur nach `warteAufMail` auf
+ * eine spätere Mail aussagekräftig: Meldungen gehen ohne Warten hinaus (FR-56, keine Meldung).
+ */
+export async function mailTexte(adresse: string, betreff: string): Promise<string[]> {
+	return Promise.all((await sucheMails(adresse, betreff)).map(({ ID }) => mailText(ID)));
+}

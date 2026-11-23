@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { holer, json, type Koerper } from '../../../tests/hilfen/abruf.ts';
+import type { Holen } from '../abruf.ts';
 import {
 	ladeMitglieder,
 	ladeMitglied,
@@ -35,6 +36,7 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 				7,
 				{},
 				{},
+				false,
 				holer(json(409, { fehler: 'vergeben', feld: 'email' })).holen
 			)
 		).toEqual({ art: 'vergeben', feld: 'email' });
@@ -42,13 +44,24 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 
 	it('A-MITGLIED-02: Speichern schickt den geladenen Stand mit, 409 veraltet wird veraltet', async () => {
 		const { aufrufe, holen } = holer(json(409, { fehler: 'veraltet' }));
-		expect(await speichereAngaben(7, { ort: 'Aarau' }, { ort: 'Olten' }, holen)).toEqual({
+		expect(await speichereAngaben(7, { ort: 'Aarau' }, { ort: 'Olten' }, false, holen)).toEqual({
 			art: 'veraltet'
 		});
 		expect(aufrufe[0].pfad).toBe('/api/admin/mitglieder/7');
 		expect(JSON.parse(String(aufrufe[0].init.body))).toEqual({
 			ort: 'Aarau',
-			vorher: { ort: 'Olten' }
+			vorher: { ort: 'Olten' },
+			benachrichtigen: false
+		});
+	});
+
+	it('FR-56: Speichern schickt das Häkchen «Mitglied benachrichtigen» mit', async () => {
+		const { aufrufe, holen } = holer(json(200, { geaendert: ['telefon'] }));
+		await speichereAngaben(7, { telefon: '1' }, { telefon: '' }, true, holen);
+		expect(JSON.parse(String(aufrufe[0].init.body))).toEqual({
+			telefon: '1',
+			vorher: { telefon: '' },
+			benachrichtigen: true
 		});
 	});
 
@@ -60,20 +73,48 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 });
 
 describe('Mitgliedschaft: Austritt, Löschung, Auskunft', () => {
-	const aktionen = [
+	// Austritt und Löschen melden nur an Partner und Anfragende, ohne Häkchen (FR-04).
+	const ohneHaekchen = [
 		[erfasseAustritt, 'austritt'],
+		[loescheMitglied, 'loeschen']
+	] as const;
+	// FR-56: Wiedereintritt und Rücknahme schicken das Häkchen «Mitglied benachrichtigen».
+	const mitHaekchen = [
 		[erfasseWiedereintritt, 'wiedereintritt'],
-		[loescheMitglied, 'loeschen'],
 		[nimmLoeschungZurueck, 'loeschen-rueckgaengig']
 	] as const;
+	const aktionen = [
+		...ohneHaekchen.map(([a, p]) => [(id: number, h: Holen) => a(id, h), p] as const),
+		...mitHaekchen.map(([a, p]) => [(id: number, h: Holen) => a(id, false, h), p] as const)
+	];
 
-	it.each(aktionen)('schickt ein leeres JSON an den richtigen Pfad (%#)', async (aktion, pfad) => {
-		const h = holer(json(200, {}));
-		expect(await aktion(5, h.holen)).toEqual({ art: 'ok', daten: {} });
-		expect(h.aufrufe[0].pfad).toBe(`/api/admin/mitglieder/5/${pfad}`);
-		expect(h.aufrufe[0].init.method).toBe('POST');
-		expect(h.aufrufe[0].init.body).toBe('{}');
-	});
+	it.each(ohneHaekchen)(
+		'schickt ein leeres JSON an den richtigen Pfad (%#)',
+		async (aktion, pfad) => {
+			const h = holer(json(200, {}));
+			expect(await aktion(5, h.holen)).toEqual({ art: 'ok', daten: {} });
+			expect(h.aufrufe[0].pfad).toBe(`/api/admin/mitglieder/5/${pfad}`);
+			expect(h.aufrufe[0].init.method).toBe('POST');
+			expect(h.aufrufe[0].init.body).toBe('{}');
+		}
+	);
+
+	it.each(mitHaekchen)(
+		'FR-56: schickt das Häkchen an den richtigen Pfad (%#)',
+		async (aktion, pfad) => {
+			const h = holer(json(200, {}));
+			expect(await aktion(5, true, h.holen)).toEqual({ art: 'ok', daten: {} });
+			await aktion(5, false, h.holen);
+			expect(h.aufrufe.map((a) => [a.init.method, a.pfad])).toEqual([
+				['POST', `/api/admin/mitglieder/5/${pfad}`],
+				['POST', `/api/admin/mitglieder/5/${pfad}`]
+			]);
+			expect(h.aufrufe.map((a) => JSON.parse(String(a.init.body)))).toEqual([
+				{ benachrichtigen: true },
+				{ benachrichtigen: false }
+			]);
+		}
+	);
 
 	it.each(aktionen)('409 und weitere Antworten werden eigene Ergebnisse (%#)', async (aktion) => {
 		const mit = <S extends number>(s: S, i: Koerper<S>) => aktion(1, holer(json(s, i)).holen);

@@ -375,13 +375,16 @@ export async function entscheide(
 	});
 }
 
-/** Teil 4, Ziel 3: der CM-Admin korrigiert die Klassierung; der Verlauf nennt ihn (FR-26). */
+/**
+ * Teil 4, Ziel 3: der CM-Admin korrigiert die Klassierung; der Verlauf nennt ihn (FR-26). Der
+ * gleiche Wert ist `unveraendert`, ohne Verlauf.
+ */
 export async function korrigiereKlassierung(
 	db: Db,
 	urheber: CmUrheber,
 	mitgliedId: number,
 	klassierung: Klassierung,
 	jetzt: Date
-): Promise<'ok' | 'nicht-gefunden'> {
+): Promise<'ok' | 'unveraendert' | 'nicht-gefunden'> {
 	return schreibeKlassierung(db, mitgliedId, klassierung, urheber, jetzt);
 }

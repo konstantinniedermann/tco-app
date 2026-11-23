@@ -1,6 +1,7 @@
 // Turniere in der Verwaltung: Turniere, Kategorien, Anmeldungen, Spielersuche, Klassierung und Doppel
 // (Anfragen an `/api/admin/turniere`, `/kategorien`, `/anmeldungen`, `/spieler` und `/anfragen`).
-// Antwort und Abruf stehen in `api.ts`.
+// Antwort und Abruf stehen in `api.ts`. `benachrichtigen` ist das Häkchen «Mitglied benachrichtigen»
+// bzw. «Spieler benachrichtigen» der Rückfrage (FR-56); es geht immer mit, auch beim Weg «Trotzdem …».
 import type { Holen, Json } from '../abruf.ts';
 import type { AnmeldungZeile, SpielerTreffer } from '../server/cm/verwaltung.ts';
 import type { DoppelVerwaltung as ServerDoppelVerwaltung } from '../server/cm/verwaltung-doppel.ts';
@@ -20,6 +21,9 @@ export type KategorieAnsicht = Json<NonNullable<Awaited<ReturnType<typeof Server
 export type { KategorieZeile, TurnierStatus };
 export type { AnmeldungZeile, SpielerTreffer };
 export type DoppelVerwaltung = Json<ServerDoppelVerwaltung>;
+
+const mitTrotzdem = (inhalt: object, trotzdem: boolean) =>
+	trotzdem ? { ...inhalt, trotzdem: true } : inhalt;
 
 export const ladeTurniere = (holen: Holen = fetch) =>
 	lese<TurnierListe>(`${ADMIN}/turniere`, holen);
@@ -62,8 +66,8 @@ export const aendereKategorie = (
 		holen
 	);
 
-export const sageKategorieAb = (id: number, holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/kategorien/${id}/absagen`, {}, holen);
+export const sageKategorieAb = (id: number, benachrichtigen: boolean, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(`${ADMIN}/kategorien/${id}/absagen`, { benachrichtigen }, holen);
 
 /** A-ANMELDUNG-06: aktive Einzel-Anmeldungen der Kategorie, sortiert nach Nachname, Vorname. */
 export const ladeAnmeldungen = (kategorieId: number, holen: Holen = fetch) =>
@@ -73,12 +77,13 @@ export const ladeAnmeldungen = (kategorieId: number, holen: Holen = fetch) =>
 export const meldeVonHandAn = (
 	kategorieId: number,
 	mitgliedId: number,
-	trotzdem = false,
+	trotzdem: boolean,
+	benachrichtigen: boolean,
 	holen: Holen = fetch
 ) =>
 	schicke<Record<string, never>>(
 		`${ADMIN}/kategorien/${kategorieId}/anmeldungen`,
-		trotzdem ? { mitgliedId, trotzdem: true } : { mitgliedId },
+		mitTrotzdem({ mitgliedId, benachrichtigen }, trotzdem),
 		holen
 	);
 
@@ -86,18 +91,27 @@ export const meldeVonHandAn = (
 export const verschiebeAnmeldung = (
 	anmeldungId: number,
 	kategorieId: number,
-	trotzdem = false,
+	trotzdem: boolean,
+	benachrichtigen: boolean,
 	holen: Holen = fetch
 ) =>
 	schicke<Record<string, never>>(
 		`${ADMIN}/anmeldungen/${anmeldungId}`,
-		trotzdem ? { kategorieId, trotzdem: true } : { kategorieId },
+		mitTrotzdem({ kategorieId, benachrichtigen }, trotzdem),
 		holen
 	);
 
 /** FR-46: Löschen zieht die Anmeldung zurück. */
-export const loescheAnmeldung = (anmeldungId: number, holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/anmeldungen/${anmeldungId}/loeschen`, {}, holen);
+export const loescheAnmeldung = (
+	anmeldungId: number,
+	benachrichtigen: boolean,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/anmeldungen/${anmeldungId}/loeschen`,
+		{ benachrichtigen },
+		holen
+	);
 
 /** FR-08: über einen Wildcard-Antrag entscheiden; der freiwillige Grund gilt nur bei Ablehnung. */
 export function entscheideAntrag(
@@ -123,11 +137,12 @@ export const sucheSpieler = (suche: string, holen: Holen = fetch) =>
 export const korrigiereKlassierung = (
 	mitgliedId: number,
 	klassierung: Klassierung,
+	benachrichtigen: boolean,
 	holen: Holen = fetch
 ) =>
 	schicke<Record<string, never>>(
 		`${ADMIN}/spieler/${mitgliedId}/klassierung`,
-		{ klassierung },
+		{ klassierung, benachrichtigen },
 		holen
 	);
 
@@ -135,19 +150,17 @@ export const korrigiereKlassierung = (
 export const ladeDoppel = (kategorieId: number, holen: Holen = fetch) =>
 	lese<DoppelVerwaltung>(`${ADMIN}/kategorien/${kategorieId}/doppel`, holen);
 
-const mitTrotzdem = (inhalt: object, trotzdem: boolean) =>
-	trotzdem ? { ...inhalt, trotzdem: true } : inhalt;
-
 /** FR-46: ein Paar (zwei Mitglieder) oder einen Suchenden (eines) von Hand anmelden. */
 export const meldeDoppelAn = (
 	kategorieId: number,
 	mitgliedIds: [number] | [number, number],
-	trotzdem = false,
+	trotzdem: boolean,
+	benachrichtigen: boolean,
 	holen: Holen = fetch
 ) =>
 	schicke<Record<string, never>>(
 		`${ADMIN}/kategorien/${kategorieId}/doppel`,
-		mitTrotzdem({ mitgliedIds }, trotzdem),
+		mitTrotzdem({ mitgliedIds, benachrichtigen }, trotzdem),
 		holen
 	);
 
@@ -155,12 +168,13 @@ export const meldeDoppelAn = (
 export const legeZusammen = (
 	anmeldungId: number,
 	mitAnmeldungId: number,
-	trotzdem = false,
+	trotzdem: boolean,
+	benachrichtigen: boolean,
 	holen: Holen = fetch
 ) =>
 	schicke<Record<string, never>>(
 		`${ADMIN}/anmeldungen/${anmeldungId}/zusammenlegen`,
-		mitTrotzdem({ mitAnmeldungId }, trotzdem),
+		mitTrotzdem({ mitAnmeldungId, benachrichtigen }, trotzdem),
 		holen
 	);
 
@@ -169,23 +183,33 @@ export const aenderePartner = (
 	anmeldungId: number,
 	bleibtId: number,
 	neuId: number | null,
-	trotzdem = false,
+	trotzdem: boolean,
+	benachrichtigen: boolean,
 	holen: Holen = fetch
 ) =>
 	schicke<Record<string, never>>(
 		`${ADMIN}/anmeldungen/${anmeldungId}/partner`,
-		mitTrotzdem({ bleibtId, neuId }, trotzdem),
+		mitTrotzdem({ bleibtId, neuId, benachrichtigen }, trotzdem),
 		holen
 	);
 
 /** FR-46, FR-48: eine offene Partner-Anfrage als Paar anmelden. */
-export const meldeAnfrageAlsPaarAn = (anfrageId: number, trotzdem = false, holen: Holen = fetch) =>
+export const meldeAnfrageAlsPaarAn = (
+	anfrageId: number,
+	trotzdem: boolean,
+	benachrichtigen: boolean,
+	holen: Holen = fetch
+) =>
 	schicke<Record<string, never>>(
 		`${ADMIN}/anfragen/${anfrageId}/paar`,
-		mitTrotzdem({}, trotzdem),
+		mitTrotzdem({ benachrichtigen }, trotzdem),
 		holen
 	);
 
-/** FR-46, FR-48: eine offene Partner-Anfrage löschen; der Anfragende erfährt es. */
-export const loescheAnfrage = (anfrageId: number, holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/anfragen/${anfrageId}/loeschen`, {}, holen);
+/** FR-46, FR-48: eine offene Partner-Anfrage löschen; mit Häkchen erfährt es der Anfragende. */
+export const loescheAnfrage = (anfrageId: number, benachrichtigen: boolean, holen: Holen = fetch) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/anfragen/${anfrageId}/loeschen`,
+		{ benachrichtigen },
+		holen
+	);

@@ -15,6 +15,7 @@
 	let { data }: PageProps = $props();
 
 	type Dialog = ReturnType<typeof Aktionsdialog>;
+	type Inhaber = PageProps['data']['liste'][number]['mitglieder'][number];
 
 	const anzahl = (n: number) => `${n} ${n === 1 ? 'Mitglied' : 'Mitglieder'}`;
 
@@ -23,6 +24,8 @@
 	let vergabeRolle = $state<Rolle>('cm');
 	let wahl = $state<{ id: number; name: string } | null>(null);
 	let suchlauf = $state(0);
+	// FR-56: An sich selbst geht keine Meldung; dann fehlt das Häkchen und die Aktion schickt `false`.
+	const vergabeMeldbar = $derived(wahl?.id !== data.eigeneMitgliedId);
 	const hatRolle = (rolle: Rolle, id: number) =>
 		data.liste.find((e) => e.rolle === rolle)?.mitglieder.some((m) => m.id === id) ?? false;
 
@@ -35,13 +38,17 @@
 
 	// A-ROLLE-01, RR-03: Entziehen mit Rückfrage; beim eigenen MyTCO-Admin mit Folge.
 	let entziehen = $state<Dialog>();
-	let ziel = $state<{ id: number; name: string; rolle: Rolle } | null>(null);
+	let ziel = $state<(Inhaber & { rolle: Rolle }) | null>(null);
 	const eigenerMytco = $derived(
 		ziel !== null && ziel.rolle === 'mytco' && ziel.id === data.eigeneMitgliedId
 	);
+	// FR-56: Meldung nur an aktive Mitglieder mit offenem Konto, nie an sich selbst.
+	const entzugMeldbar = $derived(
+		ziel !== null && ziel.stand === 'aktiv' && ziel.id !== data.eigeneMitgliedId
+	);
 
-	function oeffneEntziehen(rolle: Rolle, m: { id: number; name: string }) {
-		ziel = { id: m.id, name: m.name, rolle };
+	function oeffneEntziehen(rolle: Rolle, m: Inhaber) {
+		ziel = { id: m.id, name: m.name, rolle, stand: m.stand };
 		entziehen?.oeffne();
 	}
 
@@ -109,7 +116,9 @@
 	titel="{ROLLEN_NAME[vergabeRolle]} vergeben"
 	taste="Vergeben"
 	bereit={wahl !== null}
-	aktion={() => vergibRolle(wahl!.id, vergabeRolle)}
+	benachrichtigen={vergabeMeldbar ? { standard: false } : undefined}
+	aktion={(_, benachrichtigen) =>
+		vergibRolle(wahl!.id, vergabeRolle, vergabeMeldbar && benachrichtigen)}
 	erfolg="{wahl?.name} ist jetzt {ROLLEN_NAME[vergabeRolle]}."
 	folgen={{ 'nicht-gefunden': 'Dieses Mitglied gibt es nicht mehr.' }}
 	onfertig={fertig}
@@ -134,7 +143,9 @@
 	titel="Rolle {ziel ? ROLLEN_NAME[ziel.rolle] : ''} entziehen?"
 	taste="Entziehen"
 	bereit={ziel !== null}
-	aktion={() => entziehRolle(ziel!.id, ziel!.rolle)}
+	benachrichtigen={entzugMeldbar ? { standard: false } : undefined}
+	aktion={(_, benachrichtigen) =>
+		entziehRolle(ziel!.id, ziel!.rolle, entzugMeldbar && benachrichtigen)}
 	erfolg="{ziel?.name} hat die Rolle {ziel ? ROLLEN_NAME[ziel.rolle] : ''} nicht mehr."
 	folgen={{ 'nicht-gefunden': 'Dieses Mitglied gibt es nicht mehr.' }}
 	onfertig={fertig}

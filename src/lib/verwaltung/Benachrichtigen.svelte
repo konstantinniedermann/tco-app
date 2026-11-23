@@ -1,0 +1,20 @@
+<!--
+	FR-56: Häkchen «Mitglied benachrichtigen» in einem Formular oder einer Rückfrage der Verwaltung,
+	als Auswahlfläche über der Haupttaste, in der Karte «Mitgliedschaft» über den Tasten. Es gilt erst
+	mit der Taste (UI-Leitbild, Auswahlfläche); den Standard setzt, wer die Rückfrage öffnet. Wo keine
+	Meldung ankommen kann, lässt die Seite es weg.
+-->
+<script lang="ts">
+	type Props = {
+		an: boolean;
+		/** Im Doppel «Spieler benachrichtigen», in der Karte «Mitgliedschaft» nach der Aktion. */
+		text?: string;
+	};
+
+	let { an = $bindable(), text = 'Mitglied benachrichtigen' }: Props = $props();
+</script>
+
+<label class="auswahl">
+	<input type="checkbox" bind:checked={an} />
+	{text}
+</label>

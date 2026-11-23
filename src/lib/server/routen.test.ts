@@ -219,20 +219,25 @@ const ROUTEN: Record<string, Partial<Record<Methode, Verdrahtung>> | typeof EIGE
 		POST: [postDoppelVonHand, 'mitteilungAdmin']
 	},
 	'/api/admin/mitglieder': { GET: [getMitglieder, 'admin'], POST: [postMitglieder, 'admin'] },
-	'/api/admin/mitglieder/[id]': { GET: [getMitglied, 'admin'], POST: [postMitglied, 'admin'] },
+	'/api/admin/mitglieder/[id]': {
+		GET: [getMitglied, 'admin'],
+		POST: [postMitglied, 'mitteilungAdmin']
+	},
 	'/api/admin/mitglieder/[id]/auskunft': { GET: [getAuskunft, 'admin'] },
 	'/api/admin/mitglieder/[id]/austritt': { POST: [postAustritt, 'mitteilungAdmin'] },
 	'/api/admin/mitglieder/[id]/brief': { POST: [postBriefVerwaltung, 'admin'] },
-	'/api/admin/mitglieder/[id]/loeschen-rueckgaengig': { POST: [postLoeschenRueckgaengig, 'admin'] },
+	'/api/admin/mitglieder/[id]/loeschen-rueckgaengig': {
+		POST: [postLoeschenRueckgaengig, 'mitteilungAdmin']
+	},
 	'/api/admin/mitglieder/[id]/loeschen': { POST: [postLoeschen, 'mitteilungAdmin'] },
 	'/api/admin/mitglieder/[id]/sitzungen': { POST: [postSitzungen, 'admin'] },
-	'/api/admin/mitglieder/[id]/wiedereintritt': { POST: [postWiedereintritt, 'admin'] },
+	'/api/admin/mitglieder/[id]/wiedereintritt': { POST: [postWiedereintritt, 'mitteilungAdmin'] },
 	'/api/admin/mitteilungen': { GET: [getVereinMitteilungen, 'mitteilungAdmin'] },
 	'/api/admin/mitteilungen/senden': { POST: [postVereinSenden, 'mitteilungAdmin'] },
 	'/api/admin/mitteilungen/vorschau': { POST: [postVereinVorschau, 'mitteilungAdmin'] },
 	'/api/admin/rollen': { GET: [getRollen, 'admin'] },
-	'/api/admin/rollen/entziehen': { POST: [postRolleEntziehen, 'admin'] },
-	'/api/admin/rollen/vergeben': { POST: [postRolleVergeben, 'admin'] },
+	'/api/admin/rollen/entziehen': { POST: [postRolleEntziehen, 'mitteilungAdmin'] },
+	'/api/admin/rollen/vergeben': { POST: [postRolleVergeben, 'mitteilungAdmin'] },
 	'/api/admin/spieler': { GET: [getSpieler, 'mitteilungAdmin'] },
 	'/api/admin/spieler/[id]/klassierung': { POST: [postKlassierungVerwaltung, 'mitteilungAdmin'] },
 	'/api/admin/turniere': { GET: [getTurniere, 'admin'], POST: [postTurniere, 'admin'] },

@@ -288,10 +288,11 @@ test('FR-48: offene Anfrage als Paar anmelden und löschen', async ({ page }, in
 	await meldungAn(gian, `Der CM-Admin hat dich mit ${hugo.name} für «${HERREN.name}» angemeldet.`);
 	await meldungAn(hugo, `Der CM-Admin hat dich mit ${gian.name} für «${HERREN.name}» angemeldet.`);
 
-	// Anfrage löschen: Ivo erfährt, dass sie hinfällig ist.
+	// Anfrage löschen: Ivo erfährt, dass sie hinfällig ist (FR-56: Häkchen vorbelegt).
 	await waehleAktion(page, zeile(page, ivo.nachname), 'Löschen');
 	const loeschen = page.getByRole('dialog', { name: 'Anfrage löschen?' });
-	await expect(loeschen).toContainText(`${ivo.name} erfährt es.`);
+	await expect(loeschen.getByRole('checkbox', { name: 'Spieler benachrichtigen' })).toBeChecked();
+	await expect(loeschen).not.toContainText('erfährt es');
 	await loeschen.getByRole('button', { name: 'Löschen', exact: true }).click();
 	await expect(loeschen).toBeHidden();
 	await meldetErfolg(page, 'Anfrage gelöscht.');

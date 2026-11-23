@@ -25,6 +25,7 @@
 		zeitText,
 		fehlerText
 	} from '../../../../lib/verwaltung/anzeige.ts';
+	import Benachrichtigen from '../../../../lib/verwaltung/Benachrichtigen.svelte';
 	import Einstellungen from '../../../../lib/verwaltung/Einstellungen.svelte';
 	import Mitgliedschaft from '../../../../lib/verwaltung/Mitgliedschaft.svelte';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
@@ -52,6 +53,15 @@
 	// Solange die Angaben abweichen, ginge ein Brief an die alte Adresse: erst speichern.
 	let angabenFormular = $state<ReturnType<typeof Angabenformular>>();
 	const angabenUngespeichert = $derived(angabenFormular?.ungespeichert() ?? false);
+	// FR-56: Häkchen «Mitglied benachrichtigen» über «Angaben speichern»; leer, nach jedem
+	// Speichern wieder leer. Nur wo eine Meldung ankommen kann (der Server meldet nur aktiven
+	// Mitgliedern mit offenem Konto, nie dem Admin selbst); sonst fehlt es und schickt `false`.
+	let benachrichtigen = $state(false);
+	const meldbar = $derived(
+		detail.status === 'aktiv' &&
+			detail.login.stand !== 'gesperrt' &&
+			data.eigeneMitgliedId !== detail.id
+	);
 
 	const speichereWerte = (werte: Werte) => einzeln(() => schickeAngaben(werte));
 	async function schickeAngaben(werte: Werte) {
@@ -59,10 +69,11 @@
 		angabenMeldung = null;
 		angabenStoerung = null;
 		veraltetBei = null;
-		const a = await speichereAngaben(detail.id, werte, detail.angaben);
+		const a = await speichereAngaben(detail.id, werte, detail.angaben, meldbar && benachrichtigen);
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok') {
 			angabenMeldung = 'Gespeichert';
+			benachrichtigen = false;
 			await invalidateAll();
 			nachSpeichern += 1;
 		} else if (a.art === 'eingabe') {
@@ -221,7 +232,13 @@
 						rueckmeldung={angabenMeldung}
 						{nurLesen}
 						onspeichern={speichereWerte}
-					/>
+					>
+						{#snippet vorTaste()}
+							{#if meldbar}
+								<Benachrichtigen bind:an={benachrichtigen} />
+							{/if}
+						{/snippet}
+					</Angabenformular>
 				{/key}
 				{#if angabenVeraltet}
 					<p class="fehler" role="alert">{VERALTET}</p>
