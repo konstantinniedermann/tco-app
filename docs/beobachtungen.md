@@ -226,6 +226,8 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** `.tabelle-lang` auf weitere lange Listen übertragen, jeweils mit `.zelle-dehnbar` und einem E2E im schmalsten PC-Fenster. Passt eventuell zu #92 (Spalten sortieren und ziehen).
 
+**Nachtrag 2026-11-23 (#92):** Verlauf und Briefe haben jetzt die *Tabellen-Steuerung* (Box scrollt, Titel kleben in der Box). Offen bleiben Anmeldelisten, Anlass-Antworten, Fairgate, Posteingang und Mitteilungen.
+
 ### 2026-11-23 — Folgen-Schalter: drei kleine Lücken auf Teamseite und Profil
 
 **Thema:** Oberfläche
@@ -249,3 +251,15 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Task 6 und merge-reviewer #81 Teil 3b, Session vom 23.11.2026.
 
 **Einschätzung:** Beim Doku-Abgleich vor dem Release klären: Test-Namen um die ID ergänzen und Status setzen, oder bewusst «geplant» lassen, bis #81 geschlossen ist.
+
+### 2026-11-23 — Design System «MyTCO» steht auf dem Stand vom 09.11., die CSS ist seither aufgeteilt
+
+**Thema:** Oberfläche
+
+**Fundort:** Design-System-Artifact «MyTCO» (`project/tokens.json`, `meta.ref` dev@6b764e8, `basis.css`), `src/lib/design/` (elf Dateien).
+
+**Beobachtung:** Das Design System lädt noch `basis.css`; im Repo ist die CSS inzwischen auf elf Dateien verteilt, und seit dem 09.11. kamen mehrere Bausteine dazu (u. a. Umschalter, Rangliste, Tabellen-Steuerung aus #92). Der Entwurf zu #92 musste darum die CSS direkt aus dem Repo einbinden statt aus dem Design System.
+
+**Ursprung:** Design-Entwurf und Plan zu #92, Session vom 23.11.2026.
+
+**Einschätzung:** Ein eigener Abgleich: alle CSS-Dateien und die neuen Bausteine ins Design System übernehmen (Falle «Design System veröffentlichen» beachten). Grösser als ein Baustein, darum nicht im Branch von #92.

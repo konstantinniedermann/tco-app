@@ -11,6 +11,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Verwaltung: In den Listen Mitglieder, Briefe und Änderungsverlauf sortiert und filtert man am PC
+  direkt im Spaltentitel, und die Spaltenbreite lässt sich ziehen. Briefe zeigen den Jahrgang; der
+  Verlauf sucht mit Filter im ganzen Verlauf (#92).
 - Interclub: Mitglieder folgen Teams auf deren Seite und bekommen nach jedem neuen Endstand einen
   Push. Die gefolgten Teams stehen in Profil › Benachrichtigungen (#81).
 - Verwaltung: Der Code per Mail ist nur noch alle 30 Tage fällig statt täglich. In langen
