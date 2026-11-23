@@ -10,6 +10,9 @@ describe('nichtAusgefuehrteTests', () => {
 			'tests/e2e/c.spec.ts: Testdatei wird von keinem Testprogramm ausgeführt'
 		]);
 	});
+	it('lässt den Prüflauf gegen Test gelten, ohne dass er IDs abdeckt', () => {
+		expect(nichtAusgefuehrteTests(['tests/test-server/pruefung.test.ts'])).toEqual([]);
+	});
 });
 
 describe('fehlendeTests', () => {

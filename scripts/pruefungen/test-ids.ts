@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import {
+	istPruefLauf,
 	istTestquelle,
 	leseDateien,
 	meldeErgebnis,
@@ -60,7 +61,7 @@ export function fehlendeTests(ids: string[], testquellen: string[]): string[] {
 /** Testdateien, die weder Vitest noch Playwright ausführt — sie dürfen keine ID abdecken. */
 export function nichtAusgefuehrteTests(testpfade: string[]): string[] {
 	return testpfade
-		.filter((pfad) => !wirdAusgefuehrt(pfad))
+		.filter((pfad) => !wirdAusgefuehrt(pfad) && !istPruefLauf(pfad))
 		.map((pfad) => `${pfad}: Testdatei wird von keinem Testprogramm ausgeführt`);
 }
 
