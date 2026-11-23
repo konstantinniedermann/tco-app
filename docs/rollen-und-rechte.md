@@ -90,6 +90,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Liste *Briefe*: wer MyTCO noch nie geöffnet hat (A-LOGIN-01) | – | – | – | – | S | L |
 | Neuer Code für einen Brief, Briefe auslösen, Sitzungen beenden | – | – | – | – | S | – |
 | Rollen vergeben und entziehen (Seite *Rollen*) | – | – | – | – | – | S |
+| Rollen anderer Mitglieder sehen (Mitgliederliste, Seite eines Mitglieds) | – | – | – | – | L | L |
 | Änderungsverlauf (FR-26) | – | – | – | – | L | L |
 | Liste *Für Fairgate*: selbst geänderte Kontaktangaben sehen und abhaken (A-KONTO-02, Annahme K-19.2) | – | – | – | – | S | L |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S | L |
@@ -127,6 +128,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Mitteilung zum Anlass senden, Verlauf (FR-42) | – | – | – | – | S | L |
 | **Interclub** | | | | | | |
 | Interclub-Resultate der TCO-Teams mit Einzelpartien: Name und Klassierung der Spieler beider Teams, ohne Rangliste- und Personennummer ([ADR-011](adr/adr-011-interclub-schnittstelle-swiss-tennis.md)) | – | L | L | L | L | L |
+| Interclub-Teams folgen und entfolgen (folgen nur mit Push auf einem Gerät, A-INTERCLUB-02) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | **Verein** | | | | | | |
 | Mitteilung an den Verein senden, Verlauf (FR-42) | – | – | – | – | S | L |
 

@@ -250,10 +250,7 @@ Code ist der Abgleich nie reine Doku: Er setzt die Nummer, sein Commit läuft du
      «Mitglieder-Login» vorgesehen).
 
    Claude wählt nach dieser Regel und nennt Nummer und Grund in der Bitte um Freigabe; die
-   Freigabe des Releases gilt auch für die Nummer. **Das erste Release nach ADR-012 trägt
-   `0.23.0`**: Bei ihm ist `dev` der Nummer von `main` schon voraus; `make release-check`
-   bietet darum auch an, die Einträge in den Abschnitt «0.22.11» nachzurücken. Diesen Weg nicht
-   wählen. Dann
+   Freigabe des Releases gilt auch für die Nummer. Dann
    `npm version minor --no-git-tag-version --ignore-scripts` (bzw. `patch` / `major`), in
    `docs/versionen.md` unter «Unveröffentlicht» einen Abschnitt `## X.Y.Z — <Kurztitel>` anlegen
    und alle Einträge aus «Unveröffentlicht» hineinschieben; «Unveröffentlicht» bleibt leer
@@ -357,7 +354,7 @@ Labels, Aufräumen, Memories.
   vor einem Release (Schritt 4a), nie ein Feature-Branch und nie ein Merge nach `dev`.
 - `docs/beobachtungen.md`: Beide Sessions hängen unter „Offen“ an → bei Konflikt beide neuen
   Einträge behalten. Einträge, die auf der anderen Seite gelöscht sind, bleiben gelöscht: Das ist
-  eine Auswertung, die sie ins Archiv verschoben hat. Ein Nachtrag des eigenen Branches zu einem
+  eine Auswertung, die sie erledigt hat (Ausgang in ihrer Commit-Nachricht). Ein Nachtrag des eigenen Branches zu einem
   solchen Eintrag kommt als neuer Eintrag zurück, nicht der alte Eintrag. Kein `merge=union` — es holt
   bei Konflikten gelöschte Einträge still zurück.
 - Nachrichten zwischen Sessions (`SendMessage`) können vom Empfänger zurückgehalten werden —
