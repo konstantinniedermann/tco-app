@@ -11,6 +11,7 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Abhängigkeiten aktualisiert (Caddy-Image des Servers, neuer Stand). An der App ändert sich nichts.
 - Abhängigkeiten aktualisiert (Node-Basisimage 26-alpine, neuer Stand). An der App ändert sich nichts.
 - Interclub: Die Resultate aktualisieren sich von selbst, in Spielwochen stündlich; ältere
   Saisons ab 2021 kommen nach. Die Übersicht zeigt «Resultat folgt», die Begegnung sagt, wenn
