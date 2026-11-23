@@ -109,7 +109,9 @@ Grundsätze; das Werkzeug wird mit [#39](https://github.com/konstantinniedermann
    älteren Saisons ab 2021 nach, eine Saison und einen Wettbewerb pro Tag, also gut zehn Tage bis
    alles da ist. Ob er läuft, zeigt während der Saison «Stand: …» oben auf der Seite
    *Interclub*, sonst der letzte Versuch der laufenden Saison in der Tabelle `ic_abruf`. Fehlschläge stehen
-   nur mit festem Text im Log («Interclub-Abruf gestört» u. ä.).
+   nur mit festem Text im Log («Interclub-Abruf gestört» u. ä.). Nach jedem Abruf schickt derselbe
+   Takt den Push an die Mitglieder, die einem Team folgen; scheitert das, steht «Interclub-Melden
+   fehlgeschlagen» im Log.
 
 ## Übergabe-Checkliste
 

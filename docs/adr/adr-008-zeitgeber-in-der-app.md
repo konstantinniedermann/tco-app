@@ -48,6 +48,11 @@ nur mit `IC_ABRUF=an` (Test und Live, `betrieb/compose.umgebung.yml`); `ZEITGEBE
 beide ab. Ein Fehlschlag steht als «Interclub-Abruf fehlgeschlagen», «Interclub-Abruf gestört»
 oder «Interclub-Abruf: Form unerwartet» im Log.
 
+Nach jedem Interclub-Abruf, auch wenn er scheitert, meldet derselbe Takt neue Endstände per Push an
+die Mitglieder, die einem beteiligten Team folgen (`meldeEndstaende` in
+`src/lib/server/interclub/melden.ts`, #81 Teil 3b). Ein Fehlschlag steht als «Interclub-Melden
+fehlgeschlagen» im Log.
+
 ## Reevaluations-Trigger
 
 - MyTCO läuft dauerhaft mit mehreren Instanzen oder ohne ständig laufenden Prozess (z. B.

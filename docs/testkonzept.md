@@ -255,6 +255,7 @@ Empfänger. Die Test-Umgebung auf dem Server entsteht mit [#39](https://github.c
 - [x] Löschfristen gebaut (Etappe 3 von #43): Änderungsverlauf nach 12 Monaten (FR-26), Anlass-Antworten ein Jahr nach Beginn des Anlasses (K-50), Austritt plus 1 Jahr (K-38); auf Test prüfen, dass der Zeitgeber läuft (`ZEITGEBER` nicht auf `aus`)
 - [ ] `admin-festlegen` einmal auf Test über `docker compose exec` ausgeführt
 - [ ] Interclub-Abruf auf Test: In `ic_abruf` hat die laufende Saison einen Versuch, der jünger als ein Tag ist (Abfrage per Skript im App-Container, #81). «Stand: …» auf der Seite *Interclub* taugt dafür nur während der Saison: Von Januar bis zur Freigabe des Spielplans zeigt sie die Vorjahressaison mit ihrem letzten Stand
+- [ ] Interclub: Team folgen, nach neuem Endstand mit Spielbericht kommt ein Push (ab Saisonstart Mai 2027, #81)
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 
