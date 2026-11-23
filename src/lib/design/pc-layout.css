@@ -23,8 +23,9 @@
 		position: sticky;
 		top: 0;
 		z-index: 1;
-		margin: calc(-1 * var(--abstand-6)) 0 var(--abstand-3);
-		padding: var(--abstand-6) 0 var(--abstand-3);
+		/* Seitlich etwas breiter als der Inhalt: deckt den Schatten der Tabellen beim Scrollen ab */
+		margin: calc(-1 * var(--abstand-6)) calc(-1 * var(--abstand-2)) var(--abstand-3);
+		padding: var(--abstand-6) var(--abstand-2) var(--abstand-3);
 		background: var(--farbe-hintergrund);
 		border-bottom: var(--rand-duenn) solid var(--farbe-linie);
 	}
@@ -137,6 +138,19 @@
 	.tabelle td {
 		white-space: nowrap;
 		padding-block: var(--abstand-2);
+	}
+
+	/* Lange Liste: Spaltentitel kleben unter dem Seitenkopf (Höhe misst Seitenkopf.svelte). Dafür
+	   ist die Tabelle kein eigener Scrollbereich (clip schneidet nur die runden Ecken); sie muss
+	   darum in ihren Platz passen (.zelle-kurz, .zelle-dehnbar) */
+	.tabelle-lang {
+		overflow: clip;
+	}
+
+	.tabelle-lang th {
+		position: sticky;
+		top: var(--hoehe-seitenkopf, 0);
+		z-index: 1;
 	}
 
 	/* Tasten in der Zeile brechen nie um, auch wo eine Zelle den Umbruch wieder erlaubt */

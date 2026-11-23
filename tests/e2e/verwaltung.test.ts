@@ -834,3 +834,29 @@ test('Band «Ansicht als …» und feste Kopfleiste überlappen nicht', async ({
 	await expect(band(page)).toBeInViewport();
 	expect(fehler).toEqual([]);
 });
+
+test('Tabelle: am PC bleiben die Spaltentitel der Mitgliederliste beim Scrollen sichtbar und frei', async ({
+	page
+}, info) => {
+	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: Seitenkopf und Spaltentitel kleben nur ab 60rem
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeRollenkontoMitBriefCodeAn('Lotte', ['mitglieder']);
+	for (let i = 0; i < 15; i++) await legeKontoAn('Liste', `Scrolltest ${i}`);
+	await oeffneVerwaltung(page, admin);
+	// Schmalstes PC-Fenster: Die Seitenleiste nimmt Platz, die Tabelle muss trotzdem passen
+	await page.setViewportSize({ width: 1000, height: 500 });
+	await scrolleFenster(page, 'unten');
+	expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(200);
+	// Nichts liegt über den Spaltentiteln, auch nicht der Seitenkopf; die letzte Spalte ist nicht
+	// abgeschnitten
+	for (const name of ['Name', 'Aktion']) {
+		const spalte = page.getByRole('columnheader', { name });
+		await expect(spalte).toBeInViewport();
+		await spalte.click({ trial: true, timeout: 2000 });
+	}
+	await page
+		.getByRole('link', { name: /^Bearbeiten: / })
+		.last()
+		.click({ trial: true });
+	expect(fehler).toEqual([]);
+});
