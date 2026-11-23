@@ -4,6 +4,7 @@ import {
 	filtere,
 	hatTabellenwerte,
 	inAdresse,
+	gueltigeGrenze,
 	klemme,
 	ladeBreiten,
 	naechsteSortierung,
@@ -11,7 +12,7 @@ import {
 	speichereBreiten,
 	type Spalte
 } from './tabelle.ts';
-import { erinnere, merke } from './tabellen-gedaechtnis.ts';
+import { erinnere, merke, startStand, vergissTabellen } from './tabellen-gedaechtnis.ts';
 
 type Z = {
 	name: string | null;
@@ -346,5 +347,50 @@ describe('Gedächtnis', () => {
 		});
 		expect(erinnere('verlauf-test')?.filter).toEqual({ wer: { art: 'text', text: 'Studer' } });
 		expect(erinnere('mitglieder-test')?.suche).toBe('kel');
+	});
+});
+
+describe('#92 Nachbesserung', () => {
+	it('gueltigeGrenze: Jahrgang nur vierstellig, Tag nur ab 1900 und gültig', () => {
+		expect(gueltigeGrenze('ganz', '2010')).toBe('2010');
+		for (const halb of ['2', '20', '201', '20100', 'abc', ''])
+			expect(gueltigeGrenze('ganz', halb)).toBeNull();
+		expect(gueltigeGrenze('datum', '2026-10-01')).toBe('2026-10-01');
+		for (const halb of ['0002-10-01', '0202-10-01', '1899-12-31', '2026-02-30', '2026-1-01'])
+			expect(gueltigeGrenze('datum', halb)).toBeNull();
+		expect(ausAdresse(new URLSearchParams('jahrgang=20..2014'), SPALTEN).filter).toEqual({
+			jahrgang: { art: 'bereich', von: null, bis: '2014' }
+		});
+	});
+
+	it('startStand: Adresse ohne Werte → Gedächtnis; passt die Adresse zum Gedächtnis → Gedächtnis samt Text; sonst die Adresse', () => {
+		const gemerkt = {
+			sortierung: { spalte: 'name', richtung: 'ab' as const },
+			filter: {
+				konto: { art: 'werte' as const, werte: ['aktiv'] },
+				name: { art: 'text' as const, text: 'Keller' }
+			},
+			suche: 'kel'
+		};
+		expect(startStand(new URLSearchParams(''), SPALTEN, gemerkt)).toEqual(gemerkt);
+		expect(
+			startStand(new URLSearchParams('konto=aktiv&sort=name&richtung=ab'), SPALTEN, gemerkt)
+		).toEqual(gemerkt);
+		expect(startStand(new URLSearchParams('konto=ohne-brief'), SPALTEN, gemerkt)).toEqual({
+			sortierung: null,
+			filter: { konto: { art: 'werte', werte: ['ohne-brief'] } },
+			suche: ''
+		});
+		expect(startStand(new URLSearchParams('konto=aktiv'), SPALTEN, undefined)).toEqual({
+			sortierung: null,
+			filter: { konto: { art: 'werte', werte: ['aktiv'] } },
+			suche: ''
+		});
+	});
+
+	it('vergissTabellen leert das Gedächtnis', () => {
+		merke('x-test', { sortierung: null, filter: {} });
+		vergissTabellen();
+		expect(erinnere('x-test')).toBeUndefined();
 	});
 });

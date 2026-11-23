@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { afterNavigate } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
@@ -12,7 +13,11 @@
 	import { sortiere } from '../../../lib/verwaltung/tabelle.ts';
 	import { Tabellenstand } from '../../../lib/verwaltung/tabellen-stand.svelte.ts';
 	import { leiteUm } from '../../../lib/verwaltung/umleiten.ts';
-	import { VERLAUF_SPALTEN, verlaufAbfrage } from '../../../lib/verwaltung/verlauf-spalten.ts';
+	import {
+		VERLAUF_SPALTEN,
+		verlaufAbfrage,
+		verlaufGedaechtnis
+	} from '../../../lib/verwaltung/verlauf-spalten.ts';
 	import type { PageProps } from './$types';
 
 	// Den Verlauf lädt `+page.ts` vor dem Anzeigen, auch nach einem Wechsel von «nur dieses
@@ -24,8 +29,16 @@
 	let zeilen = $derived.by(() => (zuletzt = data.zeilen ?? zuletzt));
 	let fehler = $derived(data.zeilen === null ? MELDUNG.stoerung : null);
 
-	const stand = new Tabellenstand('verlauf', '/verwaltung/verlauf', VERLAUF_SPALTEN, page.url);
-	onMount(() => stand.sichere());
+	// Der Verlauf eines einzelnen Mitglieds hat ein eigenes Gedächtnis (`verlaufGedaechtnis`).
+	const stand = $derived(
+		new Tabellenstand(
+			verlaufGedaechtnis(mitglied),
+			'/verwaltung/verlauf',
+			VERLAUF_SPALTEN,
+			untrack(() => page.url)
+		)
+	);
+	afterNavigate(() => stand.sichere());
 	// Der Server hat schon gefiltert; hier wird nur noch sortiert.
 	const gezeigt = $derived(sortiere(zeilen, VERLAUF_SPALTEN, stand.sortierung));
 
@@ -91,7 +104,9 @@
 </Seiteninfo>
 <p class="leise">
 	{stand.gefiltert
-		? 'Die neuesten 100 Treffer im ganzen Verlauf, neueste zuerst.'
+		? mitglied === undefined
+			? 'Die neuesten 100 Treffer im ganzen Verlauf, neueste zuerst.'
+			: 'Nur dieses Mitglied, die neuesten 100 Treffer, neueste zuerst.'
 		: mitglied === undefined
 			? 'Die letzten 100 Einträge, neueste zuerst.'
 			: 'Nur dieses Mitglied, neueste zuerst.'}
@@ -106,7 +121,7 @@
 
 <Tabellenkopfzeile {stand} {anzahl} />
 
-<div class="tabelle tabelle-lang tabelle-steuerung">
+<div class="tabelle tabelle-lang tabelle-steuerung" {@attach stand.box}>
 	<table {@attach stand.gesamtbreite}>
 		<colgroup>
 			{#each stand.spalten as s (s.schluessel)}

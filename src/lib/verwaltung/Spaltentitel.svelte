@@ -1,5 +1,5 @@
 <script lang="ts" generics="Z">
-	import type { FilterWert } from './tabelle.ts';
+	import { gueltigeGrenze, type FilterWert } from './tabelle.ts';
 	import type { Tabellenstand } from './tabellen-stand.svelte.ts';
 
 	// Baustein Tabellen-Steuerung (UI-Leitbild): ein Spaltentitel mit Sortiertaste, Trichter mit
@@ -49,13 +49,15 @@
 		setze(neu.length > 0 ? { art: 'werte', werte: neu } : undefined);
 	}
 
+	// Halb getippte Grenzen («20») filtern noch nicht: sonst verschwinden beim Tippen alle Zeilen
+	// (und in den Briefen die Auswahl). Leeres Feld hebt die Grenze auf.
 	function setzeBereich(teil: 'von' | 'bis', roh: string) {
 		const art = spalte?.filter;
-		const gueltig =
-			art?.art === 'bereich' &&
-			(art.zahl === 'ganz' ? /^\d{1,4}$/.test(roh) : /^\d{4}-\d{2}-\d{2}$/.test(roh));
+		if (art?.art !== 'bereich') return;
+		const grenze = roh === '' ? null : gueltigeGrenze(art.zahl, roh);
+		if (roh !== '' && grenze === null) return;
 		const alt = filter?.art === 'bereich' ? filter : { von: null, bis: null };
-		const neu = { ...alt, [teil]: gueltig ? roh : null };
+		const neu = { ...alt, [teil]: grenze };
 		setze(
 			neu.von === null && neu.bis === null
 				? undefined

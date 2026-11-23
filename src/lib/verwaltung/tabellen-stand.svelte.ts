@@ -5,7 +5,6 @@ import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import type { Attachment } from 'svelte/attachments';
 import {
-	ausAdresse,
 	filtere,
 	klemme,
 	ladeBreiten,
@@ -18,7 +17,7 @@ import {
 	type Sortierung,
 	type Spalte
 } from './tabelle.ts';
-import { erinnere, merke } from './tabellen-gedaechtnis.ts';
+import { erinnere, merke, startStand } from './tabellen-gedaechtnis.ts';
 
 const TAG = /^(\d{4})-(\d{2})-(\d{2})$/;
 const tagText = (iso: string) => iso.replace(TAG, '$3.$2.$1');
@@ -41,6 +40,7 @@ export class Tabellenstand<Z> {
 	filter = $state<Filter>({});
 	suche = $state('');
 	breiten = $state<Record<string, number>>({});
+	#scroll: { oben: number; links: number } | undefined;
 
 	/** `url`: die sichtbare Adresse der Seite (`page.url`). */
 	constructor(
@@ -52,7 +52,8 @@ export class Tabellenstand<Z> {
 		this.tabelle = tabelle;
 		this.pfad = pfad;
 		this.spalten = spalten;
-		const stand = erinnere(tabelle) ?? { ...ausAdresse(url.searchParams, spalten), suche: '' };
+		const stand = startStand(url.searchParams, spalten, erinnere(tabelle));
+		this.#scroll = stand.scroll;
 		this.sortierung = stand.sortierung;
 		this.filter = stand.filter;
 		this.suche = stand.suche ?? '';
@@ -88,12 +89,6 @@ export class Tabellenstand<Z> {
 
 	leereFilter(): void {
 		this.filter = {};
-		this.sichere();
-	}
-
-	/** Für die Suche über der Tabelle: nur ins Gedächtnis, nie in die Adresse. */
-	setzeSuche(text: string): void {
-		this.suche = text;
 		this.sichere();
 	}
 
@@ -148,9 +143,32 @@ export class Tabellenstand<Z> {
 		});
 	}
 
-	/** Gedächtnis und Adresse nachführen; die Seite ruft es auch einmal beim Einhängen auf. */
+	/** Hält die Scroll-Lage der Box im Gedächtnis und stellt sie beim Einhängen wieder her. */
+	readonly box: Attachment<HTMLElement> = (el) => {
+		if (this.#scroll) {
+			el.scrollTop = this.#scroll.oben;
+			el.scrollLeft = this.#scroll.links;
+		}
+		const merkeLage = () => {
+			this.#scroll = { oben: el.scrollTop, links: el.scrollLeft };
+			this.merkeStand();
+		};
+		el.addEventListener('scroll', merkeLage, { passive: true });
+		return () => el.removeEventListener('scroll', merkeLage);
+	};
+
+	private merkeStand(): void {
+		merke(this.tabelle, {
+			sortierung: this.sortierung,
+			filter: this.filter,
+			suche: this.suche,
+			scroll: this.#scroll
+		});
+	}
+
+	/** Gedächtnis und Adresse nachführen; die Seite ruft es auch nach jedem Seitenwechsel auf. */
 	sichere(): void {
-		merke(this.tabelle, { sortierung: this.sortierung, filter: this.filter, suche: this.suche });
+		this.merkeStand();
 		const alt = location.search.replace(/^\?/, '');
 		const neu = suchteil(alt, this.spalten, this.sortierung, this.filter);
 		if (neu === alt) return;

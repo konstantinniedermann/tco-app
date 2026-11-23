@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
+	import { afterNavigate } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import { page } from '$app/state';
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import Spaltentitel from '../../../lib/verwaltung/Spaltentitel.svelte';
@@ -88,7 +89,7 @@
 	const TITEL = ['nummer', 'name', 'email', 'jahrgang', 'rollen', 'konto'];
 
 	const stand = new Tabellenstand('mitglieder', '/verwaltung/mitglieder', SPALTEN, page.url);
-	onMount(() => stand.sichere());
+	afterNavigate(() => stand.sichere());
 
 	async function lade(s: string, st: string) {
 		const nr = ++abfrage;
@@ -177,7 +178,7 @@
 
 <Tabellenkopfzeile {stand} {anzahl} />
 
-<div class="tabelle tabelle-lang tabelle-steuerung">
+<div class="tabelle tabelle-lang tabelle-steuerung" {@attach stand.box}>
 	<table {@attach stand.gesamtbreite}>
 		<colgroup>
 			{#each stand.spalten as s (s.schluessel)}

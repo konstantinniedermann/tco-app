@@ -1,8 +1,11 @@
 import { leiteUmBeimLaden } from '../../../lib/login/waechter.ts';
 import { ladeVerlauf } from '../../../lib/verwaltung/mitglieder-api.ts';
-import { ausAdresse } from '../../../lib/verwaltung/tabelle.ts';
-import { erinnere } from '../../../lib/verwaltung/tabellen-gedaechtnis.ts';
-import { VERLAUF_SPALTEN, verlaufAbfrage } from '../../../lib/verwaltung/verlauf-spalten.ts';
+import { erinnere, startStand } from '../../../lib/verwaltung/tabellen-gedaechtnis.ts';
+import {
+	VERLAUF_SPALTEN,
+	verlaufAbfrage,
+	verlaufGedaechtnis
+} from '../../../lib/verwaltung/verlauf-spalten.ts';
 import type { PageLoad } from './$types';
 
 // Läuft nur im Browser (ssr = false). «?mitglied=<id>» zeigt nur die Einträge dieses Mitglieds; der
@@ -13,9 +16,12 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ fetch, url }) => {
 	const roh = url.searchParams.get('mitglied');
 	const mitglied = roh !== null && /^\d+$/.test(roh) ? Number(roh) : undefined;
-	// #92: Filter aus dem Gedächtnis des Tabs (auch Text), sonst aus der Adresse (ohne Text).
-	const filter =
-		erinnere('verlauf')?.filter ?? ausAdresse(url.searchParams, VERLAUF_SPALTEN).filter;
+	// #92: Filter aus Adresse und Gedächtnis des Tabs (startStand); Text nur aus dem Gedächtnis.
+	const filter = startStand(
+		url.searchParams,
+		VERLAUF_SPALTEN,
+		erinnere(verlaufGedaechtnis(mitglied))
+	).filter;
 	const a = await ladeVerlauf(verlaufAbfrage(filter, mitglied), fetch);
 	leiteUmBeimLaden(a, 'verwaltung');
 	return { mitglied, zeilen: a.art === 'ok' ? a.daten : null };

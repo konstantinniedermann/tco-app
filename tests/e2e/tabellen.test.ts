@@ -276,7 +276,8 @@ test('#92: Briefe zeigen den Jahrgang, filtern und wählen nur Gezeigte', async 
 	await expect(page.getByRole('button', { name: 'Briefe erzeugen (2)' })).toBeVisible();
 
 	await page.getByRole('button', { name: 'Jahrgang filtern' }).click();
-	await page.getByLabel('Bis').fill('2010');
+	// Tippen wie von Hand: «2», «20», «201» filtern noch nicht und werfen keine Auswahl weg.
+	await page.getByLabel('Bis').pressSequentially('2010', { delay: 300 });
 	await pruefeBildschirm(page, info, 'briefe-filter-offen');
 	await page.keyboard.press('Escape');
 	await expect(zeilen(page, nachname)).toHaveCount(2);
@@ -326,8 +327,50 @@ test('#92: Verlauf filtert auf dem Server und behält die Ansicht', async ({ pag
 	await expect(page.getByText(`Mitglied: ${nachname}`)).toBeVisible();
 	await expect(page.getByText('Was: Rolle vergeben')).toBeVisible();
 
+	// Der Verlauf eines einzelnen Mitglieds hat ein eigenes Gedächtnis: Der Filter «Mitglied» von
+	// oben leert ihn nicht.
+	await page
+		.getByRole('navigation', { name: 'Verwaltung' })
+		.getByRole('link', { name: 'Mitglieder' })
+		.click();
+	await page.getByRole('link', { name: 'Bearbeiten: Muster, Tanja' }).click();
+	await page.getByRole('link', { name: 'Ganzer Verlauf ›' }).click();
+	await expect(page).toHaveURL(/mitglied=\d+/);
+	await expect(
+		tabelle(page).getByRole('row').filter({ hasText: 'Muster, Tanja' }).first()
+	).toBeVisible();
+	await page.goBack();
+	await page.goBack();
+	await page.goBack();
+	await expect(page.getByText(`Mitglied: ${nachname}`)).toBeVisible();
+
 	await page.reload();
 	await expect(page.getByText('Was: Rolle vergeben')).toBeVisible();
 	await expect(page.getByText(`Mitglied: ${nachname}`)).toBeHidden();
+	expect(fehler).toEqual([]);
+});
+
+test('#92: nach Zurück steht die Liste an derselben Stelle', async ({ page }, info) => {
+	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: die Box scrollt erst ab 60rem für sich
+	const fehler = sammleKonsolenfehler(page);
+	const nachname = zufall();
+	const admin = await legeRollenkontoMitBriefCodeAn('Timo', ['mitglieder']);
+	for (let i = 10; i < 40; i++) await legeKontoAn(`Person${i}`, nachname);
+	await page.setViewportSize({ width: 1280, height: 600 });
+	await oeffneVerwaltung(page, admin);
+	await wartetAufMitgliederliste(page);
+	await filtereText(page, 'Name', nachname);
+	await expect(zeilen(page, nachname)).toHaveCount(30);
+	const box = page.locator('.tabelle-steuerung');
+	await box.evaluate((e) => {
+		e.scrollTop = e.scrollHeight;
+	});
+	const unten = await box.evaluate((e) => e.scrollTop);
+	expect(unten).toBeGreaterThan(200);
+	await page.getByRole('link', { name: `Bearbeiten: ${nachname}, Person39` }).click();
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('Person39');
+	await page.goBack();
+	await expect(zeilen(page, nachname)).toHaveCount(30);
+	await expect.poll(() => box.evaluate((e) => e.scrollTop)).toBeGreaterThan(unten - 50);
 	expect(fehler).toEqual([]);
 });

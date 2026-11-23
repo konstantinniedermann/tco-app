@@ -61,6 +61,10 @@ export const VERLAUF_SPALTEN: Spalte<VerlaufEintrag>[] = [
 	}
 ];
 
+/** Name des Gedächtnisses: der ganze Verlauf und jedes einzelne Mitglied je für sich. */
+export const verlaufGedaechtnis = (mitglied: number | undefined) =>
+	mitglied === undefined ? 'verlauf' : `verlauf-${mitglied}`;
+
 /** Die Abfrage an den Server aus dem Filter der Seite; leere Filter fallen weg. */
 export function verlaufAbfrage(filter: Filter, mitglied: number | undefined): VerlaufAbfrage {
 	const a: VerlaufAbfrage = {};

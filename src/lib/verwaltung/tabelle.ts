@@ -110,9 +110,13 @@ function gueltigerTag(t: string): boolean {
 	return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === t;
 }
 
-function grenze(art: 'ganz' | 'datum', t: string): string | null {
-	if (art === 'ganz') return /^\d{1,4}$/.test(t) ? String(Number(t)) : null;
-	return gueltigerTag(t) ? t : null;
+/**
+ * Eine ganze Grenze eines Bereichs, sonst `null`: Jahrgang vierstellig, Tag gültig und ab 1900.
+ * Halb getippte Werte («20», «0202-10-01») gelten nicht, damit sie nicht schon filtern.
+ */
+export function gueltigeGrenze(art: 'ganz' | 'datum', t: string): string | null {
+	if (art === 'ganz') return /^\d{4}$/.test(t) ? t : null;
+	return gueltigerTag(t) && Number(t.slice(0, 4)) >= 1900 ? t : null;
 }
 
 /** Liest Sortierung, Häkchen- und Bereichsfilter; Unbekanntes und Kaputtes fällt still weg. */
@@ -136,8 +140,8 @@ export function ausAdresse<Z>(
 		} else if (s.filter.art === 'bereich') {
 			const teile = roh.split(BIS);
 			if (teile.length !== 2) continue;
-			const von = grenze(s.filter.zahl, teile[0]);
-			const bis = grenze(s.filter.zahl, teile[1]);
+			const von = gueltigeGrenze(s.filter.zahl, teile[0]);
+			const bis = gueltigeGrenze(s.filter.zahl, teile[1]);
 			if (von !== null || bis !== null) filter[s.schluessel] = { art: 'bereich', von, bis };
 		}
 	}
@@ -180,7 +184,7 @@ export function suchteil<Z>(
 	return inAdresse(new URLSearchParams(alt), spalten, s, f).toString();
 }
 
-/** Steht etwas von dieser Tabelle in der Adresse (dann gilt die Adresse, nicht das Gedächtnis)? */
+/** Steht etwas von dieser Tabelle in der Adresse (Sortierung, Häkchen oder Bereich)? */
 export function hatTabellenwerte<Z>(
 	q: Pick<URLSearchParams, 'get'>,
 	spalten: readonly Spalte<Z>[]

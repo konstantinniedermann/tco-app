@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
 	import Seiteninfo from '../../../lib/verwaltung/Seiteninfo.svelte';
-	import { invalidateAll } from '$app/navigation';
+	import { afterNavigate, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
-	import { onMount, tick, untrack } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import Spaltentitel from '../../../lib/verwaltung/Spaltentitel.svelte';
 	import Tabellenkopfzeile from '../../../lib/verwaltung/Tabellenkopfzeile.svelte';
 	import type { Spalte } from '../../../lib/verwaltung/tabelle.ts';
@@ -75,7 +75,7 @@
 	];
 	const TITEL = ['name', 'nummer', 'jahrgang', 'brief'];
 	const stand = new Tabellenstand('briefe', '/verwaltung/briefe', SPALTEN, page.url);
-	onMount(() => stand.sichere());
+	afterNavigate(() => stand.sichere());
 	const gezeigt = $derived(stand.zeige(zeilen));
 	const anzahlen = $derived(
 		Object.fromEntries(
@@ -204,7 +204,7 @@
 	{:else}
 		<Tabellenkopfzeile {stand} {anzahl} />
 		{#if darfErzeugen}
-			<div class="tabelle tabelle-lang tabelle-steuerung">
+			<div class="tabelle tabelle-lang tabelle-steuerung" {@attach stand.box}>
 				<table {@attach stand.gesamtbreite}>
 					<colgroup>
 						{#each stand.spalten as s (s.schluessel)}
@@ -256,6 +256,7 @@
 			<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 			<div
 				class="tabelle tabelle-lang tabelle-steuerung"
+				{@attach stand.box}
 				role="region"
 				aria-label="Briefe"
 				tabindex="0"
