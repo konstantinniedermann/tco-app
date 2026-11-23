@@ -171,9 +171,10 @@ mit erfundenen Personas ([Testgruppe](testgruppe.md)).
   ankommen. Die Adresse sehen auch die Admin-Personas, die die Persona anlegen und verwalten.
   Versand über einen Anbieter in der Schweiz oder EU (DS-01). Gelöscht beim Neuaufsetzen von
   Test nach dem Lauf. Zweite Adressen fürs «E-Mail ändern» gelten gleich.
-- **Mail-Fänger:** Mails an alle anderen Adressen (die erfundenen Konten der Testdaten) landen
-  weiter im Mail-Fänger hinter dem Test-Passwort. Damit darüber niemand in die Verwaltung mit den
-  echten Adressen kommt, haben diese Konten während des Laufs keine Admin-Rolle.
+- **Erfundene Konten der Testdaten:** Ihre Mails werden weiter umgeleitet (heute in den
+  Mail-Fänger hinter dem Test-Passwort). Damit darüber niemand in die Verwaltung mit den echten
+  Adressen kommt, haben diese Konten während des Laufs keine Admin-Rolle; die Regie arbeitet mit
+  einer eigenen Persona.
 - **Test-Passwort:** Die Testpersonen bekommen es und sehen damit auch die öffentlichen
   Interclub-Resultate mit Spielernamen (DS-08).
 - **Liste der Testpersonen** (Name, Persona, Gerät, Softwareversion, Mail-Adresse,
