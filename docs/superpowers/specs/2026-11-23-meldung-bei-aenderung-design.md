@@ -57,7 +57,7 @@ benachrichtigen» (Entscheid Projektleiter, 23.11.2026).
 
 | Anlass | Titel | Text | Link |
 |---|---|---|---|
-| Profil | Dein Profil | Die Verwaltung hat dein Profil geändert: Telefon, Strasse. | `/profil` |
+| Profil | Dein Profil | Die Verwaltung hat dein Profil geändert: Strasse, Telefon. | `/profil` |
 | Rolle vergeben | MyTCO | Du hast neu die Rolle «CM-Admin». | Startseite |
 | Rolle entzogen | MyTCO | Deine Rolle «CM-Admin» wurde entfernt. | Startseite |
 | Wiedereintritt / Rücknahme | MyTCO | Dein Zugang zu MyTCO ist wieder offen. | Startseite |
@@ -71,6 +71,9 @@ Feldnamen in der Meldung wie die Beschriftungen im Formular der Verwaltung (`FEL
 - Profil des Mitglieds (Verwaltung): Häkchen über dem Speichern-Knopf.
 - Rollen, Wiedereintritt, Rücknahme, CM-Aktionen: Häkchen im `Aktionsdialog` der Aktion bzw. in
   der bestehenden Rückfrage; nur Tokens und Bausteine aus `docs/ui-leitbild.md`.
+- Wiedereintritt und Rücknahme: Häkchen in der Karte «Mitgliedschaft», über den Knöpfen der Aktion.
+- Kategorie absagen: Häkchen nur bei Doppel-Kategorien (nur dort kann eine offene Partner-Anfrage
+  wegfallen).
 - Seiteninfo der betroffenen Seiten prüfen und neuen Text dem Projektleiter zeigen.
 
 ## Datenschutz

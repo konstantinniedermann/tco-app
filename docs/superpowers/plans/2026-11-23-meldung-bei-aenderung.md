@@ -85,7 +85,7 @@
 - Produces: `type Meldung = { titel: string; text: string; pfad: string }`; `profilMeldung(geaendert: Feld[]): Meldung`, `rolleMeldung(rolle: Rolle, art: 'vergeben' | 'entzogen'): Meldung`, `zugangMeldung(): Meldung`; `meldeVerwaltung(d: MitteilungAdminDienste, urheber: AdminUrheber, mitgliedId: number, m: Meldung): void` (Selbst-Ausnahme, still, ohne Warten — wie `cm/verwaltung-meldung.ts`).
 
 - [ ] **Step 1: Tests (DB)** in `schnittstellen.db.test.ts`, Dienste mit `push: null` und Mail-Attrappe wie in `cm/verwaltung-schnittstellen.db.test.ts:baue`:
-  - `FR-56: mit benachrichtigen meldet die Änderung ohne Wert` → Mail an das Mitglied, Betreff `Dein Profil`, Text beginnt mit `Die Verwaltung hat dein Profil geändert: Telefon, Strasse.`, enthält den neuen Wert nicht.
+  - `FR-56: mit benachrichtigen meldet die Änderung ohne Wert` → Mail an das Mitglied, Betreff `Dein Profil`, Text beginnt mit `Die Verwaltung hat dein Profil geändert: Strasse, Telefon.`, enthält den neuen Wert nicht.
   - `FR-56: ohne Angabe keine Meldung` (Review Focus 1).
   - `FR-56: nichts geändert, keine Meldung` (Review Focus 3).
   - `FR-56: eigenes Profil, keine Meldung`.

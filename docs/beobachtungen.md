@@ -121,6 +121,39 @@ Letzte Auswertung: 22.11.2026 (nur Entscheide)
 
 ## Offen
 
+### 2026-11-23 — Dialog «Von Hand anmelden» im Doppel ist höher als ein iPhone-Fenster
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/lib/verwaltung/DoppelListe.svelte` (Rückfrage «Von Hand anmelden»), Seite
+`verwaltung/turniere/[id]/kategorien/[kid]` einer Doppel-Kategorie.
+
+**Beobachtung:** Schon vor #94 ist der Inhalt des Dialogs auf dem iPhone höher als das Fenster
+(891 px Inhalt in 617 px, Android 1017 in 797 px). Nach dem Klick auf «Anmelden» schiebt die
+Liste der Warnungen die Knöpfe aus dem sichtbaren Bereich; erreichbar sind sie nur durch Scrollen
+im Dialog.
+
+**Ursprung:** #94, beim E2E der Doppel-Aktionen mit dem Häkchen «Spieler benachrichtigen».
+
+**Einschätzung:** Vorläufig. Bedienbar, aber leicht zu übersehen; denkbar: Warnungen über den
+Feldern zeigen oder nach der Warnung zu den Knöpfen scrollen.
+
+### 2026-11-23 — Häkchen in «Mitgliedschaft» steht bei Ausgetretenen auch über «Mitglied löschen»
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/lib/verwaltung/Mitgliedschaft.svelte` (`loginKommtZurueck` → `Benachrichtigen`
+über der Leiste), Seite `verwaltung/mitglieder/[id]`, Status *ausgetreten*.
+
+**Beobachtung:** Das Häkchen «Mitglied benachrichtigen» steht über beiden Knöpfen «Wiedereintritt
+erfassen» und «Mitglied löschen», wirkt aber nur beim Wiedereintritt. Beim Vormerken zum Löschen
+gibt es keine Meldung (FR-56).
+
+**Ursprung:** #94, Review der Karte «Mitgliedschaft».
+
+**Einschätzung:** Vorläufig. Beschriftung präziser fassen (z. B. «Mitglied über den Wiedereintritt
+benachrichtigen») oder das Häkchen näher an den Knopf rücken.
+
 ### 2026-11-21 — make seed legt die Beispiel-GV fest am 19.03.2027 an; danach antwortet niemand mehr
 
 **Thema:** Tests
