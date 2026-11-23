@@ -26,6 +26,10 @@ Lauf.
 - [ ] Datenschutzerklärung auf Live erreichbar (DS-09), Hinweis an die alte E-Mail-Adresse gebaut (FR-25)
 - [ ] Kontaktangabe für Fragen geklärt (K-21)
 - [ ] Vorabversion 0.x auf Live, Checkliste auf Test abgehakt
+- [ ] Volle Runde der [Checkliste](testkonzept.md#checkliste-vor-dem-release) einmal ganz, auch die Android-Runde, die solange Live aus ist ausgesetzt werden darf
+- [ ] Auf Live: Ein neuer Code per E-Mail kommt an und landet nicht im Spam, bei den Mailanbietern der Testpersonen (A-LOGIN-10). Auf Test nicht prüfbar: Dort gehen alle Mails in den Mail-Fänger
+- [ ] Steht ein Einrichtungsabend an: mobile Daten statt Club-WLAN, oder die Grenzen pro IP vorher prüfen ([ADR-004](adr/adr-004-login-einmal-code.md), Restrisiken)
+- [ ] Externe Prüfperson für die Android-Runde (der Projektleiter hat kein Android-Gerät): Zugang zu Test erst nach Entscheid des Projektleiters und Prüfung gegen den [Datenschutz](datenschutz.md). Das Test-Passwort öffnet auch den Mail-Fänger mit den Codes aller erfundenen Konten, damit auch die Verwaltung auf Test, und auf Test stehen die echten Interclub-Resultate von Swiss Tennis mit Spielernamen (öffentlich, DS-08). Sie bekommt eine eigene erfundene Persona und gibt auf Test keine eigenen Daten ein
 - [ ] Liste der Testpersonen in `intern/`, vom Projektleiter selbst angelegt. Claude bekommt daraus nur Gerät, Softwareversion, Mailanbieter und Altersgruppe grob, ohne Namen ([Datenschutz](datenschutz.md#testgruppe))
 
 ## Ablauf Lauf 1

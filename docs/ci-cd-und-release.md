@@ -48,13 +48,23 @@ flowchart LR
   C1 -->|grün| T[Test-Umgebung]
   T --> A[Doku-Abgleich auf dev, neue Nummer]
   A --> T2[Test mit neuer Nummer]
-  T2 --> K[Checkliste auf echten Handys]
-  K --> P[PR dev → main]
+  T2 --> R[make test-pruefung]
+  R --> E[PR dev → main als Entwurf, Prüfprotokoll]
+  E --> K[Handrunden auf echten Geräten, im PR abhaken]
+  K --> P[PR bereit]
   P --> C2[CI]
   C2 -->|grün, Merge| L[Live]
   L --> V[Tag vX.Y.Z und GitHub-Release]
 ```
 
+- **Checkliste:** Die [Checkliste vor dem Release](testkonzept.md#checkliste-vor-dem-release)
+  trennt *automatisch (CI)*, *Prüflauf Test* und Handrunden pro Gerät. Nach dem Merge des
+  Abgleichs, sobald Test die neue Nummer zeigt, startet Claude `make test-pruefung` (nur lokal,
+  nie in der CI; SSH-Ziel und Adresse aus `.env`). Ist er grün, entsteht der PR `dev` → `main` als
+  Entwurf mit dem Text aus `.github/release-pr.md`: Ergebnis des Prüflaufs, Link auf den CI-Lauf,
+  die ausgewählten Handpunkte als Kästchen mit Begründung. Der Projektleiter hakt dort ab, auch
+  für die externe Person der Android-Runde nach deren Rückmeldung; erst dann wird der PR bereit
+  und gemergt.
 - **Freigabe:** Der Merge des PR nach `main` geht ohne weiteren Knopf live; `main` ist
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
   abgehakt und das Release freigegeben hat. Abgehakt wird auf dem Image mit der neuen Nummer,
