@@ -178,6 +178,8 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Nachtrag 23.11.2026 (#81 Teil 3b):** `make check` wieder 9 rot bei Load 8–14, während eine andere Session E2E laufen liess: vier Interclub-DB-Tests (`abruf`, `import`, `import-bericht`) an 5 s, dazu der Seed-Test mit Folgefehlern (Aufräumen scheitert an Fremdschlüsseln, nächste Tests sehen alte Zeilen). Einzeln 140/140 grün, der zweite volle Lauf bei Load 2 ganz grün.
 
+**Nachtrag 23.11.2026 (Docker bei Bedarf):** Dasselbe Bild bei Load 10–17, während eine andere Session lief: 11 rot (`abruf`, `import`, `import-bericht`, dazu der Seed-Test mit Fremdschlüssel-Folgefehlern). Einzeln 45/45 grün, der zweite volle Lauf bei Load 17 ganz grün. Weil `make check` rot war, wies der Pre-Push-Hook auch den Push des Branches ab.
+
 ### 2026-11-23 — Themen, gültige Sitzungen und Passkeys werden an drei Stellen fast gleich geladen
 
 **Thema:** Code
@@ -289,3 +291,15 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Nachführen des Design Systems in #93, Session vom 23.11.2026.
 
 **Einschätzung:** Ein ganzer Abgleich (Bausteine, Tokens, `bundle.css` aus den aufgeteilten Dateien) lohnt sich vor dem nächsten grösseren Oberflächen-Entwurf; sonst genügt es, wie in #93 die Repo-Dateien einzubinden.
+
+### 2026-11-23 — Kaltstart von Docker Desktop über make db noch nicht echt ausprobiert
+
+**Thema:** Tests
+
+**Fundort:** `scripts/docker-bereit.sh` (Ziel `voraussetzungen-docker` im `Makefile`).
+
+**Beobachtung:** Ist Docker nicht erreichbar, startet das Skript Docker Desktop mit `open -ga Docker` und wartet bis 120 s. Belegt sind nur die Abzweigungen (Test mit Attrappen) und der Fall «Docker läuft schon». Den echten Kaltstart (Docker Desktop beendet, dann `make db`) hat niemand ausprobiert, weil eine parallele Session die gemeinsame Datenbank nutzte.
+
+**Ursprung:** Review des Branches `feat/docker-bei-bedarf`, Session vom 23.11.2026.
+
+**Einschätzung:** Einmal von Hand prüfen, wenn keine Session läuft: Erwartet sind «Docker Desktop startet …», danach laufende DB und Mailpit. Reicht die Frist nicht oder öffnet sich das Fenster von Docker Desktop, im Skript nachziehen.
