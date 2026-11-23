@@ -100,28 +100,45 @@ export function effektiveRollen(
 	return [ansicht];
 }
 
-export type RollenListe = { rolle: Rolle; mitglieder: { id: number; name: string }[] }[];
+/**
+ * Stand eines Rolleninhabers auf der Seite «Rollen»: Nur `aktiv` zählt als Rolle (RR-08); die
+ * übrigen stehen da, damit man ihnen die Rolle vor einem Wiedereintritt entziehen kann (#96).
+ */
+export type RollenStand = 'aktiv' | 'gesperrt' | 'ausgetreten' | 'vorgemerkt';
 
-// Regel 2: Wer welche Rolle hat, für die Rollenvergabe. RR-08: nur Konten, die nicht gesperrt sind
-// und deren Mitglied aktiv ist. Nur Nummer und Name; jede Rolle steht da, auch ohne Mitglieder.
+export type RollenListe = {
+	rolle: Rolle;
+	mitglieder: { id: number; name: string; stand: RollenStand }[];
+}[];
+
+// Regel 2: Wer welche Rolle hat, für die Rollenvergabe; jede Rolle steht da, auch ohne Mitglieder.
+// Nur Nummer, Name und Stand. Gelöschte fehlen: Von ihnen bleibt nur der Name in alten Resultaten.
 export async function listeRollen(db: DbOderTx): Promise<RollenListe> {
 	const zeilen = await db
 		.select({
 			rolle: kontoRolle.rolle,
 			id: mitglied.id,
 			vorname: mitglied.vorname,
-			nachname: mitglied.nachname
+			nachname: mitglied.nachname,
+			status: mitglied.status,
+			gesperrt: konto.gesperrt
 		})
 		.from(kontoRolle)
 		.innerJoin(konto, eq(konto.id, kontoRolle.kontoId))
 		.innerJoin(mitglied, eq(mitglied.id, konto.mitgliedId))
-		.where(and(eq(konto.gesperrt, false), eq(mitglied.status, 'aktiv')))
+		.where(ne(mitglied.status, 'geloescht'))
 		.orderBy(asc(mitglied.nachname), asc(mitglied.vorname), asc(mitglied.id));
+	const standVon = (z: (typeof zeilen)[number]): RollenStand =>
+		z.status === 'ausgetreten' || z.status === 'vorgemerkt'
+			? z.status
+			: z.gesperrt
+				? 'gesperrt'
+				: 'aktiv';
 	return ROLLEN.map((rolle) => ({
 		rolle,
 		mitglieder: zeilen
 			.filter((z) => z.rolle === rolle)
-			.map((z) => ({ id: z.id, name: `${z.nachname}, ${z.vorname}` }))
+			.map((z) => ({ id: z.id, name: `${z.nachname}, ${z.vorname}`, stand: standVon(z) }))
 	}));
 }
 
@@ -199,9 +216,10 @@ const gleicheMenge = (a: readonly Rolle[], b: readonly Rolle[]) =>
 	new Set(a).size === new Set(b).size && a.every((r) => b.includes(r));
 
 /**
- * Setzt alle Rollen eines Kontos auf einmal; nur für Skript und Test-Hilfen (`machAdmin`), die
- * Verwaltung vergibt und entzieht einzeln (`vergibRolle`, `entziehRolle`). `vorher`: die Rollen, wie die Seite sie geladen hat; weichen sie
- * vom gespeicherten Stand ab, ändert sich nichts (`veraltet`).
+ * Setzt alle Rollen eines Kontos auf einmal; nur für Skript und Test-Hilfen (`machAdmin`). Die
+ * Verwaltung vergibt und entzieht einzeln (`vergibRolle`, `entziehRolle`). `vorher`: die Rollen, wie
+ * der Aufrufer sie gelesen hat; weichen sie vom gespeicherten Stand ab, ändert sich nichts
+ * (`veraltet`).
  */
 export async function setzeRollen(
 	db: Db,

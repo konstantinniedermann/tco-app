@@ -8,6 +8,7 @@ import {
 	legeAdminMitBriefCodeAn,
 	legeGeraetAn,
 	legeKontoAn,
+	setzeAusgetreten,
 	legeKontoMitBriefCodeAn,
 	legeRollenkontoMitBriefCodeAn,
 	schalteThemaVereinAb,
@@ -238,6 +239,31 @@ test('RR-03: der letzte MyTCO-Admin sieht die Meldung beim Entzug seiner Rolle',
 		'Du bist der letzte MyTCO-Admin. Gib zuerst jemand anderem die Rolle MyTCO-Admin.';
 	await expect(rueckfrage.getByText(meldung)).toBeVisible();
 	await pruefeBildschirm(page, info, 'verwaltung-letzter-admin');
+	expect(fehler).toEqual([]);
+});
+
+test('#96: MyTCO-Admin entzieht sich die Rolle und landet auf seiner übrigen Verwaltung', async ({
+	page
+}) => {
+	const fehler = sammleKonsolenfehler(page);
+	const nachname = `Probe${randomUUID().slice(0, 8)}`;
+	// Ein zweiter MyTCO-Admin, damit der Entzug nicht am letzten scheitert (RR-03).
+	await legeRollenkontoMitBriefCodeAn('Zora', ['mytco']);
+	const admin = await legeRollenkontoMitBriefCodeAn('Ivo', ['mytco', 'mitglieder'], nachname);
+	await oeffneVerwaltung(page, admin);
+	await seitenleiste(page).getByRole('link', { name: 'Rollen' }).click();
+	await page.locator('summary', { hasText: 'MyTCO-Admin' }).click();
+	await page
+		.getByRole('list', { name: 'MyTCO-Admin' })
+		.getByRole('listitem')
+		.filter({ hasText: `${nachname}, Ivo` })
+		.getByRole('button', { name: 'Entziehen' })
+		.click();
+	const rueckfrage = page.getByRole('dialog', { name: 'Rolle MyTCO-Admin entziehen?' });
+	await rueckfrage.getByRole('button', { name: 'Entziehen' }).click();
+	// Ohne MyTCO-Admin gibt es die Seite «Rollen» nicht mehr: weiter zur Mitgliederverwaltung.
+	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
+	await expect(seitenleiste(page).getByRole('link', { name: 'Rollen' })).toHaveCount(0);
 	expect(fehler).toEqual([]);
 });
 
@@ -486,6 +512,21 @@ test('A-ROLLE-01, RR-07: MyTCO-Admin vergibt eine Rolle, schaut als CM-Admin, ka
 		page.getByText(`${nachname}, Selma hat die Rolle CM-Admin nicht mehr.`)
 	).toBeVisible();
 	await expect(selma).toHaveCount(0);
+
+	// #96: Ein Ausgetretener mit Rolle steht mit Plakette da; seine Rolle lässt sich entziehen,
+	// damit sie bei einem Wiedereintritt nicht zurückkommt.
+	const otto = await legeRollenkontoMitBriefCodeAn('Otto', ['cm'], nachname);
+	await setzeAusgetreten(otto.mitgliedId);
+	await page.reload();
+	await cmAdmins.locator('summary').click();
+	const ottoZeile = cmAdmins.getByRole('listitem').filter({ hasText: `${nachname}, Otto` });
+	await expect(ottoZeile.getByText('ausgetreten', { exact: true })).toBeVisible();
+	await ottoZeile.getByRole('button', { name: 'Entziehen' }).click();
+	await entziehen.getByRole('button', { name: 'Entziehen' }).click();
+	await expect(
+		page.getByText(`${nachname}, Otto hat die Rolle CM-Admin nicht mehr.`)
+	).toBeVisible();
+	await expect(ottoZeile).toHaveCount(0);
 
 	// Ansicht als CM-Admin: zuerst zu den Turnieren, nur die Clubmeisterschaft, Band oben.
 	await schaueAls(page, 'CM-Admin');

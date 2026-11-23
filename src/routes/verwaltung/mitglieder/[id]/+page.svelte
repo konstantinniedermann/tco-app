@@ -20,13 +20,13 @@
 		VERGEBEN,
 		aktionText,
 		plakette,
+		rollenZeile,
 		tagText,
 		zeitText,
 		fehlerText
 	} from '../../../../lib/verwaltung/anzeige.ts';
 	import Einstellungen from '../../../../lib/verwaltung/Einstellungen.svelte';
 	import Mitgliedschaft from '../../../../lib/verwaltung/Mitgliedschaft.svelte';
-	import { ROLLEN_NAME } from '../../../../lib/verwaltung/rollen-namen.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';
 
@@ -85,9 +85,7 @@
 		});
 
 	// A-ROLLE-01: Rollen nur zum Lesen; vergeben und entziehen geht auf der Seite «Rollen» (#96).
-	const rollenZeile = $derived(
-		['Mitglied', ...detail.rollen.map((r) => ROLLEN_NAME[r])].join(' · ')
-	);
+	const rollenZeileText = $derived(rollenZeile(detail.rollen));
 	const darfRollen = $derived(data.darfSchreiben.rollen);
 	// Regel 3: Der MyTCO-Admin liest die Angaben, ändern kann sie nur der Mitglieder-Admin.
 	const nurLesen = $derived(!data.darfSchreiben.mitglieder);
@@ -204,7 +202,7 @@
 		<p class="leise">Mitgliedernummer {angaben.mitgliedernummer}</p>
 	{/if}
 	<p class="leise">
-		Rollen: {rollenZeile}{#if darfRollen}&nbsp;·&nbsp;<a href={resolve('/verwaltung/rollen')}
+		Rollen: {rollenZeileText}{#if darfRollen}&nbsp;·&nbsp;<a href={resolve('/verwaltung/rollen')}
 				>Auf der Seite «Rollen» ändern</a
 			>{/if}
 	</p>

@@ -256,8 +256,8 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 
 	test('Mitglieder-Admin und CM-Admin: Rolle vergeben und entziehen → 403 kein-admin, nichts geändert', async () => {
 		const s = baue();
-		// Ausgetreten, damit die Rolle nicht in der Übersicht von «getRollen» landet (eigene Datenbank).
-		const ziel = await legeMitgliedAn(db(), { status: 'ausgetreten', rollen: ['lizenz'] });
+		// Gelöscht, damit die Rolle nicht in der Übersicht von «getRollen» landet (eigene Datenbank).
+		const ziel = await legeMitgliedAn(db(), { status: 'geloescht', rollen: ['lizenz'] });
 		for (const rollen of [['mitglieder'], ['cm']] as const) {
 			const k = await bestaetigt(s, [...rollen]);
 			const vergeben = await postRolleVergeben(
@@ -497,7 +497,7 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		}
 	});
 
-	test('getRollen listet nur aktive, nicht gesperrte Konten', async () => {
+	test('getRollen listet alle Inhaber mit Stand, ohne Gelöschte (#96)', async () => {
 		const s = baue();
 		const mytco = await bestaetigt(s, ['mytco']);
 		const aktiv = await legeMitgliedAn(db(), {
@@ -510,8 +510,24 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			nachname: 'Anfang',
 			rollen: ['lizenz']
 		});
-		const gesperrt = await legeMitgliedAn(db(), { gesperrt: true, rollen: ['lizenz', 'mytco'] });
-		const ausgetreten = await legeMitgliedAn(db(), { status: 'ausgetreten', rollen: ['lizenz'] });
+		const gesperrt = await legeMitgliedAn(db(), {
+			vorname: 'Gil',
+			nachname: 'Gesperrt',
+			gesperrt: true,
+			rollen: ['lizenz', 'mytco']
+		});
+		const ausgetreten = await legeMitgliedAn(db(), {
+			vorname: 'Ava',
+			nachname: 'Mitte',
+			status: 'ausgetreten',
+			rollen: ['lizenz']
+		});
+		const vorgemerkt = await legeMitgliedAn(db(), {
+			vorname: 'Vik',
+			nachname: 'Vorher',
+			status: 'vorgemerkt',
+			rollen: ['lizenz']
+		});
 		const geloescht = await legeMitgliedAn(db(), { status: 'geloescht', rollen: ['lizenz'] });
 
 		const r = await getRollen(s.d, hole(mytco.konto));
@@ -519,23 +535,25 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		expect(r.headers.get('cache-control')).toBe('no-store');
 		const liste = (await r.json()) as {
 			rolle: string;
-			mitglieder: { id: number; name: string }[];
+			mitglieder: { id: number; name: string; stand: string }[];
 		}[];
 		expect(liste.map((z) => z.rolle)).toEqual([...ROLLEN]);
 		const von = (rolle: string) => liste.find((z) => z.rolle === rolle)!.mitglieder;
-		// Nach Nachname, wie die Mitgliederliste; nur Nummer und Name, keine Kontaktdaten.
+		// Nach Nachname, wie die Mitgliederliste; nur Nummer, Name und Stand, keine Kontaktdaten.
+		// Ausgetretene, Vorgemerkte und Gesperrte stehen da, damit man ihre Rollen entziehen kann.
 		expect(von('lizenz')).toEqual([
-			{ id: auchAktiv.mitgliedId, name: 'Anfang, Lou' },
-			{ id: aktiv.mitgliedId, name: 'Zuletzt, Lia' }
+			{ id: auchAktiv.mitgliedId, name: 'Anfang, Lou', stand: 'aktiv' },
+			{ id: gesperrt.mitgliedId, name: 'Gesperrt, Gil', stand: 'gesperrt' },
+			{ id: ausgetreten.mitgliedId, name: 'Mitte, Ava', stand: 'ausgetreten' },
+			{ id: vorgemerkt.mitgliedId, name: 'Vorher, Vik', stand: 'vorgemerkt' },
+			{ id: aktiv.mitgliedId, name: 'Zuletzt, Lia', stand: 'aktiv' }
 		]);
 		expect(von('cm').map((m) => m.id)).toContain(aktiv.mitgliedId);
 		expect(von('mytco').map((m) => m.id)).toContain(mytco.mitgliedId);
 		const alleIds = liste.flatMap((z) => z.mitglieder.map((m) => m.id));
-		for (const weg of [gesperrt, ausgetreten, geloescht]) {
-			expect(alleIds).not.toContain(weg.mitgliedId);
-		}
+		expect(alleIds).not.toContain(geloescht.mitgliedId);
 		for (const m of liste.flatMap((z) => z.mitglieder)) {
-			expect(Object.keys(m).sort()).toEqual(['id', 'name']);
+			expect(Object.keys(m).sort()).toEqual(['id', 'name', 'stand']);
 		}
 	});
 });

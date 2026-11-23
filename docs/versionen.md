@@ -12,7 +12,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 ## Unveröffentlicht
 
 - Verwaltung: Rollen vergibt und entzieht der MyTCO-Admin nur noch auf der Seite «Rollen», je Rolle
-  mit Suche und Rückfrage. Die Seite eines Mitglieds zeigt seine Rollen nur noch an (#96).
+  mit Suche und Rückfrage, auch bei Ausgetretenen. Die Seite eines Mitglieds zeigt seine Rollen nur
+  noch an (#96).
 - Verwaltung: Die Seiten der Mitgliederverwaltung und «Rollen» erklären unter dem Titel kurz, wozu
   sie da sind. Bei «Briefe» steht, dass verlorene Zugänge nicht über einen neuen Brief laufen, sondern über «Code per E-Mail» (#93).
 - Interclub: Mitglieder folgen Teams auf deren Seite und bekommen nach jedem neuen Endstand einen

@@ -7,6 +7,7 @@
 	import Aktionsdialog from '../../../lib/verwaltung/Aktionsdialog.svelte';
 	import Spielersuche from '../../../lib/verwaltung/Spielersuche.svelte';
 	import { ROLLEN_NAME } from '../../../lib/verwaltung/rollen-namen.ts';
+	import { rollenStandPlakette } from '../../../lib/verwaltung/anzeige.ts';
 	import { entziehRolle, vergibRolle } from '../../../lib/verwaltung/zugang-api.ts';
 	import type { Rolle } from '../../../lib/verwaltung/mitglieder-api.ts';
 	import type { PageProps } from './$types';
@@ -40,7 +41,7 @@
 	);
 
 	function oeffneEntziehen(rolle: Rolle, m: { id: number; name: string }) {
-		ziel = { ...m, rolle };
+		ziel = { id: m.id, name: m.name, rolle };
 		entziehen?.oeffne();
 	}
 
@@ -76,10 +77,11 @@
 		{:else}
 			<ul class="trefferliste" aria-label={rolle}>
 				{#each eintrag.mitglieder as m (m.id)}
+					{@const vermerk = rollenStandPlakette(m.stand)}
 					<li class="kachel">
-						<a
-							id="rolle-{eintrag.rolle}-{m.id}"
-							href={resolve('/verwaltung/mitglieder/[id]', { id: String(m.id) })}>{m.name}</a
+						<span id="rolle-{eintrag.rolle}-{m.id}"
+							><a href={resolve('/verwaltung/mitglieder/[id]', { id: String(m.id) })}>{m.name}</a
+							>{#if vermerk}<br /><span class={vermerk.klasse}>{vermerk.text}</span>{/if}</span
 						>
 						<button
 							type="button"

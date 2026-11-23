@@ -66,6 +66,12 @@ Der Projektleiter hat A gewählt.
 - Ausgetretene oder gesperrte Konten lassen sich über die Suche nicht finden; der Server prüft beim
   Vergeben aber nicht zusätzlich (wie heute), Rollen gesperrter Konten wirken ohnehin nicht (RR-08).
 
+## Nachtrag nach dem Review (Entscheid Projektleiter, 23.11.2026)
+
+Die Seite «Rollen» zeigt auch Inhaber, die ausgetreten, zum Löschen vorgemerkt oder gesperrt sind,
+mit Plakette und «Entziehen» (Gelöschte nicht). Sonst liessen sich ihre Rollen nirgends mehr
+entziehen und kämen beim Wiedereintritt zurück (RR-08). Sie zählen weiter nicht als MyTCO-Admin.
+
 ## Nachweis
 
 - DB-Tests für `vergibRolle` / `entziehRolle`: Vergabe und Entzug mit Verlauf, doppelt ohne

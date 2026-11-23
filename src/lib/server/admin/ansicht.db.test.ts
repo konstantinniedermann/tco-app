@@ -20,8 +20,15 @@ import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login
 import { getSitzung } from '../sitzung/schnittstellen.ts';
 import { postTurniere } from '../turnier/schnittstellen.ts';
 import { riegel } from './ansicht.ts';
-import { entziehRolle, vergibRolle } from './rollen.ts';
-import { getZugang, postAnsicht, postAnsichtBeenden, postMitglieder } from './schnittstellen.ts';
+import { entziehRolle, ladeRollen, vergibRolle } from './rollen.ts';
+import {
+	getZugang,
+	postAnsicht,
+	postAnsichtBeenden,
+	postMitglieder,
+	postRolleEntziehen,
+	postRolleVergeben
+} from './schnittstellen.ts';
 import type { AdminDienste } from './rechte.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
@@ -311,6 +318,26 @@ describe('Ansicht als … (Server)', () => {
 		expect([r.status, await r.json()]).toEqual([403, { fehler: 'nur-ansehen' }]);
 		expect(await db.select().from(mitglied).where(eq(mitglied.email, email))).toEqual([]);
 		expect(await verlaufVon(a.mitgliedId)).toEqual([]);
+	});
+
+	test('in der Ansicht scheitern Rolle vergeben und entziehen direkt mit 403 nur-ansehen (#96)', async () => {
+		const a = await angemeldet(['mytco'], true);
+		const ziel = await legeMitgliedAn(db, { rollen: ['lizenz'] });
+		expect((await schalteEin(a.s.d, a.konto, { rolle: 'mitglieder' })).status).toBe(200);
+		const konto = (await lade(a.kennung))!;
+		const vergeben = await postRolleVergeben(
+			a.s.d,
+			ereignis({ konto, body: { mitgliedId: ziel.mitgliedId, rolle: 'cm' } })
+		);
+		const entziehen = await postRolleEntziehen(
+			a.s.d,
+			ereignis({ konto, body: { mitgliedId: ziel.mitgliedId, rolle: 'lizenz' } })
+		);
+		for (const r of [vergeben, entziehen]) {
+			expect([r.status, await r.json()]).toEqual([403, { fehler: 'nur-ansehen' }]);
+		}
+		expect(await ladeRollen(db, ziel.kontoId)).toEqual(['lizenz']);
+		expect(await verlaufVon(ziel.mitgliedId)).toEqual([]);
 	});
 
 	test('mytco entzogen und wieder vergeben: die alte Ansicht lebt nicht wieder auf', async () => {

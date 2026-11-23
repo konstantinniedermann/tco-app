@@ -8,6 +8,8 @@ import {
 	geaendertText,
 	neueAngaben,
 	plakette,
+	rollenStandPlakette,
+	rollenZeile,
 	rollenText,
 	datumText,
 	datumZeitText,
@@ -24,6 +26,24 @@ describe('Texte der Verwaltung', () => {
 		expect(fehlerText({ art: 'kein-recht' })).toBe('Das darfst du hier nur ansehen, nicht ändern.');
 		expect(fehlerText({ art: 'stoerung' })).toBe(MELDUNG.stoerung);
 		expect(fehlerText({ art: 'veraltet' })).toBe(MELDUNG.stoerung);
+	});
+
+	it('#96: Inhaber einer Rolle, die nicht aktiv sind, tragen eine Plakette; aktive keine', () => {
+		expect(rollenStandPlakette('aktiv')).toBeNull();
+		expect(rollenStandPlakette('ausgetreten')).toEqual({ text: 'ausgetreten', klasse: 'plakette' });
+		expect(rollenStandPlakette('vorgemerkt')).toEqual({
+			text: 'wird gelöscht',
+			klasse: 'plakette plakette-gesperrt'
+		});
+		expect(rollenStandPlakette('gesperrt')).toEqual({
+			text: 'gesperrt',
+			klasse: 'plakette plakette-gesperrt'
+		});
+	});
+
+	it('#96: die Zeile der Rollen beginnt mit Mitglied, dann in der Reihenfolge der Seite Rollen', () => {
+		expect(rollenZeile([])).toBe('Mitglied');
+		expect(rollenZeile(['cm', 'mytco'])).toBe('Mitglied · MyTCO-Admin · CM-Admin');
 	});
 
 	it('RR-03: der letzte MyTCO-Admin erfährt, was zuerst zu tun ist', () => {
