@@ -187,3 +187,16 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Review der Karte «Einstellungen» (Verwaltung), Session vom 23.11.2026.
 
 **Einschätzung:** Kein Fehler, kleine Datenmengen. Beim nächsten Umbau der Auskunft `ladeAuskunft` auf `detail.einstellungen` stützen und die Sitzungsabfrage zusammenlegen.
+
+### 2026-11-23 — E2E der Karte «Einstellungen» prüft Passkey-Liste und «Kein Gerät angemeldet.» nicht
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/verwaltung.test.ts` («Einstellungen: …»), `src/lib/verwaltung/Einstellungen.svelte`.
+
+**Beobachtung:** Der E2E deckt Themen, zwei Geräte (Push an/aus) und «Kein Passkey.» ab. Die Zeile eines Passkeys («iPhone · eingerichtet am … · zuletzt benutzt am …») und der Fall ohne Gerät sind nur in der Datenschicht geprüft (`mitglied-einstellungen.db.test.ts`), nicht in der Anzeige.
+
+**Ursprung:** Review der Karte «Einstellungen» (merge-reviewer), Session vom 23.11.2026.
+
+**Einschätzung:** Geringes Risiko, reine Textzweige. Bei der nächsten Änderung an der Karte einen Passkey per E2E-Hilfe anlegen und beide Zweige mitprüfen.
+

@@ -245,6 +245,7 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
 
+- 23.11.2026: Neuer Zweck «Hilfe bei Problemen» (Entscheid Projektleiter): Mitglieder-Admin (MyTCO-Admin nur lesend) sieht auf der Detailseite eines Mitglieds den aktuellen Stand von Themen, angemeldeten Geräten mit Push-Stand und Passkeys, ohne Push-Adresse und Schlüssel; kein Verlauf, keine neuen Daten.
 - 22.11.2026: DS-08 präzisiert (Entscheid Projektleiter, #81 Teil 3a): Test holt mit dem regelmässigen Abruf dieselben echten Interclub-Daten wie Live, auch die Einzelpartien mit Namen; lokal und im E2E bleibt der Abruf aus. Screenshots zeigen davon nur Teams, Endstände und Tabellen.
 - 13.11.2026: Auskunft ohne Interclub-Einzelpartien (hängen nicht am Konto, in der Erklärung genannt); DS-08: Beispiel-Einzelpartien mit echten Begegnungsnummern, Positionen und Ranglisten (Entscheid Projektleiter, #81 Teil 2).
 - 13.11.2026: Interclub-Einzelpartien (Entscheid Projektleiter, #81 Teil 2): Name, Klassierung, Rangliste- und Personennummer der TCO-Spieler, auch von Junioren; sichtbar für alle eingeloggten Mitglieder nur Name und Klassierung; von den Gegnern (keine Mitglieder, auch Junioren) Name und Klassierung, ohne Nummern, wie bei Swiss Tennis öffentlich; bleiben über die Saisons; kein Ausblenden auf Wunsch.
