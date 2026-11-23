@@ -38,7 +38,8 @@
 	let rueckmeldung = $state<string | null>(null);
 	let laeuft = $state(false);
 	let rueckfrage = $state<HTMLDialogElement>();
-	// FR-56: Häkchen «Mitglied benachrichtigen» der Rückfrage «Kategorie absagen?», beim Öffnen gesetzt.
+	// FR-56: Häkchen «Spieler benachrichtigen» der Rückfrage «Kategorie absagen?», beim Öffnen gesetzt.
+	// Nur im Doppel: Die Absage meldet nur offene Partner-Anfragen, die damit wegfallen.
 	let benachrichtigen = $state(true);
 	function frageAbsagen() {
 		benachrichtigen = true;
@@ -96,7 +97,7 @@
 		if (laeuft) return;
 		laeuft = true;
 		absageFehler = null;
-		const a = await sageKategorieAb(kategorie.id, benachrichtigen);
+		const a = await sageKategorieAb(kategorie.id, kategorie.art === 'doppel' && benachrichtigen);
 		rueckfrage?.close();
 		laeuft = false;
 		if (await leiteUm(a)) return;
@@ -183,11 +184,9 @@
 		<dialog class="karte" bind:this={rueckfrage} aria-labelledby="absagen-titel">
 			<h2 id="absagen-titel">Kategorie absagen?</h2>
 			<p>Das lässt sich nicht rückgängig machen.</p>
-			<!-- Die Absage meldet nur offene Partner-Anfragen, also nur im Doppel. -->
-			<Benachrichtigen
-				bind:an={benachrichtigen}
-				text={kategorie.art === 'doppel' ? 'Spieler benachrichtigen' : undefined}
-			/>
+			{#if kategorie.art === 'doppel'}
+				<Benachrichtigen bind:an={benachrichtigen} text="Spieler benachrichtigen" />
+			{/if}
 			<div class="leiste">
 				<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}
 					>Abbrechen</button
