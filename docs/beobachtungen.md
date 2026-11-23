@@ -500,3 +500,28 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Doku-Abgleich vor dem Release 0.24.0 (Audit App).
 
 **Einschätzung:** Dem Projektleiter vorlegen: «Brief mit Brief-Code» und «Wer sich nicht mehr einloggen kann, holt sich beim Login selbst einen «Code per E-Mail».»
+
+### 2026-11-23 — `make test-pruefung` meldet rote Punkte teils ohne klaren Grund
+
+**Thema:** Tests
+
+**Fundort:** `scripts/test-pruefung.ts` (`ausPlaywright`, Abbruch bei SSH),
+`scripts/test-pruefung-server.ts` (`pruefeServer`), `playwright.test-server.config.ts`.
+
+**Beobachtung:** Aus der Review des Prüflaufs, nicht behoben, weil nur die Meldung leidet, nie das
+Ergebnis:
+- Die Tabelle nennt bei roten Browser-Punkten keinen Grund; er steht nur in der Ausgabe von
+  Playwright darüber (erst übernehmen, wenn die Meldung sicher keinen Zugang enthält).
+- Kein `actionTimeout`: Ohne Zugang (Formular statt App) wartet jeder Test bis 90 s.
+- `MYTCO_TEST_URL` wird nicht auf `test.…` geprüft.
+- Der SSH-Abbruch nennt immer `ssh-add`, auch bei einem Host-Key-Fehler.
+- «keine Antwort des Server-Teils» ohne Hinweis auf ein älteres Image ohne das Skript.
+- Selten Fehlalarm beim Interclub-Abruf, wenn sich der Takt über die Nachtpause verschiebt
+  (Abstand bis etwa 32 h statt 26 h).
+- Die Regel «zählt als MyTCO-Admin» ist aus `src/lib/server/admin/rollen.ts`
+  (`zaehlendeMytcoAdmins`, nicht exportiert) kopiert.
+
+**Ursprung:** Abschluss-Review und `merge-reviewer` des Branches `feat/release-checkliste`.
+
+**Einschätzung:** Vorläufig. Nach dem ersten echten Lauf gegen Test neu bewerten; was dort stört,
+in einem Zug nachziehen.

@@ -218,44 +218,130 @@ blockieren keine gewollte Design-Änderung.
 
 ## Checkliste vor dem Release
 
-Auf der [Test-Umgebung](ci-cd-und-release.md#umgebungen) `test.my.tcolten.ch` (bis K-10.2 unter der Übergangsadresse), mit einem
-iPhone (Safari) und einem Android-Handy (Chrome) und den erfundenen Mitgliedern der
-Test-Umgebung (Erika Beispiel, Kurt Erfunden, Hanna Muster, alle `@example.org`). Test behält
-seine Daten über Auslieferungen hinweg; die Mitglieder entstehen neu, wenn Test neu aufgesetzt
-wird (erste Auslieferung, Zähler `betrieb/test-neu-aufsetzen`), und dann kommt ein Brief-Code
-für Erika Beispiel per E-Mail. Was eine frühere Runde geändert hat (E-Mail-Adresse, Passkey,
-Push-Abos, Mails im Mail-Fänger), bleibt sonst stehen; einen frischen Stand gibt ein Commit, der
-den Zähler erhöht ([Test neu aufsetzen](../betrieb/README.md#test-neu-aufsetzen)). Alle Mails von Test, auch die Codes per E-Mail für die erfundenen Mitglieder, gehen über
-die Umleitung (`MAIL_NUR_AN`) in den Mail-Fänger unter `/_mail/`; der Betreff nennt den ursprünglichen
-Empfänger. Test läuft seit 18.11.2026 auf dem Server ([#39](https://github.com/konstantinniedermann/tco-app/issues/39)). Jeder Punkt nennt die IDs, die er prüft:
+Jeder Punkt hat eine Art, wie er geprüft wird: **automatisch (CI)**, **Prüflauf Test**
+(`make test-pruefung`) oder **von Hand** in einer Runde pro Gerät. Wo ein Punkt in zwei Teilen
+steht, prüft jeder Teil etwas anderes (z. B. Hilfe: CI das Verhalten, der Prüflauf die echte
+Auslieferung, die Handrunde den Inhalt des Kontakts). Jeder Punkt nennt die IDs, die
+er prüft. Das Ergebnis jedes Releases steht im Release-PR (Vorlage `.github/release-pr.md`,
+Ablauf [CI/CD und Release](ci-cd-und-release.md#ablauf)).
+
+Geprüft wird auf der [Test-Umgebung](ci-cd-und-release.md#umgebungen) `test.my.tcolten.ch` (bis
+K-10.2 unter der Übergangsadresse), auf dem Image mit der neuen Nummer. Test behält seine Daten
+über Auslieferungen hinweg; die erfundenen Mitglieder (Erika Beispiel, Kurt Erfunden, Hanna
+Muster, alle `@example.org`) entstehen neu, wenn Test neu aufgesetzt wird (erste Auslieferung,
+Zähler `betrieb/test-neu-aufsetzen`), und dann kommt ein Brief-Code für Erika Beispiel per E-Mail.
+Was eine frühere Runde geändert hat (E-Mail-Adresse, Passkey, Push-Abos, Mails im Mail-Fänger),
+bleibt sonst stehen; einen frischen Stand gibt ein Commit, der den Zähler erhöht
+([Test neu aufsetzen](../betrieb/README.md#test-neu-aufsetzen)). Alle Mails von Test, auch die
+Codes per E-Mail, gehen über die Umleitung (`MAIL_NUR_AN`) in den Mail-Fänger unter `/_mail/`;
+der Betreff nennt den ursprünglichen Empfänger. Test läuft seit 18.11.2026 auf dem Server
+([#39](https://github.com/konstantinniedermann/tco-app/issues/39)).
+
+### Automatisch (CI)
+
+Beleg ist der grüne CI-Lauf auf dem Commit des Doku-Abgleichs (E2E auf iPhone, Android und
+Desktop, nachgestellt). Was nur ein echtes Gerät zeigt, steht zusätzlich in einer Handrunde.
+
+- Hilfe ohne Login über die Fusszeile, der Kontakt steht da (A-HILFE-01): `tests/e2e/hilfe.test.ts`
+- Selbständerung erscheint in der Verwaltung unter *Für Fairgate* und verschwindet nach dem
+  Abhaken (A-KONTO-02): `tests/e2e/verwaltung.test.ts`
+- Wappen führt zur Startseite, mit offener Tastatur schliesst es nur die Tastatur, Rückfrage
+  «Nicht gespeichert – trotzdem verlassen?» mit *Abbrechen* und *Verlassen* (Leitbild
+  «Ungespeicherte Änderungen»): `tests/e2e/wappen.test.ts`
+- Rollen: Rolle CM-Admin vergeben, *Ansicht als CM-Admin* mit Band, ohne Speicher-Tasten,
+  *Beenden*, Rolle entziehen (A-ROLLE-01, A-ROLLE-09): `tests/e2e/verwaltung.test.ts`; Riegel für
+  eine schon offene Seite (SI-20): `src/lib/server/ansicht-riegel.test.ts`,
+  `src/lib/server/admin/ansicht.db.test.ts`; Rechte je Rolle: `rechte-matrix.db.test.ts`
+
+### Prüflauf Test
+
+`make test-pruefung` vom Mac des Projektleiters, nach dem Merge des Abgleichs, sobald Test die
+neue Nummer zeigt. Er nutzt eigene erfundene Prüfkonten (Paul und Pia Prüflauf) und legt sie an,
+falls sie fehlen; die Personas fasst er nicht an. Ergebnis: Tabelle «ok / rot» und Screenshots
+unter `test-results/test-server/`.
+
+- Fusszeile zeigt die Nummer von `dev` und den Commit seines Code-Stands
+- Login mit Einmal-Code per E-Mail (A-LOGIN-10)
+- Verwaltung öffnet mit Code per Mail (SI-08, A-ROLLE-02)
+- Hilfe ohne Login über die Fusszeile (A-HILFE-01)
+- Zeitgeber läuft: Löschfristen (FR-26, K-50, K-38) und Interclub-Abruf; die laufende Saison hat
+  einen Abruf in den letzten 26 Stunden (#81)
+- Ein MyTCO-Admin ist festgelegt (`admin-festlegen`)
+
+### Von Hand
+
+**Welche Runden:** Bei jedem Release die *Grundrunde*, dazu die Punkte der übrigen Runden, die
+das Release seit dem letzten Release berührt; Claude wählt sie anhand von
+[Versionen](versionen.md) und den geänderten Pfaden aus und begründet die Auswahl im PR. Die
+*volle Runde* (alle Punkte unten) ist fällig vor dem Einschalten von Live und wenn ein Release
+Login, Passkey, Push, Startbildschirm oder Briefe ändert. Solange Live aus ist, darf die
+Android-Runde mit Grund ausgesetzt werden («Android: ausgesetzt, Grund …» im PR); vor dem
+Einschalten von Live wird sie nachgeholt, danach ist sie Pflicht. Ein iPhone hat der
+Projektleiter; Android prüft eine externe Person ([Testgruppe](testgruppe.md#bereit-für-lauf-1)).
+
+#### Grundrunde (je Gerät etwa 5 Minuten)
+
+- [ ] iPhone **und** Android: MyTCO lässt sich auf den Startbildschirm legen und startet von dort
+- [ ] Login mit Einmal-Code klappt; nach Neustart des Handys weiterhin eingeloggt (A-LOGIN-08, A-LOGIN-09)
+- [ ] Push in der App vom Startbildschirm: Push einschalten, als Mitglieder-Admin eine Mitteilung
+  zu einem Anlass schicken → sie kommt an, ein Tipp darauf öffnet den Anlass; nach dem Abmelden
+  kommt keine mehr an (FR-40, FR-44)
+
+#### iPhone-Runde (Safari, App vom Startbildschirm)
+
+- [ ] Code per E-Mail anfordern, App ganz schliessen, wieder öffnen → das Feld «Code aus der Mail»
+  steht da (A-LOGIN-10)
+- [ ] Passkey: nach einem Code-Login einrichten (die Abfrage erscheint beim ersten Tippen),
+  abmelden, mit Passkey anmelden; die Abfrage darf sich nicht wiederholen oder hängen (A-LOGIN-07,
+  [ADR-005](adr/adr-005-passkey-simplewebauthn.md), Restrisiken)
+- [ ] QR-Code scannen → Einstiegsseite mit Anleitung; Schritte und Beschriftungen stimmen mit
+  Safari überein; nach dem Ablegen startet MyTCO vom Symbol direkt mit dem Login (A-HILFE-02)
+- [ ] Anlass «In den Kalender»: der Termin landet mit Datum, Zeit und Ort im Kalender (A-ANLASS-01,
+  SI-19); vorher als Erika in der Verwaltung einen Anlass anlegen (frisch aufgesetzt hat Test
+  keinen)
+- [ ] Telefon und Adresse im Profil ändern; E-Mail ändern, in die Mail-App wechseln und zurück →
+  Schritt 2 mit den zwei Code-Feldern steht da, beide Mails kommen an (über die Umleitung), danach
+  Login mit der neuen Adresse (A-KONTO-01, A-KONTO-02, SI-09)
+- [ ] Bewegung: Reiterwechsel blendet über, Hilfe schiebt sich herein und mit «‹ Start» hinaus,
+  Aufklappbereich öffnet weich, der Seitentitel blendet beim Scrollen in die Kopfleiste über, auch
+  in der Verwaltung; kein grauer Tipp-Blitz, kein Link-Menü beim langen Drücken; mit «Bewegung
+  reduzieren» alles ohne Bewegung (UI-09, #54)
+- [ ] Kopfleiste und Reiter bleiben beim Scrollen stehen, auch in der Verwaltung, ohne hellen
+  Schleier über Uhr und Akku (Leitbild «Statusleisten-Band»); Tipp auf einen Reiter wirkt auch,
+  während der Inhalt nachläuft; mit offener Tastatur sind die Reiter weg, die Kopfleiste bleibt,
+  nichts springt, «Weiter» führt ins nächste Feld (Leitbild «Eingabe mit Tastatur», #54)
+- [ ] Tipp aufs Wappen in der App vom Startbildschirm führt zur Startseite; mit offener Tastatur
+  schliesst er nur die Tastatur (Leitbild «Ungespeicherte Änderungen»)
+
+#### Android-Runde (Chrome)
+
+Für eine externe Person ohne Repo und GitHub geschrieben. Sie bekommt dazu getrennt: Adresse und
+Passwort von Test, ihre erfundene Persona, und meldet pro Punkt «klappt» oder was sie sieht.
+
+- [ ] Taste «MyTCO installieren» öffnet den Dialog von Android; die Anleitung über das Menü stimmt
+  mit Chrome überein; im Samsung-Browser beobachten, ob die Anleitung passt (A-HILFE-02)
+- [ ] Passkey: einrichten und anmelden (A-LOGIN-07)
+- [ ] Anlass «In den Kalender»: der Termin landet mit Datum, Zeit und Ort im Kalender (A-ANLASS-01, SI-19)
+- [ ] Bewegung wie in der iPhone-Runde: Reiterwechsel, Hilfe, Aufklappbereich, Seitentitel, kein
+  Tipp-Blitz, «Bewegung reduzieren» (UI-09, #54)
+- [ ] Kopfleiste, Reiter und Tastatur wie in der iPhone-Runde (Leitbild «Statusleisten-Band»,
+  «Eingabe mit Tastatur», #54)
+- [ ] Tipp aufs Wappen in der App vom Startbildschirm führt zur Startseite; mit offener Tastatur
+  schliesst er nur die Tastatur (Leitbild «Ungespeicherte Änderungen»)
+
+#### PC- und Papier-Runde (Projektleiter)
 
 - [ ] QR-Code aus einem Testbrief öffnet MyTCO; im Brief für Live steht `my.tcolten.ch` (A-LOGIN-01, A-LOGIN-04)
-- [ ] Brief aus der Druckansicht der Verwaltung in Chrome und in Safari auf Papier drucken (Massstab 100 %): Adresse liegt im Fenster des Kuverts C5/6, eine Seite je Brief (A-LOGIN-01)
-- [ ] MyTCO lässt sich auf den Startbildschirm legen und startet von dort
-- [ ] Login mit Einmal-Code klappt; nach Neustart des Handys weiterhin eingeloggt (A-LOGIN-08, A-LOGIN-09)
-- [ ] Neuer Code per E-Mail kommt an und landet nicht im Spam (A-LOGIN-10)
-- [ ] iPhone, App vom Startbildschirm: Code per E-Mail anfordern, App ganz schliessen, wieder öffnen → das Feld «Code aus der Mail» steht da (A-LOGIN-10)
-- [ ] Passkey auf einem echten iPhone **in der App vom Startbildschirm**: nach einem Code-Login einrichten (die Passkey-Abfrage erscheint beim ersten Tippen), abmelden, mit Passkey anmelden; die Abfrage darf sich nicht wiederholen oder hängen (A-LOGIN-07, [ADR-005](adr/adr-005-passkey-simplewebauthn.md), Restrisiken)
-- [ ] Passkey auf einem Android-Handy (Chrome): einrichten und anmelden (A-LOGIN-07)
+- [ ] Brief aus der Druckansicht der Verwaltung in Chrome und in Safari auf Papier drucken
+  (Massstab 100 %): Adresse liegt im Fenster des Kuverts C5/6, eine Seite je Brief (A-LOGIN-01)
 - [ ] Anmeldung am PC mit dem Passkey vom Handy per QR-Code (A-LOGIN-07)
-- [ ] iPhone (Safari): QR-Code scannen → Einstiegsseite mit Anleitung; die Schritte und Beschriftungen stimmen mit Safari überein; nach dem Ablegen startet MyTCO vom Symbol direkt mit dem Login (A-HILFE-02)
-- [ ] Android (Chrome): Taste «MyTCO installieren» öffnet den Dialog von Android; die Anleitung über das Menü stimmt mit Chrome überein; im Samsung-Browser beobachten, ob die Anleitung passt (A-HILFE-02)
-- [ ] Seite Hilfe ohne Login über die Fusszeile erreichbar, der Kontakt stimmt (A-HILFE-01)
-- [ ] Anlass: «In den Kalender» auf einem echten iPhone **in der App vom Startbildschirm** und auf einem Android-Handy; der Termin landet mit Datum, Zeit und Ort im Kalender des Geräts (A-ANLASS-01, SI-19); vorher als Erika in der Verwaltung einen Anlass anlegen (frisch aufgesetzt hat Test keinen Anlass)
-- [ ] iPhone, App vom Startbildschirm: Telefon und Adresse im Profil ändern; E-Mail ändern, in die Mail-App wechseln und zurück → Schritt 2 mit den zwei Code-Feldern steht da, beide Mails kommen an (über die Umleitung), danach Login mit der neuen Adresse (A-KONTO-01, A-KONTO-02, SI-09)
-- [ ] Verwaltung am PC: die Selbständerung erscheint unter *Für Fairgate* und verschwindet nach dem Abhaken (A-KONTO-02)
-- [ ] iPhone (App vom Startbildschirm) und Android: Reiterwechsel blendet über, Hilfe schiebt sich herein und mit «‹ Start» hinaus, Aufklappbereich öffnet weich, der Seitentitel blendet beim Scrollen in die Kopfleiste über, auch in der Verwaltung; kein grauer Tipp-Blitz, kein Link-Menü beim langen Drücken auf Reiter und Tasten; mit «Bewegung reduzieren» alles ohne Bewegung (UI-09, #54)
-- [ ] iPhone und Android: Kopfleiste und Reiter bleiben beim Scrollen stehen, auch die Kopfleiste der Verwaltung, ohne hellen Schleier über Uhr und Akku (Leitbild «Statusleisten-Band»); Tipp auf einen Reiter wirkt auch, während der Inhalt nachläuft; mit offener Tastatur (z. B. Adresse im Profil) sind die Reiter weg, die Kopfleiste bleibt oben, nichts springt, «Weiter» führt ins nächste Feld (Leitbild «Eingabe mit Tastatur», #54)
-- [ ] iPhone (App vom Startbildschirm) und Android: Tipp aufs Wappen führt zur Startseite; mit offener Tastatur schliesst er nur die Tastatur; nach einer ungespeicherten Änderung (z. B. Telefon im Profil) kommt «Nicht gespeichert – trotzdem verlassen?», *Abbrechen* bleibt, *Verlassen* geht weiter (Leitbild «Ungespeicherte Änderungen»)
-- [ ] Steht ein Einrichtungsabend an: mobile Daten statt Club-WLAN, oder die Grenzen pro IP vorher prüfen ([ADR-004](adr/adr-004-login-einmal-code.md), Restrisiken)
-- [ ] Push auf einem echten iPhone **in der App vom Startbildschirm** und auf einem Android-Handy: Push einschalten, als Mitglieder-Admin eine Mitteilung zu einem Anlass schicken → sie kommt an, ein Tipp darauf öffnet den Anlass; nach dem Abmelden kommt keine mehr an (FR-40, FR-44)
-- [ ] Erika Beispiel (MyTCO- und Mitglieder-Admin) öffnet auf Test die Verwaltung mit Code per Mail (SI-08, A-ROLLE-02)
-- [ ] Rollen: `rechte-matrix.db.test.ts` ist im Lauf von `make check` grün; auf Test gibt Erika Hanna Muster die Rolle CM-Admin, schaltet *Ansicht als CM-Admin* ein: Band oben, Turniere ohne Speicher-Tasten, eine Mitgliedseite, die schon vorher in einem zweiten Tab offen war, meldet beim Speichern «In der Ansicht kannst du nichts speichern.» (Riegel, SI-20); *Beenden* bringt die Tasten zurück; danach die Rolle wieder entziehen (A-ROLLE-01, A-ROLLE-09)
-- [ ] Verwaltung am PC: die geänderten Funktionen einmal durchgehen
-- [x] Löschfristen gebaut (Etappe 3 von #43): Änderungsverlauf nach 12 Monaten (FR-26), Anlass-Antworten ein Jahr nach Beginn des Anlasses (K-50), Austritt plus 1 Jahr (K-38); auf Test prüfen, dass der Zeitgeber läuft (`ZEITGEBER` nicht auf `aus`)
-- [ ] `admin-festlegen` einmal auf Test über `docker compose exec` ausgeführt
-- [ ] Interclub-Abruf auf Test: In `ic_abruf` hat die laufende Saison einen Versuch, der jünger als ein Tag ist (Abfrage per Skript im App-Container, #81). «Stand: …» auf der Seite *Interclub* taugt dafür nur während der Saison: Von Januar bis zur Freigabe des Spielplans zeigt sie die Vorjahressaison mit ihrem letzten Stand
-- [ ] Interclub: Team folgen, nach neuem Endstand mit Spielbericht kommt ein Push (ab Saisonstart Mai 2027, #81)
+- [ ] Verwaltung am PC: die geänderten Funktionen des Releases einmal durchgehen
+- [ ] Seite Hilfe: der Kontakt stimmt inhaltlich (A-HILFE-01)
+
+#### Saisonal
+
+- [ ] Interclub: Team folgen, nach neuem Endstand mit Spielbericht kommt ein Push (ab Saisonstart
+  Mai 2027, #81)
 
 Nach dem Release einmal `my.tcolten.ch` öffnen: Die Fusszeile zeigt die neue Version.
 

@@ -13,6 +13,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 - Verwaltung: Bei Änderungen an Angaben, Rollen, Mitgliedschaft und CM-Anmeldungen wählt sie mit
   «Mitglied benachrichtigen», ob das Mitglied eine Meldung bekommt (#94).
+- Werkzeug: `make test-pruefung` prüft vor dem Release den echten Test-Server (Fusszeile, Login,
+  Verwaltung, Zeitgeber, Interclub-Abruf); die Checkliste vor dem Release ist nach Prüfart und
+  Gerät geordnet. An der App ändert sich nichts.
 
 ## 0.24.0 — Interclub mit Push, Tabellen am PC, Rollen auf einer Seite
 

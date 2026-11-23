@@ -24,7 +24,7 @@ COPY scripts/migrate.ts ./scripts/migrate.ts
 # brauchen dafür den Server-Code als Quelle samt der geteilten Module unter src/lib, die er
 # importiert (ohne Tests, siehe .dockerignore).
 COPY src/lib ./src/lib
-COPY scripts/testdaten.ts scripts/erfundene-mitglieder.ts scripts/admin-festlegen.ts ./scripts/
+COPY scripts/testdaten.ts scripts/erfundene-mitglieder.ts scripts/admin-festlegen.ts scripts/test-pruefung-server.ts scripts/pruefkonten.ts ./scripts/
 # Einrichtung der Umgebungen (Compose, Caddy, Skripte); der Server entnimmt sie dem Image.
 COPY betrieb ./betrieb
 USER node
