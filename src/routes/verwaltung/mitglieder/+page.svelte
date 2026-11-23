@@ -61,8 +61,8 @@
 </Seitenkopf>
 <Seiteninfo>
 	<p>
-		Alle Mitglieder suchen und über «Bearbeiten» ihre Seite öffnen: Angaben, Mitgliedschaft, Login
-		und Rollen.
+		Alle Mitglieder suchen und über «Bearbeiten» ihre Seite öffnen: Angaben, Mitgliedschaft und
+		Login. Rollen vergibt und entzieht der MyTCO-Admin auf der Seite «Rollen».
 	</p>
 	<p>Neue Mitglieder kommen einzeln über «Mitglied anlegen» oder als Datei über «Einlesen».</p>
 </Seiteninfo>

@@ -13,9 +13,7 @@
 		beendeSitzungen,
 		erzeugeBrief,
 		speichereAngaben,
-		speichereRollen,
-		type AusgestellterBrief,
-		type Rolle
+		type AusgestellterBrief
 	} from '../../../../lib/verwaltung/mitglieder-api.ts';
 	import {
 		VERALTET,
@@ -47,8 +45,8 @@
 	let angabenMeldung = $state<string | null>(null);
 	let angabenStoerung = $state<string | null>(null);
 	// Ein anderer hat seit dem Laden gespeichert: nichts gespeichert, die Eingaben bleiben stehen.
-	// Die Meldung gilt nur für den Stand, bei dem sie kam; lädt die Seite neue Angaben (auch über
-	// «Rollen speichern»), verschwindet sie.
+	// Die Meldung gilt nur für den Stand, bei dem sie kam; lädt die Seite neue Angaben (etwa nach
+	// einer anderen Aktion), verschwindet sie.
 	let veraltetBei = $state<string | null>(null);
 	const angabenVeraltet = $derived(veraltetBei === JSON.stringify(angaben));
 	// Solange die Angaben abweichen, ginge ein Brief an die alte Adresse: erst speichern.
@@ -86,17 +84,13 @@
 			nachSpeichern += 1;
 		});
 
-	// Rollen: «Mitglied» hat jedes Konto, die übrigen vergibt nur der MyTCO-Admin.
-	const WAHL: Rolle[] = ['mytco', 'mitglieder', 'cm', 'lizenz'];
+	// A-ROLLE-01: Rollen nur zum Lesen; vergeben und entziehen geht auf der Seite «Rollen» (#96).
+	const rollenZeile = $derived(
+		['Mitglied', ...detail.rollen.map((r) => ROLLEN_NAME[r])].join(' · ')
+	);
 	const darfRollen = $derived(data.darfSchreiben.rollen);
 	// Regel 3: Der MyTCO-Admin liest die Angaben, ändern kann sie nur der Mitglieder-Admin.
 	const nurLesen = $derived(!data.darfSchreiben.mitglieder);
-	// Die Auswahl wird nur neu gesetzt, wenn sich die gespeicherten Rollen ändern; ungespeicherte
-	// Häkchen überstehen ein Neuladen nach «Angaben speichern».
-	const rollenSchluessel = $derived([...detail.rollen].sort().join(','));
-	let gewaehlt = $derived<Rolle[]>(
-		rollenSchluessel === '' ? [] : (rollenSchluessel.split(',') as Rolle[])
-	);
 	// Eine Anfrage nach der anderen: ein Doppelklick schickt nicht zwei Mal (Verlaufseinträge).
 	// Solange eine läuft, sind die Tasten der Rückfragen gesperrt.
 	let laeuft = $state(false);
@@ -109,55 +103,6 @@
 			laeuft = false;
 		}
 	}
-	let rollenMeldung = $state<string | null>(null);
-	let rollenFehler = $state<string | null>(null);
-	// Wie bei den Angaben: Die Meldung gilt nur für den Stand, bei dem sie kam.
-	let rollenVeraltetBei = $state<string | null>(null);
-	const rollenVeraltet = $derived(rollenVeraltetBei === rollenSchluessel);
-	const ladeNeueRollen = () => einzeln(() => invalidateAll());
-	const rollenGeaendert = $derived(
-		WAHL.some((r) => gewaehlt.includes(r) !== detail.rollen.includes(r))
-	);
-
-	function waehle(rolle: Rolle, an: boolean) {
-		gewaehlt = an ? [...gewaehlt, rolle] : gewaehlt.filter((r) => r !== rolle);
-	}
-
-	// Wer sich selbst die Rolle MyTCO-Admin entzieht, kann keine Rollen mehr vergeben: vorher eine
-	// Rückfrage.
-	let rollenRueckfrage = $state<HTMLDialogElement>();
-	const verliertMytco = $derived(
-		data.eigeneMitgliedId === detail.id &&
-			detail.rollen.includes('mytco') &&
-			!gewaehlt.includes('mytco')
-	);
-	function speichereDieRollen() {
-		if (verliertMytco) rollenRueckfrage?.showModal();
-		else void einzeln(schickeRollen);
-	}
-	function entziehe() {
-		rollenRueckfrage?.close();
-		void einzeln(schickeRollen);
-	}
-	async function schickeRollen() {
-		rollenMeldung = null;
-		rollenFehler = null;
-		rollenVeraltetBei = null;
-		const a = await speichereRollen(detail.id, gewaehlt, detail.rollen);
-		if (await leiteUm(a)) return;
-		if (a.art === 'ok') {
-			rollenMeldung = 'Rollen gespeichert';
-			await invalidateAll();
-		} else if (a.art === 'letzter-mytco') {
-			rollenFehler =
-				'Du bist der letzte MyTCO-Admin. Gib zuerst jemand anderem die Rolle MyTCO-Admin.';
-		} else if (a.art === 'veraltet') {
-			rollenVeraltetBei = rollenSchluessel;
-		} else {
-			rollenFehler = fehlerText(a);
-		}
-	}
-
 	// Sitzungen beenden: erst Rückfrage im <dialog>
 	let rueckfrage = $state<HTMLDialogElement>();
 	let sitzungenMeldung = $state<string | null>(null);
@@ -258,6 +203,11 @@
 	{#if angaben.mitgliedernummer}
 		<p class="leise">Mitgliedernummer {angaben.mitgliedernummer}</p>
 	{/if}
+	<p class="leise">
+		Rollen: {rollenZeile}{#if darfRollen}&nbsp;·&nbsp;<a href={resolve('/verwaltung/rollen')}
+				>Auf der Seite «Rollen» ändern</a
+			>{/if}
+	</p>
 
 	<div class="spalten">
 		<div>
@@ -360,66 +310,9 @@
 			</details>
 
 			<Einstellungen einstellungen={detail.einstellungen} />
-
-			{#if darfRollen}
-				<details class="karte klappe" data-ungespeichert={rollenGeaendert ? '' : undefined}>
-					<summary class="klappe-titel"
-						>Rollen <span class="leise"
-							>{['Mitglied', ...detail.rollen.map((r) => ROLLEN_NAME[r])].join(' · ')}</span
-						></summary
-					>
-					<p>
-						<label><input type="checkbox" checked disabled /> Mitglied (immer)</label>
-					</p>
-					{#each WAHL as r (r)}
-						<p>
-							<label
-								><input
-									type="checkbox"
-									checked={gewaehlt.includes(r)}
-									onchange={(e) => waehle(r, e.currentTarget.checked)}
-									aria-describedby={r === 'mytco' && rollenFehler ? 'rollen-fehler' : undefined}
-								/>
-								{ROLLEN_NAME[r]}</label
-							>
-						</p>
-					{/each}
-					{#if rollenFehler}
-						<p class="fehler" id="rollen-fehler" role="alert">{rollenFehler}</p>
-					{/if}
-					{#if rollenVeraltet}
-						<p class="fehler" role="alert">{VERALTET}</p>
-						<div class="leiste">
-							<button type="button" class="taste-neben" onclick={ladeNeueRollen}
-								>Neuen Stand laden</button
-							>
-						</div>
-					{/if}
-					<div class="leiste">
-						<button
-							type="button"
-							class="taste-neben"
-							disabled={!rollenGeaendert}
-							onclick={speichereDieRollen}>Rollen speichern</button
-						>
-					</div>
-					<p class="leise" role="status">{rollenGeaendert ? '' : (rollenMeldung ?? '')}</p>
-				</details>
-			{/if}
 		</div>
 	</div>
 {/if}
-
-<dialog class="karte" bind:this={rollenRueckfrage} aria-labelledby="rollen-titel">
-	<h2 id="rollen-titel">Rolle MyTCO-Admin entziehen?</h2>
-	<p>Du kannst danach keine Rollen mehr vergeben.</p>
-	<div class="leiste">
-		<button type="button" class="taste-neben" onclick={() => rollenRueckfrage?.close()}
-			>Abbrechen</button
-		>
-		<button type="button" class="taste-haupt" onclick={entziehe}>Rolle entziehen</button>
-	</div>
-</dialog>
 
 <dialog class="karte" bind:this={rueckfrage} aria-labelledby="sitzungen-titel">
 	<h2 id="sitzungen-titel">Alle Sitzungen beenden?</h2>

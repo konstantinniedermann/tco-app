@@ -228,7 +228,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Name mit Rufname, kurze Textform | reine Textfunktion | dieselbe Regel für Fliesstext und reinen Text: «Rufname (Vorname Nachname)», ohne Rufname «Vorname Nachname»; die Begrüssung nimmt nur den Rufnamen. Nur eingeloggt; Seiten ohne Login und die Mitgliederverwaltung zeigen den amtlichen Namen |
 | Breite Taste | `.taste-breit` | Zusatz zu einer Taste: volle Breite (Formulare auf dem Handy) |
 | Feld-Zeile | `.feld-zeile` | nur Verwaltung: Bezeichnung links, Eingabe rechts, gleiche Schriftgrösse; unter `60rem` steht die Bezeichnung über dem Feld |
-| Inaktive Taste | `.taste-haupt:disabled`, `.taste-neben:disabled` | nur Verwaltung: grau, solange es nichts zu speichern gibt; die Taste nennt, was sie speichert («Angaben speichern», «Rollen speichern»); Haupt- und Nebentaste sehen inaktiv gleich aus |
+| Inaktive Taste | `.taste-haupt:disabled`, `.taste-neben:disabled` | nur Verwaltung: grau, solange es nichts zu speichern gibt; die Taste nennt, was sie speichert (z. B. «Angaben speichern»); Haupt- und Nebentaste sehen inaktiv gleich aus |
 | Spalten | `.spalten` | nur Verwaltung: zwei Spalten ab `60rem` |
 | Kennzahl | `.kennzahl` in `.kennzahlen` | nur Verwaltung: Karte mit einer Zahl in `--groesse-titel` und dem Text darunter in `.leise` (*kommen*, *noch keine Antwort*); mehrere nebeneinander, brechen um |
 | Mehrzeiliger Text | `.mehrzeilig` | Freitext mit Zeilenumbrüchen anzeigen, wie eingegeben (Einladung eines Anlasses) |

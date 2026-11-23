@@ -38,7 +38,7 @@ verteilt der MyTCO-Admin die Rollen von Hand. Einzelheiten im
 
 | ID | Regel | Status |
 |----|-------|--------|
-| RR-01 | Jedes Konto hat die Rolle *Mitglied*; die vier Admin-Rollen kommen einzeln dazu. Eine Person kann mehrere Rollen haben, ihre Rechte addieren sich (FR-03). Rollen vergibt und entzieht nur der MyTCO-Admin, auch sich selbst; jede Vergabe und jeder Entzug steht im Änderungsverlauf (FR-26). Einmalige Ausnahme: Die Migration des Rollen-Umbaus (`drizzle/0009_rollen_schaerfen.sql`) gab den bisherigen Admins MyTCO- und Mitglieder-Admin ohne Verlaufseintrag | umgesetzt |
+| RR-01 | Jedes Konto hat die Rolle *Mitglied*; die vier Admin-Rollen kommen einzeln dazu. Eine Person kann mehrere Rollen haben, ihre Rechte addieren sich (FR-03). Rollen vergibt und entzieht nur der MyTCO-Admin, auch sich selbst, einzeln je Rolle auf der Seite *Rollen* (die Seite eines Mitglieds zeigt sie nur an, #96); jede Vergabe und jeder Entzug steht im Änderungsverlauf (FR-26). Einmalige Ausnahme: Die Migration des Rollen-Umbaus (`drizzle/0009_rollen_schaerfen.sql`) gab den bisherigen Admins MyTCO- und Mitglieder-Admin ohne Verlaufseintrag | umgesetzt |
 | RR-02 | Gestrichen: «Der Admin darf alles, was CM- und Lizenzverantwortlicher dürfen». Es gibt keine stille Stellvertretung: Muss jemand einspringen, gibt der MyTCO-Admin sich oder einer anderen Person die Rolle, und das steht im Änderungsverlauf (K-18.4, ändert die Antwort auf K-18.1) | verworfen (#43) |
 | RR-03 | Es bleibt immer mindestens ein MyTCO-Admin: Der letzte kann sich die Rolle nicht entziehen und sein Konto nicht löschen. Zwei MyTCO-Admins (K-18.3) sind eine Abmachung, keine Sperre | umgesetzt (Entzug der Rolle, Austritt und Vormerken zum Löschen) |
 | RR-04 | Einmal-Codes (Brief- und Mail-Code) sind nur als Hash gespeichert und nach der Ausgabe für niemanden abrufbar, auch nicht für die Verwaltung. Der Mitglieder-Admin kann einen neuen Brief-Code ausstellen, der nur den alten Brief-Code ersetzt, und alle Sitzungen eines Kontos beenden; einen Code per E-Mail holt sich das Mitglied selbst (A-LOGIN-10, [#29](https://github.com/konstantinniedermann/tco-app/issues/29)) | umgesetzt (Sitzungen beenden und neuer Brief-Code in der Verwaltung, einzeln und als Serie) |
@@ -89,7 +89,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Mitgliederliste einlesen (A-MITGLIED-07) | – | – | – | – | S | L |
 | Liste *Briefe*: wer MyTCO noch nie geöffnet hat (A-LOGIN-01) | – | – | – | – | S | L |
 | Neuer Code für einen Brief, Briefe auslösen, Sitzungen beenden | – | – | – | – | S | – |
-| Rollen vergeben | – | – | – | – | – | S |
+| Rollen vergeben und entziehen (Seite *Rollen*) | – | – | – | – | – | S |
 | Änderungsverlauf (FR-26) | – | – | – | – | L | L |
 | Liste *Für Fairgate*: selbst geänderte Kontaktangaben sehen und abhaken (A-KONTO-02, Annahme K-19.2) | – | – | – | – | S | L |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S | L |
