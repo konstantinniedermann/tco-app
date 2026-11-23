@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help check check-schnell docs release-check annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev dev-handy seed ic-import admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief css-vergleich
+.PHONY: help check check-schnell docs release-check test-pruefung annahmen voraussetzungen voraussetzungen-docker voraussetzungen-env db dev dev-handy seed ic-import admin test e2e build image rauchtest betrieb-nachweis secrets hooks musterbrief css-vergleich
 
 help: ## Diese Übersicht
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-24s\033[0m %s\n", $$1, $$2}'
@@ -34,6 +34,9 @@ docs: ## Doku-Prüfung (Links, Struktur, Test-IDs, Annahmen, Design-Tokens; brau
 release-check: ## Vor dem Release dev → main: Version, docs/versionen.md und Tags abgleichen (holt Tags und origin/main)
 	@bash scripts/pruefe-node.sh
 	@node scripts/pruefungen/release.ts
+
+test-pruefung: voraussetzungen voraussetzungen-env ## Vor dem Release: Prüflauf gegen den echten Test-Server (SSH und Test-Adresse aus .env; legt dort zwei Prüfkonten an, falls sie fehlen)
+	@node --env-file=.env scripts/test-pruefung.ts
 
 annahmen: ## Annahmen zu offenen Fragen an den Verein auflisten (alle, oder nur eine: make annahmen K=K-11)
 	@node scripts/pruefungen/annahmen.ts --liste $(K)

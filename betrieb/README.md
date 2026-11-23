@@ -81,6 +81,10 @@ erfundenen Mitglieder neu an. Erst nach einer geglückten Auslieferung steht die
 `test/zustand/neu-aufgesetzt`; scheitert sie, setzt die nächste wieder neu auf. Live liest den
 Zähler nie.
 
+Dazu kommen zwei erfundene Prüfkonten, Paul und Pia Prüflauf (Pia ist Mitglieder-Admin). Sie
+entstehen nicht beim Neuaufsetzen, sondern beim nächsten `make test-pruefung`
+(`scripts/test-pruefung-server.ts`, verweigert ohne `MAIL_NUR_AN`, also nie auf Live).
+
 Zwei Branches, die die Zahl auf denselben Wert erhöhen, mergen ohne Konflikt, und Test wird nur
 einmal neu aufgesetzt; die Testdaten des später gemergten fehlen dann. Darum vor dem Merge `dev`
 einmergen: Hat `dev` die Zahl seit dem Abzweigen schon erhöht, sie im eigenen Branch noch einmal

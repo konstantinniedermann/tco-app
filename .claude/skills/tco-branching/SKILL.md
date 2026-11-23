@@ -267,8 +267,30 @@ Code ist der Abgleich nie reine Doku: Er setzt die Nummer, sein Commit läuft du
    um genau einen Schritt steigt, ihr Abschnitt zuoberst steht und «Unveröffentlicht» leer ist.
    Das Ergebnis (Fixes, Beobachtungen, Befunde auf hoch) kommt kurz in den Text des Release-PR.
 
+**4b — Prüflauf und Auswahl der Handpunkte** (sobald Test läuft): Wenn Test die neue Nummer
+zeigt (CI auf `dev` grün, Job «Ausliefern»), im Hauptordner `make test-pruefung` starten (vorher
+`ssh-add --apple-load-keychain`; `MYTCO_TEST_URL` und `MYTCO_TEST_SSH` in der `.env` des
+Hauptordners). Rot: nicht weiter, Befund klären (Fix-Branch oder Test erneut ausliefern). Ein
+zweiter Lauf frühestens nach einer Stunde (3 Mails pro Adresse und Stunde, Pia braucht zwei).
+Den Commit von `origin/dev`, gegen den der Lauf ging, als **geprüften Stand** festhalten. Dann die
+Handpunkte auswählen nach der Regel in `docs/testkonzept.md` (Checkliste vor dem Release,
+«Welche Runden»): immer die Grundrunde, sonst nur Berührtes seit dem letzten Release
+(`git diff --name-only origin/main...origin/dev`, Abschnitte in `docs/versionen.md`), die volle
+Runde vor dem Einschalten von Live und bei Änderungen an Login, Passkey, Push, Startbildschirm
+oder Briefen. Jede Auswahl mit einem Satz Begründung. Für die Android-Runde den Text der Runde
+aus dem Testkonzept für die externe Person bereitstellen; ist niemand da und Live aus, im PR
+«Android: ausgesetzt, Grund …».
+
 **5 — PR anlegen und mergen:** Direkt davor im Hauptordner `make release-check` noch einmal —
-andere Sessions können seit 4a nach `dev` gemergt haben.
+andere Sessions können seit 4a nach `dev` gemergt haben. Der PR entsteht als **Entwurf**
+(`--draft`) mit dem Text aus `.github/release-pr.md` (ausgefüllt: Tabelle des Prüflaufs, Link
+auf den CI-Lauf des Abgleichs, ausgewählte Handpunkte, Ergebnis des Abgleichs). Der
+Projektleiter hakt die Handpunkte im PR ab; erst wenn alle abgehakt oder begründet ausgesetzt
+sind, `gh pr ready <N>` und mergen. **Direkt vor `gh pr ready`:** `make release-check` erneut und
+den Kopf des PR (`gh pr view <N> --json headRefOid`) mit dem geprüften Stand vergleichen. Ist
+`dev` seither weitergezogen und liegt dazwischen Code (`nur-doku.ts` sagt `code`), gilt der Lauf
+nicht mehr: Doku-Abgleich nachziehen (Einträge in die Nummer), Prüflauf und berührte Handpunkte
+neu, PR-Text nachführen.
 Rot, weil «Unveröffentlicht» nicht leer ist (ein Merge mit Code kam nach dem Abgleich): Seine
 Einträge in den Abschnitt der neuen Nummer nachrücken, als **eigener Doku-Commit nach dem
 Merge** über einen Release-Branch wie in 4a. Im Merge selbst geht es nicht: Der Hook verlangt
@@ -276,7 +298,8 @@ beim Merge den Eintrag unter «Unveröffentlicht», die Prüfung vor dem Release
 Leere. Anderes Rot: wie 4a über einen Release-Branch nachziehen.
 
 ```bash
-gh pr create -R konstantinniedermann/tco-app --base main --head dev --title "Release: …" --body-file <datei>
+gh pr create -R konstantinniedermann/tco-app --base main --head dev --draft --title "Release: …" --body-file <datei>
+gh pr ready <N> -R konstantinniedermann/tco-app         # erst nach dem Abhaken
 gh pr checks <N> -R konstantinniedermann/tco-app        # warten bis grün
 gh pr merge <N> -R konstantinniedermann/tco-app --merge   # Merge-Commit, nie --squash
 ```

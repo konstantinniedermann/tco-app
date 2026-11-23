@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { istTestquelle, wirdAusgefuehrt } from './dateien.ts';
+import { istPruefLauf, istTestquelle, wirdAusgefuehrt } from './dateien.ts';
 
 describe('istTestquelle', () => {
 	it('erkennt test- und spec-Dateien in ts und js', () => {
@@ -36,5 +36,16 @@ describe('wirdAusgefuehrt', () => {
 		'scripts/a.db.test.ts'
 	])('%s läuft in keinem Testprogramm', (pfad) => {
 		expect(wirdAusgefuehrt(pfad)).toBe(false);
+	});
+});
+
+describe('istPruefLauf', () => {
+	it('erkennt den Prüflauf gegen Test, den nur make test-pruefung startet', () => {
+		expect(istPruefLauf('tests/test-server/pruefung.test.ts')).toBe(true);
+		expect(wirdAusgefuehrt('tests/test-server/pruefung.test.ts')).toBe(false);
+	});
+	it('zählt andere Tests nicht dazu', () => {
+		expect(istPruefLauf('tests/e2e/a.test.ts')).toBe(false);
+		expect(istPruefLauf('tests/a.test.ts')).toBe(false);
 	});
 });

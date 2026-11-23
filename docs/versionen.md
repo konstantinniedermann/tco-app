@@ -11,6 +11,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Werkzeug: `make test-pruefung` prüft vor dem Release den echten Test-Server (Fusszeile, Login,
+  Verwaltung, Zeitgeber, Interclub-Abruf); die Checkliste vor dem Release ist nach Prüfart und
+  Gerät geordnet. An der App ändert sich nichts.
+
 ## 0.24.0 — Interclub mit Push, Tabellen am PC, Rollen auf einer Seite
 
 - Verwaltung: Die Erklärung oben auf den Seiten bleibt bei grosser Schrift auch auf schmalen Handys

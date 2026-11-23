@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { matchesGlob } from 'node:path';
-import { DATENBANK, E2E, EINHEIT } from './testmuster.ts';
+import { DATENBANK, E2E, EINHEIT, TESTSERVER, type Testmuster } from './testmuster.ts';
 
 /** Alle versionierten Dateien ausser denen der Prüfskripte selbst (deren Fixtures sind absichtlich „falsch"). */
 export function versionierteDateien(): string[] {
@@ -18,10 +18,17 @@ export function istTestquelle(pfad: string): boolean {
 
 /** Ob Vitest oder Playwright die Datei ausführt (Muster aus testmuster.ts). */
 export function wirdAusgefuehrt(pfad: string): boolean {
+	return [EINHEIT, DATENBANK, E2E].some((muster) => passtAuf(pfad, muster));
+}
+
+/** Ob die Datei zum Prüflauf gegen Test gehört (nur `make test-pruefung`). */
+export function istPruefLauf(pfad: string): boolean {
+	return passtAuf(pfad, TESTSERVER);
+}
+
+function passtAuf(pfad: string, { include, exclude }: Testmuster): boolean {
 	const passt = (muster: string[]) => muster.some((glob) => matchesGlob(pfad, glob));
-	return [EINHEIT, DATENBANK, E2E].some(
-		({ include, exclude }) => passt(include) && !passt(exclude)
-	);
+	return passt(include) && !passt(exclude);
 }
 
 export function leseDateien(pfade: string[]): Map<string, string> {
