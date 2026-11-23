@@ -341,7 +341,7 @@ export function getSpieler(d: AdminDienste, e: AdminEreignis): Promise<Response>
 
 /**
  * Teil 4, Ziel 3: Klassierung eines Spielers korrigieren, im Verlauf (FR-26). Meldung nur mit
- * Häkchen; ohne Angabe keine (FR-56).
+ * Häkchen und nur bei geändertem Wert; ohne Angabe keine (FR-56).
  */
 export function postKlassierung(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
 	return schreibt(d, e, 'cm', async (urheber, koerper) => {
@@ -350,8 +350,9 @@ export function postKlassierung(d: MitteilungAdminDienste, e: AdminEreignis): Pr
 		const benachrichtigen = leseBenachrichtigen(koerper, false);
 		if (!istKlassierung(koerper.klassierung) || benachrichtigen === null) return eingabeFehler();
 		const r = await korrigiereKlassierung(d.db, urheber, mitgliedId, koerper.klassierung, jetzt(d));
-		if (r !== 'ok') return nichtGefunden();
-		if (benachrichtigen) meldeKlassierung(d, urheber, mitgliedId);
+		if (r === 'nicht-gefunden') return nichtGefunden();
+		// Nur eine echte Änderung meldet; der gleiche Wert ist `unveraendert`.
+		if (r === 'ok' && benachrichtigen) meldeKlassierung(d, urheber, mitgliedId);
 		return antwort(200, {});
 	});
 }

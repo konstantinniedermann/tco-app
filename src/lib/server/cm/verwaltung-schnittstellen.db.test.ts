@@ -559,7 +559,7 @@ describe('Anmeldungen verwalten (Teil 4)', () => {
 			post(cm, { klassierung: 'R5' }, { id: '999999999' })
 		);
 		expect(niemand.status).toBe(404);
-		expect(s.mails).toEqual([]);
+		// «Ohne Angabe keine Meldung» belegt der Test im Block «Häkchen der CM-Meldungen (FR-56)».
 	});
 });
 
@@ -1046,6 +1046,26 @@ describe('Häkchen der CM-Meldungen (FR-56)', () => {
 		expect(s.mails[0].text).not.toContain('R7');
 	});
 
+	test('FR-56: Klassierung mit true und gleichem Wert meldet nicht', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm']);
+		const gleich = await spieler('R3');
+		const mit = await spieler('R3');
+		const r = await postKlassierung(
+			s.d,
+			post(cm, { klassierung: 'R3', benachrichtigen: true }, { id: String(gleich.mitgliedId) })
+		);
+		expect(await antwortVon(r)).toEqual([200, {}]);
+		const ja = await postKlassierung(
+			s.d,
+			post(cm, { klassierung: 'R4', benachrichtigen: true }, { id: String(mit.mitgliedId) })
+		);
+		expect(await antwortVon(ja)).toEqual([200, {}]);
+		const erwartet = klassierungMail(mit.email);
+		await vi.waitFor(() => expect(s.mails).toContainEqual(erwartet));
+		expect(s.mails).toEqual([erwartet]);
+	});
+
 	test('FR-56: Wildcard-Entscheid meldet auch mit benachrichtigen false', async () => {
 		const t = await cmTurnier([['Herren A']]);
 		const s = baue(t.jetzt);
@@ -1061,7 +1081,7 @@ describe('Häkchen der CM-Meldungen (FR-56)', () => {
 		);
 	});
 
-	test('FR-56: benachrichtigen von falschem Typ → 400, nichts geändert (Einzel, Doppel, Absagen, Klassierung)', async () => {
+	test('FR-56: benachrichtigen von falschem Typ → 400, nichts geändert (Einzel, Doppel, Absagen, Anfrage löschen, Klassierung)', async () => {
 		const t = await cmTurnier([
 			['Herren A'],
 			['Herren B'],
@@ -1090,9 +1110,10 @@ describe('Häkchen der CM-Meldungen (FR-56)', () => {
 		expect(paarAn.status).toBe(200);
 		const paarId = await anmeldungIn(ka, p.mitgliedId);
 		const paar = { id: String(paarId) };
-		await db
+		const [offen] = await db
 			.insert(partnerAnfrage)
-			.values({ kategorieId: kb, vonId: c.mitgliedId, anId: p.mitgliedId, gestelltAm: t.jetzt });
+			.values({ kategorieId: kb, vonId: c.mitgliedId, anId: p.mitgliedId, gestelltAm: t.jetzt })
+			.returning({ id: partnerAnfrage.id });
 
 		for (const falsch of [1, 'ja', null]) {
 			const fall = (r: Response) => antwortVon(r).then((x) => [falsch, ...x]);
@@ -1123,6 +1144,14 @@ describe('Häkchen der CM-Meldungen (FR-56)', () => {
 			).toEqual(fehler);
 			expect(
 				await fall(
+					await postAnfrageLoeschen(
+						s.d,
+						post(cm, { benachrichtigen: falsch }, { id: String(offen.id) })
+					)
+				)
+			).toEqual(fehler);
+			expect(
+				await fall(
 					await postKlassierung(
 						s.d,
 						post(cm, { klassierung: 'R5', benachrichtigen: falsch }, { id: String(r3.mitgliedId) })
@@ -1134,11 +1163,12 @@ describe('Häkchen der CM-Meldungen (FR-56)', () => {
 		expect(await statusVon(paarId)).toEqual({ status: 'bestaetigt', kategorieId: ka });
 		expect(await anmeldungIn(ka, q.mitgliedId)).toBe(paarId);
 		expect((await ladeKategorie(db, kb))?.status).toBe('aktiv');
+		// Die offene Anfrage steht noch (weder Absagen noch Anfrage löschen ging durch).
 		const anfragen = await db
-			.select({ von: partnerAnfrage.vonId })
+			.select({ id: partnerAnfrage.id, von: partnerAnfrage.vonId })
 			.from(partnerAnfrage)
 			.where(eq(partnerAnfrage.kategorieId, kb));
-		expect(anfragen).toEqual([{ von: c.mitgliedId }]);
+		expect(anfragen).toEqual([{ id: offen.id, von: c.mitgliedId }]);
 		const [m] = await db
 			.select({ klassierung: mitglied.klassierung })
 			.from(mitglied)

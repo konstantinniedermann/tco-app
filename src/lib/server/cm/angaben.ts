@@ -109,12 +109,13 @@ export async function setzeKlassierung(
 	jetzt: Date
 ): Promise<'ok' | 'eingabe' | 'nicht-gefunden'> {
 	if (!istKlassierung(wert)) return 'eingabe';
-	return schreibeKlassierung(db, mitgliedId, wert, { art: 'mitglied', mitgliedId }, jetzt);
+	const r = await schreibeKlassierung(db, mitgliedId, wert, { art: 'mitglied', mitgliedId }, jetzt);
+	return r === 'unveraendert' ? 'ok' : r;
 }
 
 /**
- * Klassierung setzen und im Verlauf mit `urheber` festhalten (FR-26); der gleiche Wert ist `ok`
- * ohne Verlauf. Das Mitglied selbst und der CM-Admin ändern dasselbe Feld (Teil 2, Ziel 1).
+ * Klassierung setzen und im Verlauf mit `urheber` festhalten (FR-26); der gleiche Wert ist
+ * `unveraendert` ohne Verlauf. Das Mitglied selbst und der CM-Admin ändern dasselbe Feld (Teil 2, Ziel 1).
  */
 export async function schreibeKlassierung(
 	db: Db,
@@ -122,7 +123,7 @@ export async function schreibeKlassierung(
 	wert: Klassierung,
 	urheber: Urheber,
 	jetzt: Date
-): Promise<'ok' | 'nicht-gefunden'> {
+): Promise<'ok' | 'unveraendert' | 'nicht-gefunden'> {
 	return db.transaction(async (tx) => {
 		const [z] = await tx
 			.select({ klassierung: mitglied.klassierung, status: mitglied.status })
@@ -131,7 +132,7 @@ export async function schreibeKlassierung(
 			.for('update');
 		// Von einem gelöschten Mitglied bleibt nur der Name (FR-04).
 		if (!z || z.status === 'geloescht') return 'nicht-gefunden';
-		if (z.klassierung === wert) return 'ok';
+		if (z.klassierung === wert) return 'unveraendert';
 		await tx.update(mitglied).set({ klassierung: wert }).where(eq(mitglied.id, mitgliedId));
 		await schreibeVerlauf(
 			tx,
