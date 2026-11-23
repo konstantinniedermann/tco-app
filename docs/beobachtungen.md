@@ -290,6 +290,20 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** `machAdmin` und die E2E-Hilfe auf `vergibRolle` umstellen und `setzeRollen` streichen; die Meldung «inzwischen geändert» des Skripts entfällt dann. Klein, eigener Branch.
 
+### 2026-11-23 — E2E «#93: jede Menüseite … Seiteninfo» auf dem iPhone in der CI wacklig (Für Fairgate)
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/verwaltung.test.ts` (Test «#93: jede Menüseite der Verwaltung erklärt sich in ihrer Seiteninfo»), Prüfung `rechts.inhalt` auf `/verwaltung/fairgate`.
+
+**Beobachtung:** In der CI scheitert der Test auf dem iPhone mit `Expected: 0, Received: 1` bei `/verwaltung/fairgate` (Inhalt ragt rechts hinaus). So in den Läufen auf `dev` von 10:59 und 12:00 (dazwischen grün) und in beiden CI-Läufen auf dem Branch von #96 (23.11.2026); lokal grün. Ursache offen; Vermutung: Die Breite der Fairgate-Tabelle hängt von Daten paralleler Tests in der gemeinsamen E2E-Datenbank ab. Ein Trace liegt im Artefakt `test-results-iphone` des Laufs 45172782300 (`spur=true`).
+
+Daneben schlug auf dem Branch von #96 einmal der neue E2E «MyTCO-Admin entzieht sich die Rolle» auf Android fehl (Rückfrage nicht offen, Seite oben); im Lauf mit Trace grün, lokal 20-mal grün, auch mit 25 weiteren MyTCO-Admins und auf 3 s gestreckter Aufklapp-Animation. Ursache offen.
+
+**Ursprung:** CI-Lauf auf dem Branch von #96, Session vom 23.11.2026.
+
+**Einschätzung:** Trace mit `spur=true` holen, dann entweder die Prüfung auf eigene Daten stützen oder die Tabelle für lange Werte festigen.
+
 ### 2026-11-23 — Design System «MyTCO» steht bis auf die Seiteninfo auf dem Stand vom 09.11.
 
 **Thema:** Oberfläche

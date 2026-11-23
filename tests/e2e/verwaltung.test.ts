@@ -260,6 +260,9 @@ test('#96: MyTCO-Admin entzieht sich die Rolle und landet auf seiner übrigen Ve
 		.getByRole('button', { name: 'Entziehen' })
 		.click();
 	const rueckfrage = page.getByRole('dialog', { name: 'Rolle MyTCO-Admin entziehen?' });
+	// Erst bestätigen, wenn die Rückfrage wirklich den eigenen Namen nennt (gemeinsame Datenbank).
+	await expect(rueckfrage.getByText(`${nachname}, Ivo`)).toBeVisible();
+	await expect(rueckfrage.getByText('siehst diese Seite nicht mehr')).toBeVisible();
 	await rueckfrage.getByRole('button', { name: 'Entziehen' }).click();
 	// Ohne MyTCO-Admin gibt es die Seite «Rollen» nicht mehr: weiter zur Mitgliederverwaltung.
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
