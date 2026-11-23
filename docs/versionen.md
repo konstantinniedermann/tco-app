@@ -11,6 +11,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Verwaltung: Die Erklärung oben auf den Seiten bleibt bei grosser Schrift auch auf schmalen Handys
+  im Fenster; lange Wörter brechen um, statt über den Rand zu ragen.
 - Verwaltung: Rollen vergibt und entzieht der MyTCO-Admin nur noch auf der Seite «Rollen», je Rolle
   mit Suche und Rückfrage, auch bei Ausgetretenen. Die Seite eines Mitglieds zeigt seine Rollen nur
   noch an (#96).
