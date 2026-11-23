@@ -1,4 +1,5 @@
 <script lang="ts" generics="Z">
+	import { tick } from 'svelte';
 	import { gueltigeGrenze, type FilterWert } from './tabelle.ts';
 	import type { Tabellenstand } from './tabellen-stand.svelte.ts';
 
@@ -95,6 +96,17 @@
 			window.removeEventListener('scroll', nachfuehren, true);
 			window.removeEventListener('resize', nachfuehren);
 		};
+	});
+
+	// Ein neues Filterwort kann die Kopfzeile umbrechen und die Tabelle verschieben: Der offene
+	// Aufklapper rückt nach dem Zeichnen mit.
+	$effect(() => {
+		void stand.filter;
+		const karte = aufklapper;
+		if (!karte) return;
+		void tick().then(() => {
+			if (karte.matches(':popover-open')) platziere();
+		});
 	});
 
 	// Ziehgriff: Maus/Finger und Pfeiltasten (0,5 rem je Schritt).

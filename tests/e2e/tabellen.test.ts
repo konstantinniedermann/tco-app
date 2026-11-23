@@ -278,6 +278,16 @@ test('#92: Briefe zeigen den Jahrgang, filtern und wählen nur Gezeigte', async 
 	await page.getByRole('button', { name: 'Jahrgang filtern' }).click();
 	// Tippen wie von Hand: «2», «20», «201» filtern noch nicht und werfen keine Auswahl weg.
 	await page.getByLabel('Bis').pressSequentially('2010', { delay: 300 });
+	// Das neue Filterwort macht die Kopfzeile zweizeilig; der Aufklapper rückt mit und liegt unter
+	// seinem Trichter, nicht darüber.
+	const knopf = page.getByRole('button', { name: 'Jahrgang filtern' });
+	const karte = page.getByRole('group', { name: 'Jahrgang zeigen' });
+	await expect
+		.poll(async () => {
+			const k = (await knopf.boundingBox())!;
+			return (await karte.boundingBox())!.y - (k.y + k.height);
+		})
+		.toBeGreaterThanOrEqual(0);
 	await pruefeBildschirm(page, info, 'briefe-filter-offen');
 	await page.keyboard.press('Escape');
 	await expect(zeilen(page, nachname)).toHaveCount(2);
