@@ -78,6 +78,11 @@ describe('docker-bereit.sh', () => {
 		expect(erg.fehler).toContain('nach 3 s');
 	});
 
+	test('ungültige Frist: wartet mit der Vorgabe statt sofort abzubrechen', () => {
+		const erg = lauf({ docker: 'nach-start', frist: 'abc' });
+		expect(erg.code).toBe(0);
+	});
+
 	test('Docker Desktop fehlt auf dem Mac: Abbruch mit Hinweis', () => {
 		const erg = lauf({ docker: 'nie', app: false });
 		expect(erg.code).toBe(1);

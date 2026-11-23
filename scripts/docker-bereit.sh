@@ -8,9 +8,12 @@ docker info >/dev/null 2>&1 && exit 0
 
 if [ "$(uname)" = Darwin ] && open -ga Docker 2>/dev/null; then
 	frist="${DOCKER_START_FRIST:-120}"
+	case "$frist" in '' | *[!0-9]*) frist=120 ;; esac
 	echo "Docker Desktop startet …" >&2
+	# Zählt Durchläufe und echte Sekunden: Beim Hochfahren antwortet «docker info» langsam.
 	i=0
-	while [ "$i" -lt "$frist" ]; do
+	SECONDS=0
+	while [ "$i" -lt "$frist" ] && [ "$SECONDS" -lt "$frist" ]; do
 		sleep 1
 		docker info >/dev/null 2>&1 && exit 0
 		i=$((i + 1))
