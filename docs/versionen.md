@@ -11,6 +11,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Werkzeug: `make db`, `make check` und alles andere, was Docker braucht, starten Docker Desktop auf
+  dem Mac selbst, wenn es aus ist. An der App ändert sich nichts.
 - Verwaltung: Die Seiten der Mitgliederverwaltung und «Rollen» erklären unter dem Titel kurz, wozu
   sie da sind. Bei «Briefe» steht, dass verlorene Zugänge nicht über einen neuen Brief laufen, sondern über «Code per E-Mail» (#93).
 - Interclub: Mitglieder folgen Teams auf deren Seite und bekommen nach jedem neuen Endstand einen
