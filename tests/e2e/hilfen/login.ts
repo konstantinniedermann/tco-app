@@ -63,6 +63,10 @@ export async function setzeTelefon(mitgliedId: number, telefon: string): Promise
 	await hole().db.update(mitglied).set({ telefon }).where(eq(mitglied.id, mitgliedId));
 }
 
+export async function setzeJahrgang(mitgliedId: number, jahrgang: number | null): Promise<void> {
+	await hole().db.update(mitglied).set({ jahrgang }).where(eq(mitglied.id, mitgliedId));
+}
+
 /**
  * Das erfundene Mitglied ist ausgetreten, ohne die Folgen eines Austritts (seine Anmeldungen
  * bleiben stehen), wie nach dem Anmeldeschluss.

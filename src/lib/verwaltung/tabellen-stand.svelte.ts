@@ -43,7 +43,12 @@ export class Tabellenstand<Z> {
 	breiten = $state<Record<string, number>>({});
 
 	/** `url`: die sichtbare Adresse der Seite (`page.url`). */
-	constructor(tabelle: string, pfad: Tabellenseite, spalten: readonly Spalte<Z>[], url: URL) {
+	constructor(
+		tabelle: string,
+		pfad: Tabellenseite,
+		spalten: readonly Spalte<Z>[],
+		url: { readonly searchParams: Pick<URLSearchParams, 'get'> }
+	) {
 		this.tabelle = tabelle;
 		this.pfad = pfad;
 		this.spalten = spalten;

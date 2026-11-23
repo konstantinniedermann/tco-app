@@ -117,7 +117,7 @@ function grenze(art: 'ganz' | 'datum', t: string): string | null {
 
 /** Liest Sortierung, Häkchen- und Bereichsfilter; Unbekanntes und Kaputtes fällt still weg. */
 export function ausAdresse<Z>(
-	q: URLSearchParams,
+	q: Pick<URLSearchParams, 'get'>,
 	spalten: readonly Spalte<Z>[]
 ): { sortierung: Sortierung; filter: Filter } {
 	const sortRoh = q.get(SORT);
@@ -181,7 +181,10 @@ export function suchteil<Z>(
 }
 
 /** Steht etwas von dieser Tabelle in der Adresse (dann gilt die Adresse, nicht das Gedächtnis)? */
-export function hatTabellenwerte<Z>(q: URLSearchParams, spalten: readonly Spalte<Z>[]): boolean {
+export function hatTabellenwerte<Z>(
+	q: Pick<URLSearchParams, 'get'>,
+	spalten: readonly Spalte<Z>[]
+): boolean {
 	const a = ausAdresse(q, spalten);
 	return a.sortierung !== null || Object.keys(a.filter).length > 0;
 }

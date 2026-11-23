@@ -145,7 +145,7 @@
 				data-aktiv={sortiert ? '' : undefined}
 				onclick={() => stand.sortiere(schluessel)}
 			>
-				{titel}
+				<span class="sortier-text">{titel}</span>
 				<svg class={['pfeil', { 'pfeil-leise': !sortiert }]} viewBox="0 0 24 24" aria-hidden="true">
 					{#if sortiert === 'auf'}
 						<path d="M12 19V5M6 11l6-6 6 6" />
@@ -226,7 +226,7 @@
 						<label for="{id}-text">{titel} enthält</label>
 						<input
 							id="{id}-text"
-							type="search"
+							type="text"
 							autocomplete="off"
 							value={text}
 							oninput={(e) =>

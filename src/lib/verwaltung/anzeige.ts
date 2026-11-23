@@ -121,6 +121,28 @@ export function neueAngaben(z: Pick<FairgateZeile, 'felder' | 'angaben'>): strin
 }
 
 /** Plakette der Mitgliederliste: Status des Kontos, bei Austritt oder Löschung der Status. */
+export type KontoZustand =
+	'aktiv' | 'brief-offen' | 'ohne-brief' | 'gesperrt' | 'ausgetreten' | 'vorgemerkt';
+
+/** #92: Zustände der Spalte Konto für den Filter, in der Reihenfolge der Plaketten. */
+export const KONTO_ZUSTAENDE: readonly { wert: KontoZustand; text: string }[] = [
+	{ wert: 'aktiv', text: 'aktiv' },
+	{ wert: 'brief-offen', text: 'Brief offen' },
+	{ wert: 'ohne-brief', text: 'ohne Brief' },
+	{ wert: 'gesperrt', text: 'gesperrt' },
+	{ wert: 'ausgetreten', text: 'ausgetreten' },
+	{ wert: 'vorgemerkt', text: 'wird gelöscht' }
+];
+
+/** Der Zustand, den die Plakette einer Zeile zeigt (gelöschte stehen nie in der Liste). */
+export function kontoZustand(z: Pick<MitgliedZeile, 'login' | 'status'>): KontoZustand {
+	if (z.status === 'ausgetreten') return 'ausgetreten';
+	if (z.status === 'vorgemerkt') return 'vorgemerkt';
+	if (z.login === 'eingeloggt') return 'aktiv';
+	if (z.login === 'brief-offen' || z.login === 'gesperrt') return z.login;
+	return 'ohne-brief';
+}
+
 export function plakette(z: Pick<MitgliedZeile, 'login' | 'status'>): {
 	text: string;
 	klasse: string;
