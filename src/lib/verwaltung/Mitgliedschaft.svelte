@@ -31,6 +31,11 @@
 	// `austrittAm`, das Vormerken lässt es stehen. Darum heisst `austrittAm` bei «vorgemerkt»:
 	// vorher ausgetreten.
 	const davor = $derived(mg.austrittAm === null ? 'aktiv' : 'ausgetreten');
+	// FR-56: Kommt das Login zurück (Wiedereintritt, Rücknahme bei vorher aktiv), steht über den
+	// Tasten das Häkchen «Mitglied benachrichtigen»; sonst gäbe es niemanden zu benachrichtigen.
+	const loginKommtZurueck = $derived(
+		status === 'ausgetreten' || (status === 'vorgemerkt' && davor === 'aktiv')
+	);
 	const name = $derived(`${detail.angaben.vorname} ${detail.angaben.nachname}`);
 	const rollen = $derived(rollenText(detail.rollen));
 	const rollenWort = $derived(detail.rollen.length === 1 ? 'Rolle' : 'Rollen');
@@ -40,7 +45,8 @@
 	let zurueckFrage = $state<HTMLDialogElement>();
 	// Welchen Schritt die Rückfrage «… bekommt die Rolle(n) … zurück» bestätigt.
 	let zurueck = $state<'wiedereintritt' | 'rueckgaengig'>('wiedereintritt');
-	// FR-56: Häkchen «Mitglied benachrichtigen» der Rückfrage, beim Öffnen leer.
+	// FR-56: Häkchen in der Karte, leer und nach jeder erledigten Aktion wieder leer. Die Rückfrage
+	// (Mitglied mit Rollen) übernimmt seinen Wert.
 	let benachrichtigen = $state(false);
 	// Daten der Rückfragen: nur zur Anzeige, der Server rechnet selbst.
 	let frist = $state('');
@@ -63,15 +69,13 @@
 
 	// RR-08: Gespeicherte Admin-Rollen wirken wieder, sobald das Login zurückkommt; dann erst
 	// nachfragen. «Löschung rückgängig» gibt das Login nur zurück, wenn das Mitglied vorher aktiv war.
-	// Ohne Rückfrage gibt es kein Häkchen: Das Mitglied bekommt keine Meldung (FR-56).
 	function frageZurueck(art: 'wiedereintritt' | 'rueckgaengig') {
 		const loginKommt = art === 'wiedereintritt' || davor === 'aktiv';
 		if (detail.rollen.length === 0 || !loginKommt) {
-			fuehreAus((id) => ZURUECK[art](id, false));
+			fuehreAus((id) => ZURUECK[art](id, loginKommt && benachrichtigen));
 			return;
 		}
 		zurueck = art;
-		benachrichtigen = false;
 		zurueckFrage?.showModal();
 	}
 
@@ -91,6 +95,7 @@
 			if (await leiteUm(a)) return;
 			if (a.art === 'ok') {
 				erledigt = true;
+				benachrichtigen = false;
 				await invalidateAll();
 				// Die Rückfrage ist zu und die Taste vielleicht weg: der Fokus geht zur Karte.
 				titel?.focus();
@@ -148,6 +153,9 @@
 		{#if eigene && status !== 'vorgemerkt'}
 			<p class="leise">Deinen Austritt und dein Löschen erfasst ein anderer Mitglieder-Admin.</p>
 		{:else}
+			{#if loginKommtZurueck}
+				<Benachrichtigen bind:an={benachrichtigen} />
+			{/if}
 			<div class="leiste">
 				{#if status === 'aktiv'}
 					<button type="button" class="taste-neben" onclick={frageAustritt}
@@ -231,7 +239,6 @@
 			: `Löschung von ${name} rückgängig machen?`}
 	</h2>
 	<p>{detail.angaben.vorname} bekommt die {rollenWort} {rollen} zurück.</p>
-	<Benachrichtigen bind:an={benachrichtigen} />
 	<div class="leiste">
 		<button type="button" class="taste-neben" onclick={() => zurueckFrage?.close()}
 			>Abbrechen</button

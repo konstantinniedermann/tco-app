@@ -7,7 +7,7 @@ import {
 	legeKontoAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
-import { holeMailCode } from './hilfen/mail.ts';
+import { holeMailCode, mailTexte, warteAufMail } from './hilfen/mail.ts';
 import { MAILPIT_URL } from './hilfen/umgebung.ts';
 import {
 	pruefeBildschirm,
@@ -202,8 +202,13 @@ test('RR-08: Wiedereintritt eines Mitglieds mit Admin-Rolle fragt nach, ohne Rol
 	const karte = page.getByRole('region', { name: /^Mitgliedschaft/ });
 	const aktiv = 'Aktiv. Kommt der Austritt';
 
+	const haekchen = karte.getByRole('checkbox', { name: 'Mitglied benachrichtigen' });
+	const offen = 'Dein Zugang zu MyTCO ist wieder offen.';
+
 	// Mit Admin-Rolle: Rückfrage; Abbrechen ändert nichts, Weiter erfasst den Wiedereintritt.
+	// FR-56: Das Häkchen in der Karte ist leer; Vera bekommt keine Meldung (geprüft bei Otto).
 	await page.goto(`/verwaltung/mitglieder/${mitRolle.mitgliedId}`);
+	await expect(haekchen).not.toBeChecked();
 	await karte.getByRole('button', { name: 'Wiedereintritt erfassen' }).click();
 	const frage = page.getByRole('dialog', { name: `Wiedereintritt von Vera ${name} erfassen?` });
 	await expect(frage).toBeVisible();
@@ -217,11 +222,18 @@ test('RR-08: Wiedereintritt eines Mitglieds mit Admin-Rolle fragt nach, ohne Rol
 	await frage.getByRole('button', { name: 'Weiter' }).click();
 	await expect(karte).toContainText(aktiv);
 
-	// Ohne Rolle: keine Rückfrage, wie bisher.
+	// Ohne Rolle: keine Rückfrage, wie bisher. FR-56: mit Häkchen genau eine Meldung an Otto.
 	await page.goto(`/verwaltung/mitglieder/${ohneRolle.mitgliedId}`);
+	await haekchen.check();
 	await karte.getByRole('button', { name: 'Wiedereintritt erfassen' }).click();
 	await expect(karte).toContainText(aktiv);
 	await expect(page.getByRole('dialog')).toHaveCount(0);
+	await expect(haekchen).toHaveCount(0);
+	await warteAufMail(ohneRolle.email, 'MyTCO', offen);
+	expect((await mailTexte(ohneRolle.email, 'MyTCO')).filter((t) => t.includes(offen))).toHaveLength(
+		1
+	);
+	expect((await mailTexte(mitRolle.email, 'MyTCO')).filter((t) => t.includes(offen))).toEqual([]);
 
 	// Löschung rückgängig: Rückfrage nur, wenn das Login zurückkommt (vorher aktiv).
 	await page.goto(`/verwaltung/mitglieder/${vorgemerkt.mitgliedId}`);
