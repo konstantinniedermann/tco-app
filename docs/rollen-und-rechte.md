@@ -85,6 +85,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Eigener Rufname (freiwillig; das Mitglied setzt, ändert und löscht ihn selbst) | – | S eigene | S eigene | S eigene | S eigene, L alle | S eigene, L alle |
 | Eigener Name, Geschlecht, Jahrgang, Mitgliedernummer (Geschlecht und Jahrgang einmal selbst, wenn leer, FR-37) | – | L eigene | L eigene | L eigene | S | L |
 | Mitglieder anlegen, bearbeiten, löschen, Auskunft drucken (DS-07, das Öffnen steht immer im Änderungsverlauf, auch nur lesend; den eigenen Austritt und sich selbst löschen nicht, RR-10) | – | – | – | – | S | L |
+| Einstellungen anderer Mitglieder: Themen der Mitteilungen, angemeldete Geräte mit Push-Stand, Passkeys (nur Stand, ohne Push-Adresse und Schlüssel; Hilfe bei Problemen) | – | – | – | – | L | L |
 | Mitgliederliste einlesen (A-MITGLIED-07) | – | – | – | – | S | L |
 | Liste *Briefe*: wer MyTCO noch nie geöffnet hat (A-LOGIN-01) | – | – | – | – | S | L |
 | Neuer Code für einen Brief, Briefe auslösen, Sitzungen beenden | – | – | – | – | S | – |
