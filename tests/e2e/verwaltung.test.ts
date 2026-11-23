@@ -895,6 +895,21 @@ test('#93: jede Menüseite der Verwaltung erklärt sich in ihrer Seiteninfo', as
 		if (titel === 'Briefe') await pruefeBildschirm(page, info, 'seiteninfo-briefe');
 	}
 
+	// UI-02: Bei 200 % Schrift bleibt die Seiteninfo im Fenster, auch mit langen Wörtern.
+	for (const adresse of ['/verwaltung/fairgate', '/verwaltung/briefe']) {
+		await page.goto(adresse);
+		await expect(seiteninfo).toBeVisible();
+		await page.evaluate(() => (document.documentElement.style.fontSize = '200%'));
+		const rechts = await seiteninfo.evaluate((el) => ({
+			kante: el.getBoundingClientRect().right,
+			inhalt: el.scrollWidth - el.clientWidth,
+			fenster: window.innerWidth
+		}));
+		expect(rechts.kante, adresse).toBeLessThanOrEqual(rechts.fenster);
+		expect(rechts.inhalt, adresse).toBe(0);
+		await page.evaluate(() => (document.documentElement.style.fontSize = ''));
+	}
+
 	// Die Clubmeisterschaft braucht keine Seiteninfo.
 	await page.goto('/verwaltung/turniere');
 	await expect(page.getByRole('heading', { level: 1, name: 'Clubmeisterschaft' })).toBeVisible();
