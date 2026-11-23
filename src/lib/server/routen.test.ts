@@ -219,7 +219,10 @@ const ROUTEN: Record<string, Partial<Record<Methode, Verdrahtung>> | typeof EIGE
 		POST: [postDoppelVonHand, 'mitteilungAdmin']
 	},
 	'/api/admin/mitglieder': { GET: [getMitglieder, 'admin'], POST: [postMitglieder, 'admin'] },
-	'/api/admin/mitglieder/[id]': { GET: [getMitglied, 'admin'], POST: [postMitglied, 'admin'] },
+	'/api/admin/mitglieder/[id]': {
+		GET: [getMitglied, 'admin'],
+		POST: [postMitglied, 'mitteilungAdmin']
+	},
 	'/api/admin/mitglieder/[id]/auskunft': { GET: [getAuskunft, 'admin'] },
 	'/api/admin/mitglieder/[id]/austritt': { POST: [postAustritt, 'mitteilungAdmin'] },
 	'/api/admin/mitglieder/[id]/brief': { POST: [postBriefVerwaltung, 'admin'] },

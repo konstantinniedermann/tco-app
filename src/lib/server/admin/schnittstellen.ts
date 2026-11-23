@@ -8,6 +8,7 @@ import {
 	formatFehler,
 	istJson,
 	jetzt,
+	leseBenachrichtigen,
 	leseKoerper,
 	nichtGefunden
 } from '../http.ts';
@@ -52,6 +53,7 @@ import {
 	type Rolle
 } from './rollen.ts';
 import { istAktion, ladeVerlauf, schreibeVerlauf } from './verlauf.ts';
+import { meldeVerwaltung, profilMeldung } from './meldung.ts';
 import type { Rueckzug } from '../cm/austritt.ts';
 import {
 	austrittAnfrageMeldung,
@@ -164,7 +166,8 @@ export function getMitglied(d: AdminDienste, e: AdminEreignis): Promise<Response
 	});
 }
 
-export function postMitglied(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+// FR-56: `benachrichtigen` (Standard nein) meldet dem Mitglied die geänderten Felder ohne Wert.
+export function postMitglied(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
 	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
@@ -173,12 +176,16 @@ export function postMitglied(d: AdminDienste, e: AdminEreignis): Promise<Respons
 		if (!p.ok) return antwort(400, { fehler: 'eingabe', felder: p.fehler });
 		// Der Stand, den die Seite geladen hat: schützt vor dem Überschreiben fremder Änderungen.
 		const vorher = leseStand(koerper.vorher);
-		if (vorher === null) return eingabeFehler();
+		const benachrichtigen = leseBenachrichtigen(koerper, false);
+		if (vorher === null || benachrichtigen === null) return eingabeFehler();
 		const r = await aendereAngaben(d.db, urheber, id, p.angaben, vorher, t);
 		switch (r.ergebnis) {
 			case 'ok':
 				// Nach dem Commit und ohne Warten: Die Antwortzeit verrät nichts, ein Mailfehler ändert sie nicht.
+				// SI-09: Der Hinweis an die alte Adresse geht unabhängig vom Häkchen.
 				if (r.alteEmail !== null) void d.hinweis(r.alteEmail);
+				if (benachrichtigen && r.geaendert.length > 0)
+					meldeVerwaltung(d, urheber, id, profilMeldung(r.geaendert));
 				return antwort(200, { geaendert: r.geaendert });
 			case 'vergeben':
 				return antwort(409, { fehler: 'vergeben', feld: r.feld });
@@ -445,7 +452,8 @@ export function postFairgate(d: AdminDienste, e: AdminEreignis): Promise<Respons
 	});
 }
 
-// Mit den Diensten der Mitteilungen: Austritt und Löschung melden den Doppelpartnern.
+// Mit den Diensten der Mitteilungen: Austritt und Löschung melden den Doppelpartnern, die
+// Profiländerung dem Mitglied (FR-56).
 export const ADMIN_SCHNITTSTELLEN = {
 	getZugang,
 	postZugangCode,
