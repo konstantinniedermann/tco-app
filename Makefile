@@ -42,8 +42,8 @@ voraussetzungen: ## Prüft Node-Version (.nvmrc) und node_modules (installiert n
 	@bash scripts/pruefe-node.sh
 	@test -d node_modules || { echo "Abbruch: node_modules fehlt — «npm ci --ignore-scripts» ausführen." >&2; exit 1; }
 
-voraussetzungen-docker: ## Prüft, ob Docker erreichbar ist (installiert nichts)
-	@docker info >/dev/null 2>&1 || { echo "Abbruch: Docker ist nicht erreichbar — Docker Desktop starten." >&2; exit 1; }
+voraussetzungen-docker: ## Prüft, ob Docker erreichbar ist; startet Docker Desktop auf dem Mac bei Bedarf (installiert nichts)
+	@bash scripts/docker-bereit.sh
 
 voraussetzungen-env: ## Prüft, ob die lokalen Einstellungen (.env) da sind (legt nichts an)
 	@test -f .env || { echo "Abbruch: .env fehlt — «cp .env.example .env» ausführen." >&2; exit 1; }
