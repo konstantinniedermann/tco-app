@@ -156,38 +156,47 @@ Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05
   spätestens beim nächsten Start der App.
 - **Markierung für Fairgate offen:** sobald der Mitglieder-Admin die Angaben als übertragen abhakt; das
   Abhaken steht im Änderungsverlauf.
-- **Testgruppe:** Liste der Testpersonen nach Lauf 2, spätestens zu Beginn der
+- **Testgruppe:** Mail-Adressen der Testpersonen auf Test beim Neuaufsetzen von Test nach dem
+  Probelauf; Liste der Testpersonen nach dem letzten Lauf, spätestens zu Beginn der
   CM-Anmeldung; Formularantworten nach der Auswertung des jeweiligen Laufs; Spalten zur
   Testgruppe in der Fragen-Tabelle bei der Übernahme in die Liste ([Testgruppe](#testgruppe)).
 
 ## Testgruppe
 
-Vor dem Briefversand prüft eine Testgruppe den Start auf Live ([Testgruppe](testgruppe.md)).
+Vor dem Briefversand spielt eine Testgruppe die ganze App in einem Probelauf auf Test durch,
+mit erfundenen Personas ([Testgruppe](testgruppe.md)).
 
-- **Daten auf Live** sind Betrieb, kein Test: DS-08 gilt nicht. Die Konten der Testpersonen
-  bleiben nach dem Pilot bestehen.
-- **Liste der Testpersonen** (Name, Gerät, Softwareversion, Mailanbieter, Altersgruppe grob)
-  nur im gitignorierten Ordner `intern/`, vom Projektleiter selbst angelegt. An Claude
-  (Anthropic, USA) gehen nur die Angaben ohne Namen. Ins Repo kommen nur Anzahl und Verteilung.
+- **Daten auf Test** sind erfunden (DS-08). **Ausnahme:** Die Persona trägt die echte
+  Mail-Adresse der Testperson, mit ihrem Einverständnis, damit die Mails von MyTCO echt
+  ankommen. Die Adresse sehen auch die Admin-Personas, die die Persona anlegen und verwalten.
+  Versand über einen Anbieter in der Schweiz oder EU (DS-01). Gelöscht beim Neuaufsetzen von
+  Test nach dem Lauf. Zweite Adressen fürs «E-Mail ändern» gelten gleich.
+- **Mail-Fänger:** Mails an alle anderen Adressen (die erfundenen Konten der Testdaten) landen
+  weiter im Mail-Fänger hinter dem Test-Passwort. Damit darüber niemand in die Verwaltung mit den
+  echten Adressen kommt, haben diese Konten während des Laufs keine Admin-Rolle.
+- **Test-Passwort:** Die Testpersonen bekommen es und sehen damit auch die öffentlichen
+  Interclub-Resultate mit Spielernamen (DS-08).
+- **Liste der Testpersonen** (Name, Persona, Gerät, Softwareversion, Mail-Adresse,
+  Altersgruppe grob) nur im gitignorierten Ordner `intern/`, vom Projektleiter selbst angelegt.
+  An Claude (Anthropic, USA) gehen nur Persona, Gerät, Softwareversion und Altersgruppe. Ins Repo
+  kommen nur Anzahl und Verteilung.
 - **Fragen-Tabelle** (Google): Wer aus dem Vorstand mitmachen will, trägt sich auf *Wer ist
   wer* mit Handymodell ein. Die Spalten werden bei der Übernahme in die Liste geleert.
-- **Formular** (Google, ausserhalb CH/EU): ohne Name, ohne E-Mail-Adresse, ohne Jahrgang.
-  Bei wenigen Personen lässt sich eine Antwort manchmal trotzdem zuordnen; deshalb nur grobe
-  Angaben.
+- **Formular** (Google, ausserhalb CH/EU): ohne Name und ohne E-Mail-Adresse, aber mit Persona.
+  Der Projektleiter kann die Antworten über die Persona den Personen zuordnen; das sagt die
+  Begrüssung. Antworten und Tabelle werden nach der Auswertung gelöscht.
 - **Chat** (WhatsApp-Gruppe des Projektleiters) ist nicht Teil von MyTCO. In der Gruppe sehen
-  alle die Telefonnummern der anderen; das sagt die Mail. Codes und Adressen gehören nicht in
-  den Chat. Inhalte kommen nur als Befund ohne Namen ins Repo.
-- **Mail mit dem Brief als PDF** (Name, Adresse, Einmal-Code der Person an sie selbst) geht
-  über das private Postfach des Projektleiters (Google, USA), nicht über den Mailversand von
-  MyTCO, für den DS-01 gilt. Vertretbar, weil es nur die eigenen Daten der Person sind, nur
-  wenige Personen im Pilot, und der Code einmal und höchstens 90 Tage gilt. Der Projektleiter
-  löscht die gesendeten Mails und lokalen PDFs nach dem Versand, die Testpersonen Mail und
-  PDF nach dem ersten Login. Beim echten Start kommt der Brief per Post.
+  alle die Telefonnummern der anderen; das sagt die Begrüssung. Codes und Adressen gehören nicht
+  in den Chat, auch nicht in die Meldungen der Einsätze. Inhalte kommen nur als Befund ohne Namen
+  ins Repo.
+- **Rollenbuch und Brief-PDF** enthalten nur erfundene Daten der Persona; der Projektleiter
+  schickt sie privat.
 
-Die [Datenschutzerklärung](datenschutzerklaerung.md) bleibt unverändert: Liste, Formular,
-Chat und Mail sind Organisation des Pilots durch den Projektleiter, nicht Funktionen von
-MyTCO. Die Testpersonen erfahren in der [Mail](testgruppe.md#mail-an-die-testpersonen), was
-damit geschieht und wann es gelöscht wird.
+Die [Datenschutzerklärung](datenschutzerklaerung.md) bleibt unverändert: Der Probelauf läuft auf
+Test, nicht im Betrieb, und Liste, Formular und Chat sind Organisation durch den Projektleiter,
+nicht Funktionen von MyTCO. Die Testpersonen erfahren in der
+[Begrüssung](testgruppe.md#chat-nachrichten), was mit ihrer Mail-Adresse und den Antworten
+geschieht und wann sie gelöscht werden.
 
 ## Junioren
 
@@ -231,7 +240,7 @@ Verbindlich für ADRs, Code und Tests, insbesondere
 | DS-05 | Push-Nachrichten und Sammel-E-Mails ohne Daten anderer Mitglieder („Neues Resultat in Ihrer Gruppe“). Ausnahme: Einzelmeldungen zum Doppel an die Beteiligten nennen den anderen Spieler (Partner, Anfragender oder Angefragter), nie dessen Telefon oder E-Mail und nie den Namen des CM-Admins (die Rolle «Der CM-Admin» darf stehen). E-Mails gehen je Empfänger einzeln, nie mehrere Adressen in einem Empfängerfeld. Bei Mitteilungen (FR-42) weist das Formular darauf hin; die Vorschau zeigt dem Mitglieder-Admin nur Namen, die er schon sehen darf |
 | DS-06 | Löschfristen aus [Löschen](#löschen) sind umgesetzt; Logs ohne Inhalte (keine Einmal-Codes, Kontaktdaten, Resultate); IP-Adressen höchstens 24 Stunden, auch in Logs |
 | DS-07 | Der Mitglieder-Admin kann die Daten eines Mitglieds als druckbare Auskunft ausgeben und das Mitglied löschen (umgesetzt, Etappe 3 von #43) |
-| DS-08 | Entwicklung und Tests nur mit erfundenen Personendaten; öffentliche Daten ohne Personennamen (z. B. Interclub-Resultate der Teams von Swiss Tennis) dürfen 1:1 verwendet werden; in Beispiel-Einzelpartien sind Namen und Personennummern der Spieler erfunden; Begegnungsnummer, Position, Klassierung und Rangliste-Nummer bleiben echt, obwohl sie über Swiss Tennis zur echten Person führen (dort öffentlich, Entscheid Projektleiter). Auf Test, hinter dem Test-Passwort, stehen die echten Interclub-Daten von Swiss Tennis, wie auf mytennis.ch öffentlich (Entscheid Projektleiter, 22.11.2026). Screenshots fürs Repo und für Issues zeigen davon nur Teams, Endstände und Tabellen, nie Einzelpartien mit Namen |
+| DS-08 | Entwicklung und Tests nur mit erfundenen Personendaten; öffentliche Daten ohne Personennamen (z. B. Interclub-Resultate der Teams von Swiss Tennis) dürfen 1:1 verwendet werden; in Beispiel-Einzelpartien sind Namen und Personennummern der Spieler erfunden; Begegnungsnummer, Position, Klassierung und Rangliste-Nummer bleiben echt, obwohl sie über Swiss Tennis zur echten Person führen (dort öffentlich, Entscheid Projektleiter). Auf Test, hinter dem Test-Passwort, stehen die echten Interclub-Daten von Swiss Tennis, wie auf mytennis.ch öffentlich (Entscheid Projektleiter, 22.11.2026). Screenshots fürs Repo und für Issues zeigen davon nur Teams, Endstände und Tabellen, nie Einzelpartien mit Namen. Ausnahme Probelauf der [Testgruppe](#testgruppe): Die erfundene Persona trägt die echte Mail-Adresse der Testperson, mit ihrem Einverständnis; gelöscht beim Neuaufsetzen von Test nach dem Lauf (Entscheid Projektleiter, 23.11.2026) |
 | DS-09 | Die Datenschutzerklärung ist in MyTCO auch ohne Login erreichbar |
 | DS-10 | Datensicherheit (verschlüsselte Verbindung, Einmal-Codes nur als Hash, Zugriff nach Rolle) regelt das [Sicherheitskonzept](sicherheitskonzept.md) |
 
@@ -249,6 +258,7 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
 
+- 23.11.2026: Testgruppe läuft als Probelauf auf Test statt auf Live; DS-08 mit Ausnahme für die Mail-Adresse der Testpersonen (Entscheid Projektleiter, #40).
 - 23.11.2026: Gefolgte Interclub-Teams (Team-Nummer, seit wann) als freiwillige Daten für den Push nach neuem Endstand; sichtbar für das Mitglied und über die Auskunft (DS-07) für den Mitglieder-Admin, lesend für den MyTCO-Admin, nicht auf der Karte «Einstellungen» der Verwaltung; Push nennt Teams und Endstand, keine Personen (#81 Teil 3b, A-INTERCLUB-02).
 - 23.11.2026: Zweck der Bestätigung der Verwaltung angepasst: höchstens einmal pro 30 Tage statt pro 24 Stunden einen Code (SI-08, Entscheid Projektleiter); keine neuen Daten, keine längere Aufbewahrung.
 - 23.11.2026: Neuer Zweck «Hilfe bei Problemen» (Entscheid Projektleiter): Mitglieder-Admin (MyTCO-Admin nur lesend) sieht auf der Detailseite eines Mitglieds den aktuellen Stand von Themen, angemeldeten Geräten mit Push-Stand und Passkeys, ohne Push-Adresse und Schlüssel; kein Verlauf, keine neuen Daten.
