@@ -31,7 +31,8 @@ Was hier verlinkt ist, existiert; was noch fehlt, ist ein Issue im Milestone sei
 | [Betrieb und Übergabe](betrieb-und-uebergabe.md) | Konten und Eigentum, Geheimnisse, Grundsätze für Sicherung und Überwachung, Übergabe-Checkliste |
 | [Sicherheitskonzept](sicherheitskonzept.md) | Bedrohungen und Massnahmen, Login mit Einmal-Code, Vorgaben `SI-NN`, Restrisiken |
 | [Testkonzept](testkonzept.md) | Testebenen und Werkzeuge, Vertragstests der Schnittstellen, Hilfen der Tests, Abdeckung, Zuordnung Anforderung → Test, Testdaten, Checkliste vor dem Release |
-| [Testgruppe](testgruppe.md) | Pilot vor dem Briefversand: Ablauf, Aufträge, Texte für Mail und Chat, Formular, Auswertung |
+| [Testgruppe](testgruppe.md) | Probelauf vor dem Briefversand: Rollen, Personas, Kalender, Drehbuch, Einsatzliste, Chat-Texte, Formular, Auswertung |
+| [Rollenbücher der Testgruppe](testgruppe-rollenbuecher.md) | Ein Rollenbuch pro Persona für den Probelauf, zum Verschicken |
 | [UI-Leitbild](ui-leitbild.md) | Corporate Design: Farben, Schrift, Bausteine, Navigation, Sprache, Barrierefreiheit `UI-NN`; Mockups |
 
 ## Arbeitsweise
