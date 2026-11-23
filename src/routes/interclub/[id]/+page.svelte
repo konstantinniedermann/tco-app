@@ -1,6 +1,11 @@
 <script lang="ts">
+	import { tick } from 'svelte';
+	import { resolve } from '$app/paths';
 	import Resultat from '../../../lib/interclub/Resultat.svelte';
+	import { holeInterclubTeam, setzeFolgen } from '../../../lib/interclub/api.ts';
 	import { entscheidText, nachRunde, teamText } from '../../../lib/interclub/anzeige.ts';
+	import { MELDUNG } from '../../../lib/login/anmelden.ts';
+	import { leiteUmNachAktion } from '../../../lib/login/waechter.ts';
 	import Umschalter from '../../../lib/ui/Umschalter.svelte';
 	import Zurueck from '../../../lib/ui/Zurueck.svelte';
 	import type { PageProps } from './$types';
@@ -15,6 +20,52 @@
 		{ wert: 'spiele', text: 'Spiele' },
 		{ wert: 'tabelle', text: 'Tabelle' }
 	];
+
+	// «Diesem Team folgen» (#81): Schalter wie in den Benachrichtigungen, gilt sofort. Es gibt ihn mit
+	// Push auf irgendeinem Gerät oder wenn das Konto schon folgt (entfolgen geht immer); in der
+	// Ansicht («Ansicht als …», nur ansehen) gibt es ihn nicht.
+	const nurAnsehen = $derived(data.ansicht !== null);
+	let folgen = $derived(data.team.folgen);
+	// Laufende Anfrage und Fehler gehören zu einem Team: Die Seite bleibt beim Wechsel zu einem
+	// anderen Team dieselbe, dort ist der Schalter frei und ohne Meldung.
+	let laeuftFuer = $state<number | null>(null);
+	let fehlerFuer = $state<number | null>(null);
+	const folgenLaeuft = $derived(laeuftFuer === t.teamId);
+	const folgenFehler = $derived(fehlerFuer === t.teamId ? MELDUNG.stoerung : null);
+	let pushEinrichten = $state<HTMLAnchorElement | null>(null);
+
+	// Eine Anfrage nach der anderen: Solange eine läuft, ist der Schalter gesperrt. Scheitert sie,
+	// zeigt er den Stand des Servers. Ohne Sitzung geht es zum Login. Weicht der Schalter dem Satz
+	// (entfolgt ohne Push, `kein-push`), geht der Fokus auf «Push einrichten», statt verloren zu
+	// gehen; Bildschirmleser lesen den Link mit dem Satz vor.
+	async function schalteFolgen(an: boolean) {
+		const teamId = t.teamId;
+		if (laeuftFuer === teamId) return;
+		laeuftFuer = teamId;
+		fehlerFuer = null;
+		folgen = { ...folgen, folgt: an };
+		const r = await setzeFolgen(teamId, an);
+		if (r.art === 'abgemeldet') {
+			await leiteUmNachAktion(r);
+			return;
+		}
+		// Inzwischen ein anderes Team geöffnet: Dessen Stand kam mit der Seite.
+		if (teamId === t.teamId) {
+			if (r.art === 'ok') folgen = { ...folgen, folgt: r.daten.folgt };
+			else if (r.art === 'kein-push') folgen = { folgt: false, push: false };
+			else {
+				fehlerFuer = teamId;
+				const neu = await holeInterclubTeam(teamId);
+				if (teamId === t.teamId)
+					folgen = neu.art === 'ok' ? neu.daten.folgen : { ...folgen, folgt: !an };
+			}
+		}
+		if (laeuftFuer === teamId) laeuftFuer = null;
+		if (teamId === t.teamId && !folgen.push && !folgen.folgt) {
+			await tick();
+			pushEinrichten?.focus();
+		}
+	}
 </script>
 
 <svelte:head>
@@ -24,6 +75,31 @@
 <Zurueck />
 <h1>{t.liga}</h1>
 <p class="leise">{teamText(t.teamName, t.gruppe, t.rangliste)}</p>
+{#if !nurAnsehen}
+	{#if folgen.push || folgen.folgt || folgenLaeuft}
+		<label class="auswahl">
+			<input
+				type="checkbox"
+				bind:checked={() => folgen.folgt, (an) => schalteFolgen(an)}
+				disabled={folgenLaeuft}
+				aria-describedby={folgenFehler ? 'folgen-fehler' : undefined}
+			/>
+			<span
+				>Diesem Team folgen<br /><span class="leise auswahl-hilfe">Push nach jedem Endstand</span
+				></span
+			>
+		</label>
+	{:else}
+		<p>
+			Mit Push kannst du diesem Team folgen. <a href={resolve('/profil')} bind:this={pushEinrichten}
+				>Push einrichten</a
+			>
+		</p>
+	{/if}
+	{#if folgenFehler}
+		<p class="fehler" id="folgen-fehler" role="alert">{folgenFehler}</p>
+	{/if}
+{/if}
 <Umschalter wahl={ansicht} optionen={OPTIONEN} onwahl={(w) => (ansicht = w)} />
 
 {#if ansicht === 'spiele'}

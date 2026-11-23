@@ -1,8 +1,18 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
-import { legeKontoMitBriefCodeAn, schliesseLoginHilfen } from './hilfen/login.ts';
+import {
+	folgeTeamDirekt,
+	legeGeraetAn,
+	legeKontoMitBriefCodeAn,
+	schliesseLoginHilfen
+} from './hilfen/login.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
-import { pruefeBildschirm, sammleKonsolenfehler, wartetAufVorladen } from './hilfen/seite.ts';
+import {
+	klappeAuf,
+	pruefeBildschirm,
+	sammleKonsolenfehler,
+	wartetAufVorladen
+} from './hilfen/seite.ts';
 
 // Reiter IC (#81): Übersicht und Team-Seite mit den Beispieldaten der Saison 2026, die jeder
 // E2E-Lauf einspielt (playwright.config.ts). Der E2E-Server läuft mit der echten Uhr; der Stand ist stabil,
@@ -197,5 +207,174 @@ test('#81: «Resultat folgt», «keine Einzelpartien» und «Keine Einzel gemeld
 	await expect(page.getByRole('region', { name: 'Einzel' })).toContainText(
 		'Keine Einzel gemeldet.'
 	);
+	expect(fehler).toEqual([]);
+});
+
+// Folgen (#81 Teil 3b): Team 7398 ist «2L Herren 1» der Beispieldaten 2026. Push echt abonniert
+// wird im E2E nicht; `legeGeraetAn` legt ein Abo auf einem erfundenen zweiten Gerät an.
+const TEAM_ID = 7398;
+const OHNE_PUSH = 'Mit Push kannst du diesem Team folgen.';
+const folgenSchalter = (page: Page) => page.getByRole('checkbox', { name: /^Diesem Team folgen/ });
+
+async function meldeAn(page: Page, isMobile: boolean, vorname: string) {
+	if (isMobile) await startetVomSymbol(page);
+	const konto = await legeKontoMitBriefCodeAn(vorname);
+	await page.goto('/login');
+	await page.getByLabel('Code aus dem Brief').fill(formatiereBriefCode(konto.code));
+	await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
+	await expect(page.getByRole('heading', { level: 1, name: `Hoi ${vorname}` })).toBeVisible();
+	await wartetAufVorladen(page);
+	return konto;
+}
+
+async function oeffneTeam(page: Page) {
+	await reiterleiste(page).getByRole('link', { name: 'IC', exact: true }).click();
+	await page.getByRole('link', { name: /2L Herren 1/ }).click();
+	await expect(page.getByRole('heading', { level: 1, name: /2L Herren 1/ })).toBeVisible();
+}
+
+async function oeffneProfilTeams(page: Page) {
+	await reiterleiste(page).getByRole('link', { name: 'Profil', exact: true }).click();
+	await expect(page).toHaveURL(/\/profil$/);
+	await klappeAuf(page, 'Benachrichtigungen');
+	await expect(page.getByRole('group', { name: 'Interclub-Teams' })).toBeVisible();
+}
+
+/**
+ * Schaltet und wartet, bis der Server geantwortet und die Seite die Antwort verarbeitet hat
+ * (solange die Anfrage läuft, ist der Schalter gesperrt); ein Neuladen mittendrin bräche sie ab.
+ */
+async function schalteFolgen(page: Page, schalter: Locator, an: boolean) {
+	const gespeichert = page.waitForResponse(
+		(r) =>
+			r.url().endsWith(`/api/interclub/teams/${TEAM_ID}/folgen`) &&
+			r.request().method() === 'POST' &&
+			r.ok()
+	);
+	await schalter.setChecked(an);
+	await gespeichert;
+	await expect(schalter).toBeEnabled();
+}
+
+test('#81: ohne Push zeigt die Teamseite «Mit Push kannst du diesem Team folgen.» mit Link zum Profil', async ({
+	page,
+	isMobile
+}, info) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	await meldeAn(page, isMobile, 'Ida');
+	await oeffneTeam(page);
+
+	await expect(page.getByText(OHNE_PUSH)).toBeVisible();
+	await expect(folgenSchalter(page)).toHaveCount(0);
+	await pruefeBildschirm(page, info, 'interclub-folgen-ohne-push');
+
+	await page.getByRole('link', { name: 'Push einrichten', exact: true }).click();
+	await expect(page).toHaveURL(/\/profil$/);
+	await klappeAuf(page, 'Benachrichtigungen');
+	await expect(
+		page.getByText('Du folgst keinem Team. Folgen kannst du auf der Seite eines Teams unter IC.', {
+			exact: true
+		})
+	).toBeVisible();
+	expect(fehler).toEqual([]);
+});
+
+test('#81: mit Push folgt der Schalter dem Team, das Profil listet es, Abwählen im Profil entfolgt', async ({
+	page,
+	isMobile
+}, info) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const konto = await meldeAn(page, isMobile, 'Ida');
+	await legeGeraetAn(konto.kontoId, true);
+	await oeffneTeam(page);
+
+	const schalter = folgenSchalter(page);
+	await expect(schalter).not.toBeChecked();
+	await expect(page.getByText(OHNE_PUSH)).toHaveCount(0);
+	await pruefeBildschirm(page, info, 'interclub-folgen-aus');
+
+	await schalteFolgen(page, schalter, true);
+	await expect(schalter).toBeChecked();
+	await pruefeBildschirm(page, info, 'interclub-folgen-an');
+	await page.reload();
+	await expect(folgenSchalter(page)).toBeChecked();
+
+	await oeffneProfilTeams(page);
+	const gruppe = page.getByRole('group', { name: 'Interclub-Teams' });
+	const imProfil = gruppe.getByRole('checkbox', { name: '2L Herren 1', exact: true });
+	await expect(imProfil).toBeChecked();
+	await expect(
+		page.getByText(
+			'Push nach jedem Endstand. Folgen kannst du auf der Seite eines Teams unter IC.',
+			{ exact: true }
+		)
+	).toBeVisible();
+	await pruefeBildschirm(page, info, 'profil-interclub-teams');
+
+	await schalteFolgen(page, imProfil, false);
+	// Bis zum nächsten Laden bleibt das Team stehen, damit man es wieder anwählen kann.
+	await expect(imProfil).not.toBeChecked();
+
+	await oeffneTeam(page);
+	await expect(folgenSchalter(page)).not.toBeChecked();
+	expect(fehler).toEqual([]);
+});
+
+test('#81: folgt ohne Abo: Schalter angehakt, Entfolgen geht, danach der Satz', async ({
+	page,
+	isMobile
+}) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const konto = await meldeAn(page, isMobile, 'Ida');
+	await folgeTeamDirekt(konto.kontoId, TEAM_ID);
+
+	await oeffneProfilTeams(page);
+	await expect(
+		page
+			.getByRole('group', { name: 'Interclub-Teams' })
+			.getByRole('checkbox', { name: '2L Herren 1', exact: true })
+	).toBeChecked();
+	await expect(
+		page.getByText(
+			'Ohne Push bekommst du keine Mitteilung. Folgen kannst du auf der Seite eines Teams unter IC.',
+			{ exact: true }
+		)
+	).toBeVisible();
+
+	await oeffneTeam(page);
+	const schalter = folgenSchalter(page);
+	await expect(schalter).toBeChecked();
+	// Nach dem Entfolgen gibt es den Schalter nicht mehr: Ohne Push steht der Satz.
+	const entfolgt = page.waitForResponse(
+		(r) => r.url().endsWith(`/api/interclub/teams/${TEAM_ID}/folgen`) && r.ok()
+	);
+	await schalter.click();
+	await entfolgt;
+	await expect(page.getByText(OHNE_PUSH)).toBeVisible();
+	await expect(folgenSchalter(page)).toHaveCount(0);
+	expect(fehler).toEqual([]);
+});
+
+test('#81: Folgen ohne Push auf dem Server (kein-push): der Satz erscheint, der Fokus liegt auf «Push einrichten»', async ({
+	page,
+	isMobile
+}) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const konto = await meldeAn(page, isMobile, 'Ida');
+	await legeGeraetAn(konto.kontoId, true);
+	// Das Abo verschwindet zwischen Laden und Tippen (z. B. auf dem anderen Gerät abgeschaltet).
+	await page.route(`**/api/interclub/teams/${TEAM_ID}/folgen`, (route) =>
+		route.fulfill({ status: 409, json: { fehler: 'kein-push' } })
+	);
+	await oeffneTeam(page);
+
+	await folgenSchalter(page).click();
+	await expect(page.getByText(OHNE_PUSH)).toBeVisible();
+	await expect(folgenSchalter(page)).toHaveCount(0);
+	await expect(page.getByRole('link', { name: 'Push einrichten', exact: true })).toBeFocused();
 	expect(fehler).toEqual([]);
 });

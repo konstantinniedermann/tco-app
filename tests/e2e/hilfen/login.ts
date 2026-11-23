@@ -5,7 +5,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { machAdmin } from '../../../src/lib/server/admin/erster-admin.ts';
 import { setzeRollen, type Rolle } from '../../../src/lib/server/admin/rollen.ts';
-import { konto, mitglied, pushAbo, sitzung } from '../../../src/lib/server/db/schema.ts';
+import { icFolgen, konto, mitglied, pushAbo, sitzung } from '../../../src/lib/server/db/schema.ts';
 import { erstelleSitzung } from '../../../src/lib/server/login/sitzung.ts';
 import { legeMitgliedAn } from '../../hilfen/mitglieder.ts';
 import { hole, schliesseVerbindung } from './verbindung.ts';
@@ -148,6 +148,11 @@ export async function legeGeraetAn(kontoId: number, push: boolean): Promise<void
 /** Schaltet ein Thema der Mitteilungen ab, wie es das Mitglied im Profil täte. */
 export async function schalteThemaVereinAb(kontoId: number): Promise<void> {
 	await hole().db.update(konto).set({ themaVerein: false }).where(eq(konto.id, kontoId));
+}
+
+/** Das Konto folgt dem Interclub-Team direkt in der Datenbank, auch ohne Push (wie nach dem Abschalten). */
+export async function folgeTeamDirekt(kontoId: number, teamId: number): Promise<void> {
+	await hole().db.insert(icFolgen).values({ kontoId, teamId, seit: new Date() });
 }
 
 export async function schliesseLoginHilfen(): Promise<void> {

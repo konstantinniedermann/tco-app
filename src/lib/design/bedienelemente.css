@@ -220,6 +220,11 @@
 	font-weight: 700;
 }
 
+/* Hilfetext in der Fläche (Schalter «Diesem Team folgen»): leise, auch angehakt nicht fett */
+.auswahl-hilfe {
+	font-weight: 400;
+}
+
 fieldset.auswahl-gruppe {
 	margin: 0 0 var(--abstand-3);
 	padding: 0;

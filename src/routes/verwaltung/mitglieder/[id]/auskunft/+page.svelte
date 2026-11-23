@@ -28,6 +28,9 @@
 	const themen = $derived(
 		a.themen.length === 0 ? 'keine' : a.themen.map((t) => THEMA_NAME[t]).join(', ')
 	);
+	const interclubTeams = $derived(
+		a.interclubTeams.length === 0 ? 'keine' : a.interclubTeams.map((t) => t.liga).join(', ')
+	);
 	const mitgliedschaft = $derived.by(() => {
 		const m = a.mitgliedschaft;
 		const teile: string[] = [];
@@ -114,6 +117,7 @@
 					></tr
 				>
 				<tr><th scope="row">Mitteilungen</th><td>{themen}</td></tr>
+				<tr><th scope="row">Interclub-Teams</th><td>{interclubTeams}</td></tr>
 			</tbody>
 		</table>
 	</div>

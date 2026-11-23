@@ -125,6 +125,8 @@ Kopie der Antworten von Swiss Tennis ([ADR-011](adr/adr-011-interclub-schnittste
 | **Einzelpartie** | Spielbericht, Einzel oder Doppel, Position, gespielte Sätze aus Sicht des TCO, Aufgabe (TCO oder Gegner hat aufgegeben bzw. w.o.); vorher entschiedene, nicht gespielte Partien fehlen | — |
 | **Spieler (Interclub)** | Einzelpartie, Seite (TCO / Gegner), Nummer (1, im Doppel 2), Name «Nachname Vorname» wie bei Swiss Tennis, Klassierung; nur bei TCO-Spielern die Personen- und die Rangliste-Nummer von Swiss Tennis | Name, Klassierung, Nummern |
 | **Stand je Saison und Wettbewerb** | Zeitpunkt des letzten erfolgreichen Abrufs; die Anzeige nennt ihn als «Stand» | — |
+| **Folgen (Interclub)** | Konto, Team-Nummer bei Swiss Tennis (ohne Saison: sie bleibt über die Saisons gleich, das Team einer neuen Saison gilt also weiter als gefolgt), seit. Je Konto und Team höchstens einmal; nur mit Push-Abo, entfolgen auch ohne; entfällt mit dem Konto (A-INTERCLUB-02) | Konto, Team |
+| **Gemeldet (Interclub)** | Saison, Begegnung (auch Auf-/Abstiegsspiel), gemeldet am. Jede Begegnung, deren Endstand mit Spielbericht der Push schon gemeldet hat, steht hier genau einmal, auch wenn ihr niemand folgt oder zwei TCO-Teams gegeneinander spielen; sie wird nie ein zweites Mal gemeldet | — |
 
 ### Lizenzen
 

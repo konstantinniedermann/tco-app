@@ -85,6 +85,8 @@ Was nicht belegt ist, steht als *Vermutung* da.
 | Spielbericht | Die Einzelpartien einer Begegnung, wie Swiss Tennis sie liefert | — | [Fachmodell](fachmodell.md) |
 | w.o. / Aufgabe | Eine Seite gibt eine Partie kampflos (w.o.) oder während des Spiels auf; die andere Seite gewinnt | «Gegner hat aufgegeben», «aufgegeben» | [Fachmodell](fachmodell.md) |
 | Auf-/Abstiegsspiele | Zusatzspiele am Saisonende, die über Auf- oder Abstieg des Teams entscheiden | Auf-/Abstiegsspiel | [Fachmodell](fachmodell.md) |
+| folgen (Interclub) | Ein Mitglied folgt einem Team des Vereins und bekommt nach jedem neuen Endstand mit Spielbericht einen Push. Gilt über die Saisons, weil Swiss Tennis die Team-Nummer behält; nur mit Push | «Diesem Team folgen», Gruppe «Interclub-Teams» im Profil | [A-INTERCLUB-02](anforderungen/anforderungen.md) |
+| gemeldet (Interclub) | Eine Begegnung, deren Endstand der Push schon gemeldet hat; sie wird nie ein zweites Mal gemeldet | — | [Fachmodell](fachmodell.md) |
 
 ## Lizenz
 

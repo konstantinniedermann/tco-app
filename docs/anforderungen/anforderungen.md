@@ -220,6 +220,7 @@ der Praxis reicht ([K-33](../abklaerungen.md#vor-cm-betrieb-01062027)).
 | ID | Anforderung | Quelle | Etappe | Status |
 |----|-------------|--------|--------|--------|
 | A-INTERCLUB-01 | Mitglieder sehen die Interclub-Resultate der Teams des Vereins (Aktive, Senioren, Junioren): Endstände, Spielplan, Tabelle, Auf-/Abstiegsspiele und die Einzelpartien jeder gespielten Begegnung mit Sätzen, Spieler beider Teams mit Name und Klassierung (Teil 2, [Datenschutz](../datenschutz.md)). Die Daten kommen von Swiss Tennis ([ADR-011](../adr/adr-011-interclub-schnittstelle-swiss-tennis.md)); auf Test und Live holt die App sie selbst, in Spielwochen stündlich, lokal per Befehl `make ic-import` | PL, [#81](https://github.com/konstantinniedermann/tco-app/issues/81) | Interclub | geplant |
+| A-INTERCLUB-02 | Mitglieder folgen Interclub-Teams des Vereins (Schalter auf der Seite des Teams, Liste in Profil › Benachrichtigungen) und bekommen nach jedem neuen Endstand mit Spielbericht einen Push mit Liga, Teams und Endstand, ohne Spielernamen. Nur per Push: Wer auf keinem Gerät Push hat, sieht statt des Schalters einen Hinweis. Ein Team bleibt über die Saisons gefolgt (Team-Nummer von Swiss Tennis); gemeldet wird nur die laufende Saison, höchstens 7 Tage zurück, je Begegnung einmal ([ADR-011](../adr/adr-011-interclub-schnittstelle-swiss-tennis.md), [Datenschutz](../datenschutz.md)) | PL, [#81](https://github.com/konstantinniedermann/tco-app/issues/81) | Interclub | geplant |
 
 ## Nicht-funktionale Anforderungen
 

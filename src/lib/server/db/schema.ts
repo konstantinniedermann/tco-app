@@ -570,6 +570,31 @@ export const icEntscheid = pgTable(
 	]
 );
 
+// Welches Konto welchem Interclub-Team folgt (Push nach neuem Endstand). Die Team-Nummer gilt über
+// Saisons; darum kein Fremdschlüssel auf `ic_team`.
+export const icFolgen = pgTable(
+	'ic_folgen',
+	{
+		kontoId: integer('konto_id')
+			.notNull()
+			.references(() => konto.id, { onDelete: 'cascade' }),
+		teamId: integer('team_id').notNull(),
+		seit: timestamp('seit', { withTimezone: true }).notNull()
+	},
+	(t) => [primaryKey({ columns: [t.kontoId, t.teamId] })]
+);
+
+// Zu welchen Begegnungen die Folgenden schon eine Mitteilung bekommen haben.
+export const icGemeldet = pgTable(
+	'ic_gemeldet',
+	{
+		saison: integer('saison').notNull(),
+		begegnungId: integer('begegnung_id').notNull(),
+		gemeldetAm: timestamp('gemeldet_am', { withTimezone: true }).notNull()
+	},
+	(t) => [primaryKey({ columns: [t.saison, t.begegnungId] })]
+);
+
 // Wann ein Wettbewerb einer Saison zuletzt vollständig abgerufen wurde.
 export const icStand = pgTable(
 	'ic_stand',

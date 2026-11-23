@@ -630,7 +630,7 @@
 	</div>
 </details>
 
-<Benachrichtigungen {nurAnsehen} />
+<Benachrichtigungen {nurAnsehen} interclub={data.interclub} />
 
 <div class="karte">
 	<button

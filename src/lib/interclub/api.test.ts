@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'vitest';
-import { holeInterclub, holeInterclubBegegnung, holeInterclubTeam } from './api.ts';
+import {
+	holeGefolgteTeams,
+	holeInterclub,
+	holeInterclubBegegnung,
+	holeInterclubTeam,
+	setzeFolgen
+} from './api.ts';
 import { holer, json, ungeprueft, type Koerper } from '../../../tests/hilfen/abruf.ts';
 
 const STOERUNG = { art: 'stoerung' };
@@ -48,5 +54,34 @@ describe('Anfragen der Mitglieder zu Interclub', () => {
 		expect(await antwort(json(400, { fehler: 'eingabe' }))).toEqual(STOERUNG);
 		expect(await antwort(new Response('kein JSON', { status: 200 }))).toEqual(STOERUNG);
 		expect(await antwort(ungeprueft(404, null))).toEqual(STOERUNG);
+	});
+
+	test('Folgen setzen per JSON-POST, gefolgte Teams per GET', async () => {
+		const h = holer(json(200, { folgt: true }));
+		expect(await setzeFolgen(7398, true, h.holen)).toEqual({ art: 'ok', daten: { folgt: true } });
+		expect(h.aufrufe[0]).toMatchObject({
+			pfad: '/api/interclub/teams/7398/folgen',
+			init: { method: 'POST', headers: { 'content-type': 'application/json' } }
+		});
+		expect(JSON.parse(String(h.aufrufe[0].init.body))).toEqual({ folgen: true });
+		const g = holer(json(200, { teams: [{ teamId: 7398, liga: '2L Herren 1' }], push: false }));
+		expect(await holeGefolgteTeams(g.holen)).toEqual({
+			art: 'ok',
+			daten: { teams: [{ teamId: 7398, liga: '2L Herren 1' }], push: false }
+		});
+		expect(g.aufrufe[0]).toMatchObject({ pfad: '/api/interclub/folgen', init: { method: 'GET' } });
+	});
+
+	test('Folgen ohne Push ist «kein-push», andere Fehler wie bei Interclub', async () => {
+		const setze = (r: Response) => setzeFolgen(7398, true, holer(r).holen);
+		expect(await setze(json(409, { fehler: 'kein-push' }))).toEqual({ art: 'kein-push' });
+		expect(await setze(json(401, { fehler: 'abgemeldet' }))).toEqual({ art: 'abgemeldet' });
+		expect(await setze(json(404, { fehler: 'nicht-gefunden' }))).toEqual({
+			art: 'nicht-gefunden'
+		});
+		expect(await setze(json(403, { fehler: 'nur-ansehen' }))).toEqual(STOERUNG);
+		expect(await setze(json(500, {}))).toEqual(STOERUNG);
+		// Die Lese-Anfragen kennen das Wort nicht.
+		expect(await holeInterclub(holer(json(409, { fehler: 'kein-push' })).holen)).toEqual(STOERUNG);
 	});
 });

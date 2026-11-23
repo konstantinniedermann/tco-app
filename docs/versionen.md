@@ -11,6 +11,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Interclub: Mitglieder folgen Teams auf deren Seite und bekommen nach jedem neuen Endstand einen
+  Push. Die gefolgten Teams stehen in Profil › Benachrichtigungen (#81).
 - Verwaltung: Der Code per Mail ist nur noch alle 30 Tage fällig statt täglich. In langen
   Tabellen bleiben am PC die Spaltentitel beim Scrollen stehen, die Linien der Tabelle scheinen
   nicht mehr durch den Seitentitel. Klarere Texte bei Mitteilungen und auf der eigenen Seite

@@ -185,7 +185,7 @@ Komponenten entstehen erst, wenn ein Bildschirm sie braucht, und verwenden diese
 | Zurück | `.zurueck` | „‹ <Titel der Elternseite>" oben links auf Unterseiten, z. B. „‹ Profil", „‹ Clubmeisterschaft 2027"; führt eine Stufe höher in der [festen Ordnung](#feste-ordnung), egal woher man kam; immer einzeilig, ein zu langer Name endet mit „…" |
 | Pfad | `nav.pfad` | nur Verwaltung: über dem Titel jeder Unterseite die Stufen von der Seitenleiste bis hier, getrennt durch „›", z. B. „Turniere › Clubmeisterschaft 2027 › Herren R5/R9"; jede Stufe ein Link, die aktuelle Seite fett und ohne Link (`aria-current="page"`); unter `60rem` Breite des App-Rahmens steht statt seiner nur „‹ <Elternseite>" als `.zurueck`, darüber endet ein zu langer Pfad mit „…"; nie umbrechend, nicht im Druck; am PC klebt er mit dem Titel (Baustein *Seitenkopf*) |
 | Eingabefeld | `.feld` | Bezeichnung über dem Feld, Hilfetext darunter, „(freiwillig)" bei optionalen Feldern; auch mehrzeilig (`textarea`); ein Auswahlfeld (`select`) sieht aus wie ein Textfeld (gleiche Höhe, gleicher Rand) mit einem Pfeil rechts in `--farbe-text`, auf allen Geräten gleich statt im Aussehen des Browsers (UI-03); gesperrt ohne Pfeil; bei einer festen Höchstlänge zählt der Hilfetext mit („12 von 50 Zeichen", `.feld-hilfe`); als Dateiwahl (`input type="file"`, nur Verwaltung: *Einlesen*) mit dem Rand des Felds und der Wahltaste des Browsers im Aussehen der Nebentaste; Verhalten mit Tastatur unter [Eingabe mit Tastatur](#eingabe-mit-tastatur) |
-| Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>`. Als Schalter (Ein/Aus, gilt sofort, ohne Speichern-Taste) dieselbe Fläche mit Häkchen statt Kreis (`type="checkbox"`), angehakt heisst ein: *Benachrichtigungen* im Profil |
+| Auswahlfläche | `.auswahl` | eine Wahl aus wenigen (Radio) als Fläche: Rand `--rand-dick` in `--farbe-rand`, mindestens `--tippflaeche` hoch, Text neben dem Kreis; gewählt Rand `--farbe-marke`, Hintergrund `--farbe-marke-zart`, fett. Mehrere untereinander in einem `<fieldset class="auswahl-gruppe">` mit `<legend>`. Als Schalter (Ein/Aus, gilt sofort, ohne Speichern-Taste) dieselbe Fläche mit Häkchen statt Kreis (`type="checkbox"`), angehakt heisst ein: *Benachrichtigungen* im Profil, «Diesem Team folgen» auf der *Seite eines Teams*. Ein Hilfetext steht in der Fläche unter dem Text, leise und auch angehakt nicht fett (`<span class="leise auswahl-hilfe">` nach einem Zeilenumbruch) |
 | Code-Feld | `.feld-code` | Festbreitenschrift, grösser |
 | Karte | `.karte` | weisse Fläche auf Hintergrund; steht eine Überschrift zuoberst, hat sie oben keinen eigenen Abstand (der Innenabstand `--abstand-4` genügt, sonst klafft oben ein Loch); als `<dialog class="karte">` die Rückfrage vor einer folgenreichen Aktion (Abbrechen · Bestätigen; Tasten, Warnung und Fehler unter *Rückfrage*); im modalen `<dialog>` ist die bestätigende Taste die Haupttaste, und der Dialog zählt für UI-04 als eigener Bildschirm; die Rückfrage blendet weich ein (leicht vergrössert, `--dauer-mittel`) und schneller aus (`--dauer-kurz`) |
 | Aufklappbereich | `.klappe` | Karte mit Titelzeile zum Auf- und Zuklappen (`<details>`/`<summary>`), Pfeil rechts in der Titelzeile; in der Verwaltung als `.karte.klappe`, die Titelzeile darf rechts eine Kurzinfo in `.leise` tragen; innerhalb einer Karte als `details.klappe.karte-teil` ohne eigene Fläche, mit der Trennlinie des Kartenteils (z. B. «3 suchen Partner»); klappt weich auf und zu (`--dauer-mittel`) |
@@ -303,7 +303,11 @@ er nie.
   steht in seinem Abschnitt «Spielplan <Jahr> noch nicht da». Ohne Daten (direkt aufgerufen):
   «Zurzeit gibt es keine Interclub-Resultate.». Entwurf: Design-Artifact «MyTCO Interclub» (#81).
 - **Seite eines Teams** (`/interclub/[id]`): Zurück «‹ Interclub», Titel die Liga, darunter leise
-  «<Teamname> · Gruppe <G> · <Rang>. von <N>». Umschalter **Spiele · Tabelle**. *Spiele*: je Runde
+  «<Teamname> · Gruppe <G> · <Rang>. von <N>». Darunter, vor dem Umschalter, die *Auswahlfläche*
+  als Schalter «Diesem Team folgen» mit dem Hilfetext «Push nach jedem Endstand»; sie gilt sofort.
+  Es gibt sie, wenn das Konto auf irgendeinem Gerät Push hat oder dem Team schon folgt (entfolgen
+  geht immer); sonst steht dort «Mit Push kannst du diesem Team folgen.» mit dem Link «Push
+  einrichten» zum Profil. In der Ansicht fehlt beides. Umschalter **Spiele · Tabelle**. *Spiele*: je Runde
   eine Karte «Runde <n>» mit allen Begegnungen der Gruppe als *Resultatzeile*; die des eigenen
   Teams fett, mit Heim/Auswärts und Ergebnis. *Tabelle*: Karte «Gruppe <G>» mit dem Baustein
   *Rangliste* (ohne Rangliste statt ihrer «Die Tabelle steht nach der ersten Runde.»); darunter,
@@ -474,6 +478,16 @@ des Browsers bringen eine Seite dorthin zurück, wo man sie verlassen hat.
 **Aufklappbereiche im Profil** (*Meine Angaben*, *Anmelden mit Passkey*, *Benachrichtigungen*)
 sind anfangs zu und merken sich, ob sie offen sind, solange die App offen ist; nach dem
 Abmelden sind sie wieder zu.
+
+**Benachrichtigungen im Profil:** zuerst der Schalter «Push auf diesem Gerät», dann die Gruppe
+«Mitteilungen zu» mit den Themen und leise «Gilt für Push und E-Mail. …» (nur für die Themen).
+Darunter die Gruppe «Interclub-Teams»: je gefolgtes Team der neuesten Saison (IC und JIC je für sich) ein
+Schalter mit der Liga; darunter leise «Push nach jedem Endstand. Folgen kannst du auf der Seite eines Teams
+unter IC.», ohne Push auf einem Gerät statt des ersten Satzes «Ohne Push bekommst du keine
+Mitteilung.», ohne Team «Du folgst keinem Team. Folgen kannst du auf der Seite eines Teams unter
+IC.»; «IC» ist ein Link zum Reiter. Ein abgewähltes Team bleibt bis zum nächsten Laden stehen,
+damit man es wieder anwählen kann. In der Ansicht sind die Schalter gesperrt. Entwurf:
+Design-Artifact «MyTCO Interclub», Reihe «Folgen und Push» (#81).
 
 **Antippen:** kein grauer Blitz des Browsers, dafür ein Gedrückt-Zustand (`--dauer-kurz`):
 Reiter in `--farbe-marke` mit etwas kleinerem Symbol; Kachel als Link in `--farbe-marke-zart`, leicht

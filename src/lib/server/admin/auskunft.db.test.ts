@@ -14,6 +14,8 @@ import {
 	anlassAnmeldung,
 	anmeldung,
 	anmeldungSpieler,
+	icFolgen,
+	icTeam,
 	kategorie,
 	konto,
 	mitglied,
@@ -189,6 +191,43 @@ describe('ladeAuskunft (DS-07)', () => {
 		expect(a!.name).toBe('Muster, Johannes');
 		const o = await legeMitgliedAn(db, {});
 		expect((await ladeAuskunft(db, o.mitgliedId, jetzt))!.rufname).toBeNull();
+	});
+
+	test('Auskunft nennt gefolgte Interclub-Teams mit Liga', async () => {
+		const m = await legeMitgliedAn(db, {});
+		expect((await ladeAuskunft(db, m.mitgliedId, jetzt))!.interclubTeams).toEqual([]);
+		await db.insert(icTeam).values([
+			{
+				saison: 2090,
+				teamId: 9001,
+				wettbewerb: 'ic',
+				teamName: 'Olten',
+				liga: 'Alt',
+				gruppe: 1,
+				reihenfolge: 1
+			},
+			{
+				saison: 2091,
+				teamId: 9001,
+				wettbewerb: 'ic',
+				teamName: 'Olten',
+				liga: '2L Herren',
+				gruppe: 1,
+				reihenfolge: 1
+			}
+		]);
+		await db.insert(icFolgen).values([
+			{ kontoId: m.kontoId, teamId: 9001, seit: jetzt },
+			{ kontoId: m.kontoId, teamId: 9999, seit: jetzt }
+		]);
+		const a = await ladeAuskunft(db, m.mitgliedId, jetzt);
+		expect(a!.interclubTeams).toEqual(
+			expect.arrayContaining([
+				{ teamId: 9001, liga: '2L Herren' },
+				{ teamId: 9999, liga: 'Team 9999' }
+			])
+		);
+		expect(a!.interclubTeams).toHaveLength(2);
 	});
 
 	test('enthält Angaben, Rollen, Login, Anlass, bestätigte CM-Anmeldung ohne Wildcard und den ganzen Verlauf', async () => {
