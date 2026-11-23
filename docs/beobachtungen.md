@@ -320,3 +320,15 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** Je Minuten bis eine Stunde; gebündelt in einem Durchgang, wenn die Tabellen-Steuerung auf weitere Listen kommt. Die gekürzten Titel könnte ein leiser Pfeil nur bei Zeigen/Fokus beheben (Leitbild-Entscheid).
 
+### 2026-11-23 — CI: Seiteninfo von «Für Fairgate» läuft auf dem iPhone bei 200 % um 1 px über
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/verwaltung.test.ts` («#93: jede Menüseite der Verwaltung erklärt sich in ihrer Seiteninfo»), Seite `/verwaltung/fairgate`.
+
+**Beobachtung:** Der Job «E2E (iphone)» der CI ist rot: Bei 200 % Schrift ist die Seiteninfo auf `/verwaltung/fairgate` 1 px breiter als ihr Inhalt erlaubt (`scrollWidth - clientWidth` = 1 statt 0). Lokal und am PC und auf Android grün. Schon auf `dev` vor dem Merge von #92 rot (Lauf auf 41a2980), ebenso auf dem Branch von #92.
+
+**Ursprung:** CI-Lauf auf `feat/issue-092`, Session vom 23.11.2026.
+
+**Einschätzung:** Langes Wort in der Seiteninfo von «Für Fairgate» bricht in WebKit/Linux nicht um (Silbentrennung fehlt dort?). Mit `gh workflow run check.yml --ref dev -f spur=true` den Trace holen.
+
