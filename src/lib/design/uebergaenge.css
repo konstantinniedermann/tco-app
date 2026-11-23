@@ -133,6 +133,11 @@ html[data-uebergang='zurueck']::view-transition-new(root) {
 	html:has(.seitenkopf) {
 		scroll-padding-top: calc(var(--abstand-6) + 8rem);
 	}
+
+	/* In einer langen Liste kleben darunter noch die Spaltentitel (eine Zeile) */
+	html:has(.tabelle-lang) {
+		scroll-padding-top: calc(var(--abstand-6) + 8rem + 2.5rem);
+	}
 }
 
 @keyframes seitenkopf-linie {

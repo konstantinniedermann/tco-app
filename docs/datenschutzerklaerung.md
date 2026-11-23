@@ -115,7 +115,7 @@ eingerichtet und zuletzt benutzt hast. Diese Angaben löschen wir, sobald du den
 entfernst. Dazu kommt eine zufällige Kennung deines Kontos; sie entsteht, sobald du das erste Mal
 einen Passkey einrichten willst (auch wenn du abbrichst), und bleibt, bis dein Konto gelöscht wird. Deinen Namen und deine E-Mail-Adresse zeigt dein Gerät aus dem eigenen
 Schlüsselbund an, MyTCO speichert sie dafür nicht zusätzlich. Ob der Hinweis auf den Passkey
-noch erscheint, merkt sich MyTCO an deiner Sitzung.
+noch erscheint, merkt sich MyTCO an deiner Sitzung. Damit er dir bei Problemen helfen kann, sieht der Mitglieder-Admin (der MyTCO-Admin nur lesend), welche Themen du eingestellt hast, auf welchen Geräten du angemeldet bist und wann zuletzt, ob dort Push an ist und welche Passkeys du eingerichtet hast; nicht die Adresse beim Push-Dienst und keine Schlüssel.
 
 **Kein Tracking:** MyTCO speichert im Browser nur, was fürs Login und den Wechsel der E-Mail-Adresse nötig ist, und ob du den
 Hinweis auf Push mit «Nein, danke» weggeklickt hast. Schaltest du Push ein, legt dein Browser dafür eine Anmeldung beim

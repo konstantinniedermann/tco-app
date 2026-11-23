@@ -2,7 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
 	folgeTeamDirekt,
-	gibPushAbo,
+	legeGeraetAn,
 	legeKontoMitBriefCodeAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
@@ -211,7 +211,7 @@ test('#81: «Resultat folgt», «keine Einzelpartien» und «Keine Einzel gemeld
 });
 
 // Folgen (#81 Teil 3b): Team 7398 ist «2L Herren 1» der Beispieldaten 2026. Push echt abonniert
-// wird im E2E nicht; `gibPushAbo` legt ein Abo auf einem erfundenen zweiten Gerät an.
+// wird im E2E nicht; `legeGeraetAn` legt ein Abo auf einem erfundenen zweiten Gerät an.
 const TEAM_ID = 7398;
 const OHNE_PUSH = 'Mit Push kannst du diesem Team folgen.';
 const folgenSchalter = (page: Page) => page.getByRole('checkbox', { name: /^Diesem Team folgen/ });
@@ -287,7 +287,7 @@ test('#81: mit Push folgt der Schalter dem Team, das Profil listet es, Abwählen
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
 	const konto = await meldeAn(page, isMobile, 'Ida');
-	await gibPushAbo(konto.kontoId);
+	await legeGeraetAn(konto.kontoId, true);
 	await oeffneTeam(page);
 
 	const schalter = folgenSchalter(page);
@@ -365,7 +365,7 @@ test('#81: Folgen ohne Push auf dem Server (kein-push): der Satz erscheint, der 
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
 	const konto = await meldeAn(page, isMobile, 'Ida');
-	await gibPushAbo(konto.kontoId);
+	await legeGeraetAn(konto.kontoId, true);
 	// Das Abo verschwindet zwischen Laden und Tippen (z. B. auf dem anderen Gerät abgeschaltet).
 	await page.route(`**/api/interclub/teams/${TEAM_ID}/folgen`, (route) =>
 		route.fulfill({ status: 409, json: { fehler: 'kein-push' } })

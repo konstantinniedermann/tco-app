@@ -26,6 +26,7 @@
 		zeitText,
 		fehlerText
 	} from '../../../../lib/verwaltung/anzeige.ts';
+	import Einstellungen from '../../../../lib/verwaltung/Einstellungen.svelte';
 	import Mitgliedschaft from '../../../../lib/verwaltung/Mitgliedschaft.svelte';
 	import { ROLLEN_NAME } from '../../../../lib/verwaltung/rollen-namen.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
@@ -357,6 +358,8 @@
 					{/if}
 				{/if}
 			</details>
+
+			<Einstellungen einstellungen={detail.einstellungen} />
 
 			{#if darfRollen}
 				<details class="karte klappe" data-ungespeichert={rollenGeaendert ? '' : undefined}>

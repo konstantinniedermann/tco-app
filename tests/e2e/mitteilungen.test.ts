@@ -126,7 +126,7 @@ test('FR-42: Mitglieder-Admin wählt Erinnerung, sieht Vorschau mit Zahl und Nam
 	await expect(page.getByText(`${betreff.length} von 50 Zeichen`)).toBeVisible();
 	await expect(
 		page.getByText(
-			'Keine Namen, Telefonnummern oder Resultate: Die Mitteilung kann auf dem Sperrbildschirm stehen'
+			'Keine sensiblen Infos wie z. B. Namen, Telefonnummern oder Resultate: Die Mitteilung kann auf dem Sperrbildschirm stehen'
 		)
 	).toBeVisible();
 	await expect(neu(page).getByLabel('Noch keine Antwort')).toBeChecked();

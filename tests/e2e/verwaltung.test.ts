@@ -4,10 +4,13 @@ import { MELDUNG } from '../../src/lib/login/anmelden.ts';
 import type { Fehlerkoerper } from '../../src/lib/fehler.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
+	bestaetigeVerwaltungDirekt,
 	legeAdminMitBriefCodeAn,
+	legeGeraetAn,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
 	legeRollenkontoMitBriefCodeAn,
+	schalteThemaVereinAb,
 	schliesseLoginHilfen,
 	setzeRufname
 } from './hilfen/login.ts';
@@ -72,6 +75,11 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 	// RR-07: der Admin sieht die Kachel; ohne Bestätigung führt sie zum Code.
 	await page.getByRole('link', { name: 'Verwaltung' }).click();
 	await expect(page).toHaveURL(/\/verwaltung\/bestaetigen$/);
+	await expect(
+		page.getByText(
+			'Zum Schutz der Mitgliederdaten bestätigst du alle 30 Tage mit einem Code per E-Mail.'
+		)
+	).toBeVisible();
 	await pruefeBildschirm(page, info, 'verwaltung-bestaetigen');
 	await bestaetige(page, admin);
 
@@ -566,6 +574,10 @@ test('RR-07, Regel 3: MyTCO-Admin sieht Mitglied nur lesend (fieldset disabled, 
 	await expect(page.getByLabel('Vorname', { exact: true })).toHaveValue('Rahel');
 	await expect(page.getByRole('button', { name: 'Angaben speichern' })).toHaveCount(0);
 	await expect(page.getByRole('button', { name: 'Alle Sitzungen beenden' })).toHaveCount(0);
+	// Ohne Taste kein «erfasse ihn hier»
+	const mitgliedschaft = page.getByRole('region', { name: /^Mitgliedschaft/ });
+	await expect(mitgliedschaft).toContainText('Aktiv.');
+	await expect(mitgliedschaft).not.toContainText('erfasse ihn hier');
 	await page.locator('summary', { hasText: 'Rollen' }).click();
 	await expect(page.getByLabel('CM-Admin')).toBeEnabled();
 	await pruefeBildschirm(page, info, 'mytco-mitglied-nur-lesen');
@@ -620,6 +632,36 @@ test('RR-07, Regel 2: Mitglieder-Admin sieht keine Rollenvergabe', async ({ page
 	await expect(page.getByLabel('Vorname', { exact: true })).toBeEnabled();
 	await expect(page.locator('summary', { hasText: 'Rollen' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'mitglieder-admin-ohne-rollen');
+	expect(fehler).toEqual([]);
+});
+
+test('Einstellungen: Mitglieder-Admin sieht Themen, Geräte mit Push und Passkeys des Mitglieds', async ({
+	page
+}, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeRollenkontoMitBriefCodeAn('Edda', ['mitglieder']);
+	const mitglied = await legeKontoAn('Linus');
+	await schalteThemaVereinAb(mitglied.kontoId);
+	await legeGeraetAn(mitglied.kontoId, true);
+	await legeGeraetAn(mitglied.kontoId, false);
+	// Ohne Mail-Code: das Budget je IP reicht sonst nicht für alle Tests.
+	await meldeAn(page, admin);
+	await bestaetigeVerwaltungDirekt(admin.kontoId);
+
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	await expect(page.locator('summary', { hasText: 'Einstellungen' })).toContainText(
+		'Push auf 1 Gerät'
+	);
+	await klappeAuf(page, 'Einstellungen');
+	await expect(
+		page.getByText('Mitteilungen: Anlässe, Clubmeisterschaft', { exact: true })
+	).toBeVisible();
+	const geraete = page.getByRole('region', { name: 'Geräte' });
+	await expect(geraete.getByRole('row')).toHaveCount(3);
+	await expect(geraete.getByRole('cell', { name: /^an seit / })).toHaveCount(1);
+	await expect(geraete.getByRole('cell', { name: 'aus', exact: true })).toHaveCount(1);
+	await expect(page.getByText('Kein Passkey.', { exact: true })).toBeVisible();
+	await pruefeBildschirm(page, info, 'mitglied-einstellungen');
 	expect(fehler).toEqual([]);
 });
 
@@ -799,5 +841,31 @@ test('Band «Ansicht als …» und feste Kopfleiste überlappen nicht', async ({
 	expect(await ueberlappen()).toBe(false);
 	await expect(kopf).toBeInViewport();
 	await expect(band(page)).toBeInViewport();
+	expect(fehler).toEqual([]);
+});
+
+test('Tabelle: am PC bleiben die Spaltentitel der Mitgliederliste beim Scrollen sichtbar und frei', async ({
+	page
+}, info) => {
+	test.skip(info.project.name !== 'desktop', 'nur PC'); // skip: Seitenkopf und Spaltentitel kleben nur ab 60rem
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeRollenkontoMitBriefCodeAn('Lotte', ['mitglieder']);
+	for (let i = 0; i < 15; i++) await legeKontoAn('Liste', `Scrolltest ${i}`);
+	await oeffneVerwaltung(page, admin);
+	// Schmalstes PC-Fenster: Die Seitenleiste nimmt Platz, die Tabelle muss trotzdem passen
+	await page.setViewportSize({ width: 1000, height: 500 });
+	await scrolleFenster(page, 'unten');
+	expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(200);
+	// Nichts liegt über den Spaltentiteln, auch nicht der Seitenkopf; die letzte Spalte ist nicht
+	// abgeschnitten
+	for (const name of ['Name', 'Aktion']) {
+		const spalte = page.getByRole('columnheader', { name });
+		await expect(spalte).toBeInViewport();
+		await spalte.click({ trial: true, timeout: 2000 });
+	}
+	await page
+		.getByRole('link', { name: /^Bearbeiten: / })
+		.last()
+		.click({ trial: true });
 	expect(fehler).toEqual([]);
 });

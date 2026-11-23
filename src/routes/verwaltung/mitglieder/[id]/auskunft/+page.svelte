@@ -5,6 +5,7 @@
 		GESCHLECHT_NAME,
 		aktionText,
 		auskunftTitel,
+		THEMA_NAME,
 		datumText,
 		datumZeitText
 	} from '../../../../../lib/verwaltung/anzeige.ts';
@@ -24,9 +25,8 @@
 	} as const;
 	const ANTWORT = { kommt: 'kommt', 'kommt-nicht': 'kommt nicht' } as const;
 
-	const THEMA = { anlaesse: 'Anlässe', cm: 'Clubmeisterschaft', verein: 'Verein' } as const;
 	const themen = $derived(
-		a.themen.length === 0 ? 'keine' : a.themen.map((t) => THEMA[t]).join(', ')
+		a.themen.length === 0 ? 'keine' : a.themen.map((t) => THEMA_NAME[t]).join(', ')
 	);
 	const interclubTeams = $derived(
 		a.interclubTeams.length === 0 ? 'keine' : a.interclubTeams.map((t) => t.liga).join(', ')

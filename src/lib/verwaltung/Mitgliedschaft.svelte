@@ -121,7 +121,9 @@
 		{/if}
 	</h2>
 
-	{#if status === 'aktiv'}
+	{#if status === 'aktiv' && (nurLesen || eigene)}
+		<p>Aktiv.</p>
+	{:else if status === 'aktiv'}
 		<p>
 			Aktiv. Kommt der Austritt aus Fairgate, erfasse ihn hier: Das Login ist dann sofort gesperrt.
 		</p>

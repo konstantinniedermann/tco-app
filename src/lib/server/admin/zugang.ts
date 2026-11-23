@@ -14,8 +14,8 @@ import type { Mailer } from '../login/dienst.ts';
 import type { AngemeldetesKonto } from '../login/sitzung.ts';
 import { effektiveRollen, verwaltungsrollen, type VerwaltungsRolle } from './rollen.ts';
 
-// SI-08: Die Bestätigung gilt 24 Stunden für diese Sitzung.
-export const ADMIN_BESTAETIGUNG_MS = 24 * 60 * 60 * 1000;
+// SI-08: Die Bestätigung gilt 30 Tage für diese Sitzung.
+export const ADMIN_BESTAETIGUNG_MS = 30 * 24 * 60 * 60 * 1000;
 
 // RR-07: `rollen` ist nie leer; ohne Verwaltungsrolle heisst die Stufe `keine-rolle`.
 // Die Rollen werden bei jeder Prüfung neu gelesen: Entzug oder Sperre wirkt sofort. In der

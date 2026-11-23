@@ -171,6 +171,13 @@ const DATUM_ZEIT = new Intl.DateTimeFormat('de-CH', {
 	hourCycle: 'h23'
 });
 
+/** Themen der Mitteilungen (FR-41), wie das Profil sie nennt. */
+export const THEMA_NAME = {
+	anlaesse: 'Anlässe',
+	cm: 'Clubmeisterschaft',
+	verein: 'Verein'
+} as const;
+
 /** «7.11.2026» nach dem Kalender in Zürich. */
 export const datumText = (iso: string) => DATUM.format(new Date(iso)).replaceAll(' ', '');
 

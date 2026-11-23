@@ -46,7 +46,7 @@ verteilt der MyTCO-Admin die Rollen von Hand. Einzelheiten im
 | RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist | umgesetzt (Anmeldungen; Spiele mit dem CM-Betrieb) |
 | RR-07 | Die Verwaltung sieht nur, wer eine Admin-Rolle hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03): Mitglieder-Admin *Mitgliederverwaltung* (Mitglieder, Einlesen, Briefe, Anlässe, Mitteilungen, Für Fairgate, Verlauf), CM-Admin *Clubmeisterschaft*, Lizenz-Admin *Lizenzen*, MyTCO-Admin alle Bereiche nur lesend und dazu *Rollen*. Was eine Rolle nur lesen darf, weist der Server beim Speichern ab; ein ausgeblendeter Knopf reicht nicht | umgesetzt\* (Lizenzen mit ihrer Etappe) |
 | RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | umgesetzt (Austritt und Vormerken sperren das Login; Rollen bleiben gespeichert und wirken nach Wiedereintritt oder Rückgängig wieder; kommen dabei Admin-Rollen zurück, fragt die Verwaltung vorher nach) |
-| RR-09 | Wer die Verwaltung öffnet, bestätigt sie höchstens einmal pro 24 Stunden mit einem frischen Code per E-Mail, mit jeder Admin-Rolle ([SI-08](sicherheitskonzept.md#vorgaben), K-12.1) | umgesetzt |
+| RR-09 | Wer die Verwaltung öffnet, bestätigt sie höchstens einmal pro 30 Tage mit einem frischen Code per E-Mail, mit jeder Admin-Rolle ([SI-08](sicherheitskonzept.md#vorgaben); K-12.1 hatte einmal pro Tag bestätigt, auf 30 Tage verlängert vom Projektleiter, 23.11.2026) | umgesetzt |
 | RR-10 | Ein Mitglieder-Admin erfasst weder den eigenen Austritt noch merkt er sich selbst zum Löschen vor; das macht ein anderer Mitglieder-Admin | umgesetzt |
 
 **Konten mit Admin-Rolle sind nicht besonders geschützt** (Entscheid Projektleiter): Der
@@ -85,6 +85,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Eigener Rufname (freiwillig; das Mitglied setzt, ändert und löscht ihn selbst) | – | S eigene | S eigene | S eigene | S eigene, L alle | S eigene, L alle |
 | Eigener Name, Geschlecht, Jahrgang, Mitgliedernummer (Geschlecht und Jahrgang einmal selbst, wenn leer, FR-37) | – | L eigene | L eigene | L eigene | S | L |
 | Mitglieder anlegen, bearbeiten, löschen, Auskunft drucken (DS-07, das Öffnen steht immer im Änderungsverlauf, auch nur lesend; den eigenen Austritt und sich selbst löschen nicht, RR-10) | – | – | – | – | S | L |
+| Einstellungen anderer Mitglieder: Themen der Mitteilungen, angemeldete Geräte mit Push-Stand, Passkeys (nur Stand, ohne Push-Adresse und Schlüssel; Hilfe bei Problemen) | – | – | – | – | L | L |
 | Mitgliederliste einlesen (A-MITGLIED-07) | – | – | – | – | S | L |
 | Liste *Briefe*: wer MyTCO noch nie geöffnet hat (A-LOGIN-01) | – | – | – | – | S | L |
 | Neuer Code für einen Brief, Briefe auslösen, Sitzungen beenden | – | – | – | – | S | – |
