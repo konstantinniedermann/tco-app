@@ -183,7 +183,11 @@
 		<dialog class="karte" bind:this={rueckfrage} aria-labelledby="absagen-titel">
 			<h2 id="absagen-titel">Kategorie absagen?</h2>
 			<p>Das lässt sich nicht rückgängig machen.</p>
-			<Benachrichtigen bind:an={benachrichtigen} />
+			<!-- Die Absage meldet nur offene Partner-Anfragen, also nur im Doppel. -->
+			<Benachrichtigen
+				bind:an={benachrichtigen}
+				text={kategorie.art === 'doppel' ? 'Spieler benachrichtigen' : undefined}
+			/>
 			<div class="leiste">
 				<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}
 					>Abbrechen</button

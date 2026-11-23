@@ -158,6 +158,10 @@ test('RR-07, A-ROLLE-07, A-TURNIER-01, A-TURNIER-02, A-TURNIER-03, A-ANMELDUNG-0
 	await page.getByRole('button', { name: 'Kategorie absagen' }).click();
 	const rueckfrage = page.getByRole('dialog', { name: 'Kategorie absagen?' });
 	await expect(rueckfrage.getByText('Das lässt sich nicht rückgängig machen.')).toBeVisible();
+	// FR-56: Häkchen vorbelegt wie bei den übrigen CM-Aktionen.
+	await expect(
+		rueckfrage.getByRole('checkbox', { name: 'Mitglied benachrichtigen' })
+	).toBeChecked();
 	await rueckfrage.getByRole('button', { name: 'Absagen', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
 	const abgesagt = page.getByRole('row', { name: /Herren R1–R6/ });
