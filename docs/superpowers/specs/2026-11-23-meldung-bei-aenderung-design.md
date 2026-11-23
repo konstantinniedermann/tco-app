@@ -14,8 +14,9 @@ benachrichtigen» (Entscheid Projektleiter, 23.11.2026).
   Anmeldungen zur CM (CM-Admin).
 - Meldung wie FR-47: *Push, sonst E-Mail*, Themen (FR-41) gelten nicht, erst nach dem Speichern,
   ohne auf Push und Mail zu warten.
-- Text nennt das geänderte Feld bzw. die Änderung, **nie den neuen Wert** (Push steht auf dem
-  Sperrbildschirm); keine Namen anderer Mitglieder (DS-05, Ausnahme Doppel wie heute).
+- Text nennt bei Angaben nur das geänderte Feld, **nie den neuen Wert** (Push steht auf dem
+  Sperrbildschirm); bei Rollen und CM die Änderung (Rolle, Kategorie); keine Namen anderer
+  Mitglieder (DS-05, Ausnahme Doppel wie heute: der andere Spieler).
 
 ## Nicht-Ziele
 
@@ -69,9 +70,13 @@ Feldnamen in der Meldung wie die Beschriftungen im Formular der Verwaltung (`FEL
 ## Oberfläche
 
 - Profil des Mitglieds (Verwaltung): Häkchen über dem Speichern-Knopf.
-- Rollen, Wiedereintritt, Rücknahme, CM-Aktionen: Häkchen im `Aktionsdialog` der Aktion bzw. in
-  der bestehenden Rückfrage; nur Tokens und Bausteine aus `docs/ui-leitbild.md`.
-- Wiedereintritt und Rücknahme: Häkchen in der Karte «Mitgliedschaft», über den Knöpfen der Aktion.
+- Rollen und CM-Aktionen: Häkchen im `Aktionsdialog` der Aktion bzw. in der bestehenden
+  Rückfrage; nur Tokens und Bausteine aus `docs/ui-leitbild.md`.
+- Wiedereintritt und Rücknahme: Häkchen in der Karte «Mitgliedschaft», über den Knöpfen der Aktion,
+  beschriftet «Mitglied über den Wiedereintritt benachrichtigen» bzw. «… über die Rücknahme …»;
+  die Rückfrage zu den Rollen übernimmt seinen Wert.
+- Kein Häkchen, wo keine Meldung möglich ist: beim eigenen Mitglied und bei Mitgliedern, die nicht
+  aktiv sind oder deren Konto gesperrt ist.
 - Kategorie absagen: Häkchen nur bei Doppel-Kategorien (nur dort kann eine offene Partner-Anfrage
   wegfallen).
 - Seiteninfo der betroffenen Seiten prüfen und neuen Text dem Projektleiter zeigen.

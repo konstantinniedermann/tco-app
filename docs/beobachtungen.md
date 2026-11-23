@@ -138,21 +138,36 @@ im Dialog.
 **Einschätzung:** Vorläufig. Bedienbar, aber leicht zu übersehen; denkbar: Warnungen über den
 Feldern zeigen oder nach der Warnung zu den Knöpfen scrollen.
 
-### 2026-11-23 — Häkchen in «Mitgliedschaft» steht bei Ausgetretenen auch über «Mitglied löschen»
+### 2026-11-23 — `neue-version.test.ts` auf dem iPhone einmal rot unter Last im vollen `make check`
 
-**Thema:** Oberfläche
+**Thema:** Tests
 
-**Fundort:** `src/lib/verwaltung/Mitgliedschaft.svelte` (`loginKommtZurueck` → `Benachrichtigen`
-über der Leiste), Seite `verwaltung/mitglieder/[id]`, Status *ausgetreten*.
+**Fundort:** `tests/e2e/neue-version.test.ts`, Projekt `iphone` (WebKit).
 
-**Beobachtung:** Das Häkchen «Mitglied benachrichtigen» steht über beiden Knöpfen «Wiedereintritt
-erfassen» und «Mitglied löschen», wirkt aber nur beim Wiedereintritt. Beim Vormerken zum Löschen
-gibt es keine Meldung (FR-56).
+**Beobachtung:** Im vollen `make check` schlug der Test einmal fehl mit «Importing a module script
+failed»; einzeln lief die Datei danach 9/9 grün. Der Lauf fiel in eine Zeit hoher Rechnerlast.
 
-**Ursprung:** #94, Review der Karte «Mitgliedschaft».
+**Ursprung:** #94, Prüflauf vor dem Abschluss.
 
-**Einschätzung:** Vorläufig. Beschriftung präziser fassen (z. B. «Mitglied über den Wiedereintritt
-benachrichtigen») oder das Häkchen näher an den Knopf rücken.
+**Einschätzung:** Vorläufig. Vermutlich ein Ladefehler von WebKit unter Last (wie die bekannten
+Zeitgrenzen); erst nachgehen, wenn es sich wiederholt.
+
+### 2026-11-23 — Push-Nachweis: Abo ging in einem Lauf verloren, Meldung kam per E-Mail
+
+**Thema:** Tests
+
+**Fundort:** Lokaler Push-Nachweis (Playwright mit Chrome, `getNotifications()`), Meldung der
+Verwaltung nach FR-56; `src/lib/server/mitteilung/versand.ts` (`sendePush`).
+
+**Beobachtung:** Im ersten Lauf ging das Push-Abo verloren, und die Meldung fiel auf die E-Mail
+zurück. Ursache unbekannt, vermutlich eine Antwort 404/410 des Push-Diensts, nach der das Abo
+gelöscht wird. Der zweite Lauf, unverändert, lieferte den Push wie erwartet.
+
+**Ursprung:** #94, Push-Nachweis der Meldungen.
+
+**Einschätzung:** Vorläufig. Der Rückfall auf E-Mail wirkt wie vorgesehen; ob der Push-Dienst das
+frische Abo zurückwies oder der Testbrowser es verlor, ist offen. Beim nächsten Nachweis die
+Antwort des Push-Diensts mitschreiben.
 
 ### 2026-11-21 — make seed legt die Beispiel-GV fest am 19.03.2027 an; danach antwortet niemand mehr
 
