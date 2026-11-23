@@ -6,12 +6,7 @@ import { konto as kontoTabelle, kontoRolle, mitglied, sitzung } from '../db/sche
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleLoginDienst } from '../login/dienst.ts';
 import { beendeAlleSitzungen, erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
-import {
-	ADMIN_BESTAETIGUNG_MS,
-	baueAdminCodeMail,
-	erstelleZugangDienst,
-	type Zugang
-} from './zugang.ts';
+import { baueAdminCodeMail, erstelleZugangDienst, type Zugang } from './zugang.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
 afterAll(async () => {
@@ -21,6 +16,7 @@ afterAll(async () => {
 const SCHLUESSEL = 'x'.repeat(40);
 const start = new Date('2026-11-02T12:00:00Z');
 const MINUTE = 60_000;
+const TAG = 24 * 60 * MINUTE;
 
 type Nachricht = { an: string; betreff: string; text: string };
 
@@ -60,7 +56,7 @@ async function bestaetigt(
 }
 
 describe('Zugang zur Verwaltung', () => {
-	test('SI-08, RR-09: Admin bestätigt mit Code, danach 24 Stunden bestätigt', async () => {
+	test('SI-08, RR-09: Admin bestätigt mit Code, danach 30 Tage bestätigt', async () => {
 		const z = baue();
 		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const konto = await einloggen(admin.kontoId);
@@ -80,9 +76,9 @@ describe('Zugang zur Verwaltung', () => {
 			mitgliedId: admin.mitgliedId,
 			rollen: ['mytco', 'mitglieder']
 		});
-		z.zeit.t = new Date(start.getTime() + ADMIN_BESTAETIGUNG_MS - MINUTE);
+		z.zeit.t = new Date(start.getTime() + 30 * TAG - MINUTE);
 		expect((await z.dienst.pruefe(konto)).stufe).toBe('bestaetigt');
-		z.zeit.t = new Date(start.getTime() + ADMIN_BESTAETIGUNG_MS + MINUTE);
+		z.zeit.t = new Date(start.getTime() + 30 * TAG + MINUTE);
 		expect((await z.dienst.pruefe(konto)).stufe).toBe('unbestaetigt');
 	});
 

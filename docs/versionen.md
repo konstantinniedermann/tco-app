@@ -11,6 +11,10 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Verwaltung: Der Code per Mail ist nur noch alle 30 Tage fällig statt täglich. In langen
+  Tabellen bleiben am PC die Spaltentitel beim Scrollen stehen, die Linien der Tabelle scheinen
+  nicht mehr durch den Seitentitel. Klarere Texte bei Mitteilungen und auf der eigenen Seite
+  (Austritt erfasst ein anderer Mitglieder-Admin).
 - Verwaltung: Auf der Seite eines Mitglieds zeigt die neue Karte «Einstellungen», welche Mitteilungen es bekommt, auf welchen Geräten es angemeldet ist, wo Push an ist und welche Passkeys es hat. Hilft bei Problemen mit Push und Login.
 - Abhängigkeiten aktualisiert (nodemailer 10.6, Playwright 1.65.1, ESLint 10.15). An der App ändert sich nichts.
 - Abhängigkeiten aktualisiert (Caddy-Image des Servers, neuer Stand). An der App ändert sich nichts.

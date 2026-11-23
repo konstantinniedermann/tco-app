@@ -85,7 +85,7 @@
 	<p class="fehler" role="alert">{fehler}</p>
 {/if}
 
-<div class="tabelle">
+<div class="tabelle tabelle-lang">
 	<table>
 		<thead>
 			<tr>
@@ -98,10 +98,22 @@
 				{@const p = plakette(z)}
 				<tr>
 					<td>{z.mitgliedernummer ?? ''}</td>
-					<td><strong>{z.name}</strong></td>
-					<td>{z.email}</td>
+					<td>
+						<div class="zelle-dehnbar">
+							<span class="zelle-kurz" title={z.name}><strong>{z.name}</strong></span>
+						</div>
+					</td>
+					<td>
+						<div class="zelle-dehnbar">
+							<span class="zelle-kurz" title={z.email}>{z.email}</span>
+						</div>
+					</td>
 					<td>{z.jahrgang ?? ''}</td>
-					<td>{rollenText(z.rollen)}</td>
+					<td>
+						<div class="zelle-dehnbar">
+							<span class="zelle-kurz" title={rollenText(z.rollen)}>{rollenText(z.rollen)}</span>
+						</div>
+					</td>
 					<td><span class={p.klasse}>{p.text}</span></td>
 					<td>
 						<a

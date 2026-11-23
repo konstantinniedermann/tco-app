@@ -54,7 +54,7 @@
 </svelte:head>
 
 <h1>Verwaltung öffnen</h1>
-<p>Zum Schutz der Mitgliederdaten bestätigst du einmal am Tag mit einem Code per E-Mail.</p>
+<p>Zum Schutz der Mitgliederdaten bestätigst du alle 30 Tage mit einem Code per E-Mail.</p>
 
 {#if schritt === 'start'}
 	<div class="karte">

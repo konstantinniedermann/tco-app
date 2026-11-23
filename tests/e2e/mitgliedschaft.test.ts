@@ -247,7 +247,9 @@ test('RR-10: auf der eigenen Seite weder Austritt noch Löschen, dafür ein Hinw
 	const admin = await oeffneVerwaltung(page);
 	await page.goto(`/verwaltung/mitglieder/${admin.mitgliedId}`);
 	const karte = page.getByRole('region', { name: /^Mitgliedschaft/ });
-	await expect(karte).toContainText('Aktiv. Kommt der Austritt');
+	await expect(karte).toContainText('Aktiv.');
+	// Kein «erfasse ihn hier», wo die Taste fehlt
+	await expect(karte).not.toContainText('erfasse ihn hier');
 	await expect(karte).toContainText(
 		'Deinen Austritt und dein Löschen erfasst ein anderer Mitglieder-Admin.'
 	);

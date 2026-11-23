@@ -132,6 +132,10 @@
 		animation: none;
 	}
 
+	.tabelle-lang th {
+		position: static;
+	}
+
 	/* Briefe: das Blatt beginnt oben links auf dem Papier (Adressfeld im Fenster des Kuverts) */
 	.inhalt:has(.brief) {
 		padding: 0;
