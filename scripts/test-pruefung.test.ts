@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	ausPlaywright,
+	browserZeilen,
 	istCodeStandVon,
 	leseEinstellungen,
 	leseServerZeilen,
@@ -120,5 +121,25 @@ describe('tabelle', () => {
 		expect(t).toContain('ok   admin');
 		expect(t).toContain('rot  zeitgeber');
 		expect(t.split('\n').filter((z) => z.includes('admin'))).toHaveLength(1);
+	});
+});
+
+describe('browserZeilen', () => {
+	const gruen = { suites: [{ specs: [{ title: 'Prüflauf: Fusszeile', ok: true }] }] };
+	it('ohne frischen Bericht: rot, nie ein alter grüner Bericht', () => {
+		expect(browserZeilen(null, 1)).toEqual([
+			{ punkt: 'browser', ok: false, text: 'kein Bericht von Playwright' }
+		]);
+	});
+	it('Playwright mit Fehler beendet, aber alle Tests grün: zusätzlich rot', () => {
+		expect(browserZeilen(gruen, 1)).toContainEqual({
+			punkt: 'browser',
+			ok: false,
+			text: 'Playwright mit Fehler beendet'
+		});
+		expect(browserZeilen(gruen, null).some((z) => !z.ok)).toBe(true);
+	});
+	it('Playwright sauber beendet: nur die Tests', () => {
+		expect(browserZeilen(gruen, 0)).toEqual([{ punkt: 'Prüflauf: Fusszeile', ok: true, text: '' }]);
 	});
 });

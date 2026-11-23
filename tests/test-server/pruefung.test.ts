@@ -1,10 +1,11 @@
 // Prüflauf gegen den echten Test-Server (Checkliste vor dem Release, docs/testkonzept.md). Startet
 // nur `make test-pruefung`; die Prüfkonten legt der Server-Teil vorher an
-// (scripts/test-pruefung-server.ts). Höchstens drei Codes pro Lauf (Grenze 10 pro IP und Stunde).
+// (scripts/test-pruefung-server.ts). Drei Codes pro Lauf, Pia davon zwei: Pro Adresse gehen 3 Mails
+// in der Stunde (login/bremse.ts), ein zweiter Lauf darum frühestens nach einer Stunde.
 import { expect, test, type Page } from '@playwright/test';
 import { istCodeStandVon } from '../../scripts/test-pruefung.ts';
-import { PRUEFKONTEN } from '../../scripts/test-pruefung-server.ts';
-import { codeMails, holeTestMailCode } from './hilfen/test-umgebung.ts';
+import { PRUEFKONTEN } from '../../scripts/pruefkonten.ts';
+import { codeMails, holeTestMailCode } from '../../scripts/test-pruefung-mail.ts';
 
 const [PAUL, PIA] = PRUEFKONTEN;
 const VERSION = process.env.MYTCO_TEST_ERWARTET_VERSION!;

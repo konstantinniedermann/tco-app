@@ -9,11 +9,9 @@ import { jahrInZuerich } from '../src/lib/server/datum.ts';
 import { erstelleDb, type Db } from '../src/lib/server/db/index.ts';
 import { icAbruf, konto, kontoRolle, mitglied } from '../src/lib/server/db/schema.ts';
 import { legeErfundeneMitgliederAn } from './erfundene-mitglieder.ts';
+import { PRUEFKONTEN } from './pruefkonten.ts';
 
-export const PRUEFKONTEN = [
-	{ vorname: 'Paul', nachname: 'Prüflauf', email: 'paul.pruefung@example.org' },
-	{ vorname: 'Pia', nachname: 'Prüflauf', email: 'pia.pruefung@example.org' }
-] as const;
+export { PRUEFKONTEN };
 
 export type Punkt = 'zeitgeber' | 'ic-abruf' | 'admin';
 export type Befund = { punkt: Punkt; ok: boolean; text: string };
@@ -89,7 +87,7 @@ export async function pruefeServer(
 			punkt: 'zeitgeber',
 			ok: zeitgeberAn,
 			text: zeitgeberAn
-				? 'Zeitgeber und Interclub-Abruf an'
+				? 'ZEITGEBER nicht aus, IC_ABRUF an'
 				: 'ZEITGEBER aus oder IC_ABRUF nicht an'
 		},
 		{
@@ -108,18 +106,21 @@ export async function pruefeServer(
 	];
 }
 
+/** Sperre: Das Image läuft auch auf Live. Ohne MAIL_NUR_AN (= nicht Test) nie. */
+export function pruefungVerweigert(env: Record<string, string | undefined>): string | null {
+	if (!env.MAIL_NUR_AN?.trim()) return 'verweigert (nur Test)';
+	if (!env.DATABASE_URL) return 'abgebrochen';
+	return null;
+}
+
 export function zeile(b: Befund): string {
 	return `pruefung: ${b.punkt} ${b.ok ? 'ok' : 'rot'} ${b.text}`;
 }
 
 async function starte(env: Record<string, string | undefined>): Promise<void> {
-	if (!env.MAIL_NUR_AN?.trim()) {
-		console.log('pruefung: verweigert (nur Test)');
-		process.exitCode = 1;
-		return;
-	}
-	if (!env.DATABASE_URL) {
-		console.log('pruefung: abgebrochen');
+	const verweigert = pruefungVerweigert(env);
+	if (verweigert !== null || !env.DATABASE_URL) {
+		console.log(`pruefung: ${verweigert ?? 'abgebrochen'}`);
 		process.exitCode = 1;
 		return;
 	}

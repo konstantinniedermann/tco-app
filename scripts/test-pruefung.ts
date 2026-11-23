@@ -5,7 +5,7 @@
 // 3. Playwright mit playwright.test-server.config.ts gegen Test,
 // 4. Tabelle «ok / rot» je Punkt; Exit 1, wenn etwas rot ist.
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { istNurDoku } from './pruefungen/nur-doku.ts';
@@ -86,6 +86,20 @@ export function ausPlaywright(bericht: Suite): Zeile[] {
 	return zeilen.length > 0 ? zeilen : [{ punkt: 'browser', ok: false, text: 'kein Test gelaufen' }];
 }
 
+/**
+ * Zeilen des Browser-Teils: nur aus dem Bericht dieses Laufs. Ohne Bericht oder mit Exit ungleich 0
+ * (Konfiguration nicht geladen, Absturz) ist der Browser-Teil rot, auch wenn die Tests grün sind.
+ */
+export function browserZeilen(bericht: Suite | null, status: number | null): Zeile[] {
+	if (bericht === null)
+		return [{ punkt: 'browser', ok: false, text: 'kein Bericht von Playwright' }];
+	const zeilen = ausPlaywright(bericht);
+	if (status !== 0 && zeilen.every((z) => z.ok)) {
+		zeilen.push({ punkt: 'browser', ok: false, text: 'Playwright mit Fehler beendet' });
+	}
+	return zeilen;
+}
+
 export function tabelle(zeilen: Zeile[]): string {
 	return zeilen
 		.map((z) => `${z.ok ? 'ok ' : 'rot'}  ${z.punkt}${z.text ? ` — ${z.text}` : ''}`)
@@ -128,7 +142,7 @@ function starte(env: Record<string, string | undefined>): void {
 
 	let zugang: string | null = null;
 	try {
-		zugang = leseZugang(ssh(`sudo cat ${PROXY_ENV}`));
+		zugang = leseZugang(ssh(`sudo grep '^MYTCO_TEST_PASSWORT_HASH=' ${PROXY_ENV}`));
 	} catch {
 		// unten gemeldet
 	}
@@ -143,7 +157,9 @@ function starte(env: Record<string, string | undefined>): void {
 	}
 	const zeilen = leseServerZeilen(server);
 
-	spawnSync(
+	// Ein Bericht eines früheren Laufs darf nie als dieser Lauf gelten.
+	rmSync(BERICHT, { force: true });
+	const lauf = spawnSync(
 		'npx',
 		['playwright', 'test', '-c', 'playwright.test-server.config.ts', '--reporter=line,json'],
 		{
@@ -159,9 +175,10 @@ function starte(env: Record<string, string | undefined>): void {
 		}
 	);
 	zeilen.push(
-		...(existsSync(BERICHT)
-			? ausPlaywright(JSON.parse(readFileSync(BERICHT, 'utf-8')) as Suite)
-			: [{ punkt: 'browser', ok: false, text: 'kein Bericht von Playwright' }])
+		...browserZeilen(
+			existsSync(BERICHT) ? (JSON.parse(readFileSync(BERICHT, 'utf-8')) as Suite) : null,
+			lauf.status
+		)
 	);
 
 	console.log(`\nPrüflauf gegen Test, Version ${version} (dev ${devHash.slice(0, 7)}):\n`);
