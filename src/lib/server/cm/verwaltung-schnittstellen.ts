@@ -10,7 +10,7 @@ import {
 	type AdminEreignis,
 	type AdminUrheber
 } from '../admin/rechte.ts';
-import { antwort, eingabeFehler, jetzt, nichtGefunden } from '../http.ts';
+import { antwort, eingabeFehler, jetzt, leseBenachrichtigen, nichtGefunden } from '../http.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { parseId } from '../parse-id.ts';
 import { ladeKategorie } from '../turnier/turniere.ts';
@@ -37,7 +37,7 @@ import {
 	type Benachrichtigung,
 	type DoppelAbgelehnt
 } from './verwaltung-doppel.ts';
-import { melde } from './verwaltung-meldung.ts';
+import { melde, meldeKlassierung } from './verwaltung-meldung.ts';
 
 /** Höchstlänge des Suchtexts für Spieler. */
 const SUCHE_MAX = 100;
@@ -53,6 +53,9 @@ function trotzdemAus(koerper: Record<string, unknown>): boolean | null {
 	if (t === undefined) return false;
 	return typeof t === 'boolean' ? t : null;
 }
+
+/** FR-56: Die CM-Aktionen melden ohne Angabe (Häkchen vorbelegt); `null` bei falschem Typ. */
+const benachrichtigenAus = (koerper: Record<string, unknown>) => leseBenachrichtigen(koerper, true);
 
 const warnung = (w: { warnungen: Warnung[] }) =>
 	antwort(409, { fehler: 'warnung', warnungen: w.warnungen });
@@ -94,12 +97,15 @@ export function postAnmeldungVonHand(
 		if (kategorieId === null) return nichtGefunden();
 		const mitgliedId = idAus(koerper.mitgliedId);
 		const trotzdem = trotzdemAus(koerper);
-		if (mitgliedId === null || trotzdem === null) return eingabeFehler();
+		const benachrichtigen = benachrichtigenAus(koerper);
+		if (mitgliedId === null || trotzdem === null || benachrichtigen === null) {
+			return eingabeFehler();
+		}
 		const r = await meldeVonHandAn(d.db, urheber, kategorieId, mitgliedId, jetzt(d), trotzdem);
 		if (typeof r === 'object') return warnung(r);
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (r !== 'ok') return antwort(409, { fehler: r });
-		const k = await ladeKategorie(d.db, kategorieId);
+		const k = benachrichtigen ? await ladeKategorie(d.db, kategorieId) : null;
 		if (k) {
 			melde(
 				d,
@@ -120,7 +126,10 @@ export function postVerschieben(d: MitteilungAdminDienste, e: AdminEreignis): Pr
 		if (anmeldungId === null) return nichtGefunden();
 		const kategorieId = idAus(koerper.kategorieId);
 		const trotzdem = trotzdemAus(koerper);
-		if (kategorieId === null || trotzdem === null) return eingabeFehler();
+		const benachrichtigen = benachrichtigenAus(koerper);
+		if (kategorieId === null || trotzdem === null || benachrichtigen === null) {
+			return eingabeFehler();
+		}
 		const art = await artDerAnmeldung(d.db, anmeldungId);
 		if (art === null) return nichtGefunden();
 		if (art === 'doppel') {
@@ -133,20 +142,22 @@ export function postVerschieben(d: MitteilungAdminDienste, e: AdminEreignis): Pr
 				trotzdem
 			);
 			if (typeof dr === 'string' || 'warnungen' in dr) return abgelehnt(dr);
-			meldeAlle(d, urheber, dr.turnierId, dr.meldungen);
+			if (benachrichtigen) meldeAlle(d, urheber, dr.turnierId, dr.meldungen);
 			return antwort(200, {});
 		}
 		const r = await verschiebe(d.db, urheber, anmeldungId, kategorieId, jetzt(d), trotzdem);
 		if (r === 'nicht-gefunden') return nichtGefunden();
 		if (typeof r === 'string') return antwort(409, { fehler: r });
 		if ('warnungen' in r) return warnung(r);
-		melde(
-			d,
-			urheber,
-			r.mitgliedId,
-			r.turnierId,
-			`Der CM-Admin hat dich von «${r.von}» nach «${r.nach}» verschoben.`
-		);
+		if (benachrichtigen) {
+			melde(
+				d,
+				urheber,
+				r.mitgliedId,
+				r.turnierId,
+				`Der CM-Admin hat dich von «${r.von}» nach «${r.nach}» verschoben.`
+			);
+		}
 		return antwort(200, {});
 	});
 }
@@ -156,24 +167,28 @@ export function postAnmeldungLoeschen(
 	d: MitteilungAdminDienste,
 	e: AdminEreignis
 ): Promise<Response> {
-	return schreibt(d, e, 'cm', async (urheber) => {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
 		const anmeldungId = parseId(e.params.id);
 		if (anmeldungId === null) return nichtGefunden();
+		const benachrichtigen = benachrichtigenAus(koerper);
+		if (benachrichtigen === null) return eingabeFehler();
 		if ((await artDerAnmeldung(d.db, anmeldungId)) === 'doppel') {
 			const dr = await loescheDoppel(d.db, urheber, anmeldungId, jetzt(d));
 			if (dr === 'nicht-gefunden') return nichtGefunden();
-			meldeAlle(d, urheber, dr.turnierId, dr.meldungen);
+			if (benachrichtigen) meldeAlle(d, urheber, dr.turnierId, dr.meldungen);
 			return antwort(200, {});
 		}
 		const r = await loescheAnmeldung(d.db, urheber, anmeldungId, jetzt(d));
 		if (r === 'nicht-gefunden') return nichtGefunden();
-		melde(
-			d,
-			urheber,
-			r.mitgliedId,
-			r.turnierId,
-			`Der CM-Admin hat deine Anmeldung für «${r.kategorie}» gelöscht.`
-		);
+		if (benachrichtigen) {
+			melde(
+				d,
+				urheber,
+				r.mitgliedId,
+				r.turnierId,
+				`Der CM-Admin hat deine Anmeldung für «${r.kategorie}» gelöscht.`
+			);
+		}
 		return antwort(200, {});
 	});
 }
@@ -194,8 +209,10 @@ export function postDoppelVonHand(d: MitteilungAdminDienste, e: AdminEreignis): 
 		if (kategorieId === null) return nichtGefunden();
 		const ids = Array.isArray(koerper.mitgliedIds) ? koerper.mitgliedIds.map(idAus) : [];
 		const trotzdem = trotzdemAus(koerper);
+		const benachrichtigen = benachrichtigenAus(koerper);
 		if (
 			trotzdem === null ||
+			benachrichtigen === null ||
 			(ids.length !== 1 && ids.length !== 2) ||
 			ids.some((i) => i === null) ||
 			ids[0] === ids[1]
@@ -211,7 +228,7 @@ export function postDoppelVonHand(d: MitteilungAdminDienste, e: AdminEreignis): 
 			trotzdem
 		);
 		if (typeof r === 'string' || 'warnungen' in r) return abgelehnt(r);
-		meldeAlle(d, urheber, r.turnierId, r.meldungen);
+		if (benachrichtigen) meldeAlle(d, urheber, r.turnierId, r.meldungen);
 		return antwort(200, {});
 	});
 }
@@ -223,10 +240,11 @@ export function postZusammenlegen(d: MitteilungAdminDienste, e: AdminEreignis): 
 		if (anmeldungId === null) return nichtGefunden();
 		const mitId = idAus(koerper.mitAnmeldungId);
 		const trotzdem = trotzdemAus(koerper);
-		if (mitId === null || trotzdem === null) return eingabeFehler();
+		const benachrichtigen = benachrichtigenAus(koerper);
+		if (mitId === null || trotzdem === null || benachrichtigen === null) return eingabeFehler();
 		const r = await legeZusammen(d.db, urheber, anmeldungId, mitId, jetzt(d), trotzdem);
 		if (typeof r === 'string' || 'warnungen' in r) return abgelehnt(r);
-		meldeAlle(d, urheber, r.turnierId, r.meldungen);
+		if (benachrichtigen) meldeAlle(d, urheber, r.turnierId, r.meldungen);
 		return antwort(200, {});
 	});
 }
@@ -239,13 +257,19 @@ export function postPartnerAendern(d: MitteilungAdminDienste, e: AdminEreignis):
 		const bleibtId = idAus(koerper.bleibtId);
 		const neuId = koerper.neuId === null ? null : idAus(koerper.neuId);
 		const trotzdem = trotzdemAus(koerper);
-		if (bleibtId === null || (koerper.neuId !== null && neuId === null) || trotzdem === null) {
+		const benachrichtigen = benachrichtigenAus(koerper);
+		if (
+			bleibtId === null ||
+			(koerper.neuId !== null && neuId === null) ||
+			trotzdem === null ||
+			benachrichtigen === null
+		) {
 			return eingabeFehler();
 		}
 		const r = await aenderePartner(d.db, urheber, anmeldungId, bleibtId, neuId, jetzt(d), trotzdem);
 		if (r === 'eingabe') return eingabeFehler();
 		if (typeof r === 'string' || 'warnungen' in r) return abgelehnt(r);
-		meldeAlle(d, urheber, r.turnierId, r.meldungen);
+		if (benachrichtigen) meldeAlle(d, urheber, r.turnierId, r.meldungen);
 		return antwort(200, {});
 	});
 }
@@ -256,10 +280,11 @@ export function postAnfrageAlsPaar(d: MitteilungAdminDienste, e: AdminEreignis):
 		const anfrageId = parseId(e.params.id);
 		if (anfrageId === null) return nichtGefunden();
 		const trotzdem = trotzdemAus(koerper);
-		if (trotzdem === null) return eingabeFehler();
+		const benachrichtigen = benachrichtigenAus(koerper);
+		if (trotzdem === null || benachrichtigen === null) return eingabeFehler();
 		const r = await meldeAnfrageAlsPaarAn(d.db, urheber, anfrageId, jetzt(d), trotzdem);
 		if (typeof r === 'string' || 'warnungen' in r) return abgelehnt(r);
-		meldeAlle(d, urheber, r.turnierId, r.meldungen);
+		if (benachrichtigen) meldeAlle(d, urheber, r.turnierId, r.meldungen);
 		return antwort(200, {});
 	});
 }
@@ -269,11 +294,14 @@ export function postAnfrageLoeschen(
 	d: MitteilungAdminDienste,
 	e: AdminEreignis
 ): Promise<Response> {
-	return schreibt(d, e, 'cm', async (urheber) => {
+	return schreibt(d, e, 'cm', async (urheber, koerper) => {
 		const anfrageId = parseId(e.params.id);
-		const r = anfrageId === null ? null : await loescheAnfrage(d.db, anfrageId);
-		if (r === null || r === 'nicht-gefunden') return nichtGefunden();
-		meldeAlle(d, urheber, r.turnierId, r.meldungen);
+		if (anfrageId === null) return nichtGefunden();
+		const benachrichtigen = benachrichtigenAus(koerper);
+		if (benachrichtigen === null) return eingabeFehler();
+		const r = await loescheAnfrage(d.db, anfrageId);
+		if (r === 'nicht-gefunden') return nichtGefunden();
+		if (benachrichtigen) meldeAlle(d, urheber, r.turnierId, r.meldungen);
 		return antwort(200, {});
 	});
 }
@@ -311,14 +339,20 @@ export function getSpieler(d: AdminDienste, e: AdminEreignis): Promise<Response>
 	});
 }
 
-/** Teil 4, Ziel 3: Klassierung eines Spielers korrigieren; ohne Meldung, im Verlauf (FR-26). */
-export function postKlassierung(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+/**
+ * Teil 4, Ziel 3: Klassierung eines Spielers korrigieren, im Verlauf (FR-26). Meldung nur mit
+ * Häkchen; ohne Angabe keine (FR-56).
+ */
+export function postKlassierung(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
 	return schreibt(d, e, 'cm', async (urheber, koerper) => {
 		const mitgliedId = parseId(e.params.id);
 		if (mitgliedId === null) return nichtGefunden();
-		if (!istKlassierung(koerper.klassierung)) return eingabeFehler();
+		const benachrichtigen = leseBenachrichtigen(koerper, false);
+		if (!istKlassierung(koerper.klassierung) || benachrichtigen === null) return eingabeFehler();
 		const r = await korrigiereKlassierung(d.db, urheber, mitgliedId, koerper.klassierung, jetzt(d));
-		return r === 'ok' ? antwort(200, {}) : nichtGefunden();
+		if (r !== 'ok') return nichtGefunden();
+		if (benachrichtigen) meldeKlassierung(d, urheber, mitgliedId);
+		return antwort(200, {});
 	});
 }
 

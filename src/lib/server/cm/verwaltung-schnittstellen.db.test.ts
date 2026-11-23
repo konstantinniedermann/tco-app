@@ -12,7 +12,7 @@ import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import type { KategorieWerte } from '../turnier/angaben.ts';
 import { postKategorie, postKategorieAbsagen } from '../turnier/schnittstellen.ts';
-import { legeKategorieAn, legeTurnierAn, setzeStatus } from '../turnier/turniere.ts';
+import { ladeKategorie, legeKategorieAn, legeTurnierAn, setzeStatus } from '../turnier/turniere.ts';
 import { meldeAn } from './anmeldungen.ts';
 import {
 	CM_ADMIN_SCHNITTSTELLEN,
@@ -857,6 +857,279 @@ describe('Doppel verwalten (#59 Etappe 2)', () => {
 		);
 		expect(nochmal.status).toBe(200);
 		expect(s.mails).toEqual([]);
+	});
+});
+
+// FR-56: Häkchen «Mitglied benachrichtigen»; die CM-Aktionen melden ohne Angabe, die Klassierung
+// nicht. Wildcard-Entscheid und Kategorie ändern melden immer.
+describe('Häkchen der CM-Meldungen (FR-56)', () => {
+	/** Name der Einzel-Kategorie, über die `nurDieseMeldung` eine Meldung auslöst. */
+	const PROBE = 'Probe';
+
+	/**
+	 * «Keine Meldung» beweisen: Meldungen gehen ohne Warten raus. Darum danach eine Aktion mit
+	 * Meldung (von Hand anmelden in `PROBE`), auf genau diese Mail warten und prüfen, dass nur sie
+	 * da ist.
+	 */
+	async function nurDieseMeldung(
+		s: ReturnType<typeof baue>,
+		cm: AngemeldetesKonto,
+		turnierId: number,
+		probeId: number
+	) {
+		const zeuge = await spieler('R3');
+		const r = await postAnmeldungVonHand(
+			s.d,
+			post(cm, { mitgliedId: zeuge.mitgliedId, trotzdem: true }, { id: String(probeId) })
+		);
+		expect(await antwortVon(r)).toEqual([200, {}]);
+		const erwartet = meldung(
+			zeuge.email,
+			`Der CM-Admin hat dich in «${PROBE}» angemeldet. Gegner sehen deine E-Mail und Telefonnummer.`,
+			turnierId
+		);
+		await vi.waitFor(() => expect(s.mails).toContainEqual(erwartet));
+		expect(s.mails).toEqual([erwartet]);
+	}
+
+	const klassierungMail = (an: string) => ({
+		an,
+		betreff: 'Clubmeisterschaft',
+		text: `Der CM-Admin hat deine Klassierung geändert.\n\n${ADRESSE}/profil`
+	});
+
+	test('FR-56: verschieben mit benachrichtigen false meldet nicht; ebenso von Hand anmelden und löschen', async () => {
+		const t = await cmTurnier([['Herren A'], ['Herren B'], [PROBE]]);
+		const [a, b, probe] = t.kategorien;
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const r3 = await spieler('R3');
+		const an = await postAnmeldungVonHand(
+			s.d,
+			post(cm, { mitgliedId: r3.mitgliedId, benachrichtigen: false }, { id: String(a) })
+		);
+		expect(await antwortVon(an)).toEqual([200, {}]);
+		const anmeldungId = await anmeldungIn(a, r3.mitgliedId);
+		const id = { id: String(anmeldungId) };
+		const weiter = await postVerschieben(
+			s.d,
+			post(cm, { kategorieId: b, benachrichtigen: false }, id)
+		);
+		expect(await antwortVon(weiter)).toEqual([200, {}]);
+		expect(await statusVon(anmeldungId)).toEqual({ status: 'bestaetigt', kategorieId: b });
+		const weg = await postAnmeldungLoeschen(s.d, post(cm, { benachrichtigen: false }, id));
+		expect(await antwortVon(weg)).toEqual([200, {}]);
+		expect((await statusVon(anmeldungId)).status).toBe('zurueckgezogen');
+		await nurDieseMeldung(s, cm, t.id, probe);
+	});
+
+	test('FR-56: Doppel mit benachrichtigen false meldet keinem der Beteiligten', async () => {
+		const t = await cmTurnier([['Doppel A', DOPPEL_K], ['Doppel B', DOPPEL_K], [PROBE]]);
+		const [ka, kb, probe] = t.kategorien;
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const [a, b, c, d, e, f, g, h] = [
+			await doppelSpieler('Anna'),
+			await doppelSpieler('Berta'),
+			await doppelSpieler('Clara'),
+			await doppelSpieler('Dora'),
+			await doppelSpieler('Emma'),
+			await doppelSpieler('Frieda'),
+			await doppelSpieler('Greta'),
+			await doppelSpieler('Hanna')
+		];
+		const ohne = { benachrichtigen: false };
+		const ok = async (r: Response) => expect(await antwortVon(r)).toEqual([200, {}]);
+
+		// Paar von Hand, Partner ändern, verschieben, löschen.
+		await ok(
+			await postDoppelVonHand(
+				s.d,
+				post(cm, { mitgliedIds: [a.mitgliedId, b.mitgliedId], ...ohne }, { id: String(ka) })
+			)
+		);
+		const paar = { id: String(await anmeldungIn(ka, a.mitgliedId)) };
+		await ok(
+			await postPartnerAendern(
+				s.d,
+				post(cm, { bleibtId: a.mitgliedId, neuId: c.mitgliedId, ...ohne }, paar)
+			)
+		);
+		const neu = { id: String(await anmeldungIn(ka, c.mitgliedId)) };
+		await ok(await postVerschieben(s.d, post(cm, { kategorieId: kb, ...ohne }, neu)));
+		expect((await statusVon(Number(neu.id))).kategorieId).toBe(kb);
+		await ok(await postAnmeldungLoeschen(s.d, post(cm, ohne, neu)));
+		expect((await statusVon(Number(neu.id))).status).toBe('zurueckgezogen');
+
+		// Zwei Suchende zusammenlegen.
+		for (const x of [d, e]) {
+			await ok(
+				await postDoppelVonHand(
+					s.d,
+					post(cm, { mitgliedIds: [x.mitgliedId], ...ohne }, { id: String(ka) })
+				)
+			);
+		}
+		const idD = await anmeldungIn(ka, d.mitgliedId);
+		const idE = await anmeldungIn(ka, e.mitgliedId);
+		await ok(
+			await postZusammenlegen(s.d, post(cm, { mitAnmeldungId: idE, ...ohne }, { id: String(idD) }))
+		);
+
+		// Anfrage als Paar anmelden und Anfrage löschen.
+		const [x] = await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: ka, vonId: f.mitgliedId, anId: g.mitgliedId, gestelltAm: t.jetzt })
+			.returning({ id: partnerAnfrage.id });
+		const [y] = await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: ka, vonId: h.mitgliedId, anId: g.mitgliedId, gestelltAm: t.jetzt })
+			.returning({ id: partnerAnfrage.id });
+		await ok(await postAnfrageLoeschen(s.d, post(cm, ohne, { id: String(y.id) })));
+		await ok(await postAnfrageAlsPaar(s.d, post(cm, ohne, { id: String(x.id) })));
+		expect(await anmeldungIn(ka, f.mitgliedId)).toBe(await anmeldungIn(ka, g.mitgliedId));
+
+		await nurDieseMeldung(s, cm, t.id, probe);
+	});
+
+	test('FR-56: Kategorie absagen mit false meldet hinfällige Anfragen nicht', async () => {
+		const t = await cmTurnier([['Doppel A', DOPPEL_K], [PROBE]]);
+		const [ka, probe] = t.kategorien;
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const a = await doppelSpieler('Anna');
+		const b = await doppelSpieler('Berta');
+		await db
+			.insert(partnerAnfrage)
+			.values({ kategorieId: ka, vonId: a.mitgliedId, anId: b.mitgliedId, gestelltAm: t.jetzt });
+
+		const absage = await postKategorieAbsagen(
+			s.d,
+			post(cm, { benachrichtigen: false }, { id: String(ka) })
+		);
+		expect(await antwortVon(absage)).toEqual([200, {}]);
+		// Abgesagt und Anfrage gelöscht wie mit Häkchen; nur die Meldung fällt weg.
+		expect((await ladeKategorie(db, ka))?.status).toBe('abgesagt');
+		const rest = await db
+			.select()
+			.from(partnerAnfrage)
+			.where(eq(partnerAnfrage.vonId, a.mitgliedId));
+		expect(rest).toEqual([]);
+		await nurDieseMeldung(s, cm, t.id, probe);
+	});
+
+	test('FR-56: Klassierung mit true meldet «Der CM-Admin hat deine Klassierung geändert.», ohne Angabe nicht', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm']);
+		const ohne = await spieler('R3');
+		const mit = await spieler('R3');
+		const r = await postKlassierung(
+			s.d,
+			post(cm, { klassierung: 'R5' }, { id: String(ohne.mitgliedId) })
+		);
+		expect(await antwortVon(r)).toEqual([200, {}]);
+		// Die eigene Klassierung meldet auch mit Häkchen nicht.
+		const selbst = await postKlassierung(
+			s.d,
+			post(cm, { klassierung: 'R6', benachrichtigen: true }, { id: String(cm.mitgliedId) })
+		);
+		expect(await antwortVon(selbst)).toEqual([200, {}]);
+		const ja = await postKlassierung(
+			s.d,
+			post(cm, { klassierung: 'R7', benachrichtigen: true }, { id: String(mit.mitgliedId) })
+		);
+		expect(await antwortVon(ja)).toEqual([200, {}]);
+		const erwartet = klassierungMail(mit.email);
+		await vi.waitFor(() => expect(s.mails).toContainEqual(erwartet));
+		expect(s.mails).toEqual([erwartet]);
+		// Die Meldung nennt den neuen Wert nicht (DS-05).
+		expect(s.mails[0].text).not.toContain('R7');
+	});
+
+	test('FR-56: Wildcard-Entscheid meldet auch mit benachrichtigen false', async () => {
+		const t = await cmTurnier([['Herren A']]);
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const r8 = await spieler('R8');
+		const id = { id: String(await antrag(t.kategorien[0], r8.mitgliedId, t.jetzt)) };
+		const r = await postEntscheid(s.d, post(cm, { bestaetigt: true, benachrichtigen: false }, id));
+		expect(await antwortVon(r)).toEqual([200, {}]);
+		await vi.waitFor(() =>
+			expect(s.mails).toEqual([
+				meldung(r8.email, 'Deine Wildcard für «Herren A» ist bestätigt.', t.id)
+			])
+		);
+	});
+
+	test('FR-56: benachrichtigen von falschem Typ → 400, nichts geändert (Einzel, Doppel, Absagen, Klassierung)', async () => {
+		const t = await cmTurnier([['Herren A'], ['Herren B'], ['Doppel A', DOPPEL_K]]);
+		const [a, b, ka] = t.kategorien;
+		const s = baue(t.jetzt);
+		const cm = await bestaetigt(s, ['cm']);
+		const r3 = await spieler('R3');
+		expect(await meldeAn(db, a, r3.mitgliedId, t.jetzt)).toBe('ok');
+		const einzelId = await anmeldungIn(a, r3.mitgliedId);
+		const einzel = { id: String(einzelId) };
+		const p = await doppelSpieler('Anna');
+		const q = await doppelSpieler('Berta');
+		const c = await doppelSpieler('Clara');
+		const paarAn = await postDoppelVonHand(
+			s.d,
+			post(
+				cm,
+				{ mitgliedIds: [p.mitgliedId, q.mitgliedId], benachrichtigen: false },
+				{ id: String(ka) }
+			)
+		);
+		expect(paarAn.status).toBe(200);
+		const paarId = await anmeldungIn(ka, p.mitgliedId);
+		const paar = { id: String(paarId) };
+
+		for (const falsch of [1, 'ja', null]) {
+			const fall = (r: Response) => antwortVon(r).then((x) => [falsch, ...x]);
+			const fehler = [falsch, 400, { fehler: 'eingabe' }];
+			expect(
+				await fall(
+					await postVerschieben(s.d, post(cm, { kategorieId: b, benachrichtigen: falsch }, einzel))
+				)
+			).toEqual(fehler);
+			expect(
+				await fall(await postAnmeldungLoeschen(s.d, post(cm, { benachrichtigen: falsch }, einzel)))
+			).toEqual(fehler);
+			expect(
+				await fall(
+					await postPartnerAendern(
+						s.d,
+						post(cm, { bleibtId: p.mitgliedId, neuId: c.mitgliedId, benachrichtigen: falsch }, paar)
+					)
+				)
+			).toEqual(fehler);
+			expect(
+				await fall(await postAnmeldungLoeschen(s.d, post(cm, { benachrichtigen: falsch }, paar)))
+			).toEqual(fehler);
+			expect(
+				await fall(
+					await postKategorieAbsagen(s.d, post(cm, { benachrichtigen: falsch }, { id: String(ka) }))
+				)
+			).toEqual(fehler);
+			expect(
+				await fall(
+					await postKlassierung(
+						s.d,
+						post(cm, { klassierung: 'R5', benachrichtigen: falsch }, { id: String(r3.mitgliedId) })
+					)
+				)
+			).toEqual(fehler);
+		}
+		expect(await statusVon(einzelId)).toEqual({ status: 'bestaetigt', kategorieId: a });
+		expect(await statusVon(paarId)).toEqual({ status: 'bestaetigt', kategorieId: ka });
+		expect(await anmeldungIn(ka, q.mitgliedId)).toBe(paarId);
+		expect((await ladeKategorie(db, ka))?.status).toBe('aktiv');
+		const [m] = await db
+			.select({ klassierung: mitglied.klassierung })
+			.from(mitglied)
+			.where(eq(mitglied.id, r3.mitgliedId));
+		expect(m.klassierung).toBe('R3');
 	});
 });
 
