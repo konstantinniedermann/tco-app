@@ -218,8 +218,10 @@ blockieren keine gewollte Design-Änderung.
 
 ## Checkliste vor dem Release
 
-Jeder Punkt hat genau eine Art, wie er geprüft wird: **automatisch (CI)**, **Prüflauf Test**
-(`make test-pruefung`) oder **von Hand** in einer Runde pro Gerät. Jeder Punkt nennt die IDs, die
+Jeder Punkt hat eine Art, wie er geprüft wird: **automatisch (CI)**, **Prüflauf Test**
+(`make test-pruefung`) oder **von Hand** in einer Runde pro Gerät. Wo ein Punkt in zwei Teilen
+steht, prüft jeder Teil etwas anderes (z. B. Hilfe: CI das Verhalten, der Prüflauf die echte
+Auslieferung, die Handrunde den Inhalt des Kontakts). Jeder Punkt nennt die IDs, die
 er prüft. Das Ergebnis jedes Releases steht im Release-PR (Vorlage `.github/release-pr.md`,
 Ablauf [CI/CD und Release](ci-cd-und-release.md#ablauf)).
 
@@ -324,6 +326,8 @@ Passwort von Test, ihre erfundene Persona, und meldet pro Punkt «klappt» oder 
   Tipp-Blitz, «Bewegung reduzieren» (UI-09, #54)
 - [ ] Kopfleiste, Reiter und Tastatur wie in der iPhone-Runde (Leitbild «Statusleisten-Band»,
   «Eingabe mit Tastatur», #54)
+- [ ] Tipp aufs Wappen in der App vom Startbildschirm führt zur Startseite; mit offener Tastatur
+  schliesst er nur die Tastatur (Leitbild «Ungespeicherte Änderungen»)
 
 #### PC- und Papier-Runde (Projektleiter)
 

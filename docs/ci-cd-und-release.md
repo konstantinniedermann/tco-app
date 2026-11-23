@@ -64,7 +64,8 @@ flowchart LR
   Entwurf mit dem Text aus `.github/release-pr.md`: Ergebnis des Prüflaufs, Link auf den CI-Lauf,
   die ausgewählten Handpunkte als Kästchen mit Begründung. Der Projektleiter hakt dort ab, auch
   für die externe Person der Android-Runde nach deren Rückmeldung; erst dann wird der PR bereit
-  und gemergt.
+  und gemergt. Ist `dev` seit dem Prüflauf mit Code weitergezogen, gilt er nicht mehr
+  (Ablauf im Skill `tco-branching`).
 - **Freigabe:** Der Merge des PR nach `main` geht ohne weiteren Knopf live; `main` ist
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
   abgehakt und das Release freigegeben hat. Abgehakt wird auf dem Image mit der neuen Nummer,

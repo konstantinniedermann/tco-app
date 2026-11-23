@@ -270,7 +270,9 @@ Code ist der Abgleich nie reine Doku: Er setzt die Nummer, sein Commit läuft du
 **4b — Prüflauf und Auswahl der Handpunkte** (sobald Test läuft): Wenn Test die neue Nummer
 zeigt (CI auf `dev` grün, Job «Ausliefern»), im Hauptordner `make test-pruefung` starten (vorher
 `ssh-add --apple-load-keychain`; `MYTCO_TEST_URL` und `MYTCO_TEST_SSH` in der `.env` des
-Hauptordners). Rot: nicht weiter, Befund klären (Fix-Branch oder Test erneut ausliefern). Dann die
+Hauptordners). Rot: nicht weiter, Befund klären (Fix-Branch oder Test erneut ausliefern). Ein
+zweiter Lauf frühestens nach einer Stunde (3 Mails pro Adresse und Stunde, Pia braucht zwei).
+Den Commit von `origin/dev`, gegen den der Lauf ging, als **geprüften Stand** festhalten. Dann die
 Handpunkte auswählen nach der Regel in `docs/testkonzept.md` (Checkliste vor dem Release,
 «Welche Runden»): immer die Grundrunde, sonst nur Berührtes seit dem letzten Release
 (`git diff --name-only origin/main...origin/dev`, Abschnitte in `docs/versionen.md`), die volle
@@ -284,7 +286,11 @@ andere Sessions können seit 4a nach `dev` gemergt haben. Der PR entsteht als **
 (`--draft`) mit dem Text aus `.github/release-pr.md` (ausgefüllt: Tabelle des Prüflaufs, Link
 auf den CI-Lauf des Abgleichs, ausgewählte Handpunkte, Ergebnis des Abgleichs). Der
 Projektleiter hakt die Handpunkte im PR ab; erst wenn alle abgehakt oder begründet ausgesetzt
-sind, `gh pr ready <N>` und mergen.
+sind, `gh pr ready <N>` und mergen. **Direkt vor `gh pr ready`:** `make release-check` erneut und
+den Kopf des PR (`gh pr view <N> --json headRefOid`) mit dem geprüften Stand vergleichen. Ist
+`dev` seither weitergezogen und liegt dazwischen Code (`nur-doku.ts` sagt `code`), gilt der Lauf
+nicht mehr: Doku-Abgleich nachziehen (Einträge in die Nummer), Prüflauf und berührte Handpunkte
+neu, PR-Text nachführen.
 Rot, weil «Unveröffentlicht» nicht leer ist (ein Merge mit Code kam nach dem Abgleich): Seine
 Einträge in den Abschnitt der neuen Nummer nachrücken, als **eigener Doku-Commit nach dem
 Merge** über einen Release-Branch wie in 4a. Im Merge selbst geht es nicht: Der Hook verlangt

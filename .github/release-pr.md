@@ -4,6 +4,8 @@
 ## Release X.Y.Z — <Kurztitel>
 
 Abschnitt in `docs/versionen.md`: <Link>. Test zeigt `X.Y.Z · <commit>`.
+Geprüfter Stand (`origin/dev` beim Prüflauf): `<voller Hash>` — vor `gh pr ready` mit dem Kopf
+dieses PR vergleichen.
 
 ### Prüflauf Test (`make test-pruefung`)
 
