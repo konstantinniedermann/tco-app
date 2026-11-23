@@ -455,7 +455,7 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 ### 2026-11-23 — `make test-pruefung` meldet rote Punkte teils ohne klaren Grund
 
-**Thema:** Werkzeug
+**Thema:** Tests
 
 **Fundort:** `scripts/test-pruefung.ts` (`ausPlaywright`, Abbruch bei SSH),
 `scripts/test-pruefung-server.ts` (`pruefeServer`), `playwright.test-server.config.ts`.
