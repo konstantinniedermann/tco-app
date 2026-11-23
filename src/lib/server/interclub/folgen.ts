@@ -34,18 +34,19 @@ export async function setzeFolgen(
 	folgen: boolean,
 	jetzt: Date
 ): Promise<'ok' | 'nicht-gefunden' | 'kein-push'> {
-	const [team] = await db
-		.select({ teamId: icTeam.teamId })
-		.from(icTeam)
-		.where(eq(icTeam.teamId, teamId))
-		.limit(1);
-	if (!team) return 'nicht-gefunden';
+	// Entfolgen geht immer, auch wenn das Team in `ic_team` nicht mehr steht.
 	if (!folgen) {
 		await db
 			.delete(icFolgen)
 			.where(and(eq(icFolgen.kontoId, kontoId), eq(icFolgen.teamId, teamId)));
 		return 'ok';
 	}
+	const [team] = await db
+		.select({ teamId: icTeam.teamId })
+		.from(icTeam)
+		.where(eq(icTeam.teamId, teamId))
+		.limit(1);
+	if (!team) return 'nicht-gefunden';
 	if (!(await hatPush(db, kontoId))) return 'kein-push';
 	await db.insert(icFolgen).values({ kontoId, teamId, seit: jetzt }).onConflictDoNothing();
 	return 'ok';

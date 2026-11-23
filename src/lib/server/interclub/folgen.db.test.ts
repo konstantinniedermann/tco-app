@@ -85,6 +85,17 @@ describe('Interclub-Teams folgen', () => {
 		expect(await ladeFolgenStand(e.db, k, 1)).toEqual({ folgt: false, push: true });
 	});
 
+	test(
+		'entfolgen eines Teams, das es in ic_team nicht mehr gibt: ok, Zeile weg',
+		ZEIT_EIGENE_DB,
+		async () => {
+			const k = await neuesKonto(true);
+			await e.db.insert(icFolgen).values({ kontoId: k, teamId: 4712, seit: JETZT });
+			expect(await setzeFolgen(e.db, k, 4712, false, JETZT)).toBe('ok');
+			expect(await e.db.select().from(icFolgen).where(eq(icFolgen.kontoId, k))).toEqual([]);
+		}
+	);
+
 	test('unbekanntes Team: nicht-gefunden', ZEIT_EIGENE_DB, async () => {
 		const k = await neuesKonto(true);
 		expect(await setzeFolgen(e.db, k, 4711, true, JETZT)).toBe('nicht-gefunden');

@@ -151,7 +151,7 @@ describe('Schnittstellen: Teams folgen', () => {
 		const liste = await getInterclubFolgen(d, get(konto));
 		expect(liste.status).toBe(200);
 		expect(await liste.json()).toEqual({
-			teams: [{ teamId: 7398, liga: expect.any(String) }],
+			teams: [{ teamId: 7398, liga: '2L Herren 1' }],
 			push: true
 		});
 
