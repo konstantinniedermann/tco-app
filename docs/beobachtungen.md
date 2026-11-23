@@ -307,3 +307,16 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Review des Branches `feat/docker-bei-bedarf`, Session vom 23.11.2026.
 
 **Einschätzung:** Einmal von Hand prüfen, wenn keine Session läuft: Erwartet sind «Docker Desktop startet …», danach laufende DB und Mailpit. Reicht die Frist nicht oder öffnet sich das Fenster von Docker Desktop, im Skript nachziehen.
+
+### 2026-11-23 — Tabellen-Steuerung: kleine Lücken aus dem Review von #92
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/lib/verwaltung/Spaltentitel.svelte`, `tabellen-stand.svelte.ts`, `src/routes/verwaltung/{mitglieder,briefe}/+page.svelte`, `src/lib/design/verwaltung.css`.
+
+**Beobachtung:** Aus dem Review von #92, bewusst nicht im Branch behoben: Der Aufklapper wird nicht an den Bildschirmrand geklemmt (200 %, breiter Aufklapper «Was») und kann einen Moment bei (0,0) aufblitzen; die Leseansicht der Briefe rechnet die Auswahlspalte in die Gesamtbreite (3,5 rem zu breit); die Breite wird bei jeder Mausbewegung statt beim Loslassen gespeichert; die Textfelder haben kein `maxlength` (der Verlauf weist über 100 Zeichen mit «Störung» ab); eine Suche aus dem Gedächtnis zeigt kurz die ungesuchte Liste; ein am Handy gesetzter Filter «Status» wirkt nach dem Verbreitern weiter; kein E2E für einen Filter aus der Adresse auf dem Handy. Am PC kürzen sich bei 1280 px die Titel «Nummer» und «Jahrgang» zu «Num…» und «Jahrga…».
+
+**Ursprung:** Review des Branches `feat/issue-092`, Session vom 23.11.2026.
+
+**Einschätzung:** Je Minuten bis eine Stunde; gebündelt in einem Durchgang, wenn die Tabellen-Steuerung auf weitere Listen kommt. Die gekürzten Titel könnte ein leiser Pfeil nur bei Zeigen/Fokus beheben (Leitbild-Entscheid).
+
