@@ -75,6 +75,11 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 	// RR-07: der Admin sieht die Kachel; ohne Bestätigung führt sie zum Code.
 	await page.getByRole('link', { name: 'Verwaltung' }).click();
 	await expect(page).toHaveURL(/\/verwaltung\/bestaetigen$/);
+	await expect(
+		page.getByText(
+			'Zum Schutz der Mitgliederdaten bestätigst du alle 30 Tage mit einem Code per E-Mail.'
+		)
+	).toBeVisible();
 	await pruefeBildschirm(page, info, 'verwaltung-bestaetigen');
 	await bestaetige(page, admin);
 
@@ -569,6 +574,10 @@ test('RR-07, Regel 3: MyTCO-Admin sieht Mitglied nur lesend (fieldset disabled, 
 	await expect(page.getByLabel('Vorname', { exact: true })).toHaveValue('Rahel');
 	await expect(page.getByRole('button', { name: 'Angaben speichern' })).toHaveCount(0);
 	await expect(page.getByRole('button', { name: 'Alle Sitzungen beenden' })).toHaveCount(0);
+	// Ohne Taste kein «erfasse ihn hier»
+	const mitgliedschaft = page.getByRole('region', { name: /^Mitgliedschaft/ });
+	await expect(mitgliedschaft).toContainText('Aktiv.');
+	await expect(mitgliedschaft).not.toContainText('erfasse ihn hier');
 	await page.locator('summary', { hasText: 'Rollen' }).click();
 	await expect(page.getByLabel('CM-Admin')).toBeEnabled();
 	await pruefeBildschirm(page, info, 'mytco-mitglied-nur-lesen');

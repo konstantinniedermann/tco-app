@@ -24,7 +24,7 @@ naheliegende Angriffe, kein Hochsicherheitsbetrieb.
 | B-01 | Ein Bot probiert Brief-Codes durch | 50 Bit pro Code, Limit pro IP, IPv6 pro /64-Netz (SI-01, SI-02) |
 | B-02 | Jemand fordert massenhaft Mail-Codes an oder prüft, ob eine Adresse Mitglied ist | Immer dieselbe Antwort, Limits pro Adresse und IP (SI-04) |
 | B-03 | Ein Brief wird aus dem Briefkasten gestohlen und der Code zuerst benutzt | Das Mitglied sieht beim eigenen Versuch «Code schon benutzt» und meldet sich; der Mitglieder-Admin beendet die fremde Sitzung und stellt einen neuen Brief aus (SI-02, SI-07) |
-| B-04 | Ein Handy mit offener Sitzung gerät in fremde Hände | Der Mitglieder-Admin beendet alle Sitzungen des Kontos; die Verwaltung verlangt mit jeder Admin-Rolle zusätzlich einen frischen Mail-Code (SI-07, SI-08) |
+| B-04 | Ein Handy mit offener Sitzung gerät in fremde Hände | Der Mitglieder-Admin beendet alle Sitzungen des Kontos; die Verwaltung verlangt mit jeder Admin-Rolle zusätzlich einen frischen Mail-Code, höchstens alle 30 Tage (SI-07, SI-08) |
 | B-05 | Das Sitzungs-Cookie wird gestohlen oder eine fremde Seite löst Aktionen aus | Cookie für Skripte unlesbar, nur eigene Inhalte, Herkunftsprüfung (SI-06, SI-10) |
 | B-06 | Jemand mit fremder Sitzung ändert die E-Mail-Adresse auf seine eigene und übernimmt das Konto dauerhaft | Die Änderung braucht je einen Code an die alte und an die neue Adresse; wer nur die Sitzung hat, kommt nicht an den Code der alten (SI-09) |
 | B-07 | Ein Mitglied ruft per manipulierter Anfrage fremde Daten ab | Server prüft Rolle und Objektbezug bei jedem Zugriff (SI-11) |
@@ -116,7 +116,8 @@ Bewusst angenommen (Projektleiter, 01.11.2026):
   (SI-09) und den Änderungsverlauf (SI-12); unter Vereinsmitgliedern angenommen.
 - **Ein entsperrtes Handy mit offenem Mailprogramm** überwindet auch SI-08 und SI-09. Beide
   schützen vor allem gegen ein gestohlenes Cookie auf einem anderen Gerät; dagegen hilft erst
-  ein Faktor wie ein Passkey (A-LOGIN-07). Ein SMS-Code hilft nicht, die SMS käme aufs selbe
+  ein Faktor wie ein Passkey (A-LOGIN-07). Ein Cookie mit bestätigter Verwaltung öffnet sie bis
+  zu 30 Tage lang (SI-08, Projektleiter, 23.11.2026). Ein SMS-Code hilft nicht, die SMS käme aufs selbe
   Handy (Projektleiter, 01.11.2026).
 
 **Passkey** (SI-18, [ADR-005](adr/adr-005-passkey-simplewebauthn.md), Projektleiter, 04.11.2026):
