@@ -262,6 +262,8 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** Umbau von Oberfläche und Rechteprüfung (RR-07, Regel 2 und 3), mit E2E; danach die Seiteninfo von «Rollen» anpassen. Eher ein eigenes Issue.
 
+**Stand:** Mit Zustimmung des Projektleiters als Issue #96 angelegt (23.11.2026).
+
 ### 2026-11-23 — Mitteilungen gehen nur an alle oder an Gruppen eines Anlasses; zur Clubmeisterschaft gar nicht
 
 **Thema:** Oberfläche
@@ -273,3 +275,17 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Freigabe der Texte zu #93, Session vom 23.11.2026.
 
 **Einschätzung:** Zwei mögliche Erweiterungen (Empfängergruppen ohne Anlass; Mitteilung an Teilnehmende einer Kategorie bzw. eines Turniers). Gegen `docs/datenschutz.md` prüfen, bevor geplant wird; dann die Seiteninfo von «Mitteilungen» anpassen.
+
+**Stand:** Mit Zustimmung des Projektleiters als Issue #97 angelegt (23.11.2026).
+
+### 2026-11-23 — Design System «MyTCO» steht bis auf die Seiteninfo auf dem Stand vom 09.11.
+
+**Thema:** Oberfläche
+
+**Fundort:** Artifact «MyTCO» (Design System, `project/components/bundle.css`, `tokens.json` mit `meta.ref` dev@6b764e8), `src/lib/design/`.
+
+**Beobachtung:** Das Design System wurde zuletzt am 09.11. abgeglichen. Seither ist `basis.css` in mehrere Dateien unter `src/lib/design/` aufgeteilt, und neue Bausteine sind dazugekommen (z. B. Umschalter, Resultatzeile, Partie, Rangliste, Sprechblase). In #93 kam nur die Seiteninfo dazu, angehängt an `bundle.css`. Entwürfe auf dem Design System binden darum besser die echten Stil-Dateien aus dem Repo ein, wie in #93.
+
+**Ursprung:** Nachführen des Design Systems in #93, Session vom 23.11.2026.
+
+**Einschätzung:** Ein ganzer Abgleich (Bausteine, Tokens, `bundle.css` aus den aufgeteilten Dateien) lohnt sich vor dem nächsten grösseren Oberflächen-Entwurf; sonst genügt es, wie in #93 die Repo-Dateien einzubinden.
