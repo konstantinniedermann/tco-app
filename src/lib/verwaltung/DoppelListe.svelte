@@ -755,7 +755,6 @@
 	>
 		{#if anfrage}
 			<p>{paarText({ spieler: [anfrage.von, anfrage.an] })}</p>
-			<p>{text(anfrage.von)} erfährt es.</p>
 		{/if}
 	</Aktionsdialog>
 {/if}
