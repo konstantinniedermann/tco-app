@@ -1,5 +1,6 @@
 // Texte der Verwaltung: Namen von Feldern, Rollen und Verlaufseinträgen, Zeitangaben.
 import { MELDUNG } from '../login/anmelden.ts';
+import { FELD_NAMEN } from '../feld-namen.ts';
 import type { Antwort, Feld } from './api.ts';
 import type { FairgateZeile, MitgliedZeile, Rolle, VerlaufEintrag } from './mitglieder-api.ts';
 import { ROLLEN_NAME } from './rollen-namen.ts';
@@ -51,22 +52,6 @@ export function rollenStandPlakette(stand: RollenStand): { text: string; klasse:
 /** Meldung, wenn zwischen Laden und Speichern ein anderer das Mitglied geändert hat (409). */
 export const VERALTET =
 	'Inzwischen hat jemand anderes dieses Mitglied geändert. Nichts gespeichert: Lade den neuen Stand und gib deine Änderung nochmals ein.';
-
-export const FELD_NAMEN: Record<Feld | 'klassierung' | 'rufname', string> = {
-	mitgliedernummer: 'Mitgliedernummer',
-	vorname: 'Vorname',
-	nachname: 'Nachname',
-	strasse: 'Strasse',
-	plz: 'PLZ',
-	ort: 'Ort',
-	email: 'E-Mail',
-	telefon: 'Telefon',
-	geschlecht: 'Geschlecht',
-	jahrgang: 'Jahrgang',
-	klassierung: 'Klassierung',
-	rufname: 'Rufname',
-	lizenznummer: 'Lizenznummer'
-};
 
 /** Geschlecht als Wort, wie im Angabenformular. */
 export const GESCHLECHT_NAME = { w: 'weiblich', m: 'männlich' } as const;

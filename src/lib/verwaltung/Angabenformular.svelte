@@ -37,7 +37,8 @@
 </script>
 
 <script lang="ts">
-	import { FELD_NAMEN, GESCHLECHT_NAME, feldMeldung } from './anzeige.ts';
+	import { FELD_NAMEN } from '../feld-namen.ts';
+	import { GESCHLECHT_NAME, feldMeldung } from './anzeige.ts';
 
 	type Props = {
 		start: Werte;
