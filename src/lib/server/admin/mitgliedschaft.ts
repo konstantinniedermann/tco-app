@@ -67,7 +67,7 @@ const NOCHMALS = Symbol('nochmals');
 
 /**
  * Ein Übergang in einer Transaktion: erst die Rollen-Sperre (gleiche Reihenfolge wie
- * `setzeRollen`, keine Verklemmung), dann die Mitglied-Zeile `for update`. Passt ihr Status
+ * `entziehRolle` und `setzeRollen`, keine Verklemmung), dann die Mitglied-Zeile `for update`. Passt ihr Status
  * nicht zu `von`, hat inzwischen ein anderer geändert: `veraltet`, nichts geändert.
  *
  * `mitsperren` nennt weitere Mitglieder (die Doppelpartner beim Austritt). Sie werden mit dem

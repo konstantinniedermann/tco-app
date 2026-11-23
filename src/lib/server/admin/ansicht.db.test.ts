@@ -20,7 +20,7 @@ import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login
 import { getSitzung } from '../sitzung/schnittstellen.ts';
 import { postTurniere } from '../turnier/schnittstellen.ts';
 import { riegel } from './ansicht.ts';
-import { setzeRollen } from './rollen.ts';
+import { entziehRolle, vergibRolle } from './rollen.ts';
 import { getZugang, postAnsicht, postAnsichtBeenden, postMitglieder } from './schnittstellen.ts';
 import type { AdminDienste } from './rechte.ts';
 import { erstelleZugangDienst } from './zugang.ts';
@@ -321,12 +321,8 @@ describe('Ansicht als … (Server)', () => {
 		expect((await schalteEin(a.s.d, a.konto, { rolle: 'cm' })).status).toBe(200);
 		await db.update(sitzung).set({ ansichtRolle: 'lizenz' }).where(eq(sitzung.kontoId, a.kontoId));
 		const urheber = { art: 'admin' as const, mitgliedId: anderer.mitgliedId };
-		expect(
-			await setzeRollen(db, urheber, a.kontoId, ['mitglieder'], ['mytco', 'mitglieder'], start)
-		).toBe('ok');
-		expect(
-			await setzeRollen(db, urheber, a.kontoId, ['mytco', 'mitglieder'], ['mitglieder'], start)
-		).toBe('ok');
+		expect(await entziehRolle(db, urheber, a.mitgliedId, 'mytco', start)).toBe('ok');
+		expect(await vergibRolle(db, urheber, a.mitgliedId, 'mytco', start)).toBe('ok');
 		expect((await lade(a.kennung))!.ansicht).toBeNull();
 		expect((await lade(zweite))!.ansicht).toBeNull();
 	});

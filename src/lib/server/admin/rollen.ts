@@ -125,11 +125,82 @@ export async function listeRollen(db: DbOderTx): Promise<RollenListe> {
 	}));
 }
 
+/** Konto eines Mitglieds, unter `sperreRollen`; ohne Mitglied `null`. */
+async function kontoVon(tx: DbOderTx, mitgliedId: number): Promise<number | null> {
+	const [z] = await tx.select({ id: konto.id }).from(konto).where(eq(konto.mitgliedId, mitgliedId));
+	return z?.id ?? null;
+}
+
+/**
+ * A-ROLLE-01: Gibt einem Mitglied eine Rolle. Hat es sie schon, ist der gewünschte Stand erreicht:
+ * `ok` ohne Verlaufseintrag.
+ */
+export async function vergibRolle(
+	db: Db,
+	urheber: Urheber,
+	mitgliedId: number,
+	rolle: Rolle,
+	jetzt: Date
+): Promise<'ok' | 'nicht-gefunden'> {
+	return db.transaction(async (tx) => {
+		await sperreRollen(tx);
+		const kontoId = await kontoVon(tx, mitgliedId);
+		if (kontoId === null) return 'nicht-gefunden';
+		if ((await ladeRollen(tx, kontoId)).includes(rolle)) return 'ok';
+		await tx.insert(kontoRolle).values({ kontoId, rolle });
+		await schreibeVerlauf(
+			tx,
+			mitgliedId,
+			urheber,
+			[{ aktion: 'rolle-vergeben', detail: rolle }],
+			jetzt
+		);
+		return 'ok';
+	});
+}
+
+/**
+ * A-ROLLE-01, RR-03: Nimmt einem Mitglied eine Rolle; der letzte MyTCO-Admin behält `mytco`. Hat es
+ * die Rolle nicht mehr, ist der gewünschte Stand erreicht: `ok` ohne Verlaufseintrag.
+ */
+export async function entziehRolle(
+	db: Db,
+	urheber: Urheber,
+	mitgliedId: number,
+	rolle: Rolle,
+	jetzt: Date
+): Promise<'ok' | 'letzter-mytco' | 'nicht-gefunden'> {
+	return db.transaction(async (tx) => {
+		// RR-03: Zählen und Schreiben müssen gegenüber anderen Änderungen atomar sein.
+		await sperreRollen(tx);
+		const kontoId = await kontoVon(tx, mitgliedId);
+		if (kontoId === null) return 'nicht-gefunden';
+		if (!(await ladeRollen(tx, kontoId)).includes(rolle)) return 'ok';
+		if (rolle === 'mytco' && (await waereLetzterMytco(tx, kontoId))) return 'letzter-mytco';
+		await tx
+			.delete(kontoRolle)
+			.where(and(eq(kontoRolle.kontoId, kontoId), eq(kontoRolle.rolle, rolle)));
+		// Ohne `mytco` endet jede «Ansicht als …» des Kontos; bei neuer Vergabe lebt sie nicht wieder auf.
+		if (rolle === 'mytco') {
+			await tx.update(sitzung).set({ ansichtRolle: null }).where(eq(sitzung.kontoId, kontoId));
+		}
+		await schreibeVerlauf(
+			tx,
+			mitgliedId,
+			urheber,
+			[{ aktion: 'rolle-entzogen', detail: rolle }],
+			jetzt
+		);
+		return 'ok';
+	});
+}
+
 const gleicheMenge = (a: readonly Rolle[], b: readonly Rolle[]) =>
 	new Set(a).size === new Set(b).size && a.every((r) => b.includes(r));
 
 /**
- * Setzt die Rollen eines Kontos. `vorher`: die Rollen, wie die Seite sie geladen hat; weichen sie
+ * Setzt alle Rollen eines Kontos auf einmal; nur für Skript und Test-Hilfen (`machAdmin`), die
+ * Verwaltung vergibt und entzieht einzeln (`vergibRolle`, `entziehRolle`). `vorher`: die Rollen, wie die Seite sie geladen hat; weichen sie
  * vom gespeicherten Stand ab, ändert sich nichts (`veraltet`).
  */
 export async function setzeRollen(
