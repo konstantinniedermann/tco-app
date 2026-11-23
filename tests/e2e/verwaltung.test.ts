@@ -120,17 +120,16 @@ test('SI-08, A-MITGLIED-01, A-MITGLIED-02, A-ROLLE-01, A-MITGLIED-06: Admin best
 	await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
 	await expect(speichern).toBeDisabled();
 
-	// A-ROLLE-01: Rolle vergeben. Die Klappe «Rollen» ist zu wie in Mockup 6.
-	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('CM-Admin').check();
-	await page.getByRole('button', { name: 'Rollen speichern' }).click();
-	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
+	// A-ROLLE-01 (#96): Rollen stehen hier nur zum Lesen; ändern geht auf der Seite «Rollen».
+	await expect(page.getByText('Rollen: Mitglied', { exact: false })).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Auf der Seite «Rollen» ändern' })).toBeVisible();
+	await expect(page.getByRole('checkbox', { name: 'CM-Admin' })).toHaveCount(0);
+	await expect(page.getByRole('button', { name: 'Rollen speichern' })).toHaveCount(0);
 
 	// A-MITGLIED-06 / FR-26: Verlauf ohne Werte.
 	const verlauf = page.getByRole('table', { name: 'Verlauf' });
 	await expect(verlauf).toContainText('angelegt');
 	await expect(verlauf).toContainText('Telefon geändert');
-	await expect(verlauf).toContainText('Rolle CM-Admin vergeben');
 	await expect(verlauf).not.toContainText('+41 00 000 00 00');
 	// UI-03: Das Auswahlfeld ist so hoch wie die Textfelder, auch in WebKit (iPhone).
 	const hoehe = async (id: string) => (await page.locator(`#${id}`).boundingBox())!.height;
@@ -211,25 +210,33 @@ test('RR-03: der letzte MyTCO-Admin sieht die Meldung beim Entzug seiner Rolle',
 	// In der gemeinsamen Testdatenbank gibt es weitere MyTCO-Admins; die Antwort des Servers ist hier
 	// gestellt. Die Regel selbst prüfen die Datenbanktests (schnittstellen-letzter-admin).
 	const fehler = sammleKonsolenfehler(page);
-	const admin = await legeAdminMitBriefCodeAn('Emil');
+	const nachname = `Probe${randomUUID().slice(0, 8)}`;
+	const admin = await legeRollenkontoMitBriefCodeAn('Emil', ['mytco', 'mitglieder'], nachname);
 	await oeffneVerwaltung(page, admin);
-	await page.goto(`/verwaltung/mitglieder/${admin.mitgliedId}`);
-	await page.route('**/api/admin/mitglieder/*/rollen', (route) =>
+	await page.route('**/api/admin/rollen/entziehen', (route) =>
 		route.fulfill({ status: 409, json: { fehler: 'letzter-mytco' } satisfies Fehlerkoerper })
 	);
-	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('MyTCO-Admin', { exact: true }).uncheck();
-	await page.getByRole('button', { name: 'Rollen speichern' }).click();
+	await seitenleiste(page).getByRole('link', { name: 'Rollen' }).click();
+	await page.locator('summary', { hasText: 'MyTCO-Admin' }).click();
+	const eigener = page
+		.getByRole('list', { name: 'MyTCO-Admin' })
+		.getByRole('listitem')
+		.filter({ hasText: `${nachname}, Emil` });
+	await eigener.getByRole('button', { name: 'Entziehen' }).click();
 	// Wer sich selbst die Rolle entzieht, wird vorher gefragt; «Abbrechen» schickt nichts.
 	const rueckfrage = page.getByRole('dialog', { name: 'Rolle MyTCO-Admin entziehen?' });
-	await expect(rueckfrage.getByText('Du kannst danach keine Rollen mehr vergeben.')).toBeVisible();
+	await expect(
+		rueckfrage.getByText(
+			'Du kannst danach keine Rollen mehr vergeben und siehst diese Seite nicht mehr.'
+		)
+	).toBeVisible();
 	await rueckfrage.getByRole('button', { name: 'Abbrechen' }).click();
 	await expect(rueckfrage).toBeHidden();
-	await page.getByRole('button', { name: 'Rollen speichern' }).click();
-	await rueckfrage.getByRole('button', { name: 'Rolle entziehen' }).click();
+	await eigener.getByRole('button', { name: 'Entziehen' }).click();
+	await rueckfrage.getByRole('button', { name: 'Entziehen' }).click();
 	const meldung =
 		'Du bist der letzte MyTCO-Admin. Gib zuerst jemand anderem die Rolle MyTCO-Admin.';
-	await expect(page.getByText(meldung)).toBeVisible();
+	await expect(rueckfrage.getByText(meldung)).toBeVisible();
 	await pruefeBildschirm(page, info, 'verwaltung-letzter-admin');
 	expect(fehler).toEqual([]);
 });
@@ -295,22 +302,6 @@ test('A-MITGLIED-02: zwei Admins am selben Mitglied – die zweite Änderung üb
 	const verlauf = page.getByRole('table', { name: 'Verlauf' });
 	await expect(verlauf).toContainText('Ort geändert');
 	await expect(verlauf).not.toContainText('Telefon geändert');
-
-	// Zweiter Konflikt, danach «Rollen speichern»: die Seite lädt den neuen Stand, die Meldung
-	// passt nicht mehr und verschwindet.
-	const { angaben: stand2 } = (await (await page.request.get(pfad)).json()) as {
-		angaben: Record<string, unknown>;
-	};
-	await page.request.post(pfad, { data: { ...stand2, ort: 'Baden', vorher: stand2 } });
-	await telefon.fill('+41 00 000 00 03');
-	await page.getByRole('button', { name: 'Angaben speichern' }).click();
-	await expect(meldung).toBeVisible();
-	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('CM-Admin').check();
-	await page.getByRole('button', { name: 'Rollen speichern' }).click();
-	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
-	await expect(page.getByLabel('Ort', { exact: true })).toHaveValue('Baden');
-	await expect(meldung).toBeHidden();
 
 	// Ein Mitglied, das es nicht gibt: Fehlerseite mit Rahmen und Weg zurück zur Verwaltung.
 	await page.goto('/verwaltung/mitglieder/2147483000');
@@ -446,29 +437,55 @@ test('A-ROLLE-01, RR-07: MyTCO-Admin vergibt eine Rolle, schaut als CM-Admin, ka
 	const { turnierId, jahr } = await legeTurnierAn();
 	const mytco = await legeRollenkontoMitBriefCodeAn('Theo', ['mytco']);
 	const nachname = `Probe${randomUUID().slice(0, 8)}`;
-	const mitglied = await legeKontoAn('Selma', nachname);
+	await legeKontoAn('Selma', nachname);
 	await oeffneVerwaltung(page, mytco);
 
 	// Regel 7: Der MyTCO-Admin sieht alle Bereiche und dazu die Rollen.
 	await expect(seitenleiste(page).getByRole('link', { name: 'Turniere' })).toBeVisible();
 	await expect(seitenleiste(page).getByRole('link', { name: 'Rollen' })).toBeVisible();
 
-	// Regel 2: Rolle CM-Admin an ein erfundenes Mitglied vergeben.
-	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
-	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('CM-Admin').check();
-	await page.getByRole('button', { name: 'Rollen speichern' }).click();
-	await expect(page.getByText('Rollen gespeichert', { exact: true })).toBeVisible();
-
-	// Die Übersicht nennt es unter «CM-Admin», als Link zu seiner Seite.
+	// Regel 2, #96: Rolle CM-Admin auf der Seite «Rollen» an ein erfundenes Mitglied vergeben.
 	await seitenleiste(page).getByRole('link', { name: 'Rollen' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Rollen' })).toBeVisible();
-	await pruefeBildschirm(page, info, 'rollen-seite');
 	const cmAdmins = page.locator('details.klappe', {
 		has: page.locator('summary', { hasText: 'CM-Admin' })
 	});
 	await cmAdmins.locator('summary').click();
-	await expect(cmAdmins.getByRole('link', { name: `${nachname}, Selma` })).toBeVisible();
+	await cmAdmins.getByRole('button', { name: 'CM-Admin vergeben' }).click();
+	const vergeben = page.getByRole('dialog', { name: 'CM-Admin vergeben' });
+	await vergeben.getByLabel('Mitglied suchen').fill(nachname);
+	await vergeben.getByRole('radio', { name: new RegExp(`${nachname}`) }).check();
+	await pruefeBildschirm(page, info, 'rollen-vergeben');
+	await vergeben.getByRole('button', { name: 'Vergeben' }).click();
+	await expect(vergeben).toBeHidden();
+	await expect(page.getByText(`${nachname}, Selma ist jetzt CM-Admin.`)).toBeVisible();
+	// Die Übersicht nennt es unter «CM-Admin», als Link zu seiner Seite.
+	const selma = cmAdmins.getByRole('link', { name: `${nachname}, Selma` });
+	await expect(selma).toBeVisible();
+	await pruefeBildschirm(page, info, 'rollen-seite');
+
+	// Wer die Rolle schon hat, ist in der Suche gesperrt.
+	await cmAdmins.getByRole('button', { name: 'CM-Admin vergeben' }).click();
+	await vergeben.getByLabel('Mitglied suchen').fill(nachname);
+	await expect(vergeben.getByRole('radio', { name: new RegExp(`${nachname}`) })).toBeDisabled();
+	await expect(vergeben.getByText('hat die Rolle schon')).toBeVisible();
+	await vergeben.getByRole('button', { name: 'Abbrechen' }).click();
+
+	// Entziehen mit Rückfrage: danach steht es nicht mehr unter «CM-Admin».
+	await cmAdmins
+		.getByRole('listitem')
+		.filter({ hasText: `${nachname}, Selma` })
+		.getByRole('button', { name: 'Entziehen' })
+		.click();
+	const entziehen = page.getByRole('dialog', { name: 'Rolle CM-Admin entziehen?' });
+	await expect(entziehen.getByText(`${nachname}, Selma`)).toBeVisible();
+	await expect(entziehen.getByText('Du kannst danach keine Rollen mehr vergeben')).toHaveCount(0);
+	await entziehen.getByRole('button', { name: 'Entziehen' }).click();
+	await expect(entziehen).toBeHidden();
+	await expect(
+		page.getByText(`${nachname}, Selma hat die Rolle CM-Admin nicht mehr.`)
+	).toBeVisible();
+	await expect(selma).toHaveCount(0);
 
 	// Ansicht als CM-Admin: zuerst zu den Turnieren, nur die Clubmeisterschaft, Band oben.
 	await schaueAls(page, 'CM-Admin');
@@ -578,36 +595,14 @@ test('RR-07, Regel 3: MyTCO-Admin sieht Mitglied nur lesend (fieldset disabled, 
 	const mitgliedschaft = page.getByRole('region', { name: /^Mitgliedschaft/ });
 	await expect(mitgliedschaft).toContainText('Aktiv.');
 	await expect(mitgliedschaft).not.toContainText('erfasse ihn hier');
-	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await expect(page.getByLabel('CM-Admin')).toBeEnabled();
+	// #96: Rollen nur zum Lesen, mit dem Weg zur Seite «Rollen».
+	await expect(page.getByText('Rollen: Mitglied', { exact: false })).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Auf der Seite «Rollen» ändern' })).toBeVisible();
 	await pruefeBildschirm(page, info, 'mytco-mitglied-nur-lesen');
 
 	// Gesperrt heisst nicht ungespeichert: Das Wappen fragt nicht nach.
 	await page.getByRole('link', { name: 'Zur Startseite', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Mitglieder' })).toBeVisible();
-	expect(fehler).toEqual([]);
-});
-
-test('A-MITGLIED-02: Rollen speichern, inzwischen geändert – Meldung mit «Neuen Stand laden»', async ({
-	page
-}, info) => {
-	// Den Konflikt stellt der Test nach; die Regel selbst prüfen die Datenbanktests (veraltet).
-	const fehler = sammleKonsolenfehler(page);
-	const mytco = await legeRollenkontoMitBriefCodeAn('Timon', ['mytco']);
-	const mitglied = await legeKontoAn('Regula');
-	await oeffneVerwaltung(page, mytco);
-	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
-	await page.route('**/api/admin/mitglieder/*/rollen', (route) =>
-		route.fulfill({ status: 409, json: { fehler: 'veraltet' } satisfies Fehlerkoerper })
-	);
-	await page.locator('summary', { hasText: 'Rollen' }).click();
-	await page.getByLabel('Lizenz-Admin').check();
-	await page.getByRole('button', { name: 'Rollen speichern' }).click();
-	await expect(
-		page.getByText('Inzwischen hat jemand anderes dieses Mitglied geändert.')
-	).toBeVisible();
-	await expect(page.getByRole('button', { name: 'Neuen Stand laden' })).toBeVisible();
-	await pruefeBildschirm(page, info, 'rollen-veraltet');
 	expect(fehler).toEqual([]);
 });
 
@@ -626,11 +621,13 @@ test('RR-07, Regel 2: Mitglieder-Admin sieht keine Rollenvergabe', async ({ page
 	await expect(page).toHaveURL(/\/verwaltung\/mitglieder$/);
 	await wartetAufMitgliederliste(page);
 
-	// Beim Mitglied: Angaben bearbeitbar, keine Klappe «Rollen».
+	// Beim Mitglied: Angaben bearbeitbar, Rollen nur als Zeile, ohne Weg zur Seite «Rollen» (#96).
 	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
 	await expect(page.getByRole('heading', { level: 1, name: /Ruth/ })).toBeVisible();
 	await expect(page.getByLabel('Vorname', { exact: true })).toBeEnabled();
 	await expect(page.locator('summary', { hasText: 'Rollen' })).toHaveCount(0);
+	await expect(page.getByText('Rollen: Mitglied', { exact: true })).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Auf der Seite «Rollen» ändern' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'mitglieder-admin-ohne-rollen');
 	expect(fehler).toEqual([]);
 });
@@ -879,14 +876,18 @@ test('#93: jede Menüseite der Verwaltung erklärt sich in ihrer Seiteninfo', as
 	const seiteninfo = page.getByRole('note', { name: 'Über diese Seite' });
 
 	const seiten: [string, string, string[]][] = [
-		['/verwaltung/mitglieder', 'Mitglieder', ['über «Bearbeiten» ihre Seite öffnen']],
+		[
+			'/verwaltung/mitglieder',
+			'Mitglieder',
+			['über «Bearbeiten» ihre Seite öffnen', 'auf der Seite «Rollen»']
+		],
 		['/verwaltung/einlesen', 'Einlesen', ['Für das erste Einlesen']],
 		['/verwaltung/briefe', 'Briefe', ['Nicht für verlorene Zugänge', '«Code per E-Mail»']],
 		['/verwaltung/anlaesse', 'Anlässe', ['Erinnerungen an alle, die noch nicht geantwortet haben']],
 		['/verwaltung/mitteilungen', 'Mitteilungen', ['über die Seite eines Anlasses']],
 		['/verwaltung/fairgate', 'Für Fairgate', ['Mitgliedersystem Fairgate']],
 		['/verwaltung/verlauf', 'Änderungsverlauf', ['ohne alte und neue Werte']],
-		['/verwaltung/rollen', 'Rollen', ['in der Klappe «Rollen»']]
+		['/verwaltung/rollen', 'Rollen', ['Hier werden Rollen vergeben und entzogen']]
 	];
 	for (const [adresse, titel, saetze] of seiten) {
 		await page.goto(adresse);
