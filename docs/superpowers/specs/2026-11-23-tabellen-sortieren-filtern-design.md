@@ -45,8 +45,11 @@ Ein «Gefühl wie Excel» ist ausdrücklich kein Ziel.
 5. **Merken** (Entscheid PL): Sortierung, Häkchen-Filter (Rollen, Konto, Brief, Was) und
    Zahlen-Filter (Jahrgang, Zeit) stehen in der Adresse der Seite (Query); Zurück, Neuladen und
    Lesezeichen zeigen dieselbe Ansicht. **Textfilter und Suche nie in der Adresse** (Entscheid PL,
-   Datenschutz): Sie bleiben nur im Tab (SvelteKit-`snapshot`, also Sitzungsspeicher des Tabs),
-   überstehen «Zurück» aus der Detailseite, nicht aber Lesezeichen oder ein neues Fenster. Die Breiten
+   Datenschutz): Sie bleiben nur im Arbeitsspeicher des Tabs (ein Gedächtnis je Tabelle, kein
+   Browserspeicher) und überstehen jede Rückkehr zur Liste innerhalb der App (Zurück, Pfad,
+   Seitenleiste, Weiterleitung nach einer Aktion), nicht aber Neuladen, Lesezeichen oder ein neues
+   Fenster. Dasselbe Gedächtnis hält auch Sortierung und Häkchen, damit «Pfad › Mitglieder» die
+   Ansicht nicht verliert. Die Breiten
    bleiben pro Gerät gespeichert (Vorschlag Claude, Gerätespeicher je Tabelle); eine Taste
    «Breiten zurücksetzen» stellt die Standardbreiten her.
 6. **Handy unverändert** (unter `60rem`): keine Sortiertasten, keine Filter im Titel, kein Ziehen.
@@ -76,8 +79,8 @@ Ein «Gefühl wie Excel» ist ausdrücklich kein Ziel.
 - **Mitglieder und Briefe filtern und sortieren im Browser:** Der Server schickt dort schon die
   ganze Liste (alle Mitglieder ausser gelöschten bzw. alle Briefe). Die Suche der Mitglieder
   bleibt eine Anfrage an den Server wie heute; Filter und Sortierung wirken auf deren Treffer. Der
-  Kontofilter ersetzt am PC den Filter «Status» (dort ausgeblendet); auf dem Handy setzt der
-  Filter «Status» dieselben Werte (aktiv = aktiv, Brief offen, ohne Brief, gesperrt).
+  Kontofilter ersetzt am PC den Filter «Status» (dort ausgeblendet); auf dem Handy bleibt der
+  Filter «Status» wie heute eine Anfrage an den Server.
 - **Briefe – Auswahl:** «Alle wählen» wählt nur die Zeilen, die der Filter zeigt. Ein
   ausgeblendetes Mitglied zählt nicht zur Auswahl (wie heute bei Mitgliedern, die aus der Liste
   fallen), damit nie Briefe an Unsichtbare gehen (Vorschlag Claude).
@@ -91,8 +94,8 @@ Ein «Gefühl wie Excel» ist ausdrücklich kein Ziel.
   «Die neuesten 100 Treffer» bzw. wie heute «Die letzten 100 Einträge».
 - **Datenschutz:** Keine neuen Daten, alle Rollen sehen dieselben Felder wie heute. In der
   Adresse der Seite (und damit im Browserverlauf) stehen nur Sortierung, Häkchen und Zahlen, nie
-  Namen, E-Mails oder Nummern. Textfilter und Suche liegen nur im Sitzungsspeicher des Tabs und
-  verschwinden mit ihm. Der Verlauf schickt `wer` und `name` als Abfrage an den Server, wie die
+  Namen, E-Mails oder Nummern. Textfilter und Suche liegen nur im Arbeitsspeicher des Tabs und
+  verschwinden beim Neuladen. Der Verlauf schickt `wer` und `name` als Abfrage an den Server, wie die
   Suche der Mitglieder heute schon `suche`; Caddy schreibt kein Zugriffsprotokoll, die App loggt
   nur feste Texte. Im Gerätespeicher liegen nur Spaltenbreiten. Damit braucht es keinen neuen
   Eintrag in `docs/datenschutz.md`; der Merge prüft das noch einmal.
