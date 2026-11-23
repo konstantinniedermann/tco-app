@@ -61,7 +61,7 @@ Keine Gesundheitsdaten (auch nicht als Grund für eine Abmeldung), keine Fotos, 
 Bankdaten.
 
 
-Die Liste der bereits gemeldeten Interclub-Begegnungen (Team-Nummer, Begegnung) enthält keine Personendaten.
+Die Liste der bereits gemeldeten Interclub-Begegnungen (Saison, Begegnung, gemeldet am) enthält keine Personendaten.
 
 ## Wer sieht was
 
