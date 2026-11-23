@@ -1,9 +1,10 @@
 <script lang="ts">
-	// Aufklappbereich «Benachrichtigungen» im Profil (FR-40, FR-41): Push auf diesem Gerät und die
-	// drei Themen. Die Schalter gelten sofort, ohne Speichern-Taste (UI-Leitbild, Auswahlfläche
-	// als Schalter).
+	// Aufklappbereich «Benachrichtigungen» im Profil (FR-40, FR-41): Push auf diesem Gerät, die
+	// drei Themen und die gefolgten Interclub-Teams (#81). Die Schalter gelten sofort, ohne
+	// Speichern-Taste (UI-Leitbild, Auswahlfläche als Schalter).
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
+	import { holeGefolgteTeams, setzeFolgen, type GefolgteTeams } from '../interclub/api.ts';
 	import { MELDUNG } from '../login/anmelden.ts';
 	import { leiteUmNachAktion } from '../login/waechter.ts';
 	import { istKlappeOffen, merkeKlappe } from '../ui/klappe.ts';
@@ -15,7 +16,8 @@
 	} from './api.ts';
 	import { pushMoeglich, schalteAus, schalteEin } from './geraet.ts';
 
-	let { nurAnsehen }: { nurAnsehen: boolean } = $props();
+	// `interclub`: Es gibt Interclub-Daten (Reiter IC); sonst fehlt die Gruppe «Interclub-Teams».
+	let { nurAnsehen, interclub }: { nurAnsehen: boolean; interclub: boolean } = $props();
 
 	const THEMEN: { thema: Thema; name: string }[] = [
 		{ thema: 'anlaesse', name: 'Anlässe' },
@@ -33,11 +35,42 @@
 	let themenFehler = $state<string | null>(null);
 	let themenLaeuft = $state(false);
 
+	// Gefolgte Teams: Ein abgewähltes Team bleibt bis zum nächsten Laden stehen, damit man es wieder
+	// anwählen kann. `null`: Der Stand liess sich nicht laden (nur diese Gruppe meldet die Störung).
+	type IcZeile = { teamId: number; liga: string; folgt: boolean };
+	let ic = $state<{ teams: IcZeile[]; push: boolean } | null>(null);
+	let icLaeuft = $state(false);
+	let icFehler = $state<string | null>(null);
+	const IC_FOLGEN = 'Folgen kannst du auf der Seite eines Teams unter';
+	const icSatz = $derived(
+		ic === null || ic.teams.length === 0
+			? 'Du folgst keinem Team.'
+			: ic.push
+				? 'Push nach jedem Endstand.'
+				: 'Ohne Push bekommst du keine Mitteilung.'
+	);
+
+	const alsZeilen = (g: GefolgteTeams) => ({
+		teams: g.teams.map((t) => ({ ...t, folgt: true })),
+		push: g.push
+	});
+
 	onMount(async () => {
-		const r = await holeBenachrichtigungen();
+		const [r, g] = await Promise.all([
+			holeBenachrichtigungen(),
+			interclub ? holeGefolgteTeams() : null
+		]);
 		stand = r.art === 'ok' ? r.daten : null;
+		ic = g?.art === 'ok' ? alsZeilen(g.daten) : null;
 		laedt = false;
 	});
+
+	// Push auf diesem Gerät ändert, ob das Konto überhaupt Push hat: der Satz zu den Teams folgt.
+	async function ladePushDerTeams() {
+		if (!ic) return;
+		const g = await holeGefolgteTeams();
+		if (g.art === 'ok' && ic) ic.push = g.daten.push;
+	}
 
 	async function schaltePush(an: boolean) {
 		if (!stand?.schluessel || pushLaeuft) return;
@@ -57,6 +90,7 @@
 				pushFehler = MELDUNG.stoerung;
 			}
 		}
+		if (pushFehler === null) await ladePushDerTeams();
 		pushLaeuft = false;
 	}
 
@@ -81,6 +115,33 @@
 		}
 		if (r.art === 'ok') stand.themen = r.daten.themen;
 		themenLaeuft = false;
+	}
+
+	// Wie die Themen: eine Anfrage nach der anderen, bei Fehler der Stand des Servers. Ohne Push
+	// lässt sich ein abgewähltes Team nicht wieder anwählen (`kein-push`); der Satz sagt es.
+	async function schalteTeam(z: IcZeile, an: boolean) {
+		if (!ic || icLaeuft) return;
+		icLaeuft = true;
+		icFehler = null;
+		z.folgt = an;
+		const r = await setzeFolgen(z.teamId, an);
+		if (r.art === 'abgemeldet') {
+			await leiteUmNachAktion(r);
+			return;
+		}
+		if (r.art === 'ok') z.folgt = r.daten.folgt;
+		else if (r.art === 'kein-push') {
+			z.folgt = false;
+			ic.push = false;
+		} else {
+			icFehler = MELDUNG.stoerung;
+			const g = await holeGefolgteTeams();
+			if (g.art === 'ok') {
+				for (const x of ic.teams) x.folgt = g.daten.teams.some((t) => t.teamId === x.teamId);
+				ic.push = g.daten.push;
+			} else z.folgt = !an;
+		}
+		icLaeuft = false;
 	}
 </script>
 
@@ -138,6 +199,26 @@
 			<p class="leise">
 				Gilt für Push und E-Mail. Bestätigungen und Login-Codes bekommst du immer.
 			</p>
+			{#if interclub}
+				{#if ic}
+					{@const g = ic}
+					<fieldset class="auswahl-gruppe" disabled={nurAnsehen || icLaeuft}>
+						<legend>Interclub-Teams</legend>
+						{#each g.teams as z (z.teamId)}
+							<label class="auswahl">
+								<input type="checkbox" bind:checked={() => z.folgt, (an) => schalteTeam(z, an)} />
+								{z.liga}
+							</label>
+						{/each}
+					</fieldset>
+					{#if icFehler}
+						<p class="fehler" role="alert">{icFehler}</p>
+					{/if}
+					<p class="leise">{icSatz} {IC_FOLGEN} <a href={resolve('/interclub')}>IC</a>.</p>
+				{:else}
+					<p class="fehler" role="alert">{MELDUNG.stoerung}</p>
+				{/if}
+			{/if}
 		{/if}
 	</div>
 </details>
