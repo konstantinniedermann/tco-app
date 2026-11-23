@@ -1,5 +1,6 @@
 // Meldungen der Verwaltung an ein Mitglied nach einer Änderung (FR-56): Profil, Rolle, Zugang.
-// Gebraucht von den Schnittstellen der Verwaltung (`schnittstellen.ts`).
+// Gebraucht von den Schnittstellen der Verwaltung (`schnittstellen.ts`); `meldeVerwaltung` auch von
+// den Meldungen der CM (`cm/verwaltung-meldung.ts`).
 import { FELD_NAMEN } from '../../feld-namen.ts';
 import { ROLLEN_NAME } from '../../verwaltung/rollen-namen.ts';
 import { meldeMitgliedern } from '../mitteilung/meldung.ts';
