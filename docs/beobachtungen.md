@@ -200,3 +200,15 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** Geringes Risiko, reine Textzweige. Bei der nächsten Änderung an der Karte einen Passkey per E2E-Hilfe anlegen und beide Zweige mitprüfen.
 
+### 2026-11-23 — Interclub-Übersicht zeigt nur die Junioren, wenn deren neue Saison vor den Aktiven da ist
+
+**Thema:** Interclub
+
+**Fundort:** `src/lib/server/interclub/ansicht.ts`, `ladeUebersicht` (neueste Saison über IC und JIC zusammen).
+
+**Beobachtung:** Die Übersicht nimmt die neueste Saison über beide Wettbewerbe. Holt der Abruf im Frühling den Junioren-Interclub des neuen Jahres vor dem Interclub der Aktiven (er holt je Wettbewerb), zeigt die Übersicht bis zum Import der Aktiven nur die Junioren. Für die Liste der gefolgten Teams im Profil ist das in #81 Teil 3b behoben (neueste Saison je Wettbewerb).
+
+**Ursprung:** Final-Review #81 Teil 3b, Session vom 23.11.2026.
+
+**Einschätzung:** Vorübergehend, meist nur Stunden bis Tage im Frühling. Gleiche Regel wie im Profil (je Wettbewerb) wäre ein kleiner Fix; zusammen mit Hinweis 5 aus #81 («Form 2027 im Frühling prüfen») ansehen.
+
