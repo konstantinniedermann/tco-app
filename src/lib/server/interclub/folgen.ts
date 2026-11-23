@@ -1,5 +1,5 @@
 // Interclub-Teams folgen: wer welchem Team folgt, und ob das Konto Push eingerichtet hat.
-import { and, asc, desc, eq, inArray, max } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, max, or } from 'drizzle-orm';
 import type { Db } from '../db/index.ts';
 import { icFolgen, icTeam, pushAbo } from '../db/schema.ts';
 
@@ -52,24 +52,31 @@ export async function setzeFolgen(
 	return 'ok';
 }
 
-/** Die Teams der neuesten Saison, denen das Konto folgt, in der Reihenfolge der Übersicht. */
+/**
+ * Die Teams der neuesten Saison je Wettbewerb (IC und JIC getrennt), denen das Konto folgt, in der
+ * Reihenfolge der Übersicht: erst IC, dann JIC. So bleibt ein IC-Team in der Liste, auch wenn JIC
+ * der neuen Saison schon da ist und IC noch nicht.
+ */
 export async function ladeGefolgteTeams(
 	db: Db,
 	kontoId: number
 ): Promise<{ teams: GefolgtesTeam[]; push: boolean }> {
-	const [neueste] = await db.select({ saison: max(icTeam.saison) }).from(icTeam);
+	const neueste = await db
+		.select({ wettbewerb: icTeam.wettbewerb, saison: max(icTeam.saison) })
+		.from(icTeam)
+		.groupBy(icTeam.wettbewerb);
+	const saisons = neueste.flatMap((n) =>
+		n.saison === null ? [] : [and(eq(icTeam.wettbewerb, n.wettbewerb), eq(icTeam.saison, n.saison))]
+	);
 	const teams: GefolgtesTeam[] =
-		neueste?.saison == null
+		saisons.length === 0
 			? []
 			: await db
 					.select({ teamId: icTeam.teamId, liga: icTeam.liga })
 					.from(icFolgen)
-					.innerJoin(
-						icTeam,
-						and(eq(icTeam.teamId, icFolgen.teamId), eq(icTeam.saison, neueste.saison))
-					)
+					.innerJoin(icTeam, and(eq(icTeam.teamId, icFolgen.teamId), or(...saisons)))
 					.where(eq(icFolgen.kontoId, kontoId))
-					.orderBy(asc(icTeam.reihenfolge), asc(icTeam.teamId));
+					.orderBy(asc(icTeam.wettbewerb), asc(icTeam.reihenfolge), asc(icTeam.teamId));
 	return { teams, push: await hatPush(db, kontoId) };
 }
 

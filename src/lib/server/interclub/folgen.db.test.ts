@@ -127,6 +127,33 @@ describe('Interclub-Teams folgen', () => {
 	});
 
 	test(
+		'JIC 2028 schon da, IC 2028 noch nicht: IC-Team aus 2027 bleibt in der Liste',
+		ZEIT_EIGENE_DB,
+		async () => {
+			const k = await neuesKonto(true);
+			await e.db.insert(icTeam).values({
+				saison: 2028,
+				teamId: 50,
+				wettbewerb: 'jic',
+				teamName: 'Olten 50',
+				liga: 'Junioren U15',
+				gruppe: 1,
+				reihenfolge: 1
+			});
+			try {
+				for (const t of [50, 1, 2]) await setzeFolgen(e.db, k, t, true, JETZT);
+				expect((await ladeGefolgteTeams(e.db, k)).teams).toEqual([
+					{ teamId: 2, liga: '1L Damen' },
+					{ teamId: 1, liga: '2L Herren 1' },
+					{ teamId: 50, liga: 'Junioren U15' }
+				]);
+			} finally {
+				await e.db.delete(icTeam).where(eq(icTeam.saison, 2028));
+			}
+		}
+	);
+
+	test(
 		'ladeAlleGefolgtenTeams: Liga der neuesten Saison je Team, unbekannte Teams sichtbar',
 		ZEIT_EIGENE_DB,
 		async () => {

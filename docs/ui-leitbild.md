@@ -481,8 +481,8 @@ Abmelden sind sie wieder zu.
 
 **Benachrichtigungen im Profil:** zuerst der Schalter «Push auf diesem Gerät», dann die Gruppe
 «Mitteilungen zu» mit den Themen und leise «Gilt für Push und E-Mail. …» (nur für die Themen).
-Darunter die Gruppe «Interclub-Teams»: je gefolgtes Team der neuesten Saison ein Schalter mit
-der Liga; darunter leise «Push nach jedem Endstand. Folgen kannst du auf der Seite eines Teams
+Darunter die Gruppe «Interclub-Teams»: je gefolgtes Team der neuesten Saison (IC und JIC je für sich) ein
+Schalter mit der Liga; darunter leise «Push nach jedem Endstand. Folgen kannst du auf der Seite eines Teams
 unter IC.», ohne Push auf einem Gerät statt des ersten Satzes «Ohne Push bekommst du keine
 Mitteilung.», ohne Team «Du folgst keinem Team. Folgen kannst du auf der Seite eines Teams unter
 IC.»; «IC» ist ein Link zum Reiter. Ein abgewähltes Team bleibt bis zum nächsten Laden stehen,
