@@ -1,5 +1,7 @@
 # Testgruppe — Design (#40)
 
+> Abgelöst in Ablauf und Aufträgen durch den [Probelauf mit Rollen](2026-11-23-probelauf-rollen-design.md) (23.11.2026).
+
 Stand 04.11.2026. Grundlage: Brainstorming mit dem Projektleiter am 04.11.2026, Issue #40.
 
 ## Zweck
