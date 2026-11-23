@@ -718,6 +718,122 @@ describe('Admin-Schnittstellen', () => {
 		expect(((await detail.json()) as { rollen: string[] }).rollen).toEqual(['lizenz']);
 	});
 
+	// FR-56: Meldung bei Rolle, Wiedereintritt und Rücknahme der Löschung (Standard nein).
+	const mytcoMail = (an: string, text: string) => ({
+		an,
+		betreff: 'MyTCO',
+		text: `${text}\n\n${ADRESSE}/`
+	});
+	const schlechteTypen = ['ja', 1, null];
+
+	for (const [art, text] of [
+		['vergeben', 'Du hast neu die Rolle «CM-Admin».'],
+		['entziehen', 'Deine Rolle «CM-Admin» wurde entfernt.']
+	] as const) {
+		const fn = art === 'vergeben' ? postRolleVergeben : postRolleEntziehen;
+		const gegenteil = art === 'vergeben' ? postRolleEntziehen : postRolleVergeben;
+		const rolleAuf = async (kontoId: number) =>
+			(await db.select().from(kontoRolle).where(eq(kontoRolle.kontoId, kontoId))).map(
+				(r) => r.rolle
+			);
+		const body = (mitgliedId: number, extra: object = {}) => ({
+			mitgliedId,
+			rolle: 'cm',
+			...extra
+		});
+
+		test(`FR-56: Rolle ${art} meldet nur mit benachrichtigen`, async () => {
+			const s = baue();
+			const admin = await bestaetigterAdmin(s);
+			const ziel = await legeMitgliedAn(db, { rollen: art === 'vergeben' ? [] : ['cm'] });
+			const rufe = (f: typeof fn, extra?: object) =>
+				f(s.d, ereignis({ body: body(ziel.mitgliedId, extra), konto: admin.konto }));
+			// Ohne Angabe und mit false: wirkt, meldet nichts.
+			expect((await rufe(fn)).status).toBe(200);
+			expect((await rufe(gegenteil)).status).toBe(200);
+			expect((await rufe(fn, { benachrichtigen: false })).status).toBe(200);
+			expect((await rufe(gegenteil)).status).toBe(200);
+			await nurDieseMeldung(s, admin.konto, (await angelegt(s, admin.konto)).id);
+
+			// Mit Häkchen: genau diese eine Meldung an das Mitglied.
+			const s2 = baue();
+			const r = await fn(
+				s2.d,
+				ereignis({ body: body(ziel.mitgliedId, { benachrichtigen: true }), konto: admin.konto })
+			);
+			expect(r.status).toBe(200);
+			await vi.waitFor(() => expect(s2.mails).toEqual([mytcoMail(ziel.email, text)]));
+		});
+
+		test(`FR-56: Rolle ${art} mit falschem Typ → 400, nichts geändert; an sich selbst keine Meldung`, async () => {
+			const s = baue();
+			const admin = await bestaetigterAdmin(s);
+			const ziel = await legeMitgliedAn(db, { rollen: art === 'vergeben' ? [] : ['cm'] });
+			const vorher = await rolleAuf(ziel.kontoId);
+			for (const benachrichtigen of schlechteTypen) {
+				const r = await fn(
+					s.d,
+					ereignis({ body: body(ziel.mitgliedId, { benachrichtigen }), konto: admin.konto })
+				);
+				expect([benachrichtigen, r.status, await r.json()]).toEqual([
+					benachrichtigen,
+					400,
+					{ fehler: 'eingabe' }
+				]);
+			}
+			expect(await rolleAuf(ziel.kontoId)).toEqual(vorher);
+			// An sich selbst: wirkt, meldet nichts.
+			const selbst = (f: typeof fn, extra?: object) =>
+				f(s.d, ereignis({ body: body(admin.mitgliedId, extra), konto: admin.konto }));
+			if (art === 'entziehen') await selbst(gegenteil);
+			expect((await selbst(fn, { benachrichtigen: true })).status).toBe(200);
+			await nurDieseMeldung(s, admin.konto, (await angelegt(s, admin.konto)).id);
+		});
+	}
+
+	for (const [name, fn, hinein, weg] of [
+		['Wiedereintritt', postWiedereintritt, postAustritt, 'ausgetreten'],
+		['Rücknahme der Löschung', postLoeschenRueckgaengig, postLoeschen, 'vorgemerkt']
+	] as const) {
+		test(`FR-56: ${name} meldet den offenen Zugang nur mit benachrichtigen`, async () => {
+			const s = baue();
+			const admin = await bestaetigterAdmin(s, ['mitglieder']);
+			const ziel = await legeMitgliedAn(db);
+			const params = { id: String(ziel.mitgliedId) };
+			const aufruf = (dienste: typeof s.d, body: unknown) =>
+				fn(dienste, ereignis({ body, params, konto: admin.konto }));
+			const ruf = (f: typeof hinein) => f(s.d, ereignis({ body: {}, params, konto: admin.konto }));
+			const status = async () => (await ladeMitglied(db, ziel.mitgliedId, start))!.status;
+
+			// Falscher Typ: 400, Zustand unverändert.
+			expect((await ruf(hinein)).status).toBe(200);
+			for (const benachrichtigen of schlechteTypen) {
+				const r = await aufruf(s.d, { benachrichtigen });
+				expect([benachrichtigen, r.status, await r.json()]).toEqual([
+					benachrichtigen,
+					400,
+					{ fehler: 'eingabe' }
+				]);
+				expect(await status()).toBe(weg);
+			}
+			// Ohne Angabe und mit false: wirkt, meldet nichts (auch Austritt/Vormerken nicht).
+			expect((await aufruf(s.d, {})).status).toBe(200);
+			expect(await status()).toBe('aktiv');
+			expect((await ruf(hinein)).status).toBe(200);
+			expect((await aufruf(s.d, { benachrichtigen: false })).status).toBe(200);
+			await nurDieseMeldung(s, admin.konto, (await angelegt(s, admin.konto)).id);
+
+			// Mit Häkchen: genau eine Meldung, erst nachdem das Mitglied wieder aktiv ist.
+			const s2 = baue();
+			expect((await ruf(hinein)).status).toBe(200);
+			expect((await aufruf(s2.d, { benachrichtigen: true })).status).toBe(200);
+			expect(await status()).toBe('aktiv');
+			await vi.waitFor(() =>
+				expect(s2.mails).toEqual([mytcoMail(ziel.email, 'Dein Zugang zu MyTCO ist wieder offen.')])
+			);
+		});
+	}
+
 	test('SI-07, FR-24: Sitzungen beenden; unbekanntes Mitglied → 404', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);

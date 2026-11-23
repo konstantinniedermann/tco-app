@@ -30,6 +30,7 @@ import {
 	postRolleVergeben
 } from './schnittstellen.ts';
 import type { AdminDienste } from './rechte.ts';
+import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
@@ -65,7 +66,7 @@ function baue() {
 		bremsen: erstelleBremsen(),
 		jetzt: () => start
 	});
-	const d: AdminDienste = {
+	const d: MitteilungAdminDienste = {
 		db,
 		zugang,
 		hinweis: vi.fn<AdminDienste['hinweis']>(async () => {}),
@@ -74,7 +75,10 @@ function baue() {
 			adresse: 'https://mytco.example.org',
 			kontakt: 'kontakt@example.org'
 		},
-		jetzt: () => start
+		jetzt: () => start,
+		push: null,
+		mailer: async () => {},
+		adresse: 'https://mytco.example.org'
 	};
 	return { d, post };
 }

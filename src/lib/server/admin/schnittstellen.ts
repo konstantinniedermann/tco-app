@@ -53,7 +53,7 @@ import {
 	type Rolle
 } from './rollen.ts';
 import { istAktion, ladeVerlauf, schreibeVerlauf } from './verlauf.ts';
-import { meldeVerwaltung, profilMeldung } from './meldung.ts';
+import { meldeVerwaltung, profilMeldung, rolleMeldung, zugangMeldung } from './meldung.ts';
 import type { Rueckzug } from '../cm/austritt.ts';
 import {
 	austrittAnfrageMeldung,
@@ -211,22 +211,32 @@ function leseRollenAuftrag(koerper: Record<string, unknown>) {
 }
 
 // A-ROLLE-01, Regel 2: Nur der MyTCO-Admin vergibt Rollen, einzeln auf der Seite «Rollen» (#96).
-export function postRolleVergeben(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+// FR-56: `benachrichtigen` (Standard nein) meldet dem Mitglied die neue Rolle.
+export function postRolleVergeben(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
 	return schreibt(d, e, 'rollen', async (urheber, koerper) => {
 		const auftrag = leseRollenAuftrag(koerper);
-		if (auftrag === null) return eingabeFehler();
+		const benachrichtigen = leseBenachrichtigen(koerper, false);
+		if (auftrag === null || benachrichtigen === null) return eingabeFehler();
 		const r = await vergibRolle(d.db, urheber, auftrag.mitgliedId, auftrag.rolle, jetzt(d));
-		return r === 'ok' ? antwort(200, {}) : nichtGefunden();
+		if (r !== 'ok') return nichtGefunden();
+		if (benachrichtigen)
+			meldeVerwaltung(d, urheber, auftrag.mitgliedId, rolleMeldung(auftrag.rolle, 'vergeben'));
+		return antwort(200, {});
 	});
 }
 
 // A-ROLLE-01, RR-03: Entziehen; der letzte MyTCO-Admin behält seine Rolle (409 letzter-mytco).
-export function postRolleEntziehen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+export function postRolleEntziehen(d: MitteilungAdminDienste, e: AdminEreignis): Promise<Response> {
 	return schreibt(d, e, 'rollen', async (urheber, koerper) => {
 		const auftrag = leseRollenAuftrag(koerper);
-		if (auftrag === null) return eingabeFehler();
+		const benachrichtigen = leseBenachrichtigen(koerper, false);
+		if (auftrag === null || benachrichtigen === null) return eingabeFehler();
 		const r = await entziehRolle(d.db, urheber, auftrag.mitgliedId, auftrag.rolle, jetzt(d));
-		if (r === 'ok') return antwort(200, {});
+		if (r === 'ok') {
+			if (benachrichtigen)
+				meldeVerwaltung(d, urheber, auftrag.mitgliedId, rolleMeldung(auftrag.rolle, 'entzogen'));
+			return antwort(200, {});
+		}
 		if (r === 'letzter-mytco') return antwort(409, { fehler: r });
 		return nichtGefunden();
 	});
@@ -289,7 +299,8 @@ export function postBrief(d: AdminDienste, e: AdminEreignis): Promise<Response> 
 	});
 }
 
-// Die vier Übergänge der Mitgliedschaft: leerer JSON-Körper, die Funktion prüft den Ausgangszustand.
+// Die vier Übergänge der Mitgliedschaft: die Funktion prüft den Ausgangszustand. Den Körper liest nur,
+// wer ihn braucht (`mitZugangMeldung`); `'eingabe'` aus der Funktion heisst 400.
 function uebergang<E extends WortOhneZusatz>(
 	d: AdminDienste,
 	e: AdminEreignis,
@@ -297,14 +308,16 @@ function uebergang<E extends WortOhneZusatz>(
 		db: Db,
 		urheber: AdminUrheber,
 		id: number,
-		jetzt: Date
-	) => Promise<'ok' | 'nicht-gefunden' | E>
+		jetzt: Date,
+		koerper: Record<string, unknown>
+	) => Promise<'ok' | 'nicht-gefunden' | 'eingabe' | E>
 ): Promise<Response> {
-	return schreibt(d, e, 'mitglieder', async (urheber) => {
+	return schreibt(d, e, 'mitglieder', async (urheber, koerper) => {
 		const id = parseId(e.params.id);
 		if (id === null) return nichtGefunden();
-		const r = await fn(d.db, urheber, id, jetzt(d));
+		const r = await fn(d.db, urheber, id, jetzt(d), koerper);
 		if (r === 'ok') return antwort(200, {});
+		if (r === 'eingabe') return eingabeFehler();
 		return r === 'nicht-gefunden' ? nichtGefunden() : antwort(409, { fehler: r });
 	});
 }
@@ -349,14 +362,35 @@ function mitRueckzug<E extends WortOhneZusatz>(
 	});
 }
 
+// FR-56: Wiedereintritt und Rücknahme der Löschung lesen `benachrichtigen` (Standard nein) und
+// melden nach dem Erfolg, dass der Zugang wieder offen ist. Austritt und Vormerken lesen es nicht.
+function mitZugangMeldung<E extends WortOhneZusatz>(
+	d: MitteilungAdminDienste,
+	e: AdminEreignis,
+	fn: (
+		db: Db,
+		urheber: AdminUrheber,
+		id: number,
+		jetzt: Date
+	) => Promise<'ok' | 'nicht-gefunden' | E>
+): Promise<Response> {
+	return uebergang(d, e, async (db, urheber, id, t, koerper) => {
+		const benachrichtigen = leseBenachrichtigen(koerper, false);
+		if (benachrichtigen === null) return 'eingabe';
+		const r = await fn(db, urheber, id, t);
+		if (r === 'ok' && benachrichtigen) meldeVerwaltung(d, urheber, id, zugangMeldung());
+		return r;
+	});
+}
+
 export const postAustritt = (d: MitteilungAdminDienste, e: AdminEreignis) =>
 	mitRueckzug(d, e, erfasseAustritt);
-export const postWiedereintritt = (d: AdminDienste, e: AdminEreignis) =>
-	uebergang(d, e, erfasseWiedereintritt);
+export const postWiedereintritt = (d: MitteilungAdminDienste, e: AdminEreignis) =>
+	mitZugangMeldung(d, e, erfasseWiedereintritt);
 export const postLoeschen = (d: MitteilungAdminDienste, e: AdminEreignis) =>
 	mitRueckzug(d, e, merkeZumLoeschenVor);
-export const postLoeschenRueckgaengig = (d: AdminDienste, e: AdminEreignis) =>
-	uebergang(d, e, nimmLoeschungZurueck);
+export const postLoeschenRueckgaengig = (d: MitteilungAdminDienste, e: AdminEreignis) =>
+	mitZugangMeldung(d, e, nimmLoeschungZurueck);
 
 // DS-07: alles, was MyTCO zur Person speichert. Der Aufruf steht im Änderungsverlauf.
 export function getAuskunft(d: AdminDienste, e: AdminEreignis): Promise<Response> {
