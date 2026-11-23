@@ -525,3 +525,20 @@ Ergebnis:
 
 **Einschätzung:** Vorläufig. Nach dem ersten echten Lauf gegen Test neu bewerten; was dort stört,
 in einem Zug nachziehen.
+
+### 2026-11-23 — Häkchen «benachrichtigen»: zwei bewusst gelassene Grenzen der Oberfläche
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/lib/verwaltung/Mitgliedschaft.svelte` (Karten-Häkchen), `src/routes/verwaltung/rollen/+page.svelte` (Dialog «Rolle vergeben»).
+
+**Beobachtung:** (1) Leitbild und Entwurf sagen «kein Häkchen beim eigenen Mitglied»; die Karte
+«Mitgliedschaft» blendet es auf der eigenen Seite nicht aus. Der Fall tritt praktisch nicht auf
+(eigenes Konto vorgemerkt = gesperrt), und der Server meldet einem Admin nie eigene Änderungen.
+(2) In «Rolle vergeben» bleibt ein gesetztes Häkchen stehen, wenn die Wahl auf sich selbst und
+zurück wechselt; bei der eigenen Wahl geht immer «nicht melden» an den Server.
+
+**Ursprung:** Gesamtprüfung und Nachprüfung #94.
+
+**Einschätzung:** Ohne Wirkung für Mitglieder. Beim nächsten Umbau der Seiten angleichen oder die
+Formulierung im Leitbild auf Angaben und Rollen einschränken.
