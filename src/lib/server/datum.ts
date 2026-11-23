@@ -1,4 +1,4 @@
-import { utcZuZuerich } from '../anlass/zeit.ts';
+import { utcZuZuerich, zuerichZuUtc } from '../anlass/zeit.ts';
 
 /** Kalenderjahr in Schweizer Zeit (am 1. Januar um 0:30 schon das neue, auch auf einem Server in UTC). */
 export const jahrInZuerich = (jetzt: Date): number => Number(utcZuZuerich(jetzt).slice(0, 4));
@@ -10,6 +10,11 @@ export const heuteInZuerich = (jetzt: Date): string => utcZuZuerich(jetzt).slice
 export function plusTage(iso: string, tage: number): string {
 	const [j, m, t] = iso.split('-').map(Number);
 	return new Date(Date.UTC(j, m - 1, t + tage)).toISOString().slice(0, 10);
+}
+
+/** Beginn (0:00) eines Tages `YYYY-MM-DD` in Schweizer Zeit als Zeitpunkt; ungültig: `null`. */
+export function beginnDesTagesInZuerich(iso: string): Date | null {
+	return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? zuerichZuUtc(`${iso}T00:00`) : null;
 }
 
 const DATUM = new Intl.DateTimeFormat('de-CH', {

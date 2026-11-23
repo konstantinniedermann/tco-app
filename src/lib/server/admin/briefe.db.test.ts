@@ -84,6 +84,7 @@ describe('listeBriefEmpfaenger', () => {
 			id: ohneBrief.mitgliedId,
 			name: 'Briefa, Ohne',
 			mitgliedernummer: null,
+			jahrgang: null,
 			briefGueltigBis: null,
 			briefAbgelaufen: false,
 			adresseFehlt: false
@@ -115,6 +116,17 @@ describe('listeBriefEmpfaenger', () => {
 		expect(liste.find((z) => z.id === a.mitgliedId)?.briefGueltigBis).toBeNull();
 		expect(liste.find((z) => z.id === a.mitgliedId)?.briefAbgelaufen).toBe(true);
 		expect(liste.find((z) => z.id === b.mitgliedId)?.briefAbgelaufen).toBe(false);
+	});
+});
+
+describe('listeBriefEmpfaenger mit Jahrgang', () => {
+	test('#92: Liste liefert den Jahrgang, ohne Angabe null', async () => {
+		const mit = await legeMitgliedAn(db, { nachname: 'Jahrgangtest' });
+		await db.update(mitglied).set({ jahrgang: 2011 }).where(eq(mitglied.id, mit.mitgliedId));
+		const ohne = await legeMitgliedAn(db, { nachname: 'Jahrgangtest' });
+		const liste = await listeBriefEmpfaenger(db, jetzt);
+		expect(liste.find((z) => z.id === mit.mitgliedId)?.jahrgang).toBe(2011);
+		expect(liste.find((z) => z.id === ohne.mitgliedId)?.jahrgang).toBeNull();
 	});
 });
 

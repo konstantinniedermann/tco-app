@@ -14,6 +14,7 @@ export type BriefZeile = {
 	/** «Nachname, Vorname» wie in der Mitgliederliste. */
 	name: string;
 	mitgliedernummer: string | null;
+	jahrgang: number | null;
 	briefGueltigBis: Date | null;
 	/** Ein Code ist ausgestellt, nie benutzt und abgelaufen (Spalte Brief: «Code abgelaufen»). */
 	briefAbgelaufen: boolean;
@@ -42,6 +43,7 @@ export async function listeBriefEmpfaenger(db: Db, jetzt: Date): Promise<BriefZe
 			vorname: mitglied.vorname,
 			nachname: mitglied.nachname,
 			mitgliedernummer: mitglied.mitgliedernummer,
+			jahrgang: mitglied.jahrgang,
 			strasse: mitglied.strasse,
 			plz: mitglied.plz,
 			ort: mitglied.ort,
@@ -68,6 +70,7 @@ export async function listeBriefEmpfaenger(db: Db, jetzt: Date): Promise<BriefZe
 			id: z.id,
 			name: `${z.nachname}, ${z.vorname}`,
 			mitgliedernummer: z.mitgliedernummer,
+			jahrgang: z.jahrgang,
 			briefGueltigBis: briefOffen(z, jetzt) ? z.briefCodeAblauf : null,
 			briefAbgelaufen:
 				z.briefCodeHash !== null && z.briefCodeAblauf !== null && z.briefCodeAblauf <= jetzt,

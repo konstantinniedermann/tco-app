@@ -895,8 +895,19 @@ test('Tabelle: am PC bleiben die Spaltentitel der Mitgliederliste beim Scrollen 
 	await oeffneVerwaltung(page, admin);
 	// Schmalstes PC-Fenster: Die Seitenleiste nimmt Platz, die Tabelle muss trotzdem passen
 	await page.setViewportSize({ width: 1000, height: 500 });
+	// Tabellen-Steuerung (#92): Die Seite scrollt, bis die Box unter dem Seitenkopf liegt, dann
+	// scrollt die Box; ihre Spaltentitel kleben oben in ihr.
 	await scrolleFenster(page, 'unten');
-	expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(200);
+	const box = page.locator('.tabelle-steuerung');
+	await box.evaluate((e) => {
+		e.scrollTop = e.scrollHeight;
+	});
+	expect(await box.evaluate((e) => e.scrollTop)).toBeGreaterThan(200);
+	expect(
+		await page.evaluate(
+			() => document.documentElement.scrollWidth <= document.documentElement.clientWidth
+		)
+	).toBe(true);
 	// Nichts liegt über den Spaltentiteln, auch nicht der Seitenkopf; die letzte Spalte ist nicht
 	// abgeschnitten
 	for (const name of ['Name', 'Aktion']) {

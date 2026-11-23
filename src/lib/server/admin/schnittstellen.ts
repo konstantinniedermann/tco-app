@@ -12,7 +12,7 @@ import {
 	nichtGefunden
 } from '../http.ts';
 import type { WortOhneZusatz } from '../../fehler.ts';
-import { jahrInZuerich } from '../datum.ts';
+import { beginnDesTagesInZuerich, jahrInZuerich, plusTage } from '../datum.ts';
 import { INTEGER_MAX, parseId } from '../parse-id.ts';
 import { listeFuerFairgate, markiereUebertragen } from './fairgate.ts';
 import { leseStand, pruefeAngaben } from './angaben.ts';
@@ -51,7 +51,7 @@ import {
 	vergibRolle,
 	type Rolle
 } from './rollen.ts';
-import { ladeVerlauf, schreibeVerlauf } from './verlauf.ts';
+import { istAktion, ladeVerlauf, schreibeVerlauf } from './verlauf.ts';
 import type { Rueckzug } from '../cm/austritt.ts';
 import {
 	austrittAnfrageMeldung,
@@ -71,6 +71,10 @@ const STATUS: Record<MitgliedStatus, true> = {
 const istStatus = (s: string): s is MitgliedStatus => Object.hasOwn(STATUS, s);
 const VERLAUF_STANDARD = 100;
 const VERLAUF_MAX = 500;
+const VERLAUF_TEXT_MAX = 100;
+// `bis` + 1 Tag; ein ungültiger Tag bleibt ungültig (beginnDesTagesInZuerich gibt dann null).
+const plusTageSicher = (iso: string) =>
+	/^\d{4}-\d{2}-\d{2}$/.test(iso) && beginnDesTagesInZuerich(iso) ? plusTage(iso, 1) : 'ungueltig';
 
 // RR-07: `rollen` sagt der Oberfläche, welche Bereiche sie zeigt; durchgesetzt wird an den Schnittstellen.
 export async function getZugang(d: AdminDienste, e: AdminEreignis): Promise<Response> {
@@ -377,7 +381,28 @@ export function getVerlauf(d: AdminDienste, e: AdminEreignis): Promise<Response>
 			grenzeRoh === null || !Number.isInteger(zahl) || zahl < 1
 				? VERLAUF_STANDARD
 				: Math.min(zahl, VERLAUF_MAX);
-		return antwort(200, await ladeVerlauf(d.db, { mitgliedId, grenze }));
+		// #92: Filter über den ganzen Verlauf; `bis` zählt den ganzen Tag mit.
+		const tag = (name: string): Date | null | undefined => {
+			const roh = q.get(name);
+			return roh === null ? undefined : beginnDesTagesInZuerich(roh);
+		};
+		const von = tag('von');
+		const bisRoh = q.get('bis');
+		const bisVor = bisRoh === null ? undefined : beginnDesTagesInZuerich(plusTageSicher(bisRoh));
+		const text = (name: string): string | null | undefined => {
+			const roh = q.get(name)?.trim();
+			if (roh === undefined || roh === '') return undefined;
+			return roh.length > VERLAUF_TEXT_MAX ? null : roh;
+		};
+		const wer = text('wer');
+		const name = text('name');
+		const was = q.getAll('was');
+		if (von === null || bisVor === null || wer === null || name === null || !was.every(istAktion))
+			return eingabeFehler();
+		return antwort(
+			200,
+			await ladeVerlauf(d.db, { mitgliedId, grenze, von, bisVor, wer, name, was })
+		);
 	});
 }
 

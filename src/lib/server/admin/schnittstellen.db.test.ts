@@ -771,6 +771,38 @@ describe('Admin-Schnittstellen', () => {
 		expect((await hole('?mitglied=0')).status).toBe(400);
 	});
 
+	test('#92: Verlauf-Filter: falsche Werte → 400 eingabe, gültige → 200', async () => {
+		const s = baue();
+		const admin = await bestaetigterAdmin(s);
+		const hole = (q: string) =>
+			getVerlauf(
+				s.d,
+				ereignis({
+					method: 'GET',
+					url: `http://localhost/api/admin/verlauf${q}`,
+					konto: admin.konto
+				})
+			);
+		for (const q of [
+			'?von=2026-13-01',
+			'?bis=gestern',
+			'?was=foo',
+			`?wer=${'a'.repeat(101)}`,
+			`?name=${'a'.repeat(101)}`
+		]) {
+			const r = await hole(q);
+			expect(r.status, q).toBe(400);
+			expect(await r.json()).toEqual({ fehler: 'eingabe' });
+		}
+		expect(
+			(
+				await hole(
+					'?von=2026-10-01&bis=2026-10-31&was=rolle-vergeben&was=angelegt&wer=Studer&name=%20'
+				)
+			).status
+		).toBe(200);
+	});
+
 	test('RR-07: GET /api/sitzung meldet verwaltung: true mit Rolle admin, ohne mitgliedId und sitzungHash', async () => {
 		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const normal = await legeMitgliedAn(db);

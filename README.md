@@ -54,7 +54,8 @@ den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* 
 ## Lokal starten
 
 Voraussetzungen: Node 26 (genau die Hauptversion aus `.nvmrc`; Make und Hooks brechen sonst ab),
-Docker Desktop, gitleaks.
+Docker Desktop, gitleaks. Docker Desktop darf zwischen den Läufen aus sein: Alles, was Docker
+braucht (`make db`, `make check` …), startet es auf dem Mac selbst und wartet, bis es bereit ist.
 
 ```bash
 npm ci --ignore-scripts

@@ -1,5 +1,6 @@
 import { isRedirect } from '@sveltejs/kit';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { erinnere, merke } from '../verwaltung/tabellen-gedaechtnis.ts';
 import { leiteUmBeimLaden, leiteUmNachAktion, zielOhneZugang, type Lage } from './waechter.ts';
 
 const navigation = vi.hoisted(() => ({ goto: vi.fn(async () => {}) }));
@@ -193,6 +194,15 @@ describe('leiteUmNachAktion: Hülle nach einer Aktion', () => {
 		verboten('localStorage');
 		expect(await leiteUmNachAktion({ art: 'abgemeldet' })).toBe(true);
 		expect(navigation.goto).toHaveBeenCalledExactlyOnceWith('/login');
+	});
+
+	test('#92: abgemeldet vergisst die Filter und Suchen der Tabellen (nächste Person im selben Tab)', async () => {
+		merke('mitglieder', { sortierung: null, filter: {}, suche: 'Muster' });
+		await leiteUmNachAktion({ art: 'abgemeldet' });
+		expect(erinnere('mitglieder')).toBeUndefined();
+		merke('verlauf', { sortierung: null, filter: { wer: { art: 'text', text: 'X' } } });
+		expect(() => leiteUmBeimLaden({ art: 'abgemeldet' }, 'verwaltung')).toThrow();
+		expect(erinnere('verlauf')).toBeUndefined();
 	});
 
 	test('kein Fall des Wächters: nichts geschieht', async () => {

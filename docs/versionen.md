@@ -14,6 +14,11 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 - Verwaltung: Rollen vergibt und entzieht der MyTCO-Admin nur noch auf der Seite «Rollen», je Rolle
   mit Suche und Rückfrage, auch bei Ausgetretenen. Die Seite eines Mitglieds zeigt seine Rollen nur
   noch an (#96).
+- Werkzeug: `make db`, `make check` und alles andere, was Docker braucht, starten Docker Desktop auf
+  dem Mac selbst, wenn es aus ist. An der App ändert sich nichts.
+- Verwaltung: In den Listen Mitglieder, Briefe und Änderungsverlauf sortiert und filtert man am PC
+  direkt im Spaltentitel, und die Spaltenbreite lässt sich ziehen. Briefe zeigen den Jahrgang; der
+  Verlauf sucht mit Filter im ganzen Verlauf (#92).
 - Verwaltung: Die Seiten der Mitgliederverwaltung und «Rollen» erklären unter dem Titel kurz, wozu
   sie da sind. Bei «Briefe» steht, dass verlorene Zugänge nicht über einen neuen Brief laufen, sondern über «Code per E-Mail» (#93).
 - Interclub: Mitglieder folgen Teams auf deren Seite und bekommen nach jedem neuen Endstand einen

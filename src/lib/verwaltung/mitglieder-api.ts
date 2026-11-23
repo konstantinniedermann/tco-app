@@ -87,12 +87,29 @@ export const nimmLoeschungZurueck = mitgliedschaft('loeschen-rueckgaengig');
 export const ladeAuskunft = (id: number, holen: Holen = fetch) =>
 	lese<AuskunftAnsicht>(`${ADMIN}/mitglieder/${id}/auskunft`, holen);
 
+/** #92: Filter des Verlaufs; der Server sucht im ganzen Verlauf und schickt die neuesten 100. */
+export type VerlaufAbfrage = {
+	mitglied?: number;
+	/** `YYYY-MM-DD`, Zürcher Tage, beide inklusiv. */
+	von?: string;
+	bis?: string;
+	wer?: string;
+	name?: string;
+	was?: readonly string[];
+};
+
 export function ladeVerlauf(
-	filter: { mitglied?: number },
+	filter: VerlaufAbfrage,
 	holen: Holen = fetch
 ): Promise<Antwort<VerlaufEintrag[]>> {
-	const abfrage = filter.mitglied === undefined ? '' : `?mitglied=${filter.mitglied}`;
-	return lese(`${ADMIN}/verlauf${abfrage}`, holen);
+	const q = new URLSearchParams();
+	if (filter.mitglied !== undefined) q.set('mitglied', String(filter.mitglied));
+	for (const k of ['von', 'bis', 'wer', 'name'] as const) {
+		const w = filter[k];
+		if (w) q.set(k, w);
+	}
+	for (const w of filter.was ?? []) q.append('was', w);
+	return lese(`${ADMIN}/verlauf${q.size > 0 ? `?${q}` : ''}`, holen);
 }
 
 export const ladeFairgate = (holen: Holen = fetch) =>

@@ -178,6 +178,8 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Nachtrag 23.11.2026 (#81 Teil 3b):** `make check` wieder 9 rot bei Load 8–14, während eine andere Session E2E laufen liess: vier Interclub-DB-Tests (`abruf`, `import`, `import-bericht`) an 5 s, dazu der Seed-Test mit Folgefehlern (Aufräumen scheitert an Fremdschlüsseln, nächste Tests sehen alte Zeilen). Einzeln 140/140 grün, der zweite volle Lauf bei Load 2 ganz grün.
 
+**Nachtrag 23.11.2026 (Docker bei Bedarf):** Dasselbe Bild bei Load 10–17, während eine andere Session lief: 11 rot (`abruf`, `import`, `import-bericht`, dazu der Seed-Test mit Fremdschlüssel-Folgefehlern). Einzeln 45/45 grün, der zweite volle Lauf bei Load 17 ganz grün. Weil `make check` rot war, wies der Pre-Push-Hook auch den Push des Branches ab.
+
 ### 2026-11-23 — Themen, gültige Sitzungen und Passkeys werden an drei Stellen fast gleich geladen
 
 **Thema:** Code
@@ -225,6 +227,8 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Rückmeldung des Projektleiters zur Mitgliederliste, Branch fix/verwaltung-rueckmeldung.
 
 **Einschätzung:** `.tabelle-lang` auf weitere lange Listen übertragen, jeweils mit `.zelle-dehnbar` und einem E2E im schmalsten PC-Fenster. Passt eventuell zu #92 (Spalten sortieren und ziehen).
+
+**Nachtrag 2026-11-23 (#92):** Verlauf und Briefe haben jetzt die *Tabellen-Steuerung* (Box scrollt, Titel kleben in der Box). Offen bleiben Anmeldelisten, Anlass-Antworten, Fairgate, Posteingang und Mitteilungen.
 
 ### 2026-11-23 — Folgen-Schalter: drei kleine Lücken auf Teamseite und Profil
 
@@ -290,19 +294,17 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** `machAdmin` und die E2E-Hilfe auf `vergibRolle` umstellen und `setzeRollen` streichen; die Meldung «inzwischen geändert» des Skripts entfällt dann. Klein, eigener Branch.
 
-### 2026-11-23 — E2E «#93: jede Menüseite … Seiteninfo» auf dem iPhone in der CI wacklig (Für Fairgate)
+### 2026-11-23 — Neuer E2E zum Selbst-Entzug einmal auf Android in der CI rot, Ursache offen
 
 **Thema:** Tests
 
-**Fundort:** `tests/e2e/verwaltung.test.ts` (Test «#93: jede Menüseite der Verwaltung erklärt sich in ihrer Seiteninfo»), Prüfung `rechts.inhalt` auf `/verwaltung/fairgate`.
+**Fundort:** `tests/e2e/verwaltung.test.ts` («#96: MyTCO-Admin entzieht sich die Rolle und landet auf seiner übrigen Verwaltung»).
 
-**Beobachtung:** In der CI scheitert der Test auf dem iPhone mit `Expected: 0, Received: 1` bei `/verwaltung/fairgate` (Inhalt ragt rechts hinaus). So in den Läufen auf `dev` von 10:59 und 12:00 (dazwischen grün) und in beiden CI-Läufen auf dem Branch von #96 (23.11.2026); lokal grün. Ursache offen; Vermutung: Die Breite der Fairgate-Tabelle hängt von Daten paralleler Tests in der gemeinsamen E2E-Datenbank ab. Ein Trace liegt im Artefakt `test-results-iphone` des Laufs 45172782300 (`spur=true`).
+**Beobachtung:** Im ersten CI-Lauf auf dem Branch von #96 war nach dem Klick auf «Entziehen» keine Rückfrage offen, die Seite stand oben (Zeitgrenze 30 s). In den zwei folgenden CI-Läufen grün (einer mit `spur=true`), lokal 20-mal grün, auch mit 25 weiteren MyTCO-Admins und auf 3 s gestreckter Aufklapp-Animation. Der Test bestätigt jetzt erst, wenn die Rückfrage den eigenen Namen nennt.
 
-Daneben schlug auf dem Branch von #96 einmal der neue E2E «MyTCO-Admin entzieht sich die Rolle» auf Android fehl (Rückfrage nicht offen, Seite oben); im Lauf mit Trace grün, lokal 20-mal grün, auch mit 25 weiteren MyTCO-Admins und auf 3 s gestreckter Aufklapp-Animation. Ursache offen.
+**Ursprung:** CI-Lauf 45170920154 auf `feat/issue-096`, Session vom 23.11.2026.
 
-**Ursprung:** CI-Lauf auf dem Branch von #96, Session vom 23.11.2026.
-
-**Einschätzung:** Trace mit `spur=true` holen, dann entweder die Prüfung auf eigene Daten stützen oder die Tabelle für lange Werte festigen.
+**Einschätzung:** Tritt es wieder auf, den Lauf mit `-f spur=true` wiederholen und den Trace auswerten.
 
 ### 2026-11-23 — Design System «MyTCO» steht bis auf die Seiteninfo auf dem Stand vom 09.11.
 
@@ -315,3 +317,54 @@ Daneben schlug auf dem Branch von #96 einmal der neue E2E «MyTCO-Admin entzieht
 **Ursprung:** Nachführen des Design Systems in #93, Session vom 23.11.2026.
 
 **Einschätzung:** Ein ganzer Abgleich (Bausteine, Tokens, `bundle.css` aus den aufgeteilten Dateien) lohnt sich vor dem nächsten grösseren Oberflächen-Entwurf; sonst genügt es, wie in #93 die Repo-Dateien einzubinden.
+
+**Nachtrag 2026-11-23 (#92):** Auch der Baustein *Tabellen-Steuerung* fehlt im Design System; der Entwurf zu #92 band ebenfalls die Stil-Dateien aus dem Repo ein.
+
+### 2026-11-23 — Kaltstart von Docker Desktop über make db noch nicht echt ausprobiert
+
+**Thema:** Tests
+
+**Fundort:** `scripts/docker-bereit.sh` (Ziel `voraussetzungen-docker` im `Makefile`).
+
+**Beobachtung:** Ist Docker nicht erreichbar, startet das Skript Docker Desktop mit `open -ga Docker` und wartet bis 120 s. Belegt sind nur die Abzweigungen (Test mit Attrappen) und der Fall «Docker läuft schon». Den echten Kaltstart (Docker Desktop beendet, dann `make db`) hat niemand ausprobiert, weil eine parallele Session die gemeinsame Datenbank nutzte.
+
+**Ursprung:** Review des Branches `feat/docker-bei-bedarf`, Session vom 23.11.2026.
+
+**Einschätzung:** Einmal von Hand prüfen, wenn keine Session läuft: Erwartet sind «Docker Desktop startet …», danach laufende DB und Mailpit. Reicht die Frist nicht oder öffnet sich das Fenster von Docker Desktop, im Skript nachziehen.
+
+### 2026-11-23 — Tabellen-Steuerung: kleine Lücken aus dem Review von #92
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/lib/verwaltung/Spaltentitel.svelte`, `tabellen-stand.svelte.ts`, `src/routes/verwaltung/{mitglieder,briefe}/+page.svelte`, `src/lib/design/verwaltung.css`.
+
+**Beobachtung:** Aus dem Review von #92, bewusst nicht im Branch behoben: Der Aufklapper wird nicht an den Bildschirmrand geklemmt (200 %, breiter Aufklapper «Was») und kann einen Moment bei (0,0) aufblitzen; die Leseansicht der Briefe rechnet die Auswahlspalte in die Gesamtbreite (3,5 rem zu breit); die Breite wird bei jeder Mausbewegung statt beim Loslassen gespeichert; die Textfelder haben kein `maxlength` (der Verlauf weist über 100 Zeichen mit «Störung» ab); eine Suche aus dem Gedächtnis zeigt kurz die ungesuchte Liste; ein am Handy gesetzter Filter «Status» wirkt nach dem Verbreitern weiter; kein E2E für einen Filter aus der Adresse auf dem Handy. Am PC kürzen sich bei 1280 px die Titel «Nummer» und «Jahrgang» zu «Num…» und «Jahrga…».
+
+**Ursprung:** Review des Branches `feat/issue-092`, Session vom 23.11.2026.
+
+**Einschätzung:** Je Minuten bis eine Stunde; gebündelt in einem Durchgang, wenn die Tabellen-Steuerung auf weitere Listen kommt. Die gekürzten Titel könnte ein leiser Pfeil nur bei Zeigen/Fokus beheben (Leitbild-Entscheid).
+
+### 2026-11-23 — CI: Seiteninfo von «Für Fairgate» läuft auf dem iPhone bei 200 % um 1 px über
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/verwaltung.test.ts` («#93: jede Menüseite der Verwaltung erklärt sich in ihrer Seiteninfo»), Seite `/verwaltung/fairgate`.
+
+**Beobachtung:** Der Job «E2E (iphone)» der CI ist rot: Bei 200 % Schrift ist die Seiteninfo auf `/verwaltung/fairgate` 1 px breiter als ihr Inhalt erlaubt (`scrollWidth - clientWidth` = 1 statt 0). Lokal und am PC und auf Android grün. Schon auf `dev` vor dem Merge von #92 rot (Lauf auf 41a2980), ebenso auf dem Branch von #92.
+
+**Ursprung:** CI-Lauf auf `feat/issue-092`, Session vom 23.11.2026.
+
+**Einschätzung:** Langes Wort in der Seiteninfo von «Für Fairgate» bricht in WebKit/Linux nicht um (Silbentrennung fehlt dort?). Mit `gh workflow run check.yml --ref dev -f spur=true` den Trace holen. Nachtrag: Auch in allen drei CI-Läufen auf dem Branch von #96 rot; ein Trace liegt im Artefakt `test-results-iphone` des Laufs 45172782300 (`spur=true`).
+
+### 2026-11-23 — Caddy-Fehlerlog könnte die Abfrage samt Suchtext enthalten
+
+**Thema:** Sicherheit
+
+**Fundort:** `betrieb/caddy/Caddyfile` (globaler `log`-Filter, Zeilen 8–18).
+
+**Beobachtung:** Der Filter entfernt IP-Adressen, aber nicht die angefragte Adresse mit Query. Schreibt Caddy zu einer Anfrage einen Fehler, könnten `suche=` (Mitgliederliste, schon heute) sowie `wer=` und `name=` (Verlauf, seit #92) mit Namensteilen im Log stehen.
+
+**Ursprung:** merge-reviewer zu #92, Session vom 23.11.2026.
+
+**Einschätzung:** Kein neues Risiko von #92; prüfen, ob der Filter auch `request>uri` kürzen oder die Query entfernen soll (DS-06: Logs ohne Inhalte).
+
