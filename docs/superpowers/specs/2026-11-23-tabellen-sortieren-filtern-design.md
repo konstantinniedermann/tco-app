@@ -26,8 +26,11 @@ Ein «Gefühl wie Excel» ist ausdrücklich kein Ziel.
      *Konto* (Häkchen je Zustand der Plakette: aktiv, Brief offen, ohne Brief, gesperrt,
      ausgetreten, wird gelöscht), *Jahrgang* (von–bis), *Nummer*, *Name*, *E-Mail* (je ein
      Textfeld, enthält, ohne Gross/Klein).
-   - Briefe (Vorschlag Claude): *Name*, *Nummer* (Text), *Brief* (Häkchen je Zustand: Code gültig,
-     Code abgelaufen, noch kein Brief, Adresse fehlt).
+   - Briefe (Vorschlag Claude, Jahrgang Entscheid PL): neue Spalte *Jahrgang* zwischen Nummer und
+     Brief (der Server liefert ihn in der Briefliste mit; beide Rollen, die die Liste sehen, sehen
+     den Jahrgang schon in der Mitgliederliste). Filter: *Name*, *Nummer* (Text), *Jahrgang*
+     (von–bis), *Brief* (Häkchen je Zustand: Code gültig, Code abgelaufen, noch kein Brief,
+     Adresse fehlt).
    - Verlauf (Vorschlag Claude): *Zeit* (Datum von–bis, Zürcher Kalendertag), *Wer* (Text über
      Nach- und Vorname des Urhebers; «MyTCO» trifft die automatischen Einträge; «gelöschtes Konto»
      und «(selbst)» sind nicht eigens filterbar), *Mitglied* (Text über Nach- und Vorname), *Was*
@@ -110,14 +113,31 @@ Ein «Gefühl wie Excel» ist ausdrücklich kein Ziel.
 - C — Alles über den Server: überall gleich, aber jede Filtereingabe eine Anfrage, obwohl
   Mitglieder und Briefe schon im Browser sind; mehr Schnittstellen und Tests ohne Nutzen.
 
+## Entwurf (gewählt)
+
+Design-Artifact «MyTCO Tabellen sortieren und filtern»
+(https://claude.ai/artifact/DEFgwhFuiWMwGmVhyjJMyt), gebaut mit den echten Stilen aus
+`src/lib/design/`. Der PL hat **Variante A** gewählt (Entscheid PL), B (Filterzeile) ist verworfen:
+
+- Spaltentitel = Sortiertaste (Titel + Pfeil; sortierte Spalte grün mit ↑/↓, die anderen mit
+  leisem ↕) + Trichter-Knopf (`aria-expanded`, Name «<Spalte> filtern») + Ziehgriff (dünner Strich
+  am rechten Rand, beim Zeigen und Ziehen grün).
+- Trichter öffnet einen **Aufklapper**: kleine Karte unter dem Titel mit Titel «<Spalte> zeigen»,
+  Häkchen als kompakte Auswahlflächen (beim Konto mit Anzahl je Zustand), von–bis oder Textfeld;
+  jede Wahl wirkt sofort; unten «Alle zeigen» (Textlink) und «Schliessen» (Nebentaste). Bei vielen
+  Werten (Was im Verlauf) zweispaltig. Ein aktiver Filter füllt den Trichter grün.
+- Über der Tabelle eine Zeile: Anzahl («9 von 412 Mitgliedern»), je aktiver Filter ein Wort
+  «Konto: Brief offen, ohne Brief ×» (× entfernt ihn), rechts «Filter zurücksetzen» und «Breiten
+  zurücksetzen» als Textlinks.
+- Beim Ziehen eine grüne Linie durch die Tabelle und die Breite als Zahl («E-Mail: 22 rem»).
+- Klebende Spalten mit leichtem Schatten zur scrollenden Seite hin.
+- Der Aufklapper darf nicht von der scrollenden Box abgeschnitten werden (z. B. `popover` in der
+  obersten Ebene); den Weg wählt der Bauende.
+
 ## Ablauf
 
-1. Design-Entwurf als Artifact vom Typ *Design* auf dem Design System «MyTCO» (PC-Artboard der
-   Mitgliederliste, Varianten für Filter-Aufklapper, Ziehgriff, Pfeil, klebende Spalte); der PL
-   wählt visuell.
-2. Erst nach der Wahl des PL: Leitbild (Baustein *Tabellen-Steuerung*, Änderung am Baustein
-   *Tabelle*), dann Plan, dann Code. Der Plan richtet Fokus, ARIA und E2E-Selektoren nach der
-   gewählten Form des Filters (Aufklapper je Spalte oder Filterzeile).
+Leitbild (Baustein *Tabellen-Steuerung*, Änderung am Baustein *Tabelle*), dann Plan, dann Code.
+Abnahme per Bildvergleich mit dem Entwurf.
 
 ## Dem Bauenden überlassen
 
