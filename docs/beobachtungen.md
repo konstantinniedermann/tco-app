@@ -121,6 +121,18 @@ Letzte Auswertung: 22.11.2026 (nur Entscheide)
 
 ## Offen
 
+### 2026-11-23 — Doku-Prüfung erkennt kaputte Anker in Links nicht
+
+**Thema:** Tests
+
+**Fundort:** `scripts/check-docs.sh` (Schritt «Relative Links in Markdown», `make docs`)
+
+**Beobachtung:** Die Prüfung meldet nur Links auf Dateien, die fehlen. Ein Link auf einen Abschnitt, der umbenannt oder gelöscht wurde (`testgruppe.md#bereit-für-lauf-1` nach dem Umbau der Testgruppe), bleibt grün. Gefunden hat das nur das Review von Hand.
+
+**Ursprung:** Review des Branches zum Probelauf der Testgruppe (#40)
+
+**Einschätzung:** Klein: Überschriften je Datei in Anker umrechnen (GitHub-Schema, Umlaute bleiben) und `datei.md#anker` dagegen prüfen. Historische Pläne unter `docs/superpowers/` müssten ausgenommen werden, sie verweisen bewusst auf alte Stände.
+
 ### 2026-11-23 — Dialog «Von Hand anmelden» im Doppel ist höher als ein iPhone-Fenster
 
 **Thema:** Oberfläche
