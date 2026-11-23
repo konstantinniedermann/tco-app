@@ -11,6 +11,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+## 0.24.0 — Interclub mit Push, Tabellen am PC, Rollen auf einer Seite
+
 - Verwaltung: Die Erklärung oben auf den Seiten bleibt bei grosser Schrift auch auf schmalen Handys
   im Fenster; lange Wörter brechen um, statt über den Rand zu ragen.
 - Verwaltung: Rollen vergibt und entzieht der MyTCO-Admin nur noch auf der Seite «Rollen», je Rolle
@@ -72,6 +74,7 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   Einrichtung des Servers als Skript; Image mit allen Modulen für die Testdaten.
 - Antworten des Vorstands übertragen: Kostenrahmen, Adresse `my.tcolten.ch`, Absender
   `mytco@tcolten.ch`, Umzug der Website. An der App ändert sich nichts.
+- Doku-Abgleich vor dem Release: Doku an den laufenden Stand von Test, Rollen und Interclub angeglichen. An der App ändert sich nichts.
 
 ## 0.23.0 — Refactoring abgeschlossen, erstes Release mit Nummer nur beim Release
 

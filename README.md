@@ -21,10 +21,11 @@ zur Clubmeisterschaft (Wildcard-Antrag im Einzel, Doppel mit Partner-Anfrage), G
 Turnierleitung (Kontaktperson je Turnier),
 Mitteilungen per Push und E-Mail zu Anlässen und an den Verein für Mitglieder-Admins,
 Interclub-Resultate der TCO-Teams mit Einzelpartien im Reiter *IC* (die App holt sie auf Test und
-Live selbst von Swiss Tennis, lokal per Import-Befehl),
+Live selbst von Swiss Tennis, lokal per Import-Befehl; Mitglieder folgen Teams und bekommen nach
+jedem neuen Endstand einen Push, Profil › Benachrichtigungen),
 Auslieferung und Sicherung sowie die Test-Umgebung (umgeleitete Mails, erfundene Testdaten; Interclub mit den öffentlichen Daten von Swiss Tennis) sind
-gebaut und lokal nachgewiesen; der Server folgt, weitere Funktionen kommen mit
-den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* aus
+gebaut; die Test-Umgebung läuft auf dem Server, Live folgt mit dem Pilot, weitere Funktionen
+kommen mit den Etappen. Vor 1.0.0 probiert eine Testgruppe den Start in der Etappe *Pilot* aus
 ([`docs/testgruppe.md`](docs/testgruppe.md)). Termine und Umfang der Etappen
 → [`docs/roadmap.md`](docs/roadmap.md).
 
@@ -71,6 +72,8 @@ make check   # alle Prüfungen (braucht Docker)
 Neue Migration nach einer Änderung an `src/lib/server/db/schema.ts`: `npm run db:generate`
 (schreibt sie nach `drizzle/`); eingespielt wird sie lokal mit `make seed`, in den Tests und
 beim Ausliefern von selbst.
+
+Formatieren: `npm run format` (Prettier; `make check` prüft nur).
 
 Code-Mails landen lokal in Mailpit (`http://localhost:58025`). `make dev-handy` startet den
 Entwicklungsserver stattdessen fürs iPhone im selben WLAN (macOS, nur im eigenen WLAN), mit

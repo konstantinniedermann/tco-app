@@ -354,7 +354,7 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Ursprung:** CI-Lauf auf `feat/issue-092`, Session vom 23.11.2026.
 
-**Einschätzung:** Langes Wort in der Seiteninfo von «Für Fairgate» bricht in WebKit/Linux nicht um (Silbentrennung fehlt dort?). Mit `gh workflow run check.yml --ref dev -f spur=true` den Trace holen. Nachtrag: Auch in allen drei CI-Läufen auf dem Branch von #96 rot; ein Trace liegt im Artefakt `test-results-iphone` des Laufs 45172782300 (`spur=true`).
+**Einschätzung:** Langes Wort in der Seiteninfo von «Für Fairgate» bricht in WebKit/Linux nicht um (Silbentrennung fehlt dort?). Mit `gh workflow run check.yml --ref dev -f spur=true` den Trace holen. Nachtrag: Auch in allen drei CI-Läufen auf dem Branch von #96 rot; ein Trace liegt im Artefakt `test-results-iphone` des Laufs 45172782300 (`spur=true`). Nachtrag 2: Ursache war der Textblock der Seiteninfo als Flex-Kind ohne `min-width: 0` (Linux-Systemschrift breiter, keine Silbentrennung); behoben mit `fix/seiteninfo-schmal`, CI auf dem Branch grün.
 
 ### 2026-11-23 — Caddy-Fehlerlog könnte die Abfrage samt Suchtext enthalten
 
@@ -380,3 +380,75 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Review von #96, Session vom 23.11.2026.
 
 **Einschätzung:** Spielersuche um eine Wahl für den Text unter dem Namen ergänzen (z. B. nur Mitgliedernummer) oder eine schlanke Mitgliedersuche für die Verwaltung.
+
+### 2026-11-23 — Interclub-Spielberichte werden nach dem ersten Abruf nie aktualisiert, die Datenschutzerklärung verspricht «nicht mehr als Swiss Tennis»
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/interclub/import.ts` (`holen`, `alteBerichte`, `setzeAlteBerichteEin`), `faellig.ts`; `docs/datenschutzerklaerung.md` (Abschnitt Interclub), `docs/datenschutz.md` (Begründung für «kein Ausblenden»).
+
+**Beobachtung:** Auf Test und Live holt der Abruf nur frische und fehlende Spielberichte; ein gespeicherter Bericht wird beim Import wieder eingesetzt. Korrigiert oder entfernt Swiss Tennis einen Namen oder eine Partie, bleibt der alte Stand in MyTCO sichtbar. Volle Neuladung nur lokal (`make ic-import`).
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.24.0 (Audit Datenschutz).
+
+**Einschätzung:** Entscheid Projektleiter vor Live: Code angleichen (Berichte der laufenden und letzten Saison regelmässig neu holen, nicht mehr gelieferte löschen) oder Zusage präzisieren («übernimmt den Bericht einmal nach dem Spiel»), dann braucht es einen Korrekturweg von Hand.
+
+### 2026-11-23 — Datenschutz: vier kleine Abweichungen zwischen Code und Zusage
+
+**Thema:** Sicherheit
+
+**Fundort:** `src/lib/server/interclub/faellig.ts` (`ERSTE_SAISON`), `src/lib/server/interclub/folgen.ts`, `src/routes/verwaltung/mitglieder/[id]/auskunft/`, `src/lib/push/Benachrichtigungen.svelte`, `src/lib/verwaltung/tabelle.ts`; `docs/datenschutz.md`, `docs/datenschutzerklaerung.md`.
+
+**Beobachtung:** (1) Der Abruf holt Saisons ab 2021 nach und speichert so auch frühere TCO-Spieler, die keine Mitglieder mehr sind; Zeitraum und ehemalige Spieler nennt keine Doku. (2) `ic_folgen.seit` wird gespeichert, aber nirgends gelesen und fehlt in der Auskunft. (3) Ein gefolgtes Team, das in der neuesten Saison fehlt, bleibt gespeichert, ist im Profil aber unsichtbar und dort nicht abwählbar. (4) Die Verwaltung speichert Spaltenbreiten im `localStorage` (#92); die Erklärung sagt, im Browser liege «nur» Login, E-Mail-Wechsel und Push-Hinweis.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.24.0 (Audit Datenschutz).
+
+**Einschätzung:** Je beide Wege möglich (Code angleichen / Zusage präzisieren); vor Live klären, zusammen mit der Freigabe der Erklärung (K-06.2).
+
+### 2026-11-23 — Zusammenlegen der Migrationen vor Live trifft Test, das seine Datenbank behält
+
+**Thema:** Architektur
+
+**Fundort:** `docs/ci-cd-und-release.md` (Zwei Schalter, E-08), `docs/adr/adr-013-gemeinsame-bausteine.md`; `scripts/migrate.ts`, `betrieb/bin/ausliefern`, `betrieb/test-neu-aufsetzen`.
+
+**Beobachtung:** E-08 legt die Migrationen unmittelbar vor dem ersten Live zusammen. Test behält seit dem 18.11. seine Datenbank samt Migrationsliste; eine neue erste Migration würde dort gegen bestehende Tabellen laufen und die Auslieferung scheitern lassen, bis jemand den Zähler erhöht. Aus dem Code abgeleitet, nicht ausgeführt.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.24.0 (Audit Betrieb).
+
+**Einschätzung:** Entscheid Projektleiter: Der Branch, der zusammenlegt, erhöht zugleich `betrieb/test-neu-aufsetzen` (in CI/CD festhalten), oder E-08 fallen lassen.
+
+### 2026-11-23 — Vor «AUSLIEFERUNG_LIVE = an» fehlt eine Liste der Voraussetzungen
+
+**Thema:** Architektur
+
+**Fundort:** `betrieb/README.md` (Einschalten), `docs/ci-cd-und-release.md` (Geheimnisse); `docs/kosten.md` und `docs/betrieb-und-uebergabe.md` (Preis Object Storage).
+
+**Beobachtung:** «Einschalten» nennt für Live nur die Variable. Es fehlen verstreut oder ganz: Geheimnis `SSH_SCHLUESSEL_LIVE` und Live-Eintrag beim Türsteher, `live/geheim.env` ohne `MAIL_NUR_AN` und mit echtem SMTP (K-11.2), `sicherung.env` mit `restic init`, Zusammenlegen der Migrationen (Eintrag oben), Sicherungs-Timer nach der ersten Live-Auslieferung, DNS. Nebenbei: Object Storage steht mit zwei Preisständen in der Doku (2021 pro TiB, 18.11.2026 pro GB und Stunde).
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.24.0 (Audit Betrieb).
+
+**Einschätzung:** Mit #61 (Live) eine Liste «Vor `AUSLIEFERUNG_LIVE=an`» unter «Einschalten» anlegen; Preis einheitlich auf den neueren Stand.
+
+### 2026-11-23 — make seed, make admin und make e2e prüfen die Node-Version nicht
+
+**Thema:** Code
+
+**Fundort:** `Makefile` (Ziele `seed`, `admin`, `e2e` ohne `voraussetzungen`), `scripts/pruefe-node.sh`; README «Lokal starten» («Make und Hooks brechen sonst ab»).
+
+**Beobachtung:** Bei falscher Node-Version enden `seed-lokal.ts`, `admin-festlegen.ts` und `e2e.ts` still mit Exit 0 (`import.meta.main`); ein `make e2e` meldet dann grün ohne einen Test. `make check` ist geschützt.
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.24.0 (Audit Setup).
+
+**Einschätzung:** `voraussetzungen` vor die drei Ziele setzen (Minuten-Fix mit Test); sonst den README-Satz eingrenzen.
+
+### 2026-11-23 — Seiteninfo «Briefe» sagt «Anmeldecode» und «anmelden» statt Login
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/routes/verwaltung/briefe/+page.svelte` (Seiteninfo), auch `src/routes/verwaltung/einlesen/+page.svelte`; `docs/glossar.md` (Login statt Anmelden).
+
+**Beobachtung:** Das Glossar reserviert «Anmeldung» für CM und Anlässe. Die mit #93 freigegebenen Texte sagen «Brief mit Anmeldecode» und «Wer sich nicht mehr anmelden kann».
+
+**Ursprung:** Doku-Abgleich vor dem Release 0.24.0 (Audit App).
+
+**Einschätzung:** Dem Projektleiter vorlegen: «Brief mit Brief-Code» und «Wer sich nicht mehr einloggen kann, holt sich beim Login selbst einen «Code per E-Mail».»

@@ -33,10 +33,11 @@ dort nie hin (DS-08).
 **Wer baut die Auslieferung:** Das Code-Gerüst (#15) hat die CI-Prüfungen gebaut.
 [#32](https://github.com/konstantinniedermann/tco-app/issues/32) baute den lokal belegbaren Teil:
 Einrichtung, Auslieferung, Sicherung und die CI-Jobs, nachgewiesen mit `make betrieb-nachweis`
-(43 Prüfungen auf Docker Desktop, alle ok). Den echten Server nimmt
-[#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb (hängt an #32, blockiert
-#29; die Konten laufen auf eine Vereinsadresse, K-04.1; die Adresse ist erlaubt, K-10), spätestens vor dem Pilot der [Testgruppe](testgruppe.md) (Etappe *Pilot*).
-Bis dahin sind die Auslieferungs-Jobs ausgeschaltet.
+(43 Prüfungen auf Docker Desktop, alle ok). Den echten Server hat
+[#39](https://github.com/konstantinniedermann/tco-app/issues/39) in Betrieb genommen (blockiert
+#29; die Konten laufen auf eine Vereinsadresse, K-04.1; die Adresse ist erlaubt, K-10). Seit dem
+18.11.2026 liefert Test aus (`AUSLIEFERUNG_TEST` = `an`); Live bleibt aus, bis `AUSLIEFERUNG_LIVE`
+vor dem Pilot der [Testgruppe](testgruppe.md) (Etappe *Pilot*) auf `an` geht.
 
 ## Ablauf
 
@@ -45,9 +46,10 @@ flowchart LR
   B[Issue-Branch] -->|make check, Hooks| D[Merge nach dev, Eintrag unter Unveröffentlicht]
   D --> C1[CI]
   C1 -->|grün| T[Test-Umgebung]
-  T --> K[Checkliste auf echten Handys]
-  K --> A[Doku-Abgleich auf dev, neue Nummer]
-  A --> P[PR dev → main]
+  T --> A[Doku-Abgleich auf dev, neue Nummer]
+  A --> T2[Test mit neuer Nummer]
+  T2 --> K[Checkliste auf echten Handys]
+  K --> P[PR dev → main]
   P --> C2[CI]
   C2 -->|grün, Merge| L[Live]
   L --> V[Tag vX.Y.Z und GitHub-Release]
@@ -57,7 +59,7 @@ flowchart LR
   immer, was live läuft. Gemergt wird erst, wenn der Projektleiter die Checkliste auf Test
   abgehakt und das Release freigegeben hat. Abgehakt wird auf dem Image mit der neuen Nummer,
   also nach dem Merge des Doku-Abgleichs; die Fusszeile auf Test zeigt dafür Nummer und
-  Kurzform des Commits (ADR-012) (ohne Server: Ausnahmen unter [Versionen](#versionen)).
+  Kurzform des Commits (ADR-012; Test erkennt die App am Präfix `test.` der Adresse) (ohne Server: Ausnahmen unter [Versionen](#versionen)).
 - **Doku-Abgleich:** Vor jedem Release, auch einem reinen Doku-Release, wird die Doku gegen
   Code und Konfiguration abgeglichen; Korrekturen kommen als eigener Commit auf `dev`. Bei
   einem Release mit Code setzt der Abgleich die neue Nummer (siehe [Versionen](#versionen)). Danach
@@ -94,7 +96,8 @@ Doku-Merge ändert ihn nicht.
 1. **Prüfen:** Job `image` baut das Image und startet es im Rauchtest (Container mit
    PostgreSQL, Migration, `/api/status` = `ok`). Das läuft bei jeder Codeänderung und ist
    sofort aktiv.
-2. **Bauen (`bauen`, nur `dev`):** Image bauen und mit dem Commit als Kennzeichen
+2. **Bauen (`bauen`, nur `dev`):** Image bauen (mit dem Build-Argument `MYTCO_COMMIT` für die
+   Fusszeile auf Test) und mit dem Commit als Kennzeichen
    (`commit-<sha>`) in die private Container-Ablage von GitHub legen.
 3. **Verbinden (`ausliefern`):** Die CI meldet sich per SSH beim **Türsteher** auf dem Server,
    mit je einem eigenen Schlüssel für Test und Live. Der Schlüssel darf nur den Türsteher
@@ -147,8 +150,8 @@ Doku-Merge ändert ihn nicht.
 **Zwei Schalter:** Die Jobs `bauen`, `finden`, `ausliefern`, `freigeben` und `release` laufen nur,
 wenn die Repo-Variable der Umgebung auf `an` steht: `AUSLIEFERUNG_TEST` (für `dev`) bzw.
 `AUSLIEFERUNG_LIVE` (für `main`). So kann die Demo auf Test laufen, während Live noch aus ist.
-Stehen sie nicht auf `an`, gelten die Jobs als übersprungen, nicht als fehlgeschlagen. Aktiv ist
-nur der Rauchtest. Unmittelbar bevor `AUSLIEFERUNG_LIVE` zum ersten Mal auf `an` geht, werden
+Stehen sie nicht auf `an`, gelten die Jobs als übersprungen, nicht als fehlgeschlagen. Heute steht
+nur `AUSLIEFERUNG_TEST` auf `an`: Test bekommt jeden grünen Merge mit Code, Live noch nichts. Unmittelbar bevor `AUSLIEFERUNG_LIVE` zum ersten Mal auf `an` geht, werden
 die Migrationen zusammengelegt (E-08, die einzige Ausnahme von «Migrationen fügen nur hinzu»,
 [ADR-013](adr/adr-013-gemeinsame-bausteine.md)).
 
@@ -158,7 +161,7 @@ Sicherungsziel, ohne unverschlüsselte Datei, und löscht Sicherungen nach 30 Ta
 Timer, danach prüft `probe` die frische Sicherung in einer Wegwerf-Datenbank ohne Verbindung nach
 aussen. Eingespielt und zurückgespielt werden nur vollständige Läufe. Die Probe-Daten bleiben
 auf dem Server (SI-16); die Sicherung selbst verlässt ihn nur verschlüsselt, Richtung
-S3-kompatiblem Ziel (Vorschlag in [Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung), festgelegt mit dem Hosting).
+Infomaniak Object Storage ([Betrieb und Übergabe](betrieb-und-uebergabe.md#sicherung), ADR-003).
 
 - **30 Tage:** restic zählt sie je Umgebung und Datei (Dump, Zählung) ab der neuesten Sicherung,
   nicht ab heute. Bleibt die Sicherung aus, bleiben auch die alten erhalten.
@@ -194,9 +197,9 @@ ausgeben, steht nur in `<umgebung>/protokoll.log` (je Umgebung, nur für den Bet
 lesbar). Werte aus der Datenbank kommen dort nicht hin: Scheitert das Einspielen, schreibt
 `wiederherstellen` nur den Fehlercode (`psql` mit `VERBOSITY=sqlstate`) und `probe` nur die Zahl
 der Fehlerzeilen von `pg_restore`; Hauptzeile, `DETAIL` und `CONTEXT` der Meldungen werden
-verworfen (DS-06). Docker-Logs der Container rotieren nach Grösse (5 × 10 MB). Eine Rotation
-nach Zeit (höchstens 30 Tage, DS-06) für beide richtet
-[#39](https://github.com/konstantinniedermann/tco-app/issues/39) ein.
+verworfen (DS-06). Docker hält je Container eine Log-Datei bis 10 MB; logrotate
+(`/etc/logrotate.d/mytco`, eingespielt von `betrieb/server/einrichten.sh`) kürzt sie und
+`<umgebung>/protokoll.log` täglich und löscht nach 30 Tagen (DS-06).
 
 ### Schutz des Auslieferungswegs
 
@@ -270,7 +273,7 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 
 | Wo | Was |
 |----|-----|
-| GitHub (Secrets) | `SSH_SCHLUESSEL_TEST`, `SSH_SCHLUESSEL_LIVE`, `SSH_BEKANNTE_HOSTS` (die `known_hosts`-Zeile des Servers mit seinem öffentlichen Schlüssel, kein Fingerabdruck), `SERVER_ADRESSE` |
+| GitHub (Secrets) | `SSH_SCHLUESSEL_TEST`, `SSH_SCHLUESSEL_LIVE` (entsteht mit Live), `SSH_BEKANNTE_HOSTS` (die `known_hosts`-Zeile des Servers mit seinem öffentlichen Schlüssel, kein Fingerabdruck), `SERVER_ADRESSE` |
 | GitHub (Variablen, keine Geheimnisse) | `AUSLIEFERUNG_TEST`, `AUSLIEFERUNG_LIVE` |
 | CI-Lauf | kurzlebiges Token zum Lesen der Container-Ablage, das die CI für den Pull mitgibt; auf dem Server bleibt kein dauerhaftes Token |
 | Server, je Umgebung | `geheim.env`: Datenbank-Passwort, Schlüssel für die Codes (`MYTCO_CODE_SCHLUESSEL`, je eigener für Test und Live), Zugang zum E-Mail-Versand (`MYTCO_SMTP_URL`), Absender, Kontakt, Adresse der Umgebung, auf Test der einzige Mail-Empfänger (Projektleiter); VAPID-Schlüsselpaar für Push (`MYTCO_VAPID_OEFFENTLICH`, `MYTCO_VAPID_PRIVAT`, optional, je eigenes für Test und Live) |
@@ -313,6 +316,9 @@ Zählen selbst auf ihr /64-Netz zusammen (`ip-schluessel.ts`), der Proxy muss da
 Mail-Versand nur mit TLS: `smtps://` oder `smtp://…?requireTLS=true`. Mit `NODE_ENV=production`
 lehnt die App jede andere SMTP-URL ab. Ausnahme sind Hosts, die nie zu einem echten Empfänger
 führen: `localhost`, `127.0.0.1`, `[::1]` und Namen auf `.invalid` (so läuft das Image im Rauchtest).
+Abgelehnt wird auch eine URL, die die Zertifikatsprüfung abschaltet (`tls.rejectUnauthorized=false`)
+oder TLS übergeht (`ignoreTLS=true`). Der Versand gibt nach festen Zeitlimits auf (Verbindung und
+Begrüssung je 10 s, Socket 20 s).
 
 **Mails lokal und in der CI:** Mailpit (`axllent/mailpit:v1.33`) fängt alle Mails ab, lokal
 über `docker-compose.yml` (`make db`; SMTP auf Port 51025, Oberfläche auf
@@ -391,8 +397,9 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   (z. B. `svelte-kit sync`), läuft als eigener Schritt.
 - **Malware-Prüfung:** Das OSV-Gate prüft die Lock-Datei gegen die Datenbank bekannter
   Schadpakete und bricht die CI ab.
-- **Updates:** Dependabot schlägt wöchentlich Updates für npm, Docker-Images und GitHub
-  Actions vor, als PR auf `dev`. Hauptversionen werden einzeln geprüft.
+- **Updates:** Dependabot schlägt wöchentlich Updates für npm, Docker-Images (Dockerfile und die
+  Compose-Dateien in `/` und `betrieb/`) und GitHub Actions vor, als PR auf `dev`; Neben- und
+  Korrekturversionen je Ökosystem gebündelt in einem PR. Hauptversionen werden einzeln geprüft.
 - **Playwright-Image in der CI** (`mcr.microsoft.com/playwright:v<Version>-noble`, freigegeben
   vom Projektleiter am 06.11.2026): Die E2E-Jobs laufen darin, weil die Installation der
   Systempakete über apt immer wieder am langsamen Ubuntu-Spiegel hing. Die Version liest der
@@ -443,12 +450,8 @@ unabhängig davon. Begründung: [ADR-009](adr/adr-009-gruener-stand.md).
   Mitglieder oder Verwaltung etwas spürbar Neues bringt; **Korrektur** (`x.y.Z`), wenn es nur
   Fehler behebt oder Inneres und Werkzeug ändert; **Hauptversion** (`X.0.0`) nur im Auftrag
   des Projektleiters. Claude schlägt Nummer und Grund mit der Bitte um Freigabe vor.
-- **Erstes Release nach ADR-012:** Die Abschnitte zwischen 0.20.5 und diesem Release stammen
-  aus der früheren Regel (eine Nummer je Merge mit Code) und bleiben stehen. Das erste Release
-  trägt `0.23.0`. Eine ganz vergessene Nummer meldet `make release-check` auch hier (rot, weil
-  «Unveröffentlicht» nicht leer ist); den zweiten Weg der Meldung, die Einträge in den
-  Abschnitt «0.22.11» nachzurücken, beim ersten Release nicht wählen: Die Prüfung würde grün,
-  das Release ginge aber als 0.22.11 hinaus.
+- **Erstes Release nach ADR-012** war `0.23.0`; die Abschnitte zwischen 0.20.5 und 0.23.0
+  stammen aus der früheren Regel (eine Nummer je Merge mit Code) und bleiben stehen.
 - Getaggt wird nur die Nummer, mit der ein Release live geht. Die Zwischenstände davor haben
   keinen Tag und keinen Marker; sie gehen mit diesem Release live.
 - Die Version steht in `package.json`, in der Fusszeile der App und, sobald Live ausgeliefert
@@ -513,7 +516,8 @@ bleiben, weil sie auch die Wartezeit kurz halten.
   Minuten (B: Jobdauern auf `dev`, 06.11.2026).
 - **Notfall ohne CI** (GitHub-Ausfall oder das Repo wird wieder privat und die Minuten sind
   aufgebraucht): Ohne CI gibt es auch kein Image. Der Projektleiter baut
-  es dann lokal für den Server (`--platform linux/amd64`, sein Mac baut sonst für arm64),
+  es dann lokal für den Server (`--platform linux/amd64 --build-arg MYTCO_COMMIT=$(git rev-parse HEAD)`,
+  sein Mac baut sonst für arm64),
   schiebt es mit einem eigenen, kurzlebigen Token (nur `packages: write`) in
   die Container-Ablage und startet die Auslieferung mit dem Digest von Hand auf dem Server
   (Ablauf in `betrieb/README.md`). Die Regel «Live nur mit dem Image, das auf Test lief» prüft

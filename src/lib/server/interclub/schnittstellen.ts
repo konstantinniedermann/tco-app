@@ -1,4 +1,4 @@
-// Schnittstellen der Mitglieder zu den Interclub-Resultaten des Vereins (nur lesend).
+// Schnittstellen der Mitglieder zu den Interclub-Resultaten des Vereins und zum Folgen von Teams.
 import type { RequestEvent } from '@sveltejs/kit';
 import {
 	antwort,
