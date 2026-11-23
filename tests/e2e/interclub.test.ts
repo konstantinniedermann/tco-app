@@ -357,3 +357,24 @@ test('#81: folgt ohne Abo: Schalter angehakt, Entfolgen geht, danach der Satz', 
 	await expect(folgenSchalter(page)).toHaveCount(0);
 	expect(fehler).toEqual([]);
 });
+
+test('#81: Folgen ohne Push auf dem Server (kein-push): der Satz erscheint, der Fokus liegt auf «Push einrichten»', async ({
+	page,
+	isMobile
+}) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const konto = await meldeAn(page, isMobile, 'Ida');
+	await gibPushAbo(konto.kontoId);
+	// Das Abo verschwindet zwischen Laden und Tippen (z. B. auf dem anderen Gerät abgeschaltet).
+	await page.route(`**/api/interclub/teams/${TEAM_ID}/folgen`, (route) =>
+		route.fulfill({ status: 409, json: { fehler: 'kein-push' } })
+	);
+	await oeffneTeam(page);
+
+	await folgenSchalter(page).click();
+	await expect(page.getByText(OHNE_PUSH)).toBeVisible();
+	await expect(folgenSchalter(page)).toHaveCount(0);
+	await expect(page.getByRole('link', { name: 'Push einrichten', exact: true })).toBeFocused();
+	expect(fehler).toEqual([]);
+});
