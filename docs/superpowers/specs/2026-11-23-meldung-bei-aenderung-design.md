@@ -28,8 +28,11 @@ benachrichtigen» (Entscheid Projektleiter, 23.11.2026).
 ## Vorgaben
 
 - **CM:** Häkchen **vorbelegt** (heute wird immer gemeldet). Gilt für von Hand anmelden,
-  verschieben, löschen, alle Doppel-Aktionen, Kategorie absagen (samt hinfälliger Anfragen) und
-  Klassierung korrigieren. Bei einem Doppel gilt ein Häkchen für alle Beteiligten.
+  verschieben, löschen, alle Doppel-Aktionen und Kategorie absagen (Meldung an die, deren offene
+  Partner-Anfrage wegfällt). Bei einem Doppel gilt ein Häkchen für alle Beteiligten.
+  **Klassierung korrigieren** (CM-Admin) meldet heute nicht: Häkchen **leer**, neue Meldung.
+  **Unverändert immer:** Kategorie ändern meldet hinfällige Anfragen nach einem Wechsel der Art
+  weiter ohne Häkchen (selten, Formular ohne Rückfrage).
   **Ohne Häkchen:** der Entscheid über einen Wildcard-Antrag; er ist die Antwort auf den Antrag und
   wird immer gemeldet.
 - **Profil, Rollen, Wiedereintritt:** Häkchen **leer** (Admin trägt oft nur nach, was das Mitglied
@@ -54,13 +57,14 @@ benachrichtigen» (Entscheid Projektleiter, 23.11.2026).
 
 | Anlass | Titel | Text | Link |
 |---|---|---|---|
-| Profil | Dein Profil | Die Verwaltung hat deine Telefonnummer und Adresse geändert. | `/profil` |
+| Profil | Dein Profil | Die Verwaltung hat dein Profil geändert: Telefon, Strasse. | `/profil` |
 | Rolle vergeben | MyTCO | Du hast neu die Rolle «CM-Admin». | Startseite |
 | Rolle entzogen | MyTCO | Deine Rolle «CM-Admin» wurde entfernt. | Startseite |
 | Wiedereintritt / Rücknahme | MyTCO | Dein Zugang zu MyTCO ist wieder offen. | Startseite |
+| Klassierung (CM) | Clubmeisterschaft | Der CM-Admin hat deine Klassierung geändert. | `/profil` |
 | CM | Clubmeisterschaft | Texte wie heute | wie heute |
 
-Feldnamen in der Meldung wie die Beschriftungen im Formular der Verwaltung.
+Feldnamen in der Meldung wie die Beschriftungen im Formular der Verwaltung (`FELD_NAMEN`), in der Reihenfolge der Felder.
 
 ## Oberfläche
 
