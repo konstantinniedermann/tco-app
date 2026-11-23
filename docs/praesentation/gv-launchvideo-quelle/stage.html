@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="mytco/tokens.css">
+<link rel="stylesheet" href="mytco/basis.css">
+<style>
+:root { --schrift-text: 'Inter', system-ui, sans-serif; }
+*, *::before, *::after { transition: none !important; animation: none !important; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #03160f; }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: 'Inter', sans-serif; color: #fff; hyphens: none;
+  background: radial-gradient(1400px 900px at 50% 45%, #0b5640 0%, #073a2b 45%, #031a12 100%); }
+.abs { position: absolute; }
+.glow { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+.disp { font-family: 'Inter Display', 'Inter', sans-serif; letter-spacing: -0.035em; }
+
+/* Intro */
+.word { position: absolute; left: 0; right: 0; top: 50%; text-align: center; font-size: 190px; font-weight: 800; line-height: 1; translate: 0 -50%; }
+/* Lockup */
+.lockup { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; gap: 48px; }
+.lockup img { height: 260px; }
+.lockup .wm { font-size: 210px; font-weight: 800; line-height: 1; }
+.tag { position: absolute; left: 0; right: 0; text-align: center; font-size: 46px; font-weight: 500; color: var(--farbe-marke-hell); letter-spacing: -0.01em; }
+
+/* Textblöcke */
+.block { position: absolute; width: 760px; }
+.eyebrow { font-size: 30px; font-weight: 700; color: var(--farbe-marke-hell); letter-spacing: 0.01em; margin-bottom: 22px; }
+.head { font-size: 108px; font-weight: 800; line-height: 1.0; margin: 0; color: #fff; }
+.head .l { display: block; }
+.sub { font-size: 34px; line-height: 1.38; color: rgb(255 255 255 / 0.72); margin-top: 34px; font-weight: 450; max-width: 680px; }
+.grad { background: linear-gradient(90deg, #ffffff, #cde3b9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Phone */
+#phoneWrap { position: absolute; left: 0; top: 0; width: 418px; height: 872px; margin-left: -209px; margin-top: -436px; transform-style: preserve-3d; }
+#phoneShadow { position: absolute; left: 30px; right: 30px; bottom: -40px; height: 80px; background: rgb(0 0 0 / 0.55); border-radius: 50%; filter: blur(34px); }
+#phone { position: absolute; inset: 0; border-radius: 66px; background: linear-gradient(145deg, #3a4442, #0e1413 40%, #222a29); padding: 14px;
+  box-shadow: 0 0 0 2px #56605e inset, 0 40px 80px rgb(0 0 0 / 0.45), 0 0 120px rgb(205 227 185 / 0.10); }
+#screen { position: relative; width: 390px; height: 844px; border-radius: 52px; overflow: hidden; background: var(--farbe-hintergrund); color: var(--farbe-text); font-family: var(--schrift-text); font-size: var(--groesse-text); line-height: 1.5; }
+#island { position: absolute; left: 50%; top: 11px; width: 120px; height: 35px; margin-left: -60px; background: #000; border-radius: 20px; z-index: 50; }
+#gloss { position: absolute; inset: 0; z-index: 60; pointer-events: none; background: linear-gradient(115deg, rgb(255 255 255 / 0) 30%, rgb(255 255 255 / 0.16) 45%, rgb(255 255 255 / 0) 60%); background-size: 300% 100%; }
+#homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: #1f2a2a; z-index: 55; }
+.statusbar { height: 50px; background: var(--farbe-marke); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 6px 30px 0 36px; font-size: 16px; font-weight: 600; }
+.statusbar .ic { display: flex; gap: 6px; align-items: center; }
+.app.phoneapp { height: 844px; min-height: 0; position: relative; }
+.app.phoneapp .kopf { position: relative; }
+#layers { position: relative; flex: 1; overflow: hidden; }
+.layer { position: absolute; inset: 0; background: var(--farbe-hintergrund); overflow: hidden; }
+.layer main.inhalt { padding-top: var(--abstand-4); }
+.app.phoneapp .reiter { position: relative; padding-bottom: 22px; }
+.app.phoneapp .reiter a { font-family: var(--schrift-text); }
+.tap { position: absolute; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: rgb(255 255 255 / 0.55); box-shadow: 0 0 0 2px rgb(15 107 79 / 0.35); z-index: 70; opacity: 0; }
+table.rl { width: 100%; border-collapse: collapse; font-size: var(--groesse-klein); font-variant-numeric: tabular-nums; }
+table.rl th { padding: 6px 4px; font-weight: 600; color: var(--farbe-text-leise); text-align: left; }
+.rlrow { position: absolute; left: 0; right: 0; height: 44px; display: grid; grid-template-columns: 30px 1fr 36px 30px 56px; align-items: center; font-size: var(--groesse-klein); font-variant-numeric: tabular-nums; padding: 0 4px; border-top: 1px solid var(--farbe-linie); }
+.rlrow span:nth-child(n+3) { text-align: center; }
+.rlhead { display: grid; grid-template-columns: 30px 1fr 36px 30px 56px; font-size: var(--groesse-klein); color: var(--farbe-text-leise); font-weight: 600; padding: 4px 4px 6px; }
+.rlhead span:nth-child(n+3) { text-align: center; }
+.feldbox { width: 4rem; min-height: var(--tippflaeche); box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: var(--rand-dick) solid var(--farbe-rand); border-radius: var(--radius); font-weight: 600; font-size: 1.25rem; }
+
+/* Push */
+.push { position: absolute; width: 560px; display: flex; gap: 18px; align-items: flex-start; padding: 20px 24px; border-radius: 30px; background: rgb(250 252 250 / 0.94); box-shadow: 0 30px 80px rgb(0 0 0 / 0.45); color: var(--farbe-text); font-family: 'Inter', sans-serif; }
+.push .pi { flex: none; width: 60px; height: 60px; border-radius: 15px; background: var(--farbe-marke); display: flex; align-items: center; justify-content: center; }
+.push .pi img { height: 42px; }
+.push .ph { display: flex; justify-content: space-between; font-size: 20px; color: var(--farbe-text-leise); }
+.push .pt { font-size: 25px; line-height: 1.35; margin-top: 2px; }
+
+/* Schwebende Karten */
+.fcard { position: absolute; width: 470px; padding: 26px 30px; border-radius: 22px; background: #fff; color: var(--farbe-text); box-shadow: 0 30px 70px rgb(0 0 0 / 0.45); display: flex; align-items: center; gap: 22px; font-family: 'Inter', sans-serif; }
+.fcard .doc { flex: none; width: 72px; height: 88px; border-radius: 10px; background: var(--farbe-marke-zart); color: var(--farbe-marke); display: flex; align-items: center; justify-content: center; }
+.fcard strong { font-size: 28px; display: block; line-height: 1.25; }
+.fcard .plakette { font-size: 19px; }
+.fcard .leise { font-size: 20px; }
+
+/* Geräte */
+#browser { position: absolute; left: 340px; top: 300px; width: 960px; border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 40px 100px rgb(0 0 0 / 0.5); }
+.chips { position: absolute; left: 0; right: 0; top: 214px; display: flex; justify-content: center; gap: 16px; }
+.chip { padding: 12px 24px; border-radius: 999px; background: rgb(205 227 185 / 0.12); border: 1.5px solid rgb(205 227 185 / 0.45); color: #e9f3df; font-size: 26px; font-weight: 600; }
+
+/* Fahrplan */
+#road { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+.rnode { position: absolute; top: 560px; width: 330px; margin-left: -165px; hyphens: none; text-align: center; }
+.rdot { width: 34px; height: 34px; border-radius: 50%; margin: 0 auto 30px; box-sizing: border-box; border: 5px solid var(--farbe-marke-hell); background: #073a2b; }
+.rwann { font-size: 24px; color: var(--farbe-marke-hell); font-weight: 600; }
+.rtit { font-size: 34px; font-weight: 800; margin-top: 8px; line-height: 1.15; letter-spacing: -0.02em; }
+.rtxt { font-size: 23px; color: rgb(255 255 255 / 0.7); margin-top: 10px; line-height: 1.35; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="glow" id="g1" style="width:900px;height:900px;background:rgb(205 227 185 / 0.10)"></div>
+  <div class="glow" id="g2" style="width:700px;height:700px;background:rgb(168 79 31 / 0.10)"></div>
+
+  <!-- 1 Intro -->
+  <div id="intro">
+    <div class="word disp" id="w0">Spiele.</div>
+    <div class="word disp" id="w1">Resultate.</div>
+    <div class="word disp" id="w2">Anmeldungen.</div>
+    <div class="word disp" id="w3">Dokumente.</div>
+    <div class="word disp" id="w4" style="font-size:150px"><span class="grad">Alles an einem Ort.</span></div>
+  </div>
+
+  <!-- 2/11 Logo -->
+  <div class="lockup" id="lockup"><img id="lockWap" src="mytco/wappen.svg" alt=""><span class="wm disp" id="lockWm">MyTCO</span></div>
+  <div class="tag" id="tag1" style="top:720px">Die Mitglieder-App des TC Olten</div>
+  <div class="tag" id="tag2" style="top:735px;color:#fff;font-size:52px;font-weight:700">Bald für alle Mitglieder.</div>
+  <div class="tag" id="tag3" style="top:822px;font-size:34px;color:rgb(255 255 255 / 0.7)">Lust zu testen? Melde dich bei Koschi.</div>
+
+  <!-- Textblöcke -->
+  <div class="block" id="b3" style="left:150px;top:300px">
+    <div class="eyebrow">Neu für alle Mitglieder</div>
+    <h1 class="head disp"><span class="l">TCO in der</span><span class="l grad">Hosentasche.</span></h1>
+    <div class="sub">Spiele, Resultate, Anmeldungen und Unterlagen. In einer App, auf deinem Handy.</div>
+  </div>
+  <div class="block" id="b4" style="left:150px;top:300px">
+    <div class="eyebrow">Clubmeisterschaft</div>
+    <h1 class="head disp"><span class="l">Jedes Spiel.</span><span class="l grad">Jede Rangliste.</span></h1>
+    <div class="sub">Gruppen, Spiele und Ranglisten, immer auf dem neusten Stand.</div>
+  </div>
+  <div class="block" id="b5" style="left:150px;top:300px">
+    <div class="eyebrow">Resultat melden</div>
+    <h1 class="head disp"><span class="l">Gespielt.</span><span class="l grad">Gemeldet.</span></h1>
+    <div class="sub">Resultat eintippen, senden. Die Rangliste rechnet sofort neu.</div>
+  </div>
+  <div class="block" id="b6" style="left:1010px;top:250px">
+    <div class="eyebrow">Interclub</div>
+    <h1 class="head disp"><span class="l">Alle Teams.</span><span class="l grad">Auf einen Blick.</span></h1>
+    <div style="display:flex;align-items:baseline;gap:22px;margin-top:46px">
+      <span class="disp" id="icCount" style="font-size:190px;font-weight:800;line-height:0.9;color:#fff">17</span>
+      <span style="font-size:34px;line-height:1.3;color:rgb(255 255 255 / 0.72)">TCO-Teams<br>von Kids 10&amp;U bis 65+</span>
+    </div>
+  </div>
+  <div class="block" id="b7" style="left:150px;top:300px">
+    <div class="eyebrow">GV, CM und Anlässe</div>
+    <h1 class="head disp"><span class="l">Anmelden.</span><span class="l grad">Mit einem Tipp.</span></h1>
+    <div class="sub">Generalversammlung, Clubmeisterschaft und Vereinsanlässe. Ohne Formular, ohne E-Mail.</div>
+  </div>
+  <div class="block" id="b8" style="left:130px;top:300px;width:640px">
+    <div class="eyebrow">Dokumente und Lizenzen</div>
+    <h1 class="head disp" style="font-size:96px"><span class="l">Unterlagen</span><span class="l grad">in der App.</span></h1>
+    <div class="sub" style="max-width:560px">Statt per Post. Und die Lizenz bestätigst du gleich mit.</div>
+  </div>
+  <div id="b9">
+    <div class="abs disp" style="left:0;right:0;top:92px;text-align:center;font-size:92px;font-weight:800;line-height:1" id="b9h">Auf jedem Gerät. <span class="grad">Für jedes Alter.</span></div>
+    <div class="chips" id="chips">
+      <span class="chip">Handy zuerst</span><span class="chip">Grosse Tippflächen</span><span class="chip">Folgt deiner Schriftgrösse</span><span class="chip">Barrierefrei (WCAG 2.2 AA)</span>
+    </div>
+  </div>
+
+  <!-- Browser -->
+  <div id="browser">
+    <div style="height:38px;box-sizing:border-box;padding:0 16px;display:flex;align-items:center;gap:8px;background:#e8ece9;border-bottom:1px solid var(--farbe-linie);">
+      <span style="width:12px;height:12px;border-radius:999px;background:#c9d1cd"></span><span style="width:12px;height:12px;border-radius:999px;background:#c9d1cd"></span><span style="width:12px;height:12px;border-radius:999px;background:#c9d1cd"></span>
+      <span style="flex:1;margin-left:14px;height:24px;border-radius:6px;background:#fff;font-size:14px;line-height:24px;padding-left:12px;color:var(--farbe-text-leise);font-family:Inter">my.tcolten.ch/cm/herren-r5-r9</span>
+    </div>
+    <div style="width:960px;height:690px;overflow:hidden;background:var(--farbe-hintergrund);color:var(--farbe-text);font-family:var(--schrift-text);font-size:var(--groesse-text);line-height:1.5">
+      <div class="app" style="height:690px;min-height:0;">
+        <header class="kopf" style="flex-wrap:nowrap;justify-content:space-between;">
+          <span style="width:10rem;display:flex;align-items:center;gap:var(--abstand-3);"><img class="kopf-wappen" src="mytco/wappen.svg" alt="">MyTCO</span>
+          <nav style="display:flex;gap:var(--abstand-2);font-size:var(--groesse-text);font-weight:600;">
+            <span style="display:inline-flex;align-items:center;gap:8px;min-height:3rem;padding:0 1rem;border-radius:999px;color:#fff"><svg class="symbol" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Start</span>
+            <span style="display:inline-flex;align-items:center;gap:8px;min-height:3rem;padding:0 1rem;border-radius:999px;background:var(--farbe-marke-zart);color:var(--farbe-marke);font-weight:700"><svg class="symbol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6a9 9 0 0 1 0 12.8"/><path d="M18.4 5.6a9 9 0 0 0 0 12.8"/></svg>CM</span>
+            <span style="display:inline-flex;align-items:center;gap:8px;min-height:3rem;padding:0 1rem;border-radius:999px;color:#fff"><svg class="symbol" viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M9.5 20V8h5v12"/><path d="M4 20v-7h5.5"/><path d="M14.5 11H20v9"/></svg>IC</span>
+            <span style="display:inline-flex;align-items:center;gap:8px;min-height:3rem;padding:0 1rem;border-radius:999px;color:#fff"><svg class="symbol" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profil</span>
+          </nav>
+          <span style="width:10rem"></span>
+        </header>
+        <div class="rollbereich"><main class="inhalt" style="max-width:none;padding:var(--abstand-5) var(--abstand-6);">
+          <span class="zurueck" style="color:var(--farbe-marke)">‹ Clubmeisterschaft 2027</span>
+          <div style="display:flex;align-items:baseline;gap:var(--abstand-3);margin-bottom:var(--abstand-4)"><h1 style="margin:0">Herren R5/R9</h1><span class="leise">Gruppe A · Gruppenspiele bis 30. Juni</span></div>
+          <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:var(--abstand-4);align-items:start">
+            <div class="karte" style="margin:0;padding:1rem 1rem .5rem">
+              <h2 style="margin-top:0">Rangliste</h2>
+              <table class="rl"><thead><tr><th>#</th><th>Spieler</th><th style="text-align:center">Sp</th><th style="text-align:center">S</th><th style="text-align:center">Sätze</th></tr></thead><tbody>
+                <tr style="border-top:1px solid var(--farbe-linie)"><td style="padding:8px 4px;font-weight:700;color:var(--farbe-marke)">1</td><td style="padding:8px 4px;font-weight:700">Jonas Probst</td><td style="text-align:center">3</td><td style="text-align:center;font-weight:700">3</td><td style="text-align:center">6:0</td></tr>
+                <tr style="border-top:1px solid var(--farbe-linie);background:var(--farbe-marke-zart)"><td style="padding:8px 4px;font-weight:700;color:var(--farbe-marke)">2</td><td style="padding:8px 4px;font-weight:700">Luca Beispiel <span class="leise">(du)</span></td><td style="text-align:center">4</td><td style="text-align:center;font-weight:700">2</td><td style="text-align:center">5:4</td></tr>
+                <tr style="border-top:2px dashed var(--farbe-marke)"><td style="padding:8px 4px;color:var(--farbe-text-leise)">3</td><td style="padding:8px 4px">Timo Probst</td><td style="text-align:center">3</td><td style="text-align:center">2</td><td style="text-align:center">4:3</td></tr>
+                <tr style="border-top:1px solid var(--farbe-linie)"><td style="padding:8px 4px;color:var(--farbe-text-leise)">4</td><td style="padding:8px 4px">Nico Beispiel</td><td style="text-align:center">3</td><td style="text-align:center">0</td><td style="text-align:center">0:6</td></tr>
+                <tr style="border-top:1px solid var(--farbe-linie)"><td style="padding:8px 4px;color:var(--farbe-text-leise)">5</td><td style="padding:8px 4px">Marco Muster</td><td style="text-align:center">1</td><td style="text-align:center">0</td><td style="text-align:center">0:2</td></tr>
+              </tbody></table>
+              <p class="leise" style="margin:.5rem 0 0">Die ersten zwei spielen am Finalwochenende.</p>
+            </div>
+            <div class="karte" style="margin:0">
+              <h2 style="margin-top:0">Resultate</h2>
+              <div style="display:flex;flex-direction:column;gap:.5rem;font-size:var(--groesse-klein)">
+                <div style="display:flex;justify-content:space-between;padding-bottom:.5rem;border-bottom:1px solid var(--farbe-linie)"><span><strong>Luca Beispiel</strong> – Marco Muster <span class="plakette plakette-ok">neu</span></span><span>6:3 7:5</span></div>
+                <div style="display:flex;justify-content:space-between;padding-bottom:.5rem;border-bottom:1px solid var(--farbe-linie)"><span><strong>Jonas Probst</strong> – Timo Probst</span><span>6:4 6:2</span></div>
+                <div style="display:flex;justify-content:space-between;padding-bottom:.5rem;border-bottom:1px solid var(--farbe-linie)"><span><strong>Timo Probst</strong> – Nico Beispiel</span><span>7:6 6:4</span></div>
+                <div style="display:flex;justify-content:space-between;padding-bottom:.5rem;border-bottom:1px solid var(--farbe-linie)"><span><strong>Jonas Probst</strong> – Luca Beispiel</span><span>6:2 6:3</span></div>
+              </div>
+            </div>
+          </div>
+        </main></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Telefon -->
+  <div id="phoneWrap">
+    <div id="phoneShadow"></div>
+    <div id="phone">
+      <div id="screen">
+        <div id="island"></div>
+        <div class="app phoneapp">
+          <div class="statusbar"><span>9:41</span><span class="ic">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+            <svg width="26" height="13" viewBox="0 0 26 13"><rect x="0.5" y="0.5" width="22" height="12" rx="3.5" fill="none" stroke="#fff" opacity=".6"/><rect x="2.5" y="2.5" width="16" height="8" rx="2" fill="#fff"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#fff" opacity=".6"/></svg></span></div>
+          <header class="kopf"><img class="kopf-wappen" src="mytco/wappen.svg" alt="">MyTCO</header>
+          <div id="layers">
+            <!-- Start (Luca) -->
+            <div class="layer" id="Lhome"><main class="inhalt">
+              <h1>Hoi Luca</h1>
+              <span class="karte kachel hervor" id="kCM"><span><strong>Clubmeisterschaft</strong><br>1 Spiel offen, noch 12 Tage<br><span class="leise">Platz 3 in deiner Gruppe</span></span><span class="kachel-pfeil">›</span></span>
+              <section class="karte"><h2 style="margin-top:0">Neu für dich</h2>
+                <span class="kachel" id="kDoc1" style="margin-bottom:var(--abstand-3)"><span><strong>Einladung GV 2027</strong><br><span class="plakette plakette-ok">neu</span> <span class="leise">Dokument · PDF</span></span><span class="kachel-pfeil">›</span></span>
+                <span class="kachel" id="kDoc2"><span><strong>Lizenz 2027</strong><br><span class="plakette plakette-offen">bitte bestätigen</span></span><span class="kachel-pfeil">›</span></span>
+              </section>
+              <section class="karte"><h2 style="margin-top:0">Deine Anlässe</h2>
+                <span class="kachel"><span><strong>Generalversammlung</strong><br><span class="leise" id="gvState">Fr, 19. März · noch offen</span></span><span class="kachel-pfeil">›</span></span>
+              </section>
+            </main></div>
+            <!-- CM -->
+            <div class="layer" id="Lcm"><main class="inhalt">
+              <span class="zurueck" style="color:var(--farbe-marke)">‹ Clubmeisterschaft 2027</span>
+              <h1>Herren R5/R9</h1>
+              <p class="leise" style="margin-top:-4px">Gruppe A · Gruppenspiele bis 30. Juni</p>
+              <div class="karte" style="padding:1rem .75rem .75rem">
+                <h2 style="margin-top:0">Rangliste</h2>
+                <div class="rlhead"><span>#</span><span>Spieler</span><span>Sp</span><span>S</span><span>Sätze</span></div>
+                <div style="position:relative;height:222px" id="rlbox">
+                  <div class="rlrow" id="r0" style="top:0"><span style="font-weight:700;color:var(--farbe-marke)">1</span><span style="font-weight:700">Jonas Probst</span><span>3</span><span style="font-weight:700">3</span><span>6:0</span></div>
+                  <div class="rlrow" id="r1" style="top:44px"><span class="rk" style="font-weight:700;color:var(--farbe-marke)">2</span><span style="font-weight:700">Timo Probst</span><span>3</span><span style="font-weight:700">2</span><span>4:3</span></div>
+                  <div class="rlrow" id="r2" style="top:88px;background:var(--farbe-marke-zart)"><span class="rk" style="font-weight:700;color:var(--farbe-text-leise)">3</span><span style="font-weight:700">Luca <span class="leise">(du)</span></span><span class="sp">3</span><span class="s" style="font-weight:700">1</span><span class="st">3:4</span></div>
+                  <div class="rlrow" id="r3" style="top:132px"><span style="color:var(--farbe-text-leise)">4</span><span>Nico Beispiel</span><span>3</span><span>0</span><span>0:6</span></div>
+                  <div class="rlrow" id="r4" style="top:176px"><span style="color:var(--farbe-text-leise)">5</span><span>Marco Muster</span><span class="sp">0</span><span>0</span><span class="st">0:0</span></div>
+                  <div style="position:absolute;left:0;right:0;top:87px;border-top:2px dashed var(--farbe-marke);z-index:3"></div>
+                </div>
+                <p class="leise" style="margin:.5rem 0 0">Die ersten zwei spielen am Finalwochenende.</p>
+              </div>
+              <div class="karte" id="offen">
+                <p style="margin:0 0 .5rem"><strong>Offen:</strong> gegen Marco Muster</p>
+                <span class="taste-haupt" id="btnMelden" style="width:100%;display:flex">Resultat melden</span>
+              </div>
+            </main>
+              <div id="dim" style="position:absolute;inset:0;z-index:10;background:rgb(0 0 0 / 0.45);opacity:0"></div>
+              <section id="sheet" style="z-index:11;position:absolute;left:0;right:0;bottom:0;background:var(--farbe-flaeche);border-radius:16px 16px 0 0;padding:var(--abstand-2) var(--abstand-4) var(--abstand-5);transform:translateY(110%)">
+                <div style="width:2.5rem;height:.3rem;margin:0 auto var(--abstand-3);border-radius:999px;background:var(--farbe-linie)"></div>
+                <h2 style="margin-top:0">Resultat melden</h2>
+                <p class="leise" style="margin-top:0">Du gegen Marco Muster</p>
+                <div style="display:flex;flex-direction:column;gap:var(--abstand-3);margin-bottom:var(--abstand-5)">
+                  <div style="display:flex;align-items:center;gap:var(--abstand-2)"><span style="flex:1">1. Satz</span><span class="feldbox" id="f0"></span><span>:</span><span class="feldbox" id="f1"></span></div>
+                  <div style="display:flex;align-items:center;gap:var(--abstand-2)"><span style="flex:1">2. Satz</span><span class="feldbox" id="f2"></span><span>:</span><span class="feldbox" id="f3"></span></div>
+                  <div style="display:flex;align-items:center;gap:var(--abstand-2)"><span style="flex:1">Tiebreak <span class="leise">(falls nötig)</span></span><span class="feldbox"></span><span>:</span><span class="feldbox"></span></div>
+                </div>
+                <div class="leiste" style="margin-bottom:0;display:flex;gap:var(--abstand-3)"><span class="taste-neben">Abbrechen</span><span class="taste-haupt" id="btnSenden" style="flex:1">Resultat senden</span></div>
+              </section>
+            </div>
+            <!-- Interclub -->
+            <div class="layer" id="Lic"><main class="inhalt" id="icMain">
+              <h1>Interclub 2026</h1><p class="leise" style="margin-top:0">Stand: 13.11.2026, 08:56</p>
+              <nav style="display:flex;margin-bottom:var(--abstand-4);border-bottom:1px solid var(--farbe-linie)"><span style="flex:1;display:flex;align-items:center;justify-content:center;min-height:3rem;font-size:var(--groesse-klein);color:var(--farbe-text-leise)">Resultate</span><span style="flex:1;display:flex;align-items:center;justify-content:center;min-height:3rem;font-size:var(--groesse-klein);color:var(--farbe-marke);font-weight:700;box-shadow:inset 0 -4px 0 var(--farbe-marke)">Teams</span></nav>
+              <p class="leise">Saison 2026 abgeschlossen: Schlussrang jedes Teams.</p>
+              <h2>Aktive und Senioren</h2>
+              <div id="icList"></div>
+            </main></div>
+            <!-- Start mit GV -->
+            <div class="layer" id="Lhome2"><main class="inhalt">
+              <h1>Hoi Luca</h1>
+              <h2 style="margin-top:0">Jetzt aktuell</h2>
+              <span class="karte kachel hervor" id="kGV"><span><strong>Generalversammlung 2027</strong><br><span class="leise">Fr, 19. März, 19.30 Uhr · Bitte bis 16. März an- oder abmelden</span></span><span class="kachel-pfeil">›</span></span>
+              <span class="karte kachel"><span><strong>Clubmeisterschaft 2027</strong><br><span class="leise">Anmeldung ab 15. April</span></span><span class="kachel-pfeil">›</span></span>
+              <h2>Du bist angemeldet</h2>
+              <p class="leise">Noch für nichts. Hier erscheinen deine Anmeldungen.</p>
+            </main></div>
+            <!-- GV Detail -->
+            <div class="layer" id="Lgv"><main class="inhalt">
+              <span class="zurueck" style="color:var(--farbe-marke)">‹ Start</span>
+              <h1>Generalversammlung 2027</h1>
+              <p class="leise" style="margin-top:-4px">Fr, 19. März 2027, 19.30 Uhr</p>
+              <div class="karte" style="position:relative;min-height:196px">
+                <div id="gvAsk">
+                  <h2 style="margin-top:0">Bist du dabei?</h2>
+                  <p>Bitte bis 16. März an- oder abmelden.</p>
+                  <div style="display:flex;gap:var(--abstand-3)"><span class="taste-neben" style="flex:1">Abmelden</span><span class="taste-haupt" id="btnAn" style="flex:1">Anmelden</span></div>
+                </div>
+                <div id="gvOk" style="position:absolute;inset:1rem;opacity:0">
+                  <h2 style="margin-top:0">Du bist dabei</h2>
+                  <p style="margin-bottom:.5rem"><span class="plakette plakette-ok" style="font-size:1.05rem;padding:2px 12px">angemeldet</span></p>
+                  <p class="leise" style="margin:0">Du kannst dich bis 16. März wieder abmelden.</p>
+                </div>
+              </div>
+              <div class="karte"><h2 style="margin-top:0">Unterlagen</h2>
+                <span class="kachel"><span><strong>Einladung und Traktanden</strong><br><span class="leise">Dokument · PDF</span></span><span class="kachel-pfeil">›</span></span>
+              </div>
+            </main></div>
+            <div class="tap" id="tap"></div>
+          </div>
+          <nav class="reiter" data-anzahl="4" data-aktiv="0" id="reiter"><span class="reiter-balken" id="balken"></span>
+            <a id="t0"><svg class="symbol" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Start</a>
+            <a id="t1"><svg class="symbol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6a9 9 0 0 1 0 12.8"/><path d="M18.4 5.6a9 9 0 0 0 0 12.8"/></svg>CM</a>
+            <a id="t2"><svg class="symbol" viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M9.5 20V8h5v12"/><path d="M4 20v-7h5.5"/><path d="M14.5 11H20v9"/></svg>IC</a>
+            <a id="t3"><svg class="symbol" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profil</a>
+          </nav>
+        </div>
+        <div id="homebar"></div>
+        <div id="gloss"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Push -->
+  <div class="push" id="push"><span class="pi"><img src="mytco/wappen.svg" alt=""></span>
+    <div style="flex:1"><div class="ph"><strong style="color:var(--farbe-text)">MyTCO</strong><span>jetzt</span></div>
+    <div class="pt">Neues Resultat in deiner Gruppe. Du bist jetzt auf Platz 2.</div></div></div>
+
+  <!-- Schwebende Karten -->
+  <div class="fcard" id="fc1"><span class="doc"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg></span>
+    <span><strong>Einladung GV 2027</strong><span class="plakette plakette-ok">neu</span> <span class="leise">Dokument · PDF</span></span></div>
+  <div class="fcard" id="fc2"><span class="doc"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h4M14 14h3"/></svg></span>
+    <span><strong>Lizenz 2027</strong><span class="plakette plakette-offen" id="fc2p">bitte bestätigen</span></span></div>
+
+  <!-- Fahrplan -->
+  <div id="road">
+    <div class="abs disp" id="rTitle" style="left:0;right:0;top:200px;text-align:center;font-size:104px;font-weight:800;line-height:1">Der Fahrplan</div>
+    <div class="abs" id="rSub" style="left:0;right:0;top:325px;text-align:center;font-size:32px;color:rgb(255 255 255 / 0.65)">voraussichtlich</div>
+    <div class="abs" style="left:240px;width:1440px;top:575px;height:4px;background:rgb(205 227 185 / 0.18);border-radius:2px"></div>
+    <div class="abs" id="rLine" style="left:240px;width:1440px;top:575px;height:4px;background:var(--farbe-marke-hell);border-radius:2px;transform-origin:left;transform:scaleX(0)"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const E = {
+  lin: x => x,
+  out: x => 1 - Math.pow(1 - x, 3),
+  out5: x => 1 - Math.pow(1 - x, 5),
+  inO: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  in: x => x * x * x,
+  back: x => { const c = 1.5; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); },
+  slide: x => { // kurve-schieben ≈ cubic-bezier(0.32,0.72,0,1)
+    return 1 - Math.pow(1 - x, 4); }
+};
+const p = (t, a, b, e = E.out) => e(clamp((t - a) / (b - a)));
+const lerp = (a, b, k) => a + (b - a) * k;
+function st(el, o) { if (typeof el === 'string') el = $(el); Object.assign(el.style, o); }
+
+// In/out für Textelemente: rein ab a (dauer d), raus bis z
+function io(t, a, z, d = 0.8, dz = 0.5) {
+  const i = p(t, a, a + d, E.out5), o = 1 - p(t, z - dz, z, E.in);
+  return Math.min(i, o);
+}
+function textIn(el, t, a, z, opt = {}) {
+  const k = io(t, a, z, opt.d || 0.9, opt.dz || 0.5);
+  const iy = (1 - p(t, a, a + (opt.d || 0.9), E.out5)) * (opt.dy ?? 40);
+  const oy = p(t, z - 0.5, z, E.in) * -20;
+  st(el, { opacity: k, transform: `translateY(${iy + oy}px)`, filter: `blur(${(1 - k) * (opt.blur ?? 14)}px)`, visibility: k > 0.001 ? 'visible' : 'hidden' });
+}
+// Block: eyebrow, Zeilen, sub gestaffelt
+function block(id, t, a, z) {
+  const b = $(id); const kids = [b.querySelector('.eyebrow'), ...b.querySelectorAll('.head .l'), ...b.querySelectorAll('.sub'), ...b.querySelectorAll(':scope > div[style]')];
+  const vis = t > a - 0.1 && t < z + 0.1; b.style.display = vis ? 'block' : 'none'; if (!vis) return;
+  kids.forEach((k, i) => { if (k) textIn(k, t, a + i * 0.16, z - (kids.length - 1 - i) * 0.04, { dy: 50 }); });
+}
+
+// IC-Liste
+const teams = [['35+ NLA Herren','Olten · 4. von 4 · Abstiegsspiele'],['2L Herren 2','Olten 2 · 3. von 4 · Abstiegsspiele'],['2L Herren 1','Olten 1 · 2. von 4 · Aufstiegsspiele'],['2L Damen','Olten · 2. von 5'],['3L Herren 2','Olten 2 · 1. von 5'],['3L Herren 1','Olten 1 · 5. von 5'],['35+ 1L Herren','Olten · 1. von 4 · Aufstiegsspiele'],['35+ 2L Herren','Olten · 1. von 4 · Aufstiegsspiele'],['30+ 2L Damen','Olten · 2. von 4 · Aufstiegsspiele'],['65+ 1L Herren','Olten · 3. von 4 · Abstiegsspiele'],null,['15&U Boys Liga B 1','Olten 1 · 2. von 4'],['15&U Boys Liga B 2','Olten 2 · 1. von 4'],['15&U Girls Liga B','Olten · 1. von 4'],['12&U Boys Liga B 2','Olten 2 · 4. von 4'],['12&U Boys Liga B 1','Olten 1 · 4. von 4'],['12&U Girls Liga B','Olten · 3. von 3'],['Kids 10&U','Olten · 1. von 4']];
+$('icList').innerHTML = teams.map(x => x ? `<span class="karte kachel"><span><strong>${x[0].replace('&','&amp;')}</strong><br><span class="leise">${x[1]}</span></span><span class="kachel-pfeil">›</span></span>` : '<h2>Junioren</h2>').join('');
+
+// Fahrplan
+const etappen = [['Jetzt','Tester gesucht','Lust zu testen? Melde dich bei Koschi.'],['Feb./März 2027','Login-Brief','Mit Anleitung, rund um die GV.'],['Mai 2027','Interclub 2027','Die IC-Resultate der TCO-Teams in der App.'],['CM 2027','CM per App','Anmelden, verfolgen, mitspielen.'],['2028','GV und Vereinsanlässe','Anmeldung über MyTCO.']];
+etappen.forEach((e, i) => { const d = document.createElement('div'); d.className = 'rnode'; d.id = 'rn' + i; d.style.left = (240 + i * 360) + 'px';
+  d.innerHTML = `<div class="rdot" ${i === 0 ? 'style="background:var(--farbe-aktion);border-color:#e08a5a"' : ''}></div><div class="rwann" ${i === 0 ? 'style="color:#f0a77c"' : ''}>${e[0]}</div><div class="rtit">${e[1]}</div><div class="rtxt">${e[2]}</div>`;
+  $('road').appendChild(d); });
+document.querySelectorAll('.rnode').forEach(n => n.style.top = '558px');
+
+// Telefon-Posen: [t, x, y, s, ry, rx]
+const pose = [
+  [9.4, 1300, 1560, 0.95, -32, 24], [11.8, 1300, 545, 1.0, -20, 5], [17.8, 1300, 545, 1.0, -9, 2], [19.2, 1300, 545, 1.0, -5, 0],
+  [25.6, 1310, 545, 1.0, -7, 0], [33.6, 1300, 545, 1.0, -4, 0], [35.2, 620, 545, 1.0, 12, 0], [39.6, 620, 545, 1.0, 6, 0],
+  [41.2, 1300, 545, 1.0, -10, 0], [45.6, 1300, 545, 1.0, -4, 0], [47.2, 1000, 555, 0.94, -16, 2], [51.6, 1000, 555, 0.94, -7, 0],
+  [53.2, 1440, 660, 0.72, -12, 0], [57.6, 1440, 660, 0.72, -5, 0], [58.8, 1440, 1700, 0.72, 4, 26]];
+function phonePose(t) {
+  if (t <= pose[0][0]) return pose[0];
+  for (let i = 0; i < pose.length - 1; i++) { const a = pose[i], b = pose[i + 1];
+    if (t <= b[0]) { const k = E.inO((t - a[0]) / (b[0] - a[0])); return a.map((v, j) => lerp(v, b[j], k)); } }
+  return pose[pose.length - 1];
+}
+// Taps: [t, layer-relative x, y]
+const taps = [[19.8, 'kCM'], [26.9, 'btnMelden'], [29.95, 'btnSenden'], [41.3, 'kGV'], [43.3, 'btnAn'], [46.9, 'kDoc1'], [47.9, 'kDoc2']];
+function rel(el) { let x = el.offsetWidth * 0.62, y = Math.min(el.offsetHeight / 2, 20); const L = $('layers');
+  while (el && el !== L) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; } return [x, y]; }
+function tapAt(t) { const el = $('tap'); let o = 0; for (const [tt, id] of taps) { if (t >= tt - 0.25 && t < tt + 0.55) { const [x, y] = rel($(id));
+  const appear = p(t, tt - 0.25, tt - 0.05), press = p(t, tt, tt + 0.5, E.out);
+  o = appear * (1 - press); st(el, { left: x + 'px', top: y + 'px', transform: `scale(${lerp(0.7, 1.0, appear) * lerp(1, 1.8, press)})` }); } }
+  el.style.opacity = o; }
+function reiter(idx) { [0,1,2,3].forEach(i => { const a = $('t' + i); a.style.color = i === idx ? 'var(--farbe-marke)' : 'var(--farbe-text-leise)'; a.style.fontWeight = i === idx ? 700 : 400; }); }
+function balken(x) { $('balken').style.transform = `translateX(${x * 100}%)`; }
+
+function seek(t) {
+  // Hintergrund-Lichter
+  st('g1', { left: (500 + Math.sin(t * 0.21) * 380) + 'px', top: (100 + Math.cos(t * 0.17) * 160) + 'px' });
+  st('g2', { left: (1100 + Math.cos(t * 0.15) * 360) + 'px', top: (420 + Math.sin(t * 0.19) * 180) + 'px' });
+
+  // 1 Intro
+  const ws = [[0.25, 1.35], [1.35, 2.45], [2.45, 3.55], [3.55, 4.6]];
+  ws.forEach(([a, z], i) => { const el = $('w' + i); const k = io(t, a, z, 0.35, 0.3);
+    const sc = lerp(1.12, 1.0, p(t, a, a + 0.9, E.out5)) * lerp(1, 0.94, p(t, z - 0.3, z, E.in));
+    st(el, { opacity: k, transform: `scale(${sc})`, filter: `blur(${(1 - k) * 22}px)`, visibility: k > 0 ? 'visible' : 'hidden' }); });
+  { const el = $('w4'); const k = io(t, 4.65, 5.9, 0.6, 0.45); st(el, { opacity: k, transform: `scale(${lerp(0.9, 1.0, p(t, 4.65, 5.6, E.out5)) * lerp(1, 1.15, p(t, 5.45, 5.9, E.in))})`, filter: `blur(${(1 - k) * 18}px)`, visibility: k > 0 ? 'visible' : 'hidden' }); }
+
+  // 2/11 Lockup
+  let lk = 0, ls = 1, lx = 0;
+  if (t < 12) { lk = io(t, 6.0, 9.6, 0.9, 0.5); ls = lerp(0.82, 1.0, p(t, 6.0, 7.4, E.out5)) * lerp(1, 1.06, p(t, 7.4, 9.6, E.lin)); }
+  else { lk = p(t, 66.0, 67.0, E.out5) * (1 - p(t, 71.2, 72.0, E.in)); ls = lerp(0.9, 1.0, p(t, 66.0, 67.5, E.out5)); }
+  st('lockup', { opacity: lk, transform: `translate(-50%, -62%) scale(${ls})`, filter: `blur(${(1 - lk) * 16}px)`, visibility: lk > 0 ? 'visible' : 'hidden' });
+  { const wk = t < 12 ? p(t, 6.0, 7.0, E.out5) : p(t, 66.0, 67.0, E.out5); st('lockWap', { transform: `translateY(${(1 - wk) * 30}px) scale(${lerp(0.7, 1, wk)})`, filter: `drop-shadow(0 0 ${lerp(70, 24, wk)}px rgb(205 227 185 / ${lerp(0.9, 0.35, wk)}))` });
+    const mk = t < 12 ? p(t, 6.45, 7.5, E.out5) : p(t, 66.3, 67.3, E.out5); st('lockWm', { opacity: mk, letterSpacing: lerp(0.06, -0.035, mk) + 'em', transform: `translateX(${(1 - mk) * -40}px)` }); }
+  textIn($('tag1'), t, 7.5, 9.5, { dy: 24 });
+  textIn($('tag2'), t, 67.2, 71.4, { dy: 24 });
+  textIn($('tag3'), t, 67.8, 71.4, { dy: 20 });
+
+  // Textblöcke
+  block('b3', t, 11.0, 18.2); block('b4', t, 19.0, 26.2); block('b5', t, 27.0, 34.0);
+  block('b6', t, 35.0, 40.2); block('b7', t, 41.0, 46.4); block('b8', t, 47.0, 52.4);
+  $('icCount').textContent = Math.round(17 * p(t, 35.6, 37.4, E.out));
+  // Geräte
+  { const v = t > 52 && t < 59; $('b9').style.display = v ? 'block' : 'none';
+    if (v) { textIn($('b9h'), t, 52.6, 58.4, { dy: 40 }); [...$('chips').children].forEach((c, i) => textIn(c, t, 53.4 + i * 0.15, 58.4, { dy: 24 })); }
+    const bk = io(t, 52.5, 58.6, 1.1, 0.6); const bs = lerp(0.9, 1, p(t, 52.5, 54, E.out5)) * lerp(1, 1.03, p(t, 54, 58.6, E.lin));
+    st('browser', { opacity: bk, visibility: bk > 0 ? 'visible' : 'hidden', transform: `perspective(2400px) rotateY(${lerp(14, 6, p(t, 52.5, 58.6, E.out))}deg) translateY(${(1 - p(t, 52.5, 54, E.out5)) * 120 + p(t, 58, 58.6, E.in) * 200}px) scale(${bs})` }); }
+
+  // Telefon
+  { const [, x, y, s, ry, rx] = phonePose(t); const vis = t > 9.3 && t < 58.9;
+    st('phoneWrap', { display: vis ? 'block' : 'none', transform: `translate(${x}px, ${y}px) perspective(2200px) rotateY(${ry}deg) rotateX(${rx}deg) scale(${s})` });
+    $('gloss').style.backgroundPosition = `${50 + ry * 4}% 0`; }
+
+  // Bildschirme
+  const L = { home: $('Lhome'), cm: $('Lcm'), ic: $('Lic'), home2: $('Lhome2'), gv: $('Lgv') };
+  Object.values(L).forEach(l => { l.style.display = 'none'; l.style.transform = 'none'; l.style.opacity = 1; l.style.zIndex = 1; });
+  const show = (l, o = {}) => { l.style.display = 'block'; Object.assign(l.style, o); };
+  let tab = 0, bal = 0;
+  if (t < 20.0) { show(L.home); }
+  else if (t < 33.9) { const k = p(t, 20.0, 20.35, E.slide); if (k < 1) show(L.home, { transform: `translateX(${-30 * k}%)` }); show(L.cm, { transform: `translateX(${100 - 100 * k}%)`, zIndex: 2, boxShadow: '-10px 0 30px rgb(0 0 0 / .12)' }); tab = 1; bal = E.out(clamp((t - 20.0) / 0.25)); }
+  else if (t < 40.2) { const k = p(t, 33.9, 34.05, E.lin); show(L.cm); show(L.ic, { opacity: k, zIndex: 2 }); tab = 2; bal = 1 + E.out(clamp((t - 33.9) / 0.25)); }
+  else if (t < 41.4) { const k = p(t, 40.2, 40.35, E.lin); show(L.ic); show(L.home2, { opacity: k, zIndex: 2 }); tab = 0; bal = 2 - 2 * E.out(clamp((t - 40.2) / 0.25)); }
+  else if (t < 46.4) { const k = p(t, 41.4, 41.75, E.slide); if (k < 1) show(L.home2, { transform: `translateX(${-30 * k}%)` }); show(L.gv, { transform: `translateX(${100 - 100 * k}%)`, zIndex: 2 }); tab = 0; bal = 0; }
+  else if (t < 52.3) { const k = p(t, 46.4, 46.75, E.slide); show(L.home, { transform: `translateX(${-30 + 30 * k}%)` }); if (k < 1) show(L.gv, { transform: `translateX(${100 * k}%)`, zIndex: 2 }); tab = 0; bal = 0; }
+  else { show(L.cm); tab = 1; bal = 1; }
+  if (t < 33.9 && t >= 20) tab = 1; reiter(tab); balken(bal);
+  if (t < 20.0) { reiter(0); balken(0); }
+
+  // GV-Status auf Start
+  $('gvState').textContent = t > 43.6 ? 'Fr, 19. März · angemeldet' : 'Fr, 19. März · noch offen';
+  // Kachel gedrückt
+  const pressed = (el, tt) => { const k = (t > tt && t < tt + 0.25) ? 1 : 0; st(el, { backgroundColor: k ? 'var(--farbe-marke-zart)' : '', transform: k ? 'scale(0.98)' : '' }); };
+  pressed($('kCM'), 19.85); pressed($('kGV'), 41.35);
+  // Doku-Kacheln leuchten
+  [['kDoc1', 46.9], ['kDoc2', 47.9]].forEach(([id, tt]) => { const k = p(t, tt, tt + 0.2) * (1 - p(t, tt + 0.6, tt + 1.4)); st(id, { backgroundColor: k > 0 ? `rgb(227 239 220 / ${k})` : '', transform: `scale(${1 - 0.02 * k})`, borderRadius: '10px' }); });
+
+  // Ranglisten-Animation
+  { const k = p(t, 30.9, 31.6, E.inO);
+    st('r2', { top: lerp(88, 44, k) + 'px', zIndex: 2 }); st('r1', { top: lerp(44, 88, k) + 'px' });
+    const up = t > 30.8; const r2 = $('r2'), r4 = $('r4'), r1 = $('r1');
+    r2.querySelector('.rk').textContent = up ? '2' : '3'; r2.querySelector('.rk').style.color = up ? 'var(--farbe-marke)' : 'var(--farbe-text-leise)';
+    r2.querySelector('.sp').textContent = up ? '4' : '3'; r2.querySelector('.s').textContent = up ? '2' : '1'; r2.querySelector('.st').textContent = up ? '5:4' : '3:4';
+    r1.querySelector('.rk').textContent = up ? '3' : '2'; r1.querySelector('.rk').style.color = up ? 'var(--farbe-text-leise)' : 'var(--farbe-marke)';
+    r1.children[1].style.fontWeight = up ? 400 : 700; r1.children[3].style.fontWeight = up ? 400 : 700;
+    r4.querySelector('.sp').textContent = up ? '1' : '0'; r4.querySelector('.st').textContent = up ? '0:2' : '0:0';
+    const fl = p(t, 30.8, 31.0) * (1 - p(t, 31.6, 32.6)); r2.style.boxShadow = `0 0 0 ${2 * fl}px var(--farbe-marke), 0 ${8 * fl}px ${20 * fl}px rgb(15 107 79 / ${0.3 * fl})`;
+    r2.style.transform = `scale(${1 + 0.03 * Math.sin(Math.PI * k)})`; }
+  // Offenes Spiel → erledigt
+  st('offen', { opacity: 1 - p(t, 30.6, 30.9) });
+  st('btnMelden', { background: (t > 26.9 && t < 27.15) ? 'var(--farbe-aktion-dunkel)' : '' });
+  // Blatt von unten
+  { const k = p(t, 27.15, 27.5, E.slide) * (1 - p(t, 30.15, 30.5, E.slide));
+    st('sheet', { transform: `translateY(${(1 - k) * 105}%)` }); st('dim', { opacity: k });
+    const digs = [[27.95, '6'], [28.35, '3'], [28.85, '7'], [29.25, '5']];
+    digs.forEach(([tt, d], i) => { const f = $('f' + i); f.textContent = t > tt ? d : ''; const foc = t > tt - 0.35 && t <= tt + 0.25;
+      f.style.outline = foc ? '3px solid var(--farbe-marke)' : 'none'; f.style.outlineOffset = '2px'; f.style.transform = (t > tt && t < tt + 0.15) ? 'scale(1.08)' : ''; });
+    st('btnSenden', { background: (t > 29.95 && t < 30.2) ? 'var(--farbe-aktion-dunkel)' : '' }); }
+  // GV
+  { const k = p(t, 43.55, 43.9, E.out); st('gvAsk', { opacity: 1 - k, transform: `scale(${1 - 0.04 * k})` }); st('gvOk', { opacity: k, transform: `scale(${lerp(0.94, 1, E.back(clamp((t - 43.55) / 0.5)))})` });
+    st('btnAn', { background: (t > 43.3 && t < 43.55) ? 'var(--farbe-aktion-dunkel)' : '' }); }
+  // IC-Scrollen
+  { const k = p(t, 35.2, 39.8, E.inO); $('icMain').style.transform = `translateY(${-1250 * k}px)`; }
+  tapAt(t);
+
+  // Push
+  { const k = p(t, 31.7, 32.3, E.back) * (1 - p(t, 33.4, 33.8, E.in)); const a = clamp(p(t, 31.7, 32.0, E.lin) * (1 - p(t, 33.4, 33.8, E.in)));
+    st('push', { left: '1030px', top: lerp(-200, 70, k) + 'px', opacity: a, visibility: a > 0 ? 'visible' : 'hidden', transform: `scale(${lerp(0.9, 1, k)})` }); }
+
+  // Schwebende Karten
+  [['fc1', 47.05, 1360, 300, -4], ['fc2', 48.05, 1400, 560, 3]].forEach(([id, tt, x, y, r]) => {
+    const k = p(t, tt, tt + 1.0, E.out5); const o = clamp(p(t, tt, tt + 0.3, E.lin) * (1 - p(t, 51.9, 52.4, E.in)));
+    const fl = Math.sin((t - tt) * 1.3) * 8;
+    st(id, { left: lerp(1080, x, k) + 'px', top: (lerp(y + 40, y, k) + fl) + 'px', opacity: o, visibility: o > 0 ? 'visible' : 'hidden', transform: `perspective(1600px) rotateY(${lerp(-40, -12, k)}deg) rotate(${r * k}deg) scale(${lerp(0.5, 1, k)})` }); });
+  { const ok = t > 49.6; $('fc2p').textContent = ok ? 'bestätigt' : 'bitte bestätigen'; $('fc2p').className = 'plakette ' + (ok ? 'plakette-ok' : 'plakette-offen'); $('fc2p').style.transform = (t > 49.6 && t < 49.8) ? 'scale(1.12)' : ''; }
+
+  // Fahrplan
+  { const v = t > 58.4 && t < 66.4; $('road').style.display = v ? 'block' : 'none';
+    if (v) { const out = 1 - p(t, 65.6, 66.3, E.in); textIn($('rTitle'), t, 58.9, 66.3, { dy: 40 }); textIn($('rSub'), t, 59.2, 66.3, { dy: 20 });
+      st('rLine', { transform: `scaleX(${p(t, 59.6, 64.2, E.inO)})`, opacity: out });
+      etappen.forEach((e, i) => { const tt = 59.6 + i * 1.05; const n = $('rn' + i); textIn(n, t, tt, 66.3, { dy: 34 });
+        const dot = n.querySelector('.rdot'); const pk = p(t, tt, tt + 0.5, E.back);
+        dot.style.transform = `scale(${lerp(0.3, 1, pk)})`;
+        if (i === 0) dot.style.boxShadow = `0 0 0 ${10 + 8 * Math.sin(t * 4)}px rgb(168 79 31 / 0.25), 0 0 40px rgb(224 138 90 / 0.6)`; }); } }
+}
+window.seek = seek; seek(0);
+</script>
+</body>
+</html>
