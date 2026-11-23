@@ -212,3 +212,14 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** Vorübergehend, meist nur Stunden bis Tage im Frühling. Gleiche Regel wie im Profil (je Wettbewerb) wäre ein kleiner Fix; zusammen mit Hinweis 5 aus #81 («Form 2027 im Frühling prüfen») ansehen.
 
+### 2026-11-23 — Andere lange Tabellen der Verwaltung scrollen am PC in ihrer Box, Spaltentitel kleben nicht
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/lib/design/pc-layout.css` (`.tabelle-lang`), Tabellen in `src/routes/verwaltung/` (Verlauf, Briefe, Anmeldungslisten, Anlass-Antworten).
+
+**Beobachtung:** Nur die Mitgliederliste hat klebende Spaltentitel (`.tabelle-lang`). Die übrigen Tabellen bleiben eigene Scrollbereiche; scrollt man eine lange Liste, verschwinden ihre Spaltentitel. Dazu war die Mitgliederliste mit langen E-Mails breiter als ihr Platz, obwohl das Leitbild sagt, Tabellen passten ab `60rem`. Bei anderen Tabellen ist das nicht geprüft.
+
+**Ursprung:** Rückmeldung des Projektleiters zur Mitgliederliste, Branch fix/verwaltung-rueckmeldung.
+
+**Einschätzung:** `.tabelle-lang` auf weitere lange Listen übertragen, jeweils mit `.zelle-dehnbar` und einem E2E im schmalsten PC-Fenster. Passt eventuell zu #92 (Spalten sortieren und ziehen).
