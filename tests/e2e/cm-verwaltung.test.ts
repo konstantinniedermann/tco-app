@@ -108,13 +108,21 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 	await expect(page.getByText('Noch keine Anmeldungen.')).toBeVisible();
 
 	// FR-46: Von Hand anmelden; R8 passt nicht zu R1–R6, der CM-Admin meldet trotzdem an.
+	// FR-56: Er nimmt das vorbelegte Häkchen weg; auch «Trotzdem anmelden» meldet dann nichts
+	// (geprüft nach der Meldung zum Verschieben).
 	await page.getByRole('button', { name: 'Von Hand anmelden' }).click();
 	const anmelden = page.getByRole('dialog', { name: 'Von Hand anmelden' });
+	const anmeldenHaekchen = anmelden.getByRole('checkbox', { name: 'Mitglied benachrichtigen' });
+	await expect(anmeldenHaekchen).toBeChecked();
+	await anmeldenHaekchen.uncheck();
 	await anmelden.getByLabel('Mitglied suchen').fill(nachname);
 	await anmelden.getByRole('radio', { name: new RegExp(`${nachname}, Bruno`) }).check();
+	// Eine Wahl danach lässt das Häkchen, wie der CM-Admin es gesetzt hat.
+	await expect(anmeldenHaekchen).not.toBeChecked();
 	await expect(anmelden).toContainText('R8 · männlich · 1985');
 	await anmelden.getByRole('button', { name: 'Anmelden', exact: true }).click();
 	await expect(anmelden.getByRole('alert')).toHaveText('Passt nicht zur Kategorie.');
+	await expect(anmeldenHaekchen).not.toBeChecked();
 	await pruefeBildschirm(page, info, 'cm-von-hand-warnung');
 	await anmelden.getByRole('button', { name: 'Trotzdem anmelden' }).click();
 	await expect(anmelden).toBeHidden();
@@ -123,32 +131,29 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 	await expect(zeile(page, nachname)).toContainText('R8');
 	await expect(zeile(page, nachname)).toContainText('bestätigt');
 	await pruefeBildschirm(page, info, 'cm-anmeldungen-liste');
-	// FR-47, DS-05: Die Meldung an den Spieler nennt keinen anderen Namen.
-	const angemeldet = await warteAufMail(
-		spieler.email,
-		'Clubmeisterschaft',
-		'hat dich in «Herren R1–R6» angemeldet'
-	);
-	expect(angemeldet).toContain(
-		'Der CM-Admin hat dich in «Herren R1–R6» angemeldet. Gegner sehen deine E-Mail und Telefonnummer.'
-	);
-	expect(angemeldet).not.toContain('Cyrill');
 
-	// FR-46: Verschieben in die passende Kategorie, ohne Warnung. FR-56: Das Häkchen ist gesetzt;
-	// der CM-Admin nimmt es weg, der Spieler bekommt keine Meldung (geprüft nach dem Löschen).
+	// FR-46: Verschieben in die passende Kategorie, ohne Warnung, mit vorbelegtem Häkchen.
 	await waehleAktion(page, zeile(page, nachname), 'Verschieben');
 	const verschieben = page.getByRole('dialog', { name: 'Verschieben' });
-	const haekchen = verschieben.getByRole('checkbox', { name: 'Mitglied benachrichtigen' });
-	await expect(haekchen).toBeChecked();
-	await haekchen.uncheck();
-	// Eine Wahl danach lässt das Häkchen, wie der CM-Admin es gesetzt hat.
+	await expect(
+		verschieben.getByRole('checkbox', { name: 'Mitglied benachrichtigen' })
+	).toBeChecked();
 	await verschieben.getByRole('radio', { name: 'Herren R7–R9' }).check();
-	await expect(haekchen).not.toBeChecked();
-	await pruefeBildschirm(page, info, 'cm-verschieben-ohne-meldung');
 	await verschieben.getByRole('button', { name: 'Verschieben', exact: true }).click();
 	await expect(verschieben).toBeHidden();
 	await expect(page.getByText('Verschoben.', { exact: true })).toBeVisible();
 	await expect(page.getByText('Noch keine Anmeldungen.')).toBeVisible();
+	// FR-47, DS-05: Die Meldung an den Spieler nennt keinen anderen Namen.
+	const verschoben = await warteAufMail(
+		spieler.email,
+		'Clubmeisterschaft',
+		'Der CM-Admin hat dich von «Herren R1–R6» nach «Herren R7–R9» verschoben.'
+	);
+	expect(verschoben).not.toContain('Cyrill');
+	// FR-56: Das Anmelden ohne Häkchen (über «Trotzdem anmelden») hat nichts gemeldet.
+	expect(
+		(await mailTexte(spieler.email, 'Clubmeisterschaft')).filter((t) => t.includes('angemeldet'))
+	).toEqual([]);
 
 	await page.getByRole('link', { name: `‹ ${turnier}` }).click();
 	await expect(page.getByRole('heading', { level: 1, name: turnier })).toBeVisible();
@@ -182,11 +187,11 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 		'Clubmeisterschaft',
 		'Der CM-Admin hat deine Anmeldung für «Herren R7–R9» gelöscht.'
 	);
-	// FR-56: Die Meldung zum Löschen ist da, die zum Verschieben (ohne Häkchen) und zur
-	// Klassierung (Häkchen leer) nicht: genau die zwei Meldungen mit Häkchen.
+	// FR-56: genau die zwei Meldungen mit Häkchen (Verschieben, Löschen); keine zum Anmelden ohne
+	// Häkchen und keine zur Klassierung (Häkchen leer).
 	const meldungen = await mailTexte(spieler.email, 'Clubmeisterschaft');
+	expect(meldungen.filter((t) => t.includes('verschoben.'))).toHaveLength(1);
 	expect(meldungen.filter((t) => t.includes('gelöscht.'))).toHaveLength(1);
-	expect(meldungen.filter((t) => t.includes('verschoben'))).toEqual([]);
 	expect(meldungen.filter((t) => t.includes('Klassierung'))).toEqual([]);
 	expect(meldungen).toHaveLength(2);
 
