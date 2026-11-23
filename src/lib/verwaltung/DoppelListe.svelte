@@ -74,6 +74,8 @@
 	const WEG = 'Diese Anmeldung gibt es nicht mehr.';
 	const ANFRAGE_WEG = 'Diese Anfrage gibt es nicht mehr.';
 	const VORBEREITUNG = 'Das Turnier ist noch in Vorbereitung.';
+	// FR-56: Im Doppel gilt das Häkchen für alle Beteiligten.
+	const SPIELER = 'Spieler benachrichtigen';
 
 	let titel = $state<HTMLHeadingElement>();
 	let rueckmeldung = $state<string | null>(null);
@@ -436,11 +438,13 @@
 		trotzdemTaste="Trotzdem anmelden"
 		bereit={erster !== null}
 		namen={namenVon([erster, zweiter].filter((t) => t !== null))}
-		aktion={(trotzdem) =>
+		benachrichtigen={{ standard: true, text: SPIELER }}
+		aktion={(trotzdem, benachrichtigen) =>
 			meldeDoppelAn(
 				kategorieId,
 				zweiter ? [erster!.mitgliedId, zweiter.mitgliedId] : [erster!.mitgliedId],
-				trotzdem
+				trotzdem,
+				benachrichtigen
 			)}
 		erfolg="Angemeldet."
 		folgen={{
@@ -487,8 +491,15 @@
 		trotzdemTaste="Trotzdem ändern"
 		bereit={bleibtId !== null}
 		namen={neu ? [text(neu)] : []}
-		aktion={(trotzdem) =>
-			aenderePartner(gewaehlt!.anmeldungId, bleibtId!, neu?.mitgliedId ?? null, trotzdem)}
+		benachrichtigen={{ standard: true, text: SPIELER }}
+		aktion={(trotzdem, benachrichtigen) =>
+			aenderePartner(
+				gewaehlt!.anmeldungId,
+				bleibtId!,
+				neu?.mitgliedId ?? null,
+				trotzdem,
+				benachrichtigen
+			)}
 		erfolg="Partner geändert."
 		folgen={{
 			'schon-angemeldet': 'Der neue Partner ist hier schon zu zweit angemeldet.',
@@ -556,7 +567,9 @@
 			...(gewaehlt?.spieler ?? []),
 			...andereSuchende.filter((s) => s.anmeldungId === mitId).map((s) => s.spieler)
 		])}
-		aktion={(trotzdem) => legeZusammen(gewaehlt!.anmeldungId, mitId!, trotzdem)}
+		benachrichtigen={{ standard: true, text: SPIELER }}
+		aktion={(trotzdem, benachrichtigen) =>
+			legeZusammen(gewaehlt!.anmeldungId, mitId!, trotzdem, benachrichtigen)}
 		erfolg="Zusammengelegt."
 		folgen={{ vorbereitung: VORBEREITUNG, 'nicht-gefunden': 'Einer der beiden sucht nicht mehr.' }}
 		onfertig={fertig}
@@ -596,7 +609,9 @@
 		trotzdemTaste="Trotzdem verschieben"
 		bereit={zielId !== null && verschiebenSperre === null}
 		namen={namenVon(gewaehlt?.spieler ?? [])}
-		aktion={(trotzdem) => verschiebeAnmeldung(gewaehlt!.anmeldungId, zielId!, trotzdem)}
+		benachrichtigen={{ standard: true, text: SPIELER }}
+		aktion={(trotzdem, benachrichtigen) =>
+			verschiebeAnmeldung(gewaehlt!.anmeldungId, zielId!, trotzdem, benachrichtigen)}
 		erfolg="Verschoben."
 		folgen={{
 			'schon-angemeldet': 'Ist dort schon angemeldet.',
@@ -642,7 +657,9 @@
 		bereit={klassierungSpieler !== null &&
 			klassierung !== '' &&
 			klassierung !== klassierungSpieler.klassierung}
-		aktion={() => korrigiereKlassierung(spielerId!, klassierung as Klassierung)}
+		benachrichtigen={{ standard: false, text: SPIELER }}
+		aktion={(_, benachrichtigen) =>
+			korrigiereKlassierung(spielerId!, klassierung as Klassierung, benachrichtigen)}
 		erfolg="Klassierung gespeichert."
 		folgen={{ 'nicht-gefunden': 'Dieses Mitglied gibt es nicht mehr.' }}
 		onfertig={fertig}
@@ -688,7 +705,8 @@
 		id="doppel-loeschen"
 		titel="Anmeldung löschen?"
 		taste="Löschen"
-		aktion={() => loescheAnmeldung(gewaehlt!.anmeldungId)}
+		benachrichtigen={{ standard: true, text: SPIELER }}
+		aktion={(_, benachrichtigen) => loescheAnmeldung(gewaehlt!.anmeldungId, benachrichtigen)}
 		erfolg="Gelöscht."
 		folgen={{ 'nicht-gefunden': WEG }}
 		onfertig={fertig}
@@ -706,7 +724,9 @@
 		taste="Als Paar anmelden"
 		trotzdemTaste="Trotzdem anmelden"
 		namen={anfrage ? namenVon([anfrage.von, anfrage.an]) : []}
-		aktion={(trotzdem) => meldeAnfrageAlsPaarAn(anfrage!.anfrageId, trotzdem)}
+		benachrichtigen={{ standard: true, text: SPIELER }}
+		aktion={(trotzdem, benachrichtigen) =>
+			meldeAnfrageAlsPaarAn(anfrage!.anfrageId, trotzdem, benachrichtigen)}
 		erfolg="Als Paar angemeldet."
 		folgen={{
 			'schon-angemeldet': 'Einer der beiden ist schon zu zweit angemeldet.',
@@ -726,7 +746,8 @@
 		id="doppel-anfrage-loeschen"
 		titel="Anfrage löschen?"
 		taste="Löschen"
-		aktion={() => loescheAnfrage(anfrage!.anfrageId)}
+		benachrichtigen={{ standard: true, text: SPIELER }}
+		aktion={(_, benachrichtigen) => loescheAnfrage(anfrage!.anfrageId, benachrichtigen)}
 		erfolg="Anfrage gelöscht."
 		folgen={{ 'nicht-gefunden': ANFRAGE_WEG }}
 		onfertig={fertig}

@@ -23,6 +23,7 @@
 		unpassendText
 	} from '../../../../../../lib/verwaltung/turnier-anzeige.ts';
 	import { leiteUm } from '../../../../../../lib/verwaltung/umleiten.ts';
+	import Benachrichtigen from '../../../../../../lib/verwaltung/Benachrichtigen.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -37,6 +38,12 @@
 	let rueckmeldung = $state<string | null>(null);
 	let laeuft = $state(false);
 	let rueckfrage = $state<HTMLDialogElement>();
+	// FR-56: Häkchen «Mitglied benachrichtigen» der Rückfrage «Kategorie absagen?», beim Öffnen gesetzt.
+	let benachrichtigen = $state(true);
+	function frageAbsagen() {
+		benachrichtigen = true;
+		rueckfrage?.showModal();
+	}
 	// FR-36: Werte, die erst nach der Rückfrage «Trotzdem speichern» gelten, und wie viele Anmeldungen nicht mehr passen.
 	let warnung = $state<HTMLDialogElement>();
 	let ausstehend = $state<KategorieWerte | null>(null);
@@ -89,7 +96,7 @@
 		if (laeuft) return;
 		laeuft = true;
 		absageFehler = null;
-		const a = await sageKategorieAb(kategorie.id);
+		const a = await sageKategorieAb(kategorie.id, benachrichtigen);
 		rueckfrage?.close();
 		laeuft = false;
 		if (await leiteUm(a)) return;
@@ -169,15 +176,14 @@
 				{#if absageFehler}
 					<p class="fehler" role="alert">{absageFehler}</p>
 				{/if}
-				<button type="button" class="taste-neben" onclick={() => rueckfrage?.showModal()}
-					>Kategorie absagen</button
-				>
+				<button type="button" class="taste-neben" onclick={frageAbsagen}>Kategorie absagen</button>
 			{/if}
 		</div>
 
 		<dialog class="karte" bind:this={rueckfrage} aria-labelledby="absagen-titel">
 			<h2 id="absagen-titel">Kategorie absagen?</h2>
 			<p>Das lässt sich nicht rückgängig machen.</p>
+			<Benachrichtigen bind:an={benachrichtigen} />
 			<div class="leiste">
 				<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}
 					>Abbrechen</button

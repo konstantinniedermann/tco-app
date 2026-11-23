@@ -21,14 +21,24 @@ describe('Anfragen der Verwaltung an die Admin-Schnittstellen', () => {
 
 	it('A-ROLLE-01, RR-03: Rolle vergeben und entziehen schicken Mitglied und Rolle; 409 letzter-mytco', async () => {
 		const v = holer(json(200, {}));
-		expect(await vergibRolle(7, 'cm', v.holen)).toEqual({ art: 'ok', daten: {} });
+		expect(await vergibRolle(7, 'cm', false, v.holen)).toEqual({ art: 'ok', daten: {} });
 		expect(v.aufrufe.map((a) => [a.pfad, JSON.parse(String(a.init.body))])).toEqual([
-			['/api/admin/rollen/vergeben', { mitgliedId: 7, rolle: 'cm' }]
+			['/api/admin/rollen/vergeben', { mitgliedId: 7, rolle: 'cm', benachrichtigen: false }]
 		]);
 		const e = holer(json(409, { fehler: 'letzter-mytco' }));
-		expect(await entziehRolle(7, 'mytco', e.holen)).toEqual({ art: 'letzter-mytco' });
+		expect(await entziehRolle(7, 'mytco', false, e.holen)).toEqual({ art: 'letzter-mytco' });
 		expect(e.aufrufe.map((a) => [a.pfad, JSON.parse(String(a.init.body))])).toEqual([
-			['/api/admin/rollen/entziehen', { mitgliedId: 7, rolle: 'mytco' }]
+			['/api/admin/rollen/entziehen', { mitgliedId: 7, rolle: 'mytco', benachrichtigen: false }]
+		]);
+	});
+
+	it('FR-56: Rolle vergeben und entziehen schicken das Häkchen «Mitglied benachrichtigen»', async () => {
+		const h = holer(json(200, {}));
+		await vergibRolle(7, 'cm', true, h.holen);
+		await entziehRolle(7, 'cm', true, h.holen);
+		expect(h.aufrufe.map((a) => JSON.parse(String(a.init.body)))).toEqual([
+			{ mitgliedId: 7, rolle: 'cm', benachrichtigen: true },
+			{ mitgliedId: 7, rolle: 'cm', benachrichtigen: true }
 		]);
 	});
 

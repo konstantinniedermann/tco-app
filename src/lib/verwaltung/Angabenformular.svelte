@@ -37,6 +37,7 @@
 </script>
 
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { FELD_NAMEN } from '../feld-namen.ts';
 	import { GESCHLECHT_NAME, feldMeldung } from './anzeige.ts';
 
@@ -49,6 +50,8 @@
 		rueckmeldung?: string | null;
 		/** Die Rolle darf nur lesen: Felder gesperrt, ohne Tasten (UI-Leitbild, Baustein Nur lesen). */
 		nurLesen?: boolean;
+		/** Steht über der Taste, etwa das Häkchen «Mitglied benachrichtigen» (FR-56); zählt nicht als Änderung. */
+		vorTaste?: Snippet;
 		onspeichern: (werte: Werte) => void;
 	};
 	let {
@@ -58,6 +61,7 @@
 		nurBeiAenderung = false,
 		rueckmeldung = null,
 		nurLesen = false,
+		vorTaste,
 		onspeichern
 	}: Props = $props();
 
@@ -123,6 +127,7 @@
 		<fieldset class="nur-lesen" disabled>{@render felder()}</fieldset>
 	{:else}
 		{@render felder()}
+		{@render vorTaste?.()}
 		<button type="submit" class="taste-haupt" disabled={nurBeiAenderung && !geaendert}
 			>{knopf}</button
 		>

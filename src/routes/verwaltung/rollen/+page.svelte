@@ -109,7 +109,8 @@
 	titel="{ROLLEN_NAME[vergabeRolle]} vergeben"
 	taste="Vergeben"
 	bereit={wahl !== null}
-	aktion={() => vergibRolle(wahl!.id, vergabeRolle)}
+	benachrichtigen={{ standard: false }}
+	aktion={(_, benachrichtigen) => vergibRolle(wahl!.id, vergabeRolle, benachrichtigen)}
 	erfolg="{wahl?.name} ist jetzt {ROLLEN_NAME[vergabeRolle]}."
 	folgen={{ 'nicht-gefunden': 'Dieses Mitglied gibt es nicht mehr.' }}
 	onfertig={fertig}
@@ -134,7 +135,8 @@
 	titel="Rolle {ziel ? ROLLEN_NAME[ziel.rolle] : ''} entziehen?"
 	taste="Entziehen"
 	bereit={ziel !== null}
-	aktion={() => entziehRolle(ziel!.id, ziel!.rolle)}
+	benachrichtigen={{ standard: false }}
+	aktion={(_, benachrichtigen) => entziehRolle(ziel!.id, ziel!.rolle, benachrichtigen)}
 	erfolg="{ziel?.name} hat die Rolle {ziel ? ROLLEN_NAME[ziel.rolle] : ''} nicht mehr."
 	folgen={{ 'nicht-gefunden': 'Dieses Mitglied gibt es nicht mehr.' }}
 	onfertig={fertig}

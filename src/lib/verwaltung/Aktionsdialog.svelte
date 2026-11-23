@@ -4,11 +4,14 @@
 	Entscheidung (`neben`, z. B. «Ablehnen») und die Haupttaste. Nach `409 warnung` heisst die
 	Haupttaste «Trotzdem …» und schickt die Aktion mit `trotzdem`. Bei Erfolg und bei den Antworten
 	in `folgen` (der Stand hat sich inzwischen geändert) schliesst der Dialog und `onfertig` lädt die
-	Seite neu und sagt es in einem Satz.
+	Seite neu und sagt es in einem Satz. Mit `benachrichtigen` steht über der Haupttaste das Häkchen
+	«Mitglied benachrichtigen» (FR-56); jedes Öffnen setzt es auf den Standard, und die Haupttaste
+	schickt seinen Wert mit, auch als «Trotzdem …». Die zweite Entscheidung schickt es nicht.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { Antwort } from './api.ts';
+	import Benachrichtigen from './Benachrichtigen.svelte';
 	import { fehlerText } from './anzeige.ts';
 	import { warnungsSaetze } from './turnier-anzeige.ts';
 	import { leiteUm } from './umleiten.ts';
@@ -27,7 +30,9 @@
 		ohneHaupttaste?: boolean;
 		/** Spieler, die eine Warnung `voll` betreffen kann. */
 		namen?: string[];
-		aktion: (trotzdem: boolean) => Promise<Antwort<unknown>>;
+		/** Häkchen «Mitglied benachrichtigen»: Standard beim Öffnen und wahlweise eigener Text. */
+		benachrichtigen?: { standard: boolean; text?: string };
+		aktion: (trotzdem: boolean, benachrichtigen: boolean) => Promise<Antwort<unknown>>;
 		erfolg: string;
 		/**
 		 * Zweite Entscheidung vor der Haupttaste, mit eigenem Satz bei Erfolg; gesperrt wie die
@@ -48,6 +53,7 @@
 		bereit = true,
 		ohneHaupttaste = false,
 		namen = [],
+		benachrichtigen,
 		aktion,
 		erfolg,
 		neben,
@@ -61,13 +67,18 @@
 	let laeuft = $state(false);
 	let fehler = $state<string | null>(null);
 	let warnungen = $state<Antwort<unknown> & { art: 'warnung' }>();
+	let haekchen = $state(false);
 	// Zählt jedes Öffnen und jede neue Wahl: Eine Antwort auf einen älteren Stand zeigt keine
 	// Warnungen und Fehler mehr an und schliesst den Dialog nicht.
 	let stand = 0;
 
-	/** Öffnet den Dialog ohne Warnungen und Fehler vom letzten Mal. */
+	/**
+	 * Öffnet den Dialog ohne Warnungen und Fehler vom letzten Mal, das Häkchen auf dem Standard. Eine
+	 * neue Wahl (`verwerfe`) lässt das Häkchen, wie der Admin es gesetzt hat.
+	 */
 	export function oeffne() {
 		verwerfe();
+		haekchen = benachrichtigen?.standard ?? false;
 		dialog?.showModal();
 	}
 
@@ -79,7 +90,7 @@
 	}
 
 	async function ausfuehren(
-		los: (trotzdem: boolean) => Promise<Antwort<unknown>>,
+		los: (trotzdem: boolean, benachrichtigen: boolean) => Promise<Antwort<unknown>>,
 		satzBeiErfolg: string
 	) {
 		if (laeuft || !bereit) return;
@@ -88,7 +99,7 @@
 		// Wirft etwas (z. B. das Neuladen in `onfertig`), bleibt die Haupttaste nicht gesperrt.
 		try {
 			const nr = stand;
-			const a = await los(warnungen !== undefined);
+			const a = await los(warnungen !== undefined, haekchen);
 			if (await leiteUm(a)) {
 				dialog?.close();
 				return;
@@ -117,6 +128,9 @@
 <dialog class="karte" bind:this={dialog} aria-labelledby="{id}-titel" onclose={onschliessen}>
 	<h2 id="{id}-titel">{titel}</h2>
 	{@render children()}
+	{#if benachrichtigen && !ohneHaupttaste}
+		<Benachrichtigen bind:an={haekchen} text={benachrichtigen.text} />
+	{/if}
 	{#if warnungen}
 		<div role="alert">
 			<ul>

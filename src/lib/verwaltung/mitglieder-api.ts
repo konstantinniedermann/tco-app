@@ -61,13 +61,22 @@ export const legeMitgliedAn = (angaben: object, holen: Holen = fetch) =>
 export const ladeMitglied = (id: number, holen: Holen = fetch) =>
 	lese<MitgliedDetail>(`${ADMIN}/mitglieder/${id}`, holen);
 
-/** `vorher`: die Angaben, wie die Seite sie geladen hat; der Server speichert nur, wenn sie noch gelten. */
+/**
+ * `vorher`: die Angaben, wie die Seite sie geladen hat; der Server speichert nur, wenn sie noch
+ * gelten. `benachrichtigen`: das Häkchen «Mitglied benachrichtigen» (FR-56).
+ */
 export const speichereAngaben = (
 	id: number,
 	angaben: object,
 	vorher: object,
+	benachrichtigen: boolean,
 	holen: Holen = fetch
-) => schicke<{ geaendert: string[] }>(`${ADMIN}/mitglieder/${id}`, { ...angaben, vorher }, holen);
+) =>
+	schicke<{ geaendert: string[] }>(
+		`${ADMIN}/mitglieder/${id}`,
+		{ ...angaben, vorher, benachrichtigen },
+		holen
+	);
 
 export const beendeSitzungen = (id: number, holen: Holen = fetch) =>
 	schicke<Record<string, never>>(`${ADMIN}/mitglieder/${id}/sitzungen`, {}, holen);
@@ -78,10 +87,20 @@ const mitgliedschaft =
 	(id: number, holen: Holen = fetch) =>
 		schicke<Record<string, never>>(`${ADMIN}/mitglieder/${id}/${aktion}`, {}, holen);
 
+/** Wie `mitgliedschaft`, mit dem Häkchen «Mitglied benachrichtigen» (FR-56). */
+const zugangWieder =
+	(aktion: string) =>
+	(id: number, benachrichtigen: boolean, holen: Holen = fetch) =>
+		schicke<Record<string, never>>(
+			`${ADMIN}/mitglieder/${id}/${aktion}`,
+			{ benachrichtigen },
+			holen
+		);
+
 export const erfasseAustritt = mitgliedschaft('austritt');
-export const erfasseWiedereintritt = mitgliedschaft('wiedereintritt');
+export const erfasseWiedereintritt = zugangWieder('wiedereintritt');
 export const loescheMitglied = mitgliedschaft('loeschen');
-export const nimmLoeschungZurueck = mitgliedschaft('loeschen-rueckgaengig');
+export const nimmLoeschungZurueck = zugangWieder('loeschen-rueckgaengig');
 
 /** DS-07: alles, was MyTCO zu dem Mitglied speichert. */
 export const ladeAuskunft = (id: number, holen: Holen = fetch) =>

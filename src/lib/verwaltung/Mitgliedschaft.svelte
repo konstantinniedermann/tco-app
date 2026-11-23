@@ -2,6 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { type Antwort } from './api.ts';
+	import Benachrichtigen from './Benachrichtigen.svelte';
 	import {
 		erfasseWiedereintritt,
 		loescheMitglied,
@@ -39,6 +40,8 @@
 	let zurueckFrage = $state<HTMLDialogElement>();
 	// Welchen Schritt die Rückfrage «… bekommt die Rolle(n) … zurück» bestätigt.
 	let zurueck = $state<'wiedereintritt' | 'rueckgaengig'>('wiedereintritt');
+	// FR-56: Häkchen «Mitglied benachrichtigen» der Rückfrage, beim Öffnen leer.
+	let benachrichtigen = $state(false);
 	// Daten der Rückfragen: nur zur Anzeige, der Server rechnet selbst.
 	let frist = $state('');
 	let loeschDatum = $state('');
@@ -60,13 +63,15 @@
 
 	// RR-08: Gespeicherte Admin-Rollen wirken wieder, sobald das Login zurückkommt; dann erst
 	// nachfragen. «Löschung rückgängig» gibt das Login nur zurück, wenn das Mitglied vorher aktiv war.
+	// Ohne Rückfrage gibt es kein Häkchen: Das Mitglied bekommt keine Meldung (FR-56).
 	function frageZurueck(art: 'wiedereintritt' | 'rueckgaengig') {
 		const loginKommt = art === 'wiedereintritt' || davor === 'aktiv';
 		if (detail.rollen.length === 0 || !loginKommt) {
-			fuehreAus(ZURUECK[art]);
+			fuehreAus((id) => ZURUECK[art](id, false));
 			return;
 		}
 		zurueck = art;
+		benachrichtigen = false;
 		zurueckFrage?.showModal();
 	}
 
@@ -226,12 +231,15 @@
 			: `Löschung von ${name} rückgängig machen?`}
 	</h2>
 	<p>{detail.angaben.vorname} bekommt die {rollenWort} {rollen} zurück.</p>
+	<Benachrichtigen bind:an={benachrichtigen} />
 	<div class="leiste">
 		<button type="button" class="taste-neben" onclick={() => zurueckFrage?.close()}
 			>Abbrechen</button
 		>
-		<button type="button" class="taste-haupt" onclick={() => fuehreAus(ZURUECK[zurueck])}
-			>Weiter</button
+		<button
+			type="button"
+			class="taste-haupt"
+			onclick={() => fuehreAus((id) => ZURUECK[zurueck](id, benachrichtigen))}>Weiter</button
 		>
 	</div>
 </dialog>

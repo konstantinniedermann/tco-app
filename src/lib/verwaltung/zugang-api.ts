@@ -22,13 +22,34 @@ export const bestaetige = (code: string, holen: Holen = fetch) =>
 export const ladeRollenListe = (holen: Holen = fetch) =>
 	lese<RollenListe>(`${ADMIN}/rollen`, holen);
 
-/** A-ROLLE-01: gibt einem Mitglied eine Rolle (nur MyTCO-Admin). */
-export const vergibRolle = (mitgliedId: number, rolle: Rolle, holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/rollen/vergeben`, { mitgliedId, rolle }, holen);
+/**
+ * A-ROLLE-01: gibt einem Mitglied eine Rolle (nur MyTCO-Admin). `benachrichtigen`: das Häkchen
+ * «Mitglied benachrichtigen» (FR-56).
+ */
+export const vergibRolle = (
+	mitgliedId: number,
+	rolle: Rolle,
+	benachrichtigen: boolean,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/rollen/vergeben`,
+		{ mitgliedId, rolle, benachrichtigen },
+		holen
+	);
 
 /** A-ROLLE-01, RR-03: nimmt einem Mitglied eine Rolle; der letzte MyTCO-Admin behält seine. */
-export const entziehRolle = (mitgliedId: number, rolle: Rolle, holen: Holen = fetch) =>
-	schicke<Record<string, never>>(`${ADMIN}/rollen/entziehen`, { mitgliedId, rolle }, holen);
+export const entziehRolle = (
+	mitgliedId: number,
+	rolle: Rolle,
+	benachrichtigen: boolean,
+	holen: Holen = fetch
+) =>
+	schicke<Record<string, never>>(
+		`${ADMIN}/rollen/entziehen`,
+		{ mitgliedId, rolle, benachrichtigen },
+		holen
+	);
 
 /**
  * Schaltet «Ansicht als …» ein. Läuft schon eine Ansicht, beendet die Seite sie zuerst: Von einer
