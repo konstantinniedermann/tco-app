@@ -640,6 +640,9 @@ Seite *Auskunft*.
 Lange Wörter („Clubmeisterschaft") werden getrennt statt abgeschnitten (`hyphens: auto`
 auf `body`, Sprache `de-CH` in `src/app.html`). Ausnahme sind Tabellenköpfe (`.tabelle th`):
 Sie trennen nicht, weil die Tabelle auf schmalem Bildschirm ohnehin waagrecht scrollt.
+Nicht jeder Browser hat ein Trennwörterbuch; dann bricht `overflow-wrap: break-word` auf `body`
+das Wort um. Das greift in einem Flex-Kind nur mit `min-width: 0`: Textblöcke neben einem Symbol
+(z. B. Seiteninfo) brauchen es.
 
 ## Mockups
 
