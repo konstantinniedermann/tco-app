@@ -9,6 +9,7 @@
 // des Abrufs, den die Seite ohnehin stellt. So entsteht keine zusätzliche Anfrage.
 import { redirect } from '@sveltejs/kit';
 import { goto } from '$app/navigation';
+import { vergissTabellen } from '../verwaltung/tabellen-gedaechtnis.ts';
 import { resolve } from '$app/paths';
 import { laeuftVomSymbol, zeigeEinstieg } from '../hilfe/geraet.ts';
 import { holeSpeicher, leseMailanfrage } from './mailanfrage.ts';
@@ -94,6 +95,7 @@ export function leiteUmBeimLaden<A extends { art: string }, F extends Zugangsfal
 	fall: F
 ): asserts r is Exclude<A, { art: Woerter[F] }> {
 	const ziel = zielOhneZugang(r.art, fall, LAGE_IM_BROWSER);
+	if (r.art === 'abgemeldet') vergissTabellen();
 	if (ziel !== null) redirect(307, ziel);
 }
 
@@ -109,6 +111,8 @@ export async function leiteUmNachAktion(
 	weg: 'wechsel' | 'ganz-neu' = 'wechsel'
 ): Promise<boolean> {
 	const ziel = zielOhneZugang(r.art, fall, LAGE_IM_BROWSER);
+	// #92: Getippte Namen in Filtern und Suche bleiben nicht für die nächste Person im Tab.
+	if (r.art === 'abgemeldet') vergissTabellen();
 	if (ziel === null) return false;
 	if (weg === 'ganz-neu') window.location.assign(ziel);
 	else await goto(resolve(ziel));

@@ -228,6 +228,8 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Einschätzung:** `.tabelle-lang` auf weitere lange Listen übertragen, jeweils mit `.zelle-dehnbar` und einem E2E im schmalsten PC-Fenster. Passt eventuell zu #92 (Spalten sortieren und ziehen).
 
+**Nachtrag 2026-11-23 (#92):** Verlauf und Briefe haben jetzt die *Tabellen-Steuerung* (Box scrollt, Titel kleben in der Box). Offen bleiben Anmeldelisten, Anlass-Antworten, Fairgate, Posteingang und Mitteilungen.
+
 ### 2026-11-23 — Folgen-Schalter: drei kleine Lücken auf Teamseite und Profil
 
 **Thema:** Oberfläche
@@ -291,6 +293,8 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 **Ursprung:** Nachführen des Design Systems in #93, Session vom 23.11.2026.
 
 **Einschätzung:** Ein ganzer Abgleich (Bausteine, Tokens, `bundle.css` aus den aufgeteilten Dateien) lohnt sich vor dem nächsten grösseren Oberflächen-Entwurf; sonst genügt es, wie in #93 die Repo-Dateien einzubinden.
+
+**Nachtrag 2026-11-23 (#92):** Auch der Baustein *Tabellen-Steuerung* fehlt im Design System; der Entwurf zu #92 band ebenfalls die Stil-Dateien aus dem Repo ein.
 
 ### 2026-11-23 — Kaltstart von Docker Desktop über make db noch nicht echt ausprobiert
 

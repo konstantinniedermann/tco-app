@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq, gte, ilike, inArray, lt, or, sql, type SQL } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { DbOderTx } from '../db/index.ts';
 import { aenderung, mitglied } from '../db/schema.ts';
@@ -24,6 +24,41 @@ export type Aktion =
 	// FR-46, FR-08: jede Änderung des CM-Admins an einer Anmeldung, neutral: ohne Kategorie,
 	// Wildcard oder Entscheid, weil auch der Mitglieder-Admin den Verlauf sieht.
 	| 'cm-anmeldung-geaendert';
+
+// Record statt Liste: Kommt eine Aktion dazu, meldet der Compiler die Lücke hier (Filter «Was», #92).
+export const AKTIONEN: Record<Aktion, true> = {
+	angelegt: true,
+	'feld-geaendert': true,
+	'rolle-vergeben': true,
+	'rolle-entzogen': true,
+	'sitzungen-beendet': true,
+	'fairgate-uebertragen': true,
+	ausgetreten: true,
+	wiedereingetreten: true,
+	'loeschung-vorgemerkt': true,
+	'loeschung-zurueckgenommen': true,
+	'auskunft-erstellt': true,
+	'brief-code-ausgestellt': true,
+	'cm-anmeldung-geaendert': true
+};
+export const istAktion = (s: string): s is Aktion => Object.hasOwn(AKTIONEN, s);
+
+/** Filter des Verlaufs (#92); alle zusammen (und). */
+export type VerlaufFilter = {
+	mitgliedId?: number;
+	grenze?: number;
+	/** Zeitraum [von, bisVor), Grenzen am Beginn eines Zürcher Tages. */
+	von?: Date;
+	bisVor?: Date;
+	/** Enthält, ohne Gross/Klein: «Nachname, Vorname» des Urhebers; «MyTCO» trifft die automatischen. */
+	wer?: string;
+	/** Enthält, ohne Gross/Klein: «Nachname, Vorname» des Mitglieds. */
+	name?: string;
+	was?: readonly Aktion[];
+};
+
+/** Text für ILIKE «enthält»: Platzhalter und der Rückstrich gelten wörtlich. */
+const enthaelt = (text: string) => `%${text.replace(/[\\%_]/g, (z) => `\\${z}`)}%`;
 
 // FR-26: `detail` enthält nur einen Feld- oder Rollennamen, nie einen Wert.
 export type Eintrag = { aktion: Aktion; detail?: string };
@@ -77,9 +112,31 @@ export type VerlaufZeile = {
 export async function ladeVerlauf(
 	db: DbOderTx,
 	// Ohne `grenze` kommen alle Einträge.
-	filter: { mitgliedId?: number; grenze?: number }
+	filter: VerlaufFilter
 ): Promise<VerlaufZeile[]> {
 	const urheber = alias(mitglied, 'urheber');
+	const bedingungen: (SQL | undefined)[] = [];
+	if (filter.mitgliedId !== undefined)
+		bedingungen.push(eq(aenderung.mitgliedId, filter.mitgliedId));
+	if (filter.von) bedingungen.push(gte(aenderung.zeitpunkt, filter.von));
+	if (filter.bisVor) bedingungen.push(lt(aenderung.zeitpunkt, filter.bisVor));
+	if (filter.was && filter.was.length > 0)
+		bedingungen.push(inArray(aenderung.aktion, [...filter.was]));
+	if (filter.name)
+		bedingungen.push(
+			ilike(sql`${mitglied.nachname} || ', ' || ${mitglied.vorname}`, enthaelt(filter.name))
+		);
+	if (filter.wer) {
+		const name = ilike(
+			sql`${urheber.nachname} || ', ' || ${urheber.vorname}`,
+			enthaelt(filter.wer)
+		);
+		bedingungen.push(
+			'mytco'.includes(filter.wer.toLowerCase())
+				? or(name, eq(aenderung.urheberArt, 'automatisch'))
+				: name
+		);
+	}
 	const abfrage = db
 		.select({
 			id: aenderung.id,
@@ -97,9 +154,7 @@ export async function ladeVerlauf(
 		.from(aenderung)
 		.innerJoin(mitglied, eq(mitglied.id, aenderung.mitgliedId))
 		.leftJoin(urheber, eq(urheber.id, aenderung.urheberMitgliedId))
-		.where(
-			filter.mitgliedId === undefined ? undefined : eq(aenderung.mitgliedId, filter.mitgliedId)
-		)
+		.where(and(...bedingungen))
 		.orderBy(desc(aenderung.zeitpunkt), desc(aenderung.id));
 	const zeilen = await (filter.grenze === undefined ? abfrage : abfrage.limit(filter.grenze));
 	return zeilen.map((z) => ({

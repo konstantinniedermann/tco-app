@@ -7,6 +7,8 @@ import {
 	geaendertText,
 	neueAngaben,
 	plakette,
+	kontoZustand,
+	KONTO_ZUSTAENDE,
 	rollenText,
 	datumText,
 	datumZeitText,
@@ -79,6 +81,23 @@ describe('Texte der Verwaltung', () => {
 		expect(plakette({ login: 'eingeloggt', status: 'aktiv' }).text).toBe('aktiv');
 		expect(plakette({ login: 'eingeloggt', status: 'ausgetreten' }).text).toBe('ausgetreten');
 		expect(plakette({ login: 'ohne-brief', status: 'aktiv' }).text).toBe('ohne Brief');
+	});
+
+	it('#92: Kontozustand als Schlüssel für den Filter, in der Reihenfolge der Plaketten', () => {
+		expect(kontoZustand({ login: 'eingeloggt', status: 'aktiv' })).toBe('aktiv');
+		expect(kontoZustand({ login: 'brief-offen', status: 'aktiv' })).toBe('brief-offen');
+		expect(kontoZustand({ login: 'ohne-brief', status: 'aktiv' })).toBe('ohne-brief');
+		expect(kontoZustand({ login: 'gesperrt', status: 'aktiv' })).toBe('gesperrt');
+		expect(kontoZustand({ login: 'eingeloggt', status: 'ausgetreten' })).toBe('ausgetreten');
+		expect(kontoZustand({ login: 'brief-offen', status: 'vorgemerkt' })).toBe('vorgemerkt');
+		expect(KONTO_ZUSTAENDE.map((z) => z.text)).toEqual([
+			'aktiv',
+			'Brief offen',
+			'ohne Brief',
+			'gesperrt',
+			'ausgetreten',
+			'wird gelöscht'
+		]);
 	});
 
 	it('A-KONTO-02: Geändert fasst die Adressfelder zusammen', () => {
