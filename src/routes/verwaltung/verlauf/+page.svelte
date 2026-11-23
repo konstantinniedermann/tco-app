@@ -3,6 +3,7 @@
 	import { MELDUNG } from '../../../lib/login/anmelden.ts';
 	import type { VerlaufEintrag } from '../../../lib/verwaltung/mitglieder-api.ts';
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
+	import Seiteninfo from '../../../lib/verwaltung/Seiteninfo.svelte';
 	import { aktionText, zeitText } from '../../../lib/verwaltung/anzeige.ts';
 	import type { PageProps } from './$types';
 
@@ -41,11 +42,13 @@
 >
 	<h1>Änderungsverlauf</h1>
 </Seitenkopf>
+<Seiteninfo>
+	<p>Wer wann an welchem Mitglied etwas geändert hat, ohne alte und neue Werte.</p>
+</Seiteninfo>
 <p class="leise">
 	{mitglied === undefined
 		? 'Die letzten 100 Einträge, neueste zuerst.'
 		: 'Nur dieses Mitglied, neueste zuerst.'}
-	Ohne alte und neue Werte.
 	{#if mitglied !== undefined}
 		<a href={resolve('/verwaltung/verlauf')}>Alle anzeigen</a>
 	{/if}

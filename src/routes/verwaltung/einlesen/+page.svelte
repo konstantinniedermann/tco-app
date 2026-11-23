@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
+	import Seiteninfo from '../../../lib/verwaltung/Seiteninfo.svelte';
 	import { asset, resolve } from '$app/paths';
 	import {
 		liesMitgliederEin,
@@ -111,9 +112,13 @@
 <Seitenkopf>
 	<h1>Einlesen</h1>
 </Seitenkopf>
-<p class="leise">
-	Neue Mitglieder aus einer CSV-Datei anlegen. Wer schon in MyTCO ist, bleibt unverändert.
-</p>
+<Seiteninfo>
+	<p>
+		Für das erste Einlesen oder wenn viele Mitglieder auf einmal dazukommen: neue Mitglieder aus
+		einer CSV-Datei anlegen; wer schon in MyTCO ist, bleibt unverändert.
+	</p>
+	<p>Einzelne Mitglieder kommen unter «Mitglieder» über «Mitglied anlegen» dazu.</p>
+</Seiteninfo>
 
 {#if angelegt !== null}
 	<div class="karte" role="status">

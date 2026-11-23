@@ -100,11 +100,9 @@ test('A-LOGIN-01: Serie – Auswahl, Rückfrage, Druckansicht, Code meldet an', 
 	await meldeAdminAn(page);
 	await oeffneBriefe(page);
 
-	await expect(
-		page.getByText(
-			'Mitglieder, die MyTCO noch nie geöffnet haben. Ein neuer Code ersetzt den alten.'
-		)
-	).toBeVisible();
+	await expect(page.getByRole('note', { name: 'Über diese Seite' })).toContainText(
+		'für Mitglieder, die MyTCO noch nie geöffnet haben; ein neuer Code ersetzt den alten.'
+	);
 	const z = zeile(page, name);
 	await expect(z).toContainText('noch kein Brief');
 	const erzeugen = page.getByRole('button', { name: /^Briefe erzeugen \(\d+\)$/ });

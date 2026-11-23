@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
+	import Seiteninfo from '../../../lib/verwaltung/Seiteninfo.svelte';
 	import { invalidate } from '$app/navigation';
 	import { uebertrageFairgate } from '../../../lib/verwaltung/mitglieder-api.ts';
 	import {
@@ -44,10 +45,12 @@
 <Seitenkopf>
 	<h1>Für Fairgate</h1>
 </Seitenkopf>
-<p class="leise">
-	Diese Mitglieder haben Angaben in MyTCO selbst geändert.
-	{#if darfAbhaken}Trag die neuen Werte in Fairgate nach und hake dann ab.{/if}
-</p>
+<Seiteninfo>
+	<p>
+		Änderungen, die Mitglieder in MyTCO selbst gemacht haben, zum Übernehmen ins Mitgliedersystem
+		Fairgate; danach abhaken.
+	</p>
+</Seiteninfo>
 
 {#if meldung}
 	<p class="hinweis" role="status">{meldung}</p>

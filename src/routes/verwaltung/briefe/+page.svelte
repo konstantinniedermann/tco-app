@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Seitenkopf from '../../../lib/verwaltung/Seitenkopf.svelte';
+	import Seiteninfo from '../../../lib/verwaltung/Seiteninfo.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { tick } from 'svelte';
 	import Briefdruck from '../../../lib/verwaltung/Briefdruck.svelte';
@@ -93,9 +94,16 @@
 	<Seitenkopf>
 		<h1 tabindex="-1" bind:this={titel}>Briefe</h1>
 	</Seitenkopf>
-	<p class="leise">
-		Mitglieder, die MyTCO noch nie geöffnet haben. Ein neuer Code ersetzt den alten.
-	</p>
+	<Seiteninfo>
+		<p>
+			Der erste Brief mit Anmeldecode, für Mitglieder, die MyTCO noch nie geöffnet haben; ein neuer
+			Code ersetzt den alten.
+		</p>
+		<p>
+			<strong>Nicht für verlorene Zugänge:</strong> Wer sich nicht mehr anmelden kann, holt sich beim
+			Login selbst einen «Code per E-Mail».
+		</p>
+	</Seiteninfo>
 
 	{#if darfErzeugen && zeilen.length > 0}
 		<div class="leiste">

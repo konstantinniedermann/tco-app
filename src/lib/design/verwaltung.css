@@ -62,6 +62,35 @@
 	min-width: 0;
 }
 
+/* Seiteninfo (nur Verwaltung): wozu die Seite da ist, direkt unter dem Seitenkopf; ohne Aktion */
+.seiteninfo {
+	display: flex;
+	gap: var(--abstand-2);
+	align-items: flex-start;
+	max-width: var(--breite-inhalt);
+	margin: 0 0 var(--abstand-4);
+	padding: var(--abstand-3);
+	background: var(--farbe-flaeche);
+	border-left: var(--rand-akzent) solid var(--farbe-marke);
+	border-radius: var(--radius);
+	color: var(--farbe-text);
+	font-size: var(--groesse-klein);
+}
+
+.seiteninfo p {
+	margin: 0;
+}
+
+.seiteninfo p + p {
+	margin-top: var(--abstand-1);
+}
+
+/* Zusatz zu .symbol (Grösse und Strich von dort) */
+.seiteninfo-symbol {
+	flex: none;
+	color: var(--farbe-marke);
+}
+
 /* Verwaltung: Seitenleiste und Inhalt; auf schmalem Bildschirm untereinander */
 .verwaltung {
 	display: flex;
