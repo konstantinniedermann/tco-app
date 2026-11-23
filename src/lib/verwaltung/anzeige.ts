@@ -3,9 +3,14 @@ import { MELDUNG } from '../login/anmelden.ts';
 import type { Antwort, Feld } from './api.ts';
 import type { FairgateZeile, MitgliedZeile, Rolle, VerlaufEintrag } from './mitglieder-api.ts';
 import { ROLLEN_NAME } from './rollen-namen.ts';
+import type { RollenStand } from '../server/admin/rollen.ts';
 
 const NUR_ANSEHEN = 'In der Ansicht kannst du nichts speichern.';
 const KEIN_RECHT = 'Das darfst du hier nur ansehen, nicht ändern.';
+
+/** RR-03: Meldung, wenn der letzte MyTCO-Admin sich die Rolle entziehen will. */
+export const LETZTER_MYTCO =
+	'Du bist der letzte MyTCO-Admin. Gib zuerst jemand anderem die Rolle MyTCO-Admin.';
 
 /**
  * Meldung für eine Antwort, die keine Seite eigens behandelt: In der Ansicht oder ohne
@@ -13,6 +18,7 @@ const KEIN_RECHT = 'Das darfst du hier nur ansehen, nicht ändern.';
  */
 export function fehlerText(a: Antwort<unknown>): string {
 	if (a.art === 'nur-ansehen') return NUR_ANSEHEN;
+	if (a.art === 'letzter-mytco') return LETZTER_MYTCO;
 	if (a.art === 'kein-recht') return KEIN_RECHT;
 	return MELDUNG.stoerung;
 }
@@ -23,6 +29,23 @@ export function rollenText(rollen: readonly Rolle[]): string {
 		.filter((r) => rollen.includes(r))
 		.map((r) => ROLLEN_NAME[r])
 		.join(', ');
+}
+
+/** #96: Zeile der Rollen auf der Seite eines Mitglieds: «Mitglied · MyTCO-Admin · CM-Admin». */
+export function rollenZeile(rollen: readonly Rolle[]): string {
+	const namen = (Object.keys(ROLLEN_NAME) as Rolle[])
+		.filter((r) => rollen.includes(r))
+		.map((r) => ROLLEN_NAME[r]);
+	return ['Mitglied', ...namen].join(' · ');
+}
+
+/** #96: Plakette eines Rolleninhabers, der nicht aktiv ist; aktive tragen keine. */
+export function rollenStandPlakette(stand: RollenStand): { text: string; klasse: string } | null {
+	if (stand === 'ausgetreten') return { text: 'ausgetreten', klasse: 'plakette' };
+	if (stand === 'vorgemerkt')
+		return { text: 'wird gelöscht', klasse: 'plakette plakette-gesperrt' };
+	if (stand === 'gesperrt') return { text: 'gesperrt', klasse: 'plakette plakette-gesperrt' };
+	return null;
 }
 
 /** Meldung, wenn zwischen Laden und Speichern ein anderer das Mitglied geändert hat (409). */

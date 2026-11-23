@@ -10,7 +10,12 @@ import { kontoRolle } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import { erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
 import type { MitteilungAdminDienste } from '../mitteilung/typen.ts';
-import { postAustritt, postLoeschen, postRollen } from './schnittstellen.ts';
+import {
+	postAustritt,
+	postLoeschen,
+	postRolleEntziehen,
+	postRolleVergeben
+} from './schnittstellen.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
 // «Letzter Admin» ist global; darum eine eigene Datenbank statt der gemeinsamen.
@@ -66,70 +71,28 @@ async function bestaetigterMytcoAdmin(rollen: string[] = ['mytco', 'mitglieder']
 describe('Admin-Schnittstelle Rollen, eigene Datenbank', () => {
 	test('RR-03: der letzte MyTCO-Admin kann sich mytco nicht entziehen → 409 letzter-mytco', async () => {
 		const { d, admin, konto } = await bestaetigterMytcoAdmin();
-		const r = await postRollen(
+		const r = await postRolleEntziehen(
 			d,
-			ereignis({
-				body: { rollen: ['mitglieder'], vorher: ['mytco', 'mitglieder'] },
-				params: { id: String(admin.mitgliedId) },
-				konto
-			})
+			ereignis({ body: { mitgliedId: admin.mitgliedId, rolle: 'mytco' }, konto })
 		);
 		expect(r.status).toBe(409);
 		expect(await r.json()).toEqual({ fehler: 'letzter-mytco' });
 	});
 
-	test('postRollen ohne vorher → 400 eingabe', async () => {
-		const { d, admin, konto } = await bestaetigterMytcoAdmin();
-		for (const vorher of [undefined, 'mytco', ['root'], ['cm', 'cm']]) {
-			const r = await postRollen(
-				d,
-				ereignis({
-					body: { rollen: ['mytco'], vorher },
-					params: { id: String(admin.mitgliedId) },
-					konto
-				})
-			);
-			expect(r.status, JSON.stringify(vorher)).toBe(400);
-			expect(await r.json()).toEqual({ fehler: 'eingabe' });
-		}
-	});
-
-	test('postRollen: veralteter Stand → 409 veraltet', async () => {
-		const { d, admin, konto } = await bestaetigterMytcoAdmin();
-		const r = await postRollen(
-			d,
-			ereignis({
-				body: { rollen: ['mytco', 'mitglieder', 'cm'], vorher: ['mytco'] },
-				params: { id: String(admin.mitgliedId) },
-				konto
-			})
-		);
-		expect(r.status).toBe(409);
-		expect(await r.json()).toEqual({ fehler: 'veraltet' });
-	});
-
-	test('postRollen: nur Mitglieder-Admin darf keine Rollen vergeben → 403 kein-admin', async () => {
+	test('Wer mytco abgegeben hat, vergibt keine Rollen mehr → 403 kein-admin', async () => {
 		const { d, konto } = await bestaetigterMytcoAdmin();
 		const db = eigene!.db;
 		const ziel = await legeMitgliedAn(db);
 		// Der angemeldete MyTCO-Admin gibt mytco ab und hat danach nur noch mitglieder.
 		await legeMitgliedAn(db, { rollen: ['mytco'] });
-		const abgeben = await postRollen(
+		const abgeben = await postRolleEntziehen(
 			d,
-			ereignis({
-				body: { rollen: ['mitglieder'], vorher: ['mytco', 'mitglieder'] },
-				params: { id: String(konto.mitgliedId) },
-				konto
-			})
+			ereignis({ body: { mitgliedId: konto.mitgliedId, rolle: 'mytco' }, konto })
 		);
 		expect(abgeben.status).toBe(200);
-		const r = await postRollen(
+		const r = await postRolleVergeben(
 			d,
-			ereignis({
-				body: { rollen: ['cm'], vorher: [] },
-				params: { id: String(ziel.mitgliedId) },
-				konto
-			})
+			ereignis({ body: { mitgliedId: ziel.mitgliedId, rolle: 'cm' }, konto })
 		);
 		expect(r.status).toBe(403);
 		expect(await r.json()).toEqual({ fehler: 'kein-admin' });

@@ -38,14 +38,14 @@ verteilt der MyTCO-Admin die Rollen von Hand. Einzelheiten im
 
 | ID | Regel | Status |
 |----|-------|--------|
-| RR-01 | Jedes Konto hat die Rolle *Mitglied*; die vier Admin-Rollen kommen einzeln dazu. Eine Person kann mehrere Rollen haben, ihre Rechte addieren sich (FR-03). Rollen vergibt und entzieht nur der MyTCO-Admin, auch sich selbst; jede Vergabe und jeder Entzug steht im Änderungsverlauf (FR-26). Einmalige Ausnahme: Die Migration des Rollen-Umbaus (`drizzle/0009_rollen_schaerfen.sql`) gab den bisherigen Admins MyTCO- und Mitglieder-Admin ohne Verlaufseintrag | umgesetzt |
+| RR-01 | Jedes Konto hat die Rolle *Mitglied*; die vier Admin-Rollen kommen einzeln dazu. Eine Person kann mehrere Rollen haben, ihre Rechte addieren sich (FR-03). Rollen vergibt und entzieht nur der MyTCO-Admin, auch sich selbst, einzeln je Rolle auf der Seite *Rollen* (die Seite eines Mitglieds zeigt sie nur an, #96); jede Vergabe und jeder Entzug steht im Änderungsverlauf (FR-26). Einmalige Ausnahme: Die Migration des Rollen-Umbaus (`drizzle/0009_rollen_schaerfen.sql`) gab den bisherigen Admins MyTCO- und Mitglieder-Admin ohne Verlaufseintrag | umgesetzt |
 | RR-02 | Gestrichen: «Der Admin darf alles, was CM- und Lizenzverantwortlicher dürfen». Es gibt keine stille Stellvertretung: Muss jemand einspringen, gibt der MyTCO-Admin sich oder einer anderen Person die Rolle, und das steht im Änderungsverlauf (K-18.4, ändert die Antwort auf K-18.1) | verworfen (#43) |
 | RR-03 | Es bleibt immer mindestens ein MyTCO-Admin: Der letzte kann sich die Rolle nicht entziehen und sein Konto nicht löschen. Zwei MyTCO-Admins (K-18.3) sind eine Abmachung, keine Sperre | umgesetzt (Entzug der Rolle, Austritt und Vormerken zum Löschen) |
 | RR-04 | Einmal-Codes (Brief- und Mail-Code) sind nur als Hash gespeichert und nach der Ausgabe für niemanden abrufbar, auch nicht für die Verwaltung. Der Mitglieder-Admin kann einen neuen Brief-Code ausstellen, der nur den alten Brief-Code ersetzt, und alle Sitzungen eines Kontos beenden; einen Code per E-Mail holt sich das Mitglied selbst (A-LOGIN-10, [#29](https://github.com/konstantinniedermann/tco-app/issues/29)) | umgesetzt (Sitzungen beenden und neuer Brief-Code in der Verwaltung, einzeln und als Serie) |
 | RR-05 | Für die Rolle *Mitglied* gibt es kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM, bei der Wahl des Doppelpartners (nur Mitglieder, die für die Kategorie passen und noch frei sind) und in den Interclub-Einzelpartien (Daten von Swiss Tennis, nicht am Konto) | umgesetzt |
 | RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist | umgesetzt (Anmeldungen; Spiele mit dem CM-Betrieb) |
 | RR-07 | Die Verwaltung sieht nur, wer eine Admin-Rolle hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03): Mitglieder-Admin *Mitgliederverwaltung* (Mitglieder, Einlesen, Briefe, Anlässe, Mitteilungen, Für Fairgate, Verlauf), CM-Admin *Clubmeisterschaft*, Lizenz-Admin *Lizenzen*, MyTCO-Admin alle Bereiche nur lesend und dazu *Rollen*. Was eine Rolle nur lesen darf, weist der Server beim Speichern ab; ein ausgeblendeter Knopf reicht nicht | umgesetzt\* (Lizenzen mit ihrer Etappe) |
-| RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | umgesetzt (Austritt und Vormerken sperren das Login; Rollen bleiben gespeichert und wirken nach Wiedereintritt oder Rückgängig wieder; kommen dabei Admin-Rollen zurück, fragt die Verwaltung vorher nach) |
+| RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | umgesetzt (Austritt und Vormerken sperren das Login; Rollen bleiben gespeichert und wirken nach Wiedereintritt oder Rückgängig wieder; kommen dabei Admin-Rollen zurück, fragt die Verwaltung vorher nach. Die Seite *Rollen* zeigt Ausgetretene, Vorgemerkte und Gesperrte mit Vermerk, damit der MyTCO-Admin ihre Rollen vorher entziehen kann, #96) |
 | RR-09 | Wer die Verwaltung öffnet, bestätigt sie höchstens einmal pro 30 Tage mit einem frischen Code per E-Mail, mit jeder Admin-Rolle ([SI-08](sicherheitskonzept.md#vorgaben); K-12.1 hatte einmal pro Tag bestätigt, auf 30 Tage verlängert vom Projektleiter, 23.11.2026) | umgesetzt |
 | RR-10 | Ein Mitglieder-Admin erfasst weder den eigenen Austritt noch merkt er sich selbst zum Löschen vor; das macht ein anderer Mitglieder-Admin | umgesetzt |
 
@@ -89,7 +89,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Mitgliederliste einlesen (A-MITGLIED-07) | – | – | – | – | S | L |
 | Liste *Briefe*: wer MyTCO noch nie geöffnet hat (A-LOGIN-01) | – | – | – | – | S | L |
 | Neuer Code für einen Brief, Briefe auslösen, Sitzungen beenden | – | – | – | – | S | – |
-| Rollen vergeben | – | – | – | – | – | S |
+| Rollen vergeben und entziehen (Seite *Rollen*) | – | – | – | – | – | S |
 | Änderungsverlauf (FR-26) | – | – | – | – | L | L |
 | Liste *Für Fairgate*: selbst geänderte Kontaktangaben sehen und abhaken (A-KONTO-02, Annahme K-19.2) | – | – | – | – | S | L |
 | Namen anderer Mitglieder (RR-05) | – | L | L | L | S | L |

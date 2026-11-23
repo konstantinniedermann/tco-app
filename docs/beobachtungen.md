@@ -282,6 +282,30 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Stand:** Mit Zustimmung des Projektleiters als Issue #97 angelegt (23.11.2026).
 
+### 2026-11-23 — Rollen werden auf zwei Wegen geschrieben: `setzeRollen` neben `vergibRolle`/`entziehRolle`
+
+**Thema:** Architektur
+
+**Fundort:** `src/lib/server/admin/rollen.ts` (`setzeRollen`, `vergibRolle`, `entziehRolle`), `src/lib/server/admin/erster-admin.ts` (`machAdmin`), `tests/e2e/hilfen/login.ts`.
+
+**Beobachtung:** Seit #96 vergibt und entzieht die Verwaltung Rollen einzeln. `setzeRollen` (ganze Menge mit `vorher`) bleibt nur für das Skript zum ersten Admin und die E2E-Hilfe. Beide Wege enthalten die Regeln zum letzten MyTCO-Admin, zum Ende der «Ansicht als …» und zum Verlauf; eine neue Regel kann an einer Stelle fehlen. Daneben zeigt `docs/ui-mockups/index.html` noch die Taste «Rollen speichern».
+
+**Ursprung:** Review von #96, Session vom 23.11.2026.
+
+**Einschätzung:** `machAdmin` und die E2E-Hilfe auf `vergibRolle` umstellen und `setzeRollen` streichen; die Meldung «inzwischen geändert» des Skripts entfällt dann. Klein, eigener Branch.
+
+### 2026-11-23 — Neuer E2E zum Selbst-Entzug einmal auf Android in der CI rot, Ursache offen
+
+**Thema:** Tests
+
+**Fundort:** `tests/e2e/verwaltung.test.ts` («#96: MyTCO-Admin entzieht sich die Rolle und landet auf seiner übrigen Verwaltung»).
+
+**Beobachtung:** Im ersten CI-Lauf auf dem Branch von #96 war nach dem Klick auf «Entziehen» keine Rückfrage offen, die Seite stand oben (Zeitgrenze 30 s). In den zwei folgenden CI-Läufen grün (einer mit `spur=true`), lokal 20-mal grün, auch mit 25 weiteren MyTCO-Admins und auf 3 s gestreckter Aufklapp-Animation. Der Test bestätigt jetzt erst, wenn die Rückfrage den eigenen Namen nennt.
+
+**Ursprung:** CI-Lauf 45170920154 auf `feat/issue-096`, Session vom 23.11.2026.
+
+**Einschätzung:** Tritt es wieder auf, den Lauf mit `-f spur=true` wiederholen und den Trace auswerten.
+
 ### 2026-11-23 — Design System «MyTCO» steht bis auf die Seiteninfo auf dem Stand vom 09.11.
 
 **Thema:** Oberfläche
@@ -330,7 +354,7 @@ Spalte; oder sie ist ein Überbleibsel, dann Doku und Abfragen auf `mitglied.sta
 
 **Ursprung:** CI-Lauf auf `feat/issue-092`, Session vom 23.11.2026.
 
-**Einschätzung:** Langes Wort in der Seiteninfo von «Für Fairgate» bricht in WebKit/Linux nicht um (Silbentrennung fehlt dort?). Mit `gh workflow run check.yml --ref dev -f spur=true` den Trace holen.
+**Einschätzung:** Langes Wort in der Seiteninfo von «Für Fairgate» bricht in WebKit/Linux nicht um (Silbentrennung fehlt dort?). Mit `gh workflow run check.yml --ref dev -f spur=true` den Trace holen. Nachtrag: Auch in allen drei CI-Läufen auf dem Branch von #96 rot; ein Trace liegt im Artefakt `test-results-iphone` des Laufs 45172782300 (`spur=true`).
 
 ### 2026-11-23 — Caddy-Fehlerlog könnte die Abfrage samt Suchtext enthalten
 

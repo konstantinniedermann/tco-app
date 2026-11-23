@@ -31,7 +31,7 @@ import {
 	postAdminAnlaesse
 } from '../anlass/verwaltung-schnittstellen.ts';
 import { legeKategorieAn, legeTurnierAn } from '../turnier/turniere.ts';
-import { ROLLEN } from './rollen.ts';
+import { ROLLEN, ladeRollen } from './rollen.ts';
 import {
 	ADMIN_SCHNITTSTELLEN,
 	getMitglied,
@@ -39,7 +39,8 @@ import {
 	getMitglieder,
 	getRollen,
 	getVerlauf,
-	postRollen
+	postRolleEntziehen,
+	postRolleVergeben
 } from './schnittstellen.ts';
 import type { AdminDienste } from './rechte.ts';
 import { erstelleZugangDienst } from './zugang.ts';
@@ -75,7 +76,8 @@ const start = new Date('2026-11-02T12:00:00Z');
 // Schreibende Schnittstellen, die der MyTCO-Admin benutzen darf: Rollen vergeben, die eigene
 // Bestätigung der Verwaltung (SI-08) und die «Ansicht als …» seiner Sitzung.
 const ERLAUBT_FUER_MYTCO: readonly string[] = [
-	'postRollen',
+	'postRolleVergeben',
+	'postRolleEntziehen',
 	'postZugang',
 	'postZugangCode',
 	'postAnsicht',
@@ -241,36 +243,42 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		expect(s.d.mailer).not.toHaveBeenCalled();
 	});
 
-	test('MyTCO-Admin: postRollen bleibt erlaubt', async () => {
+	test('MyTCO-Admin: Rolle vergeben und entziehen bleibt erlaubt', async () => {
 		const s = baue();
 		const mytco = await bestaetigt(s, ['mytco']);
 		const ziel = await legeMitgliedAn(db());
-		const r = await postRollen(
-			s.d,
-			ereignis({
-				konto: mytco.konto,
-				body: { rollen: ['cm'], vorher: [] },
-				params: { id: String(ziel.mitgliedId) }
-			})
-		);
-		expect([r.status, await r.json()]).toEqual([200, {}]);
+		const body = { mitgliedId: ziel.mitgliedId, rolle: 'cm' };
+		for (const fn of [postRolleVergeben, postRolleEntziehen]) {
+			const r = await fn(s.d, ereignis({ konto: mytco.konto, body }));
+			expect([r.status, await r.json()]).toEqual([200, {}]);
+		}
 	});
 
-	test('Mitglieder-Admin: postRollen → 403 kein-admin', async () => {
+	test('Mitglieder-Admin und CM-Admin: Rolle vergeben und entziehen → 403 kein-admin, nichts geändert', async () => {
 		const s = baue();
-		const m = await bestaetigt(s, ['mitglieder']);
-		const ziel = await legeMitgliedAn(db());
-		const r = await postRollen(
-			s.d,
-			ereignis({
-				konto: m.konto,
-				body: { rollen: ['mytco'], vorher: [] },
-				params: { id: String(ziel.mitgliedId) }
-			})
-		);
-		expect([r.status, await r.json()]).toEqual([403, { fehler: 'kein-admin' }]);
-		const liste = await getRollen(s.d, hole(m.konto));
-		expect([liste.status, await liste.json()]).toEqual([403, { fehler: 'kein-admin' }]);
+		// Gelöscht, damit die Rolle nicht in der Übersicht von «getRollen» landet (eigene Datenbank).
+		const ziel = await legeMitgliedAn(db(), { status: 'geloescht', rollen: ['lizenz'] });
+		for (const rollen of [['mitglieder'], ['cm']] as const) {
+			const k = await bestaetigt(s, [...rollen]);
+			const vergeben = await postRolleVergeben(
+				s.d,
+				ereignis({ konto: k.konto, body: { mitgliedId: ziel.mitgliedId, rolle: 'mytco' } })
+			);
+			const entziehen = await postRolleEntziehen(
+				s.d,
+				ereignis({ konto: k.konto, body: { mitgliedId: ziel.mitgliedId, rolle: 'lizenz' } })
+			);
+			for (const r of [vergeben, entziehen]) {
+				expect([rollen[0], r.status, await r.json()]).toEqual([
+					rollen[0],
+					403,
+					{ fehler: 'kein-admin' }
+				]);
+			}
+			const liste = await getRollen(s.d, hole(k.konto));
+			expect([liste.status, await liste.json()]).toEqual([403, { fehler: 'kein-admin' }]);
+		}
+		expect(await ladeRollen(db(), ziel.kontoId)).toEqual(['lizenz']);
 	});
 
 	test('CM-Admin: getMitglieder → 403 kein-admin', async () => {
@@ -489,7 +497,7 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		}
 	});
 
-	test('getRollen listet nur aktive, nicht gesperrte Konten', async () => {
+	test('getRollen listet alle Inhaber mit Stand, ohne Gelöschte (#96)', async () => {
 		const s = baue();
 		const mytco = await bestaetigt(s, ['mytco']);
 		const aktiv = await legeMitgliedAn(db(), {
@@ -502,8 +510,24 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			nachname: 'Anfang',
 			rollen: ['lizenz']
 		});
-		const gesperrt = await legeMitgliedAn(db(), { gesperrt: true, rollen: ['lizenz', 'mytco'] });
-		const ausgetreten = await legeMitgliedAn(db(), { status: 'ausgetreten', rollen: ['lizenz'] });
+		const gesperrt = await legeMitgliedAn(db(), {
+			vorname: 'Gil',
+			nachname: 'Gesperrt',
+			gesperrt: true,
+			rollen: ['lizenz', 'mytco']
+		});
+		const ausgetreten = await legeMitgliedAn(db(), {
+			vorname: 'Ava',
+			nachname: 'Mitte',
+			status: 'ausgetreten',
+			rollen: ['lizenz']
+		});
+		const vorgemerkt = await legeMitgliedAn(db(), {
+			vorname: 'Vik',
+			nachname: 'Vorher',
+			status: 'vorgemerkt',
+			rollen: ['lizenz']
+		});
 		const geloescht = await legeMitgliedAn(db(), { status: 'geloescht', rollen: ['lizenz'] });
 
 		const r = await getRollen(s.d, hole(mytco.konto));
@@ -511,23 +535,25 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 		expect(r.headers.get('cache-control')).toBe('no-store');
 		const liste = (await r.json()) as {
 			rolle: string;
-			mitglieder: { id: number; name: string }[];
+			mitglieder: { id: number; name: string; stand: string }[];
 		}[];
 		expect(liste.map((z) => z.rolle)).toEqual([...ROLLEN]);
 		const von = (rolle: string) => liste.find((z) => z.rolle === rolle)!.mitglieder;
-		// Nach Nachname, wie die Mitgliederliste; nur Nummer und Name, keine Kontaktdaten.
+		// Nach Nachname, wie die Mitgliederliste; nur Nummer, Name und Stand, keine Kontaktdaten.
+		// Ausgetretene, Vorgemerkte und Gesperrte stehen da, damit man ihre Rollen entziehen kann.
 		expect(von('lizenz')).toEqual([
-			{ id: auchAktiv.mitgliedId, name: 'Anfang, Lou' },
-			{ id: aktiv.mitgliedId, name: 'Zuletzt, Lia' }
+			{ id: auchAktiv.mitgliedId, name: 'Anfang, Lou', stand: 'aktiv' },
+			{ id: gesperrt.mitgliedId, name: 'Gesperrt, Gil', stand: 'gesperrt' },
+			{ id: ausgetreten.mitgliedId, name: 'Mitte, Ava', stand: 'ausgetreten' },
+			{ id: vorgemerkt.mitgliedId, name: 'Vorher, Vik', stand: 'vorgemerkt' },
+			{ id: aktiv.mitgliedId, name: 'Zuletzt, Lia', stand: 'aktiv' }
 		]);
 		expect(von('cm').map((m) => m.id)).toContain(aktiv.mitgliedId);
 		expect(von('mytco').map((m) => m.id)).toContain(mytco.mitgliedId);
 		const alleIds = liste.flatMap((z) => z.mitglieder.map((m) => m.id));
-		for (const weg of [gesperrt, ausgetreten, geloescht]) {
-			expect(alleIds).not.toContain(weg.mitgliedId);
-		}
+		expect(alleIds).not.toContain(geloescht.mitgliedId);
 		for (const m of liste.flatMap((z) => z.mitglieder)) {
-			expect(Object.keys(m).sort()).toEqual(['id', 'name']);
+			expect(Object.keys(m).sort()).toEqual(['id', 'name', 'stand']);
 		}
 	});
 });

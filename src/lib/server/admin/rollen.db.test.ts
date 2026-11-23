@@ -7,7 +7,13 @@ import {
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
 import type { Db } from '../db/index.ts';
 import { aenderung, kontoRolle } from '../db/schema.ts';
-import { istMytcoAdmin, ladeRollen, setzeRollen, verwaltungsrollen } from './rollen.ts';
+import {
+	entziehRolle,
+	istMytcoAdmin,
+	ladeRollen,
+	vergibRolle,
+	verwaltungsrollen
+} from './rollen.ts';
 
 // «Letzter MyTCO-Admin» ist eine globale Eigenschaft; die gemeinsame Test-Datenbank teilen sich
 // mehrere Dateien. Darum bekommt diese Datei eine eigene Datenbank.
@@ -33,17 +39,16 @@ const verlaufVon = (mitgliedId: number) =>
 	db.select().from(aenderung).where(eq(aenderung.mitgliedId, mitgliedId));
 
 describe('Rollen', () => {
-	test('A-ROLLE-01, A-ROLLE-03, RR-01, FR-03: MyTCO-Admin vergibt und entzieht Rollen, Verlauf je Rolle', async () => {
+	test('A-ROLLE-01, A-ROLLE-03, RR-01, FR-03: MyTCO-Admin vergibt und entzieht Rollen einzeln, Verlauf je Rolle', async () => {
 		await leereRollen();
 		const admin = await legeMitgliedAn(db, { rollen: ['mytco'] });
 		const ziel = await legeMitgliedAn(db);
 		const urheber = { art: 'admin', mitgliedId: admin.mitgliedId } as const;
 
-		expect(await setzeRollen(db, urheber, ziel.kontoId, ['cm', 'lizenz'], [], jetzt)).toBe('ok');
+		expect(await vergibRolle(db, urheber, ziel.mitgliedId, 'cm', jetzt)).toBe('ok');
+		expect(await vergibRolle(db, urheber, ziel.mitgliedId, 'lizenz', jetzt)).toBe('ok');
 		expect((await ladeRollen(db, ziel.kontoId)).sort()).toEqual(['cm', 'lizenz']);
-		expect(await setzeRollen(db, urheber, ziel.kontoId, ['cm'], ['lizenz', 'cm'], jetzt)).toBe(
-			'ok'
-		);
+		expect(await entziehRolle(db, urheber, ziel.mitgliedId, 'lizenz', jetzt)).toBe('ok');
 		expect(await ladeRollen(db, ziel.kontoId)).toEqual(['cm']);
 
 		const verlauf = await verlaufVon(ziel.mitgliedId);
@@ -54,39 +59,31 @@ describe('Rollen', () => {
 		]);
 	});
 
-	test('Unveränderte Rollen: kein Verlaufseintrag', async () => {
+	test('Doppelt vergeben oder schon entzogen: ok, kein zweiter Verlaufseintrag', async () => {
 		await leereRollen();
 		const admin = await legeMitgliedAn(db, { rollen: ['mytco'] });
 		const ziel = await legeMitgliedAn(db, { rollen: ['cm'] });
 		const urheber = { art: 'admin', mitgliedId: admin.mitgliedId } as const;
-		expect(await setzeRollen(db, urheber, ziel.kontoId, ['cm'], ['cm'], jetzt)).toBe('ok');
-		expect(await verlaufVon(ziel.mitgliedId)).toHaveLength(0);
-	});
-
-	test('setzeRollen: unbekanntes Konto ergibt nicht-gefunden', async () => {
-		expect(await setzeRollen(db, { art: 'automatisch' }, 2_000_000_000, ['cm'], [], jetzt)).toBe(
-			'nicht-gefunden'
-		);
-	});
-
-	test('veralteter Stand wird abgewiesen', async () => {
-		await leereRollen();
-		const admin = await legeMitgliedAn(db, { rollen: ['mytco'] });
-		const ziel = await legeMitgliedAn(db, { rollen: ['cm'] });
-		const urheber = { art: 'admin', mitgliedId: admin.mitgliedId } as const;
-		// Die Seite hat «ohne Rollen» geladen, inzwischen hat jemand cm vergeben.
-		expect(await setzeRollen(db, urheber, ziel.kontoId, ['lizenz'], [], jetzt)).toBe('veraltet');
+		expect(await vergibRolle(db, urheber, ziel.mitgliedId, 'cm', jetzt)).toBe('ok');
 		expect(await ladeRollen(db, ziel.kontoId)).toEqual(['cm']);
+		expect(await entziehRolle(db, urheber, ziel.mitgliedId, 'lizenz', jetzt)).toBe('ok');
 		expect(await verlaufVon(ziel.mitgliedId)).toHaveLength(0);
+		expect(await entziehRolle(db, urheber, ziel.mitgliedId, 'cm', jetzt)).toBe('ok');
+		expect(await entziehRolle(db, urheber, ziel.mitgliedId, 'cm', jetzt)).toBe('ok');
+		expect(await verlaufVon(ziel.mitgliedId)).toHaveLength(1);
+	});
+
+	test('Unbekanntes Mitglied ergibt nicht-gefunden', async () => {
+		const u = { art: 'automatisch' } as const;
+		expect(await vergibRolle(db, u, 2_000_000_000, 'cm', jetzt)).toBe('nicht-gefunden');
+		expect(await entziehRolle(db, u, 2_000_000_000, 'cm', jetzt)).toBe('nicht-gefunden');
 	});
 
 	test('RR-03: der letzte MyTCO-Admin kann mytco nicht abgeben', async () => {
 		await leereRollen();
 		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const urheber = { art: 'admin', mitgliedId: admin.mitgliedId } as const;
-		expect(
-			await setzeRollen(db, urheber, admin.kontoId, ['cm'], ['mitglieder', 'mytco'], jetzt)
-		).toBe('letzter-mytco');
+		expect(await entziehRolle(db, urheber, admin.mitgliedId, 'mytco', jetzt)).toBe('letzter-mytco');
 		expect((await ladeRollen(db, admin.kontoId)).sort()).toEqual(['mitglieder', 'mytco']);
 		expect(await istMytcoAdmin(db, admin.kontoId)).toBe(true);
 		expect(await verlaufVon(admin.mitgliedId)).toHaveLength(0);
@@ -96,12 +93,10 @@ describe('Rollen', () => {
 		await leereRollen();
 		const admin = await legeMitgliedAn(db, { rollen: ['mytco', 'mitglieder'] });
 		const urheber = { art: 'admin', mitgliedId: admin.mitgliedId } as const;
-		expect(
-			await setzeRollen(db, urheber, admin.kontoId, ['mytco'], ['mytco', 'mitglieder'], jetzt)
-		).toBe('ok');
+		expect(await entziehRolle(db, urheber, admin.mitgliedId, 'mitglieder', jetzt)).toBe('ok');
 		expect(await ladeRollen(db, admin.kontoId)).toEqual(['mytco']);
 		const einziger = await legeMitgliedAn(db, { rollen: ['mitglieder'] });
-		expect(await setzeRollen(db, urheber, einziger.kontoId, [], ['mitglieder'], jetzt)).toBe('ok');
+		expect(await entziehRolle(db, urheber, einziger.mitgliedId, 'mitglieder', jetzt)).toBe('ok');
 		expect(await ladeRollen(db, einziger.kontoId)).toEqual([]);
 	});
 
@@ -110,7 +105,7 @@ describe('Rollen', () => {
 		const a = await legeMitgliedAn(db, { rollen: ['mytco'] });
 		const b = await legeMitgliedAn(db, { rollen: ['mytco'] });
 		const urheber = { art: 'admin', mitgliedId: a.mitgliedId } as const;
-		expect(await setzeRollen(db, urheber, a.kontoId, [], ['mytco'], jetzt)).toBe('ok');
+		expect(await entziehRolle(db, urheber, a.mitgliedId, 'mytco', jetzt)).toBe('ok');
 		expect(await istMytcoAdmin(db, a.kontoId)).toBe(false);
 		expect(await istMytcoAdmin(db, b.kontoId)).toBe(true);
 	});
@@ -121,15 +116,8 @@ describe('Rollen', () => {
 			const a = await legeMitgliedAn(db, { rollen: ['mytco'] });
 			const b = await legeMitgliedAn(db, { rollen: ['mytco'] });
 			const ergebnisse = await Promise.all([
-				setzeRollen(
-					db,
-					{ art: 'admin', mitgliedId: a.mitgliedId },
-					b.kontoId,
-					[],
-					['mytco'],
-					jetzt
-				),
-				setzeRollen(db, { art: 'admin', mitgliedId: b.mitgliedId }, a.kontoId, [], ['mytco'], jetzt)
+				entziehRolle(db, { art: 'admin', mitgliedId: a.mitgliedId }, b.mitgliedId, 'mytco', jetzt),
+				entziehRolle(db, { art: 'admin', mitgliedId: b.mitgliedId }, a.mitgliedId, 'mytco', jetzt)
 			]);
 			expect([...ergebnisse].sort()).toEqual(['letzter-mytco', 'ok']);
 			const admins = [await istMytcoAdmin(db, a.kontoId), await istMytcoAdmin(db, b.kontoId)];
@@ -145,7 +133,7 @@ describe('Rollen', () => {
 		expect(await istMytcoAdmin(db, ausgetreten.kontoId)).toBe(false);
 		// Ein gesperrter oder ausgetretener MyTCO-Admin ist kein Ersatz: der aktive bleibt der letzte.
 		const aktiv = await legeMitgliedAn(db, { rollen: ['mytco'] });
-		expect(await setzeRollen(db, { art: 'automatisch' }, aktiv.kontoId, [], ['mytco'], jetzt)).toBe(
+		expect(await entziehRolle(db, { art: 'automatisch' }, aktiv.mitgliedId, 'mytco', jetzt)).toBe(
 			'letzter-mytco'
 		);
 	});

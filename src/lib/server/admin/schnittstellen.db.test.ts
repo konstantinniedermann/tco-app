@@ -22,7 +22,8 @@ import {
 	ADMIN_SCHNITTSTELLEN,
 	postMitglied,
 	postMitglieder,
-	postRollen,
+	postRolleEntziehen,
+	postRolleVergeben,
 	postSitzungen,
 	getBriefe,
 	postBriefe,
@@ -156,7 +157,7 @@ describe('Admin-Schnittstellen', () => {
 			([name]) =>
 				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(21);
+		expect(geschuetzt).toHaveLength(22);
 		for (const [name, fn] of geschuetzt) {
 			const mach = (konto?: AngemeldetesKonto) =>
 				ereignis({
@@ -191,7 +192,7 @@ describe('Admin-Schnittstellen', () => {
 			([name]) =>
 				!['getZugang', 'postZugang', 'postZugangCode', 'postAnsichtBeenden'].includes(name)
 		);
-		expect(geschuetzt).toHaveLength(21);
+		expect(geschuetzt).toHaveLength(22);
 		for (const [name, fn] of geschuetzt) {
 			for (const konto of [cm.konto, ehemals.konto]) {
 				const r = await fn(
@@ -287,7 +288,8 @@ describe('Admin-Schnittstellen', () => {
 			postZugang,
 			postMitglieder,
 			postMitglied,
-			postRollen,
+			postRolleVergeben,
+			postRolleEntziehen,
 			postSitzungen,
 			postBriefe,
 			postBrief,
@@ -531,26 +533,46 @@ describe('Admin-Schnittstellen', () => {
 		]);
 	});
 
-	test('RR-03: Rollen setzen; ungültige Namen → 400; unbekannt → 404', async () => {
+	test('RR-03, A-ROLLE-01: Rolle vergeben und entziehen; ungültige Eingabe → 400; unbekannt → 404', async () => {
 		const s = baue();
 		const admin = await bestaetigterAdmin(s);
 		const ziel = await legeMitgliedAn(db);
-		const roll = (rollen: unknown, vorher: unknown, id = String(ziel.mitgliedId)) =>
-			postRollen(s.d, ereignis({ body: { rollen, vorher }, params: { id }, konto: admin.konto }));
+		const vergib = (body: unknown) =>
+			postRolleVergeben(s.d, ereignis({ body, konto: admin.konto }));
+		const entzieh = (body: unknown) =>
+			postRolleEntziehen(s.d, ereignis({ body, konto: admin.konto }));
+		const m = ziel.mitgliedId;
 
-		expect((await roll(['cm', 'lizenz'], [])).status).toBe(200);
-		// Die alte Rolle admin gibt es nicht mehr.
-		for (const schlecht of ['admin', ['admin'], ['root'], ['cm', 'cm'], [1], undefined]) {
-			expect((await roll(schlecht, ['cm', 'lizenz'])).status).toBe(400);
+		expect(await (await vergib({ mitgliedId: m, rolle: 'cm' })).json()).toEqual({});
+		expect((await vergib({ mitgliedId: m, rolle: 'lizenz' })).status).toBe(200);
+		expect((await entzieh({ mitgliedId: m, rolle: 'cm' })).status).toBe(200);
+		// Die alte Rolle admin gibt es nicht mehr; Nummern ausserhalb des Wertebereichs sind keine.
+		for (const fn of [vergib, entzieh]) {
+			for (const schlecht of [
+				{ mitgliedId: m, rolle: 'admin' },
+				{ mitgliedId: m, rolle: ['cm'] },
+				{ mitgliedId: m },
+				{ mitgliedId: String(m), rolle: 'cm' },
+				{ mitgliedId: 0, rolle: 'cm' },
+				{ mitgliedId: 2147483648, rolle: 'cm' },
+				{ rolle: 'cm' }
+			]) {
+				const r = await fn(schlecht);
+				expect([JSON.stringify(schlecht), r.status, await r.json()]).toEqual([
+					JSON.stringify(schlecht),
+					400,
+					{ fehler: 'eingabe' }
+				]);
+			}
+			const weg = await fn({ mitgliedId: 999999999, rolle: 'cm' });
+			expect([weg.status, await weg.json()]).toEqual([404, { fehler: 'nicht-gefunden' }]);
 		}
-		expect((await roll(['cm'], [], '999999999')).status).toBe(404);
-		expect((await roll(['cm'], [], 'abc')).status).toBe(404);
 
 		const detail = await getMitglied(
 			s.d,
-			ereignis({ method: 'GET', params: { id: String(ziel.mitgliedId) }, konto: admin.konto })
+			ereignis({ method: 'GET', params: { id: String(m) }, konto: admin.konto })
 		);
-		expect(((await detail.json()) as { rollen: string[] }).rollen.sort()).toEqual(['cm', 'lizenz']);
+		expect(((await detail.json()) as { rollen: string[] }).rollen).toEqual(['lizenz']);
 	});
 
 	test('SI-07, FR-24: Sitzungen beenden; unbekanntes Mitglied → 404', async () => {
@@ -715,10 +737,9 @@ describe('Admin-Schnittstellen', () => {
 				s.d,
 				ereignis({ body: { ...eindeutig(), vorher: STAND }, params: p, konto: k })
 			),
-			await postRollen(s.d, ereignis({ body: { rollen: [], vorher: [] }, params: p, konto: k })),
 			await postSitzungen(s.d, ereignis({ body: {}, params: p, konto: k }))
 		];
-		expect(antworten.map((r) => r.status)).toEqual([404, 404, 404, 404]);
+		expect(antworten.map((r) => r.status)).toEqual([404, 404, 404]);
 		const v = await getVerlauf(
 			s.d,
 			ereignis({ method: 'GET', url: `http://localhost/x?mitglied=${gross}`, konto: k })

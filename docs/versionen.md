@@ -11,6 +11,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Verwaltung: Rollen vergibt und entzieht der MyTCO-Admin nur noch auf der Seite «Rollen», je Rolle
+  mit Suche und Rückfrage, auch bei Ausgetretenen. Die Seite eines Mitglieds zeigt seine Rollen nur
+  noch an (#96).
 - Werkzeug: `make db`, `make check` und alles andere, was Docker braucht, starten Docker Desktop auf
   dem Mac selbst, wenn es aus ist. An der App ändert sich nichts.
 - Verwaltung: In den Listen Mitglieder, Briefe und Änderungsverlauf sortiert und filtert man am PC

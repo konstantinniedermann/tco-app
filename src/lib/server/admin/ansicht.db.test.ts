@@ -20,8 +20,15 @@ import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login
 import { getSitzung } from '../sitzung/schnittstellen.ts';
 import { postTurniere } from '../turnier/schnittstellen.ts';
 import { riegel } from './ansicht.ts';
-import { setzeRollen } from './rollen.ts';
-import { getZugang, postAnsicht, postAnsichtBeenden, postMitglieder } from './schnittstellen.ts';
+import { entziehRolle, ladeRollen, vergibRolle } from './rollen.ts';
+import {
+	getZugang,
+	postAnsicht,
+	postAnsichtBeenden,
+	postMitglieder,
+	postRolleEntziehen,
+	postRolleVergeben
+} from './schnittstellen.ts';
 import type { AdminDienste } from './rechte.ts';
 import { erstelleZugangDienst } from './zugang.ts';
 
@@ -313,6 +320,26 @@ describe('Ansicht als … (Server)', () => {
 		expect(await verlaufVon(a.mitgliedId)).toEqual([]);
 	});
 
+	test('in der Ansicht scheitern Rolle vergeben und entziehen direkt mit 403 nur-ansehen (#96)', async () => {
+		const a = await angemeldet(['mytco'], true);
+		const ziel = await legeMitgliedAn(db, { rollen: ['lizenz'] });
+		expect((await schalteEin(a.s.d, a.konto, { rolle: 'mitglieder' })).status).toBe(200);
+		const konto = (await lade(a.kennung))!;
+		const vergeben = await postRolleVergeben(
+			a.s.d,
+			ereignis({ konto, body: { mitgliedId: ziel.mitgliedId, rolle: 'cm' } })
+		);
+		const entziehen = await postRolleEntziehen(
+			a.s.d,
+			ereignis({ konto, body: { mitgliedId: ziel.mitgliedId, rolle: 'lizenz' } })
+		);
+		for (const r of [vergeben, entziehen]) {
+			expect([r.status, await r.json()]).toEqual([403, { fehler: 'nur-ansehen' }]);
+		}
+		expect(await ladeRollen(db, ziel.kontoId)).toEqual(['lizenz']);
+		expect(await verlaufVon(ziel.mitgliedId)).toEqual([]);
+	});
+
 	test('mytco entzogen und wieder vergeben: die alte Ansicht lebt nicht wieder auf', async () => {
 		// Ein zweiter MyTCO-Admin, damit der Entzug nicht an der Untergrenze scheitert.
 		const anderer = await legeMitgliedAn(db, { rollen: ['mytco'] });
@@ -321,12 +348,8 @@ describe('Ansicht als … (Server)', () => {
 		expect((await schalteEin(a.s.d, a.konto, { rolle: 'cm' })).status).toBe(200);
 		await db.update(sitzung).set({ ansichtRolle: 'lizenz' }).where(eq(sitzung.kontoId, a.kontoId));
 		const urheber = { art: 'admin' as const, mitgliedId: anderer.mitgliedId };
-		expect(
-			await setzeRollen(db, urheber, a.kontoId, ['mitglieder'], ['mytco', 'mitglieder'], start)
-		).toBe('ok');
-		expect(
-			await setzeRollen(db, urheber, a.kontoId, ['mytco', 'mitglieder'], ['mitglieder'], start)
-		).toBe('ok');
+		expect(await entziehRolle(db, urheber, a.mitgliedId, 'mytco', start)).toBe('ok');
+		expect(await vergibRolle(db, urheber, a.mitgliedId, 'mytco', start)).toBe('ok');
 		expect((await lade(a.kennung))!.ansicht).toBeNull();
 		expect((await lade(zweite))!.ansicht).toBeNull();
 	});

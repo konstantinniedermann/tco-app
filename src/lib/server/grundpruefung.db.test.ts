@@ -222,9 +222,9 @@ describe('Grundprüfung der Schnittstellen', () => {
 		}
 	});
 
-	test('die Listen der Verwaltung haben 62 Einträge, und jede Ausnahme gehört zu einem', () => {
+	test('die Listen der Verwaltung haben 63 Einträge, und jede Ausnahme gehört zu einem', () => {
 		const namen = verwaltungsDienste().liste.map(([name]) => name);
-		expect(namen).toHaveLength(62);
+		expect(namen).toHaveLength(63);
 		expect(new Set(namen).size).toBe(namen.length);
 		for (const name of [...Object.keys(OHNE_ROLLE_ANDERS), ...Object.keys(UNBESTAETIGT_ANDERS)]) {
 			expect(namen).toContain(name);
@@ -284,7 +284,7 @@ describe('Grundprüfung der Schnittstellen', () => {
 		).arbeit;
 		expect(await v.zugang.bestaetige(konto, v.post.at(-1)!.text.slice(0, 6))).toBe('ok');
 		const geprueft = v.liste.filter(([name]) => schreibend(name));
-		expect(geprueft).toHaveLength(42);
+		expect(geprueft).toHaveLength(43);
 		for (const [name, fn] of geprueft) {
 			const r = await fn(
 				anfrage(name, { body: 'kein JSON', contentType: 'text/plain', konto, cookie: kennung })
@@ -302,7 +302,7 @@ describe('Grundprüfung der Schnittstellen', () => {
 		const geprueft = [...mitgliederDienste(), ...verwaltungsDienste().liste].filter(([name]) =>
 			schreibend(name)
 		);
-		expect(geprueft).toHaveLength(27 + 42);
+		expect(geprueft).toHaveLength(27 + 43);
 		for (const name of Object.keys(OHNE_BEIDES_ANDERS)) {
 			expect(geprueft.map(([n]) => n)).toContain(name);
 		}

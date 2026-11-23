@@ -43,7 +43,14 @@ import {
 	type AdminEreignis,
 	type AdminUrheber
 } from './rechte.ts';
-import { ROLLEN, istAnsichtRolle, listeRollen, setzeRollen, type Rolle } from './rollen.ts';
+import {
+	ROLLEN,
+	entziehRolle,
+	istAnsichtRolle,
+	listeRollen,
+	vergibRolle,
+	type Rolle
+} from './rollen.ts';
 import { istAktion, ladeVerlauf, schreibeVerlauf } from './verlauf.ts';
 import type { Rueckzug } from '../cm/austritt.ts';
 import {
@@ -183,36 +190,38 @@ export function postMitglied(d: AdminDienste, e: AdminEreignis): Promise<Respons
 	});
 }
 
-// `setzeRollen` prüft die Namen nicht; sie müssen hier aus ROLLEN stammen und verschieden sein.
-function leseRollen(roh: unknown): Rolle[] | null {
-	if (!Array.isArray(roh)) return null;
-	const erlaubt: readonly unknown[] = ROLLEN;
-	if (!roh.every((r) => erlaubt.includes(r)) || new Set(roh).size !== roh.length) return null;
-	return roh as Rolle[];
+const istRolle = (r: unknown): r is Rolle => (ROLLEN as readonly unknown[]).includes(r);
+
+/** Mitglied und Rolle aus dem Körper der Rollen-Schnittstellen; sonst `null`. */
+function leseRollenAuftrag(koerper: Record<string, unknown>) {
+	const { mitgliedId, rolle } = koerper;
+	const nummerOk =
+		typeof mitgliedId === 'number' &&
+		Number.isSafeInteger(mitgliedId) &&
+		mitgliedId > 0 &&
+		mitgliedId <= INTEGER_MAX;
+	return nummerOk && istRolle(rolle) ? { mitgliedId, rolle } : null;
 }
 
-// Nur der MyTCO-Admin vergibt und entzieht Rollen (#43). `vorher`: die Rollen, wie die
-// Seite sie geladen hat; schützt vor dem Überschreiben fremder Änderungen.
-export function postRollen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+// A-ROLLE-01, Regel 2: Nur der MyTCO-Admin vergibt Rollen, einzeln auf der Seite «Rollen» (#96).
+export function postRolleVergeben(d: AdminDienste, e: AdminEreignis): Promise<Response> {
 	return schreibt(d, e, 'rollen', async (urheber, koerper) => {
-		const id = parseId(e.params.id);
-		if (id === null) return nichtGefunden();
-		const rollen = leseRollen(koerper.rollen);
-		const vorher = leseRollen(koerper.vorher);
-		if (rollen === null || vorher === null) return eingabeFehler();
-		const t = jetzt(d);
-		const detail = await ladeMitglied(d.db, id, t);
-		if (!detail) return nichtGefunden();
-		const r = await setzeRollen(d.db, urheber, detail.kontoId, rollen, vorher, t);
-		switch (r) {
-			case 'ok':
-				return antwort(200, {});
-			case 'letzter-mytco':
-			case 'veraltet':
-				return antwort(409, { fehler: r });
-			default:
-				return nichtGefunden();
-		}
+		const auftrag = leseRollenAuftrag(koerper);
+		if (auftrag === null) return eingabeFehler();
+		const r = await vergibRolle(d.db, urheber, auftrag.mitgliedId, auftrag.rolle, jetzt(d));
+		return r === 'ok' ? antwort(200, {}) : nichtGefunden();
+	});
+}
+
+// A-ROLLE-01, RR-03: Entziehen; der letzte MyTCO-Admin behält seine Rolle (409 letzter-mytco).
+export function postRolleEntziehen(d: AdminDienste, e: AdminEreignis): Promise<Response> {
+	return schreibt(d, e, 'rollen', async (urheber, koerper) => {
+		const auftrag = leseRollenAuftrag(koerper);
+		if (auftrag === null) return eingabeFehler();
+		const r = await entziehRolle(d.db, urheber, auftrag.mitgliedId, auftrag.rolle, jetzt(d));
+		if (r === 'ok') return antwort(200, {});
+		if (r === 'letzter-mytco') return antwort(409, { fehler: r });
+		return nichtGefunden();
 	});
 }
 
@@ -447,7 +456,8 @@ export const ADMIN_SCHNITTSTELLEN = {
 	postMitglieder,
 	getMitglied,
 	postMitglied,
-	postRollen,
+	postRolleVergeben,
+	postRolleEntziehen,
 	getRollen,
 	postSitzungen,
 	getBriefe,
