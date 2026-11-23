@@ -17,7 +17,7 @@ import {
 } from './hilfen/login.ts';
 import { legeTurnierAn } from './hilfen/turnier.ts';
 import { legeOffenenAnlassAn } from './hilfen/anlass.ts';
-import { holeMailCode } from './hilfen/mail.ts';
+import { holeMailCode, mailTexte, warteAufMail } from './hilfen/mail.ts';
 import { startetVomSymbol } from './hilfen/geraet.ts';
 import {
 	klappeAuf,
@@ -703,6 +703,44 @@ test('Einstellungen: Mitglieder-Admin sieht Themen, Geräte mit Push und Passkey
 	await expect(geraete.getByRole('cell', { name: 'aus', exact: true })).toHaveCount(1);
 	await expect(page.getByText('Kein Passkey.', { exact: true })).toBeVisible();
 	await pruefeBildschirm(page, info, 'mitglied-einstellungen');
+	expect(fehler).toEqual([]);
+});
+
+test('FR-56: Mitglieder-Admin ändert Angaben; nur mit Häkchen bekommt das Mitglied eine Meldung', async ({
+	page
+}, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeRollenkontoMitBriefCodeAn('Greta', ['mitglieder']);
+	const mitglied = await legeKontoAn('Hugo');
+	// Ohne Mail-Code: das Budget je IP reicht sonst nicht für alle Tests.
+	await meldeAn(page, admin);
+	await bestaetigeVerwaltungDirekt(admin.kontoId);
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	const speichern = page.getByRole('button', { name: 'Angaben speichern' });
+	const haekchen = page.getByRole('checkbox', { name: 'Mitglied benachrichtigen' });
+	const gespeichert = page.getByText('Gespeichert', { exact: true });
+
+	// Ohne Häkchen (Standard): gespeichert, keine Meldung (geprüft nach der zweiten Änderung).
+	await expect(haekchen).not.toBeChecked();
+	await page.getByLabel('Ort', { exact: true }).fill('Aarau');
+	await speichern.click();
+	await expect(gespeichert).toBeVisible();
+
+	// Mit Häkchen: eine Meldung, die nur die Feldnamen nennt, nie den neuen Wert.
+	await page.getByLabel('Telefon', { exact: false }).fill('+41 00 000 00 01');
+	await expect(gespeichert).toBeHidden();
+	await haekchen.check();
+	await pruefeBildschirm(page, info, 'verwaltung-mitglied-benachrichtigen');
+	await speichern.click();
+	await expect(gespeichert).toBeVisible();
+	await expect(haekchen).not.toBeChecked();
+	const text = await warteAufMail(
+		mitglied.email,
+		'Dein Profil',
+		'Die Verwaltung hat dein Profil geändert: Telefon.'
+	);
+	expect(text).not.toContain('+41 00 000 00 01');
+	expect(await mailTexte(mitglied.email, 'Dein Profil')).toHaveLength(1);
 	expect(fehler).toEqual([]);
 });
 

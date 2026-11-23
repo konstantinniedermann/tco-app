@@ -16,7 +16,7 @@ import {
 	meldeZurCmAn,
 	setzeSpielerangaben
 } from './hilfen/turnier.ts';
-import { holeMailCode, warteAufMail } from './hilfen/mail.ts';
+import { holeMailCode, mailTexte, warteAufMail } from './hilfen/mail.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,
@@ -134,19 +134,21 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 	);
 	expect(angemeldet).not.toContain('Cyrill');
 
-	// FR-46: Verschieben in die passende Kategorie, ohne Warnung.
+	// FR-46: Verschieben in die passende Kategorie, ohne Warnung. FR-56: Das Häkchen ist gesetzt;
+	// der CM-Admin nimmt es weg, der Spieler bekommt keine Meldung (geprüft nach dem Löschen).
 	await waehleAktion(page, zeile(page, nachname), 'Verschieben');
 	const verschieben = page.getByRole('dialog', { name: 'Verschieben' });
+	const haekchen = verschieben.getByRole('checkbox', { name: 'Mitglied benachrichtigen' });
+	await expect(haekchen).toBeChecked();
+	await haekchen.uncheck();
+	// Eine Wahl danach lässt das Häkchen, wie der CM-Admin es gesetzt hat.
 	await verschieben.getByRole('radio', { name: 'Herren R7–R9' }).check();
+	await expect(haekchen).not.toBeChecked();
+	await pruefeBildschirm(page, info, 'cm-verschieben-ohne-meldung');
 	await verschieben.getByRole('button', { name: 'Verschieben', exact: true }).click();
 	await expect(verschieben).toBeHidden();
 	await expect(page.getByText('Verschoben.', { exact: true })).toBeVisible();
 	await expect(page.getByText('Noch keine Anmeldungen.')).toBeVisible();
-	await warteAufMail(
-		spieler.email,
-		'Clubmeisterschaft',
-		'Der CM-Admin hat dich von «Herren R1–R6» nach «Herren R7–R9» verschoben.'
-	);
 
 	await page.getByRole('link', { name: `‹ ${turnier}` }).click();
 	await expect(page.getByRole('heading', { level: 1, name: turnier })).toBeVisible();
@@ -154,9 +156,13 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 	await expect(page.getByRole('heading', { level: 1, name: 'Herren R7–R9' })).toBeVisible();
 	await expect(zeile(page, nachname)).toContainText('R8');
 
-	// Teil 4: Der CM-Admin korrigiert die Klassierung; die Liste zeigt sie gleich.
+	// Teil 4: Der CM-Admin korrigiert die Klassierung; die Liste zeigt sie gleich. FR-56: Das
+	// Häkchen ist hier leer, der Spieler bekommt keine Meldung.
 	await waehleAktion(page, zeile(page, nachname), 'Klassierung');
 	const klassierung = page.getByRole('dialog', { name: 'Klassierung korrigieren' });
+	await expect(
+		klassierung.getByRole('checkbox', { name: 'Mitglied benachrichtigen' })
+	).not.toBeChecked();
 	await klassierung.getByLabel('Klassierung').selectOption('R7');
 	await klassierung.getByRole('button', { name: 'Klassierung speichern' }).click();
 	await expect(klassierung).toBeHidden();
@@ -166,6 +172,7 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 	// FR-46, FR-10: Löschen zieht die Anmeldung zurück, auch durch den CM-Admin.
 	await waehleAktion(page, zeile(page, nachname), 'Löschen');
 	const loeschen = page.getByRole('dialog', { name: 'Anmeldung löschen?' });
+	await expect(loeschen.getByRole('checkbox', { name: 'Mitglied benachrichtigen' })).toBeChecked();
 	await loeschen.getByRole('button', { name: 'Löschen', exact: true }).click();
 	await expect(loeschen).toBeHidden();
 	await expect(page.getByText('Gelöscht.', { exact: true })).toBeVisible();
@@ -175,6 +182,13 @@ test('A-ANMELDUNG-06, FR-46, FR-47, FR-10: CM-Admin meldet von Hand an, verschie
 		'Clubmeisterschaft',
 		'Der CM-Admin hat deine Anmeldung für «Herren R7–R9» gelöscht.'
 	);
+	// FR-56: Die Meldung zum Löschen ist da, die zum Verschieben (ohne Häkchen) und zur
+	// Klassierung (Häkchen leer) nicht: genau die zwei Meldungen mit Häkchen.
+	const meldungen = await mailTexte(spieler.email, 'Clubmeisterschaft');
+	expect(meldungen.filter((t) => t.includes('gelöscht.'))).toHaveLength(1);
+	expect(meldungen.filter((t) => t.includes('verschoben'))).toEqual([]);
+	expect(meldungen.filter((t) => t.includes('Klassierung'))).toEqual([]);
+	expect(meldungen).toHaveLength(2);
 
 	// FR-35: Ohne aktive Anmeldung lässt sich die Kategorie wieder absagen.
 	await page.getByRole('button', { name: 'Kategorie absagen' }).click();
