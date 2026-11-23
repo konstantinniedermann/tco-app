@@ -88,7 +88,7 @@ eine Partner-Anfrage stellt, gibt dem Angefragten Name, Klassierung und Telefonn
 E-Mail) frei; die Kontaktdaten des Angefragten sieht er erst nach dem Annehmen. Der Kommentar
 bei *sucht Partner* soll keine Angaben zur Gesundheit enthalten. Meldungen zum Doppel (an das
 Mitglied und aus der Verwaltung) nennen den anderen Spieler (Partner, Anfragenden oder
-Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05 erlaubt. Gibt der CM-Admin bei der Ablehnung eines Wildcard-Antrags einen Grund an, steht er nur in der Meldung an den Spieler und wird nicht gespeichert.
+Angefragten); sie gehen einzeln an die Beteiligten, wie es die Ausnahme in DS-05 erlaubt. Ändert die Verwaltung Angaben, Rollen oder CM-Anmeldungen eines Mitglieds, kann sie ihm eine persönliche Meldung schicken (FR-56); sie nennt nur das geänderte Feld oder die Änderung, nie den neuen Wert, und geht nur an das Mitglied selbst. Gibt der CM-Admin bei der Ablehnung eines Wildcard-Antrags einen Grund an, steht er nur in der Meldung an den Spieler und wird nicht gespeichert.
 
 ## Löschen
 
@@ -249,6 +249,7 @@ neuen Dienst gibt oder länger aufbewahrt: dieses Konzept und die
 [Abklärungen](abklaerungen.md) eintragen. Jedes Issue prüft das im Abschnitt *Datenschutz*
 der Issue-Vorlage.
 
+- 23.11.2026: Persönliche Meldungen der Verwaltung an das Mitglied über Änderungen an seinen Daten, Rollen und CM-Anmeldungen (Push, sonst E-Mail): nur das geänderte Feld, nie der Wert, nur an das Mitglied selbst (#94).
 - 23.11.2026: Gefolgte Interclub-Teams (Team-Nummer, seit wann) als freiwillige Daten für den Push nach neuem Endstand; sichtbar für das Mitglied und über die Auskunft (DS-07) für den Mitglieder-Admin, lesend für den MyTCO-Admin, nicht auf der Karte «Einstellungen» der Verwaltung; Push nennt Teams und Endstand, keine Personen (#81 Teil 3b, A-INTERCLUB-02).
 - 23.11.2026: Zweck der Bestätigung der Verwaltung angepasst: höchstens einmal pro 30 Tage statt pro 24 Stunden einen Code (SI-08, Entscheid Projektleiter); keine neuen Daten, keine längere Aufbewahrung.
 - 23.11.2026: Neuer Zweck «Hilfe bei Problemen» (Entscheid Projektleiter): Mitglieder-Admin (MyTCO-Admin nur lesend) sieht auf der Detailseite eines Mitglieds den aktuellen Stand von Themen, angemeldeten Geräten mit Push-Stand und Passkeys, ohne Push-Adresse und Schlüssel; kein Verlauf, keine neuen Daten.
