@@ -13,6 +13,7 @@ import type { AdminDienste } from './admin/rechte.ts';
 import { erstelleZugangDienst } from './admin/zugang.ts';
 import type { AnlassDienste } from './anlass/typen.ts';
 import type { ImportDienste } from './interclub/import.ts';
+import type { MeldeDienste } from './interclub/melden.ts';
 import type { InterclubDienste } from './interclub/typen.ts';
 import { erstelleBestaetigung } from './cm/mail.ts';
 import type { CmDienste } from './cm/typen.ts';
@@ -208,16 +209,23 @@ export function holeInterclubDienste(): InterclubDienste {
 // Regelmässiger Interclub-Abruf (#81): nur mit `IC_ABRUF=an`, sonst null. Der Server holt bei Swiss
 // Tennis über das weitergereichte `fetch` (keine Ausnahme der Regel: kein Aufruf `fetch(…)` hier).
 const PAUSE_SWISS_TENNIS = 1500;
-export function holeInterclubAbruf(): { dienste: ImportDienste; verein: number } | null {
-	const ic = leseEinstellungen().icAbruf;
+export function holeInterclubAbruf(): {
+	dienste: ImportDienste;
+	verein: number;
+	melder: MeldeDienste;
+} | null {
+	const e = leseEinstellungen();
+	const ic = e.icAbruf;
 	if (!ic) return null;
+	const db = holeDb();
 	return {
 		dienste: {
-			db: holeDb(),
+			db,
 			holen: fetch.bind(globalThis),
 			jetzt: () => new Date(),
 			pause: () => new Promise((r) => setTimeout(r, PAUSE_SWISS_TENNIS))
 		},
-		verein: ic.verein
+		verein: ic.verein,
+		melder: { db, push: holePush(e), adresse: e.adresse, jetzt: () => new Date() }
 	};
 }

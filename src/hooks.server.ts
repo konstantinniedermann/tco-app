@@ -7,6 +7,7 @@ import { holeInterclubAbruf, holeLoginDienst } from './lib/server/dienste.ts';
 import { leseEinstellungen } from './lib/server/einstellungen.ts';
 import { behandleFehler, ladeSitzungSicher } from './lib/server/login/schnittstellen.ts';
 import { fuehreAbrufAus } from './lib/server/interclub/abruf.ts';
+import { meldeEndstaende } from './lib/server/interclub/melden.ts';
 import { starteZeitgeber, STUNDE } from './lib/server/zeitgeber.ts';
 
 // Die App startet nicht ohne Schlüssel und Mail-Einstellungen. Beim Bauen läuft `init` mit
@@ -21,7 +22,10 @@ export const init: ServerInit = () => {
 	const ic = holeInterclubAbruf();
 	if (ic)
 		starteZeitgeber(
-			() => fuehreAbrufAus(ic.dienste, ic.verein),
+			async () => {
+				await fuehreAbrufAus(ic.dienste, ic.verein);
+				await meldeEndstaende(ic.melder);
+			},
 			{ start: 2 * 60_000, abstand: STUNDE },
 			{ name: 'interclub', fehler: 'Interclub-Abruf fehlgeschlagen' }
 		);
