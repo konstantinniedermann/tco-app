@@ -4,6 +4,7 @@ import { konto, kontoRolle, mitglied, sitzung } from '../db/schema.ts';
 import { nameEnthaelt } from '../namen.ts';
 import { beendeAlleSitzungen, sitzungAbgelaufen } from '../login/sitzung.ts';
 import { FELDER, type Angaben, type Feld } from './angaben.ts';
+import { ladeMitgliedEinstellungen, type MitgliedEinstellungen } from './mitglied-einstellungen.ts';
 import { loeschtAm } from './mitgliedschaft.ts';
 import { ladeRollen, type Rolle } from './rollen.ts';
 import {
@@ -44,6 +45,8 @@ export type Detail = {
 	};
 	/** Daten zu Austritt und Löschung; `loeschtAm` nur bei `ausgetreten` und `vorgemerkt`. */
 	mitgliedschaft: { austrittAm: Date | null; vorgemerktAm: Date | null; loeschtAm: Date | null };
+	/** Stand der Einstellungen des Mitglieds, für Hilfe bei Problemen. */
+	einstellungen: MitgliedEinstellungen;
 	verlauf: VerlaufZeile[];
 	/** Es gibt mehr Einträge als `verlauf` zeigt (nur die letzten `VERLAUF_GRENZE`). */
 	verlaufGekuerzt: boolean;
@@ -216,9 +219,10 @@ export async function ladeMitglied(db: Db, id: number, jetzt: Date): Promise<Det
 		.innerJoin(konto, eq(konto.mitgliedId, mitglied.id))
 		.where(eq(mitglied.id, id));
 	if (!zeile) return null;
-	const [rollen, sitzungen, verlauf] = await Promise.all([
+	const [rollen, sitzungen, einstellungen, verlauf] = await Promise.all([
 		ladeRollen(db, zeile.k.id),
 		gueltigeSitzungen(db, [zeile.k.id], jetzt),
+		ladeMitgliedEinstellungen(db, zeile.k.id, jetzt),
 		// Ein Eintrag mehr zeigt, ob gekürzt wurde.
 		ladeVerlauf(db, { mitgliedId: id, grenze: VERLAUF_GRENZE + 1 })
 	]);
@@ -244,6 +248,7 @@ export async function ladeMitglied(db: Db, id: number, jetzt: Date): Promise<Det
 			vorgemerktAm,
 			loeschtAm: loeschtAm({ status, austrittAm, vorgemerktAm })
 		},
+		einstellungen,
 		verlauf: verlauf.slice(0, VERLAUF_GRENZE),
 		verlaufGekuerzt: verlauf.length > VERLAUF_GRENZE
 	};

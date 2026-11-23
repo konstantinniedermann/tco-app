@@ -4,10 +4,13 @@ import { MELDUNG } from '../../src/lib/login/anmelden.ts';
 import type { Fehlerkoerper } from '../../src/lib/fehler.ts';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
 import {
+	bestaetigeVerwaltungDirekt,
 	legeAdminMitBriefCodeAn,
+	legeGeraetAn,
 	legeKontoAn,
 	legeKontoMitBriefCodeAn,
 	legeRollenkontoMitBriefCodeAn,
+	schalteThemaVereinAb,
 	schliesseLoginHilfen,
 	setzeRufname
 } from './hilfen/login.ts';
@@ -620,6 +623,36 @@ test('RR-07, Regel 2: Mitglieder-Admin sieht keine Rollenvergabe', async ({ page
 	await expect(page.getByLabel('Vorname', { exact: true })).toBeEnabled();
 	await expect(page.locator('summary', { hasText: 'Rollen' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'mitglieder-admin-ohne-rollen');
+	expect(fehler).toEqual([]);
+});
+
+test('Einstellungen: Mitglieder-Admin sieht Themen, Geräte mit Push und Passkeys des Mitglieds', async ({
+	page
+}, info) => {
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeRollenkontoMitBriefCodeAn('Edda', ['mitglieder']);
+	const mitglied = await legeKontoAn('Linus');
+	await schalteThemaVereinAb(mitglied.kontoId);
+	await legeGeraetAn(mitglied.kontoId, true);
+	await legeGeraetAn(mitglied.kontoId, false);
+	// Ohne Mail-Code: das Budget je IP reicht sonst nicht für alle Tests.
+	await meldeAn(page, admin);
+	await bestaetigeVerwaltungDirekt(admin.kontoId);
+
+	await page.goto(`/verwaltung/mitglieder/${mitglied.mitgliedId}`);
+	await expect(page.locator('summary', { hasText: 'Einstellungen' })).toContainText(
+		'Push auf 1 Gerät'
+	);
+	await klappeAuf(page, 'Einstellungen');
+	await expect(
+		page.getByText('Mitteilungen: Anlässe, Clubmeisterschaft', { exact: true })
+	).toBeVisible();
+	const geraete = page.getByRole('region', { name: 'Geräte' });
+	await expect(geraete.getByRole('row')).toHaveCount(3);
+	await expect(geraete.getByRole('cell', { name: /^an seit / })).toHaveCount(1);
+	await expect(geraete.getByRole('cell', { name: 'aus', exact: true })).toHaveCount(1);
+	await expect(page.getByText('Kein Passkey.', { exact: true })).toBeVisible();
+	await pruefeBildschirm(page, info, 'mitglied-einstellungen');
 	expect(fehler).toEqual([]);
 });
 

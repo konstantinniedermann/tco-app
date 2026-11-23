@@ -1,10 +1,12 @@
 // Hilfen der Login-Tests im Testprozess: Konten und Mitglieder anlegen und Brief-Codes ausstellen
 // über dieselbe Fachlogik wie der Server (gleicher Schlüssel, gleiche Datenbank). Codes aus diesen
 // Hilfen schicken nie eine Mail. Turnier, Anlass und Mailpit stehen in den Dateien daneben.
+import { createHash, randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { machAdmin } from '../../../src/lib/server/admin/erster-admin.ts';
 import { setzeRollen, type Rolle } from '../../../src/lib/server/admin/rollen.ts';
-import { konto, mitglied, sitzung } from '../../../src/lib/server/db/schema.ts';
+import { konto, mitglied, pushAbo, sitzung } from '../../../src/lib/server/db/schema.ts';
+import { erstelleSitzung } from '../../../src/lib/server/login/sitzung.ts';
 import { legeMitgliedAn } from '../../hilfen/mitglieder.ts';
 import { hole, schliesseVerbindung } from './verbindung.ts';
 
@@ -125,6 +127,27 @@ export async function bestaetigeVerwaltungDirekt(kontoId: number): Promise<void>
 		.db.update(sitzung)
 		.set({ adminBestaetigtAm: new Date() })
 		.where(eq(sitzung.kontoId, kontoId));
+}
+
+/** Ein angemeldetes Gerät des Mitglieds, wahlweise mit erfundenem Push-Abo; ohne Browser. */
+export async function legeGeraetAn(kontoId: number, push: boolean): Promise<void> {
+	const kennung = await erstelleSitzung(hole().db, kontoId, new Date());
+	if (!push) return;
+	await hole()
+		.db.insert(pushAbo)
+		.values({
+			endpunkt: `https://push.example.org/${randomUUID()}`,
+			sitzungHash: createHash('sha256').update(kennung).digest('hex'),
+			kontoId,
+			p256dh: 'erfunden',
+			auth: 'erfunden',
+			eingerichtetAm: new Date()
+		});
+}
+
+/** Schaltet ein Thema der Mitteilungen ab, wie es das Mitglied im Profil täte. */
+export async function schalteThemaVereinAb(kontoId: number): Promise<void> {
+	await hole().db.update(konto).set({ themaVerein: false }).where(eq(konto.id, kontoId));
 }
 
 export async function schliesseLoginHilfen(): Promise<void> {
