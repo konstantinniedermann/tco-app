@@ -554,3 +554,39 @@ zurück wechselt; bei der eigenen Wahl geht immer «nicht melden» an den Server
 
 **Einschätzung:** Ohne Wirkung für Mitglieder. Beim nächsten Umbau der Seiten angleichen oder die
 Formulierung im Leitbild auf Angaben und Rollen einschränken.
+
+### 2026-11-24 — Anlass-Seite lädt die Vorlagen der Mitteilungen nach «Angaben speichern» nicht neu
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/routes/verwaltung/anlaesse/[id]/+page.svelte` (Neuladen nach dem Speichern der Angaben, etwa Zeile 52–75)
+
+**Beobachtung:** Nach dem Speichern lädt die Seite nur den Anlass neu; die Vorlagen der Mitteilungen (mit Beginn und Anmeldeschluss im Text) erst nach dem Senden. Wer Beginn oder Anmeldeschluss verschiebt und gleich eine Vorlage wählt, bekommt das alte Datum in den Text. Die Turnierseite hatte dasselbe Muster und lädt jetzt beides parallel neu.
+
+**Ursprung:** Schlussprüfung #95/#97, 24.11.2026.
+
+**Einschätzung:** Klein: wie auf der Turnierseite Anlass und Mitteilungen in einem Zug neu laden, mit E2E (Datum ändern, Vorlage wählen).
+
+### 2026-11-24 — Spielberechtigt ohne Kategorie trifft alle mit fehlenden Angaben, wenn keine Kategorie mehr aktiv ist
+
+**Thema:** Code
+
+**Fundort:** `src/lib/server/mitteilung/empfaenger.ts` (Auswahl *berechtigt* ohne Kategorie)
+
+**Beobachtung:** Hat ein geöffnetes Turnier keine aktive Kategorie mehr (alle abgesagt), liefert die Auswahl «Spielberechtigt, noch nicht angemeldet» ohne Kategorie alle Mitglieder mit fehlenden Angaben, obwohl niemand mehr mitspielen kann.
+
+**Ursprung:** Schlussprüfung #95/#97, 24.11.2026.
+
+**Einschätzung:** Seltener Fall. Guard `aktive.length > 0` mit Test in `empfaenger-turnier.db.test.ts`.
+
+### 2026-11-24 — Auswahl «an eine Rolle» ist nicht an die Liste der Rollen gebunden
+
+**Thema:** Code
+
+**Fundort:** `src/lib/mitteilung/auswahl.ts` (`rolleAus`), `src/lib/server/mitteilung/empfaenger.ts` (`mitRolle`)
+
+**Beobachtung:** `rolleAus` castet mit `as Rolle`, ohne dass der Typ der Auswahl an `ROLLEN` hängt; `mitRolle(r: string)` nimmt jeden Text. Eine neue oder umbenannte Rolle fiele dem Typprüfer nicht auf.
+
+**Ursprung:** Schlussprüfung #95/#97, 24.11.2026.
+
+**Einschätzung:** Klein: Auswahl als `` `rolle-${Rolle}` `` typisieren und `mitRolle` auf `Rolle` umstellen; kein Verhalten ändert sich.
