@@ -605,3 +605,24 @@ test('Spec A5: Vorlage nennt nach «Angaben speichern» den neuen Anmeldeschluss
 	await expect(neu(page).getByLabel('Text')).toHaveValue(/Anmeldung bis \S+, 15\. Juni\./);
 	expect(fehler).toEqual([]);
 });
+
+test('FR-42: Vorlage am Anlass nennt nach «Angaben speichern» den neuen Anmeldeschluss', async ({
+	page
+}) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const admin = await legeRollenkontoMitBriefCodeAn('Mona', ['mitglieder']);
+	const titel = `GV ${randomUUID().slice(0, 8)}`;
+	const anlassId = await legeOffenenAnlassAn(admin.mitgliedId, titel);
+	await oeffneVerwaltungDirekt(page, admin, `/verwaltung/anlaesse/${anlassId}`, titel);
+
+	// Den Anmeldeschluss vom 17. auf den 18. Mai verschieben; gesendet wird nichts.
+	await page.getByLabel('Anmeldeschluss').fill('2099-05-18T23:59');
+	await page.getByRole('button', { name: 'Angaben speichern' }).click();
+	await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
+
+	await page.getByRole('button', { name: 'Neue Mitteilung' }).click();
+	await neu(page).getByRole('button', { name: 'Erinnerung', exact: true }).click();
+	await expect(neu(page).getByLabel('Text')).toHaveValue(/bis \S+ 18\. Mai/);
+	expect(fehler).toEqual([]);
+});
