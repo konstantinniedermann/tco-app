@@ -5,6 +5,8 @@ import { icFolgen, icTeam, pushAbo } from '../db/schema.ts';
 
 export type FolgenStand = { folgt: boolean; push: boolean };
 export type GefolgtesTeam = { teamId: number; liga: string };
+/** Für die Auskunft (DS-07): dazu, seit wann das Konto dem Team folgt. */
+export type GefolgtesTeamSeit = GefolgtesTeam & { seit: Date };
 
 async function hatPush(db: Db, kontoId: number): Promise<boolean> {
 	const [z] = await db
@@ -85,9 +87,12 @@ export async function ladeGefolgteTeams(
  * es das Team gibt. Reihenfolge: neueste Saison zuerst, dann wie die Übersicht. Ein Team ohne Zeile
  * in `ic_team` erscheint als «Team <Nr>», damit nichts Gespeichertes fehlt.
  */
-export async function ladeAlleGefolgtenTeams(db: Db, kontoId: number): Promise<GefolgtesTeam[]> {
+export async function ladeAlleGefolgtenTeams(
+	db: Db,
+	kontoId: number
+): Promise<GefolgtesTeamSeit[]> {
 	const gefolgt = await db
-		.select({ teamId: icFolgen.teamId })
+		.select({ teamId: icFolgen.teamId, seit: icFolgen.seit })
 		.from(icFolgen)
 		.where(eq(icFolgen.kontoId, kontoId));
 	if (gefolgt.length === 0) return [];
@@ -101,16 +106,20 @@ export async function ladeAlleGefolgtenTeams(db: Db, kontoId: number): Promise<G
 			)
 		)
 		.orderBy(desc(icTeam.saison), asc(icTeam.reihenfolge), asc(icTeam.teamId));
+	const seit = new Map(gefolgt.map((z) => [z.teamId, z.seit]));
 	const ligen = new Map<number, string>();
-	const ergebnis: GefolgtesTeam[] = [];
+	const ergebnis: GefolgtesTeamSeit[] = [];
 	for (const z of zeilen) {
 		if (ligen.has(z.teamId)) continue;
 		ligen.set(z.teamId, z.liga);
-		ergebnis.push({ teamId: z.teamId, liga: z.liga });
+		ergebnis.push({ teamId: z.teamId, liga: z.liga, seit: seit.get(z.teamId)! });
 	}
 	const unbekannt = gefolgt
 		.map((z) => z.teamId)
 		.filter((id) => !ligen.has(id))
 		.sort((a, b) => a - b);
-	return [...ergebnis, ...unbekannt.map((teamId) => ({ teamId, liga: `Team ${teamId}` }))];
+	return [
+		...ergebnis,
+		...unbekannt.map((teamId) => ({ teamId, liga: `Team ${teamId}`, seit: seit.get(teamId)! }))
+	];
 }

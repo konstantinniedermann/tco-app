@@ -18,7 +18,7 @@ import {
 	type Antwort
 } from '../db/schema.ts';
 import type { Angaben } from './angaben.ts';
-import { ladeAlleGefolgtenTeams, type GefolgtesTeam } from '../interclub/folgen.ts';
+import { ladeAlleGefolgtenTeams, type GefolgtesTeamSeit } from '../interclub/folgen.ts';
 import { ladeMitglied, type Detail, type MitgliedStatus } from './mitglieder.ts';
 import type { AnsichtRolle, Rolle } from './rollen.ts';
 import { sitzungAbgelaufen } from '../login/sitzung.ts';
@@ -43,7 +43,7 @@ export type Auskunft = {
 	/** Themen, zu denen das Mitglied Mitteilungen erhält (FR-41). */
 	themen: Thema[];
 	/** Interclub-Teams, denen das Mitglied folgt, mit ihrer Liga (neueste Saison, in der es das Team gibt). */
-	interclubTeams: GefolgtesTeam[];
+	interclubTeams: GefolgtesTeamSeit[];
 	login: {
 		/**
 		 * Gültige Sitzungen, je angemeldetes Gerät; bei Admins, wann die Verwaltung bestätigt wurde,

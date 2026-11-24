@@ -7,6 +7,7 @@ import {
 	legeKontoAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
+import { folgeTeam } from './hilfen/interclub.ts';
 import { holeMailCode, mailTexte, warteAufMail } from './hilfen/mail.ts';
 import { MAILPIT_URL } from './hilfen/umgebung.ts';
 import {
@@ -68,6 +69,9 @@ test('FR-04, A-MITGLIED-03: Austritt, Wiedereintritt, Vormerken, Rückgängig un
 	const fehler = sammleKonsolenfehler(page);
 	const projekt = info.project.name;
 	const ziel = await legeKontoAn('Gerda', `Beispiel${projekt}`);
+	// Ein gefolgtes Team, das nicht in der Datenbank steht: die Auskunft nennt es mit «seit wann».
+	const team = 900_000 + ziel.mitgliedId;
+	await folgeTeam(ziel.kontoId, team, new Date('2026-11-07T08:00:00Z'));
 	await oeffneVerwaltung(page);
 
 	await page.goto(`/verwaltung/mitglieder/${ziel.mitgliedId}`);
@@ -158,6 +162,9 @@ test('FR-04, A-MITGLIED-03: Austritt, Wiedereintritt, Vormerken, Rückgängig un
 	).toBeVisible();
 	for (const abschnitt of ['Angaben', 'Mitgliedschaft und Rollen', 'Login und Geräte'])
 		await expect(page.getByRole('heading', { level: 2, name: abschnitt })).toBeVisible();
+	await expect(page.getByRole('row', { name: /^Interclub-Teams/ })).toContainText(
+		`Team ${team} (seit 7.11.2026)`
+	);
 	// «Wer» nennt den Admin nicht beim Namen.
 	const verlauf = page.getByRole('region', { name: 'Änderungsverlauf' });
 	await expect(verlauf).toContainText('Mitgliederverwaltung');

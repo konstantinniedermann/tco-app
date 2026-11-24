@@ -29,7 +29,9 @@
 		a.themen.length === 0 ? 'keine' : a.themen.map((t) => THEMA_NAME[t]).join(', ')
 	);
 	const interclubTeams = $derived(
-		a.interclubTeams.length === 0 ? 'keine' : a.interclubTeams.map((t) => t.liga).join(', ')
+		a.interclubTeams.length === 0
+			? 'keine'
+			: a.interclubTeams.map((t) => `${t.liga} (seit ${datumText(t.seit)})`).join(', ')
 	);
 	const mitgliedschaft = $derived.by(() => {
 		const m = a.mitgliedschaft;
