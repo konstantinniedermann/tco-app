@@ -146,11 +146,12 @@ jobs:
       - run: npm run build
       - run: npm run build:spa
 
-  # Je Gerät (Playwright-Projekt) ein oder mehrere Teile (`--shard`, verteilt nach Datei): Der
-  # Runner hat 2 Kerne, Playwright nutzt davon einen Worker; ein Job je Gerät dauerte auf dem
-  # iPhone fast 9 Minuten. Jeder Teil hat gut eine Minute Vorlauf und baut die App selbst, darum
-  # nicht feiner (Minuten sind für das öffentliche Repo gratis). Fällt ein Teil durch, laufen die
-  # anderen zu Ende. Die Auslieferung wartet auf alle Teile.
+  # Je Gerät (Playwright-Projekt) mehrere Teile (`--shard`, verteilt nach Datei), Playwright nutzt
+  # je Teil 2 Worker; ein Job je Gerät dauerte auf dem iPhone fast 9 Minuten. Jeder Teil hat rund
+  # 1½ Minuten Vorlauf (Container, `npm ci`, Build der App), darum bringt ein weiterer Teil wenig,
+  # sobald die Tests eines Teils kürzer laufen als dieser Vorlauf (Minuten sind für das öffentliche
+  # Repo gratis). Fällt ein Teil durch, laufen die anderen zu Ende. Die Auslieferung wartet auf
+  # alle Teile.
   # Die Jobs laufen im offiziellen Playwright-Image (Browser und Systempakete schon drin): Die
   # Installation über apt hing am langsamen Ubuntu-Spiegel. Im Container erreichen die Tests
   # Datenbank und Mailpit über die Service-Namen, nicht über localhost.
@@ -168,12 +169,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { geraet: iphone, teil: 1, teile: 3 }
-          - { geraet: iphone, teil: 2, teile: 3 }
-          - { geraet: iphone, teil: 3, teile: 3 }
-          - { geraet: android, teil: 1, teile: 2 }
-          - { geraet: android, teil: 2, teile: 2 }
-          - { geraet: desktop, teil: 1, teile: 1 }
+          - { geraet: iphone, teil: 1, teile: 5 }
+          - { geraet: iphone, teil: 2, teile: 5 }
+          - { geraet: iphone, teil: 3, teile: 5 }
+          - { geraet: iphone, teil: 4, teile: 5 }
+          - { geraet: iphone, teil: 5, teile: 5 }
+          - { geraet: android, teil: 1, teile: 3 }
+          - { geraet: android, teil: 2, teile: 3 }
+          - { geraet: android, teil: 3, teile: 3 }
+          - { geraet: desktop, teil: 1, teile: 2 }
+          - { geraet: desktop, teil: 2, teile: 2 }
     permissions:
       contents: read
     services:
