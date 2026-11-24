@@ -92,7 +92,7 @@ Anmeldung zu einem Turnier (im Code `anlassAnmeldung`).
 | Objekt | Attribute | P |
 |--------|-----------|---|
 | **Push-Abo** | Konto, Sitzung, Adresse beim Push-Dienst, zwei Schlüssel, eingerichtet am. Gehört zur Sitzung und endet mit ihr (FR-40) | Konto |
-| **Mitteilung** | Bezug (Anlass oder Verein; die Clubmeisterschaft folgt später), Anlass (bei Bezug Anlass), Absender (Mitglied), Zeit, Titel, Text, Auswahl der Empfänger, Weg, Zahlen (Push zugestellt, E-Mails verschickt, ersatzweise per E-Mail, nicht erreichbar). Keine Empfängernamen (FR-45) | Absender |
+| **Mitteilung** | Bezug (Anlass, Verein oder Turnier), Anlass (bei Bezug Anlass), Turnier (bei Bezug Turnier), Kategorie (nur beim Turnier: Name zum Sendezeitpunkt, freiwillig), Absender (Mitglied), Zeit, Titel, Text, Auswahl der Empfänger (beim Verein auch je Rolle), Weg, Zahlen (Push zugestellt, E-Mails verschickt, ersatzweise per E-Mail, nicht erreichbar). Keine Empfängernamen (FR-45) | Absender |
 
 ### Clubmeisterschaft
 
