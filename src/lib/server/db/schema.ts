@@ -105,7 +105,7 @@ export const konto = pgTable('konto', {
 
 export type Thema = 'anlaesse' | 'cm' | 'verein';
 export type Weg = 'push' | 'push-sonst-mail' | 'push-und-mail';
-// 'cm' kommt mit dem CM-Plan.
+// Worauf sich eine Mitteilung bezieht; 'turnier' ist die Clubmeisterschaft (#95).
 export type Bezug = 'anlass' | 'verein' | 'turnier';
 
 export const sitzung = pgTable(
