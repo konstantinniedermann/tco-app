@@ -11,7 +11,12 @@ import {
 } from './hilfen/login.ts';
 import { legeOffenenAnlassAn, meldeZumAnlass } from './hilfen/anlass.ts';
 import { holeMailCode, warteAufMail } from './hilfen/mail.ts';
-import { legeOffenesTurnierAn, meldeZurCmAn, setzeSpielerangaben } from './hilfen/turnier.ts';
+import {
+	legeOffenesTurnierAn,
+	legeTurnierAn,
+	meldeZurCmAn,
+	setzeSpielerangaben
+} from './hilfen/turnier.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,
@@ -392,6 +397,17 @@ const HERREN: KategorieWerte = {
 	mindestsumme: null
 };
 
+const MIXED: KategorieWerte = {
+	name: 'Mixed Doppel',
+	geschlecht: 'mixed',
+	art: 'doppel',
+	jahrgangVon: null,
+	jahrgangBis: null,
+	klassierungVon: null,
+	klassierungBis: null,
+	mindestsumme: 9
+};
+
 /** Erfundener Spieler R8, zur Kategorie `kategorieId` angemeldet. */
 async function angemeldeterSpieler(vorname: string, kategorieId: number) {
 	const spieler = await legeKontoAn(vorname, `Probe${randomUUID().slice(0, 6)}`);
@@ -409,12 +425,12 @@ test('Spec A6: CM-Admin schickt Mitteilung an die Angemeldeten einer Kategorie',
 }, info) => {
 	test.setTimeout(90_000);
 	const fehler = sammleKonsolenfehler(page);
-	// Eigenes Turnier mit eigener Kategorie: Die Mails gehen nur an die zwei eigenen Spieler.
+	// Eigenes Turnier mit eigenen Kategorien: Die Mails gehen nur an die zwei eigenen Spieler.
 	const {
 		turnierId,
 		jahr,
 		kategorieIds: [kategorieId]
-	} = await legeOffenesTurnierAn([HERREN]);
+	} = await legeOffenesTurnierAn([HERREN, MIXED]);
 	const spieler = await angemeldeterSpieler('Kurt', kategorieId);
 	await angemeldeterSpieler('Kilian', kategorieId);
 	const cm = await legeCmMitBriefCodeAn('Dario');
@@ -436,12 +452,28 @@ test('Spec A6: CM-Admin schickt Mitteilung an die Angemeldeten einer Kategorie',
 	await expect(neu(page).getByLabel('Spielberechtigt, noch nicht angemeldet')).toBeChecked();
 	const kategorie = neu(page).getByLabel('Kategorie', { exact: true });
 	await expect(kategorie).toHaveValue('');
+	await expect(kategorie.getByRole('option')).toHaveText([
+		'Alle Kategorien',
+		HERREN.name,
+		MIXED.name
+	]);
+
+	// Spec A6: bei «alle» keine Kategorie; «sucht Partner» nur Doppel, eine Einzel-Wahl fällt weg.
+	await neu(page).getByLabel('Alle aktiven Mitglieder').check();
+	await expect(kategorie).toBeHidden();
+	await neu(page).getByLabel('Angemeldet', { exact: true }).check();
+	await kategorie.selectOption({ label: HERREN.name });
+	await neu(page).getByLabel('Doppel: sucht Partner').check();
+	await expect(kategorie).toHaveValue('');
+	await expect(kategorie.getByRole('option')).toHaveText(['Alle Kategorien', MIXED.name]);
 	await neu(page).getByLabel('Angemeldet', { exact: true }).check();
 	await kategorie.selectOption({ label: HERREN.name });
 
 	await neu(page).getByRole('button', { name: 'Vorschau' }).click();
 	await expect(page.getByText('2 Mitglieder: 0 per Push, 2 per E-Mail')).toBeVisible();
 	await expect(sendenTaste(page)).toBeEnabled();
+	// Die feste Kopfzeile steht im Ganzseiten-Bild dort, wo gerade gescrollt ist: oben halten.
+	await page.evaluate(() => window.scrollTo(0, 0));
 	await pruefeBildschirm(page, info, 'mitteilung-turnier-vorschau');
 
 	// Eine andere Kategorie verwirft die Vorschau.
@@ -499,5 +531,43 @@ test('Spec B11: Mitglieder-Admin schickt an eine Rolle (nur Push)', async ({ pag
 		.filter({ hasText: titel });
 	await expect(zeile).toContainText('Alle mit Rolle Lizenz-Admin');
 	await expect(zeile).toContainText('Nur Push');
+	expect(fehler).toEqual([]);
+});
+
+test('Spec A2: Turnier in Vorbereitung zeigt statt des Formulars einen Satz', async ({
+	page
+}, info) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const { turnierId, jahr } = await legeTurnierAn();
+	const cm = await legeCmMitBriefCodeAn('Dario');
+	await oeffneVerwaltungDirekt(
+		page,
+		cm,
+		`/verwaltung/turniere/${turnierId}`,
+		`Clubmeisterschaft ${jahr}`
+	);
+	await expect(page.getByRole('heading', { level: 2, name: 'Mitteilungen' })).toBeVisible();
+	await expect(page.getByText('Mitteilungen gehen, sobald die Anmeldung offen ist.')).toBeVisible();
+	await expect(page.getByRole('button', { name: 'Neue Mitteilung' })).toHaveCount(0);
+	await expect(page.getByText('Noch keine Mitteilungen verschickt.')).toBeVisible();
+	await pruefeBildschirm(page, info, 'mitteilung-turnier-vorbereitung');
+	expect(fehler).toEqual([]);
+});
+
+test('Spec A1: MyTCO-Admin sieht auf der Turnierseite nur den Verlauf', async ({ page }) => {
+	const fehler = sammleKonsolenfehler(page);
+	// Regel 3: Der MyTCO-Admin liest die Clubmeisterschaft, schickt aber nichts.
+	const { turnierId, jahr } = await legeOffenesTurnierAn([HERREN]);
+	const mytco = await legeRollenkontoMitBriefCodeAn('Theo', ['mytco']);
+	await oeffneVerwaltungDirekt(
+		page,
+		mytco,
+		`/verwaltung/turniere/${turnierId}`,
+		`Clubmeisterschaft ${jahr}`
+	);
+	await expect(page.getByRole('heading', { level: 2, name: 'Mitteilungen' })).toBeVisible();
+	await expect(page.getByText('Noch keine Mitteilungen verschickt.')).toBeVisible();
+	await expect(page.getByRole('button', { name: 'Neue Mitteilung' })).toHaveCount(0);
 	expect(fehler).toEqual([]);
 });
