@@ -109,8 +109,12 @@ Doku-Merge ändert ihn nicht.
    sofort aktiv.
 2. **Bauen (`bauen`, nur `dev`):** Image bauen (mit dem Build-Argument `MYTCO_COMMIT` für die
    Fusszeile auf Test) und mit dem Commit als Kennzeichen
-   (`commit-<sha>`) in die private Container-Ablage von GitHub legen.
-3. **Verbinden (`ausliefern`):** Die CI meldet sich per SSH beim **Türsteher** auf dem Server,
+   (`commit-<sha>`) in die private Container-Ablage von GitHub legen. Das läuft parallel zu den
+   Prüfungen; das Image eines roten Stands bleibt so in der Ablage, wird aber nie ausgeliefert
+   und bekommt kein Kennzeichen `code-<Hash>`. Die Ablage selbst räumt niemand auf.
+3. **Verbinden (`ausliefern`):** Erst wenn alle Prüfungen grün sind (Doku, Prüfen, alle
+   E2E-Teile, Malware-Prüfung, Image mit Rauchtest; `workflow-rechte.ts` prüft, dass der Job
+   auf jede wartet und ihr Ergebnis im `if` steht, nicht aber die Logik drumherum). Die CI meldet sich per SSH beim **Türsteher** auf dem Server,
    mit je einem eigenen Schlüssel für Test und Live. Der Schlüssel darf nur den Türsteher
    starten; die Umgebung steht im Schlüssel, nicht in der Anfrage. Übergeben wird nur der
    Digest des Images. Der Schlüssel wird je Zweig gewählt, ohne Rückfall auf den anderen; ein
@@ -233,7 +237,9 @@ Wer ausliefern kann, kommt an die Mitgliederdaten. Deshalb:
 - Die Rechte der Workflows prüft `workflow-rechte.ts` in der CI: Die Workflow-Ebene hat nur
   `contents: read`, und kein Job hat mehr als vorgegeben: `packages: write` nur `bauen` und
   `freigeben`, `packages: read` nur `finden` und `ausliefern`, `contents: write` nur `release`, die SSH-Geheimnisse
-  nur `ausliefern`.
+  nur `ausliefern`. Dazu das Tor: `ausliefern` nennt `doku`, `pruefen`, `e2e`, `malware` und
+  `image` in `needs` (als Liste in einer Zeile) und verlangt im `if` für jeden
+  `result == 'success'`.
 - Nur der Auslieferungs-Job fordert den SSH-Schlüssel an. Er führt keine npm-Pakete, keine
   fremden Actions und nichts aus Caches oder Artefakten anderer Jobs aus. GitHub gibt ein
   Geheimnis nur an Schritte, die es anfordern; ein Schadpaket in den Tests kommt so nicht
@@ -360,7 +366,7 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), dazu die Vertragstests der Schnittstellen (Grundprüfung, Routen-Test, Bremsen-Test), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
-| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI als ein Job pro Umgebung parallel (je nur mit ihrem Browser); Screenshots als Artefakt pro Umgebung, 30 Tage; im offiziellen Playwright-Image (Browser und Systempakete schon drin, Version aus `package-lock.json`), Datenbank und Mailpit über die Service-Namen; jeder Lauf läuft über `scripts/e2e.ts` auf einer eigenen, danach gelöschten Datenbank (`mytco_e2e_…`) im Postgres-Service und baut in einen eigenen, danach gelöschten Ordner (`.e2e-build/…`) | Testkonzept | vorhanden |
+| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI parallel in Teilen je Umgebung (`--shard`, nach Datei verteilt: iPhone 3, Android 2, Desktop 1; je nur mit ihrem Browser); Screenshots als Artefakt pro Teil, 30 Tage; im offiziellen Playwright-Image (Browser und Systempakete schon drin, Version aus `package-lock.json`), Datenbank und Mailpit über die Service-Namen; jeder Lauf läuft über `scripts/e2e.ts` auf einer eigenen, danach gelöschten Datenbank (`mytco_e2e_…`) im Postgres-Service und baut in einen eigenen, danach gelöschten Ordner (`.e2e-build/…`) | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
 | Docker-Image baut | ADR-003 | vorhanden |
 | Rauchtest des Images (Start, Migration, `/api/status`) | ADR-003 | vorhanden |
@@ -379,9 +385,9 @@ und nicht Teil von `make check` oder der CI.
 **Spur beim Handstart:** Wird ein E2E-Test nur in der CI rot, lässt sich ein Lauf von Hand mit
 Spur starten (`gh workflow run check.yml --ref <branch> -f spur=true`). Dann zeichnet Playwright
 für jeden Test eine Spur auf (Schritte, Netz, Konsole, Abbilder der Seite; `trace.zip` im Artefakt
-`test-results-<gerät>`, öffnen mit `npx playwright show-trace`); lokal genügt `MYTCO_E2E_SPUR=an`.
+`test-results-<gerät>-<teil>`, öffnen mit `npx playwright show-trace`); lokal genügt `MYTCO_E2E_SPUR=an`.
 Läufe bei Push und PR zeichnen keine Spur auf und wiederholen keinen Test. Ein Lauf mit Spur dauert
-rund eine Minute länger je Gerät; die Artefakte sind mit zusammen rund 1 GB etwa achtmal so gross
+rund eine Minute länger je Teil; die Artefakte sind mit zusammen rund 1 GB etwa achtmal so gross
 und liegen wie alle Artefakte 30 Tage öffentlich beim Lauf (nur erfundene Testdaten).
 
 gitleaks und osv-scanner werden als Binary geladen (bei Störungen von GitHub bis zu 5 Wiederholungen im Abstand von 15 s) und danach per SHA-256 geprüft.
@@ -523,7 +529,9 @@ bleiben, weil sie auch die Wartezeit kurz halten.
   3 Minuten und kostet 11 abgerechnete Minuten. GitHub rundet jeden Job auf ganze Minuten
   auf, gezählt werden 7 Jobs inklusive Secret-Scan. Ein reiner Doku-Merge kostet 3 Minuten.
   Seit den Ende-zu-Ende-Tests auf drei Geräten kostet ein voller Lauf rund 20 abgerechnete
-  Minuten (B: Jobdauern auf `dev`, 06.11.2026).
+  Minuten (B: Jobdauern auf `dev`, 06.11.2026). Seit dem 24.11.2026 laufen die E2E-Tests in sechs
+  Teilen und das Image entsteht parallel zu den Prüfungen: mehr Minuten, dafür kürzere Wartezeit
+  bis Test (vorher rund 11 Minuten je Merge mit Code, B: Lauf 45391979705).
 - **Notfall ohne CI** (GitHub-Ausfall oder das Repo wird wieder privat und die Minuten sind
   aufgebraucht): Ohne CI gibt es auch kein Image. Der Projektleiter baut
   es dann lokal für den Server (`--platform linux/amd64 --build-arg MYTCO_COMMIT=$(git rev-parse HEAD)`,

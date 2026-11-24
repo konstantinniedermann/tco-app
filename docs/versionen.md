@@ -26,6 +26,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
   Browser präzisiert (Beobachtungs-Auswertung vom 24.11.2026).
 - Werkzeug: `make seed` legt die Beispiel-GV im passenden Jahr an; `make seed`, `make admin` und
   `make e2e` brechen bei falscher Node-Version ab.
+- Werkzeug: Die CI teilt die E2E-Tests auf sechs Läufe und baut das Image parallel zu den
+  Prüfungen; ein Merge kommt rund doppelt so schnell auf Test. An der App ändert sich nichts.
 
 ## 0.24.0 — Interclub mit Push, Tabellen am PC, Rollen auf einer Seite
 

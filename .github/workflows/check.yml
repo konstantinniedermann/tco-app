@@ -146,14 +146,16 @@ jobs:
       - run: npm run build
       - run: npm run build:spa
 
-  # Ein Job pro Gerät (Playwright-Projekt): Der Runner hat 2 Kerne, Playwright nutzt davon einen
-  # Worker; nacheinander dauerten die drei Geräte gut 8 Minuten. Fällt ein Gerät durch, laufen
-  # die anderen zu Ende. Die Auslieferung wartet auf alle drei.
+  # Je Gerät (Playwright-Projekt) ein oder mehrere Teile (`--shard`, verteilt nach Datei): Der
+  # Runner hat 2 Kerne, Playwright nutzt davon einen Worker; ein Job je Gerät dauerte auf dem
+  # iPhone fast 9 Minuten. Jeder Teil hat gut eine Minute Vorlauf und baut die App selbst, darum
+  # nicht feiner (Minuten sind für das öffentliche Repo gratis). Fällt ein Teil durch, laufen die
+  # anderen zu Ende. Die Auslieferung wartet auf alle Teile.
   # Die Jobs laufen im offiziellen Playwright-Image (Browser und Systempakete schon drin): Die
   # Installation über apt hing am langsamen Ubuntu-Spiegel. Im Container erreichen die Tests
   # Datenbank und Mailpit über die Service-Namen, nicht über localhost.
   e2e:
-    name: E2E (${{ matrix.geraet }})
+    name: E2E (${{ matrix.geraet }} ${{ matrix.teil }}/${{ matrix.teile }})
     needs: aenderung
     if: needs.aenderung.outputs.code == 'true'
     runs-on: ubuntu-latest
@@ -165,7 +167,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        geraet: [iphone, android, desktop]
+        include:
+          - { geraet: iphone, teil: 1, teile: 3 }
+          - { geraet: iphone, teil: 2, teile: 3 }
+          - { geraet: iphone, teil: 3, teile: 3 }
+          - { geraet: android, teil: 1, teile: 2 }
+          - { geraet: android, teil: 2, teile: 2 }
+          - { geraet: desktop, teil: 1, teile: 1 }
     permissions:
       contents: read
     services:
@@ -212,14 +220,15 @@ jobs:
       - name: E2E-Tests
         env:
           GERAET: ${{ matrix.geraet }}
+          TEIL: ${{ matrix.teil }}/${{ matrix.teile }}
           # «an» nur beim Handstart mit gesetztem Schalter; bei Push und PR ist `inputs.spur` leer.
           MYTCO_E2E_SPUR: ${{ inputs.spur && 'an' || 'aus' }}
-        run: npm run e2e -- --project="$GERAET"
+        run: npm run e2e -- --project="$GERAET" --shard="$TEIL"
       - name: Ergebnisse und Screenshots sichern
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: test-results-${{ matrix.geraet }}
+          name: test-results-${{ matrix.geraet }}-${{ matrix.teil }}
           path: test-results/
           retention-days: 30
           if-no-files-found: warn
@@ -284,9 +293,12 @@ jobs:
   # Kennzeichen des Code-Stands, `finden` (main) sucht über dieses Kennzeichen genau das
   # Image wieder, das auf Test lief.
 
+  # Baut parallel zu den Prüfungen, damit die Auslieferung nicht nach den Tests noch auf den Bau
+  # wartet. Das Tor liegt in `ausliefern`: Das Image eines roten Stands bleibt in der Ablage,
+  # wird aber nie ausgeliefert und bekommt kein Kennzeichen `code-…`.
   bauen:
     name: Bauen (Image nach GHCR, für Test)
-    needs: [aenderung, doku, pruefen, e2e, malware, image]
+    needs: aenderung
     if: >-
       github.event_name == 'push' && github.ref == 'refs/heads/dev'
       && needs.aenderung.outputs.code == 'true' && vars.AUSLIEFERUNG_TEST == 'an'
@@ -393,8 +405,14 @@ jobs:
   # scripts/pruefungen/workflow-rechte.ts). Ausgabe ausschliesslich `ok` oder `fehler`.
   ausliefern:
     name: Ausliefern (SSH an den Türsteher)
-    needs: [bauen, finden]
-    if: ${{ !cancelled() && (needs.bauen.result == 'success' || needs.finden.result == 'success') }}
+    # Das Tor: wartet auf jede Prüfung und verlangt ihr Ergebnis (workflow-rechte.ts prüft, dass
+    # beides dasteht).
+    needs: [bauen, finden, doku, pruefen, e2e, malware, image]
+    if: >-
+      ${{ !cancelled() && (needs.bauen.result == 'success' || needs.finden.result == 'success')
+      && needs.doku.result == 'success' && needs.pruefen.result == 'success'
+      && needs.e2e.result == 'success' && needs.malware.result == 'success'
+      && needs.image.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
