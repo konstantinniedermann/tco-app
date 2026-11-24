@@ -130,9 +130,12 @@ import {
 } from './mitteilung/schnittstellen.ts';
 import {
 	getAnlassMitteilungen,
+	getTurnierMitteilungen,
 	getVereinMitteilungen,
 	postAnlassSenden,
 	postAnlassVorschau,
+	postTurnierSenden,
+	postTurnierVorschau,
 	postVereinSenden,
 	postVereinVorschau
 } from './mitteilung/verwaltung-schnittstellen.ts';
@@ -244,6 +247,13 @@ const ROUTEN: Record<string, Partial<Record<Methode, Verdrahtung>> | typeof EIGE
 	'/api/admin/turniere/[id]': { GET: [getTurnier, 'admin'], POST: [postTurnier, 'admin'] },
 	'/api/admin/turniere/[id]/gespraeche': { GET: [getGespraeche, 'mitteilungAdmin'] },
 	'/api/admin/turniere/[id]/kategorien': { POST: [postKategorien, 'admin'] },
+	'/api/admin/turniere/[id]/mitteilungen': { GET: [getTurnierMitteilungen, 'mitteilungAdmin'] },
+	'/api/admin/turniere/[id]/mitteilungen/senden': {
+		POST: [postTurnierSenden, 'mitteilungAdmin']
+	},
+	'/api/admin/turniere/[id]/mitteilungen/vorschau': {
+		POST: [postTurnierVorschau, 'mitteilungAdmin']
+	},
 	'/api/admin/turniere/[id]/status': { POST: [postTurnierStatus, 'admin'] },
 	'/api/admin/verlauf': { GET: [getVerlauf, 'admin'] },
 	'/api/admin/zugang': { GET: [getZugang, 'admin'], POST: [postZugang, 'admin'] },

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { pruefeMitteilung } from './angaben.ts';
+import { pruefeKategorie, pruefeMitteilung } from './angaben.ts';
 
 const AUSWAHLEN = ['alle', 'keine-antwort'] as const;
 const GUT = { titel: 'Erinnerung', text: 'Bitte melde dich an.', auswahl: 'alle', weg: 'push' };
@@ -77,5 +77,52 @@ describe('Mitteilung prüfen', () => {
 		expect(
 			pruefeMitteilung({ titel: 5, text: {}, auswahl: 'alle', weg: 'push' }, AUSWAHLEN)
 		).toEqual({ ok: false, felder: ['titel', 'text'] });
+	});
+});
+
+// Aktive Kategorien eines erfundenen Turniers.
+const KATEGORIEN = [
+	{ id: 11, name: 'Herren R1–R5', art: 'einzel' as const },
+	{ id: 12, name: 'Herren Doppel', art: 'doppel' as const }
+];
+
+describe('Kategorie einer Mitteilung zum Turnier prüfen', () => {
+	test('Spec A6: ohne Kategorie gilt das ganze Turnier', () => {
+		for (const roh of [{}, { kategorieId: null }, null, 'x'])
+			for (const auswahl of ['alle', 'angemeldet', 'berechtigt', 'sucht-partner'] as const)
+				expect(
+					pruefeKategorie(roh, auswahl, KATEGORIEN),
+					`${auswahl} ${JSON.stringify(roh)}`
+				).toEqual({
+					ok: true,
+					kategorie: null
+				});
+	});
+
+	test('Spec A6: eine Kategorie des Turniers kommt mit Namen zurück', () => {
+		expect(pruefeKategorie({ kategorieId: 11 }, 'angemeldet', KATEGORIEN)).toEqual({
+			ok: true,
+			kategorie: { id: 11, name: 'Herren R1–R5' }
+		});
+		expect(pruefeKategorie({ kategorieId: 11 }, 'berechtigt', KATEGORIEN)).toEqual({
+			ok: true,
+			kategorie: { id: 11, name: 'Herren R1–R5' }
+		});
+		expect(pruefeKategorie({ kategorieId: 12 }, 'sucht-partner', KATEGORIEN)).toEqual({
+			ok: true,
+			kategorie: { id: 12, name: 'Herren Doppel' }
+		});
+	});
+
+	test('Spec A6: unbekannte Kategorie, Kategorie bei alle, Einzel bei sucht-partner abgewiesen', () => {
+		for (const kategorieId of [13, 0, -1, 11.5, '11', true, {}])
+			expect(
+				pruefeKategorie({ kategorieId }, 'angemeldet', KATEGORIEN),
+				JSON.stringify(kategorieId)
+			).toEqual({ ok: false });
+		expect(pruefeKategorie({ kategorieId: 11 }, 'alle', KATEGORIEN)).toEqual({ ok: false });
+		expect(pruefeKategorie({ kategorieId: 11 }, 'sucht-partner', KATEGORIEN)).toEqual({
+			ok: false
+		});
 	});
 });

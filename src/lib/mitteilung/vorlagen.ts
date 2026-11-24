@@ -11,10 +11,11 @@ export const FELD_MELDUNG = {
 	titel: `Bitte einen Titel mit höchstens ${MAX_TITEL} Zeichen angeben.`,
 	text: `Bitte einen Text mit höchstens ${MAX_TEXT} Zeichen angeben.`,
 	auswahl: 'Bitte die Empfänger wählen.',
+	kategorie: 'Bitte eine Kategorie dieses Turniers wählen.',
 	weg: 'Bitte einen Weg wählen.'
 } as const;
 
-export type VorlageArt = 'erinnerung' | 'aenderung' | 'neu';
+export type VorlageArt = 'erinnerung' | 'aenderung' | 'neu' | 'offen';
 export type Vorlage = { art: VorlageArt; titel: string; text: string };
 
 const AUSLASSUNG = '…';
@@ -57,6 +58,25 @@ export function vorlagenAnlass(a: {
 			art: 'neu',
 			titel: titel('Neuer Anlass: '),
 			text: text('Neu in MyTCO: ', ` am ${beginn}. Melde dich an.`)
+		}
+	];
+}
+
+/** Spec A5: Vorlagen zur Clubmeisterschaft; `anmeldeschluss` als Tag (`JJJJ-MM-TT`). */
+export function vorlagenTurnier(t: { jahr: number; anmeldeschluss: string }): Vorlage[] {
+	const cm = `Clubmeisterschaft ${t.jahr}`;
+	const schluss = formatiereTag(t.anmeldeschluss);
+	return [
+		{ art: 'erinnerung', titel: `Erinnerung: ${cm}`, text: `${cm}: Anmeldung bis ${schluss}.` },
+		{
+			art: 'aenderung',
+			titel: `Geändert: ${cm}`,
+			text: `${cm}: Änderung, bitte in MyTCO nachsehen.`
+		},
+		{
+			art: 'offen',
+			titel: `Anmeldung offen: ${cm}`,
+			text: `${cm}: Anmeldung ist offen bis ${schluss}.`
 		}
 	];
 }

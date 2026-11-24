@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { MAX_TEXT, MAX_TITEL, vorlagenAnlass } from './vorlagen.ts';
+import { MAX_TEXT, MAX_TITEL, vorlagenAnlass, vorlagenTurnier } from './vorlagen.ts';
 
 // Erfundener Anlass; Beginn und Schluss in UTC, angezeigt in Schweizer Zeit (Winterzeit, +1 h).
 const GV = {
@@ -62,5 +62,38 @@ describe('Vorlagen zum Anlass', () => {
 		// «Erinnerung: » (12) + 36 «a» = 48 Zeichen; das Emoji (2) hätte keinen Platz mehr vor «…».
 		expect(erinnerung.titel).toBe(`Erinnerung: ${'a'.repeat(36)}…`);
 		expect(erinnerung.titel).not.toMatch(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])/);
+	});
+});
+
+describe('Vorlagen zum Turnier', () => {
+	test('FR-42: Vorlagen nennen Jahr und Anmeldeschluss', () => {
+		expect(vorlagenTurnier({ jahr: 2027, anmeldeschluss: '2027-05-31' })).toEqual([
+			{
+				art: 'erinnerung',
+				titel: 'Erinnerung: Clubmeisterschaft 2027',
+				text: 'Clubmeisterschaft 2027: Anmeldung bis Mo, 31. Mai.'
+			},
+			{
+				art: 'aenderung',
+				titel: 'Geändert: Clubmeisterschaft 2027',
+				text: 'Clubmeisterschaft 2027: Änderung, bitte in MyTCO nachsehen.'
+			},
+			{
+				art: 'offen',
+				titel: 'Anmeldung offen: Clubmeisterschaft 2027',
+				text: 'Clubmeisterschaft 2027: Anmeldung ist offen bis Mo, 31. Mai.'
+			}
+		]);
+	});
+
+	test('FR-42: Vorlagen bleiben in den Grenzen, auch mit langem Monat', () => {
+		const vorlagen = vorlagenTurnier({ jahr: 2100, anmeldeschluss: '2100-09-30' });
+		expect(vorlagen.map((v) => v.art)).toEqual(['erinnerung', 'aenderung', 'offen']);
+		for (const v of vorlagen) {
+			expect(v.titel.length, v.titel).toBeLessThanOrEqual(MAX_TITEL);
+			expect(v.text.length, v.text).toBeLessThanOrEqual(MAX_TEXT);
+			expect(v.text).toContain('2100');
+		}
+		expect(vorlagen[0].text).toContain('30. September');
 	});
 });

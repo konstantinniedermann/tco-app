@@ -22,6 +22,10 @@
 	} from '../../../../lib/verwaltung/turnier-anzeige.ts';
 	import { amtlicherName } from '../../../../lib/name.ts';
 	import { fehlerText } from '../../../../lib/verwaltung/anzeige.ts';
+	import { ladeMitteilungen } from '../../../../lib/verwaltung/mitteilung-api.ts';
+	import Mitteilungsformular from '../../../../lib/verwaltung/Mitteilungsformular.svelte';
+	import Mitteilungsverlauf from '../../../../lib/verwaltung/Mitteilungsverlauf.svelte';
+	import { MELDUNG } from '../../../../lib/login/anmelden.ts';
 	import { leiteUm } from '../../../../lib/verwaltung/umleiten.ts';
 	import type { PageProps } from './$types';
 
@@ -37,6 +41,13 @@
 	let rueckmeldung = $state<string | null>(null);
 	let statusMeldung = $state<string | null>(null);
 	let laeuft = $state(false);
+	// Mitteilungen (Spec A1): nach dem Senden und mit dem Turnier lädt die Seite sie neu.
+	let mitteilungen = $derived(data.mitteilungen);
+
+	async function verlaufNeuLaden() {
+		const m = await ladeMitteilungen({ art: 'turnier', turnierId: detail.id });
+		if (m.art === 'ok') mitteilungen = m.daten;
+	}
 
 	const ART = { einzel: 'Einzel', doppel: 'Doppel' } as const;
 	const start = $derived<TurnierWerte>(werteAusTurnier(detail));
@@ -56,9 +67,14 @@
 		'nicht-gefunden': 'Dieses Turnier gibt es nicht mehr.'
 	} as const;
 
+	// Die Vorlagen der Mitteilungen nennen Angaben des Turniers (Anmeldeschluss); darum beides neu.
 	async function neuLaden() {
-		const neu = await ladeTurnier(detail.id);
+		const [neu, m] = await Promise.all([
+			ladeTurnier(detail.id),
+			ladeMitteilungen({ art: 'turnier', turnierId: detail.id })
+		]);
 		if (neu.art === 'ok') detail = neu.daten;
+		if (m.art === 'ok') mitteilungen = m.daten;
 		return neu.art === 'ok';
 	}
 
@@ -262,6 +278,26 @@
 			</tbody>
 		</table>
 	</div>
+{/if}
+
+<h2>Mitteilungen</h2>
+{#if mitteilungen === null}
+	<p class="fehler" role="alert">{MELDUNG.stoerung}</p>
+{:else}
+	{#if !nurLesen}
+		<!-- Spec A2: In Vorbereitung sehen Mitglieder das Turnier noch nicht. -->
+		{#if detail.status === 'vorbereitung'}
+			<p>Mitteilungen gehen, sobald die Anmeldung offen ist.</p>
+		{:else}
+			<Mitteilungsformular
+				bezug={{ art: 'turnier', turnierId: detail.id }}
+				vorlagen={mitteilungen.vorlagen}
+				kategorien={mitteilungen.kategorien}
+				onverlauf={verlaufNeuLaden}
+			/>
+		{/if}
+	{/if}
+	<Mitteilungsverlauf eintraege={mitteilungen.verlauf} />
 {/if}
 
 <h2>Angaben</h2>

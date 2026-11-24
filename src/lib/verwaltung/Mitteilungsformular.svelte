@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { ANLASS_AUSWAHLEN } from '../mitteilung/auswahl.ts';
+	import { ANLASS_AUSWAHLEN, TURNIER_AUSWAHLEN, VEREIN_AUSWAHLEN } from '../mitteilung/auswahl.ts';
 	import { MAX_TEXT, MAX_TITEL } from '../mitteilung/vorlagen.ts';
 	import Name from '../ui/Name.svelte';
 	import type { Antwort } from './api.ts';
 	import { fehlerText } from './anzeige.ts';
 	import {
 		AUSWAHL_NAMEN,
+		TURNIER_NAMEN,
+		VEREIN_NAMEN,
+		empfaengerText,
 		gleicheWerte,
 		VORLAGE_NAMEN,
 		WEG_NAMEN,
@@ -18,6 +21,7 @@
 		zeigeVorschau,
 		type Bezug,
 		type MitteilungFeld,
+		type MitteilungKategorie,
 		type MitteilungWerte,
 		type Vorlage,
 		type Vorschau,
@@ -29,6 +33,8 @@
 		bezug: Bezug;
 		/** Vorlagen des Anlasses (Spec Ziel 7); beim Verein leer, dann gleich das leere Formular. */
 		vorlagen: Vorlage[];
+		/** Spec A6: aktive Kategorien des Turniers zur Wahl; nur zum Turnier. */
+		kategorien?: MitteilungKategorie[];
 		/** «Neue Mitteilung» und «Senden» als Haupttaste; nicht, wo die Seite schon eine hat (UI-04). */
 		haupt?: boolean;
 		/** Stufe der Überschrift «Neue Mitteilung»: 3 unter einem Abschnitt, 2 direkt unter dem Seitentitel. */
@@ -36,15 +42,26 @@
 		/** Nach dem Senden, auch nach einer Störung (dann kann sie schon draussen sein): Die Seite lädt den Verlauf neu. */
 		onverlauf: () => void;
 	};
-	let { bezug, vorlagen, haupt = false, stufe = 3, onverlauf }: Props = $props();
+	let { bezug, vorlagen, kategorien = [], haupt = false, stufe = 3, onverlauf }: Props = $props();
 
-	const REIHE: MitteilungFeld[] = ['titel', 'text', 'auswahl', 'weg'];
+	const REIHE: MitteilungFeld[] = ['titel', 'text', 'auswahl', 'kategorie', 'weg'];
+
+	/** Empfänger-Auswahlen des Bezugs mit ihren Namen. */
+	const AUSWAHLEN = {
+		anlass: ANLASS_AUSWAHLEN.map((wert) => ({ wert, name: AUSWAHL_NAMEN[wert] })),
+		turnier: TURNIER_AUSWAHLEN.map((wert) => ({ wert, name: TURNIER_NAMEN[wert] })),
+		verein: VEREIN_AUSWAHLEN.map((wert) => ({ wert, name: VEREIN_NAMEN[wert] }))
+	};
+
+	const zumTurnier = $derived(bezug.art === 'turnier');
 
 	let schritt = $state<'zu' | 'vorlage' | 'formular'>('zu');
 	let start = $state({ titel: '', text: '' });
 	let titel = $state('');
 	let text = $state('');
 	let auswahl = $state('alle');
+	// Spec A6: gewählte Kategorie als Wert der Auswahlliste; leer heisst alle Kategorien.
+	let kategorieWahl = $state('');
 	let weg = $state<Weg>('push-sonst-mail');
 	// FR-43: Die Vorschau gilt nur für die Werte, mit denen sie geholt wurde (`werte`); jede Eingabe
 	// danach verwirft sie, und gesendet werden genau diese Werte.
@@ -59,10 +76,28 @@
 	const ungespeichert = $derived(
 		schritt === 'formular' && (titel !== start.titel || text !== start.text)
 	);
+	// Spec A6: bei *alle* keine Kategorie, bei *sucht Partner* nur Doppel.
+	const waehlbar = $derived(
+		auswahl === 'sucht-partner' ? kategorien.filter((k) => k.art === 'doppel') : kategorien
+	);
+
+	/** Die Kategorie, die gilt: nur zum Turnier, nur wenn sie zur Auswahl passt. */
+	function kategorieId(): number | null {
+		if (!zumTurnier || auswahl === 'alle' || kategorieWahl === '') return null;
+		return waehlbar.find((k) => String(k.id) === kategorieWahl)?.id ?? null;
+	}
+
+	/** Die Werte des Formulars; Vorschau und Senden nehmen genau diese. */
+	const werte = (): MitteilungWerte => ({
+		titel,
+		text,
+		auswahl,
+		weg,
+		kategorieId: kategorieId()
+	});
+
 	const gueltig = $derived(
-		vorschau !== null && gleicheWerte(vorschau.werte, { titel, text, auswahl, weg })
-			? vorschau.daten
-			: null
+		vorschau !== null && gleicheWerte(vorschau.werte, werte()) ? vorschau.daten : null
 	);
 	const senden = $derived(gueltig !== null && gueltig.anzahl > 0 && laeuft === null);
 	const knopfHaupt = $derived(haupt ? 'taste-haupt' : 'taste-neben');
@@ -71,8 +106,10 @@
 		start = { titel: v?.titel ?? '', text: v?.text ?? '' };
 		titel = start.titel;
 		text = start.text;
-		// Die Erinnerung geht an alle, die noch nicht geantwortet haben.
-		auswahl = v?.art === 'erinnerung' ? 'keine-antwort' : 'alle';
+		// Die Erinnerung geht an alle, die noch nicht geantwortet haben, zum Turnier an alle, die
+		// spielen dürften und noch nicht angemeldet sind.
+		auswahl = v?.art === 'erinnerung' ? (zumTurnier ? 'berechtigt' : 'keine-antwort') : 'alle';
+		kategorieWahl = '';
 		weg = 'push-sonst-mail';
 		vorschau = null;
 		fehler = {};
@@ -94,7 +131,11 @@
 		vorschau = null;
 	}
 
-	const werte = (): MitteilungWerte => ({ titel, text, auswahl, weg });
+	/** Neue Auswahl; eine Kategorie, die nicht mehr passt, fällt weg. */
+	function waehle(a: string) {
+		auswahl = a;
+		if (kategorieId() === null) kategorieWahl = '';
+	}
 
 	const NACH_STOERUNG =
 		'Das hat nicht geklappt. Die Mitteilung kann trotzdem schon verschickt sein: Prüfe den Verlauf, bevor du es erneut versuchst.';
@@ -111,7 +152,11 @@
 				?.querySelector<HTMLElement>(`#mitteilung-${erstes}, [name="mitteilung-${erstes}"]`)
 				?.focus();
 		} else if (a.art === 'nicht-gefunden') {
-			allgemein = 'Diesen Anlass gibt es nicht mehr.';
+			allgemein = zumTurnier
+				? 'Dieses Turnier gibt es nicht mehr.'
+				: 'Diesen Anlass gibt es nicht mehr.';
+		} else if (a.art === 'vorbereitung') {
+			allgemein = 'Mitteilungen gehen, sobald die Anmeldung offen ist.';
 		} else {
 			allgemein = fehlerText(a);
 		}
@@ -231,28 +276,50 @@
 					<p class="fehler" id="fehler-mitteilung-text">{fehler.text}</p>
 				{/if}
 			</div>
-			{#if bezug.art === 'anlass'}
-				<fieldset
-					class="auswahl-gruppe"
-					disabled={laeuft === 'senden'}
-					aria-describedby={beschreibung(
-						'mitteilung-themen',
-						!!fehler.auswahl && 'fehler-mitteilung-auswahl'
-					)}
-				>
-					<legend>Empfänger</legend>
-					{#each ANLASS_AUSWAHLEN as a (a)}
-						<label class="auswahl">
-							<input type="radio" name="mitteilung-auswahl" value={a} bind:group={auswahl} />
-							{AUSWAHL_NAMEN[a]}
-						</label>
-					{/each}
-					{#if fehler.auswahl}
-						<p class="fehler" id="fehler-mitteilung-auswahl">{fehler.auswahl}</p>
+			<fieldset
+				class="auswahl-gruppe"
+				disabled={laeuft === 'senden'}
+				aria-describedby={beschreibung(
+					'mitteilung-themen',
+					!!fehler.auswahl && 'fehler-mitteilung-auswahl'
+				)}
+			>
+				<legend>Empfänger</legend>
+				{#each AUSWAHLEN[bezug.art] as a (a.wert)}
+					<label class="auswahl">
+						<input
+							type="radio"
+							name="mitteilung-auswahl"
+							value={a.wert}
+							checked={auswahl === a.wert}
+							onchange={() => waehle(a.wert)}
+						/>
+						{a.name}
+					</label>
+				{/each}
+				{#if fehler.auswahl}
+					<p class="fehler" id="fehler-mitteilung-auswahl">{fehler.auswahl}</p>
+				{/if}
+			</fieldset>
+			{#if zumTurnier && auswahl !== 'alle'}
+				<div class="feld-zeile">
+					<label for="mitteilung-kategorie">Kategorie</label>
+					<select
+						id="mitteilung-kategorie"
+						disabled={laeuft === 'senden'}
+						bind:value={kategorieWahl}
+						aria-invalid={fehler.kategorie ? 'true' : undefined}
+						aria-describedby={fehler.kategorie ? 'fehler-mitteilung-kategorie' : undefined}
+					>
+						<option value="">Alle Kategorien</option>
+						{#each waehlbar as k (k.id)}
+							<option value={String(k.id)}>{k.name}</option>
+						{/each}
+					</select>
+					{#if fehler.kategorie}
+						<p class="fehler" id="fehler-mitteilung-kategorie">{fehler.kategorie}</p>
 					{/if}
-				</fieldset>
-			{:else}
-				<p><strong>Empfänger:</strong> {AUSWAHL_NAMEN.alle}</p>
+				</div>
 			{/if}
 			<p class="leise" id="mitteilung-themen">
 				Wer diese Mitteilungen im Profil abgeschaltet hat, bekommt sie nicht.
@@ -330,6 +397,10 @@
 
 <dialog class="karte" bind:this={rueckfrage} aria-labelledby="mitteilung-rueckfrage-titel">
 	<h2 id="mitteilung-rueckfrage-titel">{rueckfrageText(gueltig?.anzahl ?? 0)}</h2>
+	{#if vorschau}
+		<!-- Spec A7: die Empfänger der Werte, die hinausgehen, nicht der Eingaben. -->
+		<p>{empfaengerText(vorschau.werte, kategorien)}</p>
+	{/if}
 	<p>«{titel}» geht gleich hinaus. Zurückholen lässt sie sich nicht.</p>
 	<div class="leiste">
 		<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}>Abbrechen</button>

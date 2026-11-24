@@ -105,8 +105,8 @@ export const konto = pgTable('konto', {
 
 export type Thema = 'anlaesse' | 'cm' | 'verein';
 export type Weg = 'push' | 'push-sonst-mail' | 'push-und-mail';
-// 'cm' kommt mit dem CM-Plan.
-export type Bezug = 'anlass' | 'verein';
+// Worauf sich eine Mitteilung bezieht; 'turnier' ist die Clubmeisterschaft (#95).
+export type Bezug = 'anlass' | 'verein' | 'turnier';
 
 export const sitzung = pgTable(
 	'sitzung',
@@ -348,6 +348,9 @@ export const mitteilung = pgTable(
 		id: serial('id').primaryKey(),
 		bezug: text('bezug').$type<Bezug>().notNull(),
 		anlassId: integer('anlass_id').references(() => anlass.id, { onDelete: 'cascade' }),
+		turnierId: integer('turnier_id').references(() => turnier.id, { onDelete: 'cascade' }),
+		// Name der Kategorie zum Sendezeitpunkt; `null` bei allen Turnier-Teilnehmern und ausserhalb des Turniers.
+		kategorie: text('kategorie'),
 		absenderId: integer('absender_id').references(() => mitglied.id, { onDelete: 'set null' }),
 		gesendetAm: timestamp('gesendet_am', { withTimezone: true }).notNull(),
 		titel: text('titel').notNull(),
@@ -360,10 +363,13 @@ export const mitteilung = pgTable(
 		nichtErreichbar: integer('nicht_erreichbar').notNull().default(0)
 	},
 	(t) => [
-		check('mitteilung_bezug_check', sql`${t.bezug} in ('anlass', 'verein')`),
+		check('mitteilung_bezug_check', sql`${t.bezug} in ('anlass', 'verein', 'turnier')`),
 		check('mitteilung_anlass_check', sql`(${t.bezug} = 'anlass') = (${t.anlassId} is not null)`),
+		check('mitteilung_turnier_check', sql`(${t.bezug} = 'turnier') = (${t.turnierId} is not null)`),
+		check('mitteilung_kategorie_check', sql`${t.kategorie} is null or ${t.bezug} = 'turnier'`),
 		check('mitteilung_weg_check', sql`${t.weg} in ('push', 'push-sonst-mail', 'push-und-mail')`),
 		index('mitteilung_anlass_id_gesendet_am_idx').on(t.anlassId, t.gesendetAm),
+		index('mitteilung_turnier_id_gesendet_am_idx').on(t.turnierId, t.gesendetAm),
 		index('mitteilung_gesendet_am_idx').on(t.gesendetAm)
 	]
 );

@@ -21,8 +21,9 @@ import { hole } from './verbindung.ts';
 // Pro Jahr gibt es nur ein Turnier, und alle Testdateien eines Laufs teilen die Datenbank. Darum
 // sucht sich die Hilfe das Jahr selbst: zufällig aus diesem Bereich, bei «vergeben» ein anderes.
 // Feste Jahre von Hand stiessen parallel laufende Dateien gegenseitig ihre Turniere weg. Der
-// Bereich liegt über dem Turnierformular (bis 2100, turnier.test.ts nimmt 2097–2099) und über dem
-// Turnier aus `make seed` (2027) und bleibt vierstellig wie echte Jahre.
+// Bereich liegt über dem Turnierformular (bis 2100, turnier.test.ts nimmt 2097–2099,
+// mitteilungen.test.ts 2094–2096) und über dem Turnier aus `make seed` (2027) und bleibt
+// vierstellig wie echte Jahre.
 const FREIE_JAHRE = { von: 3000, bis: 9999 };
 
 export type TestTurnier = { turnierId: number; jahr: number };
@@ -50,6 +51,13 @@ export async function legeTurnierAn(): Promise<TestTurnier> {
 	throw new Error('Kein freies Turnierjahr gefunden');
 }
 
+async function legeTurnierImFestenJahrAn(jahr: number): Promise<TestTurnier> {
+	await loescheTurnier(jahr);
+	const r = await legeTurnierImJahrAn(jahr);
+	if (r.ergebnis !== 'ok') throw new Error(`Turnier ${jahr} liess sich nicht anlegen`);
+	return { turnierId: r.id, jahr };
+}
+
 /**
  * Löscht das Turnier dieses Jahres samt Kategorien und Turniernummern (Fremdschlüssel mit
  * Cascade). Für Tests mit festem Jahr, die ein Turnier übers Formular anlegen (turnier.test.ts).
@@ -66,12 +74,15 @@ export async function benenneTurnier(turnierId: number, name: string): Promise<v
 /**
  * Wie `legeTurnierAn`, dazu diese Kategorien und offene Anmeldung (Anmeldeschluss 31. Mai des
  * Jahres). Gibt Nummer und Jahr des Turniers und die Nummern der Kategorien zurück, in der
- * Reihenfolge der Werte.
+ * Reihenfolge der Werte. Mit `festesJahr` in genau diesem Jahr (für Tests, die die Angaben übers
+ * Formular speichern; es nimmt nur Jahre bis 2100); ein altes Turnier dieses Jahres fällt weg.
  */
 export async function legeOffenesTurnierAn(
-	kategorien: KategorieWerte[]
+	kategorien: KategorieWerte[],
+	festesJahr?: number
 ): Promise<TestTurnier & { kategorieIds: number[] }> {
-	const { turnierId, jahr } = await legeTurnierAn();
+	const { turnierId, jahr } =
+		festesJahr === undefined ? await legeTurnierAn() : await legeTurnierImFestenJahrAn(festesJahr);
 	const kategorieIds: number[] = [];
 	for (const werte of kategorien) {
 		const r = await legeKategorieAn(hole().db, turnierId, werte);

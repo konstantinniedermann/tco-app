@@ -1,13 +1,23 @@
 // Verlauf der gesendeten Mitteilungen (FR-42, FR-45): nur Zahlen, nie die Namen der Empfänger.
-import { and, desc, eq, gte, lt } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, lt } from 'drizzle-orm';
 import type { Namensteile } from '../../name.ts';
 import type { Db } from '../db/index.ts';
 import { namensSpalten } from '../namen.ts';
-import { anlass, mitglied, mitteilung, type Weg } from '../db/schema.ts';
+import {
+	anlass,
+	kategorie,
+	mitglied,
+	mitteilung,
+	turnier,
+	type Art,
+	type TurnierStatus,
+	type Weg
+} from '../db/schema.ts';
 import type { Zahlen } from './versand.ts';
 
-/** Worauf sich eine Mitteilung bezieht: einen Anlass oder den ganzen Verein. */
-export type Bezug = { art: 'anlass'; anlassId: number } | { art: 'verein' };
+/** Worauf sich eine Mitteilung bezieht: einen Anlass, ein Turnier oder den ganzen Verein. */
+export type Bezug =
+	{ art: 'anlass'; anlassId: number } | { art: 'turnier'; turnierId: number } | { art: 'verein' };
 
 export type VerlaufEintrag = Zahlen & {
 	gesendetAm: Date;
@@ -16,6 +26,8 @@ export type VerlaufEintrag = Zahlen & {
 	titel: string;
 	text: string;
 	auswahl: string;
+	/** Name der Kategorie zum Sendezeitpunkt; `null` ohne Kategorie. */
+	kategorie: string | null;
 	weg: Weg;
 };
 
@@ -25,7 +37,38 @@ const AUFBEWAHRUNG_MS = 365 * 24 * 60 * 60 * 1000;
 const nachBezug = (b: Bezug) =>
 	b.art === 'anlass'
 		? and(eq(mitteilung.bezug, 'anlass'), eq(mitteilung.anlassId, b.anlassId))
-		: eq(mitteilung.bezug, 'verein');
+		: b.art === 'turnier'
+			? and(eq(mitteilung.bezug, 'turnier'), eq(mitteilung.turnierId, b.turnierId))
+			: eq(mitteilung.bezug, 'verein');
+
+/** Was die Mitteilungen zu einem Turnier brauchen: Jahr, Schluss, Stand und aktive Kategorien. */
+export async function ladeTurnierKopf(
+	db: Db,
+	id: number
+): Promise<{
+	id: number;
+	jahr: number;
+	anmeldeschluss: string;
+	status: TurnierStatus;
+	kategorien: { id: number; name: string; art: Art }[];
+} | null> {
+	const [t] = await db
+		.select({
+			id: turnier.id,
+			jahr: turnier.jahr,
+			anmeldeschluss: turnier.anmeldeschluss,
+			status: turnier.status
+		})
+		.from(turnier)
+		.where(eq(turnier.id, id));
+	if (!t) return null;
+	const kategorien = await db
+		.select({ id: kategorie.id, name: kategorie.name, art: kategorie.art })
+		.from(kategorie)
+		.where(and(eq(kategorie.turnierId, id), eq(kategorie.status, 'aktiv')))
+		.orderBy(asc(kategorie.id));
+	return { ...t, kategorien };
+}
 
 /** Was die Mitteilungen zu einem Anlass brauchen (Vorlagen, Link); `null`, wenn es ihn nicht gibt. */
 export async function ladeAnlassKopf(
@@ -56,6 +99,7 @@ export async function ladeVerlauf(db: Db, b: Bezug, jetzt: Date): Promise<Verlau
 			titel: mitteilung.titel,
 			text: mitteilung.text,
 			auswahl: mitteilung.auswahl,
+			kategorie: mitteilung.kategorie,
 			weg: mitteilung.weg,
 			push: mitteilung.push,
 			mails: mitteilung.mails,
@@ -80,7 +124,14 @@ export async function ladeVerlauf(db: Db, b: Bezug, jetzt: Date): Promise<Verlau
 export async function speichereMitteilung(
 	db: Db,
 	b: Bezug,
-	e: Zahlen & { absenderId: number; titel: string; text: string; auswahl: string; weg: Weg },
+	e: Zahlen & {
+		absenderId: number;
+		titel: string;
+		text: string;
+		auswahl: string;
+		weg: Weg;
+		kategorie?: string | null;
+	},
 	jetzt: Date
 ): Promise<void> {
 	await db.transaction(async (tx) => {
@@ -88,6 +139,8 @@ export async function speichereMitteilung(
 		await tx.insert(mitteilung).values({
 			bezug: b.art,
 			anlassId: b.art === 'anlass' ? b.anlassId : null,
+			turnierId: b.art === 'turnier' ? b.turnierId : null,
+			kategorie: e.kategorie ?? null,
 			absenderId: e.absenderId,
 			gesendetAm: jetzt,
 			titel: e.titel,

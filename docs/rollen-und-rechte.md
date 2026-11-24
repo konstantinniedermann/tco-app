@@ -44,7 +44,7 @@ verteilt der MyTCO-Admin die Rollen von Hand. Einzelheiten im
 | RR-04 | Einmal-Codes (Brief- und Mail-Code) sind nur als Hash gespeichert und nach der Ausgabe für niemanden abrufbar, auch nicht für die Verwaltung. Der Mitglieder-Admin kann einen neuen Brief-Code ausstellen, der nur den alten Brief-Code ersetzt, und alle Sitzungen eines Kontos beenden; einen Code per E-Mail holt sich das Mitglied selbst (A-LOGIN-10, [#29](https://github.com/konstantinniedermann/tco-app/issues/29)) | umgesetzt (Sitzungen beenden und neuer Brief-Code in der Verwaltung, einzeln und als Serie) |
 | RR-05 | Für die Rolle *Mitglied* gibt es kein Mitgliederverzeichnis. Namen anderer Mitglieder erscheinen nur in Listen der CM, bei der Wahl des Doppelpartners (nur Mitglieder, die für die Kategorie passen und noch frei sind) und in den Interclub-Einzelpartien (Daten von Swiss Tennis, nicht am Konto) | umgesetzt |
 | RR-06 | *eigene* und *beteiligt* hängen am Objekt, nicht an der Rolle: MyTCO prüft bei jedem Zugriff, ob das Konto Spieler der Anmeldung oder des Spiels ist | umgesetzt (Anmeldungen; Spiele mit dem CM-Betrieb) |
-| RR-07 | Die Verwaltung sieht nur, wer eine Admin-Rolle hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03): Mitglieder-Admin *Mitgliederverwaltung* (Mitglieder, Einlesen, Briefe, Anlässe, Mitteilungen, Für Fairgate, Verlauf), CM-Admin *Clubmeisterschaft*, Lizenz-Admin *Lizenzen*, MyTCO-Admin alle Bereiche nur lesend und dazu *Rollen*. Was eine Rolle nur lesen darf, weist der Server beim Speichern ab; ein ausgeblendeter Knopf reicht nicht | umgesetzt\* (Lizenzen mit ihrer Etappe) |
+| RR-07 | Die Verwaltung sieht nur, wer eine Admin-Rolle hat; sie zeigt ihm nur die Bereiche seiner Rollen (N-APP-03): Mitglieder-Admin *Mitgliederverwaltung* (Mitglieder, Einlesen, Briefe, Anlässe, Mitteilungen, Für Fairgate, Verlauf), CM-Admin *Clubmeisterschaft* (Turniere, auch Mitteilungen zur CM), Lizenz-Admin *Lizenzen*, MyTCO-Admin alle Bereiche nur lesend und dazu *Rollen*. Was eine Rolle nur lesen darf, weist der Server beim Speichern ab; ein ausgeblendeter Knopf reicht nicht | umgesetzt\* (Lizenzen mit ihrer Etappe) |
 | RR-08 | Ein gesperrtes Konto hat keine Rechte (FR-04) | umgesetzt (Austritt und Vormerken sperren das Login; Rollen bleiben gespeichert und wirken nach Wiedereintritt oder Rückgängig wieder; kommen dabei Admin-Rollen zurück, fragt die Verwaltung vorher nach. Die Seite *Rollen* zeigt Ausgetretene, Vorgemerkte und Gesperrte mit Vermerk, damit der MyTCO-Admin ihre Rollen vorher entziehen kann, #96) |
 | RR-09 | Wer die Verwaltung öffnet, bestätigt sie höchstens einmal pro 30 Tage mit einem frischen Code per E-Mail, mit jeder Admin-Rolle ([SI-08](sicherheitskonzept.md#vorgaben); K-12.1 hatte einmal pro Tag bestätigt, auf 30 Tage verlängert vom Projektleiter, 23.11.2026) | umgesetzt |
 | RR-10 | Ein Mitglieder-Admin erfasst weder den eigenen Austritt noch merkt er sich selbst zum Löschen vor; das macht ein anderer Mitglieder-Admin | umgesetzt |
@@ -111,6 +111,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Doppel von Hand anmelden, zusammenlegen, Partner ändern, Anfrage als Paar anmelden oder löschen (FR-46, FR-48) | – | – | S | – | – | L |
 | Kommentar *sucht Partner* (FR-49) | – | L; S eigener | L; S eigener | L; S eigener | L; S eigener | L; S eigener |
 | Gespräch mit der Turnierleitung: schreiben, lesen, Zustand setzen (FR-50 bis FR-54); das Mitglied sieht nur «Turnierleitung» | – | S eigenes | S | S eigenes | S eigenes | L; S eigenes |
+| Mitteilung zur CM senden, Verlauf (FR-42) | – | – | S | – | – | L |
 | **CM-Betrieb** | | | | | | |
 | Gruppen, KO-Tableaus, Spiele aus Advantage (FR-12) | – | L | S | L | L | L |
 | Resultat melden, bestätigen, bestreiten (FR-16) | – | S beteiligt | S beteiligt | S beteiligt | S beteiligt | S beteiligt |
@@ -130,7 +131,7 @@ Jede Spalte zeigt alle Rechte der Rolle, die der Rolle *Mitglied* eingeschlossen
 | Interclub-Resultate der TCO-Teams mit Einzelpartien: Name und Klassierung der Spieler beider Teams, ohne Rangliste- und Personennummer ([ADR-011](adr/adr-011-interclub-schnittstelle-swiss-tennis.md)) | – | L | L | L | L | L |
 | Interclub-Teams folgen und entfolgen (folgen nur mit Push auf einem Gerät, A-INTERCLUB-02) | – | S eigene | S eigene | S eigene | S eigene | S eigene |
 | **Verein** | | | | | | |
-| Mitteilung an den Verein senden, Verlauf (FR-42) | – | – | – | – | S | L |
+| Mitteilung an den Verein senden, auch an eine Rolle, Verlauf (FR-42) | – | – | – | – | S | L |
 
 Beim MyTCO-Admin heisst **L**: in der Verwaltung lesen, nicht absenden; als Mitglied hat er
 daneben die Rechte der Spalte *Mitglied*.
