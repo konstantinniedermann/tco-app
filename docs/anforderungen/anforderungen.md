@@ -28,7 +28,9 @@ in den [Abklärungen](../abklaerungen.md#beantwortet).
 `verworfen` (mit Begründung).
 
 **\*** = Etappe oder Status ist ein Vorschlag des Projektleiters, weil die Quellen ihn
-nicht festlegen. Vom Verein zu bestätigen.
+nicht festlegen. Vom Verein zu bestätigen. Steht hinter `umgesetzt*` eine Klammer, heisst der
+Stern stattdessen «umgesetzt mit Vorbehalt»: Die Klammer nennt, was noch offen ist (Prüfung auf
+echten Geräten oder ein Teil, der mit einer späteren Etappe kommt).
 
 ## Funktionale Anforderungen
 
