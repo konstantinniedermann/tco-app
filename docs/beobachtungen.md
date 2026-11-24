@@ -120,3 +120,15 @@ Letzte Auswertung: 24.11.2026
 ---
 
 ## Offen
+
+### 2026-11-24 — Die Container-Ablage auf GitHub räumt niemand auf
+
+**Thema:** Code
+
+**Fundort:** `.github/workflows/check.yml` (Job `bauen`), `betrieb/bin/ausliefern` (Aufräumen nur auf dem Server)
+
+**Beobachtung:** Jeder Push mit Code auf `dev` legt ein Image `commit-<sha>` in die private Ablage (ghcr.io); seit `bauen` parallel zu den Prüfungen läuft, auch für rote Stände. Gelöscht wird nur auf dem Server, nicht in der Ablage; dort lagen am 24.11.2026 schon 57 Versionen (B: `gh api`, Review des Branches `chore/ci-schneller`).
+
+**Ursprung:** Review von `chore/ci-schneller` (CI schneller bis Test).
+
+**Einschätzung:** Kein Risiko für die Auslieferung (rote Images bekommen kein `code-…` und werden nie ausgeliefert), nur wachsender Bestand. Möglich: ein Schritt nach `freigeben`, der Versionen ohne `code-…` älter als N Tage löscht; vorher prüfen, ob die Ablage für öffentliche Repos ein Speicherlimit hat.

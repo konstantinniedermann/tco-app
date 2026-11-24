@@ -110,12 +110,11 @@ Doku-Merge ändert ihn nicht.
 2. **Bauen (`bauen`, nur `dev`):** Image bauen (mit dem Build-Argument `MYTCO_COMMIT` für die
    Fusszeile auf Test) und mit dem Commit als Kennzeichen
    (`commit-<sha>`) in die private Container-Ablage von GitHub legen. Das läuft parallel zu den
-   Prüfungen; das Image eines roten Stands bleibt so in der Ablage, wird aber nie ausgeliefert,
-   bekommt kein Kennzeichen `code-<Hash>` und fällt beim Aufräumen nach der nächsten Auslieferung
-   weg.
+   Prüfungen; das Image eines roten Stands bleibt so in der Ablage, wird aber nie ausgeliefert
+   und bekommt kein Kennzeichen `code-<Hash>`. Die Ablage selbst räumt niemand auf.
 3. **Verbinden (`ausliefern`):** Erst wenn alle Prüfungen grün sind (Doku, Prüfen, alle
-   E2E-Teile, Malware-Prüfung, Image mit Rauchtest; `workflow-rechte.ts` verlangt, dass der Job
-   auf jede wartet und ihr Ergebnis prüft). Die CI meldet sich per SSH beim **Türsteher** auf dem Server,
+   E2E-Teile, Malware-Prüfung, Image mit Rauchtest; `workflow-rechte.ts` prüft, dass der Job
+   auf jede wartet und ihr Ergebnis im `if` steht, nicht aber die Logik drumherum). Die CI meldet sich per SSH beim **Türsteher** auf dem Server,
    mit je einem eigenen Schlüssel für Test und Live. Der Schlüssel darf nur den Türsteher
    starten; die Umgebung steht im Schlüssel, nicht in der Anfrage. Übergeben wird nur der
    Digest des Images. Der Schlüssel wird je Zweig gewählt, ohne Rückfall auf den anderen; ein
@@ -386,9 +385,9 @@ und nicht Teil von `make check` oder der CI.
 **Spur beim Handstart:** Wird ein E2E-Test nur in der CI rot, lässt sich ein Lauf von Hand mit
 Spur starten (`gh workflow run check.yml --ref <branch> -f spur=true`). Dann zeichnet Playwright
 für jeden Test eine Spur auf (Schritte, Netz, Konsole, Abbilder der Seite; `trace.zip` im Artefakt
-`test-results-<gerät>`, öffnen mit `npx playwright show-trace`); lokal genügt `MYTCO_E2E_SPUR=an`.
+`test-results-<gerät>-<teil>`, öffnen mit `npx playwright show-trace`); lokal genügt `MYTCO_E2E_SPUR=an`.
 Läufe bei Push und PR zeichnen keine Spur auf und wiederholen keinen Test. Ein Lauf mit Spur dauert
-rund eine Minute länger je Gerät; die Artefakte sind mit zusammen rund 1 GB etwa achtmal so gross
+rund eine Minute länger je Teil; die Artefakte sind mit zusammen rund 1 GB etwa achtmal so gross
 und liegen wie alle Artefakte 30 Tage öffentlich beim Lauf (nur erfundene Testdaten).
 
 gitleaks und osv-scanner werden als Binary geladen (bei Störungen von GitHub bis zu 5 Wiederholungen im Abstand von 15 s) und danach per SHA-256 geprüft.
