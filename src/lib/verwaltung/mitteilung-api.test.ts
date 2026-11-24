@@ -229,6 +229,12 @@ describe('Mitteilungen in der Verwaltung: Texte', () => {
 	it('FR-42: Rückfrage und Zahlen nach dem Senden', () => {
 		expect(rueckfrageText(37)).toBe('Jetzt an 37 Mitglieder senden?');
 		expect(rueckfrageText(1)).toBe('Jetzt an 1 Mitglied senden?');
+		expect(zahlenText({ push: 12, mails: 25, ersatzMails: 0, nichtErreichbar: 0 })).toBe(
+			'12 per Push, 25 per E-Mail'
+		);
+		expect(zahlenText({ push: 12, mails: 25, ersatzMails: 1, nichtErreichbar: 2 })).toBe(
+			'12 per Push, 25 per E-Mail, 1 ersatzweise per E-Mail, nicht erreichbar: 2'
+		);
 	});
 
 	it('Spec A7: Rückfrage nennt die Empfänger der gesendeten Werte in Worten', () => {
@@ -247,12 +253,6 @@ describe('Mitteilungen in der Verwaltung: Texte', () => {
 			'An: Alle mit Rolle Lizenz-Admin'
 		);
 		expect(empfaengerText({ ...WERTE, auswahl: 'alle' })).toBe('An: Alle aktiven Mitglieder');
-		expect(zahlenText({ push: 12, mails: 25, ersatzMails: 0, nichtErreichbar: 0 })).toBe(
-			'12 per Push, 25 per E-Mail'
-		);
-		expect(zahlenText({ push: 12, mails: 25, ersatzMails: 1, nichtErreichbar: 2 })).toBe(
-			'12 per Push, 25 per E-Mail, 1 ersatzweise per E-Mail, nicht erreichbar: 2'
-		);
 	});
 });
 
