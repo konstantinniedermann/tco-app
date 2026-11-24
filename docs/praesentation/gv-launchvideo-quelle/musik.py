@@ -1,10 +1,12 @@
-import os
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
+from zeitplan import echt as F, DAUER
 from scipy.signal import butter, sosfilt, fftconvolve
 from scipy.io import wavfile
 
 SR = 48000
-DUR = 72.0
+DUR = round(DAUER + 0.5, 2)
 N = int(SR * DUR)
 rng = np.random.default_rng(7)
 L = np.zeros(N); R = np.zeros(N)
@@ -114,62 +116,64 @@ prog = [[48, 55, 59, 62, 64], [47, 55, 59, 62, 67], [45, 52, 57, 60, 64], [41, 5
 roots = [36, 35, 33, 29]
 
 # Pads durchgehend
-for k, t0 in enumerate(np.arange(0, 70, 4.0)):
+for k, t0 in enumerate(np.arange(0, F(66), 4.0)):
     c = prog[k % 4]
-    g = 0.22 if t0 < 6 else 0.30
-    if 58 <= t0 < 66: g = 0.26
-    cut = 900 if t0 < 6 else (2600 if 10 <= t0 < 58 else 1600)
+    g = 0.22 if t0 < F(6) else 0.30
+    if F(58) <= t0: g = 0.26
+    cut = 900 if t0 < F(6) else (2600 if F(10) <= t0 < F(58) else 1600)
     add(pad(c, 5.0, cut), t0, g, pan=0)
 
 # Intro-Wörter: Glocken
-for i, t0 in enumerate([0.25, 1.35, 2.45, 3.55]):
+for i, t0 in enumerate([F(x) for x in [0.25, 1.35, 2.45, 3.55]]):
     add(bell([76, 79, 81, 83][i]), t0, 0.16, pan=[-0.4, 0.4, -0.2, 0.2][i])
-add(bell(84, 2.5), 4.65, 0.14)
-add(riser(1.5), 4.5, 0.5)
-add(impact(), 6.0, 0.9)
-add(pad([60, 64, 67, 71, 74], 4.5, 4000), 6.0, 0.18)
+add(bell(84, 2.5), F(4.65), 0.14)
+add(riser(1.5), F(6.0) - 1.5, 0.5)
+add(impact(), F(6.0), 0.9)
+add(pad([60, 64, 67, 71, 74], 5.5, 4000), F(6.0), 0.18)
 
 # Bass + Beat ab 10 s
-for k, t0 in enumerate(np.arange(10, 58, 4.0)):
-    r = roots[int(t0 / 4) % 4]
+B0, B1, A0 = F(10), F(58), F(18)
+for k, t0 in enumerate(np.arange(B0, B1 - 0.01, 4.0)):
+    r = roots[k % 4]
     for b in range(8):
         tb = t0 + b * BEAT
         t = tt(0.45)
         bs = lp(saw(midi(r), t), 400) * np.exp(-t * 3) * env_adsr(len(t), 0.005, 0.08)
         add(bs, tb + 0.25, 0.22)
-for tb in np.arange(10, 58, BEAT):
-    add(kick(), tb, 0.55 if tb >= 18 else 0.35)
-for tb in np.arange(18, 58, BEAT * 2):
+for tb in np.arange(B0, B1, BEAT):
+    add(kick(), tb, 0.55 if tb >= A0 else 0.35)
+A0 = B0 + round((A0 - B0) / 2) * 2
+for tb in np.arange(A0, B1, BEAT * 2):
     add(clap(), tb + BEAT, 0.5, pan=0.1)
-for tb in np.arange(18, 58, BEAT / 2):
+for tb in np.arange(A0, B1, BEAT / 2):
     add(hat(), tb + BEAT / 4, 0.8, pan=-0.3 if int(tb * 4) % 2 else 0.3)
 
 # Arpeggio (16tel) 18–58 s
 arp_pat = [0, 2, 3, 4, 3, 2, 1, 2]
-for i, tb in enumerate(np.arange(18, 58, BEAT / 2)):
-    c = prog[int(tb / 4) % 4]
+for i, tb in enumerate(np.arange(A0, B1, BEAT / 2)):
+    c = prog[int((tb - B0) / 4) % 4]
     n = c[1:][arp_pat[i % 8] % 4] + 12
     add(pluck(n, 0.4, 3200), tb, 0.07, pan=np.sin(i * 0.7) * 0.5)
 
 # kleiner Riser vor den Szenen
-for t0 in [17.0, 33.0, 51.0]:
-    add(riser(1.0), t0, 0.22)
+for t0 in [18.6, 34.6, 52.4]:
+    add(riser(1.0), F(t0) - 1.0, 0.22)
 
 # UI-Sounds
 for t0 in [19.8, 26.9, 29.95, 41.3, 43.3, 46.9, 47.9]:
-    add(tick(), t0, 0.35)
+    add(tick(), F(t0), 0.35)
 for t0 in [27.95, 28.35, 28.85, 29.25]:
-    add(tick(), t0, 0.15)
-add(bell(88, 1.0), 31.75, 0.12, pan=0.3); add(bell(93, 1.2), 31.88, 0.12, pan=0.3)
-add(bell(91, 1.0), 43.6, 0.10)
+    add(tick(), F(t0), 0.15)
+add(bell(88, 1.0), F(31.75), 0.12, pan=0.3); add(bell(93, 1.2), F(31.88), 0.12, pan=0.3)
+add(bell(91, 1.0), F(43.6), 0.10)
 
 # Fahrplan-Töne
 for i in range(5):
-    add(bell([72, 74, 76, 79, 84][i], 2.0), 59.6 + i * 1.05, 0.15, pan=-0.6 + i * 0.3)
-add(riser(1.4), 64.6, 0.45)
-add(impact(), 66.0, 0.85)
-add(pad([48, 55, 60, 64, 67, 71], 6.0, 3000), 66.0, 0.32)
-add(bell(84, 3.0), 66.0, 0.14)
+    add(bell([72, 74, 76, 79, 84][i], 2.0), F(59.6 + i * 1.05), 0.15, pan=-0.6 + i * 0.3)
+add(riser(1.4), F(66.0) - 1.4, 0.45)
+add(impact(), F(66.0), 0.85)
+add(pad([48, 55, 60, 64, 67, 71], DUR - F(66.0), 3000), F(66.0), 0.32)
+add(bell(84, 3.0), F(66.0), 0.14)
 
 # Hall
 ir_t = tt(2.2)
@@ -180,7 +184,7 @@ L2 = L + 0.28 * wetL; R2 = R + 0.28 * wetR
 
 # Schluss-Fade
 fade = np.ones(N)
-a = int(69.5 * SR); fade[a:] = np.linspace(1, 0, N - a) ** 1.5
+a = int((F(72) - 3.0) * SR); fade[a:] = np.linspace(1, 0, N - a) ** 1.5
 fi = int(0.05 * SR); fade[:fi] = np.linspace(0, 1, fi)
 L2 *= fade; R2 *= fade
 st = np.stack([L2, R2], 1)

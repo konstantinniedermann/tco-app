@@ -321,7 +321,7 @@ table.rl th { padding: 6px 4px; font-weight: 600; color: var(--farbe-text-leise)
   <!-- Fahrplan -->
   <div id="road">
     <div class="abs disp" id="rTitle" style="left:0;right:0;top:200px;text-align:center;font-size:104px;font-weight:800;line-height:1">Der Fahrplan</div>
-    <div class="abs" id="rSub" style="left:0;right:0;top:325px;text-align:center;font-size:32px;color:rgb(255 255 255 / 0.65)">voraussichtlich</div>
+    <div class="abs" id="rSub" style="left:0;right:0;top:325px;text-align:center;font-size:32px;color:rgb(255 255 255 / 0.65)">Schritt für Schritt</div>
     <div class="abs" style="left:240px;width:1440px;top:575px;height:4px;background:rgb(205 227 185 / 0.18);border-radius:2px"></div>
     <div class="abs" id="rLine" style="left:240px;width:1440px;top:575px;height:4px;background:var(--farbe-marke-hell);border-radius:2px;transform-origin:left;transform:scaleX(0)"></div>
   </div>
@@ -367,7 +367,7 @@ const teams = [['35+ NLA Herren','Olten · 4. von 4 · Abstiegsspiele'],['2L Her
 $('icList').innerHTML = teams.map(x => x ? `<span class="karte kachel"><span><strong>${x[0].replace('&','&amp;')}</strong><br><span class="leise">${x[1]}</span></span><span class="kachel-pfeil">›</span></span>` : '<h2>Junioren</h2>').join('');
 
 // Fahrplan
-const etappen = [['Jetzt','Tester gesucht','Lust zu testen? Melde dich bei Koschi.'],['Feb./März 2027','Login-Brief','Mit Anleitung, rund um die GV.'],['Mai 2027','Interclub 2027','Die IC-Resultate der TCO-Teams in der App.'],['CM 2027','CM per App','Anmelden, verfolgen, mitspielen.'],['2028','GV und Vereinsanlässe','Anmeldung über MyTCO.']];
+const etappen = [['Jetzt','Tester gesucht','Lust zu testen? Melde dich bei Koschi.'],['Als Nächstes','Login-Brief','Jedes Mitglied bekommt seinen Zugang per Post.'],['Dann','Interclub','Die Resultate der TCO-Teams in der App.'],['Danach','CM per App','Anmelden, verfolgen, mitspielen.'],['Später','GV und Anlässe','Anmeldung über MyTCO.']];
 etappen.forEach((e, i) => { const d = document.createElement('div'); d.className = 'rnode'; d.id = 'rn' + i; d.style.left = (240 + i * 360) + 'px';
   d.innerHTML = `<div class="rdot" ${i === 0 ? 'style="background:var(--farbe-aktion);border-color:#e08a5a"' : ''}></div><div class="rwann" ${i === 0 ? 'style="color:#f0a77c"' : ''}>${e[0]}</div><div class="rtit">${e[1]}</div><div class="rtxt">${e[2]}</div>`;
   $('road').appendChild(d); });
