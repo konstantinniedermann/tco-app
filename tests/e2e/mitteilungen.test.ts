@@ -314,14 +314,14 @@ test('FR-43: Eingabe während der Vorschau verwirft die späte Antwort, Senden b
 	await antwort;
 	await page.evaluate(() => new Promise((r) => requestAnimationFrame(r)));
 
-	await expect(neu(page).getByText(/^\d+ Mitglieder?:/)).toHaveCount(0);
+	await expect(neu(page).getByText(/^\d+ Mitglied(er)?:/)).toHaveCount(0);
 	await expect(sendenTaste(page)).toBeDisabled();
 	await expect(page.getByText('Senden geht nach der Vorschau.')).toBeVisible();
 
 	// Eine neue Vorschau gilt; gesendet wird genau, was sie zeigte.
 	await page.unroute('**/api/admin/mitteilungen/vorschau');
 	await neu(page).getByRole('button', { name: 'Vorschau' }).click();
-	await expect(neu(page).getByText(/^\d+ Mitglieder?:/)).toBeVisible();
+	await expect(neu(page).getByText(/^\d+ Mitglied(er)?:/)).toBeVisible();
 	let anfrage: unknown = null;
 	await page.route('**/api/admin/mitteilungen/senden', async (route) => {
 		anfrage = route.request().postDataJSON();
