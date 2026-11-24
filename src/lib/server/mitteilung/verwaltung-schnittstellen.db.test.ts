@@ -223,6 +223,7 @@ describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 					titel: NACHRICHT.titel,
 					text: NACHRICHT.text,
 					auswahl: 'kommt',
+					kategorie: null,
 					weg: 'push-sonst-mail',
 					push: 1,
 					mails: 1,

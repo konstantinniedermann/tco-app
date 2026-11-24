@@ -162,6 +162,13 @@
       "when": 1795422433932,
       "tag": "0022_huge_harrier",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1795509506373,
+      "tag": "0023_curvy_darkhawk",
+      "breakpoints": true
     }
   ]
 }

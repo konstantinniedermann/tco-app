@@ -2,12 +2,14 @@ import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, test } from 'vitest';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
 import { legeAnlassAn } from '../anlass/anlaesse.ts';
 import { erstelleDb } from '../db/index.ts';
-import { anlass, konto, mitteilung, pushAbo } from '../db/schema.ts';
+import { anlass, konto, mitteilung, pushAbo, turnier } from '../db/schema.ts';
 import { beendeSitzung, erstelleSitzung, pruefeSitzung } from '../login/sitzung.ts';
 
 const db = erstelleDb(process.env.DATABASE_URL!);
+const naechstesJahr = turnierjahre(import.meta.url);
 
 afterAll(async () => {
 	await db.$client.end();
@@ -88,5 +90,48 @@ describe('Mitteilungen: Datenmodell', () => {
 		const c = (fehler as { cause?: { constraint_name?: string; constraint?: string } } | null)
 			?.cause;
 		expect(c?.constraint_name ?? c?.constraint).toBe('mitteilung_anlass_check');
+	});
+
+	test('Mitteilung zum Turnier braucht turnier_id, Kategorie nur beim Turnier', async () => {
+		const gemeinsam = {
+			gesendetAm: SITZUNG_ZEIT,
+			titel: 'Hinweis',
+			text: 'Text',
+			auswahl: 'alle',
+			weg: 'push' as const
+		};
+		const constraint = (fehler: unknown) => {
+			const c = (fehler as { cause?: { constraint_name?: string; constraint?: string } } | null)
+				?.cause;
+			return c?.constraint_name ?? c?.constraint;
+		};
+		const ohneTurnier = await db
+			.insert(mitteilung)
+			.values({ ...gemeinsam, bezug: 'turnier', turnierId: null })
+			.then(
+				() => null,
+				(f: unknown) => f
+			);
+		expect(constraint(ohneTurnier)).toBe('mitteilung_turnier_check');
+		const verein = await db
+			.insert(mitteilung)
+			.values({ ...gemeinsam, bezug: 'verein', kategorie: 'X' })
+			.then(
+				() => null,
+				(f: unknown) => f
+			);
+		expect(constraint(verein)).toBe('mitteilung_kategorie_check');
+
+		const [t] = await db
+			.insert(turnier)
+			.values({ jahr: naechstesJahr(), name: 'CM Test', anmeldeschluss: '2099-05-31' })
+			.returning({ id: turnier.id });
+		const [z] = await db
+			.insert(mitteilung)
+			.values({ ...gemeinsam, bezug: 'turnier', turnierId: t.id, kategorie: 'Damen R7–R9' })
+			.returning({ id: mitteilung.id });
+		await db.delete(turnier).where(eq(turnier.id, t.id));
+		const rest = await db.select().from(mitteilung).where(eq(mitteilung.id, z.id));
+		expect(rest).toEqual([]);
 	});
 });
