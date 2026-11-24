@@ -23,6 +23,8 @@ export const TURNIERJAHRE: Record<string, Jahresbereich> = {
 	'src/lib/server/cm/schnittstellen.db.test.ts': [7200, 7799],
 	'src/lib/server/admin/schnittstellen.db.test.ts': [7800, 8399],
 	'src/lib/server/mitteilung/schema.db.test.ts': [8400, 8999],
+	'src/lib/server/mitteilung/empfaenger-turnier.db.test.ts': [9000, 9049],
+	'src/lib/server/mitteilung/verwaltung-schnittstellen.db.test.ts': [9050, 9099],
 	'src/lib/server/gespraech/schnittstellen.db.test.ts': [9100, 9899],
 	'src/routes/api/mail-nur-an.db.test.ts': [9960, 9999],
 	'src/lib/server/db/schema.db.test.ts': [10000, 92999]

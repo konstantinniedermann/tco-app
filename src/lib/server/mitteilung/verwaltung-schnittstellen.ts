@@ -82,7 +82,7 @@ function mitEmpfaengern(art: Ziel['art'], fn: (v: Versand) => Promise<Response>)
 								p.werte.auswahl as AnlassAuswahl,
 								jetzt(d)
 							)
-						: await vereinEmpfaenger(d.db);
+						: await vereinEmpfaenger(d.db, 'alle');
 				return fn({ d, ziel, werte: p.werte, empf, absenderId: urheber.mitgliedId });
 			})
 		);

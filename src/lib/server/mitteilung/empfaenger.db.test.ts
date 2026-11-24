@@ -210,7 +210,7 @@ describe('Empfänger einer Mitteilung', () => {
 		await abo(geloescht.kontoId);
 		for (const auswahl of ['alle', 'keine-antwort'] as const)
 			expect(ids(await anlassEmpfaenger(db, id, auswahl, JETZT), weg, geloescht)).toEqual([]);
-		expect(ids(await vereinEmpfaenger(db), weg, geloescht)).toEqual([]);
+		expect(ids(await vereinEmpfaenger(db, 'alle'), weg, geloescht)).toEqual([]);
 	});
 
 	test('FR-43: gesperrtes Konto bekommt nichts, auch keine Mail', async () => {
@@ -218,7 +218,7 @@ describe('Empfänger einer Mitteilung', () => {
 		const gesperrt = await legeMitgliedAn(db, { gesperrt: true });
 		await abo(gesperrt.kontoId);
 		expect(ids(await anlassEmpfaenger(db, id, 'alle', JETZT), gesperrt)).toEqual([]);
-		expect(ids(await vereinEmpfaenger(db), gesperrt)).toEqual([]);
+		expect(ids(await vereinEmpfaenger(db, 'alle'), gesperrt)).toEqual([]);
 	});
 
 	test('FR-43: Thema Anlässe aus → nicht dabei', async () => {
@@ -238,13 +238,32 @@ describe('Empfänger einer Mitteilung', () => {
 		const a = await abo(an.kontoId);
 		await themaAus(aus.kontoId, { themaVerein: false });
 		await themaAus(an.kontoId, { themaAnlaesse: false });
-		expect(nurMeine(await vereinEmpfaenger(db), aus, an, olga)).toEqual(
+		expect(nurMeine(await vereinEmpfaenger(db, 'alle'), aus, an, olga)).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({ mitgliedId: an.mitgliedId, abos: [a] }),
 				expect.objectContaining({ mitgliedId: olga.mitgliedId, abos: [] })
 			])
 		);
-		expect(ids(await vereinEmpfaenger(db), aus)).toEqual([]);
+		expect(ids(await vereinEmpfaenger(db, 'alle'), aus)).toEqual([]);
+	});
+
+	test('Rolle: nur Inhaber der Rolle, Thema Verein gilt, gesperrt fehlt', async () => {
+		const a = await legeMitgliedAn(db, { rollen: ['cm'] });
+		const b = await legeMitgliedAn(db);
+		const c = await legeMitgliedAn(db, { rollen: ['cm'] });
+		const d = await legeMitgliedAn(db, { rollen: ['cm'], gesperrt: true });
+		const e = await legeMitgliedAn(db, { rollen: ['mytco', 'cm', 'lizenz'] });
+		const f = await legeMitgliedAn(db, { rollen: ['lizenz'] });
+		const olga = await ohneKonto();
+		await themaAus(c.kontoId, { themaVerein: false });
+		const cm = await vereinEmpfaenger(db, 'rolle-cm');
+		// Wer mehrere Rollen hat, steht nur einmal da.
+		expect(ids(cm, a, b, c, d, e, f, olga).sort()).toEqual([a.mitgliedId, e.mitgliedId].sort());
+		expect(ids(await vereinEmpfaenger(db, 'rolle-lizenz'), a, e, f).sort()).toEqual(
+			[e.mitgliedId, f.mitgliedId].sort()
+		);
+		const alle = ids(await vereinEmpfaenger(db, 'alle'), a, b, c, d, olga);
+		expect(alle.sort()).toEqual([a.mitgliedId, b.mitgliedId, olga.mitgliedId].sort());
 	});
 
 	test('FR-43: unbekannter Anlass hat keine Empfänger', async () => {

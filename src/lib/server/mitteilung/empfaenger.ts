@@ -4,11 +4,36 @@
 // fällt weg, für Push und Mail.
 import { and, asc, eq, inArray, isNull, or, type SQL } from 'drizzle-orm';
 import type { Namensteile } from '../../name.ts';
-import type { AnlassAuswahl } from '../../mitteilung/auswahl.ts';
+import {
+	rolleAus,
+	type AnlassAuswahl,
+	type TurnierAuswahl,
+	type VereinAuswahl
+} from '../../mitteilung/auswahl.ts';
+import {
+	fehlendeAngaben,
+	passtDoppelAllein,
+	passtEinzel,
+	type Spieler
+} from '../../turnier/passung.ts';
 import { istOffen, zuPruefen } from '../anlass/anlaesse.ts';
+import { spielerAus } from '../cm/angaben.ts';
+import { GRENZE, istAktiv, regelAus, spielerSpalten } from '../cm/anmeldungen.ts';
 import type { Db } from '../db/index.ts';
 import { namensSpalten } from '../namen.ts';
-import { anlass, anlassAnmeldung, konto, mitglied, pushAbo } from '../db/schema.ts';
+import {
+	anlass,
+	anlassAnmeldung,
+	anmeldung,
+	anmeldungSpieler,
+	kategorie,
+	konto,
+	kontoRolle,
+	mitglied,
+	pushAbo,
+	turnier,
+	type AnmeldungStatus
+} from '../db/schema.ts';
 
 export type Empfaenger = {
 	mitgliedId: number;
@@ -110,13 +135,128 @@ export async function anlassEmpfaenger(
 	return mitAbos(db, zeilen.filter(passt));
 }
 
-/** Empfänger einer Mitteilung an den Verein: alle aktiven Mitglieder mit Thema Verein. */
-export async function vereinEmpfaenger(db: Db): Promise<Empfaenger[]> {
+/**
+ * Empfänger einer Mitteilung an den Verein: alle aktiven Mitglieder mit Thema Verein, oder nur die
+ * mit der Rolle der Auswahl. Eine Rolle hat nur ein Konto: Mitglieder ohne Konto fallen dort weg.
+ */
+export async function vereinEmpfaenger(db: Db, auswahl: VereinAuswahl): Promise<Empfaenger[]> {
+	const rolle = rolleAus(auswahl);
+	const grund = grundmenge(eq(konto.themaVerein, true));
+	const mitRolle = (r: string) =>
+		inArray(
+			konto.id,
+			db.select({ id: kontoRolle.kontoId }).from(kontoRolle).where(eq(kontoRolle.rolle, r))
+		);
 	const zeilen = await db
 		.select(GRUNDFELDER)
 		.from(mitglied)
 		.leftJoin(konto, eq(konto.mitgliedId, mitglied.id))
-		.where(grundmenge(eq(konto.themaVerein, true)))
+		.where(rolle === null ? grund : and(grund, mitRolle(rolle)))
 		.orderBy(...REIHENFOLGE);
 	return mitAbos(db, zeilen);
+}
+
+type AktiveAnmeldung = { kategorieId: number; status: AnmeldungStatus; spieler: number[] };
+
+/**
+ * Aktive Anmeldungen (FR-06) in allen Kategorien des Turniers, je Mitglied. `spieler` sind alle
+ * Spieler der Anmeldung, auch die ausserhalb der Grundmenge: Ein Paar bleibt ein Paar, wenn der
+ * Partner das Thema aus hat.
+ */
+async function anmeldungenJeMitglied(
+	db: Db,
+	turnierId: number
+): Promise<Map<number, AktiveAnmeldung[]>> {
+	const zeilen = await db
+		.select({
+			anmeldungId: anmeldung.id,
+			kategorieId: anmeldung.kategorieId,
+			status: anmeldung.status,
+			mitgliedId: anmeldungSpieler.mitgliedId
+		})
+		.from(anmeldung)
+		.innerJoin(kategorie, eq(kategorie.id, anmeldung.kategorieId))
+		.innerJoin(anmeldungSpieler, eq(anmeldungSpieler.anmeldungId, anmeldung.id))
+		.where(and(eq(kategorie.turnierId, turnierId), istAktiv));
+	const jeAnmeldung = new Map<number, AktiveAnmeldung>();
+	for (const z of zeilen) {
+		const a = jeAnmeldung.get(z.anmeldungId) ?? {
+			kategorieId: z.kategorieId,
+			status: z.status,
+			spieler: []
+		};
+		a.spieler.push(z.mitgliedId);
+		jeAnmeldung.set(z.anmeldungId, a);
+	}
+	const jeMitglied = new Map<number, AktiveAnmeldung[]>();
+	for (const a of jeAnmeldung.values()) {
+		for (const id of a.spieler) jeMitglied.set(id, [...(jeMitglied.get(id) ?? []), a]);
+	}
+	return jeMitglied;
+}
+
+/**
+ * Empfänger zu einem Turnier nach genau einer Auswahl, wahlweise in einer Kategorie (Spec A6).
+ * Grundmenge: aktive Mitglieder mit Thema CM. Abgesagte Kategorien zählen nirgends; ein unbekanntes
+ * Turnier und eine Kategorie, die nicht aktiv zu diesem Turnier gehört, haben keine Empfänger. Bei
+ * *alle* zählt eine gültige Kategorie nicht (die Schnittstelle lässt sie dort nicht zu).
+ * - *angemeldet*: Spieler einer aktiven Anmeldung (bestätigt oder beantragt), allein oder als Paar.
+ * - *berechtigt*: passt nach der Regel der Anmeldung (Einzel `passtEinzel`, ohne Wildcard; Doppel
+ *   `passtDoppelAllein`), ist dort nicht angemeldet und hat weniger als `GRENZE` aktive Anmeldungen
+ *   im Turnier. Ohne Kategorie: in keiner angemeldet, und wem Angaben fehlen, der zählt mit; mit
+ *   Kategorie zählt nur, wem keine Angabe fehlt.
+ * - *sucht-partner*: allein in einer Doppel-Kategorie, bestätigt.
+ */
+export async function turnierEmpfaenger(
+	db: Db,
+	turnierId: number,
+	auswahl: TurnierAuswahl,
+	kategorieId: number | null
+): Promise<Empfaenger[]> {
+	const [t] = await db.select({ id: turnier.id }).from(turnier).where(eq(turnier.id, turnierId));
+	if (!t) return [];
+	const aktive = await db
+		.select()
+		.from(kategorie)
+		.where(and(eq(kategorie.turnierId, turnierId), eq(kategorie.status, 'aktiv')));
+	const gewaehlt = aktive.filter((k) => kategorieId === null || k.id === kategorieId);
+	if (gewaehlt.length === 0 && kategorieId !== null) return [];
+	const zeilen = await db
+		.select({ ...GRUNDFELDER, ...spielerSpalten })
+		.from(mitglied)
+		.leftJoin(konto, eq(konto.mitgliedId, mitglied.id))
+		.where(grundmenge(eq(konto.themaCm, true)))
+		.orderBy(...REIHENFOLGE);
+	if (auswahl === 'alle') return mitAbos(db, zeilen);
+
+	const jeMitglied = await anmeldungenJeMitglied(db, turnierId);
+	const aktivIds = new Set(aktive.map((k) => k.id));
+	const gewaehltIds = new Set(gewaehlt.map((k) => k.id));
+	const doppelIds = new Set(gewaehlt.filter((k) => k.art === 'doppel').map((k) => k.id));
+	const passt = (k: (typeof aktive)[number], s: Spieler): boolean =>
+		k.art === 'doppel' ? passtDoppelAllein(regelAus(k), s) : passtEinzel(regelAus(k), s);
+
+	const gehoert = (z: (typeof zeilen)[number]): boolean => {
+		const eigene = jeMitglied.get(z.mitgliedId) ?? [];
+		switch (auswahl) {
+			case 'angemeldet':
+				return eigene.some((a) => gewaehltIds.has(a.kategorieId));
+			case 'sucht-partner':
+				return eigene.some(
+					(a) => doppelIds.has(a.kategorieId) && a.spieler.length === 1 && a.status === 'bestaetigt'
+				);
+			case 'berechtigt': {
+				if (eigene.length >= GRENZE) return false;
+				const s = spielerAus(z);
+				const fehlt = fehlendeAngaben(s).length > 0;
+				if (kategorieId === null) {
+					if (eigene.some((a) => aktivIds.has(a.kategorieId))) return false;
+					return fehlt || aktive.some((k) => passt(k, s));
+				}
+				if (fehlt || eigene.some((a) => a.kategorieId === kategorieId)) return false;
+				return gewaehlt.some((k) => passt(k, s));
+			}
+		}
+	};
+	return mitAbos(db, zeilen.filter(gehoert));
 }
