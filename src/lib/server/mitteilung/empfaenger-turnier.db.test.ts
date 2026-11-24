@@ -304,6 +304,27 @@ describe('Empfänger einer Mitteilung zum Turnier', () => {
 		expect(await turnierEmpfaenger(db, 2_000_000_000, 'alle', null)).toEqual([]);
 	});
 
+	test('Reihenfolge nach Name, wie in der Verwaltung', async () => {
+		const t = await herrenTurnier();
+		const z = randomUUID();
+		// Zuerst angelegt, aber nach Name zuletzt.
+		const berta = await spieler();
+		const anna = await spieler();
+		await db
+			.update(mitglied)
+			.set({ vorname: 'Berta', nachname: `Zaugg-${z}` })
+			.where(eq(mitglied.id, berta.mitgliedId));
+		await db
+			.update(mitglied)
+			.set({ vorname: 'Anna', nachname: `Aebi-${z}` })
+			.where(eq(mitglied.id, anna.mitgliedId));
+		for (const m of [berta, anna]) {
+			expect(await meldeAn(db, t.k.einzel, m.mitgliedId, t.jetzt)).toBe('ok');
+		}
+		const liste = await turnierEmpfaenger(db, t.id, 'angemeldet', t.k.einzel);
+		expect(liste.map((e) => e.mitgliedId)).toEqual([anna.mitgliedId, berta.mitgliedId]);
+	});
+
 	test('Thema Clubmeisterschaft aus', async () => {
 		const t = await herrenTurnier();
 		const { einzel } = t.k;
