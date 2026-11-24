@@ -282,7 +282,8 @@ describe('Empfänger einer Mitteilung zum Turnier', () => {
 		const angemeldet = await spieler({ geschlecht: 'w' });
 		const dame = await spieler({ geschlecht: 'w' });
 		// Aktive Anmeldung in einer abgesagten Kategorie: kommt im Betrieb nicht vor (Absagen geht
-		// nur ohne aktive Anmeldungen), zählt aber auch dann nirgends.
+		// nur ohne aktive Anmeldungen). Sie macht niemanden zum Angemeldeten; für die Höchstzahl
+		// (FR-06) zählt sie aber mit, wie beim Eintragen (`trageEin`).
 		await anmeldungMit(t.k.damen, [angemeldet.mitgliedId], 'bestaetigt', t.jetzt);
 		await db.update(kategorie).set({ status: 'abgesagt' }).where(eq(kategorie.id, t.k.damen));
 		for (const auswahl of ['alle', 'angemeldet', 'berechtigt', 'sucht-partner'] as const) {
