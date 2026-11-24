@@ -7,8 +7,9 @@ import type { Mailer } from '../login/dienst.ts';
 import type { PushSender } from './versand.ts';
 
 /**
- * Die Rechte prüft die Verwaltung (`liest`/`schreibt`, Bereich `mitglieder`): Der Mitglieder-Admin
- * sendet, der MyTCO-Admin liest nur den Verlauf. `push: null` heisst: kein VAPID, Push ist aus.
+ * Die Rechte prüft die Verwaltung (`liest`/`schreibt`; Anlass und Verein Bereich `mitglieder`,
+ * Turnier Bereich `cm`): Mitglieder-Admin bzw. CM-Admin senden, der MyTCO-Admin liest nur den
+ * Verlauf. `push: null` heisst: kein VAPID, Push ist aus.
  * `adresse`: Adresse von MyTCO für die Links.
  */
 export type MitteilungAdminDienste = AdminDienste & {

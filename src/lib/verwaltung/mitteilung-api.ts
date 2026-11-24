@@ -60,7 +60,8 @@ export const WEGE = Object.keys(WEG_NAMEN) as Weg[];
 export const VORLAGE_NAMEN: Record<Vorlage['art'], string> = {
 	erinnerung: 'Erinnerung',
 	aenderung: 'Änderung',
-	neu: 'Neuer Anlass'
+	neu: 'Neuer Anlass',
+	offen: 'Anmeldung offen'
 };
 
 const mitglieder = (n: number) => `${n} ${n === 1 ? 'Mitglied' : 'Mitglieder'}`;

@@ -398,13 +398,18 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 				s.d,
 				hole(mytco.konto, { params: { id: anlassId } })
 			),
+			// Das Turnier ist in Vorbereitung: Den Verlauf lesen geht trotzdem.
+			await MITTEILUNG_ADMIN_SCHNITTSTELLEN.getTurnierMitteilungen(
+				s.d,
+				hole(mytco.konto, { params: { id: String(t.id) } })
+			),
 			await CM_ADMIN_SCHNITTSTELLEN.getDoppel(
 				s.d,
 				hole(mytco.konto, { params: { id: String(dk.id) } })
 			)
 		];
 		expect(antworten.map((r) => r.status)).toEqual(Array(antworten.length).fill(200));
-		expect(antworten).toHaveLength(12);
+		expect(antworten).toHaveLength(13);
 		const liste = (await antworten[0].json()) as { id: number }[];
 		expect(liste.map((z) => z.id)).toContain(ziel.mitgliedId);
 		expect(await antworten[3].json()).toEqual([
@@ -430,7 +435,9 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			['postVereinSenden', mytco, 403, 'unbestaetigt'],
 			['getVereinMitteilungen', mytco, 403, 'unbestaetigt'],
 			['postVereinSenden', cm, 403, 'kein-admin'],
-			['getVereinMitteilungen', cm, 403, 'kein-admin']
+			['getVereinMitteilungen', cm, 403, 'kein-admin'],
+			['postTurnierSenden', cm, 403, 'unbestaetigt'],
+			['getTurnierMitteilungen', mytco, 403, 'unbestaetigt']
 		];
 		const alle = alleVerwaltung();
 		for (const [name, konto, status, fehler] of faelle) {
@@ -444,8 +451,9 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 	});
 
 	// Charakterisierung zu Schritt 11 (docs/refactoring-analyse.md, Anhang D.11): Die Schnittstellen
-	// von Turnier, CM und Gespräch prüfen den Bereich `cm`, gleich, in welcher Liste sie stehen.
-	test('Bereich cm: an den 26 Schnittstellen von Turnier, CM und Gespräch bekommt der Mitglieder-Admin 403 kein-admin, der CM-Admin weder 401 noch 403', async () => {
+	// von Turnier, CM, Gespräch und den Mitteilungen zum Turnier prüfen den Bereich `cm`, gleich, in
+	// welcher Liste sie stehen.
+	test('Bereich cm: an den 29 Schnittstellen von Turnier, CM, Gespräch und Mitteilungen zum Turnier bekommt der Mitglieder-Admin 403 kein-admin, der CM-Admin weder 401 noch 403', async () => {
 		const s = baue();
 		const mitglieder = await bestaetigt(s, ['mitglieder']);
 		const cm = await bestaetigt(s, ['cm']);
@@ -475,9 +483,12 @@ describe('Rechte je Bereich (Regeln 2, 3, 4, 7)', () => {
 			'getGespraeche',
 			'getAdminGespraech',
 			'postAntwort',
-			'postZustand'
+			'postZustand',
+			'getTurnierMitteilungen',
+			'postTurnierVorschau',
+			'postTurnierSenden'
 		];
-		expect(new Set(namen).size).toBe(26);
+		expect(new Set(namen).size).toBe(29);
 		const alle = alleVerwaltung();
 		const mach = (name: string, konto: AngemeldetesKonto) =>
 			ereignis({

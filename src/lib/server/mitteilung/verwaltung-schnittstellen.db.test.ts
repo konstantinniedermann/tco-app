@@ -7,21 +7,32 @@ import {
 	type EigeneDatenbank
 } from '../../../../tests/hilfen/eigene-datenbank.ts';
 import { legeMitgliedAn } from '../../../../tests/hilfen/mitglieder.ts';
-import { vorlagenAnlass } from '../../mitteilung/vorlagen.ts';
+import { turnierjahre } from '../../../../tests/hilfen/turnierjahre.ts';
+import { FELD_MELDUNG, vorlagenAnlass, vorlagenTurnier } from '../../mitteilung/vorlagen.ts';
 import { riegel, setzeAnsicht } from '../admin/ansicht.ts';
 import { erstelleZugangDienst } from '../admin/zugang.ts';
 import { legeAnlassAn, melde } from '../anlass/anlaesse.ts';
 import type { Db } from '../db/index.ts';
-import { mitteilung, pushAbo, sitzung } from '../db/schema.ts';
+import { anmeldung, anmeldungSpieler, mitteilung, pushAbo, sitzung } from '../db/schema.ts';
 import { erstelleBremsen } from '../login/bremse.ts';
 import type { Mailer } from '../login/dienst.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
+import type { KategorieWerte } from '../turnier/angaben.ts';
+import {
+	legeKategorieAn,
+	legeTurnierAn,
+	sageKategorieAb,
+	setzeStatus
+} from '../turnier/turniere.ts';
 import {
 	MITTEILUNG_ADMIN_SCHNITTSTELLEN,
 	getAnlassMitteilungen,
+	getTurnierMitteilungen,
 	getVereinMitteilungen,
 	postAnlassSenden,
 	postAnlassVorschau,
+	postTurnierSenden,
+	postTurnierVorschau,
 	postVereinSenden,
 	postVereinVorschau
 } from './verwaltung-schnittstellen.ts';
@@ -328,7 +339,10 @@ describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 		const admin = await bestaetigt(s, ['mitglieder']);
 		const { id } = await neuerAnlass(admin.mitgliedId);
 		const cm = await bestaetigt(s, ['cm']);
-		const alle = Object.entries(MITTEILUNG_ADMIN_SCHNITTSTELLEN);
+		// Die Mitteilungen zum Turnier gehören dem CM-Admin (Bereich cm).
+		const alle = Object.entries(MITTEILUNG_ADMIN_SCHNITTSTELLEN).filter(
+			([name]) => !name.includes('Turnier')
+		);
 		expect(alle).toHaveLength(6);
 		for (const [name, fn] of alle) {
 			const e = name.startsWith('get')
@@ -542,5 +556,344 @@ describe('Schnittstellen für Mitteilungen (Verwaltung)', () => {
 			{ push: 0, mails: 0, ersatzMails: 0, nichtErreichbar: 1 }
 		]);
 		// Die Prüfung, dass nichts geloggt wurde, macht afterEach.
+	});
+});
+
+// Jedes Turnier bekommt ein eigenes Jahr aus dem Bereich dieser Datei (`turnier_jahr_unique`).
+const naechstesJahr = turnierjahre(import.meta.url);
+
+const EINZEL: Omit<KategorieWerte, 'name'> = {
+	geschlecht: 'herren',
+	art: 'einzel',
+	jahrgangVon: null,
+	jahrgangBis: null,
+	klassierungVon: 'R1',
+	klassierungBis: 'R5',
+	mindestsumme: null
+};
+const DOPPEL: Omit<KategorieWerte, 'name'> = {
+	...EINZEL,
+	art: 'doppel',
+	klassierungVon: null,
+	klassierungBis: null,
+	mindestsumme: 9
+};
+
+async function kategorieIn(turnierId: number, name: string, w: Omit<KategorieWerte, 'name'>) {
+	const r = await legeKategorieAn(db(), turnierId, { name, ...w });
+	if (r.ergebnis !== 'ok') throw new Error(`Kategorie ${name}: ${r.ergebnis}`);
+	return r.id;
+}
+
+/** Turnier mit einer Einzel- und einer Doppel-Kategorie; `offen: false` bleibt in Vorbereitung. */
+async function neuesTurnier(offen = true) {
+	const jahr = naechstesJahr();
+	const anmeldeschluss = `${jahr}-05-31`;
+	const r = await legeTurnierAn(db(), {
+		jahr,
+		name: `Clubmeisterschaft ${jahr}`,
+		anmeldeschluss,
+		nummern: []
+	});
+	if (r.ergebnis !== 'ok') throw new Error(`Turnier ${jahr}: ${r.ergebnis}`);
+	const einzel = await kategorieIn(r.id, 'Herren R1–R5', EINZEL);
+	const doppel = await kategorieIn(r.id, 'Herren Doppel', DOPPEL);
+	if (offen) expect(await setzeStatus(db(), r.id, 'offen', JETZT)).toBe('ok');
+	return { id: r.id, jahr, anmeldeschluss, einzel, doppel, params: { id: String(r.id) } };
+}
+
+/** Erfundenes Mitglied, bestätigt angemeldet in einer Kategorie (direkt in der Datenbank). */
+async function angemeldet(kategorieId: number, name: { vorname?: string; nachname?: string } = {}) {
+	const m = await legeMitgliedAn(db(), name);
+	const [a] = await db()
+		.insert(anmeldung)
+		.values({ kategorieId, status: 'bestaetigt', angemeldetAm: JETZT, geaendertAm: JETZT })
+		.returning({ id: anmeldung.id });
+	await db().insert(anmeldungSpieler).values({ anmeldungId: a.id, mitgliedId: m.mitgliedId });
+	return m;
+}
+
+const name = (vorname: string, nachname: string) => ({ rufname: null, vorname, nachname });
+
+describe('Schnittstellen für Mitteilungen zum Turnier und an Rollen (Verwaltung)', () => {
+	test('CM-Admin: Vorschau an Kategorie zählt nur deren Angemeldete', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm']);
+		const t = await neuesTurnier();
+		await angemeldet(t.einzel, { vorname: 'Erich', nachname: 'Einzelzwei' });
+		await angemeldet(t.einzel, { vorname: 'Emil', nachname: 'Einzeleins' });
+		await angemeldet(t.doppel, { vorname: 'Dario', nachname: 'Doppelsuche' });
+		const vorher = await anzahlEintraege();
+		const body = { ...NACHRICHT, auswahl: 'angemeldet', kategorieId: t.einzel };
+		const r = await postTurnierVorschau(s.d, schicke(cm.konto, body, t.params));
+		expect([r.status, await r.json()]).toEqual([
+			200,
+			{
+				anzahl: 2,
+				push: 0,
+				mails: 2,
+				nichtErreichbar: 0,
+				namen: [name('Emil', 'Einzeleins'), name('Erich', 'Einzelzwei')]
+			}
+		]);
+		// Ohne Kategorie zählen die Angemeldeten aller Kategorien.
+		const ganz = await postTurnierVorschau(
+			s.d,
+			schicke(cm.konto, { ...NACHRICHT, auswahl: 'angemeldet' }, t.params)
+		);
+		expect(await ganz.json()).toMatchObject({ anzahl: 3 });
+		// Doppel: sucht Partner mit der Doppel-Kategorie.
+		const suche = await postTurnierVorschau(
+			s.d,
+			schicke(cm.konto, { ...NACHRICHT, auswahl: 'sucht-partner', kategorieId: t.doppel }, t.params)
+		);
+		expect(await suche.json()).toMatchObject({ anzahl: 1, namen: [name('Dario', 'Doppelsuche')] });
+		expect(s.mails).toEqual([]);
+		expect(await anzahlEintraege()).toBe(vorher);
+	});
+
+	test('CM-Admin: Verlauf liefert Vorlagen und nur die aktiven Kategorien nach Nummer', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm']);
+		const t = await neuesTurnier();
+		const abgesagt = await kategorieIn(t.id, 'Damen R1–R5', { ...EINZEL, geschlecht: 'damen' });
+		const zweitesDoppel = await kategorieIn(t.id, 'Herren Doppel R6', {
+			...DOPPEL,
+			mindestsumme: 12
+		});
+		const absage = await sageKategorieAb(db(), abgesagt);
+		expect(absage).toMatchObject({ ergebnis: 'ok' });
+		const r = await getTurnierMitteilungen(s.d, hole(cm.konto, t.params));
+		expect(r.status).toBe(200);
+		expect(r.headers.get('cache-control')).toBe('no-store');
+		expect(await r.json()).toEqual({
+			vorlagen: vorlagenTurnier({ jahr: t.jahr, anmeldeschluss: t.anmeldeschluss }),
+			verlauf: [],
+			kategorien: [
+				{ id: t.einzel, name: 'Herren R1–R5', art: 'einzel' },
+				{ id: t.doppel, name: 'Herren Doppel', art: 'doppel' },
+				{ id: zweitesDoppel, name: 'Herren Doppel R6', art: 'doppel' }
+			]
+		});
+	});
+
+	test('CM-Admin: Senden schreibt Verlauf mit Kategorie und Link aufs Turnier', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm'], { vorname: 'Carla', nachname: 'Cmadmin' });
+		const t = await neuesTurnier();
+		const anderes = await neuesTurnier();
+		const spieler = await angemeldet(t.einzel, { nachname: 'Spielfreudig' });
+		await angemeldet(t.doppel, { nachname: 'Doppelnur' });
+		const titel = `Regen ${randomUUID().slice(0, 8)}`;
+		const body = { ...NACHRICHT, titel, auswahl: 'angemeldet', kategorieId: t.einzel };
+		const r = await postTurnierSenden(s.d, schicke(cm.konto, body, t.params));
+		expect([r.status, await r.json()]).toEqual([
+			201,
+			{ push: 0, mails: 1, ersatzMails: 0, nichtErreichbar: 0 }
+		]);
+		expect(s.mails.map((m) => m.an)).toEqual([spieler.email]);
+		expect(s.mails[0].text).toContain(`${ADRESSE}/clubmeisterschaft/${t.id}\n`);
+
+		const g = await getTurnierMitteilungen(s.d, hole(cm.konto, t.params));
+		const roh = await g.text();
+		expect(JSON.parse(roh).verlauf).toEqual([
+			{
+				gesendetAm: JETZT.toISOString(),
+				absender: { rufname: null, vorname: 'Carla', nachname: 'Cmadmin' },
+				titel,
+				text: NACHRICHT.text,
+				auswahl: 'angemeldet',
+				kategorie: 'Herren R1–R5',
+				weg: 'push-sonst-mail',
+				push: 0,
+				mails: 1,
+				ersatzMails: 0,
+				nichtErreichbar: 0
+			}
+		]);
+		expect(roh).not.toContain('Spielfreudig');
+		expect(roh).not.toContain(spieler.email);
+		// Ohne Kategorie speichert der Verlauf keine.
+		const ganz = await postTurnierSenden(
+			s.d,
+			schicke(cm.konto, { ...NACHRICHT, titel, auswahl: 'angemeldet' }, t.params)
+		);
+		expect(ganz.status).toBe(201);
+		const zwei = await (await getTurnierMitteilungen(s.d, hole(cm.konto, t.params))).json();
+		expect(zwei.verlauf.map((e: { kategorie: string | null }) => e.kategorie)).toEqual([
+			null,
+			'Herren R1–R5'
+		]);
+		// Ein anderes Turnier und der Verein kennen die Einträge nicht.
+		const fremd = await (await getTurnierMitteilungen(s.d, hole(cm.konto, anderes.params))).json();
+		expect(fremd.verlauf).toEqual([]);
+		const mitglieder = await bestaetigt(s, ['mitglieder']);
+		const verein = await (await getVereinMitteilungen(s.d, hole(mitglieder.konto))).json();
+		expect(verein.verlauf.map((e: { titel: string }) => e.titel)).not.toContain(titel);
+	});
+
+	test('Kategorie fremd, abgesagt, bei alle oder Einzel bei sucht-partner → 400 Feld kategorie', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm']);
+		const t = await neuesTurnier();
+		const anderes = await neuesTurnier();
+		const abgesagt = await kategorieIn(t.id, 'Damen R1–R5', { ...EINZEL, geschlecht: 'damen' });
+		expect(await sageKategorieAb(db(), abgesagt)).toMatchObject({ ergebnis: 'ok' });
+		await angemeldet(t.einzel);
+		await angemeldet(anderes.einzel);
+		const vorher = await anzahlEintraege();
+		const faelle = {
+			fremd: { auswahl: 'angemeldet', kategorieId: anderes.einzel },
+			abgesagt: { auswahl: 'angemeldet', kategorieId: abgesagt },
+			alle: { auswahl: 'alle', kategorieId: t.einzel },
+			'einzel bei sucht-partner': { auswahl: 'sucht-partner', kategorieId: t.einzel }
+		};
+		for (const [fall, teil] of Object.entries(faelle)) {
+			for (const [art, fn] of Object.entries({ postTurnierVorschau, postTurnierSenden })) {
+				const r = await fn(s.d, schicke(cm.konto, { ...NACHRICHT, ...teil }, t.params));
+				expect([fall, art, r.status, await r.json()]).toEqual([
+					fall,
+					art,
+					400,
+					{ fehler: 'eingabe', felder: { kategorie: FELD_MELDUNG.kategorie } }
+				]);
+			}
+		}
+		// Fehlt auch anderes, kommen alle Felder zusammen.
+		const r = await postTurnierSenden(
+			s.d,
+			schicke(cm.konto, { ...NACHRICHT, titel: '', ...faelle.alle }, t.params)
+		);
+		expect(await r.json()).toEqual({
+			fehler: 'eingabe',
+			felder: { titel: FELD_MELDUNG.titel, kategorie: FELD_MELDUNG.kategorie }
+		});
+		expect(s.mails).toEqual([]);
+		expect(await anzahlEintraege()).toBe(vorher);
+	});
+
+	test('Turnier in Vorbereitung: Vorschau und Senden 409 vorbereitung, Verlauf 200', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm']);
+		const t = await neuesTurnier(false);
+		await angemeldet(t.einzel);
+		const vorher = await anzahlEintraege();
+		for (const body of [
+			{ ...NACHRICHT, auswahl: 'angemeldet', kategorieId: t.einzel },
+			// Vor der Prüfung der Eingabe.
+			{}
+		]) {
+			for (const [art, fn] of Object.entries({ postTurnierVorschau, postTurnierSenden })) {
+				const r = await fn(s.d, schicke(cm.konto, body, t.params));
+				expect([art, r.status, await r.json()]).toEqual([art, 409, { fehler: 'vorbereitung' }]);
+			}
+		}
+		const g = await getTurnierMitteilungen(s.d, hole(cm.konto, t.params));
+		expect(g.status).toBe(200);
+		expect((await g.json()).verlauf).toEqual([]);
+		expect(s.mails).toEqual([]);
+		expect(await anzahlEintraege()).toBe(vorher);
+	});
+
+	test('Unbekanntes Turnier: 404', async () => {
+		const s = baue();
+		const cm = await bestaetigt(s, ['cm']);
+		for (const id of ['999999', 'abc']) {
+			for (const [art, fn] of Object.entries({
+				getTurnierMitteilungen,
+				postTurnierVorschau,
+				postTurnierSenden
+			})) {
+				const e = art.startsWith('get')
+					? hole(cm.konto, { id })
+					: schicke(cm.konto, { ...NACHRICHT, auswahl: 'alle' }, { id });
+				const r = await fn(s.d, e);
+				expect([art, id, r.status, await r.json()]).toEqual([
+					art,
+					id,
+					404,
+					{ fehler: 'nicht-gefunden' }
+				]);
+			}
+		}
+	});
+
+	test('Mitglieder-Admin ohne CM-Rolle: Turnier-Mitteilung 403; MyTCO-Admin liest nur', async () => {
+		const s = baue();
+		const mitglieder = await bestaetigt(s, ['mitglieder']);
+		const mytco = await bestaetigt(s, ['mytco']);
+		const t = await neuesTurnier();
+		await angemeldet(t.einzel);
+		const vorher = await anzahlEintraege();
+		const body = { ...NACHRICHT, auswahl: 'alle' };
+		for (const [art, fn] of Object.entries({
+			getTurnierMitteilungen,
+			postTurnierVorschau,
+			postTurnierSenden
+		})) {
+			const e = art.startsWith('get')
+				? hole(mitglieder.konto, t.params)
+				: schicke(mitglieder.konto, body, t.params);
+			const r = await fn(s.d, e);
+			expect([art, r.status, await r.json()]).toEqual([art, 403, { fehler: 'kein-admin' }]);
+		}
+		expect((await getTurnierMitteilungen(s.d, hole(mytco.konto, t.params))).status).toBe(200);
+		for (const [art, fn] of Object.entries({ postTurnierVorschau, postTurnierSenden })) {
+			const r = await fn(s.d, schicke(mytco.konto, body, t.params));
+			expect([art, r.status, await r.json()]).toEqual([art, 403, { fehler: 'kein-recht' }]);
+		}
+		expect(s.mails).toEqual([]);
+		expect(await anzahlEintraege()).toBe(vorher);
+	});
+
+	test('Verein an Rolle: Vorschau enthält eigenes CM-Admin-Mitglied, nicht ein eigenes ohne Rolle', async () => {
+		const s = baue();
+		const admin = await bestaetigt(s, ['mitglieder']);
+		const mitRolle = await legeMitgliedAn(db(), {
+			vorname: 'Rita',
+			nachname: 'Rollentraeger',
+			rollen: ['cm']
+		});
+		const ohneRolle = await legeMitgliedAn(db(), { vorname: 'Otto', nachname: 'Ohnerolle' });
+		const titel = `An CM ${randomUUID().slice(0, 8)}`;
+		const body = { ...NACHRICHT, titel, auswahl: 'rolle-cm' };
+		const r = await postVereinVorschau(s.d, schicke(admin.konto, body));
+		expect(r.status).toBe(200);
+		const v = await r.json();
+		expect(v.namen).toContainEqual(name('Rita', 'Rollentraeger'));
+		expect(v.namen).not.toContainEqual(name('Otto', 'Ohnerolle'));
+		// Zum Vergleich: an alle geht es auch an das Mitglied ohne Rolle.
+		const alle = await (
+			await postVereinVorschau(s.d, schicke(admin.konto, { ...NACHRICHT, auswahl: 'alle' }))
+		).json();
+		expect(alle.namen).toContainEqual(name('Otto', 'Ohnerolle'));
+
+		const gesendet = await postVereinSenden(s.d, schicke(admin.konto, body));
+		expect(gesendet.status).toBe(201);
+		const an = s.mails.map((m) => m.an);
+		expect(an).toContain(mitRolle.email);
+		expect(an).not.toContain(ohneRolle.email);
+		expect(an).not.toContain(admin.email);
+		const verlauf = await (await getVereinMitteilungen(s.d, hole(admin.konto))).json();
+		// Frühere Tests dieser Datei haben Einträge mit späterem Datum hinterlassen: nach Titel suchen.
+		expect(verlauf.verlauf.filter((e: { titel: string }) => e.titel === titel)).toEqual([
+			expect.objectContaining({ auswahl: 'rolle-cm', kategorie: null })
+		]);
+	});
+
+	test('Verein: unbekannte Auswahl rolle-xyz → 400 Feld auswahl', async () => {
+		const s = baue();
+		const admin = await bestaetigt(s, ['mitglieder']);
+		const vorher = await anzahlEintraege();
+		for (const [art, fn] of Object.entries({ postVereinVorschau, postVereinSenden })) {
+			const r = await fn(s.d, schicke(admin.konto, { ...NACHRICHT, auswahl: 'rolle-xyz' }));
+			expect([art, r.status, await r.json()]).toEqual([
+				art,
+				400,
+				{ fehler: 'eingabe', felder: { auswahl: FELD_MELDUNG.auswahl } }
+			]);
+		}
+		expect(s.mails).toEqual([]);
+		expect(await anzahlEintraege()).toBe(vorher);
 	});
 });
