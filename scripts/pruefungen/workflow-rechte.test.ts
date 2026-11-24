@@ -20,7 +20,10 @@ const perm = (rechte: string) =>
 const BAUEN = `  bauen:\n${perm('contents: read, packages: write')}\n    steps:\n      - run: echo bauen`;
 const FINDEN = `  finden:\n${perm('contents: read, packages: read')}\n    steps:\n      - run: echo finden`;
 const FREIGEBEN = `  freigeben:\n${perm('packages: write')}\n    steps:\n      - run: echo freigeben`;
-const AUSLIEFERN = `  ausliefern:\n${perm('packages: read')}\n    steps:\n      - run: ssh host\n        env:\n          K: \${{ secrets.SSH_SCHLUESSEL_TEST }}`;
+const TOR = ['doku', 'pruefen', 'e2e', 'malware', 'image'];
+const TOR_NEEDS = `    needs: [bauen, finden, ${TOR.join(', ')}]`;
+const TOR_IF = `    if: >-\n      \${{ !cancelled() && needs.bauen.result == 'success'\n${TOR.map((j) => `      && needs.${j}.result == 'success'`).join('\n')} }}`;
+const AUSLIEFERN = `  ausliefern:\n${TOR_NEEDS}\n${TOR_IF}\n${perm('packages: read')}\n    steps:\n      - run: ssh host\n        env:\n          K: \${{ secrets.SSH_SCHLUESSEL_TEST }}`;
 const RELEASE = `  release:\n${perm('contents: write')}\n    steps:\n      - run: echo release`;
 const PRUEFEN = `  pruefen:\n    runs-on: ubuntu-latest\n    steps:\n      - run: npm ci`;
 
@@ -123,6 +126,36 @@ describe('pruefeWorkflow', () => {
 		expect(pruefeWorkflow(W, vierer)).toHaveLength(1);
 		expect(pruefeWorkflow(W, `${KOPF}${WF_RECHTE}`)).toHaveLength(1);
 	});
+	it('meldet ausliefern, das nicht auf e2e wartet', () => {
+		const ausliefern = AUSLIEFERN.replace(', e2e,', ',');
+		const befunde = pruefeWorkflow(W, workflow([ausliefern]));
+		expect(befunde).toEqual([`${W}: Job ausliefern: wartet nicht auf e2e`]);
+	});
+	it('meldet ausliefern, das das Ergebnis von pruefen nicht prüft', () => {
+		const ausliefern = AUSLIEFERN.replace("&& needs.pruefen.result == 'success'", '');
+		const befunde = pruefeWorkflow(W, workflow([ausliefern]));
+		expect(befunde).toEqual([`${W}: Job ausliefern: prüft das Ergebnis von pruefen nicht`]);
+	});
+	it('meldet ausliefern ohne needs und ohne if für jeden Tor-Job', () => {
+		const ausliefern = `  ausliefern:\n${perm('packages: read')}\n    steps:\n      - run: ssh host`;
+		expect(pruefeWorkflow(W, workflow([ausliefern]))).toHaveLength(2 * TOR.length);
+	});
+	it('meldet needs als Block-Liste als nicht lesbar (fail closed)', () => {
+		const block = `    needs:\n${['bauen', ...TOR].map((j) => `      - ${j}`).join('\n')}`;
+		const ausliefern = AUSLIEFERN.replace(TOR_NEEDS, block);
+		const befunde = pruefeWorkflow(W, workflow([ausliefern]));
+		expect(befunde).toEqual([`${W}: Job ausliefern: \`needs:\` nicht lesbar`]);
+	});
+	it('zählt eine Ergebnisprüfung ausserhalb von if nicht', () => {
+		const ohneIf = AUSLIEFERN.replace(TOR_IF, '');
+		const imEnv = `${ohneIf}\n          X: \${{ needs.e2e.result == 'success' }}`;
+		const befunde = pruefeWorkflow(W, workflow([imEnv]));
+		expect(befunde).toContain(`${W}: Job ausliefern: prüft das Ergebnis von e2e nicht`);
+	});
+	it('verlangt das Tor nur in check.yml', () => {
+		const ohneTor = `  ausliefern:\n${perm('packages: read')}\n    steps:\n      - run: ssh host`;
+		expect(pruefeWorkflow('.github/workflows/anderes.yml', workflow([ohneTor]))).toHaveLength(1);
+	});
 	it.each(['.github/workflows/check.yml', '.github/workflows/secret-scan.yml'])(
 		'akzeptiert die echte Datei %s',
 		(pfad) => {
@@ -155,7 +188,7 @@ describe('pruefeWorkflow', () => {
 		expect(pruefeWorkflow(W, workflow([job]))).toHaveLength(1);
 	});
 	it('akzeptiert ausliefern mit if und concurrency', () => {
-		const ausliefern = `  ausliefern:\n    if: always() && github.ref == 'refs/heads/main'\n    concurrency:\n      group: ausliefern\n${perm('packages: read')}\n    steps:\n      - run: ssh host\n        env:\n          K: \${{ secrets.SSH_SCHLUESSEL_TEST }}`;
+		const ausliefern = `  ausliefern:\n${TOR_NEEDS}\n${TOR_IF}\n    concurrency:\n      group: ausliefern\n${perm('packages: read')}\n    steps:\n      - run: ssh host\n        env:\n          K: \${{ secrets.SSH_SCHLUESSEL_TEST }}`;
 		expect(pruefeWorkflow(W, workflow([ausliefern]))).toEqual([]);
 	});
 	it('wendet Sonderjobs nur auf check.yml an', () => {

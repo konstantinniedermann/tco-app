@@ -16,6 +16,10 @@ const AUSLIEFERN = 'ausliefern';
 // Nur diese Datei darf die Sonderjobs (JOB_RECHTE, ausliefern) enthalten; sonst gilt überall der Standard.
 const CI_DATEI = '.github/workflows/check.yml';
 const VERBOTENE_WOERTER = ['npm', 'npx', 'node', 'cache', 'artifact'];
+// Das Tor vor der Auslieferung: `bauen` läuft parallel zu den Prüfungen, also muss
+// `ausliefern` selbst auf jede warten (`needs`) und ihr Ergebnis im `if` verlangen; das `if`
+// beginnt mit `!cancelled()`, ein übersprungener Vorgänger hielte den Job sonst nicht auf.
+const TOR_JOBS = ['doku', 'pruefen', 'e2e', 'malware', 'image'];
 
 type Zeile = { einzug: number; text: string };
 
@@ -69,6 +73,42 @@ function secretNamen(text: string): (string | null)[] {
 	}
 	if (/^\s*secrets:\s*inherit\b/im.test(text)) namen.push(null);
 	return namen;
+}
+
+/**
+ * Befunde zum Tor im Job `ausliefern` (Körperzeilen ab Einzug 4). `needs:` nur als Inline-Liste
+ * lesbar; die Ergebnisprüfung zählt nur im `if:` samt Folgezeilen.
+ */
+function pruefeTor(koerper: Zeile[]): string[] {
+	const befunde: string[] = [];
+	const needsZeile = koerper.find((k) => k.einzug === 4 && /^needs:/.test(k.text));
+	if (needsZeile) {
+		const liste = /^needs:\s*\[([^\]]*)\]$/.exec(ohneKommentar(needsZeile.text));
+		if (!liste) befunde.push('`needs:` nicht lesbar');
+		else {
+			const needs = liste[1].split(',').map((n) => n.trim());
+			for (const tor of TOR_JOBS) {
+				if (!needs.includes(tor)) befunde.push(`wartet nicht auf ${tor}`);
+			}
+		}
+	} else {
+		for (const tor of TOR_JOBS) befunde.push(`wartet nicht auf ${tor}`);
+	}
+	const ifStart = koerper.findIndex((k) => k.einzug === 4 && /^if:/.test(k.text));
+	let bedingung = '';
+	if (ifStart >= 0) {
+		const teile = [koerper[ifStart].text];
+		for (let i = ifStart + 1; i < koerper.length && koerper[i].einzug > 4; i++) {
+			teile.push(koerper[i].text);
+		}
+		bedingung = teile.join(' ');
+	}
+	for (const tor of TOR_JOBS) {
+		if (!new RegExp(`needs\\.${tor}\\.result\\s*==\\s*'success'`).test(bedingung)) {
+			befunde.push(`prüft das Ergebnis von ${tor} nicht`);
+		}
+	}
+	return befunde;
 }
 
 function gleich(a: string[], b: string[]): boolean {
@@ -164,6 +204,7 @@ export function pruefeWorkflow(pfad: string, yaml: string): string[] {
 				}
 			}
 		} else {
+			for (const befund of pruefeTor(koerper)) job(name, befund);
 			if (/\buses["']?\s*:/.test(text)) job(name, 'darf kein `uses:` enthalten');
 			for (const wort of VERBOTENE_WOERTER) {
 				if (new RegExp(`\\b${wort}\\b`).test(text)) job(name, `enthält verbotenes Wort «${wort}»`);
