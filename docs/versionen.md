@@ -11,6 +11,9 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
+- Verwaltung: Der CM-Admin schickt auf der Seite des Turniers Mitteilungen an Angemeldete,
+  Spielberechtigte oder Spieler, die einen Partner suchen, auch nur für eine Kategorie.
+  Vereinsmitteilungen gehen auch an alle mit einer Rolle (#97, #95).
 - Verwaltung: Bei Änderungen an Angaben, Rollen, Mitgliedschaft und CM-Anmeldungen wählt sie mit
   «Mitglied benachrichtigen», ob das Mitglied eine Meldung bekommt (#94).
 - Werkzeug: `make test-pruefung` prüft vor dem Release den echten Test-Server (Fusszeile, Login,
