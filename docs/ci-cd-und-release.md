@@ -366,7 +366,7 @@ sie in die Seite «Datenschutz» ein (DS-09), darum zählt sie als Code (Tests, 
 | Vitest: Fachlogik und Rechte (mit PostgreSQL in der CI), dazu die Vertragstests der Schnittstellen (Grundprüfung, Routen-Test, Bremsen-Test), Abdeckung mindestens 90 % | Testkonzept | vorhanden |
 | Jede umgesetzte `FR-`, `RR-` und `A-`-ID hat einen Test | Testkonzept | vorhanden |
 | Testdaten und Seed-Daten nur mit `@example.org` | Testkonzept | vorhanden |
-| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI parallel in Teilen je Umgebung (`--shard`, nach Datei verteilt: iPhone 5, Android 3, Desktop 2; je nur mit ihrem Browser); Screenshots als Artefakt pro Teil, 30 Tage; im offiziellen Playwright-Image (Browser und Systempakete schon drin, Version aus `package-lock.json`), Datenbank und Mailpit über die Service-Namen; jeder Lauf läuft über `scripts/e2e.ts` auf einer eigenen, danach gelöschten Datenbank (`mytco_e2e_…`) im Postgres-Service und baut in einen eigenen, danach gelöschten Ordner (`.e2e-build/…`) | Testkonzept | vorhanden |
+| Playwright Ende-zu-Ende in drei Umgebungen mit axe, in der CI parallel in Teilen je Umgebung (`--shard`, nach Datei verteilt: iPhone 7, Android 3, Desktop 2; je nur mit ihrem Browser); Screenshots als Artefakt pro Teil, 30 Tage; im offiziellen Playwright-Image (Browser und Systempakete schon drin, Version aus `package-lock.json`), Datenbank und Mailpit über die Service-Namen; jeder Lauf läuft über `scripts/e2e.ts` auf einer eigenen, danach gelöschten Datenbank (`mytco_e2e_…`) im Postgres-Service und baut in einen eigenen, danach gelöschten Ordner (`.e2e-build/…`) | Testkonzept | vorhanden |
 | Malware-Prüfung der npm-Pakete (OSV-Gate, Kopie aus Munica) | dieses Konzept | nur CI |
 | Docker-Image baut | ADR-003 | vorhanden |
 | Rauchtest des Images (Start, Migration, `/api/status`) | ADR-003 | vorhanden |
@@ -530,7 +530,7 @@ bleiben, weil sie auch die Wartezeit kurz halten.
   auf, gezählt werden 7 Jobs inklusive Secret-Scan. Ein reiner Doku-Merge kostet 3 Minuten.
   Seit den Ende-zu-Ende-Tests auf drei Geräten kostet ein voller Lauf rund 20 abgerechnete
   Minuten (B: Jobdauern auf `dev`, 06.11.2026). Seit dem 24.11.2026 laufen die E2E-Tests in mehreren
-  Teilen (heute zehn) und das Image entsteht parallel zu den Prüfungen: mehr Minuten, dafür kürzere Wartezeit
+  Teilen (heute zwölf) und das Image entsteht parallel zu den Prüfungen: mehr Minuten, dafür kürzere Wartezeit
   bis Test (vorher rund 11 Minuten je Merge mit Code, B: Lauf 45391979705).
 - **Notfall ohne CI** (GitHub-Ausfall oder das Repo wird wieder privat und die Minuten sind
   aufgebraucht): Ohne CI gibt es auch kein Image. Der Projektleiter baut
