@@ -251,7 +251,8 @@ export async function turnierEmpfaenger(
 				const fehlt = fehlendeAngaben(s).length > 0;
 				if (kategorieId === null) {
 					if (eigene.some((a) => aktivIds.has(a.kategorieId))) return false;
-					return fehlt || aktive.some((k) => passt(k, s));
+					// Ohne aktive Kategorie kann niemand mehr mitspielen, auch nicht mit nachgetragenen Angaben.
+					return aktive.length > 0 && (fehlt || aktive.some((k) => passt(k, s)));
 				}
 				if (fehlt || eigene.some((a) => a.kategorieId === kategorieId)) return false;
 				return gewaehlt.some((k) => passt(k, s));

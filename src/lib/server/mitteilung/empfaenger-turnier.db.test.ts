@@ -221,6 +221,17 @@ describe('Empfänger einer Mitteilung zum Turnier', () => {
 		expect(ids(liste, ...meine)).toEqual(sortiert(r3, ohneAngaben, dameOhneKlassierung, zurueck));
 	});
 
+	test('berechtigt ohne Kategorie, wenn alle Kategorien abgesagt sind: niemand', async () => {
+		const t = await herrenTurnier();
+		const ohneAngaben = await spieler({ geschlecht: null, jahrgang: null, klassierung: null });
+		const r3 = await spieler();
+		await db.update(kategorie).set({ status: 'abgesagt' }).where(eq(kategorie.turnierId, t.id));
+
+		const liste = await turnierEmpfaenger(db, t.id, 'berechtigt', null);
+		// Ohne aktive Kategorie kann niemand mehr mitspielen, auch nicht wer Angaben nachträgt.
+		expect(ids(liste, ohneAngaben, r3)).toEqual([]);
+	});
+
 	test('Höchstzahl', async () => {
 		const t = await offenesTurnierMit(async (id) => [
 			await kategorieIn(id, 'Herren A', HERREN_EINZEL),
