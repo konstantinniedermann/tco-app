@@ -8,7 +8,7 @@ den Anforderungen.
 
 | Datum | Anlass | Datei |
 |-------|--------|-------|
-| 23.11.2026 | **Launchvideo für die ao. GV (Ende November 2026):** 72 Sekunden, 1920 × 1080, 30 fps, mit Musik. Stellt MyTCO im Stil einer Produktvorstellung vor: Startseite, Clubmeisterschaft mit Rangliste, Resultat melden mit Push, Interclub, GV-Anmeldung, Dokumente und Lizenzen, Handy und PC, Fahrplan bis 2028, Aufruf an Tester | [`2026-11-gv-launchvideo.mp4`](2026-11-gv-launchvideo.mp4) |
+| 23.11.2026 | **Launchvideo für die ao. GV (Ende November 2026):** 1 Minute 43, 1920 × 1080, 30 fps, mit Musik. Stellt MyTCO im Stil einer Produktvorstellung vor: Startseite, Clubmeisterschaft mit Rangliste, Resultat melden mit Push, Interclub, GV-Anmeldung, Dokumente und Lizenzen, Handy und PC, Fahrplan ohne Daten, Aufruf an Tester | [`2026-11-gv-launchvideo.mp4`](2026-11-gv-launchvideo.mp4) |
 
 ## Launchvideo GV 2026
 
@@ -22,19 +22,21 @@ weicht darum vom Onepager ab. Die Musik ist selbst erzeugt, ohne fremde Lizenzen
 
 | Zeit | Szene |
 |------|-------|
-| 0–6 s | «Spiele. Resultate. Anmeldungen. Dokumente.» → «Alles an einem Ort.» |
-| 6–10 s | Wappen und MyTCO, «Die Mitglieder-App des TC Olten» |
-| 10–18 s | iPhone mit Startseite, «TCO in der Hosentasche.» |
-| 18–34 s | Clubmeisterschaft: Rangliste, Resultat melden, Rangliste rechnet neu, Push |
-| 34–40 s | Interclub: alle 17 Teams |
-| 40–46 s | GV-Anmeldung mit einem Tipp |
-| 46–52 s | Dokumente und Lizenzen in der App |
-| 52–58 s | Handy und PC, Barrierefreiheit |
-| 58–66 s | Fahrplan (voraussichtlich) |
-| 66–72 s | «Bald für alle Mitglieder.», Aufruf an Tester |
+| 0:00 | «Spiele. Resultate. Anmeldungen. Dokumente.» → «Alles an einem Ort.» |
+| 0:07 | Wappen und MyTCO, «Die Mitglieder-App des TC Olten» |
+| 0:13 | iPhone mit Startseite, «TCO in der Hosentasche.» |
+| 0:25 | Clubmeisterschaft: Rangliste, Resultat melden, Rangliste rechnet neu, Push |
+| 0:47 | Interclub: alle 17 Teams der Saison 2026 (10 Interclub, 7 Junioren-Interclub, wie in `scripts/beispiel-interclub/2026/`) |
+| 0:55 | GV-Anmeldung mit einem Tipp |
+| 1:04 | Dokumente und Lizenzen in der App |
+| 1:13 | Handy und PC, Barrierefreiheit |
+| 1:22 | Fahrplan «Schritt für Schritt»: Jetzt, Als Nächstes, Dann, Danach, Später; bewusst ohne Daten |
+| 1:34 | «Bald für alle Mitglieder.», Aufruf an Tester |
 
 **Neu erzeugen** (Ordner [`gv-launchvideo-quelle/`](gv-launchvideo-quelle/)): Die Bühne ist eine
-HTML-Seite (`stage.html`), deren Funktion `seek(t)` jedes Bild aus der Zeit berechnet; die
+HTML-Seite (`stage.html`), deren Funktion `seek(t)` jedes Bild aus der Zeit berechnet. `zeitplan.py`
+legt fest, wo die Bühne langsamer läuft, damit man lesen kann (Bühnenzeit 72 s → Video 1:43);
+Render und Musik richten sich danach; die
 Stylesheets unter `mytco/` sind eine Kopie aus dem Design-System vom 23.11.2026. Gebraucht werden
 Python 3 mit `playwright` (Chromium), `numpy` und `scipy`, `ffmpeg` und die Schrift Inter.
 
