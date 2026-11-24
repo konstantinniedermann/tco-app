@@ -590,3 +590,27 @@ Formulierung im Leitbild auf Angaben und Rollen einschränken.
 **Ursprung:** Schlussprüfung #95/#97, 24.11.2026.
 
 **Einschätzung:** Klein: Auswahl als `` `rolle-${Rolle}` `` typisieren und `mitRolle` auf `Rolle` umstellen; kein Verhalten ändert sich.
+
+### 2026-11-24 — Auf der Turnierseite steht die Kategorie-Wahl zwischen Empfängern und Themen-Hinweis
+
+**Thema:** Oberfläche
+
+**Fundort:** `src/lib/verwaltung/Mitteilungsformular.svelte` (Turnier: Kategorie-Auswahl nach der Gruppe «Empfänger»)
+
+**Beobachtung:** Der Hinweis «Wer diese Mitteilungen im Profil abgeschaltet hat …» gehört zur Empfänger-Gruppe (`aria-describedby`), steht aber beim Turnier erst nach der Kategorie-Auswahl und wirkt abgetrennt (Screenshot PC).
+
+**Ursprung:** Task-Review #95/#97, 24.11.2026.
+
+**Einschätzung:** Kosmetisch; Auswahl unter den Hinweis rücken oder den Hinweis in die Gruppe holen.
+
+### 2026-11-24 — Der Stern in den Anforderungen wird für zwei Bedeutungen benutzt
+
+**Thema:** Doku
+
+**Fundort:** `docs/anforderungen/anforderungen.md` (Legende Zeile ~30; A-LOGIN-07, N-APP-02, N-APP-03)
+
+**Beobachtung:** Die Legende sagt «\* = Vorschlag des Projektleiters, vom Verein zu bestätigen». A-LOGIN-07, N-APP-02 und N-APP-03 nutzen den Stern für «umgesetzt, Prüfung auf echten Geräten offen».
+
+**Ursprung:** Schlussprüfung #95/#97, 24.11.2026.
+
+**Einschätzung:** Legende um die zweite Bedeutung ergänzen oder für «Gerät offen» eine eigene Kennzeichnung nehmen.
