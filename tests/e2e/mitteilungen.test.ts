@@ -161,6 +161,8 @@ test('FR-42: Mitglieder-Admin wählt Erinnerung, sieht Vorschau mit Zahl und Nam
 	await sendenTaste(page).click();
 	const rueckfrage = page.getByRole('dialog', { name: 'Jetzt an 1 Mitglied senden?' });
 	await expect(rueckfrage).toBeVisible();
+	// Spec A7: Die Rückfrage nennt die Empfänger in Worten.
+	await expect(rueckfrage).toContainText('An: Kommen');
 	await pruefeBildschirm(page, info, 'mitteilung-rueckfrage');
 	await rueckfrage.getByRole('button', { name: 'Abbrechen' }).click();
 	await expect(rueckfrage).toBeHidden();
@@ -485,10 +487,10 @@ test('Spec A6: CM-Admin schickt Mitteilung an die Angemeldeten einer Kategorie',
 	await expect(page.getByText('2 Mitglieder: 0 per Push, 2 per E-Mail')).toBeVisible();
 
 	await sendenTaste(page).click();
-	await page
-		.getByRole('dialog', { name: 'Jetzt an 2 Mitglieder senden?' })
-		.getByRole('button', { name: 'Senden' })
-		.click();
+	const rueckfrage = page.getByRole('dialog', { name: 'Jetzt an 2 Mitglieder senden?' });
+	// Spec A7: Die Rückfrage nennt Auswahl und Kategorie in Worten.
+	await expect(rueckfrage).toContainText(`An: Angemeldet · ${HERREN.name}`);
+	await rueckfrage.getByRole('button', { name: 'Senden' }).click();
 	await expect(page.getByText('Gesendet: 0 per Push, 2 per E-Mail.')).toBeVisible();
 	const zeile = page
 		.getByRole('region', { name: 'Verschickte Mitteilungen' })
@@ -523,6 +525,7 @@ test('Spec B11: Mitglieder-Admin schickt an eine Rolle (nur Push)', async ({ pag
 	await pruefeBildschirm(page, info, 'mitteilung-rolle-vorschau');
 
 	await sendenTaste(page).click();
+	await expect(page.getByRole('dialog')).toContainText('An: Alle mit Rolle Lizenz-Admin');
 	await page.getByRole('dialog').getByRole('button', { name: 'Senden' }).click();
 	await expect(page.getByText(/^Gesendet: /)).toBeVisible();
 	const zeile = page

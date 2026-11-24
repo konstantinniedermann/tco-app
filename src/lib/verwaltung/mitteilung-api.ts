@@ -138,6 +138,18 @@ export function vorschauZeilen(v: Omit<Vorschau, 'namen'>, weg: Weg): string[] {
 
 export const rueckfrageText = (anzahl: number) => `Jetzt an ${mitglieder(anzahl)} senden?`;
 
+/**
+ * Spec A7: Empfänger in der Rückfrage, aus den Werten, die hinausgehen: «An: Angemeldet · Damen
+ * R7–R9». `kategorien`: die des Turniers, für den Namen der gewählten Kategorie.
+ */
+export function empfaengerText(
+	werte: Pick<MitteilungWerte, 'auswahl' | 'kategorieId'>,
+	kategorien: readonly { id: number; name: string }[] = []
+): string {
+	const kategorie = kategorien.find((k) => k.id === werte.kategorieId)?.name ?? null;
+	return `An: ${auswahlText(werte.auswahl, kategorie)}`;
+}
+
 /** Zahlen nach dem Senden und im Verlauf (Spec Ziel 12, 15). */
 export function zahlenText(z: Zahlen): string {
 	const teile = [`${z.push} per Push`, `${z.mails} per E-Mail`];

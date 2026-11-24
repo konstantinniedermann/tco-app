@@ -9,6 +9,7 @@
 		AUSWAHL_NAMEN,
 		TURNIER_NAMEN,
 		VEREIN_NAMEN,
+		empfaengerText,
 		gleicheWerte,
 		VORLAGE_NAMEN,
 		WEG_NAMEN,
@@ -396,6 +397,10 @@
 
 <dialog class="karte" bind:this={rueckfrage} aria-labelledby="mitteilung-rueckfrage-titel">
 	<h2 id="mitteilung-rueckfrage-titel">{rueckfrageText(gueltig?.anzahl ?? 0)}</h2>
+	{#if vorschau}
+		<!-- Spec A7: die Empfänger der Werte, die hinausgehen, nicht der Eingaben. -->
+		<p>{empfaengerText(vorschau.werte, kategorien)}</p>
+	{/if}
 	<p>«{titel}» geht gleich hinaus. Zurückholen lässt sie sich nicht.</p>
 	<div class="leiste">
 		<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}>Abbrechen</button>

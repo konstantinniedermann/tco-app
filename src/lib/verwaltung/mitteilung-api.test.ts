@@ -10,6 +10,7 @@ import {
 	auswahlText,
 	gleicheWerte,
 	ladeMitteilungen,
+	empfaengerText,
 	rueckfrageText,
 	sendeMitteilung,
 	vorschauZeilen,
@@ -228,6 +229,24 @@ describe('Mitteilungen in der Verwaltung: Texte', () => {
 	it('FR-42: Rückfrage und Zahlen nach dem Senden', () => {
 		expect(rueckfrageText(37)).toBe('Jetzt an 37 Mitglieder senden?');
 		expect(rueckfrageText(1)).toBe('Jetzt an 1 Mitglied senden?');
+	});
+
+	it('Spec A7: Rückfrage nennt die Empfänger der gesendeten Werte in Worten', () => {
+		const kategorien = [
+			{ id: 9, name: 'Herren R7–R9' },
+			{ id: 10, name: 'Mixed Doppel' }
+		];
+		expect(empfaengerText({ ...WERTE, auswahl: 'angemeldet', kategorieId: 9 }, kategorien)).toBe(
+			'An: Angemeldet · Herren R7–R9'
+		);
+		expect(empfaengerText({ ...WERTE, auswahl: 'berechtigt' }, kategorien)).toBe(
+			'An: Spielberechtigt, noch nicht angemeldet · alle Kategorien'
+		);
+		expect(empfaengerText({ ...WERTE, auswahl: 'kommt' })).toBe('An: Kommen');
+		expect(empfaengerText({ ...WERTE, auswahl: 'rolle-lizenz' })).toBe(
+			'An: Alle mit Rolle Lizenz-Admin'
+		);
+		expect(empfaengerText({ ...WERTE, auswahl: 'alle' })).toBe('An: Alle aktiven Mitglieder');
 		expect(zahlenText({ push: 12, mails: 25, ersatzMails: 0, nichtErreichbar: 0 })).toBe(
 			'12 per Push, 25 per E-Mail'
 		);
