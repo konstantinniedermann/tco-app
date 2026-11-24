@@ -574,3 +574,34 @@ test('Spec A1: MyTCO-Admin sieht auf der Turnierseite nur den Verlauf', async ({
 	await expect(page.getByRole('button', { name: 'Neue Mitteilung' })).toHaveCount(0);
 	expect(fehler).toEqual([]);
 });
+
+// Das Turnierformular nimmt nur Jahre bis 2100; jedes Projekt hat sein festes Jahr (wie
+// turnier.test.ts, dort 2097–2099), damit parallele Läufe sich nicht in die Quere kommen.
+const FORMULARJAHR: Record<string, number> = { iphone: 2096, android: 2095, desktop: 2094 };
+
+test('Spec A5: Vorlage nennt nach «Angaben speichern» den neuen Anmeldeschluss', async ({
+	page
+}, info) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	const festesJahr = FORMULARJAHR[info.project.name];
+	if (!festesJahr) throw new Error(`Kein Formularjahr für das Projekt ${info.project.name}`);
+	const { turnierId, jahr } = await legeOffenesTurnierAn([HERREN], festesJahr);
+	const cm = await legeCmMitBriefCodeAn('Dario');
+	await oeffneVerwaltungDirekt(
+		page,
+		cm,
+		`/verwaltung/turniere/${turnierId}`,
+		`Clubmeisterschaft ${jahr}`
+	);
+
+	// Den Anmeldeschluss vom 31. Mai auf den 15. Juni verschieben; gesendet wird nichts.
+	await page.getByLabel('Anmeldeschluss').fill(`${jahr}-06-15`);
+	await page.getByRole('button', { name: 'Angaben speichern' }).click();
+	await expect(page.getByText('Gespeichert', { exact: true })).toBeVisible();
+
+	await page.getByRole('button', { name: 'Neue Mitteilung' }).click();
+	await neu(page).getByRole('button', { name: 'Erinnerung', exact: true }).click();
+	await expect(neu(page).getByLabel('Text')).toHaveValue(/Anmeldung bis \S+, 15\. Juni\./);
+	expect(fehler).toEqual([]);
+});

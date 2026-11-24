@@ -41,7 +41,7 @@
 	let rueckmeldung = $state<string | null>(null);
 	let statusMeldung = $state<string | null>(null);
 	let laeuft = $state(false);
-	// Mitteilungen (Spec A1): nach dem Senden lädt die Seite den Verlauf neu.
+	// Mitteilungen (Spec A1): nach dem Senden und mit dem Turnier lädt die Seite sie neu.
 	let mitteilungen = $derived(data.mitteilungen);
 
 	async function verlaufNeuLaden() {
@@ -67,9 +67,14 @@
 		'nicht-gefunden': 'Dieses Turnier gibt es nicht mehr.'
 	} as const;
 
+	// Die Vorlagen der Mitteilungen nennen Angaben des Turniers (Anmeldeschluss); darum beides neu.
 	async function neuLaden() {
-		const neu = await ladeTurnier(detail.id);
+		const [neu, m] = await Promise.all([
+			ladeTurnier(detail.id),
+			ladeMitteilungen({ art: 'turnier', turnierId: detail.id })
+		]);
 		if (neu.art === 'ok') detail = neu.daten;
+		if (m.art === 'ok') mitteilungen = m.daten;
 		return neu.art === 'ok';
 	}
 
