@@ -614,3 +614,15 @@ Formulierung im Leitbild auf Angaben und Rollen einschränken.
 **Ursprung:** Schlussprüfung #95/#97, 24.11.2026.
 
 **Einschätzung:** Legende um die zweite Bedeutung ergänzen oder für «Gerät offen» eine eigene Kennzeichnung nehmen.
+
+### 2026-11-24 — Eine Kategorie nur für nicht lizenzierte Clubspieler lässt sich nicht anlegen
+
+**Thema:** Code
+
+**Fundort:** `src/lib/turnier/passung.ts` (`passtEinzel`), FR-34 in `docs/fachmodell.md`
+
+**Beobachtung:** Laut Projektleiter (24.11.2026) gibt es Kategorien für nicht lizenzierte Clubspieler, die sich untereinander messen. Im Einzel ist der Klassierungsbereich Pflicht; «keine Klassierung» passt nur, wenn der Bereich bei R9 endet, und dann passen auch R9-Spieler. Eine Kategorie, in die nur Spieler ohne Lizenz passen, gibt es nicht. Die Mitteilungen zur CM (#97) rechnen mit derselben Passung und erben die Lücke.
+
+**Ursprung:** Rückmeldung des Projektleiters beim Wrap-up #95/#97.
+
+**Einschätzung:** Fachlogik (Kategorie-Regel und Anmeldung), kein Trivial-Fix; zusammen mit den Kategorien der CM 2027 klären (K-25.1). Bei «spielberechtigt ohne Kategorie» zählen Mitglieder ohne Angaben bewusst mit (Entscheid 06.11., am 24.11. bestätigt).
