@@ -120,27 +120,3 @@ Letzte Auswertung: 24.11.2026
 ---
 
 ## Offen
-
-### 2026-11-21 — Beispielkategorien im Seed haben feste Jahrgangsgrenzen für 2027
-
-**Thema:** Tests
-
-**Fundort:** `scripts/beispiel-turnier.ts` (`KATEGORIEN`: «Junioren U18» ab 2009, «Senioren 45+» bis
-1982, «Seniorinnen 40+» bis 1987), `scripts/beispiel-turnier-fuellung.ts` (`EINZEL` mit festen
-Jahrgängen, `erzeugeSpieler`, `plane`).
-
-**Beobachtung:** Legt `beispielJahr` ab dem 1.6.2027 die CM 2028 an, stimmen Namen und Grenzen der
-Kategorien um ein Jahr nicht mehr; die Anmeldungen gelingen, weil die Füllspieler dieselben festen
-Jahrgänge haben. Rest des Eintrags zur Beispiel-GV (die GV selbst wandert seit c610f6f mit dem
-Seed-Datum).
-
-**Ursprung:** Beobachtungs-Auswertung vom 21.11.2026 (Nachtrag), nicht mitgemacht am 24.11.2026.
-
-**Einschätzung:** Nur die Grenzen relativ zu machen bricht den Seed: `plane` wirft «Plan passt
-nicht», sobald ein Füllspieler mit festem Jahrgang nicht mehr in seine Kategorie passt. Grenzen und
-Jahrgänge der Füllspieler gehören darum zusammen relativ zum Jahr; rund eine halbe Stunde mit Test.
-Spätestens, bevor die Demo-CM 2028 (ab 1.6.2027) jemandem gezeigt wird.
-
-**Verifiziert:** 24.11.2026 gegen dev 13a1cac — belegt (`scripts/beispiel-turnier.ts` → `KATEGORIEN`,
-`scripts/beispiel-turnier-fuellung.ts` → `erzeugeSpieler` «bei jedem Aufruf gleich», `plane` →
-`fehler('Plan passt nicht …')`). Offen ist nur, wann es gemacht wird.
