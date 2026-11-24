@@ -19,6 +19,8 @@ const VERBOTENE_WOERTER = ['npm', 'npx', 'node', 'cache', 'artifact'];
 // Das Tor vor der Auslieferung: `bauen` läuft parallel zu den Prüfungen, also muss
 // `ausliefern` selbst auf jede warten (`needs`) und ihr Ergebnis im `if` verlangen; das `if`
 // beginnt mit `!cancelled()`, ein übersprungener Vorgänger hielte den Job sonst nicht auf.
+// Grenze: Geprüft wird, dass jede Ergebnisprüfung im `if` steht (ohne Kommentare), nicht die
+// Logik drumherum (`always() || …` fiele nicht auf) und nicht die Prüf-Jobs selbst.
 const TOR_JOBS = ['doku', 'pruefen', 'e2e', 'malware', 'image'];
 
 type Zeile = { einzug: number; text: string };
@@ -97,9 +99,9 @@ function pruefeTor(koerper: Zeile[]): string[] {
 	const ifStart = koerper.findIndex((k) => k.einzug === 4 && /^if:/.test(k.text));
 	let bedingung = '';
 	if (ifStart >= 0) {
-		const teile = [koerper[ifStart].text];
+		const teile = [ohneKommentar(koerper[ifStart].text)];
 		for (let i = ifStart + 1; i < koerper.length && koerper[i].einzug > 4; i++) {
-			teile.push(koerper[i].text);
+			teile.push(ohneKommentar(koerper[i].text));
 		}
 		bedingung = teile.join(' ');
 	}

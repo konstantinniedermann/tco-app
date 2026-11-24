@@ -152,6 +152,13 @@ describe('pruefeWorkflow', () => {
 		const befunde = pruefeWorkflow(W, workflow([imEnv]));
 		expect(befunde).toContain(`${W}: Job ausliefern: prüft das Ergebnis von e2e nicht`);
 	});
+	it('zählt eine Ergebnisprüfung im Kommentar des if nicht', () => {
+		const imKommentar = AUSLIEFERN.replace(
+			TOR_IF,
+			`    if: \${{ !cancelled() && needs.bauen.result == 'success' }} # ${TOR.map((j) => `needs.${j}.result == 'success'`).join(' ')}`
+		);
+		expect(pruefeWorkflow(W, workflow([imKommentar]))).toHaveLength(TOR.length);
+	});
 	it('verlangt das Tor nur in check.yml', () => {
 		const ohneTor = `  ausliefern:\n${perm('packages: read')}\n    steps:\n      - run: ssh host`;
 		expect(pruefeWorkflow('.github/workflows/anderes.yml', workflow([ohneTor]))).toHaveLength(1);

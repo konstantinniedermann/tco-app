@@ -295,8 +295,7 @@ jobs:
 
   # Baut parallel zu den Prüfungen, damit die Auslieferung nicht nach den Tests noch auf den Bau
   # wartet. Das Tor liegt in `ausliefern`: Das Image eines roten Stands bleibt in der Ablage,
-  # wird aber nie ausgeliefert, bekommt kein Kennzeichen `code-…` und fällt beim Aufräumen nach
-  # der nächsten Auslieferung weg.
+  # wird aber nie ausgeliefert und bekommt kein Kennzeichen `code-…`.
   bauen:
     name: Bauen (Image nach GHCR, für Test)
     needs: aenderung
@@ -406,7 +405,8 @@ jobs:
   # scripts/pruefungen/workflow-rechte.ts). Ausgabe ausschliesslich `ok` oder `fehler`.
   ausliefern:
     name: Ausliefern (SSH an den Türsteher)
-    # Das Tor: wartet auf jede Prüfung und verlangt ihr Ergebnis (workflow-rechte.ts erzwingt beides).
+    # Das Tor: wartet auf jede Prüfung und verlangt ihr Ergebnis (workflow-rechte.ts prüft, dass
+    # beides dasteht).
     needs: [bauen, finden, doku, pruefen, e2e, malware, image]
     if: >-
       ${{ !cancelled() && (needs.bauen.result == 'success' || needs.finden.result == 'success')
