@@ -121,6 +121,18 @@ Letzte Auswertung: 24.11.2026
 
 ## Offen
 
+### 2026-11-24 — `npm ci` kostet jeden CI-Job rund 50 Sekunden
+
+**Thema:** Code
+
+**Fundort:** `.github/workflows/check.yml` (Schritt `npm ci --ignore-scripts` in `pruefen`, `e2e` und weiteren Jobs)
+
+**Beobachtung:** Seit die E2E-Tests in zwölf Teilen laufen, ist der Vorlauf jedes Jobs der grösste Posten bis Test: `npm ci` braucht 45–52 s, obwohl `setup-node` den npm-Cache schon mitbringt (B: Schrittzeiten von Lauf 45491470229). Der längste E2E-Teil und `pruefen` enden etwa gleichzeitig (4:03 bzw. 4:07); ein Aufteilen von `pruefen` brächte darum nur Sekunden.
+
+**Ursprung:** CI-Beschleunigung `chore/ci-shards` (Wartezeit bis Test 11:11 → 5:20).
+
+**Einschätzung:** Ein Zwischenspeicher für `node_modules` (Schlüssel aus `package-lock.json` und Node-Version) könnte jeden Job um rund 40 s kürzen. Vorher klären: Gefahr eines vergifteten Speichers aus einem Branch (GitHub trennt Caches nach Branch, `dev` und `main` lesen nur eigene), Grösse des Speichers, und ob `npm ci` dann noch die Integrität prüft.
+
 ### 2026-11-24 — Die Container-Ablage auf GitHub räumt niemand auf
 
 **Thema:** Code
