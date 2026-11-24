@@ -61,20 +61,20 @@ dev: voraussetzungen-env db ## Entwicklungsserver starten (mit Datenbank, Einste
 dev-handy: voraussetzungen-env db ## Entwicklungsserver fürs iPhone im selben WLAN mit einem festen Namen je Rolle (Kurt, Theo, Mona, Hanna) (macOS, nur im eigenen WLAN; Login per Code, ohne Passkey)
 	./scripts/dev-handy.sh
 
-seed: voraussetzungen-env db ## Lokale Datenbank migrieren und Testbestand anlegen (mehrfach ausführbar): 5 Personas mit Login und Brief-Code, rund 200 erfundene Mitglieder, eine Beispiel-GV, ein Clubabend, Interclub-Resultate 2026 und ein Beispielturnier mit 10 Kategorien (nächste CM mit offener Anmeldung, Schluss 31.05.) zu je 10–16 Anmeldungen (86 erfundene Spieler mit Login ohne Brief-Code, Hanna als Kontaktperson, drei Beispielgespräche mit der Turnierleitung), Brief-Codes ausgeben für Erika (MyTCO-Admin und Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin) (Einstellungen aus .env)
+seed: voraussetzungen voraussetzungen-env db ## Lokale Datenbank migrieren und Testbestand anlegen (mehrfach ausführbar): 5 Personas mit Login und Brief-Code, rund 200 erfundene Mitglieder, eine Beispiel-GV, ein Clubabend, Interclub-Resultate 2026 und ein Beispielturnier mit 10 Kategorien (nächste CM mit offener Anmeldung, Schluss 31.05.) zu je 10–16 Anmeldungen (86 erfundene Spieler mit Login ohne Brief-Code, Hanna als Kontaktperson, drei Beispielgespräche mit der Turnierleitung), Brief-Codes ausgeben für Erika (MyTCO-Admin und Mitglieder-Admin), Kurt (Mitglied), Hanna Muster (CM-Admin), Mona Vorlage (nur Mitglieder-Admin) und Theo Platzhalter (nur MyTCO-Admin) (Einstellungen aus .env)
 	node --env-file=.env scripts/migrate.ts
 	node --env-file=.env scripts/seed-lokal.ts
 
 ic-import: voraussetzungen-env db ## Interclub-Resultate von Swiss Tennis holen, z. B. make ic-import JAHR=2026 (Verein aus IC_VEREIN, Vorgabe 2202; .env wird geladen)
 	JAHR=$(JAHR) node --env-file=.env scripts/ic-import.ts
 
-admin: voraussetzungen-env db ## Ersten Admin festlegen, z. B. make admin ARGS='--mitgliedernummer 1 --vorname … --nachname … --strasse … --plz … --ort … --email …'
+admin: voraussetzungen voraussetzungen-env db ## Ersten Admin festlegen, z. B. make admin ARGS='--mitgliedernummer 1 --vorname … --nachname … --strasse … --plz … --ort … --email …'
 	node --env-file=.env scripts/admin-festlegen.ts $(ARGS)
 
 test: db ## Einheits- und Datenbanktests mit Abdeckung
 	npm test
 
-e2e: db ## Ende-zu-Ende-Tests (Playwright auf eigener, danach gelöschter Datenbank; freier Port ausser E2E_PORT ist gesetzt)
+e2e: voraussetzungen db ## Ende-zu-Ende-Tests (Playwright auf eigener, danach gelöschter Datenbank; freier Port ausser E2E_PORT ist gesetzt)
 	@port="$${E2E_PORT:-}"; \
 	[ -n "$$port" ] || port=$$(node -e "const s=require('node:net').createServer();s.listen(0,()=>{console.log(s.address().port);s.close()})"); \
 	echo "E2E auf Port $$port"; \
