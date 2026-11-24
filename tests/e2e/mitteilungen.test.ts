@@ -1,14 +1,17 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { formatiereBriefCode } from '../../src/lib/server/login/codes.ts';
+import type { KategorieWerte } from '../../src/lib/server/turnier/angaben.ts';
 import {
+	bestaetigeVerwaltungDirekt,
 	legeCmMitBriefCodeAn,
 	legeKontoAn,
 	legeRollenkontoMitBriefCodeAn,
 	schliesseLoginHilfen
 } from './hilfen/login.ts';
 import { legeOffenenAnlassAn, meldeZumAnlass } from './hilfen/anlass.ts';
-import { holeMailCode } from './hilfen/mail.ts';
+import { holeMailCode, warteAufMail } from './hilfen/mail.ts';
+import { legeOffenesTurnierAn, meldeZurCmAn, setzeSpielerangaben } from './hilfen/turnier.ts';
 import {
 	klappeAuf,
 	pruefeBildschirm,
@@ -233,10 +236,11 @@ test('FR-42: allgemeine Mitteilung an den Verein', async ({ page }, info) => {
 	await oeffneVerwaltung(page, admin);
 	await oeffneMitteilungen(page);
 
-	// Ohne Vorlage gleich das leere Formular; Empfänger ohne Wahl.
+	// Ohne Vorlage gleich das leere Formular; Empfänger alle oder eine Rolle (Spec B11).
 	await page.getByRole('button', { name: 'Neue Mitteilung' }).click();
 	await expect(neu(page).getByLabel('Titel')).toBeFocused();
-	await expect(page.getByText('Empfänger: Alle aktiven Mitglieder')).toBeVisible();
+	await expect(neu(page).getByLabel('Alle aktiven Mitglieder')).toBeChecked();
+	await expect(neu(page).getByLabel('Alle mit Rolle CM-Admin')).not.toBeChecked();
 	await expect(neu(page).getByLabel('Kommen', { exact: true })).toHaveCount(0);
 	await neu(page).getByLabel('Titel').fill('Clubhaus offen');
 	await neu(page).getByLabel('Text').fill('Ab Samstag ist das Clubhaus wieder offen.');
@@ -366,5 +370,134 @@ test('FR-42: CM-Admin sieht keinen Bereich Mitteilungen', async ({ page }, info)
 	await expect(page.getByRole('heading', { level: 1, name: 'Clubmeisterschaft' })).toBeVisible();
 	await expect(seitenleiste(page).getByRole('link', { name: 'Mitteilungen' })).toHaveCount(0);
 	await pruefeBildschirm(page, info, 'mitteilung-cm-ohne-bereich');
+	expect(fehler).toEqual([]);
+});
+
+/** Meldet mit dem Brief-Code an und bestätigt die Verwaltung direkt, ohne Mail-Code (Budget pro IP). */
+async function oeffneVerwaltungDirekt(page: Page, konto: Konto, ziel: string, titel: string) {
+	await meldeAn(page, konto);
+	await bestaetigeVerwaltungDirekt(konto.kontoId);
+	await page.goto(ziel);
+	await expect(page.getByRole('heading', { level: 1, name: titel })).toBeVisible();
+}
+
+const HERREN: KategorieWerte = {
+	name: 'Herren R7–R9',
+	geschlecht: 'herren',
+	art: 'einzel',
+	jahrgangVon: null,
+	jahrgangBis: null,
+	klassierungVon: 'R7',
+	klassierungBis: 'R9',
+	mindestsumme: null
+};
+
+/** Erfundener Spieler R8, zur Kategorie `kategorieId` angemeldet. */
+async function angemeldeterSpieler(vorname: string, kategorieId: number) {
+	const spieler = await legeKontoAn(vorname, `Probe${randomUUID().slice(0, 6)}`);
+	await setzeSpielerangaben(spieler.mitgliedId, {
+		geschlecht: 'm',
+		jahrgang: 1988,
+		klassierung: 'R8'
+	});
+	await meldeZurCmAn(kategorieId, spieler.mitgliedId);
+	return spieler;
+}
+
+test('Spec A6: CM-Admin schickt Mitteilung an die Angemeldeten einer Kategorie', async ({
+	page
+}, info) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	// Eigenes Turnier mit eigener Kategorie: Die Mails gehen nur an die zwei eigenen Spieler.
+	const {
+		turnierId,
+		jahr,
+		kategorieIds: [kategorieId]
+	} = await legeOffenesTurnierAn([HERREN]);
+	const spieler = await angemeldeterSpieler('Kurt', kategorieId);
+	await angemeldeterSpieler('Kilian', kategorieId);
+	const cm = await legeCmMitBriefCodeAn('Dario');
+	await oeffneVerwaltungDirekt(
+		page,
+		cm,
+		`/verwaltung/turniere/${turnierId}`,
+		`Clubmeisterschaft ${jahr}`
+	);
+
+	await expect(page.getByRole('heading', { level: 2, name: 'Mitteilungen' })).toBeVisible();
+	await expect(page.getByText('Noch keine Mitteilungen verschickt.')).toBeVisible();
+	await page.getByRole('button', { name: 'Neue Mitteilung' }).click();
+	await neu(page).getByRole('button', { name: 'Erinnerung', exact: true }).click();
+
+	// Die Erinnerung geht vorgewählt an alle, die spielen dürften und noch nicht angemeldet sind.
+	const betreff = `Erinnerung: Clubmeisterschaft ${jahr}`;
+	await expect(neu(page).getByLabel('Titel')).toHaveValue(betreff);
+	await expect(neu(page).getByLabel('Spielberechtigt, noch nicht angemeldet')).toBeChecked();
+	const kategorie = neu(page).getByLabel('Kategorie', { exact: true });
+	await expect(kategorie).toHaveValue('');
+	await neu(page).getByLabel('Angemeldet', { exact: true }).check();
+	await kategorie.selectOption({ label: HERREN.name });
+
+	await neu(page).getByRole('button', { name: 'Vorschau' }).click();
+	await expect(page.getByText('2 Mitglieder: 0 per Push, 2 per E-Mail')).toBeVisible();
+	await expect(sendenTaste(page)).toBeEnabled();
+	await pruefeBildschirm(page, info, 'mitteilung-turnier-vorschau');
+
+	// Eine andere Kategorie verwirft die Vorschau.
+	await kategorie.selectOption({ label: 'Alle Kategorien' });
+	await expect(page.getByText('2 Mitglieder:')).toHaveCount(0);
+	await expect(sendenTaste(page)).toBeDisabled();
+	await kategorie.selectOption({ label: HERREN.name });
+	await neu(page).getByRole('button', { name: 'Vorschau' }).click();
+	await expect(page.getByText('2 Mitglieder: 0 per Push, 2 per E-Mail')).toBeVisible();
+
+	await sendenTaste(page).click();
+	await page
+		.getByRole('dialog', { name: 'Jetzt an 2 Mitglieder senden?' })
+		.getByRole('button', { name: 'Senden' })
+		.click();
+	await expect(page.getByText('Gesendet: 0 per Push, 2 per E-Mail.')).toBeVisible();
+	const zeile = page
+		.getByRole('region', { name: 'Verschickte Mitteilungen' })
+		.getByRole('row')
+		.filter({ hasText: betreff });
+	await expect(zeile).toContainText(`Angemeldet · ${HERREN.name}`);
+	await expect(zeile).toContainText('0 per Push, 2 per E-Mail');
+
+	// Spec A4: Der Link führt auf die Seite dieses Turniers.
+	await warteAufMail(spieler.email, betreff, `/clubmeisterschaft/${turnierId}`);
+	expect(fehler).toEqual([]);
+});
+
+test('Spec B11: Mitglieder-Admin schickt an eine Rolle (nur Push)', async ({ page }, info) => {
+	test.setTimeout(90_000);
+	const fehler = sammleKonsolenfehler(page);
+	// Mindestens ein Lizenz-Admin; nur Push, damit keine Mail an Konten paralleler Tests geht.
+	await legeRollenkontoMitBriefCodeAn('Lara', ['lizenz']);
+	const admin = await legeRollenkontoMitBriefCodeAn('Mona', ['mitglieder']);
+	await oeffneVerwaltungDirekt(page, admin, '/verwaltung/mitteilungen', 'Mitteilungen');
+
+	const titel = `Sitzung ${randomUUID().slice(0, 8)}`;
+	await page.getByRole('button', { name: 'Neue Mitteilung' }).click();
+	await neu(page).getByLabel('Titel').fill(titel);
+	await neu(page).getByLabel('Text').fill('Die Sitzung der Lizenz-Admins ist am Montag.');
+	await neu(page).getByLabel('Alle mit Rolle Lizenz-Admin').check();
+	await neu(page).getByLabel('Nur Push').check();
+	await neu(page).getByRole('button', { name: 'Vorschau' }).click();
+	const zahl = neu(page).getByText(/^\d+ Mitglied(er)?:/);
+	await expect(zahl).toBeVisible();
+	expect(Number(/^(\d+)/.exec((await zahl.textContent()) ?? '')?.[1])).toBeGreaterThanOrEqual(1);
+	await pruefeBildschirm(page, info, 'mitteilung-rolle-vorschau');
+
+	await sendenTaste(page).click();
+	await page.getByRole('dialog').getByRole('button', { name: 'Senden' }).click();
+	await expect(page.getByText(/^Gesendet: /)).toBeVisible();
+	const zeile = page
+		.getByRole('region', { name: 'Verschickte Mitteilungen' })
+		.getByRole('row')
+		.filter({ hasText: titel });
+	await expect(zeile).toContainText('Alle mit Rolle Lizenz-Admin');
+	await expect(zeile).toContainText('Nur Push');
 	expect(fehler).toEqual([]);
 });

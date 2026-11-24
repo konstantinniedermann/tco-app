@@ -25,10 +25,13 @@
 	<h1>Mitteilungen</h1>
 </Seitenkopf>
 <Seiteninfo>
-	<p>Allgemeine Mitteilungen an alle aktiven Mitglieder, per Push oder E-Mail.</p>
 	<p>
-		An einen Teil der Mitglieder (z. B. wer noch nicht geantwortet hat) geht eine Mitteilung über
-		die Seite eines Anlasses.
+		Allgemeine Mitteilungen an alle aktiven Mitglieder oder an alle mit einer Rolle, per Push oder
+		E-Mail.
+	</p>
+	<p>
+		An einen Teil der Mitglieder geht eine Mitteilung über die Seite eines Anlasses oder, für die
+		Clubmeisterschaft, über die Seite des Turniers.
 	</p>
 </Seiteninfo>
 

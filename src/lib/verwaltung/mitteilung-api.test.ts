@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { TURNIER_AUSWAHLEN, VEREIN_AUSWAHLEN } from '../mitteilung/auswahl.ts';
 import { FELD_MELDUNG } from '../mitteilung/vorlagen.ts';
 import {
 	AUSWAHL_NAMEN,
+	TURNIER_NAMEN,
+	VEREIN_NAMEN,
 	WEG_NAMEN,
 	WEGE,
 	auswahlText,
@@ -20,7 +23,15 @@ const WERTE: MitteilungWerte = {
 	titel: 'Erinnerung: GV',
 	text: 'Bitte melde dich an.',
 	auswahl: 'keine-antwort',
-	weg: 'push-sonst-mail'
+	weg: 'push-sonst-mail',
+	kategorieId: null
+};
+// Ohne Kategorie: so geht der Körper an Anlass und Verein.
+const KOERPER = {
+	titel: WERTE.titel,
+	text: WERTE.text,
+	auswahl: WERTE.auswahl,
+	weg: WERTE.weg
 };
 
 describe('Mitteilungen in der Verwaltung: Anfragen', () => {
@@ -70,7 +81,45 @@ describe('Mitteilungen in der Verwaltung: Anfragen', () => {
 		]);
 		expect(v.init.method).toBe('POST');
 		expect(new Headers(v.init.headers).get('content-type')).toBe('application/json');
-		expect(JSON.parse(String(s.init.body))).toEqual(WERTE);
+		expect(JSON.parse(String(s.init.body))).toEqual(KOERPER);
+	});
+
+	it('Spec A6: Turnier liest und schickt an seine Schnittstelle, mit der Kategorie im Körper', async () => {
+		const daten = { vorlagen: [], verlauf: [], kategorien: [] };
+		const lesen = holer(json(200, daten));
+		expect(await ladeMitteilungen({ art: 'turnier', turnierId: 4 }, lesen.holen)).toEqual({
+			art: 'ok',
+			daten
+		});
+		const werte = { ...WERTE, auswahl: 'angemeldet', kategorieId: 9 };
+		const vorschau = holer(
+			json(200, { anzahl: 0, push: 0, mails: 0, nichtErreichbar: 0, namen: [] })
+		);
+		await zeigeVorschau({ art: 'turnier', turnierId: 4 }, werte, vorschau.holen);
+		const senden = holer(json(201, { push: 0, mails: 0, ersatzMails: 0, nichtErreichbar: 0 }));
+		await sendeMitteilung(
+			{ art: 'turnier', turnierId: 4 },
+			{ ...werte, kategorieId: null },
+			senden.holen
+		);
+		expect([lesen.aufrufe[0].pfad, vorschau.aufrufe[0].pfad, senden.aufrufe[0].pfad]).toEqual([
+			'/api/admin/turniere/4/mitteilungen',
+			'/api/admin/turniere/4/mitteilungen/vorschau',
+			'/api/admin/turniere/4/mitteilungen/senden'
+		]);
+		expect(JSON.parse(String(vorschau.aufrufe[0].init.body))).toEqual(werte);
+		expect(JSON.parse(String(senden.aufrufe[0].init.body))).toEqual({
+			...werte,
+			kategorieId: null
+		});
+	});
+
+	it('Spec A6: Anlass und Verein bekommen keine Kategorie mit', async () => {
+		const anlass = holer(
+			json(200, { anzahl: 0, push: 0, mails: 0, nichtErreichbar: 0, namen: [] })
+		);
+		await zeigeVorschau({ art: 'anlass', anlassId: 7 }, { ...WERTE, kategorieId: 9 }, anlass.holen);
+		expect(JSON.parse(String(anlass.aufrufe[0].init.body))).toEqual(KOERPER);
 	});
 
 	it('FR-42: Eingabefehler kommen je Feld als Satz an, andere Antworten unverändert', async () => {
@@ -124,6 +173,33 @@ describe('Mitteilungen in der Verwaltung: Texte', () => {
 		expect(auswahlText('unbekannt')).toBe('unbekannt');
 	});
 
+	it('Spec A7, B13: Auswahl zum Turnier mit Kategorie, an eine Rolle mit ihrem Namen', () => {
+		expect(auswahlText('angemeldet', 'Damen R7–R9')).toBe('Angemeldet · Damen R7–R9');
+		expect(auswahlText('berechtigt', null)).toBe(
+			'Spielberechtigt, noch nicht angemeldet · alle Kategorien'
+		);
+		expect(auswahlText('sucht-partner')).toBe('Doppel: sucht Partner · alle Kategorien');
+		expect(auswahlText('alle')).toBe('Alle aktiven Mitglieder');
+		expect(auswahlText('rolle-cm')).toBe('Alle mit Rolle CM-Admin');
+		expect(auswahlText('rolle-mytco')).toBe('Alle mit Rolle MyTCO-Admin');
+		expect(auswahlText('rolle-mitglieder')).toBe('Alle mit Rolle Mitglieder-Admin');
+		expect(auswahlText('rolle-lizenz')).toBe('Alle mit Rolle Lizenz-Admin');
+		expect(auswahlText('kommt')).toBe('Kommen');
+		expect(TURNIER_AUSWAHLEN.map((a) => TURNIER_NAMEN[a])).toEqual([
+			'Alle aktiven Mitglieder',
+			'Angemeldet',
+			'Spielberechtigt, noch nicht angemeldet',
+			'Doppel: sucht Partner'
+		]);
+		expect(VEREIN_AUSWAHLEN.map((a) => VEREIN_NAMEN[a])).toEqual([
+			'Alle aktiven Mitglieder',
+			'Alle mit Rolle MyTCO-Admin',
+			'Alle mit Rolle Mitglieder-Admin',
+			'Alle mit Rolle CM-Admin',
+			'Alle mit Rolle Lizenz-Admin'
+		]);
+	});
+
 	it('FR-43: Vorschau nennt Zahl, Push und E-Mail; nicht erreichbar nur, wenn es welche gibt', () => {
 		const v = { anzahl: 37, push: 12, mails: 25, nichtErreichbar: 0 };
 		expect(vorschauZeilen(v, 'push-sonst-mail')).toEqual([
@@ -162,12 +238,14 @@ describe('Mitteilungen in der Verwaltung: Texte', () => {
 });
 
 describe('Mitteilungen in der Verwaltung: Vorschau gilt nur für ihre Werte', () => {
-	it('FR-43: jede Abweichung in Titel, Text, Auswahl oder Weg macht die Vorschau ungültig', () => {
+	it('FR-43: jede Abweichung in Titel, Text, Auswahl, Kategorie oder Weg macht die Vorschau ungültig', () => {
 		expect(gleicheWerte(WERTE, { ...WERTE })).toBe(true);
 		expect(gleicheWerte(WERTE, { ...WERTE, titel: 'Erinnerung: GV!' })).toBe(false);
 		expect(gleicheWerte(WERTE, { ...WERTE, text: 'Bitte melde dich an' })).toBe(false);
 		expect(gleicheWerte(WERTE, { ...WERTE, auswahl: 'kommt' })).toBe(false);
 		expect(gleicheWerte(WERTE, { ...WERTE, weg: 'push' })).toBe(false);
+		expect(gleicheWerte(WERTE, { ...WERTE, kategorieId: 3 })).toBe(false);
+		expect(gleicheWerte({ ...WERTE, kategorieId: 3 }, { ...WERTE, kategorieId: 3 })).toBe(true);
 		expect(gleicheWerte(null, WERTE)).toBe(false);
 	});
 });

@@ -36,7 +36,7 @@
 								><strong>{e.titel}</strong> {e.text}</span
 							></td
 						>
-						<td>{auswahlText(e.auswahl)}</td>
+						<td>{auswahlText(e.auswahl, e.kategorie)}</td>
 						<td>{WEG_NAMEN[e.weg]}</td>
 						<td>{zahlenText(e)}</td>
 					</tr>
