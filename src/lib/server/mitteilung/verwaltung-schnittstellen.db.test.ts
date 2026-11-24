@@ -19,6 +19,7 @@ import type { Mailer } from '../login/dienst.ts';
 import { erstelleSitzung, pruefeSitzung, type AngemeldetesKonto } from '../login/sitzung.ts';
 import type { KategorieWerte } from '../turnier/angaben.ts';
 import {
+	aendereKategorie,
 	legeKategorieAn,
 	legeTurnierAn,
 	sageKategorieAb,
@@ -663,6 +664,10 @@ describe('Schnittstellen für Mitteilungen zum Turnier und an Rollen (Verwaltung
 		});
 		const absage = await sageKategorieAb(db(), abgesagt);
 		expect(absage).toMatchObject({ ergebnis: 'ok' });
+		// Umbenannt: Die Zeile liegt danach hinter den anderen, die Reihenfolge kommt aus der Nummer.
+		expect(
+			await aendereKategorie(db(), t.einzel, { name: 'Herren R1–R4', ...EINZEL }, false)
+		).toMatchObject({ ergebnis: 'ok' });
 		const r = await getTurnierMitteilungen(s.d, hole(cm.konto, t.params));
 		expect(r.status).toBe(200);
 		expect(r.headers.get('cache-control')).toBe('no-store');
@@ -670,7 +675,7 @@ describe('Schnittstellen für Mitteilungen zum Turnier und an Rollen (Verwaltung
 			vorlagen: vorlagenTurnier({ jahr: t.jahr, anmeldeschluss: t.anmeldeschluss }),
 			verlauf: [],
 			kategorien: [
-				{ id: t.einzel, name: 'Herren R1–R5', art: 'einzel' },
+				{ id: t.einzel, name: 'Herren R1–R4', art: 'einzel' },
 				{ id: t.doppel, name: 'Herren Doppel', art: 'doppel' },
 				{ id: zweitesDoppel, name: 'Herren Doppel R6', art: 'doppel' }
 			]
