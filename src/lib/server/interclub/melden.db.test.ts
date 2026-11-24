@@ -168,22 +168,26 @@ async function bericht(saison: number, teamId: number, begegnungId: number) {
 const gemeldet = async () => (await e.db.select().from(icGemeldet)).map((g) => g.begegnungId);
 
 describe('meldeEndstaende', () => {
-	test('neuer Endstand mit Bericht: ein Push an das folgende Konto', ZEIT_EIGENE_DB, async () => {
-		const k = await neuesKonto();
-		const id = await spiel({ heim: 'Olten 1', gast: 'Villmergen' });
-		expect(await meldeEndstaende(dienste())).toBe(1);
-		expect(gesendet).toEqual([
-			{
-				endpunkt: k.endpunkt,
-				nutzlast: {
-					titel: 'Interclub',
-					text: '2L Herren 1: Olten 1 – Villmergen 8:1',
-					link: `https://mytco.example/interclub/1/${id}`
+	test(
+		'A-INTERCLUB-02: neuer Endstand mit Bericht: ein Push an das folgende Konto',
+		ZEIT_EIGENE_DB,
+		async () => {
+			const k = await neuesKonto();
+			const id = await spiel({ heim: 'Olten 1', gast: 'Villmergen' });
+			expect(await meldeEndstaende(dienste())).toBe(1);
+			expect(gesendet).toEqual([
+				{
+					endpunkt: k.endpunkt,
+					nutzlast: {
+						titel: 'Interclub',
+						text: '2L Herren 1: Olten 1 – Villmergen 8:1',
+						link: `https://mytco.example/interclub/1/${id}`
+					}
 				}
-			}
-		]);
-		expect(await gemeldet()).toEqual([id]);
-	});
+			]);
+			expect(await gemeldet()).toEqual([id]);
+		}
+	);
 
 	test(
 		'Endstand ohne Bericht: nichts; nach Bericht im nächsten Lauf gemeldet',

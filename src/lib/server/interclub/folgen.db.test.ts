@@ -154,7 +154,7 @@ describe('Interclub-Teams folgen', () => {
 	);
 
 	test(
-		'ladeAlleGefolgtenTeams: Liga der neuesten Saison je Team, unbekannte Teams sichtbar',
+		'ladeAlleGefolgtenTeams: Liga der neuesten Saison je Team und seit wann, unbekannte Teams sichtbar',
 		ZEIT_EIGENE_DB,
 		async () => {
 			const k = await neuesKonto(true);
@@ -164,10 +164,10 @@ describe('Interclub-Teams folgen', () => {
 			expect(alle).toHaveLength(4);
 			expect(alle).toEqual(
 				expect.arrayContaining([
-					{ teamId: 9, liga: 'Nur 2026' },
-					{ teamId: 1, liga: '2L Herren 1' },
-					{ teamId: 2, liga: '1L Damen' },
-					{ teamId: 777, liga: 'Team 777' }
+					{ teamId: 9, liga: 'Nur 2026', seit: JETZT },
+					{ teamId: 1, liga: '2L Herren 1', seit: JETZT },
+					{ teamId: 2, liga: '1L Damen', seit: JETZT },
+					{ teamId: 777, liga: 'Team 777', seit: JETZT }
 				])
 			);
 			expect(await ladeAlleGefolgtenTeams(e.db, await neuesKonto(false))).toEqual([]);

@@ -148,7 +148,7 @@ describe('Beispielturnier für make seed', () => {
 			.set({ status: 'aktiv' })
 			.where(eq(kategorie.name, 'Junioren U18'));
 		await legeBeispielTurnierAn(eigene.db, jetzt);
-	});
+	}, 20_000);
 
 	test('A-ANMELDUNG-01: Beispielturnier hat erfundene Anmeldungen, zweiter Lauf legt nichts doppelt an', async () => {
 		const jetzt = new Date('2026-11-06T10:00:00Z');

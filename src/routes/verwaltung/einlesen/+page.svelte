@@ -123,7 +123,7 @@
 {#if angelegt !== null}
 	<div class="karte" role="status">
 		<p><strong>{anzahlText(angelegt)} angelegt.</strong></p>
-		<p>Die Briefe mit dem Anmeldecode erzeugst du auf der Seite Briefe.</p>
+		<p>Die Briefe mit dem Brief-Code erzeugst du auf der Seite Briefe.</p>
 		<p><a href={resolve('/verwaltung/briefe')}>Zu den Briefen</a></p>
 	</div>
 {/if}
@@ -242,7 +242,7 @@
 {#if darfEinlesen && vorschau}
 	<dialog class="karte" bind:this={rueckfrage} aria-labelledby="einlesen-titel">
 		<h2 id="einlesen-titel">{anzahlText(vorschau.neu.length)} anlegen?</h2>
-		<p>Briefe mit dem Anmeldecode erzeugst du danach auf der Seite Briefe.</p>
+		<p>Briefe mit dem Brief-Code erzeugst du danach auf der Seite Briefe.</p>
 		<div class="leiste">
 			<button type="button" class="taste-neben" onclick={() => rueckfrage?.close()}
 				>Abbrechen</button

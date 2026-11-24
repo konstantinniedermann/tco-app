@@ -9,7 +9,15 @@ import type { Db } from '../src/lib/server/db/index.ts';
 import { speichereMitteilung } from '../src/lib/server/mitteilung/verlauf.ts';
 import { anlass, mitglied, type Antwort } from '../src/lib/server/db/schema.ts';
 
-const TITEL = 'Generalversammlung 2027';
+/**
+ * Das Jahr der nächsten GV, auf die man noch antworten kann: das laufende bis zu ihrem
+ * Anmeldeschluss (16.03., Zürich), danach das nächste. Mit einem festen Jahr nähme `melde` nach
+ * dem Schluss still jede Antwort als `geschlossen`.
+ */
+export function gvJahr(jetzt: Date): number {
+	const jahr = Number(utcZuZuerich(jetzt).slice(0, 4));
+	return jetzt < zuerichZuUtc(`${jahr}-03-16T23:59`)! ? jahr : jahr + 1;
+}
 
 const EINLADUNG = [
 	'Liebe Mitglieder, wir laden euch herzlich zur Generalversammlung ein.',
@@ -108,21 +116,26 @@ export async function meldeBeispielAntworten(
 	}
 }
 
-/** Legt die Beispiel-GV an und gibt ihre ID; gibt es sie schon (gleicher Titel), passiert nichts. */
+/**
+ * Legt die Beispiel-GV des Jahres `gvJahr` an und gibt ihre ID; gibt es sie schon (gleicher Titel
+ * mit Jahr), passiert nichts.
+ */
 export async function legeBeispielAnlassAn(
 	db: Db,
 	erstelltVon: number,
 	jetzt: Date
 ): Promise<number> {
+	const jahr = gvJahr(jetzt);
+	const titel = `Generalversammlung ${jahr}`;
 	const [vorhanden] = await db
 		.select({ id: anlass.id })
 		.from(anlass)
-		.where(eq(anlass.titel, TITEL));
+		.where(eq(anlass.titel, titel));
 	if (vorhanden) return vorhanden.id;
-	const beginn = zuerichZuUtc('2027-03-19T19:30')!;
-	const anmeldeschluss = zuerichZuUtc('2027-03-16T23:59')!;
+	const beginn = zuerichZuUtc(`${jahr}-03-19T19:30`)!;
+	const anmeldeschluss = zuerichZuUtc(`${jahr}-03-16T23:59`)!;
 	const id = await legeAnlassAn(db, erstelltVon, {
-		titel: TITEL,
+		titel,
 		beginn,
 		ort: 'Clubhaus, Musterweg 1, Olten',
 		einladung: EINLADUNG,
@@ -134,7 +147,7 @@ export async function legeBeispielAnlassAn(
 	}
 	await erfundenesMitglied(db, OHNE_ANTWORT.vorname, OHNE_ANTWORT.nachname);
 	// Eine erfundene Erinnerung im Verlauf (nur Zahlen, nie Empfängernamen); verschickt wird nichts.
-	const erinnerung = vorlagenAnlass({ titel: TITEL, beginn, anmeldeschluss })[0];
+	const erinnerung = vorlagenAnlass({ titel, beginn, anmeldeschluss })[0];
 	await speichereMitteilung(
 		db,
 		{ art: 'anlass', anlassId: id },

@@ -193,7 +193,7 @@ describe('ladeAuskunft (DS-07)', () => {
 		expect((await ladeAuskunft(db, o.mitgliedId, jetzt))!.rufname).toBeNull();
 	});
 
-	test('Auskunft nennt gefolgte Interclub-Teams mit Liga', async () => {
+	test('Auskunft nennt gefolgte Interclub-Teams mit Liga und seit wann', async () => {
 		const m = await legeMitgliedAn(db, {});
 		expect((await ladeAuskunft(db, m.mitgliedId, jetzt))!.interclubTeams).toEqual([]);
 		await db.insert(icTeam).values([
@@ -223,8 +223,8 @@ describe('ladeAuskunft (DS-07)', () => {
 		const a = await ladeAuskunft(db, m.mitgliedId, jetzt);
 		expect(a!.interclubTeams).toEqual(
 			expect.arrayContaining([
-				{ teamId: 9001, liga: '2L Herren' },
-				{ teamId: 9999, liga: 'Team 9999' }
+				{ teamId: 9001, liga: '2L Herren', seit: jetzt },
+				{ teamId: 9999, liga: 'Team 9999', seit: jetzt }
 			])
 		);
 		expect(a!.interclubTeams).toHaveLength(2);

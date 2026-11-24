@@ -58,11 +58,16 @@
 		const a = await aendereAnlass(detail.id, werte);
 		if (await leiteUm(a)) return;
 		if (a.art === 'ok') {
-			const neu = await ladeAnlassAdmin(detail.id);
+			// Die Vorlagen der Mitteilungen nennen Titel, Beginn und Anmeldeschluss: beides neu laden.
+			const [neu, m] = await Promise.all([
+				ladeAnlassAdmin(detail.id),
+				ladeMitteilungen({ art: 'anlass', anlassId: detail.id })
+			]);
 			if (neu.art === 'ok') {
 				detail = neu.daten;
 				schluessel++;
 			}
+			if (m.art === 'ok') mitteilungen = m.daten;
 			rueckmeldung = 'Gespeichert';
 		} else if (a.art === 'eingabe') {
 			fehler = a.felder;

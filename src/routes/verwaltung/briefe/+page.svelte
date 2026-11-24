@@ -175,11 +175,11 @@
 	</Seitenkopf>
 	<Seiteninfo>
 		<p>
-			Der erste Brief mit Anmeldecode, für Mitglieder, die MyTCO noch nie geöffnet haben; ein neuer
+			Der erste Brief mit Brief-Code, für Mitglieder, die MyTCO noch nie geöffnet haben; ein neuer
 			Code ersetzt den alten.
 		</p>
 		<p>
-			<strong>Nicht für verlorene Zugänge:</strong> Wer sich nicht mehr anmelden kann, holt sich beim
+			<strong>Nicht für verlorene Zugänge:</strong> Wer sich nicht mehr einloggen kann, holt sich beim
 			Login selbst einen «Code per E-Mail».
 		</p>
 	</Seiteninfo>

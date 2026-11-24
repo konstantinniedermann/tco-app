@@ -25,7 +25,7 @@ test.afterAll(async () => {
 
 const reiterleiste = (page: Page) => page.getByRole('navigation', { name: 'Hauptnavigation' });
 
-test('#81: Mitglied sieht den Reiter IC, die Übersicht und die Team-Seite mit Tabelle', async ({
+test('#81, A-INTERCLUB-01: Mitglied sieht den Reiter IC, die Übersicht und die Team-Seite mit Tabelle', async ({
 	page,
 	isMobile
 }, info) => {
@@ -280,7 +280,7 @@ test('#81: ohne Push zeigt die Teamseite «Mit Push kannst du diesem Team folgen
 	expect(fehler).toEqual([]);
 });
 
-test('#81: mit Push folgt der Schalter dem Team, das Profil listet es, Abwählen im Profil entfolgt', async ({
+test('#81, A-INTERCLUB-02: mit Push folgt der Schalter dem Team, das Profil listet es, Abwählen im Profil entfolgt', async ({
 	page,
 	isMobile
 }, info) => {

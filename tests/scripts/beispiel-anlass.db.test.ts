@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { legeBeispielAnlassAn } from '../../scripts/beispiel-anlass.ts';
 import { anlass, anlassAnmeldung, mitteilung } from '../../src/lib/server/db/schema.ts';
@@ -49,5 +50,22 @@ describe('Beispiel-GV für make seed', () => {
 			push: 1,
 			mails: 1
 		});
+	});
+
+	test('A-ANLASS-01: Nach dem Anmeldeschluss der GV legt der Seed die GV des nächsten Jahres an, mit Antworten', async () => {
+		const { mitgliedId } = await legeMitgliedAn(eigene.db);
+		const jetzt = new Date('2027-03-17T10:00:00Z');
+		const id = await legeBeispielAnlassAn(eigene.db, mitgliedId, jetzt);
+		const [gv] = await eigene.db.select().from(anlass).where(eq(anlass.id, id));
+		expect(gv).toMatchObject({
+			titel: 'Generalversammlung 2028',
+			beginn: new Date('2028-03-19T18:30:00Z'),
+			anmeldeschluss: new Date('2028-03-16T22:59:00Z')
+		});
+		const antworten = await eigene.db
+			.select()
+			.from(anlassAnmeldung)
+			.where(eq(anlassAnmeldung.anlassId, id));
+		expect(antworten).toHaveLength(4);
 	});
 });

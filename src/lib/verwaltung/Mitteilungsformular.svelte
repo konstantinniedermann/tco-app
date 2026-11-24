@@ -301,6 +301,9 @@
 					<p class="fehler" id="fehler-mitteilung-auswahl">{fehler.auswahl}</p>
 				{/if}
 			</fieldset>
+			<p class="leise" id="mitteilung-themen">
+				Wer diese Mitteilungen im Profil abgeschaltet hat, bekommt sie nicht.
+			</p>
 			{#if zumTurnier && auswahl !== 'alle'}
 				<div class="feld-zeile">
 					<label for="mitteilung-kategorie">Kategorie</label>
@@ -321,9 +324,6 @@
 					{/if}
 				</div>
 			{/if}
-			<p class="leise" id="mitteilung-themen">
-				Wer diese Mitteilungen im Profil abgeschaltet hat, bekommt sie nicht.
-			</p>
 			<fieldset
 				class="auswahl-gruppe"
 				disabled={laeuft === 'senden'}

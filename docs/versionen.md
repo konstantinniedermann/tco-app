@@ -19,6 +19,13 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 - Werkzeug: `make test-pruefung` prüft vor dem Release den echten Test-Server (Fusszeile, Login,
   Verwaltung, Zeitgeber, Interclub-Abruf); die Checkliste vor dem Release ist nach Prüfart und
   Gerät geordnet. An der App ändert sich nichts.
+- Verwaltung: Nach «Angaben speichern» eines Anlasses nennen die Vorlagen der Mitteilungen gleich
+  den neuen Titel und die neuen Daten. «Spielberechtigt» erreicht bei einem Turnier ohne aktive
+  Kategorie niemanden mehr. Die Auskunft nennt bei gefolgten Interclub-Teams «seit wann». Briefe
+  und Einlesen sagen «Brief-Code» statt «Anmeldecode». Datenschutzerklärung zu Interclub und
+  Browser präzisiert (Beobachtungs-Auswertung vom 24.11.2026).
+- Werkzeug: `make seed` legt die Beispiel-GV im passenden Jahr an; `make seed`, `make admin` und
+  `make e2e` brechen bei falscher Node-Version ab.
 
 ## 0.24.0 — Interclub mit Push, Tabellen am PC, Rollen auf einer Seite
 
