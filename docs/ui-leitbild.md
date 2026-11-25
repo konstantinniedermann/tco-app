@@ -53,8 +53,8 @@ Farbkonzept (N-DESIGN-01). Von der öffentlichen Website übernommen: das Wappen
 Vereinslogos), das Petrol `#095d5d` und das Lindgrün `#cde3b9`. Die Website nutzt die Schrift
 Poppins; MyTCO nimmt die Systemschrift (siehe [Schrift](#schrift-und-systemschriftgrösse)).
 
-- **Annahme K-13:** Vereinslogo von tcolten.ch als App-Symbol, Freigabe des Vereins steht aus
-  (Frage K-13 in den [Abklärungen](abklaerungen.md)).
+- Das Vereinslogo von tcolten.ch darf MyTCO als App-Symbol verwenden (K-13). Das Wappen in
+  `static/` ist dieselbe Zeichnung wie im Logo der Website (Bildvergleich vom 25.11.2026).
 - **Annahme K-13.2:** Farbkonzept Variante C (eigenes Grün + Sandplatz-Rot) als Abgrenzung von
   tcolten.ch. Das Petrol der Website ist dafür im Farbton Richtung Rasengrün verschoben.
 

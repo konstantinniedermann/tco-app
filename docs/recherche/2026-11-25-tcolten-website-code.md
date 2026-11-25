@@ -50,9 +50,32 @@ Es ist kein Baukasten und kein WordPress: Wer die Website betreut, braucht PHP u
 | Neue Zugangsdaten für Auslieferung und Datenbank | trägt der Website-Betreuer im GitLab-Projekt ein | belegt |
 | Adresse der Schnittstelle | im Code fest auf `https://tcolten.ch` gesetzt; bleibt beim Umzug gleich, eine Probe unter einer anderen Adresse braucht eine Anpassung | belegt |
 
-**Vermutung:** Die Website passt auf ein gewöhnliches Webhosting-Paket bei Infomaniak, ohne
-Umbau. Auf dem Server von MyTCO liefe sie nur mit einem eigenen PHP-Container und einer
-eigenen Datenbank ([ADR-003](../adr/adr-003-hosting-infomaniak-vps.md)).
+### Geprüft: Ist der Umzug machbar?
+
+Ja, auf ein gewöhnliches Webhosting-Paket bei Infomaniak. Die Seiten selbst laufen dort
+unverändert; anpassen muss der Website-Betreuer drei Stellen der Auslieferung:
+
+| Was sich ändert | Warum | Markierung |
+|-----------------|-------|------------|
+| Der Schritt, der beim Bauen den Aufbau der Tabellen aus der Datenbank liest | Bei Infomaniak ist die Datenbank eines Webhosting-Pakets von aussen nicht erreichbar. Der Aufbau muss neu im Code liegen oder auf dem Server gelesen werden | belegt (Code, Hilfe-Seiten Infomaniak) |
+| Die Zielordner beim Hochladen | Die Kette lädt in die Ordner von Metanet; die Datei mit den Zugangsdaten muss eine Ebene über dem Web-Ordner liegen. Bei Infomaniak heissen die Ordner anders | belegt (Code); Ordner bei Infomaniak: Vermutung |
+| Zugangsdaten für Hochladen und Datenbank | neue Werte im GitLab-Projekt | belegt |
+
+Dazu zwei Punkte zum Prüfen beim Einrichten:
+
+- Die Seiten holen ihre Inhalte über die eigene Adresse `https://tcolten.ch`. Das Hosting muss
+  PHP solche Abrufe erlauben (**Vermutung:** bei Infomaniak einstellbar).
+- Eine Probe unter einer anderen Adresse zeigt ohne Anpassung die Inhalte der alten Website,
+  weil die Adresse im Code fest steht (belegt).
+
+Infomaniak nimmt Dateien per FTP und SFTP an (belegt). Auf dem Server von MyTCO liefe die
+Website nur mit einem eigenen PHP-Container und einer eigenen Datenbank
+([ADR-003](../adr/adr-003-hosting-infomaniak-vps.md)); das Webhosting-Paket ist der einfachere
+Weg.
+
+**Was zum Umzug noch fehlt,** steht nicht im Code: der Abzug der Datenbank und der Zugang zu
+Metanet (K-09), die Postfächer und die Domain, und die Zusage des Website-Betreuers, die drei
+Stellen anzupassen oder die Auslieferung zu übergeben.
 
 Nicht aus dem Code zu beantworten: Kosten und Laufzeit des Pakets bei Metanet (K-09),
 Postfächer, Domain und DNS (K-10), wer die Website nach dem Umzug betreut.
@@ -65,8 +88,10 @@ Postfächer, Domain und DNS (K-10), wer die Website nach dem Umzug betreut.
   (belegt).
 - **Schrift:** Poppins, geladen von Google Fonts (belegt).
 
-Die Dateien sind damit greifbar. Ob MyTCO sie verwenden darf, entscheidet weiter der Verein;
-MyTCO bleibt bis dahin bei eigenem Grün und Systemschrift
+MyTCO darf Logo, Farben und Schrift verwenden (K-13.1, 25.11.2026). Ein Bildvergleich zeigt:
+Das Wappen in MyTCO ist dieselbe Zeichnung wie im Logo der Website, das helle Grün ist
+derselbe Wert. MyTCO braucht keine anderen Dateien. Beim eigenen Grün und der Systemschrift
+bleibt es, weil die Anforderung ein abgeändertes Farbkonzept verlangt
 ([UI-Leitbild](../ui-leitbild.md#herkunft-und-annahmen)).
 
 ## E-Mail (K-11)
