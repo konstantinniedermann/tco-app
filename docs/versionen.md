@@ -11,7 +11,8 @@ Versionsschema und Ablauf: [CI/CD und Release](ci-cd-und-release.md#versionen).
 
 ## Unveröffentlicht
 
-- Das Vereinslogo ist für MyTCO freigegeben (K-13). An der App ändert sich nichts.
+- Das Vereinslogo ist für MyTCO freigegeben, das Farbkonzept der Demo entschieden (K-13). An der
+  App ändert sich nichts.
 - Verwaltung: Der CM-Admin schickt auf der Seite des Turniers Mitteilungen an Angemeldete,
   Spielberechtigte oder Spieler, die einen Partner suchen, auch nur für eine Kategorie.
   Vereinsmitteilungen gehen auch an alle mit einer Rolle (#97, #95).

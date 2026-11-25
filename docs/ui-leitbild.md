@@ -55,10 +55,9 @@ Poppins; MyTCO nimmt die Systemschrift (siehe [Schrift](#schrift-und-systemschri
 
 - Das Vereinslogo von tcolten.ch darf MyTCO als App-Symbol verwenden (K-13). Das Wappen in
   `static/` ist dieselbe Zeichnung wie im Logo der Website (Bildvergleich vom 25.11.2026).
-- **Annahme K-13.2:** Farbkonzept Variante C (eigenes Grün + Sandplatz-Rot) als Abgrenzung von
-  tcolten.ch. Das Petrol der Website ist dafür im Farbton Richtung Rasengrün verschoben.
-
-Antwortet der Verein anders, ändern sich die Farbtabelle und die Symbol-Dateien; sonst nichts.
+- Farbkonzept Variante C (eigenes Grün + Sandplatz-Rot) als Abgrenzung von tcolten.ch,
+  entschieden am 25.11.2026 (K-13.2). Das Petrol der Website ist dafür im Farbton Richtung
+  Rasengrün verschoben.
 
 ## Farben
 
