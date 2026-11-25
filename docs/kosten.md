@@ -160,7 +160,7 @@ Ausserhalb des Takts löst eine Preiserhöhung beim VPS eine Überprüfung aus
 
 - **K-09.1:** Was kostet das heutige Paket des Vereins bei Metanet, und enthält es schon
   E-Mail-Postfächer?
-- **K-48:** Der Umzug der Website von Metanet zu Infomaniak ist bewilligt, samt den
+- **K-48.1:** Der Umzug der Website von Metanet zu Infomaniak ist bewilligt, samt den
   Postfächern. Offen sind, wer die Website danach betreut, und ob sie auf dem MyTCO-Server oder
   getrennt bei Infomaniak läuft; davon hängen ihre Kosten ab. Zieht die Website auf den MyTCO-Server, braucht es zusätzlich
   einen Nachtrag zu ADR-003 (eigener Container, getrennt von Datenbank und Netz von MyTCO) und
