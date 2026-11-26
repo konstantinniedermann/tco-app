@@ -25,7 +25,7 @@ services:
   # Fängt alle Mails ab, die die App lokal und in den E2E-Tests verschickt (SMTP 51025).
   # Ansehen unter http://localhost:58025; die E2E-Tests lesen die Codes über die API dort.
   mail:
-    image: axllent/mailpit:v1.33
+    image: axllent/mailpit:v1.34
     ports:
       - '127.0.0.1:51025:1025'
       - '127.0.0.1:58025:8025'
